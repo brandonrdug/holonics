@@ -9,7 +9,7 @@ import Mathlib.Tactic
 
 [definition] This owner states item **T2** of
 `docs/plans/THE_TUBE_CARRIES_RELEASE_THROUGH_NECKS_FOLDS_AND_JUNCTIONS.md`. Its Rust counterpart
-is `crates/holonic-engine/src/standing.rs`.
+is `crates/holonics/src/receiver/standing.rs`.
 
 **Memory belongs to standing.** *Standing* is a prior relation still available to present
 transport: the retained residue of the passages a lineage has undergone. A remembered face is

@@ -18,11 +18,10 @@ transport.
 
 ## Rust counterpart
 
-[definition] The paired executable owner is `crates/holonic-core/src/restriction/tower.rs` (the Holon
-core's restriction facet; `crates/holonic-engine/src/continuing_tower.rs` re-exports it). Its
-types carry the same names — `Tower`, `CompatibleSection`, `ObservationFibre`, `GluingResult`,
+[definition] The paired executable owner is `crates/holonics/src/holon/restriction/tower.rs` (the Holon's
+restriction facet). Its types carry the same names — `Tower`, `CompatibleSection`, `ObservationFibre`, `GluingResult`,
 `MaterializedFace`, `ComputableTower`, `Transition` — over exact arithmetic
-(`relational_geometry::Rat`, `num_bigint::BigInt`), with `restrict_refl` and `restrict_trans`
+(`holonics::ratio::Rat`, `num_bigint::BigInt`), with `restrict_refl` and `restrict_trans`
 returned as checked receipts rather than assumed, and with the `padicTower`, `shiftTower` and
 `coarseGrain` witnesses below mirrored as unit tests. Each Rust item names the declaration here that
 it realizes; the correspondence is bidirectional and is the deliverable.
@@ -64,7 +63,8 @@ it realizes; the correspondence is bidirectional and is the deliverable.
 
 [definition] `Foundation/GrainRestriction.lean` instantiates `Tower` and `Transition` at the grain
 axis `component ⊑ residue ⊑ atom` of a physical presentation, with
-`crates/holonic-engine/src/grain_tower.rs` as its executable owner. It adds no carrier machinery: it
+the retired `grain_tower.rs` ([history](https://github.com/brandonrdug/holonics/blob/13f8c734/crates/holonics-cuda/src/grain_tower.rs))
+as its executable owner. It adds no carrier machinery: it
 *uses* `restrictTransition`, `reopen_apply`, `laterReceiverFactors` and `residual_separates`, and it
 settles, against `Foundation/AperturedGradedComplex.lean`'s open class, that a residual and an
 undecided reading are two objects (`open_admission_is_not_a_residual`,
@@ -146,7 +146,7 @@ actually presented at index `i`; `restrict` is the only transport, and it is dir
 coarser. `restrict_refl` and `restrict_trans` are the two laws — no face is the object, and the
 object is exactly this family plus these laws.
 
-Rust counterpart: `crates/holonic-core/src/restriction/tower.rs::Tower`. -/
+Rust counterpart: `crates/holonics/src/holon/restriction/tower.rs::Tower`. -/
 structure Tower (Index : Type u) [Preorder Index] where
   /-- The face actually presented at one index. -/
   Face : Index → Type v
@@ -404,7 +404,7 @@ Outside the image of `apply`, `reopen` returns whatever the constructor supplies
 pairs `(apply x, residual x)` carry the law, in the same sense as
 `Foundation/Receiver.lean`'s `ReceiverTransformer` domain.
 
-Rust counterpart: `crates/holonic-core/src/restriction/tower.rs::Transition`. -/
+Rust counterpart: `crates/holonics/src/holon/restriction/tower.rs::Transition`. -/
 structure Transition (Source : Type u) (Target : Type v) where
   /-- The part of the source the transition does not transport. -/
   Residual : Type w
@@ -931,7 +931,7 @@ theorem theOrderFaceDoesNotDetermineTheModule :
   cosets of `ker (PadicInt.toZModPow (n+1))` inside the coset of `ker (PadicInt.toZModPow n)`.
   The count is `p ^ k` on the nose — an equality of `Nat.card`, not an asymptotic statement.
 
-Rust counterpart: `crates/holonic-core/src/restriction/tower.rs::{FibreSplitting,
+Rust counterpart: `crates/holonics/src/holon/restriction/tower.rs::{FibreSplitting,
 ResidueTower::split_fibre, ResidueTower::coset_count, ResidueTower::coset_count_bits}`.
 -/
 
@@ -1200,7 +1200,7 @@ history actually needs and the direction in which a saved object can be carried 
 Naturality is the whole content and is stated and proved below. Migrations compose, composition is
 associative, and the identity migration is a two-sided unit; all three hold by `rfl`.
 
-Rust counterpart: `crates/holonic-core/src/restriction/tower.rs::{Migration, ResidualMigration,
+Rust counterpart: `crates/holonics/src/holon/restriction/tower.rs::{Migration, ResidualMigration,
 check_migration_naturality, carry_section, ComposedMigration, IdentityMigration, HalvingMigration}`.
 -/
 

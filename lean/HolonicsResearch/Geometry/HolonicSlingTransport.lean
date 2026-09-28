@@ -1,4 +1,5 @@
 import Holonics.Geometry.AffineSwing
+import Holonics.Geometry.Motion
 import Holonics.Transport.HolonicComposition
 import Holonics.Physics.HolonicEntropyActionInduction
 import Mathlib.Data.Fintype.BigOperators
@@ -17,11 +18,13 @@ an ordered generator word with a complete addressed fibre.  Calling its current 
 exact membership in a declared receiver kernel; the source current remains in the reconstruction
 fibre.
 
-The final section proves the kinematic identity underlying an ideal gravity assist.  Equal
+The final section reads the kinematic identity underlying an ideal gravity assist.  Equal
 asymptotic speed in the moving pivot frame does not imply equal speed in the exterior frame: the
 exterior squared-speed difference is exactly the pivot velocity paired with the turned relative
-velocity difference.  The orbital law establishing equal relative speeds remains a separate
-source-specific constitutive theorem.
+velocity difference.  The sling law's owner is `Geometry/Motion.sling_energy_gain` (in a
+receiver's metric); the finite-coordinate form here is its unit-metric case, and
+`Motion.sling_speed_gain` its complex chart.  The orbital law establishing equal relative speeds
+remains a separate source-specific constitutive theorem.
 -/
 
 noncomputable section
@@ -240,9 +243,11 @@ def velocityPairing {Axis : Type*} [Fintype Axis]
     (left right : Axis → ℝ) : ℝ :=
   ∑ axis, left axis * right axis
 
+open Matrix in
 /-- If the incoming and outgoing velocities have equal squared speed in the moving pivot frame,
 then the exterior-frame squared-speed change is exactly twice the pivot velocity paired with the
-turned relative-velocity difference. -/
+turned relative-velocity difference.  The unit-metric case of the sling law's owner
+`Geometry/Motion.sling_energy_gain`. -/
 theorem gravityAssist_squaredSpeed_difference
     {Axis : Type*} [Fintype Axis]
     (pivot incomingRelative outgoingRelative : Axis → ℝ)
@@ -251,40 +256,16 @@ theorem gravityAssist_squaredSpeed_difference
     squaredSpeed (pivot + outgoingRelative) -
         squaredSpeed (pivot + incomingRelative) =
       2 * velocityPairing pivot (outgoingRelative - incomingRelative) := by
-  have hrelative :
-      (∑ axis, outgoingRelative axis ^ 2) =
-        ∑ axis, incomingRelative axis ^ 2 := by
-    simpa only [squaredSpeed] using relativeSpeedConserved
-  have hcross :
-      (∑ axis, 2 * pivot axis *
-        (outgoingRelative axis - incomingRelative axis)) =
-        2 * (∑ axis, pivot axis *
-          (outgoingRelative axis - incomingRelative axis)) := by
-    rw [Finset.mul_sum]
-    apply Finset.sum_congr rfl
-    intro axis _haxis
-    ring
-  unfold squaredSpeed velocityPairing
-  simp only [Pi.add_apply, Pi.sub_apply]
-  rw [← Finset.sum_sub_distrib]
-  calc
-    (∑ axis, ((pivot axis + outgoingRelative axis) ^ 2 -
-        (pivot axis + incomingRelative axis) ^ 2)) =
-      ∑ axis,
-        (2 * pivot axis * (outgoingRelative axis - incomingRelative axis) +
-          (outgoingRelative axis ^ 2 - incomingRelative axis ^ 2)) := by
-        apply Finset.sum_congr rfl
-        intro axis _haxis
-        ring
-    _ = 2 * (∑ axis, pivot axis *
-          (outgoingRelative axis - incomingRelative axis)) +
-        ((∑ axis, outgoingRelative axis ^ 2) -
-          ∑ axis, incomingRelative axis ^ 2) := by
-        rw [Finset.sum_add_distrib, Finset.sum_sub_distrib]
-        rw [hcross]
-    _ = 2 * (∑ axis, pivot axis *
-          (outgoingRelative axis - incomingRelative axis)) := by
-        rw [hrelative, sub_self, add_zero]
+  classical
+  have hsq : ∀ v : Axis → ℝ, squaredSpeed v = v ⬝ᵥ ((1 : Matrix Axis Axis ℝ) *ᵥ v) := fun v => by
+    simp only [squaredSpeed, Matrix.one_mulVec, dotProduct, sq]
+  have hpair : ∀ v w : Axis → ℝ,
+      velocityPairing v w = v ⬝ᵥ ((1 : Matrix Axis Axis ℝ) *ᵥ w) := fun v w => by
+    simp only [velocityPairing, Matrix.one_mulVec, dotProduct]
+  rw [hsq, hsq, hpair]
+  rw [hsq, hsq] at relativeSpeedConserved
+  exact Motion.sling_energy_gain Matrix.transpose_one pivot incomingRelative outgoingRelative
+    relativeSpeedConserved
 
 section Audit
 

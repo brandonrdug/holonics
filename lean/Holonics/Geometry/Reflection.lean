@@ -8,9 +8,11 @@ open Holonics.Geometry
 
 Integration by reflection had no Lean owner until this file — the tree's other reflections are
 the conjugate reflection of the seam, the half-turns of the swing, and reflected *positivity*,
-which are different objects.  The Rust owner is exact and is not rebuilt here:
-`crates/holonic-engine/src/diffusion.rs` computes the boundary transport (the Schur complement)
-over `Rat` with both inverse residuals retained and the killed share exhibited; the derivation
+which are different objects.  The Rust owner was exact and is not rebuilt here: the retired
+`diffusion.rs` ([history](https://github.com/brandonrdug/holonics/blob/13f8c734/crates/holonics-cuda/src/diffusion.rs))
+computed the boundary transport (the Schur complement) over `Rat` with both inverse residuals
+retained and the killed share exhibited (the live Kron/Schur reduction is
+`crates/holonics/src/holon/restriction.rs::KronReduction`); the derivation
 is the record *the interior is an integral over its boundary and the kernel is built by
 reflection* (2026-08-09).  What this file adds is the mechanism at kernel-checked grain, and —
 per Brandon's direction that the integration is a **diffusing transport chain** — its pairing

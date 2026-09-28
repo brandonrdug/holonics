@@ -20,7 +20,8 @@ deposited with C4 rather than beside them:
 
 ## Rust counterpart
 
-[definition] The paired executable owner is `crates/holonic-engine/src/grain_tower.rs`, which names
+[definition] The paired executable owner was `grain_tower.rs` (retired;
+[history](https://github.com/brandonrdug/holonics/blob/13f8c734/crates/holonics-cuda/src/grain_tower.rs)), which named
 this file and every declaration below. The correspondence, both directions:
 
 | Lean | Rust |
@@ -45,7 +46,8 @@ this file and every declaration below. The correspondence, both directions:
 
 ## The measured fact this states the law for
 
-[established-bounded; measured] `crates/holonic-life/examples/m5/cif.rs::REPRESENTATIVE` filters intake to `CA`
+[established-bounded; measured] The retired M5 intake `cif.rs::REPRESENTATIVE`
+([history](https://github.com/brandonrdug/holonics/blob/23982c5e/crates/holonic-life/examples/m5/cif.rs)) filtered intake to `CA`
 rows, so no atom-grain face is ever founded and the atom→residue restriction is asserted by the act
 of selection. Over the 70,632 residue pairs the M5 deed classified, at an equal 8 Å aperture in
 exact rational arithmetic, the alpha-carbon receiver returns 301 `Inside` where the complete
@@ -73,7 +75,7 @@ universe u v w
 
 /-- [definition] The grain axis of the carrier's index. `component` is coarsest and `atom` finest.
 
-Rust counterpart: `crates/holonic-engine/src/grain_tower.rs::Grain`. -/
+Retired Rust counterpart: `grain_tower.rs::Grain` ([history](https://github.com/brandonrdug/holonics/blob/13f8c734/crates/holonics-cuda/src/grain_tower.rs)). -/
 inductive Grain where
   /-- One presented chain, entity or component. -/
   | component
@@ -201,7 +203,8 @@ theorem fineAdmissible_of_fineInside {π : FineCell → CoarseCell}
   exact ⟨a, b, ha, hb, by rw [hab]; exact fun h => ContactClass.noConfusion h⟩
 
 /-- [definition] The **selection reading**: the coarse pair carries the class of one declared
-representative fine pair. This is the receiver `crates/holonic-life/examples/m5/cif.rs::REPRESENTATIVE` enacts
+representative fine pair. This is the receiver the retired M5 intake `cif.rs::REPRESENTATIVE`
+([history](https://github.com/brandonrdug/holonics/blob/23982c5e/crates/holonic-life/examples/m5/cif.rs)) enacted
 by discarding every non-`CA` row before anything is founded.
 
 Rust counterpart: `impl Transition for GrainSelection`'s `apply`. -/
@@ -267,8 +270,9 @@ restriction, and nothing in the tower's laws can detect the difference — only 
 the classification of its pairs, and the coarser face reads the finer one at each coarse cell's
 representative.
 
-Rust counterpart: `impl Tower for GrainTower` in `crates/holonic-engine/src/grain_tower.rs`, whose
-`restrict_refl`/`restrict_trans` are returned as a `RestrictionReceipt` by
+Retired Rust counterpart: `impl Tower for GrainTower` in `grain_tower.rs`
+([history](https://github.com/brandonrdug/holonics/blob/13f8c734/crates/holonics-cuda/src/grain_tower.rs)), whose
+`restrict_refl`/`restrict_trans` were returned as a `RestrictionReceipt` by
 `continuing_tower.rs::check_restriction_laws`. -/
 def selectionTower (Cell : Grain → Type w)
     (sel : ∀ {i j : Grain}, i ≤ j → Cell i → Cell j)
@@ -305,8 +309,9 @@ is the coarse reading, `residual` is the fine face the reading never looked at, 
 the coarse face exactly where the coarse face can speak — on pairs of representatives — and the
 residual everywhere else.
 
-Rust counterpart: `impl Transition for GrainSelection` in
-`crates/holonic-engine/src/grain_tower.rs`, with `check_grain_reopen` as the executable receipt. -/
+Retired Rust counterpart: `impl Transition for GrainSelection` in `grain_tower.rs`
+([history](https://github.com/brandonrdug/holonics/blob/13f8c734/crates/holonics-cuda/src/grain_tower.rs)), with
+`check_grain_reopen` as the executable receipt. -/
 def selectionTransition (π : FineCell → CoarseCell) (sel : CoarseCell → FineCell) :
     Transition (FineCell → FineCell → ContactClass) (CoarseCell → CoarseCell → ContactClass) where
   Residual := FineCell → FineCell → ContactClass
@@ -440,8 +445,8 @@ end Inflation
 lawful values; there is no fourth, no default and no inference from the data. A coarse reading with
 no declared relation is not a reading.
 
-Rust counterpart: `crates/holonic-engine/src/grain_tower.rs::ApertureRelation`, which has no
-`Default` and which `GrainTower::found` demands. -/
+Retired Rust counterpart: `grain_tower.rs::ApertureRelation` ([history](https://github.com/brandonrdug/holonics/blob/13f8c734/crates/holonics-cuda/src/grain_tower.rs)),
+which had no `Default` and which `GrainTower::found` demanded. -/
 inductive ApertureRelation (Scale : Type w) where
   /-- The coarse receiver runs at an inflated aperture that carries every fine contact, with the
   inflation exhibited. What it preserves is `inflated_carries_every_fine_contact`. -/
@@ -495,7 +500,8 @@ Both are content a coarse receiver fails to carry. They are not instances of one
 difference is stated here rather than asserted. -/
 
 /-- [definition] A family of returns indexed by a declaration that is **not** in the source. This is
-what `crates/holonic-engine/src/physical_constraint_grading.rs` returns for the open class:
+what the retired `physical_constraint_grading.rs` ([history](https://github.com/brandonrdug/holonics/blob/13f8c734/crates/holonics-cuda/src/physical_constraint_grading.rs))
+returned for the open class:
 `Resolution → GradedConstraintComplex`, never one complex. -/
 structure DeclaredFamily (Source Target Param : Type*) where
   /-- The return under one declaration. -/

@@ -12,9 +12,9 @@ those directions, carry literally the same subset of `X × Y`, hence the same do
 image and the same fibre over every point. Passing between them is a **rebase**: invertible,
 with no residual.
 
-This is the formal statement the resident owner needs.
-`crates/holonic-engine/src/native_ecology/constitutive_fibre/field/material_transport/normal/
-direct/wave/family/receiver.rs::NormalWaveFamily::read_prospective` carries a prospective future
+This is the formal statement the resident owner needed. The retired
+`NormalWaveFamily::read_prospective` ([history](https://github.com/brandonrdug/holonics/blob/13f8c734/crates/holonics-cuda/src/native_ecology/constitutive_fibre/field/material_transport/normal/direct/wave/family/receiver.rs))
+carried a prospective future
 in either of two charts — an expanded composite relation, or the retained ordered word applied to
 this family's own receiver point — and `kernels/exact_resident_section.cu::fibre_rebase_step`
 rescales one elimination row against its pivot before the products. Neither changes the relation;

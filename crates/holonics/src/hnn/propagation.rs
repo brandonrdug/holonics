@@ -82,7 +82,7 @@
 //!
 //! | Lean | Rust |
 //! |---|---|
-//! | `HNN/Propagation.anchor_is_participation`, `junctionSwing_involutive`, `junctionSwing_isometry`; `Geometry/AffineSwing.swing` | [`junction_scattering`], [`participation`], [`scattering_about`] |
+//! | `HNN/Propagation.anchor_is_participation`, `junctionScattering_involutive`, `junctionScattering_isometry`; `Geometry/AffineSwing.swing` | [`junction_scattering`], [`participation`], [`scattering_about`] |
 //! | `HNN/Word.reaction_stage_isometry`, `reaction_stage_balance`, `contrastPort_active`; `Holon/Cayley.drive_balance`; `HNN/LatticeWord.cayley_chart_energy` | [`element_step`] |
 //! | `HNN/Propagation.partialIsometry_transit`, `transit_balance`, `tick_well_defined` | [`transit`], [`transit_solve`], [`transit_update`], [`ContactOperands`] |
 //! | `HNN/Word.word_tick_balance`; `HNN/LatticeWord.{chart_energy_identity, feedback_tick}` | [`global_power`], [`TickBalance`] |
@@ -1185,7 +1185,7 @@ pub fn scattering_about(anchor: Vec<Rat>, storage: &[Rat], arrivals: &[&[Rat]]) 
 }
 
 /// **The junction's scattering** about the participation anchor (Lean
-/// `HNN/Propagation.{anchor_is_participation, junctionSwing_involutive, junctionSwing_isometry}`):
+/// `HNN/Propagation.{anchor_is_participation, junctionScattering_involutive, junctionScattering_isometry}`):
 /// the reflection `2P_D − I` onto the common-potential subspace, `W = diag(Y_r, G_a)`, under the
 /// exact law. It divides by its own positive admittance sum only.
 pub fn junction_scattering(

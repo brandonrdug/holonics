@@ -7,7 +7,8 @@ import Mathlib.Tactic
 **The recognition instrument, ported to kernel grain: the decision is sorting integers, and the
 anchors are `decide`-class — every classical row is computed by the test, never looked up.**
 
-The Rust owner is `crates/holonic-engine/src/hypergeometric_closure.rs`, and this file rebuilds
+The Rust owner was the retired `hypergeometric_closure.rs`
+([history](https://github.com/brandonrdug/holonics/blob/814157ad/crates/holonic-engine/src/hypergeometric_closure.rs)), and this file rebuilds
 its exact core rather than its report.  A second-order transport law on the plane with three
 turning sites carries three dials `a, b, c`; the local turn numbers are `λ = 1 − c` at zero,
 `μ = c − a − b` at one, `ν = a − b` at infinity.  Put the dials on a circle: the **numerator

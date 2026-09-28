@@ -52,7 +52,10 @@ digit tree  W_h = Σ_k π_k W_h^(w_k) = Σ_(k, S) π_k prior_(w_k)(S) ∏_(leave
    kernel each face's forward weight is its prior times its prequential likelihood, the product
    telescopes to `Σ_x π_x A_x(n)` and codes within `−log₂ π_x` of every face. Over two faces with the
    prior `(π, 1 − π)` the ratio opens at `π/(1 − π)` and steps by the faces' ratio; at `½` it is
-   Decision 30's `seqMix`; on the dyadic ladder the founding ratio is `2^j − 1`.
+   Decision 30's `seqMix`; on the dyadic ladder the founding ratio is `2^j − 1`. The static
+   posterior weight is Bayes' quotient rule of the prior by the prequential likelihoods
+   (`static_weight_eq_bayes`), whose one owner is
+   `Computation/HolonicAdjointNormalization.NormalizedExponential.bayes`.
 4. **The fixed share** (`shareKernel`, `switches`, `stays`, `share_prod`, `fixed_share`,
    `shareMap`, `share_ratio_step`, `share_log_lipschitz`): from `½/½` at the switching rate
    `α ∈ (0, 1)`, the mixture codes within `1 + k(−log₂ α) + (n − k)(−log₂(1 − α))` of every face
@@ -408,6 +411,22 @@ theorem static_mixture [DecidableEq ι] {π : ι → ℚ} {f : ι → ℕ → �
   rw [Real.logb_mul (by exact_mod_cast hx.ne') (by exact_mod_cast hA.ne')] at hb
   push_cast
   linarith
+
+/-- [proved-derived; formal-checked] **`static_weight_eq_bayes`: the static mixture's posterior
+weight is Bayes.** Under the identity kernel the posterior weight of face `x` after `n` cells is
+Bayes' quotient rule of the prior `π` by the prequential likelihoods `A_y(n) = ∏_(t<n) f_y(t)`,
+`v_n(x) = π_x A_x(n)/Σ_y π_y A_y(n)`: the rule's one owner
+`Computation/HolonicAdjointNormalization.NormalizedExponential.bayes`, read through the exact
+rational chart. -/
+theorem static_weight_eq_bayes [DecidableEq ι] [Nonempty ι] {π : ι → ℚ} {f : ι → ℕ → ℚ}
+    (hπ : IsPrior π) (hf : ∀ x t, 0 < f x t) (n : ℕ) (x : ι) :
+    ((fwdWeight π f idKernel n x : ℚ) : ℝ) =
+      Holonics.Computation.HolonicAdjointNormalization.NormalizedExponential.bayes
+        (fun y => (π y : ℝ)) (fun y => (seqLik (f y) n : ℝ)) x := by
+  rw [fwdWeight, Holonics.Computation.HolonicAdjointNormalization.NormalizedExponential.bayes]
+  simp only [(static_mixture hπ hf n).1]
+  push_cast
+  rfl
 
 end Forward
 
@@ -881,6 +900,7 @@ section Audit
 #print axioms forward_executed
 #print axioms idKernel_stochastic
 #print axioms static_mixture
+#print axioms static_weight_eq_bayes
 #print axioms boolPrior_isPrior
 #print axioms two_face_prior
 #print axioms shareKernel_stochastic

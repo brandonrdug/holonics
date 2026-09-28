@@ -76,7 +76,7 @@ import HolonicsResearch.Computation.HolonicCausalTailAperture
 import HolonicsResearch.Computation.HolonicPairCurrentTensorFace
 import Holonics.Computation.HolonicNeuralMorphologyContinuation
 import Holonics.Computation.HolonicExcitationFoundedQuotient
-import Holonics.Computation.HolonicCirculationSession
+import Holonics.Computation.HolonicCirculationPassage
 import HolonicsResearch.Algorithm.Transition
 import HolonicsResearch.Algorithm.Rebase
 import Holonics.Geometry.Telescoping

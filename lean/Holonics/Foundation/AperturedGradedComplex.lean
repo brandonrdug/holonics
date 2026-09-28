@@ -7,8 +7,9 @@ import Mathlib.Tactic.Abel
 /-!
 # An apertured graded complex, and what an undecided contact may do to it
 
-[definition] This owner states the law the Rust adapter
-`crates/holonic-engine/src/physical_constraint_grading.rs` implements: how an exact aperture
+[definition] This owner states the law the retired Rust adapter `physical_constraint_grading.rs`
+implemented ([history](https://github.com/brandonrdug/holonics/blob/13f8c734/crates/holonics-cuda/src/physical_constraint_grading.rs)):
+how an exact aperture
 classification whose third class is **undecided** becomes a graded chain complex without that third
 class being quietly turned into one of the other two.
 
@@ -371,8 +372,8 @@ class: the founded two-cells close on founded one-cells, and the boundary law ho
 chain. The second component does not mention the resolution — which is the precise sense in which
 the open class changes the complex and not its algebra.
 
-Rust owner: `crates/holonic-engine/src/physical_constraint_grading.rs`
-(`graded_constraint_family`, `graded_constraint_member`, `OpenContactLaw`). -/
+Retired Rust owner: `physical_constraint_grading.rs` ([history](https://github.com/brandonrdug/holonics/blob/13f8c734/crates/holonics-cuda/src/physical_constraint_grading.rs),
+`graded_constraint_family`, `graded_constraint_member`, `OpenContactLaw`). -/
 theorem adapter_contract :
     (∀ a b c : V, FaceStands polygonal contact klass r a b c →
         ∀ d ∈ (cellBoundary (ConstraintCell.face a b c)).support,
@@ -387,9 +388,9 @@ theorem adapter_contract :
 every pair of two **distinct** components; it cannot express a pair of one component, because at
 the diagonal the one-cell collapses. The **within-component** law reads the unordered pairs
 `i < j` of one component's own chain whose positions differ by at least a declared sequence
-separation `k`. Rust owner:
-`crates/holonic-engine/src/physical_constraint_complex.rs::found_within_component_contact_family`
-and `within_component_pair_count`.
+separation `k`. Retired Rust owner:
+`physical_constraint_complex.rs::found_within_component_contact_family` and
+`within_component_pair_count` ([history](https://github.com/brandonrdug/holonics/blob/13f8c734/crates/holonics-cuda/src/physical_constraint_complex.rs)).
 
 Chain positions are counted from zero here and from one in Rust; the population and its cardinality
 are the same set under `i ↦ i + 1`.
@@ -716,9 +717,9 @@ which is itself a cycle and is nonzero. The cycle module is therefore free of ra
 of the constraint complex has any of these one-cells in its boundary in this segment, so that
 module is `H₁`.
 
-Rust owner: the reading taken through
-`crates/holonic-engine/src/physical_constraint_grading.rs::graded_constraint_family` and
-`rebase_invariants`, measured by
+Retired Rust owner: the reading taken through
+`physical_constraint_grading.rs::graded_constraint_family` and `rebase_invariants`
+([history](https://github.com/brandonrdug/holonics/blob/13f8c734/crates/holonics-cuda/src/physical_constraint_grading.rs)), measured by
 `an_open_intra_chain_contact_is_the_difference_between_a_path_and_a_cycle`. -/
 theorem segment_cycles_are_multiples {i j : ℕ} (h : i + 2 ≤ j)
     (c : GradedChain (ConstraintCell ℕ)) (hsupport : c.support ⊆ loopEdges i j)

@@ -36,8 +36,8 @@ standing, and `W_c` is the learned contrast port.
    `P = (h/4)[Σ_r Y_r|s_r|² + Σ_(r,a) G_a|a_(r←a)|²] + Σ_a E_a`, one tick of junctions, elements and
    transits changes `P` by exactly
    `−h Σ_a ⟨ω_a, D_a ω_a⟩ + (h/2) Σ_r Y_r⟨x̄_r, W_s,r x̄_r⟩ + Π_c`,
-   `Π_c = (h/2) Σ_r Y_r ⟨x̄_r, W_c,r c_r⟩` (`word_tick_balance`): the junction Swing contributes
-   zero (`Propagation.junctionSwing_isometry`), the element and the transit their balances
+   `Π_c = (h/2) Σ_r Y_r ⟨x̄_r, W_c,r c_r⟩` (`word_tick_balance`): the junction scattering contributes
+   zero (`Propagation.junctionScattering_isometry`), the element and the transit their balances
    (`reaction_stage_balance`, `Propagation.transit_balance_waves`). One conductance per contact,
    read at both ends, is load-bearing: weights read per ring at the two ends of a transmitting
    contact do not conserve the power (`word_tick_balance_needs_one_conductance`).
@@ -50,7 +50,7 @@ standing, and `W_c` is the learned contrast port.
    hops of `Z` on the word's ring/contact block graph `blockAdj` (`word_tick_cone`).
 7. **The executed tick, every defect stated** (campaign 2, Lean item 8; Decision 24). A junction
    about any executed anchor moves the weighted power by `4W⟨v̂, v̂ − v*⟩`
-   (`junctionSwing_executed`); an element at any executed output adds its chart defect `⟨x̄, e⟩`
+   (`junctionScattering_executed`); an element at any executed output adds its chart defect `⟨x̄, e⟩`
    (`element_executed_balance`); a transit at any executed rate adds `⟨ω, M ω − r⟩`
    (`transit_executed_balance`). Summed, the field's power moves by the contacts' dissipation, the
    rings' passive work, `Π_c`, and the junction, element and transit defects, none set to zero
@@ -394,11 +394,11 @@ theorem sum_ends {M : Type*} [AddCommMonoid M] (f : Contact × Bool → M) :
   simp
 
 /-- [proved-derived; formal-checked] **The tick's global power balance** (R2 C1, R3 C1). One tick
-of junction Swings, ring elements and contact transits changes the field's power by exactly the
+of junction scatterings, ring elements and contact transits changes the field's power by exactly the
 contacts' dissipation, the passive element terms and the contrast ports' power:
 `P(t+1) = P(t) − h Σ_a ⟨ω_a, D_a ω_a⟩ + (h/2) Σ_r Y_r ⟨x̄_r, W_s,r x̄_r⟩ + Π_c`,
 `Π_c = (h/2) Σ_r Y_r ⟨x̄_r, W_c,r c_r⟩`. The junctions contribute zero
-(`Propagation.junctionSwing_isometry`), the elements their drive balances
+(`Propagation.junctionScattering_isometry`), the elements their drive balances
 (`reaction_stage_balance`), and the transits their two-port balances
 (`Propagation.transit_balance_waves`); each contact's single conductance `G_a` weights its waves at
 both of its ends. -/
@@ -435,7 +435,7 @@ theorem word_tick_balance (channel : (e : Contact × Bool) → Ch e.1 →L[ℝ] 
       ← Fintype.sum_fiberwise endRing (fun e => G e.1 * ‖arr e‖ ^ 2), ← Finset.sum_add_distrib,
       ← Finset.sum_add_distrib]
     refine Finset.sum_congr rfl fun r _ => ?_
-    have hr := junctionSwing_isometry (Y r) (fun p : Port endRing r => G p.1.1) (hsum r) (s r)
+    have hr := junctionScattering_isometry (Y r) (fun p : Port endRing r => G p.1.1) (hsum r) (s r)
       (portWave endRing arr r)
     simp only [norm_portOut, norm_portWave] at hr
     exact hr
@@ -558,7 +558,7 @@ def tickSlip (μ : Medium endRing V Ch ρ) (X : Change endRing V Ch) (a : Contac
     (ContinuousLinearMap.adjoint (μ.channel (a, true)) (endOut μ.Y μ.G X.s X.arr (a, true)))
     (ContinuousLinearMap.adjoint (μ.channel (a, false)) (endOut μ.Y μ.G X.s X.arr (a, false)))
 
-/-- [definition] **One tick of the word**: junction Swings, ring elements, contact transits. -/
+/-- [definition] **One tick of the word**: junction scatterings, ring elements, contact transits. -/
 def fieldTick (μ : Medium endRing V Ch ρ) (X : Change endRing V Ch) : Change endRing V Ch where
   s r := elementSolve μ r (storageWave μ.Y μ.G X.s X.arr r) (contrast μ.Y μ.G X.s X.arr r)
   arr := endArrive μ.channel μ.G (endOut μ.Y μ.G X.s X.arr) (tickSlip μ X)
@@ -729,11 +729,11 @@ end Tick
 
 section Executed
 
-/-- [proved-derived; formal-checked] **The junction Swing about an executed anchor.** For any anchor
-`v̂` (the carried anchor, split on its lattice), the `W`-weighted power of the swung waves moves by
-exactly `4W⟨v̂, v̂ − v*⟩`, `W = Y + Σ G` the admittance sum and `v*` the participation anchor: zero at
-the law's anchor (`junctionSwing_isometry`). -/
-theorem junctionSwing_executed {V : Type*} [NormedAddCommGroup V] [InnerProductSpace ℝ V]
+/-- [proved-derived; formal-checked] **The junction scattering about an executed anchor.** For any
+anchor `v̂` (the carried anchor, split on its lattice), the `W`-weighted power of the scattered waves
+moves by exactly `4W⟨v̂, v̂ − v*⟩`, `W = Y + Σ G` the admittance sum and `v*` the participation
+anchor: zero at the law's anchor (`junctionScattering_isometry`). -/
+theorem junctionScattering_executed {V : Type*} [NormedAddCommGroup V] [InnerProductSpace ℝ V]
     {ι : Type*} [Fintype ι] (Y : ℝ) (G : ι → ℝ) (hsum : admittanceSum Y G ≠ 0) (s : V)
     (a : ι → V) (v : V) :
     Y * ‖swing v s‖ ^ 2 + ∑ p, G p * ‖swing v (a p)‖ ^ 2 =
@@ -830,7 +830,7 @@ theorem norm_portWave_swing (v : (r : Ring) → V r) (arr : (e : Contact × Bool
 
 /-- [proved-derived; formal-checked] **The field's executed balance with every defect stated**
 (Decision 24's executed word; Sol's review §1, "Committed balance"). One executed tick: each ring's
-junction Swings about its **executed** anchor `v̂_r`, each element returns any executed output `ŝ′_r`
+junction scatterings about its **executed** anchor `v̂_r`, each element returns any executed output `ŝ′_r`
 (its chart's image), and each transit runs at any executed rate `ω̂_a`. Then the field's power
 `P = (h/4)[Σ Y_r|s_r|² + Σ G_a|a|²] + Σ E_a` moves by exactly
 
@@ -890,7 +890,7 @@ theorem field_executed_balance_with_defects
       ← Fintype.sum_fiberwise endRing (fun e => G e.1 * ‖arr e‖ ^ 2), Finset.mul_sum,
       ← Finset.sum_add_distrib, ← Finset.sum_add_distrib, ← Finset.sum_add_distrib]
     refine Finset.sum_congr rfl fun r _ => ?_
-    have hr := junctionSwing_executed (Y r) (fun p : Port endRing r => G p.1.1) (hsum r) (s r)
+    have hr := junctionScattering_executed (Y r) (fun p : Port endRing r => G p.1.1) (hsum r) (s r)
       (portWave endRing arr r) (v r)
     simp only [norm_portWave_swing, norm_portWave] at hr
     have hanchor : anchor (Y r) (fun p : Port endRing r => G p.1.1) (s r) (portWave endRing arr r) =
@@ -1014,7 +1014,7 @@ section Audit
 #print axioms fieldTick_balance
 #print axioms fieldTick_local
 #print axioms word_tick_cone
-#print axioms junctionSwing_executed
+#print axioms junctionScattering_executed
 #print axioms element_executed_balance
 #print axioms transit_executed_balance
 #print axioms field_executed_balance_with_defects

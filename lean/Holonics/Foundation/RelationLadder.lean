@@ -109,12 +109,14 @@ why the addressed form is the content and the relation is its truncation.
 
 ## Rust counterpart
 
-[definition] `crates/holonic-engine/src/relation_ladder.rs`, with the same names — `Rung`,
-`Rung::entails`, `rung_meet`, `Situation`, `classify`, `Classification`, `Separator`,
-`PotentialVerdict`, `Expression`, `eval`, `Enactment`, `musical_face`, `absolute_face` — every
-theorem below mirrored as a test, and the separator search bounded by a declared history-length
-ceiling with a typed refusal. "Not separated within the declared bound" is its own return there
-and is never reported as equal potential.
+[definition] `Rung`, `Rung::entails` and `rung_meet` live in `crates/holonics/src/receiver/face.rs`.
+The rest of the executable owner, `relation_ladder.rs`, is retired
+([history](https://github.com/brandonrdug/holonics/blob/814157ad/crates/holonic-engine/src/relation_ladder.rs)):
+`Situation`, `classify`, `Classification`, `Separator`, `PotentialVerdict`, `Expression`, `eval`,
+`Enactment`, `musical_face`, `absolute_face`, every theorem below mirrored as a test, and the
+separator search bounded by a declared history-length ceiling with a typed refusal. "Not
+separated within the declared bound" was its own return there and was never reported as equal
+potential.
 -/
 
 namespace Holonics.Foundation.RelationLadder

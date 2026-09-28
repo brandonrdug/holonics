@@ -6,7 +6,7 @@ import HolonicsResearch.Mathematics.Sturm
 /-! # Root counting: the gauge a sign-variation reading is blind to, and the squarefree part
 
 [definition] This owner states the two laws the Rust module
-`crates/holonic-engine/src/exact_value.rs::SturmChain` rests on, and closes the boundary
+`crates/holonics/src/ratio/algebraic.rs::SturmChain` rests on, and closes the boundary
 `HolonicsResearch.Mathematics.Sturm` names open.
 
 That module carries the classical instrument: a chart is a coefficient list, `remainderChain` is the
@@ -40,7 +40,7 @@ factor at every entry. So:
    hence `1` in `q`. The factorization is a *hypothesis*, and the theorem is therefore conditional
    on it; what discharges it is the Rust, which computes `g` and then takes an **exact** division
    that refuses a nonzero remainder by name. This is the law under
-   `crates/holonic-engine/src/rational_polynomial.rs`'s `squarefree_part` and under every consumer
+   `crates/holonics/src/ratio/polynomial.rs`'s `squarefree_part` and under every consumer
    that counts distinct roots by counting the radical's.
 
 **Not proved here, and said so.** *Sturm's theorem itself* — that the reading's drop across an
@@ -54,11 +54,11 @@ combinatorial object, and none of them needs the theorem that interprets it. Mat
 theory (its `Polynomial.signVariations` serves Descartes' rule of signs, which is a bound and not a
 count).
 
-Rust owner: `crates/holonic-engine/src/exact_value.rs::SturmChain` ↔
+Rust owner: `crates/holonics/src/ratio/algebraic.rs::SturmChain` ↔
 `theReadingIsInvariantUnderPerEntryPositiveRescaling`;
-`crates/holonic-engine/src/exact_value.rs::SturmChain::of` on a non-squarefree polynomial ↔
+`crates/holonics/src/ratio/algebraic.rs::SturmChain::of` on a non-squarefree polynomial ↔
 `theReadingIsInvariantUnderCommonNonzeroRescaling`;
-`crates/holonic-engine/src/rational_polynomial.rs::RationalPolynomial::squarefree_part` ↔
+`crates/holonics/src/ratio/polynomial.rs::RationalPolynomial::squarefree_part` ↔
 `theSquarefreePartSharesItsRoots`.
 Plan: `docs/plans/THE_RECEIVER_ATLAS_SEPARATES_WHAT_ONE_FACE_CANNOT.md`, **R1** and **R3**.
 -/
@@ -232,7 +232,7 @@ of multiplicity `m ≥ 1` in `p` has multiplicity `m - 1` in `p'`, hence at leas
 `m - 1` in `g`, so exactly `1` remains in `q`. Backwards: `q ∣ p`.
 
 **Where the hypothesis is discharged.** It is discharged *computationally, at each use*, on the
-Rust side: `crates/holonic-engine/src/rational_polynomial.rs::RationalPolynomial::squarefree_part`
+Rust side: `crates/holonics/src/ratio/polynomial.rs::RationalPolynomial::squarefree_part`
 forms `g = monic_gcd(p, p')` and then takes `p.divided_exactly_by(&g)`, which returns
 `NonExactPolynomialDivision` — a typed refusal, in the library and not only in a test — unless the
 remainder is exactly the zero polynomial. A returned radical therefore *is* a `q` with `p = g * q`,

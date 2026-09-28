@@ -20,8 +20,9 @@ family lands on.
 modulo `n`, so the least depth at which a modulus becomes reachable is the multiplicative order of
 two — and the moduli the period-`p` sign words land on, `2^p ∓ 1` by minus-count parity, are
 tabulated and decided.  This is the arithmetic law behind the nested-radical family, whose values
-are `2cos(π m / (2^p ∓ 1))` and whose isolation `crates/holonic-engine/src/winding_inertia.rs`
-performs exactly by Sturm bisection on the Dickson polynomial.
+are `2cos(π m / (2^p ∓ 1))` and whose isolation the retired `winding_inertia.rs`
+([history](https://github.com/brandonrdug/holonics/blob/13f8c734/crates/holonics/src/geometry/winding_inertia.rs)) performed exactly by Sturm bisection on the
+Dickson polynomial.
 
 **What is imported from mathlib and restated, not proved.**  Kummer's theorem, in the form
 `Nat.factorization_choose`: the multiplicity of a prime in a binomial coefficient is *the number of

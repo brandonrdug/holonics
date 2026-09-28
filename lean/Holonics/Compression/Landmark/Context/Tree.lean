@@ -65,7 +65,9 @@ node's arrivals are the epochs of its section, on which its register is read
    standing), and it is the unique law with that sequential step. It is the Dirichlet-½ law: the
    node face is the Pólya urn's prediction at initial weight `1/2` per class
    (`dirichletPredictive`), and the urn's sequential product is the KT mass of the counts
-   (`urnSeq`, `kt_eq_dirichlet_half`).
+   (`urnSeq`, `kt_eq_dirichlet_half`). This section is the one owner of the KT law; the HNN's
+   region count run at `α = 1/2` (`RegionCounts.ktPrior`, `count_face_eq_kt`) reads the same face
+   (`ktFace_counts_eq_countFace`), and `RegionCounts.ktProb` is the conditional's formula it imports.
    **The beta-binomial polynomial** (`betaBinomial_pgf`): the Beta(α, β) law enters as its
    moments `(α)_j/(α + β)_j` (`betaMoments`, a linear functional on `ℚ[X]`, the rational face of
    Euler's integral), its mixed moments are `(α)_k (β)_m/(α + β)_(k+m)` (`betaMoments_mixed`),
@@ -528,6 +530,16 @@ theorem kt_likelihood_laws [Nonempty A] :
   · induction w using List.reverseRecOn with
     | nil => rw [h0, ktSeq_nil]
     | append_singleton w c ih => rw [hs, ih, ktSeq_snoc]
+
+/-- [proved-derived; formal-checked] **`ktFace_counts_eq_countFace`: the KT face is the HNN region
+count face.** The node face of a word's count table is the face of the region count run at the KT
+prior `α = 1/2` over the word's one-hot targets (`RegionCounts.count_face_eq_kt`). This section
+owns the KT law; `RegionCounts.{ktPrior, ktProb}` are the prior and the conditional's formula it
+reads. -/
+theorem ktFace_counts_eq_countFace [Nonempty A] (ts : List A) (c : A) :
+    ktFace (counts ts) c = countFace (countRun ktPrior (targetWord ts)) c := by
+  rw [(Holonics.HNN.RegionCounts.count_face_eq_kt ts c).2.2, ktFace, sum_counts]
+  rfl
 
 /-- [definition] **The Dirichlet(α) predictive face** of a count table: the Pólya urn that starts
 with weight `α` on every class and adds one to the class drawn, `(n_c + α)/(Σn + |A| α)`. -/
@@ -3764,6 +3776,7 @@ section Audit
 #print axioms digit_emission_descends
 #print axioms ktMass_bump
 #print axioms kt_likelihood_laws
+#print axioms ktFace_counts_eq_countFace
 #print axioms kt_eq_dirichlet_half
 #print axioms betaMoments_mixed
 #print axioms betaBinomial_pgf

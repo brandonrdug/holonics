@@ -65,7 +65,8 @@ dissociation constant or cross-species assay of any kind.
 
 ## Rust counterpart
 
-[definition] `crates/holonic-engine/src/design_selection.rs`, with the same names — `MergeVerdict`,
+[definition] The retired `design_selection.rs` ([history](https://github.com/brandonrdug/holonics/blob/814157ad/crates/holonic-engine/src/design_selection.rs)),
+with the same names — `MergeVerdict`,
 `merge_verdict`, `HardConstraint`, `admitted`, `WorstVerdict`, `worst_over`, `ReceiverReading`,
 `structural_clusters` — every theorem below mirrored as a test and every declared size checked
 before it is used.

@@ -8,8 +8,9 @@ import Mathlib.Tactic.Ring
 /-!
 # B7 — the physicochemical receiver
 
-[definition] This file states the laws the Rust module
-`crates/holonic-engine/src/physicochemical_receiver.rs` implements: the remaining half of item
+[definition] This file states the laws the retired Rust module `physicochemical_receiver.rs`
+implemented ([history](https://github.com/brandonrdug/holonics/blob/814157ad/crates/holonic-engine/src/physicochemical_receiver.rs)):
+the remaining half of item
 **B7** of `docs/plans/THE_BIOLOGICAL_ECOLOGY_INSTANTIATES_THE_CARRIER.md`, beside the rigidity
 receiver of `Foundation/RigidityReceiver.lean` and the topological receiver of
 `Foundation/TopologicalReceiver.lean`.
@@ -48,8 +49,9 @@ Six things are stated here, in this order.
    population. **And no charged reading exists without a declared acidity**:
    `no_charged_reading_without_a_declared_acidity`.
 
-Rust owner: `crates/holonic-engine/src/physicochemical_receiver.rs`
-(`UnitedInterval`, `ResidueClass`, `ClassPair`, `ResidueClassTable`, `CompositionReading`,
+Retired Rust owner: `physicochemical_receiver.rs`
+([history](https://github.com/brandonrdug/holonics/blob/814157ad/crates/holonic-engine/src/physicochemical_receiver.rs):
+`UnitedInterval`, `ResidueClass`, `ClassPair`, `ResidueClassTable`, `CompositionReading`,
 `HydrogenBondCandidate`, `reciprocal_distance_enclosure`, `electrostatic_enclosure`,
 `protonation_basis`).
 -/

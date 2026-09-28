@@ -388,7 +388,10 @@ def ktPrior : A → ℚ := fun _ => 1 / 2
 def targetWord (ts : List A) : List (ℚ × (A → ℚ)) := ts.map fun t => (1, target t)
 
 /-- [definition] **The Krichevsky–Trofimov probability** of a class seen `n_c` times in `n`
-observations over an alphabet of `k` classes: `(n_c + 1/2)/(n + k/2)`. -/
+observations over an alphabet of `k` classes: `(n_c + 1/2)/(n + k/2)`. The KT law's one owner is
+`Compression/Landmark/Context/Tree` (`ktMass`, `ktFace`, `ktSeq`, `kt_likelihood_laws`), which
+imports this formula as its conditional and bridges back to the count run here
+(`Tree.ktFace_counts_eq_countFace`). -/
 def ktProb (nc n k : ℕ) : ℚ := (nc + 1 / 2) / (n + k / 2)
 
 omit [Fintype A] in

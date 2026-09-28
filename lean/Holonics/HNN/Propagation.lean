@@ -7,11 +7,12 @@ import Mathlib.Analysis.InnerProductSpace.Adjoint
 import Mathlib.LinearAlgebra.Dual.Lemmas
 
 /-!
-# HNN.Propagation: the junction Swing, the contact transit and the causal cone
+# HNN.Propagation: the junction scattering, the contact transit and the causal cone
 
 [definition] Rebuild step 4 (#73), campaign 1, design item 2 (`docs/plans/THE_REBUILD.md`,
 "Step 4 design: the HNN law", *The law of one passage*). One tick of a word is one contact hop:
-at each ring a junction Swing about its participation anchor, then the ring's element, then on
+at each ring the lossless junction scattering about its participation anchor, then the ring's
+element, then on
 each contact the midpoint two-port transit. A change moves one contact per tick. There is no
 global solve over the contact graph.
 
@@ -27,13 +28,16 @@ transit    α_g = ι_gᵀ o_g,  α_h = ι_hᵀ o_h,   M_a ω = 2C w + h(α_g −
 1. **The junction.** The anchor is the `W`-weighted mean of the ring's arrivals, its own storage
    port included (`W = diag(Y_r, G_a)`): its weights are the normalized participation, positive and
    summing to one, and it is the unique point where the weighted residual vanishes
-   (`anchor_is_participation`). Each output is the point Swing `AffineSwing.swing` about it. The
+   (`anchor_is_participation`). Each output is the half-turn `AffineSwing.swing` about it. The
    junction is the source-derived scatter `2P − I` of `HolonicAdjointNormalization`
-   (`junction_eq_sourceDerivedScatter`), hence an involution (`junctionSwing_involutive`, from
+   (`junction_eq_sourceDerivedScatter`): **junction scattering**, the lossless junction's split of
+   one current into shares and their recombination (objects §3,
+   `docs/ELEMENTARY_OBJECTS.md#the-swing`; the motion record's §6; named the junction Swing until
+   September 28). Hence it is an involution (`junctionScattering_involutive`, from
    `sourceDerivedScatter_involutive`), and it is a `W`-isometry for any weights with nonzero sum
-   (`junctionSwing_isometry`). With one contact port it is exactly the scalar two-port junction of
+   (`junctionScattering_isometry`): it conserves the joint weighted norm and does no work. With one contact port it is exactly the scalar two-port junction of
    `HolonicConstitutiveCirculation`, whose conserved weighted square energy
-   (`weighted_square_energy`) is the isometry's two-port case (`junctionSwing_twoPort`).
+   (`weighted_square_energy`) is the isometry's two-port case (`junctionScattering_twoPort`).
 2. **The contact.** `U_a = ι_h ι_gᵀ` is a partial isometry whose reverse is `U_aᵀ = ι_g ι_hᵀ`; the
    channel part and the untransmitted part of a wave split its norm; and the constitution-free
    transit is pure transmission, `a_(g←a) = (I − ι_gι_gᵀ) o_g + U_aᵀ o_h`, conserving the summed
@@ -78,7 +82,7 @@ local solves are the unique solutions of linear equations), and it is the `tick`
 `Ring ⊕ Contact` that is `Sparse blockAdj`; then §4 and `HNN/Retention` apply to the concrete word
 verbatim. Until then the Rust owners cite §4 as the abstract model's law.
 
-[open] The continuum limit (the telegraph law of the junction Swing with transit and its
+[open] The continuum limit (the telegraph law of the junction scattering with transit and its
 overdamped connection heat equation) is a reading, owed in #62. The concrete-tick bridge above is
 owed in #62.
 
@@ -93,7 +97,7 @@ open Holonics.Geometry.AffineSwing
 open Holonics.Computation.HolonicAdjointNormalization
 open scoped BigOperators
 
-/-! ## 1. The junction Swing about the participation anchor -/
+/-! ## 1. The junction scattering about the participation anchor -/
 
 section Junction
 
@@ -154,8 +158,8 @@ theorem anchor_is_participation (Y : ℝ) (G : ι → ℝ) (hY : 0 < Y) (hG : �
     rw [hres, sub_eq_zero] at hv
     rw [anchor, ← hv, smul_smul, inv_mul_cancel₀ hsum, one_smul]
 
-/-- [proved-derived; formal-checked] **The junction keeps its anchor.** The Swing's outputs have
-the same participation anchor, because a point Swing negates each displacement from the anchor
+/-- [proved-derived; formal-checked] **The junction keeps its anchor.** The scattering's outputs
+have the same participation anchor, because a half-turn negates each displacement from the anchor
 (`AffineSwing.theSwingNegatesTheDisplacementFromTheAnchor`) and the weighted displacements sum to
 zero. -/
 theorem junction_anchor_preserved (Y : ℝ) (G : ι → ℝ) (hsum : admittanceSum Y G ≠ 0)
@@ -228,9 +232,9 @@ theorem junction_eq_sourceDerivedScatter (Y : ℝ) (G : ι → ℝ) (hY : Y ≠ 
   · funext p
     simp [portOut, swing, two_smul]
 
-/-- [proved-derived; formal-checked] **The junction Swing is an involution**: swinging the
+/-- [proved-derived; formal-checked] **The junction scattering is an involution**: scattering the
 outputs again returns the arriving waves (`sourceDerivedScatter_involutive`). -/
-theorem junctionSwing_involutive (Y : ℝ) (G : ι → ℝ) (hY : Y ≠ 0)
+theorem junctionScattering_involutive (Y : ℝ) (G : ι → ℝ) (hY : Y ≠ 0)
     (hsum : admittanceSum Y G ≠ 0) (x : V × (ι → V)) :
     junction Y G (junction Y G x) = x := by
   rw [junction_eq_sourceDerivedScatter Y G hY hsum, junction_eq_sourceDerivedScatter Y G hY hsum]
@@ -251,11 +255,11 @@ theorem norm_swing_sq (v x : V) :
   simp only [conj_trivial]
   ring
 
-/-- [proved-derived; formal-checked] **The junction Swing is a `W`-isometry** (R2 C1), with
+/-- [proved-derived; formal-checked] **The junction scattering is a `W`-isometry** (R2 C1), with
 `W = diag(Y_r, G_a)` and one conductance per contact port:
 `Y_r|b_r|² + Σ_a G_a|o_(r→a)|² = Y_r|s_r|² + Σ_a G_a|a_(r←a)|²`. Only the admittance sum must be
 nonzero; the weights need no sign. -/
-theorem junctionSwing_isometry (Y : ℝ) (G : ι → ℝ) (hsum : admittanceSum Y G ≠ 0)
+theorem junctionScattering_isometry (Y : ℝ) (G : ι → ℝ) (hsum : admittanceSum Y G ≠ 0)
     (s : V) (a : ι → V) :
     Y * ‖storageOut Y G s a‖ ^ 2 + ∑ p, G p * ‖portOut Y G s a p‖ ^ 2 =
       Y * ‖s‖ ^ 2 + ∑ p, G p * ‖a p‖ ^ 2 := by
@@ -284,7 +288,7 @@ one-dimensional ring with one contact port (admittance `a`, incoming wave `i`) a
 (admittance `b`, held wave `h`), the junction's outputs are the `emitted` and `successorHeld`
 outputs of `HolonicConstitutiveCirculation`, and their conserved weighted square energy
 (`weighted_square_energy`, exact over `ℚ`) is the isometry above. -/
-theorem junctionSwing_twoPort {a b i h : ℚ} (ha : 0 < a) (hb : 0 < b) :
+theorem junctionScattering_twoPort {a b i h : ℚ} (ha : 0 < a) (hb : 0 < b) :
     portOut (b : ℝ) (fun _ : Unit => (a : ℝ)) (h : ℝ) (fun _ => (i : ℝ)) () =
         ((Holonics.Computation.HolonicConstitutiveCirculation.emitted a b i h : ℚ) : ℝ) ∧
       storageOut (b : ℝ) (fun _ : Unit => (a : ℝ)) (h : ℝ) (fun _ => (i : ℝ)) =
@@ -934,9 +938,9 @@ section Audit
 #print axioms anchor_is_participation
 #print axioms junction_anchor_preserved
 #print axioms junction_eq_sourceDerivedScatter
-#print axioms junctionSwing_involutive
-#print axioms junctionSwing_isometry
-#print axioms junctionSwing_twoPort
+#print axioms junctionScattering_involutive
+#print axioms junctionScattering_isometry
+#print axioms junctionScattering_twoPort
 #print axioms transit_balance
 #print axioms transit_balance_waves
 #print axioms partialIsometry_transit

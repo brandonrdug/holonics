@@ -28,8 +28,9 @@ Three things are stated, in this order.
 
 ## Rust counterpart
 
-[definition] The paired executable owner is `crates/holonic-engine/src/physical_intake.rs` with its
-`mmcif` and `numpy` submodules, which names this file and every declaration below. The
+[definition] The paired executable owner was `physical_intake.rs` with its `mmcif` and `numpy`
+submodules (retired; [history](https://github.com/brandonrdug/holonics/blob/f1e184d2/crates/holonic-engine/src/physical_intake.rs)),
+which named this file and every declaration below. The
 correspondence, both directions:
 
 | Lean | Rust |
@@ -69,7 +70,8 @@ open Holonics.Foundation.AperturedGradedComplex
 
 /-- [definition] An IEEE-754 binary interchange format, as the two field widths that determine it.
 
-Rust counterpart: `crates/holonic-engine/src/physical_intake/numpy.rs::UncertaintyWordFormat`. -/
+Retired Rust counterpart: `physical_intake/numpy.rs::UncertaintyWordFormat`
+([history](https://github.com/brandonrdug/holonics/blob/f1e184d2/crates/holonic-engine/src/physical_intake/numpy.rs)). -/
 structure FloatFormat where
   /-- Stored significand bits: `10`, `23`, `52` for `binary16`, `binary32`, `binary64`. -/
   significandBits : ℕ
@@ -235,7 +237,8 @@ theorem binary32_strictly_refines_binary16 :
 /-- [definition] One written decimal coordinate token: the integer significand and the number of
 decimal places the source declared.
 
-Rust counterpart: `crates/holonic-engine/src/physical_intake/mmcif.rs::DecimalToken`. -/
+Retired Rust counterpart: `physical_intake/mmcif.rs::DecimalToken`
+([history](https://github.com/brandonrdug/holonics/blob/f1e184d2/crates/holonic-engine/src/physical_intake/mmcif.rs)). -/
 structure DecimalToken where
   /-- The token with its decimal point removed. -/
   significand : ℤ
@@ -346,7 +349,7 @@ theorem decided_under_projection_is_decided_at_source (aperture : ℚ) (places :
 
 /-- [definition] The environment `eta` one prediction was produced under.
 
-Rust counterpart: `crates/holonic-engine/src/physical_intake.rs::TargetEcology`. -/
+Retired Rust counterpart: `physical_intake.rs::TargetEcology` ([history](https://github.com/brandonrdug/holonics/blob/f1e184d2/crates/holonic-engine/src/physical_intake.rs)). -/
 structure TargetEcology where
   /-- The addressed target. -/
   target : String
@@ -554,8 +557,8 @@ theorem reading_is_directional :
 exact and total on finite words; an outward projection onto a coarser grid contains the source and
 so never flips a decision; and no occurrence is founded without its environment index.
 
-Rust owner: `crates/holonic-engine/src/physical_intake.rs` with its `mmcif` and `numpy`
-submodules. -/
+Retired Rust owner: `physical_intake.rs` with its `mmcif` and `numpy` submodules
+([history](https://github.com/brandonrdug/holonics/blob/f1e184d2/crates/holonic-engine/src/physical_intake.rs)). -/
 theorem intake_contract :
     (∀ (f : FloatFormat) (w : Codeword f), w.Finite → decode w = some w.value) ∧
       (∀ (places : ℕ) (d : ExactInterval ℚ), Contains (projectOutward places d) d) ∧

@@ -60,7 +60,8 @@ this file turns a held-out result into a universal one.
 
 ## Rust counterpart
 
-[definition] `crates/holonic-engine/src/evaluation_discipline.rs`, with the same names —
+[definition] The retired `evaluation_discipline.rs` ([history](https://github.com/brandonrdug/holonics/blob/814157ad/crates/holonic-engine/src/evaluation_discipline.rs)),
+with the same names —
 `LineageClasses`, `Split`, `FittedReceiver`, `Calibration`, `AssayBridge`, `ExternalComparison`,
 `DisagreementClass`, `EvaluationConclusion`, `UniversalClaim` — every theorem below mirrored as a
 test.

@@ -3,7 +3,13 @@ import Holonics.Computation.NativeMorphologyVariant
 import Mathlib.Tactic
 
 /-!
-# Live circulation sessions, parented commits, and diffusive boundaries
+# Live circulations, parented commits, and diffusive boundaries
+
+[definition; agent-inferred] Named for what it states: a live circulation (a rested morphology
+with its exact remount law and its conduct) and the passages that cross its boundary. It was
+`HolonicCirculationSession` until September 28; "session" is retired from the time vocabulary
+(aeon, epoch, cycle), and nothing here carries a time extent, so the structure is
+`LiveCirculation`, not an aeon or an epoch.
 
 This owner is the neutral AAC0 foundation.  It composes the existing fixed-morphology inference,
 genuinely later cultivation, repeated-circulation, morphology-package, and exact-diffusion laws.
@@ -13,19 +19,20 @@ continuation.
 
 noncomputable section
 
-namespace Holonics.Computation.HolonicCirculationSession
+namespace Holonics.Computation.HolonicCirculationPassage
 
 open Holonics.Computation.HolonicIntelligence
 open Holonics.Computation.HolonicDiffusionCharts
 
-/-! ## One live rested session -/
+/-! ## One live rested circulation -/
 
 /-- A move-owned rested morphology together with its exact snapshot/remount law.
 
 `conduct` is deliberately generic.  A concrete runtime may instantiate it with native inference,
-diffusion, or another already-founded local law; the session does not select a semantic phase.
+diffusion, or another already-founded local law; the circulation does not select a semantic
+phase.
 -/
-structure LiveCirculationSession
+structure LiveCirculation
     (Morphology RestIdentity Ingress Face Generation : Type*) where
   morphology : Morphology
   generation : Generation
@@ -34,18 +41,18 @@ structure LiveCirculationSession
   remountExact : remount (rest morphology) = morphology
   conduct : Morphology → Ingress → Face
 
-namespace LiveCirculationSession
+namespace LiveCirculation
 
 variable {Morphology RestIdentity Ingress Face Generation : Type*}
-    (session : LiveCirculationSession Morphology RestIdentity Ingress Face Generation)
+    (circulation : LiveCirculation Morphology RestIdentity Ingress Face Generation)
 
-/-- Snapshot/remount preserves every later conduct admitted by the session. -/
+/-- Snapshot/remount preserves every later conduct admitted by the circulation. -/
 theorem conduct_after_remount (ingress : Ingress) :
-    session.conduct (session.remount (session.rest session.morphology)) ingress =
-      session.conduct session.morphology ingress := by
-  rw [session.remountExact]
+    circulation.conduct (circulation.remount (circulation.rest circulation.morphology)) ingress =
+      circulation.conduct circulation.morphology ingress := by
+  rw [circulation.remountExact]
 
-end LiveCirculationSession
+end LiveCirculation
 
 /-! ## Owned circulation boundaries -/
 
@@ -169,7 +176,7 @@ end DeclinedMorphologyCandidate
 
 /-! ## Snapshot and remount -/
 
-/-- A complete exterior snapshot of one live session.  The stored chart is not runtime topology;
+/-- A complete exterior snapshot of one live circulation.  The stored chart is not runtime topology;
 its law is exact remount of the owned morphology and its later receiver conduct. -/
 structure SnapshotRemountPassage
     (Morphology Snapshot Ingress Face : Type*) where
@@ -273,7 +280,7 @@ end DiffusiveCirculationPassage
 
 section Audit
 
-#print axioms LiveCirculationSession.conduct_after_remount
+#print axioms LiveCirculation.conduct_after_remount
 #print axioms CirculationBoundary.isInferenceCut
 #print axioms ParentedMorphologyCommit.return_is_later_and_changes_morphology
 #print axioms ParentedMorphologyCommit.next_cut_uses_committed_successor
@@ -287,4 +294,4 @@ section Audit
 
 end Audit
 
-end Holonics.Computation.HolonicCirculationSession
+end Holonics.Computation.HolonicCirculationPassage

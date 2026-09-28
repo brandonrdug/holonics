@@ -73,7 +73,9 @@ theorem exact_solver_iff_posterior_mode (feasible : Candidate → Prop)
   · intro minimal p hp
     exact minimal ⟨p, hp⟩
 
-/-- Finite Bayes is the description-plus-log-loss receiver, including its normalization. -/
+/-- Finite Bayes is the description-plus-log-loss receiver, including its normalization. The
+right side is Bayes' quotient rule, whose one owner is
+`Computation/HolonicAdjointNormalization.NormalizedExponential.bayes` (`posterior_eq_bayes`). -/
 theorem posterior_of_log_description_and_likelihood
     (prior likelihood : Candidate → ℝ)
     (prior_pos : ∀ p, 0 < prior p) (likelihood_pos : ∀ p, 0 < likelihood p)
@@ -89,6 +91,18 @@ theorem posterior_of_log_description_and_likelihood
         field_simp [bitScale_pos.ne']; ring]
     rw [Real.exp_add, Real.exp_log (prior_pos p), Real.exp_log (likelihood_pos p)]
   simp only [posterior, NormalizedExponential.face, NormalizedExponential.partition, factor]
+
+/-- [proved-derived; formal-checked] **The bridge to Bayes' owner.** The description-plus-log-loss
+receiver's posterior is `HolonicAdjointNormalization.NormalizedExponential.bayes`, the one owner
+of Bayes' quotient rule; its face, log-odds translation and replicator laws are proved there
+(`bayes_eq_face`, `bayes_logOdds_twoSwings`, `bayes_eq_discrete_replicator`). -/
+theorem posterior_eq_bayes (prior likelihood : Candidate → ℝ)
+    (prior_pos : ∀ p, 0 < prior p) (likelihood_pos : ∀ p, 0 < likelihood p) :
+    (posterior (fun p => -Real.log (prior p) / Real.log 2 -
+      Real.log (likelihood p) / Real.log 2)).mass = NormalizedExponential.bayes prior likelihood := by
+  funext candidate
+  rw [posterior_of_log_description_and_likelihood prior likelihood prior_pos likelihood_pos]
+  rfl
 
 /-- The previous Gibbs/free-energy theorem now prices a distribution over executable descriptions. -/
 theorem variational_gap_eq_kl_bits (objective : Candidate → ℝ)
@@ -319,6 +333,7 @@ end CountControl
 
 #print axioms exact_solver_iff_posterior_mode
 #print axioms posterior_of_log_description_and_likelihood
+#print axioms posterior_eq_bayes
 #print axioms variational_gap_eq_kl_bits
 #print axioms variational_minimum
 #print axioms posterior_eq_iff_objective_differences

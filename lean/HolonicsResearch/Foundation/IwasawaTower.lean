@@ -15,7 +15,8 @@ import Mathlib.NumberTheory.Padics.PadicIntegers
 `ℤ_p`-tower, whose faces are finite specializations, and whose codimension-one receiver reading is
 the characteristic ideal.
 
-Rust counterpart: `crates/holonic-engine/src/iwasawa_tower.rs::{IwasawaLevel, omega, IwasawaTower,
+Retired Rust counterpart ([history](https://github.com/brandonrdug/holonics/blob/13f8c734/crates/holonics-cuda/src/iwasawa_tower.rs)):
+`iwasawa_tower.rs::{IwasawaLevel, omega, IwasawaTower,
 OmegaRestriction, FiniteLevelRing, LambdaPresentation, CharacteristicFace, FiniteSpecialization}`,
 the finite computable shadow: exact `ℤ/p^n[T]/(ω_n)` arithmetic over `BigInt`/`BigUint`, the
 `ω_n` chain by exact polynomial division, and the finite specializations of `Λ/(f)` modules read as
@@ -404,8 +405,8 @@ abbrev Lambda : Type := PowerSeries ℤ_[p]
 /-- [definition] `ω_n = (1 + T)^{p^n} − 1` as a **polynomial**, so that its distinguished shape and
 the rank of its quotient are theorems rather than descriptions.
 
-Rust counterpart: `crates/holonic-engine/src/iwasawa_tower.rs::{omega, check_distinguished,
-omega_divides_omega_succ}`. -/
+Retired Rust counterpart: `iwasawa_tower.rs::{omega, check_distinguished,
+omega_divides_omega_succ}` ([history](https://github.com/brandonrdug/holonics/blob/13f8c734/crates/holonics-cuda/src/iwasawa_tower.rs)). -/
 def omegaPoly (n : ℕ) : Polynomial ℤ_[p] := (Polynomial.X + 1) ^ (p ^ n) - 1
 
 /-- [definition] The same element inside `Λ`. -/
@@ -628,8 +629,8 @@ variable {R : Type u} [Ring R] {M : Type v} [AddCommGroup M] [Module R M]
 /-- [definition] **The tower of an antitone filtration.**  `Face n = M ⧸ N n`; the restriction from
 a finer chart to a coarser one is the quotient map that the inclusion `N j ≤ N i` supplies.
 
-Rust counterpart: `crates/holonic-engine/src/iwasawa_tower.rs::{IwasawaTower, OmegaRestriction,
-FiniteSpecialization}`. -/
+Retired Rust counterpart: `iwasawa_tower.rs::{IwasawaTower, OmegaRestriction,
+FiniteSpecialization}` ([history](https://github.com/brandonrdug/holonics/blob/13f8c734/crates/holonics-cuda/src/iwasawa_tower.rs)). -/
 def quotientTower (N : ℕ → Submodule R M) (hN : Antitone N) : Tower.{0, v} ℕ where
   Face := fun n => M ⧸ N n
   restrict := fun {i j} h => Submodule.mapQ (N j) (N i) LinearMap.id (fun _ hy => hN h hy)
@@ -728,8 +729,8 @@ theorem omegaSubmodule_antitone : Antitone (omegaSubmodule p M) := by
 /-- [definition] **The Iwasawa tower of a `Λ`-module**: `Face n = M / ω_n M`, restriction the
 canonical quotient map.  This is `ContinuingTower.Tower`, not a parallel family.
 
-Rust counterpart: `crates/holonic-engine/src/iwasawa_tower.rs::{IwasawaTower,
-LambdaPresentation::specialize, FiniteSpecialization}`. -/
+Retired Rust counterpart: `iwasawa_tower.rs::{IwasawaTower,
+LambdaPresentation::specialize, FiniteSpecialization}` ([history](https://github.com/brandonrdug/holonics/blob/13f8c734/crates/holonics-cuda/src/iwasawa_tower.rs)). -/
 def omegaTower : Tower.{0, v} ℕ :=
   quotientTower (omegaSubmodule p M) (omegaSubmodule_antitone p M)
 
@@ -1097,8 +1098,8 @@ theorem squareModule_not_annihilated :
 `ContinuingTower.theOrderFaceDoesNotDetermineTheModule`'s separation — `ℤ/4` against `ℤ/2 ⊕ ℤ/2` —
 now over `Λ`, and it is unconditional: both structure data are constructed, not assumed.
 
-Rust counterpart: `crates/holonic-engine/src/iwasawa_tower.rs` verifies the same separation
-numerically — equal orders at every level, different Smith invariants. -/
+Retired Rust counterpart: `iwasawa_tower.rs` ([history](https://github.com/brandonrdug/holonics/blob/13f8c734/crates/holonics-cuda/src/iwasawa_tower.rs))
+verified the same separation numerically — equal orders at every level, different Smith invariants. -/
 theorem theCharacteristicFaceDoesNotDetermineTheModule :
     (squareStructure p).characteristicFace = (splitStructure p).characteristicFace ∧
       IsEmpty (SquareModule p ≃ₗ[Lambda p] SplitModule p) := by
@@ -1172,7 +1173,8 @@ def pseudoNullStructure : StructureData p (PseudoNull p) where
 A nonzero finite `Λ`-module, annihilated by both `p` and `T`, whose characteristic face is the unit
 ideal.  No characteristic ideal distinguishes it from the zero module, and the module is not zero.
 
-Rust counterpart: `crates/holonic-engine/src/iwasawa_tower.rs` exhibits `Λ/(p, T)` with constant
+Retired Rust counterpart: `iwasawa_tower.rs` ([history](https://github.com/brandonrdug/holonics/blob/13f8c734/crates/holonics-cuda/src/iwasawa_tower.rs))
+exhibited `Λ/(p, T)` with constant
 order `p` at every level and trivial characteristic datum. -/
 theorem thePseudoNullResidueIsInvisibleToTheFace :
     (pseudoNullStructure p).characteristicFace = ⊤ ∧

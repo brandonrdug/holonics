@@ -20,8 +20,8 @@ use crate::ratio::linear::ExactRatMatrix;
 use crate::ratio::linear::vector::{add, dot, scale, sub};
 use crate::ratio::{Rat, integer, rat};
 
-/// Lean `HNN/Propagation.{anchor_is_participation, junctionSwing_involutive,
-/// junctionSwing_isometry}`: the anchor is the normalized participation (the weights `G_a/(Y + ΣG)`
+/// Lean `HNN/Propagation.{anchor_is_participation, junctionScattering_involutive,
+/// junctionScattering_isometry}`: the anchor is the normalized participation (the weights `G_a/(Y + ΣG)`
 /// with the storage port included), the Swing is an involution, and it keeps the `W`-weighted power
 /// `Y|s|² + Σ G|a|²`.
 #[test]

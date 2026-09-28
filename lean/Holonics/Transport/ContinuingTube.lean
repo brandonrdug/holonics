@@ -119,15 +119,17 @@ staircases the repository owns: `BoundaryScalePassage` supplies none and is a mi
 
 ## Rust counterpart
 
-[definition] The paired executable owners are `crates/holonic-core/src/restriction/tube.rs` (the
-carrier law, re-exported at `crates/holonic-engine/src/continuing_tube.rs`) and that engine file
-(its receiver layers):
+[definition] The paired executable owner of the carrier law is
+`crates/holonics/src/holon/restriction/tube.rs`; its receiver layers were the retired
+`continuing_tube.rs`
+([history](https://github.com/brandonrdug/holonics/blob/13f8c734/crates/holonics-cuda/src/continuing_tube.rs)):
 `StationedTower`, `check_commuting_square` returning `SquareVerdict::Commutes | ::Defect` with its
 witness, `wormhole_receipt`, `check_circuit_holonomy`, and `LossySwapMigration`, tested on the
 `p`-adic tower, on `grain_tower.rs`'s measured non-commuting square, and on a closed circuit with
-holonomy. `crates/holonic-engine/src/tube.rs::ReceiverTube` is the *physical* realization of the
+holonomy. The retired `tube.rs::ReceiverTube`
+([history](https://github.com/brandonrdug/holonics/blob/e732a684/crates/holonic-engine/src/tube.rs)) was the *physical* realization of the
 same two axes — core receiver, transverse section, horizon as the link of the star, and
-`presentation_holonomy` as the composite of its longitudinal presentation word — and is cited there.
+`presentation_holonomy` as the composite of its longitudinal presentation word.
 
 [definition] What this file does **not** do: it renames nothing, it states no milestone, and it
 edits no owner. It founds `ChartwiseMigration`, `Tube`, `SquareVerdict`, `Wormhole`,
@@ -157,7 +159,7 @@ transporting after restricting. It is `Foundation/ContinuingTower.lean::Migratio
 the index map the identity, and `toMigration`/`ofStationaryMigration` prove the two are the same
 data.
 
-Rust counterpart: `crates/holonic-core/src/restriction/tube.rs::StationedTower::transport`, whose
+Rust counterpart: `crates/holonics/src/holon/restriction/tube.rs::StationedTower::transport`, whose
 square is checked by `check_commuting_square`. -/
 structure ChartwiseMigration {Index : Type u} [Preorder Index] (S T : Tower.{u, v} Index) where
   /-- The component at one chart. -/
@@ -270,7 +272,7 @@ ladder and its `restrict` is the coarsening of that section. `transport` is the 
 passage. `Tube.square` is the one law that joins them, and it is
 `ChartwiseMigration.naturality`.
 
-Rust counterpart: `crates/holonic-core/src/restriction/tube.rs::StationedTower`. -/
+Rust counterpart: `crates/holonics/src/holon/restriction/tube.rs::StationedTower`. -/
 structure Tube.{us, ui, uf} (Station : Type us) [Preorder Station] (Index : Type ui)
     [Preorder Index] where
   /-- The transverse section at one station. -/
@@ -386,7 +388,7 @@ its cost are the separate obligations of `ResidualMigration` and
 `Foundation/PresentationCost.lean`, and `PresentationCost.swapMigration_route_isEmpty` records that
 for a wormhole the refinement-route cost has nothing to measure.
 
-Rust counterpart: `crates/holonic-core/src/restriction/tube.rs::wormhole_receipt`. -/
+Rust counterpart: `crates/holonics/src/holon/restriction/tube.rs::wormhole_receipt`. -/
 structure Wormhole {Station : Type uS} [Preorder Station] {Index : Type u} [Preorder Index]
     (tube : Tube.{uS, u, v} Station Index) (source target : Station) where
   /-- The passage itself. -/
@@ -781,8 +783,9 @@ def grainCell : Grain → Type
   | .atom => Bool
 
 /-- [definition] The declared selection: the coarse cell's representative atom is `false`. This is
-the receiver `crates/holonic-life/examples/m5/cif.rs::REPRESENTATIVE` enacts by discarding every
-non-`CA` row. -/
+the receiver the retired M5 intake `cif.rs::REPRESENTATIVE`
+([history](https://github.com/brandonrdug/holonics/blob/23982c5e/crates/holonic-life/examples/m5/cif.rs)) enacted by discarding
+every non-`CA` row. -/
 def grainSel : ∀ {i j : Grain}, i ≤ j → grainCell i → grainCell j
   | .component, .component, _ => _root_.id
   | .component, .residue, _ => fun _ => ()
@@ -1066,9 +1069,9 @@ proves a receiver can only lose a defect, never invent one, and `ladderReceiverI
 exhibits a poorer receiver that reads flat exactly what a richer one separates —
 `Foundation/Receiver.lean::ReceiverInsufficiency`, cited and not rebuilt.
 
-Rust counterpart: `crates/holonic-engine/src/continuing_tube.rs::{Observer, HorizonDeclaration,
-horizon_reach, two_axis_width, DefectProfile, defect_profile, CrossRankPassage,
-classify_cross_rank, plan_routes, PresentationTube}`. -/
+Retired Rust counterpart: `continuing_tube.rs::{Observer, HorizonDeclaration, horizon_reach,
+two_axis_width, DefectProfile, defect_profile, CrossRankPassage, classify_cross_rank, plan_routes,
+PresentationTube}` ([history](https://github.com/brandonrdug/holonics/blob/13f8c734/crates/holonics-cuda/src/continuing_tube.rs)). -/
 
 open Holonics.Foundation.ReceiverRelease
 

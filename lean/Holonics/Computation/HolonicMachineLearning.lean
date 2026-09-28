@@ -13,7 +13,7 @@ import Holonics.Computation.HolonicDiffusionCharts
 import Holonics.Computation.HolonicCultivationCharts
 import Holonics.Computation.HolonicIntelligenceFramework
 import Holonics.Computation.NativeMorphologyVariant
-import Holonics.Computation.HolonicCirculationSession
+import Holonics.Computation.HolonicCirculationPassage
 import Holonics.Computation.HolonicWorldReturnDeposit
 
 /-!

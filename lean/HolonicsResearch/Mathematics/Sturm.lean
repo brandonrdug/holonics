@@ -38,11 +38,12 @@ exhibits the gap on its own material: on `X² − 2X + 2` the same sign-variatio
 the coefficient list returns `2` while the chain reading returns `0`, and the real population is
 empty.  **That single pair of numbers is why this instrument is worth having.**
 
-**The Rust owners are read, not rebuilt.**  `crates/holonic-engine/src/exact_value.rs` carries
+**The Rust owners are read, not rebuilt.**  `crates/holonics/src/ratio/algebraic.rs` carries
 `sturm_sequence`, `sign_variations`, `distinct_root_count` and `AlgebraicRoot::isolate` with its
 `SturmIsolationCertificate { variations_at_lower, variations_at_upper }`, refusing an interval
 whose endpoint is itself a root and refusing an orientation whose count would be negative;
-`crates/holonic-engine/src/winding_inertia.rs` uses that isolation as the certificate carrier for
+the retired `winding_inertia.rs` ([history](https://github.com/brandonrdug/holonics/blob/13f8c734/crates/holonics/src/geometry/winding_inertia.rs))
+used that isolation as the certificate carrier for
 the star values `β_m = ω^m + ω^{−m}`, the roots of the squarefree part of `D_n(x) − 2`.  The
 chain, the negation, the zero-dropping filter and the adjacent-difference count encoded below are
 that owner's definitions transcribed; the third anchor is that owner's own terrain, `n = 6`, whose
@@ -204,7 +205,7 @@ def variationCount : List ℚ → ℕ
   | v :: l => if v = 0 then variationCount l else variationFrom v l
 
 /-- **The reading**: the sign-variation count of a chain evaluated at a rational point.  This is
-the exact carrier of `sign_variations` in `crates/holonic-engine/src/exact_value.rs`. -/
+the exact carrier of `sign_variations` in `crates/holonics/src/ratio/algebraic.rs`. -/
 def readingAt (ch : List (List ℚ)) (x : ℚ) : ℕ := variationCount (ch.map (evalAt x))
 
 /-! ## 2. The laws of the instrument
@@ -440,7 +441,8 @@ theorem theCommonRootDescendsTheDivisionTower (P Q R T : Polynomial ℝ) (h : P 
 /-! ## 3. The charts
 
 Five charts, each with its window or windows.  All coefficients are exact rationals; the third is
-the terrain of `crates/holonic-engine/src/winding_inertia.rs`. -/
+the terrain of the retired `winding_inertia.rs`
+([history](https://github.com/brandonrdug/holonics/blob/13f8c734/crates/holonics/src/geometry/winding_inertia.rs)). -/
 
 /-- `X² − 2`: one irrational root above one, the isolation certificate's own example. -/
 def squareLessTwoChart : List ℚ := [-2, 0, 1]
@@ -556,7 +558,7 @@ theorem theFuelIsAnApertureThatDoesNotSelect :
 The reading at each declared endpoint, and the difference across each window.  The difference is
 stated additively — `reading at the lower endpoint = reading at the upper endpoint + n` — so no
 truncated natural subtraction can hide a defect, which is exactly the refusal
-`InvalidSturmOrientation` in `crates/holonic-engine/src/exact_value.rs`. -/
+`InvalidSturmOrientation` in `crates/holonics/src/ratio/algebraic.rs`. -/
 
 /-- `X² − 2` across `(1, 2)`: the reading counts **one** passage. -/
 theorem theSquareLessTwoReadingCountsOnePassageAboveOne :
@@ -915,7 +917,7 @@ theorem theOpenLawHasLiveHypotheses :
 
 /-- **The endpoint condition is a real restriction and it can fail.**  On `X³ − X` the endpoint
 `0` *is* a root, so the open proposition says nothing about the window `(0, 2)` — the refusal
-`RootAtIntervalBoundary` in `crates/holonic-engine/src/exact_value.rs`, as a fact about this
+`RootAtIntervalBoundary` in `crates/holonics/src/ratio/algebraic.rs`, as a fact about this
 material rather than a defensive branch. -/
 theorem theEndpointConditionCanFail : evalAt 0 cubeLessLineChart = 0 := by
   norm_num [cubeLessLineChart]

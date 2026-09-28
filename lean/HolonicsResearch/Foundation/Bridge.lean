@@ -637,7 +637,8 @@ exact round trip.
 
 Cited owners: `GrainRestriction.selectionTransition`,
 `GrainRestriction.grain_residual_reopens_the_source`, `GrainRestriction.fineReading_factors`.
-Its executable counterpart is `crates/holonic-engine/src/grain_tower.rs::GrainSelection`. -/
+Its executable counterpart was the retired `grain_tower.rs::GrainSelection`
+([history](https://github.com/brandonrdug/holonics/blob/13f8c734/crates/holonics-cuda/src/grain_tower.rs)). -/
 def grainBridge (π : FineCell → CoarseCell) (sel : CoarseCell → FineCell) :
     Bridge.{u, u} (FineCell → FineCell → ContactClass) (CoarseCell → CoarseCell → ContactClass) where
   status := .structurePreservingMap
@@ -674,7 +675,8 @@ variable {Contact Embedding : Type}
 
 /-- [definition] **The protein contact atlas against a learned embedding atlas.** The claim being
 proposed is that a learned embedding's coordinate atlas and the contact-complex atlas of
-`crates/holonic-engine/src/grain_tower.rs` are two charts of one object. It is a *candidate*: no
+the retired `grain_tower.rs` ([history](https://github.com/brandonrdug/holonics/blob/13f8c734/crates/holonics-cuda/src/grain_tower.rs))
+are two charts of one object. It is a *candidate*: no
 passage is supplied, the status is `speculativeAnalogy` and the grade is `interpretation`, which
 `docs/canon/EPISTEMIC_GRADES.md` requires to carry explicit maps, limits, a preserved diagram, a
 first derivation target and a falsifier that can fire.
