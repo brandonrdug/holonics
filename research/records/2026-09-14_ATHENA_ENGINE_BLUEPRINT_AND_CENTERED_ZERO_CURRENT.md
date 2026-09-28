@@ -17,7 +17,7 @@ fits another normal predictor to field differences; it does not implement the ag
 model. A first worker report proposed publishing that surrogate sequence, and root rejected
 it against the existing same-material assembly equation before writing the blueprint.
 
-[definition] [ATHENA_ENGINE_BLUEPRINT](../../docs/ATHENA_ENGINE_BLUEPRINT.md) now records
+[definition] [ATHENA_ENGINE_BLUEPRINT](https://github.com/brandonrdug/holonics/blob/13f8c734/docs/ATHENA_ENGINE_BLUEPRINT.md) now records
 the actual owner-level join, its forward and adjoint formulas, the local learned-reaction
 role, and the joint-field application/measurement that will demonstrate the assembly.
 It is a compact illustrated reading of the existing plan, not a second schedule or
@@ -31,7 +31,7 @@ Its later joint forecast is checked against the actual stored coefficient contra
 This establishes local learning/application machinery; the direct field-backed Athena
 model has not been implemented or tested by this documentation/derivation turn.
 
-[established-bounded; tested] The [interactive diagram](../experiments/athena_engine_blueprint/README.md)
+[established-bounded; tested] The [interactive diagram](https://github.com/brandonrdug/holonics/blob/13f8c734/research/experiments/athena_engine_blueprint/README.md)
 switches between the same model's engine, generation, learning and encoded-reuse paths.
 All four selections and desktop/narrow layouts were checked, with no script errors or
 horizontal overflow. The same vector exports add plates 14–15 to the existing synopsis,
@@ -56,7 +56,7 @@ through the existing Foster instance and supplies the normal-current inequality 
 transverse consumer. A report that only an asymptotic flux limit existed was incorrect:
 the finite estimate was already present in that same source file.
 
-[definition] [The upper-bound synthesis](../../docs/RH_CENTERED_CURRENT_UPPER_BOUND.md)
+[definition] [The upper-bound synthesis](2026-09-14_THE_HALF_CENTRED_FACE_AND_THE_DE_BRUIJN_NEWMAN_UPPER_BOUND.md)
 develops the equal-multiplicity conserved normal face, the retained longitudinal motion,
 the source/time sign, and the inequality `d(T)²+2(1+a)T≤d(0)²` under an actual surplus margin.
 It also derives a finite-height quartet improvement through the normalized-log potential

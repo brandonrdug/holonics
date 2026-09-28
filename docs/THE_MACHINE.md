@@ -275,7 +275,8 @@ quantum and information constructions are reusable parts of this framework **at 
 hypotheses**. Apply their maps and hypotheses to the current object. Their named conjecture
 endpoints are separate claims; the targets are instances of compression and landmark discovery.
 The [research routes](../research/records/README.md) connect the records, formal statements and
-consumers, so work starts from the accumulated construction.
+consumers, and the [formal framework](FORMAL_FRAMEWORK.md) connects the Lean framework's subjects,
+so work starts from the accumulated construction.
 
 [established-bounded; source-inspected] **What the prototype showed.** The prototype at
 `13f8c734` realized a legacy geometric word, the incident field (standing `q`, transported

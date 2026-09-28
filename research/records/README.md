@@ -286,7 +286,7 @@ hypotheses when its material or receiver changes.
 ## Physical realization, forces, mass and source-qualified spectral laws
 
 Read [mass/energy and causal transport](../../docs/MASS_ENERGY_AND_CAUSAL_TRANSPORT.md),
-[the formal framework](../../docs/FORMAL_FRAMEWORK.md) and [RH source transport](../../docs/RH_CENTERED_CURRENT_UPPER_BOUND.md).
+[the formal framework](../../docs/FORMAL_FRAMEWORK.md) and [RH source transport](2026-09-14_THE_HALF_CENTRED_FACE_AND_THE_DE_BRUIJN_NEWMAN_UPPER_BOUND.md).
 The divisor-source transport of the paper `divisor-source-transport-boundary` is checked in
 [`Zeta/DivisorSourceTransport`](../../lean/HolonicsResearch/Zeta/DivisorSourceTransport.lean) and
 [`Zeta/DivisorQuotientFamily`](../../lean/HolonicsResearch/Zeta/DivisorQuotientFamily.lean).

@@ -849,21 +849,12 @@ full research build checks import/proof integration, while each result retains i
 These applications can continue enriching the framework without becoming prerequisites for
 using its already established local constructions.
 
-## Computation and the contribution to Athena
+## Computation owners in the Lean framework
 
-[established-bounded; implemented-exact; formal-checked] The common finite local-current
-ecology now passes prior local standing into its constitutive reaction. The graph specialization
-had accepted that argument but supplied zero; the complete graph update and covariance are
-now explicit, with a retention control. The [deeper architecture review](../research/records/2026-09-09_ARCHITECTURE_CHARTS_REQUIRE_COMPOSED_MECHANISMS_AND_FINITE_CONSTRUCTION_RETURNS.md)
-connects this repair, classical/tensor mechanism charts and bounded approximation to the HNN
-construction. It does not make a full-history adjoint a prerequisite for local learning.
-
-[definition] Classical architecture charts expose attention as conditional contact, convolution
-as shared transported structure, graph computation as incident current and state-space models as
-retained recurrence. The normalized-exponential receiver has an exact Jacobian and a binary
-sigmoid restriction. These are reusable maps in the same framework. HNN need not inherit an
-entire architecture to use them. Execution/simulation, logical resources and recurrence remain
-explicit in the computation owners.
+[definition] The HNN, the line it serves (compression is intelligence is navigation) and the
+obligations of its law are stated once, in [THE_MACHINE](THE_MACHINE.md) and the
+[model formula](HNN_FORMULA.md); classical architecture charts are the formula's §2. This section
+lists the Lean framework's computation owners those guides consume.
 
 [definition] Biological neural transport adds its own membrane and constitutive data. The
 Hodgkin–Huxley conduction model is a concrete historical comparison for voltage, membrane
@@ -871,21 +862,6 @@ current and internal channel state
 ([original paper](https://physoc.onlinelibrary.wiley.com/doi/10.1113/jphysiol.1952.sp004764)).
 Mapping an axon to a tube requires those fields and longitudinal/boundary transport, not merely
 renaming a machine-learning edge. Conversely, tube composition is not exclusive to neurons.
-
-[definition] The formal deposit fixes three obligations of the HNN law (rebuild step 4): return
-through the producing interior; keep the finite mixed response of changing current and
-morphology; and re-establish navigator/receiver descent before reusing a compressed successor.
-Its finite theorem is a local comparison, not a mandate to replace the machine with the
-coupled-LC chart.
-
-[project-postulate] “Compression is intelligence is navigation” names the framework's adopted
-construction ([the line](plans/THE_REBUILD.md#the-line-the-rebuild-serves)): couple fractal
-navigators with terrain, quotient what no admitted receiver distinguishes, and learn reusable
-routes through changing, receiver-relative geometry. Exact
-factorization and generator descent are mathematical theorems at declared scope. A universal
-prediction or intelligence guarantee requires its own statement and assumptions. The practical
-return here is a navigable formal framework, shared operators and explicit comparisons that can
-continue growing across subjects.
 
 [established-bounded; formal-proof] `Transport/NavigatorMachineCharts.lean`, imported by
 Framework Dynamics, checks the fixed navigator machine's rational affine spatial realization,

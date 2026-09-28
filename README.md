@@ -195,9 +195,8 @@ Failures are published with the same care as results.
 | [HOLONIC_NOTATION](docs/HOLONIC_NOTATION.md) | Kets, bras, faces, frame transports and ports |
 | [HELICAL_GEOMETRY](docs/HELICAL_GEOMETRY.md), [WINDING_CARRY_AND_PLACEMENT](docs/WINDING_CARRY_AND_PLACEMENT.md) | Screws, helices, carry, lock addresses, cell holonomy and towers |
 | [CONSTRAINT_MODES_AND_RECEIVER_FACES](docs/CONSTRAINT_MODES_AND_RECEIVER_FACES.md), [ANALYTIC_FLUX_AND_RECEIVING_BASINS](docs/ANALYTIC_FLUX_AND_RECEIVING_BASINS.md) | Constraint modes, chart transitions and analytic receiving basins |
-| [HOLONIC_FLUID_CONSTRUCTION](docs/HOLONIC_FLUID_CONSTRUCTION.md), [FLUID_REFLECTION_AND_CONCENTRATED_INTERIORS](docs/FLUID_REFLECTION_AND_CONCENTRATED_INTERIORS.md) | Euler, stress, diffusion, lightning and concentrated interiors from Swing and Holon interactions |
+| [HOLONIC_FLUID_CONSTRUCTION](docs/HOLONIC_FLUID_CONSTRUCTION.md), [FLUID_REFLECTION_AND_CONCENTRATED_INTERIORS](docs/FLUID_REFLECTION_AND_CONCENTRATED_INTERIORS.md) | Euler, stress, diffusion, lightning and concentrated interiors from the half-turn and Holon interactions |
 | [MASS_ENERGY_AND_CAUSAL_TRANSPORT](docs/MASS_ENERGY_AND_CAUSAL_TRANSPORT.md) | Mass–energy, causal transport and generative intelligence |
-| [RH_CENTERED_CURRENT_UPPER_BOUND](docs/RH_CENTERED_CURRENT_UPPER_BOUND.md) | The half-centred face and the de Bruijn–Newman upper bound |
 | [FORMAL_FRAMEWORK](docs/FORMAL_FRAMEWORK.md) | How the Lean framework's subjects connect |
 
 **Plans and position**
@@ -260,7 +259,7 @@ git grep -n 'NormalizedKernel' 13f8c734            # the pre-reset tree
   and the [population](research/records/2026-09-27_THE_EGG_IS_A_GENERATORS_GENOME_SELECTION_IS_BAYES_AND_THE_FACES_OF_INTEGERS_ARE_MOIRES_OF_GRATINGS.md).
 - **Mathematics.** Start with [ELEMENTARY_OBJECTS](docs/ELEMENTARY_OBJECTS.md), its
   [targets](docs/ELEMENTARY_OBJECTS.md#the-targets) and the
-  [RH guide](docs/RH_CENTERED_CURRENT_UPPER_BOUND.md). To find any expression by name, search
+  [RH upper-bound record](research/records/2026-09-14_THE_HALF_CENTRED_FACE_AND_THE_DE_BRUIJN_NEWMAN_UPPER_BOUND.md). To find any expression by name, search
   the atlas's `targets.tsv` and `arithmetic.tsv` (`rg -i 'Farey' docs/atlas/`).
 - **Physics.** Start with the [fluid construction](docs/HOLONIC_FLUID_CONSTRUCTION.md),
   [mass–energy](docs/MASS_ENERGY_AND_CAUSAL_TRANSPORT.md) and the atlas's `physics.tsv`.
