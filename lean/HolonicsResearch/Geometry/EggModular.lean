@@ -1,4 +1,7 @@
 import Mathlib.Analysis.SpecialFunctions.Pow.Real
+import Mathlib.Analysis.Complex.UpperHalfPlane.Metric
+import Mathlib.Analysis.SpecialFunctions.OrdinaryHypergeometric
+import Mathlib.Analysis.SpecialFunctions.Integrals.Basic
 import Mathlib.Tactic
 
 /-!
@@ -26,9 +29,24 @@ displacement `w` carries the Legendre parameter `λ = ((a − w)/(a + w))²`; wi
    Legendre curve has `j = 1728`. The irrational displacement is carried as its constraint
    identity `β² − 6β + 1 = 0`, and `√2` as the root of `x² = 2`.
 
-[open] The hypergeometric charts (`K(√λ) = (π/2) ₂F₁(½, ½; 1; λ)` and the Schwarz map of the
-`(½, ⅓, 0)` triangle whose inverse is `1728/j`) and the identification of the monodromy with
-`PSL(2, ℤ)` are not stated here; they remain named analytic obligations in #62.
+4. **The hyperbolic face** (`hyperbolic_circle_euclidean_equation`): in the upper half-plane with
+   Mathlib's hyperbolic distance, the points at distance `r ≥ 0` from `(x₀, y₀)` are exactly the
+   Euclidean circle `(x − x₀)² + (y − y₀ cosh r)² = y₀² sinh² r`; its top and bottom are
+   `y₀ eʳ` and `y₀ e⁻ʳ` (`hyperbolic_circle_vertical_extent`). A Gaussian's Fisher form is
+   `2(dx² + dy²)/y²` at `x = μ/√2`, `y = σ`, so a Fisher radius `R` is the hyperbolic radius
+   `r = R/√2`. The lopsided circle is egg-like by interpretation only: no receiver map or
+   preserved flux joins it to the Hügelschäffer egg.
+5. **The period's hypergeometric coefficients** (`egg_hypergeometric_coefficient`,
+   `egg_period_coefficient`): `₂F₁(½, ½; 1; λ)` has coefficients `((½)_j/j!)² = (C(2j, j)/4ʲ)²`
+   (`halfPochhammer_div_factorial`), and `(π/2)` times the `j`-th is the `j`-th term of
+   `K(k) = ∫₀^(π/2) (1 − k² sin²θ)^(−1/2) dθ` expanded in `k²`: the binomial coefficient
+   `C(2j, j)/4ʲ` of `(1 − x)^(−1/2)` times the Wallis integral `½∫₀^π sin^(2j)`
+   (Mathlib's `integral_sin_pow_even`, `wallis_centralBinom`).
+
+[open] Mathlib has no complete elliptic integral `K`, so the analytic join
+`K(√λ) = (π/2) ₂F₁(½, ½; 1; λ)` (the termwise integration of the binomial series) is stated here
+only term by term. The Schwarz map of the `(½, ⅓, 0)` triangle whose inverse is `1728/j` and the
+identification of its monodromy with `PSL(2, ℤ)` remain named analytic obligations in #62.
 -/
 
 namespace Holonics.Geometry.EggModular
@@ -120,6 +138,109 @@ theorem egg_j_of_legendre_lambda {β : ℝ} (hβ0 : 0 < β) (hβ1 : β < 1) :
   · rw [h]
     norm_num [legendreJ]
 
+/-! ## The hyperbolic face: an information circle is a lopsided Euclidean circle -/
+
+section Hyperbolic
+
+open UpperHalfPlane
+
+/-- [proved-derived; formal-checked] **`hyperbolic_circle_euclidean_equation`.** In the upper
+half-plane with its hyperbolic distance (`cosh d = 1 + |z − w|²/(2 Im z Im w)`, Mathlib's
+`UpperHalfPlane.cosh_dist`), the circle of radius `r ≥ 0` about `w = (x₀, y₀)` is exactly the
+Euclidean circle `(x − x₀)² + (y − y₀ cosh r)² = y₀² sinh² r`, through Mathlib's
+`dist_eq_iff_dist_coe_center_eq`. -/
+theorem hyperbolic_circle_euclidean_equation (z w : ℍ) {r : ℝ} (hr : 0 ≤ r) :
+    dist z w = r ↔
+      (z.re - w.re) ^ 2 + (z.im - w.im * Real.cosh r) ^ 2 = w.im ^ 2 * Real.sinh r ^ 2 := by
+  rw [dist_eq_iff_dist_coe_center_eq]
+  have hR : 0 ≤ w.im * Real.sinh r := mul_nonneg w.im_pos.le (Real.sinh_nonneg_iff.mpr hr)
+  rw [← sq_eq_sq₀ dist_nonneg hR, Complex.dist_eq, Complex.sq_norm, Complex.normSq_apply]
+  simp only [Complex.sub_re, Complex.sub_im, coe_re, coe_im, center_re, center_im]
+  constructor <;> intro h <;> nlinarith [h]
+
+/-- [proved-derived; formal-checked] The circle's top and bottom heights are `y₀ eʳ` and
+`y₀ e⁻ʳ`: its Euclidean centre `y₀ cosh r` is their arithmetic mean and `y₀` their geometric
+mean. -/
+theorem hyperbolic_circle_vertical_extent (w : ℍ) (r : ℝ) :
+    w.im * Real.cosh r + w.im * Real.sinh r = w.im * Real.exp r ∧
+      w.im * Real.cosh r - w.im * Real.sinh r = w.im * Real.exp (-r) := by
+  constructor
+  · rw [← mul_add, Real.cosh_add_sinh]
+  · rw [← mul_sub, Real.cosh_sub_sinh]
+
+end Hyperbolic
+
+/-! ## The period chart: the coefficients of `(π/2) ₂F₁(½, ½; 1; λ)` -/
+
+section Period
+
+open Polynomial
+
+variable {K : Type*} [Field K] [CharZero K]
+
+/-- [proved-derived; formal-checked] `(½)_j/j! = C(2j, j)/4ʲ`, the coefficient of `xʲ` in
+`(1 − x)^(−1/2)`. -/
+theorem halfPochhammer_div_factorial (j : ℕ) :
+    (ascPochhammer K j).eval (1 / 2 : K) / (j.factorial : K) = (j.centralBinom : K) / 4 ^ j := by
+  induction j with
+  | zero => simp
+  | succ j ih =>
+    have h' : ((j : K) + 1) * ((j + 1).centralBinom : K) =
+        2 * (2 * j + 1) * (j.centralBinom : K) := by
+      exact_mod_cast Nat.succ_mul_centralBinom_succ j
+    have hf : (j.factorial : K) ≠ 0 := by exact_mod_cast j.factorial_ne_zero
+    have hj : (j : K) + 1 ≠ 0 := by exact_mod_cast j.succ_ne_zero
+    rw [ascPochhammer_succ_eval, Nat.factorial_succ, Nat.cast_mul, Nat.cast_succ]
+    have hcb : ((j + 1).centralBinom : K) =
+        2 * (2 * j + 1) * (j.centralBinom : K) / ((j : K) + 1) := by
+      rw [eq_div_iff hj, mul_comm]; exact h'
+    have h4 : (4 : K) ^ j ≠ 0 := pow_ne_zero _ (by norm_num)
+    have ih' : (ascPochhammer K j).eval (1 / 2 : K) =
+        (j.centralBinom : K) * (j.factorial : K) / 4 ^ j := by
+      rw [div_eq_div_iff hf h4] at ih
+      rw [eq_div_iff h4, ih]
+    rw [hcb, pow_succ, ih']
+    field_simp
+    ring
+
+/-- [proved-derived; formal-checked] **The coefficients of `₂F₁(½, ½; 1; λ)`** (Mathlib's
+`ordinaryHypergeometricCoefficient`) are `((½)_j/j!)² = (C(2j, j)/4ʲ)²`. -/
+theorem egg_hypergeometric_coefficient (j : ℕ) :
+    ordinaryHypergeometricCoefficient (1 / 2 : K) (1 / 2) 1 j =
+      ((j.centralBinom : K) / 4 ^ j) ^ 2 := by
+  have hf : (j.factorial : K) ≠ 0 := by exact_mod_cast j.factorial_ne_zero
+  rw [ordinaryHypergeometricCoefficient, ascPochhammer_eval_one, ← halfPochhammer_div_factorial]
+  field_simp
+
+/-- [proved-derived; formal-checked] Wallis's product is the central binomial ratio:
+`∏_(i<n) (2i + 1)/(2i + 2) = C(2n, n)/4ⁿ`. -/
+theorem wallis_centralBinom (n : ℕ) :
+    ∏ i ∈ Finset.range n, (2 * (i : ℝ) + 1) / (2 * i + 2) = (n.centralBinom : ℝ) / 4 ^ n := by
+  induction n with
+  | zero => simp
+  | succ n ih =>
+    rw [Finset.prod_range_succ, ih]
+    have h' : ((n : ℝ) + 1) * ((n + 1).centralBinom : ℝ) =
+        2 * (2 * n + 1) * (n.centralBinom : ℝ) := by
+      exact_mod_cast Nat.succ_mul_centralBinom_succ n
+    have hn : (n : ℝ) + 1 ≠ 0 := by positivity
+    field_simp
+    rw [pow_succ]
+    linear_combination (-(4 : ℝ) ^ n * 2) * h'
+
+/-- [proved-derived; formal-checked] **The period's coefficients, term by term.** `(π/2)` times the
+`j`-th coefficient of `₂F₁(½, ½; 1; λ)` is the `j`-th term of `K` expanded in `k² = λ`: the binomial
+coefficient `C(2j, j)/4ʲ` of `(1 − k² sin²θ)^(−1/2)` times `∫₀^(π/2) sin^(2j) θ dθ`, carried as
+`½∫₀^π` (Mathlib's `integral_sin_pow_even`). -/
+theorem egg_period_coefficient (j : ℕ) :
+    (Real.pi / 2) * ordinaryHypergeometricCoefficient (1 / 2 : ℝ) (1 / 2) 1 j =
+      (j.centralBinom : ℝ) / 4 ^ j *
+        ((1 / 2) * ∫ x in (0 : ℝ)..Real.pi, Real.sin x ^ (2 * j)) := by
+  rw [egg_hypergeometric_coefficient, integral_sin_pow_even, wallis_centralBinom]
+  ring
+
+end Period
+
 end Holonics.Geometry.EggModular
 
 section Audit
@@ -128,4 +249,9 @@ open Holonics.Geometry.EggModular
 #print axioms legendreJ_sub_1728
 #print axioms legendreJ_half
 #print axioms egg_j_of_legendre_lambda
+#print axioms hyperbolic_circle_euclidean_equation
+#print axioms hyperbolic_circle_vertical_extent
+#print axioms egg_hypergeometric_coefficient
+#print axioms wallis_centralBinom
+#print axioms egg_period_coefficient
 end Audit

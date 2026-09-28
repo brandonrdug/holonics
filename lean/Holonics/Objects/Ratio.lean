@@ -8,6 +8,7 @@ import Holonics.Transport.JetStaircase
 import Mathlib.Analysis.Quaternion
 import Mathlib.Analysis.SpecialFunctions.Trigonometric.Deriv
 import Mathlib.Analysis.SpecialFunctions.Log.Deriv
+import Mathlib.Analysis.SpecialFunctions.Sqrt
 
 /-!
 # The ratio object: loss is the logarithm of a Holon ratio, and the ratio is a calculus
@@ -38,6 +39,10 @@ target and the second the produced section.
    `z_i = √q_i e^{iθ_i}` and lift `log̃ z_i = (log q_i)/2 + iθ_i` (`exp_liftedLog`),
    `liftedCrossEntropy T H θ = −(2/ln 2) Σ T_i log̃ z^H_i`, and the excess over the target is
    `(2/ln 2) Σ T_i ℓ_i` with `ℓ_i = log̃(z^T_i / z^H_i)` (`liftedCrossEntropy_excess_eq_logRatio`).
+   **The Fisher sphere.** The amplitude's magnitude is `ψ(p)_i = √p_i` (`norm_amplitude`), which
+   lies on the unit sphere with the simplex tangents on its tangent space (`sqrtChart_sphere`), and
+   Fisher's form is four times the sphere's inner product pulled back through it,
+   `Σ u_i v_i/p_i = 4⟨dψ_p(u), dψ_p(v)⟩` (`fisher_sqrt_pullback`).
 3. **Winding.** A lift shift `θ_i ↦ θ_i + 2πk_i` moves only the phase face, by
    `−(4π/ln 2) Σ p_i k_i`; amplitudes agree exactly when the lifts differ by whole turns
    (`amplitude_eq_iff_winding`, via `Turn`); the principal logarithm returns the lift iff it lies
@@ -275,6 +280,63 @@ theorem liftedCrossEntropy_excess_eq_logRatio (target produced : PositiveProbabi
     simp only [logRatio, mul_sub, Finset.sum_sub_distrib]
     ring
   · rw [liftedCrossEntropy_excess]
+
+/-! ### The Fisher sphere: the amplitude's magnitude section
+
+The magnitude of the amplitude, `ψ(p)_i = |z_i| = √p_i`, places a strictly positive finite face on
+the positive orthant of the unit sphere. Its differential pulls the sphere's inner product back to
+one quarter of Fisher's form: the Fisher form is the sphere's metric read through the amplitude.
+Fisher distance keeps no phase or winding; the phase face above completes the comparison. -/
+
+/-- [proved-derived; formal-checked] The magnitude section of the amplitude is `√p_i`. -/
+theorem norm_amplitude (q : PositiveProbabilitySection Index) (phase : Index → ℝ) (i : Index) :
+    ‖amplitude q phase i‖ = Real.sqrt (q.mass i) := by
+  rw [amplitude, norm_mul, Complex.norm_exp_ofReal_mul_I, mul_one, Complex.norm_real,
+    Real.norm_of_nonneg (Real.sqrt_nonneg _)]
+
+/-- [definition] **The differential of the square-root chart** `ψ(p)_i = √p_i` at a positive face,
+applied to a tangent `u`: `dψ_p(u)_i = u_i/(2√p_i)`. -/
+def sqrtChartDifferential (p : PositiveProbabilitySection Index) (u : Index → ℝ) (i : Index) :
+    ℝ :=
+  u i / (2 * Real.sqrt (p.mass i))
+
+/-- [proved-derived; formal-checked] **`fisher_sqrt_pullback`.** On a strictly positive finite face,
+`dψ_p(u)` is the derivative of `s ↦ √(p_i + s u_i)` at `0`, and Fisher's form is four times the
+pulled-back sphere inner product: `Σ_i u_i v_i/p_i = 4 ⟨dψ_p(u), dψ_p(v)⟩`. -/
+theorem fisher_sqrt_pullback (p : PositiveProbabilitySection Index) (u v : Index → ℝ) :
+    (∀ i, HasDerivAt (fun s : ℝ => Real.sqrt (p.mass i + s * u i))
+        (sqrtChartDifferential p u i) 0) ∧
+      ∑ i, u i * v i / p.mass i =
+        4 * ∑ i, sqrtChartDifferential p u i * sqrtChartDifferential p v i := by
+  refine ⟨fun i => ?_, ?_⟩
+  · have h : HasDerivAt (fun s : ℝ => p.mass i + s * u i) (u i) 0 := by
+      exact (hasDerivAt_mul_const (u i)).const_add (p.mass i)
+    have hpos : p.mass i + 0 * u i ≠ 0 := by
+      rw [zero_mul, add_zero]
+      exact (p.positive i).ne'
+    exact h.sqrt hpos |>.congr_deriv (by simp [sqrtChartDifferential])
+  · rw [Finset.mul_sum]
+    refine Finset.sum_congr rfl fun i _ => ?_
+    have hp0 : p.mass i ≠ 0 := (p.positive i).ne'
+    unfold sqrtChartDifferential
+    rw [div_mul_div_comm, mul_mul_mul_comm, Real.mul_self_sqrt (p.positive i).le]
+    field_simp
+    ring
+
+/-- [proved-derived; formal-checked] **The chart lands on the unit sphere, and simplex tangents on
+its tangent space.** `Σ_i (√p_i)² = 1`, and `⟨ψ(p), dψ_p(u)⟩ = (Σ_i u_i)/2`, which is zero exactly
+for the tangents of the simplex. -/
+theorem sqrtChart_sphere (p : PositiveProbabilitySection Index) (u : Index → ℝ) :
+    ∑ i, Real.sqrt (p.mass i) ^ 2 = 1 ∧
+      ∑ i, Real.sqrt (p.mass i) * sqrtChartDifferential p u i = (∑ i, u i) / 2 := by
+  refine ⟨?_, ?_⟩
+  · simp_rw [Real.sq_sqrt (p.positive _).le]
+    exact p.normalized
+  · rw [Finset.sum_div]
+    refine Finset.sum_congr rfl fun i _ => ?_
+    have hs0 : Real.sqrt (p.mass i) ≠ 0 := (Real.sqrt_pos.mpr (p.positive i)).ne'
+    unfold sqrtChartDifferential
+    field_simp
 
 end LiftedLog
 
@@ -918,6 +980,9 @@ section Audit
 #print axioms logitCovector_witness
 #print axioms exp_liftedLog
 #print axioms liftedCrossEntropy_eq_liftedLog
+#print axioms norm_amplitude
+#print axioms fisher_sqrt_pullback
+#print axioms sqrtChart_sphere
 #print axioms liftedCrossEntropy_excess_eq_logRatio
 #print axioms liftedCrossEntropy_windShift_im
 #print axioms amplitude_eq_iff_winding

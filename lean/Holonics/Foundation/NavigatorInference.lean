@@ -1,5 +1,6 @@
 import Holonics.Foundation.ReceiverCodeCost
 import Holonics.Foundation.ReceiverHistoryCompression
+import Holonics.Foundation.Standing
 import Holonics.Computation.HolonicAdjointNormalization
 import Holonics.Physics.InformationDifference
 
@@ -178,6 +179,30 @@ theorem sufficient_statistic_every_future
   rw [← commute]
   exact (sufficient_statistic_posterior statistic objective reduced offset factors _).symm
 
+/-- [proved-derived; formal-checked] **A sufficient statistic of the finite candidate family is a
+standing.** When the family's objective factors through the statistic up to a history offset (the
+Fisher–Neyman form, `sufficient_statistic_posterior`) and the statistic is recursively closed, the
+statistic retains a lawful `StandingLaw` whose receiver is the posterior over the finite candidate
+family: `Standing.statistical_sufficiency_gives_standing` at the posterior faces. -/
+theorem sufficient_statistic_is_standing
+    {History Statistic Generator : Type*} (statistic : History → Statistic)
+    (objective : History → Candidate → ℝ) (reduced : Statistic → Candidate → ℝ)
+    (offset : History → ℝ)
+    (factors : ∀ history p, objective history p = reduced (statistic history) p + offset history)
+    (step : Generator → History → History) (reducedStep : Generator → Statistic → Statistic)
+    (closed : ∀ g h, statistic (step g h) = reducedStep g (statistic h)) :
+    ∃ L : Standing.StandingLaw Generator Unit History Statistic (Candidate → ℝ),
+      L.transport = step ∧ L.observe = (fun _ history => (posterior (objective history)).mass) ∧
+        L.retain = statistic := by
+  obtain ⟨L, htransport, hobserve, hretain, -⟩ :=
+    Standing.statistical_sufficiency_gives_standing
+      (fun (_ : Unit) history => (posterior (objective history)).mass) step statistic
+      (fun _ s => (posterior (reduced s)).mass) reducedStep
+      (fun _ history => sufficient_statistic_posterior statistic objective reduced offset factors
+        history)
+      closed
+  exact ⟨L, htransport, hobserve, hretain⟩
+
 /-- Code/work boundary terms and residuals contribute to inference unless common to all candidates. -/
 theorem code_cost_log_odds
     (description loss cost boundary residual : Candidate → ℝ) (C : ℝ)
@@ -298,6 +323,7 @@ end CountControl
 #print axioms variational_minimum
 #print axioms posterior_eq_iff_objective_differences
 #print axioms sufficient_statistic_every_future
+#print axioms sufficient_statistic_is_standing
 #print axioms code_cost_log_odds
 #print axioms posterior_coarse_eq_pushforward
 

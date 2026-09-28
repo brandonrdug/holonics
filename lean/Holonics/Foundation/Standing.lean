@@ -54,7 +54,9 @@ Nothing here founds a second quotient, a second receiver vocabulary or a second 
    observation factors through it. Two different passage histories can leave one standing
    (`two_histories_leave_one_standing`), and two presents with one present face can carry
    different standing that a future receiver separates
-   (`one_present_face_two_standings_separated_later`).
+   (`one_present_face_two_standings_separated_later`). A statistic through which every admitted
+   face factors and every admitted transport descends is such a standing, with an explicit
+   reopening (`statistical_sufficiency_gives_standing`).
 
 2. **Memory is a generator.** `MemoryLaw.remember` returns a `TimedFace` at the *present* time, so
    the reconstruction is not of the same type as the original's face
@@ -224,6 +226,38 @@ theorem standingLaw_exists_iff_future_factors
     rw [dif_pos hexists]
     have hchosen : retain hexists.choose = retain source := hexists.choose_spec
     exact congrFun (factors _ _ hchosen) (receiver, word)
+
+/-- [proved-derived; formal-checked] **`statistical_sufficiency_gives_standing`.** A statistic `T`
+through which every admitted future face factors (`observe ρ x = face ρ (T x)`), and through which
+every admitted transport descends (`T (g x) = ḡ (T x)`), is a standing: the lawful `StandingLaw`
+retains `T` and reopens `(ρ, w)` by reading `face ρ` after the descended word `w̄`
+(`Chronology.generatorEquivarianceExtendsToEveryTransportWord`). This is the `←` direction of
+`standingLaw_exists_iff_future_factors` with its reopening made explicit, so it needs neither a
+choice nor an inhabited face type. Sufficiency for a declared statistical family certifies a
+standing only through these two hypotheses: a later contact that `T` does not factor, or a
+transport that does not descend, refutes it (`StandingLaw.separating_future_refutes_the_standing`).
+The finite candidate family's posterior is the statistical instance
+(`NavigatorInference.sufficient_statistic_is_standing`). -/
+theorem statistical_sufficiency_gives_standing
+    {Generator Receiver Source Statistic Face : Type*}
+    (observe : Receiver → Source → Face) (transport : Generator → Source → Source)
+    (statistic : Source → Statistic) (face : Receiver → Statistic → Face)
+    (descend : Generator → Statistic → Statistic)
+    (factors : ∀ receiver source, observe receiver source = face receiver (statistic source))
+    (descends : ∀ generator source,
+      statistic (transport generator source) = descend generator (statistic source)) :
+    ∃ L : StandingLaw Generator Receiver Source Statistic Face,
+      L.transport = transport ∧ L.observe = observe ∧ L.retain = statistic ∧
+        ∀ receiver word standing,
+          L.reopen receiver word standing = face receiver (transportWord descend word standing) := by
+  refine ⟨{
+    transport := transport
+    observe := observe
+    retain := statistic
+    reopen := fun receiver word standing => face receiver (transportWord descend word standing)
+    sufficient := fun receiver word source => ?_ }, rfl, rfl, rfl, fun _ _ _ => rfl⟩
+  rw [factors, generatorEquivarianceExtendsToEveryTransportWord transport descend statistic
+    descends word source]
 
 /-! ### A carrier on which both witnesses live
 
@@ -1098,6 +1132,7 @@ open Holonics.Foundation.Standing
 #print axioms StandingLaw.futureAgreement_of_retain_eq
 #print axioms StandingLaw.separating_future_refutes_the_standing
 #print axioms standingLaw_exists_iff_future_factors
+#print axioms statistical_sufficiency_gives_standing
 #print axioms two_histories_leave_one_standing
 #print axioms one_present_face_two_standings_separated_later
 #print axioms the_remembered_face_is_a_new_occurrence

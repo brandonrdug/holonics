@@ -42,6 +42,10 @@ digit vector, and its faces are residues read through the radix.
    `k ≡ −r (bᵐ)⁻¹` in `ZMod p` (`grating_on_digit_index`).
 5. **The cheap faces** (`cheap_faces`): for `d ∣ b` the last digit, for `d ∣ b − 1` the digit sum,
    and for `d ∣ b + 1` the alternating digit sum are congruent to `n` modulo `d`.
+6. **The leading face has a carry fibre** (`leading_face_fibre`): the operands' first digits
+   `A = ⌊a/bˢ⌋`, `C = ⌊c/bˢ⌋` confine the product to `[A C b^(2s), ((A + 1)bˢ − 1)((C + 1)bˢ − 1)]`,
+   and its leading reading `⌊a c/D⌋` to the readings of those two ends. The trailing face needs no
+   fibre: `a c mod bᵏ = (a mod bᵏ)(c mod bᵏ) mod bᵏ` is Mathlib's `Nat.mul_mod`.
 
 Consumers: `Compression/Landmark/ConstraintIdentity` (certified windows of π and `e`).
 -/
@@ -201,5 +205,30 @@ theorem cheap_faces (b d n : ℕ) :
       (Int.modEq_iff_dvd.mpr (by rwa [sub_neg_eq_add])).symm
     have := Nat.zmodeq_ofDigits_digits d b (-1) h1 n
     rwa [Nat.ofDigits_neg_one] at this
+
+/-- [proved-derived; formal-checked] **`leading_face_fibre`.** The operands' leading faces
+`A = ⌊a/bˢ⌋` and `C = ⌊c/bˢ⌋` (their first digits, with `s` places below) confine the product:
+`A C b^(2s) ≤ a c ≤ ((A + 1) bˢ − 1)((C + 1) bˢ − 1)`, and every leading reading `⌊a c/D⌋` of
+the product lies between the readings of the two ends. The unread lower places carry into the
+leading face; this interval is that carry fibre. -/
+theorem leading_face_fibre {b : ℕ} (hb : 0 < b) (s a c D : ℕ) :
+    (a / b ^ s) * (c / b ^ s) * b ^ (2 * s) ≤ a * c ∧
+      a * c ≤ ((a / b ^ s + 1) * b ^ s - 1) * ((c / b ^ s + 1) * b ^ s - 1) ∧
+      (a / b ^ s) * (c / b ^ s) * b ^ (2 * s) / D ≤ a * c / D ∧
+      a * c / D ≤ ((a / b ^ s + 1) * b ^ s - 1) * ((c / b ^ s + 1) * b ^ s - 1) / D := by
+  have hB : 0 < b ^ s := pow_pos hb s
+  have lower : ∀ x : ℕ, x / b ^ s * b ^ s ≤ x := fun x => Nat.div_mul_le_self x (b ^ s)
+  have upper : ∀ x : ℕ, x ≤ (x / b ^ s + 1) * b ^ s - 1 := fun x => by
+    have := Nat.lt_div_mul_add (a := x) hB
+    have h1 : 1 ≤ (x / b ^ s + 1) * b ^ s := Nat.one_le_iff_ne_zero.mpr (by positivity)
+    rw [add_mul, one_mul]
+    omega
+  have hlo : (a / b ^ s) * (c / b ^ s) * b ^ (2 * s) ≤ a * c := by
+    calc (a / b ^ s) * (c / b ^ s) * b ^ (2 * s)
+        = (a / b ^ s * b ^ s) * (c / b ^ s * b ^ s) := by rw [two_mul, pow_add]; ring
+      _ ≤ a * c := Nat.mul_le_mul (lower a) (lower c)
+  have hhi : a * c ≤ ((a / b ^ s + 1) * b ^ s - 1) * ((c / b ^ s + 1) * b ^ s - 1) :=
+    Nat.mul_le_mul (upper a) (upper c)
+  exact ⟨hlo, hhi, Nat.div_le_div_right hlo, Nat.div_le_div_right hhi⟩
 
 end Holonics.Mathematics.RadixWindowReceiver

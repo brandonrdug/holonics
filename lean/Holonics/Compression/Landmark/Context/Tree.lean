@@ -3,6 +3,7 @@ import Holonics.Aeon.Production.FirstLaw
 import Holonics.Foundation.FractalPacking
 import Holonics.Compression.Core.Cost
 import Holonics.Foundation.Standing
+import Mathlib.Analysis.SpecialFunctions.OrdinaryHypergeometric
 
 /-!
 # Compression.Landmark.Context.Tree: the receiving parametron's storage as a tree of landmarks
@@ -65,6 +66,15 @@ node's arrivals are the epochs of its section, on which its register is read
    node face is the Pólya urn's prediction at initial weight `1/2` per class
    (`dirichletPredictive`), and the urn's sequential product is the KT mass of the counts
    (`urnSeq`, `kt_eq_dirichlet_half`).
+   **The beta-binomial polynomial** (`betaBinomial_pgf`): the Beta(α, β) law enters as its
+   moments `(α)_j/(α + β)_j` (`betaMoments`, a linear functional on `ℚ[X]`, the rational face of
+   Euler's integral), its mixed moments are `(α)_k (β)_m/(α + β)_(k+m)` (`betaMoments_mixed`),
+   and the count of one class in `n` draws has generating polynomial
+   `Σ_k C(n,k) (α)_k (β)_(n−k)/(α + β)_n t^k = Σ_(j≤n) (−n)_j (α)_j/((α + β)_j j!) (1 − t)^j`,
+   the terminating `₂F₁(−n, α; α + β; 1 − t)` with Mathlib's `ordinaryHypergeometricCoefficient`.
+   On two classes the urn is that law at `β = α`: its sequential product is
+   `(α)_k (α)_(n−k)/(2α)_n` (`urnSeq_bool`), so the count it draws is beta-binomial
+   (`betaBinomial_is_urn_count`).
 3. **The opened-path face** (`path_face_normalized`, `path_face_ge_min`, `pathFace_const`): for
    positive normalized node faces and **any** `λ_d ∈ [0,1]` (the exact weights or a lattice
    chart's), the path face is positive and normalized, and at least the minimum of the path's faces.
@@ -562,6 +572,141 @@ theorem kt_eq_dirichlet_half [Nonempty A] :
   exact this
 
 end KT
+
+/-! ### The beta-binomial polynomial: the urn's count law is a terminating ₂F₁ -/
+
+section BetaBinomial
+
+open Polynomial Finset
+
+/-- [definition] **The Beta(α, β) moment** `(α)_j/(α + β)_j`, in rising factorials. -/
+def betaMoment (α β : ℚ) (j : ℕ) : ℚ :=
+  (ascPochhammer ℚ j).eval α / (ascPochhammer ℚ j).eval (α + β)
+
+/-- [definition] **The Beta(α, β) moment functional** on `ℚ[X]`: `Xʲ ↦ (α)_j/(α + β)_j`, extended
+linearly. It is Euler's integral `∫₀¹ f(x) x^(α−1)(1 − x)^(β−1) dx/B(α, β)` read on polynomials,
+where every value is rational. -/
+def betaMoments (α β : ℚ) : ℚ[X] →ₗ[ℚ] ℚ :=
+  Polynomial.lsum fun j => betaMoment α β j • LinearMap.id
+
+theorem betaMoments_X_pow (α β : ℚ) (j : ℕ) : betaMoments α β (X ^ j) = betaMoment α β j := by
+  rw [betaMoments, Polynomial.lsum_apply, ← Polynomial.monomial_one_right_eq_X_pow,
+    Polynomial.sum_monomial_index _ _ (by simp)]
+  simp
+
+/-- [definition] **The beta-binomial mass** of `k` arrivals of one class in `n` draws:
+`C(n, k) (α)_k (β)_(n−k)/(α + β)_n = C(n, k) B(α + k, β + n − k)/B(α, β)`. -/
+def betaBinomialMass (α β : ℚ) (n k : ℕ) : ℚ :=
+  (n.choose k : ℚ) * ((ascPochhammer ℚ k).eval α * (ascPochhammer ℚ (n - k)).eval β /
+    (ascPochhammer ℚ n).eval (α + β))
+
+/-- [proved-derived; formal-checked] **The mixed moments of the Beta law**:
+`E[xᵏ(1 − x)ᵐ] = (α)_k (β)_m/(α + β)_(k+m)`, by `xᵏ(1 − x)^(m+1) = xᵏ(1 − x)ᵐ − x^(k+1)(1 − x)ᵐ`. -/
+theorem betaMoments_mixed {α β : ℚ} (hα : 0 < α) (hβ : 0 < β) (m : ℕ) :
+    ∀ k : ℕ, betaMoments α β (X ^ k * (1 - X) ^ m) =
+      (ascPochhammer ℚ k).eval α * (ascPochhammer ℚ m).eval β /
+        (ascPochhammer ℚ (k + m)).eval (α + β) := by
+  induction m with
+  | zero =>
+    intro k
+    simp [betaMoments_X_pow, betaMoment]
+  | succ m ih =>
+    intro k
+    have hsplit : (X ^ k * (1 - X) ^ (m + 1) : ℚ[X]) =
+        X ^ k * (1 - X) ^ m - X ^ (k + 1) * (1 - X) ^ m := by ring
+    rw [hsplit, map_sub, ih k, ih (k + 1), show k + 1 + m = k + m + 1 by omega,
+      show k + (m + 1) = k + m + 1 by omega, ascPochhammer_succ_eval, ascPochhammer_succ_eval,
+      ascPochhammer_succ_eval]
+    have hc : 0 < (ascPochhammer ℚ (k + m)).eval (α + β) := ascPochhammer_pos _ _ (by linarith)
+    have hd : 0 < α + β + ((k + m : ℕ) : ℚ) := by positivity
+    field_simp
+    push_cast
+    ring
+
+/-- `(−n)_j = (−1)ʲ j! C(n, j)`: the rising factorial at a negative integer terminates. -/
+theorem ascPochhammer_neg_nat (n j : ℕ) :
+    (ascPochhammer ℚ j).eval (-(n : ℚ)) = (-1) ^ j * (j.factorial : ℚ) * (n.choose j : ℚ) := by
+  rw [ascPochhammer_eval_neg_eq_descPochhammer, descPochhammer_eval_eq_descFactorial,
+    Nat.descFactorial_eq_factorial_mul_choose]
+  push_cast
+  ring
+
+/-- [proved-derived; formal-checked] **`betaBinomial_pgf`.** For positive rational `α, β`, the
+beta-binomial generating polynomial is the terminating hypergeometric polynomial
+`₂F₁(−n, α; α + β; 1 − t)`:
+`Σ_(k≤n) C(n,k) (α)_k (β)_(n−k)/(α + β)_n tᵏ = Σ_(j≤n) (−n)_j (α)_j/((α + β)_j j!) (1 − t)ʲ`.
+Both sides are the Beta moments of one polynomial, `(t x + 1 − x)ⁿ = (1 − (1 − t) x)ⁿ`, expanded
+in the two binomial charts. -/
+theorem betaBinomial_pgf {α β : ℚ} (hα : 0 < α) (hβ : 0 < β) (n : ℕ) (t : ℚ) :
+    ∑ k ∈ range (n + 1), betaBinomialMass α β n k * t ^ k =
+      ∑ j ∈ range (n + 1),
+        ordinaryHypergeometricCoefficient (-(n : ℚ)) α (α + β) j * (1 - t) ^ j := by
+  have hpoly : (C t * X + (1 - X) : ℚ[X]) = -(C (1 - t) * X) + 1 := by
+    rw [C_sub, C_1]; ring
+  have lhs : betaMoments α β ((C t * X + (1 - X)) ^ n) =
+      ∑ k ∈ range (n + 1), betaBinomialMass α β n k * t ^ k := by
+    rw [add_pow, map_sum]
+    refine sum_congr rfl fun k hk => ?_
+    have hkn : k + (n - k) = n := Nat.add_sub_cancel' (Nat.lt_succ_iff.mp (mem_range.mp hk))
+    have hterm : ((C t * X) ^ k * (1 - X) ^ (n - k) * (n.choose k : ℚ[X]) : ℚ[X]) =
+        (t ^ k * n.choose k) • (X ^ k * (1 - X) ^ (n - k)) := by
+      rw [smul_eq_C_mul, mul_pow, ← C_pow]; simp only [map_mul, map_natCast]; ring
+    rw [hterm, map_smul, betaMoments_mixed hα hβ, hkn, smul_eq_mul, betaBinomialMass]
+    ring
+  have rhs : betaMoments α β ((-(C (1 - t) * X) + 1) ^ n) =
+      ∑ j ∈ range (n + 1),
+        ordinaryHypergeometricCoefficient (-(n : ℚ)) α (α + β) j * (1 - t) ^ j := by
+    rw [add_pow, map_sum]
+    refine sum_congr rfl fun j _ => ?_
+    have hterm : ((-(C (1 - t) * X)) ^ j * 1 ^ (n - j) * (n.choose j : ℚ[X]) : ℚ[X]) =
+        ((-(1 - t)) ^ j * n.choose j) • X ^ j := by
+      rw [smul_eq_C_mul, one_pow, mul_one, neg_pow, mul_pow, ← C_pow]
+      simp only [map_mul, map_natCast, map_pow, map_neg]; ring
+    have hf : (j.factorial : ℚ) ≠ 0 := by exact_mod_cast j.factorial_ne_zero
+    rw [hterm, map_smul, betaMoments_X_pow, smul_eq_mul, neg_pow, betaMoment,
+      ordinaryHypergeometricCoefficient, ascPochhammer_neg_nat]
+    field_simp
+  rw [← lhs, ← rhs, hpoly]
+
+theorem count_true_add_count_false (w : List Bool) :
+    w.count true + w.count false = w.length := by
+  induction w with
+  | nil => rfl
+  | cons b w ih => cases b <;> simp <;> omega
+
+/-- [proved-derived; formal-checked] **The two-class urn is the Beta(α, α) law.** The Pólya urn's
+sequential product over a binary word with `k` arrivals of `true` in `n` draws is
+`(α)_k (α)_(n−k)/(2α)_n`, the Beta(α, α) mixed moment. -/
+theorem urnSeq_bool {α : ℚ} (hα : 0 < α) (w : List Bool) :
+    urnSeq α w = (ascPochhammer ℚ (w.count true)).eval α *
+      (ascPochhammer ℚ (w.count false)).eval α / (ascPochhammer ℚ w.length).eval (α + α) := by
+  induction w using List.reverseRecOn with
+  | nil => simp [urnSeq, urnRev]
+  | append_singleton w c ih =>
+    have hsum : (∑ b : Bool, counts w b : ℕ) = w.length := by
+      rw [Fintype.sum_bool]; exact count_true_add_count_false w
+    have hc : 0 < (ascPochhammer ℚ w.length).eval (α + α) := ascPochhammer_pos _ _ (by linarith)
+    have hd : 0 < α + α + (w.length : ℚ) := by positivity
+    rw [urnSeq_snoc, ih, dirichletPredictive, hsum, Fintype.card_bool, List.length_append,
+      List.length_singleton, ascPochhammer_succ_eval]
+    cases c <;>
+    · simp only [List.count_append, List.count_singleton_self, counts, ascPochhammer_succ_eval]
+      simp
+      field_simp
+      ring
+
+/-- [proved-derived; formal-checked] **The urn's count is beta-binomial.** Every binary word of
+length `n` with `k` arrivals of `true` has urn likelihood `(α)_k (α)_(n−k)/(2α)_n`, so the count
+has mass `C(n, k)` times it: `betaBinomialMass α α n k`, whose generating polynomial is
+`betaBinomial_pgf`. At `α = 1/2` the urn is KT (`kt_eq_dirichlet_half`). -/
+theorem betaBinomial_is_urn_count {α : ℚ} (hα : 0 < α) (w : List Bool) :
+    betaBinomialMass α α w.length (w.count true) =
+      (w.length.choose (w.count true) : ℚ) * urnSeq α w := by
+  rw [urnSeq_bool hα, betaBinomialMass,
+    show w.length - w.count true = w.count false by
+      have := count_true_add_count_false w; omega]
+
+end BetaBinomial
 
 /-! ## 3. The opened-path face -/
 
@@ -3620,6 +3765,10 @@ section Audit
 #print axioms ktMass_bump
 #print axioms kt_likelihood_laws
 #print axioms kt_eq_dirichlet_half
+#print axioms betaMoments_mixed
+#print axioms betaBinomial_pgf
+#print axioms urnSeq_bool
+#print axioms betaBinomial_is_urn_count
 #print axioms path_face_normalized
 #print axioms path_face_ge_min
 #print axioms pathFace_const

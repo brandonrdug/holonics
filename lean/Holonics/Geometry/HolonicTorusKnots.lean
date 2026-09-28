@@ -22,6 +22,11 @@ Two primitive, nonparallel straight circles cross in exactly `|det|` points at e
 (`torus_geodesic_crossings`): their crossings are a coset set of the lattice their slopes span
 (`crossingSetEquiv`), whose index is the determinant (`slopeLattice_index`).
 
+A grating `(p, q, c)`, a ring of `q` ports stepping `p` a tick from phase `c`, reads its half-turn
+sheet on the upper arc of `ℤ/q` (`gratingSheet`, the floor reading `⌊2 · frac((c + tp)/q)⌋` by
+`gratingSheet_eq_floor`). The Swing `x ↦ ⌈q/2⌉ + q − 1 − x` about the arc's centre keeps the arc
+and turns the rate `p` into `q − p`, so a grating and its mirror emit one sheet (`sheet_mirror`).
+
 The traversible-band connection is made at the exact statement its evidence supports: an odd
 `m`-half-twist boundary has the coprime slope `(2,m)`.  No isotopy or Euclidean torus-surface theorem
 is inferred from the engine's classification enum.
@@ -357,6 +362,72 @@ theorem torus_geodesic_crossings {w₁ w₂ : Fin 2 → ℤ} (h₁ : IsCoprime (
     Nat.card (crossingSet w₁ w₂ u) = (slopeDet w₁ w₂).natAbs := by
   rw [Nat.card_congr (crossingSetEquiv h₁ h₂ hdet u), slopeLattice_index w₁ w₂ hdet]
 
+/-! ## A grating's sheet cannot tell it from its mirror -/
+
+/-- [definition] **A grating's half-turn sheet.** The ring of `q` ports stepping `p` a tick from
+phase `c` sits at port `c + t p mod q` at tick `t` (the `(p, q)` torus line's crossing of the
+meridian section), and its sheet reads the upper arc `{⌈q/2⌉, …, q − 1}`:
+`[2((c + t p) mod q) ≥ q]` (Rust `holonics::receiver::population::GratingSheet`). -/
+def gratingSheet (p : ℤ) (q : ℕ) (c : ℤ) (t : ℕ) : Bool :=
+  decide ((q : ℤ) ≤ 2 * ((c + t * p) % q))
+
+/-- [proved-derived; formal-checked] The sheet is the floor reading `⌊2 · frac((c + t p)/q)⌋` of
+the ring's phase, through Mathlib's `Int.fract_div_intCast_eq_div_intCast_mod`. -/
+theorem gratingSheet_eq_floor (p c : ℤ) {q : ℕ} (hq : 0 < q) (t : ℕ) :
+    ⌊2 * Int.fract (((c + t * p : ℤ) : ℚ) / q)⌋ = if gratingSheet p q c t then 1 else 0 := by
+  have hq' : (0 : ℤ) < q := by exact_mod_cast hq
+  have hqQ : (0 : ℚ) < q := by exact_mod_cast hq
+  rw [Int.fract_div_intCast_eq_div_intCast_mod]
+  set r := (c + t * p) % (q : ℤ) with hr
+  have hr0 : 0 ≤ r := Int.emod_nonneg _ hq'.ne'
+  have hrq : r < q := Int.emod_lt_of_pos _ hq'
+  have hr0' : (0 : ℚ) ≤ r := by exact_mod_cast hr0
+  have hrq' : (r : ℚ) < q := by exact_mod_cast hrq
+  unfold gratingSheet
+  rw [← hr]
+  by_cases h : (q : ℤ) ≤ 2 * r
+  · have h' : (q : ℚ) ≤ 2 * r := by exact_mod_cast h
+    simp only [h, decide_true, if_true]
+    rw [Int.floor_eq_iff]
+    constructor
+    · rw [mul_div_assoc', le_div_iff₀ hqQ]; push_cast; linarith
+    · rw [mul_div_assoc', div_lt_iff₀ hqQ]; push_cast; linarith
+  · have h' : (2 * r : ℚ) < q := by
+      have : 2 * r < (q : ℤ) := lt_of_not_ge h
+      exact_mod_cast this
+    simp only [h, decide_false]
+    rw [Int.floor_eq_iff]
+    constructor
+    · push_cast; positivity
+    · rw [mul_div_assoc', div_lt_iff₀ hqQ]; push_cast; linarith
+
+/-- [proved-derived; formal-checked] **`sheet_mirror`.** With `m = ⌈q/2⌉ = ⌊(q + 1)/2⌋`, the
+reflection `S(x) = m + q − 1 − x` of `ℤ/q` (the Swing about the centre `(m + q − 1)/2` of the upper
+arc) maps the upper arc `{m, …, q − 1}` onto itself and the lower arc onto itself, and it sends the
+port `c + t p` to `c′ + t(q − p)` with `c′ = m + q − 1 − c`, modulo `q`. So the grating `(p, q, c)`
+and its mirror `(q − p, q, c′)` emit the same sheet at every tick; the sheet reads `c′` only
+modulo `q`. -/
+theorem sheet_mirror (p c : ℤ) {q : ℕ} (hq : 0 < q) (t : ℕ) :
+    gratingSheet ((q : ℤ) - p) q (((q : ℤ) + 1) / 2 + q - 1 - c) t = gratingSheet p q c t := by
+  unfold gratingSheet
+  have hq' : (0 : ℤ) < q := by exact_mod_cast hq
+  set r := (c + t * p) % (q : ℤ) with hr
+  have hr0 : 0 ≤ r := Int.emod_nonneg _ hq'.ne'
+  have hrq : r < q := Int.emod_lt_of_pos _ hq'
+  have key : (((q : ℤ) + 1) / 2 + q - 1 - c + t * ((q : ℤ) - p)) % q =
+      (((q : ℤ) + 1) / 2 + q - 1 - r) % q := by
+    apply Int.ModEq.eq
+    rw [Int.modEq_iff_dvd]
+    have hx := Int.mul_ediv_add_emod (c + t * p) q
+    rw [← hr] at hx
+    exact ⟨(c + t * p) / q - t, by linear_combination (-1 : ℤ) * hx⟩
+  rw [key, decide_eq_decide]
+  by_cases hm : ((q : ℤ) + 1) / 2 ≤ r
+  · rw [Int.emod_eq_of_lt (by omega) (by omega)]
+    omega
+  · rw [Int.emod_eq_sub_self_emod, Int.emod_eq_of_lt (by omega) (by omega)]
+    omega
+
 /-! ## A finite torus probe does not determine integral winding -/
 
 def slopeModuloFour (winding : Fin 2 → ℤ) : Fin 2 → ZMod 4 :=
@@ -388,4 +459,6 @@ open Holonics.Geometry.HolonicTorusKnots
 #print axioms oddHalfTwist_boundary_isTorusKnotEmbedding
 #print axioms oddHalfTwist_boundary_lift_returns_slope
 #print axioms finiteModuloFourProbe_does_not_identify_integralSlope
+#print axioms gratingSheet_eq_floor
+#print axioms sheet_mirror
 end Audit
