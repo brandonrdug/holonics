@@ -27,9 +27,10 @@
 //! | `grating_on_digit_index` | [`grating_class`], [`IntegerTruth::gratings`] |
 //! | `cheap_faces` | [`CheapReading`], [`CheapFaces`] |
 //!
-//! [proved-standard] The trailing face's ring homomorphism is Mathlib's `Nat.mul_mod`. [open]
-//! Owed in #62: the leading face's fibre, `⌊a/b^s⌋ = A ∧ ⌊c/b^s⌋ = C ⇒ A C b^(2s) ≤ a c ≤
-//! ((A + 1) b^s − 1)((C + 1) b^s − 1)` (monotonicity of the product; no Lean statement yet).
+//! [proved-standard] The trailing face's ring homomorphism is Mathlib's `Nat.mul_mod`.
+//! [proved-derived; formal-checked] The leading face's fibre,
+//! `⌊a/b^s⌋ = A ∧ ⌊c/b^s⌋ = C ⇒ A C b^(2s) ≤ a c ≤ ((A + 1) b^s − 1)((C + 1) b^s − 1)`
+//! (Lean `Mathematics/RadixWindowReceiver.leading_face_fibre`).
 //!
 //! [definition] The computational object is the helical pair interaction, here as the terrain it
 //! meets: an integer as a digit vector on a helix, the carry its winding. Of the winding guide's six
