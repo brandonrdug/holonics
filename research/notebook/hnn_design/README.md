@@ -1461,3 +1461,13 @@ word-shape rate against the choosing vocabulary. Of the native releases, 24 are 
 typed refusals. 580 of their 758 word tokens are in the choosing vocabulary, against 3,139 of 3,306
 in the controls and 1,817 of 1,932 in the requests. Backticks come out even in 14 of 24 releases,
 against 32 of 32 controls.
+
+**F0's first candidate, adopted: the admitted egg alone.** The command is
+`hnn_population f0-egg <curated cut> <flat cut>`. On the choosing families the posterior sat wholly
+on the admitted egg, so the population drops the seven trees:
+- validation bytes are unchanged, `−2430 + 8/16 + ε` against flat, and the choosing bytes read
+  `−4593 + 5/16 + ε`, 2 bits better with no family names to pay;
+- the standing is 2,781,355,912 bytes after 1,048,243 cells, 2,653 a cell, against 10,983 for all
+  eight families and 1,298 for the flat tree;
+- the passage takes 166,113 ms at a 3,400,306,688-byte peak resident set, against 272,849 ms at
+  10,843,217,920 for all eight families.

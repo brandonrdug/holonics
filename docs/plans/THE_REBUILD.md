@@ -98,8 +98,13 @@ on the admitted egg, and the trees beyond depth 24 add at most 20 bits.
   bytes. Section letters that a conversation supplies are observed, not predicted, so they are not
   charged to either side. Whole-stream codes stay reported.
 - **Candidates**, each adopted by the choosing families alone:
-  1. **Drop what carries no share.** Remove the dominated families. The standing falls, at a code
-     cost read exactly.
+  1. **Drop what carries no share. Adopted September 28.** On the choosing families the posterior
+     sits on the admitted egg, so the population becomes the egg alone (`hnn_population f0-egg`).
+     - Validation bytes are unchanged, `−2430 + 8/16 + ε` against flat, and choosing bytes
+       improve by 2 bits, since no family names are paid.
+     - The standing falls from 11,513,530,863 to 2,781,355,912 bytes (from 10,983 to 2,653 a cell).
+     - Peak resident memory falls from 10.8 GB to 3.4 GB, and the passage from 272,849 to
+       166,113 ms.
   2. **Mix per cell.** Switching among families under the hazard ladder (Astra §14.6), so that
      each family contributes where it predicts best, instead of a posterior that settles on one.
   3. **Word contexts.** A cheap word-context family on the byte stream, and continuation transports

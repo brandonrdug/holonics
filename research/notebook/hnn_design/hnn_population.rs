@@ -1322,6 +1322,9 @@ fn main() {
         ["f4", curated_cut, flat_cut] => {
             curated::harness(curated_cut, flat_cut, curated::Reach::F4);
         }
+        ["f0-egg", curated_cut, flat_cut] => {
+            curated::harness(curated_cut, flat_cut, curated::Reach::F0Egg);
+        }
         ["f5-native", choosing_cut, request, seed, private_output] => {
             curated::native_probe(choosing_cut, request, seed, private_output, false);
         }

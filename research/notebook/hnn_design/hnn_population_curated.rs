@@ -281,6 +281,7 @@ pub(super) fn curated_population(
     chosen_hazard: HazardPartition,
     relations: Vec<holonics::receiver::population::Relation>,
     comparisons: &[(String, HazardPartition)],
+    members: Members,
 ) -> Result<
     (Population, usize, Vec<PopulationMemberManifest>),
     holonics::receiver::population::PopulationError,
@@ -313,12 +314,23 @@ pub(super) fn curated_population(
         grain,
         BoundaryEgg::letter_family(population)?,
     );
-    let families = CELL_DEPTHS.len() + 1 + TYPED_DEPTHS.len() + 1;
+    let trees = members == Members::Declared;
+    let families = if trees {
+        CELL_DEPTHS.len() + 1 + TYPED_DEPTHS.len() + 1
+    } else {
+        1
+    };
     let naming = ceil_log2(families as u64);
     let mass = Rat::new(BigInt::from(1u8), BigInt::from(1u8) << naming as usize);
     let mut declared: Vec<Box<dyn Family>> = Vec::new();
     let mut manifest = Vec::with_capacity(families);
-    for depth in CELL_DEPTHS.iter().copied().chain([cell_deepest]) {
+    let cell_depths: Vec<usize> = if trees {
+        CELL_DEPTHS.iter().copied().chain([cell_deepest]).collect()
+    } else {
+        Vec::new()
+    };
+    let typed_depths: &[usize] = if trees { &TYPED_DEPTHS } else { &[] };
+    for depth in cell_depths {
         let declaration = cells(depth);
         manifest.push(PopulationMemberManifest::Tree(TreeMemberManifest {
             declaration: declaration.clone(),
@@ -328,7 +340,7 @@ pub(super) fn curated_population(
         }));
         declared.push(Box::new(TreeFamily::new(declaration, naming)?));
     }
-    for &depth in &TYPED_DEPTHS {
+    for &depth in typed_depths {
         let declaration = typed(depth);
         manifest.push(PopulationMemberManifest::Tree(TreeMemberManifest {
             declaration: declaration.clone(),
@@ -894,6 +906,16 @@ fn readings(
     delta
 }
 
+/// Which families the curated population declares (F0's first candidate drops the families that
+/// carry no predictive share: on the choosing families the posterior sits on the admitted egg).
+#[derive(Clone, Copy, PartialEq, Eq, Debug)]
+pub enum Members {
+    /// The eight declared families: the cell trees, the typed trees and the admitted egg.
+    Declared,
+    /// The admitted egg alone.
+    EggOnly,
+}
+
 #[allow(clippy::too_many_lines)]
 /// How far the harness reads: the merges' learning alone, the development cells, or the whole cut.
 #[derive(Clone, Copy, PartialEq, Eq)]
@@ -903,6 +925,8 @@ pub enum Reach {
     Whole,
     /// F4: a choosing-family cut followed by the one validation-family passage.
     F4,
+    /// F0's first candidate on F4's development passage: the admitted egg alone.
+    F0Egg,
 }
 
 /// Counts the bytes a standing encodes to, holding none of them (F0: standing bytes per cell).
@@ -921,7 +945,12 @@ impl std::io::Write for StandingBytes {
 
 pub fn harness(curated_path: &str, flat_path: &str, reach: Reach) {
     let clock = Instant::now();
-    let f4 = reach == Reach::F4;
+    let f4 = matches!(reach, Reach::F4 | Reach::F0Egg);
+    let members = if reach == Reach::F0Egg {
+        Members::EggOnly
+    } else {
+        Members::Declared
+    };
     let chart = SectionChart::curated();
     let cut = read_curated(curated_path, &chart);
     let (flat_bytes, flat_count, flat_held) = read_cut(flat_path);
@@ -1042,7 +1071,11 @@ pub fn harness(curated_path: &str, flat_path: &str, reach: Reach) {
     );
     let cell_deepest = deepest(&cell_declaration);
     let typed_deepest = deepest(&typed_declaration);
-    let families = CELL_DEPTHS.len() + 1 + TYPED_DEPTHS.len() + 1;
+    let families = if members == Members::Declared {
+        CELL_DEPTHS.len() + 1 + TYPED_DEPTHS.len() + 1
+    } else {
+        1
+    };
     let naming = ceil_log2(families as u64);
     let relations = read_incidence(curated_path);
     let declared_relations = |kind: RelationKind, part: usize| {
@@ -1064,11 +1097,18 @@ pub fn harness(curated_path: &str, flat_path: &str, reach: Reach) {
         partition,
         relations.clone(),
         &comparison_hazards,
+        members,
     )
     .expect("the curated population");
     let swept: u64 = PROBED.iter().map(|&count| ceil_log2(count)).sum();
     let charge = sum(&point(swept), &learning_receipt.description);
     let flat_charge = ceil_log2(FLAT_SWEEP);
+    if members == Members::EggOnly {
+        println!(
+            "2. the population: the admitted egg alone (F0's first candidate: on the choosing families the posterior sits on it), named by 0 bits: the admitted receivers over the boundary egg on the typed tree at D = {typed_deepest} with the learned hazard partition; the development sweep charged {swept} bits and the learned partition's description {}, the flat tree's {flat_charge}",
+            reading_of(&learning_receipt.description, grain),
+        );
+    } else {
     println!(
         "2. the population: {families} families, each named by ⌈log₂ {families}⌉ = {naming} bits (M = {families}/{}): the cell tree at D = {:?}, the typed tree (channel slot) at D = {TYPED_DEPTHS:?}, the admitted receivers over the boundary egg on the typed tree at D = {typed_deepest} with the learned hazard partition; the development sweep charged {swept} bits and the learned partition's description {}, the flat tree's {flat_charge}",
         1u64 << naming,
@@ -1079,6 +1119,7 @@ pub fn harness(curated_path: &str, flat_path: &str, reach: Reach) {
             .collect::<Vec<_>>(),
         reading_of(&learning_receipt.description, grain),
     );
+    }
     println!(
         "  the declared relations: requests {} development, {} held out; later human returns {} and {}",
         declared_relations(RelationKind::Request, 0),
@@ -1336,7 +1377,15 @@ fn prepare_native_population(
     let (hazard, learning) =
         learn_hazard_partition(chart, &cut.codes).expect("the choosing hazard partition");
     let (mut population, egg_index, manifest) =
-        curated_population(chart, cut.population, super::GRAIN, hazard, relations, &[])
+        curated_population(
+            chart,
+            cut.population,
+            super::GRAIN,
+            hazard,
+            relations,
+            &[],
+            Members::Declared,
+        )
             .expect("the declared curated population");
     population
         .receive_passage(&cut.codes)
