@@ -49,12 +49,12 @@ fn family() -> RunnerFamily {
         speeds: vec![rat(2, 1), rat(3, 1)],
         tractions: vec![rat(1, 1), rat(3, 2)],
         holds: vec![1, 2],
-        policies: vec![
-            Policy::Flee,
-            Policy::Circle { clockwise: false },
-            Policy::Circle { clockwise: true },
-            Policy::ZigZag { period: 2 },
-            Policy::ZigZag { period: 3 },
+        evasions: vec![
+            Evasion::Flee,
+            Evasion::Circle { clockwise: false },
+            Evasion::Circle { clockwise: true },
+            Evasion::ZigZag { period: 2 },
+            Evasion::ZigZag { period: 3 },
         ],
     }
 }
@@ -63,7 +63,7 @@ fn family() -> RunnerFamily {
 /// within one lattice step, diagonals included (`ρ² = 2`).
 fn pursuer() -> Pursuer {
     Pursuer {
-        constitution: Constitution {
+        law: RunnerLaw {
             speed: rat(3, 2),
             traction: rat(2, 1),
         },
@@ -93,12 +93,12 @@ fn track_then_ice() -> Arena {
 /// A runner of speed 3, unit traction, the declared hold, fleeing.
 fn fleeing(hold: u64) -> Runner {
     Runner {
-        constitution: Constitution {
+        law: RunnerLaw {
             speed: rat(3, 1),
             traction: rat(1, 1),
         },
         hold,
-        policy: Policy::Flee,
+        evasion: Evasion::Flee,
     }
 }
 
@@ -110,8 +110,8 @@ fn fleeing(hold: u64) -> Runner {
 #[test]
 fn the_traction_bound_refuses_an_inadmissible_change() {
     let declaration = declaration();
-    let unit = fleeing(1).constitution;
-    let firm = Constitution {
+    let unit = fleeing(1).law;
+    let firm = RunnerLaw {
         speed: rat(3, 1),
         traction: rat(3, 2),
     };
@@ -142,19 +142,16 @@ fn the_traction_bound_refuses_an_inadmissible_change() {
         (moves.cap(), moves.vectors().len(), moves.alphabet()),
         (20, 69, 71)
     );
-    for constitution in [&unit, &firm] {
-        let caps = constitution.caps(&declaration).unwrap();
+    for law in [&unit, &firm] {
+        let caps = law.caps(&declaration).unwrap();
         for &change in moves.vectors() {
             for class in 0..3 {
                 assert_eq!(
-                    constitution.admits(&declaration, class, change),
+                    law.admits(&declaration, class, change),
                     quadrance(change) <= caps.classes[class]
                 );
             }
-            assert_eq!(
-                constitution.within_speed(change),
-                quadrance(change) <= caps.speed
-            );
+            assert_eq!(law.within_speed(change), quadrance(change) <= caps.speed);
         }
     }
     assert!(matches!(
@@ -177,7 +174,7 @@ fn the_traction_bound_refuses_an_inadmissible_change() {
         .demand(&ice, &moves, &caps, &state, [0, 8], 0)
         .unwrap();
     assert_eq!(demand, [2, 0]);
-    assert!(!runner.constitution.admits(&declaration, 0, demand));
+    assert!(!runner.law.admits(&declaration, 0, demand));
     let cell = runner.cell(&ice, &moves, &caps, &state, [0, 8], 0).unwrap();
     assert_eq!(cell, moves.slip());
     let next = runner.receive(&ice, &moves, &state, cell).unwrap();
@@ -219,7 +216,7 @@ fn slip_holds_for_its_declared_ticks() {
     };
     let passage = |hold: u64| -> Vec<(usize, Motion)> {
         let runner = fleeing(hold);
-        let caps = runner.constitution.caps(&declaration).unwrap();
+        let caps = runner.law.caps(&declaration).unwrap();
         let mut state = opening;
         (0..3)
             .map(|tick| {
@@ -268,7 +265,7 @@ fn walls_keep_the_runner_inside() {
     let arena = uniform(1);
     let moves = family().moves(&declaration).unwrap();
     let runner = fleeing(1);
-    let caps = runner.constitution.caps(&declaration).unwrap();
+    let caps = runner.law.caps(&declaration).unwrap();
     let state = RunnerState {
         motion: Motion {
             position: [15, 8],
@@ -301,7 +298,7 @@ fn walls_keep_the_runner_inside() {
     );
     let family = family();
     let pursuer = pursuer();
-    let pursuer_speed = pursuer.constitution.caps(&declaration).unwrap().speed;
+    let pursuer_speed = pursuer.law.caps(&declaration).unwrap().speed;
     for seed in [1u64, 2, 3] {
         let chase = Chase::draw(&declaration, &family, &pursuer, 64, seed).unwrap();
         let arena = &chase.ports.arena;
@@ -327,7 +324,7 @@ fn walls_keep_the_runner_inside() {
         }
         for index in 0..family.len() {
             let runner = family.candidate(index).unwrap();
-            let caps = runner.constitution.caps(&declaration).unwrap();
+            let caps = runner.law.caps(&declaration).unwrap();
             let mut state = RunnerState::opening(arena, chase.ports.opening.position).unwrap();
             for (tick, chaser) in chase.ports.chaser.motions().iter().enumerate() {
                 let cell = runner
@@ -370,7 +367,7 @@ fn the_truth_names_its_key() {
     let mut draw = Draw::new(7);
     assert_eq!(draw.below(40), chase.truth.index);
     let slow = Pursuer {
-        constitution: Constitution {
+        law: RunnerLaw {
             speed: rat(3, 1),
             traction: rat(2, 1),
         },
@@ -530,12 +527,7 @@ fn tiny() -> Arena {
 /// **The runner's successors, re-derived from the traction law in ℚ** (independent of the tube's
 /// caps): the kept motion while forced; otherwise every change the constitution admits on the cell
 /// it stands on, within its speed bound, keeping it inside; the wall law's motion when none.
-fn successors(
-    arena: &Arena,
-    constitution: &Constitution,
-    motion: &Motion,
-    forced: bool,
-) -> Vec<Motion> {
+fn successors(arena: &Arena, law: &RunnerLaw, motion: &Motion, forced: bool) -> Vec<Motion> {
     let step = |velocity: Point| {
         [
             motion.position[0] + velocity[0],
@@ -558,14 +550,14 @@ fn successors(
     let next: Vec<Motion> = wide
         .vectors()
         .iter()
-        .filter(|&&change| constitution.admits(arena.declaration(), class, change))
+        .filter(|&&change| law.admits(arena.declaration(), class, change))
         .map(|&change| {
             [
                 motion.velocity[0] + change[0],
                 motion.velocity[1] + change[1],
             ]
         })
-        .filter(|&velocity| constitution.within_speed(velocity) && arena.inside(step(velocity)))
+        .filter(|&velocity| law.within_speed(velocity) && arena.inside(step(velocity)))
         .map(|velocity| Motion {
             position: step(velocity),
             velocity,
@@ -585,7 +577,7 @@ fn chaser_positions(
     chaser: Motion,
     n: usize,
 ) -> Vec<BTreeSet<Point>> {
-    let caps = pursuer.constitution.caps(arena.declaration()).unwrap();
+    let caps = pursuer.law.caps(arena.declaration()).unwrap();
     let disk = Moves::within(caps.top()).unwrap();
     let mut words = vec![chaser];
     let mut positions = vec![BTreeSet::from([chaser.position])];
@@ -608,7 +600,7 @@ type BruteTube = (Vec<BTreeSet<Motion>>, Vec<BTreeSet<Motion>>);
 /// kept word of the full `n` ticks, the reach every motion at `k` on a kept word of `k` ticks.
 fn brute_tube(
     arena: &Arena,
-    constitution: &Constitution,
+    law: &RunnerLaw,
     runner: Motion,
     forced: u64,
     pursuer: &Pursuer,
@@ -630,7 +622,7 @@ fn brute_tube(
     for k in 0..n {
         let mut longer = Vec::new();
         for word in &words {
-            for next in successors(arena, constitution, &word[k], (k as u64) < forced) {
+            for next in successors(arena, law, &word[k], (k as u64) < forced) {
                 if !covered(k + 1, next.position) {
                     let mut extended = word.clone();
                     extended.push(next);
@@ -658,13 +650,13 @@ fn brute_tube(
 fn the_tube_recursion_matches_brute_force_enumeration() {
     let arena = tiny();
     let pursuer = pursuer();
-    let caps = pursuer.constitution.caps(arena.declaration()).unwrap();
+    let caps = pursuer.law.caps(arena.declaration()).unwrap();
     let disk = Moves::within(caps.top()).unwrap();
-    let slow = Constitution {
+    let slow = RunnerLaw {
         speed: rat(2, 1),
         traction: rat(1, 1),
     };
-    let firm = Constitution {
+    let firm = RunnerLaw {
         speed: rat(3, 1),
         traction: rat(3, 2),
     };
@@ -676,12 +668,12 @@ fn the_tube_recursion_matches_brute_force_enumeration() {
         (&slow, Motion::rest([5, 5]), 0, Motion::rest([3, 3])),
     ];
     let mut sizes = Vec::new();
-    for (constitution, runner, forced, chaser) in cases {
-        let runner_caps = constitution.caps(arena.declaration()).unwrap();
+    for (law, runner, forced, chaser) in cases {
+        let runner_caps = law.caps(arena.declaration()).unwrap();
         let reach = CaptureReach::of(&arena, &pursuer, &caps, &disk, chaser, 3).unwrap();
         let layers = viable_layers(&arena, &runner_caps, runner, forced, &reach).unwrap();
         let (brute_reach, brute_kernel) =
-            brute_tube(&arena, constitution, runner, forced, &pursuer, chaser, 3);
+            brute_tube(&arena, law, runner, forced, &pursuer, chaser, 3);
         for k in 0..=3 {
             let reach_set: BTreeSet<Motion> = layers.reach[k].iter().copied().collect();
             let kernel_set: BTreeSet<Motion> = layers.kernel[k].iter().copied().collect();
@@ -736,10 +728,10 @@ fn every_chaser_motion_satisfies_its_traction_bound() {
             ];
             let class = arena.class(from.position).unwrap();
             assert!(
-                pursuer.constitution.admits(&declaration, class, change),
+                pursuer.law.admits(&declaration, class, change),
                 "{from:?} → {to:?}"
             );
-            assert!(pursuer.constitution.within_speed(to.velocity));
+            assert!(pursuer.law.within_speed(to.velocity));
             assert_eq!(
                 to.position,
                 [
@@ -777,7 +769,7 @@ fn every_chaser_motion_satisfies_its_traction_bound() {
         check(&act_drawn(&declaration, &family, &action, seed, &mut ConstantBearing).unwrap());
     }
     let weak = Pursuer {
-        constitution: Constitution {
+        law: RunnerLaw {
             speed: rat(3, 2),
             traction: rat(1, 2),
         },

@@ -65,7 +65,7 @@ use holonics::compression::landmark::context::{
 };
 use holonics::holarchy::terrain::{
     ActionDeclaration, ActionPassage, ArenaDeclaration, Basin, BasinMemo, Candidate, Chase,
-    ConstantBearing, Constitution, Motion, Moves, Policy, PurePursuit, Pursuer, RunnerFamily,
+    ConstantBearing, Evasion, Motion, Moves, PurePursuit, Pursuer, RunnerFamily, RunnerLaw,
     act_drawn,
 };
 use holonics::ratio::algebraic::ExactInterval;
@@ -143,19 +143,19 @@ fn family() -> RunnerFamily {
         speeds: vec![rat(2, 1), rat(3, 1)],
         tractions: vec![rat(1, 1), rat(3, 2)],
         holds: vec![1, 2],
-        policies: vec![
-            Policy::Flee,
-            Policy::Circle { clockwise: false },
-            Policy::Circle { clockwise: true },
-            Policy::ZigZag { period: 2 },
-            Policy::ZigZag { period: 3 },
+        evasions: vec![
+            Evasion::Flee,
+            Evasion::Circle { clockwise: false },
+            Evasion::Circle { clockwise: true },
+            Evasion::ZigZag { period: 2 },
+            Evasion::ZigZag { period: 3 },
         ],
     }
 }
 
 fn pursuer() -> Pursuer {
     Pursuer {
-        constitution: Constitution {
+        law: RunnerLaw {
             speed: rat(3, 2),
             traction: rat(2, 1),
         },
@@ -317,7 +317,7 @@ fn least_capture(seed: u64, limit: usize) -> Option<usize> {
     let pursuer = pursuer();
     let (index, arena, openings) = Chase::drawn(&declaration, &family, seed).expect("a draw");
     let moves = family.moves(&declaration).expect("the alphabet");
-    let caps = pursuer.constitution.caps(&declaration).expect("the caps");
+    let caps = pursuer.law.caps(&declaration).expect("the caps");
     let disk = Moves::within(caps.top()).expect("the disk");
     let truth: Vec<Candidate> = Candidate::opening(&family, &arena, openings[0])
         .expect("the candidates")
@@ -365,8 +365,8 @@ fn action(trace: bool) {
             .map(ToString::to_string)
             .collect::<Vec<_>>(),
         family().len(),
-        pursuer.constitution.speed,
-        pursuer.constitution.traction,
+        pursuer.law.speed,
+        pursuer.law.traction,
         pursuer.capture,
     );
     let names = ["the machine", "pure pursuit", "constant bearing"];
@@ -500,8 +500,8 @@ fn reception() {
         declaration.scale(),
         factored(&BigUint::from(family.len())),
         margin,
-        pursuer.constitution.speed,
-        pursuer.constitution.traction,
+        pursuer.law.speed,
+        pursuer.law.traction,
         pursuer.capture,
     );
     let (mut within, mut below, mut in_fibre, mut singletons) = (0, 0, 0, 0);

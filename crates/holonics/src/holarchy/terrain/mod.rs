@@ -66,8 +66,8 @@ mod tests;
 
 pub use chase::{
     ARENA_SIDE_LIMIT, Arena, ArenaDeclaration, Caps, Chase, ChasePorts, ChaseTruth, ChaserPort,
-    Constitution, Futures, Letter, MOVE_CAP_LIMIT, Motion, Moves, Policy, Pursuer, Replay, Runner,
-    RunnerFamily, RunnerState,
+    Evasion, Futures, Letter, MOVE_CAP_LIMIT, Motion, Moves, Pursuer, Replay, Runner, RunnerFamily,
+    RunnerLaw, RunnerState,
 };
 pub use crib::{CribTruth, RotorCrib, rotor_crib};
 pub use moire::{Grating, Moire, MoireClass, MoireFamily, MoireTruth, PairLock};

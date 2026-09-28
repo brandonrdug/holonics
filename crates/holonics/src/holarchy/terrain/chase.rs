@@ -13,7 +13,7 @@
 //! tick), and a velocity moves the position once a tick, `x′ = x + v′`. The walls make forced
 //! turning possible: in an open arena a faster runner moving straight away is never caught (§14.4).
 //!
-//! [definition; the record's §13] **The constitution at the ground contact** ([`Constitution`]):
+//! [definition; the record's §13] **The constitution at the ground contact** ([`RunnerLaw`]):
 //! a speed bound `v` and a traction coefficient `γ`. A velocity change `Δv` in lattice steps a tick
 //! is admitted on a cell of class `μ` only if
 //!
@@ -29,7 +29,7 @@
 //! resolve on the lattice (every receipt here declares bounds of at least one step).
 //!
 //! [definition; agent-inferred] **The runner** ([`Runner`]): its constitution, its declared hybrid
-//! slip law (a hold of `s ≥ 1` ticks) and its evasion navigator ([`Policy`]). Each tick:
+//! slip law (a hold of `s ≥ 1` ticks) and its evasion navigator ([`Evasion`]). Each tick:
 //! - while a slip holds, it keeps its velocity (the cell [`Letter::Slip`]);
 //! - otherwise it **demands** the change its navigator scores best among the changes its
 //!   constitution admits on the ground it **last pushed from** (the class of its previous position;
@@ -43,7 +43,7 @@
 //!   that leaves the arena) meets the wall ([`Letter::Wall`]): its position is clamped to the
 //!   arena, the components of its velocity that crossed a wall are zeroed, and a slip ends.
 //!
-//! [definition; agent-inferred] **The evasion navigators** ([`Policy`]), each a score over the next
+//! [definition; agent-inferred] **The evasion navigators** ([`Evasion`]), each a score over the next
 //! position `x′ = x + v + Δv`, least best:
 //! - **flee**: maximize the pair contact's next quadrance `Q = ⟨x′ − x_C, x′ − x_C⟩` to the chaser
 //!   (§14.4's contact reading). Agent-inferred against the brief's reflected-position target
@@ -382,7 +382,7 @@ impl Arena {
 /// [definition] **A mover's constitution at the ground contact** (module header): its speed bound
 /// `v` and traction coefficient `γ`, positive rationals.
 #[derive(Clone, Debug, PartialEq, Eq, Hash, PartialOrd, Ord)]
-pub struct Constitution {
+pub struct RunnerLaw {
     pub speed: Rat,
     pub traction: Rat,
 }
@@ -403,12 +403,12 @@ impl Caps {
     }
 }
 
-impl Constitution {
+impl RunnerLaw {
     /// Refused unless both bounds are positive.
     pub fn check(&self) -> Result<(), TerrainError> {
         if !self.speed.is_positive() || !self.traction.is_positive() {
             return Err(refuse(
-                "a constitution",
+                "a law",
                 "its speed bound and traction coefficient are positive",
             ));
         }
@@ -529,28 +529,28 @@ impl Moves {
 
 /// [definition] **An evasion navigator** (module header).
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash, PartialOrd, Ord)]
-pub enum Policy {
+pub enum Evasion {
     Flee,
     Circle { clockwise: bool },
     ZigZag { period: u64 },
 }
 
-impl Policy {
+impl Evasion {
     /// The navigator's declared integers: its kind and its parameter.
     pub fn code(&self) -> [u64; 2] {
         match self {
-            Policy::Flee => [0, 0],
-            Policy::Circle { clockwise } => [1, u64::from(*clockwise)],
-            Policy::ZigZag { period } => [2, *period],
+            Evasion::Flee => [0, 0],
+            Evasion::Circle { clockwise } => [1, u64::from(*clockwise)],
+            Evasion::ZigZag { period } => [2, *period],
         }
     }
 
     pub fn label(&self) -> String {
         match self {
-            Policy::Flee => "flee".to_string(),
-            Policy::Circle { clockwise: false } => "circle ccw".to_string(),
-            Policy::Circle { clockwise: true } => "circle cw".to_string(),
-            Policy::ZigZag { period } => format!("zig-zag P = {period}"),
+            Evasion::Flee => "flee".to_string(),
+            Evasion::Circle { clockwise: false } => "circle ccw".to_string(),
+            Evasion::Circle { clockwise: true } => "circle cw".to_string(),
+            Evasion::ZigZag { period } => format!("zig-zag P = {period}"),
         }
     }
 
@@ -558,15 +558,15 @@ impl Policy {
     fn score(&self, arena: &Arena, motion: &Motion, next: Point, chaser: Point, tick: u64) -> i64 {
         let x = motion.position;
         match self {
-            Policy::Flee => -quadrance(sub(add(x, next), chaser)),
-            Policy::Circle { clockwise } => {
+            Evasion::Flee => -quadrance(sub(add(x, next), chaser)),
+            Evasion::Circle { clockwise } => {
                 let sign = if *clockwise { -1 } else { 1 };
                 let declaration = arena.declaration();
                 let offset = sub(scale(2, x), [declaration.width - 1, declaration.height - 1]);
                 // 2x′ − 2(x + σJ(x − c)) = 2v′ − σJ(2x − 2c).
                 quadrance(sub(scale(2, next), scale(sign, quarter_turn(offset))))
             }
-            Policy::ZigZag { period } => {
+            Evasion::ZigZag { period } => {
                 let sign = if (tick % (2 * period)) < *period {
                     1
                 } else {
@@ -583,9 +583,9 @@ impl Policy {
 /// evasion navigator.
 #[derive(Clone, Debug, PartialEq, Eq, Hash, PartialOrd, Ord)]
 pub struct Runner {
-    pub constitution: Constitution,
+    pub law: RunnerLaw,
     pub hold: u64,
-    pub policy: Policy,
+    pub evasion: Evasion,
 }
 
 /// [definition] **A runner's state**: its observed motion, the class of the ground it last pushed
@@ -614,8 +614,8 @@ impl RunnerState {
 impl Runner {
     /// Refused at a nonpositive bound, a hold of zero or a zig-zag of period zero.
     pub fn check(&self) -> Result<(), TerrainError> {
-        self.constitution.check()?;
-        if self.hold == 0 || matches!(self.policy, Policy::ZigZag { period: 0 }) {
+        self.law.check()?;
+        if self.hold == 0 || matches!(self.evasion, Evasion::ZigZag { period: 0 }) {
             return Err(refuse(
                 "a runner",
                 "its slip holds at least one tick and a zig-zag's period is positive",
@@ -627,10 +627,10 @@ impl Runner {
     pub fn label(&self) -> String {
         format!(
             "runner v = {}, γ = {}, hold {}, {}",
-            self.constitution.speed,
-            self.constitution.traction,
+            self.law.speed,
+            self.law.traction,
             self.hold,
-            self.policy.label()
+            self.evasion.label()
         )
     }
 
@@ -657,7 +657,7 @@ impl Runner {
             if quadrance(next) > caps.speed || !arena.inside(add(motion.position, next)) {
                 continue;
             }
-            let score = self.policy.score(arena, motion, next, chaser, tick);
+            let score = self.evasion.score(arena, motion, next, chaser, tick);
             if best.is_none_or(|(_, least)| score < least) {
                 best = Some((change, score));
             }
@@ -744,7 +744,7 @@ impl Runner {
 /// capturing at quadrance at most `capture = ρ² ≥ 0`.
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct Pursuer {
-    pub constitution: Constitution,
+    pub law: RunnerLaw,
     pub capture: Rat,
 }
 
@@ -803,7 +803,7 @@ impl Pursuer {
     /// every cell and keeps it where it stands, so its traction-admitted motions are never empty
     /// and it never meets the wall law: every motion it emits satisfies its traction bound.
     pub fn stops(&self, declaration: &ArenaDeclaration) -> Result<bool, TerrainError> {
-        let caps = self.constitution.caps(declaration)?;
+        let caps = self.law.caps(declaration)?;
         Ok(caps.classes.iter().all(|&cap| caps.speed <= cap))
     }
 
@@ -839,13 +839,13 @@ pub struct RunnerFamily {
     pub speeds: Vec<Rat>,
     pub tractions: Vec<Rat>,
     pub holds: Vec<u64>,
-    pub policies: Vec<Policy>,
+    pub evasions: Vec<Evasion>,
 }
 
 impl RunnerFamily {
     /// The number of candidates `N`.
     pub fn len(&self) -> usize {
-        self.speeds.len() * self.tractions.len() * self.holds.len() * self.policies.len()
+        self.speeds.len() * self.tractions.len() * self.holds.len() * self.evasions.len()
     }
 
     pub fn is_empty(&self) -> bool {
@@ -874,11 +874,11 @@ impl RunnerFamily {
         let speed = self.speeds[digit(self.speeds.len())].clone();
         let traction = self.tractions[digit(self.tractions.len())].clone();
         let hold = self.holds[digit(self.holds.len())];
-        let policy = self.policies[digit(self.policies.len())];
+        let evasion = self.evasions[digit(self.evasions.len())];
         let runner = Runner {
-            constitution: Constitution { speed, traction },
+            law: RunnerLaw { speed, traction },
             hold,
-            policy,
+            evasion,
         };
         runner.check()?;
         Ok(runner)
@@ -895,7 +895,7 @@ impl RunnerFamily {
         }
         let mut cap = 0;
         for traction in &self.tractions {
-            let caps = Constitution {
+            let caps = RunnerLaw {
                 speed: self.speeds[0].clone(),
                 traction: traction.clone(),
             }
@@ -1072,17 +1072,15 @@ impl Chase {
                 "the runner and the pursuer open in the arena, outside capture",
             ));
         }
-        if pursuer.constitution.speed >= runner.constitution.speed
-            || pursuer.constitution.traction <= runner.constitution.traction
-        {
+        if pursuer.law.speed >= runner.law.speed || pursuer.law.traction <= runner.law.traction {
             return Err(refuse(
                 "a chase's pursuer",
                 "it is slower than the runner and of larger traction",
             ));
         }
         let moves = family.moves(&declaration)?;
-        let caps = runner.constitution.caps(&declaration)?;
-        let pursuer_caps = pursuer.constitution.caps(&declaration)?;
+        let caps = runner.law.caps(&declaration)?;
+        let pursuer_caps = pursuer.law.caps(&declaration)?;
         let disk = Moves::within(pursuer_caps.top())?;
         let mut state = RunnerState::opening(&arena, runner_start)?;
         let opening = state.motion;
@@ -1186,7 +1184,7 @@ impl Chase {
     /// then follows the received cell.
     pub fn replay(&self, runner: &Runner) -> Result<Replay, TerrainError> {
         let ports = &self.ports;
-        let caps = runner.constitution.caps(ports.arena.declaration())?;
+        let caps = runner.law.caps(ports.arena.declaration())?;
         let mut state = RunnerState::opening(&ports.arena, ports.opening.position)?;
         let chaser = ports.chaser.motions();
         if chaser.len() < self.cells.len() {
@@ -1236,7 +1234,7 @@ impl Chase {
     /// its present position, then each admitted next position for the remaining ticks.
     fn words(&self, pursuer: &Pursuer, horizon: usize) -> Result<Vec<Vec<Point>>, TerrainError> {
         let ports = &self.ports;
-        let caps = pursuer.constitution.caps(ports.arena.declaration())?;
+        let caps = pursuer.law.caps(ports.arena.declaration())?;
         let disk = Moves::within(caps.top())?;
         let start = ports
             .chaser
@@ -1280,7 +1278,7 @@ impl Chase {
         let mut order: Vec<Vec<Vec<usize>>> = Vec::new();
         for &index in fibre {
             let runner = family.candidate(index)?;
-            let caps = runner.constitution.caps(ports.arena.declaration())?;
+            let caps = runner.law.caps(ports.arena.declaration())?;
             let end = self.replay(&runner)?.end;
             let mut signature = Vec::with_capacity(words.len());
             for word in &words {

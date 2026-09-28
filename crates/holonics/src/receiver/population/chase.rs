@@ -88,7 +88,7 @@ impl ChaseFamily {
             ));
         }
         runner.check()?;
-        let caps = runner.constitution.caps(ports.arena.declaration())?;
+        let caps = runner.law.caps(ports.arena.declaration())?;
         if caps.top() > ports.moves.cap() {
             return Err(refuse(
                 "a chase family's alphabet",
@@ -256,16 +256,16 @@ impl Family for ChaseFamily {
     /// navigator's code and the escape exponent.
     fn declaration(&self) -> Declaration {
         let part = |value: &BigInt| u64::try_from(value).unwrap_or(u64::MAX);
-        let constitution = &self.runner.constitution;
-        let [kind, parameter] = self.runner.policy.code();
+        let law = &self.runner.law;
+        let [kind, parameter] = self.runner.evasion.code();
         Declaration::new(
             "chase runner",
             vec![
                 self.index as u64,
-                part(constitution.speed.numer()),
-                part(constitution.speed.denom()),
-                part(constitution.traction.numer()),
-                part(constitution.traction.denom()),
+                part(law.speed.numer()),
+                part(law.speed.denom()),
+                part(law.traction.numer()),
+                part(law.traction.denom()),
                 self.runner.hold,
                 kind,
                 parameter,
