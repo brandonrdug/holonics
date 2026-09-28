@@ -278,6 +278,7 @@ pub mod dormancy;
 pub mod evolution;
 pub mod families;
 pub mod merge;
+pub mod port;
 pub mod provenance;
 pub mod releasing;
 pub mod species;
@@ -289,6 +290,8 @@ mod composition_tests;
 mod evolution_tests;
 #[cfg(test)]
 mod future_branch_tests;
+#[cfg(test)]
+mod port_tests;
 #[cfg(test)]
 mod provenance_tests;
 #[cfg(test)]
@@ -321,6 +324,7 @@ pub use merge::{
     Blocks, Item, KtTables, MergeReceipt, PartitionReceipt, Price, learn_hazard_partition,
     restaurant_ratio,
 };
+pub use port::PortPopulation;
 pub use provenance::{FaceContribution, MissingProducerTerm};
 pub use releasing::{FamilyReleaseError, PopulationRelease, ReleaseRefusal};
 pub use species::{
@@ -1310,6 +1314,14 @@ impl Bound {
         }
     }
 
+    /// The empty product, `1`.
+    fn one() -> Self {
+        Self {
+            mantissa: BigUint::one(),
+            exponent: 0,
+        }
+    }
+
     fn is_zero(&self) -> bool {
         self.mantissa.is_zero()
     }
@@ -1441,6 +1453,25 @@ fn code_between(lower: &Bound, upper: &Bound) -> Result<ExactInterval, Populatio
         &ExactInterval::point(Rat::zero()),
         &enclosure,
     )?)
+}
+
+/// **A living member's weight** `w_f = c_f/W`, enclosed by `[c_f^lo/W^hi, c_f^hi/W^lo]` and
+/// rounded outward (module header: the weights are read from the likelihoods).
+fn weight_of(charged: &(Bound, Bound), whole: &(Bound, Bound)) -> (Bound, Bound) {
+    (
+        charged.0.over(&whole.1, false),
+        charged.1.over(&whole.0, true),
+    )
+}
+
+/// **One living member's share of a class's face**, added to the class's running sum: its weight's
+/// bounds ([`weight_of`]) times its face's bounds, each side rounded outward (module header: the
+/// population's face `q(c) = Σ_f w_f P_f(c)`). The one law of the population's face, read by
+/// [`Population::face`] over families that carry their likelihoods and by
+/// [`port::PortPopulation`] over families read at a port.
+fn weigh(sum: &mut (Bound, Bound), weight: &(Bound, Bound), face: &(Bound, Bound)) {
+    sum.0 = sum.0.plus(&weight.0.times(&face.0, false), false);
+    sum.1 = sum.1.plus(&weight.1.times(&face.1, true), true);
 }
 
 /// `−log₂ w` of a mass `w ≤ 1` from its bounds: never negative.
@@ -2385,24 +2416,22 @@ impl Population {
     /// on the grid `2^(−P)` (the weights' bounds are read from the likelihoods: module header).
     pub fn face(&self) -> Result<Vec<ExactInterval>, PopulationError> {
         let bounds = self.charged_bounds();
-        let (lower, upper) = Self::total(&bounds, 0..bounds.len());
-        if lower.is_zero() {
+        let whole = Self::total(&bounds, 0..bounds.len());
+        if whole.0.is_zero() {
             return Err(PopulationError::Extinct { cell: self.cells });
         }
         let mut sums = vec![(Bound::zero(), Bound::zero()); self.alphabet];
-        for (member, (charged_lower, charged_upper)) in self.members.iter().zip(&bounds) {
+        for (member, charged) in self.members.iter().zip(&bounds) {
             if member.died.is_some() {
                 continue;
             }
-            let (weight_lower, weight_upper) = (
-                charged_lower.over(&upper, false),
-                charged_upper.over(&lower, true),
-            );
+            let weight = weight_of(charged, &whole);
             for (sum, face) in sums.iter_mut().zip(member.family.face()?) {
-                let (face_lower, face_upper) =
-                    (Bound::of_rat(&face, false), Bound::of_rat(&face, true));
-                sum.0 = sum.0.plus(&weight_lower.times(&face_lower, false), false);
-                sum.1 = sum.1.plus(&weight_upper.times(&face_upper, true), true);
+                weigh(
+                    sum,
+                    &weight,
+                    &(Bound::of_rat(&face, false), Bound::of_rat(&face, true)),
+                );
             }
         }
         sums.into_iter()

@@ -19,7 +19,7 @@ use crate::hnn::moment::{PairPort, SourceMoment};
 use crate::hnn::propagation::{
     ContactOperands, ExponentReading, gram, junction_scattering, transit, transit_solve,
 };
-use crate::hnn::receiving::{Mixture, ReceivingPhases};
+use crate::hnn::receiving::ReceivingPhases;
 use crate::hnn::ring::{
     PumpDeclaration, PumpStep, ResonatorMaterial, ResonatorOperands, ResonatorRemainders,
     RingClock, port_scattering, sheets,
@@ -91,8 +91,8 @@ impl ConstitutionRead for Declared {
     fn landmarks(&self, ring: usize) -> Option<&Landmarks> {
         self.medium.landmarks(ring)
     }
-    fn mixture(&self, ring: usize) -> Option<&Mixture> {
-        self.medium.mixture(ring)
+    fn population(&self, ring: usize) -> Option<&crate::receiver::population::PortPopulation> {
+        self.medium.population(ring)
     }
     fn contact_stiffness_signature(&self, contact: usize) -> Option<&[bool]> {
         self.signatures[contact].as_deref()

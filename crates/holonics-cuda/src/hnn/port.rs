@@ -15,7 +15,7 @@
 //! | the receiving parametron's landmark tree mirrored, stored at the faces where paths part (`hnn::tree::CardTree`, campaign 2, the storage where paths part): each window's splits at every phase's causal address in cell order (the known targets' deposits applied and undone on the card), and each deposit's opened-path update with its splits, foundings and label runs | the class faces from the splits and their grain exponents (`hnn::receiving::faces_of_splits`), added to the card's wave at the grain (`ReceivingPhases::combine`); after every deposit the mirror's counts and the masses, `β`, stop weights, depth words and label ends of every node the deposit's walks opened or it founded, its joins and its held labels, checked against the host's tree (`CardTree::agrees_at`) |
 //! | each declared ring resonator's ticks inside `hnn_word_forward`, its returned wave reaching the next junction; its state/input adjoint inside `hnn_word_reverse` (the loaded resonator) | the resonators' local operands and certified charts (`ResonatorOperands::at_cut`), formed once per publication (`publication::Loci::resonator_operands`); their balances and bounds read from the live word's record; gain contractions and deposition at the same producing operands |
 //! | in the GPU suite's parity tests only ([`Resident::with_normal_mirror`]; off the exposure's path, where it replaced no host owner): each normal law's prox step a deposit takes once at its locus (`hnn_outer_update` for `ΔH` and `ΔW`, `hnn_budgeted_split` for their carries, the reaches `X̂f` by `hnn_lattice_read` through the host's successor chart; campaign 2), read against the host's successor (`crate::hnn::lattice::normal_deposit_on_card`), every step counted carried, declined by reason or skipped | the successor constitution (`Constitution::deposited`, the owner of `Θ`), the chart of `H′`, and the steps the card's words cannot carry (a sample off the dyadics, such as `R`'s covector on `(1/W)ℤ`) |
-//! | the word's return (`hnn_word_reverse`) | the compare phase under the hardware law (`reference::compare_phase`: the tree at the grain beside the mixture score, the Holon ratio and its covector), the return's source through `Rᵀ` (the covector lives on `(1/W)ℤ`), the composition onto the loci (`reference::compose`) |
+//! | the word's return (`hnn_word_reverse`) | the compare phase under the hardware law (`reference::compare_phase`: the tree at the grain beside the population's score, the Holon ratio and its covector), the return's source through `Rᵀ` (the covector lives on `(1/W)ℤ`), the composition onto the loci (`reference::compose`) |
 //! | | keys, the collapse, the first law's ledger, the handles, every refusal's reason |
 //!
 //! [definition; agent-inferred] **The tree read moved to the card** (campaign 2; the hardware-surfaces rule; the
@@ -760,9 +760,9 @@ impl<'c> Resident<'c> {
             .zip(&slot.emitted)
             .map(|(now, then)| now.iter().zip(then).map(|(a, b)| a - b).collect())
             .collect();
-        // The receiver's scored face: the mixture of the tree's and the combined face (ruling A),
-        // its ratio stepped phase by phase, scored on the host as the reference scores it; beside
-        // it the tree's executed face alone, the tree at the grain, the Holon ratio and its
+        // The receiver's scored face: its population over the tree's and the combined face (ruling
+        // A, THE_REBUILD U1), received phase by phase, scored on the host as the reference scores
+        // it; beside it the tree's executed face alone, the tree at the grain, the Holon ratio and its
         // covector, under the hardware law (`reference::compare_phase`).
         let ComparePhase {
             tree_grain,

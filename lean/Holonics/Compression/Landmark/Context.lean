@@ -44,7 +44,7 @@ The joins to the framework ([proved-derived; formal-checked]):
 
 | Module | Law | Rust consumer |
 |---|---|---|
-| `Context/Tree` | context-tree weighting over typed addresses: KT masses, the opened-path face and its step, the Kraft form and dominance over pruned trees under any stop prior and any node law, the digit emission and its lattice chart, the cochain, the deposition join, founding and release, the receiver's two-face mixture | `compression::landmark::context::{Landmarks, IdealLandmarks, StopPrior, Beta}`, `hnn::receiving::Mixture` |
+| `Context/Tree` | context-tree weighting over typed addresses: KT masses, the opened-path face and its step, the Kraft form and dominance over pruned trees under any stop prior and any node law, the digit emission and its lattice chart, the cochain, the deposition join, founding and release, the receiver's two-face mixture | `compression::landmark::context::{Landmarks, IdealLandmarks, StopPrior, Beta}`, `hnn::receiving::receiving_population` (the two-face mixture as the population at ½/½; `hnn::receiving::Mixture` retired at U1) |
 | `Context/Standing` | each pruned tree is a candidate standing on the shift navigator's words; the tree is their mixture | the module doc of `compression::landmark::context` |
 | `Context/Address` | the receiving letters: typed bundles restricted by whole bundles, their finite partitions and injective codes, the enlarged tree keeping the cell-only branch | `compression::landmark::context::{Letter, Bundle, LetterFamily}`, `hnn::receiving::LetterReader` |
 | `Context/Carrier` | the tree's carriers rebase past their width with an enclosed released remainder | `compression::landmark::context::Beta` |

@@ -17,6 +17,18 @@ emit another class), so this module states the same mixture with **nonnegative**
   `Σ_x π_x A_x(n)`, a family whose face of a cell is zero keeps weight zero from the next cell on
   (death: `HolonicAdjointNormalization.replicator_eq_zero_iff` is its one-step form), and the
   population codes within `−log₂ π_x` of every living family.
+* `population_mixture_enclosed` [proved-derived; formal-checked]: a family read through an
+  enclosure of its faces, `lo ≤ f ≤ hi`, keeps the population's product between the priors'
+  mixtures of the endpoints' products (Rust `receiver::population::port`, a face in `ℚ(θ)` read at
+  a port through its exact enclosure; an exactly zero face is its own enclosure, so death stays
+  exact).
+* `executed_face_within_population`, `executed_mixture_within_population` [proved-derived;
+  formal-checked] (over `two_face_skew`, `execRatio_eq`, `max_inv_eq_mul`): the receiving face
+  (THE_REBUILD U1). The two-family population at ½/½ is the sequential mixture
+  (`LocalWeighing.two_face_prior`); its execution through a carried ratio stepped with chart factors
+  `ρ_t` (`Tree.execRatio`) stays within `max(k_t, k_t⁻¹)`, `k_t = ∏_(s<t) ρ_s`, of the population's
+  face at every cell, and within `∏_t max(ρ_t, ρ_t⁻¹)` of its product `½ A_n + ½ B_n` over the
+  passage: in bits, `|Σ_(s<t) log₂ ρ_s|` and `Σ_t |log₂ ρ_t|`.
 * `survivor_code` [proved-derived; formal-checked]: a finite key space of deterministic emitters
   under the uniform prior. The survivors `S_t` are the keys agreeing with every cell before `t`; the
   mixture's face of the received cell is `#S_(t+1)/#S_t`, its product is `#S_n/|K|`, and its code is
@@ -236,6 +248,25 @@ theorem population_mixture {π : ι → ℚ} {f : ι → ℕ → ℚ} (hπ : IsP
     rw [Real.logb_mul (by exact_mod_cast hx.ne') (by exact_mod_cast hA.ne')] at hb
     push_cast
     linarith
+
+/-- [proved-derived; formal-checked] **`population_mixture_enclosed`: a family read through an
+enclosure of its faces.** When each family's faces lie between declared bounds `lo ≤ f ≤ hi`
+(a face in `ℚ(θ)` read through its exact enclosure, Rust `receiver::population::port`), the
+population's product lies between the priors' mixtures of the bounds' products:
+`Σ_x π_x ∏_t lo_x(t) ≤ ∏_(t<n) q_t ≤ Σ_x π_x ∏_t hi_x(t)`. A face that is exactly zero is its own
+enclosure, so death stays exact. -/
+theorem population_mixture_enclosed {π : ι → ℚ} {lo f hi : ι → ℕ → ℚ} (hπ : IsPrior π)
+    (hlo : ∀ x t, 0 ≤ lo x t) (hlof : ∀ x t, lo x t ≤ f x t) (hfhi : ∀ x t, f x t ≤ hi x t)
+    (n : ℕ) (hlive : 0 < ∑ x, π x * seqLik (f x) n) :
+    ∑ x, π x * seqLik (lo x) n ≤ ∏ t ∈ range n, fwdMix π f idKernel t ∧
+      ∏ t ∈ range n, fwdMix π f idKernel t ≤ ∑ x, π x * seqLik (hi x) n := by
+  have hf : ∀ x t, 0 ≤ f x t := fun x t => le_trans (hlo x t) (hlof x t)
+  rw [(population_mixture hπ hf n hlive).2.1]
+  refine ⟨sum_le_sum fun x _ => ?_, sum_le_sum fun x _ => ?_⟩
+  · exact mul_le_mul_of_nonneg_left
+      (prod_le_prod (fun t _ => hlo x t) fun t _ => hlof x t) (hπ.1 x)
+  · exact mul_le_mul_of_nonneg_left
+      (prod_le_prod (fun t _ => hf x t) fun t _ => hfhi x t) (hπ.1 x)
 
 end Mixture
 
@@ -667,6 +698,268 @@ theorem local_of_constant [DecidableEq ι] (π : ι → ℚ) (f : ι → ℕ →
 
 end LocalMixture
 
+/-! ## The receiving face: the two-family population against the executed ratio chart
+
+THE_REBUILD U1: the HNN's receiving face is the population over the tree's face `a` and the combined
+face `b` at the matched prior ½/½ (Rust `hnn::receiving::receiving_population` over
+`receiver::population::port`), which is the sequential mixture (`LocalWeighing.two_face_prior` at
+`π = ½`: `priorMix (1/2) = seqMix`, a static forward mixture over `Bool`). The retired
+`hnn::receiving::Mixture` (history at `19f1eb61`) executed it through a carried ratio `β̂_(t+1) = β̂_t a_t/(b_t ρ_t)`
+(`Tree.execRatio`), `ρ_t` the chart's factor at cell `t`. These two statements bound that execution
+against the population, cell by cell and over the passage, by the chart's factors alone: in bits,
+`log₂ max(ρ, ρ⁻¹) = |log₂ ρ|`, so the per-cell faces differ by at most `|Σ_(s<t) log₂ ρ_s|` and the
+passage codes by at most `Σ_(t<n) |log₂ ρ_t|`, the retired chart's certified drift. -/
+
+section ReceivingFace
+
+/-- **One cell's face under two weight ratios**: moving the second face's weight by a factor `k`
+moves the two-face mixture by at most `max(k, k⁻¹)` either way. -/
+theorem two_face_skew {x y u v k : ℚ} (hx : 0 < x) (hy : 0 < y) (hu : 0 < u) (hv : 0 < v)
+    (hk : 0 < k) :
+    (x + y) / (u + v) ≤ max k k⁻¹ * ((x + k * y) / (u + k * v)) ∧
+      (x + k * y) / (u + k * v) ≤ max k k⁻¹ * ((x + y) / (u + v)) := by
+  have huv : 0 < u + v := by positivity
+  have hukv : 0 < u + k * v := by positivity
+  have hxu := mul_pos hx hu
+  have hxv := mul_pos hx hv
+  have hyu := mul_pos hy hu
+  have hyv := mul_pos hy hv
+  rcases le_total 1 k with h | h
+  · have hm : max k k⁻¹ = k := max_eq_left (le_trans (inv_le_one_of_one_le₀ h) h)
+    have h0 : 0 ≤ k - 1 := sub_nonneg.mpr h
+    rw [hm, ← mul_div_assoc, ← mul_div_assoc]
+    constructor
+    · rw [div_le_div_iff₀ huv hukv]
+      nlinarith [mul_nonneg h0 hxu.le, mul_nonneg (mul_nonneg h0 (by linarith : (0 : ℚ) ≤ k + 1))
+        hyu.le, mul_nonneg (mul_nonneg hk.le h0) hyv.le]
+    · rw [div_le_div_iff₀ hukv huv]
+      nlinarith [mul_nonneg h0 hxu.le, mul_nonneg (mul_nonneg h0 (by linarith : (0 : ℚ) ≤ k + 1))
+        hxv.le, mul_nonneg (mul_nonneg hk.le h0) hyv.le]
+  · have hinv : 1 ≤ k⁻¹ := one_le_inv₀ hk |>.mpr h
+    have hm : max k k⁻¹ = k⁻¹ := max_eq_right (le_trans h hinv)
+    have h0 : 0 ≤ 1 - k := sub_nonneg.mpr h
+    rw [hm]
+    constructor
+    · -- `k (x + y)/(u + v) ≤ (x + k y)/(u + k v)`, then multiply by `k⁻¹`.
+      have key : k * ((x + y) / (u + v)) ≤ (x + k * y) / (u + k * v) := by
+        rw [← mul_div_assoc, div_le_div_iff₀ huv hukv]
+        nlinarith [mul_nonneg h0 hxu.le, mul_nonneg (mul_nonneg h0 (by linarith : (0 : ℚ) ≤ 1 + k))
+          hxv.le, mul_nonneg (mul_nonneg hk.le h0) hyv.le]
+      calc (x + y) / (u + v) = k⁻¹ * (k * ((x + y) / (u + v))) := by
+            rw [← mul_assoc, inv_mul_cancel₀ hk.ne', one_mul]
+        _ ≤ k⁻¹ * ((x + k * y) / (u + k * v)) :=
+            mul_le_mul_of_nonneg_left key (inv_pos.mpr hk).le
+    · have key : k * ((x + k * y) / (u + k * v)) ≤ (x + y) / (u + v) := by
+        rw [← mul_div_assoc, div_le_div_iff₀ hukv huv]
+        nlinarith [mul_nonneg h0 hxu.le, mul_nonneg (mul_nonneg h0 (by linarith : (0 : ℚ) ≤ 1 + k))
+          hyu.le, mul_nonneg (mul_nonneg hk.le h0) hyv.le]
+      calc (x + k * y) / (u + k * v) = k⁻¹ * (k * ((x + k * y) / (u + k * v))) := by
+            rw [← mul_assoc, inv_mul_cancel₀ hk.ne', one_mul]
+        _ ≤ k⁻¹ * ((x + y) / (u + v)) := mul_le_mul_of_nonneg_left key (inv_pos.mpr hk).le
+
+/-- The carried ratio is the first face's likelihood over the second's times the chart's factors:
+`β̂_t = A_t/(B_t ∏_(s<t) ρ_s)`. -/
+theorem execRatio_eq {a b ρ : ℕ → ℚ} (hb : ∀ t, 0 < b t) (hρ : ∀ t, 0 < ρ t) (t : ℕ) :
+    execRatio a b ρ t = seqLik a t / (seqLik b t * seqLik ρ t) := by
+  induction t with
+  | zero => simp [execRatio, seqLik_zero]
+  | succ t ih =>
+    have hB := seqLik_pos hb t
+    have hk := seqLik_pos hρ t
+    have := hb t
+    have := hρ t
+    rw [execRatio, ih, seqLik_succ, seqLik_succ, seqLik_succ]
+    field_simp
+
+/-- [proved-derived; formal-checked] **`executed_face_within_population`: one cell.** The executed
+face `q̂_t` (the carried ratio's) and the two-family population's face `q_t = seqMix` at ½/½ differ
+by at most the factor `max(k_t, k_t⁻¹)`, `k_t = ∏_(s<t) ρ_s` the chart's accumulated factor: in
+bits, `|log₂ q̂_t − log₂ q_t| ≤ |Σ_(s<t) log₂ ρ_s|`. -/
+theorem executed_face_within_population {a b ρ : ℕ → ℚ} (ha : ∀ t, 0 < a t)
+    (hb : ∀ t, 0 < b t) (hρ : ∀ t, 0 < ρ t) (t : ℕ) :
+    seqMix a b t ≤ max (seqLik ρ t) (seqLik ρ t)⁻¹ * execMix a b ρ t ∧
+      execMix a b ρ t ≤ max (seqLik ρ t) (seqLik ρ t)⁻¹ * seqMix a b t := by
+  have hA := seqLik_pos ha t
+  have hB := seqLik_pos hb t
+  have hk := seqLik_pos hρ t
+  have hexec : execMix a b ρ t = (seqLik a t * a t + seqLik ρ t * (seqLik b t * b t)) /
+      (seqLik a t + seqLik ρ t * seqLik b t) := by
+    rw [execMix, execRatio_eq hb hρ]
+    have := ha t
+    have := hb t
+    field_simp
+    ring
+  have hseq : seqMix a b t = (seqLik a t * a t + seqLik b t * b t) /
+      (seqLik a t + seqLik b t) := by
+    have hAB : seqLik a t + seqLik b t ≠ 0 := by positivity
+    simp only [seqMix]
+    field_simp
+    ring
+  rw [hexec, hseq]
+  exact two_face_skew (mul_pos hA (ha t)) (mul_pos hB (hb t)) hA hB hk
+
+/-- `max(ρ, ρ⁻¹) = max(1, ρ) · max(1, ρ⁻¹)` for `ρ > 0`. -/
+theorem max_inv_eq_mul {ρ : ℚ} (hρ : 0 < ρ) : max ρ ρ⁻¹ = max 1 ρ * max 1 ρ⁻¹ := by
+  rcases le_total 1 ρ with h | h
+  · have hi : ρ⁻¹ ≤ 1 := inv_le_one_of_one_le₀ h
+    rw [max_eq_left (le_trans hi h), max_eq_right h, max_eq_left hi, mul_one]
+  · have hi : 1 ≤ ρ⁻¹ := one_le_inv₀ hρ |>.mpr h
+    rw [max_eq_right (le_trans h hi), max_eq_left h, max_eq_right hi, one_mul]
+
+/-- [proved-derived; formal-checked] **`executed_mixture_within_population`: the passage.** The
+executed product `∏_(t<n) q̂_t` and the two-family population's product `½ A_n + ½ B_n` (the
+telescope at ½/½) differ by at most the factor `K_n = ∏_(t<n) max(ρ_t, ρ_t⁻¹)`: in bits,
+`|log₂ ∏ q̂ − log₂(½ A_n + ½ B_n)| ≤ Σ_(t<n) |log₂ ρ_t|`, the chart's certified drift. -/
+theorem executed_mixture_within_population {a b ρ : ℕ → ℚ} (ha : ∀ t, 0 < a t)
+    (hb : ∀ t, 0 < b t) (hρ : ∀ t, 0 < ρ t) (n : ℕ) :
+    seqLik a n / 2 + seqLik b n / 2 ≤
+        (∏ t ∈ range n, max (ρ t) (ρ t)⁻¹) * ∏ t ∈ range n, execMix a b ρ t ∧
+      ∏ t ∈ range n, execMix a b ρ t ≤
+        (∏ t ∈ range n, max (ρ t) (ρ t)⁻¹) * (seqLik a n / 2 + seqLik b n / 2) := by
+  set Bh : ℕ → ℚ := seqLik (fun t => b t * ρ t) with hBh
+  have hbρ : ∀ t, 0 < b t * ρ t := fun t => mul_pos (hb t) (hρ t)
+  have hmix : ∀ t, execMix a b ρ t =
+      (seqLik a t * a t + Bh t * b t) / (seqLik a t + Bh t) := by
+    intro t
+    have hA := seqLik_pos ha t
+    have hB : 0 < Bh t := seqLik_pos hbρ t
+    have hsplit : seqLik b t * seqLik ρ t = Bh t := by
+      simp only [hBh, seqLik, prod_mul_distrib]
+    rw [execMix, execRatio_eq hb hρ, hsplit]
+    field_simp
+    ring
+  have hq : ∀ t, 0 < execMix a b ρ t := fun t => by
+    rw [hmix]
+    have := seqLik_pos ha t; have := seqLik_pos hbρ t; have := ha t; have := hb t
+    positivity
+  have hone : ∀ t, 1 ≤ max 1 (ρ t) := fun t => le_max_left _ _
+  have hone' : ∀ t, 1 ≤ max 1 (ρ t)⁻¹ := fun t => le_max_left _ _
+  -- The two invariants on `A_n + B̂_n`.
+  have hlo : ∀ n, seqLik a n + Bh n ≤
+      2 * (∏ t ∈ range n, max 1 (ρ t)) * ∏ t ∈ range n, execMix a b ρ t := by
+    intro n
+    induction n with
+    | zero => simp [hBh, seqLik_zero]; norm_num
+    | succ n ih =>
+      have hA := seqLik_pos ha n
+      have hB : 0 < Bh n := seqLik_pos hbρ n
+      have hAB : 0 < seqLik a n + Bh n := by positivity
+      have hm : 0 ≤ max 1 (ρ n) := le_trans zero_le_one (hone n)
+      rw [prod_range_succ, prod_range_succ, seqLik_succ, hBh, seqLik_succ, ← hBh]
+      have step : seqLik a n * a n + Bh n * (b n * ρ n) ≤
+          max 1 (ρ n) * ((seqLik a n + Bh n) * execMix a b ρ n) := by
+        rw [hmix, mul_div_cancel₀ _ hAB.ne']
+        have h1 : seqLik a n * a n ≤ max 1 (ρ n) * (seqLik a n * a n) :=
+          le_mul_of_one_le_left (mul_pos hA (ha n)).le (hone n)
+        have h2 : Bh n * (b n * ρ n) ≤ max 1 (ρ n) * (Bh n * b n) := by
+          have e : Bh n * (b n * ρ n) = ρ n * (Bh n * b n) := by ring
+          rw [e]
+          exact mul_le_mul_of_nonneg_right (le_max_right _ _) (mul_pos hB (hb n)).le
+        nlinarith
+      calc seqLik a n * a n + Bh n * (b n * ρ n)
+          ≤ max 1 (ρ n) * ((seqLik a n + Bh n) * execMix a b ρ n) := step
+        _ ≤ max 1 (ρ n) * ((2 * (∏ t ∈ range n, max 1 (ρ t)) *
+              ∏ t ∈ range n, execMix a b ρ t) * execMix a b ρ n) :=
+          mul_le_mul_of_nonneg_left (mul_le_mul_of_nonneg_right ih (hq n).le) hm
+        _ = 2 * ((∏ t ∈ range n, max 1 (ρ t)) * max 1 (ρ n)) *
+              ((∏ t ∈ range n, execMix a b ρ t) * execMix a b ρ n) := by ring
+  have hhi : ∀ n, 2 * ∏ t ∈ range n, execMix a b ρ t ≤
+      (∏ t ∈ range n, max 1 (ρ t)⁻¹) * (seqLik a n + Bh n) := by
+    intro n
+    induction n with
+    | zero => simp [hBh, seqLik_zero]; norm_num
+    | succ n ih =>
+      have hA := seqLik_pos ha n
+      have hB : 0 < Bh n := seqLik_pos hbρ n
+      have hAB : 0 < seqLik a n + Bh n := by positivity
+      have hV : 0 ≤ ∏ t ∈ range n, max 1 (ρ t)⁻¹ :=
+        prod_nonneg fun t _ => le_trans zero_le_one (hone' t)
+      rw [prod_range_succ, prod_range_succ, seqLik_succ, hBh, seqLik_succ, ← hBh]
+      -- `B̂ b ≤ max(1, ρ⁻¹) B̂ b ρ`, since `ρ max(1, ρ⁻¹) ≥ 1`.
+      have hρm : 1 ≤ ρ n * max 1 (ρ n)⁻¹ := by
+        rcases le_total 1 (ρ n)⁻¹ with h | h
+        · rw [max_eq_right h, mul_inv_cancel₀ (hρ n).ne']
+        · rw [max_eq_left h, mul_one]
+          have := (inv_le_one₀ (hρ n)).mp h
+          exact this
+      have step : seqLik a n * a n + Bh n * b n ≤
+          max 1 (ρ n)⁻¹ * (seqLik a n * a n + Bh n * (b n * ρ n)) := by
+        have h1 : seqLik a n * a n ≤ max 1 (ρ n)⁻¹ * (seqLik a n * a n) :=
+          le_mul_of_one_le_left (mul_pos hA (ha n)).le (hone' n)
+        have h2 : Bh n * b n ≤ max 1 (ρ n)⁻¹ * (Bh n * (b n * ρ n)) := by
+          have e : max 1 (ρ n)⁻¹ * (Bh n * (b n * ρ n)) =
+              (ρ n * max 1 (ρ n)⁻¹) * (Bh n * b n) := by ring
+          rw [e]
+          exact le_mul_of_one_le_left (mul_pos hB (hb n)).le hρm
+        nlinarith
+      have hqn : (seqLik a n + Bh n) * execMix a b ρ n = seqLik a n * a n + Bh n * b n := by
+        rw [hmix, mul_div_cancel₀ _ hAB.ne']
+      calc 2 * ((∏ t ∈ range n, execMix a b ρ t) * execMix a b ρ n)
+          = (2 * ∏ t ∈ range n, execMix a b ρ t) * execMix a b ρ n := by ring
+        _ ≤ ((∏ t ∈ range n, max 1 (ρ t)⁻¹) * (seqLik a n + Bh n)) * execMix a b ρ n :=
+          mul_le_mul_of_nonneg_right ih (hq n).le
+        _ = (∏ t ∈ range n, max 1 (ρ t)⁻¹) * (seqLik a n * a n + Bh n * b n) := by
+          rw [mul_assoc, hqn]
+        _ ≤ (∏ t ∈ range n, max 1 (ρ t)⁻¹) *
+              (max 1 (ρ n)⁻¹ * (seqLik a n * a n + Bh n * (b n * ρ n))) :=
+          mul_le_mul_of_nonneg_left step hV
+        _ = (∏ t ∈ range n, max 1 (ρ t)⁻¹) * max 1 (ρ n)⁻¹ *
+              (seqLik a n * a n + Bh n * (b n * ρ n)) := by ring
+  -- `K = U V`, `R ≤ U`, `R⁻¹ ≤ V`, `1 ≤ U`, `1 ≤ V`, with `B̂_n = B_n R`.
+  set U := ∏ t ∈ range n, max 1 (ρ t) with hU
+  set V := ∏ t ∈ range n, max 1 (ρ t)⁻¹ with hV
+  set R := ∏ t ∈ range n, ρ t with hR
+  have hK : ∏ t ∈ range n, max (ρ t) (ρ t)⁻¹ = U * V := by
+    rw [hU, hV, ← prod_mul_distrib]
+    exact prod_congr rfl fun t _ => max_inv_eq_mul (hρ t)
+  have hU1 : 1 ≤ U := by
+    have := prod_le_prod (s := range n) (f := fun _ => (1 : ℚ)) (g := fun t => max 1 (ρ t))
+      (fun _ _ => zero_le_one) fun t _ => hone t
+    simpa using this
+  have hV1 : 1 ≤ V := by
+    have := prod_le_prod (s := range n) (f := fun _ => (1 : ℚ)) (g := fun t => max 1 (ρ t)⁻¹)
+      (fun _ _ => zero_le_one) fun t _ => hone' t
+    simpa using this
+  have hRU : R ≤ U := prod_le_prod (fun t _ => (hρ t).le) fun t _ => le_max_right _ _
+  have hRV : R⁻¹ ≤ V := by
+    rw [hR, ← prod_inv_distrib]
+    exact prod_le_prod (fun t _ => (inv_pos.mpr (hρ t)).le) fun t _ => le_max_right _ _
+  have hRpos : 0 < R := prod_pos fun t _ => hρ t
+  have hBR : Bh n = seqLik b n * R := by
+    simp only [hBh, hR, seqLik, prod_mul_distrib]
+  have hA := seqLik_pos ha n
+  have hB := seqLik_pos hb n
+  have hP : 0 < ∏ t ∈ range n, execMix a b ρ t := prod_pos fun t _ => hq t
+  set P := ∏ t ∈ range n, execMix a b ρ t with hPdef
+  rw [hK]
+  have h1 := hlo n
+  have h2 := hhi n
+  rw [hBR] at h1 h2
+  constructor
+  · -- `A + B ≤ V (A + B R) ≤ 2 U V P`.
+    have hBle : seqLik b n ≤ V * (seqLik b n * R) := by
+      have e : V * (seqLik b n * R) = (R * V) * seqLik b n := by ring
+      rw [e]
+      have : 1 ≤ R * V := by
+        have := mul_le_mul_of_nonneg_left hRV hRpos.le
+        rwa [mul_inv_cancel₀ hRpos.ne'] at this
+      exact le_mul_of_one_le_left hB.le this
+    have hAle : seqLik a n ≤ V * seqLik a n := le_mul_of_one_le_left hA.le hV1
+    have hV0 : 0 ≤ V := le_trans zero_le_one hV1
+    have := mul_le_mul_of_nonneg_left h1 hV0
+    nlinarith
+  · -- `2 P ≤ V (A + B R) ≤ U V (A + B)`.
+    have hBle : seqLik b n * R ≤ U * seqLik b n := by
+      rw [mul_comm U]
+      exact mul_le_mul_of_nonneg_left hRU hB.le
+    have hAle : seqLik a n ≤ U * seqLik a n := le_mul_of_one_le_left hA.le hU1
+    have hV0 : 0 ≤ V := le_trans zero_le_one hV1
+    have hsum : seqLik a n + seqLik b n * R ≤ U * (seqLik a n + seqLik b n) := by linarith
+    have := mul_le_mul_of_nonneg_left hsum hV0
+    nlinarith
+
+end ReceivingFace
+
 section Audit
 
 #print axioms seqLik_eq_zero_of_le
@@ -700,6 +993,12 @@ section Audit
 #print axioms local_telescope
 #print axioms local_mixture_code
 #print axioms local_of_constant
+#print axioms population_mixture_enclosed
+#print axioms two_face_skew
+#print axioms execRatio_eq
+#print axioms executed_face_within_population
+#print axioms max_inv_eq_mul
+#print axioms executed_mixture_within_population
 
 end Audit
 

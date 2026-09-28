@@ -206,10 +206,11 @@ impl PendingRatio {
         })
     }
 
-    /// **The window scored by the receiver's mixture** (ruling A, `hnn::receiving::Mixture`): the
-    /// contemporary mixture's `β` weighs the tree's faces against the combined faces at the
-    /// targets, each phase's code length under the mixture, and the steps its deposit applies.
-    /// Refused when the constitution carries no mixture on the receiving ring.
+    /// **The window scored by the receiver's population** (ruling A, THE_REBUILD U1,
+    /// `hnn::receiving::score`): the contemporary population weighs the tree's faces against the
+    /// combined faces at the targets by the families' likelihoods, each phase's code length under
+    /// it, and the steps its deposit applies. Refused when the constitution carries no population on
+    /// the receiving ring.
     pub fn scored(
         &self,
         constitution: &impl ConstitutionRead,
@@ -217,10 +218,10 @@ impl PendingRatio {
         targets: &[usize],
     ) -> Result<Scored, HnnError> {
         let ring = self.phases.ring();
-        constitution
-            .mixture(ring)
-            .ok_or(HnnError::MissingReceivingMap { ring })?
-            .score(ring, &against.faces, &against.trees, targets)
+        let population = constitution
+            .population(ring)
+            .ok_or(HnnError::MissingReceivingMap { ring })?;
+        crate::hnn::receiving::score(population, ring, &against.faces, &against.trees, targets)
     }
 
     /// **The contemporary read against targets**: the wave's read ([`PendingRatio::read_charted`])

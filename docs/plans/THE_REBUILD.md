@@ -19,7 +19,8 @@ Its corrections are folded in.
 - **The architecture** [interpretation]. The machine is one Holarchy ([THE_MACHINE](../THE_MACHINE.md)).
   Its receiving role is a population: the receiver mixes its constituent families by Bayes, the
   discrete replicator. The landmark tree is one family; a field-derived predictor (today the combined
-  tree-and-wave face `q_C`) would be another, and U1 builds its family contract; terrain navigators and composed eggs are others. This settles
+  tree-and-wave face `q_C`) is another, read at the HNN's own port through its enclosure (U1's first
+  loop); terrain navigators and composed eggs are others. This settles
   the containment the guides stated both ways (the population inside the field, the field inside the
   population): the population is the receiving composition at the field's port. It does **not**
   establish that the population or its statistical families are Holons joined at power ports; that
@@ -58,7 +59,7 @@ Its corrections are folded in.
 | Chase (F6) | reception at truth on 16 arenas; action captures in 164 ticks against 3,704 and 366; the at-once acceptance failed; each tick is released through the one law (the certified capture, the probe) or the declared cornering arm, and F6's action law is amended to that rule (U3's second loop) |
 | Retention | one contract (objects §8): each collapse is the standing law through its own carrier, with its Lean standing and its recoverability (U2's first loop); the test-only linear chain is retired |
 | Release | one law, `receiver::release`: the HNN's threshold commit and the population's certified draws, stop law and refusals (U3's first loop); the chaser's certified capture and probe (U3's second loop), its cornering commit a declared separate arm priced by the tick |
-| Mixtures | five constructions, sharing the ideal telescope but differing in conditioning, transitions and carriers: digit-local joins (`JoinTree`, `FaceJoins`), the whole-cell `receiving::Mixture`, the population's telescope with death, dormancy's fixed share over switching paths, and the retired `LocalMixture` |
+| Mixtures | four constructions, sharing the ideal telescope but differing in conditioning, transitions and carriers: digit-local joins (`JoinTree`, `FaceJoins`), the population's telescope with death (over families carrying their faces, `Population`, or read at a port, `PortPopulation`, which is the HNN's receiving face since U1 retired the whole-cell `receiving::Mixture`), dormancy's fixed share over switching paths, and the retired `LocalMixture` |
 | Motion primitives | proved in `Geometry/Motion`; no Rust consumer |
 
 ### 3. The order
@@ -267,6 +268,91 @@ It consumes U2's and U3's contracts.
   population code is strictly shorter than without it and its complete work fits the declared
   response and passage budgets (the gate below).
 - **Failure.** The separating term is named, and the two mixtures stay, recorded.
+- **First loop, September 28: the pins** (committed before any standing-cut run; Refs #73 #63).
+  - *The owner.* `receiver::population::port::PortPopulation`, the population at a port: the
+    families' faces are the machine's readings, so it carries only the priors and each family's
+    likelihood, and reads its face, weights, code and deaths through `Population`'s own telescope
+    and outward bounds (one helper, `weigh`). *The family contract* is an enclosure: a face in
+    `ℚ(θ)` enters as its exact enclosure `[lo, hi]` (a point where rational), the likelihood is
+    carried between the endpoints' products, and zero is exact death (Lean
+    `Population.population_mixture_enclosed`). The receiver's population
+    (`hnn::receiving::receiving_population`) holds the tree `T` and the combined face `C` at one
+    bit each, `π = ½/½`, and receives each phase's two faces in cell order, deposits inside a
+    window included (`ReceivingStep`); the tree's one update stays the constitution's landmark
+    deposit, and the covector, the phase comparison and the wave's deposition are untouched.
+  - *The consumer equation.* The population's face `q^P_t(x) = (L_T q_T(x) + L_C q_C(x))/(L_T + L_C)`
+    is `two_face_prior` at `π = ½`. The mixture's executed face is `(β̂_t q_T + q_C)/(1 + β̂_t)`, with
+    `β̂_(t+1) = β̂_t q_T(x_t)/(q_C(x_t) ρ_t)` and `ρ_t = lo_t/(q_C(x_t)(1 − r_t))` (the chart and the
+    rebase), so `β̂_t = β_t/∏_(s<t) ρ_s`.
+  - *The bound, derived and proved* (Lean `Population.{executed_face_within_population,
+    executed_mixture_within_population}`, over `two_face_skew` and `execRatio_eq`): at every cell
+    `|log₂ q̂_t(x_t) − log₂ q^P_t(x_t)| ≤ |Σ_(s<t) log₂ ρ_s| ≤ D_t`, and over the passage
+    `|log₂ ∏_t q̂_t − log₂(½ L_T + ½ L_C)| ≤ Σ_t |log₂ ρ_t| ≤ D_n`, where `D_t` is the mixture's
+    certified drift before cell `t`: `Σ_(s<t) ⌈(hi_s − lo_s)/lo_s · 3/2⌉_(2^(−128))` plus `3·2^(−W)`
+    a rebase. Enclosures containing the true codes are then at most `D_t` apart.
+  - *The acceptance, pinned for the standing cut, host and card* (`hnn_exposure`, both executions on
+    the same faces in the same compare, `hnn::reference::Agreement` at `19f1eb61`): (i) at every scored phase the
+    two code enclosures lie within distance `D_t`; (ii) the mixture's summed code and the
+    population's telescope `−log₂(½ L_T + ½ L_C)` lie within `D_n`; (iii) the population's summed
+    per-cell codes meet its own telescope. Campaign 1's receipt sets the scale, not the pin:
+    `D_n = 5844186179759863429570124736444603/2^126` bits at `W = 28` with 6,147 rebases.
+  - *The fixture identities* (`the_receivers_population_is_the_mixture_cell_by_cell` at
+    `19f1eb61`, whose population half stays as
+    `the_receivers_population_weighs_by_likelihood_cell_by_cell`; `receiver::population::port_tests`). On dyadic faces that fit the carrier, `β = 1, 3, 5/3, 7/9`,
+    the two executions give the same exact weight of the tree (`1/2, 3/4, 5/8, 7/16`), the same exact
+    face of the received class (`1/2, 3/8, 5/8`) and the same product (`15/128 = ½ L_T + ½ L_C`), and
+    each code encloses the same exact code length. At an exactly zero combined face the
+    population's family dies, with weight exactly zero and the tree's exactly one; the carried ratio
+    has no death and refuses the step. The population at a port equals `Population` over families
+    carrying the same faces, enclosure for enclosure.
+  - *Projection.* Campaign 1's standing-cut exposure took 399,911 ms on the host and 353,499 ms on
+    the card. The population adds one code and one receipt over two families per phase. The public
+    control's first 512 windows took 38,514 ms at a 332,091,392-byte peak. Each run is projected
+    within ten minutes and within 4 GiB, and is stopped past that.
+- **First loop, September 28: the standing cut, passed; the mixture retired** (runs at the pins'
+  commit `19f1eb61`, `hnn_exposure cut-file … cells all`; the cut's SHA-256 is
+  `5c5613d3b0df5fe6fb8f7fca3c33cfcf90f99b65bcb3ccda0cfb29d39f23df4f`, 6,148 cells, 3,074 windows,
+  1,190 held out; only counts and bits are reported).
+  - *Host.* Complete, every window deposited. Every one of the 6,148 scored phases lies within its
+    pin. The largest distance between the two code enclosures was
+    `4003627267671666862783/2^97` bits, against that phase's pin
+    `434487243236789459311460070663947/2^126`; the largest pin read was
+    `5843235441867343318430037831758637/2^127`. Over the passage, the mixture's summed code and the
+    population's telescope lie `99019428869303789749073/2^96` bits apart, against the final drift
+    `2922093089908766130445036760152251/2^126` (`W = 29`, 6,147 rebases). The population's summed
+    per-cell code meets its telescope, at distance zero. Held out, both read `3671 + 9/16 + ε` bits,
+    `3 + 1/16 + ε` a cell (campaign 1's reading), with population − model in
+    `[158292311810566627/2^92, 2643712553560870977/2^96]` bits. On the training cells the difference
+    is in `[1547136580660878604245/2^90, 99016940284749758855251/2^96]`. The run took 367,066 ms at a
+    400,457,728-byte peak.
+  - *Card* (`realization card`, alone on the idle RTX 4080 SUPER under the GPU lock). The run was
+    complete and PASSED. Its readout equals the host's line for line outside the wall times and the
+    traffic (3,332 lines compared): the same pins, distances, drifts and codes. It took 318,378 ms at
+    a 498,278,400-byte host peak, with 444 MiB on the card.
+  - *The retirement* (the one owner, agent-inferred from the acceptance's end state: the duplicate
+    law goes, not an alias). The HNN's receiving face is now `hnn::receiving::score` over the
+    receiver's population, which the constitution holds at the receiving locus. `Mixture`, its `β`
+    chart, the rebase, the chart residual, the drift and `MixtureReport` are deleted, and so are
+    the comparison's scaffolding (`Agreement`, the `population` and `drift` readings). Their law is
+    in Lean: `Tree.{execRatio, execMix, sequential_mixture_executed}` and the bound
+    `Population.executed_{face,mixture}_within_population`. The course's `log₂ β` is now the
+    population's log-odds `log₂(L_T/L_C)`. `L_model` lies within one bit of the better face with
+    no drift term (`the_receiving_face_codes_within_one_bit_of_the_better_face`).
+    Standing-cut runs at the retirement's commit show the exposure's model reading the pins'
+    population codes exactly, endpoint for endpoint: training
+    `[715031979768513993871184210076879/2^95, 1430063959537028186828544322961367/2^96]` bits, held
+    out `[145446044393744509099079416007333/2^95, 145446044393744564611838278662333/2^95]`. Host and
+    card agree line for line outside the wall times and the traffic, and every verdict against the
+    baselines is unchanged. The constitution's curve drops the retired `β`'s bits at the receiving
+    locus. The host took 359,998 ms at a 374,853,632-byte peak; the card took 308,234 ms at a
+    499,388,416-byte host peak.
+  - *The missing physical maps, named* (objects guide, "The receiving storage"; owed in #62). For
+    the population: storage `Φ(ℓ) = ln Σ π e^ℓ`, flow the per-cell `ln P_f(x_t)`, effort the
+    posterior `∇Φ = w`, and the balance `ΔΦ = ⟨w, f⟩ + D(w ‖ w′)`, a Bregman remainder. For the
+    tree: storage the log KT mass, flow the unit count, effort the face's log, and a lossless
+    telescope. For the joint: a stated constitutive map from bits to port variables, a Dirac
+    structure from the receiving ring's port to `ln q_C` (the softmax is not power-neutral), and a
+    common clock (U5). The join is not claimed.
 
 #### U4. Motion running
 
@@ -392,7 +478,7 @@ equation extraction (#146).
 
 | Item | Disposition |
 |---|---|
-| The tree and population as Holons joined at power ports | open; U1 names its missing maps and balances; owed in #62 |
+| The tree and population as Holons joined at power ports | open; U1's first loop named its missing maps and balances ([objects, "The receiving storage"](../ELEMENTARY_OBJECTS.md#the-receiving-storage)); owed in #62 |
 | Campaign 3's descended lattice chart, card parity, finite-deposit stability, persistent dormancy across an aeon and the concrete-ring bridge | U2 retired `hnn::modes` (its state is word-local); these return with persistent motion between words (below), the mode quotient ported from `1bdacc8f` with that consumer (#73); the Lean parts owed in #62 |
 | Mode release, FOUND by interconnection, far-field moment quotient `V_m` | deferred to after U3 (#73) |
 | Encoding, Context and JointPrediction (joint against marginal witnesses) | U6, after U1; the continuation-transport discovery of [F1's after-note](../../research/records/2026-09-28_THE_REBUILDS_CONSTRUCTION_RECORD_STEPS_ZERO_TO_FIVE_THE_CAMPAIGNS_AND_THE_FORWARD_PLAN.md#f1-the-word-alphabet-campaign-5-73-148) stays live |
@@ -877,7 +963,7 @@ them now state their law (`depth_one_is_the_whole_cell_table`, `first_arrival_is
 | 27 | The region table | (h); Lean `HNN/RegionCounts`; [record](../../research/records/2026-09-25_CAMPAIGN_ONE_LOCATED_FAILURE.md), addendum |
 | 28 | The landmark tree (Brandon, September 25) | `compression::landmark::context` module doc; merges in (d), campaign 5; [derivation](../../research/records/2026-09-25_THE_COMPRESSION_IS_OF_LANDMARKS_A_TREE_COCYCLE_AND_MERGES_PRICED_BY_THEIR_CODE_LENGTH_PAIR.md), [measurement](../../research/records/2026-09-26_THE_LANDMARK_TREE_COMPRESSES_THE_STANDING_CUT_BELOW_PPM_TWO.md) |
 | 29 | Prequential scoring | (f), "The cuts and their protocol"; `compression::landmark::context`, "The measurement is prequential" |
-| 30 | The likelihood mixture; the source's normalized open | `hnn::receiving::Mixture`, `hnn::moment::PopulationChart`; [record](../../research/records/2026-09-26_CAMPAIGN_ONE_MEETS_ITS_CRITERION_THE_TREE_RECEIVES_AND_THE_WAVE_IS_WEIGHED.md) |
+| 30 | The likelihood mixture; the source's normalized open | `hnn::receiving::receiving_population` (U1; the carried-ratio `Mixture` at `19f1eb61`), `hnn::moment::PopulationChart`; [record](../../research/records/2026-09-26_CAMPAIGN_ONE_MEETS_ITS_CRITERION_THE_TREE_RECEIVES_AND_THE_WAVE_IS_WEIGHED.md) |
 | 31 | Step 4's pace (Brandon, September 26) | Rules of the rebuild, "A development harness decides"; Order, step 7; [record](../../research/records/2026-09-26_STEP_FOURS_PACE_AND_THE_LIBRARY_CONSOLIDATING_WHILE_IT_GROWS.md) |
 | 32 | The declared stop prior | `compression::landmark::context`, "The declared stop prior"; [record](../../research/records/2026-09-26_THE_LANDMARK_TREE_AT_SCALE_THE_STOP_PRIOR_LOCAL_WEIGHING_THE_WIDE_CUT_AND_THE_STORAGE_WHERE_PATHS_PART.md) §1 |
 | 33 | The Born face | (h); [record](../../research/records/2026-09-26_THE_LANDMARK_TREE_AT_SCALE_THE_STOP_PRIOR_LOCAL_WEIGHING_THE_WIDE_CUT_AND_THE_STORAGE_WHERE_PATHS_PART.md) §2 |

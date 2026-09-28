@@ -233,8 +233,10 @@ window's faces in cell order `Landmarks::window_faces`, `probability`, `score`, 
 `Landmarks::deposit` and `receive`, the certificates),
 `IdealLandmarks` (the ideal tree weighting in ℚ, the reference oracle), `Beta` (the carried β chart),
 `OpenedPath::edge_ratios` (the cochain) and `face_bits`, `carrier_width` (the derived widths). Section 10's
-consumer is `hnn::receiving::Mixture` (the receiver's scored face, its ratio stepped phase by phase
-across a window).
+consumer is the receiver's population at the HNN's receiving port (`hnn::receiving::receiving_population`,
+`receiver::population::port`: the two-family population at ½/½, stepped phase by phase across a window);
+its carried-ratio execution `execRatio` was `hnn::receiving::Mixture`, retired at THE_REBUILD U1 (history at
+`19f1eb61`), and `Population.executed_{face,mixture}_within_population` bound it against the population.
 
 No `sorry`, no `axiom`, no `native_decide`.
 -/

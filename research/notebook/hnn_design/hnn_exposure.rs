@@ -79,9 +79,10 @@
 //!   `q_T` the mixture weighs; the compare's receipt), the same tree's face at the grain (its grain
 //!   logits alone, the face the combined read opens at when the wave reads zero) and the combined
 //!   face alone (tree plus wave); each baseline against them, `L_C − L_T` (the wave's contribution
-//!   against the tree's executed face, the mixture's evidence) and `L_model − L_T` (what the
-//!   mixture keeps of it), the tree at the grain against the tree (the grain's rounding), the
-//!   course by aeon, and the mixture's end (`log₂ β`, rebases, drift);
+//!   against the tree's executed face, the population's log-odds) and `L_model − L_T` (what the
+//!   receiver's population keeps of it), the tree at the grain against the tree (the grain's
+//!   rounding), the course by aeon, and the population's end (its telescoped code, each family's
+//!   code and their log-odds; THE_REBUILD U1);
 //! - `Kt` with the published keys, against the literal over the cells read;
 //! - each key location with its fibres per ring;
 //! - each aeon's boundary: its length and lift points, readings, collapse, first law (exchange plus
@@ -384,6 +385,9 @@ fn main() {
         exposure.compares,
         mean(wall, u128::from(exposure.compares))
     );
+    if let Some((now, peak)) = exterior::resident_set() {
+        println!("resident set (exterior, /proc/self/status): now {now} bytes, peak {peak} bytes");
+    }
 }
 
 /// Decision 38's one predeclared loaded comparison. The source ring is the smallest ring in the
@@ -666,11 +670,11 @@ fn report(field: &Field, exposure: &Exposure) {
     bits("held out", &exposure.held_out, true, grain);
     println!();
     println!(
-        "== the receiving face's course by aeon (ruling A: each aeon's cells under the model, the tree's executed face alone and the combined face alone; log2 beta at its boundary) =="
+        "== the receiving face's course by aeon (ruling A: each aeon's cells under the model, the tree's executed face alone and the combined face alone; the population's log-odds log2(L_T/L_C) at its boundary) =="
     );
     for (index, leg) in exposure.course.iter().enumerate() {
         println!(
-            "aeon {index}: closed at cell {}, {} cells; model {} (a cell {}); tree {} (a cell {}); combined {} (a cell {}); L_C − L_T {}; L_model − L_T {}; log2 beta {}",
+            "aeon {index}: closed at cell {}, {} cells; model {} (a cell {}); tree {} (a cell {}); combined {} (a cell {}); L_C − L_T {}; L_model − L_T {}; log2(L_T/L_C) {}",
             leg.cell,
             leg.cells,
             per(&leg.model, 1, grain),
@@ -681,20 +685,31 @@ fn report(field: &Field, exposure: &Exposure) {
             per(&leg.combined, leg.cells, grain),
             difference(&leg.combined, &leg.tree, grain),
             difference(&leg.model, &leg.tree, grain),
-            leg.log2_beta
+            leg.odds
                 .as_ref()
                 .map_or_else(|| "-".to_string(), |log| per(log, 1, grain))
         );
     }
-    match &exposure.mixture {
-        Some(mixture) => println!(
-            "the receiver's mixture at the end (ruling A): log2 beta {} (beta = W_tree/W_combined), carried at W = {}, {} rebases, certified drift {} bits",
-            enclosure(&mixture.log2_beta, grain),
-            mixture.width,
-            mixture.rebases,
-            exact(&mixture.drift)
+    match &exposure.population {
+        Some(population) => println!(
+            "the receiver's population at the end (ruling A, THE_REBUILD U1): code −log2(½ L_T + ½ L_C) {} (the telescope); the tree alone {}; the combined face alone {}; log2(L_T/L_C) {}; {} cells; {} bits",
+            enclosure(&population.code, grain),
+            population
+                .tree
+                .as_ref()
+                .map_or_else(|| "none".to_string(), |code| enclosure(code, grain)),
+            population
+                .combined
+                .as_ref()
+                .map_or_else(|| "none".to_string(), |code| enclosure(code, grain)),
+            population
+                .odds
+                .as_ref()
+                .map_or_else(|| "none".to_string(), |odds| enclosure(odds, grain)),
+            population.cells,
+            population.bits
         ),
-        None => println!("the receiver's mixture: none"),
+        None => println!("the receiver's population: none"),
     }
 
     println!();

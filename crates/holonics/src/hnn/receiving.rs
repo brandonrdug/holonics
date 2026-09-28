@@ -92,11 +92,12 @@
 //! stored grain logits): the tree part is a stored face, deposited by its own law (the reached
 //! comparisons' cells on their opened paths, `hnn::constitution::LandmarkStep`).
 //!
-//! [definition; agent-inferred] **The scored face is the mixture** ([`Mixture`], the primary's ruling
-//! A): the receiver scores the two-way mixture of the tree's face and the combined face, weighted by
-//! their prequential likelihood ratio `β` in Θ at the receiving locus, as a tree node weighs its own
-//! face against its split, `β` stepped after every cell in cell order, within a window too. The
-//! wave keeps learning from the combined face's covector.
+//! [definition; agent-inferred] **The scored face is the receiver's population**
+//! ([`receiving_population`], the primary's ruling A; THE_REBUILD U1): the population at the
+//! receiving port (`receiver::population::port`) over the tree's face and the combined face at
+//! ½/½, its weights read from the two families' likelihoods in Θ at the receiving locus, as a tree
+//! node weighs its own face against its split, received after every cell in cell order, within a
+//! window too ([`score`]). The wave keeps learning from the combined face's covector.
 //!
 //! [definition] **Exact inside, grain only at the face.** The logits are exact rationals. The grain
 //! reading returns the carry `n_c`, the phase class `k_c ∈ ℤ/L_R` and the fibre `ε_c`, the
@@ -112,18 +113,17 @@
 //! | `receiver::reception::ReceiverFace::read` with `C_S = R P_R^(τ_R) Π_R` | [`ReceivingPhases::read`] |
 //! | `HNN/RegionCounts.{combinedLogits, combined_face_pullback, combined_code_pullback}` | [`ReceivingRead::combined`], [`ReceivingPhases::combine`] |
 //! | `Compression/Landmark/Context/Tree.{unfounded_reads_prior, founded_tree_same_law, release_rule}` (the typed suffix address, kept whole by the collapse) | [`ActiveAddress`], [`ReceivingPhases::tree_faces`] |
-//! | `Compression/Landmark/Context/Tree.{sequential_mixture, sequential_mixture_bounds, sequential_mixture_executed}` (the two-face mixture stepped cell by cell, within one bit of the better face plus the chart's drift) | [`Mixture`] |
+//! | `Compression/Landmark/Context/LocalWeighing.two_face_prior` at `π = ½` and `Tree.{sequential_mixture, sequential_mixture_bounds}` (the two-family population is the two-face mixture stepped cell by cell, within one bit of the better face); `Population.population_mixture_enclosed` (the combined face read through its enclosure) | [`receiving_population`], [`score`] |
 //! | `Compression/Landmark/Context/Address.{bundle_causal, bundle_restrict, feature_scale_square, address_descends_retention, phase_partition_finite}` (the typed bundles read from the retained clock before the cell they predict) | [`LetterReader`], [`ActiveAddress`], [`clock_letters`] |
 
 use std::ops::Range;
 
 use num_bigint::{BigInt, BigUint};
-use num_traits::{One, Signed, ToPrimitive, Zero};
+use num_traits::{ToPrimitive, Zero};
 
 use crate::compression::cost::ceil_log2;
 use crate::compression::landmark::context::{
-    Beta, Bundle, LandmarkDeclaration, LandmarkFace, Landmarks, Letter, LetterFamily, Splits,
-    code_length,
+    Bundle, LandmarkDeclaration, LandmarkFace, Landmarks, Letter, LetterFamily, Splits, code_length,
 };
 use crate::hnn::HnnError;
 use crate::hnn::contact::{ContactReading, LockDeclaration, lock_address, site_kinds};
@@ -139,6 +139,7 @@ use crate::ratio::exponentiated::CarriedPower;
 use crate::ratio::linear::ExactRatMatrix;
 use crate::ratio::{Rat, integer};
 use crate::receiver::face::GrainCell;
+use crate::receiver::population::{PopulationError, PortPopulation};
 
 // -------------------------------------------------------------------------------------------
 // the grain
@@ -157,7 +158,7 @@ pub fn grain_logits(face: &LandmarkFace) -> Vec<Rat> {
 /// **The tree face at the grain**: the code length `−log₂ p̂(c)` of one class, enclosed, under the
 /// face of the tree's grain logits alone, `θ^(k_c)/Σ_d θ^(k_d)` in `ℚ(θ)` (`hnn::ratio::Face`), the
 /// face the combined read opens at when the wave reads zero. It is not the tree's executed face
-/// `q_T(c)`, which the mixture weighs ([`Scored::tree`] reads that one): the two differ by the
+/// `q_T(c)`, which the receiver's population weighs ([`Scored::tree`] reads that one): the two differ by the
 /// grain's rounding of the exponents and the renormalization.
 pub fn tree_code_length(face: &LandmarkFace, class: usize) -> Result<ExactInterval, HnnError> {
     let read = ReceivingRead::of_logits(grain_logits(face), face.grain);
@@ -912,268 +913,148 @@ fn grain_of(tolerance: &Rat) -> Result<u64, HnnError> {
 }
 
 // -------------------------------------------------------------------------------------------
-// the mixture of the tree and the combined face
+// the receiving face: the receiver's population over the tree and the combined face
 
-/// [definition; agent-inferred] **The receiver's scored face is weighed like a landmark** (the
-/// primary's ruling A, from the landmark tree's own law, which weighs every landmark by its code-length
-/// evidence and not by a rule): the two-way mixture of the tree's face `q_T` and the combined face
-/// `q_C` (the tree's grain logits plus the wave), weighted by their prequential likelihood ratio,
-/// exactly as a tree node weighs its own KT face against its split:
-///
-/// ```text
-/// q = λ q_T + (1 − λ) q_C ,   λ = β/(1 + β) ,   β = W_T/W_C = 1 at the opening (prior ½/½)
-/// β' = β · q_T(x)/q_C(x)      after each cell x, in cell order: phase j of a window reads β after phases < j
-/// ∏ q = ½ W_T + ½ W_C ,       min(L_T, L_C) ≤ L_model ≤ min(L_T, L_C) + 1 bit          (ideal)
-/// L_model ≤ min(L_T, L_C) + 1 bit + Σ |log₂ ρ|      the executed chart, ρ its factor a step
-/// ```
-///
-/// Any `λ ∈ [0, 1]` keeps `q` a positive normalized face (Lean
-/// `Compression/Landmark/Context/Tree.path_face_normalized`), so the executed mixture is exactly scored. The
-/// telescope and the bounds are Lean `Compression/Landmark/Context/Tree.{sequential_mixture,
-/// sequential_mixture_bounds}` (the two-child case of `kraft_and_dominance`), which hold only when
-/// each cell's weight is the ratio after every earlier cell; with the ratio carried by a chart they
-/// are `sequential_mixture_executed`, the drift `Σ_t |log₂ ρ_t|` added once. `q_C(x)` lives in
-/// `ℚ(θ)`, so `β` steps by a declared rational chart of it: the lower endpoint of its exact
-/// enclosure at the carried power's reading bits, whose certified residual `|log₂ q_C − log₂ q̃_C|`
-/// is at most `(hi − lo)/lo · 3/2` (`|ln x| ≤ |x − 1|/min(x, 1)`, `log₂ e < 3/2`), carried rounded
-/// up on the dyadic grid `2^(−128)` so the drift's sum keeps one denominator. `β` is carried
-/// on the landmark β chart (`compression::landmark::context::Beta`: odd over odd times `2^e`) at the tree's carrier
-/// width `W`, rebased to its `W`-bit mantissa when its odd parts outgrow it, with the certified
-/// residual `|log₂(1 − r)| < 3 · 2^(−W)` a rebase. A step's factor is `ρ = q̃_C/(q_C (1 − r))`, so
-/// its drift (the sum of both residuals over its steps) bounds `Σ |log₂ ρ|`, and it is reported,
-/// never silent. The wave still learns from its own comparison, the covector of `q_C` against the
-/// target, and the tree's face is stored, not pulled back; the mixture is scored on the host at
-/// compare, beside the tree read, on every realization.
-///
-/// The fixed-share switching law across epochs (Lean `Compression/Landmark/Context/LocalWeighing`)
-/// is realized by the population's dormant families (`receiver::population::Dormancy`), not here.
+/// [definition] **One reached comparison's step of the receiving face**: its receiving ring and
+/// its two families' faces of the target, the tree's executed face `q_T(x)` (exact, dyadic) and the
+/// combined face's exact enclosure `q_C(x) ∈ [lo, hi]` in the real chart of `ℚ(θ)`, which the
+/// receiver's population receives ([`ReceivingStep::faces`]).
 #[derive(Clone, Debug, PartialEq, Eq)]
-pub struct Mixture {
-    beta: Beta,
-    width: u64,
-    rebases: u64,
-    drift: Rat,
-}
-
-/// [definition] **One reached comparison's step of the mixture's ratio** `β' = β q_T(x)/q̃_C(x)`:
-/// its receiving ring, the tree's executed face of the target `q_T(x)`, the combined face's
-/// rational chart `q̃_C(x)` and the chart's certified residual in bits.
-#[derive(Clone, Debug, PartialEq, Eq)]
-pub struct MixtureStep {
+pub struct ReceivingStep {
     pub ring: usize,
     pub tree: Rat,
-    pub combined: Rat,
-    pub residual: Rat,
+    pub combined: ExactInterval,
 }
 
-/// [definition] **A window scored by the mixture**: each phase's code length under the mixture
-/// `q` (the model's) and under the tree's executed face `q_T` alone (the face the mixture weighs,
-/// `compression::landmark::context::code_length` of `q_T(t_j)`), and the steps its deposit applies to `β` in cell
-/// order.
+impl ReceivingStep {
+    /// **The families' faces of the target**, in the receiver's family order ([`TREE`],
+    /// [`COMBINED`]): the tree's exact face as a point, and the combined face's enclosure.
+    pub fn faces(&self) -> [ExactInterval; 2] {
+        [
+            ExactInterval::point(self.tree.clone()),
+            self.combined.clone(),
+        ]
+    }
+}
+
+/// [definition] **A window scored by the receiving face**: each phase's code length under the
+/// receiver's population (the model's), and under the tree's executed face `q_T` alone (the face the
+/// population weighs, `compression::landmark::context::code_length` of `q_T(t_j)`), and the steps its
+/// deposit applies in cell order.
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct Scored {
     pub model: Vec<ExactInterval>,
     pub tree: Vec<ExactInterval>,
-    pub steps: Vec<MixtureStep>,
+    pub steps: Vec<ReceivingStep>,
 }
 
-impl Mixture {
-    /// **The opening mixture**: `β = 1`, the prior ½/½, carried at width `W`.
-    pub fn new(width: u64) -> Self {
-        Self {
-            beta: Beta::ONE,
-            width,
-            rebases: 0,
-            drift: Rat::zero(),
-        }
-    }
+/// The receiver's population's first family: the landmark tree's executed face `q_T`.
+pub const TREE: usize = 0;
 
-    /// `β = W_T/W_C`, exact.
-    pub fn beta(&self) -> Rat {
-        self.beta.value()
-    }
+/// The receiver's population's second family: the combined face `q_C` (the tree's grain logits
+/// plus the wave).
+pub const COMBINED: usize = 1;
 
-    /// `λ = β/(1 + β)`, the tree's weight.
-    pub fn weight(&self) -> Rat {
-        let beta = self.beta();
-        &beta / (Rat::one() + &beta)
-    }
-
-    /// The carrier width `W`.
-    pub fn width(&self) -> u64 {
-        self.width
-    }
-
-    /// The rebases so far.
-    pub fn rebases(&self) -> u64 {
-        self.rebases
-    }
-
-    /// The certified drift of the carried `β` against the exact likelihood ratio, in bits.
-    pub fn drift(&self) -> &Rat {
-        &self.drift
-    }
-
-    /// **`log₂ β`, enclosed** by the certified binary logarithm (`compression::landmark::context::code_length` of
-    /// `1/β`).
-    pub fn log2_beta(&self) -> Result<ExactInterval, HnnError> {
-        Ok(code_length(&self.beta().recip())?)
-    }
-
-    /// **Its exact bits**: `β`'s numerator and denominator, each by its bits.
-    pub fn bits(&self) -> u64 {
-        let beta = self.beta();
-        beta.numer().bits() + beta.denom().bits()
-    }
-
-    /// **One step** `β' = β q_T(x)/q̃_C(x)`, carried at `W` (module header of this section). Refused
-    /// at a face that is not positive.
-    pub fn step(&mut self, step: &MixtureStep) -> Result<(), HnnError> {
-        if !step.tree.is_positive() || !step.combined.is_positive() {
-            return Err(HnnError::Shape {
-                what: "positive faces in the mixture's step",
-                expected: 1,
-                found: 0,
-            });
-        }
-        let value = self.beta() * &step.tree / &step.combined;
-        let (beta, rebased) = carry_ratio(&value, self.width);
-        self.beta = beta;
-        self.drift += &step.residual;
-        if rebased {
-            self.rebases += 1;
-            self.drift += Rat::new(BigInt::from(3), BigInt::one() << self.width as usize);
-        }
-        Ok(())
-    }
-
-    /// **Score a window in cell order** (module header of this section; Lean
-    /// `Compression/Landmark/Context/Tree.sequential_mixture`): phase `j` reads `β_j`, the carried ratio after the
-    /// window's earlier phases' steps (their targets are known at compare), the tree's face
-    /// `q_T,j(t_j)` and the combined face's exact enclosure `q_C,j(t_j) ∈ [lo, hi]`, so the mixture
-    /// `q_j(t_j) ∈ [λ_j q_T + (1 − λ_j) lo, λ_j q_T + (1 − λ_j) hi]` and its code length is enclosed
-    /// by the certified binary logarithm. Its step `β_(j+1) = β_j q_T/q̃_C` (the chart `q̃_C = lo`)
-    /// is taken on a local copy of the ratio by [`Mixture::step`] and staged, so the deposit, which
-    /// applies the staged steps in cell order by the same step, reaches the same carried `β`. The
-    /// tree's own code length `−log₂ q_T,j(t_j)` is returned beside it. Refused unless there is one
-    /// combined face, one tree face and one target per phase.
-    pub fn score(
-        &self,
-        ring: usize,
-        combined: &Faces,
-        trees: &[LandmarkFace],
-        targets: &[usize],
-    ) -> Result<Scored, HnnError> {
-        if combined.faces.len() != trees.len() || trees.len() != targets.len() {
-            return Err(HnnError::Shape {
-                what: "one combined face, one tree face and one target per phase",
-                expected: trees.len(),
-                found: targets.len(),
-            });
-        }
-        let mut local = self.clone();
-        let mut scored = Scored {
-            model: Vec::with_capacity(targets.len()),
-            tree: Vec::with_capacity(targets.len()),
-            steps: Vec::with_capacity(targets.len()),
-        };
-        for ((face, tree), &target) in combined.faces.iter().zip(trees).zip(targets) {
-            let weight = local.weight();
-            let rest = Rat::one() - &weight;
-            let q_tree = tree
-                .probabilities
-                .get(target)
-                .ok_or(HnnError::CellOutside {
-                    code: target,
-                    alphabet: tree.probabilities.len(),
-                })?
-                .clone();
-            let q_combined = face_enclosure(face, target)?;
-            let lower = &weight * &q_tree + &rest * &q_combined.lower;
-            let upper = &weight * &q_tree + &rest * &q_combined.upper;
-            let (short, long) = (code_length(&upper)?, code_length(&lower)?);
-            scored
-                .model
-                .push(ExactInterval::new(short.lower, long.upper).map_err(|_| {
-                    HnnError::Shape {
-                        what: "an ordered enclosure of the mixture's code length",
-                        expected: 0,
-                        found: 1,
-                    }
-                })?);
-            let residual = grid_ceiling(
-                &((&q_combined.upper - &q_combined.lower) / &q_combined.lower
-                    * Rat::new(BigInt::from(3), BigInt::from(2))),
-            );
-            scored.tree.push(code_length(&q_tree)?);
-            let step = MixtureStep {
-                ring,
-                tree: q_tree,
-                combined: q_combined.lower,
-                residual,
-            };
-            local.step(&step)?;
-            scored.steps.push(step);
-        }
-        Ok(scored)
-    }
+/// [definition; agent-inferred] **The receiver's population** (`receiver::population::port`; the
+/// primary's ruling A, THE_REBUILD U1): the population at the receiving port over its two families,
+/// the tree's executed face ([`TREE`]) and the combined face ([`COMBINED`]), at matched priors, one
+/// bit of description each, so `π = ½/½` and nothing is reserved. [agent-inferred] One bit each:
+/// the prior ruling A's mixture opened at (`β_0 = 1`), declared as the two families' equal
+/// descriptions.
+///
+/// ```text
+/// q_t(x) = w_T q_T(x) + w_C q_C(x),   w_f = L_f/(L_T + L_C),   L_f = ∏_(s<t) P_f(x_s)
+/// ∏_t q_t = ½ L_T + ½ L_C,            min(L_T, L_C) ≤ L_model ≤ min(L_T, L_C) + 1 bit
+/// ```
+///
+/// The receiver's scored face is weighed like a landmark (ruling A, from the landmark tree's own
+/// law, which weighs every landmark by its code-length evidence and not by a rule), as a tree node
+/// weighs its own face against its split: at `π = ½` the population is that two-face mixture (Lean
+/// `Compression/Landmark/Context/LocalWeighing.two_face_prior`, `priorMix (1/2) = seqMix`; the
+/// telescope and the bounds are `Tree.{sequential_mixture, sequential_mixture_bounds}`), which hold
+/// only when each cell's weights are the likelihoods after every earlier cell: phase `j` of a
+/// window reads the population after phases `< j`. Its weights are read from the families'
+/// likelihoods, held in `Θ` at the receiving locus, never from a carried ratio: `q_C(x)` lives in
+/// `ℚ(θ)` and enters as its exact enclosure (Lean `Population.population_mixture_enclosed`), so the
+/// population's code encloses the true mixture's and no chart drift enters it. The wave still
+/// learns from its own comparison, the covector of `q_C` against the target, and the tree's face
+/// is stored, not pulled back; the population is scored on the host at compare, beside the tree
+/// read, on every realization.
+///
+/// It replaced the carried-ratio mixture `hnn::receiving::Mixture` (THE_REBUILD U1, first loop;
+/// history at `19f1eb61`), whose `β` stepped the same law on the chart `q̃_C = lo` with rebases: on
+/// the standing cut, host and card, every phase's two codes lay within that chart's certified drift,
+/// the bound Lean `Population.{executed_face_within_population, executed_mixture_within_population}`
+/// proves. The fixed-share switching law across epochs (Lean
+/// `Compression/Landmark/Context/LocalWeighing`) is realized by the population's dormant families
+/// (`receiver::population::Dormancy`), not here.
+pub fn receiving_population() -> PortPopulation {
+    PortPopulation::new(&[1, 1]).expect("two families of one bit each fit Kraft's sum")
 }
 
-/// [definition; agent-inferred] **A residual bound carried on the drift's dyadic grid**
-/// `2^(−2·READING_BITS)` (twice the carried power's reading bits, which bound the chart's residual
-/// from below by about `2^(−READING_BITS)`), rounded up: the drift's sum over a passage keeps one
-/// bounded denominator instead of the least common multiple of every step's.
-fn grid_ceiling(value: &Rat) -> Rat {
-    let bits = 2 * crate::ratio::exponentiated::READING_BITS as usize;
-    let scale = BigInt::one() << bits;
-    let scaled = value * Rat::from_integer(scale.clone());
-    Rat::new(scaled.ceil().to_integer(), scale)
-}
-
-/// **A positive ratio carried on the landmark β chart at width `W`**: exactly when its odd parts
-/// fit `W` bits, otherwise rebased to its `W`-bit mantissa `m = ⌊v 2^s⌋ ∈ [2^(W−1), 2^W)`; the flag
-/// says whether it was rebased.
-fn carry_ratio(value: &Rat, width: u64) -> (Beta, bool) {
-    let (numerator, denominator) = (value.numer().magnitude(), value.denom().magnitude());
-    let (twos_n, twos_d) = (
-        numerator.trailing_zeros().unwrap_or(0),
-        denominator.trailing_zeros().unwrap_or(0),
-    );
-    let (a, b) = (numerator >> twos_n, denominator >> twos_d);
-    let exponent = twos_n as i64 - twos_d as i64;
-    if a.bits() <= width && b.bits() <= width {
-        let (beta, _) = Beta::carry(
-            a.to_u128().expect("an odd part within the carrier width"),
-            b.to_u128().expect("an odd part within the carrier width"),
-            exponent,
-            width,
-        );
-        return (beta, false);
+/// **Score a window in cell order** (the receiver's population; Lean
+/// `Compression/Landmark/Context/Tree.sequential_mixture`): phase `j` reads the population after the
+/// window's earlier phases' faces (their targets are known at compare), the tree's face
+/// `q_T,j(t_j)` and the combined face's exact enclosure `q_C,j(t_j) ∈ [lo, hi]`, so its code length
+/// is the population's code of the target, enclosed ([`PortPopulation::code_of`]); its step is
+/// received on a local copy of the population and staged, so the deposit, which receives the staged
+/// steps in cell order, reaches the same population. The tree's own code length `−log₂ q_T,j(t_j)`
+/// is returned beside it. Refused unless there is one combined face, one tree face and one target
+/// per phase.
+pub fn score(
+    population: &PortPopulation,
+    ring: usize,
+    combined: &Faces,
+    trees: &[LandmarkFace],
+    targets: &[usize],
+) -> Result<Scored, HnnError> {
+    if combined.faces.len() != trees.len() || trees.len() != targets.len() {
+        return Err(HnnError::Shape {
+            what: "one combined face, one tree face and one target per phase",
+            expected: trees.len(),
+            found: targets.len(),
+        });
     }
-    // `a/b ∈ (2^(t−1), 2^(t+1))`, `t = bits(a) − bits(b)`, so `a 2^s/b ∈ (2^(W−1), 2^(W+1))` at
-    // `s = W − t`.
-    let floor = |shift: i64| -> BigUint {
-        if shift >= 0 {
-            (&a << shift as usize) / &b
-        } else {
-            &a / (&b << shift.unsigned_abs() as usize)
-        }
+    let mut local = population.clone();
+    let mut scored = Scored {
+        model: Vec::with_capacity(targets.len()),
+        tree: Vec::with_capacity(targets.len()),
+        steps: Vec::with_capacity(targets.len()),
     };
-    let mut shift = width as i64 - (a.bits() as i64 - b.bits() as i64);
-    let mut mantissa = floor(shift);
-    if mantissa.bits() > width {
-        shift -= 1;
-        mantissa = floor(shift);
+    for ((face, tree), &target) in combined.faces.iter().zip(trees).zip(targets) {
+        let q_tree = tree
+            .probabilities
+            .get(target)
+            .ok_or(HnnError::CellOutside {
+                code: target,
+                alphabet: tree.probabilities.len(),
+            })?
+            .clone();
+        scored.tree.push(code_length(&q_tree)?);
+        let step = ReceivingStep {
+            ring,
+            tree: q_tree,
+            combined: face_enclosure(face, target)?,
+        };
+        scored
+            .model
+            .push(local.code_of(&step.faces()).map_err(population_refusal)?);
+        local.receive(&step.faces()).map_err(population_refusal)?;
+        scored.steps.push(step);
     }
-    let (beta, _) = Beta::carry(
-        mantissa
-            .to_u128()
-            .expect("a mantissa within the carrier width"),
-        1,
-        exponent - shift,
-        width,
-    );
-    (beta, true)
+    Ok(scored)
+}
+
+/// A refusal of the receiver's population, as the HNN's.
+pub(crate) fn population_refusal(refusal: PopulationError) -> HnnError {
+    match refusal {
+        PopulationError::Hnn(error) => *error,
+        _ => HnnError::Shape {
+            what: "the receiver's population: faces in the unit interval, some family alive",
+            expected: 1,
+            found: 0,
+        },
+    }
 }
 
 /// **The exact enclosure of one class's face** `p̂_c = 2^(n_c − n_top) θ^(k_c)/Z` in the real chart
