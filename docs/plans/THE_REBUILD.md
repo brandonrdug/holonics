@@ -111,8 +111,15 @@ on the admitted egg, and the trees beyond depth 24 add at most 20 bits.
      for having no global share return where they win locally. Test on F4's development passage:
      the eight declared families mixed node-locally, against the admitted egg alone, reading
      validation bytes and standing.
-  3. **Word contexts.** A cheap word-context family on the byte stream, and continuation transports
-     promoted by `π_G P_G > π_C P_C`.
+  3. **Word contexts. Learned tokens as the alphabet: not adopted, September 28.** A tree over
+     learned merge tokens (`hnn_tokens`: K = 256, depth 4 tokens, both chosen on choosing alone)
+     codes the validation bytes `77906 + 10/16 + ε` bits above the flat byte tree (`1 + 15/16`
+     against `1 + 13/16` bits a byte). Its releases hold fewer real words (836 of 1,527 against
+     580 of 758), fused across merge boundaries. A token as an opaque index loses the byte tree's
+     sharing: words with common spellings share no counts. Its standing is 389 bytes a cell.
+     Words therefore enter as an **added** family, winning only where they are closest (candidate
+     2), never as a replacement alphabet. Continuation transports stay promoted by
+     `π_G P_G > π_C P_C`.
   4. **A learned lens** under source item 10.
 - **Standing.** Every receipt reports standing bytes a cell. A standing budget is pinned before each
   run.

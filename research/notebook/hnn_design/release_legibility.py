@@ -11,7 +11,11 @@ each diagnostic request with its native release and its request-aware retrieval 
 pinned choosing cut (u16 little-endian curated cells; codes below 256 are bytes, and the others are
 section letters). It prints counts only, never text.
 
-    HOLONICS_ROOT=<main checkout> python3 research/notebook/hnn_design/release_legibility.py
+    HOLONICS_ROOT=<main checkout> python3 research/notebook/hnn_design/release_legibility.py [releases.json]
+
+The optional argument reads another owner-only release file of the same case shape (`request` and
+`responses.athena.text`, e.g. F0's token releases `f0-token-releases.json`) in place of the blind
+input; a corpus whose field that file does not carry (the retrieval controls) is not read.
 
 The readings, per corpus (the native releases, the controls, the requests):
 - **texts**: the releases that are text rather than typed refusals;
@@ -95,18 +99,18 @@ def readings(texts, vocab):
 
 
 def main():
-    if sys.argv[1:]:
+    if len(sys.argv) > 2 or sys.argv[1:2] in (["-h"], ["--help"]):
         sys.exit(__doc__)
-    with open(os.path.join(CUTS, "f5-blind-input.json"), "rb") as handle:
+    path = sys.argv[1] if sys.argv[1:] else os.path.join(CUTS, "f5-blind-input.json")
+    with open(path, "rb") as handle:
         cases = json.load(handle)["cases"]
     vocab = vocabulary(os.path.join(CUTS, "curated-f5-choosing-cut.bin"))
     native = [c["responses"]["athena"]["text"] for c in cases]
     released = [t for t in native if not t.startswith("[typed refusal")]
-    corpora = {
-        "native releases": released,
-        "retrieval controls": [c["responses"]["control"]["text"] for c in cases],
-        "requests": [c["request"] for c in cases],
-    }
+    corpora = {"native releases": released}
+    if all("control" in c["responses"] for c in cases):
+        corpora["retrieval controls"] = [c["responses"]["control"]["text"] for c in cases]
+    corpora["requests"] = [c["request"] for c in cases]
     report = {
         "choosing vocabulary (distinct words)": len(vocab),
         "diagnostic cases": len(cases),
