@@ -105,9 +105,9 @@
 //! sheet with its carry; the draw is a Weyl rotation), **faces and placement** (the cell alphabet as
 //! the receiver's face; the friction field keeps absolute placement in the state, §14.4) and the
 //! **tube** (the passage, one cell a tick; a slip's hold is a span of it). The **cell holonomy**
-//! (the loop-closure reading over three observation channels belongs to the faulty-sensor switch of
-//! the action phase) and the **tower thread** (the patch-to-cell restriction of the friction field
-//! is declared, no gluing is read) stay attached.
+//! (the loop-closure reading over three observation channels, the action phase's faulty-sensor
+//! switch, `holarchy::terrain::sensing`) and the **tower thread** (the patch-to-cell restriction of
+//! the friction field is declared, no gluing is read) stay attached.
 
 use std::collections::BTreeMap;
 use std::sync::{Arc, PoisonError, RwLock};
@@ -974,14 +974,17 @@ impl RunnerFamily {
 // the chase
 
 /// [definition] **The receiver's ports on a chase**: the arena, the move alphabet, the chaser's
-/// motion port (the admitted action port) and the runner's opening motion. The cells are the
-/// runner's; these are what the receiver reads beside them.
+/// motion port (the admitted action port), the runner's opening motion and the observation
+/// channels' declared lag `d` (`holarchy::terrain::sensing`: the reading of tick `τ` arrives once
+/// tick `τ + d` has moved; zero in the reception phase). The cells are the runner's; these are what
+/// the receiver reads beside them.
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct ChasePorts {
     pub arena: Arena,
     pub moves: Moves,
     pub chaser: ChaserPort,
     pub opening: Motion,
+    pub lag: usize,
 }
 
 /// [definition; agent-inferred] **The chaser's motion port**: the chaser's motion at each tick,
@@ -1166,6 +1169,7 @@ impl Chase {
                 moves,
                 chaser: ChaserPort::new(chasers),
                 opening,
+                lag: 0,
             }),
             cells,
             truth: ChaseTruth {
@@ -1211,6 +1215,18 @@ impl Chase {
         family: &RunnerFamily,
         seed: u64,
     ) -> Result<(usize, Arena, [Point; 2]), TerrainError> {
+        let (index, arena, openings, _) = Self::draw_key(declaration, family, seed)?;
+        Ok((index, arena, openings))
+    }
+
+    /// **A seed's drawn key and the draw after it** ([`Chase::drawn`]): the action phase's switches
+    /// continue the same draw (`holarchy::terrain::sensing::FaultTruth::draw`), so the chase's own
+    /// key is the same with the switches on or off.
+    pub fn draw_key(
+        declaration: &ArenaDeclaration,
+        family: &RunnerFamily,
+        seed: u64,
+    ) -> Result<(usize, Arena, [Point; 2], Draw), TerrainError> {
         if family.is_empty() {
             return Err(refuse(
                 "a runner family",
@@ -1230,6 +1246,7 @@ impl Chase {
             index,
             arena,
             [declaration.position(runner), declaration.position(chaser)],
+            draw,
         ))
     }
 

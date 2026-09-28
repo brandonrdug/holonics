@@ -16,7 +16,9 @@
 //! and the section is the passages arriving on a switch cell. So a cell's aeon is the epoch of the
 //! micro-state it leaves, `epochOf(t) = #{switch cells ≤ t}`, the sources alternate on its parity,
 //! and the flux is the number of switches. The owner fits: nothing of the switching is read outside
-//! it. The dormant grating is named with the aeons it is silent in (the odd ones).
+//! it. The dormant grating is named with the aeons it is silent in (the odd ones). The switch clock
+//! alone ([`SwitchTruth::clock`], [`SwitchTruth::drawn`]) is also the chase's faulty sensor's: its
+//! turned frame is the second source, read in the odd aeons (`holarchy::terrain::sensing`).
 
 use std::collections::BTreeSet;
 
@@ -43,24 +45,12 @@ pub struct SwitchTruth {
 }
 
 impl SwitchTruth {
-    /// **The source a cell reads**: its aeon's parity, the epoch of the micro-state it leaves.
-    pub fn source(&self, cell: usize) -> Option<usize> {
-        self.epochs.epoch_of(cell).map(|epoch| epoch % 2)
-    }
-}
-
-/// [definition] **An aeon-switching terrain with its truth** (module header).
-#[derive(Clone, Debug, PartialEq, Eq)]
-pub struct Switching {
-    pub cells: Vec<usize>,
-    pub truth: SwitchTruth,
-}
-
-impl Switching {
-    /// **The switching of two sources by declared aeon lengths** (module header): the passage runs
-    /// over the shorter source; the lengths must cover it, and each is positive.
-    pub fn new(sources: [&[usize]; 2], lengths: Vec<u64>) -> Result<Self, TerrainError> {
-        let n = sources[0].len().min(sources[1].len());
+    /// **The switch clock of a passage of `n ≥ 1` cells under declared aeon lengths** (module
+    /// header): the lengths the passage uses, the switch cells and the switch epochs of the cell
+    /// clock's forward aeon; refused at a passage of no cells, an aeon of no cells, or lengths that
+    /// do not cover the passage. Every switching reads its sources through it, and so does the
+    /// chase's faulty sensor (`holarchy::terrain::sensing`).
+    pub fn clock(n: usize, lengths: &[u64]) -> Result<Self, TerrainError> {
         if n == 0 || lengths.contains(&0) {
             return Err(refuse(
                 "an aeon switching",
@@ -88,32 +78,18 @@ impl Switching {
         let epochs = epochs(&aeon, |passage: &LiftPassage| {
             section.contains(&(&passage.from[0] + 1))
         });
-        let cells = (0..n)
-            .map(|t| {
-                let epoch = epochs.epoch_of(t).expect("a cell's micro-state lies in the aeon");
-                sources[epoch % 2][t]
-            })
-            .collect();
         let used = switches.len() + 1;
         Ok(Self {
-            cells,
-            truth: SwitchTruth {
-                lengths: lengths[..used].to_vec(),
-                switches,
-                epochs,
-                dormant: None,
-            },
+            lengths: lengths[..used].to_vec(),
+            switches,
+            epochs,
+            dormant: None,
         })
     }
 
-    /// **The switching under drawn aeon lengths** (module header): lengths drawn until they cover
-    /// the passage.
-    pub fn draw(
-        sources: [&[usize]; 2],
-        family: &AeonFamily,
-        draw: &mut Draw,
-    ) -> Result<Self, TerrainError> {
-        let n = sources[0].len().min(sources[1].len()) as u64;
+    /// **The switch clock under drawn aeon lengths** (module header): lengths drawn from the
+    /// declared family until they cover the passage of `n` cells.
+    pub fn drawn(n: usize, family: &AeonFamily, draw: &mut Draw) -> Result<Self, TerrainError> {
         if family.shortest == 0 || family.shortest > family.longest {
             return Err(refuse(
                 "an aeon family",
@@ -124,12 +100,54 @@ impl Switching {
             .map_err(|_| refuse("an aeon family", "its span exceeds the address space"))?;
         let mut lengths = Vec::new();
         let mut covered = 0u64;
-        while covered < n {
+        while covered < n as u64 {
             let length = family.shortest + draw.below(span) as u64;
             covered += length;
             lengths.push(length);
         }
-        Self::new(sources, lengths)
+        Self::clock(n, &lengths)
+    }
+
+    /// **The source a cell reads**: its aeon's parity, the epoch of the micro-state it leaves.
+    pub fn source(&self, cell: usize) -> Option<usize> {
+        self.epochs.epoch_of(cell).map(|epoch| epoch % 2)
+    }
+}
+
+/// [definition] **An aeon-switching terrain with its truth** (module header).
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct Switching {
+    pub cells: Vec<usize>,
+    pub truth: SwitchTruth,
+}
+
+impl Switching {
+    /// **The switching of two sources by declared aeon lengths** (module header): the passage runs
+    /// over the shorter source; the lengths must cover it, and each is positive.
+    pub fn new(sources: [&[usize]; 2], lengths: Vec<u64>) -> Result<Self, TerrainError> {
+        let n = sources[0].len().min(sources[1].len());
+        let truth = SwitchTruth::clock(n, &lengths)?;
+        let cells = (0..n)
+            .map(|t| {
+                let source = truth
+                    .source(t)
+                    .expect("a cell's micro-state lies in the aeon");
+                sources[source][t]
+            })
+            .collect();
+        Ok(Self { cells, truth })
+    }
+
+    /// **The switching under drawn aeon lengths** (module header): lengths drawn until they cover
+    /// the passage.
+    pub fn draw(
+        sources: [&[usize]; 2],
+        family: &AeonFamily,
+        draw: &mut Draw,
+    ) -> Result<Self, TerrainError> {
+        let n = sources[0].len().min(sources[1].len());
+        let truth = SwitchTruth::drawn(n, family, draw)?;
+        Self::new(sources, truth.lengths)
     }
 
     /// **The dormant grating** (module header): one moiré, every grating in the even aeons and every

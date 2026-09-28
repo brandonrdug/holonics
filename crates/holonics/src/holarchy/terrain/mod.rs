@@ -18,7 +18,7 @@
 //! | [`TreeSource`] | a shift-closed pruned context tree whose leaves hold drawn faces: the shift navigator with its standing, the leaf map (Lean `Compression/Landmark/Context/Standing.leaf_standing`) | [`TreeSourceTruth`]: the tree and faces, the leaf chain's stationary law solved over ℚ, the entropy rate as its exact form in `log₂ p` and its enclosure; per passage the source's own code ([`TreeSource::passage`]), the weighting bound ([`TreeSource::weighting_bound`]) and the recovered tree ([`TreeSource::recovery`]) | the receiving tree: does it recover the tree and reach the rate? |
 //! | [`RotorCrib`] | a declared HNN field's ring as a reflector machine behind a plugboard | [`CribTruth`]: the key and the plugboard, and their description | key location |
 //! | [`Switching`] | two sources alternating by drawn aeons; for [`Switching::dormant`] one moiré whose grating is silent in the odd aeons while its ring keeps turning | [`SwitchTruth`]: the switch epochs as `aeon::Epochs` of the cell clock's forward aeon at the switch section, and the dormant grating | dormancy across aeon boundaries (campaign 3) |
-//! | [`Chase`] | a fast runner and a scripted pursuer on a bounded exact arena whose cells carry friction classes: the runner's constitution at the ground contact (speed bound, traction coefficient; `⟨Δv, Δv⟩ ≤ (γ μ g h²/ℓ)²`), its slip hold and its evasion navigator (flee, circle, zig-zag) drawn from a declared [`RunnerFamily`]; the pursuer's pure pursuit, whose capture `Q ≤ ρ²` ends the passage; the cells are the runner's realized moves, slips and wall meetings | [`ChaseTruth`]: the drawn candidate and its index, the friction field, the openings, the realized motions, the slips, walls and capture tick, and the key description `⌈log₂ N · m^P · WH · (WH − 1)⌉`; beside it the surviving fibre ([`Chase::fibre`]) and its future classes under the admitted chaser words ([`Chase::futures`]) | motion against another's constitution: reception selects the fibre of runner constitutions the passage leaves (F6); in the action phase ([`pursuit`]) a chaser releases one admitted motion a tick against the runner, and the runner's viable tube, its robust viability kernel at a bounded horizon, is read tick by tick |
+//! | [`Chase`] | a fast runner and a scripted pursuer on a bounded exact arena whose cells carry friction classes: the runner's constitution at the ground contact (speed bound, traction coefficient; `⟨Δv, Δv⟩ ≤ (γ μ g h²/ℓ)²`), its slip hold and its evasion navigator (flee, circle, zig-zag) drawn from a declared [`RunnerFamily`]; the pursuer's pure pursuit, whose capture `Q ≤ ρ²` ends the passage; the cells are the runner's realized moves, slips and wall meetings | [`ChaseTruth`]: the drawn candidate and its index, the friction field, the openings, the realized motions, the slips, walls and capture tick, and the key description `⌈log₂ N · m^P · WH · (WH − 1)⌉`; beside it the surviving fibre ([`Chase::fibre`]) and its future classes under the admitted chaser words ([`Chase::futures`]) | motion against another's constitution: reception selects the fibre of runner constitutions the passage leaves (F6); in the action phase ([`pursuit`]) a chaser releases one admitted motion a tick against the runner, and the runner's viable tube, its robust viability kernel at a bounded horizon, is read tick by tick; its switches ([`sensing`]) read the runner through three channels, late by a declared lag and one of them turned on the odd aeons of a drawn switch clock ([`FaultTruth`]), whose loop closure locates the turned channel |
 //! | [`arithmetic::Products`], [`arithmetic::PrimeWindow`] | integers as digit vectors on a helix (odometers, the carry their winding): two drawn operands joined by the convolution of their digits, whose carry is the product's odometer; a window's integers met by the gratings `p ∤ b` on the leading index (the record `2026-09-27_THE_EGG_IS_A_GENERATORS_GENOME_…`, §7) | [`arithmetic::ProductTruth`]: the operands and their factorizations, the convolution, the carry word, the trailing face and the leading face with its carry fibre; [`arithmetic::IntegerTruth`]: each integer's factorization, gratings and cheap readings, and the density read through a face | the trailing and leading faces, the cheap faces, the gratings |
 //!
 //! [definition; agent-inferred] **The draw is a navigator** ([`Draw`]): a Weyl rotation of
@@ -48,18 +48,24 @@
 //! (the context tree restricts an address to its leaf) stay attached. The chase ([`chase`]) touches
 //! the **pair** too: the runner's navigator meets the arena's friction field at its ground contact
 //! (the traction law admits or slips), and the runner and the pursuer are a pair whose quadrance the
-//! flee navigator raises and the pursuer lowers until capture.
+//! flee navigator raises and the pursuer lowers until capture; its switches ([`sensing`]) touch the
+//! **cell holonomy**: the three channels' pair contacts close around the menu's circuits, and a
+//! turned frame is the circuits' nonidentity holonomy.
 
 pub mod arithmetic;
 pub mod chase;
 pub mod crib;
 pub mod moire;
 pub mod pursuit;
+pub mod sensing;
 pub mod source;
 pub mod switching;
 
 #[cfg(test)]
 mod chase_tests;
+
+#[cfg(test)]
+mod sensing_tests;
 
 #[cfg(test)]
 mod tests;
@@ -73,9 +79,13 @@ pub use crib::{CribTruth, RotorCrib, rotor_crib};
 pub use moire::{Grating, Moire, MoireClass, MoireFamily, MoireTruth, PairLock};
 pub use pursuit::{
     ActionDeclaration, ActionPassage, Basin, BasinMemo, Candidate, CandidateLaw, CaptureReach,
-    ChaseView, Chaser, ConstantBearing, ExpectedCapture, ExpectedMemo, GRAIN_LIMIT, MoveSet,
-    PurePursuit, TUBE_STATE_LIMIT, ViableLayers, ViableTube, act, act_drawn, capture_ticks,
-    classes, expected_ticks, least_capture, viable_layers, viable_tube,
+    ChaseView, Chaser, ConstantBearing, ExpectedCapture, ExpectedMemo, GRAIN_LIMIT, MoveSet, Parts,
+    Pending, PurePursuit, TUBE_STATE_LIMIT, ViableLayers, ViableTube, act, act_drawn,
+    capture_ticks, classes, expected_ticks, least_capture, viable_layers, viable_tube,
+};
+pub use sensing::{
+    CHANNELS, CellKind, ChannelDefect, ChannelMenu, Closure, FaultTruth, LAG_LIMIT, Located,
+    Reading, Reception, Switches,
 };
 pub use source::{
     ContextTree, Passage, Recovery, TreeSource, TreeSourceFamily, TreeSourceTruth, WeightingBound,

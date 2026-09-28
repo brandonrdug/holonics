@@ -42,7 +42,7 @@ docstring says otherwise.
 | `hnn_exposure.rs` | Campaign 1's exposure on a cut: the model face (the landmark tree mixed with the combined face), the baselines, keys, aeons and the first law; on the host or the card (`realization card`); the loaded resonator (`resonator source`) | `cargo run --release -p holonics --example hnn_exposure -- cut-file .local/cuts/standing-real-cut-campaign-1.bin cells all` | [campaign 1 meets its criterion](../../records/2026-09-26_CAMPAIGN_ONE_MEETS_ITS_CRITERION_THE_TREE_RECEIVES_AND_THE_WAVE_IS_WEIGHED.md), [the resonator](../../records/2026-09-26_THE_RESONATOR_RETURNS_ITS_WAVE_AND_THE_COMPARISON_REACHES_ITS_MATERIAL.md), [campaign 2](../../records/2026-09-26_CAMPAIGN_TWO_THE_RINGS_AND_CONTACTS_ARE_LAWFUL_AND_ADD_NO_BITS_ON_TEXT.md) |
 | `hnn_landmark.rs` | The landmark tree (count-only): the depth sweep and prequential passage; `letters`, `prior`, `wide`, `compact`, `capacity` | `cargo run --release -p holonics --example hnn_landmark -- cut-file .local/cuts/standing-real-cut-campaign-1.bin` | [below PPM-2](../../records/2026-09-26_THE_LANDMARK_TREE_COMPRESSES_THE_STANDING_CUT_BELOW_PPM_TWO.md), [at scale](../../records/2026-09-26_THE_LANDMARK_TREE_AT_SCALE_THE_STOP_PRIOR_LOCAL_WEIGHING_THE_WIDE_CUT_AND_THE_STORAGE_WHERE_PATHS_PART.md), [capacity](../../records/2026-09-27_A_LANDMARKS_STORAGE_HAS_A_CAPACITY_AT_ITS_CEILING_IT_CARRIES.md), [campaign 2](../../records/2026-09-26_CAMPAIGN_TWO_THE_RINGS_AND_CONTACTS_ARE_LAWFUL_AND_ADD_NO_BITS_ON_TEXT.md) |
 | `hnn_population.rs` (with `hnn_population_{composition,evolution,curated,census,u2}.rs`) | The egg population: terrain (`tree`, `moire`, `crib`, `switching`, `standing`), `composition`, `evolution`, `species`, the curated source (`curated`, with `merges`), `f4`, F0's egg (`f0-egg`, `f0-census`), U2's acceptance run (`u2-acceptance`) | `cargo run --release -p holonics --example hnn_population -- <mode>` | [the receiving population](../../records/2026-09-27_THE_RECEIVING_POPULATION_WAS_BUILT_ON_TERRAIN_WITH_KNOWN_TRUTH_AND_THE_CURATED_SOURCE_NOW_CODES_BELOW_THE_FLAT_STREAM.md), [F4](../../records/2026-09-27_F4_DEVELOPMENT_FAMILY_SPLIT_AND_RELEASE_GATE.md), [the forward plan](../../records/2026-09-28_THE_FORWARD_PLAN_STOPPED_AT_TRANSFER_THE_POPULATION_MEMORIZES_FAMILIES_AND_ITS_STANDING_IS_AN_INDEX.md), [U2's acceptance run](../../records/2026-09-28_U2_F0S_MEMORY_ACCEPTANCE_RUN_PINNED_BEFORE_ITS_SPLIT_IS_READ.md) |
-| `hnn_chase.rs` | F6's chase terrain: the reception phase, the action phase's choosing sweep (`choose`) and its acceptance (`action`, with U4's move reading and U3's release reading); U4's next loop: the failure's diagnosis (`diagnose`) and the fresh population (`fresh`) | `cargo run --release -p holonics --example hnn_chase` | [the learner must move](../../records/2026-09-27_THE_LEARNER_MUST_MOVE_A_CHASE_TERRAIN_DATA_AS_PARTICLES_WITH_FLUX_AND_RELEASE_AS_A_THRESHOLD_COMMIT.md) (no dedicated record; the receipts below) |
+| `hnn_chase.rs` | F6's chase terrain: the reception phase, the action phase's choosing sweep (`choose`) and its acceptance (`action`, with U4's move reading and U3's release reading); U4's next loop: the failure's diagnosis (`diagnose`) and the fresh population (`fresh`); F6's switches and their attribution (`switches`) | `cargo run --release -p holonics --example hnn_chase` | [the learner must move](../../records/2026-09-27_THE_LEARNER_MUST_MOVE_A_CHASE_TERRAIN_DATA_AS_PARTICLES_WITH_FLUX_AND_RELEASE_AS_A_THRESHOLD_COMMIT.md) (no dedicated record; the receipts below) |
 | `exterior.rs` | The shared exterior boundary the examples include | | |
 | `standing_cut.py` | Pins the standing real cut (`6148`) and the wide cut (`wide 1048576`) | `python3 research/notebook/hnn_design/standing_cut.py 6148` | [campaign 1 meets its criterion](../../records/2026-09-26_CAMPAIGN_ONE_MEETS_ITS_CRITERION_THE_TREE_RECEIVES_AND_THE_WAVE_IS_WEIGHED.md), [at scale](../../records/2026-09-26_THE_LANDMARK_TREE_AT_SCALE_THE_STOP_PRIOR_LOCAL_WEIGHING_THE_WIDE_CUT_AND_THE_STORAGE_WHERE_PATHS_PART.md) |
 | `curated_source.py`, `curated_incidence.py` | The curated source, its pinned cut and flat twin; the admitted relations on the cut | `HOLONICS_ROOT=$PWD python3 research/notebook/hnn_design/curated_source.py 1048576` | [the receiving population](../../records/2026-09-27_THE_RECEIVING_POPULATION_WAS_BUILT_ON_TERRAIN_WITH_KNOWN_TRUTH_AND_THE_CURATED_SOURCE_NOW_CODES_BELOW_THE_FLAT_STREAM.md) |
@@ -2415,3 +2415,97 @@ The terrain refuses 1 of the 64 draws (20261239 opens within capture), so 63 see
   controls; there the robust machine wins 28, ties 2 and loses 3 against both at once (regret 23),
   and the candidate wins 32, ties 1 and loses 0 (regret 14).
 - Gates: `cargo check --workspace --all-targets`; `cargo test -p holonics --lib`, 876 passed.
+
+### F6: the switches and their attribution (September 28)
+
+Record: no dedicated record; THE_REBUILD F6 (the switches, the deposition law, the action
+acceptance's third bullet) and the record of September 27, §9, §12 items 7 and 10, §13 and §14.5.
+Campaign 4, #27, #63.
+
+```sh
+cargo run --release -p holonics --example hnn_chase -- switches probe 1 16   # the projection, choosing seeds
+cargo run --release -p holonics --example hnn_chase -- switches              # the pinned run, once
+cargo test -p holonics --lib holarchy::terrain::sensing_tests
+```
+
+The computational object is the helical pair interaction: the runner and the chaser as a pair, and
+the three observation channels as pair contacts between the observed frame and the runner, whose
+loop closure locates a defect. This loop touches the **pair** (each channel's contact and its slip,
+a quarter-turn), the **cell holonomy** (the syndrome is each circuit's holonomy, expected to be the
+identity) and **faces and placement** (the channels' readings of the runner's cell in their own
+frames); the helix (the fault's switch clock), the tube (the lag's withheld span) and the tower
+thread stay attached.
+
+**The switches** ([definition; agent-inferred]; `holarchy::terrain::sensing`), declared families
+whose truth the terrain returns (the `Switching` pattern):
+- each of three time-aligned channels reads the runner's cell at tick `τ` as its kind (move, slip,
+  wall), the line of sight `x_R(τ) − x_C(τ)` and the heading `v_R(τ + 1)`, in its own frame; a
+  reading names its cell exactly (`Reading::cell`, refused unless the cell's own reading returns);
+- **the lag** `d`: the readings of `τ` arrive once `τ + d` has moved, and the controls read the
+  runner's motion at `t − d`, the motion the channels agree on (they need no attribution, so the
+  faulty frame costs them nothing: the comparison is conservative against the machine);
+- **the faulty sensor**: one channel (uniform on three) reports a rotated heading, its frame turned by
+  `i^a` (`a` uniform on the three nonidentity quarter-turns, the unit group of `ℤ[i]`), on the odd
+  aeons of a switch clock drawn from a declared `AeonFamily` (`SwitchTruth::drawn`, the aeons the
+  epochs of the tick clock at the fault's section). Its draw continues the chase's own
+  (`Chase::draw_key`), so a seed names the same runner, arena and openings with the switches off.
+  [agent-inferred] The frame, not the velocity alone, is turned: a turn of a zero velocity is zero, a
+  cornered runner stands for ticks at a time, and a fault that makes no error cannot be located; the
+  line of sight is never zero before capture, so a turned frame errs at every active tick.
+
+**The separation condition, checked on the circuit matrix** ([proved-derived]; `ChannelMenu`). With
+`y_k = i^(e_k) x`, `e ∈ (ℤ/4)³`, the circuits `(0, 1)`, `(0, 2)`, `(1, 2)` give
+`C = [[1, −1, 0], [1, 0, −1], [0, 1, −1]]` and `s = C e`. A defect on at most `k` channels is located
+uniquely exactly when no nonzero `v` of support at most `2k` has `C v = 0`. `ker C = {(c, c, c)}` (the
+common mode, `im d₀` of three parallel edges), of support `3`: at `k = 1` the 36 nonzero vectors of
+support at most 2 all lie outside it, and each of the nine one-channel defects is located with its
+turn. At `k = 2` `(1, 1, 1)` breaks it; two channels at `k = 1` are broken by `(1, 1)` (a fault
+detected, located nowhere). The lag is `(d, d, d) ∈ ker C` in the time chart: no channel circuit sees
+it.
+
+**The attribution at its consumer** ([definition; proved-derived; agent-inferred];
+`receiver::population::chaser`, "The attribution", and "The lag"). A reading of `τ` meets three loops:
+- the **channel loop**: the menu's syndrome names the turned channel and its turn; **its locus is the
+  channel** (`MachineReceipt::located`), and the constitution reads a cleared channel's reading;
+- the **mover's loop**: the named cell against the contemporary fibre's own cells at `τ`, against the
+  motor record at `τ`; **its locus is the runner's constitution**, the only deposit (`ChaseFamily`
+  reads the port at its own tick);
+- the **lag's loop**: the action-time prediction of `τ` (made `d` readings short) against the
+  contemporary one; `q − p_act = (q − p_con) + (p_con − p_act)`, and deposition consumes `q − p_con`
+  alone: **its locus is none** (`MachineReceipt::lag_misses` counts the misses the lag caused).
+- Under the lag the machine reads the constitution's fibre projected through the withheld ticks
+  against its own port, a member the chaser would have captured on the way dropped (the passage goes
+  on), and the capture basin reads the lagged information structure (`pursuit::Pending`): the class it
+  learns next is named by the cell of `t − d`, each member at its own motion. At `d = 0` it is the
+  unlagged recursion value for value: `action trace` and the reception phase agree line for line with
+  the previous commit's (354 and 414 lines, wall times masked).
+
+**Pinned before the run** (this commit; `hnn_chase.rs`'s `SWITCH_SEED`, `SWITCH_SEEDS`,
+`SWITCH_LAG`, `FAULT_AEONS` and `switches`):
+- **the population**: seeds `20261301 + s`, `s < 64`, a declared contiguous range disjoint from every
+  range read so far (acceptance `20260927 + s` and choosing `20261001 + s`, `s < 16`; the spent fresh
+  populations `20261101 + s` and `20261201 + s`, `s < 64`), none read before this pin;
+- **the switches**: the lag `d = 1`, the least lag that withholds a reading (fixed by that reason
+  before any probe); the faulty sensor's aeons uniform on `1..=4` ticks (the machine captures within
+  13 ticks on every choosing seed, so a passage sees its first active aeon within four ticks);
+- **the chasers**: the machine under `MachineChaser::new`'s plan (robust, `n = 2, m = 12, d = 0`),
+  pure pursuit and constant bearing, each with the switches off and on, from the reception's draw
+  under the same traction bound; an uncaptured passage counts its cap `2^9`;
+- **the criteria, the switch bullet as written**: with the switches on, (1) the machine's capture
+  ticks strictly fewer than each control's in sum, and strictly fewer than both at once on more than
+  half of the chased seeds; (2) the fault located on exactly the aeons it is active, over the
+  readings received: every active aeon located, no inactive one, every location naming the truth's
+  channel and turn; (3) lag-caused errors deposit nothing: the switched machine's constitution equals
+  the prompt reception's on the true cells at every decision and exactly at the end, on every chased
+  seed. A draw the terrain refuses is printed and enters no sum, and "more than half" counts the
+  chased seeds;
+- **printed beside them, not criteria**: the capture ticks with the switches off on the same seeds,
+  the truth-only least, the per-tick location, the misses and those the lag caused, the deposits, and
+  the released bounds kept.
+- **The projection** (`switches probe 1 16`, the choosing seeds, a development reading): 45,374 ms at a
+  292,932 kB peak for 16 seeds with both switch settings, so the run projects at about three minutes
+  and under 1 GB, against ten minutes. The probe's own reading there, not a criterion: the machine 157
+  capture ticks with the switches on (150 off), pure pursuit 4,734 (4,668), constant bearing 822
+  (240); won against both at once on 9 of 16 (3 off); the fault located on 25 of 25 active aeons and
+  60 of 60 active ticks, none else; the constitution equal to the prompt one on 16 of 16; 146 of 146
+  released bounds kept.
