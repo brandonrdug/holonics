@@ -11,6 +11,7 @@ use crate::compression::landmark::context::{
 };
 use crate::ratio::algebraic::ExactInterval;
 use crate::receiver::population::TreeFamily;
+use crate::receiver::population::{Population, PopulationRelease};
 
 const POPULATION: u64 = 1 << 10;
 const GRAIN: u64 = 16;
@@ -380,4 +381,176 @@ fn the_incidence_is_refused_out_of_order_or_off_its_ports() {
         assert!(egg.admits(&cells).is_err());
         assert!(egg.likelihood() == Likelihood::Enclosed(PassageCode::new()));
     }
+}
+
+#[test]
+fn a_planned_request_conditions_the_response_face_before_the_request_span_is_read() {
+    let (cells, ticks) = passage();
+    let make = || {
+        AdmittedEgg::new(
+            "planned admitted receivers".to_string(),
+            1,
+            inner(),
+            chart(),
+            Vec::new(),
+            law(),
+        )
+        .expect("an admitted egg")
+    };
+    let relation = Relation {
+        letter: ticks[1],
+        kind: RelationKind::Request,
+        target: ticks[0],
+    };
+    let mut conditioned = Population::new(vec![Box::new(make())]).expect("population");
+    conditioned
+        .plan_relation(relation)
+        .expect("plan before the request arrives");
+    let mut unconditioned = Population::new(vec![Box::new(make())]).expect("population");
+
+    // Read the request and its bytes, then the response's opening section. Its following byte is
+    // now scored against the retained request span only in the planned receiver.
+    // Read through the first response while its request span is retained; its locator can then
+    // condition the next scored cell.
+    for &cell in &cells[..ticks[2] as usize] {
+        conditioned.receive(cell).expect("conditioned reception");
+        unconditioned
+            .receive(cell)
+            .expect("unconditioned reception");
+    }
+    let scored = conditioned.face().expect("conditioned score");
+    let bare = unconditioned.face().expect("unconditioned score");
+    assert_ne!(
+        scored, bare,
+        "the request relation changes the response face"
+    );
+
+    let released = PopulationRelease::from_scored_face(&conditioned, chart().alphabet() - 1)
+        .expect("release the current scored face");
+    assert_eq!(released.face(), scored.as_slice());
+    assert_eq!(released.selected_class(), chart().alphabet() - 1);
+}
+
+#[test]
+fn request_face_provenance_tracks_the_open_relation_and_survives_branching() {
+    let (cells, ticks) = passage();
+    let make = || {
+        AdmittedEgg::new(
+            "planned admitted receivers".to_string(),
+            1,
+            inner(),
+            chart(),
+            Vec::new(),
+            law(),
+        )
+        .expect("an admitted egg")
+    };
+    let relation = Relation {
+        letter: ticks[1],
+        kind: RelationKind::Request,
+        target: ticks[0],
+    };
+    let mut population = Population::new(vec![Box::new(make())]).expect("population");
+    population
+        .plan_relation(relation)
+        .expect("plan before the target arrives");
+
+    // Receive the request section and its bytes, then open the response section.
+    for &cell in &cells[..ticks[1] as usize + 1] {
+        population.receive(cell).expect("receive request");
+    }
+    let Readout::Admitted(opening) = population.readout(0).expect("family readout") else {
+        panic!("admitted readout")
+    };
+    let opening = opening.request_provenance.as_ref().expect("held request");
+    assert_eq!(opening.response_letter_tick, ticks[1]);
+    assert_eq!(opening.request_target_tick, ticks[0]);
+    assert_eq!(
+        opening.target_span_cells,
+        (ticks[1] - ticks[0] - 1) as usize
+    );
+    assert_eq!(opening.located_length, None);
+    assert_eq!(opening.next_byte, None);
+    assert_eq!(opening.copy_law, law());
+    assert_eq!(opening.copy_cell, None);
+
+    // The response's `read ` matches a suffix of the request with a following target byte.
+    let read_space = b"I read ";
+    for &byte in &read_space[1..] {
+        population
+            .receive(usize::from(byte))
+            .expect("receive response byte");
+    }
+    let Readout::Admitted(matched) = population.readout(0).expect("family readout") else {
+        panic!("admitted readout")
+    };
+    let matched = matched.request_provenance.as_ref().expect("held request");
+    assert_eq!(matched.response_letter_tick, ticks[1]);
+    assert_eq!(matched.request_target_tick, ticks[0]);
+    assert!(matched.located_length.is_some());
+    assert_eq!(matched.next_byte, Some(usize::from(b't')));
+    assert!(matched.copy_cell.is_some());
+
+    let branch = population.branch_future().expect("branch future");
+    assert_eq!(branch.readout(0), population.readout(0));
+}
+
+#[test]
+fn request_face_provenance_is_absent_without_a_held_request_relation() {
+    let (cells, ticks) = passage();
+    let make = || {
+        AdmittedEgg::new(
+            "unheld admitted receivers".to_string(),
+            1,
+            inner(),
+            chart(),
+            Vec::new(),
+            law(),
+        )
+        .expect("an admitted egg")
+    };
+    let mut population = Population::new(vec![Box::new(make())]).expect("population");
+    for &cell in &cells[..ticks[1] as usize + 1] {
+        population.receive(cell).expect("receive unheld request");
+    }
+    let Readout::Admitted(readout) = population.readout(0).expect("family readout") else {
+        panic!("admitted readout")
+    };
+    assert_eq!(readout.request_provenance, None);
+}
+
+#[test]
+fn planning_refuses_passed_targets_and_duplicate_reading_parts() {
+    let (cells, ticks) = passage();
+    let make = || {
+        AdmittedEgg::new(
+            "planned admitted receivers".to_string(),
+            1,
+            inner(),
+            chart(),
+            Vec::new(),
+            law(),
+        )
+        .expect("an admitted egg")
+    };
+    let relation = Relation {
+        letter: ticks[1],
+        kind: RelationKind::Request,
+        target: ticks[0],
+    };
+    let mut population = Population::new(vec![Box::new(make())]).expect("population");
+    population
+        .plan_relation(relation)
+        .expect("the request target is still ahead");
+    assert!(
+        population.plan_relation(relation).is_err(),
+        "one relation per part"
+    );
+
+    let mut late = Population::new(vec![Box::new(make())]).expect("population");
+    late.receive(cells[0]).expect("receive the target section");
+    assert!(
+        late.plan_relation(relation).is_err(),
+        "the target has passed"
+    );
 }

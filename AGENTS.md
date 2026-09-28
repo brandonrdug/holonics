@@ -330,6 +330,10 @@ and the remaining scope, and carry any surviving obligation into #62.
   `git log -1 --format=%ae` before pushing.
 - Use one worktree per task, under `.local/wt/<task>`. Remove it when its branch is merged, or is
   pushed and linked in its issue.
+- A new worktree reuses the main checkout's Lean build before any Lean check: symlink
+  `lean/.lake/packages` to the main checkout's and copy `lean/.lake/{config,build}` with
+  `cp -r --reflink=always`. Without them, Lake clones and compiles Mathlib from source, which takes
+  hours.
 - A campaign ends with only the main checkout, no stale branches, and no uncommitted work left in
   any worktree.
 

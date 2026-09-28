@@ -51,9 +51,13 @@ pub mod crib;
 pub mod moire;
 pub mod source;
 pub mod switching;
+pub mod words;
 
 #[cfg(test)]
 mod tests;
+
+#[cfg(test)]
+mod words_tests;
 
 pub use crib::{CribTruth, RotorCrib, rotor_crib};
 pub use moire::{Grating, Moire, MoireClass, MoireFamily, MoireTruth, PairLock};
@@ -61,6 +65,7 @@ pub use source::{
     ContextTree, Passage, Recovery, TreeSource, TreeSourceFamily, TreeSourceTruth, WeightingBound,
 };
 pub use switching::{AeonFamily, SwitchTruth, Switching};
+pub use words::{WordPassage, WordTerrain, WordTerrainFamily, WordTerrainTruth, WordVocabulary};
 
 use thiserror::Error;
 

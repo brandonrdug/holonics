@@ -154,7 +154,8 @@ pub struct PartPort {
 impl PartPort {
     /// The last byte's declared class ([`LastByte`]).
     pub fn last(&self) -> LastByte {
-        self.byte.map_or(LastByte::None, |byte| LastByte::of(usize::from(byte)))
+        self.byte
+            .map_or(LastByte::None, |byte| LastByte::of(usize::from(byte)))
     }
 }
 
@@ -212,6 +213,9 @@ impl PartClock {
         }
     }
 }
+
+mod checkpoint;
+pub use checkpoint::BoundaryPortCheckpointError;
 
 /// The last-byte values a partition classes: the part's opening (no byte) and the 256 bytes.
 pub const BYTE_VALUES: usize = 257;
@@ -349,12 +353,9 @@ impl HazardPartition {
         let mut parameters: Vec<u64> = self.classes.iter().map(|&class| class as u64).collect();
         for (rest, map) in &self.shares {
             match *rest {
-                HazardRest::Sentence { kind, phase, carry } => parameters.extend([
-                    0,
-                    kind as u64,
-                    u64::from(phase),
-                    u64::from(carry),
-                ]),
+                HazardRest::Sentence { kind, phase, carry } => {
+                    parameters.extend([0, kind as u64, u64::from(phase), u64::from(carry)])
+                }
                 HazardRest::Other { class } => parameters.extend([1, class as u64]),
             }
             parameters.extend(map.iter().map(|&channel| channel as u64));
@@ -508,6 +509,7 @@ pub struct HazardComparison {
 /// [definition; agent-inferred] **The letter tree** on the section epochs' clock (module header):
 /// its tree, the letters before the pending one with their parts' bundles, and the pending letter
 /// whose part is still open.
+#[derive(Clone)]
 struct LetterTree {
     tree: Landmarks,
     family: LetterFamily,
@@ -563,6 +565,7 @@ impl LetterTree {
 
 /// [definition; agent-inferred] **The boundary egg** (module header): the part clock composed with
 /// the byte tree and the letter tree through the hazard law.
+#[derive(Clone)]
 pub struct BoundaryEgg {
     label: String,
     description: u64,
@@ -673,7 +676,10 @@ impl BoundaryEgg {
 
     fn unread(&self, what: &'static str) -> Result<(), PopulationError> {
         if self.passage.factors() > 0 || self.letters.received > 0 {
-            return Err(refuse(what, "it is declared before the egg receives a cell"));
+            return Err(refuse(
+                what,
+                "it is declared before the egg receives a cell",
+            ));
         }
         Ok(())
     }
@@ -756,6 +762,10 @@ impl BoundaryEgg {
 }
 
 impl Family for BoundaryEgg {
+    fn branch_future(&self) -> Option<Box<dyn Family>> {
+        Some(Box::new(self.clone()))
+    }
+
     fn label(&self) -> String {
         self.label.clone()
     }
@@ -849,7 +859,11 @@ impl Family for BoundaryEgg {
                 }
             }
         }
-        for (hazard, reading) in self.comparisons.iter_mut().zip(&mut self.readout.comparisons) {
+        for (hazard, reading) in self
+            .comparisons
+            .iter_mut()
+            .zip(&mut self.readout.comparisons)
+        {
             hazard.deposit(&port, letter);
             reading.cells = hazard.cells();
         }

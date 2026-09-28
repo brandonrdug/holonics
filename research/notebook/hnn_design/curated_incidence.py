@@ -25,6 +25,10 @@ cut's codes: a letter on the reading port and a letter on the target's.
 
     HOLONICS_ROOT=<main checkout> python3 research/notebook/hnn_design/curated_incidence.py
 
+An optional `choosing` or `validation` argument reads that F4 role's private source and cut;
+pass `F1`, `F2` or `F5` second to read that item's role. Targets absent from the role's source remain unheld.
+The exterior join shifts validation's within-role relation ticks into the joint passage.
+
 Outputs in `.local/cuts/`:
 - `curated-cut.incidence.bin`: the declared relations in letter order, three little-endian u32 a
   relation (the reading part's letter tick, the kind, the target's letter tick);
@@ -53,13 +57,16 @@ def letter_tick(occurrence, start):
 
 
 def main():
-    if sys.argv[1:]:
+    arguments = sys.argv[1:]
+    if arguments and (len(arguments) not in (1, 2) or arguments[0] not in ("choosing", "validation") or (len(arguments) == 2 and arguments[1] not in ("F1", "F2", "F5"))):
         sys.exit(__doc__)
-    with open(os.path.join(OUT_DIR, "curated-source.json"), "rb") as handle:
+    item = arguments[1].lower() if len(arguments) == 2 else "f4"
+    prefix = "curated" if not arguments else f"curated-{item}-{arguments[0]}"
+    with open(os.path.join(OUT_DIR, prefix + "-source.json"), "rb") as handle:
         manifest = json.load(handle)
     cut = manifest["cut"]
     start, cells, held = cut["stream_start"], cut["cells"], cut["held_out_start"]
-    with open(os.path.join(OUT_DIR, "curated-cut.bin"), "rb") as handle:
+    with open(os.path.join(OUT_DIR, prefix + "-cut.bin"), "rb") as handle:
         raw = handle.read()
     assert hashlib.sha256(raw).hexdigest() == cut["cut_sha256"], "the pinned cut"
     codes = array("H")
@@ -67,7 +74,7 @@ def main():
     if sys.byteorder != "little":
         codes.byteswap()
     assert len(codes) == cells
-    incidence_path = os.path.join(OUT_DIR, "curated-source.incidence.jsonl")
+    incidence_path = os.path.join(OUT_DIR, prefix + "-source.incidence.jsonl")
     with open(incidence_path, "rb") as handle:
         incidence_bytes = handle.read()
     assert hashlib.sha256(incidence_bytes).hexdigest() == manifest["incidence_sha256"], "the incidence"
@@ -116,7 +123,7 @@ def main():
         packed.byteswap()
     data = packed.tobytes()
     private_directory()
-    private_write("curated-cut.incidence.bin", data)
+    private_write(prefix + "-cut.incidence.bin", data)
     out = {
         "schema": "holonics.curated-cut-incidence.v1",
         "encoding": "u32 little-endian triples: reading letter tick, kind (0 request, 1 later human), target letter tick",
@@ -126,7 +133,7 @@ def main():
         "counts": counts,
         "sha256": hashlib.sha256(data).hexdigest(),
     }
-    private_write("curated-cut.incidence.json", json.dumps(out, indent=2).encode("utf-8"))
+    private_write(prefix + "-cut.incidence.json", json.dumps(out, indent=2).encode("utf-8"))
     print(json.dumps(out, indent=1))
 
 

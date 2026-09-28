@@ -108,7 +108,10 @@ Sol's own records are on the branch:
   - Its acceptance is on a fresh development split never used for a diagnostic: charged code
     strictly below the flat stream on the validation families, within a declared standing budget.
 - **Every receipt reports standing bytes per cell read.**
-- **PR #149 is split.**
+- **PR #149 is split.** *(Reversed the same morning: the PR was merged whole. Its product shell is
+  tested and is F5's consumer, and splitting 72 interdependent files cost more than it protected.
+  F0 still gates F5. Brandon read the releases as promising: native generation without copying,
+  whose broken words show pattern recognition.)*
   - **Lands:** its gate records, the family-split pins and scripts, the known-truth release probes,
     the same-face release view, face health, the word family, and the certified inverse-CDF
     theorem.

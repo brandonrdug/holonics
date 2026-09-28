@@ -1349,3 +1349,88 @@ reproduces its receipt (4 classes adopted, the shares refused). What it located:
   to the held-out stream as well, the learned hazard `2 + 10/16` above the declared on the held-out cells, and `1 + 10/16`
   more where the copy stage reads the moved inner odds. The joined egg still codes the held-out
   stream below the flat stream and below both receiver-free eggs.
+
+## F4 release and the disjoint development families (September 27)
+
+The [F4 pin and receipt](../../records/2026-09-27_F4_DEVELOPMENT_FAMILY_SPLIT_AND_RELEASE_GATE.md)
+names the hash-seeded choosing/validation family split, each private cut's hash, the complete
+release acceptance and the failure branch. `development_families.py` writes the owner-only
+membership; `curated_source.py` and `curated_incidence.py` take a role; `family_passage.py` shifts the
+validation cut's own incidence without inventing a relation across the split. The one held-out
+passage is:
+
+```sh
+cargo run --release -p holonics --example hnn_population -- f4 .local/cuts/curated-f4-passage-cut.bin .local/cuts/curated-f4-passage-flat-cut.bin
+```
+
+It finished in 307,213 ms at a 10,330,435,584-byte peak resident set. The charged curated code
+against the flat byte stream was `−1477 + 5/16 + ε` bits on choosing and `+1346 + 1/16 + ε` on
+validation (`L_R = 16`, `0 ≤ ε < 1/16`). The validation result is above the control. The exact
+next-face identity and planned request incidence are built, but the text decoder, producing
+keys/provenance, grain/fibre and release square are not. F4 remains a predictor under its pinned
+failure branch. `f4_retrospective.py` selected 32 development-validation requests and made a
+request-aware retrieval control without reading those requests' recorded responses; the scoring
+passage is separate and cannot be used as a prospective release standing. The evaluation partition
+has not been read.
+
+## F1 word alphabet pin (September 27)
+
+The independent [F1 pin and receipt](../../records/2026-09-27_F1_WORD_ALPHABET_GATE.md) fix the
+word terrain, charged parse/termination law, byte-population baseline, one held-out passage,
+resource gate and failure branch. Its private split has 17,957 choosing and 4,492 validation
+families. A chosen 272-word dictionary (all singleton bytes and 16 learned pairs) costs 3,301
+bits under the pinned declaration. Its exact receiver took 8,981 ms for 128 choosing bytes, so a
+full passage projects far beyond ten minutes and was refused. The single bounded held-out part
+has 113 bytes and its actual END; its prequential mass equalled the sum over its parses exactly in
+6,910 ms. The sectioned 268-class adapter's small exact fixtures pass. No charged whole-stream
+word-code win is claimed, and bytes remain the text chart.
+
+## F2 field-family preflight (September 27)
+
+The [F2 pin](../../records/2026-09-27_F2_FIELD_FAMILY_GATE.md) fixes an independent
+development-family split and both the full and bounded passage budgets. The full serial field
+passage projects beyond ten minutes. The first bounded cut was below the field's `n* = 6,148`;
+the corrected private byte cut at `n*` read 4,096 choosing and 2,052 held-out validation bytes
+once in 363,330 ms on the host. `Reference::expose` provides aggregate code rather than the
+per-cell rational face required by a population family. The field cannot be inserted or
+validated by substituting its odometer covector for a probability. No F2 held-out
+**field-family** reading has run, and the evaluation partition remains closed.
+
+## F5 development-only release and product protocol (September 27)
+
+The [F5 pin and receipt](../../records/2026-09-27_F5_DEVELOPMENT_AND_BLIND_GATE.md) fix a separate
+hash-seeded development-family split, prospective-request order, context rule, blind rubric and
+privacy. That split was used to refine the release route and is now a **diagnostic**, so an
+untouched development split is still owed before F5 acceptance. The evaluation partition remains
+closed. Private request and response text never enters the tracked tree or public readouts.
+
+`hnn_population f5-native` follows the population's interval face only where an exact draw forces
+one class across its fibre. `f5-family` samples one family from the enclosed posterior and follows
+its exact face; `f5-family-verify` replays the resulting candidate on a fresh branch, capturing
+the population's scored face before every byte and its stop. The first candidate had 179 UTF-8
+bytes, the same private hash after full-path verification, 180 checked faces, and 15,826 ms full
+warm time. The full request-only diagnostic bundle (`f5-bundle`) trained choosing standing once
+and branched 32 times in 314,527 ms of preparation plus warm work: 24 provisional UTF-8 paths,
+four invalid UTF-8 refusals, one over-aperture request and three no-stop paths. Longest warm
+request: 20,760 ms. These are path and resource receipts, not answer-quality or product claims.
+
+The exterior `athena_protocol.py` fixture uses one Ask/Inspect/Checkpoint vocabulary and one
+atomic owner-only checkpoint with standing bytes, cursor, pending comparisons, incomplete input
+tail and a replayable pending output. Fourteen fixture tests pass, including durable staging of a
+complete frame until its native result commits; presenting the provisional native
+path without health/provenance/fibre produces the typed `incomplete-release-receipt` refusal and
+replays it with zero new native calls. `f5_context.py` recovers actual provider-parent context:
+21 complete one-occurrence packets and 11 unresolved-parent refusals on the diagnostic requests.
+`athena_blind.py` has a 32-case owner-only development package with source-hidden sides, no marks
+or unblinding key; it has not been shown for judgment. Exact native standing codecs now cover
+Landmarks, PassageCode, TreeFamily, BoundaryEgg, AdmittedEgg and a tagged Population on small
+continuation fixtures. A choosing-only `f5-checkpoint-census` measured 6,256,005,521 bytes in
+the eight family payloads and 6,256,005,986 bytes in the full population stream; the complete
+stream took 13,266 ms with a 9,897,873,408-byte sampled RSS peak, without printing source
+content. The choosing-only `f5-checkpoint-restore` durably wrote that stream and restored the
+same cursor, face and next receive with a 16,287,236,096-byte sampled RSS peak; its manifest was
+reconstructed from choosing source, so this is a decoder check. The file-backed v2 fixture
+streams standing and protocol metadata into one owner-only atomic file. At this actual standing
+size its synthetic typed-refusal `Ask` committed in 7,706 ms, replayed without a second Engine
+call, and used 22,323,200 bytes peak RSS in Python. An independent cold restore, live atomic
+protocol transition and full product health/provenance/fibre receipts are still owed.

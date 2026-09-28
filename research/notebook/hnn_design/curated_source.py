@@ -69,6 +69,12 @@ cells, so the two are measured on identical cells.
 
     HOLONICS_ROOT=<main checkout> python3 research/notebook/hnn_design/curated_source.py 1048576
 
+For F4, F1, F2 or F5, after `development_families.py` has pinned the private membership, the optional
+second argument `choosing` or `validation` emits only that role's development families under
+`curated-<item>-<role>-*` names (`F4` is the default item; pass `F1`, `F2` or `F5` as a third argument). It does
+not decode evaluation or deferred records. A relation across roles is unheld, never supplied by
+adjacency.
+
 Outputs in `.local/cuts/`:
 - `curated-source.bin`: the whole development stream, one little-endian u16 code a cell;
 - `curated-source.incidence.jsonl`: the occurrences' ports, cell ranges and incidence;
@@ -84,6 +90,7 @@ import os
 import sys
 from array import array
 
+from development_families import PARTITION, assignment
 from standing_cut import ROOT, SOURCE, private_directory, private_write
 
 CHANNELS = ("human", "agent", "tool")
@@ -134,10 +141,19 @@ def count(table, *keys):
 
 def main():
     arguments = sys.argv[1:]
-    if len(arguments) != 1:
+    if len(arguments) not in (1, 2, 3) or (len(arguments) >= 2 and arguments[1] not in ("choosing", "validation")) or (len(arguments) == 3 and arguments[2] not in ("F1", "F2", "F5")):
         sys.exit(__doc__)
     population = int(arguments[0])
     assert population > 0 and population & (population - 1) == 0, "a power of two"
+    role = arguments[1] if len(arguments) >= 2 else None
+    item = arguments[2] if len(arguments) == 3 else "F4"
+    name = "curated" if role is None else f"curated-{item.lower()}-{role}"
+    if role is not None:
+        with open(os.path.join(ROOT, ".local", "cuts", f"development-families-{item.lower()}.json"), "rb") as handle:
+            split = json.load(handle)
+        assert split["seed"] == f"holonics-{item.lower()}-development-families-2026-09-27-v1"
+        expected = {entry["family_sha256"]: entry["role"] for entry in split["members"]}
+        assert len(expected) == len(split["members"])
 
     stream = []  # the curated codes, bytes and letters
     occurrences = []  # the incidence records
@@ -168,12 +184,21 @@ def main():
     with open(SOURCE, "rb") as handle:
         for line in handle:
             source_hash.update(line)
+            prefix = line[:line.find(b'"views"')] if b'"views"' in line[:1024] else line[:1024]
+            match = PARTITION.search(prefix)
+            if match is None:
+                continue
+            partition = match.group(1).decode("ascii")
+            families[partition] += 1
+            if partition != "development":
+                continue
             record = json.loads(line)
-            if record.get("kind") != "occurrence-family":
-                continue
-            families[record["partition"]] += 1
-            if record["partition"] != "development":
-                continue
+            assert record["kind"] == "occurrence-family" and record["partition"] == partition
+            if role is not None:
+                assigned, family_hash = assignment(record["family"], split["seed"])
+                assert expected[family_hash] == assigned
+                if assigned != role:
+                    continue
             sequence = record["sequence"]
             count(sequence_order, "increasing" if last_sequence is None or sequence > last_sequence
                   else "not_increasing")
@@ -307,15 +332,18 @@ def main():
     incidence_bytes = "".join(json.dumps(entry, separators=(",", ":")) + "\n"
                               for entry in occurrences).encode("utf-8")
     private_directory()
-    private_write("curated-source.bin", curated)
-    private_write("curated-source.incidence.jsonl", incidence_bytes)
-    private_write("curated-cut.bin", u16(cut))
-    private_write("curated-flat-cut.bin", flat_cut)
+    private_write(name + "-source.bin", curated)
+    private_write(name + "-source.incidence.jsonl", incidence_bytes)
+    private_write(name + "-cut.bin", u16(cut))
+    private_write(name + "-flat-cut.bin", flat_cut)
     manifest = {
         "schema": "holonics.curated-source.v1",
         "source": os.path.relpath(SOURCE, ROOT),
         "source_sha256": source_hash.hexdigest(),
         "families": families,
+        "development_role": role,
+        "development_role_families": len(occurrences),
+        "split_membership_sha256": split["membership_sha256"] if role is not None else None,
         "declared_order": sequence_order,
         "chart": {"cells": "UTF-8 bytes 0..255", "alphabet": ALPHABET,
                   "letters": {f"{kind}:{channel}": letter(kind, channel)
@@ -349,19 +377,22 @@ def main():
                 "flat_cut_sha256": sha(flat_cut), "flat_development_sha256": sha(flat_cut[:flat_held_start]),
                 "flat_held_out_sha256": sha(flat_cut[flat_held_start:])},
     }
-    private_write("curated-source.json", json.dumps(manifest, indent=2).encode("utf-8"))
-    private_write("curated-cut.json", json.dumps({
+    if role is not None:
+        assert manifest["source_sha256"] == split["source_sha256"]
+    private_write(name + "-source.json", json.dumps(manifest, indent=2).encode("utf-8"))
+    private_write(name + "-cut.json", json.dumps({
         "schema": "holonics.curated-cut.v1", "encoding": "u16 little-endian, one code a cell",
         "alphabet": ALPHABET, "population": population, "cells": cells,
         "held_out_start": held_start, "cut_sha256": manifest["cut"]["cut_sha256"]}, indent=2).encode("utf-8"))
-    private_write("curated-flat-cut.json", json.dumps({
+    private_write(name + "-flat-cut.json", json.dumps({
         "schema": "holonics.standing-cut.v2",
         "from": "the curated cut's bytes, its section letters removed; held out: the curated held-out cells' bytes",
         "population": len(flat_cut), "declared_population": population,
         "held_out_range": [flat_held_start, len(flat_cut)],
         "cut_sha256": manifest["cut"]["flat_cut_sha256"]}, indent=2).encode("utf-8"))
     print(json.dumps({key: manifest[key] for key in (
-        "families", "declared_order", "checks", "ports", "sections", "incidence", "development_stream_cells",
+        "families", "development_role", "development_role_families", "split_membership_sha256",
+        "declared_order", "checks", "ports", "sections", "incidence", "development_stream_cells",
         "development_stream_sha256", "flat_stream_cells", "flat_stream_sha256", "cut")}, indent=1))
 
 

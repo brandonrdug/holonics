@@ -198,6 +198,16 @@ impl Sections {
         self.open
     }
 
+    /// Restore the contemporary open part from a durable standing. The section is checked against
+    /// this reader's immutable chart before the state changes.
+    pub(crate) fn restore_open(&mut self, open: Option<Section>) -> Result<(), ContextError> {
+        if let Some(section) = open {
+            self.chart.letter(section)?;
+        }
+        self.open = open;
+        Ok(())
+    }
+
     /// **The letter a cell would read**, nothing moved: the cell bundled with its part's slots
     /// (a section letter's own). Refused outside the chart and at a byte before any section.
     pub fn letter_of(&self, cell: usize) -> Result<Letter, ContextError> {
