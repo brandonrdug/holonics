@@ -300,7 +300,9 @@ theorem quad_congruence (M G : Matrix (Fin n) (Fin n) ℚ) (hG : Gᵀ = G) (v : 
     Matrix.dotProduct_mulVec, ← Matrix.mulVec_transpose, hG]
 
 /-- [proved-derived; formal-checked] **The rate at a motion is minus twice the dissipated power at
-its co-motion.** This is the statement `causal_chord::rate_form` is read through. -/
+its co-motion.** This is the statement the rate form `Foundation/CausalChord.lean::rateForm` is read
+through; its Rust reading `receiver::causal_chord::rate_form` was retired at THE_REBUILD U3 (history
+at `c10acca9`). -/
 theorem storage_rate_reading (Omega M G : Matrix (Fin n) (Fin n) ℚ) (hG : Gᵀ = G)
     (hOmega : Omegaᵀ = -Omega) (hM : Mᵀ = M) (v : Fin n → ℚ) :
     quad (rateFormQ (portGenerator Omega M G) G) v = -2 * quad M (G *ᵥ v) := by

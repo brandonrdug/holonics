@@ -19,8 +19,8 @@
 //!   ring [`holon::parametron`].
 //! - [`navigator`]: transport with an initial configuration and its own clock, phase lift, address
 //!   words and lock addresses, trace faces and the dynamical zeta.
-//! - [`receiver`]: roles and faces, width and release, standing as the retention quotient, the
-//!   causal chord, joint reception and the receipt ratio.
+//! - [`receiver`]: roles and faces, width and the one release law, the population, joint reception
+//!   and the receipt ratio.
 //! - [`holarchy`]: what `Holon::interconnect` returns — the joined whole with its constituents,
 //!   typed gluing (or a gluing defect) and parametric orientation, and its receiver-relative
 //!   `view`/`count`/`refine`; and the terrain a declared Holarchy makes, with its exact truth.

@@ -209,9 +209,10 @@ fn the_certified_enclosure_counts_every_root_the_cauchy_interval_counts() {
 
 /// **The half-plane counter is this module's, and it counts.**
 ///
-/// `causal_chord` holds it against Sylvester's signature on symmetric operators; this is the
-/// polynomial-level check at the owner, including the Cauchy index's sign, which is the one thing a
-/// signed remainder sequence can get wrong without failing anywhere else.
+/// `the_half_plane_count_agrees_with_the_inertia_of_a_symmetric_operator` holds it against
+/// Sylvester's signature on symmetric operators; this is the polynomial-level check at the owner,
+/// including the Cauchy index's sign, which is the one thing a signed remainder sequence can get
+/// wrong without failing anywhere else.
 #[test]
 fn the_half_plane_counter_places_declared_populations() {
     // `(x+1)(x+2)(x+3)`: Hurwitz.
@@ -227,6 +228,38 @@ fn the_half_plane_counter_places_declared_populations() {
     // a negative leading coefficient names the same population
     let count = half_plane_count(&polynomial(&[-6, -11, -6, -1])).expect("the count returns");
     assert_eq!((count.left, count.axis, count.right), (3, 0, 0));
+}
+
+/// **The symmetric route and the Routh–Hurwitz route return the same population.** A symmetric
+/// rational operator has real spectrum, so the half-plane count of its characteristic polynomial is
+/// Sylvester's signature of the operator as a form: left, axis and right are its negative, null and
+/// positive indices (`crate::ratio::linear::inertia::inertia`). Ported from the retired
+/// `receiver::causal_chord` (U3's second loop), where the two owners met.
+#[test]
+fn the_half_plane_count_agrees_with_the_inertia_of_a_symmetric_operator() {
+    use crate::ratio::linear::ExactRatMatrix;
+    use crate::ratio::linear::inertia::{SymmetricForm, inertia};
+    for rows in [
+        vec![vec![2, 1], vec![1, 2]],
+        vec![vec![-3, 1, 0], vec![1, -2, 1], vec![0, 1, -3]],
+        vec![vec![1, 2, 0], vec![2, 1, 0], vec![0, 0, 0]],
+    ] {
+        let rows: Vec<Vec<Rat>> = rows
+            .into_iter()
+            .map(|row| row.into_iter().map(integer).collect())
+            .collect();
+        let reading = inertia(&SymmetricForm::from_rows(rows.clone()).expect("a symmetric form"));
+        let characteristic = ExactRatMatrix::new(rows)
+            .expect("a square matrix")
+            .characteristic_polynomial()
+            .expect("the characteristic polynomial returns");
+        let count = half_plane_count(&characteristic).expect("the Routh route returns");
+        assert_eq!(
+            (count.left, count.axis, count.right),
+            (reading.negative, reading.zero, reading.positive),
+            "{characteristic:?}"
+        );
+    }
 }
 
 /// **The Cauchy index is a signed reading and its sign is relative to the pair.**

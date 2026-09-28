@@ -12,7 +12,7 @@ use super::{ExactPolynomialError, squared_shrinking_steps};
 /// `degree` is a caller-declared extent and it sizes both powers above, so it is gated before
 /// either is taken.
 #[derive(Clone, Debug, PartialEq, Eq)]
-pub(crate) struct RootSeparationBound {
+pub struct RootSeparationBound {
     pub degree: usize,
     /// `disc(f)`, nonzero exactly because `f` is squarefree.
     pub discriminant: BigInt,
@@ -26,7 +26,7 @@ pub(crate) struct RootSeparationBound {
 
 /// What the material says about how close two of its roots may be.
 #[derive(Clone, Debug, PartialEq, Eq)]
-pub(crate) enum RootSeparation {
+pub enum RootSeparation {
     /// Degree below two. There is no pair of roots, so no interval can hold two of them and no
     /// split can ever be required. This is a statement about the polynomial, not a missing bound.
     NothingToSeparate {

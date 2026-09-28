@@ -265,7 +265,7 @@ pub fn interval_difference(
 /// refuses the zero polynomial, so a member of this type always carries a nonempty coefficient
 /// list whose last entry is nonzero.
 #[derive(Clone, Debug, PartialEq, Eq)]
-pub(crate) struct IntegerPolynomial {
+pub struct IntegerPolynomial {
     pub coefficients: Vec<BigInt>,
 }
 
@@ -764,7 +764,7 @@ impl SturmChain {
 /// **An isolating certificate drops exactly one variation.** That is the whole content of the
 /// certificate; [`AlgebraicRoot::isolate`] derives it from the polynomial the root carries.
 #[derive(Clone, Debug, PartialEq, Eq)]
-pub(crate) struct SturmIsolationCertificate {
+pub struct SturmIsolationCertificate {
     pub variations_at_lower: u32,
     pub variations_at_upper: u32,
 }
@@ -772,7 +772,7 @@ pub(crate) struct SturmIsolationCertificate {
 /// One real algebraic number, identified by a polynomial and an exact interval
 /// containing exactly one of its real roots.
 #[derive(Clone, Debug, PartialEq, Eq)]
-pub(crate) struct AlgebraicRoot {
+pub struct AlgebraicRoot {
     pub polynomial: IntegerPolynomial,
     pub isolating_interval: ExactInterval,
     pub certificate: SturmIsolationCertificate,

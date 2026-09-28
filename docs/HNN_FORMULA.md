@@ -1085,7 +1085,9 @@ words. Two laws only that realization checked are kept here.
 [proved-derived; Lean owed in #62] **The chord survives the release.** With `V T_t = T̄_t V`,
 `V B_t = B̄_t` and `ρ_(r,t) = ρ̄_(r,t) V` at every phase, `(sI − T̄_t)⁻¹ V = V (sI − T_t)⁻¹`, so every
 admitted entry of the causal chord `ρ_(r,t)(sI − T_t)⁻¹B_t = ρ̄_(r,t)(sI − T̄_t)⁻¹B̄_t` agrees in
-lowest terms (`receiver::causal_chord`'s `C(sI − A)⁻¹B`). The release removes only factors of
+lowest terms (the causal chord `C(sI − A)⁻¹B` of Lean `Foundation/CausalChord`; its Rust
+realization `receiver::causal_chord` was retired at U3's second loop, history at `c10acca9`, its
+laws in [RECEIVER_HOLARCHY](RECEIVER_HOLARCHY.md#the-causal-chord)). The release removes only factors of
 `det(sI − T_t)` that every admitted entry cancels; a mode that stores energy is dormant, never
 released.
 

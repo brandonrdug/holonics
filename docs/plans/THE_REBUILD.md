@@ -94,8 +94,8 @@ every duplicated law has one owner that the others cite; the gates pass (check, 
   move to THE_MACHINE; #62 becomes the current obligation list; the atlas README states its tags and
   shards; the notebook and records READMEs become routes.
 - **Kept, with an actual consumer or a date.** `receiver::standing`, `compression::face_map` and
-  `hnn::modes` (a test-only chain; U2 retired all three, below) and `receiver::release`'s unconsumed half and `causal_chord` are
-  kept until U2 and U3 close, and each item's acceptance includes it: at the item's close each kept
+  `hnn::modes` (a test-only chain; U2 retired all three, below) and `receiver::release`'s unconsumed half and `causal_chord` (U3
+  retired it at its second loop, below) are kept until U2 and U3 close, and each item's acceptance includes it: at the item's close each kept
   subtree has a named call from a library owner or is deleted. `physics::fluid`'s control-volume
   operators (`control_volume::{NewtonianMaterial, ControlVolume, face_flux, vorticity}` over
   `cells::{GridCell, CubicalComplex}`) are kept for U4's fluid-cell terrain; the rest of `physics`
@@ -193,7 +193,8 @@ Owners: `receiver::release`, `population::{releasing, text_release, provenance}`
   on a simplex-covering face); `population::provenance` is called by the scored response.
   `causal_chord` is not a release owner (a decision reads widths, never a transfer object); its one
   consumer is `hnn::modes`'s check of `hnn.mode-quotient-chord-survives`, which has no Lean
-  counterpart, so its disposition joins `hnn::modes`'s at U2.
+  counterpart, so its disposition joins `hnn::modes`'s at U2. (U2 retired `hnn::modes`; the second
+  loop, below, retired `causal_chord`.)
 - **Second loop: the chaser's arm at exact parity** (September 28, done).
   - *The arms.* `MachineChaser` decides each tick through `release`, with `DecisionRule(Release,
     Ask)` at tolerance zero on the capture-within-`m` reading over the selected fibre. The basin's
@@ -217,6 +218,20 @@ Owners: `receiver::release`, `population::{releasing, text_release, provenance}`
   - *F6's law is amended* to the built rule, by that parity (F6 below: the superseded text, the date
     and the reason). The specified test's statistic is identically zero inside the fibre, and 143 of
     the 152 certified releases came over a plural fibre, where the test would still be sampling.
+  - *The kept subtree closes.* `receiver::release`'s probe arm now has its library call (the chaser's
+    `Ask`). `receiver::causal_chord` had no library caller once `hnn::modes` retired, so it is
+    retired, its module and its tests, 2,801 lines (history at `c10acca9`). Its laws are Lean
+    `Foundation/CausalChord` (the transfer object, poles ⊆ eigenvalues, the rebase, the rate form and
+    the seam, the Jordan counterexample, the spectrum's insufficiency), `Foundation/ReceiverAtlas`
+    (the full probe atlas separates) and `Transport/HolonicInteraction` (the port storage rate). The
+    laws only the Rust carried are in
+    [RECEIVER_HOLARCHY](../RECEIVER_HOLARCHY.md#the-causal-chord): the Faddeev–LeVerrier construction
+    and its coefficientwise certificate, cancellation, poles named by their factors, residues, the
+    resolvent's index, and the six-vertex cospectral pair. `ratio::polynomial` keeps the half-plane
+    count and the rational-root census as the one owner of the pole readings. They now have no
+    library caller and are public readings of the exact arithmetic, and their agreement with
+    Sylvester's inertia is tested at the owner. The partial-fraction `extended_monic_gcd`, which only
+    the residues called, went with the chord.
 - **Then** F4's second stage, `Q_R` (its gate below).
 
 #### U1. One machine: the receiving composition at the field's port

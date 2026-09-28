@@ -174,8 +174,9 @@ open Matrix Polynomial
 
 /-- [definition] The realification over the reals of the one-pole generator `λ = −γ + iΩ`, which is
 the `2 × 2` diagonal block the historical Rust mirror assembled into R1's `Linearization`. The bank's state
-operator is the block diagonal of these, exactly as `causal_chord::resolvent_probe` realifies a
-Gaussian-rational probe point. -/
+operator is the block diagonal of these, exactly as the retired `causal_chord::resolvent_probe`
+realified a Gaussian-rational probe point (history at `c10acca9`; the realification is kept in
+`docs/RECEIVER_HOLARCHY.md`, "The causal chord"). -/
 def realBlock (g o : ℝ) : Matrix (Fin 2) (Fin 2) ℂ := !![(-g : ℂ), (-o : ℂ); (o : ℂ), (-g : ℂ)]
 
 /-- [proved-derived; formal-checked] **Each band names its pole by an exact factor.** The block's

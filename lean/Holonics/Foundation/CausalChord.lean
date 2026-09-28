@@ -14,8 +14,12 @@ import Mathlib.Tactic.Module
 /-!
 # The causal chord: transfer function, rate form, and the atlas one spectrum cannot supply
 
-[definition] This owner states the law the Rust module
-`crates/holonics/src/receiver/causal_chord.rs` implements. It is receiver **R1** of
+[definition] This owner states the law of the causal chord. Its Rust realization,
+`crates/holonics/src/receiver/causal_chord.rs`, had no library caller after `hnn::modes` retired and
+was retired at THE_REBUILD U3's second loop (September 28; [history](https://github.com/brandonrdug/holonics/blob/c10acca9/crates/holonics/src/receiver/causal_chord.rs)); the laws
+only it carried (the Faddeev–LeVerrier construction and its coefficientwise certificate,
+cancellation, poles named by their factors, residues, the resolvent's index and the six-vertex
+cospectral pair) are in `docs/RECEIVER_HOLARCHY.md`, "The causal chord". It is receiver **R1** of
 `docs/plans/THE_RECEIVER_ATLAS_SEPARATES_WHAT_ONE_FACE_CANNOT.md` and it formalizes the rate-form
 algebra of `research/records/2026-09-15_INTEGRATING_AND_DIFFERENTIATING_ROLES_SHARE_ONE_CURRENT.md`
 §"The critical seam is the `Sigma_G = 0` case". Three things are stated here, in this order.
@@ -76,10 +80,11 @@ exactly the dropped hypothesis this file exists to name.
 [proved-derived; formal-checked] **The atlas.** `spectrum_does_not_determine_response` exhibits two
 linearizations over `ℚ` with the same characteristic polynomial `X²` and different numerators: this
 is the plan's governing correction, that isospectral objects exist and identity is carried by the
-organized family of responses under admitted probes, not by one global spectrum. The Rust owner's
-`separate_under_probe` exhibits the same phenomenon on a genuine pair of Laplacian-cospectral
-non-isomorphic graphs on six vertices, separated at thirty-two of the thirty-six probe/readout
-pairs; the 2×2 witness here is the minimal one a kernel can check.
+organized family of responses under admitted probes, not by one global spectrum. The retired Rust
+owner's `separate_under_probe` exhibited the same phenomenon on a genuine pair of
+Laplacian-cospectral non-isomorphic graphs on six vertices, separated at thirty-two of the
+thirty-six probe/readout pairs (the pair and its numerators are kept in `docs/RECEIVER_HOLARCHY.md`);
+the 2×2 witness here is the minimal one a kernel can check.
 `full_atlas_determines_the_operator_fin_two` is the positive counterpart at `Fin 2`: the
 *complete* probe/readout atlas — every entry of `adjugate (charmatrix A)`, which is the numerator
 for every pair of coordinate probe and coordinate readout — does determine the operator. It is
@@ -87,7 +92,8 @@ stated and proved at `Fin 2` only; the general statement is true but needs the c
 of `adjugate (charmatrix A)` in degree `n − 2`, which is not done here, and the name records the
 restriction.
 
-Rust owner: `crates/holonics/src/receiver/causal_chord.rs`
+Retired Rust owner ([history at `c10acca9`](https://github.com/brandonrdug/holonics/blob/c10acca9/crates/holonics/src/receiver/causal_chord.rs)):
+`crates/holonics/src/receiver/causal_chord.rs`
 (`Linearization` ↔ `Linearization`; `transfer_function` and `TransferFunction` ↔ `numerator`,
 `denominator`, `transfer`, `denominator_smul_transfer_eq_numerator`; `ResolventExpansion` ↔
 `resolvent_identity`; `causal_chord` and `CausalChord` ↔ `rebase_transfer`; `pole_atlas` and
