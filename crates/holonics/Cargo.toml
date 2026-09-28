@@ -41,14 +41,6 @@ path = "../../research/notebook/hnn_design/hnn_diagnose.rs"
 name = "hnn_landmark"
 path = "../../research/notebook/hnn_design/hnn_landmark.rs"
 
-# The notebook's measurement of the Born receiver (the Born face) against and beside the landmark
-# tree on the standing real cut: the register-width sweep on the development cells, the mixture,
-# and one held-out pass when a member codes below the tree (research/notebook/hnn_design/README.md):
-# a measurement run once in release, never a test.
-[[example]]
-name = "hnn_born"
-path = "../../research/notebook/hnn_design/hnn_born.rs"
-
 # The notebook's first receipts on terrain a declared Holarchy made (`holarchy::terrain`: a tree
 # source and a moiré, each with its exact truth; research/notebook/hnn_design/README.md): count-only
 # development receipts run once in release, never a test.

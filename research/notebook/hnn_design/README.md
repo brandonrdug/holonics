@@ -433,10 +433,14 @@ a build with overflow checks reproduced every reading. A digit costs, `Dyadic`: 
 39664` µs at `χ = 16`, `365 rem 14640 over 39664` µs at `χ = 128`, `1253 rem 22008 over 39664` µs
 at `χ = 256` (`Position` `1175 rem 6800 over 39664`); the harness took 168,717 ms.
 
+Retired September 28, rejected: `hnn::born`, its tests and `hnn_born.rs` run at
+[`2d34b819`](https://github.com/brandonrdug/holonics/tree/2d34b819/research/notebook/hnn_design/hnn_born.rs).
+Lean `HNN/BornFace` keeps the mathematics.
+
 `exterior.rs` is the notebook's shared exterior boundary: the cut file and its manifest
 (`read_cut`, `manifest_number`), the process's resident set (`resident_set`, read from the
 kernel's status for the `wide` mode's receipt) and the exact presentation of
-readings. `hnn_exposure`, `hnn_diagnose`, `hnn_landmark`, `hnn_born` and `hnn_curated` include it by `#[path]`.
+readings. `hnn_exposure`, `hnn_diagnose`, `hnn_landmark` and `hnn_curated` include it by `#[path]`.
 
 `field.py` is the exact reference of the revised tick: the junction Swing (a parallel adaptor), the
 Cayley ring element with its passive part `W_s` and its contrast port `W_c` driving inside the
