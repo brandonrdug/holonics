@@ -327,9 +327,11 @@ Use [retractions](../../docs/RETRACTIONS.md), the
 [portable source evidence](2026-09-06_REPOSITORY_SYNTHESIS_AND_PORTABLE_EVIDENCE.md) when a capability
 claim or older implementation is in question. The
 [evidence protocol](https://github.com/brandonrdug/holonics/blob/13f8c734/docs/AGENT_PROTOCOL.md)
-(history) gives original-message coordinates and provider codecs. A later agent summary is not the
-original human request or a substitute for the changed source.
+(history) gives original-message coordinates and provider codecs; `tools/human_messages.py` prints
+Brandon's messages today. A later agent summary is not the original human request or a substitute
+for the changed source.
 
+- [The work read from its conversations and history converges where acceptance is fixed before the claim](2026-09-27_THE_WORK_READ_FROM_ITS_CONVERSATIONS_AND_HISTORY_CONVERGES_WHERE_ACCEPTANCE_IS_FIXED_BEFORE_THE_CLAIM.md) (#63, #148): how Brandon, Claude and Codex have worked (Brandon's 907 messages outside the evaluation window, 1640 commits, the laboratory lineage): what he asks for, the corrections and repeated asks, every Athena milestone and what became of it, what worked, the habits ranked by their weight on a working product, and the practice adopted (`tools/human_messages.py`, short loops with the claim fixed first, lenses joined without resetting the plan).
 - [Lessons from the workbench and Athena prototypes](2026-09-24_LESSONS_FROM_THE_WORKBENCH_AND_ATHENA_PROTOTYPES.md): what the retired `holonics` CLI and Athena examples achieved and failed at, with evidence, and ten requirements for any rebuilt application.
 
 ## Maintaining a route

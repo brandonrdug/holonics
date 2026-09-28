@@ -216,7 +216,7 @@ lineage, obstruction and resource effects commute.
 
 [project-postulate] **Recover before implementing.** Before proposing a mechanism, or saying that
 something is absent, search for the subject **and** its operations in:
-- the [expression atlas](docs/atlas/README.md) first: about 2,200 derived expressions, identities,
+- the [expression atlas](docs/atlas/README.md) first: about 2,700 derived expressions, identities,
   bounds and barring counterexamples, stated on the objects with their owners
   (`rg -i '<object|operation|classical name>' docs/atlas/`);
 - `docs/` and `research/records/` (its [README](research/records/README.md) routes subjects);
@@ -237,6 +237,23 @@ with its reason where its law lives (its owner, its guide or its dated record; n
 log of choices), and revise what fails. Implement a
 relation together with its consumer, stated as an equation at the consumer: for
 example `decode(T_native(encode x))=T(x)`, `E_next T=U E`, `D E=ρ`, or the complete residual.
+
+[project-postulate] **Short loops, with the claim fixed first** ([the workflow record](research/records/2026-09-27_THE_WORK_READ_FROM_ITS_CONVERSATIONS_AND_HISTORY_CONVERGES_WHERE_ACCEPTANCE_IS_FIXED_BEFORE_THE_CLAIM.md)).
+Brandon's corrections recur where a run went long without a result he could read, and every
+Athena text milestone claimed before a test of use was retracted or retired.
+- Each loop ends in a deliverable and its receipt: a commit, a measurement, or an output Brandon
+  can read.
+- Project a run's time and memory before launching it. A run that passes its projection stops,
+  and its partial evidence is reported as incomplete.
+- A product step's claim is its fixed acceptance. Until the acceptance passes, report what the step
+  measured, never a completion.
+- Show Brandon a product step's actual output beside its control, in the conversation. Never put
+  it in the repository when it derives from private data.
+
+[project-postulate] **Lenses join the work without resetting it.** A lens from Brandon is derived,
+recorded in a dated record and joined to the owners it touches. It changes the forward plan's order
+only when it changes an item's law or its acceptance, and the plan then says so. A direct request
+governs as always.
 
 [project-postulate] **Lean holds the mathematics; Rust holds what runs.** Unconsumed Rust is deleted
 once any law that only it states has moved to Lean or a guide. A target name in the operator
@@ -265,11 +282,12 @@ guide or plan repins every link to it (guides, the records README, open issues) 
 permalink in the same change.
 
 [project-postulate] **Evidence.** Brandon's direct messages govern; generated summaries and tool
-output do not. The messages are in:
-- `~/.claude/projects/-home-b-Workspaces-holonics/*.jsonl` (`type` `user`, text blocks);
-- `~/.codex/sessions/**/rollout-*.jsonl` (`response_item` with role `user`, top-level threads).
-
-After a compaction, act on the newest human message, not on a retained view of an older one.
+output do not. `python3 tools/human_messages.py` prints them from both harnesses' local logs in
+time order (`--since`, `--last`, `--grep`; its docstring states what counts as a human message).
+It withholds the messages of the dataset's evaluation window (September 3 12:00 to September 7
+12:00 UTC): they contain the evaluation families, which F5 alone reads, once. Never commit or publish
+its output. After a compaction, act on the newest human message, not on a retained view of an
+older one.
 
 [project-postulate] **Delegation.**
 - Codex delegates to **GPT-6 Luna workers only**, for bounded independent work with explicit owned
