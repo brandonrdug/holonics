@@ -158,8 +158,15 @@ the wide cut and the curated cut.
 - **Gates before the evaluation partition opens.** The pinned retrospective requests and the
   restart check pass on development.
 - **Evaluation, once.** On every eligible evaluation request, Athena releases before its recorded
-  reply is read. A frozen, blind rubric judges the releases: Brandon on a declared sample, or an
-  independent judge whose model and prompt are pinned before the split is read.
+  reply is read. **Brandon judges** (September 27: "I'd want to do it"), blind, under a rubric
+  frozen before the split is read.
+  - For each request he sees two responses side by side in a hash-seeded random order, Athena's
+    and the retrieval control's, with nothing that names their source.
+  - He marks each response as answers, justified refusal, or fails, and marks which of the two is
+    better or that they tie.
+  - The judging surface shows him the request, its declared context and the two responses, and
+    nothing private beyond what he already owns.
+  - The unblinding key is written after his marks are committed.
 - **Acceptance.**
   - More than half of the outputs answer, or justifiably refuse; an answerable refusal counts as a
     failure.
