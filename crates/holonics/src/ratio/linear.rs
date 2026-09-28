@@ -785,6 +785,18 @@ impl ExactRatMatrix {
         self.kernel_basis_from_reduced(&reduced, &pivots)
     }
 
+    /// [`Self::kernel_basis`] together with the exact work of the reading that returned it (the
+    /// certified one's machine-word work, or the rational reduction's).
+    pub(crate) fn kernel_basis_with_work(
+        &self,
+    ) -> Result<(Vec<Vec<Rat>>, crate::ratio::work::ExactWork), ExactLinearError> {
+        if let Some(certificate) = self.certified_reading() {
+            return Ok((certificate.kernel().to_vec(), certified_work(&certificate)));
+        }
+        let (reduced, pivots, work) = self.reduced_row_echelon()?;
+        Ok((self.kernel_basis_from_reduced(&reduced, &pivots)?, work))
+    }
+
     fn kernel_basis_from_reduced(
         &self,
         reduced: &Self,

@@ -17,6 +17,8 @@
 //! cargo run --release -p holonics --example hnn_population -- composition [products | primes]
 //! cargo run --release -p holonics --example hnn_population -- evolution
 //! cargo run --release -p holonics --example hnn_population -- species
+//! cargo run --release -p holonics --example hnn_population -- birth-probe
+//! cargo run --release -p holonics --example hnn_population -- birth
 //! cargo run --release -p holonics --example hnn_population -- curated .local/cuts/curated-cut.bin .local/cuts/curated-flat-cut.bin
 //! cargo run --release -p holonics --example hnn_population -- f0-census .local/cuts/curated-f4-passage-cut.bin
 //! cargo run --release -p holonics --example hnn_population -- u2-acceptance .local/cuts/curated-u2-passage-cut.bin .local/cuts/curated-u2-passage-flat-cut.bin
@@ -85,6 +87,9 @@ mod census;
 
 #[path = "hnn_population_u2.rs"]
 mod u2;
+
+#[path = "hnn_population_birth.rs"]
+mod birth;
 
 use std::time::Instant;
 
@@ -1318,6 +1323,8 @@ fn main() {
         ["composition", which] => composition::harness(Some(which)),
         ["evolution"] => evolution::evolution(),
         ["species"] => evolution::species(),
+        ["birth"] => birth::harness(),
+        ["birth-probe"] => birth::probe(),
         ["curated", curated_cut, flat_cut] => {
             curated::harness(curated_cut, flat_cut, curated::Reach::Whole);
         }

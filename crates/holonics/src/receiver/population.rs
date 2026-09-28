@@ -120,6 +120,17 @@
 //! `reseed`), else the next declared candidate. The prior of every founding is declared, never tuned
 //! on the cells. [open] Owed (#62): the specialists' telescope of the abstaining newborn in Lean.
 //!
+//! [proved-derived; formal-checked] **Residual-founded transport discovery** ([`birth`]; Lean
+//! `Compression/Landmark/Context/Birth`; the learner record's §14.1). With the admitted transports
+//! `T_a` of a finite chart known, a reached covector `λ_r` the held forms do not contain (the
+//! reception's comparison pulled back through the coupling's adjoint, `λ_r = ρ*κ`) is closed under the
+//! adjoints, `V_(n+1) = V_n + Σ_a T_a* V_n`, within `d − dim V₀` strict steps, and a basis of the
+//! stable rung gives `E T_a = U_a E` and `D E = ρ`, checked exactly ([`Closure`]). The family founded
+//! on it ([`FoundedFamily`]) filters the chart's states carried in the founded chart, and is born from
+//! the reserved mass at the receiver's section ([`SectionFounding`]), its declaration charged once in
+//! its description. It constructs an observable transport representation; it infers no unknown
+//! transport.
+//!
 //! [proved-derived; measured] **The parity class locates one word, not one rate** ([`families`]
 //! module header): its survivors are one species wider than a gauge orbit.
 //!
@@ -248,6 +259,7 @@
 //! | `Compression/Landmark/Context/Population.{certified_inverseCDF_class, certified_draw_is_released_at_zero_tolerance, plural_draw_is_held}` | `receiver::release::draw`, read by [`Population::select_family`] and [`Population::release_response`] |
 //! | `Compression/Landmark/Context/Dormancy.{forward_dominance_nonneg, dormant_survivor_code, layer_survivors, productKernel_stochastic, productKernel_path}` | [`Dormancy`], [`DormantFamily`] |
 //! | `Compression/Landmark/Context/Dormancy.{share_path_code, stay_code_le, share_path_code_le}` | the declared rate `α = 2^(−j)` of [`Dormancy::new`] |
+//! | `Compression/Landmark/Context/Birth.{opening_finrank, ladder_stable_forever, strict_steps_le_chart, ladder_stabilizes, founded_invariant, founded_le, exists_transport_matrices, founding_intertwines, encode_reads}` | [`Closure`] (the ladder, its rungs and `U_a`, checked `E T_a = U_a E`; `D E = ρ` by [`Closure::readout`]), [`FoundedFamily`], [`TransportBirth`], [`SectionFounding`] |
 //! | owed (#62): the abstaining newborn's telescope | [`Population::found`], [`Population::refound`] |
 //! | `Compression/Landmark/Context/Composition.{composedFace_received, composedFace_nonneg, composedFace_sum_one, composedFace_pos, composed_telescope}` | [`Composed`] (its face and its likelihood) |
 //! | `Compression/Landmark/Context/Composition.{chain_rule, chain_rule_of_species}` | [`Composed`]'s code over a keystone's keys; [`PortedEmitters`] under `KeyFamily` (a deterministic reader: `log₂ \|K_A\| − log₂ #S`) |
@@ -266,6 +278,7 @@
 
 pub mod admitted;
 pub mod arithmetic;
+pub mod birth;
 pub use checkpoint::{
     AdmittedMemberManifest, PopulationCheckpointError, PopulationMemberManifest, TreeMemberManifest,
 };
@@ -284,6 +297,8 @@ pub mod releasing;
 pub mod species;
 pub mod text_release;
 
+#[cfg(test)]
+mod birth_tests;
 #[cfg(test)]
 mod composition_tests;
 #[cfg(test)]
@@ -306,6 +321,9 @@ pub use admitted::{
     RelationKind, StageReadout, odds_class,
 };
 pub use arithmetic::{CarryEgg, Counter, RecordClock, Sieve, SieveFace};
+pub use birth::{
+    BirthError, Closure, Founded, FoundedFamily, FoundingReceipt, SectionFounding, TransportBirth,
+};
 pub use boundary::{
     BYTE_VALUES, BoundaryEgg, BoundaryReadout, Hazard, HazardCell, HazardComparison,
     HazardPartition, HazardRest, LastByte, PartClock, PartPort, byte_index, dyadic_class,
@@ -397,6 +415,15 @@ pub enum PopulationError {
     /// The one decision law's refusal (`receiver::release`). Boxed: its refusals are wide.
     #[error(transparent)]
     Release(Box<WidthRefusal>),
+    /// A founding's refusal ([`birth`]). Boxed: its refusals are wide.
+    #[error(transparent)]
+    Birth(Box<birth::BirthError>),
+}
+
+impl From<birth::BirthError> for PopulationError {
+    fn from(error: birth::BirthError) -> Self {
+        Self::Birth(Box::new(error))
+    }
 }
 
 impl From<WidthRefusal> for PopulationError {
@@ -1258,6 +1285,9 @@ pub enum Act {
     Decide(SieveFace),
     /// A stage counted in a cell of a declared partition (the boundary egg's hazard law).
     Count,
+    /// A founded family's class of chart states advanced by its founded transport `U_a`
+    /// (`birth`).
+    Transport,
 }
 
 /// [definition; agent-inferred] **A family's work** (module header, "Maintenance work"): exact
