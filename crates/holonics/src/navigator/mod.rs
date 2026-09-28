@@ -33,8 +33,7 @@
 //! ([`Navigator::rotor`], `mapRotor_order`).
 //!
 //! The submodules carry the navigator's words: [`address`] (Stern–Brocot addresses and lock
-//! addresses), [`trace`] (trace faces and the dynamical zeta of a machine of sites) and
-//! [`reflection`] (the reflective continuation, whose codec can be revised mid-passage).
+//! addresses) and [`trace`] (trace faces and the dynamical zeta of a machine of sites).
 //!
 //! | Lean | Rust |
 //! |---|---|
@@ -59,7 +58,6 @@ use crate::ratio::linear::vector::{add, at, matrix, scale};
 use crate::ratio::rat;
 
 pub mod address;
-pub mod reflection;
 pub mod trace;
 
 /// [definition] **A clock**: a positive step `h` per tick and a tick odometer whose overflow is the

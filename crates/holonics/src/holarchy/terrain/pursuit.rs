@@ -428,7 +428,7 @@ impl Candidate {
                 Ok(Self {
                     index,
                     law: Arc::new(CandidateLaw {
-                        caps: runner.constitution.caps(arena.declaration())?,
+                        caps: runner.law.caps(arena.declaration())?,
                         runner,
                     }),
                     state: RunnerState::opening(arena, opening)?,
@@ -629,10 +629,7 @@ pub struct ChaseView<'a> {
 impl ChaseView<'_> {
     /// **The chaser's traction-admitted motions** at the tick.
     pub fn admitted(&self) -> Result<Vec<Motion>, TerrainError> {
-        let caps = self
-            .pursuer
-            .constitution
-            .caps(self.ports.arena.declaration())?;
+        let caps = self.pursuer.law.caps(self.ports.arena.declaration())?;
         let disk = Moves::within(caps.top())?;
         self.pursuer
             .motions(&self.ports.arena, &disk, &caps, &self.chaser)
@@ -790,8 +787,8 @@ pub fn act<C: Chaser>(
         )
         .into());
     }
-    if pursuer.constitution.speed >= runner.constitution.speed
-        || pursuer.constitution.traction <= runner.constitution.traction
+    if pursuer.law.speed >= runner.law.speed
+        || pursuer.law.traction <= runner.law.traction
         || !pursuer.stops(&arena_declaration)?
     {
         return Err(refuse(
@@ -801,8 +798,8 @@ pub fn act<C: Chaser>(
         .into());
     }
     let moves = family.moves(&arena_declaration)?;
-    let caps = runner.constitution.caps(&arena_declaration)?;
-    let chaser_caps = pursuer.constitution.caps(&arena_declaration)?;
+    let caps = runner.law.caps(&arena_declaration)?;
+    let chaser_caps = pursuer.law.caps(&arena_declaration)?;
     let disk = Moves::within(chaser_caps.top())?;
     let mut state = RunnerState::opening(&arena, runner_start)?;
     let ports = Arc::new(ChasePorts {

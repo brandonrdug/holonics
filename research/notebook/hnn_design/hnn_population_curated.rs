@@ -20,7 +20,7 @@
 //! same cells as comparison hazards (they enter no face), so each hazard's difference is exact on one
 //! passage. The learned partition's description is charged to the curated stream beside the sweep.
 //!
-//! [definition; agent-inferred] **The cut** is `curated_source.py`'s pinned cut (`hnn_curated`'s):
+//! [definition; agent-inferred] **The cut** is `curated_source.py`'s pinned cut (the retired `hnn_curated`'s):
 //! the section chart `256 + 12` (`SectionChart::curated`), `n* = 2^20`, the final eighth held out,
 //! and its flat twin, the same bytes with every letter removed. **Its declared relations** are
 //! `curated_incidence.py`'s (`curated-cut.incidence.bin` beside the cut): each response's request
@@ -123,7 +123,7 @@ pub(super) const TYPED_DEPTHS: [usize; 2] = [6, 12];
 /// The letter tree's depth (chosen on development among the probed, charged below).
 const LETTER_DEPTH: usize = 12;
 
-/// The flat tree's recorded depth (the typed reader's development sweep, `hnn_curated`).
+/// The flat tree's recorded depth (the typed reader's development sweep, the retired `hnn_curated`).
 pub(super) const FLAT_DEPTH: usize = 48;
 
 /// The copy stage's law (the least located length, the length classes, the odds classes a side),
@@ -298,8 +298,8 @@ pub(super) fn curated_population(
     Ok((Population::new(declared)?, egg_index, manifest))
 }
 
-/// The declared families of [`curated_population`], unmixed (F0's second candidate mixes them
-/// node-locally, `hnn_population_local.rs`), with the admitted egg's index and the manifest.
+/// The declared families of [`curated_population`], unmixed, with the admitted egg's index and the
+/// manifest.
 #[allow(clippy::type_complexity)]
 pub(super) fn curated_families(
     chart: SectionChart,

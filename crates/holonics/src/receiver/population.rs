@@ -114,8 +114,8 @@
 //! ```
 //!
 //! so the population's code does not move at a birth and the newborn pays its charge once. The
-//! trigger ([`Founding`]) is the population's residual: at the receiver's section every `epoch`
-//! cells, when the code paid since the previous section passes a founding's charge (the opening
+//! trigger ([`Founding`]) is the population's residual: at the receiver's section every
+//! `section_period` cells, when the code paid since the previous section passes a founding's charge (the opening
 //! section only opens the reading), the most recently dead family's seed is re-founded (with
 //! `reseed`), else the next declared candidate. The prior of every founding is declared, never tuned
 //! on the cells. [open] Owed (#62): the specialists' telescope of the abstaining newborn in Lean.
@@ -199,14 +199,6 @@
 //! partition learned this way on the development cells ([`learn_hazard_partition`]: the last-byte
 //! classes, then the ports' shared counts, each adopted where its complete code falls).
 //!
-//! [proved-derived; formal-checked] **A family wins where it is closest** ([`local`]; Lean
-//! `Population.{local_telescope, local_mixture_code, local_of_constant}`; THE_REBUILD F0, candidate
-//! 2). The local mixture ([`LocalMixture`]) is a family whose members are families: it keeps each
-//! member's posterior at each gating context (the last `d` cells) and mixes their faces under the
-//! posterior of the context the receiver is in. Its faces telescope context by context, so it codes
-//! within `Σ_(c met) (min_f code_f(c) + log₂ M)` under the uniform prior, and one context is the
-//! population's whole-passage Bayes.
-//!
 //! [definition; agent-inferred] **Maintenance work** ([`Work`], [`Act`]). Beside a family's
 //! description and code its receipt reports the work it has spent, as exact counts of what it
 //! executed: a key family's emissions read against received cells, a dormant family's states read
@@ -255,7 +247,6 @@
 //! | `Compression/Landmark/Context/Tree.{ktFace, ktFace_pos, ktFace_sum}` (over `{byte, letter}`) | [`Hazard`] |
 //! | `Compression/Landmark/Context/Composition.{stagedFace_nonneg, stagedFace_sum_one}` at each tick's `σ_t`, `{staged_chain_rule, staged_code}` at `σ = id` | [`AdmittedEgg`] (the copy stage over the inner egg, [`StageReadout`]) |
 //! | `Compression/Landmark/Context/Tree.{ktFace, ktFace_pos, ktFace_sum}` (over `{miss, copy}`, the pointer's sides) | [`CopyStage`], [`PointerReadout`] |
-//! | `Compression/Landmark/Context/Population.{ctxLik_succ, ctxTotal_pos, ctxTotal_succ_same, ctxTotal_succ_other, localFace_eq, ctxTotal_unmet, local_telescope, local_mixture_code, local_of_constant}` | [`LocalMixture`] (node-local Bayes over a gating ladder; the bound in [`RungReceipt`]) |
 //! | `Compression/Landmark/Context/Merge.{merge_cost_iff, merge_cost_mass_iff, merge_cost_nat}` | [`Blocks::price`] (accepted exactly when `P·W < P′·W′`) |
 //! | `Compression/Landmark/Context/Merge.{restaurant_found, restaurant_join, restaurant_step_sum, restaurant_merge_ratio, restaurant_merge_ratio_ge_two}` | [`restaurant_ratio`], [`Blocks::description_bits`] |
 //! | `Compression/Landmark/Context/Merge.{expand_merge, expansion_sum, mergedFace_isPrior}` | [`Blocks`] (a block's pooled counts; every member's seed, [`Blocks::split`]) |
@@ -277,15 +268,12 @@ pub mod evolution;
 pub mod families;
 pub mod family_release;
 pub mod health;
-pub mod local;
 pub mod merge;
 pub mod provenance;
 pub mod releasing;
 pub mod sampling;
-pub mod sectioned_words;
 pub mod species;
 pub mod text_release;
-pub mod words;
 
 #[cfg(test)]
 mod composition_tests;
@@ -298,21 +286,15 @@ mod future_branch_tests;
 #[cfg(test)]
 mod health_tests;
 #[cfg(test)]
-mod local_tests;
-#[cfg(test)]
 mod provenance_tests;
 #[cfg(test)]
 mod releasing_tests;
 #[cfg(test)]
 mod sampling_tests;
 #[cfg(test)]
-mod sectioned_words_tests;
-#[cfg(test)]
 mod tests;
 #[cfg(test)]
 mod text_release_tests;
-#[cfg(test)]
-mod words_tests;
 
 pub use admitted::{
     AdmittedEgg, AdmittedReadout, CopyCell, CopyLaw, CopyStage, PointerReadout, Relation,
@@ -336,7 +318,6 @@ pub use health::{
     PopulationReceivingFaceHealth, PopulationReceivingFaceHealthError,
     population_receiving_face_health,
 };
-pub use local::{LocalMixture, RungReceipt};
 pub use merge::{
     Blocks, Item, KtTables, MergeReceipt, PartitionReceipt, Price, learn_hazard_partition,
     restaurant_ratio,
@@ -344,16 +325,11 @@ pub use merge::{
 pub use provenance::{FaceContribution, MissingProducerTerm};
 pub use releasing::{PopulationRelease, ReleaseRefusal};
 pub use sampling::{CertifiedClass, CrossingBounds, SamplingError, select_class};
-pub use sectioned_words::SectionedWordFamily;
 pub use species::{
     AdmittedFuture, Collapse, FactorSpecies, KeystoneMember, KeystoneSpecies, Seed, Species,
 };
 pub use text_release::{
     TextAppend, TextDecoder, TextRelease, TextReleaseError, TextSeparator, verify_scored_text_path,
-};
-pub use words::{
-    EncodingSeparator, EncodingSquare, ParseError, SegmentationLattice, SeparatorCause, WORD_END,
-    WordDictionary, WordFamily, WordReadout,
 };
 
 use std::collections::BTreeMap;
@@ -516,7 +492,6 @@ pub enum Readout<'a> {
     Standing(&'a Landmarks),
     Boundary(Box<BoundaryReadout>),
     Admitted(Box<AdmittedReadout>),
-    Words(WordReadout),
 }
 
 /// [definition] **A declared navigator family** (module header): a candidate egg read by the
@@ -1602,13 +1577,13 @@ pub struct Candidate {
 pub type FoundFamily = Box<dyn FnMut(usize) -> Result<Box<dyn Family>, PopulationError> + Send>;
 
 /// [definition; agent-inferred] **The founding trigger** (module header, "Birth from reserved
-/// mass"): the receiver's section every `epoch` cells; at a section whose residual (the code the
+/// mass"): the receiver's section every `section_period` cells; at a section whose residual (the code the
 /// population paid since the last section) passes a founding's charge, it is founded from the
 /// reserved mass: with `reseed`, first the most recently dead family's seed (half the reserved
 /// mass), then the next declared candidate (its description). The opening section only opens the
 /// reading: it pays the declared families' own key location.
 pub struct Founding {
-    pub epoch: usize,
+    pub section_period: usize,
     pub candidates: Vec<Candidate>,
     pub reseed: bool,
 }
@@ -1717,7 +1692,7 @@ impl Population {
     /// **Declare the founding trigger** (module header, "Birth from reserved mass"); refused at an
     /// empty section, or when the candidates' masses pass the reserved mass.
     pub fn with_founding(mut self, founding: Founding) -> Result<Self, PopulationError> {
-        if founding.epoch == 0 {
+        if founding.section_period == 0 {
             return Err(refuse(
                 "a founding trigger",
                 "its section holds at least one cell",
@@ -2281,10 +2256,14 @@ impl Population {
 
     /// The founding trigger at a section (module header, "Birth from reserved mass").
     fn found_at_section(&mut self) -> Result<Option<BirthReceipt>, PopulationError> {
-        let Some(epoch) = self.founding.as_ref().map(|founding| founding.epoch) else {
+        let Some(period) = self
+            .founding
+            .as_ref()
+            .map(|founding| founding.section_period)
+        else {
             return Ok(None);
         };
-        if self.cells % epoch != 0 {
+        if self.cells % period != 0 {
             return Ok(None);
         }
         let code = self.code()?;

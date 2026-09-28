@@ -3,7 +3,7 @@
 //! `H = (K, ∂_A; Π; 𝒟; 𝓔; G; π)` ([object](../../../../docs/ELEMENTARY_OBJECTS.md#the-holon-as-one-object)):
 //! the complex with its connection ([`crate::geometry::complex`]), ports ([`port`]), the Dirac
 //! structure ([`dirac`]), element relations ([`element`], with [`deposition`] the only law that
-//! changes them and [`reaction`] the learned power-neutral part), navigators
+//! changes them), navigators
 //! ([`crate::navigator`]) and restrictions ([`restriction`]). The law is [`law`]; [`conformance`]
 //! holds the checks every Holon implementation passes. The two cells of the field are the helical
 //! pair [`contact`] (slips, dissipates, addresses) and the ring [`parametron`] (stores,
@@ -53,7 +53,6 @@ pub mod element;
 pub mod law;
 pub mod parametron;
 pub mod port;
-pub mod reaction;
 pub mod restriction;
 
 use std::sync::{Arc, OnceLock};

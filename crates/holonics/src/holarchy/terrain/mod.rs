@@ -57,7 +57,6 @@ pub mod moire;
 pub mod pursuit;
 pub mod source;
 pub mod switching;
-pub mod words;
 
 #[cfg(test)]
 mod chase_tests;
@@ -65,13 +64,10 @@ mod chase_tests;
 #[cfg(test)]
 mod tests;
 
-#[cfg(test)]
-mod words_tests;
-
 pub use chase::{
     ARENA_SIDE_LIMIT, Arena, ArenaDeclaration, Caps, Chase, ChasePorts, ChaseTruth, ChaserPort,
-    Constitution, Futures, Letter, MOVE_CAP_LIMIT, Motion, Moves, Policy, Pursuer, Replay, Runner,
-    RunnerFamily, RunnerState,
+    Evasion, Futures, Letter, MOVE_CAP_LIMIT, Motion, Moves, Pursuer, Replay, Runner, RunnerFamily,
+    RunnerLaw, RunnerState,
 };
 pub use crib::{CribTruth, RotorCrib, rotor_crib};
 pub use moire::{Grating, Moire, MoireClass, MoireFamily, MoireTruth, PairLock};
@@ -84,7 +80,6 @@ pub use source::{
     ContextTree, Passage, Recovery, TreeSource, TreeSourceFamily, TreeSourceTruth, WeightingBound,
 };
 pub use switching::{AeonFamily, SwitchTruth, Switching};
-pub use words::{WordPassage, WordTerrain, WordTerrainFamily, WordTerrainTruth, WordVocabulary};
 
 use thiserror::Error;
 

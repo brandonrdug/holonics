@@ -1699,8 +1699,8 @@ fn gram_sum<'a>(n: usize, terms: impl IntoIterator<Item = (&'a Rat, &'a Chart)>)
 /// operand with a large one. It is read by Euclid's remainder first (`crate::ratio::gcd`), which
 /// costs the large operand's size once; the binary `gcd` behind `Ratio`'s product halves the large
 /// operand a bit at a time, paying its full size on every step. The value is `Ratio`'s (receipt:
-/// the equality run of `hnn_lattice_growth`, which recomputes every factor update as `Ratio`'s
-/// product, [`NormalLaw::deposited`]).
+/// the equality run of the notebook's `hnn_lattice_growth`, retired at `2d34b819`, which
+/// recomputed every factor update as `Ratio`'s product, [`NormalLaw::deposited`]).
 fn rate_times(rate: &Rat, value: &Rat) -> Rat {
     if rate.is_zero() || value.is_zero() {
         return Rat::zero();
@@ -2112,7 +2112,7 @@ fn splitmix(state: u64) -> u64 {
     z ^ (z >> 31)
 }
 
-/// **The declared sign generator** (design (d), campaign 1's declared values): entry `(i, j)` of
+/// **The declared sign sequence** (design (d), campaign 1's declared values): entry `(i, j)` of
 /// locus `ℓ` is `+1` when the low bit of `SplitMix64` over `(0, ℓ, i, j)` is set, `−1` otherwise,
 /// the tuple folded as `z ← splitmix(z ⊕ x)` from `z = splitmix(0)`.
 pub fn declared_sign(locus: u64, i: u64, j: u64) -> Rat {
@@ -2123,7 +2123,7 @@ pub fn declared_sign(locus: u64, i: u64, j: u64) -> Rat {
     if z & 1 == 1 { Rat::one() } else { -Rat::one() }
 }
 
-/// The locus codes of the sign generator: `kind · 2^40 + index · 2^20 + part`.
+/// The locus codes of the sign sequence: `kind · 2^40 + index · 2^20 + part`.
 fn locus_code(kind: u64, index: usize, part: usize) -> u64 {
     (kind << 40) + ((index as u64) << 20) + part as u64
 }
@@ -2145,8 +2145,8 @@ impl Constitution {
     ///
     /// | Locus | Initial value | Update |
     /// |---|---|---|
-    /// | `E_g` on a source ring | the sign generator times ½ | normal law, `H_0 = I`, `B_0 = E_0` |
-    /// | `E_g^(δ)`, rank `2d_g` | `e_ρ = 0`; `a_ρ`, `b_ρ` from the sign generator | factor steps |
+    /// | `E_g` on a source ring | the sign sequence times ½ | normal law, `H_0 = I`, `B_0 = E_0` |
+    /// | `E_g^(δ)`, rank `2d_g` | `e_ρ = 0`; `a_ρ`, `b_ρ` from the sign sequence | factor steps |
     /// | `R` on a receiving ring | 0 | normal law, `H_0 = I`, `B_0 = 0` |
     /// | the landmark tree on a receiving ring, declared from its first receiver | empty: every node unfounded, every face uniform (`α = ½` at first arrival) | the landmark deposit (the landmark tree) |
     /// | `W_c,g` | 0 | normal law, `H_0 = I`, `B_0 = 0` |
@@ -2155,18 +2155,18 @@ impl Constitution {
     /// | `q_g` | 0 (every sheet class `+1`) | the lock chart's preconditioned step |
     /// | `c_a`, `b_a`, `F_a` | `I`, `½I`, `½I` | factor steps |
     ///
-    /// The sign generator's locus codes: `E` of ring `g` is kind 0; the pair port's current and
+    /// The sign sequence's locus codes: `E` of ring `g` is kind 0; the pair port's current and
     /// earlier reads of ring `g` at the `o`-th declared offset are kind 2 and 3 with part `o` (kind
-    /// 1 was `R`'s while it opened at the sign generator, the region table).
+    /// 1 was `R`'s while it opened at the sign sequence, the region table).
     ///
-    /// [definition; agent-inferred] **`R_0 = 0`, `E_0` the sign generator times ½.** The receiving
+    /// [definition; agent-inferred] **`R_0 = 0`, `E_0` the sign sequence times ½.** The receiving
     /// map opens at zero, so the combined face opens exactly at the tree's and the wave earns every
     /// bit it moves: the located failure read the old prior's reading `R_0 z` alone at `10 + 9/16 +
     /// ε` bits a cell, a share in `[51/56, 3713/4077]` of the held-out logits' energy. With `E_0 = 0`
     /// and `e_ρ = 0` as well, the source moment `m̃`, the open, every wave and every feature
     /// `f = P_R^(τ_R) v_R` would be zero, so `R`'s step `G = Σ γ g fᵀ` and every upstream covector
     /// `Rᵀ g` would vanish at every commit: the chain of maps needs one nonzero member to carry a
-    /// covector. `E_0` takes the sign generator's pattern at the value `R_0` had. Its normal law keeps
+    /// covector. `E_0` takes the sign sequence's pattern at the value `R_0` had. Its normal law keeps
     /// the prior's reading (`B_0 = E_0`), a fixed feature map that `R` reads, not a term of the
     /// face: at `R = 0` it moves no logit. `R` moves at the first deposit, and the upstream loci
     /// receive a covector from the second compare on (the tests
@@ -2393,8 +2393,7 @@ impl Constitution {
     ///
     /// **A complex-bilinear block is refused at declaration** (design (d), "Reaction"): a reaction
     /// slice is declared only through its factor pair `(u_ρ, v_ρ)`, so `A_ρ = u_ρ v_ρᵀ − v_ρ u_ρᵀ` is
-    /// skew and workless, the owner's real-bilinear reaction (`holon::reaction`,
-    /// `Holon/Reaction.skewReaction_workless`). A full block `c ⊗ s` has no declaration, since no
+    /// skew and workless, the real-bilinear reaction (`Holon/Reaction.skewReaction_workless`). A full block `c ⊗ s` has no declaration, since no
     /// such block is power-neutral for both `c` and `i c` unless it is zero
     /// (`Holon/Reaction.bilinear_reaction_workless_iff_zero`). The guarantee is structural, the
     /// parameter's type; the doctest fails with a type mismatch (`E0308`):

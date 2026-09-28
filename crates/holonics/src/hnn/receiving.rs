@@ -113,7 +113,6 @@
 //! | `HNN/RegionCounts.{combinedLogits, combined_face_pullback, combined_code_pullback}` | [`ReceivingRead::combined`], [`ReceivingPhases::combine`] |
 //! | `Compression/Landmark/Context/Tree.{unfounded_reads_prior, founded_tree_same_law, release_rule}` (the typed suffix address, kept whole by the collapse) | [`ActiveAddress`], [`ReceivingPhases::tree_faces`] |
 //! | `Compression/Landmark/Context/Tree.{sequential_mixture, sequential_mixture_bounds, sequential_mixture_executed}` (the two-face mixture stepped cell by cell, within one bit of the better face plus the chart's drift) | [`Mixture`] |
-//! | `Compression/Landmark/Context/LocalWeighing.{fixed_share, share_ratio_step, share_log_lipschitz, forward_executed}` (local weighing: the switching mixture across epochs, within `1 + k(−log₂ α) + (n − k)(−log₂(1 − α))` of every switching sequence, its drift carried through the contracting share) | [`Mixture::switching`] |
 //! | `Compression/Landmark/Context/Address.{bundle_causal, bundle_restrict, feature_scale_square, address_descends_retention, phase_partition_finite}` (the typed bundles read from the retained clock before the cell they predict) | [`LetterReader`], [`ActiveAddress`], [`clock_letters`] |
 
 use std::ops::Range;
@@ -946,28 +945,12 @@ fn grain_of(tolerance: &Rat) -> Result<u64, HnnError> {
 /// target, and the tree's face is stored, not pulled back; the mixture is scored on the host at
 /// compare, beside the tree read, on every realization.
 ///
-/// [definition; agent-inferred] **Switching across epochs** (local weighing, "across epochs";
-/// [`Mixture::switching`]; Lean `Compression/Landmark/Context/LocalWeighing.{fixed_share, share_ratio_step,
-/// forward_executed}`): the fixed-share mixture lets the weights move between epochs of the passage
-/// at a declared price a switch, the rate `α = 2^(−j)` on the dyadic ladder. After the likelihood
-/// step `β₊ = β q_T(x)/q̃_C(x)` the weights share, `λ' = (1 − α) λ₊ + α (1 − λ₊)`:
-///
-/// ```text
-/// β' = ((1 − α) β₊ + α)/((1 − α) + α β₊) = ((2^j − 1) β₊ + 1)/((2^j − 1) + β₊)
-/// L_model ≤ L_σ + 1 + k (−log₂ α) + (n − k)(−log₂(1 − α))    every switching sequence σ of k switches (ideal)
-/// ```
-///
-/// The share map is monotone and contracts `log β` (`share_log_lipschitz`), so the chart's drift is
-/// carried through it and a step adds only its own residuals, as the plain mixture's; the plain
-/// mixture is the rate `α = 0` (no share). [established-bounded; measured] On the standing cut's
-/// development cells the switching mixture of the tree and the Born `Dyadic` `χ = 256` face at
-/// `α = 2^(−7)` codes `−98 + 9/16 + ε` bits below the tree charged (the plain mixture `+1 + 0/16 + ε`
-/// above); held out it reads `+11 + 4/16 + ε` above (notebook `hnn_landmark -- … local`).
+/// The fixed-share switching law across epochs (Lean `Compression/Landmark/Context/LocalWeighing`)
+/// is realized by the population's dormant families (`receiver::population::Dormancy`), not here.
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct Mixture {
     beta: Beta,
     width: u64,
-    share: Option<u32>,
     rebases: u64,
     drift: Rat,
 }
@@ -1000,32 +983,9 @@ impl Mixture {
         Self {
             beta: Beta::ONE,
             width,
-            share: None,
             rebases: 0,
             drift: Rat::zero(),
         }
-    }
-
-    /// **The opening switching mixture** (local weighing, "across epochs"): `β = 1`, and after every
-    /// step the weights share at the rate `α = 2^(−j)` (rung `j` of the dyadic ladder). Refused
-    /// outside `1..=63` or past the carrier `W` (the share's `2^j − 1` is carried exactly).
-    pub fn switching(width: u64, rung: u32) -> Result<Self, HnnError> {
-        if rung == 0 || rung > 63 || u64::from(rung) > width {
-            return Err(HnnError::Shape {
-                what: "a switch rate 2^(−j) with j within 1..=63 and the carrier's W bits",
-                expected: 63.min(width as usize),
-                found: rung as usize,
-            });
-        }
-        Ok(Self {
-            share: Some(rung),
-            ..Self::new(width)
-        })
-    }
-
-    /// The declared switch rate's rung `j` (`α = 2^(−j)`), or none for the plain mixture.
-    pub fn share(&self) -> Option<u32> {
-        self.share
     }
 
     /// `β = W_T/W_C`, exact.
@@ -1066,9 +1026,8 @@ impl Mixture {
         beta.numer().bits() + beta.denom().bits()
     }
 
-    /// **One step** `β' = β q_T(x)/q̃_C(x)`, then under a switch rate the share
-    /// ([`Mixture::switching`]), carried at `W` (module header of this section). Refused at a face
-    /// that is not positive.
+    /// **One step** `β' = β q_T(x)/q̃_C(x)`, carried at `W` (module header of this section). Refused
+    /// at a face that is not positive.
     pub fn step(&mut self, step: &MixtureStep) -> Result<(), HnnError> {
         if !step.tree.is_positive() || !step.combined.is_positive() {
             return Err(HnnError::Shape {
@@ -1077,12 +1036,7 @@ impl Mixture {
                 found: 0,
             });
         }
-        let mut value = self.beta() * &step.tree / &step.combined;
-        if let Some(rung) = self.share {
-            // The share: β' = ((2^j − 1) β₊ + 1)/((2^j − 1) + β₊).
-            let keep = Rat::from_integer((BigInt::one() << rung as usize) - 1);
-            value = (&keep * &value + Rat::one()) / (&keep + &value);
-        }
+        let value = self.beta() * &step.tree / &step.combined;
         let (beta, rebased) = carry_ratio(&value, self.width);
         self.beta = beta;
         self.drift += &step.residual;

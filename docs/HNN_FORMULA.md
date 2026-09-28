@@ -734,8 +734,34 @@ skew, `J(c)=Σ_r c_r A_r` over the real coordinates of `c` with every slice skew
 `Re⟨s,J(c)s⟩=0` (`skewReaction_workless`); its passive part is a separate resistance. Applied
 explicitly, `x⁺=(I+hJ)x` gains `|x⁺|²=|x|²+h²|Jx|²`; the word therefore takes the Cayley step
 `C=(I−½hJ)⁻¹(I+½hJ)`, an isometry, and with resistance the midpoint balance
-`½|x⁺|²−½|x|²=−h⟨x̄,Rx̄⟩≤0` (`Holon/Cayley`; Rust `holonics::holon::reaction`). This is the
-power-neutral ring element of the step 4 word, taken at its sheet-class operands.
+`½|x⁺|²−½|x|²=−h⟨x̄,Rx̄⟩≤0` (`Holon/Cayley`). This is the power-neutral ring element of the step 4
+word, taken at its sheet-class operands.
+
+**Retired September 28.** The Rust owner of the reaction's grain projections,
+`holon::reaction`, had no consumer and is retired; it is at
+[`2d34b819`](https://github.com/brandonrdug/holonics/tree/2d34b819/crates/holonics/src/holon/reaction.rs). Lean `Holon/Reaction` keeps the
+skew projection `skewPart W = ½(W − Wᴴ)` (`skewPart_orthogonal`, `skewPart_of_skew`). Three laws it
+realized are not in Lean, and are kept here:
+- `[agent-inferred]` **The complex passive projection averages over `J`.** Let `L` be the
+  realification of a complex relation `W`, `J` multiplication by `i` (orthogonal, with
+  `Jᵀ(sym L)J = sym L` because `L` is complex-linear), and `R ⪰ 0` with `sym(L − R) ⪯ 0` (the
+  certified congruence clip, `Holon/Deposition.projectPassiveCongruence_passive`). Then
+  `R̄ = ½(R + JᵀRJ)` is positive semidefinite and complex-linear, and `sym(L − R̄) ⪯ 0`, since
+  `⟨e,(L − R̄)e⟩ = ½⟨e,(L − R)e⟩ + ½⟨Je,(L − R)Je⟩ ≤ 0` for every `e`.
+- `[agent-inferred]` **The grain correction.** At a grain `2^(−g)` in `n` complex dimensions,
+  rounding `R̄` Hermitian-symmetrically errs by at most half a unit in each real coordinate, so the
+  error `E` has `‖E‖₂ ≤ ‖E‖_F ≤ n` units; removing `round(R̄) + n·I` keeps `sym ⪯ 0`, and the result
+  is re-certified by exact inertia. A passive relation is fixed. The skew projection at the grain
+  rounds the strict upper triangle and completes it by `A_ji = −conj(A_ij)`, `A_ii ∈ iℤ`: exactly
+  skew-Hermitian, within half a unit per real coordinate of `skewPart W`.
+- `[measured]` **The scalar shift against the congruence clip.** The least grain integer `τ` with
+  `herm W − τI ⪯ 0` (exact inertia bisection below the Gershgorin bound) is also certified passive,
+  keeps the skew part, and removes `τ ≤ λ_max(herm W)₊ + 1` unit, bounded by the active part. The
+  congruence clip removes `P⁻ᵀ max(D, 0) P⁻¹`, which depends on the elimination order and is unbounded
+  relative to `λ_max(herm W)` under an ill-conditioned congruence; on learned native reaction blocks
+  it removed far more than the block.
+
+The averaging lemma and the grain correction are owed in Lean (#62).
 
 [proved-derived] **The return** runs the word's ticks in reverse over the word's own per-tick waves,
 or over its checkpoints. No inverse is claimed: `Holon/Cayley.cayley_bijective` makes each step
@@ -828,10 +854,13 @@ current. Softmax is not an all-to-all incidence rule: its denominator ranges ove
 contacts. Changing a previously absent edge needs the separate incidence law; the derivative on a
 fixed support does not open it.
 
-[established-bounded; implemented-exact] The exact rational positive-kernel/log-potential
-specialization is [`holonics::ratio::exponentiated::NormalizedKernel`](../crates/holonics/src/ratio/exponentiated/transport.rs).
-It accepts supplied positive rational `K`; its implicit real log chart is the normalized flow
-relation `E(s)=K`, so no logarithm is evaluated or stored. It is not an inferred exponential
+[definition] The exact rational positive-kernel/log-potential specialization takes supplied
+positive rational `K`, `a_ij = K_ij/Σ_j K_ij`, `Y = aV`, with zero entries declaring absent
+contacts; its implicit real log chart is the normalized flow relation `E′ = E`, `E(0) = 1`,
+`E(s)=K`, so no logarithm is evaluated or stored. Its differential carries both changing
+participation and changing transported current (above), and its pullback and material step are in
+§3. Its unconsumed Rust owner, `NormalizedKernel`, was retired on September 28 (at
+[`2d34b819`](https://github.com/brandonrdug/holonics/tree/2d34b819/crates/holonics/src/ratio/exponentiated/transport.rs)). It is not an inferred exponential
 navigator and does not approximate the exponential of arbitrary query/key products. The
 prototype's [connected reference computation](https://github.com/brandonrdug/holonics/blob/13f8c734/research/experiments/connected_holonic_field/README.md)
 composed it with fifteen complex toroidal channels, two heads, two layers, a sigmoid gate, a
@@ -984,8 +1013,9 @@ stored-energy change and a loss are distinct until a constitutive/receiver law j
 
 [definition] In the normalized-current chart `Y=aV`, a receiver covector `G=∂ℓ/∂Y` pulls back to
 `∂ℓ/∂s_ij=a_ij⟨G_i,V_j−Y_i⟩` and `∂ℓ/∂V=aᵀG` when the frame transport is identity; the general
-chart also pulls back through `U`, Q/K and the metric. `NormalizedKernel`'s Euclidean material step
-uses `∂ℓ/∂K=(∂ℓ/∂s)/K`, updates positive `K` and refuses a step that crosses the positive support.
+chart also pulls back through `U`, Q/K and the metric. The positive kernel's Euclidean material
+step uses `∂ℓ/∂K=(∂ℓ/∂s)/K`, updates positive `K` and refuses a step that crosses the positive
+support.
 
 [proved-derived] Integration has a differential. For the fixed-field restriction
 `x_(k+1)=λ B_Θ x_k+(1−λ)h`, `x*=(I−λB_Θ)^(−1)(1−λ)h`, and its material sensitivity solves

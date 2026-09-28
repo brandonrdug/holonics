@@ -77,7 +77,7 @@ use crate::hnn::constitution::{
 use crate::hnn::field::{Current, Field, Ring};
 use crate::hnn::keys::KeyLocation;
 use crate::hnn::moment::Ingested;
-use crate::hnn::propagation::{PathAttenuation, TickBalance, swing_about};
+use crate::hnn::propagation::{PathAttenuation, TickBalance, scattering_about};
 use crate::hnn::ratio::{Faces, HolonRatio, RatioCovector};
 use crate::hnn::realization::{apply_rows, entries, indexed};
 use crate::hnn::receiving::{MixtureStep, ReceivingPhases};
@@ -965,7 +965,7 @@ fn reverse(
                 .iter()
                 .map(|&a| record.arrivals[a][operands.end_slot(a, r)].as_slice())
                 .collect();
-            Ok::<_, HnnError>(swing_about(
+            Ok::<_, HnnError>(scattering_about(
                 record.anchors[r].clone(),
                 &record.storage[r],
                 &incoming,

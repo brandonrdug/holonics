@@ -259,7 +259,7 @@ impl Chaser for MachineChaser {
             self.declaration.escape,
         )?)?);
         self.candidates = Candidate::opening(family, &ports.arena, ports.opening.position)?;
-        let caps = pursuer.constitution.caps(ports.arena.declaration())?;
+        let caps = pursuer.law.caps(ports.arena.declaration())?;
         let disk = Moves::within(caps.top())?;
         self.pursuer = Some((pursuer.clone(), caps, disk));
         self.ports = Some(Arc::clone(ports));

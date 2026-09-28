@@ -8,16 +8,16 @@
 //! ∂(v, S) = Σ_{i ∈ S} (−1)^pos(S,i) [ (v + eᵢ, S∖i) − (v, S∖i) ]        pos(S,i) = #{j ∈ S | j < i}
 //! ```
 //!
-//! The **Swing** about an anchor `a` ([`crate::geometry::swing::swing`], `x ↦ 2a − x`) sends a cell
+//! The **half-turn** about an anchor `a` ([`crate::geometry::swing::half_turn`], `x ↦ 2a − x`) sends a cell
 //! to the box whose base is the Swing of its far corner, and reverses each of its `|S|` directions:
-//! it carries the cell's orientation with the **hand** `(−1)^|S|` ([`GridCell::swing`], Lean
+//! it carries the cell's orientation with the **hand** `(−1)^|S|` ([`GridCell::half_turn`], Lean
 //! `swingCell`, `swingChain`).
 //!
 //! | Lean `Physics/Fluid/Cells` | Rust |
 //! |---|---|
 //! | `Cell`, `faces`, `boundary` | [`GridCell`], [`GridCell::faces`] |
 //! | `boundary_faces`, `boundary_boundary`, `incidence_dd`, `gridComplex` | [`CubicalComplex::of_tops`] (`CellComplex::new` checks `∂∂ = 0`) |
-//! | `swingCell`, `swingChain`, `boundary_swingChain` | [`GridCell::swing`], [`CubicalComplex::chain_map`] |
+//! | `swingCell`, `swingChain`, `boundary_swingChain` | [`GridCell::half_turn`], [`CubicalComplex::chain_map`] |
 //! | `swingCell_cube`, `swingCell_sharedFace`, `swingChain_cube` | [`reflect_across_face`] |
 //! | `faces_cube_sharedFace`, `faces_neighbour_sharedFace`, `join_cancels`, `handed_push_cancels`, `joined_shared_face_cancels` | [`Reflection::join`], [`crate::holarchy::Holarchy::block_boundaries`] |
 //! | `rawPush_sharedFace`, `square_rawPush_cancels`, `cube_rawPush_uncancelled` | [`Reflection::join`] returning [`GluingDefect::SharedFaceUncancelled`] |
@@ -35,7 +35,7 @@ use num_traits::{One, Zero};
 
 use crate::geometry::RatVec3;
 use crate::geometry::complex::CellComplex;
-use crate::geometry::swing::swing;
+use crate::geometry::swing::half_turn;
 use crate::holarchy::{CellGluing, CellularMap, Gluing, GluingDefect, Holarchy};
 use crate::holon::{Holon, PortHolon};
 use crate::ratio::linear::ExactRatMatrix;
@@ -156,12 +156,12 @@ impl GridCell {
         faces
     }
 
-    /// [definition] **The Swing of the cell** about `anchor` (Lean `swingCell`, `swingChain`): the
+    /// [definition] **The half-turn of the cell** about `anchor` (Lean `swingCell`, `swingChain`): the
     /// box whose base is the Swing of the far corner, with the hand `(−1)^|S|`.
-    pub fn swing(&self, anchor: &RatVec3) -> (GridCell, i64) {
+    pub fn half_turn(&self, anchor: &RatVec3) -> (GridCell, i64) {
         (
             GridCell {
-                base: swing(anchor, &self.far_corner()),
+                base: half_turn(anchor, &self.far_corner()),
                 directions: self.directions.clone(),
             },
             parity(self.degree()),
@@ -374,11 +374,11 @@ pub fn reflect_across_face(
     let others: Vec<usize> = (0..dimension).filter(|j| *j != direction).collect();
     let shared = GridCell::new(unit(direction), others.clone())?;
     let anchor = unit(direction).add(&indicator(&others).scale(&rat(1, 2)));
-    let (neighbour, _) = cube.swing(&anchor);
+    let (neighbour, _) = cube.half_turn(&anchor);
     let own = CubicalComplex::of_tops(std::slice::from_ref(&cube))?;
     let glued = CubicalComplex::of_tops(&[cube.clone(), neighbour])?;
     let left_map = glued.chain_map(&own, |cell| (cell.clone(), 1))?;
-    let right_map = glued.chain_map(&own, |cell| cell.swing(&anchor))?;
+    let right_map = glued.chain_map(&own, |cell| cell.half_turn(&anchor))?;
     let own_face = own.index(&shared).ok_or(FluidError::NotATopCell {
         what: "shared face (it is not a face of the cube)",
     })?;
@@ -472,13 +472,13 @@ mod tests {
         let cube = CubicalComplex::of_tops(&[GridCell::unit_cube(3).unwrap()]).unwrap();
         for k in 1..=3 {
             for cell in cube.cells(k) {
-                let (image, hand) = cell.swing(&anchor);
+                let (image, hand) = cell.half_turn(&anchor);
                 let lhs = boundary_of(&[(image, hand)]);
                 let pushed: Vec<(GridCell, i64)> = cell
                     .faces()
                     .into_iter()
                     .map(|(face, sign)| {
-                        let (image, hand) = face.swing(&anchor);
+                        let (image, hand) = face.half_turn(&anchor);
                         (image, sign * hand)
                     })
                     .collect();
@@ -496,18 +496,18 @@ mod tests {
     /// of the face `x_i = 1` sends the cube to its neighbour with the hand `(−1)ⁿ` and fixes the
     /// face.
     #[test]
-    fn the_swing_about_a_face_centre_reflects_the_cube_to_its_neighbour() {
+    fn the_half_turn_about_a_face_centre_reflects_the_cube_to_its_neighbour() {
         let reflection = reflect_across_face(3, 1, true).unwrap();
         let cube = GridCell::unit_cube(3).unwrap();
-        let (image, hand) = cube.swing(&reflection.anchor);
+        let (image, hand) = cube.half_turn(&reflection.anchor);
         assert_eq!(image, GridCell::new(point(0, 1, 0), vec![0, 1, 2]).unwrap());
         assert_eq!(hand, -1);
         let face = GridCell::new(point(0, 1, 0), vec![0, 2]).unwrap();
-        assert_eq!(face.swing(&reflection.anchor), (face.clone(), 1));
+        assert_eq!(face.half_turn(&reflection.anchor), (face.clone(), 1));
         let square = GridCell::unit_cube(2).unwrap();
         let square_anchor = RatVec3::new(integer(1), rat(1, 2), Rat::zero());
         assert_eq!(
-            square.swing(&square_anchor),
+            square.half_turn(&square_anchor),
             (GridCell::new(point(1, 0, 0), vec![0, 1]).unwrap(), 1)
         );
     }

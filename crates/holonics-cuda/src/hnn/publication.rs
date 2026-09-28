@@ -474,9 +474,6 @@ impl DeviceError {
             DeviceError::Carrier { .. } => HnnError::Carrier {
                 what: "a resident read's l1 certificate at 2^127",
             },
-            DeviceError::Refused { .. } => HnnError::Carrier {
-                what: "a resident word's entry (carrier, word or operand)",
-            },
             DeviceError::Driver(_) => refused("the CUDA driver refused a call"),
             DeviceError::NoKernels { .. } => refused("the HNN kernels are not built"),
             DeviceError::Census { .. } => refused("the card's census"),
@@ -486,10 +483,7 @@ impl DeviceError {
             DeviceError::OffLattice { .. } => refused("an entry off its lattice"),
             DeviceError::Word { .. } => refused("a coordinate past the signed 64-bit word"),
             DeviceError::Malformed { .. } => refused("a malformed gather"),
-            DeviceError::Exponent { .. } => refused("an exponent past its ceiling"),
-            DeviceError::OffCell { .. } => refused("a remainder off its cell"),
             DeviceError::Status { .. } => refused("a status word naming no refusal"),
-            DeviceError::Graph => refused("a graph launched off its capture"),
         }
     }
 }

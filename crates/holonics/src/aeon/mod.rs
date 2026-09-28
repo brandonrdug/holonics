@@ -31,7 +31,6 @@
 //! | `Aeon/Production/Kac.FirstReturnEquations`, `firstReturn_existsUnique`, `kac_single_state`, `kac_grain_ratio` | [`MarkovChain::mean_return`], [`MarkovChain::grain_ratio`] |
 //! | `Aeon/Production/Kac.epochEntropy`, `wordEntropy_succ`, `wordEntropy_eq_sum`, `abramov_ledger`, `abramov` | [`MarkovChain::epoch_entropy`], [`MarkovChain::word_entropy`], [`MarkovChain::abramov`] |
 //! | `Physics/Information/ClockJoin.join_silent_on_cycles`, `join_of_silent_on_cycles`, `join_iff_silent`, `triangle_defect` | [`join_axes`], [`AxesJoin`], [`AxisComponent`], [`AxisRate`], [`ClockAxis`] |
-//! | Mathlib `Matrix.charpolyRev`; `Aeon/Production/Zeta.cycleLog`, `zeta_eq_exp`, `machine_charpolyRev`, `machine_zeta` | [`ReturnMap`], [`zeta`], [`cycle_exponential`] |
 //! | `Aeon/Production/FirstLaw.exchange`, `deposition`, `first_law_epoch`, `first_law_aeon` | [`PositiveLaw`], [`exchange`], [`deposition`], [`learning_balance`] |
 //! | `Aeon/Production/FirstLaw.ledger_telescopes`, `ledger_is_first_law`, `enclosed_contains`, `enclosed_telescopes` | [`EnclosedLedger`], [`EnclosedBalance`], [`LiteralComparison`] |
 
@@ -51,7 +50,6 @@ mod join;
 mod lock;
 mod production;
 mod reading;
-mod zeta;
 
 pub use epoch::{EpochTower, Epochs, Tick, epochs};
 pub(crate) use first_law::weighted_surprisal;
@@ -67,7 +65,6 @@ pub use join::{AxesJoin, AxisComponent, AxisRate, ClockAxis, join_axes};
 pub use lock::{Convergent, TwoClocks};
 pub use production::{MarkovChain, SectionEntropy, Transition};
 pub use reading::{Clock, ClosedForm, Form, Reading, TorusClock, rate, reading};
-pub use zeta::{ReturnMap, cycle_exponential, zeta};
 
 /// Every refusal of the aeon objects. Bad input is a typed return, never a panic.
 #[derive(Clone, Debug, PartialEq, Eq, Error)]
@@ -158,8 +155,6 @@ pub enum AeonError {
         /// Boxed: the undivided pair of two exact rationals.
         holonomy: Box<crate::ratio::Presentation>,
     },
-    #[error("the transfer determinant has no unit constant term")]
-    NotAUnitSeries,
     #[error(transparent)]
     Linear(#[from] ExactLinearError),
     /// Boxed: the Holon refusals carry exact inertia witnesses.

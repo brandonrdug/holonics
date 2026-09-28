@@ -16,8 +16,28 @@ The private joined passage has SHA-256 `192df2c3fd4344a7756369eea9bd0c27503fa2af
 
 [established-bounded; choosing only] The [fitter](../notebook/hnn_design/f1_dictionary.py) read the pinned choosing cut's 523,341 byte cells and 801 section letters. It produced 272 words and a 3,301-bit declaration under the pinned charge. The owner-only dictionary's canonical JSON has SHA-256 `44bf6d32319597dddc87f8c14914ee70765e29d8a0123f0738326734e021a046`; no pair, weight, source text or validation cell is printed or committed. This is a fitted candidate, not evidence of acceptance.
 
-**Work preflight and bounded validation rule, before opening validation bytes.** The exact `WordFamily` took 8,981 ms for 128 choosing bytes (the [work probe](../notebook/hnn_design/hnn_word_probe.rs)); a linear projection alone gives `36,719,730 + 81/128` ms for the choosing cut's 523,341 bytes, far beyond ten minutes, and the sectioned family adds work. A full F1 word passage is refused. The single bounded held-out probe is now fixed as the **first complete nonempty validation part of at most 128 bytes** in the pinned validation cut, including its actual following section as stop. Its selection uses section positions and length only, before byte contents are decoded. It reads this part once with the frozen choosing dictionary, compares its exact prequential byte-plus-END likelihood with the dictionary's `P_G(x)`, and reports time and work; it cannot satisfy the full curated acceptance or change the dictionary.
+**Work preflight and bounded validation rule, before opening validation bytes.** The exact `WordFamily` took 8,981 ms for 128 choosing bytes (the [work probe](https://github.com/brandonrdug/holonics/blob/2d34b819/research/notebook/hnn_design/hnn_word_probe.rs)); a linear projection alone gives `36,719,730 + 81/128` ms for the choosing cut's 523,341 bytes, far beyond ten minutes, and the sectioned family adds work. A full F1 word passage is refused. The single bounded held-out probe is now fixed as the **first complete nonempty validation part of at most 128 bytes** in the pinned validation cut, including its actual following section as stop. Its selection uses section positions and length only, before byte contents are decoded. It reads this part once with the frozen choosing dictionary, compares its exact prequential byte-plus-END likelihood with the dictionary's `P_G(x)`, and reports time and work; it cannot satisfy the full curated acceptance or change the dictionary.
 
 [established-bounded; measured] The [selector](../notebook/hnn_design/f1_validation_part.py) found that first complete part at 113 bytes; its private u16 byte passage has SHA-256 `fe5309370877e80dd0c259b723f9b95454dafc711829dee3903e3fd0a6d53255`. The frozen word family read those 113 bytes and its actual END once, in 6,749 ms for bytes and 6,910 ms including stop and exact parse-mass check. Its prequential likelihood **equalled** the dictionary's `P_G(x)` exactly, with both latent singleton/pair parses summed. This establishes the bounded source law, not the charged whole-stream win or the 268-class sectioned family on the full passage. The complete F1 curated acceptance is refused by work preflight. Under the pinned failure branch, bytes stay the text chart; no validation reading is used to revise the dictionary, and the evaluation partition remains closed.
 
 [established-bounded; exact fixture] The known-truth word terrain's fixed-width vocabulary decodes the observed word indices exactly, refuses an unknown or partial byte word, and includes END in its source passage. On its uniform three-class source, the completed two-word passage has exact probability `1/27` under `WordDictionary::parse_mass`, equal to the source's three `1/3` faces; the test proves the charged source-code bound as equality on that fixture. The sectioned word adapter also has a 268-class exact normalized face, routes END mass through the boundary egg's conditional section letters, and resets at a section. Its exact small fixture passes; its underlying work receipts do not count dictionary-edge evaluations, so the exterior work probe governs F1's budget.
+
+**Retired September 28.** Bytes stayed the text chart, so the unadopted word implementations are
+retired: `receiver::population::{words, sectioned_words}` (`WordDictionary`, `WordFamily`,
+`SectionedWordFamily`, the encoding square and `Readout::Words`), `holarchy::terrain::words` and
+the work probe. They are at [`2d34b819`](https://github.com/brandonrdug/holonics/tree/2d34b819/crates/holonics/src/receiver/population/words.rs).
+Lean `Compression/Landmark/Context/Merge` keeps the segmentation mass, the parse code and the
+encoding square or separator. This record keeps the decoder and termination laws they realized:
+- a parse `z` over a finite dictionary with token face `p` and stopping face `s` (continuation
+  `c = 1 − s`) has terminated mass `P(z) = s·∏ᵢ(c·p(zᵢ))`, and `P_G(x) = Σ_(D z = x) P(z)` pays the
+  stop once;
+- a fixed-width, duplicate-free, nonempty vocabulary makes `D(i₀…i_k, END) = w_(i₀)⋯w_(i_k)`
+  injective on terminated index words, refusing an unknown or partial byte word, and the source
+  passage charges END;
+- the sectioned face over 268 classes is `q(b) = W(b)` for a byte and
+  `q(ℓ) = W(END)·B(ℓ)/Σ_(section j) B(j)` for a section letter, normalized when `W` is an exact
+  257-class face with every byte admitted and `B` has positive letter mass; a section consumes END
+  and resets `W`.
+
+The discovery of continuation transports is not retired with them: a word alphabet over a
+segmentation lattice remains the owed consumer of `Merge` (campaign 5).

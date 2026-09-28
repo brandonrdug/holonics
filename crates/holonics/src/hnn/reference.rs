@@ -135,7 +135,7 @@
 //! stay zero. They are the integer multiply-adds and the normalizations (one `gcd` each) of
 //! `ratio::linear::vector::{integer_dot, row_dot, IntegralMatrix::{outer_sum, to_rows,
 //! symmetric_times}, combination}`, `ExactRatMatrix::{apply, inverse}`, the ticks'
-//! `propagation::{Rows::apply, junction_swing, element_step, transit, global_power}`, the return,
+//! `propagation::{Rows::apply, junction_scattering, element_step, transit, global_power}`, the return,
 //! [`compose`], and the deposit's `gram_sum`, normal law and carry; counting them needs an
 //! `ExactWork` threaded through each of those owners' loops (most outside `hnn`), so they are left
 //! uncounted rather than estimated from shapes.

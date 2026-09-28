@@ -698,7 +698,24 @@ mass declared), the tree kept as one egg, and a per-class reading of the prequen
 selection is gauged class by class against these truths; one run partitioned by class in
 `hnn::reference` would replace the one run a class used here.
 
-### The egg population on terrain (rebuild step 4 item 4, September 27)
+#### Population release checks on known-truth terrain (September 27; retired September 28)
+
+`hnn_release_terrain.rs` (at [`2d34b819`](https://github.com/brandonrdug/holonics/tree/2d34b819/research/notebook/hnn_design/hnn_release_terrain.rs)) ran three checks
+by the seed `20260927`; its receipt at that commit, now the law fixtures
+`receiver::population::releasing_tests::terrain`:
+- **The full-future check.** On the grating keys of a moiré of two rings over `ℤ/5` (sheet tuples),
+  the population's face is one-hot on the truth at tick 4, yet the surviving keys part at tick 5
+  within the joint period 20: the exact face `(2/3, 1/3, 0, 0)` against truth class 0. A one-hot
+  present face is a candidate, and it counts as future-equivalent only across the whole joint
+  period.
+- **Products.** The composed record-clock/carry key first predicts a determined cell at cell 3 of
+  the one-digit binary record `1·1`, and every later determined face matches the product's truth
+  through the record stop.
+- **The stochastic face.** The receiving tree (`D = 3`, the `½` stop prior) over a drawn binary tree
+  source reads 1,024 cells: none of its faces equals the identified conditional truth face, each
+  separator an exact difference; the first, at tick 0, is `±223696213/2^30`.
+
+## The egg population on terrain (rebuild step 4 item 4, September 27)
 
 Record: [the receiving population](../../records/2026-09-27_THE_RECEIVING_POPULATION_WAS_BUILT_ON_TERRAIN_WITH_KNOWN_TRUTH_AND_THE_CURATED_SOURCE_NOW_CODES_BELOW_THE_FLAT_STREAM.md).
 

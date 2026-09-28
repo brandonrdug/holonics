@@ -240,8 +240,9 @@ remainder: an exact face of the π navigator at a declared term aperture, not a 
 [definition] A logarithm is the inverse-scale face of a declared positive multiplicative
 transport: `log(n/d)` is the exact series `2 Σ z^(2k+1)/(2k+1)`, `z=(n−d)/(n+d)`, with its
 positive geometric tail (the prototype's `atmospheric_inverse::exact_positive_log_ratio`).
-`holonics::ratio::exponentiated::NormalizedKernel` accepts supplied positive rational `K` and defines its implicit real
-log-potential by the normalized relation `E(s)=K`. This relation needs no stored/evaluated
+The positive-kernel chart ([formula guide](HNN_FORMULA.md#one-connected-tensor-computation)) accepts
+supplied positive rational `K` and defines its implicit real log-potential by the normalized relation
+`E(s)=K`. This relation needs no stored/evaluated
 logarithm and does not claim that a learner generated the supplied K. `exp(tA)` and
 Gaussian amplitude/argument shifts are instead generic operator constructions: the formal
 `Transport/GaussianRebase` owner proves the cocycle

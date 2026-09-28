@@ -219,7 +219,7 @@ logarithm of a Holon ratio), and in history the prototype's
 - [Contextual reception and normalization reuse shared native owners](2026-09-12_CONTEXTUAL_RECEPTION_AND_NORMALIZATION_REUSE_THEIR_SHARED_NATIVE_OWNERS.md): forward/adjoint and their native boundary.
 - [Generator inference, codes, free energy and sufficient continuation](2026-09-12_GENERATOR_INFERENCE_CODES_FREE_ENERGY_AND_SUFFICIENT_CONTINUATION.md): source likelihood/code relations and their future update law.
 
-Owners: Rust `holonics::ratio::exponentiated::NormalizedKernel`; Lean
+Owners (the Rust `NormalizedKernel` retired September 28): Lean
 `HolonicAdjointNormalization` (`NormalizedExponential`), `NavigatorInference`, `Objects/Ratio`.
 The prototype's normalized receivers and normal material are in history under
 [`field/`](https://github.com/brandonrdug/holonics/tree/13f8c734/crates/holonics-cuda/src/native_ecology/constitutive_fibre/field).

@@ -18,7 +18,9 @@ use crate::hnn::pending::PendingRatio;
 use crate::hnn::port::{
     Deposit, ExecutionPort, Handle, Pullback, ReceiptDetail, Transpose, WordReturn,
 };
-use crate::hnn::propagation::{Operands, contact_exponent, element_step, junction_swing, transit};
+use crate::hnn::propagation::{
+    Operands, contact_exponent, element_step, junction_scattering, transit,
+};
 use crate::hnn::ratio::{Faces, HolonRatio, RatioCovector, TargetPhases, target_phases};
 use crate::hnn::receiving::ActiveAddress;
 use crate::hnn::reference::{Reference, compose, one_hot};
@@ -551,7 +553,7 @@ fn tangent(cut: &Cut, plus: (&Field, &Constitution), minus: (&Field, &Constituti
                     (contacts[a].conductance(), arrivals[a][slot].as_slice())
                 })
                 .collect();
-            let junction = junction_swing(ring.admittance(), &storage[r], &incoming).unwrap();
+            let junction = junction_scattering(ring.admittance(), &storage[r], &incoming).unwrap();
             let mut total = ring.admittance().clone();
             let mut weighted = scale(ring.admittance(), &d_storage[r]);
             for &a in incident {

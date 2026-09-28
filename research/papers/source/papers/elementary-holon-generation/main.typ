@@ -70,7 +70,7 @@
  #eq[$frac(partial ell,partial s_(i j))=a_(i j)⟨G_i,V_j-Y_i⟩, quad frac(partial ell,partial V)=a^T G$]
  ],
 )
-#status([Definition for the complete operator variation; proved-derived for the chain rule. The existing Rust `NormalizedKernel` checks the full tangent/pullback pairing and an observed material update in its separate exact log-rational diagnostic. That bounded control does not replace the nonlinear model equation or its geometric carrier.])
+#status([Definition for the complete operator variation; proved-derived for the chain rule. The Rust `NormalizedKernel` (retired unconsumed on September 28, at commit `2d34b819`) checked the full tangent/pullback pairing and an observed material update in its separate exact log-rational diagnostic. That bounded control does not replace the nonlinear model equation or its geometric carrier.])
 
 #pagebreak()
 #title("06","Relative phase determines a contact's dissipative return","The currents below come from the same toroidal branch, expressed in the common frame of its 2↔5 contact.")

@@ -9,7 +9,7 @@ admits the next campaign only after the failure is recorded with its located cau
 relation, encoding or decoder. This record locates it. It changes no law and proposes no fix; it
 names the missing term in each owner.
 
-**The measurement.** [`hnn_diagnose.rs`](../notebook/hnn_design/hnn_diagnose.rs), a `holonics`
+**The measurement.** [`hnn_diagnose.rs`](https://github.com/brandonrdug/holonics/blob/2d34b819/research/notebook/hnn_design/hnn_diagnose.rs), a `holonics`
 example run once in release on the host, from the repository root:
 
 ```sh

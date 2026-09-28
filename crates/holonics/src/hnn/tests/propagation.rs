@@ -13,7 +13,7 @@ use crate::hnn::chart::{ChartKey, WordLattice};
 use crate::hnn::field::{Current, Field, FieldDeclaration};
 use crate::hnn::propagation::{
     ContactOperands, ExponentReading, Operands, RingOperands, contact_exponent, element_step,
-    junction_swing, path_attenuation, transit,
+    junction_scattering, path_attenuation, transit,
 };
 use crate::hnn::word::Word;
 use crate::ratio::linear::ExactRatMatrix;
@@ -25,7 +25,7 @@ use crate::ratio::{Rat, integer, rat};
 /// with the storage port included), the Swing is an involution, and it keeps the `W`-weighted power
 /// `Y|s|² + Σ G|a|²`.
 #[test]
-fn the_junction_swing_is_a_weighted_involution_about_the_participation_anchor() {
+fn the_junction_scattering_is_a_weighted_involution_about_the_participation_anchor() {
     let mut draw = Draw::new(1);
     let admittance = rat(3, 2);
     let conductances = [rat(1, 4), integer(2), rat(5, 3)];
@@ -36,7 +36,7 @@ fn the_junction_swing_is_a_weighted_involution_about_the_participation_anchor() 
         .zip(&waves)
         .map(|(g, w)| (g, w.as_slice()))
         .collect();
-    let junction = junction_swing(&admittance, &storage, &arrivals).unwrap();
+    let junction = junction_scattering(&admittance, &storage, &arrivals).unwrap();
     let total = &admittance + conductances.iter().sum::<Rat>();
     let mut anchor = scale(&(&admittance / &total), &storage);
     for (g, w) in conductances.iter().zip(&waves) {
@@ -60,7 +60,7 @@ fn the_junction_swing_is_a_weighted_involution_about_the_participation_anchor() 
         .zip(&junction.outgoing)
         .map(|(g, w)| (g, w.as_slice()))
         .collect();
-    let twice = junction_swing(&admittance, &junction.storage_wave, &again).unwrap();
+    let twice = junction_scattering(&admittance, &junction.storage_wave, &again).unwrap();
     assert_eq!(twice.storage_wave, storage);
     assert_eq!(twice.outgoing, waves);
     assert_eq!(junction.contrast, sub(&junction.anchor, &storage));
@@ -763,7 +763,8 @@ fn the_contact_exponent_is_a_carry_and_a_phase_class() {
 /// receiver at a cut, and the path is open when `2^(−x)` is at least the receiver's grain `1/16`.
 /// At rest every `Q = 0`; one contact across a diameter (`Q = 4`, `β = 2`) attenuates by exactly
 /// the grain and stays open; two such contacts in series shield the receiver. (How often campaign
-/// 1's declared field is open over its cut is a measurement: `hnn_lattice_growth`.)
+/// 1's declared field is open over its cut is a measurement: the notebook's `hnn_lattice_growth`
+/// receipt.)
 #[test]
 fn the_path_attenuation_opens_at_the_receivers_grain() {
     let field =

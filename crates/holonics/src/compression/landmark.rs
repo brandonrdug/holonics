@@ -8,15 +8,16 @@
 //! exactly over ℚ: an irrational landmark is carried as its constraint ([`QuadraticSurd`]), and a
 //! float never enters. Each module cites the Lean declarations of `Compression/Landmark` it
 //! realizes, and says where it is sharper than the Lean or departs from it, naming the #62 item.
+//! The identity atlas, the constraint identities and the primitive cycles are held by Lean
+//! `Compression/Landmark/{Identity, ConstraintIdentity, PrimitiveCycle}` alone: their unconsumed
+//! Rust owners were retired on September 28, and the laws Lean does not yet hold are kept in their
+//! records (the identity atlas's record of September 19 and the aeon record's A8).
 //!
 //! | Module | Law | Lean `Compression/Landmark` |
 //! |---|---|---|
 //! | [`quadratic`] | a quadratic root carried as `p + q√D`, with exact sign and order | — |
 //! | [`site`] | reflection (`q < 0`), degenerate (`q = 0`), else rotation/null/boost by `a² − 4q`, each read from the eigenvalues ([`SiteKind`] is owned by `navigator::trace`); `(M − tr/2)² = disc/4`; `γ² = tr²/(4 det)`; the Doppler ratio as `k² − ak + 1 = 0`; counts `t_{n+2} = a t_{n+1} − q t_n` sandwiched by `kⁿ ≤ t_n ≤ 2kⁿ`; the torus count `\|qⁿ − t_n + 1\|` of an integer site, `\|t_n − 2\|` at `q = 1` | `SiteKind` |
 //! | [`mobius`] | fixed points of `z ↦ (αz+β)/(γz+δ)` exactly; attraction ⇔ `tr ≠ 0`; the chart scaling `μ₋/μ₊`; velocity addition fixes `±c` and its iterates converge to `c` or `−c` | `FixedPoint` |
-//! | [`identity`] | an identity is two constructions with one face; charts certify exactly the identities of `V` exactly when their images are Zariski dense (`I(⋃ images) = I(V)`), checked per component; the search over a finite family | `Identity` |
-//! | [`constraint`] | π (Machin) and `e` through their partial navigators; a window only with equal endpoint floors of Lean's enclosure | `ConstraintIdentity`, `Mathematics/RadixWindowReceiver` |
-//! | [`primitive`] | `tr(Mⁿ) = Σ_(d\|n) d·p_d`, Möbius inversion, the Euler product, for `0/1` return maps only | `PrimitiveCycle` |
 //! | [`context`] | the shift navigator's landmarks, the receiving tree: a node is a context where the source's paths converge; context-tree weighting over typed address letters, a mixture over the pruned trees' candidate standings with the stop prior, each node's arrivals the epochs of its section and its register capped by a carry; executed on a declared dyadic lattice with certified residuals, stored where paths part; the HNN reads it as the receiving parametron's storage (`hnn::receiving`) | `Context/{Tree, Standing, Epoch, Compaction, Capacity, Carrier, Address, LocalWeighing, ConvergenceFounding}` |
 //!
 //! [open] Owed in #62 (Lean `Compression/Landmark`): Gröbner completion and the face-kernel
@@ -24,44 +25,26 @@
 //! general nonnegative integer return map, the first-arrival sieve tower as a general law, and the
 //! Lefschetz count of torus periodic points. Irreducible decomposition is out of scope.
 
-pub mod constraint;
 pub mod context;
-pub mod identity;
 pub mod mobius;
-pub mod primitive;
 pub mod quadratic;
 pub mod site;
 
 use crate::navigator::trace::SiteKind;
-pub use constraint::{ConstraintIdentity, RatioBlock, WindowCertificate, certify_window};
-pub use identity::{
-    Component, ComponentDimension, Construction, IdentityAtlas, IdentitySearch, IdentityVerdict,
-    RationalChart,
-};
 pub use mobius::{
     Attraction, FixedPoint, FixedPoints, MobiusNavigator, ProjectivePoint, doppler_chart,
     velocity_addition,
 };
-pub use primitive::ReturnOccurrences;
 pub use quadratic::{QuadraticSurd, rational_square_root};
 pub use site::{DopplerRatio, lorentz_factor_squared, torus_fixed_points};
 
 use thiserror::Error;
 
-use crate::aeon::AeonError;
-use crate::ratio::algebraic::ExactValueError;
-use crate::ratio::linear::ExactLinearError;
 use crate::ratio::{GaussianRat, Rat};
 
 /// Every refusal of a landmark law. Bad input is a typed return, never a panic.
 #[derive(Clone, Debug, Error, PartialEq, Eq)]
 pub enum LandmarkError {
-    #[error(transparent)]
-    Linear(#[from] ExactLinearError),
-    #[error(transparent)]
-    Value(#[from] ExactValueError),
-    #[error(transparent)]
-    Aeon(#[from] AeonError),
     #[error("the radicand {radicand} is negative: no real quadratic field")]
     NegativeRadicand { radicand: Rat },
     #[error("the radicands {left} and {right} name two quadratic fields")]
@@ -86,51 +69,4 @@ pub enum LandmarkError {
         "the velocity {velocity} lies outside the open cone of characteristic {characteristic}"
     )]
     OutsideTheCone { velocity: Rat, characteristic: Rat },
-    #[error("expected {expected} coordinates, found {found}")]
-    VariableCount { expected: usize, found: usize },
-    #[error("the degree bound {bound} of coordinate {variable} is below its degree {degree}")]
-    DegreeBound {
-        variable: usize,
-        bound: u32,
-        degree: u32,
-    },
-    #[error("chart `{chart}` has a zero denominator")]
-    ZeroDenominator { chart: String },
-    #[error("a configuration needs at least one component")]
-    EmptyConfiguration,
-    #[error(
-        "component `{component}` is declared a {dimension:?}, but no nonzero generator in the \
-         coordinates {coordinates:?} alone bounds its dimension"
-    )]
-    UncertifiedDimension {
-        component: String,
-        dimension: ComponentDimension,
-        coordinates: Vec<usize>,
-    },
-    #[error("chart `{chart}` lands in no component of the configuration")]
-    ChartOutsideConfiguration { chart: String },
-    #[error("no chart covers the component `{component}`: its identities would be invented")]
-    UncoveredComponent { component: String },
-    #[error("a search needs at least one construction")]
-    EmptyFamily,
-    #[error("a radix of {radix} reads no digits")]
-    Radix { radix: u32 },
-    #[error("the window at offset {offset} of length {length} passes the largest exponent")]
-    WindowExtent { offset: u32, length: u32 },
-    #[error("occurrence {occurrence} returns to {image}, outside {size} occurrences")]
-    MapImage {
-        occurrence: usize,
-        image: usize,
-        size: usize,
-    },
-    #[error("a return map is square, not {rows} × {columns}")]
-    NotSquare { rows: usize, columns: usize },
-    #[error("entry ({row}, {column}) is {entry}: only a 0/1 return map has primitive cycles")]
-    NotZeroOne {
-        row: usize,
-        column: usize,
-        entry: Rat,
-    },
-    #[error("the count at length {length} is not a nonnegative integer")]
-    NonIntegralCount { length: usize },
 }

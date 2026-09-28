@@ -26,11 +26,11 @@
 //! point [`RatVec3`] or a vector of `ℚ^d`. Lean `Geometry/AffineSwing` states the half-turn and its
 //! laws over every `AddCommGroup`, so one statement covers both; the HNN's junction scattering
 //! `o = 2v − a` about the participation anchor `v ∈ ℚ^(2d_r)`, an anchor derived from
-//! admittance-weighted participation, is this half-turn (`crate::hnn::propagation::junction_swing`).
+//! admittance-weighted participation, is this half-turn (`crate::hnn::propagation::junction_scattering`).
 //!
 //! | Lean | Rust |
 //! |---|---|
-//! | `Geometry/AffineSwing.swing`, `theSwingNegatesTheDisplacementFromTheAnchor`, `theSwingIsAnInvolution`, `theAnchorIsFixed` | [`swing`], on every [`RationalPoint`] |
+//! | `Geometry/AffineSwing.swing`, `theSwingNegatesTheDisplacementFromTheAnchor`, `theSwingIsAnInvolution`, `theAnchorIsFixed` | [`half_turn`], on every [`RationalPoint`] |
 //! | `Geometry/AffineSwing.twoSwingsAreADoubledTranslation`, `theSwingsDoNotCommute` | [`composed_translation`] |
 //! | `Geometry/HolonicPantographicSwingJets.pantographicPoint`, `pantographicPoint_neg_one_eq_swing` | [`pantograph`] |
 //! | `Geometry/Swing.constraintChart`, `harmonicConjugate`, `theSwingIsNegationInTheConstraintChart` | [`constraint_chart`], [`harmonic_conjugate`] |
@@ -88,9 +88,9 @@ impl RationalPoint for Vec<Rat> {
     }
 }
 
-/// **The Swing** `S_a x = 2a − x`: the half-turn of `x` about the anchor `a`, in any exact affine
-/// space over ℚ (anchor and body of one dimension).
-pub fn swing<P: RationalPoint>(anchor: &P, body: &P) -> P {
+/// **The half-turn** `S_a x = 2a − x`: the Swing of `x` about the anchor `a` by half a turn, in any
+/// exact affine space over ℚ (anchor and body of one dimension).
+pub fn half_turn<P: RationalPoint>(anchor: &P, body: &P) -> P {
     anchor.scaled(&integer(2)).minus(body)
 }
 
@@ -150,14 +150,14 @@ mod tests {
     fn the_swing_is_a_half_turn_and_two_swings_are_a_translation() {
         let (a, b, x) = (point(1, 2, 0), point(-3, 5, 7), point(4, -1, 2));
         assert_eq!(
-            swing(&a, &x).subtract(&a),
+            half_turn(&a, &x).subtract(&a),
             x.subtract(&a).scale(&integer(-1))
         );
-        assert_eq!(swing(&a, &swing(&a, &x)), x);
-        assert_eq!(swing(&a, &a), a);
-        let ba = swing(&b, &swing(&a, &x));
+        assert_eq!(half_turn(&a, &half_turn(&a, &x)), x);
+        assert_eq!(half_turn(&a, &a), a);
+        let ba = half_turn(&b, &half_turn(&a, &x));
         assert_eq!(ba, x.add(&composed_translation(&a, &b)));
-        let ab = swing(&a, &swing(&b, &x));
+        let ab = half_turn(&a, &half_turn(&b, &x));
         assert_eq!(ba.subtract(&ab), b.subtract(&a).scale(&integer(4)));
     }
 
@@ -169,15 +169,15 @@ mod tests {
         let anchor: Vec<Rat> = vec![rat(1, 2), integer(-3), integer(0), rat(7, 5), integer(2)];
         let other: Vec<Rat> = vec![integer(4), rat(-1, 3), integer(1), integer(0), integer(-2)];
         let body: Vec<Rat> = vec![integer(3), integer(1), rat(2, 9), integer(-4), integer(5)];
-        let swung = swing(&anchor, &body);
+        let swung = half_turn(&anchor, &body);
         assert_eq!(
             swung.minus(&anchor),
             body.minus(&anchor).scaled(&integer(-1))
         );
-        assert_eq!(swing(&anchor, &swung), body);
-        assert_eq!(swing(&anchor, &anchor), anchor);
+        assert_eq!(half_turn(&anchor, &swung), body);
+        assert_eq!(half_turn(&anchor, &anchor), anchor);
         assert_eq!(
-            swing(&other, &swing(&anchor, &body)),
+            half_turn(&other, &half_turn(&anchor, &body)),
             body.plus(&composed_translation(&anchor, &other))
         );
         assert_eq!(pantograph(&anchor, &integer(-1), &body), swung);
@@ -191,7 +191,7 @@ mod tests {
         let (anchor, input) = (point(2, 0, -1), point(5, 3, 3));
         assert_eq!(
             pantograph(&anchor, &integer(-1), &input),
-            swing(&anchor, &input)
+            half_turn(&anchor, &input)
         );
         let (s, t) = (rat(2, 3), rat(-5, 2));
         assert_eq!(

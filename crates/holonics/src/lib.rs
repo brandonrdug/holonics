@@ -15,10 +15,10 @@
 //! - [`geometry`]: the complex, frames and exact carriers, the screw and pair charts, winding and
 //!   carry, cell holonomy and the Swing.
 //! - [`holon`]: the law and its facets — ports, Dirac structure, elements, restrictions (tube,
-//!   tower, fibre, descent), deposition, reaction — with the helical pair [`holon::contact`] and the
+//!   tower, fibre, descent), deposition — with the helical pair [`holon::contact`] and the
 //!   ring [`holon::parametron`].
 //! - [`navigator`]: transport with an initial configuration and its own clock, phase lift, address
-//!   words and lock addresses, trace faces and the dynamical zeta, the reflective continuation.
+//!   words and lock addresses, trace faces and the dynamical zeta.
 //! - [`receiver`]: roles and faces, width and release, standing as the retention quotient, the
 //!   causal chord, joint reception and the receipt ratio.
 //! - [`holarchy`]: what `Holon::interconnect` returns — the joined whole with its constituents,
@@ -26,7 +26,7 @@
 //!   `view`/`count`/`refine`; and the terrain a declared Holarchy makes, with its exact truth.
 //! - [`aeon`]: aeon, epoch and cycle — clock readings with carry, epochs and their towers at a
 //!   receiver's section with the oriented flux, two-clock locks, the Hodge split of a clock,
-//!   production, the dynamical zeta and the first law of learning.
+//!   production and the first law of learning.
 //! - [`compression`]: compression is intelligence is navigation — a navigator family's face map
 //!   against terrain, whose kernel quotient is retention and whose cokernel is the residual; the
 //!   resonating/emanating split of a drive; the cost `Kt` against the literal; and locating keys

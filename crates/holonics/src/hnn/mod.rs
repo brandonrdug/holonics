@@ -64,11 +64,7 @@
 //!   receiving join consumes;
 //! - [`modes`] (campaign 3, first construction): a loaded ring's exact per-phase operators and its
 //!   mode quotient: the admitted future kernel through the pump's period, the release by the one
-//!   chart that closes every phase's squares, and the descended ring that returns the same wave;
-//! - [`born`] (the Born face): the receiving ring's register read by the Born rule, a finitely
-//!   correlated receiver whose density is the retained state, each digit split by its pair of
-//!   operators' traces, the collapse its receipt, and the operators learned by the normal law's
-//!   Fisher-scored prox step on declared lattices.
+//!   chart that closes every phase's squares, and the descended ring that returns the same wave.
 //!
 //! The learning side (constitution, ratio, pending, retention, port, reference) composes these.
 //! `realization` runs the regions whose effects commute together on the host's cores (the hardware
@@ -86,7 +82,7 @@
 //! |---|---|---|
 //! | the ring element | `HNN/Word.{reaction_stage_isometry, reaction_stage_balance, contrastPort_active}` | [`propagation::element_step`] |
 //! | the tick's global power | `HNN/Word.word_tick_balance` | [`propagation::global_power`], [`propagation::TickBalance`] |
-//! | the junction Swing | `HNN/Propagation.{anchor_is_participation, junctionSwing_involutive, junctionSwing_isometry}` | [`propagation::junction_swing`] |
+//! | the junction's scattering (a half-turn about the participation anchor) | `HNN/Propagation.{anchor_is_participation, junctionSwing_involutive, junctionSwing_isometry}` | [`propagation::junction_scattering`] |
 //! | the contact two-port | `HNN/Propagation.{partialIsometry_transit, transit_balance, tick_well_defined}` | [`propagation::transit`], [`Contact`] |
 //! | the causal cone | `HNN/Word.word_tick_cone` (the concrete tick) | [`Word::support`] |
 //! | the word on declared lattices: certified inverse charts, error feedback, the executed adjoint, the balance up to the residual | `HNN/LatticeWord.{nsStep, rounded_refinement_certificate, roundedIter_certificate, warm_start_certificate, inverse_chart_deviation, feedback_tick, carried_word_accounting, executed_adjoint_unique, executed_adjoint_deviation, cayley_chart_energy}` | [`chart`], [`Word`], [`Word::pull_back`], [`propagation::TickBalance`] |
@@ -99,7 +95,6 @@
 //! | the contact's transfer and site kind, its boost, its lock address, its break (campaign 2) | `HNN/Contact.{contact_transfer_kind_by_storage_sign, contact_mode_transfer, contact_boost_solve_or_singular_direction, contact_signed_storage_balance, contact_lock_address, lockAddress_unique, least_denominator_unique, lockAddress_closes}`, `HNN/ContactBreak.{break_release_balance, break_iff_release_covers_gluing, griffith_closed_port_case, parting_returns_gluing_defect}` | [`contact`], [`contact_readings`], [`Field::parted_holarchy`] |
 //! | the loaded tick's field/resonator balance, separate element and returned-wave splits, the word's balance across the gain commit (the loaded resonator) | `HNN/Ring.{loaded_word_stage_balance, loaded_tick_executed_interconnection_balance}`, `HNN/Word.{field_commit_deposition}` | [`word::FieldBalance`], [`word::WordBalance`], [`word::PowerForm`] |
 //! | a loaded ring's modes descend to their future quotient: the period lift, one chart for every phase, the descended run, the storage-null release (campaign 3, first construction) | `HNN/ModeQuotient.{periodic_lift_exact, phase_kernel_le_lift, descended_run_reads, released_pair_storage_null}` | [`modes`] |
-//! | the wave read by the Born rule: the digit split and the dyadic cell face, the reception keeping a density, the density as the retained quotient, the absorbed tick, the interference zero, the covector and the Fisher-scored step (the Born face) | `HNN/BornFace.{born_face_normalized, born_executed_partition, born_update_trace_one, born_pure_stays_pure, born_state_future_sufficient, born_unitary_invariant, born_tick_absorbed, born_interference_zero, born_covector_eq, born_fisher_bound}` | [`born`] |
 //! | the ring's navigator | `Holon/Navigator.{mapRotor_order, map_pow_mod_order, map_turn_lossless}` | [`Ring::navigator`] over `navigator::Transport::Map` |
 //! | the block incidence, the contrast map read from its blocks, and the Holarchy chart | `Holon/Complex.{blockIncidence, block_flat_closed}`, `Holarchy/Join.interconnect` | [`Field::connection`], [`Field::contrast`], [`Field::holarchy`] |
 //! | the port's returns | `Holarchy/Reception.InteractionReturn` (the owner's, generic in its payloads) | [`ExecutionPort`] |
@@ -117,7 +112,6 @@
     clippy::disallowed_methods
 )]
 
-pub mod born;
 pub mod chart;
 pub mod constitution;
 pub mod contact;
@@ -278,10 +272,6 @@ pub enum HnnError {
     #[error("the constitution carries no receiving map for ring {ring}")]
     MissingReceivingMap { ring: usize },
     #[error(
-        "the landmark tree's declared population n* = {population} is passed; its chart's certificates hold only within it"
-    )]
-    PopulationReached { population: u64 },
-    #[error(
         "aperture {aperture} exceeds the receiving ring's observability rank {rank} over the word"
     )]
     Observability { aperture: usize, rank: usize },
@@ -364,8 +354,6 @@ pub enum HnnError {
         "ring {ring}'s resonator is not certified at pump phase {phase}: its signed form 2C + hD + (h²/2)K is not positive semidefinite"
     )]
     UncertifiedResonator { ring: usize, phase: usize },
-    #[error("the Born receiver refused {what}")]
-    BornZero { what: &'static str },
     #[error("ring {ring}'s resonator material is malformed: {what}")]
     Resonator { ring: usize, what: &'static str },
     #[error("ring {ring}'s mode quotient refused: {what}")]

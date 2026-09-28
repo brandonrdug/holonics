@@ -142,7 +142,7 @@ fn the_phase_address_is_the_trees_causal_address() {
 /// no forced split; campaign 1 declares `D = 4`, and at `n* = 6,148 = 2²·29·53`, `L_R = 16`, `B = 8`
 /// the owner derives the path lattice `M_p = 39` and the β carrier `W = 29`. A change of depth changes the field's code; the initial
 /// constitution carries a tree on the receiving ring only, empty, and its receiving map `R_0 = 0`
-/// and source port `E_0` the declared sign generator times ½ (entries `±½`).
+/// and source port `E_0` the declared sign sequence times ½ (entries `±½`).
 #[test]
 fn the_field_declares_the_tree_and_codes_it() {
     let steps = Steps::campaign_one();
@@ -383,7 +383,7 @@ fn the_wave_is_inert_when_every_map_opens_at_zero() {
 }
 
 /// **`R` opens at zero and learns from the first deposit** (the landmark tree's declared openings): at
-/// the declared initial constitution (`R_0 = 0`, `E_0` the sign generator times ½) the first
+/// the declared initial constitution (`R_0 = 0`, `E_0` the sign sequence times ½) the first
 /// compare's combined face is the tree's at the grain exactly (its code length equals the tree's
 /// grain face alone's), its
 /// covector reaches no upstream locus (`Rᵀ g = 0`), and its deposit moves `R`; the second compare's
@@ -1096,99 +1096,4 @@ fn the_contact_letters_are_read_from_the_register_before_the_cell_they_predict()
             "the address at {j} reads no cell from {j} on"
         );
     }
-}
-
-/// **The switching mixture shares its weights at the declared rate, and codes within the price of
-/// every switching sequence** (local weighing, "across epochs"; Lean `Compression/Landmark/Context/LocalWeighing.{fixed_share,
-/// share_ratio_step}`): one step at `α = 2^(−2)` moves `β = 1` by the likelihood to `β₊ = 2`, then
-/// shares it to `(3·2 + 1)/(3 + 2) = 7/5`; over a passage whose better face changes twice, the
-/// mixture's executed product is at least `½ α^k (1 − α)^(n−k) Π f_σ` for every sequence `σ` tried,
-/// within its chart's drift,
-/// (the constant ones and the one that switches with the better face), and it follows the better
-/// face where the plain mixture cannot.
-#[test]
-fn the_switching_mixture_shares_at_its_rate() {
-    use crate::hnn::receiving::{Mixture, MixtureStep};
-    let mut one = Mixture::switching(28, 2).unwrap();
-    assert_eq!(one.share(), Some(2));
-    one.step(&MixtureStep {
-        ring: 0,
-        tree: rat(1, 2),
-        combined: rat(1, 4),
-        residual: Rat::zero(),
-    })
-    .unwrap();
-    assert_eq!(one.beta(), rat(7, 5));
-    assert!(Mixture::switching(28, 0).is_err());
-    assert!(Mixture::switching(4, 5).is_err());
-    assert_eq!(Mixture::new(28).share(), None);
-
-    // Faces of the target: the tree codes the first and last epochs better, the other face the
-    // middle one.
-    let n = 18usize;
-    let tree = |t: usize| {
-        if (6..12).contains(&t) {
-            rat(1, 8)
-        } else {
-            rat(3, 4)
-        }
-    };
-    let other = |t: usize| {
-        if (6..12).contains(&t) {
-            rat(3, 4)
-        } else {
-            rat(1, 8)
-        }
-    };
-    let rung = 3u32;
-    let alpha = rat(1, 8);
-    let mut switching = Mixture::switching(63, rung).unwrap();
-    let mut plain = Mixture::new(63);
-    let (mut shared, mut fixed) = (Rat::one(), Rat::one());
-    for t in 0..n {
-        for (mixture, product) in [(&mut switching, &mut shared), (&mut plain, &mut fixed)] {
-            let weight = mixture.weight();
-            *product *= &weight * tree(t) + (Rat::one() - &weight) * other(t);
-            mixture
-                .step(&MixtureStep {
-                    ring: 0,
-                    tree: tree(t),
-                    combined: other(t),
-                    residual: Rat::zero(),
-                })
-                .unwrap();
-        }
-    }
-    // The share's rationals outgrow the carrier: each rebase adds `3·2^(−W)` bits of drift, and the
-    // executed product is within `2^drift ≤ 1 + drift` of the bound (Lean `forward_executed`).
-    assert_eq!(plain.rebases(), 0);
-    let slack = Rat::one() + switching.drift();
-    let sequences: [(Vec<bool>, usize); 3] = [
-        (vec![true; n], 0),
-        (vec![false; n], 0),
-        ((0..n).map(|t| !(6..12).contains(&t)).collect(), 2),
-    ];
-    for (sequence, switches) in sequences {
-        let faces: Rat = (0..n)
-            .map(|t| if sequence[t] { tree(t) } else { other(t) })
-            .product();
-        let mut prior = rat(1, 2);
-        for t in 1..n {
-            prior *= if sequence[t] == sequence[t - 1] {
-                Rat::one() - &alpha
-            } else {
-                alpha.clone()
-            };
-        }
-        assert_eq!(
-            (1..n).filter(|&t| sequence[t] != sequence[t - 1]).count(),
-            switches
-        );
-        assert!(&shared * &slack >= prior * &faces);
-    }
-    // The switching sequence's face product beats both constant ones, and the switching mixture
-    // follows it: it codes below the plain mixture, which telescopes to ½A + ½B.
-    let (a, b): (Rat, Rat) = ((0..n).map(tree).product(), (0..n).map(other).product());
-    assert_eq!(fixed, (&a + &b) / Rat::from_integer(BigInt::from(2)));
-    assert!(shared > fixed);
 }

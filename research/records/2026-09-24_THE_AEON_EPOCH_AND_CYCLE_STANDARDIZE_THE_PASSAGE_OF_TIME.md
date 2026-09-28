@@ -189,6 +189,27 @@ For a flow, the zeta is a product over primitive cycles weighted by their readin
 `∏_c (1 − e^{−s·t(c)})^{-1}`. The trace formula equates the resonances with a sum over cycles
 weighted by `t(c)/|det(1−P_cᵏ)|^{1/2}`, where `P_c` is the cycle's transverse holonomy.
 
+**Retired September 28.** The unconsumed Rust owners of A8, `aeon::zeta` (`ReturnMap`, `zeta`,
+`cycle_exponential`) and `compression::landmark::primitive` (`ReturnOccurrences`), are retired;
+they are at [`2d34b819`](https://github.com/brandonrdug/holonics/tree/2d34b819/crates/holonics/src/compression/landmark/primitive.rs).
+Lean `Aeon/Production/Zeta` keeps `ζ = 1/det(1 − T·M) = exp Σ N_n Tⁿ/n` and the machine's zeta, and
+`Compression/Landmark/PrimitiveCycle` keeps the primitive cycles of a finite map, their Möbius
+inversion and the finite Euler product `det(1 − T·M_f) = ∏_d (1 − T^d)^(p_d)`. The general-graph
+construction is not in Lean, and is kept here.
+- **Scope.** A `0/1` matrix, the adjacency of a directed graph without multiple edges. A signed or
+  general integer matrix is refused: `[[−1]]` has `N_1 = −1`, which no set of occurrences realizes
+  (`signed_map_has_no_primitive_cycles`), and a multigraph's necklace case is not this law.
+- `[established-bounded]` **The checked finite construction.** With `N_n = tr(Mⁿ)`, the inverted
+  counts `p_d = (1/d) Σ_(m|d) μ(d/m) N_m` are the necklace counts of primitive closed walks. Each is
+  checked to be a nonnegative integer at every `d` up to the declared horizon `H`, and anything else
+  is refused. The Euler product is then infinite, and it is returned truncated:
+  `∏_(d≤H) (1 − T^d)^(p_d) ≡ det(1 − T·M) mod T^(H+1)`.
+- The exact series: `zeta` is the reciprocal series of `det(1 − T·M)`, and the cycle exponential
+  `E` of `Σ N_n Tⁿ/n` follows `k·E_k = Σ_(j=1..k) N_j E_(k−j)`, both through a declared degree.
+
+Owed (#62): the necklace integrality and nonnegativity of `p_d` for a general `0/1` matrix, and the
+infinite Euler product.
+
 ### A9. Placement and reversibility
 
 [proved-standard, finite] Detailed balance makes the generator self-adjoint in `L²(π)`, so its
@@ -269,7 +290,7 @@ commuting clocks, the crossing axes. Its closed orbits (subtori) are its cycles.
 - `reading -> (windings, phase)`, `concat`, `reverse`, `epochs(receiver, grain)`, `coarsen`;
 - `hodge_split(clock)` on cell complexes;
 - `production(aeon)` for Markov and port-Hamiltonian instances;
-- `zeta(return_map)`.
+- `zeta(return_map)` (built, then retired unconsumed on September 28; see A8).
 
 The HNN interface is then rebuilt over aeons (open from a retained quotient, advance, receive at
 sections, close at a boundary), replacing the retired "session" types.

@@ -83,7 +83,7 @@ The objects guide defined the Swing by its frozen-board chart, the point reflect
 - [proved-derived] **A Swing without an anchor law says nothing.** Every map is pointwise a Swing,
   `T(x) = S_((x+T(x))/2)(x)`, so declaring each update a Swing moves the unexplained work into the
   choice of anchor. The objects' Swing declared its anchor. (The HNN junction's anchor is the
-  exception: `hnn::propagation::junction_swing` derives it from admittance-weighted participation, a
+  exception: `hnn::propagation::junction_scattering` derives it from admittance-weighted participation, a
   constitutive law.)
 
 ## 3. The derivation

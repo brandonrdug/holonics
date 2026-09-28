@@ -63,7 +63,9 @@ Its corrections are folded in.
 Each item fixes its owners, its consumer equation, its acceptance and its failure branch before it is
 measured, and keeps every inherited gate below verbatim.
 
-#### U0. Consolidate (no new law)
+#### U0. Consolidate (no new law) — carried out September 28
+
+The receipts are in [CONSTRUCTION_STATE](../../CONSTRUCTION_STATE.md) and the commits that name U0.
 
 The deliverable is a smaller, consistent tree. Acceptance: each retirement names the owner that keeps
 its law, or writes the law into its guide or record first; nothing live consumes what is retired;
@@ -248,7 +250,9 @@ equation extraction (#146).
 ## The gates (inherited verbatim)
 
 [definition] The product and terrain gates of the forward plan of September 27, kept word for word:
-the U-items above consume them and change none. Their receipts are in the records they cite and in
+the U-items above consume them and change none. Owners their receipts name that U0 retired
+(`LocalMixture`, `hnn_tokens`, F1's word family, `hnn::born`, `Mixture::switching`) are at commit
+`2d34b819`. Their receipts are in the records they cite and in
 the [construction record](../../research/records/2026-09-28_THE_REBUILDS_CONSTRUCTION_RECORD_STEPS_ZERO_TO_FIVE_THE_CAMPAIGNS_AND_THE_FORWARD_PLAN.md).
 
 ### F0. The predictor on unseen families (the release's gate; #73, #148)

@@ -11,7 +11,7 @@
 //! ```
 //!
 //! [definition; agent-inferred] **The terrains** are the terrain notebook's arithmetic ones
-//! (`hnn_terrain -- arithmetic`), drawn by the same seed: products in bases 2, 10 and 16 (`L = 4`
+//! (the retired `hnn_terrain -- arithmetic`), drawn by the same seed: products in bases 2, 10 and 16 (`L = 4`
 //! digits least significant first, `k = 2`, `2^12` records of 19 cells, `n = 77824 = 2^12·19`), and
 //! the prime streams over `[0, 10^4)` in base 10 (`L = 4`) and base 6 (`L = 6`), most significant
 //! first with the primality cell.

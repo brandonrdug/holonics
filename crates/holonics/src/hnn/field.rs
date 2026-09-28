@@ -330,10 +330,10 @@ impl FieldDeclaration {
     /// share a quarter turn. Integer placements keep every quadrance an integer (`q_Q = 1`), and
     /// `Q ∈ {0, 2, 4}` on one circle: with the least lattice exponent `β_a = 2`, one contact
     /// attenuates by `1`, `1/4` or `1/16`, and the source-to-receiver path is open (at least the
-    /// receiver's grain `1/16`) on 4,328 of campaign 1's 5,005 phase configurations (receipt:
-    /// `cargo run --release -p holonics --example hnn_lattice_growth -- openness configurations`;
-    /// `… openness uniform` and `… openness cut` read the windows of `n*` uniform bytes and of the
-    /// notebook's pinned cut). The earlier
+    /// receiver's grain `1/16`) on 4,328 of campaign 1's 5,005 phase configurations (receipt: the
+    /// notebook's `hnn_lattice_growth -- openness configurations`, retired at `2d34b819`; its
+    /// `uniform` and `cut` modes read the windows of `n*` uniform bytes and of the notebook's
+    /// pinned cut). The earlier
     /// sixteen points of `x² + y² = 65` put distinct nodes at `Q ≥ 4` apart and up to 260, which
     /// shielded the receiver below `2^(−10)` on about 96% of windows (review C2).
     pub fn quarter_turn(node: u64, period: u64) -> RatVec3 {
@@ -1613,7 +1613,7 @@ impl Field {
     /// **The field's exact self-delimiting code**: every declared value, each receiver's tree depth
     /// `D` (the landmark tree) and its stop-weight law's rungs (the declared stop prior), the word's precisions
     /// (`L_c`, `D_c`, `L_w`; none for the exact law), the recorded `n*`, the open's law with its
-    /// population chart's lattice `L_ν` (ruling B), the gauge convention, the sign generator's rule,
+    /// population chart's lattice `L_ν` (ruling B), the gauge convention, the sign sequence's rule,
     /// the receiving law's code ([`RECEIVING_LAW`]) with the tree's Krichevsky–Trofimov prior `α`,
     /// and the constitution's declared values (the
     /// steps `γ_U` and `η_x`, the budget `B_Θ`) with the pending capacity, as Elias-gamma naturals,
@@ -1724,7 +1724,7 @@ impl Field {
         );
         // The gauge convention (design R3 K2): 0 names "S_g(p_0) = 0 at the least visited port".
         natural(&mut code, 0);
-        // The sign generator's rule (design (d)): 0 names "the low bit of SplitMix64 over
+        // The sign sequence's rule (design (d)): 0 names "the low bit of SplitMix64 over
         // (0, ℓ, i, j)" (`constitution::declared_sign`).
         natural(&mut code, 0);
         // The receiving law (the landmark tree) and the tree's Krichevsky–Trofimov prior `α = 1/2`.
@@ -1747,7 +1747,7 @@ impl Field {
 /// reached covectors; the scored face is the mixture of the tree's face and the combined face
 /// weighted by their likelihood ratio `β`, opening at 1 (the primary's ruling A); every comparison
 /// is scored and then deposited" (`hnn::receiving`, `compression::landmark::context`).
-/// Code 2 was the region table's class masses with `R` opening at the sign generator times ½;
+/// Code 2 was the region table's class masses with `R` opening at the sign sequence times ½;
 /// code 1 the first repair's exogenous normal law on the target code face with the standing read; and
 /// campaign 1's first law (the face on the change alone) carried none. A feature-law change takes
 /// the next code and starts a fresh constitution: an old statistic cannot be re-read through new
