@@ -1,4 +1,5 @@
 import Holonics.Geometry.AffineSwing
+import Holonics.Geometry.Motion
 import Mathlib.Analysis.SpecialFunctions.Sqrt
 import Mathlib.Tactic.Positivity
 import Holonics.Foundation.Chronology
@@ -13,9 +14,11 @@ These statements do not make every fixed point an optimum of an arbitrary object
 
 Four sections.
 
-**The grading.**  An odd word of swings *is a swing*; an even word is a translation.  So the group
-the swings generate carries a `ℤ/2` grading, and the grading is the orientation class — a circuit
-of odd length returns the body with its hand reversed, which is what a band with one side is.
+**The grading.**  An odd word of half-turns *is a half-turn*; an even word is a translation.  So
+the group the half-turns generate carries a `ℤ/2` grading, and the grading is the orientation
+class — a circuit of odd length returns the body with its hand reversed, which is what a band with
+one side is.  The word law's owner is `Geometry/Motion.swing_word_linear_part` (every word has
+linear part `(−1)^length`); the circuits of length two, three and four below are derived from it.
 
 **The split.**  When a computation of size `T` factors into two pieces of sizes `x` and `T/x`, the
 map `x ↦ T/x` is an involution, its fixed point is `√T`, and **the fixed point is exactly the
@@ -48,25 +51,33 @@ open Holonics.Geometry.AffineSwing Holonics.Foundation.Chronology
 
 variable {G : Type*} [AddCommGroup G]
 
-/-- **An odd word of swings is itself a swing** — about the alternating sum of its anchors.
+/-- **An odd word of half-turns is itself a half-turn** — about the alternating sum of its anchors.
 
 Three crossings do not accumulate into something new: they collapse back to one crossing, about a
-new anchor built from the three by alternating signs.  The alternation is the hand. -/
+new anchor built from the three by alternating signs.  The alternation is the hand.  The length-three
+case of `Motion.odd_swing_word_is_swing`. -/
 theorem theOddCircuitIsASwingAboutTheAlternatingSum (b₁ b₂ b₃ a : G) :
-    swing b₁ (swing b₂ (swing b₃ a)) = swing (b₁ - b₂ + b₃) a := by
-  simp only [swing]; abel
+    swing b₁ (swing b₂ (swing b₃ a)) = swing (b₁ - b₂ + b₃) a :=
+  Motion.odd_swing_word_is_swing (word := [b₁, b₂, b₃]) ⟨1, rfl⟩
+    (by simp only [transportWord_cons, transportWord_nil, swing]; abel) a
 
-/-- **An even word of swings is a translation.**  Already the composition law; restated here so the
-grading is visible as a pair. -/
+/-- **An even word of half-turns is a translation.**  The length-two case of
+`Motion.even_swing_word_is_translation` (`AffineSwing.twoSwingsAreADoubledTranslation`), restated
+here so the grading is visible as a pair. -/
 theorem theEvenCircuitIsATranslation (b₁ b₂ a : G) :
-    swing b₁ (swing b₂ a) = a + ((b₁ + b₁) - (b₂ + b₂)) :=
-  twoSwingsAreADoubledTranslation b₁ b₂ a
+    swing b₁ (swing b₂ a) = a + ((b₁ + b₁) - (b₂ + b₂)) := by
+  have h := Motion.even_swing_word_is_translation (word := [b₁, b₂]) ⟨1, rfl⟩ a
+  simp only [transportWord_cons, transportWord_nil] at h
+  rw [h]; simp only [swing]; abel
 
-/-- **A four-letter word is a translation too**, so the grading is by parity and not by length. -/
+/-- **A four-letter word is a translation too**, so the grading is by parity and not by length.
+The length-four case of `Motion.even_swing_word_is_translation`. -/
 theorem theFourLetterCircuitIsATranslation (b₁ b₂ b₃ b₄ a : G) :
     swing b₁ (swing b₂ (swing b₃ (swing b₄ a))) =
       a + ((b₁ + b₁) - (b₂ + b₂) + ((b₃ + b₃) - (b₄ + b₄))) := by
-  simp only [swing]; abel
+  have h := Motion.even_swing_word_is_translation (word := [b₁, b₂, b₃, b₄]) ⟨2, rfl⟩ a
+  simp only [transportWord_cons, transportWord_nil] at h
+  rw [h]; simp only [swing]; abel
 
 /-- **An odd circuit that returns the body reverses the hand it returns with.**
 

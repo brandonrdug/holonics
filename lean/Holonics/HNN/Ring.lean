@@ -48,7 +48,7 @@ generator form:    ż = A z ,  A = [[0, 1], [−C⁻¹K, 0]] ,  U = (1 − A_h)�
    `Γ = (G₀ − G₁)/(G₀ + G₁)` and the **power** transmission fraction `T = 4G₀G₁/(G₀ + G₁)²` obey
    `Γ² + T = 1`. The junction's two-port case at a zero held wave
    (`HolonicConstitutiveCirculation.emitted`, `successorHeld`, the owner of
-   `HNN/Propagation.junctionSwing_twoPort`) returns the reflected wave `Γ i` in the old reference and
+   `HNN/Propagation.junctionScattering_twoPort`) returns the reflected wave `Γ i` in the old reference and
    the transmitted wave `(1 + Γ) i` in the new one, whose power there, `G₁|(1 + Γ) i|²`, is
    `T · G₀|i|²`: both powers are read in one frame, and `T` is not an amplitude.
 5. **Crossings are epoch ticks** (`ring_crossings_are_epoch_ticks`): along the ring's rational
@@ -564,7 +564,7 @@ def transmission (G₀ G₁ : ℚ) : ℚ := 4 * G₀ * G₁ / (G₀ + G₁) ^ 2
 
 /-- [proved-derived; formal-checked] **The two-port reference balance.** For `G₀, G₁ > 0`,
 `Γ² + T = 1`. The junction's two-port at a zero held wave (`emitted`, `successorHeld` of
-`HolonicConstitutiveCirculation`, the owner of `HNN/Propagation.junctionSwing_twoPort`) reflects
+`HolonicConstitutiveCirculation`, the owner of `HNN/Propagation.junctionScattering_twoPort`) reflects
 `Γ i` in the old reference and transmits `(1 + Γ) i` into the new one; the power recharted into the
 new reference is `G₁|(1 + Γ) i|² = T · G₀|i|²`, so both powers are read in one frame and the
 weighted square energy balance (`weighted_square_energy`) is `Γ² + T = 1` times the incident power. -/

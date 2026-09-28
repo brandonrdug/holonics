@@ -55,20 +55,28 @@ statement (`½` is `⅟2`, so characteristic two is excluded by hypothesis, neve
    (`multiplier_trace_det_undivided`), so `K + 1/K + 2 = tr²/det` for `K = μ₂/μ₁`
    (`multiplier_trace_det`); and `K = −1` exactly when the trace is zero
    (`multiplier_half_turn_iff_traceless`, `multiplier_ratio_half_turn_iff_traceless`).
-6. **Point reflections are poor in motions** (§2). Every word of point reflections has linear part
-   `(−1)^length` (`swing_word_linear_part`): an even word is a translation
-   (`even_swing_word_is_translation`) and an odd word a point reflection
-   (`odd_swing_word_is_point_reflection`, `odd_swing_word_is_swing`). This generalizes the words of
-   length two, three and four of `HolonicsResearch/Geometry/Navigation`. `det(−1_d) = (−1)^d`
-   (`det_half_turn`): `−1` in odd dimension (`det_half_turn_odd`), `1` in even
+6. **Half-turn words are poor in motions** (§2). Every word of half-turns (point reflections) has
+   linear part `(−1)^length` (`swing_word_linear_part`): an even word is a translation
+   (`even_swing_word_is_translation`) and an odd word a half-turn
+   (`odd_swing_word_is_point_reflection`, `odd_swing_word_is_swing`). This is the one owner of the
+   half-turn word law. Its length-two case `AffineSwing.twoSwingsAreADoubledTranslation` stays
+   beside the half-turn's definition, which this module imports, for its consumers; the circuits
+   of length two, three and four of `HolonicsResearch/Geometry/Navigation` are derived from it.
+   `det(−1_d) = (−1)^d` (`det_half_turn`): `−1` in odd dimension (`det_half_turn_odd`), `1` in even
    (`det_half_turn_even`).
 7. **Point-mass work and the sling** (§3.3, §3.8). In the complex chart, with `v̇ = v ẇ`,
    `Re(v̄ · v ẇ) = |v|² Re ẇ` (`power_is_boost_rate`: the power is the boost rate) and
    `Im(v̄ · v ẇ) = |v|² Im ẇ` (`normal_effort_is_turn_rate`), so for `m ≠ 0`, `v ≠ 0` and
    `F = m v ẇ` the signed turn rate is `θ̇ = Im(v̄ F)/(m|v|²)` and the boost rate
-   `β̇ = Re(v̄ F)/(m|v|²)` (`rates_from_effort`). If `v_out − V = k (v_in − V)` with
-   `|k|² = 1`, then `|v_out|² − |v_in|² = 2 Re(V̄ (v_out − v_in))` (`sling_speed_gain`): a turn
-   about a pivot `V` changes the speed a receiver centred at rest reads.
+   `β̇ = Re(v̄ F)/(m|v|²)` (`rates_from_effort`). **The sling** is owned here in a receiver's
+   metric: if the relative velocities about a moving pivot `V` carry equal `G`-energy,
+   `⟨u′, G u′⟩ = ⟨u, G u⟩`, the reading of the absolute velocities changes by
+   `⟨V + u′, G(V + u′)⟩ − ⟨V + u, G(V + u)⟩ = 2⟨V, G(u′ − u)⟩` (`sling_energy_gain`). In the
+   complex chart, `v_out − V = k (v_in − V)` with `|k|² = 1` gives
+   `|v_out|² − |v_in|² = 2 Re(V̄ (v_out − v_in))` (`sling_speed_gain`, derived from it): a turn
+   about a pivot `V` changes the speed a receiver centred at rest reads. The finite-coordinate form
+   `HolonicsResearch/Geometry/HolonicSlingTransport.gravityAssist_squaredSpeed_difference` is its
+   unit-metric case.
 8. **The traction disk** (§7). For `v ≠ 0` and `k = v′/v`, `|v′ − v|² = |k − 1|² |v|²`
    (`traction_move_ratio`, `traction_disk`); for `|k|² = 1`, `|k − 1|² = 2 − 2 Re k`
    (`turn_distance_from_one`); the chord of `k = cos θ + i sin θ` is
@@ -98,11 +106,19 @@ statement (`½` is `⅟2`, so characteristic two is excluded by hypothesis, neve
 12. **The energy law with a moving metric and forcing** (§3.2). Along `ẋ = Ax + f` with metric `G`
    (symmetric) and rate `Ġ`, undivided: `ẋᵀGx + xᵀĠx + xᵀGẋ = xᵀ(AᵀG + GA + Ġ)x + 2xᵀGf`
    (`energy_rate_moving_metric`) `= 2xᵀG B x + xᵀĠx + 2xᵀGf` with `B` the boost
-   (`energy_rate_moving_metric_boost`): the boost's work, the moving metric's work (a pump's or a deposition's)
-   and the push's power.
+   (`energy_rate_moving_metric_boost`): the boost's work, the moving metric's work (a pump's or a
+   deposition's) and the push's power. This is the algebraic form of the law, for any rate `A`
+   and any symmetric metric. Its dynamical owner, with learning, is
+   `Holon/Deposition.learned_energy_balance`: the derivative over `ℝ` along
+   `ẋ = (J − R + L) Q(τ) x + B u`, in the Holon's quadratic port chart (`G = Q`,
+   `A = (J − R + L) Q`, `f = B u`, `Ġ = Q̇`). The constant-metric rate form
+   `Foundation/CausalChord.rateForm` (its congruence `rateForm_congruence`) and the dissipative
+   generator's storage rate `Transport/HolonicInteraction.port_storage_rate`
+   (`AᵀG + GA = −2GMG`) are its `Ġ = 0`, `f = 0` readings; `boost_portHamiltonian` is the same
+   dissipation read as the boost.
 
 [interpretation] The words grip, push, free fall and sling are the record's readings of these
-identities; the the split's dependence on the receiver (a different metric for the same motion moves
+identities; the split's dependence on the receiver (a different metric for the same motion moves
 it; a rechart does not) is the record's §3.2 and is not a further theorem here. Owed and cited in the record, not proved here:
 `PSL(2, ℂ) ≅ SO⁺(1, 3)`, Chasles, Lancret, the polar decomposition over an exact field with square
 roots.
@@ -553,16 +569,40 @@ theorem rates_from_effort {m : ℝ} {v w F : ℂ} (hm : m ≠ 0) (hv : v ≠ 0)
   rw [hvF, im_ofReal_mul, re_ofReal_mul, normal_effort_is_turn_rate, power_is_boost_rate]
   constructor <;> field_simp
 
-/-- [proved-standard; formal-checked] **The sling:** a pure turn about the moving pivot `V`,
-`v_out − V = k (v_in − V)` with `|k|² = 1`, changes the squared speed read in another frame by
-`|v_out|² − |v_in|² = 2 Re(V̄ (v_out − v_in))`. -/
+/-- [proved-standard; formal-checked] **The sling, in a receiver's metric** (the owner of the sling
+law). About a moving pivot `V`, if the incoming and outgoing relative velocities `u`, `u′` carry
+equal `G`-energy, `⟨u′, G u′⟩ = ⟨u, G u⟩` (a turn about the pivot, or any move holding that
+energy), then for symmetric `G` the receiver's reading of the absolute velocities changes by
+`⟨V + u′, G(V + u′)⟩ − ⟨V + u, G(V + u)⟩ = 2⟨V, G(u′ − u)⟩`: the pivot's pairing with the turned
+relative change. -/
+theorem sling_energy_gain {n K : Type*} [Fintype n] [CommRing K] {G : Matrix n n K}
+    (hGs : Gᵀ = G) (V u u' : n → K) (hturn : u' ⬝ᵥ (G *ᵥ u') = u ⬝ᵥ (G *ᵥ u)) :
+    (V + u') ⬝ᵥ (G *ᵥ (V + u')) - (V + u) ⬝ᵥ (G *ᵥ (V + u)) =
+      2 * (V ⬝ᵥ (G *ᵥ (u' - u))) := by
+  have hsym : ∀ a b : n → K, a ⬝ᵥ (G *ᵥ b) = b ⬝ᵥ (G *ᵥ a) := by
+    intro a b
+    rw [Matrix.dotProduct_mulVec, dotProduct_comm, ← Matrix.mulVec_transpose, hGs]
+  simp only [Matrix.mulVec_add, Matrix.mulVec_sub, add_dotProduct, dotProduct_add,
+    dotProduct_sub]
+  rw [hsym u' V, hsym u V]
+  linear_combination hturn
+
+/-- [proved-standard; formal-checked] **The sling in the complex chart:** a pure turn about the
+moving pivot `V`, `v_out − V = k (v_in − V)` with `|k|² = 1`, changes the squared speed read in
+another frame by `|v_out|² − |v_in|² = 2 Re(V̄ (v_out − v_in))`. Derived from `sling_energy_gain`
+at the unit metric on the plane `(re, im)`. -/
 theorem sling_speed_gain {vIn vOut V k : ℂ} (hturn : vOut - V = k * (vIn - V))
     (hk : normSq k = 1) :
     normSq vOut - normSq vIn = 2 * (conj V * (vOut - vIn)).re := by
   have h := congrArg normSq hturn
   rw [normSq_mul, hk, one_mul] at h
-  simp only [normSq_apply, sub_re, sub_im, mul_re, conj_re, conj_im] at h ⊢
-  linear_combination h
+  have key := sling_energy_gain (G := (1 : Matrix (Fin 2) (Fin 2) ℝ)) Matrix.transpose_one
+    ![V.re, V.im] ![(vIn - V).re, (vIn - V).im] ![(vOut - V).re, (vOut - V).im]
+    (by simpa [dotProduct, Fin.sum_univ_two, normSq_apply] using h)
+  simp only [Matrix.one_mulVec, dotProduct, Fin.sum_univ_two, Pi.add_apply, Pi.sub_apply,
+    Matrix.cons_val_zero, Matrix.cons_val_one, Matrix.head_cons, sub_re, sub_im] at key
+  simp only [normSq_apply, sub_re, sub_im, mul_re, conj_re, conj_im]
+  linear_combination key
 
 end Work
 
@@ -875,7 +915,8 @@ variable {n K : Type*} [Fintype n] [CommRing K]
 
 /-- [proved-standard; formal-checked] **The energy law, undivided.** Along `ẋ = A x + f` with a
 symmetric metric `G` whose rate is `Ġ`, twice the rate of `E = ½ xᵀGx` is
-`ẋᵀGx + xᵀĠx + xᵀGẋ = xᵀ(AᵀG + GA + Ġ)x + 2 xᵀG f`. -/
+`ẋᵀGx + xᵀĠx + xᵀGẋ = xᵀ(AᵀG + GA + Ġ)x + 2 xᵀG f`. This is the algebraic form; the dynamical
+owner in the Holon's quadratic port chart is `Holon/Deposition.learned_energy_balance`. -/
 theorem energy_rate_moving_metric {A G Gdot : Matrix n n K} {x f xdot : n → K} (hGs : Gᵀ = G)
     (hx : xdot = A *ᵥ x + f) :
     xdot ⬝ᵥ (G *ᵥ x) + x ⬝ᵥ (Gdot *ᵥ x) + x ⬝ᵥ (G *ᵥ xdot) =
@@ -942,6 +983,7 @@ open Holonics.Geometry.Motion
 #print axioms det_half_turn_odd
 #print axioms power_is_boost_rate
 #print axioms normal_effort_is_turn_rate
+#print axioms sling_energy_gain
 #print axioms sling_speed_gain
 #print axioms traction_disk
 #print axioms turn_distance_from_one

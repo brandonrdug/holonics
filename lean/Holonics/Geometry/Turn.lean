@@ -7,9 +7,17 @@ import Mathlib.NumberTheory.Real.GoldenRatio
 /-!
 # The turn — geometric calibration and exact charts
 
-This Research owner develops metric turn calibration, real-chart readings, and half-angle branch
-applications. The generic complex exponential-kernel law used by ratio winding belongs to
-`Objects/Ratio/ExponentialKernel`; this module keeps its source-specific geometric turn results.
+This owner, in the `Holonics` library, develops metric turn calibration, real-chart readings, and
+half-angle branch applications. The generic complex exponential-kernel law used by ratio winding
+belongs to `Objects/Ratio/ExponentialKernel`; this module keeps its source-specific geometric turn
+results.
+
+**Its turn is a finite turn; `Geometry/Motion.turn` is a turn rate.** Here a turn is a unit
+multiplier `e^{iθ}` and the calibration of its angle (the whole turn, the half turn `−1`, arc
+partitions, half-angle branches). `Motion.turn G A` is the `G`-skew part of a linear rate `A` as a
+receiver of metric `G` reads it; for one complex channel `ż = (β + iθ) z` that turn rate is `θ`
+(`Motion.complex_rate_split`), and running it over a clock interval `t` multiplies by `e^{iθt}`,
+the finite turn read here. One is the other's exponential, which is why they share the word.
 
 The local exponential identities retain the distinction between an additive phase and its
 multiplicative chart; geometric calibration then supplies the turn readings used by the named

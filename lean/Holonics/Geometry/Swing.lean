@@ -8,22 +8,28 @@ import Holonics.Geometry.AffineSwing
 open Holonics.Foundation
 
 /-!
-# The swing — the one move, defined as harmonic conjugation
+# Harmonic conjugation — the projective half-turn, one move of the Swing
 
-The swing carries a body past an anchor.  Four things participate and the definition needs all
-four: the **body** that moves, the **anchor** it pivots about, a **contemporary constraint** (the
-other body present, which with the anchor spans the edge being crossed), and the **board** — the
-constraint that is invariant for every motion in the system.
+The Swing is the move about a grip (`docs/ELEMENTARY_OBJECTS.md#the-swing`, the motion record of
+September 28): a pivot held by a grip, momentum carried through it, and free fall between grips.
+**Harmonic conjugation is its projective half-turn**: a projective involution of trace zero, whose
+multiplier about its two fixed points is `−1` (`Geometry/Motion.multiplier_half_turn_iff_traceless`),
+Möbius-conjugate to a half-turn. This module keeps its historical name and states that one move.
+It carries a body past an anchor, and four things participate: the **body** that moves, the
+**anchor** it pivots about, a **contemporary constraint** (the other body present, which with the
+anchor spans the edge being crossed), and the **board** — the constraint that is invariant for
+every motion in the system.
 
-**The swing is harmonic conjugation.**  `A'` is the unique point with cross ratio
+**The move is harmonic conjugation.**  `A'` is the unique point with cross ratio
 `(A, A'; B, D) = −1`, where `B` is the anchor and `D` is the board.  Section 1 proves the
 statement that makes this precise and useful: **in the chart that sends the anchor to zero and
-the board to infinity, the swing is exactly negation** — the half turn, conjugated into whatever
+the board to infinity, the move is exactly negation** — the half turn, conjugated into whatever
 chart the constraints declare.
 
 **Freezing the board is putting `D` at infinity**, which is what makes a geometry affine rather
-than projective.  Section 2 works there: the swing degenerates to the point reflection
-`A ↦ 2B − A`, and sections 3 and 4 derive its invariants and decide a lattice puzzle with them.
+than projective.  Section 2 works there: the move degenerates to the point reflection
+`A ↦ 2B − A`, the affine half-turn `Geometry/AffineSwing.swing`, and sections 3 and 4 derive its
+invariants and decide a lattice puzzle with them.
 
 Section 5 is the point of the file for this project: **the frozen board is the first honest
 instance of the additive passage** in `Gluing.lean`.  Its obstruction group is a real, finite,

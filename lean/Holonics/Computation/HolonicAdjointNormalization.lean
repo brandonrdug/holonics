@@ -281,14 +281,21 @@ this owner's face of the potential `log p + log L` (`bayes_eq_face`), so it forg
 common origin of that potential (`bayes_eq_iff_logOdds`, through `face_eq_iff_pairwise_differences`
 and `face_add_common`); in particular the prior's own normalization is invisible
 (`bayes_smul_prior`). In the additive chart of the pair ratio the update is the translation
-`log(p'_i/p'_j) = log(p_i/p_j) + log(L_i/L_j)`, which is the Swing about `0` followed by the Swing
-about `½ log(L_i/L_j)` (`bayes_logOdds_twoSwings`, `AffineSwing.twoSwingsAreADoubledTranslation`).
+`log(p'_i/p'_j) = log(p_i/p_j) + log(L_i/L_j)`, which is the half-turn about `0` followed by the
+half-turn about `½ log(L_i/L_j)` (`bayes_logOdds_twoSwings`,
+`AffineSwing.twoSwingsAreADoubledTranslation`, the length-two case of
+`Geometry/Motion.swing_word_linear_part`).
 The same quotient on unnormalized weights is the discrete replicator `w' = w ⊙ L / ⟨w, L⟩`
 (`bayes_eq_discrete_replicator`). A positive likelihood never zeroes a weight
 (`replicator_pos`); a weight reaches zero only where its likelihood or its weight is already zero
 (`replicator_eq_zero_iff`), so a candidate is removed only by zero likelihood or an external
-release. This is a chart identity for the ratio and the Swing, not a claim that conditioning
-performs two reflections. -/
+release. This is a chart identity for the ratio and the half-turn, not a claim that conditioning
+performs two reflections.
+
+[definition] `bayes` is the one owner of Bayes' quotient rule. The other two charts of it are
+bridged here: the description-plus-log-loss Gibbs receiver
+(`Foundation/NavigatorInference.posterior_eq_bayes`) and the static mixture's posterior weight over
+`ℚ` (`Compression/Landmark/Context/LocalWeighing.static_weight_eq_bayes`). -/
 
 /-- [definition] **Bayes' quotient rule** on finite weights: `p'_i = p_i L_i / Σ_j p_j L_j`. -/
 def bayes (p L : Index → ℝ) (index : Index) : ℝ :=

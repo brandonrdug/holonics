@@ -100,7 +100,15 @@ end Commit
 
 /-- [proved-derived; formal-checked] **The balance under learning and deposition.** Along
 `ẋ = (J − R + L) Q(τ) x + B u` with `J` skew and `Q(τ)` symmetric,
-`dE/dτ = −⟨e, R e⟩ + ⟨e, L e⟩ + ⟨e, B u⟩ + ½⟨x, Q̇ x⟩`, `e = Q(τ) x`. -/
+`dE/dτ = −⟨e, R e⟩ + ⟨e, L e⟩ + ⟨e, B u⟩ + ½⟨x, Q̇ x⟩`, `e = Q(τ) x`.
+
+This is the dynamical owner of the moving-metric energy law, in the Holon's quadratic port chart
+and under exactly these hypotheses (differentiable `x`, `Q`; symmetric `Q`; skew `J`); it assigns
+no energy to a statistical receiver. Its algebraic form, for any rate `A` and symmetric metric `G`
+with rate `Ġ` and forcing `f`, is `Geometry/Motion.energy_rate_moving_metric` (read as turn and
+boost by `energy_rate_moving_metric_boost`: the turn `JQ` does no work, the dissipation `−RQ` and
+the learned relation's self-adjoint part boost). Its constant-metric readings are
+`Foundation/CausalChord.rateForm_congruence` and `Transport/HolonicInteraction.port_storage_rate`. -/
 theorem learned_energy_balance {σ μ : Type*} [Fintype σ] [Fintype μ] {J R L : Matrix σ σ ℝ}
     (hJ : Jᵀ = -J) (B : Matrix σ μ ℝ) (u : μ → ℝ) {x : ℝ → σ → ℝ} {Q : ℝ → Matrix σ σ ℝ}
     {Qd : Matrix σ σ ℝ} {t : ℝ}

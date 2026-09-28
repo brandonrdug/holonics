@@ -2,11 +2,15 @@ import Mathlib.Algebra.Group.Basic
 import Mathlib.Tactic.Abel
 
 /-!
-# Affine point reflection
+# The half-turn (affine point reflection)
 
-The frozen-board chart of a projective swing is the point reflection about its anchor. This
-elementary affine operation and its group laws live in Geometry so receiver-relative geometric
-consequences do not need to import the Research realization that motivated the name.
+The half-turn `S_a x = 2a − x` about an anchor `a` is one move of the Swing, the move about a grip
+(`docs/ELEMENTARY_OBJECTS.md#the-swing`): the move `x ↦ M x + b` with `M = −1`, whose pivot is its
+anchor (`Geometry/Motion.swing_is_half_turn_move`, `swing_pivot_is_anchor`). It is the
+frozen-board chart of harmonic conjugation (`Geometry/Swing`). The definition keeps its historical
+name `swing`. This elementary affine operation and its group laws live in Geometry so
+receiver-relative geometric consequences do not need to import the Research realization that
+motivated the name.
 -/
 
 namespace Holonics.Geometry.AffineSwing
@@ -29,7 +33,10 @@ theorem theSwingIsAnInvolution (b : G) : Function.Involutive (swing b) := by
 @[simp] theorem theAnchorIsFixed (b : G) : swing b b = b := by
   simp [swing]
 
-/-- Two point reflections about different anchors compose to a doubled translation. -/
+/-- Two half-turns about different anchors compose to a doubled translation. This is the length-two
+case of the half-turn word law, whose owner is `Geometry/Motion.swing_word_linear_part` (every
+word has linear part `(−1)^length`; `even_swing_word_is_translation`). It stays here, beside the
+definition that `Motion` imports, for its consumers. -/
 theorem twoSwingsAreADoubledTranslation (b c a : G) :
     swing b (swing c a) = a + (b + b - (c + c)) := by
   simp only [swing]; abel
