@@ -917,12 +917,12 @@ fn a_refusal_moves_nothing() {
 fn a_newborn_draws_from_the_reserved_mass() {
     let cells = vec![1usize; 40];
     let (bad, good) = (vec![rat(2, 3), rat(1, 3)], vec![rat(1, 64), rat(63, 64)]);
-    let epoch = 8;
+    let section_period = 8;
     let good_face = good.clone();
     let mut population = Population::new(vec![Box::new(Fixed::new(bad.clone(), 1))])
         .unwrap()
         .with_founding(Founding {
-            epoch,
+            section_period,
             candidates: vec![Candidate {
                 description: 2,
                 found: Box::new(move |_| Ok(Box::new(Fixed::new(good_face.clone(), 2)))),
@@ -972,7 +972,7 @@ fn a_newborn_draws_from_the_reserved_mass() {
         Population::new(vec![Box::new(Fixed::new(bad, 1))])
             .unwrap()
             .with_founding(Founding {
-                epoch,
+                section_period,
                 candidates: vec![Candidate {
                     description: 0,
                     found: Box::new(|_| unreachable!()),
@@ -1121,7 +1121,7 @@ fn a_death_keeps_the_seed_and_the_seed_is_refounded() {
     ])
     .unwrap()
     .with_founding(Founding {
-        epoch: 24,
+        section_period: 24,
         candidates: Vec::new(),
         reseed: true,
     })

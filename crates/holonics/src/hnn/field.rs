@@ -1613,7 +1613,7 @@ impl Field {
     /// **The field's exact self-delimiting code**: every declared value, each receiver's tree depth
     /// `D` (the landmark tree) and its stop-weight law's rungs (the declared stop prior), the word's precisions
     /// (`L_c`, `D_c`, `L_w`; none for the exact law), the recorded `n*`, the open's law with its
-    /// population chart's lattice `L_ν` (ruling B), the gauge convention, the sign generator's rule,
+    /// population chart's lattice `L_ν` (ruling B), the gauge convention, the sign sequence's rule,
     /// the receiving law's code ([`RECEIVING_LAW`]) with the tree's Krichevsky–Trofimov prior `α`,
     /// and the constitution's declared values (the
     /// steps `γ_U` and `η_x`, the budget `B_Θ`) with the pending capacity, as Elias-gamma naturals,
@@ -1724,7 +1724,7 @@ impl Field {
         );
         // The gauge convention (design R3 K2): 0 names "S_g(p_0) = 0 at the least visited port".
         natural(&mut code, 0);
-        // The sign generator's rule (design (d)): 0 names "the low bit of SplitMix64 over
+        // The sign sequence's rule (design (d)): 0 names "the low bit of SplitMix64 over
         // (0, ℓ, i, j)" (`constitution::declared_sign`).
         natural(&mut code, 0);
         // The receiving law (the landmark tree) and the tree's Krichevsky–Trofimov prior `α = 1/2`.
@@ -1747,7 +1747,7 @@ impl Field {
 /// reached covectors; the scored face is the mixture of the tree's face and the combined face
 /// weighted by their likelihood ratio `β`, opening at 1 (the primary's ruling A); every comparison
 /// is scored and then deposited" (`hnn::receiving`, `compression::landmark::context`).
-/// Code 2 was the region table's class masses with `R` opening at the sign generator times ½;
+/// Code 2 was the region table's class masses with `R` opening at the sign sequence times ½;
 /// code 1 the first repair's exogenous normal law on the target code face with the standing read; and
 /// campaign 1's first law (the face on the change alone) carried none. A feature-law change takes
 /// the next code and starts a fresh constitution: an old statistic cannot be re-read through new

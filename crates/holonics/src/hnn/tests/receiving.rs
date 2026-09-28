@@ -142,7 +142,7 @@ fn the_phase_address_is_the_trees_causal_address() {
 /// no forced split; campaign 1 declares `D = 4`, and at `n* = 6,148 = 2²·29·53`, `L_R = 16`, `B = 8`
 /// the owner derives the path lattice `M_p = 39` and the β carrier `W = 29`. A change of depth changes the field's code; the initial
 /// constitution carries a tree on the receiving ring only, empty, and its receiving map `R_0 = 0`
-/// and source port `E_0` the declared sign generator times ½ (entries `±½`).
+/// and source port `E_0` the declared sign sequence times ½ (entries `±½`).
 #[test]
 fn the_field_declares_the_tree_and_codes_it() {
     let steps = Steps::campaign_one();
@@ -383,7 +383,7 @@ fn the_wave_is_inert_when_every_map_opens_at_zero() {
 }
 
 /// **`R` opens at zero and learns from the first deposit** (the landmark tree's declared openings): at
-/// the declared initial constitution (`R_0 = 0`, `E_0` the sign generator times ½) the first
+/// the declared initial constitution (`R_0 = 0`, `E_0` the sign sequence times ½) the first
 /// compare's combined face is the tree's at the grain exactly (its code length equals the tree's
 /// grain face alone's), its
 /// covector reaches no upstream locus (`Rᵀ g = 0`), and its deposit moves `R`; the second compare's

@@ -1038,7 +1038,7 @@ fn switching_harness(classes: &[MoireClass]) {
         };
         let mut born = fixed
             .with_founding(Founding {
-                epoch: SECTION,
+                section_period: SECTION,
                 candidates: vec![Candidate {
                     description: bits,
                     found: Box::new(found),
@@ -1088,7 +1088,7 @@ fn switching_harness(classes: &[MoireClass]) {
         let (fixed, _) = declare_all(moire.alphabet(), MOIRE_CELLS, vec![Box::new(static_keys)]);
         let mut reseeding = fixed
             .with_founding(Founding {
-                epoch: SECTION,
+                section_period: SECTION,
                 candidates: Vec::new(),
                 reseed: true,
             })

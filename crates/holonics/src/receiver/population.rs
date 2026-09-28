@@ -114,8 +114,8 @@
 //! ```
 //!
 //! so the population's code does not move at a birth and the newborn pays its charge once. The
-//! trigger ([`Founding`]) is the population's residual: at the receiver's section every `epoch`
-//! cells, when the code paid since the previous section passes a founding's charge (the opening
+//! trigger ([`Founding`]) is the population's residual: at the receiver's section every
+//! `section_period` cells, when the code paid since the previous section passes a founding's charge (the opening
 //! section only opens the reading), the most recently dead family's seed is re-founded (with
 //! `reseed`), else the next declared candidate. The prior of every founding is declared, never tuned
 //! on the cells. [open] Owed (#62): the specialists' telescope of the abstaining newborn in Lean.
@@ -1577,13 +1577,13 @@ pub struct Candidate {
 pub type FoundFamily = Box<dyn FnMut(usize) -> Result<Box<dyn Family>, PopulationError> + Send>;
 
 /// [definition; agent-inferred] **The founding trigger** (module header, "Birth from reserved
-/// mass"): the receiver's section every `epoch` cells; at a section whose residual (the code the
+/// mass"): the receiver's section every `section_period` cells; at a section whose residual (the code the
 /// population paid since the last section) passes a founding's charge, it is founded from the
 /// reserved mass: with `reseed`, first the most recently dead family's seed (half the reserved
 /// mass), then the next declared candidate (its description). The opening section only opens the
 /// reading: it pays the declared families' own key location.
 pub struct Founding {
-    pub epoch: usize,
+    pub section_period: usize,
     pub candidates: Vec<Candidate>,
     pub reseed: bool,
 }
@@ -1692,7 +1692,7 @@ impl Population {
     /// **Declare the founding trigger** (module header, "Birth from reserved mass"); refused at an
     /// empty section, or when the candidates' masses pass the reserved mass.
     pub fn with_founding(mut self, founding: Founding) -> Result<Self, PopulationError> {
-        if founding.epoch == 0 {
+        if founding.section_period == 0 {
             return Err(refuse(
                 "a founding trigger",
                 "its section holds at least one cell",
@@ -2256,10 +2256,14 @@ impl Population {
 
     /// The founding trigger at a section (module header, "Birth from reserved mass").
     fn found_at_section(&mut self) -> Result<Option<BirthReceipt>, PopulationError> {
-        let Some(epoch) = self.founding.as_ref().map(|founding| founding.epoch) else {
+        let Some(period) = self
+            .founding
+            .as_ref()
+            .map(|founding| founding.section_period)
+        else {
             return Ok(None);
         };
-        if self.cells % epoch != 0 {
+        if self.cells % period != 0 {
             return Ok(None);
         }
         let code = self.code()?;

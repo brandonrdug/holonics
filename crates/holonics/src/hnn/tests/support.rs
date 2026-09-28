@@ -240,7 +240,7 @@ impl Medium {
     /// outputs 0 with `±1` reads; `R` a `±1` pattern times 1/2, so the wave reads a nonzero face;
     /// `W_c = 0`; `W_s = −¼I`; the slices the skew cyclic shift; `q = 0`; `C = I`, `K = D = ¼I`;
     /// the receiving parametron's tree empty. The `±1` patterns here come from the test generator,
-    /// not the declared sign generator.
+    /// not the declared sign sequence.
     pub(super) fn initial(field: &Field, seed: u64) -> Self {
         let mut draw = Draw::new(seed);
         let mut sign = move || {
