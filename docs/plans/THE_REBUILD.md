@@ -112,7 +112,21 @@ sets the order:
      aeons. The Lean for the rounding bound, the newborn's telescope and the chord equality is owed
      in #62.
 
-6. **Next: composition and the evolved prior.** Families compose at ports (a Holarchy of eggs). The birth prior over families is learned across aeons from the
+6. **Composition at ports, built (September 27;** `receiver::population::composition`, Lean
+   `Context/Composition`**).** A keystone (a record clock) exposes its port, and conditioned eggs (a
+   carry egg, a counter, a sieve) read it. The composed egg codes exactly the truth on every
+   arithmetic terrain:
+   - **Products in base 10** (`2^12` records): `108857 + 3/16 + ε` bits, the operands' entropy
+     plus the clock's `log₂ 19`, against the tree's `273520 + 7/16`. Every determined cell costs
+     exactly zero once the clock is located.
+   - **Prime streams over `[0, 10^4)`:** `15 + 9/16 + ε` bits, the key description, against the
+     tree's `161780 + 3/16`.
+   - **Keystone values** (the joint code without it against with it): the record clock is worth
+     `164662 + 4/16` in base 10 and the counter `138240 + 3/16` on the primes.
+
+   The curated source's per-port reader was measured and retired: the typed reader stays, and
+   campaign 5 needs a joint address across ports and a cheaper boundary.
+7. **Next: the evolved prior and species collapse.** Families compose at ports (a Holarchy of eggs). The birth prior over families is learned across aeons from the
    population's deaths and selections (the evolved ability; [ELEMENTARY_OBJECTS, keys](../ELEMENTARY_OBJECTS.md#keys-locks-and-navigation)):
    a retention of selection counts, never a tape. A keystone's value is the joint code with it against without it, and a mode held
    against dissipation charges its maintenance work
