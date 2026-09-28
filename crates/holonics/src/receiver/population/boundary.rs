@@ -479,6 +479,40 @@ impl BoundaryEgg {
             (split, face)
         }
     }
+
+    /// **One class's staged face, nothing moved**: `h(σ(x)) · r(x)`, exactly the entry of
+    /// [`Family::face`] at `x`, read along one path (the admitted receivers' reading of a located
+    /// byte, `admitted`).
+    pub fn probability(&self, cell: usize) -> Result<Rat, PopulationError> {
+        let alphabet = self.alphabet();
+        if cell >= alphabet {
+            return Err(PopulationError::CellOutside { cell, alphabet });
+        }
+        let port = self.clock.port();
+        let [byte, letter] = self.hazard.face(&port);
+        match self.chart.section(cell) {
+            Some(_) => {
+                let grain = self.letters.tree.declaration().grain;
+                let face = self
+                    .letters
+                    .tree
+                    .face(&self.letters.address(&port)?, grain)?;
+                Ok(letter * &face.probabilities[cell - self.chart.bytes()])
+            }
+            None if byte.is_zero() => Ok(byte),
+            None => {
+                let digits = self.bytes.score_digits(cell)?;
+                let root = digits
+                    .digits
+                    .iter()
+                    .find(|digit| digit.dyadic == 1)
+                    .ok_or_else(|| refuse("a boundary egg's byte tree", "its root digit splits"))?;
+                let (side, exponent) = self.root_side(root.split, false);
+                let root_face = Rat::new(BigInt::from(side), BigInt::one() << exponent as usize);
+                Ok(byte * (&digits.reading.executed / &root_face))
+            }
+        }
+    }
 }
 
 impl Family for BoundaryEgg {

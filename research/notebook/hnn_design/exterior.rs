@@ -292,3 +292,46 @@ pub fn read_curated(path: &str, chart: &SectionChart) -> CuratedCut {
         held: held_start..cells,
     }
 }
+
+/// **The curated cut's declared relations** (`curated-cut.incidence.bin`, written by
+/// `curated_incidence.py` beside the curated cut: three little-endian u32 a relation, the reading
+/// part's letter tick, the kind, `0` a request and `1` a later human return, and the target's
+/// letter tick), in letter order; their count must be the manifest's. Only counts are printed.
+#[allow(clippy::disallowed_types, clippy::disallowed_methods)]
+pub fn read_incidence(curated_path: &str) -> Vec<holonics::receiver::population::Relation> {
+    use holonics::receiver::population::{Relation, RelationKind};
+    let path = curated_path.strip_suffix(".bin").map_or_else(
+        || format!("{curated_path}.incidence.bin"),
+        |stem| format!("{stem}.incidence.bin"),
+    );
+    let raw = std::fs::read(&path).unwrap_or_else(|error| panic!("read the incidence: {error}"));
+    assert_eq!(raw.len() % 12, 0, "u32 triples");
+    let relations: Vec<Relation> = raw
+        .chunks_exact(12)
+        .map(|triple| {
+            let word = |at: usize| {
+                u64::from(u32::from_le_bytes([
+                    triple[at],
+                    triple[at + 1],
+                    triple[at + 2],
+                    triple[at + 3],
+                ]))
+            };
+            Relation {
+                letter: word(0),
+                kind: match word(4) {
+                    0 => RelationKind::Request,
+                    1 => RelationKind::LaterHuman,
+                    kind => panic!("a declared relation kind, found {kind}"),
+                },
+                target: word(8),
+            }
+        })
+        .collect();
+    assert_eq!(
+        relations.len(),
+        manifest_number(&path, "\"relations\":"),
+        "the incidence manifest's count"
+    );
+    relations
+}

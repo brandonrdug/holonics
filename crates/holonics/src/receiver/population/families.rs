@@ -173,6 +173,12 @@ impl TreeFamily {
             .collect()
     }
 
+    /// **Score one cell digit by digit, nothing moved** (the admitted receivers' reading of a located
+    /// byte, `admitted`): the executed face and each opened digit's split at the current standing.
+    pub(crate) fn score_digits(&self, cell: usize) -> Result<DigitsReading, PopulationError> {
+        Ok(self.tree.score_digits(&self.address(), cell)?)
+    }
+
     /// **Receive one cell digit by digit** (the boundary egg's reading of its byte tree): the
     /// executed face and each opened digit's split, read before the deposit, then the deposit and
     /// the tick's letter pushed onto the address.

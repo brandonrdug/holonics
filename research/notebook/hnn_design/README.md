@@ -149,7 +149,8 @@ milestone. Its declarations (agent-inferred from the
   `previous_record` is `event − 1` in every development view (the capture predecessor), so it is a
   coordinate, never a parent. The admitted receivers (the contract's item 7: request→response and
   response→later-human, the `comparison-request` and `later-human-after-agent` relations) are
-  carried in the incidence file but not yet consumed by any receiver.
+  carried in the incidence file and consumed by `receiver::population::admitted` ("The admitted
+  receivers" below).
 
 Counts: 22,449 development families (617 evaluation and 1,702 deferred, read for their partition
 label only), 87 conversations, 22,395 occurrences with cells; human 2,142 parts and 1,557,801
@@ -1139,3 +1140,89 @@ What it located:
   held-out cells `93 + 2/16` (at the grain) above the `[channel, kind]` reader (`258165 + 14/16` against
   `258072 + 12/16`); the egg's sections carry it below.
 
+## The admitted receivers (campaign 5, September 27)
+
+The source contract's item 7 consumed ([HNN_FORMULA](../../../docs/HNN_FORMULA.md#the-source-and-release-contract);
+`holonics::receiver::population::admitted`, `holonics::compression::landmark::context::spans`; Lean
+`Composition.{stagedFace_nonneg, stagedFace_sum_one}` at each tick's stage map and
+`{staged_chain_rule, staged_code}` at `σ = id`; #73, #148). `curated_incidence.py` (stdlib only,
+run once, writing only into `.local/cuts/`, each file mode 0600, printing counts and hashes only)
+places the curated source's relations on the pinned cut: a relation is declared when its reading
+part and its target both open a part in the cut. The `curated` mode's population now holds the
+admitted egg in the boundary egg's place (its inner egg, reported from its own receipt). These are
+development receipts; the script and the reader print counts and bits only. One passage over the
+whole cut: the population `302669` ms (its development cells `261545` ms), the flat tree `23296`
+ms, the peak resident set `10491265024` bytes.
+
+```sh
+HOLONICS_ROOT=$PWD python3 research/notebook/hnn_design/curated_incidence.py
+cargo run --release -p holonics --example hnn_population -- curated .local/cuts/curated-cut.bin .local/cuts/curated-flat-cut.bin
+```
+
+**The declared relations** (892): requests 678 development and 117 held out; later human returns 77
+and 20. Not declared: requests whose target no development occurrence holds 711 and 11, whose
+target has no cells 3, none declared 1; later human returns before the cut 1, none declared 6 and 2.
+
+**The laws.** A response is located on its request's span (the longest suffix of the part that
+recurs in the span, and the span's byte after it). At a located length of at least 4 the copy stage
+factors the boundary egg's face: a KT face of whether the located byte comes next, per cell of the
+length's dyadic class above 4 (4 classes) and the boundary egg's own odds of the located byte
+(`⌊log₂(q/(1 − q))⌋`, 8 classes a side), the miss stage the boundary egg's face renormalized off the
+located byte. The later human part is read against the response it follows under the same law, as
+a receipt only: its faces never enter the family's. The request's pointer is coded at each agent
+letter and charged to the curated stream: held or not (a KT face per section kind and the previous
+agent part's held state), the same request as the previous agent part's or not (per section kind),
+else its rank among the human parts received (its dyadic class in unary, its offset uniform).
+
+**The development probe** (`admitted_probe`, a scratch command on the development cells alone, the
+boundary egg under the request's stage, `123460` ms, resident `3087818752` bytes), each law's staged
+code against the boundary egg's on its own ticks, bits at `L_R = 16`, each `+ ε`:
+
+| least, length classes, odds classes a side | agent ticks read | copies | staged − boundary egg |
+|---|---|---|---|
+| 1, 6, 8 | 382,505 | 94,435 | `−1555 + 0/16` |
+| **4, 4, 8** (chosen) | 66,346 | 33,174 | `−1863 + 5/16` |
+| 8, 3, 8 | 9,122 | 5,987 | `−1120 + 11/16` |
+| 4, 4, 0 | 66,346 | 33,174 | `+30772 + 15/16` |
+| 1, 6, 0 | 382,505 | 94,435 | `+156406 + 8/16` |
+| 2, 5, 8 | 258,285 | 77,886 | `−1669 + 7/16` |
+| 16, 2, 8 | 952 | 804 | `−366 + 10/16` |
+| 4, 4, 4 | 66,346 | 33,174 | `−1561 + 0/16` |
+
+The pointer's code among 3 (development, the request's, each `+ ε`): held per section kind
+`2116 + 2/16`; per section kind and the previous agent part's held state `1374 + 0/16`; with the
+same request as the previous agent part's `1109 + 1/16` (chosen; the latter two read by an exact
+scratch product of the same faces, the chosen one reproduced by the passage). Charged:
+`⌈log₂ 8⌉ + ⌈log₂ 3⌉ = 5` bits beside the boundary egg's 12, so 17.
+
+[established-bounded; measured] **The passage.**
+
+| | development (915,723 bytes, 1,477 letters) | held out (130,878 bytes, 150 letters) |
+|---|---|---|
+| agent bytes, population against flat, with the admitted receivers | `1647460 + 7/16` against `1653396 + 1/16`: `−5936 + 6/16` | `180898 + 11/16` against `181648 + 14/16`: `−751 + 12/16` |
+| agent bytes, population against flat, without (commit `40ab94cf`) | `−4068 + 0/16` | `−418 + 3/16` |
+| the request receiver on its agent bytes, against the boundary egg | 66,333 bytes, 33,174 copies: `−1868 + 6/16` | 20,974 bytes, 10,262 copies: `−333 + 9/16` |
+| at its closes | 13: `+4 + 15/16` | 5: `+0 + 11/16` |
+| the request's pointer (agent letters, held) | 1,393, 678: `1109 + 1/16` | 128, 117: `159 + 1/16` |
+| **the receiver's value, its pointer paid** | **`−754 + 6/16`** | **`−173 + 6/16`** |
+| every byte against flat | `−7294 + 9/16` | `−1324 + 5/16` |
+| **whole curated stream charged against the flat stream** (before) | **`−1699 + 15/16`** (`−950 + 9/16`) | **`−583 + 10/16`** (`−415 + 3/16`) |
+| the later human return, conditioned on the response against unconditioned (receipt) | 19,053 bytes, 9,111 copies: `−470 + 12/16`; 10 closes `+0 + 9/16` | 12,391 bytes, 6,080 copies: `−457 + 11/16`; 2 closes `+0 + 5/16` |
+| the later human's pointer (human letters, held; receipt) | 84, 77: `213 + 6/16` | 22, 20: `38 + 4/16` |
+| retention: cells held at once, at most | 31,239 | 35,323 |
+
+The human bytes and the other families read exactly as before (the receipt never enters the face):
+human bytes `145988 + 3/16` and `76011 + 1/16`, the boundary egg `1799780 + 11/16` and
+`257809 + 11/16`. The admitted egg is selected at posterior `0 + 0/16` after both populations.
+
+What it located:
+- **A response is read against its request, and it pays for its pointer.** On the agent bytes it
+  reads, the request's port lowers the code by `1868 + 6/16` over 66,333 bytes on development and
+  `333 + 9/16` over 20,974 held out (under `1/16` a byte each); its pointer paid, `−754 + 6/16` and
+  `−173 + 6/16` remain. The copy stage must weigh the inner egg's own odds: without the odds classes
+  every law codes far above the boundary egg (the tree already predicts most quoted bytes).
+- **A later human return is predicted by what it answers**, as an observation: `−457 + 11/16` over
+  12,391 held-out human bytes read against the response they follow, never trained into the
+  response's reading.
+- **Most requests are not held**: 711 of 1,393 development agent parts reach a request no
+  development occurrence holds, so their port stays unheld.

@@ -148,6 +148,18 @@
 //! plus the conditioned faces', by the chain rule at every tick, and its byte tree read alone is its
 //! unheld port, so the part clock's value is exact.
 //!
+//! [proved-derived; formal-checked] **The admitted receivers** ([`admitted`]; HNN_FORMULA's source
+//! contract, item 7; Lean `Composition.{stagedFace_nonneg, stagedFace_sum_one, staged_chain_rule,
+//! staged_code}` at a tick's own stage map). The curated source's declared incidence places a
+//! response's request, and a later human part's response, on a port the reading part is located
+//! on (`compression::landmark::context::spans`: the longest suffix of the part that recurs in the
+//! target's span, and the span's byte after it). The admitted egg ([`AdmittedEgg`]) factors the
+//! boundary egg's face through a copy stage, a KT face per cell of a declared partition (the
+//! located length's and the inner egg's odds' dyadic classes) of whether the located byte comes
+//! next; the later human's stage is a receipt only, never the family's face. Its inner egg read
+//! alone is the port unheld, and the incidence is coded where it arrives and charged beside the
+//! cells.
+//!
 //! [definition; agent-inferred] **Identity** ([`evolution`]). A family's identity across aeons is
 //! its declaration ([`Family::declaration`]: the generator family's kind, declared integers and the
 //! declarations it is built on) and its description ([`Identity`]), never its label: a seed
@@ -222,7 +234,10 @@
 //! | `Compression/Landmark/Context/Evolution.{speciesWeight_isPrior, species_mixture, species_face, species_collapse_code, species_split}` | [`Population::collapse`], [`Population::split`], [`Collapse`] |
 //! | `Compression/Landmark/Context/Composition.{stagedFace_nonneg, stagedFace_sum_one, staged_chain_rule, staged_code}` | [`BoundaryEgg`] (its staged face and its code by stage, [`BoundaryReadout`]) |
 //! | `Compression/Landmark/Context/Tree.{ktFace, ktFace_pos, ktFace_sum}` (over `{byte, letter}`) | [`Hazard`] |
+//! | `Compression/Landmark/Context/Composition.{stagedFace_nonneg, stagedFace_sum_one}` at each tick's `σ_t`, `{staged_chain_rule, staged_code}` at `σ = id` | [`AdmittedEgg`] (the copy stage over the inner egg, [`StageReadout`]) |
+//! | `Compression/Landmark/Context/Tree.{ktFace, ktFace_pos, ktFace_sum}` (over `{miss, copy}`, the pointer's sides) | [`CopyStage`], [`PointerReadout`] |
 
+pub mod admitted;
 pub mod arithmetic;
 pub mod boundary;
 pub mod composition;
@@ -238,6 +253,10 @@ mod evolution_tests;
 #[cfg(test)]
 mod tests;
 
+pub use admitted::{
+    AdmittedEgg, AdmittedReadout, CopyCell, CopyLaw, CopyStage, PointerReadout, Relation,
+    RelationKind, StageReadout, odds_class,
+};
 pub use arithmetic::{CarryEgg, Counter, RecordClock, Sieve, SieveFace};
 pub use boundary::{
     BoundaryEgg, BoundaryReadout, Hazard, HazardCell, LastByte, PartClock, PartPort, dyadic_class,
@@ -399,13 +418,15 @@ impl KeyReadout {
     }
 }
 
-/// [definition] **A family's readout**: a key family's surviving keys, a tree family's standing, or
-/// a boundary egg's code by stage and channel.
+/// [definition] **A family's readout**: a key family's surviving keys, a tree family's standing, a
+/// boundary egg's code by stage and channel, or the admitted receivers' (their inner egg's, their
+/// copy stages' and their incidence's code).
 #[derive(Clone, Debug, PartialEq)]
 pub enum Readout<'a> {
     Keys(KeyReadout),
     Standing(&'a Landmarks),
     Boundary(Box<BoundaryReadout>),
+    Admitted(Box<AdmittedReadout>),
 }
 
 /// [definition] **A declared navigator family** (module header): a candidate egg read by the
@@ -1866,7 +1887,7 @@ impl Population {
                     exact: exchange,
                     seed: match member.family.readout() {
                         Readout::Keys(keys) => Some(keys),
-                        Readout::Standing(_) | Readout::Boundary(_) => None,
+                        _ => None,
                     },
                 })
             })
@@ -2248,7 +2269,7 @@ impl Population {
                 posterior,
                 keys: match member.family.readout() {
                     Readout::Keys(keys) => Some(keys),
-                    Readout::Standing(_) | Readout::Boundary(_) => None,
+                    _ => None,
                 },
                 drift: member.family.drift(),
                 work: member.family.work(),

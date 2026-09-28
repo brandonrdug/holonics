@@ -226,9 +226,23 @@ newlines as the only sections. It is a byte codec, which Holonic Encoding exclud
 regression control. The curated conversation source is built under this contract: human, agent,
 tool and harness as ports; turns as epochs; conversations as aeons; parents as incidence; and the
 request→response and response→later-human relations as the admitted receivers. It is campaign 5's
-input and step 8's curation. [open] Its first build (`curated_source.py`) meets items 1–6 and 8. It
-carries the request→response and response→later-human relations in its incidence file, but no
-receiver consumes them yet, so item 7 is unmet. Campaign 5 declares those receivers.
+input and step 8's curation. Its first build (`curated_source.py`) meets items 1–6 and 8.
+
+[established-bounded; measured] Item 7 is consumed (`receiver::population::admitted`,
+`compression::landmark::context::spans`; the
+[notebook receipt](../research/notebook/hnn_design/README.md#the-admitted-receivers-campaign-5-september-27)).
+`curated_incidence.py` places the request→response and response→later-human relations on the
+pinned cut. The request→response receiver locates a response on its request's span and factors the
+boundary egg's face through a copy stage, with the request's pointer coded where it arrives and
+charged. The response is observed conduct, predicted and never scored. The response→later-human
+receiver reads the later human part against the response it follows as a receipt only: an
+observation, never a reward, and never in the family's face. On the agent bytes the population now
+codes `−5936 + 6/16` below the flat stream on development and `−751 + 12/16` held out, against
+`−4068 + 0/16` and `−418 + 3/16` before. The receiver's value with its pointer paid is
+`−754 + 6/16` and `−173 + 6/16`. The later human return conditioned on its response codes
+`−457 + 11/16` below the unconditioned over 12,391 held-out human bytes. A relation whose target
+lies outside the passage stays unheld: 711 of the 1,393 development agent parts reach a request no
+development occurrence holds.
 
 ### A tensor is an operation chart
 

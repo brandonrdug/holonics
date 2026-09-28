@@ -1,6 +1,6 @@
 //! **`curated`: the curated conversation source through the egg population** (campaign 5 on the
-//! population; `holonics::receiver::population::{families, boundary}`,
-//! `holonics::compression::landmark::context::sections`; Lean
+//! population; `holonics::receiver::population::{families, boundary, admitted}`,
+//! `holonics::compression::landmark::context::{sections, spans}`; Lean
 //! `Compression/Landmark/Context/Composition.{stagedFace_*, staged_chain_rule, staged_code}`;
 //! #73, #148). Included by `hnn_population.rs` as its `curated` mode; count-only **development
 //! receipts**, a committed command run once in release, never a test.
@@ -11,7 +11,9 @@
 //!
 //! [definition; agent-inferred] **The cut** is `curated_source.py`'s pinned cut (`hnn_curated`'s):
 //! the section chart `256 + 12` (`SectionChart::curated`), `n* = 2^20`, the final eighth held out,
-//! and its flat twin, the same bytes with every letter removed.
+//! and its flat twin, the same bytes with every letter removed. **Its declared relations** are
+//! `curated_incidence.py`'s (`curated-cut.incidence.bin` beside the cut): each response's request
+//! and each later human part's response, placed on the cut's letter ticks where both lie in the cut.
 //!
 //! [definition; agent-inferred] **The population**, declared before any passage, every family named
 //! by `⌈log₂ 8⌉ = 3` bits (`M = 1`), each tree the `½` stop prior and
@@ -20,10 +22,17 @@
 //!   carriers admit;
 //! - **the typed tree** (`TreeFamily::sectioned`: each tick's cell bundled with its part's channel,
 //!   read once at the section; the joint address across ports) at `D = 6, 12`;
-//! - **the boundary egg** (`BoundaryEgg`): the part clock composed with the typed tree at the deepest
-//!   its carriers admit and the letter tree at `D_L = 12`, through the hazard law. Its byte tree read
-//!   alone (the part clock's port unheld) is the typed tree at that depth, reported from the egg's own
-//!   receipt: the same tree on the same cells, so the population does not hold it twice.
+//! - **the admitted receivers** (`AdmittedEgg`, HNN_FORMULA's source contract, item 7): the
+//!   boundary egg (the part clock composed with the typed tree at the deepest its carriers admit and
+//!   the letter tree at `D_L = 12`, through the hazard law) read through the request's copy stage
+//!   (`COPY_LAW`: a response located on its request's span, the KT face of whether the located byte
+//!   comes next per cell of the located length's and the boundary egg's odds' classes), and the
+//!   later human part read against the response it follows as a receipt only, under the same law.
+//!   Its inner egg read alone (the request's port unheld) is the boundary egg, and the boundary egg's
+//!   byte tree read alone (the part clock's port unheld) is the typed tree at that depth, each
+//!   reported from the egg's own receipt: the same trees on the same cells, so the population does
+//!   not hold them twice. The request's pointer (the incidence's code, `admitted`'s header) is
+//!   charged to the curated stream beside its cells.
 //!
 //! [definition; agent-inferred] **The development sweep, charged.** On the development cells alone
 //! (`boundary_probe`, a scratch command, never committed) the egg's constituents were chosen among
@@ -31,8 +40,13 @@
 //! cell tree at `D = 48`, the channel-slot tree at `D = 21`, one below its deepest), the hazard among
 //! 45 partitions and
 //! mixtures, the letter tree among 11 (plain and typed, `D_L ≤ 12`): `⌈log₂ 3⌉ + ⌈log₂ 45⌉ +
-//! ⌈log₂ 11⌉ = 2 + 6 + 4 = 12` bits, charged to the curated stream. The flat tree is charged its
-//! recorded depth sweep, `⌈log₂ 5⌉ = 3` bits.
+//! ⌈log₂ 11⌉ = 2 + 6 + 4 = 12` bits, charged to the curated stream. The admitted receivers' laws
+//! were chosen on the development cells alone (`admitted_probe`, a scratch command, never
+//! committed: the boundary egg under the request's stage): the copy stage's law among 8 (each
+//! law's staged code against the boundary egg's on its ticks), and the pointer's code among 3 (held
+//! per section kind; per section kind and the previous reading part's held state; and with the same
+//! target as the previous reading part's), a further `⌈log₂ 8⌉ + ⌈log₂ 3⌉ = 3 + 2 = 5` bits. The
+//! flat tree is charged its recorded depth sweep, `⌈log₂ 5⌉ = 3` bits.
 //!
 //! [definition] **One passage**: the population reads the whole cut once, development cells then
 //! held-out cells, every cell scored at the standing before its own deposit
@@ -43,7 +57,10 @@
 //! channel's bytes and at each channel's closes, against the retired per-port reader's closes,
 //! `849 + 1/16` over 84 human and `3139 + 4/16` over 1392 agent ends; the byte tree within the bytes;
 //! the letter tree against the retired section navigator's `1839 + 12/16`); the part clock's value
-//! (the egg's unheld byte tree against the egg); each family's code, posterior and selection; wall
+//! (the egg's unheld byte tree against the egg); the admitted receivers (the request's copy stage
+//! on the agent bytes against the boundary egg's on the same ticks, its pointer's code and the net;
+//! the later human's receipt against the boundary egg's on the human bytes, never in the face);
+//! each family's code, posterior and selection; wall
 //! times and the resident set. Bits are enclosures read at `L_R = 16` as `n + k/16 + ε`; no decimal
 //! and no content is printed.
 
@@ -57,13 +74,15 @@ use holonics::hnn::field::{Field, FieldDeclaration};
 use holonics::ratio::Rat;
 use holonics::ratio::algebraic::{ExactInterval, interval_difference, interval_sum};
 use holonics::receiver::population::{
-    BoundaryEgg, BoundaryReadout, Family, PartReading, Population, PopulationReceipt, Posterior,
-    Readout, TreeFamily,
+    AdmittedEgg, AdmittedReadout, BoundaryEgg, BoundaryReadout, CopyLaw, Family, PartReading,
+    PointerReadout, Population, PopulationReceipt, Posterior, Readout, RelationKind, StageReadout,
+    TreeFamily,
 };
 use num_bigint::BigInt;
 
 use super::exterior::{
-    against, enclosure, per, read_curated, read_cut, reading_of, receiver_grain, resident_set,
+    against, enclosure, per, read_curated, read_cut, read_incidence, reading_of, receiver_grain,
+    resident_set,
 };
 
 /// The cell tree's doubling ladder below its deepest admitted depth.
@@ -78,9 +97,14 @@ const LETTER_DEPTH: usize = 12;
 /// The flat tree's recorded depth (the typed reader's development sweep, `hnn_curated`).
 const FLAT_DEPTH: usize = 48;
 
+/// The copy stage's law (the least located length, the length classes, the odds classes a side),
+/// chosen on development among the probed (charged below).
+const COPY_LAW: (u64, u32, u32) = (4, 4, 8);
+
 /// The development sweep's charges (module header): the byte tree among 3, the hazard among 45,
-/// the letter tree among 11; the flat tree's recorded depth sweep among 5.
-const PROBED: [u64; 3] = [3, 45, 11];
+/// the letter tree among 11, the copy stage's law among 8, the pointer's code among 3; the flat
+/// tree's recorded depth sweep among 5.
+const PROBED: [u64; 5] = [3, 45, 11, 8, 3];
 const FLAT_SWEEP: u64 = 5;
 
 /// The readings' slots.
@@ -100,6 +124,13 @@ const RETIRED_CLOSES: [&str; 2] = [
     "3139 + 4/16 (1392 agent ends)",
 ];
 const RETIRED_LETTERS: &str = "1839 + 12/16";
+
+/// The population before the admitted receivers (commit `40ab94cf`, the boundary egg in their place):
+/// its agent bytes against the flat tree's, development and held out.
+const RECORDED_AGENT: [&str; 2] = [
+    "1649328 + 1/16 against 1653396 + 1/16: −4068 + 0/16",
+    "181231 + 2/16 against 181648 + 14/16: −418 + 3/16",
+];
 
 fn ceil_log2(count: u64) -> u64 {
     u64::from(count.next_power_of_two().trailing_zeros())
@@ -331,6 +362,133 @@ fn stages(stages: &Stages, channels: &[&str], letters: u64) {
     );
 }
 
+/// One copy stage's readout on one population: the later readout less the earlier (held out), or
+/// the development readout alone.
+struct StagePart {
+    ticks: [u64; 2],
+    copies: u64,
+    staged: [ExactInterval; 2],
+    inner: [ExactInterval; 2],
+    stage: ExactInterval,
+    conditioned: ExactInterval,
+}
+
+/// A code on one population: the later passage's less the earlier's, or the development's alone.
+fn since(now: &PassageCode, then: Option<&PassageCode>) -> ExactInterval {
+    match then {
+        Some(then) => minus(&bits(now), &bits(then)),
+        None => bits(now),
+    }
+}
+
+impl StagePart {
+    fn of(now: &StageReadout, before: Option<&StageReadout>) -> Self {
+        Self {
+            ticks: [0, 1].map(|at| now.ticks[at] - before.map_or(0, |b| b.ticks[at])),
+            copies: now.copies - before.map_or(0, |b| b.copies),
+            staged: [0, 1].map(|at| since(&now.staged[at], before.map(|b| &b.staged[at]))),
+            inner: [0, 1].map(|at| since(&now.inner[at], before.map(|b| &b.inner[at]))),
+            stage: since(&now.stage, before.map(|b| &b.stage)),
+            conditioned: since(&now.conditioned, before.map(|b| &b.conditioned)),
+        }
+    }
+}
+
+/// A relation's pointer on one population: its reading parts, those held, and its code.
+fn pointer_part(
+    now: &PointerReadout,
+    before: Option<&PointerReadout>,
+) -> (u64, u64, ExactInterval) {
+    (
+        now.parts - before.map_or(0, |b| b.parts),
+        now.held - before.map_or(0, |b| b.held),
+        since(&now.code, before.map(|b| &b.code)),
+    )
+}
+
+/// **The admitted receivers on one population** (module header): the request's copy stage against
+/// the boundary egg on the same ticks, its pointer and the net, and the later human's receipt.
+/// Returns the request's pointer code, charged to the curated stream.
+fn receivers(now: &AdmittedReadout, before: Option<&AdmittedReadout>) -> ExactInterval {
+    let grain = super::GRAIN;
+    let stage = |index: usize| StagePart::of(&now.stages[index], before.map(|b| &b.stages[index]));
+    let pointer = |kind: RelationKind| {
+        pointer_part(
+            &now.pointers[kind.index()],
+            before.map(|b| &b.pointers[kind.index()]),
+        )
+    };
+    let law = now.stages[0].law;
+    println!(
+        "  the admitted receivers (the copy stage: least {}, {} length classes, {} odds classes a side):",
+        law.least, law.lengths, law.odds
+    );
+    let request = stage(0);
+    let (parts, held, code) = pointer(RelationKind::Request);
+    println!(
+        "    the request→response receiver: {} agent bytes and {} closes read against their request ({} copies)",
+        request.ticks[0], request.ticks[1], request.copies
+    );
+    ordering(
+        "on those agent bytes, the receiver against the boundary egg (the request's port unheld)",
+        &request.staged[0],
+        &request.inner[0],
+        request.ticks[0],
+    );
+    ordering(
+        "at those closes, the receiver against the boundary egg",
+        &request.staged[1],
+        &request.inner[1],
+        request.ticks[1],
+    );
+    println!(
+        "      the chain rule: the stage's faces {}, the conditioned faces {}",
+        reading_of(&request.stage, grain),
+        reading_of(&request.conditioned, grain)
+    );
+    println!(
+        "    the incidence's code, the request's pointer at {parts} agent letters ({held} held): {}",
+        reading_of(&code, grain)
+    );
+    let value = minus(
+        &sum(&request.staged[0], &request.staged[1]),
+        &sum(&request.inner[0], &request.inner[1]),
+    );
+    println!(
+        "    the receiver's value, its pointer paid (the staged code less the unheld, plus the pointer): {}",
+        reading_of(&sum(&value, &code), grain)
+    );
+    let later = stage(1);
+    let (parts, held, later_code) = pointer(RelationKind::LaterHuman);
+    println!(
+        "    the response→later-human receipt (an observation, never in the face): {} human bytes and {} closes read against the response they follow ({} copies)",
+        later.ticks[0], later.ticks[1], later.copies
+    );
+    ordering(
+        "on those human bytes, conditioned on the response against unconditioned (the boundary egg)",
+        &later.staged[0],
+        &later.inner[0],
+        later.ticks[0],
+    );
+    ordering(
+        "at those closes, conditioned against unconditioned",
+        &later.staged[1],
+        &later.inner[1],
+        later.ticks[1],
+    );
+    println!(
+        "      the chain rule: the stage's faces {}, the conditioned faces {}; its pointer at {parts} human letters ({held} held) {}",
+        reading_of(&later.stage, grain),
+        reading_of(&later.conditioned, grain),
+        reading_of(&later_code, grain)
+    );
+    println!(
+        "    retention: {} spans held ({} cells) at the passage's end, at most {} cells held at once",
+        now.retained, now.retained_cells, now.widest_cells
+    );
+    code
+}
+
 /// The population's readings on one population against the flat tree's.
 #[allow(clippy::too_many_arguments)]
 fn readings(
@@ -341,6 +499,7 @@ fn readings(
     charge: u64,
     flat_charge: u64,
     egg: usize,
+    pointer: &ExactInterval,
 ) {
     let grain = super::GRAIN;
     let at = |slot: usize| &readings[part * SLOTS.len() + slot];
@@ -356,7 +515,7 @@ fn readings(
         let (population, tree) = (&at(slot).population, bits(&flat[part][slot]));
         population_bytes = sum(&population_bytes, population);
         println!(
-            "    {name} ({} cells): population {} (a cell {}), flat {} (a cell {}); the boundary egg alone {}",
+            "    {name} ({} cells): population {} (a cell {}), flat {} (a cell {}); the admitted egg alone {}",
             counts[part][slot],
             reading_of(population, grain),
             per(population, counts[part][slot], grain),
@@ -372,6 +531,12 @@ fn readings(
             &tree,
             counts[part][slot],
         );
+        if slot == 1 {
+            println!(
+                "      without the admitted receivers (the population of commit 40ab94cf): {}",
+                RECORDED_AGENT[part]
+            );
+        }
     }
     let bytes: u64 = counts[part][..LETTERS].iter().sum();
     let flat_bytes = joined(&flat[part]);
@@ -388,10 +553,14 @@ fn readings(
         reading_of(letters, grain),
         per(letters, counts[part][LETTERS], grain)
     );
-    let whole = sum(&sum(&population_bytes, letters), &point(charge));
+    let whole = sum(
+        &sum(&sum(&population_bytes, letters), &point(charge)),
+        pointer,
+    );
     let flat_whole = sum(&flat_bytes, &point(flat_charge));
     println!(
-        "  the whole curated stream (bytes and sections) charged {charge} bits: {}",
+        "  the whole curated stream (bytes, sections and the request's pointer {}) charged {charge} bits: {}",
+        reading_of(pointer, grain),
         enclosure(&whole, grain)
     );
     println!(
@@ -517,22 +686,49 @@ pub fn harness(curated_path: &str, flat_path: &str, development_only: bool) {
         ));
     }
     let egg_index = declared.len();
+    let relations = read_incidence(curated_path);
+    let law = CopyLaw::new(COPY_LAW.0, COPY_LAW.1, COPY_LAW.2).expect("the copy stage's law");
+    let declared_relations = |kind: RelationKind, part: usize| {
+        relations
+            .iter()
+            .filter(|relation| {
+                relation.kind == kind && usize::from(relation.letter >= development as u64) == part
+            })
+            .count()
+    };
+    println!(
+        "  the declared relations: requests {} development, {} held out; later human returns {} and {}",
+        declared_relations(RelationKind::Request, 0),
+        declared_relations(RelationKind::Request, 1),
+        declared_relations(RelationKind::LaterHuman, 0),
+        declared_relations(RelationKind::LaterHuman, 1)
+    );
     declared.push(Box::new(
-        BoundaryEgg::new(
+        AdmittedEgg::new(
             format!(
-                "boundary egg (part clock ⊳ typed tree D = {typed_deepest}, letter tree D_L = {LETTER_DEPTH})"
+                "admitted receivers (request ⊳ boundary egg: part clock ⊳ typed tree D = {typed_deepest}, letter tree D_L = {LETTER_DEPTH})"
             ),
             naming,
-            TreeFamily::sectioned(typed(typed_deepest), naming, slots()).expect("the byte tree"),
+            BoundaryEgg::new(
+                "boundary egg".to_string(),
+                naming,
+                TreeFamily::sectioned(typed(typed_deepest), naming, slots())
+                    .expect("the byte tree"),
+                chart,
+                letter_declaration,
+            )
+            .expect("the boundary egg"),
             chart,
-            letter_declaration,
+            relations.clone(),
+            law,
         )
-        .expect("the boundary egg"),
+        .expect("the admitted receivers")
+        .with_receipt(RelationKind::LaterHuman, law),
     ));
     let charge: u64 = PROBED.iter().map(|&count| ceil_log2(count)).sum();
     let flat_charge = ceil_log2(FLAT_SWEEP);
     println!(
-        "1. the population: {families} families, each named by ⌈log₂ {families}⌉ = {naming} bits (M = {families}/{}): the cell tree at D = {:?}, the typed tree (channel slot) at D = {TYPED_DEPTHS:?}, the boundary egg on the typed tree at D = {typed_deepest}; the development sweep charged {charge} bits, the flat tree's {flat_charge}",
+        "1. the population: {families} families, each named by ⌈log₂ {families}⌉ = {naming} bits (M = {families}/{}): the cell tree at D = {:?}, the typed tree (channel slot) at D = {TYPED_DEPTHS:?}, the admitted receivers over the boundary egg on the typed tree at D = {typed_deepest}; the development sweep charged {charge} bits, the flat tree's {flat_charge}",
         1u64 << naming,
         CELL_DEPTHS
             .iter()
@@ -555,9 +751,10 @@ pub fn harness(curated_path: &str, flat_path: &str, development_only: bool) {
         .expect("the development cells");
     let development_ms = passage.elapsed().as_millis();
     let development_receipt = population.receipt().expect("a receipt");
-    let Some(Readout::Boundary(development_stages)) = population.readout(egg_index) else {
-        panic!("the boundary egg's readout")
+    let Some(Readout::Admitted(development_admitted)) = population.readout(egg_index) else {
+        panic!("the admitted receivers' readout")
     };
+    let development_stages = &development_admitted.inner;
     if development_only {
         println!(
             "2. the development cells only (the held-out cells are not read): {development_ms} ms; resident set (now, peak) {:?} bytes",
@@ -572,16 +769,24 @@ pub fn harness(curated_path: &str, flat_path: &str, development_only: bool) {
             (0..LETTERS).map(|slot| &reading[slot].population).collect();
         let bytes = Stages::total(&bytes);
         println!(
-            "  bytes {}, section letters {}, the whole charged {charge} bits {}",
+            "  bytes {} (agent {}), section letters {}",
             reading_of(&bytes, grain),
+            reading_of(&reading[1].population, grain),
             reading_of(letters, grain),
-            reading_of(&sum(&sum(&bytes, letters), &point(charge)), grain)
         );
         selection(&development_receipt);
         stages(
-            &Stages::of(&development_stages, None),
+            &Stages::of(development_stages, None),
             &["human", "agent", "tool"],
             counts[0][LETTERS],
+        );
+        let pointer = receivers(&development_admitted, None);
+        println!(
+            "  the whole charged {charge} bits, the request's pointer paid: {}",
+            reading_of(
+                &sum(&sum(&sum(&bytes, letters), &point(charge)), &pointer),
+                grain
+            )
         );
         println!("wall time in all: {} ms", clock.elapsed().as_millis());
         return;
@@ -599,9 +804,10 @@ pub fn harness(curated_path: &str, flat_path: &str, development_only: bool) {
         }
     }
     let receipt = population.receipt().expect("a receipt");
-    let Some(Readout::Boundary(whole_stages)) = population.readout(egg_index) else {
-        panic!("the boundary egg's readout")
+    let Some(Readout::Admitted(whole_admitted)) = population.readout(egg_index) else {
+        panic!("the admitted receivers' readout")
     };
+    let whole_stages = &whole_admitted.inner;
     let resident = resident_set();
     println!(
         "2. one passage of the population over the whole cut: development {development_ms} ms, in all {} ms; resident set (now, peak) {resident:?} bytes",
@@ -651,6 +857,15 @@ pub fn harness(curated_path: &str, flat_path: &str, development_only: bool) {
             counts[part][..LETTERS].iter().sum::<u64>(),
             counts[part][LETTERS]
         );
+        let (admitted, before) = if part == 0 {
+            (&development_admitted, None)
+        } else {
+            (&whole_admitted, Some(&*development_admitted))
+        };
+        let pointer = since(
+            &admitted.pointers[RelationKind::Request.index()].code,
+            before.map(|b| &b.pointers[RelationKind::Request.index()].code),
+        );
         readings(
             part,
             &reading,
@@ -659,6 +874,7 @@ pub fn harness(curated_path: &str, flat_path: &str, development_only: bool) {
             charge,
             flat_charge,
             egg_index,
+            &pointer,
         );
         println!("  each family's code on this population:");
         let family_receipt = if part == 0 {
@@ -680,11 +896,12 @@ pub fn harness(curated_path: &str, flat_path: &str, development_only: bool) {
         println!("  the posterior after the {name} cells:",);
         selection(family_receipt);
         let egg_stages = if part == 0 {
-            Stages::of(&development_stages, None)
+            Stages::of(development_stages, None)
         } else {
-            Stages::of(&whole_stages, Some(&development_stages))
+            Stages::of(whole_stages, Some(development_stages))
         };
         stages(&egg_stages, &channels, counts[part][LETTERS]);
+        receivers(admitted, before);
         if part == 0 {
             println!(
                 "    the retired per-port reader's closes on the development cells: human {}, agent {}; its section navigator's letters {RETIRED_LETTERS}",
