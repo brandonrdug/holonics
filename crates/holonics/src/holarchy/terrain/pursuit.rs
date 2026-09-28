@@ -26,10 +26,11 @@
 //! [proved-derived; the record's §14.4, agent-inferred horizon] **The runner's viable tube: its
 //! robust viability kernel at a bounded horizon `n`** ([`viable_tube`]). The runner's admitted
 //! successors `Post(r)` under its constitution: while a slip holds (the first `f` ticks, `f` its
-//! held counter) its kept motion; otherwise every `(x + v′, v′)` with `⟨v′ − v, v′ − v⟩` within the
-//! traction cap of the cell it stands on, `⟨v′, v′⟩` within its speed cap and `x + v′` inside,
-//! and the wall law's motion when none is (the runner as an adversary never demands a slip: a
-//! slip's next motion is the rest change's, with fewer options after it). With the safe sets
+//! held counter) its kept motion, the held move `(v, v)`; otherwise every `(x + v′, v′)` whose move
+//! `(v, v′)` lies in the traction disk `⟨v′ − v, v′ − v⟩ ≤` the cap of the cell it stands on
+//! (`geometry::motion::Move::within_cap`), with `⟨v′, v′⟩` within its speed cap and `x + v′`
+//! inside, and the wall law's motion when none is (the runner as an adversary never demands a slip:
+//! a slip's next motion is the rest change's, with fewer options after it). With the safe sets
 //! `S_k = {r : x_r ∉ D_k}`, the forward viable reach `F₀ = {r₀} ∩ S₀`, `F_(k+1) = Post(F_k) ∩ S_(k+1)`,
 //! and the **Pre recursion** backward over it:
 //!
@@ -62,7 +63,8 @@
 //! quadrance, [`Pursuer::step`]). [`ConstantBearing`] holds a collision course: with
 //! `r = x_R − x_C` and the relative velocity `ṙ = v_R − v′_C` (the runner read as keeping its
 //! velocity), an approaching motion (`⟨r, ṙ⟩ < 0`) where one is admitted, least in `|det(r, ṙ)|`,
-//! then in `⟨r + ṙ, r + ṙ⟩` (the closing), then in canonical order. §14.4: `d/dt arg r =
+//! then in `⟨r + ṙ, r + ṙ⟩` (the closing), then in canonical order; `⟨r, ṙ⟩` and `det(r, ṙ)` are
+//! the faces of the pair's pairing `r̄ṙ` (`geometry::motion::{dot, det}`). §14.4: `d/dt arg r =
 //! det(r, ṙ)/|r|²` is the bearing receiver's lock, which permits radial slip, and approach also
 //! needs `⟨r, ṙ⟩ < 0`. [measured] Without the approach condition the law stalls: against a runner at
 //! rest, resting nulls `det(r, ṙ)` exactly, and the first acceptance run's constant bearing stood
@@ -85,20 +87,18 @@ use std::sync::Arc;
 use num_traits::Signed;
 
 use super::chase::{
-    Arena, Caps, Chase, ChasePorts, ChaserPort, Motion, Moves, Point, Pursuer, Runner,
-    RunnerFamily, RunnerState, add, floor_cap, quadrance, sub,
+    Arena, Caps, Chase, ChasePorts, ChaserPort, Motion, Moves, Pursuer, Runner, RunnerFamily,
+    RunnerState, floor_cap,
 };
 use super::{TerrainError, refuse};
+// The bearing's rotation `det(r, ṙ)`, shared with the tests.
+pub(super) use crate::geometry::motion::det;
+use crate::geometry::motion::{Move, Point, add, dot, quadrance, sub};
 use crate::ratio::Rat;
 
 /// [definition; agent-inferred] **The kernel lattice's declared reach**: the runner's motions a
 /// tube indexes densely, `W·H·(2R + 1)²` with `R = ⌊√(speed cap)⌋`, at most `2^22`.
 pub const TUBE_STATE_LIMIT: usize = 1 << 22;
-
-/// `det(a, b) = a_x b_y − a_y b_x`, twice the oriented area: the line of sight's rotation.
-pub fn det(a: Point, b: Point) -> i64 {
-    a[0] * b[1] - a[1] * b[0]
-}
 
 /// The lattice offsets `o` with `⟨o, o⟩ ≤ ⌊ρ²⌋`: the capture disk.
 fn capture_disk(capture: &Rat) -> Result<Vec<Point>, TerrainError> {
@@ -265,16 +265,18 @@ impl<'a> RunnerLattice<'a> {
         p * self.side * self.side + v
     }
 
-    /// **The runner's admitted successors** (module header): the kept motion while forced,
-    /// otherwise every admitted next velocity's motion, the wall law's when none.
+    /// **The runner's admitted successors** (module header): the held move's motion while forced,
+    /// otherwise the motion of every next velocity whose move lies in the cell's traction disk, the
+    /// wall law's when none.
     fn post(&self, motion: &Motion, forced: bool, out: &mut Vec<Motion>) {
         out.clear();
         if forced {
-            let stepped = add(motion.position, motion.velocity);
+            let held = Move::held(motion.velocity);
+            let stepped = add(motion.position, held.after);
             out.push(if self.arena.inside(stepped) {
                 Motion {
                     position: stepped,
-                    velocity: motion.velocity,
+                    velocity: held.after,
                 }
             } else {
                 self.arena.wall(motion)
@@ -288,7 +290,7 @@ impl<'a> RunnerLattice<'a> {
         let cap = self.caps.classes[class];
         for &velocity in &self.velocities {
             let position = add(motion.position, velocity);
-            if quadrance(sub(velocity, motion.velocity)) <= cap && self.arena.inside(position) {
+            if Move::new(motion.velocity, velocity).within_cap(cap) && self.arena.inside(position) {
                 out.push(Motion { position, velocity });
             }
         }
@@ -685,9 +687,8 @@ impl ConstantBearing {
     pub fn key(runner: &Motion, chaser: &Motion, next: &Motion) -> (bool, i64, i64) {
         let line = sub(runner.position, chaser.position);
         let rate = sub(runner.velocity, next.velocity);
-        let closing = line[0] * rate[0] + line[1] * rate[1];
         (
-            closing >= 0,
+            dot(line, rate) >= 0,
             det(line, rate).abs(),
             quadrance(add(line, rate)),
         )

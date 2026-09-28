@@ -66,7 +66,7 @@ use std::sync::Arc;
 use num_bigint::BigUint;
 
 use super::{ChaseFamily, Population, PopulationError, refuse, selected_fibre};
-use crate::holarchy::terrain::chase::quadrance;
+use crate::geometry::motion::quadrance;
 use crate::holarchy::terrain::{
     Basin, BasinMemo, Candidate, Caps, CaptureReach, ChasePorts, ChaseView, Chaser, Motion, Moves,
     Pursuer, RunnerFamily, capture_ticks, classes, viable_tube,

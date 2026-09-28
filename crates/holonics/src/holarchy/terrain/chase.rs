@@ -14,23 +14,28 @@
 //! turning possible: in an open arena a faster runner moving straight away is never caught (§14.4).
 //!
 //! [definition; the record's §13] **The constitution at the ground contact** ([`RunnerLaw`]):
-//! a speed bound `v` and a traction coefficient `γ`. A velocity change `Δv` in lattice steps a tick
-//! is admitted on a cell of class `μ` only if
+//! a speed bound `v` and a traction coefficient `γ`. A move `(v, v′)`, velocities in lattice steps
+//! a tick, carried undivided ([`Move`], `geometry::motion`), is admitted on a cell of class `μ` only
+//! if its change `Δv = v′ − v` lies in the traction disk
 //!
 //! ```text
 //! ⟨Δv, Δv⟩ ≤ (γ μ g h²/ℓ)²        (the physical |Δv|·ℓ/h ≤ γ μ g h, read in the lattice chart)
 //! ```
 //!
-//! an exact quadrance inequality in ℚ, and a velocity only if `⟨v, v⟩ ≤ v²`. There is no square
-//! root: the integer quadrance `q` meets a rational bound `b ≥ 0` exactly when `q ≤ ⌊b⌋`
-//! ([`Caps`], an identity, not a rounding). For a pure turn the bound gives the radius at least
-//! `v²/(γμg)` (the record's §6). [agent-inferred] A class whose bound lies below one lattice step
-//! admits only rest there, so a runner at rest on it could never move: the declared classes must
-//! resolve on the lattice (every receipt here declares bounds of at least one step).
+//! an exact quadrance inequality in ℚ (Lean `Geometry/Motion.traction_disk`: where `v ≠ 0`, the disk
+//! `|k − 1|²|v|² ≤ r²` about `1` of the move ratio `k = v′/v`; the pair is carried, not `k`, because
+//! the opening velocity is zero, a stop has `k = 0` and a held slip `k = 1`), and a velocity only if
+//! `⟨v, v⟩ ≤ v²`. There is no square root: the integer quadrance `q` meets a rational bound `b ≥ 0`
+//! exactly when `q ≤ ⌊b⌋` ([`Caps`], [`Move::within_cap`], an identity, not a rounding). For a pure
+//! turn the bound gives the radius at least `v²/(γμg)` (the record's §6). [agent-inferred] A class
+//! whose bound lies below one lattice step admits only rest there, so a runner at rest on it could
+//! never move: the declared classes must resolve on the lattice (every receipt here declares bounds
+//! of at least one step).
 //!
 //! [definition; agent-inferred] **The runner** ([`Runner`]): its constitution, its declared hybrid
 //! slip law (a hold of `s ≥ 1` ticks) and its evasion navigator ([`Evasion`]). Each tick:
-//! - while a slip holds, it keeps its velocity (the cell [`Letter::Slip`]);
+//! - while a slip holds, it keeps its velocity (the cell [`Letter::Slip`]; its realized move is the
+//!   held one, [`Move::held`]);
 //! - otherwise it **demands** the change its navigator scores best among the changes its
 //!   constitution admits on the ground it **last pushed from** (the class of its previous position;
 //!   at the opening, its own), within its speed bound and keeping it inside the arena, ties broken
@@ -112,36 +117,16 @@ use num_traits::{Signed, ToPrimitive};
 
 use super::{Draw, TerrainError, refuse};
 use crate::compression::cost::ceil_log2;
+use crate::geometry::motion::{Move, add, quarter_turn, scale, sub};
+// A lattice point or displacement in lattice steps (a velocity: steps a tick) and its quadrance:
+// the motion owner's Gaussian integers, shared with the tests.
+pub(super) use crate::geometry::motion::{Point, quadrance};
 use crate::ratio::Rat;
-
-/// A lattice point or displacement, `(x, y)`, in lattice steps (a velocity: steps a tick).
-pub type Point = [i64; 2];
-
-/// `⟨p, p⟩`, the lattice quadrance.
-pub fn quadrance(p: Point) -> i64 {
-    p[0] * p[0] + p[1] * p[1]
-}
-
-pub(super) fn add(a: Point, b: Point) -> Point {
-    [a[0] + b[0], a[1] + b[1]]
-}
-
-pub(super) fn sub(a: Point, b: Point) -> Point {
-    [a[0] - b[0], a[1] - b[1]]
-}
-
-fn scale(k: i64, p: Point) -> Point {
-    [k * p[0], k * p[1]]
-}
-
-/// **The oriented quarter-turn** `J(a, b) = (−b, a)`, `J² = −1`: the square root of the Swing.
-pub fn quarter_turn(p: Point) -> Point {
-    [-p[1], p[0]]
-}
 
 /// [definition; agent-inferred] **The lattice's declared reach**: an arena side of at most `2^15`
 /// positions and a move alphabet's cap of at most `2^12`, so every position, velocity and score the
-/// law forms stays below `2^40` in magnitude, far inside a machine word, and an alphabet holds at
+/// law forms stays below `2^40` in magnitude, far inside a machine word and inside the motion
+/// owner's reach (`geometry::motion::LATTICE_REACH`, `2^30` a component), and an alphabet holds at
 /// most `(2·2^6 + 1)² = 16641 = 3²·43²` moves.
 pub const ARENA_SIDE_LIMIT: i64 = 1 << 15;
 pub const MOVE_CAP_LIMIT: i64 = 1 << 12;
@@ -342,18 +327,19 @@ impl Arena {
     }
 
     /// **The observed motion after a cell** (module header), from the motion before it alone: a
-    /// move changes the velocity by its move and steps, a slip keeps the velocity and steps, a wall
-    /// applies the wall law; a step that would leave the arena meets the wall law too, so the
-    /// observed motion stays inside for every cell. Refused at a cell outside the alphabet.
+    /// move letter realizes the move `(v, v + Δv)` of its change and steps, a slip realizes the held
+    /// move `(v, v)` and steps, a wall applies the wall law to the held velocity; a step that would
+    /// leave the arena meets the wall law too, so the observed motion stays inside for every cell.
+    /// Refused at a cell outside the alphabet.
     pub fn observe(
         &self,
         moves: &Moves,
         motion: &Motion,
         cell: usize,
     ) -> Result<Motion, TerrainError> {
-        let velocity = match moves.read(cell) {
-            Some(Letter::Move(change)) => add(motion.velocity, change),
-            Some(Letter::Slip) | Some(Letter::Wall) => motion.velocity,
+        let realized = match moves.read(cell) {
+            Some(Letter::Move(change)) => Move::by_change(motion.velocity, change),
+            Some(Letter::Slip) | Some(Letter::Wall) => Move::held(motion.velocity),
             None => {
                 return Err(refuse(
                     "a chase cell",
@@ -361,6 +347,7 @@ impl Arena {
                 ));
             }
         };
+        let velocity = realized.after;
         let kept = Motion {
             position: motion.position,
             velocity,
@@ -415,11 +402,14 @@ impl RunnerLaw {
         Ok(())
     }
 
-    /// **The traction law** (module header): `⟨Δv, Δv⟩ ≤ (γ μ_c g h²/ℓ)²`, read in ℚ.
+    /// **The traction law** (module header): the move `(v, v + Δv)` lies in the traction disk
+    /// `⟨Δv, Δv⟩ ≤ (γ μ_c g h²/ℓ)²`, read in ℚ ([`Move::within_bound`]). The disk reads the change
+    /// alone, so every opening velocity admits the same changes: the move is read in the frame of its
+    /// opening velocity, from rest.
     pub fn admits(&self, declaration: &ArenaDeclaration, class: usize, change: Point) -> bool {
         declaration
             .traction_bound(&self.traction, class)
-            .is_some_and(|bound| Rat::from_integer(BigInt::from(quadrance(change))) <= bound)
+            .is_some_and(|bound| Move::by_change([0, 0], change).within_bound(&bound))
     }
 
     /// **The speed law**: `⟨v, v⟩ ≤ v²`, read in ℚ.
@@ -447,7 +437,8 @@ impl RunnerLaw {
     }
 }
 
-/// [definition] **A cell's reading**: a realized move, a slip, or a wall meeting.
+/// [definition] **A cell's reading**: a realized move, named by its change `Δv` (its move pair is
+/// `(v, v + Δv)` from the observed velocity, [`Move::by_change`]), a slip, or a wall meeting.
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub enum Letter {
     Move(Point),
@@ -634,9 +625,10 @@ impl Runner {
         )
     }
 
-    /// **The demand** (module header): the navigator's best change among those the constitution
-    /// admits on the ground last pushed from, within the speed bound, keeping the runner inside;
-    /// ties to the first in canonical order; none when no change keeps it inside.
+    /// **The demand** (module header): the navigator's best change among those whose move
+    /// `(v, v + Δv)` lies in the traction disk of the ground last pushed from, within the speed
+    /// bound, keeping the runner inside; ties to the first in canonical order; none when no change
+    /// keeps it inside.
     pub fn demand(
         &self,
         arena: &Arena,
@@ -650,10 +642,12 @@ impl Runner {
         let expected = caps.classes.get(state.ground).copied()?;
         let mut best: Option<(Point, i64)> = None;
         for &change in moves.vectors() {
-            if quadrance(change) > expected {
+            let demanded = Move::by_change(motion.velocity, change);
+            // The changes ascend in quadrance: past the disk's edge, every later one is outside.
+            if !demanded.within_cap(expected) {
                 break;
             }
-            let next = add(motion.velocity, change);
+            let next = demanded.after;
             if quadrance(next) > caps.speed || !arena.inside(add(motion.position, next)) {
                 continue;
             }
@@ -666,8 +660,9 @@ impl Runner {
     }
 
     /// **The runner's cell at a tick** (module header): a held slip, the realized demand, a slip
-    /// onset where the demand passes the cell's traction, or the wall. Refused when the runner
-    /// stands outside the arena or its top cap passes the alphabet's.
+    /// onset where the demanded move lies outside the traction disk of the cell it stands on (its
+    /// realized move is then the held one), or the wall. Refused when the runner stands outside the
+    /// arena or its top cap passes the alphabet's.
     pub fn cell(
         &self,
         arena: &Arena,
@@ -699,9 +694,13 @@ impl Runner {
         }
         Ok(match self.demand(arena, moves, caps, state, chaser, tick) {
             None => moves.wall(),
-            Some(change) if quadrance(change) <= caps.classes[class] => moves
-                .letter(change)
-                .expect("a demand within the top cap has its letter"),
+            Some(change)
+                if Move::by_change(motion.velocity, change).within_cap(caps.classes[class]) =>
+            {
+                moves
+                    .letter(change)
+                    .expect("a demand within the top cap has its letter")
+            }
             Some(_) => kept(),
         })
     }
@@ -754,9 +753,9 @@ impl Pursuer {
         Rat::from_integer(BigInt::from(quadrance(sub(runner, chaser)))) <= self.capture
     }
 
-    /// **Its traction-admitted next motions** from a motion: every change its traction admits on
-    /// its cell, within its speed bound, keeping it inside, in canonical order of the change; none
-    /// when no change does.
+    /// **Its traction-admitted next motions** from a motion: every move `(v, v + Δv)` in the
+    /// traction disk of its cell, within its speed bound, keeping it inside, in canonical order of
+    /// the change; none when no change does.
     pub fn motions(
         &self,
         arena: &Arena,
@@ -770,8 +769,9 @@ impl Pursuer {
         Ok(disk
             .vectors()
             .iter()
-            .filter(|&&change| quadrance(change) <= caps.classes[class])
-            .map(|&change| add(motion.velocity, change))
+            .map(|&change| Move::by_change(motion.velocity, change))
+            .filter(|next| next.within_cap(caps.classes[class]))
+            .map(|next| next.after)
             .filter(|&velocity| quadrance(velocity) <= caps.speed)
             .map(|velocity| Motion {
                 position: add(motion.position, velocity),
