@@ -7,8 +7,10 @@
 //! cargo run --release -p holonics --example hnn_population -- f0-census .local/cuts/curated-f4-passage-cut.bin
 //! ```
 //!
-//! [definition; agent-inferred] **What it reads.** F0's byte predictor, the admitted egg alone
-//! (`hnn_population f0-egg`), built by the same constructor (`curated::admitted_egg`) with the hazard
+//! [definition; agent-inferred] **What it reads.** F0's byte predictor as it stood before U2's
+//! acceptance run, the admitted egg alone with its byte tree at the deepest depth (U2's candidate (0),
+//! the unmerged tree; `f0-egg` now declares the adopted depth cut, `curated::F0_BYTE_DEPTH`), built by
+//! `curated::admitted_egg` with the hazard
 //! partition learned on the choosing families and the same comparison hazards, reads F4's development
 //! passage cell by cell (`Family::receive`, the population's own call for its one member). The census
 //! is taken after the choosing families, and again after the whole passage, where the recorded

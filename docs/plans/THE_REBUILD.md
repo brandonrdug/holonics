@@ -155,6 +155,16 @@ Owners: Lean `Foundation/Standing` (its Rust chart `receiver::standing` retired 
     at 12 ticks), chosen on the choosing families alone and charged `⌈log₂⌉` of the candidates; the
     margin `m` in bits and the standing budget in bytes a cell; and the readings beside the state
     reported as their own line (standing only for a receiver that reads the certified residual).
+  - **Acceptance run, September 28: passed; the depth cut at 12 ticks adopted**
+    ([record](../../research/records/2026-09-28_U2_F0S_MEMORY_ACCEPTANCE_RUN_PINNED_BEFORE_ITS_SPLIT_IS_READ.md);
+    pins `d6feae7e`, run `d31c8b37`, `hnn_population u2-acceptance`). A fresh split (seed
+    `holonics-u2-development-families-2026-09-28-v1`), `m = 1214` bits (half F0's gain over flat),
+    the budget 1,298 bytes a cell. The choosing families chose the depth cut (`+96 + 0/16 + ε`
+    charged against the unmerged tree); the once-reached chains released at each conversation's
+    opening cost `+18693 + 8/16 + ε` and were not admissible (retired). On validation the cut coded
+    `+224 + 12/16 + ε` above the unmerged tree, charged, within `m`, and the standing fell from
+    2,651 to 2,049 bytes a cell (1,134 without the readings, within the budget; 2,049 whole, past
+    it). 262,138 ms at an 8,620,863,488-byte peak. F0's egg now declares its byte tree at 12 ticks.
 
 #### U3. One release contract
 
@@ -406,6 +416,16 @@ on the admitted egg, and the trees beyond depth 24 add at most 20 bits.
      2), never as a replacement alphabet. Continuation transports stay promoted by
      `π_G P_G > π_C P_C`.
   4. **A learned lens** under source item 10.
+  5. **The egg's memory, a coarser byte tree (U2's acceptance run). Adopted September 28**
+     ([record](../../research/records/2026-09-28_U2_F0S_MEMORY_ACCEPTANCE_RUN_PINNED_BEFORE_ITS_SPLIT_IS_READ.md)).
+     The egg's byte tree is declared at 12 ticks (`f0-egg`, `F0_BYTE_DEPTH`), chosen on the choosing
+     families of a fresh split over the unmerged tree and the once-reached chains released at each
+     conversation's opening.
+     - Validation, charged: `+224 + 12/16 + ε` against the unmerged tree (within `m = 1214`); the
+       bytes `−2132 + 13/16 + ε` and the bytes with the response stops `−810 + 9/16 + ε` against the
+       flat tree's bytes (the unmerged tree `−2356 + 0/16 + ε` and `−1035 + 12/16 + ε`).
+     - The standing falls from 2,651 to 2,049 bytes a cell; without the readings kept beside the
+       state, from 1,511 to 1,134, within the budget of 1,298. That split is now spent.
 - **Standing.** Every receipt reports standing bytes a cell. A standing budget is pinned before each
   run.
 - **Readings of released text, monitored and never forced** (Brandon, September 28): paired

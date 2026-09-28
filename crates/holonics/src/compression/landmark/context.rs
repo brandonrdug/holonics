@@ -353,6 +353,16 @@
 //!   split, with `m` and the standing budget pinned before the run, the coarser standing a cell falls
 //!   strictly while the charged conditional byte-and-stop code stays within `m` of the finer's. It is
 //!   never reported as retention.
+//! - [established-bounded; measured] **U2's acceptance run: the depth cut at 12 ticks passes**
+//!   (`research/records/2026-09-28_U2_F0S_MEMORY_ACCEPTANCE_RUN_PINNED_BEFORE_ITS_SPLIT_IS_READ.md`;
+//!   `hnn_population u2-acceptance`). On a fresh family split, `m = 1214` bits pinned first, the
+//!   choosing families chose the typed tree declared at 12 ticks (charged `⌈log₂ 3⌉ = 2` bits,
+//!   `+96 + 0/16 + ε` against the unmerged tree there) over the once-reached leaf chains released at
+//!   each conversation's opening (`+18693 + 8/16 + ε`, not admissible, its bytes the separator; its
+//!   release is at commit `d31c8b37`). On the validation families the cut coded `+224 + 12/16 + ε`
+//!   above the unmerged tree, within `m`, while the egg's standing fell from 2,651 to 2,049 bytes a
+//!   cell (its readings kept beside the state 915 of them). F0's egg declares its byte tree at 12
+//!   ticks from then on (the harness's `F0_BYTE_DEPTH`); the law is this tree's declared depth.
 //!
 //! [established-bounded; measured] **The census** (`hnn_population f0-census`, U2's first loop; the
 //! admitted egg alone on F4's development passage, 1,048,243 cells; bytes of the canonical standing,
