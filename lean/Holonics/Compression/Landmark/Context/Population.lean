@@ -41,8 +41,8 @@ emit another class), so this module states the same mixture with **nonnegative**
   draw's class when its lower cumulative mass through that class exceeds the draw and its upper
   cumulative mass before that class does not. An unresolved draw remains unresolved.
 * `local_telescope`, `local_mixture_code`, `local_of_constant` [proved-derived; formal-checked]: a
-  family wins where it is closest (F0's second candidate; Rust
-  `receiver::population::LocalMixture`). A gating map `γ` places each cell in a context; the local
+  family wins where it is closest (F0's second candidate; its Rust
+  `receiver::population::LocalMixture` was measured, not adopted and retired September 28). A gating map `γ` places each cell in a context; the local
   mixture weighs the families at cell `t` by the posterior of `γ t` alone, each context's weights
   its prior times the family's faces over the context's earlier cells. With positive faces its faces
   telescope to the product of the contexts' totals (a context not met holds its prior, total one),

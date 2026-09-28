@@ -95,9 +95,9 @@ parts, and the Rust tests check the executed faces against the ideal weighting.
 
 | Lean | Rust |
 |---|---|
-| `forward_telescope`, `forward_dominance`, `forward_weight_step`, `forward_executed` | `compression::landmark::context::{JoinTree, FaceJoins}`, `hnn::receiving::Mixture::switching` |
+| `forward_telescope`, `forward_dominance`, `forward_weight_step`, `forward_executed` | `compression::landmark::context::{JoinTree, FaceJoins}`, `receiver::population::Dormancy` (the fixed share; `Mixture::switching` retired September 28) |
 | `static_mixture`, `two_face_prior` | `compression::landmark::context::JoinTree` (a two-face join from `β₀ = 2^j − 1`) |
-| `fixed_share`, `share_ratio_step`, `share_log_lipschitz` | `hnn::receiving::Mixture::switching` |
+| `fixed_share`, `share_ratio_step`, `share_log_lipschitz` | `receiver::population::Dormancy` (`Mixture::switching` retired September 28) |
 | `Tree.{own_mixture_over_trees, own_kraft_and_dominance, own_weight_step, own_ratio_step}`, `node_local_dominance`, `own_face_normalized`, `node_local_founding` | `compression::landmark::context::{Landmarks::local, LocalLaw}` (retired at `89460425`); the own-weight tree is every node law's (`compression::landmark::context::Capacity`, Decision 39) |
 | `stop_mixture_per_tree` | `compression::landmark::context::{StopMixture, FaceJoins}` |
 

@@ -152,10 +152,11 @@ private conversation data, which is never published: only its counts, bits and h
 
   [Record](research/records/2026-09-27_THE_RECEIVING_POPULATION_WAS_BUILT_ON_TERRAIN_WITH_KNOWN_TRUTH_AND_THE_CURATED_SOURCE_NOW_CODES_BELOW_THE_FLAT_STREAM.md)
 
-**Not yet.** Athena answers nothing today. The next steps are fixed in advance in the
-[forward plan](research/records/2026-09-28_THE_REBUILDS_CONSTRUCTION_RECORD_STEPS_ZERO_TO_FIVE_THE_CAMPAIGNS_AND_THE_FORWARD_PLAN.md#the-forward-plan-september-27):
-1. release text from the population (F4);
-2. build Athena-0 (F5), whose responses Brandon judges blind against a retrieval control.
+**Not yet.** Athena answers nothing today. The order is fixed in advance in the
+[unified plan](docs/plans/THE_REBUILD.md#the-unified-plan-september-28): one retention contract and
+F0's memory experiment, one release contract and the chase's motion rebase come next; the text chart
+(F4, then Athena-0, F5, whose responses Brandon judges blind against a retrieval control) follows
+them.
 
 The data's evaluation partition stays unread until that judgement, and is read once. The owed
 formal statements are listed in [#62](https://github.com/brandonrdug/holonics/issues/62).

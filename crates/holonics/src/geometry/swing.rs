@@ -94,14 +94,14 @@ pub fn half_turn<P: RationalPoint>(anchor: &P, body: &P) -> P {
     anchor.scaled(&integer(2)).minus(body)
 }
 
-/// The translation two Swings compose to: `S_second ∘ S_first` moves every point by
+/// The translation two half-turns compose to: `S_second ∘ S_first` moves every point by
 /// `2(second − first)`.
 pub fn composed_translation<P: RationalPoint>(first: &P, second: &P) -> P {
     second.minus(first).scaled(&integer(2))
 }
 
 /// **The pantograph** `O + s (P − O)`: scaling about the anchor `O`. Serial passages multiply
-/// their scales, and the scale `−1` is the Swing.
+/// their scales, and the scale `−1` is the half-turn.
 pub fn pantograph<P: RationalPoint>(anchor: &P, scale: &Rat, input: &P) -> P {
     anchor.plus(&input.minus(anchor).scaled(scale))
 }
@@ -112,7 +112,7 @@ pub fn constraint_chart(anchor: &Rat, board: &Rat, x: &Rat) -> Presentation {
     Presentation::new(x - anchor, x - board)
 }
 
-/// **The projective Swing**: the harmonic conjugate of `a` with respect to the anchor `b` and the
+/// **The projective half-turn**: the harmonic conjugate of `a` with respect to the anchor `b` and the
 /// board `d`, `((a − b) d + (a − d) b) / (2a − b − d)`, for `b ≠ d` (Lean's hypothesis). `None`
 /// when the anchor is the board, which declares no chart, and when `a` is the midpoint of anchor
 /// and board, whose conjugate is the line's point at infinity.
@@ -127,7 +127,7 @@ pub fn harmonic_conjugate(anchor: &Rat, board: &Rat, a: &Rat) -> Option<Rat> {
     Some(((a - anchor) * board + (a - board) * anchor) / denominator)
 }
 
-/// **The Swing pair** `((c − a)(d − b), (c − b)(d − a))`: the cross ratio of four marks on a line,
+/// **The half-turn pair** `((c − a)(d − b), (c − b)(d − a))`: the cross ratio of four marks on a line,
 /// undivided. An affine change of coordinates scales both comparands by one square, so the pair
 /// is projectively invariant.
 pub fn swing_pair(a: &Rat, b: &Rat, c: &Rat, d: &Rat) -> Presentation {
@@ -143,7 +143,7 @@ mod tests {
         RatVec3::from_i64(x, y, z)
     }
 
-    /// Lean `Geometry/AffineSwing`: the Swing negates displacement from its anchor, is an
+    /// Lean `Geometry/AffineSwing`: the half-turn negates displacement from its anchor, is an
     /// involution fixing the anchor, two Swings compose to the doubled translation, and they do
     /// not commute (`S_b S_a − S_a S_b = 4(b − a)`).
     #[test]

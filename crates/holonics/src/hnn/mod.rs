@@ -1,5 +1,5 @@
-//! **The HNN law over aeons** (rebuild step 4, #73; design:
-//! [THE_REBUILD](../../../../docs/plans/THE_REBUILD.md), "Step 4 design: the HNN law").
+//! **The HNN law over aeons** (rebuild step 4, #73; design: the [construction record](../../../../research/records/2026-09-28_THE_REBUILDS_CONSTRUCTION_RECORD_STEPS_ZERO_TO_FIVE_THE_CAMPAIGNS_AND_THE_FORWARD_PLAN.md#step-4-design-the-hnn-law);
+//! the order is [THE_REBUILD](../../../../docs/plans/THE_REBUILD.md)'s unified plan).
 //! Campaign 1: keys, the change on a medium, and the collapse.
 //!
 //! [definition; Brandon, September 27: "Aeons and Holarchies are at the top"; the construction

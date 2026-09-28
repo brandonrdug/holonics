@@ -99,7 +99,7 @@ so their Lean is filed by subject:
 | `Geometry/`, `Physics/`, `Foundation/`, `Transport/`, `Computation/`, `Mathematics/`, `Landmarks/`, `Holon/` | the existing subjects; winding (Farey, LocalFactor, TraceSequence, ledgers), the Swing, Poincaré/Ricci, P versus NP, primes |
 
 Author and conjecture names stay as source attribution and statement coordinates. The retired August 28
-[catalogue](https://github.com/brandonrdug/holonics/blob/13f8c734/formal/elementary-holonics/MILLENNIUM_FORMAL_CATALOG.md) is historical scope
+[catalogue](https://github.com/brandonrdug/holonics/blob/2d34b819/lean/TARGETS_FORMAL_CATALOG.md) is historical scope
 testimony; order and position
 belong to [THE_REBUILD](../docs/plans/THE_REBUILD.md) and [CONSTRUCTION_STATE](../CONSTRUCTION_STATE.md).
 

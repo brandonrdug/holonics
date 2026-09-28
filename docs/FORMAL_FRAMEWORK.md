@@ -175,7 +175,7 @@ through a declared Lipschitz receiver, and shrinking bounds force compatible rea
 [proved-derived; formal-checked] The joint additive construction uses
 `N=intersection_i ker(read_i)` and `Q=X/N`. Preservation of N is exactly the receiver-transformer
 criterion for an additive generator. All declared readers and admitted generator words factor
-through Q. The existing affine Swing additionally satisfies `q(S_b x)=S_(q b)(q x)`, including
+through Q. The existing affine half-turn additionally satisfies `q(S_b x)=S_(q b)(q x)`, including
 its anchor; its isometry transports the receiver tolerance without a source selection.
 
 [proved-derived; formal-checked] The mechanical conformation update now supplies an exact future

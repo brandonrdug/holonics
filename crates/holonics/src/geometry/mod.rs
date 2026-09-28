@@ -6,8 +6,8 @@
 //! - [`screw`]: the Lie generator `ξ = (ω, v)` of a helix, situated screws, the screw pair and its
 //!   quadrance jet;
 //! - [`winding`]: phase, winding and carry, the odometer, and the holonomy around a cell;
-//! - [`swing`]: the Swing, its composition to a translation, the pantograph and the projective
-//!   Swing as a cross ratio.
+//! - [`swing`]: the half-turn (one move of the Swing), its composition to a translation, the
+//!   pantograph and the projective half-turn as a cross ratio.
 //!
 //! Lean: `Holon/Complex`, `Geometry/{ScrewGeometry,PhaseCarry,AffineSwing,CrossRatio}`,
 //! `Transport/CellHolonomy`.

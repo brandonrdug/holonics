@@ -74,7 +74,7 @@ covector   ∂_E log p(b) at operator c = re Tr(Gᴴ E) ,  G = 2 (δ_(bc)/T_b �
   composed over the passage into a per-cell bound, as for the landmark tree and the word;
 - the convergence of the Fisher-scored prox step on the Born face.
 
-| Lean | Rust (`hnn::born`) |
+| Lean | Rust (`hnn::born`, retired September 28; at commit `2d34b819`) |
 |---|---|
 | `bornMass`, `bornSplit`, `born_face_normalized`, `born_executed_partition` | the digit read and the executed dyadic split |
 | `bornUpdate`, `born_update_trace_one`, `born_pure_stays_pure` | the reception on the carried ray `ψ` |

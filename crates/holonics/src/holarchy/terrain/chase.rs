@@ -47,11 +47,11 @@
 //! position `x′ = x + v + Δv`, least best:
 //! - **flee**: maximize the pair contact's next quadrance `Q = ⟨x′ − x_C, x′ − x_C⟩` to the chaser
 //!   (§14.4's contact reading). Agent-inferred against the brief's reflected-position target
-//!   `S_x(x_C) = 2x − x_C` (the Swing of the chaser about the runner): that target lies at the pair's
+//!   `S_x(x_C) = 2x − x_C` (the half-turn of the chaser about the runner): that target lies at the pair's
 //!   own distance, so near contact it asks for less speed than the runner has; maximizing `Q` runs
 //!   at the runner's full admitted reach and meets the walls, which the cornering needs;
 //! - **circle**: steer to the oriented quarter-turn of its offset from the arena's centre `c`,
-//!   `x + σJ(x − c)`, `J(a, b) = (−b, a)` (the quarter-turn whose square is the Swing, §14.9), `σ = ±1`
+//!   `x + σJ(x − c)`, `J(a, b) = (−b, a)` (the quarter-turn whose square is the half-turn, §14.9), `σ = ±1`
 //!   its orientation; read in doubled coordinates, so the centre `(W − 1, H − 1)/2` stays integral;
 //! - **zig-zag at period `P`**: steer to `x + d + σ_t J d`, `d = x − x_C` the flee direction and
 //!   `σ_t` the half-turn sheet of a ring of period `2P` (`+1` on the ports `t mod 2P < P`, else

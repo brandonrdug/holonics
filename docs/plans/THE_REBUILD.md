@@ -19,7 +19,7 @@ Its corrections are folded in.
 - **The architecture** [interpretation]. The machine is one Holarchy ([THE_MACHINE](../THE_MACHINE.md)).
   Its receiving role is a population: the receiver mixes its constituent families by Bayes, the
   discrete replicator. The landmark tree is one family; a field-derived predictor (today the combined
-  tree-and-wave face `q_C`) is another; terrain navigators and composed eggs are others. This settles
+  tree-and-wave face `q_C`) would be another, and U1 builds its family contract; terrain navigators and composed eggs are others. This settles
   the containment the guides stated both ways (the population inside the field, the field inside the
   population): the population is the receiving composition at the field's port. It does **not**
   establish that the population or its statistical families are Holons joined at power ports; that
@@ -65,7 +65,7 @@ measured, and keeps every inherited gate below verbatim.
 
 #### U0. Consolidate (no new law) — carried out September 28
 
-The receipts are in [CONSTRUCTION_STATE](../../CONSTRUCTION_STATE.md) and the commits that name U0.
+Its receipt is in [CONSTRUCTION_STATE](../../CONSTRUCTION_STATE.md#u0-receipt-september-28) and on #63.
 
 The deliverable is a smaller, consistent tree. Acceptance: each retirement names the owner that keeps
 its law, or writes the law into its guide or record first; nothing live consumes what is retired;
@@ -92,8 +92,11 @@ every duplicated law has one owner that the others cite; the gates pass (check, 
   shards; the notebook and records READMEs become routes.
 - **Kept, with an actual consumer or a date.** `receiver::standing`, `compression::face_map` and
   `hnn::modes` (a test-only chain) and `receiver::release`'s unconsumed half and `causal_chord` are
-  kept only until U2 and U3 decide them, by a named call or by retirement; no other retained subtree
-  is exempt. `physics::*` is kept for the fluid operators U4 names; the rest of it is decided in U4.
+  kept until U2 and U3 close, and each item's acceptance includes it: at the item's close each kept
+  subtree has a named call from a library owner or is deleted. `physics::fluid`'s control-volume
+  operators (`control_volume::{NewtonianMaterial, ControlVolume, face_flux, vorticity}` over
+  `cells::{GridCell, CubicalComplex}`) are kept for U4's fluid-cell terrain; the rest of `physics`
+  meets the same rule at U4's close.
 
 #### U2. One retention contract, and F0's memory
 
@@ -110,7 +113,8 @@ Owners: `receiver::standing` (Lean `Foundation/Standing`), `hnn::retention`, `po
 - **Acceptance.** The collapses' laws and tests unchanged; on a fresh F0 split, pinned before running
   with its standing budget, the merged tree's standing per cell falls strictly while its conditional
   byte-and-stop code stays within the pinned margin of the unmerged tree's. The squares are checked, or
-  the merge is refused for that context.
+  the merge is refused for that context. `receiver::standing`, `compression::face_map` and `hnn::modes`
+  each have a named call from a library owner, or are deleted.
 - **Failure.** The standing stays; the refused contexts and their separators are reported.
 
 #### U3. One release contract
@@ -126,7 +130,10 @@ Owners: `receiver::release`, `population::{releasing, sampling, family_release, 
 - **Acceptance.** Every existing receipt is reproduced exactly through the one law: the face laws, the
   stop law, the unresolved draw mass, the refusals and the full receipts of F4's views and the chase.
   The inverse-CDF theorem does not turn selectively emitted mass into the full mixture, so no claim
-  rests on it.
+  rests on it. `receiver::release`'s unconsumed half and `causal_chord` each have a named call from a
+  library owner, or are deleted.
+- **Failure.** A receipt that the one law cannot reproduce names its separating term; that rule
+  stays a separate arm, declared as such.
 - **Then** F4's second stage, `Q_R` (its gate below).
 
 #### U1. One machine: the receiving composition at the field's port
@@ -144,6 +151,10 @@ It consumes U2's and U3's contracts.
   population on the declared families. Then, on the standing cut, the two executions' codes differ by
   at most a bound derived from their charts (β rounding against the enclosures), pinned before the
   run, host and card. Aggregate agreement alone is not acceptance.
+- **The missing physical maps, named.** U1 states what joining the statistical families to the
+  Holon's power ports would need (their flow and effort, the storage their counts or weights would
+  be, and the balance their update would satisfy) and lands the obligations in #62; it does not
+  claim the join.
 - **Then F2's adoption gate, unchanged:** a field family is adopted for text only if the charged
   population code is strictly shorter than without it and its complete work fits the declared
   response and passage budgets (the gate below).
@@ -156,7 +167,8 @@ where one exists), `holarchy::terrain::{chase, pursuit}`, then the named operato
 - **The rebase** (with U1, independent of it). The chase carries `(v, v′)` undivided; its traction law
   `|v′ − v|² ≤ r²` reads as the disk of admitted moves; walls, speed caps, traction, demand timing and
   held slips are preserved; a zero opening velocity and a stop are explicit cases with no division and
-  no pivot. Acceptance: every chase receipt is unchanged.
+  no pivot. Acceptance: every chase receipt is unchanged. Failure: a receipt that changes names the
+  case the rebase broke, and the lattice kinematics stay as they are.
 - **The measured next failure first.** The machine misses the truth-only least on 5 of 16 seeds while
   its opening fibre is wide; that is the next loop's subject, before any new terrain.
 - **F6's switches and attribution** follow U2 and U3 (they touch the action-sufficient future and the
@@ -165,7 +177,7 @@ where one exists), `holarchy::terrain::{chase, pursuit}`, then the named operato
   is on a fresh, unfiltered population of seeds with its aggregate capture, regret and win/tie/loss
   criteria declared before the run. The subset of seeds that admit a win beyond every control is
   reported separately, as a conditional reading, never as the acceptance.
-- **Then** a fluid-cell terrain from the named `physics::fluid` operators (the pressure as the
+- **Then** a fluid-cell terrain from `physics::fluid`'s control-volume operators (the pressure as the
   incompressibility grip, doing no work; viscosity as friction on the strain; time advance and the
   pressure solve, which `physics::fluid` still owes), then the motor chart (its gate below).
 
@@ -173,13 +185,15 @@ where one exists), `holarchy::terrain::{chase, pursuit}`, then the named operato
 
 A receiving window is an `aeon::Epochs` reading, a pump period an `aeon::Cycle`, and the machine's
 clocks instantiate `navigator::Clock`. Acceptance: the section and carry correspondence is proved or
-checked exactly, and every exposure is at parity.
+checked exactly, and every exposure is at parity. Failure: the clock that does not correspond is
+named, and the program's loop stays its own counter, disclosed as such.
 
 #### U6. The text chart
 
 F0's next loop is U2's memory experiment; F4's second stage follows U3; F5 follows F0 and F4. The
 curated source gains its intervals (source contract item 9), measured as a charged comparison
-against the source without them. Their gates below are unchanged.
+against the source without them. Their gates below are unchanged. Failure: each gate's own failure
+branch; intervals that do not shorten the charged code are recorded and not adopted.
 
 #### U7. The targets, alongside
 
@@ -206,14 +220,14 @@ equation extraction (#146).
 | Item | Disposition |
 |---|---|
 | The tree and population as Holons joined at power ports | open; U1 names its missing maps and balances; owed in #62 |
-| Campaign 3's descended lattice chart, card parity, finite-deposit stability, persistent dormancy across an aeon and the concrete-ring bridge | deferred: built when U2 decides `hnn::modes`; owed in #62 |
-| Mode release, FOUND by interconnection, far-field moment quotient `V_m` | deferred to after U3; owed in #62 |
-| Encoding, Context and JointPrediction (joint against marginal witnesses) | U6, after U1; the continuation-transport discovery of F1's after-note stays live |
+| Campaign 3's descended lattice chart, card parity, finite-deposit stability, persistent dormancy across an aeon and the concrete-ring bridge | deferred: built when U2 decides `hnn::modes` (#73); the Lean parts owed in #62 |
+| Mode release, FOUND by interconnection, far-field moment quotient `V_m` | deferred to after U3 (#73) |
+| Encoding, Context and JointPrediction (joint against marginal witnesses) | U6, after U1; the continuation-transport discovery of [F1's after-note](../../research/records/2026-09-28_THE_REBUILDS_CONSTRUCTION_RECORD_STEPS_ZERO_TO_FIVE_THE_CAMPAIGNS_AND_THE_FORWARD_PLAN.md#f1-the-word-alphabet-campaign-5-73-148) stays live |
 | Concrete-tick diamond, complete word-sensitivity certificate | owed in #62 |
-| The carry word's runtime consumer, relative completeness, action-sufficient descent in Lean, Hearing's consumer | U5 (carry word); owed in #62 (the rest) |
+| The carry word's runtime consumer, relative completeness, action-sufficient descent in Lean, Hearing's consumer | U5 (the carry word); U2 (Hearing's consumer, at the collapses); owed in #62 (relative completeness, action-sufficient descent) |
 | F4's decoder, producing keys, causal provenance, grain and fibre, release squares | U3 and F4's gate |
 | F5's cold restore, atomic native transition, truthful health receipts | F5's gate |
-| Moving-continuum electromagnetic reception | deferred; owed in #62 |
+| Moving-continuum electromagnetic reception | deferred to U7 (the physical terrains); owed in #62 |
 | Persistent motion of the wave and resonator between words | open: the word-local states leave at the word's end; built only with a consumer and a falsifier |
 | Timing and intervals | U6 (source item 9), charged |
 | Calibration (predicted against realized surprise) | U3's receipts report it |
@@ -239,7 +253,7 @@ equation extraction (#146).
 | Campaign 3 (modes, dormancy, founding) | U2 decides `hnn::modes`; the rest in §4 |
 | Campaign 4 (the motor chart), F6 | U4 |
 | Campaign 5 (encoding, context, prediction) | U6; §4 |
-| F1 (words) | its failure branch holds: bytes stay; the continuation-transport after-note stays live (§4) |
+| F1 (words) | its failure branch holds: bytes stay; the continuation-transport discovery of [F1's after-note](../../research/records/2026-09-28_THE_REBUILDS_CONSTRUCTION_RECORD_STEPS_ZERO_TO_FIVE_THE_CAMPAIGNS_AND_THE_FORWARD_PLAN.md#f1-the-word-alphabet-campaign-5-73-148) stays live (§4) |
 | F2 (the field as a family) | U1 and its gate |
 | Step 5, F3 | U8 and its gate |
 | Step 6 | U7 |
@@ -281,7 +295,7 @@ on the admitted egg, and the trees beyond depth 24 add at most 20 bits.
      - Validation bytes are unchanged, `−2430 + 8/16 + ε` against flat, and choosing bytes
        improve by 2 bits, since no family names are paid.
      - The standing falls from 11,513,530,863 to 2,781,355,912 bytes (from 10,983 to 2,653 a cell).
-     - Peak resident memory falls from 10.8 GB to 3.4 GB, and the passage from 272,849 to
+     - Peak resident memory falls from 10,843,217,920 to 3,400,306,688 bytes, and the passage from 272,849 to
        166,113 ms.
   2. **A family wins where it is closest: measured, not adopted, September 28**
      ([record](../../research/records/2026-09-28_A_NUMBER_IS_A_HELIX_ITS_BASE_IS_A_FACE_AND_A_FAMILY_WINS_WHERE_IT_IS_CLOSEST.md#5-the-population-a-family-wins-where-it-is-closest);
@@ -301,7 +315,7 @@ on the admitted egg, and the trees beyond depth 24 add at most 20 bits.
        bits below its best single member, which no static mixture can do; exact whole-passage
        Bayes over the same families reads as the egg alone.
      - The standing returns to 10,983 bytes a cell (11,513,530,846 bytes), from 2,653. The passage
-       takes 263,687 ms at an 8.4 GB peak, and streaming the standing raises the peak to 14.2 GB.
+       takes 263,687 ms at an 8,407,535,616-byte peak, and streaming the standing raises the peak to 14,226,153,472 bytes.
      - The switching in time is a floor declared as the chart's width, not the hazard ladder.
        Its segment telescope in Lean is owed (#62).
      - **Not adopted.** The choosing families decide: their charged bytes read `−3 + 12/16 + ε`

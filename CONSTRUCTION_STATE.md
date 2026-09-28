@@ -20,8 +20,31 @@ The repository was reset on September 24; the pre-reset tree is
 | Motion (F6; #27) | The chase: reception at truth on 16 arenas; action captures in 164 ticks in sum against 3,704 (pure pursuit) and 366 (constant bearing), and fails the at-once acceptance; the switches are not built. The motion primitives are proved (`Geometry/Motion`) with no Rust consumer | U4 |
 | Retention | Lean `Foundation/Standing`; Rust `receiver::standing` used only by tests; the two collapses do not use it | U2 |
 | Targets and physics (#146, #20, #22, #23, #32) | Finite physics K3–K4 complete; target research continues alongside construction | U7 |
-| Lean curation (#147) | First pass and renames complete; duplicate owners and retired vocabulary remain | U0, U8 |
-| **Immediate work** | **U0, consolidation, in three workers (Rust; Lean, atlas and #62; guides and indexes); then wave B: U2's contract with F0's memory experiment, U3's contract and U4's rebase** | U0 |
+| Lean curation (#147) | First pass, renames and U0's owner consolidation complete; the remaining curation is #147's | U8 |
+| **Immediate work** | **Wave B of the unified plan: U2's retention contract with F0's memory experiment, U3's release contract, and U4's motion rebase of the chase (`(v, v′)`)** | U2, U3, U4 |
+
+## U0 receipt (September 28)
+
+The consolidation of the [unified plan](docs/plans/THE_REBUILD.md#the-unified-plan-september-28),
+reviewed by GPT-6 Astra (the plan) and one independent reviewer (the change), landed as one merge.
+- **Rust.** 19,984 lines removed across 90 files: `population::local`, `hnn_tokens`, `hnn::born`,
+  F1's word family, `Mixture::switching`, `navigator::reflection`, `holon::reaction`,
+  `landmark::{identity, primitive, constraint}`, `aeon::zeta`, `NormalizedKernel`, the CUDA word
+  path's unused wrappers and six completed harnesses. Each unformalized law was written into its
+  guide or record first. Renames: `half_turn`, `junction_scattering`, the chase's `Evasion` and
+  `RunnerLaw`, `section_period`, the sign sequence. Behaviour unchanged.
+- **Lean.** One owner each for the half-turn word law, the sling, Bayes, KT and the moving-metric
+  energy law, with bridges proved; `junctionScattering_*`; 104 retired-crate citations repinned;
+  `TARGETS_FORMAL_CATALOG.md` retired.
+- **Guides and indexes.** THE_REBUILD became the unified plan (its history in the
+  [construction record](research/records/2026-09-28_THE_REBUILDS_CONSTRUCTION_RECORD_STEPS_ZERO_TO_FIVE_THE_CAMPAIGNS_AND_THE_FORWARD_PLAN.md));
+  THE_MACHINE holds the line, the measurement protocol and the guards; one owner per definition;
+  the notebook and records READMEs are routes; the atlas README states its tags and shards; #62's
+  body is the current obligation list (106 open items).
+- **Gates.** `cargo check --workspace --all-targets` clean; `cargo test -p holonics --lib` 951
+  passed; `cargo test -p holonics-cuda` with `--include-ignored` 32 passed on the card, alone under
+  the lock; `bash tools/lean_check.sh Holonics HolonicsResearch` 10,242 jobs, no `sorry`; the atlas
+  (2,745 rows) valid; no new broken links.
 
 ## Measured receiving faces
 

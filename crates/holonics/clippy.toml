@@ -1,4 +1,4 @@
-# The HNN's guards 7 and 12 (docs/plans/THE_REBUILD.md, step 4 design (g)): no float and no file
+# The HNN's guards 7 and 12 (docs/THE_MACHINE.md, "Guards that make the rejected forms impossible"): no float and no file
 # system or process inside the machinery. `hnn` denies both lints; the rest of the crate is clean
 # of them and warns. An exterior boundary (a notebook reading a file) allows them where it reads.
 disallowed-types = [

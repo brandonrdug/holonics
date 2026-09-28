@@ -1916,4 +1916,4 @@ before the seed's first capture. The last column is the runner's slips, as onset
   - a chaser outside its bound is refused;
   - the controls' laws.
 - **Not built.** The switches: the lag channel, and three observation channels with loop-closure
-  attribution. THE_REBUILD F6 records the owed Lean.
+  attribution. The construction record's F6 action-phase receipt and #62 ("The chase consumer") record the owed Lean.

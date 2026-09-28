@@ -1,6 +1,6 @@
 //! **The resident HNN on the card** (rebuild step 5; #76 with #12–#15 and #50; design:
-//! [THE_REBUILD](../../../../docs/plans/THE_REBUILD.md), step 4 design (c), "Realization on the
-//! card").
+//! the [construction record](../../../../research/records/2026-09-28_THE_REBUILDS_CONSTRUCTION_RECORD_STEPS_ZERO_TO_FIVE_THE_CAMPAIGNS_AND_THE_FORWARD_PLAN.md#step-4-design-the-hnn-law),
+//! step 4 design (c), "Realization on the card").
 //!
 //! [definition] One library for the laws, one backend for the card: every law here is a law of
 //! `holonics::hnn`, realized on the card with exact integers, and each kernel family has a parity

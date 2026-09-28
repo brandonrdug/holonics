@@ -57,12 +57,12 @@ the identity atlas's coverage/density certificate (I1).
   Hilbert bound). Neither Buchberger's termination nor that equality is formalized.
 - **Richardson undecidability.** Identity of general expressions in `exp`, `sin`, `|·|`, `π` is
   undecidable; the holonomic (D-finite) class is where equality is certified by an annihilator
-  and initial data. The Rust consumer (`holonics::compression::landmark::identity`) searches
+  and initial data. The retired Rust consumer (`holonics::compression::landmark::identity`, at commit `2d34b819`) searched
   polynomial identities on one-parameter rational charts only; a holonomic search is owed in #62
   with this item.
-- **The chart's density and the dimension certificate.** The Rust consumer covers a declared
+- **The chart's density and the dimension certificate.** The retired Rust consumer covered a declared
   irreducible curve by one nonconstant chart landing in it (an infinite subset of an irreducible
-  curve is Zariski dense in it) and certifies each component's declared dimension by a nonzero
+  curve is Zariski dense in it) and certified each component's declared dimension by a nonzero
   generator in every single coordinate (a point) or every pair of coordinates (a curve). Both are
   standard and neither is stated here.
 

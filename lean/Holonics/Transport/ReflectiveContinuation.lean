@@ -1,8 +1,8 @@
 /-!
 # Receiver-caused codec reflection and continuation
 
-[definition] This is the source-neutral law extracted from the current Rust
-`holonic-language::ReflectiveRuntime`. A codec is an application chart (`Program` in Rust); a
+[definition] This is the source-neutral law extracted from the Rust `ReflectiveRuntime` (the pre-reset
+`holonic-language` crate, then `holonics::navigator::reflection`, retired September 28 at `2d34b819`). A codec is an application chart (`Program` in Rust); a
 revision carries the source face that caused it; a receiver owns the reflective request. The
 contract does not interpret programs or define a universal syntax.
 
