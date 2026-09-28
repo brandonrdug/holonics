@@ -93,8 +93,8 @@ pub trait Layered: Emitters + Sync {
 /// top bit is set, or zero.
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub struct Weight {
-    mantissa: u64,
-    exponent: i64,
+    pub(crate) mantissa: u64,
+    pub(crate) exponent: i64,
 }
 
 impl Weight {

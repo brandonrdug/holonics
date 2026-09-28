@@ -40,6 +40,14 @@ emit another class), so this module states the same mixture with **nonnegative**
 * `certified_inverseCDF_class` [proved-derived; formal-checked]: interval face bounds certify a
   draw's class when its lower cumulative mass through that class exceeds the draw and its upper
   cumulative mass before that class does not. An unresolved draw remains unresolved.
+* `local_telescope`, `local_mixture_code`, `local_of_constant` [proved-derived; formal-checked]: a
+  family wins where it is closest (F0's second candidate; Rust
+  `receiver::population::LocalMixture`). A gating map `γ` places each cell in a context; the local
+  mixture weighs the families at cell `t` by the posterior of `γ t` alone, each context's weights
+  its prior times the family's faces over the context's earlier cells. With positive faces its faces
+  telescope to the product of the contexts' totals (a context not met holds its prior, total one),
+  so it codes within `Σ_(c met) (−log₂ π_(g c) − log₂ L_(g c)(c))` for every choice `g` of one family
+  per context; one context (a constant gating map) is the static mixture.
 
 The computational object is the helical pair interaction read as a receiver's population of
 candidate eggs; of the winding guide's six general objects this module touches **faces and
@@ -395,6 +403,144 @@ theorem death_is_an_exchange {ι : Type*} [Fintype ι] {w L : ι → ℝ} (hsum 
 
 end Exchange
 
+section LocalMixture
+
+/-! ## The local mixture: a family wins where it is closest -/
+
+variable {ι C : Type*} [Fintype ι] [Fintype C] [DecidableEq C]
+
+/-- [definition] **A family's likelihood within a context**: the product of its faces over the
+cells before `n` that the gating map `γ` places in context `c`. -/
+def ctxLik (a : ℕ → ℚ) (γ : ℕ → C) (c : C) (n : ℕ) : ℚ :=
+  ∏ t ∈ (range n).filter (fun t => γ t = c), a t
+
+/-- [definition] **A context's total**, `Σ_x π_x L_x(c, n)`. -/
+def ctxTotal (π : ι → ℚ) (f : ι → ℕ → ℚ) (γ : ℕ → C) (c : C) (n : ℕ) : ℚ :=
+  ∑ x, π x * ctxLik (f x) γ c n
+
+/-- [definition] **The local mixture's face** of cell `t`: the families' faces of it weighed by
+the posterior of cell `t`'s context, `Σ_x π_x L_x(γ t, t) f_x(t) / Σ_x π_x L_x(γ t, t)`. -/
+def localFace (π : ι → ℚ) (f : ι → ℕ → ℚ) (γ : ℕ → C) (t : ℕ) : ℚ :=
+  (∑ x, π x * ctxLik (f x) γ (γ t) t * f x t) / ctxTotal π f γ (γ t) t
+
+omit [Fintype C] in
+theorem ctxLik_succ (a : ℕ → ℚ) (γ : ℕ → C) (c : C) (n : ℕ) :
+    ctxLik a γ c (n + 1) = if γ n = c then ctxLik a γ c n * a n else ctxLik a γ c n := by
+  unfold ctxLik
+  rw [range_add_one, filter_insert]
+  split_ifs with h
+  · rw [prod_insert (by simp), mul_comm]
+  · rfl
+
+omit [Fintype C] in
+theorem ctxLik_pos {a : ℕ → ℚ} (ha : ∀ t, 0 < a t) (γ : ℕ → C) (c : C) (n : ℕ) :
+    0 < ctxLik a γ c n :=
+  prod_pos fun t _ => ha t
+
+omit [Fintype C] in
+theorem ctxTotal_pos {π : ι → ℚ} {f : ι → ℕ → ℚ} (hπ : IsPrior π) (hf : ∀ x t, 0 < f x t)
+    (γ : ℕ → C) (c : C) (n : ℕ) : 0 < ctxTotal π f γ c n := by
+  obtain ⟨y, -, hy⟩ := exists_lt_of_sum_lt (s := univ) (f := fun _ => (0 : ℚ)) (g := π)
+    (by simp [hπ.2])
+  exact lt_of_lt_of_le (mul_pos hy (ctxLik_pos (hf y) γ c n))
+    (single_le_sum (f := fun x => π x * ctxLik (f x) γ c n)
+      (fun x _ => mul_nonneg (hπ.1 x) (ctxLik_pos (hf x) γ c n).le) (mem_univ y))
+
+omit [Fintype C] in
+/-- The context of cell `n` moves by that cell's faces. -/
+theorem ctxTotal_succ_same (π : ι → ℚ) (f : ι → ℕ → ℚ) (γ : ℕ → C) (n : ℕ) :
+    ctxTotal π f γ (γ n) (n + 1) = ∑ x, π x * ctxLik (f x) γ (γ n) n * f x n := by
+  unfold ctxTotal
+  refine sum_congr rfl fun x _ => ?_
+  rw [ctxLik_succ, if_pos rfl, mul_assoc]
+
+omit [Fintype C] in
+/-- Every other context stands still. -/
+theorem ctxTotal_succ_other (π : ι → ℚ) (f : ι → ℕ → ℚ) (γ : ℕ → C) {c : C} {n : ℕ}
+    (h : γ n ≠ c) : ctxTotal π f γ c (n + 1) = ctxTotal π f γ c n := by
+  unfold ctxTotal
+  refine sum_congr rfl fun x _ => ?_
+  rw [ctxLik_succ, if_neg h]
+
+omit [Fintype C] in
+/-- The local face is its context's total after the cell over its total before. -/
+theorem localFace_eq (π : ι → ℚ) (f : ι → ℕ → ℚ) (γ : ℕ → C) (t : ℕ) :
+    localFace π f γ t = ctxTotal π f γ (γ t) (t + 1) / ctxTotal π f γ (γ t) t := by
+  rw [localFace, ctxTotal_succ_same]
+
+omit [Fintype C] in
+/-- A context the passage has not met holds its prior: its total is one. -/
+theorem ctxTotal_unmet {π : ι → ℚ} (hπ : IsPrior π) (f : ι → ℕ → ℚ) (γ : ℕ → C) {c : C}
+    {n : ℕ} (hc : c ∉ (range n).image γ) : ctxTotal π f γ c n = 1 := by
+  have hempty : (range n).filter (fun t => γ t = c) = ∅ := by
+    ext t
+    simp only [mem_filter, mem_range, notMem_empty, iff_false, not_and]
+    intro ht h
+    exact hc (mem_image.mpr ⟨t, mem_range.mpr ht, h⟩)
+  simp [ctxTotal, ctxLik, hempty, hπ.2]
+
+/-- [proved-derived; formal-checked] **`local_telescope`: the local mixture telescopes context by
+context.** With a prior and positive faces, `∏_(t<n) q_t = ∏_c Σ_x π_x L_x(c, n)`: each cell moves
+only its own context's total, by its local face. -/
+theorem local_telescope {π : ι → ℚ} {f : ι → ℕ → ℚ} (hπ : IsPrior π) (hf : ∀ x t, 0 < f x t)
+    (γ : ℕ → C) (n : ℕ) :
+    ∏ t ∈ range n, localFace π f γ t = ∏ c, ctxTotal π f γ c n := by
+  induction n with
+  | zero =>
+    rw [range_zero, prod_empty]
+    exact (prod_eq_one fun c _ => ctxTotal_unmet hπ f γ (by simp)).symm
+  | succ n ih =>
+    have hne := (ctxTotal_pos hπ hf γ (γ n) n).ne'
+    have hrest : ∏ c ∈ univ.erase (γ n), ctxTotal π f γ c (n + 1) =
+        ∏ c ∈ univ.erase (γ n), ctxTotal π f γ c n :=
+      prod_congr rfl fun c hc => ctxTotal_succ_other π f γ (Ne.symm (ne_of_mem_erase hc))
+    rw [prod_range_succ, ih, localFace_eq,
+      ← mul_prod_erase univ (fun c => ctxTotal π f γ c n) (mem_univ (γ n)),
+      ← mul_prod_erase univ (fun c => ctxTotal π f γ c (n + 1)) (mem_univ (γ n)), hrest]
+    field_simp
+
+/-- [proved-derived; formal-checked] **`local_mixture_code`: a family wins where it is closest.**
+With a prior and positive faces the local mixture codes within, for every choice `g` of one family
+per context with a positive prior, the contexts met each paying that family's prior code and its
+code on the context's cells:
+`−log₂ ∏_(t<n) q_t ≤ Σ_(c ∈ γ[range n]) (−log₂ π_(g c) − log₂ L_(g c)(c, n))`. Under the uniform
+prior over `M` families this is `Σ_(c met) (min_f code_f(c) + log₂ M)`. -/
+theorem local_mixture_code {π : ι → ℚ} {f : ι → ℕ → ℚ} (hπ : IsPrior π)
+    (hf : ∀ x t, 0 < f x t) (γ : ℕ → C) (n : ℕ) (g : C → ι) (hg : ∀ c, 0 < π (g c)) :
+    -Real.logb 2 ((∏ t ∈ range n, localFace π f γ t : ℚ) : ℝ) ≤
+      ∑ c ∈ (range n).image γ,
+        (-Real.logb 2 (π (g c) : ℝ) - Real.logb 2 (ctxLik (f (g c)) γ c n : ℝ)) := by
+  have hmet : ∏ t ∈ range n, localFace π f γ t =
+      ∏ c ∈ (range n).image γ, ctxTotal π f γ c n := by
+    rw [local_telescope hπ hf γ n]
+    exact (prod_subset (subset_univ _) fun c _ hc => ctxTotal_unmet hπ f γ hc).symm
+  rw [hmet, Rat.cast_prod, Real.logb_prod _ _ fun c _ => by
+    exact_mod_cast (ctxTotal_pos hπ hf γ c n).ne', ← sum_neg_distrib]
+  refine sum_le_sum fun c _ => ?_
+  have hA := ctxLik_pos (hf (g c)) γ c n
+  have hle : π (g c) * ctxLik (f (g c)) γ c n ≤ ctxTotal π f γ c n :=
+    single_le_sum (f := fun x => π x * ctxLik (f x) γ c n)
+      (fun x _ => mul_nonneg (hπ.1 x) (ctxLik_pos (hf x) γ c n).le) (mem_univ (g c))
+  have hb := neg_logb_le_of_le (a := ((π (g c) * ctxLik (f (g c)) γ c n : ℚ) : ℝ))
+    (b := ((ctxTotal π f γ c n : ℚ) : ℝ)) (by exact_mod_cast mul_pos (hg c) hA)
+    (by exact_mod_cast hle)
+  push_cast at hb
+  rw [Real.logb_mul (by exact_mod_cast (hg c).ne') (by exact_mod_cast hA.ne')] at hb
+  linarith
+
+omit [Fintype C] in
+/-- [proved-derived; formal-checked] **`local_of_constant`: one context is whole-passage Bayes.**
+Under a constant gating map the local face is the static mixture's face. -/
+theorem local_of_constant [DecidableEq ι] (π : ι → ℚ) (f : ι → ℕ → ℚ) {γ : ℕ → C} {c : C}
+    (hγ : ∀ t, γ t = c) (t : ℕ) : localFace π f γ t = fwdMix π f idKernel t := by
+  have hlik : ∀ x m, ctxLik (f x) γ c m = seqLik (f x) m := by
+    intro x m
+    unfold ctxLik seqLik
+    rw [filter_true_of_mem fun s _ => hγ s]
+  simp only [localFace, fwdMix, ctxTotal, hγ, hlik, fwd_id]
+
+end LocalMixture
+
 section Audit
 
 #print axioms seqLik_eq_zero_of_le
@@ -413,6 +559,15 @@ section Audit
 #print axioms escaped_fibre_is_mode
 #print axioms death_is_an_exchange
 #print axioms certified_inverseCDF_class
+#print axioms ctxLik_succ
+#print axioms ctxTotal_pos
+#print axioms ctxTotal_succ_same
+#print axioms ctxTotal_succ_other
+#print axioms localFace_eq
+#print axioms ctxTotal_unmet
+#print axioms local_telescope
+#print axioms local_mixture_code
+#print axioms local_of_constant
 
 end Audit
 

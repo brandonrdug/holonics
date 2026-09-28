@@ -157,4 +157,5 @@ charts, where success means the navigator is found once and the base is only the
 - `(ℤ/p)^×` cyclic, and `(ℤ/2^m)^× ≅ ℤ/2 × ℤ/2^(m−2)`, as faces of the radix receiver. Mathlib
   holds the group facts; the join is owed.
 - Weyl's equidistribution giving Benford's arc frequencies on the leading face.
-- The node-local mixture's code bound.
+- The node-local mixture's code bound. Discharged September 28: `Population.local_mixture_code`
+  (with `local_telescope` and `local_of_constant`), consumed by `receiver::population::LocalMixture`.

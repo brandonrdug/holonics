@@ -115,16 +115,16 @@ use super::exterior::{
 };
 
 /// The cell tree's doubling ladder below its deepest admitted depth.
-const CELL_DEPTHS: [usize; 4] = [6, 12, 24, 48];
+pub(super) const CELL_DEPTHS: [usize; 4] = [6, 12, 24, 48];
 
 /// The typed tree's ladder below the egg's byte tree (its deepest admitted depth).
-const TYPED_DEPTHS: [usize; 2] = [6, 12];
+pub(super) const TYPED_DEPTHS: [usize; 2] = [6, 12];
 
 /// The letter tree's depth (chosen on development among the probed, charged below).
 const LETTER_DEPTH: usize = 12;
 
 /// The flat tree's recorded depth (the typed reader's development sweep, `hnn_curated`).
-const FLAT_DEPTH: usize = 48;
+pub(super) const FLAT_DEPTH: usize = 48;
 
 /// The copy stage's law (the least located length, the length classes, the odds classes a side),
 /// chosen on development among the probed (charged below).
@@ -133,17 +133,17 @@ const COPY_LAW: (u64, u32, u32) = (4, 4, 8);
 /// The development sweep's charges (module header): the byte tree among 3, the hazard among 47 (the
 /// 45 probed laws and the two learned stages), the letter tree among 11, the copy stage's law among
 /// 8, the pointer's code among 3; the flat tree's recorded depth sweep among 5.
-const PROBED: [u64; 5] = [3, 47, 11, 8, 3];
-const FLAT_SWEEP: u64 = 5;
+pub(super) const PROBED: [u64; 5] = [3, 47, 11, 8, 3];
+pub(super) const FLAT_SWEEP: u64 = 5;
 
 /// The readings' slots.
-const SLOTS: [&str; 4] = [
+pub(super) const SLOTS: [&str; 4] = [
     "human bytes",
     "agent bytes",
     "tool bytes",
     "section letters",
 ];
-const LETTERS: usize = 3;
+pub(super) const LETTERS: usize = 3;
 const PARTS: [&str; 2] = ["development", "held out"];
 
 /// The retired per-port reader's receipts (commit `38b0b81c`): the closes per port and the section
@@ -193,24 +193,24 @@ fn grain_cell((carry, phase): (i64, u64)) -> ExactInterval {
     }
 }
 
-fn ceil_log2(count: u64) -> u64 {
+pub(super) fn ceil_log2(count: u64) -> u64 {
     u64::from(count.next_power_of_two().trailing_zeros())
 }
 
-fn point(bits: u64) -> ExactInterval {
+pub(super) fn point(bits: u64) -> ExactInterval {
     ExactInterval::point(Rat::from_integer(BigInt::from(bits)))
 }
 
-fn sum(a: &ExactInterval, b: &ExactInterval) -> ExactInterval {
+pub(super) fn sum(a: &ExactInterval, b: &ExactInterval) -> ExactInterval {
     interval_sum(a, b).expect("an enclosure")
 }
 
-fn bits(code: &PassageCode) -> ExactInterval {
+pub(super) fn bits(code: &PassageCode) -> ExactInterval {
     code.bits().expect("an enclosure")
 }
 
 /// The product of several passages' faces, read once.
-fn joined<'a>(codes: impl IntoIterator<Item = &'a PassageCode>) -> ExactInterval {
+pub(super) fn joined<'a>(codes: impl IntoIterator<Item = &'a PassageCode>) -> ExactInterval {
     let mut all = PassageCode::new();
     for code in codes {
         all.join(code);
@@ -224,7 +224,7 @@ fn minus(a: &ExactInterval, b: &ExactInterval) -> ExactInterval {
 }
 
 /// A strict ordering with its exact difference, and the difference a cell.
-fn ordering(label: &str, a: &ExactInterval, b: &ExactInterval, cells: u64) {
+pub(super) fn ordering(label: &str, a: &ExactInterval, b: &ExactInterval, cells: u64) {
     let delta = ExactInterval {
         lower: &a.lower - &b.upper,
         upper: &a.upper - &b.lower,
@@ -237,7 +237,7 @@ fn ordering(label: &str, a: &ExactInterval, b: &ExactInterval, cells: u64) {
     );
 }
 
-fn declaration(
+pub(super) fn declaration(
     alphabet: usize,
     depth: usize,
     population: u64,
@@ -257,7 +257,7 @@ fn declaration(
 }
 
 /// **The deepest depth a declaration's carriers admit** (`Landmarks::new` refuses past it).
-fn deepest(declared: &LandmarkDeclaration) -> usize {
+pub(super) fn deepest(declared: &LandmarkDeclaration) -> usize {
     let mut depth = declared.depth;
     while Landmarks::new(LandmarkDeclaration {
         depth: depth + 1,
@@ -284,6 +284,33 @@ pub(super) fn curated_population(
     members: Members,
 ) -> Result<
     (Population, usize, Vec<PopulationMemberManifest>),
+    holonics::receiver::population::PopulationError,
+> {
+    let (declared, egg_index, manifest) = curated_families(
+        chart,
+        population,
+        grain,
+        chosen_hazard,
+        relations,
+        comparisons,
+        members,
+    )?;
+    Ok((Population::new(declared)?, egg_index, manifest))
+}
+
+/// The declared families of [`curated_population`], unmixed (F0's second candidate mixes them
+/// node-locally, `hnn_population_local.rs`), with the admitted egg's index and the manifest.
+#[allow(clippy::type_complexity)]
+pub(super) fn curated_families(
+    chart: SectionChart,
+    population: u64,
+    grain: u64,
+    chosen_hazard: HazardPartition,
+    relations: Vec<holonics::receiver::population::Relation>,
+    comparisons: &[(String, HazardPartition)],
+    members: Members,
+) -> Result<
+    (Vec<Box<dyn Family>>, usize, Vec<PopulationMemberManifest>),
     holonics::receiver::population::PopulationError,
 > {
     let cells = |depth| {
@@ -386,7 +413,7 @@ pub(super) fn curated_population(
         mass,
     }));
     declared.push(Box::new(admitted));
-    Ok((Population::new(declared)?, egg_index, manifest))
+    Ok((declared, egg_index, manifest))
 }
 
 fn posterior(posterior: &Posterior) -> String {
