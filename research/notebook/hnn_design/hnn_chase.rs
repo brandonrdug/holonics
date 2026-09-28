@@ -497,6 +497,13 @@ fn wtl(counts: &[usize; 3]) -> String {
 /// Reported separately, as a conditional reading and never as the acceptance: the seeds whose
 /// truth-only least lies strictly below both controls (a win beyond every control is admitted),
 /// with each machine's win/tie/loss against both at once and its regret sum on them.
+///
+/// [measured; the pin amended before the rerun] **A refused draw.** The first run stopped at seed
+/// `20261135`, the 35th: its draw opens the runner and the chaser within capture, which the terrain
+/// refuses (`Chase::draw`, `pursuit::act`), and the pin had not declared the case. A draw the terrain
+/// refuses is a seed with no chase: it is printed, read by no chaser and enters no sum, and "more
+/// than half of the seeds" counts the chased seeds. The refusal reads the openings alone, the same
+/// for every chaser, so it selects by no chaser's outcome. Nothing else changed.
 fn fresh() {
     let declaration = declaration();
     let family = family();
@@ -523,8 +530,18 @@ fn fresh() {
     let (mut admitting, mut conditional, mut conditional_regrets) =
         (0usize, [[0usize; 3]; 2], [0usize; 2]);
     let mut releases = [[0usize; 3]; 2];
+    let mut refused = Vec::new();
     for s in 0..FRESH_SEEDS {
         let seed = FRESH_SEED + s;
+        let (_, _, openings) = Chase::drawn(&declaration, &family, seed).expect("a draw");
+        if action.pursuer.captures(openings[0], openings[1]) {
+            println!(
+                "seed {seed}: the draw opens within capture ({:?}, {:?}); the terrain refuses the chase, and no chaser reads it",
+                openings[0], openings[1]
+            );
+            refused.push(seed);
+            continue;
+        }
         let mut robust = machine(TUBE_HORIZON, BASIN_HORIZON, PRICE, Plan::Robust);
         let r = act_drawn(&declaration, &family, &action, seed, &mut robust).expect("the machine");
         let mut candidate = machine(TUBE_HORIZON, BASIN_HORIZON, PRICE, CANDIDATE_PLAN);
@@ -579,9 +596,14 @@ fn fresh() {
             }
         );
     }
+    let chased = FRESH_SEEDS as usize - refused.len();
     println!();
     println!(
-        "over {FRESH_SEEDS} seeds ({} ms): capture ticks in sum {} {}, {} {}, {} {}, {} {} (an uncaptured passage counts its cap {ACTION_TICKS})",
+        "the terrain refuses {} of {FRESH_SEEDS} draws (openings within capture): {refused:?}",
+        refused.len()
+    );
+    println!(
+        "over the {chased} chased seeds ({} ms): capture ticks in sum {} {}, {} {}, {} {}, {} {} (an uncaptured passage counts its cap {ACTION_TICKS})",
         started.elapsed().as_millis(),
         names[0],
         sums[0],
@@ -614,7 +636,7 @@ fn fresh() {
     for m in 0..2 {
         let passed = sums[m] < sums[2]
             && sums[m] < sums[3]
-            && 2 * against[m][2][0] > FRESH_SEEDS as usize;
+            && 2 * against[m][2][0] > chased;
         println!(
             "  F6's action acceptance as written, {}: {}",
             names[m],

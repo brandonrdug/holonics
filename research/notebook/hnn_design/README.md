@@ -2074,3 +2074,10 @@ agrees line for line with the rebase's (342 lines, wall times masked).
 - **Reported separately, as a conditional reading, never as the acceptance**: the seeds whose
   truth-only least lies strictly below both controls, with each machine's win/tie/loss against both
   at once and its regret sum there.
+- **Amended before the rerun** (the next commit). The first run stopped at seed `20261135`, the
+  35th, after 34 seeds (118,694 ms, 635,312 kB peak): its draw opens the runner and the chaser
+  within capture, which the terrain refuses (`Chase::draw`, `pursuit::act`), and the pin had not
+  declared the case. A refused draw is a seed with no chase: it is printed, read by no chaser and
+  enters no sum, and "more than half of the seeds" counts the chased seeds. The refusal reads the
+  openings alone, the same for every chaser, so it selects by no chaser's outcome. Nothing else
+  changed; the rerun must reproduce the first run's 34 seed lines exactly.
