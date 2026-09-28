@@ -171,6 +171,13 @@ where one exists), `holarchy::terrain::{chase, pursuit}`, then the named operato
   case the rebase broke, and the lattice kinematics stay as they are.
 - **The measured next failure first.** The machine misses the truth-only least on 5 of 16 seeds while
   its opening fibre is wide; that is the next loop's subject, before any new terrain.
+- **Known-truth game terrains** (Brandon, September 28;
+  [record](../../research/records/2026-09-28_GODS_ALGORITHM_IS_THE_GEODESIC_NAVIGATOR_THE_CHASE_IS_RETROGRADE_ANALYSIS_AND_A_TEMPO_IS_A_MOBIUS_LOOP.md)),
+  after the chase's next loop and before the fluid-cell terrain: the two-by-two cube's Cayley graph
+  and king-and-queen and king-and-rook against king by retrograde analysis (the chase's capture basin).
+  Each measures a navigator's charged description length against its regret to God's algorithm, with
+  the table itself as the index control. The chase's next loop also records its capture distances as a
+  function of the admitted move set.
 - **F6's switches and attribution** follow U2 and U3 (they touch the action-sufficient future and the
   release law).
 - **F6's action acceptance stays as written, and its failure stays visible.** The next measurement
