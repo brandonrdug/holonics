@@ -20,6 +20,8 @@ records and corrects them where §8 says. Refs #73, #62.
 
 ## 1. Normalization, Bayes, ratio, and Swing
 
+**September 28 reading:** the [motion record](2026-09-28_THE_SWING_IS_A_MOVE_ABOUT_A_GRIP_A_GRIP_TURNS_A_PUSH_BOOSTS_AND_A_FREE_BODY_FALLS.md) retired "the Swing is the point reflection". `S_a x = 2a − x` is the half-turn, so the log-odds translation below is two half-turns, `S_b S_0`; the Lean name `bayes_logOdds_twoSwings` keeps the older word.
+
 **[Definition; proved-derived]** Let a receiver certify a finite, disjoint partition \(A_i\) of its admitted region \(F\), and declare a positive measure \(\mu(F)\). Its probability face is
 \[
 p_i=\frac{\mu(A_i\cap F)}{\mu(F)}.

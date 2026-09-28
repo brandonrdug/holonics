@@ -12,6 +12,8 @@ images until a receiver and transport map are supplied. The title and the origin
 below are historical wording; those physical identifications are not established by the shared
 algebraic parameter alone.
 
+**September 28 join:** the [motion record](2026-09-28_THE_SWING_IS_A_MOVE_ABOUT_A_GRIP_A_GRIP_TURNS_A_PUSH_BOOSTS_AND_A_FREE_BODY_FALLS.md) derives the three kinds of motion, the turn, the boost and free fall, and a move's pivot and grip (§3.1, §3.4, §3.5). This record's boost, null neck and Möbius navigators are those kinds read projectively, as `SiteKind` reads them.
+
 **Truth discipline:**
 - Classical results are `[proved-standard]`.
 - The algebra first checked here (exact computer algebra) is `[proved-derived]`, pending Lean.

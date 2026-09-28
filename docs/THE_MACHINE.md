@@ -27,7 +27,8 @@ results from them.
   navigator's landmarks, held in `Θ` at the receiving locus) is one family; a field-derived predictor
   (today `hnn::receiving`'s combined face `q_C`, the tree's grain logits plus the wave) is another;
   terrain navigators and composed eggs are others. `hnn::receiving::Mixture`, which weighs the tree
-  against `q_C`, realizes a two-family case with its own chart. The population and its statistical
+  against `q_C` on its own rounded chart, shares the population's ideal telescope but is a different
+  execution; joining them is the unified plan's U1. The population and its statistical
   families are not yet Holons joined at power ports: their update and code identities are their own
   laws, and their join to the Holon's energy balance is owed (the unified plan, U1 and §4).
 - **The aeon.** Its passage is an aeon on the Holarchy's parametric orientation (the lift of the
@@ -50,8 +51,10 @@ results from them.
 
 [project-postulate] HNN is one continuing field of interacting Holons: circulating modes,
 interlinked toroidal domains, helical passages, active contact faces and participating receivers.
-A Holon `|H⟩_F` is simultaneously a whole and a part, with incidence `K`, constitution `Θ`,
-currents `Ψ`, interior storage and a declared frame `F`. Athena is the first intended
+A Holon `|H⟩_F`, a motion admitted by its law
+([the Holon as one object](ELEMENTARY_OBJECTS.md#the-holon-as-one-object)), is simultaneously a
+whole and a part, with incidence `K`, constitution `Θ`, currents `Ψ`, interior storage and a
+declared frame `F`. Athena is the first intended
 application; Eros names its collective formation and composition at every grain. Holonics also
 develops the broader mathematical and physical framework these constructions instantiate.
 
@@ -281,7 +284,8 @@ quantum and information constructions are reusable parts of this framework **at 
 hypotheses**. Apply their maps and hypotheses to the current object. Their named conjecture
 endpoints are separate claims; the targets are instances of compression and landmark discovery.
 The [research routes](../research/records/README.md) connect the records, formal statements and
-consumers, so work starts from the accumulated construction.
+consumers, and the [formal framework](FORMAL_FRAMEWORK.md) connects the Lean framework's subjects,
+so work starts from the accumulated construction.
 
 [established-bounded; source-inspected] **What the prototype showed.** The prototype at
 `13f8c734` realized a legacy geometric word, the incident field (standing `q`, transported

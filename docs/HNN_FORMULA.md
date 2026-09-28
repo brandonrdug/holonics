@@ -1,11 +1,13 @@
 # HNN formula: the law `holonics::hnn` implements
 
-[project-postulate] This guide states the HNN law. Rebuild step 4 implements it in
-`holonics::hnn`, over aeons ([THE_REBUILD](../research/records/2026-09-28_THE_REBUILDS_CONSTRUCTION_RECORD_STEPS_ZERO_TO_FIVE_THE_CAMPAIGNS_AND_THE_FORWARD_PLAN.md#order), #73); step 5 realizes
-it on the card in `holonics-cuda::hnn`. Both modules implement campaigns 1–2.
-The loaded resonator (`hnn::ring`) supplies its connection and its reached material covector; release through modes,
-Holonic Encoding and joint prediction are the remaining campaign consumers. [THE_MACHINE](THE_MACHINE.md)
-states the object, and the [elementary objects](ELEMENTARY_OBJECTS.md) own the vocabulary.
+[project-postulate] This guide states the HNN law. `holonics::hnn` implements it over aeons
+(#73), and `holonics-cuda::hnn` realizes it on the card (#76). The current owners are the
+[operator contract](ELEMENTARY_OBJECTS.md#operator-contract)'s HNN row: the word, deposition and
+the collapse of campaigns 1–2, the loaded resonator (`hnn::ring`), and a loaded ring's mode
+quotient (`hnn::modes`, campaign 3's first construction). Release through modes, Holonic Encoding
+and joint prediction have no owner yet. [THE_MACHINE](THE_MACHINE.md) states the object,
+[THE_REBUILD](plans/THE_REBUILD.md) the order and [CONSTRUCTION_STATE](../CONSTRUCTION_STATE.md) the
+position; the [elementary objects](ELEMENTARY_OBJECTS.md) own the vocabulary.
 The HNN is the compression machine at scale ([the line](THE_MACHINE.md#the-line-the-rebuild-serves)):
 - its retention is the kernel quotient of Holonic Compression, the future-sufficient quotient
   taken at aeon boundaries;
@@ -15,8 +17,10 @@ The HNN is the compression machine at scale ([the line](THE_MACHINE.md#the-line-
 [definition; Brandon, September 27; the construction `agent-inferred`] **The top is a Holarchy
 and its aeons** ([THE_MACHINE](THE_MACHINE.md#the-top-a-holarchy-and-its-aeons)). The HNN is a
 Holarchy: its ring and contact Holons are joined at ports (`Field::holarchy` returns it, certified
-to glue), and the receiving parametron's storage is the context tree
-(`compression::landmark::context`). Its passage is an aeon on the Holarchy's parametric
+to glue), and the receiving parametron's storage is read from the context tree
+(`compression::landmark::context`), one family of the receiving storage the objects define
+([the receiving storage](ELEMENTARY_OBJECTS.md#the-receiving-storage), an interpretation whose
+port join is owed). Its passage is an aeon on the Holarchy's parametric
 orientation: a receiving window is an epoch at the receiver's section, a pump period or a clock
 closure is a cycle, the aeon boundary is the collapse, and the first law over the aeon is
 `aeon::EnclosedLedger`. `Field` is the Holarchy's declaration, a chart of it, and
@@ -256,7 +260,9 @@ charged. The response is observed conduct, predicted and never scored. The respo
 receiver reads the later human part against the response it follows as a receipt only: an
 observation, never a reward, and never in the family's face. On the agent bytes the population now
 codes `−5936 + 6/16` below the flat stream on development and `−751 + 12/16` held out, against
-`−4068 + 0/16` and `−418 + 3/16` before. The receiver's value with its pointer paid is
+`−4068 + 0/16` and `−418 + 3/16` before. The held-out cells are a later tail of the same
+development families, not unseen families; transfer to unseen families is read separately
+([the forward-plan audit, §2](../research/records/2026-09-28_THE_FORWARD_PLAN_STOPPED_AT_TRANSFER_THE_POPULATION_MEMORIZES_FAMILIES_AND_ITS_STANDING_IS_AN_INDEX.md#2-what-the-receipts-say)). The receiver's value with its pointer paid is
 `−754 + 6/16` and `−173 + 6/16`. The later human return conditioned on its response codes
 `−457 + 11/16` below the unconditioned over 12,391 held-out human bytes. A relation whose target
 lies outside the passage stays unheld: 711 of the 1,393 development agent parts reach a request no
@@ -391,7 +397,9 @@ M = (K, Θ, x),                 y_F = ρ_F(b_H(x)).
 ```
 
 `K` is the oriented contact complex, including its boundary ports and chart transitions; `Θ` is
-the constitution; `x` contains the active currents and internal modes. Their representations may
+the constitution; `x` contains the active currents and internal modes. `(K, Θ)` with its ports is
+the Holon's law `H`, and `x` is a point of a motion `|H⟩` that `H` admits
+([the Holon as one object](ELEMENTARY_OBJECTS.md#the-holon-as-one-object)). Their representations may
 be sparse sections, tensors, factors, recurrences or correlated parameter families. `K` is not a
 semantic classifier. The components need not share one shape, one spatial grain or a universal
 clock; at an interaction, the joined ports determine which restrictions participate.
@@ -656,13 +664,16 @@ w = v − u,                 b_next = D* v − b.
 This couples exterior and interior currents; `D` is constitution, not a descriptor appended to a
 separate example. It is also a global instantaneous solve over the contact graph, which is action
 at a distance, so the HNN never takes it as its step (light record §8.1). The step 4 word below
-is local: the junction Swing about the participation anchor, one contact hop per tick. This
-global scattering survives in two roles only:
+is local: junction scattering about the participation anchor, a half-turn about it
+(`hnn::propagation::junction_scattering`, Lean
+`HNN/Propagation.{junctionScattering_involutive, junctionScattering_isometry}`), one contact hop per
+tick. This global scattering survives in two roles only:
 - as the overdamped continuum-limit reading of that local law (atlas `heat.telegraph-relaxation`);
 - as the prototype's history.
 
-[proved-derived; formal-checked] The scattering is the Swing
-`R_G x=2P_G x−x=Swing_(P_G x)(x)`, where
+[proved-derived; formal-checked] The scattering is the half-turn about the graph projection,
+`R_G x=2P_G x−x=S_(P_G x)(x)` with `S_a x=2a−x` ([motion](ELEMENTARY_OBJECTS.md#the-swing):
+lossless junction scattering, doing no work), where
 `P_G(u,b)=(A⁻¹(u+Db), D*A⁻¹(u+Db))` projects onto the constituted contact graph.
 `Computation/HolonicConstitutiveCirculation` proves the projection and involution from the solve
 identity; with the energy adjoint, orthogonality gives the conserved norm. The
@@ -695,14 +706,14 @@ flowchart LR
 
 ```text
 junction  v_r = (Y_r s_r + Σ_a G_a a_(r←a)) / (Y_r + Σ_a G_a),   G_a = κ_a Y_a,   κ_a = 2^(s_a), one exponent per contact
-          o_(r→a) = 2 v_r − a_(r←a)                                        the junction Swing
+          o_(r→a) = 2 v_r − a_(r←a)                                        junction scattering, the half-turn about v_r
 element   (I − ½K_r) s_r′ = (I + ½K_r) b_r + W_c,r c_r,   b_r = 2 v_r − s_r,   c_r = v_r − s_r,   K_r = W_s,r + Σ_ρ σ_ρ,r A_ρ,r
           (the contrast port drives inside the midpoint: Holon/Cayley.drive_balance; THE_REBUILD step 4 design)
 transit   the contact's midpoint two-port (C_a, K_a, D_a) on its channel, U_a = ι_(a,h) ι_(a,g)ᵀ
 receive   f_j = R[P_R^(τ_R) v_R(e_j)] at the receiving epochs, read at the receiver's grain
 ```
 
-- **Participation is the Swing's anchor.** The weights `G_a / (Y_r + Σ_a G_a)` are ring `r`'s
+- **Participation is the scattering's anchor.** The weights `G_a / (Y_r + Σ_a G_a)` are ring `r`'s
   normalized participation. With one exponent `β_a` per contact, the tick conserves the global
   power exactly when the elements are lossless.
 - **The score** `Q_a` is the pair quadrance of the two rings' screws. The current-space
@@ -759,7 +770,9 @@ The prototype's softmax-participation return is in history at `13f8c734`.
   dissipation `D_a` on its slip, carried as squares with no clamp. It is not a fixed template
   scaled by one amplitude. A completed update adds no history operand.
 - **The medium** changes only by deposition and, at an aeon boundary, by the collapse onto what the
-  admitted future distinguishes.
+  admitted future distinguishes. That collapse is structural: it releases learned material and
+  cannot be reopened, so an admitted family that grows past it is refused
+  ([objects §8](ELEMENTARY_OBJECTS.md#collapse-relative-to-the-admitted-future)).
 - **What this replaces.** The
   [retention audit](../research/records/2026-09-22_RETENTION_IS_A_QUOTIENT_NOT_A_TAPE_AND_THE_SOURCE_ENTERS_AS_PHASE_CARRIED_MOMENTS.md)
   names what this replaces.
@@ -844,9 +857,12 @@ corrected its outward-normal sign and constant-input normalization domain.
 `p_c=Σ μ_j V_j`; the same attention is `a_i=(Σ_c k_ic p_c)/(Σ_c k_ic m_c)`. The pair
 (mass, current) is associative; normalized means alone are not.
 [AttentionModeCompression](../lean/Holonics/Computation/AttentionModeCompression.lean)
-owns the law. [`KernelModeReduction`](https://github.com/brandonrdug/holonics/blob/551d6c5d/crates/holonics/src/exact_linear/kernel_modes.rs) constructed an exact finite
-factorization, transports its signed current columns and tests action closure, or returns the
-source-null separator; step 4 binds it to the HNN's operator execution.
+owns the law. The prototype's
+[`KernelModeReduction`](https://github.com/brandonrdug/holonics/blob/551d6c5d/crates/holonics/src/exact_linear/kernel_modes.rs)
+constructed an exact finite factorization, transported its signed current columns and tested action
+closure, or returned the source-null separator. It is retired: `compression::face_map` (Lean
+`Compression/Core/FaceMap`) owns the face map's kernel and its quotient, and no HNN execution
+consumes it; a loaded ring's future quotient is `hnn::modes` (campaign 3's first construction).
 
 [definition] Convolution shares the transport kernel by relative position; sparse graph transport
 uses actual edges. A fixed SSM `x_next=A x+B u` has output
@@ -878,7 +894,7 @@ softmax(a,b)_1 = σ(a − b).
 
 Normalization keeps the complete ratio family `r_ij`, one per two for every pair, and forgets
 only the common additive origin, which is a gauge. Bayes is this normalization of `log p + log L`: it translates every
-`log r_ij` by `log(L_i/L_j)`, which is two Swings, and the Laplacian return is the categorical
+`log r_ij` by `log(L_i/L_j)`, which is two half-turns, `S_b S_0` with `b = ½ log(L_i/L_j)`, and the Laplacian return is the categorical
 family's Fisher information. The receiving storage's mixture over candidates is the same update, the
 discrete replicator ([probability as a receiver geometry](RECEIVER_HOLARCHY.md#probability-is-a-receiver-geometry)). Its local return is a weighted graph
 Laplacian, and sigmoid is its two-member restriction. Neither needs sampling or a privileged

@@ -2,7 +2,9 @@
 
 ## The object and its notation
 
-[definition] Write a Holon in a declared tensor chart as **|H⟩_F**. H carries the Holonic
+[definition] Write a Holon in a declared tensor chart as **|H⟩_F**: a motion admitted by the
+Holon's law `H`, presented in the frame `F`
+([the Holon as one object](ELEMENTARY_OBJECTS.md#the-holon-as-one-object) owns the statement). H carries the Holonic
 entity mark (the recovered wavy underline); F specifies its frame, port/axis roles and
 pairing. The notation packages the object so it can be manipulated without expanding its
 construction record at every use. [Holonic notation](HOLONIC_NOTATION.md) is the consolidated
@@ -277,7 +279,7 @@ operations on Holons, with familiar vector/tensor realizations where applicable.
 | Receive/contract | ⟨r\|H⟩, or a partial tensor contraction leaving specified output axes | `holon::law::HolonLaw::receive` |
 | Receive then emit | (\|B⟩⟨r\|)\|A⟩=⟨r\|A⟩\|B⟩; a rank-one operator, with an explicitly declared bra | `ratio::linear` exact maps |
 | Compose transports | Ĝ₂Ĝ₁\|H⟩; the output port of the first joins the input of the second | `navigator::Transport` |
-| Reflect/interfere | A constituted multiport operator acts on incoming and stored-current kets together | the Swing `2P_D−I`; Lean `Computation/HolonicConstitutiveCirculation`; device scattering in history |
+| Reflect/interfere | A constituted multiport operator acts on incoming and stored-current kets together | junction scattering `2P_D−I`, a half-turn about the constituted projection; Lean `Computation/HolonicConstitutiveCirculation`; device scattering in history |
 | Attend / normalize participation | `Y_i=Σ_j a_ij U_ij V_j`, `a_ij=exp(s_ij)/Σ_k exp(s_ik)` on admitted contacts; a sigmoid is its binary restriction | `ratio::exponentiated::NormalizedKernel` forward, differential and pullback |
 | Differentiate/pull back | δ\|H'⟩=D𝓘_H δ\|H⟩; a covector acts through (D𝓘_H)* on the same material | `holon::law::HolonLaw::pullback`; `ratio::exponentiated::NormalizedKernel` pullback |
 | Generate | \|X(τ)⟩=𝓤_(Θ,K)^(τ←τ₀)(\|Ξ⟩;h), then ⟨r\|b_H(X(τ))⟩; the whole field evolves | `holon::law::HolonLaw::advance`; Lean `Foundation/Holon.ofEvolution`; the field law is rebuild step 4 |
@@ -481,25 +483,19 @@ on the library; foreign forward graphs and Q/K/V caches are not ported whole.
 
 ## What exists now
 
-[established-bounded; source-inspected] After rebuild step 1 the computational Holon has these
-code owners:
-- `crates/holonics`, exact over `Rat` throughout, in five operator modules:
-  - `ratio`: the undivided pair, rings, the exponentiated/log chart, surprisal, algebraic numbers,
-    polynomials, exact work, primality, and exact linear algebra (`ratio::linear`: inversion with
-    its fibre, inertia, prime images);
-  - `geometry`: complex, frames, screws and pairs, winding, the Swing;
-  - `holon`: law, ports, Dirac, elements, restrictions (tube, tower), deposition, reaction,
-    conformance, the pair contact and serial chain (`holon::contact`), the parametron
-    (`holon::parametron`);
-  - `navigator`: navigators, clocks, phase lifts, transports, lock addresses, trace faces;
-  - `receiver`: faces, release, standing, the causal chord.
-- `crates/holonics-cuda`: the CUDA driver only. The resident HNN is rebuilt there after its law
-  exists in `holonics` (rebuild steps 4–5).
+[established-bounded; source-inspected] The computational Holon's code owners are listed once, in
+the [operator contract](ELEMENTARY_OBJECTS.md#operator-contract), each current owner beside its
+target. The map of the crates:
+- `crates/holonics`, exact over `Rat` throughout, in the ten modules its `lib.rs` names: `ratio`,
+  `geometry`, `holon`, `navigator`, `receiver`, `holarchy`, `aeon`, `compression`, `hnn` and
+  `physics`.
+- `crates/holonics-cuda`: the CUDA driver and the resident HNN (`holonics_cuda::hnn::Resident`),
+  checked in lockstep against the host reference (`hnn/port_tests.rs`).
 - The prototype's resident sections, operative field, coupled body and its wrappers are in
   history ([`hnn`](https://github.com/brandonrdug/holonics/tree/13f8c734/crates/holonics-cuda/src/hnn),
-  [`native_ecology`](https://github.com/brandonrdug/holonics/tree/13f8c734/crates/holonics-cuda/src/native_ecology)). Their laws are stated in
-  [HNN_FORMULA](HNN_FORMULA.md), and they are ported one law at a time under
-  [THE_REBUILD](plans/THE_REBUILD.md).
+  [`native_ecology`](https://github.com/brandonrdug/holonics/tree/13f8c734/crates/holonics-cuda/src/native_ecology)).
+  [HNN_FORMULA](HNN_FORMULA.md) states the laws; a law is ported from there only when
+  [THE_REBUILD](plans/THE_REBUILD.md) needs it.
 
 [definition] A face map need not be injective or reversible: a constant map refutes
 reversibility whenever the retained relation does not distinguish the prior values, and

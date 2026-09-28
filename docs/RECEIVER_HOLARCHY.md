@@ -128,7 +128,7 @@ a dissipation law (`Physics/{PortEnergyHeat,TwoCellEntropyTransport}`).
 
 <a id="the-reflection-algebra-shared-by-seam-and-swing"></a>
 
-### The reflection algebra shared by seam and Swing
+### The reflection algebra shared by seam and junction scattering
 
 [proved-derived] The graph projection `P_D` and its junction scattering `R_D = 2P_D − I` (a
 [half-turn about a subspace](ELEMENTARY_OBJECTS.md#the-swing): lossless, doing no work, of determinant
@@ -335,8 +335,9 @@ unavailable interior". The faces carry this geometry
 in #62):
 - [proved-derived; formal-checked: `HolonicAdjointNormalization.{bayes_logOdds_twoSwings, bayes_eq_face,
   bayes_eq_discrete_replicator}`] **Bayes is the quotient rule under refinement.** In the ratio's additive chart it is a translation:
-  `log(p′_i/p′_j) = log(p_i/p_j) + log(L_i/L_j)`, which is two Swings `S_b S_0` with
-  `b = ½ log(L_i/L_j)`, a chart identity. It is the softmax of `log p + log L`. The softmax ratio
+  `log(p′_i/p′_j) = log(p_i/p_j) + log(L_i/L_j)`, which is two half-turns `S_b S_0` with
+  `b = ½ log(L_i/L_j)`, a chart identity (the Lean name `bayes_logOdds_twoSwings` keeps the
+  half-turn's older name). It is the softmax of `log p + log L`. The softmax ratio
   family `r_ij` keeps every pair's ratio and forgets only the common origin, the evidence, which is a
   gauge (`Computation/HolonicAdjointNormalization.face_add_common`), and the discrete replicator
   over candidates. [agent-inferred] The same normalization is the attend row of the Holonic
@@ -436,9 +437,18 @@ readouts and reconstruction. Neither a filename nor one measured voltage is that
 object. Navigator/constraint representations can retain the required consequences without
 an event archive or perfect reconstruction of every earlier microscopic state.
 
-## The concrete implementation and diagram return
+## The moving receiver's owners and the retired optical control
 
-[established-bounded; implemented-exact] The retired [`geometry::projection`](https://github.com/brandonrdug/holonics/blob/551d6c5d/crates/holonics/src/geometry/projection.rs) exposed
+[established-bounded; source-inspected] **Current owners.** The moving receiver's rate is
+`receiver::reception::FaceMotion` (Lean `Holarchy/Reception.moving_receiver_rate_of_law`): over a
+solved joint step the face's change splits exactly into the source's motion, the receiver's own
+motion and the chart's explicit motion, `Δy = C_S Δx_S + C_R Δx_R + h c`. Boosts on aeon clocks, the
+Lorentz map and the observer current are `physics::spacetime` (`LightCone`, `DopplerBoost`,
+`LorentzMap`; Lean `Physics/Spacetime`). No current owner projects a receiver point through a
+moving chart or assembles the optical diagram below; the moving electromagnetic surface, the
+receiver's material response and their encoding consumers remain owed.
+
+[established-bounded; implemented-exact; history] **The retired optical control.** The retired [`geometry::projection`](https://github.com/brandonrdug/holonics/blob/551d6c5d/crates/holonics/src/geometry/projection.rs) exposed
 `project_receiver_point_rate` for its four projections and `project_point_with_motion` through the
 declared source→receiver route. The latter computes `p_R=Lp+b`, `ṗ_R=Lṗ+L̇p+ḃ`, then the actual
 projection derivative. The chart rates are supplied kinematic operands; two frame snapshots alone
@@ -465,8 +475,7 @@ these returns; it does not supply their I/O direction.
 [definition] The ray example is a local Minkowski specialization with supplied inertial
 motion and null-stress channels. The optical face and moving-aperture entropy are calculated.
 It does not claim a curved ray solution, calibrated photodetector response or a field
-assembly. The full receiver material response, moving EM surface coupling and the corresponding
-encoding consumers remain the integration work named by their equations above.
+assembly.
 
 ## Continuing-field correction
 

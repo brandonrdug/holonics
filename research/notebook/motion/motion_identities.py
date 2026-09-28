@@ -1,7 +1,11 @@
 """Exact symbolic checks of the motion record's identities.
 
 The record: research/records/2026-09-28_THE_SWING_IS_A_MOVE_ABOUT_A_GRIP_A_GRIP_TURNS_A_PUSH_BOOSTS_AND_A_FREE_BODY_FALLS.md.
-Every check is an exact identity over symbols or rationals (sympy); nothing is sampled or floated.
+Every check is exact, over symbols or rationals (sympy), and nothing is floated. All but one are
+symbolic identities. The exception is the receiver's split of a rate (`receiver_split`, §3.2): it
+checks the split, its uniqueness data, the energy law and rechart covariance on 20 seeded rational
+cases (`random.seed(7)`, entries `p/q` with `|p| ≤ 9`, `1 ≤ q ≤ 5`), exactly on each case. That
+check samples; it is evidence on those cases, not a proof. `Geometry/Motion` proves the split in Lean.
 Run: python3 motion_identities.py  (needs sympy). Each line prints the identity's name and True.
 """
 import random

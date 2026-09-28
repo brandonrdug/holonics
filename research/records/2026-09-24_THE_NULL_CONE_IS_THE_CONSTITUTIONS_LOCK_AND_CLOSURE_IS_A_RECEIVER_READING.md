@@ -7,6 +7,8 @@
 - whether the epochless ξ-aeon is prime-like;
 - whether anything ever really opens or closes.
 
+**September 28 join:** the [motion record](2026-09-28_THE_SWING_IS_A_MOVE_ABOUT_A_GRIP_A_GRIP_TURNS_A_PUSH_BOOSTS_AND_A_FREE_BODY_FALLS.md) places this record's boosts among the three kinds of motion: the Lorentz group factors into rotations, boosts and null rotations (§3.1), a lattice boost is a Lorentz boost (§5.2), and two boosts leave a turn (§5.6).
+
 **Truth discipline:**
 - Classical results are `[proved-standard]`.
 - Correspondences into the objects are `[interpretation]`.

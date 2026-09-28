@@ -50,7 +50,7 @@ marginal, and no proof may use a strict margin. Any induction must close at the 
 `d > 0` the partner contributes the exact baseline normal current `−1/d`, the opposite member
 contributes `d/(d²+y²)`, and `weightedSurplus_nonneg` retains each admitted zero's nonnegative
 inward term under the rightmost ordering. The width law and its integration theorem are in
-[the centered-current construction](../../docs/RH_CENTERED_CURRENT_UPPER_BOUND.md):
+[the centered-current construction](2026-09-14_THE_HALF_CENTRED_FACE_AND_THE_DE_BRUIJN_NEWMAN_UPPER_BOUND.md):
 
 ```text
 d' ≤ −1/d − J_R + ε_R,        (d²)' ≤ −2 − 2 d (J_R − ε_R),

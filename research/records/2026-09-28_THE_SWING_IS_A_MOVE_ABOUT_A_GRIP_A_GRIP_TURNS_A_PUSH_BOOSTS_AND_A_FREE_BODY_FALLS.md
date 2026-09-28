@@ -13,6 +13,8 @@ counterexamples are folded in where they apply, and the draft's errors are liste
 receipts are the Lean module `Geometry/Motion` and the exact symbolic checks in
 `research/notebook/motion/motion_identities.py` (§9).
 
+Earlier records read turns and boosts before this derivation, and each now points here: [the egg is a torus whose shape is a boost](2026-09-24_THE_EGG_IS_A_TORUS_WHOSE_SHAPE_IS_A_BOOST_AND_ITS_NECK_IS_THE_NULL_CONE.md), [the null cone is the constitution's lock](2026-09-24_THE_NULL_CONE_IS_THE_CONSTITUTIONS_LOCK_AND_CLOSURE_IS_A_RECEIVER_READING.md) (boosts as ratios of clock readings), [the light is the change](2026-09-24_THE_LIGHT_IS_THE_CHANGE_AND_EXPRESSION_COLLAPSES_ONTO_FINITELY_MANY_CRITICAL_CLASSES.md) and [seasons are rotations, generations are boosts](2026-09-25_SEASONS_ARE_ROTATIONS_GENERATIONS_ARE_BOOSTS_AND_THE_PRIME_WHEEL_IS_A_PRODUCT_OF_RESIDUE_RINGS.md).
+
 ## 0. The result
 
 - **There are three kinds of motion: the turn, the boost and free fall.** Every quadratic motion of

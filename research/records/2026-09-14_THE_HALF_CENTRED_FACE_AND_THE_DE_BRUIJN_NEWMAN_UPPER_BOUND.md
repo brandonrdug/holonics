@@ -1,5 +1,10 @@
 # The half-centred face and the de Bruijn–Newman upper bound
 
+**Date:** 2026-09-14. This target derivation stood in `docs/` as a guide until September 28, when
+it moved here as the dated record it is: it owns no definition. The objects' targets are
+[ELEMENTARY_OBJECTS, "The targets"](../../docs/ELEMENTARY_OBJECTS.md#the-targets), and its Lean is
+`Zeta/{TransverseCurrentBound,FiniteZeroCurrent,CriticalChart,FosterClassFlux}`.
+
 [project-postulate] Brandon's September 14 request explicitly continues upper-bound work
 using the evolving-source equation and the wider Holonic constructions. This bounded
 derivation proceeds alongside every rebuild step as landmark discovery. It does not make an RH endpoint
@@ -62,7 +67,7 @@ the actual current/tail relation, or a proved orientation of that complement.
 
 ## Riding the current: the recovered complex Burgers source
 
-[proved-derived] The September 5 [heat/current construction](../research/records/2026-09-05_MFR3_THE_ORIENTED_ENTROPY_CURRENT_RETURNS_ITS_HEAT_SOURCE_AND_COMPLEX_PHASE.md)
+[proved-derived] The September 5 [heat/current construction](2026-09-05_MFR3_THE_ORIENTED_ENTROPY_CURRENT_RETURNS_ITS_HEAT_SOURCE_AND_COMPLEX_PHASE.md)
 already supplies the logarithmic heat relation. Apply it to the actual seam source
 `G_τ=G_ss` on a zero-free patch. For `L=G_s/G` and `u=−2L`,
 
