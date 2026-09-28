@@ -74,17 +74,22 @@ every tolerance; its timing is released at no tolerance below `1`. `timeOfEvent_
 `timeOfEvent_crosses` earn the name: the returned step really is the first step of the exact
 trajectory at which the threshold is reached, and no earlier step reaches it.
 
-Rust owner: `crates/holonics/src/receiver/release.rs`
-(`width` ↔ `width_enumerated` and `width_enclosed`;
+Rust owner: `crates/holonics/src/receiver/release.rs`, the one decision law (THE_REBUILD U3)
+(`width` ↔ `receiver::face::width_over_readings`;
 `width_mono` ↔ `the_width_is_monotone_under_fibre_inclusion`;
-`width_nonExpansive_factor` ↔ `a_non_expansive_coarser_receiver_has_no_larger_width`;
-`expansive_factor_increases_width` ↔ `an_expansive_factor_map_widens_the_reading`;
+`width_nonExpansive_factor` ↔ `a_non_expansive_coarser_reading_has_no_larger_width`;
+`expansive_factor_increases_width` ↔ `an_expansive_factor_widens_the_reading`;
 `width_eq_zero_iff` ↔ `ReceiverWidth::is_zero` and `width_zero_releases_at_every_tolerance`;
-`ReleaseReturn` ↔ `ReleaseReturn`; `ReleaseLaw` ↔ `DecisionLaw`;
-`every_lawful_return_other_than_hold_ask_or_no_continuation_is_inside_its_tolerance` ↔
-`release` together with `LawfulOptions::assemble`;
+`ReleaseReturn` ↔ `ReleaseReturn` (whose `Drawn` and `Unresolved` are `released` and `hold` of
+`holdingLaw` at tolerance zero on a key's class reading,
+`Compression/Landmark/Context/Population.{certified_draw_is_released_at_zero_tolerance,
+plural_draw_is_held}`; `releaseCoarser` has no Rust realization, since no owner builds a coarser
+receiver); `ReleaseLaw` ↔ `DecisionLaw`;
+`every_lawful_return_other_than_hold_ask_or_no_continuation_is_inside_its_tolerance` ↔ `release`;
 `future_stable_event_with_unstable_timing` ↔
-`an_event_is_future_stable_while_its_timing_is_not`).
+`an_event_is_future_stable_while_its_timing_is_not`). The zonotope enclosure, the probe searches
+and the coarsening tower search were retired on September 28 (history at `1bdacc8f`); their laws
+are stated in `docs/RECEIVER_HOLARCHY.md`, "Width and release".
 -/
 
 namespace Holonics.Foundation.ReceiverRelease
@@ -285,10 +290,10 @@ inequality the constructor itself carries, so no separate check can be skipped f
 statement that a coarser release cannot leave the declared tolerance by being assembled under one
 tolerance and released under another.
 
-Rust counterpart: `crates/holonics/src/receiver/release.rs::release`, whose `ReleaseCoarser`
-arm recomputes `width ≤ tolerance` against the options' own tolerance, and
-`LawfulOptions::assemble`, which refuses a `CoarserRelease` searched under a different tolerance
-(`a_coarser_release_searched_under_a_wider_tolerance_is_refused`). -/
+Rust counterpart: `crates/holonics/src/receiver/release.rs::release`, which recomputes
+`width ≤ tolerance` for `Released` and `width ≤ widened` for `Widen`. The Rust coarser arm, which
+recomputed its width against the options' tolerance, was retired with the coarsening tower search
+on September 28 (history at `1bdacc8f`). -/
 theorem every_lawful_return_other_than_hold_ask_or_no_continuation_is_inside_its_tolerance
     {X : Type*} {Probe Coarser : Type*} (law : ReleaseLaw X Probe Coarser)
     (F : Finset X) (hF : F.Nonempty) (R : X → ℚ) :
@@ -605,9 +610,9 @@ restatement of the one-axis law:
   determined **face** and toward the fine it reads the whole **fibre**. Both directions are far;
   they are far in dual ways, and that asymmetry — not a symmetry — is the content.
 
-Rust owners: `crates/holonics/src/receiver/face.rs::{Horizon, width_over_readings}` and
-`crates/holonics/src/receiver/release.rs::{ExactZonotope, CompatibleFamily, horizon_image}`; and
-the retired `continuing_tube.rs::{Observer, IndexDirection, IndexReading, index_distance,
+Rust owners: `crates/holonics/src/receiver/face.rs::{Horizon, width_over_readings}`; the retired
+`crates/holonics/src/receiver/release.rs::{ExactZonotope, CompatibleFamily, horizon_image}`
+(history at `1bdacc8f`); and the retired `continuing_tube.rs::{Observer, IndexDirection, IndexReading, index_distance,
 HorizonReach, horizon_reach, two_axis_width}` ([history](https://github.com/brandonrdug/holonics/blob/13f8c734/crates/holonics-cuda/src/continuing_tube.rs)). -/
 
 /-- [definition] **A horizon with two coordinates**: `h` longitudinal steps of `Φ` and `k` steps in

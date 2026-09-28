@@ -1,5 +1,6 @@
 import Holonics.Compression.Landmark.Context.LocalWeighing
 import Holonics.Computation.HolonicAdjointNormalization
+import Holonics.Foundation.ReceiverRelease
 
 /-!
 # The egg population: the static mixture with death, and survivor filtering
@@ -40,6 +41,14 @@ emit another class), so this module states the same mixture with **nonnegative**
 * `certified_inverseCDF_class` [proved-derived; formal-checked]: interval face bounds certify a
   draw's class when its lower cumulative mass through that class exceeds the draw and its upper
   cumulative mass before that class does not. An unresolved draw remains unresolved.
+* `certified_draw_is_released_at_zero_tolerance`, `plural_draw_is_held` [proved-derived;
+  formal-checked]: **the certified draw is the release law at tolerance zero** (THE_REBUILD U3; Rust
+  `receiver::release::draw`). The draw's class reading `drawReading` (`1` where the key lands in
+  class `i`, `0` elsewhere) is constant over every finite family of faces inside certifying
+  bounds, so `Foundation/ReceiverRelease.holdingLaw` at tolerance zero returns `released`; where
+  two compatible faces part at the key, its width is at least one and the same law holds. A
+  declared draw and a threshold commit are different acts (the draw has a key; it emits a class,
+  not the face), joined by this one law.
 * `local_telescope`, `local_mixture_code`, `local_of_constant` [proved-derived; formal-checked]: a
   family wins where it is closest (F0's second candidate; its Rust
   `receiver::population::LocalMixture` was measured, not adopted and retired September 28). A gating map `γ` places each cell in a context; the local
@@ -84,6 +93,57 @@ theorem certified_inverseCDF_class {n : ℕ} (lower upper q : Fin n → ℚ)
   constructor
   · exact le_trans (Finset.sum_le_sum fun j _ => hupper j) hbefore
   · exact lt_of_lt_of_le hthrough (Finset.sum_le_sum fun j _ => hlower j)
+
+open Classical in
+/-- [definition] **The draw's class reading**: `1` where the key lands in class `i` of the exact
+face `q`, `0` elsewhere. A class has no grain coarser than itself, so the reading is decided at
+tolerance zero. -/
+def drawReading {n : ℕ} (draw : ℚ) (i : Fin n) (q : Fin n → ℚ) : ℚ :=
+  if InverseCDFClass q draw i then 1 else 0
+
+/-- [proved-derived; formal-checked] **A certified draw is a release at tolerance zero.** Over any
+finite family of exact faces inside the interval bounds, the certificate lands the key in class `i`
+for every member, so the class reading is constant and the holding law at tolerance zero returns
+`released` (`width_eq_zero_iff`). -/
+theorem certified_draw_is_released_at_zero_tolerance {n : ℕ} {Probe Coarser : Type*}
+    (lower upper : Fin n → ℚ) (draw : ℚ) (i : Fin n) (F : Finset (Fin n → ℚ)) (hF : F.Nonempty)
+    (hlower : ∀ q ∈ F, ∀ j, lower j ≤ q j) (hupper : ∀ q ∈ F, ∀ j, q j ≤ upper j)
+    (hbefore : (∑ j ∈ Finset.univ.filter (fun j : Fin n => j.val < i.val), upper j) ≤ draw)
+    (hthrough : draw < ∑ j ∈ Finset.univ.filter (fun j : Fin n => j.val ≤ i.val), lower j) :
+    (Foundation.ReceiverRelease.holdingLaw (Fin n → ℚ) Probe Coarser 0).decide F hF
+        (drawReading draw i) = Foundation.ReceiverRelease.ReleaseReturn.released := by
+  have hconst : ∀ q ∈ F, drawReading draw i q = 1 := by
+    intro q hq
+    unfold drawReading
+    rw [if_pos (certified_inverseCDF_class lower upper q draw i (hlower q hq) (hupper q hq)
+      hbefore hthrough)]
+  have hwidth : Foundation.ReceiverRelease.width F hF (drawReading draw i) = 0 := by
+    rw [Foundation.ReceiverRelease.width_eq_zero_iff]
+    intro x hx y hy
+    rw [hconst x hx, hconst y hy]
+  simp [Foundation.ReceiverRelease.holdingLaw, hwidth]
+
+/-- [proved-derived; formal-checked] **A plural draw is held.** Where two compatible faces part at
+the key (one lands it in class `i`, the other does not), the class reading's width is at least one
+(`abs_sub_le_width`), so the holding law at tolerance zero returns `hold`: the draw mass stays
+unresolved, and no class is emitted. -/
+theorem plural_draw_is_held {n : ℕ} {Probe Coarser : Type*} (draw : ℚ) (i : Fin n)
+    (F : Finset (Fin n → ℚ)) (hF : F.Nonempty) {q q' : Fin n → ℚ} (hq : q ∈ F) (hq' : q' ∈ F)
+    (hin : InverseCDFClass q draw i) (hout : ¬ InverseCDFClass q' draw i) :
+    (Foundation.ReceiverRelease.holdingLaw (Fin n → ℚ) Probe Coarser 0).decide F hF
+        (drawReading draw i) = Foundation.ReceiverRelease.ReleaseReturn.hold := by
+  have h1 : drawReading draw i q = 1 := by
+    unfold drawReading
+    rw [if_pos hin]
+  have h0 : drawReading draw i q' = 0 := by
+    unfold drawReading
+    rw [if_neg hout]
+  have hle := Foundation.ReceiverRelease.abs_sub_le_width hF (drawReading draw i) hq hq'
+  rw [h1, h0] at hle
+  have hpos : ¬ Foundation.ReceiverRelease.width F hF (drawReading draw i) ≤ 0 := by
+    norm_num at hle
+    linarith
+  simp [Foundation.ReceiverRelease.holdingLaw, hpos]
 
 end CertifiedRelease
 
@@ -559,6 +619,8 @@ section Audit
 #print axioms escaped_fibre_is_mode
 #print axioms death_is_an_exchange
 #print axioms certified_inverseCDF_class
+#print axioms certified_draw_is_released_at_zero_tolerance
+#print axioms plural_draw_is_held
 #print axioms ctxLik_succ
 #print axioms ctxTotal_pos
 #print axioms ctxTotal_succ_same

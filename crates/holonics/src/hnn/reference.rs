@@ -1396,7 +1396,7 @@ impl ExecutionPort for Reference {
         // The width is read from the receiving phases' fibres; the tolerance is their grain.
         let width = release_width(&phases, &faces)?;
         let tolerance = Rat::new(BigInt::one(), BigInt::from(phases.grain()));
-        let options = LawfulOptions::assemble(&width, tolerance.clone(), None, None, false)?;
+        let options = LawfulOptions::assemble(&width, tolerance.clone(), None, false)?;
         let decided = release(decision, &options)?;
         let released = matches!(decided, ReleaseReturn::Released { .. });
         let split = if resident

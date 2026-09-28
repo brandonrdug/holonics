@@ -100,13 +100,12 @@ use holonics::ratio::Rat;
 use holonics::ratio::algebraic::{ExactInterval, interval_difference, interval_sum};
 use holonics::receiver::population::{
     AdmittedEgg, AdmittedMemberManifest, AdmittedReadout, BoundaryEgg, BoundaryReadout, CopyLaw,
-    Family,
-    FamilyReleaseError, HazardPartition, MergeReceipt, PartReading, PartitionReceipt,
-    PointerReadout, Population, PopulationMemberManifest, PopulationReceipt, PopulationRelease,
-    Posterior, Readout, Relation, RelationKind, SamplingError, StageReadout, TextRelease,
-    TreeFamily, TreeMemberManifest, learn_hazard_partition, select_class, select_family_class,
-    verify_scored_text_path,
+    Family, HazardPartition, MergeReceipt, PartReading, PartitionReceipt, PointerReadout,
+    Population, PopulationMemberManifest, PopulationReceipt, Posterior, Readout, Relation,
+    RelationKind, ResponseLaw, ResponseRefusal, StageReadout, TreeFamily, TreeMemberManifest,
+    learn_hazard_partition, verify_scored_text_path,
 };
+use holonics::receiver::release::ReleaseReturn;
 use num_bigint::BigInt;
 
 use super::exterior::{
@@ -1535,103 +1534,47 @@ fn native_family_release(
             None,
         );
     }
-    let mut refusal = None;
-    let posterior_width = population.family_posterior_face().ok().map(|bounds| {
+    // The ancestral law of the one decision law (`Population::release_response`): the family
+    // draw, then that family's exact face to the stop; the statuses are the pre-U3 ones.
+    let mut keys = || Rat::new(BigInt::from(draw.next()), BigInt::from(1u8) << 64);
+    let release = population.release_response(chart, capacity, ResponseLaw::Ancestral, &mut keys);
+    let posterior_width = release.posterior.as_ref().map(|bounds| {
         bounds.iter().fold(
             Rat::new(BigInt::from(0u8), BigInt::from(1u8)),
             |sum, bound| sum + (&bound.upper - &bound.lower),
         )
     });
-    let mut draw_value = || Rat::new(BigInt::from(draw.next()), BigInt::from(1u8) << 64);
-    let chosen_family = match population.select_family(&draw_value()) {
-        Ok(certified) => Some(certified.class),
-        Err(FamilyReleaseError::Sampling(SamplingError::UnresolvedFibre { .. })) => {
-            refusal = Some("unresolved-family-posterior");
-            None
+    let stop = release.stop;
+    let status = match (&release.refusal, &release.family, release.last()) {
+        (Some(ResponseRefusal::NoRoomForStop { .. }), _, _) => "no-capacity-for-stop",
+        (_, Some(Err(_)), _) => "family-posterior-error",
+        (_, Some(Ok(ReleaseReturn::Unresolved(_))), _) => "unresolved-family-posterior",
+        (Some(ResponseRefusal::FamilyMissing { .. }), _, _) => "selected-family-missing",
+        (Some(ResponseRefusal::Face { .. } | ResponseRefusal::Draw { .. }), _, _) => {
+            "unresolved-family-face"
         }
-        Err(_) => {
-            refusal = Some("family-posterior-error");
-            None
-        }
-    };
-    let room = match capacity.checked_sub(population.cells() + 1) {
-        Some(room) => room,
-        None => {
-            return (
-                Vec::new(),
-                "no-capacity-for-stop",
-                chosen_family.unwrap_or(usize::MAX),
-                0,
-                branch_ms,
-                response_clock.elapsed().as_millis(),
-                posterior_width,
-                None,
-            );
-        }
-    };
-    let mut bytes = Vec::new();
-    let mut faces = 0usize;
-    let mut stop = None;
-    for _ in 0..=room {
-        if refusal.is_some() {
-            break;
-        }
-        let value = draw_value();
-        let face = match population
-            .families()
-            .nth(chosen_family.expect("family selection succeeded"))
-        {
-            Some(family) => family.face(),
-            None => {
-                refusal = Some("selected-family-missing");
-                break;
+        (Some(ResponseRefusal::Receive { .. }), _, _) => "selected-class-refused",
+        (Some(_), _, _) => "response-chart-refused",
+        (None, _, Some(ReleaseReturn::Unresolved(_))) => "unresolved-family-face",
+        (None, _, _) if stop.is_some() => {
+            if std::str::from_utf8(&release.bytes).is_ok() {
+                "provisional-family-path-provenance-fibre-health-owed"
+            } else {
+                "invalid-utf8-family-path"
             }
-        };
-        let selected = match face
-            .ok()
-            .and_then(|face| select_family_class(&face, &value).ok())
-        {
-            Some(certified) => certified.class,
-            None => {
-                refusal = Some("unresolved-family-face");
-                break;
-            }
-        };
-        if selected < chart.bytes() && bytes.len() == room {
-            refusal = Some("no-stop-within-capacity");
-            break;
         }
-        if population.receive(selected).is_err() {
-            refusal = Some("selected-class-refused");
-            break;
-        }
-        faces += 1;
-        if chart.section(selected).is_some() {
-            stop = Some(selected);
-            break;
-        }
-        bytes.push(selected as u8);
-    }
-    let status = if stop.is_some() {
-        if std::str::from_utf8(&bytes).is_ok() {
-            "provisional-family-path-provenance-fibre-health-owed"
-        } else {
-            "invalid-utf8-family-path"
-        }
+        (None, _, _) => "no-stop-within-capacity",
+    };
+    let bytes = if status == "provisional-family-path-provenance-fibre-health-owed" {
+        release.bytes.clone()
     } else {
-        refusal.unwrap_or("no-stop-within-capacity")
+        Vec::new()
     };
-    let bytes =
-        if stop.is_some() && status == "provisional-family-path-provenance-fibre-health-owed" {
-            bytes
-        } else {
-            Vec::new()
-        };
     (
         bytes,
         status,
-        chosen_family.unwrap_or(usize::MAX),
-        faces,
+        release.drawn_family().unwrap_or(usize::MAX),
+        release.emitted(),
         branch_ms,
         response_clock.elapsed().as_millis(),
         posterior_width,
@@ -1785,42 +1728,21 @@ fn native_population_release(
         population.receive(usize::from(byte)).expect("request byte");
     }
     population.receive(agent_letter).expect("agent opening");
-    let room = capacity
-        .checked_sub(population.cells() + 1)
-        .expect("room for stop");
-    let mut bytes = Vec::new();
-    let mut trace = Vec::new();
-    let mut stop = None;
-    let mut refusal = None;
-    for _ in 0..=room {
-        let value = Rat::new(BigInt::from(draw.next()), BigInt::from(1u8) << 64);
-        let face = population.face().expect("one scored next face");
-        let selected = match select_class(&face, &value) {
-            Ok(certified) => certified.class,
-            Err(_) => {
-                refusal = Some("unresolved-face-fibre");
-                break;
-            }
-        };
-        if selected < chart.bytes() && bytes.len() == room {
-            refusal = Some("no-stop-within-capacity");
-            break;
+    // The scored law of the one decision law (`Population::release_response`): every cell a
+    // certified draw from the scored face, the stop law, the codec square; the statuses are the
+    // pre-U3 ones.
+    let mut keys = || Rat::new(BigInt::from(draw.next()), BigInt::from(1u8) << 64);
+    let release = population.release_response(chart, capacity, ResponseLaw::Scored, &mut keys);
+    let refusal = match (&release.refusal, release.last()) {
+        (None, Some(ReleaseReturn::Unresolved(_))) => Some("unresolved-face-fibre"),
+        (None, Some(ReleaseReturn::NoContinuationBridges { .. })) => {
+            Some("no-stop-within-capacity")
         }
-        trace.push(
-            PopulationRelease::from_scored_face(&population, selected)
-                .expect("score-identical release face"),
-        );
-        population
-            .receive(selected)
-            .expect("selected class admitted");
-        if chart.section(selected).is_some() {
-            stop = Some(selected);
-            break;
-        }
-        bytes.push(selected as u8);
-    }
-    let result = stop
-        .and_then(|section| TextRelease::from_population_path(bytes, chart, section, &trace).ok());
+        (None, _) => None,
+        (Some(ResponseRefusal::Draw { .. }), _) => Some("unresolved-face-fibre"),
+        (Some(refused), _) => panic!("the scored response was refused: {refused:?}"),
+    };
+    let result = release.text(chart).and_then(Result::ok);
     let status = if result.is_some() {
         "codec-path-checked-provenance-and-health-owed"
     } else {
@@ -1831,7 +1753,7 @@ fn native_population_release(
             .map(|checked| checked.bytes().to_vec())
             .unwrap_or_default(),
         status,
-        trace.len(),
+        release.trace.len(),
         response_clock.elapsed().as_millis(),
     )
 }

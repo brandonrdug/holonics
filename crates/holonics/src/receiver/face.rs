@@ -27,7 +27,7 @@
 //!   the HNN's receiving read (`hnn::receiving`) and the context tree's faces
 //!   (`compression::landmark::context`) consume both.
 //!
-//! Compatible-family dynamics and release decisions are [`crate::receiver::release`].
+//! Release decisions are [`crate::receiver::release`], the one decision law.
 //!
 //! | Lean | Rust |
 //! |---|---|
@@ -389,10 +389,8 @@ pub fn softmax_jacobian(p: &[Rat]) -> Result<SymmetricForm, HolonError> {
 
 /// The ceiling on a declared horizon.
 ///
-/// [definition] `horizon_image` runs one exact matrix multiplication per step, so the *step count*
-/// is itself work sized by a caller declaration. Bounding the generator product is not enough: an
-/// admitted-input box with no width contributes no generator at all, so a hostile horizon would
-/// pass the generator ceiling and still loop. This ceiling is checked first.
+/// [definition] A horizon's step count is work sized by a caller declaration (each longitudinal
+/// step is one exact transport), so [`Horizon::declare`] bounds both coordinates before any step.
 pub const HORIZON_CEILING: usize = 4096;
 
 /// The ceiling on the number of members an enumerated compatible family may declare.
@@ -470,10 +468,11 @@ impl ExactFace {
 
 /// The declared exact norm the diameter is taken in.
 ///
-/// [established-bounded] `SquaredEuclidean` is exact on an **enumerated** family and is refused on
-/// an enclosure: the Euclidean diameter of a zonotope is attained at a vertex of the generator
-/// cube, so an exact computation would enumerate `2^k` sign patterns. The refusal is
-/// [`WidthRefusal::NormNotExactOnEnclosure`] and names the norm.
+/// [established-bounded] `SquaredEuclidean` is exact over read faces ([`width_over_readings`]). Over
+/// an enclosure it is not: the Euclidean diameter of a zonotope is attained at a vertex of the
+/// generator cube, so an exact computation would enumerate `2^k` sign patterns
+/// ([RECEIVER_HOLARCHY](../../../../docs/RECEIVER_HOLARCHY.md#width-and-release)); a width an owner
+/// bounds by an enclosure is declared in the supremum norm.
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub enum DiameterNorm {
     /// The sup-norm. Exact on both an enumerated family and an enclosure.
@@ -532,10 +531,10 @@ impl Reading for LinearReading {
 ///
 /// Lean counterpart: `Foundation/ReceiverRelease.width`.
 ///
-/// [implemented-exact] Every field is private. The constructors are `receiver_release::width_enumerated`,
-/// `receiver_release::width_enclosed` and [`Self::declared`], which refuses a negative diameter or an
-/// attaining witness incoherent with its own `read` count, so a forged width cannot be handed to
-/// `receiver_release::LawfulOptions::assemble`.
+/// [implemented-exact] Every field is private. The constructors are [`width_over_readings`] and
+/// [`Self::declared`], which refuses a negative diameter or an attaining witness incoherent with its
+/// own `read` count, so a forged width cannot be handed to
+/// [`crate::receiver::release::LawfulOptions::assemble`].
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct ReceiverWidth {
     receiver: String,
@@ -756,11 +755,9 @@ impl Horizon {
 
 /// **The width of an already-read family of exact faces.**
 ///
-/// [definition] This is `receiver_release::width_enumerated`'s second half on its own: the diameter of a set of
-/// exact faces in a declared norm, with the pair that attains it. It exists because a width is
-/// taken over readings that did not come from a `Vec<Rat>` compatible family — the faces of a
-/// tube's two-axis horizon are the first consumer — and the diameter law must not be written a
-/// second time for them.
+/// [definition] **The finite width**: the diameter of a set of exact faces read over a compatible
+/// family, in a declared norm, with the pair that attains it. It is the one Rust statement of the
+/// finite width law; retention's extinction (`receiver::standing`) reads it.
 ///
 /// Lean counterpart: `Foundation/ReceiverRelease.width`, with `abs_sub_le_width` the pair
 /// that attains it and `width_nonneg` the sign. The declared face count is checked against
@@ -828,43 +825,9 @@ pub struct WidenClaim {
     pub tolerance: Rat,
 }
 
-/// A coarser release offered against a tolerance other than the one it was searched under.
-/// Carried behind a box inside [`WidthRefusal::CoarserSearchedAtAnotherTolerance`], so the
-/// refusal stays small.
-#[derive(Clone, Debug, PartialEq, Eq)]
-pub struct CoarserToleranceClaim {
-    /// The coarser receiver named by the release.
-    pub receiver: String,
-    /// The tolerance `receiver_release::release_coarser` searched under.
-    pub searched: Rat,
-    /// The tolerance the options declare.
-    pub declared: Rat,
-}
-
-/// The coarser release a declared law claimed, with the tolerance the options were assembled
-/// against. Carried behind a box inside [`WidthRefusal::CoarserReleasedOutsideTolerance`].
-#[derive(Clone, Debug, PartialEq, Eq)]
-pub struct CoarserClaim {
-    /// The law that claimed it.
-    pub law: String,
-    /// The coarser receiver it claimed to release.
-    pub receiver: String,
-    /// The exact width it released.
-    pub width: Rat,
-    /// The exact tolerance the options declared.
-    pub tolerance: Rat,
-}
-
 /// Why a width or a release was refused. Every failure is returned as content.
 #[derive(Debug, Error)]
 pub enum WidthRefusal {
-    /// A coarser release searched under one tolerance was assembled against another.
-    #[error(
-        "the coarser receiver {} was searched inside tolerance {} and cannot be offered against \
-         the declared tolerance {}",
-        .0.receiver, .0.searched, .0.declared
-    )]
-    CoarserSearchedAtAnotherTolerance(Box<CoarserToleranceClaim>),
     /// A declared width is negative. A diameter is a maximum of absolute
     /// separations and is never negative (`width_nonneg`).
     #[error(
@@ -882,18 +845,9 @@ pub enum WidthRefusal {
         /// The witness, as prose.
         witness: String,
     },
-    /// A declared law released a coarser receiver outside the declared tolerance.
-    #[error(
-        "the law {} released the coarser receiver {} at width {} outside the declared tolerance {}",
-        .0.law, .0.receiver, .0.width, .0.tolerance
-    )]
-    CoarserReleasedOutsideTolerance(Box<CoarserClaim>),
     /// A compatible family with no member has no diameter.
     #[error("a compatible family with no member has no width")]
     EmptyFamily,
-    /// A zero-dimensional carrier has no reading.
-    #[error("a zero-dimensional carrier carries no receiver reading")]
-    EmptyDimension,
     /// Two declared extents do not agree.
     #[error("a carrier of dimension {declared} does not pair with one of dimension {found}")]
     DimensionMismatch {
@@ -901,76 +855,6 @@ pub enum WidthRefusal {
         declared: usize,
         /// What was found.
         found: usize,
-    },
-    /// A declared enclosure asks for more generators than the ceiling admits.
-    #[error(
-        "an enclosure of {requested} uncertainty generators exceeds the declared ceiling {ceiling}; \
-         nothing was allocated"
-    )]
-    GeneratorCeiling {
-        /// How many were asked for.
-        requested: usize,
-        /// The ceiling.
-        ceiling: usize,
-    },
-    /// The generator count of an `h`-step image does not fit a machine integer.
-    #[error(
-        "{states} state generators and {inputs} input generators over horizon {horizon} overflow \
-         the machine integer counting them; nothing was allocated"
-    )]
-    GeneratorCountOverflows {
-        /// State generators.
-        states: usize,
-        /// Input generators.
-        inputs: usize,
-        /// The declared horizon.
-        horizon: usize,
-    },
-    /// A declared carrier extent is wider than the ceiling admits.
-    #[error(
-        "a carrier of extent {requested} exceeds the declared ceiling {ceiling}; nothing was \
-         allocated and no product was formed"
-    )]
-    ExtentCeiling {
-        /// The declared extent.
-        requested: usize,
-        /// The ceiling.
-        ceiling: usize,
-    },
-    /// The exact multiplications a declared horizon and extent ask for exceed the work ceiling.
-    #[error(
-        "a horizon of {horizon} steps at extent {extent} asks for more than the declared ceiling \
-         of {ceiling} exact products; no step was taken"
-    )]
-    MultiplyWorkCeiling {
-        /// The declared extent.
-        extent: usize,
-        /// The declared horizon.
-        horizon: usize,
-        /// The ceiling.
-        ceiling: usize,
-    },
-    /// A declared coarsening tower carries more steps than the ceiling admits.
-    #[error(
-        "a coarsening tower of {requested} steps exceeds the declared ceiling {ceiling}; no step \
-         was checked"
-    )]
-    TowerStepCeiling {
-        /// The declared step count.
-        requested: usize,
-        /// The ceiling.
-        ceiling: usize,
-    },
-    /// More candidate observations were declared than the ceiling admits.
-    #[error(
-        "a probe over {requested} candidate observations exceeds the declared ceiling {ceiling}; \
-         no candidate was read"
-    )]
-    CandidateCeiling {
-        /// The declared candidate count.
-        requested: usize,
-        /// The ceiling.
-        ceiling: usize,
     },
     /// A declared horizon is longer than the ceiling admits.
     #[error(
@@ -1011,20 +895,6 @@ pub enum WidthRefusal {
         /// How many members were declared.
         members: usize,
     },
-    /// A generator index outside the enclosure.
-    #[error("generator {index} lies outside an enclosure carrying {carried}")]
-    GeneratorAbsent {
-        /// The index asked for.
-        index: usize,
-        /// How many the enclosure carries.
-        carried: usize,
-    },
-    /// A declared half-width was negative.
-    #[error("coordinate {coordinate} was declared a negative half-width, which is not an extent")]
-    NegativeHalfWidth {
-        /// Which coordinate.
-        coordinate: usize,
-    },
     /// Two faces of different arms have no separation.
     #[error("a {left} face and a {right} face are incomparable and no separation is invented")]
     FacesIncomparable {
@@ -1040,30 +910,6 @@ pub enum WidthRefusal {
         left: usize,
         /// The second length.
         right: usize,
-    },
-    /// A declared reading was asked for a width over an enclosure it cannot read.
-    #[error(
-        "the declared reading {receiver:?} is not linear, so its width needs an enumerated \
-         compatible family; an enclosure is refused rather than sampled"
-    )]
-    DeclaredReadingNeedsEnumeratedFamily {
-        /// The receiver that refused.
-        receiver: String,
-    },
-    /// An enclosure reading was asked for a width over an enumerated family.
-    #[error("the enclosure reading {receiver:?} was given an enumerated family instead of a hull")]
-    EnclosedReadingNeedsEnclosure {
-        /// The receiver that refused.
-        receiver: String,
-    },
-    /// A norm that is not exact on an enclosure.
-    #[error(
-        "the {norm} diameter of a zonotope is attained at a vertex of its generator cube, so it is \
-         not computed exactly on an enclosure; declare the supremum norm or enumerate the family"
-    )]
-    NormNotExactOnEnclosure {
-        /// The norm that was declared.
-        norm: &'static str,
     },
     /// A declared law released outside its own declared tolerance. The claim is boxed because two
     /// exact rationals and a name are the largest payload this refusal carries, and an unboxed
@@ -1089,56 +935,15 @@ pub enum WidthRefusal {
         /// The probe it named.
         probe: String,
     },
-    /// A declared law released a coarser receiver the tower did not return.
+    /// A declared width law returned a draw: a width decision carries no key, and a draw is
+    /// decided only by `receiver::release::draw` (the separating term between the two acts).
     #[error(
-        "the decision law {law:?} released the coarser receiver {receiver:?}, which the declared \
-         tower did not return inside tolerance"
+        "the decision law {law:?} returned a draw; a width decision carries no key, so a draw is \
+         decided only by the certified draw"
     )]
-    CoarserNotOffered {
+    DrawNotOffered {
         /// The law.
         law: String,
-        /// The receiver it named.
-        receiver: String,
-    },
-    /// A declared coarsening step does not factor through the step before it.
-    #[error(
-        "the receiver {coarse:?} does not factor through {fine:?}: members {left} and {right} of \
-         the fibre are identified by the finer reading and separated by the coarser one, so the \
-         declared tower is not a coarsening"
-    )]
-    CoarserDoesNotFactor {
-        /// The coarser receiver.
-        coarse: String,
-        /// The finer one.
-        fine: String,
-        /// The first member.
-        left: usize,
-        /// The second.
-        right: usize,
-    },
-    /// A factor map was composed with a reading whose face it cannot act on.
-    #[error("the factor map {factor:?} acts on a vector face and was given a {arm} face")]
-    FactorNeedsVectorFace {
-        /// The factor map.
-        factor: String,
-        /// The arm it was given.
-        arm: &'static str,
-    },
-    /// A declared factor map increases a separation on the fibre actually read.
-    #[error(
-        "the factor map {factor:?} is expansive on this fibre: at coordinate {coordinate} it \
-         separates members {left} and {right} further than the finer reading does, so the coarser \
-         receiver is not narrower"
-    )]
-    FactorIsExpansive {
-        /// The factor map.
-        factor: String,
-        /// The first member.
-        left: usize,
-        /// The second.
-        right: usize,
-        /// The coordinate that refutes it.
-        coordinate: usize,
     },
     /// The exact linear algebra refused.
     #[error(transparent)]

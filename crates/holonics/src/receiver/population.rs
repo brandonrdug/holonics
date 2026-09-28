@@ -216,6 +216,14 @@
 //! part). The population keeps only each part's sums while reading, never the cells: a receipt, not
 //! a record.
 //!
+//! [definition] **Release** ([`releasing`], [`text_release`]; THE_REBUILD U3). The population
+//! emits through the one decision law of `receiver::release`: the scored face view
+//! ([`PopulationRelease`], `P_release = P_scored`), the family draw ([`Population::select_family`])
+//! and the response ([`Population::release_response`]) return that law's certified draws, stop law
+//! and typed refusals; a response under the scored law carries each drawn cell's family provenance
+//! ([`Population::face_contributors`]). The chaser's rule ([`chaser`]) is a separate arm, a
+//! capture-basin commit with an information probe.
+//!
 //! [definition] The computational object is the helical pair interaction, read here as a
 //! receiver's population of candidate eggs through aeons. Of the winding guide's six general objects
 //! this owner touches four: the **helix** (a grating's key is its ring's rate and phase, a clock with
@@ -235,6 +243,7 @@
 //! | `Compression/Landmark/Context/Population.survivors_product` | [`KeyFamily`]'s factors |
 //! | `Compression/Landmark/Context/Population.{seqLik_escaped_survivor, escaped_fibre_is_mode}` | [`ChaseFamily`] (the escaped face), [`selected_fibre`] |
 //! | `Compression/Landmark/Context/Population.death_is_an_exchange` | [`DeathReceipt`] (the exchange of [`Population::receive`]) |
+//! | `Compression/Landmark/Context/Population.{certified_inverseCDF_class, certified_draw_is_released_at_zero_tolerance, plural_draw_is_held}` | `receiver::release::draw`, read by [`Population::select_family`] and [`Population::release_response`] |
 //! | `Compression/Landmark/Context/Dormancy.{forward_dominance_nonneg, dormant_survivor_code, layer_survivors, productKernel_stochastic, productKernel_path}` | [`Dormancy`], [`DormantFamily`] |
 //! | `Compression/Landmark/Context/Dormancy.{share_path_code, stay_code_le, share_path_code_le}` | the declared rate `α = 2^(−j)` of [`Dormancy::new`] |
 //! | owed (#62): the abstaining newborn's telescope | [`Population::found`], [`Population::refound`] |
@@ -266,12 +275,9 @@ pub mod composition;
 pub mod dormancy;
 pub mod evolution;
 pub mod families;
-pub mod family_release;
-pub mod health;
 pub mod merge;
 pub mod provenance;
 pub mod releasing;
-pub mod sampling;
 pub mod species;
 pub mod text_release;
 
@@ -280,17 +286,11 @@ mod composition_tests;
 #[cfg(test)]
 mod evolution_tests;
 #[cfg(test)]
-mod family_release_tests;
-#[cfg(test)]
 mod future_branch_tests;
-#[cfg(test)]
-mod health_tests;
 #[cfg(test)]
 mod provenance_tests;
 #[cfg(test)]
 mod releasing_tests;
-#[cfg(test)]
-mod sampling_tests;
 #[cfg(test)]
 mod tests;
 #[cfg(test)]
@@ -313,23 +313,18 @@ pub use composition::{
 pub use dormancy::{Dormancy, DormantFamily, Layered, Weight};
 pub use evolution::{Declaration, Identity, Selections, Tally};
 pub use families::{GratingParity, GratingSheet, RotorKeys, TreeFamily};
-pub use family_release::{FamilyReleaseError, select_family_class};
-pub use health::{
-    PopulationReceivingFaceHealth, PopulationReceivingFaceHealthError,
-    population_receiving_face_health,
-};
 pub use merge::{
     Blocks, Item, KtTables, MergeReceipt, PartitionReceipt, Price, learn_hazard_partition,
     restaurant_ratio,
 };
 pub use provenance::{FaceContribution, MissingProducerTerm};
-pub use releasing::{PopulationRelease, ReleaseRefusal};
-pub use sampling::{CertifiedClass, CrossingBounds, SamplingError, select_class};
+pub use releasing::{FamilyReleaseError, PopulationRelease, ReleaseRefusal};
 pub use species::{
     AdmittedFuture, Collapse, FactorSpecies, KeystoneMember, KeystoneSpecies, Seed, Species,
 };
 pub use text_release::{
-    TextAppend, TextDecoder, TextRelease, TextReleaseError, TextSeparator, verify_scored_text_path,
+    ResponseLaw, ResponseRefusal, ResponseRelease, TextAppend, TextDecoder, TextRelease,
+    TextReleaseError, TextSeparator, verify_scored_text_path,
 };
 
 use std::collections::BTreeMap;

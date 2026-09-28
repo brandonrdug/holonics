@@ -154,6 +154,50 @@ remaining obstruction to a seam theorem is the absent spectral realization, not 
 physicochemical (`Foundation/PhysicochemicalReceiver`). Their other Rust owners are in history at
 `13f8c734`.
 
+<a id="width-and-release"></a>
+
+## Width and release
+
+[definition] Release has one owner, [`holonics::receiver::release`](../crates/holonics/src/receiver/release.rs)
+(Lean `Foundation/ReceiverRelease`), whose module doc states the contract: every emission is a
+`ReleaseReturn` of one decision law, whose arms are the threshold commit, the certified draw, the
+probe and the typed refusal. [proved-derived; formal-checked] The certified draw is the law at
+tolerance zero on a key's class reading (`Compression/Landmark/Context/Population.{certified_draw_is_released_at_zero_tolerance,
+plural_draw_is_held}`). This section keeps the laws of the Rust carriers retired on September 28
+(U3; history at `1bdacc8f`, `crates/holonics/src/receiver/release.rs` and
+`crates/holonics/src/receiver/population/health.rs`), for an owner that needs them to re-enter
+them from here.
+- [proved-standard] **The zonotope enclosure.** An exact zonotope
+  `Z = {c + G e : e ∈ [−1, 1]^k}` over `ℚ` maps under an exact linear `M` to the exact zonotope
+  `{Mc + (MG) e}`. Under `x_(t+1) = A x_t + B u_t`, the `h`-step image of a box of compatible
+  states `Z_x` with a fresh box of admitted inputs `Z_u` at every step is
+  `A^h Z_x ⊕ ⨁_(k<h) A^(h−1−k) B Z_u`, with `k_x + h·k_u` generators. Its sup-norm diameter is
+  `2·max_i Σ_j |G_ij|`, exact and linear in the generator count, and it bounds the width of every
+  compatible set it encloses (`width_le_of_bounds`). The squared-Euclidean diameter is attained at a
+  vertex of the generator cube, so computing it exactly enumerates `2^k` sign patterns; an enclosure
+  width is declared in the sup norm.
+- [definition] **The probe searches** (`Ask`). Over an enclosure, observing one generator exactly
+  removes it, and the probe is the generator whose removal leaves the least sup-norm diameter. Over
+  an enumerated fibre, a declared observation partitions the fibre into its level sets; its survivor
+  is the largest width the target reading keeps inside one level set, never more than the whole
+  width (`width_mono`), and the probe is the observation with the least survivor. The chaser's
+  probe (`receiver::population::chaser`) partitions the same way under another criterion, the
+  expected information `I = log₂|Θ| − (1/|Θ|) Σ_c |c| log₂|c|` of the partition.
+- [definition] **The coarsening tower search** (`releaseCoarser`). Up a declared tower of readings,
+  finest first, each step's factoring through the step below is checked over the fibre: two
+  members the finer reading identifies must be identified by the coarser one
+  (`coarser_receiver_factors`; the core factor descent of `holon::restriction`). The coarser
+  invariant to release is the first step whose width is inside tolerance, carried with the
+  tolerance it was searched under, so it cannot be offered against a narrower one. A coarser reading
+  `g ∘ R` is narrower only when `g` is non-expansive (`width_nonExpansive_factor`;
+  `expansive_factor_increases_width` is the counterexample).
+- [proved-standard] **A mixture face's variation.** A family-to-class map `A_fc = P_f(c)` with
+  nonnegative columns that each sum to one is L1-nonexpansive (`‖A‖₁ = 1`), so the mixture faces of
+  any two normalized posteriors inside interval bounds differ by at most `Σ_f (upper_f − lower_f)`
+  in L1. The release reads the class enclosure itself, and a class enclosure that covers the whole
+  simplex never certifies a draw: every key is held. F5's numerical health (radius, robust count,
+  operator bound, contraction) is still a missing term.
+
 ## A displayed body is a cut; its plates can be continuing bodies
 
 [definition] A rendered frame is a present spatial/receiving cut of a world-tube and its
