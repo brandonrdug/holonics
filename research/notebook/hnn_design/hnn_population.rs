@@ -17,6 +17,7 @@
 //! cargo run --release -p holonics --example hnn_population -- composition [products | primes]
 //! cargo run --release -p holonics --example hnn_population -- evolution
 //! cargo run --release -p holonics --example hnn_population -- species
+//! cargo run --release -p holonics --example hnn_population -- curated .local/cuts/curated-cut.bin .local/cuts/curated-flat-cut.bin
 //! ```
 //!
 //! [definition; agent-inferred] **The declared population.** On each terrain the receiver declares
@@ -73,6 +74,9 @@ mod composition;
 
 #[path = "hnn_population_evolution.rs"]
 mod evolution;
+
+#[path = "hnn_population_curated.rs"]
+mod curated;
 
 use std::time::Instant;
 
@@ -1306,8 +1310,12 @@ fn main() {
         ["composition", which] => composition::harness(Some(which)),
         ["evolution"] => evolution::evolution(),
         ["species"] => evolution::species(),
+        ["curated", curated_cut, flat_cut] => curated::harness(curated_cut, flat_cut, false),
+        ["curated", curated_cut, flat_cut, "development"] => {
+            curated::harness(curated_cut, flat_cut, true);
+        }
         _ => println!(
-            "usage: hnn_population -- tree <d> | moire parity | moire sheets | crib | switching | standing <cut> | composition [products | primes] | evolution | species"
+            "usage: hnn_population -- tree <d> | moire parity | moire sheets | crib | switching | standing <cut> | composition [products | primes] | evolution | species | curated <curated-cut> <flat-cut> [development]"
         ),
     }
 }

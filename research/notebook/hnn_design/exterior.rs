@@ -14,6 +14,7 @@
 
 use std::ops::Range;
 
+use holonics::compression::landmark::context::SectionChart;
 use holonics::hnn::Field;
 use holonics::ratio::Rat;
 use holonics::ratio::algebraic::ExactInterval;
@@ -244,4 +245,50 @@ pub fn difference(a: &ExactInterval, b: &ExactInterval, grain: u64) -> String {
         },
         grain,
     )
+}
+
+/// **The curated cut** (`curated-cut.bin`, written by `curated_source.py`, one little-endian u16
+/// code a cell) and its manifest's declared population, alphabet and held-out start, read by the
+/// numbers after their keys; its alphabet must be the declared section chart's. Only its scope and
+/// counts are printed.
+pub struct CuratedCut {
+    pub codes: Vec<usize>,
+    pub alphabet: usize,
+    pub population: u64,
+    pub held: Range<usize>,
+}
+
+#[allow(clippy::disallowed_types, clippy::disallowed_methods)]
+pub fn read_curated(path: &str, chart: &SectionChart) -> CuratedCut {
+    let raw = std::fs::read(path).unwrap_or_else(|error| panic!("read the curated cut: {error}"));
+    assert_eq!(raw.len() % 2, 0, "u16 codes");
+    let codes: Vec<usize> = raw
+        .chunks_exact(2)
+        .map(|pair| usize::from(u16::from_le_bytes([pair[0], pair[1]])))
+        .collect();
+    let cells = manifest_number(path, "\"cells\":");
+    let alphabet = manifest_number(path, "\"alphabet\":");
+    let population = manifest_number(path, "\"population\":");
+    let held_start = manifest_number(path, "\"held_out_start\":");
+    assert_eq!(
+        codes.len(),
+        cells,
+        "the cut's length is its manifest's cells"
+    );
+    assert!(
+        cells <= population,
+        "the declared population bounds the cut"
+    );
+    assert_eq!(alphabet, chart.alphabet(), "the declared chart");
+    assert!(
+        codes.iter().all(|&code| code < alphabet),
+        "every code in the chart"
+    );
+    assert!(held_start <= cells, "the held-out start lies in the cut");
+    CuratedCut {
+        codes,
+        alphabet,
+        population: population as u64,
+        held: held_start..cells,
+    }
 }

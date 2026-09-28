@@ -135,6 +135,19 @@
 //! ([`Unheld`]). The arithmetic eggs ([`arithmetic`]: the record clock, the carry egg, the counter,
 //! the sieve) are the first composition.
 //!
+//! [proved-derived; formal-checked] **The curated source's readers and the boundary egg**
+//! ([`families`], [`boundary`]; Lean `Composition.{stagedFace_nonneg, stagedFace_sum_one,
+//! staged_chain_rule, staged_code}`; campaign 5). On a curated stream the receiving tree is a family
+//! over its cells (bytes and section letters) or over its typed ticks, each cell bundled with its
+//! part's channel read once at the section ([`TreeFamily::sectioned`],
+//! `compression::landmark::context::sections`). The part clock ([`PartClock`]) is a keystone of one
+//! key read from the coded past (bytes since the section letter, sentence closes among them, the last
+//! byte's class), and the boundary egg ([`BoundaryEgg`]) factors each cell's face through its stage:
+//! the hazard law ([`Hazard`], a KT face per cell of a declared partition of the port) times the byte
+//! tree's face within the bytes or the letter tree's face of the letter. Its code is the hazard's
+//! plus the conditioned faces', by the chain rule at every tick, and its byte tree read alone is its
+//! unheld port, so the part clock's value is exact.
+//!
 //! [definition; agent-inferred] **Identity** ([`evolution`]). A family's identity across aeons is
 //! its declaration ([`Family::declaration`]: the generator family's kind, declared integers and the
 //! declarations it is built on) and its description ([`Identity`]), never its label: a seed
@@ -207,8 +220,11 @@
 //! | `Compression/Landmark/Context/Evolution.{survivalPseudo_zero_deaths, survivalPseudo_death_lt, dirichletFace_isPrior, kt_face, dirichletFace_no_deaths, descriptionPrior_isPrior, evolved_isPrior, masses_total}` | [`Tally::pseudo`], [`Selections::face`], [`Selections::prior`], [`Population::evolved`] |
 //! | `Compression/Landmark/Context/Evolution.{evolved_code_le_face, evolved_code_le_description, evolved_aeon_code}` | the evolved population's code against its selected family's |
 //! | `Compression/Landmark/Context/Evolution.{speciesWeight_isPrior, species_mixture, species_face, species_collapse_code, species_split}` | [`Population::collapse`], [`Population::split`], [`Collapse`] |
+//! | `Compression/Landmark/Context/Composition.{stagedFace_nonneg, stagedFace_sum_one, staged_chain_rule, staged_code}` | [`BoundaryEgg`] (its staged face and its code by stage, [`BoundaryReadout`]) |
+//! | `Compression/Landmark/Context/Tree.{ktFace, ktFace_pos, ktFace_sum}` (over `{byte, letter}`) | [`Hazard`] |
 
 pub mod arithmetic;
+pub mod boundary;
 pub mod composition;
 pub mod dormancy;
 pub mod evolution;
@@ -223,6 +239,9 @@ mod evolution_tests;
 mod tests;
 
 pub use arithmetic::{CarryEgg, Counter, RecordClock, Sieve, SieveFace};
+pub use boundary::{
+    BoundaryEgg, BoundaryReadout, Hazard, HazardCell, LastByte, PartClock, PartPort, dyadic_class,
+};
 pub use composition::{
     Composed, Conditioned, Keystone, Port, PortPath, PortReader, PortedEmitters, Unheld,
 };
@@ -380,11 +399,13 @@ impl KeyReadout {
     }
 }
 
-/// [definition] **A family's readout**: a key family's surviving keys, or a tree family's standing.
+/// [definition] **A family's readout**: a key family's surviving keys, a tree family's standing, or
+/// a boundary egg's code by stage and channel.
 #[derive(Clone, Debug, PartialEq)]
 pub enum Readout<'a> {
     Keys(KeyReadout),
     Standing(&'a Landmarks),
+    Boundary(Box<BoundaryReadout>),
 }
 
 /// [definition] **A declared navigator family** (module header): a candidate egg read by the
@@ -1098,6 +1119,8 @@ pub enum Act {
     Product,
     /// An integer of a sieve's window decided by a face: the gratings maintained over the window.
     Decide(SieveFace),
+    /// A stage counted in a cell of a declared partition (the boundary egg's hazard law).
+    Count,
 }
 
 /// [definition; agent-inferred] **A family's work** (module header, "Maintenance work"): exact
@@ -1843,7 +1866,7 @@ impl Population {
                     exact: exchange,
                     seed: match member.family.readout() {
                         Readout::Keys(keys) => Some(keys),
-                        Readout::Standing(_) => None,
+                        Readout::Standing(_) | Readout::Boundary(_) => None,
                     },
                 })
             })
@@ -2225,7 +2248,7 @@ impl Population {
                 posterior,
                 keys: match member.family.readout() {
                     Readout::Keys(keys) => Some(keys),
-                    Readout::Standing(_) => None,
+                    Readout::Standing(_) | Readout::Boundary(_) => None,
                 },
                 drift: member.family.drift(),
                 work: member.family.work(),

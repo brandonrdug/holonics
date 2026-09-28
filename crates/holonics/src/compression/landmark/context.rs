@@ -94,6 +94,11 @@
 //! `Compression/Landmark/Context/Address.bundle_code_injective`); in a tree each typed letter is a child's key under
 //! its parent, `0` for the boundary and `1 + value` otherwise.
 //!
+//! [definition; agent-inferred] **A section's slots, read once** ([`sections`]): on a curated
+//! stream whose section letters open its parts (`B + C·k + c`), a tick's bundle carries the slots of
+//! the part it lies in, the channel (and optionally the kind), read at the part's letter and carried
+//! by every bundle of the part ([`Sections`]); the curated source's typed address.
+//!
 //! [definition; agent-inferred] **The declared family and its finite partitions** ([`LetterFamily`],
 //! the slots' alphabets; the HNN's readers of them, `hnn::receiving::{Feature, FeatureFamily}`),
 //! each derived from a declaration, never a literal:
@@ -534,6 +539,9 @@ use crate::ratio::algebraic::{ExactInterval, ExactValueError, LOG_OCTAVES, inter
 use crate::receiver::face::{GrainRefusal, grain_exponent};
 
 pub mod baseline;
+pub mod sections;
+
+pub use sections::{Section, SectionChart, SectionSlots, Sections};
 
 // -------------------------------------------------------------------------------------------
 // the refusals

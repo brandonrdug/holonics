@@ -40,11 +40,24 @@ filtered by the family that reads it.**
   alike), `code(A⊳B) = (log₂ |κ| − log₂ #S_n) − log₂ ℓ`: the keystone's key plus the conditioned
   family's code under the located key.
 
+**The staged face** (the boundary egg, Rust `receiver::population::boundary`): a keystone of one
+key whose port is read from the coded past (the part clock) locates nothing, and the family reading
+it factors each tick's face through a stage map `σ : C → S` of the classes (a byte or a section
+letter): `q_t(c) = h_t(σ c) · r_t(c)`, the stage's face (the hazard) times the conditioned face within
+the stage (the byte tree's face within the bytes, the letter tree's within the letters).
+
+* `stagedFace_nonneg`, `stagedFace_sum_one` [proved-derived; formal-checked]: the staged face is a
+  face when the stage face is one and the conditioned face is one on every stage's fibre.
+* `staged_chain_rule`, `staged_code` [proved-derived; formal-checked]: **the chain rule at every
+  tick**: the staged faces of the received cells multiply to the stage faces' product times the
+  conditioned faces' product, so the staged code is the stage's code plus the conditioned code,
+  `−log₂ ∏ q_t(x_t) = −log₂ ∏ h_t(σ x_t) − log₂ ∏ r_t(x_t)`.
+
 The computational object is the helical pair interaction read as eggs joined at ports. Of the
 winding guide's six general objects this module touches **faces and placement** (the composed face
-and its normalization) and, through the keystone's port, the **helix** (the clock's phase and its
-winding); the pair, the cell holonomy, the tube and the tower thread stay attached through the
-constituents' owners.
+and its normalization, the staged face) and, through the keystone's port, the **helix** (the clock's
+phase and its winding); the pair, the cell holonomy, the tube and the tower thread stay attached
+through the constituents' owners.
 
 No `sorry`, no `axiom`, no `native_decide`.
 -/
@@ -205,6 +218,59 @@ theorem chain_rule_of_species [Nonempty κ] {P : κ → ℕ → C → ℚ} (hP :
   rw [hmean]
   ring
 
+/-! ### The staged face: a face factored through a stage at every tick -/
+
+section Staged
+
+variable {S : Type*}
+
+/-- [definition] **The staged face**: a class's stage face times its conditioned face within the
+stage, `q_t(c) = h_t(σ c) · r_t(c)`. -/
+def stagedFace (σ : C → S) (h : ℕ → S → ℚ) (r : ℕ → C → ℚ) (t : ℕ) (c : C) : ℚ :=
+  h t (σ c) * r t c
+
+/-- [proved-derived; formal-checked] **The staged face is nonnegative** where the stage face and the
+conditioned face are. -/
+theorem stagedFace_nonneg {σ : C → S} {h : ℕ → S → ℚ} {r : ℕ → C → ℚ}
+    (hh : ∀ t s, 0 ≤ h t s) (hr : ∀ t c, 0 ≤ r t c) (t : ℕ) (c : C) :
+    0 ≤ stagedFace σ h r t c :=
+  mul_nonneg (hh t (σ c)) (hr t c)
+
+/-- [proved-derived; formal-checked] **The staged face sums to one** over the classes when the stage
+face sums to one over the stages and the conditioned face sums to one on every stage's fibre. -/
+theorem stagedFace_sum_one [Fintype C] [Fintype S] [DecidableEq S] {σ : C → S}
+    {h : ℕ → S → ℚ} {r : ℕ → C → ℚ} (t : ℕ) (hh : ∑ s, h t s = 1)
+    (hr : ∀ s, ∑ c ∈ univ.filter (fun c => σ c = s), r t c = 1) :
+    ∑ c, stagedFace σ h r t c = 1 := by
+  have hfib : ∀ s, ∑ c ∈ univ.filter (fun c => σ c = s), stagedFace σ h r t c = h t s := by
+    intro s
+    rw [sum_congr rfl fun c hc => by
+      rw [stagedFace, (mem_filter.mp hc).2], ← mul_sum, hr s, mul_one]
+  rw [← sum_fiberwise univ σ (stagedFace σ h r t), sum_congr rfl fun s _ => hfib s, hh]
+
+/-- [proved-derived; formal-checked] **`staged_chain_rule`: the chain rule at every tick.** The
+staged faces of the received cells multiply to the stage faces' product times the conditioned
+faces' product. -/
+theorem staged_chain_rule (σ : C → S) (h : ℕ → S → ℚ) (r : ℕ → C → ℚ) (x : ℕ → C) (n : ℕ) :
+    ∏ t ∈ range n, stagedFace σ h r t (x t) =
+      (∏ t ∈ range n, h t (σ (x t))) * ∏ t ∈ range n, r t (x t) :=
+  prod_mul_distrib
+
+/-- [proved-derived; formal-checked] **`staged_code`: the staged code is the stage's code plus the
+conditioned code**, while every received cell's stage face and conditioned face are positive. -/
+theorem staged_code {σ : C → S} {h : ℕ → S → ℚ} {r : ℕ → C → ℚ} (x : ℕ → C) (n : ℕ)
+    (hh : ∀ t ∈ range n, 0 < h t (σ (x t))) (hr : ∀ t ∈ range n, 0 < r t (x t)) :
+    -Real.logb 2 ((∏ t ∈ range n, stagedFace σ h r t (x t) : ℚ) : ℝ) =
+      -Real.logb 2 ((∏ t ∈ range n, h t (σ (x t)) : ℚ) : ℝ) +
+        -Real.logb 2 ((∏ t ∈ range n, r t (x t) : ℚ) : ℝ) := by
+  have h1 : (0 : ℝ) < ((∏ t ∈ range n, h t (σ (x t)) : ℚ) : ℝ) := by
+    exact_mod_cast prod_pos hh
+  have h2 : (0 : ℝ) < ((∏ t ∈ range n, r t (x t) : ℚ) : ℝ) := by
+    exact_mod_cast prod_pos hr
+  rw [staged_chain_rule, Rat.cast_mul, Real.logb_mul h1.ne' h2.ne', neg_add]
+
+end Staged
+
 section Audit
 
 #print axioms composedFace_received
@@ -217,6 +283,10 @@ section Audit
 #print axioms sum_seqLik_survivors
 #print axioms chain_rule
 #print axioms chain_rule_of_species
+#print axioms stagedFace_nonneg
+#print axioms stagedFace_sum_one
+#print axioms staged_chain_rule
+#print axioms staged_code
 
 end Audit
 

@@ -375,7 +375,7 @@ fn a_collapse_over_the_whole_future_changes_no_code() {
         .nth(1)
         .map(|family| match family.readout() {
             Readout::Keys(keys) => keys.count(),
-            Readout::Standing(_) => unreachable!(),
+            Readout::Standing(_) | Readout::Boundary(_) => unreachable!(),
         })
         .unwrap();
     assert_eq!(BigUint::from(collapse.before()), survivors);

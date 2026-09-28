@@ -1,5 +1,6 @@
 //! **The declared navigator families a population weighs** (the module header of
-//! `receiver::population`): the receiving tree at a declared depth and stop prior, and the key
+//! `receiver::population`): the receiving tree at a declared depth and stop prior (over the cells,
+//! or over a curated stream's typed ticks, [`TreeFamily::sectioned`]), and the key
 //! families whose key spaces are the terrain's own declarations: a moiré's gratings
 //! (`holarchy::terrain::MoireFamily`, each grating a rotor ring `navigator::Navigator::rotor`
 //! emitting its half-turn sheet exactly as the terrain does) and a rotor crib's key, plugboard and
@@ -53,7 +54,8 @@ use super::{
     Readout, Survivors, Work, refuse,
 };
 use crate::compression::landmark::context::{
-    Capacity, LandmarkDeclaration, Landmarks, Letter, PassageCode, StopPrior,
+    Capacity, DigitsReading, LandmarkDeclaration, Landmarks, Letter, PassageCode, SectionSlots,
+    Sections, StopPrior,
 };
 use crate::hnn::field::Field;
 use crate::holarchy::terrain::{Grating, MoireClass, MoireFamily};
@@ -70,17 +72,21 @@ pub const ROTOR_BOMBE: &str =
 // -------------------------------------------------------------------------------------------
 // the receiving tree
 
-/// [definition] **The tree family** (`compression::landmark::context`): the receiving tree over the
-/// cell-only letters at a declared depth and stop prior, reading the address of the last `D` cells
-/// (the shift navigator's address at the declared depth, its standing: Lean
+/// [definition] **The tree family** (`compression::landmark::context`): the receiving tree at a
+/// declared depth and stop prior, reading the address of the last `D` ticks (the shift navigator's
+/// address at the declared depth, its standing: Lean
 /// `Compression/Landmark/Context/Standing.address_standing`), each cell scored at the current
 /// standing by its executed face and then deposited, its likelihood the product of those faces
-/// enclosed by `PassageCode` (as `hnn::reference::tree_prequential` scores it).
+/// enclosed by `PassageCode` (as `hnn::reference::tree_prequential` scores it). Its ticks are the
+/// cells ([`TreeFamily::new`]), or on a curated stream the cells bundled with their part's slots,
+/// read once at the section ([`TreeFamily::sectioned`], the typed address of
+/// `compression::landmark::context::sections`: the joint address across ports).
 pub struct TreeFamily {
     label: String,
     description: u64,
     tree: Landmarks,
-    past: VecDeque<usize>,
+    sections: Option<Sections>,
+    past: VecDeque<Letter>,
     passage: PassageCode,
     received: u64,
 }
@@ -97,16 +103,51 @@ impl TreeFamily {
                 "it reads the cell-only letters, the population's cells",
             ));
         }
-        let prior = if declaration.prior == StopPrior::half() {
-            "½"
-        } else {
-            "declared"
-        };
-        let label = format!("tree D = {}, stop prior {prior}", declaration.depth);
+        let label = format!(
+            "tree D = {}, stop prior {}",
+            declaration.depth,
+            prior_of(&declaration)
+        );
         Ok(Self {
             label,
             description,
             tree: Landmarks::new(declaration)?,
+            sections: None,
+            past: VecDeque::new(),
+            passage: PassageCode::new(),
+            received: 0,
+        })
+    }
+
+    /// **The typed tree family** over a curated stream (module header): the declaration's letter
+    /// family must be the section reader's slots and its alphabet the reader's chart.
+    pub fn sectioned(
+        declaration: LandmarkDeclaration,
+        description: u64,
+        sections: Sections,
+    ) -> Result<Self, PopulationError> {
+        if declaration.family != *sections.family()
+            || declaration.alphabet != sections.chart().alphabet()
+        {
+            return Err(refuse(
+                "a typed tree family",
+                "its letters are the section reader's slots over the reader's chart",
+            ));
+        }
+        let slots = match sections.slots() {
+            SectionSlots::Channel => "channel",
+            SectionSlots::ChannelKind => "channel, kind",
+        };
+        let label = format!(
+            "typed tree D = {}, slots [{slots}], stop prior {}",
+            declaration.depth,
+            prior_of(&declaration)
+        );
+        Ok(Self {
+            label,
+            description,
+            tree: Landmarks::new(declaration)?,
+            sections: Some(sections),
             past: VecDeque::new(),
             passage: PassageCode::new(),
             received: 0,
@@ -118,7 +159,8 @@ impl TreeFamily {
         &self.tree
     }
 
-    /// The address of the next cell: the last `D` cells, newest first, `Boundary` before the first.
+    /// The address of the next cell: the last `D` ticks' letters, newest first, `Boundary` before
+    /// the first.
     fn address(&self) -> Vec<Letter> {
         let depth = self.tree.declaration().depth;
         (0..depth)
@@ -126,9 +168,39 @@ impl TreeFamily {
                 self.past
                     .len()
                     .checked_sub(back + 1)
-                    .map_or(Letter::Boundary, |at| Letter::Cell(self.past[at]))
+                    .map_or(Letter::Boundary, |at| self.past[at])
             })
             .collect()
+    }
+
+    /// **Receive one cell digit by digit** (the boundary egg's reading of its byte tree): the
+    /// executed face and each opened digit's split, read before the deposit, then the deposit and
+    /// the tick's letter pushed onto the address.
+    pub(crate) fn receive_digits(&mut self, cell: usize) -> Result<DigitsReading, PopulationError> {
+        let letter = match &self.sections {
+            Some(sections) => sections.letter_of(cell)?,
+            None => Letter::Cell(cell),
+        };
+        let reading = self.tree.receive_digits(&self.address(), cell)?;
+        if let Some(sections) = &mut self.sections {
+            sections.read(cell)?;
+        }
+        self.passage.face(&reading.reading.executed)?;
+        self.past.push_back(letter);
+        if self.past.len() > self.tree.declaration().depth {
+            self.past.pop_front();
+        }
+        self.received += 1;
+        Ok(reading)
+    }
+}
+
+/// The stop prior's name in a label.
+fn prior_of(declaration: &LandmarkDeclaration) -> &'static str {
+    if declaration.prior == StopPrior::half() {
+        "½"
+    } else {
+        "declared"
     }
 }
 
@@ -151,18 +223,12 @@ impl Family for TreeFamily {
     }
 
     fn receive(&mut self, cell: usize) -> Result<Rat, PopulationError> {
-        let reading = self.tree.receive(&self.address(), cell)?;
-        self.passage.face(&reading.executed)?;
-        self.past.push_back(cell);
-        if self.past.len() > self.tree.declaration().depth {
-            self.past.pop_front();
-        }
-        self.received += 1;
-        Ok(reading.executed)
+        Ok(self.receive_digits(cell)?.reading.executed)
     }
 
     /// A tree admits a passage of its alphabet's cells that stays within its declared population
-    /// `n*` (its certificates hold within it).
+    /// `n*` (its certificates hold within it); a typed tree also a passage that opens a section
+    /// before its first byte when none is open.
     fn admits(&self, cells: &[usize]) -> Result<(), PopulationError> {
         let alphabet = self.alphabet();
         if let Some(&cell) = cells.iter().find(|&&cell| cell >= alphabet) {
@@ -172,6 +238,15 @@ impl Family for TreeFamily {
             return Err(refuse(
                 "a tree family's passage",
                 "it stays within the tree's declared population",
+            ));
+        }
+        if let (Some(sections), Some(&first)) = (&self.sections, cells.first())
+            && sections.open().is_none()
+            && sections.chart().section(first).is_none()
+        {
+            return Err(refuse(
+                "a typed tree family's passage",
+                "a section letter opens its first part before any byte",
             ));
         }
         Ok(())
@@ -200,7 +275,26 @@ impl Family for TreeFamily {
             capacity,
         ];
         parameters.extend(declared.prior.rungs().iter().map(|&rung| u64::from(rung)));
-        Declaration::new("receiving tree", parameters)
+        let tree = Declaration::new("receiving tree", parameters);
+        match &self.sections {
+            None => tree,
+            Some(sections) => {
+                let chart = sections.chart();
+                let slots = match sections.slots() {
+                    SectionSlots::Channel => 1,
+                    SectionSlots::ChannelKind => 2,
+                };
+                tree.with(vec![Declaration::new(
+                    "section slots",
+                    vec![
+                        chart.bytes() as u64,
+                        chart.channels() as u64,
+                        chart.kinds() as u64,
+                        slots,
+                    ],
+                )])
+            }
+        }
     }
 
     /// The cells deposited along their addresses, and the nodes the tree holds.

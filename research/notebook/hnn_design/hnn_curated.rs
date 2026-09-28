@@ -60,14 +60,13 @@
 #[path = "exterior.rs"]
 mod exterior;
 
-use std::ops::Range;
 use std::time::Instant;
 
 use holonics::compression::cost::ceil_log2;
 use holonics::compression::landmark::context::baseline::{Baselines, PPM_ORDER};
 use holonics::compression::landmark::context::{
-    Bundle, Capacity, LandmarkDeclaration, Landmarks, Letter, LetterFamily, PassageCode, StopPrior,
-    Widths, cell_letters, letter_address, odometer_digits,
+    Capacity, LandmarkDeclaration, Landmarks, Letter, LetterFamily, PassageCode, SectionChart,
+    SectionSlots, Sections, StopPrior, Widths, cell_letters, letter_address, odometer_digits,
 };
 use holonics::hnn::reference::DepthSweep;
 use holonics::hnn::{Field, FieldDeclaration};
@@ -76,7 +75,9 @@ use holonics::ratio::algebraic::{ExactInterval, interval_sum};
 use num_bigint::{BigInt, BigUint};
 use num_traits::Zero;
 
-use exterior::{against, difference, enclosure, exact, manifest_number, per, read_cut, reading_of};
+use exterior::{
+    against, difference, enclosure, exact, manifest_number, per, read_curated, read_cut, reading_of,
+};
 
 /// The exterior chart's bytes; the section letters are coded after them.
 const BYTES: usize = 256;
@@ -111,76 +112,24 @@ const LETTER_BYTES: u128 = 4;
 // -------------------------------------------------------------------------------------------
 // the exterior boundary: the curated cut
 
-/// **The curated cut** (`curated-cut.bin`, one little-endian u16 code a cell) and its manifest's
-/// declared population, alphabet and held-out start, read by the numbers after their keys.
-struct CuratedCut {
-    codes: Vec<usize>,
-    alphabet: usize,
-    population: u64,
-    held: Range<usize>,
-}
-
-#[allow(clippy::disallowed_types, clippy::disallowed_methods)]
-fn read_curated(path: &str) -> CuratedCut {
-    let raw = std::fs::read(path).unwrap_or_else(|error| panic!("read the curated cut: {error}"));
-    assert_eq!(raw.len() % 2, 0, "u16 codes");
-    let codes: Vec<usize> = raw
-        .chunks_exact(2)
-        .map(|pair| usize::from(u16::from_le_bytes([pair[0], pair[1]])))
-        .collect();
-    let cells = manifest_number(path, "\"cells\":");
-    let alphabet = manifest_number(path, "\"alphabet\":");
-    let population = manifest_number(path, "\"population\":");
-    let held_start = manifest_number(path, "\"held_out_start\":");
-    assert_eq!(
-        codes.len(),
-        cells,
-        "the cut's length is its manifest's cells"
-    );
-    assert!(
-        cells <= population,
-        "the declared population bounds the cut"
-    );
-    assert_eq!(
-        alphabet,
-        BYTES + KINDS.len() * CHANNELS.len(),
-        "the declared chart"
-    );
-    assert!(
-        codes.iter().all(|&code| code < alphabet),
-        "every code in the chart"
-    );
-    assert!(held_start <= cells, "the held-out start lies in the cut");
-    CuratedCut {
-        codes,
-        alphabet,
-        population: population as u64,
-        held: held_start..cells,
-    }
-}
-
-/// A section letter's kind and channel.
-fn section(code: usize) -> (usize, usize) {
-    let letter = code - BYTES;
-    (letter / CHANNELS.len(), letter % CHANNELS.len())
-}
-
-/// **The ticks' ports and sections, read from the coded past**: each letter opens its part on its
-/// channel; each byte lies on the channel and section of the last letter before it. The cut opens
-/// at a letter (the codec's pin), so no cell precedes its port.
-fn ticks(codes: &[usize]) -> (Vec<usize>, Vec<usize>) {
-    let mut open = None;
+/// **The ticks' channels and typed letters, read from the coded past** (the library's typed
+/// address, `compression::landmark::context::sections`): each letter opens its part on its channel;
+/// each byte lies on the channel and section of the last letter before it. The cut opens at a
+/// letter (the codec's pin), so no cell precedes its port.
+fn ticks(codes: &[usize], chart: SectionChart) -> (Vec<usize>, Vec<Letter>) {
+    let mut sections =
+        Sections::new(chart, SectionSlots::ChannelKind).expect("the channel and section slots");
     let mut channels = Vec::with_capacity(codes.len());
-    let mut kinds = Vec::with_capacity(codes.len());
+    let mut typed = Vec::with_capacity(codes.len());
     for &code in codes {
-        if code >= BYTES {
-            open = Some(section(code));
-        }
-        let (kind, channel) = open.expect("the cut opens at a section letter");
-        channels.push(channel);
-        kinds.push(kind);
+        typed.push(
+            sections
+                .read(code)
+                .expect("the cut opens at a section letter"),
+        );
+        channels.push(sections.open().expect("an open section").channel);
     }
-    (channels, kinds)
+    (channels, typed)
 }
 
 // -------------------------------------------------------------------------------------------
@@ -627,14 +576,20 @@ fn readings(
 #[allow(clippy::too_many_lines)]
 fn curated_harness(curated_path: &str, flat_path: &str) {
     let setup = Instant::now();
-    let cut = read_curated(curated_path);
+    let chart = SectionChart::curated();
+    assert_eq!(
+        (chart.bytes(), chart.channels(), chart.kinds()),
+        (BYTES, CHANNELS.len(), KINDS.len()),
+        "the declared chart"
+    );
+    let cut = read_curated(curated_path, &chart);
     let (flat_bytes, flat_count, flat_held) = read_cut(flat_path);
     let declared_population = manifest_number(flat_path, "\"declared_population\":") as u64;
     assert_eq!(
         declared_population, cut.population,
         "one declared population"
     );
-    let (channels, kinds) = ticks(&cut.codes);
+    let (channels, typed) = ticks(&cut.codes, chart);
 
     // 0. The identical cells: the curated cut without its letters is the flat cut.
     let bytes_of: Vec<usize> = cut.codes.iter().copied().filter(|&c| c < BYTES).collect();
@@ -655,26 +610,14 @@ fn curated_harness(curated_path: &str, flat_path: &str) {
     let grain = exterior::receiver_grain(&field);
     assert_eq!(field.alphabet(), BYTES, "the flat chart is campaign 1's");
 
-    let family = LetterFamily::new(vec![CHANNELS.len() as u64, KINDS.len() as u64])
+    let family = SectionSlots::ChannelKind
+        .family(&chart)
         .expect("the channel and section slots");
     let slots: Vec<usize> = cut
         .codes
         .iter()
         .zip(&channels)
         .map(|(&code, &channel)| if code >= BYTES { SECTION } else { channel })
-        .collect();
-    let typed: Vec<Letter> = cut
-        .codes
-        .iter()
-        .zip(channels.iter().zip(&kinds))
-        .map(|(&cell, (&channel, &kind))| {
-            Letter::Bundle(Bundle {
-                cell,
-                features: family
-                    .encode(&[channel as u64, kind as u64])
-                    .expect("a slot value"),
-            })
-        })
         .collect();
     let flat = Stream {
         cells: bytes_of.clone(),
@@ -711,9 +654,8 @@ fn curated_harness(curated_path: &str, flat_path: &str) {
     );
     let mut letters = [[[0u64; 3]; 4]; 2];
     for (position, &code) in cut.codes.iter().enumerate() {
-        if code >= BYTES {
-            let (kind, channel) = section(code);
-            letters[usize::from(position >= cut.held.start)][kind][channel] += 1;
+        if let Some(section) = chart.section(code) {
+            letters[usize::from(position >= cut.held.start)][section.kind][section.channel] += 1;
         }
     }
 
