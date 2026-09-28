@@ -57,16 +57,12 @@ pub mod moire;
 pub mod pursuit;
 pub mod source;
 pub mod switching;
-pub mod words;
 
 #[cfg(test)]
 mod chase_tests;
 
 #[cfg(test)]
 mod tests;
-
-#[cfg(test)]
-mod words_tests;
 
 pub use chase::{
     ARENA_SIDE_LIMIT, Arena, ArenaDeclaration, Caps, Chase, ChasePorts, ChaseTruth, ChaserPort,
@@ -84,7 +80,6 @@ pub use source::{
     ContextTree, Passage, Recovery, TreeSource, TreeSourceFamily, TreeSourceTruth, WeightingBound,
 };
 pub use switching::{AeonFamily, SwitchTruth, Switching};
-pub use words::{WordPassage, WordTerrain, WordTerrainFamily, WordTerrainTruth, WordVocabulary};
 
 use thiserror::Error;
 

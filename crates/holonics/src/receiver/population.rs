@@ -272,10 +272,8 @@ pub mod merge;
 pub mod provenance;
 pub mod releasing;
 pub mod sampling;
-pub mod sectioned_words;
 pub mod species;
 pub mod text_release;
-pub mod words;
 
 #[cfg(test)]
 mod composition_tests;
@@ -294,13 +292,9 @@ mod releasing_tests;
 #[cfg(test)]
 mod sampling_tests;
 #[cfg(test)]
-mod sectioned_words_tests;
-#[cfg(test)]
 mod tests;
 #[cfg(test)]
 mod text_release_tests;
-#[cfg(test)]
-mod words_tests;
 
 pub use admitted::{
     AdmittedEgg, AdmittedReadout, CopyCell, CopyLaw, CopyStage, PointerReadout, Relation,
@@ -331,16 +325,11 @@ pub use merge::{
 pub use provenance::{FaceContribution, MissingProducerTerm};
 pub use releasing::{PopulationRelease, ReleaseRefusal};
 pub use sampling::{CertifiedClass, CrossingBounds, SamplingError, select_class};
-pub use sectioned_words::SectionedWordFamily;
 pub use species::{
     AdmittedFuture, Collapse, FactorSpecies, KeystoneMember, KeystoneSpecies, Seed, Species,
 };
 pub use text_release::{
     TextAppend, TextDecoder, TextRelease, TextReleaseError, TextSeparator, verify_scored_text_path,
-};
-pub use words::{
-    EncodingSeparator, EncodingSquare, ParseError, SegmentationLattice, SeparatorCause, WORD_END,
-    WordDictionary, WordFamily, WordReadout,
 };
 
 use std::collections::BTreeMap;
@@ -503,7 +492,6 @@ pub enum Readout<'a> {
     Standing(&'a Landmarks),
     Boundary(Box<BoundaryReadout>),
     Admitted(Box<AdmittedReadout>),
-    Words(WordReadout),
 }
 
 /// [definition] **A declared navigator family** (module header): a candidate egg read by the
