@@ -279,7 +279,7 @@ operations on Holons, with familiar vector/tensor realizations where applicable.
 | Receive/contract | ⟨r\|H⟩, or a partial tensor contraction leaving specified output axes | `holon::law::HolonLaw::receive` |
 | Receive then emit | (\|B⟩⟨r\|)\|A⟩=⟨r\|A⟩\|B⟩; a rank-one operator, with an explicitly declared bra | `ratio::linear` exact maps |
 | Compose transports | Ĝ₂Ĝ₁\|H⟩; the output port of the first joins the input of the second | `navigator::Transport` |
-| Reflect/interfere | A constituted multiport operator acts on incoming and stored-current kets together | the Swing `2P_D−I`; Lean `Computation/HolonicConstitutiveCirculation`; device scattering in history |
+| Reflect/interfere | A constituted multiport operator acts on incoming and stored-current kets together | junction scattering `2P_D−I`, a half-turn about the constituted projection; Lean `Computation/HolonicConstitutiveCirculation`; device scattering in history |
 | Attend / normalize participation | `Y_i=Σ_j a_ij U_ij V_j`, `a_ij=exp(s_ij)/Σ_k exp(s_ik)` on admitted contacts; a sigmoid is its binary restriction | `ratio::exponentiated::NormalizedKernel` forward, differential and pullback |
 | Differentiate/pull back | δ\|H'⟩=D𝓘_H δ\|H⟩; a covector acts through (D𝓘_H)* on the same material | `holon::law::HolonLaw::pullback`; `ratio::exponentiated::NormalizedKernel` pullback |
 | Generate | \|X(τ)⟩=𝓤_(Θ,K)^(τ←τ₀)(\|Ξ⟩;h), then ⟨r\|b_H(X(τ))⟩; the whole field evolves | `holon::law::HolonLaw::advance`; Lean `Foundation/Holon.ofEvolution`; the field law is rebuild step 4 |

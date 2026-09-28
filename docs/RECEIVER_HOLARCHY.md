@@ -128,7 +128,7 @@ a dissipation law (`Physics/{PortEnergyHeat,TwoCellEntropyTransport}`).
 
 <a id="the-reflection-algebra-shared-by-seam-and-swing"></a>
 
-### The reflection algebra shared by seam and Swing
+### The reflection algebra shared by seam and junction scattering
 
 [proved-derived] The graph projection `P_D` and its junction scattering `R_D = 2P_D − I` (a
 [half-turn about a subspace](ELEMENTARY_OBJECTS.md#the-swing): lossless, doing no work, of determinant
@@ -335,8 +335,9 @@ unavailable interior". The faces carry this geometry
 in #62):
 - [proved-derived; formal-checked: `HolonicAdjointNormalization.{bayes_logOdds_twoSwings, bayes_eq_face,
   bayes_eq_discrete_replicator}`] **Bayes is the quotient rule under refinement.** In the ratio's additive chart it is a translation:
-  `log(p′_i/p′_j) = log(p_i/p_j) + log(L_i/L_j)`, which is two Swings `S_b S_0` with
-  `b = ½ log(L_i/L_j)`, a chart identity. It is the softmax of `log p + log L`. The softmax ratio
+  `log(p′_i/p′_j) = log(p_i/p_j) + log(L_i/L_j)`, which is two half-turns `S_b S_0` with
+  `b = ½ log(L_i/L_j)`, a chart identity (the Lean name `bayes_logOdds_twoSwings` keeps the
+  half-turn's older name). It is the softmax of `log p + log L`. The softmax ratio
   family `r_ij` keeps every pair's ratio and forgets only the common origin, the evidence, which is a
   gauge (`Computation/HolonicAdjointNormalization.face_add_common`), and the discrete replicator
   over candidates. [agent-inferred] The same normalization is the attend row of the Holonic

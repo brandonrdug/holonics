@@ -1,4 +1,4 @@
-# From Swing and Holon interactions to Euler, stress and diffusion
+# From the half-turn and Holon interactions to Euler, stress and diffusion
 
 [project-postulate] This is the connected derivation requested by Brandon on September 14.
 The computational object, its interior, contact faces, nonlinear transport and changing
@@ -13,7 +13,8 @@ construction document, not another scheduler or a substitute for the HNN law.
 [established-bounded; source-inspected] Earlier work genuinely derived fluid relations.
 The September 5 MFR3 construction retained nonlinear Lamb current, pressure, stretching and
 cell flux. September 8 recovered complex Euler/NS and corrected low-order receiver closure.
-September 11–12 connected Hodge, source Swing, heat, spectral and arithmetic owners.
+September 11–12 connected Hodge, the source half-turn (then called the source Swing), heat,
+spectral and arithmetic owners.
 September 13 derived the actual finite-Galerkin Elsasser equations and dynamic interior return.
 Their source chain is retained in
 [fluid reflection](FLUID_REFLECTION_AND_CONCENTRATED_INTERIORS.md),
@@ -22,7 +23,7 @@ The lapse was leaving these operations in separate accounts instead of construct
 primitive → interaction → balance → constitutive law → receiver equation explicitly.
 
 [definition] Here “derive from the primitives” means exhibiting that chain and every operand.
-Swing and incidence determine reversible composition; energy, material response and boundary
+The half-turn and incidence determine reversible composition; energy, material response and boundary
 conditions select a physical fluid. Viscosity is a constitutive relation to derive from a
 specified interior or supply as measured material data. It does not follow from the algebraic
 identity that two reflections compose. The complete construction retains that relation so it
@@ -49,7 +50,7 @@ The physical state includes thermal/internal energy when mechanical energy is di
 | Pair / measure | Metric g, volume, Hodge star, adjoint δ=d†, specified receiver and units |
 | Transport | Pullback/pushforward, covariant derivative ∇, Lie derivative `L_u=d i_u+i_u d` |
 | Interact | Bilinear advection `B(v,w)=P[(v·∇)w]`; stress/current contraction on an actual face |
-| Turn / Swing | `S_b x=2b−x`; constituted graph reflection and its ordered compositions |
+| Half-turn / scattering | the half-turn `S_b x=2b−x`; the constituted graph scattering `2P_G−I` (a half-turn about the graph projection) and its ordered compositions |
 | Diffuse / react | Constitutive positive operator acting on an energy gradient; its heat return |
 | Restrict / reopen | A receiver q, reconstruction R, unresolved fibre r, and their rate equation |
 | Generate / emit | Evolve the coupled field, then apply its boundary/receiver map; an internal readout is another such face |
@@ -61,15 +62,18 @@ families: `E'(z)=E(z)`, `E(0)=1`, and the rotation kernel `i Θ_turn ℤ` with
 Lean's real/complex carriers express the mathematical laws; Rust realizations use exact
 expressions, rational/algebraic data or certified families as their operation requires.
 
-## 2. The constitutive contact equation is a Swing
+<a id="2-the-constitutive-contact-equation-is-a-swing"></a>
+
+## 2. The constitutive contact equation is junction scattering
 
 [proved-derived; formal-checked] Let `D:W→V`, `D†:V→W`, and let K⁻¹ solve
-`K=I+D D†` exactly. Define the graph projection and reflected current on `V⊕W`:
+`K=I+D D†` exactly. Define the graph projection and reflected current on `V⊕W`, with
+`S_a x=2a−x` the half-turn about `a` ([motion](ELEMENTARY_OBJECTS.md#the-swing)):
 
 ```text
 a = K⁻¹(u+D b),
 P_G(u,b) = (a,D†a),
-R_G(u,b) = 2P_G(u,b)−(u,b) = Swing_(P_G(u,b))(u,b).
+R_G(u,b) = 2P_G(u,b)−(u,b) = S_(P_G(u,b))(u,b).
 ```
 
 This is exactly the scattering equation `Kv=2(u+Db)`, `w=v−u`, `b'=D†v−b`, with `v=2a`
@@ -78,7 +82,9 @@ Indeed `K⁻¹(a+D D†a)=a`, so `P_G²=P_G`; linearity then gives
 `R_G²=4P_G²−4P_G+I=I`.
 [HolonicConstitutiveCirculation](../lean/Holonics/Computation/HolonicConstitutiveCirculation.lean)
 proves `graphProjection_idempotent`, `graphScattering_involutive`, and
-`graphScattering_eq_swing`, using the actual solve identity and the original Swing definition.
+`graphScattering_eq_swing`, using the actual solve identity and the half-turn's definition
+(`Geometry/AffineSwing`). This is junction scattering; with the energy adjoint (below) it is
+lossless, conserving the joint norm and doing no work.
 The algebraic proof allows a supplied transpose-like map; orthogonality additionally uses the
 actual energy adjoint, as in the following argument.
 
@@ -92,7 +98,7 @@ weighted pairing; an arbitrary oblique projector preserves an involution, not ev
 [proved-derived] Ordered moving reflections supply a rate-level connection. For a
 differentiable orthogonal involution R(t), differentiate `R²=I` to obtain
 `ṘR+RṘ=0`. Since R and Ṙ are self-adjoint, `Ω=ṘR` is skew-adjoint.
-The derivative of `R(t+h)R(t)` at h=0 is Ω: paired Swings therefore generate an
+The derivative of `R(t+h)R(t)` at h=0 is Ω: paired scatterings therefore generate an
 energy-preserving infinitesimal transport in the fixed metric. For a changing metric M(t),
 `d(xᵀMx/2)/dt=xᵀM ẋ+xᵀṀx/2`; the metric-work term remains.
 The existing [port-energy owner](../lean/Holonics/Physics/PortEnergyHeat.lean)
@@ -109,7 +115,7 @@ C_h=(I−hJ/2)⁻¹(I+hJ/2),          C_h†C_h=I.
 
 Adjunction reverses the factors; their commutation as functions of J proves the isometry.
 Use this C_h as the graph coupling D in §2. Then `K=2I`, and the actual scattering is
-`R_C(u₁,u₂)=(C_hu₂,C_h†u₁)`. Compose with the identity-graph Swing
+`R_C(u₁,u₂)=(C_hu₂,C_h†u₁)`. Compose with the identity graph's scattering
 `R_I(u₁,u₂)=(u₂,u₁)`:
 
 ```text
@@ -117,7 +123,7 @@ R_C R_I = diag(C_h,C_h†).
 ```
 
 `graphScattering_inversePair` and `paired_graphSwings_transport` prove the paired operator
-identity in the same formal owner. Thus two constituted Swings realize a Cayley advection
+identity in the same formal owner. Thus two constituted scatterings realize a Cayley advection
 step and its opposite transport on
 the paired interior/exterior carrier. This is an exact rational operator identity. C_h is
 an approximation to continuous frozen-field evolution, not an assertion that one finite
@@ -130,7 +136,7 @@ nonlinear law; its derivative includes those changing operands.
 `u=χ̇_t∘χ_t⁻¹`. An infinitesimal material variation η vanishing at the temporal endpoints
 obeys `div η=0` and `δu=∂tη+[u,η]`, with
 `[u,η]=∇_uη−∇_ηu`. This is the tangent law of composing the actual material transports;
-its finite contact realization can use the constituted Swings from §2.
+its finite contact realization can use the constituted scatterings from §2.
 
 [proved-derived] Vary the kinetic action `S=∫dt∫ρ|u|²/2` at constant density. Temporal
 and spatial integration by parts gives
@@ -147,7 +153,7 @@ rather than postulating the advection term. The actual advection operator is ske
 transported argument under incompressibility:
 `⟨v,∇_u w⟩+⟨∇_u v,w⟩=∫∂Ω(v·w)(u·n)=0` in the closed case.
 Its constituent contact/face law must realize that operator; the existence of a generic
-Swing does not identify a particular spatial advection law.
+half-turn does not identify a particular spatial advection law.
 
 
 [definition] On a fixed Euclidean control volume, let ρ be mass density, u velocity,
@@ -248,12 +254,12 @@ condition. A harmonic toroidal circulation can have zero local curl and divergen
 retaining a nonzero period around a cycle. Removing local pressure therefore does not erase
 its global period. The full nonlinear transport still determines the evolution of circulation.
 
-## 5. Swing separates the actual nonlinear fluid interaction
+## 5. The half-turn about the mean separates the actual nonlinear fluid interaction
 
 [definition] Use the existing finite-Galerkin vector field
 `N(u)=S_νu−B(u,u)`, with its actual Fourier convolution, Leray projection and carrier/aperture.
 In the normalized periodic chart, `S_νu_k=−νΘ_turn²|k|²u_k`.
-Write `u=b+r`; Swing about b sends it to `b−r`.
+Write `u=b+r`; the half-turn about b, `S_b u=2b−u`, sends it to `b−r`.
 
 [proved-derived; formal-checked] Bilinearity gives both equations, without discarding any
 mixed interaction:
@@ -271,14 +277,14 @@ trajectory has rate `2ḃ−N(u)`, so its defect from following the same fluid l
 N(2b−u)+N(u)−2ḃ = 2[N(b)−ḃ−B(u−b,u−b)].
 ```
 
-If `ḃ=N(b)`, the defect is `−2B(r,r)`. Affine Swing acts on a state; its rate pushforward
+If `ḃ=N(b)`, the defect is `−2B(r,r)`. The half-turn acts on a state; its rate pushforward
 is −I with the moving-anchor term, not another affine reflection of a velocity.
 [FluidReceiverClosure](../lean/Holonics/Physics/FluidReceiverClosure.lean)
 proves the two `swing_even/odd` identities and `moving_swing_galerkin_rate_defect`.
 These statements use the actual Galerkin operators, not a stand-in bilinear law.
 
 [established-bounded; source-inspected] The earlier
-[clocked nonlinear-source Swing](../lean/HolonicsResearch/Fluid/NavierStokesClockedPantographicSourceSwing.lean)
+[clocked nonlinear-source half-turn](../lean/HolonicsResearch/Fluid/NavierStokesClockedPantographicSourceSwing.lean)
 also telescopes oriented source differences along dyadically approaching times and retains
 their reconstruction fibre. Compact-interior continuity controls that source increment.
 A terminal-uniform estimate at a potential singular time is a distinct unclosed analytic
@@ -379,8 +385,8 @@ replace Q only together with their own energy and transport representation.
 [ Q̇ ] = [    0     ] + [ −A_Q     0  ] [ μ_Q ] − [ M μ_Q ].
 ```
 
-The middle operator is skew-adjoint; the last is dissipative. The contact Swing gives a
-reversible scattering realization of a constituted relation; this block gives its
+The middle operator is skew-adjoint; the last is dissipative. The contact's junction scattering
+gives a reversible realization of a constituted relation; this block gives its
 energy-exchange form once the physical advection port is specified. Equating an arbitrary
 contact graph with this particular fluid port still requires the stated realization map.
 The scattering law (`HolonicConstitutiveCirculation`) and
@@ -398,7 +404,7 @@ ḃ = −B(a,b)−B(b,a)+νΔ_Eb.
 ```
 
 This is the complex-bilinear Euler/NS law, with Euler obtained at ν=0. Conjugation
-`(a,b)→(a,−b)` is Swing about `(a,0)`. Projection to a loses the definite term B(b,b).
+`(a,b)→(a,−b)` is the half-turn about `(a,0)`. Projection to a loses the definite term B(b,b).
 Complex Fourier coefficients of a single real field instead obey
 `û(−k)=conj(û(k))`; they do not automatically introduce a second physical field b.
 
@@ -427,7 +433,7 @@ ż+ = −B(z−,z+) + ν+Δ_Ez+ + ν−Δ_Ez−,
 ż− = −B(z+,z−) + ν+Δ_Ez− + ν−Δ_Ez+.
 ```
 
-[proved-derived] The swap `(a,b)→(b,a)` is Swing at
+[proved-derived] The swap `(a,b)→(b,a)` is the half-turn about
 `((a+b)/2,(a+b)/2)`. Its common/difference eigensections are precisely the Elsasser
 coordinates. This joins the primitive involution to the conducting-fluid mode split;
 the interaction sign and the energy pairing select the actual physical equation.

@@ -6,8 +6,9 @@ interiors, predictive release and HNN. The requested singularity is a receiver-v
 concentration whose interior has dynamics at another scale. The physical source and its
 interior remain part of the construction. [THE_REBUILD](plans/THE_REBUILD.md) orders construction.
 
-[definition] The [Swing-to-fluid derivation](HOLONIC_FLUID_CONSTRUCTION.md) now joins these
-sources into one construction: constitutive graph reflection, material-action Euler, stress and
+[definition] The [fluid derivation](HOLONIC_FLUID_CONSTRUCTION.md), from the half-turn and Holon
+interactions, now joins these sources into one construction: constitutive graph scattering (a
+half-turn about the graph projection), material-action Euler, stress and
 relativistic projections, Hodge pressure elimination, microscopic feedback and boundary
 memory, then an energy-balanced internal-field stress/diffusion extension. It retains the
 complex-Euler/MHD sign distinction and the source-qualified Hodge/RH/BSD connections.

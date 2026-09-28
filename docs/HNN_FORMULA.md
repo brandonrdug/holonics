@@ -660,13 +660,16 @@ w = v − u,                 b_next = D* v − b.
 This couples exterior and interior currents; `D` is constitution, not a descriptor appended to a
 separate example. It is also a global instantaneous solve over the contact graph, which is action
 at a distance, so the HNN never takes it as its step (light record §8.1). The step 4 word below
-is local: the junction Swing about the participation anchor, one contact hop per tick. This
-global scattering survives in two roles only:
+is local: junction scattering about the participation anchor, a half-turn about it
+(`hnn::propagation::junction_scattering`, Lean
+`HNN/Propagation.{junctionScattering_involutive, junctionScattering_isometry}`), one contact hop per
+tick. This global scattering survives in two roles only:
 - as the overdamped continuum-limit reading of that local law (atlas `heat.telegraph-relaxation`);
 - as the prototype's history.
 
-[proved-derived; formal-checked] The scattering is the Swing
-`R_G x=2P_G x−x=Swing_(P_G x)(x)`, where
+[proved-derived; formal-checked] The scattering is the half-turn about the graph projection,
+`R_G x=2P_G x−x=S_(P_G x)(x)` with `S_a x=2a−x` ([motion](ELEMENTARY_OBJECTS.md#the-swing):
+lossless junction scattering, doing no work), where
 `P_G(u,b)=(A⁻¹(u+Db), D*A⁻¹(u+Db))` projects onto the constituted contact graph.
 `Computation/HolonicConstitutiveCirculation` proves the projection and involution from the solve
 identity; with the energy adjoint, orthogonality gives the conserved norm. The
@@ -699,14 +702,14 @@ flowchart LR
 
 ```text
 junction  v_r = (Y_r s_r + Σ_a G_a a_(r←a)) / (Y_r + Σ_a G_a),   G_a = κ_a Y_a,   κ_a = 2^(s_a), one exponent per contact
-          o_(r→a) = 2 v_r − a_(r←a)                                        the junction Swing
+          o_(r→a) = 2 v_r − a_(r←a)                                        junction scattering, the half-turn about v_r
 element   (I − ½K_r) s_r′ = (I + ½K_r) b_r + W_c,r c_r,   b_r = 2 v_r − s_r,   c_r = v_r − s_r,   K_r = W_s,r + Σ_ρ σ_ρ,r A_ρ,r
           (the contrast port drives inside the midpoint: Holon/Cayley.drive_balance; THE_REBUILD step 4 design)
 transit   the contact's midpoint two-port (C_a, K_a, D_a) on its channel, U_a = ι_(a,h) ι_(a,g)ᵀ
 receive   f_j = R[P_R^(τ_R) v_R(e_j)] at the receiving epochs, read at the receiver's grain
 ```
 
-- **Participation is the Swing's anchor.** The weights `G_a / (Y_r + Σ_a G_a)` are ring `r`'s
+- **Participation is the scattering's anchor.** The weights `G_a / (Y_r + Σ_a G_a)` are ring `r`'s
   normalized participation. With one exponent `β_a` per contact, the tick conserves the global
   power exactly when the elements are lossless.
 - **The score** `Q_a` is the pair quadrance of the two rings' screws. The current-space
@@ -884,7 +887,7 @@ softmax(a,b)_1 = σ(a − b).
 
 Normalization keeps the complete ratio family `r_ij`, one per two for every pair, and forgets
 only the common additive origin, which is a gauge. Bayes is this normalization of `log p + log L`: it translates every
-`log r_ij` by `log(L_i/L_j)`, which is two Swings, and the Laplacian return is the categorical
+`log r_ij` by `log(L_i/L_j)`, which is two half-turns, `S_b S_0` with `b = ½ log(L_i/L_j)`, and the Laplacian return is the categorical
 family's Fisher information. The receiving storage's mixture over candidates is the same update, the
 discrete replicator ([probability as a receiver geometry](RECEIVER_HOLARCHY.md#probability-is-a-receiver-geometry)). Its local return is a weighted graph
 Laplacian, and sigmoid is its two-member restriction. Neither needs sampling or a privileged
