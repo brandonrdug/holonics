@@ -100,6 +100,15 @@
 //! keeping every bound it released (144, 142 and 141 released ticks) and breaking no pledge. The
 //! pledged plan's capture ticks equal the unpledged plan's on every choosing seed.
 //!
+//! [measured] **The pledged plan, run once on a second fresh population** (the notebook's `hnn_chase
+//! fresh`, pinned before the run: 63 chased seeds of `20261201 + s`, `s < 64`): 618 capture ticks
+//! against the robust plan's 617 (regret 26 against 25), 6 won, 54 tied and 3 lost against it, every
+//! released bound kept (582 of 582). The adoption rule (strictly fewer in sum, more seeds won than
+//! lost) is not passed, so [`MachineChaser::new`] stays the robust plan. The loss is one uncertified
+//! opening tick (seed 20261203, a fibre of 40): the expected order, fewest members uncaptured within
+//! `m` and then the tick sum, took a move from which capture came at 13 where the cornering's came at
+//! the truth-only least, 2.
+//!
 //! [definition; proved-derived; agent-inferred] **What `Released` certifies: the pledge**
 //! (THE_REBUILD U4, the pledge's loop). Every plan decides through the same [`release_among`]: the
 //! commit in the plan's order, then the one law on the capture reading. A `Released` tick `t`

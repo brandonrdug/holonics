@@ -160,7 +160,8 @@ const FRESH_SEEDS: u64 = 64;
 /// plan (`receiver::population::chaser::Plan::Expected`, its release the machine's own continuation)
 /// at the machine's pinned `n`, `m` and `d`. On the choosing seeds at `n = 2, m = 12, d = 0` the
 /// robust plan summed 150 capture ticks, the certified-then-expected plan 148 and the pledged expected
-/// plan 147, each keeping every bound it released; the least sum chooses.
+/// plan 147, each keeping every bound it released; the least sum chooses. [measured] Run once on the
+/// fresh population: 618 against the robust plan's 617, so the adoption rule is not passed.
 const CANDIDATE_PLAN: Plan = Plan::Expected;
 
 /// The passage `2^8` ticks.

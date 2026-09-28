@@ -324,6 +324,19 @@ where one exists), `holarchy::terrain::{chase, pursuit}`, then the named operato
     F6's capture bullet as written); refused draws printed and entering no sum. The adoption rule:
     the candidate becomes `MachineChaser::new` exactly when its aggregate is strictly fewer than the
     robust machine's and it wins more seeds against it than it loses.
+  - *The run* (once; 63 chased seeds, one draw refused): the candidate sums 618 capture ticks
+    against the robust machine's 617 (regret 26 against 25), and wins 6, ties 54 and loses 3 against
+    it. **The adoption rule is not passed**; `MachineChaser::new` stays the robust plan, and `action
+    trace` on the 16 acceptance seeds is unchanged (164 capture ticks, 7 of 16 won against both
+    controls at once: F6's capture bullet still fails there). Every released bound was kept (581 and
+    582 ticks), no pledge broken. Against both controls at once the robust machine wins 28 of 63 and
+    the candidate 32, so on this population F6's capture bullet passes for the candidate alone.
+  - *The failure, by its measurement* (the next loop's subject): at an uncertified tick the expected
+    order (fewest members uncaptured within `m`, then the tick sum) loses 11 ticks on one seed
+    (20261203: 13 against the robust plan's 2, the truth-only least 2; neither machine certified
+    over the fibre of 40 at tick 0), more than it gains elsewhere (12 ticks on 6 seeds, less 1 on
+    each of two others). Owed in Lean (#62): the three-coordinate recursion is exact, and the pledged
+    plan keeps its bound.
 - **Known-truth game terrains** (Brandon, September 28;
   [record](../../research/records/2026-09-28_THE_OPTIMAL_POLICY_IS_THE_GEODESIC_NAVIGATOR_THE_CHASE_IS_RETROGRADE_ANALYSIS_AND_A_TEMPO_IS_A_MOBIUS_LOOP.md)),
   after the chase's next loop and before the fluid-cell terrain: the two-by-two cube's Cayley graph

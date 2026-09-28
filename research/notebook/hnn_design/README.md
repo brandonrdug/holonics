@@ -2373,3 +2373,45 @@ masked).
   and the pledges broken. **Reported separately, as a conditional reading, never as the
   acceptance**: the seeds whose truth-only least lies strictly below both controls, with each
   machine's win/tie/loss against both at once and its regret sum there.
+
+**The run** (once, on the pin: `fresh`, 179,384 ms at a 626,836 kB peak, within its projection).
+The terrain refuses 1 of the 64 draws (20261239 opens within capture), so 63 seeds are chased.
+
+| Over the 63 chased seeds | The machine (robust) | The candidate (pledged expected) | Pure pursuit | Constant bearing |
+|---|---|---|---|---|
+| Capture ticks in sum | **617** | 618 | 14,657 | 2,008 |
+| The sum of regrets to the truth-only least (`Σ L = 592`) | **25** | 26 | 14,065 | 1,416 |
+| Win/tie/loss against pure pursuit | 43/20/0 | 44/19/0 | | |
+| Win/tie/loss against constant bearing | 41/18/4 | 45/16/2 | | |
+| Win/tie/loss against both at once | 28/31/4 | 32/29/2 | | |
+| Releases: certified, commit, probe | 581, 33, 3 | 582, 31, 5 | | |
+| Released bounds kept, pledges broken | 581 of 581, 0 | 582 of 582, 0 | | |
+
+- **The candidate against the robust machine**: 6 won, 54 tied, 3 lost. It gains 12 ticks on 6
+  seeds (20261204 +1, 20261218 +2, 20261219 +2, 20261225 +3, 20261230 +2, 20261256 +2) and loses 13
+  on 3 (20261203 +11, 20261212 +1, 20261252 +1). **The adoption rule is not passed**: its aggregate
+  (618) is not strictly fewer than the robust machine's (617), though it wins more seeds against it
+  than it loses. `MachineChaser::new` stays the robust plan, so `action trace` is unchanged: it
+  agrees line for line with the previous commits' (354 lines, wall times masked), and the 16
+  acceptance seeds' reading stands (164 capture ticks, 7 of 16 won against both controls at once).
+- **The loss, read on the spent seeds after the run** (each machine's releases tick by tick). On
+  20261203 neither machine certifies at tick 0 (a fibre of 40, no move certified within `m = 12`),
+  and both commit uncertified. The robust plan's cornering takes `(6, 13)`, from which the fibre of 4
+  at tick 1 is certified within 1 and captured at tick 2, the truth-only least. The expected order
+  (fewest members uncaptured within `m`, then the tick sum) takes `(5, 13)`; at tick 1 it releases
+  `W = 12` over a fibre of 4 and keeps it exactly, capturing at 13. On 20261212 and 20261252 both
+  machines certify at tick 0 (bounds 12 and 12, then 10 and 11) and the expected order spends one
+  tick more.
+  **The failed gate, by its measurement**: at an uncertified tick the expected order loses 11 ticks
+  on one seed of 63, more than its net gain on the others.
+- **Every released bound kept**: 581 of 581 and 582 of 582, no pledge broken. The pledged plan's
+  release is a promise it keeps by construction and kept on every tick here.
+- **F6's action acceptance as written**, its capture bullet (strictly fewer ticks than both
+  controls in sum and strictly fewer than both on more than half of the seeds): on this population
+  it is not passed for the robust machine (28 of 63) and passed for the candidate (32 of 63). On the
+  pinned acceptance seeds it failed (7 of 16), and that failure stands as written. The switches are
+  not built, so F6's action acceptance as a whole is not passed.
+- **The conditional reading** (not the acceptance): 33 of the 63 seeds admit a win beyond both
+  controls; there the robust machine wins 28, ties 2 and loses 3 against both at once (regret 23),
+  and the candidate wins 32, ties 1 and loses 0 (regret 14).
+- Gates: `cargo check --workspace --all-targets`; `cargo test -p holonics --lib`, 876 passed.
