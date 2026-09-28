@@ -217,10 +217,13 @@ impl PendingRatio {
         targets: &[usize],
     ) -> Result<Scored, HnnError> {
         let ring = self.phases.ring();
+        let population = constitution
+            .population(ring)
+            .ok_or(HnnError::MissingReceivingMap { ring })?;
         constitution
             .mixture(ring)
             .ok_or(HnnError::MissingReceivingMap { ring })?
-            .score(ring, &against.faces, &against.trees, targets)
+            .score(population, ring, &against.faces, &against.trees, targets)
     }
 
     /// **The contemporary read against targets**: the wave's read ([`PendingRatio::read_charted`])

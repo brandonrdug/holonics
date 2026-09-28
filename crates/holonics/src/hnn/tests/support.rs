@@ -222,6 +222,8 @@ pub(super) struct Medium {
     pub(super) trees: Vec<Option<Landmarks>>,
     /// The receiver's mixture at its opening `β = 1` (ruling A).
     pub(super) mixtures: Vec<Option<Mixture>>,
+    /// The receiver's population at its opening (THE_REBUILD U1).
+    pub(super) populations: Vec<Option<crate::receiver::population::PortPopulation>>,
 }
 
 fn diagonal(n: usize, value: Rat) -> ExactRatMatrix {
@@ -336,6 +338,15 @@ impl Medium {
                                 .carrier,
                         )
                     })
+                })
+                .collect(),
+            populations: (0..widths.len())
+                .map(|g| {
+                    field
+                        .receivers()
+                        .iter()
+                        .any(|r| r.ring == g)
+                        .then(crate::hnn::receiving::receiving_population)
                 })
                 .collect(),
         }
@@ -498,6 +509,9 @@ impl ConstitutionRead for Medium {
     }
     fn mixture(&self, ring: usize) -> Option<&Mixture> {
         self.mixtures[ring].as_ref()
+    }
+    fn population(&self, ring: usize) -> Option<&crate::receiver::population::PortPopulation> {
+        self.populations[ring].as_ref()
     }
 }
 

@@ -91,6 +91,7 @@ use crate::ratio::linear::ExactRatMatrix;
 use crate::ratio::linear::inertia::SymmetricForm;
 use crate::ratio::linear::vector::lcm;
 use crate::ratio::{Rat, integer, rat};
+use crate::receiver::population::PortPopulation;
 
 // -------------------------------------------------------------------------------------------
 // the constitution's read face
@@ -132,6 +133,10 @@ pub trait ConstitutionRead: Sync {
     /// `hnn::receiving::Mixture`) on a receiving ring, which scores the window at compare; `None`
     /// elsewhere.
     fn mixture(&self, ring: usize) -> Option<&Mixture>;
+    /// **The receiver's population** over the tree's face and the combined face
+    /// (`hnn::receiving::receiving_population`, THE_REBUILD U1) on a receiving ring; `None`
+    /// elsewhere.
+    fn population(&self, ring: usize) -> Option<&PortPopulation>;
     /// **A contact's stiffness signature** (campaign 2, `hnn::contact`): the sign of each column of
     /// its stiffness factor, `K_a = b_a diag(σ) b_aᵀ`. `None`, every constitution of campaign 1, is
     /// every column positive (`K_a = b_a b_aᵀ ⪰ 0`).

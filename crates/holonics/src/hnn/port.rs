@@ -80,7 +80,7 @@ use crate::hnn::moment::Ingested;
 use crate::hnn::propagation::{PathAttenuation, TickBalance, scattering_about};
 use crate::hnn::ratio::{Faces, HolonRatio, RatioCovector};
 use crate::hnn::realization::{apply_rows, entries, indexed};
-use crate::hnn::receiving::{MixtureStep, ReceivingPhases};
+use crate::hnn::receiving::{ReceivingPhases, ReceivingStep};
 use crate::hnn::retention::AeonBoundary;
 use crate::hnn::word::Word;
 use crate::holon::HolonError;
@@ -210,6 +210,11 @@ pub enum ReceiptDetail {
         tree: Vec<crate::ratio::algebraic::ExactInterval>,
         tree_grain: Vec<crate::ratio::algebraic::ExactInterval>,
         model: Vec<crate::ratio::algebraic::ExactInterval>,
+        /// Each phase's code length under the receiver's population over the same two families
+        /// (`hnn::receiving::receiving_population`), and the mixture's certified drift before the
+        /// phase: THE_REBUILD U1's pinned comparison.
+        population: Vec<crate::ratio::algebraic::ExactInterval>,
+        drift: Vec<Rat>,
     },
     /// `deposit`: the applied reading and the re-read code length of the deposit's own targets at
     /// the successor (the first law's deposition term).
@@ -460,7 +465,7 @@ pub struct Deposit {
     linear: Vec<LinearStep>,
     factors: Vec<FactorStep>,
     landmarks: Vec<LandmarkStep>,
-    mixture: Vec<MixtureStep>,
+    receiving: Vec<ReceivingStep>,
     reached: Vec<Locus>,
 }
 
@@ -476,19 +481,19 @@ impl Deposit {
             linear,
             factors,
             landmarks: Vec::new(),
-            mixture: Vec::new(),
+            receiving: Vec::new(),
             reached,
         }
     }
 
-    /// The deposit with the receiver's mixture steps (ruling A).
-    pub(crate) fn with_mixture(self, mixture: Vec<MixtureStep>) -> Self {
-        Self { mixture, ..self }
+    /// The deposit with the receiving face's steps (ruling A; THE_REBUILD U1).
+    pub(crate) fn with_receiving(self, receiving: Vec<ReceivingStep>) -> Self {
+        Self { receiving, ..self }
     }
 
-    /// The receiver's mixture steps (ruling A), in cell order.
-    pub fn mixture(&self) -> &[MixtureStep] {
-        &self.mixture
+    /// The receiving face's steps (`hnn::receiving::ReceivingStep`), in cell order.
+    pub fn receiving(&self) -> &[ReceivingStep] {
+        &self.receiving
     }
 
     /// The deposit with the receiving parametron's landmark steps (the landmark tree).
@@ -555,12 +560,12 @@ impl Deposit {
                     + natural(step.class)
             })
             .sum();
-        let mixture: u64 = self
-            .mixture
+        let receiving: u64 = self
+            .receiving
             .iter()
-            .map(|step| bits(&step.tree) + bits(&step.combined) + bits(&step.residual))
+            .map(|step| bits(&step.tree) + bits(&step.combined.lower) + bits(&step.combined.upper))
             .sum();
-        linear + factors + landmarks + mixture
+        linear + factors + landmarks + receiving
     }
 }
 

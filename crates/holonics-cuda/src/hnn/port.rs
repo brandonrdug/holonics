@@ -832,6 +832,8 @@ impl<'c> Resident<'c> {
             tree: scored.tree,
             tree_grain,
             model: scored.model,
+            population: scored.population,
+            drift: scored.drift,
         };
         let steps = phases.junction_steps() as u64;
         let ticks = vec![steps; field.rings().len()];

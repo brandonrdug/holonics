@@ -28,7 +28,7 @@ use crate::hnn::receiving::{
     clock_letters, grain_logits, landmark_declaration, tree_code_length,
 };
 use crate::hnn::reference::{Reference, compose, one_hot};
-use crate::ratio::algebraic::log2_enclosure;
+use crate::ratio::algebraic::{ExactInterval, log2_enclosure};
 use crate::ratio::linear::ExactRatMatrix;
 use crate::ratio::{Rat, integer, rat};
 use crate::receiver::face::{GrainCell, grain_exponent};
@@ -300,7 +300,7 @@ fn the_compare_deposits_its_targets_on_their_own_addresses() {
         )
         .unwrap();
     let (_, deposit) = compose(&field, &theta, &pending, &back, &targets, &scored.steps).unwrap();
-    assert_eq!(deposit.mixture(), &scored.steps[..]);
+    assert_eq!(deposit.receiving(), &scored.steps[..]);
     let steps = deposit.landmarks();
     assert_eq!(steps.len(), 2);
     assert_eq!(
@@ -322,6 +322,16 @@ fn the_compare_deposits_its_targets_on_their_own_addresses() {
         .unwrap();
     let (next, reading) = theta.deposited(&deposit).unwrap();
     assert_eq!(reading.landmarks, 2);
+    let mut received = theta.population(2).unwrap().clone();
+    for step in &scored.steps {
+        received.receive(&step.faces()).unwrap();
+    }
+    assert_eq!(
+        next.population(2),
+        Some(&received),
+        "one step a phase, in cell order"
+    );
+    assert_eq!(received.cells(), 2);
     let tree = next.landmarks(2).unwrap();
     assert_eq!(tree.passed(), 2);
     let after = tree.face(&steps[1].address, 16).unwrap();
@@ -519,7 +529,10 @@ fn the_mixture_weighs_the_tree_against_the_combined_face() {
     let mut mixture = crate::hnn::receiving::Mixture::new(28);
     assert_eq!((mixture.beta(), mixture.weight()), (integer(1), rat(1, 2)));
     let targets = [1usize, 3];
-    let scored = mixture.score(2, &combined, &trees, &targets).unwrap();
+    let population = crate::hnn::receiving::receiving_population();
+    let scored = mixture
+        .score(&population, 2, &combined, &trees, &targets)
+        .unwrap();
     let code = |p: Rat| crate::compression::landmark::context::code_length(&p).unwrap();
     // Phase 0 at β = 1: q_T = 1/4, q_C = 1/8, q = 3/16.
     assert!(scored.model[0].lower <= code(rat(3, 16)).upper);
@@ -529,7 +542,22 @@ fn the_mixture_weighs_the_tree_against_the_combined_face() {
     // Phase 1 at β_1 = (1/4)/(1/8) = 2 (λ = 2/3): q_T = 1/4, q_C = 2/5, q = 3/10. The window's
     // product is (A + B)/2 = (1/16 + 1/20)/2 = 9/160; a weight left at β = 1 would read
     // 3/16 · 13/40 = 39/640.
-    let drift: Rat = scored.steps.iter().map(|step| step.residual.clone()).sum();
+    let drift = {
+        let mut stepped = mixture.clone();
+        for step in &scored.steps {
+            stepped.step(step).unwrap();
+        }
+        stepped.drift().clone()
+    };
+    // The receiver's population scores the same phases within the mixture's drift before each.
+    for ((model, weighed), pin) in scored
+        .model
+        .iter()
+        .zip(&scored.population)
+        .zip(&scored.drift)
+    {
+        assert!(model.lower <= &weighed.upper + pin && weighed.lower <= &model.upper + pin);
+    }
     let window = crate::hnn::reference::window_code_length(&scored.model).unwrap();
     let (ideal, stale) = (code(rat(9, 160)), code(rat(39, 640)));
     assert!(window.lower <= &ideal.upper + &drift && ideal.lower <= &window.upper + &drift);
@@ -540,16 +568,15 @@ fn the_mixture_weighs_the_tree_against_the_combined_face() {
     assert_eq!(scored.steps.len(), 2);
     assert!(scored.steps.iter().all(|step| step.ring == 2));
     for step in &scored.steps {
-        assert!(step.combined > Rat::zero() && step.residual >= Rat::zero());
+        assert!(step.combined.lower > Rat::zero() && step.combined.lower <= step.combined.upper);
     }
     let before = mixture.beta();
     for step in &scored.steps {
         mixture.step(step).unwrap();
     }
-    let exact: Rat = scored
-        .steps
-        .iter()
-        .fold(before, |beta, step| beta * &step.tree / &step.combined);
+    let exact: Rat = scored.steps.iter().fold(before, |beta, step| {
+        beta * &step.tree / &step.combined.lower
+    });
     // The charts' lower endpoints are rationals of many bits: β is rebased, within its drift.
     let drift = mixture.drift().clone();
     let log = mixture.log2_beta().unwrap();
@@ -559,11 +586,10 @@ fn the_mixture_weighs_the_tree_against_the_combined_face() {
     // An exact step keeps β exact: q_T = 3/4 against q̃_C = 1/2 multiplies it by 3/2.
     let mut exact_mixture = crate::hnn::receiving::Mixture::new(28);
     exact_mixture
-        .step(&crate::hnn::receiving::MixtureStep {
+        .step(&crate::hnn::receiving::ReceivingStep {
             ring: 2,
             tree: rat(3, 4),
-            combined: rat(1, 2),
-            residual: Rat::zero(),
+            combined: ExactInterval::point(rat(1, 2)),
         })
         .unwrap();
     assert_eq!(exact_mixture.beta(), rat(3, 2));
@@ -575,17 +601,111 @@ fn the_mixture_weighs_the_tree_against_the_combined_face() {
     // Past the carrier width the ratio is rebased to its W-bit mantissa, with 3·2^(−W) of drift.
     let mut narrow = crate::hnn::receiving::Mixture::new(4);
     narrow
-        .step(&crate::hnn::receiving::MixtureStep {
+        .step(&crate::hnn::receiving::ReceivingStep {
             ring: 2,
             tree: rat(17, 32),
-            combined: rat(1, 2),
-            residual: Rat::zero(),
+            combined: ExactInterval::point(rat(1, 2)),
         })
         .unwrap();
     assert_eq!(narrow.rebases(), 1);
     assert_eq!(narrow.drift(), &rat(3, 16));
     assert_eq!(narrow.beta(), integer(1));
-    assert!(mixture.score(2, &combined, &trees[..1], &targets).is_err());
+    assert!(
+        mixture
+            .score(&population, 2, &combined, &trees[..1], &targets)
+            .is_err()
+    );
+}
+
+/// **The receiver's population is the mixture, cell by cell** (THE_REBUILD U1's fixture identities;
+/// Lean `Compression/Landmark/Context/LocalWeighing.two_face_prior` at `π = ½`): on dyadic faces
+/// whose ratio fits the carrier (`β = 1, 3, 5/3, 7/9`, no rebase, no chart residual) the carried
+/// ratio's weight `λ = β/(1 + β)` and the population's weight of the tree are the same exact
+/// rational (`1/2, 3/4, 5/8, 7/16`), so are their faces of the received class (`1/2, 3/8, 5/8`)
+/// and the passage's product (`15/128 = ½ L_T + ½ L_C`), and each execution's code encloses the
+/// same exact code length. At an exactly zero combined face the population's family dies (its
+/// weight exactly zero, the tree's exactly one, the face the tree's) where the carried ratio has no
+/// death and refuses the step: neither takes a positive floor.
+#[test]
+fn the_receivers_population_is_the_mixture_cell_by_cell() {
+    use crate::compression::landmark::context::code_length;
+    use crate::hnn::receiving::{COMBINED, Mixture, ReceivingStep, TREE, receiving_population};
+    let step = |tree: Rat, combined: Rat| ReceivingStep {
+        ring: 2,
+        tree,
+        combined: ExactInterval::point(combined),
+    };
+    let steps = [
+        step(rat(3, 4), rat(1, 4)),
+        step(rat(5, 16), rat(9, 16)),
+        step(rat(7, 16), rat(15, 16)),
+    ];
+    let weights = [rat(1, 2), rat(3, 4), rat(5, 8), rat(7, 16)];
+    let faces = [rat(1, 2), rat(3, 8), rat(5, 8)];
+    let mut mixture = Mixture::new(28);
+    let mut population = receiving_population();
+    let mut product = Rat::one();
+    for (t, step) in steps.iter().enumerate() {
+        let lambda = mixture.weight();
+        assert_eq!(lambda, weights[t]);
+        assert_eq!(
+            population.weight(TREE).unwrap(),
+            ExactInterval::point(lambda.clone())
+        );
+        assert_eq!(
+            population.weight(COMBINED).unwrap(),
+            ExactInterval::point(Rat::one() - &lambda)
+        );
+        let q = &lambda * &step.tree + (Rat::one() - &lambda) * &step.combined.lower;
+        assert_eq!(q, faces[t]);
+        assert_eq!(
+            population.face_of(&step.faces()).unwrap(),
+            ExactInterval::point(q.clone())
+        );
+        let exact = code_length(&q).unwrap();
+        let weighed = population.code_of(&step.faces()).unwrap();
+        assert!(weighed.lower <= exact.lower && exact.upper <= weighed.upper);
+        product *= &q;
+        mixture.step(step).unwrap();
+        population.receive(&step.faces()).unwrap();
+    }
+    assert_eq!(mixture.weight(), weights[3]);
+    assert_eq!(
+        population.weight(TREE).unwrap(),
+        ExactInterval::point(weights[3].clone())
+    );
+    assert_eq!((mixture.rebases(), mixture.drift()), (0, &Rat::zero()));
+    assert_eq!(product, rat(15, 128));
+    let exact = code_length(&product).unwrap();
+    let code = population.code().unwrap();
+    assert!(code.lower <= exact.lower && exact.upper <= code.upper);
+    // log₂ β = L_C − L_T: β = 7/9 = (105/1024)/(135/1024).
+    assert_eq!(mixture.beta(), rat(7, 9));
+    // Death: the combined face gives the received class exactly zero.
+    let dying = step(rat(1, 2), Rat::zero());
+    assert!(
+        mixture.clone().step(&dying).is_err(),
+        "the carried ratio has no death"
+    );
+    assert_eq!(
+        population.face_of(&dying.faces()).unwrap(),
+        ExactInterval::point(rat(7, 32))
+    );
+    assert_eq!(population.receive(&dying.faces()).unwrap(), vec![COMBINED]);
+    assert_eq!(
+        population.weight(COMBINED).unwrap(),
+        ExactInterval::point(Rat::zero())
+    );
+    assert_eq!(
+        population.weight(TREE).unwrap(),
+        ExactInterval::point(Rat::one())
+    );
+    assert_eq!(
+        population
+            .face_of(&step(rat(3, 8), rat(1, 2)).faces())
+            .unwrap(),
+        ExactInterval::point(rat(3, 8))
+    );
 }
 
 /// **The mixture codes within one bit of the better face, and the tree is read in cell order**

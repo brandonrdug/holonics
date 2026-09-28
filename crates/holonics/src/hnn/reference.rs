@@ -175,7 +175,7 @@ use crate::hnn::propagation::{contact_exponent, path_attenuation};
 use crate::hnn::ratio::{Faces, HolonRatio, PhaseRatio, RatioCovector, target_phases};
 use crate::hnn::realization::{apply_rows, indexed, outer_rows};
 use crate::hnn::receiving::{
-    ActiveAddress, MixtureStep, ReceivingPhases, Scored, tree_code_length,
+    ActiveAddress, ReceivingPhases, ReceivingStep, Scored, tree_code_length,
 };
 use crate::hnn::retention::{AeonBoundary, Diamond, aeon_readings, collapse, contained, separator};
 use crate::hnn::word::{KeptWord, PowerForm, WordBalance};
@@ -1241,6 +1241,8 @@ impl ExecutionPort for Reference {
             tree: scored.tree,
             tree_grain,
             model: scored.model,
+            population: scored.population,
+            drift: scored.drift,
         };
         let steps = phases.junction_steps() as u64;
         let ticks = vec![steps; field.rings().len()];
@@ -1669,7 +1671,7 @@ pub fn compose(
     ratio: &PendingRatio,
     back: &WordReturn,
     targets: &[usize],
-    mixture: &[MixtureStep],
+    steps: &[ReceivingStep],
 ) -> Result<(Pullback, Deposit), HnnError> {
     use crate::ratio::linear::vector::{Chart, combination, integral};
     let phases = ratio.phases();
@@ -2028,8 +2030,8 @@ pub fn compose(
         pullback,
         Deposit::new(constitution.commit(), linear, factors, reached)
             .with_landmarks(landmarks)
-            .with_mixture(if retained(Locus::ReceivingMap(receiving)) {
-                mixture.to_vec()
+            .with_receiving(if retained(Locus::ReceivingMap(receiving)) {
+                steps.to_vec()
             } else {
                 Vec::new()
             }),
@@ -2403,6 +2405,9 @@ impl Cut {
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct Bits {
     pub model: ExactInterval,
+    /// The same targets' code under the receiver's population over the tree's and the combined
+    /// face (THE_REBUILD U1, `hnn::receiving::receiving_population`), beside the mixture's.
+    pub population: ExactInterval,
     pub tree: ExactInterval,
     pub tree_grain: ExactInterval,
     pub combined: ExactInterval,
@@ -2418,6 +2423,7 @@ impl Bits {
         let zero = ExactInterval::point(Rat::zero());
         Self {
             model: zero.clone(),
+            population: zero.clone(),
             tree: zero.clone(),
             tree_grain: zero.clone(),
             combined: zero.clone(),
@@ -2519,6 +2525,10 @@ pub struct Exposure {
     pub word: WordReport,
     /// The receiver's mixture at the end of the run (ruling A).
     pub mixture: Option<MixtureReport>,
+    /// The receiver's population at the end of the run (THE_REBUILD U1).
+    pub population: Option<PopulationReport>,
+    /// THE_REBUILD U1's pinned comparison of the two executions, cell by cell.
+    pub agreement: Agreement,
     /// The host's wall time by phase (exterior).
     pub wall: WallTimes,
     /// The exposure's own readings' wall time (exterior): the word balances and the census.
@@ -2535,6 +2545,70 @@ pub struct MixtureReport {
     pub width: u64,
     pub rebases: u64,
     pub drift: Rat,
+}
+
+/// [definition] **The receiver's population at the end of a run** (THE_REBUILD U1,
+/// `receiver::population::PortPopulation` over the tree `T` and the combined face `C` at ½/½): its
+/// code `−log₂(½ L_T + ½ L_C)` read once from the families' likelihoods (the telescope), each
+/// family's code alone, the cells received and its exact bits.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct PopulationReport {
+    pub code: ExactInterval,
+    pub tree: Option<ExactInterval>,
+    pub combined: Option<ExactInterval>,
+    pub cells: u64,
+    pub bits: u64,
+}
+
+/// [definition; agent-inferred] **THE_REBUILD U1's pinned comparison** of the receiving face's two
+/// executions on the same faces in the same order: at every scored phase, the distance between the
+/// mixture's code enclosure and the population's (zero where they meet) against the pin, the
+/// mixture's certified drift before the phase (Lean
+/// `Compression/Landmark/Context/Population.executed_face_within_population`: the true codes
+/// differ by at most `|Σ_(s<t) log₂ ρ_s|`, which the drift bounds, so the enclosures' distance does
+/// too). `within` counts the phases whose distance is at most their pin; `largest` is the largest
+/// distance with its phase's pin, and `pin` the largest pin read.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct Agreement {
+    pub cells: u64,
+    pub within: u64,
+    pub largest: Rat,
+    pub largest_pin: Rat,
+    pub pin: Rat,
+}
+
+impl Agreement {
+    fn open() -> Self {
+        Self {
+            cells: 0,
+            within: 0,
+            largest: Rat::zero(),
+            largest_pin: Rat::zero(),
+            pin: Rat::zero(),
+        }
+    }
+
+    /// One phase's two code enclosures against its pin.
+    fn read(&mut self, model: &ExactInterval, population: &ExactInterval, pin: &Rat) {
+        let gap = distance(model, population);
+        self.cells += 1;
+        self.within += u64::from(gap <= *pin);
+        if gap > self.largest {
+            self.largest = gap;
+            self.largest_pin = pin.clone();
+        }
+        if *pin > self.pin {
+            self.pin = pin.clone();
+        }
+    }
+}
+
+/// **The distance between two enclosures**: zero where they meet, else the gap between them.
+pub fn distance(a: &ExactInterval, b: &ExactInterval) -> Rat {
+    let zero = Rat::zero();
+    let left = &a.lower - &b.upper;
+    let right = &b.lower - &a.upper;
+    left.max(right).max(zero)
 }
 
 /// [definition] **One aeon's leg of the receiving face's course** (ruling A): the cell at which it
@@ -2871,6 +2945,7 @@ where
     let mut aeons = Vec::new();
     let mut course = Vec::new();
     let mut leg = Leg::open();
+    let mut agreement = Agreement::open();
     let mut readout = ReadoutWall::default();
     let started = Instant::now();
     let contacts = site_readings(field, resident.constitution())?;
@@ -2951,13 +3026,21 @@ where
             // and its face at the grain (ruling A, the landmark tree): the compare's readings, each
             // phase at the standing after the window's earlier phases, before the deposit and the
             // window's ingest; the combined face's are the Holon ratio's.
-            let (tree, tree_grain, model) = match &compared.receipt.detail {
+            let (tree, tree_grain, model, weighed, pins) = match &compared.receipt.detail {
                 ReceiptDetail::Compare {
                     tree,
                     tree_grain,
                     model,
+                    population,
+                    drift,
                     ..
-                } => (tree.clone(), tree_grain.clone(), model.clone()),
+                } => (
+                    tree.clone(),
+                    tree_grain.clone(),
+                    model.clone(),
+                    population.clone(),
+                    drift.clone(),
+                ),
                 _ => {
                     return Err(HnnError::Shape {
                         what: "a compare's receipt with the tree face and the mixture",
@@ -2966,21 +3049,25 @@ where
                     });
                 }
             };
-            for (offset, ((((phase, tree), grained), model), &code)) in holon
+            for (offset, ((((((phase, tree), grained), model), weighed), pin), &code)) in holon
                 .phases()
                 .iter()
                 .zip(&tree)
                 .zip(&tree_grain)
                 .zip(&model)
+                .zip(&weighed)
+                .zip(&pins)
                 .zip(window)
                 .enumerate()
             {
+                agreement.read(model, weighed, pin);
                 let bits = if cut.held_out(position + offset) {
                     &mut held_out
                 } else {
                     &mut training
                 };
                 bits.model = interval_sum(&bits.model, model)?;
+                bits.population = interval_sum(&bits.population, weighed)?;
                 bits.tree = interval_sum(&bits.tree, tree)?;
                 bits.tree_grain = interval_sum(&bits.tree_grain, grained)?;
                 bits.combined = interval_sum(&bits.combined, &phase.code_length)?;
@@ -3137,6 +3224,25 @@ where
                 })
             })
             .transpose()?,
+        population: resident
+            .constitution()
+            .population(phases.ring())
+            .map(|population| {
+                let refusal = crate::hnn::receiving::population_refusal;
+                Ok::<_, HnnError>(PopulationReport {
+                    code: population.code().map_err(refusal)?,
+                    tree: population
+                        .family_code(crate::hnn::receiving::TREE)
+                        .map_err(refusal)?,
+                    combined: population
+                        .family_code(crate::hnn::receiving::COMBINED)
+                        .map_err(refusal)?,
+                    cells: population.cells(),
+                    bits: population.bits(),
+                })
+            })
+            .transpose()?,
+        agreement,
     })
 }
 

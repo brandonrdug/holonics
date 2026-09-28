@@ -94,6 +94,9 @@ impl ConstitutionRead for Declared {
     fn mixture(&self, ring: usize) -> Option<&Mixture> {
         self.medium.mixture(ring)
     }
+    fn population(&self, ring: usize) -> Option<&crate::receiver::population::PortPopulation> {
+        self.medium.population(ring)
+    }
     fn contact_stiffness_signature(&self, contact: usize) -> Option<&[bool]> {
         self.signatures[contact].as_deref()
     }

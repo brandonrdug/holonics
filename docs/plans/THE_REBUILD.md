@@ -267,6 +267,46 @@ It consumes U2's and U3's contracts.
   population code is strictly shorter than without it and its complete work fits the declared
   response and passage budgets (the gate below).
 - **Failure.** The separating term is named, and the two mixtures stay, recorded.
+- **First loop, September 28: the pins** (committed before any standing-cut run; Refs #73 #63).
+  - *The owner.* `receiver::population::port::PortPopulation`, the population at a port: the
+    families' faces are the machine's readings, so it carries only the priors and each family's
+    likelihood, and reads its face, weights, code and deaths through `Population`'s own telescope
+    and outward bounds (one helper, `weigh`). *The family contract* is an enclosure: a face in
+    `ℚ(θ)` enters as its exact enclosure `[lo, hi]` (a point where rational), the likelihood is
+    carried between the endpoints' products, and zero is exact death (Lean
+    `Population.population_mixture_enclosed`). The receiver's population
+    (`hnn::receiving::receiving_population`) holds the tree `T` and the combined face `C` at one
+    bit each, `π = ½/½`, and receives each phase's two faces in cell order, deposits inside a
+    window included (`ReceivingStep`); the tree's one update stays the constitution's landmark
+    deposit, and the covector, the phase comparison and the wave's deposition are untouched.
+  - *The consumer equation.* The population's face `q^P_t(x) = (L_T q_T(x) + L_C q_C(x))/(L_T + L_C)`
+    is `two_face_prior` at `π = ½`. The mixture's executed face is `(β̂_t q_T + q_C)/(1 + β̂_t)`, with
+    `β̂_(t+1) = β̂_t q_T(x_t)/(q_C(x_t) ρ_t)` and `ρ_t = lo_t/(q_C(x_t)(1 − r_t))` (the chart and the
+    rebase), so `β̂_t = β_t/∏_(s<t) ρ_s`.
+  - *The bound, derived and proved* (Lean `Population.{executed_face_within_population,
+    executed_mixture_within_population}`, over `two_face_skew` and `execRatio_eq`): at every cell
+    `|log₂ q̂_t(x_t) − log₂ q^P_t(x_t)| ≤ |Σ_(s<t) log₂ ρ_s| ≤ D_t`, and over the passage
+    `|log₂ ∏_t q̂_t − log₂(½ L_T + ½ L_C)| ≤ Σ_t |log₂ ρ_t| ≤ D_n`, where `D_t` is the mixture's
+    certified drift before cell `t`: `Σ_(s<t) ⌈(hi_s − lo_s)/lo_s · 3/2⌉_(2^(−128))` plus `3·2^(−W)`
+    a rebase. Enclosures containing the true codes are then at most `D_t` apart.
+  - *The acceptance, pinned for the standing cut, host and card* (`hnn_exposure`, both executions on
+    the same faces in the same compare, `hnn::reference::Agreement`): (i) at every scored phase the
+    two code enclosures lie within distance `D_t`; (ii) the mixture's summed code and the
+    population's telescope `−log₂(½ L_T + ½ L_C)` lie within `D_n`; (iii) the population's summed
+    per-cell codes meet its own telescope. Campaign 1's receipt sets the scale, not the pin:
+    `D_n = 5844186179759863429570124736444603/2^126` bits at `W = 28` with 6,147 rebases.
+  - *The fixture identities* (`the_receivers_population_is_the_mixture_cell_by_cell`,
+    `receiver::population::port_tests`). On dyadic faces that fit the carrier, `β = 1, 3, 5/3, 7/9`,
+    the two executions give the same exact weight of the tree (`1/2, 3/4, 5/8, 7/16`), the same exact
+    face of the received class (`1/2, 3/8, 5/8`) and the same product (`15/128 = ½ L_T + ½ L_C`), and
+    each code encloses the same exact code length. At an exactly zero combined face the
+    population's family dies, with weight exactly zero and the tree's exactly one; the carried ratio
+    has no death and refuses the step. The population at a port equals `Population` over families
+    carrying the same faces, enclosure for enclosure.
+  - *Projection.* Campaign 1's standing-cut exposure took 399,911 ms on the host and 353,499 ms on
+    the card. The population adds one code and one receipt over two families per phase. The public
+    control's first 512 windows took 38,514 ms at a 332,091,392-byte peak. Each run is projected
+    within ten minutes and within 4 GiB, and is stopped past that.
 
 #### U4. Motion running
 
