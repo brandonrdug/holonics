@@ -8,7 +8,9 @@ measured and found adding no bits
 ([campaign 2](2026-09-26_CAMPAIGN_TWO_THE_RINGS_AND_CONTACTS_ARE_LAWFUL_AND_ADD_NO_BITS_ON_TEXT.md)),
 but proposal dynamics for the search for keys. This record fixes the claim, the bank, the work
 unit, the controls, the seeds and the criteria before the measured run. The harness is
-`research/notebook/hnn_design/hnn_ring_search.rs`; its header states every declaration below.
+`research/notebook/hnn_design/hnn_ring_search.rs`; its header states every declaration below. The
+harness and its driver `hnn::ring::PumpedRing` were retired after the run, as nothing else consumed
+them; both are at commit `10a837fd`, where the commands below reproduce the run.
 
 ## 1. The claim
 
