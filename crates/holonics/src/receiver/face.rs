@@ -8,8 +8,7 @@
 //!   every effort and draws no power (`Holon/Law.passiveCoholon`,
 //!   `Holon/Law.passiveCoholon_isDirac`). Its linear reading `C e` is
 //!   `Holon/Law.passive_reading`; any reading of its bond, linear or not, draws zero power
-//!   (`Holon/Law.coholon_reading_power`). [`LinearReading`] and
-//!   [`crate::receiver::standing::ReceiverReading`] are this object with a declared name.
+//!   (`Holon/Law.coholon_reading_power`). [`LinearReading`] is this object with a declared name.
 //! * **An active receiver** ([`ActiveReceiver`]): a receiver that returns something into the Holon
 //!   it reads, entering with its actual power term ([`ReceiverPower`]). Joined through an interface
 //!   conductance it satisfies `Holon/Law.active_receiver_law` ([`crate::holon::law::active_receiver`]);

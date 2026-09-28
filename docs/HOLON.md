@@ -383,7 +383,7 @@ every elementary carrier.
 | Conservation/dissipation | A supplied law accounts for flux, storage and heat | `BoundaryHolon`, `Holon/Law`; `holonics::holon::law::EnergyBalance` |
 | Information and measure | Declared measures yield entropy/loss; oriented current precedes scalar readings | `InformationDifference`, `ReceiverCodeCost`; `holonics::ratio::surprisal` |
 | Scale and locality | Restriction/prolongation and boundary summaries relate grains and local clocks | `WorldTube`, `ContinuingTower`; `holonics::holon::restriction` |
-| Continuing computation | Executable state, factors and live comparisons suffice where their law closes | `Foundation/Standing`; `holonics::receiver::standing`; the field is rebuild step 4 |
+| Continuing computation | Executable state, factors and live comparisons suffice where their law closes | `Foundation/Standing`, certified by each collapse through its own carrier ([the retention contract](ELEMENTARY_OBJECTS.md#the-retention-contract)); the field is rebuild step 4 |
 
 [definition] The operations these characteristics become are defined in the
 [operator contract](ELEMENTARY_OBJECTS.md#operator-contract), which gives each operation's current

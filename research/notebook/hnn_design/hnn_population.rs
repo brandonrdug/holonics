@@ -18,6 +18,7 @@
 //! cargo run --release -p holonics --example hnn_population -- evolution
 //! cargo run --release -p holonics --example hnn_population -- species
 //! cargo run --release -p holonics --example hnn_population -- curated .local/cuts/curated-cut.bin .local/cuts/curated-flat-cut.bin
+//! cargo run --release -p holonics --example hnn_population -- f0-census .local/cuts/curated-f4-passage-cut.bin
 //! ```
 //!
 //! [definition; agent-inferred] **The declared population.** On each terrain the receiver declares
@@ -77,6 +78,9 @@ mod evolution;
 
 #[path = "hnn_population_curated.rs"]
 mod curated;
+
+#[path = "hnn_population_census.rs"]
+mod census;
 
 use std::time::Instant;
 
@@ -1325,6 +1329,7 @@ fn main() {
         ["f0-egg", curated_cut, flat_cut] => {
             curated::harness(curated_cut, flat_cut, curated::Reach::F0Egg);
         }
+        ["f0-census", curated_cut] => census::standing_census(curated_cut),
         ["f5-native", choosing_cut, request, seed, private_output] => {
             curated::native_probe(choosing_cut, request, seed, private_output, false);
         }
@@ -1358,7 +1363,7 @@ fn main() {
             curated::checkpoint_restore(choosing_cut, checkpoint_path);
         }
         _ => println!(
-            "usage: hnn_population -- tree <d> | moire parity | moire sheets | crib | switching | standing <cut> | composition [products | primes] | evolution | species | curated <curated-cut> <flat-cut> [development | merges] | f4 <joined-cut> <joined-flat-cut> | f0-egg <joined-cut> <joined-flat-cut> | f5-native <choosing-cut> <private-request> <private-seed> <private-output> | f5-family <choosing-cut> <private-request> <private-seed> <private-output> | f5-family-verify <choosing-cut> <private-request> <private-seed> <private-output> | f5-bundle <choosing-cut> <private-F5R1-bundle> <owner-only-output-dir> [limit 1..32] | f5-checkpoint-census <choosing-cut> | f5-checkpoint-restore <choosing-cut> <.local/cuts/private-checkpoint>"
+            "usage: hnn_population -- tree <d> | moire parity | moire sheets | crib | switching | standing <cut> | composition [products | primes] | evolution | species | curated <curated-cut> <flat-cut> [development | merges] | f4 <joined-cut> <joined-flat-cut> | f0-egg <joined-cut> <joined-flat-cut> | f0-census <joined-cut> | f5-native <choosing-cut> <private-request> <private-seed> <private-output> | f5-family <choosing-cut> <private-request> <private-seed> <private-output> | f5-family-verify <choosing-cut> <private-request> <private-seed> <private-output> | f5-bundle <choosing-cut> <private-F5R1-bundle> <owner-only-output-dir> [limit 1..32] | f5-checkpoint-census <choosing-cut> | f5-checkpoint-restore <choosing-cut> <.local/cuts/private-checkpoint>"
         ),
     }
 }

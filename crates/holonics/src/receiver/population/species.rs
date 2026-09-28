@@ -18,9 +18,9 @@
 //!   class it emits), sufficient for every future passage;
 //! - a key space with neither declares no check, and its family does not collapse.
 //!
-//! The kernel of the linear face map (`compression::FaceMap`) is the same quotient where the family
-//! is linear; the key families here are not (a sheet is a threshold of a phase), so their check is
-//! the exact word.
+//! The kernel of the linear face map (Lean `Compression/Core/FaceMap`) is the same quotient where the
+//! family is linear; the key families here are not (a sheet is a threshold of a phase), so their
+//! check is the exact word.
 //!
 //! [proved-derived; formal-checked] **The collapse changes no code for the admitted future.** One
 //! member a species, carrying the summed posterior `W_s = Σ_(σ k = s) w_k` (a survivor family's:
@@ -33,6 +33,16 @@
 //! future a member's posterior is its species' times its prior share), so a wider admitted future
 //! can collapse again and split what the narrower one merged. A species dies whole: its members agree
 //! on every admitted tick, so a split restores exactly the members still alive.
+//!
+//! [proved-derived; formal-checked] **Its place in the retention contract**
+//! ([objects §8](../../../../../docs/ELEMENTARY_OBJECTS.md#the-retention-contract), which owns the
+//! contract; U2). The collapse is the standing law's instance through the keys' exact signatures:
+//! Lean `Context/Evolution.species_collapse_standing` proves that the retention `(t, W)`, the tick and
+//! each species' summed weight, is a `Foundation/Standing.StandingLaw` of the key family for every
+//! cell word (a cell past the admitted future refused), reopened by the collapsed family. Every word
+//! a release commits is a cell word, so the future is action-sufficient. Its recoverability
+//! condition holds by construction: the receipt keeps every member's seed and share, and a split
+//! restores them (`species_split`).
 //!
 //! [definition; agent-inferred] **Within a composed egg** (`Composed`) the keystone's surviving
 //! keys are one species when their conditioned families are certain over the admitted future with one

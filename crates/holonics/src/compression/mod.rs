@@ -4,14 +4,8 @@
 //! ([the line](../../../../docs/THE_MACHINE.md#the-line-the-rebuild-serves)). Terrain is
 //! whatever is present for a navigator to meet; Holonic Compression couples a navigator's
 //! resonating modes with it, and a compression is a codec pivot carrying its decoder. The law is
-//! stated in Lean `Compression/Core` and realized here in four parts:
+//! stated in Lean `Compression/Core` and realized here in three parts:
 //!
-//! - [`face_map`]: the face map `F x (ρ, w) = ρ(T_w x)` of a navigator family against terrain and
-//!   an admitted receiver family. Its **kernel** is the relevance kernel, computed by the
-//!   blind-subspace recursion and stable by horizon `dim X − 1`; the kernel quotient is
-//!   **retention**, the coarsest lawful retention, and the navigators run on it. Its **cokernel**
-//!   is the residual the navigators' image does not reach on a declared request set, relative to
-//!   that set's horizon; a face is reachable exactly when its cokernel class is zero.
 //! - [`resonance`]: the unique `C`-orthogonal split of a drive against a constitution's modes at
 //!   `λ = ω²` into the resonating part (RIDE: zero effort, the exchange law) and the emanating part
 //!   (FOUND: nonzero effort, whose work form `λ S_C(e) − S_K(e)` is exact over ℚ and can be zero).
@@ -22,16 +16,16 @@
 //!   loop-closure map over the boundary images at the menu's ports; each added loop only shrinks
 //!   it, and the key is located only up to the machine's gauge.
 //!
+//! The face map `F x (ρ, w) = ρ(T_w x)` of a navigator family against terrain and an admitted
+//! receiver family is Lean's (`Compression/Core/FaceMap`): its **kernel** is the relevance kernel,
+//! stable by horizon `dim X − 1`, whose quotient is **retention**, the coarsest lawful retention;
+//! its **cokernel** is the residual on a declared request set, relative to that set's horizon. Its
+//! dense Rust realization (`compression::face_map`, at commit `1bdacc8f`) was retired at U2: no
+//! collapse is linear, and each certifies the standing law through its own carrier (the
+//! [retention contract](../../../../docs/ELEMENTARY_OBJECTS.md#the-retention-contract)).
+//!
 //! | Lean `Compression/Core` | Rust |
 //! |---|---|
-//! | `FaceMap.faceMap`, `causalSignature_eq_faceMap` | [`FaceMap`] |
-//! | `FaceMap.horizonBlind`, `mem_horizonBlind_iff`, `horizonBlind_stable_forever`, `ker_faceMap_eq_iInf_horizonBlind`, `exists_stable_le_finrank_pred`, `Shift.horizon_sharp` | [`FaceMap::new`], [`FaceMap::blind`], [`FaceMap::stable_at`] |
-//! | `FaceMap.ker_faceMap_eq_relevanceKernel`, `horizonBlind_finrank_pred_eq_ker`, `horizonBlind_eq_ker_of_le` | [`FaceMap::kernel`] |
-//! | `FaceMap.kernelQuotient_is_coarsest_retention`, `kernelQuotient_eq_iff_futureAgreement`, `kernelReceiverQuotient` | [`FaceMap::quotient`], [`Retention`] |
-//! | `FaceMap.ker_faceMap_invariant`, `descendedNavigator`, `kernelHistoryCompression`, `kernelClass_after_word` | [`Retention::navigator`], [`Retention::transport_word`], [`Retention::face`] |
-//! | `FaceMap.horizonFaceMap`, `ker_horizonFaceMap`, `ker_horizonFaceMap_finrank_pred_eq_relevanceKernel`, `rank_nullity_ledger`, `finrank_faces`, `cokernel_ledger` | [`FaceMap::at_horizon`], [`FiniteFaceMap::ledger`], [`FaceLedger`] |
-//! | `FaceMap.exact_sequence`, `reachable_iff_cokernelClass_zero`, `reachable_iff_cocycles_vanish` | [`FiniteFaceMap::cokernel`], [`Cokernel`], [`FiniteFaceMap::reachable`] |
-//! | `FaceMap.Ramp.*` | `face_map` tests |
 //! | `Resonance.modeSpace`, `emanationSpace`, `split_exists_unique`, `split_orthogonal` | [`resonance_split`], [`ResonanceSplit`] |
 //! | `Resonance.effort_split`, `emanating_effort_eq_zero_iff`, `reactive_split` | [`ResonanceSplit::effort_amplitude`], [`ResonanceSplit::rides`], [`ResonanceSplit::work`] |
 //! | `Resonance.holdingEffort_newton`, `hasDerivAt_modeEnergy`, `work_ledger`, `resonant_drive_rides`, `emanating_drive_needs_effort`, `founded_mode_energy_pos`, `clamp_witness`, `work_witness` | `resonance` tests, at rational clock phases |
@@ -47,10 +41,8 @@
 //! | `Keys.Machine.*`, `Machine.rotorGauge` | [`ReflectorMachine`], [`ReflectorMachine::gauge`], `keys` tests |
 //! | `HNN/Keys.propagation_eq_edge_fibre` | [`Edge`], [`Menu::propagate`], [`Propagation`] |
 //!
-//! [definition; agent-inferred] Where this owner departs from the Lean it says so: [`FaceMap`]
-//! admits receivers of different face extents (Lean's face space `#requests · dim V` is the
-//! uniform case), and [`Gauge::new`] checks covariance at declared keys, where Lean's `Gauge`
-//! carries it for every key. The Perron navigator's code of a walk (`Cost.perron_walk_code_length`,
+//! [definition; agent-inferred] Where this owner departs from the Lean it says so: [`Gauge::new`]
+//! checks covariance at declared keys, where Lean's `Gauge` carries it for every key. The Perron navigator's code of a walk (`Cost.perron_walk_code_length`,
 //! `two_regular_perron_code`) and the two-candidate posterior reading
 //! (`Cost.posterior_prefers_iff_pays_off`) have no Rust consumer here; the pay-off is the integer
 //! comparison of two codes.
@@ -62,7 +54,6 @@
 //! and gauge.
 
 pub mod cost;
-pub mod face_map;
 pub mod keys;
 pub mod landmark;
 pub mod resonance;
@@ -70,7 +61,6 @@ pub mod resonance;
 pub use cost::{
     Alphabet, CodecFamily, CodecPivot, CompressionCost, NavigatorCodec, PivotForm, literal_bits,
 };
-pub use face_map::{Cokernel, FaceLedger, FaceMap, FiniteFaceMap, Request, Retention};
 pub use keys::{Candidate, Edge, Gauge, Loop, Menu, PortImages, Propagation, ReflectorMachine};
 pub use resonance::{ResonanceSplit, resonance_split};
 
@@ -79,7 +69,6 @@ use thiserror::Error;
 use crate::holon::contact::menu::MenuError;
 use crate::holon::parametron::ParametronError;
 use crate::ratio::linear::ExactLinearError;
-use crate::receiver::standing::StandingRefusal;
 
 /// Every refusal of a compression law. Bad input is a typed return, never a panic.
 #[derive(Debug, Error, PartialEq)]
@@ -87,23 +76,15 @@ pub enum CompressionError {
     #[error(transparent)]
     Linear(#[from] ExactLinearError),
     #[error(transparent)]
-    Standing(#[from] StandingRefusal),
-    #[error(transparent)]
     Parametron(#[from] ParametronError),
     #[error(transparent)]
     Menu(#[from] MenuError),
-    #[error("a face map needs at least one admitted receiver")]
-    EmptyReceiverFamily,
     #[error("{what}: expected extent {expected}, found {found}")]
     Extent {
         what: &'static str,
         expected: usize,
         found: usize,
     },
-    #[error("the relevance kernel is not carried by navigator {navigator}")]
-    KernelNotInvariant { navigator: usize },
-    #[error("receiver {receiver} does not factor through the kernel quotient")]
-    ReceiverNotFactored { receiver: usize },
     #[error("the capacity is singular: a node without capacitance admits no unique split")]
     SingularCapacity,
     #[error("the codec does not regenerate its material of length {length}")]

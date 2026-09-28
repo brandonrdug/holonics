@@ -10,11 +10,14 @@
 //! - [`face`]: the passive coholon, the active receiver with its power, and the exact faces a
 //!   reading returns (width, horizon, relation rung);
 //! - [`release`]: width over a compatible family, and release at a declared tolerance;
-//! - [`standing`]: standing as the future-sufficient retention quotient, memory and extinction;
 //! - [`population`]: the egg population, a receiver's Bayesian mixture over declared navigator
 //!   families (the discrete replicator), each family's death at zero likelihood, and survivor
 //!   filtering over a terrain's key spaces;
 //! - [`causal_chord`]: the exact transfer object `C(sI − A)⁻¹B` of a linearization and its poles.
+//!
+//! [definition; agent-inferred, U2] Retention (the standing law, Lean `Foundation/Standing`) has no
+//! owner here: each collapse certifies it through its own carrier (the [retention
+//! contract](../../../../docs/ELEMENTARY_OBJECTS.md#the-retention-contract)).
 //!
 //! Lean: `Holarchy/{Reception,Receipt}`, `Foundation/{Receiver,ReceiverRelease,Standing,CausalChord}`,
 //! `Holon/Law`, `Compression/Landmark/Context/Population`.
@@ -25,4 +28,3 @@ pub mod population;
 pub mod receipt;
 pub mod reception;
 pub mod release;
-pub mod standing;

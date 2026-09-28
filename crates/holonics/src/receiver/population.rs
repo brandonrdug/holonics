@@ -58,7 +58,7 @@
 //!
 //! [definition; agent-inferred] **The owner.** The population is the receiver's: a receiver reads a
 //! passage and weighs the navigator families it admits by their faces of it, so its owner is
-//! `receiver::population`, beside `receiver::standing` (a standing is what one family retains; a
+//! `receiver::population` (a standing, Lean `Foundation/Standing`, is what one family retains; a
 //! population is what the receiver retains over its families: each family's retained state and its
 //! likelihood, never a record of the cells). The families it declares ([`families`]) read their
 //! key spaces from the terrain's own declarations (`holarchy::terrain::MoireFamily`, the field's

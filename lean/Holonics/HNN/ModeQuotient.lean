@@ -6,7 +6,10 @@ import Holonics.Compression.Core.FaceMap
 [definition] Campaign 3, first construction (#73; `docs/plans/THE_REBUILD.md`, "Campaign 3"). A
 loaded ring at a fixed publication (Decision 38, `HNN/Ring`) ticks, under the exact law, as one
 linear system per pump phase: its word-local state `x = (u, w)` moves by `x′ = T_t x + B_t e` and
-returns `s′ = ρ_t x + D_t e`, the phase `t mod P`. The Rust owner is `holonics::hnn::modes`.
+returns `s′ = ρ_t x + D_t e`, the phase `t mod P`. Its Rust realization (`holonics::hnn::modes`, at
+commit `1bdacc8f`) was retired at U2: the word-local state it quotients leaves at every word's end,
+so the aeon's retention contract has nothing of it to collapse. The laws only that realization
+checked (the descended chord, the later-phase witness) are in `docs/HNN_FORMULA.md` §4.
 
 [proved-derived; formal-checked] What is proved.
 

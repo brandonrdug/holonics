@@ -24,8 +24,9 @@
 //! (the landmark tree). The tree sits at the receiving locus beside `R`, which is never released. Lean
 //! `Compression/Landmark/Context/Tree.release_rule` proves that nodes deeper than the address depth `D` are
 //! releasable, of which the tree founds none, and that a retention is lawful exactly when it
-//! refines the causal signature; it does not prove that no shallower merge is lawful, and the
-//! collapse attempts none. The receiving parametron's active suffix address
+//! refines the causal signature. The tree's owner derives which of its merges and releases are
+//! future-sufficient (`compression::landmark::context`, U2): beyond its chains, none of its nodes
+//! but the boundary contexts, so the collapse attempts none. The receiving parametron's active suffix address
 //! (`hnn::receiving::ActiveAddress`) is resident state beside it, which the collapse does not
 //! touch.
 //!
@@ -33,6 +34,16 @@
 //! the element of `g` at tick `t` when `r_g ≤ t` and `t + 1 + o_g ≤ e_last`; a channel likewise with
 //! the ends' minima. A deposit's statistics sum only over these windows, which is why a deposit
 //! gives the same result with or without the collapse (`deposit_descends`).
+//!
+//! [definition; agent-inferred, U2] **Its place in the retention contract**
+//! ([objects §8](../../../../docs/ELEMENTARY_OBJECTS.md#the-retention-contract), which owns the
+//! contract). The collapse is the standing law's instance through the diamond on the field's
+//! sparsity: its standing is Lean `HNN/Retention.fieldStanding`, whose generators (ingest, locate
+//! keys, refine, deposit) are the machine's admitted actions, so the future is action-sufficient.
+//! Its recoverability condition fails by construction: it cannot be reopened (`release_structural`),
+//! so the aeon's close refuses a growing family ([`contained`]) and every pending ratio whose
+//! receiver still hears a released locus ([`separator`]: Hearing's
+//! `heard_not_listened_refutes_standing` read on the diamond, Lean `Holarchy/Hearing`).
 //!
 //! [definition] **The collapse** ([`collapse`]) runs the recursions for every admitted receiver,
 //! retains the union, and releases the rest: `V = ⊕V_g`, a 0/1 projection per locus, keeping the

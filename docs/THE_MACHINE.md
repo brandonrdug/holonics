@@ -44,7 +44,7 @@ results from them.
 - [open] Three joins are not yet in the code: the receiving tree is storage read by the receiving
   face, not a Holon joined at ports in `Field::holarchy`; a receiving window is a step of the
   exposure's loop, not an `aeon::Epochs` reading at the receiver's section; and a pump's period is
-  the mode quotient's lift period (`hnn::modes`), not an `aeon::Cycle`. The unified plan's U1 and U5
+  the mode quotient's lift period (Lean `HNN/ModeQuotient.periodic_lift_exact`), not an `aeon::Cycle`. The unified plan's U1 and U5
   own them (#63).
 
 ## One continuing geometric object

@@ -300,6 +300,82 @@
 //! unchanged. The card's mirror (`holonics-cuda`, `kernels/tree.cu`) carries the same register at
 //! the same ceiling in its deposit ([`Capacity::ceiling_halves`] uploaded with the law).
 //!
+//! [proved-derived; agent-inferred, U2 of the rebuild] **Which merges and releases are
+//! future-sufficient.** The tree's storage is retention, so a merge of two contexts' storage, or the
+//! release of a node, is lawful exactly when it is a standing ([the retention
+//! contract](../../../../../docs/ELEMENTARY_OBJECTS.md#the-retention-contract)) for the **declared
+//! admitted receiver**: the executed face of every class at every cell of every continuation of the
+//! passage the chart admits, each cell read at the standing before its own deposit and then
+//! deposited (the prequential face at its grain, future deposits included). The squares of
+//! `Context/Merge.square_iff_no_separator` must hold for every such word. What that admits:
+//! - **Qualifies, exactly.**
+//!   - *The chains* (stored where paths part, above): a chain's nodes route one set of arrivals until
+//!     an arrival parts them, and its register, its chart and the declared rungs rebuild both parts
+//!     at the parting (`Compaction.chain_split`, `compacted_is_the_full_tree`). It is the one merge of
+//!     nodes, a recoverable collapse of the species kind, and it is already the storage.
+//!   - *The readings kept beside the state*: each chart's two certificates (`drift`, `excess`), its
+//!     cached stop weight (a function of `β` at the declared widths) and its rebase count. No face
+//!     reads them; they feed the residual reading ([`CellReading::residual`]) and the receipts. They
+//!     are standing only for a receiver that reads the certified distance to the ideal weighting
+//!     (the card's mirror already leaves them out, "The arena").
+//!   - *Contexts no continuing address reaches*: a subtree whose top context already holds the
+//!     boundary letter (`0`, only before the cut's first cell: its key letter, or a letter of an
+//!     ancestor's context). The executed tree carries `β` as state: a parent's `β` already holds its
+//!     children's past (the step `β′ = β k/q̂′` telescopes, `lattice_node_telescope`), no deposit
+//!     steps a node off the path it opens, and no read passes through the subtree, so it is released
+//!     whole. A chain holding the letter only inside its own label keeps its register, which an
+//!     address parting from it above the letter reads. (In the ideal weighting, which recomputes
+//!     `β` from the children, the same release keeps the subtree's weight `W`.) Lean owed in #62.
+//!   - *Nodes past the admitted depth* (`Tree.release_rule`): none are founded. *Pool letters no
+//!     label reads* (a split's key letter kept where the chain held it) are an encoding's
+//!     redundancy.
+//! - **Does not qualify.**
+//!   - *Equal present faces or equal counts at two contexts*: a deposit through one separates them
+//!     (`Context/Merge.equal_present_faces_do_not_merge`: at depth one, contexts `[0]` and `[1]` each
+//!     holding one arrival of class `0` read `4/5` alike; after one arrival of class `1` at `[0]` they
+//!     read `9/16` and `11/16`, so no lawful standing reads them through one register).
+//!   - *Equal code on validation cells*: agreement along the words those cells are, never along
+//!     every admitted word; the same witness separates.
+//!   - *A reachable node with an arrival*, evicted by a budget (`Tree.budget_eviction_changes_face`),
+//!     and in particular *a once-reached leaf chain*: releasing it changes the face at every address
+//!     that would follow its label (a context seen once predicts its second occurrence), and a later
+//!     arrival founds it again in another state.
+//!
+//!   So, for the declared receiver, the exact merges of nodes are the chains already taken and the
+//!   boundary contexts: essentially empty.
+//! - **The charged alternative, a separate law.** A declared coarser receiver `R′` (a shallower depth
+//!   `D′`; a founding rule that stores a context from its second arrival; a declared merge `σ` of
+//!   contexts) has its own exact standing (the coarser tree is a standing for `R′`,
+//!   `Context/Standing.address_standing`, `Tree.release_rule`), and is priced against the finer
+//!   receiver `R` by its code-length pair: with both complete descriptions masses it codes within a
+//!   margin of `m` bits exactly when `P·W ≤ 2^m·P′·W′` (`Context/Merge.coarsening_within_margin_iff`,
+//!   `merge_cost_mass_iff` at the margin). Its acceptance is its own: on a fresh development-family
+//!   split, with `m` and the standing budget pinned before the run, the coarser standing a cell falls
+//!   strictly while the charged conditional byte-and-stop code stays within `m` of the finer's. It is
+//!   never reported as retention.
+//!
+//! [established-bounded; measured] **The census** (`hnn_population f0-census`, U2's first loop; the
+//! admitted egg alone on F4's development passage, 1,048,243 cells; bytes of the canonical standing,
+//! 96 a node and 4 a label letter, read node by node from the arena). The egg's standing is
+//! 2,781,355,790 bytes, 2,653 a cell with remainder 367,111, of which its byte tree (the typed tree at
+//! `D = 22` ticks, 44 bundle letters) holds 2,779,334,141: 27,181,970 nodes and 42,458,078 label
+//! letters. By rule, in bytes (a cell: quotient and remainder):
+//!
+//! | Rule | Bytes | A cell |
+//! |---|---|---|
+//! | exact: the readings beside the state | 1,196,006,680 | 1,140 r 1,009,660 |
+//! | exact: the boundary contexts | 10,184 | 0 r 10,184 |
+//! | exact: nodes past the admitted depth | 0 | 0 |
+//! | exact: pool letters no label reads | 4,044,396 | 3 r 899,667 |
+//! | charged: once-reached leaf chains (17,782,143 nodes, each ending at `D`) | 1,857,086,636 | 1,771 r 648,283 |
+//! | charged: the depth cut at 12 ticks | 622,696,768 | 594 r 40,426 |
+//! | charged: the depth cut at 6 ticks | 2,080,631,512 | 1,984 r 917,400 |
+//! | refused: siblings with equal present counts in one register | 867,135,528 | 827 r 238,567 |
+//!
+//! After the choosing families alone (524,091 cells) the proportions are the same (the tree
+//! 1,387,905,377 bytes; the readings 1,136 a cell, the once-reached chains 1,766, the depth cut at
+//! 12 ticks 484). The run took 107,150 ms at an 8,656,285,696-byte peak resident set.
+//!
 //! [historical; measured] **The full arena of one node a depth is retired** (its realization,
 //! `Storage::Full`, is at commit `89460425`): it declared the same prior and read the same face in
 //! ℚ at every arrival, and on the wide cut's development cells at `D = 6` the two codes were equal
@@ -524,6 +600,7 @@
 //! | founding where paths converge (second-arrival founding, measured and retired): the stopped path normalized under any stopping rule decided before the digit (a complete code); the tree with absent children, its Kraft form and dominance; the stopped step (`β` still at the stop); the second arrival opening with the first count; the first-arrival tree its case | `Compression/Landmark/Context/ConvergenceFounding.{stopping_rule_normalized, prequential_code_complete, conv_mixture_over_trees, conv_kraft_and_dominance, conv_weight_step, conv_ratio_step, second_arrival_opens_with_the_first_count, convergence_step, convergence_is_probability, first_arrival_is_the_full_tree}` | retired (its realization is at commit `d137e8a6`; the development cells kept the first arrival) |
 //! | a landmark's storage has a capacity: the tree weighting over any node law whose state is a function of the arrivals reaching the node (its Kraft form, dominance, step and prequential code), the compacted tree for that law, and the capped register as an instance (positive, normalized, the carry lowering the register and keeping each reached symbol, KT below its ceiling, `c = ∞` KT) | `Compression/Landmark/Context/Tree.{NodeLaw, own_mixture_over_trees, own_kraft_and_dominance, own_weight_step₀, law_standing_is_routed, ktLaw_standing}`; `Compression/Landmark/Context/Compaction.{MassRouted, own_weight_prequential, compacted_node_law}`; `Compression/Landmark/Context/Capacity.{capLaw, cap_face_pos, cap_face_sum, cap_carry_laws, cap_carry_half_units, cap_run_total_le, cap_unbounded_is_kt, cap_below_ceiling_is_kt, capped_tree_laws}` | [`Capacity`], [`Capacity::carry`], [`LandmarkDeclaration::capacity`], `Law::apply_branch`, [`IdealLandmarks`] |
 //! | stored where paths part: a chain with its bottom is one node at the summed rung (`1 − ρ_top = 2^(−S)(1 − ρ_bottom)`, founded at `2^S − 1`), a chain to `D` one KT node, the split's two ratios, the landmark tree's face exactly, at most `2n − 1` nodes a tree | `Compression/Landmark/Context/Compaction.{chain_ratio, chain_ratio_dyadic, leaf_chain_is_one_node, chain_split, compacted_is_the_full_tree, compacted_node_bound}` | [`Landmarks`], [`LandmarkDeclaration::rung_sums`], the split ([`Beta::split`], `Law::part`, `Law::chain`), [`Landmarks::face_rule`], [`Landmarks::tree_sizes`], [`IdealLandmarks`] |
+//! | which merges and releases are future-sufficient: equal present faces do not merge; a coarser receiver is priced by its code-length pair within a margin | `Compression/Landmark/Context/Merge.{square_iff_no_separator, equal_present_faces_do_not_merge, coarsening_within_margin_iff}`; `Tree.{release_rule, budget_eviction_changes_face}` | the section above; the census `hnn_population f0-census` |
 //!
 //! [open] Owed in #62 (Lean `Compression/Landmark/Context/Tree`'s `[open]`): the passage-level composition of the
 //! drift bound (the subtree sum over the tree and the passage, from `lattice_node_telescope`,
