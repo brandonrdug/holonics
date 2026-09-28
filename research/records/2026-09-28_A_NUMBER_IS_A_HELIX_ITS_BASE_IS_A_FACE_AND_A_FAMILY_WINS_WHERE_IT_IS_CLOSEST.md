@@ -161,4 +161,27 @@ charts, where success means the navigator is found once and the base is only the
   holds the group facts; the join is owed.
 - Weyl's equidistribution giving Benford's arc frequencies on the leading face.
 - The node-local mixture's code bound. Discharged September 28: `Population.local_mixture_code`
-  (with `local_telescope` and `local_of_constant`), consumed by `receiver::population::LocalMixture`.
+  (with `local_telescope` and `local_of_constant`). Its Rust consumer is retired (below).
+- The executed floor's switching bound (below). Owed.
+
+**Retired September 28.** `receiver::population::LocalMixture`, its tests and the
+`hnn_population f0-local` harness were measured and not adopted (the notebook's F0 candidate 2), and
+are retired; they are at [`2d34b819`](https://github.com/brandonrdug/holonics/tree/2d34b819/crates/holonics/src/receiver/population/local.rs).
+Lean keeps the exact node-local law. The executed floor's law is not in Lean, so it is kept here.
+`[established-bounded]` Hypotheses: `M` members on one cell alphabet with a prior `π`; at each
+context each member's weight `ŵ_f` is carried with a 64-bit mantissa, multiplied by the member's
+exact face and rounded down (a factor in `(1 − 2^(−62), 1]`); after every step a living member below
+`2^(−K)` of its context's leader is raised to that floor (`K = 64`); a member at zero likelihood is
+removed. Then every living member holds at least `2^(−K)/M` of its context's total. For any path that
+reads `f_0` on a context's first ticks and `f_i` on its `i`-th later segment, with `k` switches,
+
+```text
+code(c) ≤ −log₂ π_(f_0) + Σ_i code_(f_i)(segment i) + k (K + log₂ M) + drift,
+drift ≤ 3·r·2^(−62) + M·φ·2^(1−K)
+```
+
+with `r` the cells at which a weight rounded and `φ` those at which a floor bound (from
+`−log₂(1 − x) < 3x` for `x ≤ ½` and `log₂(1 + y) < 2y`). The floor is thus a switching law entered as
+a chart width: at `d = 0` the executed mixture can code below its best single member, which no
+static mixture does. Owed (#62): the segment telescope in Lean, and the floor's comparison with the
+declared fixed share on the hazard ladder (`Dormancy.share_path_code_le`).

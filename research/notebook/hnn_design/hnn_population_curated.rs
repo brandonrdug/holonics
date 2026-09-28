@@ -298,8 +298,8 @@ pub(super) fn curated_population(
     Ok((Population::new(declared)?, egg_index, manifest))
 }
 
-/// The declared families of [`curated_population`], unmixed (F0's second candidate mixes them
-/// node-locally, `hnn_population_local.rs`), with the admitted egg's index and the manifest.
+/// The declared families of [`curated_population`], unmixed, with the admitted egg's index and the
+/// manifest.
 #[allow(clippy::type_complexity)]
 pub(super) fn curated_families(
     chart: SectionChart,

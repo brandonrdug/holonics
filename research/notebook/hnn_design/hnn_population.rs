@@ -18,11 +18,7 @@
 //! cargo run --release -p holonics --example hnn_population -- evolution
 //! cargo run --release -p holonics --example hnn_population -- species
 //! cargo run --release -p holonics --example hnn_population -- curated .local/cuts/curated-cut.bin .local/cuts/curated-flat-cut.bin
-//! cargo run --release -p holonics --example hnn_population -- f0-local .local/cuts/curated-f4-passage-cut.bin .local/cuts/curated-f4-passage-flat-cut.bin
 //! ```
-//!
-//! `f0-local` and its bounded `f0-local-probe` are F0's second candidate, the declared families
-//! mixed node-locally (`hnn_population_local.rs`).
 //!
 //! [definition; agent-inferred] **The declared population.** On each terrain the receiver declares
 //! the receiving tree (`receiver::population::TreeFamily`: cell-only letters, the `½` stop prior,
@@ -81,9 +77,6 @@ mod evolution;
 
 #[path = "hnn_population_curated.rs"]
 mod curated;
-
-#[path = "hnn_population_local.rs"]
-mod local;
 
 use std::time::Instant;
 
@@ -1332,15 +1325,6 @@ fn main() {
         ["f0-egg", curated_cut, flat_cut] => {
             curated::harness(curated_cut, flat_cut, curated::Reach::F0Egg);
         }
-        ["f0-local-probe", curated_cut, flat_cut] => {
-            local::probe(curated_cut, flat_cut, local::PROBE);
-        }
-        ["f0-local-probe", curated_cut, flat_cut, cells] => {
-            local::probe(curated_cut, flat_cut, cells.parse().expect("a cell count"));
-        }
-        ["f0-local", curated_cut, flat_cut] => {
-            local::harness(curated_cut, flat_cut);
-        }
         ["f5-native", choosing_cut, request, seed, private_output] => {
             curated::native_probe(choosing_cut, request, seed, private_output, false);
         }
@@ -1374,7 +1358,7 @@ fn main() {
             curated::checkpoint_restore(choosing_cut, checkpoint_path);
         }
         _ => println!(
-            "usage: hnn_population -- tree <d> | moire parity | moire sheets | crib | switching | standing <cut> | composition [products | primes] | evolution | species | curated <curated-cut> <flat-cut> [development | merges] | f4 <joined-cut> <joined-flat-cut> | f0-egg <joined-cut> <joined-flat-cut> | f0-local-probe <joined-cut> <joined-flat-cut> [cells] | f0-local <joined-cut> <joined-flat-cut> | f5-native <choosing-cut> <private-request> <private-seed> <private-output> | f5-family <choosing-cut> <private-request> <private-seed> <private-output> | f5-family-verify <choosing-cut> <private-request> <private-seed> <private-output> | f5-bundle <choosing-cut> <private-F5R1-bundle> <owner-only-output-dir> [limit 1..32] | f5-checkpoint-census <choosing-cut> | f5-checkpoint-restore <choosing-cut> <.local/cuts/private-checkpoint>"
+            "usage: hnn_population -- tree <d> | moire parity | moire sheets | crib | switching | standing <cut> | composition [products | primes] | evolution | species | curated <curated-cut> <flat-cut> [development | merges] | f4 <joined-cut> <joined-flat-cut> | f0-egg <joined-cut> <joined-flat-cut> | f5-native <choosing-cut> <private-request> <private-seed> <private-output> | f5-family <choosing-cut> <private-request> <private-seed> <private-output> | f5-family-verify <choosing-cut> <private-request> <private-seed> <private-output> | f5-bundle <choosing-cut> <private-F5R1-bundle> <owner-only-output-dir> [limit 1..32] | f5-checkpoint-census <choosing-cut> | f5-checkpoint-restore <choosing-cut> <.local/cuts/private-checkpoint>"
         ),
     }
 }

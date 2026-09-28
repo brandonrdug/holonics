@@ -1654,6 +1654,11 @@ cargo run --release -p holonics --example hnn_population -- f0-local .local/cuts
 cargo test -p holonics --lib local_tests
 ```
 
+Retired September 28, not adopted: the owner, its tests and the `f0-local` commands run at
+[`2d34b819`](https://github.com/brandonrdug/holonics/tree/2d34b819/research/notebook/hnn_design/hnn_population_local.rs).
+The executed floor's switching bound is kept in the
+[record's obligations](../../records/2026-09-28_A_NUMBER_IS_A_HELIX_ITS_BASE_IS_A_FACE_AND_A_FAMILY_WINS_WHERE_IT_IS_CLOSEST.md#obligations-62).
+
 [proved-derived; formal-checked] **The law** (Lean `Compression/Landmark/Context/Population`):
 - the faces telescope context by context to the contexts' totals (`local_telescope`);
 - for every choice of one family per context, the code is at most
