@@ -41,12 +41,12 @@ docstring says otherwise.
 |---|---|---|---|
 | `hnn_exposure.rs` | Campaign 1's exposure on a cut: the model face (the landmark tree mixed with the combined face), the baselines, keys, aeons and the first law; on the host or the card (`realization card`); the loaded resonator (`resonator source`) | `cargo run --release -p holonics --example hnn_exposure -- cut-file .local/cuts/standing-real-cut-campaign-1.bin cells all` | [campaign 1 meets its criterion](../../records/2026-09-26_CAMPAIGN_ONE_MEETS_ITS_CRITERION_THE_TREE_RECEIVES_AND_THE_WAVE_IS_WEIGHED.md), [the resonator](../../records/2026-09-26_THE_RESONATOR_RETURNS_ITS_WAVE_AND_THE_COMPARISON_REACHES_ITS_MATERIAL.md), [campaign 2](../../records/2026-09-26_CAMPAIGN_TWO_THE_RINGS_AND_CONTACTS_ARE_LAWFUL_AND_ADD_NO_BITS_ON_TEXT.md) |
 | `hnn_landmark.rs` | The landmark tree (count-only): the depth sweep and prequential passage; `letters`, `prior`, `wide`, `compact`, `capacity` | `cargo run --release -p holonics --example hnn_landmark -- cut-file .local/cuts/standing-real-cut-campaign-1.bin` | [below PPM-2](../../records/2026-09-26_THE_LANDMARK_TREE_COMPRESSES_THE_STANDING_CUT_BELOW_PPM_TWO.md), [at scale](../../records/2026-09-26_THE_LANDMARK_TREE_AT_SCALE_THE_STOP_PRIOR_LOCAL_WEIGHING_THE_WIDE_CUT_AND_THE_STORAGE_WHERE_PATHS_PART.md), [capacity](../../records/2026-09-27_A_LANDMARKS_STORAGE_HAS_A_CAPACITY_AT_ITS_CEILING_IT_CARRIES.md), [campaign 2](../../records/2026-09-26_CAMPAIGN_TWO_THE_RINGS_AND_CONTACTS_ARE_LAWFUL_AND_ADD_NO_BITS_ON_TEXT.md) |
-| `hnn_population.rs` (with `hnn_population_{composition,evolution,curated}.rs`) | The egg population: terrain (`tree`, `moire`, `crib`, `switching`, `standing`), `composition`, `evolution`, `species`, the curated source (`curated`, with `merges`), `f4` | `cargo run --release -p holonics --example hnn_population -- <mode>` | [the receiving population](../../records/2026-09-27_THE_RECEIVING_POPULATION_WAS_BUILT_ON_TERRAIN_WITH_KNOWN_TRUTH_AND_THE_CURATED_SOURCE_NOW_CODES_BELOW_THE_FLAT_STREAM.md), [F4](../../records/2026-09-27_F4_DEVELOPMENT_FAMILY_SPLIT_AND_RELEASE_GATE.md), [the forward plan](../../records/2026-09-28_THE_FORWARD_PLAN_STOPPED_AT_TRANSFER_THE_POPULATION_MEMORIZES_FAMILIES_AND_ITS_STANDING_IS_AN_INDEX.md) |
+| `hnn_population.rs` (with `hnn_population_{composition,evolution,curated,census,u2}.rs`) | The egg population: terrain (`tree`, `moire`, `crib`, `switching`, `standing`), `composition`, `evolution`, `species`, the curated source (`curated`, with `merges`), `f4`, F0's egg (`f0-egg`, `f0-census`), U2's acceptance run (`u2-acceptance`) | `cargo run --release -p holonics --example hnn_population -- <mode>` | [the receiving population](../../records/2026-09-27_THE_RECEIVING_POPULATION_WAS_BUILT_ON_TERRAIN_WITH_KNOWN_TRUTH_AND_THE_CURATED_SOURCE_NOW_CODES_BELOW_THE_FLAT_STREAM.md), [F4](../../records/2026-09-27_F4_DEVELOPMENT_FAMILY_SPLIT_AND_RELEASE_GATE.md), [the forward plan](../../records/2026-09-28_THE_FORWARD_PLAN_STOPPED_AT_TRANSFER_THE_POPULATION_MEMORIZES_FAMILIES_AND_ITS_STANDING_IS_AN_INDEX.md), [U2's acceptance run](../../records/2026-09-28_U2_F0S_MEMORY_ACCEPTANCE_RUN_PINNED_BEFORE_ITS_SPLIT_IS_READ.md) |
 | `hnn_chase.rs` | F6's chase terrain: the reception phase, the action phase's choosing sweep (`choose`) and its acceptance (`action`, with U4's move reading) | `cargo run --release -p holonics --example hnn_chase` | [the learner must move](../../records/2026-09-27_THE_LEARNER_MUST_MOVE_A_CHASE_TERRAIN_DATA_AS_PARTICLES_WITH_FLUX_AND_RELEASE_AS_A_THRESHOLD_COMMIT.md) (no dedicated record; the receipts below) |
 | `exterior.rs` | The shared exterior boundary the examples include | | |
 | `standing_cut.py` | Pins the standing real cut (`6148`) and the wide cut (`wide 1048576`) | `python3 research/notebook/hnn_design/standing_cut.py 6148` | [campaign 1 meets its criterion](../../records/2026-09-26_CAMPAIGN_ONE_MEETS_ITS_CRITERION_THE_TREE_RECEIVES_AND_THE_WAVE_IS_WEIGHED.md), [at scale](../../records/2026-09-26_THE_LANDMARK_TREE_AT_SCALE_THE_STOP_PRIOR_LOCAL_WEIGHING_THE_WIDE_CUT_AND_THE_STORAGE_WHERE_PATHS_PART.md) |
 | `curated_source.py`, `curated_incidence.py` | The curated source, its pinned cut and flat twin; the admitted relations on the cut | `HOLONICS_ROOT=$PWD python3 research/notebook/hnn_design/curated_source.py 1048576` | [the receiving population](../../records/2026-09-27_THE_RECEIVING_POPULATION_WAS_BUILT_ON_TERRAIN_WITH_KNOWN_TRUTH_AND_THE_CURATED_SOURCE_NOW_CODES_BELOW_THE_FLAT_STREAM.md) |
-| `development_families.py`, `family_passage.py` | The F-items' family splits and their joined passages | `HOLONICS_ROOT=$PWD python3 research/notebook/hnn_design/development_families.py [F1 \| F2 \| F5]` | [F4](../../records/2026-09-27_F4_DEVELOPMENT_FAMILY_SPLIT_AND_RELEASE_GATE.md) |
+| `development_families.py`, `family_passage.py` | The F-items' and U2's family splits and their joined passages | `HOLONICS_ROOT=$PWD python3 research/notebook/hnn_design/development_families.py [F1 \| F2 \| F5 \| U2]` | [F4](../../records/2026-09-27_F4_DEVELOPMENT_FAMILY_SPLIT_AND_RELEASE_GATE.md), [U2's acceptance run](../../records/2026-09-28_U2_F0S_MEMORY_ACCEPTANCE_RUN_PINNED_BEFORE_ITS_SPLIT_IS_READ.md) |
 | `f1_dictionary.py`, `f1_validation_part.py` | F1's dictionary on choosing cells; its bounded held-out part | `HOLONICS_ROOT=$PWD python3 research/notebook/hnn_design/f1_dictionary.py` | [F1](../../records/2026-09-27_F1_WORD_ALPHABET_GATE.md) |
 | `f2_capacity_probe.py` | F2's capacity-admissible byte-chart cut | `HOLONICS_ROOT=$PWD python3 research/notebook/hnn_design/f2_capacity_probe.py` | [F2](../../records/2026-09-27_F2_FIELD_FAMILY_GATE.md) |
 | `f4_retrospective.py` | F4's selected requests and retrieval control | `HOLONICS_ROOT=$PWD python3 research/notebook/hnn_design/f4_retrospective.py` | [F4](../../records/2026-09-27_F4_DEVELOPMENT_FAMILY_SPLIT_AND_RELEASE_GATE.md) |
@@ -1469,7 +1469,9 @@ in the controls and 1,817 of 1,932 in the requests. Backticks come out even in 1
 against 32 of 32 controls.
 
 **F0's first candidate, adopted: the admitted egg alone.** The command is
-`hnn_population f0-egg <curated cut> <flat cut>`. On the choosing families the posterior sat wholly
+`hnn_population f0-egg <curated cut> <flat cut>` (the receipts below read its byte tree at the deepest
+depth, 22 ticks, as the route did through commit `d31c8b37`; since U2's acceptance run it declares
+the byte tree at 12 ticks). On the choosing families the posterior sat wholly
 on the admitted egg, so the population drops the seven trees:
 - validation bytes are unchanged, `−2430 + 8/16 + ε` against flat, and the choosing bytes read
   `−4593 + 5/16 + ε`, 2 bits better with no family names to pay;
@@ -1503,6 +1505,44 @@ took 107,150 ms at an 8,656,285,696-byte peak, inside its projection (ten minute
 - **Refused.** Siblings with equal present counts merged into one register 867,135,528 (827 a cell).
 - **After the choosing families alone** (524,091 cells): the tree 1,387,905,377 bytes, the readings
   1,136 a cell, the once-reached chains 1,766, the depth cut at 12 ticks 484.
+
+### U2: the acceptance run of F0's memory (September 28)
+
+Record: [U2's acceptance run](../../records/2026-09-28_U2_F0S_MEMORY_ACCEPTANCE_RUN_PINNED_BEFORE_ITS_SPLIT_IS_READ.md)
+(its pins, commit `d6feae7e`, precede the split); plan:
+[U2](../../../docs/plans/THE_REBUILD.md#u2-one-retention-contract-and-f0s-memory).
+
+The fresh split and its passage (counts and hashes in the record):
+
+```sh
+HOLONICS_ROOT=$PWD python3 research/notebook/hnn_design/development_families.py U2
+HOLONICS_ROOT=$PWD python3 research/notebook/hnn_design/curated_source.py 524288 choosing U2
+HOLONICS_ROOT=$PWD python3 research/notebook/hnn_design/curated_source.py 524288 validation U2
+HOLONICS_ROOT=$PWD python3 research/notebook/hnn_design/curated_incidence.py choosing U2
+HOLONICS_ROOT=$PWD python3 research/notebook/hnn_design/curated_incidence.py validation U2
+HOLONICS_ROOT=$PWD python3 research/notebook/hnn_design/family_passage.py U2
+cargo run --release -p holonics --example hnn_population -- u2-acceptance .local/cuts/curated-u2-passage-cut.bin .local/cuts/curated-u2-passage-flat-cut.bin
+```
+
+`hnn_population_u2.rs` executes the pins: the conditional byte-and-stop code at `L_R = 16` (every
+byte, and the section letters' mass at each response's stop), the candidates read on the choosing
+families, the choice (admissible within `m = 1214` bits of the unmerged tree, charged 2 bits; the
+least standing), one validation reading of the chosen candidate against the unmerged egg and the flat
+tree, and the standing whole, its readings line (44 bytes a byte-tree node) and without it. The run
+was made once at commit `d31c8b37`, in 262,138 ms at an 8,620,863,488-byte peak; a dry run on F4's
+passage (already a diagnostic) had projected 269,015 ms and 9,366,650,880 bytes.
+- **The choice** (523,671 choosing cells): the depth cut at 12 ticks `+96 + 0/16 + ε` charged
+  against the unmerged tree, admissible; the once-reached leaf chains released at each `open` letter
+  and the join `+18693 + 8/16 + ε`, not admissible (its release and path retired, at `d31c8b37`).
+  Chosen: the depth cut.
+- **Validation** (524,133 cells, read once): the cut, charged 2 bits, `+224 + 12/16 + ε` above the
+  unmerged tree (within `m`); against the flat tree's bytes, its bytes `−2132 + 13/16 + ε` and its
+  bytes with the stops `−810 + 9/16 + ε` (the unmerged tree `−2356 + 0/16 + ε` and
+  `−1035 + 12/16 + ε`).
+- **Standing after the passage** (1,047,804 cells): the unmerged egg 2,778,320,830 bytes (2,651 a
+  cell; readings 1,140; without them 1,511), the cut 2,147,915,516 (2,049; readings 915; without them
+  1,134). **The acceptance passes**: `f0-egg` now declares its byte tree at 12 ticks
+  (`curated::F0_BYTE_DEPTH`), and `f0-census` reads the unmerged egg it replaced.
 
 ### F6 chase terrain: the reception phase (September 28)
 

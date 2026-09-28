@@ -14,11 +14,14 @@
 //!   mass on the section letters; the letter given the stop, the human closes, the request's pointer
 //!   and the letter at the families' join are observed and charged to neither side. At each stop the
 //!   face read is checked equal to the face the egg charges when the letter arrives.
-//! - **The candidates**, F0's admitted egg (`f0-egg`'s constructor, the hazard partition learned on
-//!   the choosing cells) with its byte tree (0) at the deepest depth its carriers admit, (1) the same
-//!   with the once-reached leaf chains released at each aeon boundary
-//!   (`Landmarks::release_once_reached`: each `open` letter before it is read, the families' join,
-//!   the passage's close), (2) declared at `D = 12` ticks.
+//! - **The candidates**, F0's admitted egg (`f0-egg`'s constructor before U2, the hazard partition
+//!   learned on the choosing cells) with its byte tree (0) at the deepest depth its carriers admit,
+//!   (1) the same with the once-reached leaf chains released at each aeon boundary (each `open`
+//!   letter before it is read, the families' join, the passage's close), (2) declared at `D = 12`
+//!   ticks. [historical] (1) was not admissible on the choosing families and is retired: its release
+//!   (`Landmarks::release_once_reached`, `compression::landmark::context::once_reached`, delegated
+//!   through the eggs) and this mode's path for it are at commit `d31c8b37`, where the run was made.
+//!   The mode now reads (0) and (2), which is the same choice.
 //! - **The choice** on the choosing families alone: admissible when `C_k + 2 − C_0 ≤ m` (the
 //!   difference's upper end), the least standing among the admissible, ties to the lower index; the
 //!   chosen candidate charged `⌈log₂ 3⌉ = 2` bits, (0) nothing.
@@ -36,9 +39,7 @@
 use std::ops::Range;
 use std::time::Instant;
 
-use holonics::compression::landmark::context::{
-    LetterFamily, OnceReached, PassageCode, SectionChart,
-};
+use holonics::compression::landmark::context::{LetterFamily, PassageCode, SectionChart};
 use holonics::ratio::Rat;
 use holonics::ratio::algebraic::ExactInterval;
 use holonics::receiver::population::{
@@ -60,7 +61,8 @@ const MARGIN: u64 = 1214;
 /// The standing budget in bytes a cell (pin 7: the flat control's standing on F4's passage).
 const BUDGET: u64 = 1298;
 
-/// The candidates, and the choice's charge `⌈log₂ 3⌉`.
+/// The candidates, and the choice's charge `⌈log₂ 3⌉`. (1) is retired (module header); the mode
+/// reads (0) and (2).
 const CANDIDATES: [&str; 3] = [
     "(0) the unmerged tree",
     "(1) once-reached leaf chains released at the aeon boundary",
@@ -68,8 +70,8 @@ const CANDIDATES: [&str; 3] = [
 ];
 const CHOICE: u64 = 2;
 
-/// The depth cut's depth in ticks.
-const CUT: usize = 12;
+/// The depth cut's depth in ticks: candidate (2), adopted for F0's egg (`curated::F0_BYTE_DEPTH`).
+pub(super) const CUT: usize = 12;
 
 /// The readings a byte-tree node's chart keeps beside the state (the census's E0).
 const READING_BYTES: u64 = 44;
@@ -79,9 +81,7 @@ const PASSAGE_MS: u128 = 600_000;
 const RESIDENT: u128 = 20_000_000_000;
 const GUARD_EVERY: usize = 1 << 14;
 
-/// The section kind `open` (the curated chart's kinds: open, switch, turn, part) and the agent
-/// channel (human, agent, tool).
-const OPEN: usize = 0;
+/// The agent channel (the curated chart's channels: human, agent, tool).
 const AGENT: usize = 1;
 const CHANNELS: [&str; 3] = ["human", "agent", "tool"];
 
@@ -122,26 +122,10 @@ impl Code {
     }
 }
 
-/// A candidate: its egg, whether it releases at the aeon boundaries, and what each release took.
+/// A candidate: its index among [`CANDIDATES`] and its egg.
 struct Candidate {
     index: usize,
     egg: AdmittedEgg,
-    releases: bool,
-    taken: Vec<(usize, OnceReached, u128)>,
-}
-
-impl Candidate {
-    /// **Release at an aeon boundary** (candidate (1) only), before tick `tick` is read.
-    fn boundary(&mut self, tick: usize) {
-        if self.releases {
-            let clock = Instant::now();
-            let taken = self
-                .egg
-                .release_once_reached()
-                .expect("the byte tree's release");
-            self.taken.push((tick, taken, clock.elapsed().as_millis()));
-        }
-    }
 }
 
 /// The standing: the egg's canonical checkpoint bytes and its byte tree's nodes.
@@ -218,7 +202,7 @@ fn guard(clock: &Instant) -> Result<(), Stopped> {
 }
 
 /// **One candidate reads one role's cells** (module header), charging each byte and each response's
-/// stop; candidate (1) releases before each `open` letter (the join's release is its caller's).
+/// stop; the letter at the join closes a choosing part and is charged to neither role.
 fn read_role(
     candidate: &mut Candidate,
     codes: &[usize],
@@ -231,10 +215,7 @@ fn read_role(
     let mut code = Code::new();
     for t in range {
         let cell = codes[t];
-        if let Some(section) = chart.section(cell) {
-            if section.kind == OPEN && t != join {
-                candidate.boundary(t);
-            }
+        if chart.section(cell).is_some() {
             if t != join && open_before[t] == Some(AGENT) {
                 let face = Family::face(&candidate.egg).expect("the egg's face");
                 let mass: Rat = face[chart.bytes()..].iter().sum();
@@ -372,23 +353,13 @@ pub fn acceptance(curated_path: &str, flat_path: &str) {
             before
         })
         .collect();
-    let opens = |range: Range<usize>| {
-        range
-            .filter(|&t| chart.section(cut.codes[t]).is_some_and(|s| s.kind == OPEN))
-            .count()
-    };
     println!(
         "hnn_population u2-acceptance: U2's acceptance run of F0's memory (the record's pins; #63, #73, #148)"
     );
     println!(
-        "0. the passage: {cells} curated cells (|A| = {}), the first {development} the choosing families; {flat_count} flat cells; n* = {}, L_R = {grain}; open letters (aeon boundaries) {} choosing, {} validation (the join's own letter an open: {})",
+        "0. the passage: {cells} curated cells (|A| = {}), the first {development} the choosing families; {flat_count} flat cells; n* = {}, L_R = {grain}",
         chart.alphabet(),
         cut.population,
-        opens(0..development),
-        opens(development + 1..cells),
-        chart
-            .section(cut.codes[development])
-            .is_some_and(|s| s.kind == OPEN)
     );
     println!(
         "  m = {MARGIN} bits; the choice charged {CHOICE} bits; the standing budget {BUDGET} bytes a cell; guards {PASSAGE_MS} ms a passage, {RESIDENT} bytes resident"
@@ -433,18 +404,15 @@ pub fn acceptance(curated_path: &str, flat_path: &str) {
         )
         .expect("the admitted egg")
     };
-    let mut candidates: Vec<Candidate> = [(deepest_depth, false), (deepest_depth, true), (CUT, false)]
+    let mut candidates: Vec<Candidate> = [(0, deepest_depth), (2, CUT)]
         .into_iter()
-        .enumerate()
-        .map(|(index, (depth, releases))| Candidate {
+        .map(|(index, depth)| Candidate {
             index,
             egg: egg(depth),
-            releases,
-            taken: Vec::new(),
         })
         .collect();
     println!(
-        "1. the candidates (the byte tree: (0) and (1) at D = {deepest_depth} ticks, (2) at D = {CUT}); setup {} ms",
+        "1. the candidates (the byte tree: (0) at D = {deepest_depth} ticks, (2) at D = {CUT}; (1) retired, its run at commit d31c8b37); setup {} ms",
         clock.elapsed().as_millis()
     );
     println!();
@@ -464,7 +432,6 @@ pub fn acceptance(curated_path: &str, flat_path: &str) {
             Ok(read) => read,
             Err(why) => stopped(CANDIDATES[candidate.index], why),
         };
-        candidate.boundary(development);
         let standing = Standing::of(&candidate.egg);
         println!(
             "  {}: {ms} ms; resident set (now, peak) {:?} bytes",
@@ -473,19 +440,20 @@ pub fn acceptance(curated_path: &str, flat_path: &str) {
         );
         print_code(&code, grain);
         standing.print(
-            "the standing after the choosing families (for (1), after the join's release)",
+            "the standing after the choosing families",
             development as u64,
         );
         choosing.push((code, standing));
     }
     let totals: Vec<ExactInterval> = choosing.iter().map(|(code, _)| code.total()).collect();
     println!("  the choice (admissible when C_k + {CHOICE} − C_0 ≤ m; the least standing among them):");
-    let mut chosen = 0;
-    for k in 0..CANDIDATES.len() {
+    let (mut chosen, mut chosen_at) = (0, 0);
+    for (at, candidate) in candidates.iter().enumerate() {
+        let k = candidate.index;
         let charged = if k == 0 {
-            totals[0].clone()
+            totals[at].clone()
         } else {
-            sum(&totals[k], &point(CHOICE))
+            sum(&totals[at], &point(CHOICE))
         };
         let delta = minus(&charged, &totals[0]);
         let admissible = k == 0
@@ -500,21 +468,13 @@ pub fn acceptance(curated_path: &str, flat_path: &str) {
             } else {
                 "not admissible"
             },
-            choosing[k].1.whole
+            choosing[at].1.whole
         );
-        if admissible && choosing[k].1.whole < choosing[chosen].1.whole {
-            chosen = k;
+        if admissible && choosing[at].1.whole < choosing[chosen_at].1.whole {
+            (chosen, chosen_at) = (k, at);
         }
     }
     println!("  chosen: {}", CANDIDATES[chosen]);
-    for candidate in &candidates {
-        if candidate.releases {
-            println!("  (1)'s releases on the choosing families (tick: nodes, letters, ms):");
-            for (tick, taken, ms) in &candidate.taken {
-                println!("    {tick}: {}, {}, {ms}", taken.nodes, taken.letters);
-            }
-        }
-    }
     drop(choosing);
     candidates.retain(|candidate| candidate.index == 0 || candidate.index == chosen);
     println!();
@@ -524,9 +484,8 @@ pub fn acceptance(curated_path: &str, flat_path: &str) {
         "3. the validation families ({} cells), read once:",
         cells - development
     );
-    let mut validation: Vec<(usize, Code, Standing, usize)> = Vec::new();
+    let mut validation: Vec<(Code, Standing)> = Vec::new();
     for candidate in &mut candidates {
-        let released_before = candidate.taken.len();
         let (code, ms) = match read_role(
             candidate,
             &cut.codes,
@@ -538,7 +497,6 @@ pub fn acceptance(curated_path: &str, flat_path: &str) {
             Ok(read) => read,
             Err(why) => stopped(CANDIDATES[candidate.index], why),
         };
-        candidate.boundary(cells);
         let standing = Standing::of(&candidate.egg);
         println!(
             "  {}: {ms} ms; resident set (now, peak) {:?} bytes",
@@ -546,17 +504,8 @@ pub fn acceptance(curated_path: &str, flat_path: &str) {
             resident_set()
         );
         print_code(&code, grain);
-        standing.print(
-            "the standing after the passage (for (1), after the close's release)",
-            cells as u64,
-        );
-        if candidate.releases {
-            println!("  (1)'s releases on the validation families and at the close (tick: nodes, letters, ms):");
-            for (tick, taken, ms) in &candidate.taken[released_before..] {
-                println!("    {tick}: {}, {}, {ms}", taken.nodes, taken.letters);
-            }
-        }
-        validation.push((candidate.index, code, standing, released_before));
+        standing.print("the standing after the passage", cells as u64);
+        validation.push((code, standing));
     }
     drop(candidates);
 
@@ -601,9 +550,9 @@ pub fn acceptance(curated_path: &str, flat_path: &str) {
     let unmerged = &validation[0];
     let (chosen_code, chosen_standing) = {
         let last = &validation[validation.len() - 1];
-        (&last.1, &last.2)
+        (&last.0, &last.1)
     };
-    let validation_bytes: u64 = unmerged.1.byte_cells.iter().sum();
+    let validation_bytes: u64 = unmerged.0.byte_cells.iter().sum();
     println!("5. the receipt (validation):");
     println!("  the chosen candidate: {}", CANDIDATES[chosen]);
     let charge = if chosen == 0 { 0 } else { CHOICE };
@@ -612,28 +561,28 @@ pub fn acceptance(curated_path: &str, flat_path: &str) {
     difference_line(
         &format!("its bytes and stops, charged {charge} bits, against the unmerged tree's"),
         &chosen_total,
-        &unmerged.1.total(),
-        validation_bytes + unmerged.1.stop_cells,
+        &unmerged.0.total(),
+        validation_bytes + unmerged.0.stop_cells,
     );
     println!(
         "      against the margin m = {MARGIN} bits: {}",
-        within_margin(&minus(&chosen_total, &unmerged.1.total()))
+        within_margin(&minus(&chosen_total, &unmerged.0.total()))
     );
     for (c, name) in CHANNELS.iter().enumerate() {
-        if unmerged.1.byte_cells[c] > 0 {
+        if unmerged.0.byte_cells[c] > 0 {
             difference_line(
                 &format!("  {name} bytes against the unmerged tree's"),
                 &chosen_code.channel(c),
-                &unmerged.1.channel(c),
-                unmerged.1.byte_cells[c],
+                &unmerged.0.channel(c),
+                unmerged.0.byte_cells[c],
             );
         }
     }
     difference_line(
         "  response stops against the unmerged tree's",
         &chosen_code.stops(),
-        &unmerged.1.stops(),
-        unmerged.1.stop_cells.max(1),
+        &unmerged.0.stops(),
+        unmerged.0.stop_cells.max(1),
     );
     difference_line(
         &format!("its bytes, charged {charge} bits, against the flat tree's"),
@@ -650,24 +599,24 @@ pub fn acceptance(curated_path: &str, flat_path: &str) {
     if chosen != 0 {
         difference_line(
             "the unmerged tree's bytes against the flat tree's",
-            &unmerged.1.bytes_only(),
+            &unmerged.0.bytes_only(),
             &flat_validation,
             validation_bytes,
         );
         difference_line(
             "the unmerged tree's bytes and stops against the flat tree's bytes",
-            &unmerged.1.total(),
+            &unmerged.0.total(),
             &flat_validation,
             validation_bytes,
         );
     }
     println!("  the standing a cell after the passage ({cells} cells):");
-    unmerged.2.print("the unmerged tree", cells as u64);
+    unmerged.1.print("the unmerged tree", cells as u64);
     if chosen != 0 {
         chosen_standing.print(CANDIDATES[chosen], cells as u64);
     }
-    let falls = chosen != 0 && chosen_standing.whole < unmerged.2.whole;
-    let delta = minus(&chosen_total, &unmerged.1.total());
+    let falls = chosen != 0 && chosen_standing.whole < unmerged.1.whole;
+    let delta = minus(&chosen_total, &unmerged.0.total());
     let within = delta.upper <= Rat::from_integer(BigInt::from(MARGIN));
     println!(
         "  acceptance (the standing a cell falls strictly while the code stays within m = {MARGIN} bits): the standing {}; the code {}; {}",

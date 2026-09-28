@@ -119,6 +119,13 @@ pub(super) const CELL_DEPTHS: [usize; 4] = [6, 12, 24, 48];
 /// The typed tree's ladder below the egg's byte tree (its deepest admitted depth).
 pub(super) const TYPED_DEPTHS: [usize; 2] = [6, 12];
 
+/// **F0's egg's byte tree depth** in ticks: U2's acceptance run adopted the depth cut at 12 ticks
+/// (`hnn_population_u2`, its record of September 28: on a fresh family split its validation code
+/// lay `+224 + 12/16 + ε` bits above the unmerged tree's, charged, within the pinned `m = 1214`,
+/// and its standing fell from 2,651 to 2,049 bytes a cell). Before it F0's egg read the typed tree
+/// at the deepest depth its carriers admit (22 ticks at `n* = 2^20`; commit `d31c8b37`).
+pub(super) const F0_BYTE_DEPTH: usize = super::u2::CUT;
+
 /// The letter tree's depth (chosen on development among the probed, charged below).
 const LETTER_DEPTH: usize = 12;
 
@@ -373,15 +380,28 @@ pub(super) fn curated_families(
         )?));
     }
     let egg_index = declared.len();
-    let admitted = admitted_egg(
-        chart,
-        population,
-        grain,
-        chosen_hazard,
-        relations,
-        comparisons,
-        naming,
-    )?;
+    let admitted = if trees {
+        admitted_egg(
+            chart,
+            population,
+            grain,
+            chosen_hazard,
+            relations,
+            comparisons,
+            naming,
+        )?
+    } else {
+        admitted_egg_at(
+            chart,
+            population,
+            grain,
+            chosen_hazard,
+            relations,
+            comparisons,
+            naming,
+            F0_BYTE_DEPTH,
+        )?
+    };
     manifest.push(PopulationMemberManifest::Admitted(AdmittedMemberManifest {
         fresh: admitted.clone(),
         description: naming,
@@ -1013,7 +1033,7 @@ fn readings(
 pub enum Members {
     /// The eight declared families: the cell trees, the typed trees and the admitted egg.
     Declared,
-    /// The admitted egg alone.
+    /// The admitted egg alone, its byte tree at [`F0_BYTE_DEPTH`] (U2).
     EggOnly,
 }
 
@@ -1026,7 +1046,8 @@ pub enum Reach {
     Whole,
     /// F4: a choosing-family cut followed by the one validation-family passage.
     F4,
-    /// F0's first candidate on F4's development passage: the admitted egg alone.
+    /// F0's egg on a joined family passage: the admitted egg alone (its byte tree at
+    /// [`F0_BYTE_DEPTH`] since U2).
     F0Egg,
 }
 
@@ -1206,7 +1227,7 @@ pub fn harness(curated_path: &str, flat_path: &str, reach: Reach) {
     let flat_charge = ceil_log2(FLAT_SWEEP);
     if members == Members::EggOnly {
         println!(
-            "2. the population: the admitted egg alone (F0's first candidate: on the choosing families the posterior sits on it), named by 0 bits: the admitted receivers over the boundary egg on the typed tree at D = {typed_deepest} with the learned hazard partition; the development sweep charged {swept} bits and the learned partition's description {}, the flat tree's {flat_charge}",
+            "2. the population: the admitted egg alone (F0's first candidate: on the choosing families the posterior sits on it), named by 0 bits: the admitted receivers over the boundary egg on the typed tree at D = {F0_BYTE_DEPTH} ticks (U2's adopted depth cut) with the learned hazard partition; the development sweep charged {swept} bits and the learned partition's description {}, the flat tree's {flat_charge}",
             reading_of(&learning_receipt.description, grain),
         );
     } else {

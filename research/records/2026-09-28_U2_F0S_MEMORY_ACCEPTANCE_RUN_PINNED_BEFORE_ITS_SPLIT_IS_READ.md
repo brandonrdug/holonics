@@ -1,4 +1,4 @@
-# U2: F0's memory acceptance run, pinned before its split is read
+# U2: F0's memory acceptance run, pinned before its split was read: the depth cut at 12 ticks passes
 
 **Date:** 2026-09-28. Refs #63, #73, #148. **Scope:** the acceptance run of
 [U2](../../docs/plans/THE_REBUILD.md#u2-one-retention-contract-and-f0s-memory) ("The acceptance
@@ -149,3 +149,71 @@ reproduced F0's recorded readings on that passage: the unmerged egg's standing 2
 diagnostic and choose nothing here: on F4's choosing families (1) read `+16115 + 7/16 + ε` against
 (0) charged (not admissible) and (2) `+129 + 13/16 + ε` (chosen); F4's validation read (2)
 `+219 + 0/16 + ε` against (0) at 2,058 bytes a cell against 2,653. No pin moved.
+
+## 3. The receipt: the depth cut at 12 ticks is chosen and passes
+
+[established-bounded; measured] The run was made once, at commit `d31c8b37`:
+
+```sh
+cargo run --release -p holonics --example hnn_population -- u2-acceptance .local/cuts/curated-u2-passage-cut.bin .local/cuts/curated-u2-passage-flat-cut.bin
+```
+
+It took 262,138 ms at an 8,620,863,488-byte peak resident set. Its passages took 41,653, 37,922 and
+39,832 ms on the choosing families for (0), (1) and (2), 50,508 and 48,073 ms on the validation
+families for (0) and (2), and 24,474 ms for the flat tree. Every guard held. Bits are read at
+`L_R = 16` as `n + k/16 + ε` with `0 ≤ ε < 1/16`; the exact endpoints are in the private log
+(`.local/cuts/u2-acceptance.log`, counts and codes only).
+
+**The choice, on the choosing families** (523,671 cells: 61,923 human and 460,931 agent bytes,
+747 response stops).
+
+| Candidate | `C_k` (+ 2 for (1), (2)) − `C_0` | Standing after the choosing families |
+|---|---|---|
+| (0) the unmerged tree (`D = 22`) | `C_0 = 1081185 + 12/16 + ε` | 1,388,872,106 bytes, 2,652 a cell (remainder 96,614) |
+| (1) once-reached leaf chains released at the aeon boundary | `+18693 + 8/16 + ε`: **not admissible** | 301,357,094 bytes, 575 a cell (remainder 246,269) |
+| (2) the depth cut at 12 ticks | `+96 + 0/16 + ε`: admissible | 1,128,111,144 bytes, 2,154 a cell (remainder 123,810) |
+
+**Chosen: (2), the depth cut at 12 ticks.** (1)'s separator is its bytes: it coded the human bytes
+between `2645 + 8/16` and `2645 + 10/16` bits above (0) and the agent bytes between `16045 + 14/16`
+and `16046 + 0/16` above, its stops within one grain cell of (0)'s. Its eleven releases (the ten
+`open` letters and the join) took 8,899,555 nodes and 21,411,183 pool letters, 7 to 261 ms each.
+This is the owner's derivation priced: a context seen once predicts its second occurrence, also
+across a conversation's opening.
+
+**Validation, read once** (524,133 cells: 28,773 human and 494,540 agent bytes, 773 response stops).
+
+- **Against the unmerged tree.** (2), charged 2 bits, codes the bytes and stops
+  **`+224 + 12/16 + ε`** bits above (0), exactly within
+  `[8905482150892172398634815744965/2^95, 17810964301784344797269631489933/2^96]`, **within
+  `m = 1214`**. By term: the human bytes `−2 + 13/16 + ε` (below), the agent bytes
+  `+223 + 15/16 + ε`, the response stops `−1 + 15/16 + ε` (below, by less than a sixteenth). (0)'s
+  code is `954339 + 3/16 + ε`, (2)'s `954562 + 0/16 + ε` before its charge.
+- **Against flat** (the flat tree at `D = 48`, validation bytes `955373 + 7/16 + ε`): (2), charged,
+  codes the bytes `−2132 + 13/16 + ε` and the bytes with the stops `−810 + 9/16 + ε` against the
+  flat tree's bytes; (0) codes them `−2356 + 0/16 + ε` and `−1035 + 12/16 + ε`.
+- **The standing a cell after the passage** (1,047,804 cells), whole, then the readings beside the
+  state (44 bytes a byte-tree node), then without them:
+
+| | Whole | The readings line | Without the readings |
+|---|---|---|---|
+| (0) the unmerged tree | 2,778,320,830 bytes, 2,651 a cell (r 592,426) | 1,194,967,136 (27,158,344 nodes), 1,140 a cell (r 470,576) | 1,583,353,694, 1,511 a cell (r 121,850) |
+| (2) the depth cut at 12 ticks | 2,147,915,516 bytes, 2,049 a cell (r 965,120) | 958,904,012 (21,793,273 nodes), 915 a cell (r 163,352) | 1,189,011,504, 1,134 a cell (r 801,768) |
+
+  The standing falls by 630,405,314 bytes, 601 a cell (remainder 675,110). Against the budget of
+  1,298 bytes a cell, (2) is past it whole and within it without the readings; (0) is past it both
+  ways. The flat tree's standing is 1,359,168,091 bytes after 1,046,167 cells (1,299 a cell,
+  remainder 197,158).
+
+**Verdict: the acceptance passes.** The chosen candidate's standing a cell falls strictly (2,049
+against 2,651) while its charged code stays within `m` (`+224 + 12/16 + ε` against 1,214).
+
+**What lands.**
+- **Adopted: F0's egg declares its byte tree at 12 ticks** (`hnn_population_curated::F0_BYTE_DEPTH`,
+  read by `f0-egg`). The law is the declared depth the tree already owns (`Tree.release_rule`: no
+  node past the admitted depth is founded); no new Rust enters `compression::landmark::context`,
+  whose owner section "Which merges and releases are future-sufficient" now carries this receipt. It
+  is a coarser receiver priced by its code-length pair, not retention.
+- **Retired: candidate (1)'s release** (`Landmarks::release_once_reached` and its eggs'
+  delegation, with its tests, and the harness's path for it), at commit `d31c8b37`.
+- **The split is spent.** Its validation families were read once here; F0's gate needs another
+  fresh split, and the readings against flat above are U2's, not F0's acceptance.
