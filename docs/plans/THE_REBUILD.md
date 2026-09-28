@@ -300,9 +300,24 @@ where one exists), `holarchy::terrain::{chase, pursuit}`, then the named operato
     speed realized on each ray.
   - *Not adopted as the default.* Under the expected plan a `Released` capture certifies the
     terrain's strategy, not the machine's own continuation, since the plan may leave it
-    (`receiver::population::chaser`, "What `Released` certifies under each plan"). The expected plan
+    (`receiver::population::chaser` at commit `7f2c5d4f`, "What `Released` certifies under each plan"). The expected plan
     becomes `MachineChaser::new` when its release reads its own continuation. Owed in Lean (#62): the
-    expected recursion is exact, and a finer grain never raises the least capture.
+    expected recursion is exact, and a finer grain never raises the least capture. (The pledge,
+    below, makes the release its own.)
+- **The pledge: the expected plan's release is its own continuation** (September 28; receipts in the
+  notebook README, `hnn_chase {choose, fresh}`).
+  - *The law.* A `Released` tick carries its bound `B_t`, and the machine keeps the pledge
+    `T = min_t (t + B_t)`. Under the pledged expected plan `B_t` is the expected recursion's own worst
+    case `W(u*)` (`pursuit::ExpectedCapture` gains it as a third coordinate, still exact), and once a
+    pledge stands `E` is read to it, the horizon frozen at the release. The class the runner's cell
+    names reads `U = 0` at the next tick's frozen depth, so each later `W′ ≤ W − 1` and every member is
+    captured by `T` (`receiver::population::chaser`, "What `Released` certifies: the pledge"). The
+    robust plans release `b(u*)` and keep it as before. The commit's certificate as the expected
+    plan's bound and `W` read with a sliding horizon are not promises the plan keeps; on the 94 seeds
+    read, the unpledged plan kept all 814 of its bounds, by the terrain.
+  - *Chosen on the choosing seeds only* (the pinned rule): robust 150 capture ticks (3 won against
+    both controls), certified-then-expected 148 (4), pledged expected 147 (4), each keeping every
+    bound it released (144, 142, 141) and breaking no pledge. The candidate is the pledged plan.
 - **Known-truth game terrains** (Brandon, September 28;
   [record](../../research/records/2026-09-28_THE_OPTIMAL_POLICY_IS_THE_GEODESIC_NAVIGATOR_THE_CHASE_IS_RETROGRADE_ANALYSIS_AND_A_TEMPO_IS_A_MOBIUS_LOOP.md)),
   after the chase's next loop and before the fluid-cell terrain: the two-by-two cube's Cayley graph

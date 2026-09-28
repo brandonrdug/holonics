@@ -2261,3 +2261,87 @@ lattice.
   set's least capture is at most the coarser's. Both are checked here by tests, not proved.
 - Gates: `cargo check --workspace --all-targets`; `cargo test -p holonics --lib`, 895 passed (the
   chase tests 13, two of them new: the expected capture and the move set).
+
+### F6: the chaser's release is its own continuation, the pledge (U4's next loop, September 28)
+
+Record: no dedicated record; THE_REBUILD U4 ("The pledge"). Campaign 4, #27, #148.
+
+```sh
+cargo run --release -p holonics --example hnn_chase -- choose 2 12 0 robust,certified-expected,expected
+cargo test -p holonics --lib holarchy::terrain::chase_tests
+cargo test -p holonics --lib receiver::population::chaser
+```
+
+The computational object is the helical pair interaction: the runner and the chaser as a pair whose
+contact quadrance the chaser closes. This loop touches the **pair** (the capture basin and the
+expected capture read the contact, and the pledge bounds when it closes) and **faces and placement**
+(the fibre's observation classes and their posterior weights); the helix, the cell holonomy, the
+tube and the tower thread stay attached through the terrain's laws.
+
+**The problem, at the consumer.** Every plan decides through `release_among`: the commit in the
+plan's order, then `receiver::release::release` at tolerance zero on the capture reading over the
+selected fibre, and width zero (the capture basin certifies the commit) returns `Released`. Under the
+robust and certified-then-expected plans the least certificate comes first, so the next tick's least
+is at most `b(u*) − 1` and the released bound is the machine's own. The expected plan ordered by
+`E(u)` first and released the commit's certificate `b(u*)`; it may leave the minimax strategy after
+the release, so that bound was the terrain's.
+
+**The law** ([definition; proved-derived; agent-inferred]; `receiver::population::chaser`'s header
+states the argument in full, `pursuit::ExpectedCapture` the recursion):
+- `ExpectedCapture` gains a third coordinate, `W`, the least worst case among the strategies of the
+  least sum: `(U, S, W) ⊕ (U′, S′, W′) = (U + U′, S + S′, max(W, W′))`, still exact (the first two
+  coordinates are additive and `⊕` is monotone in the lexicographic order). `U = 0` exactly when the
+  capture basin certifies the fibre, and then `b ≤ W ≤` the horizon.
+- A `Released` tick carries its **bound** `B_t` (`MachineReceipt::certified`), and the machine keeps
+  the **pledge** `T = min_t (t + B_t)`. Under the robust plans `B_t = b(u*)`. Under the **pledged
+  expected plan** `B_t = W(u*)`, and once a pledge stands `E` is read at the depth `T − t − 1`: the
+  horizon is frozen at the release.
+- **It keeps its bound.** The child of `E(u*) = (0, S, W)` for the class the runner's cell names reads
+  `U = 0` at depth `W − 1`, and that child is the least over the next tick's moves of `E` read to the
+  pledge. So every later commit is certified with `W′ ≤ W − 1`, the deadline never moves later, and
+  every member is captured by `T`. The frozen reading is the Bellman value of the least expected
+  capture among the strategies that capture every member by `T`, which continues the value the plan
+  chose by at the release.
+- **The alternatives, decided from the mathematics.** The commit's certificate as the expected plan's
+  bound fails: a sum falls by delaying the worst member (captures at `1` and `6` sum `7`, at `4` and
+  `4` sum `8`). `W` read with a sliding horizon (`E` at `m` every tick) is time-inconsistent: a tick
+  later the horizon is one tick further, and a lesser sum that captures a member there is taken. A
+  pledge at `b(u*)` with `E` inside it is kept, but the release tick then chose by a value its pledge
+  forbids. The certified-then-expected plan keeps its bound already; the choosing seeds decide
+  between it and the pledged plan.
+- **A broken pledge**: where no admitted move is certified within `T − t`, the runner has left every
+  fibre member's law. The pledge is counted (`MachineReceipt::broken`), dropped, and the plan reads on
+  at `m`. With the truth in the declared family it never breaks.
+
+[measured] **The unpledged plan kept its bounds by the terrain.** Read on 94 seeds (the 16 choosing
+seeds, the 16 acceptance seeds and the 62 chased seeds of the spent first fresh population), the
+unpledged expected plan at commit `7f2c5d4f` released 814 bounds (141, 143 and 530) and capture came
+within every one. It was never a promise the plan made, and the pledge makes it one.
+
+**Chosen on the choosing seeds only** (`choose 2 12 0 robust,certified-expected,expected`, the pinned
+rule: the least sum of capture ticks, then the most seeds won against both controls, then the least
+work; the sweep now prints each rung's released bounds and whether its passages kept them):
+
+| Plan (`n = 2, m = 12, d = 0`) | Capture ticks in sum | Won against both, of 16 | Released bounds kept | Pledges broken | Work |
+|---|---|---|---|---|---|
+| Robust | 150 | 3 | 144 of 144 | 0 | 13,206 ms |
+| Certified, then expected | 148 | 4 | 142 of 142 | 0 | 39,624 ms |
+| **Expected, pledged** | **147** | **4** | 141 of 141 | 0 | 29,982 ms |
+
+The least sum chooses the **pledged expected plan**. Its capture ticks equal the unpledged plan's on
+every choosing seed (147 in both), with less work, since `E` is read to the pledge rather than at `m`
+after the first release. The sweep took 82,822 ms at a 653,468 kB peak. The robust plan's receipts
+are unchanged: `action trace` agrees line for line with the previous commit's (354 lines, wall times
+masked).
+
+- Tests: `holarchy::terrain::chase_tests::every_released_bound_is_kept_by_the_plan_itself` (every
+  plan, on the 16 choosing seeds and on 11 chased fixtures of an `8 × 8` arena of the same law at
+  `m = 6`: capture within every released bound, deadlines never later, a release followed only by
+  releases, no pledge broken); `receiver::population::chaser::tests::the_released_bound_is_the_plans_own`
+  (the pledged plan releases its own strategy's worst case `6` where the certificate is `4`, and a
+  disagreeing reading is refused); the expected-capture test reads `W` against the basin's
+  certificate and the horizon.
+- **Owed in Lean** (#62, "The chase consumer"): the three-coordinate recursion is exact, `U = 0`
+  exactly when the basin certifies and then `b ≤ W ≤` the depth, and the pledged plan keeps its
+  bound (the frozen-horizon reading of the class the cell names attains `U = 0` at `W − 2`, so each
+  later `W′ ≤ W − 1`).

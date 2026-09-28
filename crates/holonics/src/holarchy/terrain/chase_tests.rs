@@ -793,12 +793,110 @@ fn every_chaser_motion_satisfies_its_traction_bound() {
     );
 }
 
+/// **Every released bound is kept by the plan itself** (`receiver::population::chaser`, the
+/// pledge), under each plan, on the 16 choosing seeds of the declared arena and on 16 fixtures of an
+/// `8 × 8` arena of the same law, at the basin horizon `m = 6`: at every tick the machine releases,
+/// capture comes within the bound it released; the deadlines `t + B_t` never move later; once a
+/// release stands every later tick is released; and no pledge is broken (the truth lies in the
+/// declared family). Each bound lies within the horizon (the chaser refuses a pledged expected
+/// bound below the commit's certificate).
+#[test]
+fn every_released_bound_is_kept_by_the_plan_itself() {
+    use rayon::prelude::*;
+    let family = family();
+    let action = ActionDeclaration {
+        pursuer: pursuer(),
+        ticks: 64,
+        horizon: 2,
+    };
+    let basin = 6;
+    let small = ArenaDeclaration {
+        width: 8,
+        height: 8,
+        ..declaration()
+    };
+    let chased: Vec<(ArenaDeclaration, u64)> = (0..16u64)
+        .map(|s| (declaration(), 20_261_001 + s))
+        .chain((0..16u64).map(|s| (small.clone(), s)))
+        .filter(|(arena, seed)| {
+            let (_, _, openings) = Chase::drawn(arena, &family, *seed).unwrap();
+            !action.pursuer.captures(openings[0], openings[1])
+        })
+        .collect();
+    assert_eq!(
+        chased.len(),
+        27,
+        "the 16 choosing seeds and 11 of the 16 fixtures open outside capture"
+    );
+    let plans = [Plan::Robust, Plan::CertifiedExpected, Plan::Expected];
+    let jobs: Vec<(usize, &(ArenaDeclaration, u64))> = (0..plans.len())
+        .flat_map(|p| chased.iter().map(move |case| (p, case)))
+        .collect();
+    // Each passage is read on its own: the bounds it released, per plan.
+    let released: Vec<(usize, usize)> = jobs
+        .par_iter()
+        .map(|&(p, (arena, seed))| {
+            let plan = plans[p];
+            let mut machine = MachineChaser::planning(
+                MachineDeclaration {
+                    family: family.clone(),
+                    escape: ESCAPE,
+                    horizon: 2,
+                    basin,
+                    price: 0,
+                },
+                plan,
+            )
+            .unwrap();
+            let passage = act_drawn(arena, &family, &action, *seed, &mut machine).unwrap();
+            let captured = passage
+                .captured
+                .unwrap_or_else(|| panic!("seed {seed}, plan {plan:?}: captured within the cap"));
+            let receipt = machine.receipt();
+            assert_eq!(receipt.broken, 0, "seed {seed}, plan {plan:?}");
+            let (mut deadline, mut count): (Option<usize>, usize) = (None, 0);
+            for (tick, bound) in receipt.certified.iter().enumerate() {
+                match *bound {
+                    Some(ticks) => {
+                        count += 1;
+                        assert_eq!(receipt.releases[tick].kind(), Release::Certified);
+                        assert!((1..=basin).contains(&ticks), "seed {seed}, plan {plan:?}");
+                        let at = tick + ticks;
+                        assert!(captured <= at, "seed {seed}, plan {plan:?}, tick {tick}");
+                        assert!(
+                            deadline.is_none_or(|d| at <= d),
+                            "seed {seed}, plan {plan:?}, tick {tick}"
+                        );
+                        deadline = Some(at);
+                    }
+                    None => assert!(
+                        deadline.is_none(),
+                        "seed {seed}, plan {plan:?}, tick {tick}"
+                    ),
+                }
+            }
+            assert_eq!(
+                machine.pledge().map(|d| d as usize),
+                deadline,
+                "seed {seed}, plan {plan:?}"
+            );
+            (p, count)
+        })
+        .collect();
+    for p in 0..plans.len() {
+        let count: usize = released.iter().filter(|r| r.0 == p).map(|r| r.1).sum();
+        assert!(count > 0, "{:?}", plans[p]);
+    }
+}
+
 /// **The expected capture reads every member at its weight** (`pursuit::ExpectedCapture`): on one
-/// member it is that member's least capture (the capture basin on it alone), or one uncaptured
-/// member past the horizon; on the opening's whole fibre it never captures more members than their
-/// own leasts allow and never sums fewer ticks than their own leasts; on a pair of members (one
-/// constitution and navigator, two slip holds) that the capture basin certifies within `b` ticks,
-/// it captures both, within `2b` ticks in sum and no fewer than their own leasts.
+/// member it is that member's least capture (the capture basin on it alone), its own worst case,
+/// or one uncaptured member past the horizon; on the opening's whole fibre it never captures more
+/// members than their own leasts allow and never sums fewer ticks than their own leasts, and it
+/// captures every member exactly when the capture basin certifies the fibre, its own worst case then
+/// between the certificate and the horizon; on a pair of members (one constitution and navigator,
+/// two slip holds) that the capture basin certifies within `b` ticks, it captures both, within `2b`
+/// ticks in sum and no fewer than their own leasts, its worst case between `b` and the horizon.
 #[test]
 fn the_expected_capture_reads_every_member_at_its_weight() {
     let declaration = declaration();
@@ -834,10 +932,12 @@ fn the_expected_capture_reads_every_member_at_its_weight() {
                 Some(ticks) => ExpectedCapture {
                     uncaptured: 0,
                     ticks,
+                    worst: ticks,
                 },
                 None => ExpectedCapture {
                     uncaptured: 1,
                     ticks: 0,
+                    worst: 0,
                 },
             };
             assert_eq!(reading, alone, "seed {seed}, member {}", member.index);
@@ -852,6 +952,16 @@ fn the_expected_capture_reads_every_member_at_its_weight() {
             let floor: usize = own.iter().flatten().sum();
             assert!(whole.ticks >= floor, "seed {seed}");
         }
+        match basin
+            .capture_ticks(&mut memo, chaser, 0, &fibre, depth)
+            .unwrap()
+        {
+            Some(b) => {
+                assert_eq!(whole.uncaptured, 0, "seed {seed}");
+                assert!(b <= whole.worst && whole.worst <= depth, "seed {seed}");
+            }
+            None => assert!(whole.uncaptured > 0, "seed {seed}"),
+        }
         // The hold is the third digit of the family's mixed radix (weight 2·2 = 4).
         for low in (0..fibre.len()).filter(|&i| (i / 4) % 2 == 0) {
             let pair = [fibre[low].clone(), fibre[low + 4].clone()];
@@ -865,6 +975,10 @@ fn the_expected_capture_reads_every_member_at_its_weight() {
                 certified += 1;
                 assert_eq!(reading.uncaptured, 0, "seed {seed}, pair {low}");
                 assert!(reading.ticks <= 2 * b, "seed {seed}, pair {low}");
+                assert!(
+                    b <= reading.worst && reading.worst <= depth,
+                    "seed {seed}, pair {low}"
+                );
                 let floor = own[low].unwrap() + own[low + 4].unwrap();
                 assert!(reading.ticks >= floor, "seed {seed}, pair {low}");
             }
@@ -922,7 +1036,10 @@ fn the_move_set_reads_capture_as_a_function_of_the_elementary_moves() {
             .admitted(&pursuer, &grass, &motion)
             .unwrap()
         {
-            assert!(fine.contains(&doubled(&coarse)), "{velocity:?} → {coarse:?}");
+            assert!(
+                fine.contains(&doubled(&coarse)),
+                "{velocity:?} → {coarse:?}"
+            );
         }
     }
     let axis = Motion {
@@ -960,7 +1077,9 @@ fn the_move_set_reads_capture_as_a_function_of_the_elementary_moves() {
                 runner
                     .cell_at_grain(&grass, &moves, &caps, &state, doubled, 2, tick)
                     .unwrap(),
-                runner.cell(&grass, &moves, &caps, &state, chaser, tick).unwrap(),
+                runner
+                    .cell(&grass, &moves, &caps, &state, chaser, tick)
+                    .unwrap(),
                 "{:?} against {chaser:?}",
                 runner.evasion
             );
@@ -984,9 +1103,16 @@ fn the_move_set_reads_capture_as_a_function_of_the_elementary_moves() {
             disk: &disk,
         };
         let limit = 8;
-        let lattice =
-            least_capture(&arena, &moves, &runner, openings, &pursuer, MoveSet::LATTICE, limit)
-                .unwrap();
+        let lattice = least_capture(
+            &arena,
+            &moves,
+            &runner,
+            openings,
+            &pursuer,
+            MoveSet::LATTICE,
+            limit,
+        )
+        .unwrap();
         let reading = basin
             .capture_ticks(
                 &mut BasinMemo::default(),

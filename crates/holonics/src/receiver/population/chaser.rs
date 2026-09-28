@@ -70,10 +70,12 @@
 //! - [`Plan::Robust`], the F6 action phase's rule above: the certificate `b(u)`, robust over the
 //!   whole fibre, then `K(u)`, then `N(u)`;
 //! - [`Plan::CertifiedExpected`]: the certificate first, and among the moves of the least
-//!   certificate the least **expected capture** `E(u)` (`pursuit::expected_ticks`: the members an
-//!   adaptive strategy leaves uncaptured within `m`, then the sum of the others' capture ticks, the
-//!   posterior's expectation over the fibre's classes, uniform on the fibre), then `K(u)`, `N(u)`;
-//! - [`Plan::Expected`]: `E(u)` first, then the certificate, `K(u)`, `N(u)`.
+//!   certificate the least **expected capture** `E(u)` at the basin's horizon `m`
+//!   (`pursuit::expected_ticks`: the members an adaptive strategy leaves uncaptured, then the sum of
+//!   the others' capture ticks, the posterior's expectation over the fibre's classes, uniform on the
+//!   fibre, then that strategy's own worst case), then `K(u)`, `N(u)`;
+//! - [`Plan::Expected`], **the pledged expected plan**: `E(u)` read to the pledge (below) first,
+//!   then the certificate, `K(u)`, `N(u)`.
 //!
 //! [measured] **Why** (the notebook's `hnn_chase diagnose`). On each of the 5 acceptance seeds where
 //! the robust plan missed the truth-only least, the regret enters at one tick. On four the move the
@@ -84,20 +86,68 @@
 //! that very tick, read only after the move. The expected capture reads every member at its
 //! posterior weight.
 //!
-//! [measured] **The candidate, run once on a fresh population** (the notebook's `hnn_chase fresh`,
-//! pinned before the run: 62 chased seeds of `20261101 + s`, `s < 64`): the expected plan (chosen on
-//! the choosing seeds, 147 against the robust plan's 150 and the certified-then-expected plan's 148)
-//! sums 574 capture ticks against the robust plan's 594, a regret of 9 against 29 to the truth-only
-//! least, and wins 12, ties 49 and loses 1 against it.
+//! [measured] **The unpledged candidate, run once on a first fresh population** (pinned before the
+//! run: 62 chased seeds of `20261101 + s`, `s < 64`; the plan as it stood at commit `7f2c5d4f`, `E`
+//! read at `m` every tick and the commit's certificate released as its bound): 574 capture ticks
+//! against the robust plan's 594, a regret of 9 against 29 to the truth-only least, and 12 won, 49
+//! tied and 1 lost against it. Its release was not a promise it kept by construction (below), so it
+//! was not adopted.
 //!
-//! [definition; agent-inferred] **What `Released` certifies under each plan.** Every plan decides
-//! through the same [`release_among`]: the commit in the plan's order, then the one law on the
-//! capture reading. Under [`Plan::Robust`] and [`Plan::CertifiedExpected`] the least certificate
-//! comes first, so the next tick's least is at most `b(u*) − 1` and the certified bound is the
-//! machine's own. Under [`Plan::Expected`] the width-zero reading is the terrain's: a strategy that
-//! captures every member within `b(u*)` exists after the commit, but the plan may leave it, so the
-//! bound is not the machine's. [`MachineChaser::new`] stays the robust plan until the expected
-//! plan's release reads its own continuation (THE_REBUILD U4).
+//! [measured] **The pledged plan, chosen on the choosing seeds** (`hnn_chase choose 2 12 0
+//! robust,certified-expected,expected`, the pinned rule: the least sum of capture ticks, then the
+//! most seeds won against both controls, then the least work): the robust plan sums 150 (3 won
+//! against both), the certified-then-expected plan 148 (4) and the pledged expected plan 147 (4), each
+//! keeping every bound it released (144, 142 and 141 released ticks) and breaking no pledge. The
+//! pledged plan's capture ticks equal the unpledged plan's on every choosing seed.
+//!
+//! [definition; proved-derived; agent-inferred] **What `Released` certifies: the pledge**
+//! (THE_REBUILD U4, the pledge's loop). Every plan decides through the same [`release_among`]: the
+//! commit in the plan's order, then the one law on the capture reading. A `Released` tick `t`
+//! carries its **bound** `B_t` ([`MachineReceipt::certified`]): the ticks within which **the
+//! machine's own continuation** captures every member of the fibre. The reading the law decides is
+//! `R(θ) = 𝟙[θ captured by t + B_t under the commit and the plan's continuation]`, constant on the
+//! fibre exactly when certified. The machine keeps the **pledge**, the deadline
+//! `T = min_t (t + B_t)` over its released ticks.
+//! - **Robust and certified-then-expected: `B_t = b(u*)`.** The runner's cell names the class `Θ_y`
+//!   the fibre shrinks to, and the capture basin's strategy after `u*` captures `Θ_y` within
+//!   `b(u*) − 1` ticks from `t + 1`. So the next tick's least certificate is at most `b(u*) − 1`, and
+//!   both plans take a move of the least certificate: the bound is kept, the pledge never binds.
+//! - **The pledged expected plan: `B_t = W(u*)`**, the expected recursion's own worst case
+//!   (`pursuit::ExpectedCapture`: the least worst case among the strategies of the least sum, with
+//!   `b(u*) ≤ W(u*) ≤ m`). Before any release `E` is read at the basin's horizon `m`. Once a pledge
+//!   `T` stands, `E` is read **to the pledge**, at the depth `T − t − 1`: the horizon is frozen at the
+//!   release. [proved-derived] **It keeps its bound.** At the release `E(u*) = (0, S, W)` is attained
+//!   by a strategy that captures every member by `t + W`. After the cell the fibre is the class
+//!   `Θ_y`, and that strategy's part for `Θ_y` captures it within `W − 1` ticks from `(u*, t + 1)`,
+//!   so the recursion's child reads `U = 0` at depth `W − 1`. That child is the least, over the next
+//!   tick's admitted moves `u′`, of `E(u′)` read at depth `W − 2 = T − (t + 1) − 1`: exactly the next
+//!   tick's reading to the pledge. Its least move therefore has `U = 0`, is certified, and its own
+//!   `W′ ≤ W − 1`. The deadline never moves later, each tick the remaining ticks fall by at least
+//!   one, and every member is captured by `T`; each later bound is kept by the same argument from
+//!   its own tick. The frozen reading is the Bellman value of the constrained problem, the least
+//!   expected capture among the strategies that capture every member by `T`, and it continues the
+//!   plan's own value from the release: the sum it read there is still attained.
+//! - [agent-inferred] **Why the pledge, and why at `W`.** Each alternative fails a law:
+//!   - *The commit's certificate `b(u*)` as the expected plan's bound*, with no pledge (the previous
+//!     receipt): `E` chooses by a sum, and a sum can fall by delaying the worst member (captures at
+//!     ticks `1` and `6` sum `7`, at `4` and `4` sum `8`), so the plan's own strategy may pass
+//!     `b(u*)`. [measured] On the 94 seeds read (the 16 choosing and 16 acceptance seeds and the 62
+//!     chased seeds of the spent fresh population), none of its 814 released bounds was passed: the
+//!     bound held there by the terrain, not by the plan.
+//!   - *`W` read with a sliding horizon* (`E` at `m` every tick): time-inconsistent. At `t + 1` the
+//!     horizon is `t + 1 + m`, one tick past the release's, and a strategy that captures a member at
+//!     `t + 1 + m` may sum fewer ticks than the continuation that captures every member by `t + W`;
+//!     the plan takes it, so the bound can slide a tick every tick.
+//!   - *A pledge at `b(u*)` with `E` inside it*: kept, but the release tick chose `u*` by a value its
+//!     own pledge then forbids (the strategy `E(u*)` reads may need `W(u*) > b(u*)` ticks). The pledge
+//!     at `W` continues the value the plan chose by.
+//!   - *[`Plan::CertifiedExpected`]* keeps its bound already, reading `E` only among the least
+//!     certificate's moves; the choosing seeds decide between it and the pledged plan.
+//! - **A broken pledge.** The pledge is conditional on the runner being a member of the fibre at
+//!   every tick (the truth in the declared family; then the fibre at `t + 1` is exactly the class its
+//!   cell names). Where no admitted move keeps it (no certificate within `T − t`), the runner has left
+//!   every member's law: the pledge is **broken**, counted in the receipt
+//!   ([`MachineReceipt::broken`]) and dropped, and the plan reads on at `m`.
 //!
 //! [definition; agent-inferred] **The parameters**: the viable tube's horizon `n`, the capture
 //! basin's horizon `m` and the price `d`, chosen on a pinned choosing set of seeds disjoint from the
@@ -149,7 +199,7 @@ pub struct MachineDeclaration {
 }
 
 /// [definition; agent-inferred] **The plan** (module header): the commit order's reading of the
-/// fibre.
+/// fibre. The default is [`MachineChaser::new`]'s.
 #[derive(Clone, Copy, Debug, Default, PartialEq, Eq)]
 pub enum Plan {
     /// The certificate over the whole fibre, then the cornering, then the nearness.
@@ -158,7 +208,9 @@ pub enum Plan {
     /// The certificate, then the expected capture among the least certificate's moves, then the
     /// cornering and the nearness.
     CertifiedExpected,
-    /// The expected capture, then the certificate, the cornering and the nearness.
+    /// **The pledged expected plan**: the expected capture read to the pledge (at the basin's
+    /// horizon before any release), then the certificate, the cornering and the nearness; a
+    /// release's bound is the expected recursion's own worst case.
     Expected,
 }
 
@@ -167,7 +219,7 @@ impl Plan {
         match self {
             Plan::Robust => "robust",
             Plan::CertifiedExpected => "certified, then expected",
-            Plan::Expected => "expected",
+            Plan::Expected => "expected, pledged",
         }
     }
 }
@@ -232,14 +284,17 @@ impl MachineRelease {
 }
 
 /// [definition] **The machine's receipt**: per tick its release, the fibre's size and, for a
-/// certified release, the ticks within which the capture basin certified capture; the misses of
-/// its predicted consequence.
+/// certified release, its **bound** (module header, the pledge): the ticks within which the
+/// machine's own continuation captures every member of the fibre; the misses of its predicted
+/// consequence; and the pledges broken, ticks where no admitted move kept the pledge (the runner
+/// had left every fibre member's law).
 #[derive(Clone, Debug, Default, PartialEq, Eq)]
 pub struct MachineReceipt {
     pub releases: Vec<MachineRelease>,
     pub fibre: Vec<usize>,
     pub certified: Vec<Option<usize>>,
     pub misses: usize,
+    pub broken: usize,
 }
 
 impl MachineReceipt {
@@ -258,6 +313,8 @@ pub struct MachineChaser {
     candidates: Vec<Candidate>,
     pursuer: Option<(Pursuer, Caps, Moves)>,
     predicted: Option<usize>,
+    /// The pledge (module header): the tick by which every fibre member is captured, once released.
+    pledge: Option<u64>,
     receipt: MachineReceipt,
 }
 
@@ -332,7 +389,7 @@ fn release_among(
     };
     let certified = worths[commit].capture.is_some();
     let width = ReceiverWidth::declared(
-        "capture within the basin's horizon under the commit",
+        "capture within the released bound under the commit and the machine's own continuation",
         "the population's selected fibre",
         DiameterNorm::Supremum,
         if certified { Rat::zero() } else { Rat::one() },
@@ -378,10 +435,32 @@ fn release_among(
     }
 }
 
+/// **A certified commit's bound** (module header, the pledge): the commit's certificate `b(u*)`
+/// under the robust and certified-then-expected plans, the expected recursion's own worst case
+/// `W(u*)` under the pledged expected plan; refused where the commit is not certified, or the
+/// expected reading leaves a member uncaptured beside a certificate (the two readings disagree).
+fn released_bound(plan: Plan, commit: &Worth) -> Result<usize, PopulationError> {
+    let disagree = || {
+        refuse(
+            "a machine chaser's released bound",
+            "the commit is certified, and under the pledged expected plan its reading captures every member",
+        )
+    };
+    let certificate = commit.capture.ok_or_else(disagree)?;
+    match plan {
+        Plan::Robust | Plan::CertifiedExpected => Ok(certificate),
+        Plan::Expected => match commit.expected {
+            Some(e) if e.uncaptured == 0 && certificate <= e.worst => Ok(e.worst),
+            _ => Err(disagree()),
+        },
+    }
+}
+
 impl MachineChaser {
-    /// The machine of a declaration under the robust plan; refused at a horizon of zero.
+    /// The machine of a declaration under the default plan ([`Plan::default`]); refused at a
+    /// horizon of zero.
     pub fn new(declaration: MachineDeclaration) -> Result<Self, PopulationError> {
-        Self::planning(declaration, Plan::Robust)
+        Self::planning(declaration, Plan::default())
     }
 
     /// The machine of a declaration under a plan; refused at a horizon of zero.
@@ -400,12 +479,24 @@ impl MachineChaser {
             candidates: Vec::new(),
             pursuer: None,
             predicted: None,
+            pledge: None,
             receipt: MachineReceipt::default(),
         })
     }
 
     pub fn receipt(&self) -> &MachineReceipt {
         &self.receipt
+    }
+
+    /// The machine's plan.
+    pub fn plan(&self) -> Plan {
+        self.plan
+    }
+
+    /// **The pledge** (module header): the tick by which every fibre member is captured, once a
+    /// release stands.
+    pub fn pledge(&self) -> Option<u64> {
+        self.pledge
     }
 
     /// The population it reads, once opened.
@@ -497,13 +588,12 @@ impl Chaser for MachineChaser {
     type Error = PopulationError;
 
     fn label(&self) -> String {
-        let plan = match self.plan {
-            Plan::Robust => String::new(),
-            plan => format!(", plan {}", plan.label()),
-        };
         format!(
-            "the machine (tube horizon {}, basin horizon {}, price {}{plan})",
-            self.declaration.horizon, self.declaration.basin, self.declaration.price
+            "the machine (tube horizon {}, basin horizon {}, price {}, plan {})",
+            self.declaration.horizon,
+            self.declaration.basin,
+            self.declaration.price,
+            self.plan.label()
         )
     }
 
@@ -520,6 +610,7 @@ impl Chaser for MachineChaser {
         self.pursuer = Some((pursuer.clone(), caps, disk));
         self.ports = Some(Arc::clone(ports));
         self.predicted = None;
+        self.pledge = None;
         self.receipt = MachineReceipt::default();
         Ok(())
     }
@@ -558,11 +649,27 @@ impl Chaser for MachineChaser {
         for &next in &admitted {
             worths.push(self.worth(&basin, &mut memo, &parts, next, tick, plural)?);
         }
+        // The pledge is kept while some admitted move is certified within its remaining ticks;
+        // otherwise the runner has left every member's law, and the pledge is broken and dropped.
+        if let Some(deadline) = self.pledge {
+            let remaining = deadline.saturating_sub(tick);
+            if !worths
+                .iter()
+                .any(|w| w.capture.is_some_and(|b| b as u64 <= remaining))
+            {
+                self.receipt.broken += 1;
+                self.pledge = None;
+            }
+        }
+        // The expected capture's depth: to the pledge under the pledged expected plan (the horizon
+        // frozen at the release), the basin's horizon otherwise.
+        let depth = match (self.plan, self.pledge) {
+            (Plan::Expected, Some(deadline)) => (deadline - tick - 1) as usize,
+            _ => self.declaration.basin - 1,
+        };
         let reads = |w: &Worth| match self.plan {
             Plan::Robust => false,
-            Plan::CertifiedExpected => {
-                Some(certificate(w)) == worths.iter().map(certificate).min()
-            }
+            Plan::CertifiedExpected => Some(certificate(w)) == worths.iter().map(certificate).min(),
             Plan::Expected => true,
         };
         let reading: Vec<bool> = worths.iter().map(reads).collect();
@@ -575,7 +682,7 @@ impl Chaser for MachineChaser {
                     &parts,
                     admitted[i],
                     tick,
-                    self.declaration.basin - 1,
+                    depth,
                 )?);
             }
         }
@@ -585,10 +692,15 @@ impl Chaser for MachineChaser {
             .iter()
             .max_by(|a, b| a.1.len().cmp(&b.1.len()).then(b.0.cmp(&a.0)))
             .map(|(cell, _)| *cell);
-        self.receipt.certified.push(match released.kind() {
-            Release::Certified => worths[chosen].capture,
+        let bound = match released.kind() {
+            Release::Certified => Some(released_bound(self.plan, &worths[chosen])?),
             _ => None,
-        });
+        };
+        if let Some(bound) = bound {
+            let deadline = tick + bound as u64;
+            self.pledge = Some(self.pledge.map_or(deadline, |pledge| pledge.min(deadline)));
+        }
+        self.receipt.certified.push(bound);
         self.receipt.releases.push(released);
         self.receipt.fibre.push(fibre.len());
         Ok(admitted[chosen])

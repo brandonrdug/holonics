@@ -18,7 +18,9 @@
 //! [definition; agent-inferred] **U4's next loop.** `diagnose` reads the machine's passage tick by
 //! tick against the truth-only basin and prints every admitted move's readings at each tick whose
 //! release raises the truth's least capture. `choose`'s fourth rung is the plan
-//! (`robust,certified-expected,expected`). `fresh` runs the pinned fresh population against its
+//! (`robust,certified-expected,expected`), and each rung prints the bounds its machine released and
+//! kept (capture by `t + B_t`, the chaser's pledge) and the pledges broken. `fresh` runs the pinned
+//! fresh population against its
 //! predeclared criteria ([`fresh`]). `moves` reads the truth-only least capture under each declared
 //! variant of the chaser's move set ([`MOVE_SETS`], `pursuit::MoveSet`).
 //!
@@ -147,11 +149,11 @@ const OPTIMUM_LIMIT: usize = 16;
 const FRESH_SEED: u64 = 20_261_101;
 const FRESH_SEEDS: u64 = 64;
 
-/// [definition; agent-inferred, chosen on the choosing seeds and pinned before the run] **The
-/// candidate**: the expected plan (`receiver::population::chaser::Plan::Expected`) at the machine's
-/// pinned `n`, `m` and `d`. On the choosing seeds at `n = 2, m = 12, d = 0` the robust plan summed 150
-/// capture ticks, the certified-then-expected plan 148 and the expected plan 147; the least sum
-/// chooses.
+/// [definition; agent-inferred, chosen on the choosing seeds] **The candidate**: the pledged expected
+/// plan (`receiver::population::chaser::Plan::Expected`, its release the machine's own continuation)
+/// at the machine's pinned `n`, `m` and `d`. On the choosing seeds at `n = 2, m = 12, d = 0` the
+/// robust plan summed 150 capture ticks, the certified-then-expected plan 148 and the pledged expected
+/// plan 147, each keeping every bound it released; the least sum chooses.
 const CANDIDATE_PLAN: Plan = Plan::Expected;
 
 /// The passage `2^8` ticks.
@@ -339,7 +341,13 @@ impl Chaser for Traced {
     fn decide(&mut self, view: &ChaseView<'_>) -> Result<Motion, PopulationError> {
         let indices = self.inner.fibre();
         let released = self.inner.decide(view)?;
-        let release = self.inner.receipt().releases.last().expect("a release").kind();
+        let release = self
+            .inner
+            .receipt()
+            .releases
+            .last()
+            .expect("a release")
+            .kind();
         let ports = Arc::clone(self.ports.as_ref().expect("opened"));
         let (arena, moves, pursuer) = (&ports.arena, &ports.moves, view.pursuer);
         let caps = pursuer.law.caps(arena.declaration())?;
@@ -372,7 +380,8 @@ impl Chaser for Traced {
             .collect();
         let (mut memo, mut truth_memo) = (BasinMemo::default(), BasinMemo::default());
         let mut expected_memo = ExpectedMemo::default();
-        let now = basin.capture_ticks(&mut truth_memo, view.chaser, tick, &truth, DIAGNOSIS_LIMIT)?;
+        let now =
+            basin.capture_ticks(&mut truth_memo, view.chaser, tick, &truth, DIAGNOSIS_LIMIT)?;
         let admitted = view.admitted()?;
         let mut rows = Vec::with_capacity(admitted.len());
         for &next in &admitted {
@@ -410,9 +419,14 @@ impl Chaser for Traced {
                 nearness += (gap[0] * gap[0] + gap[1] * gap[1]) * class.len() as i64;
                 if !pursuer.captures(motion.position, next.position) {
                     for member in class {
-                        cornering +=
-                            viable_tube(arena, &member.law.caps, motion, member.state.held, &reach)?
-                                .size();
+                        cornering += viable_tube(
+                            arena,
+                            &member.law.caps,
+                            motion,
+                            member.state.held,
+                            &reach,
+                        )?
+                        .size();
                     }
                 }
                 if plural {
@@ -447,7 +461,10 @@ impl Chaser for Traced {
                     (r.fibre.is_none(), r.fibre, r.cornering, r.nearness)
                 })
                 .expect("a nonempty admitted set");
-            assert_eq!(commit, chosen, "the diagnosis reads the machine's commit order");
+            assert_eq!(
+                commit, chosen,
+                "the diagnosis reads the machine's commit order"
+            );
         }
         self.ticks.push(TickRow {
             tick: view.tick,
@@ -565,9 +582,10 @@ fn fresh() {
             .iter_mut()
             .zip([robust.receipt(), candidate.receipt()])
         {
-            for (count, release) in total
-                .iter_mut()
-                .zip([Release::Certified, Release::Commit, Release::Probe])
+            for (count, release) in
+                total
+                    .iter_mut()
+                    .zip([Release::Certified, Release::Commit, Release::Probe])
             {
                 *count += receipt.count(release);
             }
@@ -645,9 +663,7 @@ fn fresh() {
     );
     let verdict = |passed: bool| if passed { "passed" } else { "not passed" };
     for m in 0..2 {
-        let passed = sums[m] < sums[2]
-            && sums[m] < sums[3]
-            && 2 * against[m][2][0] > chased;
+        let passed = sums[m] < sums[2] && sums[m] < sums[3] && 2 * against[m][2][0] > chased;
         println!(
             "  F6's action acceptance as written, {}: {}",
             names[m],
@@ -818,53 +834,77 @@ fn choose(args: &[String]) {
     let horizons: Vec<usize> = ladder(args.first(), &[2, 3, 4]);
     let basins: Vec<usize> = ladder(args.get(1), &[4, 8, 12, 16]);
     let prices: Vec<u64> = ladder(args.get(2), &[0]);
-    let plans: Vec<Plan> = args
-        .get(3)
-        .map_or(vec![Plan::Robust], |a| a.split(',').map(plan_named).collect());
+    let plans: Vec<Plan> = args.get(3).map_or(vec![Plan::Robust], |a| {
+        a.split(',').map(plan_named).collect()
+    });
     println!(
         "hnn_chase choose: choosing seeds {CHOOSING_SEED} + s, s < {SEEDS}; passages of at most {ACTION_TICKS} = 2^9 ticks"
     );
     for &horizon in &horizons {
         for &basin in &basins {
             for &price in &prices {
-              for &plan in &plans {
-                let started = Instant::now();
-                let (mut sums, mut wins) = ([0usize; 3], [0usize; 3]);
-                let mut line = Vec::new();
-                for s in 0..SEEDS {
-                    let ([m, p, b], receipt, _, _) =
-                        passages(CHOOSING_SEED + s, horizon, basin, price, plan);
-                    for (sum, passage) in sums.iter_mut().zip([&m, &p, &b]) {
-                        *sum += passage.ticks();
+                for &plan in &plans {
+                    let started = Instant::now();
+                    let (mut sums, mut wins) = ([0usize; 3], [0usize; 3]);
+                    let (mut kept, mut broken) = ((0usize, 0usize), 0usize);
+                    let mut line = Vec::new();
+                    for s in 0..SEEDS {
+                        let ([m, p, b], receipt, _, _) =
+                            passages(CHOOSING_SEED + s, horizon, basin, price, plan);
+                        let (k, r) = bounds_kept(&m, &receipt);
+                        kept.0 += k;
+                        kept.1 += r;
+                        broken += receipt.broken;
+                        for (sum, passage) in sums.iter_mut().zip([&m, &p, &b]) {
+                            *sum += passage.ticks();
+                        }
+                        wins[0] += usize::from(m.ticks() < p.ticks());
+                        wins[1] += usize::from(m.ticks() < b.ticks());
+                        wins[2] += usize::from(m.ticks() < p.ticks() && m.ticks() < b.ticks());
+                        line.push(format!(
+                            "[{}] {}/{}/{} p{}",
+                            m.index,
+                            m.ticks(),
+                            p.ticks(),
+                            b.ticks(),
+                            receipt.count(Release::Probe)
+                        ));
                     }
-                    wins[0] += usize::from(m.ticks() < p.ticks());
-                    wins[1] += usize::from(m.ticks() < b.ticks());
-                    wins[2] += usize::from(m.ticks() < p.ticks() && m.ticks() < b.ticks());
-                    line.push(format!(
-                        "[{}] {}/{}/{} p{}",
-                        m.index,
-                        m.ticks(),
-                        p.ticks(),
-                        b.ticks(),
-                        receipt.count(Release::Probe)
-                    ));
+                    println!(
+                        "n = {horizon}, m = {basin}, d = {price}, plan {}: capture ticks in sum machine {}, pursuit {}, bearing {}; seeds won {} against pursuit, {} against bearing, {} against both, of {SEEDS}; released bounds kept {} of {}, pledges broken {broken}; {} ms",
+                        plan.label(),
+                        sums[0],
+                        sums[1],
+                        sums[2],
+                        wins[0],
+                        wins[1],
+                        wins[2],
+                        kept.0,
+                        kept.1,
+                        started.elapsed().as_millis()
+                    );
+                    println!("  machine/pursuit/bearing: {}", line.join("  "));
                 }
-                println!(
-                    "n = {horizon}, m = {basin}, d = {price}, plan {}: capture ticks in sum machine {}, pursuit {}, bearing {}; seeds won {} against pursuit, {} against bearing, {} against both, of {SEEDS}; {} ms",
-                    plan.label(),
-                    sums[0],
-                    sums[1],
-                    sums[2],
-                    wins[0],
-                    wins[1],
-                    wins[2],
-                    started.elapsed().as_millis()
-                );
-                println!("  machine/pursuit/bearing: {}", line.join("  "));
-              }
             }
         }
     }
+}
+
+/// **The released bounds a passage kept** (`receiver::population::chaser`, the pledge): the ticks
+/// the machine released whose bound its own passage kept, capture by `t + B_t`, and the ticks it
+/// released.
+fn bounds_kept(passage: &ActionPassage, receipt: &MachineReceipt) -> (usize, usize) {
+    receipt
+        .certified
+        .iter()
+        .enumerate()
+        .filter_map(|(tick, bound)| bound.map(|b| tick + b))
+        .fold((0, 0), |(kept, released), by| {
+            (
+                kept + usize::from(passage.captured.is_some_and(|at| at <= by)),
+                released + 1,
+            )
+        })
 }
 
 /// **The truth-only capture basin's least capture** from the opening, within `limit` ticks: every

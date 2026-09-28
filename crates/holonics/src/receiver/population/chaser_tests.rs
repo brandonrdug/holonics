@@ -87,8 +87,8 @@ fn the_chasers_release_is_the_pre_u3_rule_through_the_one_law() {
                         })
                         .collect();
                     for price in [0u64, 1] {
-                        let (released, chosen) =
-                            release_among(&worths, Plan::Robust, fibre, price).expect("a lawful release");
+                        let (released, chosen) = release_among(&worths, Plan::Robust, fibre, price)
+                            .expect("a lawful release");
                         assert_eq!(
                             (released.kind(), chosen),
                             pre_u3(&worths, fibre, price),
@@ -102,7 +102,9 @@ fn the_chasers_release_is_the_pre_u3_rule_through_the_one_law() {
                             }
                             MachineRelease::Law(ReleaseReturn::Ask { probe }) => {
                                 assert_eq!(probe.partition.classes(), &worths[chosen].classes[..]);
-                                assert!(probe.partition.product() < probe.partition.against_product());
+                                assert!(
+                                    probe.partition.product() < probe.partition.against_product()
+                                );
                                 decided[1] += 1;
                             }
                             MachineRelease::Commit { law, price: cost } => {
@@ -175,4 +177,62 @@ fn the_price_is_the_separating_term_of_the_cornering_arm() {
         )
     );
     assert!(release_among(&[], Plan::Robust, 4, 0).is_err());
+}
+
+fn expected(uncaptured: usize, ticks: usize, worst: usize) -> Option<ExpectedCapture> {
+    Some(ExpectedCapture {
+        uncaptured,
+        ticks,
+        worst,
+    })
+}
+
+/// **The released bound is the plan's own** (module header, the pledge). Two moves certify capture
+/// of a fibre of two within `4` ticks: the first by the minimax strategy (captures at `4` and `4`,
+/// `E = (0, 8, 4)`), the second by a strategy of a lesser sum and a later worst case (captures at
+/// `1` and `6`, `E = (0, 7, 6)`). The robust plan releases the first within its certificate `4`; the
+/// pledged expected plan releases the second within its own strategy's worst case `6`, not the
+/// certificate `4` it would not keep. An uncertified commit has no bound, and a pledged expected
+/// reading that leaves a member uncaptured, or reads a worst case below the certificate, beside a
+/// certified commit is refused: the two readings disagree.
+#[test]
+fn the_released_bound_is_the_plans_own() {
+    let mut worths = vec![worth(Some(4), 5, 0, &[2]), worth(Some(4), 0, 0, &[2])];
+    worths[0].expected = expected(0, 8, 4);
+    worths[1].expected = expected(0, 7, 6);
+    let released = MachineRelease::Law(ReleaseReturn::Released {
+        width: Rat::zero(),
+        tolerance: Rat::zero(),
+    });
+    let robust = release_among(&worths, Plan::Robust, 2, 0).expect("a lawful release");
+    assert_eq!(robust, (released.clone(), 1));
+    assert_eq!(
+        released_bound(Plan::Robust, &worths[1]).expect("a bound"),
+        4
+    );
+    worths[1].cornering = 9;
+    assert_eq!(
+        release_among(&worths, Plan::Robust, 2, 0).expect("a lawful release"),
+        (released.clone(), 0)
+    );
+    assert_eq!(
+        release_among(&worths, Plan::CertifiedExpected, 2, 0).expect("a lawful release"),
+        (released.clone(), 1)
+    );
+    assert_eq!(
+        released_bound(Plan::CertifiedExpected, &worths[1]).expect("a bound"),
+        4
+    );
+    let pledged = release_among(&worths, Plan::Expected, 2, 0).expect("a lawful release");
+    assert_eq!(pledged, (released, 1));
+    assert_eq!(
+        released_bound(Plan::Expected, &worths[1]).expect("a bound"),
+        6
+    );
+    assert!(released_bound(Plan::Robust, &worth(None, 0, 0, &[2])).is_err());
+    let mut disagreeing = worth(Some(4), 0, 0, &[2]);
+    for reading in [expected(1, 3, 3), expected(0, 6, 3), None] {
+        disagreeing.expected = reading;
+        assert!(released_bound(Plan::Expected, &disagreeing).is_err());
+    }
 }
