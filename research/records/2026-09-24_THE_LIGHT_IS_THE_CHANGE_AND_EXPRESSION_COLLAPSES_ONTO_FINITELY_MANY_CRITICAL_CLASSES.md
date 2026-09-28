@@ -15,6 +15,8 @@
 - **§51.1 (Brandon, 2026-06-22).** "The invariant prime goes dark and conducts; the *change* it causes is the radiation."
 - **§51.3.** Homeostasis is a dynamic equilibrium of two unbounded flows, founding and freeing, and never a cap.
 
+**September 28 join:** the [motion record](2026-09-28_THE_SWING_IS_A_MOVE_ABOUT_A_GRIP_A_GRIP_TURNS_A_PUSH_BOOSTS_AND_A_FREE_BODY_FALLS.md) reads the radiating field as motion: vacuum Maxwell is a turn, `E` boosts a charge and `B` turns it, and a current's `J·E` is the push that exchanges energy (§5.4).
+
 **Truth discipline:**
 - Classical results are `[proved-standard]`, and measured facts are `[established-bounded; measured]`.
 - Joins into the objects are `[interpretation]`.

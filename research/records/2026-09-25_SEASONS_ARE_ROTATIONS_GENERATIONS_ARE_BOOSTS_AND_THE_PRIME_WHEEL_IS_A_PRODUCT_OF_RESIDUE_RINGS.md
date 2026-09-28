@@ -18,6 +18,8 @@ It builds on:
   with Lean `Physics/HolonicCosmologicalInference`;
 - the aeon, null-cone and egg records.
 
+**September 28 join:** the [motion record](2026-09-28_THE_SWING_IS_A_MOVE_ABOUT_A_GRIP_A_GRIP_TURNS_A_PUSH_BOOSTS_AND_A_FREE_BODY_FALLS.md) derives rotation (the turn) and the boost as two of the three kinds of motion, free fall the third (§3.1), and a receiver's reading of a rate as its turn plus its boost (§3.2). The seasons' rotations and the generations' boosts here are those kinds.
+
 **Truth discipline:** `[proved-standard]` classical; `[proved-derived]` checked here;
 `[conjecture]`; `[interpretation]` for correspondences; `[established-bounded; measured]` for
 observations.
