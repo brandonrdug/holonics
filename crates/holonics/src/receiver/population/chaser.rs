@@ -65,6 +65,40 @@
 //!   largest class, the least cell on a tie) is read against the cell that unfolds; a miss is counted
 //!   in the receipt.
 //!
+//! [definition; agent-inferred] **The plan** ([`Plan`]; THE_REBUILD U4's next loop), the commit
+//! order's reading of the fibre:
+//! - [`Plan::Robust`], the F6 action phase's rule above: the certificate `b(u)`, robust over the
+//!   whole fibre, then `K(u)`, then `N(u)`;
+//! - [`Plan::CertifiedExpected`]: the certificate first, and among the moves of the least
+//!   certificate the least **expected capture** `E(u)` (`pursuit::expected_ticks`: the members an
+//!   adaptive strategy leaves uncaptured within `m`, then the sum of the others' capture ticks, the
+//!   posterior's expectation over the fibre's classes, uniform on the fibre), then `K(u)`, `N(u)`;
+//! - [`Plan::Expected`]: `E(u)` first, then the certificate, `K(u)`, `N(u)`.
+//!
+//! [measured] **Why** (the notebook's `hnn_chase diagnose`). On each of the 5 acceptance seeds where
+//! the robust plan missed the truth-only least, the regret enters at one tick. On four the move the
+//! truth needed tied the released move's certificate (or no move was certified) and the tie went to
+//! the fibre-summed tube or, where the tube was flat across the moves, to the fibre-summed nearness;
+//! the worst case over the fibre does not read the members it does not bind. On the fifth the truth
+//! stood in one of two equally weighted observation classes whose needs part on the runner's cell of
+//! that very tick, read only after the move. The expected capture reads every member at its
+//! posterior weight.
+//!
+//! [measured] **The candidate, run once on a fresh population** (the notebook's `hnn_chase fresh`,
+//! pinned before the run: 62 chased seeds of `20261101 + s`, `s < 64`): the expected plan (chosen on
+//! the choosing seeds, 147 against the robust plan's 150 and the certified-then-expected plan's 148)
+//! sums 574 capture ticks against the robust plan's 594, a regret of 9 against 29 to the truth-only
+//! least, and wins 12, ties 49 and loses 1 against it.
+//!
+//! [definition; agent-inferred] **What `Released` certifies under each plan.** Every plan decides
+//! through the same [`release_among`]: the commit in the plan's order, then the one law on the
+//! capture reading. Under [`Plan::Robust`] and [`Plan::CertifiedExpected`] the least certificate
+//! comes first, so the next tick's least is at most `b(u*) − 1` and the certified bound is the
+//! machine's own. Under [`Plan::Expected`] the width-zero reading is the terrain's: a strategy that
+//! captures every member within `b(u*)` exists after the commit, but the plan may leave it, so the
+//! bound is not the machine's. [`MachineChaser::new`] stays the robust plan until the expected
+//! plan's release reads its own continuation (THE_REBUILD U4).
+//!
 //! [definition; agent-inferred] **The parameters**: the viable tube's horizon `n`, the capture
 //! basin's horizon `m` and the price `d`, chosen on a pinned choosing set of seeds disjoint from the
 //! acceptance seeds (the notebook's `hnn_chase choose`), never on the acceptance seeds: `n = 2`,
@@ -86,11 +120,14 @@ use std::sync::Arc;
 use num_bigint::BigUint;
 use num_traits::{One, Zero};
 
+use std::cmp::Ordering;
+
 use super::{ChaseFamily, Population, PopulationError, refuse, selected_fibre};
 use crate::geometry::motion::quadrance;
 use crate::holarchy::terrain::{
-    Basin, BasinMemo, Candidate, Caps, CaptureReach, ChasePorts, ChaseView, Chaser, Motion, Moves,
-    Pursuer, RunnerFamily, capture_ticks, classes, viable_tube,
+    Basin, BasinMemo, Candidate, Caps, CaptureReach, ChasePorts, ChaseView, Chaser,
+    ExpectedCapture, ExpectedMemo, Motion, Moves, Pursuer, RunnerFamily, capture_ticks, classes,
+    expected_ticks, viable_tube,
 };
 use crate::ratio::Rat;
 use crate::receiver::face::{DiameterNorm, ReceiverWidth, WidthWitness};
@@ -109,6 +146,30 @@ pub struct MachineDeclaration {
     pub horizon: usize,
     pub basin: usize,
     pub price: u64,
+}
+
+/// [definition; agent-inferred] **The plan** (module header): the commit order's reading of the
+/// fibre.
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq)]
+pub enum Plan {
+    /// The certificate over the whole fibre, then the cornering, then the nearness.
+    #[default]
+    Robust,
+    /// The certificate, then the expected capture among the least certificate's moves, then the
+    /// cornering and the nearness.
+    CertifiedExpected,
+    /// The expected capture, then the certificate, the cornering and the nearness.
+    Expected,
+}
+
+impl Plan {
+    pub fn label(&self) -> &'static str {
+        match self {
+            Plan::Robust => "robust",
+            Plan::CertifiedExpected => "certified, then expected",
+            Plan::Expected => "expected",
+        }
+    }
 }
 
 /// [definition] The declared name of the rule the one law decides the chaser's tick by.
@@ -191,6 +252,7 @@ impl MachineReceipt {
 /// **The machine as chaser** (module header).
 pub struct MachineChaser {
     declaration: MachineDeclaration,
+    plan: Plan,
     ports: Option<Arc<ChasePorts>>,
     population: Option<Population>,
     candidates: Vec<Candidate>,
@@ -204,23 +266,44 @@ pub struct MachineChaser {
 /// the fibre is one member).
 struct Worth {
     capture: Option<usize>,
+    expected: Option<ExpectedCapture>,
     cornering: usize,
     nearness: i64,
     classes: Vec<usize>,
     information: BigUint,
 }
 
-/// **The release among the admitted motions' readings** (module header): the commit, the probe the
-/// owner offers, the one law's decision at tolerance zero on the capture reading, and the cornering
-/// arm's cost comparison. Returns the release and the index of the motion it emits.
+/// The certificate's key: a certified capture first, in the fewest ticks.
+fn certificate(w: &Worth) -> (bool, Option<usize>) {
+    (w.capture.is_none(), w.capture)
+}
+
+/// **The plan's commit order** (module header, [`Plan`]) on two motions' readings.
+fn commit_order(plan: Plan, a: &Worth, b: &Worth) -> Ordering {
+    let tail = |w: &Worth| (w.cornering, w.nearness);
+    match plan {
+        Plan::Robust => (certificate(a), tail(a)).cmp(&(certificate(b), tail(b))),
+        Plan::CertifiedExpected => {
+            (certificate(a), a.expected, tail(a)).cmp(&(certificate(b), b.expected, tail(b)))
+        }
+        Plan::Expected => {
+            (a.expected, certificate(a), tail(a)).cmp(&(b.expected, certificate(b), tail(b)))
+        }
+    }
+}
+
+/// **The release among the admitted motions' readings** (module header): the commit in the plan's
+/// order, the probe the owner offers, the one law's decision at tolerance zero on the capture
+/// reading, and the cornering arm's cost comparison. Returns the release and the index of the motion
+/// it emits.
 fn release_among(
     worths: &[Worth],
+    plan: Plan,
     fibre: usize,
     price: u64,
 ) -> Result<(MachineRelease, usize), PopulationError> {
-    let commit_key = |w: &Worth| (w.capture.is_none(), w.capture, w.cornering, w.nearness);
     let commit = (0..worths.len())
-        .min_by_key(|&i| commit_key(&worths[i]))
+        .min_by(|&i, &j| commit_order(plan, &worths[i], &worths[j]))
         .ok_or_else(|| {
             refuse(
                 "a machine chaser's decision",
@@ -296,8 +379,13 @@ fn release_among(
 }
 
 impl MachineChaser {
-    /// The machine of a declaration; refused at a horizon of zero.
+    /// The machine of a declaration under the robust plan; refused at a horizon of zero.
     pub fn new(declaration: MachineDeclaration) -> Result<Self, PopulationError> {
+        Self::planning(declaration, Plan::Robust)
+    }
+
+    /// The machine of a declaration under a plan; refused at a horizon of zero.
+    pub fn planning(declaration: MachineDeclaration, plan: Plan) -> Result<Self, PopulationError> {
         if declaration.horizon == 0 || declaration.basin == 0 {
             return Err(refuse(
                 "a machine chaser's horizons",
@@ -306,6 +394,7 @@ impl MachineChaser {
         }
         Ok(Self {
             declaration,
+            plan,
             ports: None,
             population: None,
             candidates: Vec::new(),
@@ -395,6 +484,7 @@ impl MachineChaser {
         let information = partition_product(&sizes);
         Ok(Worth {
             capture,
+            expected: None,
             cornering,
             nearness,
             classes: sizes,
@@ -407,8 +497,12 @@ impl Chaser for MachineChaser {
     type Error = PopulationError;
 
     fn label(&self) -> String {
+        let plan = match self.plan {
+            Plan::Robust => String::new(),
+            plan => format!(", plan {}", plan.label()),
+        };
         format!(
-            "the machine (tube horizon {}, basin horizon {}, price {})",
+            "the machine (tube horizon {}, basin horizon {}, price {}{plan})",
             self.declaration.horizon, self.declaration.basin, self.declaration.price
         )
     }
@@ -464,7 +558,29 @@ impl Chaser for MachineChaser {
         for &next in &admitted {
             worths.push(self.worth(&basin, &mut memo, &parts, next, tick, plural)?);
         }
-        let (released, chosen) = release_among(&worths, fibre.len(), self.declaration.price)?;
+        let reads = |w: &Worth| match self.plan {
+            Plan::Robust => false,
+            Plan::CertifiedExpected => {
+                Some(certificate(w)) == worths.iter().map(certificate).min()
+            }
+            Plan::Expected => true,
+        };
+        let reading: Vec<bool> = worths.iter().map(reads).collect();
+        let mut expected_memo = ExpectedMemo::default();
+        for (i, worth) in worths.iter_mut().enumerate() {
+            if reading[i] {
+                worth.expected = Some(expected_ticks(
+                    &basin,
+                    &mut expected_memo,
+                    &parts,
+                    admitted[i],
+                    tick,
+                    self.declaration.basin - 1,
+                )?);
+            }
+        }
+        let (released, chosen) =
+            release_among(&worths, self.plan, fibre.len(), self.declaration.price)?;
         self.predicted = parts
             .iter()
             .max_by(|a, b| a.1.len().cmp(&b.1.len()).then(b.0.cmp(&a.0)))

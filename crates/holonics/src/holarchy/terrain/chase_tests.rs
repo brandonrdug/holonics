@@ -23,7 +23,7 @@ use crate::compression::landmark::context::{
 use crate::ratio::algebraic::ExactInterval;
 use crate::ratio::{Rat, rat};
 use crate::receiver::population::{
-    ChaseFamily, Family, MachineChaser, MachineDeclaration, Population, Posterior, Release,
+    ChaseFamily, Family, MachineChaser, MachineDeclaration, Plan, Population, Posterior, Release,
     TreeFamily, selected_fibre,
 };
 
@@ -767,6 +767,18 @@ fn every_chaser_motion_satisfies_its_traction_bound() {
         }
         check(&act_drawn(&declaration, &family, &action, seed, &mut PurePursuit).unwrap());
         check(&act_drawn(&declaration, &family, &action, seed, &mut ConstantBearing).unwrap());
+        let mut expected = MachineChaser::planning(
+            MachineDeclaration {
+                family: family.clone(),
+                escape: ESCAPE,
+                horizon: 2,
+                basin: 6,
+                price: 0,
+            },
+            Plan::Expected,
+        )
+        .unwrap();
+        check(&act_drawn(&declaration, &family, &action, seed, &mut expected).unwrap());
     }
     let weak = Pursuer {
         law: RunnerLaw {
@@ -779,6 +791,222 @@ fn every_chaser_motion_satisfies_its_traction_bound() {
         !weak.stops(&declaration).unwrap(),
         "on ice it cannot brake from a diagonal"
     );
+}
+
+/// **The expected capture reads every member at its weight** (`pursuit::ExpectedCapture`): on one
+/// member it is that member's least capture (the capture basin on it alone), or one uncaptured
+/// member past the horizon; on the opening's whole fibre it never captures more members than their
+/// own leasts allow and never sums fewer ticks than their own leasts; on a pair of members (one
+/// constitution and navigator, two slip holds) that the capture basin certifies within `b` ticks,
+/// it captures both, within `2b` ticks in sum and no fewer than their own leasts.
+#[test]
+fn the_expected_capture_reads_every_member_at_its_weight() {
+    let declaration = declaration();
+    let family = family();
+    let pursuer = pursuer();
+    let caps = pursuer.law.caps(&declaration).unwrap();
+    let disk = Moves::within(caps.top()).unwrap();
+    let moves = family.moves(&declaration).unwrap();
+    let depth = 5;
+    let mut certified = 0;
+    for seed in [20_261_001u64, 20_261_007, 20_261_014] {
+        let (_, arena, openings) = Chase::drawn(&declaration, &family, seed).unwrap();
+        let basin = Basin {
+            arena: &arena,
+            moves: &moves,
+            pursuer: &pursuer,
+            caps: &caps,
+            disk: &disk,
+        };
+        let chaser = Motion::rest(openings[1]);
+        let fibre = Candidate::opening(&family, &arena, openings[0]).unwrap();
+        let (mut memo, mut expected_memo) = (BasinMemo::default(), ExpectedMemo::default());
+        let mut own = Vec::new();
+        for member in &fibre {
+            let one = std::slice::from_ref(member);
+            let least = basin
+                .capture_ticks(&mut memo, chaser, 0, one, depth)
+                .unwrap();
+            let reading = basin
+                .expected_ticks(&mut expected_memo, chaser, 0, one, depth)
+                .unwrap();
+            let alone = match least {
+                Some(ticks) => ExpectedCapture {
+                    uncaptured: 0,
+                    ticks,
+                },
+                None => ExpectedCapture {
+                    uncaptured: 1,
+                    ticks: 0,
+                },
+            };
+            assert_eq!(reading, alone, "seed {seed}, member {}", member.index);
+            own.push(least);
+        }
+        let whole = basin
+            .expected_ticks(&mut expected_memo, chaser, 0, &fibre, depth)
+            .unwrap();
+        let beyond = own.iter().filter(|least| least.is_none()).count();
+        assert!(whole.uncaptured >= beyond, "seed {seed}");
+        if whole.uncaptured == beyond {
+            let floor: usize = own.iter().flatten().sum();
+            assert!(whole.ticks >= floor, "seed {seed}");
+        }
+        // The hold is the third digit of the family's mixed radix (weight 2·2 = 4).
+        for low in (0..fibre.len()).filter(|&i| (i / 4) % 2 == 0) {
+            let pair = [fibre[low].clone(), fibre[low + 4].clone()];
+            let reading = basin
+                .expected_ticks(&mut expected_memo, chaser, 0, &pair, depth)
+                .unwrap();
+            if let Some(b) = basin
+                .capture_ticks(&mut memo, chaser, 0, &pair, depth)
+                .unwrap()
+            {
+                certified += 1;
+                assert_eq!(reading.uncaptured, 0, "seed {seed}, pair {low}");
+                assert!(reading.ticks <= 2 * b, "seed {seed}, pair {low}");
+                let floor = own[low].unwrap() + own[low + 4].unwrap();
+                assert!(reading.ticks >= floor, "seed {seed}, pair {low}");
+            }
+        }
+    }
+    assert!(certified > 0, "some pair is certified within the depth");
+}
+
+/// **The chaser's move set as a declared variant** (`pursuit::MoveSet`): on the lattice the chaser
+/// has no pure boost from any velocity, and the half lattice has one; the half lattice holds the
+/// doubled lattice motions; the runner reads a chaser at a grain by the plane's law (its cell
+/// against `2X` at grain 2 is its cell against `X`); the truth-only least on the lattice is the
+/// capture basin's on the truth alone, and a finer set's least is at most the coarser's.
+#[test]
+fn the_move_set_reads_capture_as_a_function_of_the_elementary_moves() {
+    let declaration = declaration();
+    let family = family();
+    let pursuer = pursuer();
+    let half = MoveSet {
+        grain: 2,
+        boosts: true,
+        top: None,
+    };
+    let half_capped = MoveSet {
+        top: Some(2),
+        ..half
+    };
+    let unboosted = MoveSet {
+        boosts: false,
+        ..half
+    };
+    let grass = uniform(1);
+    let boosts = |set: MoveSet, motion: Motion| {
+        set.admitted(&pursuer, &grass, &motion)
+            .unwrap()
+            .iter()
+            .filter(|next| {
+                crate::geometry::motion::Move::new(motion.velocity, next.velocity).kind()
+                    == crate::geometry::motion::MoveKind::Boost
+            })
+            .count()
+    };
+    for velocity in [[0, 0], [1, 0], [1, 1], [0, -1], [-1, 1]] {
+        let motion = Motion {
+            position: [8, 8],
+            velocity,
+        };
+        assert_eq!(boosts(MoveSet::LATTICE, motion), 0, "{velocity:?}");
+        let doubled = |m: &Motion| Motion {
+            position: [2 * m.position[0], 2 * m.position[1]],
+            velocity: [2 * m.velocity[0], 2 * m.velocity[1]],
+        };
+        let fine = half.admitted(&pursuer, &grass, &doubled(&motion)).unwrap();
+        for coarse in MoveSet::LATTICE
+            .admitted(&pursuer, &grass, &motion)
+            .unwrap()
+        {
+            assert!(fine.contains(&doubled(&coarse)), "{velocity:?} → {coarse:?}");
+        }
+    }
+    let axis = Motion {
+        position: [16, 16],
+        velocity: [1, 0],
+    };
+    assert_eq!(boosts(half, axis), 2, "1/2 to 1 and to 3/2 along the axis");
+    assert_eq!(boosts(unboosted, axis), 0);
+    assert_eq!(boosts(half_capped, axis), 1, "1/2 to 1 below the top √2");
+    let moves = family.moves(&declaration).unwrap();
+    let caps = RunnerLaw {
+        speed: rat(3, 1),
+        traction: rat(1, 1),
+    }
+    .caps(&declaration)
+    .unwrap();
+    for runner in [
+        fleeing(1),
+        Runner {
+            evasion: Evasion::ZigZag { period: 2 },
+            ..fleeing(1)
+        },
+    ] {
+        let state = RunnerState {
+            motion: Motion {
+                position: [5, 6],
+                velocity: [1, -1],
+            },
+            ground: 1,
+            held: 0,
+        };
+        for (chaser, tick) in [([2, 9], 0), ([9, 3], 1), ([5, 8], 3)] {
+            let doubled = [2 * chaser[0], 2 * chaser[1]];
+            assert_eq!(
+                runner
+                    .cell_at_grain(&grass, &moves, &caps, &state, doubled, 2, tick)
+                    .unwrap(),
+                runner.cell(&grass, &moves, &caps, &state, chaser, tick).unwrap(),
+                "{:?} against {chaser:?}",
+                runner.evasion
+            );
+        }
+    }
+    let chaser_caps = pursuer.law.caps(&declaration).unwrap();
+    let disk = Moves::within(chaser_caps.top()).unwrap();
+    for seed in [20_261_001u64, 20_260_932] {
+        let (index, arena, openings) = Chase::drawn(&declaration, &family, seed).unwrap();
+        let runner = family.candidate(index).unwrap();
+        let truth: Vec<Candidate> = Candidate::opening(&family, &arena, openings[0])
+            .unwrap()
+            .into_iter()
+            .filter(|candidate| candidate.index == index)
+            .collect();
+        let basin = Basin {
+            arena: &arena,
+            moves: &moves,
+            pursuer: &pursuer,
+            caps: &chaser_caps,
+            disk: &disk,
+        };
+        let limit = 8;
+        let lattice =
+            least_capture(&arena, &moves, &runner, openings, &pursuer, MoveSet::LATTICE, limit)
+                .unwrap();
+        let reading = basin
+            .capture_ticks(
+                &mut BasinMemo::default(),
+                Motion::rest(openings[1]),
+                0,
+                &truth,
+                limit,
+            )
+            .unwrap();
+        assert_eq!(lattice, reading, "seed {seed}");
+        let lattice = lattice.expect("captured within the limit");
+        // Each half set holds the doubled lattice (which has no pure boost), and the half lattice
+        // holds both: every finer least is read within the lattice's.
+        let [capped, unboosted, whole] = [half_capped, unboosted, half].map(|set| {
+            least_capture(&arena, &moves, &runner, openings, &pursuer, set, lattice)
+                .unwrap()
+                .expect("a finer set captures within the lattice's least")
+        });
+        assert!(whole <= capped.min(unboosted), "seed {seed}");
+    }
 }
 
 /// A chaser outside its traction bound is refused by name.

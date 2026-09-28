@@ -309,7 +309,7 @@ pub use boundary::{
 };
 pub use chase::{ChaseFamily, selected_fibre};
 pub use chaser::{
-    MachineChaser, MachineDeclaration, MachineReceipt, MachineRelease, ProbePrice, Release,
+    MachineChaser, MachineDeclaration, MachineReceipt, MachineRelease, Plan, ProbePrice, Release,
 };
 pub use composition::{
     Composed, Conditioned, Keystone, Port, PortPath, PortReader, PortedEmitters, Unheld,

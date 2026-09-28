@@ -9,6 +9,7 @@ use crate::receiver::release::partition_product;
 fn worth(capture: Option<usize>, cornering: usize, nearness: i64, classes: &[usize]) -> Worth {
     Worth {
         capture,
+        expected: None,
         cornering,
         nearness,
         classes: classes.to_vec(),
@@ -87,7 +88,7 @@ fn the_chasers_release_is_the_pre_u3_rule_through_the_one_law() {
                         .collect();
                     for price in [0u64, 1] {
                         let (released, chosen) =
-                            release_among(&worths, fibre, price).expect("a lawful release");
+                            release_among(&worths, Plan::Robust, fibre, price).expect("a lawful release");
                         assert_eq!(
                             (released.kind(), chosen),
                             pre_u3(&worths, fibre, price),
@@ -139,7 +140,7 @@ fn the_price_is_the_separating_term_of_the_cornering_arm() {
         partition: ProbePartition::new(vec![2, 2], vec![4]).expect("a separating partition"),
     };
     assert_eq!(
-        release_among(&worths, 4, 1).expect("a lawful release"),
+        release_among(&worths, Plan::Robust, 4, 1).expect("a lawful release"),
         (
             MachineRelease::Commit {
                 law: ReleaseReturn::Ask {
@@ -154,7 +155,7 @@ fn the_price_is_the_separating_term_of_the_cornering_arm() {
         )
     );
     assert_eq!(
-        release_among(&worths, 4, 2).expect("a lawful release"),
+        release_among(&worths, Plan::Robust, 4, 2).expect("a lawful release"),
         (
             MachineRelease::Law(ReleaseReturn::Ask {
                 probe: expected_probe
@@ -164,7 +165,7 @@ fn the_price_is_the_separating_term_of_the_cornering_arm() {
     );
     let certified = vec![worth(Some(3), 0, 0, &[4]), worth(None, 5, 0, &[2, 2])];
     assert_eq!(
-        release_among(&certified, 4, 2).expect("a lawful release"),
+        release_among(&certified, Plan::Robust, 4, 2).expect("a lawful release"),
         (
             MachineRelease::Law(ReleaseReturn::Released {
                 width: Rat::zero(),
@@ -173,5 +174,5 @@ fn the_price_is_the_separating_term_of_the_cornering_arm() {
             0
         )
     );
-    assert!(release_among(&[], 4, 0).is_err());
+    assert!(release_among(&[], Plan::Robust, 4, 0).is_err());
 }

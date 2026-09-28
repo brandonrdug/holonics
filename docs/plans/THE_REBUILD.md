@@ -279,6 +279,30 @@ where one exists), `holarchy::terrain::{chase, pursuit}`, then the named operato
   case the rebase broke, and the lattice kinematics stay as they are.
 - **The measured next failure first.** The machine misses the truth-only least on 5 of 16 seeds while
   its opening fibre is wide; that is the next loop's subject, before any new terrain.
+- **Next loop: the failure located, the expected plan, a fresh population** (September 28, done;
+  receipts in the notebook README, `hnn_chase {diagnose, fresh, moves}`).
+  - *The separator.* Each of the 5 misses enters at one tick. On four, the robust certificate ties
+    across the moves (or certifies none within `m = 12`), and the tie goes to the fibre-summed tube or
+    nearness. The worst case over the fibre does not read the members it does not bind. On the fifth,
+    the truth's class parts only on the runner's cell of that tick, which is read after the move.
+  - *The candidate* (`Plan::Expected`, `pursuit::expected_ticks`) reads every member at its posterior
+    weight: the members an adaptive strategy leaves uncaptured within `m`, then the sum of the others'
+    capture ticks. It was chosen on the choosing seeds (147 against the robust 150).
+  - *The fresh population*, pinned before the run (62 chased seeds of `20261101 + s`, `s < 64`; two
+    draws open within capture and are refused by the terrain): capture ticks 574 against the robust
+    machine's 594, regret 9 against 29, and 12 won, 49 tied, 1 lost against it. The candidate
+    improves on the current machine. Against both controls at once both machines pass F6's capture
+    bullet there (37 and 35 of 62); on the 16 acceptance seeds that bullet's failure (7 of 16)
+    stands. The switches are not built, so F6's action acceptance is not passed.
+  - *The move set.* Pure boosts change no seed's truth-only least. The lattice realizes speed 1 along
+    an axis against the declared `3/2`, and the half lattice lowers the least from 153 to 133 on the
+    acceptance seeds and from 565 to 478 on the fresh ones: capture distance is a function of the top
+    speed realized on each ray.
+  - *Not adopted as the default.* Under the expected plan a `Released` capture certifies the
+    terrain's strategy, not the machine's own continuation, since the plan may leave it
+    (`receiver::population::chaser`, "What `Released` certifies under each plan"). The expected plan
+    becomes `MachineChaser::new` when its release reads its own continuation. Owed in Lean (#62): the
+    expected recursion is exact, and a finer grain never raises the least capture.
 - **Known-truth game terrains** (Brandon, September 28;
   [record](../../research/records/2026-09-28_THE_OPTIMAL_POLICY_IS_THE_GEODESIC_NAVIGATOR_THE_CHASE_IS_RETROGRADE_ANALYSIS_AND_A_TEMPO_IS_A_MOBIUS_LOOP.md)),
   after the chase's next loop and before the fluid-cell terrain: the two-by-two cube's Cayley graph

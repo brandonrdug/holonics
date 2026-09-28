@@ -42,7 +42,7 @@ docstring says otherwise.
 | `hnn_exposure.rs` | Campaign 1's exposure on a cut: the model face (the landmark tree mixed with the combined face), the baselines, keys, aeons and the first law; on the host or the card (`realization card`); the loaded resonator (`resonator source`) | `cargo run --release -p holonics --example hnn_exposure -- cut-file .local/cuts/standing-real-cut-campaign-1.bin cells all` | [campaign 1 meets its criterion](../../records/2026-09-26_CAMPAIGN_ONE_MEETS_ITS_CRITERION_THE_TREE_RECEIVES_AND_THE_WAVE_IS_WEIGHED.md), [the resonator](../../records/2026-09-26_THE_RESONATOR_RETURNS_ITS_WAVE_AND_THE_COMPARISON_REACHES_ITS_MATERIAL.md), [campaign 2](../../records/2026-09-26_CAMPAIGN_TWO_THE_RINGS_AND_CONTACTS_ARE_LAWFUL_AND_ADD_NO_BITS_ON_TEXT.md) |
 | `hnn_landmark.rs` | The landmark tree (count-only): the depth sweep and prequential passage; `letters`, `prior`, `wide`, `compact`, `capacity` | `cargo run --release -p holonics --example hnn_landmark -- cut-file .local/cuts/standing-real-cut-campaign-1.bin` | [below PPM-2](../../records/2026-09-26_THE_LANDMARK_TREE_COMPRESSES_THE_STANDING_CUT_BELOW_PPM_TWO.md), [at scale](../../records/2026-09-26_THE_LANDMARK_TREE_AT_SCALE_THE_STOP_PRIOR_LOCAL_WEIGHING_THE_WIDE_CUT_AND_THE_STORAGE_WHERE_PATHS_PART.md), [capacity](../../records/2026-09-27_A_LANDMARKS_STORAGE_HAS_A_CAPACITY_AT_ITS_CEILING_IT_CARRIES.md), [campaign 2](../../records/2026-09-26_CAMPAIGN_TWO_THE_RINGS_AND_CONTACTS_ARE_LAWFUL_AND_ADD_NO_BITS_ON_TEXT.md) |
 | `hnn_population.rs` (with `hnn_population_{composition,evolution,curated,census,u2}.rs`) | The egg population: terrain (`tree`, `moire`, `crib`, `switching`, `standing`), `composition`, `evolution`, `species`, the curated source (`curated`, with `merges`), `f4`, F0's egg (`f0-egg`, `f0-census`), U2's acceptance run (`u2-acceptance`) | `cargo run --release -p holonics --example hnn_population -- <mode>` | [the receiving population](../../records/2026-09-27_THE_RECEIVING_POPULATION_WAS_BUILT_ON_TERRAIN_WITH_KNOWN_TRUTH_AND_THE_CURATED_SOURCE_NOW_CODES_BELOW_THE_FLAT_STREAM.md), [F4](../../records/2026-09-27_F4_DEVELOPMENT_FAMILY_SPLIT_AND_RELEASE_GATE.md), [the forward plan](../../records/2026-09-28_THE_FORWARD_PLAN_STOPPED_AT_TRANSFER_THE_POPULATION_MEMORIZES_FAMILIES_AND_ITS_STANDING_IS_AN_INDEX.md), [U2's acceptance run](../../records/2026-09-28_U2_F0S_MEMORY_ACCEPTANCE_RUN_PINNED_BEFORE_ITS_SPLIT_IS_READ.md) |
-| `hnn_chase.rs` | F6's chase terrain: the reception phase, the action phase's choosing sweep (`choose`) and its acceptance (`action`, with U4's move reading and U3's release reading) | `cargo run --release -p holonics --example hnn_chase` | [the learner must move](../../records/2026-09-27_THE_LEARNER_MUST_MOVE_A_CHASE_TERRAIN_DATA_AS_PARTICLES_WITH_FLUX_AND_RELEASE_AS_A_THRESHOLD_COMMIT.md) (no dedicated record; the receipts below) |
+| `hnn_chase.rs` | F6's chase terrain: the reception phase, the action phase's choosing sweep (`choose`) and its acceptance (`action`, with U4's move reading and U3's release reading); U4's next loop: the failure's diagnosis (`diagnose`) and the fresh population (`fresh`) | `cargo run --release -p holonics --example hnn_chase` | [the learner must move](../../records/2026-09-27_THE_LEARNER_MUST_MOVE_A_CHASE_TERRAIN_DATA_AS_PARTICLES_WITH_FLUX_AND_RELEASE_AS_A_THRESHOLD_COMMIT.md) (no dedicated record; the receipts below) |
 | `exterior.rs` | The shared exterior boundary the examples include | | |
 | `standing_cut.py` | Pins the standing real cut (`6148`) and the wide cut (`wide 1048576`) | `python3 research/notebook/hnn_design/standing_cut.py 6148` | [campaign 1 meets its criterion](../../records/2026-09-26_CAMPAIGN_ONE_MEETS_ITS_CRITERION_THE_TREE_RECEIVES_AND_THE_WAVE_IS_WEIGHED.md), [at scale](../../records/2026-09-26_THE_LANDMARK_TREE_AT_SCALE_THE_STOP_PRIOR_LOCAL_WEIGHING_THE_WIDE_CUT_AND_THE_STORAGE_WHERE_PATHS_PART.md) |
 | `curated_source.py`, `curated_incidence.py` | The curated source, its pinned cut and flat twin; the admitted relations on the cut | `HOLONICS_ROOT=$PWD python3 research/notebook/hnn_design/curated_source.py 1048576` | [the receiving population](../../records/2026-09-27_THE_RECEIVING_POPULATION_WAS_BUILT_ON_TERRAIN_WITH_KNOWN_TRUTH_AND_THE_CURATED_SOURCE_NOW_CODES_BELOW_THE_FLAT_STREAM.md) |
@@ -2091,3 +2091,173 @@ log-odds between members are zero. A test on them commits only on the 9 ticks (6
 seeds) whose fibre is one member, and the capture reading had already certified every one. No
 cornering commit came over a single member. So F6's action law is amended to the built rule
 (THE_REBUILD F6, with the superseded text quoted).
+
+### F6: the measured failure located, a candidate plan, and a fresh population (U4's next loop, September 28)
+
+Record: no dedicated record; THE_REBUILD U4 ("The measured next failure first"; "F6's action
+acceptance stays as written"). Campaign 4, #27, #148.
+
+```sh
+cargo run --release -p holonics --example hnn_chase -- diagnose 20260928 20260929 20260930 20260931 20260933
+cargo run --release -p holonics --example hnn_chase -- choose 2 12 0 robust,certified-expected,expected
+cargo run --release -p holonics --example hnn_chase -- fresh
+cargo test -p holonics --lib holarchy::terrain::chase_tests
+```
+
+The computational object is the helical pair interaction: the runner and the chaser as a pair whose
+contact quadrance the chaser closes. This loop touches the **pair** (the capture basin and the
+expected capture read the contact) and **faces and placement** (each candidate's cell face, the
+fibre's observation classes and their posterior weights); the helix, the cell holonomy, the tube and
+the tower thread stay attached through the terrain's laws.
+
+**The failure, read from the traces** (`diagnose`: the machine itself decides; beside it each tick
+reads every admitted move's certificate `b(u)` over the fibre at `m = 12`, its cornering `K(u)`, its
+nearness `N(u)`, its information product, and the truth's own least capture through the move, the
+truth-only basin from the joint state after it; the diagnosis checks that the commit order on its
+readings returns the machine's release at every certified and committed tick). On each of the 5
+seeds the regret enters at exactly one tick, and every other tick keeps the truth's least:
+
+| Seed | Regret tick | Fibre (classes) | Release | The separator |
+|---|---|---|---|---|
+| 20260928 | tick 1: 15 against the truth's 13 (+2) | 28 (2) | commit | **the horizon**: no move is certified within `m = 12` (the truth alone needs 13 from here), the tube at `n = 2` is flat across the 9 moves (`K = 1416` each), and the fibre-summed nearness (1010 against 1114) releases a move the truth pays 2 ticks for |
+| 20260929 | tick 0: 11 against 10 (+1) | 40 (8) | certified | **a tie of certificates**: four moves certify `b = 11`; the fibre-summed tube takes `K = 5088` over the truth's moves at 5198 and 5348 |
+| 20260930 | tick 5: 7 against 6 (+1) | 4 (1) | certified | **a tie of certificates** with a flat tube: six moves at `b = 7`, `K = 50` each; the nearness takes 196 over the truth's 200 |
+| 20260931 | tick 6: 8 against 7 (+1) | 4 (2 + 2) | certified | **the truth's class**: the two classes need different moves and every move leaves one of them at 8; the classes part on the runner's cell of that tick, read only after the move, and the truth stands in the one the tie order does not favour |
+| 20260933 | tick 0: 10 against 4 (+6) | 40 (6) | certified | **a tie of certificates**: six moves certify `b = 10`; the tube takes `K = 2526` over the truth's move at 2848, which alone captures it in 4 |
+
+[measured] No regret tick is a probe's (no probe fired) and none a basin horizon too short to
+certify a move the truth needed, except 20260928's. On four seeds the robust certificate ties
+across the moves, and its worst case over the fibre does not read the members it does not bind;
+the tie then goes to the fibre-summed tube or, where the tube is flat, to the nearness.
+
+**The candidate** ([definition; agent-inferred]; `receiver::population::chaser::Plan`,
+`holarchy::terrain::pursuit::{ExpectedCapture, expected_ticks}`): read every member at its
+posterior weight. The **expected capture** `E(u)` is the Bellman value at a unit price a tick over
+the fibre's classes: the members an adaptive strategy leaves uncaptured within `m`, then the sum of
+the others' capture ticks, least lexicographically; the fibre's posterior is uniform, so the sum
+orders the expectations exactly. On the diagnosis's regret ticks `E` picks a move the truth needs
+on 20260929 (`E = (0, 337)`), 20260930 (`(0, 26)`) and 20260933 (`(0, 242)`); on 20260928 it ties
+(`(14, 140)` on three moves, the nearness again) and on 20260931 it weighs the other class
+(`(0, 29)` against `(0, 30)`). Two plans place it: after the certificate (`certified-expected`) or
+before it (`expected`). **Chosen on the choosing seeds only** (`choose 2 12 0 …`, the pinned rule:
+the least sum of capture ticks, then the most seeds won against both, then the least work): the
+robust plan sums 150 (3 won against both), the certified-then-expected plan 148 (4) and the expected
+plan 147 (4), so the candidate is **the expected plan** at the pinned `n = 2, m = 12, d = 0`. The
+sweep took 94,791 ms at a 617,548 kB peak. The robust plan's receipts are unchanged: `action trace`
+agrees line for line with the rebase's (342 lines, wall times masked).
+
+**Pinned before the run** (this commit; `hnn_chase.rs`'s `FRESH_SEED`, `FRESH_SEEDS`,
+`CANDIDATE_PLAN` and `fresh`):
+- **The fresh population**: seeds `20261101 + s`, `s < 64`, a declared contiguous range disjoint
+  from the acceptance and choosing seeds, none read before this pin and none selected by any
+  property. Projected from the choosing sweep at about four minutes and under 1 GB, against ten
+  minutes and 20 GB.
+- **The chasers**, each from the reception's draw under the same traction bound: the machine under
+  its robust plan (the current rule), the candidate, pure pursuit and constant bearing; an
+  uncaptured passage counts its cap `2^9`. The truth-only least `L` is read to the least of the four
+  captures, which bounds it.
+- **The criteria**: aggregate capture ticks `Σ T` for each chaser; the sum of regrets
+  `Σ (T − L)`; win/tie/loss (strictly fewer ticks, equal, more) of each machine against pure
+  pursuit, against constant bearing and against both at once (the lesser of the two on the seed),
+  and of the candidate against the robust machine; F6's action acceptance as written for each
+  machine (strictly fewer ticks than both controls in sum and strictly fewer than both on more than
+  half of the seeds); the candidate improves on the current machine exactly when its aggregate
+  capture ticks are strictly fewer and it wins more seeds against it than it loses.
+- **Reported separately, as a conditional reading, never as the acceptance**: the seeds whose
+  truth-only least lies strictly below both controls, with each machine's win/tie/loss against both
+  at once and its regret sum there.
+- **Amended before the rerun** (the next commit). The first run stopped at seed `20261135`, the
+  35th, after 34 seeds (118,694 ms, 635,312 kB peak): its draw opens the runner and the chaser
+  within capture, which the terrain refuses (`Chase::draw`, `pursuit::act`), and the pin had not
+  declared the case. A refused draw is a seed with no chase: it is printed, read by no chaser and
+  enters no sum, and "more than half of the seeds" counts the chased seeds. The refusal reads the
+  openings alone, the same for every chaser, so it selects by no chaser's outcome. Nothing else
+  changed; the rerun must reproduce the first run's 34 seed lines exactly.
+
+**The run** (once, on the amended pin: `fresh`, 226,712 ms at a 643,932 kB peak; its first 34 seed
+lines equal the stopped run's). The terrain refuses 2 of the 64 draws (20261135 and 20261149 open
+within capture), so 62 seeds are chased.
+
+| Over the 62 chased seeds | The machine (robust) | The candidate (expected) | Pure pursuit | Constant bearing |
+|---|---|---|---|---|
+| Capture ticks in sum | 594 | **574** | 15,348 | 1,559 |
+| The sum of regrets to the truth-only least (`Σ L = 565`) | 29 | **9** | 14,783 | 994 |
+| Win/tie/loss against pure pursuit | 41/21/0 | 42/20/0 | | |
+| Win/tie/loss against constant bearing | 49/9/4 | 50/12/0 | | |
+| Win/tie/loss against both at once | 35/23/4 | 37/25/0 | | |
+| Releases: certified, commit, probe | 549, 44, 1 | 530, 40, 4 | | |
+
+- **The candidate against the robust machine**: 12 won, 49 tied, 1 lost (20261126, 10 against
+  8). The candidate's regret falls on 6 seeds (20261101 +2, 20261109 +1, 20261126 +2, 20261129 +1,
+  20261137 +2, 20261157 +1); the robust machine's on 15. **Verdict: the candidate improves on the
+  current machine** (fewer ticks in sum, more seeds won than lost against it).
+- **F6's action acceptance as written**, its capture bullet (strictly fewer ticks than both
+  controls in sum and strictly fewer than both on more than half of the seeds): on the fresh
+  population it passes for the robust machine (35 of 62) and for the candidate (37 of 62). On the
+  pinned acceptance seeds it failed (7 of 16), and that failure stands as written. The acceptance's
+  other bullets are not read here: the switches (lag and the faulty sensor) are not built, so F6's
+  action acceptance as a whole is not passed.
+- **The conditional reading** (not the acceptance): 39 of the 62 seeds admit a win beyond both
+  controls (the truth-only least strictly below both); there the robust machine wins 35, ties 1 and
+  loses 3 against both at once (regret 28), and the candidate wins 37, ties 2 and loses 0 (regret 9).
+- **Work.** The candidate reads the expected capture for all 9 moves at every tick. Its
+  certificate is kept as the release's reading but is no longer a promise: after a certified release
+  the expected plan may leave the minimax strategy, so capture can come later than the certified
+  bound (the test checks the plan's motions against the traction bound, not the certified bound).
+
+### F6: the capture distances as a function of the admitted move set (U4's next loop, September 28)
+
+```sh
+cargo run --release -p holonics --example hnn_chase -- moves          # the acceptance seeds
+cargo run --release -p holonics --example hnn_chase -- moves fresh    # the fresh population
+```
+
+[definition; agent-inferred] `pursuit::MoveSet` is a declared variant of the chaser's move set,
+not a change of the terrain's law: the chaser moves on the lattice `(1/g)ℤ[i]` under the same speed
+bound `3/2`, the same traction disk on the same friction field and the same capture `ρ² = 2`, each
+bound read exactly in the grain's units, optionally without pure boosts or below a declared top
+speed; the runner reads the chaser at any grain by the plane's law (`Runner::cell_at_grain`, every
+score `g²` times the plane's). `pursuit::least_capture` reads the truth-only least breadth-first over
+the joint states (the runner is one deterministic law); on the lattice it equals the capture basin's
+truth-only reading on every seed read (checked at run time, and in the test). The four sets:
+**L**, the chaser's lattice (no pure boost; axis speed 1, diagonal `√2`); **H≤√2**, the half
+lattice held to the lattice's realized top speed `√2` (pure boosts `1/2 → 1` admitted); **H∖B**, the
+half lattice without pure boosts (axis speed `3/2` reached by starts and turns); **H**, the half
+lattice.
+
+| Seed | L | H≤√2 | H∖B | H |
+|---|---|---|---|---|
+| 20260927 | 5 | 5 | 5 | 5 |
+| 20260928 | 14 | 14 | 11 | 11 |
+| 20260929 | 10 | 10 | 8 | 8 |
+| 20260930 | 11 | 11 | 9 | 9 |
+| 20260931 | 13 | 13 | 12 | 12 |
+| 20260932 | 4 | 4 | 3 | 3 |
+| 20260933 | 4 | 4 | 4 | 4 |
+| 20260934 | 9 | 9 | 8 | 8 |
+| 20260935 | 9 | 9 | 8 | 8 |
+| 20260936 | 10 | 10 | 8 | 8 |
+| 20260937 | 10 | 10 | 9 | 9 |
+| 20260938 | 11 | 11 | 11 | 11 |
+| 20260939 | 12 | 12 | 11 | 11 |
+| 20260940 | 13 | 13 | 11 | 11 |
+| 20260941 | 5 | 5 | 5 | 5 |
+| 20260942 | 13 | 13 | 10 | 10 |
+| **Sum (16)** | **153** | **153** | **133** | **133** |
+| **Sum, the fresh population (62)** | **565** | **565** | **478** | **478** |
+
+- [measured] **The pure boost is not what the lattice lacks.** Admitting pure boosts below the
+  lattice's top speed changes no seed's least (L = H≤√2 on all 78), and removing them from the half
+  lattice changes none either (H∖B = H on all 78).
+- [measured] **The lattice under-realizes the chaser's declared speed.** At `v_C = 3/2` its nonzero
+  velocities have quadrance `1` or `2`, so along an axis it moves at 1, not `3/2`. The half lattice
+  realizes `3/2` on the axes, and that alone lowers the least on 12 of the 16 acceptance seeds (20
+  ticks) and on 46 of the 62 fresh seeds (87 ticks). The capture distances are a function of the top
+  speed the move set realizes on each ray, not of which kinds of move are elementary.
+- Work: 11,547 ms at an 89,940 kB peak (16 seeds) and 79,979 ms at 88,872 kB (62 seeds).
+- **Owed in Lean** (#62, "The chase consumer"): the expected capture's recursion is exact (the
+  least of a sum of independent class strategies is the sum of their least, on lexicographic `ℤ²`),
+  and the grain embedding `g ↦ kg` keeps every admitted motion and the runner's order, so a finer
+  set's least capture is at most the coarser's. Both are checked here by tests, not proved.
+- Gates: `cargo check --workspace --all-targets`; `cargo test -p holonics --lib`, 895 passed (the
+  chase tests 13, two of them new: the expected capture and the move set).
