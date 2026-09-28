@@ -61,7 +61,9 @@
 //! ([`RungReceipt::drift`]; `−log₂(1 − x) < 3x` for `x ≤ ½`, `log₂(1 + y) < 2y`). Where neither
 //! binds, the executed faces are the exact ones (`the_ladder_is_exact_bayes_in_each_context`).
 //! `K = 64` was declared as the chart's width (two machine words hold the aligned weights) before
-//! any passage was read, and it is never tuned on cells.
+//! any passage was read, and it is never tuned on cells. Because the floor also carries a switching
+//! law (below), `K` is a law parameter as well as a width; the declared switching law is the fixed
+//! share on the hazard ladder ([`super::dormancy`]), and the floor has not been compared with it.
 //!
 //! [established-bounded; agent-inferred] **The floor is dormancy in time: a member returns at the
 //! price `K + log₂ M`.** After every step each living member holds at least `2^(−K)` of its context's

@@ -1742,10 +1742,29 @@ The egg alone took 166,113 ms at 3,400,306,688 bytes, and the eight-family popul
 - The gating ladder does not pay on the choosing cells. Each context's posterior relearns the
   families' ranking from its prior, and the members are similar context models.
 
-**Verdict: adopted on the pinned code criterion, as dormancy in time at `d = 0`.** The mixture's
+**Worker's verdict: adopted on the code criterion, as dormancy in time at `d = 0`.** The mixture's
 validation bytes, with the 2 rung bits charged, lie strictly below the egg alone's: the difference
 reads `−296 + 8/16 + ε`. The choosing bytes agree, charged, at `−3 + 12/16 + ε`. The gating ladder
-(`d ≥ 1`) is not adopted. The adoption restores the eight families' standing (10,983 bytes a cell,
-from 2,653) and their passage time, for a difference of `−298 + 8/16 + ε` bits over 523,236
+(`d ≥ 1`) is not adopted. The adoption would restore the eight families' standing (10,983 bytes a
+cell, from 2,653) and their passage time, for a difference of `−298 + 8/16 + ε` bits over 523,236
 validation bytes. The section letters cost more under the mixture: `3373 + 4/16 + ε` on validation
 against the egg's `3333 + 10/16 + ε`.
+
+**Primary's verdict (September 28): measured, not adopted; the egg alone stays F0's byte
+predictor.**
+- **The rule.** THE_REBUILD adopts an F0 candidate by the choosing families alone. The brief put
+  adoption on validation bytes, which contradicted that rule. On the choosing families the charged
+  bytes read `−3 + 12/16 + ε` against the egg alone, and the whole choosing stream, letters
+  included, about 7 bits above it.
+- **The law.** The whole gain is carried by the floor, a switching law entered as the chart's width:
+  `K = 64` sets the price of a return at `K + log₂ M` bits. Switching in time already has a declared
+  law with a proved bound, the fixed share on the hazard ladder (`dormancy`,
+  `switching.hazard-ladder-bound`). A number width that carries the measured effect is a literal
+  inside a law, and the floor was never compared with the declared switching law.
+- **The cost.** Four times the standing (10,983 bytes a cell against 2,653) and a 14,226,153,472-byte
+  peak while streaming it, for `298 + 8/16` validation bits over 523,236 bytes: under one bit in
+  1,700 bytes, against a rate of about `1 + 12/16` bits a byte.
+- **What it shows.** Switching in time between similar context models pays on unseen families
+  (`−298 + 8/16 + ε`) and hardly at all on seen ones (`−3 + 12/16 + ε`), and the gating ladder in
+  space at `d = 1, 2` loses (`247` and `259` bits on the choosing stream). Mixing these families is
+  not the lever on F0's rate.

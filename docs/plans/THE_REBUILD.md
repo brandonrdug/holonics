@@ -105,7 +105,7 @@ on the admitted egg, and the trees beyond depth 24 add at most 20 bits.
      - The standing falls from 11,513,530,863 to 2,781,355,912 bytes (from 10,983 to 2,653 a cell).
      - Peak resident memory falls from 10.8 GB to 3.4 GB, and the passage from 272,849 to
        166,113 ms.
-  2. **A family wins where it is closest: adopted in time, not in space, September 28**
+  2. **A family wins where it is closest: measured, not adopted, September 28**
      ([record](../../research/records/2026-09-28_A_NUMBER_IS_A_HELIX_ITS_BASE_IS_A_FACE_AND_A_FAMILY_WINS_WHERE_IT_IS_CLOSEST.md#5-the-population-a-family-wins-where-it-is-closest);
      [receipt](../../research/notebook/hnn_design/README.md#f0-candidate-2-a-family-wins-where-it-is-closest-september-28)).
      `receiver::population::LocalMixture` keeps each member's posterior at each gating context,
@@ -126,8 +126,11 @@ on the admitted egg, and the trees beyond depth 24 add at most 20 bits.
        takes 263,687 ms at an 8.4 GB peak, and streaming the standing raises the peak to 14.2 GB.
      - The switching in time is a floor declared as the chart's width, not the hazard ladder.
        Its segment telescope in Lean is owed (#62).
-     - The eight families under this mixture replace candidate 1's egg alone as F0's byte
-       predictor.
+     - **Not adopted.** The choosing families decide: their charged bytes read `−3 + 12/16 + ε`
+       against the egg alone and their whole stream about 7 bits above it. The gain rides on the
+       floor, a switching law entered as a width (`K = 64`) and never compared with the declared
+       fixed share, and it costs four times the standing for under one bit in 1,700 bytes. The egg
+       alone stays F0's byte predictor. Mixing similar context models is not the lever on the rate.
   3. **Word contexts. Learned tokens as the alphabet: not adopted, September 28.** A tree over
      learned merge tokens (`hnn_tokens`: K = 256, depth 4 tokens, both chosen on choosing alone)
      codes the validation bytes `77906 + 10/16 + ε` bits above the flat byte tree (`1 + 15/16`
