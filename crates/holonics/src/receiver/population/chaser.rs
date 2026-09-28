@@ -1,16 +1,18 @@
 //! **The machine as chaser: the population reads the runner, and each motion is released through
-//! the one decision law or its declared cornering arm** (THE_REBUILD F6, the action phase, and U3's
-//! second loop; the record `2026-09-27_THE_LEARNER_MUST_MOVE_A_CHASE_TERRAIN_…`, §6, §12 items 5, 8,
-//! 9 and 13, §14.3–§14.4 and §14.10; campaign 4, #27, #148). It replaces the reception's scripted
-//! pursuer with the machine, a [`Chaser`] of `holarchy::terrain::pursuit`.
+//! the one decision law or its declared cornering arm, each error deposited only where it reached**
+//! (THE_REBUILD F6, the action phase and its switches, and U3's second loop; the record
+//! `2026-09-27_THE_LEARNER_MUST_MOVE_A_CHASE_TERRAIN_…`, §6, §9, §12 items 5, 7, 8, 9, 10 and 13,
+//! §14.3–§14.5 and §14.10; campaign 4, #27, #148). It replaces the reception's scripted pursuer with
+//! the machine, a [`Chaser`] of `holarchy::terrain::pursuit`.
 //!
 //! [definition; agent-inferred] **The reading.** The machine holds the reception's population
 //! (`ChaseFamily`, one family per declared candidate, escape mass `2^(−j)`), joined to the passage's
-//! ports as the chaser writes them, and receives the runner's cell after each tick; its **fibre** is
-//! the population's selected fibre (`selected_fibre`, the families of greatest posterior, exactly
-//! the candidates no received cell contradicted), read uniform, as the posterior is on it. It also
-//! carries each candidate's state past the received cells ([`Candidate::receive`]), so a fibre
-//! member's law predicts its cell against any chaser position.
+//! ports as the chaser writes them, and receives the channels' readings of the runner's cell as they
+//! arrive (`holarchy::terrain::sensing`; the cell each names, below, "The attribution"); its
+//! **fibre** is the population's selected fibre (`selected_fibre`, the families of greatest
+//! posterior, exactly the candidates no received cell contradicted), read uniform, as the posterior
+//! is on it. It also carries each candidate's state past the received cells
+//! ([`Candidate::receive`]), so a fibre member's law predicts its cell against any chaser position.
 //!
 //! [definition; agent-inferred] **What a move is worth**, for each admitted motion `u` at tick `t`
 //! (the fibre `Θ` split into its observation classes by the cells against the present position
@@ -61,9 +63,10 @@
 //!   already holds and the machine commits. The capture reading is coarser than the family's
 //!   identity: it certifies the consequence over a plural fibre, where the test would still be
 //!   sampling.
-//! - **Each emission carries its predicted consequence** (§12 item 9): the leading class's cell (the
-//!   largest class, the least cell on a tie) is read against the cell that unfolds; a miss is counted
-//!   in the receipt.
+//! - **Each emission carries its predicted consequence** (§12 item 9): the leading cell of tick `t`
+//!   (the cell most members of the fibre, projected to `t`, emit against `c_t`; the least on a tie)
+//!   is read against the cell the reading of `t` names when it arrives; a miss is counted in the
+//!   receipt.
 //!
 //! [definition; agent-inferred] **The plan** ([`Plan`]; THE_REBUILD U4's next loop), the commit
 //! order's reading of the fibre:
@@ -158,6 +161,57 @@
 //!   every member's law: the pledge is **broken**, counted in the receipt
 //!   ([`MachineReceipt::broken`]) and dropped, and the plan reads on at `m`.
 //!
+//! [definition; proved-derived; agent-inferred] **The lag: the fibre projected through the withheld
+//! ticks** (THE_REBUILD F6's lag channel; `pursuit::Pending`). Under the channels' declared lag `d`
+//! the constitution has received the readings of the ticks below `t − d` at tick `t`. Every member of
+//! its fibre runs its own law through the withheld ticks against the machine's own motor record (its
+//! port), its cells withheld ([`Candidate::emit`]), and a member the chaser would have captured on the
+//! way is dropped from the reading: the passage goes on, so it is not the runner. The projected
+//! members agree on every revealed cell and may part on the withheld ones, so the capture basin and
+//! the expected capture read each member at its own motion and the classes by the cell the next
+//! reading reveals (the cell of `t − d`, fixed by the past while `d ≥ 1`), a member captured on the way
+//! done (`pursuit::Basin::capture_ticks`). That is the Pre recursion of the lagged information
+//! structure, so a certified capture is certified over it, and the pledge's argument holds as at lag
+//! zero: the fibre a tick later is exactly the part the next reading names. At `d = 0` nothing is
+//! withheld and every reading is the one before.
+//!
+//! [definition; proved-derived; agent-inferred] **The attribution: deposition only at the locus a
+//! covector reached** (THE_REBUILD F6's deposition law; the record's §9, §12 items 7 and 10, and
+//! §14.5). A reception of tick `τ` meets three loops, each a loop closure over pair contacts:
+//! - **the channel loop** (`sensing::ChannelMenu::close`): the three channels' readings are pair
+//!   contacts whose circuits read the turn relating two frames, and the syndrome over the menu is the
+//!   Bombe's pairwise closure over the menu of contacts. The menu meets the separation condition at
+//!   `k = 1` (checked on its circuit matrix when the machine opens: no nonzero kernel vector of
+//!   support at most `2`), so a turned frame is located uniquely, with its turn. **Its locus is the
+//!   channel**: the faulty reading's covector reaches that channel, whose defect is the receipt's
+//!   ([`MachineReceipt::located`]); nothing of it reaches the runner's constitution, which reads a
+//!   cleared channel's reading. The channel holds no constitution here to deposit into: the fault
+//!   switches by aeons, so a retained turn would merge aeons the closure separates, and the closure
+//!   relocates it every tick;
+//! - **the mover's loop**: the named cell against the contemporary constitution's prediction, its
+//!   fibre's own cells at `τ` against the motor record at `τ`. **Its locus is the runner's
+//!   constitution**: the members whose cell differs receive the covector, and the population deposits
+//!   the cell at its own tick (`ChaseFamily` reads the port at its own tick), the only deposit; a
+//!   reading whose cell a member of the fibre did not emit is counted ([`MachineReceipt::deposits`]);
+//! - **the lag's loop**: the action-time prediction of `τ` (made at `τ` from the fibre `d` readings
+//!   short) against the contemporary one. The lag is a common mode of the three time-aligned channels,
+//!   `(d, d, d) ∈ ker C`, which no channel circuit sees; the motor record closes it, since the reading
+//!   is read against the port at `τ`, not at its arrival. A miss of the action-time prediction that the
+//!   contemporary one does not make is **the lag's** ([`MachineReceipt::lag_misses`]): **its locus is
+//!   none**. With the prediction `p` read as the fibre's law of the cell, the action-time covector
+//!   splits as `q − p_act = (q − p_con) + (p_con − p_act)`; deposition consumes `q − p_con` alone, so
+//!   the constitution after every reading is the one the prompt reception of the same true cells
+//!   holds (the notebook's `hnn_chase switches` checks it on every seed, at every tick and exactly at
+//!   the end).
+//!
+//! [measured] **F6's switch bullet, read once** (the notebook's `hnn_chase switches`, pinned at commit
+//! `95a8864a`: 63 chased seeds of `20261301 + s`, `s < 64`, `d = 1`, the fault's aeons uniform on
+//! `1..=4`). With the switches on the machine takes 646 capture ticks against pure pursuit's 19,255 and
+//! constant bearing's 4,713, fewer than both at once on 38 of 63 (off: 611, 17,034 and 1,949; 36 of
+//! 63). The fault is located on 111 of the 111 active aeons read and on no other (264 of 264 active
+//! ticks, none wrong). The constitution equals the prompt one on 63 of 63 seeds, 48 of the 126
+//! action-time misses being the lag's, and 589 of 589 released bounds are kept.
+//!
 //! [definition; agent-inferred] **The parameters**: the viable tube's horizon `n`, the capture
 //! basin's horizon `m` and the price `d`, chosen on a pinned choosing set of seeds disjoint from the
 //! acceptance seeds (the notebook's `hnn_chase choose`), never on the acceptance seeds: `n = 2`,
@@ -167,13 +221,15 @@
 //!
 //! [definition] The computational object is the helical pair interaction: the machine and the
 //! runner are a pair whose contact quadrance the machine closes by shrinking the runner's viable
-//! tube against the walls and low-friction ground. Of the winding guide's six general objects this
-//! owner touches **faces and placement** (each candidate's cell face, the fibre's classes) and the
-//! **tube** (the viable tube and the passage); the **pair**, the **tower thread** (the classes'
-//! restriction), the **helix** and the **cell holonomy** stay attached through the terrain's laws it
-//! reads.
+//! tube against the walls and low-friction ground, reading it through three channels whose pair
+//! contacts' loop closure locates a defect. Of the winding guide's six general objects this owner
+//! touches **faces and placement** (each candidate's cell face, the fibre's classes, the channels'
+//! readings), the **tube** (the viable tube, the passage and the withheld span of the lag), the
+//! **pair** (the channels' contacts and their slip, a quarter-turn) and the **cell holonomy** (the
+//! attribution's three loops, each read against its expected identity); the **tower thread** (the
+//! classes' restriction) and the **helix** stay attached through the terrain's laws it reads.
 
-use std::collections::BTreeMap;
+use std::collections::{BTreeMap, VecDeque};
 use std::sync::Arc;
 
 use num_bigint::BigUint;
@@ -182,11 +238,11 @@ use num_traits::{One, Zero};
 use std::cmp::Ordering;
 
 use super::{ChaseFamily, Population, PopulationError, refuse, selected_fibre};
-use crate::geometry::motion::quadrance;
+use crate::geometry::motion::{Point, quadrance};
 use crate::holarchy::terrain::{
-    Basin, BasinMemo, Candidate, Caps, CaptureReach, ChasePorts, ChaseView, Chaser,
-    ExpectedCapture, ExpectedMemo, Motion, Moves, Pursuer, RunnerFamily, capture_ticks, classes,
-    expected_ticks, viable_tube,
+    Basin, BasinMemo, CHANNELS, Candidate, Caps, CaptureReach, ChannelDefect, ChannelMenu,
+    ChasePorts, ChaseView, Chaser, ExpectedCapture, ExpectedMemo, Motion, Moves, Pursuer,
+    Reception, RunnerFamily, capture_ticks, classes, expected_ticks, viable_tube,
 };
 use crate::ratio::Rat;
 use crate::receiver::face::{DiameterNorm, ReceiverWidth, WidthWitness};
@@ -292,11 +348,15 @@ impl MachineRelease {
     }
 }
 
-/// [definition] **The machine's receipt**: per tick its release, the fibre's size and, for a
-/// certified release, its **bound** (module header, the pledge): the ticks within which the
-/// machine's own continuation captures every member of the fibre; the misses of its predicted
-/// consequence; and the pledges broken, ticks where no admitted move kept the pledge (the runner
-/// had left every fibre member's law).
+/// [definition] **The machine's receipt**: per tick its release, the constitution's fibre's size
+/// and, for a certified release, its **bound** (module header, the pledge): the ticks within which
+/// the machine's own continuation captures every member of the fibre; the misses of its predicted
+/// consequence at the action; and the pledges broken, ticks where no admitted move kept the pledge
+/// (the runner had left every fibre member's law). Per reading received (module header, the
+/// attribution): the channel defect the loop closure located, none where every circuit closed; the
+/// action-time misses the lag caused (the contemporary constitution predicted the reading); and the
+/// deposits, readings whose covector reached the runner's constitution (a member of the
+/// contemporary fibre emitted another cell).
 #[derive(Clone, Debug, Default, PartialEq, Eq)]
 pub struct MachineReceipt {
     pub releases: Vec<MachineRelease>,
@@ -304,6 +364,9 @@ pub struct MachineReceipt {
     pub certified: Vec<Option<usize>>,
     pub misses: usize,
     pub broken: usize,
+    pub located: Vec<Option<ChannelDefect>>,
+    pub lag_misses: usize,
+    pub deposits: usize,
 }
 
 impl MachineReceipt {
@@ -319,12 +382,26 @@ pub struct MachineChaser {
     plan: Plan,
     ports: Option<Arc<ChasePorts>>,
     population: Option<Population>,
+    /// The constitution's candidates, each at the tick of the next reading, past the readings.
     candidates: Vec<Candidate>,
     pursuer: Option<(Pursuer, Caps, Moves)>,
-    predicted: Option<usize>,
+    /// The channel menu the readings close over (module header, the attribution).
+    menu: ChannelMenu,
+    /// The readings received, the tick of the next one.
+    received: usize,
+    /// The predicted consequence of each tick not yet read: the tick and the leading cell.
+    predicted: VecDeque<(usize, usize)>,
     /// The pledge (module header): the tick by which every fibre member is captured, once released.
     pledge: Option<u64>,
     receipt: MachineReceipt,
+}
+
+/// **The leading cell** of a fibre's own cells: the cell most members emit, the least on a tie.
+fn leading(counts: &BTreeMap<usize, usize>) -> Option<usize> {
+    counts
+        .iter()
+        .max_by(|a, b| a.1.cmp(b.1).then(b.0.cmp(a.0)))
+        .map(|(&cell, _)| cell)
 }
 
 /// A move's reading (module header): `b(u)`, `K(u)`, `N(u)`, and the class sizes of the fibre's
@@ -487,7 +564,9 @@ impl MachineChaser {
             population: None,
             candidates: Vec::new(),
             pursuer: None,
-            predicted: None,
+            menu: ChannelMenu::complete(CHANNELS)?,
+            received: 0,
+            predicted: VecDeque::new(),
             pledge: None,
             receipt: MachineReceipt::default(),
         })
@@ -532,7 +611,7 @@ impl MachineChaser {
         &self,
         basin: &Basin<'_>,
         memo: &mut BasinMemo,
-        parts: &[(usize, Vec<Candidate>)],
+        parts: &[(Option<usize>, Vec<Candidate>)],
         next: Motion,
         tick: u64,
         plural: bool,
@@ -547,32 +626,35 @@ impl MachineChaser {
             next,
             horizon,
         )?;
-        let mut tubes: BTreeMap<(usize, i64, Vec<i64>, u64), usize> = BTreeMap::new();
+        // Each member at its own motion: at lag zero a class shares it; under a lag the members'
+        // motions part on their withheld cells.
+        let mut tubes: BTreeMap<(Motion, i64, Vec<i64>, u64), usize> = BTreeMap::new();
         let (mut cornering, mut nearness) = (0usize, 0i64);
         let mut sizes: Vec<usize> = Vec::new();
-        for (part, (_, class)) in parts.iter().enumerate() {
-            let motion = class[0].state.motion;
-            let gap = quadrance([
-                motion.position[0] - next.position[0],
-                motion.position[1] - next.position[1],
-            ]);
-            nearness += gap * class.len() as i64;
-            if !basin.pursuer.captures(motion.position, next.position) {
-                for member in class {
-                    let caps = &member.law.caps;
-                    let key = (part, caps.speed, caps.classes.clone(), member.state.held);
-                    let size = match tubes.get(&key) {
-                        Some(&size) => size,
-                        None => {
-                            let size =
-                                viable_tube(basin.arena, caps, motion, member.state.held, &reach)?
-                                    .size();
-                            tubes.insert(key, size);
-                            size
-                        }
-                    };
-                    cornering += size;
+        for (_, class) in parts {
+            for member in class {
+                let motion = member.state.motion;
+                let gap: Point = [
+                    motion.position[0] - next.position[0],
+                    motion.position[1] - next.position[1],
+                ];
+                nearness += quadrance(gap);
+                if basin.pursuer.captures(motion.position, next.position) {
+                    continue;
                 }
+                let caps = &member.law.caps;
+                let key = (motion, caps.speed, caps.classes.clone(), member.state.held);
+                let size = match tubes.get(&key) {
+                    Some(&size) => size,
+                    None => {
+                        let size =
+                            viable_tube(basin.arena, caps, motion, member.state.held, &reach)?
+                                .size();
+                        tubes.insert(key, size);
+                        size
+                    }
+                };
+                cornering += size;
             }
             if plural {
                 for (_, split) in classes(basin.arena, basin.moves, class, next.position, tick + 1)?
@@ -613,12 +695,20 @@ impl Chaser for MachineChaser {
             family,
             self.declaration.escape,
         )?)?);
-        self.candidates = Candidate::opening(family, &ports.arena, ports.opening.position)?;
+        if !self.menu.separates(1) {
+            return Err(refuse(
+                "a machine chaser's channel menu",
+                "it locates a defect on one channel: its circuit matrix's kernel holds no nonzero vector of support at most two",
+            ));
+        }
+        self.candidates =
+            Candidate::lagged(family, &ports.arena, ports.opening.position, ports.lag)?;
         let caps = pursuer.law.caps(ports.arena.declaration())?;
         let disk = Moves::within(caps.top())?;
         self.pursuer = Some((pursuer.clone(), caps, disk));
         self.ports = Some(Arc::clone(ports));
-        self.predicted = None;
+        self.received = 0;
+        self.predicted.clear();
         self.pledge = None;
         self.receipt = MachineReceipt::default();
         Ok(())
@@ -632,11 +722,51 @@ impl Chaser for MachineChaser {
             ));
         };
         let tick = view.tick as u64;
-        let fibre: Vec<Candidate> = self
-            .fibre()
-            .into_iter()
-            .map(|index| self.candidates[index].clone())
+        let constitution = self.fibre();
+        // The constitution's fibre, projected through the ticks the channels still withhold against
+        // the machine's own motor record (its port): each member runs its own law, its cells
+        // withheld, and a member the chaser would have captured on the way is not the runner (the
+        // passage goes on), as the capture basin reads it (module header, the lag). At lag zero
+        // nothing is withheld and the fibre shares the observed motion, never captured.
+        let mut fibre: Vec<Candidate> = constitution
+            .iter()
+            .map(|&index| self.candidates[index].clone())
             .collect();
+        for withheld in self.received..view.tick {
+            let at = ports.chaser.get(withheld).ok_or_else(|| {
+                refuse(
+                    "a machine chaser's projection",
+                    "its port holds every withheld tick",
+                )
+            })?;
+            fibre = fibre
+                .iter()
+                .filter(|member| !pursuer.captures(member.state.motion.position, at.position))
+                .map(|member| {
+                    match member.emit(&ports.arena, &ports.moves, at.position, withheld as u64)? {
+                        (_, None, next) => Ok(next),
+                        (_, Some(_), _) => Err(refuse(
+                            "a machine chaser's projection",
+                            "the channels withhold at most their declared lag",
+                        )),
+                    }
+                })
+                .collect::<Result<_, PopulationError>>()?;
+        }
+        fibre
+            .retain(|member| !pursuer.captures(member.state.motion.position, view.chaser.position));
+        if fibre.is_empty() {
+            return Err(refuse(
+                "a machine chaser's projection",
+                "the passage goes on, so some member of the fibre is not captured",
+            ));
+        }
+        // The predicted consequence at the action: the cell most of the projected fibre emits.
+        let mut own: BTreeMap<usize, usize> = BTreeMap::new();
+        for member in &fibre {
+            *own.entry(member.cell(&ports.arena, &ports.moves, view.chaser.position, tick)?)
+                .or_default() += 1;
+        }
         let plural = fibre.len() > 1;
         let parts = classes(
             &ports.arena,
@@ -697,10 +827,9 @@ impl Chaser for MachineChaser {
         }
         let (released, chosen) =
             release_among(&worths, self.plan, fibre.len(), self.declaration.price)?;
-        self.predicted = parts
-            .iter()
-            .max_by(|a, b| a.1.len().cmp(&b.1.len()).then(b.0.cmp(&a.0)))
-            .map(|(cell, _)| *cell);
+        if let Some(cell) = leading(&own) {
+            self.predicted.push_back((view.tick, cell));
+        }
         let bound = match released.kind() {
             Release::Certified => Some(released_bound(self.plan, &worths[chosen])?),
             _ => None,
@@ -711,26 +840,81 @@ impl Chaser for MachineChaser {
         }
         self.receipt.certified.push(bound);
         self.receipt.releases.push(released);
-        self.receipt.fibre.push(fibre.len());
+        self.receipt.fibre.push(constitution.len());
         Ok(admitted[chosen])
     }
 
-    fn receive(&mut self, cell: usize) -> Result<(), PopulationError> {
-        let (Some(ports), Some(population)) = (&self.ports, &mut self.population) else {
+    /// **The attribution, then the deposit** (module header): the channel menu's loop closure
+    /// locates a channel's defect and names the reading of a cleared channel; the mover's loop reads
+    /// the contemporary constitution against the motor record at the reading's own tick; the
+    /// action-time prediction's miss is the lag's where the contemporary one predicted the reading;
+    /// and only the runner's constitution deposits, from the named cell at its own tick.
+    fn receive(&mut self, reception: &Reception) -> Result<(), PopulationError> {
+        let Some(ports) = self.ports.clone() else {
             return Err(refuse(
                 "a machine chaser's reception",
                 "it has opened on the passage's ports",
             ));
         };
+        let (arena, moves) = (&ports.arena, &ports.moves);
+        let tick = reception.tick;
+        if tick != self.received {
+            return Err(refuse(
+                "a machine chaser's reception",
+                "the channels deliver their readings in tick order",
+            ));
+        }
+        // The channel loop: the pair contacts' syndrome, its location, a cleared channel's reading.
+        let closure = self.menu.close(&reception.readings)?;
+        let before = self
+            .candidates
+            .first()
+            .map(|candidate| candidate.state.motion)
+            .ok_or_else(|| refuse("a machine chaser's reception", "it reads a candidate"))?;
+        let at = ports.chaser.get(tick).ok_or_else(|| {
+            refuse(
+                "a machine chaser's reception",
+                "its port holds the reading's tick",
+            )
+        })?;
+        let cell = closure.reading.cell(arena, moves, &before, at.position)?;
+        // The mover's loop: the contemporary constitution's own cells at the reading's tick,
+        // against the machine's motor record there.
+        let mut own: BTreeMap<usize, usize> = BTreeMap::new();
+        for index in self.fibre() {
+            *own.entry(self.candidates[index].cell(arena, moves, at.position, tick as u64)?)
+                .or_default() += 1;
+        }
+        let contemporary = leading(&own);
+        let action = match self.predicted.front() {
+            Some(&(predicted, cell)) if predicted == tick => {
+                self.predicted.pop_front();
+                Some(cell)
+            }
+            _ => None,
+        };
+        if action.is_some_and(|predicted| predicted != cell) {
+            self.receipt.misses += 1;
+            if contemporary == Some(cell) {
+                self.receipt.lag_misses += 1;
+            }
+        }
+        self.receipt.deposits += usize::from(own.keys().any(|&emitted| emitted != cell));
+        self.receipt.located.push(closure.defect);
+        // The deposit: the runner's constitution receives the named cell at its own tick.
+        let population = self.population.as_mut().ok_or_else(|| {
+            refuse(
+                "a machine chaser's reception",
+                "it has opened on the passage's ports",
+            )
+        })?;
         population.receive(cell)?;
         self.candidates = self
             .candidates
             .iter()
-            .map(|candidate| candidate.receive(&ports.arena, &ports.moves, cell))
+            .map(|candidate| candidate.receive(arena, moves, cell))
             .collect::<Result<_, _>>()?;
-        if self.predicted.is_some_and(|predicted| predicted != cell) {
-            self.receipt.misses += 1;
-        }
+        self.received += 1;
         Ok(())
     }
 }

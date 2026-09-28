@@ -431,7 +431,8 @@ where one exists), `holarchy::terrain::{chase, pursuit}`, then the named operato
   the table itself as the index control. The chase's next loop also records its capture distances as a
   function of the admitted move set.
 - **F6's switches and attribution** follow U2 and U3 (they touch the action-sufficient future and the
-  release law).
+  release law). Done September 28: F6's switch bullet passes as written on its pinned population
+  (F6, "The switches and their attribution, built and read once").
 - **F6's action acceptance stays as written, and its failure stays visible.** The next measurement
   is on a fresh, unfiltered population of seeds with its aggregate capture, regret and win/tie/loss
   criteria declared before the run. The subset of seeds that admit a win beyond every control is
@@ -963,6 +964,38 @@ The machine has only read recordings; here it first moves, against another's con
   - The traces show turns forced across low-friction cells, with the runner's slips counted.
   - With the switches on, capture still beats both controls, the fault is located on exactly the
     aeons it is active, and lag-caused errors deposit nothing in the chaser's constitution.
+- **The switches and their attribution, built and read once** (September 28; #27; receipts in the
+  notebook README, `hnn_chase switches`; the owners `holarchy::terrain::sensing`,
+  `pursuit::Pending` and `receiver::population::chaser`, "The lag" and "The attribution").
+  - *The switches* ([definition; agent-inferred]): three time-aligned channels read the runner's cell
+    as its kind, the line of sight and the heading in their own frames. The lag `d` delivers tick
+    `τ`'s readings once `τ + d` has moved (the controls read the runner at `t − d`). The faulty sensor
+    turns one channel's frame by `i^a` on the odd aeons of a drawn switch clock (`SwitchTruth`); the
+    frame, not the velocity alone, since a turned zero velocity makes no error to locate.
+  - *The separation check* ([proved-derived]): the three-channel menu's circuit matrix
+    `C = [[1, −1, 0], [1, 0, −1], [0, 1, −1]]` over `ℤ/4` has `ker C = {(c, c, c)}`, so no nonzero
+    kernel vector has support at most `2 = 2k` and one turned frame is located with its turn; `(1, 1, 1)`
+    breaks `k = 2`, `(1, 1)` breaks two channels. The lag `(d, d, d)` lies in `ker C`: no channel
+    circuit sees it, and the motor record closes it.
+  - *The attribution* ([definition; proved-derived]): the channel loop's locus is the channel; the
+    mover's loop (the contemporary fibre against the port at the reading's tick) is the runner's
+    constitution, the only deposit; the lag's loop deposits nothing,
+    `q − p_act = (q − p_con) + (p_con − p_act)` with `q − p_con` alone consumed. Under the lag the
+    capture basin reads the lagged information structure (withheld cells, classes by the cell the next
+    reading reveals, capture member by member); at `d = 0` it is the unlagged recursion, and `action
+    trace` is unchanged line for line.
+  - *Pinned before the run* (commit `95a8864a`): seeds `20261301 + s`, `s < 64`; `d = 1`; the fault's
+    aeons uniform on `1..=4`; the switch bullet as written.
+  - *The run* (once; 162,402 ms at a 269,180 kB peak; 63 chased seeds, 20261325 refused): with the
+    switches on the machine takes 646 capture ticks against pure pursuit's 19,255 and constant
+    bearing's 4,713, fewer than both at once on 38 of 63 (off: 611, 17,034, 1,949; 36 of 63). The fault
+    is located on 111 of the 111 active aeons read and on no inactive one (264 of 264 active ticks,
+    none wrong, no false alarm). The constitution equals the prompt one on the true cells on 63 of 63
+    seeds; 48 of the 126 action-time misses are the lag's and deposit nothing. 589 of 589 released
+    bounds are kept. **The switch bullet passes as written.** The action acceptance as a whole still
+    fails on its first bullet at the pinned acceptance seeds (7 of 16), unchanged.
+  - Owed in Lean (#62): the localization condition and its three-channel instance, the lagged basin's
+    exactness, and the attribution's covector split.
 - **Reported beside it, not as acceptance.**
   - The cornering receipt: the runner's robust viability kernel in the arena, tick by tick, under
     the machine's play and under each control. Capture should come from shrinking it.

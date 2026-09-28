@@ -16,6 +16,7 @@ use num_traits::One;
 
 use super::chase::*;
 use super::pursuit::*;
+use super::sensing::*;
 use super::{Draw, TerrainError};
 use crate::compression::landmark::context::{
     Capacity, LandmarkDeclaration, LetterFamily, StopPrior,
@@ -30,7 +31,7 @@ use crate::receiver::population::{
 /// The declared arena: `16 × 16` positions, patches of side 4, classes ice `1/2`, grass `1`, track
 /// `3/2`, `g = 8`, `h = 1/2`, `ℓ = 1`, so `k = g h²/ℓ = 2` and a unit traction coefficient admits
 /// changes of radius `1`, `2` and `3` on the three classes: every class resolves on the lattice.
-fn declaration() -> ArenaDeclaration {
+pub(super) fn declaration() -> ArenaDeclaration {
     ArenaDeclaration {
         width: 16,
         height: 16,
@@ -44,7 +45,7 @@ fn declaration() -> ArenaDeclaration {
 
 /// The declared family: speeds `2, 3`, traction coefficients `1, 3/2`, holds `1, 2`, and five
 /// navigators: `2·2·2·5 = 40 = 2³·5` candidates, each named by `⌈log₂ 40⌉ = 6` bits.
-fn family() -> RunnerFamily {
+pub(super) fn family() -> RunnerFamily {
     RunnerFamily {
         speeds: vec![rat(2, 1), rat(3, 1)],
         tractions: vec![rat(1, 1), rat(3, 2)],
@@ -61,7 +62,7 @@ fn family() -> RunnerFamily {
 
 /// The scripted pursuer: speed `3/2` below both runner speeds, traction `2` above both, capturing
 /// within one lattice step, diagonals included (`ρ² = 2`).
-fn pursuer() -> Pursuer {
+pub(super) fn pursuer() -> Pursuer {
     Pursuer {
         law: RunnerLaw {
             speed: rat(3, 2),
@@ -72,10 +73,10 @@ fn pursuer() -> Pursuer {
 }
 
 /// The escape exponent `j`: `η = 2^(−12)` (the family module's reason).
-const ESCAPE: u32 = 12;
+pub(super) const ESCAPE: u32 = 12;
 
 /// The arena with every patch of one class.
-fn uniform(class: usize) -> Arena {
+pub(super) fn uniform(class: usize) -> Arena {
     let declaration = declaration();
     let patches = vec![class; declaration.patches()];
     Arena::new(declaration, patches).unwrap()
@@ -715,6 +716,7 @@ fn every_chaser_motion_satisfies_its_traction_bound() {
         pursuer: pursuer.clone(),
         ticks: 40,
         horizon: 2,
+        switches: Switches::OFF,
     };
     let check = |passage: &ActionPassage| {
         let arena = &passage.ports.arena;
@@ -808,6 +810,7 @@ fn every_released_bound_is_kept_by_the_plan_itself() {
         pursuer: pursuer(),
         ticks: 64,
         horizon: 2,
+        switches: Switches::OFF,
     };
     let basin = 6;
     let small = ArenaDeclaration {
@@ -1155,6 +1158,7 @@ fn a_chaser_outside_its_traction_bound_is_refused() {
         pursuer: pursuer(),
         ticks: 8,
         horizon: 2,
+        switches: Switches::OFF,
     };
     let refused = act(
         uniform(2),
@@ -1162,6 +1166,7 @@ fn a_chaser_outside_its_traction_bound_is_refused() {
         0,
         [[12, 12], [2, 2]],
         &action,
+        None,
         &mut Leaper,
     );
     assert!(matches!(refused, Err(TerrainError::Declaration { .. })));
@@ -1179,6 +1184,7 @@ fn the_controls_head_at_the_runner_and_null_the_bearing_rate() {
         moves: family().moves(&declaration()).unwrap(),
         chaser: ChaserPort::default(),
         opening: Motion::rest([8, 8]),
+        lag: 0,
     });
     let pursuer = pursuer();
     let view = ChaseView {

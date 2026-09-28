@@ -11,7 +11,10 @@
 //! tick `t` capture is read on the present positions, `⟨x_R − x_C, x_R − x_C⟩ ≤ ρ²`, and ends the
 //! passage; otherwise the chaser writes its present motion `c_t` to its port, the runner's cell is
 //! read against `c_t`, and both move at once: the runner by its cell, the chaser to the motion it
-//! released at `t`. Neither sees the other's move of the same tick.
+//! released at `t`. Neither sees the other's move of the same tick. Then, once `t ≥ d`, the chaser
+//! receives the observation channels' readings of tick `t − d` (`holarchy::terrain::sensing`: the
+//! declared lag `d`, and the faulty sensor's turned frame where it is active); with the switches off
+//! it receives the readings of the tick just moved.
 //!
 //! [definition; agent-inferred] **The chaser's admissibility.** Every motion a chaser emits is one
 //! of its traction-admitted motions ([`Pursuer::motions`]): its velocity change `Δv` satisfies
@@ -60,6 +63,19 @@
 //! and `y` the class the runner's cell names: the least `j ≤ m` for which the chaser has an adaptive
 //! strategy capturing every candidate within `j` ticks, none past the horizon `m`.
 //!
+//! [proved-derived; agent-inferred] **The basin under a lag `d`** ([`Pending`]; THE_REBUILD F6's lag
+//! channel). A reading arrives `d` ticks after its tick, so the class the chaser learns after moving
+//! at `t` is named by the cell of `t − d`, fixed by the past while `d ≥ 1`. Each candidate carries its
+//! withheld cells, and [`classes`] groups the candidates by the cell the next reading reveals
+//! ([`Candidate::emit`]: its own cell appended, the oldest revealed once more than `d` are held). A
+//! class then agrees on every revealed cell while its members' motions part on the withheld ones, so
+//! the belief state `(c, t, class)` carries each member's state and withheld cells, capture is read
+//! member by member, and a member captured at `(c, t)` is done: had it been the runner the passage
+//! would have ended, so the chaser reads on only the others ([`Basin::capture_ticks`],
+//! [`Basin::expected_ticks`]). This is the same Pre recursion on the lagged information structure; at
+//! `d = 0` every cell is revealed as it is emitted, a class shares its observed motion, and the
+//! recursion is the one above, value for value.
+//!
 //! [definition; agent-inferred] **The controls** under the same traction bound: [`PurePursuit`] heads
 //! at the runner's present position (the admitted motion whose position is nearest it in
 //! quadrance, [`Pursuer::step`]). [`ConstantBearing`] holds a collision course: with
@@ -70,19 +86,22 @@
 //! det(r, ṙ)/|r|²` is the bearing receiver's lock, which permits radial slip, and approach also
 //! needs `⟨r, ṙ⟩ < 0`. [measured] Without the approach condition the law stalls: against a runner at
 //! rest, resting nulls `det(r, ṙ)` exactly, and the first acceptance run's constant bearing stood
-//! still for hundreds of ticks (the notebook README's action section keeps that run).
+//! still for hundreds of ticks (the notebook README's action section keeps that run). With the
+//! switches on, both read the runner's motion `d` ticks late, the motion the channels agree on
+//! ([`ChaseView`]): they need no attribution, and the faulty frame costs them nothing.
 //!
 //! [definition] The computational object is the helical pair interaction: the runner and the chaser
 //! are a pair whose contact quadrance `Q = ⟨x_R − x_C, x_R − x_C⟩` the chaser closes, each meeting the
 //! arena's friction field at its ground contact. Of the winding guide's six general objects this
 //! owner touches four: the **pair** (the contact's quadrance, capture and the capture reach),
 //! **faces and placement** (the friction field keeps absolute placement in the state; the tube is
-//! counted in lattice motions), the **tube** (the passage one tick a cell, and the viable tube, the
-//! bounded span of the runner's paths) and the **tower thread** (the fibre's observation classes, a
-//! candidate set restricted by each cell). The **helix** (the zig-zag's sheet, read through the
-//! runner's law) and the **cell holonomy** (the loop closure over three observation channels, the
-//! faulty-sensor switch) stay attached.
+//! counted in lattice motions), the **tube** (the passage one tick a cell, the viable tube, the
+//! bounded span of the runner's paths, and the lag's withheld span) and the **tower thread** (the
+//! fibre's observation classes, a candidate set restricted by each revealed cell). The **helix** (the
+//! zig-zag's sheet, read through the runner's law) and the **cell holonomy** (the loop closure over
+//! three observation channels, `holarchy::terrain::sensing`) stay attached.
 
+use std::borrow::Cow;
 use std::collections::{BTreeMap, BTreeSet, HashMap, HashSet};
 use std::sync::Arc;
 
@@ -92,6 +111,7 @@ use super::chase::{
     Arena, Caps, Chase, ChasePorts, ChaserPort, Motion, Moves, Pursuer, Runner, RunnerFamily,
     RunnerState, floor_cap,
 };
+use super::sensing::{CHANNELS, FaultTruth, LAG_LIMIT, Reception, Switches, TURNS};
 use super::{TerrainError, refuse};
 // The bearing's rotation `det(r, ṙ)`, shared with the tests.
 pub(super) use crate::geometry::motion::det;
@@ -410,22 +430,97 @@ pub struct CandidateLaw {
     pub caps: Caps,
 }
 
-/// [definition] **A candidate the chaser reads**: its index in the declared family, its law and its
-/// state, which agrees with the observed motion (only the slip counter is its own).
+/// [definition; agent-inferred] **A candidate's withheld cells** under the channels' declared lag
+/// `d` (module header, the lag; `holarchy::terrain::sensing`): the cells it has emitted that no
+/// reading has revealed yet, oldest first. Emitting a cell appends it, and once more than `d` are
+/// held the oldest is revealed: the reading of tick `τ` arrives once tick `τ + d` has moved. At
+/// `d = 0` each cell is revealed as it is emitted. A fixed-width word (the cells below `2^16`, the
+/// lag at most `sensing::LAG_LIMIT`), so a candidate stays a hashable value of the capture basin's
+/// memo.
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Hash)]
+pub struct Pending {
+    cells: [u16; LAG_LIMIT + 1],
+    len: u8,
+    lag: u8,
+}
+
+impl Pending {
+    /// No cell withheld, under a lag of at most `sensing::LAG_LIMIT`.
+    pub fn new(lag: usize) -> Result<Self, TerrainError> {
+        if lag > LAG_LIMIT {
+            return Err(refuse(
+                "a channel's lag",
+                "it is at most the declared reach of 2^3 ticks",
+            ));
+        }
+        Ok(Self {
+            cells: [0; LAG_LIMIT + 1],
+            len: 0,
+            lag: lag as u8,
+        })
+    }
+
+    /// The declared lag `d`.
+    pub fn lag(&self) -> usize {
+        usize::from(self.lag)
+    }
+
+    /// The withheld cells, oldest first.
+    pub fn cells(&self) -> Vec<usize> {
+        self.cells[..usize::from(self.len)]
+            .iter()
+            .map(|&cell| usize::from(cell))
+            .collect()
+    }
+
+    /// **Append an emitted cell**; the oldest withheld cell is revealed once more than `d` are held.
+    pub(super) fn push(&mut self, cell: usize) -> Result<Option<usize>, TerrainError> {
+        let cell = u16::try_from(cell)
+            .map_err(|_| refuse("a withheld cell", "it lies below 2^16, as every alphabet's"))?;
+        let len = usize::from(self.len);
+        self.cells[len] = cell;
+        if len < usize::from(self.lag) {
+            self.len += 1;
+            return Ok(None);
+        }
+        let head = self.cells[0];
+        self.cells.copy_within(1..=len, 0);
+        self.cells[len] = 0;
+        Ok(Some(usize::from(head)))
+    }
+}
+
+/// [definition] **A candidate the chaser reads**: its index in the declared family, its law, its
+/// state, which agrees with the observed motion (only the slip counter is its own), and its
+/// withheld cells ([`Pending`]): under a lag the state runs ahead of the readings, and the cells it
+/// emitted since the last reading are its own.
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct Candidate {
     pub index: usize,
     pub law: Arc<CandidateLaw>,
     pub state: RunnerState,
+    pub pending: Pending,
 }
 
 impl Candidate {
-    /// **Every candidate of a family** at the runner's opening.
+    /// **Every candidate of a family** at the runner's opening, read through channels of no lag.
     pub fn opening(
         family: &RunnerFamily,
         arena: &Arena,
         opening: Point,
     ) -> Result<Vec<Self>, TerrainError> {
+        Self::lagged(family, arena, opening, 0)
+    }
+
+    /// **Every candidate of a family** at the runner's opening, read through channels of the
+    /// declared lag `d`.
+    pub fn lagged(
+        family: &RunnerFamily,
+        arena: &Arena,
+        opening: Point,
+        lag: usize,
+    ) -> Result<Vec<Self>, TerrainError> {
+        let pending = Pending::new(lag)?;
         (0..family.len())
             .map(|index| {
                 let runner = family.candidate(index)?;
@@ -436,6 +531,7 @@ impl Candidate {
                         runner,
                     }),
                     state: RunnerState::opening(arena, opening)?,
+                    pending,
                 })
             })
             .collect()
@@ -454,33 +550,56 @@ impl Candidate {
             .cell(arena, moves, &self.law.caps, &self.state, chaser, tick)
     }
 
-    /// **The candidate past a received cell**: its state follows the cell ([`Runner::receive`]).
+    /// **The candidate past a received cell**: its state follows the cell ([`Runner::receive`]); its
+    /// withheld cells are kept.
     pub fn receive(&self, arena: &Arena, moves: &Moves, cell: usize) -> Result<Self, TerrainError> {
         Ok(Self {
             index: self.index,
             law: Arc::clone(&self.law),
             state: self.law.runner.receive(arena, moves, &self.state, cell)?,
+            pending: self.pending,
         })
+    }
+
+    /// **The candidate emits its cell** at a tick against the chaser's position: its own cell, the
+    /// cell a reading reveals after the tick (its oldest withheld cell once more than the lag are
+    /// held; its own at lag zero), and the candidate past its own cell with that cell withheld.
+    pub fn emit(
+        &self,
+        arena: &Arena,
+        moves: &Moves,
+        chaser: Point,
+        tick: u64,
+    ) -> Result<(usize, Option<usize>, Self), TerrainError> {
+        let cell = self.cell(arena, moves, chaser, tick)?;
+        let mut next = self.receive(arena, moves, cell)?;
+        let revealed = next.pending.push(cell)?;
+        Ok((cell, revealed, next))
     }
 }
 
-/// **The observation classes of a fibre at a tick** (module header): each candidate's cell against
-/// the chaser's position, the candidates grouped by cell in ascending cell order, each advanced past
-/// its own cell.
+/// [definition] **A fibre's observation classes**: each keyed by the cell the reading after the tick
+/// reveals (none before the first reading arrives), in ascending order ([`classes`]).
+pub type Parts = Vec<(Option<usize>, Vec<Candidate>)>;
+
+/// **The observation classes of a fibre at a tick** (module header): each candidate emits its cell
+/// against the chaser's position ([`Candidate::emit`]), and the candidates are grouped by the cell
+/// the reading after the tick reveals, in ascending cell order, each past its own cell. At lag zero
+/// the revealed cell is the one emitted, so a class shares its observed motion; under a lag `d` it is
+/// the cell of tick `t − d`, and a class agrees on every revealed cell while its members' motions may
+/// part on the withheld ones. Before the first reading arrives (`t < d`) nothing is revealed and the
+/// fibre is one class, keyed none.
 pub fn classes(
     arena: &Arena,
     moves: &Moves,
     candidates: &[Candidate],
     chaser: Point,
     tick: u64,
-) -> Result<Vec<(usize, Vec<Candidate>)>, TerrainError> {
-    let mut parts: BTreeMap<usize, Vec<Candidate>> = BTreeMap::new();
+) -> Result<Parts, TerrainError> {
+    let mut parts: BTreeMap<Option<usize>, Vec<Candidate>> = BTreeMap::new();
     for candidate in candidates {
-        let cell = candidate.cell(arena, moves, chaser, tick)?;
-        parts
-            .entry(cell)
-            .or_default()
-            .push(candidate.receive(arena, moves, cell)?);
+        let (_, revealed, next) = candidate.emit(arena, moves, chaser, tick)?;
+        parts.entry(revealed).or_default().push(next);
     }
     Ok(parts.into_iter().collect())
 }
@@ -496,8 +615,21 @@ pub struct Basin<'a> {
     pub disk: &'a Moves,
 }
 
-/// A belief node: the chaser's motion, the tick, and the class's candidates by index and state.
-type Node = (Motion, u64, Vec<(usize, RunnerState)>);
+/// A belief node: the chaser's motion, the tick, and the class's candidates by index, state and
+/// withheld cells.
+type Node = (Motion, u64, Vec<(usize, RunnerState, Pending)>);
+
+/// The node of a class.
+fn node(chaser: Motion, tick: u64, class: &[Candidate]) -> Node {
+    (
+        chaser,
+        tick,
+        class
+            .iter()
+            .map(|c| (c.index, c.state, c.pending))
+            .collect(),
+    )
+}
 
 /// [definition] **The capture basin's memo** within one decision: each belief node read, with the
 /// depth it was read at and its value there. A value `Some(j)` is the least capture within any
@@ -518,9 +650,23 @@ impl BasinMemo {
 }
 
 impl Basin<'_> {
+    /// **The members of a class the chaser has not captured**: at lag zero a class shares its
+    /// observed motion, so it is all of them or none; under a lag its members' motions may part on
+    /// their withheld cells, and each member captured here is done (the passage would have ended
+    /// had it been the runner, so the chaser reads on only the others).
+    fn uncaptured<'c>(&self, chaser: Point, class: &'c [Candidate]) -> Cow<'c, [Candidate]> {
+        let captured = |c: &Candidate| self.pursuer.captures(c.state.motion.position, chaser);
+        if class.iter().any(captured) {
+            Cow::Owned(class.iter().filter(|c| !captured(c)).cloned().collect())
+        } else {
+            Cow::Borrowed(class)
+        }
+    }
+
     /// **The capture basin's value of a class** (module header): the least `j ≤ depth` for which
     /// the chaser at `chaser` captures every candidate of the class within `j` ticks under some
-    /// adaptive strategy, the class's candidates sharing their observed motion; none past `depth`.
+    /// adaptive strategy, the class's candidates agreeing on every revealed cell (and so, at lag
+    /// zero, sharing their observed motion); none past `depth`.
     pub fn capture_ticks(
         &self,
         memo: &mut BasinMemo,
@@ -529,29 +675,20 @@ impl Basin<'_> {
         class: &[Candidate],
         depth: usize,
     ) -> Result<Option<usize>, TerrainError> {
-        let Some(first) = class.first() else {
-            return Ok(Some(0));
-        };
-        if self
-            .pursuer
-            .captures(first.state.motion.position, chaser.position)
-        {
+        let class = self.uncaptured(chaser.position, class);
+        if class.is_empty() {
             return Ok(Some(0));
         }
         if depth == 0 {
             return Ok(None);
         }
-        let node: Node = (
-            chaser,
-            tick,
-            class.iter().map(|c| (c.index, c.state)).collect(),
-        );
+        let node = node(chaser, tick, &class);
         match memo.0.get(&node) {
             Some(&(_, Some(j))) => return Ok((j <= depth).then_some(j)),
             Some(&(read, None)) if depth <= read => return Ok(None),
             _ => {}
         }
-        let parts = classes(self.arena, self.moves, class, chaser.position, tick)?;
+        let parts = classes(self.arena, self.moves, &class, chaser.position, tick)?;
         let mut best: Option<usize> = None;
         for next in self
             .pursuer
@@ -577,7 +714,7 @@ impl Basin<'_> {
         memo: &mut BasinMemo,
         chaser: Motion,
         tick: u64,
-        parts: &[(usize, Vec<Candidate>)],
+        parts: &[(Option<usize>, Vec<Candidate>)],
         depth: usize,
         better: Option<usize>,
     ) -> Result<Option<usize>, TerrainError> {
@@ -605,7 +742,7 @@ impl Basin<'_> {
 pub fn capture_ticks(
     basin: &Basin<'_>,
     memo: &mut BasinMemo,
-    parts: &[(usize, Vec<Candidate>)],
+    parts: &[(Option<usize>, Vec<Candidate>)],
     next: Motion,
     tick: u64,
     depth: usize,
@@ -689,8 +826,9 @@ impl ExpectedMemo {
 
 impl Basin<'_> {
     /// **The expected capture of a class** ([`ExpectedCapture`]): the least over adaptive chaser
-    /// strategies from `chaser` at `tick`, within `depth` ticks, the class's candidates sharing their
-    /// observed motion.
+    /// strategies from `chaser` at `tick`, within `depth` ticks, the class's candidates agreeing on
+    /// every revealed cell. A member captured here reads `(0, 0, 0)`, and the class reads its
+    /// uncaptured members' value ([`Basin::capture_ticks`]'s reading of a lag).
     pub fn expected_ticks(
         &self,
         memo: &mut ExpectedMemo,
@@ -699,13 +837,8 @@ impl Basin<'_> {
         class: &[Candidate],
         depth: usize,
     ) -> Result<ExpectedCapture, TerrainError> {
-        let Some(first) = class.first() else {
-            return Ok(ExpectedCapture::default());
-        };
-        if self
-            .pursuer
-            .captures(first.state.motion.position, chaser.position)
-        {
+        let class = self.uncaptured(chaser.position, class);
+        if class.is_empty() {
             return Ok(ExpectedCapture::default());
         }
         if depth == 0 {
@@ -715,15 +848,11 @@ impl Basin<'_> {
                 worst: 0,
             });
         }
-        let node: Node = (
-            chaser,
-            tick,
-            class.iter().map(|c| (c.index, c.state)).collect(),
-        );
+        let node = node(chaser, tick, &class);
         if let Some(&value) = memo.0.get(&(node.clone(), depth)) {
             return Ok(value);
         }
-        let parts = classes(self.arena, self.moves, class, chaser.position, tick)?;
+        let parts = classes(self.arena, self.moves, &class, chaser.position, tick)?;
         let mut best: Option<ExpectedCapture> = None;
         for next in self
             .pursuer
@@ -754,7 +883,7 @@ impl Basin<'_> {
         memo: &mut ExpectedMemo,
         chaser: Motion,
         tick: u64,
-        parts: &[(usize, Vec<Candidate>)],
+        parts: &[(Option<usize>, Vec<Candidate>)],
         depth: usize,
         better: Option<ExpectedCapture>,
     ) -> Result<Option<ExpectedCapture>, TerrainError> {
@@ -788,7 +917,7 @@ impl Basin<'_> {
 pub fn expected_ticks(
     basin: &Basin<'_>,
     memo: &mut ExpectedMemo,
-    parts: &[(usize, Vec<Candidate>)],
+    parts: &[(Option<usize>, Vec<Candidate>)],
     next: Motion,
     tick: u64,
     depth: usize,
@@ -1005,9 +1134,13 @@ pub fn least_capture(
 // -------------------------------------------------------------------------------------------
 // the chasers
 
-/// [definition] **What a chaser reads at a tick**: the ports (its own motions written so far, the
-/// present one included), its constitution, the runner's present observed motion, its own present
-/// motion and the tick.
+/// [definition; agent-inferred] **What a chaser reads at a tick**: the ports (its own motions written
+/// so far, the present one included), its constitution, the runner's motion as the channels deliver
+/// it, its own present motion and the tick. Under the channels' lag `d` the runner's motion is its
+/// motion at tick `t − d` (the opening's before the first reading), the motion after the last
+/// reading: a control reads the lagged runner the channels agree on, so the faulty sensor costs it
+/// nothing (the controls need no attribution, and the comparison is conservative against the
+/// machine), and the lag costs it what it costs every chaser.
 #[derive(Clone, Copy, Debug)]
 pub struct ChaseView<'a> {
     pub ports: &'a Arc<ChasePorts>,
@@ -1028,7 +1161,8 @@ impl ChaseView<'_> {
 }
 
 /// [definition] **A chaser**: it opens on a passage's ports, releases one motion a tick from what
-/// it reads, and receives the runner's cell after both move.
+/// it reads, and receives the channels' readings of the runner's cell as they arrive after both
+/// move (`holarchy::terrain::sensing`: the readings of tick `τ` once tick `τ + d` has moved).
 pub trait Chaser {
     type Error: From<TerrainError>;
     /// The chaser's declaration, for a receipt.
@@ -1039,8 +1173,8 @@ pub trait Chaser {
     }
     /// **Release the next motion**, one of the view's admitted motions.
     fn decide(&mut self, view: &ChaseView<'_>) -> Result<Motion, Self::Error>;
-    /// **Receive the runner's cell** of the tick just moved.
-    fn receive(&mut self, _cell: usize) -> Result<(), Self::Error> {
+    /// **Receive the channels' readings** of the runner's cell at the reception's tick.
+    fn receive(&mut self, _reception: &Reception) -> Result<(), Self::Error> {
         Ok(())
     }
 }
@@ -1103,19 +1237,23 @@ impl Chaser for ConstantBearing {
 // the passage
 
 /// [definition] **The action passage's declaration**: the chaser's constitution and capture, the
-/// passage's tick cap, and the cornering receipt's horizon `n ≥ 1`.
+/// passage's tick cap, the cornering receipt's horizon `n ≥ 1`, and the observation channels'
+/// switches (`holarchy::terrain::sensing::Switches`: the lag `d` and the faulty sensor's aeon
+/// family; [`Switches::OFF`] reads the runner's cells as they happen).
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct ActionDeclaration {
     pub pursuer: Pursuer,
     pub ticks: usize,
     pub horizon: usize,
+    pub switches: Switches,
 }
 
 /// [definition] **An action passage's receipt**: the chaser's label, the truth (the candidate's
 /// index and law), the runner's cells and motions, the ports (the chaser's port holds its motion at
-/// every tick and the one after), the capture tick, the runner's slips (onsets and slipping ticks)
-/// and wall meetings, and the cornering receipt: the runner's viable tube, under the truth's
-/// constitution, at every tick before capture.
+/// every tick and the one after; the channels' lag), the capture tick, the runner's slips (onsets
+/// and slipping ticks) and wall meetings, the cornering receipt (the runner's viable tube, under the
+/// truth's constitution, at every tick before capture), and the faulty sensor's truth, where one is
+/// declared.
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct ActionPassage {
     pub chaser: String,
@@ -1129,6 +1267,7 @@ pub struct ActionPassage {
     pub slip_ticks: usize,
     pub walls: usize,
     pub tubes: Vec<ViableTube>,
+    pub fault: Option<FaultTruth>,
 }
 
 impl ActionPassage {
@@ -1141,22 +1280,46 @@ impl ActionPassage {
     pub fn kernel_sum(&self, ticks: usize) -> usize {
         self.tubes.iter().take(ticks).map(ViableTube::size).sum()
     }
+
+    /// **The readings the chaser received**: the ticks whose readings arrived before capture, the
+    /// passage's cells less the channels' lag.
+    pub fn received(&self) -> usize {
+        self.cells.len().saturating_sub(self.ports.lag)
+    }
 }
 
 /// **The action passage** (module header) of candidate `index` of the family on an arena from its
-/// openings, against a chaser, for at most the declared ticks. Refused unless the openings lie in
-/// the arena outside capture, the chaser is slower and of larger traction than the runner and can
-/// always stop, the horizon is at least one tick, and every motion the chaser releases is one of its
-/// admitted motions.
+/// openings, against a chaser, for at most the declared ticks, the runner read through the declared
+/// channels (`holarchy::terrain::sensing`): after each tick moves, the chaser receives the readings of
+/// tick `t − d` once `t ≥ d`, each channel's heading turned by the drawn fault where it is active, and
+/// the view carries the runner's motion at `t − d`. Refused unless the openings lie in the arena
+/// outside capture, the chaser is slower and of larger traction than the runner and can always stop,
+/// the horizon is at least one tick, the switches check, a fault is given exactly where the switches
+/// declare one (a channel of the three, a turn other than the identity), and every motion the chaser
+/// releases is one of its admitted motions.
 pub fn act<C: Chaser>(
     arena: Arena,
     family: &RunnerFamily,
     index: usize,
     openings: [Point; 2],
     declaration: &ActionDeclaration,
+    fault: Option<FaultTruth>,
     chaser: &mut C,
 ) -> Result<ActionPassage, C::Error> {
     let pursuer = &declaration.pursuer;
+    let switches = &declaration.switches;
+    switches.check()?;
+    if fault.is_some() != switches.fault.is_some()
+        || fault
+            .as_ref()
+            .is_some_and(|f| f.channel >= CHANNELS || f.turns == 0 || f.turns >= TURNS)
+    {
+        return Err(refuse(
+            "a chase's faulty sensor",
+            "a fault of one channel and a nonidentity turn is drawn exactly where the switches declare one",
+        )
+        .into());
+    }
     let runner = family.candidate(index)?;
     let arena_declaration = arena.declaration().clone();
     let [runner_start, chaser_start] = openings;
@@ -1192,16 +1355,18 @@ pub fn act<C: Chaser>(
     let chaser_caps = pursuer.law.caps(&arena_declaration)?;
     let disk = Moves::within(chaser_caps.top())?;
     let mut state = RunnerState::opening(&arena, runner_start)?;
+    let lag = switches.lag;
     let ports = Arc::new(ChasePorts {
         arena,
         moves,
         chaser: ChaserPort::default(),
         opening: state.motion,
+        lag,
     });
     chaser.open(&ports, pursuer)?;
     let (arena, moves) = (&ports.arena, &ports.moves);
     let mut present = Motion::rest(chaser_start);
-    let (mut cells, mut path, mut tubes) = (Vec::new(), Vec::new(), Vec::new());
+    let (mut cells, mut path, mut tubes) = (Vec::new(), Vec::<Motion>::new(), Vec::new());
     let (mut slips, mut slip_ticks, mut walls, mut captured) = (0, 0, 0, None);
     for tick in 0..declaration.ticks {
         if pursuer.captures(state.motion.position, present.position) {
@@ -1218,10 +1383,17 @@ pub fn act<C: Chaser>(
             declaration.horizon,
         )?;
         tubes.push(viable_tube(arena, &caps, state.motion, state.held, &reach)?);
+        // The runner as the channels deliver it: its motion at tick t − d, the motion after the
+        // last reading (the opening's before the first).
+        let seen = if tick > lag {
+            path[tick - lag - 1]
+        } else {
+            ports.opening
+        };
         let view = ChaseView {
             ports: &ports,
             pursuer,
-            runner: state.motion,
+            runner: seen,
             chaser: present,
             tick,
         };
@@ -1243,9 +1415,27 @@ pub fn act<C: Chaser>(
         }
         walls += usize::from(cell == moves.wall());
         state = runner.receive(arena, moves, &state, cell)?;
-        chaser.receive(cell)?;
         cells.push(cell);
         path.push(state.motion);
+        if let Some(read) = tick.checked_sub(lag) {
+            let before = if read == 0 {
+                ports.opening
+            } else {
+                path[read - 1]
+            };
+            let sighted = ports.chaser.get(read).ok_or_else(|| {
+                refuse("a chase's ports", "the chaser's port holds every tick read")
+            })?;
+            chaser.receive(&Reception::read(
+                moves,
+                cells[read],
+                &before,
+                sighted.position,
+                &path[read],
+                read,
+                fault.as_ref(),
+            )?)?;
+        }
         present = next;
     }
     if captured.is_none() && pursuer.captures(state.motion.position, present.position) {
@@ -1264,11 +1454,14 @@ pub fn act<C: Chaser>(
         slip_ticks,
         walls,
         tubes,
+        fault,
     })
 }
 
 /// **A seed's action passage** (module header): the reception's draw ([`Chase::drawn`]), the same
-/// candidate, arena and openings, against a chaser.
+/// candidate, arena and openings, against a chaser; where the switches declare a faulty sensor its
+/// fault is drawn from the same draw's continuation ([`Chase::draw_key`], `FaultTruth::draw`) over
+/// the passage's tick cap.
 pub fn act_drawn<C: Chaser>(
     arena_declaration: &super::chase::ArenaDeclaration,
     family: &RunnerFamily,
@@ -1276,6 +1469,10 @@ pub fn act_drawn<C: Chaser>(
     seed: u64,
     chaser: &mut C,
 ) -> Result<ActionPassage, C::Error> {
-    let (index, arena, openings) = Chase::drawn(arena_declaration, family, seed)?;
-    act(arena, family, index, openings, declaration, chaser)
+    let (index, arena, openings, mut draw) = Chase::draw_key(arena_declaration, family, seed)?;
+    let fault = match &declaration.switches.fault {
+        Some(aeons) => Some(FaultTruth::draw(aeons, declaration.ticks, &mut draw)?),
+        None => None,
+    };
+    act(arena, family, index, openings, declaration, fault, chaser)
 }

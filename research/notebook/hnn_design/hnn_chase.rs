@@ -13,6 +13,8 @@
 //! cargo run --release -p holonics --example hnn_chase -- diagnose [seeds]   # U4: the failure located
 //! cargo run --release -p holonics --example hnn_chase -- fresh    # U4: the pledge loop's fresh population
 //! cargo run --release -p holonics --example hnn_chase -- moves [fresh]   # U4: the move sets (fresh: the first fresh population)
+//! cargo run --release -p holonics --example hnn_chase -- switches        # F6's switches: the pinned population
+//! cargo run --release -p holonics --example hnn_chase -- switches probe 1 16   # a projection on the choosing seeds
 //! ```
 //!
 //! [definition; agent-inferred] **U4's next loop.** `diagnose` reads the machine's passage tick by
@@ -23,6 +25,14 @@
 //! fresh population against its
 //! predeclared criteria ([`fresh`]). `moves` reads the truth-only least capture under each declared
 //! variant of the chaser's move set ([`MOVE_SETS`], `pursuit::MoveSet`).
+//!
+//! [definition; agent-inferred] **F6's switches** (`holarchy::terrain::sensing`,
+//! `receiver::population::chaser`'s attribution). `switches` reads each seed of the pinned population
+//! with the switches off and on (the lag [`SWITCH_LAG`], the faulty sensor on [`FAULT_AEONS`]) for the
+//! machine and both controls, and prints the channel menu's circuit matrix and its separation check,
+//! the fault's location per aeon and per tick against the terrain's truth, the switched machine's
+//! misses and those the lag caused, and whether its constitution equals the prompt one on the true
+//! cells ([`switches`] states the criteria, pinned before the run).
 //!
 //! [definition; agent-inferred] **The declaration** (the tests' own, `chase_tests.rs`): a `16 × 16`
 //! arena of `4 × 4` friction patches, classes ice `1/2`, grass `1` and track `3/2`, `g = 8`,
@@ -92,10 +102,11 @@ use holonics::compression::landmark::context::{
 };
 use holonics::geometry::motion::{Move, MoveKind};
 use holonics::holarchy::terrain::{
-    ActionDeclaration, ActionPassage, ArenaDeclaration, Basin, BasinMemo, Candidate, CaptureReach,
-    Chase, ChasePorts, ChaseView, Chaser, ConstantBearing, Evasion, ExpectedCapture, ExpectedMemo,
-    Motion, MoveSet, Moves, PurePursuit, Pursuer, RunnerFamily, RunnerLaw, RunnerState, act_drawn,
-    capture_ticks, classes, expected_ticks, viable_tube,
+    ActionDeclaration, ActionPassage, AeonFamily, ArenaDeclaration, Basin, BasinMemo, CHANNELS,
+    Candidate, CaptureReach, ChannelDefect, ChannelMenu, Chase, ChasePorts, ChaseView, Chaser,
+    ConstantBearing, Evasion, ExpectedCapture, ExpectedMemo, Motion, MoveSet, Moves, PurePursuit,
+    Pursuer, Reception, RunnerFamily, RunnerLaw, RunnerState, Switches, act_drawn, capture_ticks,
+    classes, expected_ticks, viable_tube,
 };
 use holonics::ratio::algebraic::ExactInterval;
 use holonics::ratio::surprisal::SymbolicSurprisal;
@@ -265,6 +276,7 @@ fn main() {
         Some("diagnose") => diagnose(&mode[1..]),
         Some("fresh") => fresh(),
         Some("moves") => move_sets(&mode[1..]),
+        Some("switches") => switches(&mode[1..]),
         _ => reception(),
     }
 }
@@ -486,9 +498,22 @@ impl Chaser for Traced {
         Ok(released)
     }
 
-    fn receive(&mut self, cell: usize) -> Result<(), PopulationError> {
-        self.inner.receive(cell)?;
+    fn receive(&mut self, reception: &Reception) -> Result<(), PopulationError> {
+        self.inner.receive(reception)?;
         let ports = self.ports.as_ref().expect("opened");
+        let cell = ChannelMenu::complete(CHANNELS)?
+            .close(&reception.readings)?
+            .reading
+            .cell(
+                &ports.arena,
+                &ports.moves,
+                &self.candidates[0].state.motion,
+                ports
+                    .chaser
+                    .get(reception.tick)
+                    .expect("the port holds the tick read")
+                    .position,
+            )?;
         self.candidates = self
             .candidates
             .iter()
@@ -550,6 +575,7 @@ fn fresh() {
         pursuer: pursuer(),
         ticks: ACTION_TICKS,
         horizon: RECEIPT_HORIZON,
+        switches: Switches::OFF,
     };
     println!(
         "hnn_chase fresh: the fresh population {FRESH_SEED} + s, s < {FRESH_SEEDS}; the machine n = {TUBE_HORIZON}, m = {BASIN_HORIZON}, d = {PRICE}, escape 2^(−{ESCAPE}); the candidate plan {}; passages of at most {ACTION_TICKS} = 2^9 ticks",
@@ -714,6 +740,435 @@ fn fresh() {
     );
 }
 
+// -------------------------------------------------------------------------------------------
+// F6's switches and their attribution
+
+/// [definition; agent-inferred, pinned before the run] **The switches' population** (F6's switch
+/// bullet): the seeds `SWITCH_SEED + s`, `s < SWITCH_SEEDS`, a declared contiguous range disjoint from
+/// every range read so far (the acceptance seeds `SEED + s` and the choosing seeds `CHOOSING_SEED +
+/// s`, `s < 16`; the spent fresh populations `FIRST_FRESH_SEED + s` and `FRESH_SEED + s`, `s < 64`),
+/// none read before this pin and none selected by any property. [measured] Run once (pinned at commit
+/// `95a8864a`; 162,402 ms at a 269,180 kB peak; 63 chased seeds): with the switches on the machine 646
+/// capture ticks against pure pursuit's 19,255 and constant bearing's 4,713, fewer than both at once
+/// on 38 of 63; the fault located on 111 of 111 active aeons and no other; the constitution equal to
+/// the prompt one on 63 of 63. The switch bullet passes as written.
+const SWITCH_SEED: u64 = 20_261_301;
+const SWITCH_SEEDS: u64 = 64;
+
+/// [definition; agent-inferred, pinned before the run] **The channels' lag** `d` (F6's lag channel):
+/// see [`switches`] for its reason.
+const SWITCH_LAG: usize = 1;
+
+/// [definition; agent-inferred, pinned before the run] **The faulty sensor's aeons**: lengths uniform
+/// on `1..=4` ticks, the fault active on the odd ones (`holarchy::terrain::sensing::FaultTruth`). On
+/// the choosing seeds the machine captures within `13` ticks on every seed (`150` in sum), so aeons of
+/// one to four ticks switch the fault several times in a passage and open its first active aeon
+/// within the first four ticks.
+const FAULT_AEONS: AeonFamily = AeonFamily {
+    shortest: 1,
+    longest: 4,
+};
+
+/// The switches on: the pinned lag and the faulty sensor.
+fn switched(lag: usize) -> Switches {
+    Switches {
+        lag,
+        fault: Some(FAULT_AEONS),
+    }
+}
+
+/// [definition] **The fault's location on one passage**, read against the terrain's truth over the
+/// readings the machine received: per tick, the ticks the fault is active (its turned frame errs at
+/// each: the line of sight is never zero before capture), those located with the truth's channel and
+/// turn, those located otherwise, the active ticks left unlocated and the false alarms (a location
+/// on an inactive tick); per aeon read, the aeons the fault is active in, those located, and the
+/// inactive aeons located.
+#[derive(Clone, Copy, Debug, Default)]
+struct Location {
+    active: usize,
+    exact: usize,
+    wrong: usize,
+    unlocated: usize,
+    false_alarms: usize,
+    aeons: usize,
+    active_aeons: usize,
+    located_aeons: usize,
+    false_aeons: usize,
+}
+
+impl Location {
+    fn add(&mut self, other: &Location) {
+        self.active += other.active;
+        self.exact += other.exact;
+        self.wrong += other.wrong;
+        self.unlocated += other.unlocated;
+        self.false_alarms += other.false_alarms;
+        self.aeons += other.aeons;
+        self.active_aeons += other.active_aeons;
+        self.located_aeons += other.located_aeons;
+        self.false_aeons += other.false_aeons;
+    }
+
+    /// **Located on exactly the aeons it is active** (the criterion): every active aeon read is
+    /// located, no inactive aeon is, and every location names the truth's channel and turn.
+    fn exact_on_aeons(&self) -> bool {
+        self.located_aeons == self.active_aeons && self.false_aeons == 0 && self.wrong == 0
+    }
+
+    fn line(&self) -> String {
+        format!(
+            "aeons: located {} of {} active of {} read, {} inactive located; ticks: located exactly {} of {} active ({} wrong, {} unlocated, {} false alarms)",
+            self.located_aeons,
+            self.active_aeons,
+            self.aeons,
+            self.false_aeons,
+            self.exact,
+            self.active,
+            self.wrong,
+            self.unlocated,
+            self.false_alarms
+        )
+    }
+}
+
+/// **The fault's location** (see [`Location`]) of a switched passage and its machine's receipt.
+fn location(passage: &ActionPassage, receipt: &MachineReceipt) -> Location {
+    let fault = passage.fault.as_ref().expect("a declared fault");
+    let truth = ChannelDefect {
+        channel: fault.channel,
+        turns: fault.turns,
+    };
+    let mut reading = Location::default();
+    // Per aeon read: whether the fault is active in it, and whether a location fell in it.
+    let mut aeons: std::collections::BTreeMap<usize, [bool; 2]> = Default::default();
+    for (tick, located) in receipt.located.iter().enumerate() {
+        let active = fault.active(tick);
+        reading.active += usize::from(active);
+        match (located, active) {
+            (Some(l), true) if *l == truth => reading.exact += 1,
+            (Some(_), true) => reading.wrong += 1,
+            (None, true) => reading.unlocated += 1,
+            (Some(_), false) => reading.false_alarms += 1,
+            (None, false) => {}
+        }
+        let aeon = aeons
+            .entry(fault.aeon(tick).expect("a tick within the clock"))
+            .or_default();
+        aeon[0] |= active;
+        aeon[1] |= located.is_some();
+    }
+    for [active, located] in aeons.values() {
+        reading.aeons += 1;
+        reading.active_aeons += usize::from(*active);
+        reading.located_aeons += usize::from(*active && *located);
+        reading.false_aeons += usize::from(!*active && *located);
+    }
+    reading
+}
+
+/// **The prompt constitution's check** (the deposition law's receipt): a reception population over
+/// the passage's ports receives the terrain's true cells at their own ticks, with no lag and no
+/// channel between; the machine's constitution must equal it at every decision (the machine at tick
+/// `t` has received the readings of ticks below `t − d`, so its fibre is the prompt fibre after
+/// `t − d` cells) and, family by family and exactly, at the passage's end.
+fn prompt_constitution(passage: &ActionPassage, machine: &MachineChaser) -> bool {
+    let lag = passage.ports.lag;
+    let received = passage.received();
+    let mut prompt = Population::new(
+        ChaseFamily::declare_on(&passage.ports, &family(), ESCAPE).expect("the families"),
+    )
+    .expect("the population");
+    let fibre = |population: &Population| {
+        let selected = selected_fibre(population);
+        if selected.is_empty() {
+            family().len()
+        } else {
+            selected.len()
+        }
+    };
+    let mut sizes = vec![fibre(&prompt)];
+    for &cell in &passage.cells[..received] {
+        prompt.receive(cell).expect("a true cell");
+        sizes.push(fibre(&prompt));
+    }
+    let receipt = machine.receipt();
+    let every_tick = receipt
+        .fibre
+        .iter()
+        .enumerate()
+        .all(|(tick, &size)| size == sizes[tick.saturating_sub(lag)]);
+    let likelihoods = |population: &Population| -> Vec<Option<Rat>> {
+        population
+            .families()
+            .map(|family| match family.likelihood() {
+                holonics::receiver::population::Likelihood::Exact(value) => Some(value),
+                _ => None,
+            })
+            .collect()
+    };
+    let at_end = machine.population().map(likelihoods) == Some(likelihoods(&prompt));
+    every_tick && at_end
+}
+
+/// [definition] **One seed read with the switches off and on**: the truth, the capture ticks of the
+/// machine, pure pursuit and constant bearing each way (the cap `2^9` where uncaptured), the
+/// truth-only least, the fault's location, the switched machine's misses and those the lag caused,
+/// its deposits, its constitution against the prompt one, and its released bounds.
+struct SwitchRow {
+    off: [usize; 3],
+    on: [usize; 3],
+    least: usize,
+    location: Location,
+    readings: usize,
+    misses: usize,
+    lag_misses: usize,
+    deposits: usize,
+    prompt: bool,
+    kept: (usize, usize),
+    broken: usize,
+}
+
+/// **A seed with the switches off and on** at a lag, printed; none where the terrain refuses the
+/// draw (openings within capture).
+fn switch_seed(seed: u64, lag: usize) -> Option<SwitchRow> {
+    let declaration = declaration();
+    let family = family();
+    let (_, _, openings) = Chase::drawn(&declaration, &family, seed).expect("a draw");
+    if pursuer().captures(openings[0], openings[1]) {
+        println!(
+            "seed {seed}: the draw opens within capture ({:?}, {:?}); the terrain refuses the chase, and no chaser reads it",
+            openings[0], openings[1]
+        );
+        return None;
+    }
+    let action = |switches: Switches| ActionDeclaration {
+        pursuer: pursuer(),
+        ticks: ACTION_TICKS,
+        horizon: RECEIPT_HORIZON,
+        switches,
+    };
+    let (off, on) = (action(Switches::OFF), action(switched(lag)));
+    let mut plain = machine(TUBE_HORIZON, BASIN_HORIZON, PRICE, Plan::Robust);
+    let mo = act_drawn(&declaration, &family, &off, seed, &mut plain).expect("the machine");
+    let po = act_drawn(&declaration, &family, &off, seed, &mut PurePursuit).expect("pursuit");
+    let bo = act_drawn(&declaration, &family, &off, seed, &mut ConstantBearing).expect("bearing");
+    let mut chaser = machine(TUBE_HORIZON, BASIN_HORIZON, PRICE, Plan::Robust);
+    let m = act_drawn(&declaration, &family, &on, seed, &mut chaser).expect("the switched machine");
+    let p = act_drawn(&declaration, &family, &on, seed, &mut PurePursuit).expect("pursuit");
+    let b = act_drawn(&declaration, &family, &on, seed, &mut ConstantBearing).expect("bearing");
+    let (off_ticks, on_ticks) = (
+        [mo.ticks(), po.ticks(), bo.ticks()],
+        [m.ticks(), p.ticks(), b.ticks()],
+    );
+    let limit = off_ticks
+        .iter()
+        .chain(&on_ticks)
+        .copied()
+        .min()
+        .expect("six");
+    let least = least_capture(seed, limit).expect("the least lies within every capture");
+    let receipt = chaser.receipt();
+    let fault = m.fault.as_ref().expect("a declared fault");
+    let location = location(&m, receipt);
+    let prompt = prompt_constitution(&m, &chaser);
+    let row = SwitchRow {
+        off: off_ticks,
+        on: on_ticks,
+        least,
+        location,
+        readings: m.received(),
+        misses: receipt.misses,
+        lag_misses: receipt.lag_misses,
+        deposits: receipt.deposits,
+        prompt,
+        kept: bounds_kept(&m, receipt),
+        broken: receipt.broken,
+    };
+    let lengths: Vec<String> = fault
+        .clock
+        .lengths
+        .iter()
+        .take(8)
+        .map(u64::to_string)
+        .collect();
+    println!(
+        "seed {seed}: the truth [{}] {}; the fault on channel {} turned by i^{}, aeon lengths {},…; off: machine {}, pursuit {}, bearing {}; on: machine {}, pursuit {}, bearing {}; least {least}",
+        m.index,
+        m.runner.label(),
+        fault.channel,
+        fault.turns,
+        lengths.join(","),
+        capture_line(&mo),
+        capture_line(&po),
+        capture_line(&bo),
+        capture_line(&m),
+        capture_line(&p),
+        capture_line(&b),
+    );
+    println!(
+        "  readings {}: {}; misses {} (the lag's {}); deposits {}; the constitution equals the prompt one: {}; bounds kept {} of {}, pledges broken {}",
+        row.readings,
+        location.line(),
+        row.misses,
+        row.lag_misses,
+        row.deposits,
+        if prompt { "yes" } else { "NO" },
+        row.kept.0,
+        row.kept.1,
+        row.broken
+    );
+    Some(row)
+}
+
+/// [definition; agent-inferred, pinned before the run] **F6's switches, read once** (THE_REBUILD F6,
+/// the action acceptance's third bullet; `holarchy::terrain::sensing`,
+/// `receiver::population::chaser`, "The attribution"). On each seed of the switches' population
+/// ([`SWITCH_SEED`]), from the reception's draw under the same traction bound: the machine under
+/// `MachineChaser::new`'s plan (robust), pure pursuit and constant bearing, each with the switches
+/// off and with them on (the lag [`SWITCH_LAG`] and the faulty sensor on [`FAULT_AEONS`]; the
+/// controls read the lagged runner the channels agree on); an uncaptured passage counts its cap
+/// `2^9`. The criteria, the switch bullet as written, declared before the run:
+/// - **capture still beats both controls**: with the switches on, the machine's capture ticks in sum
+///   strictly fewer than each control's, and strictly fewer than both on more than half of the chased
+///   seeds;
+/// - **the fault is located on exactly the aeons it is active**: over the readings received, every
+///   aeon the fault is active in is located, no other aeon is, and every location names the truth's
+///   channel and turn; the per-tick reading (located exactly on the active ticks, no false alarm) is
+///   printed beside it;
+/// - **lag-caused errors deposit nothing in the chaser's constitution**: the switched machine's
+///   constitution equals the prompt one on the true cells at every decision and exactly at the end,
+///   on every chased seed; the action-time misses the lag caused are counted beside it.
+///
+/// Printed beside them, not criteria: the capture ticks with the switches off on the same seeds, the
+/// truth-only least and each chaser's regret to it, the switched machine's released bounds and those
+/// it kept, the pledges broken and the deposits. A draw the terrain refuses (openings within capture)
+/// is printed, read by no chaser and enters no sum; "more than half of the seeds" counts the chased
+/// seeds. `switches probe <d> <n>` reads the first `n` choosing seeds at lag `d`, a projection and
+/// never a criterion.
+///
+/// [definition; agent-inferred] **Why `d = 1`.** The least lag that withholds a reading: under it the
+/// reading after a tick reveals the cell of the tick before, fixed by the past, so every tick the
+/// chaser's move is certified against a fibre one reading wider. The lagged capture basin is exact
+/// for every `d ≤ 2^3`. [measured] The projection, `switches probe 1 16` on the 16 choosing seeds:
+/// 45,374 ms at a 292,932 kB peak for both switch settings, so the 64 pinned seeds project at about
+/// three minutes and under 1 GB, against the ten-minute budget.
+fn switches(args: &[String]) {
+    let (first, count, lag, pinned) = match args.first().map(String::as_str) {
+        Some("probe") => (
+            CHOOSING_SEED,
+            args.get(2).map_or(4, |n| n.parse().expect("a count")),
+            args.get(1)
+                .map_or(SWITCH_LAG, |d| d.parse().expect("a lag")),
+            false,
+        ),
+        _ => (SWITCH_SEED, SWITCH_SEEDS, SWITCH_LAG, true),
+    };
+    println!(
+        "hnn_chase switches{}: seeds {first} + s, s < {count}; the machine n = {TUBE_HORIZON}, m = {BASIN_HORIZON}, d = {PRICE}, plan robust; the switches: lag {lag}, the faulty sensor's aeons uniform on {}..={}; passages of at most {ACTION_TICKS} = 2^9 ticks",
+        if pinned {
+            ""
+        } else {
+            " probe (a projection, not a criterion)"
+        },
+        FAULT_AEONS.shortest,
+        FAULT_AEONS.longest
+    );
+    let menu = ChannelMenu::complete(CHANNELS).expect("the channel menu");
+    println!(
+        "the channel menu: circuits {:?}, circuit matrix {:?}; separation at k = 1: {}; at k = 2 broken by {:?}; two channels at k = 1 broken by {:?}",
+        menu.circuits(),
+        menu.matrix(),
+        if menu.separates(1) {
+            "holds (no nonzero kernel vector of support at most 2)"
+        } else {
+            "FAILS"
+        },
+        menu.separation_witness(2),
+        ChannelMenu::complete(2)
+            .expect("two channels")
+            .separation_witness(1)
+    );
+    let started = Instant::now();
+    let names = ["the machine", "pure pursuit", "constant bearing"];
+    let (mut off, mut on, mut least) = ([0usize; 3], [0usize; 3], 0usize);
+    // The machine against both controls at once, win/tie/loss: switches on, switches off.
+    let (mut both_on, mut both_off) = ([0usize; 3], [0usize; 3]);
+    let mut location = Location::default();
+    let (mut readings, mut misses, mut lag_misses, mut deposits) = (0, 0, 0, 0);
+    let (mut prompt, mut kept, mut released, mut broken) = (0usize, 0, 0, 0);
+    let mut refused = Vec::new();
+    for s in 0..count {
+        let seed = first + s;
+        let Some(row) = switch_seed(seed, lag) else {
+            refused.push(seed);
+            continue;
+        };
+        for i in 0..3 {
+            off[i] += row.off[i];
+            on[i] += row.on[i];
+        }
+        least += row.least;
+        both_on[outcome(row.on[0], row.on[1].min(row.on[2]))] += 1;
+        both_off[outcome(row.off[0], row.off[1].min(row.off[2]))] += 1;
+        location.add(&row.location);
+        readings += row.readings;
+        misses += row.misses;
+        lag_misses += row.lag_misses;
+        deposits += row.deposits;
+        prompt += usize::from(row.prompt);
+        kept += row.kept.0;
+        released += row.kept.1;
+        broken += row.broken;
+    }
+    let chased = count as usize - refused.len();
+    println!();
+    println!(
+        "the terrain refuses {} of {count} draws (openings within capture): {refused:?}",
+        refused.len()
+    );
+    println!(
+        "over the {chased} chased seeds ({} ms): capture ticks in sum, switches on: {} {}, {} {}, {} {}; switches off: {} {}, {} {}, {} {} (an uncaptured passage counts its cap {ACTION_TICKS}); the truth-only least in sum {least}",
+        started.elapsed().as_millis(),
+        names[0],
+        on[0],
+        names[1],
+        on[1],
+        names[2],
+        on[2],
+        names[0],
+        off[0],
+        names[1],
+        off[1],
+        names[2],
+        off[2]
+    );
+    println!(
+        "  the machine against both controls at once, win/tie/loss: switches on {}, switches off {}",
+        wtl(&both_on),
+        wtl(&both_off)
+    );
+    println!("  the fault over {readings} readings: {}", location.line());
+    println!(
+        "  the switched machine: misses {misses}, the lag's {lag_misses}; deposits {deposits}; the constitution equals the prompt one on {prompt} of {chased} seeds; released bounds kept {kept} of {released}, pledges broken {broken}"
+    );
+    let verdict = |passed: bool| if passed { "passed" } else { "not passed" };
+    let capture = on[0] < on[1] && on[0] < on[2] && 2 * both_on[0] > chased;
+    let located = location.exact_on_aeons();
+    let deposits_nothing = prompt == chased;
+    println!(
+        "  the switch bullet as written: capture beats both controls {} ({} < {}, {} < {}, won against both on {} of {chased}); the fault located on exactly its active aeons {}; lag-caused errors deposit nothing {}; the bullet {}",
+        verdict(capture),
+        on[0],
+        on[1],
+        on[0],
+        on[2],
+        both_on[0],
+        verdict(located),
+        verdict(deposits_nothing),
+        verdict(capture && located && deposits_nothing)
+    );
+}
+
 /// An optional tick count, `·` for none.
 fn opt(value: Option<usize>) -> String {
     value.map_or("·".to_string(), |v| v.to_string())
@@ -734,6 +1189,7 @@ fn diagnose(args: &[String]) {
         pursuer: pursuer(),
         ticks: ACTION_TICKS,
         horizon: RECEIPT_HORIZON,
+        switches: Switches::OFF,
     };
     println!(
         "hnn_chase diagnose: the machine n = {TUBE_HORIZON}, m = {BASIN_HORIZON}, d = {PRICE}; the truth-only basin read to {DIAGNOSIS_LIMIT} ticks; rows: position, velocity, the truth's capture through the move, b over the fibre, b over the leading class, b over the truth's class, K, N, ∏|c|^|c|"
@@ -835,6 +1291,7 @@ fn passages(
         pursuer: pursuer(),
         ticks: ACTION_TICKS,
         horizon: RECEIPT_HORIZON,
+        switches: Switches::OFF,
     };
     let started = Instant::now();
     let mut chaser = machine(horizon, basin, price, plan);
