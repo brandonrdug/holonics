@@ -471,6 +471,9 @@ pub struct RotorKeys {
     inverses: Vec<Vec<usize>>,
     field: Field,
     ring: usize,
+    /// The declared configurations, one per ring of the field: the identity's, never moved.
+    configurations: Vec<u64>,
+    /// The field's lift, stepped by each cell from the declared configurations.
     lift: Vec<BigInt>,
     taken: u64,
     last: Option<usize>,
@@ -546,6 +549,7 @@ impl RotorKeys {
             inverses,
             field: field.clone(),
             ring,
+            configurations: configurations.to_vec(),
             lift: configurations.iter().map(|&c| BigInt::from(c)).collect(),
             taken: 0,
             last: None,
@@ -599,11 +603,11 @@ impl Emitters for RotorKeys {
             .collect()
     }
 
-    /// The ring, its ports, its rotor's period, the declared configurations and the machine's
-    /// stages; the field's rings by their periods.
+    /// The ring, its ports, its rotor's period, the declared configurations (as declared, never the
+    /// lift a passage has stepped) and the machine's stages; the field's rings by their periods.
     fn declaration(&self) -> Declaration {
         let mut parameters = vec![self.ring as u64, self.ports as u64, self.rotor];
-        parameters.extend(self.lift.iter().map(|c| c.to_u64().unwrap_or(u64::MAX)));
+        parameters.extend(&self.configurations);
         parameters.extend(self.stages.iter().flatten().map(|&port| port as u64));
         Declaration::new("rotor keys", parameters).with(vec![Declaration::new(
             "field rings",

@@ -71,17 +71,22 @@
 //! dormant: a dormant layer is silent while its ring's clock keeps winding, so its key is retained
 //! through the aeon, filtered only where the layer sounds (`layer_survivors`), and each layer's
 //! activity switches between cells under the fixed share at `α = 2^(−j)` (`LocalWeighing.shareKernel`,
-//! independent layers `Dormancy.productKernel`). The family codes within
-//! `log₂ |K| − log₂ #S_σ` plus the activity path's fixed-share code for every path `σ`
-//! (`dormant_survivor_code`), and a switch costs `j` bits, the `log₂` of its positions when
-//! `n ≤ 2^j` (`share_path_code_le`). Death is reserved for keys contradicted while active.
+//! independent layers `Dormancy.productKernel`). The exact mixture codes within
+//! `log₂ |K| − log₂ #S_σ` plus the activity path's fixed-share code over its transitions between
+//! received cells, for every path `σ` (`dormant_survivor_code`), and a switch costs `j` bits, the
+//! `log₂` of its positions when `n ≤ 2^j` (`share_path_code_le`). The executed family codes within
+//! that bound plus its certified drift `3 · r · 2^(−62)` bits, `r` its roundings counted
+//! ([established-bounded]; [`Dormancy::drift`], the `dormancy` module's "The executed chart").
+//! Death is reserved for keys contradicted while active.
 //!
 //! [proved-derived; formal-checked] **Death is an exchange, never a deletion** (Brandon, September
 //! 27: "the death is felt by whatever killed it"; Lean `Population.death_is_an_exchange`, a
 //! corollary of `sum_replicator`). A family dies exactly at zero likelihood; its mass `w_f` passes to
-//! the survivors, each receiving `w_f w′_g` (`w′_g = c_g P_g(x)/Σ_(h alive) c_h P_h(x)`, Bayes'
-//! normalization stated as the transfer), which sum to `w_f`: the population's mass is conserved,
-//! and the survivors' total gain is the dead mass. The reception returns a [`DeathReceipt`]: the
+//! the survivors: the population's mass is conserved, and the survivors' total gain is the dead
+//! mass. Bayes fixes only that total. [definition] **The per-survivor attribution**: survivor `g`
+//! receives `w_f w′_g` of dead family `f`'s mass (`w′_g = c_g P_g(x)/Σ_(h alive) c_h P_h(x)`, Bayes'
+//! normalization stated as the transfer), and under it each dead family's shares sum to `w_f`
+//! (`death_is_an_exchange`'s dead-family clause). The reception returns a [`DeathReceipt`]: the
 //! killing cell and the class that arrived, the dead family's last face (a death is not a deposit,
 //! so the dead family keeps the state it died in), the exhausted factor, the dying mass and the
 //! shares (enclosed, and exact when every living likelihood is), and its seed. Within a key family a
@@ -142,8 +147,11 @@
 //! `π(f) = λ D(f) + (1 − λ) 2^(−ℓ_f)/M`, `D(f) = (s_f + σ_f)/Σ_g (s_g + σ_g)` the Dirichlet face of
 //! the selections at the survival pseudo-count `σ_f = (2(a_f − d_f) + 1)/(2(2a_f + 1))` (KT's `½`
 //! until a death), at the static total mass `M` (the reserve unchanged), and the aeon's code is at
-//! most the selected family's code plus `−log₂ π(f)` (`evolved_aeon_code`). A family is founded at a
-//! declared rational mass with [`Population::found_with`].
+//! most the selected family's code plus `−log₂ π(f)` in an aeon without births
+//! (`evolved_aeon_code`). A birth renormalizes the declared priors to `m_f/M_n`, so once births have
+//! founded the mass `M_n` the bound gains `log₂(M_n/M)` ([`evolution`]; its Lean owed with the
+//! newborn's telescope, #62). A family is founded at a declared rational mass with
+//! [`Population::found_with`].
 //!
 //! [proved-derived; formal-checked] **Species collapse** ([`species`]; Lean `Evolution.{species_face,
 //! species_collapse_code, species_split}`). Surviving keys whose conditioned faces agree for every
@@ -1320,7 +1328,7 @@ pub struct FamilyReceipt {
 }
 
 /// [definition] **A death's exchange, exactly** (when every living family's likelihood is exact):
-/// the dying mass `w_f` and each survivor's received share `w_f w′_g`, which sum to `w_f`.
+/// the dying mass `w_f` and each survivor's attributed share `w_f w′_g`, which sum to `w_f`.
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct Exchange {
     pub mass: Rat,
@@ -1332,7 +1340,8 @@ pub struct Exchange {
 /// position and the class that arrived, the dead family's last face (what it predicted against what
 /// arrived), the dying mass `−log₂ w_f` and each survivor `g`'s received share
 /// `−log₂(w_f w′_g)`, `w′_g = c_g P_g(x)/Σ_(h alive) c_h P_h(x)` (Bayes' normalization, stated as
-/// the transfer), each enclosed, and the same exactly when every living family's likelihood is;
+/// the transfer: [definition] the per-survivor attribution, since Bayes fixes only the survivors'
+/// total gain), each enclosed, and the same exactly when every living family's likelihood is;
 /// and its seed, the keys it held when it died (a key family's), which stay in its declared key
 /// space and can be re-founded.
 #[derive(Clone, Debug, PartialEq, Eq)]
@@ -1951,8 +1960,10 @@ impl Population {
     /// it held when it died, wound to this cell, charged half the reserved mass (the declared prior
     /// share of a re-founding), never the relearning of its key space. Refused unless the family is
     /// a declared or founded family (not itself a seed's newborn) that is dead with its seed not
-    /// alive in a newborn, and its clocks wind without the cells. When the newborn dies, the seed
-    /// returns to the dead family and can be re-founded again.
+    /// alive in a newborn, its clocks wind without the cells, and its species are split first where
+    /// a re-founding cannot keep them (a composed egg's keystone species, and any species, its own
+    /// or a conditioned family's, whose admitted future has ended at this cell). When the newborn
+    /// dies, the seed returns to the dead family and can be re-founded again.
     pub fn refound(
         &mut self,
         dead: usize,
@@ -1970,7 +1981,7 @@ impl Population {
         let Some(newborn) = member.family.reseed(self.cells) else {
             return Err(refuse(
                 "a re-founding",
-                "the dead family's clocks wind without the cells",
+                "the dead family's clocks wind without the cells, and its species are split first (a composed egg's keystone species, and any species whose admitted future has ended)",
             ));
         };
         let mass = self.reserved() / Rat::from_integer(BigInt::from(2u32));

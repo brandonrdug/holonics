@@ -674,7 +674,9 @@ impl Family for Composed {
     /// from its own seed where it has one, else declared anew on the path from `at` (a carry egg
     /// joining mid-record reads its product phases uniform until it has read a record's operands).
     /// The prior is uniform over the keystone keys the seed stands for. None while a keystone
-    /// collapse's admitted future holds (split its species first).
+    /// collapse's admitted future holds, and none once a conditioned family's collapse's admitted
+    /// future has ended at `at`, as a key family refuses (split its species first): declaring that
+    /// family anew would relearn its key space.
     fn reseed(&self, at: usize) -> Option<Box<dyn Family>> {
         if self.until.is_some() {
             return None;
@@ -685,8 +687,13 @@ impl Family for Composed {
             .held
             .iter()
             .map(|member| {
+                let ended = member
+                    .family
+                    .seed()
+                    .is_some_and(|seed| seed.until.is_some_and(|end| at as u64 >= end));
                 let family = match member.family.reseed(at) {
                     Some(family) => family,
+                    None if ended => return None,
                     None => {
                         (self.conditioned)(upstream.through(Arc::clone(&self.keystone), member.key))
                             .ok()?

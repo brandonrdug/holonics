@@ -36,7 +36,11 @@ only deaths thin it.
   description prior (at `λ = ½`, one bit over the better of the two).
 * `evolved_aeon_code` [proved-derived; formal-checked]: **the aeon's code is at most the selected
   family's code plus `−log₂` of its evolved prior**, `−log₂ ∏ q ≤ −log₂ π(f) − log₂ L_f`, for every
-  living family (`Population.population_mixture` under the evolved prior).
+  living family (`Population.population_mixture` under the evolved prior), in an aeon without
+  births. A birth draws `m_g` from the reserve and renormalizes the priors over the founded mass
+  `M_n = M + Σ_g m_g`, so with births the bound is `−log₂(m_f/M_n) − log₂ L_f` (Rust
+  `receiver::population::evolution`); its statement here is owed with the abstaining newborn's
+  telescope (#62).
 
 **Species collapse.** Keys `k` with weights `w_k` and faces `f_k(t)`, and a species map
 `σ : κ → S` with a representative `rep s`, such that every key's face agrees with its species'
@@ -202,7 +206,9 @@ theorem evolved_code_le_description {w : ℚ} (hw0 : 0 ≤ w) (hw1 : w < 1) {D P
 /-- [proved-derived; formal-checked] **`evolved_aeon_code`: the aeon's code is at most the selected
 family's code plus `−log₂` of its evolved prior.** Under the evolved prior every forward total of the
 aeon's passage is positive while a family with positive prior keeps a positive likelihood, and the
-population codes within `−log₂ π(x)` of that family's own code (`Population.population_mixture`). -/
+population codes within `−log₂ π(x)` of that family's own code (`Population.population_mixture`):
+the mixture of the declared families alone, an aeon without births (a birth renormalizes the priors
+to `m_f/M_n`, module header). -/
 theorem evolved_aeon_code [DecidableEq ι] {w : ℚ} (hw0 : 0 ≤ w) (hw1 : w ≤ 1) {D P : ι → ℚ}
     (hD : IsPrior D) (hP : IsPrior P) {f : ι → ℕ → ℚ} (hf : ∀ x t, 0 ≤ f x t) (n : ℕ) {x : ι}
     (hx : 0 < evolved w D P x) (hL : 0 < seqLik (f x) n) :

@@ -29,9 +29,25 @@
 //! D(f) = (s_f + σ_f)/Σ_(g∈F) (s_g + σ_g)                    the Dirichlet face of the selections
 //! π(f) = λ D(f) + (1 − λ) 2^(−ℓ_f)/M,   M = Σ_(g∈F) 2^(−ℓ_g)  λ ∈ [0, 1] declared
 //! m_f = M π(f),   Σ_f m_f = M                               the declared masses; 1 − M reserved
-//! −log₂ W ≤ −log₂ π(f) − log₂ L_f                           every living f (the aeon's code bound)
+//! −log₂ W ≤ −log₂ π(f) − log₂ L_f                           every living f, an aeon without births
 //! −log₂ π(f) ≤ −log₂ λ − log₂ D(f),   −log₂ π(f) ≤ −log₂(1 − λ) + ℓ_f + log₂ M
 //! ```
+//!
+//! [proved-derived] **The aeon's code bound with births.** A birth draws its mass `m_g` from the
+//! reserve and renormalizes every prior over the founded mass `M_n = M + Σ_g m_g` (the population's
+//! "Birth from reserved mass"), so a declared family's prior at `n` is `m_f/M_n = π(f) M/M_n`, and
+//! over an aeon with births the bound is
+//!
+//! ```text
+//! −log₂ W_n ≤ −log₂(m_f/M_n) − log₂ L_f = −log₂ π(f) + log₂(M_n/M) − log₂ L_f     every living declared f
+//! ```
+//!
+//! (the birth telescope, whose Lean statement is owed with the abstaining newborn's, #62).
+//! `evolved_aeon_code` proves the no-birth form (`M_n = M`). The no-birth form does not hold across
+//! a birth: when every newborn dies, `W_n = Σ_f m_f L_f/M_n`, and the code exceeds it by up to
+//! `log₂(M_n/M)` (one family at `M = ½, π = 1` and a newborn of mass `¼` that dies at the next
+//! cell: the excess is `log₂(3/2)`, the test
+//! `the_evolved_aeon_bound_with_a_birth_is_over_the_founded_mass`).
 //!
 //! With no deaths `σ = ½` and `D` is the Krichevsky–Trofimov (Dirichlet-½) face of the selection
 //! counts; each death thins the pseudo-count (`survivalPseudo_death_lt`), so a family that keeps

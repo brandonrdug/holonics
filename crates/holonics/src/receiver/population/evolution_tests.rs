@@ -11,6 +11,7 @@ use num_bigint::BigUint;
 use num_traits::{One, Zero};
 
 use super::composition::{Conditioned, Keystone, Port, PortPath, PortReader, PortedEmitters};
+use super::tests::Fixed;
 use super::*;
 use crate::compression::landmark::context::{
     Capacity, LandmarkDeclaration, LetterFamily, StopPrior, ratio_code_length,
@@ -120,6 +121,66 @@ fn a_familys_identity_is_its_declaration_across_aeons_and_refounding() {
     );
 }
 
+/// Every key family's identity is its declaration, unmoved by a passage: the moiré's gratings (both
+/// classes, static and dormant), the rotor crib's keys (its declared configurations, never the
+/// field's lift the cells step) and the composed arithmetic eggs carry after reading their terrain
+/// the identity they carried before it.
+#[test]
+fn a_key_familys_identity_is_unmoved_by_a_passage() {
+    let parity = hand_moire(MoireClass::Parity).emit(24);
+    let sheets = hand_moire(MoireClass::Sheets).emit(24);
+    let mut declared = FieldDeclaration::campaign_one(1 << 16);
+    declared.rings[1].lock = (0..7).collect();
+    let field = Field::declare(declared).unwrap();
+    let configurations = [0u64, 0, 0, 0];
+    let crib = RotorCrib::draw(&field, 1, &configurations, 64, &mut Draw::new(41)).unwrap();
+    let products = ProductFamily {
+        base: 10,
+        digits: 2,
+        face: 1,
+        order: DigitOrder::LeastFirst,
+    };
+    let product_cells = Products::draw(&products, 4, &mut Draw::new(7))
+        .unwrap()
+        .emit();
+    let window = PrimeWindow {
+        base: 10,
+        start: 137,
+        end: 400,
+        digits: 3,
+        trailing: 1,
+        order: DigitOrder::MostFirst,
+        emission: PrimeEmission::Digits,
+    };
+    let prime_cells = window.emit().unwrap();
+    let dormant = |class| DormantFamily::gratings(&small_family(), class, 1 << 16, 4, 3).unwrap();
+    let passages: Vec<(Box<dyn Family>, &[usize])> = vec![
+        (Box::new(gratings(MoireClass::Parity, 3)), &parity),
+        (Box::new(gratings(MoireClass::Sheets, 3)), &sheets),
+        (Box::new(dormant(MoireClass::Parity)), &parity),
+        (Box::new(dormant(MoireClass::Sheets)), &sheets),
+        (
+            Box::new(KeyFamily::rotor(&field, 1, &configurations, 1 << 24, 3).unwrap()),
+            &crib.cells,
+        ),
+        (
+            Box::new(Composed::products(&products, 3).unwrap()),
+            &product_cells,
+        ),
+        (
+            Box::new(Composed::primes(&window, 1 << 20, 3).unwrap()),
+            &prime_cells[..40],
+        ),
+    ];
+    for (mut family, cells) in passages {
+        let before = family.identity();
+        for &cell in cells {
+            family.receive(cell).unwrap();
+        }
+        assert_eq!(family.identity(), before, "{}", family.label());
+    }
+}
+
 /// The survival pseudo-count: `½` without a death (the KT count), `(2(a − d) + 1)/(2(2a + 1))`.
 #[test]
 fn the_survival_pseudo_count_is_kts_half_until_a_death() {
@@ -219,10 +280,54 @@ fn the_evolved_prior_is_the_dirichlet_face_of_the_retained_counts() {
         &bits(&rat(27, 56)),
     )
     .unwrap();
-    assert!(receipt.code.lower <= bound.upper);
+    // Decided below, not merely unrefuted: the enclosed slack `bound − code` is positive.
+    assert!(receipt.code.upper < bound.lower);
     // Against the static prior's ½ the gratings' death costs this aeon: it codes more.
     let stat = aeon(&moire, None).receipt().unwrap();
     assert!(receipt.code.lower > stat.code.upper);
+}
+
+/// **The evolved aeon bound with a birth** (module header of `evolution`): one evolved family at
+/// `M = ½, π = 1` and a newborn of mass `¼` that dies at the next cell. The no-birth form
+/// `−log₂ π(f) − log₂ L_f` is exceeded, decided, by `log₂(3/2)`; the bound over the founded mass,
+/// `−log₂(m_f/M_n) − log₂ L_f` at `m_f/M_n = (½)/(¾) = 2/3`, is not refuted (it is the code itself
+/// here: every newborn died).
+#[test]
+fn the_evolved_aeon_bound_with_a_birth_is_over_the_founded_mass() {
+    let fair = Box::new(Fixed::new(vec![rat(1, 2), rat(1, 2)], 1)) as Box<dyn Family>;
+    let mut population = Population::evolved(vec![fair], &Selections::new(), &rat(1, 2)).unwrap();
+    assert_eq!(population.mass(), &rat(1, 2));
+    let opening = population.prior(0).unwrap().clone();
+    assert_eq!(opening, Rat::one());
+    population.receive_passage(&[0, 1, 0]).unwrap();
+    let newborn = Fixed::new(vec![Rat::one(), Rat::zero()], 2);
+    population
+        .found_with(Box::new(newborn), rat(1, 4), None)
+        .unwrap();
+    population.receive(1).unwrap();
+    assert!(
+        population.died(1).is_some(),
+        "the newborn dies at the next cell"
+    );
+    assert_eq!(population.prior(0), Some(&rat(2, 3)), "m_f/M_n");
+    let code = population.code().unwrap();
+    let own = bits(&rat(1, 16));
+    let unrestricted = interval_sum(&bits(&opening), &own).unwrap();
+    let corrected = interval_sum(&bits(&rat(2, 3)), &own).unwrap();
+    assert!(
+        code.lower > unrestricted.upper,
+        "the no-birth form is exceeded"
+    );
+    let excess = ExactInterval {
+        lower: &code.lower - &unrestricted.upper,
+        upper: &code.upper - &unrestricted.lower,
+    };
+    let three_halves = bits(&rat(2, 3));
+    assert!(excess.lower <= three_halves.upper && three_halves.lower <= excess.upper);
+    assert!(
+        code.lower <= corrected.upper && corrected.lower <= code.upper,
+        "the bound over the founded mass is not refuted"
+    );
 }
 
 /// Founding at a declared rational mass: the newborn draws it from the reserve and the population's
@@ -572,6 +677,87 @@ fn a_composed_egg_is_refounded_from_its_seed() {
     for &cell in &cells[40..] {
         assert_eq!(newborn.receive(cell).unwrap(), Rat::one());
     }
+}
+
+/// `pass ⊳ (clock ⊳ half)`: a keystone of one key, and the clock's offsets as the conditioned key
+/// family reading the half-turn sheet, named by `description` bits.
+fn pass_clock_half(description: u64) -> Composed {
+    let conditioned: Conditioned = Arc::new(|path| {
+        let emitters = PortedEmitters::new(Arc::new(Clock), Arc::new(Half), path)?;
+        let factor = Survivors::new(Box::new(emitters), 4, "none")?;
+        Ok(
+            Box::new(KeyFamily::new("clock ⊳ half".to_string(), 0, vec![factor])?)
+                as Box<dyn Family>,
+        )
+    });
+    Composed::new(
+        "pass ⊳ (clock ⊳ half)".to_string(),
+        description,
+        Arc::new(Pass),
+        &PortPath::tick(),
+        &conditioned,
+        1,
+    )
+    .unwrap()
+}
+
+/// **A composed egg refuses re-founding past a conditioned collapse**, as a key family does: the
+/// conditioned family's offsets 1 and 3 are one species over six ticks (the keystone's one key
+/// merges nothing), so within that future the egg is re-founded holding the species, and once the
+/// future has ended it is refused (split first), never re-founded by declaring the conditioned
+/// family anew over its whole key space. In a population the refusal names the split it is owed.
+#[test]
+fn a_composed_egg_refuses_refounding_past_a_conditioned_collapse() {
+    let cells: Vec<usize> = (0..16).map(|t| (1 + t) % 2).collect();
+    let mut composed = pass_clock_half(0);
+    for &cell in &cells[..3] {
+        composed.receive(cell).unwrap();
+    }
+    composed.collapse(AdmittedFuture::Ticks(6)).unwrap();
+    assert_eq!(
+        composed.members(),
+        vec![(0, 1)],
+        "the keystone merges nothing"
+    );
+    let Readout::Keys(keys) = composed.readout() else {
+        unreachable!()
+    };
+    assert_eq!(
+        keys.survivors[1],
+        vec![vec![1]],
+        "offsets 1 and 3 are one species"
+    );
+    let within = composed.reseed(5).expect("within the admitted future");
+    let Readout::Keys(keys) = within.readout() else {
+        unreachable!()
+    };
+    assert_eq!(
+        keys.survivors[1],
+        vec![vec![1]],
+        "re-founded holding the species"
+    );
+    assert!(
+        composed.reseed(9).is_none(),
+        "the future has ended: split first"
+    );
+
+    let mut population = Population::new(vec![
+        Box::new(TreeFamily::new(tree(2, 2, 64), 1).unwrap()) as Box<dyn Family>,
+        Box::new(pass_clock_half(1)),
+    ])
+    .unwrap();
+    population.receive_passage(&cells[..3]).unwrap();
+    population.collapse(1, AdmittedFuture::Ticks(6)).unwrap();
+    population.receive(1 - cells[3]).unwrap();
+    assert_eq!(population.died(1), Some(3));
+    population.receive_passage(&cells[4..12]).unwrap();
+    assert_eq!(
+        population.refound(1, None).unwrap_err(),
+        refuse(
+            "a re-founding",
+            "the dead family's clocks wind without the cells, and its species are split first (a composed egg's keystone species, and any species whose admitted future has ended)",
+        )
+    );
 }
 
 /// The work each family reports: a key family's reads are its survivors before each cell, a tree's

@@ -16,8 +16,10 @@ the case of one activity.
   faces (a deterministic emitter's) telescopes and dominates every state sequence whose prior, faces
   and kernel steps are positive: `LocalWeighing.forward_dominance` without positive faces.
 * `dormant_survivor_code` [proved-derived; formal-checked]: **the dormancy-aware survivor code.**
-  For every activity path `σ`, the keys `S_σ(n)` that emit every cell at `σ`'s activity survive,
-  and the mixture codes within `log₂ |K| − log₂ #S_σ(n) − log₂ π(σ_0) − Σ_t log₂ T(σ_t, σ_(t+1))`.
+  Over `n + 1` cells, for every activity path `σ`, the keys `S_σ(n + 1)` that emit every cell at
+  `σ`'s activity survive, and the mixture codes within
+  `log₂ |K| − log₂ #S_σ(n + 1) − log₂ π(σ_0) − Σ_(t<n) log₂ T(σ_t, σ_(t+1))`: the path pays its `n`
+  transitions between received cells, and the step after the last cell sums out.
 * `layer_survivors` [proved-derived; formal-checked]: **keys are filtered only where the layer
   sounds.** For one layer whose dormancy emits a declared silent class, when `σ`'s dormant ticks
   read the silent class, `S_σ(n)` is exactly the keys agreeing with the cells at `σ`'s active ticks.
@@ -159,28 +161,32 @@ theorem keyKernel_stochastic {T : A → A → ℚ} (hT : Stochastic T) :
 
 omit [DecidableEq A] in
 /-- [proved-derived; formal-checked] **`dormant_survivor_code`: the dormancy-aware survivor code.**
-Under the uniform key prior, an activity prior `π` and an activity kernel `T`, for every activity
-path `σ` whose survivors `S_σ(n)` are nonempty and whose prior and kernel steps are positive, the
-mixture over (key, activity) dominates `#S_σ(n)/|K| · π(σ_0) ∏_t T(σ_t, σ_(t+1))`, so it codes
-within `log₂ |K| − log₂ #S_σ(n) − log₂ π(σ_0) − Σ_t log₂ T(σ_t, σ_(t+1))`: the key description less
-the fibre that survives along the path, plus the path's own code. -/
+Under the uniform key prior, an activity prior `π` and an activity kernel `T`, over `n + 1` received
+cells and so `n` transitions (the kernel step after the last cell sums out: its row is stochastic),
+for every activity path `σ` whose survivors `S_σ(n + 1)` are nonempty and whose prior and kernel
+steps are positive, the mixture over (key, activity) dominates
+`#S_σ(n + 1)/|K| · π(σ_0) ∏_(t<n) T(σ_t, σ_(t+1))`, so it codes within
+`log₂ |K| − log₂ #S_σ(n + 1) − log₂ π(σ_0) − Σ_(t<n) log₂ T(σ_t, σ_(t+1))`: the key description less
+the fibre that survives along the path, plus the path's own code over its transitions between
+received cells (Rust `Dormancy`'s bound over a passage of `n + 1` cells, `n` transitions). -/
 theorem dormant_survivor_code {π : A → ℚ} {T : A → A → ℚ} (hπ : IsPrior π) (hT : Stochastic T)
-    (e : κ → A → ℕ → C) (x : ℕ → C) (σ : ℕ → A) (n : ℕ) (hS : (pathSurvivors e x σ n).Nonempty)
+    (e : κ → A → ℕ → C) (x : ℕ → C) (σ : ℕ → A) (n : ℕ)
+    (hS : (pathSurvivors e x σ (n + 1)).Nonempty)
     (h0 : 0 < π (σ 0)) (hTσ : ∀ t < n, 0 < T (σ t) (σ (t + 1))) :
-    ((pathSurvivors e x σ n).card : ℚ) / Fintype.card κ *
+    ((pathSurvivors e x σ (n + 1)).card : ℚ) / Fintype.card κ *
         (π (σ 0) * ∏ t ∈ range n, T (σ t) (σ (t + 1))) ≤
-      ∏ t ∈ range n, fwdMix (keyPrior π) (activeEmits e x) (keyKernel T) t ∧
-      -Real.logb 2 ((∏ t ∈ range n, fwdMix (keyPrior π) (activeEmits e x) (keyKernel T) t : ℚ) :
-          ℝ) ≤
-        Real.logb 2 (Fintype.card κ) - Real.logb 2 ((pathSurvivors e x σ n).card) -
+      ∏ t ∈ range (n + 1), fwdMix (keyPrior π) (activeEmits e x) (keyKernel T) t ∧
+      -Real.logb 2 ((∏ t ∈ range (n + 1), fwdMix (keyPrior π) (activeEmits e x) (keyKernel T) t :
+          ℚ) : ℝ) ≤
+        Real.logb 2 (Fintype.card κ) - Real.logb 2 ((pathSurvivors e x σ (n + 1)).card) -
           Real.logb 2 (π (σ 0) : ℝ) - ∑ t ∈ range n, Real.logb 2 (T (σ t) (σ (t + 1)) : ℝ) := by
   have hP := keyPrior_isPrior (κ := κ) hπ
   have hK := keyKernel_stochastic (κ := κ) hT
   have hf : ∀ s t, 0 ≤ activeEmits e x s t := fun s t => by
     unfold activeEmits; split_ifs <;> norm_num
   have hcard : (0 : ℚ) < Fintype.card κ := by exact_mod_cast Fintype.card_pos
-  -- the path of a surviving key
-  have hpath : ∀ k ∈ pathSurvivors e x σ n,
+  -- a surviving key emits every cell up to the last along the path: its transitions' weight
+  have hpath : ∀ k ∈ pathSurvivors e x σ (n + 1),
       keyPrior π (k, σ 0) * ∏ t ∈ range n, (activeEmits e x (k, σ t) t *
         keyKernel T (k, σ t) (k, σ (t + 1))) =
         1 / Fintype.card κ * (π (σ 0) * ∏ t ∈ range n, T (σ t) (σ (t + 1))) := by
@@ -188,47 +194,60 @@ theorem dormant_survivor_code {π : A → ℚ} {T : A → A → ℚ} (hπ : IsPr
     have hk' := (mem_filter.mp hk).2
     rw [prod_congr rfl fun t ht => show activeEmits e x (k, σ t) t *
         keyKernel T (k, σ t) (k, σ (t + 1)) = T (σ t) (σ (t + 1)) by
-      simp [activeEmits, keyKernel, hk' t (mem_range.mp ht)]]
+      simp [activeEmits, keyKernel, hk' t (by have := mem_range.mp ht; omega)]]
     simp only [keyPrior, uniformPrior]
     ring
+  -- and its face of the last cell is one
+  have hlast : ∀ k ∈ pathSurvivors e x σ (n + 1), activeEmits e x (k, σ n) n = 1 := by
+    intro k hk
+    simp [activeEmits, (mem_filter.mp hk).2 n (by omega)]
   obtain ⟨k₀, hk₀⟩ := hS
   have hTpos : 0 < ∏ t ∈ range n, T (σ t) (σ (t + 1)) :=
     prod_pos fun t ht => hTσ t (mem_range.mp ht)
   have hpos : 0 < keyPrior π (k₀, σ 0) * ∏ t ∈ range n, (activeEmits e x (k₀, σ t) t *
       keyKernel T (k₀, σ t) (k₀, σ (t + 1))) := by
     rw [hpath k₀ hk₀]; exact mul_pos (by positivity) (mul_pos h0 hTpos)
-  obtain ⟨-, htel, -⟩ := forward_dominance_nonneg hP hf hK (fun t => (k₀, σ t)) n hpos
+  obtain ⟨htot, htel, -⟩ := forward_dominance_nonneg hP hf hK (fun t => (k₀, σ t)) n hpos
   have hnn := fwd_nonneg hP.1 hf hK.1
-  have hsum : ((pathSurvivors e x σ n).card : ℚ) / Fintype.card κ *
+  -- the product over `n + 1` cells is the forward weight read at the last cell, before its step
+  have htel' : ∏ t ∈ range (n + 1), fwdMix (keyPrior π) (activeEmits e x) (keyKernel T) t =
+      ∑ s, fwd (keyPrior π) (activeEmits e x) (keyKernel T) n s * activeEmits e x s n := by
+    rw [prod_range_succ, htel, fwdMix, mul_div_cancel₀ _ (htot n le_rfl).ne']
+  have hsum : ((pathSurvivors e x σ (n + 1)).card : ℚ) / Fintype.card κ *
       (π (σ 0) * ∏ t ∈ range n, T (σ t) (σ (t + 1))) ≤
-      ∏ t ∈ range n, fwdMix (keyPrior π) (activeEmits e x) (keyKernel T) t := by
-    rw [htel, Fintype.sum_prod_type]
-    calc ((pathSurvivors e x σ n).card : ℚ) / Fintype.card κ *
+      ∏ t ∈ range (n + 1), fwdMix (keyPrior π) (activeEmits e x) (keyKernel T) t := by
+    rw [htel', Fintype.sum_prod_type]
+    calc ((pathSurvivors e x σ (n + 1)).card : ℚ) / Fintype.card κ *
           (π (σ 0) * ∏ t ∈ range n, T (σ t) (σ (t + 1)))
-        = ∑ k ∈ pathSurvivors e x σ n,
+        = ∑ k ∈ pathSurvivors e x σ (n + 1),
             1 / Fintype.card κ * (π (σ 0) * ∏ t ∈ range n, T (σ t) (σ (t + 1))) := by
           rw [sum_const, nsmul_eq_mul]; ring
-      _ ≤ ∑ k ∈ pathSurvivors e x σ n, fwd (keyPrior π) (activeEmits e x) (keyKernel T) n
-            (k, σ n) := sum_le_sum fun k hk => by
-          rw [← hpath k hk]
+      _ ≤ ∑ k ∈ pathSurvivors e x σ (n + 1),
+            fwd (keyPrior π) (activeEmits e x) (keyKernel T) n (k, σ n) *
+              activeEmits e x (k, σ n) n := sum_le_sum fun k hk => by
+          rw [← hpath k hk, hlast k hk, mul_one]
           exact fwd_path_le hP.1 hf hK.1 (fun t => (k, σ t)) n
-      _ ≤ ∑ k, fwd (keyPrior π) (activeEmits e x) (keyKernel T) n (k, σ n) :=
-          sum_le_sum_of_subset_of_nonneg (subset_univ _) fun k _ _ => hnn n _
-      _ ≤ ∑ k, ∑ a, fwd (keyPrior π) (activeEmits e x) (keyKernel T) n (k, a) :=
+      _ ≤ ∑ k, fwd (keyPrior π) (activeEmits e x) (keyKernel T) n (k, σ n) *
+            activeEmits e x (k, σ n) n :=
+          sum_le_sum_of_subset_of_nonneg (subset_univ _) fun k _ _ =>
+            mul_nonneg (hnn n _) (hf _ _)
+      _ ≤ ∑ k, ∑ a, fwd (keyPrior π) (activeEmits e x) (keyKernel T) n (k, a) *
+            activeEmits e x (k, a) n :=
           sum_le_sum fun k _ => single_le_sum (f := fun a => fwd (keyPrior π) (activeEmits e x)
-            (keyKernel T) n (k, a)) (fun a _ => hnn n _) (mem_univ _)
+            (keyKernel T) n (k, a) * activeEmits e x (k, a) n)
+            (fun a _ => mul_nonneg (hnn n _) (hf _ _)) (mem_univ _)
   refine ⟨hsum, ?_⟩
-  have hSpos : (0 : ℚ) < (pathSurvivors e x σ n).card := by
+  have hSpos : (0 : ℚ) < (pathSurvivors e x σ (n + 1)).card := by
     exact_mod_cast Finset.card_pos.mpr ⟨k₀, hk₀⟩
-  have hlow : 0 < ((pathSurvivors e x σ n).card : ℚ) / Fintype.card κ *
+  have hlow : 0 < ((pathSurvivors e x σ (n + 1)).card : ℚ) / Fintype.card κ *
       (π (σ 0) * ∏ t ∈ range n, T (σ t) (σ (t + 1))) :=
     mul_pos (div_pos hSpos hcard) (mul_pos h0 hTpos)
   have hR := neg_logb_le_of_le (by exact_mod_cast hlow) (show
-    ((((pathSurvivors e x σ n).card : ℚ) / Fintype.card κ *
+    ((((pathSurvivors e x σ (n + 1)).card : ℚ) / Fintype.card κ *
         (π (σ 0) * ∏ t ∈ range n, T (σ t) (σ (t + 1))) : ℚ) : ℝ) ≤
-      ((∏ t ∈ range n, fwdMix (keyPrior π) (activeEmits e x) (keyKernel T) t : ℚ) : ℝ) by
+      ((∏ t ∈ range (n + 1), fwdMix (keyPrior π) (activeEmits e x) (keyKernel T) t : ℚ) : ℝ) by
     exact_mod_cast hsum)
-  have hSr : (0 : ℝ) < (pathSurvivors e x σ n).card := by exact_mod_cast hSpos
+  have hSr : (0 : ℝ) < (pathSurvivors e x σ (n + 1)).card := by exact_mod_cast hSpos
   have hKr : (0 : ℝ) < Fintype.card κ := by exact_mod_cast hcard
   have h0r : (0 : ℝ) < (π (σ 0) : ℝ) := by exact_mod_cast h0
   have hTr : ∀ t ∈ range n, ((T (σ t) (σ (t + 1)) : ℚ) : ℝ) ≠ 0 := fun t ht =>

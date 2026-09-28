@@ -27,11 +27,11 @@ emit another class), so this module states the same mixture with **nonnegative**
 * `death_is_an_exchange` [proved-derived; formal-checked] (a corollary of
   `HolonicAdjointNormalization.sum_replicator`): death is an exchange, never a deletion. At a cell
   whose likelihood is zero for the dying families and positive in total, each dying family's weight
-  goes to zero, the survivors' new weights sum to one, the survivors' total gain is exactly the dead
-  mass, each dead family's mass `w_f` is received by the survivors as `w_f w′_g`, which sum to
-  `w_f`, and each survivor's new weight is its share of the living mass plus its shares of the dead
-  (Rust `receiver::population::DeathReceipt`: the population's total mass is conserved across a
-  death).
+  goes to zero, the survivors' new weights sum to one, and the survivors' total gain is exactly the
+  dead mass. [definition] Each dead family's mass `w_f` is attributed to the survivors as
+  `w_f w′_g`; under that attribution each dead family's mass is received whole, and a survivor's new
+  weight reads as its share of the living mass plus its attributed shares of the dead (Rust
+  `receiver::population::DeathReceipt`: the population's total mass is conserved across a death).
 
 The computational object is the helical pair interaction read as a receiver's population of
 candidate eggs; of the winding guide's six general objects this module touches **faces and
@@ -284,18 +284,22 @@ gain.** With normalized nonnegative weights `w`, nonnegative likelihoods `L` of 
 a positive total, the dying families (`L_f = 0`) keep weight zero after the replicator, and, with
 `w′ = replicator w L` over the survivors (`L_g ≠ 0`):
 * `Σ_g w′_g = 1`: the population's mass is conserved;
-* `Σ_g (w′_g − w_g) = Σ_f w_f`: the survivors' total gain is exactly the dead mass;
-* `Σ_g w_f w′_g = w_f`: each dead family's mass is received whole, `w_f w′_g` by survivor `g`
-  (`w_f · w_g L_g / Σ_(h alive) w_h L_h`, Bayes' normalization stated as the transfer);
-* `w′_g = (Σ_(h alive) w_h) w′_g + Σ_f w_f w′_g`: a survivor's new weight is its share of the living
-  mass and its shares of the dead. -/
+* `Σ_g (w′_g − w_g) = Σ_f w_f`: the survivors' total gain is exactly the dead mass.
+
+Bayes fixes only these totals. [definition] **The per-survivor attribution**: dead family `f`'s
+mass `w_f` is attributed to survivor `g` as `w_f w′_g` (`w_f · w_g L_g / Σ_(h alive) w_h L_h`, Bayes'
+normalization stated as the transfer). Under it:
+* `Σ_g w_f w′_g = w_f` for every dead `f`: each dead family's mass is received whole;
+* `w′_g = (Σ_(h alive) w_h) w′_g + Σ_(f dead) w_f w′_g`: a survivor's new weight read as its share
+  of the living mass and its attributed shares of the dead (the identity `Σ_i w_i = 1`, not a
+  further law). -/
 theorem death_is_an_exchange {ι : Type*} [Fintype ι] {w L : ι → ℝ} (hsum : ∑ i, w i = 1)
     (hZ : 0 < ∑ j, w j * L j) :
     (∀ f, L f = 0 → replicator w L f = 0) ∧
       ∑ g ∈ univ.filter (fun i => ¬ L i = 0), replicator w L g = 1 ∧
       ∑ g ∈ univ.filter (fun i => ¬ L i = 0), (replicator w L g - w g) =
         ∑ f ∈ univ.filter (fun i => L i = 0), w f ∧
-      (∀ f, ∑ g ∈ univ.filter (fun i => ¬ L i = 0), w f * replicator w L g = w f) ∧
+      (∀ f, L f = 0 → ∑ g ∈ univ.filter (fun i => ¬ L i = 0), w f * replicator w L g = w f) ∧
       ∀ g, replicator w L g =
         (∑ h ∈ univ.filter (fun i => ¬ L i = 0), w h) * replicator w L g +
           ∑ f ∈ univ.filter (fun i => L i = 0), w f * replicator w L g := by
@@ -310,7 +314,7 @@ theorem death_is_an_exchange {ι : Type*} [Fintype ι] {w L : ι → ℝ} (hsum 
     exact hsplit
   have hw_split := sum_filter_add_sum_filter_not univ (fun i => L i = 0) w
   rw [hsum] at hw_split
-  refine ⟨hdead, halive, ?_, fun f => ?_, fun g => ?_⟩
+  refine ⟨hdead, halive, ?_, fun f _ => ?_, fun g => ?_⟩
   · rw [sum_sub_distrib, halive]
     linarith
   · rw [← mul_sum, halive, mul_one]

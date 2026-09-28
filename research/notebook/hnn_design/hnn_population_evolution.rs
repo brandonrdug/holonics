@@ -25,9 +25,10 @@
 //!
 //! [definition] **Printed, exactly**, aeon by aeon: the terrain, the evolved prior of the family the
 //! aeon selects and of the key family (its founding charge `−log₂ m_f` against the static 3 bits),
-//! both populations' codes and their difference, the bound `code ≤ code(selected) − log₂ π(selected)`,
-//! the selected family's work, and the retained counts `(declared, selected, died)` per identity;
-//! then the totals.
+//! both populations' codes and their difference, the evolved code against the bound
+//! `code(selected) − log₂ π(selected)` (no aeon here founds a family, so the no-birth form holds;
+//! read two-sided: below, above or undecided, with the enclosed slack), the selected family's
+//! work, and the retained counts `(declared, selected, died)` per identity; then the totals.
 //!
 //! [definition; agent-inferred] **The species** (`species`): the parity moiré and the sheet tuple of
 //! the `moire` mode and the rotor crib of the `crib` mode, each read whole by its population, then its
@@ -56,7 +57,7 @@ use holonics::receiver::population::{
 };
 use num_bigint::BigInt;
 
-use super::exterior::exact;
+use super::exterior::{against, exact};
 use super::{CRIB_RING, DEPTHS, ENUMERATION, GRAIN, SEED, crib_field, factored, tree_declaration};
 
 /// The aeons: three cycles of the four terrains.
@@ -89,6 +90,16 @@ fn minus(a: &ExactInterval, b: &ExactInterval) -> ExactInterval {
     ExactInterval {
         lower: &a.lower - &b.upper,
         upper: &a.upper - &b.lower,
+    }
+}
+
+/// **A code against its bound, two-sided** (`exterior::against`): decided below (the bound holds),
+/// decided above (the bound is refuted), or undecided where the enclosures overlap (not refuted).
+fn verdict(code: &ExactInterval, bound: &ExactInterval) -> String {
+    match against(code, bound) {
+        "below" => "below: the bound holds".to_string(),
+        "above" => "above: the bound is refuted".to_string(),
+        undecided => format!("{undecided}: not refuted"),
     }
 }
 
@@ -283,11 +294,14 @@ pub fn evolution() {
                     exact(&prior),
                     short(&code)
                 );
+                let slack = minus(&bound, &receipt.code);
                 println!(
-                    "  the bound: the evolved population's code {} ≤ code(selected) − log₂ π(selected) = {}: {}",
+                    "  the bound (an aeon without births): the evolved population's code {} against code(selected) − log₂ π(selected) = {}: {}; the slack bound − code, enclosed: exact [{}, {}] bits",
                     short(&receipt.code),
                     short(&bound),
-                    receipt.code.lower <= bound.upper
+                    verdict(&receipt.code, &bound),
+                    exact(&slack.lower),
+                    exact(&slack.upper)
                 );
                 println!("  the selected family's work: {}", work_line(&family.work));
             }

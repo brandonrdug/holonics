@@ -25,14 +25,14 @@ use crate::ratio::algebraic::interval_difference;
 use crate::ratio::{Rat, rat};
 
 /// A family with one fixed exact face, the same at every cell.
-struct Fixed {
+pub(super) struct Fixed {
     face: Vec<Rat>,
     likelihood: Rat,
     description: u64,
 }
 
 impl Fixed {
-    fn new(face: Vec<Rat>, description: u64) -> Self {
+    pub(super) fn new(face: Vec<Rat>, description: u64) -> Self {
         Self {
             face,
             likelihood: Rat::one(),
@@ -771,7 +771,8 @@ fn a_dormant_ring_keeps_its_key_through_its_silent_aeon() {
 }
 
 /// Lean `Population.death_is_an_exchange`: the gratings die at the flipped cell and their mass
-/// passes to the survivors in proportion to their posteriors, which sum to it exactly; the receipt
+/// passes to the survivors in proportion to their posteriors (the declared attribution), which sum
+/// to it exactly, each survivor's posterior after the cell its share over the dying mass; the receipt
 /// names the killing cell, what arrived, the dead family's last face (it predicted the other class
 /// with certainty) and the exhausted factor; the dying mass and shares enclose the exact ones. A cell
 /// every living family gives zero is refused and moves nothing.
@@ -803,20 +804,25 @@ fn death_is_an_exchange() {
         assert_eq!(g, h);
         assert!(contains(bits, &code_length(share).unwrap()));
     }
-    // The survivors' posteriors after the cell are the exchange's shares over the dying mass.
-    let before = Population::new(families(true)).unwrap();
-    let mut before = before;
-    before.receive_passage(&cells[..36]).unwrap();
-    let weights: Vec<Rat> = (0..3)
-        .map(|f| match before.posterior_of(&[f]).unwrap() {
-            Posterior::Bits(bits) => bits.lower,
-            Posterior::Dead => unreachable!(),
-        })
-        .collect();
+    // The dying mass is the gratings' posterior before the cell, and the survivors' posteriors
+    // after it are the exchange's shares over the dying mass.
+    let posterior = |population: &Population, f: usize| match population.posterior_of(&[f]) {
+        Ok(Posterior::Bits(bits)) => bits,
+        _ => unreachable!(),
+    };
+    let mut at_death = Population::new(families(true)).unwrap();
+    at_death.receive_passage(&cells[..36]).unwrap();
+    let dying = posterior(&at_death, 1);
+    assert!(contains(&dying, &code_length(&exchange.mass).unwrap()));
     assert!(
-        weights[1] < Rat::one(),
+        dying.upper < Rat::one(),
         "the gratings held most of the mass"
     );
+    at_death.receive(cells[36]).unwrap();
+    for (g, share) in &exchange.shares {
+        let after = code_length(&(share / &exchange.mass)).unwrap();
+        assert!(contains(&posterior(&at_death, *g), &after));
+    }
 
     let mut gratings_only = Population::new(vec![Box::new(
         KeyFamily::gratings(&small_family(), MoireClass::Parity, 1 << 16, 0).unwrap(),

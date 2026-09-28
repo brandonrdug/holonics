@@ -25,6 +25,9 @@
 //! α = 2^(−j):  −log₂(1 − α) < 3·2^(−j),  so c_α(σ^ℓ) < (k_ℓ + [σ^ℓ_0 dormant]) j + 3 when n ≤ 2^j
 //! ```
 //!
+//! Over `n` cells the path pays `n − 1` transitions: the step after the last cell sums out (Lean
+//! states `dormant_survivor_code` over `n + 1` cells and `n` transitions).
+//!
 //! A key dies only when every activity contradicts the cell: a cell that a dormant layer's silence
 //! cannot explain and the key's active layers do not emit. Death is reserved for keys contradicted
 //! while active; a dormant key's weight only moves by the switch it pays.
