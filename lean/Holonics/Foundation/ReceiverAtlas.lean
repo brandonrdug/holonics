@@ -37,12 +37,13 @@ stated with residuals (`Cocycle`, `CocycleDefect`), and its failure is returned 
 
 ## Rust counterpart
 
-[definition] The paired executable owner is `crates/holonic-engine/src/receiver_atlas.rs`. Its
-types carry the same names — `Capability`, `SuppliedCapability`, `LocalChart`, `ChartTransition`,
+[definition] The paired executable owner was `receiver_atlas.rs` (retired;
+[history](https://github.com/brandonrdug/holonics/blob/814157ad/crates/holonic-engine/src/receiver_atlas.rs)). Its
+types carried the same names — `Capability`, `SuppliedCapability`, `LocalChart`, `ChartTransition`,
 `ReceiverAtlas`, `CoherentPlacement`, `AtlasGluing`, `CocycleDefect` — over exact arithmetic
-(`num_bigint::BigInt`, `relational_geometry::Rat`), with every theorem below mirrored as a test and
-with the protein atlas of `grain_tower.rs` as the instantiated atlas. Each Rust item names the
-declaration here that it realizes.
+(`num_bigint::BigInt` and an exact rational, now `holonics::ratio::Rat`), with every theorem
+below mirrored as a test and with the protein atlas of `grain_tower.rs` as the instantiated atlas.
+Each Rust item named the declaration here that it realized.
 
 ## What this file does not do
 
@@ -84,7 +85,7 @@ is the only thing that is real"; a unary reading ignores its second argument. No
 structure can be built from `Carrier` alone, which is the whole point:
 `no_operation_from_the_carrier_alone`.
 
-Rust counterpart: `crates/holonic-engine/src/receiver_atlas.rs::Capability`. -/
+Retired Rust counterpart: `receiver_atlas.rs::Capability` ([history](https://github.com/brandonrdug/holonics/blob/814157ad/crates/holonic-engine/src/receiver_atlas.rs)). -/
 structure Capability (Carrier : Type u) where
   /-- Which supplied structure this is. -/
   kind : CapabilityKind
@@ -197,7 +198,7 @@ A chart with `metric = none` has placement and incidence and **no angles**: aski
 operation returns `none` by `reading_none_of_metric_none`, which is the type-level refusal the
 doctrine demands rather than a zero.
 
-Rust counterpart: `crates/holonic-engine/src/receiver_atlas.rs::LocalChart`. -/
+Retired Rust counterpart: `receiver_atlas.rs::LocalChart` ([history](https://github.com/brandonrdug/holonics/blob/814157ad/crates/holonic-engine/src/receiver_atlas.rs)). -/
 structure LocalChart (X : Type u) where
   /-- Where this chart reads at all. -/
   Region : Set X
@@ -369,7 +370,8 @@ theorem coarseGrain_not_cocycle :
 their overlap and agreeing with both charts' own placements there. It is not assumed invertible; it
 carries the residual its `Transition` carries.
 
-Rust counterpart: `crates/holonic-engine/src/receiver_atlas.rs::ChartTransition`. -/
+Retired Rust counterpart: `receiver_atlas.rs::ChartTransition`
+([history](https://github.com/brandonrdug/holonics/blob/814157ad/crates/holonic-engine/src/receiver_atlas.rs)). -/
 structure ChartTransition {X : Type u} (A B : LocalChart.{u, v} X) where
   /-- Where both charts read. -/
   overlap : Set X
@@ -414,7 +416,8 @@ chart is not wrong; it is incomparable, and the type says so."
 The cost of a transition belongs to item **C5** (`Foundation/PresentationCost.lean`) and is
 deliberately not a field here.
 
-Rust counterpart: `crates/holonic-engine/src/receiver_atlas.rs::ReceiverAtlas`. -/
+Retired Rust counterpart: `receiver_atlas.rs::ReceiverAtlas`
+([history](https://github.com/brandonrdug/holonics/blob/814157ad/crates/holonic-engine/src/receiver_atlas.rs)). -/
 structure ReceiverAtlas (X : Type u) where
   /-- The index of charts. -/
   Chart : Type v
@@ -1014,7 +1017,8 @@ end LinearClass
 occurrences with seven contacts, and the declared atlas is the one R3 and R5 actually supply for
 such a complex with no configuration: the grade-0 and grade-1 Hodge spectra under the unit metric,
 the integral Betti numbers with torsion, and the persistence of the dimension filtration. The
-reading below is the one `crates/holonic-engine/src/receiver_atlas/tests.rs` computes exactly for
+reading below is the one the retired `receiver_atlas/tests.rs`
+([history](https://github.com/brandonrdug/holonics/blob/814157ad/crates/holonic-engine/src/receiver_atlas/tests.rs)) computed exactly for
 the two Laplacian-cospectral non-isomorphic graphs of
 `causal_chord.rs::cospectral_graphs_are_separated_by_the_response_atlas`:
 

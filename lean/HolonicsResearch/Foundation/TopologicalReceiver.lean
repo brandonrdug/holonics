@@ -5,8 +5,9 @@ import Holonics.Foundation.ContinuingTower
 /-!
 # The topological receiver: a filtration, its persistence pairing, and linking from an embedding
 
-[definition] This owner states the laws the Rust module
-`crates/holonic-engine/src/topological_receiver.rs` implements. It is receiver **R5** of
+[definition] This owner states the laws the retired Rust module `topological_receiver.rs`
+implemented ([history](https://github.com/brandonrdug/holonics/blob/13f8c734/crates/holonics-cuda/src/topological_receiver.rs)).
+It is receiver **R5** of
 `docs/plans/THE_RECEIVER_ATLAS_SEPARATES_WHAT_ONE_FACE_CANNOT.md` and the topological share of
 **B7** in `docs/plans/THE_BIOLOGICAL_ECOLOGY_INSTANTIATES_THE_CARRIER.md`. Four things are stated,
 in this order.
@@ -80,8 +81,9 @@ computed anywhere in this file."* This file supplies exactly that missing half: 
 crossing **derived from an embedding and a declared rational projection direction**. Nothing here
 duplicates `net`, `total` or the blindness theorems, which remain that file's.
 
-Rust owner: `crates/holonic-engine/src/topological_receiver.rs`
-(`ApertureFiltration`, `FiltrationOrder`, `OrderLaw`, `persistence`, `PersistenceReading`,
+Retired Rust owner: `topological_receiver.rs`
+([history](https://github.com/brandonrdug/holonics/blob/13f8c734/crates/holonics-cuda/src/topological_receiver.rs):
+`ApertureFiltration`, `FiltrationOrder`, `OrderLaw`, `persistence`, `PersistenceReading`,
 `persistent_rank`, `community_persistence`, `integral_profile`, `Crossing`, `linking_number`,
 `projected_writhe`, `contact_loops`, `knot_like_reading`).
 -/

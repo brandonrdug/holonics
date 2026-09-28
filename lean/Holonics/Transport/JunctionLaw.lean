@@ -5,8 +5,8 @@ import Holonics.Foundation.Lineage
 # The junction law: the tangential part is continuous, the normal part jumps, and the jump is the
 source that lives on the joint
 
-[definition] This owner states the law the Rust module
-`crates/holonic-engine/src/junction_law.rs` implements. It is the junction half of item **T7** of
+[definition] This owner states the law the retired Rust module `junction_law.rs` implemented
+([history](https://github.com/brandonrdug/holonics/blob/13f8c734/crates/holonics-cuda/src/junction_law.rs)). It is the junction half of item **T7** of
 `docs/plans/THE_TUBE_CARRIES_RELEASE_THROUGH_NECKS_FOLDS_AND_JUNCTIONS.md`.
 
 Nothing here founds a complex, a metric, a coboundary or a codifferential. Every statement is made
@@ -71,7 +71,7 @@ the exact polynomial Burgers flux) and `three_conormals_balance_iff` with
 `four_conormals_balance_of_pairwise` (Plateau's tension balance at a junction line and at a
 vertex). Each is exact over `ℚ`; none claims anything beyond its declared model.
 
-Rust owner: `crates/holonic-engine/src/junction_law.rs`.
+Retired Rust owner: `junction_law.rs` ([history](https://github.com/brandonrdug/holonics/blob/13f8c734/crates/holonics-cuda/src/junction_law.rs)).
 -/
 
 noncomputable section

@@ -5,8 +5,8 @@ import Mathlib.Tactic
 /-!
 # The jet staircase: the finite jet ladder, and the passage between difference orders
 
-[definition] This owner states the law the Rust module
-`crates/holonic-engine/src/jet_staircase.rs` implements. It is item **T8** of
+[definition] This owner states the law the retired Rust module `jet_staircase.rs` implemented
+([history](https://github.com/brandonrdug/holonics/blob/13f8c734/crates/holonics-cuda/src/jet_staircase.rs)). It is item **T8** of
 `docs/plans/THE_TUBE_CARRIES_RELEASE_THROUGH_NECKS_FOLDS_AND_JUNCTIONS.md`. Four things are stated
 here, in this order.
 

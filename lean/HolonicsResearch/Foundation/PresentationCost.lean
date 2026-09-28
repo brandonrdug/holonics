@@ -68,7 +68,8 @@ weighs more than one axis. A scalar score of a presentation is a receiver readin
 
 ## Rust counterpart
 
-[definition] The paired executable owner is `crates/holonic-engine/src/presentation_cost.rs`:
+[definition] The paired executable owner was `presentation_cost.rs` (retired;
+[history](https://github.com/brandonrdug/holonics/blob/13f8c734/crates/holonics-cuda/src/presentation_cost.rs)):
 `Axis`, `Provenance`, `Counted`, `CostReceipt`, `Weighting`, `ParetoPoint`, `pareto_frontier`,
 `CostReceipt::compose`, `code_bits`, over `BigUint` counts and exact `BigRational` weights, with
 each theorem below appearing as a named test.

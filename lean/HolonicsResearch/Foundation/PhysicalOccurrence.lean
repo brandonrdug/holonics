@@ -5,7 +5,7 @@ import HolonicsResearch.Foundation.ExteriorIntake
 
 [definition] This owner states the law behind items **B3** and **B4** of
 `docs/plans/THE_BIOLOGICAL_ECOLOGY_INSTANTIATES_THE_CARRIER.md`, and it is the formal half of
-`crates/holonic-engine/src/physical_occurrence.rs`.
+the retired `physical_occurrence.rs` ([history](https://github.com/brandonrdug/holonics/blob/814157ad/crates/holonic-engine/src/physical_occurrence.rs)).
 
 `Foundation/ExteriorIntake.lean` already established that no occurrence is founded without an
 environment index. That index is a *presented* one: the arrays the released wire happens to carry.
@@ -41,8 +41,9 @@ Four things are stated, in this order.
 
 ## Rust counterpart
 
-[definition] The paired executable owner is `crates/holonic-engine/src/physical_occurrence.rs`,
-which names this file and every declaration below. The correspondence, both directions:
+[definition] The paired executable owner was `physical_occurrence.rs` (retired;
+[history](https://github.com/brandonrdug/holonics/blob/814157ad/crates/holonic-engine/src/physical_occurrence.rs)),
+which named this file and every declaration below. The correspondence, both directions:
 
 | Lean | Rust |
 |---|---|
@@ -98,8 +99,8 @@ a value **declared together with the ground that licenses it**, or an explicit s
 coordinate was not declared at all. There is deliberately no `Inhabited` instance, so nothing can
 produce a coordinate by default.
 
-Rust counterpart: `crates/holonic-engine/src/physical_occurrence.rs::Coordinate`, whose two
-constructors both refuse an empty ground. -/
+Retired Rust counterpart: `physical_occurrence.rs::Coordinate` ([history](https://github.com/brandonrdug/holonics/blob/814157ad/crates/holonic-engine/src/physical_occurrence.rs)),
+whose two constructors both refused an empty ground. -/
 inductive Coordinate (α : Type u) where
   /-- A declared value, carrying the ground that licenses the declaration. -/
   | declared (value : α) (ground : String)
@@ -758,7 +759,8 @@ not prove realization.** Unanimity of a family on a receiver gives `R`-indisting
 members and never equality of sources; adding a member can only shrink or preserve the unanimous
 set; and a single separating contact refutes a proposed merge.
 
-Rust counterpart: `crates/holonic-engine/src/physical_occurrence/plural_fibre.rs`. -/
+Retired Rust counterpart: `physical_occurrence/plural_fibre.rs`
+([history](https://github.com/brandonrdug/holonics/blob/814157ad/crates/holonic-engine/src/physical_occurrence/plural_fibre.rs)). -/
 
 section PluralFibre
 
@@ -1086,7 +1088,8 @@ reparameterizations. Mutation changes the object itself, so it is a **horizontal
 typed apart from the three vertical ones; the axis is an index of the passage type, so there is no
 coercion between them.
 
-Rust counterpart: `crates/holonic-engine/src/physical_occurrence/passage.rs`. -/
+Retired Rust counterpart: `physical_occurrence/passage.rs`
+([history](https://github.com/brandonrdug/holonics/blob/814157ad/crates/holonic-engine/src/physical_occurrence/passage.rs)). -/
 
 section Passages
 
@@ -1423,7 +1426,7 @@ returns the disagreement set rather than a verdict, and a passage answers exactl
 static exact law reaches exactly the three geometric states and none of the other three; and no
 symmetrizing function can be used without merging readings the source kept apart.
 
-Rust owner: `crates/holonic-engine/src/physical_occurrence.rs`. -/
+Retired Rust owner: `physical_occurrence.rs` ([history](https://github.com/brandonrdug/holonics/blob/814157ad/crates/holonic-engine/src/physical_occurrence.rs)). -/
 theorem occurrence_contract :
     (∀ {α : Type} [DecidableEq α] (a b : Coordinate α), Coordinate.agrees a b = true →
         a.isDeclared = true ∧ b.isDeclared = true) ∧

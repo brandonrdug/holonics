@@ -6,8 +6,8 @@ import Mathlib.Tactic
 /-!
 # One Holonic Interaction chain: source → medium → neck → medium → perspective
 
-[definition] This owner states the laws the Rust module `crates/holonic-engine/src/holonic_chain.rs`
-implements. It is the **join** of the two halves already owned: the unit and its media
+[definition] This owner states the laws the retired Rust module `holonic_chain.rs` implemented
+([history](https://github.com/brandonrdug/holonics/blob/13f8c734/crates/holonics-cuda/src/holonic_chain.rs)). It is the **join** of the two halves already owned: the unit and its media
 (`Transport/HolonicInteraction.lean`) and the neck station with its jet staircase
 (`Transport/Neck.lean`, `Transport/JetStaircase.lean`). It founds no fifth object. A chain is
 **one** interaction whose joint chart splits into an upstream medium and a downstream medium, with

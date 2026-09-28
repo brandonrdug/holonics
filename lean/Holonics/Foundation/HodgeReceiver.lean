@@ -8,8 +8,9 @@ import Mathlib.Tactic.Linarith
 /-!
 # The Hodge receiver: a weighted cochain complex, its Laplacian, and the three-way decomposition
 
-[definition] This owner states the law the Rust module
-`crates/holonic-engine/src/hodge_receiver.rs` implements. It is receiver **R3** of
+[definition] This owner states the law the retired Rust module `hodge_receiver.rs` implemented
+([history](https://github.com/brandonrdug/holonics/blob/13f8c734/crates/holonics-cuda/src/hodge_receiver.rs)).
+It is receiver **R3** of
 `docs/plans/THE_RECEIVER_ATLAS_SEPARATES_WHAT_ONE_FACE_CANNOT.md`. Six things are stated here, in
 this order.
 
@@ -52,8 +53,9 @@ this order.
 inner product space. The field is `ℚ`, the form is the declared diagonal one, and every statement
 is finite linear algebra.
 
-Rust owner: `crates/holonic-engine/src/hodge_receiver.rs`
-(`MetricLaw`, `CellMetric`, `BoundaryCondition`, `HodgeOperator::codifferential`,
+Retired Rust owner: `hodge_receiver.rs`
+([history](https://github.com/brandonrdug/holonics/blob/13f8c734/crates/holonics-cuda/src/hodge_receiver.rs):
+`MetricLaw`, `CellMetric`, `BoundaryCondition`, `HodgeOperator::codifferential`,
 `HodgeOperator::laplacian`, `hodge_decomposition`, `hodge_reading`, `exact_hodge_spectrum`,
 `hodge_family`).
 -/

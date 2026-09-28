@@ -12,10 +12,12 @@ form, and its storage energy is the energy of the rank-one family itself:
 
 With nonnegative weights the storage is passive (`0 ≤ storageEnergy C x`). This is the law behind
 plan phase 13: the compact image chart `Bᵀ H B`, the rooted spine and the fixed pair carrier of
-`holonic-engine::factored_moment` (and the resident card that realizes them) are one
-`ElementRelation::Storage`, `QuadraticMomentStorage` in Rust.
+the retired `factored_moment` ([history](https://github.com/brandonrdug/holonics/blob/13f8c734/crates/holonics-cuda/src/factored_moment.rs))
+(and the resident card that realized them) are one
+`ElementRelation::Storage`. The Rust counterpart `QuadraticMomentStorage` was retired at the reset
+([history](https://github.com/brandonrdug/holonics/blob/13f8c734/crates/holonics-cuda/src/factored_moment/storage.rs)).
 
-| Lean | Rust |
+| Lean | Rust (retired) |
 |---|---|
 | `quadraticMoment_symm` | `QuadraticMomentStorage::storage_form` (refuses an asymmetric chart) |
 | `storageEnergy_quadraticMoment` | `QuadraticMomentStorage::stored_energy` |

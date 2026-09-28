@@ -6,8 +6,9 @@ import Mathlib.Tactic.Linarith
 /-!
 # The rigidity receiver: a constraint system, its Jacobian, and the two null spaces
 
-[definition] This owner states the law the Rust module
-`crates/holonic-engine/src/rigidity_receiver.rs` implements. The physical ontology of
+[definition] This owner states the law the retired Rust module `rigidity_receiver.rs` implemented
+([history](https://github.com/brandonrdug/holonics/blob/13f8c734/crates/holonics-cuda/src/rigidity_receiver.rs)).
+The physical ontology of
 `research/records/2026-08-21_THE_FOLD_IS_A_CONSTRAINT_ECOLOGY…` §5 represents a structure at one
 grain as `P_eta = (V, C_eta, q, F_eta, J_eta, G, E_eta, R_eta, Gamma_eta)` with `F_eta(q) = 0` the
 constraint system and `J_eta = D F_eta(q)` its rigidity Jacobian. Five things are stated here, in
@@ -46,8 +47,9 @@ exact rank for exactly this reason.
 constraints on the same occurrences can only shrink `ker J`, so the refusing and admitting members
 of `physical_constraint_grading`'s family bracket the motion dimension of every member.
 
-Rust owner: `crates/holonic-engine/src/rigidity_receiver.rs`
-(`RigidityJacobian`, `rigidity_reading`, `TrivialMotionReading`, `MaxwellCount`,
+Retired Rust owner: `rigidity_receiver.rs`
+([history](https://github.com/brandonrdug/holonics/blob/13f8c734/crates/holonics-cuda/src/rigidity_receiver.rs):
+`RigidityJacobian`, `rigidity_reading`, `TrivialMotionReading`, `MaxwellCount`,
 `rigid_clusters`, `removal_sensitivity`, `rigidity_family`).
 -/
 

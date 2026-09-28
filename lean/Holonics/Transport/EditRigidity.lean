@@ -6,7 +6,8 @@ import Mathlib.LinearAlgebra.Dual.Lemmas
 
 [definition] This file is the formal owner of item **T4** of
 `docs/plans/THE_TUBE_CARRIES_RELEASE_THROUGH_NECKS_FOLDS_AND_JUNCTIONS.md`. Its executable
-counterpart is `crates/holonic-engine/src/edit_rigidity.rs`. **It founds no second Jacobian.**
+counterpart was the retired `edit_rigidity.rs` ([history](https://github.com/brandonrdug/holonics/blob/13f8c734/crates/holonics-cuda/src/edit_rigidity.rs)).
+**It founds no second Jacobian.**
 `Foundation/RigidityReceiver.lean` owns the constraint Jacobian, its two null spaces and the
 rank–nullity identities; `Transport/ArtifactRelease.lean` owns the discrete edited family, its
 release law and the three relations that "independent versus entangled" conflates. What is new
@@ -103,7 +104,7 @@ friction moment* in the sense of an electromagnetic moment is Brandon's picture 
 interpretation. What is defined here is exact and finite: a squared rethreading work in a declared
 metric, an adjoint pullback of a declared residual, and a self-stress dimension per declared scale.
 
-Rust owner: `crates/holonic-engine/src/edit_rigidity.rs`.
+Retired Rust owner: `edit_rigidity.rs` ([history](https://github.com/brandonrdug/holonics/blob/13f8c734/crates/holonics-cuda/src/edit_rigidity.rs)).
 -/
 
 noncomputable section

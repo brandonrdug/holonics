@@ -10,8 +10,9 @@ import Holonics.Foundation.CausalChord
 /-!
 # The acoustic receiver: a resonator bank on the colour receiver's own mode population
 
-[definition] This is the checked mathematical owner of receiver **R2**. A standalone Rust mirror
-at `crates/holonic-engine/src/acoustic_receiver.rs` implemented this law and was retired in R1
+[definition] This is the checked mathematical owner of receiver **R2**. A standalone Rust mirror,
+`acoustic_receiver.rs` ([history](https://github.com/brandonrdug/holonics/blob/1a6299e4/crates/holonic-engine/src/acoustic_receiver.rs)),
+implemented this law and was retired in R1
 (issue #65) because no current Rust caller or example consumed it. The correspondence below is
 historical evidence, not a live code dependency. R2 is recorded in
 `docs/plans/THE_RECEIVER_ATLAS_SEPARATES_WHAT_ONE_FACE_CANNOT.md`:
@@ -76,8 +77,9 @@ those executed instances. The reverse does not hold, and the mirror's exactness 
 arithmetic, not from these statements.
 
 Historical Rust correspondence (retired R1, issue #65):
-`crates/holonic-engine/src/acoustic_receiver.rs`
-(`Bank` ↔ `ResonatorBank`; `cayley`/`gain` ↔ `ResonatorBank::transition`/`ResonatorBank::gain`;
+`acoustic_receiver.rs`
+([history](https://github.com/brandonrdug/holonics/blob/1a6299e4/crates/holonic-engine/src/acoustic_receiver.rs):
+`Bank` ↔ `ResonatorBank`; `cayley`/`gain` ↔ `ResonatorBank::transition`/`ResonatorBank::gain`;
 `Bank.advance`/`Bank.run` ↔ `ResonatorBank::advance`/`ResonatorBank::run`; `run_causal` ↔
 `the_state_after_n_steps_ignores_every_later_input`; `run_add` ↔
 `superposition_holds_through_the_bank`; `colour_does_not_distribute` ↔

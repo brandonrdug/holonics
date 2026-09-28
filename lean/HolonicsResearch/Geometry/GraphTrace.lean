@@ -9,10 +9,12 @@ open Holonics.Geometry
 The proved spectral-placement instance of the Riemann route — spectrum against closed orbits as
 an exact ledger — has a finite home: the non-backtracking walk structure of a regular graph,
 where the Ihara zeta is `det(1 − uB)⁻¹` for the dart-transition matrix `B` and graph-RH is the
-Ramanujan condition.  **The determinant face already has an exact owner in this repository** —
-`crates/relational-geometry/src/receiver_topology.rs` computes the Ihara signature with an Euler-
-product cross-check and `crates/holonic-engine/examples/the_graph_is_asked_the_ramanujan_question.rs`
-drives the Ramanujan question with a negative control — so this file does **not** rebuild it.
+Ramanujan condition.  **The determinant face had an exact owner in this repository** — the retired
+`receiver_topology.rs` ([history](https://github.com/brandonrdug/holonics/blob/13f8c734/crates/holonics/src/geometry/receiver_topology.rs))
+computed the Ihara signature with an Euler-product cross-check, and the retired example
+`the_graph_is_asked_the_ramanujan_question.rs`
+([history](https://github.com/brandonrdug/holonics/blob/814157ad/crates/holonic-engine/examples/the_graph_is_asked_the_ramanujan_question.rs))
+drove the Ramanujan question with a negative control — so this file does **not** rebuild it.
 What had no owner anywhere is the **trace formula proper**: the spectral identity equating the
 enumerated closed-geodesic population to a sum of trace sequences.  This file proves it on the
 tetrahedron `K₄`, joining the dynamical side to `TraceSequence.lean` — the same sequence whose

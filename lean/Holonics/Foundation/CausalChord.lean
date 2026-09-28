@@ -15,7 +15,7 @@ import Mathlib.Tactic.Module
 # The causal chord: transfer function, rate form, and the atlas one spectrum cannot supply
 
 [definition] This owner states the law the Rust module
-`crates/holonic-engine/src/causal_chord.rs` implements. It is receiver **R1** of
+`crates/holonics/src/receiver/causal_chord.rs` implements. It is receiver **R1** of
 `docs/plans/THE_RECEIVER_ATLAS_SEPARATES_WHAT_ONE_FACE_CANNOT.md` and it formalizes the rate-form
 algebra of `research/records/2026-09-15_INTEGRATING_AND_DIFFERENTIATING_ROLES_SHARE_ONE_CURRENT.md`
 §"The critical seam is the `Sigma_G = 0` case". Three things are stated here, in this order.
@@ -87,7 +87,7 @@ stated and proved at `Fin 2` only; the general statement is true but needs the c
 of `adjugate (charmatrix A)` in degree `n − 2`, which is not done here, and the name records the
 restriction.
 
-Rust owner: `crates/holonic-engine/src/causal_chord.rs`
+Rust owner: `crates/holonics/src/receiver/causal_chord.rs`
 (`Linearization` ↔ `Linearization`; `transfer_function` and `TransferFunction` ↔ `numerator`,
 `denominator`, `transfer`, `denominator_smul_transfer_eq_numerator`; `ResolventExpansion` ↔
 `resolvent_identity`; `causal_chord` and `CausalChord` ↔ `rebase_transfer`; `pole_atlas` and
@@ -316,7 +316,9 @@ variable {n : ℕ}
 
 /-- [definition] The constant-metric rate form `Sigma_G = A* G + G A` of the record. With a moving
 metric the record's third term `G'` is added; that term is not carried here because every statement
-below fixes `G`. -/
+below fixes `G`. The moving-metric law with forcing is `Geometry/Motion.energy_rate_moving_metric`
+(algebraic form) and `Holon/Deposition.learned_energy_balance` (its dynamical owner in the
+Holon's quadratic port chart); `rateForm` is their `Ġ = 0`, `f = 0` reading over `ℂ`. -/
 def rateForm (A G : Matrix (Fin n) (Fin n) ℂ) : Matrix (Fin n) (Fin n) ℂ := Aᴴ * G + G * A
 
 /-- [proved-derived; formal-checked] **The rate form transforms by congruence**, which is the

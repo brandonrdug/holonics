@@ -5,8 +5,10 @@ import Mathlib.Tactic
 /-!
 # The neck: the pinhole station where flux converges and then diverges
 
-[definition] This owner states the law the Rust module `crates/holonic-engine/src/neck.rs`
-implements. It is item **T6** of
+[definition] This owner states the law the retired Rust module `neck.rs` implemented
+([history](https://github.com/brandonrdug/holonics/blob/13f8c734/crates/holonics-cuda/src/neck.rs)).
+(`crates/holonics/src/physics/thermal/neck.rs` is a different law: Schnakenberg production
+across a neck.) It is item **T6** of
 `docs/plans/THE_TUBE_CARRIES_RELEASE_THROUGH_NECKS_FOLDS_AND_JUNCTIONS.md`. Three things are
 stated here, in this order, and each one carries its hypotheses in the open.
 

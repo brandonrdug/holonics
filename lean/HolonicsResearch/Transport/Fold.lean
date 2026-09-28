@@ -10,8 +10,8 @@ import Mathlib.Tactic.LinearCombination
 /-!
 # The fold: a reflection applied to one side of a crease
 
-[definition] This owner states the law the Rust module `crates/holonic-engine/src/fold.rs`
-implements. It is the fold/cut half of item **T7** of
+[definition] This owner states the law the retired Rust module `fold.rs` implemented
+([history](https://github.com/brandonrdug/holonics/blob/814157ad/crates/holonic-engine/src/fold.rs)). It is the fold/cut half of item **T7** of
 `docs/plans/THE_TUBE_CARRIES_RELEASE_THROUGH_NECKS_FOLDS_AND_JUNCTIONS.md`. Eight things are
 stated here, in this order.
 
@@ -87,7 +87,7 @@ no second reflection algebra. `Geometry/Swing.lean`'s frozen-board point reflect
 and `Zeta/Seam.lean`'s `conjugateReflection` remain their own owners; this file is the
 *hyperplane* reflection of `ℚ^d` and its one-sided application, which neither of those carries.
 
-Rust owner: `crates/holonic-engine/src/fold.rs`.
+Retired Rust owner: `fold.rs` ([history](https://github.com/brandonrdug/holonics/blob/814157ad/crates/holonic-engine/src/fold.rs)).
 -/
 
 noncomputable section
@@ -170,7 +170,7 @@ theorem dot_self_eq_zero_iff (x : Fin d → ℚ) : dot x x = 0 ↔ x = 0 := by
 field is `⟨n,n⟩ ≠ 0`, which over `ℚ` is exactly `n ≠ 0` (`dot_self_eq_zero_iff`); it is carried in
 that form because it is the denominator every reflection divides by.
 
-Rust counterpart: `crates/holonic-engine/src/fold.rs::Crease`. -/
+Retired Rust counterpart: `fold.rs::Crease` ([history](https://github.com/brandonrdug/holonics/blob/814157ad/crates/holonic-engine/src/fold.rs)). -/
 structure Crease (d : ℕ) where
   /-- The exact rational normal. -/
   normal : Fin d → ℚ

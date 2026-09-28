@@ -7,8 +7,8 @@ Every polygon-level identity below is closed by kernel computation (`rfl` / `dec
 `ℤ × ℤ` carriers; the structural statements around them are proved by `omega`, `ring`, `field_simp`
 and `linarith`.  Nothing is approximated and no floating point appears.
 
-This is the Lean carrier of the crossing ledger behind
-`crates/relational-geometry/src/exact_analysis.rs`'s `polygon_winding`, ported at Brandon's
+This is the Lean carrier of the crossing ledger behind the retired `exact_analysis.rs`'s
+`polygon_winding` ([history](https://github.com/brandonrdug/holonics/blob/13f8c734/crates/holonics/src/geometry/exact_analysis.rs)), ported at Brandon's
 direction together with the standing falsifier recorded against it — *two different crossing
 populations producing the same net*.
 

@@ -605,10 +605,10 @@ restatement of the one-axis law:
   determined **face** and toward the fine it reads the whole **fibre**. Both directions are far;
   they are far in dual ways, and that asymmetry — not a symmetry — is the content.
 
-Rust owners: `crates/holonics/src/law/receiver.rs::{Horizon, width_over_readings}` and
+Rust owners: `crates/holonics/src/receiver/face.rs::{Horizon, width_over_readings}` and
 `crates/holonics/src/receiver/release.rs::{ExactZonotope, CompatibleFamily, horizon_image}`; and
-`crates/holonic-engine/src/continuing_tube.rs::{Observer, IndexDirection, IndexReading,
-index_distance, HorizonReach, horizon_reach, two_axis_width}`. -/
+the retired `continuing_tube.rs::{Observer, IndexDirection, IndexReading, index_distance,
+HorizonReach, horizon_reach, two_axis_width}` ([history](https://github.com/brandonrdug/holonics/blob/13f8c734/crates/holonics-cuda/src/continuing_tube.rs)). -/
 
 /-- [definition] **A horizon with two coordinates**: `h` longitudinal steps of `Φ` and `k` steps in
 the tower's index, in either direction.

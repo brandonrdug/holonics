@@ -30,7 +30,7 @@ evaluation (`Sturm.evalReal`) and through an exact cast of the rational reading 
   reads `1` there whatever the entry did.
 
 **The material is Sturm's own.**  The star quartic `X⁴ − 5X² + 4` of
-`crates/holonic-engine/src/winding_inertia.rs` — the squarefree part of `D₆(x) − 2`, whose roots are
+the retired `winding_inertia.rs` ([history](https://github.com/brandonrdug/holonics/blob/13f8c734/crates/holonics/src/geometry/winding_inertia.rs)) — the squarefree part of `D₆(x) − 2`, whose roots are
 the star values `β_m = ω^m + ω^{−m}` at `n = 6` — is carried here as a real polynomial, proved to
 name the same function as `Sturm.starHexagonChart`, and its chain is exhibited as a division tower
 over `ℝ`.  The flip is run at the star value `2`; the constancy corollary is run on the gap between
@@ -547,7 +547,8 @@ theorem theInteriorEntryStraddlesItsNeighbours {P Q R T : Polynomial ℝ} (hdiv 
 
 `X⁴ − 5X² + 4` is the squarefree part of `D₆(x) − 2` — the Dickson polynomial with
 `D_n(z + z⁻¹) = zⁿ + z⁻ⁿ` — whose roots `2, 1, −1, −2` are the star values `β_m = ω^m + ω^{−m}` at
-`n = 6`, the terrain of `crates/holonic-engine/src/winding_inertia.rs`.  Sturm's chain for it is
+`n = 6`, the terrain of the retired `winding_inertia.rs`
+([history](https://github.com/brandonrdug/holonics/blob/13f8c734/crates/holonics/src/geometry/winding_inertia.rs)).  Sturm's chain for it is
 transcribed here as real polynomials so the local lemmas can be run on it. -/
 
 /-- The chain's head: the star quartic. -/

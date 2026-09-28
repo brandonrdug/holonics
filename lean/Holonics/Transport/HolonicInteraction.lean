@@ -7,8 +7,9 @@ import Mathlib.Tactic
 /-!
 # The Holonic Interaction unit: a medium's contact exchange and its derived modal response
 
-[definition] This owner states the law the Rust module
-`crates/holonic-engine/src/holonic_interaction.rs` implements. It is the **medium and contact**
+[definition] This owner states the law the retired Rust module `holonic_interaction.rs`
+implemented ([history](https://github.com/brandonrdug/holonics/blob/13f8c734/crates/holonics-cuda/src/holonic_interaction.rs)).
+It is the **medium and contact**
 half of the Holonic Interaction subject named in
 `docs/plans/THE_TUBE_CARRIES_RELEASE_THROUGH_NECKS_FOLDS_AND_JUNCTIONS.md`; the derivation it
 formalizes is the linear dissipative specialization written out in
@@ -263,7 +264,11 @@ def portGenerator (Omega M G : Matrix (Fin n) (Fin n) ℚ) : Matrix (Fin n) (Fin
 
 /-- [proved-derived; formal-checked] **The storage-rate identity.**
 `Aᵀ G + G A = −2 G M G` for `A = (Ω − M) G` with `G` symmetric, `Ω` skew and `M` symmetric. The
-skew part cancels exactly; the dissipation is all that survives. -/
+skew part cancels exactly; the dissipation is all that survives. It is the constant-metric,
+unforced reading of the moving-metric energy law (algebraic form
+`Geometry/Motion.energy_rate_moving_metric`; dynamical owner `Holon/Deposition.learned_energy_balance`
+at `L = 0`, `Q̇ = 0`, `u = 0`), and for invertible `G` the same dissipation is the boost
+`Geometry/Motion.boost_portHamiltonian`, `−M G`, while `Ω G` is the turn. -/
 theorem port_storage_rate (Omega M G : Matrix (Fin n) (Fin n) ℚ) (hG : Gᵀ = G)
     (hOmega : Omegaᵀ = -Omega) (hM : Mᵀ = M) :
     rateFormQ (portGenerator Omega M G) G = -(G * M * G) - G * M * G := by

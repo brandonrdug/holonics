@@ -5,7 +5,8 @@ import Mathlib.Tactic
 
 The Shioda height form of a Mestre rank-12 family (leaderboards #159, #161, #280 — all three
 return the same lattice) was computed exactly over `ℚ[T]` by
-`crates/holonic-engine/examples/the_height_form_of_the_surface_is_exact.rs`
+the retired example `the_height_form_of_the_surface_is_exact.rs`
+([history](https://github.com/brandonrdug/holonics/blob/814157ad/crates/holonic-engine/examples/the_height_form_of_the_surface_is_exact.rs))
 (`.local/artifacts/the_height_form_of_the_surface_is_exact/159.txt`, 2026-08-28): the globally minimal
 short model has `χ = 2` (a K3 surface), fibre `I₄` at infinity and twenty `I₁` fibres, and on the
 twelve independent sections `a₁−T, a₂±T, …, a₆±T, L₀⁺` the Gram matrix `Q` below.  This file hands
