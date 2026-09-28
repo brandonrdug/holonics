@@ -392,8 +392,8 @@
 //! [definition; agent-inferred] **Weighing is local** (Lean `Compression/Landmark/Context/LocalWeighing`). A
 //! mixture of whole passages telescopes to `½W_T + ½W_X` and uses a face only where it beats the
 //! tree over the whole passage; the tree's own law weighs every landmark by its own evidence. Of
-//! local weighing's three local laws, the one adopted lives here (the switching mixture across epochs
-//! is `hnn::receiving::Mixture::switching`):
+//! local weighing's three local laws, the one adopted lives here (the switching mixture across epochs,
+//! the fixed share, is the population's `receiver::population::Dormancy`):
 //! - **in each digit tree** ([`StopMixture`], [`JoinTree`], [`FaceJoins`]): `K` trees under the
 //!   declared stop priors, and in each dyadic cell a join tree of two-face joins mixing their digit
 //!   faces by that digit tree's evidence, each join's chart and certificates the enlarged tree's
