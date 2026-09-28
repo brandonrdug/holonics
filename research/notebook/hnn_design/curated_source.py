@@ -74,11 +74,6 @@ Outputs in `.local/cuts/`:
 - `curated-source.incidence.jsonl`: the occurrences' ports, cell ranges and incidence;
 - `curated-source.json`: the manifest (counts and hashes only);
 - `curated-cut.bin` (+ `.json`): the pinned cut, u16 codes;
-- `curated-cut.aeons.bin`: one little-endian u16 a section letter of the cut, the ordinal of the
-  conversation (aeon) its part lies in, numbered by first appearance in the development stream (a
-  coordinate, never an identifier). The reader places each part on its port's span in its own aeon
-  from it; a code carries it through the letters (`turn` and `part` stay, `open` founds, and a
-  `switch` codes its target), and the reader checks it against them;
 - `curated-flat-cut.bin` (+ `.json`): the same bytes, one byte a cell, in the standing cut's
   manifest format (`exterior::read_cut` reads it).
 """
@@ -145,7 +140,6 @@ def main():
     assert population > 0 and population & (population - 1) == 0, "a power of two"
 
     stream = []  # the curated codes, bytes and letters
-    letter_aeons = []  # each letter's (position, conversation ordinal), in the stream's order
     occurrences = []  # the incidence records
     event_to_occurrence = {}
     families = {"development": 0, "evaluation": 0, "deferred": 0}
@@ -265,7 +259,6 @@ def main():
                     known["last"] = declared
                     last_session, last_turn = view["session_id"], declared
                 opened = True
-                letter_aeons.append((len(stream), conversation))
                 stream.append(letter(kind, channel))
                 letters[kind][channel] += 1
                 paths[path][kind][channel] += 1
@@ -305,7 +298,6 @@ def main():
     held_start = cells - cells // 8
     flat_cut = bytes(code for code in cut if code < BYTES)
     flat_held_start = sum(1 for code in cut[:held_start] if code < BYTES)
-    cut_aeons = u16([aeon for position, aeon in letter_aeons if position >= start])
     cut_letters = {kind: {channel: 0 for channel in CHANNELS} for kind in KINDS}
     for code in cut:
         if code >= BYTES:
@@ -318,7 +310,6 @@ def main():
     private_write("curated-source.bin", curated)
     private_write("curated-source.incidence.jsonl", incidence_bytes)
     private_write("curated-cut.bin", u16(cut))
-    private_write("curated-cut.aeons.bin", cut_aeons)
     private_write("curated-flat-cut.bin", flat_cut)
     manifest = {
         "schema": "holonics.curated-source.v1",
@@ -351,7 +342,7 @@ def main():
         "cut": {"from": "development stream tail, beginning at its first section letter at or after len - population",
                 "stream_start": start, "cells": cells, "population": population,
                 "held_out_start": held_start, "held_out_rule": "the cut's final eighth, cells // 8 (as the wide cut)",
-                "letters": cut_letters, "aeons_sha256": sha(cut_aeons),
+                "letters": cut_letters,
                 "cut_sha256": sha(u16(cut)), "development_sha256": sha(u16(cut[:held_start])),
                 "held_out_sha256": sha(u16(cut[held_start:])),
                 "flat_cells": len(flat_cut), "flat_held_out_start": flat_held_start,
@@ -362,10 +353,7 @@ def main():
     private_write("curated-cut.json", json.dumps({
         "schema": "holonics.curated-cut.v1", "encoding": "u16 little-endian, one code a cell",
         "alphabet": ALPHABET, "population": population, "cells": cells,
-        "held_out_start": held_start, "cut_sha256": manifest["cut"]["cut_sha256"],
-        "aeons": {"encoding": "u16 little-endian, one conversation ordinal a section letter",
-                  "section_letters": len(cut_aeons) // 2, "conversations": len(sessions),
-                  "aeons_sha256": manifest["cut"]["aeons_sha256"]}}, indent=2).encode("utf-8"))
+        "held_out_start": held_start, "cut_sha256": manifest["cut"]["cut_sha256"]}, indent=2).encode("utf-8"))
     private_write("curated-flat-cut.json", json.dumps({
         "schema": "holonics.standing-cut.v2",
         "from": "the curated cut's bytes, its section letters removed; held out: the curated held-out cells' bytes",

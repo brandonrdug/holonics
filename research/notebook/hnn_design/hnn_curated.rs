@@ -1,8 +1,7 @@
-//! **The curated conversation source read by its own navigators: a tree per port and a navigator
-//! for its sections, against the flat stream of the same bytes** (campaign 5's input under
-//! HNN_FORMULA's source contract; #73, #148): the notebook's development receipt of
-//! `holonics::compression::landmark::context` on the curated source, a committed command run once
-//! in release, never a test.
+//! **The curated conversation source read as typed letters, against the flat stream of the same
+//! bytes** (campaign 5's input under HNN_FORMULA's source contract; #73, #148): the notebook's
+//! development receipt of `holonics::compression::landmark::context` on the curated source, a
+//! committed command run once in release, never a test.
 //!
 //! ```sh
 //! cargo run --release -p holonics --example hnn_curated -- curated .local/cuts/curated-cut.bin .local/cuts/curated-flat-cut.bin
@@ -10,78 +9,48 @@
 //!
 //! [definition; agent-inferred] **The source** (`curated_source.py`, an exterior codec step): the
 //! exposure's development partition, each visible part's UTF-8 bytes on its channel's port (human,
-//! agent, tool; the harness holds references only), and before each part one **section letter**,
-//! a coded cell of the declared chart `|A| = 256 + 12`: `open` (the occurrence opens its
-//! conversation's aeon), `switch` (another aeon than the previous emitted occurrence's), `part`
-//! (the previous emitted occurrence's declared turn, or a further part of its record) or `turn`
-//! (the next epoch of the same aeon), each typed by the channel the part opens on. Beside the cut,
-//! `curated-cut.aeons.bin` gives each letter's aeon ordinal (a coordinate); the reader codes it
-//! through the letters and checks it against them. The flat cut is the same bytes with every
+//! agent, tool; the harness holds references only), and before each part one **section letter**, a
+//! coded cell of the declared chart `|A| = 256 + 12`: `open` (the occurrence opens its
+//! conversation's aeon), `switch` (it lies in another conversation than the previous emitted
+//! occurrence), `part` (it lies in the previous emitted occurrence's declared turn, the provider's
+//! `turn_id`, or is a further part of the same record) or `turn` (a new declared turn, or the
+//! record boundary where no `turn_id` is declared: the next epoch of the same aeon), each typed by
+//! the channel the part opens on. So the channel is never supplied: it is read from the coded
+//! past, and every section costs the bits of its letter. The flat cut is the same bytes with every
 //! letter removed, its held-out cells the curated held-out cells' bytes: the two are measured on
-//! identical bytes.
+//! identical cells.
 //!
-//! [definition; agent-inferred, the typed reader's receipt at `a76413d3`] **The readers.** The
-//! typed tree read the channel as a slot of every bundle, which capped it at `D = 16` (path depth
-//! `D + 3D + 2`). Here the source is read by its own navigators, each a cell-only tree (the `½`
-//! stop prior, the KT node `c = ∞`, stored where paths part, at the declared population `n*` of the
-//! curated manifest and campaign 1's receiver grain `L_R`):
-//! - **the flat tree** over the flat bytes (`|A| = 256`), unchanged;
-//! - **a tree per port** (the winding guide's faces and placement, and the tube): channel `c`'s tree
-//!   reads its **port spans**, one per aeon (the conversation's own span, not the joint clock of
-//!   interleaved conversations): the span `σ(a, c)` is channel `c`'s ticks in aeon `a` within the
-//!   cut, each part's opening kind (the section, read once) and then its bytes. Its chart is the
-//!   bytes, the four kinds (address letters only: the section navigator codes them) and `END`
-//!   (`|A| = 256 + 4 + 1`, `END` last, alone in its dyadic cell beside the kinds). It emits each
-//!   byte, and at a part's close (a section letter follows in the cut) it emits `END`: **the
-//!   boundary predicted from the bytes**, the probability that a section letter comes next read
-//!   from the port's own context. `END`'s tick in the span is the next part's kind, when the span
-//!   reopens. The span's address is its last `D` ticks, `Boundary` before its first in the cut.
-//! - **the section navigator** (the tower thread: sections as restrictions of the passage), with
-//!   its own clock, the section epochs (one tick a letter): its address is the last `D` section
-//!   letters of every port (the joint alternation), its **letter tree** codes the twelve letters,
-//!   and at a `switch` its **target tree** codes the target aeon's recency rank among the aeons met
-//!   in the cut (`0`: not yet met), since `switch` says only that the aeon changes. `open` founds a
-//!   new aeon, and `turn` and `part` stay, so every part's span is decoded from the code.
-//! - **the shared port tree**, a development diagnostic that locates the trees per port's cost: one
-//!   tree for every port (the ports share their landmarks, as the flat tree's bytes do), each
-//!   emission still addressed on its own port span in its own aeon, the span's opening tick the
-//!   whole section letter (the channel read once, at the section), `|A| = 256 + 12 + 1`. It is swept
-//!   on the development cells beside the rest and read against the trees per port there; its
-//!   held-out passage is not taken, since the held-out cells are read once, by the declared reader
-//!   (the trees per port and the section navigator).
+//! [definition; agent-inferred] **The reader** (`curated`): each tick's bundle is its cell with two
+//! declared slots, its **channel** (3 letters) and its **section** letter (the kind of the letter
+//! that opened its part, 4 letters), `LetterFamily::new([3, 4])`, so each cell's address carries
+//! its channel and section letters (`letter_address` over `Letter::Bundle`). Three trees, each the
+//! `½` stop prior, the KT node (`Capacity::Unbounded`, the HNN's declared receiving tree), stored
+//! where paths part, at the declared population `n*` of the curated manifest (`2^20`) and campaign
+//! 1's receiver grain `L_R`:
+//! - the **flat** tree: the cell-only tree over the flat bytes (`|A| = 256`);
+//! - the **curated cell** tree: the cell-only tree over the curated cells, letters included;
+//! - the **curated typed** tree: the enlarged tree over the typed bundles.
 //!
-//! [definition; agent-inferred] **The composition** (the chain rule; each face the executed face
-//! at its tree's standing before its own deposit). For the cut `x_0 … x_(N−1)`, its letters
-//! `ℓ_k = (kind_k, c_k)` at `p_0 = 0 < p_1 < … < p_(K−1)`, part `k` in aeon `a_k` on port `c_k`, and
-//! `α_(a,c)(t)` the last `D_c` ticks of `σ(a, c)` before its tick `t`:
-//!
-//! ```text
-//! L(x) = Σ_(k<K)  [ −log₂ q̂_S(ℓ_k | ℓ_(k−1), …, ℓ_(k−D_S)) − [kind_k = switch] log₂ q̂_T(r_k | ℓ_(k−1), …, ℓ_(k−D_S)) ]
-//!      + Σ_(bytes j) −log₂ q̂_(c(j))(x_j | α_(a(j), c(j))(j))
-//!      + Σ_(1≤k<K)   −log₂ q̂_(c_(k−1))(END | α_(a_(k−1), c_(k−1))(p_k))
-//! ```
-//!
-//! A decoder reads `ℓ_0` (and `r_0` at a switch), then port `c_0`'s tree until `END`, then `ℓ_1`,
-//! and so on: a prefix code of the curated stream given its length `N`, as the flat code is given
-//! its length. The byte terms carry `P(no section yet)` in their top digit, as the joint tree's
-//! bytes carried `P(no letter)`; the section terms are `END`, the letter and the target.
-//!
-//! - **0. The cut and its counts**: the bytes per port, the letters per kind, the port spans, the
-//!   closes per port and the switch targets' ranks, on each population; the checks (the curated cut
-//!   without its letters is the flat cut; each letter's aeon agrees with its kind).
-//! - **1. The families**, stated before any passage: each navigator's depths doubling from 6 to the
-//!   deepest its carriers admit at `n*` (`Landmarks::new`; a navigator of two trees, the deepest
-//!   both admit), charged `⌈log₂⌉` of its length; the a-priori memory, checked against Brandon's
-//!   20 GB cap and the memory the kernel reports available.
-//! - **2. The sweeps** on the development cells, the navigators run together on the host (each
-//!   reads its own immutable spans and writes its own sweep), each until its code does not fall
-//!   strictly (`DepthSweep::{decreasing, of}`) or a passage passes four minutes.
-//! - **3. The choices**: each navigator's depth and charge.
-//! - **4. The development readings**: per port, the port tree against the flat tree on identical
-//!   bytes (uncharged); the section cost (the closes, the letters, the targets); the whole codes
-//!   charged (the curated stream carries its sections, the flat one does not).
-//! - **5. One held-out passage** of each navigator at its chosen depth over the whole cut, every
-//!   emission scored at the standing before its own deposit: the same readings, choosing nothing.
+//! - **0. The cut and its counts**: the cells per channel and the section letters per kind, on each
+//!   population; the check that the curated cut without its letters is the flat cut, cell for cell.
+//! - **1. The families**, stated before any passage: each tree's depths doubling from 6 to the
+//!   deepest its carriers admit at `n*` (`Landmarks::new`), charged `⌈log₂⌉` of its length; the
+//!   curated family (cells or typed) charged `⌈log₂ 2⌉ = 1` bit; the a-priori memory (each
+//!   branch at most `2 n B` stored nodes and `n D` label letters) of the three sweeps run together,
+//!   checked against Brandon's 20 GB cap and the memory the kernel reports available.
+//! - **2. The sweeps** on the development cells, the three trees run together on the host (each
+//!   reads its own immutable stream and writes its own sweep), each until its code does not fall
+//!   strictly (`DepthSweep::{decreasing, of}`) or a passage passes four minutes: every depth's code in
+//!   all and per slot (human, agent, tool, section letters).
+//! - **3. The choices**: each tree's depth; the curated family, typed only when its charged code lies
+//!   below the cell tree's by disjoint exact enclosures.
+//! - **4. The development readings**: per slot, the flat tree against the chosen curated tree on
+//!   identical cells (uncharged), the section letters' price, the whole codes charged (the curated
+//!   stream carries its sections, the flat one does not), and each tree against online order-0 and
+//!   PPM-2 on its own stream (`context::baseline`).
+//! - **5. One held-out passage** of the flat tree and of the chosen curated tree at their chosen
+//!   depths over the whole cut, every cell scored at the standing before its own deposit, beside the
+//!   baselines re-read: the same readings, choosing nothing.
 //!
 //! [definition] **Privacy**: the cut is private (`.local/cuts/`); this reads codes and prints counts,
 //! bits and hashes' scope only, never any cell's content. Every reading is exact (`exterior`): bits
@@ -91,14 +60,14 @@
 #[path = "exterior.rs"]
 mod exterior;
 
-use std::collections::BTreeMap;
 use std::ops::Range;
 use std::time::Instant;
 
 use holonics::compression::cost::ceil_log2;
+use holonics::compression::landmark::context::baseline::{Baselines, PPM_ORDER};
 use holonics::compression::landmark::context::{
-    Capacity, LandmarkDeclaration, Landmarks, Letter, LetterFamily, PassageCode, StopPrior, Widths,
-    odometer_digits,
+    Bundle, Capacity, LandmarkDeclaration, Landmarks, Letter, LetterFamily, PassageCode, StopPrior,
+    Widths, cell_letters, letter_address, odometer_digits,
 };
 use holonics::hnn::reference::DepthSweep;
 use holonics::hnn::{Field, FieldDeclaration};
@@ -117,38 +86,12 @@ const CHANNELS: [&str; 3] = ["human", "agent", "tool"];
 
 /// The section letters' kinds, in the letters' order.
 const KINDS: [&str; 4] = ["open", "switch", "turn", "part"];
-const OPEN: usize = 0;
-const SWITCH: usize = 1;
 
-/// The section letters: `kind × channel`.
-const LETTERS: usize = KINDS.len() * CHANNELS.len();
-
-/// **A port's chart**: the bytes, the four kinds at `BYTES + kind` (address letters only), and
-/// `END` last (the part's close, alone in its dyadic cell beside the kinds).
-const END: usize = BYTES + KINDS.len();
-const PORT_ALPHABET: usize = END + 1;
-
-/// The readings' slots: each port's bytes, each port's closes, the letters, the switch targets.
-const SLOTS: [&str; 8] = [
-    "human bytes",
-    "agent bytes",
-    "tool bytes",
-    "human closes (END)",
-    "agent closes (END)",
-    "tool closes (END)",
-    "section letters",
-    "switch targets",
-];
-const SLOT_COUNT: usize = SLOTS.len();
+/// The readings' slots: a cell's channel, or a section letter.
+const SLOTS: [&str; 4] = ["human", "agent", "tool", "section letters"];
+const SECTION: usize = 3;
 const BYTE_SLOTS: [usize; 3] = [0, 1, 2];
-const SECTION_SLOTS: [usize; 5] = [3, 4, 5, 6, 7];
-const ALL_SLOTS: [usize; SLOT_COUNT] = [0, 1, 2, 3, 4, 5, 6, 7];
-const LETTER_SLOT: usize = 6;
-const TARGET_SLOT: usize = 7;
-
-fn end_slot(channel: usize) -> usize {
-    CHANNELS.len() + channel
-}
+const ALL_SLOTS: [usize; 4] = [0, 1, 2, 3];
 
 /// **The declared doubling family** (Decision 37's, stated before any passage): `D = 6, 12, 24, 48`,
 /// then the deepest depth the carriers admit at the population.
@@ -166,42 +109,29 @@ const NODE_BYTES: u128 = 96 + 16;
 const LETTER_BYTES: u128 = 4;
 
 // -------------------------------------------------------------------------------------------
-// the exterior boundary: the curated cut and its letters' aeons
+// the exterior boundary: the curated cut
 
-/// **The curated cut** (`curated-cut.bin`, one little-endian u16 code a cell), each section
-/// letter's aeon ordinal (`curated-cut.aeons.bin`), and its manifest's declared population,
-/// alphabet, held-out start and conversations, read by the numbers after their keys.
+/// **The curated cut** (`curated-cut.bin`, one little-endian u16 code a cell) and its manifest's
+/// declared population, alphabet and held-out start, read by the numbers after their keys.
 struct CuratedCut {
     codes: Vec<usize>,
-    aeons: Vec<usize>,
-    conversations: usize,
+    alphabet: usize,
     population: u64,
     held: Range<usize>,
 }
 
 #[allow(clippy::disallowed_types, clippy::disallowed_methods)]
-fn read_u16(path: &str) -> Vec<usize> {
-    let raw = std::fs::read(path).unwrap_or_else(|error| panic!("read a curated file: {error}"));
-    assert_eq!(raw.len() % 2, 0, "u16 codes");
-    raw.chunks_exact(2)
-        .map(|pair| usize::from(u16::from_le_bytes([pair[0], pair[1]])))
-        .collect()
-}
-
 fn read_curated(path: &str) -> CuratedCut {
-    let codes = read_u16(path);
-    let aeons = read_u16(
-        &path
-            .strip_suffix(".bin")
-            .map(|stem| format!("{stem}.aeons.bin"))
-            .expect("a .bin cut"),
-    );
+    let raw = std::fs::read(path).unwrap_or_else(|error| panic!("read the curated cut: {error}"));
+    assert_eq!(raw.len() % 2, 0, "u16 codes");
+    let codes: Vec<usize> = raw
+        .chunks_exact(2)
+        .map(|pair| usize::from(u16::from_le_bytes([pair[0], pair[1]])))
+        .collect();
     let cells = manifest_number(path, "\"cells\":");
     let alphabet = manifest_number(path, "\"alphabet\":");
     let population = manifest_number(path, "\"population\":");
     let held_start = manifest_number(path, "\"held_out_start\":");
-    let letters = manifest_number(path, "\"section_letters\":");
-    let conversations = manifest_number(path, "\"conversations\":");
     assert_eq!(
         codes.len(),
         cells,
@@ -211,21 +141,19 @@ fn read_curated(path: &str) -> CuratedCut {
         cells <= population,
         "the declared population bounds the cut"
     );
-    assert_eq!(alphabet, BYTES + LETTERS, "the declared chart");
+    assert_eq!(
+        alphabet,
+        BYTES + KINDS.len() * CHANNELS.len(),
+        "the declared chart"
+    );
     assert!(
         codes.iter().all(|&code| code < alphabet),
         "every code in the chart"
     );
     assert!(held_start <= cells, "the held-out start lies in the cut");
-    assert_eq!(aeons.len(), letters, "one aeon a section letter");
-    assert!(
-        aeons.iter().all(|&aeon| aeon < conversations),
-        "every aeon among the declared conversations"
-    );
     CuratedCut {
         codes,
-        aeons,
-        conversations,
+        alphabet,
         population: population as u64,
         held: held_start..cells,
     }
@@ -237,375 +165,94 @@ fn section(code: usize) -> (usize, usize) {
     (letter / CHANNELS.len(), letter % CHANNELS.len())
 }
 
-/// **A part of the cut**: its letter's position, kind and channel, its aeon, and its bytes.
-struct Part {
-    at: usize,
-    kind: usize,
-    channel: usize,
-    aeon: usize,
-    bytes: Range<usize>,
-}
-
-/// **The cut's parts**, read from the coded letters: the cut opens at a letter (the codec's pin),
-/// and each part runs to the next letter.
-fn parts(codes: &[usize], aeons: &[usize]) -> Vec<Part> {
-    let positions: Vec<usize> = (0..codes.len()).filter(|&p| codes[p] >= BYTES).collect();
-    assert_eq!(positions.len(), aeons.len(), "one aeon a section letter");
-    assert_eq!(
-        positions.first(),
-        Some(&0),
-        "the cut opens at a section letter"
-    );
-    positions
-        .iter()
-        .enumerate()
-        .map(|(k, &at)| {
-            let (kind, channel) = section(codes[at]);
-            Part {
-                at,
-                kind,
-                channel,
-                aeon: aeons[k],
-                bytes: at + 1..positions.get(k + 1).copied().unwrap_or(codes.len()),
-            }
-        })
-        .collect()
-}
-
-/// **The switch targets' recency ranks**, and the check that each letter's aeon agrees with its
-/// kind: `open` meets a new aeon, `switch` leaves its aeon for the one at its rank among the aeons
-/// met in the cut, most recent first (`0`: not yet met), and `turn` and `part` stay (the cut's first
-/// part excepted: its aeon's past lies before the cut).
-fn targets(parts: &[Part]) -> Vec<Option<usize>> {
-    let mut recency: Vec<usize> = Vec::new();
-    parts
-        .iter()
-        .enumerate()
-        .map(|(k, part)| {
-            let met = recency.iter().position(|&aeon| aeon == part.aeon);
-            let rank = match part.kind {
-                OPEN => {
-                    assert!(met.is_none(), "an opened aeon is new");
-                    None
-                }
-                SWITCH => {
-                    assert_ne!(met, Some(0), "a switch leaves its aeon");
-                    Some(met.unwrap_or(0))
-                }
-                _ => {
-                    if k > 0 {
-                        assert_eq!(met, Some(0), "a turn or a part stays in its aeon");
-                    }
-                    None
-                }
-            };
-            if let Some(at) = met {
-                recency.remove(at);
-            }
-            recency.insert(0, part.aeon);
-            rank
-        })
-        .collect()
+/// **The ticks' ports and sections, read from the coded past**: each letter opens its part on its
+/// channel; each byte lies on the channel and section of the last letter before it. The cut opens
+/// at a letter (the codec's pin), so no cell precedes its port.
+fn ticks(codes: &[usize]) -> (Vec<usize>, Vec<usize>) {
+    let mut open = None;
+    let mut channels = Vec::with_capacity(codes.len());
+    let mut kinds = Vec::with_capacity(codes.len());
+    for &code in codes {
+        if code >= BYTES {
+            open = Some(section(code));
+        }
+        let (kind, channel) = open.expect("the cut opens at a section letter");
+        channels.push(channel);
+        kinds.push(kind);
+    }
+    (channels, kinds)
 }
 
 // -------------------------------------------------------------------------------------------
-// the navigators and their passages
+// the streams and their passages
 
-/// **One emission**: its position on the joint clock (its population), the span and tick its
-/// address is read before, its class and its reading slot.
-#[derive(Clone, Copy)]
-struct Emission {
-    joint: usize,
-    span: usize,
-    at: usize,
-    class: usize,
-    slot: usize,
-}
-
-/// **A tree of a navigator**: its chart and its emissions in the cut's order.
-struct Tree {
+/// **A stream the trees read**: its cells, each tick's letter, each cell's reading slot, the
+/// exterior chart and the development cells' count (the held-out cells close it).
+struct Stream {
+    cells: Vec<usize>,
+    letters: Vec<Letter>,
+    slots: Vec<usize>,
     alphabet: usize,
-    emissions: Vec<Emission>,
-}
-
-/// **A navigator**: its spans (the ticks its addresses read), its trees at one depth, and the
-/// joint position where its held-out emissions begin.
-struct Navigator {
-    name: String,
-    spans: Vec<Vec<usize>>,
-    trees: Vec<Tree>,
     development: usize,
 }
 
-/// **The flat tree's navigator**: one span, the flat bytes, each emitted on its channel's slot.
-fn flat_navigator(cut: &[usize], parts: &[Part], development: usize) -> Navigator {
-    let mut span = Vec::new();
-    let mut emissions = Vec::new();
-    for part in parts {
-        for j in part.bytes.clone() {
-            emissions.push(Emission {
-                joint: span.len(),
-                span: 0,
-                at: span.len(),
-                class: cut[j],
-                slot: part.channel,
-            });
-            span.push(cut[j]);
-        }
-    }
-    Navigator {
-        name: "the flat tree".to_string(),
-        spans: vec![span],
-        trees: vec![Tree {
-            alphabet: BYTES,
-            emissions,
-        }],
-        development,
-    }
-}
-
-/// **A port's navigator**: its spans, one per aeon, each part's kind then its bytes; its bytes
-/// emitted in order and, at each of its parts' closes, `END` at the next letter's position.
-fn port_navigator(cut: &[usize], parts: &[Part], channel: usize, development: usize) -> Navigator {
-    let mut spans: Vec<Vec<usize>> = Vec::new();
-    let mut span_of: BTreeMap<usize, usize> = BTreeMap::new();
-    let mut emissions = Vec::new();
-    for (k, part) in parts.iter().enumerate() {
-        if let Some(previous) = k.checked_sub(1).map(|i| &parts[i])
-            && previous.channel == channel
-        {
-            let span = span_of[&previous.aeon];
-            emissions.push(Emission {
-                joint: part.at,
-                span,
-                at: spans[span].len(),
-                class: END,
-                slot: end_slot(channel),
-            });
-        }
-        if part.channel != channel {
-            continue;
-        }
-        let span = *span_of.entry(part.aeon).or_insert_with(|| {
-            spans.push(Vec::new());
-            spans.len() - 1
-        });
-        spans[span].push(BYTES + part.kind);
-        for j in part.bytes.clone() {
-            emissions.push(Emission {
-                joint: j,
-                span,
-                at: spans[span].len(),
-                class: cut[j],
-                slot: channel,
-            });
-            spans[span].push(cut[j]);
-        }
-    }
-    Navigator {
-        name: format!("the {} port's tree", CHANNELS[channel]),
-        spans,
-        trees: vec![Tree {
-            alphabet: PORT_ALPHABET,
-            emissions,
-        }],
-        development,
-    }
-}
-
-/// **The shared port tree** (the development diagnostic): one tree for every port, so the ports
-/// share their landmarks as the flat tree's bytes do, each emission still addressed on its own port
-/// span in its own aeon; a span's opening tick is the whole section letter (`BYTES + kind × channel`:
-/// the channel read once, at the section), and `END` is `SHARED_END`.
-const SHARED_END: usize = BYTES + LETTERS;
-
-fn shared_navigator(cut: &[usize], parts: &[Part], development: usize) -> Navigator {
-    let mut spans: Vec<Vec<usize>> = Vec::new();
-    let mut span_of: BTreeMap<(usize, usize), usize> = BTreeMap::new();
-    let mut emissions = Vec::new();
-    for (k, part) in parts.iter().enumerate() {
-        if let Some(previous) = k.checked_sub(1).map(|i| &parts[i]) {
-            let span = span_of[&(previous.aeon, previous.channel)];
-            emissions.push(Emission {
-                joint: part.at,
-                span,
-                at: spans[span].len(),
-                class: SHARED_END,
-                slot: end_slot(previous.channel),
-            });
-        }
-        let span = *span_of.entry((part.aeon, part.channel)).or_insert_with(|| {
-            spans.push(Vec::new());
-            spans.len() - 1
-        });
-        spans[span].push(cut[part.at]);
-        for j in part.bytes.clone() {
-            emissions.push(Emission {
-                joint: j,
-                span,
-                at: spans[span].len(),
-                class: cut[j],
-                slot: part.channel,
-            });
-            spans[span].push(cut[j]);
-        }
-    }
-    Navigator {
-        name: "the shared port tree (diagnostic)".to_string(),
-        spans,
-        trees: vec![Tree {
-            alphabet: SHARED_END + 1,
-            emissions,
-        }],
-        development,
-    }
-}
-
-/// **The section navigator**: one span, the section letters (the section epochs' clock); its
-/// letter tree emits each letter, its target tree each switch's rank, both at the letter's position.
-fn section_navigator(
-    parts: &[Part],
-    ranks: &[Option<usize>],
-    conversations: usize,
-    development: usize,
-) -> Navigator {
-    let span: Vec<usize> = parts
-        .iter()
-        .map(|part| CHANNELS.len() * part.kind + part.channel)
-        .collect();
-    let letters = Tree {
-        alphabet: LETTERS,
-        emissions: parts
-            .iter()
-            .enumerate()
-            .map(|(k, part)| Emission {
-                joint: part.at,
-                span: 0,
-                at: k,
-                class: span[k],
-                slot: LETTER_SLOT,
-            })
-            .collect(),
-    };
-    let targets = Tree {
-        alphabet: conversations,
-        emissions: parts
-            .iter()
-            .zip(ranks)
-            .enumerate()
-            .filter_map(|(k, (part, rank))| {
-                rank.map(|rank| Emission {
-                    joint: part.at,
-                    span: 0,
-                    at: k,
-                    class: rank,
-                    slot: TARGET_SLOT,
-                })
-            })
-            .collect(),
-    };
-    Navigator {
-        name: "the section navigator".to_string(),
-        spans: vec![span],
-        trees: vec![letters, targets],
-        development,
-    }
-}
-
-/// **One passage of a navigator at a depth**, its emissions before `end` on the joint clock: the
-/// faces' products per population and slot, the certified residuals summed, the stored nodes and
-/// label letters, each tree's widths and whether its largest residual lies within its rule, the
-/// rebases and the largest drift, and wall time.
+/// **One passage of a tree over a stream's first `end` cells**: the faces' products per population
+/// (before and from `development`) and slot, the certified residuals summed, the stored nodes and
+/// label letters, the widths, the rule and the chart, and wall time.
 struct Pass {
     depth: usize,
-    codes: [[PassageCode; SLOT_COUNT]; 2],
+    codes: [[PassageCode; 4]; 2],
     residuals: [Rat; 2],
     largest: Rat,
-    within: bool,
     nodes: usize,
     held: usize,
-    widths: Vec<Widths>,
+    widths: Widths,
+    rule: Rat,
     rebases: u64,
     drift: Rat,
     wall: u128,
 }
 
-fn declared(alphabet: usize, depth: usize, population: u64, grain: u64) -> LandmarkDeclaration {
-    LandmarkDeclaration {
-        alphabet,
-        depth,
-        forced: 0,
-        population,
-        grain,
-        family: LetterFamily::cells(),
-        prior: StopPrior::half(),
-        capacity: Capacity::Unbounded,
-    }
-}
-
-fn pass(navigator: &Navigator, depth: usize, end: usize, population: u64, grain: u64) -> Pass {
+fn pass(stream: &Stream, end: usize, declaration: &LandmarkDeclaration) -> Pass {
     let clock = Instant::now();
-    let mut codes = [[PassageCode::new(); SLOT_COUNT]; 2];
+    let mut tree = Landmarks::new(declaration.clone()).expect("a declared tree");
+    let mut codes = [[PassageCode::new(); 4]; 2];
     let mut residuals = [Rat::zero(), Rat::zero()];
-    let (mut largest, mut drift) = (Rat::zero(), Rat::zero());
-    let (mut within, mut nodes, mut held, mut rebases) = (true, 0, 0, 0);
-    let mut widths = Vec::new();
-    for tree in &navigator.trees {
-        let mut landmarks = Landmarks::new(declared(tree.alphabet, depth, population, grain))
-            .expect("a declared tree");
-        let mut tree_largest = Rat::zero();
-        for emission in tree.emissions.iter().take_while(|e| e.joint < end) {
-            let span = &navigator.spans[emission.span];
-            let address: Vec<Letter> = (1..=depth)
-                .map(|back| {
-                    emission
-                        .at
-                        .checked_sub(back)
-                        .map_or(Letter::Boundary, |tick| Letter::Cell(span[tick]))
-                })
-                .collect();
-            let reading = landmarks
-                .receive(&address, emission.class)
-                .expect("an emission within the declaration");
-            let part = usize::from(emission.joint >= navigator.development);
-            codes[part][emission.slot]
-                .face(&reading.executed)
-                .expect("a positive face");
-            residuals[part] += &reading.residual;
-            if reading.residual > tree_largest {
-                tree_largest = reading.residual;
-            }
+    let mut largest = Rat::zero();
+    for position in 0..end {
+        let reading = tree
+            .receive(
+                &letter_address(&stream.letters, position, declaration.depth),
+                stream.cells[position],
+            )
+            .expect("a cell within the declaration");
+        let part = usize::from(position >= stream.development);
+        codes[part][stream.slots[position]]
+            .face(&reading.executed)
+            .expect("a positive face");
+        residuals[part] += &reading.residual;
+        if reading.residual > largest {
+            largest = reading.residual;
         }
-        within &= tree_largest <= landmarks.face_rule();
-        if tree_largest > largest {
-            largest = tree_largest;
-        }
-        let chart = landmarks.chart();
-        rebases += chart.rebases;
-        if chart.drift > drift {
-            drift = chart.drift;
-        }
-        nodes += landmarks.nodes();
-        held += landmarks.held();
-        widths.push(landmarks.widths());
     }
+    let chart = tree.chart();
     Pass {
-        depth,
+        depth: declaration.depth,
         codes,
         residuals,
         largest,
-        within,
-        nodes,
-        held,
-        widths,
-        rebases,
-        drift,
+        nodes: tree.nodes(),
+        held: tree.held(),
+        widths: tree.widths(),
+        rule: tree.face_rule(),
+        rebases: chart.rebases,
+        drift: chart.drift,
         wall: clock.elapsed().as_millis(),
     }
 }
 
 /// The product of a population's faces over the named slots.
-fn joined(codes: &[PassageCode; SLOT_COUNT], slots: &[usize]) -> PassageCode {
+fn joined(codes: &[PassageCode; 4], slots: &[usize]) -> PassageCode {
     let mut all = PassageCode::new();
     for &slot in slots {
         all.join(&codes[slot]);
@@ -617,25 +264,41 @@ fn bits(code: &PassageCode) -> ExactInterval {
     code.bits().expect("an enclosure")
 }
 
-/// **The deepest depth a chart's carriers admit** at the population (`Landmarks::new` refuses past
-/// it).
-fn deepest_admitted(alphabet: usize, population: u64, grain: u64) -> usize {
+/// **The deepest depth the carriers admit** at a declaration's population (`Landmarks::new`
+/// refuses past it).
+fn deepest_admitted(declared: &LandmarkDeclaration) -> usize {
     let mut depth = 1;
-    while Landmarks::new(declared(alphabet, depth + 1, population, grain)).is_ok() {
+    while Landmarks::new(LandmarkDeclaration {
+        depth: depth + 1,
+        ..declared.clone()
+    })
+    .is_ok()
+    {
         depth += 1;
     }
     depth
 }
 
-/// **A navigator's declared doubling family**: `D = 6, 12, 24, 48` below the deepest all its trees'
-/// carriers admit, then that deepest.
-fn family_of(navigator: &Navigator, population: u64, grain: u64) -> Vec<usize> {
-    let deepest = navigator
-        .trees
-        .iter()
-        .map(|tree| deepest_admitted(tree.alphabet, population, grain))
-        .min()
-        .expect("a tree");
+/// **A passage's a-priori memory** over `cells` cells at `depth`: each branch at most `2 n B`
+/// stored nodes and `n D_b` label letters, at the bytes each occupies, doubled for the vectors'
+/// and the table's growth.
+fn projected(cells: usize, declared: &LandmarkDeclaration, depth: usize) -> u128 {
+    let at = LandmarkDeclaration {
+        depth,
+        ..declared.clone()
+    };
+    let n = cells as u128;
+    let digits = u128::from(odometer_digits(at.alphabet));
+    let branches = at.branch_depths();
+    let nodes = branches.len() as u128 * 2 * n * digits;
+    let letters: u128 = branches.iter().map(|&d| n * d as u128).sum();
+    2 * (nodes * NODE_BYTES + letters * LETTER_BYTES)
+}
+
+/// **A tree's declared doubling family**: `D = 6, 12, 24, 48` below its carriers' deepest, then
+/// the deepest.
+fn family_of(declared: &LandmarkDeclaration) -> Vec<usize> {
+    let deepest = deepest_admitted(declared);
     DOUBLING
         .iter()
         .copied()
@@ -644,23 +307,8 @@ fn family_of(navigator: &Navigator, population: u64, grain: u64) -> Vec<usize> {
         .collect()
 }
 
-/// **A passage's a-priori memory** at a depth over its emissions: each tree at most `2 n B` stored
-/// nodes and `n D` label letters, at the bytes each occupies, doubled for the vectors' and the
-/// table's growth.
-fn projected(navigator: &Navigator, depth: usize, end: usize) -> u128 {
-    navigator
-        .trees
-        .iter()
-        .map(|tree| {
-            let n = tree.emissions.iter().take_while(|e| e.joint < end).count() as u128;
-            let digits = u128::from(odometer_digits(tree.alphabet));
-            2 * (2 * n * digits * NODE_BYTES + n * depth as u128 * LETTER_BYTES)
-        })
-        .sum()
-}
-
-/// **One navigator's depth sweep on the development cells**: the family's depths in order while
-/// the code falls strictly (`DepthSweep`'s rule) and no passage passed the budget.
+/// **One tree's depth sweep on the development cells**: the family's depths in order while the
+/// code falls strictly (`DepthSweep`'s rule) and no passage passed the budget.
 struct Sweep {
     family: Vec<usize>,
     passes: Vec<Pass>,
@@ -668,8 +316,8 @@ struct Sweep {
     stopped: Option<String>,
 }
 
-fn sweep(navigator: &Navigator, population: u64, grain: u64) -> Sweep {
-    let family = family_of(navigator, population, grain);
+fn sweep(stream: &Stream, declared: &LandmarkDeclaration) -> Sweep {
+    let family = family_of(declared);
     let mut passes: Vec<Pass> = Vec::new();
     let mut tried: Vec<(usize, ExactInterval)> = Vec::new();
     let mut stopped = None;
@@ -686,7 +334,14 @@ fn sweep(navigator: &Navigator, population: u64, grain: u64) -> Sweep {
                 break;
             }
         }
-        let run = pass(navigator, depth, navigator.development, population, grain);
+        let run = pass(
+            stream,
+            stream.development,
+            &LandmarkDeclaration {
+                depth,
+                ..declared.clone()
+            },
+        );
         tried.push((depth, bits(&joined(&run.codes[0], &ALL_SLOTS))));
         passes.push(run);
     }
@@ -709,6 +364,28 @@ impl Sweep {
     fn charge(&self) -> u64 {
         ceil_log2(&BigUint::from(self.family.len()))
     }
+}
+
+/// **The online baselines over a stream** (order-0 and order-1 KT, PPM-2 escape C), each cell's
+/// face per population and slot: `[coder][population][slot]`.
+fn baselines(stream: &Stream) -> ([[[PassageCode; 4]; 2]; 3], u128) {
+    let clock = Instant::now();
+    let mut coders = Baselines::new(stream.alphabet).expect("the baselines");
+    let mut codes = [[[PassageCode::new(); 4]; 2]; 3];
+    for (position, &class) in stream.cells.iter().enumerate() {
+        let faces = coders.face_cell(class).expect("a cell in the chart");
+        let part = usize::from(position >= stream.development);
+        let slot = stream.slots[position];
+        for (coder, face) in [&faces.order_zero, &faces.order_one, &faces.ppm]
+            .into_iter()
+            .enumerate()
+        {
+            codes[coder][part][slot]
+                .face(face)
+                .expect("a positive face");
+        }
+    }
+    (codes, clock.elapsed().as_millis())
 }
 
 // -------------------------------------------------------------------------------------------
@@ -748,6 +425,13 @@ fn ordering(label: &str, a: &ExactInterval, b: &ExactInterval, cells: u64, grain
     }
 }
 
+fn widths(widths: &Widths) -> String {
+    format!(
+        "B = {}, M_p = {}, W = {}, C = {}",
+        widths.digits, widths.face, widths.carrier, widths.certificate
+    )
+}
+
 /// The dyadic ceiling of a printed upper bound on `2^(−48)`.
 fn dyadic_ceiling(value: &Rat) -> Rat {
     let scale: BigInt = BigInt::from(1) << 48usize;
@@ -755,45 +439,41 @@ fn dyadic_ceiling(value: &Rat) -> Rat {
     Rat::new(scaled.ceil().to_integer(), scale)
 }
 
-/// A passage's lines on a population: its code in all and an emission, per slot, its certified
-/// residual, and its stored parts and wall time.
-fn pass_lines(pass: &Pass, part: usize, counts: &[u64; SLOT_COUNT], grain: u64) {
+/// A passage's line on a population: its code in all (exact, at the grain) and a cell, per slot
+/// at the grain and a cell, its certified residual, and its stored parts and wall time.
+fn pass_lines(pass: &Pass, part: usize, counts: &[u64; 4], grain: u64) {
     let all = bits(&joined(&pass.codes[part], &ALL_SLOTS));
-    let emissions: u64 = counts.iter().sum();
-    let widths: Vec<String> = pass
-        .widths
-        .iter()
-        .map(|w| {
-            format!(
-                "B = {}, M_p = {}, W = {}, C = {}",
-                w.digits, w.face, w.carrier, w.certificate
-            )
-        })
-        .collect();
+    let cells: u64 = counts.iter().sum();
     println!(
-        "  D = {} ({}): {}; an emission {}",
+        "  D = {} ({}): {}; a cell {}",
         pass.depth,
-        widths.join("; "),
+        widths(&pass.widths),
         enclosure(&all, grain),
-        per(&all, emissions, grain)
+        per(&all, cells, grain)
     );
     for (slot, name) in SLOTS.iter().enumerate() {
         if counts[slot] == 0 {
+            println!("    {name}: no cells");
             continue;
         }
         let code = bits(&pass.codes[part][slot]);
         println!(
-            "    {name} ({}): {}; each {}",
+            "    {name} ({} cells): {}; a cell {}",
             counts[slot],
             reading_of(&code, grain),
             per(&code, counts[slot], grain)
         );
     }
     println!(
-        "    certified residuals summed ≤ {} bits; the largest ≤ {} bits, {} each tree's rule; {} rebases, the largest drift ≤ {} bits; {} nodes stored, {} label letters; {} ms",
+        "    certified residuals summed ≤ {} bits; the largest a cell ≤ {} bits, {} the rule ≤ {}; {} rebases, the largest drift ≤ {} bits; {} nodes stored, {} label letters; {} ms",
         exact(&dyadic_ceiling(&pass.residuals[part])),
         exact(&dyadic_ceiling(&pass.largest)),
-        if pass.within { "within" } else { "ABOVE" },
+        if pass.largest <= pass.rule {
+            "within"
+        } else {
+            "ABOVE"
+        },
+        exact(&dyadic_ceiling(&pass.rule)),
         pass.rebases,
         exact(&dyadic_ceiling(&pass.drift)),
         pass.nodes,
@@ -802,49 +482,52 @@ fn pass_lines(pass: &Pass, part: usize, counts: &[u64; SLOT_COUNT], grain: u64) 
     );
 }
 
-/// Each slot's emissions on each population.
-fn slot_counts(navigator: &Navigator) -> [[u64; SLOT_COUNT]; 2] {
-    let mut counts = [[0u64; SLOT_COUNT]; 2];
-    for tree in &navigator.trees {
-        for emission in &tree.emissions {
-            counts[usize::from(emission.joint >= navigator.development)][emission.slot] += 1;
-        }
+/// Each slot's cells on each population.
+fn slot_counts(stream: &Stream) -> [[u64; 4]; 2] {
+    let mut counts = [[0u64; 4]; 2];
+    for (position, &slot) in stream.slots.iter().enumerate() {
+        counts[usize::from(position >= stream.development)][slot] += 1;
     }
     counts
 }
 
-/// **The curated stream's code on a population**: its navigators' passes joined slot by slot (the
-/// slots are disjoint across navigators).
-fn curated_codes(passes: &[&Pass], part: usize) -> [PassageCode; SLOT_COUNT] {
-    let mut codes = [PassageCode::new(); SLOT_COUNT];
-    for pass in passes {
-        for (slot, code) in codes.iter_mut().enumerate() {
-            code.join(&pass.codes[part][slot]);
-        }
-    }
-    codes
-}
+const BASELINE_NAMES: [&str; 3] = [
+    "online order-0 KT",
+    "online order-1 KT",
+    "PPM order 2, escape C",
+];
 
-/// **The readings on one population**: per port, the port tree against the flat tree on identical
-/// bytes (uncharged); the section cost; the whole codes charged.
+/// **The readings on one population**: the flat tree against the curated tree on identical cells
+/// per channel and in all (uncharged), the section letters' price, the whole codes charged, and each
+/// tree against order-0 and PPM-2 on its own stream, per slot and in all.
+#[allow(clippy::too_many_arguments)]
 fn readings(
-    flat: &[PassageCode; SLOT_COUNT],
+    part: usize,
+    flat: &Pass,
     flat_charge: u64,
-    curated: &[PassageCode; SLOT_COUNT],
+    curated: &Pass,
     curated_charge: u64,
-    counts: &[u64; SLOT_COUNT],
+    flat_baselines: &[[[PassageCode; 4]; 2]; 3],
+    curated_baselines: &[[[PassageCode; 4]; 2]; 3],
+    counts: &[u64; 4],
     grain: u64,
 ) {
     let bytes: u64 = BYTE_SLOTS.iter().map(|&slot| counts[slot]).sum();
-    println!("  a. identical bytes, each port's tree against the flat tree, uncharged:");
+    println!(
+        "  a. identical cells, the curated tree (D = {}) against the flat tree (D = {}), uncharged:",
+        curated.depth, flat.depth
+    );
     for &slot in &BYTE_SLOTS {
         if counts[slot] == 0 {
-            println!("    {}: none", SLOTS[slot]);
+            println!("    {}: no cells", SLOTS[slot]);
             continue;
         }
-        let (a, b) = (bits(&curated[slot]), bits(&flat[slot]));
+        let (a, b) = (
+            bits(&curated.codes[part][slot]),
+            bits(&flat.codes[part][slot]),
+        );
         println!(
-            "    {} ({}): port {} each {}; flat {} each {}",
+            "    {} ({} cells): curated {} a cell {}; flat {} a cell {}",
             SLOTS[slot],
             counts[slot],
             reading_of(&a, grain),
@@ -853,59 +536,89 @@ fn readings(
             per(&b, counts[slot], grain)
         );
         ordering(
-            &format!("    {}, the port against the flat tree", SLOTS[slot]),
+            &format!("    {} cells, curated against flat", SLOTS[slot]),
             &a,
             &b,
             counts[slot],
             grain,
         );
     }
-    let (port_bytes, flat_bytes) = (
-        bits(&joined(curated, &BYTE_SLOTS)),
-        bits(&joined(flat, &BYTE_SLOTS)),
-    );
+    let curated_bytes = bits(&joined(&curated.codes[part], &BYTE_SLOTS));
+    let flat_bytes = bits(&joined(&flat.codes[part], &BYTE_SLOTS));
     ordering(
-        &format!("    every byte ({bytes}), the ports against the flat tree"),
-        &port_bytes,
+        &format!("    every byte ({bytes} cells), curated against flat"),
+        &curated_bytes,
         &flat_bytes,
         bytes,
         grain,
     );
-    let letters = counts[LETTER_SLOT];
-    println!("  b. the sections' cost ({letters} letters):");
-    for &slot in &SECTION_SLOTS {
-        if counts[slot] == 0 {
-            continue;
-        }
-        let code = bits(&curated[slot]);
-        println!(
-            "    {} ({}): {}; each {}",
-            SLOTS[slot],
-            counts[slot],
-            reading_of(&code, grain),
-            per(&code, counts[slot], grain)
-        );
-    }
-    let sections = bits(&joined(curated, &SECTION_SLOTS));
+    let letters = bits(&curated.codes[part][SECTION]);
     println!(
-        "    in all: {}; a letter {}",
-        enclosure(&sections, grain),
-        per(&sections, letters, grain)
+        "  b. the section letters' price in the curated tree ({} letters): {}; a letter {}",
+        counts[SECTION],
+        reading_of(&letters, grain),
+        per(&letters, counts[SECTION], grain)
     );
-    let curated_all = charged(&bits(&joined(curated, &ALL_SLOTS)), curated_charge);
-    let flat_all = charged(&bits(&joined(flat, &ALL_SLOTS)), flat_charge);
+    let curated_all = bits(&joined(&curated.codes[part], &ALL_SLOTS));
+    let flat_all = bits(&joined(&flat.codes[part], &ALL_SLOTS));
     println!(
         "  c. the whole codes: the curated stream (its bytes and its sections) charged {curated_charge} bits, against the flat stream (its bytes alone) charged {flat_charge}:"
     );
-    println!("    curated {}", enclosure(&curated_all, grain));
-    println!("    flat    {}", enclosure(&flat_all, grain));
+    println!(
+        "    curated {}",
+        enclosure(&charged(&curated_all, curated_charge), grain)
+    );
+    println!(
+        "    flat    {}",
+        enclosure(&charged(&flat_all, flat_charge), grain)
+    );
     ordering(
         "    curated with its sections against flat, charged, a byte",
-        &curated_all,
-        &flat_all,
+        &charged(&curated_all, curated_charge),
+        &charged(&flat_all, flat_charge),
         bytes,
         grain,
     );
+    println!("  d. each tree against the online baselines on its own stream:");
+    for (name, pass, charge, coders) in [
+        ("flat", flat, flat_charge, flat_baselines),
+        ("curated", curated, curated_charge, curated_baselines),
+    ] {
+        let tree = charged(&bits(&joined(&pass.codes[part], &ALL_SLOTS)), charge);
+        for coder in [0usize, 2] {
+            let base = bits(&joined(&coders[coder][part], &ALL_SLOTS));
+            println!(
+                "    {name} stream, {}: {}",
+                BASELINE_NAMES[coder],
+                reading_of(&base, grain)
+            );
+            for (slot, slot_name) in SLOTS.iter().enumerate() {
+                if counts[slot] == 0 || (name == "flat" && slot == SECTION) {
+                    continue;
+                }
+                let code = bits(&coders[coder][part][slot]);
+                println!(
+                    "      {slot_name}: {}; a cell {}",
+                    reading_of(&code, grain),
+                    per(&code, counts[slot], grain)
+                );
+            }
+            ordering(
+                &format!(
+                    "    the {name} tree charged {charge} against {}",
+                    BASELINE_NAMES[coder]
+                ),
+                &tree,
+                &base,
+                if name == "flat" {
+                    bytes
+                } else {
+                    bytes + counts[SECTION]
+                },
+                grain,
+            );
+        }
+    }
 }
 
 // -------------------------------------------------------------------------------------------
@@ -921,15 +634,13 @@ fn curated_harness(curated_path: &str, flat_path: &str) {
         declared_population, cut.population,
         "one declared population"
     );
-    let parts = parts(&cut.codes, &cut.aeons);
-    let ranks = targets(&parts);
+    let (channels, kinds) = ticks(&cut.codes);
 
     // 0. The identical cells: the curated cut without its letters is the flat cut.
-    let identical = cut.codes.iter().filter(|&&c| c < BYTES).count() == flat_count
-        && cut
-            .codes
+    let bytes_of: Vec<usize> = cut.codes.iter().copied().filter(|&c| c < BYTES).collect();
+    let identical = bytes_of.len() == flat_count
+        && bytes_of
             .iter()
-            .filter(|&&c| c < BYTES)
             .zip(&flat_bytes)
             .all(|(&a, &b)| a == usize::from(b));
     assert!(identical, "the flat cut is the curated cut's bytes");
@@ -937,143 +648,170 @@ fn curated_harness(curated_path: &str, flat_path: &str) {
         .iter()
         .filter(|&&c| c < BYTES)
         .count();
-    assert_eq!(flat_held.start, flat_held_start, "identical held-out bytes");
+    assert_eq!(flat_held.start, flat_held_start, "identical held-out cells");
 
     let field = Field::declare(FieldDeclaration::campaign_one(cut.population))
         .expect("campaign 1's declared field at the population");
     let grain = exterior::receiver_grain(&field);
     assert_eq!(field.alphabet(), BYTES, "the flat chart is campaign 1's");
-    let population = cut.population;
 
-    let flat = flat_navigator(&cut.codes, &parts, flat_held.start);
-    let ports: Vec<Navigator> = (0..CHANNELS.len())
-        .map(|channel| port_navigator(&cut.codes, &parts, channel, cut.held.start))
+    let family = LetterFamily::new(vec![CHANNELS.len() as u64, KINDS.len() as u64])
+        .expect("the channel and section slots");
+    let slots: Vec<usize> = cut
+        .codes
+        .iter()
+        .zip(&channels)
+        .map(|(&code, &channel)| if code >= BYTES { SECTION } else { channel })
         .collect();
-    let sections = section_navigator(&parts, &ranks, cut.conversations, cut.held.start);
-    let flat_counts = slot_counts(&flat);
-    let mut counts = [[0u64; SLOT_COUNT]; 2];
-    for navigator in ports.iter().chain([&sections]) {
-        for (part, row) in slot_counts(navigator).iter().enumerate() {
-            for (slot, &count) in row.iter().enumerate() {
-                counts[part][slot] += count;
-            }
+    let typed: Vec<Letter> = cut
+        .codes
+        .iter()
+        .zip(channels.iter().zip(&kinds))
+        .map(|(&cell, (&channel, &kind))| {
+            Letter::Bundle(Bundle {
+                cell,
+                features: family
+                    .encode(&[channel as u64, kind as u64])
+                    .expect("a slot value"),
+            })
+        })
+        .collect();
+    let flat = Stream {
+        cells: bytes_of.clone(),
+        letters: cell_letters(&bytes_of),
+        slots: slots.iter().copied().filter(|&s| s != SECTION).collect(),
+        alphabet: BYTES,
+        development: flat_held.start,
+    };
+    let curated_cells = Stream {
+        cells: cut.codes.clone(),
+        letters: cell_letters(&cut.codes),
+        slots: slots.clone(),
+        alphabet: cut.alphabet,
+        development: cut.held.start,
+    };
+    let curated_typed = Stream {
+        cells: cut.codes.clone(),
+        letters: typed,
+        slots,
+        alphabet: cut.alphabet,
+        development: cut.held.start,
+    };
+    let counts = slot_counts(&curated_typed);
+    assert_eq!(
+        slot_counts(&flat)
+            .iter()
+            .map(|c| c[..SECTION].to_vec())
+            .collect::<Vec<_>>(),
+        counts
+            .iter()
+            .map(|c| c[..SECTION].to_vec())
+            .collect::<Vec<_>>(),
+        "identical cells on each port"
+    );
+    let mut letters = [[[0u64; 3]; 4]; 2];
+    for (position, &code) in cut.codes.iter().enumerate() {
+        if code >= BYTES {
+            let (kind, channel) = section(code);
+            letters[usize::from(position >= cut.held.start)][kind][channel] += 1;
         }
     }
-    for part in 0..2 {
-        assert_eq!(
-            flat_counts[part][..CHANNELS.len()],
-            counts[part][..CHANNELS.len()],
-            "identical bytes on each port"
-        );
-    }
-    let closes: u64 = counts.iter().map(|c| c[3] + c[4] + c[5]).sum();
-    assert_eq!(
-        closes + 1,
-        parts.len() as u64,
-        "a close before every letter but the first"
-    );
 
     println!(
-        "hnn_curated curated: the curated conversation source read by its own navigators (a tree per port, a navigator for its sections) against the flat stream of the same bytes (campaign 5's input; #73, #148)"
+        "hnn_curated curated: the curated conversation source as typed letters against the flat stream of the same bytes (campaign 5's input; #73, #148)"
     );
     println!(
-        "0. the cut: {} curated cells (|A| = 256 bytes + {LETTERS} section letters), {flat_count} flat bytes, identical: {identical}; {} letters in {} aeons met in the cut ({} declared); n* = {population}, L_R = {grain}",
+        "0. the cut: {} curated cells (|A| = {} = 256 bytes + 12 section letters), {} flat cells (|A| = 256), identical bytes: {identical}; n* = {}, L_R = {grain}",
         cut.codes.len(),
-        parts.len(),
-        parts
-            .iter()
-            .map(|p| p.aeon)
-            .collect::<std::collections::BTreeSet<_>>()
-            .len(),
-        cut.conversations
-    );
-    println!(
-        "  the aeons agree with the letters: open founds, turn and part stay, switch leaves (checked)"
+        cut.alphabet,
+        flat_count,
+        cut.population
     );
     for (part, name) in ["development", "held out"].iter().enumerate() {
-        let letter_range = |k: usize| usize::from(parts[k].at >= cut.held.start) == part;
-        let mut letters = [[0u64; 3]; 4];
-        let mut ranks_seen: BTreeMap<usize, u64> = BTreeMap::new();
-        for (k, p) in parts.iter().enumerate() {
-            if letter_range(k) {
-                letters[p.kind][p.channel] += 1;
-                if let Some(rank) = ranks[k] {
-                    *ranks_seen.entry(rank).or_default() += 1;
-                }
-            }
-        }
+        let range = if part == 0 {
+            0..cut.held.start
+        } else {
+            cut.held.clone()
+        };
+        let flat_range = if part == 0 {
+            0..flat_held.start
+        } else {
+            flat_held.clone()
+        };
         println!(
-            "  {name}: human bytes {}, agent bytes {}, tool bytes {}; closes human {}, agent {}, tool {}; letters {}",
+            "  {name}: curated cells {}..{}, flat cells {}..{}; human {}, agent {}, tool {}, section letters {}",
+            range.start,
+            range.end,
+            flat_range.start,
+            flat_range.end,
             counts[part][0],
             counts[part][1],
             counts[part][2],
-            counts[part][3],
-            counts[part][4],
-            counts[part][5],
-            counts[part][LETTER_SLOT]
+            counts[part][SECTION]
         );
         for (kind, kind_name) in KINDS.iter().enumerate() {
             println!(
                 "    {kind_name} letters: human {}, agent {}, tool {}",
-                letters[kind][0], letters[kind][1], letters[kind][2]
+                letters[part][kind][0], letters[part][kind][1], letters[part][kind][2]
             );
         }
-        println!(
-            "    switch targets by recency rank (0: an aeon not yet met in the cut): {}",
-            ranks_seen
-                .iter()
-                .map(|(rank, count)| format!("{rank}: {count}"))
-                .collect::<Vec<_>>()
-                .join(", ")
-        );
-    }
-    for (channel, port) in ports.iter().enumerate() {
-        println!(
-            "  the {} port: {} spans (aeons), {} ticks",
-            CHANNELS[channel],
-            port.spans.len(),
-            port.spans.iter().map(Vec::len).sum::<usize>()
-        );
     }
     println!();
 
     // 1. The declarations, their families and the memory.
-    let shared = shared_navigator(&cut.codes, &parts, cut.held.start);
-    let navigators: Vec<&Navigator> = [&flat]
-        .into_iter()
-        .chain(ports.iter().filter(|p| !p.trees[0].emissions.is_empty()))
-        .chain([&sections, &shared])
-        .collect();
-    // The declared reader's navigators (the ports' and the sections'), after the flat tree; the
-    // shared port tree, last, is read on the development cells only.
-    let reader = 1..navigators.len() - 1;
+    let declare = |alphabet: usize, family: LetterFamily| LandmarkDeclaration {
+        alphabet,
+        depth: DOUBLING[0],
+        forced: 0,
+        population: cut.population,
+        grain,
+        family,
+        prior: StopPrior::half(),
+        capacity: Capacity::Unbounded,
+    };
+    let trees: [(&str, &Stream, LandmarkDeclaration); 3] = [
+        (
+            "the flat tree",
+            &flat,
+            declare(BYTES, LetterFamily::cells()),
+        ),
+        (
+            "the curated cell tree",
+            &curated_cells,
+            declare(cut.alphabet, LetterFamily::cells()),
+        ),
+        (
+            "the curated typed tree",
+            &curated_typed,
+            declare(cut.alphabet, family.clone()),
+        ),
+    ];
+    let family_choice = ceil_log2(&BigUint::from(2u32));
     println!(
-        "1. the declarations: each tree cell-only, the ½ stop prior, the KT node (c = ∞), stored where paths part, at n* = {population}; the flat chart 256, a port's 256 + 4 kinds + END = {PORT_ALPHABET}, the letters {LETTERS}, the targets {} (the declared conversations); each navigator's family doubling from 6 to its carriers' deepest, charged ⌈log₂⌉ of its length",
-        cut.conversations
+        "1. the declarations: the ½ stop prior, the KT node (c = ∞), stored where paths part; each family doubling from 6 to its carriers' deepest at n* = {}; the curated family (cells or typed, slots [channel 3, section 4]) charged ⌈log₂ 2⌉ = {family_choice} bit",
+        cut.population
     );
-    for port in ports.iter().filter(|p| p.trees[0].emissions.is_empty()) {
-        println!(
-            "  {}: declared, no cells; it reads nothing and is charged nothing",
-            port.name
-        );
-    }
     let mut total_projection = 0u128;
-    for navigator in &navigators {
-        let depths = family_of(navigator, population, grain);
+    for (name, stream, declared) in &trees {
+        let depths = family_of(declared);
         let deepest = *depths.last().expect("a family");
-        let projection = projected(navigator, deepest, navigator.development);
+        let projection = projected(stream.development, declared, deepest);
         total_projection += projection;
         println!(
-            "  {}: D = {depths:?}, charged ⌈log₂ {}⌉ = {} bits; the a-priori memory at D = {deepest}: {projection} bytes",
-            navigator.name,
+            "  {name}: D = {depths:?}, charged ⌈log₂ {}⌉ = {} bits; P at D = 6: {}; the a-priori memory at D = {deepest}: {projection} bytes",
             depths.len(),
             ceil_log2(&BigUint::from(depths.len())),
+            LandmarkDeclaration {
+                depth: 6,
+                ..declared.clone()
+            }
+            .path_depth(),
         );
     }
     let available = exterior::available_memory();
     let together = total_projection <= CAP && available.is_none_or(|free| total_projection <= free);
     println!(
-        "  the sweeps together: {total_projection} bytes a priori, the cap {CAP}, {} bytes available: {}",
+        "  the three sweeps together: {total_projection} bytes a priori, the cap {CAP}, {} bytes available: {}",
         available.map_or_else(|| "unread".to_string(), |free| free.to_string()),
         if together {
             "run together"
@@ -1088,9 +826,9 @@ fn curated_harness(curated_path: &str, flat_path: &str) {
     let clock = Instant::now();
     let sweeps: Vec<Sweep> = if together {
         std::thread::scope(|scope| {
-            let handles: Vec<_> = navigators
+            let handles: Vec<_> = trees
                 .iter()
-                .map(|navigator| scope.spawn(move || sweep(navigator, population, grain)))
+                .map(|(_, stream, declared)| scope.spawn(move || sweep(stream, declared)))
                 .collect();
             handles
                 .into_iter()
@@ -1098,18 +836,22 @@ fn curated_harness(curated_path: &str, flat_path: &str) {
                 .collect()
         })
     } else {
-        navigators
+        trees
             .iter()
-            .map(|navigator| sweep(navigator, population, grain))
+            .map(|(_, stream, declared)| sweep(stream, declared))
             .collect()
     };
     println!(
         "2. the sweeps on the development cells ({} ms in all):",
         clock.elapsed().as_millis()
     );
-    for (navigator, result) in navigators.iter().zip(&sweeps) {
-        println!("  {}:", navigator.name);
-        let dev = slot_counts(navigator)[0];
+    for ((name, _, _), result) in trees.iter().zip(&sweeps) {
+        println!("  {name}:");
+        let dev = if *name == "the flat tree" {
+            [counts[0][0], counts[0][1], counts[0][2], 0]
+        } else {
+            counts[0]
+        };
         for run in &result.passes {
             pass_lines(run, 0, &dev, grain);
         }
@@ -1120,11 +862,13 @@ fn curated_harness(curated_path: &str, flat_path: &str) {
     println!();
 
     // 3. The choices.
+    let [flat_sweep, cell_sweep, typed_sweep] = &sweeps[..] else {
+        unreachable!("three sweeps")
+    };
     println!("3. the choices on the development cells:");
-    for (navigator, result) in navigators.iter().zip(&sweeps) {
+    for ((name, _, _), result) in trees.iter().zip(&sweeps) {
         println!(
-            "  {}: D = {} of {:?} tried ({}), charged {} bits",
-            navigator.name,
+            "  {name}: D = {} of {:?} tried ({}), charged {} bits",
             result.choice.chosen,
             result
                 .choice
@@ -1140,69 +884,82 @@ fn curated_harness(curated_path: &str, flat_path: &str) {
             result.charge()
         );
     }
-    let flat_charge = sweeps[0].charge();
-    let curated_charge: u64 = sweeps[reader.clone()].iter().map(Sweep::charge).sum();
+    let cell_charged = charged(
+        &bits(&joined(&cell_sweep.chosen().codes[0], &ALL_SLOTS)),
+        cell_sweep.charge() + family_choice,
+    );
+    let typed_charged = charged(
+        &bits(&joined(&typed_sweep.chosen().codes[0], &ALL_SLOTS)),
+        typed_sweep.charge() + family_choice,
+    );
+    ordering(
+        "the typed tree against the cell tree on the curated development cells, each charged its depths and the family bit",
+        &typed_charged,
+        &cell_charged,
+        counts[0].iter().sum(),
+        grain,
+    );
+    let typed_chosen = typed_charged.upper < cell_charged.lower;
+    let (chosen_name, chosen_sweep, chosen_stream, chosen_declared) = if typed_chosen {
+        (
+            "the curated typed tree",
+            typed_sweep,
+            &curated_typed,
+            &trees[2].2,
+        )
+    } else {
+        (
+            "the curated cell tree",
+            cell_sweep,
+            &curated_cells,
+            &trees[1].2,
+        )
+    };
+    let curated_charge = chosen_sweep.charge() + family_choice;
+    let flat_charge = flat_sweep.charge();
+    println!("  the curated source's tree: {chosen_name}, charged {curated_charge} bits");
+    println!();
+
+    // Baselines on each stream (development and held out; they choose nothing).
+    let ((flat_base, flat_base_ms), (curated_base, curated_base_ms)) =
+        rayon::join(|| baselines(&flat), || baselines(chosen_stream));
     println!(
-        "  the curated stream's navigators charged {curated_charge} bits in all, the flat tree {flat_charge}"
+        "  the baselines ({}, {}, {}; PPM order {PPM_ORDER}): flat {flat_base_ms} ms, curated {curated_base_ms} ms",
+        BASELINE_NAMES[0], BASELINE_NAMES[1], BASELINE_NAMES[2]
     );
     println!();
 
     // 4. The development readings.
     println!(
         "4. the development readings ({} bytes and {} section letters), bits at L_R = {grain}:",
-        BYTE_SLOTS.iter().map(|&s| counts[0][s]).sum::<u64>(),
-        counts[0][LETTER_SLOT]
+        counts[0][..SECTION].iter().sum::<u64>(),
+        counts[0][SECTION]
     );
-    let chosen: Vec<&Pass> = sweeps[reader.clone()].iter().map(Sweep::chosen).collect();
     readings(
-        &sweeps[0].chosen().codes[0],
+        0,
+        flat_sweep.chosen(),
         flat_charge,
-        &curated_codes(&chosen, 0),
+        chosen_sweep.chosen(),
         curated_charge,
+        &flat_base,
+        &curated_base,
         &counts[0],
-        grain,
-    );
-    // The diagnostic: the ports' landmarks shared, the sections' navigator unchanged.
-    let shared_sweep = sweeps.last().expect("the shared port tree's sweep");
-    let section_sweep = &sweeps[reader.end - 1];
-    let shared_charge = shared_sweep.charge() + section_sweep.charge();
-    println!(
-        "  the diagnostic, development only (its held-out passage is not taken: the held-out cells are read once, by the declared reader): the shared port tree at D = {} with the section navigator, charged {shared_charge} bits:",
-        shared_sweep.choice.chosen
-    );
-    readings(
-        &sweeps[0].chosen().codes[0],
-        flat_charge,
-        &curated_codes(&[shared_sweep.chosen(), section_sweep.chosen()], 0),
-        shared_charge,
-        &counts[0],
-        grain,
-    );
-    let (separate, together) = (
-        bits(&joined(&curated_codes(&chosen, 0), &ALL_SLOTS)),
-        bits(&joined(
-            &curated_codes(&[shared_sweep.chosen(), section_sweep.chosen()], 0),
-            &ALL_SLOTS,
-        )),
-    );
-    ordering(
-        "  the shared port tree against the trees per port, each with the section navigator, uncharged",
-        &together,
-        &separate,
-        counts[0].iter().sum(),
         grain,
     );
     println!();
 
     // 5. One held-out passage of each at its chosen depth.
     let clock = Instant::now();
-    let navigators = &navigators[..reader.end];
-    let sweeps = &sweeps[..reader.end];
-    let held_projection: u128 = navigators
-        .iter()
-        .zip(sweeps)
-        .map(|(navigator, result)| projected(navigator, result.choice.chosen, usize::MAX))
-        .sum();
+    let flat_at = LandmarkDeclaration {
+        depth: flat_sweep.choice.chosen,
+        ..trees[0].2.clone()
+    };
+    let curated_at = LandmarkDeclaration {
+        depth: chosen_sweep.choice.chosen,
+        ..chosen_declared.clone()
+    };
+    let held_projection = projected(flat.cells.len(), &flat_at, flat_at.depth)
+        + projected(chosen_stream.cells.len(), &curated_at, curated_at.depth);
     let available = exterior::available_memory();
     if held_projection > CAP || available.is_some_and(|free| held_projection > free) {
         println!(
@@ -1211,55 +968,43 @@ fn curated_harness(curated_path: &str, flat_path: &str) {
         );
         return;
     }
-    let wholes: Vec<Pass> = std::thread::scope(|scope| {
-        let handles: Vec<_> = navigators
-            .iter()
-            .zip(sweeps)
-            .map(|(navigator, result)| {
-                let depth = result.choice.chosen;
-                scope.spawn(move || pass(navigator, depth, usize::MAX, population, grain))
-            })
-            .collect();
-        handles
-            .into_iter()
-            .map(|handle| handle.join().expect("a passage"))
-            .collect()
-    });
+    let (flat_whole, curated_whole) = rayon::join(
+        || pass(&flat, flat.cells.len(), &flat_at),
+        || pass(chosen_stream, chosen_stream.cells.len(), &curated_at),
+    );
     println!(
-        "5. one held-out passage of each navigator at its chosen depth over the whole cut, every emission scored at the standing before its own deposit ({} ms; {held_projection} bytes a priori):",
+        "5. one held-out passage of each at its chosen depth over the whole cut, every cell scored at the standing before its own deposit ({} ms; {held_projection} bytes a priori):",
         clock.elapsed().as_millis()
     );
-    let checks: Vec<String> = navigators
-        .iter()
-        .zip(wholes.iter().zip(sweeps))
-        .map(|(navigator, (whole, result))| {
-            format!(
-                "{} {}",
-                navigator.name,
-                bits(&joined(&whole.codes[0], &ALL_SLOTS))
-                    == bits(&joined(&result.chosen().codes[0], &ALL_SLOTS))
-            )
-        })
-        .collect();
     println!(
-        "  checks, each passage's development code is its sweep's: {}",
-        checks.join("; ")
+        "  checks: the flat passage's development code is its sweep's: {}; the curated passage's: {}",
+        bits(&joined(&flat_whole.codes[0], &ALL_SLOTS))
+            == bits(&joined(&flat_sweep.chosen().codes[0], &ALL_SLOTS)),
+        bits(&joined(&curated_whole.codes[0], &ALL_SLOTS))
+            == bits(&joined(&chosen_sweep.chosen().codes[0], &ALL_SLOTS))
     );
-    for (navigator, whole) in navigators.iter().zip(&wholes) {
-        println!("  {}, held out:", navigator.name);
-        pass_lines(whole, 1, &slot_counts(navigator)[1], grain);
-    }
+    println!("  the flat tree, held out:");
+    pass_lines(
+        &flat_whole,
+        1,
+        &[counts[1][0], counts[1][1], counts[1][2], 0],
+        grain,
+    );
+    println!("  {chosen_name}, held out:");
+    pass_lines(&curated_whole, 1, &counts[1], grain);
     println!(
         "  held out ({} bytes and {} section letters), bits at L_R = {grain}:",
-        BYTE_SLOTS.iter().map(|&s| counts[1][s]).sum::<u64>(),
-        counts[1][LETTER_SLOT]
+        counts[1][..SECTION].iter().sum::<u64>(),
+        counts[1][SECTION]
     );
-    let held: Vec<&Pass> = wholes[reader].iter().collect();
     readings(
-        &wholes[0].codes[1],
+        1,
+        &flat_whole,
         flat_charge,
-        &curated_codes(&held, 1),
+        &curated_whole,
         curated_charge,
+        &flat_base,
+        &curated_base,
         &counts[1],
         grain,
     );
