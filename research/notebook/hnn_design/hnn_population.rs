@@ -13,7 +13,7 @@
 //! cargo run --release -p holonics --example hnn_population -- moire sheets
 //! cargo run --release -p holonics --example hnn_population -- crib
 //! cargo run --release -p holonics --example hnn_population -- switching [parity | sheets]
-//! cargo run --release -p holonics --example hnn_population -- standing /home/b/Workspaces/holonics/.local/cuts/standing-real-cut-campaign-1.bin
+//! cargo run --release -p holonics --example hnn_population -- standing .local/cuts/standing-real-cut-campaign-1.bin
 //! cargo run --release -p holonics --example hnn_population -- composition [products | primes]
 //! cargo run --release -p holonics --example hnn_population -- evolution
 //! cargo run --release -p holonics --example hnn_population -- species

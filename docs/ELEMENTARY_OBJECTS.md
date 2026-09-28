@@ -777,7 +777,7 @@ family that reads its faces, read together as one generator of faces.
 - **Death** is zero likelihood or a lawful release. A poor positive likelihood only loses weight.
   A death is an exchange, never a deletion: the dead mass passes to the survivors in proportion to
   their posteriors (`Population.death_is_an_exchange`), and the dead family keeps its seed, the keys
-  it held, which can be re-founded at the birth price when their face becomes relevant again.
+  it held, which can be re-founded from the reserved mass (half the reserve at each birth) when their face becomes relevant again.
 - **Generation is egg packing.** The requested consequence is packed into the keys, and the native
   transport emits it: `decode(T_native(encode x)) = T(x)`.
 - **Keystones and their maintenance** (Brandon, September 27: some functions may need energy spent

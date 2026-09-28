@@ -129,21 +129,24 @@ sets the order:
    - **Identity.** A family's identity is its declaration, which survives re-founding and aeons.
    - **The evolved prior.** Its only history is three counts per identity (aeons declared,
      selected, died). The prior is a Dirichlet face of the counts mixed with the description
-     prior, and an aeon codes at most the selected family's code plus `−log₂` of its evolved mass.
-     Over twelve aeons of mixed terrains it codes `−4 + 15/16 + ε` below the static prior, saving
-     more each cycle (`0 + 8/16`, then `−2 + 8/16`, then `−3 + 14/16`); naming a family is all it
-     can save.
+     prior. In an aeon without births, the aeon codes at most the selected family's code plus
+     `−log₂` of its normalized evolved prior `π(f) = m_f/M`; a birth renormalizes the prior, and
+     the bound then reads `m_f/M_n`. Over twelve aeons of mixed terrains it codes
+     `−4 + 15/16 + ε` below the static prior: the first cycle costs `0 + 8/16`, and the next two
+     save `2 + 8/16` and `3 + 14/16`. Naming a family is all it can save.
    - **Species collapse.** It is relative to the admitted future: keys whose faces agree over it
      become one member with the summed posterior, and every seed is kept so the species can split.
      The parity moiré's 720 keys become one species; each grating merges with its mirror; the
-     rotor's gauge orbit merges. No code changes. A shorter admitted future splits the species
-     again (2, 4, 14 and 27 species over 1, 2, 4 and 8 ticks).
+     rotor's gauge orbit merges. No code changes. A longer admitted future separates more: at
+     cell 9 the parity survivors form 2, 4, 14 and 27 species over 1, 2, 4 and 8 ticks, and a
+     growing future splits a species again.
    - **Work.** Each family's executed work is counted in its cost receipt.
-8. **Next.** Families compose at ports (a Holarchy of eggs). The birth prior over families is learned across aeons from the
-   population's deaths and selections (the evolved ability; [ELEMENTARY_OBJECTS, keys](../ELEMENTARY_OBJECTS.md#keys-locks-and-navigation)):
-   a retention of selection counts, never a tape. A keystone's value is the joint code with it against without it, and a mode held
-   against dissipation charges its maintenance work
-   ([ELEMENTARY_OBJECTS, the egg](../ELEMENTARY_OBJECTS.md#the-egg-a-generator-read-as-a-whole)).
+8. **Next: campaign 5 on the population.**
+   - the curated readers as families;
+   - a part clock with a boundary egg, so a message's end is predicted by more than its bytes;
+   - a joint address across ports;
+   - merges priced by their code pair as species collapse (Holonic Encoding);
+   - then the full HNN at scale on the population.
 
 The standing cut has been reused for development and lies within the wide cut's held-out range.
 These are development receipts. The dataset's separate evaluation partition remains unspent.
