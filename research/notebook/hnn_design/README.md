@@ -1471,3 +1471,117 @@ on the admitted egg, so the population drops the seven trees:
   eight families and 1,298 for the flat tree;
 - the passage takes 166,113 ms at a 3,400,306,688-byte peak resident set, against 272,849 ms at
   10,843,217,920 for all eight families.
+
+## F0 candidate 3: learned tokens with the receiving tree over them (September 28)
+
+`hnn_tokens` builds THE_REBUILD's F0 candidate 3 as a token lens: byte-pair merges learned on the
+choosing role, read by the existing receiving tree (`TreeFamily`, cell-only letters over the token
+alphabet, the `½` stop prior, `L_R = 16`), against the flat byte tree on the same bytes. The
+computational object is the helical pair interaction: the token navigator meeting the receiving tree
+at its section. It touches **faces and placement** (each token's face at its address) and the
+**tower thread** (a merge is a coarsening whose restriction is its bytes; no token crosses a section);
+the helix, the pair, the cell holonomy and the tube stay attached through the tree's owner.
+
+```sh
+cargo run --release -p holonics --example hnn_tokens -- probe .local/cuts/curated-f4-passage-cut.bin
+cargo run --release -p holonics --example hnn_tokens -- f0 .local/cuts/curated-f4-passage-cut.bin .local/cuts/curated-f4-passage-flat-cut.bin .local/cuts/f0-token-dictionary-f4.bin
+cargo run --release -p holonics --example hnn_tokens -- release .local/cuts/curated-f5-choosing-cut.bin .local/cuts/f5-blind-input.json .local/cuts/f0-token-releases.json .local/cuts/f0-token-dictionary-f5.bin 256 4
+HOLONICS_ROOT=<main checkout> python3 research/notebook/hnn_design/release_legibility.py .local/cuts/f0-token-releases.json
+cargo test -p holonics --example hnn_tokens
+```
+
+[definition; agent-inferred] **The law** (the example's header states it in full).
+- Merges are learned greedily by pair count within parts, ties to the least pair; a section letter is
+  never an operand. Frequency is the proposal order; the choosing role's charged code accepts `K`.
+- The canonical parse applies the merges in learned order, left to right without overlap, and decodes
+  exactly. It is one admitted parse, so its prequential code is a prefix code for the bytes.
+- `K ∈ {2^8, 2^10, 2^12}` and the depth `D ∈ {2, 3, 4, 6}` tokens are chosen together by the choosing
+  role's charged code: the stream plus the dictionary's description, `2⌈log₂(256 + i)⌉` bits for
+  merge `i` and the Elias-gamma `K`. The sweep over 12 rungs is charged `2 + 2 = 4` bits.
+- Releases draw by exact inverse CDF on the tree's face, realized as the descent of its dyadic heap
+  (atlas `receiver.population-descent-inverse-cdf`). The full-face selection at K = 4,096 took
+  1,143 ms for 16 draws, projecting past ten minutes for 32 releases, so it checks the descent instead:
+  on its first 4 draws of each release, and at every exact cumulative boundary in the tests.
+
+Tests: the parse decodes exactly and equals the learned stream at every prefix; no merge crosses a
+section letter; over every byte string of at most 5 bytes on a 2-byte chart, the exact masses of
+`open · parse(x) · stop` sum below one; the descent equals `select_family_class`; the description and
+the JSON reading.
+
+**Projection.** The bounded probe (the first `2^15` choosing tokens a rung) projected the choosing sweep
+at 16,891 ms and each token passage below 5,000 ms, beside the flat tree's recorded 21,581 ms. The
+releases projected 9,300 ms of descents and 9,144 ms of checks. Every run passed its projection.
+
+**Choosing receipts** (F4's choosing role, 524,091 cells: 523,389 bytes and 702 letters). 4,096 merges
+learned in 105 ms. The charged code, stream plus description, at `L_R = 16`:
+
+| K (description) | D = 2 | D = 3 | D = 4 | D = 6 |
+|---|---|---|---|---|
+| 256 (4,623 bits) | `1241129 + 15/16 + ε` | `1216344 + 6/16 + ε` | **`1215631 + 5/16 + ε`** | `1215821 + 3/16 + ε` |
+| 1,024 (20,495) | `1262795 + 14/16 + ε` | `1265531 + 4/16 + ε` | `1267600 + 9/16 + ε` | `1268368 + 3/16 + ε` |
+| 4,096 (93,199) | `1322614 + 5/16 + ε` | `1327600 + 11/16 + ε` | `1328763 + 15/16 + ε` | `1329123 + 11/16 + ε` |
+
+- **Chosen: K = 256, D = 4.** Its enclosure is decided below every other rung, by `189 + 13/16 + ε`
+  below the next (K = 256, D = 6). The stream alone also orders K = 256 first.
+- The F4 dictionary is 2,072 bytes, SHA-256
+  `8f7623aed2bb831dc20311ed2553991e8292c430252853d5a6aa3de2291a86e9`, owner-only in `.local/cuts/`.
+
+**Validation, read once** (523,236 bytes in 257,278 byte tokens and 916 letters). The flat tree
+reproduces its recorded reading exactly.
+
+| Validation bytes | Token tree (K = 256, D = 4) | Flat tree (D = 48) | Tokens against flat |
+|---|---|---|---|
+| human (30,841) | `67961 + 3/16 + ε` | `62604 + 5/16 + ε` | above by `5356 + 13/16 + ε` |
+| agent (492,395) | `963744 + 6/16 + ε` | `891195 + 9/16 + ε` | above by `72548 + 13/16 + ε` |
+| every byte | `1031705 + 10/16 + ε`, a byte `1 + 15/16 + ε` | `953799 + 15/16 + ε`, a byte `1 + 13/16 + ε` | |
+| **like with like**, charged 4 and 3 | `1031709 + 10/16 + ε` | `953802 + 15/16 + ε` | **above by `77906 + 10/16 + ε`**, a byte `0 + 2/16 + ε` |
+| with the dictionary's 4,623 bits too | | | above by `82529 + 10/16 + ε` |
+
+- The section letters, coded by the token tree only: `2961 + 0/16 + ε` over 916 letters.
+- On the choosing role the token bytes are `110838 + 0/16 + ε` above flat, like with like.
+
+**Standing and work.**
+- The token tree's standing is 407,818,583 bytes and the dictionary 2,072, together 407,820,655 bytes
+  after 1,048,243 cells: 389 a cell, remainder 54,128. The flat tree's is 1,298 a cell and the
+  admitted egg's 2,653.
+- The token passage took 6,060 ms at a 1,446,195,200-byte peak resident set. The flat tree took
+  22,922 ms. The whole run took 53,325 ms at a 4,414,365,696-byte peak, dominated by encoding the
+  flat tree's standing.
+
+**Releases on the spent F5 requests** (development diagnostics, never evaluation). The merges were
+learned on the F5 choosing cut the same way at F4's chosen K = 256, and the tree at D = 4 read all of
+it: 522,206 cells in 263,408 tokens, a 220,523,223-byte standing, 3,198 ms. The F5 dictionary is
+2,072 bytes, SHA-256 `dbaedde4f6ee3756a571cd9596a1329e35d879808715054453e1e5f437858742`. The seed is
+`20260928 + i` for request `i`, with a stop at a section letter or 600 bytes.
+- **Outcomes.** 16 releases stopped at a section letter and 14 reached the cap. Two are typed
+  refusals for invalid UTF-8.
+- **Draws.** 11,358 bytes were released from 6,292 tokens drawn. 127 draws were checked equal to the
+  full face's certified inverse CDF.
+- **Resources.** The longest request took 153 ms, and the run 6,665 ms at a 790,351,872-byte peak.
+- The owner-only releases, `f0-token-releases.json`, have SHA-256
+  `1b0e23e954edf4919d49a1c905e23d2c59b5a6421ac2b663b9e091c54b5ea412`.
+
+`release_legibility.py` counts against the F5 choosing vocabulary (6,325 words); counts only:
+
+| Reading | Byte releases (F5 native) | Token releases | Controls | Requests |
+|---|---|---|---|---|
+| texts (typed refusals) | 24 (8) | 30 (2) | 32 | 32 |
+| word tokens in the vocabulary | 580 of 758 | 836 of 1,527 | 3,139 of 3,306 | 1,817 of 1,932 |
+| backticks even | 14 of 24 | 21 of 30 | 32 of 32 | 32 of 32 |
+| `()` balanced | 16 of 24 | 15 of 30 | 32 of 32 | 32 of 32 |
+| `[]` / `{}` balanced | 17 / 21 of 24 | 20 / 17 of 30 | 32 / 32 | 32 / 32 |
+| straight quotes / bold even | 22 / 16 of 24 | 22 / 19 of 30 | 32 / 32 | 32 / 32 |
+
+The token releases' word rate is below the byte releases': `836·758 = 633,688 < 580·1,527 = 885,660`.
+Their backtick parity rate is above: `21·24 = 504 > 14·30 = 420`.
+
+[interpretation] **Not adopted: the token tree codes above flat on unseen families, and its releases do
+not move to whole words.**
+- The charged code rises with `K` at every depth. The choosing role chose the smallest rung, K = 256,
+  so the lens pulls back toward bytes.
+- The receiving tree reads a token as an opaque odometer index. Tokens that share bytes share no
+  counts, and a context of four tokens is sparse where a byte context of the same span is not.
+- On F4's held-out passage the byte cell tree at `D = 6` codes the whole curated stream, bytes and
+  letters, at `970145 + 1/16 + ε`. The token tree's bytes alone lie above that, at
+  `1031705 + 10/16 + ε`.
+- F0's byte code stays the admitted egg's.

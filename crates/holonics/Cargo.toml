@@ -79,3 +79,11 @@ path = "../../research/notebook/hnn_design/hnn_release_terrain.rs"
 [[example]]
 name = "hnn_word_probe"
 path = "../../research/notebook/hnn_design/hnn_word_probe.rs"
+
+# The notebook's F0 candidate 3: byte-pair merges learned on the choosing role, the receiving tree
+# over the tokens, against the flat byte tree on F4's development passage, and token releases on the
+# spent F5 requests (research/notebook/hnn_design/README.md): development receipts run once in
+# release; its fixtures are tested (`cargo test -p holonics --example hnn_tokens`).
+[[example]]
+name = "hnn_tokens"
+path = "../../research/notebook/hnn_design/hnn_tokens.rs"
