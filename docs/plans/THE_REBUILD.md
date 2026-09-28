@@ -1,15 +1,20 @@
 # The rebuild
 
-**Status: active, September 27.** Tracked in #63. Steps 0–3 are built. Campaign 1
-meets its standing-cut criterion; campaign 2's laws and host/card parity pass, while its predictive
-criterion fails. The compacted landmark tree (`compression::landmark::context`) and the loaded
-resonator/adjoint (`hnn::ring`) run on host and card. The fixed loaded source-ring family does not improve the
-standing-cut prediction. The HNN's receiving storage is a population of candidate standings under
-Bayesian selection. Its extension to a population of eggs (candidate generator families) on
-terrain whose truth is known is the immediate work. Campaigns 3–5 are that population's birth,
-death and dormancy (3), its motor chart (4), and its species and generation (5). Step 6's finite physics and
-step 7's first curation pass are built; equation extraction (#146), remaining curation (#147) and
-applications (#148) remain open.
+**Status: active, September 27.** Tracked in #63.
+- **Built.** Steps 0–3 are built. Campaigns 1–2 run on host and card; campaign 1 meets its
+  standing-cut criterion and campaign 2's predictive criterion fails.
+- **The receiving storage is a population of eggs.** It is a Bayesian mixture over declared
+  generator families (`receiver::population`), with composition at ports, dormancy, death and
+  birth, the evolved prior and species collapse. On the tested terrain it selects among the
+  declared families the one that made the terrain. On deterministic terrain it codes at that
+  family's truth. On the parity moiré it locates a future-equivalent word fibre, not the rings'
+  rates.
+- **The curated conversation source** (channels as ports, turns as epochs, conversations as aeons)
+  codes below the flat stream of the same bytes on a development-partition cut. There is no
+  evidence yet of performance on the evaluation families, or of answer quality.
+- **What follows** is the [forward plan](#the-forward-plan-september-27). Step 6's finite physics
+  and step 7's first curation pass are built; equation extraction (#146), the remaining curation
+  (#147) and applications (#148) remain open.
 
 This plan replaces the [pre-reset restructure plan](https://github.com/brandonrdug/holonics/blob/13f8c734/docs/plans/THE_REPOSITORY_RESTRUCTURE.md).
 The specification below records the campaign-1 construction. The laws decided since live in their
@@ -20,156 +25,163 @@ short current position; dated records hold the evidence.
 
 | Current boundary | What runs | Evidence / remaining term |
 |---|---|---|
-| Host and card | Campaigns 1–2, compacted landmark receiver | Per-law parity; deposition and exact face completion still have host owners (#76) |
-| Standing-cut HNN | Depth 4, half stop prior, tree/wave mixture | Recorded `3 + 1/16 + ε` bits per cell; this is the full HNN exposure |
-| Wide-cut count receiver | Compacted tree, depth `48 = 3·2⁴` | `2²⁰` cells, final `2¹⁷` scored as held out, `1 + 15/16 + ε` bits per cell; no full-HNN claim |
-| Ring storage | Loaded forward, adjoint and reached material deposition (`hnn::ring`) | Balance and parity pass; the fixed source-ring family loses to the default HNN on the standing cut |
-| Mode release and generation | Shared primitive laws exist | Campaigns 3–5 must build their consumers; application acceptance is step 8 |
+| Host and card | Campaigns 1–2 and the compacted landmark tree, with per-law parity | The population's families run on the host only (F3); deposition and exact face completion keep host owners (#76) |
+| Standing-cut HNN | The field (rings, contacts, word, deposition, wave) with the depth-4 tree as receiving storage | `3 + 1/16 + ε` bits a cell held out; the field on the population is F2 |
+| Wide-cut receiver | The compacted tree, `D = 48`, with capacity `2^11` | `1 + 15/16 + ε` bits a cell held out; count-only, not the full HNN |
+| Terrain with known truth | `holarchy::terrain` and the population's families | Selects among declared families: the sheet moiré at its key description, the arithmetic at exactly its truth, the parity moiré at a word fibre |
+| Curated conversation source | The population: a part clock, a boundary egg, a request→response receiver, learned byte classes | On the development partition's curated cut, `−1820 + 9/16 + ε` in its development cells and `−535 + 8/16 + ε` in its held-out tail against the flat stream; words are F1 |
+| Release (generation) and products | The release contract (`HNN_FORMULA`), the generic `receiver::release` law, egg packing | No population text-release consumer yet (F4); Athena-0 is F5 |
 
-**Immediate work (September 27): unity before campaign 3 continues.** The
-[unity audit](../../research/records/2026-09-27_THE_HOLARCHY_AND_ITS_AEONS_ARE_THE_TOP_THE_DECISIONS_DISSOLVE_INTO_THEIR_OWNERS_AND_LEARNING_IS_PROTOTYPED_WHERE_A_HOLARCHY_MADE_THE_TERRAIN.md)
-sets the order:
-1. dissolve the Decisions log into its owners and records (done September 27; [index](#i-the-decisions-index));
-2. put the Holarchy and its aeons at the top of `hnn`, with the receiving tree expressed through
-   `receiver::standing`, `aeon::Epochs` and the source navigator's words. The tree's part is built
-   (September 27): the tree is the shift navigator's landmarks, `compression::landmark::context`
-   (Lean `Compression/Landmark/Context`), and its Lean joins to `Foundation/Standing` (each pruned
-   tree a candidate standing, the weight their mixture) and `Aeon/Clock/Epoch` (a node's arrivals
-   are the epochs of its section) are proved. The tree no longer reads the machine, and
-   `Field::holarchy` names the top. A cut passes through the resident's aeons: the joint clock
-   carries out every 5005 cells on campaign 1, so its 6148 cells close two. Still open in code:
-   - the receiving tree is storage read by the receiving face, not a Holon joined at ports;
-   - a receiving window is a step of the exposure's loop, not an `aeon::Epochs` reading at the
-     receiver's section;
-   - a pump period is the mode quotient's lift period, not an `aeon::Cycle`;
-3. prototype learning on terrain a declared Holarchy made, with its exact truth. Built:
-   `holarchy::terrain` (moiré, tree source, rotor cribs, aeon switching), with the first receipts
-   in the [audit record §6](../../research/records/2026-09-27_THE_HOLARCHY_AND_ITS_AEONS_ARE_THE_TOP_THE_DECISIONS_DISSOLVE_INTO_THEIR_OWNERS_AND_LEARNING_IS_PROTOTYPED_WHERE_A_HOLARCHY_MADE_THE_TERRAIN.md#6-the-first-receipts-on-terrain-september-27-commit-ab416919):
-   - the receiving tree recovers a tree source's minimal tree exactly, within the weighting bound;
-   - on a moiré the harness's depth rule stops at a plateau below the determining depth. The
-     depth choice takes the least code over the declared family, each passage paid, not the
-     first rise (`agent-inferred`: a zero-rate terrain's code can plateau before it falls);
-   - the tree memorizes a moiré at about 30 times its key description. The rings are measured
-     there next. That needs parallel gratings, a declared plugboard for the rate, and a parity
-     menu for the Bombe. The construction is stated on the joint clock in
-     [egg packing](../../research/records/2026-09-27_EGG_PACKING_THE_MOIRE_OF_TWO_HELICES_IS_A_TORUS_KNOT_AND_THE_TREFOIL_IS_THE_HALF_TURN_WITH_THE_THIRD_TURN.md#7-what-this-asks-of-the-construction) §7:
-     - a tick's class is its crossing cell (`|ad − bc|` of them);
-     - a lock is a modular-group word located by Stern–Brocot descent;
-     - phases come from parity relations;
-     - generation packs the response into the keys;
-     - the measurement is an egg population: a mixture over generator families (trees, moiré
-       gratings, rotor keys) weighted by prequential likelihood, the replicator, gauged by
-       selecting the family that made the terrain
-       ([record §9](../../research/records/2026-09-27_THE_EGG_IS_A_GENERATORS_GENOME_SELECTION_IS_BAYES_AND_THE_FACES_OF_INTEGERS_ARE_MOIRES_OF_GRATINGS.md#9-what-it-asks-of-the-construction));
-       an arithmetic terrain (products and primes in bases 2, 6, 10 and 16) follows;
-4. **the egg population** (September 27; [ELEMENTARY_OBJECTS, the egg](../ELEMENTARY_OBJECTS.md#the-egg-a-generator-read-as-a-whole),
-   [RECEIVER_HOLARCHY, probability](../RECEIVER_HOLARCHY.md#probability-is-a-receiver-geometry),
-   [record](../../research/records/2026-09-27_PROBABILITY_IS_A_RECEIVER_GEOMETRY_BAYES_IS_THE_RATIOS_TRANSLATION_AND_THE_EGGS_PERIOD_IS_HYPERGEOMETRIC.md)). The receiving storage's mixture over candidate
-   standings extends to a mixture over candidate navigator families (tree sources, moiré gratings,
-   rotor keys). Each family has its description, decoder, gauge fibre and prequential likelihood,
-   and Bayes (the replicator) weighs them. On `holarchy::terrain` it is gauged by selecting the
-   family that made the terrain, with each family's charged code against the source's exact code
-   and its key description. The arithmetic terrain (digit convolution and carry, cheap residue
-   faces, prime gratings) follows through the same owner. The real cut stays each campaign's
-   acceptance;
-   **Built and measured (September 27).** `receiver::population` (Lean
-   `Context/Population.{population_mixture, survivor_code, survivors_product}`): a receiver's Bayesian
-   mixture over declared families (trees at a ladder of depths, moiré gratings, rotor keys), each
-   named by its description bits. On every terrain one declared family made, it selects that family:
-   - the moiré sheet tuple codes `29 + 0/16 + ε` bits against its `29 + 4/16` key description and
-     the tree's `1549`;
-   - the moiré parity codes `14 + 1/16 + ε`, below its `20 + 12/16` key description, because the
-     720 surviving keys are one species;
-   - the rotor crib codes `17 + 14/16 + ε` against its 16-bit key and the tree's `375 + 12/16`;
-   - the tree sources select the right depth and recover the minimal tree.
+**Built on September 27** ([record](../../research/records/2026-09-27_THE_RECEIVING_POPULATION_WAS_BUILT_ON_TERRAIN_WITH_KNOWN_TRUTH_AND_THE_CURATED_SOURCE_NOW_CODES_BELOW_THE_FLAT_STREAM.md)):
+- the unity steps: the Decisions log dissolved, the Holarchy and aeons at the top, and the
+  receiving tree at `compression::landmark::context`;
+- the terrain with known truth (`holarchy::terrain`: moiré, tree source, rotor cribs, aeon switching,
+  arithmetic);
+- the egg population (`receiver::population`), which selects the family that made each terrain;
+- campaign 3 at the population: dormancy, death as an exchange, birth;
+- composition at ports, whose arithmetic eggs code exactly the truth;
+- the evolved prior and species collapse;
+- the curated conversation source, whose stream codes `−1820 + 9/16 + ε` below the flat stream on
+  development and `−535 + 8/16 + ε` held out.
 
-   The static population fails on aeon switching: a dormant grating's keys die at the first silent
-   cell (`252 + 9/16` against `14 + 1/16` unswitched). That is campaign 3's work. The arithmetic
-   terrain (`holarchy::terrain::arithmetic`) shows the tree cannot read the trailing face or a
-   record's position in bases 10 and 16: determined cells cost `3 + 3/16` to `4 + 7/16` bits each.
-   The arithmetic eggs (a record clock, a convolution-and-carry egg, a counter, a sieve) are
-   families of the same population. The curated conversation source (channels as ports, turns as
-   epochs, conversations as aeons) codes every byte below the flat stream (`−777 + 7/16` held out).
-   Its section letters cost more than they save on development, so each port needs its own tree
-   and the sections their own navigator (campaign 5);
-5. **Campaign 3 at the population, built (September 27;** `receiver::population::dormancy`, Lean
-   `Context/Dormancy`, `Population.death_is_an_exchange`**).**
-   - **Dormancy.** A ring is a layer, active or dormant. A dormant layer reads nothing while its
-     ring's clock winds on, so its keys are filtered only where it sounds, and its activity switches
-     under a fixed share (`dormant_survivor_code`, `share_path_code_le`). On the aeon-switching
-     terrain (eleven switches over `2^14` cells):
-     - the sheet tuple codes `169 + 9/16 + ε` against the static population's `688 + 6/16`, below
-       the unswitched code plus 14 bits a switch (`174 + 9/16`);
-     - the parity class codes `163 + 4/16` against `252 + 9/16`;
-     - the dormant ring's grating survives every silent aeon.
-   - **Death is an exchange.** A family dies only at zero likelihood. Its mass passes to the
-     survivors, summing exactly to what died, with a receipt: the killing cell, the dead family's
-     last face, each survivor's share, and the seed it held.
-   - **Birth.** Founding draws from the reserved prior mass without moving the population's code. A
-     dead seed can be re-founded. The descended ring's causal chord equals the full ring's
-     (`the_chord_survives_the_release`).
-   - **Remaining.** The Lean for the rounding bound, the newborn's telescope and the chord equality
-     is owed in #62. Species collapse and the evolved prior are item 7.
+## The forward plan (September 27)
 
-6. **Composition at ports, built (September 27;** `receiver::population::composition`, Lean
-   `Context/Composition`**).** A keystone (a record clock) exposes its port, and conditioned eggs (a
-   carry egg, a counter, a sieve) read it. The composed egg codes exactly the truth on every
-   arithmetic terrain:
-   - **Products in base 10** (`2^12` records): `108857 + 3/16 + ε` bits, the operands' entropy
-     plus the clock's `log₂ 19`, against the tree's `273520 + 7/16`. Every determined cell costs
-     exactly zero once the clock is located.
-   - **Prime streams over `[0, 10^4)`:** `15 + 9/16 + ε` bits, the key description, against the
-     tree's `161780 + 3/16`.
-   - **Keystone values** (the joint code without it against with it): the record clock is worth
-     `164662 + 4/16` in base 10 and the counter `138240 + 3/16` on the primes.
+[definition; agent-inferred; reviewed by GPT-6 Sol, September 27] Each item fixes its goal, its
+owners (existing, or named as new), its consumer equation, its acceptance and its failure branch
+before anything is measured. The tails already read are development receipts: the standing cut,
+the wide cut and the curated cut.
 
-   The curated source's per-port reader was measured and retired: the typed reader stays, and
-   campaign 5 needs a joint address across ports and a cheaper boundary.
-7. **The evolved prior and species collapse, built (September 27;** Lean `Context/Evolution`**).**
-   - **Identity.** A family's identity is its declaration, which survives re-founding and aeons.
-   - **The evolved prior.** Its only history is three counts per identity (aeons declared,
-     selected, died). The prior is a Dirichlet face of the counts mixed with the description
-     prior. In an aeon without births, the aeon codes at most the selected family's code plus
-     `−log₂` of its normalized evolved prior `π(f) = m_f/M`; a birth renormalizes the prior, and
-     the bound then reads `m_f/M_n`. Over twelve aeons of mixed terrains it codes
-     `−4 + 15/16 + ε` below the static prior: the first cycle costs `0 + 8/16`, and the next two
-     save `2 + 8/16` and `3 + 14/16`. Naming a family is all it can save.
-   - **Species collapse.** It is relative to the admitted future: keys whose faces agree over it
-     become one member with the summed posterior, and every seed is kept so the species can split.
-     The parity moiré's 720 keys become one species; each grating merges with its mirror; the
-     rotor's gauge orbit merges. No code changes. A longer admitted future separates more: at
-     cell 9 the parity survivors form 2, 4, 14 and 27 species over 1, 2, 4 and 8 ticks, and a
-     growing future splits a species again.
-   - **Work.** Each family's executed work is counted in its cost receipt.
-8. **Campaign 5 on the population, first step built (September 27;**
-   `receiver::population::boundary`, `compression::landmark::context::sections`, Lean
-   `Composition.{staged_chain_rule, staged_code}`**).** The curated readers are families. A part
-   clock (a keystone carrying the open part's channel and kind, its phase, its sentence carry and
-   the last byte's class) feeds a boundary egg. Its hazard is a KT face on a declared partition of
-   those classes, and the chain rule splits its code exactly into boundary and letters. With its
-   sections paid, **the curated stream now codes below the flat stream of the same bytes**:
-   `−950 + 9/16 + ε` on development and `−415 + 3/16 + ε` held out (charged 12 bits for the
-   design choices). Every byte gains (`−5426 + 3/16` development), and the letters fall to
-   `4467 + 6/16` from `5774 + 15/16`. The part clock is worth `2764 + 8/16` on development.
-   Bayes selects the boundary egg outright.
-9. **Campaign 5's merges and admitted receivers, built (September 27;** `receiver::population::{merge,
-   admitted}`, `compression::landmark::context::spans`, Lean `Context/Merge`**).**
-   - **The admitted receivers** (the source contract's item 7) are consumed. A response is read
-     against its request's span (where it quotes it), with the pointer to the request coded and
-     paid; it is worth `−754 + 6/16` on development and `−173 + 6/16` held out. A later human
-     return is read against the response it answers as a receipt only (`−470 + 12/16`), never a
-     target.
-   - **Merges are species of partition cells.** The merge Lean (`expand_merge`, `merge_cost_iff`,
-     `segmentation_mass`, `encoding_square_or_separator`, `release_merge_iff_future_equivalent`)
-     is proved. The part clock's six declared byte classes are learned into four on development
-     cells, and the human port's shared counts are refused, by `7/16`.
-   - **Combined, the curated stream codes `−1820 + 9/16 + ε` below the flat stream on
-     development.** Held out it reads `−535 + 8/16 + ε`, disclosed and choosing nothing: `47 + 14/16`
-     above the declared classes, which is mostly the learned partition's description.
-10. **Next in campaign 5.**
-   - merges of the byte tree's contexts (tokenizers as landmark words), priced by their code pair
-     as species collapse (Holonic Encoding), which need a key signature for tree contexts;
-   - then the full HNN at scale on the population.
+**Protocol.**
+- **Pinned families.** Before each new validation the item pins disjoint development families for
+  choosing and for validation, drawn from the dataset's development partition by a declared
+  hash-seeded split. It also pins the consumer, the charges, the baselines, the acceptance and a
+  deadline.
+- **The evaluation partition.** F5 alone opens it, once, after every product gate has passed on
+  development.
+- **Budgets.** Each full passage is projected before it runs, against ten minutes, 20 GB of host
+  memory and the card's 16 GiB. A failed projection admits a bounded probe, never a full-passage
+  claim.
+
+**Order.**
+- F4 builds release on the byte population as it stands.
+- F1 (words) and F2 (the field) are improvements the population may adopt; neither blocks F4.
+- F5 needs F4 and the product surface.
+- F3 is an acceleration gate, required only if Athena-0's response deadline needs the card.
+- F6 follows the common release law of F4.
+
+### F1. The word alphabet (campaign 5; #73, #148)
+
+- **Builds on.** `Context/Merge` (`expand_merge`, `merge_cost_iff`, `segmentation_mass`,
+  `parse_code`, `segmentation_code_le`, `encoding_square_or_separator`,
+  `release_merge_iff_future_equivalent`) and `receiver::population::merge`.
+- **New.** A word terrain (`holarchy::terrain::words`), a segmentation lattice with its decoder, and
+  a word family in the population.
+- **Law.**
+  - `P_G(x) = Σ_(D z = x) P(z)`, the parse law including its termination and its dictionary's cost.
+  - Every admitted parse `z` decodes to `x`.
+  - The merged encoding's square holds, or the separator is returned.
+  - The dictionary, the segmentation, the family's selection and the boundary are all charged.
+- **Terrain acceptance.** The terrain is a uniquely decodable known-truth word source: a drawn
+  vocabulary emitted by a drawn tree source over word indices. The lattice must:
+  - recover every observed word that a future receiver can distinguish;
+  - release no spurious word;
+  - meet the declared source-code bound.
+- **Curated acceptance.** On the pinned validation families, the charged whole-stream code is
+  strictly shorter than the byte population's.
+- **Budget.** The lattice's size and work are preflighted.
+- **If either fails.** The bytes stay, and the word law's bounded terrain result is recorded.
+
+### F2. The field as a family (step 4; #73)
+
+- **Builds on.** `hnn::receiving`, `hnn::reference::expose`, `receiver::population` and its work
+  receipts.
+- **New.** A field family in `receiver::population`. Its learning covector is the declared target
+  minus its own face, while `q_population = Σ_f w_f P_f` scores the passage. Its declaration is
+  charged once, in the prior.
+- **Acceptance.** It is adopted for text only if both hold on the pinned validation families:
+  - the charged population code is strictly shorter than without the field;
+  - its complete work fits the declared response and passage budgets.
+
+  Field work, memory and code are reported separately.
+- **Budget.** At the recorded costs (card about 104 ms a two-cell window), a serial field-and-
+  population passage over the standing cut exceeds ten minutes. It is projected, and run as a
+  bounded probe if the projection fails.
+- **If it fails.** The field stays dormant for text, kept and not run, with the decision recorded.
+
+### F3. The resident population (step 5; #76)
+
+- **Scope.** The curated population's selected family, its mixture and its receipts, ported as a
+  bounded resident path. Each family that stays on the host is named, with its reason in #76.
+- **Acceptance.**
+  - Faces, code enclosures, deaths and receipts equal the host's on pinned fixtures and on one
+    curated passage.
+  - The report gives population-only card time against population-only host time, the transfer,
+    the peak card memory and the capacity census.
+  - Acceleration is claimed only if the resident path is faster within capacity.
+- **If no family completes resident.** F3 fails, and a host Athena may still proceed.
+
+### F4. Release (campaign 5 into step 8)
+
+- **Builds on.** `receiver::release`, the generic release law.
+- **New.** The population's text-release consumer.
+- **Law.** A request conditions the same face that scores a complete response, its stopping section
+  included: `P_release(y | request, Θ) = P_scored(y | request, Θ)`. Each release carries:
+  - its decoder;
+  - the keys;
+  - its causal provenance (the egg and keys that produced each face);
+  - the grain and fibre;
+  - a typed refusal where it declines.
+
+  `D E = ρ` and `E_next T = U E` are checked, or a separator is returned.
+- **Terrain acceptance.**
+  - Exact continuation is required only on deterministic terrain (the moiré, the arithmetic),
+    after a future-equivalent key is located.
+  - On stochastic terrain the conditional faces are compared with the known source, never one
+    drawn stream against its entropy.
+- **Curated.** Development responses are inspected against a request-aware retrieval control:
+  answering with the most similar earlier request's recorded response.
+- **Deadline.** A warm-response deadline is pinned.
+- **If it fails.** The machine is a predictor, not yet a releasing product.
+
+### F5. Athena-0: the first product outcome (step 8; #148)
+
+- **Definition.** A local interaction on this machine (one RTX 4080 SUPER of 16 GiB, 20 GB of RAM
+  admitted). It accepts a visible human request and its declared conversation context, and returns
+  a relevant, grounded text response or a justified refusal, with a receipt.
+- **Built for it** (the lessons record's requirements):
+  - one command vocabulary with human, JSON and JSONL views;
+  - one atomic checkpoint of standing, cursor and pending comparisons;
+  - exactly-once output and byte-identical resume;
+  - each response's numerical health (radius, robust count, operator bound, contraction),
+    provenance and costs by kind, refusing any face that covers the simplex;
+  - private sources and diagnostics kept owner-only.
+- **Gates before the evaluation partition opens.** The pinned retrospective requests and the
+  restart check pass on development.
+- **Evaluation, once.** On every eligible evaluation request, Athena releases before its recorded
+  reply is read. A frozen, blind rubric judges the releases: Brandon on a declared sample, or an
+  independent judge whose model and prompt are pinned before the split is read.
+- **Acceptance.**
+  - More than half of the outputs answer, or justifiably refuse; an answerable refusal counts as a
+    failure.
+  - The releases win more than they lose against the request-aware retrieval control built from
+    development only.
+  - Nothing private is disclosed.
+  - A warm response returns within one minute, within the declared memory limits.
+- **Reported beside it, not as acceptance.** The conditional code of the recorded replies, against
+  the request-blind population, PPM-2 and the flat tree.
+- **If any gate fails.** Athena-0 has not been reached.
+
+### F6. The motor chart (campaign 4; #27)
+
+- **Pinned before fitting.** A public recording, its skeleton, its units, the horizon, the split
+  and a constant-velocity control.
+- **New.** The HNN's motor consumer. It preserves the ordered screw transport and
+  `⟨w, Jθ̇⟩ = ⟨Jᵀw, θ̇⟩`, and releases a reachable endpoint at its declared grain or returns the
+  complete joint fibre and residual.
+- **Acceptance.** A held-out endpoint residual strictly smaller than the control's, within budget.
+- **Otherwise.** The exact geometry is reported, with no claim of motor usefulness.
+
+Alongside every item: the step 6 targets, the Lean owed in #62, and curation (#147).
 
 The standing cut has been reused for development and lies within the wide cut's held-out range.
 These are development receipts. The dataset's separate evaluation partition remains unspent.
@@ -437,7 +449,7 @@ archive root. Brandon's Metal port stays on its own branch, `codex/apple-silicon
    do-not-port list.
 5. **The resident HNN in `holonics-cuda::hnn`** (advancing with step 4 since September 25 by the rule "the hardware surfaces advance with the laws"; campaign 1's execution port runs resident, `holonics_cuda::hnn::Resident`, with every return equal to the host reference's). Kernels are ported per law under the hardware law,
    each with its parity check against the host reference. The device debts of #76 (#12–#15, #50)
-   are paid here.
+   are paid here. The resident population is [F3](#f3-the-resident-population-step-5-76).
 6. **Targets, physics and extraction.**
    - The targets continue as landmark discovery on the rebuilt library and their Lean. The egg's
      Legendre period and modular `j`, the Farey and Ford faces, the torus knots, the Fisher
@@ -458,7 +470,8 @@ archive root. Brandon's Metal port stays on its own branch, `codex/apple-silicon
      constructions, and the `BivariateSeries`/`LaurentBody` abbreviations, checked at their owners.
    - Fix stale owner citations when their consumer changes, with the atlas in the same commit.
 8. **Applications** (#148: a workbench, an Athena application, a simulator), rebuilt on the library
-   under the lessons record's requirements.
+   under the lessons record's requirements. The first outcome is [Athena-0, F5](#f5-athena-0-the-first-product-outcome-step-8-148),
+   after release by egg packing ([F4](#f4-release-campaign-5-into-step-8)).
    - An outcome is one of:
      - a trainable model;
      - a first usable Athena;
