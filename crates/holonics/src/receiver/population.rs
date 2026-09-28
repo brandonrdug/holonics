@@ -306,7 +306,7 @@ pub use boundary::{
     HazardPartition, HazardRest, LastByte, PartClock, PartPort, byte_index, dyadic_class,
 };
 pub use chase::{ChaseFamily, selected_fibre};
-pub use chaser::{MachineChaser, MachineDeclaration, MachineReceipt, Release};
+pub use chaser::{MachineChaser, MachineDeclaration, MachineReceipt, Plan, Release};
 pub use composition::{
     Composed, Conditioned, Keystone, Port, PortPath, PortReader, PortedEmitters, Unheld,
 };

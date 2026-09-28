@@ -614,6 +614,172 @@ pub fn capture_ticks(
 }
 
 // -------------------------------------------------------------------------------------------
+// the expected capture over a fibre of candidates
+
+/// [definition; agent-inferred] **A fibre's expected capture at a horizon** (U4's next loop): the
+/// members an adaptive chaser strategy leaves uncaptured within the horizon, then the sum of the
+/// captured members' capture ticks, ordered lexicographically (the fields' order): most members
+/// captured first, then the least sum.
+///
+/// [proved-derived] **Why a sum is the expectation.** The chaser's fibre is the population's
+/// selected fibre, the families of greatest and so equal posterior mass: the posterior is uniform on
+/// it, and each member's capture tick weighs `1/|Θ|`. Every move is compared over the same fibre, so
+/// the sums order the expectations exactly and no division is formed.
+///
+/// [proved-derived] **The Bellman recursion** ([`Basin::expected_ticks`]). On the belief state
+/// `(c, t, Θ_y)`, a class whose shared position lies within capture reads `(0, 0)`; at depth `0` an
+/// uncaptured class reads `(|Θ_y|, 0)`; otherwise
+///
+/// ```text
+/// V(c, t, Θ_y, j) = min_(u ∈ motions(c)) Σ_(y′) [ V(u, t + 1, Θ_(y y′), j − 1) + (0, |Θ_(y y′)| − U) ]
+/// ```
+///
+/// with `U` the child's uncaptured count: each member the child captures pays the move's tick. After
+/// the move the chaser reads the class the runner's cell names and plays each class on, so the
+/// classes' strategies are independent, and on the ordered group `ℤ²` in lexicographic order the
+/// least of a sum of independent choices is the sum of the least: the recursion is exact. It is
+/// the capture basin's recursion ([`Basin::capture_ticks`]) with the worst class replaced by the
+/// posterior's sum over the classes: the Bellman value at a unit price a tick, where the basin is
+/// its robust (worst-case) reading.
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq, PartialOrd, Ord, Hash)]
+pub struct ExpectedCapture {
+    pub uncaptured: usize,
+    pub ticks: usize,
+}
+
+impl ExpectedCapture {
+    /// The sum of two classes' readings.
+    fn plus(self, other: Self) -> Self {
+        Self {
+            uncaptured: self.uncaptured + other.uncaptured,
+            ticks: self.ticks + other.ticks,
+        }
+    }
+}
+
+/// [definition] **The expected capture's memo** within one decision: each belief node read at a
+/// depth and its value there, a quotient of the recursion's own nodes, dropped after the decision.
+#[derive(Clone, Debug, Default)]
+pub struct ExpectedMemo(HashMap<(Node, usize), ExpectedCapture>);
+
+impl ExpectedMemo {
+    /// The nodes read.
+    pub fn len(&self) -> usize {
+        self.0.len()
+    }
+
+    pub fn is_empty(&self) -> bool {
+        self.0.is_empty()
+    }
+}
+
+impl Basin<'_> {
+    /// **The expected capture of a class** ([`ExpectedCapture`]): the least over adaptive chaser
+    /// strategies from `chaser` at `tick`, within `depth` ticks, the class's candidates sharing their
+    /// observed motion.
+    pub fn expected_ticks(
+        &self,
+        memo: &mut ExpectedMemo,
+        chaser: Motion,
+        tick: u64,
+        class: &[Candidate],
+        depth: usize,
+    ) -> Result<ExpectedCapture, TerrainError> {
+        let Some(first) = class.first() else {
+            return Ok(ExpectedCapture::default());
+        };
+        if self
+            .pursuer
+            .captures(first.state.motion.position, chaser.position)
+        {
+            return Ok(ExpectedCapture::default());
+        }
+        if depth == 0 {
+            return Ok(ExpectedCapture {
+                uncaptured: class.len(),
+                ticks: 0,
+            });
+        }
+        let node: Node = (
+            chaser,
+            tick,
+            class.iter().map(|c| (c.index, c.state)).collect(),
+        );
+        if let Some(&value) = memo.0.get(&(node.clone(), depth)) {
+            return Ok(value);
+        }
+        let parts = classes(self.arena, self.moves, class, chaser.position, tick)?;
+        let mut best: Option<ExpectedCapture> = None;
+        for next in self
+            .pursuer
+            .motions(self.arena, self.disk, self.caps, &chaser)?
+        {
+            if let Some(value) = self.expected_after(memo, next, tick + 1, &parts, depth - 1, best)?
+            {
+                best = Some(value);
+            }
+        }
+        let value = best.ok_or_else(|| {
+            refuse(
+                "an expected capture",
+                "the chaser has an admitted motion (it can always stop)",
+            )
+        })?;
+        memo.0.insert((node, depth), value);
+        Ok(value)
+    }
+
+    /// **The expected capture of the classes after a move**: the sum over the classes, with the
+    /// chaser at `chaser` at `tick`, each captured member paying the move's tick; none when it cannot
+    /// fall strictly below `better`, a value already in hand (each class's least possible reading is
+    /// `(0, |Θ_y|)`, so the partial sum bounds the whole).
+    pub fn expected_after(
+        &self,
+        memo: &mut ExpectedMemo,
+        chaser: Motion,
+        tick: u64,
+        parts: &[(usize, Vec<Candidate>)],
+        depth: usize,
+        better: Option<ExpectedCapture>,
+    ) -> Result<Option<ExpectedCapture>, TerrainError> {
+        let mut rest: usize = parts.iter().map(|(_, class)| class.len()).sum();
+        let mut total = ExpectedCapture::default();
+        for (_, class) in parts {
+            let floor = total.plus(ExpectedCapture {
+                uncaptured: 0,
+                ticks: rest,
+            });
+            if better.is_some_and(|b| floor >= b) {
+                return Ok(None);
+            }
+            let child = self.expected_ticks(memo, chaser, tick, class, depth)?;
+            total = total.plus(ExpectedCapture {
+                uncaptured: child.uncaptured,
+                ticks: child.ticks + class.len() - child.uncaptured,
+            });
+            rest -= class.len();
+        }
+        Ok((!better.is_some_and(|b| total >= b)).then_some(total))
+    }
+}
+
+/// **The expected capture of a fibre's move** ([`ExpectedCapture`]): with the fibre split into its
+/// classes at tick `tick` against the chaser's present position, the chaser's move to `next` and
+/// the least adaptive strategy after it, within `1 + depth` ticks.
+pub fn expected_ticks(
+    basin: &Basin<'_>,
+    memo: &mut ExpectedMemo,
+    parts: &[(usize, Vec<Candidate>)],
+    next: Motion,
+    tick: u64,
+    depth: usize,
+) -> Result<ExpectedCapture, TerrainError> {
+    Ok(basin
+        .expected_after(memo, next, tick + 1, parts, depth, None)?
+        .expect("an unbounded reading is always returned"))
+}
+
+// -------------------------------------------------------------------------------------------
 // the chasers
 
 /// [definition] **What a chaser reads at a tick**: the ports (its own motions written so far, the

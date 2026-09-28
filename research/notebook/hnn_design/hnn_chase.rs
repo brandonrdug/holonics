@@ -10,7 +10,15 @@
 //! cargo run --release -p holonics --example hnn_chase             # the reception phase
 //! cargo run --release -p holonics --example hnn_chase -- choose   # the action phase's choosing sweep
 //! cargo run --release -p holonics --example hnn_chase -- action   # the action phase's acceptance
+//! cargo run --release -p holonics --example hnn_chase -- diagnose [seeds]   # U4: the failure located
+//! cargo run --release -p holonics --example hnn_chase -- fresh    # U4: the fresh population
 //! ```
+//!
+//! [definition; agent-inferred] **U4's next loop.** `diagnose` reads the machine's passage tick by
+//! tick against the truth-only basin and prints every admitted move's readings at each tick whose
+//! release raises the truth's least capture. `choose`'s fourth rung is the plan
+//! (`robust,certified-expected,expected`). `fresh` runs the pinned fresh population against its
+//! predeclared criteria ([`fresh`]).
 //!
 //! [definition; agent-inferred] **The declaration** (the tests' own, `chase_tests.rs`): a `16 × 16`
 //! arena of `4 × 4` friction patches, classes ice `1/2`, grass `1` and track `3/2`, `g = 8`,
@@ -65,6 +73,7 @@
 #[path = "exterior.rs"]
 mod exterior;
 
+use std::sync::Arc;
 use std::time::Instant;
 
 use holonics::compression::landmark::context::{
@@ -72,16 +81,17 @@ use holonics::compression::landmark::context::{
 };
 use holonics::geometry::motion::{Move, MoveKind};
 use holonics::holarchy::terrain::{
-    ActionDeclaration, ActionPassage, ArenaDeclaration, Basin, BasinMemo, Candidate, Chase,
-    ConstantBearing, Evasion, Motion, Moves, PurePursuit, Pursuer, RunnerFamily, RunnerLaw,
-    RunnerState, act_drawn,
+    ActionDeclaration, ActionPassage, ArenaDeclaration, Basin, BasinMemo, Candidate, CaptureReach,
+    Chase, ChasePorts, ChaseView, Chaser, ConstantBearing, Evasion, ExpectedCapture, ExpectedMemo,
+    Motion, Moves, PurePursuit, Pursuer, RunnerFamily, RunnerLaw, RunnerState, act_drawn,
+    capture_ticks, classes, expected_ticks, viable_tube,
 };
 use holonics::ratio::algebraic::ExactInterval;
 use holonics::ratio::surprisal::SymbolicSurprisal;
 use holonics::ratio::{Rat, rat};
 use holonics::receiver::population::{
-    ChaseFamily, Family, MachineChaser, MachineDeclaration, MachineReceipt, Population, Posterior,
-    Release, TreeFamily, selected_fibre,
+    ChaseFamily, Family, MachineChaser, MachineDeclaration, MachineReceipt, Plan, Population,
+    PopulationError, Posterior, Release, TreeFamily, selected_fibre,
 };
 use num_bigint::{BigInt, BigUint};
 
@@ -118,6 +128,21 @@ const RECEIPT_HORIZON: usize = 4;
 
 /// The truth-only basin's reading limit.
 const OPTIMUM_LIMIT: usize = 16;
+
+/// [definition; agent-inferred, pinned before the run] **The fresh population** (U4's next loop):
+/// the seeds `FRESH_SEED + s`, `s < FRESH_SEEDS`, a declared contiguous range disjoint from the
+/// acceptance seeds (`SEED + s`) and the choosing seeds (`CHOOSING_SEED + s`), none read before this
+/// pin and none selected by any property. `64 = 2⁶` seeds: the run was projected at about four
+/// minutes against the ten-minute budget from the choosing sweep's work.
+const FRESH_SEED: u64 = 20_261_101;
+const FRESH_SEEDS: u64 = 64;
+
+/// [definition; agent-inferred, chosen on the choosing seeds and pinned before the run] **The
+/// candidate**: the expected plan (`receiver::population::chaser::Plan::Expected`) at the machine's
+/// pinned `n`, `m` and `d`. On the choosing seeds at `n = 2, m = 12, d = 0` the robust plan summed 150
+/// capture ticks, the certified-then-expected plan 148 and the expected plan 147; the least sum
+/// chooses.
+const CANDIDATE_PLAN: Plan = Plan::Expected;
 
 /// The passage `2^8` ticks.
 const TICKS: usize = 1 << 8;
@@ -217,20 +242,503 @@ fn main() {
     match mode.first().map(String::as_str) {
         Some("choose") => choose(&mode[1..]),
         Some("action") => action(mode.get(1).is_some_and(|a| a == "trace")),
+        Some("diagnose") => diagnose(&mode[1..]),
+        Some("fresh") => fresh(),
         _ => reception(),
     }
 }
 
-/// The machine of a declaration.
-fn machine(horizon: usize, basin: usize, price: u64) -> MachineChaser {
-    MachineChaser::new(MachineDeclaration {
-        family: family(),
-        escape: ESCAPE,
-        horizon,
-        basin,
-        price,
-    })
+// -------------------------------------------------------------------------------------------
+// U4's next loop: the measured failure located
+
+/// [definition; agent-inferred] **The diagnosis's truth-only reading limit**: the truth's least
+/// capture through each admitted move is read to at most this many ticks (above every least the
+/// acceptance seeds read, `14`).
+const DIAGNOSIS_LIMIT: usize = 24;
+
+/// [definition; agent-inferred] **An admitted move's readings at a tick** (U4's next loop, the
+/// diagnosis; readings of the machine's own laws, not a change of its rule): the machine's four
+/// (the fibre's capture basin `b(u)` at its horizon `m`, the cornering `K(u)`, the nearness `N(u)`
+/// and the information product `∏_c |c|^|c|`), the truth's own least capture through the move
+/// (`1 +` the truth-only basin from the joint state after it), and the capture basin at `m` over
+/// the leading class alone (the class the machine predicts) and over the truth's class alone.
+struct MoveRow {
+    next: Motion,
+    truth: Option<usize>,
+    fibre: Option<usize>,
+    cornering: usize,
+    nearness: i64,
+    information: BigUint,
+    lead: Option<usize>,
+    own: Option<usize>,
+    sum: ExpectedCapture,
+}
+
+/// [definition] **A tick's diagnosis**: the fibre's size and classes, the release, the chosen move's
+/// row, the truth's least capture from the present joint state, and every admitted move's row.
+struct TickRow {
+    tick: usize,
+    fibre: usize,
+    classes: usize,
+    release: Release,
+    chosen: usize,
+    now: Option<usize>,
+    rows: Vec<MoveRow>,
+}
+
+impl TickRow {
+    /// **A regret tick**: the chosen move's truth-only capture exceeds the present least.
+    fn regret(&self) -> bool {
+        match (self.now, self.rows[self.chosen].truth) {
+            (Some(now), Some(via)) => via > now,
+            (Some(_), None) => true,
+            _ => false,
+        }
+    }
+}
+
+/// [definition; agent-inferred] **The traced machine**: the machine itself decides and receives;
+/// beside it, each candidate's state is carried past the received cells (as the machine carries
+/// them), and each tick's readings are taken on the machine's fibre before it releases. The
+/// diagnosis checks that the machine's commit order on these readings returns the move the machine
+/// released at every certified and committed tick.
+struct Traced {
+    inner: MachineChaser,
+    truth: usize,
+    candidates: Vec<Candidate>,
+    ports: Option<Arc<ChasePorts>>,
+    ticks: Vec<TickRow>,
+}
+
+impl Chaser for Traced {
+    type Error = PopulationError;
+
+    fn label(&self) -> String {
+        self.inner.label()
+    }
+
+    fn open(&mut self, ports: &Arc<ChasePorts>, pursuer: &Pursuer) -> Result<(), PopulationError> {
+        self.inner.open(ports, pursuer)?;
+        self.candidates = Candidate::opening(&family(), &ports.arena, ports.opening.position)?;
+        self.ports = Some(Arc::clone(ports));
+        self.ticks.clear();
+        Ok(())
+    }
+
+    fn decide(&mut self, view: &ChaseView<'_>) -> Result<Motion, PopulationError> {
+        let indices = self.inner.fibre();
+        let released = self.inner.decide(view)?;
+        let release = *self.inner.receipt().releases.last().expect("a release");
+        let ports = Arc::clone(self.ports.as_ref().expect("opened"));
+        let (arena, moves, pursuer) = (&ports.arena, &ports.moves, view.pursuer);
+        let caps = pursuer.law.caps(arena.declaration())?;
+        let disk = Moves::within(caps.top())?;
+        let basin = Basin {
+            arena,
+            moves,
+            pursuer,
+            caps: &caps,
+            disk: &disk,
+        };
+        let tick = view.tick as u64;
+        let fibre: Vec<Candidate> = indices
+            .iter()
+            .map(|&i| self.candidates[i].clone())
+            .collect();
+        let plural = fibre.len() > 1;
+        let parts = classes(arena, moves, &fibre, view.chaser.position, tick)?;
+        let truth = [self.candidates[self.truth].clone()];
+        let truth_parts = classes(arena, moves, &truth, view.chaser.position, tick)?;
+        let lead = parts
+            .iter()
+            .max_by(|a, b| a.1.len().cmp(&b.1.len()).then(b.0.cmp(&a.0)))
+            .map(|part| vec![part.clone()])
+            .expect("a nonempty fibre");
+        let own: Vec<_> = parts
+            .iter()
+            .filter(|(_, class)| class.iter().any(|c| c.index == self.truth))
+            .cloned()
+            .collect();
+        let (mut memo, mut truth_memo) = (BasinMemo::default(), BasinMemo::default());
+        let mut expected_memo = ExpectedMemo::default();
+        let now = basin.capture_ticks(&mut truth_memo, view.chaser, tick, &truth, DIAGNOSIS_LIMIT)?;
+        let admitted = view.admitted()?;
+        let mut rows = Vec::with_capacity(admitted.len());
+        for &next in &admitted {
+            let fibre_b = capture_ticks(&basin, &mut memo, &parts, next, tick, BASIN_HORIZON - 1)?;
+            let truth_b = capture_ticks(
+                &basin,
+                &mut truth_memo,
+                &truth_parts,
+                next,
+                tick,
+                DIAGNOSIS_LIMIT - 1,
+            )?;
+            let lead_b = capture_ticks(&basin, &mut memo, &lead, next, tick, BASIN_HORIZON - 1)?;
+            let own_b = if own.is_empty() {
+                None
+            } else {
+                capture_ticks(&basin, &mut memo, &own, next, tick, BASIN_HORIZON - 1)?
+            };
+            let sum = expected_ticks(
+                &basin,
+                &mut expected_memo,
+                &parts,
+                next,
+                tick,
+                BASIN_HORIZON - 1,
+            )?;
+            let reach = CaptureReach::of(arena, pursuer, &caps, &disk, next, TUBE_HORIZON)?;
+            let (mut cornering, mut nearness, mut sizes) = (0usize, 0i64, Vec::new());
+            for (_, class) in &parts {
+                let motion = class[0].state.motion;
+                let gap = [
+                    motion.position[0] - next.position[0],
+                    motion.position[1] - next.position[1],
+                ];
+                nearness += (gap[0] * gap[0] + gap[1] * gap[1]) * class.len() as i64;
+                if !pursuer.captures(motion.position, next.position) {
+                    for member in class {
+                        cornering +=
+                            viable_tube(arena, &member.law.caps, motion, member.state.held, &reach)?
+                                .size();
+                    }
+                }
+                if plural {
+                    for (_, split) in classes(arena, moves, class, next.position, tick + 1)? {
+                        sizes.push(split.len());
+                    }
+                }
+            }
+            let information = sizes.iter().fold(BigUint::from(1u32), |product, &size| {
+                product * BigUint::from(size).pow(size as u32)
+            });
+            rows.push(MoveRow {
+                next,
+                truth: truth_b,
+                fibre: fibre_b,
+                cornering,
+                nearness,
+                information,
+                lead: lead_b,
+                own: own_b,
+                sum,
+            });
+        }
+        let chosen = admitted
+            .iter()
+            .position(|&m| m == released)
+            .expect("the machine releases an admitted move");
+        if release != Release::Probe {
+            let commit = (0..rows.len())
+                .min_by_key(|&i| {
+                    let r = &rows[i];
+                    (r.fibre.is_none(), r.fibre, r.cornering, r.nearness)
+                })
+                .expect("a nonempty admitted set");
+            assert_eq!(commit, chosen, "the diagnosis reads the machine's commit order");
+        }
+        self.ticks.push(TickRow {
+            tick: view.tick,
+            fibre: fibre.len(),
+            classes: parts.len(),
+            release,
+            chosen,
+            now,
+            rows,
+        });
+        Ok(released)
+    }
+
+    fn receive(&mut self, cell: usize) -> Result<(), PopulationError> {
+        self.inner.receive(cell)?;
+        let ports = self.ports.as_ref().expect("opened");
+        self.candidates = self
+            .candidates
+            .iter()
+            .map(|candidate| candidate.receive(&ports.arena, &ports.moves, cell))
+            .collect::<Result<_, _>>()?;
+        Ok(())
+    }
+}
+
+/// A win, tie or loss of `a` against `b` in capture ticks (fewer wins): `0`, `1` or `2`.
+fn outcome(a: usize, b: usize) -> usize {
+    match a.cmp(&b) {
+        std::cmp::Ordering::Less => 0,
+        std::cmp::Ordering::Equal => 1,
+        std::cmp::Ordering::Greater => 2,
+    }
+}
+
+/// `w/t/l` of a count triple.
+fn wtl(counts: &[usize; 3]) -> String {
+    format!("{}/{}/{}", counts[0], counts[1], counts[2])
+}
+
+/// [definition; agent-inferred, pinned before the run] **The fresh population's run** (U4's next
+/// loop; THE_REBUILD U4, "F6's action acceptance stays as written"). On each seed of the fresh
+/// population ([`FRESH_SEED`]), four chasers from the reception's draw under the same traction
+/// bound: the machine under its robust plan (the current rule), the candidate ([`CANDIDATE_PLAN`]),
+/// pure pursuit and constant bearing; each capture tick counts the cap `2^9` when uncaptured. The
+/// truth-only basin's least capture `L` is read to the least of the four captures, which bounds it
+/// (each chaser's realized word is a strategy that knows nothing the truth-only basin lacks). The
+/// criteria, declared before the run:
+/// - **aggregate capture ticks**, `Σ T` for each chaser;
+/// - **the sum of regrets** to the truth-only least, `Σ (T − L)`, for each chaser;
+/// - **win/tie/loss** (strictly fewer ticks, equal, more) of each machine against pure pursuit,
+///   against constant bearing, and against both at once (against the lesser of the two on the
+///   seed), and of the candidate against the robust machine;
+/// - **F6's action acceptance as written**, for each machine: strictly fewer ticks than both
+///   controls in sum, and strictly fewer than both on more than half of the seeds;
+/// - **the candidate against the current machine**: it improves on it exactly when its aggregate
+///   capture ticks are strictly fewer and it wins more seeds against it than it loses.
+///
+/// Reported separately, as a conditional reading and never as the acceptance: the seeds whose
+/// truth-only least lies strictly below both controls (a win beyond every control is admitted),
+/// with each machine's win/tie/loss against both at once and its regret sum on them.
+fn fresh() {
+    let declaration = declaration();
+    let family = family();
+    let action = ActionDeclaration {
+        pursuer: pursuer(),
+        ticks: ACTION_TICKS,
+        horizon: RECEIPT_HORIZON,
+    };
+    println!(
+        "hnn_chase fresh: the fresh population {FRESH_SEED} + s, s < {FRESH_SEEDS}; the machine n = {TUBE_HORIZON}, m = {BASIN_HORIZON}, d = {PRICE}, escape 2^(−{ESCAPE}); the candidate plan {}; passages of at most {ACTION_TICKS} = 2^9 ticks",
+        CANDIDATE_PLAN.label()
+    );
+    let names = [
+        "the machine (robust)",
+        "the candidate",
+        "pure pursuit",
+        "constant bearing",
+    ];
+    let started = Instant::now();
+    let (mut sums, mut regrets) = ([0usize; 4], [0usize; 4]);
+    // Per machine (robust, candidate): against pursuit, bearing, both at once; win/tie/loss.
+    let mut against = [[[0usize; 3]; 3]; 2];
+    let mut head = [0usize; 3];
+    let (mut admitting, mut conditional, mut conditional_regrets) =
+        (0usize, [[0usize; 3]; 2], [0usize; 2]);
+    let mut releases = [[0usize; 3]; 2];
+    for s in 0..FRESH_SEEDS {
+        let seed = FRESH_SEED + s;
+        let mut robust = machine(TUBE_HORIZON, BASIN_HORIZON, PRICE, Plan::Robust);
+        let r = act_drawn(&declaration, &family, &action, seed, &mut robust).expect("the machine");
+        let mut candidate = machine(TUBE_HORIZON, BASIN_HORIZON, PRICE, CANDIDATE_PLAN);
+        let e =
+            act_drawn(&declaration, &family, &action, seed, &mut candidate).expect("the candidate");
+        let p = act_drawn(&declaration, &family, &action, seed, &mut PurePursuit).expect("pursuit");
+        let b =
+            act_drawn(&declaration, &family, &action, seed, &mut ConstantBearing).expect("bearing");
+        for (total, receipt) in releases
+            .iter_mut()
+            .zip([robust.receipt(), candidate.receipt()])
+        {
+            for (count, release) in total
+                .iter_mut()
+                .zip([Release::Certified, Release::Commit, Release::Probe])
+            {
+                *count += receipt.count(release);
+            }
+        }
+        let ticks = [r.ticks(), e.ticks(), p.ticks(), b.ticks()];
+        let limit = *ticks.iter().min().expect("four");
+        let least = least_capture(seed, limit).expect("the least lies within every capture");
+        for i in 0..4 {
+            sums[i] += ticks[i];
+            regrets[i] += ticks[i] - least;
+        }
+        let best_control = ticks[2].min(ticks[3]);
+        let admits = least < best_control;
+        admitting += usize::from(admits);
+        for m in 0..2 {
+            against[m][0][outcome(ticks[m], ticks[2])] += 1;
+            against[m][1][outcome(ticks[m], ticks[3])] += 1;
+            against[m][2][outcome(ticks[m], best_control)] += 1;
+            if admits {
+                conditional[m][outcome(ticks[m], best_control)] += 1;
+                conditional_regrets[m] += ticks[m] - least;
+            }
+        }
+        head[outcome(ticks[1], ticks[0])] += 1;
+        println!(
+            "seed {seed}: the truth [{}] {}; capture robust {}, candidate {}, pursuit {}, bearing {}; least {least}{}",
+            r.index,
+            r.runner.label(),
+            capture_line(&r),
+            capture_line(&e),
+            capture_line(&p),
+            capture_line(&b),
+            if admits {
+                "; admits a win beyond both controls"
+            } else {
+                ""
+            }
+        );
+    }
+    println!();
+    println!(
+        "over {FRESH_SEEDS} seeds ({} ms): capture ticks in sum {} {}, {} {}, {} {}, {} {} (an uncaptured passage counts its cap {ACTION_TICKS})",
+        started.elapsed().as_millis(),
+        names[0],
+        sums[0],
+        names[1],
+        sums[1],
+        names[2],
+        sums[2],
+        names[3],
+        sums[3]
+    );
+    println!(
+        "  the sum of regrets to the truth-only least: {} {}, {} {}, {} {}, {} {}",
+        names[0], regrets[0], names[1], regrets[1], names[2], regrets[2], names[3], regrets[3]
+    );
+    for m in 0..2 {
+        println!(
+            "  {} win/tie/loss: against pure pursuit {}, against constant bearing {}, against both at once {}; releases certified/commit/probe {:?}",
+            names[m],
+            wtl(&against[m][0]),
+            wtl(&against[m][1]),
+            wtl(&against[m][2]),
+            releases[m]
+        );
+    }
+    println!(
+        "  the candidate against the robust machine, win/tie/loss: {}",
+        wtl(&head)
+    );
+    let verdict = |passed: bool| if passed { "passed" } else { "not passed" };
+    for m in 0..2 {
+        let passed = sums[m] < sums[2]
+            && sums[m] < sums[3]
+            && 2 * against[m][2][0] > FRESH_SEEDS as usize;
+        println!(
+            "  F6's action acceptance as written, {}: {}",
+            names[m],
+            verdict(passed)
+        );
+    }
+    println!(
+        "  the candidate improves on the current machine (fewer ticks in sum, more seeds won than lost against it): {}",
+        verdict(sums[1] < sums[0] && head[0] > head[2])
+    );
+    println!(
+        "  conditional reading (not the acceptance): {admitting} seeds admit a win beyond both controls; on them win/tie/loss against both at once {} {}, {} {}; regret sums {} / {}",
+        names[0],
+        wtl(&conditional[0]),
+        names[1],
+        wtl(&conditional[1]),
+        conditional_regrets[0],
+        conditional_regrets[1]
+    );
+}
+
+/// An optional tick count, `·` for none.
+fn opt(value: Option<usize>) -> String {
+    value.map_or("·".to_string(), |v| v.to_string())
+}
+
+/// **The diagnosis** (U4's next loop): on each named seed (the acceptance seeds by default), the
+/// machine's passage read tick by tick against the truth-only basin; every tick whose release
+/// raises the truth's least capture is printed with every admitted move's readings.
+fn diagnose(args: &[String]) {
+    let seeds: Vec<u64> = if args.is_empty() {
+        (0..SEEDS).map(|s| SEED + s).collect()
+    } else {
+        args.iter().map(|a| a.parse().expect("a seed")).collect()
+    };
+    let declaration = declaration();
+    let family = family();
+    let action = ActionDeclaration {
+        pursuer: pursuer(),
+        ticks: ACTION_TICKS,
+        horizon: RECEIPT_HORIZON,
+    };
+    println!(
+        "hnn_chase diagnose: the machine n = {TUBE_HORIZON}, m = {BASIN_HORIZON}, d = {PRICE}; the truth-only basin read to {DIAGNOSIS_LIMIT} ticks; rows: position, velocity, the truth's capture through the move, b over the fibre, b over the leading class, b over the truth's class, K, N, ∏|c|^|c|"
+    );
+    for seed in seeds {
+        let (index, _, _) = Chase::drawn(&declaration, &family, seed).expect("a draw");
+        let mut traced = Traced {
+            inner: machine(TUBE_HORIZON, BASIN_HORIZON, PRICE, Plan::Robust),
+            truth: index,
+            candidates: Vec::new(),
+            ports: None,
+            ticks: Vec::new(),
+        };
+        let started = Instant::now();
+        let passage =
+            act_drawn(&declaration, &family, &action, seed, &mut traced).expect("the machine");
+        println!();
+        println!(
+            "seed {seed}: the truth [{index}] {}; the machine captures at {}; the truth-only least from the opening {} ({} ms)",
+            passage.runner.label(),
+            capture_line(&passage),
+            opt(traced.ticks.first().and_then(|t| t.now)),
+            started.elapsed().as_millis()
+        );
+        for row in &traced.ticks {
+            let chosen = &row.rows[row.chosen];
+            println!(
+                "  t {:>2}: |Θ| {:>2} in {:>2} classes; {:?}; to {:?} v {:?}; the truth's least now {}, through the release {}{}",
+                row.tick,
+                row.fibre,
+                row.classes,
+                row.release,
+                chosen.next.position,
+                chosen.next.velocity,
+                opt(row.now),
+                opt(chosen.truth),
+                if row.regret() { "  ← regret" } else { "" }
+            );
+            if row.regret() {
+                for (i, r) in row.rows.iter().enumerate() {
+                    println!(
+                        "      {} {:?} v {:>7}: truth {:>2}, b {:>2}, lead {:>2}, own {:>2}, S {:?}, K {:>6}, N {:>5}, ∏ {}",
+                        if i == row.chosen { "*" } else { " " },
+                        r.next.position,
+                        format!("{:?}", r.next.velocity),
+                        opt(r.truth),
+                        opt(r.fibre),
+                        opt(r.lead),
+                        opt(r.own),
+                        (r.sum.uncaptured, r.sum.ticks),
+                        r.cornering,
+                        r.nearness,
+                        r.information
+                    );
+                }
+            }
+        }
+    }
+}
+
+/// The machine of a declaration under a plan.
+fn machine(horizon: usize, basin: usize, price: u64, plan: Plan) -> MachineChaser {
+    MachineChaser::planning(
+        MachineDeclaration {
+            family: family(),
+            escape: ESCAPE,
+            horizon,
+            basin,
+            price,
+        },
+        plan,
+    )
     .expect("a declared machine")
+}
+
+/// A plan by its name: `robust`, `certified-expected` or `expected`.
+fn plan_named(name: &str) -> Plan {
+    match name {
+        "robust" => Plan::Robust,
+        "certified-expected" => Plan::CertifiedExpected,
+        "expected" => Plan::Expected,
+        other => panic!("no plan named {other}"),
+    }
 }
 
 /// **One seed's three passages**: the machine at a tube horizon, basin horizon and price, pure
@@ -241,6 +749,7 @@ fn passages(
     horizon: usize,
     basin: usize,
     price: u64,
+    plan: Plan,
 ) -> ([ActionPassage; 3], MachineReceipt, usize, u128) {
     let declaration = declaration();
     let family = family();
@@ -250,7 +759,7 @@ fn passages(
         horizon: RECEIPT_HORIZON,
     };
     let started = Instant::now();
-    let mut chaser = machine(horizon, basin, price);
+    let mut chaser = machine(horizon, basin, price, plan);
     let m = act_drawn(&declaration, &family, &action, seed, &mut chaser).expect("the machine");
     let ms = started.elapsed().as_millis();
     let fibre = chaser.fibre().len();
@@ -276,23 +785,28 @@ fn choose(args: &[String]) {
     let horizons: Vec<usize> = ladder(args.first(), &[2, 3, 4]);
     let basins: Vec<usize> = ladder(args.get(1), &[4, 8, 12, 16]);
     let prices: Vec<u64> = ladder(args.get(2), &[0]);
+    let plans: Vec<Plan> = args
+        .get(3)
+        .map_or(vec![Plan::Robust], |a| a.split(',').map(plan_named).collect());
     println!(
         "hnn_chase choose: choosing seeds {CHOOSING_SEED} + s, s < {SEEDS}; passages of at most {ACTION_TICKS} = 2^9 ticks"
     );
     for &horizon in &horizons {
         for &basin in &basins {
             for &price in &prices {
+              for &plan in &plans {
                 let started = Instant::now();
-                let (mut sums, mut wins) = ([0usize; 3], [0usize; 2]);
+                let (mut sums, mut wins) = ([0usize; 3], [0usize; 3]);
                 let mut line = Vec::new();
                 for s in 0..SEEDS {
                     let ([m, p, b], receipt, _, _) =
-                        passages(CHOOSING_SEED + s, horizon, basin, price);
+                        passages(CHOOSING_SEED + s, horizon, basin, price, plan);
                     for (sum, passage) in sums.iter_mut().zip([&m, &p, &b]) {
                         *sum += passage.ticks();
                     }
                     wins[0] += usize::from(m.ticks() < p.ticks());
                     wins[1] += usize::from(m.ticks() < b.ticks());
+                    wins[2] += usize::from(m.ticks() < p.ticks() && m.ticks() < b.ticks());
                     line.push(format!(
                         "[{}] {}/{}/{} p{}",
                         m.index,
@@ -303,15 +817,18 @@ fn choose(args: &[String]) {
                     ));
                 }
                 println!(
-                    "n = {horizon}, m = {basin}, d = {price}: capture ticks in sum machine {}, pursuit {}, bearing {}; seeds won {} against pursuit, {} against bearing, of {SEEDS}; {} ms",
+                    "n = {horizon}, m = {basin}, d = {price}, plan {}: capture ticks in sum machine {}, pursuit {}, bearing {}; seeds won {} against pursuit, {} against bearing, {} against both, of {SEEDS}; {} ms",
+                    plan.label(),
                     sums[0],
                     sums[1],
                     sums[2],
                     wins[0],
                     wins[1],
+                    wins[2],
                     started.elapsed().as_millis()
                 );
                 println!("  machine/pursuit/bearing: {}", line.join("  "));
+              }
             }
         }
     }
@@ -503,7 +1020,8 @@ fn action(trace: bool) {
     let mut readings = [MoveReading::default(); 3];
     for s in 0..SEEDS {
         let seed = SEED + s;
-        let (runs, receipt, fibre, ms) = passages(seed, TUBE_HORIZON, BASIN_HORIZON, PRICE);
+        let (runs, receipt, fibre, ms) =
+            passages(seed, TUBE_HORIZON, BASIN_HORIZON, PRICE, Plan::Robust);
         let [m, p, b] = &runs;
         println!();
         println!("seed {seed}: the truth [{}] {}", m.index, m.runner.label());

@@ -23,7 +23,7 @@ use crate::compression::landmark::context::{
 use crate::ratio::algebraic::ExactInterval;
 use crate::ratio::{Rat, rat};
 use crate::receiver::population::{
-    ChaseFamily, Family, MachineChaser, MachineDeclaration, Population, Posterior, Release,
+    ChaseFamily, Family, MachineChaser, MachineDeclaration, Plan, Population, Posterior, Release,
     TreeFamily, selected_fibre,
 };
 
@@ -767,6 +767,18 @@ fn every_chaser_motion_satisfies_its_traction_bound() {
         }
         check(&act_drawn(&declaration, &family, &action, seed, &mut PurePursuit).unwrap());
         check(&act_drawn(&declaration, &family, &action, seed, &mut ConstantBearing).unwrap());
+        let mut expected = MachineChaser::planning(
+            MachineDeclaration {
+                family: family.clone(),
+                escape: ESCAPE,
+                horizon: 2,
+                basin: 6,
+                price: 0,
+            },
+            Plan::Expected,
+        )
+        .unwrap();
+        check(&act_drawn(&declaration, &family, &action, seed, &mut expected).unwrap());
     }
     let weak = Pursuer {
         law: RunnerLaw {
@@ -779,6 +791,86 @@ fn every_chaser_motion_satisfies_its_traction_bound() {
         !weak.stops(&declaration).unwrap(),
         "on ice it cannot brake from a diagonal"
     );
+}
+
+/// **The expected capture reads every member at its weight** (`pursuit::ExpectedCapture`): on one
+/// member it is that member's least capture (the capture basin on it alone), or one uncaptured
+/// member past the horizon; on the opening's whole fibre it never captures more members than their
+/// own leasts allow and never sums fewer ticks than their own leasts; on a pair of members (one
+/// constitution and navigator, two slip holds) that the capture basin certifies within `b` ticks,
+/// it captures both, within `2b` ticks in sum and no fewer than their own leasts.
+#[test]
+fn the_expected_capture_reads_every_member_at_its_weight() {
+    let declaration = declaration();
+    let family = family();
+    let pursuer = pursuer();
+    let caps = pursuer.law.caps(&declaration).unwrap();
+    let disk = Moves::within(caps.top()).unwrap();
+    let moves = family.moves(&declaration).unwrap();
+    let depth = 5;
+    let mut certified = 0;
+    for seed in [20_261_001u64, 20_261_007, 20_261_014] {
+        let (_, arena, openings) = Chase::drawn(&declaration, &family, seed).unwrap();
+        let basin = Basin {
+            arena: &arena,
+            moves: &moves,
+            pursuer: &pursuer,
+            caps: &caps,
+            disk: &disk,
+        };
+        let chaser = Motion::rest(openings[1]);
+        let fibre = Candidate::opening(&family, &arena, openings[0]).unwrap();
+        let (mut memo, mut expected_memo) = (BasinMemo::default(), ExpectedMemo::default());
+        let mut own = Vec::new();
+        for member in &fibre {
+            let one = std::slice::from_ref(member);
+            let least = basin
+                .capture_ticks(&mut memo, chaser, 0, one, depth)
+                .unwrap();
+            let reading = basin
+                .expected_ticks(&mut expected_memo, chaser, 0, one, depth)
+                .unwrap();
+            let alone = match least {
+                Some(ticks) => ExpectedCapture {
+                    uncaptured: 0,
+                    ticks,
+                },
+                None => ExpectedCapture {
+                    uncaptured: 1,
+                    ticks: 0,
+                },
+            };
+            assert_eq!(reading, alone, "seed {seed}, member {}", member.index);
+            own.push(least);
+        }
+        let whole = basin
+            .expected_ticks(&mut expected_memo, chaser, 0, &fibre, depth)
+            .unwrap();
+        let beyond = own.iter().filter(|least| least.is_none()).count();
+        assert!(whole.uncaptured >= beyond, "seed {seed}");
+        if whole.uncaptured == beyond {
+            let floor: usize = own.iter().flatten().sum();
+            assert!(whole.ticks >= floor, "seed {seed}");
+        }
+        // The hold is the third digit of the family's mixed radix (weight 2·2 = 4).
+        for low in (0..fibre.len()).filter(|&i| (i / 4) % 2 == 0) {
+            let pair = [fibre[low].clone(), fibre[low + 4].clone()];
+            let reading = basin
+                .expected_ticks(&mut expected_memo, chaser, 0, &pair, depth)
+                .unwrap();
+            if let Some(b) = basin
+                .capture_ticks(&mut memo, chaser, 0, &pair, depth)
+                .unwrap()
+            {
+                certified += 1;
+                assert_eq!(reading.uncaptured, 0, "seed {seed}, pair {low}");
+                assert!(reading.ticks <= 2 * b, "seed {seed}, pair {low}");
+                let floor = own[low].unwrap() + own[low + 4].unwrap();
+                assert!(reading.ticks >= floor, "seed {seed}, pair {low}");
+            }
+        }
+    }
+    assert!(certified > 0, "some pair is certified within the depth");
 }
 
 /// A chaser outside its traction bound is refused by name.

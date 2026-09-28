@@ -73,8 +73,9 @@ pub use crib::{CribTruth, RotorCrib, rotor_crib};
 pub use moire::{Grating, Moire, MoireClass, MoireFamily, MoireTruth, PairLock};
 pub use pursuit::{
     ActionDeclaration, ActionPassage, Basin, BasinMemo, Candidate, CandidateLaw, CaptureReach,
-    ChaseView, Chaser, ConstantBearing, PurePursuit, TUBE_STATE_LIMIT, ViableLayers, ViableTube,
-    act, act_drawn, capture_ticks, classes, viable_layers, viable_tube,
+    ChaseView, Chaser, ConstantBearing, ExpectedCapture, ExpectedMemo, PurePursuit,
+    TUBE_STATE_LIMIT, ViableLayers, ViableTube, act, act_drawn, capture_ticks, classes,
+    expected_ticks, viable_layers, viable_tube,
 };
 pub use source::{
     ContextTree, Passage, Recovery, TreeSource, TreeSourceFamily, TreeSourceTruth, WeightingBound,
