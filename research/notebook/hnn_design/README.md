@@ -2577,3 +2577,34 @@ leaves 36 passages uncaptured by `2^9` with the switches on (32 off), each count
   three-channel menu over `ℤ/4` as its instance; the lagged capture basin is the Pre recursion of the
   lagged information structure (and equals the unlagged one at `d = 0`); the attribution's split
   `q − p_act = (q − p_con) + (p_con − p_act)` with deposition consuming `q − p_con` alone.
+
+### Residual-founded transport discovery on the moiré (September 28)
+
+`hnn_population.rs`'s `birth`, `birth-probe` and `birth-dimensions` modes
+(`hnn_population_birth.rs`, whose header states the pins) run
+`holonics::receiver::population::birth` (Lean `Compression/Landmark/Context/Birth`); the pins and
+the verdict are in [the record](../../records/2026-09-28_RESIDUAL_FOUNDED_TRANSPORT_DISCOVERY_PINNED_BEFORE_ITS_SEEDS_ARE_READ.md).
+
+```sh
+cargo run --release -p holonics --example hnn_population -- birth-probe
+cargo run --release -p holonics --example hnn_population -- birth
+cargo run --release -p holonics --example hnn_population -- birth-dimensions
+```
+
+- **The probe** (no pinned seed): the founding on rates `1/8, 1/7, 1/5` (`d = 280`) in 73 ms,
+  dimension 141 after 139 strict steps; both populations over `2^12` cells in 122 and 451 ms; peak
+  resident 42,900 KiB.
+- **The pinned run** (commit `4a452884`; eight seeds, `2^14` cells each): 10,882 ms, peak resident
+  53,744 KiB. The acceptance fails as pinned. Six seeds found nothing: on four the declared two-ring
+  parity gratings survive (`13 + 10/16 + ε` bits the passage), on two the trees read periods 28 and
+  7 inside the opening section. On 2026092883 and 2026092887 (one orbit each) the founding at cell
+  512 closes to the Hankel rank exactly (106 and 141, in 104 and 139 strict steps), the newborn
+  codes the rest at the truth exactly (`7 + 11/16 + ε` and `8 + 2/16 + ε`), and the population with
+  the birth less the control reads `−465 + 4/16 + ε` and `−682 + 5/16 + ε`; the margin bound is
+  attained within `3/2^97` bits, undecided.
+- **The diagnostic** (after the run, never an acceptance): the founded dimension equals the Hankel
+  rank on six seeds and exceeds it by one on 2026092881 and 2026092884, each the one founded form
+  silent on the visited orbit, a conserved charge (`T*v = v`); the restriction to the visited orbit
+  has the Hankel rank on all eight.
+- Gates: `cargo check --workspace --all-targets`; `cargo test -p holonics --lib`; `bash
+  tools/lean_check.sh Holonics HolonicsResearch`.

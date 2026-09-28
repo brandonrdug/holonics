@@ -1,13 +1,17 @@
 //! **`birth`: residual-founded transport discovery on the moiré** (`holonics::receiver::population::
 //! birth`; Lean `Compression/Landmark/Context/Birth`; the learner record's §14.1; THE_REBUILD's
 //! ring-search row, "residual-founded transport discovery first"; #73, #63). Included by
-//! `hnn_population.rs` as its `birth` and `birth-probe` modes; count-only **development receipts**, a
+//! `hnn_population.rs` as its `birth`, `birth-probe` and `birth-dimensions` modes; count-only **development receipts**, a
 //! committed command run once in release, never a test.
 //!
 //! ```sh
 //! cargo run --release -p holonics --example hnn_population -- birth-probe
 //! cargo run --release -p holonics --example hnn_population -- birth
+//! cargo run --release -p holonics --example hnn_population -- birth-dimensions
 //! ```
+//!
+//! `birth-dimensions` ([`dimensions`]) is a diagnostic added after the pinned run, never an
+//! acceptance: the closure founded on every pinned seed, whether or not a section founds it.
 //!
 //! [definition; agent-inferred] **The pins** (fixed in the commit before any measured run; the
 //! record `research/records/2026-09-28_RESIDUAL_FOUNDED_TRANSPORT_DISCOVERY_PINNED_BEFORE_ITS_SEEDS_
@@ -441,4 +445,93 @@ pub fn harness() {
         started.elapsed().as_millis(),
         memory()
     );
+}
+
+/// **`birth-dimensions`**, a diagnostic read after the pinned run and never an acceptance: on each
+/// pinned seed the closure founded directly from the polarized reading (whether or not a section
+/// would found it), its dimension against the emission's Hankel rank, and the rank of the founded
+/// forms restricted to the visited orbit, `[φ_i(x₀ + t p)]_(i, t<L)` (the record's derivation: the
+/// Hankel rank is that restriction's rank, and the founded dimension exceeds it exactly by the
+/// founded forms that vanish on the visited orbit).
+pub fn dimensions() {
+    println!("hnn_population birth-dimensions (diagnostic, after the pinned run):");
+    for seed in SEEDS {
+        let moire =
+            Moire::draw(&TERRAIN, MoireClass::Parity, &mut Draw::new(seed)).expect("a moiré");
+        let truth = moire.truth(&TERRAIN).expect("its truth");
+        let gratings = moire.gratings();
+        let rates: Vec<(u64, u64)> = gratings
+            .iter()
+            .map(|g| (g.numerator(), g.denominator()))
+            .collect();
+        let cells = moire.emit(truth.least_period);
+        let hankel = hankel_rank(&cells);
+        let birth =
+            TransportBirth::moire(&rates, MoireClass::Parity, founding_bits()).expect("the chart");
+        let one = Rat::from_integer(1.into());
+        let separator = birth
+            .reached(&[-one.clone(), one])
+            .expect("the polarized reading");
+        let founded = birth.found(&separator).expect("a founding");
+        let forms = founded.closure.forms();
+        let joint = usize::try_from(&truth.joint_period).expect("a joint period in a word");
+        // The visited orbit: the state at tick t, ring 0 least significant.
+        let state = |tick: usize| -> usize {
+            gratings.iter().rev().fold(0usize, |index, g| {
+                index * g.denominator() as usize + g.port(tick as u64) as usize
+            })
+        };
+        let restricted: Vec<Vec<Rat>> = forms
+            .iter()
+            .map(|form| (0..joint).map(|t| form[state(t)].clone()).collect())
+            .collect();
+        let restriction = ExactRatMatrix::new(restricted).expect("the restriction");
+        let visited = restriction.rank().expect("an exact rank");
+        println!(
+            "  {seed}: d = {}, orbits {}, founded dimension {} (strict steps {}), restricted to the visited orbit {visited}, Hankel rank {hankel}",
+            founded.closure.chart(),
+            founded.closure.chart() / joint,
+            founded.closure.dimension(),
+            founded.closure.strict_steps()
+        );
+        // The founded forms silent on the visited orbit: `Σ_i c_i φ_i` with `c` in the kernel of the
+        // restriction's transpose; each read against the tick (`v ∘ T = ±v`).
+        let silent = restriction
+            .transpose()
+            .expect("a transpose")
+            .kernel_basis()
+            .expect("an exact kernel");
+        let chart = founded.closure.chart();
+        let tick = &birth.transports()[0];
+        for c in silent {
+            let v: Vec<Rat> = (0..chart)
+                .map(|s| {
+                    c.iter()
+                        .zip(forms)
+                        .map(|(ci, form)| ci * &form[s])
+                        .sum::<Rat>()
+                })
+                .collect();
+            // (T* v)_s = v(T s): row r of column s of the tick is its image.
+            let moved: Vec<Rat> = (0..chart)
+                .map(|s| {
+                    (0..chart)
+                        .map(|r| tick.get(r, s).expect("an entry") * &v[r])
+                        .sum::<Rat>()
+                })
+                .collect();
+            let reading = if moved == v {
+                "T*v = v: a conserved charge, constant on each orbit"
+            } else if moved.iter().zip(&v).all(|(a, b)| *a == -b.clone()) {
+                "T*v = −v: a half-turn on each orbit"
+            } else {
+                "neither ±v"
+            };
+            let values: std::collections::BTreeSet<Rat> = v.iter().cloned().collect();
+            println!(
+                "    a founded form silent on the visited orbit: {reading}; its values {}",
+                values.iter().map(exact).collect::<Vec<_>>().join(", ")
+            );
+        }
+    }
 }

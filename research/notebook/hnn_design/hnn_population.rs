@@ -19,6 +19,7 @@
 //! cargo run --release -p holonics --example hnn_population -- species
 //! cargo run --release -p holonics --example hnn_population -- birth-probe
 //! cargo run --release -p holonics --example hnn_population -- birth
+//! cargo run --release -p holonics --example hnn_population -- birth-dimensions
 //! cargo run --release -p holonics --example hnn_population -- curated .local/cuts/curated-cut.bin .local/cuts/curated-flat-cut.bin
 //! cargo run --release -p holonics --example hnn_population -- f0-census .local/cuts/curated-f4-passage-cut.bin
 //! cargo run --release -p holonics --example hnn_population -- u2-acceptance .local/cuts/curated-u2-passage-cut.bin .local/cuts/curated-u2-passage-flat-cut.bin
@@ -1325,6 +1326,7 @@ fn main() {
         ["species"] => evolution::species(),
         ["birth"] => birth::harness(),
         ["birth-probe"] => birth::probe(),
+        ["birth-dimensions"] => birth::dimensions(),
         ["curated", curated_cut, flat_cut] => {
             curated::harness(curated_cut, flat_cut, curated::Reach::Whole);
         }

@@ -51,7 +51,16 @@
 //! reading must be one class (`D z = e_c`). The face is the surviving states' fraction emitting each
 //! class, the likelihood `#S/d`, the code `log₂ d − log₂ #S` (survivor filtering, Lean
 //! `Population.survivor_code`); a death is not a deposit, so a family whose classes all miss the
-//! cell keeps the state it died in.
+//! cell keeps the state it died in. It emits exactly the chart's readings: `ρ(Tᵗ x) = D Uᵗ E x`
+//! (Lean `Birth.{encode_iterate, founded_reads_iterate}`).
+//!
+//! [proved-derived] **The founded dimension against the emission's.** For a permutation of the
+//! chart's states the span of an emission's shifts is the founded forms restricted to the visited
+//! orbit, so its Hankel rank is that restriction's rank: equal to `dim V` on one orbit, and below it
+//! by the forms silent on the orbit, an invariant space (Lean `Birth.silent_invariant`) whose
+//! rational eigenvectors are conserved charges or half-turns (`Birth.eigenvalue_of_finite_order`).
+//! The founding is the chart's observable representation; the emission's minimal realization is
+//! its restriction (measured on the moiré: the record of September 28).
 //!
 //! [definition; agent-inferred] **Which covector reaches** ([`TransportBirth::reached`]). The
 //! reception's comparison at the arrival `y` is the descent covector `κ = e_y − q` on the cell

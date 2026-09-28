@@ -116,4 +116,109 @@ five seconds a seed and under 200 MiB, far inside ten minutes and 20 GB.
 
 ## 4. The receipt
 
-To be appended by the run.
+`[established-bounded; measured]` The pinned run, `hnn_population birth` in release after the pin
+commit `4a452884`: 10,882 ms of exterior wall for the eight seeds and a peak resident set of
+53,744 KiB, inside the projection. Codes are enclosures with exact endpoints, read at `L_R = 16`
+as `n + k/16 + ε`, `0 ≤ ε < 1/16`.
+
+| seed | rates | `d` | orbits `d/L` | least period | Hankel rank | the declared two-ring gratings | control's code | founded |
+|---|---|---|---|---|---|---|---|---|
+| 2026092881 | `3/8, 3/8, 4/7` | `448 = 2⁶·7` | 8 | 28 | 28 | died at cell 13 | `162 + 13/16 + ε` | no |
+| 2026092882 | `4/5, 5/8, 1/5` | `200 = 2³·5²` | 5 | 40 | 21 | survived | `13 + 10/16 + ε` | no |
+| 2026092883 | `4/5, 5/6, 6/7` | `210 = 2·3·5·7` | 1 | 210 | 106 | died at cell 11 | `943 + 4/16 + ε` | at cell 512 |
+| 2026092884 | `2/7, 5/7, 5/7` | `343 = 7³` | 49 | 7 | 7 | died at cell 8 | `57 + 4/16 + ε` | no |
+| 2026092885 | `3/4, 4/7, 7/8` | `224 = 2⁵·7` | 4 | 56 | 29 | survived | `13 + 10/16 + ε` | no |
+| 2026092886 | `2/7, 5/8, 3/7` | `392 = 2³·7²` | 7 | 56 | 29 | survived | `13 + 10/16 + ε` | no |
+| 2026092887 | `5/8, 3/5, 1/7` | `280 = 2³·5·7` | 1 | 280 | 141 | died at cell 9 | `1201 + 8/16 + ε` | at cell 512 |
+| 2026092888 | `1/6, 4/7, 1/3` | `126 = 2·3²·7` | 3 | 42 | 22 | survived | `13 + 10/16 + ε` | no |
+
+The two foundings, each at the second section (cell 512) from one prime chart, `V_old` the mass
+form (`dim 1`):
+
+| | 2026092883 | 2026092887 |
+|---|---|---|
+| arrival and residual since the previous section | class 1, `199 + 13/16 + ε` | class 0, `234 + 0/16 + ε` |
+| rungs `dim V₀ … dim V` | `2, 3, …, 106` | `2, 3, …, 141` |
+| (1) strict steps against `d − dim V₀` | 104 ≤ 208 | 139 ≤ 278 |
+| `E T = U E`, `D E = ρ` | exact | exact |
+| (2) founded dimension against the Hankel rank | 106 = 106 | 141 = 141 |
+| founding work: additions, multiplications, divisions, peak width | 71868, 11741781, 212, 2 bits | 125208, 23361894, 282, 2 bits |
+| founding wall time (the section's cell, exterior) | 38 ms | 66 ms |
+| the truth after the birth: `#S` of `d`, code | 1 of 210, `7 + 11/16 + ε` | 1 of 280, `8 + 2/16 + ε` |
+| the newborn's own code | equal to the truth's, exactly | equal to the truth's, exactly |
+| the population after the birth | `24 + 8/16 + ε` | `24 + 14/16 + ε` |
+| the margin `−log₂(m_g/M_n)`, `m_g = 2^(−17)`, `M_n = 7/8 + 2^(−17)` | `16 + 12/16 + ε` | `16 + 12/16 + ε` |
+| (3) after the birth, less the truth, less the margin | inside `[−3/2^97, 3/2^97]`: undecided | inside `[−3/2^97, 3/2^97]`: undecided |
+| (4) with the birth, against the control | `478 + 9/16 + ε` against `943 + 4/16 + ε`: `−465 + 4/16 + ε`, strictly below | `519 + 14/16 + ε` against `1201 + 8/16 + ε`: `−682 + 5/16 + ε`, strictly below |
+| the newborn's acts | `Read` 16299, `Transport` 16090 | `Read` 16410, `Transport` 16131 |
+| both populations' wall time | 1492 ms with, 506 ms without | 1904 ms with, 588 ms without |
+
+**The verdict: the acceptance fails as pinned.** Six of the eight seeds founded nothing, so they
+fail (3) and (4) as the pins state; on the two that founded, (1), (2) and (4) pass and (3) is
+undecided. The separating terms, by their measurements:
+- **The declared families did not fail on six seeds.** On four (2026092882, 885, 886 and 888) the
+  declared two-ring parity gratings survived the whole passage and coded it at `13 + 10/16 + ε`
+  bits: those three-ring parity words are two-ring parity words (the parity class locates a word,
+  not its rings: `receiver::population::families`, "The parity class locates its word"). On two
+  (2026092881 and 884) the two-ring gratings died by cell 13, but the trees read the short periods
+  (28 and 7) within the opening section, and the whole passage cost `162 + 13/16 + ε` and
+  `57 + 4/16 + ε` bits, so no later section's residual passed `ℓ_g = 17`. There was no residual to
+  found from, and none was founded. The pin's premise (the declared families fail) held on the two
+  seeds whose torus is one long orbit.
+- **(3) is attained, not refuted.** After the birth the population's code is the truth's plus the
+  margin to within `3/2^97` bits. The telescope's slack is `−log₂(1 + Σ_f m_f L_f / (m_g W_(t_g) L_g))`,
+  the declared families' remaining mass after the birth, and it lies below the enclosure's grid,
+  so "decided on the enclosures" cannot hold. The bound itself is the population's birth telescope,
+  whose Lean statement is owed (#62).
+
+**What the founding did where a residual existed.** On 2026092883 and 2026092887 the population met
+a passage its declared families failed (the two-ring gratings died; the trees paid `199 + 13/16`
+and `234` bits in the section before the founding). The reached covector, the polarized parity
+reading, closed under the three rotors in one strict step a rung, to exactly the emission's Hankel
+rank; the founded family located the phases to one state of the torus and coded the rest of the
+passage at the truth exactly; with every charge included, the population with the birth less the
+control read `−465 + 4/16 + ε` and `−682 + 5/16 + ε` bits. The measured work was 11,741,781 and 23,361,894 machine-word
+and rational multiplications in 38 and 66 ms.
+
+## 5. A diagnostic after the run
+
+`[established-bounded; measured]` Not an acceptance: `hnn_population birth-dimensions`, added after
+the pinned run, founds the closure on every pinned seed from the polarized reading, whether or not
+a section would, and reads the founded forms restricted to the visited orbit.
+
+| seed | orbits | founded dimension | restricted to the visited orbit | Hankel rank | the forms silent on the orbit |
+|---|---|---|---|---|---|
+| 2026092881 | 8 | 29 | 28 | 28 | one, `T*v = v`: a conserved charge, values `−6, −4, −2, 0, 2` |
+| 2026092882 | 5 | 21 | 21 | 21 | none |
+| 2026092883 | 1 | 106 | 106 | 106 | none |
+| 2026092884 | 49 | 8 | 7 | 7 | one, `T*v = v`: a conserved charge, values `−4, 0` |
+| 2026092885 | 4 | 29 | 29 | 29 | none |
+| 2026092886 | 7 | 29 | 29 | 29 | none |
+| 2026092887 | 1 | 141 | 141 | 141 | none |
+| 2026092888 | 3 | 22 | 22 | 22 | none |
+
+The restriction's rank equals the Hankel rank on all eight, as §1 derives. The founded dimension
+equals it on six and exceeds it by one on two (`3/8, 3/8, 4/7` and `2/7, 5/7, 5/7`). On those two
+the parity reading averages differently over different orbits: rings of one period keep their
+relative phase along an orbit, and no balanced sheet of a coprime period (a `q = 8` ring beside the
+others, as on 2026092882) evens the average out. So the founded forms carry the orbit's label, a
+conserved charge constant along each orbit and zero on the visited one. So the founding law gives
+the chart's observable representation, whose dimension exceeds the emission's minimal realization
+by exactly the conserved charges the visited orbit does not vary (Lean
+`Birth.{silent_invariant, eigenvalue_of_finite_order}`: the silent forms are invariant, their
+rational eigenvalues `±1`). Had (2) been read on 2026092881 or 884, it would have failed by that
+one charge.
+
+## 6. Dispositions
+
+- **The owner stays.** A consumer earned it where a residual existed: on both seeds that founded,
+  the newborn coded at the truth exactly and the population coded hundreds of bits below the
+  control, every charge included. The Rust owner, its tests and the Lean stay; the atlas rows
+  `birth.*` name them.
+- **The rotor crib** was not run: the loop's failed premise is its next subject, not a second
+  terrain.
+- **Owed to #62:** (a) the Hankel-rank identification: for a permutation `T` of a finite state set
+  and a reading `ρ`, the rank of the emission's Hankel matrix from `x₀` equals the rank of
+  `span{T*ᵗ ρ}` restricted to the orbit of `x₀` (Lean holds the invariance of the silent forms and
+  their `±1` eigenvalues, not the rank equality); (b) the abstaining newborn's telescope, already
+  owed, which bound (3) reads.

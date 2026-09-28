@@ -19,7 +19,17 @@ one still step and every later step is still                         (ladder_sta
 the stable rung V is T_a*-invariant and the least such space ⊇ V₀    (founded_invariant, founded_le)
 basis φ_i of V, T_a* φ_i = Σ_j U_(a,ij) φ_j  ⇒  E T_a = U_a E,  E x = (φ_i x)_i   (founding_intertwines)
 ρ ∈ V, ρ = Σ_j D_j φ_j  ⇒  ρ = D E                                   (encode_reads)
+E Tᵗ = Uᵗ E, so ρ(Tᵗ x) = D Uᵗ E x: the founded family reads the chart  (encode_iterate, founded_reads_iterate)
+forms silent on a T-closed orbit stay silent; a rational eigenvalue of a
+  finite-order T* is ±1                                              (silent_invariant, eigenvalue_of_finite_order)
 ```
+
+[proved-derived] **The founded dimension against the emission's minimal realization.** For `T` a
+permutation of a finite state set, the span of the emission's shifts is the founded forms restricted
+to the visited orbit, so its Hankel rank is that restriction's rank; the founded dimension exceeds
+it by the forms silent on the orbit, an invariant space (`silent_invariant`) whose rational
+eigenvectors are conserved charges or half-turns (`eigenvalue_of_finite_order`). The Hankel-rank
+identification is owed (#62).
 
 It constructs an observable transport representation. It does **not** infer an unknown `T_a`
 ([counterexample] no finite observation determines an unrestricted navigator family,
@@ -187,6 +197,43 @@ theorem encode_reads (φ : r → Dual K X) (ρ : Dual K X) (D : r → K)
     (hD : ρ = ∑ j, D j • φ j) (x : X) : ρ x = ∑ j, D j * encode φ x j := by
   subst hD
   simp [encode]
+
+/-- **The encoding carries every tick**: `E T = U E` gives `E Tᵗ = Uᵗ E`. -/
+theorem encode_iterate [DecidableEq r] (T : X →ₗ[K] X) (φ : r → Dual K X) (U : Matrix r r K)
+    (hU : ∀ x, encode φ (T x) = U.mulVec (encode φ x)) (t : ℕ) (x : X) :
+    encode φ (T^[t] x) = (U ^ t).mulVec (encode φ x) := by
+  induction t generalizing x with
+  | zero => simp
+  | succ t ih =>
+    rw [Function.iterate_succ_apply, ih, hU, pow_succ, ← Matrix.mulVec_mulVec]
+
+/-- **The founded family reads the transported state**: with `E T = U E` and `ρ = D E`, the reading
+after `t` ticks is `ρ(Tᵗ x) = D Uᵗ E x`, so a family carried in the founded chart emits exactly the
+chart's readings. -/
+theorem founded_reads_iterate [DecidableEq r] (T : X →ₗ[K] X) (φ : r → Dual K X)
+    (U : Matrix r r K)
+    (hU : ∀ x, encode φ (T x) = U.mulVec (encode φ x)) (ρ : Dual K X) (D : r → K)
+    (hD : ρ = ∑ j, D j • φ j) (t : ℕ) (x : X) :
+    ρ (T^[t] x) = ∑ j, D j * (U ^ t).mulVec (encode φ x) j := by
+  rw [encode_reads φ ρ D hD, encode_iterate T φ U hU t x]
+
+/-- **A form silent on a visited orbit stays silent**: when `T` carries the set `O` into itself,
+`T*` carries a form vanishing on `O` to a form vanishing on `O`. So the founded forms silent on the
+visited orbit are an invariant space, and the founded dimension exceeds the emission's
+minimal realization exactly by it. -/
+theorem silent_invariant (T : X →ₗ[K] X) {O : Set X} (hO : ∀ x ∈ O, T x ∈ O)
+    {v : Dual K X} (hv : ∀ x ∈ O, v x = 0) : ∀ x ∈ O, T.dualMap v x = 0 := fun x hx => by
+  rw [LinearMap.dualMap_apply]
+  exact hv _ (hO x hx)
+
+/-- **A rational eigenvalue of a finite-order transport is `±1`**: a silent form `T* v = μ v`
+under `Tᴸ = 1` is a conserved charge (`μ = 1`) or a half-turn on each orbit (`μ = −1`, `L` even). -/
+theorem eigenvalue_of_finite_order {μ : ℚ} {L : ℕ} (hL : 0 < L) (h : μ ^ L = 1) :
+    μ = 1 ∨ (μ = -1 ∧ Even L) := by
+  rcases pow_eq_one_iff_cases.mp h with h0 | h1 | h2
+  · omega
+  · exact Or.inl h1
+  · exact Or.inr h2
 
 /-- **The transport matrices exist** on any basis of an invariant space of forms. -/
 theorem exists_transport_matrices (T : ι → X →ₗ[K] X) {V : Submodule K (Dual K X)}
