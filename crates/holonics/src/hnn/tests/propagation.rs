@@ -763,7 +763,8 @@ fn the_contact_exponent_is_a_carry_and_a_phase_class() {
 /// receiver at a cut, and the path is open when `2^(−x)` is at least the receiver's grain `1/16`.
 /// At rest every `Q = 0`; one contact across a diameter (`Q = 4`, `β = 2`) attenuates by exactly
 /// the grain and stays open; two such contacts in series shield the receiver. (How often campaign
-/// 1's declared field is open over its cut is a measurement: `hnn_lattice_growth`.)
+/// 1's declared field is open over its cut is a measurement: the notebook's `hnn_lattice_growth`
+/// receipt.)
 #[test]
 fn the_path_attenuation_opens_at_the_receivers_grain() {
     let field =

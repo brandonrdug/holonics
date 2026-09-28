@@ -10,7 +10,7 @@
 //! control (1,126 → 10,883 → 623,415 at the declared steps; 1,126 → 7,053 → 311,864 → 2,224,183
 //! with the factor steps off). On the carrier lattice with the refining remainder (the lattice deposit) the
 //! entries and remainders grow logarithmically, while the solved charts `H⁻¹` still grow with the
-//! carried Grams (`research/notebook/hnn_design/hnn_lattice_growth.rs`). These cuts run on the
+//! carried Grams (the notebook's `hnn_lattice_growth`, retired at `2d34b819`). These cuts run on the
 //! exposure's chain (no pair offset, so its capacity and cut are 17 and 18 cells: one aeon, nine
 //! receiving windows), declare a budget two deposits pass (read off the unbudgeted run's curve at
 //! its second commit, [`two_deposits`]), which is the stop rule's own case and keeps the exact

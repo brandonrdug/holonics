@@ -139,7 +139,7 @@ const AEONS: AeonFamily = AeonFamily {
 };
 
 /// The recorded tree codes of the terrain notebook's moiré at its determining depth `D*`
-/// (`hnn_terrain -- moire`, the audit record's §6.2): parity `993 + 5/16 + ε`, sheets `1549 + 0/16 + ε`.
+/// (the retired `hnn_terrain -- moire`, the audit record's §6.2): parity `993 + 5/16 + ε`, sheets `1549 + 0/16 + ε`.
 const RECORDED_PARITY_AT_D_STAR: &str = "993 + 5/16 + ε (D* = 14)";
 const RECORDED_SHEETS_AT_D_STAR: &str = "1549 + 0/16 + ε (D* = 8)";
 

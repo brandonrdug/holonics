@@ -330,10 +330,10 @@ impl FieldDeclaration {
     /// share a quarter turn. Integer placements keep every quadrance an integer (`q_Q = 1`), and
     /// `Q ∈ {0, 2, 4}` on one circle: with the least lattice exponent `β_a = 2`, one contact
     /// attenuates by `1`, `1/4` or `1/16`, and the source-to-receiver path is open (at least the
-    /// receiver's grain `1/16`) on 4,328 of campaign 1's 5,005 phase configurations (receipt:
-    /// `cargo run --release -p holonics --example hnn_lattice_growth -- openness configurations`;
-    /// `… openness uniform` and `… openness cut` read the windows of `n*` uniform bytes and of the
-    /// notebook's pinned cut). The earlier
+    /// receiver's grain `1/16`) on 4,328 of campaign 1's 5,005 phase configurations (receipt: the
+    /// notebook's `hnn_lattice_growth -- openness configurations`, retired at `2d34b819`; its
+    /// `uniform` and `cut` modes read the windows of `n*` uniform bytes and of the notebook's
+    /// pinned cut). The earlier
     /// sixteen points of `x² + y² = 65` put distinct nodes at `Q ≥ 4` apart and up to 260, which
     /// shielded the receiver below `2^(−10)` on about 96% of windows (review C2).
     pub fn quarter_turn(node: u64, period: u64) -> RatVec3 {

@@ -17,13 +17,13 @@
 //! cells read must close at the range's end (`cells all`), so the range is the cut's own.
 //!
 //! [definition] **The development control** is `docs/plans/THE_REBUILD.md` at [`CUT_COMMIT`] as UTF-8 bytes
-//! (171,754 bytes). It is read by `git show`, as `hnn_lattice_growth` reads it, never from the live
-//! file.
+//! (171,754 bytes). It is read by `git show`, never from the live file.
 //! - `cells N` exposes the cut's first `N` cells on campaign 1's field declared at that population
 //!   (`FieldDeclaration::campaign_one(N)`: the population is the cut's length, and
 //!   `Field::declare` refuses one below `n*`).
-//! - The default is `N = n* = 6,148`, 3,074 windows, which `hnn_lattice_growth growth campaign 40
-//!   declared` projects to `334,451 rem 8 over 40` ms at its means (the notebook README's receipt):
+//! - The default is `N = n* = 6,148`, 3,074 windows, which the retired `hnn_lattice_growth growth
+//!   campaign 40 declared` projected to `334,451 rem 8 over 40` ms at its means (the notebook
+//!   README's receipt):
 //!   the control at the standing cut's population.
 //! - `cells all` is the whole cut: 85,877 windows, `9,343,417 rem 24 over 40` ms at those means.
 //!
@@ -139,7 +139,7 @@ use exterior::{
 };
 
 /// **The pinned campaign cut**: the commit whose `docs/plans/THE_REBUILD.md` is the campaign
-/// field's cut (as `hnn_lattice_growth`).
+/// field's cut.
 const CUT_COMMIT: &str = "fed5488ce70eb5ffbc90f2f03d23638be9d69189";
 const CUT_PATH: &str = "docs/plans/THE_REBUILD.md";
 

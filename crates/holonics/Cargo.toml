@@ -14,24 +14,11 @@ thiserror = { workspace = true }
 # regions whose effects commute run on the host's cores, collected in index order.
 rayon = "1.12"
 
-# The notebook's exact measurement of the deposited constitution's bits under the lattice law
-# (research/notebook/hnn_design/README.md): a measurement, never a test.
-[[example]]
-name = "hnn_lattice_growth"
-path = "../../research/notebook/hnn_design/hnn_lattice_growth.rs"
-
 # The notebook's exposure of campaign 1 on the pinned cut (`Reference::expose` and its complete
 # readout; research/notebook/hnn_design/README.md): a measurement run once in release, never a test.
 [[example]]
 name = "hnn_exposure"
 path = "../../research/notebook/hnn_design/hnn_exposure.rs"
-
-# The notebook's diagnostics of campaign 1's failure on the standing real cut (review E1: the
-# located cause before campaign 2; research/notebook/hnn_design/README.md): a measurement run once
-# in release, never a test.
-[[example]]
-name = "hnn_diagnose"
-path = "../../research/notebook/hnn_design/hnn_diagnose.rs"
 
 # The notebook's measurement of the landmark tree (count-only) on the standing real
 # cut: the depth sweeps on the development cells and the prequential run against the online
@@ -40,21 +27,6 @@ path = "../../research/notebook/hnn_design/hnn_diagnose.rs"
 [[example]]
 name = "hnn_landmark"
 path = "../../research/notebook/hnn_design/hnn_landmark.rs"
-
-# The notebook's first receipts on terrain a declared Holarchy made (`holarchy::terrain`: a tree
-# source and a moiré, each with its exact truth; research/notebook/hnn_design/README.md): count-only
-# development receipts run once in release, never a test.
-[[example]]
-name = "hnn_terrain"
-path = "../../research/notebook/hnn_design/hnn_terrain.rs"
-
-# The notebook's reader of the curated conversation source (channels as ports, turns as epochs,
-# conversations as aeons) as typed letters, against the flat stream of the same bytes
-# (research/notebook/hnn_design/README.md): count-only development receipts run once in release,
-# never a test.
-[[example]]
-name = "hnn_curated"
-path = "../../research/notebook/hnn_design/hnn_curated.rs"
 
 # The notebook's egg population on terrain a declared Holarchy made (`receiver::population` over
 # `holarchy::terrain`: the tree at a ladder of depths, a moiré's gratings, a rotor crib's keys,
@@ -71,7 +43,3 @@ path = "../../research/notebook/hnn_design/hnn_population.rs"
 [[example]]
 name = "hnn_chase"
 path = "../../research/notebook/hnn_design/hnn_chase.rs"
-
-[[example]]
-name = "hnn_release_terrain"
-path = "../../research/notebook/hnn_design/hnn_release_terrain.rs"

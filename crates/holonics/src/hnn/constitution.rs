@@ -1699,8 +1699,8 @@ fn gram_sum<'a>(n: usize, terms: impl IntoIterator<Item = (&'a Rat, &'a Chart)>)
 /// operand with a large one. It is read by Euclid's remainder first (`crate::ratio::gcd`), which
 /// costs the large operand's size once; the binary `gcd` behind `Ratio`'s product halves the large
 /// operand a bit at a time, paying its full size on every step. The value is `Ratio`'s (receipt:
-/// the equality run of `hnn_lattice_growth`, which recomputes every factor update as `Ratio`'s
-/// product, [`NormalLaw::deposited`]).
+/// the equality run of the notebook's `hnn_lattice_growth`, retired at `2d34b819`, which
+/// recomputed every factor update as `Ratio`'s product, [`NormalLaw::deposited`]).
 fn rate_times(rate: &Rat, value: &Rat) -> Rat {
     if rate.is_zero() || value.is_zero() {
         return Rat::zero();
