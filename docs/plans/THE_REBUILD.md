@@ -63,12 +63,40 @@ the wide cut and the curated cut.
   claim.
 
 **Order.**
-- F4 builds release on the byte population as it stands.
+- F0 comes first: the predictor must transfer across families before F4's curated release or F5
+  (September 28, [audit](../../research/records/2026-09-28_THE_FORWARD_PLAN_STOPPED_AT_TRANSFER_THE_POPULATION_MEMORIZES_FAMILIES_AND_ITS_STANDING_IS_AN_INDEX.md)). F4's known-truth terrain
+  acceptance can proceed meanwhile.
 - F1 (words) and F2 (the field) are improvements the population may adopt; neither blocks F4.
-- F5 needs F4 and the product surface.
+- F5 needs F0, F4 and the product surface. The product shell built in PR #149 waits on its branch
+  until F0 and F4 pass.
 - F3 is an acceleration gate, required only if Athena-0's response deadline needs the card.
 - F6's chase terrain needs nothing from F4 for its reception phase; its action phase and the
   motor chart use F4's release law.
+
+### F0. Transfer across families (the predictor's gate; #73, #148)
+
+[definition; agent-inferred; [audit](../../research/records/2026-09-28_THE_FORWARD_PLAN_STOPPED_AT_TRANSFER_THE_POPULATION_MEMORIZES_FAMILIES_AND_ITS_STANDING_IS_AN_INDEX.md)] F4's pinned validation found
+the curated population coding `+1346 + 1/16 + ε` bits above the flat stream on families it had not
+seen. Its 32 diagnostic releases were not legible text, and its standing after 522,206 cells was
+6,256,005,986 bytes. Neither release (F4) nor Athena-0 (F5) can pass on that predictor.
+
+- **Builds on.** `receiver::population`, `compression::landmark::context`,
+  `Context/Merge.merge_cost_mass_iff`, the transport-closure founding law and continuation
+  transports ([Astra's review](../../research/records/2026-09-27_THE_LEARNER_MUST_MOVE_A_CHASE_TERRAIN_DATA_AS_PARTICLES_WITH_FLUX_AND_RELEASE_AS_A_THRESHOLD_COMMIT.md#141-birth)), and PR #149's family-split
+  scripts.
+- **First loop: the diagnosis.** On the spent F4 passage (development, already read), report the
+  validation code against the flat stream by family and by component: the trees, sections and part
+  clock, the boundary egg, the request copy, and the charges. No law changes from it.
+- **Law.** A candidate is adopted by the choosing families alone and judged on validation families.
+  Candidates include a bounded or pruned context standing that pays for what it drops, a
+  continuation transport promoted by `π_G P_G > π_C P_C`, and a learned lens under source item 10.
+- **Standing.** Every receipt reports standing bytes per cell read (F4's population kept 11,979).
+  A standing budget is pinned before each run.
+- **Acceptance.** On a fresh development-family split never used for a diagnostic, the charged code
+  is strictly below the flat stream's on the validation families, within the pinned standing and
+  passage budgets.
+- **If it fails.** The byte population remains a compression result, F4's curated release and F5
+  stay closed, and the chase terrain (F6) carries the architecture's tests.
 
 ### F1. The word alphabet (campaign 5; #73, #148)
 

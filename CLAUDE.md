@@ -251,6 +251,8 @@ Athena text milestone claimed before a test of use was retracted or retired.
   measured, never a completion.
 - Show Brandon a product step's actual output beside its control, in the conversation. Never put
   it in the repository when it derives from private data.
+- A failed gate is the next loop's subject. Work on the failure, not past it, and name the blocker
+  by its measurement ("the predictor codes above flat on unseen families"), not as a missing part.
 
 [project-postulate] **Lenses join the work without resetting it.** A lens from Brandon is derived,
 recorded in a dated record and joined to the owners it touches. It changes the forward plan's order
