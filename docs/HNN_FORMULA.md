@@ -207,6 +207,17 @@ decode.
 8. **A pinned partition and a calibration terrain.** Development, evaluation and deferred families
    are pinned by hash before any learning. Each curated source is paired with a terrain whose truth
    is known (`holarchy::terrain`), so a failure can be attributed.
+9. **Changes and their intervals are the carried quantity** (Brandon's derivation, September 27,
+   [record](../research/records/2026-09-27_THE_LEARNER_MUST_MOVE_A_CHASE_TERRAIN_DATA_AS_PARTICLES_WITH_FLUX_AND_RELEASE_AS_A_THRESHOLD_COMMIT.md#10-data-as-particles-with-real-flux)).
+   The source records identities that persist across epochs, their changes with the real intervals
+   between them, and the causes of each change (item 4's incidence). Where the source is live, it
+   records its response to the learner's own emissions. Bytes read at uniform ticks with their
+   intervals and causes removed are the residue of the motion, not its flux.
+10. **The record is pinned; the encoding is not.** The physical record (items 1–9) is pinned once,
+    by hash, for honest evaluation. No encoding is pinned: each re-encoding (learned classes, words,
+    concepts across ports and aeons) is a lens in the population, a face map that pays its own
+    description and stays only while it shortens held-out code. The encoder is what the machine
+    does; a hand-built transducer is a catalyst the population may retire.
 
 **The release contract.** What an output must carry to be decodable:
 1. **A receipt of faces** over the declared partition, each at its receiver's grain, frame and
@@ -220,13 +231,15 @@ decode.
 4. **Health and cost.** Each response carries its numerical health and its costs by kind
    ([lessons record §4](../research/records/2026-09-24_LESSONS_FROM_THE_WORKBENCH_AND_ATHENA_PROTOTYPES.md)).
 
-[established-bounded; source-inspected] The standing real cut meets items 1, 6 and 8 and not 2–5.
+[established-bounded; source-inspected] The standing real cut meets items 1, 6 and 8 and not 2–5 or 9.
 It is the UTF-8 bytes of each family's visible parts, with roles and provenance removed and
 newlines as the only sections. It is a byte codec, which Holonic Encoding excludes, and it stays the
 regression control. The curated conversation source is built under this contract: human, agent,
 tool and harness as ports; turns as epochs; conversations as aeons; parents as incidence; and the
 request→response and response→later-human relations as the admitted receivers. It is campaign 5's
-input and step 8's curation. Its first build (`curated_source.py`) meets items 1–6 and 8.
+input and step 8's curation. Its first build (`curated_source.py`) meets items 1–6 and 8. It drops
+the intervals between turns, so it does not meet item 9; its learned byte classes are a lens inside
+the population, as item 10 requires.
 
 [established-bounded; measured] Item 7 is consumed (`receiver::population::admitted`,
 `compression::landmark::context::spans`; the

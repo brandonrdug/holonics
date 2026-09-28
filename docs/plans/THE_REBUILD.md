@@ -67,7 +67,8 @@ the wide cut and the curated cut.
 - F1 (words) and F2 (the field) are improvements the population may adopt; neither blocks F4.
 - F5 needs F4 and the product surface.
 - F3 is an acceleration gate, required only if Athena-0's response deadline needs the card.
-- F6 follows the common release law of F4.
+- F6's chase terrain needs nothing from F4 for its reception phase; its action phase and the
+  motor chart use F4's release law.
 
 ### F1. The word alphabet (campaign 5; #73, #148)
 
@@ -178,15 +179,57 @@ the wide cut and the curated cut.
   the request-blind population, PPM-2 and the flat tree.
 - **If any gate fails.** Athena-0 has not been reached.
 
-### F6. The motor chart (campaign 4; #27)
+### F6. Motion: the chase terrain, then the motor chart (campaign 4; #27, #148)
 
-- **Pinned before fitting.** A public recording, its skeleton, its units, the horizon, the split
-  and a constant-velocity control.
-- **New.** The HNN's motor consumer. It preserves the ordered screw transport and
-  `⟨w, Jθ̇⟩ = ⟨Jᵀw, θ̇⟩`, and releases a reachable endpoint at its declared grain or returns the
-  complete joint fibre and residual.
-- **Acceptance.** A held-out endpoint residual strictly smaller than the control's, within budget.
-- **Otherwise.** The exact geometry is reported, with no claim of motor usefulness.
+[definition; agent-inferred; Brandon's derivation, September 27, [record](../../research/records/2026-09-27_THE_LEARNER_MUST_MOVE_A_CHASE_TERRAIN_DATA_AS_PARTICLES_WITH_FLUX_AND_RELEASE_AS_A_THRESHOLD_COMMIT.md#13-the-chase-terrain)]
+The machine has only read recordings; here it first moves, against another's constitution.
+
+- **Builds on.** `holarchy::terrain` (terrain with known truth, the `Switching` pattern of declared
+  families), `receiver::population` (families, mixture, dormancy's fixed share, composition),
+  `receiver::release` (`DecisionRule`), `holarchy::gluing`, `geometry::screw` and Lean
+  `Transport/SerialScrewChain`.
+- **New.** A chase terrain, `holarchy::terrain::chase`:
+  - an exact 2D arena over a rational lattice with a declared tick, each cell with a friction class
+    `μ` from a declared finite set of rationals;
+  - a fast runner (speed bound `v_R`) whose velocity change per tick is admitted only if
+    `|Δv|² ≤ (μ g h)²` on its cell, which bounds a pure turn's radius below by `v_R²/(μg)`. A demand
+    beyond traction slips: the runner keeps its tangent velocity for a declared number of ticks. Its
+    evasion navigator and key are drawn from a declared family, which is the terrain's truth;
+  - the chaser, the machine: slower (`v_C < v_R`), of a larger traction class, every emitted motion
+    satisfying its own bound exactly;
+  - two switches: a lag channel (observation `d` ticks late) and a faulty sensor (one of two
+    channels reports a rotated heading on declared aeons).
+- **Law.**
+  - Reception: the population reads the runner's passage and selects its constitution (speed bound,
+    traction per friction class, slip law, policy family).
+  - Action: each chaser motion is released as a threshold commit, a sequential test on accumulated
+    log-odds whose threshold is priced by the declared cost of a tick. Each emission carries its
+    predicted consequence, and the directed covector (predicted against unfolding) is read at the
+    action.
+  - Deposition only at the locus a covector reached: a loop-closure reading across the two
+    observation channels attributes each error to the mover or to the channel.
+  - Capture: the agents' quadrance is at most a declared capture radius squared.
+- **Reception acceptance.** On hash-seeded arenas the selected family is the true one, its code is
+  within a declared margin of the truth code, and strictly below the landmark tree reading the same
+  passage.
+- **Action acceptance.**
+  - Over pinned seeds, capture takes strictly fewer ticks in sum, and in more than half of the seeds,
+    than both controls under the same traction bound: pure pursuit and constant bearing.
+  - The traces show turns forced across low-friction cells, with the runner's slips counted.
+  - With the switches on, capture still beats both controls, the fault is located on exactly the
+    aeons it is active, and lag-caused errors deposit nothing in the chaser's constitution.
+- **Reported beside it, not as acceptance.** Brandon's own play through a small exact interface,
+  with real intervals: the human baseline, and data with real flux.
+- **Budget.** A few thousand ticks per seed in exact arithmetic on the host, projected against ten
+  minutes and the host memory before it runs. No card is needed.
+- **If it fails.** A reception failure locates the birth problem on terrain whose truth is known. An
+  action failure leaves a receiver without a controller, reported as a terrain result.
+- **Then the motor chart.** Pinned before fitting: a public recording, its skeleton, its units, the
+  horizon, the split and a constant-velocity control. The HNN's motor consumer preserves the ordered
+  screw transport and `⟨w, Jθ̇⟩ = ⟨Jᵀw, θ̇⟩`, and releases a reachable endpoint at its declared grain
+  or returns the complete joint fibre and residual. Acceptance: a held-out endpoint residual strictly
+  smaller than the control's, within budget; otherwise the exact geometry is reported with no claim
+  of motor usefulness.
 
 Alongside every item: the step 6 targets, the Lean owed in #62, and curation (#147).
 
