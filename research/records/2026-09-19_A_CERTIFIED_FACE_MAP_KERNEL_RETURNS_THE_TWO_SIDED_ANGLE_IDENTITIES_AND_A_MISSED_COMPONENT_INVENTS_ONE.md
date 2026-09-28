@@ -1,7 +1,7 @@
 # A certified face-map kernel returns the two-sided-angle identities, and a missed component invents one
 
 **Date:** September 19, 2026. **Status:** first instance of the
-[identity atlas](../../docs/plans/THE_IDENTITIES_OF_A_CONFIGURATION_ARE_THE_KERNEL_OF_ITS_FACE_MAP.md)
+[identity atlas](https://github.com/brandonrdug/holonics/blob/13f8c734/docs/plans/THE_IDENTITIES_OF_A_CONFIGURATION_ARE_THE_KERNEL_OF_ITS_FACE_MAP.md)
 contract (I1–I8, as corrected by the September 19 audit), advancing
 [#49](https://github.com/brandonrdug/holonics/issues/49) for the helical-pair consumer
 [#48](https://github.com/brandonrdug/holonics/issues/48). **Truth status is per claim.** Classical
