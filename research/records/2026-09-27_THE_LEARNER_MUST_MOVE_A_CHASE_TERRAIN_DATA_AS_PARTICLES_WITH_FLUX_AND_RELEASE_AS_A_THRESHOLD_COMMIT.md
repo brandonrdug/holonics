@@ -480,6 +480,17 @@ and no loop.
 - **With the switches on.** Capture still beats the controls. The loop-closure reading locates the
   fault on exactly the aeons it is active, and lag-caused errors deposit nothing in the chaser's
   constitution.
+- **Cornering** (Brandon: the walls are what the chaser drives the runner into, "pinching" or
+  "squeezing"; the dog turned because the terrain curved). The chaser's advantage is acceleration
+  and traction, and the runner's is top speed. So capture comes from shrinking the runner's
+  reachable set until it lies inside the chaser's capture basin, not from pursuit.
+  - `[proved-derived]` The receipt is the runner's robust viability kernel in the arena (§14.4's
+    recursion), read tick by tick under the machine's play and under each control.
+  - `[interpretation]` The machine should shrink it faster than the controls; a capture without
+    cornering is luck.
+  - `[interpretation]` The same operation appears across games, proofs and argument: chess mating
+    nets; Thistlethwaite's cube algorithm, which drives the cube down a chain of nested subgroups
+    to the identity; the squeeze theorem and proof by narrowing cases; closing a listener's options.
 - **The human baseline.** Brandon's own play through a small exact interface, recorded with real
   intervals. It is reported beside the machine, not as acceptance, and it is itself data with real
   flux.

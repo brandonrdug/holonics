@@ -240,8 +240,11 @@ The machine has only read recordings; here it first moves, against another's con
   - The traces show turns forced across low-friction cells, with the runner's slips counted.
   - With the switches on, capture still beats both controls, the fault is located on exactly the
     aeons it is active, and lag-caused errors deposit nothing in the chaser's constitution.
-- **Reported beside it, not as acceptance.** Brandon's own play through a small exact interface,
-  with real intervals: the human baseline, and data with real flux.
+- **Reported beside it, not as acceptance.**
+  - The cornering receipt: the runner's robust viability kernel in the arena, tick by tick, under
+    the machine's play and under each control. Capture should come from shrinking it.
+  - Brandon's own play through a small exact interface, with real intervals: the human baseline,
+    and data with real flux.
 - **Budget.** A few thousand ticks per seed in exact arithmetic on the host, projected against ten
   minutes and the host memory before it runs. No card is needed.
 - **If it fails.** A reception failure locates the birth problem on terrain whose truth is known. An
