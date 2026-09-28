@@ -125,7 +125,11 @@
 //! `n` ([`tick_work`]: three dense products, nine vector operations and three carried splits a
 //! coordinate), a sheet read `2n` ([`read_work`]), and each stage's preparation `n³ + 6n²` plus its
 //! solve, `2n³` exact or `2n³(1 + 3·steps)` for the chart's Newton–Schulz refinement
-//! ([`PumpedRing::solve_work`]). The executed balance each tick forms is not counted.
+//! ([`PumpedRing::solve_work`]). The executed balance each tick forms is not counted. Its consumer's
+//! pinned run found the rings not a search: the bank costs more than enumeration and menu
+//! propagation, its lock proposes nothing its unpumped control does not, and undriven it lands on a
+//! plural lock, not the Stern–Brocot prior
+//! (`research/records/2026-09-28_THE_RINGS_AS_A_SEARCH_FOR_KEYS_PINNED_BEFORE_THE_RUN.md`).
 //!
 //! [proved-derived; implemented-exact] **The clock** ([`RingClock`]). The ring's rotor steps `1/d` of
 //! a turn per micro-step; over a passage of cells its arrivals on its section (the lift's multiples of

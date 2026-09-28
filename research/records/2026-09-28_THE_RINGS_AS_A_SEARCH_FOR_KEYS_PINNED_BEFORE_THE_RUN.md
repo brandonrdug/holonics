@@ -1,4 +1,4 @@
-# The rings as a search for keys, pinned before the run
+# The rings as a search for keys, pinned before the run: neither the search nor the prior holds
 
 **Date:** 2026-09-28. Refs #28, #73, #63. THE_REBUILD §4, "The ring-search experiment", wave C.
 
@@ -167,4 +167,127 @@ No parameter of the bank's dynamics was changed.
 
 ## 7. The run
 
-Pending: the pinned run follows this commit and is recorded here without changing §§1–6.
+`[established-bounded; measured]` Run once on the pin of `c2f577f1`
+(`cargo run --release -p holonics --example hnn_ring_search -- run`), in 6,887 ms at a peak
+resident set of 174,500 kB on 24 cores, within the projection. Every passage's balance closed: 672
+of 672 moiré passages, 78 of 78 crib passages and 91 of 91 of (2)'s orbit passages. Every certified
+key was checked against the truth after the fact, and every one was future-equivalent to it.
+
+### (1) Search: the work to a certified key
+
+Summed over the 8 seeds of each terrain; a moiré bank's sum adds its declaration once (the 21 rings'
+data-free solves, 3,795,456 for the bank and 3,795,456 for the control).
+
+| Terrain | Bank | Nonlocking control | Enumeration | Menu propagation |
+|---|---|---|---|---|
+| Blind moiré | 7 of 8 seeds certified: none | 7 of 8: none | 8 of 8: 25,566 | not declared |
+| Parity moiré | 6 of 8: none | 7 of 8: none | 8 of 8: 53,017,545 | not declared |
+| Rotor crib | 8 of 8: 1,512,813,925 | 8 of 8: 1,512,813,925 | 8 of 8: 460,880 | 8 of 8: 268,218 |
+
+- **Blind moiré.** The bank spent 6,423,444 to 6,424,242 a seed; enumeration's first certified key
+  cost 2,412 to 3,756. On the seven seeds both certified, the bank with its declaration spent
+  48,762,630 against enumeration's 21,810: `2235 rem 17280 over 21810` times as much. Both banks
+  missed seed 20262808, whose truth holds two layers of one rate (`5/8 @ 4/8` and `5/8 @ 7/8`).
+- **Parity moiré.** The bank spent 6,434,409 to 7,640,115 on the seeds it certified; enumeration
+  5,253 to 23,415,123. The bank was below enumeration on three seeds (20262813: 7,550,019 against
+  13,559,913; 20262814: 7,389,705 against 11,372,970; 20262816: 7,640,115 against 23,415,123) and
+  above on three. It missed 20262811 and 20262817; the control missed 20262811 only. On the six seeds
+  the bank certified, its work with the declaration was 46,079,115 against enumeration's 51,347,856
+  on the same seeds. This is a reading on a subset that the bank's own success selects, not a
+  comparison the criterion admits.
+- **Rotor crib.** The bank and the control are equal on every seed: the pump changes no proposal.
+  Each certified at key 0 (the rotor gauge puts a member of the truth's orbit at every key). The bank
+  spent `5640 rem 64405 over 268218` times menu propagation's work and `3282 rem 205765 over 460880`
+  times enumeration's. On seed 20262827, 186,471,264 of its 187,571,979 is the preparation of key 0's
+  two 98-wide solves.
+
+**(1) fails on all three terrains.**
+
+### (2) Prior: the basins of the undriven bank
+
+Each ring's `2^q` initial sign patterns, by the read of `T_B` at which the ring locks (the rotation
+equivariance held on every pattern for `q ≤ 4`):
+
+| `q` | locked at the first read | locked later | no lock |
+|---|---|---|---|
+| 2 | 2 of 4 | 0 | 2 |
+| 3 | 3 of 8 | 0 | 5 |
+| 4 | 4 of 16 | 0 | 12 |
+| 5 | 15 of 32 | 0 | 17 |
+| 6 | 42 of 64 | 0 | 22 |
+| 7 | 63 of 128 | 0 | 65 |
+| 8 | 112 of 256 | 32 | 112 |
+
+Over the bank's `2^122` configurations, every rate of one `q` has one basin (undriven, a ring's
+motion depends on `q` alone):
+
+| `q` | the basin of each rate, exact | on `2^(−24)ℤ` | the mass law `π` of its rates |
+|---|---|---|---|
+| 2 | `3^10·5^8·11^2·13^6·17^4 / 2^99` | `[29, 30)` | `1/2`: `512/807` |
+| 3 | `3^11·5^7·11^2·13^6·17^4 / 2^99` | `[17, 18)` | `64/807` each |
+| 4 | `3^9·5^8·11^2·13^6·17^4 / 2^99` | `[9, 10)` | `32/807` each |
+| 5 | `3^11·5^9·11^2·13^6·17^3 / 2^99` | `[26, 27)` | `1/5`, `4/5`: `4/807`; `2/5`, `3/5`: `32/807` |
+| 6 | `3^11·5^8·7·11·13^6·17^4 / 2^99` | `[56, 57)` | `2/807` each |
+| 7 | `3^12·5^7·7·11^2·13^5·17^4 / 2^99` | `[28, 29)` | `1/7`, `6/7`: `1/807`; the rest `4/807` |
+| 8 | `3^4·5^8·11^2·13^6·17^4·331 / 2^98` | `[27, 28)` | `1/8`, `7/8`: `1/1614`; `3/8`, `5/8`: `4/807` |
+
+(`Z = 807/2048`.) The plural lock carries `1 − 3^2·5^7·11·13^5·17^3·311·677·3793 / 2^98` of the
+configurations, in `[1 − 597/2^24, 1 − 596/2^24)`; no lock at all carries
+`3^2·5^8·7^4·11^2·13^6·17^4 / 2^99`, in `[10/2^24, 11/2^24)`.
+Every basin lies below its mass, so the total variation is `1 − Σ_r basin(r)`, with
+`Σ_r basin(r) = 22122889006909061118515625 / 2^99` in `[585/2^24, 586/2^24)`: far above `1/4`. The
+basins do not fall with the description (the `q = 6` rates' is the largest); 114 ordered pairs have
+a strictly shorter description with a strictly smaller basin.
+
+**(2) fails.**
+
+### The verdict
+
+Neither hypothesis holds. By the falsifier fixed in §5, the reading "rings as proposal dynamics"
+is **refuted for the HNN's ring law**: on these terrains the bank of pumped rings is not a key
+search. The adoption statement's second branch applies: the rings are recorded as not a search, and
+menu propagation (`hnn::keys`) remains the key search.
+
+## 8. What the measurement located
+
+- **The lock does no search.** On every terrain the nonlocking control proposed as well as the
+  pumped bank: identical proposals on the crib, 7 and 7 certified seeds on the blind moiré, 7 against
+  6 on the parity moiré. The pump's bifurcation amplifies an in-phase pattern that the integration
+  has already formed. Where the bank finds anything, the linear phase-carried moment finds it: a ring
+  resonating at its own rate (RIDE), not a lock.
+- **The work is the bank's fixed passage, not the key space.** The moiré bank's work is its 21
+  rings' 288 ticks, 6,423,444 to 7,640,115 a seed whatever the key space. Enumeration's is the key
+  space's: 2,412 to 3,756 on a channel's 122 gratings, and 5,253 to 23,415,123 on the parity moiré's
+  1,815,848 joint keys. The two meet only where the key space is large, and there the bank was
+  below enumeration on 3 of 8 seeds.
+- **A ring holds one phase of its rate.** One ring per rate cannot hold two layers of one rate (blind
+  seed 20262808).
+- **A parity product starves a ring's moment.** `[proved-derived]` A ring's phase-carried moment of a
+  parity product is, at each of its ports, its own layer's sheet there times the mean of the product
+  of the other layers' spins `1 − 2s` over the ticks that visit the port. A partner layer balanced on
+  every class of ticks those visits fix makes that mean zero. On 20262811 (`6/7`, `3/8`, `1/6`) the
+  `3/8` layer is balanced on each parity class of the tick, so the `6/7` and `1/6` rings are starved;
+  the `3/8` ring's moment is its pattern alternated by the `1/6` layer's parity-dependent mean
+  (`±1/3`), whose first Fourier pair is the pattern's third harmonic. No triple certified.
+- **The crib's board bank is the Bombe at the price of a solve.** Its lit wires are the support of
+  the linear response to the seed's kick, which is the Bombe's current; the pump changes none of them.
+  Preparing the 98-wide solve costs almost all of its work.
+- **Independent rings lock together.** Undriven, every ring whose initial first-Fourier projection
+  has a grating's sheet locks at the first pumped read, so the bank lands on a plural lock in all but
+  `[596/2^24, 597/2^24)` of its configurations (single locks `[585/2^24, 586/2^24)`, no lock
+  `[10/2^24, 11/2^24)`). The single-rate basins follow the rings' sign
+  combinatorics, not `2^(−ℓ)`. A linear bank has no mechanism by which one lock excludes another,
+  and coupling its rings into one connected linear network would give one dominant mode, whose
+  basins are two half-spaces.
+
+## 9. Obligations
+
+Owed in #62 (the harness relies on them; none is a new law in an owner):
+- Fine and Wilf's theorem in its two-word form (the moiré certificate);
+- the crib's revisit certificate: a key that reproduces a cycle of the joint state repeats it;
+- the rotation equivariance of a circulant ring's pumped passage on the word lattice (the orbit
+  reading of (2), checked on every pattern for `q ≤ 4`);
+- the starved moment: a ring's phase-carried moment of a parity product vanishes against a
+  balanced, independent partner layer;
+- the pumped passage's telescoping with its switch work, as one Lean statement composed from
+  `HNN/Ring.{ring_material_commit_work, ring_tick_executed_energy_balance}`.

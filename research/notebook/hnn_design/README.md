@@ -2578,3 +2578,37 @@ leaves 36 passages uncaptured by `2^9` with the switches on (32 off), each count
   three-channel menu over `ℤ/4` as its instance; the lagged capture basin is the Pre recursion of the
   lagged information structure (and equals the unlagged one at `d = 0`); the attribution's split
   `q − p_act = (q − p_con) + (p_con − p_act)` with deposition consuming `q − p_con` alone.
+
+### The ring-search experiment (September 28)
+
+Record: [the rings as a search for keys](../../records/2026-09-28_THE_RINGS_AS_A_SEARCH_FOR_KEYS_PINNED_BEFORE_THE_RUN.md)
+(its pin, the run and what it located). #28, #73, #63.
+
+```sh
+cargo run --release -p holonics --example hnn_ring_search -- bank        # the declaration
+cargo run --release -p holonics --example hnn_ring_search -- preflight   # development seeds only
+cargo run --release -p holonics --example hnn_ring_search -- run         # the pinned run, once
+```
+
+The computational object is the helical pair interaction: the rings as complex parametrons whose
+ports are joined by their contacts (neighbours and half-turn partners), carried by their rotors at
+their rates, locking onto sheets past the pump's bifurcation. This loop touches the **helix** (each
+ring's rotor winding with carry, the phase-carried moment), the **pair** (the contacts' coupling and,
+on the crib, the Bombe's wires joined by the menu's stages) and the **cell holonomy** (the Bombe's
+loop closure, and the crib's revisited joint state); faces and placement, the tube and the tower
+thread stay attached.
+
+Pinned at `c2f577f1`, run once (6,887 ms, peak resident 174,500 kB, 24 cores); every passage's
+balance closed (672 moiré, 78 crib, 91 prior), and every certified key was future-equivalent to the
+truth. The work to a certified key, summed over 8 fresh seeds a terrain (a moiré bank with its
+declaration, 3,795,456):
+
+| Terrain | Bank | Nonlocking control | Enumeration | Menu propagation |
+|---|---|---|---|---|
+| Blind moiré | 7 of 8 certified: none | 7 of 8: none | 25,566 | not declared |
+| Parity moiré | 6 of 8: none | 7 of 8: none | 53,017,545 | not declared |
+| Rotor crib | 1,512,813,925 | 1,512,813,925 | 460,880 | 268,218 |
+
+(1) fails on all three terrains. (2) fails: the undriven bank lands on a plural lock in all but
+`[596/2^24, 597/2^24)` of its `2^122` configurations, and its single-rate basins do not follow
+`2^(−ℓ)` (114 ordering violations). The rings are recorded as not a search.
