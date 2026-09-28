@@ -108,9 +108,8 @@ sets the order:
    - **Birth.** Founding draws from the reserved prior mass without moving the population's code. A
      dead seed can be re-founded. The descended ring's causal chord equals the full ring's
      (`the_chord_survives_the_release`).
-   - **Remaining.** Species collapse is not built, and the birth prior is not yet learned across
-     aeons. The Lean for the rounding bound, the newborn's telescope and the chord equality is owed
-     in #62.
+   - **Remaining.** The Lean for the rounding bound, the newborn's telescope and the chord equality
+     is owed in #62. Species collapse and the evolved prior are item 7.
 
 6. **Composition at ports, built (September 27;** `receiver::population::composition`, Lean
    `Context/Composition`**).** A keystone (a record clock) exposes its port, and conditioned eggs (a
@@ -126,7 +125,21 @@ sets the order:
 
    The curated source's per-port reader was measured and retired: the typed reader stays, and
    campaign 5 needs a joint address across ports and a cheaper boundary.
-7. **Next: the evolved prior and species collapse.** Families compose at ports (a Holarchy of eggs). The birth prior over families is learned across aeons from the
+7. **The evolved prior and species collapse, built (September 27;** Lean `Context/Evolution`**).**
+   - **Identity.** A family's identity is its declaration, which survives re-founding and aeons.
+   - **The evolved prior.** Its only history is three counts per identity (aeons declared,
+     selected, died). The prior is a Dirichlet face of the counts mixed with the description
+     prior, and an aeon codes at most the selected family's code plus `−log₂` of its evolved mass.
+     Over twelve aeons of mixed terrains it codes `−4 + 15/16 + ε` below the static prior, saving
+     more each cycle (`0 + 8/16`, then `−2 + 8/16`, then `−3 + 14/16`); naming a family is all it
+     can save.
+   - **Species collapse.** It is relative to the admitted future: keys whose faces agree over it
+     become one member with the summed posterior, and every seed is kept so the species can split.
+     The parity moiré's 720 keys become one species; each grating merges with its mirror; the
+     rotor's gauge orbit merges. No code changes. A shorter admitted future splits the species
+     again (2, 4, 14 and 27 species over 1, 2, 4 and 8 ticks).
+   - **Work.** Each family's executed work is counted in its cost receipt.
+8. **Next.** Families compose at ports (a Holarchy of eggs). The birth prior over families is learned across aeons from the
    population's deaths and selections (the evolved ability; [ELEMENTARY_OBJECTS, keys](../ELEMENTARY_OBJECTS.md#keys-locks-and-navigation)):
    a retention of selection counts, never a tape. A keystone's value is the joint code with it against without it, and a mode held
    against dissipation charges its maintenance work
