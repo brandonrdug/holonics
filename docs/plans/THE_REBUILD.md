@@ -640,6 +640,79 @@ adoption. The field remains dormant for text until that consumer is built.
   population passage over the standing cut exceeds ten minutes. It is projected, and run as a
   bounded probe if the projection fails.
 - **If it fails.** The field stays dormant for text, kept and not run, with the decision recorded.
+- **The adoption gate on the receiving population, September 28: the pins** (committed before the
+  split is generated and before any of its cells is read; Refs #73 #63). U1 joined the field's
+  per-cell face to the population at the HNN's port, which is the consumer the preflight found
+  missing: `hnn::receiving::receiving_population`, a `PortPopulation` over the tree's face `q_T` and
+  the combined face `q_C`, which enters as its exact enclosure in `ℚ(θ)`, at `½/½`. No law or owner
+  is added. The gate is a mode of the exposure harness (`hnn_exposure … gate f2`).
+  1. *The families.* F2's split of September 27 is spent. Its validation tail was read once by the
+     capacity-admissible exposure, whose model face was then the tree-and-combined mixture, with the
+     tree printed beside it, so the with-and-without comparison has already been read on those
+     cells. A different part of the same split, chosen after that reading, would not be fresh. The
+     fresh split uses `seed = holonics-f2-development-families-2026-09-28-v2` under F4's rule
+     (`development_families.py F2V2`). Each role's stream is written by
+     `curated_source.py 524288 <role> F2V2`: F4's aperture, one tail of at most `2^19` cells a role,
+     opening at a section letter. Its counts and hashes are recorded with the receipt.
+  2. *The full gate is projected and refused.* The declared passage is the validation role at F4's
+     aperture: at most `2^19` cells, so at most `2^18` two-cell windows, read after the choosing
+     role's. U1's card run on the standing cut took 308,234 ms over 3,074 windows, `100 rem 834` ms
+     a window. At that rate the validation role alone projects to at most `26285521 rem 2142` ms,
+     43 times ten minutes and 485,521 ms more. The host is slower (359,998 ms, `117 rem 340` a
+     window). Ten minutes admit 5,983 windows at the card's rate. So no full passage runs and none
+     is claimed (the protocol).
+  3. *The bounded probe*, at the field's admitted `n* = 6,148`, keeps F2's capacity-admissible
+     shape: the last 4,096 byte cells of the choosing role's stream, then the last 2,052 of the
+     validation role's, with the section letters removed (`f2_capacity_probe.py F2V2`), held out
+     `[4096, 6148)`, 3,074 windows. The field is campaign one's, declared at 6,148 cells, and the
+     tree is its receiver's (`D = 4`, the `½` stop prior, `L_R = 16`), as on the standing cut.
+  4. *The comparison.* Both populations are declared at the passage's opening. Each scores every
+     cell before that cell's own deposit.
+     - **With**: the receiver's population, the tree and `q_C` at one bit each (`π = ½/½`). The
+       field's declaration is charged once, in the prior, and reaches the validation cells through
+       the posterior.
+     - **Without**: the population over the tree alone, one family at prior one
+       (`PortPopulation::new(&[0])`). Its faces are the same tree's executed faces at the same
+       causal addresses (`Landmarks::receive` over the cell letters). It is read after the exposure,
+       over the cells the exposure scored.
+     - The charged code of the validation families is each population's per-cell codes summed over
+       the held-out cells, as enclosures. *Strictly shorter* means `with.upper < without.lower`.
+     - The two readings of the tree must agree: the population over it alone and the exposure's
+       tree column must intersect on both parts. Otherwise the run is refused as inconsistent.
+     - Beside the gate, deciding nothing: each population's whole-passage telescope (where the one
+       bit is paid explicitly), the field's own face `L_C` on the validation cells, the log-odds
+       `log₂(L_T/L_C)` at the join and at the end, and the field's declared description (the
+       `Kt` term).
+  5. *Work and memory, reported separately.*
+     - With the field: the exposure's wall time by phase (the tree's read, transfers and deposit
+       updates apart from the field's word and wave phases), its resident state bits, the process's
+       peak resident set, and the card's memory, sampled by `nvidia-smi` during the run.
+     - Without it: the population over the tree alone, its wall time and its state bits (the tree's
+       and the one-family population's).
+     - The field's part of the state is the resident's bits less the tree's and the population's.
+  6. *The budgets.*
+     - (a) The probe passage: the whole run (setup and exposure) within 600,000 ms, a resident set
+       within 20,000,000,000 bytes, and at most 16 GiB on the card.
+     - (b) The warm response: 60,000 ms. It is read on the declared validation passage's agent
+       responses: each agent-channel part, as F0's response stops count them. The longest, `r`
+       cells, occupies `⌈r/2⌉` windows at the run's mean a window. The reading excludes the
+       request's own reception, so it can refuse the budget and cannot by itself admit it.
+     - (c) The declared validation passage of item 2: ten minutes, at the run's mean a window.
+  7. *The adoption rule.* The field is adopted for text only if the comparison of item 4 is
+     strictly shorter and every budget of item 6 holds. [agent-inferred, from the protocol: a failed
+     projection admits a bounded probe, never a full-passage claim; the F2 pin of September 27 said
+     the same.] Budget (c) is refused by projection before the run, so **this run cannot adopt the
+     field**. It reads the code and the probe's work, and names each separating term by its
+     measurement. If the field fails, it stays dormant for text, kept and not run.
+  8. *The run, once*, on the card: `holonics-cuda`'s `hnn_exposure … realization card gate f2`,
+     alone on the idle card under the GPU lock. Its readout equals the host's line for line (U1).
+     - It is projected at 308,234 to 318,378 ms for the exposure, milliseconds for the tree alone,
+       under 1 GB of host memory and about 0.5 GiB on the card.
+     - It is stopped past ten minutes (`timeout`) or past 20 GB (a memory-limited scope), and its
+       partial evidence is then reported as incomplete.
+     - The harness's smoke is the public development control (`held-out 6132 windows 16 gate f2`,
+       32 cells, the two readings of the tree agreeing). Nothing of the fresh split is read before
+       the run.
 
 
 ### F3. The resident population (step 5; #76)

@@ -61,6 +61,26 @@
 //! The card's readout is the host's line for line but for the realization's line, the wall times
 //! and, beside them, what crossed the bus (`holonics_cuda::hnn::Traffic`).
 //!
+//! [definition; agent-inferred] **F2's adoption gate** (`gate f2`; THE_REBUILD F2, the pins of
+//! September 28): after the exposure, the same cells it scored are read once more by the
+//! population over the tree alone, one family at prior one (`PortPopulation::new(&[0])`), its faces
+//! the receiver's tree's executed faces at the same causal addresses (`Landmarks::receive` over the
+//! cell letters), each scored before its own deposit. The gate block prints the charged code of the
+//! held-out (validation) cells with the field (the receiver's population, the tree and `q_C` at
+//! `½/½`, the exposure's model) and without it, whether the first is strictly shorter on the
+//! enclosures, the two readings of the tree against each other, the whole-passage telescopes, the
+//! field's own face, the posterior at the join and at the end, work and memory with and without
+//! (the field's part separately), and the budgets: the probe passage (ten minutes, 20 GB), the warm
+//! response (60 s for the declared validation passage's longest agent response, at the run's mean a
+//! window) and the declared validation passage (ten minutes, at the same mean), the last two read
+//! from the cut's manifest (`declared_validation_cells`, `longest_agent_response`, written by
+//! `f2_capacity_probe.py`). The card's memory is read outside the process.
+//!
+//! ```sh
+//! cargo run --release -p holonics --example hnn_exposure -- held-out 6132 windows 16 gate f2   # the smoke, public
+//! cargo run --release -p holonics-cuda --example hnn_exposure -- cut-file .local/cuts/f2v2-gate-probe.bin cells all realization card gate f2
+//! ```
+//!
 //! [established-bounded; measured] **The readout** is the complete `Exposure`, with every quantity
 //! design (f) names:
 //! - the executed word (Decision 24): the declared precisions, the charts' refinements (their starts,
@@ -122,21 +142,25 @@ use std::time::Instant;
 use holonics::aeon::{EnclosedBalance, LiteralComparison};
 use holonics::compression::cost::ceil_log2;
 use holonics::compression::landmark::context::baseline::PPM_ORDER;
+use holonics::compression::landmark::context::{Landmarks, cell_letters, letter_address};
 use holonics::hnn::constitution::CAMPAIGN_ONE_BUDGET;
 use holonics::hnn::port::{ExecutionPort, ReceiptDetail};
+use holonics::hnn::receiving::landmark_declaration;
 use holonics::hnn::reference::{Bits, KeyReport};
 use holonics::hnn::{
     AeonBoundary, Constitution, Cut, Exposure, Field, FieldDeclaration, Reference,
     ResonatorMaterial, Steps,
 };
-use holonics::ratio::algebraic::ExactInterval;
+use holonics::ratio::algebraic::{ExactInterval, interval_sum};
 use holonics::ratio::{Rat, rat};
+use holonics::receiver::population::PortPopulation;
 use holonics::receiver::reception::Component;
 use num_bigint::{BigInt, BigUint};
-use num_traits::One;
+use num_traits::{One, Zero};
 
 use exterior::{
-    against, difference, enclosure, exact, per, ratio, read_cut, reading, receiver_grain,
+    against, difference, enclosure, exact, manifest_number, per, ratio, read_cut, reading,
+    receiver_grain,
 };
 
 /// **The pinned campaign cut**: the commit whose `docs/plans/THE_REBUILD.md` is the campaign
@@ -201,6 +225,7 @@ fn main() {
     let mut cut_file: Option<String> = None;
     let mut realization = String::from("host");
     let mut loaded = false;
+    let mut gate = false;
     for pair in arguments.chunks(2) {
         match pair {
             [key, value] if key == "cells" => cells = Some(value.clone()),
@@ -217,9 +242,10 @@ fn main() {
             [key, value] if key == "realization" && (value == "host" || value == "card") => {
                 realization = value.clone();
             }
+            [key, value] if key == "gate" && value == "f2" => gate = true,
             _ => {
                 println!(
-                    "usage: hnn_exposure [cut-file <path>] [cells <N|all>] [held-out <cells>] [windows <deadline>] [realization <host|card>] [resonator <none|source>]"
+                    "usage: hnn_exposure [cut-file <path>] [cells <N|all>] [held-out <cells>] [windows <deadline>] [realization <host|card>] [resonator <none|source>] [gate f2]"
                 );
                 return;
             }
@@ -387,6 +413,9 @@ fn main() {
     );
     if let Some((now, peak)) = exterior::resident_set() {
         println!("resident set (exterior, /proc/self/status): now {now} bytes, peak {peak} bytes");
+    }
+    if gate {
+        f2_gate(&field, &cut, &exposure, setup + wall, cut_file.as_deref());
     }
 }
 
@@ -1096,4 +1125,268 @@ fn literal(face: &LiteralComparison, grain: u64) {
     println!("    gain (sum of g)  {}", enclosure(&face.gain, grain));
     println!("    literal n·log2|A| {}", enclosure(&face.literal, grain));
     println!("    code + gain = literal on the enclosures' endpoints: {balances}");
+}
+
+// -------------------------------------------------------------------------------------------
+// F2's adoption gate
+
+/// The probe passage's budget: ten minutes, in milliseconds (the protocol).
+const PASSAGE_MS: u128 = 600_000;
+
+/// The warm response's budget: one minute, in milliseconds (F2's pin of September 27).
+const RESPONSE_MS: u128 = 60_000;
+
+/// The host memory admitted: 20 GB of resident set, in bytes (the protocol).
+const HOST_BYTES: u128 = 20_000_000_000;
+
+/// **The population over the tree alone** (`gate f2`, module header): its code on the training
+/// and the held-out cells (each cell's code read before the cell is received, summed as the
+/// exposure sums its model's), its telescope over the cells read, and its state: the tree's nodes
+/// and bits and the population's bits.
+struct TreeAlone {
+    training: ExactInterval,
+    held_out: ExactInterval,
+    telescope: ExactInterval,
+    nodes: usize,
+    tree_bits: u64,
+    population_bits: u64,
+}
+
+/// Read the cut's first `scored` cells with the population over the receiver's tree alone: one
+/// family at prior one (`PortPopulation::new(&[0])`), its face of each cell the tree's executed
+/// face at the cell's causal address over the cell letters, read before the cell's own deposit.
+fn tree_alone(field: &Field, cut: &Cut, scored: usize) -> TreeAlone {
+    let declaration =
+        landmark_declaration(field, &field.receivers()[0]).expect("the receiver's declared tree");
+    let depth = declaration.depth;
+    let cells = &cut.cells[..scored];
+    let letters = cell_letters(cells);
+    let mut tree = Landmarks::new(declaration).expect("the receiver's tree");
+    let mut population = PortPopulation::new(&[0]).expect("one family at prior one");
+    let zero = ExactInterval::point(Rat::zero());
+    let (mut training, mut held_out) = (zero.clone(), zero);
+    for (position, &class) in cells.iter().enumerate() {
+        let reading = tree
+            .receive(&letter_address(&letters, position, depth), class)
+            .expect("the tree receives the cell");
+        let face = [ExactInterval::point(reading.executed)];
+        let code = population
+            .code_of(&face)
+            .expect("a positive executed face has a code");
+        let sum = if cut.held_out(position) {
+            &mut held_out
+        } else {
+            &mut training
+        };
+        *sum = interval_sum(sum, &code).expect("an ordered sum");
+        population
+            .receive(&face)
+            .expect("the population receives the cell");
+    }
+    TreeAlone {
+        training,
+        held_out,
+        telescope: population.code().expect("the population's telescope"),
+        nodes: tree.nodes(),
+        tree_bits: tree.bits(),
+        population_bits: population.bits(),
+    }
+}
+
+/// Whether two enclosures share a point (two readings of one exact value must).
+fn intersect(a: &ExactInterval, b: &ExactInterval) -> bool {
+    a.lower <= b.upper && b.lower <= a.upper
+}
+
+/// `value` against `bound`, exactly: within or past it, with the exact margin.
+fn budget(value: u128, bound: u128) -> String {
+    if value <= bound {
+        format!("within it (margin {})", bound - value)
+    } else {
+        format!("PAST it (by {})", value - bound)
+    }
+}
+
+/// **F2's adoption gate** (module header; THE_REBUILD F2, the pins of September 28): the charged
+/// code of the validation cells with and without the field, the work and memory of each, and the
+/// budgets, with the adoption rule's verdict.
+fn f2_gate(field: &Field, cut: &Cut, exposure: &Exposure, run: u128, cut_file: Option<&str>) {
+    let grain = receiver_grain(field);
+    let scored = usize::try_from(exposure.training.cells + exposure.held_out.cells)
+        .expect("the cells scored fit the address space");
+    let clock = Instant::now();
+    let alone = tree_alone(field, cut, scored);
+    let alone_wall = clock.elapsed().as_millis();
+
+    println!();
+    println!("== F2's adoption gate (THE_REBUILD F2, the pins of September 28) ==");
+    println!(
+        "without the field: the population over the tree alone (one family at prior one; the receiver's tree at each cell's causal address, each cell scored before its own deposit), read after the exposure over the {scored} cells it scored: {alone_wall} ms wall"
+    );
+    let agree = [
+        intersect(&alone.training, &exposure.training.tree),
+        intersect(&alone.held_out, &exposure.held_out.tree),
+    ];
+    println!(
+        "the two readings of the tree (the population over it alone; the exposure's tree column, the face the receiver's population weighs) intersect: training {}, held out {}",
+        agree[0], agree[1]
+    );
+
+    let held = exposure.held_out.cells;
+    let (with, without) = (&exposure.held_out.model, &alone.held_out);
+    let shorter = with.upper < without.lower;
+    println!("the charged code of the held-out (validation) cells, {held} cells:");
+    println!(
+        "  with the field (the receiver's population: the tree and q_C at ½/½, the field's declaration charged once, in the prior): {}",
+        enclosure(with, grain)
+    );
+    println!(
+        "  without it (the population over the tree alone): {}",
+        enclosure(without, grain)
+    );
+    println!(
+        "  with − without: {}; with is {} without; strictly shorter (with.upper < without.lower): {shorter}",
+        difference(with, without, grain),
+        against(with, without)
+    );
+    println!(
+        "  a cell: with {}; without {}",
+        per(with, held, grain),
+        per(without, held, grain)
+    );
+    println!(
+        "  the field's own face q_C on them: {}; L_C − L_T: {}",
+        enclosure(&exposure.held_out.combined, grain),
+        difference(&exposure.held_out.combined, &exposure.held_out.tree, grain)
+    );
+    println!(
+        "the training (choosing) cells, {} cells: with {}; without {}; with − without {}; L_C − L_T {}",
+        exposure.training.cells,
+        enclosure(&exposure.training.model, grain),
+        enclosure(&alone.training, grain),
+        difference(&exposure.training.model, &alone.training, grain),
+        difference(&exposure.training.combined, &exposure.training.tree, grain)
+    );
+    match &exposure.population {
+        Some(population) => {
+            println!(
+                "the whole passage, each population's telescope (the field's one bit paid once, in the prior): with −log2(½ L_T + ½ L_C) {}; without −log2 L_T {}; with − without {}",
+                enclosure(&population.code, grain),
+                enclosure(&alone.telescope, grain),
+                difference(&population.code, &alone.telescope, grain)
+            );
+            println!(
+                "the posterior's log-odds log2(L_T/L_C) = L_C − L_T: at the join (after the training cells) {}; at the end {}",
+                difference(&exposure.training.combined, &exposure.training.tree, grain),
+                population
+                    .odds
+                    .as_ref()
+                    .map_or_else(|| "none".to_string(), |odds| enclosure(odds, grain))
+            );
+        }
+        None => println!("the receiver's population: none"),
+    }
+    println!(
+        "the field's declared description (Kt's term; the gate charges the prior's one bit, not this): {} bits",
+        exposure.description_bits
+    );
+
+    // Work and memory, the field's part apart.
+    let windows = u128::from(exposure.compares);
+    let wall = &exposure.wall;
+    let tree_ms = (wall.tree_read + wall.tree_transfer + wall.tree_deposit).as_millis();
+    let phases_ms = wall.total().as_millis();
+    println!(
+        "work with the field: the run {run} ms (setup and exposure) over {windows} windows ({} ms a window); of the phases' {phases_ms} ms, the tree's read, transfers and deposit updates {tree_ms} ms and the rest {} ms (the field's word and wave, both populations' scoring inside the compare, and the host's deposit, which on the host also moves the tree)",
+        mean(run, windows),
+        phases_ms.saturating_sub(tree_ms)
+    );
+    println!("work without it: the population over the tree alone {alone_wall} ms");
+    let resident = exposure.state.resident_bits;
+    let population_bits = exposure.population.as_ref().map_or(0, |p| p.bits);
+    let peak = exterior::resident_set().map(|(_, peak)| peak);
+    println!(
+        "memory with the field: the resident's state {resident} bits, of which the tree {} and the population {population_bits}, so the field's part {} bits; the process's peak resident set {} bytes",
+        alone.tree_bits,
+        resident.saturating_sub(alone.tree_bits + population_bits),
+        peak.map_or_else(|| "unread".to_string(), |bytes| bytes.to_string())
+    );
+    println!(
+        "memory without it: the tree {} bits ({} nodes) and the population {} bits, {} bits in all",
+        alone.tree_bits,
+        alone.nodes,
+        alone.population_bits,
+        alone.tree_bits + alone.population_bits
+    );
+
+    // The budgets.
+    let passage_ok = run <= PASSAGE_MS;
+    let memory_ok = peak.is_some_and(|bytes| bytes <= HOST_BYTES);
+    println!(
+        "budget (a), the probe passage: {run} ms against {PASSAGE_MS}: {}; the peak resident set against {HOST_BYTES} bytes: {} (the card's memory is read outside the process)",
+        budget(run, PASSAGE_MS),
+        peak.map_or_else(|| "unread".to_string(), |bytes| budget(bytes, HOST_BYTES))
+    );
+    let declared = cut_file.map(|path| {
+        (
+            manifest_number(path, "\"longest_agent_response\":") as u128,
+            manifest_number(path, "\"declared_validation_cells\":") as u128,
+        )
+    });
+    let (response_ok, declared_ok) = match declared {
+        Some((response, cells)) if windows > 0 => {
+            // A span of `c` cells occupies ⌈c/2⌉ two-cell windows, each at the run's mean.
+            let at_mean = |cells: u128| (cells.div_ceil(2) * run).div_ceil(windows);
+            let (response_ms, passage_ms) = (at_mean(response), at_mean(cells));
+            println!(
+                "budget (b), the warm response: the declared validation passage's longest agent response, {response} cells, {} windows at the run's mean: {response_ms} ms (rounded up) against {RESPONSE_MS}: {}; the budget admits {} windows at the mean (the request's own reception excluded, so this reading can refuse the budget and cannot alone admit it)",
+                response.div_ceil(2),
+                budget(response_ms, RESPONSE_MS),
+                RESPONSE_MS * windows / run.max(1)
+            );
+            println!(
+                "budget (c), the declared validation passage: {cells} byte cells, {} windows at the run's mean: {passage_ms} ms (rounded up) against {PASSAGE_MS}: {}; ten minutes admit {} windows at the mean",
+                cells.div_ceil(2),
+                budget(passage_ms, PASSAGE_MS),
+                PASSAGE_MS * windows / run.max(1)
+            );
+            (response_ms <= RESPONSE_MS, passage_ms <= PASSAGE_MS)
+        }
+        _ => {
+            println!(
+                "budgets (b) and (c): unread (no cut file with the declared validation passage's counts, or no window read)"
+            );
+            (false, false)
+        }
+    };
+    let consistent = agree[0] && agree[1];
+    let adopted = consistent && shorter && passage_ok && memory_ok && response_ok && declared_ok;
+    let mut terms = Vec::new();
+    if !consistent {
+        terms.push("the two readings of the tree disagree: the run is refused as inconsistent");
+    }
+    if !shorter {
+        terms.push("the code: with the field is not strictly shorter on the validation cells");
+    }
+    if !passage_ok {
+        terms.push("the probe passage's time");
+    }
+    if !memory_ok {
+        terms.push("the host memory (past the budget or unread)");
+    }
+    if !response_ok {
+        terms.push("the warm response (past the budget or unread)");
+    }
+    if !declared_ok {
+        terms.push("the declared validation passage (past the budget or unread)");
+    }
+    println!(
+        "verdict (host and process; the card's memory is read outside): {}",
+        if adopted {
+            "every clause holds (adopted for text if the card's memory is within 16 GiB)"
+                .to_string()
+        } else {
+            format!("NOT ADOPTED; the separating terms: {}", terms.join("; "))
+        }
+    );
 }

@@ -69,10 +69,10 @@ cells, so the two are measured on identical cells.
 
     HOLONICS_ROOT=<main checkout> python3 research/notebook/hnn_design/curated_source.py 1048576
 
-For F4, F1, F2, F5 or U2, after `development_families.py` has pinned the private membership, the
-optional second argument `choosing` or `validation` emits only that role's development families under
-`curated-<item>-<role>-*` names (`F4` is the default item; pass `F1`, `F2`, `F5` or `U2` as a third
-argument). It does
+For F4, F1, F2, F5, U2 or F2V2, after `development_families.py` has pinned the private membership,
+the optional second argument `choosing` or `validation` emits only that role's development families
+under `curated-<item>-<role>-*` names (`F4` is the default item; pass `F1`, `F2`, `F5`, `U2` or `F2V2`
+as a third argument). It does
 not decode evaluation or deferred records. A relation across roles is unheld, never supplied by
 adjacency.
 

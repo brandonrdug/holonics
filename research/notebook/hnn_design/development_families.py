@@ -5,8 +5,10 @@ Family keys and assignments stay in an owner-only file; stdout contains counts a
 
     HOLONICS_ROOT=<checkout with private data> python3 development_families.py
 
-Pass `F1`, `F2`, `F5` or `U2` for an independent item split before its validation; the default remains
-the pinned F4 split. Each item's seed is declared in `SEEDS` (U2's acceptance run: its record's pin 1).
+Pass `F1`, `F2`, `F5`, `U2` or `F2V2` for an independent item split before its validation; the default
+remains the pinned F4 split. Each item's seed is declared in `SEEDS` (U2's acceptance run: its record's
+pin 1; `F2V2`, F2's adoption gate on the receiving population: THE_REBUILD F2, the pins of September 28,
+a fresh split because F2's first validation tail was read once on September 27).
 
 The split belongs to the exterior codec. A family is the undivided pair
 ``(provider, record_group)`` from the dataset, not a byte span or an aeon. SHA-256 of the
@@ -31,6 +33,7 @@ SEEDS = {
     "F2": "holonics-f2-development-families-2026-09-27-v1",
     "F5": "holonics-f5-development-families-2026-09-27-v1",
     "U2": "holonics-u2-development-families-2026-09-28-v1",
+    "F2V2": "holonics-f2-development-families-2026-09-28-v2",
 }
 NAME = "development-families-f4.json"
 PARTITION = re.compile(rb'"partition"\s*:\s*"(development|evaluation|deferred)"')
