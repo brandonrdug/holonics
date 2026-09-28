@@ -545,11 +545,22 @@ impl Evasion {
         }
     }
 
-    /// **The navigator's score of a next velocity** (module header), least best.
-    fn score(&self, arena: &Arena, motion: &Motion, next: Point, chaser: Point, tick: u64) -> i64 {
+    /// **The navigator's score of a next velocity** (module header), least best, against a chaser
+    /// at a grain `g ≥ 1` (its position `X/g` carried as `X`, [`Runner::demand_at_grain`]): each
+    /// score is read in the grain's units, `g²` times the plane's, so at `g = 1` it is the lattice's.
+    fn score(
+        &self,
+        arena: &Arena,
+        motion: &Motion,
+        next: Point,
+        chaser: Point,
+        grain: i64,
+        tick: u64,
+    ) -> i64 {
         let x = motion.position;
         match self {
-            Evasion::Flee => -quadrance(sub(add(x, next), chaser)),
+            // g²·|x + v′ − X/g|² = |g(x + v′) − X|².
+            Evasion::Flee => -quadrance(sub(scale(grain, add(x, next)), chaser)),
             Evasion::Circle { clockwise } => {
                 let sign = if *clockwise { -1 } else { 1 };
                 let declaration = arena.declaration();
@@ -563,8 +574,12 @@ impl Evasion {
                 } else {
                     -1
                 };
-                let away = sub(x, chaser);
-                quadrance(sub(next, add(away, scale(sign, quarter_turn(away)))))
+                // g²·|v′ − (a + σJa)|² with a = x − X/g: |g v′ − (A + σJA)|², A = g x − X.
+                let away = sub(scale(grain, x), chaser);
+                quadrance(sub(
+                    scale(grain, next),
+                    add(away, scale(sign, quarter_turn(away))),
+                ))
             }
         }
     }
@@ -638,6 +653,26 @@ impl Runner {
         chaser: Point,
         tick: u64,
     ) -> Option<Point> {
+        self.demand_at_grain(arena, moves, caps, state, chaser, 1, tick)
+    }
+
+    /// [definition; agent-inferred] **The demand against a chaser at a grain** (THE_REBUILD U4's
+    /// move-set reading, `pursuit::MoveSet`): the chaser stands at `X/g` on the lattice
+    /// `(1/g)ℤ[i]`, carried as its numerator `X` and the grain `g ≥ 1`. The navigators are laws of
+    /// the plane (the flee's pair quadrance, the zig-zag's direction from the chaser, the circle's
+    /// centre); read in the grain's units every score is `g²` times the plane's, an exact positive
+    /// multiple, so the order and its ties are the plane's, and at `g = 1` this is [`Runner::demand`].
+    #[allow(clippy::too_many_arguments)]
+    pub fn demand_at_grain(
+        &self,
+        arena: &Arena,
+        moves: &Moves,
+        caps: &Caps,
+        state: &RunnerState,
+        chaser: Point,
+        grain: i64,
+        tick: u64,
+    ) -> Option<Point> {
         let motion = &state.motion;
         let expected = caps.classes.get(state.ground).copied()?;
         let mut best: Option<(Point, i64)> = None;
@@ -651,7 +686,7 @@ impl Runner {
             if quadrance(next) > caps.speed || !arena.inside(add(motion.position, next)) {
                 continue;
             }
-            let score = self.evasion.score(arena, motion, next, chaser, tick);
+            let score = self.evasion.score(arena, motion, next, chaser, grain, tick);
             if best.is_none_or(|(_, least)| score < least) {
                 best = Some((change, score));
             }
@@ -672,6 +707,25 @@ impl Runner {
         chaser: Point,
         tick: u64,
     ) -> Result<usize, TerrainError> {
+        self.cell_at_grain(arena, moves, caps, state, chaser, 1, tick)
+    }
+
+    /// **The runner's cell against a chaser at a grain** ([`Runner::demand_at_grain`]); at `g = 1`
+    /// it is [`Runner::cell`]. Refused at a grain below one.
+    #[allow(clippy::too_many_arguments)]
+    pub fn cell_at_grain(
+        &self,
+        arena: &Arena,
+        moves: &Moves,
+        caps: &Caps,
+        state: &RunnerState,
+        chaser: Point,
+        grain: i64,
+        tick: u64,
+    ) -> Result<usize, TerrainError> {
+        if grain < 1 {
+            return Err(refuse("a chaser's grain", "it is at least one"));
+        }
         let motion = &state.motion;
         let class = arena
             .class(motion.position)
@@ -692,7 +746,7 @@ impl Runner {
         if state.held > 0 {
             return Ok(kept());
         }
-        Ok(match self.demand(arena, moves, caps, state, chaser, tick) {
+        Ok(match self.demand_at_grain(arena, moves, caps, state, chaser, grain, tick) {
             None => moves.wall(),
             Some(change)
                 if Move::by_change(motion.velocity, change).within_cap(caps.classes[class]) =>

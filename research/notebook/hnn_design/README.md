@@ -2081,3 +2081,91 @@ agrees line for line with the rebase's (342 lines, wall times masked).
   enters no sum, and "more than half of the seeds" counts the chased seeds. The refusal reads the
   openings alone, the same for every chaser, so it selects by no chaser's outcome. Nothing else
   changed; the rerun must reproduce the first run's 34 seed lines exactly.
+
+**The run** (once, on the amended pin: `fresh`, 226,712 ms at a 643,932 kB peak; its first 34 seed
+lines equal the stopped run's). The terrain refuses 2 of the 64 draws (20261135 and 20261149 open
+within capture), so 62 seeds are chased.
+
+| Over the 62 chased seeds | The machine (robust) | The candidate (expected) | Pure pursuit | Constant bearing |
+|---|---|---|---|---|
+| Capture ticks in sum | 594 | **574** | 15,348 | 1,559 |
+| The sum of regrets to the truth-only least (`Σ L = 565`) | 29 | **9** | 14,783 | 994 |
+| Win/tie/loss against pure pursuit | 41/21/0 | 42/20/0 | | |
+| Win/tie/loss against constant bearing | 49/9/4 | 50/12/0 | | |
+| Win/tie/loss against both at once | 35/23/4 | 37/25/0 | | |
+| Releases: certified, commit, probe | 549, 44, 1 | 530, 40, 4 | | |
+
+- **The candidate against the robust machine**: 12 won, 49 tied, 1 lost (20261126, 10 against
+  8). The candidate's regret falls on 6 seeds (20261101 +2, 20261109 +1, 20261126 +2, 20261129 +1,
+  20261137 +2, 20261157 +1); the robust machine's on 15. **Verdict: the candidate improves on the
+  current machine** (fewer ticks in sum, more seeds won than lost against it).
+- **F6's action acceptance as written**, its capture bullet (strictly fewer ticks than both
+  controls in sum and strictly fewer than both on more than half of the seeds): on the fresh
+  population it passes for the robust machine (35 of 62) and for the candidate (37 of 62). On the
+  pinned acceptance seeds it failed (7 of 16), and that failure stands as written. The acceptance's
+  other bullets are not read here: the switches (lag and the faulty sensor) are not built, so F6's
+  action acceptance as a whole is not passed.
+- **The conditional reading** (not the acceptance): 39 of the 62 seeds admit a win beyond both
+  controls (the truth-only least strictly below both); there the robust machine wins 35, ties 1 and
+  loses 3 against both at once (regret 28), and the candidate wins 37, ties 2 and loses 0 (regret 9).
+- **Work.** The candidate reads the expected capture for all 9 moves at every tick. Its
+  certificate is kept as the release's reading but is no longer a promise: after a certified release
+  the expected plan may leave the minimax strategy, so capture can come later than the certified
+  bound (the test checks the plan's motions against the traction bound, not the certified bound).
+
+### F6: the capture distances as a function of the admitted move set (U4's next loop, September 28)
+
+```sh
+cargo run --release -p holonics --example hnn_chase -- moves          # the acceptance seeds
+cargo run --release -p holonics --example hnn_chase -- moves fresh    # the fresh population
+```
+
+[definition; agent-inferred] `pursuit::MoveSet` is a declared variant of the chaser's move set,
+not a change of the terrain's law: the chaser moves on the lattice `(1/g)ℤ[i]` under the same speed
+bound `3/2`, the same traction disk on the same friction field and the same capture `ρ² = 2`, each
+bound read exactly in the grain's units, optionally without pure boosts or below a declared top
+speed; the runner reads the chaser at any grain by the plane's law (`Runner::cell_at_grain`, every
+score `g²` times the plane's). `pursuit::least_capture` reads the truth-only least breadth-first over
+the joint states (the runner is one deterministic law); on the lattice it equals the capture basin's
+truth-only reading on every seed read (checked at run time, and in the test). The four sets:
+**L**, the chaser's lattice (no pure boost; axis speed 1, diagonal `√2`); **H≤√2**, the half
+lattice held to the lattice's realized top speed `√2` (pure boosts `1/2 → 1` admitted); **H∖B**, the
+half lattice without pure boosts (axis speed `3/2` reached by starts and turns); **H**, the half
+lattice.
+
+| Seed | L | H≤√2 | H∖B | H |
+|---|---|---|---|---|
+| 20260927 | 5 | 5 | 5 | 5 |
+| 20260928 | 14 | 14 | 11 | 11 |
+| 20260929 | 10 | 10 | 8 | 8 |
+| 20260930 | 11 | 11 | 9 | 9 |
+| 20260931 | 13 | 13 | 12 | 12 |
+| 20260932 | 4 | 4 | 3 | 3 |
+| 20260933 | 4 | 4 | 4 | 4 |
+| 20260934 | 9 | 9 | 8 | 8 |
+| 20260935 | 9 | 9 | 8 | 8 |
+| 20260936 | 10 | 10 | 8 | 8 |
+| 20260937 | 10 | 10 | 9 | 9 |
+| 20260938 | 11 | 11 | 11 | 11 |
+| 20260939 | 12 | 12 | 11 | 11 |
+| 20260940 | 13 | 13 | 11 | 11 |
+| 20260941 | 5 | 5 | 5 | 5 |
+| 20260942 | 13 | 13 | 10 | 10 |
+| **Sum (16)** | **153** | **153** | **133** | **133** |
+| **Sum, the fresh population (62)** | **565** | **565** | **478** | **478** |
+
+- [measured] **The pure boost is not what the lattice lacks.** Admitting pure boosts below the
+  lattice's top speed changes no seed's least (L = H≤√2 on all 78), and removing them from the half
+  lattice changes none either (H∖B = H on all 78).
+- [measured] **The lattice under-realizes the chaser's declared speed.** At `v_C = 3/2` its nonzero
+  velocities have quadrance `1` or `2`, so along an axis it moves at 1, not `3/2`. The half lattice
+  realizes `3/2` on the axes, and that alone lowers the least on 12 of the 16 acceptance seeds (20
+  ticks) and on 46 of the 62 fresh seeds (87 ticks). The capture distances are a function of the top
+  speed the move set realizes on each ray, not of which kinds of move are elementary.
+- Work: 11,547 ms at an 89,940 kB peak (16 seeds) and 79,979 ms at 88,872 kB (62 seeds).
+- **Owed in Lean** (#62, "The chase consumer"): the expected capture's recursion is exact (the
+  least of a sum of independent class strategies is the sum of their least, on lexicographic `ℤ²`),
+  and the grain embedding `g ↦ kg` keeps every admitted motion and the runner's order, so a finer
+  set's least capture is at most the coarser's. Both are checked here by tests, not proved.
+- Gates: `cargo check --workspace --all-targets`; `cargo test -p holonics --lib`, 895 passed (the
+  chase tests 13, two of them new: the expected capture and the move set).

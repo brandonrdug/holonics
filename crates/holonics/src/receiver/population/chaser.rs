@@ -60,8 +60,18 @@
 //! truth needed tied the released move's certificate (or no move was certified) and the tie went to
 //! the fibre-summed tube or, where the tube was flat across the moves, to the fibre-summed nearness;
 //! the worst case over the fibre does not read the members it does not bind. On the fifth the truth
-//! stood in the smaller of two observation classes whose needs part. The expected capture reads every
-//! member at its posterior weight.
+//! stood in one of two equally weighted observation classes whose needs part on the runner's cell of
+//! that very tick, read only after the move. The expected capture reads every member at its
+//! posterior weight.
+//!
+//! [measured] **The candidate, run once on a fresh population** (the notebook's `hnn_chase fresh`,
+//! pinned before the run: 62 chased seeds of `20261101 + s`, `s < 64`): the expected plan (chosen on
+//! the choosing seeds, 147 against the robust plan's 150 and the certified-then-expected plan's 148)
+//! sums 574 capture ticks against the robust plan's 594, a regret of 9 against 29 to the truth-only
+//! least, and wins 12, ties 49 and loses 1 against it. [agent-inferred] [`MachineChaser::new`] stays
+//! the robust plan: U3's next loop reproduces the robust receipts through `receiver::release`, and
+//! the expected plan's certified release is no longer a promise (the plan may leave the minimax
+//! strategy after it), so its arm in the release law is read by that parity first.
 //!
 //! [definition; agent-inferred] **The parameters**: the viable tube's horizon `n`, the capture
 //! basin's horizon `m` and the price `d`, chosen on a pinned choosing set of seeds disjoint from the

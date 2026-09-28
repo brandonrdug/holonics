@@ -1,9 +1,11 @@
 //! **The chase's action phase: the chaser moves, and cornering is read as the runner's robust
 //! viability kernel** (THE_REBUILD F6; the record `2026-09-27_THE_LEARNER_MUST_MOVE_A_CHASE_TERRAIN_…`,
 //! §6, §13 and §14.4; campaign 4, #27, #148). The terrain's laws the action phase reads: the chaser's
-//! capture reach, the runner's viable tube, the capture basin over a fibre of candidate runners, the
-//! chaser's port and admissibility, the two controls and the passage. The machine that chases
-//! (`receiver::population::chaser`) is a [`Chaser`] reading these.
+//! capture reach, the runner's viable tube, the capture basin over a fibre of candidate runners and
+//! its expected reading ([`ExpectedCapture`], THE_REBUILD U4's next loop), the chaser's port and
+//! admissibility, the two controls and the passage; and, as a reading, the chaser's move set as a
+//! declared variant with the truth-only least capture under it ([`MoveSet`], [`least_capture`]). The
+//! machine that chases (`receiver::population::chaser`) is a [`Chaser`] reading these.
 //!
 //! [definition; agent-inferred] **The order of a tick** (as in the reception's [`Chase::run`]): at
 //! tick `t` capture is read on the present positions, `⟨x_R − x_C, x_R − x_C⟩ ≤ ρ²`, and ends the
@@ -81,7 +83,7 @@
 //! runner's law) and the **cell holonomy** (the loop closure over three observation channels, the
 //! faulty-sensor switch) stay attached.
 
-use std::collections::{BTreeMap, BTreeSet, HashMap};
+use std::collections::{BTreeMap, BTreeSet, HashMap, HashSet};
 use std::sync::Arc;
 
 use num_traits::Signed;
@@ -93,7 +95,7 @@ use super::chase::{
 use super::{TerrainError, refuse};
 // The bearing's rotation `det(r, ṙ)`, shared with the tests.
 pub(super) use crate::geometry::motion::det;
-use crate::geometry::motion::{Move, Point, add, dot, quadrance, sub};
+use crate::geometry::motion::{Move, MoveKind, Point, add, dot, quadrance, sub};
 use crate::ratio::Rat;
 
 /// [definition; agent-inferred] **The kernel lattice's declared reach**: the runner's motions a
@@ -777,6 +779,214 @@ pub fn expected_ticks(
     Ok(basin
         .expected_after(memo, next, tick + 1, parts, depth, None)?
         .expect("an unbounded reading is always returned"))
+}
+
+// -------------------------------------------------------------------------------------------
+// the chaser's move set, a declared variant
+
+/// [definition; agent-inferred] **The grains a move set reads**: `1 ≤ g ≤ 2^4`, so a position's
+/// numerator stays below `2^19` and every score the runner forms against it inside a machine word.
+pub const GRAIN_LIMIT: i64 = 1 << 4;
+
+/// [definition; agent-inferred] **A declared variant of the chaser's move set** (THE_REBUILD U4's
+/// next loop: the capture distances as a function of which moves are elementary; a reading, not a
+/// change of the terrain's law). The chaser moves on the lattice `(1/g)ℤ[i]` of grain `g`, positions
+/// and velocities carried as numerators in the grain's units, under the **same** speed bound, the
+/// same traction disk on the same friction field and the same capture:
+///
+/// ```text
+/// ⟨V′, V′⟩ ≤ ⌊g² v_C²⌋,   ⟨V′ − V, V′ − V⟩ ≤ ⌊g² (γ_C μ_c g_h h²/ℓ)²⌋ on the class of ⌊X/g⌋,
+/// 0 ≤ X + V′ ≤ g·(W − 1, H − 1),   capture ⟨g x_R − X, g x_R − X⟩ ≤ ⌊g² ρ²⌋
+/// ```
+///
+/// each an identity on the integers for the rational bound scaled by `g²` (as [`floor_cap`]); a
+/// position's patch is `⌊⌊X/g⌋/side⌋ = ⌊X/(g·side)⌋`. With `boosts` false the pure boosts
+/// (`geometry::motion::MoveKind::Boost`) are removed from the set; with `top` a declared integer
+/// `q`, the velocities are held to `⟨V′, V′⟩ ≤ g² q` as well, a lower speed bound `√q` read exactly
+/// (the lattice's realized top speed is `√2` for `v_C = 3/2`). At `g = 1` the set is the chaser's
+/// declared one ([`Pursuer::motions`]). [proved-derived] **The embedding**: `g` into `k·g` sends every
+/// motion to `k` times itself (the bounds scale by `k²` and `k²⌊b⌋ ≤ ⌊k²b⌋`) and keeps its kind, and
+/// the runner reads the chaser at every grain by the plane's law ([`Runner::cell_at_grain`]), so a
+/// finer grain's least capture is at most the coarser's. [measured] At `g = 1` and speed `3/2` the
+/// chaser's nonzero velocities have quadrance `1` or `2`, one to each ray, so it has no pure boost;
+/// at `g = 2` the axis admits the speeds `1/2`, `1` and `3/2` and the diagonal `√2/2` and `√2`.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub struct MoveSet {
+    pub grain: i64,
+    pub boosts: bool,
+    pub top: Option<i64>,
+}
+
+impl MoveSet {
+    /// The chaser's declared set: the lattice itself.
+    pub const LATTICE: MoveSet = MoveSet {
+        grain: 1,
+        boosts: true,
+        top: None,
+    };
+
+    pub fn label(&self) -> String {
+        let boosts = if self.boosts {
+            ""
+        } else {
+            ", no pure boost"
+        };
+        let top = self
+            .top
+            .map_or(String::new(), |q| format!(", speed² ≤ {q}"));
+        format!("grain 1/{}{boosts}{top}", self.grain)
+    }
+
+    /// The set's caps on the arena and its capture cap, all in the grain's units; refused outside
+    /// [`GRAIN_LIMIT`] or where the chaser could not always stop (its speed cap above a class cap).
+    fn caps(&self, pursuer: &Pursuer, arena: &Arena) -> Result<(Caps, i64), TerrainError> {
+        if !(1..=GRAIN_LIMIT).contains(&self.grain) {
+            return Err(refuse(
+                "a chaser's move set",
+                "its grain lies in 1..=2^4",
+            ));
+        }
+        let declaration = arena.declaration();
+        let square = Rat::from_integer((self.grain * self.grain).into());
+        let mut speed = floor_cap(&(&square * &pursuer.law.speed * &pursuer.law.speed))?;
+        if let Some(q) = self.top {
+            if !(0..=GRAIN_LIMIT).contains(&q) {
+                return Err(refuse(
+                    "a chaser's move set's top speed",
+                    "its square lies in 0..=2^4",
+                ));
+            }
+            speed = speed.min(self.grain * self.grain * q);
+        }
+        let classes = (0..declaration.classes.len())
+            .map(|class| {
+                floor_cap(
+                    &(&square
+                        * declaration
+                            .traction_bound(&pursuer.law.traction, class)
+                            .expect("a declared class")),
+                )
+            })
+            .collect::<Result<Vec<_>, _>>()?;
+        if classes.iter().any(|&cap| speed > cap) {
+            return Err(refuse(
+                "a chaser's move set",
+                "the chaser can always stop on it (its speed cap is at most every class cap)",
+            ));
+        }
+        let capture = floor_cap(&(&square * &pursuer.capture))?;
+        Ok((Caps { speed, classes }, capture))
+    }
+
+    /// **The chaser's admitted motions under the set** from a motion at the grain (its position and
+    /// velocity in the grain's units).
+    pub fn admitted(
+        &self,
+        pursuer: &Pursuer,
+        arena: &Arena,
+        motion: &Motion,
+    ) -> Result<Vec<Motion>, TerrainError> {
+        let (caps, _) = self.caps(pursuer, arena)?;
+        Ok(self.motions(arena, &caps, &speed_disk(caps.speed), motion))
+    }
+
+    /// The admitted motions, the set's caps and speed disk in hand.
+    fn motions(
+        &self,
+        arena: &Arena,
+        caps: &Caps,
+        velocities: &[Point],
+        motion: &Motion,
+    ) -> Vec<Motion> {
+        let g = self.grain;
+        let declaration = arena.declaration();
+        let limits = [g * (declaration.width - 1), g * (declaration.height - 1)];
+        let class = arena
+            .class([motion.position[0].div_euclid(g), motion.position[1].div_euclid(g)])
+            .expect("a chaser motion in the arena");
+        velocities
+            .iter()
+            .filter_map(|&velocity| {
+                let step = Move::new(motion.velocity, velocity);
+                let position = add(motion.position, velocity);
+                let inside = (0..=limits[0]).contains(&position[0])
+                    && (0..=limits[1]).contains(&position[1]);
+                (step.within_cap(caps.classes[class])
+                    && inside
+                    && (self.boosts || step.kind() != MoveKind::Boost))
+                    .then_some(Motion { position, velocity })
+            })
+            .collect()
+    }
+}
+
+/// The lattice velocities of quadrance at most `cap`.
+fn speed_disk(cap: i64) -> Vec<Point> {
+    let mut radius = 0i64;
+    while (radius + 1) * (radius + 1) <= cap {
+        radius += 1;
+    }
+    (-radius..=radius)
+        .flat_map(|vx| (-radius..=radius).map(move |vy| [vx, vy]))
+        .filter(|&v| quadrance(v) <= cap)
+        .collect()
+}
+
+/// **The truth-only least capture under a move set** ([`MoveSet`]): the least `k ≤ limit` for which
+/// some chaser strategy on the set, knowing the runner's law, captures it within `k` ticks from the
+/// openings (both at rest), in the passage's order of a tick; none within `limit`. The runner is one
+/// deterministic law, so the capture basin on it alone is a shortest path over the joint states
+/// `(chaser motion, runner state)` tick by tick: read breadth-first, each tick's states deduplicated.
+/// At the lattice it equals the capture basin's reading on the truth alone ([`Basin::capture_ticks`]).
+pub fn least_capture(
+    arena: &Arena,
+    moves: &Moves,
+    runner: &Runner,
+    openings: [Point; 2],
+    pursuer: &Pursuer,
+    set: MoveSet,
+    limit: usize,
+) -> Result<Option<usize>, TerrainError> {
+    let (chaser_caps, capture) = set.caps(pursuer, arena)?;
+    let caps = runner.law.caps(arena.declaration())?;
+    let g = set.grain;
+    let velocities = speed_disk(chaser_caps.speed);
+    let captured = |chaser: &Motion, state: &RunnerState| {
+        quadrance(sub(
+            [g * state.motion.position[0], g * state.motion.position[1]],
+            chaser.position,
+        )) <= capture
+    };
+    let mut layer: HashSet<(Motion, RunnerState)> = HashSet::from([(
+        Motion::rest([g * openings[1][0], g * openings[1][1]]),
+        RunnerState::opening(arena, openings[0])?,
+    )]);
+    for tick in 0..=limit {
+        if layer.iter().any(|(chaser, state)| captured(chaser, state)) {
+            return Ok(Some(tick));
+        }
+        if tick == limit {
+            break;
+        }
+        let mut next = HashSet::with_capacity(layer.len());
+        for (chaser, state) in &layer {
+            let cell = runner.cell_at_grain(
+                arena,
+                moves,
+                &caps,
+                state,
+                chaser.position,
+                g,
+                tick as u64,
+            )?;
+            let after = runner.receive(arena, moves, state, cell)?;
+            for motion in set.motions(arena, &chaser_caps, &velocities, chaser) {
+                next.insert((motion, after));
+            }
+        }
+        layer = next;
+    }
+    Ok(None)
 }
 
 // -------------------------------------------------------------------------------------------

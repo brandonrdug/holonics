@@ -12,13 +12,15 @@
 //! cargo run --release -p holonics --example hnn_chase -- action   # the action phase's acceptance
 //! cargo run --release -p holonics --example hnn_chase -- diagnose [seeds]   # U4: the failure located
 //! cargo run --release -p holonics --example hnn_chase -- fresh    # U4: the fresh population
+//! cargo run --release -p holonics --example hnn_chase -- moves [fresh]   # U4: the move sets
 //! ```
 //!
 //! [definition; agent-inferred] **U4's next loop.** `diagnose` reads the machine's passage tick by
 //! tick against the truth-only basin and prints every admitted move's readings at each tick whose
 //! release raises the truth's least capture. `choose`'s fourth rung is the plan
 //! (`robust,certified-expected,expected`). `fresh` runs the pinned fresh population against its
-//! predeclared criteria ([`fresh`]).
+//! predeclared criteria ([`fresh`]). `moves` reads the truth-only least capture under each declared
+//! variant of the chaser's move set ([`MOVE_SETS`], `pursuit::MoveSet`).
 //!
 //! [definition; agent-inferred] **The declaration** (the tests' own, `chase_tests.rs`): a `16 × 16`
 //! arena of `4 × 4` friction patches, classes ice `1/2`, grass `1` and track `3/2`, `g = 8`,
@@ -83,7 +85,7 @@ use holonics::geometry::motion::{Move, MoveKind};
 use holonics::holarchy::terrain::{
     ActionDeclaration, ActionPassage, ArenaDeclaration, Basin, BasinMemo, Candidate, CaptureReach,
     Chase, ChasePorts, ChaseView, Chaser, ConstantBearing, Evasion, ExpectedCapture, ExpectedMemo,
-    Motion, Moves, PurePursuit, Pursuer, RunnerFamily, RunnerLaw, RunnerState, act_drawn,
+    Motion, MoveSet, Moves, PurePursuit, Pursuer, RunnerFamily, RunnerLaw, RunnerState, act_drawn,
     capture_ticks, classes, expected_ticks, viable_tube,
 };
 use holonics::ratio::algebraic::ExactInterval;
@@ -244,6 +246,7 @@ fn main() {
         Some("action") => action(mode.get(1).is_some_and(|a| a == "trace")),
         Some("diagnose") => diagnose(&mode[1..]),
         Some("fresh") => fresh(),
+        Some("moves") => move_sets(&mode[1..]),
         _ => reception(),
     }
 }
@@ -887,6 +890,116 @@ fn least_capture(seed: u64, limit: usize) -> Option<usize> {
             limit,
         )
         .expect("the basin")
+}
+
+/// [definition; agent-inferred] **The move sets read** (U4's next loop; `pursuit::MoveSet`): the
+/// chaser's declared lattice; the half lattice held to the lattice's realized top speed `√2`; the
+/// half lattice without pure boosts; the half lattice. The same traction disk, friction field and
+/// capture throughout, and the same speed bound `3/2` except where the top is declared lower.
+const MOVE_SETS: [MoveSet; 4] = [
+    MoveSet::LATTICE,
+    MoveSet {
+        grain: 2,
+        boosts: true,
+        top: Some(2),
+    },
+    MoveSet {
+        grain: 2,
+        boosts: false,
+        top: None,
+    },
+    MoveSet {
+        grain: 2,
+        boosts: true,
+        top: None,
+    },
+];
+
+/// [definition; agent-inferred] **The truth-only least capture as a function of the move set**
+/// (U4's next loop, a reading, not a change of law): on each seed (the acceptance seeds by default,
+/// or `fresh` for the fresh population), the truth-only least capture from the opening under each
+/// declared move set (`pursuit::least_capture`), each finer set read to the lattice's least (a finer
+/// grain's least is at most it); the lattice's reading is checked equal to the capture basin's on the
+/// truth alone.
+fn move_sets(args: &[String]) {
+    let (first, count) = match args.first().map(String::as_str) {
+        Some("fresh") => (FRESH_SEED, FRESH_SEEDS),
+        _ => (SEED, SEEDS),
+    };
+    let declaration = declaration();
+    let family = family();
+    let pursuer = pursuer();
+    let moves = family.moves(&declaration).expect("the alphabet");
+    println!(
+        "hnn_chase moves: seeds {first} + s, s < {count}; the truth-only least capture under the move sets {}",
+        MOVE_SETS
+            .iter()
+            .map(MoveSet::label)
+            .collect::<Vec<_>>()
+            .join(", ")
+    );
+    let started = Instant::now();
+    let (mut sums, mut read, mut refused) = ([0usize; 4], 0usize, 0usize);
+    for s in 0..count {
+        let seed = first + s;
+        let (index, arena, openings) = Chase::drawn(&declaration, &family, seed).expect("a draw");
+        if pursuer.captures(openings[0], openings[1]) {
+            println!("seed {seed}: the draw opens within capture; no chase");
+            refused += 1;
+            continue;
+        }
+        let runner = family.candidate(index).expect("the truth");
+        let mut least = [None; 4];
+        let mut limit = ACTION_TICKS;
+        for (i, set) in MOVE_SETS.iter().enumerate() {
+            least[i] = pursuit_least(&arena, &moves, &runner, openings, &pursuer, *set, limit);
+            if i == 0 {
+                let basin = least_capture(seed, least[0].unwrap_or(OPTIMUM_LIMIT));
+                assert_eq!(
+                    least[0], basin,
+                    "the lattice's reading is the capture basin's on the truth alone"
+                );
+                limit = least[0].expect("the lattice captures the truth");
+            }
+        }
+        let values: Vec<usize> = least.iter().map(|l| l.expect("within")).collect();
+        for (sum, value) in sums.iter_mut().zip(&values) {
+            *sum += value;
+        }
+        read += 1;
+        println!(
+            "seed {seed}: the truth [{index}] {}; least capture {}",
+            runner.label(),
+            values
+                .iter()
+                .map(ToString::to_string)
+                .collect::<Vec<_>>()
+                .join(" / ")
+        );
+    }
+    println!();
+    println!(
+        "over {read} seeds ({refused} refused draws; {} ms): least captures in sum {}",
+        started.elapsed().as_millis(),
+        sums.iter()
+            .map(ToString::to_string)
+            .collect::<Vec<_>>()
+            .join(" / ")
+    );
+}
+
+/// `pursuit::least_capture`, read.
+fn pursuit_least(
+    arena: &holonics::holarchy::terrain::Arena,
+    moves: &Moves,
+    runner: &holonics::holarchy::terrain::Runner,
+    openings: [[i64; 2]; 2],
+    pursuer: &Pursuer,
+    set: MoveSet,
+    limit: usize,
+) -> Option<usize> {
+    holonics::holarchy::terrain::least_capture(arena, moves, runner, openings, pursuer, set, limit)
+        .expect("a declared move set")
 }
 
 /// [definition; agent-inferred] **A passage's move reading** (module header; a reading of the
