@@ -12,7 +12,7 @@ use crate::hnn::field::{
     ReceiverDeclaration, RingDeclaration,
 };
 use crate::hnn::moment::PairPort;
-use crate::hnn::receiving::{Mixture, landmark_declaration};
+use crate::hnn::receiving::landmark_declaration;
 use crate::ratio::linear::ExactRatMatrix;
 use crate::ratio::{Rat, integer, rat};
 
@@ -220,8 +220,6 @@ pub(super) struct Medium {
     pub(super) receiving: Vec<Option<ExactRatMatrix>>,
     /// The receiving parametron's landmark tree, empty (`compression::landmark::context`).
     pub(super) trees: Vec<Option<Landmarks>>,
-    /// The receiver's mixture at its opening `β = 1` (ruling A).
-    pub(super) mixtures: Vec<Option<Mixture>>,
     /// The receiver's population at its opening (THE_REBUILD U1).
     pub(super) populations: Vec<Option<crate::receiver::population::PortPopulation>>,
 }
@@ -327,17 +325,6 @@ impl Medium {
                         .iter()
                         .find(|r| r.ring == g)
                         .map(|r| Landmarks::new(landmark_declaration(field, r).unwrap()).unwrap())
-                })
-                .collect(),
-            mixtures: (0..widths.len())
-                .map(|g| {
-                    field.receivers().iter().find(|r| r.ring == g).map(|r| {
-                        let declared = landmark_declaration(field, r).unwrap();
-                        Mixture::new(
-                            crate::compression::landmark::context::Widths::derived(&declared)
-                                .carrier,
-                        )
-                    })
                 })
                 .collect(),
             populations: (0..widths.len())
@@ -506,9 +493,6 @@ impl ConstitutionRead for Medium {
     }
     fn landmarks(&self, ring: usize) -> Option<&Landmarks> {
         self.trees[ring].as_ref()
-    }
-    fn mixture(&self, ring: usize) -> Option<&Mixture> {
-        self.mixtures[ring].as_ref()
     }
     fn population(&self, ring: usize) -> Option<&crate::receiver::population::PortPopulation> {
         self.populations[ring].as_ref()

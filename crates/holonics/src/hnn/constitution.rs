@@ -180,7 +180,7 @@ use crate::hnn::moment::PairPort;
 use crate::hnn::port::Deposit;
 use crate::hnn::propagation::gram;
 use crate::hnn::realization::{indexed, outer_rows};
-use crate::hnn::receiving::{Mixture, ReceivingStep, landmark_declaration, receiving_population};
+use crate::hnn::receiving::{ReceivingStep, landmark_declaration, receiving_population};
 use crate::hnn::ring::ResonatorMaterial;
 use crate::holon::deposition::CommittedEnergyBound;
 use crate::ratio::linear::vector::{Chart, integral, lcm, matrix_form};
@@ -1751,11 +1751,8 @@ struct RingMaterial {
     receiving: Option<NormalLaw>,
     /// The receiving parametron's landmark tree (`compression::landmark::context`), on a receiving ring.
     tree: Option<Landmarks>,
-    /// The receiver's mixture of the tree's face and the combined face (ruling A), on a receiving
-    /// ring: its carried likelihood ratio `β`.
-    mixture: Option<Mixture>,
-    /// The receiver's population over the same two families (THE_REBUILD U1,
-    /// `hnn::receiving::receiving_population`), on a receiving ring: their likelihoods.
+    /// The receiver's population over the tree's face and the combined face (ruling A; THE_REBUILD
+    /// U1, `hnn::receiving::receiving_population`), on a receiving ring: their likelihoods.
     population: Option<PortPopulation>,
     /// The ring's loaded resonator: immutable base forms with learned scalar amplitudes.
     resonator: Option<ResonatorMaterial>,
@@ -2197,17 +2194,6 @@ impl Constitution {
         let a = field.alphabet();
         let receivers: BTreeSet<usize> = field.receivers().iter().map(|r| r.ring).collect();
         // Each receiving ring's tree, declared from its first declared receiver.
-        // The mixture's β is carried at its ring's tree's carrier width `W`.
-        let carrier = |g: usize| {
-            field
-                .receivers()
-                .iter()
-                .find(|receiver| receiver.ring == g)
-                .and_then(|receiver| landmark_declaration(field, receiver).ok())
-                .map_or(2, |declared| {
-                    crate::compression::landmark::context::Widths::derived(&declared).carrier
-                })
-        };
         let tree = |g: usize| -> Result<Option<Landmarks>, HnnError> {
             field
                 .receivers()
@@ -2290,7 +2276,6 @@ impl Constitution {
                     pairs,
                     pair_scale: Rat::one(),
                     receiving,
-                    mixture: receivers.contains(&g).then(|| Mixture::new(carrier(g))),
                     population: receivers.contains(&g).then(receiving_population),
                     tree: tree(g)?,
                     resonator: None,
@@ -2823,7 +2808,6 @@ impl Constitution {
             if let Some(receiving) = &material.receiving {
                 let mut parts = receiving.carrier_bits();
                 parts.entries += material.tree.as_ref().map_or(0, Landmarks::bits);
-                parts.entries += material.mixture.as_ref().map_or(0, Mixture::bits);
                 parts.entries += material.population.as_ref().map_or(0, PortPopulation::bits);
                 loci.push((Locus::ReceivingMap(g), parts));
             }
@@ -3449,15 +3433,13 @@ impl Constitution {
                         .map_err(|refusal| refused(refusal.into()))?;
                 }
                 LocusStep::Receiving(step) => {
-                    // The mixture's β carries its own chart and the population its likelihoods'
-                    // bounds, so neither moves a lattice clock.
+                    // The population carries its likelihoods' bounds, so it moves no lattice clock.
                     budgeted(&mut stroke).map_err(refused)?;
-                    let (mixture, population) = material
+                    let population = material
                         .as_deref_mut()
-                        .and_then(LocusMaterial::receiving_face)
+                        .and_then(LocusMaterial::population)
                         .ok_or(HnnError::MissingReceivingMap { ring: step.ring })
                         .map_err(refused)?;
-                    mixture.step(step).map_err(refused)?;
                     population
                         .receive(&step.faces())
                         .map_err(crate::hnn::receiving::population_refusal)
@@ -3572,7 +3554,6 @@ enum LocusMaterial<'a> {
     ReceivingMap {
         receiving: &'a mut Option<NormalLaw>,
         tree: &'a mut Option<Landmarks>,
-        mixture: &'a mut Option<Mixture>,
         population: &'a mut Option<PortPopulation>,
     },
     Resonator {
@@ -3606,7 +3587,6 @@ impl<'a> LocusMaterial<'a> {
                 pair_scale,
                 receiving,
                 tree,
-                mixture,
                 population,
                 resonator,
                 resonator_scales,
@@ -3651,7 +3631,6 @@ impl<'a> LocusMaterial<'a> {
                     LocusMaterial::ReceivingMap {
                         receiving,
                         tree,
-                        mixture,
                         population,
                     },
                 );
@@ -3692,14 +3671,10 @@ impl<'a> LocusMaterial<'a> {
         }
     }
 
-    /// The receiver's mixture and its population, when this locus carries them.
-    fn receiving_face(&mut self) -> Option<(&mut Mixture, &mut PortPopulation)> {
+    /// The receiver's population, when this locus carries it.
+    fn population(&mut self) -> Option<&mut PortPopulation> {
         match self {
-            LocusMaterial::ReceivingMap {
-                mixture,
-                population,
-                ..
-            } => mixture.as_mut().zip(population.as_mut()),
+            LocusMaterial::ReceivingMap { population, .. } => population.as_mut(),
             _ => None,
         }
     }
@@ -4068,9 +4043,6 @@ impl ConstitutionRead for Constitution {
     }
     fn landmarks(&self, ring: usize) -> Option<&Landmarks> {
         self.rings[ring].tree.as_ref()
-    }
-    fn mixture(&self, ring: usize) -> Option<&Mixture> {
-        self.rings[ring].mixture.as_ref()
     }
     fn population(&self, ring: usize) -> Option<&PortPopulation> {
         self.rings[ring].population.as_ref()

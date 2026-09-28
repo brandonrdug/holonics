@@ -701,9 +701,10 @@ end LocalMixture
 /-! ## The receiving face: the two-family population against the executed ratio chart
 
 THE_REBUILD U1: the HNN's receiving face is the population over the tree's face `a` and the combined
-face `b` at the matched prior ½/½, which is the sequential mixture (`LocalWeighing.two_face_prior`
-at `π = ½`: `priorMix (1/2) = seqMix`, a static forward mixture over `Bool`). The retired
-`hnn::receiving::Mixture` executed it through a carried ratio `β̂_(t+1) = β̂_t a_t/(b_t ρ_t)`
+face `b` at the matched prior ½/½ (Rust `hnn::receiving::receiving_population` over
+`receiver::population::port`), which is the sequential mixture (`LocalWeighing.two_face_prior` at
+`π = ½`: `priorMix (1/2) = seqMix`, a static forward mixture over `Bool`). The retired
+`hnn::receiving::Mixture` (history at `19f1eb61`) executed it through a carried ratio `β̂_(t+1) = β̂_t a_t/(b_t ρ_t)`
 (`Tree.execRatio`), `ρ_t` the chart's factor at cell `t`. These two statements bound that execution
 against the population, cell by cell and over the passage, by the chart's factors alone: in bits,
 `log₂ max(ρ, ρ⁻¹) = |log₂ ρ|`, so the per-cell faces differ by at most `|Σ_(s<t) log₂ ρ_s|` and the

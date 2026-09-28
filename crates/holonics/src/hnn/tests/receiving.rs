@@ -497,17 +497,18 @@ fn tree_face(
     }
 }
 
-/// **The mixture weighs the tree against the combined face, cell by cell** (ruling A; Lean
-/// `Compression/Landmark/Context/Tree.{path_face_normalized, sequential_mixture, sequential_mixture_executed}`): it
-/// opens at `β = 1`, `λ = 1/2`; phase `j` of a window reads the ratio after the earlier phases'
-/// steps, so the window's product is `½ A + ½ B` (the tree's and the combined face's likelihoods),
-/// within the steps' residuals, and a weight read before phase 0's step (`β = 1` at phase 1) is
-/// excluded; each phase's code length encloses `−log₂(λ_j q_T + (1 − λ_j) q_C)` with `q_C` the
-/// combined face's exact class mass, and the tree's own `−log₂ q_T` is returned beside it; the
-/// steps multiply `β` by `q_T(x)/q̃_C(x)` in cell order, exactly while the odd parts fit `W`, and
-/// past it the carried `β` is rebased with its drift reported; `log₂ β` is enclosed.
+/// **The receiver's population weighs the tree against the combined face, cell by cell** (ruling
+/// A, THE_REBUILD U1; Lean `Compression/Landmark/Context/{LocalWeighing.two_face_prior,
+/// Tree.sequential_mixture}`): it opens at ½/½; phase `j` of a window reads the population after
+/// the earlier phases' faces, so the window's product is `½ A + ½ B` (the tree's and the combined
+/// face's likelihoods) exactly enclosed, with no chart, and a weight read before phase 0's step
+/// (½/½ at phase 1) is excluded; each phase's code length encloses
+/// `−log₂(w_T q_T + w_C q_C)` with `q_C` the combined face's exact class mass, and the tree's own
+/// `−log₂ q_T` is returned beside it; the steps carry the families' faces of the targets in cell
+/// order, and a window without one tree face a phase is refused.
 #[test]
-fn the_mixture_weighs_the_tree_against_the_combined_face() {
+fn the_population_weighs_the_tree_against_the_combined_face() {
+    use crate::hnn::receiving::{COMBINED, TREE, receiving_population, score};
     let grain = 16;
     let trees = [
         tree_face(&[rat(1, 2), rat(1, 4), rat(1, 8), rat(1, 8)], grain),
@@ -526,110 +527,57 @@ fn the_mixture_weighs_the_tree_against_the_combined_face() {
         ReceivingRead::of_logits(logits([0, 0, 0, 1]), grain),
     ];
     let combined = crate::hnn::ratio::Faces::of_reads(&reads, grain).unwrap();
-    let mut mixture = crate::hnn::receiving::Mixture::new(28);
-    assert_eq!((mixture.beta(), mixture.weight()), (integer(1), rat(1, 2)));
+    let population = receiving_population();
+    assert_eq!(
+        population.weight(TREE).unwrap(),
+        ExactInterval::point(rat(1, 2))
+    );
     let targets = [1usize, 3];
-    let population = crate::hnn::receiving::receiving_population();
-    let scored = mixture
-        .score(&population, 2, &combined, &trees, &targets)
-        .unwrap();
+    let scored = score(&population, 2, &combined, &trees, &targets).unwrap();
     let code = |p: Rat| crate::compression::landmark::context::code_length(&p).unwrap();
-    // Phase 0 at β = 1: q_T = 1/4, q_C = 1/8, q = 3/16.
+    // Phase 0 at ½/½: q_T = 1/4, q_C = 1/8, q = 3/16.
     assert!(scored.model[0].lower <= code(rat(3, 16)).upper);
     assert!(code(rat(3, 16)).lower <= scored.model[0].upper);
     // The tree's own code lengths: two bits each.
     assert_eq!(scored.tree, vec![code(rat(1, 4)), code(rat(1, 4))]);
-    // Phase 1 at β_1 = (1/4)/(1/8) = 2 (λ = 2/3): q_T = 1/4, q_C = 2/5, q = 3/10. The window's
-    // product is (A + B)/2 = (1/16 + 1/20)/2 = 9/160; a weight left at β = 1 would read
+    // Phase 1 at w_T = (1/4)/(1/4 + 1/8) = 2/3: q_T = 1/4, q_C = 2/5, q = 3/10. The window's
+    // product is (A + B)/2 = (1/16 + 1/20)/2 = 9/160; a weight left at ½/½ would read
     // 3/16 · 13/40 = 39/640.
-    let drift = {
-        let mut stepped = mixture.clone();
-        for step in &scored.steps {
-            stepped.step(step).unwrap();
-        }
-        stepped.drift().clone()
-    };
-    // The receiver's population scores the same phases within the mixture's drift before each.
-    for ((model, weighed), pin) in scored
-        .model
-        .iter()
-        .zip(&scored.population)
-        .zip(&scored.drift)
-    {
-        assert!(model.lower <= &weighed.upper + pin && weighed.lower <= &model.upper + pin);
-    }
     let window = crate::hnn::reference::window_code_length(&scored.model).unwrap();
     let (ideal, stale) = (code(rat(9, 160)), code(rat(39, 640)));
-    assert!(window.lower <= &ideal.upper + &drift && ideal.lower <= &window.upper + &drift);
+    assert!(window.lower <= ideal.upper && ideal.lower <= window.upper);
     assert!(
-        &stale.upper + &drift < window.lower,
+        stale.upper < window.lower,
         "the stale weight (which codes this window shorter) is excluded"
     );
     assert_eq!(scored.steps.len(), 2);
     assert!(scored.steps.iter().all(|step| step.ring == 2));
+    assert_eq!(scored.steps[0].tree, rat(1, 4));
     for step in &scored.steps {
         assert!(step.combined.lower > Rat::zero() && step.combined.lower <= step.combined.upper);
     }
-    let before = mixture.beta();
+    // The staged steps received in cell order reach the population the window was scored through.
+    let mut received = population.clone();
     for step in &scored.steps {
-        mixture.step(step).unwrap();
+        received.receive(&step.faces()).unwrap();
     }
-    let exact: Rat = scored.steps.iter().fold(before, |beta, step| {
-        beta * &step.tree / &step.combined.lower
-    });
-    // The charts' lower endpoints are rationals of many bits: β is rebased, within its drift.
-    let drift = mixture.drift().clone();
-    let log = mixture.log2_beta().unwrap();
-    let exact_log = crate::compression::landmark::context::code_length(&exact.recip()).unwrap();
-    assert!(log.lower <= &exact_log.upper + &drift && exact_log.lower <= &log.upper + &drift);
-    assert!(mixture.rebases() <= 2);
-    // An exact step keeps β exact: q_T = 3/4 against q̃_C = 1/2 multiplies it by 3/2.
-    let mut exact_mixture = crate::hnn::receiving::Mixture::new(28);
-    exact_mixture
-        .step(&crate::hnn::receiving::ReceivingStep {
-            ring: 2,
-            tree: rat(3, 4),
-            combined: ExactInterval::point(rat(1, 2)),
-        })
-        .unwrap();
-    assert_eq!(exact_mixture.beta(), rat(3, 2));
-    assert_eq!(exact_mixture.weight(), rat(3, 5));
-    assert_eq!(
-        (exact_mixture.rebases(), exact_mixture.drift()),
-        (0, &Rat::zero())
-    );
-    // Past the carrier width the ratio is rebased to its W-bit mantissa, with 3·2^(−W) of drift.
-    let mut narrow = crate::hnn::receiving::Mixture::new(4);
-    narrow
-        .step(&crate::hnn::receiving::ReceivingStep {
-            ring: 2,
-            tree: rat(17, 32),
-            combined: ExactInterval::point(rat(1, 2)),
-        })
-        .unwrap();
-    assert_eq!(narrow.rebases(), 1);
-    assert_eq!(narrow.drift(), &rat(3, 16));
-    assert_eq!(narrow.beta(), integer(1));
-    assert!(
-        mixture
-            .score(&population, 2, &combined, &trees[..1], &targets)
-            .is_err()
-    );
+    let weight = received.weight(COMBINED).unwrap();
+    // w_C after both phases: (1/8 · 2/5)/(1/4 · 1/4 + 1/8 · 2/5) = (1/20)/(1/16 + 1/20) = 4/9.
+    assert!(weight.lower <= rat(4, 9) && rat(4, 9) <= weight.upper);
+    assert!(score(&population, 2, &combined, &trees[..1], &targets).is_err());
 }
 
-/// **The receiver's population is the mixture, cell by cell** (THE_REBUILD U1's fixture identities;
-/// Lean `Compression/Landmark/Context/LocalWeighing.two_face_prior` at `π = ½`): on dyadic faces
-/// whose ratio fits the carrier (`β = 1, 3, 5/3, 7/9`, no rebase, no chart residual) the carried
-/// ratio's weight `λ = β/(1 + β)` and the population's weight of the tree are the same exact
-/// rational (`1/2, 3/4, 5/8, 7/16`), so are their faces of the received class (`1/2, 3/8, 5/8`)
-/// and the passage's product (`15/128 = ½ L_T + ½ L_C`), and each execution's code encloses the
-/// same exact code length. At an exactly zero combined face the population's family dies (its
-/// weight exactly zero, the tree's exactly one, the face the tree's) where the carried ratio has no
-/// death and refuses the step: neither takes a positive floor.
+/// **The receiver's population weighs by the families' likelihoods, cell by cell** (THE_REBUILD
+/// U1; the fixture on which the retired carried ratio and the population agreed exactly, commit
+/// `19f1eb61`): on dyadic faces the tree's weight is the exact posterior
+/// `L_T/(L_T + L_C)` (`1/2, 3/4, 5/8, 7/16`), the face of the received class is exact
+/// (`1/2, 3/8, 5/8`) and the passage's product is `15/128 = ½ L_T + ½ L_C`, each code enclosing its
+/// exact code length. At an exactly zero combined face the combined family dies: its weight is
+/// exactly zero, the tree's exactly one, and the face the tree's; no positive floor.
 #[test]
-fn the_receivers_population_is_the_mixture_cell_by_cell() {
+fn the_receivers_population_weighs_by_likelihood_cell_by_cell() {
     use crate::compression::landmark::context::code_length;
-    use crate::hnn::receiving::{COMBINED, Mixture, ReceivingStep, TREE, receiving_population};
+    use crate::hnn::receiving::{COMBINED, ReceivingStep, TREE, receiving_population};
     let step = |tree: Rat, combined: Rat| ReceivingStep {
         ring: 2,
         tree,
@@ -642,21 +590,19 @@ fn the_receivers_population_is_the_mixture_cell_by_cell() {
     ];
     let weights = [rat(1, 2), rat(3, 4), rat(5, 8), rat(7, 16)];
     let faces = [rat(1, 2), rat(3, 8), rat(5, 8)];
-    let mut mixture = Mixture::new(28);
     let mut population = receiving_population();
     let mut product = Rat::one();
     for (t, step) in steps.iter().enumerate() {
-        let lambda = mixture.weight();
-        assert_eq!(lambda, weights[t]);
+        let w = weights[t].clone();
         assert_eq!(
             population.weight(TREE).unwrap(),
-            ExactInterval::point(lambda.clone())
+            ExactInterval::point(w.clone())
         );
         assert_eq!(
             population.weight(COMBINED).unwrap(),
-            ExactInterval::point(Rat::one() - &lambda)
+            ExactInterval::point(Rat::one() - &w)
         );
-        let q = &lambda * &step.tree + (Rat::one() - &lambda) * &step.combined.lower;
+        let q = &w * &step.tree + (Rat::one() - &w) * &step.combined.lower;
         assert_eq!(q, faces[t]);
         assert_eq!(
             population.face_of(&step.faces()).unwrap(),
@@ -666,27 +612,18 @@ fn the_receivers_population_is_the_mixture_cell_by_cell() {
         let weighed = population.code_of(&step.faces()).unwrap();
         assert!(weighed.lower <= exact.lower && exact.upper <= weighed.upper);
         product *= &q;
-        mixture.step(step).unwrap();
         population.receive(&step.faces()).unwrap();
     }
-    assert_eq!(mixture.weight(), weights[3]);
     assert_eq!(
         population.weight(TREE).unwrap(),
         ExactInterval::point(weights[3].clone())
     );
-    assert_eq!((mixture.rebases(), mixture.drift()), (0, &Rat::zero()));
     assert_eq!(product, rat(15, 128));
     let exact = code_length(&product).unwrap();
     let code = population.code().unwrap();
     assert!(code.lower <= exact.lower && exact.upper <= code.upper);
-    // log₂ β = L_C − L_T: β = 7/9 = (105/1024)/(135/1024).
-    assert_eq!(mixture.beta(), rat(7, 9));
     // Death: the combined face gives the received class exactly zero.
     let dying = step(rat(1, 2), Rat::zero());
-    assert!(
-        mixture.clone().step(&dying).is_err(),
-        "the carried ratio has no death"
-    );
     assert_eq!(
         population.face_of(&dying.faces()).unwrap(),
         ExactInterval::point(rat(7, 32))
@@ -708,19 +645,21 @@ fn the_receivers_population_is_the_mixture_cell_by_cell() {
     );
 }
 
-/// **The mixture codes within one bit of the better face, and the tree is read in cell order**
-/// (Lean `Compression/Landmark/Context/Tree.{sequential_mixture_bounds, sequential_mixture_executed}`): on the
-/// exposure's chain, over the whole cut, against the tree's executed face `L_T` (the face the
-/// mixture weighs) and the combined face `L_C`, `min(L_T, L_C) − drift ≤ L_model ≤ min(L_T, L_C) +
-/// 1 + drift`, each half read on the enclosure endpoints that can refute it (a half fails only when
-/// the law is violated); `log₂ β` is `L_C − L_T` within the drift; and the tree's code length is
-/// the count-only prequential tree's over the same cut (`hnn::reference::prequential`, which encloses
-/// the faces' product once, `PassageCode`, where the exposure sums its windows' enclosures): the two
-/// enclosures meet and each is narrower than `2^(−60)` bits, far below the least move one cell's
-/// face read at a different standing would make, so every phase of every window read the tree after
-/// every earlier cell.
+/// **The receiving face codes within one bit of the better face, and the tree is read in cell
+/// order** (Lean `Compression/Landmark/Context/Tree.sequential_mixture_bounds`, the two-family
+/// population at ½/½): on the exposure's chain, over the whole cut, against the tree's executed face
+/// `L_T` (the face the population weighs) and the combined face `L_C`,
+/// `min(L_T, L_C) ≤ L_model ≤ min(L_T, L_C) + 1`, each half read on the enclosure endpoints that can
+/// refute it, with no chart drift; the population's own code (its telescope) meets the model's
+/// summed code; each family's likelihood is its summed code (the population's tree code meets the
+/// exposure's tree sum, its combined code the combined sum), so its log-odds is `L_C − L_T`; and the
+/// tree's code length is the count-only prequential tree's over the same cut
+/// (`hnn::reference::prequential`, which encloses the faces' product once, `PassageCode`, where the
+/// exposure sums its windows' enclosures): the two enclosures meet and each is narrower than
+/// `2^(−60)` bits, far below the least move one cell's face read at a different standing would
+/// make, so every phase of every window read the tree after every earlier cell.
 #[test]
-fn the_mixture_codes_within_one_bit_of_the_better_face() {
+fn the_receiving_face_codes_within_one_bit_of_the_better_face() {
     use super::learning::chain_of;
     use crate::hnn::reference::Cut;
     let n_star = chain_of(1 << 16).capacity().n_star() as usize;
@@ -743,26 +682,33 @@ fn the_mixture_codes_within_one_bit_of_the_better_face() {
         .expose(&field, &cut)
         .unwrap();
     assert!(exposure.complete, "every window deposited");
-    let total =
-        |pick: fn(&crate::hnn::reference::Bits) -> &crate::ratio::algebraic::ExactInterval| {
-            let (a, b) = (pick(&exposure.training), pick(&exposure.held_out));
-            (&a.lower + &b.lower, &a.upper + &b.upper)
-        };
+    let total = |pick: fn(&crate::hnn::reference::Bits) -> &ExactInterval| {
+        let (a, b) = (pick(&exposure.training), pick(&exposure.held_out));
+        ExactInterval::new(&a.lower + &b.lower, &a.upper + &b.upper).unwrap()
+    };
     let model = total(|bits| &bits.model);
     let tree = total(|bits| &bits.tree);
     let combined = total(|bits| &bits.combined);
-    let report = exposure.mixture.as_ref().unwrap();
-    let drift = &report.drift;
-    assert!(*drift >= Rat::zero());
     let lowest = |a: &Rat, b: &Rat| if a < b { a.clone() } else { b.clone() };
-    // L_model ≤ min(L_T, L_C) + 1 + drift, refuted only if the lower endpoint passes the upper ones.
-    assert!(model.0 <= lowest(&tree.1, &combined.1) + integer(1) + drift);
-    // min(L_T, L_C) − drift ≤ L_model, refuted only if the upper endpoint falls below the lower ones.
-    assert!(lowest(&tree.0, &combined.0) - drift <= model.1);
-    // log₂ β = L_C − L_T within the drift (the mixture's evidence).
-    let log = &report.log2_beta;
-    assert!(log.lower <= &combined.1 - &tree.0 + drift);
-    assert!(&combined.0 - &tree.1 - drift <= log.upper);
+    // L_model ≤ min(L_T, L_C) + 1, refuted only if the lower endpoint passes the upper ones.
+    assert!(model.lower <= lowest(&tree.upper, &combined.upper) + integer(1));
+    // min(L_T, L_C) ≤ L_model, refuted only if the upper endpoint falls below the lower ones.
+    assert!(lowest(&tree.lower, &combined.lower) <= model.upper);
+    let meet = |a: &ExactInterval, b: &ExactInterval| a.lower <= b.upper && b.lower <= a.upper;
+    let report = exposure.population.as_ref().unwrap();
+    assert!(
+        meet(&report.code, &model),
+        "the telescope is the summed code"
+    );
+    assert!(meet(report.tree.as_ref().unwrap(), &tree));
+    assert!(meet(report.combined.as_ref().unwrap(), &combined));
+    let odds = report.odds.as_ref().unwrap();
+    assert!(odds.lower <= &combined.upper - &tree.lower);
+    assert!(&combined.lower - &tree.upper <= odds.upper);
+    assert_eq!(
+        report.cells,
+        exposure.training.cells + exposure.held_out.cells
+    );
     // The tree read in cell order is the count-only prequential tree, exactly.
     let receiver = &field.receivers()[0];
     let declared = landmark_declaration(&field, receiver).unwrap();

@@ -34,7 +34,8 @@
 //! reserved. At that prior the population is the sequential mixture (Lean
 //! `Compression/Landmark/Context/LocalWeighing.two_face_prior` at `π = ½`: `priorMix (1/2) = seqMix`),
 //! stepped cell by cell in the receiver's prequential order, deposits inside a receiving window
-//! included. The retired carried ratio `β` of `hnn::receiving::Mixture` stepped the same law
+//! included. The retired carried ratio `β` of `hnn::receiving::Mixture` (THE_REBUILD U1, history at
+//! `19f1eb61`) stepped the same law
 //! through a rational chart and a rebase; against it this population's face differs at cell `t` by
 //! at most `|Σ_(s<t) log₂ ρ_s|` bits and its passage code by at most `Σ_t |log₂ ρ_t|`, the chart's
 //! certified drift (Lean `Population.{executed_face_within_population,

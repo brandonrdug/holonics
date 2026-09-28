@@ -948,19 +948,43 @@ family by `receiver::population::TreeFamily`), is one of them. The terrain navig
 survivor families and composed eggs are others. This guide owns the statement;
 [THE_MACHINE](THE_MACHINE.md) and [HNN_FORMULA](HNN_FORMULA.md) cite it. What is built, and what is
 not:
-- **The HNN reads the tree.** Its receiving face reads the tree at the receiving locus
-  (`hnn::receiving`), and `hnn::receiving::Mixture` weighs the tree against the combined
-  tree-plus-wave face. That mixture is not the population's two-family case: its second component
-  lives in `ℚ(θ)` where a family's face is rational, and its weight is carried on the tree's β chart
-  where the population reads its code from its families' likelihoods. Digit-local joins
-  (`JoinTree`, `FaceJoins`) and whole-family Bayes are different admitted combinations of the same
-  families: in general `∏_h Σ_f π_f L_(f,h) ≠ Σ_f π_f ∏_h L_(f,h)`.
-- **The field is not yet a family.** It exposes no per-cell face `P_field(c | past)`
+- **The HNN's receiving face is the population's** (THE_REBUILD U1). Its receiving face reads the
+  tree at the receiving locus (`hnn::receiving`), and scores the population at that port
+  (`receiver::population::port::PortPopulation`, declared by `hnn::receiving::receiving_population`)
+  over the tree's face and the combined tree-plus-wave face at ½/½, cell by cell, deposits inside a
+  window included. The combined face lives in `ℚ(θ)`, so it enters as its exact enclosure; zero is
+  exact death (Lean `Population.population_mixture_enclosed`). The population carries only the
+  priors and the likelihoods; the tree's one update is the constitution's landmark deposit. It
+  replaced the carried-ratio `hnn::receiving::Mixture` (history at `19f1eb61`), whose codes lay
+  within its chart's drift of the population's on the standing cut
+  (`Population.executed_{face,mixture}_within_population`). Digit-local joins (`JoinTree`,
+  `FaceJoins`) and whole-family Bayes are different admitted combinations of the same families: in
+  general `∏_h Σ_f π_f L_(f,h) ≠ Σ_f π_f ∏_h L_(f,h)`.
+- **The field is a family at its own port, not yet in the text population.** Its combined face is
+  read per cell at the HNN's receiving port; `Reference::expose` still returns no per-cell face to a
+  `Population` outside the machine, so F2's field family is not built
   ([F2 record](../research/records/2026-09-27_F2_FIELD_FAMILY_GATE.md)).
-- **The missing join.** Neither the tree nor the population is yet a Holon joined at power ports.
-  Their counts and posterior weights carry no flow/effort pair, no declared storage and no power
-  balance. The learned-energy balance (`Holon/Deposition.learned_energy_balance`) holds in its
-  quadratic port chart, under its hypotheses; it assigns no energy to KT counts or Bayesian weights.
+- **The missing join, and its maps named** (U1; owed in #62). Neither the tree nor the population
+  is yet a Holon joined at power ports. Their counts and posterior weights carry no declared
+  flow/effort pair, storage or power balance, and the learned-energy balance
+  (`Holon/Deposition.learned_energy_balance`) holds in its quadratic port chart, under its
+  hypotheses; it assigns no energy to KT counts or Bayesian weights. What the join needs:
+  - *the population*: storage the log-partition `Φ(ℓ) = ln Σ_f π_f e^(ℓ_f)` of the log-likelihoods
+    (its code is `−Φ`), flow the per-cell increment `f_f = ln P_f(x_t)`, effort the posterior
+    `w = ∇Φ`, and the balance `Φ(ℓ + f) − Φ(ℓ) = ⟨w, f⟩ + D(w ‖ w′)` (the Bregman remainder of
+    log-sum-exp, `w′` the Bayes update): the code `−Φ` changes by the supplied `−⟨w, f⟩` less a
+    nonnegative dissipation, and death is the boundary `w′_f = 0`;
+  - *the tree*: a node's storage its log KT mass `ln B(a + ½, b + ½)/B(½, ½)`, its flow the unit
+    count on the opened path, its effort the face's log `ln((a + ½)/(a + b + 1))`, and the balance
+    the face-code telescope, lossless at the node; the weighing over pruned trees adds the
+    population's remainder at each node;
+  - *the joint*: a declared constitutive map from bits to the Holon's port variables (no code
+    carries joules until one is stated), a Dirac structure between the receiving ring's port (the
+    wave's `R P_R^(τ_R) v_R` in the field's quadratic chart) and the combined family's flow
+    `ln q_C(x)`, which the softmax receiver does not give power-neutrally (a power-preserving
+    receiver map, or its defect bounded), and a common clock (the receiving window as an
+    `aeon::Epochs` reading, U5).
+
   Until that join is constructed, a statistical receiver obeys its count and posterior update laws
   and its code identities, and this reading stays an interpretation.
 

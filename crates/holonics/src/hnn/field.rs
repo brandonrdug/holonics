@@ -78,7 +78,6 @@ use crate::hnn::HnnError;
 use crate::hnn::chart::WordLattice;
 use crate::hnn::constitution::{Lattice, Locus, Steps};
 use crate::hnn::moment::{Capacity, PairPort, capacity};
-use crate::hnn::receiving::Mixture;
 use crate::holarchy::{Gluing, GluingDefect, Holarchy};
 use crate::holon::contact::PairContact;
 use crate::holon::contact::menu::PortPermutation;
@@ -129,13 +128,9 @@ pub trait ConstitutionRead: Sync {
     /// ring, whose face at each phase's causal address the receiving read adds to the wave at the
     /// grain (`hnn::receiving`); `None` elsewhere.
     fn landmarks(&self, ring: usize) -> Option<&Landmarks>;
-    /// **The receiver's mixture** of the tree's face and the combined face (ruling A,
-    /// `hnn::receiving::Mixture`) on a receiving ring, which scores the window at compare; `None`
-    /// elsewhere.
-    fn mixture(&self, ring: usize) -> Option<&Mixture>;
-    /// **The receiver's population** over the tree's face and the combined face
-    /// (`hnn::receiving::receiving_population`, THE_REBUILD U1) on a receiving ring; `None`
-    /// elsewhere.
+    /// **The receiver's population** over the tree's face and the combined face (ruling A;
+    /// `hnn::receiving::receiving_population`, THE_REBUILD U1) on a receiving ring, which scores the
+    /// window at compare; `None` elsewhere.
     fn population(&self, ring: usize) -> Option<&PortPopulation>;
     /// **A contact's stiffness signature** (campaign 2, `hnn::contact`): the sign of each column of
     /// its stiffness factor, `K_a = b_a diag(σ) b_aᵀ`. `None`, every constitution of campaign 1, is
@@ -1750,7 +1745,8 @@ impl Field {
 /// the per-cell causal address of depth `D`, coded with each receiver, on the tree's declared
 /// lattice) plus the wave `R P_R^(τ_R) v_R`, `R` opening at zero and moving by the prox step on its
 /// reached covectors; the scored face is the mixture of the tree's face and the combined face
-/// weighted by their likelihood ratio `β`, opening at 1 (the primary's ruling A); every comparison
+/// weighted by their likelihoods, opening at ½/½ (the primary's ruling A; since THE_REBUILD U1 the
+/// receiver's population, `hnn::receiving::receiving_population`); every comparison
 /// is scored and then deposited" (`hnn::receiving`, `compression::landmark::context`).
 /// Code 2 was the region table's class masses with `R` opening at the sign sequence times ½;
 /// code 1 the first repair's exogenous normal law on the target code face with the standing read; and

@@ -79,9 +79,10 @@
 //!   `q_T` the mixture weighs; the compare's receipt), the same tree's face at the grain (its grain
 //!   logits alone, the face the combined read opens at when the wave reads zero) and the combined
 //!   face alone (tree plus wave); each baseline against them, `L_C − L_T` (the wave's contribution
-//!   against the tree's executed face, the mixture's evidence) and `L_model − L_T` (what the
-//!   mixture keeps of it), the tree at the grain against the tree (the grain's rounding), the
-//!   course by aeon, and the mixture's end (`log₂ β`, rebases, drift);
+//!   against the tree's executed face, the population's log-odds) and `L_model − L_T` (what the
+//!   receiver's population keeps of it), the tree at the grain against the tree (the grain's
+//!   rounding), the course by aeon, and the population's end (its telescoped code, each family's
+//!   code and their log-odds; THE_REBUILD U1);
 //! - `Kt` with the published keys, against the literal over the cells read;
 //! - each key location with its fibres per ring;
 //! - each aeon's boundary: its length and lift points, readings, collapse, first law (exchange plus
@@ -669,11 +670,11 @@ fn report(field: &Field, exposure: &Exposure) {
     bits("held out", &exposure.held_out, true, grain);
     println!();
     println!(
-        "== the receiving face's course by aeon (ruling A: each aeon's cells under the model, the tree's executed face alone and the combined face alone; log2 beta at its boundary) =="
+        "== the receiving face's course by aeon (ruling A: each aeon's cells under the model, the tree's executed face alone and the combined face alone; the population's log-odds log2(L_T/L_C) at its boundary) =="
     );
     for (index, leg) in exposure.course.iter().enumerate() {
         println!(
-            "aeon {index}: closed at cell {}, {} cells; model {} (a cell {}); tree {} (a cell {}); combined {} (a cell {}); L_C − L_T {}; L_model − L_T {}; log2 beta {}",
+            "aeon {index}: closed at cell {}, {} cells; model {} (a cell {}); tree {} (a cell {}); combined {} (a cell {}); L_C − L_T {}; L_model − L_T {}; log2(L_T/L_C) {}",
             leg.cell,
             leg.cells,
             per(&leg.model, 1, grain),
@@ -684,22 +685,32 @@ fn report(field: &Field, exposure: &Exposure) {
             per(&leg.combined, leg.cells, grain),
             difference(&leg.combined, &leg.tree, grain),
             difference(&leg.model, &leg.tree, grain),
-            leg.log2_beta
+            leg.odds
                 .as_ref()
                 .map_or_else(|| "-".to_string(), |log| per(log, 1, grain))
         );
     }
-    match &exposure.mixture {
-        Some(mixture) => println!(
-            "the receiver's mixture at the end (ruling A): log2 beta {} (beta = W_tree/W_combined), carried at W = {}, {} rebases, certified drift {} bits",
-            enclosure(&mixture.log2_beta, grain),
-            mixture.width,
-            mixture.rebases,
-            exact(&mixture.drift)
+    match &exposure.population {
+        Some(population) => println!(
+            "the receiver's population at the end (ruling A, THE_REBUILD U1): code −log2(½ L_T + ½ L_C) {} (the telescope); the tree alone {}; the combined face alone {}; log2(L_T/L_C) {}; {} cells; {} bits",
+            enclosure(&population.code, grain),
+            population
+                .tree
+                .as_ref()
+                .map_or_else(|| "none".to_string(), |code| enclosure(code, grain)),
+            population
+                .combined
+                .as_ref()
+                .map_or_else(|| "none".to_string(), |code| enclosure(code, grain)),
+            population
+                .odds
+                .as_ref()
+                .map_or_else(|| "none".to_string(), |odds| enclosure(odds, grain)),
+            population.cells,
+            population.bits
         ),
-        None => println!("the receiver's mixture: none"),
+        None => println!("the receiver's population: none"),
     }
-    receiving_agreement(exposure, grain);
 
     println!();
     println!("== cost against the literal ==");
@@ -859,83 +870,6 @@ fn census(field: &Field, exposure: &Exposure) {
 /// One population's bits against the baselines, each comparison with its exact difference, and the
 /// verdict against online order-0: on the held-out targets, the campaign's criterion (design (f):
 /// not beating it is a failure).
-/// **THE_REBUILD U1's pinned comparison** of the receiving face's two executions, the mixture's
-/// carried ratio and the receiver's population, on the same faces in the same order (pinned before
-/// the standing-cut run, THE_REBUILD U1's first loop):
-/// - cell by cell, the distance between the two code enclosures is at most the mixture's certified
-///   drift before the phase (Lean `Population.executed_face_within_population`);
-/// - over the passage, the distance between the mixture's summed code and the population's
-///   telescoped code `−log₂(½ L_T + ½ L_C)` is at most the mixture's final drift (Lean
-///   `Population.executed_mixture_within_population`);
-/// - the population's summed per-cell codes meet its own telescope (distance zero).
-fn receiving_agreement(exposure: &Exposure, grain: u64) {
-    let agreement = &exposure.agreement;
-    let (Some(population), Some(mixture)) = (&exposure.population, &exposure.mixture) else {
-        println!("U1's pinned comparison: no receiver's population or mixture");
-        return;
-    };
-    println!(
-        "the receiver's population at the end (U1): code −log2(½ L_T + ½ L_C) {} (the telescope, exact endpoints [{}, {}]); the tree alone {}; the combined face alone {}; {} cells; {} bits",
-        enclosure(&population.code, grain),
-        exact(&population.code.lower),
-        exact(&population.code.upper),
-        population
-            .tree
-            .as_ref()
-            .map_or_else(|| "none".to_string(), |code| enclosure(code, grain)),
-        population
-            .combined
-            .as_ref()
-            .map_or_else(|| "none".to_string(), |code| enclosure(code, grain)),
-        population.cells,
-        population.bits
-    );
-    let cells_ok = agreement.within == agreement.cells;
-    println!(
-        "U1 cell by cell: {} of {} phases within their pin (the mixture's drift before the phase); the largest distance between the two code enclosures {} bits against its phase's pin {}; the largest pin read {}: {}",
-        agreement.within,
-        agreement.cells,
-        exact(&agreement.largest),
-        exact(&agreement.largest_pin),
-        exact(&agreement.pin),
-        if cells_ok {
-            "every phase within its pin"
-        } else {
-            "PINS BROKEN"
-        }
-    );
-    let sum = |a: &ExactInterval, b: &ExactInterval| {
-        holonics::ratio::algebraic::interval_sum(a, b).expect("an enclosure sum")
-    };
-    let model = sum(&exposure.training.model, &exposure.held_out.model);
-    let weighed = sum(&exposure.training.population, &exposure.held_out.population);
-    let passage = holonics::hnn::reference::distance(&model, &population.code);
-    let passage_ok = passage <= mixture.drift;
-    let own = holonics::hnn::reference::distance(&weighed, &population.code);
-    println!(
-        "U1 over the passage: the mixture's summed code {} against the population's telescope: distance {} bits against the final drift {}: {}; the population's summed per-cell code {} against its telescope: distance {}: {}",
-        enclosure(&model, grain),
-        exact(&passage),
-        exact(&mixture.drift),
-        if passage_ok { "within" } else { "PAST THE PIN" },
-        enclosure(&weighed, grain),
-        exact(&own),
-        if own == Rat::from_integer(BigInt::from(0)) {
-            "they meet"
-        } else {
-            "THEY PART"
-        }
-    );
-    println!(
-        "U1's pinned acceptance on this run: {}",
-        if cells_ok && passage_ok && own == Rat::from_integer(BigInt::from(0)) {
-            "PASSED"
-        } else {
-            "FAILED"
-        }
-    );
-}
-
 fn bits(label: &str, bits: &Bits, criterion: bool, grain: u64) {
     println!("{label}: {} targets", bits.cells);
     if bits.cells == 0 {
@@ -960,13 +894,6 @@ fn bits(label: &str, bits: &Bits, criterion: bool, grain: u64) {
             per(interval, bits.cells, grain)
         );
     }
-    println!(
-        "  population q (U1) {}; per cell at L_R = {grain}: {}; population − model ∈ [{}, {}] bits, exact",
-        enclosure(&bits.population, grain),
-        per(&bits.population, bits.cells, grain),
-        exact(&(&bits.population.lower - &bits.model.upper)),
-        exact(&(&bits.population.upper - &bits.model.lower))
-    );
     for (name, baseline) in &rows[1..] {
         println!(
             "  the model is {} {name}; model − {name}: {}",

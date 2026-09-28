@@ -447,7 +447,7 @@ Record: [the landmark tree at scale](../../records/2026-09-26_THE_LANDMARK_TREE_
 (the receiver's declaration through `hnn::receiving::landmark_declaration_with`, cell-only, `D =
 4`): each cell scored before its own deposit, for the Born face alone, the tree alone and Decision
 30's likelihood mixture of the two (`hnn::receiving::Mixture`, `β` stepped by `q_T(x)/q_B(x)` on the
-landmark β chart). The declared family is both emissions (`Position`: a pair of operators per digit
+landmark β chart; retired at THE_REBUILD U1, history at `19f1eb61`). The declared family is both emissions (`Position`: a pair of operators per digit
 position; `Dyadic`: a pair per dyadic cell, the tree's forced split) at every register width
 `χ = 2^j`, `j ≤ J`, the cost bound (`14·4^J·B·n_dev ≤ 2^37` complex products a passage: `J = 8`),
 stopping before a width the receiver's carrier refuses at the declared population (at `n* = 2^20`

@@ -26,9 +26,11 @@ results from them.
   (`receiver::population`): the landmark tree (`compression::landmark::context`, the shift
   navigator's landmarks, held in `Θ` at the receiving locus) is one family; a field-derived predictor
   (today `hnn::receiving`'s combined face `q_C`, the tree's grain logits plus the wave) is another;
-  terrain navigators and composed eggs are others. `hnn::receiving::Mixture`, which weighs the tree
-  against `q_C` on its own rounded chart, shares the population's ideal telescope but is a different
-  execution; joining them is the unified plan's U1. The population and its statistical
+  terrain navigators and composed eggs are others. The HNN's scored face is that population at its
+  own port (`hnn::receiving::receiving_population`, `receiver::population::port`): the tree and
+  `q_C` at ½/½, `q_C` read through its exact enclosure; it replaced the carried-ratio mixture at
+  the unified plan's U1, whose codes the standing cut placed within that chart's drift of it. The
+  population and its statistical
   families are not yet Holons joined at power ports: their update and code identities are their own
   laws, and their join to the Holon's energy balance is owed (the unified plan, U1 and §4).
 - **The aeon.** Its passage is an aeon on the Holarchy's parametric orientation (the lift of the
@@ -433,7 +435,8 @@ with its units, population and clock. The host reference's exposure (`Reference:
 them into one readout, `hnn::reference::Exposure`, whose fields are named below.
 1. **The scored face and the declared comparison covector.**
    - Since the likelihood mixture (September 26), `L_target|model = Σ_j −log₂ q_j(t_j)` scores the likelihood mixture of
-     the tree face and the combined tree/wave face. Both component codes are reported beside it.
+     the tree face and the combined tree/wave face, the receiver's population over the two since
+     U1. Both component codes are reported beside it.
    - The wave's covector comes from its own combined face `q_C`, in the declared odometer chart,
      with its phase excess and winding. It is not the derivative of the quantized mixture score.
      Exact enclosures and grain fibres accompany the scored readings.
@@ -444,7 +447,8 @@ them into one readout, `hnn::reference::Exposure`, whose fields are named below.
        (no processes in `holonics`), owed to the application that runs the exposure.
    - Failing to beat online order-0 is reported as a failure.
    - Selection reads the declared scored face. The component comparison that supplies each
-     covector is named explicitly (`hnn::receiving::Mixture`).
+     covector is named explicitly (the receiver's population, `hnn::receiving::receiving_population`,
+     scores; the combined face's comparison supplies the wave's covector).
 2. **The first law of learning over an aeon.** `ΔC = exchange + deposition` (aeon A7), with the
    released part counted as exchange, through `aeon::EnclosedLedger` (the enclosed first law; Lean
    `Aeon/Production/FirstLaw.{ledger_telescopes, ledger_is_first_law, enclosed_contains,
