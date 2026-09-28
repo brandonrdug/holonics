@@ -90,8 +90,8 @@ use super::{
 };
 use crate::compression::landmark::context::baseline::kt_probability;
 use crate::compression::landmark::context::{
-    Bundle, LandmarkDeclaration, Landmarks, Letter, LetterFamily, PassageCode, Section,
-    SectionChart, odometer_digits,
+    Bundle, LandmarkDeclaration, Landmarks, Letter, LetterFamily, OnceReached, PassageCode,
+    Section, SectionChart, odometer_digits,
 };
 use crate::ratio::Rat;
 
@@ -704,6 +704,13 @@ impl BoundaryEgg {
     /// The byte tree (its own likelihood is the egg's unheld reading).
     pub fn byte_tree(&self) -> &TreeFamily {
         &self.bytes
+    }
+
+    /// **Release the byte tree's once-reached leaf chains** (U2's acceptance run,
+    /// [`TreeFamily::release_once_reached`]); the clock, the hazard and the letter tree are
+    /// unchanged.
+    pub fn release_once_reached(&mut self) -> Result<OnceReached, PopulationError> {
+        self.bytes.release_once_reached()
     }
 
     /// The part clock.

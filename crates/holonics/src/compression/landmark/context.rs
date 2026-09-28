@@ -630,6 +630,8 @@ mod checkpoint;
 pub use checkpoint::StandingCodecError;
 mod passage_checkpoint;
 pub use passage_checkpoint::PassageCodecError;
+mod once_reached;
+pub use once_reached::OnceReached;
 
 // -------------------------------------------------------------------------------------------
 // the refusals

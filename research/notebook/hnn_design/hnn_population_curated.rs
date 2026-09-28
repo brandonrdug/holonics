@@ -403,17 +403,58 @@ pub(super) fn admitted_egg(
     comparisons: &[(String, HazardPartition)],
     naming: u64,
 ) -> Result<AdmittedEgg, holonics::receiver::population::PopulationError> {
+    let typed_deepest = deepest(&typed_declaration(
+        chart,
+        TYPED_DEPTHS[TYPED_DEPTHS.len() - 1],
+        population,
+        grain,
+    ));
+    admitted_egg_at(
+        chart,
+        population,
+        grain,
+        chosen_hazard,
+        relations,
+        comparisons,
+        naming,
+        typed_deepest,
+    )
+}
+
+/// The typed tree's declaration (the channel slot) at `depth` ticks.
+pub(super) fn typed_declaration(
+    chart: SectionChart,
+    depth: usize,
+    population: u64,
+    grain: u64,
+) -> LandmarkDeclaration {
+    declaration(
+        chart.alphabet(),
+        depth,
+        population,
+        grain,
+        Sections::new(chart, SectionSlots::Channel)
+            .expect("the channel slot")
+            .family()
+            .clone(),
+    )
+}
+
+/// **The admitted egg with its byte tree declared at `typed_depth` ticks** (U2's depth cut; the
+/// admitted egg of [`admitted_egg`] at the deepest depth its carriers admit).
+#[allow(clippy::too_many_arguments)]
+pub(super) fn admitted_egg_at(
+    chart: SectionChart,
+    population: u64,
+    grain: u64,
+    chosen_hazard: HazardPartition,
+    relations: Vec<holonics::receiver::population::Relation>,
+    comparisons: &[(String, HazardPartition)],
+    naming: u64,
+    typed_deepest: usize,
+) -> Result<AdmittedEgg, holonics::receiver::population::PopulationError> {
     let slots = || Sections::new(chart, SectionSlots::Channel).expect("the channel slot");
-    let typed = |depth| {
-        declaration(
-            chart.alphabet(),
-            depth,
-            population,
-            grain,
-            slots().family().clone(),
-        )
-    };
-    let typed_deepest = deepest(&typed(TYPED_DEPTHS[TYPED_DEPTHS.len() - 1]));
+    let typed = |depth| typed_declaration(chart, depth, population, grain);
     let letter_declaration = declaration(
         chart.letters(),
         LETTER_DEPTH,

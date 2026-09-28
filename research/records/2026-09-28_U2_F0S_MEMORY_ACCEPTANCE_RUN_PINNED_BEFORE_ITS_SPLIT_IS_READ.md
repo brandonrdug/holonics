@@ -112,3 +112,40 @@ pair and the cell holonomy stay attached through the tree's owner.
     only if a candidate passes and is adopted; otherwise the measurement harness mode alone. The
     release the run needs is realized on the tree with the eggs' delegation; if (1) is not adopted it
     is retired after the run with the harness's (1) path, and the run's commit is named.
+
+## 2. Before the run: the split and the projection
+
+The pins are commit `d6feae7e`. Everything below was done after it.
+
+**The split** (`development_families.py U2`, then `curated_source.py 524288 {choosing,validation} U2`,
+`curated_incidence.py {choosing,validation} U2` and `family_passage.py U2`; counts and hashes only).
+Source SHA-256 `e1001a7ed0dd03c583ab4ef097f3e243b12680daad05911374b8765107f2f8b2`, as F4's. Of 22,449
+development families, 18,006 choose and 4,443 validate; the membership's SHA-256 is
+`56e1585b6dcfe15d6940057cf1873d7eae406345180d28de299d0c5da9d4bca8`; no family was refused. The
+choosing cut holds 523,671 cells (SHA-256 `27b4fcbf135328d3643f9be715a3c22ad82eb4c6178ccde13c540d59eef8ab5d`)
+and 452 relations (`286d136323f7ac7b958f35125edeb437cca79773333c2f5fcc8a3d34b98e57b5`), the
+validation cut 524,133 cells (`edda3cff1f40add4a0d948188b61b69c816da6bc01f19f6a3e8fb8280067985f`)
+and 95 relations (`f69bde8f8f1e3e080da59f002d2675cf01b70ce71ecdb31787f92d6117c2b304`). The joined
+passage holds 1,047,804 cells (`4a40516a4ae6ce75be2f092fe25a624c7427dd33494a7b87577b72f7028cd3da`,
+`held_out_start` 523,671) and 547 relations (`cd5efd08c9e238b9581741ad084d61656573e6fc375a64436545941683e96e8f`);
+its flat twin 1,046,167 bytes (`e66e0d7eb9e644732197dea52e25fa4385ce80750a3e294f331e619f2bcdb62f`,
+held out from 522,854). The cuts' manifests count 10 `open` letters in the choosing cut and 20 in
+the validation cut.
+
+**The release and the harness.** Candidate (1)'s release is `Landmarks::release_once_reached`
+(`compression::landmark::context::once_reached`, with its tests: a released context reads exactly as
+one never founded, a read along kept nodes is unchanged, releases between deposits keep every face
+normalized and every standing decodable, a ceiling refuses), delegated through `TreeFamily`,
+`BoundaryEgg` and `AdmittedEgg`. The run is `hnn_population u2-acceptance`
+(`research/notebook/hnn_design/hnn_population_u2.rs`).
+
+**The projection, measured on F4's passage** (already a diagnostic; the whole harness run once as a
+dry run of its code paths, `u2-acceptance` on `curated-f4-passage-cut.bin`). It took 269,015 ms at a
+9,366,650,880-byte peak resident set: each candidate's role passage 40,458 to 48,827 ms, the flat
+tree 26,478 ms, each of (1)'s ten releases on the choosing families 67 to 283 ms. Every guard held
+with room (the longest passage under a tenth of ten minutes, the peak under half of 20 GB). It
+reproduced F0's recorded readings on that passage: the unmerged egg's standing 2,781,355,790 bytes
+(the census's) and its bytes `−2430 + 8/16 + ε` against flat. Its readings on F4's families are a
+diagnostic and choose nothing here: on F4's choosing families (1) read `+16115 + 7/16 + ε` against
+(0) charged (not admissible) and (2) `+129 + 13/16 + ε` (chosen); F4's validation read (2)
+`+219 + 0/16 + ε` against (0) at 2,058 bytes a cell against 2,653. No pin moved.

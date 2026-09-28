@@ -54,8 +54,8 @@ use super::{
     Readout, Survivors, Work, refuse,
 };
 use crate::compression::landmark::context::{
-    Capacity, DigitsReading, LandmarkDeclaration, Landmarks, Letter, PassageCode, SectionSlots,
-    Sections, StopPrior,
+    Capacity, DigitsReading, LandmarkDeclaration, Landmarks, Letter, OnceReached, PassageCode,
+    SectionSlots, Sections, StopPrior,
 };
 use crate::hnn::field::Field;
 use crate::holarchy::terrain::{Grating, MoireClass, MoireFamily};
@@ -161,6 +161,12 @@ impl TreeFamily {
     /// The tree.
     pub fn tree(&self) -> &Landmarks {
         &self.tree
+    }
+
+    /// **Release the tree's once-reached leaf chains** (a declared coarser receiver, U2's acceptance
+    /// run: [`Landmarks::release_once_reached`]); the address and the passage's code are unchanged.
+    pub fn release_once_reached(&mut self) -> Result<OnceReached, PopulationError> {
+        Ok(self.tree.release_once_reached()?)
     }
 
     /// The address of the next cell: the last `D` ticks' letters, newest first, `Boundary` before

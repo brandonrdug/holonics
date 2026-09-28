@@ -5,8 +5,8 @@ Family keys and assignments stay in an owner-only file; stdout contains counts a
 
     HOLONICS_ROOT=<checkout with private data> python3 development_families.py
 
-Pass `F1`, `F2` or `F5` for an independent item split before its validation; the default remains the
-pinned F4 split.
+Pass `F1`, `F2`, `F5` or `U2` for an independent item split before its validation; the default remains
+the pinned F4 split. Each item's seed is declared in `SEEDS` (U2's acceptance run: its record's pin 1).
 
 The split belongs to the exterior codec. A family is the undivided pair
 ``(provider, record_group)`` from the dataset, not a byte span or an aeon. SHA-256 of the
@@ -25,6 +25,13 @@ import sys
 from standing_cut import OUT_DIR, SOURCE, private_directory, private_write
 
 SEED = "holonics-f4-development-families-2026-09-27-v1"
+SEEDS = {
+    "F4": SEED,
+    "F1": "holonics-f1-development-families-2026-09-27-v1",
+    "F2": "holonics-f2-development-families-2026-09-27-v1",
+    "F5": "holonics-f5-development-families-2026-09-27-v1",
+    "U2": "holonics-u2-development-families-2026-09-28-v1",
+}
 NAME = "development-families-f4.json"
 PARTITION = re.compile(rb'"partition"\s*:\s*"(development|evaluation|deferred)"')
 
@@ -43,10 +50,10 @@ def assignment(family, seed=SEED):
 
 def main():
     arguments = sys.argv[1:]
-    if arguments not in ([], ["F1"], ["F2"], ["F5"]):
+    if len(arguments) > 1 or (arguments and arguments[0] not in SEEDS):
         sys.exit(__doc__)
     item = arguments[0] if arguments else "F4"
-    seed = SEED if item == "F4" else f"holonics-{item.lower()}-development-families-2026-09-27-v1"
+    seed = SEEDS[item]
     name = NAME if item == "F4" else f"development-families-{item.lower()}.json"
     with open(os.path.join(OUT_DIR, "curated-source.json"), "rb") as handle:
         source_manifest = json.load(handle)

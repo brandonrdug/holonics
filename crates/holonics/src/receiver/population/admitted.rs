@@ -552,6 +552,14 @@ impl AdmittedEgg {
         &self.inner
     }
 
+    /// **Release the inner egg's byte tree's once-reached leaf chains** (U2's acceptance run,
+    /// [`BoundaryEgg::release_once_reached`]); the relations, spans and stages are unchanged.
+    pub fn release_once_reached(
+        &mut self,
+    ) -> Result<crate::compression::landmark::context::OnceReached, PopulationError> {
+        self.inner.release_once_reached()
+    }
+
     /// Check a request/response incidence while both its target and reading part are still ahead
     /// of the clock. This does not create a span early: `open_part` creates and retains that span
     /// when the target letter is actually received.

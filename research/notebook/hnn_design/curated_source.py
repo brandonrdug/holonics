@@ -69,9 +69,10 @@ cells, so the two are measured on identical cells.
 
     HOLONICS_ROOT=<main checkout> python3 research/notebook/hnn_design/curated_source.py 1048576
 
-For F4, F1, F2 or F5, after `development_families.py` has pinned the private membership, the optional
-second argument `choosing` or `validation` emits only that role's development families under
-`curated-<item>-<role>-*` names (`F4` is the default item; pass `F1`, `F2` or `F5` as a third argument). It does
+For F4, F1, F2, F5 or U2, after `development_families.py` has pinned the private membership, the
+optional second argument `choosing` or `validation` emits only that role's development families under
+`curated-<item>-<role>-*` names (`F4` is the default item; pass `F1`, `F2`, `F5` or `U2` as a third
+argument). It does
 not decode evaluation or deferred records. A relation across roles is unheld, never supplied by
 adjacency.
 
@@ -90,7 +91,7 @@ import os
 import sys
 from array import array
 
-from development_families import PARTITION, assignment
+from development_families import PARTITION, SEEDS, assignment
 from standing_cut import ROOT, SOURCE, private_directory, private_write
 
 CHANNELS = ("human", "agent", "tool")
@@ -141,7 +142,7 @@ def count(table, *keys):
 
 def main():
     arguments = sys.argv[1:]
-    if len(arguments) not in (1, 2, 3) or (len(arguments) >= 2 and arguments[1] not in ("choosing", "validation")) or (len(arguments) == 3 and arguments[2] not in ("F1", "F2", "F5")):
+    if len(arguments) not in (1, 2, 3) or (len(arguments) >= 2 and arguments[1] not in ("choosing", "validation")) or (len(arguments) == 3 and arguments[2] not in SEEDS):
         sys.exit(__doc__)
     population = int(arguments[0])
     assert population > 0 and population & (population - 1) == 0, "a power of two"
@@ -151,7 +152,7 @@ def main():
     if role is not None:
         with open(os.path.join(ROOT, ".local", "cuts", f"development-families-{item.lower()}.json"), "rb") as handle:
             split = json.load(handle)
-        assert split["seed"] == f"holonics-{item.lower()}-development-families-2026-09-27-v1"
+        assert split["seed"] == SEEDS[item]
         expected = {entry["family_sha256"]: entry["role"] for entry in split["members"]}
         assert len(expected) == len(split["members"])
 
