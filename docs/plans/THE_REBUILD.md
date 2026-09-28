@@ -53,7 +53,7 @@ Its corrections are folded in.
 | Population | codes known-truth terrain at its truth among declared families; the egg alone is F0's byte predictor; no library owner calls it (the harnesses do) |
 | Field (rings, contacts, word, deposition, wave) | lawful on host and card; `5 − 13/16 − ε` held-out bits on the standing cut through `q_C`; campaign 2 and the loaded resonator added none; its wave and resonator states live inside one word |
 | Chase (F6) | reception at truth on 16 arenas; action captures in 164 ticks against 3,704 and 366; the at-once acceptance failed; its decision rule is a capture-basin planner, not the specified log-odds commit |
-| Retention | Lean `Foundation/Standing`; Rust `receiver::standing` is used only by tests; two collapses do not use it |
+| Retention | one contract (objects §8): each collapse is the standing law through its own carrier, with its Lean standing and its recoverability (U2's first loop); the test-only linear chain is retired |
 | Release | three rules: `receiver::release` (the HNN), the population's draw pipeline, the chaser's decision |
 | Mixtures | five constructions, sharing the ideal telescope but differing in conditioning, transitions and carriers: digit-local joins (`JoinTree`, `FaceJoins`), the whole-cell `receiving::Mixture`, the population's telescope with death, dormancy's fixed share over switching paths, and the retired `LocalMixture` |
 | Motion primitives | proved in `Geometry/Motion`; no Rust consumer |
@@ -91,7 +91,7 @@ every duplicated law has one owner that the others cite; the gates pass (check, 
   move to THE_MACHINE; #62 becomes the current obligation list; the atlas README states its tags and
   shards; the notebook and records READMEs become routes.
 - **Kept, with an actual consumer or a date.** `receiver::standing`, `compression::face_map` and
-  `hnn::modes` (a test-only chain) and `receiver::release`'s unconsumed half and `causal_chord` are
+  `hnn::modes` (a test-only chain; U2 retired all three, below) and `receiver::release`'s unconsumed half and `causal_chord` are
   kept until U2 and U3 close, and each item's acceptance includes it: at the item's close each kept
   subtree has a named call from a library owner or is deleted. `physics::fluid`'s control-volume
   operators (`control_volume::{NewtonianMaterial, ControlVolume, face_flux, vorticity}` over
@@ -100,8 +100,8 @@ every duplicated law has one owner that the others cite; the gates pass (check, 
 
 #### U2. One retention contract, and F0's memory
 
-Owners: `receiver::standing` (Lean `Foundation/Standing`), `hnn::retention`, `population::species`,
-`compression::landmark::context`.
+Owners: Lean `Foundation/Standing` (its Rust chart `receiver::standing` retired in the first loop),
+`hnn::retention`, `population::species`, `compression::landmark::context`.
 - **Contract.** Both collapses share the abstract factorization law (`standingLaw_exists_iff_future_factors`)
   with action-sufficient futures, through their own carriers: the HNN's structural collapse keeps its
   refusal to reopen; species collapse keeps seeds, shares and its certified future. No dense global
@@ -116,6 +116,44 @@ Owners: `receiver::standing` (Lean `Foundation/Standing`), `hnn::retention`, `po
   the merge is refused for that context. `receiver::standing`, `compression::face_map` and `hnn::modes`
   each have a named call from a library owner, or are deleted.
 - **Failure.** The standing stays; the refused contexts and their separators are reported.
+- **First loop, September 28 (the contract, the derivation and a census; nothing adopted).**
+  - *The contract* is in [objects §8](../ELEMENTARY_OBJECTS.md#the-retention-contract), which owns
+    it; the owners cite it. Its Lean standings: `HNN/Retention.fieldStanding` (the structural
+    collapse, which cannot be reopened), `Context/Evolution.species_collapse_standing` (new: the
+    species retention `(t, W)` is a standing for every cell word within the certified future; it
+    splits by `species_split`), and the tree's chains (`Context/Standing.address_standing`,
+    `Compaction.compacted_is_the_full_tree`). Hearing's consumer at the collapses is
+    `hnn::retention::separator`, which refuses at the aeon's close every pending ratio whose
+    receiver still hears a released locus.
+  - *The kept subtree, retired.* `receiver::standing` and `compression::face_map` are a dense
+    linear chart of the standing law and of the face map's kernel; no collapse is linear, and the
+    contract certifies each through its own carrier, so none needs them. `hnn::modes` quotients a
+    loaded ring's word-local state, which leaves at every word's end, so an aeon's collapse has
+    nothing of it to act on. Their laws are Lean's (`Foundation/Standing`, `Compression/Core/FaceMap`,
+    `HNN/ModeQuotient`); the two only `hnn::modes` checked are in
+    [HNN_FORMULA §4](../HNN_FORMULA.md#the-loaded-rings-mode-quotient). All three are at commit
+    `1bdacc8f`. §4's campaign-3 row now waits on persistent motion between words.
+  - *Which merges are future-sufficient* (derived in `compression::landmark::context`, "Which merges
+    and releases are future-sufficient"; Lean `Context/Merge.equal_present_faces_do_not_merge`).
+    For the declared receiver, the exact node merges are the chains already stored and the contexts
+    no continuing address reaches; equal present faces, equal counts and equal validation code do
+    not qualify. The exact merges are therefore essentially empty, and **the memory experiment's
+    acceptance is amended accordingly**: it tests the charged coarsening law
+    (`Context/Merge.coarsening_within_margin_iff`), a declared coarser receiver priced by its
+    code-length pair, with its own acceptance and never reported as retention. The squares clause
+    applies to exact merges, which the derivation already refuses beyond the chains.
+  - *The census* (`hnn_population f0-census`; the egg alone on F4's development passage; 107,150 ms
+    at an 8,656,285,696-byte peak). Of the egg's 2,653 bytes a cell its byte tree holds 2,651: the
+    readings kept beside the state (certificates, cached stop weight, rebase count) 1,140, the
+    boundary contexts 0 (10,184 bytes in all), letters no label reads 3; once-reached leaf chains
+    1,771; the depth cut at 12 ticks 594, at 6 ticks 1,984; the refused equal-count merge of
+    siblings 827. The table is in the tree's owner.
+  - *The acceptance run pins, before it runs:* a fresh development-family split never used for a
+    diagnostic; the declared receiver (the conditional byte-and-stop code at `L_R = 16`); the
+    candidates (the unmerged tree, once-reached chains released at the aeon boundary, the depth cut
+    at 12 ticks), chosen on the choosing families alone and charged `⌈log₂⌉` of the candidates; the
+    margin `m` in bits and the standing budget in bytes a cell; and the readings beside the state
+    reported as their own line (standing only for a receiver that reads the certified residual).
 
 #### U3. One release contract
 
@@ -227,11 +265,11 @@ equation extraction (#146).
 | Item | Disposition |
 |---|---|
 | The tree and population as Holons joined at power ports | open; U1 names its missing maps and balances; owed in #62 |
-| Campaign 3's descended lattice chart, card parity, finite-deposit stability, persistent dormancy across an aeon and the concrete-ring bridge | deferred: built when U2 decides `hnn::modes` (#73); the Lean parts owed in #62 |
+| Campaign 3's descended lattice chart, card parity, finite-deposit stability, persistent dormancy across an aeon and the concrete-ring bridge | U2 retired `hnn::modes` (its state is word-local); these return with persistent motion between words (below), the mode quotient ported from `1bdacc8f` with that consumer (#73); the Lean parts owed in #62 |
 | Mode release, FOUND by interconnection, far-field moment quotient `V_m` | deferred to after U3 (#73) |
 | Encoding, Context and JointPrediction (joint against marginal witnesses) | U6, after U1; the continuation-transport discovery of [F1's after-note](../../research/records/2026-09-28_THE_REBUILDS_CONSTRUCTION_RECORD_STEPS_ZERO_TO_FIVE_THE_CAMPAIGNS_AND_THE_FORWARD_PLAN.md#f1-the-word-alphabet-campaign-5-73-148) stays live |
 | Concrete-tick diamond, complete word-sensitivity certificate | owed in #62 |
-| The carry word's runtime consumer, relative completeness, action-sufficient descent in Lean, Hearing's consumer | U5 (the carry word); U2 (Hearing's consumer, at the collapses); owed in #62 (relative completeness, action-sufficient descent) |
+| The carry word's runtime consumer, relative completeness, action-sufficient descent in Lean, Hearing's consumer | U5 (the carry word); Hearing's consumer is `hnn::retention::separator` at the aeon's close (U2); owed in #62 (relative completeness, action-sufficient descent) |
 | F4's decoder, producing keys, causal provenance, grain and fibre, release squares | U3 and F4's gate |
 | F5's cold restore, atomic native transition, truthful health receipts | F5's gate |
 | Moving-continuum electromagnetic reception | deferred to U7 (the physical terrains); owed in #62 |
@@ -257,7 +295,7 @@ equation extraction (#146).
 |---|---|
 | Steps 0–3 | complete (construction record) |
 | Step 4 (the HNN law), campaigns 1–2 | built; U1–U5 join it |
-| Campaign 3 (modes, dormancy, founding) | U2 decides `hnn::modes`; the rest in §4 |
+| Campaign 3 (modes, dormancy, founding) | U2 retired `hnn::modes`; the rest in §4 |
 | Campaign 4 (the motor chart), F6 | U4 |
 | Campaign 5 (encoding, context, prediction) | U6; §4 |
 | F1 (words) | its failure branch holds: bytes stay; the continuation-transport discovery of [F1's after-note](../../research/records/2026-09-28_THE_REBUILDS_CONSTRUCTION_RECORD_STEPS_ZERO_TO_FIVE_THE_CAMPAIGNS_AND_THE_FORWARD_PLAN.md#f1-the-word-alphabet-campaign-5-73-148) stays live (§4) |

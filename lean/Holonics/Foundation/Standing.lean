@@ -8,8 +8,18 @@ import Mathlib.Tactic
 # Standing, memory and extinction
 
 [definition] This owner states item **T2** of
-`docs/plans/THE_TUBE_CARRIES_RELEASE_THROUGH_NECKS_FOLDS_AND_JUNCTIONS.md`. Its Rust counterpart
-is `crates/holonics/src/receiver/standing.rs`.
+`docs/plans/THE_TUBE_CARRIES_RELEASE_THROUGH_NECKS_FOLDS_AND_JUNCTIONS.md`.
+
+[definition; agent-inferred, U2 of `docs/plans/THE_REBUILD.md`] **The retention contract**
+(`docs/ELEMENTARY_OBJECTS.md` §8, which owns its statement). Every collapse is an instance of
+`standingLaw_exists_iff_future_factors` with an action-sufficient future, certified through its own
+carrier and keeping its own recoverability condition: the HNN's structural collapse is
+`HNN/Retention.fieldStanding` (it cannot be reopened, `release_structural`), species collapse is
+`Compression/Landmark/Context/Evolution.species_collapse_standing` (it splits,
+`species_split`), and the receiving tree's storage is `Compression/Landmark/Context/Standing.
+address_standing` with `Context/Compaction.compacted_is_the_full_tree` (a chain splits where paths
+part). No dense global realization is forced on them; the linear one (`receiver::standing` and
+`compression::face_map`, at commit `1bdacc8f`) was retired at U2.
 
 **Memory belongs to standing.** *Standing* is a prior relation still available to present
 transport: the retained residue of the passages a lineage has undergone. A remembered face is

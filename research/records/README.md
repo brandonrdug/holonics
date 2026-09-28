@@ -147,7 +147,8 @@ targets in [`HolonicsResearch.Landmarks`](../../lean/HolonicsResearch/Landmarks.
 `IntegralCokernel` over [`CokernelCalculus`](../../lean/HolonicsResearch/Landmarks/CokernelCalculus.lean),
 `HasseSite`, `PrimeCycles`, `Sieve`). Rust [`holonics::compression`](../../crates/holonics/src/compression/)
 and site kinds in `holonics::navigator::trace`. The prototype's `kernel_modes` is superseded by
-`compression::face_map`; its `winding_inertia` was not needed and stays in
+Lean `Compression/Core/FaceMap` (its Rust realization `compression::face_map` was retired at U2, at
+commit `1bdacc8f`); its `winding_inertia` was not needed and stays in
 [history](https://github.com/brandonrdug/holonics/blob/551d6c5d/crates/holonics/src/geometry/winding_inertia.rs).
 The [null-cone record](2026-09-24_THE_NULL_CONE_IS_THE_CONSTITUTIONS_LOCK_AND_CLOSURE_IS_A_RECEIVER_READING.md)
 states the landmark readings (site kinds, Hasse sites, primes as primitive cycles).

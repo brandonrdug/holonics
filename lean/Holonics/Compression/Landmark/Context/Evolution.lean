@@ -55,6 +55,16 @@ admitted receiver). The collapsed mixture carries one member a species at the su
   is its species' weight times its prior share within the species, `w_k L_k = (w_k/W_(σ k)) ·
   W_(σ k) L_(rep(σ k))`, so a species kept with every member's seed splits exactly when the
   admitted future grows.
+* `species_collapse_standing` [proved-derived; formal-checked]: **the collapse is a standing for
+  its certified future** (U2, the [retention contract](../../../../../docs/ELEMENTARY_OBJECTS.md#the-retention-contract)).
+  The family's state is its tick and each key's weight `(t, v)`; a cell `c` multiplies each weight
+  by its key's face `f_k(t)(c)` inside the admitted future and is refused past it (`keyStep`), and
+  the receiver reads the mixture's mass of a class there (`keyRead`). When every member agrees with
+  its representative at every admitted tick and cell, the retention `(t, W)` with `W_s` the species'
+  summed weight (`speciesRetain`) is a `Foundation/Standing.StandingLaw` for every cell word, read
+  by the collapsed family (`speciesStep`, `speciesRead`), through
+  `Standing.statistical_sufficiency_gives_standing`. Every cell word includes every word a release
+  commits, so the future is action-sufficient. Its recoverability is `species_split`.
 
 The computational object is the helical pair interaction read as a receiver's population of eggs
 across aeons. Of the winding guide's six general objects this module touches the **tube** (the
@@ -289,6 +299,74 @@ theorem species_split (σ : κ → S) (rep : S → κ) (w : κ → ℚ) {f : κ 
   rw [species_likelihood σ rep hagree hn k]
   field_simp
 
+/-! ### The collapse is a standing for its certified future -/
+
+variable {C : Type*}
+
+/-- [definition] **A key family's step on a cell** `c` at its tick: each key's weight multiplies by
+its face of the cell; past the admitted future `h` the collapsed family refuses the cell and nothing
+moves. -/
+def keyStep (f : κ → ℕ → C → ℚ) (h : ℕ) (c : C) (x : ℕ × (κ → ℚ)) : ℕ × (κ → ℚ) :=
+  if x.1 < h then (x.1 + 1, fun k => x.2 k * f k x.1 c) else x
+
+/-- [definition] **The receiver's reading of a class** at the family's tick: the mixture's mass of it
+inside the admitted future, nothing past it. -/
+def keyRead (f : κ → ℕ → C → ℚ) (h : ℕ) (c : C) (x : ℕ × (κ → ℚ)) : ℚ :=
+  if x.1 < h then ∑ k, x.2 k * f k x.1 c else 0
+
+/-- [definition] **The species collapse's retention**: the tick and each species' summed weight. -/
+def speciesRetain (σ : κ → S) (x : ℕ × (κ → ℚ)) : ℕ × (S → ℚ) := (x.1, speciesWeight σ x.2)
+
+/-- [definition] **The collapsed family's step**: each species at its representative's face. -/
+def speciesStep (rep : S → κ) (f : κ → ℕ → C → ℚ) (h : ℕ) (c : C) (y : ℕ × (S → ℚ)) :
+    ℕ × (S → ℚ) :=
+  if y.1 < h then (y.1 + 1, fun s => y.2 s * f (rep s) y.1 c) else y
+
+/-- [definition] **The collapsed family's reading.** -/
+def speciesRead (rep : S → κ) (f : κ → ℕ → C → ℚ) (h : ℕ) (c : C) (y : ℕ × (S → ℚ)) : ℚ :=
+  if y.1 < h then ∑ s, y.2 s * f (rep s) y.1 c else 0
+
+omit [Fintype S] [DecidableEq κ] in
+/-- A species' weight after a factor its members share is its weight times the factor. -/
+theorem speciesWeight_mul (σ : κ → S) (rep : S → κ) (v g : κ → ℚ)
+    (hg : ∀ k, g k = g (rep (σ k))) (s : S) :
+    speciesWeight σ (fun k => v k * g k) s = speciesWeight σ v s * g (rep s) := by
+  unfold speciesWeight
+  rw [sum_mul]
+  refine sum_congr rfl fun k hk => ?_
+  show v k * g k = v k * g (rep s)
+  rw [hg k, (mem_filter.1 hk).2]
+
+omit [DecidableEq κ] in
+/-- [proved-derived; formal-checked] **`species_collapse_standing`: the collapse is a standing for its
+certified future.** When every key agrees with its species' representative at every tick `t < h` of
+the admitted future and every cell, the retention `(t, W)` is a `Foundation/Standing.StandingLaw` of
+the key family (`keyStep`, `keyRead`) for every cell word, reopened by the collapsed family. -/
+theorem species_collapse_standing (σ : κ → S) (rep : S → κ) (f : κ → ℕ → C → ℚ) (h : ℕ)
+    (hagree : ∀ k t c, t < h → f k t c = f (rep (σ k)) t c) :
+    ∃ L : Holonics.Foundation.Standing.StandingLaw C C (ℕ × (κ → ℚ)) (ℕ × (S → ℚ)) ℚ,
+      L.transport = keyStep f h ∧ L.observe = keyRead f h ∧ L.retain = speciesRetain σ ∧
+        ∀ c w y, L.reopen c w y = speciesRead rep f h c
+          (Holonics.Foundation.Chronology.transportWord (speciesStep rep f h) w y) := by
+  refine Holonics.Foundation.Standing.statistical_sufficiency_gives_standing (keyRead f h)
+    (keyStep f h) (speciesRetain σ) (speciesRead rep f h) (speciesStep rep f h) ?_ ?_
+  · intro c x
+    unfold keyRead speciesRead speciesRetain
+    split_ifs with ht
+    · rw [← sum_fiberwise univ σ (fun k => x.2 k * f k x.1 c)]
+      refine sum_congr rfl fun s _ => ?_
+      have := speciesWeight_mul σ rep x.2 (fun k => f k x.1 c) (fun k => hagree k x.1 c ht) s
+      unfold speciesWeight at this
+      exact this
+    · rfl
+  · intro c x
+    unfold keyStep speciesStep speciesRetain
+    split_ifs with ht
+    · simp only [Prod.mk.injEq, true_and]
+      funext s
+      exact speciesWeight_mul σ rep x.2 (fun k => f k x.1 c) (fun k => hagree k x.1 c ht) s
+    · rfl
+
 end Species
 
 section Audit
@@ -311,6 +389,8 @@ section Audit
 #print axioms species_face
 #print axioms species_collapse_code
 #print axioms species_split
+#print axioms speciesWeight_mul
+#print axioms species_collapse_standing
 
 end Audit
 

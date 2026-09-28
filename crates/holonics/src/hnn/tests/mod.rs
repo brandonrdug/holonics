@@ -8,7 +8,6 @@ mod guards;
 mod keys;
 mod learning;
 mod loaded_scalar;
-mod modes;
 mod moment;
 mod pending;
 mod physics;

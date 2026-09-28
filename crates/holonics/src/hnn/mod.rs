@@ -28,8 +28,8 @@
 //! - [open] Three joins the sentence names are not yet in the code. The receiving tree is storage
 //!   read by the receiving face, not a Holon joined at ports in [`Field::holarchy`]. A receiving
 //!   window is a step of the exposure's loop, not an [`crate::aeon::Epochs`] reading at the
-//!   receiver's section. A pump's period is the mode quotient's lift period ([`modes`]), not an
-//!   [`crate::aeon::Cycle`]. The unity audit's order, item 2, owns them (#63).
+//!   receiver's section. A pump's period is the mode quotient's lift period (Lean
+//!   `HNN/ModeQuotient.periodic_lift_exact`), not an [`crate::aeon::Cycle`]. The unity audit's order, item 2, owns them (#63).
 //!
 //! Within an aeon the medium `(Θ, λ)` fixes every operand of a word, and a change opens at zero,
 //! propagates one contact per tick and is released at the word's end. The forward machine is here:
@@ -61,10 +61,13 @@
 //!   reference change;
 //! - [`contact`] (campaign 2): the contact's transfer and site kind, its certified boost, its lock
 //!   address and its break receipt, with [`contact_readings`], the lock and site readings the
-//!   receiving join consumes;
-//! - [`modes`] (campaign 3, first construction): a loaded ring's exact per-phase operators and its
-//!   mode quotient: the admitted future kernel through the pump's period, the release by the one
-//!   chart that closes every phase's squares, and the descended ring that returns the same wave.
+//!   receiving join consumes.
+//!
+//! [definition; agent-inferred, U2] A loaded ring's mode quotient (campaign 3's first construction)
+//! is Lean's (`HNN/ModeQuotient`); its Rust realization (`hnn::modes`, at commit `1bdacc8f`) was
+//! retired at U2. It quotients the ring's word-local state, which leaves at every word's end, so the
+//! aeon's retention contract has nothing of it to collapse; the laws only it held are in
+//! [HNN_FORMULA §4](../../../../docs/HNN_FORMULA.md#the-loaded-rings-mode-quotient).
 //!
 //! The learning side (constitution, ratio, pending, retention, port, reference) composes these.
 //! `realization` runs the regions whose effects commute together on the host's cores (the hardware
@@ -94,7 +97,6 @@
 //! | the ring's mode tick, its pump and sheets, its clock, the junction's reference change (campaign 2) | `HNN/Ring.{ring_tick_conserves_mode_energy, ring_descriptor_tick_conserves, ring_cayley_denominator_nonsingular, ring_tick_executed_energy_balance, two_port_reference_balance, ring_crossings_are_epoch_ticks, pump_half_turn_invariant, pump_blind_to_sheets, locked_sheet_receiver_face}` | [`ring`] |
 //! | the contact's transfer and site kind, its boost, its lock address, its break (campaign 2) | `HNN/Contact.{contact_transfer_kind_by_storage_sign, contact_mode_transfer, contact_boost_solve_or_singular_direction, contact_signed_storage_balance, contact_lock_address, lockAddress_unique, least_denominator_unique, lockAddress_closes}`, `HNN/ContactBreak.{break_release_balance, break_iff_release_covers_gluing, griffith_closed_port_case, parting_returns_gluing_defect}` | [`contact`], [`contact_readings`], [`Field::parted_holarchy`] |
 //! | the loaded tick's field/resonator balance, separate element and returned-wave splits, the word's balance across the gain commit (the loaded resonator) | `HNN/Ring.{loaded_word_stage_balance, loaded_tick_executed_interconnection_balance}`, `HNN/Word.{field_commit_deposition}` | [`word::FieldBalance`], [`word::WordBalance`], [`word::PowerForm`] |
-//! | a loaded ring's modes descend to their future quotient: the period lift, one chart for every phase, the descended run, the storage-null release (campaign 3, first construction) | `HNN/ModeQuotient.{periodic_lift_exact, phase_kernel_le_lift, descended_run_reads, released_pair_storage_null}` | [`modes`] |
 //! | the ring's navigator | `Holon/Navigator.{mapRotor_order, map_pow_mod_order, map_turn_lossless}` | [`Ring::navigator`] over `navigator::Transport::Map` |
 //! | the block incidence, the contrast map read from its blocks, and the Holarchy chart | `Holon/Complex.{blockIncidence, block_flat_closed}`, `Holarchy/Join.interconnect` | [`Field::connection`], [`Field::contrast`], [`Field::holarchy`] |
 //! | the port's returns | `Holarchy/Reception.InteractionReturn` (the owner's, generic in its payloads) | [`ExecutionPort`] |
@@ -117,7 +119,6 @@ pub mod constitution;
 pub mod contact;
 pub mod field;
 pub mod keys;
-pub mod modes;
 pub mod moment;
 pub mod pending;
 pub mod port;
@@ -356,8 +357,6 @@ pub enum HnnError {
     UncertifiedResonator { ring: usize, phase: usize },
     #[error("ring {ring}'s resonator material is malformed: {what}")]
     Resonator { ring: usize, what: &'static str },
-    #[error("ring {ring}'s mode quotient refused: {what}")]
-    ModeQuotient { ring: usize, what: &'static str },
     #[error(
         "the chart {chart:?} did not refine below its certificate {certificate}: the target is {target}"
     )]

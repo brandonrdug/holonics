@@ -58,6 +58,20 @@ changes) or **priced** (the faces change and the complete description must fall)
   admitted future exactly as the unmerged one (`Evolution.species_collapse_code` with the merged
   face in place of a representative). [correction, Sol] A merge that stops shortening the code is not
   thereby releasable: release needs this equivalence, which the code-length pair does not test.
+* `equal_present_faces_do_not_merge` [counterexample; formal-checked] (U2; GPT-6 Astra's review of
+  September 28): **equal present faces do not make a merge of tree contexts lawful.** At depth one,
+  after one arrival of class `0` at `[0]` and one at `[1]`, the two contexts read every class alike
+  (`4/5` and `1/5`); after one further arrival of class `1` at `[0]` they read `9/16` and `11/16`. A
+  merge stores the two contexts in one register, which reads them alike after every word, so no
+  lawful `Foundation/Standing.StandingLaw` of the tree under arrivals reads them through one register.
+  Equal code on validation cells is agreement along the words those cells are, and fails the same
+  way. The merges and releases of the tree that are future-sufficient are derived in the tree's
+  owner (`compression::landmark::context`, "Which merges and releases are future-sufficient").
+* `coarsening_within_margin_iff` [proved-derived; formal-checked] (U2): **the charged coarsening
+  law.** A declared coarser receiver (a shallower depth, a founding rule, a merge of contexts) is not
+  a retention of the finer one; it is priced against it. With both complete descriptions masses, the
+  coarser code lies within a margin of `m` bits of the finer exactly when `P·W ≤ 2^m·P′·W′`
+  (`merge_cost_mass_iff` at the margin `m`).
 
 The computational object is the helical pair interaction read as the receiver's cells and their
 merges. Of the winding guide's six general objects this module touches **faces and placement**
@@ -156,6 +170,20 @@ theorem merge_cost_mass_iff {P P' W W' : ℝ} (hP : 0 < P) (hP' : 0 < P') (hW : 
     completeCode (-Real.logb 2 P') W' < completeCode (-Real.logb 2 P) W ↔ P * W < P' * W' := by
   rw [← Real.logb_lt_logb_iff (b := 2) (by norm_num) (mul_pos hP hW) (mul_pos hP' hW'),
     Real.logb_mul hP.ne' hW.ne', Real.logb_mul hP'.ne' hW'.ne']
+  unfold completeCode
+  constructor <;> intro h <;> linarith
+
+/-- [proved-derived; formal-checked] **`coarsening_within_margin_iff`: a coarsening is within a margin
+of `m` bits exactly when `P·W ≤ 2^m·P′·W′`.** The charged coarsening law (module header): the coarser
+complete code `K′ = −log₂ P′ − log₂ W′` lies within `m` bits of the finer `K = −log₂ P − log₂ W`. -/
+theorem coarsening_within_margin_iff {P P' W W' m : ℝ} (hP : 0 < P) (hP' : 0 < P') (hW : 0 < W)
+    (hW' : 0 < W') :
+    completeCode (-Real.logb 2 P') W' ≤ completeCode (-Real.logb 2 P) W + m ↔
+      P * W ≤ (2 : ℝ) ^ m * (P' * W') := by
+  have h2 : (0 : ℝ) < (2 : ℝ) ^ m := Real.rpow_pos_of_pos (by norm_num) _
+  rw [← Real.logb_le_logb (b := 2) (by norm_num) (mul_pos hP hW) (mul_pos h2 (mul_pos hP' hW')),
+    Real.logb_mul hP.ne' hW.ne', Real.logb_mul h2.ne' (mul_pos hP' hW').ne',
+    Real.logb_mul hP'.ne' hW'.ne', Real.logb_rpow (by norm_num) (by norm_num)]
   unfold completeCode
   constructor <;> intro h <;> linarith
 
@@ -428,6 +456,92 @@ theorem release_merge_code (σ : κ → S) (w : κ → ℚ) {f : κ → ℕ → 
 
 end Release
 
+/-! ## 7. The tree's contexts: equal present faces do not merge -/
+
+section TreeContexts
+
+open Holonics.Foundation.Standing (StandingLaw)
+open Holonics.Foundation.Chronology (transportWord)
+
+/-- [definition] **The fixture**: at depth one over `Fin 2` letters and classes, one arrival of class
+`0` at the address `[0]` and one at `[1]`. -/
+def twoContexts : TreeStanding (Fin 2) (Fin 2) := arrive (arrive emptyStanding [0] 0) [1] 0
+
+/-- [definition] The fixture after one further arrival of class `1` at `[0]`. -/
+def parted : TreeStanding (Fin 2) (Fin 2) := arrival ([0], 1) twoContexts
+
+theorem ktMass_fin_two (n : Fin 2 → ℕ) :
+    ktMass n = (∏ j ∈ range (n 0), ((j : ℚ) + 1 / 2)) *
+        (∏ j ∈ range (n 1), ((j : ℚ) + 1 / 2)) / ∏ j ∈ range (n 0 + n 1), ((j : ℚ) + 1) := by
+  simp [ktMass, Fin.prod_univ_two, Fin.sum_univ_two]
+
+/-- The root face at depth one: the root's KT face and the context's, mixed by the stop weight. -/
+theorem rootRead_depth_one (N : TreeStanding (Fin 2) (Fin 2)) (b c : Fin 2) :
+    rootRead 1 ([b], c) N =
+      ktMass (N []) / (ktMass (N []) + ktMass (N [0]) * ktMass (N [1])) * ktFace (N []) c +
+        (1 - ktMass (N []) / (ktMass (N []) + ktMass (N [0]) * ktMass (N [1]))) *
+          ktFace (N [b]) c := by
+  simp only [rootRead, face]
+  rw [pathFace_step _ _ Nat.zero_lt_one, pathFace_deepest]
+  simp [kAt, lamAt, splitMass, treeWeight, Fin.prod_univ_two]
+
+theorem twoContexts_counts :
+    (twoContexts [] 0 = 2 ∧ twoContexts [] 1 = 0) ∧
+      (twoContexts [0] 0 = 1 ∧ twoContexts [0] 1 = 0) ∧
+        (twoContexts [1] 0 = 1 ∧ twoContexts [1] 1 = 0) := by
+  refine ⟨⟨?_, ?_⟩, ⟨?_, ?_⟩, ⟨?_, ?_⟩⟩ <;> decide
+
+theorem parted_counts :
+    (parted [] 0 = 2 ∧ parted [] 1 = 1) ∧
+      (parted [0] 0 = 1 ∧ parted [0] 1 = 1) ∧
+        (parted [1] 0 = 1 ∧ parted [1] 1 = 0) := by
+  refine ⟨⟨?_, ?_⟩, ⟨?_, ?_⟩, ⟨?_, ?_⟩⟩ <;> decide
+
+/-- The two contexts read every class alike now, `4/5` for class `0`. -/
+theorem twoContexts_faces :
+    (∀ c, rootRead 1 ([0], c) twoContexts = rootRead 1 ([1], c) twoContexts) ∧
+      rootRead 1 ([0], 0) twoContexts = 4 / 5 := by
+  have same : twoContexts [0] = twoContexts [1] := by
+    funext c
+    fin_cases c <;> decide
+  refine ⟨fun c => by rw [rootRead_depth_one, rootRead_depth_one, same], ?_⟩
+  obtain ⟨⟨a0, a1⟩, ⟨b0, b1⟩, ⟨c0, c1⟩⟩ := twoContexts_counts
+  rw [rootRead_depth_one, ktMass_fin_two, ktMass_fin_two, ktMass_fin_two]
+  simp only [ktFace, Holonics.HNN.RegionCounts.ktProb, Fin.sum_univ_two, a0, a1, b0, b1, c0, c1]
+  norm_num [prod_range_succ]
+
+/-- After the parting arrival they read `9/16` and `11/16`. -/
+theorem parted_faces :
+    rootRead 1 ([0], 0) parted = 9 / 16 ∧ rootRead 1 ([1], 0) parted = 11 / 16 := by
+  obtain ⟨⟨a0, a1⟩, ⟨b0, b1⟩, ⟨c0, c1⟩⟩ := parted_counts
+  constructor <;>
+  · rw [rootRead_depth_one, ktMass_fin_two, ktMass_fin_two, ktMass_fin_two]
+    simp only [ktFace, Holonics.HNN.RegionCounts.ktProb, Fin.sum_univ_two, a0, a1, b0, b1, c0, c1]
+    norm_num [prod_range_succ]
+
+/-- [counterexample; formal-checked] **`equal_present_faces_do_not_merge`** (module header). The
+contexts `[0]` and `[1]` read every class alike now; after the arrival of class `1` at `[0]` they
+read `9/16` and `11/16`; so every lawful standing of the tree under arrivals reopens the two
+contexts differently after that word, and no register shared by both is a standing. -/
+theorem equal_present_faces_do_not_merge :
+    (∀ c, rootRead 1 ([0], c) twoContexts = rootRead 1 ([1], c) twoContexts) ∧
+      rootRead 1 ([0], 0) (arrival ([0], 1) twoContexts) = 9 / 16 ∧
+        rootRead 1 ([1], 0) (arrival ([0], 1) twoContexts) = 11 / 16 ∧
+          ∀ {R : Type} (L : StandingLaw (List (Fin 2) × Fin 2) (List (Fin 2) × Fin 2)
+              (TreeStanding (Fin 2) (Fin 2)) R ℚ),
+            L.transport = arrival → L.observe = rootRead 1 →
+              L.reopen ([0], 0) [([0], 1)] (L.retain twoContexts) ≠
+                L.reopen ([1], 0) [([0], 1)] (L.retain twoContexts) := by
+  obtain ⟨h0, h1⟩ := parted_faces
+  refine ⟨twoContexts_faces.1, h0, h1, fun L ht ho => ?_⟩
+  rw [L.sufficient, L.sufficient]
+  simp only [transportWord, ht, ho]
+  change rootRead 1 ([0], 0) parted ≠ rootRead 1 ([1], 0) parted
+  rw [h0, h1]
+  norm_num
+
+end TreeContexts
+
 section Audit
 
 #print axioms expand_merge
@@ -450,6 +564,10 @@ section Audit
 #print axioms merged_square_of_compatible
 #print axioms release_merge_iff_future_equivalent
 #print axioms release_merge_code
+#print axioms coarsening_within_margin_iff
+#print axioms twoContexts_faces
+#print axioms parted_faces
+#print axioms equal_present_faces_do_not_merge
 
 end Audit
 

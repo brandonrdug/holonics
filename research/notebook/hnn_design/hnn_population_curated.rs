@@ -333,14 +333,6 @@ pub(super) fn curated_families(
         )
     };
     let cell_deepest = deepest(&cells(CELL_DEPTHS[CELL_DEPTHS.len() - 1]));
-    let typed_deepest = deepest(&typed(TYPED_DEPTHS[TYPED_DEPTHS.len() - 1]));
-    let letter_declaration = declaration(
-        chart.letters(),
-        LETTER_DEPTH,
-        population,
-        grain,
-        BoundaryEgg::letter_family(population)?,
-    );
     let trees = members == Members::Declared;
     let families = if trees {
         CELL_DEPTHS.len() + 1 + TYPED_DEPTHS.len() + 1
@@ -382,6 +374,54 @@ pub(super) fn curated_families(
         )?));
     }
     let egg_index = declared.len();
+    let admitted = admitted_egg(
+        chart,
+        population,
+        grain,
+        chosen_hazard,
+        relations,
+        comparisons,
+        naming,
+    )?;
+    manifest.push(PopulationMemberManifest::Admitted(AdmittedMemberManifest {
+        fresh: admitted.clone(),
+        description: naming,
+        mass,
+    }));
+    declared.push(Box::new(admitted));
+    Ok((declared, egg_index, manifest))
+}
+
+/// **The admitted egg** of [`curated_families`] (its member `M` alone): the admitted receivers
+/// over the boundary egg on the typed tree at the deepest depth its carriers admit and the letter
+/// tree at `D_L`, through the hazard law on `chosen_hazard`, with `comparisons` read beside it.
+pub(super) fn admitted_egg(
+    chart: SectionChart,
+    population: u64,
+    grain: u64,
+    chosen_hazard: HazardPartition,
+    relations: Vec<holonics::receiver::population::Relation>,
+    comparisons: &[(String, HazardPartition)],
+    naming: u64,
+) -> Result<AdmittedEgg, holonics::receiver::population::PopulationError> {
+    let slots = || Sections::new(chart, SectionSlots::Channel).expect("the channel slot");
+    let typed = |depth| {
+        declaration(
+            chart.alphabet(),
+            depth,
+            population,
+            grain,
+            slots().family().clone(),
+        )
+    };
+    let typed_deepest = deepest(&typed(TYPED_DEPTHS[TYPED_DEPTHS.len() - 1]));
+    let letter_declaration = declaration(
+        chart.letters(),
+        LETTER_DEPTH,
+        population,
+        grain,
+        BoundaryEgg::letter_family(population)?,
+    );
     let law = CopyLaw::new(COPY_LAW.0, COPY_LAW.1, COPY_LAW.2)?;
     let mut inner = BoundaryEgg::new(
         format!(
@@ -407,13 +447,7 @@ pub(super) fn curated_families(
         law,
     )?
     .with_receipt(RelationKind::LaterHuman, law);
-    manifest.push(PopulationMemberManifest::Admitted(AdmittedMemberManifest {
-        fresh: admitted.clone(),
-        description: naming,
-        mass,
-    }));
-    declared.push(Box::new(admitted));
-    Ok((declared, egg_index, manifest))
+    Ok(admitted)
 }
 
 fn posterior(posterior: &Posterior) -> String {

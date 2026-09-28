@@ -1478,6 +1478,32 @@ on the admitted egg, so the population drops the seven trees:
 - the passage takes 166,113 ms at a 3,400,306,688-byte peak resident set, against 272,849 ms at
   10,843,217,920 for all eight families.
 
+### U2: the standing census of F0's egg (September 28)
+
+Plan: [U2](../../../docs/plans/THE_REBUILD.md#u2-one-retention-contract-and-f0s-memory); the rules are
+derived in `compression::landmark::context` ("Which merges and releases are future-sufficient").
+
+```sh
+cargo run --release -p holonics --example hnn_population -- f0-census .local/cuts/curated-f4-passage-cut.bin
+```
+
+Read-only; counts and bytes only (`hnn_population_census.rs`). The admitted egg alone, built by the
+F0 route's constructor, reads F4's development passage; its byte tree (the typed tree at `D = 22`
+ticks) is censused node by node after the choosing families and after the whole passage. The run
+took 107,150 ms at an 8,656,285,696-byte peak, inside its projection (ten minutes, 20 GB).
+- **The standing.** After 1,048,243 cells the egg's standing is 2,781,355,790 bytes (2,653 a cell,
+  remainder 367,111; the population's recorded 2,781,355,912 adds its 122-byte header). Its byte
+  tree holds 2,779,334,141: 27,181,970 nodes (2,609,465,824 bytes) and 42,458,078 label letters
+  (169,832,312).
+- **Exact for the declared receiver.** The readings kept beside the state 1,196,006,680 bytes (1,140
+  a cell); the boundary contexts 10,184; nodes past the admitted depth 0; letters no label reads
+  4,044,396 (3 a cell).
+- **Charged coarsenings.** Once-reached leaf chains (17,782,143 nodes) 1,857,086,636 bytes (1,771 a
+  cell); the depth cut at 12 ticks 622,696,768 (594 a cell), at 6 ticks 2,080,631,512 (1,984 a cell).
+- **Refused.** Siblings with equal present counts merged into one register 867,135,528 (827 a cell).
+- **After the choosing families alone** (524,091 cells): the tree 1,387,905,377 bytes, the readings
+  1,136 a cell, the once-reached chains 1,766, the depth cut at 12 ticks 484.
+
 ### F6 chase terrain: the reception phase (September 28)
 
 Record: no dedicated record; the law is in [the learner must move](../../records/2026-09-27_THE_LEARNER_MUST_MOVE_A_CHASE_TERRAIN_DATA_AS_PARTICLES_WITH_FLUX_AND_RELEASE_AS_A_THRESHOLD_COMMIT.md) and the motion's first consumer in [the motion record](../../records/2026-09-28_THE_SWING_IS_A_MOVE_ABOUT_A_GRIP_A_GRIP_TURNS_A_PUSH_BOOSTS_AND_A_FREE_BODY_FALLS.md) (§7).

@@ -3,9 +3,9 @@
 [project-postulate] This guide states the HNN law. `holonics::hnn` implements it over aeons
 (#73), and `holonics-cuda::hnn` realizes it on the card (#76). The current owners are the
 [operator contract](ELEMENTARY_OBJECTS.md#operator-contract)'s HNN row: the word, deposition and
-the collapse of campaigns 1–2, the loaded resonator (`hnn::ring`), and a loaded ring's mode
-quotient (`hnn::modes`, campaign 3's first construction). Release through modes, Holonic Encoding
-and joint prediction have no owner yet. [THE_MACHINE](THE_MACHINE.md) states the object,
+the collapse of campaigns 1–2 and the loaded resonator (`hnn::ring`); a loaded ring's mode quotient
+(campaign 3's first construction) is Lean's `HNN/ModeQuotient` ([§4](#the-loaded-rings-mode-quotient)).
+Release through modes, Holonic Encoding and joint prediction have no owner yet. [THE_MACHINE](THE_MACHINE.md) states the object,
 [THE_REBUILD](plans/THE_REBUILD.md) the order and [CONSTRUCTION_STATE](../CONSTRUCTION_STATE.md) the
 position; the [elementary objects](ELEMENTARY_OBJECTS.md) own the vocabulary.
 The HNN is the compression machine at scale ([the line](THE_MACHINE.md#the-line-the-rebuild-serves)):
@@ -889,9 +889,9 @@ corrected its outward-normal sign and constant-input normalization domain.
 owns the law. The prototype's
 [`KernelModeReduction`](https://github.com/brandonrdug/holonics/blob/551d6c5d/crates/holonics/src/exact_linear/kernel_modes.rs)
 constructed an exact finite factorization, transported its signed current columns and tested action
-closure, or returned the source-null separator. It is retired: `compression::face_map` (Lean
-`Compression/Core/FaceMap`) owns the face map's kernel and its quotient, and no HNN execution
-consumes it; a loaded ring's future quotient is `hnn::modes` (campaign 3's first construction).
+closure, or returned the source-null separator. It is retired: Lean `Compression/Core/FaceMap`
+owns the face map's kernel and its quotient, and no HNN execution consumes it; a loaded ring's
+future quotient is Lean `HNN/ModeQuotient` ([§4](#the-loaded-rings-mode-quotient)).
 
 [definition] Convolution shares the transport kernel by relative position; sparse graph transport
 uses actual edges. A fixed SSM `x_next=A x+B u` has output
@@ -1066,6 +1066,37 @@ factorization of `E_next[A B]` through `[E 0]` in `holonics::ratio::linear` cons
 returned null-space separator identifies an omitted influence. With a constrained `z`-family,
 factor only that family. The same condition at each step yields the reduced recurrence by
 induction.
+
+### The loaded ring's mode quotient
+
+[definition; agent-inferred, U2 of [the rebuild](plans/THE_REBUILD.md#u2-one-retention-contract-and-f0s-memory)]
+A loaded ring's word-local state `x = (u, w)` ticks as one exact linear system per pump phase,
+`x′ = T_t x + B_t e`, `s′ = ρ_t x + D_t e`, and its modes descend to their future quotient: the
+period lift reads the admitted future, one chart for every phase releases at most the phase
+family's kernel, the descended ring returns the same wave, the release stores nothing, the learning
+covector factors through the chart exactly when each gain family's variation vanishes on the
+release, and the descended block keeps the full ring's balance. Lean `HNN/ModeQuotient` owns those
+laws. Its Rust realization (`hnn::modes`, at commit `1bdacc8f`) was retired at U2: the state it
+quotients leaves at every word's end, so the aeon's retention contract
+([objects §8](ELEMENTARY_OBJECTS.md#the-retention-contract)) has nothing of it to collapse, and it
+had no library caller. It returns with a consumer when the wave and resonator states persist between
+words. Two laws only that realization checked are kept here.
+
+[proved-derived; Lean owed in #62] **The chord survives the release.** With `V T_t = T̄_t V`,
+`V B_t = B̄_t` and `ρ_(r,t) = ρ̄_(r,t) V` at every phase, `(sI − T̄_t)⁻¹ V = V (sI − T_t)⁻¹`, so every
+admitted entry of the causal chord `ρ_(r,t)(sI − T_t)⁻¹B_t = ρ̄_(r,t)(sI − T̄_t)⁻¹B̄_t` agrees in
+lowest terms (`receiver::causal_chord`'s `C(sI − A)⁻¹B`). The release removes only factors of
+`det(sI − T_t)` that every admitted entry cancels; a mode that stores energy is dormant, never
+released.
+
+[counterexample; checked on exact fixtures at `h = Y = 1`] **A present-silent coordinate a later
+phase reads is retained with its separator.** Two nodes, `C = diag(1, 0, 1, 0)`, `K = ½`, a
+half-turn pump `p = ¼` (`K_0 = diag(0, 1, 0, 1)`, `K_1 = diag(1, 0, 1, 0)`): the present blind
+subspace is `span{u_0x, u_1x, w_0y, w_1y}`. With the port alone, `u_0x` and `u_1x` are heard at
+(port, phase 1, word `[0]`) and `w_0y`, `w_1y` are released: rank 6 retained, 2 released. Admitting
+a cycle receiver that reads `w_0y` at phase 1 hears it at (receiver 1, phase 1, word `[0]`): rank 7
+retained, 1 released. On the cycle base `C = 2L̃`, `K = 4L̃`, `D = ⅛` the present blind subspace has
+dimension 6, the release `ker K × ker C` dimension 4, and two directions are heard at tick 1.
 
 [definition] Approximation measures the actual projected residual and propagates its error
 through the admitted dynamics. Exact invisibility, tolerated difference and physical dissipation
