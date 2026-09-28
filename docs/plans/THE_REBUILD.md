@@ -105,12 +105,32 @@ on the admitted egg, and the trees beyond depth 24 add at most 20 bits.
      - The standing falls from 11,513,530,863 to 2,781,355,912 bytes (from 10,983 to 2,653 a cell).
      - Peak resident memory falls from 10.8 GB to 3.4 GB, and the passage from 272,849 to
        166,113 ms.
-  2. **A family wins where it is closest: dormancy in space and in time** ([record](../../research/records/2026-09-28_A_NUMBER_IS_A_HELIX_ITS_BASE_IS_A_FACE_AND_A_FAMILY_WINS_WHERE_IT_IS_CLOSEST.md#5-the-population-a-family-wins-where-it-is-closest)).
-     Keep a posterior over families at each context of a shared gating tree (node-local Bayes),
-     with the activity switching in time under the hazard ladder (Astra §14.6). Families dropped
-     for having no global share return where they win locally. Test on F4's development passage:
-     the eight declared families mixed node-locally, against the admitted egg alone, reading
-     validation bytes and standing.
+  2. **A family wins where it is closest: measured, not adopted, September 28**
+     ([record](../../research/records/2026-09-28_A_NUMBER_IS_A_HELIX_ITS_BASE_IS_A_FACE_AND_A_FAMILY_WINS_WHERE_IT_IS_CLOSEST.md#5-the-population-a-family-wins-where-it-is-closest);
+     [receipt](../../research/notebook/hnn_design/README.md#f0-candidate-2-a-family-wins-where-it-is-closest-september-28)).
+     `receiver::population::LocalMixture` keeps each member's posterior at each gating context,
+     the last `d` cells (node-local Bayes; Lean `Population.{local_telescope, local_mixture_code,
+     local_of_constant}`). Its executed chart holds a member at `2^(−64)` of its context's leader,
+     which also makes it return at `64 + log₂ M` bits (`hnn_population f0-local`, the eight
+     declared families).
+     - The choosing role chose `d = 0` from `{0, 1, 2}`, charged 2 bits. On the choosing stream the
+       rung `d = 0` read `−247 + 0/16 + ε` against `d = 1` and `−259 + 0/16 + ε` against `d = 2`.
+       The gating ladder in space is not adopted.
+     - Validation bytes read `−2727 + 1/16 + ε` against flat. Against the egg alone they read
+       `−298 + 8/16 + ε`, and `−296 + 8/16 + ε` with the 2 bits charged. The choosing bytes agree,
+       charged, at `−3 + 12/16 + ε`.
+     - The gain is dormancy in time. Over the whole passage the mixture codes `254 + 14/16 + ε`
+       bits below its best single member, which no static mixture can do; exact whole-passage
+       Bayes over the same families reads as the egg alone.
+     - The standing returns to 10,983 bytes a cell (11,513,530,846 bytes), from 2,653. The passage
+       takes 263,687 ms at an 8.4 GB peak, and streaming the standing raises the peak to 14.2 GB.
+     - The switching in time is a floor declared as the chart's width, not the hazard ladder.
+       Its segment telescope in Lean is owed (#62).
+     - **Not adopted.** The choosing families decide: their charged bytes read `−3 + 12/16 + ε`
+       against the egg alone and their whole stream about 7 bits above it. The gain rides on the
+       floor, a switching law entered as a width (`K = 64`) and never compared with the declared
+       fixed share, and it costs four times the standing for under one bit in 1,700 bytes. The egg
+       alone stays F0's byte predictor. Mixing similar context models is not the lever on the rate.
   3. **Word contexts. Learned tokens as the alphabet: not adopted, September 28.** A tree over
      learned merge tokens (`hnn_tokens`: K = 256, depth 4 tokens, both chosen on choosing alone)
      codes the validation bytes `77906 + 10/16 + ε` bits above the flat byte tree (`1 + 15/16`

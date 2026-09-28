@@ -1634,6 +1634,141 @@ not move to whole words.**
   `1031705 + 10/16 + ε`.
 - F0's byte code stays the admitted egg's.
 
+## F0 candidate 2: a family wins where it is closest (September 28)
+
+`receiver::population::LocalMixture` builds THE_REBUILD's F0 candidate 2 as a new composed family
+(the [record](../../records/2026-09-28_A_NUMBER_IS_A_HELIX_ITS_BASE_IS_A_FACE_AND_A_FAMILY_WINS_WHERE_IT_IS_CLOSEST.md),
+§5): a `Family` whose members are families. It forwards every cell to each member and keeps, at each
+gating context `c` (the last `d` curated cells), each member's weight `π_f ∏ P_f` over the cells met
+earlier in `c`. Its face mixes the members' faces under the posterior of the current context. The
+population's core law is untouched. The computational object is the helical pair interaction: at
+each context the members (navigator families) meet the receiving face. The owner touches **faces
+and placement** (the mixed face, placed by its context), the **tube** (each context's posterior
+moves only at its own ticks) and the **tower thread** (a `d = 2` context restricts to its `d = 1`
+suffix and to the one context at `d = 0`). The helix, the pair's slip and the cell holonomy stay
+attached through the members.
+
+```sh
+cargo run --release -p holonics --example hnn_population -- f0-local-probe .local/cuts/curated-f4-passage-cut.bin .local/cuts/curated-f4-passage-flat-cut.bin
+cargo run --release -p holonics --example hnn_population -- f0-local .local/cuts/curated-f4-passage-cut.bin .local/cuts/curated-f4-passage-flat-cut.bin
+cargo test -p holonics --lib local_tests
+```
+
+[proved-derived; formal-checked] **The law** (Lean `Compression/Landmark/Context/Population`):
+- the faces telescope context by context to the contexts' totals (`local_telescope`);
+- for every choice of one family per context, the code is at most
+  `Σ_(c met) (min_f code_f(c) + log₂ M)` under the uniform prior (`local_mixture_code`);
+- one context is the static mixture, whole-passage Bayes (`local_of_constant`).
+
+[definition; established-bounded] **The executed chart.** Each weight is the dormancy module's
+64-bit `Weight`, multiplied by the member's exact face and rounded down. A member more than `K = 64`
+octaves below its context's leader is held at that floor, so the aligned carriers fit two machine
+words. The executed face is exact and normalized, and the code lies within the bound plus a
+certified drift `3·r·2^(−62) + M·φ·2^(1−K)` bits. `K` was declared as the chart's width before any
+passage was read. The floor is also a switching law: a member that fell far behind returns at a price
+of at most `K + log₂ M` bits a return (the owner's header; its Lean telescope is owed, #62).
+
+Tests (exact, on fixtures): every rung's face sums to one; the opening rung equals the population's
+whole-passage Bayes face by face and in its telescope; `d = 1` and `d = 2` equal node-local Bayes
+stepped in ℚ, and `∏ q ≥ ∏_c max_f π_f L_f(c)` holds exactly; a rung chosen later reads as if it had
+made every face; a non-dyadic face rounds within the drift; a member returns from the floor within
+the switching path's code; death at zero likelihood; the refusals; and the standing's stream.
+
+[definition; agent-inferred] **The measurement.** The eight families of `Members::Declared`, each
+named by 3 bits (`π_f = 1/8` at every context), wrapped in one `LocalMixture` over the ladder
+`d ∈ {0, 1, 2}`. Every rung reads every cell as a comparison. `d = 0` makes the face on the choosing
+cells, and the choosing role's charged code picks the rung for validation (`⌈log₂ 3⌉ = 2` bits; ties
+to the shallower). The admitted egg's own faces on the same cells are the egg alone.
+
+**Projection.** The bounded probe read the first `2^16` choosing cells: the members alone took
+8,690 ms, the mixture over them 11,519 ms. The full passage projected at 354,286 ms (the recorded
+eight-family passage plus the mixture's 2,829 ms scaled, plus the flat tree and the standing stream),
+within ten minutes. Memory was projected from the recorded 10,843,217,920-byte peak. The run passed
+both.
+
+**Choosing** (524,091 cells, 124,063 ms). The choosing stream, bytes and letters, at `L_R = 16`:
+
+| Rung | Contexts met (whole passage) | Choosing stream | `d = 0` minus this rung |
+|---|---|---|---|
+| `d = 0` (chosen) | 1 | `1094761 + 12/16 + ε` | |
+| `d = 1` | 177 | `1095008 + 11/16 + ε` | `−247 + 0/16 + ε` |
+| `d = 2` | 5,286 | `1095020 + 12/16 + ε` | `−259 + 0/16 + ε` |
+| the egg alone | | `1094756 + 12/16 + ε` | |
+
+- `d = 0` is decided below both deeper rungs, so the gating ladder in space is not chosen.
+- On the choosing bytes, the egg alone reads `−4593 + 5/16 + ε` against flat, as recorded, and
+  `d = 0` reads `−4597 + 2/16 + ε`. That is `−5 + 12/16 + ε` against the egg alone, and
+  `−3 + 12/16 + ε` with the 2 rung bits charged.
+- On the choosing letters `d = 0` costs more: `2442 + 10/16 + ε` against the egg's
+  `2435 + 6/16 + ε`.
+
+**Validation** (523,236 bytes and 916 letters, read once; 139,620 ms):
+
+| Validation bytes, the difference | Against flat | Against the egg alone |
+|---|---|---|
+| the egg alone | `−2430 + 8/16 + ε` (as recorded) | |
+| **`d = 0`, chosen** | `−2727 + 1/16 + ε` | `−298 + 8/16 + ε` |
+| `d = 0`, charged 2 bits (flat charged its 3) | `−2728 + 1/16 + ε` | **`−296 + 8/16 + ε`** |
+| `d = 1`, disclosed | `−2512 + 7/16 + ε` | `−83 + 14/16 + ε` |
+| `d = 2`, disclosed | `−2818 + 8/16 + ε` | `−389 + 15/16 + ε` |
+
+- The unchosen rungs' readings are disclosed and choose nothing.
+- The validation letters under `d = 0` read `3373 + 4/16 + ε`, against the egg's `3333 + 10/16 + ε`.
+
+**The bound over every cell** (code ≤ `Σ_c min_f (code_f(c) + 3)` + drift; each drift below
+`2^(−40)` bits):
+
+| Rung | Code | Bound | Bound + drift − code | Floors bound at |
+|---|---|---|---|---|
+| `d = 0` | `2049206 + 0/16 + ε` | `2049463 + 15/16 + ε` | `257 + 14/16 + ε` | 270,223 cells |
+| `d = 1` | `2049556 + 9/16 + ε` | `2049713 + 3/16 + ε` | `156 + 10/16 + ε` | 138,487 |
+| `d = 2` | `2049328 + 5/16 + ε` | `2062784 + 8/16 + ε` | `13456 + 2/16 + ε` | 59,132 |
+
+**Standing and work.** The standing is 11,513,530,846 bytes after 1,048,243 cells, 10,983 bytes a
+cell. Of it, 11,513,530,398 bytes are the members' own checkpoints, and the chosen rung's table and
+frame are 448 bytes. That is the eight-family standing again, against 2,653 bytes a cell for the egg
+alone. The passage took 263,687 ms at an 8,407,535,616-byte peak resident set. Streaming the
+standing took 30,973 ms and raised the peak to 14,226,153,472 bytes. The whole run took 320,571 ms.
+The egg alone took 166,113 ms at 3,400,306,688 bytes, and the eight-family population 272,849 ms at
+10,843,217,920.
+
+[interpretation] **What carries the gain: dormancy in time, not in space.**
+- At `d = 0` the bound's `min_f code_f` is the egg's own code, so over the whole passage the mixture
+  codes `254 + 14/16 + ε` bits (less its drift) **below its best single member**. No static mixture
+  can do that, since `Σ_f π_f L_f ≤ max_f L_f`. The eight families under exact whole-passage Bayes
+  read the same as the egg alone. The gain is therefore the floor's: a tree that fell thousands of
+  bits behind the egg returns after about `K + log₂ M = 67` bits of evidence wherever it codes
+  closer for a while.
+- The gating ladder does not pay on the choosing cells. Each context's posterior relearns the
+  families' ranking from its prior, and the members are similar context models.
+
+**Worker's verdict: adopted on the code criterion, as dormancy in time at `d = 0`.** The mixture's
+validation bytes, with the 2 rung bits charged, lie strictly below the egg alone's: the difference
+reads `−296 + 8/16 + ε`. The choosing bytes agree, charged, at `−3 + 12/16 + ε`. The gating ladder
+(`d ≥ 1`) is not adopted. The adoption would restore the eight families' standing (10,983 bytes a
+cell, from 2,653) and their passage time, for a difference of `−298 + 8/16 + ε` bits over 523,236
+validation bytes. The section letters cost more under the mixture: `3373 + 4/16 + ε` on validation
+against the egg's `3333 + 10/16 + ε`.
+
+**Primary's verdict (September 28): measured, not adopted; the egg alone stays F0's byte
+predictor.**
+- **The rule.** THE_REBUILD adopts an F0 candidate by the choosing families alone. The brief put
+  adoption on validation bytes, which contradicted that rule. On the choosing families the charged
+  bytes read `−3 + 12/16 + ε` against the egg alone, and the whole choosing stream, letters
+  included, about 7 bits above it.
+- **The law.** The whole gain is carried by the floor, a switching law entered as the chart's width:
+  `K = 64` sets the price of a return at `K + log₂ M` bits. Switching in time already has a declared
+  law with a proved bound, the fixed share on the hazard ladder (`dormancy`,
+  `switching.hazard-ladder-bound`). A number width that carries the measured effect is a literal
+  inside a law, and the floor was never compared with the declared switching law.
+- **The cost.** Four times the standing (10,983 bytes a cell against 2,653) and a 14,226,153,472-byte
+  peak while streaming it, for `298 + 8/16` validation bits over 523,236 bytes: under one bit in
+  1,700 bytes, against a rate of about `1 + 12/16` bits a byte.
+- **What it shows.** Switching in time between similar context models pays on unseen families
+  (`−298 + 8/16 + ε`) and hardly at all on seen ones (`−3 + 12/16 + ε`), and the gating ladder in
+  space at `d = 1, 2` loses (`247` and `259` bits on the choosing stream). Mixing these families is
+  not the lever on F0's rate.
+
 ## F6 chase terrain: the action phase (September 28)
 
 ```sh

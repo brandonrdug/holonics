@@ -199,6 +199,14 @@
 //! partition learned this way on the development cells ([`learn_hazard_partition`]: the last-byte
 //! classes, then the ports' shared counts, each adopted where its complete code falls).
 //!
+//! [proved-derived; formal-checked] **A family wins where it is closest** ([`local`]; Lean
+//! `Population.{local_telescope, local_mixture_code, local_of_constant}`; THE_REBUILD F0, candidate
+//! 2). The local mixture ([`LocalMixture`]) is a family whose members are families: it keeps each
+//! member's posterior at each gating context (the last `d` cells) and mixes their faces under the
+//! posterior of the context the receiver is in. Its faces telescope context by context, so it codes
+//! within `Σ_(c met) (min_f code_f(c) + log₂ M)` under the uniform prior, and one context is the
+//! population's whole-passage Bayes.
+//!
 //! [definition; agent-inferred] **Maintenance work** ([`Work`], [`Act`]). Beside a family's
 //! description and code its receipt reports the work it has spent, as exact counts of what it
 //! executed: a key family's emissions read against received cells, a dormant family's states read
@@ -247,6 +255,7 @@
 //! | `Compression/Landmark/Context/Tree.{ktFace, ktFace_pos, ktFace_sum}` (over `{byte, letter}`) | [`Hazard`] |
 //! | `Compression/Landmark/Context/Composition.{stagedFace_nonneg, stagedFace_sum_one}` at each tick's `σ_t`, `{staged_chain_rule, staged_code}` at `σ = id` | [`AdmittedEgg`] (the copy stage over the inner egg, [`StageReadout`]) |
 //! | `Compression/Landmark/Context/Tree.{ktFace, ktFace_pos, ktFace_sum}` (over `{miss, copy}`, the pointer's sides) | [`CopyStage`], [`PointerReadout`] |
+//! | `Compression/Landmark/Context/Population.{ctxLik_succ, ctxTotal_pos, ctxTotal_succ_same, ctxTotal_succ_other, localFace_eq, ctxTotal_unmet, local_telescope, local_mixture_code, local_of_constant}` | [`LocalMixture`] (node-local Bayes over a gating ladder; the bound in [`RungReceipt`]) |
 //! | `Compression/Landmark/Context/Merge.{merge_cost_iff, merge_cost_mass_iff, merge_cost_nat}` | [`Blocks::price`] (accepted exactly when `P·W < P′·W′`) |
 //! | `Compression/Landmark/Context/Merge.{restaurant_found, restaurant_join, restaurant_step_sum, restaurant_merge_ratio, restaurant_merge_ratio_ge_two}` | [`restaurant_ratio`], [`Blocks::description_bits`] |
 //! | `Compression/Landmark/Context/Merge.{expand_merge, expansion_sum, mergedFace_isPrior}` | [`Blocks`] (a block's pooled counts; every member's seed, [`Blocks::split`]) |
@@ -268,6 +277,7 @@ pub mod evolution;
 pub mod families;
 pub mod family_release;
 pub mod health;
+pub mod local;
 pub mod merge;
 pub mod provenance;
 pub mod releasing;
@@ -287,6 +297,8 @@ mod family_release_tests;
 mod future_branch_tests;
 #[cfg(test)]
 mod health_tests;
+#[cfg(test)]
+mod local_tests;
 #[cfg(test)]
 mod provenance_tests;
 #[cfg(test)]
@@ -324,6 +336,7 @@ pub use health::{
     PopulationReceivingFaceHealth, PopulationReceivingFaceHealthError,
     population_receiving_face_health,
 };
+pub use local::{LocalMixture, RungReceipt};
 pub use merge::{
     Blocks, Item, KtTables, MergeReceipt, PartitionReceipt, Price, learn_hazard_partition,
     restaurant_ratio,
