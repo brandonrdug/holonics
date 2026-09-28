@@ -1538,6 +1538,11 @@ HOLONICS_ROOT=<main checkout> python3 research/notebook/hnn_design/release_legib
 cargo test -p holonics --example hnn_tokens
 ```
 
+Retired September 28, not adopted: the example, its fixtures and these commands run at
+[`2d34b819`](https://github.com/brandonrdug/holonics/tree/2d34b819/research/notebook/hnn_design/hnn_tokens.rs).
+What was rejected is learned tokens as an opaque alphabet under the receiving tree, not the
+discovery of continuation transports.
+
 [definition; agent-inferred] **The law** (the example's header states it in full).
 - Merges are learned greedily by pair count within parts, ties to the least pair; a section letter is
   never an operand. Frequency is the proposal order; the choosing role's charged code accepts `K`.
