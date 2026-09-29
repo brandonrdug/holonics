@@ -77,8 +77,18 @@
 //! passive only at `W_c = 0`, Lean `HNN/Word.contrastPort_active`) enters the committed energy
 //! bound through this growth.
 //!
+//! [definition; agent-inferred, September 29] **A jump certified by the exact comparison**
+//! ([`strictly_better`]; Lean `HNN/Normal.{lock_flip_descends, lock_face_decides}`). A move no
+//! curvature bounds, a sheet's half-turn at its node (`hnn::constitution`, "The standing's fold"), is
+//! certified by reading the score at both ends exactly: it is taken only when the other end's code
+//! enclosure lies strictly below the current one's, so the true scores are strictly ordered and the
+//! jump descends. The same comparison is the two-state lock's decision: with the sheets' weights
+//! `a = 2^(−ℓ_other)` and `K = 2^(−ℓ_current)`, the lock's face `θ = a/(a + K)` exceeds `½` exactly
+//! when `a > K`, exactly when `ℓ_other < ℓ_current`.
+//!
 //! | Lean | Rust |
 //! |---|---|
+//! | `HNN/Normal.{lock_flip_descends, lock_face_decides}` | [`strictly_better`] |
 //! | `certified_step_descends` | [`CertifiedStep`] |
 //! | `gauss_newton_curvature`, `joint_cauchy_schwarz` | the curvature `C` a machine supplies (`hnn::constitution`) |
 //! | `joint_move_triangle`, `joint_step_descends` | [`JointReading`] |
@@ -91,6 +101,7 @@
 //! | `indefiniteBlock`, `divergentState`, `normal_law_divergence_witness` | [`indefinite_block`], [`divergent_state`] |
 
 use crate::ratio::Rat;
+use crate::ratio::algebraic::ExactInterval;
 use num_bigint::BigInt;
 use num_traits::{One, Signed, Zero};
 
@@ -719,6 +730,16 @@ impl JointReading {
     pub fn certified_decrease(&self) -> Rat {
         &self.decrease / Rat::from_integer(BigInt::from(2))
     }
+}
+
+/// [definition; agent-inferred, September 29] **The exact comparison that certifies a jump**
+/// (module header, "A jump certified by the exact comparison"; Lean
+/// `HNN/Normal.{lock_flip_descends, lock_face_decides}`): the other configuration's code
+/// enclosure lies strictly below the current one's, `ℓ_other⁺ < ℓ_current⁻`, so every score the
+/// two enclosures hold is strictly ordered. Equal or overlapping enclosures decide nothing, and
+/// the jump is not taken.
+pub fn strictly_better(current: &ExactInterval, other: &ExactInterval) -> bool {
+    other.upper < current.lower
 }
 
 /// **An active element's growth factor** `(1 + ω)²` (module header; Lean

@@ -256,6 +256,21 @@ fn division_with_remainder_is_the_nearest_lattice_point_ties_upward() {
     assert!(lattice.contains(&rat(3, 8)) && !lattice.contains(&rat(1, 16)));
 }
 
+/// **The founding's standing wave scaled `depth` times deeper into its lobes** (a test chart, never
+/// a law): the carry's laws are exercised on the standing, whose unit moves then keep every lobe
+/// (module header of `hnn::constitution`, "Within a lobe").
+fn deep(theta: Constitution, depth: i64) -> Constitution {
+    let rings = theta.standing_contrasts().len();
+    (0..rings).fold(theta, |theta, g| {
+        let scaled = theta
+            .standing(g)
+            .iter()
+            .map(|x| x * integer(depth))
+            .collect();
+        theta.with_ports(g, Some(scaled), None, None).unwrap()
+    })
+}
+
 /// Lean `HNN/LatticeDeposit.{carry, release, carry_accounting}` at the ties, through the carry's two
 /// splits ([`Lattice::div_rem`] fine, [`Lattice::div_rem_coordinate`] coarse), with `u = 2^(−L)` and
 /// the fine unit `f = 2^(−L−k_m)`: at clock 1 (`k = 1`) a fine tie `Δ = f/2` rounds up to the fine
@@ -267,7 +282,7 @@ fn division_with_remainder_is_the_nearest_lattice_point_ties_upward() {
 #[test]
 fn the_carry_splits_its_ties_upward_at_both_lattices() {
     let field = chain();
-    let theta = Constitution::initial(&field, OPEN_BUDGET).unwrap();
+    let theta = deep(Constitution::initial(&field, OPEN_BUDGET).unwrap(), 256);
     let lattice = theta.lattice(Locus::Standing(1)).unwrap();
     let (u, n) = (lattice.unit(), field.ring(1).width());
     // At `R = 0` no gain reaches the stations, so the certified step is the covector bound's: at a
@@ -903,6 +918,7 @@ fn the_release_since_the_founding_stays_below_half_a_unit() {
     // clock it advances to.
     let field = chain();
     let mut theta = Constitution::initial(&field, OPEN_BUDGET).unwrap();
+    let founded = theta.standing(0).to_vec();
     let n = field.ring(0).width();
     let lattice = theta.lattice(Locus::Standing(0)).unwrap();
     let u = lattice.unit();
@@ -938,7 +954,8 @@ fn the_release_since_the_founding_stays_below_half_a_unit() {
         (Rat::one() - Rat::new(BigInt::one(), BigInt::one() << 8)) * &shy * &u / integer(2);
     assert_eq!(released, budget);
     assert!(released < &u / integer(2));
-    assert!(theta.standing(0).iter().all(Zero::is_zero));
+    // The founding's standing: the lattice never moved.
+    assert_eq!(theta.standing(0), founded.as_slice());
     assert!(theta.carried_remainders().is_empty());
 }
 
@@ -1017,7 +1034,7 @@ fn a_carried_remainder_takes_its_lattice_and_clock_bits() {
 #[test]
 fn a_zero_update_advances_nothing() {
     let field = chain();
-    let theta = Constitution::initial(&field, OPEN_BUDGET).unwrap();
+    let theta = deep(Constitution::initial(&field, OPEN_BUDGET).unwrap(), 256);
     let n = field.ring(1).width();
     let standing = |commit: u64, gradient: Vec<Rat>| {
         Deposit::new(
@@ -1164,11 +1181,16 @@ fn every_family_steps_by_its_certificate() {
             .deposit
             .into_present()
             .unwrap();
-        // The joint certificate: `½ (Σ η m)² ≤ Σ η a` over every stepping family, `m ≥ √(κ² b)`.
+        // The joint certificate: `½ (Σ η m)² ≤ Σ η a` over every stepping family whose move the
+        // realized score reads, `m ≥ √(κ² b)`; a standing held in its lobes moves nothing there
+        // (Lean `HNN/Normal.lobe_move_is_null`) and is not in it.
         let joint = reading.joint.clone().expect("families stepped");
         assert!(joint.holds());
         let (mut moved, mut decrease) = (Rat::zero(), Rat::zero());
         for (_, step) in &reading.steps {
+            if step.family == Family::Standing {
+                continue;
+            }
             moved += &step.step.step * &step.bound;
             decrease += &step.step.step * &step.step.alignment;
         }
@@ -1471,14 +1493,110 @@ fn the_standing_moves_only_by_deposit_and_a_class_only_across_zero() {
         )
         .with_reach(chain_reach())
     };
-    // q_2 = 1/8 on every coordinate; ring 2's contrast is U q_1 − q_2 = −1/8 on its matched
-    // coordinates. At `R = 0` the certified step is the covector bound's, `η = 1`, so the step
-    // moves `q_2` by the gradient. A small step keeps every class; a step past the fold flips them.
-    let (small, _) = theta.deposited(&step(rat(1, 16))).unwrap();
+    // q_2 = 1/8 on every coordinate; ring 2's contrast is U q_1 − q_2 = 3/128 − 1/8 < 0 on its
+    // matched coordinates (q_1 founded at 3 units of 2^(−7)). At `R = 0` the certified step is the
+    // covector bound's, `η = 1`, so the step moves `q_2` by the gradient. A small step keeps every
+    // class and lobe, and is taken whole, offering nothing to the lock.
+    let (small, reading) = theta.deposited(&step(rat(1, 16))).unwrap();
     assert_eq!(classes(&small), start);
     assert_ne!(small.standing(2), theta.standing(2));
-    let (crossed, _) = theta.deposited(&step(rat(-1, 2))).unwrap();
-    assert_ne!(classes(&crossed)[2], start[2]);
+    assert!(reading.lobe.is_none() && reading.lock.is_none());
+    // A step past the node is held in its lobes (every class kept, Lean `lobe_ray_keeps_class`):
+    // the lobe halves it until no slice leaves its lobe, and offers the crossings to the lock.
+    let (held, reading) = theta.deposited(&step(rat(-1, 2))).unwrap();
+    assert_eq!(classes(&held), start);
+    let lobe = reading.lobe.expect("the crossing was offered");
+    assert!(lobe.offered.iter().any(|&(r, _)| r == 2));
+    assert!(lobe.held.iter().any(|&(g, _)| g == 2));
+    for (r, (before, after)) in theta
+        .standing_contrasts()
+        .iter()
+        .zip(held.standing_contrasts())
+        .enumerate()
+    {
+        for (rho, (x, y)) in before.iter().zip(&after).enumerate() {
+            assert_eq!(x.is_negative(), y.is_negative(), "({r}, {rho})");
+            assert!(x.is_zero() || !y.is_zero(), "({r}, {rho}) reached its node");
+        }
+    }
+    // The lock's proposal turns ring 2's sheets by a half-turn; the constitution takes it only on
+    // the successor it was made at, as a commit of its own. The exact comparison decides whether a
+    // machine takes it (`holon::deposition::strictly_better`).
+    let proposal = reading.lock.expect("the chart's step turns a sheet");
+    assert!(proposal.crossings().iter().any(|&(r, _)| r == 2));
+    assert!(matches!(
+        theta.locked(&proposal),
+        Err(HnnError::StaleDeposit { .. })
+    ));
+    let (turned, lock) = held.locked(&proposal).unwrap();
+    assert_eq!(lock.commit, held.commit() + 1);
+    assert_eq!(turned.commit(), held.commit() + 1);
+    assert_ne!(classes(&turned)[2], start[2]);
+    for &(r, rho) in proposal.crossings() {
+        assert_ne!(
+            held.standing_contrasts()[r][rho].is_negative(),
+            turned.standing_contrasts()[r][rho].is_negative()
+        );
+    }
+}
+
+/// **The founding is a standing wave off its nodes** (module header of `hnn::constitution`, "The
+/// founding"; Lean `HNN/Normal.{founding_off_node, chain_founding, channel_fixed_node}`): on the
+/// chain every slice's contrast sits at its component's first lattice unit in the `+1` lobe (the
+/// coarsest standing unit of the rings it joins), the lock chart reads what `Field::contrast`
+/// reads, every class is the tie rule's `+1` at `q = 0` (the declared element unchanged), and the
+/// chain has no fixed node. A single channel between two rings is a singular chart: its ends are
+/// the field's fixed nodes, founded on their node.
+#[test]
+fn the_standing_is_founded_off_its_nodes() {
+    let field = chain();
+    let theta = Constitution::initial(&field, OPEN_BUDGET).unwrap();
+    assert!(theta.fixed_nodes().is_empty());
+    let unit = |g: usize| theta.lattice(Locus::Standing(g)).unwrap().unit();
+    let coarsest = unit(0).max(unit(1)).max(unit(2));
+    for (g, contrast) in theta.standing_contrasts().iter().enumerate() {
+        assert_eq!(&field.standing_contrast(&theta, g).unwrap(), contrast);
+        for (rho, x) in contrast.iter().enumerate() {
+            // Ring 1's third node meets no channel: its component is its own, `Δ = −q`.
+            let first = if g == 1 && rho >= 4 {
+                unit(1)
+            } else {
+                coarsest.clone()
+            };
+            assert_eq!(x, &first, "({g}, {rho})");
+        }
+    }
+    let current = Current::at_rest(&field);
+    let operands = Operands::at_cut(&field, &theta, &current).unwrap();
+    assert!(operands.rings().iter().all(|ring| ring.sheets().iter().all(|s| *s)));
+    // The chain at one matched coordinate founds at (2, 3, 2) units.
+    assert_eq!(theta.standing(0)[0], &coarsest * integer(2));
+    assert_eq!(theta.standing(1)[0], &coarsest * integer(3));
+    assert_eq!(theta.standing(2)[0], &coarsest * integer(2));
+    // One channel between two rings: the chart is singular, its ends fixed nodes.
+    let pair = super::support::small_field(&[2, 2], vec![super::support::contact(0, 1, 2, 0)], 1);
+    let theta = Constitution::initial(&pair, OPEN_BUDGET).unwrap();
+    assert_eq!(theta.fixed_nodes().len(), 8);
+    for contrast in theta.standing_contrasts() {
+        assert!(contrast.iter().all(Zero::is_zero));
+    }
+    // Campaign 1's cycle of rings 5, 7, 11, 13: rings 2 and 3 alone share nodes 7..11, a single
+    // channel there, so their 16 realified slices are its fixed nodes; every other slice is off its
+    // node in the `+1` lobe.
+    let campaign = crate::hnn::field::Field::declare(
+        crate::hnn::field::FieldDeclaration::campaign_one(6148),
+    )
+    .unwrap();
+    let theta = Constitution::initial(&campaign, OPEN_BUDGET).unwrap();
+    let fixed = theta.fixed_nodes();
+    assert_eq!(fixed.len(), 16);
+    assert!(fixed.iter().all(|&(g, rho)| (g == 2 || g == 3) && (14..22).contains(&rho)));
+    for (g, contrast) in theta.standing_contrasts().iter().enumerate() {
+        for (rho, x) in contrast.iter().enumerate() {
+            assert_eq!(x.is_zero(), fixed.contains(&(g, rho)), "({g}, {rho})");
+            assert!(!x.is_negative());
+        }
+    }
 }
 
 /// Lean `HNN/Normal.deposit_local`, `windowGram_apply_eq_zero`, `HNN/Retention.deposit_descends`:
@@ -1625,7 +1743,9 @@ fn the_initial_constitution_is_the_declared_one() {
             &ExactRatMatrix::identity(n).unwrap().scaled(&rat(1, 2))
         );
         assert!(theta.contrast_port(g).entries().iter().all(Zero::is_zero));
-        assert!(theta.standing(g).iter().all(Zero::is_zero));
+        // The standing is founded off its nodes, every slice in the `+1` lobe
+        // (`the_standing_is_founded_off_its_nodes`).
+        assert!(theta.standing_contrasts()[g].iter().all(Signed::is_positive));
         for (rho, (u, v)) in theta.slices(g).iter().enumerate() {
             assert!(u[rho].is_one() && v[(rho + 1) % n].is_one());
         }

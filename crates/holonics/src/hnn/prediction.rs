@@ -155,6 +155,7 @@ use crate::hnn::retention::{Diamond, loci};
 use crate::hnn::word::{CommitWork, EndChange, PowerForm, Word};
 use crate::holarchy::terrain::Draw;
 use crate::holon::deposition::{power, sqrt_ceiling};
+use crate::ratio::algebraic::ExactInterval;
 use crate::ratio::linear::ExactRatMatrix;
 use crate::ratio::linear::vector::{add, dot};
 use crate::ratio::Rat;
@@ -1170,6 +1171,45 @@ pub fn stage(
         released: released.join(&back.joined.released),
         peak_bits,
     })
+}
+
+/// [definition; agent-inferred, September 29] **The comparison's code at a constitution** (the
+/// lock's exact comparison, `hnn::constitution`, "At a node: the lock's half-turn"): the forward
+/// half of [`stage`], its section refined at the cut with the request's placement and the locked
+/// targets placed, compared at its unlocked stations, and read as its code's enclosure. Nothing is
+/// returned or deposited.
+#[allow(clippy::too_many_arguments)]
+pub fn comparison_code(
+    field: &Field,
+    constitution: &impl ConstitutionRead,
+    current: &Current,
+    moment: &SourceMoment,
+    declared: &Refinement,
+    targets: &[usize],
+    locked: &[bool],
+    charts: &mut Charts,
+) -> Result<ExactInterval, HnnError> {
+    if targets.len() != declared.stations || locked.len() != declared.stations {
+        return Err(HnnError::Shape {
+            what: "one target and one lock per station",
+            expected: declared.stations,
+            found: targets.len().min(locked.len()),
+        });
+    }
+    let cells: Vec<Option<usize>> = targets
+        .iter()
+        .zip(locked)
+        .map(|(&target, &lock)| lock.then_some(target))
+        .collect();
+    let placed = if locked.iter().any(|&lock| lock) {
+        Some(declared.section(field, current, &cells)?)
+    } else {
+        None
+    };
+    let placements: Vec<&SourceMoment> = std::iter::once(moment).chain(placed.as_ref()).collect();
+    let compared: Vec<bool> = locked.iter().map(|lock| !lock).collect();
+    let section = Section::refine(field, constitution, current, &placements, declared, charts)?;
+    section.compare_partition(targets, &compared)?.code_length()
 }
 
 /// [definition] **A generated section** ([`generate`]): its release (every station locked, at width
