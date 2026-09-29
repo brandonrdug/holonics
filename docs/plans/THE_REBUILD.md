@@ -810,6 +810,37 @@ branch; intervals that do not shorten the charged code are recorded and not adop
       10 bits longer;
     - text's 8 sections are two of 32 spaces and six held: the readout still sits at the byte
       marginal (failure 4).
+- **The order repair, September 29: order reaches the section on known truth; text stays at the
+  byte marginal**
+  ([pin](../../research/records/2026-09-29_THE_ORDER_REPAIR_PINNED_BEFORE_ITS_RUNS.md), `bd06105c`;
+  [receipt](../../research/records/2026-09-29_THE_ORDER_REPAIR_ORDER_REACHES_THE_SECTION_ON_KNOWN_TRUTH_AND_TEXT_STAYS_AT_THE_BYTE_MARGINAL.md);
+  `af5e7de6`; Refs #73 #148 #63).
+  - *Built* (failure 4's owners; Brandon's lens "remainders, spectral placement"): no window and no
+    table of pairs.
+    - The receiving ring's period is a product of pairwise coprime factors, so a datum's residue is
+      its joint residue class (`joint_residue_determines_position`). The joint class is placed on
+      the product (`joint_class_not_additive`).
+    - A refinement's locked data are placed at their stations' residues over their own population
+      (`SourceMoment::section`, `placed_at_station`) and read with the request's placement.
+    - Generation locks the stations of largest gap at the grain, ties together
+      (`prediction::generate`, `lock_reads_unique_top`).
+    - Learning compares only a drawn partition's unlocked stations (`prediction::mask`,
+      `HolonRatio::compare_partition`, `partition_reading_ignores_compared_targets`).
+  - *Measured*:
+    - every check holds on every refinement;
+    - on the order-2 terrain (`x_t = x_(t−2) + 1 mod 4` after 40 drawn cells, 256 fresh requests)
+      866 of 2,048 held-out stations read right against the static marginal's 512 and the
+      per-station marginal's 520, and 39 of 256 sections are exact; the September 29 readout on the
+      same draws reads 324;
+    - text (385 choosing pairs, two passes, `D = 35`) releases one illegible section of spaces and
+      `e` and holds seven.
+  - *What stays open*, measured: the placement superposes the data.
+    - The terrain's first two stations, which read the request's last cells, are right on 112 of
+      256 requests each.
+    - Text's compared stations code `7 + 14/16 + ε` bits against flat `8 + 0/16`.
+    - `E`'s certified step (`2⁻¹⁶..2⁻¹²`) leaves the class images spread over the ring, and a
+      linear readout of their sum cancels the other data only when
+      `2D ≥ (n + m − 1)(|A| − 1)`.
 
 #### U7. The targets, alongside
 
