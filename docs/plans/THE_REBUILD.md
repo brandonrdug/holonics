@@ -810,6 +810,36 @@ branch; intervals that do not shorten the charged code are recorded and not adop
       10 bits longer;
     - text's 8 sections are two of 32 spaces and six held: the readout still sits at the byte
       marginal (failure 4).
+- **The tightened certificate, September 29: the factor families move, and the standings' fold
+  costs the copy**
+  ([pin](../../research/records/2026-09-29_THE_TIGHTENED_CERTIFICATE_PINNED_BEFORE_ITS_RUNS.md),
+  `22bae4be`;
+  [receipt](../../research/records/2026-09-29_THE_TIGHTENED_CERTIFICATE_THE_FACTOR_FAMILIES_MOVE_AND_THE_STANDINGS_FOLD_COSTS_THE_COPY.md);
+  `05efc278`, `dab65944`; Refs #73 #63).
+  - *Built*: two of the certificate's loose bounds are replaced by sharper proved ones, and no limit
+    moves:
+    - each family keeps its own curvature `½·κ²·b` and `ηC ≤ a`, `ηc ≤ 1`, and the families hold one
+      joint certificate `½(Σ η m)² ≤ Σ η a` (the cross terms by Cauchy–Schwarz on the joint ray) in
+      place of the count `B`;
+    - the readout's `‖R‖₂²` is read by its Gram certificate (exact inertia on a dyadic face) in place
+      of the Schur test.
+
+    The Lean is `Holon/Deposition` §9.
+  - *Measured*:
+    - every check holds on every run;
+    - on text all 7 factor families in the diamond move, against 3 under the previous certificate,
+      with steps raised by `2³` to `2⁵` and the storage product in `[19/16, 20/16)`;
+    - the standing cut's held-out code is `5469 + 13/16 + ε`, against `5472 + 3/16 + ε` and
+      `5459 + 13/16 + ε`;
+    - the moiré is 6 of 6 at `K = 8` and 5 of 6 at `K = 4`; the copy is 128 of 256, against 256.
+  - *What stays open*, measured: the standings, founded on their fold (`q = 0`), now cross it. The
+    element reads them only through their sheet classes, so a crossing flips a slice's sign, a jump
+    the certificate does not bound. Holding the standings alone restores the copy's development read
+    (32 of 32) and the moiré's (6 of 6) under the tightened certificate.
+
+    The next loop is the standing's fold in `hnn::constitution`: a standing's certified step stays
+    in its sheet cell, and a class crossing is a separate move certified by comparing the score at
+    both classes.
 
 #### U7. The targets, alongside
 
