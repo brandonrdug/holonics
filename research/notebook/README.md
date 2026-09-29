@@ -31,11 +31,14 @@ source separation.
 - `attempts/sheet.typ` renders a blank symbolic algebra canvas for handwriting.
 - `ledger/questions.typ` records unresolved relations without forcing them into exercise answers.
 
-Two further directories are measurement surfaces, not part of this unit:
+Three further directories are measurement surfaces, not part of this unit:
 - `hnn_design/`: the HNN's measurement harnesses; [its README](hnn_design/README.md) is their
   route (index, commands, records, receipts).
 - `motion/`: the exact symbolic checks of the
   [motion record](../records/2026-09-28_THE_SWING_IS_A_MOVE_ABOUT_A_GRIP_A_GRIP_TURNS_A_PUSH_BOOSTS_AND_A_FREE_BODY_FALLS.md).
+- `arithmetic/`: the exact checks (standard library) of the
+  [arithmetic contract](../records/2026-09-29_THE_ARITHMETIC_CONTRACT_A_NUMERAL_IS_A_FACE_OF_A_COUNTING_NAVIGATOR_AND_ITS_PRODUCER_IS_A_KEY.md),
+  `python3 research/notebook/arithmetic/contract_checks.py`.
 
 ## Build and check
 

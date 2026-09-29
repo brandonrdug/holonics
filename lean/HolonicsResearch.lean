@@ -717,6 +717,7 @@ import HolonicsResearch.EllipticCurve.AreaQuartic
 import HolonicsResearch.Mathematics.TwinWheel
 import HolonicsResearch.Mathematics.PrimeIndex
 import HolonicsResearch.Mathematics.PrimeRadixAtlas
+import HolonicsResearch.Mathematics.ArithmeticContract
 import HolonicsResearch.EllipticCurve.QuarticSeventeen
 import HolonicsResearch.Mathematics.BooleanTower
 import HolonicsResearch.Geometry.Constructible

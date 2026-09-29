@@ -532,6 +532,17 @@ branch; intervals that do not shorten the charged code are recorded and not adop
   The symmetric comparison (2), generation as a requested consequence (4) and retention around the
   admitted actions (5) follow. F0's release gate, F4's curated release and F5 wait on them. Brandon
   reviews the record before the loop is built.
+- **Item (3) derived, September 29**
+  ([record](../../research/records/2026-09-29_THE_ARITHMETIC_CONTRACT_A_NUMERAL_IS_A_FACE_OF_A_COUNTING_NAVIGATOR_AND_ITS_PRODUCER_IS_A_KEY.md),
+  Lean `HolonicsResearch/Mathematics/ArithmeticContract`). The record states:
+  - the arithmetic contract, its consumer equation and its provenance;
+  - its code lengths;
+  - its composition at a numeral port;
+  - the build loop's acceptance (A1–A3, bases 2, 10 and 16, prose, Rust and Lean streams) and the
+    smallest build that tests it.
+
+  The build waits on Brandon's review of the record. Its composition into the text chart's population
+  waits on item (1)'s protocol.
 
 #### U7. The targets, alongside
 
