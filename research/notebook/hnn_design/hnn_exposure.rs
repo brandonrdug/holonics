@@ -827,6 +827,39 @@ fn report(field: &Field, exposure: &Exposure) {
         exposure.constitution_curve.len()
     );
     census(field, exposure);
+    // The certified steps (September 29): each linear locus's least and largest exponent `k` over
+    // the curve (the step `2^k`), and the certified storage growth's product and extremes.
+    let mut exponents: std::collections::BTreeMap<String, (i64, i64, u64)> =
+        std::collections::BTreeMap::new();
+    let mut product = Rat::one();
+    let mut growths: Option<(Rat, Rat)> = None;
+    for point in exposure.constitution_curve.iter().skip(1) {
+        for (locus, k) in &point.steps {
+            let entry = exponents.entry(format!("{locus:?}")).or_insert((*k, *k, 0));
+            entry.0 = entry.0.min(*k);
+            entry.1 = entry.1.max(*k);
+            entry.2 += 1;
+        }
+        product *= Rat::one() + &point.storage_growth;
+        let extremes =
+            growths.get_or_insert((point.storage_growth.clone(), point.storage_growth.clone()));
+        if point.storage_growth < extremes.0 {
+            extremes.0 = point.storage_growth.clone();
+        }
+        if point.storage_growth > extremes.1 {
+            extremes.1 = point.storage_growth.clone();
+        }
+    }
+    for (locus, (least, largest, count)) in &exponents {
+        println!(
+            "the certified steps at {locus}: 2^k for k from {least} to {largest}, over {count} deposits"
+        );
+    }
+    if let Some((least, largest)) = &growths {
+        println!(
+            "the certified storage growth ε_k of one deposit: from {least} to {largest}; the product ∏(1 + ε_k) since the mount {product}"
+        );
+    }
     println!("commit\tbits\tentries\tremainders\tsolved\treleased_bits\tstepped");
     for point in &exposure.constitution_curve {
         println!(

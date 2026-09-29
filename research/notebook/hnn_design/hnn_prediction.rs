@@ -1,7 +1,9 @@
 //! **`hnn_prediction`: native generation on known-truth terrain and on text** (THE_REBUILD U6;
 //! Brandon, September 29; #73, #148, #63). The pins are
-//! `research/records/2026-09-29_NATIVE_GENERATION_PINNED_BEFORE_ITS_RUNS.md`, committed before any
-//! measured run; a committed command run once in release, never a test.
+//! `research/records/2026-09-29_NATIVE_GENERATION_PINNED_BEFORE_ITS_RUNS.md` and, for the certified
+//! step's runs (`moire 4`, `moire 8`, `copy`, `develop text`),
+//! `research/records/2026-09-29_THE_CERTIFIED_DEPOSITION_STEP_PINNED_BEFORE_ITS_RUNS.md`, each
+//! committed before any measured run; a committed command run once in release, never a test.
 //!
 //! ```sh
 //! cargo run --release -p holonics --example hnn_prediction -- probe copy
@@ -23,7 +25,8 @@
 //!   `L_R = 16`; its aperture `K·w + 1`, so the word's precisions by rule cover the refinement's
 //!   junction steps. The refinement is `K = 2` words of `w = 1` tick; its diamond does not reach
 //!   ring 1's element or anything of ring 2, so the unreached check is exercised.
-//! - **The constitution** is `Constitution::initial` at campaign 1's steps (`γ_U = 1`, `η_x = ½`):
+//! - **The constitution** is `Constitution::initial` at campaign 1's factor step `η_x = ½`, the normal
+//!   laws' steps certified at every deposit (the declared `γ_U = 1` was retired September 29):
 //!   `R = 0`, `E` the declared sign sequence, nothing authored for a terrain. Everything a terrain's
 //!   answer needs is located by the field's own refinement and deposition.
 //! - **Development** (`develop`) reads the terrains at development seeds only (never the pinned
@@ -70,9 +73,8 @@ use holonics::geometry::screw::ScrewGenerator;
 use holonics::hnn::chart::Charts;
 use holonics::hnn::constitution::{CAMPAIGN_ONE_BUDGET, Constitution, Steps};
 use holonics::hnn::field::{
-    ConstitutionRead,
-    ContactDeclaration, CribDeclaration, Current, Field, FieldDeclaration, ReceiverDeclaration,
-    RingDeclaration,
+    ConstitutionRead, ContactDeclaration, CribDeclaration, Current, Field, FieldDeclaration,
+    ReceiverDeclaration, RingDeclaration,
 };
 use holonics::hnn::moment::SourceMoment;
 use holonics::hnn::prediction::{Refinement, Section, deposit_of, stage, unreached_unchanged};
@@ -260,7 +262,7 @@ impl Engine {
             },
             CAMPAIGN_ONE_BUDGET,
         )
-            .expect("the initial constitution");
+        .expect("the initial constitution");
         Self {
             field,
             refinement,
@@ -308,8 +310,8 @@ impl Engine {
         }
         self.tally.stage_ms += staging.elapsed().as_millis();
         let depositing = Instant::now();
-        let deposit = deposit_of(&self.theta, &self.refinement, &composed)
-            .expect("the batch's deposit");
+        let deposit =
+            deposit_of(&self.theta, &self.refinement, &composed).expect("the batch's deposit");
         let amplitude = self
             .theta
             .amplitude()
@@ -366,10 +368,10 @@ impl Engine {
             maps.push((format!("b{a}"), largest(next.contact_stiffness(a))));
             maps.push((format!("F{a}"), largest(next.contact_dissipation(a))));
         }
-        let growth = self
-            .tally
-            .growths
-            .get_or_insert((reading.storage_growth.clone(), reading.storage_growth.clone()));
+        let growth = self.tally.growths.get_or_insert((
+            reading.storage_growth.clone(),
+            reading.storage_growth.clone(),
+        ));
         if reading.storage_growth < growth.0 {
             growth.0 = reading.storage_growth.clone();
         }
@@ -377,7 +379,11 @@ impl Engine {
             growth.1 = reading.storage_growth.clone();
         }
         for (name, value) in &maps {
-            let kept = self.tally.entries.entry(name.clone()).or_insert_with(Rat::zero);
+            let kept = self
+                .tally
+                .entries
+                .entry(name.clone())
+                .or_insert_with(Rat::zero);
             if value > kept {
                 *kept = value.clone();
             }
@@ -397,7 +403,9 @@ impl Engine {
         for (current, end, mut balance) in balances {
             let before = PowerForm::read(&self.field, &self.theta, &current).expect("a form");
             let after = PowerForm::read(&self.field, &next, &current).expect("a form");
-            balance.commit(&before, &after, &end).expect("the commit's work");
+            balance
+                .commit(&before, &after, &end)
+                .expect("the commit's work");
             self.tally.commits += u64::from(balance.closes());
             let bound = balance
                 .energy_bound(
@@ -481,7 +489,9 @@ impl Engine {
                 .map_or_else(|| "none".to_string(), ToString::to_string)
         );
         if let Some((least, largest)) = &t.growths {
-            println!("  the certified storage growth ε_k of one deposit: from {least} to {largest}");
+            println!(
+                "  the certified storage growth ε_k of one deposit: from {least} to {largest}"
+            );
         }
         for (locus, (least, largest)) in &t.exponents {
             println!("  certified steps at {locus}: 2^k for k from {least} to {largest}");

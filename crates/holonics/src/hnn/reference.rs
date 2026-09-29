@@ -2532,8 +2532,9 @@ pub struct StateReport {
 /// what the deposit that reached it released (its residuals' exact bits) and stepped (the entries
 /// whose lattice coordinate moved), and each contact's site reading at the commit (campaign 2's
 /// contact-kind census, `hnn::contact::site_readings`, certified from the factors in one prime
-/// chart and read exactly otherwise: the kinds a register refreshed after the next ingest reads).
-/// The mount's point releases and steps nothing.
+/// chart and read exactly otherwise: the kinds a register refreshed after the next ingest reads),
+/// the deposit's certified steps (each stepped linear locus with its exponent `k`, the step `2^k`)
+/// and its certified storage growth `ε_k`. The mount's point releases and steps nothing.
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct CurvePoint {
     pub commit: u64,
@@ -2541,6 +2542,8 @@ pub struct CurvePoint {
     pub released_bits: u64,
     pub stepped: u64,
     pub contacts: Vec<SiteReading>,
+    pub steps: Vec<(Locus, i64)>,
+    pub storage_growth: Rat,
 }
 
 /// [definition] **The exposure's readout** (design (f)): bits on the training and held-out targets
@@ -2998,6 +3001,8 @@ where
         released_bits: 0,
         stepped: 0,
         contacts,
+        steps: Vec::new(),
+        storage_growth: Rat::zero(),
     }];
     let mut words = WordBalances {
         closed: true,
@@ -3124,6 +3129,19 @@ where
                             .deposit
                             .present()
                             .map_or((0, 0), |reading| (reading.released_bits, reading.stepped));
+                        let (steps, storage_growth) = returned.deposit.present().map_or_else(
+                            || (Vec::new(), Rat::zero()),
+                            |reading| {
+                                (
+                                    reading
+                                        .steps
+                                        .iter()
+                                        .map(|(locus, step)| (*locus, step.step.exponent))
+                                        .collect(),
+                                    reading.storage_growth.clone(),
+                                )
+                            },
+                        );
                         let started = Instant::now();
                         let after =
                             PowerForm::read(field, resident.constitution(), resident.current())?;
@@ -3138,6 +3156,8 @@ where
                             released_bits,
                             stepped,
                             contacts,
+                            steps,
+                            storage_growth,
                         });
                     }
                     Err(refusal @ HnnError::ConstitutionBudget { .. }) => {
