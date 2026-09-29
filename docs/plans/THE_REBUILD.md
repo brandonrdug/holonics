@@ -687,6 +687,35 @@ on the admitted egg, and the trees beyond depth 24 add at most 20 bits.
   release branches at the present incidence (`AdmittedEgg::branch_at_present`), since on F4's
   passage 8 of 32 releases were refused where the passage's declared future incidence placed a
   later letter.
+- **The acceptance run, September 28: fails.** The code clause fails and the standing is past its
+  budget; the byte population stays a compression result, and F4's curated release and F5 wait
+  (pins `adc2cfbc`; [record](../../research/records/2026-09-28_F0_THE_PREDICTOR_ON_UNSEEN_FAMILIES_PINNED_BEFORE_ITS_SPLIT_IS_READ.md) §3;
+  only counts, bits and hashes).
+  - *The split.* 17,944 choosing and 4,505 validation families, none refused (membership
+    `b1e322fe…`); the joined passage holds 1,047,752 cells (`d36a63ab…`, 523,747 choosing), its
+    flat twin 1,046,085 bytes (`a8e4552a…`).
+  - *The code* (the validation families: 20,990 human and 502,034 agent bytes, 936 response stops).
+    Charged, the egg's bytes and stops lie `−290 + 0/16 + ε` bits against the flat tree's bytes,
+    `[−11485719006832285584773538369701/2^95, −22971438013664571169547076739397/2^96]`, **not
+    below `−534`**. The bytes alone are `−1981 + 0/16 + ε` uncharged and
+    `−1931 + 9/16 + ε` charged; the 936 stops cost the egg `1640 + 7/16 + ε` bits, `1 + 12/16 + ε` a
+    stop, which the flat tree does not code. Both read `1 + 12/16 + ε` bits a byte. The uncharged
+    difference, `−341 + 7/16 + ε`, lies inside the spent draws' range. The whole curated stream
+    lies `+2122 + 14/16 + ε` above the flat stream, charged.
+  - *The standing*: 2,044 bytes a cell after the passage, **past 1,298**; the readings beside the
+    state 912 a cell, and without them 1,131, within. The flat tree's is 1,296.
+  - *The passage*: within: the validation reading 48,562 ms, the peak resident set 7,212,138,496
+    bytes; the run 365,812 ms.
+  - *The release readings* (32 releases, `release_legibility.py` against the split's 6,461-word
+    choosing vocabulary). The egg: 28 texts and 4 typed refusals (3 text-codec separators, 1 at the
+    cap); 1,186 of 1,513 word tokens real. The flat tree: 1,626 of 2,096 real, 24 of 32 valid
+    UTF-8. The truths: 3,056 of 3,232. `()` balanced in 14 of 28 releases, against 11 of 32 for the
+    flat tree and 32 of 32 truths; backticks even in 13 of 28, against 15 of 32 and 32 of 32. The
+    longest warm release took 27,187 ms.
+  - *The failure, by its measurement* (the next loop's subject): on unseen families the egg's byte
+    gain over the flat tree, 1,981 bits in 523,024 bytes, is mostly spent on the stops it must
+    predict, and what remains is within the draw-to-draw spread; its standing is past the flat
+    tree's by the readings kept beside the state.
 
 ### F2. The field as a family (step 4; #73)
 

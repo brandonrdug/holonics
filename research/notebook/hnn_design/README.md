@@ -1642,6 +1642,18 @@ the response's opening under the scored law, the flat tree's at its first byte, 
 beside them), their text written owner-only. With `none` in place of the release file it reads the
 code alone (the margin's dry runs on the spent passages).
 
+- **The margin's dry runs** (spent splits only, before the split): the uncharged difference on F1's,
+  F4's, F5's and U2's passages `−279 + 10/16`, `−726 + 9/16`, `−672 + 15/16`, `−812 + 9/16` (each
+  `+ ε`), so `m = 534`; the release cap 2,048 bytes; U2's receipt reproduced exactly. On F4's passage
+  8 of 32 releases were refused at the passage's declared future incidence, so a release branches
+  at the present one (`AdmittedEgg::branch_at_present`).
+- **The run** (once, at `adc2cfbc`; 365,812 ms at a 7,212,138,496-byte peak): **fails**. Charged,
+  the egg's bytes and stops lie `−290 + 0/16 + ε` against the flat tree's bytes, not below `−534`
+  (the bytes alone `−1981 + 0/16 + ε` uncharged; the 936 stops `1640 + 7/16 + ε`); the standing
+  2,044 bytes a cell against 1,298 (1,131 without the readings); the validation reading 48,562 ms.
+  The releases: 28 texts of 32, 1,186 of 1,513 word tokens real (the flat tree's 1,626 of 2,096, the
+  truths' 3,056 of 3,232).
+
 ### F0 candidate 3: learned tokens with the receiving tree over them (September 28)
 
 Record: no dedicated record; THE_REBUILD's F0 carries the outcome, after [the forward plan stopped at transfer](../../records/2026-09-28_THE_FORWARD_PLAN_STOPPED_AT_TRANSFER_THE_POPULATION_MEMORIZES_FAMILIES_AND_ITS_STANDING_IS_AN_INDEX.md) (`hnn_tokens`, retired September 28, last at commit `2d34b819`).

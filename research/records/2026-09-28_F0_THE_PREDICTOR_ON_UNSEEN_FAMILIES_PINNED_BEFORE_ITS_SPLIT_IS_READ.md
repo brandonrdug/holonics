@@ -1,4 +1,4 @@
-# F0: the predictor on unseen families, its acceptance run pinned before its split is read
+# F0: the predictor on unseen families, its acceptance run pinned before its split is read: the code and the standing fail
 
 **Date:** 2026-09-28. Refs #63, #73, #148. **Scope:** the acceptance of
 [F0](../../docs/plans/THE_REBUILD.md#f0-the-predictor-on-unseen-families-the-releases-gate-73-148),
@@ -195,3 +195,99 @@ code-only runs, made together, took 129,627 to 132,449 ms each at peaks of 6,798
 about 50,000 ms for the validation passage (against 600,000) and about 7.2 GB (against 20 GB); the
 releases are bounded by 32 releases at the cap, 32 × 46,245 ms, and the run is given 2,400,000 ms
 before it is stopped as incomplete.
+
+## 3. The receipt: the code clause fails and the standing is past its budget
+
+The pins are commit `adc2cfbc`. Everything below was done after it.
+
+**The split** (`development_families.py F0`, then `curated_source.py 524288 {choosing,validation} F0`,
+`curated_incidence.py {choosing,validation} F0` and `family_passage.py F0`; counts and hashes only).
+Source SHA-256 `e1001a7ed0dd03c583ab4ef097f3e243b12680daad05911374b8765107f2f8b2`, as F4's. Of 22,449
+development families, 17,944 choose and 4,505 validate; the membership's SHA-256 is
+`b1e322fe41a417de75aadc5c5bed63b5fdf8e6da49c9acc15b2d5696437eed3e`; no family was refused. The
+choosing cut holds 523,747 cells (SHA-256 `960a708869995f5d0a22290733d64478b86b56f64005cdb6676042c44740a779`)
+and 387 relations (`1aead00c3ef4c594c6a6809eedafedae2bc46ae5dbd1447603d312f4a78fdd98`), the
+validation cut 524,005 cells (`18a80652ead7af8c32227cee1dd5a40e39dda0fd2115ad7d2e1aff4b3b8c297f`)
+and 157 relations (`ea3bc70a4a5ee3a86b919bef57e2e042b7e947d81e1b6fc1de0cfa95661e8ee7`). The joined
+passage holds 1,047,752 cells (`d36a63ab01dd1daf9a664885d1e7da34c45f5264fdf05bc8df7642f39faa5bbb`,
+`held_out_start` 523,747) and 544 relations (`166c5d201830d8ac412cb180ef48c5242d9a99427a5cbe67cae7306fdbd28da4`);
+its flat twin 1,046,085 bytes (`a8e4552a6a20cba9effb704fbf273de7bc88186d6b896ed50abcde0a561a6444`,
+held out from 523,061).
+
+**The run**, once, at commit `adc2cfbc`:
+
+```sh
+cargo run --release -p holonics --example hnn_population -- f0-acceptance .local/cuts/curated-f0-passage-cut.bin .local/cuts/curated-f0-passage-flat-cut.bin .local/cuts/f0-acceptance-releases.json
+```
+
+It took 365,812 ms at a 7,212,138,496-byte peak resident set: the choosing reading 43,793 ms, the
+validation reading 48,562 ms, the egg's releases 190,966 ms apart, the flat tree 26,164 ms and its
+releases 51,497 ms. Every guard held, and the run stayed within its projection. The exact
+endpoints are in the private log (`.local/cuts/f0-acceptance.log`, counts and codes only).
+
+**The charges.** The learned partition's description on this split's choosing cells is
+`31 + 9/16 + ε` bits, so the egg is charged `53 + 9/16 + ε` (17 + 5 + the description) and the flat
+tree 3.
+
+**The code on the validation families** (524,005 cells: 20,990 human and 502,034 agent bytes, 936
+response stops, 981 section letters).
+
+| | The egg | The flat tree (`D = 48`) |
+|---|---|---|
+| Human bytes | `42882 + 7/16 + ε` | — |
+| Agent bytes | `895439 + 2/16 + ε` | — |
+| Every byte (523,024) | `938321 + 10/16 + ε`, `1 + 12/16 + ε` a byte | `940302 + 10/16 + ε`, `1 + 12/16 + ε` a byte |
+| Response stops (936) | `1640 + 7/16 + ε`, `1 + 12/16 + ε` a stop | not coded |
+
+- **The acceptance's comparison**: the egg's bytes and stops, charged, against the flat tree's bytes,
+  charged: `−290 + 0/16 + ε` bits, exactly
+  `[−11485719006832285584773538369701/2^95, −22971438013664571169547076739397/2^96]`. **Its upper end
+  is not below `−m = −534`: the code clause fails.**
+- Uncharged, the difference is `−341 + 7/16 + ε`, inside the spent draws' range (§2: F1's
+  `−279 + 10/16 + ε` to U2's `−812 + 9/16 + ε`).
+- Beside it, deciding nothing: the bytes alone `−1981 + 0/16 + ε` uncharged and `−1931 + 9/16 + ε`
+  charged below the flat tree's; the whole curated stream (every cell, the request's pointer
+  `518 + 12/16 + ε` and the charges) `+2122 + 14/16 + ε` above the flat stream; on the choosing
+  families the bytes and stops `−3728 + 3/16 + ε` below the flat tree's bytes, uncharged.
+
+**The standing after the passage** (1,047,752 cells): whole 2,141,915,637 bytes, **2,044 a cell
+(remainder 310,549), past the budget of 1,298**; the readings beside the state 956,217,328 bytes
+(21,732,212 byte-tree nodes), 912 a cell; without them 1,185,698,309 bytes, 1,131 a cell (remainder
+690,797), within it. The flat tree's standing is 1,356,089,751 bytes after 1,046,085 cells, 1,296 a
+cell.
+
+**The passage**: within its budget: the validation reading 48,562 ms against 600,000, the peak
+resident set 7,212,138,496 bytes against 20,000,000,000.
+
+**Verdict: F0's acceptance fails.** The code clause fails (`−290 + 0/16 + ε` against `−534`) and the
+standing is past its budget (2,044 bytes a cell against 1,298); the passage is within. Under F0's
+failure branch the byte population stays a compression result, and F4's curated release and F5 wait.
+
+- *The separating term of the code*: the response stops. On unseen families the egg's byte gain over
+  the flat tree is 1,981 bits in 523,024 bytes (both `1 + 12/16 + ε` a byte), and the 936 stops it
+  must predict cost it `1640 + 7/16 + ε` bits. What remains, charged, lies within the variation
+  between family draws.
+- *The separating term of the standing*: the readings kept beside the state, 912 bytes a cell; the
+  standing without them is 1,131 a cell, within the budget.
+
+**The release readings** (32 releases at the hash-ordered validation responses, of 152 eligible;
+`release_legibility.py .local/cuts/f0-acceptance-releases.json .local/cuts/curated-f0-choosing-cut.bin`,
+against the split's choosing vocabulary of 6,461 words; counts only).
+
+| Reading | The egg's releases | The flat tree's releases | The held-out truths | The requests |
+|---|---|---|---|---|
+| Texts (typed refusals) | 28 (4: 3 text-codec separators, 1 at the cap) | 32 | 32 | 32 |
+| Valid UTF-8 | 28 of 32 | 24 of 32 | 32 of 32 | — |
+| Word tokens in the vocabulary | 1,186 of 1,513 | 1,626 of 2,096 | 3,056 of 3,232 | 1,054 of 1,182 |
+| `()` balanced | 14 of 28 | 11 of 32 | 32 of 32 | 32 of 32 |
+| `[]` / `{}` / `“”` balanced | 17 / 17 / 21 of 28 | 18 / 20 / 26 of 32 | 32 / 32 / 32 | 32 / 32 / 32 |
+| Backticks / straight quotes / bold even | 13 / 20 / 18 of 28 | 15 / 26 / 21 of 32 | 32 / 32 / 32 | 32 / 32 / 32 |
+
+The egg's word rate lies above the flat tree's (`1186·2096 = 2,485,856 > 1626·1513 = 2,460,138`) and
+below the truths'. Its releases' warm times: the longest 27,187 ms (the one at the cap), in all
+190,966 ms. The text stays owner-only (`.local/cuts/f0-acceptance-releases.json`, mode 0600); four
+releases were shown in the conversation beside their controls.
+
+**What lands.** The pins, the harness mode, the split scripts' item `F0`, `release_legibility.py`'s
+further corpora and named vocabulary, and `AdmittedEgg::branch_at_present` with its test and atlas
+row. No law of the receiver or the tree changes, and F0's egg is unchanged. **The split is spent.**
