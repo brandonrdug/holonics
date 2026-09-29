@@ -192,7 +192,7 @@ peak: the choosing reading 43,252 ms, the validation reading 48,637 ms, the egg'
 (the longest 29,264 ms) and the flat tree's 55,775 ms, the flat passage 26,596 ms. The three
 code-only runs, made together, took 129,627 to 132,449 ms each at peaks of 6,798,041,088 to
 7,022,305,280 bytes. The fresh passage is of the same aperture, so its readings are projected at
-about 50,000 ms for the validation passage (against 600,000) and about 7.2 GB (against 20 GB); the
+about 50,000 ms for the validation passage (against 600,000) and about 7,200,000,000 bytes (against 20 GB); the
 releases are bounded by 32 releases at the cap, 32 × 46,245 ms, and the run is given 2,400,000 ms
 before it is stopped as incomplete.
 

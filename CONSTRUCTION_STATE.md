@@ -22,7 +22,7 @@ The repository was reset on September 24; the pre-reset tree is
 | Birth (`receiver::population::birth`) | The founding law `E T_a = U_a E` is built and proved (Lean `Context/Birth`). On the two parity-moiré seeds that founded, the newborn codes at the truth exactly, and the population codes `465 + 4/16` and `682 + 5/16` bits below the control. The pinned acceptance fails: six of eight seeds had nothing to found, and the margin bound is attained within `3/2^97` bits, not decided. The founding closes observability, not reachability, so its dimension can exceed the Hankel rank | the ring-search row |
 | Targets and physics (#146, #20, #22, #23, #32) | Finite physics K3–K4 complete; target research continues alongside construction | U7 |
 | Lean curation (#147) | First pass, renames and U0's owner consolidation complete; the remaining curation is #147's | U8 |
-| **Immediate work** | **Wave C closed: U1 joined; F2 failed on work; the rings are not a search; birth's founding law is built and awaits a terrain whose declared families fail. Wave D: U5 done (the clocks are aeons, at parity); U6 (the text chart) next** | U6 |
+| **Immediate work** | **Wave D: U5 done (the clocks are aeons, at parity). U6's first loop: F0's acceptance fails on a fresh split. The egg's charged bytes and stops lie `−290 + 0/16 + ε` against the flat tree's bytes, not below the pinned `−534`; its 1,981-bit byte gain is spent on the 936 stops it must predict. The standing is 2,044 bytes a cell against 1,298 (1,131 without the readings). The byte population stays a compression result; F4's curated release and F5 wait, and F6's chase carries the architecture's tests** | U6, F6 |
 
 ## U0 receipt (September 28)
 
