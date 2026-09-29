@@ -5,7 +5,7 @@ validation is read once afterward. Relations retain their role-local target and 
 the joint tick chart. The boundary between the cuts is a declared section, not an invented causal
 edge. Only counts and hashes leave the owner-only cut directory.
 
-    HOLONICS_ROOT=<checkout with private cuts> python3 family_passage.py [F1 | F2 | F5 | U2]
+    HOLONICS_ROOT=<checkout with private cuts> python3 family_passage.py [F1 | F2 | F5 | U2 | F0]
 """
 
 import hashlib
@@ -43,7 +43,7 @@ def read(item, role):
 
 def main():
     arguments = sys.argv[1:]
-    if arguments not in ([], ["F1"], ["F2"], ["F5"], ["U2"]):
+    if arguments not in ([], ["F1"], ["F2"], ["F5"], ["U2"], ["F0"]):
         sys.exit(__doc__)
     item = arguments[0].lower() if arguments else "f4"
     name = f"curated-{item}-passage"

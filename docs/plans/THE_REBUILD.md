@@ -672,6 +672,17 @@ on the admitted egg, and the trees beyond depth 24 add at most 20 bits.
   reported beside it.
 - **If it fails.** The byte population stays a compression result, and F4's curated release and F5
   wait. The chase terrain (F6) carries the architecture's tests.
+- **The acceptance run, September 28: the pins** (U6's first loop; committed before the split is
+  generated; [record](../../research/records/2026-09-28_F0_THE_PREDICTOR_ON_UNSEEN_FAMILIES_PINNED_BEFORE_ITS_SPLIT_IS_READ.md);
+  `hnn_population f0-acceptance`; Refs #73 #148 #63). A fresh split (seed
+  `holonics-f0-development-families-2026-09-28-v1`; F4's, F1's, F2's two, F5's and U2's excluded);
+  the egg at `F0_BYTE_DEPTH = 12`; U2's receiver; the egg's bytes and response stops, charged its
+  declaration (17 + 5 bits and the learned partition's description), against the flat tree's bytes,
+  charged 3, the flat tree charged no stop; the margin `m` the range of the uncharged difference over
+  the spent draws read at F0's aperture (F1's, F4's, F5's and U2's passages), read before the split
+  is generated; the standing budget 1,298 bytes a cell, whole; the passage budget ten minutes and
+  20 GB; 32 releases at hash-ordered validation responses beside the held-out truth and the flat
+  tree's release, read by `release_legibility.py`, the text owner-only.
 
 ### F2. The field as a family (step 4; #73)
 
