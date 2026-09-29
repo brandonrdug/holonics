@@ -70,7 +70,7 @@ use holonics::hnn::reference::{
 use holonics::hnn::retention::{Diamond, aeon_readings, collapse, contained, separator};
 use holonics::hnn::{
     ActiveAddress, AeonBoundary, ChartKey, ChartReading, Constitution, ConstitutionRead, Current,
-    Faces, Field, HnnError, Locus, PendingRatio, ReceivingPhases, SourceMoment, Steps,
+    Faces, Field, HnnError, Locus, PendingRatio, ReceivingPhases, SourceMoment,
 };
 use holonics::navigator::Clock;
 use holonics::ratio::Rat;
@@ -437,12 +437,11 @@ impl ExposedResident for Mounted<'_> {
 // the port
 
 /// [definition] **The device's execution port**: a card, with the declared pending capacity,
-/// steps and constitution budget, and an exposure's deadline if one is set (the reference's
+/// constitution budget, and an exposure's deadline if one is set (the reference's
 /// declarations, so the two describe the same field).
 pub struct Resident<'c> {
     card: &'c Card,
     pending_capacity: usize,
-    steps: Steps,
     budget: u64,
     deadline: Option<u64>,
     /// The normal-law mirror's tally when the mirror runs (the GPU suite's parity tests,
@@ -475,17 +474,16 @@ fn codes(cells: &[Vec<(usize, Rat)>], alphabet: usize) -> Result<Vec<usize>, Hnn
 }
 
 impl<'c> Resident<'c> {
-    /// Campaign 1's declarations on a card: `γ_U = 1`, `η_x = 1/2`, `B_Θ = 2^33`, a pending
-    /// capacity of 64 (the reference's).
+    /// Campaign 1's declarations on a card: `B_Θ = 2^33` and a pending capacity of 64 (the
+    /// reference's), every locus's step certified at its deposit.
     pub fn campaign_one(card: &'c Card) -> Self {
-        Self::new(card, 64, Steps::campaign_one(), CAMPAIGN_ONE_BUDGET)
+        Self::new(card, 64, CAMPAIGN_ONE_BUDGET)
     }
 
-    pub fn new(card: &'c Card, pending_capacity: usize, steps: Steps, budget: u64) -> Self {
+    pub fn new(card: &'c Card, pending_capacity: usize, budget: u64) -> Self {
         Self {
             card,
             pending_capacity,
-            steps,
             budget,
             deadline: None,
             normal_mirror: None,
@@ -544,7 +542,6 @@ impl<'c> Resident<'c> {
         expose(
             self,
             &Declared {
-                steps: &self.steps,
                 budget: self.budget,
                 pending_capacity: self.pending_capacity,
                 deadline: self.deadline,
@@ -568,7 +565,6 @@ impl<'c> Resident<'c> {
         expose_from(
             self,
             &Declared {
-                steps: &self.steps,
                 budget: self.budget,
                 pending_capacity: self.pending_capacity,
                 deadline: self.deadline,
@@ -869,7 +865,7 @@ impl<'c> ExecutionPort for Resident<'c> {
     }
 
     fn mount(&self, field: &Field, current: &Current) -> Result<Mounted<'c>, HnnError> {
-        let constitution = Constitution::initial(field, self.steps.clone(), self.budget)?;
+        let constitution = Constitution::initial(field, self.budget)?;
         self.mount_with(field, current, constitution)
     }
 
@@ -1378,15 +1374,9 @@ impl<'c> ExecutionPort for Resident<'c> {
                     .filter(|(at, ..)| *at == locus)
                     .map(|(_, carrier, entry, residual)| (*carrier, *entry, residual.clone()))
                     .collect();
-                // The locus's certified step (zero where its alignment certified none).
-                let certified = reading
-                    .steps
-                    .iter()
-                    .find(|(at, _)| *at == locus)
-                    .map_or_else(
-                        || Rat::from_integer(0.into()),
-                        |(_, step)| step.step.step.clone(),
-                    );
+                // The normal law's certified step at the locus (zero where its alignment certified
+                // none; the locus's factor families step beside it).
+                let certified = reading.linear_step(locus);
                 tally.count(normal_deposit_on_card(
                     self.card,
                     before,

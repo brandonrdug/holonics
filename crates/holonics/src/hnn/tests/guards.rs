@@ -98,9 +98,9 @@ fn guard_fifteen_the_grain_reading_rounds_nothing() {
 // takes no face and has no lifetime (`PendingRatio`); the return accepts only a covector a Holon
 // ratio built (`Word::pull_back`, `RatioCovector`); a port return has no lifetime (`InteractionReturn`).
 
-use super::learning::{OPEN_BUDGET, chain, chain_declaration, generic};
+use super::learning::{OPEN_BUDGET, chain, chain_declaration, chain_reach, generic};
 use crate::hnn::constitution::{
-    Constitution, FactorGradient, FactorStep, LinearLocus, LinearStep, Locus, Sample, Steps,
+    Constitution, FactorGradient, FactorStep, LinearLocus, LinearStep, Locus, Sample,
 };
 use crate::hnn::field::ConstitutionRead;
 use crate::hnn::port::{Deposit, ExecutionPort};
@@ -117,7 +117,7 @@ use num_traits::{One, Zero};
 #[test]
 fn guard_four_the_constitution_keeps_no_journal() {
     let field = chain();
-    let initial = Constitution::initial(&field, Steps::campaign_one(), OPEN_BUDGET).unwrap();
+    let initial = Constitution::initial(&field, OPEN_BUDGET).unwrap();
     let zero = |rows: usize, columns: usize| vec![vec![Rat::zero(); columns]; rows];
     let zeros = |n: usize| vec![Rat::zero(); n];
     let matrix = |rows: usize, columns: usize| ExactRatMatrix::zero(rows, columns).unwrap();
@@ -158,11 +158,13 @@ fn guard_four_the_constitution_keeps_no_journal() {
                 FactorGradient::Standing {
                     ring: g,
                     gradient: zeros(n),
+                    reach: vec![(g, Rat::zero())],
                 },
             ] {
                 factors.push(FactorStep {
                     gradient,
                     energy: Rat::zero(),
+                    covector: Rat::zero(),
                 });
             }
         }
@@ -176,6 +178,7 @@ fn guard_four_the_constitution_keeps_no_journal() {
                 earlier: zero(pair.rank(), alphabet),
             },
             energy: Rat::zero(),
+            covector: Rat::zero(),
         });
         for a in 0..field.contacts().len() {
             let k = field.contact(a).width();
@@ -196,6 +199,7 @@ fn guard_four_the_constitution_keeps_no_journal() {
                 factors.push(FactorStep {
                     gradient,
                     energy: Rat::zero(),
+                    covector: Rat::zero(),
                 });
             }
         }
@@ -272,7 +276,7 @@ fn guard_fifteen_the_budget_is_refused_never_rounded() {
     let field = chain();
     let loose = generic(&field, 93);
     let budget = loose.exact_bits();
-    let theta = Constitution::initial(&field, Steps::campaign_one(), budget)
+    let theta = Constitution::initial(&field, budget)
         .unwrap()
         .with_channel(
             0,
@@ -292,10 +296,12 @@ fn guard_fifteen_the_budget_is_refused_never_rounded() {
                 gradient: draw.matrix(k, k).scaled(&rat(1, 997)),
             },
             energy: rat(3, 7),
+            covector: Rat::one(),
         }],
         Vec::new(),
-    );
-    let generous = Constitution::initial(&field, Steps::campaign_one(), OPEN_BUDGET)
+    )
+    .with_reach(chain_reach());
+    let generous = Constitution::initial(&field, OPEN_BUDGET)
         .unwrap()
         .with_channel(
             0,
@@ -306,7 +312,7 @@ fn guard_fifteen_the_budget_is_refused_never_rounded() {
         .unwrap();
     let (grown, _) = generous.deposited(&deposit).unwrap();
     assert!(grown.exact_bits() > theta.exact_bits());
-    let tight = Constitution::initial(&field, Steps::campaign_one(), theta.exact_bits())
+    let tight = Constitution::initial(&field, theta.exact_bits())
         .unwrap()
         .with_channel(
             0,

@@ -9,7 +9,7 @@ use super::learning::{OPEN_BUDGET, chain, generic, moment, six_path};
 use super::support::Draw;
 use crate::compression::landmark::context::Landmarks;
 use crate::hnn::chart::Charts;
-use crate::hnn::constitution::{Constitution, Steps};
+use crate::hnn::constitution::Constitution;
 use crate::hnn::field::{ConstitutionRead, Current, Field};
 use crate::hnn::moment::{PairPort, SourceMoment};
 use crate::hnn::prediction::{Refinement, Section, deposit_of, stage, unreached_unchanged};
@@ -289,7 +289,7 @@ fn the_release_holds_a_plural_section_and_releases_a_determined_one() {
     let field = chain();
     let (current, moment) = moment(&field, 79, 7);
     let refinement = declared(&field, 2, 2);
-    let initial = Constitution::initial(&field, Steps::campaign_one(), OPEN_BUDGET).unwrap();
+    let initial = Constitution::initial(&field, OPEN_BUDGET).unwrap();
     let plural = Section::refine(
         &field,
         &initial,

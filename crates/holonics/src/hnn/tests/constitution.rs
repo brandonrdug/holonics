@@ -11,12 +11,12 @@ use std::sync::OnceLock;
 use num_bigint::BigInt;
 use num_traits::{One, Signed, Zero};
 
-use super::learning::{OPEN_BUDGET, chain, generic, moment, phases, six_path};
+use super::learning::{OPEN_BUDGET, chain, chain_reach, generic, moment, phases, six_path};
 use super::support::Draw;
 use crate::hnn::HnnError;
 use crate::hnn::constitution::{
     BudgetedCarry, Carrier, ChartRule, Constitution, DepositReading, FactorGradient, FactorStep,
-    Lattice, LinearLocus, LinearStep, Locus, NormalLaw, Reach, Sample, Steps, declared_sign,
+    Family, Lattice, LinearLocus, LinearStep, Locus, NormalLaw, Sample, declared_sign,
     gamma_length, refined_once,
 };
 use crate::hnn::field::{ConstitutionRead, Current};
@@ -267,10 +267,12 @@ fn division_with_remainder_is_the_nearest_lattice_point_ties_upward() {
 #[test]
 fn the_carry_splits_its_ties_upward_at_both_lattices() {
     let field = chain();
-    let theta = Constitution::initial(&field, Steps::campaign_one(), OPEN_BUDGET).unwrap();
+    let theta = Constitution::initial(&field, OPEN_BUDGET).unwrap();
     let lattice = theta.lattice(Locus::Standing(1)).unwrap();
     let (u, n) = (lattice.unit(), field.ring(1).width());
-    // η_x / h_x = ½ with no feature energy, so a gradient `2Δ` applies the update `Δ`.
+    // At `R = 0` no gain reaches the stations, so the certified step is the covector bound's: at a
+    // covector scale `c = 1` it is `η = 1`, and with no feature energy `h_x = 1`, so a gradient `Δ`
+    // applies the update `Δ`.
     let standing = |commit: u64, updates: Vec<Rat>| {
         Deposit::new(
             commit,
@@ -278,12 +280,15 @@ fn the_carry_splits_its_ties_upward_at_both_lattices() {
             vec![FactorStep {
                 gradient: FactorGradient::Standing {
                     ring: 1,
-                    gradient: updates.iter().map(|x| x * integer(2)).collect(),
+                    gradient: updates,
+                    reach: vec![(1, Rat::zero())],
                 },
                 energy: Rat::zero(),
+                covector: Rat::one(),
             }],
             Vec::new(),
         )
+        .with_reach(chain_reach())
     };
     let check = |theta: &Constitution,
                  before: &Constitution,
@@ -560,7 +565,7 @@ fn chain_run() -> &'static [Deposited] {
     static RUN: OnceLock<Vec<Deposited>> = OnceLock::new();
     RUN.get_or_init(|| {
         let field = chain();
-        let reference = Reference::new(8, Steps::campaign_one(), OPEN_BUDGET);
+        let reference = Reference::new(8, OPEN_BUDGET);
         let mut resident = reference.mount(&field, &Current::at_rest(&field)).unwrap();
         let (moment_id, _) = reference
             .ingest(&mut resident, None, &one_hot(&[1, 2, 3, 0, 2]))
@@ -647,21 +652,16 @@ fn entries(theta: &Constitution, locus: Locus, carrier: Carrier) -> Vec<Rat> {
 /// **The exact updates of a deposit** per carried array (the laws of `NormalLaw::deposited` and
 /// the factor steps, recomputed): `ΔH = Σ w f fᵀ`, `ΔW = η Σ w g (X̂f)ᵀ` at the successor's solved
 /// chart `X̂` and the locus's certified step `η` (zero where none was certified), `Δh_x = Σ w|f|²`
-/// and `Δx = (η_x / h_x') G_x` at the successor's statistic.
+/// and `Δx = (η_x / h_x') G_x` at the successor's statistic and the family's certified step `η_x`.
 fn updates(
     deposit: &Deposit,
     next: &Constitution,
     reading: &DepositReading,
 ) -> Vec<((Locus, Carrier), Vec<Rat>)> {
-    let steps = next.steps();
     let mut out = Vec::new();
     for step in deposit.linear() {
         let locus = step.locus.locus();
-        let certified = reading
-            .steps
-            .iter()
-            .find(|(at, _)| *at == locus)
-            .map_or_else(Rat::zero, |(_, certified)| certified.step.step.clone());
+        let certified = reading.linear_step(locus);
         let law = match step.locus {
             LinearLocus::SourcePort(g) => next.source_law(g).unwrap(),
             LinearLocus::Contrast(g) => next.contrast_law(g),
@@ -713,7 +713,7 @@ fn updates(
                         .collect(),
                 )],
             ),
-            FactorGradient::Standing { ring, gradient } => (
+            FactorGradient::Standing { ring, gradient, .. } => (
                 Carrier::StandingScale,
                 next.ring_scales(*ring)[0].clone(),
                 vec![(Carrier::Standing, gradient.clone())],
@@ -765,7 +765,7 @@ fn updates(
                 )
             }
         };
-        let rate = &steps.factor / index;
+        let rate = reading.family_step(locus, step.gradient.family()) / index;
         out.push(((locus, scale), vec![step.energy.clone()]));
         for (carrier, gradient) in family {
             out.push((
@@ -898,10 +898,11 @@ fn the_release_since_the_founding_stays_below_half_a_unit() {
             assert!((x - (x0 + at(&ledger.updates))).abs() < u, "{key:?}");
         }
     }
-    // The adversary: ring 0's standing, rate η_x / h_x = ½ (no energy), each update just under half
-    // a fine unit of the clock it advances to.
+    // The adversary: ring 0's standing at `R = 0`, so its certified step is the covector bound's,
+    // `η = 1` at `c = 1`, and `h_x = 1` (no energy): each update just under half a fine unit of the
+    // clock it advances to.
     let field = chain();
-    let mut theta = Constitution::initial(&field, Steps::campaign_one(), OPEN_BUDGET).unwrap();
+    let mut theta = Constitution::initial(&field, OPEN_BUDGET).unwrap();
     let n = field.ring(0).width();
     let lattice = theta.lattice(Locus::Standing(0)).unwrap();
     let u = lattice.unit();
@@ -916,12 +917,15 @@ fn the_release_since_the_founding_stays_below_half_a_unit() {
             vec![FactorStep {
                 gradient: FactorGradient::Standing {
                     ring: 0,
-                    gradient: vec![&update * integer(2); n],
+                    gradient: vec![update.clone(); n],
+                    reach: vec![(0, Rat::zero())],
                 },
                 energy: Rat::zero(),
+                covector: Rat::one(),
             }],
             Vec::new(),
-        );
+        )
+        .with_reach(chain_reach());
         let (next, reading) = theta.deposited(&deposit).unwrap();
         assert_eq!(next.clock(Locus::Standing(0)), m);
         assert_eq!(reading.released.len(), n);
@@ -1013,18 +1017,24 @@ fn a_carried_remainder_takes_its_lattice_and_clock_bits() {
 #[test]
 fn a_zero_update_advances_nothing() {
     let field = chain();
-    let theta = Constitution::initial(&field, Steps::campaign_one(), OPEN_BUDGET).unwrap();
+    let theta = Constitution::initial(&field, OPEN_BUDGET).unwrap();
     let n = field.ring(1).width();
     let standing = |commit: u64, gradient: Vec<Rat>| {
         Deposit::new(
             commit,
             Vec::new(),
             vec![FactorStep {
-                gradient: FactorGradient::Standing { ring: 1, gradient },
+                gradient: FactorGradient::Standing {
+                    ring: 1,
+                    gradient,
+                    reach: vec![(1, Rat::zero())],
+                },
                 energy: Rat::zero(),
+                covector: Rat::one(),
             }],
             Vec::new(),
         )
+        .with_reach(chain_reach())
     };
     let (thirds, _) = theta.deposited(&standing(0, vec![rat(1, 3); n])).unwrap();
     assert_eq!(thirds.clock(Locus::Standing(1)), 1);
@@ -1076,6 +1086,7 @@ fn the_factor_carriers_stay_positive_semidefinite_with_no_clamp() {
                 gradient: big(&mut draw, field.contact(0).width()),
             },
             energy: Rat::zero(),
+            covector: Rat::one(),
         },
         FactorStep {
             gradient: FactorGradient::Stiffness {
@@ -1083,6 +1094,7 @@ fn the_factor_carriers_stay_positive_semidefinite_with_no_clamp() {
                 gradient: big(&mut draw, field.contact(1).width()),
             },
             energy: Rat::zero(),
+            covector: Rat::one(),
         },
         FactorStep {
             gradient: FactorGradient::Dissipation {
@@ -1090,6 +1102,7 @@ fn the_factor_carriers_stay_positive_semidefinite_with_no_clamp() {
                 gradient: big(&mut draw, field.contact(1).width()),
             },
             energy: Rat::zero(),
+            covector: Rat::one(),
         },
         FactorStep {
             gradient: FactorGradient::Passive {
@@ -1097,9 +1110,10 @@ fn the_factor_carriers_stay_positive_semidefinite_with_no_clamp() {
                 gradient: big(&mut draw, field.ring(1).width()),
             },
             energy: Rat::zero(),
+            covector: Rat::one(),
         },
     ];
-    let deposit = Deposit::new(0, Vec::new(), factors, Vec::new());
+    let deposit = Deposit::new(0, Vec::new(), factors, Vec::new()).with_reach(chain_reach());
     let (next, _) = theta.deposited(&deposit).unwrap();
     for a in 0..2 {
         assert!(psd(next.contact_storage(a)));
@@ -1112,6 +1126,189 @@ fn the_factor_carriers_stay_positive_semidefinite_with_no_clamp() {
         .subtract(&ExactRatMatrix::identity(2).unwrap().scaled(&integer(2)))
         .unwrap();
     assert_eq!(inertia(&matrix_form(&additive).unwrap()).negative, 2);
+}
+
+/// `hnn::constitution`, "The factor families' certified step" (Lean
+/// `Holon/Deposition.{certified_step_descends, factor_unit_step_alignment, square_ray_deriv_bound}`):
+/// on a generic constitution (its receiving map nonzero, so the comparisons' covectors reach every
+/// family), every stepping family, a normal law's and a factor family's alike, holds its certificate
+/// `ηC ≤ a`, `ηc ≤ 1` with `C = B·½·κ²·b` and `B` every family stepping in the deposit; the factor
+/// families step (the declared `η_x` is retired), each moving its entries by exactly `η G_x / h_x′`
+/// less what its budgeted carry holds and releases.
+#[test]
+fn every_family_steps_by_its_certificate() {
+    let field = chain();
+    let reference = Reference::new(8, OPEN_BUDGET);
+    let mut resident = reference
+        .mount_with(&field, &Current::at_rest(&field), generic(&field, 71))
+        .unwrap();
+    let (moment_id, _) = reference
+        .ingest(&mut resident, None, &one_hot(&[1, 2, 3, 0, 2]))
+        .unwrap();
+    let phases = resident.admitted()[0].clone();
+    let targets = [[2usize, 1], [0, 3], [1, 1], [3, 0]];
+    let mut factor_families = 0;
+    for target in &targets {
+        let (pending, _) = reference
+            .refine(&mut resident, &moment_id, &phases)
+            .unwrap();
+        let (staged, compared) = reference
+            .compare(&mut resident, pending, &one_hot(target))
+            .unwrap();
+        let deposit = compared.deposit.into_present().unwrap();
+        let before = resident.constitution().clone();
+        let reading = reference
+            .deposit(&mut resident, staged)
+            .unwrap()
+            .deposit
+            .into_present()
+            .unwrap();
+        let together = reading.steps.len() as u64;
+        for (locus, step) in &reading.steps {
+            assert!(step.step.holds(), "{locus:?} {:?}", step.family);
+            assert!(step.step.alignment.is_positive());
+            assert_eq!(step.together, together);
+            assert_eq!(
+                step.step.curvature,
+                Rat::new(BigInt::from(together), BigInt::from(2)) * &step.gain * &step.moves
+            );
+            if step.family == Family::Map {
+                continue;
+            }
+            factor_families += 1;
+            // The standing's move, exactly: its entries plus their remainders and releases move by
+            // `η G / h′` at the carried statistic `h′`.
+            if let Locus::Standing(g) = *locus {
+                let factor = deposit
+                    .factors()
+                    .iter()
+                    .find(|factor| factor.gradient.locus() == *locus)
+                    .unwrap();
+                let FactorGradient::Standing { gradient, .. } = &factor.gradient else {
+                    unreachable!()
+                };
+                let after = resident.constitution();
+                let scale = after.ring_scales(g)[0].clone();
+                let remainder = |theta: &Constitution, i: usize| {
+                    remainders(theta)
+                        .get(&(*locus, Carrier::Standing, i))
+                        .cloned()
+                        .unwrap_or_else(Rat::zero)
+                };
+                for (i, dx) in gradient.iter().enumerate() {
+                    let released: Rat = reading
+                        .released
+                        .iter()
+                        .filter(|(at, carrier, entry, _)| {
+                            (*at, *carrier, *entry) == (*locus, Carrier::Standing, i)
+                        })
+                        .map(|(.., e)| e.clone())
+                        .sum();
+                    assert_eq!(
+                        &after.standing(g)[i] + remainder(after, i) + released,
+                        &before.standing(g)[i]
+                            + remainder(&before, i)
+                            + &step.step.step * dx / &scale
+                    );
+                }
+            }
+        }
+    }
+    assert!(factor_families > 0);
+}
+
+/// A channel family's gain reads its contact's conductance bound, `G_a ≤ Y_a` when `β_a ≥ 0`; a
+/// contact whose exponent is negative has none, and a step of its channel is refused
+/// (`UncertifiedConductance`), while a step elsewhere is certified.
+#[test]
+fn a_channel_step_through_an_unbounded_conductance_is_refused() {
+    let mut declared = super::learning::chain_declaration(1 << 16);
+    declared.contacts[1].exponent = integer(-2);
+    let field = crate::hnn::field::Field::declare(declared).unwrap();
+    let theta = Constitution::initial(&field, OPEN_BUDGET).unwrap();
+    let step = |contact: usize| {
+        let k = field.contact(contact).width();
+        Deposit::new(
+            0,
+            Vec::new(),
+            vec![FactorStep {
+                gradient: FactorGradient::Storage {
+                    contact,
+                    gradient: ExactRatMatrix::identity(k).unwrap(),
+                },
+                energy: Rat::zero(),
+                covector: Rat::one(),
+            }],
+            Vec::new(),
+        )
+        .with_reach(chain_reach())
+    };
+    assert_eq!(
+        theta.deposited(&step(1)),
+        Err(HnnError::UncertifiedConductance { contact: 1 })
+    );
+    assert!(theta.deposited(&step(0)).is_ok());
+}
+
+/// Lean `Holon/Deposition.committed_energy_bound` at the commit: a rank-one storage `C = e₀e₀ᵀ`
+/// grows outside its range under a certified step that moves its column off `e₀` (at `R = 0` the
+/// step is the covector bound's, `η = 1`), which no dyadic `ε` of the declared search certifies, so
+/// the deposit is refused (`UncertifiedStorage`) and the predecessor is kept; the same step on the
+/// full-rank campaign storage `C = I` is certified.
+#[test]
+fn a_storage_growth_outside_its_range_is_refused() {
+    let field = chain();
+    let k = field.contact(0).width();
+    let initial = Constitution::initial(&field, OPEN_BUDGET).unwrap();
+    let e0 = |i: usize| if i == 0 { Rat::one() } else { Rat::zero() };
+    let rank_one = initial
+        .clone()
+        .with_channel(
+            0,
+            ExactRatMatrix::from_diagonal((0..k).map(e0).collect()).unwrap(),
+            initial.contact_stiffness(0).clone(),
+            initial.contact_dissipation(0).clone(),
+        )
+        .unwrap();
+    // The storage factor's column 0 moves toward `e₁`.
+    let gradient = ExactRatMatrix::shaped(
+        k,
+        k,
+        (0..k)
+            .map(|i| {
+                (0..k)
+                    .map(|j| {
+                        if (i, j) == (1, 0) {
+                            Rat::one()
+                        } else {
+                            Rat::zero()
+                        }
+                    })
+                    .collect()
+            })
+            .collect(),
+    )
+    .unwrap();
+    let deposit = Deposit::new(
+        0,
+        Vec::new(),
+        vec![FactorStep {
+            gradient: FactorGradient::Storage {
+                contact: 0,
+                gradient,
+            },
+            energy: Rat::zero(),
+            covector: Rat::one(),
+        }],
+        Vec::new(),
+    )
+    .with_reach(chain_reach());
+    assert_eq!(
+        rank_one.deposited(&deposit),
+        Err(HnnError::UncertifiedStorage)
+    );
+    let (_, certified) = initial.deposited(&deposit).unwrap();
+    assert!(certified.storage_growth.is_positive());
 }
 
 /// Lean `HNN/Normal.reaction_deposit_storage_unchanged`: a deposit of reaction material and ports
@@ -1136,13 +1333,17 @@ fn reaction_deposits_have_zero_storage_growth() {
                 gradient: (0..n).map(|_| (draw.vector(n), draw.vector(n))).collect(),
             },
             energy: Rat::one(),
+            covector: Rat::one(),
         }],
         Vec::new(),
     )
     .with_reach(chain_reach());
     let (_, reading) = theta.deposited(&reaction).unwrap();
     assert_eq!(reading.storage_growth, Rat::zero());
+    // A storage deposit at `R = 0`: its certified step is the covector bound's, `η = 1` at `c = 1`,
+    // so `c = I` moves by `G/h_x′ = I` and `C = I` grows to `4I`, certified at `ε = 2² ≥ 3`.
     let k = field.contact(0).width();
+    let initial = Constitution::initial(&field, OPEN_BUDGET).unwrap();
     let storage = Deposit::new(
         0,
         Vec::new(),
@@ -1152,11 +1353,13 @@ fn reaction_deposits_have_zero_storage_growth() {
                 gradient: ExactRatMatrix::identity(k).unwrap(),
             },
             energy: Rat::zero(),
+            covector: Rat::one(),
         }],
         Vec::new(),
-    );
-    let (_, grown) = theta.deposited(&storage).unwrap();
-    assert!(grown.storage_growth > Rat::zero());
+    )
+    .with_reach(chain_reach());
+    let (_, grown) = initial.deposited(&storage).unwrap();
+    assert_eq!(grown.storage_growth, integer(4));
     assert_eq!(grown.storage_product, Rat::one() + &grown.storage_growth);
 }
 
@@ -1168,12 +1371,12 @@ fn the_budget_refuses_the_successor_and_keeps_the_predecessor() {
     let field = chain();
     let (current, _) = moment(&field, 11, 0);
     // One bit above the declared initial constitution: the first deposit that grows it is refused.
-    let budget = Constitution::initial(&field, Steps::campaign_one(), OPEN_BUDGET)
+    let budget = Constitution::initial(&field, OPEN_BUDGET)
         .unwrap()
         .exact_bits()
         + 1;
-    let reference = Reference::new(8, Steps::campaign_one(), budget);
-    let tight = Constitution::initial(&field, Steps::campaign_one(), budget).unwrap();
+    let reference = Reference::new(8, budget);
+    let tight = Constitution::initial(&field, budget).unwrap();
     let mut resident = reference.mount_with(&field, &current, tight).unwrap();
     let before = resident.constitution().clone();
     let (moment_id, _) = reference
@@ -1229,7 +1432,7 @@ fn the_budget_refuses_the_successor_and_keeps_the_predecessor() {
 #[test]
 fn the_standing_moves_only_by_deposit_and_a_class_only_across_zero() {
     let field = chain();
-    let theta = Constitution::initial(&field, Steps::campaign_one(), OPEN_BUDGET)
+    let theta = Constitution::initial(&field, OPEN_BUDGET)
         .unwrap()
         .with_ports(2, Some(vec![rat(1, 8); 4]), None, None)
         .unwrap();
@@ -1251,14 +1454,18 @@ fn the_standing_moves_only_by_deposit_and_a_class_only_across_zero() {
                 gradient: FactorGradient::Standing {
                     ring: 2,
                     gradient: vec![amount; 4],
+                    reach: vec![(2, Rat::zero()), (1, Rat::zero())],
                 },
                 energy: Rat::zero(),
+                covector: Rat::one(),
             }],
             Vec::new(),
         )
+        .with_reach(chain_reach())
     };
     // q_2 = 1/8 on every coordinate; ring 2's contrast is U q_1 − q_2 = −1/8 on its matched
-    // coordinates. A small step keeps every class; a step past the fold flips them.
+    // coordinates. At `R = 0` the certified step is the covector bound's, `η = 1`, so the step
+    // moves `q_2` by the gradient. A small step keeps every class; a step past the fold flips them.
     let (small, _) = theta.deposited(&step(rat(1, 16))).unwrap();
     assert_eq!(classes(&small), start);
     assert_ne!(small.standing(2), theta.standing(2));
@@ -1349,18 +1556,6 @@ fn a_deposit_reaches_only_the_diamond_and_sums_only_its_window() {
     }
 }
 
-/// **A hand-built deposit's reach** on the chain (its receiver ring 2 read at ticks 1 and 2, the
-/// moment entering once at the open, one phase), the certified step's reading of a window a compare
-/// did not compose.
-fn chain_reach() -> Reach {
-    Reach {
-        receiver: 2,
-        stations: vec![1, 2],
-        entries: vec![0],
-        phases: 1,
-    }
-}
-
 /// A deposit staged at one commit is refused at another: `E` is never mixed across two cuts.
 #[test]
 fn a_stale_deposit_is_refused() {
@@ -1396,7 +1591,7 @@ fn a_stale_deposit_is_refused() {
 #[test]
 fn the_initial_constitution_is_the_declared_one() {
     let field = chain();
-    let theta = Constitution::initial(&field, Steps::campaign_one(), OPEN_BUDGET).unwrap();
+    let theta = Constitution::initial(&field, OPEN_BUDGET).unwrap();
     let source = theta.source_port(0).unwrap();
     assert!((source.rows(), source.columns()) == (4, 4));
     assert!(source.entries().iter().all(|x| x.abs() == rat(1, 2)));
@@ -1435,7 +1630,6 @@ fn the_initial_constitution_is_the_declared_one() {
         assert_eq!(theta.contact_dissipation(a), &identity.scaled(&rat(1, 2)));
     }
     assert_eq!(theta.commit(), 0);
-    assert_eq!(theta.steps(), &Steps::campaign_one());
 }
 
 /// Design (d), "Reaction": **a complex-bilinear block is refused at declaration.** A reaction slice
@@ -1455,7 +1649,7 @@ fn a_complex_bilinear_block_has_no_declaration() {
     let n = field.ring(ring).width();
     let slices: Vec<(Vec<Rat>, Vec<Rat>)> =
         (0..n).map(|_| (draw.vector(n), draw.vector(n))).collect();
-    let theta = Constitution::initial(&field, Steps::campaign_one(), OPEN_BUDGET)
+    let theta = Constitution::initial(&field, OPEN_BUDGET)
         .unwrap()
         .with_ports(ring, Some(draw.vector(n)), None, None)
         .unwrap()

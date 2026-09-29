@@ -17,7 +17,7 @@ use crate::compression::landmark::context::{
     Landmarks, Letter, LetterFamily, Widths, address, letter_address,
 };
 use crate::hnn::HnnError;
-use crate::hnn::constitution::{CAMPAIGN_ONE_BUDGET, Constitution, Locus, Steps};
+use crate::hnn::constitution::{CAMPAIGN_ONE_BUDGET, Constitution, Locus};
 use crate::hnn::field::{ConstitutionRead, Current, Field, FieldDeclaration, ReceiverDeclaration};
 use crate::hnn::keys;
 use crate::hnn::pending::PendingRatio;
@@ -145,14 +145,13 @@ fn the_phase_address_is_the_trees_causal_address() {
 /// and source port `E_0` the declared sign sequence times ½ (entries `±½`).
 #[test]
 fn the_field_declares_the_tree_and_codes_it() {
-    let steps = Steps::campaign_one();
     let deep = chain();
     let mut shallow = chain_declaration(1 << 20);
     shallow.receivers[0].depth = 1;
     let shallow = Field::declare(shallow).unwrap();
     assert_ne!(
-        deep.describe(&steps, OPEN_BUDGET, 64),
-        shallow.describe(&steps, OPEN_BUDGET, 64)
+        deep.describe(OPEN_BUDGET, 64),
+        shallow.describe(OPEN_BUDGET, 64)
     );
     let campaign = Field::declare(FieldDeclaration::campaign_one(6_148)).unwrap();
     assert_eq!(campaign.receivers()[0].depth, 4);
@@ -165,7 +164,7 @@ fn the_field_declares_the_tree_and_codes_it() {
     assert_eq!((declared.population, declared.grain), (6_148, 16));
     let widths = Widths::derived(&declared);
     assert_eq!((widths.digits, widths.face, widths.carrier), (8, 39, 29));
-    let theta = Constitution::initial(&campaign, steps, CAMPAIGN_ONE_BUDGET).unwrap();
+    let theta = Constitution::initial(&campaign, CAMPAIGN_ONE_BUDGET).unwrap();
     let tree = theta.landmarks(2).unwrap();
     assert_eq!(tree.declaration(), &declared);
     assert_eq!((tree.nodes(), tree.passed()), (0, 0));
@@ -347,7 +346,7 @@ fn the_compare_deposits_its_targets_on_their_own_addresses() {
 fn the_wave_is_inert_when_every_map_opens_at_zero() {
     let field = chain();
     let a = field.alphabet();
-    let initial = Constitution::initial(&field, Steps::campaign_one(), OPEN_BUDGET).unwrap();
+    let initial = Constitution::initial(&field, OPEN_BUDGET).unwrap();
     let silent = initial
         .with_ports(0, None, Some(ExactRatMatrix::zero(4, a).unwrap()), None)
         .unwrap();
@@ -678,7 +677,7 @@ fn the_receiving_face_codes_within_one_bit_of_the_better_face() {
             .collect(),
         held_out: std::iter::once(length - 4..length).collect(),
     };
-    let exposure = Reference::new(64, Steps::campaign_one(), OPEN_BUDGET)
+    let exposure = Reference::new(64, OPEN_BUDGET)
         .expose(&field, &cut)
         .unwrap();
     assert!(exposure.complete, "every window deposited");
@@ -1046,7 +1045,7 @@ fn the_contact_letters_are_read_from_the_register_before_the_cell_they_predict()
     use crate::hnn::contact::{LockDeclaration, contact_readings, site_kinds};
     use crate::navigator::trace::SiteKind;
     let field = campaign_field();
-    let theta = Constitution::initial(&field, Steps::campaign_one(), OPEN_BUDGET).unwrap();
+    let theta = Constitution::initial(&field, OPEN_BUDGET).unwrap();
     let width = field.contact(0).width();
     let boosted = theta
         .clone()

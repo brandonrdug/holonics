@@ -6,7 +6,7 @@ use super::learning::{OPEN_BUDGET, chain_declaration, generic};
 use super::support::{Draw, chorded_field, contact, ring, small_field};
 use crate::geometry::RatVec3;
 use crate::hnn::HnnError;
-use crate::hnn::constitution::{Constitution, Locus, Steps};
+use crate::hnn::constitution::{Constitution, Locus};
 use crate::hnn::field::ConstitutionRead;
 use crate::hnn::field::{Current, End, Field, FieldDeclaration};
 use crate::hnn::moment::capacity;
@@ -397,14 +397,13 @@ fn the_field_reads_its_clock_torus_and_pair_geometry() {
 }
 
 /// The one exact code: every declared value changes it, the tree's stop-weight law, the
-/// constitution's declared steps, budget and the pending capacity included (review D3), and it is
-/// self-delimiting per field.
+/// constitution's budget and the pending capacity included (review D3), and it is self-delimiting
+/// per field. No step is declared: every locus's step is certified (`hnn::constitution`).
 #[test]
 fn describe_is_the_fields_exact_code() {
     let field = Field::declare(chain_declaration(1 << 20)).unwrap();
-    let steps = Steps::campaign_one();
     let (budget, pending) = (crate::hnn::constitution::CAMPAIGN_ONE_BUDGET, 64);
-    let describe = |field: &Field| field.describe(&steps, budget, pending);
+    let describe = |field: &Field| field.describe(budget, pending);
     let code = describe(&field);
     assert!(!code.is_empty());
     let mut declared = chain_declaration(1 << 20);
@@ -421,10 +420,8 @@ fn describe_is_the_fields_exact_code() {
     let mut declared = chain_declaration(1 << 20);
     declared.contacts[1].admittance = integer(3);
     assert_ne!(describe(&Field::declare(declared).unwrap()), code);
-    let slower = Steps { factor: rat(1, 4) };
-    assert_ne!(field.describe(&slower, budget, pending), code);
-    assert_ne!(field.describe(&steps, budget / 2, pending), code);
-    assert_ne!(field.describe(&steps, budget, pending + 1), code);
+    assert_ne!(field.describe(budget / 2, pending), code);
+    assert_ne!(field.describe(budget, pending + 1), code);
     assert_eq!(
         describe(&Field::declare(chain_declaration(1 << 20)).unwrap()),
         code
@@ -562,7 +559,7 @@ fn the_field_holon_is_a_read_only_holarchy_of_rings_and_contacts() {
             );
         }
     }
-    let initial = Constitution::initial(&field, Steps::campaign_one(), OPEN_BUDGET).unwrap();
+    let initial = Constitution::initial(&field, OPEN_BUDGET).unwrap();
     let other = field.holarchy(&initial).unwrap();
     assert_ne!(other.whole().active(), whole.active());
     // A singular contact storage has no momentum chart and is refused, not pseudo-inverted.

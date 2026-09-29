@@ -160,7 +160,7 @@ use crate::hnn::HnnError;
 use crate::hnn::chart::{ChartReading, ChartStart, Charts, Remainders};
 use crate::hnn::constitution::{
     CAMPAIGN_ONE_BUDGET, CarrierBits, Constitution, DepositReading, FactorGradient, FactorStep,
-    LandmarkStep, LinearLocus, LinearStep, Locus, Reach, Sample, Steps,
+    Family, LandmarkStep, LinearLocus, LinearStep, Locus, Reach, Sample,
 };
 use crate::hnn::contact::{SiteReading, site_readings};
 use crate::hnn::field::{ConstitutionRead, Current, Field};
@@ -686,26 +686,25 @@ impl Resident {
 // the reference
 
 /// [definition] **The exact host reference** of the execution port, with its declared pending
-/// capacity, steps and constitution budget, and an exposure's deadline if one is set.
+/// capacity and constitution budget, and an exposure's deadline if one is set. No step is declared:
+/// every locus's step is certified at its deposit (`hnn::constitution`).
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct Reference {
     pending_capacity: usize,
-    steps: Steps,
     budget: u64,
     deadline: Option<u64>,
 }
 
 impl Reference {
-    /// Campaign 1's declarations: `η_x = 1/2` (the normal laws' steps are certified at every
-    /// deposit), `B_Θ = 2^33`, and a pending capacity of 64.
+    /// Campaign 1's declarations: `B_Θ = 2^33` and a pending capacity of 64 (every locus's step
+    /// certified at every deposit).
     pub fn campaign_one() -> Self {
-        Self::new(64, Steps::campaign_one(), CAMPAIGN_ONE_BUDGET)
+        Self::new(64, CAMPAIGN_ONE_BUDGET)
     }
 
-    pub fn new(pending_capacity: usize, steps: Steps, budget: u64) -> Self {
+    pub fn new(pending_capacity: usize, budget: u64) -> Self {
         Self {
             pending_capacity,
-            steps,
             budget,
             deadline: None,
         }
@@ -832,7 +831,7 @@ impl ExecutionPort for Reference {
     }
 
     fn mount(&self, field: &Field, current: &Current) -> Result<Resident, HnnError> {
-        let constitution = Constitution::initial(field, self.steps.clone(), self.budget)?;
+        let constitution = Constitution::initial(field, self.budget)?;
         self.mount_with(field, current, constitution)
     }
 
@@ -1819,26 +1818,50 @@ pub fn compose_return(
     let mut ring_pullbacks = Vec::with_capacity(parts.len());
     let mut classes_all: Vec<Vec<Rat>> = Vec::with_capacity(parts.len());
     let mut midpoint_energy: Vec<Rat> = Vec::with_capacity(parts.len());
+    let mut element_covector: Vec<Rat> = Vec::with_capacity(parts.len());
     for part in parts {
         linear.extend(part.contrast);
         factors.extend(part.factors);
         ring_pullbacks.push(part.pullback);
         classes_all.push(part.classes);
         midpoint_energy.push(part.energy);
+        element_covector.push(part.covector);
     }
 
     // The standing, through the declared lock chart: Δ = M q with the contrast map `M`, which is
-    // symmetric, so ∂ℓ/∂q = Mᵀ g_σ = M g_σ ([`Field::contrast`]).
+    // symmetric, so ∂ℓ/∂q = Mᵀ g_σ = M g_σ ([`Field::contrast`]). A move of `q_g` moves the
+    // contrast of `g` and of the other end of each contact at `g`: its chart's reach, each ring with
+    // its element window's energy, and its covector scale the largest of their elements' adjoints
+    // (`hnn::constitution`, "The factor families' certified step").
     let class_fields: Vec<&[Rat]> = classes_all.iter().map(Vec::as_slice).collect();
     let standings = indexed(field.rings().len(), |g| field.contrast(g, &class_fields))?;
     for (g, standing) in standings.into_iter().enumerate() {
         if retained(Locus::Standing(g)) {
+            let mut rings = vec![g];
+            for contact in field.contacts() {
+                let (from, to) = contact.ends();
+                for (end, other) in [(from, to), (to, from)] {
+                    if end == g && !rings.contains(&other) {
+                        rings.push(other);
+                    }
+                }
+            }
+            let covector = rings
+                .iter()
+                .map(|&r| element_covector[r].clone())
+                .max()
+                .unwrap_or_else(Rat::zero);
             factors.push(FactorStep {
                 gradient: FactorGradient::Standing {
                     ring: g,
                     gradient: negated(&standing),
+                    reach: rings
+                        .iter()
+                        .map(|&r| (r, midpoint_energy[r].clone()))
+                        .collect(),
                 },
                 energy: midpoint_energy[g].clone(),
+                covector,
             });
         }
         ring_pullbacks[g].standing = standing;
@@ -1957,6 +1980,15 @@ pub fn compose_return(
                 current_reads.push(current_read);
                 earlier_reads.push(earlier_read);
             }
+            // The covector one phase's injection carries: the turned opening at each phase the
+            // offset moment occupies.
+            let covector = nonzero
+                .iter()
+                .zip(&turned)
+                .filter(|(slots, _)| !slots.is_empty())
+                .flat_map(|(_, h)| h.iter().map(Signed::abs))
+                .max()
+                .unwrap_or_else(Rat::zero);
             pair_steps.push(FactorStep {
                 gradient: FactorGradient::PairPort {
                     ring: g,
@@ -1966,6 +1998,7 @@ pub fn compose_return(
                     earlier: earlier_reads.iter().map(|x| negated(x)).collect(),
                 },
                 energy,
+                covector,
             });
             pair_pullbacks.push((offset, [outputs, current_reads, earlier_reads]));
         }
@@ -2009,11 +2042,18 @@ pub fn compose_return(
         let mut loss_gradients = std::array::from_fn(|_| Rat::zero());
         let mut energies = std::array::from_fn(|_| Rat::zero());
         let mut reached = false;
+        // The covector one tick carries at the resolvent's right-hand side, its solved `r̄`.
+        let mut covector = Rat::zero();
         for tick in ticks {
             if !diamond.element_window(g, tick.tick) {
                 continue;
             }
             reached = true;
+            for value in &tick.solved {
+                if value.abs() > covector {
+                    covector = value.abs();
+                }
+            }
             let hω = scale(&(&h / integer(2)), &tick.rate);
             let midpoint = add(&tick.displacement, &hω);
             let w_minus_ω = sub(&tick.velocity, &tick.rate);
@@ -2064,6 +2104,7 @@ pub fn compose_return(
                         gradient: -loss_gradients[family].clone(),
                     },
                     energy: energies[family].clone(),
+                    covector: covector.clone(),
                 });
             }
         }
@@ -2114,6 +2155,8 @@ pub fn compose_return(
 struct RingPart {
     contrast: Option<LinearStep>,
     factors: Vec<FactorStep>,
+    /// The largest entry of an adjoint `u_t` in the element's window (its families' covector scale).
+    covector: Rat,
     pullback: RingPullback,
     classes: Vec<Rat>,
     energy: Rat,
@@ -2222,9 +2265,17 @@ fn compose_ring(
     }
     let mut energy = Rat::zero();
     let mut contrast_samples = Vec::new();
+    // The covector one tick carries at the element's drive, its adjoint `u_t`: the element's
+    // families' covector scale, as the contrast port's samples carry it.
+    let mut covector = Rat::zero();
     for tick in ticks {
         if diamond.element_window(g, tick.tick) {
             energy += dot(&tick.midpoint, &tick.midpoint);
+            for value in &tick.adjoint {
+                if value.abs() > covector {
+                    covector = value.abs();
+                }
+            }
             contrast_samples.push(Sample {
                 weight: one.clone(),
                 feature: tick.contrast.clone(),
@@ -2252,6 +2303,7 @@ fn compose_ring(
                 )?,
             },
             energy: energy.clone(),
+            covector: covector.clone(),
         });
         factors.push(FactorStep {
             gradient: FactorGradient::Slices {
@@ -2262,11 +2314,13 @@ fn compose_ring(
                     .collect(),
             },
             energy: energy.clone(),
+            covector: covector.clone(),
         });
     }
     Ok(RingPart {
         contrast,
         factors,
+        covector,
         pullback: RingPullback {
             ring: g,
             passive: matrix_of(passive_gradient, passive.columns())?,
@@ -2309,9 +2363,14 @@ fn compose_contact(
         let (r, u, w, omega) = (&tick.solved, &tick.displacement, &tick.rate, &tick.midpoint);
         let slip: Vec<Rat> = w.iter().zip(omega).map(|(w, o)| w - o).collect();
         let strain = add(u, &scale(&half_h, omega));
-        let energies = diamond
-            .channel_window(field, a, tick.tick)
-            .then(|| [dot(&slip, &slip), dot(&strain, &strain), dot(omega, omega)]);
+        // The window's energies, and the covector the tick carries at the transit's right-hand
+        // side, its solved `r̄` (the channel's families' covector scale).
+        let energies = diamond.channel_window(field, a, tick.tick).then(|| {
+            (
+                [dot(&slip, &slip), dot(&strain, &strain), dot(omega, omega)],
+                r.iter().map(Signed::abs).max().unwrap_or_else(Rat::zero),
+            )
+        });
         Ok((
             [
                 integral(r),
@@ -2323,13 +2382,17 @@ fn compose_contact(
         ))
     })?;
     let mut energies = [Rat::zero(), Rat::zero(), Rat::zero()];
+    let mut covector = Rat::zero();
     let mut window = false;
     let mut charts: Vec<[Chart; 4]> = Vec::with_capacity(read.len());
     for (chart, terms) in read {
-        if let Some(terms) = terms {
+        if let Some((terms, widest)) = terms {
             window = true;
             for (energy, term) in energies.iter_mut().zip(terms) {
                 *energy += term;
+            }
+            if widest > covector {
+                covector = widest;
             }
         }
         charts.push(chart);
@@ -2365,6 +2428,7 @@ fn compose_contact(
                 gradient: descent(0)?,
             },
             energy: energies[0].clone(),
+            covector: covector.clone(),
         });
         steps.push(FactorStep {
             gradient: FactorGradient::Stiffness {
@@ -2372,6 +2436,7 @@ fn compose_contact(
                 gradient: descent(1)?,
             },
             energy: energies[1].clone(),
+            covector: covector.clone(),
         });
         steps.push(FactorStep {
             gradient: FactorGradient::Dissipation {
@@ -2379,6 +2444,7 @@ fn compose_contact(
                 gradient: descent(2)?,
             },
             energy: energies[2].clone(),
+            covector,
         });
     }
     // λ_Q: G_a = 2^(−β Q / 2) Y_a, so ∂ℓ/∂Q = −(β/2) G_a λ_G in units of ln 2.
@@ -2533,7 +2599,7 @@ pub struct StateReport {
 /// whose lattice coordinate moved), and each contact's site reading at the commit (campaign 2's
 /// contact-kind census, `hnn::contact::site_readings`, certified from the factors in one prime
 /// chart and read exactly otherwise: the kinds a register refreshed after the next ingest reads),
-/// the deposit's certified steps (each stepped linear locus with its exponent `k`, the step `2^k`)
+/// the deposit's certified steps (each stepped family at its locus with its exponent `k`, the step `2^k`)
 /// and its certified storage growth `ε_k`. The mount's point releases and steps nothing.
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct CurvePoint {
@@ -2542,7 +2608,7 @@ pub struct CurvePoint {
     pub released_bits: u64,
     pub stepped: u64,
     pub contacts: Vec<SiteReading>,
-    pub steps: Vec<(Locus, i64)>,
+    pub steps: Vec<(Locus, Family, i64)>,
     pub storage_growth: Rat,
 }
 
@@ -2553,7 +2619,7 @@ pub struct CurvePoint {
 /// was open at their cut against all windows read (the refine receipt's located cause, review C2),
 /// the peak bits of the change inside any word, the budget stop, the deadline, the description bits
 /// (`Field::describe` plus the constitution's self-delimiting campaign-2 material declaration; the
-/// field code includes its declared steps, budget and pending capacity), the final resonator gains,
+/// field code includes its step rule, budget and pending capacity), the final resonator gains,
 /// the located keys' bits (`⌈log₂ d_g⌉` per published key: the model pays for what
 /// learning located) and `Kt = |describe| + key bits + L_target|model + ⌈log₂ work⌉` against the
 /// literal over the cells read, the work counted and the state against the source. The run is
@@ -2812,7 +2878,7 @@ fn code_baselines(baselines: &mut Baselines, bits: &mut Bits, code: usize) -> Re
 
 impl Reference {
     /// **Run campaign 1's exposure protocol on a cut** and read its measurement (module header):
-    /// [`expose`] on this reference, at its declared steps, budget, pending capacity and deadline.
+    /// [`expose`] on this reference, at its declared budget, pending capacity and deadline.
     /// The admitted family is the field's declared receivers throughout. Refused unless the cut is
     /// exactly the field's declared population, which `Field::declare` checked against `n*`. Under a
     /// deadline ([`Reference::with_deadline`]) the reading stops after that many receiving windows.
@@ -2820,7 +2886,6 @@ impl Reference {
         expose(
             self,
             &Declared {
-                steps: &self.steps,
                 budget: self.budget,
                 pending_capacity: self.pending_capacity,
                 deadline: self.deadline,
@@ -2842,7 +2907,6 @@ impl Reference {
         expose_from(
             self,
             &Declared {
-                steps: &self.steps,
                 budget: self.budget,
                 pending_capacity: self.pending_capacity,
                 deadline: self.deadline,
@@ -2901,12 +2965,11 @@ impl ExposedResident for Resident {
     }
 }
 
-/// [definition] **The declarations an exposure reads off its port**: the constitution's steps and
-/// budget and the pending capacity (which [`Field::describe`] codes), and the deadline in windows
+/// [definition] **The declarations an exposure reads off its port**: the constitution's budget and
+/// the pending capacity (which [`Field::describe`] codes), and the deadline in windows
 /// ([`Reference::with_deadline`]).
 #[derive(Clone, Copy, Debug)]
-pub struct Declared<'a> {
-    pub steps: &'a Steps,
+pub struct Declared {
     pub budget: u64,
     pub pending_capacity: usize,
     pub deadline: Option<u64>,
@@ -2917,7 +2980,7 @@ pub struct Declared<'a> {
 /// run, so their readouts are comparable line for line.
 pub fn expose<P>(
     port: &P,
-    declared: &Declared<'_>,
+    declared: &Declared,
     field: &Field,
     cut: &Cut,
 ) -> Result<Exposure, HnnError>
@@ -2939,7 +3002,7 @@ where
 /// Continue the standard exposure protocol from an already mounted resident.
 pub fn expose_from<P>(
     port: &P,
-    declared: &Declared<'_>,
+    declared: &Declared,
     field: &Field,
     cut: &Cut,
     mut resident: P::Resident,
@@ -3136,7 +3199,9 @@ where
                                     reading
                                         .steps
                                         .iter()
-                                        .map(|(locus, step)| (*locus, step.step.exponent))
+                                        .map(|(locus, step)| {
+                                            (*locus, step.family, step.step.exponent)
+                                        })
                                         .collect(),
                                     reading.storage_growth.clone(),
                                 )
@@ -3190,7 +3255,7 @@ where
         position = end;
     }
     let description_bits = field
-        .describe(declared.steps, declared.budget, declared.pending_capacity)
+        .describe(declared.budget, declared.pending_capacity)
         .len() as u64
         + declared_physics_bits;
     let key_bits: u64 = keys

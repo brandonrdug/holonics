@@ -1,8 +1,8 @@
 //! **The constitution `Θ`: its one owner, per locus and factored, and its deposition.**
 //!
 //! [definition] `Θ` is the medium (design (a), "The one object"). [`Constitution`] is its one owner:
-//! every learned map, the standings `q` included, the factor families' declared step `η_x`, a commit
-//! counter and the bit budget `B_Θ`; the normal laws' steps are certified at each deposit ("The
+//! every learned map, the standings `q` included, a commit counter and the bit budget `B_Θ`; every
+//! locus's step, a normal law's and a factor family's alike, is certified at each deposit ("The
 //! certified step" below). Its fields are private; only [`Constitution::deposited`] (the
 //! successor of a staged deposit) and the collapse at an aeon boundary change it (guard 4). It holds
 //! the current parameters and their normal statistics, and no list of deposits, updates, gradients
@@ -72,14 +72,71 @@
 //! the same at its ring; each passive tick keeps the power and a contrast port's tick multiplies it
 //! by at most `(1 + ω)²`. The gains are read at the end of each ray (the triangle bound on the
 //! Schur norms, `‖R + ηD‖₁ ≤ ‖R‖₁ + η‖D‖₁`), so a step that raises another locus's gain is halved
-//! until every certificate holds at its own ray (the projection; [`Constitution::deposited`]). A
-//! pumped resonator has no certified growth (the Floquet bound is owed in #62): a linear step
-//! through it is refused ([`HnnError::UncertifiedGain`]). [scope] The certificate is the
-//! Gauss–Newton curvature of the section's score along each locus's step, the other loci's moves
-//! entering through `B`; the model's own second-order terms (the bilinear coupling of `R` and `E`,
-//! a contrast port acting on its own downstream contrast) and the factor families' steps (their
-//! carriers are squares, `η_x / h_x`) are not certified here: their statements are owed in #62. The
-//! executed word's deviation from the exact law is the lattice word's certificate (owed in #62).
+//! until every certificate holds at its own ray (the projection; [`Constitution::deposited`]). The
+//! gains assume the medium passive but for the contrast ports, whose growth `(1 + ω)²` they carry:
+//! a pumped resonator has no certified growth (the Floquet bound is owed in #62), and a declared
+//! boost's signed stiffness stores indefinite energy, so no step is certified through either
+//! ([`HnnError::UncertifiedGain`], [`HnnError::ActiveContact`]).
+//!
+//! [definition; agent-inferred, September 29] **The factor families' certified step** (the
+//! [factor step's record](../../../../research/records/2026-09-29_THE_FACTOR_FAMILIES_CERTIFIED_STEP_PINNED_BEFORE_ITS_RUNS.md);
+//! Lean `Holon/Deposition.{factor_unit_step_alignment, square_ray_move, square_ray_deriv_bound,
+//! contracting_resolvent, transit_difference_power}`). The declared factor step `η_x = ½` is
+//! retired: it moved the standing past the entry bound on text and grew a contact's storage by up to
+//! `2²⁸` in one deposit. A factor family `x` steps by the same certificate as a linear locus, in the
+//! same loop and the same count `B`. Its metric is its carried statistic `h_x′ = h_x + e` (`e`, the
+//! feature energy its window adds), so its unit step is `D = G_x / h_x′`:
+//!
+//! ```text
+//! a = ⟨G_x, D⟩ = |G_x|² / h_x′          checked ≥ 0 (factor_unit_step_alignment)
+//! c = max_t |g_t|_∞                     the covector one return carries at the family's output (FactorStep::covector)
+//! C = B · s · κ²_ℓ · b(η)               b(η) the output's moves along the whole ray [0, η], read at its end
+//! η = the largest 2^k with ηC ≤ a and ηc ≤ 1, halved with every other locus until each certificate holds
+//! ```
+//!
+//! Each family's output is its carriers applied to its feature, so its moves read the Schur test
+//! `S(X) = ‖X‖₁‖X‖_∞ ≥ ‖X‖₂²` on the unit step and on the factor at the ray's end,
+//! `S(X + ηD) ≤ (‖X‖₁ + η‖D‖₁)(‖X‖_∞ + η‖D‖_∞)` (the square's move along its ray,
+//! `square_ray_deriv_bound`: `‖∂_t (x + tD)(x + tD)ᵀ‖ ≤ 2‖D‖(‖x‖ + η‖D‖)`):
+//!
+//! ```text
+//! family          output per return                    b(η)                                                          κ²
+//! f_g             −f fᵀ x̄_t                            4 S(D) S(f + ηD) e                                            the element's at g
+//! (u_ρ, v_ρ)_g    Σ_ρ σ_ρ(u_ρv_ρᵀ − v_ρu_ρᵀ) x̄_t        8 (S(dU) S(V + η dV) + S(U + η dU) S(dV)) e                   the element's at g
+//! q_g             Σ_ρ (M D)_ρ A_ρ,r x̄_t,r (lock chart)  4 |D|²_∞ Σ_r S(U_r) S(V_r) e_r over its chart's rings r        N_g · max_r the element's at r
+//! c_a, b_a, F_a   2 c cᵀ(w − ω), h b bᵀ(u + ½hω), h F Fᵀ ω   (16, 4h², 4h²) · S(D) S(x + ηD) e                     the channel's at a
+//! g_(r,i)         g_i² × base_i                         |D|² e ((|g_i| + η|D|) / |g_i|)²,  e from ∂(output)/∂g_i        the resonator's at r
+//! (e, a, b)_(g,o) Σ_ρ e_ρ a_ρᵀ M_c b_ρ                   3 k e Σ_ρ (|De_ρ|² A_ρ B_ρ + E_ρ |Da_ρ|² B_ρ + E_ρ A_ρ |Db_ρ|²)   the source's at g
+//! ```
+//!
+//! with `X_ρ = 2|x_ρ|² + 2η²|Dx_ρ|²` for `x ∈ {e, a, b}` (`|x + tDx|² ≤ X_ρ` on the ray), `k` the pair
+//! port's rank, `N_g` the rings of the standing's lock chart whose term is nonzero (their moves add by
+//! Cauchy–Schwarz), and `M` the contrast map, whose blocks are coordinate matchings, so
+//! `|(M D)_r|_∞ ≤ |D|_∞`. A channel's and a loaded resonator's output is the right-hand side of their
+//! solve `m ζ = r`, `m ⪰ 1` (so `|δζ| ≤ |δr|`, `contracting_resolvent`), whose difference state carries
+//! at most `P |δζ|²` (`transit_difference_power`):
+//!
+//! ```text
+//! channel a      κ² = ‖R‖² (4 / (h Y_R)) P_a Σ_j Σ_(τ < T_j) (1+ω)^(2(T_j − τ − 1)),   P_a = G_a/(2h) + ½ (G_a/h)² ‖C_a‖ + ⅛ G_a² ‖K_a‖
+//! resonator r    the channel's with G = 2Y_r (one port of admittance Y_r)
+//! ```
+//!
+//! `G_a ≤ Y_a` at every lift when `β_a ≥ 0` (`G_a = 2^(−β_a Q_a/2) Y_a`, `Q_a ≥ 0`); a channel family
+//! through a contact with `β_a < 0` is refused ([`HnnError::UncertifiedConductance`]). The storage
+//! norms are read at their families' rays. The element's gain is the contrast port's
+//! (`(h/4)Y_r|δs|²` is its output's power, the element's solve `(I − ½K)⁻¹` a contraction), so the
+//! standing's is read at each ring its lock chart moves. The standing's certificate holds in its
+//! declared lock chart (Lean `HNN/Normal.standing_deposit`), where the element reads the contrast's
+//! move as its classes' tangent; the element itself reads only the classes, so a class that crosses
+//! its fold jumps, which no curvature bounds (owed in #62). No part of this reads a codec, an alphabet
+//! or a terrain.
+//!
+//! [scope] The certificate is the Gauss–Newton curvature of the section's score along each locus's
+//! step, the other loci's moves entering through `B`; the model's own second-order terms (the
+//! bilinear coupling of `R` and `E`, a contrast port acting on its own downstream contrast, a square
+//! factor's own `2D Dᵀ` along its ray, the element's and the transit's resolvents differentiated
+//! twice) are not certified here: their statements are owed in #62. The executed word's deviation
+//! from the exact law is the lattice word's certificate (owed in #62).
 //!
 //! [definition; agent-inferred, September 29] **The committed energy bound, enforced at the
 //! commit** (Lean `Holon/Deposition.{committed_energy_bound, active_element_growth}`). The storage
@@ -215,6 +272,7 @@
 //! | `HNN/Normal.reaction_deposit_storage_unchanged`, `reaction_deposits_keep_committed_energy`; `Holon/Deposition.committed_energy_bound` | [`DepositReading::storage_growth`], [`Constitution::storage_product`] (refused when uncertified: [`HnnError::UncertifiedStorage`]) |
 //! | `Holon/Deposition.{certified_step_descends, quadratic_upper_model, gauss_newton_curvature, joint_cauchy_schwarz}`, `HNN/Normal.certified_normal_step` | [`NormalLaw::prepare`] (the unit step and its readings), [`Constitution::deposited`] (the certified steps: [`StepReading`]) |
 //! | `Holon/Deposition.{active_element_growth, active_energy_growth}` | [`Constitution::amplitude`] (the per-tick growth `1 + ω`) |
+//! | `Holon/Deposition.{factor_unit_step_alignment, square_ray_move, square_ray_deriv_bound, contracting_resolvent, transit_difference_power}` with `certified_step_descends`, `gauss_newton_curvature` | the factor families' certified step ([`FactorStep`], [`Family`], [`StepReading`], [`Constitution::deposited`]) |
 //! | `HNN/Normal.factorCarrier_psd` | the factor families ([`FactorGradient`]) |
 //! | `HNN/Normal.standing_deposit`, `sheetClass_locally_constant` | [`FactorGradient::Standing`] |
 //! | `HNN/LatticeDeposit.{quot, rem, div_rem_spec, rem_bounds, quot_eq_zero_of_bounds, fine}` | [`Lattice::div_rem`] (the carry's fine split), [`Lattice::div_rem_coordinate`] (its coarse split) |
@@ -246,7 +304,7 @@ use crate::hnn::realization::{indexed, outer_integral};
 use crate::hnn::receiving::{ReceivingStep, landmark_declaration, receiving_population};
 use crate::hnn::ring::ResonatorMaterial;
 use crate::holon::deposition::{
-    CertifiedStep, CommittedEnergyBound, power, schur_norms, sqrt_ceiling,
+    CertifiedStep, CommittedEnergyBound, schur_norms, significant, sqrt_ceiling,
 };
 use crate::ratio::linear::vector::{
     Chart, IntegralMatrix, integer_dot, integral, lcm, matrix_form,
@@ -697,21 +755,6 @@ impl Locus {
 
 // -------------------------------------------------------------------------------------------
 // steps
-
-/// [definition] **The declared steps**: the factor families' step `η_x` (recorded in the field's
-/// description by the caller). The normal laws' declared proxy step `γ_U` was retired on
-/// September 29: their step is certified at every deposit (module header, "The certified step").
-#[derive(Clone, Debug, PartialEq, Eq)]
-pub struct Steps {
-    pub factor: Rat,
-}
-
-impl Steps {
-    /// Campaign 1: `η_x = 1/2`.
-    pub fn campaign_one() -> Self {
-        Self { factor: rat(1, 2) }
-    }
-}
 
 // -------------------------------------------------------------------------------------------
 // the solved chart
@@ -2020,15 +2063,14 @@ pub enum Carrier {
 
 type Carries = BTreeMap<(Locus, Carrier), Carry>;
 
-/// `h_x' = h_x + Σ w|f|²`, carried on the family's lattice; the step's rate `η_x / h_x'`, refused
-/// when the carried statistic is not positive.
+/// `h_x' = h_x + Σ w|f|²`, carried on the family's lattice: the family's metric, whose unit step is
+/// `G_x / h_x'`. Refused when the carried statistic is not positive.
 fn advance(
     carries: &mut Carries,
     at: &mut BudgetedCarry,
     key: (Locus, Carrier),
     scale: &mut Rat,
     energy: &Rat,
-    eta: &Rat,
 ) -> Result<Rat, HnnError> {
     carries
         .entry(key)
@@ -2040,7 +2082,7 @@ fn advance(
             statistic: scale.clone(),
         });
     }
-    Ok(eta / &*scale)
+    Ok(scale.clone())
 }
 
 /// Carry `rate · delta` onto a family of vectors, flat in row order.
@@ -2122,8 +2164,15 @@ pub enum FactorGradient {
         gradient: Vec<(Vec<Rat>, Vec<Rat>)>,
     },
     /// The standing `q_g`, through the declared lock chart (the class covector carried by the
-    /// transpose of the contrast map `q ↦ Δ`).
-    Standing { ring: usize, gradient: Vec<Rat> },
+    /// transpose of the contrast map `q ↦ Δ`), with its chart's **reach**: every ring whose contrast
+    /// a move of `q_g` moves (`g` and the other ends of its contacts), each with its element
+    /// window's energy `Σ_t |x̄_t|²`, which the certified step's curvature reads (module header,
+    /// "The factor families' certified step").
+    Standing {
+        ring: usize,
+        gradient: Vec<Rat>,
+        reach: Vec<(usize, Rat)>,
+    },
     /// One squared scalar amplitude of a declared resonator base form: `C`, `K`, `D`, or pump.
     Resonator {
         ring: usize,
@@ -2190,14 +2239,54 @@ impl FactorGradient {
             | FactorGradient::Dissipation { contact, .. } => Locus::Channel(contact),
         }
     }
+
+    /// The family the step moves at its locus.
+    pub fn family(&self) -> Family {
+        match *self {
+            FactorGradient::Passive { .. } => Family::Passive,
+            FactorGradient::Slices { .. } => Family::Slices,
+            FactorGradient::Standing { .. } => Family::Standing,
+            FactorGradient::Resonator { family, .. } => Family::Resonator(family),
+            FactorGradient::PairPort { offset, .. } => Family::Pair(offset),
+            FactorGradient::Storage { .. } => Family::Factor(0),
+            FactorGradient::Stiffness { .. } => Family::Factor(1),
+            FactorGradient::Dissipation { .. } => Family::Factor(2),
+        }
+    }
 }
 
-/// [definition] **One factor step**: the family's descent direction and the feature energy
-/// `Σ_t w|f_t|²` its window adds to the family's statistic `h_x`.
+/// [definition] **The family a certified step moves at its locus**: a normal law's map (`E_g`, `R`,
+/// `W_c`), or one factor family (module header, "The factor families' certified step").
+#[derive(Clone, Copy, Debug, PartialEq, Eq, PartialOrd, Ord, Hash)]
+pub enum Family {
+    /// A normal law's map `W`.
+    Map,
+    /// The element's passive factor `f` (`W_s = −f fᵀ`).
+    Passive,
+    /// The element's skew slices `(u_ρ, v_ρ)`.
+    Slices,
+    /// The standing `q`, through its lock chart.
+    Standing,
+    /// A loaded resonator's gain: `C`, `K`, `D` or pump.
+    Resonator(usize),
+    /// The pair port at its declared offset.
+    Pair(usize),
+    /// A channel's storage `c`, stiffness `b` or dissipation `F` (0, 1, 2).
+    Factor(usize),
+}
+
+/// [definition] **One factor step**: the family's descent direction `G_x`, the feature energy
+/// `e = Σ_t w|f_t|²` its window adds to the family's statistic `h_x`, and the **covector scale**
+/// `c = max_t |g_t|_∞`, the largest entry of the covector one return carries at the family's output
+/// (the element's adjoint `u_t` for the element's families and the standing, the transit's solved
+/// `r̄_t` for a channel's and a resonator's, the turned opening at a phase for a pair port), which
+/// the certified step reads as the linear loci read theirs (module header, "The factor families'
+/// certified step").
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct FactorStep {
     pub gradient: FactorGradient,
     pub energy: Rat,
+    pub covector: Rat,
 }
 
 /// [definition; agent-inferred] **A deposit's reach** (module header, "The certified step"): what
@@ -2219,6 +2308,7 @@ impl Reach {
     /// `Σ_j (Σ_(n: T_n ≤ T_j) g^(T_j − T_n))²`: the re-entries' amplitude gains summed at every
     /// station, for a per-tick amplitude growth `g`.
     fn entry_gain(&self, growth: &Rat) -> Rat {
+        let powers = Self::powers(growth, self.stations.iter().max().map_or(0, |t| t + 1));
         self.stations
             .iter()
             .map(|&station| {
@@ -2226,7 +2316,7 @@ impl Reach {
                     .entries
                     .iter()
                     .filter(|&&entry| entry <= station)
-                    .map(|&entry| power(growth, station - entry))
+                    .map(|&entry| powers[(station - entry) as usize].clone())
                     .sum();
                 &sum * &sum
             })
@@ -2235,20 +2325,41 @@ impl Reach {
 
     /// `Σ_j Σ_(τ < T_j) g^(2(T_j − τ − 1))`: every tick's energy gain to every station.
     fn tick_gain(&self, growth: &Rat) -> Rat {
-        let square = growth * growth;
+        let top = self.stations.iter().max().copied().unwrap_or(0);
+        let powers = Self::powers(&(growth * growth), top);
+        // `sums[t] = Σ_(k < t) g^(2k)`.
+        let mut sums = Vec::with_capacity(top as usize + 1);
+        sums.push(Rat::zero());
+        for power in &powers {
+            let next = sums.last().expect("seeded") + power;
+            sums.push(next);
+        }
         self.stations
             .iter()
-            .map(|&station| (0..station).map(|k| power(&square, k)).sum::<Rat>())
+            .map(|&station| sums[station as usize].clone())
             .sum()
+    }
+
+    /// `[1, x, x², …, x^(count − 1)]`, each from the one before.
+    fn powers(x: &Rat, count: u64) -> Vec<Rat> {
+        let mut powers = Vec::with_capacity(count as usize);
+        let mut current = Rat::one();
+        for _ in 0..count {
+            powers.push(current.clone());
+            current *= x;
+        }
+        powers
     }
 }
 
-/// [definition; agent-inferred] **One linear locus's certified step at a deposit** (module header,
-/// "The certified step"): the step with its alignment `a`, curvature `C` and covector scale `c`; the
-/// gain `κ²` read at the step's ray, and its parts: the feature moves `b`, the loci stepping
-/// together `B`, the readout's Schur bound `‖R‖₂²` and the per-tick amplitude growth `1 + ω`.
+/// [definition; agent-inferred] **One family's certified step at a deposit** (module header, "The
+/// certified step", "The factor families' certified step"): the family it moves, the step with its
+/// alignment `a`, curvature `C = B·½·κ²·b` and covector scale `c`; the gain `κ²` read at the step's
+/// ray, and its parts: the output's moves `b` along the whole ray, the families stepping together
+/// `B`, the readout's Schur bound `‖R‖₂²` and the per-tick amplitude growth `1 + ω`.
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct StepReading {
+    pub family: Family,
     pub step: CertifiedStep,
     pub gain: Rat,
     pub moves: Rat,
@@ -2260,7 +2371,8 @@ pub struct StepReading {
 /// [definition] **What a deposit's publication reads** (module header, "The committed energy bound,
 /// enforced at the commit"): the certified storage growth `ε_k` of the storage forms the deposit
 /// changes (`Q_(k+1) ⪯ (1 + ε_k) Q_k`; a deposit with none certified is refused) and the product
-/// `∏(1 + ε_k)` since the founding; each linear locus's certified step ([`StepReading`]); the
+/// `∏(1 + ε_k)` since the founding; each family's certified step, by locus ([`StepReading`], its
+/// family named in it); the
 /// successor's per-tick amplitude growth `1 + ω` (the contrast ports' certified bound; `None` when a
 /// pumped resonator leaves it uncertified); the commit reached, the successor's exact bits against
 /// the budget, the loci reached, and the budgeted carry's report: every residual the deposit
@@ -2290,6 +2402,21 @@ pub struct DepositReading {
     pub backtracks: Vec<GainBacktrack>,
 }
 
+impl DepositReading {
+    /// **A normal law's certified step** at its locus (zero where its alignment certified none).
+    pub fn linear_step(&self, locus: Locus) -> Rat {
+        self.family_step(locus, Family::Map)
+    }
+
+    /// **A family's certified step** at its locus (zero where its alignment certified none).
+    pub fn family_step(&self, locus: Locus, family: Family) -> Rat {
+        self.steps
+            .iter()
+            .find(|(at, reading)| *at == locus && reading.family == family)
+            .map_or_else(Rat::zero, |(_, reading)| reading.step.step.clone())
+    }
+}
+
 // -------------------------------------------------------------------------------------------
 // the constitution
 
@@ -2298,7 +2425,6 @@ pub struct DepositReading {
 pub struct Constitution {
     rings: Vec<RingMaterial>,
     contacts: Vec<ContactMaterial>,
-    steps: Steps,
     budget: u64,
     commit: u64,
     released: BTreeSet<Locus>,
@@ -2308,6 +2434,13 @@ pub struct Constitution {
     /// Each ring's declared storage admittance `Y_g` (the field's), which the certified step's gains
     /// read.
     admittances: Vec<Rat>,
+    /// Each contact's conductance bound at every lift (the field's): `Y_a` when `β_a ≥ 0`, since
+    /// `G_a = 2^(−β_a Q_a / 2) Y_a` with `Q_a ≥ 0`; `None` when `β_a < 0`, where no bound holds and a
+    /// channel family's certified step is refused (module header, "The factor families' certified
+    /// step").
+    conductances: Vec<Option<Rat>>,
+    /// The field's hop `h`, which the channels' and resonators' outputs and powers read.
+    hop: Rat,
     /// The declared lattice of every learned locus (the field's).
     lattices: BTreeMap<Locus, Lattice>,
     /// The factor families' carried remainders (the normal laws carry their own).
@@ -2389,8 +2522,9 @@ impl Constitution {
     /// `r_opens_at_zero_and_learns_from_the_first_deposit`).
     ///
     /// Every initial value (0, ±½, 1, the unit vectors) lies on every lattice `L ≥ 1`, and each
-    /// locus takes the field's declared lattice ([`Field::lattice`]).
-    pub fn initial(field: &Field, steps: Steps, budget: u64) -> Result<Self, HnnError> {
+    /// locus takes the field's declared lattice ([`Field::lattice`]). No step is declared: every
+    /// locus's step is certified at its deposit (module header).
+    pub fn initial(field: &Field, budget: u64) -> Result<Self, HnnError> {
         let lattices = field.lattices().clone();
         // L_R = ⌈1/ε_bits⌉, the finest admitted receiver's (`FieldDeclaration::lattice_by_rule`).
         let grain = field
@@ -2521,7 +2655,6 @@ impl Constitution {
         Ok(Self {
             rings,
             contacts,
-            steps,
             budget,
             commit: 0,
             released: BTreeSet::new(),
@@ -2531,6 +2664,14 @@ impl Constitution {
                 .iter()
                 .map(|ring| ring.admittance().clone())
                 .collect(),
+            conductances: field
+                .contacts()
+                .iter()
+                .map(|contact| {
+                    (!contact.exponent().is_negative()).then(|| contact.admittance().clone())
+                })
+                .collect(),
+            hop: field.step().clone(),
             lattices,
             carries: Carries::new(),
             clocks: BTreeMap::new(),
@@ -2541,11 +2682,6 @@ impl Constitution {
     /// The commit counter.
     pub fn commit(&self) -> u64 {
         self.commit
-    }
-
-    /// The declared steps.
-    pub fn steps(&self) -> &Steps {
-        &self.steps
     }
 
     /// `B_Θ`.
@@ -3435,39 +3571,108 @@ impl Constitution {
 
     /// **A linear locus's gain `κ²`** at a readout bound `‖R‖₂²` and an amplitude growth `1 + ω`
     /// (module header, "The certified step").
-    fn gain(&self, locus: LinearLocus, reach: &Reach, readout: &Rat, amplitude: &Rat) -> Rat {
-        let receiver = &self.admittances[reach.receiver];
+    fn gain(&self, locus: LinearLocus, reach: &Reach, readout: &Rat, sums: &(Rat, Rat)) -> Rat {
         match locus {
             LinearLocus::Receiving(_) => Rat::one(),
-            LinearLocus::SourcePort(g) => {
-                Rat::from_integer(BigInt::from(reach.phases))
-                    * readout
-                    * (&self.admittances[g] / receiver)
-                    * reach.entry_gain(amplitude)
-            }
-            LinearLocus::Contrast(r) => {
-                readout * (&self.admittances[r] / receiver) * reach.tick_gain(amplitude)
-            }
+            LinearLocus::SourcePort(g) => self.source_gain(g, reach, readout, &sums.1),
+            LinearLocus::Contrast(r) => self.element_gain(r, reach, readout, &sums.0),
         }
     }
 
-    /// **The certified steps of a deposit's linear loci** (module header, "The certified step"):
-    /// each prepared unit step whose alignment is positive is certified (a negative alignment is
-    /// refused), its curvature `C = B s κ² b` read with the gains at the end of every locus's ray,
-    /// and a step whose certificate the gains at its ray do not admit is halved, until every one
-    /// holds. Refused without a reach, or through a pumped resonator.
+    /// **The gain from an injection at source ring `g`**, `d ‖R‖² (Y_g/Y_R) Σ_j (Σ_n (1+ω)^(T_j−T_n))²`
+    /// at the reach's entry gain (module header, "The certified step").
+    fn source_gain(&self, g: usize, reach: &Reach, readout: &Rat, entry: &Rat) -> Rat {
+        Rat::from_integer(BigInt::from(reach.phases))
+            * readout
+            * (&self.admittances[g] / &self.admittances[reach.receiver])
+            * entry
+    }
+
+    /// **The gain from an element output at ring `r`**, `‖R‖² (Y_r/Y_R) Σ_j Σ_(τ<T_j) (1+ω)^(2(T_j−τ−1))`
+    /// at the reach's tick gain (module header, "The certified step").
+    fn element_gain(&self, r: usize, reach: &Reach, readout: &Rat, tick: &Rat) -> Rat {
+        readout * (&self.admittances[r] / &self.admittances[reach.receiver]) * tick
+    }
+
+    /// **The gain from a solve's right-hand side whose difference carries at most `P|δζ|²`** (a
+    /// channel's transit or a loaded resonator's solve), `‖R‖² (4/(h Y_R)) P Σ_j Σ_(τ<T_j) (1+ω)^(2(T_j−τ−1))`
+    /// (module header, "The factor families' certified step"; Lean
+    /// `Holon/Deposition.{contracting_resolvent, transit_difference_power}`).
+    fn power_gain(&self, power: &Rat, reach: &Reach, readout: &Rat, tick: &Rat) -> Rat {
+        readout * Rat::from_integer(BigInt::from(4)) * power
+            / (&self.hop * &self.admittances[reach.receiver])
+            * tick
+    }
+
+    /// **A solve's difference power coefficient** `P = G/(2h) + ½(G/h)²‖C‖ + ⅛G²‖K‖` at a conductance
+    /// `G` and storage norms `‖C‖`, `‖K‖` (Lean `Holon/Deposition.transit_difference_power`; a loaded
+    /// resonator is the case `G = 2Y`).
+    fn difference_power(&self, conductance: &Rat, storage: &Rat, stiffness: &Rat) -> Rat {
+        let ratio = conductance / &self.hop;
+        &ratio / Rat::from_integer(BigInt::from(2))
+            + &ratio * &ratio * storage / Rat::from_integer(BigInt::from(2))
+            + conductance * conductance * stiffness / Rat::from_integer(BigInt::from(8))
+    }
+
+    /// **The certified steps of a deposit's families** (module header, "The certified step", "The
+    /// factor families' certified step"): each prepared unit step whose alignment is positive, a
+    /// normal law's or a factor family's, is certified (a negative alignment is refused); its
+    /// curvature `C = B s κ² b` is read with the gains and the moves at the end of every family's ray,
+    /// `B` every family stepping together; and a step whose certificate the readings at its ray do not
+    /// admit is halved, until every one holds. Refused without a reach, through a pumped resonator or
+    /// a declared boost, and for a channel family through a contact whose conductance has no bound.
     fn certify_steps(
         &self,
         reach: Option<&Reach>,
-        prepared: &[(Locus, LinearLocus, &PreparedStep)],
-    ) -> Result<BTreeMap<Locus, StepReading>, HnnError> {
-        let mut moving: Vec<(Locus, LinearLocus, &PreparedStep)> = Vec::new();
-        for (locus, linear, step) in prepared {
-            if CertifiedStep::certify(&step.alignment, &Rat::zero(), &step.covector)?.is_some() {
-                moving.push((*locus, *linear, *step));
+        linear: &[(Locus, LinearLocus, &PreparedStep)],
+        factors: &[(Locus, &FactorPrepared)],
+    ) -> Result<BTreeMap<(Locus, Family), StepReading>, HnnError> {
+        /// A normal law's readings at the certificate's faces: its alignment at its floor, its
+        /// covector scale, feature moves and unit step's Schur norms at their ceilings.
+        struct LinearFace {
+            kind: LinearLocus,
+            alignment: Rat,
+            covector: Rat,
+            moves: Rat,
+            unit: (Rat, Rat),
+        }
+        /// A family stepping in the deposit.
+        enum Part<'p> {
+            Linear(LinearFace),
+            Factor(&'p FactorPrepared),
+        }
+        /// The prepared factor family at a key, when it steps.
+        fn factor_at<'p>(
+            parts: &'p [(Locus, Family, Part<'p>)],
+            place: &BTreeMap<(Locus, Family), usize>,
+            key: (Locus, Family),
+        ) -> Option<&'p FactorPrepared> {
+            place.get(&key).and_then(|&index| match &parts[index].2 {
+                Part::Factor(prepared) => Some(*prepared),
+                Part::Linear(..) => None,
+            })
+        }
+        let mut parts: Vec<(Locus, Family, Part<'_>)> = Vec::new();
+        for (locus, kind, prepared) in linear {
+            let face = LinearFace {
+                kind: *kind,
+                alignment: floor(&prepared.alignment),
+                covector: ceiling(&prepared.covector),
+                moves: ceiling(&prepared.moves),
+                unit: ceilings(&prepared.unit_norms),
+            };
+            if CertifiedStep::certify(&face.alignment, &Rat::zero(), &face.covector)?.is_some() {
+                parts.push((*locus, Family::Map, Part::Linear(face)));
             }
         }
-        if moving.is_empty() {
+        for (locus, prepared) in factors {
+            if CertifiedStep::certify(&prepared.alignment, &Rat::zero(), &prepared.covector)?
+                .is_some()
+            {
+                parts.push((*locus, prepared.family, Part::Factor(prepared)));
+            }
+        }
+        if parts.is_empty() {
             return Ok(BTreeMap::new());
         }
         let reach = reach.ok_or(HnnError::MissingReach)?;
@@ -3478,7 +3683,26 @@ impl Constitution {
         {
             return Err(HnnError::UncertifiedGain { ring });
         }
-        let together = moving.len() as u64;
+        if let Some(contact) = self
+            .contacts
+            .iter()
+            .position(|material| material.boost.is_some())
+        {
+            return Err(HnnError::ActiveContact { contact });
+        }
+        for (locus, ..) in &parts {
+            if let Locus::Channel(contact) = *locus
+                && self.conductances[contact].is_none()
+            {
+                return Err(HnnError::UncertifiedConductance { contact });
+            }
+        }
+        let place: BTreeMap<(Locus, Family), usize> = parts
+            .iter()
+            .enumerate()
+            .map(|(index, (locus, family, _))| ((*locus, *family), index))
+            .collect();
+        let together = parts.len() as u64;
         let factor = Rat::new(BigInt::from(together), BigInt::from(2));
         let receiving = self
             .rings
@@ -3487,37 +3711,86 @@ impl Constitution {
             .ok_or(HnnError::MissingReceivingMap {
                 ring: reach.receiver,
             })?;
-        let readout_base = schur_norms(receiving.map());
+        let readout_base = ceilings(&schur_norms(receiving.map()));
         let contrast_base: Vec<(Rat, Rat)> = self
             .rings
             .iter()
-            .map(|material| schur_norms(material.contrast.map()))
+            .map(|material| ceilings(&schur_norms(material.contrast.map())))
             .collect();
         let grains: Vec<u32> = (0..self.rings.len())
             .map(|g| Ok(self.lattice(Locus::Element(g))?.exponent()))
             .collect::<Result<_, HnnError>>()?;
+        // The slices' Schur norms by ring (their rows the slices `ρ`), which the standing's lock
+        // chart reads at every ring it reaches.
+        let slice_base: Vec<((Rat, Rat), (Rat, Rat))> = self
+            .rings
+            .iter()
+            .map(|material| {
+                let (u, v) = slice_norms(&material.slices);
+                (ceilings(&u), ceilings(&v))
+            })
+            .collect();
+        // Each channel's storage and stiffness factors' Schur norms, at their ceilings.
+        let channel_base: Vec<((Rat, Rat), (Rat, Rat))> = self
+            .contacts
+            .iter()
+            .map(|material| {
+                (
+                    ceilings(&schur_norms(&material.storage)),
+                    ceilings(&schur_norms(&material.stiffness)),
+                )
+            })
+            .collect();
+        // Each loaded resonator's gains and its storage bases' Schur products.
+        let resonator_base: Vec<Option<([Rat; 4], Rat, Rat)>> = self
+            .rings
+            .iter()
+            .map(|material| {
+                material.resonator.as_ref().map(|resonator| {
+                    let (capacity, stiffness, ..) = resonator.gain_bases();
+                    let product = |form: &ExactRatMatrix| {
+                        let (column, row) = ceilings(&schur_norms(form));
+                        column * row
+                    };
+                    (
+                        resonator.gains().clone(),
+                        product(capacity),
+                        product(stiffness),
+                    )
+                })
+            })
+            .collect();
+        // The step a family takes (zero when it does not step).
+        let taken = |steps: &[Option<CertifiedStep>], key: (Locus, Family)| -> Rat {
+            place
+                .get(&key)
+                .and_then(|&index| steps[index].as_ref())
+                .map_or_else(Rat::zero, |step| step.step.clone())
+        };
         // The Schur bound at the end of a ray: `(‖W‖₁ + η‖D‖₁)(‖W‖_∞ + η‖D‖_∞)`.
         let ray = |base: &(Rat, Rat), moved: Option<(&Rat, &(Rat, Rat))>| -> Rat {
             match moved {
-                Some((step, unit)) => (&base.0 + step * &unit.0) * (&base.1 + step * &unit.1),
+                Some((step, unit)) => ray_product(base, unit, step),
                 None => &base.0 * &base.1,
             }
         };
         let gains = |steps: &[Option<CertifiedStep>]| -> (Rat, Rat) {
-            let moved = |target: LinearLocus| {
-                moving
-                    .iter()
-                    .zip(steps)
-                    .find(|((_, linear, _), _)| *linear == target)
-                    .and_then(|((_, _, prepared), step)| {
-                        step.as_ref().map(|step| (&step.step, &prepared.unit_norms))
-                    })
+            let moved = |key: (Locus, Family)| {
+                place.get(&key).and_then(|&index| match &parts[index].2 {
+                    Part::Linear(face) => {
+                        steps[index].as_ref().map(|step| (&step.step, &face.unit))
+                    }
+                    Part::Factor(_) => None,
+                })
             };
-            let readout = ray(&readout_base, moved(LinearLocus::Receiving(reach.receiver)));
+            let readout = ray(
+                &readout_base,
+                moved((Locus::ReceivingMap(reach.receiver), Family::Map)),
+            );
             let omega = (0..self.rings.len())
                 .map(|r| {
                     sqrt_ceiling(
-                        &ray(&contrast_base[r], moved(LinearLocus::Contrast(r))),
+                        &ray(&contrast_base[r], moved((Locus::Element(r), Family::Map))),
                         grains[r],
                     )
                 })
@@ -3525,26 +3798,161 @@ impl Constitution {
                 .unwrap_or_else(Rat::zero);
             (readout, Rat::one() + omega)
         };
-        // The first steps read the gains at the current constitution.
-        let (readout, amplitude) = gains(&vec![None; moving.len()]);
-        let mut steps: Vec<Option<CertifiedStep>> = moving
+        // A factor family's square carrier at the end of its ray, `S(x + ηD)` (its current value
+        // when it does not step).
+        let square_ray =
+            |steps: &[Option<CertifiedStep>], key: (Locus, Family), base: &(Rat, Rat)| {
+                match factor_at(&parts, &place, key).map(|prepared| &prepared.moves) {
+                    Some(Moves::Square { unit, factor, .. }) => {
+                        ray_product(factor, unit, &taken(steps, key))
+                    }
+                    _ => &base.0 * &base.1,
+                }
+            };
+        // Each family's gain `κ²` and moves `b` at the end of every ray.
+        let curvature = |index: usize,
+                         steps: &[Option<CertifiedStep>],
+                         readout: &Rat,
+                         sums: &(Rat, Rat)|
+         -> Result<(Rat, Rat), HnnError> {
+            let (locus, family, part) = &parts[index];
+            let prepared = match part {
+                Part::Linear(face) => {
+                    return Ok((
+                        self.gain(face.kind, reach, readout, sums),
+                        face.moves.clone(),
+                    ));
+                }
+                Part::Factor(prepared) => *prepared,
+            };
+            let own = &taken(steps, (*locus, *family));
+            let tick = || sums.0.clone();
+            match (*locus, &prepared.moves) {
+                (Locus::Standing(_), Moves::Standing { unit, reach: rings }) => {
+                    let tick = tick();
+                    let (mut moves, mut widest, mut terms) = (Rat::zero(), Rat::zero(), 0u64);
+                    for (r, energy) in rings {
+                        if energy.is_zero() {
+                            continue;
+                        }
+                        let (u, v) = &slice_base[*r];
+                        let (s_u, s_v) =
+                            match factor_at(&parts, &place, (Locus::Element(*r), Family::Slices))
+                                .map(|prepared| &prepared.moves)
+                            {
+                                Some(Moves::Slices { du, dv, .. }) => {
+                                    let step = taken(steps, (Locus::Element(*r), Family::Slices));
+                                    (ray_product(u, du, &step), ray_product(v, dv, &step))
+                                }
+                                _ => (&u.0 * &u.1, &v.0 * &v.1),
+                            };
+                        let term =
+                            Rat::from_integer(BigInt::from(4)) * unit * unit * s_u * s_v * energy;
+                        if term.is_zero() {
+                            continue;
+                        }
+                        let gain = self.element_gain(*r, reach, readout, &tick);
+                        if gain > widest {
+                            widest = gain;
+                        }
+                        moves += term;
+                        terms += 1;
+                    }
+                    Ok((Rat::from_integer(BigInt::from(terms)) * widest, moves))
+                }
+                (Locus::Element(r), moves) => Ok((
+                    self.element_gain(r, reach, readout, &tick()),
+                    moves.own(&prepared.energy, own)?,
+                )),
+                (Locus::SourcePort(g), moves) => Ok((
+                    self.source_gain(g, reach, readout, &sums.1),
+                    moves.own(&prepared.energy, own)?,
+                )),
+                (Locus::Channel(a), moves) => {
+                    let conductance = self.conductances[a]
+                        .as_ref()
+                        .ok_or(HnnError::UncertifiedConductance { contact: a })?;
+                    let (storage, stiffness) = &channel_base[a];
+                    let storage = square_ray(steps, (*locus, Family::Factor(0)), storage);
+                    let stiffness = square_ray(steps, (*locus, Family::Factor(1)), stiffness);
+                    let power = self.difference_power(conductance, &storage, &stiffness);
+                    Ok((
+                        self.power_gain(&power, reach, readout, &tick()),
+                        moves.own(&prepared.energy, own)?,
+                    ))
+                }
+                (Locus::Resonator(g), moves) => {
+                    let (gains, capacity, stiffness) = resonator_base[g]
+                        .as_ref()
+                        .ok_or(HnnError::Lattice { locus: *locus })?;
+                    // `g_i + η|D_i|` at the end of each gain's ray.
+                    let reached = |family: usize| -> Rat {
+                        let key = (*locus, Family::Resonator(family));
+                        match factor_at(&parts, &place, key).map(|prepared| &prepared.moves) {
+                            Some(Moves::Resonator { unit, gain }) => {
+                                gain + taken(steps, key) * unit
+                            }
+                            _ => gains[family].abs(),
+                        }
+                    };
+                    let (c, k) = (reached(0), reached(1));
+                    let power = self.difference_power(
+                        &(Rat::from_integer(BigInt::from(2)) * &self.admittances[g]),
+                        &(&c * &c * capacity),
+                        &(&k * &k * stiffness),
+                    );
+                    Ok((
+                        self.power_gain(&power, reach, readout, &tick()),
+                        moves.own(&prepared.energy, own)?,
+                    ))
+                }
+                _ => Err(HnnError::Lattice { locus: *locus }),
+            }
+        };
+        // The reach's tick and entry sums at an amplitude growth, at their ceilings, read once a
+        // pass.
+        let sums = |amplitude: &Rat| {
+            (
+                ceiling(&reach.tick_gain(amplitude)),
+                ceiling(&reach.entry_gain(amplitude)),
+            )
+        };
+        let reading = |steps: &[Option<CertifiedStep>]| -> Result<Vec<(Rat, Rat)>, HnnError> {
+            let (readout, amplitude) = gains(steps);
+            let sums = sums(&amplitude);
+            (0..parts.len())
+                .map(|index| curvature(index, steps, &readout, &sums))
+                .collect()
+        };
+        let alignment = |part: &Part<'_>| -> (Rat, Rat) {
+            match part {
+                Part::Linear(face) => (face.alignment.clone(), face.covector.clone()),
+                Part::Factor(prepared) => (prepared.alignment.clone(), prepared.covector.clone()),
+            }
+        };
+        // The first steps read the gains and moves at the current constitution.
+        let none = vec![None; parts.len()];
+        let first = reading(&none)?;
+        let mut steps: Vec<Option<CertifiedStep>> = parts
             .iter()
-            .map(|(_, linear, prepared)| {
-                let curvature =
-                    &factor * self.gain(*linear, reach, &readout, &amplitude) * &prepared.moves;
-                CertifiedStep::certify(&prepared.alignment, &curvature, &prepared.covector)
+            .zip(&first)
+            .map(|((.., part), (gain, moves))| {
+                let (a, c) = alignment(part);
+                CertifiedStep::certify(&a, &(&factor * gain * moves), &c)
             })
             .collect::<Result<_, _>>()?;
         loop {
             let (readout, amplitude) = gains(&steps);
+            let read = reading(&steps)?;
             let mut changed = false;
             let mut readings = BTreeMap::new();
-            for ((locus, linear, prepared), step) in moving.iter().zip(steps.iter_mut()) {
+            for (((locus, family, _), step), (gain, moves)) in
+                parts.iter().zip(steps.iter_mut()).zip(read)
+            {
                 let certified = step
                     .as_mut()
                     .expect("a positive alignment certifies a step");
-                let gain = self.gain(*linear, reach, &readout, &amplitude);
-                let curvature = &factor * &gain * &prepared.moves;
+                let curvature = &factor * &gain * &moves;
                 if !certified.admits(&curvature) {
                     *certified = certified.halved();
                     changed = true;
@@ -3552,11 +3960,12 @@ impl Constitution {
                 }
                 certified.curvature = curvature;
                 readings.insert(
-                    *locus,
+                    (*locus, *family),
                     StepReading {
+                        family: *family,
                         step: certified.clone(),
                         gain,
-                        moves: prepared.moves.clone(),
+                        moves,
                         together,
                         readout: readout.clone(),
                         amplitude: amplitude.clone(),
@@ -3570,13 +3979,15 @@ impl Constitution {
     }
 
     /// **The successor of a staged deposit** (design (c), `deposit`): each linear locus's step
-    /// prepared at its unit step (its Gram carried and its chart refined), certified against every
-    /// locus's gains (module header, "The certified step") and carried; each factor family's
-    /// preconditioned step; the commit advanced; the storage growth certified (a deposit with none
+    /// prepared at its unit step (its Gram carried and its chart refined) and each factor family's
+    /// (its statistic carried, its unit step `G_x / h_x′` read), all certified together against every
+    /// family's gains and moves (module header, "The certified step", "The factor families' certified
+    /// step") and carried; the commit advanced; the storage growth certified (a deposit with none
     /// certified is refused); and the budget checked on the successor's exact bits before anything
     /// is published. Refused with [`HnnError::ConstitutionBudget`] past `B_Θ`, with
     /// [`HnnError::StaleDeposit`] when the deposit was computed at another commit, with
-    /// [`HnnError::ReleasedLocus`] when it names a released locus, and with the certified step's
+    /// [`HnnError::ReleasedLocus`] when it names a released locus, with
+    /// [`HnnError::RepeatedFactorStep`] when it steps one family twice, and with the certified step's
     /// refusals. A loaded resonator's gain step whose carried gain would be `≤ 0` backtracks to the
     /// midpoint of the admissible side and is named in the reading ([`GainBacktrack`]): deposition
     /// never releases a family.
@@ -3588,7 +3999,6 @@ impl Constitution {
             });
         }
         let mut next = self.clone();
-        let eta = self.steps.factor.clone();
         // The deposit's steps by locus, each with its place in the deposit's order (its linear
         // steps, then its factor steps, then its class-mass steps).
         let mut groups: BTreeMap<Locus, Vec<(usize, LocusStep<'_>)>> = BTreeMap::new();
@@ -3604,9 +4014,17 @@ impl Constitution {
             }
         }
         let linear = deposit.linear().len();
+        let mut families: BTreeSet<(Locus, Family)> = BTreeSet::new();
         for (index, step) in deposit.factors().iter().enumerate() {
+            let locus = step.gradient.locus();
+            if !families.insert((locus, step.gradient.family())) {
+                return Err(HnnError::RepeatedFactorStep {
+                    locus,
+                    family: step.gradient.family(),
+                });
+            }
             groups
-                .entry(step.gradient.locus())
+                .entry(locus)
                 .or_default()
                 .push((linear + index, LocusStep::Factor(step)));
         }
@@ -3656,10 +4074,13 @@ impl Constitution {
             .map(|((locus, steps), (_, carries))| (*locus, steps, materials.remove(locus), carries))
             .collect();
         drop(materials);
-        // Pass 1: each locus's linear step prepared at its unit step, the loci together.
+        // Pass 1: each locus's linear step and factor families prepared at their unit steps, the
+        // loci together.
         let prepared: Vec<Result<Prepared, (usize, HnnError)>> = regions
             .par_iter_mut()
-            .map(|(locus, steps, material, _)| self.prepare_at(*locus, steps, material.as_mut()))
+            .map(|(locus, steps, material, carries)| {
+                self.prepare_at(*locus, steps, material.as_mut(), carries)
+            })
             .collect();
         let mut first: Option<(usize, HnnError)> = None;
         let mut ready = Vec::with_capacity(prepared.len());
@@ -3678,39 +4099,48 @@ impl Constitution {
         }
         // The certificate reads every prepared step at once.
         let certified = {
-            let steps: Vec<(Locus, LinearLocus, &PreparedStep)> = regions
+            let linear: Vec<(Locus, LinearLocus, &PreparedStep)> = regions
                 .iter()
                 .zip(&ready)
-                .filter_map(|((locus, ..), (_, linear))| {
-                    linear.as_ref().and_then(|(_, locus_kind, prepared)| {
-                        prepared
-                            .as_ref()
-                            .map(|prepared| (*locus, *locus_kind, prepared))
-                    })
+                .filter_map(|((locus, ..), region)| {
+                    region
+                        .linear
+                        .as_ref()
+                        .and_then(|(_, locus_kind, prepared)| {
+                            prepared
+                                .as_ref()
+                                .map(|prepared| (*locus, *locus_kind, prepared))
+                        })
                 })
                 .collect();
-            self.certify_steps(deposit.reach(), &steps)?
+            let factors: Vec<(Locus, &FactorPrepared)> = regions
+                .iter()
+                .zip(&ready)
+                .flat_map(|((locus, ..), region)| {
+                    region
+                        .factors
+                        .iter()
+                        .map(move |prepared| (*locus, prepared))
+                })
+                .collect();
+            self.certify_steps(deposit.reach(), &linear, &factors)?
         };
-        // Pass 2: every locus's steps in the deposit's order, the linear step at its certified
-        // step, the loci together.
+        // Pass 2: every locus's steps in the deposit's order, each family at its certified step,
+        // the loci together.
         let done: Vec<LocusDeposit> = regions
             .into_par_iter()
             .zip(ready)
-            .map(
-                |((locus, steps, mut material, mut carries), (stroke, linear))| {
-                    self.deposit_at(
-                        locus,
-                        steps,
-                        material.as_mut(),
-                        &mut carries,
-                        stroke,
-                        linear,
-                        certified.get(&locus),
-                        &eta,
-                    )
-                    .map(|at| (locus, carries, at))
-                },
-            )
+            .map(|((locus, steps, mut material, mut carries), region)| {
+                self.deposit_at(
+                    locus,
+                    steps,
+                    material.as_mut(),
+                    &mut carries,
+                    region,
+                    &certified,
+                )
+                .map(|at| (locus, carries, at))
+            })
             .collect();
         // The refusal is the first in the deposit's order: the one the steps taken in that order
         // meet first.
@@ -3802,7 +4232,10 @@ impl Constitution {
         let reading = DepositReading {
             storage_growth,
             storage_product: next.storage_product.clone(),
-            steps: certified.into_iter().collect(),
+            steps: certified
+                .into_iter()
+                .map(|((locus, _), reading)| (locus, reading))
+                .collect(),
             amplitude: next.amplitude()?,
             commit: next.commit,
             bits,
@@ -3818,72 +4251,109 @@ impl Constitution {
         Ok((next, reading))
     }
 
-    /// **One locus's linear step prepared** (pass 1 of [`Constitution::deposited`]): the locus's
-    /// budgeted carry opened at the clock the deposit would advance it to, and its normal law's
-    /// Gram carried, chart refined and unit step formed ([`NormalLaw::prepare`]). A locus with no
-    /// linear step opens nothing here.
+    /// **One locus's steps prepared** (pass 1 of [`Constitution::deposited`]): the locus's budgeted
+    /// carry opened at the clock the deposit would advance it to; its normal law's Gram carried, chart
+    /// refined and unit step formed ([`NormalLaw::prepare`]); and each factor family's statistic
+    /// carried and unit step read ([`factor_prepared`]). A locus with neither opens nothing here.
     fn prepare_at(
         &self,
         locus: Locus,
         steps: &[(usize, LocusStep<'_>)],
-        material: Option<&mut LocusMaterial<'_>>,
+        mut material: Option<&mut LocusMaterial<'_>>,
+        carries: &mut Carries,
     ) -> Result<Prepared, (usize, HnnError)> {
-        let Some((index, step)) = steps.iter().find_map(|(index, step)| match step {
-            LocusStep::Linear(step) => Some((*index, *step)),
-            _ => None,
-        }) else {
-            return Ok((None, None));
+        let mut prepared = Prepared {
+            stroke: None,
+            linear: None,
+            factors: Vec::new(),
         };
-        let refused = |refusal: HnnError| (index, refusal);
-        if self.released.contains(&locus) {
-            return Err(refused(HnnError::ReleasedLocus { locus }));
+        for (index, step) in steps {
+            let refused = |refusal: HnnError| (*index, refusal);
+            match step {
+                LocusStep::Linear(step) => {
+                    if self.released.contains(&locus) {
+                        return Err(refused(HnnError::ReleasedLocus { locus }));
+                    }
+                    let law = material
+                        .as_deref_mut()
+                        .and_then(|material| material.law(step.locus))
+                        .ok_or(HnnError::MissingSourcePort {
+                            ring: match step.locus {
+                                LinearLocus::SourcePort(g)
+                                | LinearLocus::Contrast(g)
+                                | LinearLocus::Receiving(g) => g,
+                            },
+                        })
+                        .map_err(refused)?;
+                    let at = self.stroke(locus, &mut prepared.stroke).map_err(refused)?;
+                    let rule = self.chart_rule(locus).map_err(refused)?;
+                    let step_prepared = law.prepare(&step.samples, &rule, at).map_err(refused)?;
+                    prepared.linear = Some((*index, step.locus, step_prepared));
+                }
+                LocusStep::Factor(step) => {
+                    if self.released.contains(&locus) {
+                        return Err(refused(HnnError::ReleasedLocus { locus }));
+                    }
+                    let at = self.stroke(locus, &mut prepared.stroke).map_err(refused)?;
+                    let material = material
+                        .as_deref_mut()
+                        .ok_or(HnnError::Lattice { locus })
+                        .map_err(refused)?;
+                    let factor =
+                        factor_prepared(material, carries, step, at, &self.hop).map_err(refused)?;
+                    prepared.factors.push(FactorPrepared {
+                        index: *index,
+                        ..factor
+                    });
+                }
+                LocusStep::Landmark(_) | LocusStep::Receiving(_) => {}
+            }
         }
-        let law = material
-            .and_then(|material| material.law(step.locus))
-            .ok_or(HnnError::MissingSourcePort {
-                ring: match step.locus {
-                    LinearLocus::SourcePort(g)
-                    | LinearLocus::Contrast(g)
-                    | LinearLocus::Receiving(g) => g,
-                },
-            })
-            .map_err(refused)?;
-        let mut at =
-            BudgetedCarry::new(self.lattice(locus).map_err(refused)?, self.clock(locus) + 1);
-        let rule = self.chart_rule(locus).map_err(refused)?;
-        let prepared = law
-            .prepare(&step.samples, &rule, &mut at)
-            .map_err(refused)?;
-        Ok((Some(at), Some((index, step.locus, prepared))))
+        Ok(prepared)
+    }
+
+    /// The locus's budgeted carry for this deposit, opened at the clock the deposit would advance it
+    /// to when no step has opened it yet.
+    fn stroke<'s>(
+        &self,
+        locus: Locus,
+        stroke: &'s mut Option<BudgetedCarry>,
+    ) -> Result<&'s mut BudgetedCarry, HnnError> {
+        if stroke.is_none() {
+            *stroke = Some(BudgetedCarry::new(
+                self.lattice(locus)?,
+                self.clock(locus) + 1,
+            ));
+        }
+        Ok(stroke.as_mut().expect("opened above"))
     }
 
     /// **One locus's steps of a deposit** (pass 2 of [`Constitution::deposited`]), in the deposit's
     /// order, on the locus's material and carried remainders alone, with the locus's budgeted carry
-    /// (opened by its linear step's preparation, or here at the clock the deposit would advance it
-    /// to), its linear step taken at its certified step, and its normal law's chart reading. A
-    /// refusal returns with the place of the step that met it in the deposit's order.
-    #[allow(clippy::too_many_arguments)]
+    /// (opened by its preparation, or here at the clock the deposit would advance it to): its linear
+    /// step taken at its certified step with its normal law's chart reading, and each factor family
+    /// moved by its certified step along its unit step, `Δx = η G_x / h_x′` (zero where its alignment
+    /// certified none: the statistic moved in pass 1, the family does not). A refusal returns with
+    /// the place of the step that met it in the deposit's order.
     fn deposit_at(
         &self,
         locus: Locus,
         steps: &[(usize, LocusStep<'_>)],
         mut material: Option<&mut LocusMaterial<'_>>,
         carries: &mut Carries,
-        stroke: Option<BudgetedCarry>,
-        mut linear: Option<(usize, LinearLocus, Option<PreparedStep>)>,
-        certified: Option<&StepReading>,
-        eta: &Rat,
+        prepared: Prepared,
+        certified: &BTreeMap<(Locus, Family), StepReading>,
     ) -> Result<(BudgetedCarry, Vec<ChartReading>), (usize, HnnError)> {
-        let mut stroke = stroke;
+        let Prepared {
+            mut stroke,
+            mut linear,
+            factors,
+        } = prepared;
         let mut charts = Vec::new();
-        let budgeted = |stroke: &mut Option<BudgetedCarry>| -> Result<(), HnnError> {
-            if stroke.is_none() {
-                *stroke = Some(BudgetedCarry::new(
-                    self.lattice(locus)?,
-                    self.clock(locus) + 1,
-                ));
-            }
-            Ok(())
+        let step_of = |family: Family| {
+            certified
+                .get(&(locus, family))
+                .map_or_else(Rat::zero, |reading| reading.step.step.clone())
         };
         for (index, step) in steps {
             let refused = |refusal: HnnError| (*index, refusal);
@@ -3903,32 +4373,36 @@ impl Constitution {
                             },
                         })
                         .map_err(refused)?;
-                    budgeted(&mut stroke).map_err(refused)?;
-                    let at = stroke.as_mut().expect("opened above");
+                    let at = self.stroke(locus, &mut stroke).map_err(refused)?;
                     // The step prepared in pass 1 (none when its window reached nothing), at its
                     // certified step (zero when its alignment was zero: the Gram and chart move,
                     // the map does not).
                     if let Some((_, _, Some(prepared))) = linear.take() {
-                        let step =
-                            certified.map_or_else(Rat::zero, |reading| reading.step.step.clone());
-                        let (next, reading) = prepared.stepped(&step, at).map_err(refused)?;
+                        let (next, reading) = prepared
+                            .stepped(&step_of(Family::Map), at)
+                            .map_err(refused)?;
                         *law = next;
                         charts.push(reading);
                     }
                 }
                 LocusStep::Factor(step) => {
-                    budgeted(&mut stroke).map_err(refused)?;
-                    let at = stroke.as_mut().expect("opened above");
+                    let at = self.stroke(locus, &mut stroke).map_err(refused)?;
                     let material = material
                         .as_deref_mut()
                         .ok_or(HnnError::Lattice { locus })
                         .map_err(refused)?;
-                    factor_step(material, carries, step, eta, at).map_err(refused)?;
+                    let prepared = factors
+                        .iter()
+                        .find(|prepared| prepared.index == *index)
+                        .ok_or(HnnError::Lattice { locus })
+                        .map_err(refused)?;
+                    let rate = step_of(prepared.family) / &prepared.scale;
+                    factor_step(material, carries, step, &rate, at).map_err(refused)?;
                 }
                 LocusStep::Landmark(step) => {
                     // The tree carries no lattice remainder, so the stroke is opened for the locus's
                     // reading and nothing moves its clock.
-                    budgeted(&mut stroke).map_err(refused)?;
+                    self.stroke(locus, &mut stroke).map_err(refused)?;
                     let tree = material
                         .as_deref_mut()
                         .and_then(LocusMaterial::tree)
@@ -3939,7 +4413,7 @@ impl Constitution {
                 }
                 LocusStep::Receiving(step) => {
                     // The population carries its likelihoods' bounds, so it moves no lattice clock.
-                    budgeted(&mut stroke).map_err(refused)?;
+                    self.stroke(locus, &mut stroke).map_err(refused)?;
                     let population = material
                         .as_deref_mut()
                         .and_then(LocusMaterial::population)
@@ -4023,12 +4497,399 @@ impl Constitution {
 /// steps met with the place of the refusing step in the deposit's order.
 type LocusDeposit = Result<(Locus, Carries, (BudgetedCarry, Vec<ChartReading>)), (usize, HnnError)>;
 
-/// One locus's pass-1 preparation: its budgeted carry (opened by its linear step) and its linear
-/// step's place, kind and prepared unit step (none when its window reached nothing).
-type Prepared = (
-    Option<BudgetedCarry>,
-    Option<(usize, LinearLocus, Option<PreparedStep>)>,
-);
+/// One locus's pass-1 preparation: its budgeted carry (opened by its first step), its linear step's
+/// place, kind and prepared unit step (none when its window reached nothing), and its factor
+/// families' prepared unit steps.
+struct Prepared {
+    stroke: Option<BudgetedCarry>,
+    linear: Option<(usize, LinearLocus, Option<PreparedStep>)>,
+    factors: Vec<FactorPrepared>,
+}
+
+/// [definition; agent-inferred] **A factor family's step prepared at its unit step** (module
+/// header, "The factor families' certified step"): its place in the deposit's order, its family, its
+/// carried statistic `h_x′` (the metric of the unit step `D = G_x / h_x′`), the unit step's alignment
+/// `a = |G_x|² / h_x′`, the covector scale `c`, the feature energy `e`, and the norms its output's
+/// moves read.
+pub(crate) struct FactorPrepared {
+    index: usize,
+    family: Family,
+    scale: Rat,
+    alignment: Rat,
+    covector: Rat,
+    energy: Rat,
+    moves: Moves,
+}
+
+/// **The norms a factor family's output moves read** (module header's table), each Schur pair
+/// `(‖X‖₁, ‖X‖_∞)` exact.
+enum Moves {
+    /// A square carrier `w x xᵀ` read at its feature: `weight = 4w²`, the unit step's and the
+    /// factor's Schur norms; `b(η) = weight S(D) S(x + ηD) e`.
+    Square {
+        weight: Rat,
+        unit: (Rat, Rat),
+        factor: (Rat, Rat),
+    },
+    /// The slices, their rows the slices `ρ`: the unit step's `dU`, `dV` and the factors' `U`, `V`;
+    /// `b(η) = 8 (S(dU) S(V + η dV) + S(U + η dU) S(dV)) e`.
+    Slices {
+        du: (Rat, Rat),
+        dv: (Rat, Rat),
+        u: (Rat, Rat),
+        v: (Rat, Rat),
+    },
+    /// The standing: `|D|_∞` and its lock chart's reach (each ring with its element window's
+    /// energy); its moves read the reached rings' slices (the certificate).
+    Standing { unit: Rat, reach: Vec<(usize, Rat)> },
+    /// A resonator gain: `|D|` and `|g_i| > 0`; `b(η) = |D|² e ((|g_i| + η|D|) / |g_i|)²`.
+    Resonator { unit: Rat, gain: Rat },
+    /// A pair port, per rank `(|De_ρ|², |Da_ρ|², |Db_ρ|², |e_ρ|², |a_ρ|², |b_ρ|²)`;
+    /// `b(η) = 3 k e Σ_ρ (|De_ρ|² A_ρ B_ρ + E_ρ |Da_ρ|² B_ρ + E_ρ A_ρ |Db_ρ|²)`,
+    /// `X_ρ = 2|x_ρ|² + 2η²|Dx_ρ|²`.
+    Pair { ranks: Vec<[Rat; 6]> },
+}
+
+impl Moves {
+    /// `b(η)` at the family's own ray (the standing's reads its chart's rings, in the certificate).
+    fn own(&self, energy: &Rat, step: &Rat) -> Result<Rat, HnnError> {
+        let integer = |n: i64| Rat::from_integer(BigInt::from(n));
+        Ok(match self {
+            Moves::Square {
+                weight,
+                unit,
+                factor,
+            } => weight * &unit.0 * &unit.1 * ray_product(factor, unit, step) * energy,
+            Moves::Slices { du, dv, u, v } => {
+                integer(8)
+                    * (&du.0 * &du.1 * ray_product(v, dv, step)
+                        + ray_product(u, du, step) * &dv.0 * &dv.1)
+                    * energy
+            }
+            Moves::Resonator { unit, gain } => {
+                if !gain.is_positive() {
+                    return Err(HnnError::Carrier {
+                        what: "a resonator gain's certified step at a gain that is not positive",
+                    });
+                }
+                let reached = (gain + step * unit) / gain;
+                unit * unit * energy * &reached * &reached
+            }
+            Moves::Pair { ranks } => {
+                let square = step * step;
+                let bound = |x: &Rat, dx: &Rat| integer(2) * x + integer(2) * &square * dx;
+                let sum: Rat = ranks
+                    .iter()
+                    .map(|[de, da, db, e, a, b]| {
+                        let (big_e, big_a, big_b) = (bound(e, de), bound(a, da), bound(b, db));
+                        de * &big_a * &big_b + &big_e * da * &big_b + &big_e * &big_a * db
+                    })
+                    .sum();
+                integer(3) * integer(ranks.len() as i64) * energy * sum
+            }
+            Moves::Standing { .. } => {
+                return Err(HnnError::Carrier {
+                    what: "the standing's moves read its lock chart's rings, in the certificate",
+                });
+            }
+        })
+    }
+}
+
+/// [definition; agent-inferred] **The certificate's faces**: every reading a certified step
+/// compares is carried at [`FACE`] significant bits, its decrease `a` at its floor and every factor
+/// of its curvature `C`, its covector scale `c` and the gains' norms at their ceilings
+/// (`holon::deposition::significant`), so `ηC⁺ ≤ a⁻` and `ηc⁺ ≤ 1` imply the exact certificate while
+/// its products stay a few hundred bits wide, whatever the exact readings' own (thousands of bits
+/// from the pullback). The step is exact; only the certificate's comparison reads the faces.
+const FACE: u32 = 64;
+
+/// A reading's floor at the certificate's face.
+fn floor(x: &Rat) -> Rat {
+    significant(x, FACE, false)
+}
+
+/// A reading's ceiling at the certificate's face.
+fn ceiling(x: &Rat) -> Rat {
+    significant(x, FACE, true)
+}
+
+/// A Schur pair's ceilings at the certificate's face.
+fn ceilings(pair: &(Rat, Rat)) -> (Rat, Rat) {
+    (ceiling(&pair.0), ceiling(&pair.1))
+}
+
+/// `(‖X‖₁ + η‖D‖₁)(‖X‖_∞ + η‖D‖_∞)`: the Schur bound at the end of a ray `X + tD`, `t ∈ [0, η]`.
+fn ray_product(base: &(Rat, Rat), unit: &(Rat, Rat), step: &Rat) -> Rat {
+    (&base.0 + step * &unit.0) * (&base.1 + step * &unit.1)
+}
+
+/// **The Schur norms `(‖X‖₁, ‖X‖_∞)` of a flat row-major array** of `columns` columns, read in the
+/// integral chart (one normalization per norm).
+fn schur_flat(entries: &[Rat], columns: usize) -> (Rat, Rat) {
+    if entries.is_empty() || columns == 0 {
+        return (Rat::zero(), Rat::zero());
+    }
+    let (values, denominator) = integral(entries);
+    let mut column_sums = vec![BigInt::zero(); columns];
+    let mut row_widest = BigInt::zero();
+    for row in values.chunks(columns) {
+        let mut sum = BigInt::zero();
+        for (total, value) in column_sums.iter_mut().zip(row) {
+            let magnitude = value.abs();
+            sum += &magnitude;
+            *total += magnitude;
+        }
+        if sum > row_widest {
+            row_widest = sum;
+        }
+    }
+    let column_widest = column_sums.into_iter().max().unwrap_or_default();
+    (
+        Rat::new(column_widest, denominator.clone()),
+        Rat::new(row_widest, denominator),
+    )
+}
+
+/// `Σ x²` of an array, read in the integral chart.
+fn squared(entries: &[Rat]) -> Rat {
+    if entries.is_empty() {
+        return Rat::zero();
+    }
+    let (values, denominator) = integral(entries);
+    Rat::new(
+        values.iter().map(|x| x * x).sum(),
+        &denominator * &denominator,
+    )
+}
+
+/// `max |x|` of an array.
+fn widest(entries: &[Rat]) -> Rat {
+    entries
+        .iter()
+        .map(Signed::abs)
+        .max()
+        .unwrap_or_else(Rat::zero)
+}
+
+/// The Schur norms of the slices' two factor matrices `U`, `V`, their rows the slices `ρ`.
+fn slice_norms(slices: &[(Vec<Rat>, Vec<Rat>)]) -> ((Rat, Rat), (Rat, Rat)) {
+    let width = slices.first().map_or(0, |(u, _)| u.len());
+    let u: Vec<Rat> = slices.iter().flat_map(|(u, _)| u.iter().cloned()).collect();
+    let v: Vec<Rat> = slices.iter().flat_map(|(_, v)| v.iter().cloned()).collect();
+    (schur_flat(&u, width), schur_flat(&v, width))
+}
+
+/// **One factor family's statistic carried and its unit step read** (pass 1 of
+/// [`Constitution::deposited`]; module header, "The factor families' certified step"): `h_x` carried
+/// to `h_x′ = h_x + e`, and the unit step `D = G_x / h_x′` read by its alignment `a = |G_x|²/h_x′`
+/// and the norms its output's moves read, on the family's locus's material and carried remainders.
+/// The family's entries do not move here ([`factor_step`] moves them at the certified step).
+fn factor_prepared(
+    material: &mut LocusMaterial<'_>,
+    carries: &mut Carries,
+    step: &FactorStep,
+    at: &mut BudgetedCarry,
+    hop: &Rat,
+) -> Result<FactorPrepared, HnnError> {
+    let locus = step.gradient.locus();
+    let energy = &step.energy;
+    let integer = |n: i64| Rat::from_integer(BigInt::from(n));
+    let (scale, alignment, moves) = match (&step.gradient, material) {
+        (
+            FactorGradient::Passive { gradient, .. },
+            LocusMaterial::Element {
+                passive,
+                passive_scale,
+                ..
+            },
+        ) => {
+            let scale = advance(
+                carries,
+                at,
+                (locus, Carrier::PassiveScale),
+                passive_scale,
+                energy,
+            )?;
+            let (column, row) = schur_flat(gradient.entries(), gradient.columns());
+            let moves = Moves::Square {
+                weight: integer(4),
+                unit: ceilings(&(column / &scale, row / &scale)),
+                factor: ceilings(&schur_norms(passive)),
+            };
+            (scale.clone(), squared(gradient.entries()) / &scale, moves)
+        }
+        (
+            FactorGradient::Slices { gradient, .. },
+            LocusMaterial::Element {
+                slices,
+                slice_scale,
+                ..
+            },
+        ) => {
+            let scale = advance(
+                carries,
+                at,
+                (locus, Carrier::SliceScale),
+                slice_scale,
+                energy,
+            )?;
+            let width = gradient.first().map_or(0, |(du, _)| du.len());
+            let du: Vec<Rat> = gradient
+                .iter()
+                .flat_map(|(du, _)| du.iter().cloned())
+                .collect();
+            let dv: Vec<Rat> = gradient
+                .iter()
+                .flat_map(|(_, dv)| dv.iter().cloned())
+                .collect();
+            let per = |(column, row): (Rat, Rat)| ceilings(&(column / &scale, row / &scale));
+            let (u, v) = slice_norms(slices);
+            let moves = Moves::Slices {
+                du: per(schur_flat(&du, width)),
+                dv: per(schur_flat(&dv, width)),
+                u: ceilings(&u),
+                v: ceilings(&v),
+            };
+            (scale.clone(), (squared(&du) + squared(&dv)) / &scale, moves)
+        }
+        (
+            FactorGradient::Standing {
+                gradient, reach, ..
+            },
+            LocusMaterial::Standing { scale, .. },
+        ) => {
+            let scale = advance(carries, at, (locus, Carrier::StandingScale), scale, energy)?;
+            let moves = Moves::Standing {
+                unit: ceiling(&(widest(gradient) / &scale)),
+                reach: reach
+                    .iter()
+                    .map(|(ring, energy)| (*ring, ceiling(energy)))
+                    .collect(),
+            };
+            (scale.clone(), squared(gradient) / &scale, moves)
+        }
+        (
+            FactorGradient::Resonator {
+                ring,
+                family,
+                gradient,
+            },
+            LocusMaterial::Resonator {
+                ring: material_ring,
+                material,
+                scales,
+                ..
+            },
+        ) if ring == material_ring => {
+            if *family >= 4 {
+                return Err(HnnError::Resonator {
+                    ring: *ring,
+                    what: "a resonator gain family is one of C, K, D, or pump",
+                });
+            }
+            let current = material.as_ref().ok_or(HnnError::Lattice { locus })?;
+            let gain = current.gains()[*family].abs();
+            let scale = advance(
+                carries,
+                at,
+                (locus, Carrier::ResonatorScale(*family)),
+                &mut scales[*family],
+                energy,
+            )?;
+            let moves = Moves::Resonator {
+                unit: ceiling(&(gradient.abs() / &scale)),
+                gain: floor(&gain),
+            };
+            (scale.clone(), gradient * gradient / &scale, moves)
+        }
+        (
+            FactorGradient::PairPort {
+                offset,
+                outputs,
+                current,
+                earlier,
+                ..
+            },
+            LocusMaterial::SourcePort { pairs, scale, .. },
+        ) => {
+            let scale = advance(carries, at, (locus, Carrier::PairScale), scale, energy)?;
+            let slot = pairs
+                .iter()
+                .find(|(declared, _)| declared == offset)
+                .ok_or(HnnError::Offset { offset: *offset })?;
+            let square_scale = &scale * &scale;
+            let ranks: Vec<[Rat; 6]> = (0..slot.1.rank())
+                .map(|rho| {
+                    [
+                        squared(&outputs[rho]) / &square_scale,
+                        squared(&current[rho]) / &square_scale,
+                        squared(&earlier[rho]) / &square_scale,
+                        squared(&slot.1.outputs()[rho]),
+                        squared(&slot.1.current_reads()[rho]),
+                        squared(&slot.1.earlier_reads()[rho]),
+                    ]
+                    .map(|x| ceiling(&x))
+                })
+                .collect();
+            let total: Rat = [outputs, current, earlier]
+                .into_iter()
+                .flatten()
+                .map(|row| squared(row))
+                .sum();
+            (scale.clone(), total / &scale, Moves::Pair { ranks })
+        }
+        (
+            FactorGradient::Storage { gradient, .. }
+            | FactorGradient::Stiffness { gradient, .. }
+            | FactorGradient::Dissipation { gradient, .. },
+            LocusMaterial::Channel(material),
+        ) => {
+            let index = match &step.gradient {
+                FactorGradient::Storage { .. } => 0,
+                FactorGradient::Stiffness { .. } => 1,
+                _ => 2,
+            };
+            let scale = advance(
+                carries,
+                at,
+                (locus, Carrier::FactorScale(index)),
+                &mut material.scales[index],
+                energy,
+            )?;
+            // The transit reads `2C(w − ω)`, `hK(u + ½hω)` and `hDω`: the output's weight `w` enters
+            // the moves as `4w²` (16, `4h²`, `4h²`). A boost's signature flips columns only, so the
+            // unit step's norms are the gradient's.
+            let weight = match index {
+                0 => integer(16),
+                _ => integer(4) * hop * hop,
+            };
+            let factor = match index {
+                0 => &material.storage,
+                1 => &material.stiffness,
+                _ => &material.dissipation,
+            };
+            let (column, row) = schur_flat(gradient.entries(), gradient.columns());
+            let moves = Moves::Square {
+                weight,
+                unit: ceilings(&(column / &scale, row / &scale)),
+                factor: ceilings(&schur_norms(factor)),
+            };
+            (scale.clone(), squared(gradient.entries()) / &scale, moves)
+        }
+        // A factor step's locus is its gradient's, so its material is this locus's.
+        _ => return Err(HnnError::Lattice { locus }),
+    };
+    Ok(FactorPrepared {
+        index: 0,
+        family: step.gradient.family(),
+        scale,
+        alignment: floor(&alignment),
+        covector: ceiling(&step.covector),
+        energy: ceiling(energy),
+        moves,
+    })
+}
 
 /// Whether a resonator is pumped (its declared pump at a nonzero strength).
 fn pumped(resonator: &ResonatorMaterial) -> bool {
@@ -4207,61 +5068,30 @@ impl<'a> LocusMaterial<'a> {
     }
 }
 
-/// **One factor family's carried step** (module header): `h_x` carried to `h_x'`, then
-/// `Δx = (η_x / h_x') G_x` carried onto the family's entries, on the family's locus's material and
-/// carried remainders.
+/// **One factor family's carried step** (pass 2 of [`Constitution::deposited`]; module header, "The
+/// factor families' certified step"): `Δx = rate · G_x` carried onto the family's entries at
+/// `rate = η / h_x′`, `η` the family's certified step and `h_x′` the statistic carried in pass 1
+/// ([`factor_prepared`]), on the family's locus's material and carried remainders.
 fn factor_step(
     material: &mut LocusMaterial<'_>,
     carries: &mut Carries,
     step: &FactorStep,
-    eta: &Rat,
+    rate: &Rat,
     at: &mut BudgetedCarry,
 ) -> Result<(), HnnError> {
     let locus = step.gradient.locus();
-    let energy = &step.energy;
     match (&step.gradient, material) {
-        (
-            FactorGradient::Passive { gradient, .. },
-            LocusMaterial::Element {
-                passive,
-                passive_scale,
-                ..
-            },
-        ) => {
-            let rate = advance(
-                carries,
-                at,
-                (locus, Carrier::PassiveScale),
-                passive_scale,
-                energy,
-                eta,
-            )?;
+        (FactorGradient::Passive { gradient, .. }, LocusMaterial::Element { passive, .. }) => {
             **passive = carried_matrix(
                 carries.entry((locus, Carrier::Passive)).or_default(),
                 at,
                 Carrier::Passive,
                 passive,
-                &rate_matrix(&rate, gradient)?,
+                &rate_matrix(rate, gradient)?,
                 "a passive factor gradient",
             )?;
         }
-        (
-            FactorGradient::Slices { gradient, .. },
-            LocusMaterial::Element {
-                slices,
-                slice_scale,
-                width,
-                ..
-            },
-        ) => {
-            let rate = advance(
-                carries,
-                at,
-                (locus, Carrier::SliceScale),
-                slice_scale,
-                energy,
-                eta,
-            )?;
+        (FactorGradient::Slices { gradient, .. }, LocusMaterial::Element { slices, width, .. }) => {
             let n = *width;
             let carry = carries.entry((locus, Carrier::Slices)).or_default();
             for (rho, ((u, v), (du, dv))) in slices.iter_mut().zip(gradient).enumerate() {
@@ -4272,27 +5102,16 @@ fn factor_step(
                             Carrier::Slices,
                             (2 * rho + side) * n + i,
                             x,
-                            &rate_times(&rate, dx),
+                            &rate_times(rate, dx),
                         );
                     }
                 }
             }
         }
-        (
-            FactorGradient::Standing { gradient, .. },
-            LocusMaterial::Standing { standing, scale },
-        ) => {
-            let rate = advance(
-                carries,
-                at,
-                (locus, Carrier::StandingScale),
-                scale,
-                energy,
-                eta,
-            )?;
+        (FactorGradient::Standing { gradient, .. }, LocusMaterial::Standing { standing, .. }) => {
             let carry = carries.entry((locus, Carrier::Standing)).or_default();
             for (i, (x, dx)) in standing.iter_mut().zip(gradient).enumerate() {
-                carry.deposit(at, Carrier::Standing, i, x, &rate_times(&rate, dx));
+                carry.deposit(at, Carrier::Standing, i, x, &rate_times(rate, dx));
             }
         }
         (
@@ -4304,8 +5123,8 @@ fn factor_step(
             LocusMaterial::Resonator {
                 ring: material_ring,
                 material,
-                scales,
                 step: hop,
+                ..
             },
         ) if ring == material_ring => {
             if *family >= 4 {
@@ -4315,19 +5134,11 @@ fn factor_step(
                 });
             }
             let current = material.as_ref().ok_or(HnnError::Lattice { locus })?;
-            let rate = advance(
-                carries,
-                at,
-                (locus, Carrier::ResonatorScale(*family)),
-                &mut scales[*family],
-                energy,
-                eta,
-            )?;
             // The candidate step, carried on copies of the entry's carry; kept when the carried
             // gain stays positive, backtracked otherwise ([`GainBacktrack`]).
             let carrier = Carrier::Resonator(*family);
             let from = current.gains()[*family].clone();
-            let delta = rate_times(&rate, gradient);
+            let delta = rate_times(rate, gradient);
             let carry = carries.entry((locus, carrier)).or_default();
             let (mut trial, mut stroke, mut gain) = (carry.clone(), at.clone(), from.clone());
             trial.deposit(&mut stroke, carrier, 0, &mut gain, &delta);
@@ -4368,9 +5179,8 @@ fn factor_step(
                 earlier,
                 ..
             },
-            LocusMaterial::SourcePort { pairs, scale, .. },
+            LocusMaterial::SourcePort { pairs, .. },
         ) => {
-            let rate = advance(carries, at, (locus, Carrier::PairScale), scale, energy, eta)?;
             let slot = pairs
                 .iter_mut()
                 .find(|(declared, _)| declared == offset)
@@ -4386,7 +5196,7 @@ fn factor_step(
                     carrier,
                     base,
                     delta,
-                    &rate,
+                    rate,
                 )
             };
             let outputs = family(0, slot.1.outputs(), outputs);
@@ -4405,14 +5215,6 @@ fn factor_step(
                 FactorGradient::Stiffness { .. } => 1,
                 _ => 2,
             };
-            let rate = advance(
-                carries,
-                at,
-                (locus, Carrier::FactorScale(index)),
-                &mut material.scales[index],
-                energy,
-                eta,
-            )?;
             // A boost's stiffness factor carries its signature: its gradient's columns take their
             // signs (`signed_columns`).
             let gradient = match (index, &material.boost) {
@@ -4429,7 +5231,7 @@ fn factor_step(
                 at,
                 Carrier::Factor(index),
                 factor,
-                &rate_matrix(&rate, &gradient)?,
+                &rate_matrix(rate, &gradient)?,
                 "a channel factor gradient",
             )?;
         }

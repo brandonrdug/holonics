@@ -18,6 +18,9 @@ x ← x + η_x G_x / h_x                                   factor families (c_a,
 q_r ← q_r + η_q Lᵀ g_σ / h_q                           the standing, through the lock chart
 ```
 
+Every step `γ_U`, `η_x`, `η_q` is certified at its deposit (`Holon/Deposition` §6 and §8): the
+largest dyadic its Gauss–Newton curvature along the ray and the covector bound admit.
+
 Everything is realified and exact: statements are over a general field (so over `ℚ`), with
 transposes. The complex chart of the same identities is the owner
 `Physics/AccumulatedNormalResponse`, joined in §2 and §3.

@@ -12,7 +12,7 @@
 
 use std::time::Instant;
 
-use holonics::hnn::constitution::{Constitution, Steps};
+use holonics::hnn::constitution::Constitution;
 use holonics::hnn::field::Field;
 use holonics::hnn::ring::ResonatorMaterial;
 use holonics::ratio::{Rat, rat};
@@ -23,7 +23,7 @@ use super::tests::{Draw, card};
 /// resonator (unit weights, `d = 1/4`) unpumped: passive loaded material (`C, K, D ⪰ 0`), whose
 /// growth the certified step reads as one.
 pub(super) fn loaded(field: &Field) -> Constitution {
-    let mut theta = Constitution::initial(field, Steps::campaign_one(), 1 << 40).unwrap();
+    let mut theta = Constitution::initial(field, 1 << 40).unwrap();
     for ring in 0..field.rings().len() {
         let material =
             ResonatorMaterial::of_parametron(field.ring(ring).parametron(), &rat(1, 4), None)

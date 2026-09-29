@@ -11,7 +11,7 @@ use num_traits::{One, Signed, Zero};
 use super::learning::{chain, chain_with, generic, moment, pairing, phases};
 use super::support::Draw;
 use crate::hnn::HnnError;
-use crate::hnn::constitution::{Constitution, FactorGradient, Locus, Steps};
+use crate::hnn::constitution::{Carrier, Constitution, FactorGradient, Family, Locus};
 use crate::hnn::field::{ConstitutionRead, Current, End, Field};
 use crate::hnn::moment::PairPort;
 use crate::hnn::pending::PendingRatio;
@@ -231,10 +231,15 @@ pub(super) fn cut_at(field: Field, theta: Constitution) -> Cut {
     }
 }
 
-/// A real comparison composes loaded resonator gain steps, and applying only that reached material
-/// return changes the same pending ratio's next receiving logits.
+/// A real comparison composes loaded resonator gain steps, and the deposit of only that reached
+/// material return certifies the capacity gain's step (its alignment positive, its curvature read
+/// through the loaded resonator's power gain) and advances its statistic by the window's energy. The
+/// step moves the gain by `η G / h′` exactly: the budgeted carry holds it as the lattice carries any
+/// update, the gain's coordinate, remainder and released residual summing to that move. On this
+/// fixture the reached gradient is far below the gain's lattice unit, so the published gain and the
+/// next logits are unchanged; a declared factor step once moved it past the lattice (September 29).
 #[test]
-fn loaded_comparison_composes_a_gain_deposit_that_changes_next_logits() {
+fn loaded_comparison_composes_a_certified_gain_deposit() {
     let field = chain().with_exact_word();
     let width_receiver = field.ring(2).width();
     let mut draw = Draw::new(67);
@@ -249,28 +254,13 @@ fn loaded_comparison_composes_a_gain_deposit_that_changes_next_logits() {
         None,
     )
     .unwrap();
-    let declare = |factor: Rat| {
-        Constitution::initial(&field, Steps { factor }, 1 << 40)
-            .unwrap()
-            .with_ports(2, None, None, Some(receiving.clone()))
-            .unwrap()
-            .with_ring_resonator(&field, 0, material.clone())
-            .unwrap()
-    };
-    let coarse = cut_at(field.clone(), declare(Rat::one()));
-    let seed_step = coarse
-        .deposit
-        .factors()
-        .iter()
-        .find(|step| matches!(&step.gradient, FactorGradient::Resonator { family: 0, .. }))
+    let declared = Constitution::initial(&field, 1 << 40)
+        .unwrap()
+        .with_ports(2, None, None, Some(receiving.clone()))
+        .unwrap()
+        .with_ring_resonator(&field, 0, material.clone())
         .unwrap();
-    let FactorGradient::Resonator { gradient, .. } = &seed_step.gradient else {
-        unreachable!()
-    };
-    let unit = coarse.theta.lattice(Locus::Resonator(0)).unwrap().unit();
-    // Choose a declared factor rate whose actual composed gradient moves several lattice units.
-    let factor_rate = integer(4) * unit * (Rat::one() + &seed_step.energy) / gradient.abs();
-    let cut = cut_at(field.clone(), declare(factor_rate));
+    let cut = cut_at(field.clone(), declared);
     let pulled = cut
         .pullback
         .resonators
@@ -285,24 +275,55 @@ fn loaded_comparison_composes_a_gain_deposit_that_changes_next_logits() {
         .filter(|step| matches!(&step.gradient, FactorGradient::Resonator { ring: 0, .. }))
         .cloned()
         .collect();
-    assert!(!factors.is_empty());
-    assert!(
-        factors
-            .iter()
-            .any(|step| { matches!(&step.gradient, FactorGradient::Resonator { family: 0, .. }) })
-    );
+    let capacity = factors
+        .iter()
+        .find(|step| matches!(&step.gradient, FactorGradient::Resonator { family: 0, .. }))
+        .expect("the comparison composed the capacity gain's step")
+        .clone();
+    let FactorGradient::Resonator { gradient, .. } = &capacity.gradient else {
+        unreachable!()
+    };
     let isolated = Deposit::new(
         cut.theta.commit(),
         Vec::new(),
-        factors,
+        factors.clone(),
         vec![Locus::Resonator(0)],
-    );
-    let (successor, deposit_reading) = cut.theta.deposited(&isolated).unwrap();
-    assert!(deposit_reading.stepped > 0);
-    assert_ne!(successor.resonator_gains(), cut.theta.resonator_gains());
-    let (_, before) = cut.pending.read(&cut.field, &cut.theta).unwrap();
-    let (_, after) = cut.pending.read(&cut.field, &successor).unwrap();
-    assert_ne!(before.logits, after.logits);
+    )
+    .with_reach(cut.deposit.reach().unwrap().clone());
+    let (successor, reading) = cut.theta.deposited(&isolated).unwrap();
+    let certified = reading
+        .steps
+        .iter()
+        .find(|(locus, step)| *locus == Locus::Resonator(0) && step.family == Family::Resonator(0))
+        .map(|(_, step)| step.clone())
+        .expect("the capacity gain's step is certified");
+    assert!(certified.step.alignment.is_positive() && certified.step.holds());
+    assert!(certified.gain.is_positive());
+    // The move is `η G / h′`, at the statistic carried to `h′ = h + e`.
+    let scale = &successor.resonator_scales(0).unwrap()[0];
+    assert!(scale > &Rat::one() && !capacity.energy.is_zero());
+    let moved = &certified.step.step * gradient / scale;
+    let carried = successor
+        .carried_remainders()
+        .into_iter()
+        .filter(|(locus, carrier, ..)| {
+            *locus == Locus::Resonator(0) && *carrier == Carrier::Resonator(0)
+        })
+        .map(|(.., r)| r)
+        .sum::<Rat>();
+    let released = reading
+        .released
+        .iter()
+        .filter(|(locus, carrier, ..)| {
+            *locus == Locus::Resonator(0) && *carrier == Carrier::Resonator(0)
+        })
+        .map(|(.., e)| e.clone())
+        .sum::<Rat>();
+    let gain = &successor.resonator_gains()[0].1[0];
+    assert_eq!(gain + carried + released, Rat::one() + moved);
+    let unit = cut.theta.lattice(Locus::Resonator(0)).unwrap().unit();
+    assert!(certified.step.step.clone() * gradient.abs() / scale < unit / integer(2));
+    assert_eq!(successor.resonator_gains(), cut.theta.resonator_gains());
 }
 
 /// The chain's cut at a generic constitution, built once and shared by the pullback's laws.
@@ -1277,7 +1298,7 @@ fn per_ring_receipts_are_read_in_their_own_clocks() {
 #[test]
 fn refine_refuses_beyond_the_pending_capacity() {
     let field = chain();
-    let reference = Reference::new(2, Steps::campaign_one(), 1 << 40);
+    let reference = Reference::new(2, 1 << 40);
     let mut resident = reference.mount(&field, &Current::at_rest(&field)).unwrap();
     let (moment, _) = reference
         .ingest(&mut resident, None, &one_hot(&[1, 2]))
@@ -1308,7 +1329,7 @@ fn refine_refuses_beyond_the_pending_capacity() {
 #[test]
 fn a_refused_compare_or_deposit_leaves_its_handle_and_the_resident() {
     let field = chain();
-    let reference = Reference::new(4, Steps::campaign_one(), 1 << 40);
+    let reference = Reference::new(4, 1 << 40);
     let mut resident = reference.mount(&field, &Current::at_rest(&field)).unwrap();
     let (moment, _) = reference
         .ingest(&mut resident, None, &one_hot(&[1, 2]))

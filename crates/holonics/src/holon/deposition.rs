@@ -478,6 +478,25 @@ pub fn sqrt_ceiling(x: &Rat, grain: u32) -> Rat {
     Rat::new(BigInt::from(root), BigInt::one() << grain as usize)
 }
 
+/// **A nonnegative rational's dyadic face at `bits` significant bits**, rounded down (`up = false`)
+/// or up: the nearest `m·2^e` below or above `x` with `2^(bits−1) ≤ m < 2^bits`, exact, with zero
+/// its own face. A certificate reads its decrease at the floor and its curvature at the ceiling, so
+/// `η C⁺ ≤ a⁻` implies `η C ≤ a`, and the products it takes stay within a few hundred bits whatever
+/// the exact readings' own (module header, "The certified step").
+pub fn significant(x: &Rat, bits: u32, up: bool) -> Rat {
+    if !x.is_positive() {
+        return Rat::zero();
+    }
+    let shift = i64::from(bits) - 1 - floor_log2(x);
+    let scaled = x * dyadic(shift);
+    let mantissa = if up {
+        scaled.ceil().to_integer()
+    } else {
+        scaled.floor().to_integer()
+    };
+    Rat::from_integer(mantissa) * dyadic(-shift)
+}
+
 /// **An active element's growth factor** `(1 + ω)²` (module header; Lean
 /// `active_element_growth`, `active_energy_growth`): the most an element with an active relation of
 /// operator bound `ω` multiplies the energy share it reads in one step.
@@ -599,6 +618,20 @@ mod tests {
             CertifiedStep::certify(&a, &integer(-1), &Rat::one()),
             Err(HolonError::Negative { .. })
         ));
+    }
+
+    /// A dyadic face at a few significant bits encloses its value: `1/3` at 4 bits lies in
+    /// `[10/32, 11/32]`, a dyadic value is its own face, and zero stays zero.
+    #[test]
+    fn the_significant_face_encloses_its_value() {
+        assert_eq!(significant(&rat(1, 3), 4, false), rat(10, 32));
+        assert_eq!(significant(&rat(1, 3), 4, true), rat(11, 32));
+        assert_eq!(significant(&rat(3, 8), 4, true), rat(3, 8));
+        assert_eq!(significant(&integer(5), 2, true), integer(6));
+        assert_eq!(significant(&integer(5), 2, false), integer(4));
+        assert_eq!(significant(&Rat::zero(), 8, true), Rat::zero());
+        let x = rat(22, 7);
+        assert!(significant(&x, 64, false) <= x && x <= significant(&x, 64, true));
     }
 
     #[test]

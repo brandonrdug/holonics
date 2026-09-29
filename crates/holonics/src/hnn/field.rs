@@ -106,7 +106,7 @@ use crate::geometry::complex::{CellComplex, ConnectionIncidence};
 use crate::geometry::screw::{ScrewAxis, ScrewGenerator, ScrewPair, SituatedScrew};
 use crate::hnn::HnnError;
 use crate::hnn::chart::WordLattice;
-use crate::hnn::constitution::{Lattice, Locus, Steps};
+use crate::hnn::constitution::{Lattice, Locus};
 use crate::hnn::moment::{Capacity, PairPort, capacity};
 use crate::holarchy::{Gluing, GluingDefect, Holarchy};
 use crate::holon::contact::PairContact;
@@ -1732,11 +1732,11 @@ impl Field {
     /// (`L_c`, `D_c`, `L_w`; none for the exact law), the recorded `n*`, the open's law with its
     /// population chart's lattice `L_ν` (ruling B), the gauge convention, the sign sequence's rule,
     /// the receiving law's code ([`RECEIVING_LAW`]) with the tree's Krichevsky–Trofimov prior `α`,
-    /// and the constitution's declared values (the factor step `η_x`, the certified-step rule of
-    /// the normal laws, the budget `B_Θ`) with the pending capacity, as Elias-gamma naturals,
-    /// zig-zag integers and rationals as (numerator, denominator). It is the one exact code of the
-    /// declaration (guard 13), and `Kt` pays for every part of it (design (f), review D3).
-    pub fn describe(&self, steps: &Steps, budget: u64, pending_capacity: usize) -> Vec<bool> {
+    /// and the constitution's declared values (the step rule, which certifies every locus's step,
+    /// and the budget `B_Θ`) with the pending capacity, as Elias-gamma naturals, zig-zag integers
+    /// and rationals as (numerator, denominator). It is the one exact code of the declaration
+    /// (guard 13), and `Kt` pays for every part of it (design (f), review D3).
+    pub fn describe(&self, budget: u64, pending_capacity: usize) -> Vec<bool> {
         let mut code = Vec::new();
         natural(&mut code, self.rings.len() as u64);
         for ring in &self.rings {
@@ -1849,12 +1849,13 @@ impl Field {
         // The receiving law (the landmark tree) and the tree's Krichevsky–Trofimov prior `α = 1/2`.
         natural(&mut code, RECEIVING_LAW);
         rational(&mut code, &rat(1, 2));
-        // The normal laws' step rule: 1 names "the certified step" (`hnn::constitution`, "The
-        // certified step": the largest dyadic step its Gauss–Newton curvature along the ray and the
-        // lattice's covector bound admit). The declared proxy step it replaced is retired.
-        natural(&mut code, 1);
-        // The constitution's declared values and the resident's pending capacity.
-        rational(&mut code, &steps.factor);
+        // The step rule: 2 names "the certified step of every locus" (`hnn::constitution`, "The
+        // certified step" and "The factor families' certified step": the largest dyadic step its
+        // Gauss–Newton curvature along the ray and the covector bound admit, for the normal laws and
+        // the factor families alike). Code 1 certified the normal laws only, beside the factor
+        // families' declared step `η_x`, which was coded after it; both are retired.
+        natural(&mut code, 2);
+        // The constitution's declared budget and the resident's pending capacity.
         natural(&mut code, budget);
         natural(&mut code, pending_capacity as u64);
         code

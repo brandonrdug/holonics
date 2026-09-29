@@ -2,7 +2,9 @@
 //! Brandon, September 29; #73, #148, #63). The pins are
 //! `research/records/2026-09-29_NATIVE_GENERATION_PINNED_BEFORE_ITS_RUNS.md` and, for the certified
 //! step's runs (`moire 4`, `moire 8`, `copy`, `develop text`),
-//! `research/records/2026-09-29_THE_CERTIFIED_DEPOSITION_STEP_PINNED_BEFORE_ITS_RUNS.md`, each
+//! `research/records/2026-09-29_THE_CERTIFIED_DEPOSITION_STEP_PINNED_BEFORE_ITS_RUNS.md` and, for the
+//! factor families' certified step (`moire 4`, `moire 8`, `copy`, `text … passes 1`),
+//! `research/records/2026-09-29_THE_FACTOR_FAMILIES_CERTIFIED_STEP_PINNED_BEFORE_ITS_RUNS.md`, each
 //! committed before any measured run; a committed command run once in release, never a test.
 //!
 //! ```sh
@@ -13,8 +15,8 @@
 //! cargo run --release -p holonics --example hnn_prediction -- moire [K]
 //! cargo run --release -p holonics --example hnn_prediction -- divergence
 //! cargo run --release -p holonics --example hnn_prediction -- text .local/cuts/curated-u6-passage-cut.bin .local/cuts/u6-native-sections.txt
-//! cargo run --release -p holonics --example hnn_prediction -- develop copy|moire <train> <evaluate> [s] [batch] [d] [K]
-//! cargo run --release -p holonics --example hnn_prediction -- develop text <cut> <train> [s]
+//! cargo run --release -p holonics --example hnn_prediction -- develop copy|moire <train> <evaluate> [batch] [d] [K]
+//! cargo run --release -p holonics --example hnn_prediction -- develop text <cut> <train>
 //! ```
 //!
 //! [definition; agent-inferred, the record's pins] **What it executes.**
@@ -25,9 +27,9 @@
 //!   `L_R = 16`; its aperture `K·w + 1`, so the word's precisions by rule cover the refinement's
 //!   junction steps. The refinement is `K = 2` words of `w = 1` tick; its diamond does not reach
 //!   ring 1's element or anything of ring 2, so the unreached check is exercised.
-//! - **The constitution** is `Constitution::initial` at campaign 1's factor step `η_x = ½`, the normal
-//!   laws' steps certified at every deposit (the declared `γ_U = 1` was retired September 29):
-//!   `R = 0`, `E` the declared sign sequence, nothing authored for a terrain. Everything a terrain's
+//! - **The constitution** is `Constitution::initial`, every locus's step certified at every deposit
+//!   (the normal laws' declared `γ_U = 1` and the factor families' declared `η_x = ½` were retired
+//!   September 29): `R = 0`, `E` the declared sign sequence, nothing authored for a terrain. Everything a terrain's
 //!   answer needs is located by the field's own refinement and deposition.
 //! - **Development** (`develop`) reads the terrains at development seeds only (never the pinned
 //!   ones) and the text's choosing pairs only; it chose `d`, `K`, the batch and the steps before the
@@ -49,12 +51,13 @@
 //!   to an owner-only file with nothing beside it. A plural section is held (a typed refusal); no
 //!   keyed latent is tried (retired September 29). Every cut is refused unless it names the reserve
 //!   as excluded (`exterior`).
-//! - **The certified step** (September 29; `hnn::constitution`, "The certified step"): the normal
-//!   laws' steps are certified at every deposit; the readout prints each locus's certified steps
-//!   `2^k` (the least and largest `k`), the largest absolute entry of every learned map (`E`, `R`,
-//!   each `W_c`) over the run and after each of the first eight deposits, and the committed energy
-//!   bound read on every refinement at its commit (`RefinementBalance::energy_bound`) with the
-//!   certified storage growth's product. `s` now scales only the factor families' `η_x = 1/(2s)`.
+//! - **The certified step** (September 29; `hnn::constitution`, "The certified step", "The factor
+//!   families' certified step"): every family's step is certified at every deposit; the readout
+//!   prints each family's certified steps `2^k` by locus (the least and largest `k`), the largest
+//!   absolute entry of every learned map (`E`, `R`, each `W_c`, the factor families `f`, the slices,
+//!   `q`, `c`, `b`, `F`) over the run and after each of the first eight deposits, and the committed
+//!   energy bound read on every refinement at its commit (`RefinementBalance::energy_bound`) with the
+//!   certified storage growth's product and its extremes.
 //! - **Guards**: the run stops at its deadline (the pin's projection bound) or at its resident cap,
 //!   and reports its partial evidence as incomplete. `train <pairs>` and `passes <n>` bound the text
 //!   run's training below the pinned 1,024 pairs and 2 passes (a bounded reading, reported as such).
@@ -71,7 +74,7 @@ use holonics::compression::landmark::context::{SectionChart, StopPrior};
 use holonics::geometry::RatVec3;
 use holonics::geometry::screw::ScrewGenerator;
 use holonics::hnn::chart::Charts;
-use holonics::hnn::constitution::{CAMPAIGN_ONE_BUDGET, Constitution, Steps};
+use holonics::hnn::constitution::{CAMPAIGN_ONE_BUDGET, Constitution};
 use holonics::hnn::field::{
     ConstitutionRead, ContactDeclaration, CribDeclaration, Current, Field, FieldDeclaration,
     ReceiverDeclaration, RingDeclaration,
@@ -110,9 +113,6 @@ const AGENT: usize = 1;
 struct Declared {
     /// `d`: every ring's period.
     period: u64,
-    /// `s`: the factor families' declared step `η_x = 1/(2s)` (campaign 1 at `s = 1`); the normal
-    /// laws' steps are certified.
-    steps: i64,
     /// `|A|`: the exterior chart, its last class the termination.
     alphabet: usize,
     /// `K` and `w`.
@@ -255,14 +255,8 @@ impl Engine {
             declared.alphabet - 1,
         )
         .expect("the declared refinement");
-        let theta = Constitution::initial(
-            &field,
-            Steps {
-                factor: rat(1, 2 * declared.steps),
-            },
-            CAMPAIGN_ONE_BUDGET,
-        )
-        .expect("the initial constitution");
+        let theta =
+            Constitution::initial(&field, CAMPAIGN_ONE_BUDGET).expect("the initial constitution");
         Self {
             field,
             refinement,
@@ -323,7 +317,7 @@ impl Engine {
             let entry = self
                 .tally
                 .exponents
-                .entry(format!("{locus:?}"))
+                .entry(format!("{locus:?} {:?}", step.family))
                 .or_insert((step.step.exponent, step.step.exponent));
             entry.0 = entry.0.min(step.step.exponent);
             entry.1 = entry.1.max(step.step.exponent);
@@ -586,7 +580,6 @@ const MOIRE_FAMILY: MoireFamily = MoireFamily {
 fn terrain_declared() -> Declared {
     Declared {
         period: 32,
-        steps: 1,
         alphabet: 5,
         words: 2,
         span: 1,
@@ -614,7 +607,7 @@ fn terrain(
     let clock = Instant::now();
     let mut engine = Engine::new(declared);
     println!(
-        "hnn_prediction {name}: d = {}, |A| = {} (termination {}), K = {}, w = {}, m = {}, batch {}, steps 1/{}, n* = {}, training pairs {}, evaluated {}",
+        "hnn_prediction {name}: d = {}, |A| = {} (termination {}), K = {}, w = {}, m = {}, batch {}, n* = {}, training pairs {}, evaluated {}",
         declared.period,
         declared.alphabet,
         declared.alphabet - 1,
@@ -622,7 +615,6 @@ fn terrain(
         declared.span,
         declared.stations,
         declared.batch,
-        declared.steps,
         engine.field.capacity().n_star(),
         train.len(),
         evaluate.len()
@@ -670,7 +662,6 @@ fn terrain(
 fn text_declared() -> Declared {
     Declared {
         period: 32,
-        steps: 1,
         alphabet: 257,
         words: 2,
         span: 1,
@@ -911,16 +902,13 @@ fn main() {
         // training or evaluation seeds) and counts given on the command line.
         Some("develop") => {
             let mut declared = terrain_declared();
-            if let Some(steps) = arguments.get(5).and_then(|value| value.parse().ok()) {
-                declared.steps = steps;
-            }
-            if let Some(batch) = arguments.get(6).and_then(|value| value.parse().ok()) {
+            if let Some(batch) = arguments.get(5).and_then(|value| value.parse().ok()) {
                 declared.batch = batch;
             }
-            if let Some(period) = arguments.get(7).and_then(|value| value.parse().ok()) {
+            if let Some(period) = arguments.get(6).and_then(|value| value.parse().ok()) {
                 declared.period = period;
             }
-            if let Some(words) = arguments.get(8).and_then(|value| value.parse().ok()) {
+            if let Some(words) = arguments.get(7).and_then(|value| value.parse().ok()) {
                 declared.words = words;
             }
             let count = |at: usize| -> usize {
@@ -949,10 +937,7 @@ fn main() {
                 }
                 // Text: the choosing role's pairs only; the validation role is never read here.
                 Some("text") => {
-                    let mut declared = text_declared();
-                    if let Some(steps) = arguments.get(5).and_then(|value| value.parse().ok()) {
-                        declared.steps = steps;
-                    }
+                    let declared = text_declared();
                     let passage = text_passage(
                         arguments.get(3).map(String::as_str).expect("the passage cut"),
                         &declared,

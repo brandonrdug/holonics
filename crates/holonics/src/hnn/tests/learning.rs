@@ -2,7 +2,7 @@
 //! a small chain for the return's exactness, and generic exact constitutions (control charts).
 
 use super::support::{Draw, contact, ring};
-use crate::hnn::constitution::{Constitution, Steps};
+use crate::hnn::constitution::{Constitution, Reach};
 use crate::hnn::field::{
     ContactDeclaration, CribDeclaration, Current, Field, FieldDeclaration, ReceiverDeclaration,
 };
@@ -123,6 +123,18 @@ pub(super) fn chain() -> Field {
     chain_with(integer(2))
 }
 
+/// **A hand-built deposit's reach** on the chain (its receiver ring 2 read at ticks 1 and 2, the
+/// moment entering once at the open, one phase): the certified step's reading of a window a compare
+/// did not compose.
+pub(super) fn chain_reach() -> Reach {
+    Reach {
+        receiver: 2,
+        stations: vec![1, 2],
+        entries: vec![0],
+        phases: 1,
+    }
+}
+
 /// **A generic exact constitution** on a field: every locus carries drawn half-integers (`½ℤ`, on
 /// every lattice `L ≥ 1`, so a deposit's denominators stay the updates' own): the passive factor,
 /// the contrast port, generic slices, a mixed standing, the source and receiving maps, nonzero
@@ -130,7 +142,7 @@ pub(super) fn chain() -> Field {
 pub(super) fn generic(field: &Field, seed: u64) -> Constitution {
     let mut draw = Draw::new(seed);
     let a = field.alphabet();
-    let mut theta = Constitution::initial(field, Steps::campaign_one(), OPEN_BUDGET).unwrap();
+    let mut theta = Constitution::initial(field, OPEN_BUDGET).unwrap();
     for g in 0..field.rings().len() {
         let n = field.ring(g).width();
         theta = theta

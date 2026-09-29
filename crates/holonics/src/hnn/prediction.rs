@@ -1013,6 +1013,10 @@ pub fn deposit_of(
                 Some(kept) => {
                     kept.gradient = summed(&kept.gradient, &step.gradient)?;
                     kept.energy += &step.energy;
+                    // One return's covector scale over the joined windows: the largest.
+                    if step.covector > kept.covector {
+                        kept.covector = step.covector.clone();
+                    }
                 }
                 None => factors.push(step.clone()),
             }
@@ -1092,10 +1096,32 @@ fn summed(left: &FactorGradient, right: &FactorGradient) -> Result<FactorGradien
                 .map(|((u, v), (x, y))| (add(u, x), add(v, y)))
                 .collect(),
         },
-        (Standing { ring, gradient: a }, Standing { gradient: b, .. }) => Standing {
-            ring: *ring,
-            gradient: add(a, b),
-        },
+        (
+            Standing {
+                ring,
+                gradient: a,
+                reach: left,
+            },
+            Standing {
+                gradient: b,
+                reach: right,
+                ..
+            },
+        ) => {
+            // The chart's rings, each with the energies of both windows (one refinement's each).
+            let mut reach = left.clone();
+            for (r, energy) in right {
+                match reach.iter_mut().find(|(kept, _)| kept == r) {
+                    Some((_, kept)) => *kept += energy,
+                    None => reach.push((*r, energy.clone())),
+                }
+            }
+            Standing {
+                ring: *ring,
+                gradient: add(a, b),
+                reach,
+            }
+        }
         (
             Resonator {
                 ring,

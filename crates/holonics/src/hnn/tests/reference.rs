@@ -26,7 +26,6 @@ use crate::compression::landmark::context::{
     code_length, prior_family,
 };
 use crate::hnn::HnnError;
-use crate::hnn::constitution::Steps;
 use crate::hnn::field::Current;
 use crate::hnn::port::{ExecutionPort, ReceiptDetail};
 use crate::hnn::reference::{
@@ -215,7 +214,7 @@ fn cut_length() -> usize {
 /// commit. Each deposit grows the constitution (the tree founds nodes on every deposit), so the
 /// third deposit's successor exceeds it.
 fn two_deposits(field: &crate::hnn::Field, cut: &Cut) -> u64 {
-    let open = Reference::new(64, Steps::campaign_one(), OPEN_BUDGET)
+    let open = Reference::new(64, OPEN_BUDGET)
         .with_deadline(3)
         .expose(field, cut)
         .unwrap();
@@ -238,7 +237,7 @@ fn the_exposure_deposits_every_window_until_its_budget_stop_and_runs_to_the_end(
         cells: source(length, 81),
         held_out: vec![2..4, length - 4..length],
     };
-    let exposure = Reference::new(64, Steps::campaign_one(), two_deposits(&field, &cut))
+    let exposure = Reference::new(64, two_deposits(&field, &cut))
         .expose(&field, &cut)
         .unwrap();
     read_out(&exposure, length as u64, 6);
@@ -272,7 +271,7 @@ fn the_exposure_stops_at_its_deadline_and_changes_nothing_it_read() {
         cells: source(length, 81),
         held_out: vec![2..4, length - 4..length],
     };
-    let reference = Reference::new(64, Steps::campaign_one(), OPEN_BUDGET);
+    let reference = Reference::new(64, OPEN_BUDGET);
     let run = |windows: u64| {
         reference
             .clone()
@@ -348,7 +347,7 @@ fn the_exposure_reads_its_declared_population_and_a_past_crib() {
 #[test]
 fn a_compare_returns_the_same_with_and_without_the_refines_kept_read() {
     let field = chain();
-    let reference = Reference::new(4, Steps::campaign_one(), 1 << 40);
+    let reference = Reference::new(4, 1 << 40);
     let mut resident = reference.mount(&field, &Current::at_rest(&field)).unwrap();
     let (moment, _) = reference
         .ingest(&mut resident, None, &one_hot(&[1, 2, 0, 3, 1]))
@@ -393,8 +392,7 @@ fn one_worker_and_many_return_the_same_values() {
         cells: source(length, 81),
         held_out: vec![2..4, length - 4..length],
     };
-    let reference =
-        Reference::new(64, Steps::campaign_one(), two_deposits(&field, &cut)).with_deadline(4);
+    let reference = Reference::new(64, two_deposits(&field, &cut)).with_deadline(4);
     let run = |workers: usize| {
         let pool = rayon::ThreadPoolBuilder::new()
             .num_threads(workers)

@@ -149,7 +149,7 @@ use holonics::hnn::receiving::landmark_declaration;
 use holonics::hnn::reference::{Bits, KeyReport};
 use holonics::hnn::{
     AeonBoundary, Constitution, Cut, Exposure, Field, FieldDeclaration, Reference,
-    ResonatorMaterial, Steps,
+    ResonatorMaterial,
 };
 use holonics::ratio::algebraic::{ExactInterval, interval_sum};
 use holonics::ratio::{Rat, rat};
@@ -310,7 +310,6 @@ fn main() {
     let constitution = loaded.then(|| loaded_constitution(&field));
     let setup = setup.elapsed().as_millis();
     let aperture = field.receivers()[0].aperture;
-    let steps = Steps::campaign_one();
     println!("hnn_exposure: campaign 1's declared field over {source}");
     println!(
         "resonator: {}",
@@ -339,8 +338,7 @@ fn main() {
         tail.start
     );
     println!(
-        "reference: campaign 1 (the normal laws' certified step, eta_x = {}, B_Theta = 2^{} bits, pending capacity {}); deadline: {}",
-        exact(&steps.factor),
+        "reference: campaign 1 (every locus's certified step, the normal laws' and the factor families', B_Theta = 2^{} bits, pending capacity {}); deadline: {}",
         CAMPAIGN_ONE_BUDGET.trailing_zeros(),
         reference.census().pending_capacity,
         deadline.map_or("none".to_string(), |windows| format!("{windows} windows"))
@@ -426,7 +424,7 @@ fn main() {
 fn loaded_constitution(field: &Field) -> Constitution {
     let material = ResonatorMaterial::of_parametron(field.ring(0).parametron(), &rat(1, 4), None)
         .expect("the declared source parametron");
-    Constitution::initial(field, Steps::campaign_one(), CAMPAIGN_ONE_BUDGET)
+    Constitution::initial(field, CAMPAIGN_ONE_BUDGET)
         .expect("the initial constitution")
         .with_ring_resonator(field, 0, material)
         .expect("the source resonator's certified phases")
@@ -827,15 +825,17 @@ fn report(field: &Field, exposure: &Exposure) {
         exposure.constitution_curve.len()
     );
     census(field, exposure);
-    // The certified steps (September 29): each linear locus's least and largest exponent `k` over
-    // the curve (the step `2^k`), and the certified storage growth's product and extremes.
+    // The certified steps (September 29): each family's least and largest exponent `k` over the
+    // curve (the step `2^k`), by locus, and the certified storage growth's product and extremes.
     let mut exponents: std::collections::BTreeMap<String, (i64, i64, u64)> =
         std::collections::BTreeMap::new();
     let mut product = Rat::one();
     let mut growths: Option<(Rat, Rat)> = None;
     for point in exposure.constitution_curve.iter().skip(1) {
-        for (locus, k) in &point.steps {
-            let entry = exponents.entry(format!("{locus:?}")).or_insert((*k, *k, 0));
+        for (locus, family, k) in &point.steps {
+            let entry = exponents
+                .entry(format!("{locus:?} {family:?}"))
+                .or_insert((*k, *k, 0));
             entry.0 = entry.0.min(*k);
             entry.1 = entry.1.max(*k);
             entry.2 += 1;

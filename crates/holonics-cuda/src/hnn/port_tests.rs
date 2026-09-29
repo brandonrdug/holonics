@@ -19,7 +19,7 @@
 use std::ops::Range;
 
 use holonics::compression::landmark::context::Letter;
-use holonics::hnn::constitution::{CAMPAIGN_ONE_BUDGET, Steps};
+use holonics::hnn::constitution::CAMPAIGN_ONE_BUDGET;
 use holonics::hnn::field::{ContactDeclaration, CribDeclaration, ReceiverDeclaration};
 use holonics::hnn::port::{ExecutionPort, Handle, ReceiptDetail};
 use holonics::hnn::reference::ExposedResident;
@@ -147,8 +147,7 @@ fn half_matrix(draw: &mut Draw, rows: usize, columns: usize) -> ExactRatMatrix {
 fn generic(field: &Field, seed: u64) -> Constitution {
     let mut draw = Draw(seed);
     let a = field.alphabet();
-    let mut theta =
-        Constitution::initial(field, Steps::campaign_one(), CAMPAIGN_ONE_BUDGET).unwrap();
+    let mut theta = Constitution::initial(field, CAMPAIGN_ONE_BUDGET).unwrap();
     for g in 0..field.rings().len() {
         let n = field.ring(g).width();
         let passive = half_matrix(&mut draw, n, n);
@@ -601,27 +600,27 @@ fn the_card_port_returns_the_reference_on_campaign_one() {
 }
 
 /// **Campaign 2's physics through the port** (the hardware-surfaces rule): campaign 1's field with a resonator on
-/// every ring (`physics_tests::resonant`) and a certified boost on contact 0 (one negative
-/// stiffness column), on a drawn byte cut: every return the reference's, the refine receipts'
-/// resonator balances (the loaded word's ticks decoded by `crate::hnn::readout`)
-/// and the published constitutions after every deposit included (the card's stiffness is the signed
-/// one, `publication`), and the normal laws' prox steps the card carried in the deposits
-/// (`crate::hnn::lattice::normal_deposit_on_card`, the mirror the GPU suite runs, its `X̂f` read
-/// through the host's successor chart) read equal to the host's successor, with its declines and
-/// skips counted and reported.
+/// every ring (`physics_tests::resonant`), on a drawn byte cut: every return the reference's, the
+/// refine receipts' resonator balances (the loaded word's ticks decoded by `crate::hnn::readout`)
+/// and the published constitutions after every deposit included, and the normal laws' prox steps the
+/// card carried in the deposits (`crate::hnn::lattice::normal_deposit_on_card`, the mirror the GPU
+/// suite runs, its `X̂f` read through the host's successor chart) read equal to the host's
+/// successor, with its declines and skips counted and reported. A declared boost refuses every
+/// deposit that moves a family (its signed stiffness stores indefinite energy, `ActiveContact`), so
+/// its port path is read by `a_refused_deposit_restores_host_and_card_predecessors` and its word by
+/// the loaded source's test; [historical] this test carried a boost until the gains' certificate
+/// refused it (September 29).
 #[test]
 #[ignore = "needs the CUDA card; run alone with --include-ignored --test-threads=1"]
-fn the_card_port_returns_the_reference_with_resonators_and_a_boost() {
+fn the_card_port_returns_the_reference_with_resonators() {
     let probe = Field::declare(FieldDeclaration::campaign_one(1 << 17)).unwrap();
     let n_star = probe.capacity().n_star() as usize;
     let field = Field::declare(FieldDeclaration::campaign_one(n_star as u64)).unwrap();
-    let width = field.contact(0).width();
     // Unpumped loaded resonators (passive), so the certified step certifies the deposits and the
     // normal-law mirror carries them; the pumped resonators' word is checked by the physics tests,
     // and their deposit's refusal by `the_loaded_source_matches_with_y4_and_hop_two`.
-    let theta = super::physics_tests::loaded(&field)
-        .with_contact_signature(&field, 0, (0..width).map(|j| j != 0).collect())
-        .unwrap();
+    let theta = super::physics_tests::loaded(&field);
+
     let mut draw = Draw(13);
     let cells: Vec<usize> = (0..n_star).map(|_| draw.below(256)).collect();
     let compared = lockstep(
@@ -631,7 +630,7 @@ fn the_card_port_returns_the_reference_with_resonators_and_a_boost() {
         Some(theta),
         4,
     );
-    println!("campaign 1 with resonators and a boost, drawn bytes: {compared:?}");
+    println!("campaign 1 with resonators, drawn bytes: {compared:?}");
     assert_eq!(compared.compares, 8);
     assert!(compared.mirror.carried > 0);
     // Coarse gains may stay in their lattice cells on these first windows. The returned
@@ -668,7 +667,7 @@ fn the_loaded_source_matches_with_y4_and_hop_two() {
             .collect(),
     )
     .unwrap();
-    let baseline = Constitution::initial(&field, Steps::campaign_one(), CAMPAIGN_ONE_BUDGET)
+    let baseline = Constitution::initial(&field, CAMPAIGN_ONE_BUDGET)
         .unwrap()
         .with_ports(receiver, None, None, Some(receiving))
         .unwrap()
@@ -724,31 +723,31 @@ fn the_loaded_source_matches_with_y4_and_hop_two() {
     );
     assert_eq!(compared.compares, 8);
     // The pumped resonator's growth is not certified (the Floquet bound is owed in #62), so the
-    // certified step refuses every deposit whose linear loci move through it, alike on both ports;
-    // a deposit whose linear loci move nothing is published and steps no linear locus.
+    // certified step refuses every deposit whose families move through it, alike on both ports;
+    // a deposit whose families move nothing is published and steps no family.
     assert!(compared.refused > 0);
     assert_eq!(compared.stepped_loci, 0);
 }
 
-/// A finite, valid staged deposit the committed energy bound refuses leaves the old constitution,
-/// staged handle and every card mirror at their predecessor on both ports, and a fresh read at the
-/// same moment/targets agrees with the old host tree.
+/// A finite, valid staged deposit the constitution refuses leaves the old constitution, staged
+/// handle and every card mirror at their predecessor on both ports, and a fresh read at the same
+/// moment/targets agrees with the old host tree. Contact 0 declares a certified boost, whose signed
+/// stiffness stores indefinite energy, so no step's gain is certified through it and every deposit
+/// that moves a family is refused on both ports alike (`ActiveContact`). [historical] The refusal was
+/// the committed energy bound's, forced by a 129-bit declared factor step, until the factor
+/// families' step was certified (September 29).
 #[test]
 #[ignore = "needs the CUDA card; run alone with --include-ignored --test-threads=1"]
-fn late_successor_read_refusal_restores_host_and_card_predecessors() {
+fn a_refused_deposit_restores_host_and_card_predecessors() {
     let field = chain();
-    // A 129-bit factor step (the factor families' declared step, not certified here, owed in #62)
-    // grows a contact's storage past every dyadic ε of the declared search: the committed energy
-    // bound refuses the successor on both ports alike (`UncertifiedStorage`). [historical] This test
-    // read a late successor-read refusal when the normal laws' declared step could be 129 bits wide;
-    // the certified step no longer takes one.
-    let steps = Steps {
-        factor: Rat::from_integer(BigInt::from(1u8) << 128usize),
-    };
-    let theta = Constitution::initial(&field, steps.clone(), u64::MAX).unwrap();
-    let host = Reference::new(64, steps.clone(), u64::MAX);
+    let k = field.contact(0).width();
+    let theta = Constitution::initial(&field, u64::MAX)
+        .unwrap()
+        .with_contact_signature(&field, 0, (0..k).map(|j| j != 0).collect())
+        .unwrap();
+    let host = Reference::new(64, u64::MAX);
     let card = card();
-    let device = Resident::new(&card, 64, steps, u64::MAX);
+    let device = Resident::new(&card, 64, u64::MAX);
     let current = Current::at_rest(&field);
     let mut h = host.mount_with(&field, &current, theta.clone()).unwrap();
     let mut d = device.mount_with(&field, &current, theta).unwrap();
@@ -760,28 +759,8 @@ fn late_successor_read_refusal_restores_host_and_card_predecessors() {
     )
     .unwrap();
     let phases = h.admitted()[0].clone();
-    // The first deposit moves the receiving map by its certified step (every upstream covector is
-    // zero at the initial `R = 0`), so the second comparison's covectors reach the factor families.
     let (pending, _) = same(
         "refine the first window",
-        host.refine(&mut h, &moment, &phases),
-        device.refine(&mut d, &moment, &phases),
-    )
-    .unwrap();
-    let (first, _) = same(
-        "stage the first comparison",
-        host.compare(&mut h, pending, &one_hot(&[0, 1])),
-        device.compare(&mut d, pending, &one_hot(&[0, 1])),
-    )
-    .unwrap();
-    same(
-        "deposit the first comparison",
-        host.deposit(&mut h, first),
-        device.deposit(&mut d, first),
-    )
-    .expect("the first deposit is certified");
-    let (pending, _) = same(
-        "refine before staging the large finite update",
         host.refine(&mut h, &moment, &phases),
         device.refine(&mut d, &moment, &phases),
     )
@@ -796,6 +775,7 @@ fn late_successor_read_refusal_restores_host_and_card_predecessors() {
         .deposit
         .into_present()
         .expect("compare staged a deposit");
+
     assert!(!deposit.linear().is_empty());
     assert!(!deposit.landmarks().is_empty());
 
@@ -818,8 +798,14 @@ fn late_successor_read_refusal_restores_host_and_card_predecessors() {
 
     let host_refusal = host.deposit(&mut h, staged);
     let device_refusal = device.deposit(&mut d, staged);
-    assert!(matches!(host_refusal, Err(HnnError::UncertifiedStorage)));
-    assert!(matches!(device_refusal, Err(HnnError::UncertifiedStorage)));
+    assert!(matches!(
+        host_refusal,
+        Err(HnnError::ActiveContact { contact: 0 })
+    ));
+    assert!(matches!(
+        device_refusal,
+        Err(HnnError::ActiveContact { contact: 0 })
+    ));
     assert!(!matches!(
         host_refusal,
         Err(HnnError::ConstitutionBudget { .. })

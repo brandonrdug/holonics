@@ -56,12 +56,28 @@ that fixed-material passivity does not see — the learned power `⟨e, L e⟩` 
    stage balance with its passive part dropped) and `‖w‖ ≤ ωc` has `‖s′‖ ≤ ‖b‖ + ωc`
    (`active_element_growth`); with `‖b‖, c ≤ r` and `ω ≥ 0`, `‖s′‖² ≤ (1 + ω)² r²` and
    `‖s′‖² − ‖b‖² ≤ (2ω + ω²) r²` (`active_energy_growth`).
+8. **The factor families' certified step.** A factor family steps along its unit step `D = G/h'`,
+   its descent covector read through its scalar metric `h' > 0`, with first-order decrease
+   `a = ⟨G, D⟩ = |G|²/h' ≥ 0` (`factor_unit_step_alignment`). A square factor's output
+   `B(x, x)` moves along its ray by `(t − s)(B(D, x) + B(x, D)) + (t² − s²) B(D, D)`
+   (`square_ray_identity`, `square_ray_move`), with Jacobian `B(D, x + tD) + B(x + tD, D)`
+   bounded at the ray's end, `2‖B‖ ‖D‖ (‖x‖ + η‖D‖)` on `[0, η]` (`square_ray_deriv`,
+   `square_ray_deriv_bound`): the move `gauss_newton_curvature` reads. The transit's solve is a
+   contraction at `m ⪰ 1` (`contracting_resolvent`), and its difference power is at most
+   `(G/2h + ½(G/h)² c + ⅛ G² k) |δζ|²` (`transit_difference_power`); the loaded resonator is the
+   case `G = 2Y`.
 
 [open] Owed in #62 ("The certified deposition step"): the model's own second-order terms when the
 logits are not linear in the step (the bilinear coupling of a receiving map with a source port, a
-contrast port acting on its own downstream contrast), the composition of the per-tick growth over
-a word's stations and re-entries into the gains `κ²` the machine reads (`hnn::constitution`), and
-the station score's curvature bound `s = ½`.
+contrast port acting on its own downstream contrast); the factor families' second-order terms along
+their rays (the square's own `2B(D, D)` paired with the station covector, the element's resolvent
+`(I − ½K)⁻¹` and the transit's `m⁻¹` differentiated twice, the ticks' products); the composition of
+the per-tick growth over a word's stations and re-entries into the gains `κ²` the machine reads
+(`hnn::constitution`); the Schur test `‖W‖₂² ≤ ‖W‖₁‖W‖_∞` and its composition into the per-family
+moves; the station score's curvature bound `s = ½`; the standing's fold crossing (its certificate
+holds in its lock chart; a class that crosses its fold jumps, which no curvature bounds); and a
+declared boost's growth bound (its signed stiffness stores indefinite energy, so no gain is
+certified through it; a step through it is refused, like a pumped resonator's).
 -/
 
 noncomputable section
@@ -626,5 +642,127 @@ theorem active_energy_growth {b s' : E} {ω c r : ℝ} (hgrow : ‖s'‖ ≤ ‖
   · nlinarith [mul_le_mul_of_nonneg_left hb (mul_nonneg hω hr)]
 
 end Active
+
+/-! ## 8. The factor families' certified step -/
+
+section Factor
+
+/-- [proved-derived; formal-checked] **The factor family's unit step is aligned.** The family's
+descent covector `G`, read through its scalar metric `h' > 0` (the family's carried feature-energy
+statistic), gives the unit step `D = G/h'`, whose first-order decrease is
+`a = ⟨G, D⟩ = |G|²/h' ≥ 0`: the alignment is checked, never negative, at a positive metric. -/
+theorem factor_unit_step_alignment {E : Type*} [NormedAddCommGroup E] [InnerProductSpace ℝ E]
+    (G : E) {h : ℝ} (hh : 0 < h) :
+    inner ℝ G (h⁻¹ • G) = h⁻¹ * ‖G‖ ^ 2 ∧ 0 ≤ inner ℝ G (h⁻¹ • G) := by
+  have ha : inner ℝ G (h⁻¹ • G) = h⁻¹ * ‖G‖ ^ 2 := by
+    rw [real_inner_smul_right, real_inner_self_eq_norm_sq]
+  exact ⟨ha, by rw [ha]; positivity⟩
+
+/-- [proved-derived; formal-checked] **The square's output along its ray.** A square factor's
+output is the diagonal `x ↦ B(x, x)` of a bilinear map of the factor (the carriers `c cᵀ`, `b bᵀ`,
+`F Fᵀ`, the passive factor `−f fᵀ`, a skew slice `u vᵀ − v uᵀ` in the pair `(u, v)`, a gain
+`g² · base`). Along the ray `x + tD` it moves between `s` and `t` by
+`(t − s)(B(D, x) + B(x, D)) + (t² − s²) B(D, D)`. -/
+theorem square_ray_identity {E F : Type*} [NormedAddCommGroup E] [NormedSpace ℝ E]
+    [NormedAddCommGroup F] [NormedSpace ℝ F] (B : E →L[ℝ] E →L[ℝ] F) (x D : E) (s t : ℝ) :
+    B (x + t • D) (x + t • D) - B (x + s • D) (x + s • D) =
+      (t - s) • (B D x + B x D) + (t ^ 2 - s ^ 2) • B D D := by
+  simp only [map_add, map_smul, _root_.add_apply, _root_.smul_apply]
+  module
+
+/-- [proved-derived; formal-checked] **The square's output moves are Lipschitz along its ray**, with
+the constant read at the ray's end:
+`‖B(x + tD, x + tD) − B(x + sD, x + sD)‖ ≤ |t − s| ‖B‖ ‖D‖ (2‖x‖ + |t + s| ‖D‖)`. -/
+theorem square_ray_move {E F : Type*} [NormedAddCommGroup E] [NormedSpace ℝ E]
+    [NormedAddCommGroup F] [NormedSpace ℝ F] (B : E →L[ℝ] E →L[ℝ] F) (x D : E) (s t : ℝ) :
+    ‖B (x + t • D) (x + t • D) - B (x + s • D) (x + s • D)‖ ≤
+      |t - s| * (‖B‖ * ‖D‖ * (2 * ‖x‖ + |t + s| * ‖D‖)) := by
+  rw [square_ray_identity, show (t ^ 2 - s ^ 2) • B D D = (t - s) • ((t + s) • B D D) by
+    rw [smul_smul]; ring_nf, ← smul_add, norm_smul, Real.norm_eq_abs]
+  refine mul_le_mul_of_nonneg_left ?_ (abs_nonneg _)
+  have h1 := B.le_opNorm₂ D x
+  have h2 := B.le_opNorm₂ x D
+  have h3 := B.le_opNorm₂ D D
+  calc ‖B D x + B x D + (t + s) • B D D‖ ≤ ‖B D x‖ + ‖B x D‖ + |t + s| * ‖B D D‖ := by
+        refine (norm_add_le _ _).trans ?_
+        rw [norm_smul, Real.norm_eq_abs]
+        linarith [norm_add_le (B D x) (B x D)]
+    _ ≤ ‖B‖ * ‖D‖ * ‖x‖ + ‖B‖ * ‖x‖ * ‖D‖ + |t + s| * (‖B‖ * ‖D‖ * ‖D‖) := by gcongr
+    _ = _ := by ring
+
+/-- [proved-derived; formal-checked] **The square's Jacobian along its ray**:
+`d/dt B(x + tD, x + tD) = B(D, x + tD) + B(x + tD, D)`. -/
+theorem square_ray_deriv {E F : Type*} [NormedAddCommGroup E] [NormedSpace ℝ E]
+    [NormedAddCommGroup F] [NormedSpace ℝ F] (B : E →L[ℝ] E →L[ℝ] F) (x D : E) (t : ℝ) :
+    HasDerivAt (fun t : ℝ => B (x + t • D) (x + t • D)) (B D (x + t • D) + B (x + t • D) D) t := by
+  have hγ : HasDerivAt (fun t : ℝ => x + t • D) D t := by
+    simpa using ((hasDerivAt_id t).smul_const D).const_add x
+  exact (B.hasDerivAt_of_bilinear (fun _ => hγ) (fun _ => hγ)).congr_deriv (add_comm _ _)
+
+/-- [proved-derived; formal-checked] **The output's moves, bounded at the ray's end.** On the ray
+`[0, η]` the square's Jacobian is at most `2‖B‖ ‖D‖ (‖x‖ + η‖D‖)`. This is the move `‖u_ℓ‖` that
+`gauss_newton_curvature` reads: with `b` its square, `κ²` the gain from the output to the station
+logits and `n` loci stepping together, the family's Gauss–Newton curvature is `C = n s κ² b`. -/
+theorem square_ray_deriv_bound {E F : Type*} [NormedAddCommGroup E] [NormedSpace ℝ E]
+    [NormedAddCommGroup F] [NormedSpace ℝ F] (B : E →L[ℝ] E →L[ℝ] F) (x D : E) {t η : ℝ}
+    (ht : 0 ≤ t) (htη : t ≤ η) :
+    ‖B D (x + t • D) + B (x + t • D) D‖ ≤ 2 * ‖B‖ * ‖D‖ * (‖x‖ + η * ‖D‖) := by
+  have hy : ‖x + t • D‖ ≤ ‖x‖ + η * ‖D‖ := by
+    refine (norm_add_le _ _).trans ?_
+    rw [norm_smul, Real.norm_of_nonneg ht]
+    gcongr
+  have h1 := B.le_opNorm₂ D (x + t • D)
+  have h2 := B.le_opNorm₂ (x + t • D) D
+  calc ‖B D (x + t • D) + B (x + t • D) D‖ ≤ ‖B D (x + t • D)‖ + ‖B (x + t • D) D‖ :=
+        norm_add_le _ _
+    _ ≤ ‖B‖ * ‖D‖ * ‖x + t • D‖ + ‖B‖ * ‖x + t • D‖ * ‖D‖ := add_le_add h1 h2
+    _ = 2 * (‖B‖ * ‖D‖) * ‖x + t • D‖ := by ring
+    _ ≤ 2 * (‖B‖ * ‖D‖) * (‖x‖ + η * ‖D‖) := by gcongr
+    _ = _ := by ring
+
+/-- [proved-derived; formal-checked] **The transit's solve is a contraction.** An operator `m ⪰ 1`
+(`‖v‖² ≤ ⟨v, m v⟩`), as the transit's normalized `m_a = 1 + (G/2h)(2C + hD + (h²/2)K)` is for
+positive semidefinite carriers, has `‖v‖ ≤ ‖m v‖`: the solve `m ζ = r` has `|ζ| ≤ |r|`. -/
+theorem contracting_resolvent {E : Type*} [NormedAddCommGroup E] [InnerProductSpace ℝ E]
+    (M : E →L[ℝ] E) (hM : ∀ v, ‖v‖ ^ 2 ≤ inner ℝ v (M v)) (v : E) : ‖v‖ ≤ ‖M v‖ := by
+  have h1 := (hM v).trans (real_inner_le_norm v (M v))
+  by_contra hlt
+  replace hlt := not_le.mp hlt
+  nlinarith [norm_nonneg (M v), norm_nonneg v]
+
+/-- [proved-derived; formal-checked] **The transit's difference power.** The transit's difference
+state `δζ` moves the waves at its two ends by `δa = ∓ι δζ/h` (ends with `‖ι v‖ ≤ ‖v‖`), which
+carry `(h/4) G |δa|²`, and the contact's states by `δw = (G/h) δζ` and `δu = (G/2) δζ`, which store
+`½⟨δw, C δw⟩` and `½⟨δu, K δu⟩` under `⟨w, C w⟩ ≤ c|w|²` and `⟨u, K u⟩ ≤ k|u|²`. The whole is at
+most `(G/2h + ½(G/h)² c + ⅛ G² k) |δζ|²`. The loaded resonator is the case `G = 2Y` with both
+ends its one port of admittance `Y` (`ιg = ιh` the identity): its returned wave `(2/h) δζ` carries
+`(h/4) Y |2δζ/h|² = (h/4)(2Y)(|δζ/h|² + |δζ/h|²)`, and its states move by `2δω = (G/h) δζ` and
+`h δω = (G/2) δζ` at `δω = (Y/h) δζ`. -/
+theorem transit_difference_power {E V : Type*} [NormedAddCommGroup E] [InnerProductSpace ℝ E]
+    [NormedAddCommGroup V] [InnerProductSpace ℝ V] (ιg ιh : E →L[ℝ] V)
+    (hιg : ∀ v, ‖ιg v‖ ≤ ‖v‖) (hιh : ∀ v, ‖ιh v‖ ≤ ‖v‖) (C K : E →L[ℝ] E) {c k G h : ℝ}
+    (hC : ∀ w, inner ℝ w (C w) ≤ c * ‖w‖ ^ 2) (hK : ∀ u, inner ℝ u (K u) ≤ k * ‖u‖ ^ 2)
+    (hG : 0 < G) (hh : 0 < h) (v : E) :
+    (h / 4) * G * (‖ιg ((1 / h) • v)‖ ^ 2 + ‖ιh ((1 / h) • v)‖ ^ 2) +
+        (1 / 2) * inner ℝ ((G / h) • v) (C ((G / h) • v)) +
+        (1 / 2) * inner ℝ ((G / 2) • v) (K ((G / 2) • v)) ≤
+      (G / (2 * h) + (1 / 2) * (G / h) ^ 2 * c + (1 / 8) * G ^ 2 * k) * ‖v‖ ^ 2 := by
+  have hn : ‖(1 / h) • v‖ = (1 / h) * ‖v‖ := by
+    rw [norm_smul, Real.norm_of_nonneg (by positivity)]
+  have hwave : ∀ ι : E →L[ℝ] V, (∀ v, ‖ι v‖ ≤ ‖v‖) →
+      ‖ι ((1 / h) • v)‖ ^ 2 ≤ ((1 / h) * ‖v‖) ^ 2 := fun ι hι =>
+    pow_le_pow_left₀ (norm_nonneg _) ((hι _).trans hn.le) 2
+  have hw := hC ((G / h) • v)
+  have hu := hK ((G / 2) • v)
+  rw [norm_smul, Real.norm_of_nonneg (by positivity)] at hw hu
+  have hwaves : (h / 4) * G * (‖ιg ((1 / h) • v)‖ ^ 2 + ‖ιh ((1 / h) • v)‖ ^ 2) ≤
+      (h / 4) * G * (2 * ((1 / h) * ‖v‖) ^ 2) := by
+    refine mul_le_mul_of_nonneg_left ?_ (by positivity)
+    linarith [hwave ιg hιg, hwave ιh hιh]
+  have heq : (h / 4) * G * (2 * ((1 / h) * ‖v‖) ^ 2) = G / (2 * h) * ‖v‖ ^ 2 := by
+    field_simp; ring
+  nlinarith [hwaves, heq, hw, hu]
+
+end Factor
 
 end Holonics.HolonCore

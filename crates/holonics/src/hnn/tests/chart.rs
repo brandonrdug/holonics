@@ -74,13 +74,9 @@ fn the_rule_declares_campaign_ones_precisions() {
         (38, 19, 15)
     );
     assert_eq!(word.target(), Rat::new(BigInt::one(), BigInt::one() << 19));
-    let steps = crate::hnn::Steps::campaign_one();
     assert_ne!(
-        field.describe(&steps, 1 << 33, 64),
-        field
-            .clone()
-            .with_exact_word()
-            .describe(&steps, 1 << 33, 64),
+        field.describe(1 << 33, 64),
+        field.clone().with_exact_word().describe(1 << 33, 64),
         "the description codes the word's precisions"
     );
 }

@@ -15,7 +15,7 @@ use holonics::hnn::constitution::CAMPAIGN_ONE_BUDGET;
 use holonics::hnn::field::{CribDeclaration, ReceiverDeclaration};
 use holonics::hnn::{
     Constitution, ConstitutionRead, ContactDeclaration, Current, Field, FieldDeclaration, Lattice,
-    Locus, ReceivingPhases, RingDeclaration, SourceMoment, Steps,
+    Locus, ReceivingPhases, RingDeclaration, SourceMoment,
 };
 use holonics::ratio::linear::ExactRatMatrix;
 use holonics::ratio::{Rat, integer, rat};
@@ -646,8 +646,7 @@ fn campaign_one_reads_and_ingest_match_the_host() {
     let started = Instant::now();
     let population = 6_148;
     let field = Field::declare(FieldDeclaration::campaign_one(population)).unwrap();
-    let initial =
-        Constitution::initial(&field, Steps::campaign_one(), CAMPAIGN_ONE_BUDGET).unwrap();
+    let initial = Constitution::initial(&field, CAMPAIGN_ONE_BUDGET).unwrap();
     eprintln!("declared in {} us", started.elapsed().as_micros());
     let card = card();
     let mut draw = Draw(1_077);

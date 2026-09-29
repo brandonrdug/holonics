@@ -1,13 +1,13 @@
 //! Loaded resonator gain deposition, its carrier remainders, complete-candidate certification and
 //! receiver-relative release.
 
-use super::learning::{chain, chain_declaration, generic, phases};
-use num_bigint::BigInt;
+use super::learning::{chain, chain_declaration, chain_reach, generic, phases};
+
 use num_traits::{One, Zero};
 
 use crate::hnn::HnnError;
 use crate::hnn::constitution::{
-    Carrier, Constitution, FactorGradient, FactorStep, GainBacktrack, Locus, Steps,
+    Carrier, Constitution, FactorGradient, FactorStep, GainBacktrack, Locus,
 };
 use crate::hnn::field::{Current, Field};
 use crate::hnn::port::{Deposit, ExecutionPort, Handle};
@@ -32,27 +32,51 @@ fn material(field: &Field, ring: usize) -> ResonatorMaterial {
     .unwrap()
 }
 
+/// **A generic constitution whose receiving map is zero**, so no gain reaches the stations and a
+/// gain family's certified step is the covector bound's (`hnn::constitution`, "The factor families'
+/// certified step"): at the covector scale [`COVECTOR`] it is `η = ½`, the step these laws of the
+/// carry, the backtrack and the candidate's certification read.
+fn silent(field: &Field, seed: u64) -> Constitution {
+    let receiver = field.receivers()[0].ring;
+    let width = field.ring(receiver).width();
+    generic(field, seed)
+        .with_ports(
+            receiver,
+            None,
+            None,
+            Some(ExactRatMatrix::zero(2 * field.alphabet(), width).unwrap()),
+        )
+        .unwrap()
+}
+
+/// The covector scale `c = 2` of the fixtures' gain steps: the certified step `η = 2^⌊log₂(1/c)⌋ = ½`
+/// where no gain reaches the stations.
+const COVECTOR: i64 = 2;
+
 fn declared(field: &Field, seed: u64) -> Constitution {
-    let theta = generic(field, seed);
-    theta
+    silent(field, seed)
         .with_ring_resonator(field, 0, material(field, 0))
         .unwrap()
 }
 
+fn gain_step(ring: usize, family: usize, gradient: Rat, energy: Rat) -> FactorStep {
+    FactorStep {
+        gradient: FactorGradient::Resonator {
+            ring,
+            family,
+            gradient,
+        },
+        energy,
+        covector: integer(COVECTOR),
+    }
+}
+
+fn gain_deposit(commit: u64, ring: usize, steps: Vec<FactorStep>) -> Deposit {
+    Deposit::new(commit, Vec::new(), steps, vec![Locus::Resonator(ring)]).with_reach(chain_reach())
+}
+
 fn one_gain_step(ring: usize, family: usize, gradient: Rat, energy: Rat) -> Deposit {
-    Deposit::new(
-        0,
-        Vec::new(),
-        vec![FactorStep {
-            gradient: FactorGradient::Resonator {
-                ring,
-                family,
-                gradient,
-            },
-            energy,
-        }],
-        vec![Locus::Resonator(ring)],
-    )
+    gain_deposit(0, ring, vec![gain_step(ring, family, gradient, energy)])
 }
 
 #[test]
@@ -154,35 +178,20 @@ fn all_gain_families_are_certified_as_one_atomic_candidate() {
         None,
     )
     .unwrap();
-    let theta = generic(&field, 302)
+    let theta = silent(&field, 302)
         .with_ring_resonator(&field, 0, base)
         .unwrap();
     // At `h = 1` the certificate is `2g_C² + g_D²/10 − 1/2`. The capacity step alone carries
     // `g_C` from 1 to 1/4, whose intermediate reads `1/8 + 1/10 − 1/2 = −11/40 < 0`. Raising the
     // dissipation amplitude to 3 in the same comparison makes the complete successor
     // `1/8 + 9/10 − 1/2 = 21/40 > 0`, and the candidate is certified once, whole.
-    let deposit = Deposit::new(
+    let deposit = gain_deposit(
         0,
-        Vec::new(),
+        0,
         vec![
-            FactorStep {
-                gradient: FactorGradient::Resonator {
-                    ring: 0,
-                    family: 0,
-                    gradient: rat(-3, 2),
-                },
-                energy: Rat::zero(),
-            },
-            FactorStep {
-                gradient: FactorGradient::Resonator {
-                    ring: 0,
-                    family: 2,
-                    gradient: integer(4),
-                },
-                energy: Rat::zero(),
-            },
+            gain_step(0, 0, rat(-3, 2), Rat::zero()),
+            gain_step(0, 2, integer(4), Rat::zero()),
         ],
-        vec![Locus::Resonator(0)],
     );
     let (next, reading) = theta.deposited(&deposit).unwrap();
     assert_eq!(
@@ -224,18 +233,10 @@ fn a_step_past_zero_backtracks_to_the_midpoint_and_is_named() {
     let mut gain = Rat::one();
     while gain > unit {
         let (next, reading) = current
-            .deposited(&Deposit::new(
+            .deposited(&gain_deposit(
                 current.commit(),
-                Vec::new(),
-                vec![FactorStep {
-                    gradient: FactorGradient::Resonator {
-                        ring: 0,
-                        family: 0,
-                        gradient: integer(-4),
-                    },
-                    energy: Rat::zero(),
-                }],
-                vec![Locus::Resonator(0)],
+                0,
+                vec![gain_step(0, 0, integer(-4), Rat::zero())],
             ))
             .unwrap();
         assert_eq!(reading.backtracks.len(), 1);
@@ -245,18 +246,10 @@ fn a_step_past_zero_backtracks_to_the_midpoint_and_is_named() {
         current = next;
     }
     let (held, reading) = current
-        .deposited(&Deposit::new(
+        .deposited(&gain_deposit(
             current.commit(),
-            Vec::new(),
-            vec![FactorStep {
-                gradient: FactorGradient::Resonator {
-                    ring: 0,
-                    family: 0,
-                    gradient: integer(-4),
-                },
-                energy: Rat::zero(),
-            }],
-            vec![Locus::Resonator(0)],
+            0,
+            vec![gain_step(0, 0, integer(-4), Rat::zero())],
         ))
         .unwrap();
     assert_eq!(held.resonator(0).unwrap().gains()[0], unit);
@@ -271,6 +264,9 @@ fn a_step_past_zero_backtracks_to_the_midpoint_and_is_named() {
     ));
 }
 
+/// A pumped resonator has no certified growth (its Floquet bound is owed in #62), so a step of its
+/// pump gain is refused before any candidate is formed (`UncertifiedGain`), and nothing is
+/// published.
 #[test]
 fn an_uncertified_pump_gain_refuses_without_publishing_any_part_of_the_candidate() {
     let field = chain();
@@ -284,17 +280,14 @@ fn an_uncertified_pump_gain_refuses_without_publishing_any_part_of_the_candidate
         Some(pump),
     )
     .unwrap();
-    let theta = generic(&field, 303)
+    let theta = silent(&field, 303)
         .with_ring_resonator(&field, 0, material)
         .unwrap();
     let before_bits = theta.exact_bits();
     let error = theta
         .deposited(&one_gain_step(0, 3, integer(2), Rat::zero()))
         .unwrap_err();
-    assert!(matches!(
-        error,
-        HnnError::UncertifiedResonator { ring: 0, phase: 0 }
-    ));
+    assert!(matches!(error, HnnError::UncertifiedGain { ring: 0 }));
     assert_eq!(theta.commit(), 0);
     assert_eq!(theta.exact_bits(), before_bits);
     assert!(
@@ -433,21 +426,23 @@ fn an_out_of_range_gain_family_is_a_typed_refusal() {
     assert!(matches!(error, HnnError::Resonator { ring: 0, .. }));
 }
 
-/// **A deposit the committed energy bound refuses keeps the staged deposit and all published
-/// state** (`hnn::constitution`, "The committed energy bound, enforced at the commit"): a 129-bit
-/// factor step (the factor families' declared step, not certified here, owed in #62) grows a
-/// contact's storage past every dyadic `ε` of the declared search, so the constitution refuses the
-/// successor with `UncertifiedStorage`; the port publishes nothing of it. [historical] This test read
-/// a late reread refusal when the normal laws' declared step could be 129 bits wide; the certified
-/// step no longer takes one.
+/// **A deposit the constitution refuses keeps the staged deposit and all published state**
+/// (`hnn::constitution`, "The certified step"): contact 0 declares a certified boost, whose signed
+/// stiffness stores indefinite energy, so no step's gain is certified through it and the constitution
+/// refuses every deposit that moves a family (`ActiveContact`); the port publishes nothing of it.
+/// [historical] The refusal was the committed energy bound's, forced by a 129-bit declared factor
+/// step, until the factor families' step was certified (September 29); a storage grown outside its
+/// range is refused at the constitution (`tests::constitution`,
+/// `a_storage_growth_outside_its_range_is_refused`).
 #[test]
-fn an_uncertified_storage_growth_keeps_the_staged_deposit_and_all_published_state() {
+fn a_refused_deposit_keeps_the_staged_deposit_and_all_published_state() {
     let field = chain();
-    let steps = Steps {
-        factor: Rat::from_integer(BigInt::one() << 128usize),
-    };
-    let constitution = Constitution::initial(&field, steps.clone(), u64::MAX).unwrap();
-    let reference = Reference::new(64, steps, u64::MAX);
+    let k = field.contact(0).width();
+    let constitution = Constitution::initial(&field, u64::MAX)
+        .unwrap()
+        .with_contact_signature(&field, 0, (0..k).map(|j| j != 0).collect())
+        .unwrap();
+    let reference = Reference::new(64, u64::MAX);
     let current = Current::at_rest(&field);
     let mut resident = reference
         .mount_with(&field, &current, constitution)
@@ -456,16 +451,9 @@ fn an_uncertified_storage_growth_keeps_the_staged_deposit_and_all_published_stat
         .ingest(&mut resident, None, &one_hot(&[0]))
         .unwrap();
     let phases = resident.admitted()[0].clone();
-    // The first deposit moves the receiving map by its certified step (every upstream covector is
-    // zero at the initial `R = 0`), so the second comparison's covectors reach the factor families.
-    let (pending, _) = reference.refine(&mut resident, &moment, &phases).unwrap();
-    let (staged, _) = reference
-        .compare(&mut resident, pending, &one_hot(&[0, 1]))
-        .unwrap();
-    reference.deposit(&mut resident, staged).unwrap();
     let (pending, _) = reference.refine(&mut resident, &moment, &phases).unwrap();
     let (staged, compared) = reference
-        .compare(&mut resident, pending, &one_hot(&[1, 0]))
+        .compare(&mut resident, pending, &one_hot(&[0, 1]))
         .unwrap();
     let deposit = compared.deposit.into_present().unwrap();
 
@@ -477,10 +465,10 @@ fn an_uncertified_storage_growth_keeps_the_staged_deposit_and_all_published_stat
     let handles_before = reference.read(&resident).unwrap().2;
 
     let refusal = reference.deposit(&mut resident, staged).unwrap_err();
-    assert_eq!(refusal, HnnError::UncertifiedStorage);
+    assert_eq!(refusal, HnnError::ActiveContact { contact: 0 });
     assert_eq!(
         constitution_before.deposited(&deposit),
-        Err(HnnError::UncertifiedStorage)
+        Err(HnnError::ActiveContact { contact: 0 })
     );
     assert!(resident.stopped().is_none());
     assert_eq!(resident.constitution(), &constitution_before);

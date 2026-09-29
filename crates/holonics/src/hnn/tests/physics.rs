@@ -9,7 +9,7 @@ use super::support::{Draw, Medium};
 use crate::aeon::{Cycle, Reading, TorusClock, TwoClocks, epochs, reading};
 use crate::compression::landmark::context::Landmarks;
 use crate::hnn::HnnError;
-use crate::hnn::constitution::{Constitution, Steps};
+use crate::hnn::constitution::Constitution;
 use crate::hnn::contact::{
     ContactLock, LockDeclaration, certify_boost, contact_readings, lock_address,
     signed_form_certifies, signed_stiffness, site_reading, site_reading_of_factors, transfer,
@@ -704,7 +704,7 @@ fn the_refine_receipt_carries_each_resonators_balance() {
     use crate::hnn::port::{ExecutionPort, ReceiptDetail};
     use crate::hnn::reference::{Reference, one_hot};
     let field = chain();
-    let theta = Constitution::initial(&field, Steps::campaign_one(), OPEN_BUDGET).unwrap();
+    let theta = Constitution::initial(&field, OPEN_BUDGET).unwrap();
     let mut resonant = theta.clone();
     for ring in 0..field.rings().len() {
         let period = field.ring(ring).period() as usize;
@@ -786,7 +786,7 @@ fn the_census_from_the_factors_is_the_exact_site_reading() {
         }
     }
     let field = Field::declare(FieldDeclaration::campaign_one(6148)).unwrap();
-    let theta = Constitution::initial(&field, Steps::campaign_one(), OPEN_BUDGET).unwrap();
+    let theta = Constitution::initial(&field, OPEN_BUDGET).unwrap();
     for contact in 0..field.contacts().len() {
         let exact = site_reading(
             &crate::hnn::propagation::gram(theta.contact_storage(contact)).unwrap(),
@@ -1101,7 +1101,7 @@ fn a_boost_is_admitted_only_with_a_certified_solve() {
 #[test]
 fn a_certified_boost_runs_in_the_word_and_reads_as_a_boost() {
     let field = chain();
-    let theta = Constitution::initial(&field, Steps::campaign_one(), OPEN_BUDGET).unwrap();
+    let theta = Constitution::initial(&field, OPEN_BUDGET).unwrap();
     // Campaign 1's contact: C = I, K = ¼I, D = ¼I, factors ½I. One negative column.
     let k = field.contact(0).width();
     let signature: Vec<bool> = (0..k).map(|j| j != 0).collect();
@@ -1252,7 +1252,7 @@ fn lock_addresses_mediants_and_whole_windings() {
 #[test]
 fn the_contact_readings_are_read_from_retained_state() {
     let field = Field::declare(FieldDeclaration::campaign_one(6148)).unwrap();
-    let theta = Constitution::initial(&field, Steps::campaign_one(), OPEN_BUDGET).unwrap();
+    let theta = Constitution::initial(&field, OPEN_BUDGET).unwrap();
     let rest = Current::at_rest(&field);
     let readings = contact_readings(&field, &theta, &rest, None).unwrap();
     assert_eq!(readings.len(), 4);
@@ -1334,7 +1334,7 @@ fn the_break_receipt_and_the_parted_face() {
     let (_, image) = transit_solve(contact, operands.step(), &from, &to, &u, &w).unwrap();
     assert_eq!(image.len(), 4);
     // The parted face.
-    let theta = Constitution::initial(&field, Steps::campaign_one(), OPEN_BUDGET).unwrap();
+    let theta = Constitution::initial(&field, OPEN_BUDGET).unwrap();
     assert!(field.holarchy(&theta).is_ok());
     match field.parted_holarchy(&theta, 1).unwrap() {
         GluingDefect::UncancelledPower { power, .. } => assert!(!power.is_zero()),
@@ -1379,7 +1379,7 @@ fn every_refusal_is_typed() {
     assert!(PumpDeclaration::new(integer(-1), Carrier::at(&Rat::zero()), PumpStep::Stand).is_err());
     // A signature of the wrong length.
     let field = chain();
-    let theta = Constitution::initial(&field, Steps::campaign_one(), OPEN_BUDGET).unwrap();
+    let theta = Constitution::initial(&field, OPEN_BUDGET).unwrap();
     assert!(matches!(
         theta.clone().with_contact_signature(&field, 0, vec![true]),
         Err(HnnError::Shape { .. })

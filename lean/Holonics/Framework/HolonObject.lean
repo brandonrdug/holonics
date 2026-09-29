@@ -149,6 +149,13 @@ open Holonics.HolonCore
 #print axioms gauss_newton_curvature
 #print axioms active_element_growth
 #print axioms active_energy_growth
+#print axioms factor_unit_step_alignment
+#print axioms square_ray_identity
+#print axioms square_ray_move
+#print axioms square_ray_deriv
+#print axioms square_ray_deriv_bound
+#print axioms contracting_resolvent
+#print axioms transit_difference_power
 #print axioms re_sum_antiConj
 #print axioms re_herm_skew
 #print axioms eq_zero_of_herm_zero
