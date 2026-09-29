@@ -569,6 +569,37 @@ branch; intervals that do not shorten the charged code are recorded and not adop
     smallest build that tests it.
 
   Its composition into the text chart's population reads item (1)'s protocol, built above.
+- **Item (3) built and its acceptance passed, September 29** (`c17ea7bd`, pinned in `54925b4c`
+  before its draws were read; the
+  [record's §8](../../research/records/2026-09-29_THE_ARITHMETIC_CONTRACT_A_NUMERAL_IS_A_FACE_OF_A_COUNTING_NAVIGATOR_AND_ITS_PRODUCER_IS_A_KEY.md#8-the-build-and-its-acceptance-run-september-29);
+  Refs #73 #148 #63).
+  - *Built*:
+    - `holarchy::terrain::arithmetic::Expressions`: the prose, Rust and Lean layouts in one declared
+      glyph set, each line with its exact truth;
+    - `receiver::population::arithmetic::{ExpressionPort, ExpressionEgg}`: the numeral port with no
+      chart branch, the `^` pairing located by which results hold, the holds sheet over the byte
+      tree, a receipt per expression, and the release as egg packing by certified draws;
+    - the `arithmetic` mode of `hnn_population`;
+    - Lean `jet_separates_across_keys`.
+  - *The run*, seed `2026092903`, `2^10` expressions a base and chart, 105886 ms and 614312 kB
+    against 240 s and 1 GiB projected:
+    - A1: on all nine streams, under the located key, `A + B ≥ P(holds)` exactly on every
+      expression, so the result cells cost at most `2N − log₂ C(2N, N) = 5 + 13/16 + ε` bits a
+      stream. The egg's own code is within that plus the pairing's one bit, and the square and its
+      rebase held on all 9216 expressions.
+    - A2: every shared face (`a ^ 1 = a · 1`; sums whose operands share no bit, `a + c = a ⊕ c`) has
+      its receipt naming the carried producer. On the faces-only control every other family died by
+      the third face on all 192 runs.
+    - A3: 1024 of 1024 reached on every stream, and the contract's code was equal on every equal
+      expression across the charts. The keystone's value against the byte tree alone lies between
+      `20262 + 13/16` and `23610 + 12/16` bits a stream.
+    - The failure branch: no pinned expression unreached. The declared forms outside the layouts
+      (`(2 : ℕ)`, `2u64`, `1_000`, `1,000`, `0o17`, `-`, words, chains, `2 ^ 70`) are recorded
+      unreached. The port's numeral start was revised for every chart during development, before
+      the pin, after it misread `1,000 + 1 = 1,001`.
+  - *Disclosed*: the byte tree's 16-byte context cannot tell an operand's end from a result's in
+    prose and Rust (`1469 + 8/16 + ε` bits on 1024 ends in prose base 2, against `22 + 4/16 + ε` in
+    Lean). Composing the egg with the text chart's population is the next loop.
 
 #### U7. The targets, alongside
 
