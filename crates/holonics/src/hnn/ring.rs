@@ -234,7 +234,8 @@ use crate::hnn::contact::symmetric;
 use crate::holon::parametron::{Carrier, Parametron, threshold_sheet};
 use crate::ratio::linear::ExactRatMatrix;
 use crate::ratio::linear::inertia::{Inertia, inertia};
-use crate::ratio::linear::vector::{add, dot, scale, sub};
+use crate::ratio::gaussian::GaussianRat;
+use crate::ratio::linear::vector::{add, common_denominator, dot, scale, sub};
 use crate::ratio::polynomial::{RationalPolynomial, half_plane_count};
 use crate::ratio::{Rat, integer};
 
@@ -380,17 +381,19 @@ impl PumpDeclaration {
     /// **The node block** `−2p [[cos ψ, sin ψ], [sin ψ, −cos ψ]]` the pump adds to a node's `K`
     /// (Lean `HNN/Ring.pumpBlock`, read as `½ zᵀ K z`).
     pub fn block(&self, phase: usize) -> [[Rat; 2]; 2] {
-        pump_block(&self.strength, &self.carrier(phase))
+        pump_block(&self.strength, &self.carrier(phase).as_gaussian())
     }
 }
 
-/// `−2p R_ψ`, `R_ψ = [[cos ψ, sin ψ], [sin ψ, −cos ψ]]`: the reflection across the pump's axis
-/// `ψ/2`, scaled (Lean `HNN/Floquet.reflection`).
-fn pump_block(strength: &Rat, carrier: &Carrier) -> [[Rat; 2]; 2] {
+/// `−2p R_c`, `R_c = [[Re c, Im c], [Im c, −Re c]]`: at a unit carrier `c = e^(iψ)` the reflection
+/// across the pump's axis `ψ/2`, scaled (Lean `HNN/Floquet.reflection`); at a placed amplitude
+/// `c = |c| e^(iψ)` the same reflection scaled by `|c|` (module header, "The passage's
+/// monodromy").
+fn pump_block(strength: &Rat, carrier: &GaussianRat) -> [[Rat; 2]; 2] {
     let twice = integer(-2) * strength;
     [
-        [&twice * carrier.cos(), &twice * carrier.sin()],
-        [&twice * carrier.sin(), -(&twice * carrier.cos())],
+        [&twice * &carrier.re, &twice * &carrier.im],
+        [&twice * &carrier.im, -(&twice * &carrier.re)],
     ]
 }
 
@@ -400,16 +403,23 @@ fn pump_block(strength: &Rat, carrier: &Carrier) -> [[Rat; 2]; 2] {
 /// every node's stiffness. A declared pump is the schedule `a² s^t` over its order
 /// ([`PumpSchedule::declared`]). A pump whose carriers are multiplied by the carriers of the cells
 /// crossing the ring's section is modulated by them ([`PumpSchedule::modulated`]): the cells enter
-/// the constitution through the pump, the only place the law reads them quadratically.
+/// the constitution through the pump, the only place the law reads them quadratically. The cells
+/// of a passage enter at their placed amplitudes ([`PumpSchedule::placed`]), each reflection scaled
+/// by its cell's `|z_t|`, and a tick no cell crosses is unpumped.
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct PumpSchedule {
     strength: Rat,
-    carriers: Vec<Carrier>,
+    carriers: Vec<GaussianRat>,
 }
 
 impl PumpSchedule {
-    /// A schedule of at least one tick at a nonnegative strength.
+    /// A schedule of at least one tick at a nonnegative strength, one unit carrier a tick.
     pub fn new(strength: Rat, carriers: Vec<Carrier>) -> Result<Self, HnnError> {
+        Self::of_amplitudes(strength, carriers.iter().map(Carrier::as_gaussian).collect())
+    }
+
+    /// A schedule of at least one tick at a nonnegative strength, one placed amplitude a tick.
+    fn of_amplitudes(strength: Rat, carriers: Vec<GaussianRat>) -> Result<Self, HnnError> {
         if strength.is_negative() {
             return Err(HnnError::Resonator {
                 ring: usize::MAX,
@@ -430,7 +440,7 @@ impl PumpSchedule {
         Self {
             strength: pump.strength.clone(),
             carriers: (0..pump.phases())
-                .map(|phase| pump.carrier(phase))
+                .map(|phase| pump.carrier(phase).as_gaussian())
                 .collect(),
         }
     }
@@ -438,12 +448,28 @@ impl PumpSchedule {
     /// **The declared pump modulated by the crossing cells**: one tick per cell, the carrier at tick
     /// `t` the declared carrier `a² s^t` times the cell's carrier `c_t`. Its period is the cells'.
     pub fn modulated(pump: &PumpDeclaration, cells: &[Carrier]) -> Result<Self, HnnError> {
-        Self::new(
+        Self::placed(
+            pump,
+            &cells.iter().map(Carrier::as_gaussian).collect::<Vec<_>>(),
+        )
+    }
+
+    /// [definition; agent-inferred, September 29] **The declared pump modulated by a passage's placed
+    /// amplitudes** (module header, "The passage's monodromy"): one tick per crossing, the carrier at
+    /// tick `t` the declared carrier `a² s^t` times the amplitude `z_t` crossing the section there,
+    /// `|z_t|` scaling the reflection; a zero amplitude leaves its tick unpumped. Its period is the
+    /// passage's.
+    pub fn placed(pump: &PumpDeclaration, amplitudes: &[GaussianRat]) -> Result<Self, HnnError> {
+        Self::of_amplitudes(
             pump.strength.clone(),
-            cells
+            amplitudes
                 .iter()
                 .enumerate()
-                .map(|(tick, cell)| compose(&pump.carrier(tick % pump.phases()), cell))
+                .map(|(tick, amplitude)| {
+                    pump.carrier(tick % pump.phases())
+                        .as_gaussian()
+                        .mul(amplitude)
+                })
                 .collect(),
         )
     }
@@ -457,8 +483,9 @@ impl PumpSchedule {
         self.carriers.len()
     }
 
-    /// The carrier at word tick `t`: the schedule's own clock, `t mod period`.
-    pub fn carrier(&self, tick: usize) -> &Carrier {
+    /// The carrier at word tick `t` (a unit carrier, or a placed amplitude): the schedule's own
+    /// clock, `t mod period`.
+    pub fn carrier(&self, tick: usize) -> &GaussianRat {
         &self.carriers[tick % self.carriers.len()]
     }
 
@@ -1391,41 +1418,17 @@ impl Floquet {
     /// The half-plane count of `q` (`ratio::polynomial::half_plane_count`, Routh–Hurwitz in its
     /// Sturm form) counts the multipliers outside, on and inside exactly; each `−r` counts on.
     pub fn placement(&self, radius: &Rat) -> Result<Placement, HnnError> {
-        if !radius.is_positive() {
-            return Err(HnnError::NonpositiveDeclaration);
-        }
-        let degree = self.monodromy.rows();
-        let plus = RationalPolynomial::new(vec![Rat::one(), Rat::one()]);
-        let minus = RationalPolynomial::new(vec![Rat::one(), -Rat::one()]);
-        let powers = |factor: &RationalPolynomial| {
-            let mut powers = vec![RationalPolynomial::one()];
-            for _ in 0..degree {
-                let next = powers.last().expect("one power at least").times(factor);
-                powers.push(next);
-            }
-            powers
-        };
-        let (plus_powers, minus_powers) = (powers(&plus), powers(&minus));
-        let mut image = RationalPolynomial::zero();
-        let mut scale = Rat::one();
-        for k in 0..=degree {
-            let coefficient = self.characteristic.coefficient(k);
-            if !coefficient.is_zero() {
-                image = image.plus(
-                    &plus_powers[k]
-                        .times(&minus_powers[degree - k])
-                        .scaled(&(coefficient * &scale)),
-                );
-            }
-            scale *= radius;
-        }
-        let image_degree = image.degree().unwrap_or(0);
-        let count = half_plane_count(&image).map_err(HnnError::from)?;
-        Ok(Placement {
-            outside: count.right,
-            on: count.axis + (degree - image_degree),
-            inside: count.left,
-        })
+        placement_of(&self.characteristic, self.monodromy.rows(), radius)
+    }
+
+    /// [proved-derived; implemented-exact] **The growth enclosed on either side of one** (module
+    /// header, "The passage's monodromy"): `lower ≤ ρ(M_T) < upper` with
+    /// `upper − lower ≤ upper·2^(−g)`, `lower` a radius some multiplier reaches or passes and every
+    /// multiplier strictly inside `upper`, by exact bisection on the Schur–Cohn test. Unlike
+    /// [`Floquet::decide`] it encloses a passive monodromy's radius too, so two passages' readings
+    /// are ordered exactly on either side of the bifurcation.
+    pub fn growth(&self, grain: u32) -> Growth {
+        bisect(|radius: &Rat| !strictly_inside(&self.characteristic, radius), grain)
     }
 
     /// [proved-derived; implemented-exact] **The Floquet certificate** (module header): a metric
@@ -1576,6 +1579,281 @@ impl Floquet {
 /// `2^(−g)`.
 fn dyadic(grain: u32) -> Rat {
     Rat::new(BigInt::one(), BigInt::one() << grain)
+}
+
+/// [proved-derived; implemented-exact] **The multipliers' placement about `|μ| = r`** of a
+/// monodromy of the given degree read from its characteristic polynomial ([`Floquet::placement`]).
+fn placement_of(
+    characteristic: &RationalPolynomial,
+    degree: usize,
+    radius: &Rat,
+) -> Result<Placement, HnnError> {
+    if !radius.is_positive() {
+        return Err(HnnError::NonpositiveDeclaration);
+    }
+    let plus = RationalPolynomial::new(vec![Rat::one(), Rat::one()]);
+    let minus = RationalPolynomial::new(vec![Rat::one(), -Rat::one()]);
+    let powers = |factor: &RationalPolynomial| {
+        let mut powers = vec![RationalPolynomial::one()];
+        for _ in 0..degree {
+            let next = powers.last().expect("one power at least").times(factor);
+            powers.push(next);
+        }
+        powers
+    };
+    let (plus_powers, minus_powers) = (powers(&plus), powers(&minus));
+    let mut image = RationalPolynomial::zero();
+    let mut scale = Rat::one();
+    for k in 0..=degree {
+        let coefficient = characteristic.coefficient(k);
+        if !coefficient.is_zero() {
+            image = image.plus(
+                &plus_powers[k]
+                    .times(&minus_powers[degree - k])
+                    .scaled(&(coefficient * &scale)),
+            );
+        }
+        scale *= radius;
+    }
+    let image_degree = image.degree().unwrap_or(0);
+    let count = half_plane_count(&image).map_err(HnnError::from)?;
+    Ok(Placement {
+        outside: count.right,
+        on: count.axis + (degree - image_degree),
+        inside: count.left,
+    })
+}
+
+/// [proved-derived; implemented-exact] **An exact enclosure of a monodromy's spectral radius**
+/// ([`Floquet::growth`]): `lower ≤ ρ(M) ≤ upper`, `lower` a radius some multiplier reaches and
+/// none outside or on `upper`. A reading is ordered strictly above another exactly when its
+/// `lower` exceeds the other's `upper` ([`Growth::exceeds`]).
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct Growth {
+    pub lower: Rat,
+    pub upper: Rat,
+}
+
+impl Growth {
+    /// **The lock's flip between two readings** (`hnn::constitution`, "At a node: the lock's
+    /// half-turn"; `Objects/ParametronLock.lockFace_logistic`): with the weights `a` and `K` of the
+    /// two sheets, the lock turns exactly when `θ = a/(a + K) > ½`, `a > K`; on exact enclosures,
+    /// exactly when this reading's `lower` exceeds the other's `upper`.
+    pub fn exceeds(&self, other: &Self) -> bool {
+        self.lower > other.upper
+    }
+
+    /// **The ring locks**: its growth is certified past the bifurcation, `ρ ≥ lower > 1`.
+    pub fn is_locked(&self) -> bool {
+        self.lower > Rat::one()
+    }
+}
+
+/// [proved-standard; implemented-exact] **Every root strictly inside `|μ| < r`** (the Schur–Cohn
+/// recursion, the discrete-time Routh test): a real polynomial `p = Σ c_i μ^i` of degree `n ≥ 1` has
+/// every root strictly inside the unit disc exactly when `|c_0| < |c_n|` and the polynomial
+/// `(c_n p(μ) − c_0 p*(μ))/μ` of degree `n − 1` has every root strictly inside, with
+/// `p*(μ) = μ^n p(1/μ)` the reversed polynomial (a degree-zero polynomial has no root). Read on
+/// integers at `p(rμ)`, `r = a/b` in lowest terms: `c_i a^i b^(n−i)`, each stage divided by the
+/// power of two its coefficients share. It answers the one question a spectral-radius bisection
+/// asks, `ρ < r`, without the Cayley map's half-plane count.
+fn schur_inside(coefficients: &[BigInt], radius: &Rat) -> bool {
+    let mut degree = coefficients.len().saturating_sub(1);
+    while degree > 0 && coefficients[degree].is_zero() {
+        degree -= 1;
+    }
+    let (numerator, denominator) = (radius.numer(), radius.denom());
+    let mut numerator_power = BigInt::one();
+    let mut stage: Vec<BigInt> = Vec::with_capacity(degree + 1);
+    for coefficient in &coefficients[..=degree] {
+        stage.push(coefficient * &numerator_power);
+        numerator_power *= numerator;
+    }
+    if !denominator.is_one() {
+        let mut denominator_power = BigInt::one();
+        for coefficient in stage.iter_mut().rev() {
+            *coefficient *= &denominator_power;
+            denominator_power *= denominator;
+        }
+    }
+    while stage.len() > 1 {
+        let n = stage.len() - 1;
+        let (low, high) = (stage[0].clone(), stage[n].clone());
+        if low.magnitude() >= high.magnitude() {
+            return false;
+        }
+        let mut next: Vec<BigInt> = (1..=n)
+            .map(|i| &high * &stage[i] - &low * &stage[n - i])
+            .collect();
+        let shared = next
+            .iter()
+            .filter(|c| !c.is_zero())
+            .map(|c| c.trailing_zeros().unwrap_or(0))
+            .min()
+            .unwrap_or(0);
+        if shared > 0 {
+            for c in &mut next {
+                *c >>= shared;
+            }
+        }
+        stage = next;
+    }
+    true
+}
+
+/// [`schur_inside`] for a rational polynomial, over the common denominator of its coefficients.
+fn strictly_inside(characteristic: &RationalPolynomial, radius: &Rat) -> bool {
+    let Some(degree) = characteristic.degree() else {
+        return true;
+    };
+    let coefficients: Vec<Rat> = (0..=degree).map(|k| characteristic.coefficient(k)).collect();
+    let common = common_denominator(coefficients.iter());
+    let integral: Vec<BigInt> = coefficients
+        .iter()
+        .map(|c| c.numer() * (&common / c.denom()))
+        .collect();
+    schur_inside(&integral, radius)
+}
+
+/// **The growth enclosure** of `M = N/Δ` from the integer coefficients `c_k` of `N`'s characteristic
+/// polynomial and the scale `Δ > 0`: the polynomial `q(μ) = Σ c_k Δ^k μ^k = det(Δμ − N)` has the
+/// multipliers of `M` as its roots. Bracketed from one by doubling or halving, then bisected until
+/// `upper − lower ≤ upper·2^(−g)`, each step decided by [`schur_inside`]: `lower` is a radius some
+/// multiplier reaches or passes, and every multiplier lies strictly inside `upper`.
+///
+/// [definition; agent-inferred] **The bracket's attainment.** The bracket is attained on `q` with
+/// every coefficient shifted right by the bits of `Δ^n` less `ATTAINMENT_BITS` (small integers,
+/// cheap to test), bisected there to the grain, then certified on `q` itself by two exact tests:
+/// what the shift attains is trusted nowhere. A bracket the exact tests refuse falls back to the
+/// exact bracket and bisection.
+fn growth_of(characteristic: &[BigInt], scale: &BigInt, grain: u32) -> Growth {
+    let mut power = BigInt::one();
+    let exact: Vec<BigInt> = characteristic
+        .iter()
+        .map(|c| {
+            let term = c * &power;
+            power *= scale;
+            term
+        })
+        .collect();
+    let leading = exact.last().map_or(0, |c| c.bits());
+    let shift = leading.saturating_sub(ATTAINMENT_BITS);
+    let rounded: Vec<BigInt> = exact.iter().map(|c| c >> shift).collect();
+    let attained = bisect(|radius: &Rat| !schur_inside(&rounded, radius), grain);
+    let reached = |radius: &Rat| !schur_inside(&exact, radius);
+    if reached(&attained.lower) && !reached(&attained.upper) {
+        return attained;
+    }
+    bisect(reached, grain)
+}
+
+/// The bits an attainment keeps below a polynomial's leading coefficient, or a matrix's largest
+/// entry.
+const ATTAINMENT_BITS: u64 = 128;
+
+/// `A·B` on integer matrices.
+fn integer_product(left: &[Vec<BigInt>], right: &[Vec<BigInt>]) -> Vec<Vec<BigInt>> {
+    let n = left.len();
+    (0..n)
+        .map(|i| {
+            (0..n)
+                .map(|j| {
+                    (0..n).fold(BigInt::zero(), |sum, k| {
+                        if left[i][k].is_zero() || right[k][j].is_zero() {
+                            sum
+                        } else {
+                            sum + &left[i][k] * &right[k][j]
+                        }
+                    })
+                })
+                .collect()
+        })
+        .collect()
+}
+
+/// [proved-standard; implemented-exact] **The characteristic polynomial of an integer matrix**
+/// `det(μ − A)`, monic, by the Faddeev–LeVerrier recurrence `M_k = A M_(k−1) + c_(n−k+1) I`,
+/// `c_(n−k) = −tr(A M_k)/k`, whose divisions are exact over the integers (every coefficient is an
+/// integer).
+fn integer_characteristic(matrix: &[Vec<BigInt>]) -> Vec<BigInt> {
+    let n = matrix.len();
+    let mut coefficients = vec![BigInt::one()];
+    let mut standing: Vec<Vec<BigInt>> = vec![vec![BigInt::zero(); n]; n];
+    for step in 1..=n {
+        let last = coefficients.last().expect("a leading coefficient").clone();
+        standing = integer_product(matrix, &standing);
+        for (i, row) in standing.iter_mut().enumerate() {
+            row[i] += &last;
+        }
+        let product = integer_product(matrix, &standing);
+        let trace: BigInt = (0..n).map(|i| product[i][i].clone()).sum();
+        coefficients.push(-trace / BigInt::from(step as u64));
+    }
+    coefficients.reverse();
+    coefficients
+}
+
+/// A matrix with each entry rounded toward zero on the dyadic lattice `2^(e − ATTAINMENT_BITS)`,
+/// `2^e` the magnitude of its largest entry: an attainment's operand, never trusted.
+fn rounded_matrix(matrix: &ExactRatMatrix) -> Result<ExactRatMatrix, HnnError> {
+    let largest = matrix
+        .entries()
+        .iter()
+        .filter(|entry| !entry.is_zero())
+        .map(|entry| entry.numer().bits() as i64 - entry.denom().bits() as i64)
+        .max()
+        .unwrap_or(0);
+    let shift = ATTAINMENT_BITS as i64 - largest;
+    let unit = if shift >= 0 {
+        Rat::new(BigInt::one(), BigInt::one() << shift as u64)
+    } else {
+        Rat::from_integer(BigInt::one() << (-shift) as u64)
+    };
+    Ok(ExactRatMatrix::shaped(
+        matrix.rows(),
+        matrix.columns(),
+        (0..matrix.rows())
+            .map(|i| {
+                (0..matrix.columns())
+                    .map(|j| {
+                        let entry = matrix.get(i, j).expect("in range");
+                        Rat::from_integer((entry / &unit).to_integer()) * &unit
+                    })
+                    .collect()
+            })
+            .collect(),
+    )?)
+}
+
+/// Bracket a monotone reading (`reached` true below the radius, false above) from one by doubling
+/// or halving, then bisect until `upper − lower ≤ upper·2^(−g)`.
+fn bisect(reached: impl Fn(&Rat) -> bool, grain: u32) -> Growth {
+    let two = integer(2);
+    let (mut lower, mut upper);
+    if reached(&Rat::one()) {
+        lower = Rat::one();
+        upper = two.clone();
+        while reached(&upper) {
+            lower = upper.clone();
+            upper *= &two;
+        }
+    } else {
+        upper = Rat::one();
+        lower = &upper / &two;
+        while !reached(&lower) {
+            upper = lower.clone();
+            lower /= &two;
+        }
+    }
+    while &upper - &lower > &upper * dyadic(grain) {
+        let middle = (&lower + &upper) / &two;
+        if reached(&middle) {
+            lower = middle;
+        } else {
+            upper = middle;
+        }
+    }
+    Growth { lower, upper }
 }
 
 /// The least value at the relative grain `2^(−g)` where a monotone predicate (false below its
@@ -1943,6 +2221,245 @@ impl ReceivingBank {
             .collect::<Result<Vec<_>, HnnError>>()?;
         Ok(BankReading { readings })
     }
+
+    /// [proved-derived; implemented-exact] **The bank's reading of a passage's turn** (module header,
+    /// "The passage's monodromy"): each member's monodromy through every crossing of the turn, its
+    /// pump modulated by the placed amplitude crossing at each tick ([`PumpSchedule::placed`]), and
+    /// its growth enclosed exactly at the relative grain `2^(−g)` ([`Floquet::growth`]); the bank's
+    /// joint monodromy is the members' block sum, so its growth is the largest member's. A member
+    /// reads the turn only when its pump's period divides the turn's ticks, so the turn is a cycle
+    /// of its clock and the product is its Floquet monodromy; otherwise refused. Each tick is
+    /// certified by its signed form as a scheduled phase is.
+    ///
+    /// [definition; agent-inferred] **Realized on integers.** Each executed tick map `T_t` is carried
+    /// as `N_t/L_t`, `L_t` the least common denominator of its entries, so the product is the integer
+    /// matrix `N = N_(T−1) ⋯ N_0` over `Δ = ∏ L_t` and the multipliers of `M_T = N/Δ` at radius `r` are
+    /// those of `N` at `rΔ`: the same monodromy, without a common-denominator reduction at every
+    /// product.
+    pub fn read_turn(&self, amplitudes: &[GaussianRat], grain: u32) -> Result<TurnReading, HnnError> {
+        let members = (0..self.pumps.len())
+            .map(|member| {
+                let (_, product, scale) = self.turn_monodromy(member, amplitudes)?;
+                Ok(growth_of(&integer_characteristic(&product), &scale, grain))
+            })
+            .collect::<Result<Vec<_>, HnnError>>()?;
+        let joint = Growth {
+            lower: members
+                .iter()
+                .map(|growth| growth.lower.clone())
+                .max()
+                .expect("a bank has a member"),
+            upper: members
+                .iter()
+                .map(|growth| growth.upper.clone())
+                .max()
+                .expect("a bank has a member"),
+        };
+        Ok(TurnReading { members, joint })
+    }
+
+    /// Member `member`'s turn: each crossing's executed tick map, and the monodromy as the integer
+    /// matrix `N` over its scale `Δ` (`M_T = N/Δ`; [`ReceivingBank::read_turn`]).
+    fn turn_monodromy(
+        &self,
+        member: usize,
+        amplitudes: &[GaussianRat],
+    ) -> Result<(Vec<ExactRatMatrix>, Vec<Vec<BigInt>>, BigInt), HnnError> {
+        let pump = &self.pumps[member];
+        if !amplitudes.len().is_multiple_of(pump.phases()) {
+            return Err(HnnError::Resonator {
+                ring: member,
+                what: "a member reads a turn only when its pump's period divides the turn",
+            });
+        }
+        let schedule = PumpSchedule::placed(pump, amplitudes)?;
+        let n = 2 * self.material.width();
+        let mut maps = Vec::with_capacity(schedule.period());
+        let mut product: Vec<Vec<BigInt>> = (0..n)
+            .map(|i| (0..n).map(|j| BigInt::from(u8::from(i == j))).collect())
+            .collect();
+        let mut scale = BigInt::one();
+        for tick in 0..schedule.period() {
+            let map = self.crossing(member, &schedule.block(tick), tick)?;
+            let denominator = common_denominator(map.entries());
+            let integral: Vec<Vec<BigInt>> = (0..n)
+                .map(|i| {
+                    (0..n)
+                        .map(|j| {
+                            let entry = map.get(i, j).expect("in range");
+                            entry.numer() * (&denominator / entry.denom())
+                        })
+                        .collect()
+                })
+                .collect();
+            product = integer_product(&integral, &product);
+            scale *= denominator;
+            maps.push(map);
+        }
+        Ok((maps, product, scale))
+    }
+
+    /// One crossing's executed tick map for member `member`: the unpumped stiffness with the node
+    /// block of its placed carrier, certified by its signed form, solved exactly.
+    fn crossing(
+        &self,
+        member: usize,
+        block: &[[Rat; 2]; 2],
+        tick: usize,
+    ) -> Result<ExactRatMatrix, HnnError> {
+        let (capacity, stiffness, _) = self.material.forms();
+        let pumped = stiffened(stiffness, block)?;
+        if !self.material.signed_form_holds(&pumped, &self.hop)? {
+            return Err(HnnError::UncertifiedResonator {
+                ring: member,
+                phase: tick,
+            });
+        }
+        let phase = Phase::of(
+            member,
+            &self.material,
+            pumped,
+            &self.admittance,
+            &self.hop,
+            None,
+            tick,
+        )?;
+        tick_map(&phase.solve.matrix()?, capacity, &phase.stiffness, &self.hop)
+    }
+
+    /// [proved-derived; implemented-exact] **The certificate of a turn's reading**: each member's
+    /// monodromy through the turn certified at the joint reading's `upper` ([`Floquet::certify`]: `G`
+    /// and `upper²G − M_TᵀGM_T` decided by inertia on the exact monodromy), and the executed,
+    /// undriven turn from the declared seed (node 0's real displacement one, its imaginary rate one
+    /// half) under the placed schedule, every tick's balance checked.
+    ///
+    /// [definition; agent-inferred] **The metric's attainment.** `G` is the exact Stein solve
+    /// ([`attain_metric`]) of the monodromy with each entry rounded toward zero at `ATTAINMENT_BITS`
+    /// significant bits of its largest entry: the exact monodromy's entries carry every crossing's
+    /// denominators, and nothing of how `G` was attained is trusted. A metric the exact inertia
+    /// refuses is attained again by the exact Stein solve of the exact monodromy.
+    pub fn certify_turn(
+        &self,
+        amplitudes: &[GaussianRat],
+        reading: &TurnReading,
+        grain: u32,
+    ) -> Result<TurnCertificate, HnnError> {
+        let width = self.material.width();
+        let mut certificates = Vec::with_capacity(self.pumps.len());
+        let (mut closed, mut ticks) = (0usize, 0usize);
+        for (member, pump) in self.pumps.iter().enumerate() {
+            let (maps, product, scale) = self.turn_monodromy(member, amplitudes)?;
+            let n = product.len();
+            let monodromy = ExactRatMatrix::shaped(
+                n,
+                n,
+                product
+                    .iter()
+                    .map(|row| {
+                        row.iter()
+                            .map(|entry| Rat::new(entry.clone(), scale.clone()))
+                            .collect()
+                    })
+                    .collect(),
+            )?;
+            // `det(μ − N/Δ) = Δ^(−n) det(Δμ − N)`: the coefficient of `μ^k` is `c_k Δ^(k − n)`.
+            let integral = integer_characteristic(&product);
+            let mut power = Rat::one();
+            let mut coefficients = vec![Rat::zero(); n + 1];
+            for k in (0..=n).rev() {
+                coefficients[k] = Rat::from_integer(integral[k].clone()) / &power;
+                power *= Rat::from_integer(scale.clone());
+            }
+            let characteristic = RationalPolynomial::new(coefficients);
+            let floquet = Floquet {
+                ring: member,
+                ticks: maps,
+                monodromy,
+                characteristic,
+            };
+            let mut upper = reading.joint.upper.clone();
+            if !strictly_inside(floquet.characteristic(), &upper) {
+                // A reading enclosed exactly at a multiplier: one grain above it.
+                upper *= Rat::one() + dyadic(grain);
+            }
+            let rounded = rounded_matrix(floquet.monodromy())?;
+            let certificate = match attain_metric(member, &rounded, &upper)
+                .and_then(|metric| floquet.certify(&metric, &upper))
+            {
+                Ok(certificate) => certificate,
+                Err(_) => {
+                    let metric = attain_metric(member, floquet.monodromy(), &upper)?;
+                    floquet.certify(&metric, &upper)?
+                }
+            };
+            certificates.push(certificate);
+            let schedule = PumpSchedule::placed(pump, amplitudes)?;
+            let operands = ResonatorOperands::scheduled(
+                member,
+                &self.material,
+                &schedule,
+                &self.admittance,
+                &self.hop,
+                None,
+            )?;
+            let drive = vec![Rat::zero(); width];
+            let mut state = [vec![Rat::zero(); width], vec![Rat::zero(); width]];
+            state[0][0] = Rat::one();
+            state[1][1] = Rat::new(BigInt::one(), BigInt::from(2));
+            for tick in 0..operands.phases() {
+                let step = operands.step(
+                    tick,
+                    &drive,
+                    [&state[0], &state[1]],
+                    &ResonatorRemainders::zero(width),
+                    None,
+                )?;
+                closed += usize::from(step.closes());
+                ticks += 1;
+                state = step.state;
+            }
+        }
+        Ok(TurnCertificate {
+            certificates,
+            closed,
+            ticks,
+        })
+    }
+}
+
+/// [definition; agent-inferred, September 29] **A turn of the receiving ring** (module header, "The
+/// passage's monodromy"): the ring's storage, one complex amplitude per node
+/// (`u_(2ν) + i u_(2ν+1)`), in the order its nodes cross the section as the ring turns on. The ring's
+/// port map is `P = (· + 1)` and a datum of age `a` is placed at rotation `a`, so the next tick
+/// brings node `d − 1` to the section (age `−1`: the first station), then `d − 2`, …, and node `0`
+/// (the newest request cell) last: tick `t` reads node `d − 1 − t`, the passage in its own time
+/// order around the cycle of the turn.
+pub fn turn(storage: &[Rat]) -> Vec<GaussianRat> {
+    let nodes = storage.len() / 2;
+    (0..nodes)
+        .map(|tick| {
+            let node = nodes - 1 - tick;
+            GaussianRat::new(storage[2 * node].clone(), storage[2 * node + 1].clone())
+        })
+        .collect()
+}
+
+/// [proved-derived; implemented-exact] **The bank's reading of a turn** ([`ReceivingBank::read_turn`]):
+/// each member's growth enclosure and the joint (the largest member's).
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct TurnReading {
+    pub members: Vec<Growth>,
+    pub joint: Growth,
+}
+
+/// [proved-derived; implemented-exact] **A turn reading's certificate**
+/// ([`ReceivingBank::certify_turn`]): each member's Floquet certificate at the joint growth, and the
+/// executed turn's ticks whose balance closed, of those run.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct TurnCertificate {
+    pub certificates: Vec<FloquetCertificate>,
+    pub closed: usize,
+    pub ticks: usize,
 }
 
 /// [proved-derived; implemented-exact] **A bank's reading**: each member's exact Floquet reading.

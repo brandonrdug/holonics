@@ -265,9 +265,9 @@ fn the_executed_balance_closes_under_a_modulated_pump() {
     .unwrap();
     assert_eq!(schedule.period(), 3);
     // tick t: i^t · c_t
-    assert_eq!(schedule.carrier(0), &quarter(1));
-    assert_eq!(schedule.carrier(1), &quarter(0));
-    assert_eq!(schedule.carrier(2), &quarter(0));
+    assert_eq!(schedule.carrier(0), &quarter(1).as_gaussian());
+    assert_eq!(schedule.carrier(1), &quarter(0).as_gaussian());
+    assert_eq!(schedule.carrier(2), &quarter(0).as_gaussian());
     let lattice = WordLattice::by_rule(16, 6, 6, 4);
     for lattice in [None, Some(&lattice)] {
         let operands = ResonatorOperands::scheduled(
