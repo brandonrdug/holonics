@@ -85,9 +85,14 @@ their rays (the square's own `2B(D, D)` paired with the station covector, the el
 the per-tick growth over a word's stations and re-entries into the gains `κ²` the machine reads
 (`hnn::constitution`); the Schur test `‖W‖₂² ≤ ‖W‖₁‖W‖_∞` and its composition into the per-family
 moves (the readout reads the Gram certificate of §9 instead, whose inertia decision is the exact
-congruence of `ratio::linear::inertia`); the station score's curvature bound `s = ½`; the standing's fold crossing (its certificate
-holds in its lock chart; a class that crosses its fold jumps, which no curvature bounds); and a
-declared boost's growth bound (its signed stiffness stores indefinite energy, so no gain is
+congruence of `ratio::linear::inertia`); the station score's curvature bound `s = ½`; the
+standing's fold: the lobe law and the lock's exact comparison are proved in `HNN/Normal` §6
+(`lobe_of_step_bound`, `lobe_ray_keeps_class`, `lobe_move_is_null`, `lobe_deposit_descends`,
+`lock_face_decides`, `lock_flip_descends`, `founding_off_node`), and what stays owed is the
+carried lattice's reading of the lobe (the machine reads the carried successor exactly; the
+statement that the carry's rounding keeps a halved ray in its lobe is not written) and the lock's
+code enclosure as the realized score's (`ExactInterval` code lengths read as the Lean real
+score); and a declared boost's growth bound (its signed stiffness stores indefinite energy, so no gain is
 certified through it; a step through it is refused, like a pumped resonator's).
 -/
 

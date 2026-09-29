@@ -98,9 +98,10 @@ use holonics::hnn::field::{
 };
 use holonics::hnn::moment::SourceMoment;
 use holonics::hnn::prediction::{
-    Refinement, Section, deposit_of, generate, mask, stage, unreached_unchanged,
+    Refinement, Section, comparison_code, deposit_of, generate, mask, stage, unreached_unchanged,
 };
 use holonics::hnn::word::PowerForm;
+use holonics::holon::deposition::strictly_better;
 use holonics::holarchy::terrain::Draw;
 use holonics::holarchy::terrain::moire::{Moire, MoireClass, MoireFamily};
 use holonics::ratio::algebraic::{ExactInterval, interval_sum};
@@ -249,6 +250,40 @@ struct Tally {
     /// Each learned family's deposits that moved any of its entries (a lattice coordinate changed:
     /// the family's accumulated step reached its lattice unit), by name.
     moved: BTreeMap<String, u64>,
+    /// The standing's fold (`hnn::constitution`, "The standing's fold"): the deposits whose lock
+    /// chart offered crossings, the slices offered, the standing families the lobe held (halved)
+    /// and dropped; the lock's proposals, the half-turns they proposed, the proposals taken by the
+    /// exact comparison and the half-turns taken; and the lock's comparison time.
+    lobe_deposits: u64,
+    lobe_offered: u64,
+    lobe_halved: u64,
+    lobe_dropped: u64,
+    lock_proposals: u64,
+    lock_proposed: u64,
+    lock_taken: u64,
+    lock_turned: u64,
+    lock_ms: u128,
+}
+
+/// **The comparison's code of a batch at a constitution** (the lock's exact comparison): each
+/// window's code enclosure, summed.
+fn batch_code(
+    field: &Field,
+    theta: &Constitution,
+    refinement: &Refinement,
+    windows: &[(Current, SourceMoment, Vec<usize>, Vec<bool>)],
+    charts: &mut Charts,
+) -> ExactInterval {
+    let mut total: Option<ExactInterval> = None;
+    for (current, moment, target, locked) in windows {
+        let code = comparison_code(field, theta, current, moment, refinement, target, locked, charts)
+            .expect("the comparison's code");
+        total = Some(match total {
+            Some(sum) => interval_sum(&sum, &code).expect("enclosures add"),
+            None => code,
+        });
+    }
+    total.expect("a batch of at least one window")
 }
 
 impl Tally {
@@ -312,6 +347,7 @@ impl Engine {
         let staging = Instant::now();
         let mut composed = Vec::with_capacity(batch.len());
         let mut balances = Vec::with_capacity(batch.len());
+        let mut windows = Vec::with_capacity(batch.len());
         for (request, target) in batch {
             let (current, moment) = ingest(&self.field, request);
             let locked = if self.order {
@@ -345,8 +381,9 @@ impl Engine {
             self.tally.peak_bits = self.tally.peak_bits.max(staged.peak_bits);
             self.tally
                 .add_code(&staged.ratio.code_length().expect("the section's code"));
-            balances.push((current, staged.end, staged.balance));
+            balances.push((current.clone(), staged.end, staged.balance));
             composed.push(staged.composed);
+            windows.push((current, moment, target.clone(), locked));
         }
         self.tally.stage_ms += staging.elapsed().as_millis();
         let depositing = Instant::now();
@@ -357,8 +394,37 @@ impl Engine {
             .amplitude()
             .expect("the amplitude reads")
             .expect("no pumped resonator on the declared field");
-        let (next, reading) = self.theta.deposited(&deposit).expect("the deposit");
+        let (mut next, reading) = self.theta.deposited(&deposit).expect("the deposit");
         self.tally.deposit_ms += depositing.elapsed().as_millis();
+        // The standing's fold: the lobe held the standings in their lobes; where the lock chart's
+        // steps turn a sheet, the lock compares the batch's code at both sheets exactly and takes
+        // the half-turn only where the turned sheets are strictly better.
+        if let Some(lobe) = &reading.lobe {
+            self.tally.lobe_deposits += 1;
+            self.tally.lobe_offered += lobe.offered.len() as u64;
+            for (_, step) in &lobe.held {
+                match step {
+                    Some(_) => self.tally.lobe_halved += 1,
+                    None => self.tally.lobe_dropped += 1,
+                }
+            }
+        }
+        if let Some(proposal) = &reading.lock {
+            let locking = Instant::now();
+            let (turned, _) = next.locked(proposal).expect("the lock's proposal at its commit");
+            let held_code =
+                batch_code(&self.field, &next, &self.refinement, &windows, &mut self.charts);
+            let turned_code =
+                batch_code(&self.field, &turned, &self.refinement, &windows, &mut self.charts);
+            self.tally.lock_proposals += 1;
+            self.tally.lock_proposed += proposal.crossings().len() as u64;
+            if strictly_better(&held_code, &turned_code) {
+                self.tally.lock_taken += 1;
+                self.tally.lock_turned += proposal.crossings().len() as u64;
+                next = turned;
+            }
+            self.tally.lock_ms += locking.elapsed().as_millis();
+        }
         for (locus, step) in &reading.steps {
             let entry = self
                 .tally
@@ -560,6 +626,19 @@ impl Engine {
         for (locus, (least, largest)) in &t.exponents {
             println!("  certified steps at {locus}: 2^k for k from {least} to {largest}");
         }
+        println!(
+            "  the standing's fold: the lock chart offered crossings at {} of {} deposits ({} slices in all); the lobe halved {} standing steps and dropped {}; the lock's proposals {} ({} half-turns), taken by the exact comparison {} ({} half-turns); the lock's comparisons {} ms",
+            t.lobe_deposits,
+            t.deposits,
+            t.lobe_offered,
+            t.lobe_halved,
+            t.lobe_dropped,
+            t.lock_proposals,
+            t.lock_proposed,
+            t.lock_taken,
+            t.lock_turned,
+            t.lock_ms
+        );
         let factor = |name: &str| !["E", "R", "Wc"].iter().any(|linear| {
             name.strip_prefix(linear)
                 .is_some_and(|ring| ring.chars().all(|c| c.is_ascii_digit()))

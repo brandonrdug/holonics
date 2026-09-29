@@ -903,6 +903,36 @@ branch; intervals that do not shorten the charged code are recorded and not adop
       ring's parametric resonance), not built;
     - `hnn::constitution` does not yet read `FloquetBound::reach`, so a step through a pumped
       resonator stays refused.
+- **The standing's fold, September 29: the copy and the moiré return, and text turns its sheets by
+  the lock**
+  ([pin](../../research/records/2026-09-29_THE_STANDINGS_FOLD_PINNED_BEFORE_ITS_RUNS.md),
+  `5a4ab6e3`;
+  [receipt](../../research/records/2026-09-29_THE_STANDINGS_FOLD_THE_COPY_AND_THE_MOIRE_RETURN_AND_TEXT_TURNS_ITS_SHEETS_BY_THE_LOCK.md);
+  `f3ae1adb`; Refs #73 #63).
+  - *Built* (Brandon's frame: "holding the standings … nodes and anti-nodes, standing waves"): the
+    contrast `Δ = M q` is a standing pattern with nodes, lobes and amplitudes, and a crossing is the
+    sheet's half-turn.
+    - The standing is founded off its nodes: `M_C q_C = k u_C 𝟙` on each chart component, every
+      slice at its first lattice unit in the `+1` lobe the tie rule read at `q = 0`; singular
+      components (one channel's two ends) stay on their node, the field's fixed nodes (campaign 1:
+      16; the prediction field: none).
+    - A standing step is held in its lobes on its carried successor (halved with the families
+      reaching a crossed slice, dropped below half a fine unit) and leaves the realized joint
+      certificate, since the element does not move.
+    - A crossing is the lock's proposal, a commit of its own, taken only where the comparison's code
+      at the turned sheets is strictly shorter (`strictly_better`; the parametron's lock
+      `θ = a/(a + K) > ½ ⇔ a > K`).
+
+    The Lean is `HNN/Normal` §6.
+  - *Measured*:
+    - every check holds on every run;
+    - the copy is 256 of 256 and the moiré 6 of 6 at `K = 4` and `K = 8`, the lock refusing every
+      proposal there;
+    - on text the lock takes 22 of 24 proposals (770 half-turns), and 4 of the 7 reachable factor
+      families move, as many as the previous build on the same declaration;
+    - the standing cut's held-out code is `5470 + 1/16 + ε` (the reference port reads no lock).
+  - *What stays open*, in #62: the carry's reading of the lobe as a Lean statement, the code
+    enclosures as the realized score, and the lock on the reference and card ports.
 
 #### U7. The targets, alongside
 

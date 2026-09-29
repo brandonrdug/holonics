@@ -130,8 +130,63 @@
 //! standing's is read at each ring its lock chart moves. The standing's certificate holds in its
 //! declared lock chart (Lean `HNN/Normal.standing_deposit`), where the element reads the contrast's
 //! move as its classes' tangent; the element itself reads only the classes, so a class that crosses
-//! its fold jumps, which no curvature bounds (owed in #62). No part of this reads a codec, an alphabet
-//! or a terrain.
+//! its node jumps, which no curvature bounds: the standing's fold, below, holds the step in its
+//! lobes and gives the crossing to the lock. No part of this reads a codec, an alphabet or a
+//! terrain.
+//!
+//! [definition; agent-inferred, September 29] **The standing's fold: nodes, lobes, amplitudes and
+//! the lock's half-turn** (the
+//! [fold's record](../../../../research/records/2026-09-29_THE_STANDINGS_FOLD_PINNED_BEFORE_ITS_RUNS.md);
+//! Lean `HNN/Normal` §6, "The standing's fold"). The tightened certificate's receipt located the
+//! copy's regression here: the standings were founded at `q = 0`, on the fold, and the element
+//! reads them only through their sheet classes, so the certified steps' crossings flipped slices'
+//! signs, jumps no curvature bounds. The contrast `Δ = M q` of the lock chart ([`Field::contrast`])
+//! is a standing pattern: `Δ_ρ = 0` is a **node**, the sign classes `σ_ρ = sign Δ_ρ` (`sign 0 = +1`)
+//! are its **lobes**, `|Δ_ρ|` its **amplitude**, and adjacent lobes are in antiphase, so a crossing
+//! is the half-turn `e^{iπ}` of the parametron's sheet.
+//! - **The founding.** The standing is founded as a standing wave with declared lobes: on each
+//!   connected component `C` of the chart's coordinates, `M_C q_C = k u_C 𝟙`, every slice at the
+//!   component's first lattice unit in the `+1` lobe (`u_C` the coarsest standing unit among its
+//!   rings, `k` the least positive integer with `k M_C⁻¹ 𝟙` integral). [agent-inferred] The `+1` lobe
+//!   is the sheet the tie rule already read at `q = 0`, so the founding element `Σ_ρ A_ρ` is exactly
+//!   the declared one; only the amplitude leaves the node (Lean `founding_off_node`). The prediction
+//!   field's chain `0 — 1 — 2` is unimodular at every coordinate and founds at `(2, 3, 2)` units
+//!   (`chain_founding`). A component whose chart is singular cannot place its declared lobes off the
+//!   node: a single channel's two ends read `Δ` and `−Δ`, so its kernel fixes their sum
+//!   (`channel_fixed_node`). It stays on its node, and its slices are the field's **fixed nodes**
+//!   ([`Constitution::fixed_nodes`]): no within-lobe move reaches them, and only the lock can turn
+//!   them. Campaign 1's field has them (the channel between rings 2 and 3 past ring 1's width); the
+//!   prediction field has none.
+//! - **Within a lobe.** A standing's move is read on its carried lattice successor, exactly as the
+//!   carry takes it, against the contrasts of every ring: its step stays in every lobe it reaches,
+//!   with no slice carried onto its node from off it, the lattice form of `η |(M D)_ρ| < |Δ_ρ|`
+//!   wherever the move points toward the node (Lean `lobe_of_step_bound`). Where the chart's
+//!   certified step would leave a lobe, the families whose moves reach the crossed slices are halved
+//!   together (the joint ray scaled) until none leaves; a family whose step falls below half its
+//!   fine lattice's unit on its widest entry would move nothing and is dropped ([`LobeReading`]).
+//!   Along such a move every class is kept (`lobe_ray_keeps_class`), so the element, and every score
+//!   read through it, does not move (`lobe_move_is_null`): the standing's realized move and decrease
+//!   are zero, it leaves the joint certificate, and the deposit descends by the other families'
+//!   `½ Σ η a` (`lobe_deposit_descends`). Its own lock-chart certificate (`ηC ≤ a`, `ηc ≤ 1`) still
+//!   rates its amplitude. [measured, the record's development reads] The joint certificate no longer
+//!   counts the lock chart's decrease of a move the realized score never makes, so the other
+//!   families' joint steps are those their own moves certify.
+//! - **At a node: the lock's half-turn.** The crossings the chart's step offered are the lock's
+//!   proposal ([`LockProposal`]): the standings at the chart's certified step, turning each proposed
+//!   sheet by a half-turn. It is a separate move and a commit of its own ([`Constitution::locked`]),
+//!   taken by the machine that holds the comparison's window only where the lock's exact comparison
+//!   of the comparison's code at both sheets says the turned sheets are strictly better
+//!   ([`crate::holon::deposition::strictly_better`]: the turned code's enclosure lies strictly below
+//!   the held one's). It is the two-state lock's own decision, no threshold: with the sheets'
+//!   weights `a = 2^(−ℓ_turned)`, `K = 2^(−ℓ_held)`, the lock's face `θ = a/(a + K)` exceeds `½`
+//!   exactly when `K < a` (Lean `lock_face_decides`), and the strict comparison descends across the
+//!   jump (`lock_flip_descends`). [agent-inferred] **The consumer equation for the parametron's
+//!   lock** (`hnn::ring`, the parametron worker's target): the merged lock, reading the exchange
+//!   polynomial `Π = 1 + a/K` and its face `θ = a/(a + K)` on the two sheets, turns the sheet exactly
+//!   when `θ > ½`, `lock(a, K) = turn ⇔ a > K`, so `strictly_better(held, turned)` is its decision on
+//!   exact code enclosures. The prediction path takes the lock (`hnn_prediction`'s batch comparison
+//!   through `hnn::prediction::comparison_code`); a port that does not read the comparison twice
+//!   takes the held step and no half-turn, which is lawful: nothing jumps uncertified.
 //!
 //! [definition; agent-inferred, September 29] **The tightened certificate** (the
 //! [tightening's record](../../../../research/records/2026-09-29_THE_TIGHTENED_CERTIFICATE_PINNED_BEFORE_ITS_RUNS.md);
@@ -318,6 +373,9 @@
 //! | `Holon/Deposition.{joint_move_triangle, joint_step_descends, gram_certificate_bound, adjoint_gram_certificate_bound, entrywise_error_bound}` | the tightened certificate ([`Constitution::deposited`], [`DepositReading::joint`], [`StepReading::bound`]; `holon::deposition::{JointReading, spectral_norm}`) |
 //! | `HNN/Normal.factorCarrier_psd` | the factor families ([`FactorGradient`]) |
 //! | `HNN/Normal.standing_deposit`, `sheetClass_locally_constant` | [`FactorGradient::Standing`] |
+//! | `HNN/Normal.{lobe_of_step_bound, lobe_ray_keeps_class, lobe_move_is_null, lobe_deposit_descends}` | the lobe law ([`Constitution::deposited`], [`LobeReading`]; the standing out of the joint certificate) |
+//! | `HNN/Normal.{lock_face_decides, lock_flip_descends}` | the lock's half-turn ([`LockProposal`], [`Constitution::locked`], `holon::deposition::strictly_better`) |
+//! | `HNN/Normal.{founding_off_node, chain_founding, channel_fixed_node}` | the founding ([`Constitution::initial`], [`Constitution::fixed_nodes`], [`Constitution::standing_contrasts`]) |
 //! | `HNN/LatticeDeposit.{quot, rem, div_rem_spec, rem_bounds, quot_eq_zero_of_bounds, fine}` | [`Lattice::div_rem`] (the carry's fine split), [`Lattice::div_rem_coordinate`] (its coarse split) |
 //! | `HNN/LatticeDeposit.{gammaLength, gamma_kraft_lt_one}` | [`gamma_length`] |
 //! | `HNN/LatticeDeposit.{carry, release, carry_accounting, lattice_deposit_accounting, carry_zero, carry_entry_zero, carry_entry_below_grain}` | [`BudgetedCarry`], the carried deposit of every entry |
@@ -2448,6 +2506,13 @@ pub struct DepositReading {
     /// Every loaded resonator gain step the deposit backtracked instead of carrying a gain to
     /// `g ≤ 0` ([`GainBacktrack`]); deposition never releases a family.
     pub backtracks: Vec<GainBacktrack>,
+    /// The lobe law's reading: the crossings the standings' lock chart offered, and the families
+    /// it held in their lobes (`None` when every standing step kept its lobes; module header,
+    /// "Within a lobe").
+    pub lobe: Option<LobeReading>,
+    /// The lock's proposal, when the chart's steps turn a sheet the held successor keeps
+    /// ([`Constitution::locked`]; module header, "At a node: the lock's half-turn").
+    pub lock: Option<LockProposal>,
 }
 
 impl DepositReading {
@@ -2498,6 +2563,12 @@ pub struct Constitution {
     clocks: BTreeMap<Locus, u64>,
     /// `L_R`, the finest admitted receiver grain (the field's), which the chart rule reads.
     grain: u128,
+    /// The standing's lock chart `Δ = M q` (the field's contrast map), which the lobes read
+    /// (module header, "The standing's fold").
+    lock: LockChart,
+    /// The field's fixed nodes: the slices of the chart's singular components, founded on their
+    /// node (module header, "The founding").
+    fixed: Vec<(usize, usize)>,
 }
 
 /// SplitMix64's finalizer after one golden-gamma step.
@@ -2536,6 +2607,273 @@ fn unit(n: usize, i: usize) -> Vec<Rat> {
         .collect()
 }
 
+// -------------------------------------------------------------------------------------------
+// the standing's fold: its nodes, lobes, amplitudes and the lock's half-turn
+
+/// [definition; agent-inferred, September 29] **The standing's lock chart** `Δ = M q` (module
+/// header, "The standing's fold"): the contrast map of [`Field::contrast`], read once from the
+/// field's connection incidence at the founding, so that the constitution reads its standings'
+/// nodes and lobes without the field. Row `(r, ρ)` holds the terms `(g, j, w)` of
+/// `Δ_r[ρ] = Σ w q_g[j]`: `−1` at `(r, ρ)`, each contact block `T_a` read forward at its `from` end
+/// and transposed at its `to` end, exactly as [`Field::contrast`] reads them.
+#[derive(Clone, Debug, PartialEq, Eq)]
+struct LockChart {
+    rows: Vec<Vec<Vec<(usize, usize, Rat)>>>,
+}
+
+impl LockChart {
+    /// The chart read from the field's connection incidence.
+    fn of(field: &Field) -> Result<Self, HnnError> {
+        let connection = field.connection();
+        let (sources, targets) = (connection.sources(), connection.targets());
+        let mut rows = Vec::with_capacity(field.rings().len());
+        for (r, ring) in field.rings().iter().enumerate() {
+            let width = ring.width();
+            let mut terms: Vec<BTreeMap<(usize, usize), Rat>> = (0..width)
+                .map(|rho| BTreeMap::from([((r, rho), -Rat::one())]))
+                .collect();
+            for &a in field.incident(r) {
+                let block = connection.transport(a).ok_or(HnnError::Shape {
+                    what: "a contact's block of the connection incidence",
+                    expected: field.contacts().len(),
+                    found: a,
+                })?;
+                // `Δ_r += T_a q_(t a)` at the `from` end, `Δ_r += T_aᵀ q_(s a)` at the `to` end.
+                let (forward, other) = if sources[a] == r {
+                    (true, targets[a])
+                } else {
+                    (false, sources[a])
+                };
+                let (extent, reach) = if forward {
+                    (block.rows(), block.columns())
+                } else {
+                    (block.columns(), block.rows())
+                };
+                if extent != width {
+                    return Err(HnnError::Shape {
+                        what: "a contact block's side at its ring (the ring's realified width)",
+                        expected: width,
+                        found: extent,
+                    });
+                }
+                for (rho, row) in terms.iter_mut().enumerate() {
+                    for j in 0..reach {
+                        let w = if forward {
+                            block.get(rho, j)?
+                        } else {
+                            block.get(j, rho)?
+                        };
+                        if !w.is_zero() {
+                            *row.entry((other, j)).or_insert_with(Rat::zero) += w;
+                        }
+                    }
+                }
+            }
+            rows.push(
+                terms
+                    .into_iter()
+                    .map(|row| {
+                        row.into_iter()
+                            .filter(|(_, w)| !w.is_zero())
+                            .map(|((g, j), w)| (g, j, w))
+                            .collect()
+                    })
+                    .collect(),
+            );
+        }
+        Ok(Self { rows })
+    }
+
+    /// `Δ_r` of every ring at the standings `q`.
+    fn contrast(&self, standings: &[&[Rat]]) -> Vec<Vec<Rat>> {
+        self.rows
+            .iter()
+            .map(|ring| {
+                ring.iter()
+                    .map(|terms| {
+                        terms
+                            .iter()
+                            .map(|(g, j, w)| w * &standings[*g][*j])
+                            .sum()
+                    })
+                    .collect()
+            })
+            .collect()
+    }
+
+    /// Whether row `(r, ρ)` reads ring `g`'s standing at a coordinate in `moved`.
+    fn reads(&self, r: usize, rho: usize, g: usize, moved: &BTreeSet<usize>) -> bool {
+        self.rows[r][rho]
+            .iter()
+            .any(|(ring, j, _)| *ring == g && moved.contains(j))
+    }
+
+    /// [definition; agent-inferred, September 29] **The standing founded as a standing wave with
+    /// declared lobes** (module header, "The founding"). The chart is block diagonal over the
+    /// connected components of its coordinates; on each component `C` the founding solves
+    /// `M_C q_C = k u_C 𝟙` exactly: every slice's amplitude at the component's first lattice unit
+    /// `k u_C` in the `+1` lobe, `u_C` the coarsest standing unit among the component's rings and `k`
+    /// the least positive integer with `k M_C⁻¹ 𝟙` integral (so `q_C` lies on every ring's lattice).
+    /// A component whose chart is singular cannot place its declared lobes off the node (its kernel
+    /// fixes a combination of its contrasts: a single channel's two ends read `Δ` and `−Δ`); it stays
+    /// founded on its node, and its slices are returned as the field's **fixed nodes**.
+    fn founding(&self, units: &[Rat]) -> Result<Founding, HnnError> {
+        let widths: Vec<usize> = self.rows.iter().map(Vec::len).collect();
+        let mut base = Vec::with_capacity(widths.len());
+        let mut total = 0usize;
+        for width in &widths {
+            base.push(total);
+            total += width;
+        }
+        let mut parent: Vec<usize> = (0..total).collect();
+        fn root(parent: &mut [usize], mut v: usize) -> usize {
+            while parent[v] != v {
+                parent[v] = parent[parent[v]];
+                v = parent[v];
+            }
+            v
+        }
+        for (r, ring) in self.rows.iter().enumerate() {
+            for (rho, terms) in ring.iter().enumerate() {
+                for (g, j, _) in terms {
+                    let (x, y) = (root(&mut parent, base[r] + rho), root(&mut parent, base[*g] + j));
+                    if x != y {
+                        parent[x.max(y)] = x.min(y);
+                    }
+                }
+            }
+        }
+        let mut components: BTreeMap<usize, Vec<(usize, usize)>> = BTreeMap::new();
+        for (r, width) in widths.iter().enumerate() {
+            for rho in 0..*width {
+                let top = root(&mut parent, base[r] + rho);
+                components.entry(top).or_default().push((r, rho));
+            }
+        }
+        let mut standings: Vec<Vec<Rat>> = widths.iter().map(|w| vec![Rat::zero(); *w]).collect();
+        let mut fixed = Vec::new();
+        for members in components.values() {
+            let local: BTreeMap<(usize, usize), usize> = members
+                .iter()
+                .enumerate()
+                .map(|(index, member)| (*member, index))
+                .collect();
+            let chart: Vec<Vec<Rat>> = members
+                .iter()
+                .map(|&(r, rho)| {
+                    let mut row = vec![Rat::zero(); members.len()];
+                    for (g, j, w) in &self.rows[r][rho] {
+                        row[local[&(*g, *j)]] += w;
+                    }
+                    row
+                })
+                .collect();
+            let inverse = match ExactRatMatrix::new(chart)?.inverse() {
+                Ok(inverse) => inverse,
+                Err(ExactLinearError::SingularMatrix) => {
+                    fixed.extend(members.iter().copied());
+                    continue;
+                }
+                Err(refusal) => return Err(refusal.into()),
+            };
+            let wave = inverse.apply(&vec![Rat::one(); members.len()])?;
+            let k = wave
+                .iter()
+                .fold(BigInt::one(), |common, y| lcm(&common, y.denom()));
+            let unit = members
+                .iter()
+                .map(|&(r, _)| units[r].clone())
+                .max()
+                .unwrap_or_else(Rat::zero);
+            let amplitude = &unit * Rat::from_integer(k);
+            for (&(r, rho), y) in members.iter().zip(&wave) {
+                standings[r][rho] = &amplitude * y;
+            }
+        }
+        Ok(Founding { standings, fixed })
+    }
+}
+
+/// The founding's standings and the field's fixed nodes ([`LockChart::founding`]).
+struct Founding {
+    standings: Vec<Vec<Rat>>,
+    fixed: Vec<(usize, usize)>,
+}
+
+/// [definition; agent-inferred, September 29] **The slices a standing move takes out of their
+/// lobes** (module header, "Within a lobe"): every `(r, ρ)` whose sheet class changes (the
+/// half-open lobes `Δ ≥ 0` and `Δ < 0`), or whose contrast the move carries onto its node from off
+/// it. A move with none keeps every class, so the element reads it not at all (Lean
+/// `HNN/Normal.{lobe_step_keeps_element, lobe_move_is_null}`).
+fn crossings(before: &[Vec<Rat>], after: &[Vec<Rat>]) -> Vec<(usize, usize)> {
+    let mut crossed = Vec::new();
+    for (r, (ring_before, ring_after)) in before.iter().zip(after).enumerate() {
+        for (rho, (x, y)) in ring_before.iter().zip(ring_after).enumerate() {
+            if x.is_negative() != y.is_negative() || (!x.is_zero() && y.is_zero()) {
+                crossed.push((r, rho));
+            }
+        }
+    }
+    crossed
+}
+
+/// [definition; agent-inferred, September 29] **The lobe's reading at a deposit** (module header,
+/// "Within a lobe"): the slices the lock chart's certified step would have carried across their
+/// nodes (the crossings it offered the lock), and each standing family the lobe held, with the step
+/// it took (`Some(k)`, the step `2^k`, halved from its chart's) or none (dropped: its move could not
+/// stay in its lobes above its fine lattice's resolution).
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct LobeReading {
+    pub offered: Vec<(usize, usize)>,
+    pub held: Vec<(usize, Option<i64>)>,
+}
+
+/// One standing the lock's proposal moves: its entries, carried remainders, clock and released
+/// residuals at the lock chart's certified step.
+#[derive(Clone, Debug, PartialEq, Eq)]
+struct ProposedStanding {
+    ring: usize,
+    standing: Vec<Rat>,
+    carry: Carry,
+    clock: u64,
+    released: Vec<(Carrier, usize, Rat)>,
+}
+
+/// [definition; agent-inferred, September 29] **The lock's proposal at a deposit** (module header,
+/// "At a node: the lock's half-turn"): the standings the lock chart's certified step reaches when
+/// it carries some slices across their nodes, and those crossings. It is taken only by
+/// [`Constitution::locked`] on the successor it was proposed at, when the lock's exact comparison
+/// of the comparison's code at both sheets ([`crate::holon::deposition::strictly_better`]) says the
+/// crossed sheets are strictly better.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct LockProposal {
+    commit: u64,
+    standings: Vec<ProposedStanding>,
+    crossings: Vec<(usize, usize)>,
+}
+
+impl LockProposal {
+    /// The successor's commit the proposal was made at.
+    pub fn commit(&self) -> u64 {
+        self.commit
+    }
+
+    /// The slices `(r, ρ)` whose sheet the proposal turns by a half-turn (or carries onto its node).
+    pub fn crossings(&self) -> &[(usize, usize)] {
+        &self.crossings
+    }
+}
+
+/// [definition] **The lock's reading** ([`Constitution::locked`]): the crossings taken, the commit
+/// reached, the successor's exact bits, and the residuals the proposal's carry released.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct LockReading {
+    pub crossings: Vec<(usize, usize)>,
+    pub commit: u64,
+    pub bits: u64,
+    pub released: Vec<(Locus, Carrier, usize, Rat)>,
+}
+
 impl Constitution {
     /// **Campaign 1's initial constitution and its priors** (design (d), R3 D2):
     ///
@@ -2548,7 +2886,7 @@ impl Constitution {
     /// | `W_c,g` | 0 | normal law, `H_0 = I`, `B_0 = 0` |
     /// | `W_s,g = −f fᵀ` | `f = ½I` | factor step |
     /// | slices | `u_ρ = e_ρ`, `v_ρ = e_(ρ+1)`: the skew cyclic shift | factor steps |
-    /// | `q_g` | 0 (every sheet class `+1`) | the lock chart's preconditioned step |
+    /// | `q_g` | the standing wave `M_C q_C = k u_C 𝟙`, every slice at its component's first unit in the `+1` lobe; a singular component on its node (module header, "The founding") | the lock chart's preconditioned step, held in its lobes; the lock's half-turn |
     /// | `c_a`, `b_a`, `F_a` | `I`, `½I`, `½I` | factor steps |
     ///
     /// The sign sequence's locus codes: `E` of ring `g` is kind 0; the pair port's current and
@@ -2598,6 +2936,23 @@ impl Constitution {
                 .map(|receiver| Ok(Landmarks::new(landmark_declaration(field, receiver)?)?))
                 .transpose()
         };
+        // The standing founded as a standing wave with declared lobes (module header, "The
+        // founding"): every slice at its component's first lattice unit in the `+1` lobe.
+        let lock = LockChart::of(field)?;
+        let units: Vec<Rat> = (0..field.rings().len())
+            .map(|g| {
+                lattices
+                    .get(&Locus::Standing(g))
+                    .map(Lattice::unit)
+                    .ok_or(HnnError::Lattice {
+                        locus: Locus::Standing(g),
+                    })
+            })
+            .collect::<Result<_, HnnError>>()?;
+        let Founding {
+            standings: mut founded,
+            fixed,
+        } = lock.founding(&units)?;
         let rings = field
             .rings()
             .iter()
@@ -2664,7 +3019,7 @@ impl Constitution {
                     .then(|| ExactRatMatrix::zero(2 * a, n).map(NormalLaw::with_prior))
                     .transpose()?;
                 Ok(RingMaterial {
-                    standing: vec![Rat::zero(); n],
+                    standing: std::mem::take(&mut founded[g]),
                     standing_scale: Rat::one(),
                     passive: scaled_identity(n, rat(1, 2)),
                     passive_scale: Rat::one(),
@@ -2724,6 +3079,8 @@ impl Constitution {
             carries: Carries::new(),
             clocks: BTreeMap::new(),
             grain,
+            lock,
+            fixed,
         })
     }
 
@@ -4056,12 +4413,22 @@ impl Constitution {
                         .expect("a positive alignment certifies a step")
                 })
                 .collect();
+            // The joint certificate reads the realized score's moves: a standing's step stays in
+            // its lobes (module header, "Within a lobe"), where the element reads it not at all, so
+            // its realized move and decrease are both zero and it leaves the joint certificate
+            // (Lean `HNN/Normal.lobe_move_is_null`); its own lock-chart certificate still rates it.
+            let realized: Vec<bool> = parts
+                .iter()
+                .map(|(_, family, _)| *family != Family::Standing)
+                .collect();
             let joint = JointReading::read(
                 &score,
                 certified
                     .iter()
                     .zip(&bounds)
-                    .map(|(step, bound)| (&step.step, &step.alignment, bound)),
+                    .zip(&realized)
+                    .filter(|(_, realized)| **realized)
+                    .map(|((step, bound), _)| (&step.step, &step.alignment, bound)),
             );
             if !joint.holds() {
                 // The family whose halving gains the joint certificate most,
@@ -4069,11 +4436,16 @@ impl Constitution {
                 let total: Rat = certified
                     .iter()
                     .zip(&bounds)
-                    .map(|(step, bound)| &step.step * bound)
+                    .zip(&realized)
+                    .filter(|(_, realized)| **realized)
+                    .map(|((step, bound), _)| &step.step * bound)
                     .sum();
                 let two = rat(2, 1);
                 let mut worst: Option<(usize, Rat)> = None;
                 for (index, (step, bound)) in certified.iter().zip(&bounds).enumerate() {
+                    if !realized[index] {
+                        continue;
+                    }
                     let moved = &step.step * bound;
                     let gained = &step.step
                         * (&score * bound * (&two * &total - &moved / &two) - &step.alignment)
@@ -4259,6 +4631,36 @@ impl Constitution {
                 .collect();
             self.certify_steps(deposit.reach(), &linear, &factors)?
         };
+        let mut certified = certified;
+        // The standing's fold (module header, "Within a lobe", "At a node"): each standing
+        // family's step held inside its lobes, and the crossings its lock chart offered proposed
+        // to the lock.
+        let (lobe, lock) = {
+            let stepping: Vec<(usize, &[Rat], Rat)> = regions
+                .iter()
+                .zip(&ready)
+                .filter_map(|((locus, steps, ..), region)| {
+                    let Locus::Standing(g) = *locus else {
+                        return None;
+                    };
+                    let gradient = steps.iter().find_map(|(_, step)| match step {
+                        LocusStep::Factor(FactorStep {
+                            gradient: FactorGradient::Standing { gradient, .. },
+                            ..
+                        }) => Some(gradient.as_slice()),
+                        _ => None,
+                    })?;
+                    let scale = region
+                        .factors
+                        .iter()
+                        .find(|prepared| prepared.family == Family::Standing)?
+                        .scale
+                        .clone();
+                    Some((g, gradient, scale))
+                })
+                .collect();
+            self.lobe(&stepping, &mut certified)?
+        };
         // Pass 2: every locus's steps in the deposit's order, each family at its certified step,
         // the loci together.
         let done: Vec<LocusDeposit> = regions
@@ -4382,8 +4784,278 @@ impl Constitution {
             charts,
             landmarks: deposit.landmarks().len() as u64,
             backtracks,
+            lobe,
+            lock,
         };
         Ok((next, reading))
+    }
+
+    /// [definition; agent-inferred, September 29] **The lobe law at a deposit** (module header,
+    /// "Within a lobe", "At a node: the lock's half-turn"). Each stepping standing family's move is
+    /// read on its carried lattice successor, exactly as pass 2 carries it; the contrasts `Δ = M q`
+    /// of every ring are read before and after. When the lock chart's certified steps keep every
+    /// slice in its lobe (no class changes, no slice carried onto its node from off it), nothing
+    /// changes. Otherwise the crossings are offered to the lock: the standings the chart's steps
+    /// reach are the lock's proposal, and the families whose moves reach a crossed slice are halved
+    /// together (the joint ray scaled), until no slice leaves its lobe; a family whose step falls
+    /// below half its fine lattice's unit on its widest entry moves nothing there and is dropped
+    /// (its statistic moved in pass 1, its entries do not). The halving ends: a dropped family moves
+    /// no coordinate, so a crossing that remains is read by a family still stepping.
+    fn lobe(
+        &self,
+        stepping: &[(usize, &[Rat], Rat)],
+        certified: &mut BTreeMap<(Locus, Family), StepReading>,
+    ) -> Result<(Option<LobeReading>, Option<LockProposal>), HnnError> {
+        struct Trial {
+            standing: Vec<Rat>,
+            carry: Carry,
+            clock: u64,
+            released: Vec<(Carrier, usize, Rat)>,
+        }
+        // The families that step, with their gradient, metric, chart step and fine half-unit.
+        let mut families: Vec<(usize, &[Rat], Rat, CertifiedStep, Rat)> = Vec::new();
+        for (g, gradient, scale) in stepping {
+            let Some(reading) = certified.get(&(Locus::Standing(*g), Family::Standing)) else {
+                continue;
+            };
+            let locus = Locus::Standing(*g);
+            let precision = gamma_length(self.clock(locus) + 1);
+            let exponent = self.lattice(locus)?.exponent() + precision + 1;
+            let half_fine = Rat::new(BigInt::one(), BigInt::one() << exponent as usize);
+            families.push((*g, gradient, scale.clone(), reading.step.clone(), half_fine));
+        }
+        if families.is_empty() {
+            return Ok((None, None));
+        }
+        let trial = |g: usize, gradient: &[Rat], scale: &Rat, step: &Rat| -> Result<Trial, HnnError> {
+            let locus = Locus::Standing(g);
+            let mut carry = self
+                .carries
+                .get(&(locus, Carrier::Standing))
+                .cloned()
+                .unwrap_or_default();
+            let mut at = BudgetedCarry::new(self.lattice(locus)?, self.clock(locus) + 1);
+            let mut standing = self.rings[g].standing.clone();
+            let rate = step / scale;
+            for (i, (x, dx)) in standing.iter_mut().zip(gradient).enumerate() {
+                carry.deposit(&mut at, Carrier::Standing, i, x, &rate_times(&rate, dx));
+            }
+            Ok(Trial {
+                standing,
+                carry,
+                clock: at.clock(),
+                released: at.released(),
+            })
+        };
+        let before_standings: Vec<&[Rat]> = self
+            .rings
+            .iter()
+            .map(|material| material.standing.as_slice())
+            .collect();
+        let before = self.lock.contrast(&before_standings);
+        // The successor's contrasts at the families' steps (`None`: the family does not step).
+        let successor = |steps: &[Option<Rat>]| -> Result<(Vec<Option<Trial>>, Vec<Vec<Rat>>), HnnError> {
+            let trials: Vec<Option<Trial>> = families
+                .iter()
+                .zip(steps)
+                .map(|((g, gradient, scale, ..), step)| {
+                    step.as_ref()
+                        .map(|step| trial(*g, gradient, scale, step))
+                        .transpose()
+                })
+                .collect::<Result<_, HnnError>>()?;
+            let mut standings = before_standings.clone();
+            for ((g, ..), moved) in families.iter().zip(&trials) {
+                if let Some(moved) = moved {
+                    standings[*g] = moved.standing.as_slice();
+                }
+            }
+            let after = self.lock.contrast(&standings);
+            Ok((trials, after))
+        };
+        let chart_steps: Vec<Option<Rat>> = families
+            .iter()
+            .map(|(.., step, _)| Some(step.step.clone()))
+            .collect();
+        let (proposed, proposed_after) = successor(&chart_steps)?;
+        let offered = crossings(&before, &proposed_after);
+        if offered.is_empty() {
+            return Ok((None, None));
+        }
+        let mut steps = chart_steps;
+        let mut halvings = vec![0i64; families.len()];
+        let held_after = loop {
+            let (trials, after) = successor(&steps)?;
+            let crossed = crossings(&before, &after);
+            if crossed.is_empty() {
+                break after;
+            }
+            let mut halved = false;
+            for (index, (g, gradient, scale, _, half_fine)) in families.iter().enumerate() {
+                let (Some(step), Some(moved)) = (&steps[index], &trials[index]) else {
+                    continue;
+                };
+                let coordinates: BTreeSet<usize> = moved
+                    .standing
+                    .iter()
+                    .zip(before_standings[*g])
+                    .enumerate()
+                    .filter(|(_, (x, y))| x != y)
+                    .map(|(j, _)| j)
+                    .collect();
+                if !crossed
+                    .iter()
+                    .any(|&(r, rho)| self.lock.reads(r, rho, *g, &coordinates))
+                {
+                    continue;
+                }
+                let next = step * rat(1, 2);
+                halvings[index] += 1;
+                halved = true;
+                steps[index] = (&next * widest(gradient) / scale >= *half_fine).then_some(next);
+            }
+            if !halved {
+                return Err(HnnError::Carrier {
+                    what: "a standing's crossing that no stepping family's move reads",
+                });
+            }
+        };
+        // The lock's proposal: the chart's standings where the lobe held a family, and the classes
+        // they turn against the held successor.
+        let proposal_crossings: Vec<(usize, usize)> = held_after
+            .iter()
+            .zip(&proposed_after)
+            .enumerate()
+            .flat_map(|(r, (held, proposed))| {
+                held.iter()
+                    .zip(proposed)
+                    .enumerate()
+                    .filter(|(_, (x, y))| x.is_negative() != y.is_negative())
+                    .map(move |(rho, _)| (r, rho))
+            })
+            .collect();
+        let mut standings = Vec::new();
+        let mut lobe_held = Vec::new();
+        for (index, ((g, ..), proposed)) in families.iter().zip(proposed).enumerate() {
+            if halvings[index] == 0 {
+                continue;
+            }
+            let key = (Locus::Standing(*g), Family::Standing);
+            match &steps[index] {
+                Some(_) => {
+                    let reading = certified.get_mut(&key).expect("a stepping standing family");
+                    for _ in 0..halvings[index] {
+                        reading.step = reading.step.halved();
+                    }
+                    lobe_held.push((*g, Some(reading.step.exponent)));
+                }
+                None => {
+                    certified.remove(&key);
+                    lobe_held.push((*g, None));
+                }
+            }
+            if let Some(proposed) = proposed {
+                standings.push(ProposedStanding {
+                    ring: *g,
+                    standing: proposed.standing,
+                    carry: proposed.carry,
+                    clock: proposed.clock,
+                    released: proposed.released,
+                });
+            }
+        }
+        let lock =(!proposal_crossings.is_empty()).then(|| LockProposal {
+            commit: self.commit + 1,
+            standings,
+            crossings: proposal_crossings,
+        });
+        Ok((
+            Some(LobeReading {
+                offered,
+                held: lobe_held,
+            }),
+            lock,
+        ))
+    }
+
+    /// [definition; agent-inferred, September 29] **The lock's half-turn** (module header, "At a
+    /// node: the lock's half-turn"): the successor with the lock's proposal taken, its standings
+    /// moved to the chart's certified step so every proposed slice's sheet turns by `e^{iπ}`, as a
+    /// commit of its own. The caller takes it only where the lock's exact comparison of the
+    /// comparison's code at both sheets says the turned sheets are strictly better
+    /// ([`crate::holon::deposition::strictly_better`]); the constitution certifies only that the
+    /// proposal was made at this commit, on retained standings, within the budget. Refused with
+    /// [`HnnError::StaleDeposit`] at another commit, [`HnnError::ReleasedLocus`] on a released
+    /// standing and [`HnnError::ConstitutionBudget`] past `B_Θ`.
+    pub fn locked(&self, proposal: &LockProposal) -> Result<(Self, LockReading), HnnError> {
+        if proposal.commit != self.commit {
+            return Err(HnnError::StaleDeposit {
+                staged: proposal.commit,
+                published: self.commit,
+            });
+        }
+        let mut next = self.clone();
+        let mut released = Vec::new();
+        for proposed in &proposal.standings {
+            let locus = Locus::Standing(proposed.ring);
+            if self.released.contains(&locus) {
+                return Err(HnnError::ReleasedLocus { locus });
+            }
+            next.rings[proposed.ring].standing = proposed.standing.clone();
+            if proposed.carry.0.is_empty() {
+                next.carries.remove(&(locus, Carrier::Standing));
+            } else {
+                next.carries
+                    .insert((locus, Carrier::Standing), proposed.carry.clone());
+            }
+            next.clocks.insert(locus, proposed.clock);
+            released.extend(
+                proposed
+                    .released
+                    .iter()
+                    .map(|(carrier, entry, residual)| (locus, *carrier, *entry, residual.clone())),
+            );
+        }
+        next.commit += 1;
+        let bits = next.exact_bits();
+        if bits > self.budget {
+            return Err(HnnError::ConstitutionBudget {
+                bits,
+                budget: self.budget,
+                commit: self.commit,
+                loci: proposal
+                    .standings
+                    .iter()
+                    .map(|proposed| Locus::Standing(proposed.ring))
+                    .collect(),
+            });
+        }
+        Ok((
+            next,
+            LockReading {
+                crossings: proposal.crossings.clone(),
+                commit: self.commit + 1,
+                bits,
+                released,
+            },
+        ))
+    }
+
+    /// **The field's fixed nodes** (module header, "The founding"): the slices `(r, ρ)` of the lock
+    /// chart's singular components, founded on their node, where a combination of the contrasts is
+    /// fixed by the chart's kernel whatever the standings.
+    pub fn fixed_nodes(&self) -> &[(usize, usize)] {
+        &self.fixed
+    }
+
+    /// **The standing contrasts** `Δ_r = (M q)_r` of every ring, read through the lock chart.
+    pub fn standing_contrasts(&self) -> Vec<Vec<Rat>> {
+        let standings: Vec<&[Rat]> = self
+            .rings
+            .iter()
+            .map(|material| material.standing.as_slice())
+            .collect();
+        self.lock.contrast(&standings)
     }
 
     /// **One locus's steps prepared** (pass 1 of [`Constitution::deposited`]): the locus's budgeted

@@ -66,6 +66,22 @@ transposes. The complex chart of the same identities is the owner
    changes exactly where the deposit carries `Δ_ρ` across zero. At the fold the class jumps under
    arbitrarily small deposits (`sheet_fold_witness`); a negative step moves the contrast against
    the covector (`standing_step_sign_witness`).
+   **The standing's fold** (September 29; `hnn::constitution`, "The standing's fold"). `Δ` is a
+   standing pattern: `Δ_ρ = 0` is a node, the sign classes are its lobes, a crossing is the
+   sheet's half-turn. *Within a lobe*: off the node, a move whose contrast points away from the
+   node or is shorter than the amplitude, `η |(L D)_ρ| < |Δ_ρ|` wherever it points toward the
+   node, keeps its end in the lobe (`lobe_of_step_bound`), and then every point of the ray reads
+   the same classes and element (`lobe_ray_keeps_class`), so a score read through the element does
+   not move (`lobe_move_is_null`): the standing leaves the realized joint certificate, and the
+   deposit descends by the others' `½ Σ η a` (`lobe_deposit_descends`, with
+   `Holon/Deposition.joint_step_descends`). *At a node*: no curvature bounds the half-turn; the
+   lock's two-state face `θ = a/(a + K)` exceeds `½` exactly when `K < a` (`lock_face_decides`),
+   and an enclosure of the turned sheets' code strictly below the held one's orders the scores and
+   descends past the deposit's certificate (`lock_flip_descends`). *The founding*: a contrast at a
+   positive constant is off every node and reads the tie rule's classes at `q = 0`, so the declared
+   element is unchanged (`founding_off_node`); the chain founds at `(2, 3, 2)` units
+   (`chain_founding`), and a single channel's two ends read `Δ` and `−Δ`, a fixed node of the
+   declared lobes (`channel_fixed_node`).
 7. **The certified normal step** (`certified_normal_step`, September 29). The deposit at step `η`
    is `W' = W + η D` with the unit step `D = (Σ_t w g_t f_tᵀ) H'⁻¹`; its first-order decrease
    `a = Σ_t w ⟨g_t, D f_t⟩` is the chart's quadratic form on the rows of the window covector
@@ -644,7 +660,178 @@ theorem sheet_fold_witness :
   have : ¬ (0 : ℚ) ≤ -(ε / 2) := by linarith
   simp [sheetClass, this]
 
+/-! ### The standing's fold: nodes, lobes, the lock's half-turn and the founding
+
+The contrast `Δ = L q` is a standing pattern: `Δ_ρ = 0` is a node, the sign classes are its lobes,
+and adjacent lobes are in antiphase, so a crossing is the half-turn `e^{iπ}` of the sheet. -/
+
+/-- [proved-derived; formal-checked] **Within a lobe the whole ray keeps every class.** If every
+contrast coordinate is off its node and the move's end lies strictly on the same side, each point
+`q + t δ` of the ray, `t ∈ [0, 1]`, reads the same classes and the same element operator: the
+contrast along the ray is the convex combination of its two ends. -/
+theorem lobe_ray_keeps_class (Ws : Matrix n n 𝕜) (A : ρ → Matrix n n 𝕜) (L : Matrix ρ ι 𝕜)
+    (q δ : ι → 𝕜)
+    (hlobe : ∀ r, (0 < (L *ᵥ q) r ∧ 0 < (L *ᵥ (q + δ)) r) ∨
+      ((L *ᵥ q) r < 0 ∧ (L *ᵥ (q + δ)) r < 0))
+    {t : 𝕜} (ht0 : 0 ≤ t) (ht1 : t ≤ 1) :
+    (∀ r, sheetClass L (q + t • δ) r = sheetClass L q r) ∧
+      elementOperator Ws A L (q + t • δ) = elementOperator Ws A L q := by
+  have hcls : ∀ r, sheetClass L (q + t • δ) r = sheetClass L q r := by
+    intro r
+    have hray : (L *ᵥ (q + t • δ)) r =
+        (1 - t) * (L *ᵥ q) r + t * (L *ᵥ (q + δ)) r := by
+      simp only [mulVec_add, mulVec_smul, Pi.add_apply, Pi.smul_apply, smul_eq_mul]
+      ring
+    unfold sheetClass
+    rw [hray]
+    rcases hlobe r with ⟨h0, h1⟩ | ⟨h0, h1⟩
+    · have : 0 < (1 - t) * (L *ᵥ q) r + t * (L *ᵥ (q + δ)) r := by
+        rcases ht1.lt_or_eq with hlt | heq
+        · have := mul_pos (sub_pos.mpr hlt) h0
+          nlinarith [mul_nonneg ht0 h1.le]
+        · subst heq; simpa using h1
+      rw [if_pos this.le, if_pos h0.le]
+    · have : (1 - t) * (L *ᵥ q) r + t * (L *ᵥ (q + δ)) r < 0 := by
+        rcases ht1.lt_or_eq with hlt | heq
+        · have := mul_neg_of_pos_of_neg (sub_pos.mpr hlt) h0
+          nlinarith [mul_nonpos_of_nonneg_of_nonpos ht0 h1.le]
+        · subst heq; simpa using h1
+      rw [if_neg (not_le.mpr this), if_neg (not_le.mpr h0)]
+  exact ⟨hcls, elementOperator_eq_of_sheetClass_eq Ws A L hcls⟩
+
+omit [Fintype ρ] in
+/-- [proved-derived; formal-checked] **The step bound gives the lobe.** Off the node, a contrast
+move that points away from the node, or is shorter than the amplitude, `|(L δ)_r| < |Δ_r|` (for
+`δ = η D`: `η |(L D)_r| < |Δ_r|` wherever the move points toward the node), keeps the end strictly
+in its lobe. -/
+theorem lobe_of_step_bound (L : Matrix ρ ι 𝕜) (q δ : ι → 𝕜) (r : ρ)
+    (hoff : (L *ᵥ q) r ≠ 0)
+    (hbound : 0 ≤ (L *ᵥ q) r * (L *ᵥ δ) r ∨ |(L *ᵥ δ) r| < |(L *ᵥ q) r|) :
+    (0 < (L *ᵥ q) r ∧ 0 < (L *ᵥ (q + δ)) r) ∨ ((L *ᵥ q) r < 0 ∧ (L *ᵥ (q + δ)) r < 0) := by
+  have hsum : (L *ᵥ (q + δ)) r = (L *ᵥ q) r + (L *ᵥ δ) r := by rw [mulVec_add]; rfl
+  rw [hsum]
+  rcases lt_or_gt_of_ne hoff with hneg | hpos
+  · right
+    refine ⟨hneg, ?_⟩
+    rcases hbound with h | h
+    · have : (L *ᵥ δ) r ≤ 0 := by
+        by_contra hd
+        have := mul_neg_of_neg_of_pos hneg (lt_of_not_ge hd)
+        linarith
+      linarith
+    · rw [abs_of_neg hneg] at h
+      linarith [le_abs_self ((L *ᵥ δ) r)]
+  · left
+    refine ⟨hpos, ?_⟩
+    rcases hbound with h | h
+    · have : 0 ≤ (L *ᵥ δ) r := by
+        by_contra hd
+        have := mul_neg_of_pos_of_neg hpos (lt_of_not_ge hd)
+        linarith
+      linarith
+    · rw [abs_of_pos hpos] at h
+      linarith [neg_abs_le ((L *ᵥ δ) r)]
+
+/-- [proved-derived; formal-checked] **A move within the lobes is null for every score read through
+the element.** A score that reads the standing only through the element operator takes one value
+along the whole ray, so the standing's realized move and first-order decrease are zero there: it
+enters a joint certificate on the realized score with move and decrease `0`, and leaves it. -/
+theorem lobe_move_is_null {X : Type*} (S : X → Matrix n n 𝕜 → 𝕜) (x : X) (Ws : Matrix n n 𝕜)
+    (A : ρ → Matrix n n 𝕜) (L : Matrix ρ ι 𝕜) (q δ : ι → 𝕜)
+    (hlobe : ∀ r, (0 < (L *ᵥ q) r ∧ 0 < (L *ᵥ (q + δ)) r) ∨
+      ((L *ᵥ q) r < 0 ∧ (L *ᵥ (q + δ)) r < 0))
+    {t : 𝕜} (ht0 : 0 ≤ t) (ht1 : t ≤ 1) :
+    S x (elementOperator Ws A L (q + t • δ)) = S x (elementOperator Ws A L q) := by
+  rw [(lobe_ray_keeps_class Ws A L q δ hlobe ht0 ht1).2]
+
+/-- [proved-derived; formal-checked] **The deposit with its standings held in their lobes descends
+as the other families' joint certificate certifies.** If the other families' move descends the
+realized score by `d` at the held element (`Holon/Deposition.joint_step_descends`, `d = ½ Σ η a`),
+the deposit that also moves the standing within its lobes descends by the same `d`. -/
+theorem lobe_deposit_descends {X : Type*} (S : X → Matrix n n 𝕜 → 𝕜) (x x' : X)
+    (Ws : Matrix n n 𝕜) (A : ρ → Matrix n n 𝕜) (L : Matrix ρ ι 𝕜) (q δ : ι → 𝕜) (d : 𝕜)
+    (hothers : S x' (elementOperator Ws A L q) ≤ S x (elementOperator Ws A L q) - d)
+    (hlobe : ∀ r, (0 < (L *ᵥ q) r ∧ 0 < (L *ᵥ (q + δ)) r) ∨
+      ((L *ᵥ q) r < 0 ∧ (L *ᵥ (q + δ)) r < 0)) :
+    S x' (elementOperator Ws A L (q + δ)) ≤ S x (elementOperator Ws A L q) - d := by
+  have h := (lobe_ray_keeps_class Ws A L q δ hlobe (t := 1) zero_le_one le_rfl).2
+  rw [one_smul] at h
+  rw [h]
+  exact hothers
+
+/-- [proved-derived; formal-checked] **The lock's face decides by comparing its two sheets.** With
+the sheets' weights `a, K > 0` (the exchange polynomial `Π = 1 + a/K`), the face `θ = a/(a + K)`
+exceeds `½` exactly when `K < a`; with `a = 2^(−ℓ_other)` and `K = 2^(−ℓ_current)`, exactly when
+the other sheet's code is shorter. -/
+theorem lock_face_decides {a K : 𝕜} (ha : 0 < a) (hK : 0 < K) :
+    1 / 2 < a / (a + K) ↔ K < a := by
+  rw [lt_div_iff₀ (by linarith)]
+  constructor <;> intro h <;> linarith
+
+/-- [proved-derived; formal-checked] **The exact comparison certifies the half-turn's descent.** No
+curvature bounds the jump at a node (`sheet_fold_witness`); the lock reads the score at both sheets.
+With the held and turned codes enclosed, `lo₁ ≤ ℓ₁` and `ℓ₂ ≤ hi₂`, an enclosure strictly below,
+`hi₂ < lo₁`, orders them strictly, `ℓ₂ < ℓ₁`; after a deposit certified to `ℓ₁ ≤ φ₀ − d`, the
+half-turn descends strictly below it. -/
+theorem lock_flip_descends {lo₁ ℓ₁ ℓ₂ hi₂ φ₀ d : 𝕜} (h₁ : lo₁ ≤ ℓ₁) (h₂ : ℓ₂ ≤ hi₂)
+    (hlock : hi₂ < lo₁) (hdeposit : ℓ₁ ≤ φ₀ - d) : ℓ₂ < ℓ₁ ∧ ℓ₂ < φ₀ - d :=
+  ⟨by linarith, by linarith⟩
+
+omit [IsStrictOrderedRing 𝕜] in
+/-- [proved-derived; formal-checked] **The founding off the node keeps the declared element.** A
+standing whose contrast is a positive constant, `L q₀ = c` (every slice at the same amplitude in the
+`+1` lobe), is off every node and reads every class `+1`, the class the tie rule reads at `q = 0`,
+so its element operator is the founding one while `sheetClass_locally_constant` applies at `q₀`. -/
+theorem founding_off_node (Ws : Matrix n n 𝕜) (A : ρ → Matrix n n 𝕜) (L : Matrix ρ ι 𝕜)
+    (q₀ : ι → 𝕜) {c : 𝕜} (hc : 0 < c) (hq : L *ᵥ q₀ = fun _ => c) :
+    (∀ r, (L *ᵥ q₀) r ≠ 0) ∧ (∀ r, sheetClass L q₀ r = sheetClass L 0 r) ∧
+      elementOperator Ws A L q₀ = elementOperator Ws A L 0 := by
+  have hcls : ∀ r, sheetClass L q₀ r = sheetClass L 0 r := by
+    intro r
+    simp [sheetClass, hq, hc.le]
+  refine ⟨fun r => by rw [hq]; exact hc.ne', hcls, ?_⟩
+  exact elementOperator_eq_of_sheetClass_eq Ws A L hcls
+
 end Standing
+
+/-! ### The founding's witnesses: the chain and the single channel -/
+
+/-- The lock chart of three rings in a chain `0 — 1 — 2` at one node coordinate (the prediction
+field's component, `(M q)_r = Σ_(neighbours) q − q_r`). -/
+def chainChart : Matrix (Fin 3) (Fin 3) ℚ := !![-1, 1, 0; 1, -1, 1; 0, 1, -1]
+
+/-- [proved-derived; formal-checked] **The chain founds at `(2, 3, 2)`.** The chain's chart is
+unimodular, and `q₀ = (2, 3, 2)` lattice units place every slice at the first unit of the `+1`
+lobe: `M q₀ = (1, 1, 1)`. -/
+theorem chain_founding : chainChart *ᵥ ![2, 3, 2] = fun _ => 1 := by
+  funext i
+  fin_cases i <;> simp [chainChart, mulVec, dotProduct, Fin.sum_univ_three] <;> norm_num
+
+/-- A single channel's lock chart read from its two ends, `(M q)_0 = q₁ − q₀`, `(M q)_1 = q₀ − q₁`. -/
+def channelChart : Matrix (Fin 2) (Fin 2) ℚ := !![-1, 1; 1, -1]
+
+/-- [counterexample; formal-checked] **A single channel's ends are a fixed node of the declared
+lobes.** The two ends read `Δ` and `−Δ` for every standing (the chart's kernel fixes their sum), so
+both read the declared `+1` lobe exactly on the node: the chart is singular, and the founding keeps
+the channel on its node. -/
+theorem channel_fixed_node (q : Fin 2 → ℚ) :
+    (channelChart *ᵥ q) 0 + (channelChart *ᵥ q) 1 = 0 ∧
+      (sheetClass channelChart q 0 = 1 ∧ sheetClass channelChart q 1 = 1 ↔
+        (channelChart *ᵥ q) 0 = 0) := by
+  have h0 : (channelChart *ᵥ q) 0 = -q 0 + q 1 := by
+    simp [channelChart, mulVec, dotProduct, Fin.sum_univ_two]
+  have h1 : (channelChart *ᵥ q) 1 = q 0 - q 1 := by
+    simp [channelChart, mulVec, dotProduct, Fin.sum_univ_two]; ring
+  refine ⟨by rw [h0, h1]; ring, ?_⟩
+  unfold sheetClass
+  rw [h0, h1]
+  constructor
+  · rintro ⟨ha, hb⟩
+    by_cases x : (0 : ℚ) ≤ -q 0 + q 1 <;> by_cases y : (0 : ℚ) ≤ q 0 - q 1 <;>
+      simp_all <;> linarith
+  · intro h
+    have hy : (0 : ℚ) ≤ q 0 - q 1 := by linarith
+    simp [h, hy]
 
 /-! ## 7. The certified normal step -/
 
@@ -737,6 +924,15 @@ section Audit
 #print axioms standing_deposit
 #print axioms standing_step_sign_witness
 #print axioms sheet_fold_witness
+#print axioms lobe_ray_keeps_class
+#print axioms lobe_of_step_bound
+#print axioms lobe_move_is_null
+#print axioms lobe_deposit_descends
+#print axioms lock_face_decides
+#print axioms lock_flip_descends
+#print axioms founding_off_node
+#print axioms chain_founding
+#print axioms channel_fixed_node
 #print axioms window_alignment_eq
 #print axioms frobenius_chart
 #print axioms inv_psd
