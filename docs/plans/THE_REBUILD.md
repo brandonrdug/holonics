@@ -655,6 +655,17 @@ branch; intervals that do not shorten the charged code are recorded and not adop
     prose and Rust (`1469 + 8/16 + ε` bits on 1024 ends in prose base 2, against `22 + 4/16 + ε` in
     Lean). Its composition joins the native field (`hnn::encoding`, `hnn::prediction`, the redirect
     above), not the byte tree.
+- **`hnn::encoding` pinned, September 29**
+  ([pin](../../research/records/2026-09-29_HOLONIC_ENCODING_FOR_THE_FIELD_PINNED_BEFORE_ITS_RUN.md);
+  Refs #73 #63). The founding law is the minimal realization of a passage chart, founded by
+  `birth::Closure` forward from the openings and backward from the receiving forms; the field's step
+  classes are read from the founded constituents, each placed on a ring at its first arrival on the
+  ring's own clock; `E_g` opens at the founded injection; the open reads the whole offset moment, not
+  a column at a raw cell's address. Acceptance, fixed before any run: the squares exact and the
+  founded dimension equal to the emission's Hankel rank on the moiré, a copy terrain and the rotor
+  crib; the moment equal across every split, with nothing discarded by length; on a 6,148-byte
+  choosing-role passage, the founded constituents, `n*` and the field's charged code, the code before
+  the change beside it.
 
 #### U7. The targets, alongside
 
