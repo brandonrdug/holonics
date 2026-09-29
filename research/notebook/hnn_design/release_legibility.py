@@ -31,6 +31,10 @@ The readings, per corpus (the native releases, the controls, the requests):
   requests and the controls give the rate for legible text the vocabulary has not read;
 - **valid UTF-8**: where a response carries its `valid_utf8` flag, the cases whose bytes are valid
   UTF-8 (a native release that is not is a typed refusal, so its texts are all valid).
+
+A release file or a choosing cut whose manifest does not name the development reserve as excluded
+(every one written before the reserve was named) is refused unless the logged flag `--read-reserve`
+is passed (`development_families.py`).
 """
 
 import json
@@ -39,11 +43,8 @@ import re
 import sys
 from array import array
 
-ROOT = os.environ.get(
-    "HOLONICS_ROOT",
-    os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))),
-)
-CUTS = os.path.join(ROOT, ".local", "cuts")
+from development_families import require_reserve_excluded, reserve_flag
+from standing_cut import OUT_DIR as CUTS
 CORPUS = {"control": "retrieval controls", "logged": "logged replies (observed conduct, not targets)", "flat": "flat tree releases"}
 PAIRED = {"()": ("(", ")"), "[]": ("[", "]"), "{}": ("{", "}"), "“”": ("“", "”")}
 SELF_PAIRED = {"backtick": "`", "straight quote": '"', "bold": "**"}
@@ -106,12 +107,17 @@ def readings(texts, vocab):
 
 
 def main():
-    if len(sys.argv) > 3 or sys.argv[1:2] in (["-h"], ["--help"]):
+    arguments, read_reserve = reserve_flag(sys.argv[1:], "release_legibility.py")
+    if len(arguments) > 2 or arguments[:1] in (["-h"], ["--help"]):
         sys.exit(__doc__)
-    path = sys.argv[1] if sys.argv[1:] else os.path.join(CUTS, "f5-blind-input.json")
+    path = arguments[0] if arguments else os.path.join(CUTS, "f5-blind-input.json")
+    choosing = arguments[1] if arguments[1:] else os.path.join(CUTS, "curated-f5-choosing-cut.bin")
+    with open(choosing[:-len(".bin")] + ".json" if choosing.endswith(".bin") else choosing + ".json", "rb") as handle:
+        require_reserve_excluded(json.load(handle), "the choosing cut", read_reserve)
     with open(path, "rb") as handle:
-        cases = json.load(handle)["cases"]
-    choosing = sys.argv[2] if sys.argv[2:] else os.path.join(CUTS, "curated-f5-choosing-cut.bin")
+        released_file = json.load(handle)
+    require_reserve_excluded(released_file, "the release file", read_reserve)
+    cases = released_file["cases"]
     vocab = vocabulary(choosing)
     native = [c["responses"]["athena"]["text"] for c in cases]
     released = [t for t in native if not t.startswith("[typed refusal")]

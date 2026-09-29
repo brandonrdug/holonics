@@ -5,6 +5,9 @@ and numerical health, so the one protocol must return a typed refusal. The outpu
 stay owner-only; stdout contains only counts, hashes and the refusal code.
 
     HOLONICS_ROOT=<checkout with private cuts> python3 athena_dev_gate.py
+
+The request comes from F5's spent diagnostic split, which holds the development reserve, so it is
+refused unless the logged flag `--read-reserve` is passed (`development_families.py`).
 """
 
 import hashlib
@@ -14,6 +17,7 @@ import sys
 from pathlib import Path
 
 from athena_protocol import AtomicCheckpoint, EngineTransition, Protocol
+from development_families import require_reserve_excluded, reserve_flag
 from standing_cut import OUT_DIR
 
 
@@ -38,8 +42,11 @@ def owner_only(path):
 
 
 def main():
-    if sys.argv[1:]:
+    arguments, read_reserve = reserve_flag(sys.argv[1:], "athena_dev_gate.py")
+    if arguments:
         sys.exit(__doc__)
+    with open(os.path.join(OUT_DIR, "f5-dev-request.json"), "rb") as handle:
+        require_reserve_excluded(json.load(handle), "the F5 development request", read_reserve)
     request_path = os.path.join(OUT_DIR, "f5-dev-request.bin")
     candidate_path = os.path.join(OUT_DIR, "f5-native-probe.bin")
     owner_only(request_path)

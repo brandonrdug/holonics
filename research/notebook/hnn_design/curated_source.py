@@ -69,18 +69,30 @@ cells, so the two are measured on identical cells.
 
     HOLONICS_ROOT=<main checkout> python3 research/notebook/hnn_design/curated_source.py 1048576
 
-For F4, F1, F2, F5, U2, F2V2 or F0, after `development_families.py` has pinned the private
-membership, the optional second argument `choosing` or `validation` emits only that role's development
-families under `curated-<item>-<role>-*` names (`F4` is the default item; pass `F1`, `F2`, `F5`, `U2`,
-`F2V2` or `F0` as a third argument). It does
-not decode evaluation or deferred records. A relation across roles is unheld, never supplied by
-adjacency.
+After `development_families.py` has pinned the private membership, the optional second argument
+`choosing` or `validation` emits only that role's development material under
+`curated-<item>-<role>-*` names. The default item is `U6`, the split by conversation (the aeon):
+every message of a conversation lies in its role, and no relation crosses roles (the membership's
+count-only checks). It does not decode evaluation or deferred records. A relation outside the role is
+unheld, never supplied by adjacency.
+
+**The reserve** (`development_families.py`, `RESERVE_SHA256`). The whole stream (no role) skips the
+reserve's conversations, and every manifest written names the reserve as excluded
+(`reserve_excluded`) exactly when it is. The role `reserve` is emitted only with the logged flag
+`--read-reserve`, which no loop has passed. The spent family-unit splits (F4, F1, F2, F5, U2, F2V2,
+F0, as the third argument) are reshuffles of read material that hold the reserve, so they are
+regenerated only with `--read-reserve`, to reproduce their receipts.
 
 Outputs in `.local/cuts/`:
 - `curated-source.bin`: the whole development stream, one little-endian u16 code a cell;
 - `curated-source.incidence.jsonl`: the occurrences' ports, cell ranges and incidence;
 - `curated-source.json`: the manifest (counts and hashes only);
 - `curated-cut.bin` (+ `.json`): the pinned cut, u16 codes;
+- `curated-cut.aeons.bin`: one little-endian u32 a section letter of the cut, the ordinal of the
+  conversation (aeon) its part lies in, numbered by first appearance in the emitted stream (a
+  coordinate, never an identifier; the cut manifest's `aeons`). The admitted egg and the flat control
+  enter each part's aeon at its letter, so each conversation keeps its own context
+  (`receiver::population`, `enter_aeon`);
 - `curated-flat-cut.bin` (+ `.json`): the same bytes, one byte a cell, in the standing cut's
   manifest format (`exterior::read_cut` reads it).
 """
@@ -91,7 +103,9 @@ import os
 import sys
 from array import array
 
-from development_families import PARTITION, SEEDS, assignment
+from development_families import (PARTITION, READ_RESERVE, RESERVE_SHA256, SEEDS, SPENT,
+                                  development_records, family_assignment, reserve_flag,
+                                  reserve_sessions, session_roles)
 from standing_cut import ROOT, SOURCE, private_directory, private_write
 
 CHANNELS = ("human", "agent", "tool")
@@ -141,20 +155,38 @@ def count(table, *keys):
 
 
 def main():
-    arguments = sys.argv[1:]
-    if len(arguments) not in (1, 2, 3) or (len(arguments) >= 2 and arguments[1] not in ("choosing", "validation")) or (len(arguments) == 3 and arguments[2] not in SEEDS):
+    arguments, read_reserve = reserve_flag(sys.argv[1:], "curated_source.py")
+    roles = ("choosing", "validation", "reserve")
+    items = tuple(SEEDS) + tuple(SPENT)
+    if len(arguments) not in (1, 2, 3) or (len(arguments) >= 2 and arguments[1] not in roles) or (len(arguments) == 3 and arguments[2] not in items):
         sys.exit(__doc__)
     population = int(arguments[0])
     assert population > 0 and population & (population - 1) == 0, "a power of two"
     role = arguments[1] if len(arguments) >= 2 else None
-    item = arguments[2] if len(arguments) == 3 else "F4"
+    item = arguments[2] if len(arguments) == 3 else "U6"
+    if role is not None and (item in SPENT or role == "reserve") and not read_reserve:
+        what = "the reserve role is the development reserve" if role == "reserve" else \
+            f"the spent split {item} holds the development reserve's material"
+        sys.exit(f"refused: {what}; pass {READ_RESERVE} (logged) to emit it")
+    if role == "reserve" and item in SPENT:
+        sys.exit("refused: a spent family-unit split has no reserve role")
     name = "curated" if role is None else f"curated-{item.lower()}-{role}"
-    if role is not None:
+    split = None
+    skipped = set()  # the reserve's sessions, which the whole stream skips
+    by_session = None  # each session's role under a conversation split
+    if role is not None and item in SPENT:
         with open(os.path.join(ROOT, ".local", "cuts", f"development-families-{item.lower()}.json"), "rb") as handle:
             split = json.load(handle)
-        assert split["seed"] == SEEDS[item]
+        assert split["seed"] == SPENT[item]
         expected = {entry["family_sha256"]: entry["role"] for entry in split["members"]}
         assert len(expected) == len(split["members"])
+    elif role is not None:
+        split, by_session = session_roles(development_records()[0], item)
+    elif not read_reserve:
+        skipped = reserve_sessions(development_records()[0])
+    unread = (role is None and not read_reserve) or (item in SEEDS and role in ("choosing", "validation"))
+    excluded = RESERVE_SHA256 if unread else None
+    letter_aeons = []  # each letter's (position, conversation ordinal), in the stream's order
 
     stream = []  # the curated codes, bytes and letters
     occurrences = []  # the incidence records
@@ -195,11 +227,16 @@ def main():
                 continue
             record = json.loads(line)
             assert record["kind"] == "occurrence-family" and record["partition"] == partition
-            if role is not None:
-                assigned, family_hash = assignment(record["family"], split["seed"])
+            if by_session is not None:
+                if by_session[record["views"][0]["session_id"]] != role:
+                    continue
+            elif role is not None:
+                assigned, family_hash = family_assignment(record["family"], split["seed"])
                 assert expected[family_hash] == assigned
                 if assigned != role:
                     continue
+            elif record["views"][0]["session_id"] in skipped:
+                continue
             sequence = record["sequence"]
             count(sequence_order, "increasing" if last_sequence is None or sequence > last_sequence
                   else "not_increasing")
@@ -285,6 +322,7 @@ def main():
                     known["last"] = declared
                     last_session, last_turn = view["session_id"], declared
                 opened = True
+                letter_aeons.append((len(stream), conversation))
                 stream.append(letter(kind, channel))
                 letters[kind][channel] += 1
                 paths[path][kind][channel] += 1
@@ -324,6 +362,11 @@ def main():
     held_start = cells - cells // 8
     flat_cut = bytes(code for code in cut if code < BYTES)
     flat_held_start = sum(1 for code in cut[:held_start] if code < BYTES)
+    aeons = array("I", [aeon for position, aeon in letter_aeons if position >= start])
+    if sys.byteorder != "little":
+        aeons.byteswap()
+    cut_aeons = aeons.tobytes()
+    assert len(aeons) == sum(1 for code in cut if code >= BYTES), "one aeon a letter"
     cut_letters = {kind: {channel: 0 for channel in CHANNELS} for kind in KINDS}
     for code in cut:
         if code >= BYTES:
@@ -336,6 +379,7 @@ def main():
     private_write(name + "-source.bin", curated)
     private_write(name + "-source.incidence.jsonl", incidence_bytes)
     private_write(name + "-cut.bin", u16(cut))
+    private_write(name + "-cut.aeons.bin", cut_aeons)
     private_write(name + "-flat-cut.bin", flat_cut)
     manifest = {
         "schema": "holonics.curated-source.v1",
@@ -344,7 +388,9 @@ def main():
         "families": families,
         "development_role": role,
         "development_role_families": len(occurrences),
+        "development_split": item if role is not None else None,
         "split_membership_sha256": split["membership_sha256"] if role is not None else None,
+        "reserve_excluded": excluded,
         "declared_order": sequence_order,
         "chart": {"cells": "UTF-8 bytes 0..255", "alphabet": ALPHABET,
                   "letters": {f"{kind}:{channel}": letter(kind, channel)
@@ -371,7 +417,7 @@ def main():
         "cut": {"from": "development stream tail, beginning at its first section letter at or after len - population",
                 "stream_start": start, "cells": cells, "population": population,
                 "held_out_start": held_start, "held_out_rule": "the cut's final eighth, cells // 8 (as the wide cut)",
-                "letters": cut_letters,
+                "letters": cut_letters, "aeons_sha256": sha(cut_aeons),
                 "cut_sha256": sha(u16(cut)), "development_sha256": sha(u16(cut[:held_start])),
                 "held_out_sha256": sha(u16(cut[held_start:])),
                 "flat_cells": len(flat_cut), "flat_held_out_start": flat_held_start,
@@ -384,15 +430,20 @@ def main():
     private_write(name + "-cut.json", json.dumps({
         "schema": "holonics.curated-cut.v1", "encoding": "u16 little-endian, one code a cell",
         "alphabet": ALPHABET, "population": population, "cells": cells,
-        "held_out_start": held_start, "cut_sha256": manifest["cut"]["cut_sha256"]}, indent=2).encode("utf-8"))
+        "held_out_start": held_start, "cut_sha256": manifest["cut"]["cut_sha256"],
+        "reserve_excluded": excluded,
+        "aeons": {"encoding": "u32 little-endian, one conversation ordinal a section letter",
+                  "section_letters": len(aeons), "conversations": len(sessions),
+                  "aeons_sha256": manifest["cut"]["aeons_sha256"]}}, indent=2).encode("utf-8"))
     private_write(name + "-flat-cut.json", json.dumps({
         "schema": "holonics.standing-cut.v2",
         "from": "the curated cut's bytes, its section letters removed; held out: the curated held-out cells' bytes",
         "population": len(flat_cut), "declared_population": population,
-        "held_out_range": [flat_held_start, len(flat_cut)],
+        "held_out_range": [flat_held_start, len(flat_cut)], "reserve_excluded": excluded,
         "cut_sha256": manifest["cut"]["flat_cut_sha256"]}, indent=2).encode("utf-8"))
     print(json.dumps({key: manifest[key] for key in (
-        "families", "development_role", "development_role_families", "split_membership_sha256",
+        "families", "development_role", "development_role_families", "development_split",
+        "split_membership_sha256", "reserve_excluded",
         "declared_order", "checks", "ports", "sections", "incidence", "development_stream_cells",
         "development_stream_sha256", "flat_stream_cells", "flat_stream_sha256", "cut")}, indent=1))
 

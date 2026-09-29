@@ -4,6 +4,9 @@ The owner-only bundle contains requests and exact draw keys, never recorded vali
 Its order is the already pinned hash selection. Only counts and a hash are printed.
 
     HOLONICS_ROOT=<checkout with private cuts> python3 f5_request_bundle.py
+
+The selection comes from F5's spent diagnostic split, which holds the development reserve, so it is
+refused unless the logged flag `--read-reserve` is passed (`development_families.py`).
 """
 
 import hashlib
@@ -12,14 +15,17 @@ import os
 import struct
 import sys
 
+from development_families import require_reserve_excluded, reserve_flag
 from standing_cut import OUT_DIR, private_directory, private_write
 
 
 def main():
-    if sys.argv[1:]:
+    arguments, read_reserve = reserve_flag(sys.argv[1:], "f5_request_bundle.py")
+    if arguments:
         sys.exit(__doc__)
     with open(os.path.join(OUT_DIR, "f5-retrospective.json"), "rb") as handle:
         selection = json.load(handle)
+    require_reserve_excluded(selection, "the F5 retrospective selection", read_reserve)
     assert selection["schema"] == "holonics.f5-retrospective.v1"
     items = selection["items"]
     assert len(items) == selection["selected"] == 32

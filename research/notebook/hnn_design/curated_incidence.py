@@ -25,9 +25,13 @@ cut's codes: a letter on the reading port and a letter on the target's.
 
     HOLONICS_ROOT=<main checkout> python3 research/notebook/hnn_design/curated_incidence.py
 
-An optional `choosing` or `validation` argument reads that F4 role's private source and cut;
-pass `F1`, `F2`, `F5`, `U2` or `F0` second to read that item's role. Targets absent from the role's source remain unheld.
-The exterior join shifts validation's within-role relation ticks into the joint passage.
+An optional `choosing` or `validation` argument reads that role's private source and cut under the
+conversation split `U6` (the default item); a spent family-unit item (`F4`, `F1`, `F2`, `F5`, `U2`,
+`F0`) second reads that item's role, and holds the reserve. Targets absent from the role's source
+remain unheld; under the conversation split no relation leaves its role. The exterior join shifts
+validation's within-role relation ticks into the joint passage. A source whose manifest does not name
+the development reserve as excluded (`reserve_excluded`) is refused unless the logged flag
+`--read-reserve` is passed (`development_families.py`).
 
 Outputs in `.local/cuts/`:
 - `curated-cut.incidence.bin`: the declared relations in letter order, three little-endian u32 a
@@ -41,6 +45,7 @@ import os
 import sys
 from array import array
 
+from development_families import SEEDS, SPENT, reserve_flag, require_reserve_excluded
 from standing_cut import OUT_DIR, private_directory, private_write
 
 BYTES = 256
@@ -57,13 +62,15 @@ def letter_tick(occurrence, start):
 
 
 def main():
-    arguments = sys.argv[1:]
-    if arguments and (len(arguments) not in (1, 2) or arguments[0] not in ("choosing", "validation") or (len(arguments) == 2 and arguments[1] not in ("F1", "F2", "F5", "U2", "F0"))):
+    arguments, read_reserve = reserve_flag(sys.argv[1:], "curated_incidence.py")
+    items = tuple(SEEDS) + tuple(SPENT)
+    if arguments and (len(arguments) not in (1, 2) or arguments[0] not in ("choosing", "validation") or (len(arguments) == 2 and arguments[1] not in items)):
         sys.exit(__doc__)
-    item = arguments[1].lower() if len(arguments) == 2 else "f4"
+    item = arguments[1].lower() if len(arguments) == 2 else "u6"
     prefix = "curated" if not arguments else f"curated-{item}-{arguments[0]}"
     with open(os.path.join(OUT_DIR, prefix + "-source.json"), "rb") as handle:
         manifest = json.load(handle)
+    require_reserve_excluded(manifest, prefix + "-source", read_reserve)
     cut = manifest["cut"]
     start, cells, held = cut["stream_start"], cut["cells"], cut["held_out_start"]
     with open(os.path.join(OUT_DIR, prefix + "-cut.bin"), "rb") as handle:
@@ -132,6 +139,7 @@ def main():
         "relations": len(records),
         "counts": counts,
         "sha256": hashlib.sha256(data).hexdigest(),
+        "reserve_excluded": manifest.get("reserve_excluded"),
     }
     private_write(prefix + "-cut.incidence.json", json.dumps(out, indent=2).encode("utf-8"))
     print(json.dumps(out, indent=1))

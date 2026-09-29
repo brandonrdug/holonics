@@ -1309,7 +1309,7 @@ fn standing_harness(path: &str) {
 }
 
 fn main() {
-    let arguments: Vec<String> = std::env::args().skip(1).collect();
+    let arguments: Vec<String> = exterior::admit_reserve_flag(std::env::args().skip(1).collect());
     match arguments
         .iter()
         .map(String::as_str)

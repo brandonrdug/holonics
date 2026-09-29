@@ -5,6 +5,9 @@ The rule is fixed in the F1 gate record: first complete nonempty validation part
 counts and hashes. No evaluation partition is opened.
 
     HOLONICS_ROOT=<checkout with private cuts> python3 f1_validation_part.py
+
+F1's split is a spent family-unit split that holds the development reserve, so its cut is refused
+unless the logged flag `--read-reserve` is passed (`development_families.py`).
 """
 
 import hashlib
@@ -13,17 +16,20 @@ import os
 import sys
 from array import array
 
+from development_families import require_reserve_excluded, reserve_flag
 from standing_cut import OUT_DIR, private_directory, private_write
 
 CEILING = 128
 
 
 def main():
-    if sys.argv[1:]:
+    arguments, read_reserve = reserve_flag(sys.argv[1:], "f1_validation_part.py")
+    if arguments:
         sys.exit(__doc__)
     prefix = os.path.join(OUT_DIR, "curated-f1-validation-cut")
     with open(prefix + ".json", "rb") as handle:
         manifest = json.load(handle)
+    require_reserve_excluded(manifest, "curated-f1-validation-cut", read_reserve)
     with open(prefix + ".bin", "rb") as handle:
         raw = handle.read()
     assert hashlib.sha256(raw).hexdigest() == manifest["cut_sha256"]
