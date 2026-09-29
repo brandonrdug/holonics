@@ -348,9 +348,12 @@ pub enum HnnError {
         family: crate::hnn::constitution::Family,
     },
     #[error(
-        "ring {ring}'s pumped resonator has no certified growth (its pumped stiffness may be indefinite; the Floquet bound is owed in #62): no step is certified through it"
+        "ring {ring}'s resonator is not certified passive and its Floquet reach is refused ({refusal:?}): no step is certified through it"
     )]
-    UncertifiedGain { ring: usize },
+    UncertifiedGain {
+        ring: usize,
+        refusal: ring::FloquetRefusal,
+    },
     #[error(
         "contact {contact}'s declared boost stores indefinite energy in its signed stiffness, so the medium's growth is not certified (owed in #62): no step is certified through it"
     )]

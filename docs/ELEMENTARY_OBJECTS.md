@@ -384,9 +384,13 @@ hearing        c_v = ⟨s, Mv⟩⟨r, v⟩ = 0 exactly when one coupling vanishe
   by at most `ρ²` a period (`HNN/Floquet.{floquet_energy_step, floquet_energy_iterate,
   floquet_passive}`). The multipliers are placed exactly about any circle through the Cayley map
   and the half-plane count, so a growth is enclosed with exact endpoints. **Its consumer** is the
-  constitution's certified step: through a pumped resonator the gain reads the consumer factor
-  above (`floquet_tick_product`, `floquet_metric_change`; Rust `hnn::ring::FloquetBound::reach`).
-  Until it reads it, a linear step through a pumped resonator stays refused (`UncertifiedGain`).
+  constitution's certified step: through a ring not certified passive (a pump, or a signed
+  stiffness) every gain but the readout's reads the medium's span factor
+  `F(s) = ∏_r max_(s′ ≤ s) reach_r(s′)` term by term (`floquet_span_reach`,
+  `Holon/Deposition.{station_tick_gain, entry_span_gain, pumped_span_factor}`; Rust
+  `hnn::ring::FloquetBound::reach`, `hnn::constitution`, "The pumped medium's reach"), the ring's
+  own gain families held. A step through it is refused (`UncertifiedGain`) only where its decided
+  certificate is. The driven ring's loop within a span (the port's feedback) is owed in #62.
 - **The bifurcation.** [proved-derived; formal-checked] A standing pump's tick has the multiplier one
   exactly where the pumped stiffness is singular (`standing_fixed_point_iff`): on the in-phase axis,
   at `k − 2p = 0`. Below it the storage form is itself the certificate at `ρ = 1`

@@ -20,7 +20,11 @@ states what the certificate implies, and the pump's own geometry.
 2. **The consumer equation.** [proved-derived; formal-checked] Against a reference form `Q` with
    `γ_lo Q ⪯ G ⪯ γ_hi Q` and `γ_lo > 0`: `E_Q(Mᵐ x) ≤ (γ_hi/γ_lo) ρ^(2m) E_Q(x)`
    (`floquet_metric_change`): the certified growth the constitution's step reads through a pumped
-   resonator, one change of metric and `ρ²` per period.
+   resonator, one change of metric and `ρ²` per period. A span from any pump phase is a partial
+   period, `m` whole periods and a partial period, each partial product certified tick by tick
+   (`partial_period_le_pow`): `E_Q(Post Mᵐ Pre x) ≤ (γ_hi/γ_lo) σ_post ρ^(2m) σ_pre E_Q(x)`
+   (`floquet_span_reach`), the factor `hnn::ring::FloquetBound::reach` maximizes over the phases
+   and `hnn::constitution` composes into its gains (`Holon/Deposition` §10).
 3. **The pump's axes.** [proved-derived; formal-checked] The pumped node stiffness
    `kI − 2p [[cos ψ, sin ψ], [sin ψ, −cos ψ]]` at `cos ψ = c² − s²`, `sin ψ = 2cs` has the in-phase
    axis `a = (c, s) = e^{iψ/2}` at `k − 2p` and the quadrature `ia` at `k + 2p`
@@ -167,6 +171,59 @@ theorem floquet_metric_change {G Q M : Matrix n n ℝ} {ρ2 γlo γhi : ℝ} (h�
   have h4 : ρ2 ^ m * energy G x ≤ ρ2 ^ m * (γhi * energy Q x) := mul_le_mul_of_nonneg_left h3 hp
   have key : γlo * energy Q ((M ^ m) *ᵥ x) ≤ ρ2 ^ m * (γhi * energy Q x) := by linarith
   have e : γhi / γlo * ρ2 ^ m * energy Q x = ρ2 ^ m * (γhi * energy Q x) / γlo := by
+    field_simp
+  rw [e, le_div_iff₀ hlo]
+  linarith
+
+omit [Fintype n] [DecidableEq n] in
+/-- [proved-derived; formal-checked] **A partial period's factor is at most the largest tick's
+power**: ticks each certified at `0 ≤ σ_t² ≤ σ²` have `∏ σ_t² ≤ (σ²)^k` over `k` ticks. -/
+theorem partial_period_le_pow (ticks : List (Matrix n n ℝ × ℝ)) {σ2 : ℝ}
+    (h : ∀ t ∈ ticks, 0 ≤ t.2 ∧ t.2 ≤ σ2) :
+    (ticks.map Prod.snd).prod ≤ σ2 ^ ticks.length := by
+  induction ticks with
+  | nil => simp
+  | cons t rest ih =>
+    have ht := h t List.mem_cons_self
+    have hrest : ∀ u ∈ rest, 0 ≤ u.2 ∧ u.2 ≤ σ2 := fun u hu => h u (List.mem_cons_of_mem _ hu)
+    have hprod : 0 ≤ (rest.map Prod.snd).prod :=
+      List.prod_nonneg fun x hx => by
+        obtain ⟨u, hu, rfl⟩ := List.mem_map.mp hx
+        exact (hrest u hu).1
+    simp only [List.map_cons, List.prod_cons, List.length_cons, pow_succ']
+    exact mul_le_mul ht.2 (ih hrest) hprod (ht.1.trans ht.2)
+
+/-- [proved-derived; formal-checked] **The reach over a span from any pump phase** (the consumer's
+factor, `hnn::ring::FloquetBound::reach`). A span of ticks starting at an unread pump phase is a
+partial period `Pre` up to the phase where the certified period starts, `m` whole periods `M`, and
+a partial period `Post`; with each partial product certified in `G` (`floquet_tick_product`, bounded
+by `partial_period_le_pow`) and the metric's equivalence to the reference form,
+`E_Q(Post Mᵐ Pre x) ≤ (γ_hi/γ_lo) σ_post ρ^(2m) σ_pre E_Q(x)`. The machine's reach is the largest of
+these over the `T` phases the span can start at, `max_o ρ^(2m_o) (max_t σ_t²)^(s − T m_o)`. -/
+theorem floquet_span_reach {G Q M Pre Post : Matrix n n ℝ} {ρ2 σpre σpost γlo γhi : ℝ}
+    (hρ : 0 ≤ ρ2) (hpre0 : 0 ≤ σpre) (hpost0 : 0 ≤ σpost) (hlo : 0 < γlo)
+    (hbelow : ∀ x, γlo * energy Q x ≤ energy G x) (habove : ∀ x, energy G x ≤ γhi * energy Q x)
+    (hcert : FloquetCertifies G M ρ2)
+    (hpre : ∀ x, energy G (Pre *ᵥ x) ≤ σpre * energy G x)
+    (hpost : ∀ x, energy G (Post *ᵥ x) ≤ σpost * energy G x) (m : ℕ) (x : n → ℝ) :
+    energy Q ((Post * M ^ m * Pre) *ᵥ x) ≤ γhi / γlo * (σpost * ρ2 ^ m * σpre) * energy Q x := by
+  have hp : 0 ≤ ρ2 ^ m := pow_nonneg hρ m
+  have hfactor : 0 ≤ σpost * ρ2 ^ m * σpre := mul_nonneg (mul_nonneg hpost0 hp) hpre0
+  have hG : energy G ((Post * M ^ m * Pre) *ᵥ x) ≤ σpost * ρ2 ^ m * σpre * energy G x := by
+    rw [← Matrix.mulVec_mulVec, ← Matrix.mulVec_mulVec]
+    calc energy G (Post *ᵥ ((M ^ m) *ᵥ (Pre *ᵥ x)))
+        ≤ σpost * energy G ((M ^ m) *ᵥ (Pre *ᵥ x)) := hpost _
+      _ ≤ σpost * (ρ2 ^ m * energy G (Pre *ᵥ x)) :=
+          mul_le_mul_of_nonneg_left (floquet_energy_iterate hρ hcert m _) hpost0
+      _ ≤ σpost * (ρ2 ^ m * (σpre * energy G x)) :=
+          mul_le_mul_of_nonneg_left (mul_le_mul_of_nonneg_left (hpre x) hp) hpost0
+      _ = σpost * ρ2 ^ m * σpre * energy G x := by ring
+  have h1 := hbelow ((Post * M ^ m * Pre) *ᵥ x)
+  have h3 := mul_le_mul_of_nonneg_left (habove x) hfactor
+  have key : γlo * energy Q ((Post * M ^ m * Pre) *ᵥ x) ≤
+      σpost * ρ2 ^ m * σpre * (γhi * energy Q x) := by linarith
+  have e : γhi / γlo * (σpost * ρ2 ^ m * σpre) * energy Q x =
+      σpost * ρ2 ^ m * σpre * (γhi * energy Q x) / γlo := by
     field_simp
   rw [e, le_div_iff₀ hlo]
   linarith
@@ -396,6 +453,8 @@ section Audit
 #print axioms floquet_passive
 #print axioms floquet_tick_product
 #print axioms floquet_metric_change
+#print axioms partial_period_le_pow
+#print axioms floquet_span_reach
 #print axioms pumped_inphase_axis
 #print axioms pumped_quadrature_axis
 #print axioms inphase_growing

@@ -86,6 +86,21 @@
 //! `a = 2^(−ℓ_other)` and `K = 2^(−ℓ_current)`, the lock's face `θ = a/(a + K)` exceeds `½` exactly
 //! when `a > K`, exactly when `ℓ_other < ℓ_current`.
 //!
+//! [definition; agent-inferred, September 29] **The pumped medium's span factor** ([`span_factors`];
+//! Lean `Holon/Deposition` §10, `HNN/Floquet.floquet_span_reach`). A medium passive but for its
+//! active elements carries a difference over a span of `s` ticks with the energy gain
+//! `(1 + ω)^(2(s − 1))` of its contrast ports; a ring that is not certified passive (a pumped
+//! resonator) carries it with its certified reach `reach_r(s′)` over the ticks `s′ ≤ s` its state
+//! holds it (`hnn::ring::FloquetBound::reach`). The two compose by the product of the maps' bounds
+//! (`span_transport_compose`); a difference that passes several such rings within the span is
+//! carried by each for at most `s` ticks, so its factor is at most
+//! `F(s) = ∏_r max_(s′ ≤ s) reach_r(s′)` (`pumped_span_factor`, the running maximum
+//! `runningMax`), which does not fall with `s` (`runningMax_mono`). A certified gain `κ²` sums the
+//! span gains over its stations and ticks (`station_tick_gain`, Cauchy–Schwarz over the ticks), each
+//! multiplied by `F` of its span; the re-entries of one injection at one station add as amplitudes,
+//! so their squared sum is multiplied by `F` of the longest span (`entry_span_gain`). The factor
+//! reads no codec, alphabet or terrain; what it needs from a machine is each ring's reach.
+//!
 //! | Lean | Rust |
 //! |---|---|
 //! | `HNN/Normal.{lock_flip_descends, lock_face_decides}` | [`strictly_better`] |
@@ -94,6 +109,7 @@
 //! | `joint_move_triangle`, `joint_step_descends` | [`JointReading`] |
 //! | `gram_certificate_bound`, `adjoint_gram_certificate_bound`, `entrywise_error_bound` | [`spectral_norm`] |
 //! | `active_element_growth`, `active_energy_growth` | [`active_growth`] |
+//! | `runningMax`, `le_runningMax`, `runningMax_mono`, `pumped_span_factor`, `span_transport_compose`, `station_tick_gain`, `entry_span_gain` | [`span_factors`], and the gains that read them (`hnn::constitution`) |
 //! | `learned_rate_form` | [`learned_rate_form`] |
 //! | `energy_product_bound`, `committed_energy_bound` | [`CommittedEnergyBound`] |
 //! | `projectPassive`, `projectPassive_passive`, `projectPassive_of_passive` | [`project_passive`] |
@@ -750,6 +766,29 @@ pub fn active_growth(bound: &Rat) -> Rat {
     &one_plus * &one_plus
 }
 
+/// [definition; agent-inferred, September 29] **The pumped medium's span factors** `F(0..=S)`
+/// (module header, "The pumped medium's span factor"; Lean `Holon/Deposition.{runningMax,
+/// le_runningMax, runningMax_mono, pumped_span_factor}`): from each ring's reach over the spans
+/// `0..=S` (`reaches[r][s]`, each `≥ 0`), `F(s) = ∏_r max_(s′ ≤ s) reach_r(s′)`, exact and
+/// nondecreasing in `s`. With no ring every factor is one. Each ring's table must cover the span.
+pub fn span_factors(reaches: &[Vec<Rat>], span: usize) -> Vec<Rat> {
+    let mut factors = vec![Rat::one(); span + 1];
+    for reach in reaches {
+        assert!(
+            reach.len() > span,
+            "a ring's reach covers every span the factor reads"
+        );
+        let mut running = Rat::zero();
+        for (factor, value) in factors.iter_mut().zip(reach) {
+            if *value > running {
+                running = value.clone();
+            }
+            *factor *= &running;
+        }
+    }
+    factors
+}
+
 /// `diag(1, −1)`, the indefinite normal-law block (`Holon/Deposition.indefiniteBlock`).
 pub fn indefinite_block() -> ExactRatMatrix {
     ExactRatMatrix::from_diagonal(vec![Rat::one(), -Rat::one()])
@@ -1031,5 +1070,23 @@ mod tests {
             CommittedEnergyBound::certify_deposit(&q, &q, &integer(-2)),
             Err(HolonError::NegativeGrowth)
         );
+    }
+
+    /// **The span factor is the product of the rings' running maxima** (Lean
+    /// `Holon/Deposition.{pumped_span_factor, runningMax_mono}`): it does not fall as the span
+    /// grows, a ring whose reach falls keeps its largest reach so far, and no ring reads one.
+    #[test]
+    fn the_span_factor_is_the_product_of_running_maxima() {
+        assert_eq!(span_factors(&[], 3), vec![Rat::one(); 4]);
+        // A growing ring and a ring whose reach falls after its first tick.
+        let growing = vec![integer(2), integer(4), integer(8), integer(16)];
+        let falling = vec![rat(3, 2), integer(3), rat(5, 4), integer(1)];
+        let factors = span_factors(&[growing.clone(), falling], 3);
+        assert_eq!(
+            factors,
+            vec![integer(3), integer(12), integer(24), integer(48)]
+        );
+        assert!(factors.windows(2).all(|pair| pair[0] <= pair[1]));
+        assert_eq!(span_factors(&[growing], 1), vec![integer(2), integer(4)]);
     }
 }

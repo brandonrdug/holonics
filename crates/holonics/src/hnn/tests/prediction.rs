@@ -198,14 +198,50 @@ fn the_refinement_balance_closes_with_the_injection_the_pump_and_the_commit() {
         false,
     )
     .unwrap();
-    // A pumped resonator's growth is not certified (the Floquet bound is owed in #62): the
-    // certified step refuses every linear step through it that moves.
+    // Pumped, every ring's growth is read by its Floquet reach (`hnn::constitution`, "The pumped
+    // medium's reach"): the step through the pumped rings is certified and taken, the rings' own
+    // gain families held, and the balance closes across the commit within the committed energy
+    // bound read with the span factor at the refinement's span.
     let deposit = deposit_of(&theta, &refinement, std::slice::from_ref(&staged.composed)).unwrap();
-    let refused = theta.deposited(&deposit).map(|(_, reading)| reading.steps);
+    let medium = theta.medium_reach(refinement.last_epoch() as u64).unwrap();
+    assert_eq!(medium.rings.len(), field.rings().len());
+    assert!(theta.amplitude().unwrap().is_none());
+    let (next, reading) = theta.deposited(&deposit).unwrap();
+    assert!(!reading.steps.is_empty());
+    assert!(reading.steps.iter().all(|(_, step)| step.step.holds()));
+    let pumped = reading
+        .pumped
+        .clone()
+        .expect("the pumped rings' reach is read");
     assert!(
-        matches!(refused, Err(crate::hnn::HnnError::UncertifiedGain { .. })),
-        "{refused:?}"
+        pumped
+            .held
+            .iter()
+            .all(|(locus, _)| matches!(locus, crate::hnn::constitution::Locus::Resonator(_)))
     );
+    assert!(
+        reading
+            .steps
+            .iter()
+            .all(|(locus, _)| !matches!(locus, crate::hnn::constitution::Locus::Resonator(_)))
+    );
+    let mut pumped_balance = balance.clone();
+    let before = crate::hnn::word::PowerForm::read(&field, &theta, &current).unwrap();
+    let after = crate::hnn::word::PowerForm::read(&field, &next, &current).unwrap();
+    pumped_balance
+        .commit(&before, &after, section.end())
+        .unwrap();
+    assert!(pumped_balance.closes(), "{pumped_balance:?}");
+    let passive = pumped_balance
+        .energy_bound(
+            &refinement,
+            &medium.amplitude,
+            &reading.storage_growth,
+            field.word_lattice(),
+        )
+        .unwrap();
+    let factor = medium.factor(refinement.last_epoch() as u64).unwrap();
+    assert!(passive.committed <= &passive.bound * factor, "{passive:?}");
     // Unpumped, the loaded resonators are passive: the step is certified and the balance closes
     // across its commit, within the committed energy bound.
     let theta = loaded(&field, generic(&field, 75));

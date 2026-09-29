@@ -161,6 +161,12 @@ open Holonics.HolonCore
 #print axioms gram_certificate_bound
 #print axioms adjoint_gram_certificate_bound
 #print axioms entrywise_error_bound
+#print axioms span_transport_compose
+#print axioms station_tick_gain
+#print axioms entry_span_gain
+#print axioms le_runningMax
+#print axioms runningMax_mono
+#print axioms pumped_span_factor
 #print axioms re_sum_antiConj
 #print axioms re_herm_skew
 #print axioms eq_zero_of_herm_zero

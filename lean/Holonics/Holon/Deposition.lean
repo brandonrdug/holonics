@@ -76,14 +76,25 @@ that fixed-material passivity does not see — the learned power `⟨e, L e⟩` 
    suffices (`adjoint_gram_certificate_bound`), and a face whose entries are within `ε` moves a
    vector by at most `m n ε²` times its squared length (`entrywise_error_bound`): the readout's
    spectral bound that replaces its Schur test.
+10. **The pumped medium's reach in the gain** (September 29). A difference carried over a span by a
+   map of energy gain `a` (a pumped ring's reach, `HNN/Floquet.floquet_span_reach`) and a map of
+   energy gain `b` (the medium's passive and contrast ticks) moves by at most `b a`
+   (`span_transport_compose`). Moves `δ_τ` reaching the stations through span maps of energy gains
+   `G_(jτ)` move the stacked logits by `Σ_j ‖Σ_τ Φ_(jτ) δ_τ‖² ≤ (Σ_j Σ_τ G_(jτ)) Σ_τ ‖δ_τ‖²`
+   (`station_tick_gain`, Cauchy–Schwarz over the ticks): the gain `κ²` is the sum of the span
+   gains. One injection re-entering at several ticks reaches a station with amplitudes that add,
+   so `‖Σ_n Φ_n v‖² ≤ F (Σ_n a_n)² ‖v‖²` when each span's factor is at most `F`
+   (`entry_span_gain`). A difference carried by several pumped rings within `s` ticks moves by at
+   most `∏_r max_(s′ ≤ s) R_r(s′)` (`pumped_span_factor`, through `runningMax`, `le_runningMax`),
+   which does not fall with `s` (`runningMax_mono`): the factor `F(s)` the machine reads.
 
 [open] Owed in #62 ("The certified deposition step"): the model's own second-order terms when the
 logits are not linear in the step (the bilinear coupling of a receiving map with a source port, a
 contrast port acting on its own downstream contrast); the factor families' second-order terms along
 their rays (the square's own `2B(D, D)` paired with the station covector, the element's resolvent
-`(I − ½K)⁻¹` and the transit's `m⁻¹` differentiated twice, the ticks' products); the composition of
-the per-tick growth over a word's stations and re-entries into the gains `κ²` the machine reads
-(`hnn::constitution`); the Schur test `‖W‖₂² ≤ ‖W‖₁‖W‖_∞` and its composition into the per-family
+`(I − ½K)⁻¹` and the transit's `m⁻¹` differentiated twice, the ticks' products); the per-tick growth
+of a word's executed ticks (the medium's `(1 + ω)²` a tick, the span gains that §10 composes into
+`κ²` over the stations and re-entries, `station_tick_gain`, `entry_span_gain`); the Schur test `‖W‖₂² ≤ ‖W‖₁‖W‖_∞` and its composition into the per-family
 moves (the readout reads the Gram certificate of §9 instead, whose inertia decision is the exact
 congruence of `ratio::linear::inertia`); the station score's curvature bound `s = ½`; the
 standing's fold: the lobe law and the lock's exact comparison are proved in `HNN/Normal` §6
@@ -92,8 +103,13 @@ standing's fold: the lobe law and the lock's exact comparison are proved in `HNN
 carried lattice's reading of the lobe (the machine reads the carried successor exactly; the
 statement that the carry's rounding keeps a halved ray in its lobe is not written) and the lock's
 code enclosure as the realized score's (`ExactInterval` code lengths read as the Lean real
-score); and a declared boost's growth bound (its signed stiffness stores indefinite energy, so no gain is
-certified through it; a step through it is refused, like a pumped resonator's).
+score); a declared boost's growth bound (its signed stiffness stores indefinite energy, so no gain is
+certified through it; a step through it is refused); and ("The certified step reads the Floquet
+reach", September 29) the pumped ring's loop within a span: §10 composes the ring's undriven reach
+with the medium's ticks as a factorization of the span's transport, and the driven ring's
+supply-rate certificate `E_G(x′) ≤ σ²E_G(x) + supply(e, s′)` that would discharge that
+factorization through the field's return into the ring is owed, with the reach along a ring's own
+gain ray (a tube of monodromies) and a modulated pump's passage-dependent schedule.
 -/
 
 noncomputable section
@@ -922,5 +938,113 @@ theorem entrywise_error_bound {m n : Type*} [Fintype m] [Fintype n] (E : Matrix 
   calc (E *ᵥ v) ⬝ᵥ (E *ᵥ v) = ∑ i, (E *ᵥ v) i * (E *ᵥ v) i := rfl
     _ ≤ ∑ _i : m, Fintype.card n * ε ^ 2 * (v ⬝ᵥ v) := Finset.sum_le_sum fun i _ => hrow i
     _ = Fintype.card m * Fintype.card n * ε ^ 2 * (v ⬝ᵥ v) := by simp; ring
+
+/-! ## 10. The pumped medium's reach in the gain -/
+
+section Reach
+
+variable {E F : Type*} [SeminormedAddCommGroup E] [SeminormedAddCommGroup F]
+
+/-- [proved-derived; formal-checked] **A span's transport through two carriers**: a difference
+carried for a span by a map `Λ` of energy gain `a` (the pumped ring's reach over the span,
+`HNN/Floquet.floquet_span_reach`) and by a map `Ψ` of energy gain `b` (the medium's passive and
+contrast ticks, `(1 + ω)^(2(s − 1))`) moves by at most `b a`: `‖Ψ(Λ v)‖² ≤ b a ‖v‖²`. -/
+theorem span_transport_compose {G : Type*} [SeminormedAddCommGroup G] (Λ : E → F) (Ψ : F → G)
+    {a b : ℝ} (hb : 0 ≤ b) (hΛ : ∀ v, ‖Λ v‖ ^ 2 ≤ a * ‖v‖ ^ 2)
+    (hΨ : ∀ w, ‖Ψ w‖ ^ 2 ≤ b * ‖w‖ ^ 2) (v : E) : ‖Ψ (Λ v)‖ ^ 2 ≤ b * a * ‖v‖ ^ 2 := by
+  calc ‖Ψ (Λ v)‖ ^ 2 ≤ b * ‖Λ v‖ ^ 2 := hΨ (Λ v)
+    _ ≤ b * (a * ‖v‖ ^ 2) := mul_le_mul_of_nonneg_left (hΛ v) hb
+    _ = b * a * ‖v‖ ^ 2 := by ring
+
+/-- [proved-derived; formal-checked] **The gain over the stations and the ticks** (Cauchy–Schwarz
+over the ticks): a locus's moves `δ_τ`, one a tick, reaching station `j`'s logits through span maps
+of energy gains `‖Φ_(jτ) v‖² ≤ G_(jτ) ‖v‖²` (zero past the station), move the stacked logits by
+`Σ_j ‖Σ_τ Φ_(jτ) δ_τ‖² ≤ (Σ_j Σ_τ G_(jτ)) Σ_τ ‖δ_τ‖²`: the gain `κ²` is the sum of the span gains,
+the moves `b` the sum of the moves. With `G_(jτ) = c (1 + ω)^(2(T_j − τ − 1)) F(T_j − τ)` it is the
+certified step's `κ²` through a pumped medium (`hnn::constitution`, "The pumped medium's reach"). -/
+theorem station_tick_gain {J T : Type*} (stations : Finset J) (ticks : Finset T)
+    (Φ : J → T → E → F) (G : J → T → ℝ) (hG : ∀ j τ, 0 ≤ G j τ)
+    (hΦ : ∀ j τ v, ‖Φ j τ v‖ ^ 2 ≤ G j τ * ‖v‖ ^ 2) (δ : T → E) :
+    ∑ j ∈ stations, ‖∑ τ ∈ ticks, Φ j τ (δ τ)‖ ^ 2 ≤
+      (∑ j ∈ stations, ∑ τ ∈ ticks, G j τ) * ∑ τ ∈ ticks, ‖δ τ‖ ^ 2 := by
+  have hamp : ∀ j τ v, ‖Φ j τ v‖ ≤ Real.sqrt (G j τ) * ‖v‖ := by
+    intro j τ v
+    have h := hΦ j τ v
+    have hr : Real.sqrt (G j τ * ‖v‖ ^ 2) = Real.sqrt (G j τ) * ‖v‖ := by
+      rw [Real.sqrt_mul (hG j τ), Real.sqrt_sq (norm_nonneg v)]
+    rw [← hr]
+    exact Real.le_sqrt_of_sq_le h
+  have hstation : ∀ j, ‖∑ τ ∈ ticks, Φ j τ (δ τ)‖ ^ 2 ≤
+      (∑ τ ∈ ticks, G j τ) * ∑ τ ∈ ticks, ‖δ τ‖ ^ 2 := by
+    intro j
+    have htri : ‖∑ τ ∈ ticks, Φ j τ (δ τ)‖ ≤ ∑ τ ∈ ticks, Real.sqrt (G j τ) * ‖δ τ‖ :=
+      (norm_sum_le _ _).trans (Finset.sum_le_sum fun τ _ => hamp j τ (δ τ))
+    have hsq := pow_le_pow_left₀ (norm_nonneg _) htri 2
+    have hcs := Finset.sum_mul_sq_le_sq_mul_sq ticks (fun τ => Real.sqrt (G j τ))
+      (fun τ => ‖δ τ‖)
+    have hroot : ∑ τ ∈ ticks, Real.sqrt (G j τ) ^ 2 = ∑ τ ∈ ticks, G j τ :=
+      Finset.sum_congr rfl fun τ _ => Real.sq_sqrt (hG j τ)
+    rw [hroot] at hcs
+    exact hsq.trans hcs
+  calc ∑ j ∈ stations, ‖∑ τ ∈ ticks, Φ j τ (δ τ)‖ ^ 2
+      ≤ ∑ j ∈ stations, (∑ τ ∈ ticks, G j τ) * ∑ τ ∈ ticks, ‖δ τ‖ ^ 2 :=
+        Finset.sum_le_sum fun j _ => hstation j
+    _ = (∑ j ∈ stations, ∑ τ ∈ ticks, G j τ) * ∑ τ ∈ ticks, ‖δ τ‖ ^ 2 := by
+        rw [Finset.sum_mul]
+
+/-- [proved-derived; formal-checked] **One station's re-entries** (the triangle on their
+amplitudes): the same injection re-entering at the ticks `T_n` reaches the station through span
+maps with `‖Φ_n v‖² ≤ a_n² F_n ‖v‖²` and `0 ≤ F_n ≤ F`, so
+`‖Σ_n Φ_n v‖² ≤ F (Σ_n a_n)² ‖v‖²`: the pumped factor at the longest span multiplies the passive
+entry gain `(Σ_n (1 + ω)^(T_j − T_n))²`. -/
+theorem entry_span_gain {ι : Type*} (entries : Finset ι) (Φ : ι → E → F) (a f : ι → ℝ)
+    {Fmax : ℝ} (hF : 0 ≤ Fmax) (ha : ∀ n ∈ entries, 0 ≤ a n)
+    (hf : ∀ n ∈ entries, 0 ≤ f n ∧ f n ≤ Fmax)
+    (hΦ : ∀ n ∈ entries, ∀ v, ‖Φ n v‖ ^ 2 ≤ a n ^ 2 * f n * ‖v‖ ^ 2) (v : E) :
+    ‖∑ n ∈ entries, Φ n v‖ ^ 2 ≤ Fmax * (∑ n ∈ entries, a n) ^ 2 * ‖v‖ ^ 2 := by
+  have hamp : ∀ n ∈ entries, ‖Φ n v‖ ≤ Real.sqrt Fmax * a n * ‖v‖ := by
+    intro n hn
+    have h := hΦ n hn v
+    have hbound : a n ^ 2 * f n * ‖v‖ ^ 2 ≤ (Real.sqrt Fmax * a n * ‖v‖) ^ 2 := by
+      rw [mul_pow, mul_pow, Real.sq_sqrt hF]
+      have := (hf n hn).2
+      have hav : 0 ≤ a n ^ 2 * ‖v‖ ^ 2 := by positivity
+      nlinarith
+    have hnn : 0 ≤ Real.sqrt Fmax * a n * ‖v‖ :=
+      mul_nonneg (mul_nonneg (Real.sqrt_nonneg _) (ha n hn)) (norm_nonneg v)
+    exact (pow_le_pow_iff_left₀ (norm_nonneg _) hnn two_ne_zero).mp (h.trans hbound)
+  have htri : ‖∑ n ∈ entries, Φ n v‖ ≤ Real.sqrt Fmax * (∑ n ∈ entries, a n) * ‖v‖ := by
+    refine (norm_sum_le _ _).trans ((Finset.sum_le_sum hamp).trans (le_of_eq ?_))
+    rw [Finset.mul_sum, Finset.sum_mul]
+  have hsq := pow_le_pow_left₀ (norm_nonneg _) htri 2
+  calc ‖∑ n ∈ entries, Φ n v‖ ^ 2 ≤ (Real.sqrt Fmax * (∑ n ∈ entries, a n) * ‖v‖) ^ 2 := hsq
+    _ = Fmax * (∑ n ∈ entries, a n) ^ 2 * ‖v‖ ^ 2 := by
+        rw [mul_pow, mul_pow, Real.sq_sqrt hF]
+
+end Reach
+
+/-- [definition] **The running maximum** of a span's reach, `max_(s′ ≤ s) R(s′)`: the factor over
+every span a difference can be carried by one pumped ring within `s` ticks. -/
+def runningMax (R : ℕ → ℝ) (s : ℕ) : ℝ := (Finset.range (s + 1)).sup' Finset.nonempty_range_add_one R
+
+/-- [proved-derived; formal-checked] The running maximum bounds every shorter span's reach. -/
+theorem le_runningMax (R : ℕ → ℝ) {s' s : ℕ} (h : s' ≤ s) : R s' ≤ runningMax R s :=
+  Finset.le_sup' R (Finset.mem_range.mpr (Nat.lt_succ_of_le h))
+
+/-- [proved-derived; formal-checked] The running maximum does not fall as the span grows. -/
+theorem runningMax_mono (R : ℕ → ℝ) : Monotone (runningMax R) := by
+  intro s t hst
+  refine Finset.sup'_le _ _ fun s' hs' => le_runningMax R ?_
+  exact (Nat.lt_succ_iff.mp (Finset.mem_range.mp hs')).trans hst
+
+/-- [proved-derived; formal-checked] **The pumped medium's span factor**: a difference whose span of
+`s` ticks passes through several pumped rings, carried by ring `r` for `s_r ≤ s` ticks with reach
+`R_r(s_r) ≥ 0`, moves by at most `∏_r R_r(s_r) ≤ ∏_r max_(s′ ≤ s) R_r(s′)`, the factor
+`F(s) = ∏_r runningMax R_r s` the certified step reads, which does not fall with `s`. -/
+theorem pumped_span_factor {ι : Type*} (rings : Finset ι) (R : ι → ℕ → ℝ)
+    (hR : ∀ r ∈ rings, ∀ s, 0 ≤ R r s) (span : ι → ℕ) {s : ℕ}
+    (hspan : ∀ r ∈ rings, span r ≤ s) :
+    ∏ r ∈ rings, R r (span r) ≤ ∏ r ∈ rings, runningMax (R r) s :=
+  Finset.prod_le_prod (fun r hr => hR r hr (span r)) fun r hr => le_runningMax (R r) (hspan r hr)
 
 end Holonics.HolonCore
