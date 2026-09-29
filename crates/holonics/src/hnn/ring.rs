@@ -109,11 +109,22 @@
 //! pump phases, each with its own operator and chart. A pump of infinite order would give each tick
 //! its own operator; it is not declared.
 //!
-//! [proved-derived; implemented-exact] **The clock** ([`RingClock`]). The ring's rotor steps `1/d` of
-//! a turn per micro-step; over a passage of cells its arrivals on its section (the lift's multiples of
-//! `d`) are its epoch ticks, `(r + N)/d` of them from residue `r` after `N` micro-steps
-//! (`ring_crossings_are_epoch_ticks`, the owner [`crate::holon::parametron::ring_crossings`]); they
-//! are the carries it sends down the carry chain.
+//! [proved-derived; implemented-exact] **The clock.** The ring's rotor steps `1/d` of a turn per
+//! micro-step, its clock the navigator's (`hnn::field::Ring::clock_at`); over a passage of cells its
+//! arrivals on its section (the lift's multiples of `d`) are its epoch ticks, `(r + N)/d` of them
+//! from residue `r` after `N` micro-steps (`ring_crossings_are_epoch_ticks`, the owner
+//! [`crate::holon::parametron::ring_crossings`]). They are read by the aeon owner: the epochs of the
+//! passage's aeon at the ring section (`aeon::epochs` at `aeon::ClockLift::ring_section`, read at
+//! the aeon's boundary by `hnn::retention::aeon_readings`), and cell by cell they are the carries
+//! the ring sends down the carry chain (`hnn::field::Field::selective_step`). [agent-inferred, U5]
+//! The walk that counted them micro-step by micro-step here (`RingClock`, at `e5eb7304`) duplicated
+//! that owner and had no library consumer; it is retired.
+//!
+//! [proved-derived; implemented-exact] **The pump's period is a cycle** ([`PumpDeclaration::clock`],
+//! [`PumpDeclaration::period`]). The pump's clock is one circle of the step's order; the pump phase
+//! at word tick `t` is its torus point, the carrier there is `a² s^t`, and the aeon of `t` ticks is an
+//! `aeon::Cycle` exactly when the order divides `t`, exactly when `s^t = 1` (Lean
+//! `pump_period_is_cycle`). The card reads the same torus point as `t mod order`.
 //!
 //! [proved-derived; implemented-exact] **The reference change at a junction port**
 //! ([`port_scattering`]). A wave arriving at port `p` of a junction meets the rest of the junction as
@@ -130,20 +141,21 @@
 //! | `loaded_tick_adjoint_pairing`, `loaded_material_rate_tangent`, `loaded_tick_material_variation` | [`ResonatorOperands::solve_transpose`], `hnn::port::Word::pull_back`, `hnn::reference::compose` |
 //! | `loaded_gain_family_increment`, `loaded_gains_preserve_storage_dissipation`, `ring_material_commit_work` | [`ResonatorMaterial::with_gains`], `hnn::constitution::Constitution::deposited`, `hnn::word::PowerForm::deposition_work` |
 //! | `two_port_reference_balance` | [`port_scattering`], [`PortScattering`] |
-//! | `ring_crossings_are_epoch_ticks` | [`RingClock::over`] |
+//! | `ring_crossings_are_epoch_ticks` | `aeon::epochs` at `aeon::ClockLift::ring_section`, read by `hnn::retention::aeon_readings` |
+//! | `pump_period_is_cycle` | [`PumpDeclaration::clock`], [`PumpDeclaration::phase_at`], [`PumpDeclaration::period`], [`ResonatorOperands::phase_at`] |
 //! | `pump_half_turn_invariant`, `pump_blind_to_sheets`, `locked_sheet_receiver_face` | [`PumpDeclaration`], [`sheets`] |
 //! | `loaded_solve_chart_bound`, `loaded_state_split_bound` (with `abs_mulVec_le_rowNorm`, `abs_dot_le_l1`) | [`ResonatorStep::bound`], [`ResonatorStep::closes`] |
 //! | `gain_backtrack_midpoint` | `hnn::constitution::GainBacktrack`, [`ResonatorMaterial::with_gains`] |
 
 use num_bigint::{BigInt, BigUint};
-use num_traits::{One, Signed, Zero};
+use num_traits::{One, Signed, ToPrimitive, Zero};
 
+use crate::aeon::{ClockLift, Cycle};
 use crate::hnn::HnnError;
 use crate::hnn::chart::{ChartKey, ChartReading, ChartWords, WordLattice, carry, refine};
 use crate::hnn::constitution::Lattice;
 use crate::hnn::contact::symmetric;
-use crate::hnn::field::{Current, Field};
-use crate::holon::parametron::{Carrier, Parametron, ring_crossings, threshold_sheet};
+use crate::holon::parametron::{Carrier, Parametron, threshold_sheet};
 use crate::ratio::linear::ExactRatMatrix;
 use crate::ratio::linear::inertia::inertia;
 use crate::ratio::linear::vector::{add, dot, scale, sub};
@@ -251,6 +263,35 @@ impl PumpDeclaration {
     /// The pump phases a word visits.
     pub fn phases(&self) -> usize {
         self.step.order()
+    }
+
+    /// [definition; agent-inferred, U5] **The pump's clock**: one circle whose period is the step's
+    /// order, one micro-step a word tick (`aeon::ClockLift`). Its torus point at tick `t` is the
+    /// pump phase ([`PumpDeclaration::phase_at`]), and the aeon of one period is the pump's cycle
+    /// ([`PumpDeclaration::period`]).
+    pub fn clock(&self) -> ClockLift {
+        ClockLift::new(vec![BigUint::from(self.phases())])
+            .expect("a pump step's order is at least one tick")
+    }
+
+    /// **The pump phase at word tick `t`**: the pump's clock's torus point at `t` (Lean
+    /// `Aeon/Clock/Winding.torusPoint`), whose carrier is `a² s^t` ([`PumpDeclaration::carrier`];
+    /// Lean `HNN/Ring.pump_period_is_cycle`).
+    pub fn phase_at(&self, tick: usize) -> usize {
+        self.clock().torus_point(&[BigInt::from(tick)])[0]
+            .to_usize()
+            .expect("a pump phase lies below the step's order")
+    }
+
+    /// [proved-derived; implemented-exact] **The pump's period is a cycle** (`aeon::Cycle`): the
+    /// aeon of one period of ticks from rest closes on the pump's clock and reads one whole
+    /// winding. Its carrier returns there, `s^order = 1`, and at no fewer ticks: the aeon of `t`
+    /// ticks closes exactly when the order divides `t`, exactly when `s^t = 1` (Lean
+    /// `HNN/Ring.pump_period_is_cycle`).
+    pub fn period(&self) -> Result<Cycle<ClockLift>, HnnError> {
+        let clock = self.clock();
+        let aeon = clock.forward(vec![BigInt::zero()], &[BigInt::from(self.phases())])?;
+        Ok(Cycle::close(&clock, aeon)?)
     }
 
     /// **The pump carrier** `e^(iψ)` at phase `j`: `a² i^(j·k)`.
@@ -747,9 +788,10 @@ impl ResonatorOperands {
         &self.admittance
     }
 
-    /// The pump phase at word tick `t`.
+    /// **The pump phase at word tick `t`**: the pump's clock's torus point
+    /// ([`PumpDeclaration::phase_at`]); an unpumped ring has the one phase.
     pub fn phase_at(&self, tick: usize) -> usize {
-        tick % self.phases.len()
+        self.material.pump().map_or(0, |pump| pump.phase_at(tick))
     }
 
     /// The pump phases the word visits.
@@ -955,80 +997,6 @@ fn sup(vector: &[Rat]) -> Rat {
         .map(|x| x.abs())
         .max()
         .unwrap_or_else(Rat::zero)
-}
-
-// -------------------------------------------------------------------------------------------
-// the rotor's clock
-
-/// [definition] **A ring's clock over a passage of cells** (Lean
-/// `HNN/Ring.ring_crossings_are_epoch_ticks`): its period `d`, its residue `r` at the passage's
-/// start, the micro-steps `N` it took, its arrivals on its section (the epoch ticks, `(r + N)/d`),
-/// and the micro-steps at which it arrived.
-#[derive(Clone, Debug, PartialEq, Eq)]
-pub struct RingClock {
-    pub ring: usize,
-    pub period: u64,
-    pub residue: u64,
-    pub micro_steps: BigUint,
-    pub crossings: BigUint,
-    pub ticks: Vec<usize>,
-}
-
-impl RingClock {
-    /// **Every ring's clock over a passage of cells** from a lift point: the lift stepped cell by
-    /// cell (`Field::selective_step`, carries included), each micro-step that lands on the ring's
-    /// section counted as an epoch tick. The count equals the owner's `ring_crossings(d, r, N)` and
-    /// the ring's winding difference, which [`RingClock::agrees`] checks.
-    pub fn over(field: &Field, start: &Current, cells: &[usize]) -> Result<Vec<Self>, HnnError> {
-        let mut current = start.clone();
-        let mut clocks: Vec<Self> = (0..field.rings().len())
-            .map(|ring| {
-                let period = field.ring(ring).period();
-                Ok(Self {
-                    ring,
-                    period,
-                    residue: current.phase(field, ring)?,
-                    micro_steps: BigUint::zero(),
-                    crossings: BigUint::zero(),
-                    ticks: Vec::new(),
-                })
-            })
-            .collect::<Result<_, HnnError>>()?;
-        let mut micro: Vec<usize> = vec![0; field.rings().len()];
-        for &cell in cells {
-            let before: Vec<BigInt> = current.lift().to_vec();
-            let stepped = current.step(field, cell)?;
-            for (ring, clock) in clocks.iter_mut().enumerate() {
-                let taken = u64::from(stepped.ticks[ring]);
-                let d = BigInt::from(clock.period);
-                for k in 1..=taken {
-                    let position = &before[ring] + BigInt::from(k);
-                    micro[ring] += 1;
-                    if (&position % &d).is_zero() {
-                        clock.crossings += BigUint::one();
-                        clock.ticks.push(micro[ring]);
-                    }
-                }
-                clock.micro_steps += BigUint::from(taken);
-            }
-        }
-        Ok(clocks)
-    }
-
-    /// **The count is the owner's**: the arrivals equal `ring_crossings(d, r, N)` (Lean
-    /// `ringCrossings_eq`), and every arrival is a micro-step inside the passage.
-    pub fn agrees(&self) -> Result<bool, HnnError> {
-        let owner = ring_crossings(
-            &BigUint::from(self.period),
-            &BigUint::from(self.residue),
-            &self.micro_steps,
-        )?;
-        let inside = self
-            .ticks
-            .iter()
-            .all(|tick| BigUint::from(*tick) <= self.micro_steps);
-        Ok(owner == self.crossings && inside && BigUint::from(self.ticks.len()) == self.crossings)
-    }
 }
 
 // -------------------------------------------------------------------------------------------

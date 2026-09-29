@@ -25,11 +25,19 @@
 //!   is an [`crate::aeon::Cycle`] of the last ring's clock when that ring opened on its section;
 //!   the boundary runs the collapse; and the resident carries the ledger
 //!   ([`retention::aeon_readings`], [`AeonBoundary`], [`Reference`]'s header).
-//! - [open] Three joins the sentence names are not yet in the code. The receiving tree is storage
-//!   read by the receiving face, not a Holon joined at ports in [`Field::holarchy`]. A receiving
-//!   window is a step of the exposure's loop, not an [`crate::aeon::Epochs`] reading at the
-//!   receiver's section. A pump's period is the mode quotient's lift period (Lean
-//!   `HNN/ModeQuotient.periodic_lift_exact`), not an [`crate::aeon::Cycle`]. The unity audit's order, item 2, owns them (#63).
+//! - **The clocks are aeons** (THE_REBUILD U5; agent-inferred, each choice in its owner). A
+//!   receiving window is an [`crate::aeon::Epochs`] reading: an epoch of the cut's cell clock at the
+//!   receiver's section ([`ReceivingPhases::windows`], which the exposure reads). A pump's period
+//!   is an [`crate::aeon::Cycle`] of its own clock ([`PumpDeclaration::period`]; the mode
+//!   quotient's lift period, Lean `HNN/ModeQuotient.periodic_lift_exact`, is that cycle's). Every
+//!   ring clock the machine keeps is its navigator's `navigator::Clock` (`field`'s header, "The
+//!   rings' clocks"), and the selective step's carry is its jumps, the flux of its section. The
+//!   word's clock is an unwound `navigator::Clock` whose ticks the receiver reads at `e_0 … e_last`.
+//!   The exposure's own counters (compares, deposits, the deadline in windows) are the program's,
+//!   disclosed as such in [`reference::Exposure`].
+//! - [open] One join the sentence names is not yet in the code: the receiving tree is storage read
+//!   by the receiving face, not a Holon joined at ports in [`Field::holarchy`] (U1 named the missing
+//!   maps; owed in #62).
 //!
 //! Within an aeon the medium `(Θ, λ)` fixes every operand of a word, and a change opens at zero,
 //! propagates one contact per tick and is released at the word's end. The forward machine is here:
@@ -94,7 +102,7 @@
 //! | the receiving face compresses landmarks: the tree's path face, its opened-path deposit and telescope, the executed dyadic face (the landmark tree) | `Compression/Landmark/Context/Tree.{path_face_normalized, weight_step, landmark_step, path_telescope_exact, depth_one_is_the_whole_cell_table, executed_split_laws, cell_faces_partition, digit_log_residual}` (the owner's header has the rest) | [`crate::compression::landmark::context`] |
 //! | the word opens at zero | structural: [`Current`] has no wave field (`HNN/Retention.word_opens_at_zero` is the abstract trajectory's linearity) | [`Word::open`] |
 //! | keys | `HNN/Keys.{field_loop_fibre, selective_step_dormant, propagation_eq_edge_fibre, gauge_fix_unique}` | [`keys`], [`crate::compression::Menu::propagate`] |
-//! | the ring's mode tick, its pump and sheets, its clock, the junction's reference change (campaign 2) | `HNN/Ring.{ring_tick_conserves_mode_energy, ring_descriptor_tick_conserves, ring_cayley_denominator_nonsingular, ring_tick_executed_energy_balance, two_port_reference_balance, ring_crossings_are_epoch_ticks, pump_half_turn_invariant, pump_blind_to_sheets, locked_sheet_receiver_face}` | [`ring`] |
+//! | the ring's mode tick, its pump and sheets, its clock, the junction's reference change (campaign 2) | `HNN/Ring.{ring_tick_conserves_mode_energy, ring_descriptor_tick_conserves, ring_cayley_denominator_nonsingular, ring_tick_executed_energy_balance, two_port_reference_balance, ring_crossings_are_epoch_ticks, pump_period_is_cycle, pump_half_turn_invariant, pump_blind_to_sheets, locked_sheet_receiver_face}` | [`ring`] |
 //! | the contact's transfer and site kind, its boost, its lock address, its break (campaign 2) | `HNN/Contact.{contact_transfer_kind_by_storage_sign, contact_mode_transfer, contact_boost_solve_or_singular_direction, contact_signed_storage_balance, contact_lock_address, lockAddress_unique, least_denominator_unique, lockAddress_closes}`, `HNN/ContactBreak.{break_release_balance, break_iff_release_covers_gluing, griffith_closed_port_case, parting_returns_gluing_defect}` | [`contact`], [`contact_readings`], [`Field::parted_holarchy`] |
 //! | the loaded tick's field/resonator balance, separate element and returned-wave splits, the word's balance across the gain commit (the loaded resonator) | `HNN/Ring.{loaded_word_stage_balance, loaded_tick_executed_interconnection_balance}`, `HNN/Word.{field_commit_deposition}` | [`word::FieldBalance`], [`word::WordBalance`], [`word::PowerForm`] |
 //! | the ring's navigator | `Holon/Navigator.{mapRotor_order, map_pow_mod_order, map_turn_lossless}` | [`Ring::navigator`] over `navigator::Transport::Map` |
@@ -152,7 +160,7 @@ pub use ratio::{Faces, HolonRatio, RatioCovector};
 pub use receiving::{ActiveAddress, LetterReader, ReceivingPhases, ReceivingRead};
 pub use reference::{Cut, Exposure, Reference, Resident};
 pub use retention::AeonBoundary;
-pub use ring::{PumpDeclaration, ResonatorMaterial, RingClock};
+pub use ring::{PumpDeclaration, ResonatorMaterial};
 pub use word::{Released, ResonatorBalance, Word};
 
 #[cfg(test)]

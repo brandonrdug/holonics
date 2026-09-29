@@ -447,6 +447,53 @@ A receiving window is an `aeon::Epochs` reading, a pump period an `aeon::Cycle`,
 clocks instantiate `navigator::Clock`. Acceptance: the section and carry correspondence is proved or
 checked exactly, and every exposure is at parity. Failure: the clock that does not correspond is
 named, and the program's loop stays its own counter, disclosed as such.
+- **First loop, September 28: the clocks joined; every clock corresponds** (Refs #73 #63). The
+  computational object is the helical pair interaction; the loop touches the helix (a clock is a
+  circle plus carry), the tube (the receiving window as a clocked span) and the cell holonomy (a
+  pump's cycle closes on its torus), with the pair, faces and placement, and the tower thread
+  attached. Each choice is agent-inferred in its owner.
+  - *The inventory and its dispositions.*
+
+    | Clock (host and card) | Section, carry, period | Disposition |
+    |---|---|---|
+    | Ring `g`'s rotor clock, the lift coordinate `λ_g` | section `d_g ∣ λ`; its jumps are the carry into ring `g + 1`; period `d_g` | `navigator::Clock` (`hnn::field::Ring::clock_at`): the lift point's phase class and winding, the selective step's carry, the keys' crib opening and carried key, the cut's branch and the letters' register all read it; a signed coordinate (the map powers of `Ring::rotate`, a ring's point) splits by `aeon::Reading`, which agrees with the clock wherever both read |
+    | The carry chain and the joint clock's carry-out | ring `g`'s carry on a cell is its section's flux over the cell's aeon | `aeon::Epochs` flux, proved (Lean `HNN/Moment.SelectiveDecl.carryIn_is_section_flux`); the carry-out stays the `aeon::Cycle` of the last ring's clock at the boundary (`hnn::retention::aeon_readings`). A ring's carry word is its section's epoch reading at the cell clock's sections: the carry word's runtime consumer (§4) is the selective step |
+    | A ring's epoch ticks over a passage | the ring section's flux, `(r + N)/d` | `aeon::epochs` at `ClockLift::ring_section`, read by `aeon_readings` |
+    | The receiving window | the cut's cell clock (an unwound `navigator::Clock`, one tick a cell) at the section `A ∣ x`, `A` the aperture | `aeon::Epochs`: window `k` is epoch `k`, `[kA, min((k + 1)A, n))`, the closed windows the flux `⌊n/A⌋` (`hnn::receiving::ReceivingPhases::windows`, which the exposure's loop reads; Lean `Aeon/Clock/Epoch.{mem_epoch_digitTicks, epochOf_digitTicks, odometer_tower}`) |
+    | The word's clock (junction steps; the receiver's `e_0 … e_last`; the diamond's rounds and windows) | unwound, every tick on its section | `navigator::Clock::unwound` (already); the receiving epochs are its ticks, the epochs of the word's aeon at its unit section, disclosed as such |
+    | The pump's clock | one circle of the step's order `1`, `2` or `4` | `aeon::Cycle` (`hnn::ring::PumpDeclaration::{clock, phase_at, period}`; the resonator's phase is the clock's torus point; Lean `HNN/Ring.pump_period_is_cycle`) |
+    | A locus's deposit clock `m` | the locus's section, crossed by each deposit that moves it | `aeon::Epochs` flux, kept as its count (the constitution's header, unchanged: deposits only advance, so the count is the flux and its sufficient statistic) |
+    | The keys' `steps_g(k)` and crib ticks | ring `g`'s clock over the crib | the ring clock's reading, its lift displacement (Lean `Winding.reading_navigatorClock`), summed from the selective step |
+    | The moment's cells and an aeon's `cells` | the cell clock | the unwound cell clock's reading, which `receiving_windows` lifts |
+    | The card's moment ingest carry and pump phase | device realizations | the ring clock's jumps (`before + step ≥ period`) and the pump clock's torus point (`t mod order`), each at parity with the host by the GPU suite and the card exposure |
+    | The chase's switch clock | the tick clock at the switch cells | `aeon::Epochs` already (F6); untouched |
+    | The exposure's compares, deposits and open windows, its deadline in windows, `Constitution::commit` | none | the program's own counters, disclosed as such (`hnn::reference::Exposure`) |
+  - *Joins and deletions.* `hnn::field::phase_winding` (a copy of the division with remainder) is
+    deleted: its readers go through `Ring::clock_at` or `aeon::Reading`. `hnn::ring::RingClock`
+    (a micro-step walk counting section arrivals, test-only) is deleted: its law is read through
+    `aeon::epochs` (history at `e5eb7304`). The letters' register keeps each ring's
+    `navigator::Clock` instead of a copy of its arithmetic. `aeon::Epochs::intervals` gives an
+    aeon's epochs as intervals (Lean `epoch_contiguous`). The exposure's stride `position += A` is
+    replaced by the epochs of the cut's cell clock. The atlas gains `hnn.ring-clock`,
+    `hnn.carry-is-section-flux`, `hnn.receiving-window-epoch` and `parametron.pump-period-cycle`, and
+    `parametron.crossings-epoch-ticks` names the aeon owners.
+  - *Lean.* `Aeon/Clock/Epoch.mem_epoch_digitTicks` (epoch `k` of a digit clock of base `n` is the
+    window `[n k, n (k + 1))`); `HNN/Moment.SelectiveDecl.carryIn_is_section_flux` (the carry is the
+    ring clock's jumps and the signed crossing count of its section over any aeon of its circle
+    lift across the cell); `HNN/Ring.{pumpOrder, quarterTurn_pow_eq_one_iff, pump_period_is_cycle}`
+    (`s = i^k` returns exactly at multiples of its order, `a² s^t = a² s^(t mod order)`, and an aeon
+    of the pump's clock closes exactly when the carrier returns). Owed in #62: the forward walk's
+    bridge, that on the one-navigator lift the aeon section (`Epoch.aeonSection`) of the forward
+    walk `0 → n` at `sectionForm 0 A` is `Epoch.digitTicks A (n + 1)` (checked exactly in Rust,
+    `the_receiving_windows_are_the_epochs_of_the_cell_clock`).
+  - *Parity* (the standing cut, SHA-256 `5c5613d3…f23df4f`, 6,148 cells, 3,074 windows; only
+    counts, bits and hashes). The host exposure before the loop (`e5eb7304`) and after it agree line
+    for line outside the wall times (3,335 lines each; the 3,307 lines outside the setup line and
+    the wall-time table hash alike): complete, 3,074 windows compared and deposited, held out
+    `3671 + 9/16 + ε` bits, `3 + 1/16 + ε` a cell. Before, 391,605 ms at a 427,786,240-byte peak;
+    after, 371,468 ms at a 383,205,376-byte peak (projected from the first, within ten minutes and
+    4 GiB).
+  - *Verdict.* Every clock corresponds; none is left a counter but the program's own, disclosed.
 
 #### U6. The text chart
 

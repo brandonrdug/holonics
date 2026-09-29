@@ -1163,3 +1163,56 @@ fn the_contact_letters_are_read_from_the_register_before_the_cell_they_predict()
         );
     }
 }
+
+/// The receiving windows are the epochs of the cell clock at the receiver's section (U5; Lean
+/// `Aeon/Clock/Epoch.{epochOf_digitTicks, mem_epoch_digitTicks, odometer_tower}`): for every
+/// aperture `A` and passage of `n` cells, the windows tile the passage as `[kA, min((k + 1)A, n))`,
+/// the window of cell `c` is its epoch `⌊c/A⌋`, the windows that close number the section's flux
+/// `⌊n/A⌋`, and the cell clock's own grain coarsens to the receiver's by the carry `winding A`.
+/// The declared receiver reads its windows through the same law, and `A = 0` is no section.
+#[test]
+fn the_receiving_windows_are_the_epochs_of_the_cell_clock() {
+    use crate::aeon::{ClockLift, EpochTower, epochs};
+    use crate::geometry::winding::winding;
+    use crate::hnn::receiving::receiving_windows;
+    use num_bigint::BigUint;
+    for aperture in 1usize..=4 {
+        for n in 0usize..=13 {
+            let windows = receiving_windows(n, aperture).unwrap();
+            let expected: Vec<_> = (0..n.div_ceil(aperture))
+                .map(|k| k * aperture..((k + 1) * aperture).min(n))
+                .collect();
+            assert_eq!(windows, expected, "A = {aperture}, n = {n}");
+            for (k, window) in windows.iter().enumerate() {
+                assert!(window.clone().all(|cell| cell / aperture == k));
+            }
+            let closed = windows.iter().filter(|w| w.len() == aperture).count();
+            assert_eq!(closed, n / aperture);
+            // The tower: the cell clock's own grain one, then the receiver's grain A.
+            let lift = ClockLift::new(vec![BigUint::one()]).unwrap();
+            let aeon = lift
+                .forward(vec![BigInt::zero()], &[BigInt::from(n)])
+                .unwrap();
+            let at =
+                |grain: usize| epochs(&aeon, lift.ring_section(0, BigUint::from(grain)).unwrap());
+            let receiver = at(aperture);
+            assert_eq!(receiver.flux(), BigInt::from(n / aperture));
+            let tower = EpochTower::new(vec![at(1), receiver]).unwrap();
+            for (fine, coarse) in tower.coarsen(0, 1).unwrap() {
+                assert_eq!(
+                    BigUint::from(coarse),
+                    winding(&BigUint::from(aperture), &BigUint::from(fine)).unwrap()
+                );
+            }
+        }
+    }
+    assert!(receiving_windows(5, 0).is_err());
+    let field = &chain();
+    let medium = Medium::initial(field, 4);
+    let current = Current::at_rest(field);
+    let phases = ReceivingPhases::declare(field, &medium, &current, &field.receivers()[0]).unwrap();
+    assert_eq!(
+        phases.windows(7).unwrap(),
+        receiving_windows(7, phases.aperture()).unwrap()
+    );
+}

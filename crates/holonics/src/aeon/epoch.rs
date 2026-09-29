@@ -29,6 +29,7 @@
 //! owed in #62 (#72).
 
 use std::collections::BTreeMap;
+use std::ops::Range;
 
 use num_bigint::{BigInt, BigUint};
 use num_traits::{One, Zero};
@@ -120,6 +121,19 @@ impl Epochs {
         (0..self.epochs.len())
             .filter(|micro_state| self.epochs[*micro_state] == label)
             .collect()
+    }
+
+    /// **The epochs as intervals of micro-states**, lowest label first: epoch `k` runs from the
+    /// micro-state its opening tick reaches (`0` for the first) up to the one before the next
+    /// tick's. Every epoch is an interval (Lean `epoch_contiguous`) and the epoch advances by one at
+    /// every tick (`epochOf_succ`), so these are [`Epochs::epoch`]'s sets, `#ticks + 1` of them
+    /// (`aeon_epochs_attained`).
+    pub fn intervals(&self) -> Vec<Range<usize>> {
+        let mut starts: Vec<usize> = std::iter::once(0)
+            .chain(self.ticks.iter().map(|tick| tick.step + 1))
+            .collect();
+        starts.push(self.micro_states());
+        starts.windows(2).map(|pair| pair[0]..pair[1]).collect()
     }
 
     /// The epochs the aeon attains, lowest first.
@@ -242,8 +256,9 @@ mod tests {
 
     /// **Epochs partition the aeon into intervals and the flux is a reading.** The epoch advances
     /// by one at every tick, forward or back, and the sheet by the tick's sign; every epoch is an
-    /// interval and there are `#ticks + 1` of them on any aeon; the flux adds under concatenation
-    /// and changes sign under reversal; and the sheet is the epoch exactly on a monotone aeon. Lean
+    /// interval ([`Epochs::intervals`]) and there are `#ticks + 1` of them on any aeon; the flux
+    /// adds under concatenation and changes sign under reversal; and the sheet is the epoch exactly
+    /// on a monotone aeon. Lean
     /// `Epoch.epochOf_succ`, `epoch_contiguous`, `aeon_epochs_attained`, `crossings_concat`.
     #[test]
     fn epochs_partition_the_aeon_and_the_flux_is_a_reading() {
@@ -275,7 +290,9 @@ mod tests {
             for label in epochs.attained() {
                 let epoch = epochs.epoch(label);
                 assert_eq!(epoch.len(), epoch[epoch.len() - 1] - epoch[0] + 1);
+                assert_eq!(epochs.intervals()[label].clone().collect::<Vec<_>>(), epoch);
             }
+            assert_eq!(epochs.intervals().len(), epochs.ticks().len() + 1);
         }
         let joined = epochs(&gamma.concat(&delta).unwrap(), section());
         assert_eq!(joined.flux(), at.flux() + forward.flux());

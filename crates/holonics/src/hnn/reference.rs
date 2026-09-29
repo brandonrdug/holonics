@@ -74,8 +74,9 @@
 //!
 //! [definition] **The exposure** ([`Reference::expose`], design (d), campaign 1's protocol under
 //! prequential scoring): the cut, exactly the field's declared population (so the `n*` guard holds), is
-//! read in order, as one stream, into one moment; at each receiving window `refine` runs on the
-//! moment and `compare` against the next `A` cells, whose return is then deposited, held-out
+//! read in order, as one stream, into one moment; at each receiving window (an epoch of the cut's
+//! cell clock at the receiver's section, `hnn::receiving::ReceivingPhases::windows`; U5) `refine`
+//! runs on the moment and `compare` against the window's `A` cells, whose return is then deposited, held-out
 //! windows included (prequential: every comparison is scored at the standing before its own
 //! deposit, as the online baselines are); then those cells are ingested; the aeon boundary is the joint clock's carry-out,
 //! and after it keys are located on the crib that closed the aeon: its last `W_crib` cells, past
@@ -2498,6 +2499,8 @@ pub struct Exposure {
     /// lengths and the population's log-odds at its boundary, the run's last, open aeon at its end.
     pub course: Vec<AeonCourse>,
     pub constitution_curve: Vec<CurvePoint>,
+    /// The receiving windows read: the closed epochs of the cut's cell clock at the receiver's
+    /// section that the run compared (`hnn::receiving::ReceivingPhases::windows`).
     pub windows: u64,
     pub open_windows: u64,
     pub peak_word_bits: u64,
@@ -2517,6 +2520,9 @@ pub struct Exposure {
     pub literal_bits: u64,
     pub work: ExactWork,
     pub state: StateReport,
+    /// [definition; agent-inferred, U5] The program's own counters, disclosed as such: the
+    /// compares and the deposits the loop made. They are not clocks of the Holarchy; the
+    /// constitution's clock at a locus is its deposit clock (`Constitution::clock`), an epoch count.
     pub compares: u64,
     pub deposits: u64,
     /// The executed word's readout (the lattice word).
@@ -2937,9 +2943,12 @@ where
     let mut work = ExactWork::nothing();
     let (mut compares, mut deposits) = (0u64, 0u64);
     let mut deadline = None;
+    // The receiving windows are the epochs of the cut's cell clock at the receiver's section
+    // (`ReceivingPhases::windows`): the loop reads them, and its position is the epoch's opening.
     let mut position = 0usize;
-    while position < cells.len() {
-        let end = (position + aperture).min(cells.len());
+    for span in phases.windows(cells.len())? {
+        position = span.start;
+        let end = span.end;
         let window = &cells[position..end];
         if window.len() == aperture && declared.deadline.is_some_and(|windows| compares >= windows)
         {

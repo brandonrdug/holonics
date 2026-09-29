@@ -41,6 +41,19 @@
 //! carry is the joint clock's carry-out, the aeon boundary. A ring whose lock no input fits and
 //! that receives no carry keeps its configuration (Lean `HNN/Keys.selective_step_dormant`).
 //!
+//! [definition; agent-inferred, U5] **The rings' clocks.** Ring `g`'s clock is its navigator's
+//! `navigator::Clock`, a ring of period `d_g` ([`Ring::clock_at`]); the lift coordinate `λ_g` is
+//! its tick count since rest, its digit the phase class and its overflow the winding. Every reading
+//! of a ring's clock goes through it: the lift point's phase class and winding, the selective
+//! step's carry (the clock's jumps over the advance, which is the flux of the ring's section over
+//! the cell: [`Field::selective_step`]), the keys' crib opening and carried key
+//! (`hnn::keys`), and the receiving letters' register (`hnn::receiving::LetterReader`). The
+//! split of a signed lift coordinate (the map powers of [`Ring::rotate`], a ring's point) is the
+//! aeon owner's division with remainder (`aeon::Reading`), which agrees with the clock at every
+//! nonnegative lift. The joint clock torus they lift is [`Field::parametric`]; the card's moment
+//! ingest realizes the same clock law on the device (`holonics-cuda`, its parity test against
+//! [`Field::selective_step`]).
+//!
 //! [definition; agent-inferred] **The constitution's read face.** `Θ` is owned once by the
 //! constitution (`hnn::constitution`, the learning side). The forward pass reads it only through
 //! [`ConstitutionRead`], every learned operand carried as its factors so that the storage,
@@ -52,6 +65,8 @@
 //! | Lean | Rust |
 //! |---|---|
 //! | `HNN/Keys.selective_step_dormant`, `HNN/Moment.selective_position` | [`Field::selective_step`] |
+//! | `HNN/Moment.SelectiveDecl.carryIn_is_section_flux`, `Holon/Navigator.jumps_are_carries` (the carry is the ring clock's jumps and its section's flux) | [`Field::selective_step`] through [`Ring::clock_at`] |
+//! | `Aeon/Clock/Winding.ratio_split`, `split_unique` (a lift coordinate's phase class and windings) | [`Current::phase`], [`Current::winding`], [`Ring::point`], [`Ring::rotate`] |
 //! | `Aeon/Clock/Winding.clockLift` | [`Field::parametric`] |
 //! | `Holon/Complex` (`∂∘∂ = 0`) | [`Field::complex`] |
 //! | `Holon/Navigator.{mapRotor_order, map_pow_mod_order}` | [`Ring::navigator`], [`Ring::rotate`] |
@@ -68,7 +83,7 @@ use std::collections::BTreeMap;
 use num_bigint::{BigInt, BigUint};
 use num_traits::{One, Signed, ToPrimitive, Zero};
 
-use crate::aeon::ClockLift;
+use crate::aeon::{ClockLift, Reading};
 use crate::compression::ReflectorMachine;
 use crate::compression::landmark::context::{Landmarks, StopPrior};
 use crate::geometry::RatVec3;
@@ -585,7 +600,11 @@ impl Ring {
     }
 
     /// **The ring's clock at a lift coordinate**: its navigator's clock advanced `λ_g` ticks, so
-    /// its digit is the phase class and its overflow the winding.
+    /// its digit is the phase class and its overflow the winding. It is the one clock of the ring
+    /// (module header, "The rings' clocks"): the lift point's phase class and winding
+    /// ([`Current::phase`], [`Current::winding`]), the selective step's carry
+    /// ([`Field::selective_step`]), the keys' crib opening and carried key, and the receiving
+    /// letters' register all read it.
     pub fn clock_at(&self, lift: &BigInt) -> Result<Clock, HnnError> {
         let ticks = lift.to_biguint().ok_or(HnnError::Shape {
             what: "a nonnegative lift coordinate",
@@ -629,8 +648,28 @@ impl Ring {
 
     /// **Ring `g`'s point at lift `τ`**: `x_g(τ mod d_g, ⌊τ/d_g⌋) = placement + winding · v_∥`.
     pub fn point(&self, lift: &BigInt) -> RatVec3 {
-        let (phase, winding) = phase_winding(lift, self.period);
-        self.placements[phase as usize].add(&self.carry.scale(&Rat::from_integer(winding)))
+        let (phase, winding) = self.split(lift);
+        self.placements[phase].add(&self.carry.scale(&Rat::from_integer(winding)))
+    }
+
+    /// [definition; agent-inferred, U5] **A lift coordinate's split on the ring's circle**: its
+    /// reading `λ/d_g` turns divided with remainder by the aeon owner, the phase class
+    /// `λ mod d_g` and the whole windings `⌊λ/d_g⌋` (`aeon::Reading`, Lean
+    /// `Aeon/Clock/Winding.ratio_split`, `split_unique`). It reads any integer, since the map powers
+    /// of [`Ring::rotate`] are signed; at a nonnegative lift it is the ring's clock
+    /// ([`Ring::clock_at`]: digit and overflow, `Winding.windings_of_microsteps`,
+    /// `openPhase_of_microsteps`). The inferred choice: the split has one owner, the aeon's
+    /// division with remainder, and no copy of it is kept here.
+    fn split(&self, lift: &BigInt) -> (usize, BigInt) {
+        let period = BigInt::from(self.period);
+        let reading = Reading::of_turns(&Rat::new(lift.clone(), period.clone()));
+        let class = (reading.phase() * Rat::from_integer(period)).to_integer();
+        (
+            class
+                .to_usize()
+                .expect("a phase class lies below its period"),
+            reading.windings().clone(),
+        )
     }
 
     /// The situated screw of the node at lift `τ`: the ring's generator at that point.
@@ -659,7 +698,7 @@ impl Ring {
     /// order (Lean `Holon/Navigator.map_pow_mod_order`), carries node `i`'s two coordinates to node
     /// `P_g^k(i)`.
     pub fn rotate(&self, vector: &[Rat], k: &BigInt) -> Vec<Rat> {
-        let (shift, _) = phase_winding(k, self.period);
+        let (shift, _) = self.split(k);
         let power = self
             .navigator
             .map()
@@ -674,18 +713,11 @@ impl Ring {
     }
 }
 
-/// `(τ mod d, ⌊τ/d⌋)` with floor semantics.
-pub(crate) fn phase_winding(lift: &BigInt, period: u64) -> (u64, BigInt) {
-    let d = BigInt::from(period);
-    let mut phase = lift % &d;
-    if phase.is_negative() {
-        phase += &d;
-    }
-    let winding = (lift - &phase) / &d;
-    (
-        phase.to_u64().expect("a phase lies below its period"),
-        winding,
-    )
+/// **A ring clock's phase class**: the digit of a clock on one ring level ([`Ring::clock_at`]).
+pub(crate) fn ring_digit(clock: &Clock) -> u64 {
+    clock.phase().first().map_or(0, |digit| {
+        digit.to_u64().expect("a digit lies below its period")
+    })
 }
 
 // -------------------------------------------------------------------------------------------
@@ -1174,6 +1206,16 @@ impl Field {
     /// **One cell's selective step on a lift point**, in carry order: ring `g` advances
     /// `[port_g(x) ∈ N_g]` plus its predecessor's carry; the last ring's carry is the carry-out.
     /// Lean `HNN/Moment.selective_position`.
+    ///
+    /// [definition; agent-inferred, U5] **The carry is the ring clock's jumps.** Ring `g`'s carry
+    /// into ring `g + 1` is the jump count of its clock ([`Ring::clock_at`]) over its advance,
+    /// `⌊τ′_g/d_g⌋ − ⌊τ_g/d_g⌋` (`navigator::Clock::advance`, Lean
+    /// `Holon/Navigator.jumps_are_carries`, `HNN/Moment.SelectiveDecl.carryIn`), which is the flux
+    /// of ring `g`'s section over the cell's aeon (`aeon::epochs` at `ClockLift::ring_section`,
+    /// Lean `HNN/Moment.SelectiveDecl.carryIn_is_section_flux`). So the sequence of a ring's carries
+    /// over a passage, its **carry word**, is the epoch reading of its section at the cell clock's
+    /// sections (Lean `Aeon/Clock/CarryWord`, of which it is the selective-rate case). A lift point
+    /// is nonnegative, so a negative coordinate is refused by the clock.
     pub fn selective_step(
         &self,
         lift: &mut [BigInt],
@@ -1196,9 +1238,11 @@ impl Field {
         let mut carry = 0u8;
         for (ring, tau) in self.rings.iter().zip(lift.iter_mut()) {
             let advance = u8::from(ring.fits(ring.port(code))) + carry;
-            let (phase, _) = phase_winding(tau, ring.period);
+            let jumps = ring.clock_at(tau)?.advance(&BigUint::from(advance));
             *tau += advance;
-            carry = u8::from(phase + u64::from(advance) >= ring.period);
+            carry = jumps.to_u8().expect(
+                "a ring of period at least 2 advanced at most two ticks jumps at most once",
+            );
             ticks.push(advance);
         }
         Ok(SelectiveStep {
@@ -2074,16 +2118,21 @@ impl Current {
         }
     }
 
-    /// Ring `g`'s phase class `λ_g mod d_g`; refused outside the field.
-    pub fn phase(&self, field: &Field, ring: usize) -> Result<u64, HnnError> {
-        let (lift, period) = self.coordinate(field, ring)?;
-        Ok(phase_winding(lift, period).0)
+    /// **Ring `g`'s clock at the lift point** ([`Ring::clock_at`]): its navigator's clock advanced
+    /// `λ_g` ticks; refused outside the field.
+    pub fn clock(&self, field: &Field, ring: usize) -> Result<Clock, HnnError> {
+        let (lift, _) = self.coordinate(field, ring)?;
+        field.rings[ring].clock_at(lift)
     }
 
-    /// Ring `g`'s winding `⌊λ_g / d_g⌋`; refused outside the field.
+    /// Ring `g`'s phase class `λ_g mod d_g`, its clock's digit; refused outside the field.
+    pub fn phase(&self, field: &Field, ring: usize) -> Result<u64, HnnError> {
+        Ok(ring_digit(&self.clock(field, ring)?))
+    }
+
+    /// Ring `g`'s winding `⌊λ_g / d_g⌋`, its clock's jumps; refused outside the field.
     pub fn winding(&self, field: &Field, ring: usize) -> Result<BigInt, HnnError> {
-        let (lift, period) = self.coordinate(field, ring)?;
-        Ok(phase_winding(lift, period).1)
+        Ok(BigInt::from(self.clock(field, ring)?.winding().clone()))
     }
 
     /// One cell's selective step of the lift point ([`Field::selective_step`]).
@@ -2102,7 +2151,8 @@ impl Current {
                 initial: phase,
             });
         }
-        let (old, winding) = phase_winding(&self.lift[ring], period);
+        let clock = self.clock(field, ring)?;
+        let (old, winding) = (ring_digit(&clock), BigInt::from(clock.winding().clone()));
         self.lift[ring] = winding * BigInt::from(period) + BigInt::from(phase);
         Ok(i64::try_from(phase).unwrap_or(i64::MAX) - i64::try_from(old).unwrap_or(i64::MAX))
     }

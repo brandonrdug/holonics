@@ -62,7 +62,11 @@ generator form:    ż = A z ,  A = [[0, 1], [−C⁻¹K, 0]] ,  U = (1 − A_h)�
    the half-turn (`PhaseCarrier.pumpStorage_halfTurnSheet`) and equal on the two sheets of its axis;
    on locked sheets the ring population's driven phase energy is the Ising energy and the threshold
    sheet minimizes it (`Objects/Parametron.{drivenPhaseEnergy_binaryPhase, thresholdSheet_minimizes,
-   sheetReading_binaryPhase}`): the perceptron is that receiver face, not the ring.
+   sheetReading_binaryPhase}`): the perceptron is that receiver face, not the ring. **The pump's
+   period is a cycle** (`pump_period_is_cycle`, THE_REBUILD U5): the step `s = i^k` returns,
+   `s^t = 1`, exactly when its order divides `t`; the carrier `a² s^t` reads only `t mod order`,
+   the torus point of the pump's clock; and an aeon of that clock across `t` ticks closes, a cycle,
+   exactly when the carrier returns.
 
 7. **The executed solve's bound and a gain's backtrack** (`abs_mulVec_le_rowNorm`,
    `abs_dot_le_l1`, `loaded_solve_chart_bound`, `loaded_state_split_bound`,
@@ -672,6 +676,51 @@ theorem locked_sheet_receiver_face {ι : Type*} [DecidableEq ι] [Fintype ι]
     fun k => sheetReading_binaryPhase (state k),
     fun s => thresholdSheet_minimizes edges weight drive noLoop state i s⟩
 
+/-- [definition] **The order of the pump's step** `s = i^k`, `k < 4` (the Rust `PumpStep::order`):
+the standing pump `1`, the half-turn `2`, a quarter-turn either way `4`. -/
+def pumpOrder (k : ℕ) : ℕ := if k = 0 then 1 else if k = 2 then 2 else 4
+
+/-- [proved-derived; formal-checked] A power of the quarter-turn `i` is one exactly at the
+multiples of four. -/
+theorem quarterTurn_pow_eq_one_iff (n : ℕ) : Complex.I ^ n = 1 ↔ 4 ∣ n := by
+  have h : Complex.I ^ n = Complex.I ^ (n % 4) := by
+    conv_lhs => rw [← Nat.div_add_mod n 4, pow_add, pow_mul, Complex.I_pow_four, one_pow, one_mul]
+  rw [h, Nat.dvd_iff_mod_eq_zero]
+  rcases (by omega : n % 4 = 0 ∨ n % 4 = 1 ∨ n % 4 = 2 ∨ n % 4 = 3) with hr | hr | hr | hr <;>
+    rw [hr] <;> norm_num [Complex.ext_iff, pow_succ]
+
+open Holonics.Aeon.Clock.Groupoid Holonics.Aeon.Clock.Winding in
+/-- [proved-derived; formal-checked] **The pump's period is a cycle** (THE_REBUILD U5; the Rust
+`PumpDeclaration::{clock, phase_at, period}`). For the pump's step `s = i^k`, `k < 4`: `s^t = 1`
+exactly when the step's order divides `t`; the carrier `a² s^t` at word tick `t` is the carrier at
+`t mod order`, the torus point of the pump's clock (one circle of the step's order); and an aeon of
+that clock from rest across `t` ticks closes on its torus, a cycle, exactly when the carrier
+returns, `s^t = 1` (`Winding.torus_closes_iff`, `reading_navigatorClock`). -/
+theorem pump_period_is_cycle (a : ℂ) {k : ℕ} (hk : k < 4) (t : ℕ)
+    (γ : Aeon (clockLift (Fin 1)) 0 (fun _ => (t : ℤ))) :
+    ((Complex.I ^ k) ^ t = 1 ↔ pumpOrder k ∣ t) ∧
+      a ^ 2 * (Complex.I ^ k) ^ t = a ^ 2 * (Complex.I ^ k) ^ (t % pumpOrder k) ∧
+      (torusPoint (fun _ : Fin 1 => pumpOrder k) 0 =
+          torusPoint (fun _ : Fin 1 => pumpOrder k) (fun _ => (t : ℤ)) ↔
+        (Complex.I ^ k) ^ t = 1) := by
+  have hperiod : ∀ s : ℕ, (Complex.I ^ k) ^ s = 1 ↔ pumpOrder k ∣ s := by
+    intro s
+    rw [← pow_mul, quarterTurn_pow_eq_one_iff]
+    interval_cases k <;> simp only [pumpOrder] <;> norm_num <;> omega
+  refine ⟨hperiod t, ?_, ?_⟩
+  · have hone : (Complex.I ^ k) ^ pumpOrder k = 1 := (hperiod _).mpr dvd_rfl
+    conv_lhs =>
+      rw [← Nat.div_add_mod t (pumpOrder k), pow_add, pow_mul, hone, one_pow, one_mul]
+  · rw [torus_closes_iff _ γ, hperiod]
+    constructor
+    · intro h
+      have := h 0
+      rw [reading_navigatorClock] at this
+      exact Int.natCast_dvd_natCast.mp (by simpa using this)
+    · intro h i
+      rw [reading_navigatorClock]
+      simpa using Int.natCast_dvd_natCast.mpr h
+
 end Pump
 
 /-! ## 6. The executed solve's bound and a gain's backtrack -/
@@ -798,6 +847,8 @@ section Audit
 #print axioms pump_half_turn_invariant
 #print axioms pump_blind_to_sheets
 #print axioms locked_sheet_receiver_face
+#print axioms quarterTurn_pow_eq_one_iff
+#print axioms pump_period_is_cycle
 #print axioms abs_mulVec_le_rowNorm
 #print axioms abs_dot_le_l1
 #print axioms loaded_solve_chart_bound

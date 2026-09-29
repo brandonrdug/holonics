@@ -55,7 +55,7 @@ use num_traits::ToPrimitive;
 
 use crate::compression::{Candidate, Menu};
 use crate::hnn::HnnError;
-use crate::hnn::field::{Current, Field};
+use crate::hnn::field::{Current, Field, ring_digit};
 use crate::navigator::Clock;
 
 /// [definition] **One ring's key location**: its menu's ports and edges, the fibre of consistent
@@ -185,13 +185,12 @@ pub fn crib_opening(
         if start.sign() == num_bigint::Sign::Minus {
             return Err(HnnError::NegativeLift { ring: g });
         }
-        let period = ring.period();
-        let mut phase = (&start % BigInt::from(period))
-            .to_u64()
-            .expect("a nonnegative lift's phase lies below its period");
+        // The carries ring `g` sends are its clock's jumps over its advances (`Ring::clock_at`).
+        let mut clock = ring.clock_at(&start)?;
         for (carry, advance) in carries.iter_mut().zip(&advances) {
-            *carry = u64::from(phase + advance >= period);
-            phase = (phase + advance) % period;
+            *carry = clock.advance(&BigUint::from(*advance)).to_u64().expect(
+                "a ring of period at least 2 advanced at most two ticks jumps at most once",
+            );
         }
         opening.push(start);
     }
@@ -365,9 +364,12 @@ pub fn locate_closing(
     for ring in &mut location.rings {
         ring.carried = match ring.published {
             Some(key) => {
-                let period = field.ring(ring.ring).period();
+                // The key carried over the crib: the ring's clock at the key advanced by the
+                // crib's ticks, read as its phase class.
                 let ticks = crib_ticks(field, ring.ring, crib, &configurations)?;
-                Some((key + ticks % period) % period)
+                let mut clock = field.ring(ring.ring).clock_at(&BigInt::from(key))?;
+                clock.advance(&BigUint::from(ticks));
+                Some(ring_digit(&clock))
             }
             None => None,
         };

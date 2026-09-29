@@ -2,6 +2,7 @@ import Holonics.Objects.SourceHolon
 import Holonics.Objects.SourcePorts
 import Mathlib.Data.Sym.Card
 import Mathlib.Data.Fintype.BigOperators
+import Holonics.Aeon.Clock.Epoch
 
 /-!
 # HNN.Moment: selective stepping on closing rings, the phase-binned moment and its capacity
@@ -29,7 +30,10 @@ every period is at least `2`, `carryIn_le_one`). On a closing ring (`P^d = 1`) t
    period is at least two (`carryIn_le_one`), so a ring moves at most two ticks per cell
    (`advance_le_two`). Witnesses: an Enigma notch law that reads the ring's own position makes the
    steps depend on its key (`notch_steps_depend_on_own_key`), and ring `1`'s steps depend on ring
-   `0`'s phase class (`earlier_phase_class_is_load_bearing`).
+   `0`'s phase class (`earlier_phase_class_is_load_bearing`). **The carry is a clock reading**
+   (THE_REBUILD U5): the carry into ring `g + 1` is ring `g`'s clock's jumps over its advance, and
+   the signed crossing count of its section over any aeon of its circle lift across the cell, the
+   section's flux (`carryIn_is_section_flux`, over `Aeon/Clock/Epoch.signed_count_is_flux`).
 2. **Phase binning is exact on a closing ring (§8.5).** For `P^d = 1`,
    `Σ_k P^(−τ_k) I x_k = Σ_(c<d) P^(−c) I h_c` with `h_c = Σ_(τ_k ≡ c) x_k`
    (`closingRing_moment_is_phaseBinned`). Witness: for the non-closing doubling advance the bins do
@@ -238,6 +242,34 @@ theorem position_eq_key_add_steps (cells : List Cell) (τ : ℕ → ℕ) (g key 
 theorem emptyLock_steps_only_by_carry (x : Cell) (τ : ℕ → ℕ) (g : ℕ) (hg : D.lock g = ∅) :
     D.advance x τ g = τ g + D.carryIn x τ g := by
   simp [advance, step, Fits, hg]
+
+open Holonics.Geometry Holonics.Aeon.Clock.Groupoid Holonics.Aeon.Clock.Winding
+  Holonics.Aeon.Clock.Epoch in
+/-- [proved-derived; formal-checked] **The carry is the ring clock's jumps and its section's flux**
+(THE_REBUILD U5). The carry ring `g` sends into ring `g + 1` on a cell is its clock's jumps over
+its advance, the change of its whole windings `winding d (τ′_g) − winding d (τ_g)` (the count
+`Holon/Navigator.jumps_are_carries` composes), and it is the signed crossing count of ring `g`'s
+section `{x | d ∣ x}` over any aeon of the ring's circle lift from `τ_g` to `τ′_g`
+(`Epoch.signed_count_is_flux`): the flux of the cell's passage through the section. So a ring's
+carry word over a passage is the epoch reading of its section at the cell clock's sections. -/
+theorem carryIn_is_section_flux (x : Cell) (τ : ℕ → ℕ) (g : ℕ) (hd : 0 < D.period g)
+    (γ : Aeon (clockLift (Fin 1)) (fun _ => (τ g : ℤ)) (fun _ => (D.advance x τ g : ℤ))) :
+    D.carryIn x τ (g + 1) =
+        PhaseCarry.winding (D.period g) (D.advance x τ g) - PhaseCarry.winding (D.period g) (τ g) ∧
+      (D.carryIn x τ (g + 1) : ℤ) =
+        (forwardCrossings (sectionForm (0 : Fin 1) (D.period g)) γ.steps : ℤ) -
+          backwardCrossings (sectionForm (0 : Fin 1) (D.period g)) γ.steps := by
+  have hjumps : D.carryIn x τ (g + 1) =
+      PhaseCarry.winding (D.period g) (D.advance x τ g) -
+        PhaseCarry.winding (D.period g) (τ g) := by
+    simp only [carryIn, advance, PhaseCarry.winding]
+  refine ⟨hjumps, ?_⟩
+  rw [signed_count_is_flux (0 : Fin 1) hd γ, hjumps]
+  have hle : τ g / D.period g ≤ D.advance x τ g / D.period g :=
+    Nat.div_le_div_right (D.le_advance x τ g)
+  simp only [PhaseCarry.winding]
+  push_cast [Nat.cast_sub hle]
+  rfl
 
 end SelectiveDecl
 
@@ -1143,6 +1175,7 @@ section Audit
 #print axioms SelectiveDecl.selective_position
 #print axioms SelectiveDecl.carryIn_le_one
 #print axioms SelectiveDecl.position_eq_key_add_steps
+#print axioms SelectiveDecl.carryIn_is_section_flux
 #print axioms notch_steps_depend_on_own_key
 #print axioms earlier_phase_class_is_load_bearing
 #print axioms closingRing_moment_is_phaseBinned

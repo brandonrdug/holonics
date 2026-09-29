@@ -35,9 +35,10 @@ parametron ring's section is for `d ≥ 2`.
    the aperture while the net winding stays; a transversal section on a monotone ring fixes the
    count to the windings.
 4. **The Odometer is a tower of epochs.** With ticks at the multiples of `n`, the epoch of a
-   micro-step is its `PhaseCarry.winding` (`epochOf_digitTicks`), the Odometer's upper digit counts
-   epochs (`odometer_counts_epochs`), and coarsening to the multiples of `n·m` is the carry
-   `winding m` (`odometer_tower`).
+   micro-step is its `PhaseCarry.winding` (`epochOf_digitTicks`), so epoch `k` is the window
+   `[n k, n (k + 1))` of the aeon (`mem_epoch_digitTicks`: the HNN's receiving windows), the
+   Odometer's upper digit counts epochs (`odometer_counts_epochs`), and coarsening to the
+   multiples of `n·m` is the carry `winding m` (`odometer_tower`).
 
 5. **Epochs of an aeon, and count as oriented flux.** A receiver's section on the parametric
    complex is a **cut clock**: a closed `0/1` cochain (`CutClock`), a `Clock K ℤ` reading `+1` on
@@ -428,6 +429,24 @@ theorem epochOf_digitTicks (n N j : ℕ) (hj : j < N) :
       exact ⟨⟨⟨h0, by omega⟩, hd⟩, hx⟩
   rw [epochOf, hset, Nat.Ioc_filter_dvd_card_eq_div]
   rfl
+
+/-- [proved-derived; formal-checked] **Epoch `k` of a digit clock is the window `[n k, n (k + 1))`**
+(THE_REBUILD U5: a receiving window of aperture `n` is this epoch of the cell clock). A micro-step
+of the aeon lies in epoch `k` of the multiples of `n` exactly when it lies between `n k` and
+`n (k + 1)`. -/
+theorem mem_epoch_digitTicks {n N k j : ℕ} (hn : 0 < n) :
+    j ∈ epoch (digitTicks n N) N k ↔ j < N ∧ n * k ≤ j ∧ j < n * (k + 1) := by
+  rw [mem_epoch]
+  refine and_congr_right fun hj => ?_
+  rw [epochOf_digitTicks n N j hj]
+  change j / n = k ↔ _
+  constructor
+  · rintro rfl
+    exact ⟨Nat.mul_div_le j n, Nat.lt_mul_div_succ j hn⟩
+  · rintro ⟨h1, h2⟩
+    apply le_antisymm
+    · exact Nat.lt_succ_iff.mp ((Nat.div_lt_iff_lt_mul hn).mpr (by rwa [mul_comm] at h2))
+    · exact (Nat.le_div_iff_mul_le hn).mpr (by rwa [mul_comm] at h1)
 
 theorem digitTicks_subset (n m N : ℕ) : digitTicks (n * m) N ⊆ digitTicks n N :=
   monotone_filter_right _ (fun _ _ hx => (dvd_mul_right n m).trans hx)

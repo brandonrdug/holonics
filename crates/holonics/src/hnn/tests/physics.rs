@@ -6,7 +6,7 @@ use num_traits::{One, Signed, Zero};
 
 use super::learning::{OPEN_BUDGET, chain};
 use super::support::{Draw, Medium};
-use crate::aeon::TwoClocks;
+use crate::aeon::{Cycle, Reading, TorusClock, TwoClocks, epochs, reading};
 use crate::compression::landmark::context::Landmarks;
 use crate::hnn::HnnError;
 use crate::hnn::constitution::{Constitution, Steps};
@@ -20,13 +20,14 @@ use crate::hnn::propagation::{
     ContactOperands, ExponentReading, gram, junction_scattering, transit, transit_solve,
 };
 use crate::hnn::receiving::ReceivingPhases;
+use crate::hnn::retention::aeon_readings;
 use crate::hnn::ring::{
     PumpDeclaration, PumpStep, ResonatorMaterial, ResonatorOperands, ResonatorRemainders,
-    RingClock, port_scattering, sheets,
+    port_scattering, sheets,
 };
 use crate::hnn::word::{PowerForm, Word, WordBalance};
 use crate::holarchy::GluingDefect;
-use crate::holon::parametron::{Carrier, Parametron, Population, pump_storage};
+use crate::holon::parametron::{Carrier, Parametron, Population, pump_storage, ring_crossings};
 use crate::navigator::address::{are_neighbours, mediant};
 use crate::navigator::trace::SiteKind;
 use crate::ratio::linear::ExactRatMatrix;
@@ -404,27 +405,102 @@ fn the_pump_is_blind_to_the_sheets_and_the_locked_sheet_is_an_ising_face() {
     }
 }
 
-/// Lean `HNN/Ring.ring_crossings_are_epoch_ticks`: over a passage of cells every ring's arrivals on
-/// its section are the owner's `ring_crossings(d, r, N)` and its winding difference, at
-/// micro-steps inside the passage.
+/// Lean `HNN/Ring.ring_crossings_are_epoch_ticks`, read through the aeon owner, and
+/// `HNN/Moment.SelectiveDecl.carryIn_is_section_flux` (U5): over a passage of cells every ring's
+/// epoch ticks at its ring section, the flux of the passage's aeon through it (`aeon::epochs` at
+/// `ClockLift::ring_section`, read at the boundary by `retention::aeon_readings`), are the owner's
+/// `ring_crossings(d, r, N)` and the ring's winding difference; cell by cell, the carry the ring
+/// sends on (the next ring's advance less its fit, or the carry-out) is its section's flux over the
+/// cell's aeon, so the ring's carry word is its epoch reading at the cell clock's sections, and it
+/// sums to the passage's flux.
 #[test]
-fn ticks_equal_the_ring_crossings() {
+fn the_ring_ticks_are_its_section_epochs_and_its_carries_their_flux() {
     let field = Field::declare(FieldDeclaration::campaign_one(1 << 17)).unwrap();
+    let lift = field.parametric();
+    let rings = field.rings().len();
+    let section = |ring: usize| {
+        lift.ring_section(ring, BigUint::from(field.ring(ring).period()))
+            .unwrap()
+    };
     let mut draw = Draw::new(29);
     let cells: Vec<usize> = (0..3000).map(|_| draw.below(256)).collect();
     let start = Current::at_rest(&field);
-    let clocks = RingClock::over(&field, &start, &cells).unwrap();
     let mut end = start.clone();
+    let mut carried = vec![BigInt::zero(); rings];
     for &cell in &cells {
-        end.step(&field, cell).unwrap();
+        let before = end.lift().to_vec();
+        let step = end.step(&field, cell).unwrap();
+        let aeon = lift.forward(before, end.lift()).unwrap();
+        for ring in 0..rings {
+            let carry = match field.rings().get(ring + 1) {
+                Some(next) => step.ticks[ring + 1] - u8::from(next.fits(next.port(cell))),
+                None => u8::from(step.carry_out),
+            };
+            assert_eq!(epochs(&aeon, section(ring)).flux(), BigInt::from(carry));
+            carried[ring] += BigInt::from(carry);
+        }
     }
-    for clock in &clocks {
-        assert!(clock.agrees().unwrap(), "ring {}", clock.ring);
-        let windings =
-            end.winding(&field, clock.ring).unwrap() - start.winding(&field, clock.ring).unwrap();
-        assert_eq!(BigInt::from(clock.crossings.clone()), windings);
+    let (_, fluxes, _) = aeon_readings(&lift, start.lift(), end.lift()).unwrap();
+    for ring in 0..rings {
+        let micro = (&end.lift()[ring] - &start.lift()[ring])
+            .to_biguint()
+            .unwrap();
+        let crossings = ring_crossings(
+            &BigUint::from(field.ring(ring).period()),
+            &BigUint::from(start.phase(&field, ring).unwrap()),
+            &micro,
+        )
+        .unwrap();
+        let windings = end.winding(&field, ring).unwrap() - start.winding(&field, ring).unwrap();
+        assert_eq!(fluxes[ring], BigInt::from(crossings), "ring {ring}");
+        assert_eq!(fluxes[ring], windings);
+        assert_eq!(carried[ring], fluxes[ring]);
     }
-    assert!(clocks.iter().any(|clock| clock.crossings > BigUint::zero()));
+    assert!(fluxes.iter().any(Signed::is_positive));
+}
+
+/// Lean `HNN/Ring.pump_period_is_cycle` (U5): at every step, the pump phase at word tick `t` is its
+/// clock's torus point, whose carrier is `a² s^t` exactly; the aeon of `t` ticks is a cycle of the
+/// pump's clock exactly when the step's order divides `t`, exactly when `s^t = 1`; and the declared
+/// period is that cycle, one period of ticks reading one whole winding.
+#[test]
+fn the_pump_period_is_a_cycle_of_its_clock() {
+    let times = |a: &Carrier, b: &Carrier| {
+        Carrier::new(
+            a.cos() * b.cos() - a.sin() * b.sin(),
+            a.cos() * b.sin() + a.sin() * b.cos(),
+        )
+        .unwrap()
+    };
+    let unit = |cos: i64, sin: i64| Carrier::new(integer(cos), integer(sin)).unwrap();
+    let axis = Carrier::at(&rat(2, 5));
+    let doubled = times(&axis, &axis);
+    for (step, s) in [
+        (PumpStep::Stand, unit(1, 0)),
+        (PumpStep::Quarter, unit(0, 1)),
+        (PumpStep::Half, unit(-1, 0)),
+        (PumpStep::ThreeQuarters, unit(0, -1)),
+    ] {
+        let pump = PumpDeclaration::new(rat(3, 2), axis.clone(), step).unwrap();
+        let (clock, order) = (pump.clock(), pump.phases());
+        let mut power = unit(1, 0);
+        for t in 0..3 * order + 2 {
+            assert_eq!(pump.carrier(pump.phase_at(t)), times(&doubled, &power));
+            let aeon = clock
+                .forward(vec![BigInt::zero()], &[BigInt::from(t)])
+                .unwrap();
+            let closes = Cycle::close(&clock, aeon).is_ok();
+            assert_eq!(closes, t % order == 0, "{step:?} at {t}");
+            assert_eq!(closes, power == unit(1, 0));
+            power = times(&power, &s);
+        }
+        let period = pump.period().unwrap();
+        assert_eq!(period.aeon().steps().len(), order);
+        assert_eq!(
+            reading(&TorusClock::navigator(&clock, 0).unwrap(), period.aeon()).unwrap(),
+            Reading::of_turns(&integer(1))
+        );
+    }
 }
 
 /// Lean `HNN/Ring.two_port_reference_balance`: at every port of every junction of a cut,

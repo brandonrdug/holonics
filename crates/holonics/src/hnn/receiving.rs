@@ -17,6 +17,17 @@
 //! φ^H_c = Im f_c / 2                             each class's phase, in turns
 //! ```
 //!
+//! [definition; agent-inferred, U5] **The receiving window is an epoch.** Two clocks meet at a
+//! window. Over the passage, the source's cell clock (an unwound `navigator::Clock`, one tick a
+//! cell) is crossed by the receiver's section every `A` cells: the windows are the epochs of the
+//! passage's aeon at that section, the digit clock of base `A` ([`ReceivingPhases::windows`], the
+//! exposure's windows; Lean `Aeon/Clock/Epoch.{epochOf_digitTicks, mem_epoch_digitTicks}`). Inside a
+//! word, the word's own unwound clock (`hnn::word::Word`, one tick a junction step) is read by the
+//! receiver at its ticks `e_0 … e_last` ([`ReceivingPhases::epochs`]), the epochs of the word's aeon
+//! at its unit section, which is every tick; phase `j` at word tick `e_0 + j` reads cell `p + j` of
+//! the window opening at `p`. The inferred choice: the window's cell span is the aeon owner's
+//! reading, not a loop's stride, and the word's tick index is its clock's, disclosed as such.
+//!
 //! [definition; agent-inferred] **The receiving parametron's storage is the landmark tree**
 //! (the landmark tree, `compression::landmark::context::Landmarks`, held in `Θ` at the receiving locus beside `R`). It
 //! replaces the region table, whose laws stay in Lean (`HNN/RegionCounts`). The region
@@ -109,6 +120,7 @@
 //! |---|---|
 //! | `HNN/Ratio.face_constant_on_fibre` (the face reads only `(n, k)`; the owner's, `receiver::face`) | [`GrainCell`] |
 //! | `HNN/Ratio.grain_of_tolerance` (`L_R = ⌈1/ε_bits⌉`) | [`ReceivingPhases::declare`] |
+//! | `Aeon/Clock/Epoch.{epochOf_digitTicks, mem_epoch_digitTicks, odometer_tower}` (the windows are the digit clock's epochs) | [`ReceivingPhases::windows`] |
 //! | `HNN/RegionCounts.{grain_face_residual, grain_code_residual}` (the grain exponent is `receiver::face::grain_exponent`'s, `grainExponent_spec`, `grain_log_iff_pow_bounds`) | [`grain_logits`] |
 //! | `receiver::reception::ReceiverFace::read` with `C_S = R P_R^(τ_R) Π_R` | [`ReceivingPhases::read`] |
 //! | `HNN/RegionCounts.{combinedLogits, combined_face_pullback, combined_code_pullback}` | [`ReceivingRead::combined`], [`ReceivingPhases::combine`] |
@@ -119,20 +131,22 @@
 use std::ops::Range;
 
 use num_bigint::{BigInt, BigUint};
-use num_traits::{ToPrimitive, Zero};
+use num_traits::{One, ToPrimitive, Zero};
 
+use crate::aeon::{ClockLift, epochs};
 use crate::compression::cost::ceil_log2;
 use crate::compression::landmark::context::{
     Bundle, LandmarkDeclaration, LandmarkFace, Landmarks, Letter, LetterFamily, Splits, code_length,
 };
 use crate::hnn::HnnError;
 use crate::hnn::contact::{ContactReading, LockDeclaration, lock_address, site_kinds};
-use crate::hnn::field::{ConstitutionRead, Current, Field, ReceiverDeclaration};
+use crate::hnn::field::{ConstitutionRead, Current, Field, ReceiverDeclaration, ring_digit};
 use crate::hnn::keys;
 use crate::hnn::propagation::Operands;
 use crate::hnn::ratio::{Face, Faces};
 use crate::hnn::realization::{apply_rows, indexed};
 use crate::hnn::word::Word;
+use crate::navigator::Clock;
 use crate::navigator::trace::SiteKind;
 use crate::ratio::algebraic::ExactInterval;
 use crate::ratio::exponentiated::CarriedPower;
@@ -384,12 +398,14 @@ impl FeatureFamily {
     }
 }
 
-/// One ring's clock law as the register reads it: its period and its lock on the port chart
-/// `port(x) = x mod d` (`hnn::field::Ring::{port, fits}`).
+/// One ring's clock law as the register reads it: its period, its lock on the port chart
+/// `port(x) = x mod d` (`hnn::field::Ring::{port, fits}`) and its navigator's clock at rest
+/// (`hnn::field::Ring::clock_at`), from which the register's clock restarts at an aeon's opening.
 #[derive(Clone, Debug, PartialEq, Eq)]
 struct ClockRing {
     period: u64,
     lock: Vec<bool>,
+    rest: Clock,
 }
 
 /// [definition; agent-inferred] **The letters' reader** (module header, "The receiving letters"):
@@ -416,9 +432,12 @@ struct ClockRing {
 pub struct LetterReader {
     family: FeatureFamily,
     rings: Vec<ClockRing>,
-    phases: Vec<u64>,
-    /// Each kept ring's whole windings since the aeon's opening (read only by contact letters).
-    windings: Vec<u64>,
+    /// [definition; agent-inferred, U5] Each kept ring's clock, its navigator's `navigator::Clock`
+    /// (`hnn::field::Ring::clock_at`): its digit the phase `λ_g mod d_g`, its jumps the whole
+    /// windings since the aeon's opening (read only by contact letters). The register keeps the
+    /// ring's own clock, not a copy of its arithmetic, so its carries are the clock's jumps as the
+    /// lift point's are (`hnn::field::Field::selective_step`).
+    clocks: Vec<Clock>,
     /// Each contact's site kind at the last refresh; `None` before one (a contact family refuses).
     kinds: Option<Vec<SiteKind>>,
     /// Each contact's ends `(g, h)`, for the contact slots.
@@ -431,8 +450,7 @@ impl LetterReader {
         Self {
             family: FeatureFamily::cells(),
             rings: Vec::new(),
-            phases: Vec::new(),
-            windings: Vec::new(),
+            clocks: Vec::new(),
             kinds: None,
             ends: Vec::new(),
         }
@@ -471,20 +489,20 @@ impl LetterReader {
                 }
             }
         }
-        let rings = field.rings()[..reach]
+        let rings: Vec<ClockRing> = field.rings()[..reach]
             .iter()
             .map(|ring| ClockRing {
                 period: ring.period(),
                 lock: (0..ring.period() as usize)
                     .map(|port| ring.fits(port))
                     .collect(),
+                rest: ring.navigator().clock().clone(),
             })
             .collect();
         let mut reader = Self {
             family,
+            clocks: rings.iter().map(|ring| ring.rest.clone()).collect(),
             rings,
-            phases: vec![0; reach],
-            windings: vec![0; reach],
             kinds: None,
             ends: field
                 .contacts()
@@ -501,10 +519,15 @@ impl LetterReader {
     }
 
     /// **Take the rings' phases from a lift point** (at the mount, and after a re-keying, which
-    /// keeps every winding).
+    /// keeps every winding): each kept ring's clock at the lift point's phase class with its
+    /// windings since the opening kept.
     pub fn synchronize(&mut self, field: &Field, current: &Current) -> Result<(), HnnError> {
-        for (ring, phase) in self.phases.iter_mut().enumerate() {
-            *phase = current.phase(field, ring)?;
+        for (ring, clock) in self.clocks.iter_mut().enumerate() {
+            let declared = &self.rings[ring];
+            let ticks = clock.winding() * BigUint::from(declared.period)
+                + BigUint::from(current.phase(field, ring)?);
+            *clock = declared.rest.clone();
+            clock.advance(&ticks);
         }
         Ok(())
     }
@@ -546,33 +569,29 @@ impl LetterReader {
             return false;
         };
         let contacts = self.family.reads_contacts();
-        self.phases.iter().enumerate().all(|(ring, phase)| {
-            current.phase(field, ring).ok() == Some(*phase)
+        self.clocks.iter().enumerate().all(|(ring, clock)| {
+            current.phase(field, ring).ok() == Some(ring_digit(clock))
                 && (!contacts
                     || match (current.winding(field, ring), opening.winding(field, ring)) {
-                        (Ok(now), Ok(then)) => now - then == BigInt::from(self.windings[ring]),
+                        (Ok(now), Ok(then)) => now - then == BigInt::from(clock.winding().clone()),
                         _ => false,
                     })
         })
     }
 
     /// **One cell's selective step on the kept rings** (`hnn::field::Field::selective_step`):
-    /// ring `g` advances `[port_g(x) ∈ N_g]` plus its predecessor's carry, and winds when it
-    /// passes its period. Returns whether the last ring carried out.
+    /// ring `g`'s clock advances `[port_g(x) ∈ N_g]` plus its predecessor's carry, and its jumps
+    /// are the carry it sends on. Returns whether the last ring carried out.
     fn step(&mut self, cell: usize) -> bool {
         let mut carry = 0u64;
-        for ((ring, phase), windings) in self
-            .rings
-            .iter()
-            .zip(self.phases.iter_mut())
-            .zip(self.windings.iter_mut())
-        {
+        for (ring, clock) in self.rings.iter().zip(self.clocks.iter_mut()) {
             let port = (cell as u64 % ring.period) as usize;
-            let advance = u64::from(ring.lock[port]) + carry;
-            let next = *phase + advance;
-            carry = u64::from(next >= ring.period);
-            *windings += carry;
-            *phase = next % ring.period;
+            carry = clock
+                .advance(&BigUint::from(u64::from(ring.lock[port]) + carry))
+                .to_u64()
+                .expect(
+                    "a ring of period at least 2 advanced at most two ticks jumps at most once",
+                );
         }
         carry == 1
     }
@@ -582,7 +601,10 @@ impl LetterReader {
     fn class(&self, ring: usize, grain: u64) -> u64 {
         let period = self.rings[ring].period;
         GrainCell::of(
-            &Rat::new(BigInt::from(self.phases[ring]), BigInt::from(period)),
+            &Rat::new(
+                BigInt::from(ring_digit(&self.clocks[ring])),
+                BigInt::from(period),
+            ),
             grain,
         )
         .phase
@@ -600,8 +622,8 @@ impl LetterReader {
         Ok(ContactReading {
             contact,
             lock: lock_address(
-                &BigInt::from(self.windings[g]),
-                &BigInt::from(self.windings[h]),
+                &BigInt::from(self.clocks[g].winding().clone()),
+                &BigInt::from(self.clocks[h].winding().clone()),
                 bound,
             ),
             kind: kinds[contact],
@@ -629,7 +651,12 @@ impl LetterReader {
             })
             .collect::<Result<Vec<u64>, HnnError>>()?;
         if carry_out && self.family.reads_contacts() {
-            self.windings.iter_mut().for_each(|windings| *windings = 0);
+            // The next aeon opens here: each clock restarts at its phase class, no windings.
+            for (ring, clock) in self.rings.iter().zip(self.clocks.iter_mut()) {
+                let phase = BigUint::from(ring_digit(clock));
+                *clock = ring.rest.clone();
+                clock.advance(&phase);
+            }
         }
         Ok(Letter::Bundle(Bundle {
             cell,
@@ -814,6 +841,24 @@ impl ActiveAddress {
 /// `Δ_letters` decided positive), so no letter carried information the preceding cells do not.
 pub fn letter_family(_field: &Field) -> FeatureFamily {
     FeatureFamily::cells()
+}
+
+/// [definition; agent-inferred, U5] **The receiving windows of `n` cells at aperture `A`**
+/// ([`ReceivingPhases::windows`], module header): the epochs of the cell clock's forward aeon of
+/// `n` cells at the receiver's section of grain `A`, each as the span of cells whose leaving
+/// micro-state it holds; a last epoch with no cell is not a window. Refused at `A = 0`, which is no
+/// section (`aeon::AeonError::ZeroPeriod`).
+pub fn receiving_windows(cells: usize, aperture: usize) -> Result<Vec<Range<usize>>, HnnError> {
+    // One cell a tick: the cell clock's declared duration is the cell.
+    let cell_clock = ClockLift::of_clocks(&[Clock::unwound(Rat::one())?]);
+    let aeon = cell_clock.forward(vec![BigInt::zero()], &[BigInt::from(cells)])?;
+    let receiver = cell_clock.ring_section(0, BigUint::from(aperture))?;
+    Ok(epochs(&aeon, receiver)
+        .intervals()
+        .into_iter()
+        .map(|span| span.start..span.end.min(cells))
+        .filter(|span| !span.is_empty())
+        .collect())
 }
 
 /// [definition; agent-inferred] **The letters of a passage replayed without the wave** (the
@@ -1209,9 +1254,25 @@ impl ReceivingPhases {
         self.first_epoch + self.aperture
     }
 
-    /// The receiving epochs `e_0 … e_last`.
+    /// The receiving epochs `e_0 … e_last`: the word clock's ticks at which the receiver reads
+    /// (module header, "The receiving window is an epoch").
     pub fn epochs(&self) -> Range<usize> {
         self.first_epoch..self.first_epoch + self.aperture
+    }
+
+    /// [definition; agent-inferred, U5] **The receiving windows of a passage of `n` cells**
+    /// (module header, "The receiving window is an epoch"): the epochs of the cell clock's forward
+    /// aeon at the receiver's section. The cell clock is the source's unwound navigator clock, one
+    /// tick a cell (`navigator::Clock::unwound`, period one, lifted by
+    /// `aeon::ClockLift::of_clocks`); the receiver's section is its sub-section at grain `A`, the
+    /// aperture (`aeon::ClockLift::ring_section`), the digit clock of base `A`. So window `k` is
+    /// epoch `k` ([`crate::aeon::Epochs::intervals`]), its cells those whose leaving micro-state
+    /// lies in it, `[kA, min((k + 1)A, n))`; the window of cell `c` is its epoch `⌊c/A⌋`, and the
+    /// windows that close are the section's flux `⌊n/A⌋` (Lean `Aeon/Clock/Epoch.{epochOf_digitTicks,
+    /// mem_epoch_digitTicks, odometer_tower}`). A last epoch that holds no cell (`A | n`, the last
+    /// micro-state alone) is not a window.
+    pub fn windows(&self, cells: usize) -> Result<Vec<Range<usize>>, HnnError> {
+        receiving_windows(cells, self.aperture)
     }
 
     /// `L_R = ⌈1/ε_bits⌉`.

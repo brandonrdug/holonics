@@ -58,7 +58,7 @@ use num_traits::{One, ToPrimitive, Zero};
 
 use crate::aeon::Reading;
 use crate::hnn::HnnError;
-use crate::hnn::field::{Field, phase_winding};
+use crate::hnn::field::Field;
 use crate::hnn::realization::indexed;
 use crate::hnn::receiving::ReceivingRead;
 use crate::ratio::algebraic::{
@@ -270,20 +270,18 @@ pub fn target_phases(
     ring: usize,
     targets: &[usize],
 ) -> Result<TargetPhases, HnnError> {
-    let period = field
-        .rings()
-        .get(ring)
-        .ok_or(HnnError::RingOutside {
-            ring,
-            rings: field.rings().len(),
-        })?
-        .period();
+    let declared = field.rings().get(ring).ok_or(HnnError::RingOutside {
+        ring,
+        rings: field.rings().len(),
+    })?;
+    let period = declared.period();
     let at = anchor.get(ring).ok_or(HnnError::Shape {
         what: "lift point",
         expected: field.rings().len(),
         found: anchor.len(),
     })?;
-    let (_, branch) = phase_winding(at, period);
+    // The cut's winding is the receiving ring's clock's (`Ring::clock_at`).
+    let branch = BigInt::from(declared.clock_at(at)?.winding().clone());
     let floor = &branch * BigInt::from(period);
     let mut lift = anchor.to_vec();
     let phases = targets

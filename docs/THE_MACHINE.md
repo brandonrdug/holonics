@@ -42,12 +42,16 @@ results from them.
   `aeon::Aeon` on the parametric orientation from its opening lift point to the joint clock's
   carry-out; each ring's epochs are the flux through its own ring section; the carry-out is an
   `aeon::Cycle` of the last ring's clock when that ring opened on its section; the boundary runs
-  the collapse; and the resident carries the `EnclosedLedger`.
-- [open] Three joins are not yet in the code: the receiving tree is storage read by the receiving
-  face, not a Holon joined at ports in `Field::holarchy`; a receiving window is a step of the
-  exposure's loop, not an `aeon::Epochs` reading at the receiver's section; and a pump's period is
-  the mode quotient's lift period (Lean `HNN/ModeQuotient.periodic_lift_exact`), not an `aeon::Cycle`. The unified plan's U1 and U5
-  own them (#63).
+  the collapse; and the resident carries the `EnclosedLedger`. Since the unified plan's U5: a
+  receiving window is an `aeon::Epochs` reading, an epoch of the cut's cell clock at the
+  receiver's section (`hnn::receiving::ReceivingPhases::windows`, which the exposure reads); a
+  pump's period is an `aeon::Cycle` of its own clock (`hnn::ring::PumpDeclaration::period`); every
+  ring clock is its navigator's `navigator::Clock` (`hnn::field::Ring::clock_at`), and the
+  selective step's carry is its jumps, the flux of its section (Lean
+  `HNN/Moment.SelectiveDecl.carryIn_is_section_flux`).
+- [open] One join is not yet in the code: the receiving tree is storage read by the receiving
+  face, not a Holon joined at ports in `Field::holarchy` (the unified plan's U1 named the missing
+  maps; #62).
 
 ## One continuing geometric object
 
