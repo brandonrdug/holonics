@@ -63,6 +63,7 @@
 //! | `exteriorOffset_independent_of_E` | [`SourceMoment::offset_counts`], [`PairPort::apply_table`] |
 //! | `HNN/IndexedOpen.{normalized_phase_counts_mass, normalized_open_population_invariant, normalized_zero_population}`; `HNN/Encoding.{whole_pair_read_counts, whole_pair_read_population_invariant, whole_pair_read_tape_free}` (the open reads no window) | [`PopulationChart`], [`SourceMoment::normalized_counts`], [`SourceMoment::offset_table`], [`SourceMoment::encode`] |
 //! | `moment_capacity` | [`capacity`], [`Capacity`] |
+//! | `HNN/Prediction.{placed_at_station, joint_residue_determines_position}` (a locked datum at its station's residue; a ring of period `∏ dᵢ`, pairwise coprime, places each datum at its joint residue class) | [`SourceMoment::section`] |
 
 use num_bigint::{BigInt, BigUint};
 use num_traits::{One, ToPrimitive, Zero};
@@ -523,6 +524,45 @@ impl SourceMoment {
             cells: cells.len(),
             carry_out: false,
         })
+    }
+
+    /// [definition; agent-inferred, U6's order repair] **The section's placement** (`hnn::prediction`'s
+    /// header, "Order is carried by residues and relative phases"): a refinement's locked data placed on the receiving
+    /// ring's spectrum at their stations' residues. Station `j` lies at the receiving ring's clock
+    /// unwound one tick a station from the request's last tick (`hnn::prediction`'s header), so its
+    /// datum is counted at the residue `τ_R + 1 + j (mod d_R)`: the same phase-carried law as the
+    /// request's, `m = Σ Ĝ(τ)⁻¹ E u`, read at the same frame, with its own population (the section
+    /// is its own port: the response's channel, source contract item 2). An unlocked station places
+    /// nothing. No offset pair is counted and nothing is kept but the counts: the placement of `v`
+    /// locked data is `v` counts on one ring. Refused unless `ring` is a source ring.
+    pub fn section(
+        field: &Field,
+        current: &Current,
+        ring: usize,
+        cells: &[Option<usize>],
+    ) -> Result<Self, HnnError> {
+        let mut moment = Self::open(field, current);
+        let a = moment.alphabet;
+        let phase = current.phase(field, ring)? as usize;
+        let counts = moment
+            .rings
+            .iter_mut()
+            .find(|counts| counts.ring == ring)
+            .ok_or(HnnError::MissingSourcePort { ring })?;
+        let period = counts.period;
+        let mut placed = 0u64;
+        for (station, cell) in cells.iter().enumerate() {
+            let Some(code) = *cell else {
+                continue;
+            };
+            if code >= a {
+                return Err(HnnError::CellOutside { code, alphabet: a });
+            }
+            bump(&mut counts.first[((phase + 1 + station) % period) * a + code])?;
+            placed += 1;
+        }
+        moment.cells = placed;
+        Ok(moment)
     }
 
     /// `|A|`, the exterior chart the moment counts on.

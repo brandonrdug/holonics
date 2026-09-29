@@ -1,5 +1,6 @@
 import Holonics.Foundation.Holon
 import Holonics.Foundation.ReceiverRelease
+import Mathlib.Data.Nat.ModEq
 import Mathlib.Logic.Function.Iterate
 import Mathlib.Tactic
 
@@ -32,6 +33,19 @@ station (`docs/HNN_FORMULA.md`, "Generation as field refinement and boundary rad
 - **The consumer equation** (`consumer_eq`): `ρ(F^K(I_h)) = T(request)` is
   `Holon.ofEvolution_receive_eq_encoded` at `evolve := F^[K]`: the native refinement returns the
   reference's section whenever its encoding and reading squares commute.
+
+- **The order repair** (the lessons record's failure 4; Brandon, September 29: "remainders?
+  spectral placement"). A datum placed at its residue on a ring of period `D = ∏ dᵢ` (pairwise
+  coprime factors) is placed at its joint residue class: two positions below `m·n` with the same
+  residues mod `m` and mod `n` are the same position (`joint_residue_determines_position`), so the
+  ring resolves position mod `D`. The joint class is placed on the product of the factors' spectra
+  because a sum of per-factor functions cannot single out one joint class
+  (`joint_class_not_additive`): separate factor placements summed would carry only their marginals.
+  The section's locked datum at station `j` is read by station `j` at rotation zero
+  (`placed_at_station`); a station locks only on a positive gap, so its top class is the unique
+  greatest (`lock_reads_unique_top`); and a reading that depends on the targets only through the
+  locked stations' placement never reads an unlocked (compared) station's target
+  (`partition_reading_ignores_compared_targets`).
 
 What this file does not state: the concrete word (`HNN/Word.fieldTick`) as the step `F`, the
 continuing word's return as the exact adjoint of `F^[K]` (checked on every refinement in Rust, on
@@ -159,6 +173,68 @@ theorem consumer_eq {Encoded EncodedNext : Type*}
   Holon.ofEvolution_receive_eq_encoded prepare (refine step words)
     (fun x station => read station x) encode encodeNext encodedRefine decode hstep hread seed
 
+/-! ## The order repair: the joint residue class, the section's placement and the lock -/
+
+/-- [proved-derived; formal-checked] **The joint residue determines position** (the Chinese
+remainder theorem on positions): below `m·n`, two positions with equal residues mod coprime `m` and
+`n` are equal. Applied factor by factor, a ring of period `∏ dᵢ` over pairwise coprime `dᵢ` places
+each datum at its position mod `∏ dᵢ`. -/
+theorem joint_residue_determines_position {m n a b : ℕ} (hmn : Nat.Coprime m n)
+    (ha : a < m * n) (hb : b < m * n) (hm : a % m = b % m) (hn : a % n = b % n) : a = b := by
+  have h : a ≡ b [MOD m * n] := (Nat.modEq_and_modEq_iff_modEq_mul hmn).mp ⟨hm, hn⟩
+  unfold Nat.ModEq at h
+  rwa [Nat.mod_eq_of_lt ha, Nat.mod_eq_of_lt hb] at h
+
+/-- [proved-derived; formal-checked] **One joint class is not a sum of per-factor functions**: on
+two factors each with two distinct residues, no `f x + g y` equals the indicator of the class
+`(x₀, y₀)`. A field that summed separate factor placements would read only their marginals, so the
+joint class is placed on the product. -/
+theorem joint_class_not_additive {X Y : Type*} [DecidableEq X] [DecidableEq Y] {x₀ x₁ : X}
+    {y₀ y₁ : Y} (hx : x₀ ≠ x₁) (hy : y₀ ≠ y₁) :
+    ¬ ∃ (f : X → ℚ) (g : Y → ℚ), ∀ x y, f x + g y = if x = x₀ ∧ y = y₀ then 1 else 0 := by
+  rintro ⟨f, g, h⟩
+  have a := h x₀ y₀
+  have b := h x₁ y₁
+  have c := h x₀ y₁
+  have d := h x₁ y₀
+  rw [if_pos ⟨rfl, rfl⟩] at a
+  rw [if_neg (fun e => hx e.1.symm)] at b
+  rw [if_neg (fun e => hy e.2.symm)] at c
+  rw [if_neg (fun e => hx e.1.symm)] at d
+  linarith
+
+/-- [proved-derived; formal-checked] **A placed datum sits at its station's rotation zero**: the
+datum locked at station `j` is placed at the tick `τ + 1 + j`, so in the request's frame it sits at
+the rotation `τ − (τ + 1 + j)`, and station `j` reads the rotation `1 + j` of that frame. -/
+theorem placed_at_station {D : ℕ} (τ j : ZMod D) : (1 + j) + (τ - (τ + 1 + j)) = 0 := by
+  ring
+
+/-- [proved-derived; formal-checked] **A lock reads a unique top.** A station locks only when its
+top class's score leads every other class's by a positive gap, so the top is the unique greatest:
+the lock is a width-zero reading of that station. -/
+theorem lock_reads_unique_top {C : Type*} (score : C → ℤ) (top : C) (gap : ℤ) (hgap : 0 < gap)
+    (hlead : ∀ c, c ≠ top → score c + gap ≤ score top) :
+    ∀ c, score top ≤ score c → c = top := by
+  intro c hc
+  by_contra hne
+  have := hlead c hne
+  linarith
+
+/-- [proved-derived; formal-checked] **A compared station never reads its own target.** A reading
+that sees the targets only through the placement of the locked stations (`locked j`, the datum
+`some (t j)`; an unlocked station places nothing) is the same for two target sections that agree at
+the locked stations, whatever they hold at the compared ones. -/
+theorem partition_reading_ignores_compared_targets {Station Class Reading : Type*}
+    (locked : Station → Prop) [DecidablePred locked] (read : (Station → Option Class) → Reading)
+    (t t' : Station → Class) (hagree : ∀ j, locked j → t j = t' j) :
+    read (fun j => if locked j then some (t j) else none) =
+      read (fun j => if locked j then some (t' j) else none) := by
+  congr 1
+  funext j
+  by_cases hj : locked j
+  · simp [hj, hagree j hj]
+  · simp [hj]
+
 section Audit
 #print axioms refine_iterate
 #print axioms jointSection_receive
@@ -168,6 +244,11 @@ section Audit
 #print axioms release_width_zero
 #print axioms plural_section_held
 #print axioms consumer_eq
+#print axioms joint_residue_determines_position
+#print axioms joint_class_not_additive
+#print axioms placed_at_station
+#print axioms lock_reads_unique_top
+#print axioms partition_reading_ignores_compared_targets
 end Audit
 
 end Holonics.HNN.Prediction
