@@ -902,7 +902,7 @@ branch; intervals that do not shorten the charged code are recorded and not adop
       passage's reading is the monodromy through every crossing cell's pump (its spectrum at the
       ring's parametric resonance), not built;
     - `hnn::constitution` does not yet read `FloquetBound::reach`, so a step through a pumped
-      resonator stays refused.
+      resonator stays refused (read September 29, below).
 - **The standing's fold, September 29: the copy and the moiré return, and text turns its sheets by
   the lock**
   ([pin](../../research/records/2026-09-29_THE_STANDINGS_FOLD_PINNED_BEFORE_ITS_RUNS.md),
@@ -933,6 +933,37 @@ branch; intervals that do not shorten the charged code are recorded and not adop
     - the standing cut's held-out code is `5470 + 1/16 + ε` (the reference port reads no lock).
   - *What stays open*, in #62: the carry's reading of the lobe as a Lean statement, the code
     enclosures as the realized score, and the lock on the reference and card ports.
+- **The certified step reads the Floquet reach, September 29: a deposit through a pumped ring is
+  certified below and past its bifurcation**
+  ([pin](../../research/records/2026-09-29_THE_CERTIFIED_STEP_READS_THE_FLOQUET_REACH_PINNED_BEFORE_ITS_RUNS.md),
+  `d343c817`;
+  [receipt](../../research/records/2026-09-29_THE_CERTIFIED_STEP_READS_THE_FLOQUET_REACH_A_DEPOSIT_THROUGH_A_PUMPED_RING_IS_CERTIFIED_BELOW_AND_PAST_ITS_BIFURCATION.md);
+  `7c3e9393`; Refs #73 #63).
+  - *Built* (the parametron's consumer equation, in `hnn::constitution`, "The pumped medium's
+    reach"):
+    - a resonator not certified passive (a pump, or a signed stiffness) is read by its Floquet
+      monodromy on the exact law, decided at its lattice's grain and bounded on a ladder of
+      certified growths `ρ₀(1 + 2^k)`, each span's reach the least of the certified bounds';
+    - the medium's span factor `F(s) = ∏_r max_(s′ ≤ s) reach_r(s′)` multiplies every tick term of
+      every gain but the readout's, and each station's re-entry sum at its longest span;
+    - the ring's own gain families are held (their ray moves the monodromy); the refusal
+      `UncertifiedGain` stays only where the decided certificate is refused;
+    - Lean `HNN/Floquet.{floquet_span_reach, partial_period_le_pow}` and `Holon/Deposition` §10
+      (`station_tick_gain`, `entry_span_gain`, `span_transport_compose`, `pumped_span_factor`).
+  - *Measured*:
+    - every check holds on every run;
+    - on the pumped receiving ring (`d = 4`, the copy terrain), 16 of 16 deposits are certified and
+      taken below (`p = 1/4`, passive) and past (`p = 1`, growing, spectral radius in
+      `[583/256, 73/32]`) the bifurcation, where the parent build refused every one; the entry bound
+      holds (largest `R` `397/64`); past the bifurcation the steps shrink by `2^5` to `2^6` as the
+      reach at two ticks rises from between 2 and 3 to between `2^7` and `2^8`;
+    - the copy (256 of 256), the moiré (6 of 6 at `K = 4` and `K = 8`), text (4 of 7 families, 22 of
+      24 proposals taken) and the standing cut (`5470 + 1/16 + ε`) read exactly as before: no
+      resonator is declared there.
+  - *What stays open*, in #62: the driven ring's loop within a span (a supply-rate certificate that
+    discharges the consumer equation's factorization), the reach along a ring's own gain ray, the
+    per-tick growth of the executed ticks, a modulated pump's reach per passage, and the executed
+    chart's monodromy.
 
 #### U7. The targets, alongside
 
