@@ -17,9 +17,12 @@ The optional argument reads another owner-only release file of the same case sha
 `responses.athena.text`, e.g. F0's token releases `f0-token-releases.json`) in place of the blind
 input; a corpus whose field that file does not carry (the retrieval controls) is not read. Every
 other response every case carries is its own corpus (F0's acceptance run: `logged`, the held-out
-continuation, and `flat`, the flat tree's release). The second argument names the choosing cut whose
-vocabulary the words are read against (the F5 choosing cut by default; F0's acceptance run reads its
-own split's, `curated-f0-choosing-cut.bin`).
+continuation, and `flat`, the flat tree's release; U6's symmetric comparison: `tree`, the control
+tree's release over the whole stream, stopping at its own drawn letter, and `logged`). A released
+corpus's typed refusals (a text beginning `[typed refusal`) are counted and not read as text. The
+second argument names the choosing cut whose vocabulary the words are read against (the F5 choosing
+cut by default; F0's acceptance run reads its own split's, `curated-f0-choosing-cut.bin`, and U6's
+`curated-u6-choosing-cut.bin`).
 
 The readings, per corpus (the native releases, the controls, the requests):
 - **texts**: the releases that are text rather than typed refusals;
@@ -45,7 +48,9 @@ from array import array
 
 from development_families import require_reserve_excluded, reserve_flag
 from standing_cut import OUT_DIR as CUTS
-CORPUS = {"control": "retrieval controls", "logged": "logged replies (observed conduct, not targets)", "flat": "flat tree releases"}
+CORPUS = {"control": "retrieval controls", "logged": "logged replies (observed conduct, not targets)", "flat": "flat tree releases",
+          "tree": "control tree releases (the whole stream, its own stop)"}
+REFUSAL = "[typed refusal"
 PAIRED = {"()": ("(", ")"), "[]": ("[", "]"), "{}": ("{", "}"), "“”": ("“", "”")}
 SELF_PAIRED = {"backtick": "`", "straight quote": '"', "bold": "**"}
 WORD = re.compile(r"[A-Za-z]{2,}")
@@ -120,8 +125,9 @@ def main():
     cases = released_file["cases"]
     vocab = vocabulary(choosing)
     native = [c["responses"]["athena"]["text"] for c in cases]
-    released = [t for t in native if not t.startswith("[typed refusal")]
+    released = [t for t in native if not t.startswith(REFUSAL)]
     corpora = {"native releases": released}
+    refusals = {"native releases": len(native) - len(released)}
     flags = {}
     names = [name for name in cases[0]["responses"] if name != "athena"] if cases else []
     for name in ["athena"] + names:
@@ -129,12 +135,19 @@ def main():
             flags[name] = sum(bool(c["responses"][name]["valid_utf8"]) for c in cases)
     for name in names:
         if all(name in c["responses"] for c in cases):
-            corpora[CORPUS.get(name, name)] = [c["responses"][name]["text"] for c in cases]
+            texts = [c["responses"][name]["text"] for c in cases]
+            corpus = CORPUS.get(name, name)
+            if all("status" in c["responses"][name] for c in cases):
+                # A released corpus (each release carries its status): its typed refusals apart.
+                corpora[corpus] = [t for t in texts if not t.startswith(REFUSAL)]
+                refusals[corpus] = len(texts) - len(corpora[corpus])
+            else:
+                corpora[corpus] = texts
     corpora["requests"] = [c["request"] for c in cases]
     report = {
         "choosing vocabulary (distinct words)": len(vocab),
         "diagnostic cases": len(cases),
-        "typed refusals": len(native) - len(released),
+        "typed refusals": refusals["native releases"] if len(refusals) == 1 else refusals,
         "corpora": {name: readings(texts, vocab) for name, texts in corpora.items()},
     }
     if flags:

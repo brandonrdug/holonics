@@ -83,7 +83,7 @@ const BUDGET: u64 = 1298;
 
 /// F0's adoption decisions made on choosing families before this run (pin 5): candidates 1, 2 and
 /// 3 each adopted or not, candidate 5 one of three; charged `⌈log₂ (2·2·2·3)⌉ = 5` bits.
-const DECISIONS: [u64; 4] = [2, 2, 2, 3];
+pub(super) const DECISIONS: [u64; 4] = [2, 2, 2, 3];
 
 /// The readings a byte-tree node's chart keeps beside the state (the census's E0, U2's pin 5).
 const READING_BYTES: u64 = 44;
@@ -170,12 +170,12 @@ impl Standing {
 }
 
 /// Why a passage stopped: a guard passed.
-enum Stopped {
+pub(super) enum Stopped {
     Time(u128),
     Memory(u128),
 }
 
-fn guard(reading_ms: u128) -> Result<(), Stopped> {
+pub(super) fn guard(reading_ms: u128) -> Result<(), Stopped> {
     if reading_ms > PASSAGE_MS {
         return Err(Stopped::Time(reading_ms));
     }
@@ -187,7 +187,7 @@ fn guard(reading_ms: u128) -> Result<(), Stopped> {
     Ok(())
 }
 
-fn stopped(what: &str, why: Stopped) -> ! {
+pub(super) fn stopped(what: &str, why: Stopped) -> ! {
     let why = match why {
         Stopped::Time(ms) => format!("the passage reached {ms} ms, past {PASSAGE_MS}"),
         Stopped::Memory(bytes) => {
@@ -201,7 +201,7 @@ fn stopped(what: &str, why: Stopped) -> ! {
 }
 
 /// `a − b`, enclosed: `[a.lower − b.upper, a.upper − b.lower]`.
-fn minus(a: &ExactInterval, b: &ExactInterval) -> ExactInterval {
+pub(super) fn minus(a: &ExactInterval, b: &ExactInterval) -> ExactInterval {
     ExactInterval {
         lower: &a.lower - &b.upper,
         upper: &a.upper - &b.lower,
@@ -219,14 +219,14 @@ fn difference_line(label: &str, a: &ExactInterval, b: &ExactInterval, cells: u64
 }
 
 /// A validation response selected for release: its letter, its request's letter, its order key.
-struct Selected {
-    letter: usize,
-    target: usize,
-    key: u64,
+pub(super) struct Selected {
+    pub(super) letter: usize,
+    pub(super) target: usize,
+    pub(super) key: u64,
 }
 
 /// The bytes of the part a section letter opens, up to the next section letter.
-fn part_bytes(codes: &[usize], letter: usize, chart: SectionChart) -> Vec<u8> {
+pub(super) fn part_bytes(codes: &[usize], letter: usize, chart: SectionChart) -> Vec<u8> {
     codes[letter + 1..]
         .iter()
         .take_while(|&&code| chart.section(code).is_none())
@@ -236,14 +236,17 @@ fn part_bytes(codes: &[usize], letter: usize, chart: SectionChart) -> Vec<u8> {
 
 /// **The selection** (pin 9): the validation role's declared request→response relations whose
 /// request lies in the validation role, whose response opens on the agent channel, and whose two
-/// parts are nonempty, with room in the aperture; ordered by `Draw::new(RELEASE_SEED + v).next()`,
-/// `v` the response letter's tick in the validation role, the lowest [`RELEASES`] kept.
-fn select(
+/// parts are nonempty, with room in the aperture; ordered by `Draw::new(seed + v).next()`, `v` the
+/// response letter's tick in the validation role, the lowest `count` kept (F0: [`RELEASE_SEED`]
+/// and [`RELEASES`]).
+pub(super) fn select(
     codes: &[usize],
     relations: &[Relation],
     development: usize,
     population: usize,
     chart: SectionChart,
+    seed: u64,
+    count: usize,
 ) -> (usize, Vec<Selected>) {
     let mut eligible: Vec<Selected> = relations
         .iter()
@@ -269,18 +272,18 @@ fn select(
                 .then(|| Selected {
                     letter,
                     target,
-                    key: Draw::new(RELEASE_SEED.wrapping_add((letter - development) as u64)).next(),
+                    key: Draw::new(seed.wrapping_add((letter - development) as u64)).next(),
                 })
         })
         .collect();
-    let count = eligible.len();
+    let eligible_count = eligible.len();
     eligible.sort_by_key(|selected| selected.key);
-    eligible.truncate(RELEASES);
-    (count, eligible)
+    eligible.truncate(count);
+    (eligible_count, eligible)
 }
 
 /// One key of `[0, 1)` from the draw.
-fn key_of(draw: &mut Draw) -> Rat {
+pub(super) fn key_of(draw: &mut Draw) -> Rat {
     Rat::new(BigInt::from(draw.next()), BigInt::from(1u8) << 64)
 }
 
@@ -294,7 +297,7 @@ struct EggRelease {
     warm_ms: u128,
 }
 
-fn refusal_name(refusal: &ResponseRefusal) -> &'static str {
+pub(super) fn refusal_name(refusal: &ResponseRefusal) -> &'static str {
     match refusal {
         ResponseRefusal::Chart { .. } => "chart",
         ResponseRefusal::NoRoomForStop { .. } => "no-room-for-stop",
@@ -368,7 +371,7 @@ fn release_flat(tree: &TreeFamily, length: usize, key: u64) -> (Vec<u8>, u128) {
 }
 
 /// A JSON string literal of `bytes` (lossy where they are not UTF-8; the flag says which).
-fn json_text(bytes: &[u8]) -> String {
+pub(super) fn json_text(bytes: &[u8]) -> String {
     let text = String::from_utf8_lossy(bytes);
     let mut out = String::with_capacity(text.len() + 2);
     out.push('"');
@@ -388,7 +391,7 @@ fn json_text(bytes: &[u8]) -> String {
 }
 
 /// Write the owner-only release file (mode 0600, its directory owner-only).
-fn write_private(path: &str, contents: &str) {
+pub(super) fn write_private(path: &str, contents: &str) {
     use std::io::Write;
     use std::os::unix::fs::{OpenOptionsExt, PermissionsExt};
     let path = std::path::Path::new(path);
@@ -417,11 +420,11 @@ fn write_private(path: &str, contents: &str) {
 }
 
 /// The request's pointer code in the admitted egg's readout.
-fn pointer(readout: &AdmittedReadout) -> ExactInterval {
+pub(super) fn pointer(readout: &AdmittedReadout) -> ExactInterval {
     bits(&readout.pointers[RelationKind::Request.index()].code)
 }
 
-fn admitted(egg: &AdmittedEgg) -> Box<AdmittedReadout> {
+pub(super) fn admitted(egg: &AdmittedEgg) -> Box<AdmittedReadout> {
     match Family::readout(egg) {
         Readout::Admitted(readout) => readout,
         _ => panic!("the admitted egg's readout"),
@@ -564,7 +567,15 @@ pub fn acceptance(curated_path: &str, flat_path: &str, releases_path: &str) {
         reading_of(&receipt.description, grain),
         reading_of(&egg_charge, grain)
     );
-    let (eligible, selected) = select(&cut.codes, &relations, development, population, chart);
+    let (eligible, selected) = select(
+        &cut.codes,
+        &relations,
+        development,
+        population,
+        chart,
+        RELEASE_SEED,
+        RELEASES,
+    );
     println!(
         "  the declared relations: {} in all; requests with both parts in the validation role and room in the aperture {eligible}; releases {} (cap {RELEASE_CAP} bytes){}; setup {} ms",
         relations.len(),
