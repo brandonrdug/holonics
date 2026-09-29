@@ -781,6 +781,35 @@ branch; intervals that do not shorten the charged code are recorded and not adop
       covector scale, and the prox step's reach is the growing Gram's `ln det`.
 
     The next loop is the factor families' certified step in `hnn::constitution`.
+- **The factor families' certified step, September 29: text holds its entry bound, the copy is
+  exact, and the factor families barely move**
+  ([pin](../../research/records/2026-09-29_THE_FACTOR_FAMILIES_CERTIFIED_STEP_PINNED_BEFORE_ITS_RUNS.md),
+  `ebcb7f4c`;
+  [receipt](../../research/records/2026-09-29_THE_FACTOR_FAMILIES_CERTIFIED_STEP_TEXT_HOLDS_ITS_ENTRY_BOUND_THE_COPY_IS_EXACT_AND_THE_FACTOR_FAMILIES_BARELY_MOVE.md);
+  `231a8939`; Refs #73 #63).
+  - *Built*: every factor family steps by the linear loci's certificate, in one loop and one count
+    `B`:
+    - its unit step `G_x/h_x′` and checked alignment `|G_x|²/h_x′`;
+    - its covector scale at its output;
+    - its curvature from its output's moves along the ray (the Schur test at the ray's end) and the
+      gain reaching its loci (the element's, the source's, and a channel's and a loaded resonator's
+      through their solve's difference power).
+
+    The declared `η_x` is retired. A declared boost is refused like a pumped resonator. The Lean is
+    `Holon/Deposition` §8.
+  - *Measured*:
+    - text on all 385 choosing pairs holds every check, the energy bound and the entry bound (the
+      standing `1/2048`, against `8 + 517/1024`), with storage product 1 (against `2²⁷⁴..2²⁷⁵`);
+    - the moiré is 6 of 6 at `K = 4` and `K = 8`;
+    - the copy is 256 of 256 (against 237);
+    - the standing cut's held-out code is `5472 + 3/16 + ε`, against `5462 + 4/16 + ε`, with its
+      storage product between `2⁸` and `2⁹` (against `2¹⁵⁴..2¹⁵⁵`).
+  - *What stays open*, measured:
+    - on the prediction field the factor families' certified steps are `2⁻²³..2⁻⁷`, below their
+      lattices, so they barely move; on campaign 1's field they move and the held-out code is about
+      10 bits longer;
+    - text's 8 sections are two of 32 spaces and six held: the readout still sits at the byte
+      marginal (failure 4).
 
 #### U7. The targets, alongside
 
