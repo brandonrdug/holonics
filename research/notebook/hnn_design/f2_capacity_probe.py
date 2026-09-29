@@ -14,6 +14,9 @@ budgets read from the declared validation passage, the validation role's cut at 
 agent responses (`agent_responses`, each an agent-channel part, the cells after an agent letter up
 to the next letter, as F0's response stops count them) and the longest of them
 (`longest_agent_response`). Only counts are read from it.
+
+Both splits are spent family-unit splits that hold the development reserve, so their role streams
+are refused unless the logged flag `--read-reserve` is passed (`development_families.py`).
 """
 
 import hashlib
@@ -22,6 +25,7 @@ import os
 import sys
 from array import array
 
+from development_families import require_reserve_excluded, reserve_flag
 from standing_cut import OUT_DIR, private_directory, private_write
 
 ROLES = (("choosing", 4096), ("validation", 2052))
@@ -39,10 +43,11 @@ def codes_of(raw):
     return codes
 
 
-def tail(item, role, count):
+def tail(item, role, count, read_reserve):
     prefix = os.path.join(OUT_DIR, f"curated-{item}-{role}-source")
     with open(prefix + ".json", "rb") as handle:
         manifest = json.load(handle)
+    require_reserve_excluded(manifest, f"curated-{item}-{role}-source", read_reserve)
     with open(prefix + ".bin", "rb") as handle:
         raw = handle.read()
     assert hashlib.sha256(raw).hexdigest() == manifest["development_stream_sha256"]
@@ -51,11 +56,12 @@ def tail(item, role, count):
     return bytes_only[-count:]
 
 
-def declared_passage(item):
+def declared_passage(item, read_reserve):
     """The declared validation passage's counts: its byte cells and its agent responses' lengths."""
     prefix = os.path.join(OUT_DIR, f"curated-{item}-validation-cut")
     with open(prefix + ".json", "rb") as handle:
         manifest = json.load(handle)
+    require_reserve_excluded(manifest, f"curated-{item}-validation-cut", read_reserve)
     with open(prefix + ".bin", "rb") as handle:
         raw = handle.read()
     assert hashlib.sha256(raw).hexdigest() == manifest["cut_sha256"]
@@ -80,12 +86,12 @@ def declared_passage(item):
 
 
 def main():
-    arguments = sys.argv[1:]
+    arguments, read_reserve = reserve_flag(sys.argv[1:], "f2_capacity_probe.py")
     if len(arguments) > 1 or (arguments and arguments[0] not in ITEMS):
         sys.exit(__doc__)
     key = arguments[0] if arguments else "F2"
     item, name = ITEMS[key]
-    pieces = [tail(item, role, count) for role, count in ROLES]
+    pieces = [tail(item, role, count, read_reserve) for role, count in ROLES]
     cut = b"".join(pieces)
     assert len(cut) == 6148
     private_directory()
@@ -100,7 +106,7 @@ def main():
         "validation_sha256": hashlib.sha256(pieces[1]).hexdigest(),
     }
     if key == "F2V2":
-        receipt.update(declared_passage(item))
+        receipt.update(declared_passage(item, read_reserve))
     private_write(name + ".json", json.dumps(receipt, indent=2).encode())
     print(json.dumps({field: value for field, value in receipt.items() if field not in ("schema", "source")},
                      indent=2))

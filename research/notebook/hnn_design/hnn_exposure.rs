@@ -219,7 +219,7 @@ fn component<T>(value: &Component<T>, present: impl Fn(&T) -> String) -> String 
 // the run
 
 fn main() {
-    let arguments: Vec<String> = std::env::args().skip(1).collect();
+    let arguments: Vec<String> = exterior::admit_reserve_flag(std::env::args().skip(1).collect());
     let (mut cells, mut held_out, mut deadline): (Option<String>, Option<usize>, Option<u64>) =
         (None, None, None);
     let mut cut_file: Option<String> = None;

@@ -2726,7 +2726,7 @@ fn capacity_line(capacity: Capacity, pass: &Pass, part: usize, cells: u64, grain
     pass_line(pass, part, cells, grain);
 }
 fn main() {
-    let arguments: Vec<String> = std::env::args().skip(1).collect();
+    let arguments: Vec<String> = exterior::admit_reserve_flag(std::env::args().skip(1).collect());
     let path = match arguments.as_slice() {
         [key, value] if key == "cut-file" => value.clone(),
         [key, value, mode] if key == "cut-file" && mode == "letters" => {

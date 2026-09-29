@@ -1,6 +1,7 @@
 //! Tests of the admitted receivers (`admitted`'s module header): the located continuation, the copy
 //! stage's face and chain rule, the unheld port, the receipt that never enters the face, the
-//! incidence's code and the spans' release.
+//! incidence's code, retention by the present law, the aeon, and the invariance of the request's
+//! time under any withheld continuation.
 
 use num_bigint::BigInt;
 use num_traits::One;
@@ -11,7 +12,7 @@ use crate::compression::landmark::context::{
 };
 use crate::ratio::algebraic::ExactInterval;
 use crate::receiver::population::TreeFamily;
-use crate::receiver::population::{Population, PopulationRelease};
+use crate::receiver::population::{Population, PopulationRelease, ResponseLaw};
 
 const POPULATION: u64 = 1 << 10;
 const GRAIN: u64 = 16;
@@ -324,20 +325,57 @@ fn the_incidence_is_coded_where_it_arrives() {
 }
 
 #[test]
-fn a_span_is_held_while_a_relation_reaches_it() {
+fn a_run_is_held_until_its_aeon_turns_to_its_port_again() {
     let (cells, ticks) = passage();
     let mut egg = egg(relations(ticks));
-    // Through the second agent part: the request's span and the first response's are held.
+    // Through the second agent part: the request's run (one human part) and the response's run
+    // (two agent parts) are held.
     for &cell in &cells[..ticks[3] as usize] {
         egg.receive(cell).expect("a cell");
     }
     let before = readout(&egg);
-    assert_eq!(before.retained, 2);
-    // The later human part opens: the request's last reader closed, so only the response is held.
+    assert_eq!(before.retained, 3);
+    let request = (ticks[1] - ticks[0] - 1) as usize;
+    // The later human part opens a new human run: the request's is released, the response's
+    // stays for the return that reads it, and the return's own part joins the human port.
     egg.receive(cells[ticks[3] as usize]).expect("a letter");
     let after = readout(&egg);
-    assert_eq!(after.retained, 1);
+    assert_eq!(after.retained, 3);
+    assert_eq!(after.retained_cells, before.retained_cells - request);
     assert!(after.widest_cells > after.retained_cells);
+    assert_eq!(after.released, vec![0, 0], "every relation was held");
+}
+
+#[test]
+fn a_relation_to_a_released_run_is_unheld_and_counted() {
+    let (mut cells, ticks) = passage();
+    // A further agent part after the human return, declared to read the first request: the
+    // conversation turned to the human port since, so retention released that run.
+    let late = cells.len() as u64;
+    cells.push(letter(2, AGENT));
+    cells.extend(b"alpha.txt holds".iter().map(|&b| usize::from(b)));
+    let mut declared = relations(ticks);
+    declared.push(Relation {
+        letter: late,
+        kind: RelationKind::Request,
+        target: ticks[0],
+    });
+    let mut admitted = egg(declared);
+    let mut unheld = egg(relations(ticks));
+    admitted
+        .admits(&cells)
+        .expect("an earlier target retention released is admitted");
+    for &cell in &cells {
+        assert_eq!(
+            admitted.face().expect("a face"),
+            unheld.face().expect("a face")
+        );
+        admitted.receive(cell).expect("a cell");
+        unheld.receive(cell).expect("a cell");
+    }
+    assert_eq!(readout(&admitted).released, vec![1, 0]);
+    let pointer = &readout(&admitted).pointers[RelationKind::Request.index()];
+    assert_eq!((pointer.parts, pointer.held), (3, 2));
 }
 
 #[test]
@@ -579,4 +617,179 @@ fn a_branch_at_the_present_withholds_the_future_incidence_and_moves_no_face() {
     assert!(carried.receive(byte).is_err(), "a declared future letter");
     let mut released = Population::new(vec![Box::new(present)]).expect("the present incidence");
     assert!(released.receive(byte).is_ok(), "no future incidence");
+}
+
+/// A part's cells: its letter and its bytes.
+fn part(kind: usize, channel: usize, text: &[u8]) -> Vec<usize> {
+    std::iter::once(letter(kind, channel))
+        .chain(text.iter().map(|&b| usize::from(b)))
+        .collect()
+}
+
+/// An exact key stream of `[0, 1)` (a declared congruence, the test's own keys).
+fn keys(seed: u64) -> impl FnMut() -> Rat {
+    let mut state = seed;
+    move || {
+        state = state
+            .wrapping_mul(6_364_136_223_846_793_005)
+            .wrapping_add(1_442_695_040_888_963_407);
+        Rat::new(BigInt::from(state), BigInt::one() << 64)
+    }
+}
+
+/// [THE_REBUILD U6, the audit's §4 item 1 and finding 7: the invariance test] **A withheld
+/// continuation moves nothing at request time.** Two passages share a prefix through a response's
+/// opening letter (its request relation present) and differ in everything after it: the response's
+/// bytes and length, and the future relations (one continuation declares a further part at the very
+/// next tick, the other a later part that reaches the first request again). At the request's time
+/// the two eggs have the same state (their present branches' checkpoints and their readouts,
+/// retention included), the same face, and the same keyed release through the general future branch.
+/// Under the former retention law the second continuation's future relation held the first request's
+/// span, and under the former future branch the first continuation's declared letter refused the
+/// release's first byte.
+#[test]
+fn a_withheld_continuation_moves_nothing_at_request_time() {
+    let prefix: Vec<Vec<usize>> = vec![
+        part(0, HUMAN, b"Please read the file alpha.txt now."),
+        part(
+            2,
+            AGENT,
+            b"I read the file alpha.txt now, it holds two lines.",
+        ),
+        part(2, HUMAN, b"Now read the file beta.txt."),
+        part(2, AGENT, b""),
+    ];
+    let mut ticks = Vec::new();
+    let mut cells = Vec::new();
+    for cells_of in &prefix {
+        ticks.push(cells.len() as u64);
+        cells.extend(cells_of);
+    }
+    let present = vec![
+        Relation {
+            letter: ticks[1],
+            kind: RelationKind::Request,
+            target: ticks[0],
+        },
+        Relation {
+            letter: ticks[3],
+            kind: RelationKind::Request,
+            target: ticks[2],
+        },
+    ];
+    let at = cells.len() as u64;
+    // Continuation one: the response has no bytes; a further agent part opens at the next tick,
+    // reading the same request, and a human return follows.
+    let mut one = present.clone();
+    one.push(Relation {
+        letter: at,
+        kind: RelationKind::Request,
+        target: ticks[2],
+    });
+    one.push(Relation {
+        letter: at + 20,
+        kind: RelationKind::LaterHuman,
+        target: ticks[3],
+    });
+    // Continuation two: a long response, then a later agent part reading the first request.
+    let mut two = present.clone();
+    two.push(Relation {
+        letter: at + 41,
+        kind: RelationKind::Request,
+        target: ticks[0],
+    });
+    let mut eggs = [egg(one), egg(two)];
+    for egg in &mut eggs {
+        for &cell in &cells {
+            egg.receive(cell)
+                .expect("the prefix through the response's opening");
+        }
+    }
+    let [first, second] = &eggs;
+    assert_eq!(first.face(), second.face(), "the same face");
+    assert_eq!(
+        readout(first),
+        readout(second),
+        "the same readout, retention included"
+    );
+    assert_eq!(
+        first.branch_at_present().encode_checkpoint(),
+        second.branch_at_present().encode_checkpoint(),
+        "the same present state"
+    );
+    let release = |egg: &AdmittedEgg| {
+        let branch = Family::branch_future(egg).expect("the admitted egg branches its future");
+        let mut alone = Population::new(vec![branch]).expect("the egg alone");
+        let mut stream = keys(29);
+        alone.release_response(chart(), 64, ResponseLaw::Scored, &mut stream)
+    };
+    let released = release(first);
+    assert_eq!(released, release(second), "the same keyed release");
+    assert!(
+        released.refusal.is_none(),
+        "no declared future letter refuses a byte"
+    );
+}
+
+/// [THE_REBUILD U6: state per conversation] **A request is held across another conversation's
+/// parts, and each conversation's addresses are its own.** Aeon 1's request, then aeon 2's request
+/// and response, then aeon 1's response reading its request: the request is held (the human part of
+/// aeon 2 began aeon 2's run, not aeon 1's), and aeon 1's response is read in aeon 1's addresses.
+#[test]
+fn a_request_is_held_across_another_conversations_parts() {
+    let parts: Vec<(u64, Vec<usize>)> = vec![
+        (1, part(0, HUMAN, b"Please read the file alpha.txt now.")),
+        (2, part(0, HUMAN, b"What does beta.txt hold?")),
+        (2, part(2, AGENT, b"Beta holds one line.")),
+        (1, part(1, AGENT, b"I read the file alpha.txt now.")),
+    ];
+    let mut ticks = Vec::new();
+    let mut cells: Vec<usize> = Vec::new();
+    for (_, cells_of) in &parts {
+        ticks.push(cells.len());
+        cells.extend(cells_of);
+    }
+    let relations = vec![
+        Relation {
+            letter: ticks[2] as u64,
+            kind: RelationKind::Request,
+            target: ticks[1] as u64,
+        },
+        Relation {
+            letter: ticks[3] as u64,
+            kind: RelationKind::Request,
+            target: ticks[0] as u64,
+        },
+    ];
+    let mut interleaved = egg(relations);
+    let mut alone = egg(vec![Relation {
+        letter: (ticks[1] - ticks[0]) as u64,
+        kind: RelationKind::Request,
+        target: 0,
+    }]);
+    for (index, (aeon, cells_of)) in parts.iter().enumerate() {
+        interleaved
+            .enter_aeon(*aeon)
+            .expect("an aeon at its letter");
+        for (at, &cell) in cells_of.iter().enumerate() {
+            if *aeon == 1 {
+                if at > 0 {
+                    assert_eq!(
+                        interleaved.inner().addresses().expect("the addresses"),
+                        alone.inner().addresses().expect("the addresses"),
+                        "part {index}, cell {at}: aeon 1's own addresses"
+                    );
+                }
+                alone.receive(cell).expect("aeon 1 alone");
+            }
+            interleaved.receive(cell).expect("the interleaved passage");
+        }
+    }
+    let readout = readout(&interleaved);
+    assert_eq!(readout.released, vec![0, 0], "both requests held");
+    assert_eq!(readout.pointers[RelationKind::Request.index()].held, 2);
+    assert!(
+        readout.stages[0].copies > 0,
+        "aeon 1's response copied its request"
+    );
 }

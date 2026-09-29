@@ -5,6 +5,9 @@ for development inspection, not F5's final acceptance or evaluation partition. R
 owner-only. Stdout contains counts and hashes.
 
     HOLONICS_ROOT=<checkout with private cuts> python3 f5_blind_input.py
+
+The selection comes from F5's spent diagnostic split, which holds the development reserve, so it is
+refused unless the logged flag `--read-reserve` is passed (`development_families.py`).
 """
 
 import hashlib
@@ -14,14 +17,17 @@ import re
 import sys
 from pathlib import Path
 
+from development_families import require_reserve_excluded, reserve_flag
 from standing_cut import OUT_DIR, private_directory, private_write
 
 
 def main():
-    if sys.argv[1:]:
+    arguments, read_reserve = reserve_flag(sys.argv[1:], "f5_blind_input.py")
+    if arguments:
         sys.exit(__doc__)
     root = Path(OUT_DIR)
     selection = json.loads((root / "f5-retrospective.json").read_bytes())
+    require_reserve_excluded(selection, "the F5 retrospective selection", read_reserve)
     contexts = [json.loads(line) for line in (root / "f5-context.jsonl").read_bytes().splitlines()]
     assert selection["schema"] == "holonics.f5-retrospective.v1"
     assert len(selection["items"]) == len(contexts) == 32
@@ -52,7 +58,8 @@ def main():
                           "control": {"label": "request-aware retrieval control", "text": item["retrieval"] or "[retrieval refused]"},
                       }})
     document = {"schema": "holonics.athena-blind-input.v1",
-                "coordinate_order": [case["coordinate"] for case in cases], "cases": cases}
+                "coordinate_order": [case["coordinate"] for case in cases], "cases": cases,
+                "reserve_excluded": None if read_reserve else selection.get("reserve_excluded")}
     raw = json.dumps(document, ensure_ascii=False, sort_keys=True, separators=(",", ":")).encode() + b"\n"
     private_directory()
     private_write("f5-blind-input.json", raw)

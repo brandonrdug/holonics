@@ -13,6 +13,61 @@
 #![allow(dead_code)]
 
 use std::ops::Range;
+use std::sync::atomic::{AtomicBool, Ordering};
+
+/// **The development reserve's name** (`development_families.py`, `RESERVE_SHA256`; THE_REBUILD U6):
+/// the SHA-256 of the reserve's sorted membership, committed before any run reads a role. Every cut
+/// this boundary reads must name it as excluded (`"reserve_excluded"` in its manifest) unless the
+/// logged flag `--read-reserve` was passed ([`admit_reserve_flag`]); a cut written before the
+/// reserve was named holds it (every earlier split read every conversation).
+pub const RESERVE_SHA256: &str = "09d7ae5b86d1b34cd1f57a100fb0ec412f59902f6ec3b90924a7c80b136f8a24";
+
+static READ_RESERVE: AtomicBool = AtomicBool::new(false);
+
+/// **Strip the explicit `--read-reserve` flag** from an example's arguments; when it is passed, the
+/// read is logged on stdout and every cut is admitted without the reserve's exclusion.
+pub fn admit_reserve_flag(arguments: Vec<String>) -> Vec<String> {
+    if !arguments
+        .iter()
+        .any(|argument| argument == "--read-reserve")
+    {
+        return arguments;
+    }
+    READ_RESERVE.store(true, Ordering::SeqCst);
+    println!(
+        "READING THE RESERVE: --read-reserve was passed; this run may read the development reserve"
+    );
+    arguments
+        .into_iter()
+        .filter(|argument| argument != "--read-reserve")
+        .collect()
+}
+
+/// Whether `--read-reserve` was passed (an output written then does not name the reserve as
+/// excluded).
+pub fn reserve_read() -> bool {
+    READ_RESERVE.load(Ordering::SeqCst)
+}
+
+/// **Refuse a manifest that does not name the reserve as excluded** (unless `--read-reserve`).
+fn require_reserve_excluded(manifest_path: &str, manifest: &str) {
+    if reserve_read() {
+        return;
+    }
+    let named = manifest
+        .find("\"reserve_excluded\":")
+        .map(|at| &manifest[at + "\"reserve_excluded\":".len()..])
+        .is_some_and(|rest| {
+            rest.trim_start()
+                .strip_prefix('"')
+                .is_some_and(|value| value.starts_with(RESERVE_SHA256))
+        });
+    assert!(
+        named,
+        "refused: {manifest_path} does not name the development reserve as excluded, so it may hold \
+         the reserve's material; pass --read-reserve (logged) to read it"
+    );
+}
 
 use holonics::compression::landmark::context::SectionChart;
 use holonics::hnn::Field;
@@ -36,6 +91,7 @@ pub fn read_cut(path: &str) -> (Vec<u8>, usize, Range<usize>) {
         .map_or_else(|| format!("{path}.json"), |stem| format!("{stem}.json"));
     let manifest = std::fs::read_to_string(&manifest_path)
         .unwrap_or_else(|error| panic!("read the cut manifest {manifest_path}: {error}"));
+    require_reserve_excluded(&manifest_path, &manifest);
     let numbers_after = |key: &str| -> Vec<usize> {
         let start = manifest
             .find(key)
@@ -260,6 +316,12 @@ pub struct CuratedCut {
 
 #[allow(clippy::disallowed_types, clippy::disallowed_methods)]
 pub fn read_curated(path: &str, chart: &SectionChart) -> CuratedCut {
+    let manifest_path = path
+        .strip_suffix(".bin")
+        .map_or_else(|| format!("{path}.json"), |stem| format!("{stem}.json"));
+    let manifest = std::fs::read_to_string(&manifest_path)
+        .unwrap_or_else(|error| panic!("read the cut manifest {manifest_path}: {error}"));
+    require_reserve_excluded(&manifest_path, &manifest);
     let raw = std::fs::read(path).unwrap_or_else(|error| panic!("read the curated cut: {error}"));
     assert_eq!(raw.len() % 2, 0, "u16 codes");
     let codes: Vec<usize> = raw
@@ -334,4 +396,42 @@ pub fn read_incidence(curated_path: &str) -> Vec<holonics::receiver::population:
         "the incidence manifest's count"
     );
     relations
+}
+
+/// **The curated cut's aeons** (`<cut>.aeons.bin`, written by `curated_source.py` and joined by
+/// `family_passage.py`: one little-endian u32 a section letter, the ordinal of the conversation its
+/// part lies in), placed on the cut's ticks: each letter tick at which the conversation changes
+/// (the cut's first letter included) with the aeon it enters, in tick order. The count must be the
+/// manifest's section letters. Only counts are printed.
+#[allow(clippy::disallowed_types, clippy::disallowed_methods)]
+pub fn read_aeons(curated_path: &str, codes: &[usize], chart: &SectionChart) -> Vec<(usize, u64)> {
+    let path = curated_path.strip_suffix(".bin").map_or_else(
+        || format!("{curated_path}.aeons.bin"),
+        |stem| format!("{stem}.aeons.bin"),
+    );
+    let raw = std::fs::read(&path).unwrap_or_else(|error| panic!("read the aeons: {error}"));
+    assert_eq!(raw.len() % 4, 0, "u32 ordinals");
+    let ordinals: Vec<u64> = raw
+        .chunks_exact(4)
+        .map(|word| u64::from(u32::from_le_bytes([word[0], word[1], word[2], word[3]])))
+        .collect();
+    let letters: Vec<usize> = codes
+        .iter()
+        .enumerate()
+        .filter(|&(_, &code)| chart.section(code).is_some())
+        .map(|(tick, _)| tick)
+        .collect();
+    assert_eq!(ordinals.len(), letters.len(), "one aeon a section letter");
+    assert_eq!(
+        ordinals.len(),
+        manifest_number(curated_path, "\"section_letters\":"),
+        "the aeons manifest's count"
+    );
+    let mut marks = Vec::new();
+    for (&tick, &aeon) in letters.iter().zip(&ordinals) {
+        if marks.last().is_none_or(|&(_, last)| last != aeon) {
+            marks.push((tick, aeon));
+        }
+    }
+    marks
 }

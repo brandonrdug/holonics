@@ -33,6 +33,11 @@ cells (a power of two, `2^20` by the notebook's memory derivation, `hnn_landmark
 which the final `population/8` are held out, into `.local/cuts/wide-real-cut.{bin,json}`. It holds
 the standing cut (both are the stream's tail), and the evaluation partition stays unread. Run from
 the main checkout, or set `HOLONICS_ROOT` to it.
+
+**The development reserve** (`development_families.py`, THE_REBUILD U6): both cuts skip the reserve's
+conversations and name it as excluded in their manifests (`reserve_excluded`), unless the logged flag
+`--read-reserve` is passed. The cuts written before the reserve was named hold it, and every reader
+refuses them.
 """
 
 import hashlib
@@ -78,7 +83,12 @@ def family_bytes(record):
 
 
 def main():
-    arguments = sys.argv[1:]
+    # Imported here: `development_families` reads this module's paths.
+    from development_families import (RESERVE_SHA256, development_records, reserve_flag,
+                                      reserve_sessions)
+
+    arguments, read_reserve = reserve_flag(sys.argv[1:], "standing_cut.py")
+    skipped = set() if read_reserve else reserve_sessions(development_records()[0])
     if len(arguments) == 1:
         name, population = NAME, int(arguments[0])
         held_out = mean_aeon_cells()
@@ -100,7 +110,7 @@ def main():
             if record.get("kind") != "occurrence-family":
                 continue
             counts[record["partition"]] += 1
-            if record["partition"] == "development":
+            if record["partition"] == "development" and record["views"][0]["session_id"] not in skipped:
                 development += family_bytes(record)
     assert held_out < population <= len(development), "the development stream cannot hold the cut"
     cut = bytes(development[len(development) - population:])
@@ -111,6 +121,7 @@ def main():
         "source": os.path.relpath(SOURCE, ROOT),
         "source_sha256": source_hash.hexdigest(),
         "families": counts,
+        "reserve_excluded": None if read_reserve else RESERVE_SHA256,
         "development_stream_bytes": len(development),
         "population": population,
         "held_out_range": [population - held_out, population],

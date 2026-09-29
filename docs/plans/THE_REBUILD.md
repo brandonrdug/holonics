@@ -532,6 +532,34 @@ branch; intervals that do not shorten the charged code are recorded and not adop
   The symmetric comparison (2), generation as a requested consequence (4) and retention around the
   admitted actions (5) follow. F0's release gate, F4's curated release and F5 wait on them. Brandon
   reviews the record before the loop is built.
+- **Item 1, the data protocol, built September 29** (`f68100f2`, `f4479d9d`; the
+  [notebook's receipt](../../research/notebook/hnn_design/README.md#u6-the-data-protocol-by-conversation-with-a-reserve-nothing-reads-september-29);
+  Refs #73 #148 #63). No passage was run; the split's checks are count-only, on metadata.
+  - *The split by conversation* (`development_families.py U6`): the unit is the conversation, joined
+    through its relations (one relation joins two of the 87). Choosing holds 61 conversations and
+    16,314 messages, validation 11 and 682, the reserve 15 and 5,453. No conversation lies in two
+    roles, and no relation crosses roles. Validation drew small conversations.
+  - *The reserve* [agent-inferred]: 15 conversations, the least number whose mean reads no less
+    sharply than validation's at one in five of the rest (`72·71 = 5112 ≤ 4·1290 = 5160`), leaving
+    72 to choosing and validation. It is named
+    `09d7ae5b86d1b34cd1f57a100fb0ec412f59902f6ec3b90924a7c80b136f8a24` in the scripts and
+    `exterior.rs`. Every script refuses its material, and every artifact written before it was named,
+    unless the logged `--read-reserve` is passed; no run passed it. Its conversations were read by
+    the earlier splits, so it guards the choices made from now on.
+  - *State per conversation*: the typed byte tree, the letter tree and the flat control keep one
+    address per aeon, with their counts shared (`enter_aeon`; atlas
+    `receiver.population-aeon-address`). A test reads two interleaved conversations context for
+    context as each alone. This is not the reverted per-port trees of `38b0b81c`, which split the
+    counts.
+  - *The leaks*: the general future branch is the present branch. Retention holds each aeon's latest
+    run on each target port and reads only the present (`receiver.population-present-retention`); on
+    the choosing incidence it releases 7 of 12,261 requests. The flat control's release draws the
+    egg's cap, never the logged reply's length. The invariance test: two passages that differ in a
+    withheld continuation's bytes, length and future relations have the same request-time state,
+    face, readout and keyed release, and the former future branch fails it.
+  - *Wording*: "truth" no longer names a logged reply in the plan, the notebook or the harnesses.
+  - `f0-acceptance` enters the aeons; the spent harnesses (`curated`, `f4`, `u2-acceptance`,
+    `f0-census`, the F5 native paths) read one aeon and refuse every spent cut.
 - **Item (3) derived, September 29**
   ([record](../../research/records/2026-09-29_THE_ARITHMETIC_CONTRACT_A_NUMERAL_IS_A_FACE_OF_A_COUNTING_NAVIGATOR_AND_ITS_PRODUCER_IS_A_KEY.md),
   Lean `HolonicsResearch/Mathematics/ArithmeticContract`). The record states:
@@ -542,7 +570,7 @@ branch; intervals that do not shorten the charged code are recorded and not adop
     smallest build that tests it.
 
   The build waits on Brandon's review of the record. Its composition into the text chart's population
-  waits on item (1)'s protocol.
+  reads item (1)'s protocol, built above.
 
 #### U7. The targets, alongside
 
@@ -719,7 +747,7 @@ on the admitted egg, and the trees beyond depth 24 add at most 20 bits.
   the spent draws read at F0's aperture before the split is generated: F1's `−279 + 10/16 + ε`, F4's
   `−726 + 9/16 + ε`, F5's `−672 + 15/16 + ε`, U2's `−812 + 9/16 + ε`, so **`m = 534` bits**; the
   standing budget 1,298 bytes a cell, whole; the passage budget ten minutes and 20 GB; 32 releases at
-  hash-ordered validation responses (cap 2,048 bytes) beside the held-out truth and the flat tree's
+  hash-ordered validation responses (cap 2,048 bytes) beside the logged reply and the flat tree's
   release, read by `release_legibility.py`, the text owner-only. One amendment before the split: a
   release branches at the present incidence (`AdmittedEgg::branch_at_present`), since on F4's
   passage 8 of 32 releases were refused where the passage's declared future incidence placed a
@@ -746,9 +774,9 @@ on the admitted egg, and the trees beyond depth 24 add at most 20 bits.
   - *The release readings* (32 releases, `release_legibility.py` against the split's 6,461-word
     choosing vocabulary). The egg: 28 texts and 4 typed refusals (3 text-codec separators, 1 at the
     cap); 1,186 of 1,513 word tokens real. The flat tree: 1,626 of 2,096 real, 24 of 32 valid
-    UTF-8. The truths: 3,056 of 3,232. `()` balanced in 14 of 28 releases, against 11 of 32 for the
-    flat tree and 32 of 32 truths; backticks even in 13 of 28, against 15 of 32 and 32 of 32. The
-    longest warm release took 27,187 ms.
+    UTF-8. The logged replies: 3,056 of 3,232. `()` balanced in 14 of 28 releases, against 11 of 32
+    for the flat tree and 32 of 32 logged replies; backticks even in 13 of 28, against 15 of 32 and
+    32 of 32. The longest warm release took 27,187 ms.
   - *The failure, by its measurement* (the next loop's subject): on unseen families the egg's byte
     gain over the flat tree, 1,981 bits in 523,024 bytes, is mostly spent on the stops it must
     predict, and what remains is within the draw-to-draw spread; its standing is past the flat

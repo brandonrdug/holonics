@@ -55,15 +55,33 @@
 //! letter, and charged beside the cells, per relation: whether a relation is held (a KT face per
 //! section kind and the previous reading part's held state); when the previous reading part's was
 //! held, whether the target is the same (a KT face per section kind: a response's further parts
-//! answer one request); otherwise the target's rank `r` among the parts received on its port (`0`
-//! the latest), its dyadic class `⌊log₂(r + 1)⌋` in unary (a KT face per level, forced where no
-//! higher class is admissible) and its offset uniform over the admissible ranks of its class.
+//! answer one request); otherwise the target's rank `r` among the parts of the reading aeon's run on
+//! its port (`0` the latest; retention, below), its dyadic class `⌊log₂(r + 1)⌋` in unary (a KT
+//! face per level, forced where no higher class is admissible) and its offset uniform over the
+//! admissible ranks of its class. A declared relation whose target retention has released is coded
+//! as unheld.
 //!
-//! [definition; agent-inferred] **Retention** (the source contract's item 7: the admitted future
-//! family names what retention must keep). A target's span is held exactly while a declared
-//! relation still reaches it (released when its last reading part closes), and the open reading
-//! part's own cells while it is open: the ports the admitted receivers read, never a record of the
-//! passage.
+//! [definition; agent-inferred] **The aeon** ([`AdmittedEgg::enter_aeon`]; THE_REBUILD U6, the
+//! audit of September 29, §4 item 1). A passage may interleave conversations. The egg enters a
+//! part's conversation, its aeon, at the part's letter: its inner egg keeps one address per aeon
+//! (`BoundaryEgg::enter_aeon`), and its retention keeps its runs per aeon, so a switch splices no
+//! other conversation into what a part is read against.
+//!
+//! [definition; agent-inferred] **Retention, a law of the present** (the source contract's item 7:
+//! the admitted future family names what retention must keep; the audit's finding 7). Each aeon
+//! holds its latest **run** of parts on each target port (a relation's target channel: the human
+//! port for requests, the agent port for responses): a part opening on a target port joins its
+//! aeon's run there when that aeon's previous part on a target port lay on the same port, and
+//! otherwise begins a new run, releasing the aeon's former run on that port. So a request's human
+//! parts stay held through the response that answers them, and a response's agent parts through
+//! the human return that follows them, until the conversation turns to that port again. A declared
+//! relation is **held** when its target lies in the reading aeon's run on the target port, at the
+//! rank counted from the run's latest part among the run's parts; otherwise the law has already
+//! released its target, and the pointer codes the part as unheld ([`AdmittedReadout::released`]
+//! counts them). The law reads only the present incidence. The former law held a target exactly
+//! while a declared future relation still reached it, which read the future relations' count
+//! whenever a target's letter arrived. The held spans are the ports the admitted receivers read,
+//! never a record of the passage.
 //!
 //! [definition] The computational object is the helical pair interaction, read here as a receiver
 //! that reads a response against its request. Of the winding guide's six general objects this owner
@@ -415,13 +433,15 @@ impl PointerCode {
 }
 
 /// [definition; agent-inferred] **The admitted receivers' readout**: the inner egg's, each copy
-/// stage's (the face stage first), each relation's pointer code, and the spans held now and at the
-/// widest.
+/// stage's (the face stage first), each relation's pointer code, the declared relations whose
+/// targets retention had released when their reading parts opened (per kind, in
+/// [`RelationKind::ALL`]'s order), and the spans held now and at the widest.
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct AdmittedReadout {
     pub inner: BoundaryReadout,
     pub stages: Vec<StageReadout>,
     pub pointers: Vec<PointerReadout>,
+    pub released: Vec<u64>,
     pub retained: usize,
     pub retained_cells: usize,
     pub widest_cells: usize,
@@ -442,13 +462,18 @@ pub struct RequestFaceProvenance {
     pub copy_cell: Option<CopyCell>,
 }
 
-/// A target's span while a relation still reaches it.
+/// A part's span on a target port while its aeon's run holds it.
 #[derive(Clone, Debug)]
 struct Span {
     channel: usize,
-    ordinal: u64,
     cells: Vec<usize>,
-    remaining: u64,
+}
+
+/// Whether some relation's target lies on the channel (a target port, whose parts retention holds).
+fn target_port(channel: usize) -> bool {
+    RelationKind::ALL
+        .iter()
+        .any(|kind| kind.channels().1 == channel)
 }
 
 /// The open part: its letter tick, its channel, its held relation and its address on the target.
@@ -472,8 +497,14 @@ pub struct AdmittedEgg {
     stage: CopyStage,
     receipts: Vec<CopyStage>,
     pointers: Vec<PointerCode>,
+    released: Vec<u64>,
     spans: BTreeMap<u64, Span>,
-    targets: BTreeMap<u64, u64>,
+    /// Each aeon's latest run on each target port: its parts' letter ticks, in order.
+    runs: BTreeMap<(u64, usize), Vec<u64>>,
+    /// Each aeon's latest part's target port.
+    last: BTreeMap<u64, usize>,
+    aeon: u64,
+    entering: Option<u64>,
     open: Option<OpenPart>,
     parts: Vec<u64>,
     tick: u64,
@@ -512,10 +543,6 @@ impl AdmittedEgg {
                 "one relation a part, in letter order, each target before its reading part",
             ));
         }
-        let mut targets = BTreeMap::new();
-        for relation in &relations {
-            *targets.entry(relation.target).or_insert(0) += 1;
-        }
         Ok(Self {
             label,
             description,
@@ -529,8 +556,12 @@ impl AdmittedEgg {
                 .iter()
                 .map(|&kind| PointerCode::new(kind))
                 .collect(),
+            released: vec![0; RelationKind::ALL.len()],
             spans: BTreeMap::new(),
-            targets,
+            runs: BTreeMap::new(),
+            last: BTreeMap::new(),
+            aeon: 0,
+            entering: None,
             open: None,
             parts: vec![0; chart.channels()],
             tick: 0,
@@ -552,38 +583,44 @@ impl AdmittedEgg {
         &self.inner
     }
 
-    /// [definition; agent-inferred] **A branch at the present incidence**: a copy of this standing
-    /// that declares only the relations whose reading part has opened. A relation whose letter lies
-    /// ahead is the recorded future's exterior codec information, which a release branched from the
-    /// present must not read: the population's admission refuses a byte at a declared future letter
-    /// or target tick, so a branch carrying them would stop a release at the recorded part's length
-    /// (F0's acceptance run, its dry run on F4's passage: 8 of 32 releases). Withholding them moves
-    /// no face: a face reads only the open part's relation, whose target keeps its span, and a
-    /// withheld relation's count on a held target only held that span longer.
+    /// [definition; agent-inferred] **A branch at the present incidence**, the only future branch
+    /// ([`Family::branch_future`] is this law): a copy of this standing that declares only the
+    /// relations whose reading part has opened. A relation whose letter lies ahead is the recorded
+    /// future's exterior codec information, which a release branched from the present must not read:
+    /// the population's admission refuses a byte at a declared future letter or target tick, so a
+    /// branch carrying them would stop a release at the recorded part's length (F0's acceptance run,
+    /// its dry run on F4's passage: 8 of 32 releases). Withholding them moves nothing else: retention
+    /// reads only the present (module header), so no span, run or count depends on them.
     pub fn branch_at_present(&self) -> Self {
         let mut branch = self.clone();
-        let withheld = branch.relations.split_off(branch.next);
-        for relation in withheld {
-            if let Some(count) = branch.targets.get_mut(&relation.target) {
-                *count -= 1;
-                if *count == 0 {
-                    branch.targets.remove(&relation.target);
-                }
-            }
-            if let Some(span) = branch.spans.get_mut(&relation.target) {
-                span.remaining -= 1;
-                if span.remaining == 0 {
-                    branch.held -= span.cells.len();
-                    branch.spans.remove(&relation.target);
-                }
-            }
-        }
+        branch.relations.truncate(branch.next);
         branch
     }
 
+    /// [definition; agent-inferred] **Enter an aeon at the next section letter** (module header,
+    /// "The aeon"): the letter is read in the leaving aeon, then its part opens in the entered one,
+    /// where its relation is resolved and its span retained. Refused while another aeon waits to be
+    /// entered.
+    pub fn enter_aeon(&mut self, aeon: u64) -> Result<(), PopulationError> {
+        if self.entering.is_some() {
+            return Err(refuse(
+                "an aeon entered",
+                "one aeon is entered at a part's opening letter",
+            ));
+        }
+        self.inner.enter_aeon(aeon)?;
+        self.entering = Some(aeon);
+        Ok(())
+    }
+
+    /// The aeon the open part lies in.
+    pub fn aeon(&self) -> u64 {
+        self.aeon
+    }
+
     /// Check a request/response incidence while both its target and reading part are still ahead
-    /// of the clock. This does not create a span early: `open_part` creates and retains that span
-    /// when the target letter is actually received.
+    /// of the clock. This does not create a span early: `open_part` retains every target port's
+    /// part in its aeon's run when its letter is actually received.
     fn validate_planned_relation(&self, relation: Relation) -> Result<(), PopulationError> {
         if relation.target >= relation.letter || relation.target < self.tick {
             return Err(refuse(
@@ -621,7 +658,6 @@ impl AdmittedEgg {
         if insertion < self.next {
             self.next += 1;
         }
-        *self.targets.entry(relation.target).or_insert(0) += 1;
     }
 
     /// The open part's located continuation and its relation's kind, when a relation is held.
@@ -664,25 +700,38 @@ impl AdmittedEgg {
             .min()
     }
 
-    /// **Close the open part**: its relation's target is released once no relation still reaches
-    /// it.
-    fn close(&mut self) {
-        if let Some(OpenPart {
-            relation: Some((_, target)),
-            ..
-        }) = self.open.take()
-            && let Some(span) = self.spans.get_mut(&target)
+    /// **Retain a part opening on a target port** (module header, "Retention"): it joins its aeon's
+    /// run on the port when the aeon's previous part on a target port lay there, and otherwise
+    /// begins a new run, releasing the aeon's former run on the port.
+    fn retain(&mut self, letter: u64, channel: usize) {
+        if !target_port(channel) {
+            return;
+        }
+        if self.last.get(&self.aeon) != Some(&channel)
+            && let Some(run) = self.runs.remove(&(self.aeon, channel))
         {
-            span.remaining -= 1;
-            if span.remaining == 0 {
-                self.held -= span.cells.len();
-                self.spans.remove(&target);
+            for tick in run {
+                if let Some(span) = self.spans.remove(&tick) {
+                    self.held -= span.cells.len();
+                }
             }
         }
+        self.runs
+            .entry((self.aeon, channel))
+            .or_default()
+            .push(letter);
+        self.spans.insert(
+            letter,
+            Span {
+                channel,
+                cells: Vec::new(),
+            },
+        );
+        self.last.insert(self.aeon, channel);
     }
 
-    /// **Open a part at its letter**: the pointer coded on each relation it reads, its relation
-    /// held, and its span retained when a relation reaches it.
+    /// **Open a part at its letter** in the entered aeon: the pointer coded on each relation it
+    /// reads, its relation held when retention holds its target, and the part retained.
     fn open_part(
         &mut self,
         letter: u64,
@@ -694,6 +743,12 @@ impl AdmittedEgg {
             .get(self.next)
             .filter(|relation| relation.letter == letter)
             .copied();
+        if declared.is_some_and(|declared| declared.kind.channels().0 != channel) {
+            return Err(refuse(
+                "an admitted relation",
+                "its letter opens a part on the relation's reading port",
+            ));
+        }
         let mut relation = None;
         for kind in RelationKind::ALL {
             let (reader, target_channel) = kind.channels();
@@ -702,44 +757,30 @@ impl AdmittedEgg {
             }
             let rank = match declared.filter(|declared| declared.kind == kind) {
                 Some(declared) => {
-                    let span = self
-                        .spans
-                        .get(&declared.target)
-                        .filter(|span| span.channel == target_channel)
-                        .ok_or_else(|| {
-                            refuse(
-                                "an admitted relation",
-                                "its target is an earlier part on the target's port",
-                            )
-                        })?;
-                    let count = self.parts[target_channel];
-                    relation = Some((kind, declared.target));
-                    Some((declared.target, count - 1 - span.ordinal, count))
+                    let held = self.runs.get(&(self.aeon, target_channel)).and_then(|run| {
+                        run.iter()
+                            .rposition(|&tick| tick == declared.target)
+                            .map(|at| (run.len() as u64, at as u64))
+                    });
+                    match held {
+                        Some((count, at)) => {
+                            relation = Some((kind, declared.target));
+                            Some((declared.target, count - 1 - at, count))
+                        }
+                        None => {
+                            self.released[kind.index()] += 1;
+                            None
+                        }
+                    }
                 }
                 None => None,
             };
             self.pointers[kind.index()].read(section_kind, rank)?;
         }
         if declared.is_some() {
-            if relation.is_none() {
-                return Err(refuse(
-                    "an admitted relation",
-                    "its letter opens a part on the relation's reading port",
-                ));
-            }
             self.next += 1;
         }
-        if let Some(&remaining) = self.targets.get(&letter) {
-            self.spans.insert(
-                letter,
-                Span {
-                    channel,
-                    ordinal: self.parts[channel],
-                    cells: Vec::new(),
-                    remaining,
-                },
-            );
-        }
+        self.retain(letter, channel);
         self.parts[channel] += 1;
         self.open = Some(OpenPart {
             letter,
@@ -780,8 +821,10 @@ impl Family for AdmittedEgg {
         }
     }
 
+    /// The branch at the present incidence ([`AdmittedEgg::branch_at_present`]): a future branch
+    /// never carries the recorded future's relations.
     fn branch_future(&self) -> Option<Box<dyn Family>> {
-        Some(Box::new(self.clone()))
+        Some(Box::new(self.branch_at_present()))
     }
 
     fn owns_planned_relation(&self) -> bool {
@@ -817,6 +860,12 @@ impl Family for AdmittedEgg {
         if cell >= alphabet {
             return Err(PopulationError::CellOutside { cell, alphabet });
         }
+        if self.entering.is_some() && self.chart.section(cell).is_none() {
+            return Err(refuse(
+                "an aeon entered",
+                "the admitted receivers enter an aeon at the section letter that opens its part",
+            ));
+        }
         let located = self.located().filter(|&(kind, located)| {
             self.least(kind)
                 .is_some_and(|least| located.length >= least)
@@ -848,7 +897,10 @@ impl Family for AdmittedEgg {
         self.passage.face(&face)?;
         match section {
             Some(section) => {
-                self.close();
+                self.open = None;
+                if let Some(aeon) = self.entering.take() {
+                    self.aeon = aeon;
+                }
                 self.open_part(self.tick, section.channel, section.kind)?;
             }
             None => self.read_byte(cell),
@@ -857,50 +909,51 @@ impl Family for AdmittedEgg {
         Ok(face)
     }
 
-    /// The inner egg admits the passage, and every declared relation within it opens on a letter
-    /// of its reading port whose target is a letter of the target's port (held, when earlier).
+    /// The inner egg admits the passage, and every declared relation whose letter or target lies
+    /// within it opens on a letter of its port; an earlier target still held lies on the target's
+    /// port (one retention has released leaves its reading part unheld).
     fn admits(&self, cells: &[usize]) -> Result<(), PopulationError> {
         self.inner.admits(cells)?;
+        if let (Some(_), Some(&first)) = (self.entering, cells.first())
+            && self.chart.section(first).is_none()
+        {
+            return Err(refuse(
+                "an aeon entered",
+                "the admitted receivers enter an aeon at the section letter that opens its part",
+            ));
+        }
         let end = self.tick + cells.len() as u64;
+        let within = |tick: u64| (self.tick..end).contains(&tick);
         let letter_on = |tick: u64, channel: usize| -> bool {
-            if tick >= self.tick {
-                cells
-                    .get((tick - self.tick) as usize)
-                    .and_then(|&cell| self.chart.section(cell))
-                    .is_some_and(|section| section.channel == channel)
-            } else {
-                self.spans
-                    .get(&tick)
-                    .is_some_and(|span| span.channel == channel)
-            }
+            cells
+                .get((tick - self.tick) as usize)
+                .and_then(|&cell| self.chart.section(cell))
+                .is_some_and(|section| section.channel == channel)
         };
         for relation in &self.relations[self.next..] {
             let (reader, target) = relation.kind.channels();
-            if (self.tick..end).contains(&relation.target) && !letter_on(relation.target, target) {
+            if within(relation.target) && !letter_on(relation.target, target) {
                 return Err(refuse(
                     "a planned admitted relation's target",
                     "it opens as a letter on the target port before any state changes",
                 ));
             }
-            if (self.tick..end).contains(&relation.letter) && !letter_on(relation.letter, reader) {
+            if within(relation.letter) && !letter_on(relation.letter, reader) {
                 return Err(refuse(
                     "a planned admitted relation's reading part",
                     "it opens as a letter on the reading port before any state changes",
                 ));
             }
-        }
-        for relation in &self.relations[self.next..] {
-            if relation.letter >= end {
-                break;
-            }
-            let (reader, target) = relation.kind.channels();
-            if relation.letter < self.tick
-                || !letter_on(relation.letter, reader)
-                || !letter_on(relation.target, target)
+            if within(relation.letter)
+                && relation.target < self.tick
+                && self
+                    .spans
+                    .get(&relation.target)
+                    .is_some_and(|span| span.channel != target)
             {
                 return Err(refuse(
                     "an admitted relation of a passage",
-                    "its letter opens a part on its reading port and its target a part on the target's port",
+                    "its held target is a part on the target's port",
                 ));
             }
         }
@@ -931,6 +984,7 @@ impl Family for AdmittedEgg {
                 .iter()
                 .map(|pointer| pointer.readout.clone())
                 .collect(),
+            released: self.released.clone(),
             retained: self.spans.len(),
             retained_cells: self.held,
             widest_cells: self.widest,

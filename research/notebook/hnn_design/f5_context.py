@@ -9,6 +9,10 @@ The prospective F5 consumer is the request/response helical pair: request and
 response are its receiving ports, while this packet supplies the request-side
 tube and its continuation thread. Helix, pair and cell holonomy remain attached.
 Winding objects touched: faces/placement, tube, and tower thread.
+
+A full-source manifest that does not name the development reserve as excluded (every source written
+before the reserve was named) is refused unless the logged flag `--read-reserve` is passed
+(`development_families.py`).
 """
 
 from __future__ import annotations
@@ -20,6 +24,8 @@ import os
 import sys
 from pathlib import Path
 from typing import BinaryIO, Mapping, Sequence
+
+from development_families import require_reserve_excluded, reserve_flag
 
 
 class ContextRefusal(ValueError):
@@ -228,7 +234,13 @@ def main() -> None:
     parser.add_argument("--output", type=Path, required=True, help="owner-only JSONL context packets")
     parser.add_argument("--context-cells", type=int, required=True,
                         help="caller-declared n* ceiling for causal context cells")
-    args = parser.parse_args()
+    arguments, read_reserve = reserve_flag(sys.argv[1:], "f5_context.py")
+    args = parser.parse_args(arguments)
+    with args.manifest.open("rb") as handle:
+        manifest = json.load(handle)
+    if manifest.get("schema") != "holonics.curated-source.v1":
+        raise ContextRefusal("unexpected full-source manifest schema")
+    require_reserve_excluded(manifest, "the full development curated source", read_reserve)
 
     # Read only request ordinals from the selector. Its request text is not used;
     # selected response ordinals are validated as later coordinates and discarded.
@@ -242,10 +254,6 @@ def main() -> None:
     coordinates = [parse_coordinates(item.get("coordinate", "")) for item in items]
     request_ordinals = [request for _, request in coordinates]
     response_ordinals = {response for response, _ in coordinates}
-    with args.manifest.open("rb") as handle:
-        manifest = json.load(handle)
-    if manifest.get("schema") != "holonics.curated-source.v1":
-        raise ContextRefusal("unexpected full-source manifest schema")
     source_cell_extent = manifest.get("development_stream_cells")
     if not isinstance(source_cell_extent, int) or source_cell_extent < 0:
         raise ContextRefusal("manifest has no full-source cell extent")

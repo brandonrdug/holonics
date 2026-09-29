@@ -4,15 +4,20 @@ Only development incidence and request text, plus choosing-family response text,
 The validation responses are not sought or decoded. The owner-only output contains the selected
 requests and control responses for the later release inspection; stdout is counts and hashes.
 
-    HOLONICS_ROOT=<checkout with private cuts> python3 f4_retrospective.py
+    HOLONICS_ROOT=<checkout with private cuts> python3 f4_retrospective.py --read-reserve
+
+F4's and F5's splits are spent family-unit splits, reshuffles of read material that hold the
+development reserve (`development_families.py`), so this selector runs only with the logged flag
+`--read-reserve`, to reproduce its receipt.
 """
 
 import hashlib
 import json
 import os
+import sys
 from array import array
 
-from development_families import PARTITION, SEED, assignment
+from development_families import PARTITION, READ_RESERVE, SEED, family_assignment, reserve_flag
 from standing_cut import OUT_DIR, SOURCE, private_directory, private_write
 
 LIMIT = 32
@@ -36,7 +41,7 @@ def role_by_event(item, seed):
                 continue
             family = header_object(prefix, "family")
             position = header_object(prefix, "position")
-            role, _ = assignment(family, seed)
+            role, _ = family_assignment(family, seed)
             counts[role] += 1
             roles[position["first_event"]] = role
     with open(os.path.join(OUT_DIR, f"development-families-{item.lower()}.json"), "rb") as handle:
@@ -93,6 +98,12 @@ def best_control(request, before, candidates):
 
 def main(item="F4"):
     assert item in ("F4", "F5")
+    arguments, read_reserve = reserve_flag(sys.argv[1:], f"{item.lower()}_retrospective.py")
+    if arguments:
+        sys.exit(__doc__)
+    if not read_reserve:
+        sys.exit(f"refused: {item}'s split is spent and holds the development reserve; pass "
+                 f"{READ_RESERVE} (logged) to reproduce its receipt")
     seed = SEED if item == "F4" else "holonics-f5-development-families-2026-09-27-v1"
     roles = role_by_event(item, seed)
     with open(os.path.join(OUT_DIR, "curated-source.incidence.jsonl"), "rb") as handle:

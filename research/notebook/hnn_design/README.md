@@ -46,7 +46,7 @@ docstring says otherwise.
 | `exterior.rs` | The shared exterior boundary the examples include | | |
 | `standing_cut.py` | Pins the standing real cut (`6148`) and the wide cut (`wide 1048576`) | `python3 research/notebook/hnn_design/standing_cut.py 6148` | [campaign 1 meets its criterion](../../records/2026-09-26_CAMPAIGN_ONE_MEETS_ITS_CRITERION_THE_TREE_RECEIVES_AND_THE_WAVE_IS_WEIGHED.md), [at scale](../../records/2026-09-26_THE_LANDMARK_TREE_AT_SCALE_THE_STOP_PRIOR_LOCAL_WEIGHING_THE_WIDE_CUT_AND_THE_STORAGE_WHERE_PATHS_PART.md) |
 | `curated_source.py`, `curated_incidence.py` | The curated source, its pinned cut and flat twin; the admitted relations on the cut | `HOLONICS_ROOT=$PWD python3 research/notebook/hnn_design/curated_source.py 1048576` | [the receiving population](../../records/2026-09-27_THE_RECEIVING_POPULATION_WAS_BUILT_ON_TERRAIN_WITH_KNOWN_TRUTH_AND_THE_CURATED_SOURCE_NOW_CODES_BELOW_THE_FLAT_STREAM.md) |
-| `development_families.py`, `family_passage.py` | The F-items' and U2's family splits and their joined passages | `HOLONICS_ROOT=$PWD python3 research/notebook/hnn_design/development_families.py [F1 \| F2 \| F5 \| U2 \| F2V2]` | [F4](../../records/2026-09-27_F4_DEVELOPMENT_FAMILY_SPLIT_AND_RELEASE_GATE.md), [U2's acceptance run](../../records/2026-09-28_U2_F0S_MEMORY_ACCEPTANCE_RUN_PINNED_BEFORE_ITS_SPLIT_IS_READ.md) |
+| `development_families.py`, `family_passage.py` | The split by conversation with the development reserve (U6), the spent family splits (F-items, U2) behind `--read-reserve`, and their joined passages | `HOLONICS_ROOT=$PWD python3 research/notebook/hnn_design/development_families.py [U6]` | [F4](../../records/2026-09-27_F4_DEVELOPMENT_FAMILY_SPLIT_AND_RELEASE_GATE.md), [U2's acceptance run](../../records/2026-09-28_U2_F0S_MEMORY_ACCEPTANCE_RUN_PINNED_BEFORE_ITS_SPLIT_IS_READ.md) |
 | `f1_dictionary.py`, `f1_validation_part.py` | F1's dictionary on choosing cells; its bounded held-out part | `HOLONICS_ROOT=$PWD python3 research/notebook/hnn_design/f1_dictionary.py` | [F1](../../records/2026-09-27_F1_WORD_ALPHABET_GATE.md) |
 | `f2_capacity_probe.py` | F2's capacity-admissible byte-chart cut; with `F2V2`, the adoption gate's probe over the fresh split and the declared validation passage's counts | `HOLONICS_ROOT=$PWD python3 research/notebook/hnn_design/f2_capacity_probe.py [F2 \| F2V2]` | [F2](../../records/2026-09-27_F2_FIELD_FAMILY_GATE.md), [THE_REBUILD F2](../../../docs/plans/THE_REBUILD.md#f2-the-field-as-a-family-step-4-73) |
 | `f4_retrospective.py` | F4's selected requests and retrieval control | `HOLONICS_ROOT=$PWD python3 research/notebook/hnn_design/f4_retrospective.py` | [F4](../../records/2026-09-27_F4_DEVELOPMENT_FAMILY_SPLIT_AND_RELEASE_GATE.md) |
@@ -1638,9 +1638,12 @@ HOLONICS_ROOT=$PWD python3 research/notebook/hnn_design/release_legibility.py .l
 the flat tree over the flat twin; the charged comparison against the pinned margin; the standing
 whole, its readings line and without it; the validation passage's time and the resident set against
 the budgets; and the releases at the hash-ordered validation responses (the egg's future branched at
-the response's opening under the scored law, the flat tree's at its first byte, the held-out truth
+the response's opening under the scored law, the flat tree's at its first byte, the logged reply
 beside them), their text written owner-only. With `none` in place of the release file it reads the
-code alone (the margin's dry runs on the spent passages).
+code alone (the margin's dry runs on the spent passages). F0's split is spent and holds the
+development reserve (U6, below), so the commands above run only with `--read-reserve`, and the run's
+receipts reproduce at `adc2cfbc`: since U6 the harness enters each conversation's aeon, retains by
+the present law, and gives the flat tree the egg's cap in place of the logged reply's length.
 
 - **The margin's dry runs** (spent splits only, before the split): the uncharged difference on F1's,
   F4's, F5's and U2's passages `−279 + 10/16`, `−726 + 9/16`, `−672 + 15/16`, `−812 + 9/16` (each
@@ -1652,7 +1655,51 @@ code alone (the margin's dry runs on the spent passages).
   (the bytes alone `−1981 + 0/16 + ε` uncharged; the 936 stops `1640 + 7/16 + ε`); the standing
   2,044 bytes a cell against 1,298 (1,131 without the readings); the validation reading 48,562 ms.
   The releases: 28 texts of 32, 1,186 of 1,513 word tokens real (the flat tree's 1,626 of 2,096, the
-  truths' 3,056 of 3,232).
+  logged replies' 3,056 of 3,232).
+
+### U6: the data protocol, by conversation, with a reserve nothing reads (September 29)
+
+Record: [the text chart, audited](../../records/2026-09-29_THE_TEXT_CHART_AUDITED_ONE_PREDICTOR_SEEN_CONVERSATIONS_AND_NO_ARITHMETIC.md),
+§4 item 1; plan: THE_REBUILD U6. Refs #73 #148 #63.
+
+The split's unit is the conversation (the aeon), and the reserve is named before any role is read.
+Count-only, on the development partition's metadata (keys, sessions, ports and links; no text):
+
+```sh
+HOLONICS_ROOT=$PWD python3 research/notebook/hnn_design/development_families.py U6
+```
+
+- **The roles** (86 units: 87 conversations, one relation joining two): choosing 61 conversations
+  (60 units) and 16,314 messages; validation 11 conversations and 682 messages; the reserve 15
+  conversations and 5,453 messages. The validation role drew 11 of 71 units at one in five, and
+  small ones.
+- **The checks**: conversations with messages in two roles 0; `comparison-request` 16,698 within a
+  role, 0 across, 3,555 outside the partition; `later-human-after-agent` 1,374, 0, 757;
+  `provider-parent` 3, 0, 6,782.
+- **The reserve**: `RESERVE_SIZE = 15` (the least `k` whose mean over `k` of 87 conversations reads
+  no less sharply than validation's at one in five of the rest, `72·71 = 5112 ≤ 4·1290 = 5160`),
+  named `09d7ae5b86d1b34cd1f57a100fb0ec412f59902f6ec3b90924a7c80b136f8a24`, committed in
+  `development_families.py` and `exterior.rs`. The membership is
+  `19f8b42d46e1ea96dbcaa2f8e83029ab9c9b92a5dd7cee9b138244d8207a6e75`. The reserve's conversations
+  were read by every earlier split (F0's choosing role held all 87): it is unread from its naming
+  on.
+- **The present retention law on the incidence** (by message; choosing and validation only): of the
+  choosing role's requests, 12,254 are held at rank class 0 (their run's latest message), 7 released
+  and 2,207 reach no earlier development part with cells; of its human returns 1,105 are held at rank
+  class 0 and 1 reaches another conversation (the joined pair); in validation every request and
+  return that reaches an earlier part with cells, 462 and 53, is held at rank class 0. The reserve's
+  messages are not read, not even for their ports.
+- **The guard**: every script that reads the source, a cut or a receipt refuses the reserve's
+  material unless `--read-reserve` is passed, logged to `.local/cuts/reserve-reads.log`; no run
+  passed it. Every artifact written before the reserve was named is refused (the spent F4, F1, F2,
+  F2V2, F5, U2 and F0 splits are reshuffles of read material).
+- **Checked on a synthetic source** (24 made-up conversations, no private data): the scripts emit the
+  roles, their incidence, the joined passage and its aeons end to end, and `f0-acceptance` reads it
+  with 126 conversation changes entered; without `--read-reserve` the harness refuses the synthetic
+  cut, which does not name the committed reserve.
+
+The roles' streams (`curated_source.py 524288 <role>`, `curated_incidence.py <role>`,
+`family_passage.py`) are generated by the loop that measures them, after its pins.
 
 ### F0 candidate 3: learned tokens with the receiving tree over them (September 28)
 

@@ -5,6 +5,9 @@ earlier choosing retrieval control but no selected recorded reply. The first has
 request and its exact draw key are written owner-only; stdout is counts and hashes.
 
     HOLONICS_ROOT=<checkout with private cuts> python3 f5_dev_request.py
+
+The selection comes from F5's spent diagnostic split, which holds the development reserve, so it is
+refused unless the logged flag `--read-reserve` is passed (`development_families.py`).
 """
 
 import hashlib
@@ -12,14 +15,17 @@ import json
 import os
 import sys
 
+from development_families import require_reserve_excluded, reserve_flag
 from standing_cut import OUT_DIR, private_directory, private_write
 
 
 def main():
-    if sys.argv[1:]:
+    arguments, read_reserve = reserve_flag(sys.argv[1:], "f5_dev_request.py")
+    if arguments:
         sys.exit(__doc__)
     with open(os.path.join(OUT_DIR, "f5-retrospective.json"), "rb") as handle:
         selection = json.load(handle)
+    require_reserve_excluded(selection, "the F5 retrospective selection", read_reserve)
     assert selection["schema"] == "holonics.f5-retrospective.v1"
     assert selection["items"] and selection["selected"] == len(selection["items"])
     item = selection["items"][0]

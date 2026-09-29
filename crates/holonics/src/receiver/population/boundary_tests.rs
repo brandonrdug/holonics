@@ -363,3 +363,137 @@ fn a_population_selects_the_boundary_egg_over_its_tree_alone_on_sectioned_prose(
         "the part clock pays on sectioned prose"
     );
 }
+
+/// One conversation's parts: its aeon, each part's section kind, channel and bytes.
+type Conversation = (u64, Vec<(usize, usize, &'static [u8])>);
+
+/// [THE_REBUILD U6, the audit's §4 item 1: the acceptance of state per conversation] **Two
+/// interleaved conversations are coded identically to each coded alone, context for context.** Each
+/// conversation alone is its own cells from the interleaved stream (its letters as they stand
+/// there). In the interleaved passage, every byte is read in exactly the addresses (the byte tree's
+/// and the letter tree's) it has in its conversation alone; the letter that switches is read in the
+/// leaving conversation's addresses, exactly those that conversation alone has at its next letter.
+/// The flat control, a cell-only tree entering each part's aeon before its first byte, reads every
+/// byte in the address it has alone. Without the aeons the second conversation's bytes would enter
+/// the first's context.
+#[test]
+fn two_interleaved_conversations_are_coded_identically_to_each_coded_alone() {
+    let a: Conversation = (
+        4,
+        vec![
+            (0, 0, b"Read alpha now."),
+            (1, 1, b"Alpha holds two lines."),
+            (1, 0, b"Thanks.\n"),
+        ],
+    );
+    let b: Conversation = (
+        9,
+        vec![(0, 0, b"What is beta?"), (1, 1, b"Beta is a letter.")],
+    );
+    // The stream: a's first part, b's, a's second, b's second, a's third.
+    let order = [(0usize, 0usize), (1, 0), (0, 1), (1, 1), (0, 2)];
+    let conversations = [&a, &b];
+    let cells_of = |(kind, channel, text): (usize, usize, &[u8])| -> Vec<usize> {
+        std::iter::once(letter(kind, channel))
+            .chain(text.iter().map(|&byte| usize::from(byte)))
+            .collect()
+    };
+    let flat_tree = || {
+        TreeFamily::new(
+            LandmarkDeclaration {
+                alphabet: 256,
+                depth: 5,
+                forced: 0,
+                population: POPULATION,
+                grain: GRAIN,
+                family: Default::default(),
+                prior: StopPrior::half(),
+                capacity: Capacity::Unbounded,
+            },
+            1,
+        )
+        .expect("a cell-only tree")
+    };
+    let mut interleaved = egg();
+    let mut flat = flat_tree();
+    let mut alone = [egg(), egg()];
+    let mut flat_alone = [flat_tree(), flat_tree()];
+    let mut previous: Option<usize> = None;
+    let mut read = 0;
+    for (conversation, part) in order {
+        let (aeon, parts) = conversations[conversation];
+        let cells = cells_of(parts[part]);
+        if let Some(leaving) = previous.filter(|&leaving| leaving != conversation) {
+            assert_eq!(
+                interleaved.addresses().expect("the addresses"),
+                alone[leaving].addresses().expect("the addresses"),
+                "the switching letter is read where the leaving conversation reads its next letter"
+            );
+        }
+        interleaved
+            .enter_aeon(*aeon)
+            .expect("an aeon at its letter");
+        interleaved.receive(cells[0]).expect("the part's letter");
+        alone[conversation]
+            .receive(cells[0])
+            .expect("the part's letter alone");
+        flat.enter_aeon(*aeon)
+            .expect("a cell-only tree enters at once");
+        for &cell in &cells[1..] {
+            assert_eq!(
+                interleaved.addresses().expect("the addresses"),
+                alone[conversation].addresses().expect("the addresses"),
+                "a byte is read in its own conversation's addresses"
+            );
+            assert_eq!(
+                flat.address(),
+                flat_alone[conversation].address(),
+                "the flat control reads a byte in its own conversation's address"
+            );
+            interleaved.receive(cell).expect("a byte");
+            alone[conversation].receive(cell).expect("a byte alone");
+            flat.receive(cell).expect("a flat byte");
+            flat_alone[conversation]
+                .receive(cell)
+                .expect("a flat byte alone");
+            read += 1;
+        }
+        previous = Some(conversation);
+    }
+    assert_eq!(read, 75, "every byte compared");
+    assert_eq!(interleaved.aeon(), 4);
+    // A checkpoint keeps both conversations' addresses: the restored egg continues identically.
+    let bytes = interleaved.encode_checkpoint();
+    let mut restored = BoundaryEgg::decode_checkpoint(egg(), &bytes).expect("a restored egg");
+    let flat_bytes = flat.encode_checkpoint();
+    let restored_flat =
+        TreeFamily::decode_checkpoint(flat.tree().declaration().clone(), 1, None, &flat_bytes)
+            .expect("a restored flat tree");
+    assert_eq!(restored_flat.address(), flat.address());
+    interleaved.enter_aeon(9).expect("b again");
+    restored.enter_aeon(9).expect("b again");
+    for cell in cells_of((1, 0, b"Ok.")) {
+        assert_eq!(restored.receive(cell), interleaved.receive(cell));
+        assert_eq!(restored.addresses(), interleaved.addresses());
+    }
+    assert_eq!(
+        restored.encode_checkpoint(),
+        interleaved.encode_checkpoint()
+    );
+}
+
+#[test]
+fn an_aeon_is_entered_only_at_a_letter() {
+    let mut egg = egg();
+    egg.receive(letter(0, 0)).expect("an opening letter");
+    egg.enter_aeon(3).expect("declared before the next letter");
+    assert!(egg.enter_aeon(5).is_err(), "one aeon waits at a time");
+    assert!(
+        egg.receive(usize::from(b'x')).is_err(),
+        "a byte cannot enter it"
+    );
+    assert!(egg.admits(&[usize::from(b'x')]).is_err());
+    egg.receive(letter(1, 1))
+        .expect("the switching letter enters it");
+    assert_eq!(egg.aeon(), 3);
+}

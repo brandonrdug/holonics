@@ -43,7 +43,7 @@
 //! past it the family is refused with the Bombe that owns the larger space ([`MOIRE_BOMBE`], owed;
 //! [`ROTOR_BOMBE`], built).
 
-use std::collections::VecDeque;
+use std::collections::{BTreeMap, VecDeque};
 
 use num_bigint::{BigInt, BigUint};
 use num_traits::ToPrimitive;
@@ -84,6 +84,18 @@ pub const ROTOR_BOMBE: &str =
 /// cells ([`TreeFamily::new`]), or on a curated stream the cells bundled with their part's slots,
 /// read once at the section ([`TreeFamily::sectioned`], the typed address of
 /// `compression::landmark::context::sections`: the joint address across ports).
+///
+/// [definition; agent-inferred] **The address per aeon** ([`TreeFamily::enter_aeon`]; THE_REBUILD
+/// U6, the audit of September 29, §4 item 1). A passage that interleaves conversations (aeons) keeps
+/// one address per aeon: the tree's counts, its constitution, stay one, and only the last `D` ticks it
+/// reads are the entered aeon's own, so a switch never splices another conversation's ticks into the
+/// context. An aeon is entered at the tick that opens its part. On a sectioned tree that tick is the
+/// section letter: it is read in the leaving aeon's address (it closes that aeon's part), deposited
+/// there, and then pushed onto the entered aeon's address, whose part it opens. On a cell-only tree
+/// (the flat control, which has no letters) the aeon's address returns before the part's first cell.
+/// So every cell is read in the address it has in its own aeon coded alone, except the letter that
+/// switches, which is read in the address the leaving aeon has at its next letter. A leaving aeon's
+/// address is kept while it is away (the bounded last `D` ticks, never a record of its passage).
 #[derive(Clone)]
 pub struct TreeFamily {
     label: String,
@@ -91,6 +103,9 @@ pub struct TreeFamily {
     tree: Landmarks,
     sections: Option<Sections>,
     past: VecDeque<Letter>,
+    aeon: u64,
+    aeons: BTreeMap<u64, VecDeque<Letter>>,
+    entering: Option<u64>,
     passage: PassageCode,
     received: u64,
 }
@@ -118,6 +133,9 @@ impl TreeFamily {
             tree: Landmarks::new(declaration)?,
             sections: None,
             past: VecDeque::new(),
+            aeon: 0,
+            aeons: BTreeMap::new(),
+            entering: None,
             passage: PassageCode::new(),
             received: 0,
         })
@@ -153,6 +171,9 @@ impl TreeFamily {
             tree: Landmarks::new(declaration)?,
             sections: Some(sections),
             past: VecDeque::new(),
+            aeon: 0,
+            aeons: BTreeMap::new(),
+            entering: None,
             passage: PassageCode::new(),
             received: 0,
         })
@@ -163,9 +184,72 @@ impl TreeFamily {
         &self.tree
     }
 
-    /// The address of the next cell: the last `D` ticks' letters, newest first, `Boundary` before
-    /// the first.
-    fn address(&self) -> Vec<Letter> {
+    /// The aeon whose address the next cell reads (`0` before any is entered).
+    pub fn aeon(&self) -> u64 {
+        self.aeon
+    }
+
+    /// The aeon waiting to be entered at the next section letter, if any.
+    pub(crate) fn entering(&self) -> Option<u64> {
+        self.entering
+    }
+
+    /// Whether the tree reads a curated stream's typed ticks (its letters open the parts).
+    pub(crate) fn is_sectioned(&self) -> bool {
+        self.sections.is_some()
+    }
+
+    /// The aeons away, whose addresses are kept, in order.
+    pub(crate) fn aeons_away(&self) -> impl Iterator<Item = u64> + '_ {
+        self.aeons.keys().copied()
+    }
+
+    /// [definition; agent-inferred] **Enter an aeon** (the type's header, "The address per aeon"):
+    /// declared before the tick that opens its part. A sectioned tree enters it at that tick, which
+    /// must be a section letter, after the letter is read in the leaving aeon's address; a cell-only
+    /// tree enters it now. Refused while another aeon waits to be entered.
+    pub fn enter_aeon(&mut self, aeon: u64) -> Result<(), PopulationError> {
+        if self.entering.is_some() {
+            return Err(refuse(
+                "an aeon entered",
+                "one aeon is entered at a part's opening tick",
+            ));
+        }
+        if self.sections.is_some() {
+            self.entering = Some(aeon);
+        } else {
+            self.switch_aeon(aeon);
+        }
+        Ok(())
+    }
+
+    /// The leaving aeon's address kept (none kept empty), and the entered aeon's returned.
+    fn switch_aeon(&mut self, aeon: u64) {
+        if aeon == self.aeon {
+            return;
+        }
+        let leaving = std::mem::take(&mut self.past);
+        if !leaving.is_empty() {
+            self.aeons.insert(self.aeon, leaving);
+        }
+        self.past = self.aeons.remove(&aeon).unwrap_or_default();
+        self.aeon = aeon;
+    }
+
+    /// Refused when an aeon waits to be entered and the cell is not a section letter.
+    fn entered_at(&self, cell: usize) -> Result<(), PopulationError> {
+        match (&self.sections, self.entering) {
+            (Some(sections), Some(_)) if sections.chart().section(cell).is_none() => Err(refuse(
+                "an aeon entered",
+                "a sectioned tree enters an aeon at the section letter that opens its part",
+            )),
+            _ => Ok(()),
+        }
+    }
+
+    /// The address of the next cell: the entered aeon's last `D` ticks' letters, newest first,
+    /// `Boundary` before its first.
+    pub(crate) fn address(&self) -> Vec<Letter> {
         let depth = self.tree.declaration().depth;
         (0..depth)
             .map(|back| {
@@ -184,9 +268,10 @@ impl TreeFamily {
     }
 
     /// **Receive one cell digit by digit** (the boundary egg's reading of its byte tree): the
-    /// executed face and each opened digit's split, read before the deposit, then the deposit and
-    /// the tick's letter pushed onto the address.
+    /// executed face and each opened digit's split, read before the deposit, then the deposit, an
+    /// aeon waiting at this letter entered, and the tick's letter pushed onto the address.
     pub(crate) fn receive_digits(&mut self, cell: usize) -> Result<DigitsReading, PopulationError> {
+        self.entered_at(cell)?;
         let letter = match &self.sections {
             Some(sections) => sections.letter_of(cell)?,
             None => Letter::Cell(cell),
@@ -196,6 +281,9 @@ impl TreeFamily {
             sections.read(cell)?;
         }
         self.passage.face(&reading.reading.executed)?;
+        if let Some(aeon) = self.entering.take() {
+            self.switch_aeon(aeon);
+        }
         self.past.push_back(letter);
         if self.past.len() > self.tree.declaration().depth {
             self.past.pop_front();
@@ -270,6 +358,9 @@ impl Family for TreeFamily {
                 "a typed tree family's passage",
                 "a section letter opens its first part before any byte",
             ));
+        }
+        if let Some(&first) = cells.first() {
+            self.entered_at(first)?;
         }
         Ok(())
     }

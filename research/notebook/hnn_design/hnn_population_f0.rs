@@ -34,9 +34,17 @@
 //!   32 order keys among the eligible, module constants), the egg's future is branched at the
 //!   response's opening and released under the scored law (`Population::release_response`, the egg
 //!   alone named by 0 bits) with a cap of [`RELEASE_CAP`] bytes; the flat tree's future is branched
-//!   at the same byte and draws as many bytes as the logged reply holds (its stop observed, never
-//!   predicted; the logged reply is observed conduct, not a target, and the length it lends the flat
-//!   control is a borrowing the audit of September 29 names), from the same keys. The text of each goes to the owner-only file.
+//!   at the same byte and, having no stop to draw, draws the same cap's bytes from the same keys. It
+//!   is given no length: the logged reply is observed conduct, never a target, and the length it lent
+//!   the flat control is retired (the audit of September 29, finding 7; THE_REBUILD U6). The logged
+//!   reply is shown beside the releases, and the text of each goes to the owner-only file.
+//! - **The aeons** (the audit's §4 item 1; THE_REBUILD U6): a passage whose cut carries its aeons
+//!   (`<cut>.aeons.bin`, `curated_source.py`) is read with each conversation's context its own. The
+//!   egg enters a part's aeon at its letter (`AdmittedEgg::enter_aeon`), and the flat tree enters it
+//!   before the part's first byte (`TreeFamily::enter_aeon`), so the comparison stays symmetric.
+//! - **The reserve**: every cut read must name the development reserve as excluded
+//!   (`exterior::RESERVE_SHA256`) unless `--read-reserve` is passed; F0's own passage predates the
+//!   reserve and holds it, so its receipts reproduce at `adc2cfbc`.
 //! - **The guards**: a passage past 600,000 ms or a resident set past 20,000,000,000 bytes stops the
 //!   run; its partial evidence is printed as incomplete.
 
@@ -59,7 +67,8 @@ use super::curated::{
     joined, point, sum,
 };
 use super::exterior::{
-    against, enclosure, per, read_curated, read_cut, read_incidence, reading_of, resident_set,
+    RESERVE_SHA256, against, enclosure, per, read_aeons, read_curated, read_cut, read_incidence,
+    reading_of, reserve_read, resident_set,
 };
 
 /// **The margin `m` in bits** (the record's pin 6): the range of the uncharged conditional
@@ -339,7 +348,8 @@ fn release_egg(
 }
 
 /// **The flat tree's release** at the response's first byte: a branch of its future drawing
-/// `length` bytes from its exact face, from the same keys.
+/// `length` bytes from its exact face, from the same keys; the caller passes the egg's cap, never a
+/// logged reply's length.
 fn release_flat(tree: &TreeFamily, length: usize, key: u64) -> (Vec<u8>, u128) {
     let clock = Instant::now();
     let mut branch = Family::branch_future(tree).expect("the flat tree branches its future");
@@ -453,6 +463,30 @@ pub fn acceptance(curated_path: &str, flat_path: &str, releases_path: &str) {
         "identical held-out cells"
     );
     let relations = read_incidence(curated_path);
+    // The aeons (module header): each conversation change's letter tick and the aeon it enters,
+    // and for the flat twin the position of the part's first byte (a later mark at one position
+    // is the one entered). A cut written without its aeons reads as one aeon.
+    let aeons_file = curated_path.strip_suffix(".bin").map_or_else(
+        || format!("{curated_path}.aeons.bin"),
+        |stem| format!("{stem}.aeons.bin"),
+    );
+    let aeons: BTreeMap<usize, u64> = if std::path::Path::new(&aeons_file).exists() {
+        read_aeons(curated_path, &cut.codes, &chart)
+            .into_iter()
+            .collect()
+    } else {
+        BTreeMap::new()
+    };
+    let mut flat_aeons: BTreeMap<usize, u64> = BTreeMap::new();
+    let mut bytes_before = 0usize;
+    for (t, &code) in cut.codes.iter().enumerate() {
+        if let Some(&aeon) = aeons.get(&t) {
+            flat_aeons.insert(bytes_before, aeon);
+        }
+        if chart.section(code).is_none() {
+            bytes_before += 1;
+        }
+    }
     let mut open = None;
     let open_before: Vec<Option<usize>> = cut
         .codes
@@ -468,6 +502,15 @@ pub fn acceptance(curated_path: &str, flat_path: &str, releases_path: &str) {
     let with_releases = releases_path != "none";
     println!(
         "hnn_population f0-acceptance: F0's acceptance run, the predictor on unseen families (the record's pins; #63, #73, #148)"
+    );
+    println!(
+        "  the aeons: {} conversation changes entered{}",
+        aeons.len(),
+        if aeons.is_empty() {
+            " (the cut carries no aeons: one aeon)"
+        } else {
+            ""
+        }
     );
     println!(
         "0. the passage: {cells} curated cells (|A| = {}), the first {development} the choosing families; {flat_count} flat cells; n* = {population}, L_R = {grain}",
@@ -552,6 +595,9 @@ pub fn acceptance(curated_path: &str, flat_path: &str, releases_path: &str) {
         let mut code = Code::new();
         for t in range {
             let cell = cut.codes[t];
+            if let Some(&aeon) = aeons.get(&t) {
+                egg.enter_aeon(aeon).expect("an aeon at its letter");
+            }
             if chart.section(cell).is_some() {
                 code.letters += 1;
                 let charged = if t != development && open_before[t] == Some(AGENT) {
@@ -682,12 +728,15 @@ pub fn acceptance(curated_path: &str, flat_path: &str, releases_path: &str) {
     let mut flat = [PassageCode::new(), PassageCode::new()];
     let mut flat_releasing = 0u128;
     for (position, &byte) in flat_bytes.iter().enumerate() {
+        if let Some(&aeon) = flat_aeons.get(&position) {
+            flat_tree
+                .enter_aeon(aeon)
+                .expect("a cell-only tree enters at once");
+        }
         if with_releases && let Some(&order) = at_byte.get(&position) {
-            let released = release_flat(
-                &flat_tree,
-                logged[order].len().min(RELEASE_CAP),
-                selected[order].key,
-            );
+            // The egg's cap at this response (its aperture's room), never the logged reply's length.
+            let cap = RELEASE_CAP.min(population - selected[order].letter - 2);
+            let released = release_flat(&flat_tree, cap, selected[order].key);
             flat_releasing += released.1;
             flat_releases[order] = Some(released);
         }
@@ -907,10 +956,15 @@ pub fn acceptance(curated_path: &str, flat_path: &str, releases_path: &str) {
             warm.iter().max().copied().unwrap_or(0),
             warm.iter().sum::<u128>()
         );
+        let excluded = if reserve_read() {
+            "null".to_string()
+        } else {
+            format!("\"{RESERVE_SHA256}\"")
+        };
         write_private(
             releases_path,
             &format!(
-                "{{\"schema\":\"holonics.f0-acceptance-releases.v1\",\"cap\":{RELEASE_CAP},\"cases\":[{}]}}\n",
+                "{{\"schema\":\"holonics.f0-acceptance-releases.v1\",\"cap\":{RELEASE_CAP},\"reserve_excluded\":{excluded},\"cases\":[{}]}}\n",
                 cases.join(",")
             ),
         );
