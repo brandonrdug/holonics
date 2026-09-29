@@ -693,6 +693,26 @@ branch; intervals that do not shorten the charged code are recorded and not adop
     transformations must be located from the passage, not founded by rotor closure alone. On a
     shared host the whole-moment read's word refine read took 120,578 ms against the indexed read's
     42,932 on this passage.
+- **`hnn::prediction`, native generation, built and run, September 29: the checks and the moiré
+  hold; the copy is near; text is illegible**
+  ([pins](../../research/records/2026-09-29_NATIVE_GENERATION_PINNED_BEFORE_ITS_RUNS.md), `70a572e7`;
+  [receipt](../../research/records/2026-09-29_NATIVE_GENERATION_THE_MOIRE_CONTINUES_EXACTLY_THE_COPY_IS_NEAR_AND_TEXT_IS_ILLEGIBLE.md);
+  `64eac0eb`; Refs #73 #148 #63).
+  - *Built*: the continuing word (`Word::continuing`, its return `Word::pull_back_continuing`;
+    guard 16 amended: the change lives only inside its word or its refinement); `hnn::prediction`:
+    the latent section opened at the request's moment, `K` continuing words with the moment
+    re-entering, every station read from one anchor on the receiving ring's clock unwound from the
+    request's last tick, the release at width zero through `receiver::release`, a keyed latent as
+    the selection within the joint family, and learning through the words in reverse, composed in
+    the refinement's diamond and deposited by the normal law; the checks on every refinement; Lean
+    `HNN/Prediction` (`jointSection`, `joint_not_marginals`, `release_width_zero`, `consumer_eq`).
+  - *Measured*: every refinement's balance, exact pairing, commit and unreached loci hold (2,818
+    refinements); the moiré's 6 windows continue exactly; the copy echoes 234 of 256 fresh requests
+    exactly (2,026 of 2,048 stations), failing its pin of 256; the 8 text sections are illegible.
+  - *What stays open*, measured: the native readout codes the training responses at between
+    `5 + 13/16` and `5 + 14/16` bits a station, near their byte frequencies, so its sections are
+    illegible; campaign 1's normal-law steps diverge at `K = 4` on the moiré (the covector reaching
+    the source port sums every station and re-entry), a stability bound owed in #62.
 
 #### U7. The targets, alongside
 

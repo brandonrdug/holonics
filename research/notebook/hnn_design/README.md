@@ -42,6 +42,7 @@ docstring says otherwise.
 | `hnn_exposure.rs` | Campaign 1's exposure on a cut: the model face (the receiver's population over the landmark tree and the combined face), the baselines, keys, aeons and the first law; on the host or the card (`realization card`); the loaded resonator (`resonator source`); F2's adoption gate (`gate f2`: the population with and without the field on the held-out cells, work, memory and budgets) | `cargo run --release -p holonics --example hnn_exposure -- cut-file .local/cuts/standing-real-cut-campaign-1.bin cells all` | [campaign 1 meets its criterion](../../records/2026-09-26_CAMPAIGN_ONE_MEETS_ITS_CRITERION_THE_TREE_RECEIVES_AND_THE_WAVE_IS_WEIGHED.md), [the resonator](../../records/2026-09-26_THE_RESONATOR_RETURNS_ITS_WAVE_AND_THE_COMPARISON_REACHES_ITS_MATERIAL.md), [campaign 2](../../records/2026-09-26_CAMPAIGN_TWO_THE_RINGS_AND_CONTACTS_ARE_LAWFUL_AND_ADD_NO_BITS_ON_TEXT.md), [F2's adoption gate](../../../docs/plans/THE_REBUILD.md#f2-the-field-as-a-family-step-4-73) |
 | `hnn_landmark.rs` | The landmark tree (count-only): the depth sweep and prequential passage; `letters`, `prior`, `wide`, `compact`, `capacity` | `cargo run --release -p holonics --example hnn_landmark -- cut-file .local/cuts/standing-real-cut-campaign-1.bin` | [below PPM-2](../../records/2026-09-26_THE_LANDMARK_TREE_COMPRESSES_THE_STANDING_CUT_BELOW_PPM_TWO.md), [at scale](../../records/2026-09-26_THE_LANDMARK_TREE_AT_SCALE_THE_STOP_PRIOR_LOCAL_WEIGHING_THE_WIDE_CUT_AND_THE_STORAGE_WHERE_PATHS_PART.md), [capacity](../../records/2026-09-27_A_LANDMARKS_STORAGE_HAS_A_CAPACITY_AT_ITS_CEILING_IT_CARRIES.md), [campaign 2](../../records/2026-09-26_CAMPAIGN_TWO_THE_RINGS_AND_CONTACTS_ARE_LAWFUL_AND_ADD_NO_BITS_ON_TEXT.md) |
 | `hnn_population.rs` (with `hnn_population_{evolution,curated,census,u2,f0,u6,birth}.rs`) | The egg population: terrain (`tree`, `moire`, `crib`, `switching`, `standing`), `evolution`, `species`, `composition` and `arithmetic` (retired September 29 as catered machinery, receipts below, last at commit `1b374d46`), the curated source (`curated`, with `merges`), `f4`, F0's egg (`f0-egg`, `f0-census`), U2's acceptance run (`u2-acceptance`), F0's acceptance run (`f0-acceptance`), U6's symmetric comparison (`u6-symmetric`), residual-founded transport discovery (`birth-probe`, `birth`) | `cargo run --release -p holonics --example hnn_population -- <mode>` | [the receiving population](../../records/2026-09-27_THE_RECEIVING_POPULATION_WAS_BUILT_ON_TERRAIN_WITH_KNOWN_TRUTH_AND_THE_CURATED_SOURCE_NOW_CODES_BELOW_THE_FLAT_STREAM.md), [F4](../../records/2026-09-27_F4_DEVELOPMENT_FAMILY_SPLIT_AND_RELEASE_GATE.md), [the forward plan](../../records/2026-09-28_THE_FORWARD_PLAN_STOPPED_AT_TRANSFER_THE_POPULATION_MEMORIZES_FAMILIES_AND_ITS_STANDING_IS_AN_INDEX.md), [U2's acceptance run](../../records/2026-09-28_U2_F0S_MEMORY_ACCEPTANCE_RUN_PINNED_BEFORE_ITS_SPLIT_IS_READ.md), [F0's acceptance run](../../records/2026-09-28_F0_THE_PREDICTOR_ON_UNSEEN_FAMILIES_PINNED_BEFORE_ITS_SPLIT_IS_READ.md), [U6's symmetric comparison](../../records/2026-09-29_U6_THE_SYMMETRIC_COMPARISON_PINNED_BEFORE_ITS_VALIDATION_ROLE_IS_READ.md), [residual-founded transport discovery](../../records/2026-09-28_RESIDUAL_FOUNDED_TRANSPORT_DISCOVERY_PINNED_BEFORE_ITS_SEEDS_ARE_READ.md) |
+| `hnn_prediction.rs` | Native generation (`hnn::prediction`, U6): the copy and moiré terrains with known truth and the text sections for the validation role's requests, every refinement checked; `probe`, `develop` | `cargo run --release -p holonics --example hnn_prediction -- <mode>` | [pins](../../records/2026-09-29_NATIVE_GENERATION_PINNED_BEFORE_ITS_RUNS.md), [receipt](../../records/2026-09-29_NATIVE_GENERATION_THE_MOIRE_CONTINUES_EXACTLY_THE_COPY_IS_NEAR_AND_TEXT_IS_ILLEGIBLE.md) |
 | `hnn_chase.rs` | F6's chase terrain: the reception phase, the action phase's choosing sweep (`choose`) and its acceptance (`action`, with U4's move reading and U3's release reading); U4's next loop: the failure's diagnosis (`diagnose`) and the fresh population (`fresh`); F6's switches and their attribution (`switches`) | `cargo run --release -p holonics --example hnn_chase` | [the learner must move](../../records/2026-09-27_THE_LEARNER_MUST_MOVE_A_CHASE_TERRAIN_DATA_AS_PARTICLES_WITH_FLUX_AND_RELEASE_AS_A_THRESHOLD_COMMIT.md) (no dedicated record; the receipts below) |
 | `exterior.rs` | The shared exterior boundary the examples include | | |
 | `standing_cut.py` | Pins the standing real cut (`6148`) and the wide cut (`wide 1048576`) | `python3 research/notebook/hnn_design/standing_cut.py 6148` | [campaign 1 meets its criterion](../../records/2026-09-26_CAMPAIGN_ONE_MEETS_ITS_CRITERION_THE_TREE_RECEIVES_AND_THE_WAVE_IS_WEIGHED.md), [at scale](../../records/2026-09-26_THE_LANDMARK_TREE_AT_SCALE_THE_STOP_PRIOR_LOCAL_WEIGHING_THE_WIDE_CUT_AND_THE_STORAGE_WHERE_PATHS_PART.md) |
@@ -1759,6 +1760,36 @@ HOLONICS_ROOT=$PWD python3 research/notebook/hnn_design/release_legibility.py .l
   candidate gave 6 texts and 2 typed refusals at the cap, with 276 of 338 word tokens real. The
   control tree gave 6 texts and 2 refusals (1 at the cap, 1 a text-codec separator), with 513 of 629
   real. The logged replies had 1,118 of 1,214.
+
+### U6: native generation, a section refined and released whole (September 29)
+
+Records: [the pins](../../records/2026-09-29_NATIVE_GENERATION_PINNED_BEFORE_ITS_RUNS.md) (committed
+at `70a572e7` before any run) and [the receipt](../../records/2026-09-29_NATIVE_GENERATION_THE_MOIRE_CONTINUES_EXACTLY_THE_COPY_IS_NEAR_AND_TEXT_IS_ILLEGIBLE.md);
+plan: THE_REBUILD U6. Refs #73 #148 #63.
+
+```sh
+cargo run --release -p holonics --example hnn_prediction -- copy
+cargo run --release -p holonics --example hnn_prediction -- moire
+cargo run --release -p holonics --example hnn_prediction -- text .local/cuts/curated-u6-passage-cut.bin .local/cuts/u6-native-sections.txt
+```
+
+`hnn_prediction.rs` declares three rings of 32 in a chain with no pair offset, campaign 1's
+constitution and steps, `K = 2` continuing words of one tick, and a batch of 16 refinements a
+deposit. The computational object is the helical pair interaction: the section is a span of the
+receiving ring's helix (**the helix**), the refinement is **the tube**, the joint readout is **faces
+and placement**, and the contacts' transit carries **the pair**; the cell holonomy and the tower
+thread stay attached through the field's complex and carry chain.
+
+- **The checks** hold on all 2,818 refinements: every balance, every exact pairing on the executed
+  charts, every commit's deposition work, and every locus outside a refinement's diamond unchanged.
+- **Known truth.** The moiré (two gratings, least period 6): all 6 windows continue exactly after 512
+  windows. The copy (8 of 4 symbols): 234 of 256 fresh requests echoed exactly, 2,026 of 2,048
+  stations, after 1,536 requests; the pin asked for 256.
+- **Text.** Two passes over the passage's 385 choosing pairs; the 8 validation requests (F0's rule)
+  gave 7 sections of 32 bytes and one typed refusal, strings of `e`, `o`, `r` and spaces: illegible.
+  The text is owner-only.
+- **Cost.** 447,718, 142,464 and 389,739 ms; peak resident sets 401,580,032, 381,526,016 and
+  819,576,832 bytes.
 
 ### F0 candidate 3: learned tokens with the receiving tree over them (September 28)
 
