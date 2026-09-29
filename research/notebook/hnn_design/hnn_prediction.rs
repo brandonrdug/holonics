@@ -10,18 +10,24 @@
 //! cargo run --release -p holonics --example hnn_prediction -- copy
 //! cargo run --release -p holonics --example hnn_prediction -- moire
 //! cargo run --release -p holonics --example hnn_prediction -- text .local/cuts/curated-u6-passage-cut.bin .local/cuts/u6-native-sections.txt
+//! cargo run --release -p holonics --example hnn_prediction -- develop copy|moire <train> <evaluate> [s] [batch] [d] [K]
+//! cargo run --release -p holonics --example hnn_prediction -- develop text <cut> <train> [s]
 //! ```
 //!
 //! [definition; agent-inferred, the record's pins] **What it executes.**
-//! - **The field** (`declare`): three rings of one period `d` in a chain `0 — 1 — 2`, joined node to
-//!   node on every node at exponent 0 (`G_a = Y_a`), ring 0 the source and the receiving ring
-//!   (its lock every port, so it steps once a cell), rings 1 and 2 stepping only by carries; no pair
-//!   offset (no window on the source); the receiver's grain `L_R = 16`; its aperture `K·w + 1`, so
-//!   the word's precisions by rule cover the refinement's junction steps. Ring 2 lies two hops out:
-//!   the refinement's diamond does not reach its element, so the unreached check is exercised.
+//! - **The field** (`declare`): three rings of one period `d = 32` in a chain `0 — 1 — 2`, joined
+//!   node to node on every node at exponent 0 (`G_a = Y_a`), ring 0 the source and the receiving
+//!   ring (its lock every port, so it steps once a cell and the port chart does not enter), rings 1
+//!   and 2 stepping only by carries; no pair offset (no window on the source); the receiver's grain
+//!   `L_R = 16`; its aperture `K·w + 1`, so the word's precisions by rule cover the refinement's
+//!   junction steps. The refinement is `K = 2` words of `w = 1` tick; its diamond does not reach
+//!   ring 1's element or anything of ring 2, so the unreached check is exercised.
 //! - **The constitution** is `Constitution::initial` at campaign 1's steps (`γ_U = 1`, `η_x = ½`):
 //!   `R = 0`, `E` the declared sign sequence, nothing authored for a terrain. Everything a terrain's
 //!   answer needs is located by the field's own refinement and deposition.
+//! - **Development** (`develop`) reads the terrains at development seeds only (never the pinned
+//!   ones) and the text's choosing pairs only; it chose `d`, `K`, the batch and the steps before the
+//!   pins (the record's development table).
 //! - **Learning** (`hnn::prediction::{stage, deposit_of}`): each request is ingested from rest into
 //!   its own moment, refined, compared with its target at every station, its covector pulled back
 //!   through the words and composed; a batch of requests is deposited at one commit.
@@ -73,7 +79,8 @@ const TOLERANCE: (i64, i64) = (1, 16);
 /// The declared population, above every declared field's capacity `n*`.
 const POPULATION: u64 = 1 << 16;
 /// The run's deadline (the pin's projection bound) and its resident cap.
-const DEADLINE_MS: u128 = 600_000;
+/// Training stops here (the pin: evaluation and generation fit in the rest of the ten minutes).
+const DEADLINE_MS: u128 = 540_000;
 const RESIDENT_CAP: u128 = 20_000_000_000;
 
 /// The text releases (F0's rule, as U6 item 2 read it): how many, and the seed of their keys.
@@ -298,7 +305,7 @@ impl Engine {
         }
         self.tally.deposits += 1;
         self.theta = next;
-        if self.tally.deposits % 16 == 0 {
+        if self.tally.deposits.is_multiple_of(16) {
             eprintln!(
                 "  progress: deposits {}, stage {} ms, deposit {} ms, peak bits {}, released {} held {}",
                 self.tally.deposits,
@@ -442,23 +449,24 @@ const MOIRE_FAMILY: MoireFamily = MoireFamily {
 /// **The terrains' declaration** (the record's pins).
 fn terrain_declared() -> Declared {
     Declared {
-        period: 16,
+        period: 32,
         steps: 1,
         alphabet: 5,
-        words: 4,
+        words: 2,
         span: 1,
         stations: 8,
-        batch: 8,
+        batch: 16,
         members: 0,
     }
 }
 
 /// The pins of a terrain run: training requests, the seeds, and the evaluation.
-const TRAIN: usize = 2048;
-const TRAIN_SEED: u64 = 20_260_929_01;
+const COPY_TRAIN: usize = 1536;
+const MOIRE_TRAIN: usize = 512;
+const TRAIN_SEED: u64 = 2_026_092_901;
 const EVALUATE: usize = 256;
-const EVALUATE_SEED: u64 = 20_260_929_02;
-const MOIRE_SEED: u64 = 20_260_929_03;
+const EVALUATE_SEED: u64 = 2_026_092_902;
+const MOIRE_SEED: u64 = 2_026_092_903;
 
 /// **A terrain run**: train over the pinned pairs in batches within the guards, then evaluate each
 /// held-out pair's released section against its truth.
@@ -471,7 +479,7 @@ fn terrain(
     let clock = Instant::now();
     let mut engine = Engine::new(declared);
     println!(
-        "hnn_prediction {name}: d = {}, |A| = {} (termination {}), K = {}, w = {}, m = {}, batch {}, n* = {}, training pairs {}, evaluated {}",
+        "hnn_prediction {name}: d = {}, |A| = {} (termination {}), K = {}, w = {}, m = {}, batch {}, steps 1/{}, n* = {}, training pairs {}, evaluated {}",
         declared.period,
         declared.alphabet,
         declared.alphabet - 1,
@@ -479,6 +487,7 @@ fn terrain(
         declared.span,
         declared.stations,
         declared.batch,
+        declared.steps,
         engine.field.capacity().n_star(),
         train.len(),
         evaluate.len()
@@ -528,10 +537,10 @@ fn text_declared() -> Declared {
         period: 32,
         steps: 1,
         alphabet: 257,
-        words: 4,
+        words: 2,
         span: 1,
         stations: 32,
-        batch: 8,
+        batch: 16,
         members: 8,
     }
 }
@@ -554,6 +563,8 @@ fn target_of(response: &[usize], stations: usize, termination: usize) -> Vec<usi
 
 /// **The pinned bound on the choosing pairs** read in training.
 const TEXT_TRAIN: usize = 1024;
+/// **The pinned passes** over the choosing pairs.
+const TEXT_PASSES: usize = 2;
 
 /// [definition] **The text passage read for the run**: the choosing role's request pairs (the
 /// request's bytes and the response's target), every eligible count, and the validation requests
@@ -567,7 +578,7 @@ struct TextPassage {
     selected: Vec<(usize, Vec<usize>)>,
 }
 
-fn text_passage(cut_path: &str, declared: &Declared, bound: usize) -> TextPassage {
+fn text_passage(cut_path: &str, declared: &Declared, bound: usize, validation: bool) -> TextPassage {
     let chart = SectionChart::curated();
     let cut = read_curated(cut_path, &chart);
     let relations = read_incidence(cut_path);
@@ -605,7 +616,8 @@ fn text_passage(cut_path: &str, declared: &Declared, bound: usize) -> TextPassag
         })
         .collect();
     // The validation requests F0's rule selects.
-    let mut selected: Vec<(u64, usize, usize)> = relations
+    // The validation role is read only by the run, never by the probe.
+    let mut selected: Vec<(u64, usize, usize)> = if !validation { Vec::new() } else { relations
         .iter()
         .filter(|relation| relation.kind == RelationKind::Request)
         .filter_map(|relation| {
@@ -626,7 +638,7 @@ fn text_passage(cut_path: &str, declared: &Declared, bound: usize) -> TextPassag
                     )
                 })
         })
-        .collect();
+        .collect() };
     let validation_eligible = selected.len();
     selected.sort_unstable();
     selected.truncate(RELEASES);
@@ -655,7 +667,7 @@ fn text(cut_path: &str, out_path: &str) {
         train,
         validation_eligible,
         selected,
-    } = text_passage(cut_path, &declared, TEXT_TRAIN);
+    } = text_passage(cut_path, &declared, TEXT_TRAIN, true);
     let mut engine = Engine::new(declared);
     println!(
         "hnn_prediction text: the passage {cells} cells, the choosing role's first {development}; choosing request pairs {eligible}, trained on the first {}; validation eligible {validation_eligible}, released {}; d = {}, |A| = {}, K = {}, w = {}, m = {}, batch {}, keyed members {}; reserve excluded {}",
@@ -671,16 +683,18 @@ fn text(cut_path: &str, out_path: &str) {
         if reserve_read() { "NO (--read-reserve)" } else { RESERVE_SHA256 }
     );
     let mut complete = true;
-    for batch in train.chunks(declared.batch) {
-        if !guarded(&clock) {
-            complete = false;
-            break;
+    'passes: for _ in 0..TEXT_PASSES {
+        for batch in train.chunks(declared.batch) {
+            if !guarded(&clock) {
+                complete = false;
+                break 'passes;
+            }
+            engine.learn(batch);
         }
-        engine.learn(batch);
     }
     engine.report("training");
     println!(
-        "  training {} ms{}; resident {}",
+        "  training ({TEXT_PASSES} passes) {} ms{}; resident {}",
         clock.elapsed().as_millis(),
         if complete { "" } else { ", stopped at a guard: INCOMPLETE" },
         resident()
@@ -729,7 +743,7 @@ fn probe(mode: &str, cut: Option<&str>) {
         }
         "text" => {
             let declared = text_declared();
-            let passage = text_passage(cut.expect("a passage cut"), &declared, 32);
+            let passage = text_passage(cut.expect("a passage cut"), &declared, 32, false);
             (declared, passage.train)
         }
         other => panic!("probe copy | moire | text, not {other}"),
@@ -771,19 +785,24 @@ fn main() {
             if let Some(batch) = arguments.get(6).and_then(|value| value.parse().ok()) {
                 declared.batch = batch;
             }
+            if let Some(period) = arguments.get(7).and_then(|value| value.parse().ok()) {
+                declared.period = period;
+            }
+            if let Some(words) = arguments.get(8).and_then(|value| value.parse().ok()) {
+                declared.words = words;
+            }
             let count = |at: usize| -> usize {
                 arguments
                     .get(at)
                     .and_then(|value| value.parse().ok())
                     .expect("a count")
             };
-            let (train, evaluate) = (count(3), count(4));
             match arguments.get(2).map(String::as_str) {
                 Some("copy") => terrain(
                     "develop copy",
                     declared,
-                    copy_pairs(&declared, 11, train),
-                    copy_pairs(&declared, 12, evaluate),
+                    copy_pairs(&declared, 11, count(3)),
+                    copy_pairs(&declared, 12, count(4)),
                 ),
                 Some("moire") => {
                     let moire =
@@ -792,11 +811,34 @@ fn main() {
                     terrain(
                         "develop moire",
                         declared,
-                        moire_pairs(&moire, &declared, 14, train),
+                        moire_pairs(&moire, &declared, 14, count(3)),
                         moire_windows(&moire, &declared),
                     );
                 }
-                _ => panic!("develop copy | moire <train> <evaluate>"),
+                // Text: the choosing role's pairs only; the validation role is never read here.
+                Some("text") => {
+                    let mut declared = text_declared();
+                    if let Some(steps) = arguments.get(5).and_then(|value| value.parse().ok()) {
+                        declared.steps = steps;
+                    }
+                    let passage = text_passage(
+                        arguments.get(3).map(String::as_str).expect("the passage cut"),
+                        &declared,
+                        count(4),
+                        false,
+                    );
+                    let clock = Instant::now();
+                    let mut engine = Engine::new(declared);
+                    for batch in passage.train.chunks(declared.batch) {
+                        if !guarded(&clock) {
+                            break;
+                        }
+                        engine.learn(batch);
+                    }
+                    engine.report("develop text");
+                    println!("  {} ms; resident {}", clock.elapsed().as_millis(), resident());
+                }
+                _ => panic!("develop copy | moire <train> <evaluate> | text <cut> <train>"),
             }
         }
         Some("copy") => {
@@ -804,7 +846,7 @@ fn main() {
             terrain(
                 "copy",
                 declared,
-                copy_pairs(&declared, TRAIN_SEED, TRAIN),
+                copy_pairs(&declared, TRAIN_SEED, COPY_TRAIN),
                 copy_pairs(&declared, EVALUATE_SEED, EVALUATE),
             );
         }
@@ -823,7 +865,7 @@ fn main() {
             terrain(
                 "moire",
                 declared,
-                moire_pairs(&moire, &declared, TRAIN_SEED, TRAIN),
+                moire_pairs(&moire, &declared, TRAIN_SEED, MOIRE_TRAIN),
                 moire_windows(&moire, &declared),
             );
         }

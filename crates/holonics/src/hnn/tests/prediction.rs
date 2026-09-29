@@ -387,17 +387,30 @@ fn the_section_reads_no_landmark_tree() {
     assert_eq!(plain, guarded);
 }
 
-/// A keyed latent is a member of the joint family: it opens the receiving ring at one lattice unit
-/// a coordinate, and every station is read from its one anchor.
+/// A keyed latent is a member of the joint family: it opens the receiving ring at the source's
+/// amplitude on every coordinate, it moves the section from the member at rest, and every station
+/// is read from its one anchor.
 #[test]
 fn a_keyed_latent_moves_the_whole_section_from_one_anchor() {
     let field = chain();
     let theta = generic(&field, 85);
     let (current, moment) = moment(&field, 86, 6);
     let refinement = declared(&field, 2, 1);
-    let unit = field.word_lattice().unwrap().transient().unit();
-    let latent = Latent::Keyed(3).storage(&field, refinement.ring());
-    assert!(latent[refinement.ring()].iter().all(|x| x == &unit || x == &-unit.clone()));
+    let injection = moment.open_storage(&field, &theta, &current).unwrap();
+    let a = crate::hnn::prediction::amplitude(&injection);
+    assert!(!a.is_zero());
+    let latent = Latent::Keyed(3).storage(&field, refinement.ring(), &a);
+    assert!(latent[refinement.ring()].iter().all(|x| x == &a || x == &-a.clone()));
+    let rest = Section::refine(
+        &field,
+        &theta,
+        &current,
+        &moment,
+        Latent::Rest,
+        &refinement,
+        &mut Charts::new(),
+    )
+    .unwrap();
     let section = Section::refine(
         &field,
         &theta,
@@ -408,6 +421,7 @@ fn a_keyed_latent_moves_the_whole_section_from_one_anchor() {
         &mut Charts::new(),
     )
     .unwrap();
+    assert_ne!(rest.anchor(), section.anchor());
     let ring = field.ring(refinement.ring());
     for (j, read) in section.reads().iter().enumerate() {
         assert_eq!(

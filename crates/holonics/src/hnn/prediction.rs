@@ -262,11 +262,12 @@ impl Refinement {
 
 /// [definition; agent-inferred] **A member of the joint family** (module header): the latent ξ the
 /// section opens with on the receiving ring. `Rest` is the zero latent, the egg packed with the
-/// request alone. `Keyed(k)` is one member of the declared family of minimal latents: each
-/// coordinate of the receiving ring's storage one unit of the word's transient lattice
-/// (`2^(−L_w)`; one under the exact law) with the sign of a coin of `Draw::new(k)`. The unit is the
-/// least change the word carries, so a keyed member moves the section only where its reading is
-/// plural; it is the declared selection within the joint family, never a marginal draw.
+/// request alone. `Keyed(k)` is one member of the declared family of latents at the source's own
+/// amplitude: each coordinate of the receiving ring's storage `±a`, the sign a coin of
+/// `Draw::new(k)` and `a` the injection's largest coordinate (the request's moment enters at that
+/// amplitude, so a member enters as the source does: a noise realization of the diffusion chart at
+/// the source's scale). A member changes the whole section from its one anchor; selecting one is
+/// the declared selection within the joint family, never a marginal draw.
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub enum Latent {
     Rest,
@@ -274,28 +275,36 @@ pub enum Latent {
 }
 
 impl Latent {
-    /// **The latent's storage** per ring: zero but on the receiving ring.
-    pub fn storage(&self, field: &Field, ring: usize) -> Vec<Vec<Rat>> {
+    /// **The latent's storage** per ring at the source's amplitude `a`: zero but on the receiving
+    /// ring.
+    pub fn storage(&self, field: &Field, ring: usize, amplitude: &Rat) -> Vec<Vec<Rat>> {
         let mut storage: Vec<Vec<Rat>> = field
             .rings()
             .iter()
             .map(|declared| vec![Rat::zero(); declared.width()])
             .collect();
         if let Latent::Keyed(key) = self {
-            let unit = field
-                .word_lattice()
-                .map_or_else(Rat::one, |lattice| lattice.transient().unit());
             let mut draw = Draw::new(*key);
             for value in &mut storage[ring] {
                 *value = if draw.coin() {
-                    unit.clone()
+                    amplitude.clone()
                 } else {
-                    -unit.clone()
+                    -amplitude.clone()
                 };
             }
         }
         storage
     }
+}
+
+/// **The source's amplitude**: the injection's largest coordinate in magnitude.
+pub fn amplitude(injection: &[Vec<Rat>]) -> Rat {
+    injection
+        .iter()
+        .flatten()
+        .map(Signed::abs)
+        .max()
+        .unwrap_or_else(Rat::zero)
 }
 
 // -------------------------------------------------------------------------------------------
@@ -509,7 +518,7 @@ impl<'c> Section<'c> {
             })?
             .clone();
         let mut change = EndChange::rest(field, &operands);
-        change.storage = latent.storage(field, declared.ring);
+        change.storage = latent.storage(field, declared.ring, &amplitude(&injection));
         let opening = change.clone();
         let mut words: Vec<Word<'c>> = Vec::with_capacity(declared.words);
         for n in 0..declared.words {
