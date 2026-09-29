@@ -41,6 +41,10 @@ from its naming on, so it guards the choices made after it, not those made befor
 passed, which is logged (`reserve_flag`): the scripts that read the source skip the reserve's records,
 their manifests carry `reserve_excluded` (the reserve's hash), and every reader of a private cut or
 receipt refuses one without it (`require_reserve_excluded`; `exterior.rs` for the Rust harnesses).
+To find a record's conversation the source's lines are decoded, as the family splits decoded them
+for their family keys: of a reserve message only its conversation key, its capture events and its
+links' kinds and targets are read (to name the reserve and check that no relation crosses roles);
+its text, its port and its length are never examined, counted or written.
 
 **The spent splits** (`SPENT`): F4, F1, F2, F2V2, F5 (its diagnostic), U2 and F0 split messages, not
 conversations, and every one of them is a reshuffle of read material: their validation messages lay in
