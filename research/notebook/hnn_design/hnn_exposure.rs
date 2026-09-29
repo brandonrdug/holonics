@@ -116,6 +116,21 @@
 //!   exposure, and the host's tree read per window against the word's (the refine read, the word
 //!   executed and read: on the card, the card's word with its host readout).
 //!
+//! [definition; agent-inferred, U6] **The port chart** (`ports <founded|residue>`, default `founded`;
+//! the [encoding pin](../../records/2026-09-29_HOLONIC_ENCODING_FOR_THE_FIELD_PINNED_BEFORE_ITS_RUN.md)).
+//! `founded` founds the field's port chart on the cut's development cells, the cells before its
+//! held-out range (`holonics::hnn::encoding::found_ports`: the reached cells, each placed on every ring
+//! at the ring's phase at its first arrival on the field's own clock; the unreached cells one plural
+//! fibre outside every lock), a causal function of cells the exposure codes, so the description
+//! charges its rule (`Field::describe`). The readout prints the chart's receipt as counts only: the
+//! constituents and the fibre, their recurrence over the development and the held-out cells as
+//! sorted anonymous counts, and per ring the constituents at each port and in its lock. `residue`
+//! declares the codec's residue chart `code mod d_g`, the chart the field read before U6.
+//!
+//! ```sh
+//! cargo run --release -p holonics --example hnn_exposure -- cut-file <cut> cells all ports founded
+//! ```
+//!
 //! [definition] **Every reading is exact; no decimal is printed** (a decimal is a collapse, CLAUDE.md's
 //! exact-arithmetic law). Integers print as integers and rationals as `n/d` (`n/2^e` or
 //! `n/(2^e·m)` on a wide denominator with a power-of-two factor).
@@ -148,8 +163,8 @@ use holonics::hnn::port::{ExecutionPort, ReceiptDetail};
 use holonics::hnn::receiving::landmark_declaration;
 use holonics::hnn::reference::{Bits, KeyReport};
 use holonics::hnn::{
-    AeonBoundary, Constitution, Cut, Exposure, Field, FieldDeclaration, Reference,
-    ResonatorMaterial, Steps,
+    AeonBoundary, Constitution, Cut, Exposure, Field, FieldDeclaration, FoundedPorts, Reference,
+    ResonatorMaterial, Steps, found_ports,
 };
 use holonics::ratio::algebraic::{ExactInterval, interval_sum};
 use holonics::ratio::{Rat, rat};
@@ -226,6 +241,7 @@ fn main() {
     let mut realization = String::from("host");
     let mut loaded = false;
     let mut gate = false;
+    let mut founded_ports = true;
     for pair in arguments.chunks(2) {
         match pair {
             [key, value] if key == "cells" => cells = Some(value.clone()),
@@ -243,9 +259,12 @@ fn main() {
                 realization = value.clone();
             }
             [key, value] if key == "gate" && value == "f2" => gate = true,
+            [key, value] if key == "ports" && (value == "founded" || value == "residue") => {
+                founded_ports = value == "founded";
+            }
             _ => {
                 println!(
-                    "usage: hnn_exposure [cut-file <path>] [cells <N|all>] [held-out <cells>] [windows <deadline>] [realization <host|card>] [resonator <none|source>] [gate f2]"
+                    "usage: hnn_exposure [cut-file <path>] [cells <N|all>] [held-out <cells>] [windows <deadline>] [realization <host|card>] [resonator <none|source>] [gate f2] [ports <founded|residue>]"
                 );
                 return;
             }
@@ -278,7 +297,7 @@ fn main() {
         "the pinned cut has {} cells",
         text.len()
     );
-    let field = Field::declare(FieldDeclaration::campaign_one(length as u64))
+    let mut field = Field::declare(FieldDeclaration::campaign_one(length as u64))
         .expect("campaign 1's declared field (refused below n*)");
     // With a cut file the held-out range is the manifest's own, which must close the cells read;
     // otherwise the declared tail.
@@ -303,6 +322,16 @@ fn main() {
             .collect(),
         held_out: vec![tail.clone()],
     };
+    // The port chart, founded on the development cells (module header, "The port chart").
+    let founded = founded_ports.then(|| {
+        let founded = found_ports(&field, &cut.cells[..tail.start])
+            .expect("the port chart founded on the development cells");
+        field = field
+            .clone()
+            .with_port_chart(founded.chart.clone())
+            .expect("the founded chart reads the field");
+        founded
+    });
     let reference = match deadline {
         Some(windows) => Reference::campaign_one().with_deadline(windows),
         None => Reference::campaign_one(),
@@ -355,6 +384,7 @@ fn main() {
             .collect::<Vec<_>>()
             .join(", ")
     );
+    ports_receipt(&field, founded.as_ref(), &cut, &tail);
     println!("setup (cut read, fields declared): {setup} ms wall");
 
     if realization == "card" {
@@ -416,6 +446,67 @@ fn main() {
     }
     if gate {
         f2_gate(&field, &cut, &exposure, setup + wall, cut_file.as_deref());
+    }
+}
+
+/// **The port chart's receipt** (module header, "The port chart"), counts only: the founded
+/// constituents and the plural fibre, their recurrence over the development and the held-out cells
+/// as sorted anonymous counts, and per ring the constituents at each port and those in its lock.
+fn ports_receipt(
+    field: &Field,
+    founded: Option<&FoundedPorts>,
+    cut: &Cut,
+    tail: &std::ops::Range<usize>,
+) {
+    println!();
+    println!("== the port chart ==");
+    let Some(founded) = founded else {
+        println!("the codec's residue chart code mod d_g (the chart the field read before U6)");
+        return;
+    };
+    println!(
+        "founded at first arrival on the rings' own clocks over the development cells 0..{}: {} constituents, a plural fibre of {} codes",
+        tail.start,
+        founded.constituents.len(),
+        founded.fibre.len()
+    );
+    let sorted = |passage: &[usize]| -> (Vec<u64>, u64) {
+        let mut counts = founded.recurrence(passage);
+        let fibre = counts.pop().unwrap_or(0);
+        counts.sort_unstable_by(|a, b| b.cmp(a));
+        (counts, fibre)
+    };
+    let (development, development_fibre) = sorted(&cut.cells[..tail.start]);
+    let (held, held_fibre) = sorted(&cut.cells[tail.clone()]);
+    println!(
+        "recurrence over the development cells (sorted counts, one a constituent): {development:?}; the fibre {development_fibre}"
+    );
+    println!(
+        "recurrence over the held-out cells (sorted counts, one a constituent): {held:?}; the fibre {held_fibre}"
+    );
+    println!(
+        "constituents recurring in the held-out cells: {} of {}",
+        held.iter().filter(|&&count| count > 0).count(),
+        held.len()
+    );
+    for (g, ring) in field.rings().iter().enumerate() {
+        let d = ring.period() as usize;
+        let mut at_port = vec![0usize; d];
+        let mut locked = 0usize;
+        let mut locked_cells = 0u64;
+        let development_counts = founded.recurrence(&cut.cells[..tail.start]);
+        for (constituent, placement) in founded.placements.iter().enumerate() {
+            at_port[placement[g]] += 1;
+            if ring.fits(placement[g]) {
+                locked += 1;
+                locked_cells += development_counts[constituent];
+            }
+        }
+        println!(
+            "ring {g} (d = {d}, lock {:?}): constituents at each port {at_port:?}; in the lock {locked}, on {locked_cells} development cells; the fibre at port {}",
+            ring.notches(),
+            field.port_chart().ports()[g][founded.fibre.first().copied().unwrap_or(0)]
+        );
     }
 }
 

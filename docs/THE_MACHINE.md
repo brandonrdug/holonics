@@ -247,7 +247,7 @@ Copson and Newman boundaries have source owners in the
 | Receiving comparison and covectors | `Objects/Ratio`, `HNN/Ratio`, `Compression/Landmark/Context/{Tree,Compaction,Standing,Epoch}` | `hnn::{ratio,receiving}`, `compression::landmark::context`, CUDA compacted tree | Composed lattice drift and the log squaring invariant (#62) |
 | Constitutive current, storage and scattering | `Holon/{Element,Dirac,Law}`, `HNN/{Word,Propagation}` | `holon::{element,dirac,law,reaction}`, `hnn::{propagation,word}` | Complete word sensitivity and concrete diamond bridge (#62) |
 | Source moments, retention and release | `Transport/SourceMoment`, `HNN/{Moment,Retention}` | `hnn::{moment,pending,retention}`, `receiver::{standing,release}` | Mode release, founding and moment quotient (campaign 3) |
-| Reuse at future receivers | `Compression`, `Foundation/{ReceiverHistoryCompression,NavigatorModeQuotient,CausalRelevance}` | `compression`, structural `hnn::retention` | Value-kernel/mode consumer (campaign 3), encoding squares (campaign 5) |
+| Reuse at future receivers | `Compression`, `Foundation/{ReceiverHistoryCompression,NavigatorModeQuotient,CausalRelevance}`, `HNN/Encoding` | `compression`, structural `hnn::retention`, `hnn::encoding` (the encoding squares, U6) | Value-kernel/mode consumer (campaign 3); the Hankel identification of the founded dimension (#62) |
 | Physical placement | `HNN/LatticeWord` and local law owners | `hnn::realization`, `holonics_cuda::hnn::{card,port,word,tree}` | Host deposition remains authoritative; device debts #76 |
 
 History paths are under `crates/holonics-cuda/src/` at
@@ -562,9 +562,10 @@ tests can comb through anything valuable").
 8. **No templates.** Output faces are `ρ_R` readings, and no port method returns a string.
 9. **The codec is not the architecture.** `Field::declare` fixes the ring count and widths without
    the exterior alphabet. A test changes the alphabet and checks that they do not change. The
-   stepping classes are not covered by that test: `port_g(x) = code(x) mod d_g` lets the codec's
-   integer numbering choose the lock classes, so they are a codec-dependent exterior chart until
-   campaign 5's Holonic Encoding replaces it (R3 §4).
+   stepping classes are the field's port chart (`hnn::field::PortChart`): a text field reads the
+   chart founded at first arrival on its rings' own clocks (`hnn::encoding::found_ports`, U6), and a
+   test relabels the codes and checks that the founded chart is relabeled and nothing else; the
+   codec's residue chart `code mod d_g` is the declared chart of synthetic fields only.
 10. **No scalar operand.** `Word::pull_back` accepts only a `RatioCovector`, which only a
     `HolonRatio` constructs (`compile_fail`).
 11. **Learning is locating keys and depositing covectors,** never "a current changes a later

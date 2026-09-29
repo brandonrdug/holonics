@@ -406,6 +406,34 @@ fn a_founded_field_opens_its_source_port_at_the_founded_injection() {
     );
 }
 
+/// **The receiving letters' reader steps by the field's own chart**: on campaign 1's field with a
+/// chart founded on a drawn passage, a register reading rings 0 and 1's phase letters keeps its
+/// clock with the lift point at every cell (the reader reads `Ring::port`, one owner of the chart).
+#[test]
+fn the_letters_reader_steps_by_the_founded_chart() {
+    use crate::hnn::receiving::{ActiveAddress, Feature, FeatureFamily, LetterReader};
+    let campaign = Field::declare(FieldDeclaration::campaign_one(6_148)).unwrap();
+    let mut draw = Draw::new(7);
+    let passage: Vec<usize> = (0..400).map(|_| 60 + draw.below(40)).collect();
+    let founded = found_ports(&campaign, &passage[..200]).unwrap();
+    let field = campaign.with_port_chart(founded.chart).unwrap();
+    let family = FeatureFamily::new(vec![
+        Feature::Phase { ring: 0, grain: 5 },
+        Feature::Phase { ring: 1, grain: 7 },
+    ])
+    .unwrap();
+    let mut current = Current::at_rest(&field);
+    let mut register =
+        ActiveAddress::of_reader(3, LetterReader::of(&field, family, &current).unwrap());
+    let rest = current.lift().to_vec();
+    for &cell in &passage {
+        current.step(&field, cell).unwrap();
+        register.receive(cell).unwrap();
+        assert!(register.reader().agrees(&field, &current, current.lift()));
+    }
+    assert_ne!(current.lift(), &rest[..], "the founded chart steps the rings");
+}
+
 /// Refusals are typed: an empty chart, a transport off the chart, openings that reach nothing and
 /// forms that read nothing on the reached span.
 #[test]
