@@ -1,5 +1,8 @@
 //! The source moment: the capacity by counting, the phase-binned counts against their clocked
-//! closed form, the encoder contract and its tape-free covector, the window, and the carry-out.
+//! closed form, the encoder contract and its tape-free covector, the pair buffer, the carry-out, and
+//! the window tests of the encoding loop (the pin of September 29, acceptance 2): the moment of a
+//! long source equals the moment accumulated across every split, and nothing of the source is
+//! discarded by length.
 
 use num_bigint::{BigInt, BigUint};
 use num_traits::{Signed, Zero};
@@ -113,11 +116,12 @@ fn per_cell_ingest_equals_the_clocked_closed_form() {
     assert_eq!(moment.opening(), opening.lift());
 }
 
-/// Lean `HNN/Moment.encoderMoment_contract` with `HNN/IndexedOpen` (ruling B): for any rational
+/// Lean `HNN/Moment.encoderMoment_contract` with `HNN/Encoding.whole_pair_read_offset_moment` (the
+/// normalized open, reading no window): for any rational
 /// encoder and pair port, the open storage from the counts equals the streamed sum
-/// `Σ_k P^(τ_cut − τ_k)(ν̂(n) E x_k + [x_(k−1) = a] ν̂(N_a) E^(1)(x_k, a))`: the marginal over its
-/// population `n`, and the pair port read only on the pairs whose earlier cell is the address `a`
-/// the window supplies (the last cell), over that column's population `N_a`.
+/// `Σ_k P^(τ_cut − τ_k)(ν̂(n) E x_k + [k ≥ 1] ν̂(n − 1) E^(1)(x_k, x_(k−1)))`: the marginal over its
+/// population `n`, and the pair port read on every pair of the passage over the pair population
+/// `n − 1` (the open reads no window).
 #[test]
 fn the_moment_contracts_to_the_streamed_encoder_sum() {
     let field = small_field(&[3, 2], vec![contact(0, 1, 1, 0)], 1);
@@ -144,22 +148,21 @@ fn the_moment_contracts_to_the_streamed_encoder_sum() {
     let port = medium.source_port(0).unwrap();
     let pair = medium.pair_port(0, 1).unwrap();
     let chart = crate::hnn::moment::PopulationChart::of(&field);
-    let address = *cells.last().unwrap();
-    let column = (1..cells.len())
-        .filter(|&k| cells[k - 1] == address)
-        .count() as u64;
-    assert_eq!(moment.address(1), Some(address));
+    let pairs = cells.len() as u64 - 1;
     assert_eq!(moment.population(0).unwrap(), cells.len() as u64);
-    let (nu, nu_a) = (chart.value(cells.len() as u64), chart.value(column));
+    assert_eq!(moment.pair_population(0, 1).unwrap(), pairs);
+    let (nu, nu_pairs) = (chart.value(cells.len() as u64), chart.value(pairs));
     let mut streamed = vec![Rat::zero(); ring.width()];
     for (k, &code) in cells.iter().enumerate() {
         let mut x = vec![Rat::zero(); 2];
         x[code] = Rat::from_integer(1.into());
         let mut driven: Vec<Rat> = port.apply(&x).unwrap().iter().map(|v| v * &nu).collect();
-        if k > 0 && cells[k - 1] == address {
+        if k > 0 {
+            let earlier = cells[k - 1];
             for rho in 0..pair.rank() {
-                let weight =
-                    &pair.current_reads()[rho][code] * &pair.earlier_reads()[rho][address] * &nu_a;
+                let weight = &pair.current_reads()[rho][code]
+                    * &pair.earlier_reads()[rho][earlier]
+                    * &nu_pairs;
                 driven = add(
                     &driven,
                     &crate::ratio::linear::vector::scale(&weight, &pair.outputs()[rho]),
@@ -208,10 +211,10 @@ fn the_encoder_covector_is_the_exact_directional_derivative() {
     assert_eq!(moved - base, pairing);
 }
 
-/// The window is a shift register of raw cells, overwritten; its bits are counted in the moment's
-/// dense code, which is sized once.
+/// The pair buffer is a shift register of raw cells, overwritten once their pairs are counted; its
+/// bits are counted in the moment's dense code, which is sized once.
 #[test]
-fn the_window_overwrites_and_its_bits_are_counted() {
+fn the_pair_buffer_overwrites_and_its_bits_are_counted() {
     let field = &chain();
     let mut current = Current::at_rest(field);
     let mut moment = SourceMoment::open(field, &current);
@@ -241,16 +244,15 @@ fn ingest_stops_at_the_carry_out() {
     assert_eq!(rest.cells, 2);
 }
 
-/// **The population chart and the indexed normalized open** (ruling B; Lean
-/// `HNN/IndexedOpen.{normalized_phase_counts_mass, conditional_mass, normalized_zero_population,
-/// indexed_read_zero_population}`): `ν̂(n)` is the nearest point of `2^(−L_ν)ℤ` to `1/n`
+/// **The population chart and the normalized open that reads no window** (Lean
+/// `HNN/IndexedOpen.{normalized_phase_counts_mass, normalized_zero_population}`,
+/// `HNN/Encoding.whole_pair_read_counts`): `ν̂(n)` is the nearest point of `2^(−L_ν)ℤ` to `1/n`
 /// (`|ν̂ − 1/n| ≤ 2^(−L_ν−1)`), zero at `n = 0`; `L_ν = ⌈log₂(2 L_R n*)⌉` (18 on campaign 1:
 /// `2 · 16 · 6,148 = 196,736 ≤ 2^18`); the normalized phase counts carry the mass `n ν̂(n)`, within
-/// `n 2^(−L_ν−1)` of 1; the indexed column at the window's address has the population of the pairs
-/// whose earlier cell is that address; and before any pair there is no column, so the pair port
-/// contributes nothing.
+/// `n 2^(−L_ν−1)` of 1; the offset moment is read whole over its pair population, every pair of the
+/// passage; and before any pair there is no table, so the pair port contributes nothing.
 #[test]
-fn the_open_reads_the_indexed_normalized_counts() {
+fn the_open_reads_the_normalized_counts_and_no_window() {
     use crate::hnn::field::FieldDeclaration;
     use crate::hnn::moment::PopulationChart;
     use crate::ratio::rat;
@@ -271,7 +273,7 @@ fn the_open_reads_the_indexed_normalized_counts() {
     assert_eq!(chart.value(0), Rat::zero());
     let mut current = Current::at_rest(field);
     let mut moment = SourceMoment::open(field, &current);
-    assert_eq!(moment.indexed_column(field, 0, 1).unwrap(), None);
+    assert_eq!(moment.offset_table(field, 0, 1).unwrap(), None);
     let cells = [1usize, 3, 1, 1, 0, 3, 1, 2, 1];
     let mut fed = 0;
     while fed < cells.len() {
@@ -290,10 +292,99 @@ fn the_open_reads_the_indexed_normalized_counts() {
         (&mass - Rat::from_integer(1.into())).abs()
             <= Rat::from_integer(BigInt::from(n)) * chart.residual()
     );
-    // The address is the last cell, 1; the pairs whose earlier cell is 1: (3,1), (1,1), (0,1), (2,1).
-    let column = moment.indexed_column(field, 0, 1).unwrap().unwrap();
-    assert_eq!(column.address, 1);
-    assert_eq!(column.counts.iter().sum::<u64>(), 4);
-    assert_eq!(column.weight, chart.value(4));
-    assert_eq!(chart.value(4), rat(1, 4));
+    // Every pair of the passage, whatever cell came last: 8 pairs over 9 cells.
+    let table = moment.offset_table(field, 0, 1).unwrap().unwrap();
+    assert_eq!(table.population, 8);
+    assert_eq!(table.counts.iter().sum::<u64>(), 8);
+    assert_eq!(table.weight, chart.value(8));
+    assert_eq!(chart.value(8), rat(1, 8));
+}
+
+/// Ingest every cell of `cells`, feeding past each carry-out, in the chunks `splits` cuts.
+fn ingest_split(field: &Field, cells: &[usize], splits: &[usize]) -> (SourceMoment, Current) {
+    let mut current = Current::at_rest(field);
+    let mut moment = SourceMoment::open(field, &current);
+    let mut bounds = splits.to_vec();
+    bounds.push(cells.len());
+    let mut start = 0;
+    for end in bounds {
+        let mut fed = start;
+        while fed < end {
+            fed += moment
+                .ingest(field, &mut current, &cells[fed..end])
+                .unwrap()
+                .cells;
+        }
+        start = end;
+    }
+    (moment, current)
+}
+
+/// **Acceptance 2: the moment of a long source equals the moment accumulated across any split of
+/// it.** On the chain (`|A| = 4`, `Δ = {1}`), a drawn source of 4,096 cells ingested whole, cell by
+/// cell, at every split point of its first 128 cells and across 32 drawn splits gives one moment:
+/// every phase count, every offset count, the pair buffer, the lift point and the open storage.
+#[test]
+fn the_moment_is_one_across_every_split() {
+    let field = &chain();
+    let medium = Medium::generic(field, 11, Parts::default());
+    let mut draw = Draw::new(29);
+    let cells: Vec<usize> = (0..4096).map(|_| draw.below(field.alphabet())).collect();
+    let (whole, lift) = ingest_split(field, &cells, &[]);
+    let open = whole.open_storage(field, &medium, &lift).unwrap();
+    let same = |(moment, current): (SourceMoment, Current)| {
+        assert_eq!(moment, whole);
+        assert_eq!(current.lift(), lift.lift());
+        assert_eq!(moment.open_storage(field, &medium, &current).unwrap(), open);
+    };
+    same(ingest_split(field, &cells, &(1..cells.len()).collect::<Vec<_>>()));
+    for split in 1..128 {
+        same(ingest_split(field, &cells, &[split]));
+    }
+    let mut splits: Vec<usize> = (0..32).map(|_| 1 + draw.below(cells.len() - 1)).collect();
+    splits.sort_unstable();
+    splits.dedup();
+    same(ingest_split(field, &cells, &splits));
+}
+
+/// **Acceptance 2: nothing of the source is discarded by length.** Over a drawn source of 4,096
+/// cells, 4,096 times the pair buffer's length: every cell is counted once in the source ring's
+/// phase counts (their symbol totals are the source's histogram) and every pair at the declared
+/// offset once in its offset counts (their totals are the source's adjacent-pair histogram); and a
+/// source that differs only in its first cell has another moment at the end.
+#[test]
+fn nothing_of_the_source_is_discarded_by_length() {
+    let field = &chain();
+    let a = field.alphabet();
+    let d = field.ring(0).period() as usize;
+    let mut draw = Draw::new(31);
+    let cells: Vec<usize> = (0..4096).map(|_| draw.below(a)).collect();
+    let (moment, _) = ingest_split(field, &cells, &[]);
+    assert_eq!(moment.cells(), cells.len() as u64);
+    assert_eq!(moment.window().len(), 1);
+    let mut histogram = vec![0u64; a];
+    for &cell in &cells {
+        histogram[cell] += 1;
+    }
+    let mut pairs = vec![0u64; a * a];
+    for k in 1..cells.len() {
+        pairs[cells[k] * a + cells[k - 1]] += 1;
+    }
+    let mut counted = vec![0u64; a];
+    let mut paired = vec![0u64; a * a];
+    for phase in 0..d {
+        for (total, count) in counted.iter_mut().zip(moment.phase_counts(0, phase).unwrap()) {
+            *total += count;
+        }
+        for (total, count) in paired.iter_mut().zip(moment.offset_counts(0, 1, phase).unwrap()) {
+            *total += count;
+        }
+    }
+    assert_eq!(counted, histogram);
+    assert_eq!(paired, pairs);
+    assert_eq!(moment.pair_population(0, 1).unwrap(), cells.len() as u64 - 1);
+    let mut changed = cells.clone();
+    changed[0] = (changed[0] + 1) % a;
+    let (other, _) = ingest_split(field, &changed, &[]);
+    assert_ne!(other, moment, "the first of 4,096 cells is still in the moment");
 }

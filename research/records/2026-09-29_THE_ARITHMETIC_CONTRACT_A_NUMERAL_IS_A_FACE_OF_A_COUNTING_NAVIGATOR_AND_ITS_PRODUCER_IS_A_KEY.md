@@ -1,10 +1,17 @@
 # The arithmetic contract: a numeral is a face of a counting navigator, and its producer is a key
 
+> **Retired September 29 as catered machinery** ([antipattern record](2026-09-29_ANTIPATTERN_CATERED_MACHINERY_A_TASKS_SOLUTION_ROUTINE_NEVER_STANDS_IN_FOR_LEARNING.md)). The build of §8 recognized
+> the test's layouts by a hand-written grammar and computed each result by exact routines: a calculator,
+> not learning. The code is retired (history at `1b374d46`). The mathematics stays in Lean
+> (`Mathematics/ArithmeticContract`, `jet_separates_across_keys`), and the one native finding stays: an
+> operator's reading is located by which consequences hold.
+
 **Date.** September 29. **Issues.** #73, #148, #63 (THE_REBUILD U6, restated; the text chart audit's
-§4 item 3). **Status.** A derivation for Brandon's review, stated before any build. No library Rust
-changed. Lean `HolonicsResearch/Mathematics/ArithmeticContract` proves what is marked
-formal-checked; `research/notebook/arithmetic/contract_checks.py` (standard library) checks every
-finite case exactly.
+§4 item 3). **Status.** A derivation stated before any build (§1–§7); the smallest build and its
+pinned acceptance run follow in §8, and the acceptance passed. Lean
+`HolonicsResearch/Mathematics/ArithmeticContract` proves what is marked formal-checked;
+`research/notebook/arithmetic/contract_checks.py` (standard library) checks every finite case
+exactly.
 
 **Occasion.** The [audit](2026-09-29_THE_TEXT_CHART_AUDITED_ONE_PREDICTOR_SEEN_CONVERSATIONS_AND_NO_ARITHMETIC.md)
 found that the text chart reads digits as opaque bytes (finding 5) and asked for arithmetic
@@ -318,15 +325,171 @@ protocol's owners. Composing it with the text chart's population follows once th
 - *Never reconstruct past raw states* is honoured: the port holds only an open expression's operands
   (§5).
 
+## 8. The build and its acceptance run (September 29)
+
+**Built** (`c17ea7bd`; Refs #73 #148 #63), the smallest build of §6:
+- `holarchy::terrain::arithmetic::Expressions`: the three chart layouts in one declared glyph set,
+  each line with its exact truth (key, digit word, carry words, `T` and its factorization, the
+  result's glyph cells and the numeral's end). `T_native` joins the operands' digit words at the
+  pair port and carries them by one cascade (`carry_cascade`, now also `digit_product`'s). The
+  carry-free sum is the base-2 sum with its windings released, and the released windings are
+  `a ∧ c`.
+- `receiver::population::arithmetic::{ExpressionPort, ExpressionEgg}`, with `ExpressionEgg::release`.
+- The `arithmetic` mode of `hnn_population` (`research/notebook/hnn_design/hnn_population_arithmetic.rs`).
+- Lean `jet_separates_across_keys`: the second-order jet parts two producers whatever keys
+  `a, a' ≥ 2` they hold. It is the law of the faces-only control, whose families hold free keys.
+
+**Decisions** [agent-inferred], each with its reason (they are stated in the owners too):
+- *The numeral's end is a stage.* Under `holds` the face on the cell after the result is the stage
+  `{continues, ends}` with the end certain, and the glyph that ends it is the byte tree's (its face
+  within the ending glyphs). The terminator is `.`, `)` or ` ` by chart, so it is not a function of
+  the key.
+- *The result's start is a stage too.* That a numeral begins after `= ` or `== ` is chart syntax, the
+  byte tree's `T(S)`. Within it, the first glyph is the sheet's.
+- So every cell's face factors as a chart part (the byte tree's) times a sheet part (the result's).
+  A1 is measured on the sheet parts, and the chart parts are reported beside them.
+- *The result wears its left operand's base.*
+- *The `^` pairing is inside the egg.* Its keys share the port and the byte tree, so it is not a
+  `Composed` of copies: a common factor cancels from the posterior.
+  - A key dies at a close where another living key's consequence held and its own did not, or was
+    not computed. That is the record's "located by which pairing's results hold". A false result
+    kills no key.
+  - Before a death, the keys' weights move only within the parting expression, so the exact
+    posterior stays small. The pairing costs at most `log₂ 2 = 1` bit a stream.
+- *Exponents below 64*: a power of two with such an exponent fits the machine word. A power past
+  them is not computed.
+- *The byte tree at depth 16*: sixteen bytes span the longest run between an operand and the
+  result's first glyph (`B * 0x13EE == 0x`).
+- *The failure branch, revised during development, before the pin.* On the development seed's
+  declared forms the port read `so 1,000 + 1 = 1,001.` as `000 + 1 = 1`, which held. The port's
+  law was revised for every chart: a numeral does not begin after a digit and a separator `,`, just
+  as it does not begin after an identifier glyph. The form is now unreached and named.
+
+**The pin** (`54925b4c`, committed before its draws were read):
+- Seed `2026092903`, one seeded draw for the whole run: bases 2, 10 and 16 in that order, `N = 2^10`
+  expressions a base serving its three charts, operands below `2^13`, exponents below 4; then the
+  faces-only control; then the release keys.
+- The development runs read seed `2026092913`, and the tests read their own seeds.
+- The projection: 240 s and 1 GiB for the whole run. The development run took 105877 ms and
+  623000 kB on one core, against the caps of ten minutes and 20 GB.
+
+**The run**: `cargo run --release -p holonics --example hnn_population -- arithmetic` took
+105886 ms against 240 s projected. Its peak resident set was 614312 kB against 1 GiB. Every code
+below is read at `L_R = 16` as `n + k/16 + ε`, `0 ≤ ε < 1/16`; the endpoints are exact in the
+output.
+
+| Stream | Cells | Reached | A1: located key's sheet on the result cells (bound `5 + 13/16`) | Egg's sheet, the pairing mixed in (bound `6 + 13/16`) | Square / rebase | `^` located | Shared faces | Result's first glyph: tree → egg | Result's other glyphs: tree → egg | Numeral's end: tree → egg | All cells: tree → egg | Keystone's value |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| prose 2 | 57493 | 1024/1024 | 5 + 10/16 | 6 + 9/16 | 1024 / 1024 | power | 81 | 29 + 1/16 → 26 + 11/16 | 19686 + 3/16 → 5 + 0/16 | 4522 + 11/16 → 1469 + 8/16 | 56710 + 11/16 → 33973 + 15/16 | 22736 + 11/16 |
+| Rust 2 | 66042 | 1024/1024 | 5 + 13/16 | 6 + 13/16 | 1024 / 1024 | carry-free sum | 15 | 26 + 14/16 → 23 + 10/16 | 17964 + 2/16 → 6 + 2/16 | 4707 + 5/16 → 1667 + 1/16 | 59579 + 9/16 → 38578 + 2/16 | 21001 + 6/16 |
+| Lean 2 | 78649 | 1024/1024 | 5 + 10/16 | 6 + 9/16 | 1024 / 1024 | power | 81 | 21 + 6/16 → 19 + 1/16 | 19680 + 1/16 → 4 + 15/16 | 3077 + 8/16 → 22 + 4/16 | 57147 + 15/16 → 34415 + 3/16 | 22732 + 11/16 |
+| prose 10 | 24542 | 1024/1024 | 5 + 10/16 | 6 + 10/16 | 1024 / 1024 | power | 91 | 2871 + 10/16 → 29 + 13/16 | 19527 + 10/16 → 0 + 10/16 | 2674 + 8/16 → 1443 + 15/16 | 56239 + 6/16 → 32639 + 15/16 | 23599 + 6/16 |
+| Rust 10 | 31695 | 1024/1024 | 5 + 13/16 | 6 + 13/16 | 1024 / 1024 | carry-free sum | 18 | 3137 + 5/16 → 38 + 11/16 | 16631 + 0/16 → 0 + 12/16 | 2986 + 13/16 → 1750 + 2/16 | 58839 + 12/16 → 37874 + 4/16 | 20965 + 8/16 |
+| Lean 10 | 45693 | 1024/1024 | 5 + 10/16 | 6 + 10/16 | 1024 / 1024 | power | 91 | 2872 + 5/16 → 30 + 9/16 | 19542 + 6/16 → 0 + 11/16 | 1282 + 7/16 → 55 + 1/16 | 56741 + 4/16 → 33130 + 7/16 | 23610 + 12/16 |
+| prose 16 | 28987 | 1024/1024 | 5 + 11/16 | 6 + 11/16 | 1024 / 1024 | power | 88 | 34 + 7/16 → 27 + 13/16 | 21431 + 7/16 → 5 + 10/16 | 2797 + 5/16 → 1544 + 0/16 | 56071 + 14/16 → 33386 + 1/16 | 22685 + 12/16 |
+| Rust 16 | 36209 | 1024/1024 | 5 + 13/16 | 6 + 13/16 | 1024 / 1024 | carry-free sum | 24 | 44 + 0/16 → 35 + 7/16 | 18940 + 10/16 → 5 + 1/16 | 3152 + 3/16 → 1833 + 8/16 | 58693 + 1/16 → 38430 + 3/16 | 20262 + 13/16 |
+| Lean 16 | 50186 | 1024/1024 | 5 + 11/16 | 6 + 11/16 | 1024 / 1024 | power | 88 | 28 + 4/16 → 21 + 15/16 | 21455 + 14/16 → 5 + 10/16 | 1381 + 14/16 → 131 + 3/16 | 56598 + 14/16 → 33891 + 11/16 | 22707 + 3/16 |
+
+- **A1 passed on all nine streams.**
+  - Under the located key, `A + B ≥ P(holds)` held as an exact rational inequality on each of the
+    1024 expressions of every stream. Every prior was `(2i + 1)/(2i + 2)`, and the priors' product
+    equals `C(2N, N)/4^N` exactly. So the result cells, digits and end together, cost at most
+    `2N − log₂ C(2N, N) = 5 + 13/16 + ε` bits a stream, and the enclosures put the measured code
+    below that bound on every stream.
+  - The egg's own sheet parts, with the pairing mixed in, lie within the bound plus one bit. The
+    product of the per-expression bounds is `C(2N, N)/4^N · 2^−1` exactly: one parting expression a
+    stream.
+  - The square `decode_b(T_native(encode_b x)) = T(x)`, read back from the numeral's glyphs, held on
+    all 9216 expressions, and so did its rebase through the other two bases.
+- **A2 passed.**
+  - *Shared faces on the streams.* Every expression whose face two admitted producers share has a
+    receipt naming its carried producer (the operator glyph's key), with the holds and free
+    contributions: 81, 15, 81, 91, 18, 91, 88, 24 and 88 expressions.
+    - In prose and Lean the share is `a ^ 1 = a · 1`.
+    - In Rust it is a sum or carry-free sum whose operands share no bit, where `a + c = a ⊕ c`.
+  - *The record's own cases* (`2 + 2`, `2 · 2`, `2 ^ 2`; `0b10 + 0b10 = 0b100` in base 2), written in
+    each chart through a fresh egg:
+    - each receipt's fibre is {sum, product, power}, and the carried producer is named;
+    - the priors run `1/2`, `3/4`, `5/6`;
+    - the `^` line kills the pairing key it contradicts, and Rust's `2 ^ 2 == 0` leaves the fibre
+      {carry-free sum}.
+  - *The faces-only control*: 64 runs a producer of 4 faces, `a ∈ [2, 16)`, `k ∈ [0, 8)`, each
+    family holding all 112 keys.
+    - On every one of the 192 runs, every other family died by the third face. The carried family
+      never died.
+    - Before the separating face the provenance code was `log₂` of the tied fibre: `log₂ 3`, `1`
+      or `0` at the first face, `1` at the second on 4 runs, and `0` from the third face on.
+    - Each death carries its receipt: the face that killed it and the keys it held. For example, a
+      product run `(8, 1)` with faces `8, 16, 24` killed the power's last key at the third face, 24.
+- **A3 passed.**
+  - One owner reads the three charts: the port has no chart branch, and `^` was located per stream,
+    as the power in prose and Lean and as the carry-free sum in Rust.
+  - Every stream reached 1024 of its 1024 expressions.
+  - On equal expressions across the charts (sums and products in all three, powers in prose and
+    Lean), the contract's code `−log₂ Σ_held W·P(holds)` was equal exactly: 1716, 1676 and 1687
+    chart pairs in bases 2, 10 and 16, with none unequal.
+  - The measured codes differ only by the free key's share, the byte tree's belief, by less than
+    `1/16` bit.
+  - The keystone's value, the byte tree alone against the egg on the same cells, is the table's last
+    column: between `20262 + 13/16` and `23610 + 12/16` bits a stream. On the chart's other cells the
+    egg's face equalled the byte tree's exactly, cell by cell.
+- **The failure branch.**
+  - No pinned expression was unreached.
+  - The declared forms outside the layouts, each read through a fresh egg, are recorded unreached:
+    Lean's `(2 : ℕ) + 2 = 4`, Rust's `2u64 + 2 == 4`, `1_000 + 1 = 1001`, `1,000 + 1 = 1,001`,
+    `0o17 + 1 = 0o20`, `5 - 3 = 2`, `two + two = four` and `2 + 2 + 2 = 6`.
+  - `2 ^ 70 = 1180591620717411303424` is keyed, but its power lies past the admitted exponents, so no
+    key reaches it.
+  - `2 + 2 = 5` is a false result: it held under no key, and the sheet's free key coded it.
+
+**What the run shows beyond the acceptance** [measured]:
+- On the result's glyphs after the first, in prose, the byte tree alone pays `19686 + 3/16 + ε` bits
+  on 19600 binary glyphs, `19527 + 10/16 + ε` on 5078 decimal glyphs and `21431 + 7/16 + ε` on 6111
+  hex glyphs. The egg pays under 7 bits on them in every stream.
+- On the numeral's end the egg pays `1469 + 8/16 + ε` bits over 1024 ends in prose base 2, and
+  `22 + 4/16 + ε` in Lean base 2. That cost is the chart part, the byte tree's: after a long numeral
+  its 16-byte context cannot tell an operand's end (a space) from a result's end (`.` or `)`). Lean
+  ends both with a space. The port's phase would part them as the tree's context, but that is not
+  built.
+
+**The output product** (synthetic; each request is read at the port of the egg that read its stream,
+and its result is released by certified draws at tolerance zero, each cell `[0, 1)`; the control is
+the byte tree alone, drawing from its face under the same keys):
+
+| Request | Egg's release | Receipt | Byte tree alone |
+|---|---|---|---|
+| `so 347 × 5102 = ` (base 10, prose) | `1770394` | product; `1770394 = 2·347·2551`; carry word `[1, 0, 1, 4, 2, 1, 0]`; base 10, no declaration | `5241 ` |
+| `assert!(0x15B ^ 0x13EE == ` (base 16, Rust) | `0x12B5` | carry-free sum (the located `^`); `4789`, prime; released windings `[0,1,0,1,0,0,1,0,1,0,0,0,0]` (`330 = 0x15B ∧ 0x13EE`); base 16, `0x` | `0x1FD22FA2 ` |
+| `example : 0x15B ^ 0x3 = ` (base 16, Lean) | `0x27D8AA3` | power (the located `^`); `41781923 = 347³`; three carry words `[0,0,0]`, `[7,7,3,0,0]`, `[6,6,6,11,5,1,0]`; base 16, `0x` | `0x52A7 ` |
+| `so 0b101011011 × 0b1001111101110 = ` (base 2, prose) | `0b110110000001110011010` | product; `2·347·2551`; carry word `[0,0,1,1,1,2,3,3,3,4,4,4,4,4,3,3,2,1,1,0,0]`; base 2, `0b` | `0b100001110110110101101 ` |
+| `so 2 ^ 2 = ` (base 10, prose) | `4` | power; `4 = 2²`; carry words `[0]`, `[0]` | `120 ` |
+| the power `2, 2` in Rust | refused: Rust wears no glyph for the power | | |
+
+Each release checked its square and its rebase: all true.
+
+**Verdict.** The acceptance of §6 passed on the pinned run: A1, A2 and A3 on all nine streams, no
+pinned expression unreached, and the run within its projection. Two costs are disclosed rather than
+claimed away:
+- the pairing's one bit a stream;
+- the byte tree's cost on the numeral's end in prose and Rust.
+
+Composing this egg with the text chart's population, now that item (1)'s protocol is built, is the
+next loop.
+
 ## Receipts
 
-- Lean `HolonicsResearch/Mathematics/ArithmeticContract`: 26 audited statements with their
-  lemmas, no `sorry`, standard axioms only. `bash tools/lean_check.sh Holonics HolonicsResearch`:
-  10,244 jobs, success.
+- Lean `HolonicsResearch/Mathematics/ArithmeticContract`: 27 audited statements with their
+  lemmas (`jet_separates_across_keys` added with the build), no `sorry`, standard axioms only.
+  `bash tools/lean_check.sh Holonics HolonicsResearch`: 10,244 jobs, success.
 - `python3 research/notebook/arithmetic/contract_checks.py`: every check true.
+- The build: `cargo check --workspace --all-targets`; `cargo test -p holonics --lib`, 912 passed
+  (the terrain's `the_carry_cascade_keeps_the_value_and_emits_digits`,
+  `every_producer_closes_the_consumer_square_and_rebases`,
+  `the_three_charts_write_the_records_lines`, and the egg's six tests).
+- The run: `hnn_population -- arithmetic` at the pin `54925b4c`.
 - Atlas: `radix.carry-cascade-consumer`, `radix.carry-section-flux`, `radix.multiplication-table`,
   `radix.power-digit-lock`, `arith.producer-jets`, `arith.presentation-codes`,
-  `code.holds-sheet`.
+  `code.holds-sheet`, `holarchy.terrain-expressions`, `receiver.population-expression-egg`.
 
 ## Owed (#62)
 
@@ -338,3 +501,6 @@ protocol's owners. Composing it with the text chart's population follows once th
   expression family, with the jet order that parts it.
 - The holds sheet's composed code as an equality, not only the bound: the composition's telescope
   with the `free` key's likelihood included.
+- The pairing located by its results (§8): a keystone whose key dies at a close where another key's
+  consequence held and its own did not, rather than at a zero face. Its code is at most
+  `log₂ |K|` plus the located key's code; the statement is owed, beside `Composition.chain_rule`.

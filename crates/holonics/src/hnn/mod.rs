@@ -43,9 +43,14 @@
 //! propagates one contact per tick and is released at the word's end. The forward machine is here:
 //!
 //! - [`field`]: the declaration ([`Ring`], [`Contact`], [`Field`]), the lift point [`Current`] and
-//!   the read face of the constitution ([`ConstitutionRead`]); selective stepping on the port chart;
-//! - [`moment`]: the phase-binned [`SourceMoment`] on closing source rings, its window, the pair
-//!   port and its capacity `n*`;
+//!   the read face of the constitution ([`ConstitutionRead`]); selective stepping on the port chart
+//!   ([`PortChart`]: the codec's residue chart of the synthetic fields, or a founded chart);
+//! - [`encoding`] (U6): Holonic Encoding, a passage chart's minimal realization founded by
+//!   closing the receiving forms under the field's own transports ([`Encoding`], [`PassageChart`]),
+//!   its squares `D E = ρ`, `E T = U E` and the injection square, its Preimage Fibre and separator,
+//!   and the field's founded port chart ([`found_ports`]);
+//! - [`moment`]: the phase-binned [`SourceMoment`] on closing source rings, its pair buffer, the
+//!   pair port read over the whole offset moment (no window), and its capacity `n*`;
 //! - [`propagation`]: the junction Swing, the ring element's Cayley step with its contrast port,
 //!   the contact's midpoint two-port, the global power and the causal cone;
 //! - [`word`]: a [`Word`], one evaluation at one cut's fixed operands, opening at zero change and
@@ -102,7 +107,8 @@
 //! | the contact two-port | `HNN/Propagation.{partialIsometry_transit, transit_balance, tick_well_defined}` | [`propagation::transit`], [`Contact`] |
 //! | the causal cone | `HNN/Word.word_tick_cone` (the concrete tick) | [`Word::support`] |
 //! | the word on declared lattices: certified inverse charts, error feedback, the executed adjoint, the balance up to the residual | `HNN/LatticeWord.{nsStep, rounded_refinement_certificate, roundedIter_certificate, warm_start_certificate, inverse_chart_deviation, feedback_tick, carried_word_accounting, executed_adjoint_unique, executed_adjoint_deviation, cayley_chart_energy}` | [`chart`], [`Word`], [`Word::pull_back`], [`propagation::TickBalance`] |
-//! | the moment | `HNN/Moment.{encoderMoment_contract, encoder_covector_tape_free, closingRing_moment_is_phaseBinned, exteriorOffset_independent_of_E, selective_position, moment_capacity}` | [`SourceMoment`], [`moment::capacity`] |
+//! | the moment | `HNN/Moment.{encoderMoment_contract, encoder_covector_tape_free, closingRing_moment_is_phaseBinned, exteriorOffset_independent_of_E, selective_position, moment_capacity}`; the open with no window `HNN/Encoding.{whole_pair_read_counts, whole_pair_read_offset_moment}` | [`SourceMoment`], [`moment::capacity`] |
+//! | Holonic Encoding (U6) | `HNN/Encoding.{injection_square, encoding_reduced_recurrence, moment_reduced_recurrence, encoding_separator, encoding_descends_iff}`, `Compression/Landmark/Context/Birth.founding_intertwines` | [`encoding`] |
 //! | the receiving face: the landmark tree's face at each phase's causal address, read at the grain, plus the wave (the region table and the landmark tree; the region table is the depth-one forced case of the whole-cell emission, kept in Lean, not of the digit tree) | `HNN/RegionCounts.{grain_log_iff_pow_bounds, grain_code_residual, combined_face_pullback}`, `Compression/Landmark/Context/Tree.{depth_one_is_the_whole_cell_table, release_rule}` | [`receiving`], [`ReceivingRead::combined`], [`ActiveAddress`]; the grain read is [`crate::receiver::face::grain_exponent`]'s |
 //! | the receiving face compresses landmarks: the tree's path face, its opened-path deposit and telescope, the executed dyadic face (the landmark tree) | `Compression/Landmark/Context/Tree.{path_face_normalized, weight_step, landmark_step, path_telescope_exact, depth_one_is_the_whole_cell_table, executed_split_laws, cell_faces_partition, digit_log_residual}` (the owner's header has the rest) | [`crate::compression::landmark::context`] |
 //! | the word opens at zero | structural: [`Current`] has no wave field (`HNN/Retention.word_opens_at_zero` is the abstract trajectory's linearity) | [`Word::open`] |
@@ -131,6 +137,7 @@
 pub mod chart;
 pub mod constitution;
 pub mod contact;
+pub mod encoding;
 pub mod field;
 pub mod keys;
 pub mod moment;
@@ -153,9 +160,10 @@ pub use contact::{
     contact_readings, site_kinds, site_readings,
 };
 
+pub use encoding::{Encoding, EncodingError, FoundedPorts, PassageChart, found_ports};
 pub use field::{
-    ConstitutionRead, Contact, ContactDeclaration, Current, Field, FieldDeclaration, Ring,
-    RingDeclaration,
+    ConstitutionRead, Contact, ContactDeclaration, Current, Field, FieldDeclaration, PortChart,
+    PortChartKind, Ring, RingDeclaration,
 };
 pub use keys::{KeyLocation, RingKeys, locate_keys};
 pub use moment::{Capacity, PairPort, SourceMoment};

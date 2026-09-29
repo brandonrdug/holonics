@@ -6,7 +6,8 @@ import Holonics.Compression.Landmark.Context.Population
 [definition; agent-inferred] Eggs compose at ports, a Holarchy of eggs (`docs/ELEMENTARY_OBJECTS.md`,
 "The egg: a generator read as a whole", keystones; Rust `receiver::population::composition`). A
 **keystone** `A` is a declared finite key space `κ` of navigators, each exposing its state at a port
-(the arithmetic terrain's record clock exposes the record's phase and the records completed). A
+(a moiré's grating, a rotor ring keyed at its port, exposes its phase and the turns it has completed;
+the arithmetic record clock first named here is retired, history at `1b374d46`). A
 **conditioned family** `B` reads that port: under key `a` its face of class `c` at tick `t` is
 `P_a(t, c)`, its own face given the port path key `a` drives. The composed family `A ⊳ B` is the
 mixture over the keystone's keys weighed by what `B` read under each:

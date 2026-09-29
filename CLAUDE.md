@@ -201,6 +201,18 @@ intended HNN capability, and its motor chart is serial screw words.
 data to the HNN. No Lean parser, kernel call, theorem emitter, template or verdict enters the HNN.
 Lean verifies mathematics outside it.
 
+[definition] **No catered machinery** (Brandon, September 29: "rote computation is not a machine
+learning solution … I don't want this kind of contaminated machinery to appear again";
+[antipattern record](research/records/2026-09-29_ANTIPATTERN_CATERED_MACHINERY_A_TASKS_SOLUTION_ROUTINE_NEVER_STANDS_IN_FOR_LEARNING.md)). The machine is never handed a task's solution routine as a family,
+stage, port, receiver or predictor: no calculator, hand-written grammar or parser, copier, sentence
+counter, sieve, depth-limited context window or classical compressor tuned to a codec stands in for
+learning. Producers, structure and keys are located by the machine's own encoding, dynamics and
+deposition from its passage; tokenizing, encoding and recursive refinement are the field's own. A
+terrain may generate its truth with exact routines, the machine's own laws are exact, and a declared
+family may be a navigator of the machine's own kind whose keys are located; no receiver computes a
+task's answer by an authored routine. A result that is perfect because it was authored is a failed
+build.
+
 [definition] **"Soulkiller" is a name only** (borrowed from a game). Its subject is **equation
 extraction**: reading a foreign realization's operators and coefficients as the element relations,
 interconnection and navigators of a Holon, so that the extracted equations are native objects.

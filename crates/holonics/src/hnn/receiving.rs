@@ -398,12 +398,14 @@ impl FeatureFamily {
     }
 }
 
-/// One ring's clock law as the register reads it: its period, its lock on the port chart
-/// `port(x) = x mod d` (`hnn::field::Ring::{port, fits}`) and its navigator's clock at rest
-/// (`hnn::field::Ring::clock_at`), from which the register's clock restarts at an aeon's opening.
+/// One ring's clock law as the register reads it: its period, the field's port chart for each
+/// exterior code and its lock on those ports (`hnn::field::Ring::{port, fits}`, one owner of the
+/// chart) and its navigator's clock at rest (`hnn::field::Ring::clock_at`), from which the
+/// register's clock restarts at an aeon's opening.
 #[derive(Clone, Debug, PartialEq, Eq)]
 struct ClockRing {
     period: u64,
+    ports: Vec<usize>,
     lock: Vec<bool>,
     rest: Clock,
 }
@@ -493,6 +495,7 @@ impl LetterReader {
             .iter()
             .map(|ring| ClockRing {
                 period: ring.period(),
+                ports: (0..field.alphabet()).map(|code| ring.port(code)).collect(),
                 lock: (0..ring.period() as usize)
                     .map(|port| ring.fits(port))
                     .collect(),
@@ -585,9 +588,14 @@ impl LetterReader {
     fn step(&mut self, cell: usize) -> bool {
         let mut carry = 0u64;
         for (ring, clock) in self.rings.iter().zip(self.clocks.iter_mut()) {
-            let port = (cell as u64 % ring.period) as usize;
+            let fits = ring
+                .ports
+                .get(cell)
+                .and_then(|&port| ring.lock.get(port))
+                .copied()
+                .unwrap_or(false);
             carry = clock
-                .advance(&BigUint::from(u64::from(ring.lock[port]) + carry))
+                .advance(&BigUint::from(u64::from(fits) + carry))
                 .to_u64()
                 .expect(
                     "a ring of period at least 2 advanced at most two ticks jumps at most once",

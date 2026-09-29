@@ -10,15 +10,14 @@
 //! cargo run --release -p holonics --example hnn_population -- species
 //! ```
 //!
-//! [definition; agent-inferred] **The aeons** (`evolution`). Twelve declared aeons, three cycles of
-//! four terrains, each drawn by the seed plus its aeon's index: a moiré's parity color (`k = 3`,
-//! `q ≤ 2^3`, `2^12` cells), a tree source (depth 2 over bits, `2^12` cells), products in base 2
-//! (`L = 4` least significant first, `k = 2`, `2^8` records of 19 cells) and a prime stream in base
-//! 10 (`L = 3`, most significant first, over `[100c, 1000)` in cycle `c`). Each aeon declares the
-//! receiving tree at every depth of the ladder and the one key family of the catalogue that reads
-//! its cell alphabet (the parity gratings on both binary terrains, `clock ⊳ carry` on the
-//! products, `clock ⊳ (counter ⊳ sieve)` on the primes): seven families, each named by 3 bits, so
-//! the static prior is `1/7` a family at the Kraft mass `7/8`. Two populations read the same cells:
+//! [definition; agent-inferred] **The aeons** (`evolution`). Six declared aeons, three cycles of two
+//! terrains, each drawn by the seed plus its aeon's index: a moiré's parity color (`k = 3`,
+//! `q ≤ 2^3`, `2^12` cells) and a tree source (depth 2 over bits, `2^12` cells). The product and
+//! prime aeons that completed each cycle to four were retired September 29 with the arithmetic
+//! eggs, catered machinery (the mode at `1b374d46`). Each aeon declares the receiving tree at every
+//! depth of the ladder and the parity gratings, the one key family of the catalogue that reads the
+//! binary alphabet: seven families, each named by 3 bits, so the static prior is `1/7` a family at
+//! the Kraft mass `7/8`. Two populations read the same cells:
 //! the **static** one, and the **evolved** one, declared at the aeon's opening by
 //! `Population::evolved` from the counts retained so far at `λ = ½`. The retention reads the evolved
 //! population's receipt after each aeon; the counts are the only history kept.
@@ -42,9 +41,6 @@ use std::collections::BTreeMap;
 use std::time::Instant;
 
 use holonics::compression::landmark::context::ratio_code_length;
-use holonics::holarchy::terrain::arithmetic::{
-    DigitOrder, PrimeEmission, PrimeWindow, ProductFamily, Products,
-};
 use holonics::holarchy::terrain::{
     Draw, Moire, MoireClass, MoireFamily, RotorCrib, TreeSource, TreeSourceFamily,
 };
@@ -52,7 +48,7 @@ use holonics::ratio::Rat;
 use holonics::ratio::algebraic::{ExactInterval, interval_sum};
 use holonics::receiver::face::GrainCell;
 use holonics::receiver::population::{
-    AdmittedFuture, Collapse, Composed, Family, Identity, KeyFamily, Population, PopulationReceipt,
+    AdmittedFuture, Collapse, Family, Identity, KeyFamily, Population, PopulationReceipt,
     Selections, TreeFamily, Work,
 };
 use num_bigint::BigInt;
@@ -60,12 +56,12 @@ use num_bigint::BigInt;
 use super::exterior::{against, exact};
 use super::{CRIB_RING, DEPTHS, ENUMERATION, GRAIN, SEED, crib_field, factored, tree_declaration};
 
-/// The aeons: three cycles of the four terrains.
-const AEONS: usize = 12;
+/// The terrains a cycle: the moiré and the tree source.
+const TERRAINS: usize = 2;
+/// The aeons: three cycles of the terrains.
+const AEONS: usize = 3 * TERRAINS;
 /// The moiré's and the tree source's cells an aeon.
 const AEON_CELLS: usize = 1 << 12;
-/// The products' records an aeon.
-const AEON_RECORDS: usize = 1 << 8;
 /// Each family's naming bits: `⌈log₂ 7⌉`.
 const NAMING: u64 = 3;
 
@@ -138,7 +134,7 @@ fn terrain(aeon: usize) -> Terrain {
                 .expect("the parity gratings"),
         )
     };
-    match aeon % 4 {
+    match aeon % TERRAINS {
         0 => {
             let moire = Moire::draw(&parity, MoireClass::Parity, &mut Draw::new(seed))
                 .expect("a drawn moiré");
@@ -162,7 +158,7 @@ fn terrain(aeon: usize) -> Terrain {
                 key: Box::new(gratings),
             }
         }
-        1 => {
+        _ => {
             let family = TreeSourceFamily {
                 alphabet: 2,
                 depth: 2,
@@ -175,49 +171,6 @@ fn terrain(aeon: usize) -> Terrain {
                 cells: source.emit(AEON_CELLS, &mut draw),
                 alphabet: 2,
                 key: Box::new(gratings),
-            }
-        }
-        2 => {
-            let family = ProductFamily {
-                base: 2,
-                digits: 4,
-                face: 2,
-                order: DigitOrder::LeastFirst,
-            };
-            let products =
-                Products::draw(&family, AEON_RECORDS, &mut Draw::new(seed)).expect("products");
-            let declared = family.clone();
-            Terrain {
-                name: "products in base 2 (L = 4, 2^8 records)".to_string(),
-                cells: products.emit(),
-                alphabet: family.alphabet(),
-                key: Box::new(move || {
-                    Box::new(Composed::products(&declared, NAMING).expect("clock ⊳ carry"))
-                }),
-            }
-        }
-        _ => {
-            let start = 100 * (aeon / 4) as u64;
-            let window = PrimeWindow {
-                base: 10,
-                start,
-                end: 1000,
-                digits: 3,
-                trailing: 1,
-                order: DigitOrder::MostFirst,
-                emission: PrimeEmission::Digits,
-            };
-            let cells = window.emit().expect("the prime stream");
-            Terrain {
-                name: format!("primes in base 10 over [{start}, 1000) (L = 3)"),
-                cells,
-                alphabet: 12,
-                key: Box::new(move || {
-                    Box::new(
-                        Composed::primes(&window, ENUMERATION, NAMING)
-                            .expect("clock ⊳ (counter ⊳ sieve)"),
-                    )
-                }),
             }
         }
     }
@@ -253,7 +206,7 @@ pub fn evolution() {
     let mut names: BTreeMap<Identity, String> = BTreeMap::new();
     let zero = ExactInterval::point(Rat::from_integer(BigInt::from(0)));
     let (mut total_static, mut total_evolved) = (zero.clone(), zero.clone());
-    let mut cycles = vec![(zero.clone(), zero.clone()); AEONS / 4];
+    let mut cycles = vec![(zero.clone(), zero.clone()); AEONS / TERRAINS];
     println!(
         "hnn_population evolution: {AEONS} aeons, seed {SEED} + the aeon; seven families an aeon, each named by {NAMING} bits; the evolved prior at λ = 1/2"
     );
@@ -318,7 +271,7 @@ pub fn evolution() {
         );
         total_static = interval_sum(&total_static, &static_receipt.code).expect("a sum");
         total_evolved = interval_sum(&total_evolved, &receipt.code).expect("a sum");
-        let cycle = &mut cycles[aeon / 4];
+        let cycle = &mut cycles[aeon / TERRAINS];
         cycle.0 = interval_sum(&cycle.0, &static_receipt.code).expect("a sum");
         cycle.1 = interval_sum(&cycle.1, &receipt.code).expect("a sum");
         for family in &receipt.families {
@@ -348,8 +301,8 @@ pub fn evolution() {
     for (cycle, (stat, evolved)) in cycles.iter().enumerate() {
         println!(
             "cycle {cycle} (aeons {}–{}): static {}, evolved {}, evolved − static {}",
-            4 * cycle,
-            4 * cycle + 3,
+            TERRAINS * cycle,
+            TERRAINS * cycle + TERRAINS - 1,
             short(stat),
             short(evolved),
             short(&minus(evolved, stat))

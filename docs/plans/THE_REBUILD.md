@@ -505,6 +505,19 @@ named, and the program's loop stays its own counter, disclosed as such.
 
 #### U6. The text chart
 
+- **Redirected September 29: the text chart is the one machine's field**
+  ([record](../../research/records/2026-09-29_THE_TEXT_CHART_IS_THE_ONE_MACHINES_FIELD_TORI_HELICES_EGGS_AND_TUBES_ARE_ONE_FAMILY.md)).
+  The byte-tree text line below (F0, F4, U2, and U6 items 1 and 2) broke HNN_FORMULA's laws: it
+  coded bytes, addressed a window of the last `D` bytes and drew one byte at a time. It stops: no
+  further tuning of, or comparison against, the context tree. Tori, helices, eggs, tubes, fractals,
+  friction, knots and the flux physics are one family, and text enters the one machine's field as
+  moments on its helices and leaves as a jointly refined section. The next loop is two owners,
+  built in parallel: `hnn::encoding` (`E` founded by closing the receiving forms under the field's
+  transports, no window) and `hnn::prediction` (a latent section refined by `K` words with the
+  field's motion continuing, read jointly, released at width zero). Acceptance: exact balances,
+  exact `T(x)` on copy and moiré terrain, then generated text sections shown whole. The data
+  protocol (item 1) and the arithmetic contract (item 3) stay.
+
 F0's next loop is U2's memory experiment; F4's second stage follows U3; F5 follows F0 and F4. The
 curated source gains its intervals (source contract item 9), measured as a charged comparison
 against the source without them. Their gates below are unchanged. Failure: each gate's own failure
@@ -606,6 +619,80 @@ branch; intervals that do not shorten the charged code are recorded and not adop
     of 1,214). Both recombine vocabulary, and neither answers.
   - *What stays open*, measured: both states past the budget; the hazard at a response's end; the
     releases. Items 3–5 carry them, and F0's release gate, F4's curated release and F5 wait on them.
+- **Item (3) retired September 29 as catered machinery** ([antipattern record](../../research/records/2026-09-29_ANTIPATTERN_CATERED_MACHINERY_A_TASKS_SOLUTION_ROUTINE_NEVER_STANDS_IN_FOR_LEARNING.md)):
+  a hand-written grammar over the test's layouts and exact routines computing each result, a
+  calculator rather than learning. Its code and the arithmetic eggs are retired (history at
+  `1b374d46`); its mathematics stays in Lean. The entry below is its history.
+- **Item (3) built and its acceptance passed, September 29** (`c17ea7bd`, pinned in `54925b4c`
+  before its draws were read; the
+  [record's §8](../../research/records/2026-09-29_THE_ARITHMETIC_CONTRACT_A_NUMERAL_IS_A_FACE_OF_A_COUNTING_NAVIGATOR_AND_ITS_PRODUCER_IS_A_KEY.md#8-the-build-and-its-acceptance-run-september-29);
+  Refs #73 #148 #63).
+  - *Built*:
+    - `holarchy::terrain::arithmetic::Expressions`: the prose, Rust and Lean layouts in one declared
+      glyph set, each line with its exact truth;
+    - `receiver::population::arithmetic::{ExpressionPort, ExpressionEgg}`: the numeral port with no
+      chart branch, the `^` pairing located by which results hold, the holds sheet over the byte
+      tree, a receipt per expression, and the release as egg packing by certified draws;
+    - the `arithmetic` mode of `hnn_population` (retired with it; at `1b374d46`);
+    - Lean `jet_separates_across_keys`.
+  - *The run*, seed `2026092903`, `2^10` expressions a base and chart, 105886 ms and 614312 kB
+    against 240 s and 1 GiB projected:
+    - A1: on all nine streams, under the located key, `A + B ≥ P(holds)` exactly on every
+      expression, so the result cells cost at most `2N − log₂ C(2N, N) = 5 + 13/16 + ε` bits a
+      stream. The egg's own code is within that plus the pairing's one bit, and the square and its
+      rebase held on all 9216 expressions.
+    - A2: every shared face (`a ^ 1 = a · 1`; sums whose operands share no bit, `a + c = a ⊕ c`) has
+      its receipt naming the carried producer. On the faces-only control every other family died by
+      the third face on all 192 runs.
+    - A3: 1024 of 1024 reached on every stream, and the contract's code was equal on every equal
+      expression across the charts. The keystone's value against the byte tree alone lies between
+      `20262 + 13/16` and `23610 + 12/16` bits a stream.
+    - The failure branch: no pinned expression unreached. The declared forms outside the layouts
+      (`(2 : ℕ)`, `2u64`, `1_000`, `1,000`, `0o17`, `-`, words, chains, `2 ^ 70`) are recorded
+      unreached. The port's numeral start was revised for every chart during development, before
+      the pin, after it misread `1,000 + 1 = 1,001`.
+  - *Disclosed*: the byte tree's 16-byte context cannot tell an operand's end from a result's in
+    prose and Rust (`1469 + 8/16 + ε` bits on 1024 ends in prose base 2, against `22 + 4/16 + ε` in
+    Lean). Its composition joins the native field (`hnn::encoding`, `hnn::prediction`, the redirect
+    above), not the byte tree.
+- **`hnn::encoding` pinned, September 29**
+  ([pin](../../research/records/2026-09-29_HOLONIC_ENCODING_FOR_THE_FIELD_PINNED_BEFORE_ITS_RUN.md);
+  Refs #73 #63). The founding law is the minimal realization of a passage chart, founded by
+  `birth::Closure` forward from the openings and backward from the receiving forms; the field's step
+  classes are read from the founded constituents, each placed on a ring at its first arrival on the
+  ring's own clock; `E_g` opens at the founded injection; the open reads the whole offset moment, not
+  a column at a raw cell's address. Acceptance, fixed before any run: the squares exact and the
+  founded dimension equal to the emission's Hankel rank on the moiré, a copy terrain and the rotor
+  crib; the moment equal across every split, with nothing discarded by length; on a 6,148-byte
+  choosing-role passage, the founded constituents, `n*` and the field's charged code, the code before
+  the change beside it.
+- **`hnn::encoding` built and run, September 29: acceptance 1 and 2 hold; text unchanged**
+  ([record](../../research/records/2026-09-29_HOLONIC_ENCODING_FOR_THE_FIELD_THE_SQUARES_CLOSE_ON_KNOWN_TRUTH_AND_TEXT_FOUNDS_ONLY_ITS_REACHED_CELLS.md);
+  `38cf65ac`, `397de664`; Refs #73 #63).
+  - *Built*: `hnn::encoding` (the minimal realization through `birth::Closure`, its squares, fibre and
+    separator, `found_ports`); `hnn::field::PortChart`, read by the rings, the card's lock chart and
+    the letters' reader; `E_0` at the founded injection on a founded field; the open's pair read over
+    the whole offset moment on host and card; Lean `HNN/Encoding` (`injection_square`,
+    `encoding_reduced_recurrence`, `moment_reduced_recurrence`, `encoding_separator`,
+    `encoding_descends_iff`, the window-free read) and `SelectiveDecl`'s declared port chart.
+  - *Terrain*: the squares exact and the founded dimension the emission's Hankel rank on the moiré
+    (7 of 12; 7 on 12 reached of 24; 11 of 20), the copy ring (8, and 4 on a period-4 word, where
+    observability alone founds 32) and the rotor crib (3–6 on `d = 5`; 16–40 on `d = 7`, where
+    observability alone founds 81–86).
+  - *No window*: one moment across every split of 4,096 cells; every cell and pair counted once.
+  - *Text* (6,148 choosing-role bytes): 65 founded constituents, each a reached byte, and a plural
+    fibre of 191; `n* = 6,148` unchanged; the field's held-out code `5463 + 9/16 + ε` bits against
+    `5463 + 7/16 + ε` before (its part against the tree `−13 + 5/16 + ε` against `−13 + 4/16 + ε`);
+    `Kt` `+26 + 14/16 + ε`, of which the description is 28 bits. Ring 0's lock admits 210 development
+    cells against the residue's 842; 2 aeons against 6. An attribution run on the residue chart separates two opposite moves: the open
+    without a window earns `−4 + 6/16 + ε` held-out bits, and the founded chart with its founded `E_0`
+    costs `3 + 11/16 + ε` against the residue chart and sign sequence.
+  - *What stays open*, measured: the founded chart with its founded `E_0` codes the held-out cells
+    `3 + 11/16 + ε` bits above the residue chart with the sign sequence; on the exterior chart the
+    field knows no transport, so the founding reaches exactly a passage's cells, and text's recurring
+    transformations must be located from the passage, not founded by rotor closure alone. On a
+    shared host the whole-moment read's word refine read took 120,578 ms against the indexed read's
+    42,932 on this passage.
 
 #### U7. The targets, alongside
 

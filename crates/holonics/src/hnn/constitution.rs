@@ -2146,7 +2146,7 @@ impl Constitution {
     ///
     /// | Locus | Initial value | Update |
     /// |---|---|---|
-    /// | `E_g` on a source ring | the sign sequence times ½ | normal law, `H_0 = I`, `B_0 = E_0` |
+    /// | `E_g` on a source ring | on a founded port chart, the founded injection: each cell's column ½ at its constituent's placement node (real quadrature; `hnn::encoding`); on the codec's residue chart, the sign sequence times ½ | normal law, `H_0 = I`, `B_0 = E_0` |
     /// | `E_g^(δ)`, rank `2d_g` | `e_ρ = 0`; `a_ρ`, `b_ρ` from the sign sequence | factor steps |
     /// | `R` on a receiving ring | 0 | normal law, `H_0 = I`, `B_0 = 0` |
     /// | the landmark tree on a receiving ring, declared from its first receiver | empty: every node unfounded, every face uniform (`α = ½` at first arrival) | the landmark deposit (the landmark tree) |
@@ -2208,6 +2208,10 @@ impl Constitution {
             .enumerate()
             .map(|(g, ring)| {
                 let n = ring.width();
+                // `E_0`: on a founded port chart, the founded injection (each cell's column one half
+                // at its constituent's placement node, the real quadrature; `hnn::encoding`, the pin
+                // of September 29); on the codec's residue chart, the declared sign sequence.
+                let founded = field.port_chart().is_founded();
                 let source = field
                     .is_source(g)
                     .then(|| {
@@ -2218,8 +2222,19 @@ impl Constitution {
                                 .map(|i| {
                                     (0..a)
                                         .map(|j| {
-                                            declared_sign(locus_code(0, g, 0), i as u64, j as u64)
-                                                * rat(1, 2)
+                                            if founded {
+                                                if i == 2 * ring.port(j) {
+                                                    rat(1, 2)
+                                                } else {
+                                                    Rat::zero()
+                                                }
+                                            } else {
+                                                declared_sign(
+                                                    locus_code(0, g, 0),
+                                                    i as u64,
+                                                    j as u64,
+                                                ) * rat(1, 2)
+                                            }
                                         })
                                         .collect()
                                 })

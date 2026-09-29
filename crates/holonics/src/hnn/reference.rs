@@ -1874,21 +1874,22 @@ pub fn compose_return(
                 .pair_port(g, offset)
                 .ok_or(HnnError::MissingSourcePort { ring: g })?;
             let rank = pair.rank();
-            // The indexed normalized column of each phase `(x, a, C_c[x, a] ν̂_a)` (ruling B), read
-            // once; none at an unsupported fibre.
-            let column = moment.indexed_column(field, g, offset)?;
+            // The whole normalized offset moment of each phase `(x, a, C_c[x, a] ν̂)` over its pair
+            // population (`hnn::moment`: the open reads no window), read once; none at an empty
+            // population.
+            let table = moment.offset_table(field, g, offset)?;
             let mut nonzero: Vec<Vec<(usize, usize, Rat)>> = Vec::with_capacity(d);
             let mut energy = Rat::zero();
             for c in 0..d {
                 let mut slots = Vec::new();
-                if let Some(column) = &column {
-                    for (x, &count) in column.phase(c, alphabet).iter().enumerate() {
+                if let Some(table) = &table {
+                    for (slot, &count) in table.phase(c, alphabet).iter().enumerate() {
                         if count == 0 {
                             continue;
                         }
-                        let value = Rat::from_integer(BigInt::from(count)) * &column.weight;
+                        let value = Rat::from_integer(BigInt::from(count)) * &table.weight;
                         energy += &value * &value;
-                        slots.push((x, column.address, value));
+                        slots.push((slot / alphabet, slot % alphabet, value));
                     }
                 }
                 nonzero.push(slots);

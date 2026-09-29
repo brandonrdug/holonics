@@ -110,13 +110,15 @@ mod terrain {
     use crate::compression::landmark::context::{
         Capacity, LandmarkDeclaration, LetterFamily, StopPrior,
     };
-    use crate::holarchy::terrain::arithmetic::{DigitOrder, ProductCell, ProductFamily, Products};
     use crate::holarchy::terrain::{
         Draw, Moire, MoireClass, MoireFamily, MoireTruth, TreeSource, TreeSourceFamily,
     };
     use crate::ratio::{Rat, rat};
+    use crate::receiver::population::composition_tests::{
+        drawn_sheets, horizon, ring_survivors, sheet_tuple_egg, two_rings,
+    };
     use crate::receiver::population::{
-        Composed, Family, KeyFamily, Population, PopulationRelease, TreeFamily,
+        Family, KeyFamily, Population, PopulationRelease, TreeFamily,
     };
     use crate::receiver::release::{ReleaseReturn, draw_exact};
 
@@ -230,37 +232,41 @@ mod terrain {
         );
     }
 
-    /// **The composed product key predicts every determined cell through the record stop**: the
-    /// record clock joined to the carry egg first gives a one-hot face on a determined cell at cell
-    /// 3 of the one-digit binary record `1·1`, and every later determined face is one-hot on the
-    /// exact product truth through the stop.
+    /// **The composed grating key predicts every cell once its survivors are one species** (the
+    /// full-future check above, on a composed egg): on the drawn sheet tuple composed at its first
+    /// ring (`composition_tests::sheet_tuple_egg`), each ring's species is the gratings emitting
+    /// its drawn word forever (its survivors over the horizon), and the tick from which both rings'
+    /// survivors are their species is read by brute force. From that tick every face is one-hot on
+    /// the truth through the one law, and the first one-hot face comes no later. On the drawn
+    /// `3/5 @ 0/5, 1/4 @ 0/4` each species is the ring's grating and its mirror; the first one-hot
+    /// face is at tick 4, before the survivors are their species at tick 7.
     #[test]
-    fn the_composed_product_key_holds_through_the_record_stop() {
-        let family = ProductFamily {
-            base: 2,
-            digits: 1,
-            face: 1,
-            order: DigitOrder::LeastFirst,
-        };
-        let products = Products::new(family.clone(), vec![(1, 1)]).unwrap();
-        let stream = products.emit();
-        assert_eq!(products.truth().unwrap()[0].value, 1);
-        assert_eq!(stream.len(), family.record_length());
-        let composed = Composed::products(&family, 1).unwrap();
+    fn the_composed_grating_key_holds_once_its_survivors_are_one_species() {
+        let family = two_rings();
+        let reach = horizon(&family);
+        let cells = drawn_sheets().emit(3 * reach);
+        let species = [0, 1].map(|ring| ring_survivors(&family, &cells[..reach], ring));
+        let settled = (0..=cells.len())
+            .find(|&t| {
+                (0..2).all(|ring| ring_survivors(&family, &cells[..t], ring) == species[ring])
+            })
+            .expect("the survivors reach their species by the horizon");
+        assert!(settled <= reach);
+        let composed = sheet_tuple_egg(&family, 1);
         let mut population = Population::new(vec![Box::new(composed) as Box<dyn Family>]).unwrap();
         let mut located = None;
-        for (position, &cell) in stream.iter().enumerate() {
-            if family.class(position) != ProductCell::Operand {
-                let exact = one_hot(&enclosed_member_face(&population), cell);
-                match located {
-                    None if exact => located = Some(position),
-                    Some(_) => assert!(exact, "a determined face after the first at {position}"),
-                    None => {}
-                }
+        for (tick, &cell) in cells.iter().enumerate() {
+            let exact = one_hot(&enclosed_member_face(&population), cell);
+            if exact && located.is_none() {
+                located = Some(tick);
+            }
+            if tick >= settled {
+                assert!(exact, "a face past the species at {tick}");
             }
             population.receive(cell).unwrap();
         }
-        assert_eq!(located, Some(3));
+        assert!(located.is_some_and(|tick| tick <= settled));
+        assert_eq!((located, settled), (Some(4), 7));
     }
 
     /// **A learned face is compared with the identified source face by exact separators**: the
