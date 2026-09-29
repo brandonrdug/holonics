@@ -290,7 +290,7 @@ theorem carry_moves_an_unfitted_ring :
     (∀ x, ¬ twoRing.Fits 1 x) ∧ twoRing.run [()] (fun _ => 1) 1 = 2 := by
   refine ⟨fun x h => by simp [SelectiveDecl.Fits, twoRing] at h, ?_⟩
   simp [SelectiveDecl.run, SelectiveDecl.advance, SelectiveDecl.carryIn, SelectiveDecl.step,
-    SelectiveDecl.Fits, SelectiveDecl.port, twoRing]
+    SelectiveDecl.Fits, twoRing]
 
 end Dormant
 

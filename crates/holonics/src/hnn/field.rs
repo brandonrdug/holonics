@@ -7,7 +7,7 @@
 //!   finite-order port map `P_g = (· + 1)` of its `d_g` nodes (`navigator::Transport::Map`, order
 //!   exactly `d_g`), its key the declared initial configuration; its reflector `F_g`, an involution
 //!   of `ℤ/d_g` (the keys' [`ReflectorMachine`] is built from the two, [`Ring::machine`]); its lock
-//!   `N_g ⊂ ℤ/d_g` on the port chart `port_g(x) = code(x) mod d_g`;
+//!   `N_g ⊂ ℤ/d_g` on the field's port chart ([`PortChart`], "The port chart" below);
 //!   one screw generator with `d_g` node placements on its circle, node `k` at winding `n` sitting
 //!   at `x_g(k, n) = placement_k + n·v_∥` (helix = circle + carry, `v_∥` the generator's axial
 //!   advance). The period is combinatorial, so several nodes may share a placement; its storage
@@ -41,6 +41,18 @@
 //! carry is the joint clock's carry-out, the aeon boundary. A ring whose lock no input fits and
 //! that receives no carry keeps its configuration (Lean `HNN/Keys.selective_step_dormant`).
 //!
+//! [definition; agent-inferred, U6] **The port chart** ([`PortChart`]; the
+//! [encoding pin](../../../../research/records/2026-09-29_HOLONIC_ENCODING_FOR_THE_FIELD_PINNED_BEFORE_ITS_RUN.md)).
+//! `port_g(x)` is read from the field's declared chart, one port of `ℤ/d_g` for each exterior code
+//! on each ring. A text field's chart is **founded** (`hnn::encoding::found_ports`): its step
+//! classes are the founded constituents of the exterior chart on a founding passage, each placed on
+//! each ring at the ring's phase class at its first arrival on the field's own clock, and the codes
+//! the passage never separates are one plural fibre that steps no ring by its lock. The codec
+//! supplies only the exterior alphabet and its decoder. [`Field::declare`] declares the **residue
+//! chart** `code mod d_g`, the codec's choice: it is the declared chart of the synthetic fields whose
+//! drawn codes carry no source structure (and whose codes are the ring's ports when `|A| ≤ d_g`), and
+//! it is never the text chart ([`Field::with_port_chart`] replaces it).
+//!
 //! [definition; agent-inferred, U5] **The rings' clocks.** Ring `g`'s clock is its navigator's
 //! `navigator::Clock`, a ring of period `d_g` ([`Ring::clock_at`]); the lift coordinate `λ_g` is
 //! its tick count since rest, its digit the phase class and its overflow the winding. Every reading
@@ -65,6 +77,7 @@
 //! | Lean | Rust |
 //! |---|---|
 //! | `HNN/Keys.selective_step_dormant`, `HNN/Moment.selective_position` | [`Field::selective_step`] |
+//! | `HNN/Moment.SelectiveDecl` (its declared port chart `port g x`, any chart) | [`PortChart`], [`Ring::port`], [`Field::with_port_chart`]; the founding `hnn::encoding::found_ports` |
 //! | `HNN/Moment.SelectiveDecl.carryIn_is_section_flux`, `Holon/Navigator.jumps_are_carries` (the carry is the ring clock's jumps and its section's flux) | [`Field::selective_step`] through [`Ring::clock_at`] |
 //! | `Aeon/Clock/Winding.ratio_split`, `split_unique` (a lift coordinate's phase class and windings) | [`Current::phase`], [`Current::winding`], [`Ring::point`], [`Ring::rotate`] |
 //! | `Aeon/Clock/Winding.clockLift` | [`Field::parametric`] |
@@ -446,6 +459,74 @@ pub fn lattice_exponent(grain: u128, fan_in: u128) -> u32 {
 }
 
 // -------------------------------------------------------------------------------------------
+// the port chart
+
+/// [definition; agent-inferred, U6] **The field's port chart** (module header, "The port chart"):
+/// the port `port_g(x) ∈ ℤ/d_g` of every exterior code `x` on every ring `g`, and how it was made.
+/// The selective step reads it through [`Ring::port`]; the card mounts the lock chart it gives
+/// (`[port_g(x) ∈ N_g]`, read off the host owner at the moment's open), so both realizations read
+/// one chart.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct PortChart {
+    /// `ports[g][x]`.
+    ports: Vec<Vec<usize>>,
+    kind: PortChartKind,
+}
+
+/// [definition] **How a port chart was made.**
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub enum PortChartKind {
+    /// The codec's residue chart `code mod d_g`: the declared chart of synthetic fields.
+    Residue,
+    /// Founded by `hnn::encoding::found_ports` on a founding passage of `passage` cells: the
+    /// founded constituents placed at their first arrival on each ring's clock, `constituents` of
+    /// them, and the plural fibre of `fibre` codes the passage never separated.
+    Founded {
+        passage: u64,
+        constituents: u64,
+        fibre: u64,
+    },
+}
+
+impl PortChart {
+    /// **The residue chart** `port_g(x) = x mod d_g` over an exterior chart of `alphabet` codes.
+    pub fn residue(periods: &[u64], alphabet: usize) -> Self {
+        Self {
+            ports: periods
+                .iter()
+                .map(|&period| {
+                    (0..alphabet)
+                        .map(|code| (code as u64 % period.max(1)) as usize)
+                        .collect()
+                })
+                .collect(),
+            kind: PortChartKind::Residue,
+        }
+    }
+
+    /// **A founded chart**, `ports[g][x]` as founded (`hnn::encoding::found_ports`); its shape is
+    /// checked where a field takes it ([`Field::with_port_chart`]).
+    pub fn founded(ports: Vec<Vec<usize>>, kind: PortChartKind) -> Self {
+        Self { ports, kind }
+    }
+
+    /// `ports[g][x]`.
+    pub fn ports(&self) -> &[Vec<usize>] {
+        &self.ports
+    }
+
+    /// How the chart was made.
+    pub fn kind(&self) -> PortChartKind {
+        self.kind
+    }
+
+    /// Whether the chart was founded (not the codec's residue chart).
+    pub fn is_founded(&self) -> bool {
+        matches!(self.kind, PortChartKind::Founded { .. })
+    }
+}
+
+// -------------------------------------------------------------------------------------------
 // the ring
 
 /// [definition] **A closing rotor ring**, checked. See the module header.
@@ -461,6 +542,8 @@ pub struct Ring {
     admittance: Rat,
     parametron: Parametron,
     initial: u64,
+    /// The port of each exterior code on this ring, read from the field's [`PortChart`].
+    ports: Vec<usize>,
 }
 
 impl Ring {
@@ -559,6 +642,7 @@ impl Ring {
             admittance: declared.admittance.clone(),
             parametron,
             initial: declared.initial,
+            ports: Vec::new(),
         })
     }
 
@@ -616,9 +700,15 @@ impl Ring {
         Ok(clock)
     }
 
-    /// The port class of an exterior code: `port_g(x) = code(x) mod d_g`.
+    /// **The port class of an exterior code** on this ring, read from the field's [`PortChart`]
+    /// (module header, "The port chart"). Every caller reads a code of the field's exterior chart
+    /// (the selective step refuses one outside it); a code outside the chart reads the port `d_g`,
+    /// which no lock admits.
     pub fn port(&self, code: usize) -> usize {
-        code % self.placements.len()
+        self.ports
+            .get(code)
+            .copied()
+            .unwrap_or(self.placements.len())
     }
 
     /// Whether a port class fits the lock `N_g`.
@@ -886,6 +976,8 @@ pub struct Field {
     /// The word's declared precisions by rule ([`WordLattice::by_rule`]); `None` only for the
     /// exact law's own tests (`Field::with_exact_word`).
     word: Option<WordLattice>,
+    /// The port chart the rings read ([`PortChart`]).
+    port_chart: PortChart,
 }
 
 impl Field {
@@ -906,12 +998,21 @@ impl Field {
         if !declared.step.is_positive() || declared.exponent_grain == 0 || declared.alphabet == 0 {
             return Err(HnnError::NonpositiveDeclaration);
         }
-        let rings = declared
+        let mut rings = declared
             .rings
             .iter()
             .enumerate()
             .map(|(index, ring)| Ring::declare(index, ring))
             .collect::<Result<Vec<_>, _>>()?;
+        // The declared chart is the codec's residue chart (module header, "The port chart"); a text
+        // field replaces it with its founded chart (`Field::with_port_chart`).
+        let port_chart = PortChart::residue(
+            &rings.iter().map(Ring::period).collect::<Vec<_>>(),
+            declared.alphabet,
+        );
+        for (ring, ports) in rings.iter_mut().zip(port_chart.ports()) {
+            ring.ports = ports.clone();
+        }
         let contacts = declared
             .contacts
             .iter()
@@ -1063,7 +1164,48 @@ impl Field {
             distances,
             lattices,
             word,
+            port_chart,
         })
+    }
+
+    /// **The field with a founded port chart** (module header, "The port chart"): every ring reads
+    /// its ports from `chart`. Refused unless the chart gives one port of `ℤ/d_g` for every
+    /// exterior code on every ring. Nothing else of the declaration changes: the capacity counts the
+    /// exterior chart, and the word's precisions read no port.
+    pub fn with_port_chart(mut self, chart: PortChart) -> Result<Self, HnnError> {
+        if chart.ports().len() != self.rings.len() {
+            return Err(HnnError::Shape {
+                what: "a port chart's rings",
+                expected: self.rings.len(),
+                found: chart.ports().len(),
+            });
+        }
+        for (ring, ports) in self.rings.iter().zip(chart.ports()) {
+            if ports.len() != self.alphabet {
+                return Err(HnnError::Shape {
+                    what: "a port chart's codes on a ring",
+                    expected: self.alphabet,
+                    found: ports.len(),
+                });
+            }
+            if let Some(&port) = ports.iter().find(|&&port| port >= ring.placements.len()) {
+                return Err(HnnError::Shape {
+                    what: "a port inside the ring's port chart",
+                    expected: ring.placements.len(),
+                    found: port,
+                });
+            }
+        }
+        for (ring, ports) in self.rings.iter_mut().zip(chart.ports()) {
+            ring.ports = ports.clone();
+        }
+        self.port_chart = chart;
+        Ok(self)
+    }
+
+    /// The port chart the rings read.
+    pub fn port_chart(&self) -> &PortChart {
+        &self.port_chart
     }
 
     /// **The word's declared precisions** (the lattice word; [`WordLattice::by_rule`]): the charts'
@@ -1227,6 +1369,18 @@ impl Field {
                 alphabet: self.alphabet,
             });
         }
+        self.step_at_ports(lift, |g| self.rings[g].port(code))
+    }
+
+    /// **The selective step at given ports**: ring `g` advances `[port(g) ∈ N_g]` plus its
+    /// predecessor's carry. It is the one owner of the step law; [`Field::selective_step`] reads the
+    /// ports from the field's chart, and the port chart's founding (`hnn::encoding::found_ports`)
+    /// reads them from the chart as it is founded.
+    pub(crate) fn step_at_ports(
+        &self,
+        lift: &mut [BigInt],
+        port: impl Fn(usize) -> usize,
+    ) -> Result<SelectiveStep, HnnError> {
         if lift.len() != self.rings.len() {
             return Err(HnnError::Shape {
                 what: "lift point",
@@ -1236,8 +1390,8 @@ impl Field {
         }
         let mut ticks = Vec::with_capacity(self.rings.len());
         let mut carry = 0u8;
-        for (ring, tau) in self.rings.iter().zip(lift.iter_mut()) {
-            let advance = u8::from(ring.fits(ring.port(code))) + carry;
+        for (g, (ring, tau)) in self.rings.iter().zip(lift.iter_mut()).enumerate() {
+            let advance = u8::from(ring.fits(port(g))) + carry;
             let jumps = ring.clock_at(tau)?.advance(&BigUint::from(advance));
             *tau += advance;
             carry = jumps.to_u8().expect(
@@ -1759,9 +1913,22 @@ impl Field {
             None => naturals(&mut code, &[]),
         }
         natural(&mut code, self.capacity.n_star());
-        // The source's open (the primary's ruling B, the first repair's): 1 names "the indexed
-        // normalized open", with its population chart's lattice `L_ν` (`hnn::moment::PopulationChart`).
-        natural(&mut code, 1);
+        // The port chart (module header, "The port chart"): 0 names the codec's residue chart
+        // `code mod d_g`; 1 names the chart founded at first arrival on the rings' own clocks over a
+        // founding passage of the given length (`hnn::encoding::found_ports`), a causal function of
+        // that passage's cells, which the exposure codes, so its rule is its description.
+        match self.port_chart.kind() {
+            PortChartKind::Residue => natural(&mut code, 0),
+            PortChartKind::Founded { passage, .. } => {
+                natural(&mut code, 1);
+                natural(&mut code, passage);
+            }
+        }
+        // The source's open: 2 names "the normalized open that reads no window" (the marginal over
+        // its population and the whole offset moment over its pair population; the encoding pin of
+        // September 29), with its population chart's lattice `L_ν` (`hnn::moment::PopulationChart`).
+        // Code 1 was ruling B's indexed open, the pair port read at the buffer's address.
+        natural(&mut code, 2);
         natural(
             &mut code,
             u64::from(crate::hnn::moment::PopulationChart::of(self).exponent()),
@@ -1769,7 +1936,8 @@ impl Field {
         // The gauge convention (design R3 K2): 0 names "S_g(p_0) = 0 at the least visited port".
         natural(&mut code, 0);
         // The sign sequence's rule (design (d)): 0 names "the low bit of SplitMix64 over
-        // (0, ℓ, i, j)" (`constitution::declared_sign`).
+        // (0, ℓ, i, j)" (`constitution::declared_sign`); `E_0` reads it on the residue chart, and on a
+        // founded chart opens at the founded injection (`Constitution::initial`).
         natural(&mut code, 0);
         // The receiving law (the landmark tree) and the tree's Krichevsky–Trofimov prior `α = 1/2`.
         natural(&mut code, RECEIVING_LAW);

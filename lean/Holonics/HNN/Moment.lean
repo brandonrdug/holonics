@@ -10,8 +10,10 @@ import Holonics.Aeon.Clock.Epoch
 [definition] Rebuild step 4, campaign 1, law 3 (`docs/plans/THE_REBUILD.md`, "Step 4 design",
 table (b) row 3). A source passage enters the HNN as **phase-binned counts** on closing rotor rings.
 The rings are indexed by `ℕ` in the declared carry order `0 → 1 → …`; ring `g` has period `d_g`,
-a lock `N_g` of residues and the exterior port chart `port_g(x) = code(x) mod d_g`, which is known
-before any key is located. On each source cell `x` ring `g` advances
+a lock `N_g` of ports and the declared port chart `port_g(x)`, which is known before any key is
+located: the codec's residue chart `code(x) mod d_g` of the synthetic fields, or the chart a founding
+passage founds at first arrival (`hnn::encoding`, THE_REBUILD U6). No law below reads which. On each
+source cell `x` ring `g` advances
 
 ```text
 c_g(x) = [port_g(x) ∈ N_g]      plus the carry of its predecessor:   carryIn_(g+1) = ⌊τ'_g / d_g⌋ − ⌊τ_g / d_g⌋
@@ -81,20 +83,17 @@ open Holonics.Objects.SourceHolon
 /-! ## 1. The selective stepping machine -/
 
 /-- [definition] **A declaration of closing rotor rings in carry order.** Ring `g` has period
-`period g`, lock `lock g` (a set of residues of its port chart) and reads the cell's exterior code
-through the port chart `code x mod period g`. -/
+`period g`, lock `lock g` (a set of ports) and reads each cell through its declared port chart
+`port g x`: the codec's residue chart `code x mod period g`, or a founded chart
+(`hnn::encoding::found_ports`); every law below holds for any chart. -/
 structure SelectiveDecl (Cell : Type*) where
   period : ℕ → ℕ
   lock : ℕ → Finset ℕ
-  code : Cell → ℕ
+  port : ℕ → Cell → ℕ
 
 namespace SelectiveDecl
 
 variable {Cell : Type*} (D : SelectiveDecl Cell)
-
-/-- [definition] The port chart `port_g(x) = code(x) mod d_g`: an exterior residue face, known
-before any key is located. -/
-def port (g : ℕ) (x : Cell) : ℕ := D.code x % D.period g
 
 /-- [definition] The cell fits ring `g`'s lock. -/
 def Fits (g : ℕ) (x : Cell) : Prop := D.port g x ∈ D.lock g
@@ -290,7 +289,7 @@ of period `5` whose lock no cell fits. -/
 def twoRing : SelectiveDecl Unit where
   period g := if g = 0 then 2 else 5
   lock g := if g = 0 then {0, 1} else ∅
-  code _ := 0
+  port _ _ := 0
 
 /-- [counterexample; formal-checked] **The earlier phase class is load-bearing.** Ring `1`'s step on
 one cell depends on ring `0`'s phase class: from ring `0` at phase `1` it wraps and carries into
@@ -298,7 +297,7 @@ ring `1`; from phase `0` it does not. -/
 theorem earlier_phase_class_is_load_bearing :
     twoRing.run [()] (fun _ => 1) 1 - 1 ≠ twoRing.run [()] (fun _ => 0) 1 - 0 := by
   simp [SelectiveDecl.run, SelectiveDecl.advance, SelectiveDecl.carryIn, SelectiveDecl.step,
-    SelectiveDecl.Fits, SelectiveDecl.port, twoRing]
+    SelectiveDecl.Fits, twoRing]
 
 /-! ## 2. The phase-binned moment on a closing ring -/
 
@@ -1146,7 +1145,7 @@ end DirectedContrast
 def oneSourceRing : SourceDecl Bool where
   period _ := 2
   lock _ := ∅
-  code _ := 0
+  port _ _ := 0
   sources := {0}
   offsets := ∅
 

@@ -377,15 +377,16 @@ extern "C" __global__ void hnn_scatter_words(
 // the pair port's weights at the open
 // -------------------------------------------------------------------------------------------------
 //
-// [definition] `holonics::hnn::PairPort::apply`: at phase `c`, rank `ρ`, the weight
-// `w_(c,ρ) = Σ_(x,y) C_c[x, y] a_ρ[x] b_ρ[y]` of the offset counts (row the current cell, column the
-// earlier), exact at the pair port's scale `2σ` (`a`, `b` on `2^(−σ)ℤ`). Block `(c, ρ)`; thread `t`
-// takes the current cells `x ≡ t` and loops over the earlier cells, summing `C·(a b)` as a word
+// [definition] `holonics::hnn::PairPort::apply_table`: at phase `c`, rank `ρ`, the weight
+// `w_(c,ρ) = Σ_(x,y) C_c[x, y] ν a_ρ[x] b_ρ[y]` of the whole offset moment (row the current cell,
+// column the earlier; the open reads no window), each count times the pair population's chart
+// numerator `ν`, exact at the pair port's scale `2σ` (`a`, `b` on `2^(−σ)ℤ`). Block `(c, ρ)`; thread
+// `t` takes the current cells `x ≡ t` and loops over the earlier cells, summing `C·(a b)` as a word
 // times a carrier word; the block joins the sums by the shared tree. Every block writes its own
 // weight and status. Shared: 2 · blockDim.x words of 16 octets.
 extern "C" __global__ void hnn_pair_weights(
     const unsigned long long *counts, const int64_t *current, const int64_t *earlier,
-    uint32_t alphabet, uint32_t rank, uint32_t phases, uint32_t address, unsigned long long nu,
+    uint32_t alphabet, uint32_t rank, uint32_t phases, unsigned long long nu,
     wide *weights, uint32_t *status
 ) {
     uwide *ring = (uwide *)hnn_shared;
@@ -398,21 +399,23 @@ extern "C" __global__ void hnn_pair_weights(
     const int64_t *a = current + (size_t)rho * alphabet;
     const int64_t *b = earlier + (size_t)rho * alphabet;
     uwide word = 0, certificate = 0;
-    // The indexed normalized column (ruling B): only the earlier cell at the address, each count
-    // times the column's population chart numerator (zero at an unsupported fibre).
+    // The whole normalized offset moment: every earlier cell, each count times the pair
+    // population's chart numerator (zero at an empty population).
     for (uint32_t x = t; x < alphabet && nu != 0; x += blockDim.x) {
-        const unsigned long long count = phase[(size_t)x * alphabet + address];
-        if (count == 0) {
-            continue;
+        for (uint32_t y = 0; y < alphabet; ++y) {
+            const unsigned long long count = phase[(size_t)x * alphabet + y];
+            if (count == 0) {
+                continue;
+            }
+            uwide magnitude;
+            // A count is at most its pair population N, so count · ⌊2^L/N + ½⌋ < 2^(L+1) + N,
+            // within the signed word.
+            const wide p = hnn_bounded_product(
+                (int64_t)(count * nu), hnn_word_product(a[x], b[y]), &magnitude
+            );
+            word += (uwide)p;
+            certificate = hnn_certify(certificate, magnitude);
         }
-        uwide magnitude;
-        // A column's count is at most its population N_a, so count · ⌊2^L/N_a + ½⌋ < 2^(L+1) + N_a,
-        // within the signed word.
-        const wide p = hnn_bounded_product(
-            (int64_t)(count * nu), hnn_word_product(a[x], b[address]), &magnitude
-        );
-        word += (uwide)p;
-        certificate = hnn_certify(certificate, magnitude);
     }
     ring[t] = word;
     bound[t] = certificate;

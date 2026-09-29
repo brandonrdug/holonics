@@ -5,7 +5,7 @@
 [operator contract](ELEMENTARY_OBJECTS.md#operator-contract)'s HNN row: the word, deposition and
 the collapse of campaigns 1–2 and the loaded resonator (`hnn::ring`); a loaded ring's mode quotient
 (campaign 3's first construction) is Lean's `HNN/ModeQuotient` ([§4](#the-loaded-rings-mode-quotient)).
-Release through modes, Holonic Encoding and joint prediction have no owner yet. [THE_MACHINE](THE_MACHINE.md) states the object,
+Holonic Encoding's founding law and the field's founded port chart are `hnn::encoding` (Lean `HNN/Encoding`, [below](#holonic-encoding)); release through modes and joint prediction have no owner yet. [THE_MACHINE](THE_MACHINE.md) states the object,
 [THE_REBUILD](plans/THE_REBUILD.md) the order and [CONSTRUCTION_STATE](../CONSTRUCTION_STATE.md) the
 position; the [elementary objects](ELEMENTARY_OBJECTS.md) own the vocabulary.
 The HNN is the compression machine at scale ([the line](THE_MACHINE.md#the-line-the-rebuild-serves)):
@@ -181,6 +181,36 @@ address (`Transport/SourceMoment`). The complex parametron keeps quadratures and
 incidence before any phase/sign/intensity receiver, so encoding keeps real timing and receiver
 orientation; it assigns no pump frequency to a character and imposes no torus on every datum.
 
+[proved-derived; formal-checked for the squares; agent-inferred for the chart] **The founding law**
+(`hnn::encoding`, THE_REBUILD U6, the [pin](../research/records/2026-09-29_HOLONIC_ENCODING_FOR_THE_FIELD_PINNED_BEFORE_ITS_RUN.md); Lean
+`HNN/Encoding`). A passage chart (a finite chart, the admitted transports it knows, the injection
+`B` of the exterior cells, the receiving forms `ρ`, the openings) founds its minimal realization
+with the one closure owner (`receiver::population::birth::Closure`): forward from the openings under
+`T_a` (the reached span `R`), then backward from `ρ` restricted to `R` under `T_a|_R`. It returns
+the constituents with their ports (the chart states each reads) and incidence (the pattern of
+`U_a`), `U_a`, `D`, `J = E B` and the Preimage Fibre, and its consumers' equations hold exactly:
+
+```text
+D E = ρ,   E T_a = U_a E,   E(T_a x + B e_u) = U_a E x + J e_u      (injection_square)
+E(moment l) = the founded chart's own moment z ← U_a z + J e_u        (encoding_reduced_recurrence)
+ρ = D E for some D,  or a merged direction v (E v = 0) with ρ v ≠ 0   (encoding_separator)
+```
+
+Its dimension is the emission's Hankel rank on the reached orbit, measured on the moiré, a copy
+ring and the rotor crib; observability alone (Birth's closure on the whole chart) exceeds it where
+forms are silent on the orbit. The proof of the Hankel identification is owed in #62.
+
+[definition; agent-inferred] **The field's step classes are founded, not the codec's.** On the
+exterior chart the field knows no transport but the identity, so a founding passage founds exactly
+its reached cells, each one constituent, and the cells it never separates are one plural fibre.
+Each constituent is placed on each ring at the ring's phase class at its first arrival on the
+field's own selective clock (the placement of the [winding guide](WINDING_CARRY_AND_PLACEMENT.md));
+the fibre sits outside every lock (`hnn::encoding::found_ports`, `hnn::field::PortChart`). A ring
+then ticks when a constituent it met at its notch recurs. The codec's residue chart `code mod d_g`
+stays only as the declared chart of synthetic fields; no codec value enters a text field's chart.
+A founded field opens `E_g` at the founded injection (each cell's column at its constituent's
+placement node) and moves it only by deposition.
+
 ### The source and release contract
 
 [definition; agent-inferred] (Brandon, September 27: data must be "structured fluid input that's
@@ -310,7 +340,10 @@ m_g = Σ_k Ĝ_g(τ_g(k))⁻¹ E_g(u_k)         (Ĝ_g the navigator's transport, 
 ```
 
 and the oriented pair moments `M_gh(δ)` at offset `δ`, keeping the decoder, the source fibre and
-the future-action/injection square. A response position reads `y_j=ρ_R(Ĝ_R(τ_R(j))q)` through a
+the future-action/injection square. The open reads the pair moments whole, over their pair
+population, and never at an address a buffer of the last cells supplies: such a read would condition
+the source on a depth-limited window (`hnn::moment`, Lean `HNN/Encoding.whole_pair_read_*`); the
+buffer is only the offset moment's one-step state. A response position reads `y_j=ρ_R(Ĝ_R(τ_R(j))q)` through a
 separately tagged phase binding. The adjoint of the moment needs no tape: the position adjoint is
 `g∘U^(n−1−k)∘I` (`Transport/SourceMoment`). Navigator count is independent of source length;
 ingestion, exact bit growth and retained source defects keep their own costs.

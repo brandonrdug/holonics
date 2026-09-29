@@ -655,6 +655,44 @@ branch; intervals that do not shorten the charged code are recorded and not adop
     prose and Rust (`1469 + 8/16 + ε` bits on 1024 ends in prose base 2, against `22 + 4/16 + ε` in
     Lean). Its composition joins the native field (`hnn::encoding`, `hnn::prediction`, the redirect
     above), not the byte tree.
+- **`hnn::encoding` pinned, September 29**
+  ([pin](../../research/records/2026-09-29_HOLONIC_ENCODING_FOR_THE_FIELD_PINNED_BEFORE_ITS_RUN.md);
+  Refs #73 #63). The founding law is the minimal realization of a passage chart, founded by
+  `birth::Closure` forward from the openings and backward from the receiving forms; the field's step
+  classes are read from the founded constituents, each placed on a ring at its first arrival on the
+  ring's own clock; `E_g` opens at the founded injection; the open reads the whole offset moment, not
+  a column at a raw cell's address. Acceptance, fixed before any run: the squares exact and the
+  founded dimension equal to the emission's Hankel rank on the moiré, a copy terrain and the rotor
+  crib; the moment equal across every split, with nothing discarded by length; on a 6,148-byte
+  choosing-role passage, the founded constituents, `n*` and the field's charged code, the code before
+  the change beside it.
+- **`hnn::encoding` built and run, September 29: acceptance 1 and 2 hold; text unchanged**
+  ([record](../../research/records/2026-09-29_HOLONIC_ENCODING_FOR_THE_FIELD_THE_SQUARES_CLOSE_ON_KNOWN_TRUTH_AND_TEXT_FOUNDS_ONLY_ITS_REACHED_CELLS.md);
+  `38cf65ac`, `397de664`; Refs #73 #63).
+  - *Built*: `hnn::encoding` (the minimal realization through `birth::Closure`, its squares, fibre and
+    separator, `found_ports`); `hnn::field::PortChart`, read by the rings, the card's lock chart and
+    the letters' reader; `E_0` at the founded injection on a founded field; the open's pair read over
+    the whole offset moment on host and card; Lean `HNN/Encoding` (`injection_square`,
+    `encoding_reduced_recurrence`, `moment_reduced_recurrence`, `encoding_separator`,
+    `encoding_descends_iff`, the window-free read) and `SelectiveDecl`'s declared port chart.
+  - *Terrain*: the squares exact and the founded dimension the emission's Hankel rank on the moiré
+    (7 of 12; 7 on 12 reached of 24; 11 of 20), the copy ring (8, and 4 on a period-4 word, where
+    observability alone founds 32) and the rotor crib (3–6 on `d = 5`; 16–40 on `d = 7`, where
+    observability alone founds 81–86).
+  - *No window*: one moment across every split of 4,096 cells; every cell and pair counted once.
+  - *Text* (6,148 choosing-role bytes): 65 founded constituents, each a reached byte, and a plural
+    fibre of 191; `n* = 6,148` unchanged; the field's held-out code `5463 + 9/16 + ε` bits against
+    `5463 + 7/16 + ε` before (its part against the tree `−13 + 5/16 + ε` against `−13 + 4/16 + ε`);
+    `Kt` `+26 + 14/16 + ε`, of which the description is 28 bits. Ring 0's lock admits 210 development
+    cells against the residue's 842; 2 aeons against 6. An attribution run on the residue chart separates two opposite moves: the open
+    without a window earns `−4 + 6/16 + ε` held-out bits, and the founded chart with its founded `E_0`
+    costs `3 + 11/16 + ε` against the residue chart and sign sequence.
+  - *What stays open*, measured: the founded chart with its founded `E_0` codes the held-out cells
+    `3 + 11/16 + ε` bits above the residue chart with the sign sequence; on the exterior chart the
+    field knows no transport, so the founding reaches exactly a passage's cells, and text's recurring
+    transformations must be located from the passage, not founded by rotor closure alone. On a
+    shared host the whole-moment read's word refine read took 120,578 ms against the indexed read's
+    42,932 on this passage.
 
 #### U7. The targets, alongside
 

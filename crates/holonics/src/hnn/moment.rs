@@ -7,25 +7,35 @@
 //!
 //! ```text
 //! M_g[c] += x_k                                      phase-binned counts           (d_g × |A|)
-//! C_g(δ)[c] += x_k ⊗ win[δ],  δ ∈ Δ                    offset counts on the exterior (d_g × |A|²)
-//! win ← shift(win, x_k)                               the window: the last max Δ cells, overwritten
-//! n_g = Σ_(c,x) M_g[c,x] ,  N_(g,δ,a) = Σ_(c,x) C_g(δ)[c,x,a] ,  a_δ = win[δ]      populations, the address
-//! m̃_g = Σ_c P_g^(−c) (E_g M_g[c] ν̂(n_g) + Σ_δ E_g^(δ)(C_g(δ)[c,·,a_δ] ν̂(N_(g,δ,a_δ)) ⊗ e_(a_δ)))   never stored
+//! C_g(δ)[c] += x_k ⊗ buf[δ],  δ ∈ Δ                    offset counts on the exterior (d_g × |A|²)
+//! buf ← shift(buf, x_k)                               the pair buffer: a cell until its pairs are counted
+//! n_g = Σ_(c,x) M_g[c,x] ,  n_(g,δ) = Σ_(c,x,a) C_g(δ)[c,x,a]                        populations
+//! m̃_g = Σ_c P_g^(−c) (E_g M_g[c] ν̂(n_g) + Σ_δ Σ_(x,a) C_g(δ)[c,x,a] ν̂(n_(g,δ)) E_g^(δ)(e_x ⊗ e_a))   never stored
 //! s_g(0) = P_g^(τ_g) m̃_g                                          the word's open on g ∈ 𝒮
 //! ```
 //!
-//! [definition; agent-inferred] **The open is indexed and normalized** (the primary's ruling B,
-//! the first repair's open; Lean `HNN/IndexedOpen`): the marginal reads the phase counts over their
-//! population, and the pair port reads only the column of its offset counts at the address the
-//! retained window supplies, over that column's population, so the open's amplitude no longer grows
-//! with the ingested cells (the located failure's third cause; `normalized_open_population_invariant`).
+//! [definition; agent-inferred, U6] **The open is normalized and reads no window** (the
+//! [encoding pin](../../../../research/records/2026-09-29_HOLONIC_ENCODING_FOR_THE_FIELD_PINNED_BEFORE_ITS_RUN.md)
+//! §1.4; Lean `HNN/IndexedOpen.{pairPopulation, pairNormalized}`, `HNN/Encoding.whole_pair_read_*`):
+//! the marginal reads the phase counts over their population, and the pair port reads the whole
+//! oriented offset moment over its pair population, so the open's amplitude does not grow with the
+//! ingested cells (`normalized_open_population_invariant`) and depends on no raw cell. The read at
+//! the address the buffer supplied (the primary's ruling B, the first repair's open) conditioned the
+//! open on the last `max Δ` raw cells, a depth-limited context window on the source; it is retired.
 //! Each `1/n` is carried by the [`PopulationChart`] on its declared lattice, so the open stays
 //! dyadic and the card carries it in parity; an empty population contributes nothing.
 //!
+//! [definition; agent-inferred, U6] **The pair buffer is the offset moment's one-step state**
+//! (Lean `Transport/SourceMoment.streamStep`'s previous value, `HNN/Moment.SourceDecl.StreamState`'s
+//! window): the offset-`δ` pair of cell `k` needs cell `k − δ`, so a cell stays in the buffer for
+//! `max Δ` ingests until every pair it joins is counted, and then leaves. No receiver reads the
+//! buffer, and nothing of the source is discarded by length: every cell is counted once in every
+//! source ring's phase counts, and every pair at every declared offset in its offset counts, over the
+//! moment's whole passage (the window tests in `hnn::tests::moment`).
+//!
 //! Every slot is sized once from the field; nothing grows with the cells but the counts'
-//! `O(log n)` bits. The window is a shift register of raw cells, whose overwrite law is distinct
-//! from the counts' accumulate law, and it enters the open only as the pair port's address. Ingest stops at a
-//! carry-out of the joint clock: the aeon boundary belongs to the winding, not to a caller counter.
+//! `O(log n)` bits. Ingest stops at a carry-out of the joint clock: the aeon boundary belongs to the
+//! winding, not to a caller counter.
 //!
 //! [definition] **The pair port** [`PairPort`] `E_g^(δ) = Σ_(ρ<m) e_ρ (a_ρ·x)(b_ρ·y)` is carried
 //! factored on the exterior pair chart `x ⊗ y` (`x` the current cell, `y` the earlier). The offset
@@ -50,8 +60,8 @@
 //! | `closingRing_moment_is_phaseBinned`, `selective_position` | [`SourceMoment::ingest`] |
 //! | `encoderMoment_contract` (`m̃_g = ⟨M_g, E_g⟩`) | [`SourceMoment::encode`] |
 //! | `encoder_covector_tape_free` | [`SourceMoment::encoder_covector`] |
-//! | `exteriorOffset_independent_of_E` | [`SourceMoment::offset_counts`], [`PairPort::apply_column`] |
-//! | `HNN/IndexedOpen.{normalized_phase_counts_mass, indexed_pair_read_eq_column_contraction, normalized_open_population_invariant, normalized_zero_population, indexed_read_zero_population}` (ruling B) | [`PopulationChart`], [`SourceMoment::normalized_counts`], [`SourceMoment::indexed_column`], [`SourceMoment::encode`] |
+//! | `exteriorOffset_independent_of_E` | [`SourceMoment::offset_counts`], [`PairPort::apply_table`] |
+//! | `HNN/IndexedOpen.{normalized_phase_counts_mass, normalized_open_population_invariant, normalized_zero_population}`; `HNN/Encoding.{whole_pair_read_counts, whole_pair_read_population_invariant, whole_pair_read_tape_free}` (the open reads no window) | [`PopulationChart`], [`SourceMoment::normalized_counts`], [`SourceMoment::offset_table`], [`SourceMoment::encode`] |
 //! | `moment_capacity` | [`capacity`], [`Capacity`] |
 
 use num_bigint::{BigInt, BigUint};
@@ -281,25 +291,26 @@ impl PairPort {
         &self.earlier
     }
 
-    /// **`E^(δ)` on one phase's indexed normalized column** (ruling B, Lean
-    /// `HNN/IndexedOpen.indexed_pair_read_eq_column_contraction`): at the address `a`, with the
-    /// column's counts `C[c, x, a]` and its chart weight `ν̂_a`,
-    /// `Σ_ρ e_ρ (Σ_x C[c, x, a] ν̂_a a_ρ[x]) b_ρ[a]`, over the nonzero counts only.
-    pub fn apply_column(
+    /// **`E^(δ)` on one phase of the whole normalized offset moment** (module header; Lean
+    /// `HNN/Encoding.whole_pair_read_counts`): with the offset counts `C[c, x, a]` and the pair
+    /// population's chart weight `ν̂`, `Σ_ρ e_ρ Σ_(x,a) C[c, x, a] ν̂ a_ρ[x] b_ρ[a]`, over the nonzero
+    /// counts only. No address is read.
+    pub fn apply_table(
         &self,
-        column: &IndexedColumn,
+        table: &OffsetTable,
         phase: usize,
         alphabet: usize,
         width: usize,
     ) -> Vec<Rat> {
         let mut weights = vec![Rat::zero(); self.rank()];
-        for (x, &count) in column.phase(phase, alphabet).iter().enumerate() {
+        for (slot, &count) in table.phase(phase, alphabet).iter().enumerate() {
             if count == 0 {
                 continue;
             }
-            let count = Rat::from_integer(BigInt::from(count)) * &column.weight;
+            let (x, a) = (slot / alphabet, slot % alphabet);
+            let count = Rat::from_integer(BigInt::from(count)) * &table.weight;
             for (rho, weight) in weights.iter_mut().enumerate() {
-                *weight += &count * &self.current[rho][x] * &self.earlier[rho][column.address];
+                *weight += &count * &self.current[rho][x] * &self.earlier[rho][a];
             }
         }
         let mut output = vec![Rat::zero(); width];
@@ -377,19 +388,21 @@ impl PopulationChart {
     }
 }
 
-/// [definition] **One offset's indexed normalized column** (ruling B): the address `a` the window
-/// supplies, the column's counts `C_g(δ)[c, x, a]` (phase-major) and its chart weight `ν̂_a`.
+/// [definition] **One offset's whole normalized offset moment** (module header): the offset counts
+/// `C_g(δ)[c, x, a]` (phase-major, the current cell `x` then the earlier `a`), their pair population
+/// `n_(g,δ)` and its chart weight `ν̂(n_(g,δ))`.
 #[derive(Clone, Debug, PartialEq, Eq)]
-pub struct IndexedColumn {
-    pub address: usize,
+pub struct OffsetTable {
     pub counts: Vec<u64>,
+    pub population: u64,
     pub weight: Rat,
 }
 
-impl IndexedColumn {
-    /// The phase's counts `C_g(δ)[c, ·, a]`.
+impl OffsetTable {
+    /// The phase's counts `C_g(δ)[c, ·, ·]`, row the current cell.
     pub fn phase(&self, phase: usize, alphabet: usize) -> &[u64] {
-        &self.counts[phase * alphabet..(phase + 1) * alphabet]
+        let block = alphabet * alphabet;
+        &self.counts[phase * block..(phase + 1) * block]
     }
 }
 
@@ -563,7 +576,8 @@ impl SourceMoment {
         Ok(&counts.offset[index][phase * block..(phase + 1) * block])
     }
 
-    /// The window's cells, most recent first (`win[1], win[2], …`), `None` before enough cells.
+    /// The pair buffer's cells, most recent first (`buf[1], buf[2], …`), `None` before enough
+    /// cells: the offset moment's one-step state (module header), which no receiver reads.
     pub fn window(&self) -> Vec<Option<usize>> {
         (1..=self.window.len())
             .map(|offset| earlier(&self.window, self.cursor, offset))
@@ -575,39 +589,15 @@ impl SourceMoment {
         Ok(self.counts(ring)?.first.iter().sum())
     }
 
-    /// **The address `a_δ`** the retained window supplies at offset `δ`: the cell `δ` back
-    /// (`window[δ − 1]`), `None` before enough cells or past the window.
-    pub fn address(&self, offset: usize) -> Option<usize> {
-        earlier(&self.window, self.cursor, offset)
-    }
-
-    /// **The pair counts' column at the address `a`**: `C_g(δ)[c, x, a]` for each phase `c` and
-    /// current cell `x` (phase-major), and its population `N_(g,δ,a) = Σ_(c,x) C_g(δ)[c, x, a]`.
-    pub fn column(
-        &self,
-        ring: usize,
-        offset: usize,
-        address: usize,
-    ) -> Result<(Vec<u64>, u64), HnnError> {
-        let counts = self.counts(ring)?;
+    /// **The pair population `n_(g,δ) = Σ_(c,x,a) C_g(δ)[c, x, a]`** of a source ring's offset
+    /// counts at a declared offset.
+    pub fn pair_population(&self, ring: usize, offset: usize) -> Result<u64, HnnError> {
         let index = self
             .offsets
             .iter()
             .position(|declared| *declared == offset)
             .ok_or(HnnError::Offset { offset })?;
-        let a = self.alphabet;
-        if address >= a {
-            return Err(HnnError::CellOutside {
-                code: address,
-                alphabet: a,
-            });
-        }
-        let table = &counts.offset[index];
-        let column: Vec<u64> = (0..counts.period * a)
-            .map(|slot| table[slot * a + address])
-            .collect();
-        let population = column.iter().sum();
-        Ok((column, population))
+        Ok(self.counts(ring)?.offset[index].iter().sum())
     }
 
     /// **The normalized phase counts** `M_g[c] ν̂(n_g)` of one phase (ruling B): the counts times
@@ -626,34 +616,36 @@ impl SourceMoment {
             .collect())
     }
 
-    /// **The indexed normalized pair read** (ruling B, Lean
-    /// `HNN/IndexedOpen.indexed_pair_read_eq_column_contraction`): at offset `δ`, the address
-    /// `a_δ` and its column's population chart `ν̂_a = ν̂(N_(g,δ,a))`, each phase's normalized column
-    /// `C_g(δ)[c, ·, a] ν̂_a`; `None` at an unsupported fibre (no address, or an empty column), which
-    /// contributes nothing.
-    pub fn indexed_column(
+    /// **The whole normalized offset moment** at offset `δ` (module header; Lean
+    /// `HNN/Encoding.whole_pair_read_counts`): the offset counts `C_g(δ)` with their pair
+    /// population `n_(g,δ)` and its chart weight `ν̂(n_(g,δ))`; `None` at an empty population, which
+    /// contributes nothing. No address is read.
+    pub fn offset_table(
         &self,
         field: &Field,
         ring: usize,
         offset: usize,
-    ) -> Result<Option<IndexedColumn>, HnnError> {
-        let Some(address) = self.address(offset) else {
-            return Ok(None);
-        };
-        let (counts, population) = self.column(ring, offset, address)?;
+    ) -> Result<Option<OffsetTable>, HnnError> {
+        let index = self
+            .offsets
+            .iter()
+            .position(|declared| *declared == offset)
+            .ok_or(HnnError::Offset { offset })?;
+        let counts = self.counts(ring)?.offset[index].clone();
+        let population: u64 = counts.iter().sum();
         if population == 0 {
             return Ok(None);
         }
-        Ok(Some(IndexedColumn {
-            address,
+        Ok(Some(OffsetTable {
             counts,
+            population,
             weight: PopulationChart::of(field).value(population),
         }))
     }
 
     /// **The source moment `m̃_g`** of one source ring at the constitution's ports, computed from
-    /// the counts and never stored, on the indexed normalized open (ruling B, the first repair's; Lean
-    /// `HNN/IndexedOpen`): `Σ_c P_g^(−c)(E_g M_g[c] ν̂(n_g) + Σ_δ E_g^(δ)(C_g(δ)[c, ·, a_δ] ν̂_a ⊗ e_(a_δ)))`.
+    /// the counts and never stored, on the normalized open that reads no window (module header):
+    /// `Σ_c P_g^(−c)(E_g M_g[c] ν̂(n_g) + Σ_δ Σ_(x,a) C_g(δ)[c, x, a] ν̂(n_(g,δ)) E_g^(δ)(e_x ⊗ e_a))`.
     pub fn encode(
         &self,
         field: &Field,
@@ -662,10 +654,10 @@ impl SourceMoment {
     ) -> Result<Vec<Rat>, HnnError> {
         let counts = self.counts(ring)?;
         let nu = PopulationChart::of(field).value(self.population(ring)?);
-        let columns = self
+        let tables = self
             .offsets
             .iter()
-            .map(|&offset| self.indexed_column(field, ring, offset))
+            .map(|&offset| self.offset_table(field, ring, offset))
             .collect::<Result<Vec<_>, _>>()?;
         let geometry = field.ring(ring);
         let width = geometry.width();
@@ -692,14 +684,14 @@ impl SourceMoment {
                     *value += &count * port.get(row, code)?;
                 }
             }
-            for (&offset, column) in self.offsets.iter().zip(&columns) {
-                let Some(column) = column else {
+            for (&offset, table) in self.offsets.iter().zip(&tables) {
+                let Some(table) = table else {
                     continue;
                 };
                 let pair = constitution
                     .pair_port(ring, offset)
                     .ok_or(HnnError::MissingSourcePort { ring })?;
-                let driven = pair.apply_column(column, phase, a, width);
+                let driven = pair.apply_table(table, phase, a, width);
                 for (value, add) in binned.iter_mut().zip(driven) {
                     *value += add;
                 }

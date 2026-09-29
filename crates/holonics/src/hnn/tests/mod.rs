@@ -3,6 +3,7 @@
 
 mod chart;
 mod constitution;
+mod encoding;
 mod field;
 mod guards;
 mod keys;
