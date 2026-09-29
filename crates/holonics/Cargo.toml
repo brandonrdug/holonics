@@ -50,3 +50,10 @@ path = "../../research/notebook/hnn_design/hnn_chase.rs"
 [[example]]
 name = "hnn_prediction"
 path = "../../research/notebook/hnn_design/hnn_prediction.rs"
+
+# The notebook's parametron re-derived (`hnn::ring`: the Floquet certificate on declared pumped
+# rings, and the receiving bank's reading of relative phase on known truth; THE_REBUILD U6;
+# research/notebook/hnn_design/README.md): run once in release, never a test.
+[[example]]
+name = "hnn_parametron"
+path = "../../research/notebook/hnn_design/hnn_parametron.rs"
