@@ -320,7 +320,10 @@ pub use admitted::{
     AdmittedEgg, AdmittedReadout, CopyCell, CopyLaw, CopyStage, PointerReadout, Relation,
     RelationKind, StageReadout, odds_class,
 };
-pub use arithmetic::{CarryEgg, Counter, RecordClock, Sieve, SieveFace};
+pub use arithmetic::{
+    CarryEgg, Counter, ExpressionEgg, ExpressionPort, ExpressionReceipt, ExpressionRelease,
+    RecordClock, Sieve, SieveFace,
+};
 pub use birth::{
     BirthError, Closure, Founded, FoundedFamily, FoundingReceipt, SectionFounding, TransportBirth,
 };

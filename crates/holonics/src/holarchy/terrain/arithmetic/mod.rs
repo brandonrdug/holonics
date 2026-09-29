@@ -1,23 +1,27 @@
-//! **The arithmetic terrain: products and prime streams as digit cells, with their exact faces**
-//! (the record `2026-09-27_THE_EGG_IS_A_GENERATORS_GENOME_…_THE_FACES_OF_INTEGERS_ARE_MOIRES_OF_GRATINGS.md`,
-//! §7 and §9; rebuild step 4, #73).
+//! **The arithmetic terrain: products and prime streams as digit cells, and expressions as prose,
+//! Rust and Lean write them, with their exact faces** (the record
+//! `2026-09-27_THE_EGG_IS_A_GENERATORS_GENOME_…_THE_FACES_OF_INTEGERS_ARE_MOIRES_OF_GRATINGS.md`, §7
+//! and §9; rebuild step 4, #73; the arithmetic contract's record of September 29, THE_REBUILD U6
+//! item 3, #148).
 //!
 //! [definition; agent-inferred] **An integer is a digit vector on a helix** (the record's §7.1). Its
 //! `L` digits in base `b` are the reading of an odometer of `L` levels of radix `b` ([`digits`],
 //! through `geometry::winding::Odometer`, Lean `Geometry/PhaseCarry.value_digits`), and the carry
 //! between levels is the helix's winding. Multiplication is the convolution of two digit vectors
-//! (carry-free and linear) followed by that carry ([`digit_product`]). Two terrains are made of
-//! it, each emitted as a cell stream beside its exact truth, so a receiver is gauged on the faces
-//! the record names: the trailing face, the leading face with its carry fibre, the cheap faces and
-//! the gratings.
+//! (carry-free and linear) followed by that carry ([`digit_product`], its cascade
+//! [`carry_cascade`]). Three terrains are made of it, each emitted as a cell stream beside its exact
+//! truth, so a receiver is gauged on the faces the records name: the trailing face, the leading face
+//! with its carry fibre, the cheap faces and the gratings, and a written expression's result.
 //!
 //! | Terrain | Its Holarchy | Its truth receipt | The faces it isolates |
 //! |---|---|---|---|
 //! | [`Products`] | two operand odometers of `L` levels drawn uniformly (the keys), joined by the convolution of their digit vectors, whose carry cascade is the product's odometer of `2L` levels | [`ProductTruth`]: the operands and their factorizations, the convolution before carry, the carry word, the product's digits, its trailing face `mod b^k` and its leading face with the carry fibre ([`LeadingFace`]) | the trailing face (a ring homomorphism: the carry flows up, never down) and the leading face (multiplicative up to the fibre the unread lower places carry into it) |
 //! | [`PrimeWindow`] | a window's integers as one odometer ticking once a record, met by the gratings: each prime `p ∤ b` a ring of period `p` on the leading index | [`IntegerTruth`] for each integer: its factorization and least prime factor, its leading index and residue, the gratings covering it with their classes, its cheap readings; the base's [`CheapFaces`]; the density's code read through a face ([`FaceCode`]) | the cheap faces of `b`, `b − 1`, `b + 1` and the gratings on the leading index |
+//! | [`Expressions`] | a base's drawn sums, products and powers (and Rust's carry-free sums), each producer a navigator keyed by its operands, written as prose, Rust or Lean lines in the declared glyph set (the arithmetic contract's record, §2 and §6) | [`ExpressionTruth`] for each line: its key, the consequence's digit word and carry words ([`Producer::consequence`]), the value `T` ([`Producer::scalar`]) and its factorization, and where its result's glyphs and the numeral's end lie | the result's digits and its end, determined by the key; the producers of one face (`2 + 2`, `2 · 2`, `2 ^ 2`) |
 //!
 //! [proved-derived; formal-checked in Lean, implemented-exact here] The joins to Lean
-//! `Mathematics/RadixWindowReceiver` (the tests realize each on hand-computed fixtures):
+//! `Mathematics/RadixWindowReceiver` and `Mathematics/ArithmeticContract` (the tests realize each on
+//! hand-computed fixtures):
 //!
 //! | Lean | Rust |
 //! |---|---|
@@ -26,6 +30,8 @@
 //! | `carried_word_is_product_digits` | [`DigitProduct::digits`]: the carried word, no zero at its top, is the product's digit word |
 //! | `grating_on_digit_index` | [`grating_class`], [`IntegerTruth::gratings`] |
 //! | `cheap_faces` | [`CheapReading`], [`CheapFaces`] |
+//! | `ArithmeticContract.{carryWord_cons, carryWord_value, carryWord_lt}` | [`carry_cascade`] |
+//! | `ArithmeticContract.{encode, decode, consumer_add, consumer_mul, consumer_pow, consumer_rebase}` | [`encode`], [`decode`], [`Producer::consequence`] against [`Producer::scalar`] |
 //!
 //! [proved-standard] The trailing face's ring homomorphism is Mathlib's `Nat.mul_mod`.
 //! [proved-derived; formal-checked] The leading face's fibre,
@@ -42,12 +48,18 @@
 //! record a tick) and the **tower thread** (the base chain `2 → 4 → 16` restricts a trailing face
 //! to the next, §7.4) stay attached.
 
+mod expressions;
 mod primes;
 mod products;
 
 #[cfg(test)]
 mod tests;
 
+pub use expressions::{
+    BASES, Chart, Consequence, Drawn, ExpressionFamily, ExpressionStream, ExpressionTruth,
+    Expressions, Operator, Producer, Slot, digit_of, glyph_of, numeral, prefix, prefixed,
+    read_numeral,
+};
 pub use primes::{
     CheapFaces, CheapReading, ClassCount, FaceCode, GratingCover, IntegerTruth, PrimeCell,
     PrimeEmission, PrimeWindow, grating_class,
@@ -164,6 +176,66 @@ fn horner(word: &[u64], base: u64) -> BigUint {
     })
 }
 
+/// **Decoding in base `b`** (Lean `ArithmeticContract.decode`): the value `Σ_j w_j b^j` of a word
+/// read least significant first. Its digits may be any naturals, as a word before carry.
+pub fn decode(base: u64, word: &[u64]) -> BigUint {
+    horner(word, base)
+}
+
+/// **Encoding in base `b`** (Lean `ArithmeticContract.encode`, `Nat.digits`): the radix receiver's
+/// digit word of `value`, least significant first with no zero at its top (empty for zero), read
+/// from an odometer of that many levels of radix `b` holding the value
+/// (`geometry::winding::Odometer`). Refused when the base holds fewer than two digits.
+pub fn encode(base: u64, value: &BigUint) -> Result<Vec<u64>, TerrainError> {
+    check_base(base)?;
+    let radix = BigUint::from(base);
+    let mut length = 0;
+    let mut rest = value.clone();
+    while !rest.is_zero() {
+        rest /= &radix;
+        length += 1;
+    }
+    let odometer = Odometer::from_value(vec![radix; length], value)
+        .map_err(|_| refuse("a digit word", "its base needs at least two digits"))?;
+    Ok(odometer
+        .digits()
+        .iter()
+        .map(|digit| u64::try_from(digit).expect("a digit lies below a machine-word base"))
+        .collect())
+}
+
+/// **The carry cascade** (Lean `ArithmeticContract.carryWord`, `carryWord_cons`): each place's
+/// total (the word's term and the carry arriving from below) is read on the circle of `b` steps,
+/// its phase emitted as the digit and its winding passed up (`geometry::winding::{phase, winding}`),
+/// until the word and the carry are exhausted; the zeros at the top are then dropped with their
+/// carries (their totals are zero). Returns the carried word, least significant first, and the
+/// carry leaving each of its places. The carried word keeps the word's value and every digit lies
+/// below `b` (`carryWord_value`, `carryWord_lt`). Refused when the base holds fewer than two digits
+/// or a carry leaves the machine word.
+pub fn carry_cascade(base: u64, word: &[u64]) -> Result<(Vec<u64>, Vec<u64>), TerrainError> {
+    check_base(base)?;
+    let radix = BigUint::from(base);
+    let (mut digits, mut carries) = (Vec::new(), Vec::new());
+    let mut carry = BigUint::zero();
+    let mut place = 0;
+    while place < word.len() || !carry.is_zero() {
+        let total = BigUint::from(word.get(place).copied().unwrap_or(0)) + &carry;
+        let digit = phase(&radix, &total).expect("a base of at least two steps");
+        carry = winding(&radix, &total).expect("a base of at least two steps");
+        digits.push(u64::try_from(&digit).expect("a digit lies below a machine-word base"));
+        carries.push(
+            u64::try_from(&carry)
+                .map_err(|_| refuse("a carry cascade", "its carry leaves the machine word"))?,
+        );
+        place += 1;
+    }
+    while digits.last() == Some(&0) {
+        digits.pop();
+        carries.pop();
+    }
+    Ok((digits, carries))
+}
+
 impl DigitProduct {
     /// `Σ_j c_j b^j`: the convolution's value, the product of the two vectors' values (Lean
     /// `RadixWindowReceiver.digit_product_is_carry_of_convolution`).
@@ -180,12 +252,11 @@ impl DigitProduct {
 
 /// **Multiplication is convolution with carry** (the record's §7.1; Lean
 /// `RadixWindowReceiver.digit_product_is_carry_of_convolution`, `carry_step_value`,
-/// `carried_word_is_product_digits`). The digits may be any naturals, as in Lean's polynomials; each
-/// place's total (its convolution term and the carry arriving from below) is read on the circle of
-/// `b` steps, its phase the digit and its winding the carry passed up (`geometry::winding`), until
-/// the convolution and the carry are exhausted; the zeros at the top are then dropped (their totals
-/// and carries are zero). Refused when the base holds fewer than two digits or a convolution term
-/// leaves the machine word.
+/// `carried_word_is_product_digits`). The digits may be any naturals, as in Lean's polynomials; the
+/// convolution is then carried by [`carry_cascade`]: each place's total (its convolution term and
+/// the carry arriving from below) read on the circle of `b` steps, its phase the digit and its
+/// winding the carry passed up (`geometry::winding`). Refused when the base holds fewer than two
+/// digits or a convolution term leaves the machine word.
 pub fn digit_product(base: u64, left: &[u64], right: &[u64]) -> Result<DigitProduct, TerrainError> {
     check_base(base)?;
     let overflow = || refuse("a digit product", "its convolution leaves the machine word");
@@ -201,22 +272,7 @@ pub fn digit_product(base: u64, left: &[u64], right: &[u64]) -> Result<DigitProd
             convolution[i + j] = convolution[i + j].checked_add(term).ok_or_else(overflow)?;
         }
     }
-    let radix = BigUint::from(base);
-    let (mut digits, mut carries) = (Vec::new(), Vec::new());
-    let mut carry = BigUint::zero();
-    let mut place = 0;
-    while place < convolution.len() || !carry.is_zero() {
-        let total = BigUint::from(convolution.get(place).copied().unwrap_or(0)) + &carry;
-        let digit = phase(&radix, &total).expect("a base of at least two steps");
-        carry = winding(&radix, &total).expect("a base of at least two steps");
-        digits.push(u64::try_from(&digit).expect("a digit lies below a machine-word base"));
-        carries.push(u64::try_from(&carry).map_err(|_| overflow())?);
-        place += 1;
-    }
-    while digits.last() == Some(&0) {
-        digits.pop();
-        carries.pop();
-    }
+    let (digits, carries) = carry_cascade(base, &convolution)?;
     Ok(DigitProduct {
         base,
         convolution,
