@@ -507,8 +507,9 @@ pub struct HazardComparison {
 }
 
 /// [definition; agent-inferred] **The letter tree** on the section epochs' clock (module header):
-/// its tree, the letters before the pending one with their parts' bundles, and the pending letter
-/// whose part is still open.
+/// its tree, the entered aeon's letters before the pending one with their parts' bundles, the
+/// pending letter whose part is still open, and every other aeon's letters while it is away (the
+/// address per aeon, [`BoundaryEgg::enter_aeon`]).
 #[derive(Clone)]
 struct LetterTree {
     tree: Landmarks,
@@ -517,6 +518,9 @@ struct LetterTree {
     past: VecDeque<Letter>,
     pending: Option<usize>,
     received: u64,
+    aeon: u64,
+    aeons: BTreeMap<u64, VecDeque<Letter>>,
+    entering: Option<u64>,
 }
 
 impl LetterTree {
@@ -546,7 +550,9 @@ impl LetterTree {
         Ok(address)
     }
 
-    /// Receive a letter at the port that closes the pending part: its face, then the deposit.
+    /// Receive a letter at the port that closes the pending part: its face in the leaving aeon's
+    /// address, then the deposit, the closed part kept in that aeon's address, an aeon waiting at
+    /// this letter entered, and the letter pending in it.
     fn receive(&mut self, letter: usize, port: &PartPort) -> Result<Rat, PopulationError> {
         let address = self.address(port)?;
         let reading = self.tree.receive(&address, letter)?;
@@ -556,6 +562,16 @@ impl LetterTree {
             if self.past.len() > self.tree.declaration().depth {
                 self.past.pop_front();
             }
+        }
+        if let Some(aeon) = self.entering.take()
+            && aeon != self.aeon
+        {
+            let leaving = std::mem::take(&mut self.past);
+            if !leaving.is_empty() {
+                self.aeons.insert(self.aeon, leaving);
+            }
+            self.past = self.aeons.remove(&aeon).unwrap_or_default();
+            self.aeon = aeon;
         }
         self.pending = Some(letter);
         self.received += 1;
@@ -629,6 +645,9 @@ impl BoundaryEgg {
                 past: VecDeque::new(),
                 pending: None,
                 received: 0,
+                aeon: 0,
+                aeons: BTreeMap::new(),
+                entering: None,
             },
             passage: PassageCode::new(),
             readout: BoundaryReadout {
@@ -714,6 +733,46 @@ impl BoundaryEgg {
     /// The readout by stage and channel.
     pub fn stages(&self) -> &BoundaryReadout {
         &self.readout
+    }
+
+    /// [definition; agent-inferred] **Enter an aeon at the next section letter** (THE_REBUILD U6;
+    /// [`TreeFamily`]'s "The address per aeon"): the byte tree and the letter tree each keep one
+    /// address per aeon. The letter is read in the leaving aeon's addresses, where it closes that
+    /// aeon's part, and then opens its part in the entered aeon: the byte tree pushes it onto that
+    /// aeon's address, and the letter tree keeps the closed part in the leaving aeon's letters and
+    /// holds the letter pending in the entered one. The part clock and the hazard read only the open
+    /// part's port, which every letter resets, so they keep nothing across parts. Refused while
+    /// another aeon waits to be entered.
+    pub fn enter_aeon(&mut self, aeon: u64) -> Result<(), PopulationError> {
+        if self.letters.entering.is_some() || !self.bytes.is_sectioned() {
+            return Err(refuse(
+                "an aeon entered",
+                "one aeon is entered at a part's opening letter, read by a sectioned byte tree",
+            ));
+        }
+        self.bytes.enter_aeon(aeon)?;
+        self.letters.entering = Some(aeon);
+        Ok(())
+    }
+
+    /// The aeon whose addresses the next cell reads.
+    pub fn aeon(&self) -> u64 {
+        self.letters.aeon
+    }
+
+    /// The aeon waiting to be entered at the next section letter, if any.
+    pub(crate) fn entering(&self) -> Option<u64> {
+        self.letters.entering
+    }
+
+    /// The addresses the next cell is read in: the byte tree's and the letter tree's (the pending
+    /// letter closed at the current port).
+    #[cfg(test)]
+    pub(crate) fn addresses(&self) -> Result<(Vec<Letter>, Vec<Letter>), PopulationError> {
+        Ok((
+            self.bytes.address(),
+            self.letters.address(&self.clock.port())?,
+        ))
     }
 
     /// The byte tree's root digit's side of a stage, `(numerator, M_p)`, from its split.
@@ -808,6 +867,12 @@ impl Family for BoundaryEgg {
         let port = self.clock.port();
         let section = self.chart.section(cell);
         let letter = section.is_some();
+        if self.letters.entering.is_some() && !letter {
+            return Err(refuse(
+                "an aeon entered",
+                "a boundary egg enters an aeon at the section letter that opens its part",
+            ));
+        }
         let [byte_face, letter_face] = self.hazard.face(&port);
         let stage = if letter { letter_face } else { byte_face };
         if stage.is_zero() {

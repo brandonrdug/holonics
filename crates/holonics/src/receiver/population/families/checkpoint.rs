@@ -1,9 +1,12 @@
 //! Canonical durable standing of a receiving tree family.
 //!
-//! The payload contains contemporary landmark state, the bounded causal address, the current
-//! section reader state, and the passage-code accumulator. It never stores or replays the source
-//! passage. The immutable tree declaration, family description, and optional section declaration
-//! are supplied again at restoration and bound to the payload.
+//! The payload contains contemporary landmark state, the bounded causal address of the entered aeon
+//! and of every aeon away (each at most the declared depth), the aeon waiting at the next letter,
+//! the current section reader state, and the passage-code accumulator. It never stores or replays
+//! the source passage. The immutable tree declaration, family description, and optional section
+//! declaration are supplied again at restoration and bound to the payload.
+
+use std::collections::{BTreeMap, VecDeque};
 
 use super::TreeFamily;
 use crate::compression::landmark::context::{
@@ -12,7 +15,7 @@ use crate::compression::landmark::context::{
 };
 use thiserror::Error;
 
-const MAGIC: &[u8; 8] = b"HTREE\0\0\x01";
+const MAGIC: &[u8; 8] = b"HTREE\0\0\x02";
 
 /// A refusal to encode or restore a tree family's contemporary standing.
 #[derive(Clone, Debug, Error, PartialEq, Eq)]
@@ -228,6 +231,22 @@ impl TreeFamily {
         for &letter in &self.past {
             writer.letter(letter);
         }
+        writer.u64(self.aeon);
+        match self.entering {
+            None => writer.u8(0),
+            Some(aeon) => {
+                writer.u8(1);
+                writer.u64(aeon);
+            }
+        }
+        writer.len(self.aeons.len());
+        for (&aeon, past) in &self.aeons {
+            writer.u64(aeon);
+            writer.len(past.len());
+            for &letter in past {
+                writer.letter(letter);
+            }
+        }
         let passage = self.passage.encode_checkpoint();
         writer.len(passage.len());
         writer.0.extend_from_slice(&passage);
@@ -282,6 +301,26 @@ impl TreeFamily {
         for _ in 0..past_len {
             past.push(reader.letter()?);
         }
+        let aeon = reader.u64()?;
+        let entering = match reader.u8()? {
+            0 => None,
+            1 => Some(reader.u64()?),
+            _ => return reader.malformed("invalid entering-aeon tag"),
+        };
+        let away = reader.len(9)?;
+        let mut aeons: BTreeMap<u64, VecDeque<Letter>> = BTreeMap::new();
+        for _ in 0..away {
+            let key = reader.u64()?;
+            let len = reader.len(1)?;
+            let mut letters = VecDeque::with_capacity(len);
+            for _ in 0..len {
+                letters.push_back(reader.letter()?);
+            }
+            if aeons.last_key_value().is_some_and(|(last, _)| *last >= key) {
+                return reader.malformed("aeons away are duplicated or not canonical");
+            }
+            aeons.insert(key, letters);
+        }
         let passage_len = reader.len(1)?;
         let passage_end =
             reader
@@ -302,9 +341,13 @@ impl TreeFamily {
         }
 
         let tree = Landmarks::decode_standing(declaration.clone(), standing)?;
+        let every_letter = || past.iter().chain(aeons.values().flatten());
         let section_reader = match sections {
             None => {
-                if open.is_some() || past.iter().any(|letter| !matches!(letter, Letter::Cell(_))) {
+                if open.is_some()
+                    || entering.is_some()
+                    || every_letter().any(|letter| !matches!(letter, Letter::Cell(_)))
+                {
                     return Err(TreeFamilyCheckpointError::Inconsistent);
                 }
                 None
@@ -312,24 +355,33 @@ impl TreeFamily {
             Some((chart, slots)) => {
                 let mut section_reader = Sections::new(chart, slots)?;
                 section_reader.restore_open(open)?;
-                if past
-                    .iter()
-                    .any(|letter| !matches!(letter, Letter::Bundle(_)))
-                {
+                if every_letter().any(|letter| !matches!(letter, Letter::Bundle(_))) {
                     return Err(TreeFamilyCheckpointError::Inconsistent);
                 }
                 Some(section_reader)
             }
         };
+        // With no aeon away every tick was read in the entered aeon (a leaving address is kept
+        // whenever it holds a tick), so its address is the last `min(n, D)` ticks; otherwise each
+        // address holds at most `D` ticks and all of them at most the ticks received.
         let expected_past = usize::try_from(received)
             .map_or(declaration.depth, |count| count.min(declaration.depth));
+        let held = aeons
+            .values()
+            .try_fold(past.len(), |sum, letters| sum.checked_add(letters.len()));
         if received != tree.passed()
             || received > declaration.population
-            || past.len() != expected_past
+            || (aeons.is_empty() && past.len() != expected_past)
+            || past.len() > expected_past
+            || aeons.contains_key(&aeon)
+            || aeons
+                .values()
+                .any(|letters| letters.is_empty() || letters.len() > declaration.depth)
+            || held.is_none_or(|held| held as u64 > received)
         {
             return Err(TreeFamilyCheckpointError::Inconsistent);
         }
-        for letter in &past {
+        for letter in every_letter() {
             match (letter, section_reader.as_ref()) {
                 (Letter::Cell(cell), None) if *cell < declaration.alphabet => {}
                 (Letter::Bundle(bundle), Some(sections)) => {
@@ -364,6 +416,9 @@ impl TreeFamily {
         fresh.tree = tree;
         fresh.sections = section_reader;
         fresh.past = past.into();
+        fresh.aeon = aeon;
+        fresh.aeons = aeons;
+        fresh.entering = entering;
         fresh.passage = passage;
         fresh.received = received;
         if fresh.encode_checkpoint() != bytes {

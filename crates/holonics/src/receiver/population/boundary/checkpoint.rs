@@ -18,7 +18,7 @@ use thiserror::Error;
 
 const CLOCK_MAGIC: &[u8; 8] = b"HPCLK\0\0\x01";
 const HAZARD_MAGIC: &[u8; 8] = b"HHAZ\0\0\0\x01";
-const EGG_MAGIC: &[u8; 8] = b"HBEGG\0\0\x01";
+const EGG_MAGIC: &[u8; 8] = b"HBEGG\0\0\x02";
 
 /// Typed refusal while encoding or restoring a part-clock or hazard standing.
 #[derive(Clone, Debug, Error, PartialEq, Eq)]
@@ -571,7 +571,7 @@ fn inferred_sections(
 }
 
 fn tree_open_section(bytes: &[u8]) -> Result<Option<Section>, BoundaryPortCheckpointError> {
-    const TREE_MAGIC: &[u8; 8] = b"HTREE\0\0\x01";
+    const TREE_MAGIC: &[u8; 8] = b"HTREE\0\0\x02";
     if bytes.len() < TREE_MAGIC.len() || &bytes[..TREE_MAGIC.len()] != TREE_MAGIC {
         return Err(BoundaryPortCheckpointError::Inconsistent);
     }
@@ -647,6 +647,20 @@ impl BoundaryEgg {
         writer.u64(self.letters.received);
         let past: Vec<Letter> = self.letters.past.iter().copied().collect();
         write_letters(&mut writer, &past);
+        writer.u64(self.letters.aeon);
+        match self.letters.entering {
+            None => writer.u8(0),
+            Some(aeon) => {
+                writer.u8(1);
+                writer.u64(aeon);
+            }
+        }
+        writer.len(self.letters.aeons.len());
+        for (&aeon, letters) in &self.letters.aeons {
+            writer.u64(aeon);
+            let letters: Vec<Letter> = letters.iter().copied().collect();
+            write_letters(&mut writer, &letters);
+        }
         writer.passage(&self.passage);
         encode_readout(&mut writer, &self.readout);
         writer.0
@@ -740,6 +754,25 @@ impl BoundaryEgg {
         };
         let received = reader.u64()?;
         let past = read_letters(&mut reader)?;
+        let aeon = reader.u64()?;
+        let entering = match reader.u8()? {
+            0 => None,
+            1 => Some(reader.u64()?),
+            _ => return reader.fail("unknown entering-aeon tag"),
+        };
+        let away = reader.len(9)?;
+        let mut aeons = std::collections::BTreeMap::new();
+        for _ in 0..away {
+            let key = reader.u64()?;
+            let letters = read_letters(&mut reader)?;
+            if aeons
+                .last_key_value()
+                .is_some_and(|(last, _): (&u64, _)| *last >= key)
+            {
+                return reader.fail("aeons away are duplicated or not canonical");
+            }
+            aeons.insert(key, std::collections::VecDeque::from(letters));
+        }
         let passage = reader.passage()?;
         let readout = decode_readout(&mut reader, declaration.chart.channels(), &expected_labels)?;
         if reader.at != bytes.len() {
@@ -749,6 +782,9 @@ impl BoundaryEgg {
         declaration.letters.pending = pending;
         declaration.letters.received = received;
         declaration.letters.past = past.into();
+        declaration.letters.aeon = aeon;
+        declaration.letters.entering = entering;
+        declaration.letters.aeons = aeons;
         declaration.passage = passage;
         declaration.readout = readout;
         validate_egg_state(&declaration)?;
@@ -800,7 +836,24 @@ fn validate_egg_state(egg: &BoundaryEgg) -> Result<(), BoundaryPortCheckpointErr
         || egg.passage.factors() != expected_passed
         || letters.tree.passed() != letters.received
         || letters.received > letters.tree.declaration().population
-        || letters.past.len() as u64 != expected_past
+        // With no aeon away every letter was read in the entered aeon; otherwise each aeon's
+        // letters are at most the declared depth, and the byte tree keeps the same aeons.
+        || (letters.aeons.is_empty() && letters.past.len() as u64 != expected_past)
+        || letters.past.len() as u64 > expected_past
+        || letters.aeons.contains_key(&letters.aeon)
+        || letters.aeons.values().any(|away| {
+            away.is_empty() || away.len() > letters.tree.declaration().depth
+        })
+        || egg.bytes.aeon() != letters.aeon
+        || egg.bytes.entering() != letters.entering
+        || !egg.bytes.aeons_away().eq(letters.aeons.keys().copied())
+        || letters.aeons.values().flatten().any(|letter| match letter {
+            Letter::Bundle(bundle) => {
+                bundle.cell >= egg.chart.letters()
+                    || u64::from(bundle.features) >= letters.family.codes()
+            }
+            _ => true,
+        })
         || letters.pending.is_some() != (letters.received > 0)
         || !latest_letter_matches
         || letters
@@ -1054,7 +1107,7 @@ mod tests {
         let bytes = current.encode_checkpoint();
         assert!(BoundaryEgg::decode_checkpoint(egg(), &bytes[..bytes.len() - 1]).is_err());
         let mut wrong_version = bytes.clone();
-        wrong_version[7] = 2;
+        wrong_version[7] = 1;
         assert!(matches!(
             BoundaryEgg::decode_checkpoint(egg(), &wrong_version),
             Err(BoundaryPortCheckpointError::Version)

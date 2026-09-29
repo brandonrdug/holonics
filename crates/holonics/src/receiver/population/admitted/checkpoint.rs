@@ -14,7 +14,7 @@ use thiserror::Error;
 
 const STAGE_MAGIC: &[u8; 8] = b"HACPY\0\0\x01";
 const POINTER_MAGIC: &[u8; 8] = b"HAPTR\0\0\x01";
-const EGG_MAGIC: &[u8; 8] = b"HAEGG\0\0\x01";
+const EGG_MAGIC: &[u8; 8] = b"HAEGG\0\0\x02";
 
 /// A typed refusal to encode or restore an admitted-stage standing component.
 #[derive(Clone, Debug, Error, PartialEq, Eq)]
@@ -475,8 +475,10 @@ impl PointerCode {
 impl AdmittedEgg {
     /// Encode this egg's current future-sufficient outer standing and its complete inner egg.
     /// Copy laws and the caller's base incidence remain pinned declarations. Newly committed
-    /// future relations are part of current incidence state; spans retain only live target cells,
-    /// while the open reading address keeps only the suffix needed by that fixed target span.
+    /// future relations are part of current incidence state. Retention is the present law's: each
+    /// aeon's runs on the target ports with their spans' cells, each aeon's latest target port,
+    /// the aeon entered and the one waiting at the next letter, and the released relations'
+    /// counts; the open reading address keeps only the suffix needed by its fixed target span.
     pub fn encode_checkpoint(&self) -> Result<Vec<u8>, AdmittedStageCheckpointError> {
         let mut out = Writer(EGG_MAGIC.to_vec());
         out.string(&self.label);
@@ -506,12 +508,36 @@ impl AdmittedEgg {
         for pointer in &self.pointers {
             out.blob(&pointer.encode_checkpoint());
         }
+        out.len(self.released.len());
+        for &released in &self.released {
+            out.u64(released);
+        }
+        out.u64(self.aeon);
+        match self.entering {
+            None => out.u8(0),
+            Some(aeon) => {
+                out.u8(1);
+                out.u64(aeon);
+            }
+        }
+        out.len(self.runs.len());
+        for (&(aeon, channel), run) in &self.runs {
+            out.u64(aeon);
+            out.len(channel);
+            out.len(run.len());
+            for &letter in run {
+                out.u64(letter);
+            }
+        }
+        out.len(self.last.len());
+        for (&aeon, &channel) in &self.last {
+            out.u64(aeon);
+            out.len(channel);
+        }
         out.len(self.spans.len());
         for (&letter, span) in &self.spans {
             out.u64(letter);
             out.len(span.channel);
-            out.u64(span.ordinal);
-            out.u64(span.remaining);
             out.len(span.cells.len());
             for &cell in &span.cells {
                 out.len(cell);
@@ -594,9 +620,6 @@ impl AdmittedEgg {
             return Err(AdmittedStageCheckpointError::Declaration);
         }
         let relation_count = input.len(17)?;
-        if relation_count < declaration.relations.len() {
-            return Err(AdmittedStageCheckpointError::Declaration);
-        }
         let mut relations = Vec::with_capacity(relation_count);
         let mut previous_relation = None;
         for _ in 0..relation_count {
@@ -612,15 +635,6 @@ impl AdmittedEgg {
             }
             previous_relation = Some(actual);
             relations.push(actual);
-        }
-        let mut base = declaration.relations.iter().peekable();
-        for relation in &relations {
-            if base.peek().is_some_and(|expected| **expected == *relation) {
-                base.next();
-            }
-        }
-        if base.next().is_some() {
-            return Err(AdmittedStageCheckpointError::Declaration);
         }
         if input.law()? != declaration.stage.readout.law {
             return Err(AdmittedStageCheckpointError::Declaration);
@@ -641,7 +655,24 @@ impl AdmittedEgg {
             &inner_bytes,
         )?;
         let next = input.usize_value()?;
-        if next > declaration.relations.len() {
+        // The pinned base incidence is kept, except where a branch at the present withheld its
+        // relations past `next`: the kept relations hold the base's as a subsequence up to the
+        // first withheld one.
+        let mut base = declaration.relations.iter().peekable();
+        for relation in &relations {
+            if base.peek().is_some_and(|expected| **expected == *relation) {
+                base.next();
+            }
+        }
+        if let Some(first) = base.next()
+            && (relations.len() != next
+                || relations
+                    .last()
+                    .is_some_and(|last| last.letter >= first.letter))
+        {
+            return Err(AdmittedStageCheckpointError::Declaration);
+        }
+        if next > relations.len() {
             return input.malformed("next relation lies outside the declared incidence");
         }
         declaration.stage = CopyStage::decode_checkpoint(
@@ -668,7 +699,51 @@ impl AdmittedEgg {
             *pointer =
                 PointerCode::decode_checkpoint(kind, declaration.chart.kinds(), input.blob()?)?;
         }
-        let span_count = input.len(40)?;
+        let released_count = input.len(8)?;
+        if released_count != RelationKind::ALL.len() {
+            return input.malformed("one released count a relation kind");
+        }
+        let mut released = Vec::with_capacity(released_count);
+        for _ in 0..released_count {
+            released.push(input.u64()?);
+        }
+        let aeon = input.u64()?;
+        let entering = match input.u8()? {
+            0 => None,
+            1 => Some(input.u64()?),
+            _ => return input.malformed("unknown entering-aeon tag"),
+        };
+        let run_count = input.len(24)?;
+        let mut runs = BTreeMap::new();
+        for _ in 0..run_count {
+            let key = (input.u64()?, input.usize_value()?);
+            let len = input.len(8)?;
+            let mut run = Vec::with_capacity(len);
+            for _ in 0..len {
+                run.push(input.u64()?);
+            }
+            if runs
+                .last_key_value()
+                .is_some_and(|(last, _): (&(u64, usize), _)| *last >= key)
+            {
+                return input.malformed("runs are duplicated or not canonical");
+            }
+            runs.insert(key, run);
+        }
+        let last_count = input.len(16)?;
+        let mut last = BTreeMap::new();
+        for _ in 0..last_count {
+            let key = input.u64()?;
+            let channel = input.usize_value()?;
+            if last
+                .last_key_value()
+                .is_some_and(|(old, _): (&u64, _)| *old >= key)
+            {
+                return input.malformed("latest ports are duplicated or not canonical");
+            }
+            last.insert(key, channel);
+        }
+        let span_count = input.len(24)?;
         let mut spans = BTreeMap::new();
         let mut previous_letter = None;
         let mut held = 0usize;
@@ -678,11 +753,9 @@ impl AdmittedEgg {
                 return input.malformed("span keys are duplicated or not canonical");
             }
             let channel = input.usize_value()?;
-            let ordinal = input.u64()?;
-            let remaining = input.u64()?;
             let cell_count = input.len(8)?;
-            if channel >= declaration.chart.channels() || remaining == 0 {
-                return input.malformed("span port or live-reader count is invalid");
+            if channel >= declaration.chart.channels() {
+                return input.malformed("span port is invalid");
             }
             let mut cells = Vec::with_capacity(cell_count);
             for _ in 0..cell_count {
@@ -696,15 +769,7 @@ impl AdmittedEgg {
                 .checked_add(cell_count)
                 .ok_or(AdmittedStageCheckpointError::Inconsistent)?;
             previous_letter = Some(letter);
-            spans.insert(
-                letter,
-                Span {
-                    channel,
-                    ordinal,
-                    cells,
-                    remaining,
-                },
-            );
+            spans.insert(letter, Span { channel, cells });
         }
         let open = match input.u8()? {
             0 => None,
@@ -771,34 +836,22 @@ impl AdmittedEgg {
         let encoded_held = input.usize_value()?;
         let widest = input.usize_value()?;
         input.finish()?;
-        declaration.passage = passage.clone();
 
-        let mut targets = BTreeMap::new();
         declaration.relations = relations;
-        for relation in &declaration.relations {
-            *targets.entry(relation.target).or_insert(0u64) += 1;
-        }
-        validate_outer(
-            &declaration,
-            next,
-            &spans,
-            open.as_ref(),
-            &parts,
-            tick,
-            held,
-            encoded_held,
-            widest,
-            &targets,
-        )?;
         declaration.next = next;
+        declaration.released = released;
+        declaration.aeon = aeon;
+        declaration.entering = entering;
+        declaration.runs = runs;
+        declaration.last = last;
         declaration.spans = spans;
-        declaration.targets = targets;
         declaration.open = open;
         declaration.parts = parts;
         declaration.tick = tick;
         declaration.passage = passage;
         declaration.held = held;
         declaration.widest = widest;
+        validate_outer(&declaration, encoded_held)?;
         Ok(declaration)
     }
 }
@@ -820,6 +873,11 @@ fn fresh(egg: &AdmittedEgg) -> bool {
                 && pointer.levels.is_empty()
                 && pointer.previous.is_none()
         })
+        && egg.released.iter().all(|&count| count == 0)
+        && egg.aeon == 0
+        && egg.entering.is_none()
+        && egg.runs.is_empty()
+        && egg.last.is_empty()
         && egg.spans.is_empty()
         && egg.open.is_none()
         && egg.parts.iter().all(|&count| count == 0)
@@ -829,24 +887,21 @@ fn fresh(egg: &AdmittedEgg) -> bool {
         && egg.widest == 0
 }
 
+/// The restored outer state is the present retention law's: every span lies in exactly one run of
+/// its aeon on its target port, every run's aeon names that port or the other as its latest, and
+/// the open part and its relation read the entered aeon's runs.
 fn validate_outer(
     egg: &AdmittedEgg,
-    next: usize,
-    spans: &BTreeMap<u64, Span>,
-    open: Option<&OpenPart>,
-    parts: &[u64],
-    tick: u64,
-    held: usize,
     encoded_held: usize,
-    widest: usize,
-    targets: &BTreeMap<u64, u64>,
 ) -> Result<(), AdmittedStageCheckpointError> {
     let inconsistent = || AdmittedStageCheckpointError::Inconsistent;
+    let parts = &egg.parts;
+    let tick = egg.tick;
     let part_total = parts
         .iter()
         .try_fold(0u64, |sum, &count| sum.checked_add(count))
         .ok_or_else(inconsistent)?;
-    if next > egg.relations.len()
+    if egg.next > egg.relations.len()
         || parts.len() != egg.chart.channels()
         || part_total > tick
         || !matches!(
@@ -854,49 +909,59 @@ fn validate_outer(
             super::Likelihood::Enclosed(code) if code.factors() == tick
         )
         || egg.passage.factors() != tick
-        || held != encoded_held
+        || egg.held != encoded_held
         || egg.pointers[RelationKind::Request.index()].readout.parts != parts[super::AGENT]
         || egg.pointers[RelationKind::LaterHuman.index()].readout.parts != parts[super::HUMAN]
+        || egg.inner.aeon() != egg.aeon
+        || egg.inner.entering() != egg.entering
     {
         return Err(inconsistent());
     }
-    let mut held_cells = 0usize;
-    for (&letter, span) in spans {
-        let expected_remaining = egg.relations[next..]
-            .iter()
-            .filter(|relation| relation.target == letter)
-            .count() as u64
-            + if open.is_some_and(|open| open.relation.is_some_and(|(_, target)| target == letter))
-            {
-                1
-            } else {
-                0
-            };
-        if expected_remaining == 0
-            || span.remaining != expected_remaining
-            || span.ordinal >= parts[span.channel]
-            || targets.get(&letter).copied().unwrap_or(0) < expected_remaining
+    for (pointer, &released) in egg.pointers.iter().zip(&egg.released) {
+        if pointer
+            .readout
+            .held
+            .checked_add(released)
+            .is_none_or(|read| read > pointer.readout.parts)
         {
             return Err(inconsistent());
         }
-        let expected_channel = egg
-            .relations
-            .iter()
-            .filter(|relation| relation.target == letter)
-            .map(|relation| relation.kind.channels().1)
-            .next();
-        if expected_channel != Some(span.channel) {
+    }
+    let mut in_runs = 0usize;
+    for (&(aeon, channel), run) in &egg.runs {
+        if run.is_empty()
+            || !super::target_port(channel)
+            || !egg.last.contains_key(&aeon)
+            || run.windows(2).any(|pair| pair[0] >= pair[1])
+            || run.last().is_some_and(|&letter| letter >= tick)
+            || run.iter().any(|letter| {
+                egg.spans
+                    .get(letter)
+                    .is_none_or(|span| span.channel != channel)
+            })
+        {
             return Err(inconsistent());
         }
-        held_cells = held_cells
-            .checked_add(span.cells.len())
-            .ok_or_else(inconsistent)?;
+        in_runs += run.len();
     }
-    if held_cells != held {
+    if in_runs != egg.spans.len()
+        || egg
+            .last
+            .iter()
+            .any(|(&aeon, &channel)| !egg.runs.contains_key(&(aeon, channel)))
+    {
+        return Err(inconsistent());
+    }
+    let held_cells = egg
+        .spans
+        .values()
+        .try_fold(0usize, |sum, span| sum.checked_add(span.cells.len()))
+        .ok_or_else(inconsistent)?;
+    if held_cells != egg.held {
         return Err(inconsistent());
     }
     let section = egg.inner.clock().port().section;
-    match (open, section) {
+    match (&egg.open, section) {
         (None, None) if tick == 0 => {}
         (Some(open), Some(section)) => {
             if open.letter >= tick
@@ -905,14 +970,26 @@ fn validate_outer(
             {
                 return Err(inconsistent());
             }
+            let phase = egg.inner.clock().port().phase;
+            if super::target_port(section.channel)
+                && (egg
+                    .runs
+                    .get(&(egg.aeon, section.channel))
+                    .and_then(|run| run.last())
+                    != Some(&open.letter)
+                    || egg
+                        .spans
+                        .get(&open.letter)
+                        .is_none_or(|span| span.cells.len() as u64 != phase))
+            {
+                return Err(inconsistent());
+            }
             if let Some((kind, target)) = open.relation {
-                let Some(relation) = next
+                let Some(relation) = egg
+                    .next
                     .checked_sub(1)
                     .and_then(|index| egg.relations.get(index))
                 else {
-                    return Err(inconsistent());
-                };
-                let Some(span) = spans.get(&target) else {
                     return Err(inconsistent());
                 };
                 let (reader, target_channel) = kind.channels();
@@ -923,17 +1000,20 @@ fn validate_outer(
                         target,
                     })
                     || reader != section.channel
-                    || target_channel != span.channel
-                    || u64::try_from(open.reading.cells()).ok()
-                        != Some(egg.inner.clock().port().phase)
+                    || !egg
+                        .runs
+                        .get(&(egg.aeon, target_channel))
+                        .is_some_and(|run| run.contains(&target))
+                    || u64::try_from(open.reading.cells()).ok() != Some(phase)
                 {
                     return Err(inconsistent());
                 }
             }
-            if held
+            if egg
+                .held
                 .checked_add(open.reading.cells())
                 .ok_or_else(inconsistent)?
-                > widest
+                > egg.widest
             {
                 return Err(inconsistent());
             }
@@ -1183,7 +1263,62 @@ mod tests {
         let bytes = original.encode_checkpoint().unwrap();
         let restored = AdmittedEgg::decode_checkpoint(egg(), &bytes).unwrap();
         assert_eq!(restored.relations, original.relations);
-        assert_eq!(restored.targets, original.targets);
+        assert_eq!(restored.encode_checkpoint().unwrap(), bytes);
+    }
+
+    #[test]
+    fn admitted_egg_restores_its_aeons_runs_and_the_aeon_waiting_at_a_letter() {
+        // Two conversations interleaved: aeon 7's request (tick 0), aeon 9's human part (tick 3),
+        // then aeon 7's response (tick 4, reading its request across aeon 9's part); the checkpoint
+        // is taken with aeon 7 waiting at the response's letter, and again within the response.
+        let mut original = egg();
+        original.enter_aeon(7).unwrap();
+        receive(
+            &mut original,
+            &[letter(0, 0), usize::from(b'a'), usize::from(b'b')],
+        );
+        original.enter_aeon(9).unwrap();
+        receive(&mut original, &[letter(1, 0)]);
+        original.enter_aeon(7).unwrap();
+        for continuing in [false, true] {
+            let bytes = original.encode_checkpoint().unwrap();
+            let mut restored = AdmittedEgg::decode_checkpoint(egg(), &bytes)
+                .unwrap_or_else(|error| panic!("decode error: {error:?}"));
+            assert_eq!(restored.encode_checkpoint().unwrap(), bytes);
+            assert_eq!(restored.face().unwrap(), original.face().unwrap());
+            let cells = if continuing {
+                vec![usize::from(b'b'), letter(2, 0)]
+            } else {
+                vec![letter(1, 1), usize::from(b'a'), usize::from(b'b')]
+            };
+            for cell in cells {
+                assert_eq!(
+                    restored.receive(cell).unwrap(),
+                    original.receive(cell).unwrap()
+                );
+                assert_eq!(
+                    restored.encode_checkpoint().unwrap(),
+                    original.encode_checkpoint().unwrap()
+                );
+            }
+        }
+        assert_eq!(original.aeon(), 7);
+        assert_eq!(
+            original.released,
+            vec![0, 0],
+            "the request was held across aeon 9"
+        );
+    }
+
+    #[test]
+    fn a_branch_at_the_present_restores_against_its_pinned_base() {
+        // The base declares a request read at tick 4; a branch at tick 2 withholds it.
+        let mut original = egg();
+        receive(&mut original, &[letter(0, 0), usize::from(b'a')]);
+        let branch = original.branch_at_present();
+        let bytes = branch.encode_checkpoint().unwrap();
+        let restored = AdmittedEgg::decode_checkpoint(egg(), &bytes).unwrap();
+        assert_eq!(restored.relations, Vec::new());
         assert_eq!(restored.encode_checkpoint().unwrap(), bytes);
     }
 }
