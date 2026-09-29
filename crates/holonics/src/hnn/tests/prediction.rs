@@ -173,7 +173,7 @@ fn the_refinement_balance_closes_with_the_injection_the_pump_and_the_commit() {
         &field,
         &theta,
         &current,
-        &moment,
+        &[&moment],
         &refinement,
         &mut Charts::new(),
     )
@@ -193,6 +193,7 @@ fn the_refinement_balance_closes_with_the_injection_the_pump_and_the_commit() {
         &moment,
         &refinement,
         &targets,
+        &vec![false; refinement.stations()],
         &mut Charts::new(),
         false,
     )
@@ -212,7 +213,7 @@ fn the_refinement_balance_closes_with_the_injection_the_pump_and_the_commit() {
         &field,
         &theta,
         &current,
-        &moment,
+        &[&moment],
         &refinement,
         &mut Charts::new(),
     )
@@ -226,6 +227,7 @@ fn the_refinement_balance_closes_with_the_injection_the_pump_and_the_commit() {
         &moment,
         &refinement,
         &targets,
+        &vec![false; refinement.stations()],
         &mut Charts::new(),
         false,
     )
@@ -271,6 +273,7 @@ fn the_section_return_pairs_exactly_on_the_executed_charts() {
             &moment,
             &refinement,
             &targets,
+            &vec![false; refinement.stations()],
             &mut Charts::new(),
             true,
         )
@@ -294,7 +297,7 @@ fn the_release_holds_a_plural_section_and_releases_a_determined_one() {
         &field,
         &initial,
         &current,
-        &moment,
+        &[&moment],
         &refinement,
         &mut Charts::new(),
     )
@@ -318,7 +321,7 @@ fn the_release_holds_a_plural_section_and_releases_a_determined_one() {
         &field,
         &theta,
         &current,
-        &moment,
+        &[&moment],
         &refinement,
         &mut Charts::new(),
     )
@@ -352,6 +355,7 @@ fn a_deposit_leaves_every_unreached_locus_unchanged() {
         &moment,
         &refinement,
         &targets,
+        &vec![false; refinement.stations()],
         &mut Charts::new(),
         false,
     )
@@ -423,7 +427,7 @@ fn the_section_reads_no_landmark_tree() {
         &field,
         &theta,
         &current,
-        &moment,
+        &[&moment],
         &refinement,
         &mut Charts::new(),
     )
@@ -434,7 +438,7 @@ fn the_section_reads_no_landmark_tree() {
         &field,
         &NoTree(&theta),
         &current,
-        &moment,
+        &[&moment],
         &refinement,
         &mut Charts::new(),
     )
@@ -457,7 +461,7 @@ fn every_station_is_read_from_the_one_anchor() {
         &field,
         &theta,
         &current,
-        &moment,
+        &[&moment],
         &refinement,
         &mut Charts::new(),
     )
@@ -469,5 +473,225 @@ fn every_station_is_read_from_the_one_anchor() {
             read,
             &ring.rotate(section.anchor(), &BigInt::from(j as u64 + 1))
         );
+    }
+}
+
+// -------------------------------------------------------------------------------------------
+// the order repair: the joint residue class, the section's placement and the lock
+
+/// **A joint-residue field**: three rings of period `6 = 2·3` in a chain `0 — 1 — 2`, joined node to
+/// node on every node at exponent 0; ring 0 the source and receiving ring, stepping every cell (its
+/// lock every port), rings 1 and 2 stepping by carries; no pair offset; `|A| = 3`, the last class
+/// the termination.
+fn joint() -> Field {
+    Field::declare(
+        crate::hnn::field::FieldDeclaration {
+            rings: vec![
+                super::support::ring(6, (0..6).collect()),
+                super::support::ring(6, Vec::new()),
+                super::support::ring(6, Vec::new()),
+            ],
+            contacts: vec![
+                super::support::contact(0, 1, 6, 0),
+                super::support::contact(1, 2, 6, 0),
+            ],
+            loops: Vec::new(),
+            sources: vec![0],
+            offsets: Vec::new(),
+            alphabet: 3,
+            step: integer(1),
+            exponent_grain: 1,
+            receivers: vec![crate::hnn::field::ReceiverDeclaration {
+                ring: 0,
+                aperture: 3,
+                tolerance: rat(1, 16),
+                depth: 1,
+                prior: crate::compression::landmark::context::StopPrior::half(),
+            }],
+            crib: crate::hnn::field::CribDeclaration {
+                window: 16,
+                offset: 1,
+            },
+            population: 1 << 16,
+            lattice: Default::default(),
+        }
+        .by_lattice_rule(),
+    )
+    .unwrap()
+}
+
+/// **A placed datum is read at its station's residue** (`SourceMoment::section`): the datum locked
+/// at station `j` is counted at the receiving ring's residue `τ + 1 + j`, and station `j`'s rotation
+/// `P^(1+j)` of its open storage is the datum's column of `E` over its population, `E e_x ν̂(1)`.
+#[test]
+fn a_placed_datum_is_read_at_its_station_residue() {
+    let field = joint();
+    let theta = generic(&field, 91);
+    let (current, _) = moment(&field, 92, 7);
+    let refinement = Refinement::declare(&field, 0, 2, 1, 4, 2).unwrap();
+    let phase = current.phase(&field, 0).unwrap() as usize;
+    let nu = crate::hnn::moment::PopulationChart::of(&field).value(1);
+    let port = theta.source_port(0).unwrap();
+    for station in 0..4 {
+        for code in 0..field.alphabet() {
+            let mut cells = vec![None; 4];
+            cells[station] = Some(code);
+            let placed = refinement.section(&field, &current, &cells).unwrap();
+            assert_eq!(placed.cells(), 1);
+            assert_eq!(
+                placed.phase_counts(0, (phase + 1 + station) % 6).unwrap()[code],
+                1
+            );
+            let open = placed.open_storage(&field, &theta, &current).unwrap();
+            let read = field
+                .ring(0)
+                .rotate(&open[0], &BigInt::from(station as u64 + 1));
+            let column: Vec<Rat> = (0..field.ring(0).width())
+                .map(|row| port.get(row, code).unwrap() * &nu)
+                .collect();
+            assert_eq!(read, column);
+        }
+    }
+}
+
+/// **A compared station never reads its own target**, and the partition's ratio is the whole
+/// ratio at its stations: two target sections that differ only at the compared stations give the
+/// same faces; the partition's covector is zero at the locked stations and equals the whole
+/// comparison's at the compared ones; the staged return with the section placed pairs exactly.
+#[test]
+fn a_compared_station_never_reads_its_own_target() {
+    let field = joint();
+    let theta = generic(&field, 93);
+    let (current, moment) = moment(&field, 94, 9);
+    let refinement = Refinement::declare(&field, 0, 2, 1, 4, 2).unwrap();
+    let locked = [true, false, true, false];
+    let compared: Vec<bool> = locked.iter().map(|lock| !lock).collect();
+    let first = [0usize, 1, 2, 0];
+    let second = [0usize, 2, 2, 1];
+    let faces = |targets: &[usize]| {
+        let cells: Vec<Option<usize>> = targets
+            .iter()
+            .zip(&locked)
+            .map(|(&t, &lock)| lock.then_some(t))
+            .collect();
+        let placed = refinement.section(&field, &current, &cells).unwrap();
+        Section::refine(
+            &field,
+            &theta,
+            &current,
+            &[&moment, &placed],
+            &refinement,
+            &mut Charts::new(),
+        )
+        .unwrap()
+    };
+    let section = faces(&first);
+    assert_eq!(section.faces(), faces(&second).faces());
+    let whole = section.compare(&first).unwrap().covector().unwrap();
+    let part = section
+        .compare_partition(&first, &compared)
+        .unwrap()
+        .covector()
+        .unwrap();
+    for (j, lock) in locked.iter().enumerate() {
+        if *lock {
+            assert!(part.logits()[j].iter().all(Rat::is_zero));
+        } else {
+            assert_eq!(part.logits()[j], whole.logits()[j]);
+        }
+    }
+    let staged = stage(
+        &field,
+        &theta,
+        &current,
+        &moment,
+        &refinement,
+        &first,
+        &locked,
+        &mut Charts::new(),
+        true,
+    )
+    .unwrap();
+    assert_eq!(staged.ratio.stations(), &[1, 3]);
+    let pairing = staged.pairing.unwrap();
+    assert!(pairing.holds() && !pairing.produced.is_zero(), "{pairing:?}");
+    assert!(staged.balance.closes());
+}
+
+/// **The partition law** (`prediction::mask`): at least one station is always compared, and every
+/// number of locked stations `0 … m − 1` is drawn.
+#[test]
+fn the_mask_compares_a_station_and_reaches_every_level() {
+    let mut draw = crate::holarchy::terrain::Draw::new(95);
+    let mut levels = [0usize; 8];
+    for _ in 0..512 {
+        let locked = crate::hnn::prediction::mask(&mut draw, 8);
+        let count = locked.iter().filter(|&&lock| lock).count();
+        assert!(count < 8);
+        levels[count] += 1;
+    }
+    assert!(levels.iter().all(|&count| count > 0), "{levels:?}");
+}
+
+/// **Generation locks by the largest gap and releases at width zero** (`prediction::generate`): at
+/// the initial constitution (`R = 0`) every station is plural, so the first refinement holds the
+/// whole section; at a generic constitution with a receiving map at scale `2^12` every lock reads a
+/// unique top cell, the locks partition the stations, one refinement a lock, every balance closes,
+/// and the section is released at width zero with each locked class.
+#[test]
+fn generation_locks_by_the_largest_gap_and_releases_at_width_zero() {
+    let field = joint();
+    let (current, moment) = moment(&field, 96, 9);
+    let refinement = Refinement::declare(&field, 0, 2, 1, 4, 2).unwrap();
+    let initial = Constitution::initial(&field, OPEN_BUDGET).unwrap();
+    let held = crate::hnn::prediction::generate(
+        &field,
+        &initial,
+        &current,
+        &moment,
+        &refinement,
+        &mut Charts::new(),
+    )
+    .unwrap();
+    assert_eq!(held.release.decision, ReleaseReturn::Hold);
+    assert_eq!(held.refinements, 1);
+    assert_eq!(held.release.plural, vec![0, 1, 2, 3]);
+    let mut draw = Draw::new(97);
+    let scaled = draw
+        .half_matrix(2 * field.alphabet(), field.ring(0).width())
+        .scaled(&integer(1 << 12));
+    let theta = generic(&field, 97)
+        .with_ports(0, None, None, Some(scaled))
+        .unwrap();
+    let generated = crate::hnn::prediction::generate(
+        &field,
+        &theta,
+        &current,
+        &moment,
+        &refinement,
+        &mut Charts::new(),
+    )
+    .unwrap();
+    assert!(generated.release.released(), "{generated:?}");
+    assert!(generated.release.width.is_zero());
+    assert_eq!(generated.refinements, generated.locks.len());
+    assert_eq!(generated.balances_closed, generated.refinements);
+    let mut stations: Vec<usize> = generated.locks.iter().flatten().copied().collect();
+    stations.sort_unstable();
+    assert_eq!(stations, vec![0, 1, 2, 3]);
+    // The first lock is the unplaced section's leader: its release reads the same top classes there.
+    let first = Section::refine(
+        &field,
+        &theta,
+        &current,
+        &[&moment],
+        &refinement,
+        &mut Charts::new(),
+    )
+    .unwrap()
+    .release()
+    .unwrap();
+    for &station in &generated.locks[0] {
+        assert_eq!(generated.release.classes[station], first.classes[station]);
     }
 }

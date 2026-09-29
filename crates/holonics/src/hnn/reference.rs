@@ -1686,7 +1686,7 @@ pub fn compose(
         &diamond,
         ratio.anchor(),
         &ratio.current(field)?,
-        ratio.moment(),
+        &[ratio.moment()],
         back,
     )?;
     // The receiving parametron's landmark tree (`compression::landmark::context`): each compared target deposits on
@@ -1766,10 +1766,17 @@ pub fn compose_return(
     diamond: &Diamond,
     anchor: &[BigInt],
     current: &Current,
-    moment: &SourceMoment,
+    placements: &[&SourceMoment],
     back: &WordReturn,
 ) -> Result<ComposedReturn, HnnError> {
     use crate::ratio::linear::vector::{Chart, combination, integral};
+    let Some(&moment) = placements.first() else {
+        return Err(HnnError::Shape {
+            what: "a return's placements (the request's moment first)",
+            expected: 1,
+            found: 0,
+        });
+    };
     let released = constitution.released();
     let retained = |locus: Locus| diamond.retains(field, locus) && !released.contains(&locus);
     let alphabet = field.alphabet();
@@ -1880,7 +1887,12 @@ pub fn compose_return(
         let source = constitution
             .source_port(g)
             .ok_or(HnnError::MissingSourcePort { ring: g })?;
-        let gradient = moment.encoder_covector(field, &current, g, opening)?;
+        // Every placement enters through the same `E_g` at the same frame, so its encoder
+        // covector is the sum of theirs (each read from its own counts and population).
+        let mut gradient = moment.encoder_covector(field, &current, g, opening)?;
+        for placement in &placements[1..] {
+            gradient = gradient.add(&placement.encoder_covector(field, &current, g, opening)?)?;
+        }
         let source_t = source.transpose()?;
         // The covector on the moment's counts at their population (ruling B: the open reads
         // `M ν̂(n)`, so `∂/∂M = ν̂ Eᵀ h` with the population held).
@@ -1891,15 +1903,27 @@ pub fn compose_return(
                 .map(|x| x * &nu)
                 .collect())
         })?;
+        // One sample per occupied phase: its feature the placements' normalized counts summed
+        // (each over its own population), since `E_g` reads each at the same phase and frame.
         let mut source_samples = Vec::new();
         for (c, h) in turned.iter().enumerate() {
-            let counts = moment.phase_counts(g, c)?;
-            if counts.iter().all(|x| *x == 0) {
-                continue;
+            let mut feature: Option<Vec<Rat>> = None;
+            for placement in placements {
+                if placement.phase_counts(g, c)?.iter().all(|x| *x == 0) {
+                    continue;
+                }
+                let counts = placement.normalized_counts(field, g, c)?;
+                feature = Some(match feature {
+                    Some(sum) => add(&sum, &counts),
+                    None => counts,
+                });
             }
+            let Some(feature) = feature else {
+                continue;
+            };
             source_samples.push(Sample {
                 weight: one.clone(),
-                feature: moment.normalized_counts(field, g, c)?,
+                feature,
                 covector: negated(h),
             });
         }
@@ -1913,12 +1937,15 @@ pub fn compose_return(
             // The whole normalized offset moment of each phase `(x, a, C_c[x, a] ν̂)` over its pair
             // population (`hnn::moment`: the open reads no window), read once; none at an empty
             // population.
-            let table = moment.offset_table(field, g, offset)?;
+            let tables = placements
+                .iter()
+                .map(|placement| placement.offset_table(field, g, offset))
+                .collect::<Result<Vec<_>, HnnError>>()?;
             let mut nonzero: Vec<Vec<(usize, usize, Rat)>> = Vec::with_capacity(d);
             let mut energy = Rat::zero();
             for c in 0..d {
                 let mut slots = Vec::new();
-                if let Some(table) = &table {
+                for table in tables.iter().flatten() {
                     for (slot, &count) in table.phase(c, alphabet).iter().enumerate() {
                         if count == 0 {
                             continue;

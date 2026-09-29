@@ -323,10 +323,17 @@ impl PhaseRatio {
 
 /// [definition] **The Holon ratio `R_j = Ĝ_(T←H)` over a receiving window**: the contemporary faces
 /// and, per phase, the ratio at its target class. Only it constructs a [`RatioCovector`].
+///
+/// [definition; agent-inferred, U6's order repair] **A ratio over a partition of the phases**
+/// ([`HolonRatio::compare_partition`]): a receipt is a field of readings over a partition, so a
+/// comparison may cover only some phases (a refinement's unlocked stations, whose targets are not
+/// placed); the others carry no ratio and a zero covector (no global scalar is formed over them).
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct HolonRatio {
     faces: Faces,
     phases: Vec<PhaseRatio>,
+    /// The receiving phase of each compared ratio, in order.
+    stations: Vec<usize>,
 }
 
 impl HolonRatio {
@@ -337,19 +344,36 @@ impl HolonRatio {
         targets: &[usize],
         target_phases: &TargetPhases,
     ) -> Result<Self, HnnError> {
+        let compared = vec![true; targets.len()];
+        Self::compare_partition(faces, targets, target_phases, &compared)
+    }
+
+    /// **Compare the produced faces with the targets at the compared phases only** (the type's
+    /// header): each compared phase's ratio as [`HolonRatio::compare`] reads it; the rest carry none.
+    pub fn compare_partition(
+        faces: Faces,
+        targets: &[usize],
+        target_phases: &TargetPhases,
+        compared: &[bool],
+    ) -> Result<Self, HnnError> {
         let TargetPhases {
             branch,
             phases: target_phases,
         } = target_phases;
-        if targets.len() != faces.faces.len() || target_phases.len() != targets.len() {
+        if targets.len() != faces.faces.len()
+            || target_phases.len() != targets.len()
+            || compared.len() != targets.len()
+        {
             return Err(HnnError::Shape {
                 what: "targets per receiving phase",
                 expected: faces.faces.len(),
                 found: targets.len(),
             });
         }
+        let stations: Vec<usize> = (0..targets.len()).filter(|&j| compared[j]).collect();
         // Each receiving phase reads only its own face and target: the phases run together.
-        let phases = indexed(targets.len(), |j| {
+        let phases = indexed(stations.len(), |i| {
+            let j = stations[i];
             let (face, target, target_phase) = (&faces.faces[j], targets[j], &target_phases[j]);
             let produced_phase = face
                 .phases
@@ -370,7 +394,16 @@ impl HolonRatio {
                 branch: branch.clone(),
             })
         })?;
-        Ok(Self { faces, phases })
+        Ok(Self {
+            faces,
+            phases,
+            stations,
+        })
+    }
+
+    /// The receiving phase of each compared ratio, in order.
+    pub fn stations(&self) -> &[usize] {
+        &self.stations
     }
 
     /// The contemporary faces.
@@ -406,7 +439,7 @@ impl HolonRatio {
             expected: self.phases.len(),
             found: phase,
         })?;
-        let mass = self.faces.faces[phase].odometer_masses()?[ratio.target].clone();
+        let mass = self.faces.faces[self.stations[phase]].odometer_masses()?[ratio.target].clone();
         let winding = ratio.winding().to_i64().ok_or(HnnError::CountOverflow)?;
         LogRatio::new(
             GaussianRat::real(Rat::one()),
@@ -423,23 +456,22 @@ impl HolonRatio {
     /// **`R⁻¹dR` at the face**: the magnitude part `p̃ − q` on `Re f` and the phase part
     /// `−½ q_c Δ_c` on `Im f`, per receiving phase (module header, the covector's chart).
     pub fn covector(&self) -> Result<RatioCovector, HnnError> {
-        let logits = self
+        let mut logits: Vec<Vec<Rat>> = self
             .faces
             .faces
             .iter()
-            .zip(&self.phases)
-            .map(|(face, ratio)| {
-                let masses = face.odometer_masses()?;
-                let mut covector = vec![Rat::zero(); 2 * masses.len()];
-                for (class, mass) in masses.into_iter().enumerate() {
-                    covector[2 * class] = mass;
-                }
-                covector[2 * ratio.target] -= Rat::one();
-                let gap = ratio.gap.turns();
-                covector[2 * ratio.target + 1] = -gap / integer(2);
-                Ok(covector)
-            })
-            .collect::<Result<_, HnnError>>()?;
+            .map(|face| vec![Rat::zero(); 2 * face.cells().len()])
+            .collect();
+        for (ratio, &j) in self.phases.iter().zip(&self.stations) {
+            let masses = self.faces.faces[j].odometer_masses()?;
+            let covector = &mut logits[j];
+            for (class, mass) in masses.into_iter().enumerate() {
+                covector[2 * class] = mass;
+            }
+            covector[2 * ratio.target] -= Rat::one();
+            let gap = ratio.gap.turns();
+            covector[2 * ratio.target + 1] = -gap / integer(2);
+        }
         Ok(RatioCovector { logits })
     }
 }

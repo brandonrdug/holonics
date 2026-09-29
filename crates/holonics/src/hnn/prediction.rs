@@ -66,9 +66,49 @@
 //!   normal-law and factor deposition ([`Constitution::deposited`]) at its certified step, which
 //!   reads the refinement's reach ([`Refinement::reach`]: its stations at `K·w`, the moment's
 //!   re-entries at `n·w` and the phases one moment occupies).
-//! - **No window anywhere.** The path reads the request only through its phase-carried moment; it
-//!   reads no landmark tree, no suffix address, no copy stage and no byte context, and it deposits
-//!   nothing into the receiving tree (a deposit it stages has no landmark and no receiving-face step).
+//! - **No window anywhere.** The path reads the request only through its phase-carried moment and
+//!   the section only through its own placement (below); it reads no landmark tree, no suffix
+//!   address, no copy stage and no byte context, and it deposits nothing into the receiving tree (a
+//!   deposit it stages has no landmark and no receiving-face step).
+//!
+//! [definition; agent-inferred, U6's order repair (the lessons record's failure 4; Brandon,
+//! September 29: "offset moments? modulo, remainders? spectral placement")] **Order is carried by
+//! residues and relative phases.** The located failure: every station read one ring's placement
+//! through one map, `y_j = R P^(1+j) v_R`, so the section saw a residue histogram, the table
+//! without its index, and each station's top class was read alone; its best reading was the
+//! marginal. The repair has two parts, neither a window nor a table of pairs:
+//!
+//! - **Remainders: the joint residue class.** Each datum is placed on the receiving ring's spectrum
+//!   at its residue ([`SourceMoment`], `m = Σ_k Ĝ(τ_k)⁻¹ E u_k`, unchanged). A field declares that
+//!   ring's period as a product `D = ∏ d_i` of pairwise coprime factors, so a datum's residue mod
+//!   `D` is its joint residue class `(τ mod d_i)_i` (the Chinese remainder theorem, Lean
+//!   `HNN/Prediction.joint_residue_determines_position`) and the ring's modes are the products of
+//!   the factors' modes. Station `j` reads every placed datum by the relative phase `P^(1+j+age)`
+//!   between the station and the datum, the ratio of two rotations, resolved modulo `D`. The joint
+//!   class of a datum is placed on the product of the factors' spectra because a sum of separate
+//!   factor placements carries only their marginal modes: the indicator of one joint class is not
+//!   a sum of per-factor functions (`joint_class_not_additive`), so a field that summed the factors'
+//!   residue histograms would read three tables without their index.
+//! - **Relative phases between placed data: the section's own order.** The section's locked data are
+//!   placed on the same spectrum at their stations' residues ([`SourceMoment::section`], the
+//!   response's port with its own population), and every refinement reads the request's placement
+//!   and the section's together, so a station reads its neighbours' locked data by their relative
+//!   phases. Generation ([`generate`]) opens with nothing locked and refines: in each refinement
+//!   every unlocked station is read jointly from the one refined field, and the stations whose top
+//!   grain cell leads its runner-up by the largest gap lock together (a gap of zero is a plural
+//!   reading); a locked datum re-enters as placed data and drives the others. It stops when every
+//!   station is locked (released at width zero) or every unlocked station is plural (held, typed).
+//!   Learning ([`stage`]) compares only the unlocked stations of a drawn partition ([`mask`]) with
+//!   the locked ones placed, so no station reads its own target (`HolonRatio::compare_partition`).
+//!   The lock's order is the field's own (the largest drive locks first, ties together); it is not an
+//!   output index, and a locked station is never redrawn.
+//!
+//! [definition; agent-inferred] **Every modality reads it the same way.** A cell is a datum placed
+//! at its residue on a ring's spectrum: a text cell at its byte tick, an image cell at its scan tick
+//! (row-major, so a row of width `w` is a residue class mod `w` when `w` divides a factor of `D`), an
+//! acoustic sample at its sample tick (a period of the signal a residue class), a motor word's screw
+//! at its step. The station reads relative phases to placed data, and the section's own locked data
+//! are placed data of the same kind. Nothing here reads a codec, a byte or an alphabet's meaning.
 //!
 //! [definition] **The internal checks of every refinement** ([`Checks`]):
 //! - the refinement's balance ([`RefinementBalance`]): every tick's field-and-resonator balance
@@ -113,6 +153,7 @@ use crate::hnn::receiving::ReceivingRead;
 use crate::hnn::reference::{ComposedReturn, compose_return};
 use crate::hnn::retention::{Diamond, loci};
 use crate::hnn::word::{CommitWork, EndChange, PowerForm, Word};
+use crate::holarchy::terrain::Draw;
 use crate::holon::deposition::{power, sqrt_ceiling};
 use crate::ratio::linear::ExactRatMatrix;
 use crate::ratio::linear::vector::{add, dot};
@@ -261,6 +302,25 @@ impl Refinement {
             BigInt::from(station as u64 + 1),
             BigInt::from(self.period),
         )
+    }
+
+    /// **The section's placement** (module header, "Order is carried by residues and relative
+    /// phases"): the locked data `cells[j]` (an unlocked station `None`) placed on the receiving
+    /// ring's spectrum at their stations' residues ([`SourceMoment::section`]).
+    pub fn section(
+        &self,
+        field: &Field,
+        current: &Current,
+        cells: &[Option<usize>],
+    ) -> Result<SourceMoment, HnnError> {
+        if cells.len() != self.stations {
+            return Err(HnnError::Shape {
+                what: "one cell slot per station",
+                expected: self.stations,
+                found: cells.len(),
+            });
+        }
+        SourceMoment::section(field, current, self.ring, cells)
     }
 
     /// **The target phases of the section** (`hnn::ratio::TargetPhases`): each station's phase on
@@ -513,12 +573,12 @@ impl<'c> Section<'c> {
         field: &'c Field,
         constitution: &impl ConstitutionRead,
         current: &Current,
-        moment: &SourceMoment,
+        placements: &[&SourceMoment],
         declared: &Refinement,
         charts: &mut Charts,
     ) -> Result<Self, HnnError> {
         let operands = Operands::at_cut_charted(field, constitution, current, charts)?;
-        let injection = moment.open_storage(field, constitution, current)?;
+        let injection = injection(field, constitution, current, placements)?;
         Self::refine_on(field, constitution, operands, injection, declared)
     }
 
@@ -665,45 +725,7 @@ impl<'c> Section<'c> {
             }
             classes.push(top);
         }
-        let (diameter, attaining) = match plural.first() {
-            Some(&station) => (
-                Rat::one(),
-                WidthWitness::Coordinate {
-                    coordinate: station,
-                },
-            ),
-            None => (Rat::zero(), WidthWitness::Point),
-        };
-        let width = ReceiverWidth::declared(
-            format!("the section on receiving ring {}", self.declared.ring),
-            "every station's top class at the grain, over the grain fibre of its logits",
-            DiameterNorm::Supremum,
-            diameter,
-            attaining,
-            self.faces.faces.len().max(1),
-        )?;
-        let options = LawfulOptions::assemble(&width, Rat::zero(), None, false)?;
-        let rule = DecisionRule::new(
-            "the section's joint commit at tolerance zero",
-            WithinTolerance::Release,
-            BeyondTolerance::Hold,
-        );
-        let decision = release(&rule, &options)?;
-        let terminated = classes
-            .iter()
-            .position(|&class| class == self.declared.termination);
-        let emitted = match &decision {
-            ReleaseReturn::Released { .. } => classes[..terminated.unwrap_or(classes.len())].to_vec(),
-            _ => Vec::new(),
-        };
-        Ok(SectionRelease {
-            decision,
-            width: width.diameter().clone(),
-            classes,
-            plural,
-            emitted,
-            terminated,
-        })
+        section_release(&self.declared, classes, plural)
     }
 
     /// **The section's Holon ratio against its targets**, one class per station, each target read
@@ -717,6 +739,29 @@ impl<'c> Section<'c> {
             });
         }
         HolonRatio::compare(self.faces.clone(), targets, &self.declared.target_phases())
+    }
+
+    /// **The section's Holon ratio at its compared stations only** (the unlocked ones; module
+    /// header): each compared station's ratio as [`Section::compare`] reads it, a zero covector at
+    /// the others.
+    pub fn compare_partition(
+        &self,
+        targets: &[usize],
+        compared: &[bool],
+    ) -> Result<HolonRatio, HnnError> {
+        if targets.len() != self.declared.stations {
+            return Err(HnnError::Shape {
+                what: "one target per station",
+                expected: self.declared.stations,
+                found: targets.len(),
+            });
+        }
+        HolonRatio::compare_partition(
+            self.faces.clone(),
+            targets,
+            &self.declared.target_phases(),
+            compared,
+        )
     }
 
     /// **The section's return** (module header, "Learning"): the covector at every station pulled
@@ -804,6 +849,130 @@ impl SectionRelease {
     pub fn released(&self) -> bool {
         matches!(self.decision, ReleaseReturn::Released { .. })
     }
+}
+
+/// **A section's release from its stations' classes and its plural stations** ([`Section::release`],
+/// [`generate`]): width zero exactly when no station is plural, the discrete metric's one otherwise,
+/// attained at the first plural station, decided at tolerance zero by the holding rule through
+/// `receiver::release`; the released classes read up to the first termination.
+fn section_release(
+    declared: &Refinement,
+    classes: Vec<usize>,
+    plural: Vec<usize>,
+) -> Result<SectionRelease, HnnError> {
+    let (diameter, attaining) = match plural.first() {
+        Some(&station) => (
+            Rat::one(),
+            WidthWitness::Coordinate {
+                coordinate: station,
+            },
+        ),
+        None => (Rat::zero(), WidthWitness::Point),
+    };
+    let width = ReceiverWidth::declared(
+        format!("the section on receiving ring {}", declared.ring),
+        "every station's top class at the grain, over the grain fibre of its logits",
+        DiameterNorm::Supremum,
+        diameter,
+        attaining,
+        classes.len().max(1),
+    )?;
+    let options = LawfulOptions::assemble(&width, Rat::zero(), None, false)?;
+    let rule = DecisionRule::new(
+        "the section's joint commit at tolerance zero",
+        WithinTolerance::Release,
+        BeyondTolerance::Hold,
+    );
+    let decision = release(&rule, &options)?;
+    let terminated = classes
+        .iter()
+        .position(|&class| class == declared.termination);
+    let emitted = match &decision {
+        ReleaseReturn::Released { .. } => classes[..terminated.unwrap_or(classes.len())].to_vec(),
+        _ => Vec::new(),
+    };
+    Ok(SectionRelease {
+        decision,
+        width: width.diameter().clone(),
+        classes,
+        plural,
+        emitted,
+        terminated,
+    })
+}
+
+/// **The injection of several placements** at one frame: each placement's open storage
+/// `P_g^(τ_g) m̃_g` ([`SourceMoment::open_storage`]) at the request's lift, summed ring by ring
+/// (every placement enters through the same `E_g`, each over its own population).
+pub fn injection(
+    field: &Field,
+    constitution: &impl ConstitutionRead,
+    current: &Current,
+    placements: &[&SourceMoment],
+) -> Result<Vec<Vec<Rat>>, HnnError> {
+    let mut storage: Vec<Vec<Rat>> = field
+        .rings()
+        .iter()
+        .map(|ring| vec![Rat::zero(); ring.width()])
+        .collect();
+    for placement in placements {
+        for (total, wave) in storage
+            .iter_mut()
+            .zip(placement.open_storage(field, constitution, current)?)
+        {
+            if wave.iter().any(|x| !x.is_zero()) {
+                *total = add(total, &wave);
+            }
+        }
+    }
+    Ok(storage)
+}
+
+/// **A station's lock reading** at the grain `L`: its top class (the greatest grain cell, the
+/// least class on a tie) and the gap in grain steps `(n_top − n_2) L + (k_top − k_2)` to the
+/// runner-up cell, zero exactly when the top cell is shared (a plural reading).
+fn lock_reading(face: &crate::hnn::ratio::Face, grain: u64) -> (usize, BigInt) {
+    let cells = face.cells();
+    let step = |cell: &crate::receiver::face::GrainCell| -> BigInt {
+        &cell.carry * BigInt::from(grain) + BigInt::from(cell.phase)
+    };
+    let mut top = 0;
+    for (class, cell) in cells.iter().enumerate() {
+        if step(cell) > step(&cells[top]) {
+            top = class;
+        }
+    }
+    let runner = cells
+        .iter()
+        .enumerate()
+        .filter(|&(class, _)| class != top)
+        .map(|(_, cell)| step(cell))
+        .max();
+    let gap = match runner {
+        Some(runner) => step(&cells[top]) - runner,
+        None => BigInt::zero(),
+    };
+    (top, gap)
+}
+
+/// [definition; agent-inferred, U6's order repair] **The partition a training refinement compares**
+/// (module header): the corruption chart of absorbing (masked) diffusion read on the stations. The
+/// number `v` of locked stations is drawn uniformly from `0 … m − 1`, then `v` stations uniformly
+/// (a partial Fisher–Yates draw); the rest are compared. Every partition a generation passes through
+/// (nothing locked, then more) is one this law draws with positive mass, and at least one station is
+/// always compared. `true` marks a locked (placed, uncompared) station.
+pub fn mask(draw: &mut Draw, stations: usize) -> Vec<bool> {
+    let mut order: Vec<usize> = (0..stations).collect();
+    let locked = draw.below(stations.max(1));
+    for i in 0..locked {
+        let j = i + draw.below(stations - i);
+        order.swap(i, j);
+    }
+    let mut visible = vec![false; stations];
+    for &station in &order[..locked] {
+        visible[station] = true;
+    }
+    visible
 }
 
 /// [definition] **The adjoint pairing of a section's return** (module header, the second check):
@@ -924,10 +1093,12 @@ pub struct Staged {
 }
 
 /// **Refine, compare and return one section** at the constitution's commit (module header,
-/// "Learning"): the section refined at the cut, released, compared with its targets, its covector
-/// pulled back through the `K` words and composed onto every locus inside the refinement's diamond.
-/// With `check`, the refinement is also run on the executed charts with no transient split and its
-/// return's pairing read ([`Pairing`]).
+/// "Learning"): the targets at the `locked` stations placed as the section's data ([`mask`] draws
+/// the partition; none locked is the pinned September 29 path), the section refined at the cut with
+/// the request's placement and the section's, released, compared at its unlocked stations only, its
+/// covector pulled back through the `K` words and composed onto every locus inside the refinement's
+/// diamond, both placements entering through `E_g`. With `check`, the refinement is also run on the
+/// executed charts with no transient split and its return's pairing read ([`Pairing`]).
 #[allow(clippy::too_many_arguments)]
 pub fn stage(
     field: &Field,
@@ -936,23 +1107,44 @@ pub fn stage(
     moment: &SourceMoment,
     declared: &Refinement,
     targets: &[usize],
+    locked: &[bool],
     charts: &mut Charts,
     check: bool,
 ) -> Result<Staged, HnnError> {
+    if targets.len() != declared.stations || locked.len() != declared.stations {
+        return Err(HnnError::Shape {
+            what: "one target and one lock per station",
+            expected: declared.stations,
+            found: targets.len().min(locked.len()),
+        });
+    }
+    let cells: Vec<Option<usize>> = targets
+        .iter()
+        .zip(locked)
+        .map(|(&target, &lock)| lock.then_some(target))
+        .collect();
+    // Nothing locked places nothing (the pinned September 29 path, on any receiving ring).
+    let placed = if locked.iter().any(|&lock| lock) {
+        Some(declared.section(field, current, &cells)?)
+    } else {
+        None
+    };
+    let placements: Vec<&SourceMoment> = std::iter::once(moment).chain(placed.as_ref()).collect();
+    let compared: Vec<bool> = locked.iter().map(|lock| !lock).collect();
     let operands = Operands::at_cut_charted(field, constitution, current, charts)?;
-    let injection = moment.open_storage(field, constitution, current)?;
+    let injection = injection(field, constitution, current, &placements)?;
     let pairing = if check {
         let unsplit = operands.clone().unsplit()?;
         let section =
             Section::refine_on(field, constitution, unsplit, injection.clone(), declared)?;
-        let covector = section.compare(targets)?.covector()?;
+        let covector = section.compare_partition(targets, &compared)?.covector()?;
         Some(section.pull_back(&covector)?.pairing)
     } else {
         None
     };
     let section = Section::refine_on(field, constitution, operands, injection, declared)?;
     let release = section.release()?;
-    let ratio = section.compare(targets)?;
+    let ratio = section.compare_partition(targets, &compared)?;
     let covector = ratio.covector()?;
     let end = section.end().clone();
     let balance = section.balance().clone();
@@ -965,7 +1157,7 @@ pub fn stage(
         &declared.diamond(field),
         current.lift(),
         current,
-        moment,
+        &placements,
         &back.joined,
     )?;
     Ok(Staged {
@@ -977,6 +1169,91 @@ pub fn stage(
         pairing,
         released: released.join(&back.joined.released),
         peak_bits,
+    })
+}
+
+/// [definition] **A generated section** ([`generate`]): its release (every station locked, at width
+/// zero, or held with the stations that were plural when no unlocked station led), the refinements
+/// it took, how many of their balances closed, and the stations each refinement locked, in order.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct Generation {
+    pub release: SectionRelease,
+    pub refinements: usize,
+    pub balances_closed: usize,
+    pub locks: Vec<Vec<usize>>,
+}
+
+/// **Generate a section** (module header, "Relative phases between placed data"): the request's
+/// placement fixed, nothing locked; each refinement reads every station jointly from the one refined
+/// field with the locked data placed, and locks every unlocked station whose gap at the grain is the
+/// largest (ties together). It stops when every station is locked, released at width zero (each lock
+/// read a unique top cell), or when the largest gap is zero, held with the unlocked stations plural.
+/// At most `m` refinements; the operands are read once at the cut.
+pub fn generate(
+    field: &Field,
+    constitution: &impl ConstitutionRead,
+    current: &Current,
+    moment: &SourceMoment,
+    declared: &Refinement,
+    charts: &mut Charts,
+) -> Result<Generation, HnnError> {
+    if !field.is_source(declared.ring) {
+        return Err(HnnError::MissingSourcePort {
+            ring: declared.ring,
+        });
+    }
+    let operands = Operands::at_cut_charted(field, constitution, current, charts)?;
+    let stations = declared.stations;
+    let mut locked: Vec<Option<usize>> = vec![None; stations];
+    let mut tops: Vec<usize> = vec![declared.termination; stations];
+    let mut locks: Vec<Vec<usize>> = Vec::new();
+    let mut plural: Vec<usize> = Vec::new();
+    let (mut refinements, mut balances_closed) = (0usize, 0usize);
+    while locked.iter().any(Option::is_none) {
+        let placed = declared.section(field, current, &locked)?;
+        let injection = injection(field, constitution, current, &[moment, &placed])?;
+        let section = Section::refine_on(field, constitution, operands.clone(), injection, declared)?;
+        refinements += 1;
+        balances_closed += usize::from(section.balance().closes());
+        let readings: Vec<(usize, usize, BigInt)> = (0..stations)
+            .filter(|&j| locked[j].is_none())
+            .map(|j| {
+                let (top, gap) = lock_reading(&section.faces().faces[j], declared.grain);
+                (j, top, gap)
+            })
+            .collect();
+        for &(j, top, _) in &readings {
+            tops[j] = top;
+        }
+        let largest = readings
+            .iter()
+            .map(|(_, _, gap)| gap.clone())
+            .max()
+            .unwrap_or_else(BigInt::zero);
+        if largest.is_zero() {
+            plural = readings.iter().map(|&(j, ..)| j).collect();
+            break;
+        }
+        let now: Vec<usize> = readings
+            .iter()
+            .filter(|(_, _, gap)| *gap == largest)
+            .map(|&(j, top, _)| {
+                locked[j] = Some(top);
+                j
+            })
+            .collect();
+        locks.push(now);
+    }
+    let classes: Vec<usize> = locked
+        .iter()
+        .zip(&tops)
+        .map(|(lock, &top)| lock.unwrap_or(top))
+        .collect();
+    Ok(Generation {
+        release: section_release(declared, classes, plural)?,
+        refinements,
+        balances_closed,
+        locks,
     })
 }
 

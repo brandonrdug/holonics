@@ -4,10 +4,14 @@
 //! step's runs (`moire 4`, `moire 8`, `copy`, `develop text`),
 //! `research/records/2026-09-29_THE_CERTIFIED_DEPOSITION_STEP_PINNED_BEFORE_ITS_RUNS.md` and, for the
 //! factor families' certified step (`moire 4`, `moire 8`, `copy`, `text … passes 1`),
-//! `research/records/2026-09-29_THE_FACTOR_FAMILIES_CERTIFIED_STEP_PINNED_BEFORE_ITS_RUNS.md`, each
-//! committed before any measured run; a committed command run once in release, never a test.
+//! `research/records/2026-09-29_THE_FACTOR_FAMILIES_CERTIFIED_STEP_PINNED_BEFORE_ITS_RUNS.md`, and,
+//! for the order repair (`order2`, `order2 pinned`, `text`),
+//! `research/records/2026-09-29_THE_ORDER_REPAIR_PINNED_BEFORE_ITS_RUNS.md`, each committed before
+//! any measured run; a committed command run once in release, never a test.
 //!
 //! ```sh
+//! cargo run --release -p holonics --example hnn_prediction -- order2 [pinned]
+//! cargo run --release -p holonics --example hnn_prediction -- develop order2 <train> <evaluate> [batch] [D] [K] [pinned]
 //! cargo run --release -p holonics --example hnn_prediction -- probe copy
 //! cargo run --release -p holonics --example hnn_prediction -- probe moire
 //! cargo run --release -p holonics --example hnn_prediction -- probe text .local/cuts/curated-u6-passage-cut.bin
@@ -58,6 +62,17 @@
 //!   `q`, `c`, `b`, `F`) over the run and after each of the first eight deposits, and the committed
 //!   energy bound read on every refinement at its commit (`RefinementBalance::energy_bound`) with the
 //!   certified storage growth's product and its extremes.
+//! - **The order repair** (the order pin; `hnn::prediction`'s header, "Order is carried by residues
+//!   and relative phases"): the receiving ring's period is a product of pairwise coprime factors, so
+//!   a datum's residue is its joint residue class; training compares the unlocked stations of a
+//!   partition drawn by `prediction::mask` with the locked targets placed on the ring's spectrum;
+//!   generation locks stations by the largest gap at the grain (`prediction::generate`). `pinned`
+//!   runs the September 29 construction instead (the ring of period 32, every station compared with
+//!   nothing placed, the one refinement's release) on the same terrain: the located failure's
+//!   control. `order2` is the order-2 terrain: a request of `n` cells drawn uniformly from 4 symbols,
+//!   its continuation `x_t = x_(t−2) + 1 (mod 4)` the target, whose marginal is uniform; its
+//!   evaluation also counts the held-out stations the static marginal (the class most frequent in
+//!   the training targets) and the per-station marginal read right.
 //! - **Guards**: the run stops at its deadline (the pin's projection bound) or at its resident cap,
 //!   and reports its partial evidence as incomplete. `train <pairs>` and `passes <n>` bound the text
 //!   run's training below the pinned 1,024 pairs and 2 passes (a bounded reading, reported as such).
@@ -80,7 +95,9 @@ use holonics::hnn::field::{
     ReceiverDeclaration, RingDeclaration,
 };
 use holonics::hnn::moment::SourceMoment;
-use holonics::hnn::prediction::{Refinement, Section, deposit_of, stage, unreached_unchanged};
+use holonics::hnn::prediction::{
+    Refinement, Section, deposit_of, generate, mask, stage, unreached_unchanged,
+};
 use holonics::hnn::word::PowerForm;
 use holonics::holarchy::terrain::Draw;
 use holonics::holarchy::terrain::moire::{Moire, MoireClass, MoireFamily};
@@ -122,6 +139,11 @@ struct Declared {
     stations: usize,
     /// Requests a deposit.
     batch: usize,
+    /// The order repair (partition training, the section's placement, lock generation), or the
+    /// pinned September 29 readout.
+    order: bool,
+    /// The order-2 terrain's request length `n`.
+    request: usize,
 }
 
 /// **The field** (module header).
@@ -241,7 +263,16 @@ struct Engine {
     theta: Constitution,
     charts: Charts,
     tally: Tally,
+    order: bool,
+    /// The partitions' draw (`prediction::mask`), keyed by the pin's `MASK_SEED`.
+    partitions: Draw,
+    /// Generation's refinements, the balances closed among them, and the locks.
+    generation_refinements: u64,
+    generation_balances: u64,
 }
+
+/// The partitions' seed (the order pin).
+const MASK_SEED: u64 = 2_026_092_904;
 
 impl Engine {
     fn new(declared: Declared) -> Self {
@@ -263,6 +294,10 @@ impl Engine {
             theta,
             charts: Charts::new(),
             tally: Tally::default(),
+            order: declared.order,
+            partitions: Draw::new(MASK_SEED),
+            generation_refinements: 0,
+            generation_balances: 0,
         }
     }
 
@@ -274,6 +309,11 @@ impl Engine {
         let mut balances = Vec::with_capacity(batch.len());
         for (request, target) in batch {
             let (current, moment) = ingest(&self.field, request);
+            let locked = if self.order {
+                mask(&mut self.partitions, self.refinement.stations())
+            } else {
+                vec![false; self.refinement.stations()]
+            };
             let staged = stage(
                 &self.field,
                 &self.theta,
@@ -281,6 +321,7 @@ impl Engine {
                 &moment,
                 &self.refinement,
                 target,
+                &locked,
                 &mut self.charts,
                 true,
             )
@@ -431,16 +472,33 @@ impl Engine {
     /// section is a typed refusal, never retried).
     fn generate(&mut self, request: &[usize]) -> (Vec<usize>, bool) {
         let (current, moment) = ingest(&self.field, request);
-        let section = Section::refine(
-            &self.field,
-            &self.theta,
-            &current,
-            &moment,
-            &self.refinement,
-            &mut self.charts,
-        )
-        .expect("a refined section");
-        let release = section.release().expect("the section's release");
+        let release = if self.order {
+            let generated = generate(
+                &self.field,
+                &self.theta,
+                &current,
+                &moment,
+                &self.refinement,
+                &mut self.charts,
+            )
+            .expect("a generated section");
+            self.generation_refinements += generated.refinements as u64;
+            self.generation_balances += generated.balances_closed as u64;
+            generated.release
+        } else {
+            let section = Section::refine(
+                &self.field,
+                &self.theta,
+                &current,
+                &[&moment],
+                &self.refinement,
+                &mut self.charts,
+            )
+            .expect("a refined section");
+            self.generation_refinements += 1;
+            self.generation_balances += u64::from(section.balance().closes());
+            section.release().expect("the section's release")
+        };
         if release.released() {
             (release.classes, true)
         } else {
@@ -585,7 +643,44 @@ fn terrain_declared() -> Declared {
         span: 1,
         stations: 8,
         batch: 16,
+        order: false,
+        request: ORDER_REQUEST,
     }
+}
+
+/// **The order-2 terrain's declaration** (the order pin): the joint residue ring of period
+/// `D = 3·4·5 = 60`, pairwise coprime factors, at least the request and its section
+/// (`n + m = 48`); or, `pinned`, the September 29 declaration (period 32, every station compared).
+fn order_declared(pinned: bool) -> Declared {
+    Declared {
+        period: if pinned { 32 } else { 3 * 4 * 5 },
+        order: !pinned,
+        ..terrain_declared()
+    }
+}
+
+/// The order-2 terrain's request length (the order pin): past the September 29 ring's period 32.
+const ORDER_REQUEST: usize = 40;
+/// The order-2 terrain's pinned counts.
+const ORDER_TRAIN: usize = 512;
+
+/// **The order-2 terrain** (module header): a request of `n` cells drawn uniformly from 4 symbols,
+/// its target the continuation `x_t = x_(t−2) + 1 (mod 4)` over `m` stations.
+fn order_pairs(declared: &Declared, seed: u64, count: usize) -> Vec<(Vec<usize>, Vec<usize>)> {
+    let symbols = declared.alphabet - 1;
+    let mut draw = Draw::new(seed);
+    (0..count)
+        .map(|_| {
+            let mut passage: Vec<usize> =
+                (0..declared.request).map(|_| draw.below(symbols)).collect();
+            for _ in 0..declared.stations {
+                let next = (passage[passage.len() - 2] + 1) % symbols;
+                passage.push(next);
+            }
+            let target = passage.split_off(declared.request);
+            (passage, target)
+        })
+        .collect()
 }
 
 /// The pins of a terrain run: training requests, the seeds, and the evaluation.
@@ -607,7 +702,9 @@ fn terrain(
     let clock = Instant::now();
     let mut engine = Engine::new(declared);
     println!(
-        "hnn_prediction {name}: d = {}, |A| = {} (termination {}), K = {}, w = {}, m = {}, batch {}, n* = {}, training pairs {}, evaluated {}",
+        "hnn_prediction {name}: {}, n = {}, d = {}, |A| = {} (termination {}), K = {}, w = {}, m = {}, batch {}, n* = {}, training pairs {}, evaluated {}",
+        if declared.order { "the order repair" } else { "the pinned September 29 readout" },
+        declared.request,
         declared.period,
         declared.alphabet,
         declared.alphabet - 1,
@@ -628,6 +725,7 @@ fn terrain(
         engine.learn(batch);
     }
     let trained = clock.elapsed().as_millis();
+    let train = &train;
     engine.report("training");
     println!(
         "  training {} ms{}; resident {}",
@@ -635,15 +733,46 @@ fn terrain(
         if complete { "" } else { ", stopped at a guard: INCOMPLETE" },
         resident()
     );
+    // The marginals read from the training targets: the static marginal (the most frequent class,
+    // the least on a tie) and each station's own.
+    let classes = declared.alphabet;
+    let mut overall = vec![0usize; classes];
+    let mut per_station = vec![vec![0usize; classes]; declared.stations];
+    for (_, target) in train {
+        for (j, &class) in target.iter().enumerate() {
+            overall[class] += 1;
+            per_station[j][class] += 1;
+        }
+    }
+    let leader = |counts: &[usize]| -> usize {
+        (0..counts.len())
+            .max_by(|&a, &b| counts[a].cmp(&counts[b]).then(b.cmp(&a)))
+            .expect("a class")
+    };
+    let static_marginal = leader(&overall);
+    let station_marginals: Vec<usize> = per_station.iter().map(|counts| leader(counts)).collect();
+    let generation_clock = Instant::now();
     let mut exact = 0usize;
     let mut released = 0usize;
     let mut stations_right = 0usize;
+    let mut static_right = 0usize;
+    let mut station_right = 0usize;
+    let mut by_station = vec![0usize; declared.stations];
     for (request, truth) in &evaluate {
-        let (classes, was_released) = engine.generate(request);
+        let (generated, was_released) = engine.generate(request);
+        static_right += truth.iter().filter(|&&class| class == static_marginal).count();
+        station_right += truth
+            .iter()
+            .zip(&station_marginals)
+            .filter(|(class, marginal)| class == marginal)
+            .count();
         if was_released {
             released += 1;
-            stations_right += classes.iter().zip(truth).filter(|(a, b)| a == b).count();
-            exact += usize::from(&classes == truth);
+            stations_right += generated.iter().zip(truth).filter(|(a, b)| a == b).count();
+            for (j, (a, b)) in generated.iter().zip(truth).enumerate() {
+                by_station[j] += usize::from(a == b);
+            }
+            exact += usize::from(&generated == truth);
         }
     }
     println!(
@@ -653,6 +782,18 @@ fn terrain(
         evaluate.len() * declared.stations,
         clock.elapsed().as_millis()
     );
+    println!("  stations right by station: {by_station:?}");
+    println!(
+        "  the marginals on the same held-out stations: the static marginal (class {static_marginal}) {static_right} of {}, the per-station marginal {station_right} of {}",
+        evaluate.len() * declared.stations,
+        evaluate.len() * declared.stations,
+    );
+    println!(
+        "  generation: {} refinements, balances closed {} of them, {} ms",
+        engine.generation_refinements,
+        engine.generation_balances,
+        generation_clock.elapsed().as_millis()
+    );
 }
 
 // -------------------------------------------------------------------------------------------
@@ -661,12 +802,16 @@ fn terrain(
 /// **The text declaration** (the record's pins): `|A| = 257`, the bytes and a termination.
 fn text_declared() -> Declared {
     Declared {
-        period: 32,
+        // The joint residue ring `D = 5·7 = 35` (the order pin): pairwise coprime factors, at least
+        // the section's 32 stations.
+        period: 5 * 7,
         alphabet: 257,
         words: 2,
         span: 1,
         stations: 32,
         batch: 16,
+        order: true,
+        request: ORDER_REQUEST,
     }
 }
 
@@ -823,6 +968,7 @@ fn text(cut_path: &str, out_path: &str, bound: usize, passes: usize) {
         if complete { "" } else { ", stopped at a guard: INCOMPLETE" },
         resident()
     );
+    let generation_clock = Instant::now();
     let mut written = String::new();
     for (order, (letter, request)) in selected.iter().enumerate() {
         let start = Instant::now();
@@ -847,6 +993,13 @@ fn text(cut_path: &str, out_path: &str, bound: usize, passes: usize) {
         ));
     }
     std::fs::write(out_path, written).expect("write the sections, owner-only");
+    println!(
+        "  generation: {} refinements, balances closed {} of them, {} ms; resident {}",
+        engine.generation_refinements,
+        engine.generation_balances,
+        generation_clock.elapsed().as_millis(),
+        resident()
+    );
     println!("  the sections are written whole to the owner-only file; {} ms in all", clock.elapsed().as_millis());
 }
 
@@ -859,6 +1012,8 @@ fn probe(mode: &str, cut: Option<&str>) {
     let clock = Instant::now();
     let (declared, pairs) = match mode {
         "copy" => (terrain_declared(), copy_pairs(&terrain_declared(), 1, 32)),
+        "order2" => (order_declared(false), order_pairs(&order_declared(false), 1, 32)),
+        "order2-pinned" => (order_declared(true), order_pairs(&order_declared(true), 1, 32)),
         "moire" => {
             let moire = Moire::draw(&MOIRE_FAMILY, MoireClass::Sheets, &mut Draw::new(MOIRE_SEED))
                 .expect("the moiré");
@@ -918,6 +1073,28 @@ fn main() {
                     .expect("a count")
             };
             match arguments.get(2).map(String::as_str) {
+                Some("order2") => {
+                    let pinned = arguments.get(8).is_some_and(|value| value == "pinned");
+                    let mut declared = order_declared(pinned);
+                    if let Some(batch) = arguments.get(5).and_then(|value| value.parse().ok()) {
+                        declared.batch = batch;
+                    }
+                    if let Some(period) = arguments.get(6).and_then(|value| value.parse().ok()) {
+                        declared.period = period;
+                    }
+                    if let Some(words) = arguments.get(7).and_then(|value| value.parse().ok()) {
+                        declared.words = words;
+                    }
+                    if let Some(request) = arguments.get(9).and_then(|value| value.parse().ok()) {
+                        declared.request = request;
+                    }
+                    terrain(
+                        "develop order2",
+                        declared,
+                        order_pairs(&declared, 21, count(3)),
+                        order_pairs(&declared, 22, count(4)),
+                    );
+                }
                 Some("copy") => terrain(
                     "develop copy",
                     declared,
@@ -954,9 +1131,52 @@ fn main() {
                     }
                     engine.report("develop text");
                     println!("  {} ms; resident {}", clock.elapsed().as_millis(), resident());
+                    // A development generation on choosing requests already read (never the
+                    // validation role), written to the owner-only file given as `develop text
+                    // <cut> <train> <out>`: its counts are printed, its bytes only written.
+                    if let Some(out) = arguments.get(5) {
+                        let start = Instant::now();
+                        let mut written = String::new();
+                        for (order, (request, _)) in passage.train.iter().take(RELEASES).enumerate() {
+                            let (classes, released) = engine.generate(request);
+                            let bytes: Vec<u8> = classes
+                                .iter()
+                                .take_while(|&&class| class != declared.alphabet - 1)
+                                .map(|&class| u8::try_from(class).expect("a byte class"))
+                                .collect();
+                            println!(
+                                "  development section {order}: {}, {} bytes, UTF-8 {}",
+                                if released { "released" } else { "held" },
+                                bytes.len(),
+                                std::str::from_utf8(&bytes).is_ok()
+                            );
+                            written.push_str(&format!(
+                                "section {order}: {}\n{}\n\n",
+                                if released { "released" } else { "held" },
+                                String::from_utf8_lossy(&bytes)
+                            ));
+                        }
+                        #[allow(clippy::disallowed_methods)]
+                        std::fs::write(out, written).expect("write the development sections");
+                        println!(
+                            "  development generation: {} refinements, {} ms",
+                            engine.generation_refinements,
+                            start.elapsed().as_millis()
+                        );
+                    }
                 }
                 _ => panic!("develop copy | moire <train> <evaluate> | text <cut> <train>"),
             }
+        }
+        Some("order2") => {
+            let pinned = arguments.get(2).is_some_and(|value| value == "pinned");
+            let declared = order_declared(pinned);
+            terrain(
+                if pinned { "order2 pinned" } else { "order2" },
+                declared,
+                order_pairs(&declared, TRAIN_SEED, ORDER_TRAIN),
+                order_pairs(&declared, EVALUATE_SEED, EVALUATE),
+            );
         }
         Some("copy") => {
             let declared = terrain_declared();
