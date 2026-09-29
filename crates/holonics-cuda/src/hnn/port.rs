@@ -1378,12 +1378,21 @@ impl<'c> ExecutionPort for Resident<'c> {
                     .filter(|(at, ..)| *at == locus)
                     .map(|(_, carrier, entry, residual)| (*carrier, *entry, residual.clone()))
                     .collect();
+                // The locus's certified step (zero where its alignment certified none).
+                let certified = reading
+                    .steps
+                    .iter()
+                    .find(|(at, _)| *at == locus)
+                    .map_or_else(
+                        || Rat::from_integer(0.into()),
+                        |(_, step)| step.step.step.clone(),
+                    );
                 tally.count(normal_deposit_on_card(
                     self.card,
                     before,
                     after,
                     &step.samples,
-                    &resident.constitution.steps().proxy,
+                    &certified,
                     resident.constitution.lattice(locus)?,
                     gamma_length(resident.constitution.clock(locus) + 1),
                     &released,

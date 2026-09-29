@@ -250,19 +250,12 @@ fn loaded_comparison_composes_a_gain_deposit_that_changes_next_logits() {
     )
     .unwrap();
     let declare = |factor: Rat| {
-        Constitution::initial(
-            &field,
-            Steps {
-                proxy: Rat::one(),
-                factor,
-            },
-            1 << 40,
-        )
-        .unwrap()
-        .with_ports(2, None, None, Some(receiving.clone()))
-        .unwrap()
-        .with_ring_resonator(&field, 0, material.clone())
-        .unwrap()
+        Constitution::initial(&field, Steps { factor }, 1 << 40)
+            .unwrap()
+            .with_ports(2, None, None, Some(receiving.clone()))
+            .unwrap()
+            .with_ring_resonator(&field, 0, material.clone())
+            .unwrap()
     };
     let coarse = cut_at(field.clone(), declare(Rat::one()));
     let seed_step = coarse

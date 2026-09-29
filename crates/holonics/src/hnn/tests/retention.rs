@@ -291,7 +291,22 @@ fn deposit_descends() {
 fn the_collapse_keeps_the_retained_remainders_and_clocks() {
     let field = six_path(2);
     let (current, open) = moment(&field, 56, 11);
-    let theta = generic(&field, 55);
+    // The committed energy bound refuses storage grown where none was stored (a singular `C = c cᵀ`
+    // has no certified growth into its kernel), so the channels store on every direction.
+    let mut theta = generic(&field, 55);
+    for a in 0..field.contacts().len() {
+        let k = field.contact(a).width();
+        let dissipation = theta.contact_dissipation(a).clone();
+        let identity = crate::ratio::linear::ExactRatMatrix::identity(k).unwrap();
+        theta = theta
+            .with_channel(
+                a,
+                identity.clone(),
+                identity.scaled(&crate::ratio::rat(1, 2)),
+                dissipation,
+            )
+            .unwrap();
+    }
     let phases = phases(&field, &theta, &current);
     let pending = PendingRatio::produce(
         &current,

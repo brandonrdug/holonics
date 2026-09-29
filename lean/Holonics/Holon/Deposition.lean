@@ -1,4 +1,6 @@
 import Holonics.Holon.Element
+import Mathlib.Algebra.Order.Chebyshev
+import Mathlib.Analysis.Calculus.MeanValue
 import Mathlib.Analysis.Matrix.Spectrum
 import Mathlib.Analysis.SpecialFunctions.Exp
 
@@ -42,6 +44,24 @@ that fixed-material passivity does not see — the learned power `⟨e, L e⟩` 
    eigen-clip: for `S = [[1,1],[1,0]]` with `P = [[1,−1],[0,1]]` the certified clip is `diag(0,−1)`,
    whose removed part does not commute with `S`, while the eigen-clip does (`clipNeg_commute`,
    `congruence_vs_eigen_witness`).
+6. **The certified step** (September 29). Along a ray `t ↦ Θ + tΔ` whose score has slope `−a` at
+   `0` and curvature at most `C` on `[0, η]`, `φ(η) ≤ φ(0) − η a + ½ η² C`
+   (`quadratic_upper_model`). Loci `ℓ ∈ B` stepping together with steps `η_ℓ ≥ 0` under the joint
+   model `φ ≤ φ₀ − Σ η_ℓ a_ℓ + ½ Σ η_ℓ² C_ℓ` and `η_ℓ C_ℓ ≤ a_ℓ` descend by at least half their
+   first-order decrease, `φ ≤ φ₀ − ½ Σ η_ℓ a_ℓ` (`certified_step_descends`). The joint model's
+   curvature splits per locus: `‖Σ_(ℓ∈B) u_ℓ‖² ≤ |B| Σ ‖u_ℓ‖²` (`joint_cauchy_schwarz`), so a score
+   of curvature `s` in its logits, reached through gains `‖A_ℓ v‖ ≤ κ‖v‖`, has
+   `s‖Σ A_ℓ u_ℓ‖² ≤ |B| s κ² Σ ‖u_ℓ‖²` (`gauss_newton_curvature`).
+7. **An active element's growth.** An element with `½‖s′‖² − ½‖b‖² ≤ ⟨½(b + s′), w⟩` (the reaction
+   stage balance with its passive part dropped) and `‖w‖ ≤ ωc` has `‖s′‖ ≤ ‖b‖ + ωc`
+   (`active_element_growth`); with `‖b‖, c ≤ r` and `ω ≥ 0`, `‖s′‖² ≤ (1 + ω)² r²` and
+   `‖s′‖² − ‖b‖² ≤ (2ω + ω²) r²` (`active_energy_growth`).
+
+[open] Owed in #62 ("The certified deposition step"): the model's own second-order terms when the
+logits are not linear in the step (the bilinear coupling of a receiving map with a source port, a
+contrast port acting on its own downstream contrast), the composition of the per-tick growth over
+a word's stations and re-entries into the gains `κ²` the machine reads (`hnn::constitution`), and
+the station score's curvature bound `s = ½`.
 -/
 
 noncomputable section
@@ -485,5 +505,126 @@ theorem congruence_vs_eigen_witness (hS : wS.IsHermitian) :
   rw [← h, h3] at hc
   have := congrFun (congrFun hc 0) 1
   simp [wS, Matrix.mul_apply, Fin.sum_univ_two] at this
+
+/-! ## 6. The certified step -/
+
+section Step
+
+variable {𝕜 : Type*} [Field 𝕜] [LinearOrder 𝕜] [IsStrictOrderedRing 𝕜]
+
+/-- [proved-derived; formal-checked] **The certified step descends.** Loci `ℓ ∈ B` stepping
+together along their unit steps by `η_ℓ ≥ 0`, under the joint quadratic upper model
+`φ ≤ φ₀ − Σ η_ℓ a_ℓ + ½ Σ η_ℓ² C_ℓ` (`a_ℓ` the unit step's first-order decrease, `C_ℓ` its
+certified curvature), with `η_ℓ C_ℓ ≤ a_ℓ`, descend by at least half their first-order decrease. -/
+theorem certified_step_descends {ι : Type*} (B : Finset ι) {φ₀ φη : 𝕜} {η a C : ι → 𝕜}
+    (hmodel : φη ≤ φ₀ - ∑ ℓ ∈ B, η ℓ * a ℓ + (1 / 2) * ∑ ℓ ∈ B, η ℓ ^ 2 * C ℓ)
+    (hη : ∀ ℓ ∈ B, 0 ≤ η ℓ) (hstep : ∀ ℓ ∈ B, η ℓ * C ℓ ≤ a ℓ) :
+    φη ≤ φ₀ - (1 / 2) * ∑ ℓ ∈ B, η ℓ * a ℓ := by
+  have h : ∑ ℓ ∈ B, η ℓ ^ 2 * C ℓ ≤ ∑ ℓ ∈ B, η ℓ * a ℓ := Finset.sum_le_sum fun ℓ hℓ => by
+    have := mul_le_mul_of_nonneg_left (hstep ℓ hℓ) (hη ℓ hℓ)
+    nlinarith [this]
+  linarith
+
+end Step
+
+open Set in
+/-- [proved-derived; formal-checked] **The quadratic upper model along a ray.** A score with slope
+`−a` at `0` and curvature at most `C` on `[0, η]` obeys `φ(η) ≤ φ(0) − η a + ½ η² C`. -/
+theorem quadratic_upper_model {φ φ' φ'' : ℝ → ℝ} {a C η : ℝ} (hη : 0 ≤ η)
+    (hφ : ∀ t ∈ Icc 0 η, HasDerivAt φ (φ' t) t) (hφ' : ∀ t ∈ Icc 0 η, HasDerivAt φ' (φ'' t) t)
+    (h0 : φ' 0 = -a) (hC : ∀ t ∈ Icc 0 η, φ'' t ≤ C) :
+    φ η ≤ φ 0 - η * a + 1 / 2 * η ^ 2 * C := by
+  have hslope : ∀ t ∈ Icc 0 η, φ' t ≤ -a + t * C := by
+    intro t ht
+    refine image_le_of_deriv_right_le_deriv_boundary (f := φ') (f' := φ'') (a := 0) (b := η)
+      (B := fun t => -a + t * C) (B' := fun _ => C) ?_ ?_ ?_ ?_ ?_ ?_ ht
+    · exact fun x hx => (hφ' x hx).continuousAt.continuousWithinAt
+    · exact fun x hx => (hφ' x (Ico_subset_Icc_self hx)).hasDerivWithinAt
+    · simp [h0]
+    · exact (continuous_const.add (continuous_id.mul continuous_const)).continuousOn
+    · intro x _
+      have := ((hasDerivAt_id x).mul_const C).const_add (-a)
+      simpa using this.hasDerivWithinAt
+    · exact fun x hx => hC x (Ico_subset_Icc_self hx)
+  refine image_le_of_deriv_right_le_deriv_boundary (f := φ) (f' := φ') (a := 0) (b := η)
+    (B := fun t => φ 0 - t * a + 1 / 2 * t ^ 2 * C) (B' := fun t => -a + t * C)
+    ?_ ?_ ?_ ?_ ?_ ?_ ⟨hη, le_rfl⟩
+  · exact fun x hx => (hφ x hx).continuousAt.continuousWithinAt
+  · exact fun x hx => (hφ x (Ico_subset_Icc_self hx)).hasDerivWithinAt
+  · simp
+  · fun_prop
+  · intro x _
+    have h := (((hasDerivAt_id' x).mul_const a).const_sub (φ 0)).add
+      (((hasDerivAt_pow 2 x).const_mul (1 / 2 : ℝ)).mul_const C)
+    refine (h.congr_deriv ?_).hasDerivWithinAt
+    rw [show (2 : ℕ) - 1 = 1 from rfl, pow_one]
+    push_cast
+    ring
+  · exact fun x hx => hslope x (Ico_subset_Icc_self hx)
+
+/-- [proved-derived; formal-checked] **The joint moves' Cauchy–Schwarz**: the moves of `|B|` loci
+stepping together add, `‖Σ_(ℓ∈B) u_ℓ‖² ≤ |B| Σ ‖u_ℓ‖²`. -/
+theorem joint_cauchy_schwarz {E : Type*} [SeminormedAddCommGroup E] {ι : Type*} (B : Finset ι)
+    (u : ι → E) : ‖∑ ℓ ∈ B, u ℓ‖ ^ 2 ≤ B.card * ∑ ℓ ∈ B, ‖u ℓ‖ ^ 2 :=
+  (pow_le_pow_left₀ (norm_nonneg _) (norm_sum_le _ _) 2).trans sq_sum_le_card_mul_sum_sq
+
+/-- [proved-derived; formal-checked] **The curvature a linear locus reads** (Gauss–Newton): a
+score of curvature `s` in its logits, reached by the loci's moves `u_ℓ` through gains
+`‖A_ℓ v‖ ≤ κ‖v‖`, has second-order term `s‖Σ A_ℓ u_ℓ‖² ≤ |B| s κ² Σ ‖u_ℓ‖²`. -/
+theorem gauss_newton_curvature {E F : Type*} [SeminormedAddCommGroup E]
+    [SeminormedAddCommGroup F] {ι : Type*} (B : Finset ι) {s κ : ℝ} (hs : 0 ≤ s)
+    (A : ι → E → F) (hA : ∀ ℓ v, ‖A ℓ v‖ ≤ κ * ‖v‖) (u : ι → E) :
+    s * ‖∑ ℓ ∈ B, A ℓ (u ℓ)‖ ^ 2 ≤ B.card * s * κ ^ 2 * ∑ ℓ ∈ B, ‖u ℓ‖ ^ 2 := by
+  have h1 := joint_cauchy_schwarz B (fun ℓ => A ℓ (u ℓ))
+  have h2 : ∑ ℓ ∈ B, ‖A ℓ (u ℓ)‖ ^ 2 ≤ κ ^ 2 * ∑ ℓ ∈ B, ‖u ℓ‖ ^ 2 := by
+    rw [Finset.mul_sum]
+    refine Finset.sum_le_sum fun ℓ _ => ?_
+    rw [← mul_pow]
+    exact pow_le_pow_left₀ (norm_nonneg _) (hA ℓ (u ℓ)) 2
+  have h3 : ‖∑ ℓ ∈ B, A ℓ (u ℓ)‖ ^ 2 ≤ B.card * (κ ^ 2 * ∑ ℓ ∈ B, ‖u ℓ‖ ^ 2) :=
+    h1.trans (mul_le_mul_of_nonneg_left h2 (Nat.cast_nonneg _))
+  calc s * ‖∑ ℓ ∈ B, A ℓ (u ℓ)‖ ^ 2 ≤ s * (B.card * (κ ^ 2 * ∑ ℓ ∈ B, ‖u ℓ‖ ^ 2)) :=
+        mul_le_mul_of_nonneg_left h3 hs
+    _ = _ := by ring
+
+section Active
+
+variable {E : Type*} [NormedAddCommGroup E] [InnerProductSpace ℝ E]
+
+/-- [proved-derived; formal-checked] **An active element's growth.** An element whose storage
+obeys `½‖s′‖² − ½‖b‖² ≤ ⟨½(b + s′), w⟩` (the reaction stage balance of `HNN/Word` with its passive
+part dropped, `w = W_c c`) and `‖w‖ ≤ ωc` has `‖s′‖ ≤ ‖b‖ + ωc`. -/
+theorem active_element_growth {b s' w : E} {ω c : ℝ}
+    (hbal : (1 / 2 : ℝ) * ‖s'‖ ^ 2 - (1 / 2 : ℝ) * ‖b‖ ^ 2 ≤ inner ℝ ((1 / 2 : ℝ) • (b + s')) w)
+    (hw : ‖w‖ ≤ ω * c) : ‖s'‖ ≤ ‖b‖ + ω * c := by
+  have hin : inner ℝ ((1 / 2 : ℝ) • (b + s')) w ≤ (1 / 2 : ℝ) * (‖b‖ + ‖s'‖) * (ω * c) := by
+    rw [real_inner_smul_left]
+    have h1 := real_inner_le_norm (b + s') w
+    have h2 := norm_add_le b s'
+    have h3 := mul_le_mul h2 hw (norm_nonneg _) (by positivity)
+    nlinarith [norm_nonneg w]
+  have hk : 0 ≤ ω * c := (norm_nonneg w).trans hw
+  by_contra hlt
+  replace hlt := not_le.mp hlt
+  have hs : 0 ≤ ‖b‖ := norm_nonneg b
+  nlinarith [hbal, hin, hlt, hs, hk]
+
+omit [InnerProductSpace ℝ E] in
+/-- [proved-derived; formal-checked] **An active element's energy growth**: with `‖b‖, c ≤ r` and
+`ω ≥ 0`, `‖s′‖² ≤ (1 + ω)² r²` and `‖s′‖² − ‖b‖² ≤ (2ω + ω²) r²`. -/
+theorem active_energy_growth {b s' : E} {ω c r : ℝ} (hgrow : ‖s'‖ ≤ ‖b‖ + ω * c)
+    (hω : 0 ≤ ω) (hc : 0 ≤ c) (hb : ‖b‖ ≤ r) (hcr : c ≤ r) :
+    ‖s'‖ ^ 2 ≤ (1 + ω) ^ 2 * r ^ 2 ∧ ‖s'‖ ^ 2 - ‖b‖ ^ 2 ≤ (2 * ω + ω ^ 2) * r ^ 2 := by
+  have hbn := norm_nonneg b
+  have hsn := norm_nonneg s'
+  have hwc : ω * c ≤ ω * r := mul_le_mul_of_nonneg_left hcr hω
+  have hs : ‖s'‖ ≤ ‖b‖ + ω * r := hgrow.trans (by linarith)
+  have hsq : ‖s'‖ ^ 2 ≤ (‖b‖ + ω * r) ^ 2 := pow_le_pow_left₀ hsn hs 2
+  have hr : 0 ≤ r := hbn.trans hb
+  constructor
+  · nlinarith [mul_le_mul_of_nonneg_left hb hω]
+  · nlinarith [mul_le_mul_of_nonneg_left hb (mul_nonneg hω hr)]
+
+end Active
 
 end Holonics.HolonCore

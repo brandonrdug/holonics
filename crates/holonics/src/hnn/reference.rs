@@ -160,7 +160,7 @@ use crate::hnn::HnnError;
 use crate::hnn::chart::{ChartReading, ChartStart, Charts, Remainders};
 use crate::hnn::constitution::{
     CAMPAIGN_ONE_BUDGET, CarrierBits, Constitution, DepositReading, FactorGradient, FactorStep,
-    LandmarkStep, LinearLocus, LinearStep, Locus, Sample, Steps,
+    LandmarkStep, LinearLocus, LinearStep, Locus, Reach, Sample, Steps,
 };
 use crate::hnn::contact::{SiteReading, site_readings};
 use crate::hnn::field::{ConstitutionRead, Current, Field};
@@ -696,7 +696,8 @@ pub struct Reference {
 }
 
 impl Reference {
-    /// Campaign 1's declarations: `γ_U = 1`, `η_x = 1/2`, `B_Θ = 2^33`, and a pending capacity of 64.
+    /// Campaign 1's declarations: `η_x = 1/2` (the normal laws' steps are certified at every
+    /// deposit), `B_Θ = 2^33`, and a pending capacity of 64.
     pub fn campaign_one() -> Self {
         Self::new(64, Steps::campaign_one(), CAMPAIGN_ONE_BUDGET)
     }
@@ -1713,6 +1714,14 @@ pub fn compose(
     } else {
         Vec::new()
     };
+    // The word's reach (the certified step's reading): the receiver reads its anchor at each
+    // receiving epoch `e_j`, after `e_j` full ticks, and the moment enters once, at the open.
+    let reach = Reach {
+        receiver: receiving,
+        stations: phases.epochs().map(|epoch| epoch as u64).collect(),
+        entries: vec![0],
+        phases: composed.phases,
+    };
     Ok((
         composed.pullback,
         Deposit::new(
@@ -1721,6 +1730,7 @@ pub fn compose(
             composed.factors,
             composed.reached,
         )
+        .with_reach(reach)
         .with_landmarks(landmarks)
         .with_receiving(if retained(Locus::ReceivingMap(receiving)) {
             steps.to_vec()
@@ -1731,14 +1741,16 @@ pub fn compose(
 }
 
 /// [definition; agent-inferred] **A word return composed onto the loci** ([`compose_return`]): the
-/// complete pullback, the linear loci's windows, the factor families' steps and the loci reached,
-/// before any landmark tree or receiving face is joined to them.
+/// complete pullback, the linear loci's windows, the factor families' steps, the loci reached, and
+/// the most phases one source moment occupied (the phase-binned counts one injection sums, which
+/// the certified step's reach reads), before any landmark tree or receiving face is joined to them.
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct ComposedReturn {
     pub pullback: Pullback,
     pub linear: Vec<LinearStep>,
     pub factors: Vec<FactorStep>,
     pub reached: Vec<Locus>,
+    pub phases: u64,
 }
 
 /// **A word return composed onto every locus inside a causal diamond** ([`compose`]'s law, read
@@ -1765,6 +1777,7 @@ pub fn compose_return(
     let h = field.step().clone();
     let mut linear: Vec<LinearStep> = Vec::new();
     let mut factors: Vec<FactorStep> = Vec::new();
+    let mut phases = 0u64;
     let one = Rat::one();
 
     // The receiving map: Σ_j g_j ⊗ P_R^(τ_R) v_R(e_j), by row blocks.
@@ -1956,6 +1969,7 @@ pub fn compose_return(
             });
             pair_pullbacks.push((offset, [outputs, current_reads, earlier_reads]));
         }
+        phases = phases.max(source_samples.len() as u64);
         if retained(Locus::SourcePort(g)) {
             linear.push(LinearStep {
                 locus: LinearLocus::SourcePort(g),
@@ -2090,6 +2104,7 @@ pub fn compose_return(
         linear,
         factors,
         reached,
+        phases,
     })
 }
 

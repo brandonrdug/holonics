@@ -1092,6 +1092,24 @@ declared prior belong in `f` and `H_0`. It keeps sufficient statistics, not trai
 Exact preimage and factorization solvers infer other unknown functions; each operator uses the law
 appropriate to it.
 
+[definition; agent-inferred, September 29] **The step is certified, never declared.** An HNN
+locus's deposit moves its map by `ηD`, with `D = Σ_t w g_t (H'⁻¹f_t)ᵀ` the unit step through the
+carried Gram's solved chart. `η` is the largest dyadic `2^k` with `ηC ≤ a` and `ηc ≤ 1`:
+- `a = Σ_t w⟨g_t, D f_t⟩` is the unit step's first-order decrease. It is computed, and a negative
+  one is refused (`HNN/Normal.certified_normal_step`: `a ≥ 0` at a positive semidefinite carried
+  Gram).
+- `C` bounds the score's curvature along the whole ray: the Gauss–Newton bound
+  `B·s·κ²·Σ_t w|D f_t|²`, with `B` the loci stepping together, `s = ½` the station score's
+  curvature in its logits, and `κ²` the gain from the locus's output to the station logits over
+  every station and re-entry, certified by the medium's energy law (the contrast port's per-tick
+  growth `(1 + ω)²`, `Holon/Deposition.active_element_growth`).
+- `c` is the lattice's covector scale, `max_t |w g_t|_∞`.
+
+The score then falls by at least `½ηa` (`Holon/Deposition.{quadratic_upper_model,
+certified_step_descends, gauss_newton_curvature}`). The declared step `γ_U = 1` it replaces moved a
+locus by the whole covector reaching it and overshot at `K = 4`. Owner: `hnn::constitution`,
+"The certified step"; the parts not yet certified are named there and owed in #62.
+
 [definition] Learning contact structure changes `K` or its local carrier. A rank/separation result
 can expose a direction absent from the present representation; actual incidence and constitutive
 transport decide how it attaches. A change of rank is not a fixed-dimensional derivative with new

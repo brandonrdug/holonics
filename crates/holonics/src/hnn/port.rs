@@ -21,7 +21,7 @@
 //! | `locate_keys` | the fibres per ring, from the crib that closed the aeon | absent (discrete; the key covector is a reading) | the published ring clocks ([`Clock`] at the boundary, winding kept; none where a ring fell back) | the crib's edges | absent | fibres, orbits, failing loops, work |
 //! | `refine` | the wave's faces (the tree part needs each phase's address, read at compare) | absent (forward only) | absent | the moment's lift | the binding read | ticks, balances (each with its residual and certified bound), diamond, the released change, the charts' certificates, the released remainders |
 //! | `compare` | the [`HolonRatio`] on the combined faces (the tree's at each phase's causal address plus the wave's) | the complete [`Pullback`] | a [`Deposit`] (its landmark steps included) | the anchor's | the pending binding | KL, excess, winding, residual, loci, the return's released remainders, the tree face alone's code lengths |
-//! | `deposit` | the successor constitution | absent | the applied [`DepositReading`] | unchanged | absent | contact-storage `ε_k` product, commit, bits against `B_Θ` |
+//! | `deposit` | the successor constitution | absent | the applied [`DepositReading`] | unchanged | absent | each linear locus's certified step, the certified storage growth `ε_k` and its product, the successor's per-tick amplitude growth, commit, bits against `B_Θ` |
 //! | `release` | the released face, or a declared absence when the rule holds | absent | absent (FOUND is campaign 3's) | the anchor's | the pending binding | the width read from the receiving phases' fibres against the grain, the rule's decision, the RIDE/FOUND split |
 //! | `close_aeon` | the [`AeonBoundary`] (its collapse names the released loci and their remainders; the staged deposits it refuses) | the transpose of `V` per pending ratio, or its separator ([`Transpose`]) | absent (the released loci are the boundary's collapse) | the aeon readings | the admitted family | the boundary |
 //! | `discard` | the handle removed | absent | absent | unchanged | absent | bits freed |
@@ -72,7 +72,7 @@ use crate::compression::{CompressionError, ResonanceSplit, resonance_split};
 use crate::hnn::HnnError;
 use crate::hnn::chart::{ChartReading, Remainders, carry};
 use crate::hnn::constitution::{
-    DepositReading, FactorStep, LandmarkStep, Lattice, LinearStep, Locus,
+    DepositReading, FactorStep, LandmarkStep, Lattice, LinearStep, Locus, Reach,
 };
 use crate::hnn::field::{Current, Field, Ring};
 use crate::hnn::keys::KeyLocation;
@@ -452,8 +452,9 @@ pub struct Pullback {
 /// [definition] **The staged material return** (design (c), `Deposit`): keyed by locus, inside the
 /// causal diamond of the source rings and the receiver, at the constitution commit it was computed
 /// at: the linear loci's windows, the factor families' steps and the receiving parametron's
-/// landmark steps (the landmark tree), one per reached comparison in cell order. Only a compare builds
-/// one.
+/// landmark steps (the landmark tree), one per reached comparison in cell order; and its reach
+/// (`hnn::constitution::Reach`: the stations, re-entries and phases its covectors summed), which
+/// the certified step reads. Only a compare or a refinement builds one.
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct Deposit {
     commit: u64,
@@ -462,6 +463,7 @@ pub struct Deposit {
     landmarks: Vec<LandmarkStep>,
     receiving: Vec<ReceivingStep>,
     reached: Vec<Locus>,
+    reach: Option<Reach>,
 }
 
 impl Deposit {
@@ -478,7 +480,21 @@ impl Deposit {
             landmarks: Vec::new(),
             receiving: Vec::new(),
             reached,
+            reach: None,
         }
+    }
+
+    /// The deposit with its reach (the certified step's reading of its covectors' sums).
+    pub(crate) fn with_reach(self, reach: Reach) -> Self {
+        Self {
+            reach: Some(reach),
+            ..self
+        }
+    }
+
+    /// Its reach, when declared.
+    pub fn reach(&self) -> Option<&Reach> {
+        self.reach.as_ref()
     }
 
     /// The deposit with the receiving face's steps (ruling A; THE_REBUILD U1).

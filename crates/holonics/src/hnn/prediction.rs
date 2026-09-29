@@ -63,7 +63,9 @@
 //!   before as its end. The words' returns are joined on the refinement's clock ([`join`]) and
 //!   composed onto every locus inside the refinement's causal diamond
 //!   ([`crate::hnn::reference::compose_return`], [`Refinement::diamond`]); the deposit is the
-//!   existing normal-law and factor deposition ([`Constitution::deposited`]).
+//!   normal-law and factor deposition ([`Constitution::deposited`]) at its certified step, which
+//!   reads the refinement's reach ([`Refinement::reach`]: its stations at `K·w`, the moment's
+//!   re-entries at `n·w` and the phases one moment occupies).
 //! - **No window anywhere.** The path reads the request only through its phase-carried moment; it
 //!   reads no landmark tree, no suffix address, no copy stage and no byte context, and it deposits
 //!   nothing into the receiving tree (a deposit it stages has no landmark and no receiving-face step).
@@ -97,9 +99,9 @@ use num_bigint::BigInt;
 use num_traits::{One, Signed, ToPrimitive, Zero};
 
 use crate::hnn::HnnError;
-use crate::hnn::chart::{Charts, Remainders};
+use crate::hnn::chart::{Charts, Remainders, WordLattice};
 use crate::hnn::constitution::{
-    Constitution, FactorGradient, FactorStep, LinearLocus, LinearStep, Locus,
+    Constitution, FactorGradient, FactorStep, LinearLocus, LinearStep, Locus, Reach,
 };
 use crate::hnn::field::{ConstitutionRead, Current, Field};
 use crate::hnn::moment::SourceMoment;
@@ -111,6 +113,7 @@ use crate::hnn::receiving::ReceivingRead;
 use crate::hnn::reference::{ComposedReturn, compose_return};
 use crate::hnn::retention::{Diamond, loci};
 use crate::hnn::word::{CommitWork, EndChange, PowerForm, Word};
+use crate::holon::deposition::{power, sqrt_ceiling};
 use crate::ratio::linear::ExactRatMatrix;
 use crate::ratio::linear::vector::{add, dot};
 use crate::ratio::Rat;
@@ -229,6 +232,19 @@ impl Refinement {
     /// word's last junction).
     pub fn last_epoch(&self) -> usize {
         self.words * self.span
+    }
+
+    /// **The refinement's reach** (the certified step's reading; `hnn::constitution::Reach`): its
+    /// `m` stations read the receiving ring's anchor after `K·w` full ticks, and the request's moment
+    /// enters at the open of every word, `n·w` for `n < K`; `phases` the most phases one moment
+    /// occupied.
+    pub fn reach(&self, phases: u64) -> Reach {
+        Reach {
+            receiver: self.ring,
+            stations: vec![self.last_epoch() as u64; self.stations],
+            entries: (0..self.words).map(|n| (n * self.span) as u64).collect(),
+            phases,
+        }
     }
 
     /// **The refinement's causal diamond** (Lean `HNN/Retention.diamond_recursion`): the field's
@@ -390,6 +406,53 @@ impl RefinementBalance {
             && committed
     }
 
+    /// **The committed energy bound of the refinement** (`hnn::constitution`'s header, "The
+    /// committed energy bound, enforced at the commit"; Lean `Holon/Deposition.{committed_energy_bound,
+    /// active_element_growth}`), read after its commit: with the per-tick amplitude growth `g = 1 + ω`
+    /// of the constitution it ran at and the commit's certified storage growth `ε_k`, the committed
+    /// energy is at most
+    ///
+    /// ```text
+    /// (1 + ε_k) · (Σ_(n<K) g^(K·w − n·w) · √P_inj + g^(K·w) · √((K·w + 1) · r))²
+    /// ```
+    ///
+    /// `P_inj` the injection's power (the balance's open: the change opens at rest), each word
+    /// re-injecting it; `r` the executed residual's certified bound. Each passive tick keeps the
+    /// power and a contrast port's tick multiplies it by at most `g²` (`active_element_growth`), so
+    /// `√P(t+1) ≤ g√P(t) + √|r_t|`, an injection adds `√P_inj` to `√P` (the triangle inequality in
+    /// the power's norm), and `Σ_t √|r_t| ≤ √((K·w + 1) Σ_t |r_t|)`; the commit's deposition work
+    /// is at most `ε_k` times the storage part (`certify_deposit`). The square roots are read at
+    /// their dyadic ceilings on the word's transient lattice. Refused before a commit.
+    pub fn energy_bound(
+        &self,
+        declared: &Refinement,
+        amplitude: &Rat,
+        storage_growth: &Rat,
+        lattice: Option<&WordLattice>,
+    ) -> Result<EnergyBound, HnnError> {
+        let commit = self.commit.as_ref().ok_or(HnnError::Shape {
+            what: "a refinement's balance carried across its commit",
+            expected: 1,
+            found: 0,
+        })?;
+        let grain = lattice.map_or(0, WordLattice::transient_exponent);
+        let ticks = declared.last_epoch() as u64;
+        let entries: Rat = (0..declared.words)
+            .map(|n| power(amplitude, ticks - (n * declared.span) as u64))
+            .sum();
+        let residual = sqrt_ceiling(
+            &(Rat::from_integer(BigInt::from(ticks + 1)) * self.bound.abs()),
+            grain,
+        );
+        let root = entries * sqrt_ceiling(&self.open, grain) + power(amplitude, ticks) * residual;
+        let bound = (Rat::one() + storage_growth) * &root * &root;
+        Ok(EnergyBound {
+            holds: commit.committed <= bound,
+            committed: commit.committed.clone(),
+            bound,
+        })
+    }
+
     /// **Carry the balance across the commit** from the cut's form `before` to the committed form
     /// `after` (both read at the refinement's lift): the deposition work on the end change and the
     /// end change's power and resonator energy under the committed forms.
@@ -409,6 +472,16 @@ impl RefinementBalance {
         });
         Ok(())
     }
+}
+
+/// [definition] **A refinement's committed energy against its bound**
+/// ([`RefinementBalance::energy_bound`]): the committed energy, the certified bound and whether it
+/// holds.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct EnergyBound {
+    pub committed: Rat,
+    pub bound: Rat,
+    pub holds: bool,
 }
 
 // -------------------------------------------------------------------------------------------
@@ -910,10 +983,12 @@ pub fn stage(
 /// **The deposit of a set of staged refinements at one commit** (module header): every linear
 /// locus's samples gathered into one window (the normal law sums its samples' terms), every factor
 /// family's descent directions and feature energies summed into one step (a shared operand's
-/// gradient is the sum over its uses), the loci reached united. No landmark and no receiving-face
-/// step is staged.
+/// gradient is the sum over its uses), the loci reached united, and the refinement's reach
+/// ([`Refinement::reach`]) at the most phases one of its moments occupied. No landmark and no
+/// receiving-face step is staged.
 pub fn deposit_of(
     constitution: &Constitution,
+    declared: &Refinement,
     composed: &[ComposedReturn],
 ) -> Result<Deposit, HnnError> {
     let mut linear: BTreeMap<LinearLocus, Vec<crate::hnn::constitution::Sample>> = BTreeMap::new();
@@ -955,7 +1030,9 @@ pub fn deposit_of(
             samples: linear.remove(&locus).unwrap_or_default(),
         })
         .collect();
-    Ok(Deposit::new(constitution.commit(), linear, factors, reached))
+    let phases = composed.iter().map(|part| part.phases).max().unwrap_or(0);
+    Ok(Deposit::new(constitution.commit(), linear, factors, reached)
+        .with_reach(declared.reach(phases)))
 }
 
 /// Whether two factor steps descend the same family.

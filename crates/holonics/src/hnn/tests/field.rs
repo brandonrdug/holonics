@@ -421,15 +421,7 @@ fn describe_is_the_fields_exact_code() {
     let mut declared = chain_declaration(1 << 20);
     declared.contacts[1].admittance = integer(3);
     assert_ne!(describe(&Field::declare(declared).unwrap()), code);
-    let halved = Steps {
-        proxy: rat(1, 2),
-        factor: steps.factor.clone(),
-    };
-    assert_ne!(field.describe(&halved, budget, pending), code);
-    let slower = Steps {
-        proxy: steps.proxy.clone(),
-        factor: rat(1, 4),
-    };
+    let slower = Steps { factor: rat(1, 4) };
     assert_ne!(field.describe(&slower, budget, pending), code);
     assert_ne!(field.describe(&steps, budget / 2, pending), code);
     assert_ne!(field.describe(&steps, budget, pending + 1), code);

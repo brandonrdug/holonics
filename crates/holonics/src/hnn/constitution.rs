@@ -1,8 +1,9 @@
 //! **The constitution `Θ`: its one owner, per locus and factored, and its deposition.**
 //!
 //! [definition] `Θ` is the medium (design (a), "The one object"). [`Constitution`] is its one owner:
-//! every learned map, the standings `q` included, with the declared steps `γ_U` and `η_x`, a commit
-//! counter and the bit budget `B_Θ`. Its fields are private; only [`Constitution::deposited`] (the
+//! every learned map, the standings `q` included, the factor families' declared step `η_x`, a commit
+//! counter and the bit budget `B_Θ`; the normal laws' steps are certified at each deposit ("The
+//! certified step" below). Its fields are private; only [`Constitution::deposited`] (the
 //! successor of a staged deposit) and the collapse at an aeon boundary change it (guard 4). It holds
 //! the current parameters and their normal statistics, and no list of deposits, updates, gradients
 //! or producers. The guarantee is structural, the struct's own private fields; the doctest shows
@@ -30,10 +31,70 @@
 //! each locus at the predecessor's lattice-valued operands:
 //!
 //! ```text
-//! ΔH_U = Σ_t w f_t f_tᵀ ,            ΔW_U = γ_U Σ_t w g_t (H_U'⁻¹ f_t)ᵀ ,  H_U' the carried successor Gram    per linear locus (E_g, R, W_c)
+//! ΔH_U = Σ_t w f_t f_tᵀ ,            ΔW_U = η_U Σ_t w g_t (H_U'⁻¹ f_t)ᵀ ,  H_U' the carried successor Gram    per linear locus (E_g, R, W_c)
 //! Δh_x = Σ_t w |f_t|² ,              Δx = η_x G_x / h_x' ,                 h_x' the carried successor statistic  per factor family
 //! n_s(t) += 1, β_s ← β_s k_s(t)/q    per reached comparison, on the path its address a opens (target t)       the landmark tree
 //! ```
+//!
+//! [definition; agent-inferred, September 29] **The certified step** (the
+//! [lessons record](../../../../research/records/2026-09-29_LESSONS_THE_FAILURES_THAT_REPEATED_AFTER_THEY_WERE_RECORDED.md),
+//! lesson 6; `holon::deposition::CertifiedStep`; Lean `Holon/Deposition.{certified_step_descends,
+//! gauss_newton_curvature, joint_cauchy_schwarz}`, `HNN/Normal.certified_normal_step`). The declared
+//! step `γ_U = 1` is retired: it moved a locus by the whole covector reaching it, which sums every
+//! station and every re-entry of the source times the readout's gain, and at `K = 4` it overshot
+//! (the source port's entries 1, 6, 26, 316). A normal law prepares its **unit step**
+//! `D = Σ_t w g_t (X̂ f_t)ᵀ` ([`NormalLaw::prepare`]), and the deposit reads, per linear locus:
+//!
+//! ```text
+//! a = Σ_t w ⟨g_t, D f_t⟩            the unit step's first-order decrease, checked ≥ 0 (descent after pullback and chart)
+//! b = Σ_t w |D f_t|²                its feature moves
+//! C = B · s · κ² · b                its curvature along the ray; B the linear loci stepping together, s = ½
+//! c = max_t |w g_t|_∞               the lattice's covector scale
+//! η = the largest 2^k with η C ≤ a and η c ≤ 1                          (holon::deposition::CertifiedStep)
+//! ```
+//!
+//! `s = ½` bounds the station score's curvature in its realified logits: the magnitude part is a
+//! base-two softmax, whose Hessian is `ln 2 (diag p − p pᵀ) ⪯ (ln 2 / 2) I ⪯ ½ I`, and the phase part
+//! `½ q_t Δ²` in `Δ = φ^T − Im f_t / 2` has curvature `q_t / 4 ≤ ¼` (`hnn::ratio`). `κ²` is the
+//! certified gain from the locus's output to the stacked station logits, read from the deposit's
+//! [`Reach`] and the medium's energy law ([`Constitution::amplitude`]): the receiving map's Schur
+//! bound `‖R‖₂² ≤ ‖R‖₁‖R‖_∞`, the admittances `Y`, and the per-tick amplitude growth `1 + ω` of the
+//! word, `ω` the contrast ports' certified bound (`holon::deposition::active_growth`):
+//!
+//! ```text
+//! R_g      κ² = 1                                                   each sample one station's logits
+//! E_g      κ² = d · ‖R‖² · (Y_g/Y_R) · Σ_j (Σ_(n: T_n ≤ T_j) (1+ω)^(T_j − T_n))²      d phases, re-entries T_n, stations T_j
+//! W_c,r    κ² = ‖R‖² · (Y_r/Y_R) · Σ_j Σ_(τ < T_j) (1+ω)^(2(T_j − τ − 1))               every tick the port acts at
+//! ```
+//!
+//! A station's anchor is the junction's participation mean, so `|v_R|² ≤ (4/h)P/Y_R` for the power
+//! `P` its change carries; an injection `δs` at ring `g` carries `(h/4)Y_g|δs|²`, an element output
+//! the same at its ring; each passive tick keeps the power and a contrast port's tick multiplies it
+//! by at most `(1 + ω)²`. The gains are read at the end of each ray (the triangle bound on the
+//! Schur norms, `‖R + ηD‖₁ ≤ ‖R‖₁ + η‖D‖₁`), so a step that raises another locus's gain is halved
+//! until every certificate holds at its own ray (the projection; [`Constitution::deposited`]). A
+//! pumped resonator has no certified growth (the Floquet bound is owed in #62): a linear step
+//! through it is refused ([`HnnError::UncertifiedGain`]). [scope] The certificate is the
+//! Gauss–Newton curvature of the section's score along each locus's step, the other loci's moves
+//! entering through `B`; the model's own second-order terms (the bilinear coupling of `R` and `E`,
+//! a contrast port acting on its own downstream contrast) and the factor families' steps (their
+//! carriers are squares, `η_x / h_x`) are not certified here: their statements are owed in #62. The
+//! executed word's deviation from the exact law is the lattice word's certificate (owed in #62).
+//!
+//! [definition; agent-inferred, September 29] **The committed energy bound, enforced at the
+//! commit** (Lean `Holon/Deposition.{committed_energy_bound, active_element_growth}`). The storage
+//! a deposit changes (every contact's `C_a`, `K_a` and every unpumped resonator's `C`, `K`) is
+//! certified `Q_(k+1) ⪯ (1 + ε_k) Q_k` by inertia before publication, and a deposit no dyadic
+//! `ε_k` of the declared search certifies is refused ([`HnnError::UncertifiedStorage`]); the product
+//! `∏(1 + ε_k)` since the founding is kept ([`Constitution::storage_product`]). The one learned
+//! relation in the word that injects power is the contrast port, which is passive only at `W_c = 0`
+//! (Lean `HNN/Word.contrastPort_active`), so it is not projected: its certified bound `ω` enters the
+//! bound as the per-tick growth `(1 + ω)²`, read at every certified step. `E` and `R` are the
+//! source's input map and the receiver's readout: `E` supplies the injection whose power the bound
+//! scales, and `R` does no work on the field; both gains enter the certified step. A refinement's
+//! committed energy is then at most `(1 + ε_k)` times its driven bound
+//! `(Σ_n (1+ω)^(T − T_n) √P_inj + (1+ω)^T √(T · r))²`, `r` its executed residual's certified bound
+//! (`hnn::prediction::RefinementBalance::energy_bound`), checked at every commit.
 //!
 //! [definition; agent-inferred] **The landmark tree at the receiving locus.** The receiving map `R` keeps
 //! the prox step on its reached covectors (the lattice deposit and the lattice word), the covector of the ratio read on
@@ -151,7 +212,9 @@
 //! | `HNN/LatticeWord.{roundedIter_certificate, newton_schulz_iter_left, inverse_chart_deviation}` | [`ChartRule`] (the lattice `L_s`, the target `δ_ℓ`, the refinement count) |
 //! | `HNN/Normal.normalStatistic_standing`, `objective_eq_statisticObjective`, for its statistic `H` only (carried on the lattice) | [`NormalLaw::gram`] (keeps `H`, never the samples) |
 //! | `HNN/Normal.deposit_local`, `windowGram_apply_eq_zero` | [`Constitution::deposited`] (per locus, only its window) |
-//! | `HNN/Normal.reaction_deposit_storage_unchanged`, `reaction_deposits_keep_committed_energy` | [`DepositReading::contact_growth`] |
+//! | `HNN/Normal.reaction_deposit_storage_unchanged`, `reaction_deposits_keep_committed_energy`; `Holon/Deposition.committed_energy_bound` | [`DepositReading::storage_growth`], [`Constitution::storage_product`] (refused when uncertified: [`HnnError::UncertifiedStorage`]) |
+//! | `Holon/Deposition.{certified_step_descends, quadratic_upper_model, gauss_newton_curvature, joint_cauchy_schwarz}`, `HNN/Normal.certified_normal_step` | [`NormalLaw::prepare`] (the unit step and its readings), [`Constitution::deposited`] (the certified steps: [`StepReading`]) |
+//! | `Holon/Deposition.{active_element_growth, active_energy_growth}` | [`Constitution::amplitude`] (the per-tick growth `1 + ω`) |
 //! | `HNN/Normal.factorCarrier_psd` | the factor families ([`FactorGradient`]) |
 //! | `HNN/Normal.standing_deposit`, `sheetClass_locally_constant` | [`FactorGradient::Standing`] |
 //! | `HNN/LatticeDeposit.{quot, rem, div_rem_spec, rem_bounds, quot_eq_zero_of_bounds, fine}` | [`Lattice::div_rem`] (the carry's fine split), [`Lattice::div_rem_coordinate`] (its coarse split) |
@@ -179,11 +242,15 @@ use crate::hnn::field::{ConstitutionRead, Field, lattice_exponent};
 use crate::hnn::moment::PairPort;
 use crate::hnn::port::Deposit;
 use crate::hnn::propagation::gram;
-use crate::hnn::realization::{indexed, outer_rows};
+use crate::hnn::realization::{indexed, outer_integral};
 use crate::hnn::receiving::{ReceivingStep, landmark_declaration, receiving_population};
 use crate::hnn::ring::ResonatorMaterial;
-use crate::holon::deposition::CommittedEnergyBound;
-use crate::ratio::linear::vector::{Chart, integral, lcm, matrix_form};
+use crate::holon::deposition::{
+    CertifiedStep, CommittedEnergyBound, power, schur_norms, sqrt_ceiling,
+};
+use crate::ratio::linear::vector::{
+    Chart, IntegralMatrix, integer_dot, integral, lcm, matrix_form,
+};
 use crate::ratio::linear::{ExactLinearError, ExactRatMatrix};
 use crate::ratio::{Rat, rat};
 use crate::receiver::population::PortPopulation;
@@ -631,21 +698,18 @@ impl Locus {
 // -------------------------------------------------------------------------------------------
 // steps
 
-/// [definition] **The declared steps**: the normal law's proxy step `γ_U` and the factor step `η_x`
-/// (one each in campaign 1, recorded in the field's description by the caller).
+/// [definition] **The declared steps**: the factor families' step `η_x` (recorded in the field's
+/// description by the caller). The normal laws' declared proxy step `γ_U` was retired on
+/// September 29: their step is certified at every deposit (module header, "The certified step").
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct Steps {
-    pub proxy: Rat,
     pub factor: Rat,
 }
 
 impl Steps {
-    /// Campaign 1: `γ_U = 1` (the pure normal solve), `η_x = 1/2`.
+    /// Campaign 1: `η_x = 1/2`.
     pub fn campaign_one() -> Self {
-        Self {
-            proxy: Rat::one(),
-            factor: rat(1, 2),
-        }
+        Self { factor: rat(1, 2) }
     }
 }
 
@@ -681,7 +745,8 @@ const RESIDUAL_SHIFT: u32 = 125;
 /// `‖ρ‖∞ ≤ ‖γG‖∞ δ` (`prox_chart_certificate`). The map differs from the exact prox step's by
 /// `−ρH'⁻¹`, so a read at an operand `x` moves by `|ρ_i H'⁻¹ x| ≤ ‖ρ_i‖₂‖x‖₂/λ_min(H') ≤
 /// ‖ρ‖∞‖x‖₁/c`, with `c = 1 − 1/(2L_R)` the carried Gram's margin (`carried_gram_posDef_rule`).
-/// One return of a unit-scale covector (`‖wγg‖∞ ≤ 1`, the lattice rule's assumption) and a feature
+/// One return of a unit-scale covector (`‖wηg‖∞ ≤ 1`, the lattice rule's assumption, which the
+/// certified step enforces) and a feature
 /// `‖f‖₁ ≤ X_ℓ` read at an operand `‖x‖₁ ≤ X_ℓ` therefore moves by at most `X_ℓ²δ/c`; the lattice
 /// rule's `2L_R X_ℓ ≤ 2^(L_ℓ)` makes that at most `2^(2L_ℓ)δ/(2L_R(2L_R − 1)) ≤ 1/(4L_R)` at
 /// `δ ≤ δ_ℓ`: the chart's release moves a read by no more than a carried remainder does
@@ -1484,32 +1549,32 @@ impl NormalLaw {
         )
     }
 
-    /// **The carried prox step through the solved chart** over a window's samples (Lean
-    /// `HNN/Normal.normal_prox_step` at the carried operands, `HNN/LatticeDeposit.carry`,
-    /// `HNN/LatticeWord.prox_chart_residual`): `ΔH = Σ w f fᵀ` carried onto `H` gives `H'`; the chart
-    /// of `H'` follows from the previous chart ([`SolvedChart`]: the warm start, its exact
-    /// certificate and the rounded refinements to `δ ≤ δ_ℓ` of the locus's [`ChartRule`]); then
-    /// `ΔW = γ Σ w g (X̂f)ᵀ`, so `(W + ΔW)H' = WH' + γG − γG(1 − X̂H')` exactly, with `G = Σ w g fᵀ`;
-    /// `ΔW` is carried onto `W`. Each carry is at the budgeted carry `at` of the locus's deposit (its
-    /// residuals staged there). Returns the successor with its chart's reading, `None` when the
-    /// window reached nothing (no nonzero weighted feature), which moves nothing.
+    /// **The carried prox step through the solved chart, prepared at its unit step** (Lean
+    /// `HNN/Normal.normal_prox_step`, `HNN/LatticeDeposit.carry`, `HNN/LatticeWord.prox_chart_residual`;
+    /// module header, "The certified step"): `ΔH = Σ w f fᵀ` carried onto `H` gives `H'`; the chart of
+    /// `H'` follows from the previous chart ([`SolvedChart`]: the warm start, its exact certificate
+    /// and the rounded refinements to `δ ≤ δ_ℓ` of the locus's [`ChartRule`]); then the **unit step**
+    /// `D = Σ w g (X̂f)ᵀ` is formed in the integral chart with the readings its certificate needs: the
+    /// alignment `a = Σ_t w ⟨g_t, D f_t⟩` (checked, never assumed), the feature moves
+    /// `b = Σ_t w |D f_t|²`, the lattice's covector scale `c = max_t |w g_t|_∞`, and the Schur norms of
+    /// `W` and `D`. The step `η` is certified by the constitution (it reads every locus's gains) and
+    /// applied by [`PreparedStep::stepped`]: `ΔW = η D`, so `(W + ΔW)H' = WH' + ηG − ηG(1 − X̂H')`
+    /// exactly, with `G = Σ w g fᵀ`. The Gram's carry is at the budgeted carry `at` of the locus's
+    /// deposit (its residuals staged there). `None` when the window reached nothing (no nonzero
+    /// weighted feature), which moves nothing.
     ///
     /// [definition; agent-inferred] **The sums are read in the integral chart**: each sample's
     /// feature and covector is charted once as integers over its least common denominator
     /// (`ratio::linear::vector::integral`), each reach `X̂f` is an integer product over the feature's
     /// denominator times `2^(L_s)`, each sum of rank-one terms is formed over integers and each entry
-    /// normalized once (`ΔW` by `IntegralMatrix::outer_sum`, the symmetric `ΔH` on its upper triangle
-    /// and mirrored). A reduced ratio is canonical, so every value equals the termwise rational sum's.
-    /// The samples' exact bits (the word's receiving reads and the ratio's covectors, thousands of
-    /// bits each) make the update's normalization, one per entry, the cost; its residual the carry
-    /// releases exactly.
-    pub fn deposited(
+    /// normalized once (`D` by row blocks, the symmetric `ΔH` on its upper triangle and mirrored). A
+    /// reduced ratio is canonical, so every value equals the termwise rational sum's.
+    pub(crate) fn prepare(
         &self,
         samples: &[Sample],
-        proxy: &Rat,
         rule: &ChartRule,
         at: &mut BudgetedCarry,
-    ) -> Result<(Self, Option<ChartReading>), HnnError> {
+    ) -> Result<Option<PreparedStep>, HnnError> {
         let (m, n) = (self.map.rows(), self.map.columns());
         for sample in samples {
             if sample.feature.len() != n || sample.covector.len() != m {
@@ -1527,9 +1592,9 @@ impl NormalLaw {
             .map(|sample| (sample, integral(&sample.feature)))
             .collect();
         if active.is_empty() {
-            return Ok((self.clone(), None));
+            return Ok(None);
         }
-        let mut next = self.clone();
+        let mut law = self.clone();
         // ΔH = Σ w f fᵀ, carried onto H.
         let gram_update = gram_sum(
             n,
@@ -1538,27 +1603,23 @@ impl NormalLaw {
                 .map(|(sample, feature)| (&sample.weight, feature)),
         );
         let mut gram: Vec<Rat> = self.gram.iter().flatten().cloned().collect();
-        next.gram_carry
+        law.gram_carry
             .deposit_all(at, Carrier::Gram, &mut gram, &gram_update);
-        next.gram = gram.chunks(n).map(<[Rat]>::to_vec).collect();
+        law.gram = gram.chunks(n).map(<[Rat]>::to_vec).collect();
         // The chart of H', from the previous chart.
         let features: Vec<(&Rat, &Chart)> = active
             .iter()
             .map(|(sample, feature)| (&sample.weight, feature))
             .collect();
-        let (chart, refinement) = self.chart.deposited(&next.gram, &features, rule)?;
-        next.chart = chart;
-        // ΔW = γ Σ w g (X̂f)ᵀ at the successor's chart, carried onto W. Each sample's term reads only
-        // its own covector and reach: the samples run together. Each term's `|wγ| ‖g‖∞ ‖f‖₁` bounds its
-        // share of the released prox residual.
-        let moving: Vec<&(&Sample, Chart)> = active
-            .iter()
-            .filter(|(sample, _)| !sample.covector.iter().all(Zero::is_zero))
-            .collect();
-        let chart = &next.chart;
-        let terms: Vec<(Rat, Chart, Chart, Rat)> = indexed(moving.len(), |t| {
-            let (sample, feature) = moving[t];
-            let weight = proxy * &sample.weight;
+        let (chart, refinement) = self.chart.deposited(&law.gram, &features, rule)?;
+        law.chart = chart;
+        // The unit step D = Σ w g (X̂f)ᵀ at the successor's chart. Each sample's term reads only its
+        // own covector and reach: the samples run together. Each term's `|w| ‖g‖∞ ‖f‖₁` bounds its
+        // share of the released prox residual at the unit step, and its `|w| ‖g‖∞` the lattice's
+        // covector scale.
+        let chart = &law.chart;
+        let terms: Vec<(Rat, Chart, Chart, Rat, Rat)> = indexed(active.len(), |t| {
+            let (sample, feature) = &active[t];
             let covector = integral(&sample.covector);
             let widest = covector
                 .0
@@ -1572,40 +1633,80 @@ impl NormalLaw {
                 .iter()
                 .map(|x| BigInt::from(x.magnitude().clone()))
                 .sum();
-            let share = weight.abs()
-                * Rat::new(BigInt::from(widest), covector.1.clone())
-                * Rat::new(mass, feature.1.clone());
-            Ok((weight, covector, chart.reach(feature), share))
+            let scale = sample.weight.abs() * Rat::new(BigInt::from(widest), covector.1.clone());
+            let share = &scale * Rat::new(mass, feature.1.clone());
+            Ok((
+                sample.weight.clone(),
+                covector,
+                chart.reach(feature),
+                share,
+                scale,
+            ))
         })?;
-        let map_update: Vec<Rat> = outer_rows(
+        let unit = outer_integral(
             m,
             n,
             &terms
                 .iter()
-                .map(|(weight, covector, reach, _)| (weight, covector, reach))
+                .map(|(weight, covector, reach, ..)| (weight, covector, reach))
                 .collect::<Vec<_>>(),
-        )
-        .into_iter()
-        .flatten()
-        .collect();
-        let mut map = self.map.entries().to_vec();
-        next.map_carry
-            .deposit_all(at, Carrier::Map, &mut map, &map_update);
-        next.map = flat_matrix(m, n, map)?;
-        let released =
-            next.chart.certificate() * terms.iter().map(|(.., share)| share).sum::<Rat>();
-        let reading = ChartReading {
-            exponent: next.chart.exponent(),
+        );
+        // a = Σ w ⟨g, D f⟩ and b = Σ w |D f|², each sample's D f read once in the integral chart.
+        let reads: Vec<(Rat, Rat)> = indexed(active.len(), |t| {
+            let (sample, feature) = &active[t];
+            let (moved, denominator) = unit.apply(feature);
+            let (covector, covector_denominator) = &terms[t].1;
+            let alignment = Rat::new(
+                integer_dot(covector, &moved),
+                covector_denominator * &denominator,
+            );
+            let squares: BigInt = moved.iter().map(|x| x * x).sum();
+            let moves = Rat::new(squares, &denominator * &denominator);
+            Ok((&sample.weight * alignment, &sample.weight * moves))
+        })?;
+        let (mut alignment, mut moves) = (Rat::zero(), Rat::zero());
+        for (a, b) in reads {
+            alignment += a;
+            moves += b;
+        }
+        let covector = terms
+            .iter()
+            .map(|(.., scale)| scale.clone())
+            .max()
+            .unwrap_or_else(Rat::zero);
+        let shares = terms.iter().map(|(_, _, _, share, _)| share).sum::<Rat>();
+        Ok(Some(PreparedStep {
+            unit_norms: unit.schur_norms(),
+            law,
+            unit,
+            alignment,
+            moves,
+            covector,
+            shares,
+            refinement,
             target: rule.target(),
-            warm: refinement.warm,
-            certificate: next.chart.certificate().clone(),
-            refinements: refinement.refinements,
-            cold: refinement.cold,
-            read: rule.read(&released),
-            released,
-            residual_bits: refinement.residual_bits,
-        };
-        Ok((next, Some(reading)))
+            rule: *rule,
+        }))
+    }
+
+    /// **The carried prox step at a given step `η`** ([`NormalLaw::prepare`] then
+    /// [`PreparedStep::stepped`]): the law's own step (Lean `HNN/Normal.normal_prox_step` at
+    /// `γ = η`), which a deposit takes at its certified step and a test at any step. Returns the
+    /// successor with its chart's reading, `None` when the window reached nothing.
+    pub fn deposited(
+        &self,
+        samples: &[Sample],
+        step: &Rat,
+        rule: &ChartRule,
+        at: &mut BudgetedCarry,
+    ) -> Result<(Self, Option<ChartReading>), HnnError> {
+        match self.prepare(samples, rule, at)? {
+            None => Ok((self.clone(), None)),
+            Some(prepared) => {
+                let (next, reading) = prepared.stepped(step, at)?;
+                Ok((next, Some(reading)))
+            }
+        }
     }
 
     /// Its bits by carrier.
@@ -1630,6 +1731,56 @@ impl NormalLaw {
             .iter()
             .chain(self.gram.iter().flatten())
             .all(|value| lattice.contains(value))
+    }
+}
+
+/// [definition; agent-inferred] **A normal law's step prepared at its unit step**
+/// ([`NormalLaw::prepare`]): the law with its Gram and chart carried (its map not yet moved), the
+/// unit step `D` in the integral chart, its alignment `a`, its feature moves `b`, the lattice's
+/// covector scale `c`, the Schur norms of `D`, the released residual's factor at the unit step, and
+/// the chart's refinement.
+pub(crate) struct PreparedStep {
+    law: NormalLaw,
+    unit: IntegralMatrix,
+    alignment: Rat,
+    moves: Rat,
+    covector: Rat,
+    shares: Rat,
+    unit_norms: (Rat, Rat),
+    refinement: Refinement,
+    target: Rat,
+    rule: ChartRule,
+}
+
+impl PreparedStep {
+    /// **The step taken at `η`** (module header, "The certified step"): `ΔW = η D` carried onto `W`
+    /// at the locus's budgeted carry, with the chart's reading: its certificate and the released prox
+    /// residual `ρ = ηG(1 − X̂H')` by `‖ρ‖∞ ≤ η Σ_t |w| ‖g_t‖∞ ‖f_t‖₁ · δ`.
+    pub(crate) fn stepped(
+        self,
+        step: &Rat,
+        at: &mut BudgetedCarry,
+    ) -> Result<(NormalLaw, ChartReading), HnnError> {
+        let (m, n) = (self.law.map.rows(), self.law.map.columns());
+        let mut next = self.law;
+        let update: Vec<Rat> = self.unit.scaled_rows(step).into_iter().flatten().collect();
+        let mut map = next.map.entries().to_vec();
+        next.map_carry
+            .deposit_all(at, Carrier::Map, &mut map, &update);
+        next.map = flat_matrix(m, n, map)?;
+        let released = next.chart.certificate() * step * &self.shares;
+        let reading = ChartReading {
+            exponent: next.chart.exponent(),
+            target: self.target,
+            warm: self.refinement.warm,
+            certificate: next.chart.certificate().clone(),
+            refinements: self.refinement.refinements,
+            cold: self.refinement.cold,
+            read: self.rule.read(&released),
+            released,
+            residual_bits: self.refinement.residual_bits,
+        };
+        Ok((next, reading))
     }
 }
 
@@ -2049,23 +2200,82 @@ pub struct FactorStep {
     pub energy: Rat,
 }
 
-/// [definition] **What a deposit's publication reads**: the contact-storage growth bound `ε_k`
-/// certified for the contact forms only (`Q_(k+1) ⪯ (1 + ε_k) Q_k`, zero when contact C/K did not
-/// move, `None` when no dyadic bound up to `2^40` certifies it), and its contact-only product
-/// `∏(1 + ε_k)`. This is not a certificate for the loaded resonator's C, signed/pumped K or D;
-/// `PowerForm::deposition_work` reports C/K end-state work, while a phase-dependent growth bound
-/// through later words remains owed in #62. The reading also returns the commit
-/// reached, the successor's exact bits against the budget, the loci reached, and the budgeted
-/// carry's report: every residual the deposit released (exact and sparse, with its locus, carrier
-/// and entry; Lean `HNN/LatticeDeposit.release`), their bits, and the number of entries whose
-/// lattice coordinate moved (`q ≠ 0`, review R5); and each normal law's solved chart with the prox
-/// residual its chart released ([`ChartReading`], the lattice word); and the cells its reached
-/// comparisons deposited into the receiving parametrons' landmark trees (the landmark tree). The release
-/// is reported, never silent.
+/// [definition; agent-inferred] **A deposit's reach** (module header, "The certified step"): what
+/// its covectors summed before they reached the loci. The receiving ring its stations read; each
+/// station's read tick (the full ticks its change had run when the station read the ring's anchor);
+/// each tick at which the source moment entered the change; and the most phases one source moment
+/// occupied (the phase-binned counts one injection sums). A refinement of `K` words of `w` ticks
+/// read at `m` stations declares `m` stations at `K·w` and entries at `0, w, …, (K−1)w`; a word read
+/// at its receiving epochs declares one station at each epoch and one entry at `0`.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct Reach {
+    pub receiver: usize,
+    pub stations: Vec<u64>,
+    pub entries: Vec<u64>,
+    pub phases: u64,
+}
+
+impl Reach {
+    /// `Σ_j (Σ_(n: T_n ≤ T_j) g^(T_j − T_n))²`: the re-entries' amplitude gains summed at every
+    /// station, for a per-tick amplitude growth `g`.
+    fn entry_gain(&self, growth: &Rat) -> Rat {
+        self.stations
+            .iter()
+            .map(|&station| {
+                let sum: Rat = self
+                    .entries
+                    .iter()
+                    .filter(|&&entry| entry <= station)
+                    .map(|&entry| power(growth, station - entry))
+                    .sum();
+                &sum * &sum
+            })
+            .sum()
+    }
+
+    /// `Σ_j Σ_(τ < T_j) g^(2(T_j − τ − 1))`: every tick's energy gain to every station.
+    fn tick_gain(&self, growth: &Rat) -> Rat {
+        let square = growth * growth;
+        self.stations
+            .iter()
+            .map(|&station| (0..station).map(|k| power(&square, k)).sum::<Rat>())
+            .sum()
+    }
+}
+
+/// [definition; agent-inferred] **One linear locus's certified step at a deposit** (module header,
+/// "The certified step"): the step with its alignment `a`, curvature `C` and covector scale `c`; the
+/// gain `κ²` read at the step's ray, and its parts: the feature moves `b`, the loci stepping
+/// together `B`, the readout's Schur bound `‖R‖₂²` and the per-tick amplitude growth `1 + ω`.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct StepReading {
+    pub step: CertifiedStep,
+    pub gain: Rat,
+    pub moves: Rat,
+    pub together: u64,
+    pub readout: Rat,
+    pub amplitude: Rat,
+}
+
+/// [definition] **What a deposit's publication reads** (module header, "The committed energy bound,
+/// enforced at the commit"): the certified storage growth `ε_k` of the storage forms the deposit
+/// changes (`Q_(k+1) ⪯ (1 + ε_k) Q_k`; a deposit with none certified is refused) and the product
+/// `∏(1 + ε_k)` since the founding; each linear locus's certified step ([`StepReading`]); the
+/// successor's per-tick amplitude growth `1 + ω` (the contrast ports' certified bound; `None` when a
+/// pumped resonator leaves it uncertified); the commit reached, the successor's exact bits against
+/// the budget, the loci reached, and the budgeted carry's report: every residual the deposit
+/// released (exact and sparse, with its locus, carrier and entry; Lean
+/// `HNN/LatticeDeposit.release`), their bits, and the number of entries whose lattice coordinate
+/// moved (`q ≠ 0`, review R5); and each normal law's solved chart with the prox residual its chart
+/// released ([`ChartReading`], the lattice word); and the cells its reached comparisons deposited
+/// into the receiving parametrons' landmark trees (the landmark tree). The release is reported,
+/// never silent.
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct DepositReading {
-    pub contact_growth: Option<Rat>,
-    pub contact_product: Rat,
+    pub storage_growth: Rat,
+    pub storage_product: Rat,
+    pub steps: Vec<(Locus, StepReading)>,
+    pub amplitude: Option<Rat>,
     pub commit: u64,
     pub bits: u64,
     pub budget: u64,
@@ -2092,8 +2302,12 @@ pub struct Constitution {
     budget: u64,
     commit: u64,
     released: BTreeSet<Locus>,
-    /// Contact C/K growth only. Loaded ring-mode growth has no committed global bound yet.
-    contact_bound: CommittedEnergyBound,
+    /// `∏(1 + ε_k)` since the founding: the committed energy bound's product of certified storage
+    /// growths (module header, "The committed energy bound, enforced at the commit").
+    storage_product: Rat,
+    /// Each ring's declared storage admittance `Y_g` (the field's), which the certified step's gains
+    /// read.
+    admittances: Vec<Rat>,
     /// The declared lattice of every learned locus (the field's).
     lattices: BTreeMap<Locus, Lattice>,
     /// The factor families' carried remainders (the normal laws carry their own).
@@ -2311,7 +2525,12 @@ impl Constitution {
             budget,
             commit: 0,
             released: BTreeSet::new(),
-            contact_bound: CommittedEnergyBound::new(Rat::zero()),
+            storage_product: Rat::one(),
+            admittances: field
+                .rings()
+                .iter()
+                .map(|ring| ring.admittance().clone())
+                .collect(),
             lattices,
             carries: Carries::new(),
             clocks: BTreeMap::new(),
@@ -3162,22 +3381,205 @@ impl Constitution {
         rings && contacts
     }
 
-    /// The contact storage forms `(C_a, K_a)` per contact, as symmetric forms.
-    fn contact_storage_forms(&self) -> Result<Vec<[ExactRatMatrix; 2]>, HnnError> {
-        self.contacts
-            .iter()
-            .map(|material| Ok([gram(&material.storage)?, gram(&material.stiffness)?]))
-            .collect()
+    /// **The storage forms a deposit can change** (module header, "The committed energy bound,
+    /// enforced at the commit"): each contact's `C_a = c cᵀ` and `K_a = b bᵀ`, and each unpumped
+    /// resonator's `C` and `K` (squared gains times their declared bases). A pumped resonator's
+    /// stiffness may be indefinite; its growth is not certified here.
+    fn storage_forms(&self) -> Result<Vec<ExactRatMatrix>, HnnError> {
+        let mut forms = Vec::new();
+        for material in &self.contacts {
+            forms.push(gram(&material.storage)?);
+            forms.push(gram(&material.stiffness)?);
+        }
+        for material in &self.rings {
+            if let Some(resonator) = &material.resonator
+                && !pumped(resonator)
+            {
+                let (capacity, stiffness, _) = resonator.forms();
+                forms.push(capacity.clone());
+                forms.push(stiffness.clone());
+            }
+        }
+        Ok(forms)
     }
 
-    /// **The successor of a staged deposit** (design (c), `deposit`): each linear locus's prox
-    /// step over its window's samples, each factor family's preconditioned step, the commit
-    /// advanced, the energy-growth bound certified, and the budget checked on the successor's
-    /// exact bits before anything is published. Refused with [`HnnError::ConstitutionBudget`]
-    /// past `B_Θ`, with [`HnnError::StaleDeposit`] when the deposit was computed at another commit,
-    /// and with [`HnnError::ReleasedLocus`] when it names a released locus. A loaded resonator's
-    /// gain step whose carried gain would be `≤ 0` backtracks to the midpoint of the admissible
-    /// side and is named in the reading ([`GainBacktrack`]): deposition never releases a family.
+    /// `∏(1 + ε_k)` since the founding: the committed energy bound's product of certified storage
+    /// growths.
+    pub fn storage_product(&self) -> &Rat {
+        &self.storage_product
+    }
+
+    /// **The per-tick amplitude growth `1 + ω`** of the word at this constitution (module header,
+    /// "The certified step"): `ω` the largest certified bound of a ring's contrast port
+    /// (`holon::deposition::{schur_norms, sqrt_ceiling}` at the ring's element lattice), so a tick
+    /// multiplies the power by at most `(1 + ω)²` (`holon::deposition::active_growth`). `None` when a
+    /// pumped resonator leaves the growth uncertified.
+    pub fn amplitude(&self) -> Result<Option<Rat>, HnnError> {
+        if self
+            .rings
+            .iter()
+            .any(|material| material.resonator.as_ref().is_some_and(pumped))
+        {
+            return Ok(None);
+        }
+        let mut bound = Rat::zero();
+        for (g, material) in self.rings.iter().enumerate() {
+            let (column, row) = schur_norms(material.contrast.map());
+            let omega = sqrt_ceiling(&(column * row), self.lattice(Locus::Element(g))?.exponent());
+            if omega > bound {
+                bound = omega;
+            }
+        }
+        Ok(Some(Rat::one() + bound))
+    }
+
+    /// **A linear locus's gain `κ²`** at a readout bound `‖R‖₂²` and an amplitude growth `1 + ω`
+    /// (module header, "The certified step").
+    fn gain(&self, locus: LinearLocus, reach: &Reach, readout: &Rat, amplitude: &Rat) -> Rat {
+        let receiver = &self.admittances[reach.receiver];
+        match locus {
+            LinearLocus::Receiving(_) => Rat::one(),
+            LinearLocus::SourcePort(g) => {
+                Rat::from_integer(BigInt::from(reach.phases))
+                    * readout
+                    * (&self.admittances[g] / receiver)
+                    * reach.entry_gain(amplitude)
+            }
+            LinearLocus::Contrast(r) => {
+                readout * (&self.admittances[r] / receiver) * reach.tick_gain(amplitude)
+            }
+        }
+    }
+
+    /// **The certified steps of a deposit's linear loci** (module header, "The certified step"):
+    /// each prepared unit step whose alignment is positive is certified (a negative alignment is
+    /// refused), its curvature `C = B s κ² b` read with the gains at the end of every locus's ray,
+    /// and a step whose certificate the gains at its ray do not admit is halved, until every one
+    /// holds. Refused without a reach, or through a pumped resonator.
+    fn certify_steps(
+        &self,
+        reach: Option<&Reach>,
+        prepared: &[(Locus, LinearLocus, &PreparedStep)],
+    ) -> Result<BTreeMap<Locus, StepReading>, HnnError> {
+        let mut moving: Vec<(Locus, LinearLocus, &PreparedStep)> = Vec::new();
+        for (locus, linear, step) in prepared {
+            if CertifiedStep::certify(&step.alignment, &Rat::zero(), &step.covector)?.is_some() {
+                moving.push((*locus, *linear, *step));
+            }
+        }
+        if moving.is_empty() {
+            return Ok(BTreeMap::new());
+        }
+        let reach = reach.ok_or(HnnError::MissingReach)?;
+        if let Some(ring) = self
+            .rings
+            .iter()
+            .position(|material| material.resonator.as_ref().is_some_and(pumped))
+        {
+            return Err(HnnError::UncertifiedGain { ring });
+        }
+        let together = moving.len() as u64;
+        let factor = Rat::new(BigInt::from(together), BigInt::from(2));
+        let receiving = self
+            .rings
+            .get(reach.receiver)
+            .and_then(|material| material.receiving.as_ref())
+            .ok_or(HnnError::MissingReceivingMap {
+                ring: reach.receiver,
+            })?;
+        let readout_base = schur_norms(receiving.map());
+        let contrast_base: Vec<(Rat, Rat)> = self
+            .rings
+            .iter()
+            .map(|material| schur_norms(material.contrast.map()))
+            .collect();
+        let grains: Vec<u32> = (0..self.rings.len())
+            .map(|g| Ok(self.lattice(Locus::Element(g))?.exponent()))
+            .collect::<Result<_, HnnError>>()?;
+        // The Schur bound at the end of a ray: `(‖W‖₁ + η‖D‖₁)(‖W‖_∞ + η‖D‖_∞)`.
+        let ray = |base: &(Rat, Rat), moved: Option<(&Rat, &(Rat, Rat))>| -> Rat {
+            match moved {
+                Some((step, unit)) => (&base.0 + step * &unit.0) * (&base.1 + step * &unit.1),
+                None => &base.0 * &base.1,
+            }
+        };
+        let gains = |steps: &[Option<CertifiedStep>]| -> (Rat, Rat) {
+            let moved = |target: LinearLocus| {
+                moving
+                    .iter()
+                    .zip(steps)
+                    .find(|((_, linear, _), _)| *linear == target)
+                    .and_then(|((_, _, prepared), step)| {
+                        step.as_ref().map(|step| (&step.step, &prepared.unit_norms))
+                    })
+            };
+            let readout = ray(&readout_base, moved(LinearLocus::Receiving(reach.receiver)));
+            let omega = (0..self.rings.len())
+                .map(|r| {
+                    sqrt_ceiling(
+                        &ray(&contrast_base[r], moved(LinearLocus::Contrast(r))),
+                        grains[r],
+                    )
+                })
+                .max()
+                .unwrap_or_else(Rat::zero);
+            (readout, Rat::one() + omega)
+        };
+        // The first steps read the gains at the current constitution.
+        let (readout, amplitude) = gains(&vec![None; moving.len()]);
+        let mut steps: Vec<Option<CertifiedStep>> = moving
+            .iter()
+            .map(|(_, linear, prepared)| {
+                let curvature =
+                    &factor * self.gain(*linear, reach, &readout, &amplitude) * &prepared.moves;
+                CertifiedStep::certify(&prepared.alignment, &curvature, &prepared.covector)
+            })
+            .collect::<Result<_, _>>()?;
+        loop {
+            let (readout, amplitude) = gains(&steps);
+            let mut changed = false;
+            let mut readings = BTreeMap::new();
+            for ((locus, linear, prepared), step) in moving.iter().zip(steps.iter_mut()) {
+                let certified = step
+                    .as_mut()
+                    .expect("a positive alignment certifies a step");
+                let gain = self.gain(*linear, reach, &readout, &amplitude);
+                let curvature = &factor * &gain * &prepared.moves;
+                if !certified.admits(&curvature) {
+                    *certified = certified.halved();
+                    changed = true;
+                    continue;
+                }
+                certified.curvature = curvature;
+                readings.insert(
+                    *locus,
+                    StepReading {
+                        step: certified.clone(),
+                        gain,
+                        moves: prepared.moves.clone(),
+                        together,
+                        readout: readout.clone(),
+                        amplitude: amplitude.clone(),
+                    },
+                );
+            }
+            if !changed {
+                return Ok(readings);
+            }
+        }
+    }
+
+    /// **The successor of a staged deposit** (design (c), `deposit`): each linear locus's step
+    /// prepared at its unit step (its Gram carried and its chart refined), certified against every
+    /// locus's gains (module header, "The certified step") and carried; each factor family's
+    /// preconditioned step; the commit advanced; the storage growth certified (a deposit with none
+    /// certified is refused); and the budget checked on the successor's exact bits before anything
+    /// is published. Refused with [`HnnError::ConstitutionBudget`] past `B_Θ`, with
+    /// [`HnnError::StaleDeposit`] when the deposit was computed at another commit, with
+    /// [`HnnError::ReleasedLocus`] when it names a released locus, and with the certified step's
+    /// refusals. A loaded resonator's gain step whose carried gain would be `≤ 0` backtracks to the
+    /// midpoint of the admissible side and is named in the reading ([`GainBacktrack`]): deposition
+    /// never releases a family.
     pub fn deposited(&self, deposit: &Deposit) -> Result<(Self, DepositReading), HnnError> {
         if deposit.commit() != self.commit {
             return Err(HnnError::StaleDeposit {
@@ -3186,7 +3588,7 @@ impl Constitution {
             });
         }
         let mut next = self.clone();
-        let (proxy, eta) = (self.steps.proxy.clone(), self.steps.factor.clone());
+        let eta = self.steps.factor.clone();
         // The deposit's steps by locus, each with its place in the deposit's order (its linear
         // steps, then its factor steps, then its class-mass steps).
         let mut groups: BTreeMap<Locus, Vec<(usize, LocusStep<'_>)>> = BTreeMap::new();
@@ -3195,6 +3597,11 @@ impl Constitution {
                 .entry(step.locus.locus())
                 .or_default()
                 .push((index, LocusStep::Linear(step)));
+        }
+        for (locus, steps) in &groups {
+            if steps.len() > 1 {
+                return Err(HnnError::RepeatedLinearStep { locus: *locus });
+            }
         }
         let linear = deposit.linear().len();
         for (index, step) in deposit.factors().iter().enumerate() {
@@ -3243,19 +3650,68 @@ impl Constitution {
             }
         }
         let mut materials = LocusMaterial::split(&mut next.rings, &mut next.contacts, &groups);
-        let regions: Vec<_> = groups
+        let mut regions: Vec<_> = groups
             .iter()
             .zip(local)
             .map(|((locus, steps), (_, carries))| (*locus, steps, materials.remove(locus), carries))
             .collect();
+        drop(materials);
+        // Pass 1: each locus's linear step prepared at its unit step, the loci together.
+        let prepared: Vec<Result<Prepared, (usize, HnnError)>> = regions
+            .par_iter_mut()
+            .map(|(locus, steps, material, _)| self.prepare_at(*locus, steps, material.as_mut()))
+            .collect();
+        let mut first: Option<(usize, HnnError)> = None;
+        let mut ready = Vec::with_capacity(prepared.len());
+        for region in prepared {
+            match region {
+                Ok(region) => ready.push(region),
+                Err(refusal) => {
+                    if first.as_ref().is_none_or(|(index, _)| refusal.0 < *index) {
+                        first = Some(refusal);
+                    }
+                }
+            }
+        }
+        if let Some((_, refusal)) = first {
+            return Err(refusal);
+        }
+        // The certificate reads every prepared step at once.
+        let certified = {
+            let steps: Vec<(Locus, LinearLocus, &PreparedStep)> = regions
+                .iter()
+                .zip(&ready)
+                .filter_map(|((locus, ..), (_, linear))| {
+                    linear.as_ref().and_then(|(_, locus_kind, prepared)| {
+                        prepared
+                            .as_ref()
+                            .map(|prepared| (*locus, *locus_kind, prepared))
+                    })
+                })
+                .collect();
+            self.certify_steps(deposit.reach(), &steps)?
+        };
+        // Pass 2: every locus's steps in the deposit's order, the linear step at its certified
+        // step, the loci together.
         let done: Vec<LocusDeposit> = regions
             .into_par_iter()
-            .map(|(locus, steps, mut material, mut carries)| {
-                self.deposit_at(locus, steps, material.as_mut(), &mut carries, &proxy, &eta)
+            .zip(ready)
+            .map(
+                |((locus, steps, mut material, mut carries), (stroke, linear))| {
+                    self.deposit_at(
+                        locus,
+                        steps,
+                        material.as_mut(),
+                        &mut carries,
+                        stroke,
+                        linear,
+                        certified.get(&locus),
+                        &eta,
+                    )
                     .map(|at| (locus, carries, at))
-            })
+                },
+            )
             .collect();
-        drop(materials);
         // The refusal is the first in the deposit's order: the one the steps taken in that order
         // meet first.
         let (mut deposited, mut refusals) = (Vec::with_capacity(done.len()), Vec::new());
@@ -3315,17 +3771,12 @@ impl Constitution {
             .values()
             .flat_map(|at| at.backtracks().iter().cloned())
             .collect();
-        // `contact_growth` is certified on contact C/K blocks only. It deliberately makes no
-        // claim about loaded resonator C, D or the signed, phase-varying pump contribution to K;
-        // their end-state work is read by `Word::PowerForm`, and a future-word growth bound is owed
-        // in #62.
-        let (before, after) = (self.contact_storage_forms()?, next.contact_storage_forms()?);
-        let contact_growth = certify_contact_growth(&before, &after)?;
-        if let Some(epsilon) = &contact_growth {
-            let (initial, reached) = (contact_joint_form(&before)?, contact_joint_form(&after)?);
-            next.contact_bound
-                .commit(&initial, &reached, epsilon, Rat::zero())?;
-        }
+        // The committed energy bound at the commit: the storage growth certified by inertia, or the
+        // deposit refused (module header, "The committed energy bound, enforced at the commit").
+        let storage_growth =
+            certify_storage_growth(&self.storage_forms()?, &next.storage_forms()?)?
+                .ok_or(HnnError::UncertifiedStorage)?;
+        next.storage_product = &self.storage_product * (Rat::one() + &storage_growth);
         let bits = next.exact_bits();
         if bits > self.budget {
             let predecessor = self.bits_by_locus();
@@ -3349,8 +3800,10 @@ impl Constitution {
             });
         }
         let reading = DepositReading {
-            contact_growth,
-            contact_product: next.contact_bound.product().clone(),
+            storage_growth,
+            storage_product: next.storage_product.clone(),
+            steps: certified.into_iter().collect(),
+            amplitude: next.amplitude()?,
             commit: next.commit,
             bits,
             budget: self.budget,
@@ -3365,20 +3818,63 @@ impl Constitution {
         Ok((next, reading))
     }
 
-    /// **One locus's steps of a deposit**, in the deposit's order, on the locus's material and
-    /// carried remainders alone, with the locus's budgeted carry opened at the clock the deposit
-    /// would advance it to, and its normal law's chart readings. A refusal returns with the place of
-    /// the step that met it in the deposit's order.
+    /// **One locus's linear step prepared** (pass 1 of [`Constitution::deposited`]): the locus's
+    /// budgeted carry opened at the clock the deposit would advance it to, and its normal law's
+    /// Gram carried, chart refined and unit step formed ([`NormalLaw::prepare`]). A locus with no
+    /// linear step opens nothing here.
+    fn prepare_at(
+        &self,
+        locus: Locus,
+        steps: &[(usize, LocusStep<'_>)],
+        material: Option<&mut LocusMaterial<'_>>,
+    ) -> Result<Prepared, (usize, HnnError)> {
+        let Some((index, step)) = steps.iter().find_map(|(index, step)| match step {
+            LocusStep::Linear(step) => Some((*index, *step)),
+            _ => None,
+        }) else {
+            return Ok((None, None));
+        };
+        let refused = |refusal: HnnError| (index, refusal);
+        if self.released.contains(&locus) {
+            return Err(refused(HnnError::ReleasedLocus { locus }));
+        }
+        let law = material
+            .and_then(|material| material.law(step.locus))
+            .ok_or(HnnError::MissingSourcePort {
+                ring: match step.locus {
+                    LinearLocus::SourcePort(g)
+                    | LinearLocus::Contrast(g)
+                    | LinearLocus::Receiving(g) => g,
+                },
+            })
+            .map_err(refused)?;
+        let mut at =
+            BudgetedCarry::new(self.lattice(locus).map_err(refused)?, self.clock(locus) + 1);
+        let rule = self.chart_rule(locus).map_err(refused)?;
+        let prepared = law
+            .prepare(&step.samples, &rule, &mut at)
+            .map_err(refused)?;
+        Ok((Some(at), Some((index, step.locus, prepared))))
+    }
+
+    /// **One locus's steps of a deposit** (pass 2 of [`Constitution::deposited`]), in the deposit's
+    /// order, on the locus's material and carried remainders alone, with the locus's budgeted carry
+    /// (opened by its linear step's preparation, or here at the clock the deposit would advance it
+    /// to), its linear step taken at its certified step, and its normal law's chart reading. A
+    /// refusal returns with the place of the step that met it in the deposit's order.
+    #[allow(clippy::too_many_arguments)]
     fn deposit_at(
         &self,
         locus: Locus,
         steps: &[(usize, LocusStep<'_>)],
         mut material: Option<&mut LocusMaterial<'_>>,
         carries: &mut Carries,
-        proxy: &Rat,
+        stroke: Option<BudgetedCarry>,
+        mut linear: Option<(usize, LinearLocus, Option<PreparedStep>)>,
+        certified: Option<&StepReading>,
         eta: &Rat,
     ) -> Result<(BudgetedCarry, Vec<ChartReading>), (usize, HnnError)> {
-        let mut stroke: Option<BudgetedCarry> = None;
+        let mut stroke = stroke;
         let mut charts = Vec::new();
         let budgeted = |stroke: &mut Option<BudgetedCarry>| -> Result<(), HnnError> {
             if stroke.is_none() {
@@ -3409,12 +3905,16 @@ impl Constitution {
                         .map_err(refused)?;
                     budgeted(&mut stroke).map_err(refused)?;
                     let at = stroke.as_mut().expect("opened above");
-                    let rule = self.chart_rule(locus).map_err(refused)?;
-                    let (next, reading) = law
-                        .deposited(&step.samples, proxy, &rule, at)
-                        .map_err(refused)?;
-                    *law = next;
-                    charts.extend(reading);
+                    // The step prepared in pass 1 (none when its window reached nothing), at its
+                    // certified step (zero when its alignment was zero: the Gram and chart move,
+                    // the map does not).
+                    if let Some((_, _, Some(prepared))) = linear.take() {
+                        let step =
+                            certified.map_or_else(Rat::zero, |reading| reading.step.step.clone());
+                        let (next, reading) = prepared.stepped(&step, at).map_err(refused)?;
+                        *law = next;
+                        charts.push(reading);
+                    }
                 }
                 LocusStep::Factor(step) => {
                     budgeted(&mut stroke).map_err(refused)?;
@@ -3522,6 +4022,20 @@ impl Constitution {
 /// One locus's deposited carried remainders, budgeted carry and chart readings, or the refusal its
 /// steps met with the place of the refusing step in the deposit's order.
 type LocusDeposit = Result<(Locus, Carries, (BudgetedCarry, Vec<ChartReading>)), (usize, HnnError)>;
+
+/// One locus's pass-1 preparation: its budgeted carry (opened by its linear step) and its linear
+/// step's place, kind and prepared unit step (none when its window reached nothing).
+type Prepared = (
+    Option<BudgetedCarry>,
+    Option<(usize, LinearLocus, Option<PreparedStep>)>,
+);
+
+/// Whether a resonator is pumped (its declared pump at a nonzero strength).
+fn pumped(resonator: &ResonatorMaterial) -> bool {
+    resonator
+        .pump()
+        .is_some_and(|pump| !pump.strength().is_zero())
+}
 
 /// One step of a deposit at its locus.
 #[derive(Clone, Copy)]
@@ -3925,38 +4439,20 @@ fn factor_step(
     Ok(())
 }
 
-fn contact_joint_form(
-    forms: &[[ExactRatMatrix; 2]],
-) -> Result<crate::ratio::linear::inertia::SymmetricForm, HnnError> {
-    let blocks: Vec<&ExactRatMatrix> = forms.iter().flat_map(|pair| pair.iter()).collect();
-    let n: usize = blocks.iter().map(|block| block.rows()).sum();
-    let mut rows = vec![vec![Rat::zero(); n]; n];
-    let mut at = 0;
-    for block in blocks {
-        for i in 0..block.rows() {
-            for j in 0..block.columns() {
-                rows[at + i][at + j] = block.get(i, j)?.clone();
-            }
-        }
-        at += block.rows();
-    }
-    let joint = ExactRatMatrix::shaped(n, n, rows)?;
-    Ok(matrix_form(&joint).map_err(crate::holon::HolonError::from)?)
-}
-
-/// The least contact-only `ε ∈ {0} ∪ {2^k : −20 ≤ k ≤ 40}` certifying
-/// `Q_(k+1) ⪯ (1 + ε) Q_k` on every contact's storage and stiffness form, or `None` when no
-/// candidate certifies those contact blocks. It does not cover the loaded resonator's mode storage.
+/// The least `ε ∈ {0} ∪ {2^k : −20 ≤ k ≤ 40}` certifying `Q_(k+1) ⪯ (1 + ε) Q_k` on every storage
+/// form a deposit can change ([`Constitution::storage_forms`]), or `None` when no candidate
+/// certifies them, which refuses the deposit.
 ///
-/// [definition; agent-inferred] Read block by block: the joint form is block-diagonal, so it is
+/// [definition; agent-inferred] Read form by form: the joint form is block-diagonal, so it is
 /// certified at `ε` exactly when every block is (its negative inertia is the blocks' sum), and the
-/// least joint `ε` is the largest of the blocks' least. Each block's `Q_k` is a Gram (`C = c cᵀ`,
-/// `K = b bᵀ`), so `(1 + ε) Q_k − Q_(k+1)` only gains the PSD term `(ε′ − ε) Q_k` as `ε` grows to
-/// `ε′`: a block's certified candidates are upward closed, and its least is found by bisection over
-/// the ordered candidates. An unchanged block certifies at `0`.
-fn certify_contact_growth(
-    before: &[[ExactRatMatrix; 2]],
-    after: &[[ExactRatMatrix; 2]],
+/// least joint `ε` is the largest of the blocks' least. Each block's `Q_k` is positive semidefinite
+/// (a Gram `c cᵀ`, `b bᵀ`, or a squared gain times a declared base), so `(1 + ε) Q_k − Q_(k+1)`
+/// only gains the PSD term `(ε′ − ε) Q_k` as `ε` grows to `ε′`: a block's certified candidates are
+/// upward closed, and its least is found by bisection over the ordered candidates. An unchanged
+/// block certifies at `0`.
+fn certify_storage_growth(
+    before: &[ExactRatMatrix],
+    after: &[ExactRatMatrix],
 ) -> Result<Option<Rat>, HnnError> {
     let candidates: Vec<Rat> = std::iter::once(Rat::zero())
         .chain((-20i32..=40).map(|k| {
@@ -3969,7 +4465,7 @@ fn certify_contact_growth(
         .collect();
     let last = candidates.len() - 1;
     let mut least = 0usize;
-    for (old, new) in before.iter().flatten().zip(after.iter().flatten()) {
+    for (old, new) in before.iter().zip(after) {
         if old == new {
             continue;
         }

@@ -339,8 +339,7 @@ fn main() {
         tail.start
     );
     println!(
-        "reference: campaign 1 (gamma_U = {}, eta_x = {}, B_Theta = 2^{} bits, pending capacity {}); deadline: {}",
-        exact(&steps.proxy),
+        "reference: campaign 1 (the normal laws' certified step, eta_x = {}, B_Theta = 2^{} bits, pending capacity {}); deadline: {}",
         exact(&steps.factor),
         CAMPAIGN_ONE_BUDGET.trailing_zeros(),
         reference.census().pending_capacity,

@@ -31,8 +31,43 @@
 //! it equals `clipNeg` when the congruence is orthogonal (e.g. `sym L` diagonal) and depends on the
 //! elimination order otherwise.
 //!
+//! [definition; agent-inferred, September 29] **The certified step** ([`CertifiedStep`]; the
+//! [lessons record](../../../../research/records/2026-09-29_LESSONS_THE_FAILURES_THAT_REPEATED_AFTER_THEY_WERE_RECORDED.md),
+//! lesson 6). A locus steps along a preconditioned direction `Δ` (the unit step: for a normal law
+//! `Δ = G X̂`, the covector that reached the locus read through the solved chart of its metric).
+//! Along the ray `η ↦ Θ + ηΔ` the score obeys the quadratic upper model
+//! `φ(η) ≤ φ(0) − η a + ½ η² C` with `a = ⟨G, Δ⟩` the first-order decrease of the unit step and `C`
+//! a certified bound on its curvature along the whole ray. The step is the largest dyadic
+//! `η = 2^k` (`k ∈ ℤ`) with `η C ≤ a` (so `η L ≤ 1` for `L = C/a`, the curvature in the locus's own
+//! metric) and `η c ≤ 1` (the lattice's covector bound: one return's weighted covector stays
+//! unit-scale, the assumption the lattice rule and the chart rule read). It certifies
+//! `φ(η) ≤ φ(0) − ½ η a` (Lean `Holon/Deposition.certified_step_descends`). The alignment `a` is
+//! computed, never assumed: `a < 0` is refused, `a = 0` moves nothing. The step reads no codec,
+//! alphabet or terrain; what it needs from a machine is `a`, `C` and `c`.
+//!
+//! [definition; agent-inferred] **The curvature a linear locus reads** (Lean
+//! `Holon/Deposition.gauss_newton_curvature`, `joint_cauchy_schwarz`). When a locus's outputs `W f_t`
+//! reach a receiver's logits linearly, `z_t = A_t(W f_t)`, through gains `‖A_t u‖ ≤ κ‖u‖`, and the
+//! receiver's score has curvature at most `s` in its logits, the curvature of the unit step is
+//! `C ≤ B s κ² Σ_t w_t |Δ f_t|²`, `B` the loci stepping together (their logit moves add, and
+//! `|Σ_(ℓ<B) u_ℓ|² ≤ B Σ_ℓ |u_ℓ|²`). The gain `κ` is certified by the machine's energy law; a learned
+//! map's operator bound is read by the Schur test `‖W‖₂² ≤ ‖W‖₁ ‖W‖_∞` ([`schur_norms`]), exact over
+//! `ℚ`, and a square root by its dyadic ceiling ([`sqrt_ceiling`]).
+//!
+//! [proved-derived; formal-checked] **An active element's growth** (Lean
+//! `Holon/Deposition.active_element_growth`, [`active_growth`]). An element whose storage obeys
+//! `½|s′|² − ½|b|² ≤ ⟨x̄, W c⟩`, `x̄ = ½(b + s′)` (the ring element with its passive part dropped,
+//! Lean `HNN/Word.reaction_stage_balance`), with `‖W c‖ ≤ ω|c|`, has `|s′| ≤ |b| + ω|c|`; with
+//! `|b|, |c| ≤ r` its energy grows by at most `(2ω + ω²) r²`, the factor `(1 + ω)²` on the share
+//! `r²` bounds. A learned active relation that cannot be projected passive (the contrast port is
+//! passive only at `W_c = 0`, Lean `HNN/Word.contrastPort_active`) enters the committed energy
+//! bound through this growth.
+//!
 //! | Lean | Rust |
 //! |---|---|
+//! | `certified_step_descends` | [`CertifiedStep`] |
+//! | `gauss_newton_curvature`, `joint_cauchy_schwarz` | the curvature `C` a machine supplies (`hnn::constitution`) |
+//! | `active_element_growth`, `active_energy_growth` | [`active_growth`] |
 //! | `learned_rate_form` | [`learned_rate_form`] |
 //! | `energy_product_bound`, `committed_energy_bound` | [`CommittedEnergyBound`] |
 //! | `projectPassive`, `projectPassive_passive`, `projectPassive_of_passive` | [`project_passive`] |
@@ -272,6 +307,185 @@ impl CommittedEnergyBound {
     }
 }
 
+// -------------------------------------------------------------------------------------------
+// the certified step
+
+/// `⌊log₂ q⌋` of a positive rational: the largest `k ∈ ℤ` with `2^k ≤ q`.
+fn floor_log2(q: &Rat) -> i64 {
+    let (p, r) = (q.numer().magnitude(), q.denom().magnitude());
+    let k = p.bits() as i64 - r.bits() as i64;
+    let at_least = if k >= 0 {
+        *p >= (r << k as usize)
+    } else {
+        (p << (-k) as usize) >= *r
+    };
+    if at_least { k } else { k - 1 }
+}
+
+/// `x^k` for a natural `k`.
+pub fn power(x: &Rat, k: u64) -> Rat {
+    let mut result = Rat::one();
+    for _ in 0..k {
+        result *= x;
+    }
+    result
+}
+
+/// `2^k` for `k ∈ ℤ`.
+pub fn dyadic(k: i64) -> Rat {
+    if k >= 0 {
+        Rat::from_integer(BigInt::one() << k as usize)
+    } else {
+        Rat::new(BigInt::one(), BigInt::one() << (-k) as usize)
+    }
+}
+
+/// [definition; agent-inferred] **The certified step** (module header, "The certified step"): the
+/// unit step's first-order decrease `a = ⟨G, Δ⟩`, its certified curvature `C` along the ray, the
+/// lattice's covector scale `c`, and the largest dyadic `η = 2^k` with `η C ≤ a` and `η c ≤ 1`.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct CertifiedStep {
+    /// `k`: the step is `2^k`.
+    pub exponent: i64,
+    /// `η = 2^k`.
+    pub step: Rat,
+    /// `a = ⟨G, Δ⟩ > 0`.
+    pub alignment: Rat,
+    /// `C ≥ 0`, the certified curvature of the unit step along the ray.
+    pub curvature: Rat,
+    /// `c ≥ 0`, the largest weighted covector entry of one return.
+    pub covector: Rat,
+}
+
+impl CertifiedStep {
+    /// **Certify a step**: refused when `a < 0` (the preconditioned direction does not descend the
+    /// covector that reached the locus) or when `C` or `c` is negative; `None` when `a = 0` (nothing
+    /// descends, nothing moves); otherwise the largest dyadic step both bounds admit.
+    pub fn certify(
+        alignment: &Rat,
+        curvature: &Rat,
+        covector: &Rat,
+    ) -> Result<Option<Self>, HolonError> {
+        if alignment.is_negative() {
+            return Err(HolonError::Misaligned {
+                alignment: alignment.clone(),
+            });
+        }
+        for (what, value) in [
+            ("a step's curvature", curvature),
+            ("a covector's scale", covector),
+        ] {
+            if value.is_negative() {
+                return Err(HolonError::Negative {
+                    what,
+                    value: value.clone(),
+                });
+            }
+        }
+        if alignment.is_zero() {
+            return Ok(None);
+        }
+        let bounds: Vec<i64> = [
+            (!curvature.is_zero()).then(|| floor_log2(&(alignment / curvature))),
+            (!covector.is_zero()).then(|| floor_log2(&(Rat::one() / covector))),
+        ]
+        .into_iter()
+        .flatten()
+        .collect();
+        // `a > 0` comes from a nonzero covector, so the covector bound is present; a curvature and
+        // a covector both zero would leave the step undetermined.
+        let exponent = bounds.into_iter().min().ok_or(HolonError::Unsupported {
+            what: "a certified step",
+            reason: "a positive alignment with neither a curvature nor a covector scale",
+        })?;
+        Ok(Some(Self {
+            exponent,
+            step: dyadic(exponent),
+            alignment: alignment.clone(),
+            curvature: curvature.clone(),
+            covector: covector.clone(),
+        }))
+    }
+
+    /// **Whether a curvature bound read at the step's own ray still certifies it**: `η C′ ≤ a`
+    /// (the fixed point a machine iterates when its curvature depends on the steps taken).
+    pub fn admits(&self, curvature: &Rat) -> bool {
+        &self.step * curvature <= self.alignment
+    }
+
+    /// **The step halved** (`k − 1`), the projection a machine takes when the curvature read at the
+    /// step's own ray exceeds what the step certified.
+    pub fn halved(&self) -> Self {
+        Self {
+            exponent: self.exponent - 1,
+            step: dyadic(self.exponent - 1),
+            ..self.clone()
+        }
+    }
+
+    /// Both bounds at the step: `η C ≤ a` and `η c ≤ 1`.
+    pub fn holds(&self) -> bool {
+        self.admits(&self.curvature) && &self.step * &self.covector <= Rat::one()
+    }
+
+    /// **The certified decrease** `½ η a` (Lean `certified_step_descends`): the score falls by at
+    /// least this much along the step.
+    pub fn decrease(&self) -> Rat {
+        &self.step * &self.alignment / Rat::from_integer(BigInt::from(2))
+    }
+}
+
+/// **The Schur test's two norms** of a matrix: `‖W‖₁` (the largest absolute column sum) and
+/// `‖W‖_∞` (the largest absolute row sum), so `‖W‖₂² ≤ ‖W‖₁ ‖W‖_∞`, exactly over `ℚ`.
+pub fn schur_norms(matrix: &ExactRatMatrix) -> (Rat, Rat) {
+    let (rows, columns) = (matrix.rows(), matrix.columns());
+    let entries = matrix.entries();
+    let mut column_sums = vec![Rat::zero(); columns];
+    let mut row_max = Rat::zero();
+    for i in 0..rows {
+        let mut row_sum = Rat::zero();
+        for (j, sum) in column_sums.iter_mut().enumerate() {
+            let value = &entries[i * columns + j];
+            if !value.is_zero() {
+                let magnitude = value.abs();
+                row_sum += &magnitude;
+                *sum += magnitude;
+            }
+        }
+        if row_sum > row_max {
+            row_max = row_sum;
+        }
+    }
+    let column_max = column_sums.into_iter().max().unwrap_or_else(Rat::zero);
+    (column_max, row_max)
+}
+
+/// **The dyadic ceiling of a square root** at grain `2^(−p)`: the least `m·2^(−p)` with
+/// `(m·2^(−p))² ≥ x`, for `x ≥ 0`; an upper bound on `√x` within `2^(−p)` of it.
+pub fn sqrt_ceiling(x: &Rat, grain: u32) -> Rat {
+    if !x.is_positive() {
+        return Rat::zero();
+    }
+    // m = ⌈√(x·4^p)⌉ = ⌈√⌈x·4^p⌉⌉ over the integers.
+    let scaled = (x * Rat::from_integer(BigInt::one() << (2 * grain as usize)))
+        .ceil()
+        .to_integer();
+    let magnitude = scaled.magnitude();
+    let mut root = magnitude.sqrt();
+    if &(&root * &root) < magnitude {
+        root += 1u32;
+    }
+    Rat::new(BigInt::from(root), BigInt::one() << grain as usize)
+}
+
+/// **An active element's growth factor** `(1 + ω)²` (module header; Lean
+/// `active_element_growth`, `active_energy_growth`): the most an element with an active relation of
+/// operator bound `ω` multiplies the energy share it reads in one step.
+pub fn active_growth(bound: &Rat) -> Rat {
+    let one_plus = Rat::one() + bound;
+    &one_plus * &one_plus
+}
+
 /// `diag(1, −1)`, the indefinite normal-law block (`Holon/Deposition.indefiniteBlock`).
 pub fn indefinite_block() -> ExactRatMatrix {
     ExactRatMatrix::from_diagonal(vec![Rat::one(), -Rat::one()])
@@ -332,6 +546,82 @@ mod tests {
         let (up, _) = learned_rate_form(&identity, &indefinite_block(), &ints(&[1, 0])).unwrap();
         let (down, _) = learned_rate_form(&identity, &indefinite_block(), &ints(&[0, 1])).unwrap();
         assert!(up > Rat::zero() && down < Rat::zero());
+    }
+
+    #[test]
+    fn floor_log2_is_the_largest_dyadic_below() {
+        for (q, k) in [
+            (integer(1), 0),
+            (rat(3, 5), -1),
+            (integer(8), 3),
+            (integer(7), 2),
+            (rat(1, 8), -3),
+            (rat(1, 7), -3),
+        ] {
+            assert_eq!(floor_log2(&q), k, "{q}");
+            assert!(dyadic(k) <= q && q < dyadic(k + 1));
+        }
+    }
+
+    /// `Holon/Deposition.certified_step_descends`: the largest dyadic step under `ηC ≤ a` and
+    /// `ηc ≤ 1`, and its half decrease on the exact quadratic model, which the next dyadic breaks.
+    #[test]
+    fn the_certified_step_is_the_largest_dyadic_under_both_bounds() {
+        let (a, curvature) = (integer(3), integer(5));
+        let step = CertifiedStep::certify(&a, &curvature, &rat(1, 4))
+            .unwrap()
+            .unwrap();
+        assert_eq!((step.exponent, step.step.clone()), (-1, rat(1, 2)));
+        assert!(step.holds());
+        assert_eq!(step.decrease(), rat(3, 4));
+        let model = |eta: &Rat| -(eta * &a) + eta * eta * &curvature / integer(2);
+        assert!(model(&step.step) <= -step.decrease());
+        let doubled = dyadic(step.exponent + 1);
+        assert!(model(&doubled) > -(&doubled * &a / integer(2)));
+        // The covector bound binds when the curvature is zero.
+        let bound = CertifiedStep::certify(&a, &Rat::zero(), &integer(3))
+            .unwrap()
+            .unwrap();
+        assert_eq!(bound.step, rat(1, 4));
+        // A curvature read at the ray's end past what the step certified halves it.
+        assert!(!step.admits(&integer(7)));
+        assert!(step.halved().admits(&integer(7)));
+        // Misalignment is refused, zero alignment moves nothing, negative bounds are refused.
+        assert!(matches!(
+            CertifiedStep::certify(&integer(-1), &curvature, &Rat::one()),
+            Err(HolonError::Misaligned { .. })
+        ));
+        assert_eq!(
+            CertifiedStep::certify(&Rat::zero(), &curvature, &Rat::one()),
+            Ok(None)
+        );
+        assert!(matches!(
+            CertifiedStep::certify(&a, &integer(-1), &Rat::one()),
+            Err(HolonError::Negative { .. })
+        ));
+    }
+
+    #[test]
+    fn the_square_root_ceiling_is_the_least_dyadic_upper_root() {
+        let root = sqrt_ceiling(&integer(2), 4);
+        assert_eq!(root, rat(23, 16));
+        assert!(&root * &root >= integer(2) && rat(22, 16) * rat(22, 16) < integer(2));
+        assert_eq!(sqrt_ceiling(&rat(9, 4), 0), integer(2));
+        assert_eq!(sqrt_ceiling(&rat(9, 4), 1), rat(3, 2));
+        assert_eq!(sqrt_ceiling(&Rat::zero(), 8), Rat::zero());
+    }
+
+    /// The Schur test `‖W‖₂² ≤ ‖W‖₁‖W‖_∞` and the active growth `(1 + ω)²`
+    /// (`Holon/Deposition.active_energy_growth`).
+    #[test]
+    fn the_schur_norms_and_the_active_growth() {
+        let w = integer_matrix(&[&[1, -2], &[3, 0]]).unwrap();
+        assert_eq!(schur_norms(&w), (integer(4), integer(3)));
+        // ‖W‖₂² is the largest root of λ² − 14λ + 36 (WᵀW = [[10, −2], [−2, 4]]); it is below
+        // 12 because 12² − 14·12 + 36 > 0 and 12 > 7, the roots' midpoint.
+        assert!(integer(144) - integer(168) + integer(36) > Rat::zero());
+        assert_eq!(active_growth(&rat(1, 2)), rat(9, 4));
+        assert_eq!(active_growth(&Rat::zero()), Rat::one());
     }
 
     #[test]

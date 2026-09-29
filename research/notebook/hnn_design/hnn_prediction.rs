@@ -8,7 +8,8 @@
 //! cargo run --release -p holonics --example hnn_prediction -- probe moire
 //! cargo run --release -p holonics --example hnn_prediction -- probe text .local/cuts/curated-u6-passage-cut.bin
 //! cargo run --release -p holonics --example hnn_prediction -- copy
-//! cargo run --release -p holonics --example hnn_prediction -- moire
+//! cargo run --release -p holonics --example hnn_prediction -- moire [K]
+//! cargo run --release -p holonics --example hnn_prediction -- divergence
 //! cargo run --release -p holonics --example hnn_prediction -- text .local/cuts/curated-u6-passage-cut.bin .local/cuts/u6-native-sections.txt
 //! cargo run --release -p holonics --example hnn_prediction -- develop copy|moire <train> <evaluate> [s] [batch] [d] [K]
 //! cargo run --release -p holonics --example hnn_prediction -- develop text <cut> <train> [s]
@@ -45,6 +46,12 @@
 //!   to an owner-only file with nothing beside it. A plural section is held (a typed refusal); no
 //!   keyed latent is tried (retired September 29). Every cut is refused unless it names the reserve
 //!   as excluded (`exterior`).
+//! - **The certified step** (September 29; `hnn::constitution`, "The certified step"): the normal
+//!   laws' steps are certified at every deposit; the readout prints each locus's certified steps
+//!   `2^k` (the least and largest `k`), the largest absolute entry of every learned map (`E`, `R`,
+//!   each `W_c`) over the run and after each of the first eight deposits, and the committed energy
+//!   bound read on every refinement at its commit (`RefinementBalance::energy_bound`) with the
+//!   certified storage growth's product. `s` now scales only the factor families' `η_x = 1/(2s)`.
 //! - **Guards**: the run stops at its deadline (the pin's projection bound) or at its resident cap,
 //!   and reports its partial evidence as incomplete. `train <pairs>` and `passes <n>` bound the text
 //!   run's training below the pinned 1,024 pairs and 2 passes (a bounded reading, reported as such).
@@ -54,6 +61,7 @@
 #[path = "exterior.rs"]
 mod exterior;
 
+use std::collections::BTreeMap;
 use std::time::Instant;
 
 use holonics::compression::landmark::context::{SectionChart, StopPrior};
@@ -62,6 +70,7 @@ use holonics::geometry::screw::ScrewGenerator;
 use holonics::hnn::chart::Charts;
 use holonics::hnn::constitution::{CAMPAIGN_ONE_BUDGET, Constitution, Steps};
 use holonics::hnn::field::{
+    ConstitutionRead,
     ContactDeclaration, CribDeclaration, Current, Field, FieldDeclaration, ReceiverDeclaration,
     RingDeclaration,
 };
@@ -73,6 +82,7 @@ use holonics::holarchy::terrain::moire::{Moire, MoireClass, MoireFamily};
 use holonics::ratio::algebraic::{ExactInterval, interval_sum};
 use holonics::ratio::{Rat, rat};
 use holonics::receiver::population::RelationKind;
+use num_traits::{Signed, Zero};
 
 use exterior::{
     RESERVE_SHA256, read_curated, read_incidence, reading_of, reserve_read, resident_set,
@@ -98,7 +108,8 @@ const AGENT: usize = 1;
 struct Declared {
     /// `d`: every ring's period.
     period: u64,
-    /// `s`: the declared steps `γ_U = 1/s`, `η_x = 1/(2s)` (campaign 1 at `s = 1`).
+    /// `s`: the factor families' declared step `η_x = 1/(2s)` (campaign 1 at `s = 1`); the normal
+    /// laws' steps are certified.
     steps: i64,
     /// `|A|`: the exterior chart, its last class the termination.
     alphabet: usize,
@@ -196,6 +207,19 @@ struct Tally {
     peak_bits: u64,
     stage_ms: u128,
     deposit_ms: u128,
+    /// The committed energy bound read on every refinement at its commit, and how many held.
+    energy_checks: u64,
+    energy_holds: u64,
+    /// Every certified step's exponent `k` (the step `2^k`), by locus: the least and the largest.
+    exponents: BTreeMap<String, (i64, i64)>,
+    /// The largest absolute entry of each learned map after each deposit (the source port, the
+    /// receiving map and every contrast port), the largest over the run, and the first deposits'.
+    entries: BTreeMap<String, Rat>,
+    trajectory: Vec<Vec<(String, Rat)>>,
+    /// The certified storage growth's product since the founding, at the last deposit, and the
+    /// least and largest growth `ε_k` of one deposit.
+    storage_product: Option<Rat>,
+    growths: Option<(Rat, Rat)>,
 }
 
 impl Tally {
@@ -232,7 +256,6 @@ impl Engine {
         let theta = Constitution::initial(
             &field,
             Steps {
-                proxy: rat(1, declared.steps),
                 factor: rat(1, 2 * declared.steps),
             },
             CAMPAIGN_ONE_BUDGET,
@@ -285,9 +308,83 @@ impl Engine {
         }
         self.tally.stage_ms += staging.elapsed().as_millis();
         let depositing = Instant::now();
-        let deposit = deposit_of(&self.theta, &composed).expect("the batch's deposit");
-        let (next, _) = self.theta.deposited(&deposit).expect("the deposit");
+        let deposit = deposit_of(&self.theta, &self.refinement, &composed)
+            .expect("the batch's deposit");
+        let amplitude = self
+            .theta
+            .amplitude()
+            .expect("the amplitude reads")
+            .expect("no pumped resonator on the declared field");
+        let (next, reading) = self.theta.deposited(&deposit).expect("the deposit");
         self.tally.deposit_ms += depositing.elapsed().as_millis();
+        for (locus, step) in &reading.steps {
+            let entry = self
+                .tally
+                .exponents
+                .entry(format!("{locus:?}"))
+                .or_insert((step.step.exponent, step.step.exponent));
+            entry.0 = entry.0.min(step.step.exponent);
+            entry.1 = entry.1.max(step.step.exponent);
+        }
+        self.tally.storage_product = Some(reading.storage_product.clone());
+        let largest = |matrix: &holonics::ratio::linear::ExactRatMatrix| {
+            matrix
+                .entries()
+                .iter()
+                .map(|x| x.abs())
+                .max()
+                .unwrap_or_else(Rat::zero)
+        };
+        let mut maps: Vec<(String, Rat)> = Vec::new();
+        for g in 0..self.field.rings().len() {
+            if let Some(port) = next.source_port(g) {
+                maps.push((format!("E{g}"), largest(port)));
+            }
+            if let Some(map) = next.receiving_map(g) {
+                maps.push((format!("R{g}"), largest(map)));
+            }
+            maps.push((format!("Wc{g}"), largest(next.contrast_port(g))));
+            maps.push((format!("f{g}"), largest(next.passive_factor(g))));
+            let slices = next
+                .slices(g)
+                .iter()
+                .flat_map(|(u, v)| u.iter().chain(v))
+                .map(|x| x.abs())
+                .max()
+                .unwrap_or_else(Rat::zero);
+            maps.push((format!("slices{g}"), slices));
+            let standing = next
+                .standing(g)
+                .iter()
+                .map(|x| x.abs())
+                .max()
+                .unwrap_or_else(Rat::zero);
+            maps.push((format!("q{g}"), standing));
+        }
+        for a in 0..self.field.contacts().len() {
+            maps.push((format!("c{a}"), largest(next.contact_storage(a))));
+            maps.push((format!("b{a}"), largest(next.contact_stiffness(a))));
+            maps.push((format!("F{a}"), largest(next.contact_dissipation(a))));
+        }
+        let growth = self
+            .tally
+            .growths
+            .get_or_insert((reading.storage_growth.clone(), reading.storage_growth.clone()));
+        if reading.storage_growth < growth.0 {
+            growth.0 = reading.storage_growth.clone();
+        }
+        if reading.storage_growth > growth.1 {
+            growth.1 = reading.storage_growth.clone();
+        }
+        for (name, value) in &maps {
+            let kept = self.tally.entries.entry(name.clone()).or_insert_with(Rat::zero);
+            if value > kept {
+                *kept = value.clone();
+            }
+        }
+        if self.tally.trajectory.len() < 8 {
+            self.tally.trajectory.push(maps);
+        }
         let (loci, unchanged) = unreached_unchanged(
             &self.field,
             &self.theta,
@@ -302,6 +399,16 @@ impl Engine {
             let after = PowerForm::read(&self.field, &next, &current).expect("a form");
             balance.commit(&before, &after, &end).expect("the commit's work");
             self.tally.commits += u64::from(balance.closes());
+            let bound = balance
+                .energy_bound(
+                    &self.refinement,
+                    &amplitude,
+                    &reading.storage_growth,
+                    self.field.word_lattice(),
+                )
+                .expect("the committed energy bound");
+            self.tally.energy_checks += 1;
+            self.tally.energy_holds += u64::from(bound.holds);
         }
         self.tally.deposits += 1;
         self.theta = next;
@@ -363,6 +470,33 @@ impl Engine {
             println!(
                 "  the training sections' code, Σ_j −log₂ p̂_j(t_j): {}",
                 reading_of(code, 16)
+            );
+        }
+        println!(
+            "  the committed energy bound held at {} of {} refinements' commits; the certified storage growth's product since the founding {}",
+            t.energy_holds,
+            t.energy_checks,
+            t.storage_product
+                .as_ref()
+                .map_or_else(|| "none".to_string(), ToString::to_string)
+        );
+        if let Some((least, largest)) = &t.growths {
+            println!("  the certified storage growth ε_k of one deposit: from {least} to {largest}");
+        }
+        for (locus, (least, largest)) in &t.exponents {
+            println!("  certified steps at {locus}: 2^k for k from {least} to {largest}");
+        }
+        for (name, value) in &t.entries {
+            println!("  the largest absolute entry of {name} over the run: {value}");
+        }
+        for (deposit, maps) in t.trajectory.iter().enumerate() {
+            println!(
+                "  after deposit {}: {}",
+                deposit + 1,
+                maps.iter()
+                    .map(|(name, value)| format!("{name} {value}"))
+                    .collect::<Vec<_>>()
+                    .join(", ")
             );
         }
     }
@@ -839,7 +973,12 @@ fn main() {
             );
         }
         Some("moire") => {
-            let declared = terrain_declared();
+            // `moire [K]`: the pinned moiré at `K` words (the pins of September 29 took `K = 2`;
+            // the certified step's pins read `K = 4` and `K = 8`).
+            let mut declared = terrain_declared();
+            if let Some(words) = arguments.get(2).and_then(|value| value.parse().ok()) {
+                declared.words = words;
+            }
             let moire = Moire::draw(&MOIRE_FAMILY, MoireClass::Sheets, &mut Draw::new(MOIRE_SEED))
                 .expect("the moiré");
             let truth = moire.truth(&MOIRE_FAMILY).expect("the moiré's truth");
@@ -854,6 +993,24 @@ fn main() {
                 "moire",
                 declared,
                 moire_pairs(&moire, &declared, TRAIN_SEED, MOIRE_TRAIN),
+                moire_windows(&moire, &declared),
+            );
+        }
+        // The development configuration where `K = 4` diverged under the declared step `γ_U = 1`
+        // (the native generation pins' development table: `d = 16`, `K = 4`, `s = 1`, batch 8, 128
+        // windows at the development seeds; `E`'s entries grew 1, 6, 26, 316), read again under the
+        // certified step: development seeds only, never the pinned ones.
+        Some("divergence") => {
+            let mut declared = terrain_declared();
+            declared.period = 16;
+            declared.words = 4;
+            declared.batch = 8;
+            let moire = Moire::draw(&MOIRE_FAMILY, MoireClass::Sheets, &mut Draw::new(13))
+                .expect("the moiré");
+            terrain(
+                "divergence",
+                declared,
+                moire_pairs(&moire, &declared, 14, 128),
                 moire_windows(&moire, &declared),
             );
         }

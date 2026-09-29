@@ -155,7 +155,9 @@ pub mod ring;
 pub mod word;
 
 pub use chart::{ChartKey, ChartReading, ChartStart, ChartWords, Charts, Remainders, WordLattice};
-pub use constitution::{Carrier, CarrierBits, Constitution, Lattice, Locus, NormalLaw, Steps};
+pub use constitution::{
+    Carrier, CarrierBits, Constitution, Lattice, Locus, NormalLaw, Reach, StepReading, Steps,
+};
 pub use contact::{
     BreakReceipt, ContactLock, ContactReading, KindCensus, LockDeclaration, SiteReading,
     contact_readings, site_kinds, site_readings,
@@ -329,6 +331,22 @@ pub enum HnnError {
     },
     #[error("the carried factor statistic h_x = {statistic} of {locus:?} is not positive")]
     FactorStatistic { locus: Locus, statistic: Rat },
+    #[error(
+        "the deposit's linear steps declare no reach: their certified step reads the stations, re-entries and ticks their covectors summed"
+    )]
+    MissingReach,
+    #[error(
+        "the deposit steps locus {locus:?} by more than one linear step; its certified step reads one window"
+    )]
+    RepeatedLinearStep { locus: Locus },
+    #[error(
+        "ring {ring}'s pumped resonator has no certified growth (its pumped stiffness may be indefinite; the Floquet bound is owed in #62): no linear step is certified through it"
+    )]
+    UncertifiedGain { ring: usize },
+    #[error(
+        "the deposit's storage growth is not certified: no dyadic ε in the declared search makes Q_(k+1) ⪯ (1 + ε) Q_k on the contacts' and resonators' storage forms"
+    )]
+    UncertifiedStorage,
     #[error("deposits stopped at commit {commit}, when the constitution reached its budget")]
     DepositsStopped { commit: u64 },
     #[error(

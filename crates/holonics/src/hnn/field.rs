@@ -1732,8 +1732,8 @@ impl Field {
     /// (`L_c`, `D_c`, `L_w`; none for the exact law), the recorded `n*`, the open's law with its
     /// population chart's lattice `L_ν` (ruling B), the gauge convention, the sign sequence's rule,
     /// the receiving law's code ([`RECEIVING_LAW`]) with the tree's Krichevsky–Trofimov prior `α`,
-    /// and the constitution's declared values (the
-    /// steps `γ_U` and `η_x`, the budget `B_Θ`) with the pending capacity, as Elias-gamma naturals,
+    /// and the constitution's declared values (the factor step `η_x`, the certified-step rule of
+    /// the normal laws, the budget `B_Θ`) with the pending capacity, as Elias-gamma naturals,
     /// zig-zag integers and rationals as (numerator, denominator). It is the one exact code of the
     /// declaration (guard 13), and `Kt` pays for every part of it (design (f), review D3).
     pub fn describe(&self, steps: &Steps, budget: u64, pending_capacity: usize) -> Vec<bool> {
@@ -1849,8 +1849,11 @@ impl Field {
         // The receiving law (the landmark tree) and the tree's Krichevsky–Trofimov prior `α = 1/2`.
         natural(&mut code, RECEIVING_LAW);
         rational(&mut code, &rat(1, 2));
+        // The normal laws' step rule: 1 names "the certified step" (`hnn::constitution`, "The
+        // certified step": the largest dyadic step its Gauss–Newton curvature along the ray and the
+        // lattice's covector bound admit). The declared proxy step it replaced is retired.
+        natural(&mut code, 1);
         // The constitution's declared values and the resident's pending capacity.
-        rational(&mut code, &steps.proxy);
         rational(&mut code, &steps.factor);
         natural(&mut code, budget);
         natural(&mut code, pending_capacity as u64);

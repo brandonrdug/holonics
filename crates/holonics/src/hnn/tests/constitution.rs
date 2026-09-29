@@ -16,8 +16,8 @@ use super::support::Draw;
 use crate::hnn::HnnError;
 use crate::hnn::constitution::{
     BudgetedCarry, Carrier, ChartRule, Constitution, DepositReading, FactorGradient, FactorStep,
-    Lattice, LinearLocus, LinearStep, Locus, NormalLaw, Sample, Steps, declared_sign, gamma_length,
-    refined_once,
+    Lattice, LinearLocus, LinearStep, Locus, NormalLaw, Reach, Sample, Steps, declared_sign,
+    gamma_length, refined_once,
 };
 use crate::hnn::field::{ConstitutionRead, Current};
 use crate::hnn::pending::PendingRatio;
@@ -645,13 +645,23 @@ fn entries(theta: &Constitution, locus: Locus, carrier: Carrier) -> Vec<Rat> {
 }
 
 /// **The exact updates of a deposit** per carried array (the laws of `NormalLaw::deposited` and
-/// the factor steps, recomputed): `ΔH = Σ w f fᵀ`, `ΔW = γ Σ w g (X̂f)ᵀ` at the successor's solved
-/// chart `X̂`, `Δh_x = Σ w|f|²` and `Δx = (η_x / h_x') G_x` at the successor's statistic.
-fn updates(deposit: &Deposit, next: &Constitution) -> Vec<((Locus, Carrier), Vec<Rat>)> {
+/// the factor steps, recomputed): `ΔH = Σ w f fᵀ`, `ΔW = η Σ w g (X̂f)ᵀ` at the successor's solved
+/// chart `X̂` and the locus's certified step `η` (zero where none was certified), `Δh_x = Σ w|f|²`
+/// and `Δx = (η_x / h_x') G_x` at the successor's statistic.
+fn updates(
+    deposit: &Deposit,
+    next: &Constitution,
+    reading: &DepositReading,
+) -> Vec<((Locus, Carrier), Vec<Rat>)> {
     let steps = next.steps();
     let mut out = Vec::new();
     for step in deposit.linear() {
         let locus = step.locus.locus();
+        let certified = reading
+            .steps
+            .iter()
+            .find(|(at, _)| *at == locus)
+            .map_or_else(Rat::zero, |(_, certified)| certified.step.step.clone());
         let law = match step.locus {
             LinearLocus::SourcePort(g) => next.source_law(g).unwrap(),
             LinearLocus::Contrast(g) => next.contrast_law(g),
@@ -675,7 +685,7 @@ fn updates(deposit: &Deposit, next: &Constitution) -> Vec<((Locus, Carrier), Vec
             }
             for i in 0..m {
                 for j in 0..n {
-                    map[i * n + j] += &steps.proxy * &s.weight * &s.covector[i] * &reach[j];
+                    map[i * n + j] += &certified * &s.weight * &s.covector[i] * &reach[j];
                 }
             }
         }
@@ -791,7 +801,7 @@ fn ledger(run: &[Deposited]) -> Ledger {
         arrays: Vec::new(),
     };
     for (_, deposit, next, reading) in run {
-        for (array, values) in updates(deposit, next) {
+        for (array, values) in updates(deposit, next, reading) {
             if !ledger.arrays.contains(&array) {
                 ledger.arrays.push(array);
             }
@@ -938,8 +948,8 @@ fn the_carried_gram_stays_positive_definite() {
     let grain = integer(16);
     let mut exact: BTreeMap<Locus, Vec<Rat>> = BTreeMap::new();
     let mut checked = 0;
-    for (_, deposit, next, _) in run {
-        for ((locus, carrier), values) in updates(deposit, next) {
+    for (_, deposit, next, reading) in run {
+        for ((locus, carrier), values) in updates(deposit, next, reading) {
             if carrier != Carrier::Gram {
                 continue;
             }
@@ -1105,10 +1115,11 @@ fn the_factor_carriers_stay_positive_semidefinite_with_no_clamp() {
 }
 
 /// Lean `HNN/Normal.reaction_deposit_storage_unchanged`: a deposit of reaction material and ports
-/// leaves contact C/K forms, so its contact growth is `ε_k = 0`; a contact storage deposit (the
-/// counterexample, `storage_deposit_does_work`) grows that contact-only bound.
+/// leaves every storage form (contacts' C/K, unpumped resonators' C/K), so its certified storage
+/// growth is `ε_k = 0`; a contact storage deposit (the counterexample, `storage_deposit_does_work`)
+/// grows it, and the product since the founding carries it.
 #[test]
-fn reaction_deposits_have_zero_contact_growth() {
+fn reaction_deposits_have_zero_storage_growth() {
     let field = chain();
     let theta = generic(&field, 9);
     let mut draw = Draw::new(10);
@@ -1127,9 +1138,10 @@ fn reaction_deposits_have_zero_contact_growth() {
             energy: Rat::one(),
         }],
         Vec::new(),
-    );
+    )
+    .with_reach(chain_reach());
     let (_, reading) = theta.deposited(&reaction).unwrap();
-    assert_eq!(reading.contact_growth, Some(Rat::zero()));
+    assert_eq!(reading.storage_growth, Rat::zero());
     let k = field.contact(0).width();
     let storage = Deposit::new(
         0,
@@ -1144,11 +1156,8 @@ fn reaction_deposits_have_zero_contact_growth() {
         Vec::new(),
     );
     let (_, grown) = theta.deposited(&storage).unwrap();
-    assert!(
-        grown
-            .contact_growth
-            .is_none_or(|epsilon| epsilon > Rat::zero())
-    );
+    assert!(grown.storage_growth > Rat::zero());
+    assert_eq!(grown.storage_product, Rat::one() + &grown.storage_growth);
 }
 
 /// Design (d), the budget and stop rule: a deposit whose successor exceeds `B_Θ` is refused with
@@ -1340,6 +1349,18 @@ fn a_deposit_reaches_only_the_diamond_and_sums_only_its_window() {
     }
 }
 
+/// **A hand-built deposit's reach** on the chain (its receiver ring 2 read at ticks 1 and 2, the
+/// moment entering once at the open, one phase), the certified step's reading of a window a compare
+/// did not compose.
+fn chain_reach() -> Reach {
+    Reach {
+        receiver: 2,
+        stations: vec![1, 2],
+        entries: vec![0],
+        phases: 1,
+    }
+}
+
 /// A deposit staged at one commit is refused at another: `E` is never mixed across two cuts.
 #[test]
 fn a_stale_deposit_is_refused() {
@@ -1355,7 +1376,8 @@ fn a_stale_deposit_is_refused() {
         }],
         Vec::new(),
         Vec::new(),
-    );
+    )
+    .with_reach(chain_reach());
     let (next, _) = theta.deposited(&deposit).unwrap();
     assert_eq!(
         next.deposited(&deposit),
