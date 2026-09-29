@@ -583,7 +583,12 @@ branch; intervals that do not shorten the charged code are recorded and not adop
     524,009 cells in 11 conversations: 523,404 bytes and 605 letters). Its letters are 52 responses'
     ends, 214 record boundaries, 329 turns, no switch and 10 openings.
   - *The code, charged*: the candidate `1023189 + 2/16 + ε`, the control `1027201 + 2/16 + ε`, the
-    difference `−4013 + 15/16 + ε`, below `−534`. **The acceptance holds.** The terms:
+    difference `−4013 + 15/16 + ε`, below `−534`. **The acceptance holds.** [primary's note] Its scale:
+    both sides code near `1 + 15/16` bits a byte, and the gain is under one bit in 128 cells. Its
+    reach: the 11 conversations are unread by this run's choosing role, but F0's choosing role read
+    all 87 development conversations and the candidate's settings were swept on material holding
+    them, so this is a within-development measurement; only the evaluation partition (F5's) and
+    conversations newer than the capture are unread by every run. The terms:
     - bytes `−3560 + 8/16 + ε` (agent `−3144 + 14/16 + ε`, human `−417 + 10/16 + ε`);
     - letters `−793 + 15/16 + ε`: record boundaries `−310 + 11/16 + ε`, turns `−560 + 13/16 + ε`,
       a response's end `+55 + 6/16 + ε` (its end `+147 + 5/16 + ε`), openings `+21 + 0/16 + ε`;
