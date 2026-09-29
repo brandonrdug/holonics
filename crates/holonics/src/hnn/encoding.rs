@@ -1,14 +1,16 @@
 //! **Holonic Encoding: a passage chart's minimal realization, founded by closing the receiving
-//! forms under the field's own transports** (THE_REBUILD U6; the
-//! [pin](../../../../research/records/2026-09-29_HOLONIC_ENCODING_FOR_THE_FIELD_PINNED_BEFORE_ITS_RUN.md);
+//! forms under the passage's own transports** (THE_REBUILD U6; the
+//! [pin](../../../../research/records/2026-09-29_HOLONIC_ENCODING_FOR_THE_FIELD_PINNED_BEFORE_ITS_RUN.md)
+//! and the [pin of the passage's own transports](../../../../research/records/2026-09-29_THE_PASSAGES_OWN_TRANSPORTS_PINNED_BEFORE_ITS_RUNS.md);
 //! `docs/HNN_FORMULA.md`, "Holonic Encoding"; the September 11
 //! [encoding record](../../../../research/records/2026-09-11_HOLONIC_ENCODING_RETAINS_TRANSFORMATION_GRAIN_ACROSS_MODALITIES.md);
-//! Lean `HNN/Encoding`; #73, #63).
+//! Lean `HNN/Encoding`; #73, #148, #63).
 //!
 //! [definition; agent-inferred] **The passage chart** ([`PassageChart`]): a finite chart `ℚ^n`,
-//! the admitted transports `T_a` (known: made of the field's own objects, the rings' rotor steps,
-//! their reflectors and selective clock), the injection `B e_u` of each exterior cell `u`, the
-//! receiving forms `ρ_c` (the coupling the decoder reads) and the openings `x_0`.
+//! its admitted transports `T_a` (known), the injection `B e_u` of each exterior cell `u`, the
+//! receiving forms `ρ_c` (the coupling the decoder reads) and the openings `x_0`. The terrains'
+//! charts declare the field's own objects as transports (the rings' rotor steps, their reflectors
+//! and selective clock); a passage's own chart declares none ([`PassageChart::passage`]).
 //!
 //! [proved-derived; formal-checked for the laws, `HNN/Encoding` and `Compression/Landmark/Context/Birth`]
 //! **The founding** ([`Encoding::found`]) is the minimal realization, founded twice by the one owner
@@ -23,9 +25,9 @@
 //! E x = (ψ_i(coordinates_R x))_i,  E T_a = U_a E,  D E = ρ,  J e_u = E B e_u
 //! ```
 //!
-//! Its dimension is the emission's observable dimension on the reached orbit: `R` is reachable by
-//! construction, and on it `E` keeps exactly what the receiving forms separate under the admitted
-//! transports (the Hankel rank; the identification is owed in #62, "Birth"). Birth alone closes
+//! Its dimension is the rank of the chart's Hankel map on the reached span: `R` is reachable by
+//! construction, and on it `E` merges exactly the directions every reading `ρ T_w` merges
+//! (Lean `HNN/Encoding.{hankel_identification, forms_span_kernel}`). Birth alone closes
 //! observability on the whole chart, so its dimension can exceed the Hankel rank by forms silent on
 //! the reached orbit; the reached restriction removes them.
 //!
@@ -45,31 +47,64 @@
 //! E (T_a r_j + B e_u) = U_a E r_j + J e_u          the injection square (the moment's one-step law)
 //! ```
 //!
-//! [definition; agent-inferred] **The field's port chart** ([`found_ports`]). On the exterior chart
-//! the field knows no transport but the identity, so the founding of a passage reaches exactly the
-//! passage's cells, each its own constituent, and the cells the passage never separates are one
-//! plural fibre. Each constituent is **placed** on each ring at the ring's phase class at its first
-//! arrival, read on the field's own selective clock while the chart is founded (the winding guide's
-//! placement; a cell's port reads only the cells before its first arrival, so the chart is a causal
-//! function of the founding passage). The plural fibre sits at the least port outside each ring's
-//! lock: it carries no founded transport and steps no ring by its lock. No codec value enters: the
-//! codec supplies the exterior alphabet and its decoder, and the rings' own clocks place what the
-//! passage founds (the governing law "No catered machinery").
+//! [definition; agent-inferred, U6] **The passage's own transports** ([`ContextClasses`],
+//! [`PassageChart::passage`]; Brandon: "a source word is its address"). A passage's **context
+//! classes** are the contexts `p` (the words ending somewhere in it) with one set of end positions,
+//! reached from the opening (the empty context) by the cells' **right actions** `T_u e_p = e_(pu)`
+//! (Nerode's right congruence of the passage; a closed cycle's positions are read modulo its
+//! period, so its ends add no edge). The receiving forms are the one-cell continuation counts
+//! `ρ_c(p) = N(pc)` in the passage, so `T_u* ρ_s = ρ_(us)`, and the founding is the passage's
+//! **Hankel realization**, `E p = (N(p s_i))_i` with `E T_u = U_u E` and `D E = ρ`, its dimension the
+//! rank of the count Hankel matrix `[N(ps)]`. The **unconditioned tick** `T = Σ_u T_u` (the right
+//! action of any next cell, [`PassageChart::unconditioned`]) is the passage's own clock: opened at a
+//! context that fixes the phase, its founding is the emission's shift realization, the rotor's.
+//! No transport is declared; the passage's cells are its only data.
+//!
+//! [definition; agent-inferred, U6] **The charged founding** ([`found_passage`]; the second clause).
+//! Founded exactly, a finite passage's realization is an index: its rank is the passage's length
+//! (every position is a context class of its own prefix). So a class is kept only where it shortens
+//! the charged code, by the population's laws: the reach closure's ladder from the opening, one rung
+//! a cell's right action on the classes born at the rung before; each class a rung reaches is
+//! **born** only when `merge_cost_mass_iff` read from the birth's side accepts it
+//! (`receiver::population::birth_price`): the founding passage's KT code over the founded classes'
+//! own continuations, plus the newborn's draw from the reserved mass `2^(−ℓ)`, `ℓ = 2 log₂(|A_R| + 1)`
+//! (its address in the ladder: its cell among the `|A_R|` reached cells or a stop, and its own stop),
+//! falls. [agent-inferred] Why this charge: it is the ladder's own prefix code, decodable without
+//! the passage, and it prices a class by what it adds to the description, as the restaurant prices
+//! a merge. A class not born stays in its parent's class (its Preimage Fibre). The **founded
+//! machine** reads a cell from a class: the class of the cell's right action, escaping to the
+//! parent where the context never met the cell, then the deepest born class containing it. No
+//! vocabulary, segmentation, window, depth or frequency rank is declared: the ladder stops when a
+//! rung founds nothing, and within a rung the proposal is ordered by the price's gain, never
+//! accepted by it. Birth's closure then founds the machine's minimal realization, which merges the
+//! classes no reading separates.
+//!
+//! [definition; agent-inferred] **The field's port chart** ([`found_ports`]). The founded classes
+//! are the field's step codes: each is **placed** on each ring at the ring's phase class at its
+//! first arrival, read on the field's own selective clock as the founded machine reads the founding
+//! passage (the winding guide's placement; a class's port reads only the cells before its first
+//! arrival, so the chart is a causal function of the founding passage), and a ring ticks when a
+//! founded class placed at its notch recurs. The codes the passage never met are one plural fibre at
+//! the least port outside each ring's lock. No codec value enters: the codec supplies the exterior
+//! alphabet and its decoder (the governing law "No catered machinery").
 //!
 //! [definition] The computational object is the helical pair interaction. Of the winding guide's six
-//! general objects this owner touches four: the **helix** (the rings' rotor steps and the selective
-//! clock, on which the source enters and constituents are placed), the **pair** (the offset moment
-//! the injection square carries, through the moment chart), **faces and placement** (`D`, the
-//! constituents' ports and each constituent's placement on a ring) and the **tower thread** (the
-//! carry chain the selective clock reads, which the crib's chart carries across rings). The cell
-//! holonomy and the tube stay attached through `Field::holarchy` and the word.
+//! general objects this owner touches: **faces and placement** (`D`, the founded forms, each class's
+//! placement on a ring), the **helix** (the transports' windings: the passage's right actions and
+//! the rings' selective clock on which the founded classes are placed) and the **tower thread** (the
+//! founded classes coarsening: a class not born restricts to its parent). The pair (the offset
+//! moment the injection square carries), the cell holonomy and the tube stay attached through the
+//! moment chart, `Field::holarchy` and the word.
 //!
 //! | Lean | Rust |
 //! |---|---|
 //! | `Compression/Landmark/Context/Birth.{founding_intertwines, encode_reads, encode_iterate, founded_reads_iterate, silent_invariant}` | [`Encoding::found`] through `birth::Closure` |
+//! | `HNN/Encoding.{hankel_identification, forms_span_kernel, hankel_rank_eq}` | [`Encoding::dimension`] against the count Hankel rank (`hnn::tests::encoding`) |
+//! | `HNN/Encoding.continuation_intertwines` | [`PassageChart::passage`] (`T_u* ρ_s = ρ_(us)`) |
 //! | `HNN/Encoding.injection_square` | [`Encoding::squares`] (the injection square) |
-//! | `HNN/Encoding.encoding_reduced_recurrence` | [`Encoding::reduced_moment`] |
+//! | `HNN/Encoding.encoding_reduced_recurrence` | [`Encoding::reduced_moment`], `hnn::field::FoundedMachine` |
 //! | `HNN/Encoding.encoding_separator` | [`Encoding::fibre`], [`Encoding::separator`] |
+//! | `Compression/Landmark/Context/Merge.merge_cost_mass_iff` | [`found_passage`] through `receiver::population::birth_price` |
 
 use std::collections::BTreeMap;
 
@@ -77,17 +112,21 @@ use num_bigint::{BigInt, BigUint};
 use num_traits::{One, ToPrimitive, Zero};
 use thiserror::Error;
 
+use crate::compression::landmark::context::ratio_code_length;
 use crate::hnn::HnnError;
-use crate::hnn::field::{Current, Field, PortChart, PortChartKind, ring_digit};
+use crate::hnn::field::{Current, Field, FoundedMachine, PortChart, PortChartKind, ring_digit};
 use crate::holarchy::terrain::{Grating, MoireClass, TerrainError};
 use crate::holon::HolonError;
 use crate::holon::contact::menu::{MenuError, PortPermutation};
 use crate::holon::restriction::PreimageFibre;
 use crate::navigator::Navigator;
 use crate::ratio::Rat;
+use crate::ratio::algebraic::ExactInterval;
 use crate::ratio::linear::vector::{dot, matrix};
 use crate::ratio::linear::{ExactLinearError, ExactRatMatrix};
-use crate::receiver::population::{BirthError, Closure, TransportBirth};
+use crate::receiver::population::{
+    BirthError, Closure, KtTables, PopulationError, TransportBirth, birth_price, partition_code,
+};
 
 /// Every refusal of the encoding. Bad input is a typed return, never a panic.
 #[derive(Debug, Error, PartialEq)]
@@ -114,6 +153,9 @@ pub enum EncodingError {
     /// Boxed: a terrain's refusals are wide.
     #[error(transparent)]
     Terrain(Box<TerrainError>),
+    /// Boxed: the population's refusals are wide (the priced birth).
+    #[error(transparent)]
+    Population(Box<PopulationError>),
 }
 
 impl From<HnnError> for EncodingError {
@@ -437,20 +479,105 @@ impl PassageChart {
         Self::new(chart, transports, injection.clone(), coupling, injection)
     }
 
-    /// **The exterior chart of a founding passage** ([`found_ports`]): `ℚ^|A|`, the identity its only
-    /// transport (the field knows no transport on the exterior chart), each cell injected as its
-    /// one-hot, read by its class, opened at the cells the passage reaches in first-arrival order.
-    pub fn exterior(alphabet: usize, arrivals: &[usize]) -> Result<Self, EncodingError> {
-        if arrivals.iter().any(|&cell| cell >= alphabet) {
-            return Err(chart_refusal("a reached cell lies inside the exterior chart"));
-        }
-        let cells: Vec<Vec<Rat>> = (0..alphabet).map(|cell| unit(alphabet, cell)).collect();
+    /// **The passage's own chart** (module header, "The passage's own transports"): its reached
+    /// context classes, each reached cell's right action `T_u e_p = e_(pu)` (a transport per reached
+    /// cell, in first-arrival order), the injection `B e_u = e_[u]` (the one-cell context), the
+    /// one-cell continuation counts `ρ_c(p) = N(pc)` and the opening at the empty context. Dense:
+    /// for a passage whose classes are few (a closed cycle, a terrain's emission); a text passage is
+    /// founded through [`found_passage`] instead.
+    pub fn passage(classes: &ContextClasses) -> Result<Self, EncodingError> {
+        let n = classes.len();
+        let letters = classes.letters().len();
+        let transports = (0..letters)
+            .map(|letter| {
+                matrix(n, n, |row, column| {
+                    if classes.next(column, letter) == Some(row) {
+                        Rat::one()
+                    } else {
+                        Rat::zero()
+                    }
+                })
+            })
+            .collect::<Result<Vec<_>, _>>()?;
+        let injection = (0..letters)
+            .map(|letter| {
+                let class = classes
+                    .next(ContextClasses::OPENING, letter)
+                    .ok_or_else(|| chart_refusal("a reached cell follows the empty context"))?;
+                Ok(unit(n, class))
+            })
+            .collect::<Result<Vec<_>, EncodingError>>()?;
         Self::new(
-            alphabet,
-            vec![ExactRatMatrix::identity(alphabet)?],
-            cells.clone(),
-            cells,
-            arrivals.iter().map(|&cell| unit(alphabet, cell)).collect(),
+            n,
+            transports,
+            injection,
+            classes.continuations(),
+            vec![unit(n, ContextClasses::OPENING)],
+        )
+    }
+
+    /// **The passage's unconditioned tick** (module header): one transport `T = Σ_u T_u`, the right
+    /// action of any next cell, the passage's own clock, the same receiving forms, opened at the
+    /// class `opening` (a context that fixes the phase, where the tick is the emission's shift).
+    pub fn unconditioned(classes: &ContextClasses, opening: usize) -> Result<Self, EncodingError> {
+        let n = classes.len();
+        if opening >= n {
+            return Err(chart_refusal(
+                "the opening is a context class of the passage",
+            ));
+        }
+        let letters = classes.letters().len();
+        let tick = matrix(n, n, |row, column| {
+            let into = (0..letters)
+                .filter(|&letter| classes.next(column, letter) == Some(row))
+                .count();
+            Rat::from_integer(BigInt::from(into))
+        })?;
+        Self::new(
+            n,
+            vec![tick],
+            Vec::new(),
+            classes.continuations(),
+            vec![unit(n, opening)],
+        )
+    }
+
+    /// **The founded machine's chart** (module header, "The charged founding"): the born classes,
+    /// each reached cell's action on them (`T_u e_z = e_(machine(z, u))`), the injection at the
+    /// class each cell reaches from the opening, each class's own continuation counts as the
+    /// receiving forms (the founded receiver's face reads them), and the opening class.
+    pub fn founded(founding: &PassageFounding) -> Result<Self, EncodingError> {
+        let n = founding.classes.len();
+        let letters = founding.letters.len();
+        let transports = (0..letters)
+            .map(|letter| {
+                matrix(n, n, |row, column| {
+                    if founding.next[column][letter] == row {
+                        Rat::one()
+                    } else {
+                        Rat::zero()
+                    }
+                })
+            })
+            .collect::<Result<Vec<_>, _>>()?;
+        let injection = (0..letters)
+            .map(|letter| unit(n, founding.next[PassageFounding::OPENING][letter]))
+            .collect();
+        let coupling = (0..letters)
+            .map(|letter| {
+                founding
+                    .counts
+                    .iter()
+                    .map(|row| Rat::from_integer(BigInt::from(row[letter])))
+                    .collect()
+            })
+            .collect();
+        Self::new(
+            n,
+            transports,
+            injection,
+            coupling,
+            vec![unit(n, PassageFounding::OPENING)],
         )
     }
 }
@@ -832,119 +959,677 @@ impl Encoding {
 }
 
 // -------------------------------------------------------------------------------------------
+// the passage's context classes
+
+/// [definition; agent-inferred, U6] **A passage's reached context classes** (module header, "The
+/// passage's own transports"): the contexts with one set of end positions, reached from the empty
+/// context by the cells' right actions; each class's ends, its right action on each reached cell
+/// (the class of the contexts it holds followed by the cell), and its **parent**, the least class
+/// strictly containing its ends (its shorter contexts). The classes of a finite word are its index:
+/// they are read while a passage is founded ([`found_passage`]) and never kept as standing.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct ContextClasses {
+    cells: Vec<usize>,
+    cyclic: bool,
+    letters: Vec<usize>,
+    letter_of: BTreeMap<usize, usize>,
+    ends: Vec<Vec<usize>>,
+    next: Vec<Vec<Option<usize>>>,
+    parent: Vec<Option<usize>>,
+}
+
+impl ContextClasses {
+    /// The opening class, the empty context (it ends at every position).
+    pub const OPENING: usize = 0;
+
+    /// **A word's classes**: its positions `0 … n`, position `e` the context of the first `e`
+    /// cells. Refused on an empty passage.
+    pub fn linear(cells: &[usize]) -> Result<Self, EncodingError> {
+        Self::build(cells, false)
+    }
+
+    /// **A closed cycle's classes**: its positions `ℤ/P` for the cycle's `P` cells, so its ends add
+    /// no edge effects. Refused on an empty cycle.
+    pub fn cycle(cells: &[usize]) -> Result<Self, EncodingError> {
+        Self::build(cells, true)
+    }
+
+    /// The subset construction from the opening, each class's ends bucketed by the next cell, and
+    /// the parents read from the laminar family (two classes that share an end are nested, so the
+    /// classes holding one position form a chain by size).
+    fn build(cells: &[usize], cyclic: bool) -> Result<Self, EncodingError> {
+        if cells.is_empty() {
+            return Err(chart_refusal("a passage holds at least one cell"));
+        }
+        let n = cells.len();
+        let mut letters = Vec::new();
+        let mut letter_of: BTreeMap<usize, usize> = BTreeMap::new();
+        for &cell in cells {
+            if let std::collections::btree_map::Entry::Vacant(entry) = letter_of.entry(cell) {
+                entry.insert(letters.len());
+                letters.push(cell);
+            }
+        }
+        let read: Vec<usize> = cells.iter().map(|cell| letter_of[cell]).collect();
+        let positions = if cyclic { n } else { n + 1 };
+        let root: Vec<usize> = (0..positions).collect();
+        let mut index: BTreeMap<Vec<usize>, usize> = BTreeMap::new();
+        index.insert(root.clone(), Self::OPENING);
+        let mut ends = vec![root];
+        let mut next: Vec<Vec<Option<usize>>> = vec![vec![None; letters.len()]];
+        let mut queue = std::collections::VecDeque::from([Self::OPENING]);
+        while let Some(class) = queue.pop_front() {
+            let mut buckets: Vec<Vec<usize>> = vec![Vec::new(); letters.len()];
+            for &end in &ends[class] {
+                if end < n {
+                    buckets[read[end]].push(if cyclic { (end + 1) % n } else { end + 1 });
+                }
+            }
+            for (letter, mut bucket) in buckets.into_iter().enumerate() {
+                if bucket.is_empty() {
+                    continue;
+                }
+                bucket.sort_unstable();
+                let target = match index.get(&bucket) {
+                    Some(&target) => target,
+                    None => {
+                        let target = ends.len();
+                        index.insert(bucket.clone(), target);
+                        ends.push(bucket);
+                        next.push(vec![None; letters.len()]);
+                        queue.push_back(target);
+                        target
+                    }
+                };
+                next[class][letter] = Some(target);
+            }
+        }
+        let mut order: Vec<usize> = (0..ends.len()).collect();
+        order.sort_by_key(|&class| (ends[class].len(), class));
+        let mut chains: Vec<Vec<usize>> = vec![Vec::new(); positions];
+        let mut place = vec![0usize; ends.len()];
+        for &class in &order {
+            place[class] = chains[ends[class][0]].len();
+            for &end in &ends[class] {
+                chains[end].push(class);
+            }
+        }
+        let parent = (0..ends.len())
+            .map(|class| chains[ends[class][0]].get(place[class] + 1).copied())
+            .collect();
+        Ok(Self {
+            cells: cells.to_vec(),
+            cyclic,
+            letters,
+            letter_of,
+            ends,
+            next,
+            parent,
+        })
+    }
+
+    /// The count of classes.
+    pub fn len(&self) -> usize {
+        self.ends.len()
+    }
+
+    /// Never empty: the opening is a class.
+    pub fn is_empty(&self) -> bool {
+        self.ends.is_empty()
+    }
+
+    /// The reached cells, in first-arrival order (the transports' index).
+    pub fn letters(&self) -> &[usize] {
+        &self.letters
+    }
+
+    /// The letter (first-arrival index) of an exterior cell the passage reached.
+    pub fn letter(&self, cell: usize) -> Option<usize> {
+        self.letter_of.get(&cell).copied()
+    }
+
+    /// **The right action** of a reached cell on a class: the class of its contexts followed by the
+    /// cell, none where no context of the class is followed by it.
+    pub fn next(&self, class: usize, letter: usize) -> Option<usize> {
+        self.next.get(class)?.get(letter).copied().flatten()
+    }
+
+    /// The parent: the least class strictly containing the class's ends; none at the opening.
+    pub fn parent(&self, class: usize) -> Option<usize> {
+        self.parent.get(class).copied().flatten()
+    }
+
+    /// A class's end positions, ascending.
+    pub fn ends(&self, class: usize) -> &[usize] {
+        &self.ends[class]
+    }
+
+    /// **The class a word reaches from the opening**, none where the word never occurs.
+    pub fn read(&self, cells: &[usize]) -> Option<usize> {
+        cells.iter().try_fold(Self::OPENING, |class, &cell| {
+            self.next(class, self.letter(cell)?)
+        })
+    }
+
+    /// `N(pc)`: the occurrences of a class's contexts followed by a reached cell.
+    pub fn count(&self, class: usize, letter: usize) -> u64 {
+        self.next(class, letter)
+            .map_or(0, |target| self.ends[target].len() as u64)
+    }
+
+    /// **The receiving forms** `ρ_c(p) = N(pc)`, one per reached cell, over the classes.
+    pub fn continuations(&self) -> Vec<Vec<Rat>> {
+        (0..self.letters.len())
+            .map(|letter| {
+                (0..self.len())
+                    .map(|class| Rat::from_integer(BigInt::from(self.count(class, letter))))
+                    .collect()
+            })
+            .collect()
+    }
+
+    /// **The length of a class's longest context**: its contexts extended to the left while every
+    /// occurrence agrees (at most the passage's length on a cycle).
+    pub fn longest(&self, class: usize) -> usize {
+        let n = self.cells.len();
+        let ends = &self.ends[class];
+        let mut length = 0usize;
+        while length < n {
+            let mut agreed: Option<usize> = None;
+            let mut extends = true;
+            for &end in ends {
+                let before = if self.cyclic {
+                    (end + 2 * n - length - 1) % n
+                } else if end > length {
+                    end - length - 1
+                } else {
+                    extends = false;
+                    break;
+                };
+                match agreed {
+                    None => agreed = Some(self.cells[before]),
+                    Some(cell) if cell == self.cells[before] => {}
+                    Some(_) => {
+                        extends = false;
+                        break;
+                    }
+                }
+            }
+            if !extends {
+                break;
+            }
+            length += 1;
+        }
+        length
+    }
+
+    /// **A class's longest context**, its cells (read at its first end).
+    pub fn word(&self, class: usize) -> Vec<usize> {
+        let length = self.longest(class);
+        let n = self.cells.len();
+        let end = self.ends[class][0];
+        (0..length)
+            .map(|k| {
+                let at = if self.cyclic {
+                    (end + n * (length / n + 1) - length + k) % n
+                } else {
+                    end - length + k
+                };
+                self.cells[at]
+            })
+            .collect()
+    }
+
+    /// **One founded machine's step** (module header, "The charged founding"): the right action of
+    /// a reached cell on the class, escaping to the parent where no context of the class met it,
+    /// then the deepest class `born` holds that contains it.
+    fn machine_step(&self, born: &[bool], class: usize, letter: usize) -> usize {
+        let mut from = class;
+        let mut reached = loop {
+            if let Some(target) = self.next(from, letter) {
+                break target;
+            }
+            match self.parent(from) {
+                Some(parent) => from = parent,
+                // The opening meets every reached cell.
+                None => break Self::OPENING,
+            }
+        };
+        while !born[reached] {
+            reached = self.parent(reached).unwrap_or(Self::OPENING);
+        }
+        reached
+    }
+}
+
+// -------------------------------------------------------------------------------------------
+// the charged founding
+
+/// [definition] **A founded class's receipt**: its longest context (its expansion: its contexts
+/// are the suffixes of it at least `shortest` cells long, a plural fibre of words with one set of
+/// ends), the occurrences of its contexts in the founding passage, and the cells the founded
+/// machine read at it.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct FoundedClass {
+    pub word: Vec<usize>,
+    pub shortest: usize,
+    pub occurrences: u64,
+    pub visits: u64,
+}
+
+/// [definition] **One rung of the charged ladder**: the classes it reached, the classes born, and
+/// the prices left undecided (their bounds overlapped; not born).
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub struct Rung {
+    pub candidates: usize,
+    pub born: usize,
+    pub undecided: usize,
+}
+
+/// [definition; agent-inferred, U6] **The charged founding of a passage** (module header, "The
+/// charged founding"): the reached cells, the founded classes in the order the machine first reads
+/// them (the opening first), the machine `next[z][u]` over the reached cells, each class's own
+/// continuation counts, the ladder's rungs, the passage's KT code at the opening alone and over the
+/// founded classes, the classes' description, and the born classes the final machine never read
+/// (returned to their parents: nothing read them, so no code moved).
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct PassageFounding {
+    passage: usize,
+    alphabet: usize,
+    letters: Vec<usize>,
+    letter_of: BTreeMap<usize, usize>,
+    classes: Vec<FoundedClass>,
+    next: Vec<Vec<usize>>,
+    counts: Vec<Vec<u64>>,
+    rungs: Vec<Rung>,
+    code: [ExactInterval; 2],
+    description: ExactInterval,
+    returned: usize,
+}
+
+impl PassageFounding {
+    /// The opening class (the empty context).
+    pub const OPENING: usize = 0;
+
+    /// The founding passage's length.
+    pub fn passage(&self) -> usize {
+        self.passage
+    }
+
+    /// The exterior chart `|A|`.
+    pub fn alphabet(&self) -> usize {
+        self.alphabet
+    }
+
+    /// The reached cells, in first-arrival order.
+    pub fn letters(&self) -> &[usize] {
+        &self.letters
+    }
+
+    /// The founded classes, the opening first.
+    pub fn classes(&self) -> &[FoundedClass] {
+        &self.classes
+    }
+
+    /// `next[z][u]`: the class the machine reaches from class `z` on reached cell `u`.
+    pub fn next(&self) -> &[Vec<usize>] {
+        &self.next
+    }
+
+    /// Each class's continuation counts over the reached cells.
+    pub fn counts(&self) -> &[Vec<u64>] {
+        &self.counts
+    }
+
+    /// The ladder's rungs.
+    pub fn rungs(&self) -> &[Rung] {
+        &self.rungs
+    }
+
+    /// `−log₂ W` of the founding passage at the opening alone and over the founded classes.
+    pub fn code(&self) -> &[ExactInterval; 2] {
+        &self.code
+    }
+
+    /// The founded classes' description, `(2K − 1) log₂(|A_R| + 1)` bits, enclosed.
+    pub fn description(&self) -> &ExactInterval {
+        &self.description
+    }
+
+    /// The born classes the final machine never read, returned to their parents.
+    pub fn returned(&self) -> usize {
+        self.returned
+    }
+
+    /// **One cell's founded step** from class `state`: the class it reaches, or none for a cell the
+    /// founding passage never met (the plural fibre, after which the machine stands at the opening).
+    /// Refused outside the exterior chart.
+    pub fn step(&self, state: &mut usize, cell: usize) -> Result<Option<usize>, EncodingError> {
+        if cell >= self.alphabet {
+            return Err(HnnError::CellOutside {
+                code: cell,
+                alphabet: self.alphabet,
+            }
+            .into());
+        }
+        let row = self.next.get(*state).ok_or(EncodingError::Unreached)?;
+        match self.letter_of.get(&cell) {
+            Some(&letter) => {
+                *state = row[letter];
+                Ok(Some(*state))
+            }
+            None => {
+                *state = Self::OPENING;
+                Ok(None)
+            }
+        }
+    }
+}
+
+/// The founded machine's run over the passage (its letters): each born class's continuation counts
+/// over the reached cells and the fibre (the fibre never read here).
+fn machine_counts(
+    classes: &ContextClasses,
+    born: &[bool],
+    read: &[usize],
+    symbols: usize,
+) -> BTreeMap<usize, Vec<u64>> {
+    let mut counts: BTreeMap<usize, Vec<u64>> = born
+        .iter()
+        .enumerate()
+        .filter(|(_, born)| **born)
+        .map(|(class, _)| (class, vec![0u64; symbols]))
+        .collect();
+    let mut state = ContextClasses::OPENING;
+    for &letter in read {
+        if let Some(row) = counts.get_mut(&state) {
+            row[letter] += 1;
+        }
+        state = classes.machine_step(born, state, letter);
+    }
+    counts
+}
+
+fn blocks(counts: &BTreeMap<usize, Vec<u64>>) -> Vec<Vec<u64>> {
+    counts.values().cloned().collect()
+}
+
+/// **The charged founding of a passage** (module header, "The charged founding"): the passage's
+/// context classes, the reach ladder from the opening with each reached class born only where the
+/// population's priced birth accepts it (`receiver::population::birth_price`, over the KT faces of
+/// `|A_R| + 1` classes, the reached cells and the fibre, at the charge `(|A_R| + 1)²`), the born
+/// classes the final machine never reads returned to their parents, and the machine read over the
+/// founded classes. Refused on an empty passage or a cell outside the exterior chart.
+pub fn found_passage(cells: &[usize], alphabet: usize) -> Result<PassageFounding, EncodingError> {
+    if let Some(&cell) = cells.iter().find(|&&cell| cell >= alphabet) {
+        return Err(HnnError::CellOutside {
+            code: cell,
+            alphabet,
+        }
+        .into());
+    }
+    let classes = ContextClasses::linear(cells)?;
+    let letters = classes.letters().len();
+    let symbols = letters + 1;
+    let mut tables = KtTables::new(symbols).map_err(population)?;
+    let charge = BigUint::from(symbols).pow(2);
+    let read: Vec<usize> = cells
+        .iter()
+        .map(|&cell| classes.letter(cell).ok_or(EncodingError::Unreached))
+        .collect::<Result<_, _>>()?;
+    let mut born = vec![false; classes.len()];
+    born[ContextClasses::OPENING] = true;
+    let mut counts = machine_counts(&classes, &born, &read, symbols);
+    let opening_code = partition_code(&mut tables, &blocks(&counts)).map_err(population)?;
+    let mut rungs = Vec::new();
+    let mut frontier = vec![ContextClasses::OPENING];
+    while !frontier.is_empty() {
+        let mut candidates: Vec<usize> = Vec::new();
+        for &class in &frontier {
+            for letter in 0..letters {
+                if let Some(target) = classes.next(class, letter)
+                    && !born[target]
+                    && !candidates.contains(&target)
+                {
+                    candidates.push(target);
+                }
+            }
+        }
+        // First-arrival order: blind to the codec's values.
+        candidates.sort_by_key(|&class| (classes.ends(class)[0], class));
+        let mut undecided = 0usize;
+        let mut proposed: Vec<(Rat, usize)> = Vec::new();
+        let before = blocks(&counts);
+        for &class in &candidates {
+            born[class] = true;
+            let after = machine_counts(&classes, &born, &read, symbols);
+            born[class] = false;
+            let price =
+                birth_price(&mut tables, &before, &blocks(&after), &charge).map_err(population)?;
+            match price.accepted {
+                Some(true) => proposed.push((price.gain.lower, class)),
+                None => undecided += 1,
+                Some(false) => {}
+            }
+        }
+        // The proposal: the largest gain first (its enclosure's lower end, exact), ties in
+        // first-arrival order; each is decided again against the classes born before it.
+        proposed.sort_by(|a, b| b.0.cmp(&a.0));
+        let mut newborn = Vec::new();
+        for (_, class) in proposed {
+            let before = blocks(&counts);
+            born[class] = true;
+            let after = machine_counts(&classes, &born, &read, symbols);
+            let price =
+                birth_price(&mut tables, &before, &blocks(&after), &charge).map_err(population)?;
+            match price.accepted {
+                Some(true) => {
+                    counts = after;
+                    newborn.push(class);
+                }
+                None => {
+                    born[class] = false;
+                    undecided += 1;
+                }
+                Some(false) => born[class] = false,
+            }
+        }
+        rungs.push(Rung {
+            candidates: candidates.len(),
+            born: newborn.len(),
+            undecided,
+        });
+        frontier = newborn;
+    }
+    // A born class the final machine never reads is returned to its parent: nothing read it, so the
+    // run and every other class's counts are unchanged.
+    let mut returned = 0usize;
+    loop {
+        let unread: Vec<usize> = counts
+            .iter()
+            .filter(|(class, row)| {
+                **class != ContextClasses::OPENING && row.iter().all(|&count| count == 0)
+            })
+            .map(|(class, _)| *class)
+            .collect();
+        if unread.is_empty() {
+            break;
+        }
+        for class in unread {
+            born[class] = false;
+            returned += 1;
+        }
+        counts = machine_counts(&classes, &born, &read, symbols);
+    }
+    let code = partition_code(&mut tables, &blocks(&counts)).map_err(population)?;
+    // The founded classes in the order the machine first reads them, the opening first.
+    let mut order: Vec<usize> = vec![ContextClasses::OPENING];
+    let mut state = ContextClasses::OPENING;
+    for &letter in &read {
+        state = classes.machine_step(&born, state, letter);
+        if !order.contains(&state) {
+            order.push(state);
+        }
+    }
+    let index_of: BTreeMap<usize, usize> = order
+        .iter()
+        .enumerate()
+        .map(|(index, &class)| (class, index))
+        .collect();
+    let next = order
+        .iter()
+        .map(|&class| {
+            (0..letters)
+                .map(|letter| index_of[&classes.machine_step(&born, class, letter)])
+                .collect()
+        })
+        .collect();
+    let founded_counts: Vec<Vec<u64>> = order
+        .iter()
+        .map(|class| counts[class][..letters].to_vec())
+        .collect();
+    let founded = order
+        .iter()
+        .zip(&founded_counts)
+        .map(|(&class, row)| FoundedClass {
+            word: classes.word(class),
+            shortest: classes
+                .parent(class)
+                .map_or(0, |parent| classes.longest(parent) + 1),
+            occurrences: classes.ends(class).len() as u64,
+            visits: row.iter().sum(),
+        })
+        .collect::<Vec<_>>();
+    let symbols_word = BigUint::from(symbols);
+    let description = ratio_code_length(
+        &BigUint::one(),
+        &symbols_word.pow(u32::try_from(2 * order.len() - 1).unwrap_or(u32::MAX)),
+    )
+    .map_err(|_| chart_refusal("the founded classes' description is a positive ratio"))?;
+    Ok(PassageFounding {
+        passage: cells.len(),
+        alphabet,
+        letters: classes.letters().to_vec(),
+        letter_of: classes.letter_of.clone(),
+        classes: founded,
+        next,
+        counts: founded_counts,
+        rungs,
+        code: [opening_code, code],
+        description,
+        returned,
+    })
+}
+
+fn population(error: PopulationError) -> EncodingError {
+    EncodingError::Population(Box::new(error))
+}
+
+// -------------------------------------------------------------------------------------------
 // the port chart
 
-/// [definition] **A founded port chart with its receipt** ([`found_ports`]): the chart, the
-/// exterior encoding it read, the constituents in first-arrival order (each a class of exterior
-/// cells), the plural fibre, and each constituent's placement on every ring.
+/// [definition] **A founded port chart with its receipt** ([`found_ports`]): the chart, the charged
+/// founding it read, Birth's closure on the founded machine's chart, the founded classes of each
+/// step code (the classes the closure keeps as one constituent), each constituent's placement on
+/// every ring, the constituents the founding passage never reached (placed at the fibre's port),
+/// and the exterior codes it never met (the plural fibre).
 #[derive(Clone, Debug, PartialEq)]
 pub struct FoundedPorts {
     pub chart: PortChart,
+    pub founding: PassageFounding,
     pub encoding: Encoding,
     pub constituents: Vec<Vec<usize>>,
-    pub fibre: Vec<usize>,
     pub placements: Vec<Vec<usize>>,
-    /// The constituent of each exterior cell; `None` in the plural fibre.
-    pub constituent_of: Vec<Option<usize>>,
+    pub unplaced: Vec<usize>,
+    pub fibre: Vec<usize>,
 }
 
 impl FoundedPorts {
-    /// **The recurrence of each constituent** over a passage: its cells' count, in first-arrival
-    /// order, and the plural fibre's count last.
-    pub fn recurrence(&self, passage: &[usize]) -> Vec<u64> {
-        let mut counts = vec![0u64; self.constituents.len() + 1];
+    /// **The recurrence of each step code** over a passage read from the opening: the cells that
+    /// reach each constituent, the plural fibre's last.
+    pub fn recurrence(&self, passage: &[usize]) -> Result<Vec<u64>, EncodingError> {
+        let machine = self.chart.machine().ok_or(EncodingError::Unreached)?;
+        let mut counts = vec![0u64; machine.fibre() + 1];
+        let mut state = machine.opening();
         for &cell in passage {
-            match self.constituent_of.get(cell).copied().flatten() {
-                Some(constituent) => counts[constituent] += 1,
-                None => counts[self.constituents.len()] += 1,
-            }
+            counts[machine.step(&mut state, cell)?] += 1;
         }
-        counts
+        Ok(counts)
     }
 }
 
 /// **The field's founded port chart on a founding passage** (module header, "The field's port
-/// chart"): the exterior chart's founding ([`PassageChart::exterior`], [`Encoding::found`]); each
+/// chart"): the charged founding ([`found_passage`]); Birth's closure on its machine's chart
+/// ([`PassageChart::founded`], [`Encoding::found`]), whose constituents are the step codes; each
 /// constituent placed on every ring at the ring's phase class at its first arrival, read on the
-/// field's own selective clock (`Field::step_at_ports`) from its declared initial configuration
-/// while the chart is founded; the plural fibre at the least port outside each ring's lock.
+/// field's own selective clock (`Field::step_at_ports`) from its declared initial configuration as
+/// the founded machine reads the founding passage; the fibre (and a constituent the passage never
+/// reached) at the least port outside each ring's lock.
 pub fn found_ports(field: &Field, passage: &[usize]) -> Result<FoundedPorts, EncodingError> {
     let alphabet = field.alphabet();
-    let mut arrivals = Vec::new();
-    let mut seen = vec![false; alphabet];
-    for &cell in passage {
-        if cell >= alphabet {
-            return Err(HnnError::CellOutside {
-                code: cell,
-                alphabet,
-            }
-            .into());
-        }
-        if !seen[cell] {
-            seen[cell] = true;
-            arrivals.push(cell);
-        }
-    }
-    if arrivals.is_empty() {
-        return Err(chart_refusal("the founding passage reaches no cell"));
-    }
-    let chart = PassageChart::exterior(alphabet, &arrivals)?;
+    let founding = found_passage(passage, alphabet)?;
+    let chart = PassageChart::founded(&founding)?;
     let encoding = Encoding::found(&chart)?;
-    // The constituents: the cells of one founded injection, ordered by their first arrival.
-    let mut constituent_of: Vec<Option<usize>> = vec![None; alphabet];
+    // The constituents: the founded classes with one founded configuration `E e_z`, in first
+    // arrival (the founded classes are in the machine's first-arrival order).
+    let classes = founding.classes.len();
+    let mut constituent_of = vec![0usize; classes];
+    let mut images: BTreeMap<Vec<Rat>, usize> = BTreeMap::new();
     let mut constituents: Vec<Vec<usize>> = Vec::new();
-    let mut fibre = Vec::new();
-    let classes = encoding.cells();
-    let mut class_of: Vec<Option<usize>> = vec![None; alphabet];
-    for (index, class) in classes.iter().enumerate() {
-        match &class.native {
-            Some(_) => {
-                for &cell in &class.members {
-                    class_of[cell] = Some(index);
+    for class in 0..classes {
+        let image = encoding.encode(&unit(classes, class))?;
+        let next = constituents.len();
+        let id = *images.entry(image).or_insert(next);
+        if id == constituents.len() {
+            constituents.push(Vec::new());
+        }
+        constituents[id].push(class);
+        constituent_of[class] = id;
+    }
+    // The machine on the constituents: `E T_u = U_u E` carries one constituent to one.
+    let fibre_step = constituents.len();
+    let mut next = vec![vec![fibre_step; alphabet]; constituents.len()];
+    for (id, members) in constituents.iter().enumerate() {
+        for (letter, &code) in founding.letters.iter().enumerate() {
+            let steps: std::collections::BTreeSet<usize> = members
+                .iter()
+                .map(|&class| constituent_of[founding.next[class][letter]])
+                .collect();
+            let step = match steps.len() {
+                1 => *steps.first().expect("one step"),
+                _ => {
+                    return Err(chart_refusal(
+                        "the classes of one constituent step to one constituent",
+                    ));
                 }
-            }
-            None => fibre = class.members.clone(),
+            };
+            next[id][code] = step;
         }
     }
-    let mut numbered: BTreeMap<usize, usize> = BTreeMap::new();
-    for &cell in &arrivals {
-        let class = class_of[cell].ok_or(EncodingError::Unreached)?;
-        let next = numbered.len();
-        let constituent = *numbered.entry(class).or_insert(next);
-        if constituent == constituents.len() {
-            constituents.push(classes[class].members.clone());
-        }
-        constituent_of[cell] = Some(constituent);
-    }
-    for (constituent, members) in constituents.iter().enumerate() {
-        for &cell in members {
-            constituent_of[cell] = Some(constituent);
-        }
-    }
+    let opening = constituent_of[PassageFounding::OPENING];
+    let machine = FoundedMachine::new(next, opening)?;
     // Placement at first arrival on the field's own clock.
     let rings = field.rings();
     let mut lift: Vec<BigInt> = Current::at_rest(field).lift().to_vec();
     let mut placements: Vec<Option<Vec<usize>>> = vec![None; constituents.len()];
+    let mut state = opening;
     for &cell in passage {
-        let constituent = constituent_of[cell].ok_or(EncodingError::Unreached)?;
-        if placements[constituent].is_none() {
+        let step = machine.step(&mut state, cell)?;
+        if placements[step].is_none() {
             let phases = rings
                 .iter()
                 .zip(&lift)
                 .map(|(ring, tau)| Ok(ring_digit(&ring.clock_at(tau)?) as usize))
                 .collect::<Result<Vec<_>, HnnError>>()?;
-            placements[constituent] = Some(phases);
+            placements[step] = Some(phases);
         }
-        let ports = placements[constituent]
-            .as_ref()
+        let ports = placements[step]
+            .clone()
             .expect("placed at its first arrival");
         field.step_at_ports(&mut lift, |g| ports[g])?;
     }
-    let placements: Vec<Vec<usize>> = placements
-        .into_iter()
-        .map(|placed| placed.expect("every constituent arrives in the founding passage"))
-        .collect();
-    // The plural fibre: the least port outside each ring's lock (port 0 when the lock is every port).
+    // The fibre, and a constituent the founding passage never reached: the least port outside each
+    // ring's lock (port 0 when the lock is every port).
     let dormant: Vec<usize> = rings
         .iter()
         .map(|ring| {
@@ -953,30 +1638,43 @@ pub fn found_ports(field: &Field, passage: &[usize]) -> Result<FoundedPorts, Enc
                 .unwrap_or(0)
         })
         .collect();
+    let unplaced: Vec<usize> = (0..constituents.len())
+        .filter(|&id| placements[id].is_none())
+        .collect();
+    let placements: Vec<Vec<usize>> = placements
+        .into_iter()
+        .map(|placed| placed.unwrap_or_else(|| dormant.clone()))
+        .collect();
     let ports: Vec<Vec<usize>> = (0..rings.len())
         .map(|g| {
-            (0..alphabet)
-                .map(|cell| match constituent_of[cell] {
-                    Some(constituent) => placements[constituent][g],
-                    None => dormant[g],
-                })
+            placements
+                .iter()
+                .map(|placed| placed[g])
+                .chain(std::iter::once(dormant[g]))
                 .collect()
         })
         .collect();
-    let chart = PortChart::founded(
+    let injection = machine.next()[opening].clone();
+    let fibre: Vec<usize> = (0..alphabet)
+        .filter(|code| !founding.letter_of.contains_key(code))
+        .collect();
+    let chart = PortChart::passage(
         ports,
-        PortChartKind::Founded {
+        injection,
+        machine,
+        PortChartKind::Passage {
             passage: passage.len() as u64,
-            constituents: constituents.len() as u64,
+            classes: constituents.len() as u64,
             fibre: fibre.len() as u64,
         },
     );
     Ok(FoundedPorts {
         chart,
+        founding,
         encoding,
         constituents,
-        fibre,
         placements,
-        constituent_of,
+        unplaced,
+        fibre,
     })
 }

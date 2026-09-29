@@ -355,8 +355,32 @@ fn declared_chart(index: usize) -> ModularWords {
 
 /// **The exact coordinates of dependent forms in the basis** (module header, "The execution"):
 /// the kernel of `[φ_0 … φ_(r−1) | v_0 … v_(k−1)]`, each `v_j` free with its kernel vector
-/// `(−c_j, e_j)`; none when a dependent is not freed (the chart was unlucky).
+/// `(−c_j, e_j)`; none when a dependent is not freed (the chart was unlucky). [agent-inferred] The
+/// dependents are read in blocks of at most `max(r, 1)`: the basis is independent, so each
+/// dependent's coordinates are unique and a block's kernel returns exactly them, while the kernel
+/// of all `k` at once would carry `k` vectors of `r + k` entries.
 fn coordinates(
+    forms: &[Vec<Rat>],
+    dependents: &[Vec<Rat>],
+    chart: usize,
+    work: &mut ExactWork,
+) -> Result<Option<Vec<Vec<Rat>>>, BirthError> {
+    let block = forms.len().max(1);
+    if dependents.len() <= block {
+        return coordinates_of_block(forms, dependents, chart, work);
+    }
+    let mut solved = Vec::with_capacity(dependents.len());
+    for part in dependents.chunks(block) {
+        match coordinates_of_block(forms, part, chart, work)? {
+            Some(coordinates) => solved.extend(coordinates),
+            None => return Ok(None),
+        }
+    }
+    Ok(Some(solved))
+}
+
+/// One block's kernel read (see [`coordinates`]).
+fn coordinates_of_block(
     forms: &[Vec<Rat>],
     dependents: &[Vec<Rat>],
     chart: usize,

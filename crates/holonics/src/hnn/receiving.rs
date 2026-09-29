@@ -140,7 +140,9 @@ use crate::compression::landmark::context::{
 };
 use crate::hnn::HnnError;
 use crate::hnn::contact::{ContactReading, LockDeclaration, lock_address, site_kinds};
-use crate::hnn::field::{ConstitutionRead, Current, Field, ReceiverDeclaration, ring_digit};
+use crate::hnn::field::{
+    ConstitutionRead, Current, Field, FoundedMachine, ReceiverDeclaration, ring_digit,
+};
 use crate::hnn::keys;
 use crate::hnn::propagation::Operands;
 use crate::hnn::ratio::{Face, Faces};
@@ -444,6 +446,11 @@ pub struct LetterReader {
     kinds: Option<Vec<SiteKind>>,
     /// Each contact's ends `(g, h)`, for the contact slots.
     ends: Vec<(usize, usize)>,
+    /// [definition; agent-inferred, U6] The field's founded machine and the class the register's
+    /// passage has reached (`hnn::field::FoundedMachine`): each cell steps the kept rings at its
+    /// step code, as the lift point's does (`hnn::field::Field::step_code`). None on a chart with no
+    /// machine, whose step codes are the exterior codes.
+    machine: Option<(FoundedMachine, usize)>,
 }
 
 impl LetterReader {
@@ -455,6 +462,7 @@ impl LetterReader {
             clocks: Vec::new(),
             kinds: None,
             ends: Vec::new(),
+            machine: None,
         }
     }
 
@@ -495,7 +503,7 @@ impl LetterReader {
             .iter()
             .map(|ring| ClockRing {
                 period: ring.period(),
-                ports: (0..field.alphabet()).map(|code| ring.port(code)).collect(),
+                ports: (0..field.steps()).map(|step| ring.port(step)).collect(),
                 lock: (0..ring.period() as usize)
                     .map(|port| ring.fits(port))
                     .collect(),
@@ -512,6 +520,10 @@ impl LetterReader {
                 .iter()
                 .map(|contact| contact.ends())
                 .collect(),
+            machine: field
+                .port_chart()
+                .machine()
+                .map(|machine| (machine.clone(), machine.opening())),
         };
         reader.synchronize(field, current)?;
         Ok(reader)
@@ -583,14 +595,19 @@ impl LetterReader {
     }
 
     /// **One cell's selective step on the kept rings** (`hnn::field::Field::selective_step`):
-    /// ring `g`'s clock advances `[port_g(x) ∈ N_g]` plus its predecessor's carry, and its jumps
-    /// are the carry it sends on. Returns whether the last ring carried out.
-    fn step(&mut self, cell: usize) -> bool {
+    /// ring `g`'s clock advances `[port_g(s) ∈ N_g]` plus its predecessor's carry, `s` the cell's
+    /// step code, and its jumps are the carry it sends on. Returns whether the last ring carried
+    /// out.
+    fn step(&mut self, cell: usize) -> Result<bool, HnnError> {
+        let step = match &mut self.machine {
+            Some((machine, state)) => machine.step(state, cell)?,
+            None => cell,
+        };
         let mut carry = 0u64;
         for (ring, clock) in self.rings.iter().zip(self.clocks.iter_mut()) {
             let fits = ring
                 .ports
-                .get(cell)
+                .get(step)
                 .and_then(|&port| ring.lock.get(port))
                 .copied()
                 .unwrap_or(false);
@@ -601,7 +618,7 @@ impl LetterReader {
                     "a ring of period at least 2 advanced at most two ticks jumps at most once",
                 );
         }
-        carry == 1
+        Ok(carry == 1)
     }
 
     /// **Ring `g`'s phase class at grain `g_R`**: `⌊g_R·phase⌋ mod g_R` of the phase `λ_g/d_g` in
@@ -643,7 +660,7 @@ impl LetterReader {
     /// slot from its reading; at the joint clock's carry-out the windings then restart, as the next
     /// aeon opens there.
     pub fn tick(&mut self, cell: usize) -> Result<Letter, HnnError> {
-        let carry_out = self.step(cell);
+        let carry_out = self.step(cell)?;
         if self.family.is_empty() {
             return Ok(Letter::Cell(cell));
         }
@@ -895,20 +912,22 @@ pub fn clock_letters(
     let mut current = Current::at_rest(field);
     let mut reader = LetterReader::of(field, family.clone(), &current)?;
     let crib = field.crib();
+    // The cells' step codes from the opening (`Field::step_codes`), as the source moment reads them.
+    let steps = field.step_codes(cells)?;
     let mut aeon_start = 0usize;
     let mut letters = Vec::with_capacity(cells.len());
     for (at, &cell) in cells.iter().enumerate() {
         if family.reads_contacts() && reader.kinds.as_ref() != Some(&kinds[at]) {
             reader.hold_kinds(kinds[at].clone())?;
         }
-        let step = current.step(field, cell)?;
+        let step = current.step(field, steps[at])?;
         letters.push(reader.tick(cell)?);
         if step.carry_out {
             let end = at + 1;
             let from = end.saturating_sub(crib.window).max(aeon_start);
             if end - from > crib.offset {
                 let location =
-                    keys::locate_closing(field, &current, &cells[from..end], crib.offset)?;
+                    keys::locate_closing(field, &current, &steps[from..end], crib.offset)?;
                 location.rekey(field, &mut current)?;
                 reader.synchronize(field, &current)?;
             }

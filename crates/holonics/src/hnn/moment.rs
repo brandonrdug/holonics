@@ -451,10 +451,17 @@ pub struct SourceMoment {
     cursor: usize,
     cells: u64,
     opening: Vec<BigInt>,
+    /// [definition; agent-inferred, U6] **The founded class** the passage's founded machine is in
+    /// (`hnn::field::FoundedMachine`): the founded chart's reduced-recurrence state `z ← U_x z`
+    /// (Lean `HNN/Encoding.encoding_reduced_recurrence`), from which each cell's step code is read.
+    /// It opens at the machine's opening (the empty context); on a chart with no machine it is not
+    /// read. One class, never a record of the cells.
+    founded: usize,
 }
 
 impl SourceMoment {
-    /// **Open a moment** at the current lift point: every count zero, the window empty.
+    /// **Open a moment** at the current lift point: every count zero, the window empty, the founded
+    /// class at the chart's opening.
     pub fn open(field: &Field, current: &Current) -> Self {
         let alphabet = field.alphabet();
         let offsets = field.offsets().to_vec();
@@ -483,12 +490,14 @@ impl SourceMoment {
             cursor: 0,
             cells: 0,
             opening: current.lift().to_vec(),
+            founded: field.founded_opening(),
         }
     }
 
-    /// **Ingest cells in order**: the lift point's selective step, then the phase-binned and offset
-    /// counts on every source ring, then the window. Stops after the cell whose step carries the
-    /// joint clock out, and reports it.
+    /// **Ingest cells in order**: the cell's step code from the founded class (the exterior code on
+    /// a chart with no machine; `hnn::field::Field::step_code`), the lift point's selective step at
+    /// it, then the phase-binned and offset counts of the exterior cell on every source ring, then
+    /// the window. Stops after the cell whose step carries the joint clock out, and reports it.
     pub fn ingest(
         &mut self,
         field: &Field,
@@ -497,7 +506,8 @@ impl SourceMoment {
     ) -> Result<Ingested, HnnError> {
         let a = self.alphabet;
         for (consumed, &code) in cells.iter().enumerate() {
-            let step = current.step(field, code)?;
+            let step = field.step_code(&mut self.founded, code)?;
+            let step = current.step(field, step)?;
             for counts in &mut self.rings {
                 let phase = current.phase(field, counts.ring)? as usize;
                 bump(&mut counts.first[phase * a + code])?;
@@ -538,6 +548,12 @@ impl SourceMoment {
     /// The lift point at the open.
     pub fn opening(&self) -> &[BigInt] {
         &self.opening
+    }
+
+    /// **The founded class** the moment's passage has reached (module header of
+    /// `hnn::field`, "The port chart"): the class the next cell's step code is read from.
+    pub fn founded(&self) -> usize {
+        self.founded
     }
 
     /// The source rings, in order.

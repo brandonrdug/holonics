@@ -2209,9 +2209,11 @@ impl Constitution {
             .map(|(g, ring)| {
                 let n = ring.width();
                 // `E_0`: on a founded port chart, the founded injection (each cell's column one half
-                // at its constituent's placement node, the real quadrature; `hnn::encoding`, the pin
-                // of September 29); on the codec's residue chart, the declared sign sequence.
+                // at the placement node of the founded class it reaches from the opening, `J e_x`'s
+                // class, the real quadrature; `hnn::encoding`, the pins of September 29); on the
+                // codec's residue chart, the declared sign sequence.
                 let founded = field.port_chart().is_founded();
+                let injection = field.port_chart().injection();
                 let source = field
                     .is_source(g)
                     .then(|| {
@@ -2223,7 +2225,7 @@ impl Constitution {
                                     (0..a)
                                         .map(|j| {
                                             if founded {
-                                                if i == 2 * ring.port(j) {
+                                                if i == 2 * ring.port(injection[j]) {
                                                     rat(1, 2)
                                                 } else {
                                                     Rat::zero()

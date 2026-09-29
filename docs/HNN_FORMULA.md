@@ -196,20 +196,47 @@ E(moment l) = the founded chart's own moment z ← U_a z + J e_u        (encodin
 ρ = D E for some D,  or a merged direction v (E v = 0) with ρ v ≠ 0   (encoding_separator)
 ```
 
-Its dimension is the emission's Hankel rank on the reached orbit, measured on the moiré, a copy
-ring and the rotor crib; observability alone (Birth's closure on the whole chart) exceeds it where
-forms are silent on the orbit. The proof of the Hankel identification is owed in #62.
+Its dimension is the rank of the chart's Hankel map on the reached orbit: on the reached span an
+encoding that merges exactly what every reading `ρ T_w` merges has the readings' rank (Lean
+`HNN/Encoding.{hankel_identification, hankel_rank_eq, forms_span_kernel}`), measured on the moiré, a
+copy ring and the rotor crib; observability alone (Birth's closure on the whole chart) exceeds it
+where forms are silent on the orbit. That Birth's executed closure spans exactly those readings on
+the reached span is its ladder's statement, owed in #62.
 
-[definition; agent-inferred] **The field's step classes are founded, not the codec's.** On the
-exterior chart the field knows no transport but the identity, so a founding passage founds exactly
-its reached cells, each one constituent, and the cells it never separates are one plural fibre.
-Each constituent is placed on each ring at the ring's phase class at its first arrival on the
-field's own selective clock (the placement of the [winding guide](WINDING_CARRY_AND_PLACEMENT.md));
-the fibre sits outside every lock (`hnn::encoding::found_ports`, `hnn::field::PortChart`). A ring
-then ticks when a constituent it met at its notch recurs. The codec's residue chart `code mod d_g`
-stays only as the declared chart of synthetic fields; no codec value enters a text field's chart.
-A founded field opens `E_g` at the founded injection (each cell's column at its constituent's
-placement node) and moves it only by deposition.
+[definition; agent-inferred] **The passage's own transports** (`hnn::encoding::{ContextClasses,
+PassageChart::passage, found_passage}`; the
+[pin](../research/records/2026-09-29_THE_PASSAGES_OWN_TRANSPORTS_PINNED_BEFORE_ITS_RUNS.md)). A
+source word is its address. A passage's context classes are its words' end-position classes, reached
+from the empty context by the cells' **right actions** `T_u e_p = e_(pu)`; its receiving forms are
+the one-cell continuation counts `ρ_c(p) = N(pc)`, so `T_u* ρ_s = ρ_(us)`
+(`continuation_intertwines`), and the founding is the passage's Hankel realization
+`E p = (N(p s_i))_i`, of dimension `rank [N(ps)]`, with no transport declared. Conditioned on each
+cell it separates positions (a primitive cycle of period `P` founds `P`); the **unconditioned tick**
+`Σ_u T_u`, opened where one period read from the opening fixes the phase, founds the emission's
+shift realization (the moiré's 7, 7 and 11). Founded exactly, a finite passage is its own index
+(`rank = n`), so the **charged founding** keeps a class only where the population's priced birth
+(`merge_cost_mass_iff` read from the birth's side, `receiver::population::birth_price`) shortens the
+founding passage's KT code over the founded classes' own continuations by more than the newborn's
+draw `2^(−ℓ)`, `ℓ = 2 log₂(|A_R| + 1)`: the reach closure's ladder from the opening, one rung a
+reached cell's right action on the classes born at the rung before. A class not born stays in its
+parent's class, its Preimage Fibre. The ladder is myopic: a class that pays only through a longer
+class it would open is not born. Birth's closure on the founded machine's chart merges the classes no
+reading separates.
+
+[definition; agent-inferred] **The field's step classes are founded, not the codec's.** A text
+field's **step codes** are the founded classes of a founding passage and the plural fibre (the codes
+it never met). The founded machine (`hnn::field::FoundedMachine`) reads a cell's step code from the
+class before it, the founded chart's reduced recurrence `z ← U_x z`, which the source moment carries;
+the selective step, the target phases, the keys' crib and the letters' reader read step codes. Each
+class is placed on each ring at the ring's phase class at its first arrival on the field's own
+selective clock (the placement of the [winding guide](WINDING_CARRY_AND_PLACEMENT.md)); the fibre
+sits outside every lock (`hnn::encoding::found_ports`, `hnn::field::PortChart`). A ring then ticks
+when a founded class placed at its notch recurs. The codec's residue chart `code mod d_g`, whose
+step codes are the codes, stays only as the declared chart of synthetic fields; no codec value
+enters a text field's chart. A founded field opens `E_g` at the founded injection (each cell's
+column at the placement node of the class it reaches from the opening) and moves it only by
+deposition. [scope] The source moment still bins the exterior cells by the rings' phases; its
+replacement by the founded chart's own moment is not built. The card refuses a founded machine.
 
 ### The source and release contract
 

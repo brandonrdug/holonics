@@ -10,6 +10,7 @@
 //! cargo run --release -p holonics --example hnn_prediction -- copy
 //! cargo run --release -p holonics --example hnn_prediction -- moire
 //! cargo run --release -p holonics --example hnn_prediction -- text .local/cuts/curated-u6-passage-cut.bin .local/cuts/u6-native-sections.txt
+//! cargo run --release -p holonics --example hnn_prediction -- text .local/cuts/curated-u6-passage-cut.bin <owner-only sections> founding .local/cuts/u6-encoding-probe.bin
 //! cargo run --release -p holonics --example hnn_prediction -- develop copy|moire <train> <evaluate> [s] [batch] [d] [K]
 //! cargo run --release -p holonics --example hnn_prediction -- develop text <cut> <train> [s]
 //! ```
@@ -46,6 +47,12 @@
 //!   as excluded (`exterior`).
 //! - **Guards**: the run stops at its deadline (the pin's projection bound) or at its resident cap,
 //!   and reports its partial evidence as incomplete.
+//! - **The founded chart** (`founding <cut>`; the
+//!   [pin of the passage's own transports](../../records/2026-09-29_THE_PASSAGES_OWN_TRANSPORTS_PINNED_BEFORE_ITS_RUNS.md)):
+//!   the text field reads the port chart founded by the passage's own transports on the named cut's
+//!   development part (`holonics::hnn::encoding::found_ports`), placed on this field's rings; the
+//!   source moment steps by the founded classes and `E_0` opens at the founded injection. Nothing
+//!   else of the run changes. Without it the field reads the declared residue chart.
 
 #[path = "exterior.rs"]
 mod exterior;
@@ -61,6 +68,7 @@ use holonics::hnn::field::{
     ContactDeclaration, CribDeclaration, Current, Field, FieldDeclaration, ReceiverDeclaration,
     RingDeclaration,
 };
+use holonics::hnn::encoding::found_ports;
 use holonics::hnn::moment::SourceMoment;
 use holonics::hnn::prediction::{
     Latent, Refinement, Section, deposit_of, stage, unreached_unchanged,
@@ -72,7 +80,9 @@ use holonics::ratio::algebraic::{ExactInterval, interval_sum};
 use holonics::ratio::{Rat, rat};
 use holonics::receiver::population::RelationKind;
 
-use exterior::{RESERVE_SHA256, read_curated, read_incidence, reading_of, reserve_read, resident_set};
+use exterior::{
+    RESERVE_SHA256, read_curated, read_cut, read_incidence, reading_of, reserve_read, resident_set,
+};
 
 /// The receiver's code tolerance: campaign 1's `1/16` bit, so `L_R = 16`.
 const TOLERANCE: (i64, i64) = (1, 16);
@@ -218,7 +228,30 @@ struct Engine {
 
 impl Engine {
     fn new(declared: Declared) -> Self {
-        let field = declare(&declared);
+        Self::founded(declared, None)
+    }
+
+    /// **The engine on a founded chart** (module header, "The founded chart"): the declared field
+    /// with the port chart founded on `founding` placed on its rings, or the declared chart.
+    fn founded(declared: Declared, founding: Option<&[usize]>) -> Self {
+        let field = match founding {
+            Some(passage) => {
+                let field = declare(&declared);
+                let founded = found_ports(&field, passage).expect("the founded port chart");
+                println!(
+                    "  the port chart founded by the passage's own transports on {} cells: {} reached cells, {} founded classes, {} constituents, a fibre of {} codes",
+                    passage.len(),
+                    founded.founding.letters().len(),
+                    founded.founding.classes().len(),
+                    founded.constituents.len(),
+                    founded.fibre.len()
+                );
+                field
+                    .with_port_chart(founded.chart)
+                    .expect("the founded chart reads the field")
+            }
+            None => declare(&declared),
+        };
         let refinement = Refinement::declare(
             &field,
             0,
@@ -656,9 +689,14 @@ fn text_passage(cut_path: &str, declared: &Declared, bound: usize, validation: b
 }
 
 #[allow(clippy::disallowed_types, clippy::disallowed_methods)]
-fn text(cut_path: &str, out_path: &str) {
+fn text(cut_path: &str, out_path: &str, founding_path: Option<&str>) {
     let clock = Instant::now();
     let declared = text_declared();
+    // The founding passage: the named cut's development part, before its held-out range.
+    let founding: Option<Vec<usize>> = founding_path.map(|path| {
+        let (bytes, _, held) = read_cut(path);
+        bytes[..held.start].iter().map(|&byte| usize::from(byte)).collect()
+    });
     let termination = declared.alphabet - 1;
     let TextPassage {
         cells,
@@ -668,7 +706,7 @@ fn text(cut_path: &str, out_path: &str) {
         validation_eligible,
         selected,
     } = text_passage(cut_path, &declared, TEXT_TRAIN, true);
-    let mut engine = Engine::new(declared);
+    let mut engine = Engine::founded(declared, founding.as_deref());
     println!(
         "hnn_prediction text: the passage {cells} cells, the choosing role's first {development}; choosing request pairs {eligible}, trained on the first {}; validation eligible {validation_eligible}, released {}; d = {}, |A| = {}, K = {}, w = {}, m = {}, batch {}, keyed members {}; reserve excluded {}",
         train.len(),
@@ -872,7 +910,14 @@ fn main() {
         Some("text") => text(
             arguments.get(2).map(String::as_str).expect("the passage cut"),
             arguments.get(3).map(String::as_str).expect("the sections' owner-only file"),
+            match (arguments.get(4).map(String::as_str), arguments.get(5)) {
+                (Some("founding"), Some(path)) => Some(path.as_str()),
+                (None, _) => None,
+                _ => panic!("text <cut> <out> [founding <cut>]"),
+            },
         ),
-        _ => panic!("hnn_prediction probe <mode> [cut] | copy | moire | text <cut> <out>"),
+        _ => panic!(
+            "hnn_prediction probe <mode> [cut] | copy | moire | text <cut> <out> [founding <cut>]"
+        ),
     }
 }

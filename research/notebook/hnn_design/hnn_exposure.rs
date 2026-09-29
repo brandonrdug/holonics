@@ -116,19 +116,32 @@
 //!   exposure, and the host's tree read per window against the word's (the refine read, the word
 //!   executed and read: on the card, the card's word with its host readout).
 //!
-//! [definition; agent-inferred, U6] **The port chart** (`ports <founded|residue>`, default `founded`;
-//! the [encoding pin](../../records/2026-09-29_HOLONIC_ENCODING_FOR_THE_FIELD_PINNED_BEFORE_ITS_RUN.md)).
-//! `founded` founds the field's port chart on the cut's development cells, the cells before its
-//! held-out range (`holonics::hnn::encoding::found_ports`: the reached cells, each placed on every ring
-//! at the ring's phase at its first arrival on the field's own clock; the unreached cells one plural
-//! fibre outside every lock), a causal function of cells the exposure codes, so the description
-//! charges its rule (`Field::describe`). The readout prints the chart's receipt as counts only: the
-//! constituents and the fibre, their recurrence over the development and the held-out cells as
-//! sorted anonymous counts, and per ring the constituents at each port and in its lock. `residue`
-//! declares the codec's residue chart `code mod d_g`, the chart the field read before U6.
+//! [definition; agent-inferred, U6] **The port chart** (`ports <passage|residue>`, default
+//! `passage`; the [encoding pin](../../records/2026-09-29_HOLONIC_ENCODING_FOR_THE_FIELD_PINNED_BEFORE_ITS_RUN.md)
+//! and the [pin of the passage's own transports](../../records/2026-09-29_THE_PASSAGES_OWN_TRANSPORTS_PINNED_BEFORE_ITS_RUNS.md)).
+//! `passage` founds the field's port chart on the cut's development cells, the cells before its
+//! held-out range, by the passage's own transports (`holonics::hnn::encoding::found_ports`: the
+//! cells' right actions on the passage's context classes, each class born only where the
+//! population's priced birth shortens the charged code, Birth's closure on the founded machine,
+//! each founded class placed on every ring at the ring's phase at its first arrival on the field's
+//! own clock, the codes never met one plural fibre outside every lock), a causal function of cells
+//! the exposure codes, so the description charges its rule (`Field::describe`). The readout prints
+//! the chart's receipt as counts and bits only: the ladder's rungs, the founded classes, the
+//! development cells' KT code at the opening alone and over the founded classes with the classes'
+//! description, the constituents and the fibre, their recurrence over the development and the
+//! held-out cells as sorted anonymous counts, and per ring the constituents at each port and in its
+//! lock. `residue` declares the codec's residue chart `code mod d_g`, the chart the field read
+//! before U6.
+//!
+//! [definition] **The founded classes' expansions** (`expansions <path>`): each founded class's
+//! longest context and the length of its shortest, its occurrences and the cells the machine read
+//! at it, written to an owner-only file (the text is the private passage's; never the repository).
+//! `found-only` founds and prints the chart's receipt and stops before the exposure (a development
+//! reading of the founding's work).
 //!
 //! ```sh
-//! cargo run --release -p holonics --example hnn_exposure -- cut-file <cut> cells all ports founded
+//! cargo run --release -p holonics --example hnn_exposure -- cut-file <cut> cells all ports passage
+//! cargo run --release -p holonics --example hnn_exposure -- cut-file <cut> cells all found-only yes expansions <owner-only file>
 //! ```
 //!
 //! [definition] **Every reading is exact; no decimal is printed** (a decimal is a collapse, CLAUDE.md's
@@ -242,6 +255,8 @@ fn main() {
     let mut loaded = false;
     let mut gate = false;
     let mut founded_ports = true;
+    let mut expansions: Option<String> = None;
+    let mut found_only = false;
     for pair in arguments.chunks(2) {
         match pair {
             [key, value] if key == "cells" => cells = Some(value.clone()),
@@ -259,12 +274,14 @@ fn main() {
                 realization = value.clone();
             }
             [key, value] if key == "gate" && value == "f2" => gate = true,
-            [key, value] if key == "ports" && (value == "founded" || value == "residue") => {
-                founded_ports = value == "founded";
+            [key, value] if key == "ports" && (value == "passage" || value == "residue") => {
+                founded_ports = value == "passage";
             }
+            [key, value] if key == "expansions" => expansions = Some(value.clone()),
+            [key, value] if key == "found-only" && value == "yes" => found_only = true,
             _ => {
                 println!(
-                    "usage: hnn_exposure [cut-file <path>] [cells <N|all>] [held-out <cells>] [windows <deadline>] [realization <host|card>] [resonator <none|source>] [gate f2] [ports <founded|residue>]"
+                    "usage: hnn_exposure [cut-file <path>] [cells <N|all>] [held-out <cells>] [windows <deadline>] [realization <host|card>] [resonator <none|source>] [gate f2] [ports <passage|residue>] [expansions <owner-only file>] [found-only yes]"
                 );
                 return;
             }
@@ -323,6 +340,7 @@ fn main() {
         held_out: vec![tail.clone()],
     };
     // The port chart, founded on the development cells (module header, "The port chart").
+    let founding_clock = Instant::now();
     let founded = founded_ports.then(|| {
         let founded = found_ports(&field, &cut.cells[..tail.start])
             .expect("the port chart founded on the development cells");
@@ -385,7 +403,21 @@ fn main() {
             .join(", ")
     );
     ports_receipt(&field, founded.as_ref(), &cut, &tail);
+    println!(
+        "the port chart founded in {} ms wall (within the setup)",
+        founding_clock.elapsed().as_millis()
+    );
+    if let (Some(founded), Some(path)) = (founded.as_ref(), expansions.as_deref()) {
+        write_expansions(founded, path);
+    }
     println!("setup (cut read, fields declared): {setup} ms wall");
+    if found_only {
+        if let Some((now, peak)) = exterior::resident_set() {
+            println!("resident set (exterior, /proc/self/status): now {now} bytes, peak {peak} bytes");
+        }
+        println!("found-only: stopped before the exposure");
+        return;
+    }
 
     if realization == "card" {
         println!("realization: {}", card_realization());
@@ -449,9 +481,11 @@ fn main() {
     }
 }
 
-/// **The port chart's receipt** (module header, "The port chart"), counts only: the founded
-/// constituents and the plural fibre, their recurrence over the development and the held-out cells
-/// as sorted anonymous counts, and per ring the constituents at each port and those in its lock.
+/// **The port chart's receipt** (module header, "The port chart"), counts and bits only: the
+/// ladder's rungs, the founded classes, the development cells' code at the opening alone and over
+/// the founded classes with the classes' description, the constituents and the fibre, their
+/// recurrence over the development and the held-out cells as sorted anonymous counts, and per ring
+/// the constituents at each port and those in its lock.
 fn ports_receipt(
     field: &Field,
     founded: Option<&FoundedPorts>,
@@ -464,14 +498,35 @@ fn ports_receipt(
         println!("the codec's residue chart code mod d_g (the chart the field read before U6)");
         return;
     };
+    let founding = &founded.founding;
+    let grain = receiver_grain(field);
     println!(
-        "founded at first arrival on the rings' own clocks over the development cells 0..{}: {} constituents, a plural fibre of {} codes",
+        "founded by the passage's own transports over the development cells 0..{}: {} reached cells; the ladder's rungs (reached, born, undecided) {:?}; {} founded classes ({} returned unread); {} constituents after Birth's closure (founded dimension {}, reached {}), {} never reached by the founding passage; a plural fibre of {} codes",
         tail.start,
+        founding.letters().len(),
+        founding
+            .rungs()
+            .iter()
+            .map(|rung| (rung.candidates, rung.born, rung.undecided))
+            .collect::<Vec<_>>(),
+        founding.classes().len(),
+        founding.returned(),
         founded.constituents.len(),
+        founded.encoding.dimension(),
+        founded.encoding.reached(),
+        founded.unplaced.len(),
         founded.fibre.len()
     );
+    println!(
+        "the development cells' KT code over the reached cells and the fibre: at the opening alone {}, over the founded classes {}, the classes' description {}",
+        enclosure(&founding.code()[0], grain),
+        enclosure(&founding.code()[1], grain),
+        enclosure(founding.description(), grain)
+    );
     let sorted = |passage: &[usize]| -> (Vec<u64>, u64) {
-        let mut counts = founded.recurrence(passage);
+        let mut counts = founded
+            .recurrence(passage)
+            .expect("the founded machine reads the cut");
         let fibre = counts.pop().unwrap_or(0);
         counts.sort_unstable_by(|a, b| b.cmp(a));
         (counts, fibre)
@@ -482,19 +537,22 @@ fn ports_receipt(
         "recurrence over the development cells (sorted counts, one a constituent): {development:?}; the fibre {development_fibre}"
     );
     println!(
-        "recurrence over the held-out cells (sorted counts, one a constituent): {held:?}; the fibre {held_fibre}"
+        "recurrence over the held-out cells read from the opening (sorted counts, one a constituent): {held:?}; the fibre {held_fibre}"
     );
     println!(
         "constituents recurring in the held-out cells: {} of {}",
         held.iter().filter(|&&count| count > 0).count(),
         held.len()
     );
+    let development_counts = founded
+        .recurrence(&cut.cells[..tail.start])
+        .expect("the founded machine reads the development cells");
+    let fibre_step = founded.constituents.len();
     for (g, ring) in field.rings().iter().enumerate() {
         let d = ring.period() as usize;
         let mut at_port = vec![0usize; d];
         let mut locked = 0usize;
         let mut locked_cells = 0u64;
-        let development_counts = founded.recurrence(&cut.cells[..tail.start]);
         for (constituent, placement) in founded.placements.iter().enumerate() {
             at_port[placement[g]] += 1;
             if ring.fits(placement[g]) {
@@ -505,9 +563,50 @@ fn ports_receipt(
         println!(
             "ring {g} (d = {d}, lock {:?}): constituents at each port {at_port:?}; in the lock {locked}, on {locked_cells} development cells; the fibre at port {}",
             ring.notches(),
-            field.port_chart().ports()[g][founded.fibre.first().copied().unwrap_or(0)]
+            field.port_chart().ports()[g][fibre_step]
         );
     }
+}
+
+/// **The founded classes' expansions** (module header), written to an owner-only file: each
+/// founded class in the machine's first-arrival order, its constituent, its longest context (its
+/// contexts are its suffixes at least `shortest` cells long), its occurrences and its visits.
+#[allow(clippy::disallowed_types, clippy::disallowed_methods)]
+fn write_expansions(founded: &FoundedPorts, path: &str) {
+    use std::io::Write;
+    use std::os::unix::fs::OpenOptionsExt;
+    let mut constituent_of = vec![0usize; founded.founding.classes().len()];
+    for (id, members) in founded.constituents.iter().enumerate() {
+        for &class in members {
+            constituent_of[class] = id;
+        }
+    }
+    let mut text = String::new();
+    for (index, class) in founded.founding.classes().iter().enumerate() {
+        let bytes: Vec<u8> = class
+            .word
+            .iter()
+            .map(|&code| u8::try_from(code).unwrap_or(b'?'))
+            .collect();
+        text.push_str(&format!(
+            "class {index} (constituent {}): {:?} (contexts of at least {} cells); occurrences {}, visits {}\n",
+            constituent_of[index],
+            String::from_utf8_lossy(&bytes),
+            class.shortest,
+            class.occurrences,
+            class.visits
+        ));
+    }
+    let mut file = std::fs::OpenOptions::new()
+        .write(true)
+        .create(true)
+        .truncate(true)
+        .mode(0o600)
+        .open(path)
+        .expect("the owner-only expansions file");
+    file.write_all(text.as_bytes())
+        .expect("write the expansions");
+    println!("the founded classes' expansions are written to the owner-only file");
 }
 
 /// Decision 38's one predeclared loaded comparison. The source ring is the smallest ring in the

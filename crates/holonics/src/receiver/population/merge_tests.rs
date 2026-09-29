@@ -130,6 +130,44 @@ fn the_price_is_the_code_length_pair_decided_exactly() {
     assert!(blocks.price(0, 0).is_err(), "a block merges with another");
 }
 
+/// **A birth is the merge's inverse** (`birth_price`, Lean `merge_cost_mass_iff` read from the
+/// birth's side): a newborn block is kept exactly when `W′ > W · charge`, decided on the exact
+/// masses, its gain enclosing `log₂(W′/(W · charge))`, and the partition's code encloses `−log₂ W`.
+#[test]
+fn a_birth_is_kept_exactly_when_it_pays_its_charge() {
+    let mut tables = KtTables::new(3).expect("tables");
+    let charge = BigUint::from(9u8);
+    // Splitting a block whose cells read one class from one that reads the others pays; splitting
+    // two blocks of one rate does not.
+    let cases = [
+        (vec![vec![20, 20, 1]], vec![vec![20, 0, 1], vec![0, 20, 0]]),
+        (vec![vec![10, 10, 2]], vec![vec![5, 5, 1], vec![5, 5, 1]]),
+    ];
+    for (before, after) in &cases {
+        let price = birth_price(&mut tables, before, after, &charge).expect("a price");
+        let w = before.iter().fold(Rat::one(), |mass, counts| mass * kt(counts, 3));
+        let w_after = after.iter().fold(Rat::one(), |mass, counts| mass * kt(counts, 3));
+        let ratio = w_after / (w.clone() * Rat::from_integer(BigInt::from(9)));
+        assert_eq!(price.accepted, Some(ratio > Rat::one()));
+        let exact = negated(&code_length(&ratio).expect("bits"));
+        assert!(contains(&exact, &price.gain));
+        let code = partition_code(&mut tables, before).expect("a code");
+        assert!(contains(&code_length(&w).expect("bits"), &code));
+    }
+    assert_eq!(
+        birth_price(&mut tables, &cases[0].0, &cases[0].1, &charge)
+            .expect("a price")
+            .accepted,
+        Some(true)
+    );
+    assert_eq!(
+        birth_price(&mut tables, &cases[1].0, &cases[1].1, &charge)
+            .expect("a price")
+            .accepted,
+        Some(false)
+    );
+}
+
 #[test]
 fn a_merge_keeps_every_seed_and_splits_back_exactly() {
     let items = vec![

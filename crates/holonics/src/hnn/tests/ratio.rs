@@ -149,7 +149,7 @@ fn the_windowed_gap_stays_bounded_over_a_long_stream() {
     let zeros = read(vec![Rat::zero(); 2 * alphabet], 16);
     for (start, cells) in stream.chunks(aperture).enumerate() {
         if cells.len() == aperture && start % 29 == 0 {
-            let window = target_phases(field, current.lift(), ring, cells).unwrap();
+            let window = target_phases(field, current.lift(), field.founded_opening(), ring, cells).unwrap();
             assert_eq!(window.branch, current.winding(field, ring).unwrap());
             for phase in &window.phases {
                 assert!(!phase.is_negative() && phase < &bound, "{phase}");
@@ -191,7 +191,7 @@ fn a_targets_phase_is_its_clock_and_ingesting_the_targets_reaches_it() {
             .cells;
     }
     let targets = [0usize, 3, 2, 0, 3, 1];
-    let window = target_phases(field, current.lift(), 2, &targets).unwrap();
+    let window = target_phases(field, current.lift(), field.founded_opening(), 2, &targets).unwrap();
     assert_eq!(window.branch, current.winding(field, 2).unwrap());
     let floor = &window.branch * &period;
     let mut fed = 0;

@@ -32,6 +32,12 @@
 //!   kept at 127 bits and rounded outward): accepted when the lower bound of `R·E`'s numerator
 //!   passes the upper bound of its denominator, refused when the reverse, and **undecided** (kept
 //!   apart, and counted in the receipt) when the bounds overlap.
+//! - **A priced birth** ([`birth_price`]) is the merge read from the birth's side: a newborn block
+//!   split off its parent's is kept exactly when `P(G′)·W_(G′)(z) > P(G)·W_G(z)`, the newborn's
+//!   description its draw from the reserved mass, `P(G′)/P(G) = 1/charge`. It is decided on the same
+//!   integer bounds (undecided: not born). Its consumer is the passage's charged founding
+//!   (`hnn::encoding::found_passage`), where a context class is born only where it shortens the
+//!   founding passage's code.
 //!
 //! [definition; agent-inferred] **The description of a partition** is the restaurant mass at
 //! `α = ½` over each group's items (Lean `restaurant_found`, `restaurant_join`,
@@ -514,6 +520,83 @@ impl Blocks {
             description: [description_before, self.description_bits()?],
         })
     }
+}
+
+// -------------------------------------------------------------------------------------------
+// the priced birth
+
+/// [definition; agent-inferred, U6] **A birth's price**: the priced merge read from the birth's
+/// side (module header, "The two merges"; Lean `merge_cost_mass_iff`). A birth splits cells off
+/// their block into a newborn block; it is the merge's inverse, so it is kept exactly when the merge
+/// would be refused: `P(G′) W_G′(z) > P(G) W_G(z)`, `G′` the partition with the newborn. The newborn
+/// draws its description mass from the reserved mass, `P(G′)/P(G) = 1/charge` (the population's
+/// birth from reserved mass `2^(−ℓ_g)`, `charge = 2^ℓ_g` an integer), so it is born exactly when
+/// `W′ · D > W · D′ · charge` on the KT masses' integer bounds: accepted when the lower bound of the
+/// left passes the upper bound of the right, refused when the reverse, undecided (not born, and
+/// counted by the caller) when they overlap. Its gain `log₂(W′/(W · charge))` is enclosed.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct BirthPrice {
+    pub gain: ExactInterval,
+    pub accepted: Option<bool>,
+    ratio: [Bounds; 2],
+}
+
+impl BirthPrice {
+    /// Whether this price's gain surely passes another's lower bound (their lower bounds compared by
+    /// cross-multiplying): the proposal order, never the acceptance.
+    pub fn above(&self, other: &BirthPrice) -> bool {
+        let left = self.ratio[0][0].times_bound(other.ratio[1][1], false);
+        let right = other.ratio[0][0].times_bound(self.ratio[1][1], false);
+        left > right
+    }
+}
+
+/// The KT masses' product over blocks, its numerator's and denominator's bounds.
+fn kt_product(tables: &mut KtTables, blocks: &[Vec<u64>]) -> (Bounds, Bounds) {
+    let (mut numerator, mut denominator) = (ONE, ONE);
+    for counts in blocks {
+        let (n, d) = tables.mass(counts);
+        numerator = times(numerator, n);
+        denominator = times(denominator, d);
+    }
+    (numerator, denominator)
+}
+
+/// **The price of a birth** (see [`BirthPrice`]): the blocks' counts over the tables' alphabet
+/// before and after the birth (the same received cells), and the newborn's charge `2^ℓ_g`.
+pub fn birth_price(
+    tables: &mut KtTables,
+    before: &[Vec<u64>],
+    after: &[Vec<u64>],
+    charge: &BigUint,
+) -> Result<BirthPrice, PopulationError> {
+    let (w, d) = kt_product(tables, before);
+    let (w_after, d_after) = kt_product(tables, after);
+    let left = times(w_after, d);
+    let right = times_integer(times(w, d_after), charge);
+    let accepted = if left[0] > right[1] {
+        Some(true)
+    } else if left[1] <= right[0] {
+        Some(false)
+    } else {
+        None
+    };
+    Ok(BirthPrice {
+        gain: log_ratio(left, right)?,
+        accepted,
+        ratio: [left, right],
+    })
+}
+
+/// **`−log₂ W`** of a partition read as its blocks' counts over the tables' alphabet: the KT masses'
+/// product (each block's cells coded before its own deposit, in any order: KT is exchangeable),
+/// enclosed.
+pub fn partition_code(
+    tables: &mut KtTables,
+    blocks: &[Vec<u64>],
+) -> Result<ExactInterval, PopulationError> {
+    let (numerator, denominator) = kt_product(tables, blocks);
+    Ok(negated(&log_ratio(numerator, denominator)?))
 }
 
 /// [definition] **The hazard's learned partition's receipt** (module header).

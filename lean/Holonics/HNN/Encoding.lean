@@ -39,9 +39,15 @@ moment of the passage on a closing ring over it (`whole_pair_read_offset_moment`
 (`whole_pair_read_population_invariant`); it reads only the retained table
 (`whole_pair_read_tape_free`); and an empty population reads zero (`whole_pair_read_zero`).
 
-[open] The founded dimension on the reached span equals the emission's Hankel rank (measured on the
-moiré, a copy ring and the rotor crib in `hnn::tests::encoding`); its proof is owed in #62 with
-Birth's Hankel identification.
+[proved-derived; formal-checked] **The Hankel identification** (§4): on the reached span, an
+encoding that merges exactly the directions every reading merges has the readings' rank
+(`hankel_identification`, `hankel_rank_eq`), and forms of one span merge one set of directions
+(`forms_span_kernel`), so the founded forms, which span the least `T*`-invariant space containing
+the receiving forms, meet the Hankel rank. The passage's own chart reads its continuation counts,
+which intertwine with its right actions (`continuation_intertwines`, Rust
+`hnn::encoding::PassageChart::passage`; the pin of September 29 of the passage's own transports).
+[open] That Birth's executed closure (`Compression/Landmark/Context/Birth`) spans exactly the
+readings `ρ ∘ T_w` restricted to the reached span is its ladder's statement, joined here in #62.
 
 The computational object is the helical pair interaction. Of the winding guide's six objects this
 module touches the **helix** (the transports and the moment's advance), the **pair** (the offset
@@ -238,6 +244,79 @@ theorem whole_pair_read_zero (P : (Module.End ℚ S)ˣ) (I : X →ₗ[ℚ] S)
 
 end Whole
 
+/-! ## 4. The Hankel identification and the passage's own transports -/
+
+section Hankel
+
+variable {K X Q V : Type*} [Field K] [AddCommGroup X] [Module K X] [AddCommGroup Q] [Module K Q]
+  [AddCommGroup V] [Module K V]
+
+/-- [proved-derived; formal-checked] **The Hankel identification** (Rust
+`hnn::encoding::Encoding::dimension` against the count Hankel rank, `hnn::tests::encoding`): on a
+reached span `R`, an encoding `E` that merges exactly the directions the observations `O` merge has
+the observations' rank, `dim E(R) = dim O(R)` (rank–nullity on `R`, one kernel). -/
+theorem hankel_identification [FiniteDimensional K X] (R : Submodule K X) (E : X →ₗ[K] Q)
+    (O : X →ₗ[K] V) (h : ∀ x ∈ R, E x = 0 ↔ O x = 0) :
+    Module.finrank K (R.map E) = Module.finrank K (R.map O) := by
+  have hker : LinearMap.ker (E.domRestrict R) = LinearMap.ker (O.domRestrict R) := by
+    ext ⟨x, hx⟩
+    simp only [LinearMap.mem_ker, LinearMap.domRestrict_apply]
+    exact h x hx
+  have hE := LinearMap.finrank_range_add_finrank_ker (E.domRestrict R)
+  have hO := LinearMap.finrank_range_add_finrank_ker (O.domRestrict R)
+  rw [LinearMap.range_domRestrict] at hE hO
+  rw [hker] at hE
+  omega
+
+/-- [proved-derived; formal-checked] **The founded dimension is the Hankel rank**: with the reached
+span the range of the reach map (the words read from the opening) and an encoding that merges on it
+exactly what the observations merge, the encoded reached span has the rank of the Hankel map
+`O ∘ reach` (`LinearMap.range_comp`). -/
+theorem hankel_rank_eq {W : Type*} [AddCommGroup W] [Module K W] [FiniteDimensional K X]
+    (reach : W →ₗ[K] X) (E : X →ₗ[K] Q) (O : X →ₗ[K] V)
+    (h : ∀ x ∈ LinearMap.range reach, E x = 0 ↔ O x = 0) :
+    Module.finrank K ((LinearMap.range reach).map E) =
+      Module.finrank K (LinearMap.range (O.comp reach)) := by
+  rw [LinearMap.range_comp]
+  exact hankel_identification _ E O h
+
+/-- [proved-derived; formal-checked] **Forms of one span merge one set of directions**: two families
+of linear forms spanning one subspace of the dual vanish together. Birth's founded forms span the
+least `T*`-invariant space containing the receiving forms, which the readings `ρ ∘ T_w` span, so the
+encoding merges exactly what every reading merges: [`hankel_identification`]'s hypothesis. -/
+theorem forms_span_kernel {ι κ : Type*} (ψ : ι → Module.Dual K X) (φ : κ → Module.Dual K X)
+    (h : Submodule.span K (Set.range ψ) = Submodule.span K (Set.range φ)) (x : X) :
+    (∀ i, ψ i x = 0) ↔ ∀ j, φ j x = 0 := by
+  have key : ∀ S : Set (Module.Dual K X), (∀ f ∈ S, f x = 0) →
+      ∀ f ∈ Submodule.span K S, f x = 0 := by
+    intro S hS f hf
+    induction hf using Submodule.span_induction with
+    | mem f hf => exact hS f hf
+    | zero => simp
+    | add f g _ _ hf hg => simp [hf, hg]
+    | smul a f _ hf => simp [hf]
+  constructor
+  · intro hψ j
+    have hj : φ j ∈ Submodule.span K (Set.range ψ) := by
+      rw [h]
+      exact Submodule.subset_span ⟨j, rfl⟩
+    exact key _ (by rintro f ⟨i, rfl⟩; exact hψ i) _ hj
+  · intro hφ i
+    have hi : ψ i ∈ Submodule.span K (Set.range φ) := by
+      rw [← h]
+      exact Submodule.subset_span ⟨i, rfl⟩
+    exact key _ (by rintro f ⟨j, rfl⟩; exact hφ j) _ hi
+
+end Hankel
+
+/-- [proved-derived; formal-checked] **The passage's receiving forms intertwine with its right
+actions** (Rust `hnn::encoding::PassageChart::passage`): for any count `N` of words, the
+continuation reading `ρ_s(p) = N(p s)` at the context `p u` is the reading `ρ_(u s)` at `p`, so
+`T_u* ρ_s = ρ_(us)` and the passage chart's founding is its Hankel realization. -/
+theorem continuation_intertwines {α R : Type*} (N : List α → R) (p s : List α) (u : α) :
+    N ((p ++ [u]) ++ s) = N (p ++ (u :: s)) := by
+  simp
+
 section Audit
 
 #print axioms factor_of_ker_le
@@ -252,6 +331,10 @@ section Audit
 #print axioms whole_pair_read_population_invariant
 #print axioms whole_pair_read_tape_free
 #print axioms whole_pair_read_zero
+#print axioms hankel_identification
+#print axioms hankel_rank_eq
+#print axioms forms_span_kernel
+#print axioms continuation_intertwines
 
 end Audit
 

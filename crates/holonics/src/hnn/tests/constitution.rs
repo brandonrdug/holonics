@@ -1277,7 +1277,7 @@ fn a_deposit_reaches_only_the_diamond_and_sums_only_its_window() {
     .unwrap();
     let (word, faces) = pending.read(&field, &theta).unwrap();
     let targets = [1usize, 0];
-    let anchors = target_phases(&field, pending.anchor(), 2, &targets).unwrap();
+    let anchors = target_phases(&field, pending.anchor(), pending.moment().founded(), 2, &targets).unwrap();
     let ratio = HolonRatio::compare(faces, &targets, &anchors).unwrap();
     let back = word
         .pull_back(

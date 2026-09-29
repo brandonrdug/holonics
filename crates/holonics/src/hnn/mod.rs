@@ -160,10 +160,13 @@ pub use contact::{
     contact_readings, site_kinds, site_readings,
 };
 
-pub use encoding::{Encoding, EncodingError, FoundedPorts, PassageChart, found_ports};
+pub use encoding::{
+    ContextClasses, Encoding, EncodingError, FoundedPorts, PassageChart, PassageFounding,
+    found_passage, found_ports,
+};
 pub use field::{
-    ConstitutionRead, Contact, ContactDeclaration, Current, Field, FieldDeclaration, PortChart,
-    PortChartKind, Ring, RingDeclaration,
+    ConstitutionRead, Contact, ContactDeclaration, Current, Field, FieldDeclaration,
+    FoundedMachine, PortChart, PortChartKind, Ring, RingDeclaration,
 };
 pub use keys::{KeyLocation, RingKeys, locate_keys};
 pub use moment::{Capacity, PairPort, SourceMoment};

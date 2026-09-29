@@ -289,7 +289,7 @@ fn the_compare_deposits_its_targets_on_their_own_addresses() {
     let (word, wave) = pending.read(&field, &theta).unwrap();
     let against = pending.against(&theta, &wave, &targets).unwrap();
     let scored = pending.scored(&theta, &against, &targets).unwrap();
-    let anchors = target_phases(&field, pending.anchor(), 2, &targets).unwrap();
+    let anchors = target_phases(&field, pending.anchor(), pending.moment().founded(), 2, &targets).unwrap();
     let ratio = HolonRatio::compare(against.faces, &targets, &anchors).unwrap();
     let back = word
         .pull_back(

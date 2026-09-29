@@ -42,16 +42,24 @@
 //! that receives no carry keeps its configuration (Lean `HNN/Keys.selective_step_dormant`).
 //!
 //! [definition; agent-inferred, U6] **The port chart** ([`PortChart`]; the
-//! [encoding pin](../../../../research/records/2026-09-29_HOLONIC_ENCODING_FOR_THE_FIELD_PINNED_BEFORE_ITS_RUN.md)).
-//! `port_g(x)` is read from the field's declared chart, one port of `ℤ/d_g` for each exterior code
-//! on each ring. A text field's chart is **founded** (`hnn::encoding::found_ports`): its step
-//! classes are the founded constituents of the exterior chart on a founding passage, each placed on
-//! each ring at the ring's phase class at its first arrival on the field's own clock, and the codes
-//! the passage never separates are one plural fibre that steps no ring by its lock. The codec
-//! supplies only the exterior alphabet and its decoder. [`Field::declare`] declares the **residue
-//! chart** `code mod d_g`, the codec's choice: it is the declared chart of the synthetic fields whose
-//! drawn codes carry no source structure (and whose codes are the ring's ports when `|A| ≤ d_g`), and
-//! it is never the text chart ([`Field::with_port_chart`] replaces it).
+//! [encoding pin](../../../../research/records/2026-09-29_HOLONIC_ENCODING_FOR_THE_FIELD_PINNED_BEFORE_ITS_RUN.md)
+//! and the [pin of the passage's own transports](../../../../research/records/2026-09-29_THE_PASSAGES_OWN_TRANSPORTS_PINNED_BEFORE_ITS_RUNS.md)).
+//! `port_g(s)` is read from the field's declared chart, one port of `ℤ/d_g` for each **step code**
+//! `s` on each ring. A text field's chart is **founded** (`hnn::encoding::found_ports`) from a
+//! founding passage by the passage's own transports: each cell's right action on the passage's
+//! context classes, the classes born only where they shorten the charged code, their minimal
+//! realization through Birth's closure. Its step codes are the founded classes and the plural
+//! fibre (the codes the passage never met): a cell's step code is the class the **founded machine**
+//! ([`FoundedMachine`]) reaches at it from the class before, the reduced recurrence of the founded
+//! chart, so a ring ticks when a founded class placed at its notch recurs, never on a raw cell's
+//! value. Each class sits on each ring at the ring's phase class at its first arrival on the field's
+//! own clock, and the fibre steps no ring by its lock. The source moment carries the class
+//! (`hnn::moment::SourceMoment`), and every reader of the chart steps by step codes
+//! ([`Field::step_code`], [`Field::step_codes`]). The codec supplies only the exterior alphabet and
+//! its decoder. [`Field::declare`] declares the **residue chart** `code mod d_g`, the codec's
+//! choice, whose step codes are the exterior codes: it is the declared chart of the synthetic fields
+//! whose drawn codes carry no source structure (and whose codes are the ring's ports when
+//! `|A| ≤ d_g`), and it is never the text chart ([`Field::with_port_chart`] replaces it).
 //!
 //! [definition; agent-inferred, U5] **The rings' clocks.** Ring `g`'s clock is its navigator's
 //! `navigator::Clock`, a ring of period `d_g` ([`Ring::clock_at`]); the lift coordinate `λ_g` is
@@ -78,6 +86,7 @@
 //! |---|---|
 //! | `HNN/Keys.selective_step_dormant`, `HNN/Moment.selective_position` | [`Field::selective_step`] |
 //! | `HNN/Moment.SelectiveDecl` (its declared port chart `port g x`, any chart) | [`PortChart`], [`Ring::port`], [`Field::with_port_chart`]; the founding `hnn::encoding::found_ports` |
+//! | `HNN/Encoding.encoding_reduced_recurrence` (the founded class moves by `U_x`) | [`FoundedMachine::step`], [`Field::step_code`] |
 //! | `HNN/Moment.SelectiveDecl.carryIn_is_section_flux`, `Holon/Navigator.jumps_are_carries` (the carry is the ring clock's jumps and its section's flux) | [`Field::selective_step`] through [`Ring::clock_at`] |
 //! | `Aeon/Clock/Winding.ratio_split`, `split_unique` (a lift coordinate's phase class and windings) | [`Current::phase`], [`Current::winding`], [`Ring::point`], [`Ring::rotate`] |
 //! | `Aeon/Clock/Winding.clockLift` | [`Field::parametric`] |
@@ -462,14 +471,19 @@ pub fn lattice_exponent(grain: u128, fan_in: u128) -> u32 {
 // the port chart
 
 /// [definition; agent-inferred, U6] **The field's port chart** (module header, "The port chart"):
-/// the port `port_g(x) ∈ ℤ/d_g` of every exterior code `x` on every ring `g`, and how it was made.
-/// The selective step reads it through [`Ring::port`]; the card mounts the lock chart it gives
-/// (`[port_g(x) ∈ N_g]`, read off the host owner at the moment's open), so both realizations read
-/// one chart.
+/// the port `port_g(s) ∈ ℤ/d_g` of every **step code** `s` on every ring `g`, the step code each
+/// exterior code reaches from the chart's opening (its injection), the founded machine that reads a
+/// passage's cells as step codes (none on the residue chart, whose step codes are the exterior
+/// codes), and how it was made. The selective step reads the ports through [`Ring::port`]; the card
+/// mounts the lock chart of a chart without a machine (`[port_g(x) ∈ N_g]`, read off the host owner
+/// at the moment's open), so both realizations read one chart.
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct PortChart {
-    /// `ports[g][x]`.
+    /// `ports[g][s]`.
     ports: Vec<Vec<usize>>,
+    /// The step code each exterior code reaches from the opening: `J e_x`'s class.
+    injection: Vec<usize>,
+    machine: Option<FoundedMachine>,
     kind: PortChartKind,
 }
 
@@ -478,18 +492,105 @@ pub struct PortChart {
 pub enum PortChartKind {
     /// The codec's residue chart `code mod d_g`: the declared chart of synthetic fields.
     Residue,
-    /// Founded by `hnn::encoding::found_ports` on a founding passage of `passage` cells: the
-    /// founded constituents placed at their first arrival on each ring's clock, `constituents` of
-    /// them, and the plural fibre of `fibre` codes the passage never separated.
-    Founded {
+    /// Founded by `hnn::encoding::found_ports` on a founding passage of `passage` cells from the
+    /// passage's own transports (the cells' right actions on its context classes, the charged
+    /// founding): `classes` founded classes, each placed at its first arrival on each ring's clock,
+    /// and the plural fibre of `fibre` codes the passage never met.
+    Passage {
         passage: u64,
-        constituents: u64,
+        classes: u64,
         fibre: u64,
     },
 }
 
+/// [definition; agent-inferred, U6] **The founded machine** (`hnn::encoding::found_ports`; the
+/// passage's own transports): the step code a cell reaches from each founded class,
+/// `next[z][x] = T_x z` (the founded class the cell's right action reaches from class `z`, or the
+/// plural fibre for a code the founding passage never met), the opening class (the empty
+/// context) and the fibre's step code. The class it is in is the founded chart's reduced-recurrence
+/// state `z ← U_x z` (Lean `HNN/Encoding.encoding_reduced_recurrence`), carried by the source moment
+/// (`hnn::moment::SourceMoment`); after the fibre it stands at the opening.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct FoundedMachine {
+    next: Vec<Vec<usize>>,
+    opening: usize,
+    fibre: usize,
+}
+
+impl FoundedMachine {
+    /// **Declare a founded machine**: `next[z][x]` for every founded class `z` and exterior code
+    /// `x`, each a class or the fibre (the step code after the last class). Refused unless every
+    /// class reads every code and the opening is a class.
+    pub fn new(next: Vec<Vec<usize>>, opening: usize) -> Result<Self, HnnError> {
+        let fibre = next.len();
+        let alphabet = next.first().map_or(0, Vec::len);
+        if fibre == 0 || opening >= fibre || alphabet == 0 {
+            return Err(HnnError::Shape {
+                what: "a founded machine's classes and its opening among them",
+                expected: 1,
+                found: fibre,
+            });
+        }
+        if let Some(row) = next.iter().find(|row| row.len() != alphabet) {
+            return Err(HnnError::Shape {
+                what: "a founded class's step for every exterior code",
+                expected: alphabet,
+                found: row.len(),
+            });
+        }
+        if let Some(&step) = next.iter().flatten().find(|&&step| step > fibre) {
+            return Err(HnnError::Shape {
+                what: "a founded step inside the classes and the fibre",
+                expected: fibre,
+                found: step,
+            });
+        }
+        Ok(Self {
+            next,
+            opening,
+            fibre,
+        })
+    }
+
+    /// **One cell's step code** from class `state`, and the class after it (the opening after the
+    /// fibre). Refused outside the exterior chart or the classes.
+    pub fn step(&self, state: &mut usize, code: usize) -> Result<usize, HnnError> {
+        let row = self.next.get(*state).ok_or(HnnError::Shape {
+            what: "a founded class",
+            expected: self.fibre,
+            found: *state,
+        })?;
+        let step = *row.get(code).ok_or(HnnError::CellOutside {
+            code,
+            alphabet: row.len(),
+        })?;
+        *state = if step == self.fibre {
+            self.opening
+        } else {
+            step
+        };
+        Ok(step)
+    }
+
+    /// The opening class (the empty context).
+    pub fn opening(&self) -> usize {
+        self.opening
+    }
+
+    /// The fibre's step code (the classes are `0 … fibre − 1`).
+    pub fn fibre(&self) -> usize {
+        self.fibre
+    }
+
+    /// `next[z][x]`.
+    pub fn next(&self) -> &[Vec<usize>] {
+        &self.next
+    }
+}
+
 impl PortChart {
-    /// **The residue chart** `port_g(x) = x mod d_g` over an exterior chart of `alphabet` codes.
+    /// **The residue chart** `port_g(x) = x mod d_g` over an exterior chart of `alphabet` codes; its
+    /// step codes are the exterior codes.
     pub fn residue(periods: &[u64], alphabet: usize) -> Self {
         Self {
             ports: periods
@@ -500,19 +601,51 @@ impl PortChart {
                         .collect()
                 })
                 .collect(),
+            injection: (0..alphabet).collect(),
+            machine: None,
             kind: PortChartKind::Residue,
         }
     }
 
-    /// **A founded chart**, `ports[g][x]` as founded (`hnn::encoding::found_ports`); its shape is
-    /// checked where a field takes it ([`Field::with_port_chart`]).
-    pub fn founded(ports: Vec<Vec<usize>>, kind: PortChartKind) -> Self {
-        Self { ports, kind }
+    /// **A chart founded from a passage's own transports** (`hnn::encoding::found_ports`):
+    /// `ports[g][s]` for the founded classes and the fibre, each exterior code's injection class,
+    /// and the founded machine. Its shape is checked where a field takes it
+    /// ([`Field::with_port_chart`]).
+    pub fn passage(
+        ports: Vec<Vec<usize>>,
+        injection: Vec<usize>,
+        machine: FoundedMachine,
+        kind: PortChartKind,
+    ) -> Self {
+        Self {
+            ports,
+            injection,
+            machine: Some(machine),
+            kind,
+        }
     }
 
-    /// `ports[g][x]`.
+    /// `ports[g][s]`.
     pub fn ports(&self) -> &[Vec<usize>] {
         &self.ports
+    }
+
+    /// The step code each exterior code reaches from the opening.
+    pub fn injection(&self) -> &[usize] {
+        &self.injection
+    }
+
+    /// The founded machine, on a chart founded from a passage.
+    pub fn machine(&self) -> Option<&FoundedMachine> {
+        self.machine.as_ref()
+    }
+
+    /// The count of step codes (the exterior codes on the residue chart; the founded classes and
+    /// the fibre on a founded chart).
+    pub fn steps(&self) -> usize {
+        self.machine
+            .as_ref()
+            .map_or(self.injection.len(), |machine| machine.fibre + 1)
     }
 
     /// How the chart was made.
@@ -522,7 +655,7 @@ impl PortChart {
 
     /// Whether the chart was founded (not the codec's residue chart).
     pub fn is_founded(&self) -> bool {
-        matches!(self.kind, PortChartKind::Founded { .. })
+        matches!(self.kind, PortChartKind::Passage { .. })
     }
 }
 
@@ -542,7 +675,7 @@ pub struct Ring {
     admittance: Rat,
     parametron: Parametron,
     initial: u64,
-    /// The port of each exterior code on this ring, read from the field's [`PortChart`].
+    /// The port of each step code on this ring, read from the field's [`PortChart`].
     ports: Vec<usize>,
 }
 
@@ -700,13 +833,14 @@ impl Ring {
         Ok(clock)
     }
 
-    /// **The port class of an exterior code** on this ring, read from the field's [`PortChart`]
-    /// (module header, "The port chart"). Every caller reads a code of the field's exterior chart
-    /// (the selective step refuses one outside it); a code outside the chart reads the port `d_g`,
-    /// which no lock admits.
-    pub fn port(&self, code: usize) -> usize {
+    /// **The port class of a step code** on this ring, read from the field's [`PortChart`]
+    /// (module header, "The port chart"): an exterior code on the residue chart, a founded class or
+    /// the fibre on a founded chart ([`Field::step_code`]). Every caller reads a step code of the
+    /// field's chart (the selective step refuses one outside it); a code outside the chart reads
+    /// the port `d_g`, which no lock admits.
+    pub fn port(&self, step: usize) -> usize {
         self.ports
-            .get(code)
+            .get(step)
             .copied()
             .unwrap_or(self.placements.len())
     }
@@ -1169,9 +1303,10 @@ impl Field {
     }
 
     /// **The field with a founded port chart** (module header, "The port chart"): every ring reads
-    /// its ports from `chart`. Refused unless the chart gives one port of `ℤ/d_g` for every
-    /// exterior code on every ring. Nothing else of the declaration changes: the capacity counts the
-    /// exterior chart, and the word's precisions read no port.
+    /// its ports from `chart`. Refused unless the chart gives one port of `ℤ/d_g` for every step
+    /// code on every ring, one step code for every exterior code, and a founded machine (where it
+    /// has one) reading every exterior code. Nothing else of the declaration changes: the capacity
+    /// counts the exterior chart, and the word's precisions read no port.
     pub fn with_port_chart(mut self, chart: PortChart) -> Result<Self, HnnError> {
         if chart.ports().len() != self.rings.len() {
             return Err(HnnError::Shape {
@@ -1180,11 +1315,30 @@ impl Field {
                 found: chart.ports().len(),
             });
         }
+        let steps = chart.steps();
+        if chart.injection().len() != self.alphabet
+            || chart.injection().iter().any(|&step| step >= steps)
+        {
+            return Err(HnnError::Shape {
+                what: "a port chart's injection: one step code for every exterior code",
+                expected: self.alphabet,
+                found: chart.injection().len(),
+            });
+        }
+        if let Some(machine) = chart.machine()
+            && machine.next().first().map_or(0, Vec::len) != self.alphabet
+        {
+            return Err(HnnError::Shape {
+                what: "a founded machine reading every exterior code",
+                expected: self.alphabet,
+                found: machine.next().first().map_or(0, Vec::len),
+            });
+        }
         for (ring, ports) in self.rings.iter().zip(chart.ports()) {
-            if ports.len() != self.alphabet {
+            if ports.len() != steps {
                 return Err(HnnError::Shape {
-                    what: "a port chart's codes on a ring",
-                    expected: self.alphabet,
+                    what: "a port chart's step codes on a ring",
+                    expected: steps,
                     found: ports.len(),
                 });
             }
@@ -1206,6 +1360,45 @@ impl Field {
     /// The port chart the rings read.
     pub fn port_chart(&self) -> &PortChart {
         &self.port_chart
+    }
+
+    /// The count of the port chart's step codes ([`PortChart::steps`]).
+    pub fn steps(&self) -> usize {
+        self.port_chart.steps()
+    }
+
+    /// **The founded class a passage opens at**: the founded machine's opening, or `0` on a chart
+    /// with no machine (where the class is not read).
+    pub fn founded_opening(&self) -> usize {
+        self.port_chart.machine().map_or(0, FoundedMachine::opening)
+    }
+
+    /// **One cell's step code** from the founded class `state` (module header, "The port chart"):
+    /// the exterior code itself on a chart with no machine; the founded class the cell reaches on a
+    /// founded chart, the class moving with it (`FoundedMachine::step`). Refused outside the
+    /// exterior chart.
+    pub fn step_code(&self, state: &mut usize, code: usize) -> Result<usize, HnnError> {
+        if code >= self.alphabet {
+            return Err(HnnError::CellOutside {
+                code,
+                alphabet: self.alphabet,
+            });
+        }
+        match self.port_chart.machine() {
+            Some(machine) => machine.step(state, code),
+            None => Ok(code),
+        }
+    }
+
+    /// **A passage's step codes from the opening** ([`Field::step_code`] over the cells in order,
+    /// the class starting at [`Field::founded_opening`]): what the source moment steps the rings by
+    /// on a passage it opens at its first cell.
+    pub fn step_codes(&self, cells: &[usize]) -> Result<Vec<usize>, HnnError> {
+        let mut state = self.founded_opening();
+        cells
+            .iter()
+            .map(|&code| self.step_code(&mut state, code))
+            .collect()
     }
 
     /// **The word's declared precisions** (the lattice word; [`WordLattice::by_rule`]): the charts'
@@ -1346,8 +1539,10 @@ impl Field {
     }
 
     /// **One cell's selective step on a lift point**, in carry order: ring `g` advances
-    /// `[port_g(x) ∈ N_g]` plus its predecessor's carry; the last ring's carry is the carry-out.
-    /// Lean `HNN/Moment.selective_position`.
+    /// `[port_g(s) ∈ N_g]` plus its predecessor's carry; the last ring's carry is the carry-out.
+    /// Lean `HNN/Moment.selective_position`. `s` is the cell's step code ([`Field::step_code`]): the
+    /// exterior code on a chart with no machine, the founded class the cell reached on a founded
+    /// chart.
     ///
     /// [definition; agent-inferred, U5] **The carry is the ring clock's jumps.** Ring `g`'s carry
     /// into ring `g + 1` is the jump count of its clock ([`Ring::clock_at`]) over its advance,
@@ -1361,15 +1556,15 @@ impl Field {
     pub fn selective_step(
         &self,
         lift: &mut [BigInt],
-        code: usize,
+        step: usize,
     ) -> Result<SelectiveStep, HnnError> {
-        if code >= self.alphabet {
+        if step >= self.steps() {
             return Err(HnnError::CellOutside {
-                code,
-                alphabet: self.alphabet,
+                code: step,
+                alphabet: self.steps(),
             });
         }
-        self.step_at_ports(lift, |g| self.rings[g].port(code))
+        self.step_at_ports(lift, |g| self.rings[g].port(step))
     }
 
     /// **The selective step at given ports**: ring `g` advances `[port(g) ∈ N_g]` plus its
@@ -1914,13 +2109,16 @@ impl Field {
         }
         natural(&mut code, self.capacity.n_star());
         // The port chart (module header, "The port chart"): 0 names the codec's residue chart
-        // `code mod d_g`; 1 names the chart founded at first arrival on the rings' own clocks over a
-        // founding passage of the given length (`hnn::encoding::found_ports`), a causal function of
-        // that passage's cells, which the exposure codes, so its rule is its description.
+        // `code mod d_g`; 2 names the chart founded from a founding passage of the given length by
+        // its own transports (`hnn::encoding::found_ports`: the charged founding of its context
+        // classes, each founded class placed at first arrival on the rings' own clocks), a causal
+        // function of that passage's cells, which the exposure codes, so its rule is its
+        // description. Code 1 was the retired exterior founding (each reached cell its own
+        // constituent, the identity its only transport).
         match self.port_chart.kind() {
             PortChartKind::Residue => natural(&mut code, 0),
-            PortChartKind::Founded { passage, .. } => {
-                natural(&mut code, 1);
+            PortChartKind::Passage { passage, .. } => {
+                natural(&mut code, 2);
                 natural(&mut code, passage);
             }
         }
@@ -2303,9 +2501,10 @@ impl Current {
         Ok(BigInt::from(self.clock(field, ring)?.winding().clone()))
     }
 
-    /// One cell's selective step of the lift point ([`Field::selective_step`]).
-    pub fn step(&mut self, field: &Field, code: usize) -> Result<SelectiveStep, HnnError> {
-        field.selective_step(&mut self.lift, code)
+    /// One cell's selective step of the lift point at the cell's step code ([`Field::selective_step`];
+    /// the exterior code on a chart with no machine, [`Field::step_code`] on a founded chart).
+    pub fn step(&mut self, field: &Field, step: usize) -> Result<SelectiveStep, HnnError> {
+        field.selective_step(&mut self.lift, step)
     }
 
     /// **Re-key one ring**: set its phase class, keeping its winding (design (d), R3 K1; Lean
