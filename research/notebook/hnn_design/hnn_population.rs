@@ -15,6 +15,7 @@
 //! cargo run --release -p holonics --example hnn_population -- switching [parity | sheets]
 //! cargo run --release -p holonics --example hnn_population -- standing .local/cuts/standing-real-cut-campaign-1.bin
 //! cargo run --release -p holonics --example hnn_population -- composition [products | primes]
+//! cargo run --release -p holonics --example hnn_population -- arithmetic [development]
 //! cargo run --release -p holonics --example hnn_population -- evolution
 //! cargo run --release -p holonics --example hnn_population -- species
 //! cargo run --release -p holonics --example hnn_population -- birth-probe
@@ -95,6 +96,9 @@ mod f0;
 
 #[path = "hnn_population_birth.rs"]
 mod birth;
+
+#[path = "hnn_population_arithmetic.rs"]
+mod arithmetic;
 
 use std::time::Instant;
 
@@ -1326,6 +1330,8 @@ fn main() {
         ["standing", path] => standing_harness(path),
         ["composition"] => composition::harness(None),
         ["composition", which] => composition::harness(Some(which)),
+        ["arithmetic"] => arithmetic::harness(false),
+        ["arithmetic", "development"] => arithmetic::harness(true),
         ["evolution"] => evolution::evolution(),
         ["species"] => evolution::species(),
         ["birth"] => birth::harness(),
@@ -1384,7 +1390,7 @@ fn main() {
             curated::checkpoint_restore(choosing_cut, checkpoint_path);
         }
         _ => println!(
-            "usage: hnn_population -- tree <d> | moire parity | moire sheets | crib | switching | standing <cut> | composition [products | primes] | evolution | species | curated <curated-cut> <flat-cut> [development | merges] | f4 <joined-cut> <joined-flat-cut> | f0-egg <joined-cut> <joined-flat-cut> | f0-census <joined-cut> | u2-acceptance <joined-cut> <joined-flat-cut> | f0-acceptance <joined-cut> <joined-flat-cut> <owner-only-releases.json | none> | f5-native <choosing-cut> <private-request> <private-seed> <private-output> | f5-family <choosing-cut> <private-request> <private-seed> <private-output> | f5-family-verify <choosing-cut> <private-request> <private-seed> <private-output> | f5-bundle <choosing-cut> <private-F5R1-bundle> <owner-only-output-dir> [limit 1..32] | f5-checkpoint-census <choosing-cut> | f5-checkpoint-restore <choosing-cut> <.local/cuts/private-checkpoint>"
+            "usage: hnn_population -- tree <d> | moire parity | moire sheets | crib | switching | standing <cut> | composition [products | primes] | arithmetic [development] | evolution | species | curated <curated-cut> <flat-cut> [development | merges] | f4 <joined-cut> <joined-flat-cut> | f0-egg <joined-cut> <joined-flat-cut> | f0-census <joined-cut> | u2-acceptance <joined-cut> <joined-flat-cut> | f0-acceptance <joined-cut> <joined-flat-cut> <owner-only-releases.json | none> | f5-native <choosing-cut> <private-request> <private-seed> <private-output> | f5-family <choosing-cut> <private-request> <private-seed> <private-output> | f5-family-verify <choosing-cut> <private-request> <private-seed> <private-output> | f5-bundle <choosing-cut> <private-F5R1-bundle> <owner-only-output-dir> [limit 1..32] | f5-checkpoint-census <choosing-cut> | f5-checkpoint-restore <choosing-cut> <.local/cuts/private-checkpoint>"
         ),
     }
 }
