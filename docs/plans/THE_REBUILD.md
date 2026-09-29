@@ -841,6 +841,38 @@ branch; intervals that do not shorten the charged code are recorded and not adop
     - `E`'s certified step (`2⁻¹⁶..2⁻¹²`) leaves the class images spread over the ring, and a
       linear readout of their sum cancels the other data only when
       `2D ≥ (n + m − 1)(|A| − 1)`.
+- **The parametron re-derived, September 29: the pump reads relative phase, and the Floquet
+  certificate decides the lock**
+  ([pin](../../research/records/2026-09-29_THE_PARAMETRON_RE_DERIVED_PINNED_BEFORE_ITS_RUNS.md),
+  `ad0281ab`;
+  [receipt](../../research/records/2026-09-29_THE_PARAMETRON_RE_DERIVED_THE_PUMP_READS_RELATIVE_PHASE_AND_THE_FLOQUET_CERTIFICATE_DECIDES_THE_LOCK.md);
+  `8e094bf7`; Refs #73 #63).
+  - *Built* (Brandon: "please do not restrict us to clearly partially implemented constructs"):
+    - the pump as a periodic modulation of the constitution, declared or modulated by the crossing
+      cells (`hnn::ring::PumpSchedule`, `ResonatorOperands::scheduled`);
+    - the Floquet monodromy of a pump period, its multipliers placed exactly about any circle, its
+      certificate `M_TᵀGM_T ⪯ ρ²G` by inertia on a metric attained by any means, the exact
+      decision passive, edge or growing, and the consumer's bound (`Floquet`, `attain_metric`,
+      `FloquetBound::reach`);
+    - phase-sensitive amplification read at its sheet (`lock`) and a bank of receiving parametrons
+      at declared pump phases (`ReceivingBank`);
+    - Lean `HNN/Floquet` and `Objects/ParametronLock` (44 theorems); the guide's §5 re-derived.
+  - *Measured*:
+    - 13 of 13 declared pumped rings decided as declared on the law and the lattice word (passive
+      certified at `ρ = 1`, the standing bifurcation at the edge, growth enclosed at `2⁻⁸`); 448 of
+      448 executed ticks closed; the rotating pumps' bifurcations bracketed exactly;
+    - the bank read the relative phase class of 13,824 of 13,824 known-truth pairs (2,048 declared
+      pairs and 11,776 of the order-2 terrain's placed cells), against the linear lock's best map
+      at 1,561 of 2,048, which cannot read the orientation.
+  - *What stays open*, measured:
+    - the square law is the pump's: a relative phase is even under the half-turn, and no linear
+      threshold reads it, so the relative phases in the order repair's superposed moment reach no
+      linear face;
+    - the bank reads two cells, each pumping its own section crossing, not a superposed passage; the
+      passage's reading is the monodromy through every crossing cell's pump (its spectrum at the
+      ring's parametric resonance), not built;
+    - `hnn::constitution` does not yet read `FloquetBound::reach`, so a step through a pumped
+      resonator stays refused.
 
 #### U7. The targets, alongside
 
