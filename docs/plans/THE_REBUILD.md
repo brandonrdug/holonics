@@ -510,6 +510,29 @@ curated source gains its intervals (source contract item 9), measured as a charg
 against the source without them. Their gates below are unchanged. Failure: each gate's own failure
 branch; intervals that do not shorten the charged code are recorded and not adopted.
 
+- **Audited September 29; restated**
+  ([record](../../research/records/2026-09-29_THE_TEXT_CHART_AUDITED_ONE_PREDICTOR_SEEN_CONVERSATIONS_AND_NO_ARITHMETIC.md)).
+  F0's acceptance run failed, and two independent audits of the chart found its method naive. The
+  failures:
+  - The comparison was lopsided: under full accounting the "egg" codes the curated stream
+    `+2122 + 14/16 + ε` bits worse than the flat tree.
+  - "Unseen families" were unseen messages inside conversations already read.
+  - The "response stops" are mostly record splits and conversation switches.
+  - The stream interleaves conversations with no per-conversation state.
+  - The chart has no arithmetic.
+  - Its generation is byte-by-byte sampling, not egg packing.
+  - "Truth" named the logged reply, which is observed conduct; the name is retired.
+
+  The chart's next loop is the record's §4, each item with its acceptance fixed there:
+  - (1) the data protocol: conversations as the split unit, a reserve that nothing has read, and a
+    state per conversation;
+  - (3) arithmetic joined through one shared contract, in bases 2, 10 and 16, with producers of one
+    face kept distinguishable.
+
+  The symmetric comparison (2), generation as a requested consequence (4) and retention around the
+  admitted actions (5) follow. F0's release gate, F4's curated release and F5 wait on them. Brandon
+  reviews the record before the loop is built.
+
 #### U7. The targets, alongside
 
 Every existing target obligation stays (RH, Hodge, complex Euler and Navier–Stokes, BSD, their Lean
@@ -672,6 +695,9 @@ on the admitted egg, and the trees beyond depth 24 add at most 20 bits.
   reported beside it.
 - **If it fails.** The byte population stays a compression result, and F4's curated release and F5
   wait. The chase terrain (F6) carries the architecture's tests.
+- **Audited September 29** (U6's restatement): the acceptance run's comparison was lopsided, its
+  validation messages lay in conversations already read, and its stops were mostly record
+  boundaries. The failure verdict stands, more strongly.
 - **The acceptance run, September 28: the pins** (U6's first loop; committed before the split is
   generated; [record](../../research/records/2026-09-28_F0_THE_PREDICTOR_ON_UNSEEN_FAMILIES_PINNED_BEFORE_ITS_SPLIT_IS_READ.md);
   `hnn_population f0-acceptance`; Refs #73 #148 #63). A fresh split (seed

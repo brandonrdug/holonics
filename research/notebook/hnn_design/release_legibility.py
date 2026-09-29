@@ -16,7 +16,7 @@ section letters). It prints counts only, never text.
 The optional argument reads another owner-only release file of the same case shape (`request` and
 `responses.athena.text`, e.g. F0's token releases `f0-token-releases.json`) in place of the blind
 input; a corpus whose field that file does not carry (the retrieval controls) is not read. Every
-other response every case carries is its own corpus (F0's acceptance run: `truth`, the held-out
+other response every case carries is its own corpus (F0's acceptance run: `logged`, the held-out
 continuation, and `flat`, the flat tree's release). The second argument names the choosing cut whose
 vocabulary the words are read against (the F5 choosing cut by default; F0's acceptance run reads its
 own split's, `curated-f0-choosing-cut.bin`).
@@ -44,7 +44,7 @@ ROOT = os.environ.get(
     os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))),
 )
 CUTS = os.path.join(ROOT, ".local", "cuts")
-CORPUS = {"control": "retrieval controls", "truth": "held-out truths", "flat": "flat tree releases"}
+CORPUS = {"control": "retrieval controls", "logged": "logged replies (observed conduct, not targets)", "flat": "flat tree releases"}
 PAIRED = {"()": ("(", ")"), "[]": ("[", "]"), "{}": ("{", "}"), "“”": ("“", "”")}
 SELF_PAIRED = {"backtick": "`", "straight quote": '"', "bold": "**"}
 WORD = re.compile(r"[A-Za-z]{2,}")

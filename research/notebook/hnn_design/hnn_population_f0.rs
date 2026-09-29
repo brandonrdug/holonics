@@ -34,8 +34,9 @@
 //!   32 order keys among the eligible, module constants), the egg's future is branched at the
 //!   response's opening and released under the scored law (`Population::release_response`, the egg
 //!   alone named by 0 bits) with a cap of [`RELEASE_CAP`] bytes; the flat tree's future is branched
-//!   at the same byte and draws as many bytes as the held-out truth holds (its stop observed, never
-//!   predicted), from the same keys. The text of each goes to the owner-only file.
+//!   at the same byte and draws as many bytes as the logged reply holds (its stop observed, never
+//!   predicted; the logged reply is observed conduct, not a target, and the length it lends the flat
+//!   control is a borrowing the audit of September 29 names), from the same keys. The text of each goes to the owner-only file.
 //! - **The guards**: a passage past 600,000 ms or a resident set past 20,000,000,000 bytes stops the
 //!   run; its partial evidence is printed as incomplete.
 
@@ -659,7 +660,7 @@ pub fn acceptance(curated_path: &str, flat_path: &str, releases_path: &str) {
         0,
     )
     .expect("the flat tree");
-    let truths: Vec<Vec<u8>> = selected
+    let logged: Vec<Vec<u8>> = selected
         .iter()
         .map(|chosen| part_bytes(&cut.codes, chosen.letter, chart))
         .collect();
@@ -684,7 +685,7 @@ pub fn acceptance(curated_path: &str, flat_path: &str, releases_path: &str) {
         if with_releases && let Some(&order) = at_byte.get(&position) {
             let released = release_flat(
                 &flat_tree,
-                truths[order].len().min(RELEASE_CAP),
+                logged[order].len().min(RELEASE_CAP),
                 selected[order].key,
             );
             flat_releasing += released.1;
@@ -861,17 +862,17 @@ pub fn acceptance(curated_path: &str, flat_path: &str, releases_path: &str) {
             let (flat_release, flat_ms) = flat_releases[order]
                 .as_ref()
                 .expect("the flat tree released here");
-            let truth = &truths[order];
+            let reply = &logged[order];
             *statuses.entry(egg_release.status.clone()).or_default() += 1;
             println!(
-                "  release {order}: {}; {} bytes over {} cells; branch {} ms, warm {} ms; the truth {} bytes (UTF-8 {}); the flat tree {} bytes (UTF-8 {}) in {flat_ms} ms",
+                "  release {order}: {}; {} bytes over {} cells; branch {} ms, warm {} ms; the logged reply {} bytes (UTF-8 {}); the flat tree {} bytes (UTF-8 {}) in {flat_ms} ms",
                 egg_release.status,
                 egg_release.bytes.len(),
                 egg_release.cells,
                 egg_release.branch_ms,
                 egg_release.warm_ms,
-                truth.len(),
-                std::str::from_utf8(truth).is_ok(),
+                reply.len(),
+                std::str::from_utf8(reply).is_ok(),
                 flat_release.len(),
                 std::str::from_utf8(flat_release).is_ok()
             );
@@ -882,15 +883,15 @@ pub fn acceptance(curated_path: &str, flat_path: &str, releases_path: &str) {
             };
             let request = part_bytes(&cut.codes, chosen.target, chart);
             cases.push(format!(
-                "{{\"order\":{order},\"validation_tick\":{},\"request\":{},\"responses\":{{\"athena\":{{\"text\":{athena},\"valid_utf8\":{},\"bytes\":{},\"emitted\":{}}},\"truth\":{{\"text\":{},\"valid_utf8\":{},\"bytes\":{}}},\"flat\":{{\"text\":{},\"valid_utf8\":{},\"bytes\":{}}}}}}}",
+                "{{\"order\":{order},\"validation_tick\":{},\"request\":{},\"responses\":{{\"athena\":{{\"text\":{athena},\"valid_utf8\":{},\"bytes\":{},\"emitted\":{}}},\"logged\":{{\"text\":{},\"valid_utf8\":{},\"bytes\":{}}},\"flat\":{{\"text\":{},\"valid_utf8\":{},\"bytes\":{}}}}}}}",
                 chosen.letter - development,
                 json_text(&request),
                 std::str::from_utf8(&egg_release.bytes).is_ok(),
                 egg_release.bytes.len(),
                 json_text(&egg_release.bytes),
-                json_text(truth),
-                std::str::from_utf8(truth).is_ok(),
-                truth.len(),
+                json_text(reply),
+                std::str::from_utf8(reply).is_ok(),
+                reply.len(),
                 json_text(flat_release),
                 std::str::from_utf8(flat_release).is_ok(),
                 flat_release.len()
