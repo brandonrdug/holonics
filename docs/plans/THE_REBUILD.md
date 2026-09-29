@@ -713,6 +713,37 @@ branch; intervals that do not shorten the charged code are recorded and not adop
     `5 + 13/16` and `5 + 14/16` bits a station, near their byte frequencies, so its sections are
     illegible; campaign 1's normal-law steps diverge at `K = 4` on the moiré (the covector reaching
     the source port sums every station and re-entry), a stability bound owed in #62.
+- **The passage's own transports, September 29: the moiré founds its ranks with no transport
+  declared; text codes below the cell chart; the sections are not produced by the pinned run**
+  ([pin](../../research/records/2026-09-29_THE_PASSAGES_OWN_TRANSPORTS_PINNED_BEFORE_ITS_RUNS.md),
+  `962d038e`;
+  [receipt](../../research/records/2026-09-29_THE_PASSAGES_OWN_TRANSPORTS_THE_MOIRE_FOUNDS_ITS_RANKS_WITH_NO_TRANSPORT_DECLARED_AND_TEXT_CODES_BELOW_THE_CELL_CHART.md);
+  `32314569`; Refs #73 #148 #63).
+  - *Built*: a passage's context classes under the cells' right actions and their chart, whose
+    founding is the passage's Hankel realization (`hnn::encoding::{ContextClasses,
+    PassageChart::{passage, unconditioned, founded}}`); the charged founding (`found_passage`: the
+    reach ladder, each class born only where `receiver::population::birth_price`, the priced merge
+    read from the birth's side, shortens the code); the founded machine's classes as the field's step
+    codes (`hnn::field::FoundedMachine`), carried by the source moment and read by the target phases,
+    the keys' crib, the letters' reader and `E_0`; the exterior founding retired; Lean
+    `HNN/Encoding.{hankel_identification, hankel_rank_eq, forms_span_kernel, continuation_intertwines}`.
+  - *Terrain*, no transport declared: the moiré's letters found 12, 12 and 20 (the count Hankel rank,
+    the cycles' periods, as the pin's correction derived) and its unconditioned tick 7, 7 and 11 (the
+    declared rotor's), every square exact. The crib's eight emissions fall into one fixed cell after
+    2–39 cells, so their closed cycle is one cell: (a) holds, (b)'s equality with 3–6 and 16–40 fails
+    as pinned.
+  - *Text* (6,148 choosing-role bytes): 36 founded classes from 65 reached cells (24 one-cell
+    contexts, the longest three cells); the field's held-out code `5461 + 10/16 + ε` against the 65-cell
+    chart's `5463 + 9/16 + ε` (**acceptance 2 holds**) and the residue chart's `5459 + 13/16 + ε`;
+    `Kt` `20023 + 10/16 + ε`; 437,281 ms, peak 381,263,872 bytes.
+  - *Sections*: the pinned `hnn_prediction` text run passed its bound twice (660 s and 900 s) with no
+    section; on the founded `E_0` a batch's stage grows to 55,433 ms from the ninth deposit against at
+    most 6,047 on the residue chart. A bounded reading (128 pairs, one pass) released 8 illegible
+    sections, six empty.
+  - *What stays open*, measured: the founded chart codes the held-out cells about `1 + 13/16` bits above
+    the residue chart; ring 0's lock admits 174 development cells against 842; the ladder is myopic
+    (a class that pays only through a longer class it opens is never born); the founded `E_0` makes
+    the prediction's refinement cost grow past its bound.
 
 #### U7. The targets, alongside
 

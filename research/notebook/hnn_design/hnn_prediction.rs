@@ -7,12 +7,13 @@
 //! cargo run --release -p holonics --example hnn_prediction -- probe copy
 //! cargo run --release -p holonics --example hnn_prediction -- probe moire
 //! cargo run --release -p holonics --example hnn_prediction -- probe text .local/cuts/curated-u6-passage-cut.bin
+//! cargo run --release -p holonics --example hnn_prediction -- probe text .local/cuts/curated-u6-passage-cut.bin founding .local/cuts/u6-encoding-probe.bin
 //! cargo run --release -p holonics --example hnn_prediction -- copy
 //! cargo run --release -p holonics --example hnn_prediction -- moire
 //! cargo run --release -p holonics --example hnn_prediction -- text .local/cuts/curated-u6-passage-cut.bin .local/cuts/u6-native-sections.txt
 //! cargo run --release -p holonics --example hnn_prediction -- text .local/cuts/curated-u6-passage-cut.bin <owner-only sections> founding .local/cuts/u6-encoding-probe.bin
 //! cargo run --release -p holonics --example hnn_prediction -- develop copy|moire <train> <evaluate> [s] [batch] [d] [K]
-//! cargo run --release -p holonics --example hnn_prediction -- develop text <cut> <train> [s]
+//! cargo run --release -p holonics --example hnn_prediction -- develop text <cut> <train> [s] [founding cut]
 //! ```
 //!
 //! [definition; agent-inferred, the record's pins] **What it executes.**
@@ -52,7 +53,9 @@
 //!   the text field reads the port chart founded by the passage's own transports on the named cut's
 //!   development part (`holonics::hnn::encoding::found_ports`), placed on this field's rings; the
 //!   source moment steps by the founded classes and `E_0` opens at the founded injection. Nothing
-//!   else of the run changes. Without it the field reads the declared residue chart.
+//!   else of the run changes. Without it the field reads the declared residue chart. `train <pairs>`
+//!   and `passes <n>` bound the text run's training below the pinned 1,024 pairs and 2 passes (a
+//!   bounded reading, reported as such).
 
 #[path = "exterior.rs"]
 mod exterior;
@@ -689,7 +692,7 @@ fn text_passage(cut_path: &str, declared: &Declared, bound: usize, validation: b
 }
 
 #[allow(clippy::disallowed_types, clippy::disallowed_methods)]
-fn text(cut_path: &str, out_path: &str, founding_path: Option<&str>) {
+fn text(cut_path: &str, out_path: &str, founding_path: Option<&str>, bound: usize, passes: usize) {
     let clock = Instant::now();
     let declared = text_declared();
     // The founding passage: the named cut's development part, before its held-out range.
@@ -705,7 +708,7 @@ fn text(cut_path: &str, out_path: &str, founding_path: Option<&str>) {
         train,
         validation_eligible,
         selected,
-    } = text_passage(cut_path, &declared, TEXT_TRAIN, true);
+    } = text_passage(cut_path, &declared, bound, true);
     let mut engine = Engine::founded(declared, founding.as_deref());
     println!(
         "hnn_prediction text: the passage {cells} cells, the choosing role's first {development}; choosing request pairs {eligible}, trained on the first {}; validation eligible {validation_eligible}, released {}; d = {}, |A| = {}, K = {}, w = {}, m = {}, batch {}, keyed members {}; reserve excluded {}",
@@ -721,7 +724,7 @@ fn text(cut_path: &str, out_path: &str, founding_path: Option<&str>) {
         if reserve_read() { "NO (--read-reserve)" } else { RESERVE_SHA256 }
     );
     let mut complete = true;
-    'passes: for _ in 0..TEXT_PASSES {
+    'passes: for _ in 0..passes {
         for batch in train.chunks(declared.batch) {
             if !guarded(&clock) {
                 complete = false;
@@ -732,7 +735,7 @@ fn text(cut_path: &str, out_path: &str, founding_path: Option<&str>) {
     }
     engine.report("training");
     println!(
-        "  training ({TEXT_PASSES} passes) {} ms{}; resident {}",
+        "  training ({passes} passes) {} ms{}; resident {}",
         clock.elapsed().as_millis(),
         if complete { "" } else { ", stopped at a guard: INCOMPLETE" },
         resident()
@@ -770,8 +773,12 @@ fn text(cut_path: &str, out_path: &str, founding_path: Option<&str>) {
 
 /// **The probe**: a bounded dry run of one mode's engine, its milliseconds a refinement and a
 /// deposit and its resident set, from which the pinned run is projected.
-fn probe(mode: &str, cut: Option<&str>) {
+fn probe(mode: &str, cut: Option<&str>, founding_path: Option<&str>) {
     let clock = Instant::now();
+    let founding: Option<Vec<usize>> = founding_path.map(|path| {
+        let (bytes, _, held) = read_cut(path);
+        bytes[..held.start].iter().map(|&byte| usize::from(byte)).collect()
+    });
     let (declared, pairs) = match mode {
         "copy" => (terrain_declared(), copy_pairs(&terrain_declared(), 1, 32)),
         "moire" => {
@@ -786,7 +793,7 @@ fn probe(mode: &str, cut: Option<&str>) {
         }
         other => panic!("probe copy | moire | text, not {other}"),
     };
-    let mut engine = Engine::new(declared);
+    let mut engine = Engine::founded(declared, founding.as_deref());
     let built = clock.elapsed().as_millis();
     let start = Instant::now();
     for batch in pairs.chunks(declared.batch) {
@@ -812,6 +819,11 @@ fn main() {
         Some("probe") => probe(
             arguments.get(2).map(String::as_str).expect("a mode"),
             arguments.get(3).map(String::as_str),
+            match (arguments.get(4).map(String::as_str), arguments.get(5)) {
+                (Some("founding"), Some(path)) => Some(path.as_str()),
+                (None, _) => None,
+                _ => panic!("probe text <cut> [founding <cut>]"),
+            },
         ),
         // Development reads before the pins: the terrain at development seeds (never the pinned
         // training or evaluation seeds) and counts given on the command line.
@@ -866,7 +878,11 @@ fn main() {
                         false,
                     );
                     let clock = Instant::now();
-                    let mut engine = Engine::new(declared);
+                    let founding: Option<Vec<usize>> = arguments.get(6).map(|path| {
+                        let (bytes, _, held) = read_cut(path);
+                        bytes[..held.start].iter().map(|&byte| usize::from(byte)).collect()
+                    });
+                    let mut engine = Engine::founded(declared, founding.as_deref());
                     for batch in passage.train.chunks(declared.batch) {
                         if !guarded(&clock) {
                             break;
@@ -907,17 +923,26 @@ fn main() {
                 moire_windows(&moire, &declared),
             );
         }
-        Some("text") => text(
-            arguments.get(2).map(String::as_str).expect("the passage cut"),
-            arguments.get(3).map(String::as_str).expect("the sections' owner-only file"),
-            match (arguments.get(4).map(String::as_str), arguments.get(5)) {
-                (Some("founding"), Some(path)) => Some(path.as_str()),
-                (None, _) => None,
-                _ => panic!("text <cut> <out> [founding <cut>]"),
-            },
-        ),
+        Some("text") => {
+            let (mut founding, mut bound, mut passes) = (None, TEXT_TRAIN, TEXT_PASSES);
+            for pair in arguments[4..].chunks(2) {
+                match pair {
+                    [key, value] if key == "founding" => founding = Some(value.as_str()),
+                    [key, value] if key == "train" => bound = value.parse().expect("pairs"),
+                    [key, value] if key == "passes" => passes = value.parse().expect("passes"),
+                    _ => panic!("text <cut> <out> [founding <cut>] [train <pairs>] [passes <n>]"),
+                }
+            }
+            text(
+                arguments.get(2).map(String::as_str).expect("the passage cut"),
+                arguments.get(3).map(String::as_str).expect("the sections' owner-only file"),
+                founding,
+                bound,
+                passes,
+            )
+        }
         _ => panic!(
-            "hnn_prediction probe <mode> [cut] | copy | moire | text <cut> <out> [founding <cut>]"
+            "hnn_prediction probe <mode> [cut] | copy | moire | text <cut> <out> [founding <cut>] [train <pairs>] [passes <n>]"
         ),
     }
 }

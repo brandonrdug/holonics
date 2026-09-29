@@ -1791,6 +1791,30 @@ thread stay attached through the field's complex and carry chain.
 - **Cost.** 447,718, 142,464 and 389,739 ms; peak resident sets 401,580,032, 381,526,016 and
   819,576,832 bytes.
 
+### U6: the passage's own transports, the founded port chart (September 29)
+
+Records: [the pin](../../records/2026-09-29_THE_PASSAGES_OWN_TRANSPORTS_PINNED_BEFORE_ITS_RUNS.md)
+(`962d038e`) and [the receipt](../../records/2026-09-29_THE_PASSAGES_OWN_TRANSPORTS_THE_MOIRE_FOUNDS_ITS_RANKS_WITH_NO_TRANSPORT_DECLARED_AND_TEXT_CODES_BELOW_THE_CELL_CHART.md);
+plan: THE_REBUILD U6. Refs #73 #148 #63.
+
+```sh
+cargo run --release -p holonics --example hnn_exposure -- cut-file .local/cuts/u6-encoding-probe.bin cells all ports passage expansions <owner-only file>
+cargo run --release -p holonics --example hnn_exposure -- found-only yes            # the founding alone, on the public control
+cargo run --release -p holonics --example hnn_prediction -- text .local/cuts/curated-u6-passage-cut.bin <owner-only file> founding .local/cuts/u6-encoding-probe.bin [train <pairs>] [passes <n>]
+cargo run --release -p holonics --example hnn_prediction -- develop text .local/cuts/curated-u6-passage-cut.bin 385 1 .local/cuts/u6-encoding-probe.bin
+```
+
+- **The founding** (development cells only): the public control's 4,958 cells found 41 classes from
+  101 reached cells in 29,254 ms; the probe's 4,096 found 36 from 65 in 9,647 ms.
+- **The exposure**: the held-out field face `5461 + 10/16 + ε` against the 65-cell chart's
+  `5463 + 9/16 + ε`; 437,281 ms, peak 381,263,872 bytes. On the public control (a development
+  reading) ring 0's lock admitted 2,128 of 4,958 development cells and the joint clock closed 37
+  aeons (484,315 ms of exposure).
+- **The prediction**: the pinned text run passed its bound (660 s, then 900 s) with no section; the
+  founded `E_0` grows a batch's stage to 55,433 ms from the ninth deposit, against at most 6,047 on
+  the residue chart (`develop text`, one pass). A bounded reading (`train 128 passes 1`) released 8
+  illegible sections, six empty. The text is owner-only.
+
 ### F0 candidate 3: learned tokens with the receiving tree over them (September 28)
 
 Record: no dedicated record; THE_REBUILD's F0 carries the outcome, after [the forward plan stopped at transfer](../../records/2026-09-28_THE_FORWARD_PLAN_STOPPED_AT_TRANSFER_THE_POPULATION_MEMORIZES_FAMILIES_AND_ITS_STANDING_IS_AN_INDEX.md) (`hnn_tokens`, retired September 28, last at commit `2d34b819`).
