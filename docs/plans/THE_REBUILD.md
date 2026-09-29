@@ -493,8 +493,12 @@ named, and the program's loop stays its own counter, disclosed as such.
     the wall-time table hash alike): complete, 3,074 windows compared and deposited, held out
     `3671 + 9/16 + ε` bits, `3 + 1/16 + ε` a cell. Before, 391,605 ms at a 427,786,240-byte peak;
     after, 371,468 ms at a 383,205,376-byte peak (projected from the first, within ten minutes and
-    4 GiB). The loaded resonator's development pilot (`windows 32 resonator source`, the pump's
-    phase read through its clock) agrees line for line outside the wall times (149 lines, stopped
+    4 GiB). The card (`realization card`, alone on the idle RTX 4080 SUPER under the GPU lock):
+    complete, and its readout equals the host's before and after line for line outside the setup,
+    realization, wall-time and bus lines (the 3,306 lines hash alike across the three runs); 331,710
+    ms at a 483,717,120-byte host peak. The GPU suite: 32 passed. The loaded resonator's
+    development pilot (`windows 32 resonator source`, the pump's phase read through its clock)
+    agrees line for line outside the wall times (149 lines, stopped
     at its deadline at cell 64 in both). The chase's `action trace` agrees line for line with the
     wall times masked (354 lines; capture ticks 164 / 3,704 / 366); the switch clock is untouched.
   - *Verdict.* Every clock corresponds; none is left a counter but the program's own, disclosed.
@@ -535,7 +539,7 @@ equation extraction (#146).
 | Mode release, FOUND by interconnection, far-field moment quotient `V_m` | deferred to after U3 (#73) |
 | Encoding, Context and JointPrediction (joint against marginal witnesses) | U6, after U1; the continuation-transport discovery of [F1's after-note](../../research/records/2026-09-28_THE_REBUILDS_CONSTRUCTION_RECORD_STEPS_ZERO_TO_FIVE_THE_CAMPAIGNS_AND_THE_FORWARD_PLAN.md#f1-the-word-alphabet-campaign-5-73-148) stays live |
 | Concrete-tick diamond, complete word-sensitivity certificate | owed in #62 |
-| The carry word's runtime consumer, relative completeness, action-sufficient descent in Lean, Hearing's consumer | U5 (the carry word); Hearing's consumer is `hnn::retention::separator` at the aeon's close (U2); owed in #62 (relative completeness, action-sufficient descent) |
+| The carry word's runtime consumer, relative completeness, action-sufficient descent in Lean, Hearing's consumer | the carry word's consumer is the selective step, whose carry is a ring's section flux cell by cell (U5, Lean `HNN/Moment.SelectiveDecl.carryIn_is_section_flux`); Hearing's consumer is `hnn::retention::separator` at the aeon's close (U2); owed in #62 (relative completeness, action-sufficient descent) |
 | F4's decoder, producing keys, causal provenance, grain and fibre, release squares | U3 and F4's gate |
 | F5's cold restore, atomic native transition, truthful health receipts | F5's gate |
 | Moving-continuum electromagnetic reception | deferred to U7 (the physical terrains); owed in #62 |
