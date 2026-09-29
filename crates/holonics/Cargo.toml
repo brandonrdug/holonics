@@ -43,3 +43,10 @@ path = "../../research/notebook/hnn_design/hnn_population.rs"
 [[example]]
 name = "hnn_chase"
 path = "../../research/notebook/hnn_design/hnn_chase.rs"
+
+# The notebook's native generation (`hnn::prediction`, THE_REBUILD U6): the copy and moiré terrains
+# with known truth, and text sections for the validation role's requests, each refinement checked
+# (research/notebook/hnn_design/README.md): run once in release, never a test.
+[[example]]
+name = "hnn_prediction"
+path = "../../research/notebook/hnn_design/hnn_prediction.rs"
