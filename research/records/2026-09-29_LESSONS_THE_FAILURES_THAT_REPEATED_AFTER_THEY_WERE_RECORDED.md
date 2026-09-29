@@ -127,6 +127,15 @@ Two independent reviews read today's code; they agree.
     never hand Brandon a decision or a document to review. After a compaction, act on the newest
     message and the plan; never re-answer an old one. Take his words as written.
 
+11. **Think in the mathematics, not in the programming language.** A design is stated in residues,
+    remainders, modes and spectral placement, and in the objects, before it is written in code;
+    arrays, offsets, windows and tables are the realization, never the design. Brandon, September 20,
+    on naming carriers after programming units ("nibble"), and September 29: "offset moments? modulo,
+    remainders? spectral placement. the programming language will fuck your thinking up, it's clearer
+    when you pay attention to my habits in thinking for the purpose of machine learning." Order in a
+    passage is carried by residues across coprime rings (the Chinese remainder theorem) and by the
+    relative phases of spectrally placed data (their cross-spectrum), not by a table of pair offsets.
+
 ## 4. Corrections to the current state
 
 - **Credit.** The measured text compression (`3 + 1/16 + ε` bits a cell held out on the standing cut)

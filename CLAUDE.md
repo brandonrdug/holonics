@@ -251,7 +251,9 @@ an authored routine standing in for learning; recitation or an index of contexts
 generation; text run on its codec's grain as the exception (every design is checked against text,
 image, acoustic and motor input, and anything modality-specific lives only in a boundary codec); a
 located cause carried unrepaired into a new consumer; an uncertified deposition step; seen material
-graded as unseen; bits read as progress; a refusal answered with a larger limit.
+graded as unseen; bits read as progress; a refusal answered with a larger limit; a design thought in
+the programming language (arrays, offsets, windows, tables) instead of in residues, modes and spectral
+placement.
 
 [project-postulate] **Decide from the mathematics.** Resolve routine choices from the mathematics,
 mark an inferred choice with its reason (`agent-inferred`), and proceed. Never hand Brandon a
