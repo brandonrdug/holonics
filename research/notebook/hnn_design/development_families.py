@@ -261,6 +261,8 @@ def run_law_counts(records, role_of_session):
     family_of_event = {}
     for index, record in enumerate(records):
         view = record["views"][0]
+        if role_of_session[view["session_id"]] == "reserve":
+            continue
         port = "harness" if HARNESS_FLAG in view["flags"] else AUTHOR[view["author_class"]]
         cells = any((part.get("text") or "") != "" for part in view["visible_parts"])
         for captured in record["views"]:
@@ -273,9 +275,11 @@ def run_law_counts(records, role_of_session):
     for index, record in enumerate(records):
         view = record["views"][0]
         session = view["session_id"]
-        port = port_of_event[view["event"]]
         role = role_of_session[session]
-        if role == "reserve" or port not in ("human", "agent"):
+        if role == "reserve":
+            continue
+        port = port_of_event[view["event"]]
+        if port not in ("human", "agent"):
             continue
         for link in view["links"]:
             kind = link["kind"]

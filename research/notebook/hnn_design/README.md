@@ -1686,8 +1686,9 @@ HOLONICS_ROOT=$PWD python3 research/notebook/hnn_design/development_families.py 
 - **The present retention law on the incidence** (by message; choosing and validation only): of the
   choosing role's requests, 12,254 are held at rank class 0 (their run's latest message), 7 released
   and 2,207 reach no earlier development part with cells; of its human returns 1,105 are held at rank
-  class 0 and 1 reaches another conversation (the joined pair); validation's 462 requests and 53
-  returns are all held at rank class 0.
+  class 0 and 1 reaches another conversation (the joined pair); in validation every request and
+  return that reaches an earlier part with cells, 462 and 53, is held at rank class 0. The reserve's
+  messages are not read, not even for their ports.
 - **The guard**: every script that reads the source, a cut or a receipt refuses the reserve's
   material unless `--read-reserve` is passed, logged to `.local/cuts/reserve-reads.log`; no run
   passed it. Every artifact written before the reserve was named is refused (the spent F4, F1, F2,
