@@ -50,8 +50,8 @@
 //! at every admitted tick of every admitted passage it survives): the representative's family is kept
 //! at the summed weight, and each member's seed (its key, its weight share within the species, its
 //! conditioned family's held keys) stays in the receipt. Every conditioned family also collapses its
-//! own keys. A conditioned family that holds state along its port (the carry egg) is never certain, so
-//! its keystone keys stay apart.
+//! own keys. A conditioned family that holds state along its port and declares no exact check is
+//! never certain, so its keystone keys stay apart.
 //!
 //! [definition] Of the winding guide's six objects this owner touches the **helix** (a key's clock
 //! winding through the admitted future, read ahead) and **faces and placement** (the population's

@@ -143,8 +143,10 @@
 //! rule along the surviving keys, `code(A⊳B) = (log₂ |K_A| − log₂ #S_A) + code(B | A)`. A
 //! deterministic keystone is survivor filtered by the family that reads it. A keystone's value is
 //! the joint code without it against with it; without it a stateless reader meets its unheld port
-//! ([`Unheld`]). The arithmetic eggs ([`arithmetic`]: the record clock, the carry egg, the counter,
-//! the sieve) are the first composition.
+//! ([`Unheld`]). The arithmetic eggs that were the first composition (a record clock, a carry egg, a
+//! counter and a sieve) were retired as catered machinery (history at `1b374d46`; the antipattern
+//! record of September 29); its tests read families of the machine's own kind, a moiré's gratings
+//! as keystones and readers.
 //!
 //! [proved-derived; formal-checked] **The curated source's readers and the boundary egg**
 //! ([`families`], [`boundary`]; Lean `Composition.{stagedFace_nonneg, stagedFace_sum_one,
@@ -213,11 +215,10 @@
 //! [definition; agent-inferred] **Maintenance work** ([`Work`], [`Act`]). Beside a family's
 //! description and code its receipt reports the work it has spent, as exact counts of what it
 //! executed: a key family's emissions read against received cells, a dormant family's states read
-//! and kernel shares, a tree's deposits and held nodes, a composed egg's keystone keys weighed and its
-//! constituents' work, a carry egg's digit products, and a sieve's window decided once by face (its
-//! gratings' maintenance). No family here is pumped against dissipation (every ring is a lossless
-//! exact clock), so no pump work is claimed: the counts are the computation the families actually
-//! execute.
+//! and kernel shares, a tree's deposits and held nodes, and a composed egg's keystone keys weighed
+//! and its constituents' work, the living and the dead. No family here is pumped against
+//! dissipation (every ring is a lossless exact clock), so no pump work is claimed: the counts are
+//! the computation the families actually execute.
 //!
 //! [definition; agent-inferred] **A partition's reading** ([`Population::receive_partitioned`],
 //! [`PartReading`]). A receipt is a field of readings over a partition: the passage's cells declared
@@ -277,7 +278,6 @@
 //! | `Compression/Landmark/Context/Merge.{segmentation_mass, parse_given_sum, parse_code, segmentation_code_le}`, `{square_iff_no_separator, encoding_square_or_separator, merged_square_of_compatible}` | owed consumers: word merges over segmentation lattices and the merged encoding's square (campaign 5) |
 
 pub mod admitted;
-pub mod arithmetic;
 pub mod birth;
 pub use checkpoint::{
     AdmittedMemberManifest, PopulationCheckpointError, PopulationMemberManifest, TreeMemberManifest,
@@ -319,10 +319,6 @@ mod text_release_tests;
 pub use admitted::{
     AdmittedEgg, AdmittedReadout, CopyCell, CopyLaw, CopyStage, PointerReadout, Relation,
     RelationKind, StageReadout, odds_class,
-};
-pub use arithmetic::{
-    CarryEgg, Counter, ExpressionEgg, ExpressionPort, ExpressionReceipt, ExpressionRelease,
-    RecordClock, Sieve, SieveFace,
 };
 pub use birth::{
     BirthError, Closure, Founded, FoundedFamily, FoundingReceipt, SectionFounding, TransportBirth,
@@ -1282,10 +1278,6 @@ pub enum Act {
     Node,
     /// A keystone key weighed at a received cell: its conditioned family read, its weight moved.
     Weigh,
-    /// A record's digit product formed by convolution and carry (the carry egg).
-    Product,
-    /// An integer of a sieve's window decided by a face: the gratings maintained over the window.
-    Decide(SieveFace),
     /// A stage counted in a cell of a declared partition (the boundary egg's hazard law).
     Count,
     /// A founded family's class of chart states advanced by its founded transport `U_a`

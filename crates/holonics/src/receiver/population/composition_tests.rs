@@ -1,9 +1,12 @@
 //! Composition at ports checked exactly on small fixtures: the composed face is a face and its
 //! product telescopes to the keystone's prior mixture (against the conditioned families stepped
 //! apart in ℚ), the chain rule along the surviving keys, a reader keyed through a keystone against
-//! brute force, the reader at an unheld port, and the arithmetic eggs: the sieve against primality,
-//! the carry egg locating the record clock and paying the operands' entropy exactly, the counter
-//! and sieve locating the start, and the partition's reading summing to the passage's code.
+//! brute force, the reader at an unheld port, and eggs of the machine's own kind composed at ports
+//! (the arithmetic eggs that were these fixtures are retired as catered machinery, history at
+//! `1b374d46`): a moiré's grating read at its port as its sheet, the first ring of a sheet tuple
+//! as the keystone of the rest (the chain rule against the factorized grating family), a ring
+//! stepped by a clock's carry (a nested composition locating both keys), the stepped ring at an
+//! unheld port (the keystone's value), and the partition's reading summing to the passage's code.
 
 use std::sync::Arc;
 
@@ -15,14 +18,10 @@ use super::composition::{
 };
 use super::*;
 use crate::compression::landmark::context::{
-    Capacity, LandmarkDeclaration, LetterFamily, StopPrior,
+    Capacity, LandmarkDeclaration, LetterFamily, StopPrior, ratio_code_length,
 };
-use crate::holarchy::terrain::Draw;
-use crate::holarchy::terrain::arithmetic::{
-    DigitOrder, PrimeEmission, PrimeWindow, ProductCell, ProductFamily, Products,
-};
+use crate::holarchy::terrain::{Draw, Grating, Moire, MoireClass, MoireFamily};
 use crate::ratio::algebraic::{ExactInterval, interval_difference};
-use crate::ratio::primality::is_prime;
 use crate::ratio::surprisal::SymbolicSurprisal;
 
 fn rational(numerator: i64, denominator: i64) -> Rat {
@@ -257,136 +256,502 @@ fn a_reader_keyed_through_a_keystone_is_survivor_filtering_and_unheld_it_reads_t
     );
 }
 
-#[test]
-fn the_sieve_reads_the_cheap_faces_then_the_gratings_and_agrees_with_primality() {
-    for (base, digits) in [(10, 4), (6, 6), (2, 10), (16, 3)] {
-        let window = PrimeWindow {
-            base,
-            start: 0,
-            end: 100,
-            digits,
-            trailing: 1,
-            order: DigitOrder::MostFirst,
-            emission: PrimeEmission::Digits,
-        };
-        let sieve = Sieve::of(&window, 1 << 20).expect("a sieve");
-        let range = base.pow(digits as u32);
-        for n in 0..range {
-            let (prime, face) = sieve.verdict(n);
-            assert_eq!(prime, is_prime(n), "base {base}: {n}");
-            match face {
-                SieveFace::Unit => assert!(n < 2),
-                SieveFace::Gap => assert!(prime),
-                SieveFace::LastDigit(p)
-                | SieveFace::DigitSum(p)
-                | SieveFace::Alternating(p)
-                | SieveFace::Grating(p) => assert_eq!(n % p, 0, "base {base}: {p} ∤ {n}"),
-            }
+// -------------------------------------------------------------------------------------------
+// eggs of the machine's own kind: a moiré's rings as keystones and readers
+
+/// `gcd(a, b)` of two machine words.
+fn gcd(mut a: u64, mut b: u64) -> u64 {
+    while b != 0 {
+        (a, b) = (b, a % b);
+    }
+    a
+}
+
+/// Whether two enclosures lie within `2^(−32)` of each other.
+fn near(a: &ExactInterval, b: &ExactInterval) {
+    let slack = Rat::new(BigInt::one(), BigInt::one() << 32);
+    let difference = interval_difference(a, b).expect("an enclosed difference");
+    assert!(
+        difference.lower <= slack && difference.upper >= -&slack,
+        "[{}, {}] against [{}, {}]",
+        a.lower,
+        a.upper,
+        b.lower,
+        b.upper
+    );
+}
+
+/// [definition; agent-inferred] **A moiré's ring as a keystone**: the declared family's gratings,
+/// key `g` its `g`-th grating `(p, q, c)` (`MoireFamily::grating`), a rotor ring keyed at its port.
+/// At the upstream port's winding `w` the ring stands at `c + w p`: its port reads the phase
+/// `(c + w p) mod q` at the family's common grain `L = lcm(2, …, Q)` (the phase
+/// `((c + w p) mod q) · L/q` of `L`, so a reader needs no key) and the winding `⌊(c + w p)/q⌋`, the
+/// turns the ring has completed (the carry it passes up). Its coordinates are the grating's
+/// `(p, q, c)`, as `GratingSheet` lays them out.
+pub(super) struct GratingRing {
+    gratings: Vec<Grating>,
+    grain: u64,
+    denominator: u64,
+}
+
+impl GratingRing {
+    pub(super) fn new(family: &MoireFamily) -> Self {
+        let gratings = (0..family.gratings())
+            .map(|index| family.grating(index).expect("a grating of the family"))
+            .collect();
+        let grain = (2..=family.denominator).fold(1, |grain, q| grain / gcd(grain, q) * q);
+        Self {
+            gratings,
+            grain,
+            denominator: family.denominator,
         }
+    }
+
+    /// `L = lcm(2, …, Q)`.
+    pub(super) fn grain(&self) -> u64 {
+        self.grain
     }
 }
 
-#[test]
-fn the_carry_egg_locates_the_clock_and_pays_the_operands_entropy_exactly() {
-    for (base, order) in [
-        (10, DigitOrder::LeastFirst),
-        (10, DigitOrder::MostFirst),
-        (2, DigitOrder::LeastFirst),
-    ] {
-        let family = ProductFamily {
-            base,
-            digits: 2,
-            face: 1,
-            order,
-        };
-        let records = 32usize;
-        let products = Products::draw(&family, records, &mut Draw::new(7)).expect("products");
-        let cells = products.emit();
-        let classes = products.classes();
-        let mut composed = Composed::products(&family, 1).expect("clock ⊳ carry");
-        for (t, (&cell, class)) in cells.iter().zip(&classes).enumerate() {
-            let face = composed.face().expect("its face");
-            assert_eq!(face.iter().sum::<Rat>(), Rat::one());
-            let received = composed.receive(cell).expect("the cell");
-            if t >= family.record_length() {
-                let expected = match class {
-                    ProductCell::Operand => rational(1, base as i64),
-                    _ => Rat::one(),
-                };
-                assert_eq!(received, expected, "cell {t}, {class:?}");
-            }
+impl Keystone for GratingRing {
+    fn label(&self) -> String {
+        format!("grating ring, q ≤ {}", self.denominator)
+    }
+    fn keys(&self) -> u64 {
+        self.gratings.len() as u64
+    }
+    fn port(&self, key: u64, upstream: Port) -> Port {
+        let grating = &self.gratings[key as usize];
+        let q = grating.denominator();
+        let position = grating.phase() + upstream.winding * grating.numerator();
+        Port {
+            phase: (position % q) * (self.grain / q),
+            winding: position / q,
         }
-        assert_eq!(composed.posterior(), vec![(0, Rat::one())]);
-        // code = log₂ (4L + 3) + records · 2L log₂ b, the key and the operands' entropy.
-        let truth = log2_of(family.record_length() as i64)
-            .plus(&log2_of(base as i64).scaled(&Rat::from_integer(BigInt::from(records * 4))));
-        let code = composed.likelihood().code().unwrap().unwrap();
-        encloses(&code, &truth);
+    }
+    fn coordinates(&self, key: u64) -> Vec<u64> {
+        let grating = &self.gratings[key as usize];
+        vec![grating.numerator(), grating.denominator(), grating.phase()]
+    }
+    fn declaration(&self) -> Declaration {
+        Declaration::new("grating ring", vec![self.denominator])
     }
 }
 
-#[test]
-fn the_counter_and_sieve_locate_the_start_under_the_clock() {
-    for (base, digits, start, end) in [
-        (10u64, 3usize, 0u64, 1000u64),
-        (10, 3, 137, 900),
-        (6, 4, 0, 1296),
-    ] {
-        let window = PrimeWindow {
-            base,
-            start,
-            end,
-            digits,
-            trailing: 1,
-            order: DigitOrder::MostFirst,
-            emission: PrimeEmission::Digits,
-        };
-        let cells = window.emit().expect("cells");
-        let mut composed = Composed::primes(&window, 1 << 20, 1).expect("clock ⊳ counter ⊳ sieve");
-        for &cell in &cells {
-            let face = composed.face().expect("its face");
-            assert_eq!(face.iter().sum::<Rat>(), Rat::one());
-            assert!(!composed.receive(cell).expect("the cell").is_zero());
-        }
-        let Readout::Keys(keys) = composed.readout() else {
-            panic!("a key readout");
-        };
-        assert_eq!(keys.survivors, vec![vec![vec![0]], vec![vec![start]]]);
-        // code = log₂ (L + 1) + log₂ b^L: the clock's key and the counter's.
-        let truth = log2_of(digits as i64 + 1)
-            .plus(&log2_of(base as i64).scaled(&Rat::from_integer(BigInt::from(digits))));
-        encloses(&composed.likelihood().code().unwrap().unwrap(), &truth);
+/// [definition] **A ring's half-turn sheet read at its port**: `[2 · phase ≥ L]` at the common
+/// grain `L`, which is the grating's own sheet `[2 · port ≥ q]` (`Grating::sheet`).
+pub(super) struct Sheet(pub(super) u64);
+
+impl PortReader for Sheet {
+    fn label(&self) -> String {
+        "half-turn sheet".to_string()
+    }
+    fn alphabet(&self) -> usize {
+        2
+    }
+    fn emit(&self, port: Port) -> usize {
+        usize::from(2 * port.phase >= self.0)
+    }
+    fn declaration(&self) -> Declaration {
+        Declaration::new("half-turn sheet", vec![self.0])
     }
 }
 
+/// A keystone of one key passing its port through.
+pub(super) struct Pass;
+
+impl Keystone for Pass {
+    fn label(&self) -> String {
+        "pass".to_string()
+    }
+    fn keys(&self) -> u64 {
+        1
+    }
+    fn port(&self, _key: u64, upstream: Port) -> Port {
+        upstream
+    }
+    fn coordinates(&self, key: u64) -> Vec<u64> {
+        vec![key]
+    }
+    fn declaration(&self) -> Declaration {
+        Declaration::new("pass", Vec::new())
+    }
+}
+
+/// The seed of the drawn moirés (the release checks' seed).
+pub(super) const SEED: u64 = 20_260_927;
+
+/// The declared sheet tuple: two rings over `ℤ/q`, `q ≤ 5`, `N_5 = 36 = 2²·3²` gratings a ring.
+pub(super) fn two_rings() -> MoireFamily {
+    MoireFamily {
+        rings: 2,
+        denominator: 5,
+    }
+}
+
+/// One ring over `ℤ/q`, `q ≤ 5`: the ring a clock steps.
+pub(super) fn one_ring() -> MoireFamily {
+    MoireFamily {
+        rings: 1,
+        denominator: 5,
+    }
+}
+
+/// The drawn sheet tuple of [`two_rings`].
+pub(super) fn drawn_sheets() -> Moire {
+    Moire::draw(&two_rings(), MoireClass::Sheets, &mut Draw::new(SEED)).expect("a drawn moiré")
+}
+
+/// [proved-derived] **The horizon past which a ring's survivors are its species**: two sheet
+/// words of periods `q` and `q′` agree at every tick exactly when they agree over `lcm(q, q′)`
+/// consecutive ticks, so past `max lcm(q, q′)` ticks (`20 = 2²·5` for `q, q′ ≤ 5`) every surviving
+/// grating emits the drawn ring's word forever.
+pub(super) fn horizon(family: &MoireFamily) -> usize {
+    let top = family.denominator;
+    (2..=top)
+        .flat_map(|a| (2..=top).map(move |b| a / gcd(a, b) * b))
+        .max()
+        .expect("a denominator of at least 2") as usize
+}
+
+/// **A ring's survivors by brute force**: the family's gratings whose sheet is bit `ring` of every
+/// cell, ascending.
+pub(super) fn ring_survivors(family: &MoireFamily, cells: &[usize], ring: usize) -> Vec<u64> {
+    (0..family.gratings())
+        .filter(|&index| {
+            let grating = family.grating(index).expect("a grating of the family");
+            cells
+                .iter()
+                .enumerate()
+                .all(|(t, &cell)| usize::from(grating.sheet(t as u64)) == (cell >> ring) & 1)
+        })
+        .collect()
+}
+
+/// A grating's index in its family's order.
+pub(super) fn index_of(family: &MoireFamily, grating: &Grating) -> u64 {
+    let coordinates = |g: &Grating| (g.numerator(), g.denominator(), g.phase());
+    (0..family.gratings())
+        .find(|&index| {
+            coordinates(&family.grating(index).expect("a grating of the family"))
+                == coordinates(grating)
+        })
+        .expect("a grating of the family")
+}
+
+/// **The sheet tuple composed at its first ring** (`ring 0 ⊳ (its sheet, the other rings)`): ring
+/// 0's gratings as the keystone ([`GratingRing`] on the passage's clock), and under each key the key
+/// family reading bit 0 as that ring's sheet at its port (one key, [`Pass`] ⊳ [`Sheet`]) and each
+/// other bit `i` by ring `i`'s gratings (`GratingSheet`), the cell the tuple of the factors'
+/// classes, bit 0 least significant. Returns the keystone and the conditioned family's declaration,
+/// so a key's conditioned family can be stepped apart.
+pub(super) fn sheet_tuple(family: &MoireFamily) -> (Arc<dyn Keystone>, Conditioned) {
+    let ring = GratingRing::new(family);
+    let grain = ring.grain();
+    let declared = family.clone();
+    let conditioned: Conditioned = Arc::new(move |path| {
+        let own = PortedEmitters::new(Arc::new(Pass), Arc::new(Sheet(grain)), path)?;
+        let mut factors = vec![Survivors::new(Box::new(own), 1, "none")?];
+        for _ in 1..declared.rings {
+            let others = GratingSheet::new(&declared)?;
+            let keys = others.keys();
+            factors.push(Survivors::new(Box::new(others), keys, "none")?);
+        }
+        Ok(Box::new(KeyFamily::new(
+            "ring 0's sheet at its port, the other rings' gratings".to_string(),
+            0,
+            factors,
+        )?) as Box<dyn Family>)
+    });
+    (Arc::new(ring), conditioned)
+}
+
+/// [`sheet_tuple`] composed, named by `description` bits.
+pub(super) fn sheet_tuple_egg(family: &MoireFamily, description: u64) -> Composed {
+    let (ring, conditioned) = sheet_tuple(family);
+    let keys = ring.keys();
+    Composed::new(
+        format!(
+            "ring 0 ⊳ sheet tuple, k = {}, q ≤ {}",
+            family.rings, family.denominator
+        ),
+        description,
+        ring,
+        &PortPath::tick(),
+        &conditioned,
+        keys,
+    )
+    .expect("the composed sheet tuple")
+}
+
+/// The declared stepped ring: rate `2/5` at phase `1/5`, stepped by a clock of three phases at
+/// offset 2.
+pub(super) fn stepped_truth() -> (Grating, u64, u64) {
+    (Grating::new(2, 5, 1).expect("a grating"), 2, 3)
+}
+
+/// **A ring stepped by a clock's carry**, the terrain's truth read by `Grating::sheet`: the ring's
+/// sheet at the clock's windings, `x_t = s(⌊(o + t)/R⌋)`.
+pub(super) fn stepped_cells(
+    grating: &Grating,
+    offset: u64,
+    period: u64,
+    cells: usize,
+) -> Vec<usize> {
+    (0..cells as u64)
+        .map(|t| usize::from(grating.sheet((offset + t) / period)))
+        .collect()
+}
+
+/// **`clock ⊳ (grating ring ⊳ sheet)`**: the clock's offsets ([`Ring`]) as the keystone, and under
+/// each the ring's gratings as a key family reading the sheet at the ring's port, which turns once
+/// each time the clock completes a turn (an odometer's two wheels, a rotor machine's stepping).
+pub(super) fn stepped_egg(family: &MoireFamily, period: u64, description: u64) -> Composed {
+    let ring = GratingRing::new(family);
+    let sheet: Arc<dyn PortReader> = Arc::new(Sheet(ring.grain()));
+    let ring: Arc<dyn Keystone> = Arc::new(ring);
+    let conditioned: Conditioned = Arc::new(move |path| {
+        let emitters = PortedEmitters::new(Arc::clone(&ring), Arc::clone(&sheet), path)?;
+        let keys = emitters.keys();
+        let factor = Survivors::new(Box::new(emitters), keys, "none")?;
+        Ok(Box::new(KeyFamily::new(
+            "grating ring ⊳ sheet".to_string(),
+            0,
+            vec![factor],
+        )?) as Box<dyn Family>)
+    });
+    Composed::new(
+        format!("clock of {period} ⊳ (grating ring ⊳ sheet)"),
+        description,
+        Arc::new(Ring(period)),
+        &PortPath::tick(),
+        &conditioned,
+        period,
+    )
+    .expect("the stepped ring")
+}
+
+/// **`clock ⊳ (unheld grating ring ⊳ sheet)`**: the stepped ring's sheet at the ring's unheld port.
+fn stepped_unheld(family: &MoireFamily, period: u64) -> Composed {
+    let ring = GratingRing::new(family);
+    let sheet: Arc<dyn PortReader> = Arc::new(Sheet(ring.grain()));
+    let ring: Arc<dyn Keystone> = Arc::new(ring);
+    let conditioned: Conditioned = Arc::new(move |path| {
+        let emitters = PortedEmitters::new(Arc::clone(&ring), Arc::clone(&sheet), path)?;
+        Ok(Box::new(Unheld::new(
+            "unheld grating ring ⊳ sheet".to_string(),
+            0,
+            emitters,
+        )) as Box<dyn Family>)
+    });
+    Composed::new(
+        format!("clock of {period} ⊳ (unheld grating ring ⊳ sheet)"),
+        0,
+        Arc::new(Ring(period)),
+        &PortPath::tick(),
+        &conditioned,
+        period,
+    )
+    .expect("the unheld stepped ring")
+}
+
+/// A grating ring read at its ports through the sheet is the moiré's own grating: every key emits
+/// `GratingSheet`'s class at every tick, with its coordinates, and the common grain of `q ≤ 5` is
+/// `60 = 2²·3·5`.
 #[test]
-fn the_sieve_at_an_unheld_counter_reads_the_density() {
-    let window = PrimeWindow {
-        base: 10,
-        start: 0,
-        end: 1000,
-        digits: 3,
-        trailing: 1,
-        order: DigitOrder::MostFirst,
-        emission: PrimeEmission::Digits,
-    };
-    let cells = window.emit().expect("cells");
-    let mut unheld = Composed::primes_unheld_counter(&window, 1 << 20, 1).expect("the unheld");
+fn a_grating_ring_read_at_its_port_is_its_sheet() {
+    let family = two_rings();
+    let ring = GratingRing::new(&family);
+    assert_eq!(ring.grain(), 60);
+    let ring: Arc<dyn Keystone> = Arc::new(ring);
+    let mut ported =
+        PortedEmitters::new(Arc::clone(&ring), Arc::new(Sheet(60)), PortPath::tick()).unwrap();
+    let mut sheets = GratingSheet::new(&family).unwrap();
+    assert_eq!(ported.keys(), sheets.keys());
+    for _ in 0..3 * horizon(&family) {
+        for key in 0..sheets.keys() {
+            assert_eq!(ported.emit(key), sheets.emit(key));
+            assert_eq!(ring.coordinates(key), sheets.coordinates(key));
+        }
+        ported.advance(0).unwrap();
+        sheets.advance(0).unwrap();
+    }
+}
+
+/// **The sheet tuple composed at its first ring codes by the chain rule** (`chain_rule_of_species`):
+/// on the drawn sheet tuple every composed face is a face and the received cell's face; ring 0's
+/// keys die where their sheet contradicts bit 0, so its posterior is uniform over its brute-force
+/// survivors, which hold the drawn ring and its mirror (`GratingSheet::mirror`); past the horizon
+/// every face is one (the keys are located); and the code is the keystone's key less its surviving
+/// fibre plus the conditioned family's code under the located species,
+/// `2 log₂ 36 − log₂ #S_0 − log₂ #S_1` (here `log₂ 324`, `324 = 2²·3⁴`: each ring's species is its
+/// grating and its mirror), the factorized grating family's code on the same cells.
+#[test]
+fn the_sheet_tuple_composed_at_its_first_ring_codes_by_the_chain_rule() {
+    let family = two_rings();
+    let moire = drawn_sheets();
+    let reach = horizon(&family);
+    let cells = moire.emit(3 * reach);
+    let mut composed = sheet_tuple_egg(&family, 1);
+    for (t, &cell) in cells.iter().enumerate() {
+        let face = composed.face().expect("its face");
+        assert_eq!(
+            face.iter().sum::<Rat>(),
+            Rat::one(),
+            "the composed face sums to one"
+        );
+        assert!(face.iter().all(|class| *class >= Rat::zero()));
+        let received = composed.receive(cell).expect("the cell");
+        assert_eq!(received, face[cell]);
+        assert!(!received.is_zero());
+        if t >= reach {
+            assert_eq!(received, Rat::one(), "tick {t}: past the horizon");
+        }
+    }
+    let first = ring_survivors(&family, &cells, 0);
+    let second = ring_survivors(&family, &cells, 1);
+    for (ring, survivors) in [&first, &second].into_iter().enumerate() {
+        let drawn = &moire.gratings()[ring];
+        let mirror = GratingSheet::mirror(drawn).unwrap();
+        assert!(survivors.contains(&index_of(&family, drawn)));
+        assert!(survivors.contains(&index_of(&family, &mirror)));
+    }
+    assert_eq!(
+        (first.len(), second.len()),
+        (2, 2),
+        "each ring and its mirror"
+    );
+    let share = Rat::new(BigInt::one(), BigInt::from(first.len()));
+    assert_eq!(
+        composed.posterior(),
+        first
+            .iter()
+            .map(|&key| (key, share.clone()))
+            .collect::<Vec<_>>()
+    );
+    let (keys, fibre) = (
+        family.gratings() as i64,
+        (first.len() * second.len()) as i64,
+    );
+    let truth = SymbolicSurprisal::log2_of_ratio(&rational(keys * keys, fibre)).unwrap();
+    let code = composed
+        .likelihood()
+        .code()
+        .expect("a code")
+        .expect("alive");
+    encloses(&code, &truth);
+    let mut factorized = KeyFamily::gratings(&family, MoireClass::Sheets, 1 << 16, 1).unwrap();
     for &cell in &cells {
+        factorized.receive(cell).unwrap();
+    }
+    assert_eq!(
+        factorized.likelihood(),
+        Likelihood::Exact(rational(fibre, keys * keys))
+    );
+}
+
+/// **Nested composition locates both keys** (`clock ⊳ (grating ring ⊳ sheet)`): the stepped ring's
+/// cells locate the clock's offset (the sheet can turn only where the clock completes a turn) and
+/// the ring's species; the readout is the keystone's located key, then the conditioned family's
+/// located keys; and the code is the joint key space's survivor code by the chain rule,
+/// `log₂ 3 + log₂ 36 − log₂ #S`, every survivor counted by brute force over the joint key space.
+#[test]
+fn a_ring_stepped_by_a_clock_locates_the_offset_and_the_ring() {
+    let family = one_ring();
+    let (truth, offset, period) = stepped_truth();
+    let cells = stepped_cells(
+        &truth,
+        offset,
+        period,
+        2 * period as usize * horizon(&family),
+    );
+    let mut composed = stepped_egg(&family, period, 1);
+    for &cell in &cells {
+        let face = composed.face().expect("its face");
+        assert_eq!(face.iter().sum::<Rat>(), Rat::one());
+        assert!(!composed.receive(cell).expect("the cell").is_zero());
+    }
+    let gratings = family.gratings();
+    let joint: Vec<(u64, u64)> = (0..period)
+        .flat_map(|o| (0..gratings).map(move |g| (o, g)))
+        .filter(|&(o, g)| {
+            let grating = family.grating(g).expect("a grating");
+            stepped_cells(&grating, o, period, cells.len()) == cells
+        })
+        .collect();
+    assert!(joint.iter().all(|&(o, _)| o == offset), "the offset");
+    let ring = GratingRing::new(&family);
+    let located: Vec<Vec<u64>> = joint.iter().map(|&(_, g)| ring.coordinates(g)).collect();
+    let mirror = GratingSheet::mirror(&truth).unwrap();
+    assert!(located.contains(&vec![2, 5, 1]));
+    assert!(located.contains(&vec![
+        mirror.numerator(),
+        mirror.denominator(),
+        mirror.phase()
+    ]));
+    let Readout::Keys(keys) = composed.readout() else {
+        panic!("a key readout");
+    };
+    assert_eq!(keys.survivors, vec![vec![vec![offset]], located]);
+    let truth =
+        SymbolicSurprisal::log2_of_ratio(&rational((period * gratings) as i64, joint.len() as i64))
+            .unwrap();
+    encloses(&composed.likelihood().code().unwrap().unwrap(), &truth);
+}
+
+/// **The stepped ring at an unheld port reads the gratings' prior** (a keystone's value): each tick
+/// the sheet meets `#{g : s_g(⌊(o + t)/R⌋) = x_t}/36` under each clock offset `o`, never filtered;
+/// both sheets are emitted at every step, so no offset dies, and the code is exactly
+/// `−log₂ ((1/3) Σ_o ∏_t #{…}/36)`. The ring's value, the code without it against with it, is
+/// positive, decided.
+#[test]
+fn the_stepped_ring_at_an_unheld_port_reads_the_gratings_prior() {
+    let family = one_ring();
+    let (truth, offset, period) = stepped_truth();
+    let cells = stepped_cells(
+        &truth,
+        offset,
+        period,
+        2 * period as usize * horizon(&family),
+    );
+    let mut unheld = stepped_unheld(&family, period);
+    for &cell in &cells {
+        let face = unheld.face().expect("its face");
+        assert_eq!(face.iter().sum::<Rat>(), Rat::one());
         assert!(!unheld.receive(cell).unwrap().is_zero());
     }
-    // The clock's key, the digits at log₂ 10 each, the primality at the range's density 168/1000.
-    let (primes, range) = (168i64, 1000i64);
-    let density = |count: i64| {
-        SymbolicSurprisal::log2_of_ratio(&rational(range, count))
-            .unwrap()
-            .scaled(&Rat::from_integer(BigInt::from(count)))
-    };
-    let truth = log2_of(4)
-        .plus(&log2_of(10).scaled(&Rat::from_integer(BigInt::from(3000))))
-        .plus(&density(primes))
-        .plus(&density(range - primes));
-    encloses(&unheld.likelihood().code().unwrap().unwrap(), &truth);
+    assert_eq!(unheld.posterior().len() as u64, period, "no offset dies");
+    let gratings: Vec<Grating> = (0..family.gratings())
+        .map(|index| family.grating(index).unwrap())
+        .collect();
+    let keys = BigInt::from(gratings.len());
+    let mixture: Rat = (0..period)
+        .map(|o| {
+            cells
+                .iter()
+                .enumerate()
+                .map(|(t, &cell)| {
+                    let step = (o + t as u64) / period;
+                    let count = gratings
+                        .iter()
+                        .filter(|grating| usize::from(grating.sheet(step)) == cell)
+                        .count();
+                    Rat::new(BigInt::from(count), keys.clone())
+                })
+                .product::<Rat>()
+        })
+        .sum::<Rat>()
+        * Rat::new(BigInt::one(), BigInt::from(period));
+    let truth_code: ExactInterval =
+        ratio_code_length(mixture.numer().magnitude(), mixture.denom().magnitude()).unwrap();
+    let code = unheld.likelihood().code().unwrap().unwrap();
+    near(&code, &truth_code);
+    let mut held = stepped_egg(&family, period, 1);
+    for &cell in &cells {
+        held.receive(cell).unwrap();
+    }
+    let held = held.likelihood().code().unwrap().unwrap();
+    assert!(held.upper < code.lower, "the ring's value is positive");
 }
 
 fn tree(alphabet: usize, depth: usize, population: usize) -> Box<dyn Family> {
@@ -408,27 +773,31 @@ fn tree(alphabet: usize, depth: usize, population: usize) -> Box<dyn Family> {
     )
 }
 
+/// The partition's reading on the drawn sheet tuple, read by a tree and the composed egg over parts
+/// declared before the passage (each cell's class, before the horizon and past it): the parts sum
+/// to the population's code and to each family's, their cells to the passage, the composed egg is
+/// selected, and past the horizon it pays nothing (its faces there are exactly one), so its code
+/// before the horizon is its whole code.
 #[test]
 fn the_partition_reads_the_passage_code_whole_and_selects_the_composed_egg() {
-    let family = ProductFamily {
-        base: 10,
-        digits: 2,
-        face: 1,
-        order: DigitOrder::LeastFirst,
-    };
-    let products = Products::draw(&family, 64, &mut Draw::new(11)).expect("products");
-    let cells = products.emit();
-    let parts: Vec<usize> = products
-        .classes()
+    let family = two_rings();
+    let moire = drawn_sheets();
+    let reach = horizon(&family);
+    let classes = moire.alphabet();
+    let cells = moire.emit(4 * reach);
+    let parts: Vec<usize> = cells
         .iter()
-        .map(|class| *class as usize)
+        .enumerate()
+        .map(|(t, &cell)| cell + classes * usize::from(t >= reach))
         .collect();
     let mut population = Population::new(vec![
-        tree(family.alphabet(), 2, cells.len()),
-        Box::new(Composed::products(&family, 1).unwrap()),
+        tree(classes, 2, cells.len()),
+        Box::new(sheet_tuple_egg(&family, 1)),
     ])
     .unwrap();
-    let (_, readings) = population.receive_partitioned(&cells, &parts, 5).unwrap();
+    let (_, readings) = population
+        .receive_partitioned(&cells, &parts, 2 * classes)
+        .unwrap();
     let receipt = population.receipt().unwrap();
     assert_eq!(receipt.selected, Some(1));
     let sum = |values: Vec<&ExactInterval>| {
@@ -438,11 +807,6 @@ fn the_partition_reads_the_passage_code_whole_and_selects_the_composed_egg() {
                 ExactInterval::new(&total.lower + &value.lower, &total.upper + &value.upper)
                     .unwrap()
             })
-    };
-    let slack = Rat::new(BigInt::one(), BigInt::one() << 32);
-    let near = |a: &ExactInterval, b: &ExactInterval| {
-        let difference = interval_difference(a, b).unwrap();
-        assert!(difference.lower <= slack && difference.upper >= -&slack);
     };
     near(
         &sum(readings.iter().map(|part| &part.population).collect()),
@@ -459,22 +823,15 @@ fn the_partition_reads_the_passage_code_whole_and_selects_the_composed_egg() {
         readings.iter().map(|part| part.cells).sum::<usize>(),
         cells.len()
     );
-    // The composed egg pays nothing on a determined cell once the clock is located (its faces
-    // there are exactly one), so its code on the determined classes lies within its code on the
-    // first record, where the clock is located.
-    let mut first = Composed::products(&family, 1).unwrap();
-    for &cell in &cells[..family.record_length()] {
-        first.receive(cell).unwrap();
+    let zero = ExactInterval::point(Rat::zero());
+    for part in &readings[classes..] {
+        near(part.families[1].as_ref().unwrap(), &zero);
     }
-    let bound = first.likelihood().code().unwrap().unwrap();
-    let determined = sum([
-        ProductCell::Mark,
-        ProductCell::Trailing,
-        ProductCell::Middle,
-        ProductCell::Leading,
-    ]
-    .iter()
-    .map(|class| readings[*class as usize].families[1].as_ref().unwrap())
-    .collect());
-    assert!(determined.upper <= &bound.upper + &slack);
+    near(
+        &sum(readings[..classes]
+            .iter()
+            .map(|part| part.families[1].as_ref().unwrap())
+            .collect()),
+        receipt.families[1].code.as_ref().unwrap(),
+    );
 }

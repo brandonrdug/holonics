@@ -89,8 +89,10 @@ consumers.
   4,465 validation families. On one private passage the charged curated code against the flat
   stream is `−1477 + 5/16 + ε` choosing and `+1346 + 1/16 + ε` validation, at `L_R = 16`.
   The 307,213-ms run peaked at 10,330,435,584 bytes, within its preflight budget. A one-hot
-  moiré next face separates at the following tick; arithmetic composition matches its determined
-  truth; the stochastic source and receiving faces differ. The byte population remains a
+  moiré next face separates at the following tick; arithmetic composition matched its determined
+  truth (that fixture retired September 29 as catered machinery; the composed check now reads a
+  grating egg, one-hot once its survivors are one species); the stochastic source and receiving
+  faces differ. The byte population remains a
   predictor. [F4 pin and receipt](research/records/2026-09-27_F4_DEVELOPMENT_FAMILY_SPLIT_AND_RELEASE_GATE.md).
 - **F1 word alphabet.** A separate split pins 17,957 choosing and 4,492 validation families.
   The known-truth fixed-width terrain recovers its observed words and the source mass including

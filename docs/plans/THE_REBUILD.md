@@ -633,7 +633,7 @@ branch; intervals that do not shorten the charged code are recorded and not adop
     - `receiver::population::arithmetic::{ExpressionPort, ExpressionEgg}`: the numeral port with no
       chart branch, the `^` pairing located by which results hold, the holds sheet over the byte
       tree, a receipt per expression, and the release as egg packing by certified draws;
-    - the `arithmetic` mode of `hnn_population`;
+    - the `arithmetic` mode of `hnn_population` (retired with it; at `1b374d46`);
     - Lean `jet_separates_across_keys`.
   - *The run*, seed `2026092903`, `2^10` expressions a base and chart, 105886 ms and 614312 kB
     against 240 s and 1 GiB projected:

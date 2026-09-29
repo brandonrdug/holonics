@@ -4,11 +4,12 @@
 //!
 //! [definition; agent-inferred] **A keystone** ([`Keystone`]) is a declared finite key space of
 //! navigators, each exposing its state at a port ([`Port`]: the phase on its circle and its winding,
-//! the carry it has passed up; the arithmetic terrain's record clock exposes the record's phase and
-//! the records completed). A **port path** ([`PortPath`]) is a chain of located keys, root first: it
-//! reads the port a family meets at each tick from the passage's own clock ([`Port::tick`]) through
-//! each keystone in turn, so a keystone can itself read an upstream port (the counter reads the
-//! clock). A **conditioned family** is any [`Family`] built on a port path: its face is its face
+//! the carry it has passed up; a moiré's grating, a rotor ring keyed at its port, exposes its phase
+//! and the turns it has completed). A **port path** ([`PortPath`]) is a chain of located keys, root
+//! first: it reads the port a family meets at each tick from the passage's own clock
+//! ([`Port::tick`]) through each keystone in turn, so a keystone can itself read an upstream port (a
+//! ring stepped by another's carry, as an odometer's wheels and a rotor machine's rings step). A
+//! **conditioned family** is any [`Family`] built on a port path: its face is its face
 //! given what the port reads. The composed family `A ⊳ B` ([`Composed`]) is the mixture over the
 //! keystone's keys of the conditioned family built under each:
 //!
@@ -46,10 +47,10 @@
 //! never its own bits (the egg's section in `ELEMENTARY_OBJECTS`). Without the keystone its port is
 //! **unheld**: no key is located, so a stateless reader meets the keystone's prior pushed through the
 //! port at every tick ([`Unheld`], `P(x_t) = #{k : R(port_A(k, t)) = x_t}/|K_A|`, never filtered).
-//! That is the reader alone. A conditioned family that holds state along its port path (the carry
-//! egg holds a record's operands, read at the clock's phases) has no reading at an unheld port: its
+//! That is the reader alone. A conditioned family that holds state along its port path (one that
+//! keeps what it read at earlier phases to face a later one) has no reading at an unheld port: its
 //! arch falls with the keystone, and the joint code without the keystone is the population's other
-//! families (the notebook reads the population without the record clock as the tree alone).
+//! families.
 //!
 //! [definition; agent-inferred] **Re-founding and species.** A port path is read from the passage's
 //! cell at its start ([`PortPath::starting`]), so a composed egg's seed (its keystone's surviving
@@ -61,10 +62,10 @@
 //!
 //! [definition] The computational object is the helical pair interaction, read as eggs joined at
 //! ports. Of the winding guide's six general objects this owner touches three: the **helix** (a
-//! port's phase and its winding: the clock's record phase and its carry, the counter's odometer),
+//! port's phase and its winding: a ring's phase and its carry, a stepped ring's odometer),
 //! **faces and placement** (the composed face and each constituent's face given its port) and the
-//! **tower thread** (a record's phases restrict a cell to its place in the record). The pair, the
-//! cell holonomy and the tube stay attached through the constituents' owners.
+//! **tower thread** (a port path restricts each keystone to the carry of the one below it). The
+//! pair, the cell holonomy and the tube stay attached through the constituents' owners.
 
 use std::collections::BTreeMap;
 use std::sync::Arc;
@@ -405,8 +406,8 @@ struct Held {
 /// surviving keys, each with the conditioned family built on the path through it and the key's
 /// exact posterior; the likelihood is the product of the composed faces, enclosed. It keeps its
 /// declaration (the keystone's, the upstream path's and the conditioned family's), the path it
-/// reads from, the cells received, the admitted future's end of a keystone collapse, the work of
-/// the conditioned families that died, and its declared maintenance.
+/// reads from, the cells received, the admitted future's end of a keystone collapse, and the work
+/// of the conditioned families that died.
 pub struct Composed {
     label: String,
     description: u64,
@@ -420,7 +421,6 @@ pub struct Composed {
     ticks: u64,
     until: Option<u64>,
     spent: Work,
-    maintenance: Work,
 }
 
 impl Composed {
@@ -484,15 +484,7 @@ impl Composed {
             ticks: 0,
             until: None,
             spent: Work::default(),
-            maintenance: Work::default(),
         })
-    }
-
-    /// **The composed family with its declared maintenance**: the work its constituents spent
-    /// once, at their declaration (a sieve's gratings laid over its window).
-    pub fn with_maintenance(mut self, maintenance: Work) -> Self {
-        self.maintenance = maintenance;
-        self
     }
 
     /// The keystone.
@@ -657,11 +649,9 @@ impl Family for Composed {
         self.declared.clone()
     }
 
-    /// The keystone keys weighed, every conditioned family's work (the living and the dead), and
-    /// the declared maintenance.
+    /// The keystone keys weighed and every conditioned family's work (the living and the dead).
     fn work(&self) -> Work {
-        let mut work = self.maintenance.clone();
-        work.absorb(&self.spent);
+        let mut work = self.spent.clone();
         for member in &self.held {
             work.absorb(&member.family.work());
         }
@@ -671,8 +661,8 @@ impl Family for Composed {
     /// [definition; agent-inferred] **The composed egg re-founded from its seed** at the passage's
     /// cell `at` (item 3 of the population's remaining terms): the keystone's keys wind without the
     /// cells, so each surviving key's port is read from `at`; each conditioned family is re-founded
-    /// from its own seed where it has one, else declared anew on the path from `at` (a carry egg
-    /// joining mid-record reads its product phases uniform until it has read a record's operands).
+    /// from its own seed where it has one, else declared anew on the path from `at` (a stateful
+    /// conditioned family declared anew holds nothing it read before `at`).
     /// The prior is uniform over the keystone keys the seed stands for. None while a keystone
     /// collapse's admitted future holds, and none once a conditioned family's collapse's admitted
     /// future has ended at `at`, as a key family refuses (split its species first): declaring that
@@ -720,7 +710,6 @@ impl Family for Composed {
             ticks: 0,
             until: None,
             spent: Work::default(),
-            maintenance: self.maintenance.clone(),
         }))
     }
 

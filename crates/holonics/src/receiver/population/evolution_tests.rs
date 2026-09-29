@@ -11,15 +11,16 @@ use num_bigint::BigUint;
 use num_traits::{One, Zero};
 
 use super::composition::{Conditioned, Keystone, Port, PortPath, PortReader, PortedEmitters};
+use super::composition_tests::{
+    Pass, drawn_sheets, horizon, one_ring, sheet_tuple, sheet_tuple_egg, stepped_cells,
+    stepped_egg, stepped_truth, two_rings,
+};
 use super::tests::Fixed;
 use super::*;
 use crate::compression::landmark::context::{
     Capacity, LandmarkDeclaration, LetterFamily, StopPrior, ratio_code_length,
 };
 use crate::hnn::field::{Field, FieldDeclaration};
-use crate::holarchy::terrain::arithmetic::{
-    DigitOrder, PrimeEmission, PrimeWindow, ProductCell, ProductFamily, Products,
-};
 use crate::holarchy::terrain::{
     Draw, Grating, Moire, MoireClass, MoireFamily, RotorCrib, TreeSource, TreeSourceFamily,
 };
@@ -95,36 +96,31 @@ fn a_familys_identity_is_its_declaration_across_aeons_and_refounding() {
         short.identity(),
         TreeFamily::new(tree(2, 8, 64), 3).unwrap().identity()
     );
-    let family = ProductFamily {
-        base: 10,
-        digits: 2,
-        face: 1,
-        order: DigitOrder::LeastFirst,
-    };
-    let composed = Composed::products(&family, 1).unwrap();
-    assert_eq!(
-        composed.identity(),
-        Composed::products(&family, 1).unwrap().identity()
-    );
+    let family = two_rings();
+    let composed = sheet_tuple_egg(&family, 1);
+    assert_eq!(composed.identity(), sheet_tuple_egg(&family, 1).identity());
     assert_eq!(composed.reseed(19).unwrap().identity(), composed.identity());
     assert_ne!(
         composed.identity(),
-        Composed::products(
-            &ProductFamily {
-                base: 16,
+        sheet_tuple_egg(
+            &MoireFamily {
+                denominator: 4,
                 ..family.clone()
             },
             1
         )
-        .unwrap()
         .identity()
+    );
+    assert_ne!(
+        stepped_egg(&one_ring(), 3, 1).identity(),
+        stepped_egg(&one_ring(), 4, 1).identity()
     );
 }
 
 /// Every key family's identity is its declaration, unmoved by a passage: the moiré's gratings (both
 /// classes, static and dormant), the rotor crib's keys (its declared configurations, never the
-/// field's lift the cells step) and the composed arithmetic eggs carry after reading their terrain
-/// the identity they carried before it.
+/// field's lift the cells step) and the composed grating eggs (the sheet tuple at its first ring, the
+/// ring a clock steps) carry after reading their terrain the identity they carried before it.
 #[test]
 fn a_key_familys_identity_is_unmoved_by_a_passage() {
     let parity = hand_moire(MoireClass::Parity).emit(24);
@@ -134,25 +130,9 @@ fn a_key_familys_identity_is_unmoved_by_a_passage() {
     let field = Field::declare(declared).unwrap();
     let configurations = [0u64, 0, 0, 0];
     let crib = RotorCrib::draw(&field, 1, &configurations, 64, &mut Draw::new(41)).unwrap();
-    let products = ProductFamily {
-        base: 10,
-        digits: 2,
-        face: 1,
-        order: DigitOrder::LeastFirst,
-    };
-    let product_cells = Products::draw(&products, 4, &mut Draw::new(7))
-        .unwrap()
-        .emit();
-    let window = PrimeWindow {
-        base: 10,
-        start: 137,
-        end: 400,
-        digits: 3,
-        trailing: 1,
-        order: DigitOrder::MostFirst,
-        emission: PrimeEmission::Digits,
-    };
-    let prime_cells = window.emit().unwrap();
+    let tuple = drawn_sheets().emit(60);
+    let (ring, offset, period) = stepped_truth();
+    let stepped = stepped_cells(&ring, offset, period, 60);
     let dormant = |class| DormantFamily::gratings(&small_family(), class, 1 << 16, 4, 3).unwrap();
     let passages: Vec<(Box<dyn Family>, &[usize])> = vec![
         (Box::new(gratings(MoireClass::Parity, 3)), &parity),
@@ -163,14 +143,8 @@ fn a_key_familys_identity_is_unmoved_by_a_passage() {
             Box::new(KeyFamily::rotor(&field, 1, &configurations, 1 << 24, 3).unwrap()),
             &crib.cells,
         ),
-        (
-            Box::new(Composed::products(&products, 3).unwrap()),
-            &product_cells,
-        ),
-        (
-            Box::new(Composed::primes(&window, 1 << 20, 3).unwrap()),
-            &prime_cells[..40],
-        ),
+        (Box::new(sheet_tuple_egg(&two_rings(), 3)), &tuple),
+        (Box::new(stepped_egg(&one_ring(), period, 3)), &stepped),
     ];
     for (mut family, cells) in passages {
         let before = family.identity();
@@ -529,27 +503,6 @@ impl Keystone for Clock {
     }
 }
 
-/// A keystone of one key passing its port through.
-struct Pass;
-
-impl Keystone for Pass {
-    fn label(&self) -> String {
-        "pass".to_string()
-    }
-    fn keys(&self) -> u64 {
-        1
-    }
-    fn port(&self, _key: u64, upstream: Port) -> Port {
-        upstream
-    }
-    fn coordinates(&self, key: u64) -> Vec<u64> {
-        vec![key]
-    }
-    fn declaration(&self) -> Declaration {
-        Declaration::new("pass", Vec::new())
-    }
-}
-
 /// A reader of the phase's half-turn sheet: the phase mod 2.
 struct Half;
 
@@ -622,59 +575,52 @@ fn keystone_keys_reading_one_word_are_one_species_and_split_from_their_seed() {
     assert_eq!(composed.posterior(), twin.posterior());
 }
 
-/// The composed egg re-founded from its seed at a record's boundary: the located clock key and,
-/// on a prime stream, the counter's located start carry over, the ports wound to the cell; the
-/// newborn reads every determined cell with face one once it has read a record whole.
+/// The composed egg re-founded from its seed past the horizon: on the sheet tuple the keystone's
+/// surviving keys (the drawn first ring and its mirror) carry over at their posterior and each
+/// conditioned family from its own seed, the ports wound to the cell; on the stepped ring the
+/// located clock offset and the ring's species carry over. Either newborn reads every later cell
+/// with face one.
 #[test]
 fn a_composed_egg_is_refounded_from_its_seed() {
-    let family = ProductFamily {
-        base: 10,
-        digits: 2,
-        face: 1,
-        order: DigitOrder::LeastFirst,
+    let keys = |family: &dyn Family| match family.readout() {
+        Readout::Keys(keys) => (keys.survivors, keys.masses),
+        _ => unreachable!(),
     };
-    let length = family.record_length();
-    let products = Products::draw(&family, 6, &mut Draw::new(7)).unwrap();
-    let (cells, classes) = (products.emit(), products.classes());
-    let mut composed = Composed::products(&family, 1).unwrap();
-    for &cell in &cells[..2 * length] {
+    let family = two_rings();
+    let reach = horizon(&family);
+    let cells = drawn_sheets().emit(3 * reach);
+    let mut composed = sheet_tuple_egg(&family, 1);
+    for &cell in &cells[..reach] {
         composed.receive(cell).unwrap();
     }
     let mut newborn = composed
-        .reseed(2 * length)
-        .expect("the clock winds without the cells");
+        .reseed(reach)
+        .expect("the rings wind without the cells");
     assert_eq!(newborn.identity(), composed.identity());
-    for (t, (&cell, class)) in cells.iter().zip(&classes).enumerate().skip(2 * length) {
-        let face = newborn.receive(cell).unwrap();
-        let expected = match class {
-            ProductCell::Operand => rat(1, 10),
-            _ => Rat::one(),
-        };
-        assert_eq!(face, expected, "cell {t}");
+    assert_eq!(keys(newborn.as_ref()), keys(&composed));
+    for (t, &cell) in cells.iter().enumerate().skip(reach) {
+        assert_eq!(newborn.receive(cell).unwrap(), Rat::one(), "cell {t}");
     }
 
-    let window = PrimeWindow {
-        base: 10,
-        start: 137,
-        end: 400,
-        digits: 3,
-        trailing: 1,
-        order: DigitOrder::MostFirst,
-        emission: PrimeEmission::Digits,
-    };
-    let cells = window.emit().unwrap();
-    let mut primes = Composed::primes(&window, 1 << 20, 1).unwrap();
-    for &cell in &cells[..40] {
-        primes.receive(cell).unwrap();
+    let ring = one_ring();
+    let (truth, offset, period) = stepped_truth();
+    let cells = stepped_cells(&truth, offset, period, 2 * period as usize * horizon(&ring));
+    let at = cells.len() / 2;
+    let mut stepped = stepped_egg(&ring, period, 1);
+    for &cell in &cells[..at] {
+        stepped.receive(cell).unwrap();
     }
-    let mut newborn = primes
-        .reseed(40)
-        .expect("the clock and counter wind without the cells");
-    let Readout::Keys(keys) = newborn.readout() else {
-        unreachable!()
-    };
-    assert_eq!(keys.survivors, vec![vec![vec![0]], vec![vec![137]]]);
-    for &cell in &cells[40..] {
+    let (located, _) = keys(&stepped);
+    assert_eq!(
+        located[0],
+        vec![vec![offset]],
+        "the clock's offset is located"
+    );
+    let mut newborn = stepped
+        .reseed(at)
+        .expect("the clock and the ring wind without the cells");
+    assert_eq!(keys(newborn.as_ref()).0, located);
+    for &cell in &cells[at..] {
         assert_eq!(newborn.receive(cell).unwrap(), Rat::one());
     }
 }
@@ -761,7 +707,9 @@ fn a_composed_egg_refuses_refounding_past_a_conditioned_collapse() {
 }
 
 /// The work each family reports: a key family's reads are its survivors before each cell, a tree's
-/// deposits are its cells, a composed prime egg's maintenance is its sieve's window decided once.
+/// deposits are its cells, and a composed egg's work is its keystone keys weighed at each cell and
+/// every conditioned family's reads, the living and the dead (each key's family stepped apart until
+/// it dies).
 #[test]
 fn the_cost_receipt_reports_each_familys_work() {
     let cells = hand_moire(MoireClass::Parity).emit(20);
@@ -783,25 +731,34 @@ fn the_cost_receipt_reports_each_familys_work() {
     assert!(receipt.families[0].work.of(Act::Node) > 0);
     assert_eq!(receipt.families[1].work.of(Act::Read), reads);
 
-    let window = PrimeWindow {
-        base: 10,
-        start: 0,
-        end: 1000,
-        digits: 3,
-        trailing: 1,
-        order: DigitOrder::MostFirst,
-        emission: PrimeEmission::Digits,
-    };
-    let primes = Composed::primes(&window, 1 << 20, 1).unwrap();
-    let decided: u64 = primes
-        .work()
-        .acts
-        .iter()
-        .filter(|(act, _)| matches!(act, Act::Decide(_)))
-        .map(|(_, &count)| count)
-        .sum();
-    assert_eq!(decided, 1000);
-    // The 168 primes below 1000 less the 11 up to 31, which their own faces decide.
-    assert_eq!(primes.work().of(Act::Decide(SieveFace::Gap)), 157);
-    assert_eq!(primes.work().of(Act::Decide(SieveFace::Unit)), 2);
+    let family = two_rings();
+    let cells = drawn_sheets().emit(2 * horizon(&family));
+    let (ring, conditioned) = sheet_tuple(&family);
+    let mut composed = sheet_tuple_egg(&family, 1);
+    let mut weighed = 0u64;
+    for &cell in &cells {
+        weighed += composed.posterior().len() as u64;
+        composed.receive(cell).unwrap();
+    }
+    let mut reads = 0u64;
+    let mut died = 0u64;
+    for key in 0..ring.keys() {
+        let mut apart = conditioned(PortPath::tick().through(Arc::clone(&ring), key)).unwrap();
+        for &cell in &cells {
+            if apart.receive(cell).unwrap().is_zero() {
+                died += 1;
+                break;
+            }
+        }
+        reads += apart.work().of(Act::Read);
+    }
+    assert!(died > 0 && died < ring.keys(), "keys die and keys live");
+    let work = composed.work();
+    assert_eq!(work.of(Act::Weigh), weighed);
+    assert_eq!(work.of(Act::Read), reads);
+    assert!(
+        work.acts
+            .keys()
+            .all(|act| matches!(act, Act::Weigh | Act::Read))
+    );
 }

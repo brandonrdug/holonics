@@ -41,7 +41,7 @@ docstring says otherwise.
 |---|---|---|---|
 | `hnn_exposure.rs` | Campaign 1's exposure on a cut: the model face (the receiver's population over the landmark tree and the combined face), the baselines, keys, aeons and the first law; on the host or the card (`realization card`); the loaded resonator (`resonator source`); F2's adoption gate (`gate f2`: the population with and without the field on the held-out cells, work, memory and budgets) | `cargo run --release -p holonics --example hnn_exposure -- cut-file .local/cuts/standing-real-cut-campaign-1.bin cells all` | [campaign 1 meets its criterion](../../records/2026-09-26_CAMPAIGN_ONE_MEETS_ITS_CRITERION_THE_TREE_RECEIVES_AND_THE_WAVE_IS_WEIGHED.md), [the resonator](../../records/2026-09-26_THE_RESONATOR_RETURNS_ITS_WAVE_AND_THE_COMPARISON_REACHES_ITS_MATERIAL.md), [campaign 2](../../records/2026-09-26_CAMPAIGN_TWO_THE_RINGS_AND_CONTACTS_ARE_LAWFUL_AND_ADD_NO_BITS_ON_TEXT.md), [F2's adoption gate](../../../docs/plans/THE_REBUILD.md#f2-the-field-as-a-family-step-4-73) |
 | `hnn_landmark.rs` | The landmark tree (count-only): the depth sweep and prequential passage; `letters`, `prior`, `wide`, `compact`, `capacity` | `cargo run --release -p holonics --example hnn_landmark -- cut-file .local/cuts/standing-real-cut-campaign-1.bin` | [below PPM-2](../../records/2026-09-26_THE_LANDMARK_TREE_COMPRESSES_THE_STANDING_CUT_BELOW_PPM_TWO.md), [at scale](../../records/2026-09-26_THE_LANDMARK_TREE_AT_SCALE_THE_STOP_PRIOR_LOCAL_WEIGHING_THE_WIDE_CUT_AND_THE_STORAGE_WHERE_PATHS_PART.md), [capacity](../../records/2026-09-27_A_LANDMARKS_STORAGE_HAS_A_CAPACITY_AT_ITS_CEILING_IT_CARRIES.md), [campaign 2](../../records/2026-09-26_CAMPAIGN_TWO_THE_RINGS_AND_CONTACTS_ARE_LAWFUL_AND_ADD_NO_BITS_ON_TEXT.md) |
-| `hnn_population.rs` (with `hnn_population_{composition,evolution,curated,census,u2,f0,u6,birth}.rs`) | The egg population: terrain (`tree`, `moire`, `crib`, `switching`, `standing`), `composition`, `evolution`, `species`, the curated source (`curated`, with `merges`), `f4`, F0's egg (`f0-egg`, `f0-census`), U2's acceptance run (`u2-acceptance`), F0's acceptance run (`f0-acceptance`), U6's symmetric comparison (`u6-symmetric`), residual-founded transport discovery (`birth-probe`, `birth`) | `cargo run --release -p holonics --example hnn_population -- <mode>` | [the receiving population](../../records/2026-09-27_THE_RECEIVING_POPULATION_WAS_BUILT_ON_TERRAIN_WITH_KNOWN_TRUTH_AND_THE_CURATED_SOURCE_NOW_CODES_BELOW_THE_FLAT_STREAM.md), [F4](../../records/2026-09-27_F4_DEVELOPMENT_FAMILY_SPLIT_AND_RELEASE_GATE.md), [the forward plan](../../records/2026-09-28_THE_FORWARD_PLAN_STOPPED_AT_TRANSFER_THE_POPULATION_MEMORIZES_FAMILIES_AND_ITS_STANDING_IS_AN_INDEX.md), [U2's acceptance run](../../records/2026-09-28_U2_F0S_MEMORY_ACCEPTANCE_RUN_PINNED_BEFORE_ITS_SPLIT_IS_READ.md), [F0's acceptance run](../../records/2026-09-28_F0_THE_PREDICTOR_ON_UNSEEN_FAMILIES_PINNED_BEFORE_ITS_SPLIT_IS_READ.md), [U6's symmetric comparison](../../records/2026-09-29_U6_THE_SYMMETRIC_COMPARISON_PINNED_BEFORE_ITS_VALIDATION_ROLE_IS_READ.md), [residual-founded transport discovery](../../records/2026-09-28_RESIDUAL_FOUNDED_TRANSPORT_DISCOVERY_PINNED_BEFORE_ITS_SEEDS_ARE_READ.md) |
+| `hnn_population.rs` (with `hnn_population_{evolution,curated,census,u2,f0,u6,birth}.rs`) | The egg population: terrain (`tree`, `moire`, `crib`, `switching`, `standing`), `evolution`, `species`, `composition` and `arithmetic` (retired September 29 as catered machinery, receipts below, last at commit `1b374d46`), the curated source (`curated`, with `merges`), `f4`, F0's egg (`f0-egg`, `f0-census`), U2's acceptance run (`u2-acceptance`), F0's acceptance run (`f0-acceptance`), U6's symmetric comparison (`u6-symmetric`), residual-founded transport discovery (`birth-probe`, `birth`) | `cargo run --release -p holonics --example hnn_population -- <mode>` | [the receiving population](../../records/2026-09-27_THE_RECEIVING_POPULATION_WAS_BUILT_ON_TERRAIN_WITH_KNOWN_TRUTH_AND_THE_CURATED_SOURCE_NOW_CODES_BELOW_THE_FLAT_STREAM.md), [F4](../../records/2026-09-27_F4_DEVELOPMENT_FAMILY_SPLIT_AND_RELEASE_GATE.md), [the forward plan](../../records/2026-09-28_THE_FORWARD_PLAN_STOPPED_AT_TRANSFER_THE_POPULATION_MEMORIZES_FAMILIES_AND_ITS_STANDING_IS_AN_INDEX.md), [U2's acceptance run](../../records/2026-09-28_U2_F0S_MEMORY_ACCEPTANCE_RUN_PINNED_BEFORE_ITS_SPLIT_IS_READ.md), [F0's acceptance run](../../records/2026-09-28_F0_THE_PREDICTOR_ON_UNSEEN_FAMILIES_PINNED_BEFORE_ITS_SPLIT_IS_READ.md), [U6's symmetric comparison](../../records/2026-09-29_U6_THE_SYMMETRIC_COMPARISON_PINNED_BEFORE_ITS_VALIDATION_ROLE_IS_READ.md), [residual-founded transport discovery](../../records/2026-09-28_RESIDUAL_FOUNDED_TRANSPORT_DISCOVERY_PINNED_BEFORE_ITS_SEEDS_ARE_READ.md) |
 | `hnn_chase.rs` | F6's chase terrain: the reception phase, the action phase's choosing sweep (`choose`) and its acceptance (`action`, with U4's move reading and U3's release reading); U4's next loop: the failure's diagnosis (`diagnose`) and the fresh population (`fresh`); F6's switches and their attribution (`switches`) | `cargo run --release -p holonics --example hnn_chase` | [the learner must move](../../records/2026-09-27_THE_LEARNER_MUST_MOVE_A_CHASE_TERRAIN_DATA_AS_PARTICLES_WITH_FLUX_AND_RELEASE_AS_A_THRESHOLD_COMMIT.md) (no dedicated record; the receipts below) |
 | `exterior.rs` | The shared exterior boundary the examples include | | |
 | `standing_cut.py` | Pins the standing real cut (`6148`) and the wide cut (`wide 1048576`) | `python3 research/notebook/hnn_design/standing_cut.py 6148` | [campaign 1 meets its criterion](../../records/2026-09-26_CAMPAIGN_ONE_MEETS_ITS_CRITERION_THE_TREE_RECEIVES_AND_THE_WAVE_IS_WEIGHED.md), [at scale](../../records/2026-09-26_THE_LANDMARK_TREE_AT_SCALE_THE_STOP_PRIOR_LOCAL_WEIGHING_THE_WIDE_CUT_AND_THE_STORAGE_WHERE_PATHS_PART.md) |
@@ -884,7 +884,11 @@ cheaper boundary: the part's end predicted by more than its bytes.
 
 ### Eggs composed at ports: the arithmetic eggs (rebuild step 4 item 6, September 27)
 
-Record: [the receiving population](../../records/2026-09-27_THE_RECEIVING_POPULATION_WAS_BUILT_ON_TERRAIN_WITH_KNOWN_TRUTH_AND_THE_CURATED_SOURCE_NOW_CODES_BELOW_THE_FLAT_STREAM.md).
+Record: [the receiving population](../../records/2026-09-27_THE_RECEIVING_POPULATION_WAS_BUILT_ON_TERRAIN_WITH_KNOWN_TRUTH_AND_THE_CURATED_SOURCE_NOW_CODES_BELOW_THE_FLAT_STREAM.md)
+(`hnn_population composition`, retired September 29 with the arithmetic eggs as catered machinery,
+[the antipattern record](../../records/2026-09-29_ANTIPATTERN_CATERED_MACHINERY_A_TASKS_SOLUTION_ROUTINE_NEVER_STANDS_IN_FOR_LEARNING.md);
+last at commit `1b374d46`). The composition law's tests now read a moiré's rings as keystones
+(`receiver::population::composition_tests`).
 
 `hnn_population.rs`'s `composition` mode (`hnn_population_composition.rs`, its header states the
 declarations) runs the composed eggs of `holonics::receiver::population::{composition,
@@ -896,6 +900,7 @@ unheld port counting every start a cell on the host's cores), its peak resident 
 `58400` kB.
 
 ```sh
+# at commit 1b374d46
 cargo run --release -p holonics --example hnn_population -- composition [products | primes]
 ```
 
@@ -980,7 +985,19 @@ cargo run --release -p holonics --example hnn_population -- evolution
 cargo run --release -p holonics --example hnn_population -- species
 ```
 
-**The evolved prior across aeons.** Twelve declared aeons, three cycles of four terrains, each drawn
+**September 29: the product and prime aeons retired.** They read the arithmetic eggs
+(`clock ⊳ carry`, `clock ⊳ (counter ⊳ sieve)`), retired as catered machinery
+([the antipattern record](../../records/2026-09-29_ANTIPATTERN_CATERED_MACHINERY_A_TASKS_SOLUTION_ROUTINE_NEVER_STANDS_IN_FOR_LEARNING.md)),
+so the twelve-aeon receipts below are the mode's at commit `1b374d46`. The mode now reads six
+aeons, three cycles of the moiré and the tree source (the seed plus the aeon), in `2444` ms: the
+gratings are selected on every moiré at evolved priors `1/7`, `72/371` and `209/917` and die on
+every tree source, retaining `(6, 3, 3)`; the tree at `D = 2` is selected on every tree source at
+`8/63`, `118/623` and `284/1281`, retaining `(6, 3, 0)`. By cycle the evolved population codes
+`0 + 2/16`, `−1 + 4/16` and `−2 + 13/16` against the static one, and over the six aeons
+`9534 + 11/16` against `9536 + 5/16`, `−2 + 5/16` (each `+ ε`); in every aeon its code lies
+within the bound, decided below or not refuted.
+
+**The evolved prior across aeons** (at `1b374d46`). Twelve declared aeons, three cycles of four terrains, each drawn
 by the seed plus the aeon's index: a moiré's parity color (`k = 3`, `q ≤ 2^3`, `2^12` cells), a tree
 source (depth 2 over bits, `2^12` cells), products in base 2 (`L = 4`, `k = 2`, `2^8` records of 19
 cells) and a prime stream in base 10 (`L = 3` over `[100c, 1000)` in cycle `c`). Each aeon declares
