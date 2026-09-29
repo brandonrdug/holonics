@@ -12,9 +12,12 @@ use crate::hnn::chart::Charts;
 use crate::hnn::constitution::Constitution;
 use crate::hnn::field::{ConstitutionRead, Current, Field};
 use crate::hnn::moment::{PairPort, SourceMoment};
-use crate::hnn::prediction::{Refinement, Section, deposit_of, stage, unreached_unchanged};
+use crate::hnn::prediction::{
+    BankPlacement, Refinement, Section, deposit_of, generate_by_bank, injection, stage,
+    unreached_unchanged,
+};
 use crate::hnn::propagation::Operands;
-use crate::hnn::ring::{PumpDeclaration, PumpStep, ResonatorMaterial};
+use crate::hnn::ring::{PumpDeclaration, PumpStep, ReceivingBank, ResonatorMaterial};
 use crate::hnn::word::{EndChange, Word};
 use crate::holon::parametron::{Carrier, Parametron};
 use crate::ratio::linear::ExactRatMatrix;
@@ -729,5 +732,82 @@ fn generation_locks_by_the_largest_gap_and_releases_at_width_zero() {
     .unwrap();
     for &station in &generated.locks[0] {
         assert_eq!(generated.release.classes[station], first.classes[station]);
+    }
+}
+
+/// **The bank's placement is the section's injection** (`prediction::BankPlacement`): the receiving
+/// ring's storage with any set of stations placed equals `injection` of the request's moment and the
+/// section's `SourceMoment::section`, exactly, and with nothing placed it is the request's own.
+#[test]
+fn the_bank_placement_is_the_sections_injection() {
+    let field = joint();
+    let theta = generic(&field, 91);
+    let (current, request) = moment(&field, 92, 7);
+    let refinement = Refinement::declare(&field, 0, 2, 1, 4, 2).unwrap();
+    let placement =
+        BankPlacement::of(&field, &theta, &current, &request, &refinement).unwrap();
+    let patterns: [[Option<usize>; 4]; 5] = [
+        [None; 4],
+        [Some(1), None, None, None],
+        [None, Some(2), None, Some(0)],
+        [Some(0), Some(0), Some(1), None],
+        [Some(2), Some(1), Some(0), Some(1)],
+    ];
+    for cells in &patterns {
+        let section = refinement.section(&field, &current, cells).unwrap();
+        let injected = injection(&field, &theta, &current, &[&request, &section]).unwrap();
+        assert_eq!(placement.storage(cells), injected[0]);
+    }
+}
+
+/// **The bank generates by its locks** (`prediction::generate_by_bank`): on the joint field's ring of
+/// period 6, a bank of the members whose period divides the turn (standing and half-turn) reads
+/// every unlocked station's candidates, locks the stations of the largest gap, each lock certified
+/// on both members with every executed tick closed and its growth above the runner-up's; a
+/// released section is released at width zero with every station locked once.
+#[test]
+fn the_bank_generates_by_its_certified_locks() {
+    let field = joint();
+    let theta = generic(&field, 94);
+    let (current, request) = moment(&field, 95, 9);
+    let refinement = Refinement::declare(&field, 0, 2, 1, 4, 2).unwrap();
+    let identity = ExactRatMatrix::identity(2).unwrap();
+    let axis = Carrier::new(Rat::one(), Rat::zero()).unwrap();
+    let bank = ReceivingBank::new(
+        ResonatorMaterial::new(
+            identity.clone(),
+            identity,
+            ExactRatMatrix::zero(2, 2).unwrap(),
+            None,
+        )
+        .unwrap(),
+        [PumpStep::Stand, PumpStep::Half]
+            .into_iter()
+            .map(|step| PumpDeclaration::new(rat(5, 8), axis.clone(), step).unwrap())
+            .collect(),
+        integer(16),
+        Rat::one(),
+        6,
+    )
+    .unwrap();
+    let generated =
+        generate_by_bank(&field, &theta, &current, &request, &refinement, &bank, 12).unwrap();
+    let locked: usize = generated.locks.iter().map(Vec::len).sum();
+    assert_eq!(generated.decisions.len(), locked);
+    assert_eq!(generated.members, 2 * locked);
+    assert_eq!(generated.certified, generated.members);
+    assert_eq!(generated.ticks_closed, generated.ticks);
+    for (_, _, growth, runner) in &generated.decisions {
+        assert!(growth.exceeds(runner) && growth.is_locked());
+    }
+    if generated.release.released() {
+        assert!(generated.release.width.is_zero());
+        let mut stations: Vec<usize> = generated.locks.iter().flatten().copied().collect();
+        stations.sort_unstable();
+        assert_eq!(stations, vec![0, 1, 2, 3]);
+        assert_eq!(generated.refinements, generated.locks.len());
+    } else {
+        assert_eq!(generated.refinements, generated.locks.len() + 1);
+        assert!(!generated.release.plural.is_empty());
     }
 }

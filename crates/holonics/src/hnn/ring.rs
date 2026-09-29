@@ -196,6 +196,51 @@
 //! the nearest misaligned member only past a strength bracketed in development in
 //! `(361/512, 725/1024]`; the declared `p = 5/8` lies between.
 //!
+//! [proved-derived; implemented-exact, September 29] **The passage's monodromy: the bank reads a
+//! superposed passage** ([`ReceivingBank::read_turn`], [`turn`], [`Growth`]; Lean
+//! `HNN/FloquetPassage`; the [record](../../../../research/records/2026-09-29_THE_BANK_READS_A_SUPERPOSED_PASSAGE_THE_LOCKS_CONTINUE_A_SPECTRAL_LINE_AND_THE_ORDER_TWO_TERRAIN_STAYS_AT_THE_MARGINAL.md)).
+//! The receiving ring holds the passage superposed: every datum placed at its residue through the
+//! source port, `Σ_k P^(τ − c_k) E u_k` (`hnn::moment`). As the ring turns on, its nodes cross the
+//! section one a tick, node `d − 1 − t` at tick `t` (the passage in its own time order around the
+//! cycle of the turn), and each crossing pumps the receiving parametron: the reflection at the
+//! node's placed amplitude `z`, scaled by `|z|` ([`PumpSchedule::placed`]). The passage's monodromy
+//! is the ordered product of those pumped ticks over one turn:
+//!
+//! ```text
+//! crossing     K_t = K − 2p R(a² s^t z_t),  R(c) = [[Re c, Im c], [Im c, −Re c]]      each tick certified by its signed form
+//! monodromy    M = T_(d−1) ⋯ T_0 = N/Δ                                              on integers: T_t = N_t/L_t, Δ = ∏ L_t
+//! growth       lower ≤ ρ(M) < upper,  upper − lower ≤ upper·2^(−g)                    Schur–Cohn on det(Δμ − N)
+//! second order R_u Rot_v R_w = Rot(u v̄ w̄);  2 Re Σ_t w_t conj(Σ_(s<t) w_s) = |Σ w|² − Σ |w|²   (the kicked chart)
+//! ```
+//!
+//! - **What the growth reads.** In the kicked chart two crossings separated by the ring's transport
+//!   compose to the turn by their relative phase less the transport (Lean
+//!   `reflection_transport_reflection_carriers`), and one crossing more pairs the new crossing with
+//!   every earlier one (`kick_coeff_two`): the monodromy's second order is the sum over ordered pairs
+//!   of the passage's relative phases read at the ring's parametric resonance, and at a whole turn
+//!   its trace is the passage's power spectrum there (`pair_sum_power_spectrum`). The square law is
+//!   the pump's; the bifurcation is the threshold. The executed law's own second order is owed
+//!   (#62).
+//! - **The bank's members.** The declared bank's member `j` (axis `1`, step `i^j`) reads the passage
+//!   modulated by `i^(jt)`: its frequency shifted by `j` quarter turns. A member reads a turn only
+//!   when its pump's period divides the turn, so the turn is a cycle of its clock and the product
+//!   is a Floquet monodromy. The bank's joint monodromy is the members' block sum, and its growth
+//!   the largest member's.
+//! - **Known truth: a spectral line** (the owner's tests). On a line of unit cells stepping one
+//!   quarter-turn class `j` a crossing, every member's reading depends only on `m − j (mod 4)`: the
+//!   line's own member (a standing pump) grows, the two quarter-turn neighbours (nearest the node's
+//!   parametric resonance) grow more, and the half-turn partner is certified silent, so the lock
+//!   pattern names the line's class. With a crossing left open, the candidate completing the line
+//!   reads the joint growth strictly above every other: the lock's flip continues the line.
+//! - **The growth's realization** [definition; agent-inferred]. Every enclosure is decided on
+//!   integers: the monodromy as `N/Δ`, its characteristic polynomial by the Faddeev–LeVerrier
+//!   recurrence with exact divisions, the multipliers of `M` as the roots of `det(Δμ − N)`, each
+//!   bisection step the Schur–Cohn test `ρ < r` (every root strictly inside the disc). The bracket is
+//!   attained on the polynomial shifted to `ATTAINMENT_BITS` bits and certified by two exact tests;
+//!   the turn's certificate attains its metric by the exact Stein solve of the monodromy rounded at
+//!   the same bits and certifies it by inertia on the exact monodromy. What is attained is trusted
+//!   nowhere.
+//!
 //! [proved-derived; implemented-exact] **The reference change at a junction port**
 //! ([`port_scattering`]). A wave arriving at port `p` of a junction meets the rest of the junction as
 //! one reference admittance `G_rest = W − G_p`: it reflects `Γ = (G_p − G_rest)/(G_p + G_rest)` and
@@ -222,6 +267,8 @@
 //! | `HNN/Floquet.{inphase_growing, inphase_squeezed, inphase_growing_coordinate, quadrature_turns, cayley_eigen, cayley_tick_eigen}` | [`lock`], [`LockedSheets`] |
 //! | `HNN/Floquet.{reflection_sq, reflection_mul_reflection, reflection_pair_trace, reflection_pair_trace_carriers, relativePairing_halfTurn, no_linear_threshold_reads_relative_phase}` | [`PumpSchedule::modulated`], [`ReceivingBank::read`], [`BankReading::class`] |
 //! | `Objects/ParametronLock` (the lock's exchange polynomial, capacity as lock count, the winding as the carry, coupled locks, modal hearing) | the guide's §5; no Rust consumer beyond the bank's lock pattern |
+//! | `HNN/FloquetPassage.{reflection_mul_rotation, rotation_mul_reflection, reflection_transport_reflection, reflection_transport_reflection_carriers, rotation_trace_carrier, kick_coeff_zero, kick_coeff_one, kick_coeff_two, pair_sum_power_spectrum}` (the passage's monodromy at second order, the kicked chart) | [`PumpSchedule::placed`], [`ReceivingBank::read_turn`], [`turn`] |
+//! | `Objects/ParametronLock.lockFace_logistic` (`θ = a/(a + K) > ½ ⇔ a > K`) | [`Growth::exceeds`] (the lock's flip on exact enclosures), `hnn::prediction::generate_by_bank` |
 
 use num_bigint::{BigInt, BigUint};
 use num_traits::{One, Signed, ToPrimitive, Zero};
@@ -2378,7 +2425,16 @@ impl ReceivingBank {
                 characteristic,
             };
             let mut upper = reading.joint.upper.clone();
-            if !strictly_inside(floquet.characteristic(), &upper) {
+            let mut power = BigInt::one();
+            let scaled: Vec<BigInt> = integral
+                .iter()
+                .map(|c| {
+                    let term = c * &power;
+                    power *= &scale;
+                    term
+                })
+                .collect();
+            if !schur_inside(&scaled, &upper) {
                 // A reading enclosed exactly at a multiplier: one grain above it.
                 upper *= Rat::one() + dyadic(grain);
             }

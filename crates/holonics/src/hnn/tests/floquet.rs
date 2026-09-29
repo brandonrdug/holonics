@@ -1,17 +1,19 @@
 //! The parametron re-derived (`hnn::ring`, Lean `HNN/Floquet`, `Objects/ParametronLock`): the
 //! Floquet monodromy of a pumped ring and its certificate, the bifurcation, phase-sensitive
-//! amplification at the locked sheet, and the receiving bank's reading of a relative phase. One test
-//! per stated law and per refusal.
+//! amplification at the locked sheet, the receiving bank's reading of a relative phase, and its
+//! reading of a passage's turn. One test per stated law and per refusal.
 
+use num_bigint::BigInt;
 use num_traits::{One, Signed, Zero};
 
 use crate::hnn::HnnError;
 use crate::hnn::chart::WordLattice;
 use crate::hnn::ring::{
-    Floquet, FloquetReading, FloquetRefusal, PumpDeclaration, PumpSchedule, PumpStep,
-    ReceivingBank, ResonatorMaterial, ResonatorOperands, ResonatorRemainders, lock,
+    Floquet, FloquetReading, FloquetRefusal, Growth, PumpDeclaration, PumpSchedule, PumpStep,
+    ReceivingBank, ResonatorMaterial, ResonatorOperands, ResonatorRemainders, TurnReading, lock,
 };
 use crate::holon::parametron::Carrier;
+use crate::ratio::gaussian::GaussianRat;
 use crate::ratio::linear::ExactRatMatrix;
 use crate::ratio::linear::vector::dot;
 use crate::ratio::{Rat, integer, rat};
@@ -465,6 +467,197 @@ fn the_consumer_bound_covers_every_span_of_the_executed_passage() {
                 let from = dot(&states[start], &states[start]);
                 let to = dot(&states[end], &states[end]);
                 assert!(to <= bound.reach((end - start) as u64) * from);
+            }
+        }
+    }
+}
+
+// -------------------------------------------------------------------------------------------
+// the passage's monodromy: the bank reads a superposed passage
+
+/// The four members of the declared bank: axis `1`, steps `i^j`, at strength `p`.
+fn members(strength: Rat) -> Vec<PumpDeclaration> {
+    [
+        PumpStep::Stand,
+        PumpStep::Quarter,
+        PumpStep::Half,
+        PumpStep::ThreeQuarters,
+    ]
+    .into_iter()
+    .map(|step| PumpDeclaration::new(strength.clone(), quarter(0), step).unwrap())
+    .collect()
+}
+
+/// A drawn turn of placed amplitudes on the dyadic lattice `2^(−bits − 1)`, within `[−1/2, 1/2]` a
+/// coordinate.
+fn drawn_turn(seed: u64, ticks: usize, bits: u32) -> Vec<GaussianRat> {
+    let mut draw = crate::holarchy::terrain::Draw::new(seed);
+    let unit = BigInt::one() << (bits + 1);
+    let mut coordinate = || {
+        let n = draw.below(1 << bits) as i64 - (1 << (bits - 1));
+        Rat::new(BigInt::from(n), unit.clone())
+    };
+    (0..ticks)
+        .map(|_| GaussianRat::new(coordinate(), coordinate()))
+        .collect()
+}
+
+/// **The placed schedule of unit cells is the modulated schedule**: `PumpSchedule::placed` with
+/// unit carriers equals `PumpSchedule::modulated`, and its carrier at tick `t` is `a² s^t z_t`.
+#[test]
+fn the_placed_schedule_of_unit_cells_is_the_modulated_schedule() {
+    let pump = PumpDeclaration::new(rat(5, 8), quarter(0), PumpStep::Quarter).unwrap();
+    let cells = [quarter(1), quarter(3), quarter(2), quarter(0)];
+    let placed = PumpSchedule::placed(
+        &pump,
+        &cells.iter().map(Carrier::as_gaussian).collect::<Vec<_>>(),
+    )
+    .unwrap();
+    assert_eq!(placed, PumpSchedule::modulated(&pump, &cells).unwrap());
+    let amplitude = GaussianRat::new(rat(3, 8), rat(-1, 4));
+    let scaled = PumpSchedule::placed(&pump, &[GaussianRat::zero(), amplitude.clone()]).unwrap();
+    assert!(scaled.carrier(0).is_zero());
+    // a² s^1 z_1 with a = 1, s = i.
+    assert_eq!(scaled.carrier(1), &GaussianRat::i().mul(&amplitude));
+}
+
+/// **The turn's reading is the executed monodromy's growth** (`ReceivingBank::read_turn`, the
+/// monodromy carried as `N/Δ` on integers and its growth enclosed by the Schur–Cohn test from an
+/// attained bracket): every member's enclosure equals the one read from `Floquet::of` on the
+/// scheduled operands, and the Cayley placement certifies it (some multiplier outside or on
+/// `lower`, none outside or on `upper`); the joint reading is the largest member's, and its
+/// certificate holds on every member with every executed tick closed.
+#[test]
+fn the_turn_reading_is_the_executed_monodromys_growth() {
+    let grain = 12;
+    for (seed, strength) in [(3, rat(1, 2)), (5, Rat::one())] {
+        let bank = ReceivingBank::new(
+            node(Rat::one(), None),
+            members(strength),
+            integer(16),
+            Rat::one(),
+            6,
+        )
+        .unwrap();
+        let amplitudes = drawn_turn(seed, 8, 6);
+        let reading = bank.read_turn(&amplitudes, grain).unwrap();
+        for (member, pump) in bank.pumps().iter().enumerate() {
+            let operands = ResonatorOperands::scheduled(
+                member,
+                &node(Rat::one(), None),
+                &PumpSchedule::placed(pump, &amplitudes).unwrap(),
+                &integer(16),
+                &Rat::one(),
+                None,
+            )
+            .unwrap();
+            let floquet = Floquet::of(&operands).unwrap();
+            let growth = &reading.members[member];
+            assert_eq!(growth, &floquet.growth(grain));
+            let at_lower = floquet.placement(&growth.lower).unwrap();
+            let at_upper = floquet.placement(&growth.upper).unwrap();
+            assert!(at_lower.outside + at_lower.on > 0);
+            assert_eq!(at_upper.outside + at_upper.on, 0);
+            assert!(&growth.upper - &growth.lower <= &growth.upper * rat(1, 1 << grain));
+        }
+        let largest = reading
+            .members
+            .iter()
+            .map(|growth| growth.upper.clone())
+            .max()
+            .unwrap();
+        assert_eq!(reading.joint.upper, largest);
+        let certificate = bank.certify_turn(&amplitudes, &reading, grain).unwrap();
+        assert_eq!(certificate.certificates.len(), 4);
+        assert_eq!(certificate.closed, certificate.ticks);
+        assert_eq!(certificate.ticks, 4 * 8);
+    }
+}
+
+/// **A member reads a turn only when its pump's period divides it**: a turn of 6 ticks is refused by
+/// the quarter-turn members and read by the standing and half-turn ones.
+#[test]
+fn a_member_reads_a_turn_only_when_its_period_divides_it() {
+    let amplitudes = drawn_turn(7, 6, 4);
+    let whole = ReceivingBank::new(
+        node(Rat::one(), None),
+        members(Rat::one()),
+        integer(16),
+        Rat::one(),
+        6,
+    )
+    .unwrap();
+    assert!(matches!(
+        whole.read_turn(&amplitudes, 8),
+        Err(HnnError::Resonator { ring: 1, .. })
+    ));
+    let commensurate = ReceivingBank::new(
+        node(Rat::one(), None),
+        members(Rat::one())
+            .into_iter()
+            .filter(|pump| pump.phases() <= 2)
+            .collect(),
+        integer(16),
+        Rat::one(),
+        6,
+    )
+    .unwrap();
+    assert_eq!(commensurate.read_turn(&amplitudes, 8).unwrap().members.len(), 2);
+}
+
+/// **The bank reads a passage's spectral line, and its lock's flip continues it** (known truth of
+/// the passage's reading and of generation by the bank): a turn of 8 unit cells
+/// `z_t = u·i^(−jt)` steps by one quarter-turn class `j` a crossing (every class `j`, every offset
+/// `u`). Member `m`'s carriers `i^(mt) z_t` then turn by `m − j` a tick, so its reading depends only
+/// on `m − j (mod 4)`: the line's own member (a standing pump) grows in `[46, 1473/32]`, the two
+/// quarter-turn neighbours (the pump nearest the node's parametric resonance `2θ`,
+/// `e^(iθ) = (3 + 4i)/5` less its port's loss) in `[1061/16, 531/8]`, and the half-turn partner is
+/// certified silent in `[827/1024, 1655/2048]` (its axes cancel): the lock pattern names the line's
+/// class. With the last cell left open, the candidate completing the line reads the joint growth
+/// `[1061/16, 531/8]`, strictly above every other candidate's, and the bank locks there.
+#[test]
+fn the_bank_reads_a_passages_spectral_line_and_its_flip_continues_it() {
+    let bank = ReceivingBank::new(
+        node(Rat::one(), None),
+        members(rat(5, 8)),
+        integer(16),
+        Rat::one(),
+        6,
+    )
+    .unwrap();
+    let growth = |lower: Rat, upper: Rat| Growth { lower, upper };
+    let by_difference = [
+        growth(integer(46), rat(1473, 32)),
+        growth(rat(1061, 16), rat(531, 8)),
+        growth(rat(827, 1024), rat(1655, 2048)),
+        growth(rat(1061, 16), rat(531, 8)),
+    ];
+    for class in 0..4usize {
+        for offset in 0..4usize {
+            let cell = |t: usize| quarter(offset + 4 * 8 - (class * t) % 4).as_gaussian();
+            let line: Vec<GaussianRat> = (0..8).map(cell).collect();
+            let reading = bank.read_turn(&line, 10).unwrap();
+            for (member, read) in reading.members.iter().enumerate() {
+                assert_eq!(read, &by_difference[(member + 4 - class) % 4]);
+            }
+            let silent: Vec<usize> = (0..4)
+                .filter(|&member| !reading.members[member].is_locked())
+                .collect();
+            assert_eq!(silent, vec![(class + 2) % 4]);
+            let candidates: Vec<TurnReading> = (0..4)
+                .map(|candidate| {
+                    let mut turn = line.clone();
+                    turn[7] = quarter(candidate).as_gaussian();
+                    bank.read_turn(&turn, 10).unwrap()
+                })
+                .collect();
+            let completing = (offset + 4 * 8 - (class * 7) % 4) % 4;
+            let top = &candidates[completing].joint;
+            assert!(top.is_locked());
+            for (candidate, read) in candidates.iter().enumerate() {
+                if candidate != completing {
+                    assert!(top.exceeds(&read.joint));
+                }
             }
         }
     }

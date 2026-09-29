@@ -110,6 +110,40 @@
 //! at its step. The station reads relative phases to placed data, and the section's own locked data
 //! are placed data of the same kind. Nothing here reads a codec, a byte or an alphabet's meaning.
 //!
+//! [definition; agent-inferred, September 29] **The bank reads the superposed passage**
+//! ([`generate_by_bank`], [`BankPlacement`]; `hnn::ring`, "The passage's monodromy"; the
+//! [record](../../../../research/records/2026-09-29_THE_BANK_READS_A_SUPERPOSED_PASSAGE_THE_LOCKS_CONTINUE_A_SPECTRAL_LINE_AND_THE_ORDER_TWO_TERRAIN_STAYS_AT_THE_MARGINAL.md)).
+//! The linear readout reads the superposed placement through one map, and a linear readout of
+//! superposed placed data separates them only when `2D ≥ (n + m − 1)(|A| − 1)` (the order repair);
+//! the relative phases between them need the square law, which is the pump. Generation by the bank
+//! is the lock iteration above with the bank's reading in place of the readout:
+//!
+//! - **the candidates**: in a refinement, every unlocked station `j` and every class `x` of the
+//!   exterior chart, the receiving ring's storage with the locked data and `x` at station `j` placed
+//!   at their residues over the section's population ([`BankPlacement::storage`], the law of
+//!   [`SourceMoment::section`] and [`injection`]), the other unlocked stations unplaced;
+//! - **the reading**: the bank's turn of that storage (every node crossing the section pumps each
+//!   member) and its joint growth, enclosed exactly;
+//! - **the lock's flip**: a station's top candidate reads a growth strictly above every other
+//!   candidate's (`θ = a/(a + K) > ½ ⇔ a > K`, on exact enclosures) and the bank locks there (its
+//!   growth certified past one); its gap is the top's `lower` less the largest other `upper`; the
+//!   stations of the largest gap lock together, each lock's reading certified (every member's
+//!   Floquet certificate at the joint growth, the executed turn's balances);
+//! - **the release**: every station locked, at width zero through `receiver::release`; no station
+//!   with a positive gap, held with the unlocked stations plural.
+//!
+//! **What it learns** [agent-inferred]. Nothing is deposited here: the bank's members are declared
+//! and the placement is the constitution's source port `E` at its cut, trained by the certified
+//! deposition through the linear readout. The bank's reading enters no comparison: no covector of
+//! the lock's decision reaches `E` or a member's pump, and the field's words run their resonators'
+//! declared pumps, never one modulated by the passage. The certified step now reads a pumped ring's
+//! reach (`hnn::constitution`, "The pumped medium's reach"), but that path is linear in the data.
+//!
+//! **Every modality reads it the same way**: the bank reads the ring's storage, which holds any
+//! chart's classes through `E` at their residues; an image's pixels at their scan ticks and an
+//! acoustic stream's samples at theirs cross the section as a text's bytes do, and a periodic
+//! component of any stream is a spectral line the bank's lock's flip continues.
+//!
 //! [definition] **The internal checks of every refinement** ([`Checks`]):
 //! - the refinement's balance ([`RefinementBalance`]): every tick's field-and-resonator balance
 //!   closes with every term stated, the ticks chain within and across the words, the injection is
@@ -132,6 +166,7 @@
 //! | the continuing word's return | `HolonicAdjointNormalization.dualMap_comp_reverse_order`, `HNN/LatticeWord.executed_adjoint_unique` | [`Word::pull_back_continuing`], [`Pairing`] |
 //! | the refinement's balance | `HNN/Ring.loaded_tick_executed_interconnection_balance`, `HNN/Word.field_commit_deposition` | [`RefinementBalance`] |
 //! | the diamond over the refinement | `HNN/Retention.{diamond_recursion, deposit_descends}` | [`Refinement::diamond`], [`unreached_unchanged`] |
+//! | the bank's reading of the superposed passage and the lock's flip | `HNN/FloquetPassage.{reflection_transport_reflection_carriers, kick_coeff_two, pair_sum_power_spectrum}`, `Objects/ParametronLock.lockFace_logistic`, `HNN/Prediction.{placed_at_station, release_width_zero}` | [`generate_by_bank`], [`BankPlacement`] |
 
 use std::collections::BTreeMap;
 
@@ -1347,36 +1382,9 @@ pub fn generate_by_bank(
     if !field.is_source(ring) {
         return Err(HnnError::MissingSourcePort { ring });
     }
-    let port = constitution
-        .source_port(ring)
-        .ok_or(HnnError::MissingSourcePort { ring })?;
-    let geometry = field.ring(ring);
-    let period = geometry.period();
     let alphabet = field.alphabet();
     let stations = declared.stations;
-    let base = injection(field, constitution, current, &[moment])?[ring].clone();
-    let phase = current.phase(field, ring)?;
-    let lift = current.lift()[ring].clone();
-    let columns: Vec<Vec<Rat>> = (0..alphabet)
-        .map(|class| {
-            (0..port.rows())
-                .map(|row| port.get(row, class).cloned())
-                .collect::<Result<Vec<_>, _>>()
-        })
-        .collect::<Result<Vec<_>, _>>()?;
-    // A datum of class `x` at station `j` is placed at rotation `lift − c_j`, `c_j = τ + 1 + j`
-    // (mod `d`), over the section's population: `SourceMoment::section` then `open_storage`.
-    let images: Vec<Vec<Vec<Rat>>> = (0..stations)
-        .map(|station| {
-            let residue = (phase + 1 + station as u64) % period;
-            let rotation = &lift - BigInt::from(residue);
-            columns
-                .iter()
-                .map(|column| geometry.rotate(column, &rotation))
-                .collect()
-        })
-        .collect();
-    let chart = PopulationChart::of(field);
+    let placement = BankPlacement::of(field, constitution, current, moment, declared)?;
     let mut locked: Vec<Option<usize>> = vec![None; stations];
     let mut tops: Vec<usize> = vec![declared.termination; stations];
     let mut locks: Vec<Vec<usize>> = Vec::new();
@@ -1385,19 +1393,11 @@ pub fn generate_by_bank(
     let (mut refinements, mut readings, mut certified, mut members) = (0, 0, 0, 0);
     let (mut ticks_closed, mut ticks) = (0, 0);
     while locked.iter().any(Option::is_none) {
-        let width = base.len();
-        let mut placed = vec![Rat::zero(); width];
-        let mut population = 1u64;
-        for (station, class) in locked.iter().enumerate() {
-            if let Some(class) = class {
-                placed = add(&placed, &images[station][*class]);
-                population += 1;
-            }
-        }
-        let nu = chart.value(population);
+        let placed = locked.clone();
         let storage = |station: usize, class: usize| -> Vec<Rat> {
-            let section = add(&placed, &images[station][class]);
-            add(&base, &section.iter().map(|x| x * &nu).collect::<Vec<_>>())
+            let mut cells = placed.clone();
+            cells[station] = Some(class);
+            placement.storage(&cells)
         };
         let open: Vec<(usize, usize)> = (0..stations)
             .filter(|&station| locked[station].is_none())
@@ -1487,6 +1487,80 @@ pub fn generate_by_bank(
         ticks,
         decisions,
     })
+}
+
+/// [definition; agent-inferred, September 29] **The receiving ring's storage under a section's
+/// placement** ([`generate_by_bank`]): the request's open storage `P^τ m̃` on the receiving ring and,
+/// per station `j` and class `x`, the datum's image `P^(λ − c_j) E e_x`, `c_j = τ + 1 + j` (mod `d`),
+/// so a section's cells place `Σ_j P^(λ − c_j) E e_(x_j) ν̂(v)` over their own population `v`: the
+/// law of `SourceMoment::section` then `open_storage`, and [`injection`]'s sum, read without
+/// re-encoding the request for every candidate. Held to [`injection`] exactly by the owner's tests.
+#[derive(Clone, Debug)]
+pub struct BankPlacement {
+    base: Vec<Rat>,
+    images: Vec<Vec<Vec<Rat>>>,
+    chart: PopulationChart,
+}
+
+impl BankPlacement {
+    /// The request's storage and every station's class images on the receiving ring.
+    pub fn of(
+        field: &Field,
+        constitution: &impl ConstitutionRead,
+        current: &Current,
+        moment: &SourceMoment,
+        declared: &Refinement,
+    ) -> Result<Self, HnnError> {
+        let ring = declared.ring;
+        let port = constitution
+            .source_port(ring)
+            .ok_or(HnnError::MissingSourcePort { ring })?;
+        let geometry = field.ring(ring);
+        let period = geometry.period();
+        let base = injection(field, constitution, current, &[moment])?[ring].clone();
+        let phase = current.phase(field, ring)?;
+        let lift = current.lift()[ring].clone();
+        let columns: Vec<Vec<Rat>> = (0..field.alphabet())
+            .map(|class| {
+                (0..port.rows())
+                    .map(|row| port.get(row, class).cloned())
+                    .collect::<Result<Vec<_>, _>>()
+            })
+            .collect::<Result<Vec<_>, _>>()?;
+        let images = (0..declared.stations)
+            .map(|station| {
+                let residue = (phase + 1 + station as u64) % period;
+                let rotation = &lift - BigInt::from(residue);
+                columns
+                    .iter()
+                    .map(|column| geometry.rotate(column, &rotation))
+                    .collect()
+            })
+            .collect();
+        Ok(Self {
+            base,
+            images,
+            chart: PopulationChart::of(field),
+        })
+    }
+
+    /// **The receiving ring's storage** with the section's cells placed (a station's class, or
+    /// unplaced): the request's storage plus the placed images over the section's population.
+    pub fn storage(&self, cells: &[Option<usize>]) -> Vec<Rat> {
+        let mut placed = vec![Rat::zero(); self.base.len()];
+        let mut population = 0u64;
+        for (station, class) in cells.iter().enumerate() {
+            if let Some(class) = class {
+                placed = add(&placed, &self.images[station][*class]);
+                population += 1;
+            }
+        }
+        if population == 0 {
+            return self.base.clone();
+        }
+        let nu = self.chart.value(population);
+        add(&self.base, &placed.iter().map(|x| x * &nu).collect::<Vec<_>>())
+    }
 }
 
 /// **The deposit of a set of staged refinements at one commit** (module header): every linear
