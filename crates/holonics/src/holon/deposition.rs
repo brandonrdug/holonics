@@ -52,7 +52,21 @@
 //! `C ≤ B s κ² Σ_t w_t |Δ f_t|²`, `B` the loci stepping together (their logit moves add, and
 //! `|Σ_(ℓ<B) u_ℓ|² ≤ B Σ_ℓ |u_ℓ|²`). The gain `κ` is certified by the machine's energy law; a learned
 //! map's operator bound is read by the Schur test `‖W‖₂² ≤ ‖W‖₁ ‖W‖_∞` ([`schur_norms`]), exact over
-//! `ℚ`, and a square root by its dyadic ceiling ([`sqrt_ceiling`]).
+//! `ℚ`, and a square root by its dyadic ceiling ([`sqrt_ceiling`], [`root_ceiling`]).
+//!
+//! [definition; agent-inferred, September 29] **The tightened certificate** (Lean
+//! `Holon/Deposition` §9; `hnn::constitution`, "The tightened certificate"). Two of those bounds
+//! are sharpened, each by a proved statement:
+//! - **The joint moves** ([`JointReading`]; `joint_move_triangle`, `joint_step_descends`). Families
+//!   with logit moves per unit step at most `m_ℓ` move the logits by at most `Σ η_ℓ m_ℓ` (the cross
+//!   terms by Cauchy–Schwarz on the joint ray), so each family keeps its own curvature `C_ℓ = s κ² b`
+//!   (`B = 1`) and the families hold one joint certificate `s (Σ η_ℓ m_ℓ)² ≤ Σ η_ℓ a_ℓ`, which
+//!   descends by `½ Σ η_ℓ a_ℓ` through [`CertifiedStep`]'s law (`certified_step_descends`, the joint
+//!   term apportioned by decrease).
+//! - **The Gram certificate** ([`spectral_norm`]; `gram_certificate_bound`,
+//!   `adjoint_gram_certificate_bound`, `entrywise_error_bound`). `‖X‖₂` is bounded on a dyadic face
+//!   of the matrix by a rational `μ` with `μ I − G ⪰ 0` decided by exact inertia on the face's
+//!   integer Gram, plus the face's entrywise error; the Schur test is the fallback it sharpens.
 //!
 //! [proved-derived; formal-checked] **An active element's growth** (Lean
 //! `Holon/Deposition.active_element_growth`, [`active_growth`]). An element whose storage obeys
@@ -67,6 +81,8 @@
 //! |---|---|
 //! | `certified_step_descends` | [`CertifiedStep`] |
 //! | `gauss_newton_curvature`, `joint_cauchy_schwarz` | the curvature `C` a machine supplies (`hnn::constitution`) |
+//! | `joint_move_triangle`, `joint_step_descends` | [`JointReading`] |
+//! | `gram_certificate_bound`, `adjoint_gram_certificate_bound`, `entrywise_error_bound` | [`spectral_norm`] |
 //! | `active_element_growth`, `active_energy_growth` | [`active_growth`] |
 //! | `learned_rate_form` | [`learned_rate_form`] |
 //! | `energy_product_bound`, `committed_energy_bound` | [`CommittedEnergyBound`] |
@@ -497,6 +513,214 @@ pub fn significant(x: &Rat, bits: u32, up: bool) -> Rat {
     Rat::from_integer(mantissa) * dyadic(-shift)
 }
 
+/// **A dyadic upper root at a relative grain**: the least `m·2^(−p)` with `(m·2^(−p))² ≥ x`, at the
+/// grain `p = 32 − ⌊log₂ x⌋/2` (so within `√x · 2^(−31)` of `√x`, whatever its magnitude), for
+/// `x ≥ 0` ([`sqrt_ceiling`]).
+pub fn root_ceiling(x: &Rat) -> Rat {
+    if !x.is_positive() {
+        return Rat::zero();
+    }
+    let grain = (32 - floor_log2(x).div_euclid(2)).max(0);
+    sqrt_ceiling(x, u32::try_from(grain).expect("a grain below 2^32"))
+}
+
+/// [definition; agent-inferred, September 29] **A certified spectral norm** `ρ ≥ ‖X‖₂` (module
+/// header, "The tightened certificate"; Lean `Holon/Deposition.{gram_certificate_bound,
+/// adjoint_gram_certificate_bound, entrywise_error_bound}`). `X` is read on a dyadic face: each entry
+/// at the grain `2^e`, `e = ⌊log₂ max|x|⌋ − 30`, as the nearest integer `N_ij`, so `X = 2^e N + E`
+/// with `|E_ij| ≤ 2^(e−1)` and `‖E‖₂ ≤ 2^(e−1) √(rows · columns)` (zero when the face is exact). The
+/// Gram `G` of `N`'s smaller side (`N Nᵀ` or `NᵀN`, whose largest eigenvalue is `‖N‖₂²` either way)
+/// is formed over the integers, and a rational `λ` is taken only when `λ I − G ⪰ 0` is decided by
+/// exact inertia (Sylvester's law, `ratio::linear::inertia`), so `|Nv|² ≤ λ|v|²` for every `v`; then
+/// `ρ = 2^e (√λ + ½ √(rows · columns))` at their dyadic ceilings. The candidates are guessed, never
+/// trusted: the Rayleigh quotient of a few power steps from the widest diagonal (a lower bound of the
+/// largest eigenvalue) raised by `2^(−6)`, then `2^(−4)`, `2^(−2)`, `2^0`, `2^1`, …; the first the
+/// inertia certifies is taken, and the Schur test `‖N‖₁‖N‖_∞` (the bound it sharpens) when none
+/// below it is. Zero for the zero matrix.
+pub fn spectral_norm(rows: usize, columns: usize, entries: &[Rat]) -> Rat {
+    use crate::ratio::linear::vector::integer_dot;
+    // The face's grain from the entries' bit lengths (`2^(b(p) − b(q) − 1) ≤ |p/q| < 2^(b(p) − b(q) + 1)`);
+    // any grain is sound, the grain sets only the face's precision.
+    let Some(widest) = entries
+        .iter()
+        .filter(|x| !x.is_zero())
+        .map(|x| x.numer().bits() as i64 - x.denom().bits() as i64)
+        .max()
+    else {
+        return Rat::zero();
+    };
+    if rows == 0 || columns == 0 {
+        return Rat::zero();
+    }
+    // The dyadic face: `N_ij` the nearest integer to `x_ij / 2^e`.
+    let exponent = widest - 16;
+    let unit = dyadic(exponent);
+    let mut exact = true;
+    let numerators: Vec<BigInt> = entries
+        .iter()
+        .map(|x| {
+            // `x / 2^e = p / q` on the raw pair (no normalization), and its nearest integer.
+            let (p, q) = if exponent <= 0 {
+                (x.numer() << (-exponent) as usize, x.denom().clone())
+            } else {
+                (x.numer().clone(), x.denom() << exponent as usize)
+            };
+            let quotient = &p / &q;
+            let remainder = &p - &quotient * &q;
+            if remainder.is_zero() {
+                return quotient;
+            }
+            exact = false;
+            if remainder.magnitude() * 2u32 >= *q.magnitude() {
+                quotient + p.signum()
+            } else {
+                quotient
+            }
+        })
+        .collect();
+    // The Schur test on the face: the bound this sharpens, taken when no candidate below it is
+    // certified.
+    let mut column_sums = vec![BigInt::zero(); columns];
+    let mut row_widest = BigInt::zero();
+    for row in numerators.chunks(columns) {
+        let mut sum = BigInt::zero();
+        for (total, value) in column_sums.iter_mut().zip(row) {
+            let magnitude = value.abs();
+            sum += &magnitude;
+            *total += magnitude;
+        }
+        if sum > row_widest {
+            row_widest = sum;
+        }
+    }
+    let upper = Rat::from_integer(column_sums.into_iter().max().unwrap_or_default() * row_widest);
+    // The Gram of the face's smaller side, over the integers.
+    let lines: Vec<Vec<BigInt>> = if rows <= columns {
+        numerators.chunks(columns).map(<[BigInt]>::to_vec).collect()
+    } else {
+        (0..columns)
+            .map(|j| {
+                (0..rows)
+                    .map(|i| numerators[i * columns + j].clone())
+                    .collect()
+            })
+            .collect()
+    };
+    let n = lines.len();
+    let mut gram = vec![vec![BigInt::zero(); n]; n];
+    for i in 0..n {
+        for j in i..n {
+            let value = integer_dot(&lines[i], &lines[j]);
+            gram[j][i] = value.clone();
+            gram[i][j] = value;
+        }
+    }
+    // A lower bound of the largest eigenvalue: the Rayleigh quotient of a few power steps from the
+    // widest diagonal entry, each iterate shifted to 64 significant bits (any vector's quotient is a
+    // lower bound, so the shift is only a guess's grain).
+    let start = (0..n).max_by_key(|&i| gram[i][i].clone()).unwrap_or(0);
+    let mut vector: Vec<BigInt> = (0..n)
+        .map(|i| {
+            if i == start {
+                BigInt::one()
+            } else {
+                BigInt::zero()
+            }
+        })
+        .collect();
+    for _ in 0..16 {
+        let next: Vec<BigInt> = gram.iter().map(|row| integer_dot(row, &vector)).collect();
+        let bits = next.iter().map(BigInt::bits).max().unwrap_or(0);
+        let shift = bits.saturating_sub(64);
+        vector = next.into_iter().map(|x| x >> shift).collect();
+    }
+    let applied: Vec<BigInt> = gram.iter().map(|row| integer_dot(row, &vector)).collect();
+    let norm = integer_dot(&vector, &vector);
+    let diagonal = Rat::from_integer(gram[start][start].clone());
+    let lower = if norm.is_zero() {
+        diagonal
+    } else {
+        Rat::new(integer_dot(&vector, &applied), norm).max(diagonal)
+    };
+    // `λ I − G ⪰ 0`, decided by exact inertia on `λ_num I − λ_den G`.
+    let dominates = |lambda: &Rat| -> bool {
+        let (numerator, denominator) = (lambda.numer(), lambda.denom());
+        let form: Vec<Vec<Rat>> = (0..n)
+            .map(|i| {
+                (0..n)
+                    .map(|j| {
+                        let entry = -(denominator * &gram[i][j]);
+                        Rat::from_integer(if i == j { entry + numerator } else { entry })
+                    })
+                    .collect()
+            })
+            .collect();
+        SymmetricForm::from_rows(form).is_ok_and(|form| inertia(&form).negative == 0)
+    };
+    let mut bound = upper.clone();
+    for raise in [-6i64, -4, -2, 0, 1, 2, 3, 4, 5, 6] {
+        let candidate = significant(&(&lower * (Rat::one() + dyadic(raise))), 24, true);
+        if candidate >= upper {
+            break;
+        }
+        if dominates(&candidate) {
+            bound = candidate;
+            break;
+        }
+    }
+    let error = if exact {
+        Rat::zero()
+    } else {
+        root_ceiling(&Rat::from_integer(BigInt::from(rows * columns)))
+            / Rat::from_integer(BigInt::from(2))
+    };
+    (root_ceiling(&bound) + error) * unit
+}
+
+/// [definition; agent-inferred, September 29] **The joint certificate** (module header, "The
+/// tightened certificate"; Lean `Holon/Deposition.{joint_move_triangle, joint_step_descends}`):
+/// families stepping together by `η_ℓ`, each with its unit step's first-order decrease `a_ℓ` and a
+/// bound `m_ℓ` on its logit move along its whole ray, move the logits by at most `Σ η_ℓ m_ℓ` (the
+/// triangle: the cross terms by Cauchy–Schwarz on the joint ray), so the joint curvature term is at
+/// most `s(Σ η_ℓ m_ℓ)²`; when it is at most the first-order decrease `Σ η_ℓ a_ℓ`, the score falls by
+/// at least `½ Σ η_ℓ a_ℓ` (through `certified_step_descends`, with the joint curvature apportioned to
+/// the families by their decreases).
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct JointReading {
+    /// `s (Σ η_ℓ m_ℓ)²`: the joint curvature term.
+    pub curvature: Rat,
+    /// `Σ η_ℓ a_ℓ`: the first-order decrease.
+    pub decrease: Rat,
+}
+
+impl JointReading {
+    /// The reading at a score curvature `s` over `(η_ℓ, a_ℓ, m_ℓ)`.
+    pub fn read<'a>(
+        curvature: &Rat,
+        terms: impl IntoIterator<Item = (&'a Rat, &'a Rat, &'a Rat)>,
+    ) -> Self {
+        let (mut moves, mut decrease) = (Rat::zero(), Rat::zero());
+        for (step, alignment, bound) in terms {
+            moves += step * bound;
+            decrease += step * alignment;
+        }
+        Self {
+            curvature: curvature * &moves * &moves,
+            decrease,
+        }
+    }
+
+    /// `s (Σ η m)² ≤ Σ η a`.
+    pub fn holds(&self) -> bool {
+        self.curvature <= self.decrease
+    }
+
+    /// **The certified decrease** `½ Σ η a` (Lean `joint_step_descends`).
+    pub fn certified_decrease(&self) -> Rat {
+        &self.decrease / Rat::from_integer(BigInt::from(2))
+    }
+}
+
 /// **An active element's growth factor** `(1 + ω)²` (module header; Lean
 /// `active_element_growth`, `active_energy_growth`): the most an element with an active relation of
 /// operator bound `ω` multiplies the energy share it reads in one step.
@@ -655,6 +879,122 @@ mod tests {
         assert!(integer(144) - integer(168) + integer(36) > Rat::zero());
         assert_eq!(active_growth(&rat(1, 2)), rat(9, 4));
         assert_eq!(active_growth(&Rat::zero()), Rat::one());
+    }
+
+    /// `ρ² I − XᵀX ⪰ 0`, decided exactly: the bound [`spectral_norm`] returns certifies `X`.
+    fn certifies(x: &ExactRatMatrix, rho: &Rat) -> bool {
+        let gram = x.transpose().unwrap().multiply(x).unwrap();
+        let n = gram.rows();
+        let slack = ExactRatMatrix::identity(n)
+            .unwrap()
+            .scaled(&(rho * rho))
+            .subtract(&gram)
+            .unwrap();
+        inertia(&matrix_form(&slack).unwrap()).negative == 0
+    }
+
+    /// Lean `Holon/Deposition.{gram_certificate_bound, adjoint_gram_certificate_bound,
+    /// entrywise_error_bound}`: the certified spectral norm bounds the map, on either side's Gram and
+    /// on an inexact face, and sharpens the Schur test where the Schur test is loose.
+    #[test]
+    fn the_spectral_norm_is_certified_and_sharpens_the_schur_test() {
+        // `[[1, −2], [3, 0]]`: `‖W‖₂² = 7 + √13`, below the Schur test's 12.
+        let w = integer_matrix(&[&[1, -2], &[3, 0]]).unwrap();
+        let rho = spectral_norm(2, 2, w.entries());
+        assert!(certifies(&w, &rho));
+        let square = &rho * &rho;
+        assert!(square < integer(12), "{square}");
+        // `ρ² ≥ 7 + √13`: `(ρ² − 7)² ≥ 13` with `ρ² ≥ 7`.
+        assert!(
+            square >= integer(7) && (&square - integer(7)) * (&square - integer(7)) >= integer(13)
+        );
+        // A wide and a tall matrix read their smaller side's Gram; both are certified.
+        let wide = integer_matrix(&[&[2, -1, 0, 3], &[1, 1, -2, 0]]).unwrap();
+        let tall = wide.transpose().unwrap();
+        for x in [&wide, &tall] {
+            let rho = spectral_norm(x.rows(), x.columns(), x.entries());
+            assert!(certifies(x, &rho));
+            let (column, row) = schur_norms(x);
+            assert!(&rho * &rho <= column * row);
+        }
+        // An inexact face (a third is not dyadic) adds its entrywise error and stays certified.
+        let third = ExactRatMatrix::new(vec![
+            vec![rat(1, 3), rat(-2, 7)],
+            vec![rat(5, 11), rat(1, 13)],
+        ])
+        .unwrap();
+        assert!(certifies(&third, &spectral_norm(2, 2, third.entries())));
+        // The rank-one all-ones block is its own Schur test, reached within the face's grain.
+        let ones = integer_matrix(&[&[1, 1, 1], &[1, 1, 1]]).unwrap();
+        let rho = spectral_norm(2, 3, ones.entries());
+        assert!(certifies(&ones, &rho) && &rho * &rho <= integer(6) * rat(33, 32));
+        // Zero is its own bound.
+        assert_eq!(
+            spectral_norm(2, 2, &[Rat::zero(), Rat::zero(), Rat::zero(), Rat::zero()]),
+            Rat::zero()
+        );
+    }
+
+    /// The relative root ceiling bounds the root from above within `2^(−31)` of it.
+    #[test]
+    fn the_root_ceiling_is_a_close_upper_root() {
+        for x in [integer(2), rat(1, 3), integer(1 << 40), rat(1, 1 << 40)] {
+            let root = root_ceiling(&x);
+            assert!(&root * &root >= x, "{x}");
+            let below = &root * (Rat::one() - dyadic(-30));
+            assert!(&below * &below < x, "{x}");
+        }
+        assert_eq!(root_ceiling(&Rat::zero()), Rat::zero());
+    }
+
+    /// Lean `Holon/Deposition.{joint_move_triangle, joint_step_descends}`: the joint certificate
+    /// holds where the count `B` would refuse the same steps, and fails when the moves outgrow the
+    /// decrease.
+    #[test]
+    fn the_joint_certificate_reads_the_moves_not_the_count() {
+        let s = rat(1, 2);
+        // One family with a large decrease and move, and two with small moves.
+        let steps = [integer(1), rat(1, 4), rat(1, 4)];
+        let alignments = [integer(8), integer(1), integer(1)];
+        let bounds = [integer(2), integer(1), integer(1)];
+        let joint = JointReading::read(
+            &s,
+            steps
+                .iter()
+                .zip(&alignments)
+                .zip(&bounds)
+                .map(|((e, a), m)| (e, a, m)),
+        );
+        // `½ (2 + ¼ + ¼)² = 25/8 ≤ 8 + ½`.
+        assert_eq!(joint.curvature, rat(25, 8));
+        assert_eq!(joint.decrease, rat(17, 2));
+        assert!(joint.holds());
+        assert_eq!(joint.certified_decrease(), rat(17, 4));
+        // Every family at `η = 1`: the count `B = 3` refuses a small one (`η B s m² = 3/2 > a = 1`),
+        // while the joint certificate holds (`½ (2 + 1 + 1)² = 8 ≤ 8 + 1 + 1`).
+        let wider = [integer(1), integer(1), integer(1)];
+        let joint = JointReading::read(
+            &s,
+            wider
+                .iter()
+                .zip(&alignments)
+                .zip(&bounds)
+                .map(|((e, a), m)| (e, a, m)),
+        );
+        assert!(joint.holds());
+        assert!(&wider[1] * integer(3) * &s * &bounds[1] * &bounds[1] > alignments[1]);
+        // Moves that outgrow the decrease fail it.
+        let far = [integer(4), integer(4), integer(4)];
+        assert!(
+            !JointReading::read(
+                &s,
+                far.iter()
+                    .zip(&alignments)
+                    .zip(&bounds)
+                    .map(|((e, a), m)| (e, a, m)),
+            )
+            .holds()
+        );
     }
 
     #[test]

@@ -61,7 +61,9 @@
 //!   absolute entry of every learned map (`E`, `R`, each `W_c`, the factor families `f`, the slices,
 //!   `q`, `c`, `b`, `F`) over the run and after each of the first eight deposits, and the committed
 //!   energy bound read on every refinement at its commit (`RefinementBalance::energy_bound`) with the
-//!   certified storage growth's product and its extremes.
+//!   certified storage growth's product and its extremes, and each learned family's deposits that
+//!   moved any of its entries (a lattice coordinate changed), with the count of factor families that
+//!   moved over the run (the tightened certificate's acceptance 2).
 //! - **The order repair** (the order pin; `hnn::prediction`'s header, "Order is carried by residues
 //!   and relative phases"): the receiving ring's period is a product of pairwise coprime factors, so
 //!   a datum's residue is its joint residue class; training compares the unlocked stations of a
@@ -244,6 +246,9 @@ struct Tally {
     /// least and largest growth `ε_k` of one deposit.
     storage_product: Option<Rat>,
     growths: Option<(Rat, Rat)>,
+    /// Each learned family's deposits that moved any of its entries (a lattice coordinate changed:
+    /// the family's accumulated step reached its lattice unit), by name.
+    moved: BTreeMap<String, u64>,
 }
 
 impl Tally {
@@ -453,6 +458,13 @@ impl Engine {
             self.tally.energy_checks += 1;
             self.tally.energy_holds += u64::from(bound.holds);
         }
+        for ((name, before), (_, after)) in families(&self.field, &self.theta)
+            .into_iter()
+            .zip(families(&self.field, &next))
+        {
+            let count = self.tally.moved.entry(name).or_insert(0);
+            *count += u64::from(before != after);
+        }
         self.tally.deposits += 1;
         self.theta = next;
         if self.tally.deposits.is_multiple_of(16) {
@@ -548,6 +560,21 @@ impl Engine {
         for (locus, (least, largest)) in &t.exponents {
             println!("  certified steps at {locus}: 2^k for k from {least} to {largest}");
         }
+        let factor = |name: &str| !["E", "R", "Wc"].iter().any(|linear| {
+            name.strip_prefix(linear)
+                .is_some_and(|ring| ring.chars().all(|c| c.is_ascii_digit()))
+        });
+        let (mut factors, mut factors_moved) = (0, 0);
+        for (name, count) in &t.moved {
+            println!("  deposits that moved {name}: {count} of {}", t.deposits);
+            if factor(name) {
+                factors += 1;
+                factors_moved += usize::from(*count > 0);
+            }
+        }
+        println!(
+            "  factor families whose entries moved (a lattice coordinate changed) over the run: {factors_moved} of {factors}"
+        );
         for (name, value) in &t.entries {
             println!("  the largest absolute entry of {name} over the run: {value}");
         }
@@ -562,6 +589,39 @@ impl Engine {
             );
         }
     }
+}
+
+/// **Every learned family's entries**, by name: the source port `E`, the receiving map `R`, each
+/// contrast port `Wc`, and the factor families (each ring's passive factor `f`, slices and standing
+/// `q`; each contact's storage `c`, stiffness `b` and dissipation `F`).
+fn families(field: &Field, theta: &Constitution) -> Vec<(String, Vec<Rat>)> {
+    let mut families = Vec::new();
+    for g in 0..field.rings().len() {
+        if let Some(port) = theta.source_port(g) {
+            families.push((format!("E{g}"), port.entries().to_vec()));
+        }
+        if let Some(map) = theta.receiving_map(g) {
+            families.push((format!("R{g}"), map.entries().to_vec()));
+        }
+        families.push((format!("Wc{g}"), theta.contrast_port(g).entries().to_vec()));
+        families.push((format!("f{g}"), theta.passive_factor(g).entries().to_vec()));
+        families.push((
+            format!("slices{g}"),
+            theta
+                .slices(g)
+                .iter()
+                .flat_map(|(u, v)| u.iter().chain(v))
+                .cloned()
+                .collect(),
+        ));
+        families.push((format!("q{g}"), theta.standing(g).to_vec()));
+    }
+    for a in 0..field.contacts().len() {
+        families.push((format!("c{a}"), theta.contact_storage(a).entries().to_vec()));
+        families.push((format!("b{a}"), theta.contact_stiffness(a).entries().to_vec()));
+        families.push((format!("F{a}"), theta.contact_dissipation(a).entries().to_vec()));
+    }
+    families
 }
 
 /// The resident set at its peak against the cap, and the deadline.

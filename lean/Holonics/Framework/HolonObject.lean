@@ -156,6 +156,11 @@ open Holonics.HolonCore
 #print axioms square_ray_deriv_bound
 #print axioms contracting_resolvent
 #print axioms transit_difference_power
+#print axioms joint_step_descends
+#print axioms joint_move_triangle
+#print axioms gram_certificate_bound
+#print axioms adjoint_gram_certificate_bound
+#print axioms entrywise_error_bound
 #print axioms re_sum_antiConj
 #print axioms re_herm_skew
 #print axioms eq_zero_of_herm_zero

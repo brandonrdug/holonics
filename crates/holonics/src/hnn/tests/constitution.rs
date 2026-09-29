@@ -1128,13 +1128,14 @@ fn the_factor_carriers_stay_positive_semidefinite_with_no_clamp() {
     assert_eq!(inertia(&matrix_form(&additive).unwrap()).negative, 2);
 }
 
-/// `hnn::constitution`, "The factor families' certified step" (Lean
-/// `Holon/Deposition.{certified_step_descends, factor_unit_step_alignment, square_ray_deriv_bound}`):
-/// on a generic constitution (its receiving map nonzero, so the comparisons' covectors reach every
-/// family), every stepping family, a normal law's and a factor family's alike, holds its certificate
-/// `ηC ≤ a`, `ηc ≤ 1` with `C = B·½·κ²·b` and `B` every family stepping in the deposit; the factor
-/// families step (the declared `η_x` is retired), each moving its entries by exactly `η G_x / h_x′`
-/// less what its budgeted carry holds and releases.
+/// `hnn::constitution`, "The factor families' certified step" and "The tightened certificate" (Lean
+/// `Holon/Deposition.{certified_step_descends, factor_unit_step_alignment, square_ray_deriv_bound,
+/// joint_move_triangle, joint_step_descends}`): on a generic constitution (its receiving map nonzero,
+/// so the comparisons' covectors reach every family), every stepping family, a normal law's and a
+/// factor family's alike, holds its own certificate `ηC ≤ a`, `ηc ≤ 1` with `C = ½·κ²·b`, and the
+/// families together hold the joint one, `½ (Σ η m)² ≤ Σ η a` with `m² ≥ κ² b`; the factor families
+/// step (the declared `η_x` is retired), each moving its entries by exactly `η G_x / h_x′` less what
+/// its budgeted carry holds and releases.
 #[test]
 fn every_family_steps_by_its_certificate() {
     let field = chain();
@@ -1163,15 +1164,22 @@ fn every_family_steps_by_its_certificate() {
             .deposit
             .into_present()
             .unwrap();
-        let together = reading.steps.len() as u64;
+        // The joint certificate: `½ (Σ η m)² ≤ Σ η a` over every stepping family, `m ≥ √(κ² b)`.
+        let joint = reading.joint.clone().expect("families stepped");
+        assert!(joint.holds());
+        let (mut moved, mut decrease) = (Rat::zero(), Rat::zero());
+        for (_, step) in &reading.steps {
+            moved += &step.step.step * &step.bound;
+            decrease += &step.step.step * &step.step.alignment;
+        }
+        assert_eq!(joint.decrease, decrease);
+        assert_eq!(joint.curvature, rat(1, 2) * &moved * &moved);
         for (locus, step) in &reading.steps {
             assert!(step.step.holds(), "{locus:?} {:?}", step.family);
             assert!(step.step.alignment.is_positive());
-            assert_eq!(step.together, together);
-            assert_eq!(
-                step.step.curvature,
-                Rat::new(BigInt::from(together), BigInt::from(2)) * &step.gain * &step.moves
-            );
+            // Each family's own curvature, `B = 1`, and its move bound at or above `√(κ² b)`.
+            assert_eq!(step.step.curvature, rat(1, 2) * &step.gain * &step.moves);
+            assert!(&step.bound * &step.bound >= &step.gain * &step.moves);
             if step.family == Family::Map {
                 continue;
             }
