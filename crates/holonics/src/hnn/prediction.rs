@@ -7,8 +7,8 @@
 //! built from the field's own owners:
 //!
 //! ```text
-//! x(0)      = I_h(ξ):  the change at rest, with the latent ξ on the receiving ring,          the latent section
-//!             and the request's moment s_g = P_g^(τ_g) m̃_g injected at the source rings    (egg packing)
+//! x(0)      = I_h:  the change at rest, with the request's moment s_g = P_g^(τ_g) m̃_g
+//!             injected at the source rings                                                  the section at rest
 //! x_(n+1)   = F_Θ(x_n, m̃):  one word of w full ticks (junction → element → loaded
 //!             resonator → contact transit) opened on the change x_n the previous word left,
 //!             the request's moment re-entering at the source ports                            the refinement, n < K
@@ -47,11 +47,12 @@
 //!   class at the receiver's grain: the face reads only the grain cells, so the reading is constant
 //!   on the grain fibre exactly when every station's top cell is unique, and it is then released at
 //!   width zero (`release_width_zero`); a shared top cell is a plural reading, held
-//!   ([`Section::release`]). A selection, when one is needed, is made within the joint family: a
-//!   member is a keyed latent ξ ([`Latent`]), and the whole section is read from that one member,
-//!   never by independent marginal draws. The termination face is a class of the exterior chart
+//!   ([`Section::release`]). A plural section is held, never retried: no member of a family of
+//!   pseudo-random latents stands in for a located key (the keyed latent was retired September 29,
+//!   the [lessons record](../../../../research/records/2026-09-29_LESSONS_THE_FAILURES_THAT_REPEATED_AFTER_THEY_WERE_RECORDED.md)
+//!   §4; `96d8940b`). The termination face is a class of the exterior chart
 //!   ([`Refinement::termination`]): the released section is read up to its first station at it.
-//! - **The consumer equation** is `ρ(F^K(I_h(ξ))) = T(request)`, the instance of Lean
+//! - **The consumer equation** is `ρ(F^K(I_h)) = T(request)`, the instance of Lean
 //!   `Holon.ofEvolution_receive_eq_encoded` (`HNN/Prediction.consumer_eq`): checked exactly where a
 //!   terrain knows `T` (the copy and moiré terrains of the notebook's `hnn_prediction`).
 //! - **Learning.** The section is compared with its target at every station at once
@@ -62,7 +63,9 @@
 //!   before as its end. The words' returns are joined on the refinement's clock ([`join`]) and
 //!   composed onto every locus inside the refinement's causal diamond
 //!   ([`crate::hnn::reference::compose_return`], [`Refinement::diamond`]); the deposit is the
-//!   existing normal-law and factor deposition ([`Constitution::deposited`]).
+//!   normal-law and factor deposition ([`Constitution::deposited`]) at its certified step, which
+//!   reads the refinement's reach ([`Refinement::reach`]: its stations at `K·w`, the moment's
+//!   re-entries at `n·w` and the phases one moment occupies).
 //! - **No window anywhere.** The path reads the request only through its phase-carried moment; it
 //!   reads no landmark tree, no suffix address, no copy stage and no byte context, and it deposits
 //!   nothing into the receiving tree (a deposit it stages has no landmark and no receiving-face step).
@@ -74,7 +77,7 @@
 //!   within its certified bound, and across the commit the deposition work closes it;
 //! - the adjoint pairing ([`Pairing`]): on the executed charts with no transient split, the
 //!   stations' covectors paired with their logits equal the returned opening covectors paired with
-//!   the injections and the latent, exactly (Lean `HNN/LatticeWord.executed_adjoint_unique`,
+//!   the injections, exactly (Lean `HNN/LatticeWord.executed_adjoint_unique`,
 //!   `HolonicAdjointNormalization.dualMap_comp_reverse_order`);
 //! - the unreached loci ([`unreached_unchanged`]): every locus outside the refinement's diamond has
 //!   the same material and deposit clock after the deposit;
@@ -96,9 +99,9 @@ use num_bigint::BigInt;
 use num_traits::{One, Signed, ToPrimitive, Zero};
 
 use crate::hnn::HnnError;
-use crate::hnn::chart::{Charts, Remainders};
+use crate::hnn::chart::{Charts, Remainders, WordLattice};
 use crate::hnn::constitution::{
-    Constitution, FactorGradient, FactorStep, LinearLocus, LinearStep, Locus,
+    Constitution, FactorGradient, FactorStep, LinearLocus, LinearStep, Locus, Reach,
 };
 use crate::hnn::field::{ConstitutionRead, Current, Field};
 use crate::hnn::moment::SourceMoment;
@@ -110,7 +113,7 @@ use crate::hnn::receiving::ReceivingRead;
 use crate::hnn::reference::{ComposedReturn, compose_return};
 use crate::hnn::retention::{Diamond, loci};
 use crate::hnn::word::{CommitWork, EndChange, PowerForm, Word};
-use crate::holarchy::terrain::Draw;
+use crate::holon::deposition::{power, sqrt_ceiling};
 use crate::ratio::linear::ExactRatMatrix;
 use crate::ratio::linear::vector::{add, dot};
 use crate::ratio::Rat;
@@ -231,6 +234,19 @@ impl Refinement {
         self.words * self.span
     }
 
+    /// **The refinement's reach** (the certified step's reading; `hnn::constitution::Reach`): its
+    /// `m` stations read the receiving ring's anchor after `K·w` full ticks, and the request's moment
+    /// enters at the open of every word, `n·w` for `n < K`; `phases` the most phases one moment
+    /// occupied.
+    pub fn reach(&self, phases: u64) -> Reach {
+        Reach {
+            receiver: self.ring,
+            stations: vec![self.last_epoch() as u64; self.stations],
+            entries: (0..self.words).map(|n| (n * self.span) as u64).collect(),
+            phases,
+        }
+    }
+
     /// **The refinement's causal diamond** (Lean `HNN/Retention.diamond_recursion`): the field's
     /// source rings reach, the receiving ring observes, over `K·w` rounds.
     pub fn diamond(&self, field: &Field) -> Diamond {
@@ -255,56 +271,6 @@ impl Refinement {
             phases: (0..self.stations).map(|j| self.station_turns(j)).collect(),
         }
     }
-}
-
-// -------------------------------------------------------------------------------------------
-// the latent
-
-/// [definition; agent-inferred] **A member of the joint family** (module header): the latent ξ the
-/// section opens with on the receiving ring. `Rest` is the zero latent, the egg packed with the
-/// request alone. `Keyed(k)` is one member of the declared family of latents at the source's own
-/// amplitude: each coordinate of the receiving ring's storage `±a`, the sign a coin of
-/// `Draw::new(k)` and `a` the injection's largest coordinate (the request's moment enters at that
-/// amplitude, so a member enters as the source does: a noise realization of the diffusion chart at
-/// the source's scale). A member changes the whole section from its one anchor; selecting one is
-/// the declared selection within the joint family, never a marginal draw.
-#[derive(Clone, Copy, Debug, PartialEq, Eq)]
-pub enum Latent {
-    Rest,
-    Keyed(u64),
-}
-
-impl Latent {
-    /// **The latent's storage** per ring at the source's amplitude `a`: zero but on the receiving
-    /// ring.
-    pub fn storage(&self, field: &Field, ring: usize, amplitude: &Rat) -> Vec<Vec<Rat>> {
-        let mut storage: Vec<Vec<Rat>> = field
-            .rings()
-            .iter()
-            .map(|declared| vec![Rat::zero(); declared.width()])
-            .collect();
-        if let Latent::Keyed(key) = self {
-            let mut draw = Draw::new(*key);
-            for value in &mut storage[ring] {
-                *value = if draw.coin() {
-                    amplitude.clone()
-                } else {
-                    -amplitude.clone()
-                };
-            }
-        }
-        storage
-    }
-}
-
-/// **The source's amplitude**: the injection's largest coordinate in magnitude.
-pub fn amplitude(injection: &[Vec<Rat>]) -> Rat {
-    injection
-        .iter()
-        .flatten()
-        .map(Signed::abs)
-        .max()
-        .unwrap_or_else(Rat::zero)
 }
 
 // -------------------------------------------------------------------------------------------
@@ -440,6 +406,53 @@ impl RefinementBalance {
             && committed
     }
 
+    /// **The committed energy bound of the refinement** (`hnn::constitution`'s header, "The
+    /// committed energy bound, enforced at the commit"; Lean `Holon/Deposition.{committed_energy_bound,
+    /// active_element_growth}`), read after its commit: with the per-tick amplitude growth `g = 1 + ω`
+    /// of the constitution it ran at and the commit's certified storage growth `ε_k`, the committed
+    /// energy is at most
+    ///
+    /// ```text
+    /// (1 + ε_k) · (Σ_(n<K) g^(K·w − n·w) · √P_inj + g^(K·w) · √((K·w + 1) · r))²
+    /// ```
+    ///
+    /// `P_inj` the injection's power (the balance's open: the change opens at rest), each word
+    /// re-injecting it; `r` the executed residual's certified bound. Each passive tick keeps the
+    /// power and a contrast port's tick multiplies it by at most `g²` (`active_element_growth`), so
+    /// `√P(t+1) ≤ g√P(t) + √|r_t|`, an injection adds `√P_inj` to `√P` (the triangle inequality in
+    /// the power's norm), and `Σ_t √|r_t| ≤ √((K·w + 1) Σ_t |r_t|)`; the commit's deposition work
+    /// is at most `ε_k` times the storage part (`certify_deposit`). The square roots are read at
+    /// their dyadic ceilings on the word's transient lattice. Refused before a commit.
+    pub fn energy_bound(
+        &self,
+        declared: &Refinement,
+        amplitude: &Rat,
+        storage_growth: &Rat,
+        lattice: Option<&WordLattice>,
+    ) -> Result<EnergyBound, HnnError> {
+        let commit = self.commit.as_ref().ok_or(HnnError::Shape {
+            what: "a refinement's balance carried across its commit",
+            expected: 1,
+            found: 0,
+        })?;
+        let grain = lattice.map_or(0, WordLattice::transient_exponent);
+        let ticks = declared.last_epoch() as u64;
+        let entries: Rat = (0..declared.words)
+            .map(|n| power(amplitude, ticks - (n * declared.span) as u64))
+            .sum();
+        let residual = sqrt_ceiling(
+            &(Rat::from_integer(BigInt::from(ticks + 1)) * self.bound.abs()),
+            grain,
+        );
+        let root = entries * sqrt_ceiling(&self.open, grain) + power(amplitude, ticks) * residual;
+        let bound = (Rat::one() + storage_growth) * &root * &root;
+        Ok(EnergyBound {
+            holds: commit.committed <= bound,
+            committed: commit.committed.clone(),
+            bound,
+        })
+    }
+
     /// **Carry the balance across the commit** from the cut's form `before` to the committed form
     /// `after` (both read at the refinement's lift): the deposition work on the end change and the
     /// end change's power and resonator energy under the committed forms.
@@ -461,19 +474,28 @@ impl RefinementBalance {
     }
 }
 
+/// [definition] **A refinement's committed energy against its bound**
+/// ([`RefinementBalance::energy_bound`]): the committed energy, the certified bound and whether it
+/// holds.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct EnergyBound {
+    pub committed: Rat,
+    pub bound: Rat,
+    pub holds: bool,
+}
+
 // -------------------------------------------------------------------------------------------
 // the section
 
 /// [definition] **A refined section** (module header): the refinement's words (owned until the
-/// return consumes them), the injection and the opening latent, the receiving map read at the cut,
-/// the anchor, each station's read and the stations' faces, the end change and the balance.
+/// return consumes them), the injection, the receiving map read at the cut, the anchor, each
+/// station's read and the stations' faces, the end change and the balance.
 #[derive(Debug)]
 pub struct Section<'c> {
     field: &'c Field,
     declared: Refinement,
     words: Vec<Word<'c>>,
     injection: Vec<Vec<Rat>>,
-    opening: EndChange,
     map: ExactRatMatrix,
     anchor: Vec<Rat>,
     reads: Vec<Vec<Rat>>,
@@ -484,21 +506,20 @@ pub struct Section<'c> {
 
 impl<'c> Section<'c> {
     /// **Refine a section** (module header): the operands read once at the cut (every word of the
-    /// refinement reads the same medium), the request's moment injected at the source rings, the
-    /// latent opened on the receiving ring, `K` words of `w` full ticks with the motion continuing,
-    /// the last ending at its last junction, and every station read from its anchor.
+    /// refinement reads the same medium), the change opened at rest with the request's moment
+    /// injected at the source rings, `K` words of `w` full ticks with the motion continuing, the last
+    /// ending at its last junction, and every station read from its anchor.
     pub fn refine(
         field: &'c Field,
         constitution: &impl ConstitutionRead,
         current: &Current,
         moment: &SourceMoment,
-        latent: Latent,
         declared: &Refinement,
         charts: &mut Charts,
     ) -> Result<Self, HnnError> {
         let operands = Operands::at_cut_charted(field, constitution, current, charts)?;
         let injection = moment.open_storage(field, constitution, current)?;
-        Self::refine_on(field, constitution, operands, injection, latent, declared)
+        Self::refine_on(field, constitution, operands, injection, declared)
     }
 
     /// **Refine on given operands**: the executed charts with no transient split for the pairing
@@ -508,7 +529,6 @@ impl<'c> Section<'c> {
         constitution: &impl ConstitutionRead,
         operands: Operands,
         injection: Vec<Vec<Rat>>,
-        latent: Latent,
         declared: &Refinement,
     ) -> Result<Self, HnnError> {
         let map = constitution
@@ -518,8 +538,6 @@ impl<'c> Section<'c> {
             })?
             .clone();
         let mut change = EndChange::rest(field, &operands);
-        change.storage = latent.storage(field, declared.ring, &amplitude(&injection));
-        let opening = change.clone();
         let mut words: Vec<Word<'c>> = Vec::with_capacity(declared.words);
         for n in 0..declared.words {
             let mut word = Word::continuing(
@@ -564,7 +582,6 @@ impl<'c> Section<'c> {
             declared: declared.clone(),
             words,
             injection,
-            opening,
             map,
             anchor,
             reads,
@@ -759,9 +776,6 @@ impl<'c> Section<'c> {
                 returned += dot(covector, injected);
             }
         }
-        if let Some((_, first)) = returns.first() {
-            returned += first.pairing(&self.opening);
-        }
         let joined = join(&returns, declared.span, reads)?;
         Ok(SectionReturn {
             joined,
@@ -794,8 +808,8 @@ impl SectionRelease {
 
 /// [definition] **The adjoint pairing of a section's return** (module header, the second check):
 /// `produced = Σ_j ⟨g_j, R P_R^(1+j) v_R⟩`, the stations' covectors paired with their logits, and
-/// `returned = Σ_n ⟨μ_n, injection⟩ + ⟨μ_0, latent⟩`, the returned opening covectors paired with
-/// what each word's open added. On the executed charts with no transient split the two are equal
+/// `returned = Σ_n ⟨μ_n, injection⟩`, the returned opening covectors paired with what each word's
+/// open added (the change opens at rest, so nothing else). On the executed charts with no transient split the two are equal
 /// exactly; on the word's lattice they differ by the released remainders' work.
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct Pairing {
@@ -929,27 +943,14 @@ pub fn stage(
     let injection = moment.open_storage(field, constitution, current)?;
     let pairing = if check {
         let unsplit = operands.clone().unsplit()?;
-        let section = Section::refine_on(
-            field,
-            constitution,
-            unsplit,
-            injection.clone(),
-            Latent::Rest,
-            declared,
-        )?;
+        let section =
+            Section::refine_on(field, constitution, unsplit, injection.clone(), declared)?;
         let covector = section.compare(targets)?.covector()?;
         Some(section.pull_back(&covector)?.pairing)
     } else {
         None
     };
-    let section = Section::refine_on(
-        field,
-        constitution,
-        operands,
-        injection,
-        Latent::Rest,
-        declared,
-    )?;
+    let section = Section::refine_on(field, constitution, operands, injection, declared)?;
     let release = section.release()?;
     let ratio = section.compare(targets)?;
     let covector = ratio.covector()?;
@@ -982,10 +983,12 @@ pub fn stage(
 /// **The deposit of a set of staged refinements at one commit** (module header): every linear
 /// locus's samples gathered into one window (the normal law sums its samples' terms), every factor
 /// family's descent directions and feature energies summed into one step (a shared operand's
-/// gradient is the sum over its uses), the loci reached united. No landmark and no receiving-face
-/// step is staged.
+/// gradient is the sum over its uses), the loci reached united, and the refinement's reach
+/// ([`Refinement::reach`]) at the most phases one of its moments occupied. No landmark and no
+/// receiving-face step is staged.
 pub fn deposit_of(
     constitution: &Constitution,
+    declared: &Refinement,
     composed: &[ComposedReturn],
 ) -> Result<Deposit, HnnError> {
     let mut linear: BTreeMap<LinearLocus, Vec<crate::hnn::constitution::Sample>> = BTreeMap::new();
@@ -1027,7 +1030,9 @@ pub fn deposit_of(
             samples: linear.remove(&locus).unwrap_or_default(),
         })
         .collect();
-    Ok(Deposit::new(constitution.commit(), linear, factors, reached))
+    let phases = composed.iter().map(|part| part.phases).max().unwrap_or(0);
+    Ok(Deposit::new(constitution.commit(), linear, factors, reached)
+        .with_reach(declared.reach(phases)))
 }
 
 /// Whether two factor steps descend the same family.

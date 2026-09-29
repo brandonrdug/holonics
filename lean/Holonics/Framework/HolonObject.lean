@@ -143,6 +143,12 @@ open Holonics.HolonCore
 #print axioms projectPassiveCongruence_of_passive
 #print axioms certified_committed_energy_bound
 #print axioms congruence_vs_eigen_witness
+#print axioms certified_step_descends
+#print axioms quadratic_upper_model
+#print axioms joint_cauchy_schwarz
+#print axioms gauss_newton_curvature
+#print axioms active_element_growth
+#print axioms active_energy_growth
 #print axioms re_sum_antiConj
 #print axioms re_herm_skew
 #print axioms eq_zero_of_herm_zero

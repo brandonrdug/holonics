@@ -18,7 +18,6 @@ use crate::hnn::ring::{
 };
 use crate::hnn::word::{EndChange, PowerForm};
 use crate::holon::parametron::Carrier as PumpAxis;
-use crate::ratio::exponentiated::RatioError;
 use crate::ratio::linear::ExactRatMatrix;
 use crate::ratio::{Rat, integer, rat};
 
@@ -64,7 +63,7 @@ fn a_reached_capacity_gain_changes_the_next_word_local_solve() {
     let (next, reading) = theta
         .deposited(&one_gain_step(0, 0, Rat::one(), Rat::one()))
         .unwrap();
-    assert_eq!(reading.contact_growth, Some(Rat::zero()));
+    assert!(reading.storage_growth >= Rat::from_integer(0.into()));
     let learned = next.resonator(0).unwrap();
     assert_eq!(learned.gains()[0], rat(5, 4));
 
@@ -434,16 +433,18 @@ fn an_out_of_range_gain_family_is_a_typed_refusal() {
     assert!(matches!(error, HnnError::Resonator { ring: 0, .. }));
 }
 
+/// **A deposit the committed energy bound refuses keeps the staged deposit and all published
+/// state** (`hnn::constitution`, "The committed energy bound, enforced at the commit"): a 129-bit
+/// factor step (the factor families' declared step, not certified here, owed in #62) grows a
+/// contact's storage past every dyadic `ε` of the declared search, so the constitution refuses the
+/// successor with `UncertifiedStorage`; the port publishes nothing of it. [historical] This test read
+/// a late reread refusal when the normal laws' declared step could be 129 bits wide; the certified
+/// step no longer takes one.
 #[test]
-fn a_late_reread_refusal_keeps_the_staged_deposit_and_all_published_state() {
+fn an_uncertified_storage_growth_keeps_the_staged_deposit_and_all_published_state() {
     let field = chain();
-    // This coefficient has only 129 bits. It grows a tiny map into an exponent which the next
-    // receiver read cannot carry into a machine-word shift; power_of_two checks that bound before
-    // allocating the shifted integer. The lattice successor itself remains far below u64::MAX.
-    let proxy = Rat::from_integer(BigInt::one() << 128usize);
     let steps = Steps {
-        proxy,
-        factor: Rat::zero(),
+        factor: Rat::from_integer(BigInt::one() << 128usize),
     };
     let constitution = Constitution::initial(&field, steps.clone(), u64::MAX).unwrap();
     let reference = Reference::new(64, steps, u64::MAX);
@@ -455,10 +456,18 @@ fn a_late_reread_refusal_keeps_the_staged_deposit_and_all_published_state() {
         .ingest(&mut resident, None, &one_hot(&[0]))
         .unwrap();
     let phases = resident.admitted()[0].clone();
+    // The first deposit moves the receiving map by its certified step (every upstream covector is
+    // zero at the initial `R = 0`), so the second comparison's covectors reach the factor families.
     let (pending, _) = reference.refine(&mut resident, &moment, &phases).unwrap();
     let (staged, _) = reference
         .compare(&mut resident, pending, &one_hot(&[0, 1]))
         .unwrap();
+    reference.deposit(&mut resident, staged).unwrap();
+    let (pending, _) = reference.refine(&mut resident, &moment, &phases).unwrap();
+    let (staged, compared) = reference
+        .compare(&mut resident, pending, &one_hot(&[1, 0]))
+        .unwrap();
+    let deposit = compared.deposit.into_present().unwrap();
 
     let constitution_before = resident.constitution().clone();
     let current_before = resident.current().clone();
@@ -468,10 +477,11 @@ fn a_late_reread_refusal_keeps_the_staged_deposit_and_all_published_state() {
     let handles_before = reference.read(&resident).unwrap().2;
 
     let refusal = reference.deposit(&mut resident, staged).unwrap_err();
-    assert!(matches!(
-        refusal,
-        HnnError::Ratio(RatioError::CarryTooWide { .. })
-    ));
+    assert_eq!(refusal, HnnError::UncertifiedStorage);
+    assert_eq!(
+        constitution_before.deposited(&deposit),
+        Err(HnnError::UncertifiedStorage)
+    );
     assert!(resident.stopped().is_none());
     assert_eq!(resident.constitution(), &constitution_before);
     assert_eq!(resident.current(), &current_before);

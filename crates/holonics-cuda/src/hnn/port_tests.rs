@@ -269,6 +269,11 @@ struct Compared {
     releases: u64,
     compares: u64,
     deposits: u64,
+    /// Deposits both ports refused alike (a pumped resonator's growth is not certified, so the
+    /// certified step refuses a linear step through it); their staged handles are discarded.
+    refused: u64,
+    /// The linear loci the published deposits stepped (their certified steps).
+    stepped_loci: u64,
     discards: u64,
     boundaries: u64,
     keys: u64,
@@ -372,12 +377,22 @@ fn lockstep(
                     device.deposit(&mut d, staged),
                 );
                 compared.deposits += 1;
+                if deposited.is_none() {
+                    compared.refused += 1;
+                    same(
+                        "discard a refused deposit",
+                        host.discard(&mut h, Handle::Staged(staged)),
+                        device.discard(&mut d, Handle::Staged(staged)),
+                    );
+                    compared.discards += 1;
+                }
                 // The cells a deposit added to the tree (the landmark tree), and the published
                 // constitutions, the tree among them, equal on both ports.
                 if let Some(reading) =
                     deposited.and_then(|returned| returned.deposit.into_present())
                 {
                     compared.landmarks += reading.landmarks;
+                    compared.stepped_loci += reading.steps.len() as u64;
                 }
                 compared.resonator_material_changes += (0..field.rings().len())
                     .filter(|&ring| {
@@ -601,7 +616,10 @@ fn the_card_port_returns_the_reference_with_resonators_and_a_boost() {
     let n_star = probe.capacity().n_star() as usize;
     let field = Field::declare(FieldDeclaration::campaign_one(n_star as u64)).unwrap();
     let width = field.contact(0).width();
-    let theta = super::physics_tests::resonant(&field)
+    // Unpumped loaded resonators (passive), so the certified step certifies the deposits and the
+    // normal-law mirror carries them; the pumped resonators' word is checked by the physics tests,
+    // and their deposit's refusal by `the_loaded_source_matches_with_y4_and_hop_two`.
+    let theta = super::physics_tests::loaded(&field)
         .with_contact_signature(&field, 0, (0..width).map(|j| j != 0).collect())
         .unwrap();
     let mut draw = Draw(13);
@@ -705,20 +723,27 @@ fn the_loaded_source_matches_with_y4_and_hop_two() {
         2,
     );
     assert_eq!(compared.compares, 8);
-    assert!(compared.mirror.carried > 0);
+    // The pumped resonator's growth is not certified (the Floquet bound is owed in #62), so the
+    // certified step refuses every deposit whose linear loci move through it, alike on both ports;
+    // a deposit whose linear loci move nothing is published and steps no linear locus.
+    assert!(compared.refused > 0);
+    assert_eq!(compared.stepped_loci, 0);
 }
 
-/// A finite, valid staged deposit may still fail when its successor is read. The host fails while
-/// carrying the resulting exponent; the card may refuse earlier while forming its bounded
-/// publication. In either case the old constitution, staged handle and every card mirror remain at
-/// their predecessor, and a fresh read at the same moment/targets agrees with the old host tree.
+/// A finite, valid staged deposit the committed energy bound refuses leaves the old constitution,
+/// staged handle and every card mirror at their predecessor on both ports, and a fresh read at the
+/// same moment/targets agrees with the old host tree.
 #[test]
 #[ignore = "needs the CUDA card; run alone with --include-ignored --test-threads=1"]
 fn late_successor_read_refusal_restores_host_and_card_predecessors() {
     let field = chain();
+    // A 129-bit factor step (the factor families' declared step, not certified here, owed in #62)
+    // grows a contact's storage past every dyadic ε of the declared search: the committed energy
+    // bound refuses the successor on both ports alike (`UncertifiedStorage`). [historical] This test
+    // read a late successor-read refusal when the normal laws' declared step could be 129 bits wide;
+    // the certified step no longer takes one.
     let steps = Steps {
-        proxy: Rat::from_integer(BigInt::from(1u8) << 128usize),
-        factor: Rat::zero(),
+        factor: Rat::from_integer(BigInt::from(1u8) << 128usize),
     };
     let theta = Constitution::initial(&field, steps.clone(), u64::MAX).unwrap();
     let host = Reference::new(64, steps.clone(), u64::MAX);
@@ -735,6 +760,26 @@ fn late_successor_read_refusal_restores_host_and_card_predecessors() {
     )
     .unwrap();
     let phases = h.admitted()[0].clone();
+    // The first deposit moves the receiving map by its certified step (every upstream covector is
+    // zero at the initial `R = 0`), so the second comparison's covectors reach the factor families.
+    let (pending, _) = same(
+        "refine the first window",
+        host.refine(&mut h, &moment, &phases),
+        device.refine(&mut d, &moment, &phases),
+    )
+    .unwrap();
+    let (first, _) = same(
+        "stage the first comparison",
+        host.compare(&mut h, pending, &one_hot(&[0, 1])),
+        device.compare(&mut d, pending, &one_hot(&[0, 1])),
+    )
+    .unwrap();
+    same(
+        "deposit the first comparison",
+        host.deposit(&mut h, first),
+        device.deposit(&mut d, first),
+    )
+    .expect("the first deposit is certified");
     let (pending, _) = same(
         "refine before staging the large finite update",
         host.refine(&mut h, &moment, &phases),
@@ -743,8 +788,8 @@ fn late_successor_read_refusal_restores_host_and_card_predecessors() {
     .unwrap();
     let (staged, compared) = same(
         "stage a valid comparison",
-        host.compare(&mut h, pending, &one_hot(&[0, 1])),
-        device.compare(&mut d, pending, &one_hot(&[0, 1])),
+        host.compare(&mut h, pending, &one_hot(&[1, 0])),
+        device.compare(&mut d, pending, &one_hot(&[1, 0])),
     )
     .unwrap();
     let deposit = compared
@@ -773,7 +818,8 @@ fn late_successor_read_refusal_restores_host_and_card_predecessors() {
 
     let host_refusal = host.deposit(&mut h, staged);
     let device_refusal = device.deposit(&mut d, staged);
-    assert!(host_refusal.is_err() && device_refusal.is_err());
+    assert!(matches!(host_refusal, Err(HnnError::UncertifiedStorage)));
+    assert!(matches!(device_refusal, Err(HnnError::UncertifiedStorage)));
     assert!(!matches!(
         host_refusal,
         Err(HnnError::ConstitutionBudget { .. })
@@ -802,9 +848,9 @@ fn late_successor_read_refusal_restores_host_and_card_predecessors() {
     let (device_pending, _) = device.refine(&mut d, &moment, &phases).unwrap();
     assert_eq!(host_pending, device_pending);
     let retried = same(
-        "compare again after the late refusal",
-        host.compare(&mut h, host_pending, &one_hot(&[0, 1])),
-        device.compare(&mut d, device_pending, &one_hot(&[0, 1])),
+        "compare again after the refusal",
+        host.compare(&mut h, host_pending, &one_hot(&[1, 0])),
+        device.compare(&mut d, device_pending, &one_hot(&[1, 0])),
     );
     assert!(retried.is_some());
 }

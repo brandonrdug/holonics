@@ -123,6 +123,15 @@ pub enum HolonError {
     DepositExceedsBound { inertia: Inertia },
     #[error("1 + ε must be nonnegative")]
     NegativeGrowth,
+    #[error(
+        "the preconditioned step is not a descent direction of the covector that reached it: ⟨G, Δ⟩ = {alignment}"
+    )]
+    Misaligned { alignment: crate::ratio::Rat },
+    #[error("{what} must be nonnegative, found {value}")]
+    Negative {
+        what: &'static str,
+        value: crate::ratio::Rat,
+    },
     #[error("conformance check failed: {what}")]
     ConformanceFailed { what: &'static str },
     #[error("{what} is not supported: {reason}")]

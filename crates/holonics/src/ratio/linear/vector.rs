@@ -74,6 +74,93 @@ impl IntegralMatrix {
         }
     }
 
+    /// **Row blocks stacked** into one matrix: blocks of one width over one common denominator (the
+    /// row blocks of one outer sum, each over the same terms). `None` when they disagree.
+    pub(crate) fn stack(blocks: Vec<Self>) -> Option<Self> {
+        let first = blocks.first()?;
+        let (columns, denominator) = (first.columns, first.denominator.clone());
+        if blocks
+            .iter()
+            .any(|block| block.columns != columns || block.denominator != denominator)
+        {
+            return None;
+        }
+        let rows = blocks.iter().map(|block| block.rows).sum();
+        let numerators = blocks
+            .into_iter()
+            .flat_map(|block| block.numerators)
+            .collect();
+        Some(Self {
+            rows,
+            columns,
+            numerators,
+            denominator,
+        })
+    }
+
+    /// **`M v`** for `v` in the integral chart, in the integral chart: `N v / (D · d_v)`.
+    pub(crate) fn apply(&self, (values, denominator): &Chart) -> Chart {
+        let sums = (0..self.rows)
+            .map(|i| {
+                let row = &self.numerators[i * self.columns..(i + 1) * self.columns];
+                let mut sum = BigInt::zero();
+                for (entry, value) in row.iter().zip(values) {
+                    if !entry.is_zero() && !value.is_zero() {
+                        sum += entry * value;
+                    }
+                }
+                sum
+            })
+            .collect();
+        (sums, &self.denominator * denominator)
+    }
+
+    /// **The Schur test's norms** `(‖M‖₁, ‖M‖_∞)`: the largest absolute column and row sums.
+    pub(crate) fn schur_norms(&self) -> (Rat, Rat) {
+        let mut columns = vec![BigInt::zero(); self.columns];
+        let mut row_max = BigInt::zero();
+        for i in 0..self.rows {
+            let mut row = BigInt::zero();
+            for (j, entry) in self.numerators[i * self.columns..(i + 1) * self.columns]
+                .iter()
+                .enumerate()
+            {
+                if !entry.is_zero() {
+                    let magnitude = BigInt::from(entry.magnitude().clone());
+                    row += &magnitude;
+                    columns[j] += magnitude;
+                }
+            }
+            if row > row_max {
+                row_max = row;
+            }
+        }
+        let column_max = columns.into_iter().max().unwrap_or_else(BigInt::zero);
+        (
+            Rat::new(column_max, self.denominator.clone()),
+            Rat::new(row_max, self.denominator.clone()),
+        )
+    }
+
+    /// **The entries times a scale** as normalized rows (`s N / D`).
+    pub(crate) fn scaled_rows(&self, scale: &Rat) -> Vec<Vec<Rat>> {
+        let denominator = &self.denominator * scale.denom();
+        (0..self.rows)
+            .map(|i| {
+                self.numerators[i * self.columns..(i + 1) * self.columns]
+                    .iter()
+                    .map(|n| {
+                        if n.is_zero() {
+                            Rat::zero()
+                        } else {
+                            Rat::new(n * scale.numer(), denominator.clone())
+                        }
+                    })
+                    .collect()
+            })
+            .collect()
+    }
+
     /// The entries as normalized rows.
     pub(crate) fn to_rows(&self) -> Vec<Vec<Rat>> {
         (0..self.rows)

@@ -7,9 +7,7 @@
 //! [`Candidate`], [`crate::compression::Gauge`] and [`crate::compression::ReflectorMachine`] owners
 //! and the new menu edges with their propagation ([`Menu::propagate`]):
 //!
-//! - **ports** are `ℤ/d_g`, and the port chart `port_g(s)` is known before any key; the crib is read
-//!   as its cells' step codes `s` (`hnn::field::Field::step_codes`: the exterior codes on a chart
-//!   with no machine, the founded classes the source moment reached on a founded chart);
+//! - **ports** are `ℤ/d_g`, and the port chart `port_g(x) = code(x) mod d_g` is known before any key;
 //! - **edges**: every pair `(x_k, x_(k+δ))` of the crib at the declared offset `δ` is an edge
 //!   `port_g(x_k) — port_g(x_(k+δ))`, labelled by its position `k` from the crib's opening. No
 //!   admission depends on the key; a pair the machine does not carry shows as a failing loop;
@@ -169,10 +167,10 @@ pub fn crib_opening(
             found: now.len(),
         });
     }
-    if let Some(&code) = crib.iter().find(|&&code| code >= field.steps()) {
+    if let Some(&code) = crib.iter().find(|&&code| code >= field.alphabet()) {
         return Err(HnnError::CellOutside {
             code,
-            alphabet: field.steps(),
+            alphabet: field.alphabet(),
         });
     }
     let mut carries = vec![0u64; crib.len()];

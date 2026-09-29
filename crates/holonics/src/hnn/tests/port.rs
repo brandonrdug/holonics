@@ -199,7 +199,7 @@ pub(super) fn cut_at(field: Field, theta: Constitution) -> Cut {
     let (word, faces) = pending.read(&field, &theta).unwrap();
     let operands = word.operands().clone();
     let targets = [2usize, 1];
-    let anchors = target_phases(&field, pending.anchor(), pending.moment().founded(), 2, &targets).unwrap();
+    let anchors = target_phases(&field, pending.anchor(), 2, &targets).unwrap();
     let faces_logits = faces.logits.clone();
     // The covector is the combined face's (the tree's at each phase's address plus the wave's); the
     // functional pairs it with the wave's logits, the tree part being a stored face.
@@ -250,19 +250,12 @@ fn loaded_comparison_composes_a_gain_deposit_that_changes_next_logits() {
     )
     .unwrap();
     let declare = |factor: Rat| {
-        Constitution::initial(
-            &field,
-            Steps {
-                proxy: Rat::one(),
-                factor,
-            },
-            1 << 40,
-        )
-        .unwrap()
-        .with_ports(2, None, None, Some(receiving.clone()))
-        .unwrap()
-        .with_ring_resonator(&field, 0, material.clone())
-        .unwrap()
+        Constitution::initial(&field, Steps { factor }, 1 << 40)
+            .unwrap()
+            .with_ports(2, None, None, Some(receiving.clone()))
+            .unwrap()
+            .with_ring_resonator(&field, 0, material.clone())
+            .unwrap()
     };
     let coarse = cut_at(field.clone(), declare(Rat::one()));
     let seed_step = coarse

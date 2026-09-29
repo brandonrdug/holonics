@@ -43,12 +43,12 @@
 //! propagates one contact per tick and is released at the word's end. The forward machine is here:
 //!
 //! - [`field`]: the declaration ([`Ring`], [`Contact`], [`Field`]), the lift point [`Current`] and
-//!   the read face of the constitution ([`ConstitutionRead`]); selective stepping on the port chart
-//!   ([`PortChart`]: the codec's residue chart of the synthetic fields, or a founded chart);
+//!   the read face of the constitution ([`ConstitutionRead`]); selective stepping on the declared
+//!   port chart ([`PortChart`], the codec's residue chart);
 //! - [`encoding`] (U6): Holonic Encoding, a passage chart's minimal realization founded by
-//!   closing the receiving forms under the field's own transports ([`Encoding`], [`PassageChart`]),
-//!   its squares `D E = ρ`, `E T = U E` and the injection square, its Preimage Fibre and separator,
-//!   and the field's founded port chart ([`found_ports`]);
+//!   closing the receiving forms under the chart's declared transports ([`Encoding`],
+//!   [`PassageChart`]), its squares `D E = ρ`, `E T = U E` and the injection square, its Preimage
+//!   Fibre and separator;
 //! - [`moment`]: the phase-binned [`SourceMoment`] on closing source rings, its pair buffer, the
 //!   pair port read over the whole offset moment (no window), and its capacity `n*`;
 //! - [`propagation`]: the junction Swing, the ring element's Cayley step with its contrast port,
@@ -76,9 +76,10 @@
 //!   address and its break receipt, with [`contact_readings`], the lock and site readings the
 //!   receiving join consumes;
 //! - [`prediction`] (THE_REBUILD U6, native generation): a section of the receiving ring refined by
-//!   `K` continuing words from the request's moment and a latent, read jointly at every station
-//!   from one anchor, released at width zero through `receiver::release`, and learned by its
-//!   covector pulled back through the `K` words (`Word::continuing`, `Word::pull_back_continuing`).
+//!   `K` continuing words from the request's moment, read jointly at every station from one
+//!   anchor, released at width zero through `receiver::release` (a plural section held), and
+//!   learned by its covector pulled back through the `K` words (`Word::continuing`,
+//!   `Word::pull_back_continuing`) and deposited at the certified step (`constitution`).
 //!
 //! [definition; agent-inferred, U2] A loaded ring's mode quotient (campaign 3's first construction)
 //! is Lean's (`HNN/ModeQuotient`); its Rust realization (`hnn::modes`, at commit `1bdacc8f`) was
@@ -154,19 +155,18 @@ pub mod ring;
 pub mod word;
 
 pub use chart::{ChartKey, ChartReading, ChartStart, ChartWords, Charts, Remainders, WordLattice};
-pub use constitution::{Carrier, CarrierBits, Constitution, Lattice, Locus, NormalLaw, Steps};
+pub use constitution::{
+    Carrier, CarrierBits, Constitution, Lattice, Locus, NormalLaw, Reach, StepReading, Steps,
+};
 pub use contact::{
     BreakReceipt, ContactLock, ContactReading, KindCensus, LockDeclaration, SiteReading,
     contact_readings, site_kinds, site_readings,
 };
 
-pub use encoding::{
-    ContextClasses, Encoding, EncodingError, FoundedPorts, PassageChart, PassageFounding,
-    found_passage, found_ports,
-};
+pub use encoding::{Encoding, EncodingError, PassageChart};
 pub use field::{
-    ConstitutionRead, Contact, ContactDeclaration, Current, Field, FieldDeclaration,
-    FoundedMachine, PortChart, PortChartKind, Ring, RingDeclaration,
+    ConstitutionRead, Contact, ContactDeclaration, Current, Field, FieldDeclaration, PortChart, Ring,
+    RingDeclaration,
 };
 pub use keys::{KeyLocation, RingKeys, locate_keys};
 pub use moment::{Capacity, PairPort, SourceMoment};
@@ -331,6 +331,22 @@ pub enum HnnError {
     },
     #[error("the carried factor statistic h_x = {statistic} of {locus:?} is not positive")]
     FactorStatistic { locus: Locus, statistic: Rat },
+    #[error(
+        "the deposit's linear steps declare no reach: their certified step reads the stations, re-entries and ticks their covectors summed"
+    )]
+    MissingReach,
+    #[error(
+        "the deposit steps locus {locus:?} by more than one linear step; its certified step reads one window"
+    )]
+    RepeatedLinearStep { locus: Locus },
+    #[error(
+        "ring {ring}'s pumped resonator has no certified growth (its pumped stiffness may be indefinite; the Floquet bound is owed in #62): no linear step is certified through it"
+    )]
+    UncertifiedGain { ring: usize },
+    #[error(
+        "the deposit's storage growth is not certified: no dyadic ε in the declared search makes Q_(k+1) ⪯ (1 + ε) Q_k on the contacts' and resonators' storage forms"
+    )]
+    UncertifiedStorage,
     #[error("deposits stopped at commit {commit}, when the constitution reached its budget")]
     DepositsStopped { commit: u64 },
     #[error(

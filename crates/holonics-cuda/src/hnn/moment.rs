@@ -144,16 +144,6 @@ impl<'c> ResidentMoment<'c> {
                 found: periods[ring] as usize,
             });
         }
-        // The card's ingest steps each ring by its lock chart over the exterior codes, so it
-        // realizes a chart whose step codes are the exterior codes; a founded machine's step codes
-        // follow the passage's founded class (`hnn::field::FoundedMachine`), which it does not carry.
-        if field.port_chart().machine().is_some() {
-            return Err(DeviceError::Shape {
-                what: "a port chart the card steps by exterior codes (a founded machine is host-only)",
-                expected: 0,
-                found: 1,
-            });
-        }
         let sources = field.sources().to_vec();
         let offsets = field.offsets().to_vec();
         let mut chart = Vec::with_capacity(rings * alphabet);

@@ -160,7 +160,7 @@ use crate::hnn::HnnError;
 use crate::hnn::chart::{ChartReading, ChartStart, Charts, Remainders};
 use crate::hnn::constitution::{
     CAMPAIGN_ONE_BUDGET, CarrierBits, Constitution, DepositReading, FactorGradient, FactorStep,
-    LandmarkStep, LinearLocus, LinearStep, Locus, Sample, Steps,
+    LandmarkStep, LinearLocus, LinearStep, Locus, Reach, Sample, Steps,
 };
 use crate::hnn::contact::{SiteReading, site_readings};
 use crate::hnn::field::{ConstitutionRead, Current, Field};
@@ -516,13 +516,7 @@ pub fn compare_phase(
         },
         || -> Result<(Scored, HolonRatio, RatioCovector), HnnError> {
             let scored = ratio.scored(constitution, &against, targets)?;
-            let anchors = target_phases(
-                field,
-                ratio.anchor(),
-                ratio.moment().founded(),
-                phases.ring(),
-                targets,
-            )?;
+            let anchors = target_phases(field, ratio.anchor(), phases.ring(), targets)?;
             let holon = HolonRatio::compare(against.faces.clone(), targets, &anchors)?;
             let covector = holon.covector()?;
             Ok((scored, holon, covector))
@@ -702,7 +696,8 @@ pub struct Reference {
 }
 
 impl Reference {
-    /// Campaign 1's declarations: `γ_U = 1`, `η_x = 1/2`, `B_Θ = 2^33`, and a pending capacity of 64.
+    /// Campaign 1's declarations: `η_x = 1/2` (the normal laws' steps are certified at every
+    /// deposit), `B_Θ = 2^33`, and a pending capacity of 64.
     pub fn campaign_one() -> Self {
         Self::new(64, Steps::campaign_one(), CAMPAIGN_ONE_BUDGET)
     }
@@ -985,9 +980,7 @@ impl ExecutionPort for Reference {
             return Err(HnnError::KeysNotAdmitted);
         }
         let field = resident.field.clone();
-        // The crib is read as its cells' step codes (`Field::step_codes`): the exterior codes on a
-        // chart with no machine, the founded classes the source moment reached on a founded chart.
-        let codes = codes(crib, field.steps())?;
+        let codes = codes(crib, field.alphabet())?;
         if codes.len() as u64 > resident.aeon.closed {
             return Err(HnnError::Shape {
                 what: "a closing crib's cells against the closed aeon's",
@@ -1721,6 +1714,14 @@ pub fn compose(
     } else {
         Vec::new()
     };
+    // The word's reach (the certified step's reading): the receiver reads its anchor at each
+    // receiving epoch `e_j`, after `e_j` full ticks, and the moment enters once, at the open.
+    let reach = Reach {
+        receiver: receiving,
+        stations: phases.epochs().map(|epoch| epoch as u64).collect(),
+        entries: vec![0],
+        phases: composed.phases,
+    };
     Ok((
         composed.pullback,
         Deposit::new(
@@ -1729,6 +1730,7 @@ pub fn compose(
             composed.factors,
             composed.reached,
         )
+        .with_reach(reach)
         .with_landmarks(landmarks)
         .with_receiving(if retained(Locus::ReceivingMap(receiving)) {
             steps.to_vec()
@@ -1739,14 +1741,16 @@ pub fn compose(
 }
 
 /// [definition; agent-inferred] **A word return composed onto the loci** ([`compose_return`]): the
-/// complete pullback, the linear loci's windows, the factor families' steps and the loci reached,
-/// before any landmark tree or receiving face is joined to them.
+/// complete pullback, the linear loci's windows, the factor families' steps, the loci reached, and
+/// the most phases one source moment occupied (the phase-binned counts one injection sums, which
+/// the certified step's reach reads), before any landmark tree or receiving face is joined to them.
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct ComposedReturn {
     pub pullback: Pullback,
     pub linear: Vec<LinearStep>,
     pub factors: Vec<FactorStep>,
     pub reached: Vec<Locus>,
+    pub phases: u64,
 }
 
 /// **A word return composed onto every locus inside a causal diamond** ([`compose`]'s law, read
@@ -1773,6 +1777,7 @@ pub fn compose_return(
     let h = field.step().clone();
     let mut linear: Vec<LinearStep> = Vec::new();
     let mut factors: Vec<FactorStep> = Vec::new();
+    let mut phases = 0u64;
     let one = Rat::one();
 
     // The receiving map: Σ_j g_j ⊗ P_R^(τ_R) v_R(e_j), by row blocks.
@@ -1964,6 +1969,7 @@ pub fn compose_return(
             });
             pair_pullbacks.push((offset, [outputs, current_reads, earlier_reads]));
         }
+        phases = phases.max(source_samples.len() as u64);
         if retained(Locus::SourcePort(g)) {
             linear.push(LinearStep {
                 locus: LinearLocus::SourcePort(g),
@@ -2098,6 +2104,7 @@ pub fn compose_return(
         linear,
         factors,
         reached,
+        phases,
     })
 }
 
@@ -2525,8 +2532,9 @@ pub struct StateReport {
 /// what the deposit that reached it released (its residuals' exact bits) and stepped (the entries
 /// whose lattice coordinate moved), and each contact's site reading at the commit (campaign 2's
 /// contact-kind census, `hnn::contact::site_readings`, certified from the factors in one prime
-/// chart and read exactly otherwise: the kinds a register refreshed after the next ingest reads).
-/// The mount's point releases and steps nothing.
+/// chart and read exactly otherwise: the kinds a register refreshed after the next ingest reads),
+/// the deposit's certified steps (each stepped linear locus with its exponent `k`, the step `2^k`)
+/// and its certified storage growth `ε_k`. The mount's point releases and steps nothing.
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct CurvePoint {
     pub commit: u64,
@@ -2534,6 +2542,8 @@ pub struct CurvePoint {
     pub released_bits: u64,
     pub stepped: u64,
     pub contacts: Vec<SiteReading>,
+    pub steps: Vec<(Locus, i64)>,
+    pub storage_growth: Rat,
 }
 
 /// [definition] **The exposure's readout** (design (f)): bits on the training and held-out targets
@@ -2961,14 +2971,11 @@ where
     let alphabet = field.alphabet();
     let crib = field.crib();
     let cells = &cut.cells;
-    // The cells' step codes (`Field::step_codes`): the one moment opens at the cut's first cell, so
-    // its founded class reaches each cell's step code as these do; a closing crib is read by them.
-    let steps = field.step_codes(cells)?;
     let mut keys = Vec::new();
     let mut locate = |resident: &mut P::Resident, span: Range<usize>| -> Result<(), HnnError> {
         if span.len() > crib.offset {
             let at = span.end as u64;
-            let located = port.locate_keys(resident, &one_hot(&steps[span]), crib.offset)?;
+            let located = port.locate_keys(resident, &one_hot(&cells[span]), crib.offset)?;
             keys.push(KeyReport {
                 cell: at,
                 detail: located.receipt.detail,
@@ -2994,6 +3001,8 @@ where
         released_bits: 0,
         stepped: 0,
         contacts,
+        steps: Vec::new(),
+        storage_growth: Rat::zero(),
     }];
     let mut words = WordBalances {
         closed: true,
@@ -3120,6 +3129,19 @@ where
                             .deposit
                             .present()
                             .map_or((0, 0), |reading| (reading.released_bits, reading.stepped));
+                        let (steps, storage_growth) = returned.deposit.present().map_or_else(
+                            || (Vec::new(), Rat::zero()),
+                            |reading| {
+                                (
+                                    reading
+                                        .steps
+                                        .iter()
+                                        .map(|(locus, step)| (*locus, step.step.exponent))
+                                        .collect(),
+                                    reading.storage_growth.clone(),
+                                )
+                            },
+                        );
                         let started = Instant::now();
                         let after =
                             PowerForm::read(field, resident.constitution(), resident.current())?;
@@ -3134,6 +3156,8 @@ where
                             released_bits,
                             stepped,
                             contacts,
+                            steps,
+                            storage_growth,
                         });
                     }
                     Err(refusal @ HnnError::ConstitutionBudget { .. }) => {

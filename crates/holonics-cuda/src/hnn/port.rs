@@ -1051,8 +1051,7 @@ impl<'c> ExecutionPort for Resident<'c> {
             return Err(HnnError::KeysNotAdmitted);
         }
         let field = resident.field.clone();
-        // The crib's step codes (the host's contract, `Field::step_codes`).
-        let codes = codes(crib, field.steps())?;
+        let codes = codes(crib, field.alphabet())?;
         if codes.len() as u64 > resident.aeon.closed {
             return Err(HnnError::Shape {
                 what: "a closing crib's cells against the closed aeon's",
@@ -1379,12 +1378,21 @@ impl<'c> ExecutionPort for Resident<'c> {
                     .filter(|(at, ..)| *at == locus)
                     .map(|(_, carrier, entry, residual)| (*carrier, *entry, residual.clone()))
                     .collect();
+                // The locus's certified step (zero where its alignment certified none).
+                let certified = reading
+                    .steps
+                    .iter()
+                    .find(|(at, _)| *at == locus)
+                    .map_or_else(
+                        || Rat::from_integer(0.into()),
+                        |(_, step)| step.step.step.clone(),
+                    );
                 tally.count(normal_deposit_on_card(
                     self.card,
                     before,
                     after,
                     &step.samples,
-                    &resident.constitution.steps().proxy,
+                    &certified,
                     resident.constitution.lattice(locus)?,
                     gamma_length(resident.constitution.clock(locus) + 1),
                     &released,

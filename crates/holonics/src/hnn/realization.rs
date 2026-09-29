@@ -95,6 +95,40 @@ pub(crate) fn outer_rows(
     blocks.into_iter().flatten().collect()
 }
 
+/// **`Σ_t w_t l_t r_tᵀ` in the integral chart, by row blocks** ([`outer_rows`]'s blocks, each over
+/// the same terms and so the same common denominator, stacked unnormalized): the unit step a normal
+/// law certifies before it is scaled and carried.
+pub(crate) fn outer_integral(
+    rows: usize,
+    columns: usize,
+    terms: &[(&Rat, &Chart, &Chart)],
+) -> IntegralMatrix {
+    let extent = row_block(rows);
+    let blocks: Vec<IntegralMatrix> = (0..rows.div_ceil(extent))
+        .into_par_iter()
+        .map(|block| {
+            let (start, end) = (block * extent, ((block + 1) * extent).min(rows));
+            let restricted: Vec<(&Rat, Chart, &Chart)> = terms
+                .iter()
+                .map(|(weight, (left, denominator), right)| {
+                    let restricted = &left[start.min(left.len())..end.min(left.len())];
+                    (*weight, (restricted.to_vec(), denominator.clone()), *right)
+                })
+                .collect();
+            IntegralMatrix::outer_sum(
+                end - start,
+                columns,
+                restricted
+                    .iter()
+                    .map(|(weight, left, right)| (*weight, left, *right)),
+            )
+        })
+        .collect();
+    IntegralMatrix::stack(blocks).unwrap_or_else(|| {
+        IntegralMatrix::outer_sum(rows, columns, terms.iter().map(|(w, l, r)| (*w, *l, *r)))
+    })
+}
+
 /// **`M v` by rows**: the vector read once in the integral chart, and each row one normalized dot
 /// ([`ExactRatMatrix::apply`]'s own reading and refusal, row by row).
 pub(crate) fn apply_rows(matrix: &ExactRatMatrix, vector: &[Rat]) -> Result<Vec<Rat>, HnnError> {

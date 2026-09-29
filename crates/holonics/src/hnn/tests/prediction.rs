@@ -12,9 +12,7 @@ use crate::hnn::chart::Charts;
 use crate::hnn::constitution::{Constitution, Steps};
 use crate::hnn::field::{ConstitutionRead, Current, Field};
 use crate::hnn::moment::{PairPort, SourceMoment};
-use crate::hnn::prediction::{
-    Latent, Refinement, Section, deposit_of, stage, unreached_unchanged,
-};
+use crate::hnn::prediction::{Refinement, Section, deposit_of, stage, unreached_unchanged};
 use crate::hnn::propagation::Operands;
 use crate::hnn::ring::{PumpDeclaration, PumpStep, ResonatorMaterial};
 use crate::hnn::word::{EndChange, Word};
@@ -55,6 +53,23 @@ fn resonant(field: &Field, theta: Constitution) -> Constitution {
             .unwrap();
     }
     resonant
+}
+
+/// The same resonators unpumped: the loaded resonators passive (`C, K, D ⪰ 0`), whose growth the
+/// certified step reads as one.
+fn loaded(field: &Field, theta: Constitution) -> Constitution {
+    let mut loaded = theta;
+    for ring in 0..field.rings().len() {
+        let period = field.ring(ring).period() as usize;
+        loaded = loaded
+            .with_ring_resonator(
+                field,
+                ring,
+                ResonatorMaterial::of_parametron(&cycle(period), &rat(1, 8), None).unwrap(),
+            )
+            .unwrap();
+    }
+    loaded
 }
 
 fn storage(field: &Field, seed: u64) -> Vec<Vec<Rat>> {
@@ -150,19 +165,20 @@ fn declared(field: &Field, words: usize, span: usize) -> Refinement {
 fn the_refinement_balance_closes_with_the_injection_the_pump_and_the_commit() {
     let field = chain();
     let theta = resonant(&field, generic(&field, 75));
-    let (current, moment) = moment(&field, 76, 9);
+    // A moment whose phases leave the path from the source to the receiver open, so the section
+    // reads a nonzero anchor and the deposit moves its linear loci.
+    let (current, moment) = moment(&field, 177, 11);
     let refinement = declared(&field, 3, 2);
     let section = Section::refine(
         &field,
         &theta,
         &current,
         &moment,
-        Latent::Rest,
         &refinement,
         &mut Charts::new(),
     )
     .unwrap();
-    let mut balance = section.balance().clone();
+    let balance = section.balance().clone();
     assert_eq!(balance.words, 3);
     assert_eq!(balance.ticks, 6);
     assert!(balance.every_tick_closes && balance.chained, "{balance:?}");
@@ -181,13 +197,58 @@ fn the_refinement_balance_closes_with_the_injection_the_pump_and_the_commit() {
         false,
     )
     .unwrap();
-    let deposit = deposit_of(&theta, std::slice::from_ref(&staged.composed)).unwrap();
-    let (next, _) = theta.deposited(&deposit).unwrap();
+    // A pumped resonator's growth is not certified (the Floquet bound is owed in #62): the
+    // certified step refuses every linear step through it that moves.
+    let deposit = deposit_of(&theta, &refinement, std::slice::from_ref(&staged.composed)).unwrap();
+    let refused = theta.deposited(&deposit).map(|(_, reading)| reading.steps);
+    assert!(
+        matches!(refused, Err(crate::hnn::HnnError::UncertifiedGain { .. })),
+        "{refused:?}"
+    );
+    // Unpumped, the loaded resonators are passive: the step is certified and the balance closes
+    // across its commit, within the committed energy bound.
+    let theta = loaded(&field, generic(&field, 75));
+    let section = Section::refine(
+        &field,
+        &theta,
+        &current,
+        &moment,
+        &refinement,
+        &mut Charts::new(),
+    )
+    .unwrap();
+    let mut balance = section.balance().clone();
+    assert!(balance.closes(), "{balance:?}");
+    let staged = stage(
+        &field,
+        &theta,
+        &current,
+        &moment,
+        &refinement,
+        &targets,
+        &mut Charts::new(),
+        false,
+    )
+    .unwrap();
+    let deposit = deposit_of(&theta, &refinement, std::slice::from_ref(&staged.composed)).unwrap();
+    let amplitude = theta.amplitude().unwrap().unwrap();
+    let (next, reading) = theta.deposited(&deposit).unwrap();
+    assert!(!reading.steps.is_empty());
+    assert!(reading.steps.iter().all(|(_, step)| step.step.holds()));
     let before = crate::hnn::word::PowerForm::read(&field, &theta, &current).unwrap();
     let after = crate::hnn::word::PowerForm::read(&field, &next, &current).unwrap();
     balance.commit(&before, &after, section.end()).unwrap();
     assert!(balance.commit.is_some());
     assert!(balance.closes(), "{balance:?}");
+    let bound = balance
+        .energy_bound(
+            &refinement,
+            &amplitude,
+            &reading.storage_growth,
+            field.word_lattice(),
+        )
+        .unwrap();
+    assert!(bound.holds, "{bound:?}");
 }
 
 /// **The section's return is the exact adjoint of its refinement** on the executed charts with no
@@ -234,7 +295,6 @@ fn the_release_holds_a_plural_section_and_releases_a_determined_one() {
         &initial,
         &current,
         &moment,
-        Latent::Rest,
         &refinement,
         &mut Charts::new(),
     )
@@ -259,7 +319,6 @@ fn the_release_holds_a_plural_section_and_releases_a_determined_one() {
         &theta,
         &current,
         &moment,
-        Latent::Rest,
         &refinement,
         &mut Charts::new(),
     )
@@ -297,7 +356,7 @@ fn a_deposit_leaves_every_unreached_locus_unchanged() {
         false,
     )
     .unwrap();
-    let deposit = deposit_of(&theta, std::slice::from_ref(&staged.composed)).unwrap();
+    let deposit = deposit_of(&theta, &refinement, std::slice::from_ref(&staged.composed)).unwrap();
     assert!(deposit.landmarks().is_empty() && deposit.receiving().is_empty());
     let (next, _) = theta.deposited(&deposit).unwrap();
     let (count, unchanged) = unreached_unchanged(&field, &theta, &next, &diamond);
@@ -365,7 +424,6 @@ fn the_section_reads_no_landmark_tree() {
         &theta,
         &current,
         &moment,
-        Latent::Rest,
         &refinement,
         &mut Charts::new(),
     )
@@ -377,7 +435,6 @@ fn the_section_reads_no_landmark_tree() {
         &NoTree(&theta),
         &current,
         &moment,
-        Latent::Rest,
         &refinement,
         &mut Charts::new(),
     )
@@ -387,41 +444,25 @@ fn the_section_reads_no_landmark_tree() {
     assert_eq!(plain, guarded);
 }
 
-/// A keyed latent is a member of the joint family: it opens the receiving ring at the source's
-/// amplitude on every coordinate, it moves the section from the member at rest, and every station
-/// is read from its one anchor.
+/// Every station of a section is read from its one anchor: station `j` reads the receiving ring's
+/// anchor through the port map to the power `1 + j`, so the section is one joint reading, never a
+/// product of station marginals.
 #[test]
-fn a_keyed_latent_moves_the_whole_section_from_one_anchor() {
+fn every_station_is_read_from_the_one_anchor() {
     let field = chain();
     let theta = generic(&field, 85);
     let (current, moment) = moment(&field, 86, 6);
     let refinement = declared(&field, 2, 1);
-    let injection = moment.open_storage(&field, &theta, &current).unwrap();
-    let a = crate::hnn::prediction::amplitude(&injection);
-    assert!(!a.is_zero());
-    let latent = Latent::Keyed(3).storage(&field, refinement.ring(), &a);
-    assert!(latent[refinement.ring()].iter().all(|x| x == &a || x == &-a.clone()));
-    let rest = Section::refine(
-        &field,
-        &theta,
-        &current,
-        &moment,
-        Latent::Rest,
-        &refinement,
-        &mut Charts::new(),
-    )
-    .unwrap();
     let section = Section::refine(
         &field,
         &theta,
         &current,
         &moment,
-        Latent::Keyed(3),
         &refinement,
         &mut Charts::new(),
     )
     .unwrap();
-    assert_ne!(rest.anchor(), section.anchor());
+    assert!(section.anchor().iter().any(|x| !x.is_zero()));
     let ring = field.ring(refinement.ring());
     for (j, read) in section.reads().iter().enumerate() {
         assert_eq!(

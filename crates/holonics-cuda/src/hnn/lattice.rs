@@ -769,7 +769,7 @@ impl NormalMirror {
 /// ```text
 /// ΔH = Σ w f fᵀ          hnn_outer_update, carried onto H by hnn_budgeted_split at (L, k)
 /// X̂f                     hnn_lattice_read of the successor's chart (the host's, refined from H′)
-/// ΔW = Σ (γw) g (X̂f)ᵀ    hnn_outer_update, carried onto W by hnn_budgeted_split at (L, k)
+/// ΔW = Σ (ηw) g (X̂f)ᵀ    hnn_outer_update, carried onto W by hnn_budgeted_split at (L, k), η the locus's certified step
 /// ```
 ///
 /// and its `H′`, `W′`, both carried remainders and every released residual must equal the host's;

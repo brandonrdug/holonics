@@ -1,19 +1,20 @@
 //! **`hnn_prediction`: native generation on known-truth terrain and on text** (THE_REBUILD U6;
 //! Brandon, September 29; #73, #148, #63). The pins are
-//! `research/records/2026-09-29_NATIVE_GENERATION_PINNED_BEFORE_ITS_RUNS.md`, committed before any
-//! measured run; a committed command run once in release, never a test.
+//! `research/records/2026-09-29_NATIVE_GENERATION_PINNED_BEFORE_ITS_RUNS.md` and, for the certified
+//! step's runs (`moire 4`, `moire 8`, `copy`, `develop text`),
+//! `research/records/2026-09-29_THE_CERTIFIED_DEPOSITION_STEP_PINNED_BEFORE_ITS_RUNS.md`, each
+//! committed before any measured run; a committed command run once in release, never a test.
 //!
 //! ```sh
 //! cargo run --release -p holonics --example hnn_prediction -- probe copy
 //! cargo run --release -p holonics --example hnn_prediction -- probe moire
 //! cargo run --release -p holonics --example hnn_prediction -- probe text .local/cuts/curated-u6-passage-cut.bin
-//! cargo run --release -p holonics --example hnn_prediction -- probe text .local/cuts/curated-u6-passage-cut.bin founding .local/cuts/u6-encoding-probe.bin
 //! cargo run --release -p holonics --example hnn_prediction -- copy
-//! cargo run --release -p holonics --example hnn_prediction -- moire
+//! cargo run --release -p holonics --example hnn_prediction -- moire [K]
+//! cargo run --release -p holonics --example hnn_prediction -- divergence
 //! cargo run --release -p holonics --example hnn_prediction -- text .local/cuts/curated-u6-passage-cut.bin .local/cuts/u6-native-sections.txt
-//! cargo run --release -p holonics --example hnn_prediction -- text .local/cuts/curated-u6-passage-cut.bin <owner-only sections> founding .local/cuts/u6-encoding-probe.bin
 //! cargo run --release -p holonics --example hnn_prediction -- develop copy|moire <train> <evaluate> [s] [batch] [d] [K]
-//! cargo run --release -p holonics --example hnn_prediction -- develop text <cut> <train> [s] [founding cut]
+//! cargo run --release -p holonics --example hnn_prediction -- develop text <cut> <train> [s]
 //! ```
 //!
 //! [definition; agent-inferred, the record's pins] **What it executes.**
@@ -24,7 +25,8 @@
 //!   `L_R = 16`; its aperture `K·w + 1`, so the word's precisions by rule cover the refinement's
 //!   junction steps. The refinement is `K = 2` words of `w = 1` tick; its diamond does not reach
 //!   ring 1's element or anything of ring 2, so the unreached check is exercised.
-//! - **The constitution** is `Constitution::initial` at campaign 1's steps (`γ_U = 1`, `η_x = ½`):
+//! - **The constitution** is `Constitution::initial` at campaign 1's factor step `η_x = ½`, the normal
+//!   laws' steps certified at every deposit (the declared `γ_U = 1` was retired September 29):
 //!   `R = 0`, `E` the declared sign sequence, nothing authored for a terrain. Everything a terrain's
 //!   answer needs is located by the field's own refinement and deposition.
 //! - **Development** (`develop`) reads the terrains at development seeds only (never the pinned
@@ -44,22 +46,25 @@
 //!   response answers, and the response's first `m` bytes, a termination where it ends); training
 //!   reads the choosing role only, the earliest pairs up to the pin's bound; the eight generated
 //!   sections answer the validation requests F0's rule selects (`RELEASE_SEED`), each written whole
-//!   to an owner-only file with nothing beside it. Every cut is refused unless it names the reserve
+//!   to an owner-only file with nothing beside it. A plural section is held (a typed refusal); no
+//!   keyed latent is tried (retired September 29). Every cut is refused unless it names the reserve
 //!   as excluded (`exterior`).
+//! - **The certified step** (September 29; `hnn::constitution`, "The certified step"): the normal
+//!   laws' steps are certified at every deposit; the readout prints each locus's certified steps
+//!   `2^k` (the least and largest `k`), the largest absolute entry of every learned map (`E`, `R`,
+//!   each `W_c`) over the run and after each of the first eight deposits, and the committed energy
+//!   bound read on every refinement at its commit (`RefinementBalance::energy_bound`) with the
+//!   certified storage growth's product. `s` now scales only the factor families' `η_x = 1/(2s)`.
 //! - **Guards**: the run stops at its deadline (the pin's projection bound) or at its resident cap,
-//!   and reports its partial evidence as incomplete.
-//! - **The founded chart** (`founding <cut>`; the
-//!   [pin of the passage's own transports](../../records/2026-09-29_THE_PASSAGES_OWN_TRANSPORTS_PINNED_BEFORE_ITS_RUNS.md)):
-//!   the text field reads the port chart founded by the passage's own transports on the named cut's
-//!   development part (`holonics::hnn::encoding::found_ports`), placed on this field's rings; the
-//!   source moment steps by the founded classes and `E_0` opens at the founded injection. Nothing
-//!   else of the run changes. Without it the field reads the declared residue chart. `train <pairs>`
-//!   and `passes <n>` bound the text run's training below the pinned 1,024 pairs and 2 passes (a
-//!   bounded reading, reported as such).
+//!   and reports its partial evidence as incomplete. `train <pairs>` and `passes <n>` bound the text
+//!   run's training below the pinned 1,024 pairs and 2 passes (a bounded reading, reported as such).
+//!   The founded chart (`founding <cut>`) was retired September 29 with the passage's founding
+//!   (the lessons record; `96d8940b`): every field reads the declared residue chart.
 
 #[path = "exterior.rs"]
 mod exterior;
 
+use std::collections::BTreeMap;
 use std::time::Instant;
 
 use holonics::compression::landmark::context::{SectionChart, StopPrior};
@@ -68,23 +73,21 @@ use holonics::geometry::screw::ScrewGenerator;
 use holonics::hnn::chart::Charts;
 use holonics::hnn::constitution::{CAMPAIGN_ONE_BUDGET, Constitution, Steps};
 use holonics::hnn::field::{
-    ContactDeclaration, CribDeclaration, Current, Field, FieldDeclaration, ReceiverDeclaration,
-    RingDeclaration,
+    ConstitutionRead, ContactDeclaration, CribDeclaration, Current, Field, FieldDeclaration,
+    ReceiverDeclaration, RingDeclaration,
 };
-use holonics::hnn::encoding::found_ports;
 use holonics::hnn::moment::SourceMoment;
-use holonics::hnn::prediction::{
-    Latent, Refinement, Section, deposit_of, stage, unreached_unchanged,
-};
+use holonics::hnn::prediction::{Refinement, Section, deposit_of, stage, unreached_unchanged};
 use holonics::hnn::word::PowerForm;
 use holonics::holarchy::terrain::Draw;
 use holonics::holarchy::terrain::moire::{Moire, MoireClass, MoireFamily};
 use holonics::ratio::algebraic::{ExactInterval, interval_sum};
 use holonics::ratio::{Rat, rat};
 use holonics::receiver::population::RelationKind;
+use num_traits::{Signed, Zero};
 
 use exterior::{
-    RESERVE_SHA256, read_curated, read_cut, read_incidence, reading_of, reserve_read, resident_set,
+    RESERVE_SHA256, read_curated, read_incidence, reading_of, reserve_read, resident_set,
 };
 
 /// The receiver's code tolerance: campaign 1's `1/16` bit, so `L_R = 16`.
@@ -107,7 +110,8 @@ const AGENT: usize = 1;
 struct Declared {
     /// `d`: every ring's period.
     period: u64,
-    /// `s`: the declared steps `γ_U = 1/s`, `η_x = 1/(2s)` (campaign 1 at `s = 1`).
+    /// `s`: the factor families' declared step `η_x = 1/(2s)` (campaign 1 at `s = 1`); the normal
+    /// laws' steps are certified.
     steps: i64,
     /// `|A|`: the exterior chart, its last class the termination.
     alphabet: usize,
@@ -118,8 +122,6 @@ struct Declared {
     stations: usize,
     /// Requests a deposit.
     batch: usize,
-    /// Keyed members tried when a section is plural.
-    members: u64,
 }
 
 /// **The field** (module header).
@@ -207,6 +209,19 @@ struct Tally {
     peak_bits: u64,
     stage_ms: u128,
     deposit_ms: u128,
+    /// The committed energy bound read on every refinement at its commit, and how many held.
+    energy_checks: u64,
+    energy_holds: u64,
+    /// Every certified step's exponent `k` (the step `2^k`), by locus: the least and the largest.
+    exponents: BTreeMap<String, (i64, i64)>,
+    /// The largest absolute entry of each learned map after each deposit (the source port, the
+    /// receiving map and every contrast port), the largest over the run, and the first deposits'.
+    entries: BTreeMap<String, Rat>,
+    trajectory: Vec<Vec<(String, Rat)>>,
+    /// The certified storage growth's product since the founding, at the last deposit, and the
+    /// least and largest growth `ε_k` of one deposit.
+    storage_product: Option<Rat>,
+    growths: Option<(Rat, Rat)>,
 }
 
 impl Tally {
@@ -221,7 +236,6 @@ impl Tally {
 /// [definition] **The engine**: the field, the refinement, the constitution, the charts it warms,
 /// the diamond, and the tally.
 struct Engine {
-    declared: Declared,
     field: Field,
     refinement: Refinement,
     theta: Constitution,
@@ -231,30 +245,7 @@ struct Engine {
 
 impl Engine {
     fn new(declared: Declared) -> Self {
-        Self::founded(declared, None)
-    }
-
-    /// **The engine on a founded chart** (module header, "The founded chart"): the declared field
-    /// with the port chart founded on `founding` placed on its rings, or the declared chart.
-    fn founded(declared: Declared, founding: Option<&[usize]>) -> Self {
-        let field = match founding {
-            Some(passage) => {
-                let field = declare(&declared);
-                let founded = found_ports(&field, passage).expect("the founded port chart");
-                println!(
-                    "  the port chart founded by the passage's own transports on {} cells: {} reached cells, {} founded classes, {} constituents, a fibre of {} codes",
-                    passage.len(),
-                    founded.founding.letters().len(),
-                    founded.founding.classes().len(),
-                    founded.constituents.len(),
-                    founded.fibre.len()
-                );
-                field
-                    .with_port_chart(founded.chart)
-                    .expect("the founded chart reads the field")
-            }
-            None => declare(&declared),
-        };
+        let field = declare(&declared);
         let refinement = Refinement::declare(
             &field,
             0,
@@ -267,14 +258,12 @@ impl Engine {
         let theta = Constitution::initial(
             &field,
             Steps {
-                proxy: rat(1, declared.steps),
                 factor: rat(1, 2 * declared.steps),
             },
             CAMPAIGN_ONE_BUDGET,
         )
-            .expect("the initial constitution");
+        .expect("the initial constitution");
         Self {
-            declared,
             field,
             refinement,
             theta,
@@ -321,9 +310,87 @@ impl Engine {
         }
         self.tally.stage_ms += staging.elapsed().as_millis();
         let depositing = Instant::now();
-        let deposit = deposit_of(&self.theta, &composed).expect("the batch's deposit");
-        let (next, _) = self.theta.deposited(&deposit).expect("the deposit");
+        let deposit =
+            deposit_of(&self.theta, &self.refinement, &composed).expect("the batch's deposit");
+        let amplitude = self
+            .theta
+            .amplitude()
+            .expect("the amplitude reads")
+            .expect("no pumped resonator on the declared field");
+        let (next, reading) = self.theta.deposited(&deposit).expect("the deposit");
         self.tally.deposit_ms += depositing.elapsed().as_millis();
+        for (locus, step) in &reading.steps {
+            let entry = self
+                .tally
+                .exponents
+                .entry(format!("{locus:?}"))
+                .or_insert((step.step.exponent, step.step.exponent));
+            entry.0 = entry.0.min(step.step.exponent);
+            entry.1 = entry.1.max(step.step.exponent);
+        }
+        self.tally.storage_product = Some(reading.storage_product.clone());
+        let largest = |matrix: &holonics::ratio::linear::ExactRatMatrix| {
+            matrix
+                .entries()
+                .iter()
+                .map(|x| x.abs())
+                .max()
+                .unwrap_or_else(Rat::zero)
+        };
+        let mut maps: Vec<(String, Rat)> = Vec::new();
+        for g in 0..self.field.rings().len() {
+            if let Some(port) = next.source_port(g) {
+                maps.push((format!("E{g}"), largest(port)));
+            }
+            if let Some(map) = next.receiving_map(g) {
+                maps.push((format!("R{g}"), largest(map)));
+            }
+            maps.push((format!("Wc{g}"), largest(next.contrast_port(g))));
+            maps.push((format!("f{g}"), largest(next.passive_factor(g))));
+            let slices = next
+                .slices(g)
+                .iter()
+                .flat_map(|(u, v)| u.iter().chain(v))
+                .map(|x| x.abs())
+                .max()
+                .unwrap_or_else(Rat::zero);
+            maps.push((format!("slices{g}"), slices));
+            let standing = next
+                .standing(g)
+                .iter()
+                .map(|x| x.abs())
+                .max()
+                .unwrap_or_else(Rat::zero);
+            maps.push((format!("q{g}"), standing));
+        }
+        for a in 0..self.field.contacts().len() {
+            maps.push((format!("c{a}"), largest(next.contact_storage(a))));
+            maps.push((format!("b{a}"), largest(next.contact_stiffness(a))));
+            maps.push((format!("F{a}"), largest(next.contact_dissipation(a))));
+        }
+        let growth = self.tally.growths.get_or_insert((
+            reading.storage_growth.clone(),
+            reading.storage_growth.clone(),
+        ));
+        if reading.storage_growth < growth.0 {
+            growth.0 = reading.storage_growth.clone();
+        }
+        if reading.storage_growth > growth.1 {
+            growth.1 = reading.storage_growth.clone();
+        }
+        for (name, value) in &maps {
+            let kept = self
+                .tally
+                .entries
+                .entry(name.clone())
+                .or_insert_with(Rat::zero);
+            if value > kept {
+                *kept = value.clone();
+            }
+        }
+        if self.tally.trajectory.len() < 8 {
+            self.tally.trajectory.push(maps);
+        }
         let (loci, unchanged) = unreached_unchanged(
             &self.field,
             &self.theta,
@@ -336,8 +403,20 @@ impl Engine {
         for (current, end, mut balance) in balances {
             let before = PowerForm::read(&self.field, &self.theta, &current).expect("a form");
             let after = PowerForm::read(&self.field, &next, &current).expect("a form");
-            balance.commit(&before, &after, &end).expect("the commit's work");
+            balance
+                .commit(&before, &after, &end)
+                .expect("the commit's work");
             self.tally.commits += u64::from(balance.closes());
+            let bound = balance
+                .energy_bound(
+                    &self.refinement,
+                    &amplitude,
+                    &reading.storage_growth,
+                    self.field.word_lattice(),
+                )
+                .expect("the committed energy bound");
+            self.tally.energy_checks += 1;
+            self.tally.energy_holds += u64::from(bound.holds);
         }
         self.tally.deposits += 1;
         self.theta = next;
@@ -354,33 +433,25 @@ impl Engine {
         }
     }
 
-    /// **A generated section**: refined at rest; when its reading is plural, the keyed members of
-    /// the joint family in order, the first released one emitted with its key.
-    fn generate(&mut self, request: &[usize]) -> (Option<u64>, Vec<usize>, bool) {
+    /// **A generated section**: refined at rest and released at width zero, or held (a plural
+    /// section is a typed refusal, never retried).
+    fn generate(&mut self, request: &[usize]) -> (Vec<usize>, bool) {
         let (current, moment) = ingest(&self.field, request);
-        let mut latents = vec![Latent::Rest];
-        latents.extend((1..=self.declared.members).map(Latent::Keyed));
-        for latent in latents {
-            let section = Section::refine(
-                &self.field,
-                &self.theta,
-                &current,
-                &moment,
-                latent,
-                &self.refinement,
-                &mut self.charts,
-            )
-            .expect("a refined section");
-            let release = section.release().expect("the section's release");
-            if release.released() {
-                let key = match latent {
-                    Latent::Rest => None,
-                    Latent::Keyed(key) => Some(key),
-                };
-                return (key, release.classes, true);
-            }
+        let section = Section::refine(
+            &self.field,
+            &self.theta,
+            &current,
+            &moment,
+            &self.refinement,
+            &mut self.charts,
+        )
+        .expect("a refined section");
+        let release = section.release().expect("the section's release");
+        if release.released() {
+            (release.classes, true)
+        } else {
+            (Vec::new(), false)
         }
-        (None, Vec::new(), false)
     }
 
     fn report(&self, label: &str) {
@@ -407,6 +478,35 @@ impl Engine {
             println!(
                 "  the training sections' code, Σ_j −log₂ p̂_j(t_j): {}",
                 reading_of(code, 16)
+            );
+        }
+        println!(
+            "  the committed energy bound held at {} of {} refinements' commits; the certified storage growth's product since the founding {}",
+            t.energy_holds,
+            t.energy_checks,
+            t.storage_product
+                .as_ref()
+                .map_or_else(|| "none".to_string(), ToString::to_string)
+        );
+        if let Some((least, largest)) = &t.growths {
+            println!(
+                "  the certified storage growth ε_k of one deposit: from {least} to {largest}"
+            );
+        }
+        for (locus, (least, largest)) in &t.exponents {
+            println!("  certified steps at {locus}: 2^k for k from {least} to {largest}");
+        }
+        for (name, value) in &t.entries {
+            println!("  the largest absolute entry of {name} over the run: {value}");
+        }
+        for (deposit, maps) in t.trajectory.iter().enumerate() {
+            println!(
+                "  after deposit {}: {}",
+                deposit + 1,
+                maps.iter()
+                    .map(|(name, value)| format!("{name} {value}"))
+                    .collect::<Vec<_>>()
+                    .join(", ")
             );
         }
     }
@@ -492,7 +592,6 @@ fn terrain_declared() -> Declared {
         span: 1,
         stations: 8,
         batch: 16,
-        members: 0,
     }
 }
 
@@ -548,7 +647,7 @@ fn terrain(
     let mut released = 0usize;
     let mut stations_right = 0usize;
     for (request, truth) in &evaluate {
-        let (_, classes, was_released) = engine.generate(request);
+        let (classes, was_released) = engine.generate(request);
         if was_released {
             released += 1;
             stations_right += classes.iter().zip(truth).filter(|(a, b)| a == b).count();
@@ -577,7 +676,6 @@ fn text_declared() -> Declared {
         span: 1,
         stations: 32,
         batch: 16,
-        members: 8,
     }
 }
 
@@ -692,14 +790,9 @@ fn text_passage(cut_path: &str, declared: &Declared, bound: usize, validation: b
 }
 
 #[allow(clippy::disallowed_types, clippy::disallowed_methods)]
-fn text(cut_path: &str, out_path: &str, founding_path: Option<&str>, bound: usize, passes: usize) {
+fn text(cut_path: &str, out_path: &str, bound: usize, passes: usize) {
     let clock = Instant::now();
     let declared = text_declared();
-    // The founding passage: the named cut's development part, before its held-out range.
-    let founding: Option<Vec<usize>> = founding_path.map(|path| {
-        let (bytes, _, held) = read_cut(path);
-        bytes[..held.start].iter().map(|&byte| usize::from(byte)).collect()
-    });
     let termination = declared.alphabet - 1;
     let TextPassage {
         cells,
@@ -709,9 +802,9 @@ fn text(cut_path: &str, out_path: &str, founding_path: Option<&str>, bound: usiz
         validation_eligible,
         selected,
     } = text_passage(cut_path, &declared, bound, true);
-    let mut engine = Engine::founded(declared, founding.as_deref());
+    let mut engine = Engine::new(declared);
     println!(
-        "hnn_prediction text: the passage {cells} cells, the choosing role's first {development}; choosing request pairs {eligible}, trained on the first {}; validation eligible {validation_eligible}, released {}; d = {}, |A| = {}, K = {}, w = {}, m = {}, batch {}, keyed members {}; reserve excluded {}",
+        "hnn_prediction text: the passage {cells} cells, the choosing role's first {development}; choosing request pairs {eligible}, trained on the first {}; validation eligible {validation_eligible}, released {}; d = {}, |A| = {}, K = {}, w = {}, m = {}, batch {}; reserve excluded {}",
         train.len(),
         selected.len(),
         declared.period,
@@ -720,7 +813,6 @@ fn text(cut_path: &str, out_path: &str, founding_path: Option<&str>, bound: usiz
         declared.span,
         declared.stations,
         declared.batch,
-        declared.members,
         if reserve_read() { "NO (--read-reserve)" } else { RESERVE_SHA256 }
     );
     let mut complete = true;
@@ -743,7 +835,7 @@ fn text(cut_path: &str, out_path: &str, founding_path: Option<&str>, bound: usiz
     let mut written = String::new();
     for (order, (letter, request)) in selected.iter().enumerate() {
         let start = Instant::now();
-        let (key, classes, released) = engine.generate(request);
+        let (classes, released) = engine.generate(request);
         let bytes: Vec<u8> = classes
             .iter()
             .take_while(|&&class| class != termination)
@@ -751,11 +843,10 @@ fn text(cut_path: &str, out_path: &str, founding_path: Option<&str>, bound: usiz
             .collect();
         let utf8 = std::str::from_utf8(&bytes).is_ok();
         println!(
-            "  section {order} (validation letter {letter}, request {} bytes): {}, {} bytes, UTF-8 {utf8}, member {}, {} ms",
+            "  section {order} (validation letter {letter}, request {} bytes): {}, {} bytes, UTF-8 {utf8}, {} ms",
             request.len(),
             if released { "released" } else { "held (typed refusal)" },
             bytes.len(),
-            key.map_or_else(|| "at rest".to_string(), |key| format!("keyed {key}")),
             start.elapsed().as_millis()
         );
         written.push_str(&format!(
@@ -773,12 +864,8 @@ fn text(cut_path: &str, out_path: &str, founding_path: Option<&str>, bound: usiz
 
 /// **The probe**: a bounded dry run of one mode's engine, its milliseconds a refinement and a
 /// deposit and its resident set, from which the pinned run is projected.
-fn probe(mode: &str, cut: Option<&str>, founding_path: Option<&str>) {
+fn probe(mode: &str, cut: Option<&str>) {
     let clock = Instant::now();
-    let founding: Option<Vec<usize>> = founding_path.map(|path| {
-        let (bytes, _, held) = read_cut(path);
-        bytes[..held.start].iter().map(|&byte| usize::from(byte)).collect()
-    });
     let (declared, pairs) = match mode {
         "copy" => (terrain_declared(), copy_pairs(&terrain_declared(), 1, 32)),
         "moire" => {
@@ -793,7 +880,7 @@ fn probe(mode: &str, cut: Option<&str>, founding_path: Option<&str>) {
         }
         other => panic!("probe copy | moire | text, not {other}"),
     };
-    let mut engine = Engine::founded(declared, founding.as_deref());
+    let mut engine = Engine::new(declared);
     let built = clock.elapsed().as_millis();
     let start = Instant::now();
     for batch in pairs.chunks(declared.batch) {
@@ -801,7 +888,7 @@ fn probe(mode: &str, cut: Option<&str>, founding_path: Option<&str>) {
     }
     let learned = start.elapsed().as_millis();
     let start = Instant::now();
-    let (_, _, _) = engine.generate(&pairs[0].0);
+    let _ = engine.generate(&pairs[0].0);
     let generated = start.elapsed().as_millis();
     engine.report("probe");
     println!(
@@ -819,11 +906,6 @@ fn main() {
         Some("probe") => probe(
             arguments.get(2).map(String::as_str).expect("a mode"),
             arguments.get(3).map(String::as_str),
-            match (arguments.get(4).map(String::as_str), arguments.get(5)) {
-                (Some("founding"), Some(path)) => Some(path.as_str()),
-                (None, _) => None,
-                _ => panic!("probe text <cut> [founding <cut>]"),
-            },
         ),
         // Development reads before the pins: the terrain at development seeds (never the pinned
         // training or evaluation seeds) and counts given on the command line.
@@ -878,11 +960,7 @@ fn main() {
                         false,
                     );
                     let clock = Instant::now();
-                    let founding: Option<Vec<usize>> = arguments.get(6).map(|path| {
-                        let (bytes, _, held) = read_cut(path);
-                        bytes[..held.start].iter().map(|&byte| usize::from(byte)).collect()
-                    });
-                    let mut engine = Engine::founded(declared, founding.as_deref());
+                    let mut engine = Engine::new(declared);
                     for batch in passage.train.chunks(declared.batch) {
                         if !guarded(&clock) {
                             break;
@@ -905,7 +983,12 @@ fn main() {
             );
         }
         Some("moire") => {
-            let declared = terrain_declared();
+            // `moire [K]`: the pinned moiré at `K` words (the pins of September 29 took `K = 2`;
+            // the certified step's pins read `K = 4` and `K = 8`).
+            let mut declared = terrain_declared();
+            if let Some(words) = arguments.get(2).and_then(|value| value.parse().ok()) {
+                declared.words = words;
+            }
             let moire = Moire::draw(&MOIRE_FAMILY, MoireClass::Sheets, &mut Draw::new(MOIRE_SEED))
                 .expect("the moiré");
             let truth = moire.truth(&MOIRE_FAMILY).expect("the moiré's truth");
@@ -923,26 +1006,42 @@ fn main() {
                 moire_windows(&moire, &declared),
             );
         }
+        // The development configuration where `K = 4` diverged under the declared step `γ_U = 1`
+        // (the native generation pins' development table: `d = 16`, `K = 4`, `s = 1`, batch 8, 128
+        // windows at the development seeds; `E`'s entries grew 1, 6, 26, 316), read again under the
+        // certified step: development seeds only, never the pinned ones.
+        Some("divergence") => {
+            let mut declared = terrain_declared();
+            declared.period = 16;
+            declared.words = 4;
+            declared.batch = 8;
+            let moire = Moire::draw(&MOIRE_FAMILY, MoireClass::Sheets, &mut Draw::new(13))
+                .expect("the moiré");
+            terrain(
+                "divergence",
+                declared,
+                moire_pairs(&moire, &declared, 14, 128),
+                moire_windows(&moire, &declared),
+            );
+        }
         Some("text") => {
-            let (mut founding, mut bound, mut passes) = (None, TEXT_TRAIN, TEXT_PASSES);
+            let (mut bound, mut passes) = (TEXT_TRAIN, TEXT_PASSES);
             for pair in arguments[4..].chunks(2) {
                 match pair {
-                    [key, value] if key == "founding" => founding = Some(value.as_str()),
                     [key, value] if key == "train" => bound = value.parse().expect("pairs"),
                     [key, value] if key == "passes" => passes = value.parse().expect("passes"),
-                    _ => panic!("text <cut> <out> [founding <cut>] [train <pairs>] [passes <n>]"),
+                    _ => panic!("text <cut> <out> [train <pairs>] [passes <n>]"),
                 }
             }
             text(
                 arguments.get(2).map(String::as_str).expect("the passage cut"),
                 arguments.get(3).map(String::as_str).expect("the sections' owner-only file"),
-                founding,
                 bound,
                 passes,
             )
         }
         _ => panic!(
-            "hnn_prediction probe <mode> [cut] | copy | moire | text <cut> <out> [founding <cut>] [train <pairs>] [passes <n>]"
+            "hnn_prediction probe <mode> [cut] | copy | moire | text <cut> <out> [train <pairs>] [passes <n>]"
         ),
     }
 }

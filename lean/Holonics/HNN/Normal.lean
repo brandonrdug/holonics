@@ -63,6 +63,13 @@ transposes. The complex chart of the same identities is the owner
    changes exactly where the deposit carries `Δ_ρ` across zero. At the fold the class jumps under
    arbitrarily small deposits (`sheet_fold_witness`); a negative step moves the contrast against
    the covector (`standing_step_sign_witness`).
+7. **The certified normal step** (`certified_normal_step`, September 29). The deposit at step `η`
+   is `W' = W + η D` with the unit step `D = (Σ_t w g_t f_tᵀ) H'⁻¹`; its first-order decrease
+   `a = Σ_t w ⟨g_t, D f_t⟩` is the chart's quadratic form on the rows of the window covector
+   (`window_alignment_eq`, `frobenius_chart`), so `a ≥ 0` at a positive semidefinite invertible
+   carried Gram (`inv_psd`): the solved chart descends. The step `η` itself is the owner's
+   `Holon/Deposition.certified_step_descends`; the running chart `X̂` is the lattice's refined
+   solve, so the machine checks `a ≥ 0` rather than assuming it.
 
 [definition; agent-inferred] **What runs is the carried law** (Decision 22 of the step 4 design).
 The laws here are exact, and a map that is an operand of its own covector grows in bits under them.
@@ -636,6 +643,74 @@ theorem sheet_fold_witness :
 
 end Standing
 
+/-! ## 7. The certified normal step -/
+
+section Certified
+
+variable {𝕜 : Type*} [Field 𝕜] {σ τ : Type*} [Fintype σ] [Fintype τ] [DecidableEq σ]
+
+omit [DecidableEq σ] in
+/-- [proved-derived; formal-checked] **A window pairs a unit step as its Frobenius pairing with
+the window covector**: `Σ_t w ⟨g_t, D f_t⟩ = ⟨D, Σ_t w g_t f_tᵀ⟩`. -/
+theorem window_alignment_eq (D : Matrix τ σ 𝕜) (data : Window 𝕜 σ τ) :
+    (data.map fun d => d.1 * (d.2.2 ⬝ᵥ (D *ᵥ d.2.1))).sum =
+      ∑ i, ∑ j, D i j * windowCovector data i j := by
+  induction data with
+  | nil => simp [windowCovector]
+  | cons d data ih =>
+      simp only [windowCovector, List.map_cons, List.sum_cons] at ih ⊢
+      rw [ih]
+      simp only [Matrix.add_apply, Matrix.smul_apply, vecMulVec_apply, smul_eq_mul, mul_add,
+        Finset.sum_add_distrib, dotProduct, mulVec, Finset.mul_sum]
+      congr 1
+      refine Finset.sum_congr rfl fun i _ => Finset.sum_congr rfl fun j _ => ?_
+      ring
+
+omit [DecidableEq σ] in
+/-- [proved-derived; formal-checked] The Frobenius pairing of `M X` with `M` is the chart's
+quadratic form on the rows of `M`. -/
+theorem frobenius_chart (M : Matrix τ σ 𝕜) (X : Matrix σ σ 𝕜) :
+    ∑ i, ∑ j, (M * X) i j * M i j = ∑ i, M i ⬝ᵥ (X *ᵥ M i) := by
+  refine Finset.sum_congr rfl fun i _ => ?_
+  simp only [Matrix.mul_apply, dotProduct, mulVec, Finset.sum_mul, Finset.mul_sum]
+  rw [Finset.sum_comm]
+  refine Finset.sum_congr rfl fun k _ => Finset.sum_congr rfl fun j _ => ?_
+  ring
+
+variable [LinearOrder 𝕜] [IsStrictOrderedRing 𝕜]
+
+omit [Fintype τ] [IsStrictOrderedRing 𝕜] in
+/-- [proved-derived; formal-checked] The solved chart of a positive semidefinite invertible Gram is
+positive semidefinite. -/
+theorem inv_psd {H : Matrix σ σ 𝕜} (hpsd : ∀ v, 0 ≤ v ⬝ᵥ (H *ᵥ v)) (hunit : IsUnit H.det)
+    (v : σ → 𝕜) : 0 ≤ v ⬝ᵥ (H⁻¹ *ᵥ v) := by
+  have hv : H *ᵥ (H⁻¹ *ᵥ v) = v := by
+    rw [mulVec_mulVec, Matrix.mul_nonsing_inv _ hunit, one_mulVec]
+  calc (0 : 𝕜) ≤ (H⁻¹ *ᵥ v) ⬝ᵥ (H *ᵥ (H⁻¹ *ᵥ v)) := hpsd _
+    _ = v ⬝ᵥ (H⁻¹ *ᵥ v) := by rw [dotProduct_comm, hv]
+
+/-- [proved-derived; formal-checked] **The certified normal step.** The deposit at step `η` is
+`W' = W + η D` with the unit step `D = (Σ_t w g_t f_tᵀ) H'⁻¹`, and the unit step's first-order
+decrease `a = Σ_t w ⟨g_t, D f_t⟩` is the solved chart's quadratic form on the rows of the window
+covector, nonnegative at a positive semidefinite invertible carried Gram `H'`. -/
+theorem certified_normal_step (η : 𝕜) (θ : LocusState 𝕜 σ τ) (data : Window 𝕜 σ τ)
+    (hpsd : ∀ v, 0 ≤ v ⬝ᵥ ((θ.gram + windowGram data) *ᵥ v))
+    (hunit : IsUnit (θ.gram + windowGram data).det) :
+    (depositLocus η θ data).map =
+        θ.map + η • (windowCovector data * (θ.gram + windowGram data)⁻¹) ∧
+      (data.map fun d =>
+          d.1 * (d.2.2 ⬝ᵥ ((windowCovector data * (θ.gram + windowGram data)⁻¹) *ᵥ d.2.1))).sum =
+        ∑ i, windowCovector data i ⬝ᵥ ((θ.gram + windowGram data)⁻¹ *ᵥ windowCovector data i) ∧
+      0 ≤ (data.map fun d =>
+          d.1 * (d.2.2 ⬝ᵥ ((windowCovector data * (θ.gram + windowGram data)⁻¹) *ᵥ d.2.1))).sum := by
+  have ha := (window_alignment_eq (windowCovector data * (θ.gram + windowGram data)⁻¹) data).trans
+    (frobenius_chart (windowCovector data) _)
+  refine ⟨by simp only [depositLocus]; rw [Matrix.smul_mul], ha, ?_⟩
+  rw [ha]
+  exact Finset.sum_nonneg fun i _ => inv_psd hpsd hunit _
+
+end Certified
+
 section Audit
 
 #print axioms normalStatistic_standing
@@ -659,6 +734,10 @@ section Audit
 #print axioms standing_deposit
 #print axioms standing_step_sign_witness
 #print axioms sheet_fold_witness
+#print axioms window_alignment_eq
+#print axioms frobenius_chart
+#print axioms inv_psd
+#print axioms certified_normal_step
 
 end Audit
 

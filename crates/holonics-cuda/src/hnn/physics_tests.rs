@@ -1,6 +1,7 @@
 //! **Campaign 2's resident physics fixtures and the normal law's deposit on the card**: the
-//! resonant constitution the loaded port tests declare (`port_tests`), and the prox deposit's
-//! parity with the host. The loaded resonator itself runs only inside the word kernels
+//! loaded constitution the port tests declare (`port_tests`; unpumped, since the certified step
+//! refuses a linear deposit through a pumped resonator, whose growth is not certified), and the
+//! prox deposit's parity with the host. The loaded resonator itself runs only inside the word kernels
 //! (`hnn_word_forward`, `hnn_word_reverse`), whose parity tests cover its law; the standalone
 //! resonator kernel was retired with its last consumer. The parity tests are `#[ignore]` and need
 //! the card; run them alone:
@@ -13,27 +14,19 @@ use std::time::Instant;
 
 use holonics::hnn::constitution::{Constitution, Steps};
 use holonics::hnn::field::Field;
-use holonics::hnn::ring::{PumpDeclaration, PumpStep, ResonatorMaterial};
-use holonics::holon::parametron::Carrier;
+use holonics::hnn::ring::ResonatorMaterial;
 use holonics::ratio::{Rat, rat};
-use num_traits::Zero;
 
 use super::tests::{Draw, card};
 
 /// Campaign 1's field at the standing cut's population, each ring carrying its parametron's
-/// resonator (unit weights, `d = 1/4`) with a half-turn pump of strength `1/8` on the axis `1`: dyadic
-/// material, certified at both pump phases (`2C + D + ½K_j ⪰ 0` since `d ≥ p`).
-pub(super) fn resonant(field: &Field) -> Constitution {
+/// resonator (unit weights, `d = 1/4`) unpumped: passive loaded material (`C, K, D ⪰ 0`), whose
+/// growth the certified step reads as one.
+pub(super) fn loaded(field: &Field) -> Constitution {
     let mut theta = Constitution::initial(field, Steps::campaign_one(), 1 << 40).unwrap();
     for ring in 0..field.rings().len() {
-        let pump = PumpDeclaration::new(
-            rat(1, 8),
-            Carrier::new(Rat::from_integer(1.into()), Rat::zero()).unwrap(),
-            PumpStep::Half,
-        )
-        .unwrap();
         let material =
-            ResonatorMaterial::of_parametron(field.ring(ring).parametron(), &rat(1, 4), Some(pump))
+            ResonatorMaterial::of_parametron(field.ring(ring).parametron(), &rat(1, 4), None)
                 .unwrap();
         theta = theta.with_ring_resonator(field, ring, material).unwrap();
     }
