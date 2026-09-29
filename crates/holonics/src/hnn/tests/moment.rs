@@ -116,7 +116,8 @@ fn per_cell_ingest_equals_the_clocked_closed_form() {
     assert_eq!(moment.opening(), opening.lift());
 }
 
-/// Lean `HNN/Moment.encoderMoment_contract` with `HNN/IndexedOpen` (ruling B): for any rational
+/// Lean `HNN/Moment.encoderMoment_contract` with `HNN/Encoding.whole_pair_read_offset_moment` (the
+/// normalized open, reading no window): for any rational
 /// encoder and pair port, the open storage from the counts equals the streamed sum
 /// `Σ_k P^(τ_cut − τ_k)(ν̂(n) E x_k + [k ≥ 1] ν̂(n − 1) E^(1)(x_k, x_(k−1)))`: the marginal over its
 /// population `n`, and the pair port read on every pair of the passage over the pair population
