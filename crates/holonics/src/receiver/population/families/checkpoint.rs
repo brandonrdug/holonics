@@ -71,6 +71,7 @@ impl Writer {
         self.u8(match sections.slots() {
             SectionSlots::Channel => 0,
             SectionSlots::ChannelKind => 1,
+            SectionSlots::Cells => 2,
         });
     }
 
@@ -169,6 +170,7 @@ impl<'a> Reader<'a> {
                 let slots = match self.u8()? {
                     0 => SectionSlots::Channel,
                     1 => SectionSlots::ChannelKind,
+                    2 => SectionSlots::Cells,
                     _ => return self.malformed("invalid section-slot tag"),
                 };
                 Ok(Some((SectionChart::new(bytes, channels, kinds)?, slots)))
@@ -355,7 +357,14 @@ impl TreeFamily {
             Some((chart, slots)) => {
                 let mut section_reader = Sections::new(chart, slots)?;
                 section_reader.restore_open(open)?;
-                if every_letter().any(|letter| !matches!(letter, Letter::Bundle(_))) {
+                // Under no slots the address holds cells alone; otherwise bundles.
+                let cells = section_reader.family().is_empty();
+                if every_letter().any(|letter| {
+                    !matches!(
+                        (letter, cells),
+                        (Letter::Cell(_), true) | (Letter::Bundle(_), false)
+                    )
+                }) {
                     return Err(TreeFamilyCheckpointError::Inconsistent);
                 }
                 Some(section_reader)
@@ -384,6 +393,8 @@ impl TreeFamily {
         for letter in every_letter() {
             match (letter, section_reader.as_ref()) {
                 (Letter::Cell(cell), None) if *cell < declaration.alphabet => {}
+                (Letter::Cell(cell), Some(sections))
+                    if sections.family().is_empty() && *cell < declaration.alphabet => {}
                 (Letter::Bundle(bundle), Some(sections)) => {
                     if bundle.cell >= declaration.alphabet
                         || u64::from(bundle.features) >= sections.family().codes()
@@ -512,6 +523,42 @@ mod tests {
             Some((chart, slots)),
             usize::from(b'!'),
         );
+    }
+
+    #[test]
+    fn whole_stream_control_checkpoint_restores_cells_and_identical_continuation() {
+        let chart = SectionChart::curated();
+        let slots = SectionSlots::Cells;
+        let sections = Sections::new(chart, slots).unwrap();
+        let declaration = tree_declaration(chart.alphabet(), sections.family().clone());
+        let mut family = TreeFamily::sectioned(declaration.clone(), DESCRIPTION, sections).unwrap();
+        let section = chart
+            .letter(Section {
+                kind: 2,
+                channel: 1,
+            })
+            .unwrap();
+        family.receive(section).unwrap();
+        family.receive(usize::from(b'o')).unwrap();
+        family.enter_aeon(3).unwrap();
+        family.receive(section).unwrap();
+        family.receive(usize::from(b'k')).unwrap();
+        continuation(
+            &family,
+            declaration.clone(),
+            Some((chart, slots)),
+            usize::from(b'!'),
+        );
+        let bytes = family.encode_checkpoint();
+        assert!(matches!(
+            TreeFamily::decode_checkpoint(
+                declaration,
+                DESCRIPTION,
+                Some((chart, SectionSlots::Channel)),
+                &bytes
+            ),
+            Err(TreeFamilyCheckpointError::Declaration)
+        ));
     }
 
     #[test]

@@ -482,6 +482,102 @@ fn two_interleaved_conversations_are_coded_identically_to_each_coded_alone() {
     );
 }
 
+/// [THE_REBUILD U6, item 2: the symmetric comparison's control] **The whole-stream control reads
+/// every cell in its own conversation's address.** A tree over the curated chart's cells with no
+/// slots (`SectionSlots::Cells`) predicts every byte and every section letter; it enters each part's
+/// aeon at the letter exactly as the typed tree does. Interleaved, every byte is read in the address
+/// it has in its conversation alone, and the letter that switches in the leaving conversation's
+/// address, the one that conversation alone has at its next letter; its address holds cells, never
+/// bundles. A checkpoint keeps both conversations' addresses.
+#[test]
+fn the_whole_stream_control_reads_each_conversation_as_alone() {
+    let control = || {
+        let sections = Sections::new(chart(), SectionSlots::Cells).expect("no slots");
+        assert!(
+            sections.family().is_empty(),
+            "no slots: the cell-only family"
+        );
+        TreeFamily::sectioned(
+            LandmarkDeclaration {
+                alphabet: chart().alphabet(),
+                depth: 5,
+                forced: 0,
+                population: POPULATION,
+                grain: GRAIN,
+                family: sections.family().clone(),
+                prior: StopPrior::half(),
+                capacity: Capacity::Unbounded,
+            },
+            1,
+            sections,
+        )
+        .expect("the whole-stream control")
+    };
+    let parts: [(u64, usize, usize, &[u8]); 5] = [
+        (4, 0, 0, b"Read alpha now."),
+        (9, 0, 0, b"What is beta?"),
+        (4, 2, 1, b"Alpha holds two lines."),
+        (9, 2, 1, b"Beta is a letter."),
+        (4, 2, 0, b"Thanks.\n"),
+    ];
+    let mut interleaved = control();
+    let mut alone = BTreeMap::from([(4u64, control()), (9u64, control())]);
+    let mut previous: Option<u64> = None;
+    for &(aeon, kind, channel, text) in &parts {
+        let opening = letter(kind, channel);
+        if let Some(leaving) = previous.filter(|&leaving| leaving != aeon) {
+            assert_eq!(
+                interleaved.address(),
+                alone[&leaving].address(),
+                "the switching letter is read where the leaving conversation reads its next letter"
+            );
+        } else if let Some(same) = previous {
+            assert_eq!(interleaved.address(), alone[&same].address());
+        }
+        interleaved.enter_aeon(aeon).expect("an aeon at its letter");
+        assert!(
+            interleaved.admits(&[usize::from(b'x')]).is_err(),
+            "the aeon is entered at a letter, never at a byte"
+        );
+        interleaved.receive(opening).expect("the part's letter");
+        let own = alone.get_mut(&aeon).expect("the conversation");
+        own.receive(opening).expect("the part's letter alone");
+        for &byte in text {
+            assert_eq!(
+                interleaved.address(),
+                alone[&aeon].address(),
+                "a byte is read in its own conversation's address"
+            );
+            assert!(
+                interleaved
+                    .address()
+                    .iter()
+                    .all(|letter| !matches!(letter, Letter::Bundle(_))),
+                "the control's address holds cells alone"
+            );
+            assert!(interleaved.face().expect("the face")[usize::from(byte)] > Rat::zero());
+            interleaved.receive(usize::from(byte)).expect("a byte");
+            alone
+                .get_mut(&aeon)
+                .expect("the conversation")
+                .receive(usize::from(byte))
+                .expect("a byte alone");
+        }
+        previous = Some(aeon);
+    }
+    assert_eq!(interleaved.aeon(), 4);
+    let bytes = interleaved.encode_checkpoint();
+    let restored = TreeFamily::decode_checkpoint(
+        interleaved.tree().declaration().clone(),
+        1,
+        Some((chart(), SectionSlots::Cells)),
+        &bytes,
+    )
+    .expect("a restored control");
+    assert_eq!(restored.address(), interleaved.address());
+    assert_eq!(restored.encode_checkpoint(), bytes);
+}
+
 #[test]
 fn an_aeon_is_entered_only_at_a_letter() {
     let mut egg = egg();

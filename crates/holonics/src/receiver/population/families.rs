@@ -91,8 +91,11 @@ pub const ROTOR_BOMBE: &str =
 /// reads are the entered aeon's own, so a switch never splices another conversation's ticks into the
 /// context. An aeon is entered at the tick that opens its part. On a sectioned tree that tick is the
 /// section letter: it is read in the leaving aeon's address (it closes that aeon's part), deposited
-/// there, and then pushed onto the entered aeon's address, whose part it opens. On a cell-only tree
-/// (the flat control, which has no letters) the aeon's address returns before the part's first cell.
+/// there, and then pushed onto the entered aeon's address, whose part it opens. A sectioned tree
+/// with no slots (`SectionSlots::Cells`: the control over every byte and letter of a curated stream,
+/// THE_REBUILD U6 item 2) reads its cells alone and enters its aeons at the letter the same way. On
+/// a cell-only tree (the flat control, which has no letters) the aeon's address returns before the
+/// part's first cell.
 /// So every cell is read in the address it has in its own aeon coded alone, except the letter that
 /// switches, which is read in the address the leaving aeon has at its next letter. A leaving aeon's
 /// address is kept while it is away (the bounded last `D` ticks, never a record of its passage).
@@ -157,6 +160,7 @@ impl TreeFamily {
             ));
         }
         let slots = match sections.slots() {
+            SectionSlots::Cells => "none",
             SectionSlots::Channel => "channel",
             SectionSlots::ChannelKind => "channel, kind",
         };
@@ -394,6 +398,7 @@ impl Family for TreeFamily {
             Some(sections) => {
                 let chart = sections.chart();
                 let slots = match sections.slots() {
+                    SectionSlots::Cells => 0,
                     SectionSlots::Channel => 1,
                     SectionSlots::ChannelKind => 2,
                 };

@@ -17,6 +17,13 @@
 //! The reader refuses a cell outside the chart and a byte before any section letter (a cut opens at
 //! a letter: the codec's pin), before anything moves.
 //!
+//! [definition; agent-inferred] **No slots** ([`SectionSlots::Cells`], the empty family `[]`): each
+//! tick's letter is its cell alone, as on the cell-only tree, and the chart's sections are read only
+//! where a part opens. It is the control over a curated stream (THE_REBUILD U6, item 2, the symmetric
+//! comparison): a context tree over every byte and every section letter, with no channel or kind
+//! carried by its address, whose conversations (aeons) are entered at the letter that opens their
+//! part exactly as the typed tree enters them (`receiver::population::TreeFamily::enter_aeon`).
+//!
 //! [definition] The computational object is the helical pair interaction, read here as the receiving
 //! tree's address over a curated passage. Of the winding guide's six general objects this owner
 //! touches **faces and placement** (the ports: a cell's channel placed on its bundle) and the **tower
@@ -128,19 +135,22 @@ impl SectionChart {
     }
 }
 
-/// [definition; agent-inferred] **The slots a typed address carries** (module header): the
-/// channel alone, or the channel and the kind.
+/// [definition; agent-inferred] **The slots a typed address carries** (module header): none (the
+/// cells alone), the channel alone, or the channel and the kind.
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash)]
 pub enum SectionSlots {
+    Cells,
     Channel,
     ChannelKind,
 }
 
 impl SectionSlots {
-    /// **The declared letter family** of the slots over a chart: `[C]` or `[C, K]`. Refused where a
-    /// slot would hold one letter (a chart of one kind carries no kind slot).
+    /// **The declared letter family** of the slots over a chart: `[]` (the cell-only family), `[C]`
+    /// or `[C, K]`. Refused where a slot would hold one letter (a chart of one kind carries no kind
+    /// slot).
     pub fn family(self, chart: &SectionChart) -> Result<LetterFamily, ContextError> {
         match self {
+            SectionSlots::Cells => Ok(LetterFamily::cells()),
             SectionSlots::Channel => LetterFamily::new(vec![chart.channels as u64]),
             SectionSlots::ChannelKind => {
                 LetterFamily::new(vec![chart.channels as u64, chart.kinds as u64])
@@ -151,6 +161,7 @@ impl SectionSlots {
     /// The slots' values of a section.
     fn values(self, section: Section) -> Vec<u64> {
         match self {
+            SectionSlots::Cells => Vec::new(),
             SectionSlots::Channel => vec![section.channel as u64],
             SectionSlots::ChannelKind => vec![section.channel as u64, section.kind as u64],
         }
@@ -209,7 +220,8 @@ impl Sections {
     }
 
     /// **The letter a cell would read**, nothing moved: the cell bundled with its part's slots
-    /// (a section letter's own). Refused outside the chart and at a byte before any section.
+    /// (a section letter's own), or the cell alone under no slots. Refused outside the chart and at
+    /// a byte before any section.
     pub fn letter_of(&self, cell: usize) -> Result<Letter, ContextError> {
         let alphabet = self.chart.alphabet();
         if cell >= alphabet {
@@ -223,6 +235,9 @@ impl Sections {
             .section(cell)
             .or(self.open)
             .ok_or_else(|| shape("a section letter before the first byte", 1, 0))?;
+        if self.family.is_empty() {
+            return Ok(Letter::Cell(cell));
+        }
         Ok(Letter::Bundle(Bundle {
             cell,
             features: self.family.encode(&self.slots.values(section))?,
