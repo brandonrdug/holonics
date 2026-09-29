@@ -142,6 +142,14 @@ acceptance is fixed here, before any run.]
    - Acceptance: no validation conversation, and no reply to or return from one, lies in any
      choosing role. Replacing any withheld continuation, with its length and future relations,
      leaves the request-time state, faces and keyed release unchanged.
+   - **The earlier splits, marked** (September 29, with the protocol's build): F4's, F1's, F2's two
+     (F2, F2V2), F5's diagnostic, U2's and F0's splits divided messages, not conversations. Each is a
+     reshuffle of read material: its validation messages lay in conversations its choosing role
+     also held, and together they read every development conversation. The reserve, 15
+     conversations, is named `09d7ae5b86d1b34cd1f57a100fb0ec412f59902f6ec3b90924a7c80b136f8a24`
+     (`development_families.py`). It is unread from its naming on, since those splits read its
+     conversations too. The spent splits reproduce only with the logged `--read-reserve`
+     (THE_REBUILD U6, item 1 built).
 2. **A symmetric comparison.**
    - Both sides receive the same available context and predict the same events: bytes, section
      letters and ends.
