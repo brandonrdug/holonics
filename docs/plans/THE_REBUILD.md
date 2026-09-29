@@ -505,6 +505,19 @@ named, and the program's loop stays its own counter, disclosed as such.
 
 #### U6. The text chart
 
+- **Redirected September 29: the text chart is the one machine's field**
+  ([record](../../research/records/2026-09-29_THE_TEXT_CHART_IS_THE_ONE_MACHINES_FIELD_TORI_HELICES_EGGS_AND_TUBES_ARE_ONE_FAMILY.md)).
+  The byte-tree text line below (F0, F4, U2, and U6 items 1 and 2) broke HNN_FORMULA's laws: it
+  coded bytes, addressed a window of the last `D` bytes and drew one byte at a time. It stops: no
+  further tuning of, or comparison against, the context tree. Tori, helices, eggs, tubes, fractals,
+  friction, knots and the flux physics are one family, and text enters the one machine's field as
+  moments on its helices and leaves as a jointly refined section. The next loop is two owners,
+  built in parallel: `hnn::encoding` (`E` founded by closing the receiving forms under the field's
+  transports, no window) and `hnn::prediction` (a latent section refined by `K` words with the
+  field's motion continuing, read jointly, released at width zero). Acceptance: exact balances,
+  exact `T(x)` on copy and moiré terrain, then generated text sections shown whole. The data
+  protocol (item 1) and the arithmetic contract (item 3) stay.
+
 F0's next loop is U2's memory experiment; F4's second stage follows U3; F5 follows F0 and F4. The
 curated source gains its intervals (source contract item 9), measured as a charged comparison
 against the source without them. Their gates below are unchanged. Failure: each gate's own failure
