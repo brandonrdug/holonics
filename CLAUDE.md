@@ -249,8 +249,10 @@ Athena text milestone claimed before a test of use was retracted or retired.
   and its partial evidence is reported as incomplete.
 - A product step's claim is its fixed acceptance. Until the acceptance passes, report what the step
   measured, never a completion.
-- Show Brandon a product step's actual output beside its control, in the conversation. Never put
-  it in the repository when it derives from private data.
+- Show Brandon a product step's actual output, whole and as it is, in the conversation: no invented
+  control, logged reply or reference text beside a generation (September 29: "there is no control
+  … we just have to eyeball what it outputs creatively"). Never put it in the repository when it
+  derives from private data.
 - Brandon reviews output products, not records, plans or derivations (September 29). Never gate a
   loop on his reading a document: decide, record the decision where its law lives, and proceed.
 - A failed gate is the next loop's subject. Work on the failure, not past it, and name the blocker
