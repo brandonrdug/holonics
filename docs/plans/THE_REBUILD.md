@@ -530,8 +530,7 @@ branch; intervals that do not shorten the charged code are recorded and not adop
     face kept distinguishable.
 
   The symmetric comparison (2), generation as a requested consequence (4) and retention around the
-  admitted actions (5) follow. F0's release gate, F4's curated release and F5 wait on them. Brandon
-  reviews the record before the loop is built.
+  admitted actions (5) follow. F0's release gate, F4's curated release and F5 wait on them.
 - **Item 1, the data protocol, built September 29** (`f68100f2`, `f4479d9d`; the
   [notebook's receipt](../../research/notebook/hnn_design/README.md#u6-the-data-protocol-by-conversation-with-a-reserve-nothing-reads-september-29);
   Refs #73 #148 #63). No passage was run; the split's checks are count-only, on metadata.
@@ -569,8 +568,7 @@ branch; intervals that do not shorten the charged code are recorded and not adop
   - the build loop's acceptance (A1–A3, bases 2, 10 and 16, prose, Rust and Lean streams) and the
     smallest build that tests it.
 
-  The build waits on Brandon's review of the record. Its composition into the text chart's population
-  reads item (1)'s protocol, built above.
+  Its composition into the text chart's population reads item (1)'s protocol, built above.
 
 #### U7. The targets, alongside
 

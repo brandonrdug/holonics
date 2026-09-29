@@ -251,6 +251,8 @@ Athena text milestone claimed before a test of use was retracted or retired.
   measured, never a completion.
 - Show Brandon a product step's actual output beside its control, in the conversation. Never put
   it in the repository when it derives from private data.
+- Brandon reviews output products, not records, plans or derivations (September 29). Never gate a
+  loop on his reading a document: decide, record the decision where its law lives, and proceed.
 - A failed gate is the next loop's subject. Work on the failure, not past it, and name the blocker
   by its measurement ("the predictor codes above flat on unseen families"), not as a missing part.
 
