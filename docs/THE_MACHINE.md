@@ -586,3 +586,8 @@ tests can comb through anything valuable").
 16. **No change outlives its word (R2 C2c, C3).** `Current` has no wave or contact-state field.
     Waves and contact states are fields of `Word` only, created at zero by its open and dropped at
     its return (`compile_fail` on building a `Current` from a `Word`'s waves).
+17. **No catered machinery** ([antipattern record](../research/records/2026-09-29_ANTIPATTERN_CATERED_MACHINERY_A_TASKS_SOLUTION_ROUTINE_NEVER_STANDS_IN_FOR_LEARNING.md)). No receiver, family, stage or
+    port computes a task's answer by an authored routine or recognizes its inputs by a grammar
+    fitted to a test's layouts. A terrain generates its truth; the machine locates it. The
+    arithmetic calculator and the arithmetic eggs are retired, and the byte-tree text line's
+    catered layers are retired when the native encoding and prediction land.

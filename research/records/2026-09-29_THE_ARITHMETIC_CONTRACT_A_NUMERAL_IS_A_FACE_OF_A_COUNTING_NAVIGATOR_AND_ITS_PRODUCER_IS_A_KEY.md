@@ -1,5 +1,11 @@
 # The arithmetic contract: a numeral is a face of a counting navigator, and its producer is a key
 
+> **Retired September 29 as catered machinery** ([antipattern record](2026-09-29_ANTIPATTERN_CATERED_MACHINERY_A_TASKS_SOLUTION_ROUTINE_NEVER_STANDS_IN_FOR_LEARNING.md)). The build of §8 recognized
+> the test's layouts by a hand-written grammar and computed each result by exact routines: a calculator,
+> not learning. The code is retired (history at `1b374d46`). The mathematics stays in Lean
+> (`Mathematics/ArithmeticContract`, `jet_separates_across_keys`), and the one native finding stays: an
+> operator's reading is located by which consequences hold.
+
 **Date.** September 29. **Issues.** #73, #148, #63 (THE_REBUILD U6, restated; the text chart audit's
 §4 item 3). **Status.** A derivation stated before any build (§1–§7); the smallest build and its
 pinned acceptance run follow in §8, and the acceptance passed. Lean

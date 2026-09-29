@@ -619,6 +619,10 @@ branch; intervals that do not shorten the charged code are recorded and not adop
     of 1,214). Both recombine vocabulary, and neither answers.
   - *What stays open*, measured: both states past the budget; the hazard at a response's end; the
     releases. Items 3–5 carry them, and F0's release gate, F4's curated release and F5 wait on them.
+- **Item (3) retired September 29 as catered machinery** ([antipattern record](../../research/records/2026-09-29_ANTIPATTERN_CATERED_MACHINERY_A_TASKS_SOLUTION_ROUTINE_NEVER_STANDS_IN_FOR_LEARNING.md)):
+  a hand-written grammar over the test's layouts and exact routines computing each result, a
+  calculator rather than learning. Its code and the arithmetic eggs are retired (history at
+  `1b374d46`); its mathematics stays in Lean. The entry below is its history.
 - **Item (3) built and its acceptance passed, September 29** (`c17ea7bd`, pinned in `54925b4c`
   before its draws were read; the
   [record's §8](../../research/records/2026-09-29_THE_ARITHMETIC_CONTRACT_A_NUMERAL_IS_A_FACE_OF_A_COUNTING_NAVIGATOR_AND_ITS_PRODUCER_IS_A_KEY.md#8-the-build-and-its-acceptance-run-september-29);
