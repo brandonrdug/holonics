@@ -52,7 +52,10 @@ parametron ring's section is for `d ≥ 2`.
    `x ↦ ⌊x i / d⌋` (`sectionForm_eq_exactForm`, `sectionClock`), so **the signed crossing count
    is the change of whole windings** (`signed_count_is_flux`), for any `±1` walk; a monotone aeon
    has no backward crossing and its tick count is that change (`monotone_count_is_flux`), of which
-   the parametron ring's count above is the owner's instance.
+   the parametron ring's count above is the owner's instance. The forward walk `0 → n` of one
+   clock (`forwardWord`, an aeon by `forwardWord_chained`) crosses the section of grain `A` at the
+   digit clock's ticks (`crossingTicks_forwardWord`), so its epochs at that section are the windows
+   `[A k, A (k + 1))` (`forward_epoch_is_window`: the HNN's receiving windows).
 
 [counterexample; formal-checked] The hypotheses are load-bearing.
 - **An uncertified declared tick list does not partition.** Declared ticks `[3, 1]` on an aeon of
@@ -744,6 +747,92 @@ theorem unsigned_count_is_not_flux :
     decide
   · decide
   · decide
+
+/-! ### The forward walk of one clock: its epochs are the digit clock's windows -/
+
+/-- [definition] **The forward word** of the one-navigator lift from `s`: `n` micro-steps, each
+along its passage. -/
+def forwardWord (s : ℤ) : ℕ → List (((Fin 1 → ℤ) × Fin 1) × Bool)
+  | 0 => []
+  | n + 1 => (((fun _ => s), 0), true) :: forwardWord (s + 1) n
+
+/-- [proved-derived; formal-checked] The forward word is an aeon from `s` to `s + n`. -/
+theorem forwardWord_chained (s : ℤ) (n : ℕ) :
+    (clockLift (Fin 1)).Chained (fun _ => s) (forwardWord s n) (fun _ => s + n) := by
+  induction n generalizing s with
+  | zero => simp [forwardWord]
+  | succ n ih =>
+    simp only [forwardWord, ParametricComplex.chained_cons]
+    refine ⟨by simp [ParametricComplex.start, clockLift], ?_⟩
+    have hfinish : (clockLift (Fin 1)).finish (((fun _ => s), 0), true) = fun _ => s + 1 := by
+      funext i
+      simp [ParametricComplex.finish, clockLift, Fin.fin_one_eq_zero i]
+    have htarget : (fun _ : Fin 1 => s + ((n + 1 : ℕ) : ℤ)) = fun _ => s + 1 + (n : ℤ) := by
+      funext _
+      push_cast
+      ring
+    rw [hfinish, htarget]
+    exact ih (s + 1)
+
+/-- [proved-derived; formal-checked] **The forward word's ticks at a section of grain `A`** are the
+micro-states `t ∈ (0, n]` with `A ∣ s + t`. -/
+theorem crossingTicks_forwardWord (A : ℕ) (s : ℤ) (n : ℕ) :
+    crossingTicks (sectionForm (0 : Fin 1) A) (forwardWord s n) =
+      (Ioc 0 n).filter (fun t : ℕ => (A : ℤ) ∣ s + (t : ℤ)) := by
+  induction n generalizing s with
+  | zero => rfl
+  | succ n ih =>
+    change crossingTicks _ ((((fun _ => s), 0), true) :: forwardWord (s + 1) n) = _
+    rw [crossingTicks, ih (s + 1)]
+    ext t
+    simp only [sectionForm, mem_union, mem_map, mem_filter, mem_Ioc, addRightEmbedding_apply,
+      true_and]
+    by_cases hA : (A : ℤ) ∣ s + 1
+    · simp only [hA, if_true, one_ne_zero, if_false, mem_singleton]
+      constructor
+      · rintro (rfl | ⟨a, ⟨⟨ha0, han⟩, hd⟩, rfl⟩)
+        · exact ⟨⟨Nat.one_pos, by omega⟩, by simpa using hA⟩
+        · refine ⟨⟨by omega, by omega⟩, ?_⟩
+          push_cast
+          simpa [add_assoc, add_comm, add_left_comm] using hd
+      · rintro ⟨⟨ht0, htn⟩, hd⟩
+        rcases Nat.lt_or_ge t 2 with h | h
+        · left; omega
+        · right
+          refine ⟨t - 1, ⟨⟨by omega, by omega⟩, ?_⟩, by omega⟩
+          have : ((t - 1 : ℕ) : ℤ) = (t : ℤ) - 1 := by omega
+          rw [this]
+          simpa [add_assoc, add_comm, add_left_comm, sub_eq_add_neg] using hd
+    · simp only [hA, if_false, if_true, notMem_empty, false_or]
+      constructor
+      · rintro ⟨a, ⟨⟨ha0, han⟩, hd⟩, rfl⟩
+        refine ⟨⟨by omega, by omega⟩, ?_⟩
+        push_cast
+        simpa [add_assoc, add_comm, add_left_comm] using hd
+      · rintro ⟨⟨ht0, htn⟩, hd⟩
+        have ht : t ≠ 1 := by
+          rintro rfl
+          exact hA (by simpa using hd)
+        refine ⟨t - 1, ⟨⟨by omega, by omega⟩, ?_⟩, by omega⟩
+        have : ((t - 1 : ℕ) : ℤ) = (t : ℤ) - 1 := by omega
+        rw [this]
+        simpa [add_assoc, add_comm, add_left_comm, sub_eq_add_neg] using hd
+
+/-- [proved-derived; formal-checked] **The receiving windows are the epochs of the forward walk**
+(THE_REBUILD U5; the Rust `hnn::receiving::receiving_windows`). On the one-navigator lift, the
+forward walk `0 → n` crosses the section of grain `A` at the digit clock's ticks, so its epoch `k`
+at that section is the window `[A k, A (k + 1))` of its `n + 1` micro-states. -/
+theorem forward_epoch_is_window {A n k j : ℕ} (hA : 0 < A) :
+    crossingTicks (sectionForm (0 : Fin 1) A) (forwardWord 0 n) = digitTicks A (n + 1) ∧
+      (j ∈ epoch (crossingTicks (sectionForm (0 : Fin 1) A) (forwardWord 0 n)) (n + 1) k ↔
+        j < n + 1 ∧ A * k ≤ j ∧ j < A * (k + 1)) := by
+  have hticks : crossingTicks (sectionForm (0 : Fin 1) A) (forwardWord 0 n) =
+      digitTicks A (n + 1) := by
+    rw [crossingTicks_forwardWord]
+    ext t
+    simp only [mem_filter, mem_Ioc, digitTicks, mem_Ioo, zero_add, Int.natCast_dvd_natCast]
+    omega
+  exact ⟨hticks, by rw [hticks]; exact mem_epoch_digitTicks hA⟩
 
 end AeonEpochs
 

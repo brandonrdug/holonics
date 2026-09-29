@@ -21,7 +21,7 @@
 //! window. Over the passage, the source's cell clock (an unwound `navigator::Clock`, one tick a
 //! cell) is crossed by the receiver's section every `A` cells: the windows are the epochs of the
 //! passage's aeon at that section, the digit clock of base `A` ([`ReceivingPhases::windows`], the
-//! exposure's windows; Lean `Aeon/Clock/Epoch.{epochOf_digitTicks, mem_epoch_digitTicks}`). Inside a
+//! exposure's windows; Lean `Aeon/Clock/Epoch.{forward_epoch_is_window, mem_epoch_digitTicks}`). Inside a
 //! word, the word's own unwound clock (`hnn::word::Word`, one tick a junction step) is read by the
 //! receiver at its ticks `e_0 … e_last` ([`ReceivingPhases::epochs`]), the epochs of the word's aeon
 //! at its unit section, which is every tick; phase `j` at word tick `e_0 + j` reads cell `p + j` of
@@ -120,7 +120,7 @@
 //! |---|---|
 //! | `HNN/Ratio.face_constant_on_fibre` (the face reads only `(n, k)`; the owner's, `receiver::face`) | [`GrainCell`] |
 //! | `HNN/Ratio.grain_of_tolerance` (`L_R = ⌈1/ε_bits⌉`) | [`ReceivingPhases::declare`] |
-//! | `Aeon/Clock/Epoch.{epochOf_digitTicks, mem_epoch_digitTicks, odometer_tower}` (the windows are the digit clock's epochs) | [`ReceivingPhases::windows`] |
+//! | `Aeon/Clock/Epoch.{forward_epoch_is_window, crossingTicks_forwardWord, mem_epoch_digitTicks, odometer_tower}` (the windows are the digit clock's epochs) | [`ReceivingPhases::windows`] |
 //! | `HNN/RegionCounts.{grain_face_residual, grain_code_residual}` (the grain exponent is `receiver::face::grain_exponent`'s, `grainExponent_spec`, `grain_log_iff_pow_bounds`) | [`grain_logits`] |
 //! | `receiver::reception::ReceiverFace::read` with `C_S = R P_R^(τ_R) Π_R` | [`ReceivingPhases::read`] |
 //! | `HNN/RegionCounts.{combinedLogits, combined_face_pullback, combined_code_pullback}` | [`ReceivingRead::combined`], [`ReceivingPhases::combine`] |
@@ -846,7 +846,9 @@ pub fn letter_family(_field: &Field) -> FeatureFamily {
 /// [definition; agent-inferred, U5] **The receiving windows of `n` cells at aperture `A`**
 /// ([`ReceivingPhases::windows`], module header): the epochs of the cell clock's forward aeon of
 /// `n` cells at the receiver's section of grain `A`, each as the span of cells whose leaving
-/// micro-state it holds; a last epoch with no cell is not a window. Refused at `A = 0`, which is no
+/// micro-state it holds (Lean `Aeon/Clock/Epoch.forward_epoch_is_window`: the forward walk's ticks
+/// at the section are the digit clock's, and its epoch `k` is `[kA, (k + 1)A)`); a last epoch with
+/// no cell is not a window. Refused at `A = 0`, which is no
 /// section (`aeon::AeonError::ZeroPeriod`).
 pub fn receiving_windows(cells: usize, aperture: usize) -> Result<Vec<Range<usize>>, HnnError> {
     // One cell a tick: the cell clock's declared duration is the cell.
@@ -1269,7 +1271,7 @@ impl ReceivingPhases {
     /// epoch `k` ([`crate::aeon::Epochs::intervals`]), its cells those whose leaving micro-state
     /// lies in it, `[kA, min((k + 1)A, n))`; the window of cell `c` is its epoch `⌊c/A⌋`, and the
     /// windows that close are the section's flux `⌊n/A⌋` (Lean `Aeon/Clock/Epoch.{epochOf_digitTicks,
-    /// mem_epoch_digitTicks, odometer_tower}`). A last epoch that holds no cell (`A | n`, the last
+    /// forward_epoch_is_window, odometer_tower}`). A last epoch that holds no cell (`A | n`, the last
     /// micro-state alone) is not a window.
     pub fn windows(&self, cells: usize) -> Result<Vec<Range<usize>>, HnnError> {
         receiving_windows(cells, self.aperture)

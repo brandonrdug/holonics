@@ -1165,7 +1165,7 @@ fn the_contact_letters_are_read_from_the_register_before_the_cell_they_predict()
 }
 
 /// The receiving windows are the epochs of the cell clock at the receiver's section (U5; Lean
-/// `Aeon/Clock/Epoch.{epochOf_digitTicks, mem_epoch_digitTicks, odometer_tower}`): for every
+/// `Aeon/Clock/Epoch.{forward_epoch_is_window, mem_epoch_digitTicks, odometer_tower}`): for every
 /// aperture `A` and passage of `n` cells, the windows tile the passage as `[kA, min((k + 1)A, n))`,
 /// the window of cell `c` is its epoch `⌊c/A⌋`, the windows that close number the section's flux
 /// `⌊n/A⌋`, and the cell clock's own grain coarsens to the receiver's by the carry `winding A`.
