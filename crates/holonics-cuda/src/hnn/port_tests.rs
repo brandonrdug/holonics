@@ -272,6 +272,8 @@ struct Compared {
     /// Deposits both ports refused alike (a pumped resonator's growth is not certified, so the
     /// certified step refuses a linear step through it); their staged handles are discarded.
     refused: u64,
+    /// The linear loci the published deposits stepped (their certified steps).
+    stepped_loci: u64,
     discards: u64,
     boundaries: u64,
     keys: u64,
@@ -390,6 +392,7 @@ fn lockstep(
                     deposited.and_then(|returned| returned.deposit.into_present())
                 {
                     compared.landmarks += reading.landmarks;
+                    compared.stepped_loci += reading.steps.len() as u64;
                 }
                 compared.resonator_material_changes += (0..field.rings().len())
                     .filter(|&ring| {
@@ -721,9 +724,10 @@ fn the_loaded_source_matches_with_y4_and_hop_two() {
     );
     assert_eq!(compared.compares, 8);
     // The pumped resonator's growth is not certified (the Floquet bound is owed in #62), so the
-    // certified step refuses every deposit whose linear loci move through it, alike on both ports.
+    // certified step refuses every deposit whose linear loci move through it, alike on both ports;
+    // a deposit whose linear loci move nothing is published and steps no linear locus.
     assert!(compared.refused > 0);
-    assert_eq!(compared.refused, compared.deposits);
+    assert_eq!(compared.stepped_loci, 0);
 }
 
 /// A finite, valid staged deposit the committed energy bound refuses leaves the old constitution,

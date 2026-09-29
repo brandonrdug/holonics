@@ -752,6 +752,35 @@ branch; intervals that do not shorten the charged code are recorded and not adop
     the residue chart; ring 0's lock admits 174 development cells against 842; the ladder is myopic
     (a class that pays only through a longer class it opens is never born); the founded `E_0` makes
     the prediction's refinement cost grow past its bound.
+- **The certified deposition step, September 29: the moiré stays bounded at `K = 4` and `K = 8`;
+  the copy keeps its reach cap; the factor step is uncertified**
+  ([pin](../../research/records/2026-09-29_THE_CERTIFIED_DEPOSITION_STEP_PINNED_BEFORE_ITS_RUNS.md),
+  `14ba69f5`;
+  [receipt](../../research/records/2026-09-29_THE_CERTIFIED_DEPOSITION_STEP_THE_MOIRE_STAYS_BOUNDED_AT_K_EIGHT_THE_COPY_KEEPS_ITS_REACH_CAP_AND_THE_FACTOR_STEP_IS_UNCERTIFIED.md);
+  `2dcbd5e2`, `0ab398af`; Refs #73 #63).
+  - *Retired*: the count-priced founding, first-arrival placement, the founded `E_0`, the keyed
+    latent's signs and the record-only contact growth (2,459 lines deleted, 250 written).
+  - *Built*: each linear locus steps by the largest dyadic `η` with `ηC ≤ a` and `ηc ≤ 1`, where:
+    - `a` is the unit step's checked alignment;
+    - `C = B·½·κ²·b` is its curvature through the deposit's reach and the medium's energy law;
+    - `c` is the lattice's covector scale.
+
+    The step is halved until every certificate holds at its ray's end. The storage growth is
+    certified by inertia or the deposit is refused, and a linear step through a pumped resonator is
+    refused. The Lean is `Holon/Deposition` §6 and `HNN/Normal.certified_normal_step`.
+  - *Measured*:
+    - the moiré at `K = 4` and `K = 8` holds every check and the committed energy bound at every
+      commit; `E` stays within `1/1024` of `1/2`, where `γ_U = 1` grew it to 316; 6 of 6 exact;
+    - the copy is 237 of 256 exact, against 234;
+    - the standing cut's held-out code is `5462 + 4/16 + ε`, against `5459 + 13/16 + ε`;
+    - text training fails its entry bound: the standing reached `8 + 517/1024`.
+  - *What stays open*, measured:
+    - the factor families' declared step is uncertified: it grows the rank-deficient storage by up
+      to `2²⁸` in one deposit, so the energy bound's product reached `2²⁷⁵` on text;
+    - the reach cap stays: `R`'s certified step never exceeded `2¹` on the copy, capped by the
+      covector scale, and the prox step's reach is the growing Gram's `ln det`.
+
+    The next loop is the factor families' certified step in `hnn::constitution`.
 
 #### U7. The targets, alongside
 
