@@ -297,7 +297,7 @@ impl<'c> Mounted<'c> {
     ) -> Result<(ExecutedWord<'c>, Faces), HnnError> {
         let field = &self.field;
         let current = ratio.current(field)?;
-        // The indexed normalized open (ruling B), read from the pending ratio's copy of the moment.
+        // The normalized open (it reads no window), read from the pending ratio's copy of the moment.
         let opens = SourceOpen::of(field, ratio.moment())?;
         // The host's declared resonator operands and charts at this publication, formed once per
         // publication (`Loci::resonator_operands`); ring/contact chart refinement remains resident

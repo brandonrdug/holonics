@@ -230,9 +230,9 @@ pub(crate) struct WordPlan {
     pub(crate) logit_exp: u32,
     pub(crate) grain: u64,
     /// Per pair port entry `(source ring index, offset index, phases, rank, weights offset)` and
-    /// its indexed column (ruling B): the address and the population chart's numerator, `0` at an
-    /// unsupported fibre.
-    pub(crate) pairs: Vec<(usize, usize, usize, usize, usize, u32, u64)>,
+    /// its pair population's chart numerator, `0` at an empty population (the open reads no
+    /// window).
+    pub(crate) pairs: Vec<(usize, usize, usize, usize, usize, u64)>,
     pub(crate) pair_weights: usize,
     /// Host decoding scales in the embedded resonator table's order.
     pub(crate) resonators: Vec<LoadedResonatorPlan>,
@@ -566,8 +566,8 @@ impl WordPlan {
             let open_exp = open_exponent(source, population);
             let open = opens
                 .get(s)
-                .filter(|open| open.ring == g && open.columns.len() == source.pairs.len())
-                .ok_or_else(|| refused("the source's indexed normalized open against its loci"))?;
+                .filter(|open| open.ring == g && open.pairs.len() == source.pairs.len())
+                .ok_or_else(|| refused("the source's normalized open against its loci"))?;
             let first_pair = pair_entries.len();
             for (o, pair) in source.pairs.iter().enumerate() {
                 let rank = pair.rank;
@@ -583,8 +583,7 @@ impl WordPlan {
                     i64::from(open_exp) - 3 * i64::from(sigma) - i64::from(population),
                     phases_g as i64,
                 ]);
-                let (address, nu) = open.columns[o].unwrap_or((0, 0));
-                pairs.push((s, o, phases_g, rank, pair_weights, address, nu));
+                pairs.push((s, o, phases_g, rank, pair_weights, open.pairs[o]));
                 pair_weights += phases_g * rank;
             }
             let record = &mut plan[source_at + s * WS_STRIDE..source_at + (s + 1) * WS_STRIDE];
@@ -804,15 +803,16 @@ fn open_exponent(source: &crate::hnn::publication::SourceLoci, population: u32) 
         + population
 }
 
-/// [definition] **One source ring's indexed normalized open, as the plan reads it** (ruling B;
-/// `holonics::hnn::moment`): its ring, the marginal's population chart numerator
-/// `⌊2^(L_ν)/n_g + ½⌋`, and per declared offset the address and its column's chart numerator, or
-/// `None` at an unsupported fibre. The host forms it from its mirror of the moment.
+/// [definition] **One source ring's normalized open, as the plan reads it**
+/// (`holonics::hnn::moment`: the open reads no window): its ring, the marginal's population chart
+/// numerator `⌊2^(L_ν)/n_g + ½⌋`, and per declared offset the pair population's chart numerator
+/// `⌊2^(L_ν)/n_(g,δ) + ½⌋`, `0` at an empty population. The host forms it from its mirror of the
+/// moment.
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub(crate) struct SourceOpen {
     pub(crate) ring: usize,
     pub(crate) marginal: u64,
-    pub(crate) columns: Vec<Option<(u32, u64)>>,
+    pub(crate) pairs: Vec<u64>,
 }
 
 impl SourceOpen {
@@ -824,24 +824,15 @@ impl SourceOpen {
             .sources()
             .iter()
             .map(|&ring| {
-                let columns = field
+                let pairs = field
                     .offsets()
                     .iter()
-                    .map(|&offset| {
-                        Ok(match moment.indexed_column(field, ring, offset)? {
-                            Some(column) => Some((
-                                u32::try_from(column.address)
-                                    .map_err(|_| refused("an address past 32 bits"))?,
-                                chart.numerator(column.counts.iter().sum()),
-                            )),
-                            None => None,
-                        })
-                    })
+                    .map(|&offset| Ok(chart.numerator(moment.pair_population(ring, offset)?)))
                     .collect::<Result<Vec<_>, HnnError>>()?;
                 Ok(Self {
                     ring,
                     marginal: chart.numerator(moment.population(ring)?),
-                    columns,
+                    pairs,
                 })
             })
             .collect()
@@ -1221,7 +1212,7 @@ impl<'c> ResidentWord<'c> {
         let weight_status = card
             .alloc::<u32>(plan.pair_weights.max(1))
             .map_err(device)?;
-        for &(s, o, phases, rank, at, address, nu) in &plan.pairs {
+        for &(s, o, phases, rank, at, nu) in &plan.pairs {
             let pair = &publication.loci.sources[s].pairs[o];
             let entry = card.entry(PAIR_ENTRY).map_err(device)?;
             let alphabet = pair.current.matrix.columns;
@@ -1233,7 +1224,6 @@ impl<'c> ResidentWord<'c> {
             let mut alphabet_wire = alphabet as u32;
             let mut rank_wire = rank as u32;
             let mut phases_wire = phases as u32;
-            let mut address_wire = address;
             let mut nu_wire = nu;
             let mut out = weights.device_ptr() + 16 * at as u64;
             let mut status = weight_status.device_ptr() + 4 * at as u64;
@@ -1244,7 +1234,6 @@ impl<'c> ResidentWord<'c> {
                 alphabet_wire,
                 rank_wire,
                 phases_wire,
-                address_wire,
                 nu_wire,
                 out,
                 status
