@@ -166,3 +166,49 @@ The helix, the pair, the cell holonomy and the tower thread stay attached throug
     - these pins and the receipt.
 
     No law of the candidate changes.
+
+## 2. The streams and the projection
+
+The pins are commit `9b849f54`. The streams below were generated after it and before the run.
+Only counts and hashes are read here.
+
+**The streams** (`curated_source.py 524288 {choosing,validation}`, `curated_incidence.py
+{choosing,validation}`, `family_passage.py`; the split's membership
+`19f8b42d46e1ea96dbcaa2f8e83029ab9c9b92a5dd7cee9b138244d8207a6e75`; every manifest names the reserve
+as excluded; no family refused).
+
+| | Choosing | Validation |
+|---|---|---|
+| Conversations; messages | 61; 16,314 | 11; 682 |
+| The role's whole stream (cells; SHA-256) | 11,682,320; `99a488a8…22393c0` | 574,447; `3a81a9ac…1605d5e0` |
+| The cut (F0's aperture, a tail from the letter at or after `length − 2^19`) | 524,012 cells from 11,158,308; `2155c166…4d7d312b` | 524,009 cells from 50,438; `aad74932…9d5ef5451` |
+| The cut's letters (`open`, `switch`, `turn`, `part`) | 9, 74, 355, 359 | 10, 0, 380, 215 |
+| The cut's aeons (SHA-256) | `e8140caa…ea33799` | `104187ae…a33920` |
+| Declared relations (SHA-256) | 434 (`367340f2…a5867c07`) | 515 (`c8d1bf85…f04aeebdb`) |
+
+The joined passage holds 1,048,021 cells
+(`c6e51a356de4c04cdbb4256fb811bf08cdce0f635f4ec4f81a544d007a0d0816`, `held_out_start` 524,012),
+949 relations (`cefea3d87c7f27700783573f1b313c654babbe1f45870872cf1c24e015ca2d4e`) and its aeons
+(`6a87d27224b837deab0c8c997ca39e91cf7559a9a4742d58585c48acc4c5f9f6`). The validation cut opens
+inside a conversation whose opening lies before the aperture. Its 11 conversations follow one another
+without interleaving: it holds no `switch` letter.
+
+**The projection**, from F0's run on a joined passage of the same aperture (1,047,752 cells), which
+took 365,812 ms at a 7,212,138,496-byte peak:
+- *The candidate*: the choosing reading about 44,000 ms and the validation reading about 49,000 ms
+  (F0: 43,793 and 48,562; the face at 605 letters is read where F0 read it at 936 stops).
+- *The candidate's releases*: 8 at most F0's bound at the cap, `2048·(89/4) + 677 = 46,245` ms each,
+  so at most 369,960 ms. F0's 32 releases took 190,966 ms in all (`5967 rem 22` ms each).
+- *The control*: the flat tree read 1,046,085 bytes in 26,164 ms on an odometer of 8 digits. The
+  whole-stream tree reads 1,048,021 cells on 9 digits, projected at most 40,000 ms with its 605
+  letter faces.
+- *The control's releases*: on the synthetic check the control's scored release cost less than a
+  third of the candidate's a cell (`1487/470` against `5902/527` ms). At a third of F0's `89/4` ms
+  a cell, a release at the cap takes at most about 15,000 ms, so 8 take at most 120,000 ms.
+- *The setup and the two checkpoints*: at most 40,000 ms.
+
+In all at most 655,000 ms, and about 240,000 ms when the releases stop at their own letters. The peak
+resident set is at most 10,000,000,000 bytes: F0's egg pass (7,212,138,496) dominates, and the egg is
+dropped before the control reads. The run is stopped at 700,000 ms and reported incomplete past it;
+its own guards stop a passage past 600,000 ms or 20,000,000,000 bytes. Available memory at the launch:
+24,566,611,968 bytes.
