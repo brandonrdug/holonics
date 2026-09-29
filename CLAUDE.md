@@ -241,6 +241,15 @@ Read the matched record and its actual owner or caller. A search hit is not a jo
 existing owner and the concrete missing term. A change that adds, moves or retires an owner updates
 its atlas rows in the same commit.
 
+[project-postulate] **Read the lessons before designing** ([the failures that repeated](research/records/2026-09-29_LESSONS_THE_FAILURES_THAT_REPEATED_AFTER_THEY_WERE_RECORDED.md);
+[the prototypes' lessons](research/records/2026-09-24_LESSONS_FROM_THE_WORKBENCH_AND_ATHENA_PROTOTYPES.md)). Before any design, brief or build, name which recorded failure
+each choice could repeat; a choice that repeats one is refused before it is built. The most repeated:
+an authored routine standing in for learning; recitation or an index of contexts counted as
+generation; text run on its codec's grain as the exception (every design is checked against text,
+image, acoustic and motor input, and anything modality-specific lives only in a boundary codec); a
+located cause carried unrepaired into a new consumer; an uncertified deposition step; seen material
+graded as unseen; bits read as progress; a refusal answered with a larger limit.
+
 [project-postulate] **Decide from the mathematics.** Resolve routine choices from the mathematics,
 mark an inferred choice with its reason (`agent-inferred`), and proceed. Never hand Brandon a
 decision that the framework settles, and never hedge finished work with a queue of "next" items.
@@ -314,6 +323,7 @@ older one.
   5.5 reviewer that spawns nothing**. Use fewer workers when the work does not split, and a
   sequential join when a step consumes several returns.
 - Every brief supplies:
+  - the lessons records above, with the recorded failures the brief's work could repeat;
   - this guide, the exact paths, the existing owners, the equations, the consumer and the receipts;
   - its computational object, the helical pair interaction;
   - which of the six general objects of the [winding guide](docs/WINDING_CARRY_AND_PLACEMENT.md) it

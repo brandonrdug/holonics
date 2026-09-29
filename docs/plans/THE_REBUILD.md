@@ -505,6 +505,14 @@ named, and the program's loop stays its own counter, disclosed as such.
 
 #### U6. The text chart
 
+- **Lessons, September 29** ([record](../../research/records/2026-09-29_LESSONS_THE_FAILURES_THAT_REPEATED_AFTER_THEY_WERE_RECORDED.md)). Today's native text builds (`hnn::encoding`'s
+  passage founding, `hnn::prediction`) repeated recorded failures: counts as the learner, text on its
+  codec's grain, the byte-marginal readout located on September 25 and carried unrepaired, and an
+  uncertified deposition step. The count-priced founding, first-arrival placement, the founded
+  `E_0`, the pseudo-random latent and the unit step inside a refinement are retired from the native
+  path. The next loop is the certified deposition step in its owner (`constitution`, under
+  `Holon/Deposition.committed_energy_bound`), before any further consumer.
+
 - **Redirected September 29: the text chart is the one machine's field**
   ([record](../../research/records/2026-09-29_THE_TEXT_CHART_IS_THE_ONE_MACHINES_FIELD_TORI_HELICES_EGGS_AND_TUBES_ARE_ONE_FAMILY.md)).
   The byte-tree text line below (F0, F4, U2, and U6 items 1 and 2) broke HNN_FORMULA's laws: it
