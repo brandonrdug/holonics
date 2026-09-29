@@ -103,8 +103,9 @@ the tree's owner (`compression::landmark::context`) and the egg's (`receiver::po
      letter's tick in the validation role; the terrain's seeded exact draw, `holarchy::terrain::Draw`),
      or all if fewer.
    - *The egg's release*: at the response's opening letter, after the egg has received it within the
-     passage (the standing that scores the response's first byte), its future is branched and
-     released under the scored law (`Population::release_response`, the egg alone named by 0 bits:
+     passage (the standing that scores the response's first byte), its future is branched at the
+     present incidence (amended before the split, §2: `AdmittedEgg::branch_at_present`, the
+     passage's declared future relations withheld) and released under the scored law (`Population::release_response`, the egg alone named by 0 bits:
      `P_release = P_scored` at every cell, the stop law, the text codec's squares), with keys from
      `Draw::new(order key)`. The cap: the largest power of two `P` of bytes with `P·c + b ≤ 60,000`
      ms, F4's warm response budget, where `c` is the F4 dry run's longest milliseconds a released
@@ -134,5 +135,63 @@ the tree's owner (`compression::landmark::context`) and the egg's (`receiver::po
     the validation passage is within 600,000 ms and 20 GB. **Failure** (F0's): the byte population
     stays a compression result, and F4's curated release and F5 wait; the failed clause is named by
     its measurement.
-13. **Where it lands.** No library law changes. The harness mode `f0-acceptance`, the item `F0` in the
-    split scripts, and `release_legibility.py` reading further corpora and a named vocabulary.
+13. **Where it lands.** No law of the receiver or the tree changes. The harness mode `f0-acceptance`,
+    the item `F0` in the split scripts, and `release_legibility.py` reading further corpora and a
+    named vocabulary. Amended before the split (§2): the admitted egg's owner gains
+    `branch_at_present`, with its test and its atlas row (`receiver.population-present-branch`).
+
+## 2. Before the split: the dry runs, the margin, the cap, one amendment and the projection
+
+The pins' rules are commit `33197fe2`. Everything below was read after it on spent splits only, and
+committed before the fresh split was generated. Bits are read at `L_R = 16` as `n + k/16 + ε` with
+`0 ≤ ε < 1/16`; the exact endpoints are in the private logs (`.local/cuts/f0-dryrun-*.log`, counts
+and codes only).
+
+**The draws and the margin.** `hnn_population f0-acceptance` on each spent joined passage, the egg
+at 12 ticks, the partition learned on that split's choosing cells:
+
+| Spent split | Validation cells | `Δ = V_egg − V_flat`, uncharged | The charged difference |
+|---|---|---|---|
+| F1's | 523,051 | `−279 + 10/16 + ε` | `−226 + 11/16 + ε` |
+| F4's | 524,152 | `−726 + 9/16 + ε` | `−681 + 6/16 + ε` |
+| F5's | 523,802 | `−672 + 15/16 + ε` | `−618 + 0/16 + ε` |
+| U2's | 524,133 | `−812 + 9/16 + ε` | `−765 + 2/16 + ε` |
+
+From F1's upper end to U2's lower end the range is exactly
+`42236879361267602706533278199317/2^96` bits, `533 + 1/16 + ε`, so **`m = 534` bits**. The code
+clause on the fresh split needs its charged difference's upper end below `−534`: three of the four
+spent draws would meet it and F1's would not.
+
+The run on U2's passage reproduces U2's recorded receipt of the same egg exactly: the standing
+2,147,915,516 bytes after 1,047,804 cells (2,049 a cell, 21,793,273 byte-tree nodes), the flat tree's
+1,359,168,091, and the bytes with the stops `−812 + 9/16 + ε` uncharged, U2's `−810 + 9/16 + ε` with
+its 2 bits.
+
+**The cap.** On F4's passage at the dry run's cap of 2,048 bytes, the longest milliseconds a released
+cell were `c = 89/4` (22 rem 1 over 4, a release of four cells, its branch apart) and the longest
+branch `b = 677` ms. `2048·c + b = 46,245 ≤ 60,000 < 4096·c + b = 91,813`, so **the cap is 2,048
+bytes**.
+
+**One amendment, before the split: the release branches at the present incidence.** On F4's passage,
+8 of the 32 releases were refused by the population's admission, each at a tick where the passage's
+declared incidence placed a later part's letter or target, 6 of them exactly at the held-out truth's
+length. The branch carried the passage's declared future relations, which are the recorded future's
+exterior codec information, so a release could stop at the recorded part's end. The admitted egg's
+owner gains `AdmittedEgg::branch_at_present` (the relations whose reading part has not opened
+withheld, their targets' counts and held spans released), with its test
+(`a_branch_at_the_present_withholds_the_future_incidence_and_moves_no_face`: the same face at every
+cell of the open part, and a byte at a withheld letter admitted where the full incidence refuses it)
+and its atlas row (`receiver.population-present-branch`); the harness releases from it (pin 9). Read
+again on F4's passage: the code unchanged, 28 releases stopped at their own stop and 4 reached the
+cap, no refusal; of the 32 egg releases 24 are byte-identical to the first run's and the other 8
+continue the refused ones' emitted bytes, so withholding the future moved no face; the flat
+releases are identical.
+
+**The projection.** F4's passage with the amended releases took 382,774 ms at a 7,116,886,016-byte
+peak: the choosing reading 43,252 ms, the validation reading 48,637 ms, the egg's releases 203,358 ms
+(the longest 29,264 ms) and the flat tree's 55,775 ms, the flat passage 26,596 ms. The three
+code-only runs, made together, took 129,627 to 132,449 ms each at peaks of 6,798,041,088 to
+7,022,305,280 bytes. The fresh passage is of the same aperture, so its readings are projected at
+about 50,000 ms for the validation passage (against 600,000) and about 7.2 GB (against 20 GB); the
+releases are bounded by 32 releases at the cap, 32 × 46,245 ms, and the run is given 2,400,000 ms
+before it is stopped as incomplete.

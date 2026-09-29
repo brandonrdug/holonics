@@ -63,9 +63,10 @@ use super::exterior::{
 
 /// **The margin `m` in bits** (the record's pin 6): the range of the uncharged conditional
 /// difference `V_egg − V_flat` over the spent family draws read at F0's aperture by this harness
-/// (F1's, F4's, F5's and U2's passages), rounded up to whole bits. `None` until those dry runs are
-/// read and the number is committed, before the fresh split is generated.
-const MARGIN: Option<u64> = None;
+/// (F1's, F4's, F5's and U2's passages), rounded up to whole bits: from F1's upper end (the draw
+/// `−279 + 10/16 + ε`) to U2's lower end (`−812 + 9/16 + ε`), `533 + 1/16 + ε`, so `m = 534`
+/// (the record's §2), committed before the fresh split is generated.
+const MARGIN: Option<u64> = Some(534);
 
 /// The standing budget in bytes a cell (pin 7: the flat control's standing on F4's passage, U2's).
 const BUDGET: u64 = 1298;
@@ -82,7 +83,10 @@ const PASSAGE_MS: u128 = 600_000;
 const RESIDENT: u128 = 20_000_000_000;
 const GUARD_EVERY: usize = 1 << 14;
 
-/// The releases (pin 8): how many, the declared seed of their order keys, and the cap in bytes.
+/// The releases (pin 9): how many, the declared seed of their order keys, and the cap in bytes:
+/// the largest power of two `P` with `P·c + b ≤ 60,000` ms (F4's warm response), `c = 89/4` ms a
+/// released cell and `b = 677` ms the longest branch on the F4 dry run, so `2048·c + b = 46,245`
+/// and `4096·c + b = 91,813` (the record's §2).
 const RELEASES: usize = 32;
 const RELEASE_SEED: u64 = 20_260_928;
 const RELEASE_CAP: usize = 2048;
@@ -220,7 +224,7 @@ fn part_bytes(codes: &[usize], letter: usize, chart: SectionChart) -> Vec<u8> {
         .collect()
 }
 
-/// **The selection** (pin 8): the validation role's declared request→response relations whose
+/// **The selection** (pin 9): the validation role's declared request→response relations whose
 /// request lies in the validation role, whose response opens on the agent channel, and whose two
 /// parts are nonempty, with room in the aperture; ordered by `Draw::new(RELEASE_SEED + v).next()`,
 /// `v` the response letter's tick in the validation role, the lowest [`RELEASES`] kept.
@@ -293,8 +297,9 @@ fn refusal_name(refusal: &ResponseRefusal) -> &'static str {
 }
 
 /// **The egg's release** from its standing after the response's opening letter (`received` cells):
-/// a branch of its future, alone in a population named by 0 bits, under the scored law, the cap the
-/// least of [`RELEASE_CAP`] and the aperture's room.
+/// a branch at the present incidence (`AdmittedEgg::branch_at_present`: the passage's declared
+/// future relations withheld, amended pin 9), alone in a population named by 0 bits, under the
+/// scored law, the cap the least of [`RELEASE_CAP`] and the aperture's room.
 fn release_egg(
     egg: &AdmittedEgg,
     chart: SectionChart,
@@ -303,7 +308,7 @@ fn release_egg(
     key: u64,
 ) -> EggRelease {
     let clock = Instant::now();
-    let branch = Family::branch_future(egg).expect("the admitted egg branches its future");
+    let branch: Box<dyn Family> = Box::new(egg.branch_at_present());
     let branch_ms = clock.elapsed().as_millis();
     let mut alone = Population::new(vec![branch]).expect("the egg alone, named by 0 bits");
     let room = RELEASE_CAP.min(population - received - 1);

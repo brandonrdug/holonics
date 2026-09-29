@@ -552,6 +552,35 @@ impl AdmittedEgg {
         &self.inner
     }
 
+    /// [definition; agent-inferred] **A branch at the present incidence**: a copy of this standing
+    /// that declares only the relations whose reading part has opened. A relation whose letter lies
+    /// ahead is the recorded future's exterior codec information, which a release branched from the
+    /// present must not read: the population's admission refuses a byte at a declared future letter
+    /// or target tick, so a branch carrying them would stop a release at the recorded part's length
+    /// (F0's acceptance run, its dry run on F4's passage: 8 of 32 releases). Withholding them moves
+    /// no face: a face reads only the open part's relation, whose target keeps its span, and a
+    /// withheld relation's count on a held target only held that span longer.
+    pub fn branch_at_present(&self) -> Self {
+        let mut branch = self.clone();
+        let withheld = branch.relations.split_off(branch.next);
+        for relation in withheld {
+            if let Some(count) = branch.targets.get_mut(&relation.target) {
+                *count -= 1;
+                if *count == 0 {
+                    branch.targets.remove(&relation.target);
+                }
+            }
+            if let Some(span) = branch.spans.get_mut(&relation.target) {
+                span.remaining -= 1;
+                if span.remaining == 0 {
+                    branch.held -= span.cells.len();
+                    branch.spans.remove(&relation.target);
+                }
+            }
+        }
+        branch
+    }
+
     /// Check a request/response incidence while both its target and reading part are still ahead
     /// of the clock. This does not create a span early: `open_part` creates and retains that span
     /// when the target letter is actually received.

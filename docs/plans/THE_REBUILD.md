@@ -679,10 +679,14 @@ on the admitted egg, and the trees beyond depth 24 add at most 20 bits.
   the egg at `F0_BYTE_DEPTH = 12`; U2's receiver; the egg's bytes and response stops, charged its
   declaration (17 + 5 bits and the learned partition's description), against the flat tree's bytes,
   charged 3, the flat tree charged no stop; the margin `m` the range of the uncharged difference over
-  the spent draws read at F0's aperture (F1's, F4's, F5's and U2's passages), read before the split
-  is generated; the standing budget 1,298 bytes a cell, whole; the passage budget ten minutes and
-  20 GB; 32 releases at hash-ordered validation responses beside the held-out truth and the flat
-  tree's release, read by `release_legibility.py`, the text owner-only.
+  the spent draws read at F0's aperture before the split is generated: F1's `−279 + 10/16 + ε`, F4's
+  `−726 + 9/16 + ε`, F5's `−672 + 15/16 + ε`, U2's `−812 + 9/16 + ε`, so **`m = 534` bits**; the
+  standing budget 1,298 bytes a cell, whole; the passage budget ten minutes and 20 GB; 32 releases at
+  hash-ordered validation responses (cap 2,048 bytes) beside the held-out truth and the flat tree's
+  release, read by `release_legibility.py`, the text owner-only. One amendment before the split: a
+  release branches at the present incidence (`AdmittedEgg::branch_at_present`), since on F4's
+  passage 8 of 32 releases were refused where the passage's declared future incidence placed a
+  later letter.
 
 ### F2. The field as a family (step 4; #73)
 

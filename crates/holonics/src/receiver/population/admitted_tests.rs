@@ -554,3 +554,29 @@ fn planning_refuses_passed_targets_and_duplicate_reading_parts() {
         "the target has passed"
     );
 }
+
+#[test]
+fn a_branch_at_the_present_withholds_the_future_incidence_and_moves_no_face() {
+    let (cells, ticks) = passage();
+    let mut egg = egg(relations(ticks));
+    let opening = ticks[1] as usize;
+    for &cell in &cells[..=opening] {
+        egg.receive(cell)
+            .expect("the request and the response's opening");
+    }
+    let mut present = egg.branch_at_present();
+    let mut full = egg.clone();
+    // The response's first part: the same face at every cell.
+    for &cell in &cells[opening + 1..ticks[2] as usize] {
+        assert_eq!(present.face(), full.face());
+        assert_eq!(present.receive(cell), full.receive(cell));
+    }
+    assert_eq!(present.face(), full.face());
+    // At the second part's declared letter, a drawn byte: the full incidence refuses it, the
+    // present admits it.
+    let byte = usize::from(b'x');
+    let mut carried = Population::new(vec![Box::new(full)]).expect("the full incidence");
+    assert!(carried.receive(byte).is_err(), "a declared future letter");
+    let mut released = Population::new(vec![Box::new(present)]).expect("the present incidence");
+    assert!(released.receive(byte).is_ok(), "no future incidence");
+}
