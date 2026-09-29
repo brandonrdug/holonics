@@ -17,6 +17,7 @@ import Holonics.Objects.Pairing
 import Holonics.Objects.Deposition
 import Holonics.Objects.Ratio
 import Holonics.Objects.Parametron
+import Holonics.Objects.ParametronLock
 import Holonics.Objects.RelativeCompleteness
 import Holonics.Objects.RatioPhase
 import Holonics.Objects.RatioBlock
@@ -52,7 +53,7 @@ with its consumer. The operator contract in the guide lists every owner; the ent
 | Navigator | `Holon/Navigator`, `Transport/{SourceMoment,NavigatorTraceFaces,ReflectiveContinuation}`, `Foundation/{FractalPacking,FractalString}` (the scale zeta read through the transfer determinant), `Aeon/Production/Zeta` (return words, word counts and the transfer determinant) |
 | Swing | `Geometry/{AffineSwing,SwingPotential}` (FractalPacking's reflection is the Swing about ½) |
 | Pair contact, tube and tower | `Transport/{HelicalPairInteraction,CellHolonomy,ContinuingTube,WorldTube}` |
-| Parametron | `Objects/Parametron`, `Physics/{PhaseCarrier,CoupledIncidence,HolonicMeasuredParametron,HolonicTorusParametronRealization}` |
+| Parametron | `Objects/{Parametron,ParametronLock}` (the lock's exchange polynomial and its logistic face, capacity as lock count, the winding as the carry, coupled locks, modal hearing as dormancy), `Physics/{PhaseCarrier,CoupledIncidence,HolonicMeasuredParametron,HolonicTorusParametronRealization}`; the pumped ring's Floquet certificate is `HNN/Floquet` |
 | Relatively complete region | `Objects/RelativeCompleteness`, `Holarchy/Globe` |
 | Ratio | `Objects/{Ratio,RatioPhase,RatioBlock}` |
 | Receiver and receipt | `Holarchy/{Reception,Receipt,Hearing}`, `Foundation/Standing` |

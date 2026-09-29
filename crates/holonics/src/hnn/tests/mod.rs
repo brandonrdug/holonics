@@ -5,6 +5,7 @@ mod chart;
 mod constitution;
 mod encoding;
 mod field;
+mod floquet;
 mod guards;
 mod keys;
 mod learning;

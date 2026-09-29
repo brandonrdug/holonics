@@ -66,7 +66,7 @@ built. Each rebuild step updates this table in the same commit.
 | Swing (motion) | `move` (`x ↦ Mx + b`: its multiplier, pivot and kind), `split` (turn and boost against a receiver's metric, with the energy law), `compose`, `kind` (turn, boost, free fall, half-turn with a boost; `tr²/det`), `factor` (turn · boost · shear), `half_turn`, `pantograph` (a scalar move about an anchor), `tick` (oriented section crossing), inner fibre of a coarse move, `junction_scattering` (`2P_D − I`) | Lean `Geometry/Motion` (the split, the three kinds, the Iwasawa factors, pivots, the multiplier as a cross ratio, the path jets), `Geometry/{AffineSwing,SwingPotential}` (the half-turn), `HolonicsResearch/Zeta/Seam` (ξ is invariant under the half-turn about ½), `Foundation/FractalPacking.reflect_eq_swing`, `Geometry/{Swing,SwingBridges,Navigation,HolonicPantographicSwingJets,HolonicClockedPantographicSwing,HolonicClockedPantographicSwingApparatus}`, `Compression/Landmark/FixedPoint` (Möbius pivots and multipliers), `Physics/Spacetime/{Boost,Wigner}`; Rust `holonics::geometry::swing` (`half_turn`, `composed_translation`, `pantograph`, `harmonic_conjugate`, `swing_pair`) over `ℚ^d` anchors (`RationalPoint`), which the HNN junction's scattering calls (`hnn::propagation::junction_scattering`); `holonics::geometry::motion` (`Move`: the move pair `(v, v′)` over `ℤ[i]` carried undivided, its `kind` decided without division where a velocity vanishes, the traction disk, the power and the signed turn), which the chase's traction law, slip test and viable tube read (`holarchy::terrain::{chase, pursuit}`); `holonics::navigator::trace::SiteKind` (the projective kinds) | `holonics::geometry`; `Holonics.Geometry` |
 | Pair and tube charts | `screw_pair` (two motions, relative jet), `tube` (longitudinal transfer), `restrict` (transverse, gluing unique/plural/obstructed), neck, fold, junction | Lean `Transport/{HelicalPairInteraction,ContinuingTube,WorldTube,Neck,Fold,JunctionLaw,JetStaircase}`, `Geometry/PairResonance`, `Foundation/{ContinuingTower,IwasawaTower}`; Rust `holonics::geometry::screw`, `holonics::holon::restriction::{tube,tower}` | `holonics::geometry`; `Holonics.Geometry` |
 | Pair contact | `slip` (`J=[v_a\|−v_b]`), `quadrance` (`Q`, `DQ=2J*Δ`, `D²Q`), `material` (`M_contact=ΣwJ*DJ`), `power` (resistive element on slip), `lock_address` (Farey), `chain` (serial screw words and contact rows) | Lean `Transport/{HelicalPairInteraction,HolonicInteraction,HolonicChain,SerialScrewChain}`, `Geometry/PairResonance`, `Holon/Conformance.pairContact_resistive`; Rust `holonics::geometry::screw::{ScrewPair,PairQuadranceJet,SituatedScrew}` (the pair geometry), `holonics::holon::contact` (`PairContact`, `ContactMaterial`, `Alignment`, `SerialChain`), `holonics::navigator::address::LockAddress` | `holonics::holon::contact`; `Holonics.Holon` |
-| Parametron | `store`/`exchange` (`C`, `L`, `ω=1/√(LC)`, mode energy), `pump`, `lock` (half-turn sheets, Ising pairing), `tick` (section crossing), `read` (the perceptron face) | Lean `Objects/Parametron`, `Physics/{PhaseCarrier,CoupledIncidence,HolonicMeasuredParametron,HolonicTorusParametronRealization}`; Rust `holonics::holon::parametron` (`Parametron`, `Carrier`, `Population` (a coupled parametron population), `pump_storage`, `ring_crossings`) and the pumped-LC witness of `holonics::holon::conformance` | `holonics::holon::parametron`; `Holonics.Holon` |
+| Parametron | `store`/`exchange` (`C`, `L`, `ω=1/√(LC)`, mode energy), `pump` (a periodic modulation of the constitution: a declared schedule, or one modulated by the crossing cells), `floquet` (the monodromy of one period, the multipliers' placement about a circle, the certificate `M_TᵀGM_T ⪯ ρ²G` by inertia, the exact decision passive/edge/growing, the consumer's bound), `lock` (half-turn sheets, phase-sensitive amplification, the Ising site's exchange polynomial and logistic face, coupled locks), `tick` (section crossing), `read` (the perceptron face; the bank's relative-phase class), `hear` (modal coupling; dormancy) | Lean `Objects/{Parametron,ParametronLock}`, `HNN/{Ring,Floquet}`, `Physics/{PhaseCarrier,CoupledIncidence,HolonicMeasuredParametron,HolonicTorusParametronRealization}`; Rust `holonics::holon::parametron` (`Parametron`, `Carrier`, `Population` (a coupled parametron population), `pump_storage`, `ring_crossings`), `holonics::hnn::ring` (`PumpSchedule`, `ResonatorOperands::scheduled`, `Floquet`, `attain_metric`, `FloquetCertificate`, `FloquetReading`, `FloquetBound`, `lock`, `ReceivingBank`, `BankReading`) and the pumped-LC witness of `holonics::holon::conformance` | `holonics::holon::parametron`, `holonics::hnn::ring`; `Holonics.Holon` |
 | Navigator | `configure` (initial configuration: the key), `advance` (own clock, carry), `restrict` (scale square), `address` (source word), trace faces and the dynamical zeta, lock address, scale zeta and complex dimensions, `release` at tolerance | Lean `Holon/Navigator`, `Foundation/{FractalPacking,FractalString,NavigatorInference}`, `Transport/{NavigatorTraceFaces,SourceMoment,ReflectiveContinuation}`; Rust `holonics::navigator` (`Navigator`, `Transport`, `Clock`, `PhaseLift`, `address`), `holonics::navigator::trace::{SiteFactor,Machine}`; `holonics::navigator::Transport::Map`, a finite-order port map on `ℤ/d` with `order` and `compose` (Lean `Holon/Navigator.{map_pow_mod_order, map_turn_lossless, map_compose_order_pos, map_compose_order_dvd, mapRotor_order}`) | `holonics::navigator`; `Holonics.Navigator` |
 | Holon | `advance` (state, bond, energy balance), `interconnect -> Holarchy`, `contact` (a pair contact as element), `continue` (through a tube), `restrict`, `depose`, `pullback` | Lean `Holon/{Law,Port,Dirac,Element,Navigator,Restriction,Deposition,Reaction,Cayley,Conformance}`, `Foundation/{Holon,Lineage,ConnectionLineage}`, `Objects/Deposition`; Rust `holonics::holon` (`law`, `port`, `dirac`, `element`, `restriction`, `deposition`, `conformance`, `contact`, `parametron`; `reaction` retired September 28), `holonics::navigator` | `holonics::holon`; `Holonics.Holon` |
 | Receiver and receipt | `interact`/`receive -> InteractionReturn` (both participants' next states, face, receipt, boundary currents, power balance, unresolved fibre); `Ratio::between(receipts)`; `width`, `release` (the one decision law: threshold commit, certified draw `draw` at tolerance zero, probe with its `ProbePartition`, typed refusal; caller-declared decision and tolerance checks); `chord` (transfer object; Lean only, its Rust realization retired at U3, history at `c10acca9`, its laws in [RECEIVER_HOLARCHY](RECEIVER_HOLARCHY.md#the-causal-chord)); `heard`/`null`/`listened` (face, grain and reached action) | Lean `Holarchy/{Reception,Receipt,Hearing}`, `Foundation/{Receiver,ReceiverRelease,Standing,CausalChord,ReceiverAtlas,PresentationCost,SituatedInformationRate}`, `Transport/ChangingReceiver`, `Objects/Pairing`; Rust `holonics::receiver::reception` (`JointLaw::interact -> InteractionReturn` on the solved joint step, `ReceiverFace` and its three-term `FaceMotion`, `JointLaw::of_holarchy`; `HolonLaw::receive` is its zero-storage specialization `JointLaw::reading`), `holonics::receiver::receipt` (`Receipt`, `ReceiptLaw`, `ReceiptRatio::between` and `follow`, with `ratio::Presentation::follow`), `holonics::receiver::face` (faces and passive law; the face read at a grain, `GrainCell` and `grain_exponent`), `holonics::receiver::release` (the chaser's certified capture and probe return through it: `receiver::population::chaser`), `holonics::ratio::work::ExactWork`; history [`presentation_cost.rs`](https://github.com/brandonrdug/holonics/blob/13f8c734/crates/holonics-cuda/src/presentation_cost.rs), [`landauer.rs`](https://github.com/brandonrdug/holonics/blob/13f8c734/crates/holonics-cuda/src/landauer.rs); guide [RECEIVER_HOLARCHY](RECEIVER_HOLARCHY.md); the generic `receiver::reception::InteractionReturn<Fw, Pb, Dp, Ph, Rc>` of `Component`s and `receiver::release::DecisionRule` (the data form of `DecisionLaw`) | `holonics::receiver` (release operations); `Holonics.Receiver` |
@@ -341,20 +341,117 @@ and chain at `13f8c734` ([`helical.rs`](https://github.com/brandonrdug/holonics/
 
 ### 5. Parametron
 
-[definition] The **complex parametron** is the ring: oriented incidence `B`, storage `M_C` and flow
-`M_L`, complex modal transport, a time-periodic pump, damping and basin selection, a receiver, and
-an optional two-sheet quotient. Its phase carrier is `e^{iθ}`; the half-turn `e^{iπ}=−1` exchanges
-the two locked sheets, to which the pump is blind; on those sheets coupling `−w cos(θ_i−θ_j)` is
-exactly the Ising pairing `−w σ_iσ_j`. A **perceptron is one receiver face of a coupled parametron
-population**: fixed couplings, locked sheets, threshold readout. Storage and flow exchange at
-`ω=1/√(LC)`; a section crossing of the ring is a clock tick. Owners:
-`Physics/{PhaseCarrier,CoupledIncidence,HolonicMeasuredParametron}` and the torus realizations; the device refinement at `13f8c734`
-([`complex_parametron.rs`](https://github.com/brandonrdug/holonics/blob/13f8c734/crates/holonics-cuda/src/cuda_refine/complex_parametron.rs)) is a port
-source for `holonics::holon::parametron`. Joined in `Objects/Parametron`: the LC and generalized-mode
-energy exchange, the ring's owner crossings as `RationalClockPassage` ticks (`d ≥ 2`), and the
-threshold unit as the energy-minimizing locked sheet with a witness that equal perceptron outputs
-carry different phase energy and quadrature. Open: pump/Floquet locking dynamics; the continuous
-crossing of `A cos(ωt+φ)` equal to the micro-step ring.
+[definition; re-derived from its constitution, September 29
+([record](../research/records/2026-09-29_THE_PARAMETRON_RE_DERIVED_THE_PUMP_READS_RELATIVE_PHASE_AND_THE_FLOQUET_CERTIFICATE_DECIDES_THE_LOCK.md));
+Brandon: "please do not restrict us to clearly partially implemented constructs"] The **complex
+parametron** is the ring: oriented incidence `B` with its storage, a pump that modulates its
+constitution periodically, the Floquet monodromy of one pump period, the bifurcation where that
+monodromy starts to grow, two half-turn sheets past it, and its lock read as an Ising site. Its
+phase carrier is `e^{iθ}`; the half-turn `e^{iπ} = −1` exchanges the sheets, to which the pump is
+blind; on locked sheets the coupling `−w cos(θ_i − θ_j)` is exactly the Ising pairing `−w σ_iσ_j`.
+Storage and flow exchange at `ω = 1/√(LC)`, and a section crossing of the ring is a clock tick. The
+objects, each with its equation:
+
+```text
+storage        C = BᵀW_C B,  K = BᵀW_K B on node amplitudes z = x + iy;  E_Q = ½⟨w, Cw⟩ + ½⟨u, Ku⟩;  Kv = ω²Cv
+pump           K_t = K + ⊕ −2p R_(ψ_t),  R_ψ = [[cos ψ, sin ψ], [sin ψ, −cos ψ]], the reflection across ψ/2
+               ½ zᵀ(−2pR_ψ)z = −p Re(z² e^(−iψ)): the doubled phase, blind to the half-turn
+schedule       one carrier e^(iψ_t) a tick of the period T: declared a²s^t, or modulated by the crossing cells, (a²s^t)·c_t
+tick           x′ = T_t x on x = (u, w),  T_t = [[I − h²X_tK_t, 2hX_tC], [−2hX_tK_t, 4X_tC − I]],  X_t the executed solve
+monodromy      M_T = T_(T−1) ⋯ T_0, the holonomy of the pump's cycle
+certificate    G ≻ 0 and M_TᵀGM_T ⪯ ρ²G  ⇒  E_G(M_T^m x) ≤ ρ^(2m) E_G(x);  decided by In(G) and In(ρ²G − M_TᵀGM_T)
+placement      #{|μ| > r}, #{|μ| = r} = the half-plane counts of (1 − s)^n χ(r(1 + s)/(1 − s))
+consumer       E_Q(x_(τ+s)) ≤ (γ_hi/γ_lo) ρ^(2m) (max_t σ_t²)^(s − Tm) E_Q(x_τ),  γ_lo Q ⪯ G ⪯ γ_hi Q,  T_tᵀGT_t ⪯ σ_t²G
+axes           K_ψ a = (k − 2p) a,  K_ψ(ia) = (k + 2p)(ia),  a = e^(iψ/2);  standing bifurcation k − 2p = 0
+amplification  in-phase [[0, 1], [κ², 0]]: (1, κ) grows at +κ, (1, −κ) squeezes at −κ, read by κu_∥ + w_∥;  the quadrature turns
+sheet          σ = sign(κu_∥ + w_∥) of the seed: sign cos(φ_in − ψ/2) for a seed on the displacement
+relative       R_ψR_χ = the turn by ψ − χ,  tr = 2Re(e^(iψ)e^(−iχ));  Re(z_a z̄_b) even under the half-turn, every linear reading odd
+lock           Π(a) = 1 + a/K,  θ = aΠ′/Π = a/(a + K),  a∂_aθ = θ(1 − θ) ≤ ¼;  N locks: Π = ∏_i(1 + a/K_i), pivots a = −K_i
+capacity       S = Π(a₂)/Π(a₁) = ∏_i (a₂ + K_i)/(a₁ + K_i), strictly between 1 and (a₂/a₁)^N
+carry          (2πi)⁻¹ ∮_(|a| = r) Π′/Π da = #{i : K_i < r}
+coupled        two locks: Π = a² + 2ya + 1;  y = 1: (1 + a)²;  |y| < 1: both zeros on |a| = 1, off the real axis
+hearing        c_v = ⟨s, Mv⟩⟨r, v⟩ = 0 exactly when one coupling vanishes; a constitutive change can reopen it
+```
+
+- **The pump is a periodic modulation of the constitution.** [definition] An element relation with
+  its power (the Holon's `𝓔`): its work at a switch, `½⟨u, (K_t − K_(t−1))u⟩`, is a term of the
+  executed balance (`HNN/Ring.ring_tick_executed_energy_balance`). It retains nothing, so it is not
+  deposition. Its schedule is declared, or supplied at its port by the cells crossing the ring's
+  section, one tick a crossing.
+- **The Floquet monodromy and its certificate.** [proved-derived; formal-checked, implemented-exact]
+  The executed tick is linear in the state, and one period composes the monodromy. A metric `G`,
+  attained by any exterior means, is certified inside by Sylvester inertia, and the energy then grows
+  by at most `ρ²` a period (`HNN/Floquet.{floquet_energy_step, floquet_energy_iterate,
+  floquet_passive}`). The multipliers are placed exactly about any circle through the Cayley map
+  and the half-plane count, so a growth is enclosed with exact endpoints. **Its consumer** is the
+  constitution's certified step: through a pumped resonator the gain reads the consumer factor
+  above (`floquet_tick_product`, `floquet_metric_change`; Rust `hnn::ring::FloquetBound::reach`).
+  Until it reads it, a linear step through a pumped resonator stays refused (`UncertifiedGain`).
+- **The bifurcation.** [proved-derived; formal-checked] A standing pump's tick has the multiplier one
+  exactly where the pumped stiffness is singular (`standing_fixed_point_iff`): on the in-phase axis,
+  at `k − 2p = 0`. Below it the storage form is itself the certificate at `ρ = 1`
+  (`storage_form_certifies_passive`, from `ring_tick_port_balance`). The three kinds of the Swing
+  are its three sides: below, a damped turn; at it, a shear (the edge); past it, a boost. A rotating
+  pump resonates parametrically: [measured] the quarter-turn pump grows at strengths the standing
+  pump leaves passive, its growing multiplier negative (a half-turn with a boost, the subharmonic
+  lock); the half-turn pump's perpendicular axes cancel, and it stays passive past the standing
+  bifurcation. Its tongue boundaries are owed (#62).
+- **The two sheets and phase-sensitive amplification.** [proved-derived; formal-checked in the
+  continuous chart, implemented-exact in the executed law] Past the bifurcation the in-phase axis
+  boosts: its phase plane holds the growing quadrature `(1, κ)` and the squeezed `(1, −κ)`, and the
+  node plane's quadrature turns (`pumped_inphase_axis`, `inphase_growing`, `inphase_squeezed`,
+  `quadrature_turns`; the Cayley tick keeps each axis with the multiplier `(2 + hλ)/(2 − hλ)`,
+  `cayley_tick_eigen`). The envelope chart's "amplify the in-phase component, squeeze the
+  quadrature" is this boost read in the frame that rotates with the ring. The sheets are the two
+  rays `±v₊` of the growing Floquet mode; the pump cannot choose between them, and the seed's growing
+  coordinate does (`inphase_growing_coordinate`; Rust `hnn::ring::lock`).
+- **The locked-sheet face and the relative phase.** [proved-derived; formal-checked; measured] The
+  perceptron, the threshold of a local field, is the locked sheet's linear face: linear, then
+  threshold, and odd under the half-turn of its input. A relative phase `Re(z_a z̄_b)` is even under
+  the half-turn, so no linear reading followed by a threshold reads it
+  (`no_linear_threshold_reads_relative_phase`). The law's quadratic place is the pump. When the
+  crossing cells modulate the pump's carriers, the monodromy composes their reflections, and at
+  second order in the pump carries the turn by their relative phase (`reflection_mul_reflection`,
+  `reflection_pair_trace_carriers`): the **square law**. The bifurcation is the **threshold**. A
+  **bank of receiving parametrons at declared pump phases** (member `j`: axis `1`, step `i^j`, its
+  carriers `(c_e, i^j c_l)`) locks at the one member whose declared phase aligns the two cells, and
+  every other member is certified silent: the lock pattern is the relative phase's class, decided by
+  the Floquet certificate (Rust `hnn::ring::{ReceivingBank, BankReading}`; the record's counts).
+  Retired: the reading of the linear lock as a square-law reading of relative phase.
+- **The lock is an Ising site.** [definition; proved-derived; formal-checked] A two-sheet lock under
+  the bias `a` has the exchange polynomial `Π = 1 + a/K` (its partition function read at the resting
+  sheet) and the logistic face `θ = a/(a + K)`, whose susceptibility is at most `¼`
+  (`Objects/ParametronLock.{lockFace_logistic, lock_susceptibility_le_quarter}`); the threshold is its
+  face at zero temperature. [interpretation] Reading a pumped ring's basins under noise as this face at
+  a declared temperature is not proved.
+- **Capacity is the lock count, not the coordinate count.** [proved-derived; formal-checked] Each
+  factor of the selectivity is the cross ratio of the two biases about a pivot and `∞`, so `N` locks
+  separate two biases by at most `(a₂/a₁)^N` (`selectivity_lock_count_bound`). [proved-standard] A
+  bank of `N` members, each locking on an arc of relative phase, cuts the circle into at most `2N`
+  classes.
+- **The winding is the carry.** [proved-standard; formal-checked] On `|a| = r` the argument of `Π`
+  winds once for each pivot inside (`winding_is_carry`): as the bias's magnitude passes a pivot, one
+  more lock has flipped.
+- **Coupled locks (Lee–Yang).** [proved-derived; formal-checked] A ferromagnetic coupling moves the
+  pair's double pivot off the negative real axis onto the unit circle
+  (`coupled_zeros_leave_the_axis`): the coupled-sheet parametron.
+- **Modal hearing is dormancy.** [proved-derived; formal-checked] A mode is silent exactly when its
+  source or its receiver coupling vanishes, and a constitutive change can reopen it
+  (`modal_silent_iff`, `dormant_mode_reopens`). A bank's silent members are dormant: the
+  modulation that aligns a member's pump reopens it, and it locks.
+
+Owners: Lean `Objects/{Parametron,ParametronLock}`, `HNN/{Ring,Floquet}`,
+`Physics/{PhaseCarrier,CoupledIncidence,HolonicMeasuredParametron}` and the torus realizations; Rust
+`holonics::holon::parametron`, `holonics::hnn::ring` (the device refinement at `13f8c734`,
+[`complex_parametron.rs`](https://github.com/brandonrdug/holonics/blob/13f8c734/crates/holonics-cuda/src/cuda_refine/complex_parametron.rs),
+is a port source). `Objects/Parametron` joins the LC and generalized-mode exchange, the ring's
+crossings as `RationalClockPassage` ticks (`d ≥ 2`), and the threshold unit as the
+energy-minimizing locked sheet. [open] The rotating pump's tongue boundaries and its subharmonic
+multiplier below `−1`; a saturation (the law is linear, so a locked amplitude grows until a
+certified step or a declared saturation bounds it); the continuous crossing of `A cos(ωt + φ)` as
+the micro-step ring; the bank's reading of more than two superposed cells, where the monodromy
+through every crossing cell's pump reads the passage's spectrum at the ring's parametric
+resonance.
 
 ### 6. Tube and tower
 

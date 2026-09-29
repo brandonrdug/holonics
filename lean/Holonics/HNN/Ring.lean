@@ -77,8 +77,11 @@ generator form:    ż = A z ,  A = [[0, 1], [−C⁻¹K, 0]] ,  U = (1 − A_h)�
    absorbs a wrong solve. A gain at the positive lattice coordinate `q` backtracks to
    `quot L (q·2^(−L)/2) = ⌊(q + 1)/2⌋ ∈ [1, q]`: positive, never past the admissible side.
 
-[open] Pump/Floquet locking (that the pumped tick selects the two sheets as attracting basins) is
-not proved; the sheets are read, not asserted to attract (#62).
+[open] The pump's locking is the pumped ring's Floquet growth, stated in `HNN/Floquet` (the
+monodromy's certificate, the standing bifurcation, the growing and squeezed quadratures whose seed
+coordinate chooses the sheet, and the two pumps' composition that reads a relative phase). Owed
+(#62): the rotating pump's tongue boundaries and its subharmonic multiplier below `−1`; the law is
+linear, so no saturation holds a locked amplitude.
 
 No `sorry`, no `axiom`, no `native_decide`.
 -/
