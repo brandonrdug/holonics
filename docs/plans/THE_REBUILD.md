@@ -773,6 +773,11 @@ F3's gate (below) when the product deadline needs the card; parity for every cha
 resident HNN made by U1, U3 or U5 (the GPU suite, alone on an idle card); Lean curation (#147);
 equation extraction (#146).
 
+- **Systolic realization** (lens, September 29, [record](../../research/records/2026-09-29_SYSTOLIC_FLOW_THE_WORD_IS_A_SYSTOLIC_PULSE_AND_A_TABLE_IS_A_NAVIGATORS_RESIDENT_FACE.md)): the word is a systolic pulse, and
+  exact arithmetic on the card is a limb-wise integer multiply-accumulate on the tensor cores with the carry
+  cascade between limbs (the odometer). Its layout and width are derived from the device's capacity and
+  the data's rank. `holonics-cuda` has no tensor-core path yet.
+
 ### 4. The open joins and the learner's necessities, each disposed
 
 | Item | Disposition |
