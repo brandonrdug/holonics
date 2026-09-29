@@ -154,12 +154,19 @@ impl Diamond {
     /// **The two recursions** for the field's source rings and one admitted receiver, `e_last`
     /// rounds each (Lean `HNN/Retention.diamond_recursion`).
     pub fn of(field: &Field, phases: &ReceivingPhases) -> Self {
-        let last_epoch = phases.last_epoch();
+        Self::over(field, phases.ring(), phases.last_epoch())
+    }
+
+    /// **The two recursions for a receiver read at junction step `last_epoch`** of a span that
+    /// opens at the source rings: a refinement's continuing words read once, at their last junction
+    /// (`hnn::prediction`; the source re-enters at every word's open, never before the first, so
+    /// the reach is the first open's).
+    pub fn over(field: &Field, receiver: usize, last_epoch: usize) -> Self {
         Self {
-            receiver: phases.ring(),
+            receiver,
             last_epoch,
             reach: recursion(field, field.sources(), last_epoch),
-            observe: recursion(field, &[phases.ring()], last_epoch),
+            observe: recursion(field, &[receiver], last_epoch),
         }
     }
 

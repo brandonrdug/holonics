@@ -45,6 +45,19 @@
 //! word, without the borrow of its field (`KeptWord`), for the compare at the same commit, whose
 //! return consumes it.
 //!
+//! [definition; agent-inferred, U6's native generation (`hnn::prediction`; Brandon, September 29)]
+//! **Continuing motion within a refinement.** A word may open on the change the previous word of
+//! the same refinement left ([`Word::continuing`]): its storage waves, arriving waves, contact
+//! states and resonator states carry across the word's boundary instead of being released, with a
+//! declared injection added at the storage ports (the request's moment re-entering). The word then
+//! ticks on the refinement's clock: its hop clock and every resonator's pump phase read the ticks
+//! since the refinement opened ([`Word::opened_at`]), so a pump's cycle and the balance's resonator
+//! energies chain across the boundary. Only a refinement opens a continuing word; the refinement
+//! owns its words until its return consumes them, so the change still lives only inside the
+//! refinement (bounded by its words' ticks, never by a source length), and [`Current`] still holds
+//! no wave (guard 16). A word opened at rest ([`Word::open`]) is the continuing word opened on the
+//! zero change at tick zero (Lean `HNN/Retention.word_opens_at_zero` is that case).
+//!
 //! [definition; agent-inferred] **Within a step the rings, then the contacts, run together** (the
 //! hardware law; `hnn::realization`): every junction reads only its own storage and arrivals and
 //! its own anchor's remainder, every element only its own junction and storage remainder, and every
@@ -66,6 +79,7 @@
 //! fn borrowed(field: holonics::hnn::Field<'static>) {}
 //! ```
 
+use num_bigint::BigUint;
 use num_traits::{Signed, Zero};
 
 use crate::hnn::HnnError;
@@ -161,6 +175,9 @@ pub struct Word<'c> {
     fields: Vec<FieldBalance>,
     /// Every full tick's break receipts, per contact where its break law is declared.
     partings: Vec<Vec<Option<BreakReceipt>>>,
+    /// The refinement clock's ticks at the word's open: zero for a word opened at rest, the ticks
+    /// of the refinement's earlier words for a continuing word ([`Word::continuing`]).
+    opened_at: usize,
 }
 
 /// [definition] **A resonator inside a word**: its state `[u, w]`, its carried remainders, and its
@@ -396,8 +413,9 @@ impl PowerForm {
         Ok(&self.step / integer(4) * waves + stored)
     }
 
-    /// The declared resonator energy at the end state, measured with this constitution.
-    fn resonator_power(&self, change: &EndChange) -> Result<Rat, HnnError> {
+    /// **The declared resonators' energy at a change**, measured with this form's materials at each
+    /// resonator's form phase.
+    pub fn resonator_power(&self, change: &EndChange) -> Result<Rat, HnnError> {
         let mut total = Rat::zero();
         for (ring, state) in change.resonators.iter().enumerate() {
             let (Some(material), Some(state), Some(phase)) = (
@@ -777,36 +795,120 @@ impl<'c> Word<'c> {
         operands: Operands,
         storage: Vec<Vec<Rat>>,
     ) -> Result<Self, HnnError> {
-        if storage.len() != field.rings().len() {
+        let rest = EndChange::rest(field, &operands);
+        let storage_shaped = storage.len() == field.rings().len()
+            && field
+                .rings()
+                .iter()
+                .zip(&storage)
+                .all(|(ring, wave)| wave.len() == ring.width());
+        if !storage_shaped {
             return Err(HnnError::Shape {
-                what: "open storage",
+                what: "open storage (one wave per ring, each of its ring's width)",
                 expected: field.rings().len(),
                 found: storage.len(),
             });
         }
-        for (ring, wave) in field.rings().iter().zip(&storage) {
-            if wave.len() != ring.width() {
+        Self::on_change(
+            field,
+            operands,
+            EndChange { storage, ..rest },
+            0,
+        )
+    }
+
+    /// [definition; agent-inferred] **Open a continuing word** (module header, "Continuing motion
+    /// within a refinement"): on the change `change` the previous word of the same refinement left
+    /// (its storage waves, arriving waves, contact states and resonator states), with `injection`
+    /// added at every ring's storage port, at the refinement clock's tick `opened_at`. Every carried
+    /// remainder opens at zero: the previous word released its own at its end, and the opening
+    /// storage is split once at the transients' lattice, as at rest. Refused on a change or an
+    /// injection not of the field's shape, or on resonator states where none is declared.
+    pub fn continuing(
+        field: &'c Field,
+        operands: Operands,
+        change: &EndChange,
+        injection: &[Vec<Rat>],
+        opened_at: usize,
+    ) -> Result<Self, HnnError> {
+        if injection.len() != change.storage.len() {
+            return Err(HnnError::Shape {
+                what: "the injection (one wave per ring)",
+                expected: change.storage.len(),
+                found: injection.len(),
+            });
+        }
+        let mut storage = Vec::with_capacity(change.storage.len());
+        for (wave, added) in change.storage.iter().zip(injection) {
+            if wave.len() != added.len() {
                 return Err(HnnError::Shape {
-                    what: "ring storage wave",
-                    expected: ring.width(),
-                    found: wave.len(),
+                    what: "an injected wave against its ring's carried storage",
+                    expected: wave.len(),
+                    found: added.len(),
                 });
             }
+            storage.push(add(wave, added));
         }
+        Self::on_change(
+            field,
+            operands,
+            EndChange {
+                storage,
+                ..change.clone()
+            },
+            opened_at,
+        )
+    }
+
+    /// Open on a change at the refinement clock's tick `opened_at`: every shape checked, the
+    /// opening storage split once at the transients' lattice (the first tick of its error
+    /// feedback), every other carried remainder zero.
+    fn on_change(
+        field: &'c Field,
+        operands: Operands,
+        change: EndChange,
+        opened_at: usize,
+    ) -> Result<Self, HnnError> {
+        let EndChange {
+            storage,
+            arrivals,
+            states,
+            resonators: resonator_states,
+            ..
+        } = change;
         let widths: Vec<usize> = field.rings().iter().map(|ring| ring.width()).collect();
-        let arrivals: Vec<[Vec<Rat>; 2]> = field
-            .contacts()
-            .iter()
-            .map(|contact| {
-                let (from, to) = contact.ends();
-                [zeros(widths[from]), zeros(widths[to])]
-            })
-            .collect();
-        let states: Vec<[Vec<Rat>; 2]> = field
-            .contacts()
-            .iter()
-            .map(|contact| [zeros(contact.width()), zeros(contact.width())])
-            .collect();
+        let shaped = storage.len() == widths.len()
+            && storage.iter().zip(&widths).all(|(wave, n)| wave.len() == *n)
+            && arrivals.len() == field.contacts().len()
+            && states.len() == field.contacts().len()
+            && field
+                .contacts()
+                .iter()
+                .zip(arrivals.iter().zip(&states))
+                .all(|(contact, (pair, state))| {
+                    let (from, to) = contact.ends();
+                    pair[0].len() == widths[from]
+                        && pair[1].len() == widths[to]
+                        && state.iter().all(|x| x.len() == contact.width())
+                })
+            && resonator_states.len() == widths.len()
+            && resonator_states
+                .iter()
+                .zip(operands.resonators())
+                .all(|(state, declared)| match (state, declared) {
+                    (None, _) => true,
+                    (Some(state), Some(resonator)) => {
+                        state.iter().all(|x| x.len() == resonator.width())
+                    }
+                    (Some(_), None) => false,
+                });
+        if !shaped {
+            return Err(HnnError::Shape {
+                what: "a word's opening change (storage per ring, arrivals and states per contact, resonator states only where declared)",
+                expected: widths.len(),
+                found: storage.len(),
+            });
+        }
         let lattice = operands.lattice().map(|word| word.transient());
         let mut carried = Carried {
             anchors: widths.iter().map(|n| zeros(*n)).collect(),
@@ -817,8 +919,14 @@ impl<'c> Word<'c> {
                 .iter()
                 .map(|contact| zeros(contact.width()))
                 .collect(),
-            arrivals: arrivals.clone(),
-            states: states.clone(),
+            arrivals: arrivals
+                .iter()
+                .map(|pair| [zeros(pair[0].len()), zeros(pair[1].len())])
+                .collect(),
+            states: states
+                .iter()
+                .map(|state| [zeros(state[0].len()), zeros(state[1].len())])
+                .collect(),
         };
         // The source-open split belongs to the ordinary ring element's incoming storage chart.
         // Once a resonator is inserted after that element, the returned wave starts a distinct
@@ -842,21 +950,28 @@ impl<'c> Word<'c> {
         let resonators = operands
             .resonators()
             .iter()
-            .map(|resonator| {
+            .zip(resonator_states)
+            .map(|(resonator, state)| {
                 resonator.as_ref().map(|resonator| {
                     let n = resonator.width();
                     Resonance {
-                        state: [zeros(n), zeros(n)],
+                        state: state.unwrap_or_else(|| [zeros(n), zeros(n)]),
                         remainders: ResonatorRemainders::default(),
                         steps: Vec::new(),
                     }
                 })
             })
             .collect();
+        // The hop clock reads the refinement's ticks: a continuing word's clock opens where the
+        // previous word's stopped.
+        let mut clock = Clock::unwound(field.step().clone())?;
+        if opened_at > 0 {
+            clock.advance(&BigUint::from(opened_at));
+        }
         let mut word = Self {
             field,
             operands,
-            clock: Clock::unwound(field.step().clone())?,
+            clock,
             storage,
             arrivals,
             states,
@@ -871,6 +986,7 @@ impl<'c> Word<'c> {
             resonators,
             fields: Vec::new(),
             partings: Vec::new(),
+            opened_at,
         };
         word.peak_bits = word.state_bits();
         Ok(word)
@@ -894,6 +1010,74 @@ impl<'c> Word<'c> {
     /// The junction steps taken: every ring's tick count, since every junction ticks once per hop.
     pub fn ticks(&self) -> usize {
         self.passage.len()
+    }
+
+    /// The refinement clock's tick at the word's open (module header): zero at rest.
+    pub fn opened_at(&self) -> usize {
+        self.opened_at
+    }
+
+    /// Whether the word has run its last junction and ended.
+    pub fn is_ended(&self) -> bool {
+        self.ended
+    }
+
+    /// **Run `ticks` full ticks** (junction, element, loaded resonator, contact transit), each
+    /// balance recorded; refused once the word has ended.
+    pub fn run(&mut self, ticks: usize) -> Result<(), HnnError> {
+        for _ in 0..ticks {
+            self.tick()?;
+        }
+        Ok(())
+    }
+
+    /// **The change now** (module header, "Continuing motion within a refinement"): the storage
+    /// waves, the arriving waves, the contact states and the resonator states as the last full
+    /// tick left them, with the pump phase of each resonator's form, which a continuing word opens
+    /// on. Refused once the word has ended at a last junction, whose arriving waves are outgoing.
+    pub fn change(&self) -> Result<EndChange, HnnError> {
+        if self.ended {
+            return Err(HnnError::WordEnded {
+                ticks: self.passage.len(),
+            });
+        }
+        Ok(self.end_change())
+    }
+
+    /// The change as the word holds it, with each resonator's form phase: its last executed
+    /// tick's, and with no tick of this word the phase at the word's open.
+    fn end_change(&self) -> EndChange {
+        EndChange {
+            storage: self.storage.clone(),
+            arrivals: self.arrivals.clone(),
+            states: self.states.clone(),
+            resonators: self
+                .resonators
+                .iter()
+                .map(|resonance| resonance.as_ref().map(|r| r.state.clone()))
+                .collect(),
+            // The last executed tick's phase; with no full tick, the phase at the word's open,
+            // where the open state is read (`EndChange::resonator_phases`).
+            resonator_phases: self
+                .resonators
+                .iter()
+                .zip(self.operands.resonators())
+                .map(|(resonance, operands)| {
+                    resonance.as_ref().map(|r| {
+                        r.steps.last().map_or_else(
+                            || {
+                                // The open state is read at the phase the previous tick left
+                                // (`ResonatorOperands::step` reads `before` there), phase 0 at rest.
+                                operands.as_ref().map_or(0, |operands| {
+                                    operands.phase_at(self.opened_at.saturating_sub(1))
+                                })
+                            },
+                            |step| step.phase,
+                        )
+                    })
+                })
+                .collect(),
+        }
     }
 
     /// Every full tick's balance, in order.
@@ -1089,7 +1273,9 @@ impl<'c> Word<'c> {
             &self.carried.element_drive,
             &self.resonators,
         );
-        let tick = self.passage.len() - 1;
+        // The pump reads the refinement's clock: its phase at this tick continues across a
+        // continuing word's boundary (module header).
+        let tick = self.opened_at + self.passage.len() - 1;
         let steps = indexed(junctions.len(), |ring| {
             let element = element_step(
                 &operands.rings()[ring],
@@ -1506,27 +1692,7 @@ impl<'c> Word<'c> {
             balances: self.balances.clone(),
             last: self.last.clone(),
             last_bound: self.last_bound.clone(),
-            end: EndChange {
-                storage: self.storage.clone(),
-                arrivals: self.arrivals.clone(),
-                states: self.states.clone(),
-                resonators: self
-                    .resonators
-                    .iter()
-                    .map(|resonance| resonance.as_ref().map(|r| r.state.clone()))
-                    .collect(),
-                // The last executed tick's phase; with no full tick, phase 0, where the open
-                // state is read (`EndChange::resonator_phases`).
-                resonator_phases: self
-                    .resonators
-                    .iter()
-                    .map(|resonance| {
-                        resonance
-                            .as_ref()
-                            .map(|r| r.steps.last().map_or(0, |step| step.phase))
-                    })
-                    .collect(),
-            },
+            end: self.end_change(),
             remainders: self.carried.released(),
             charts: self.operands.charts(),
             resonators: self
@@ -1563,6 +1729,7 @@ impl<'c> Word<'c> {
             resonators,
             fields,
             partings,
+            opened_at,
         } = self;
         KeptWord {
             operands,
@@ -1581,6 +1748,46 @@ impl<'c> Word<'c> {
             resonators,
             fields,
             partings,
+            opened_at,
+        }
+    }
+}
+
+impl EndChange {
+    /// **The rest change** of a field at its operands: every storage wave, arriving wave and
+    /// contact state zero, and each declared resonator at rest at phase 0; the change a word opened
+    /// at rest carries (Lean `HNN/Retention.word_opens_at_zero`).
+    pub fn rest(field: &Field, operands: &Operands) -> Self {
+        let widths: Vec<usize> = field.rings().iter().map(|ring| ring.width()).collect();
+        Self {
+            storage: widths.iter().map(|n| zeros(*n)).collect(),
+            arrivals: field
+                .contacts()
+                .iter()
+                .map(|contact| {
+                    let (from, to) = contact.ends();
+                    [zeros(widths[from]), zeros(widths[to])]
+                })
+                .collect(),
+            states: field
+                .contacts()
+                .iter()
+                .map(|contact| [zeros(contact.width()), zeros(contact.width())])
+                .collect(),
+            resonators: operands
+                .resonators()
+                .iter()
+                .map(|resonator| {
+                    resonator
+                        .as_ref()
+                        .map(|r| [zeros(r.width()), zeros(r.width())])
+                })
+                .collect(),
+            resonator_phases: operands
+                .resonators()
+                .iter()
+                .map(|resonator| resonator.as_ref().map(|_| 0))
+                .collect(),
         }
     }
 }
@@ -1620,6 +1827,7 @@ pub(crate) struct KeptWord {
     resonators: Vec<Option<Resonance>>,
     fields: Vec<FieldBalance>,
     partings: Vec<Vec<Option<BreakReceipt>>>,
+    opened_at: usize,
 }
 
 impl KeptWord {
@@ -1642,6 +1850,7 @@ impl KeptWord {
             resonators,
             fields,
             partings,
+            opened_at,
         } = self;
         Word {
             field,
@@ -1661,6 +1870,7 @@ impl KeptWord {
             resonators,
             fields,
             partings,
+            opened_at,
         }
     }
 }

@@ -1099,8 +1099,7 @@ impl Operands {
     /// **The executed charts with no transient split**: every solve the executed chart's exact
     /// values and every junction weight the executed one, the word unsplit. The executed word's
     /// linear map, on which its return pairs exactly (Lean `HNN/LatticeWord.executed_adjoint_unique`,
-    /// the law's own tests).
-    #[cfg(test)]
+    /// the law's own tests, and the pairing check of every refinement, `hnn::prediction`).
     pub(crate) fn unsplit(mut self) -> Result<Self, HnnError> {
         let exact = |solve: &Solve| -> Result<Solve, HnnError> { Solve::exact(&solve.matrix()?) };
         for ring in &mut self.rings {
@@ -1108,6 +1107,11 @@ impl Operands {
         }
         for contact in &mut self.contacts {
             contact.solve = exact(&contact.solve)?;
+        }
+        for resonator in &mut self.resonators {
+            if let Some(operands) = resonator.take() {
+                *resonator = Some(operands.unsplit()?);
+            }
         }
         self.lattice = None;
         Ok(self)

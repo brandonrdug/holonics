@@ -1675,49 +1675,20 @@ pub fn compose(
     targets: &[usize],
     steps: &[ReceivingStep],
 ) -> Result<(Pullback, Deposit), HnnError> {
-    use crate::ratio::linear::vector::{Chart, combination, integral};
     let phases = ratio.phases();
     let diamond = Diamond::of(field, phases);
     let released = constitution.released();
     let retained = |locus: Locus| diamond.retains(field, locus) && !released.contains(&locus);
-    let anchor = ratio.anchor();
-    let current = ratio.current(field)?;
-    let moment = ratio.moment();
-    let alphabet = field.alphabet();
-    let h = field.step().clone();
-    let mut linear: Vec<LinearStep> = Vec::new();
-    let mut factors: Vec<FactorStep> = Vec::new();
-    let one = Rat::one();
-
-    // The receiving map: Σ_j g_j ⊗ P_R^(τ_R) v_R(e_j), by row blocks.
     let receiving = phases.ring();
-    let width_r = field.ring(receiving).width();
-    let read_charts: Vec<[Chart; 2]> = back
-        .reads
-        .iter()
-        .map(|(feature, gradient)| [integral(gradient), integral(feature)])
-        .collect();
-    let map_gradient = outer_rows(
-        2 * alphabet,
-        width_r,
-        &read_charts
-            .iter()
-            .map(|[gradient, feature]| (&one, gradient, feature))
-            .collect::<Vec<_>>(),
-    );
-    let samples = back
-        .reads
-        .iter()
-        .map(|(feature, gradient)| Sample {
-            weight: one.clone(),
-            feature: feature.clone(),
-            covector: negated(gradient),
-        })
-        .collect();
-    linear.push(LinearStep {
-        locus: LinearLocus::Receiving(receiving),
-        samples,
-    });
+    let composed = compose_return(
+        field,
+        constitution,
+        &diamond,
+        ratio.anchor(),
+        &ratio.current(field)?,
+        ratio.moment(),
+        back,
+    )?;
     // The receiving parametron's landmark tree (`compression::landmark::context`): each compared target deposits on
     // the paths its phase's causal address opens, in cell order, when the comparison reached the
     // receiving locus.
@@ -1742,10 +1713,95 @@ pub fn compose(
     } else {
         Vec::new()
     };
+    Ok((
+        composed.pullback,
+        Deposit::new(
+            constitution.commit(),
+            composed.linear,
+            composed.factors,
+            composed.reached,
+        )
+        .with_landmarks(landmarks)
+        .with_receiving(if retained(Locus::ReceivingMap(receiving)) {
+            steps.to_vec()
+        } else {
+            Vec::new()
+        }),
+    ))
+}
+
+/// [definition; agent-inferred] **A word return composed onto the loci** ([`compose_return`]): the
+/// complete pullback, the linear loci's windows, the factor families' steps and the loci reached,
+/// before any landmark tree or receiving face is joined to them.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct ComposedReturn {
+    pub pullback: Pullback,
+    pub linear: Vec<LinearStep>,
+    pub factors: Vec<FactorStep>,
+    pub reached: Vec<Locus>,
+}
+
+/// **A word return composed onto every locus inside a causal diamond** ([`compose`]'s law, read
+/// from its operands directly): the receiving map `R` of the diamond's receiver from the return's
+/// reads, every ring's element and standing, the source rings' ports and moment from the return's
+/// opening covector against the moment's counts at the lift `anchor`, the loaded resonators and
+/// the contacts, each only at loci the diamond retains and the constitution has not released.
+/// The compare composes a word's return in its pending ratio's diamond and joins the landmark tree
+/// to it; U6's native generation (`hnn::prediction`) composes a refinement's joined return in the
+/// refinement's diamond and joins nothing else.
+pub fn compose_return(
+    field: &Field,
+    constitution: &Constitution,
+    diamond: &Diamond,
+    anchor: &[BigInt],
+    current: &Current,
+    moment: &SourceMoment,
+    back: &WordReturn,
+) -> Result<ComposedReturn, HnnError> {
+    use crate::ratio::linear::vector::{Chart, combination, integral};
+    let released = constitution.released();
+    let retained = |locus: Locus| diamond.retains(field, locus) && !released.contains(&locus);
+    let alphabet = field.alphabet();
+    let h = field.step().clone();
+    let mut linear: Vec<LinearStep> = Vec::new();
+    let mut factors: Vec<FactorStep> = Vec::new();
+    let one = Rat::one();
+
+    // The receiving map: Σ_j g_j ⊗ P_R^(τ_R) v_R(e_j), by row blocks.
+    let receiving = diamond.receiver();
+    let width_r = field.ring(receiving).width();
+    let read_charts: Vec<[Chart; 2]> = back
+        .reads
+        .iter()
+        .map(|(feature, gradient)| [integral(gradient), integral(feature)])
+        .collect();
+    let map_gradient = outer_rows(
+        2 * alphabet,
+        width_r,
+        &read_charts
+            .iter()
+            .map(|[gradient, feature]| (&one, gradient, feature))
+            .collect::<Vec<_>>(),
+    );
+    let samples = back
+        .reads
+        .iter()
+        .map(|(feature, gradient)| Sample {
+            weight: one.clone(),
+            feature: feature.clone(),
+            covector: negated(gradient),
+        })
+        .collect();
+    if retained(Locus::ReceivingMap(receiving)) {
+        linear.push(LinearStep {
+            locus: LinearLocus::Receiving(receiving),
+            samples,
+        });
+    }
 
     // The rings' element material and class covectors, the rings together.
     let parts = indexed(field.rings().len(), |g| {
-        compose_ring(field, constitution, back, &diamond, &retained, g)
+        compose_ring(field, constitution, back, diamond, &retained, g)
     })?;
     let mut ring_pullbacks = Vec::with_capacity(parts.len());
     let mut classes_all: Vec<Vec<Rat>> = Vec::with_capacity(parts.len());
@@ -2005,7 +2061,7 @@ pub fn compose(
             field,
             constitution,
             back,
-            &diamond,
+            diamond,
             &retained,
             anchor,
             &h,
@@ -2028,16 +2084,12 @@ pub fn compose(
         resonators: resonator_pullbacks,
         receiving: (receiving, matrix_of(map_gradient, width_r)?),
     };
-    Ok((
+    Ok(ComposedReturn {
         pullback,
-        Deposit::new(constitution.commit(), linear, factors, reached)
-            .with_landmarks(landmarks)
-            .with_receiving(if retained(Locus::ReceivingMap(receiving)) {
-                steps.to_vec()
-            } else {
-                Vec::new()
-            }),
-    ))
+        linear,
+        factors,
+        reached,
+    })
 }
 
 /// **One ring's part of the composition**: its contrast port's window (when retained), its

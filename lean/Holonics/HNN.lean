@@ -16,6 +16,7 @@ import Holonics.HNN.Contact
 import Holonics.HNN.ContactBreak
 import Holonics.HNN.BornFace
 import Holonics.HNN.ModeQuotient
+import Holonics.HNN.Prediction
 
 /-!
 # The HNN law
@@ -43,6 +44,7 @@ design: the HNN law", table (b) rows 1–8, stated before their Rust owners in `
 | `HNN/ContactBreak` | campaign 2, item 8: the released storage `R = E_a + W_a − D_a − E_a′`, the advance `R ≥ J`, Griffith's closed-port case, the parted face's typed gluing defect | `hnn::contact`, `hnn::field` |
 | `HNN/BornFace` | Decision 33: the wave read by the Born rule, a finitely correlated receiver on the receiving ring's register: the normalized digit split and dyadic cell face, the reception keeping a density, the density as the retained quotient, the absorbed unitary tick, the interference zero no nonnegative receiver makes, the exact covector and the Fisher-scored step | `hnn::born` (its Rust receiver `hnn::born` retired September 28) |
 | `HNN/ModeQuotient` | Campaign 3, first construction: a loaded ring's modes descend to their future quotient: the pump's cycle factors through its period (`cycle_mul_add`), so the period lift reads exactly the admitted future (`periodic_lift_exact`); one chart for every phase releases at most the phase family's kernel, which lies in it (`shared_chart_le_phase_kernel`, `phase_kernel_le_lift`); the descended ring returns the same wave for every drive (`descended_run`, `descended_run_reads`); a pair silent at the loaded port on its state and its tick stores nothing (`released_pair_storage_null`); the learning covector factors through the chart (`descended_costate`, `descended_gain`, `gain_fibre_invariant`) exactly when each gain family's variation vanishes on the release (`solved_pairing_null_iff`), which capacity and dissipation always do and stiffness and pump do under a half-turn pump cycle (`half_turn_separates`) but not at a standing pump's threshold (`standing_pump_threshold_reads_release`), so a learning aeon admits the variations as receivers (`learning_chart_le_kernel`); and the descended block ticks with its descended storage form and the full ring's balance (`descended_form`, `descended_balance`) | retired at U2 (`hnn::modes`, at commit `1bdacc8f`) |
+| `HNN/Prediction` | THE_REBUILD U6, native generation: the refinement is `K` words of one step (`refine_iterate`); the joint section is `Holon.ofEvolution` read at every station from the one refined field (`jointSection`, `jointSection_receive`); its image is not the product of its marginals (`joint_not_marginals`, `jointImage_ne_marginalProduct`); a reading through a face constant on the fibre releases at width zero and a parted one is held (`release_width_zero`, `plural_section_held`); the consumer equation is `ofEvolution_receive_eq_encoded` at `F^[K]` (`consumer_eq`) | `hnn::prediction` |
 
 [definition] The receiving parametron's storage is the receiving tree, the shift navigator's
 landmarks: its laws are `Compression/Landmark/Context` (its Rust owner

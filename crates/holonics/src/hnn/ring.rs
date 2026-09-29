@@ -844,6 +844,18 @@ impl ResonatorOperands {
         self
     }
 
+    /// **The executed charts with no transient split**: every phase's solve the executed chart's
+    /// exact values, its certificate kept (the resonator's part of the word's executed linear map,
+    /// on which a return pairs exactly: `Operands::unsplit`).
+    pub(crate) fn unsplit(mut self) -> Result<Self, HnnError> {
+        for phase in &mut self.phases {
+            if let PhaseSolve::Chart(chart) = &phase.solve {
+                phase.solve = PhaseSolve::Exact(chart.to_matrix()?);
+            }
+        }
+        Ok(self)
+    }
+
     /// Apply the transpose of the executed phase solve to a covector.
     pub fn solve_transpose(&self, phase: usize, covector: &[Rat]) -> Result<Vec<Rat>, HnnError> {
         self.phases[phase].solve.apply_transpose(covector)

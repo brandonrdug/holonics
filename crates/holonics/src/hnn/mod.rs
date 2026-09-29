@@ -69,7 +69,11 @@
 //!   reference change;
 //! - [`contact`] (campaign 2): the contact's transfer and site kind, its certified boost, its lock
 //!   address and its break receipt, with [`contact_readings`], the lock and site readings the
-//!   receiving join consumes.
+//!   receiving join consumes;
+//! - [`prediction`] (THE_REBUILD U6, native generation): a section of the receiving ring refined by
+//!   `K` continuing words from the request's moment and a latent, read jointly at every station
+//!   from one anchor, released at width zero through `receiver::release`, and learned by its
+//!   covector pulled back through the `K` words (`Word::continuing`, `Word::pull_back_continuing`).
 //!
 //! [definition; agent-inferred, U2] A loaded ring's mode quotient (campaign 3's first construction)
 //! is Lean's (`HNN/ModeQuotient`); its Rust realization (`hnn::modes`, at commit `1bdacc8f`) was
@@ -85,7 +89,8 @@
 //! below, and every value is [`crate::ratio::Rat`] or an exact integer); the [`SourceMoment`] is
 //! sized once from the field and accepts closing source rings only; a [`Word`] borrows its field,
 //! is not `Clone`, and owns the only waves and contact states; [`Current`] holds the lift point and
-//! nothing else, so no change outlives its word; `propagation` exposes only junction-local solves.
+//! nothing else, so no change outlives its word, or, for a continuing word, the refinement that
+//! owns it until its return (`prediction`); `propagation` exposes only junction-local solves.
 //! Their `compile_fail` proofs are doctests on the types, and their runtime tests are in
 //! `tests/guards.rs`.
 //!
@@ -109,6 +114,7 @@
 //! | the block incidence, the contrast map read from its blocks, and the Holarchy chart | `Holon/Complex.{blockIncidence, block_flat_closed}`, `Holarchy/Join.interconnect` | [`Field::connection`], [`Field::contrast`], [`Field::holarchy`] |
 //! | the port's returns | `Holarchy/Reception.InteractionReturn` (the owner's, generic in its payloads) | [`ExecutionPort`] |
 //! | the mount certifies the Holarchy; its parametric orientation carries the aeons | `Holarchy/Join.interconnect`, `Holarchy/Join.Holarchy.parametric` | [`Reference`] (`mount_with`), [`reference::Resident::parametric`] |
+//! | native generation: the joint section, joint against marginals, the release at width zero, the consumer equation (U6) | `HNN/Prediction.{refine_iterate, jointSection, jointSection_receive, joint_not_marginals, release_width_zero, plural_section_held, consumer_eq}` | [`prediction`] |
 //! | the aeon at its boundary: readings, epochs as section flux, the carry-out's cycle | `Aeon/Clock/Winding.{reading_navigatorClock, torus_cycle_reads_whole_windings}`, `Aeon/Clock/Epoch.signed_count_is_flux`, `HNN/Retention.lift_reading` | [`retention::aeon_readings`], [`AeonBoundary`] |
 //! | the first law over an aeon, on enclosed code lengths, with the face against the literal | `Aeon/Production/FirstLaw.{ledger_telescopes, enclosed_telescopes}` | [`crate::aeon::EnclosedLedger`] in the resident; [`AeonBoundary::first_law`], [`AeonBoundary::literal`] |
 //!
@@ -130,6 +136,7 @@ pub mod keys;
 pub mod moment;
 pub mod pending;
 pub mod port;
+pub mod prediction;
 pub mod propagation;
 pub mod ratio;
 pub(crate) mod realization;

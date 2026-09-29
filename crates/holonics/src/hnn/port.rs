@@ -761,6 +761,42 @@ pub struct ResonatorPullback {
     pub energy: [Rat; 4],
 }
 
+/// [definition; agent-inferred] **A covector on a word's change** (U6's native generation,
+/// `hnn::prediction`; `hnn::word`'s "Continuing motion within a refinement"): one covector per
+/// part of the change a continuing word opens on, in the change's own shape (the storage waves per
+/// ring, the arriving waves per contact `[at from, at to]`, the contact states `[u, w]`, and each
+/// declared resonator's state `[u, w]`). A continuing word's return reads the covector on its end
+/// change (the next word's opening covector) and returns the covector on its opening change.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct ChangeCovector {
+    pub storage: Vec<Vec<Rat>>,
+    pub arrivals: Vec<[Vec<Rat>; 2]>,
+    pub states: Vec<[Vec<Rat>; 2]>,
+    pub resonators: Vec<Option<[Vec<Rat>; 2]>>,
+}
+
+impl ChangeCovector {
+    /// **The pairing** `⟨μ, x⟩` of the covector with a change of the same shape, every part summed.
+    pub fn pairing(&self, change: &crate::hnn::word::EndChange) -> Rat {
+        let mut total = Rat::zero();
+        for (covector, wave) in self.storage.iter().zip(&change.storage) {
+            total += dot(covector, wave);
+        }
+        for (covector, pair) in self.arrivals.iter().zip(&change.arrivals) {
+            total += dot(&covector[0], &pair[0]) + dot(&covector[1], &pair[1]);
+        }
+        for (covector, state) in self.states.iter().zip(&change.states) {
+            total += dot(&covector[0], &state[0]) + dot(&covector[1], &state[1]);
+        }
+        for (covector, state) in self.resonators.iter().zip(&change.resonators) {
+            if let (Some(covector), Some(state)) = (covector, state) {
+                total += dot(&covector[0], &state[0]) + dot(&covector[1], &state[1]);
+            }
+        }
+        total
+    }
+}
+
 impl<'c> Word<'c> {
     /// **The word's return over its own per-tick waves** (module header). `map` is the receiving
     /// map `R` and `lift` the receiving ring's lift `τ_R` the read used.
@@ -772,6 +808,32 @@ impl<'c> Word<'c> {
         phases: &ReceivingPhases,
     ) -> Result<WordReturn, HnnError> {
         reverse(&self, covector, map, lift, phases)
+    }
+
+    /// [definition; agent-inferred] **A continuing word's return** (U6's native generation,
+    /// `hnn::prediction`): the same reverse sweep over the word's own per-tick waves, the transpose
+    /// of the linear map each tick executed at its fixed operands, read from two sources. `anchors`
+    /// holds, per junction step, the covector on the receiving ring `receiving`'s anchor at that
+    /// step (a section's station reads, already pulled back through its receiving map and phase
+    /// bindings); `end` is the covector on the change the word ends with, which a word that ended
+    /// at a last junction does not continue (refused there). It returns the word's return (its
+    /// `reads` empty: the caller holds the stations' reads) and the covector on the word's opening
+    /// change, which the previous word of the refinement reads as its `end`. The word is consumed
+    /// (guard 2).
+    pub fn pull_back_continuing(
+        self,
+        anchors: Vec<Option<Vec<Rat>>>,
+        receiving: usize,
+        end: Option<&ChangeCovector>,
+    ) -> Result<(WordReturn, ChangeCovector), HnnError> {
+        if anchors.len() != self.recorded().len() {
+            return Err(HnnError::Shape {
+                what: "one anchor covector slot per junction step of the word",
+                expected: self.recorded().len(),
+                found: anchors.len(),
+            });
+        }
+        reverse_core(&self, anchors, receiving, end)
     }
 }
 
@@ -870,9 +932,7 @@ fn reverse(
     phases: &ReceivingPhases,
 ) -> Result<WordReturn, HnnError> {
     let field = word.field();
-    let operands = word.operands();
-    let records = word.recorded();
-    let steps = records.len();
+    let steps = word.recorded().len();
     if steps != phases.junction_steps() {
         return Err(HnnError::Shape {
             what: "the word's junction steps against its receiving window",
@@ -887,7 +947,6 @@ fn reverse(
             found: covector.logits().len(),
         });
     }
-    let lattice = operands.lattice().map(|word| word.transient());
     let receiving = phases.ring();
     let receiving_ring = field.ring(receiving);
     let map_t = map.transpose()?;
@@ -903,50 +962,55 @@ fn reverse(
             .ok_or(HnnError::WordEnded { ticks: steps })?;
         reads.push((receiving_ring.rotate(anchor, lift), gradient));
     }
+    let (mut back, _) = reverse_core(word, read_covector, receiving, None)?;
+    back.reads = reads;
+    Ok(back)
+}
+
+/// **The reverse sweep** over a word's own per-tick waves (module header, "The word's return"):
+/// from the covector on the receiving ring's anchor at each junction step (`read_covector`, carried
+/// on the transients' lattice as it enters) and, for a word that did not end at a last junction,
+/// the covector on its end change (`end`, a continuing word's; `hnn::prediction`). Every step of a
+/// word that ended at its last junction but that last one reverses its element, loaded resonator
+/// and transit; every step of a continuing word does. Returns the word's return (its `reads`
+/// empty) and the covector on the word's opening change.
+fn reverse_core(
+    word: &Word<'_>,
+    mut read_covector: Vec<Option<Vec<Rat>>>,
+    receiving: usize,
+    end: Option<&ChangeCovector>,
+) -> Result<(WordReturn, ChangeCovector), HnnError> {
+    let field = word.field();
+    let operands = word.operands();
+    let records = word.recorded();
+    let steps = records.len();
+    if receiving >= field.rings().len() {
+        return Err(HnnError::RingOutside {
+            ring: receiving,
+            rings: field.rings().len(),
+        });
+    }
+    if end.is_some() && word.is_ended() {
+        return Err(HnnError::WordEnded { ticks: steps });
+    }
+    let lattice = operands.lattice().map(|word| word.transient());
     let h = operands.step().clone();
     let rings = operands.rings();
     let contacts = operands.contacts();
     let widths: Vec<usize> = field.rings().iter().map(|ring| ring.width()).collect();
-    let mut storage_bar: Vec<Vec<Rat>> = widths.iter().map(|n| zeros(*n)).collect();
-    let mut arrival_bar: Vec<[Vec<Rat>; 2]> = contacts
+    let rest_storage: Vec<Vec<Rat>> = widths.iter().map(|n| zeros(*n)).collect();
+    let rest_arrivals: Vec<[Vec<Rat>; 2]> = contacts
         .iter()
         .map(|contact| {
             let (from, to) = contact.ends();
             [zeros(widths[from]), zeros(widths[to])]
         })
         .collect();
-    let mut displacement_bar: Vec<Vec<Rat>> = contacts
+    let rest_states: Vec<Vec<Rat>> = contacts
         .iter()
         .map(|contact| zeros(contact.width()))
         .collect();
-    let mut rate_bar = displacement_bar.clone();
-    let mut carried = Adjoint {
-        storage: storage_bar.clone(),
-        arrivals: arrival_bar.clone(),
-        displacement: displacement_bar.clone(),
-        rate: rate_bar.clone(),
-        elements: storage_bar.clone(),
-        resonator_drive: storage_bar.clone(),
-        resonator_rate: storage_bar.clone(),
-        resonator_solve: storage_bar.clone(),
-        resonator_state: operands
-            .resonators()
-            .iter()
-            .map(|resonator| {
-                resonator
-                    .as_ref()
-                    .map(|r| [zeros(r.width()), zeros(r.width())])
-            })
-            .collect(),
-        zetas: displacement_bar.clone(),
-        solved: displacement_bar.clone(),
-        reads: zeros(widths[receiving]),
-    };
-    let mut conductance = vec![Rat::zero(); contacts.len()];
-    let mut elements: Vec<Vec<ElementTick>> = vec![Vec::new(); rings.len()];
-    let mut resonator_ticks: Vec<Vec<ResonatorTick>> = vec![Vec::new(); rings.len()];
-    let mut transits: Vec<Vec<TransitTick>> = vec![Vec::new(); contacts.len()];
-    let mut resonator_state_bar: Vec<Option<[Vec<Rat>; 2]>> = operands
+    let rest_resonators: Vec<Option<[Vec<Rat>; 2]>> = operands
         .resonators()
         .iter()
         .map(|resonator| {
@@ -955,6 +1019,65 @@ fn reverse(
                 .map(|r| [zeros(r.width()), zeros(r.width())])
         })
         .collect();
+    // The covector on the end change seeds the sweep; a word that ended opens it at zero.
+    let (mut storage_bar, mut arrival_bar, mut displacement_bar, mut rate_bar) = match end {
+        Some(end) => {
+            let shaped = end.storage.len() == widths.len()
+                && end.storage.iter().zip(&widths).all(|(x, n)| x.len() == *n)
+                && end.arrivals.len() == contacts.len()
+                && end.states.len() == contacts.len()
+                && end.resonators.len() == widths.len();
+            if !shaped {
+                return Err(HnnError::Shape {
+                    what: "a covector on a word's end change",
+                    expected: widths.len(),
+                    found: end.storage.len(),
+                });
+            }
+            (
+                end.storage.clone(),
+                end.arrivals.clone(),
+                end.states.iter().map(|state| state[0].clone()).collect(),
+                end.states.iter().map(|state| state[1].clone()).collect(),
+            )
+        }
+        None => (
+            rest_storage.clone(),
+            rest_arrivals.clone(),
+            rest_states.clone(),
+            rest_states.clone(),
+        ),
+    };
+    let mut carried = Adjoint {
+        storage: rest_storage.clone(),
+        arrivals: rest_arrivals.clone(),
+        displacement: rest_states.clone(),
+        rate: rest_states.clone(),
+        elements: rest_storage.clone(),
+        resonator_drive: rest_storage.clone(),
+        resonator_rate: rest_storage.clone(),
+        resonator_solve: rest_storage.clone(),
+        resonator_state: rest_resonators.clone(),
+        zetas: rest_states.clone(),
+        solved: rest_states.clone(),
+        reads: zeros(widths[receiving]),
+    };
+    let mut conductance = vec![Rat::zero(); contacts.len()];
+    let mut elements: Vec<Vec<ElementTick>> = vec![Vec::new(); rings.len()];
+    let mut resonator_ticks: Vec<Vec<ResonatorTick>> = vec![Vec::new(); rings.len()];
+    let mut transits: Vec<Vec<TransitTick>> = vec![Vec::new(); contacts.len()];
+    let mut resonator_state_bar: Vec<Option<[Vec<Rat>; 2]>> = match end {
+        Some(end) => end
+            .resonators
+            .iter()
+            .zip(&rest_resonators)
+            .map(|(covector, rest)| match (covector, rest) {
+                (Some(covector), Some(_)) => Some(covector.clone()),
+                (_, rest) => rest.clone(),
+            })
+            .collect(),
+        None => rest_resonators.clone(),
+    };
     for t in (0..steps).rev() {
         let record = &records[t];
         // The step's junctions, read from its own record at the anchors the word carried: the
@@ -984,7 +1107,9 @@ fn reverse(
             .collect();
         let (mut displacement_prev, mut rate_prev) = (displacement_bar.clone(), rate_bar.clone());
         let mut resonator_state_prev = resonator_state_bar.clone();
-        if t + 1 < steps {
+        // A word that ended stopped after its last junction; a continuing word's every step is a
+        // full tick.
+        if t + 1 < steps || !word.is_ended() {
             // Reverse the loaded storage-port stage first. Its drive covector then enters the
             // element transpose, so the junction and contact receive the complete loaded path.
             let loaded = indexed(rings.len(), |r| {
@@ -1313,13 +1438,26 @@ fn reverse(
     for ticks in &mut resonator_ticks {
         ticks.reverse();
     }
-    Ok(WordReturn {
-        opening: storage_bar,
-        elements,
-        transits,
-        resonators: resonator_ticks,
-        conductance,
-        reads,
-        released: carried.released(),
-    })
+    let opening = ChangeCovector {
+        storage: storage_bar.clone(),
+        arrivals: arrival_bar,
+        states: displacement_bar
+            .into_iter()
+            .zip(rate_bar)
+            .map(|(displacement, rate)| [displacement, rate])
+            .collect(),
+        resonators: resonator_state_bar,
+    };
+    Ok((
+        WordReturn {
+            opening: storage_bar,
+            elements,
+            transits,
+            resonators: resonator_ticks,
+            conductance,
+            reads: Vec::new(),
+            released: carried.released(),
+        },
+        opening,
+    ))
 }

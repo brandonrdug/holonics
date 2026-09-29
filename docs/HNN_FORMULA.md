@@ -5,7 +5,8 @@
 [operator contract](ELEMENTARY_OBJECTS.md#operator-contract)'s HNN row: the word, deposition and
 the collapse of campaigns 1–2 and the loaded resonator (`hnn::ring`); a loaded ring's mode quotient
 (campaign 3's first construction) is Lean's `HNN/ModeQuotient` ([§4](#the-loaded-rings-mode-quotient)).
-Release through modes, Holonic Encoding and joint prediction have no owner yet. [THE_MACHINE](THE_MACHINE.md) states the object,
+Release through modes and Holonic Encoding have no owner yet; joint prediction's smallest form is
+`hnn::prediction` (U6, [below](#generation-as-field-refinement-and-boundary-radiation)). [THE_MACHINE](THE_MACHINE.md) states the object,
 [THE_REBUILD](plans/THE_REBUILD.md) the order and [CONSTRUCTION_STATE](../CONSTRUCTION_STATE.md) the
 position; the [elementary objects](ELEMENTARY_OBJECTS.md) own the vocabulary.
 The HNN is the compression machine at scale ([the line](THE_MACHINE.md#the-line-the-rebuild-serves)):
@@ -484,6 +485,23 @@ Holon type. Its encoding theorem equates full and reduced generation when their 
 its composition equivalence carries one latent population through two refinements. Neither needs
 a trajectory archive or independent output marginals.
 
+[definition; agent-inferred, U6, September 29] **The smallest native form** (`hnn::prediction`,
+Lean `HNN/Prediction`). The latent section is the receiving ring's change: `x(0) = I_h(ξ)`, the
+latent `ξ` on the receiving ring and the request's moment `s_g = P_g^(τ_g) m̃_g` on the source
+rings (egg packing). The refinement is `x_(n+1) = F_Θ(x_n, m̃)`, one word of `w` full ticks
+(junction scattering → element → loaded resonator → contact transit) opened on the change the
+previous word left, the moment re-entering at every word; `K` words are declared and the
+refinement clock is `n`. The joint readout reads every station from the one anchor at the last
+word's last junction, `y_j = ρ_R(P_R^(1+j) v_R)`, `j < m ≤ d_R`: station `j` is the receiving
+ring's clock unwound from the request's last tick, `τ + 1 + j`, its target phase `(1 + j)/d_R`
+turns. The section's reading is every station's top class at the grain, released at width zero
+through `receiver::release` (`release_width_zero`) and held when plural; a selection is a keyed
+member of the latent family, never a marginal draw (`joint_not_marginals`). The consumer equation
+is `ρ(F^K(I_h(ξ))) = T(request)` (`consumer_eq`). Learning pulls `R⁻¹dR` at every station back
+through `R`, each station's phase binding and the `K` words in reverse (`Word::pull_back_continuing`),
+composes it onto the refinement's diamond and deposits it by the normal law. The path reads no
+window, no landmark tree and no copy stage.
+
 ### Bounded exact transport-family inference
 
 [established-bounded; source-inspected] A finite deterministic construction shows how an exact
@@ -722,7 +740,9 @@ receive   f_j = R[P_R^(τ_R) v_R(e_j)] at the receiving epochs, read at the rece
   finite remainder `pairScore_add_sub`).
 - **The sheet classes** `σ` are read from the standing's contrast `Δ_r = Σ_a U_(r←a) q_a − q_r`.
 - **At the word's end** the unread change is released, and nothing is carried to the next word.
-  The standing `q` moves only by deposition.
+  The standing `q` moves only by deposition. Within one refinement (native generation,
+  `hnn::prediction`) a continuing word opens on the change the previous word left; the refinement
+  owns its words until its return (THE_MACHINE guard 16).
 - **What the word lacks.** It has no global `D/b`, no softmax drive, no boundary hold `H̄` and no
   relaxation `μ`. Those belonged to the prototype's word, which is kept in history at
   [`13f8c734`](https://github.com/brandonrdug/holonics/blob/13f8c734/docs/HNN_FORMULA.md#the-incident-word).
