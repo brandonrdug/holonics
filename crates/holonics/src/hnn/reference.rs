@@ -516,13 +516,7 @@ pub fn compare_phase(
         },
         || -> Result<(Scored, HolonRatio, RatioCovector), HnnError> {
             let scored = ratio.scored(constitution, &against, targets)?;
-            let anchors = target_phases(
-                field,
-                ratio.anchor(),
-                ratio.moment().founded(),
-                phases.ring(),
-                targets,
-            )?;
+            let anchors = target_phases(field, ratio.anchor(), phases.ring(), targets)?;
             let holon = HolonRatio::compare(against.faces.clone(), targets, &anchors)?;
             let covector = holon.covector()?;
             Ok((scored, holon, covector))
@@ -985,9 +979,7 @@ impl ExecutionPort for Reference {
             return Err(HnnError::KeysNotAdmitted);
         }
         let field = resident.field.clone();
-        // The crib is read as its cells' step codes (`Field::step_codes`): the exterior codes on a
-        // chart with no machine, the founded classes the source moment reached on a founded chart.
-        let codes = codes(crib, field.steps())?;
+        let codes = codes(crib, field.alphabet())?;
         if codes.len() as u64 > resident.aeon.closed {
             return Err(HnnError::Shape {
                 what: "a closing crib's cells against the closed aeon's",
@@ -2961,14 +2953,11 @@ where
     let alphabet = field.alphabet();
     let crib = field.crib();
     let cells = &cut.cells;
-    // The cells' step codes (`Field::step_codes`): the one moment opens at the cut's first cell, so
-    // its founded class reaches each cell's step code as these do; a closing crib is read by them.
-    let steps = field.step_codes(cells)?;
     let mut keys = Vec::new();
     let mut locate = |resident: &mut P::Resident, span: Range<usize>| -> Result<(), HnnError> {
         if span.len() > crib.offset {
             let at = span.end as u64;
-            let located = port.locate_keys(resident, &one_hot(&steps[span]), crib.offset)?;
+            let located = port.locate_keys(resident, &one_hot(&cells[span]), crib.offset)?;
             keys.push(KeyReport {
                 cell: at,
                 detail: located.receipt.detail,

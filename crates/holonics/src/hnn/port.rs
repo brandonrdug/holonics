@@ -606,10 +606,9 @@ pub trait ExecutionPort {
     >;
 
     /// Locates the ring keys, per ring in carry order, from the crib that closed the aeon (at most
-    /// its last cells, already ingested and read, given as their step codes: the exterior codes on
-    /// a chart with no machine, the founded classes the moment reached on a founded chart,
-    /// `Field::step_codes`), at one offset, and re-keys `λ` with each published key carried to the
-    /// boundary. Admitted only between `close_aeon` and the next ingest (review D1).
+    /// its last cells, already ingested and read), at one offset, and re-keys `λ` with each
+    /// published key carried to the boundary. Admitted only between `close_aeon` and the next
+    /// ingest (review D1).
     fn locate_keys(
         &self,
         resident: &mut Self::Resident,

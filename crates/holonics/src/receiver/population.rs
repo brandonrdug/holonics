@@ -338,8 +338,8 @@ pub use dormancy::{Dormancy, DormantFamily, Layered, Weight};
 pub use evolution::{Declaration, Identity, Selections, Tally};
 pub use families::{GratingParity, GratingSheet, RotorKeys, TreeFamily};
 pub use merge::{
-    BirthPrice, Blocks, Item, KtTables, MergeReceipt, PartitionReceipt, Price, birth_price,
-    learn_hazard_partition, partition_code, restaurant_ratio,
+    Blocks, Item, KtTables, MergeReceipt, PartitionReceipt, Price, learn_hazard_partition,
+    restaurant_ratio,
 };
 pub use port::PortPopulation;
 pub use provenance::{FaceContribution, MissingProducerTerm};

@@ -562,10 +562,13 @@ tests can comb through anything valuable").
 8. **No templates.** Output faces are `ρ_R` readings, and no port method returns a string.
 9. **The codec is not the architecture.** `Field::declare` fixes the ring count and widths without
    the exterior alphabet. A test changes the alphabet and checks that they do not change. The
-   stepping classes are the field's port chart (`hnn::field::PortChart`): a text field reads the
-   chart founded at first arrival on its rings' own clocks (`hnn::encoding::found_ports`, U6), and a
-   test relabels the codes and checks that the founded chart is relabeled and nothing else; the
-   codec's residue chart `code mod d_g` is the declared chart of synthetic fields only.
+   stepping classes are the field's declared port chart (`hnn::field::PortChart`), the codec's
+   residue chart `code mod d_g`, the one exterior chart the field reads (the guard's stated
+   exception). [open] The passage-founded chart (placed at first arrival, its classes priced by
+   counts) was retired September 29 with the passage's founding
+   ([lessons](../research/records/2026-09-29_LESSONS_THE_FAILURES_THAT_REPEATED_AFTER_THEY_WERE_RECORDED.md)
+   §4), so a text field steps on its codec's residues until the stepping classes are located by the
+   field's own keys and deposition.
 10. **No scalar operand.** `Word::pull_back` accepts only a `RatioCovector`, which only a
     `HolonRatio` constructs (`compile_fail`).
 11. **Learning is locating keys and depositing covectors,** never "a current changes a later

@@ -260,15 +260,13 @@ pub struct TargetPhases {
 }
 
 /// **The target phases** of a window: the receiving ring's lift from the anchor `λ`, advanced by
-/// selective stepping over `t_0 … t_j` (with carries, as ingest would, without ingesting: each
-/// target's step code read from the anchor's founded class `founded`, the moment's, as
-/// `hnn::field::Field::step_code` reads it), read relative to the cut's winding `w = ⌊λ_R/d_R⌋`,
-/// which is returned as the branch. Each phase lies in `[0, 1 + 2(j+1)/d_R)`, the anchor's open
-/// phase plus at most two ticks a cell (a step and a carry), however long the stream before the cut.
+/// selective stepping over `t_0 … t_j` (with carries, as ingest would, without ingesting), read
+/// relative to the cut's winding `w = ⌊λ_R/d_R⌋`, which is returned as the branch. Each phase lies
+/// in `[0, 1 + 2(j+1)/d_R)`, the anchor's open phase plus at most two ticks a cell (a step and a
+/// carry), however long the stream before the cut.
 pub fn target_phases(
     field: &Field,
     anchor: &[BigInt],
-    founded: usize,
     ring: usize,
     targets: &[usize],
 ) -> Result<TargetPhases, HnnError> {
@@ -286,12 +284,10 @@ pub fn target_phases(
     let branch = BigInt::from(declared.clock_at(at)?.winding().clone());
     let floor = &branch * BigInt::from(period);
     let mut lift = anchor.to_vec();
-    let mut state = founded;
     let phases = targets
         .iter()
         .map(|&code| {
-            let step = field.step_code(&mut state, code)?;
-            field.selective_step(&mut lift, step)?;
+            field.selective_step(&mut lift, code)?;
             Ok(Rat::new(&lift[ring] - &floor, BigInt::from(period)))
         })
         .collect::<Result<_, HnnError>>()?;

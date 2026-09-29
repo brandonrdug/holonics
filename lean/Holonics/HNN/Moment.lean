@@ -11,9 +11,8 @@ import Holonics.Aeon.Clock.Epoch
 table (b) row 3). A source passage enters the HNN as **phase-binned counts** on closing rotor rings.
 The rings are indexed by `ℕ` in the declared carry order `0 → 1 → …`; ring `g` has period `d_g`,
 a lock `N_g` of ports and the declared port chart `port_g(x)`, which is known before any key is
-located: the codec's residue chart `code(x) mod d_g` of the synthetic fields, or the chart a founding
-passage founds at first arrival (`hnn::encoding`, THE_REBUILD U6). No law below reads which. On each
-source cell `x` ring `g` advances
+located: the codec's residue chart `code(x) mod d_g` in the Rust owner (`hnn::field::PortChart`).
+No law below reads which chart. On each source cell `x` ring `g` advances
 
 ```text
 c_g(x) = [port_g(x) ∈ N_g]      plus the carry of its predecessor:   carryIn_(g+1) = ⌊τ'_g / d_g⌋ − ⌊τ_g / d_g⌋
@@ -84,8 +83,8 @@ open Holonics.Objects.SourceHolon
 
 /-- [definition] **A declaration of closing rotor rings in carry order.** Ring `g` has period
 `period g`, lock `lock g` (a set of ports) and reads each cell through its declared port chart
-`port g x`: the codec's residue chart `code x mod period g`, or a founded chart
-(`hnn::encoding::found_ports`); every law below holds for any chart. -/
+`port g x` (in the Rust owner the codec's residue chart `code x mod period g`); every law below
+holds for any chart. -/
 structure SelectiveDecl (Cell : Type*) where
   period : ℕ → ℕ
   lock : ℕ → Finset ℕ

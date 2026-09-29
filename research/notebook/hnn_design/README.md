@@ -1804,6 +1804,11 @@ cargo run --release -p holonics --example hnn_prediction -- text .local/cuts/cur
 cargo run --release -p holonics --example hnn_prediction -- develop text .local/cuts/curated-u6-passage-cut.bin 385 1 .local/cuts/u6-encoding-probe.bin
 ```
 
+[historical] These commands ran at `96d8940b`. The founding and its modes (`ports passage`,
+`expansions`, `found-only`, `founding <cut>`) and the keyed latent were retired on September 29
+([lessons](../../records/2026-09-29_LESSONS_THE_FAILURES_THAT_REPEATED_AFTER_THEY_WERE_RECORDED.md)
+§4); every field now reads the declared residue chart.
+
 - **The founding** (development cells only): the public control's 4,958 cells found 41 classes from
   101 reached cells in 29,254 ms; the probe's 4,096 found 36 from 65 in 9,647 ms.
 - **The exposure**: the held-out field face `5461 + 10/16 + ε` against the 65-cell chart's

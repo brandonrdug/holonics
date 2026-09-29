@@ -12,9 +12,7 @@ use crate::hnn::chart::Charts;
 use crate::hnn::constitution::{Constitution, Steps};
 use crate::hnn::field::{ConstitutionRead, Current, Field};
 use crate::hnn::moment::{PairPort, SourceMoment};
-use crate::hnn::prediction::{
-    Latent, Refinement, Section, deposit_of, stage, unreached_unchanged,
-};
+use crate::hnn::prediction::{Refinement, Section, deposit_of, stage, unreached_unchanged};
 use crate::hnn::propagation::Operands;
 use crate::hnn::ring::{PumpDeclaration, PumpStep, ResonatorMaterial};
 use crate::hnn::word::{EndChange, Word};
@@ -157,7 +155,6 @@ fn the_refinement_balance_closes_with_the_injection_the_pump_and_the_commit() {
         &theta,
         &current,
         &moment,
-        Latent::Rest,
         &refinement,
         &mut Charts::new(),
     )
@@ -234,7 +231,6 @@ fn the_release_holds_a_plural_section_and_releases_a_determined_one() {
         &initial,
         &current,
         &moment,
-        Latent::Rest,
         &refinement,
         &mut Charts::new(),
     )
@@ -259,7 +255,6 @@ fn the_release_holds_a_plural_section_and_releases_a_determined_one() {
         &theta,
         &current,
         &moment,
-        Latent::Rest,
         &refinement,
         &mut Charts::new(),
     )
@@ -365,7 +360,6 @@ fn the_section_reads_no_landmark_tree() {
         &theta,
         &current,
         &moment,
-        Latent::Rest,
         &refinement,
         &mut Charts::new(),
     )
@@ -377,7 +371,6 @@ fn the_section_reads_no_landmark_tree() {
         &NoTree(&theta),
         &current,
         &moment,
-        Latent::Rest,
         &refinement,
         &mut Charts::new(),
     )
@@ -387,41 +380,25 @@ fn the_section_reads_no_landmark_tree() {
     assert_eq!(plain, guarded);
 }
 
-/// A keyed latent is a member of the joint family: it opens the receiving ring at the source's
-/// amplitude on every coordinate, it moves the section from the member at rest, and every station
-/// is read from its one anchor.
+/// Every station of a section is read from its one anchor: station `j` reads the receiving ring's
+/// anchor through the port map to the power `1 + j`, so the section is one joint reading, never a
+/// product of station marginals.
 #[test]
-fn a_keyed_latent_moves_the_whole_section_from_one_anchor() {
+fn every_station_is_read_from_the_one_anchor() {
     let field = chain();
     let theta = generic(&field, 85);
     let (current, moment) = moment(&field, 86, 6);
     let refinement = declared(&field, 2, 1);
-    let injection = moment.open_storage(&field, &theta, &current).unwrap();
-    let a = crate::hnn::prediction::amplitude(&injection);
-    assert!(!a.is_zero());
-    let latent = Latent::Keyed(3).storage(&field, refinement.ring(), &a);
-    assert!(latent[refinement.ring()].iter().all(|x| x == &a || x == &-a.clone()));
-    let rest = Section::refine(
-        &field,
-        &theta,
-        &current,
-        &moment,
-        Latent::Rest,
-        &refinement,
-        &mut Charts::new(),
-    )
-    .unwrap();
     let section = Section::refine(
         &field,
         &theta,
         &current,
         &moment,
-        Latent::Keyed(3),
         &refinement,
         &mut Charts::new(),
     )
     .unwrap();
-    assert_ne!(rest.anchor(), section.anchor());
+    assert!(section.anchor().iter().any(|x| !x.is_zero()));
     let ring = field.ring(refinement.ring());
     for (j, read) in section.reads().iter().enumerate() {
         assert_eq!(

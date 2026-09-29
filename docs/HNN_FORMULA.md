@@ -5,7 +5,7 @@
 [operator contract](ELEMENTARY_OBJECTS.md#operator-contract)'s HNN row: the word, deposition and
 the collapse of campaigns 1–2 and the loaded resonator (`hnn::ring`); a loaded ring's mode quotient
 (campaign 3's first construction) is Lean's `HNN/ModeQuotient` ([§4](#the-loaded-rings-mode-quotient)).
-Holonic Encoding's founding law and the field's founded port chart are `hnn::encoding` (Lean `HNN/Encoding`, [below](#holonic-encoding)); joint prediction's smallest form is `hnn::prediction` (U6, [below](#generation-as-field-refinement-and-boundary-radiation)); release through modes has no owner yet. [THE_MACHINE](THE_MACHINE.md) states the object,
+Holonic Encoding's founding law on declared transports is `hnn::encoding` (Lean `HNN/Encoding`, [below](#holonic-encoding)); joint prediction's smallest form is `hnn::prediction` (U6, [below](#generation-as-field-refinement-and-boundary-radiation)); release through modes has no owner yet. [THE_MACHINE](THE_MACHINE.md) states the object,
 [THE_REBUILD](plans/THE_REBUILD.md) the order and [CONSTRUCTION_STATE](../CONSTRUCTION_STATE.md) the
 position; the [elementary objects](ELEMENTARY_OBJECTS.md) own the vocabulary.
 The HNN is the compression machine at scale ([the line](THE_MACHINE.md#the-line-the-rebuild-serves)):
@@ -203,40 +203,22 @@ copy ring and the rotor crib; observability alone (Birth's closure on the whole 
 where forms are silent on the orbit. That Birth's executed closure spans exactly those readings on
 the reached span is its ladder's statement, owed in #62.
 
-[definition; agent-inferred] **The passage's own transports** (`hnn::encoding::{ContextClasses,
-PassageChart::passage, found_passage}`; the
-[pin](../research/records/2026-09-29_THE_PASSAGES_OWN_TRANSPORTS_PINNED_BEFORE_ITS_RUNS.md)). A
-source word is its address. A passage's context classes are its words' end-position classes, reached
-from the empty context by the cells' **right actions** `T_u e_p = e_(pu)`; its receiving forms are
-the one-cell continuation counts `ρ_c(p) = N(pc)`, so `T_u* ρ_s = ρ_(us)`
-(`continuation_intertwines`), and the founding is the passage's Hankel realization
-`E p = (N(p s_i))_i`, of dimension `rank [N(ps)]`, with no transport declared. Conditioned on each
-cell it separates positions (a primitive cycle of period `P` founds `P`); the **unconditioned tick**
-`Σ_u T_u`, opened where one period read from the opening fixes the phase, founds the emission's
-shift realization (the moiré's 7, 7 and 11). Founded exactly, a finite passage is its own index
-(`rank = n`), so the **charged founding** keeps a class only where the population's priced birth
-(`merge_cost_mass_iff` read from the birth's side, `receiver::population::birth_price`) shortens the
-founding passage's KT code over the founded classes' own continuations by more than the newborn's
-draw `2^(−ℓ)`, `ℓ = 2 log₂(|A_R| + 1)`: the reach closure's ladder from the opening, one rung a
-reached cell's right action on the classes born at the rung before. A class not born stays in its
-parent's class, its Preimage Fibre. The ladder is myopic: a class that pays only through a longer
-class it would open is not born. Birth's closure on the founded machine's chart merges the classes no
-reading separates.
-
-[definition; agent-inferred] **The field's step classes are founded, not the codec's.** A text
-field's **step codes** are the founded classes of a founding passage and the plural fibre (the codes
-it never met). The founded machine (`hnn::field::FoundedMachine`) reads a cell's step code from the
-class before it, the founded chart's reduced recurrence `z ← U_x z`, which the source moment carries;
-the selective step, the target phases, the keys' crib and the letters' reader read step codes. Each
-class is placed on each ring at the ring's phase class at its first arrival on the field's own
-selective clock (the placement of the [winding guide](WINDING_CARRY_AND_PLACEMENT.md)); the fibre
-sits outside every lock (`hnn::encoding::found_ports`, `hnn::field::PortChart`). A ring then ticks
-when a founded class placed at its notch recurs. The codec's residue chart `code mod d_g`, whose
-step codes are the codes, stays only as the declared chart of synthetic fields; no codec value
-enters a text field's chart. A founded field opens `E_g` at the founded injection (each cell's
-column at the placement node of the class it reaches from the opening) and moves it only by
-deposition. [scope] The source moment still bins the exterior cells by the rings' phases; its
-replacement by the founded chart's own moment is not built. The card refuses a founded machine.
+[historical; retired September 29] **The passage's own transports and the founded step classes.**
+A passage's context classes under the cells' right actions `T_u e_p = e_(pu)` found its Hankel
+realization `E p = (N(p s_i))_i`, of dimension `rank [N(ps)]` with no transport declared: the law
+stays in Lean (`HNN/Encoding.{hankel_identification, hankel_rank_eq, forms_span_kernel,
+continuation_intertwines}`) as mathematics. Its Rust realization and consumers were retired from the
+native path by the
+[lessons record](../research/records/2026-09-29_LESSONS_THE_FAILURES_THAT_REPEATED_AFTER_THEY_WERE_RECORDED.md)
+(§2, §4; code at `96d8940b`): the charged founding priced each class by KT continuation counts (a
+suffix-automaton context model, the byte-tree line re-entering through the encoding), bypassed
+deposition, Birth's own trigger and key location, and placed its classes on the rings by first
+arrival; the founded `E_0` put each code's column at one node, aliasing cells. [open] Every field
+now reads its declared port chart, the codec's residue chart `code mod d_g`, and `E_g` opens at the
+declared sign sequence. A text field's stepping classes are therefore its codec's residues (the
+recorded failure "text run on its codec's grain"); the classes it needs are to be located by the
+field's own keys and deposition from a reached covector, never founded by counts or placed by first
+arrival.
 
 ### The source and release contract
 
@@ -545,18 +527,20 @@ its composition equivalence carries one latent population through two refinement
 a trajectory archive or independent output marginals.
 
 [definition; agent-inferred, U6, September 29] **The smallest native form** (`hnn::prediction`,
-Lean `HNN/Prediction`). The latent section is the receiving ring's change: `x(0) = I_h(ξ)`, the
-latent `ξ` on the receiving ring and the request's moment `s_g = P_g^(τ_g) m̃_g` on the source
-rings (egg packing). The refinement is `x_(n+1) = F_Θ(x_n, m̃)`, one word of `w` full ticks
+Lean `HNN/Prediction`). The section opens at rest: `x(0) = I_h`, the request's moment
+`s_g = P_g^(τ_g) m̃_g` on the source rings and nothing else. The refinement is `x_(n+1) = F_Θ(x_n, m̃)`, one word of `w` full ticks
 (junction scattering → element → loaded resonator → contact transit) opened on the change the
 previous word left, the moment re-entering at every word; `K` words are declared and the
 refinement clock is `n`. The joint readout reads every station from the one anchor at the last
 word's last junction, `y_j = ρ_R(P_R^(1+j) v_R)`, `j < m ≤ d_R`: station `j` is the receiving
 ring's clock unwound from the request's last tick, `τ + 1 + j`, its target phase `(1 + j)/d_R`
 turns. The section's reading is every station's top class at the grain, released at width zero
-through `receiver::release` (`release_width_zero`) and held when plural; a selection is a keyed
-member of the latent family, never a marginal draw (`joint_not_marginals`). The consumer equation
-is `ρ(F^K(I_h(ξ))) = T(request)` (`consumer_eq`). Learning pulls `R⁻¹dR` at every station back
+through `receiver::release` (`release_width_zero`) and held when plural, never retried and never
+completed by a marginal draw (`joint_not_marginals`). [historical] A keyed latent (a pseudo-random
+sign vector on the receiving ring, tried when a section was plural) was retired September 29: it
+was not a key located by loop closure (the
+[lessons record](../research/records/2026-09-29_LESSONS_THE_FAILURES_THAT_REPEATED_AFTER_THEY_WERE_RECORDED.md)
+§2). The consumer equation is `ρ(F^K(I_h)) = T(request)` (`consumer_eq`). Learning pulls `R⁻¹dR` at every station back
 through `R`, each station's phase binding and the `K` words in reverse (`Word::pull_back_continuing`),
 composes it onto the refinement's diamond and deposits it by the normal law. The path reads no
 window, no landmark tree and no copy stage.

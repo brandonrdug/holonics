@@ -231,7 +231,7 @@ fn replacing_any_one_retained_item_changes_some_reading() {
 fn deposited(field: &Field, theta: &Constitution, pending: &PendingRatio) -> Constitution {
     let (word, faces) = pending.read(field, theta).unwrap();
     let targets = [1usize, 0];
-    let anchors = target_phases(field, pending.anchor(), pending.moment().founded(), 2, &targets).unwrap();
+    let anchors = target_phases(field, pending.anchor(), 2, &targets).unwrap();
     let ratio = HolonRatio::compare(faces, &targets, &anchors).unwrap();
     let back = word
         .pull_back(

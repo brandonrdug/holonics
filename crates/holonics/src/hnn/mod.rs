@@ -43,12 +43,12 @@
 //! propagates one contact per tick and is released at the word's end. The forward machine is here:
 //!
 //! - [`field`]: the declaration ([`Ring`], [`Contact`], [`Field`]), the lift point [`Current`] and
-//!   the read face of the constitution ([`ConstitutionRead`]); selective stepping on the port chart
-//!   ([`PortChart`]: the codec's residue chart of the synthetic fields, or a founded chart);
+//!   the read face of the constitution ([`ConstitutionRead`]); selective stepping on the declared
+//!   port chart ([`PortChart`], the codec's residue chart);
 //! - [`encoding`] (U6): Holonic Encoding, a passage chart's minimal realization founded by
-//!   closing the receiving forms under the field's own transports ([`Encoding`], [`PassageChart`]),
-//!   its squares `D E = ρ`, `E T = U E` and the injection square, its Preimage Fibre and separator,
-//!   and the field's founded port chart ([`found_ports`]);
+//!   closing the receiving forms under the chart's declared transports ([`Encoding`],
+//!   [`PassageChart`]), its squares `D E = ρ`, `E T = U E` and the injection square, its Preimage
+//!   Fibre and separator;
 //! - [`moment`]: the phase-binned [`SourceMoment`] on closing source rings, its pair buffer, the
 //!   pair port read over the whole offset moment (no window), and its capacity `n*`;
 //! - [`propagation`]: the junction Swing, the ring element's Cayley step with its contrast port,
@@ -76,9 +76,10 @@
 //!   address and its break receipt, with [`contact_readings`], the lock and site readings the
 //!   receiving join consumes;
 //! - [`prediction`] (THE_REBUILD U6, native generation): a section of the receiving ring refined by
-//!   `K` continuing words from the request's moment and a latent, read jointly at every station
-//!   from one anchor, released at width zero through `receiver::release`, and learned by its
-//!   covector pulled back through the `K` words (`Word::continuing`, `Word::pull_back_continuing`).
+//!   `K` continuing words from the request's moment, read jointly at every station from one
+//!   anchor, released at width zero through `receiver::release` (a plural section held), and
+//!   learned by its covector pulled back through the `K` words (`Word::continuing`,
+//!   `Word::pull_back_continuing`) and deposited at the certified step (`constitution`).
 //!
 //! [definition; agent-inferred, U2] A loaded ring's mode quotient (campaign 3's first construction)
 //! is Lean's (`HNN/ModeQuotient`); its Rust realization (`hnn::modes`, at commit `1bdacc8f`) was
@@ -160,13 +161,10 @@ pub use contact::{
     contact_readings, site_kinds, site_readings,
 };
 
-pub use encoding::{
-    ContextClasses, Encoding, EncodingError, FoundedPorts, PassageChart, PassageFounding,
-    found_passage, found_ports,
-};
+pub use encoding::{Encoding, EncodingError, PassageChart};
 pub use field::{
-    ConstitutionRead, Contact, ContactDeclaration, Current, Field, FieldDeclaration,
-    FoundedMachine, PortChart, PortChartKind, Ring, RingDeclaration,
+    ConstitutionRead, Contact, ContactDeclaration, Current, Field, FieldDeclaration, PortChart, Ring,
+    RingDeclaration,
 };
 pub use keys::{KeyLocation, RingKeys, locate_keys};
 pub use moment::{Capacity, PairPort, SourceMoment};

@@ -13,7 +13,7 @@ station (`docs/HNN_FORMULA.md`, "Generation as field refinement and boundary rad
 "Joint prediction is a boundary section of the future").
 
 - **The refinement** is `K` words of one constituted step `F` from the prepared field
-  `prepare seed` (the request's moment and the latent, egg packing): `F^[K]` (`refine_iterate`).
+  `prepare seed` (the request's moment at rest): `F^[K]` (`refine_iterate`).
   One seed carries through every refinement (`Holon.ofEvolutionCompOccurrenceEquiv`); no trajectory
   is the occurrence.
 - **The joint section** (`jointSection`) is the elementary Holon `Holon.ofEvolution` whose receiver
@@ -29,7 +29,7 @@ station (`docs/HNN_FORMULA.md`, "Generation as field refinement and boundary rad
   releases it; a reading that parts two members of the fibre has positive width and is held
   (`plural_section_held`). In Rust the face is the stations' grain cells, constant on the grain
   fibre of the logits, and the reading is every station's top class.
-- **The consumer equation** (`consumer_eq`): `ρ(F^K(I_h(ξ))) = T(request)` is
+- **The consumer equation** (`consumer_eq`): `ρ(F^K(I_h)) = T(request)` is
   `Holon.ofEvolution_receive_eq_encoded` at `evolve := F^[K]`: the native refinement returns the
   reference's section whenever its encoding and reading squares commute.
 
@@ -58,8 +58,8 @@ theorem refine_iterate (step : Field → Field) (words : ℕ) (x : Field) :
   exact Function.iterate_succ_apply' step words x
 
 /-- [definition] **The joint section** as an elementary Holon: the occurrence is the seed (the
-request and the latent), the source the prepared field, the target the refined field, and the
-receiver reads every station from that one refined field. -/
+request), the source the prepared field, the target the refined field, and the receiver reads every
+station from that one refined field. -/
 def jointSection (prepare : Seed → Field) (step : Field → Field) (words : ℕ)
     (read : Station → Field → Class) : Holon Field Field (Station → Class) :=
   Holon.ofEvolution prepare (refine step words) (fun x station => read station x)

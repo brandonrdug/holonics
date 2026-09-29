@@ -1051,8 +1051,7 @@ impl<'c> ExecutionPort for Resident<'c> {
             return Err(HnnError::KeysNotAdmitted);
         }
         let field = resident.field.clone();
-        // The crib's step codes (the host's contract, `Field::step_codes`).
-        let codes = codes(crib, field.steps())?;
+        let codes = codes(crib, field.alphabet())?;
         if codes.len() as u64 > resident.aeon.closed {
             return Err(HnnError::Shape {
                 what: "a closing crib's cells against the closed aeon's",
