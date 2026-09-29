@@ -24,8 +24,12 @@
 //! population**. A ring stepping `1/d` of a turn crosses its section `(r + N)/d` times in `N`
 //! micro-steps from residue `r < d`; each crossing is a clock tick.
 //!
-//! [open] Pump/Floquet locking (that the pump selects the two sheets as attracting basins) is not
-//! proved; the locked sheets are taken as given.
+//! [proved-derived; re-derived September 29] The pump's locking is the pumped ring's Floquet growth,
+//! owned by `hnn::ring` (Lean `HNN/Floquet`): past the bifurcation the two sheets are the rays of the
+//! growing Floquet mode, and the seed's growing coordinate chooses between them; the lock's exchange
+//! polynomial, capacity, winding and coupled pivots are Lean `Objects/ParametronLock`. [open] The
+//! law is linear, so no saturation holds a locked amplitude; this population takes its sheets as
+//! given.
 //!
 //! | Lean | Rust |
 //! |---|---|

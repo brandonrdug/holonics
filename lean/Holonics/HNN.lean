@@ -13,6 +13,7 @@ import Holonics.HNN.RegionCounts
 import Holonics.HNN.Retention
 import Holonics.HNN.Keys
 import Holonics.HNN.Ring
+import Holonics.HNN.Floquet
 import Holonics.HNN.Contact
 import Holonics.HNN.ContactBreak
 import Holonics.HNN.BornFace
@@ -42,6 +43,7 @@ design: the HNN law", table (b) rows 1–8, stated before their Rust owners in `
 | `HNN/Retention` | 6. retention as the collapse onto what the admitted future distinguishes | `hnn::{retention, pending}` |
 | `HNN/Keys` | 7. keys by loop closure, and selective stepping | `hnn::keys` |
 | `HNN/Ring` | campaign 2, item 8: the ring's mode tick keeps `Q = diag(K, C)`, its denominator, its executed balance with pump and port work, the two-port reference change, crossings as epoch ticks, the pump and the sheets | `hnn::ring` |
+| `HNN/Floquet` | the parametron re-derived (September 29): the pumped ring's monodromy over one period and its growth certificate `M_Tᵀ G M_T ⪯ ρ² G` (energy grows by at most `ρ²` a period, passive at `ρ² ≤ 1`, one certificate per tick for a partial period, and the consumer's change of metric `E_Q(Mᵐx) ≤ (γ_hi/γ_lo) ρ^(2m) E_Q(x)`); the pump's in-phase and quadrature axes, the standing bifurcation where the stiffness is singular and the storage form's passivity below it; phase-sensitive amplification (growing and squeezed quadratures, the Cayley tick's multiplier on an eigen-axis); two pumps compose to the turn by their relative phase; no linear threshold reads a relative phase | `hnn::ring` (the Floquet certificate and the receiving bank) |
 | `HNN/Contact` | campaign 2, item 8: the contact's transfer and site kind by its stiffness's sign, the boost's certified solve or singular direction, the signed-storage balance, the lock address from the measured winding pair | `hnn::contact`, `hnn::propagation` |
 | `HNN/ContactBreak` | campaign 2, item 8: the released storage `R = E_a + W_a − D_a − E_a′`, the advance `R ≥ J`, Griffith's closed-port case, the parted face's typed gluing defect | `hnn::contact`, `hnn::field` |
 | `HNN/BornFace` | Decision 33: the wave read by the Born rule, a finitely correlated receiver on the receiving ring's register: the normalized digit split and dyadic cell face, the reception keeping a density, the density as the retained quotient, the absorbed unitary tick, the interference zero no nonnegative receiver makes, the exact covector and the Fisher-scored step | `hnn::born` (its Rust receiver `hnn::born` retired September 28) |

@@ -126,6 +126,76 @@
 //! `aeon::Cycle` exactly when the order divides `t`, exactly when `s^t = 1` (Lean
 //! `pump_period_is_cycle`). The card reads the same torus point as `t mod order`.
 //!
+//! [definition; re-derived September 29] **The parametron re-derived** (`docs/ELEMENTARY_OBJECTS.md`
+//! §5; the [record](../../../../research/records/2026-09-29_THE_PARAMETRON_RE_DERIVED_THE_PUMP_READS_RELATIVE_PHASE_AND_THE_FLOQUET_CERTIFICATE_DECIDES_THE_LOCK.md);
+//! Lean `HNN/Floquet`, `Objects/ParametronLock`). **The pump is a periodic modulation of the
+//! constitution** ([`PumpSchedule`]): one carrier a tick of its period, each adding the reflection
+//! block `−2p R_(ψ_t)` to every node's stiffness. A declared pump is the schedule `a² s^t`
+//! ([`PumpSchedule::declared`]); the cells crossing the ring's section modulate it, one tick a
+//! crossing, its carrier `(a² s^t)·c_t` ([`PumpSchedule::modulated`], run by
+//! [`ResonatorOperands::scheduled`] on an unpumped material, each tick certified by its signed form
+//! as a declared pump's phase is).
+//!
+//! [proved-derived; implemented-exact] **The Floquet monodromy** ([`Floquet`]). The executed tick is
+//! linear in the state `x = (u, w)`, and one period composes the transport around the pump's cycle:
+//!
+//! ```text
+//! tick         x′ = T_t x,  T_t = [[I − h²X_tK_t, 2hX_tC], [−2hX_tK_t, 4X_tC − I]]     X_t the executed solve
+//! monodromy    M_T = T_(T−1) ⋯ T_0                                                      the law's inverse, or the chart's matrix
+//! placement    q(s) = (1 − s)^n χ(r(1 + s)/(1 − s)) = ∏_i ((r − μ_i) + (r + μ_i)s)      #{|μ| > r} = right(q), #{|μ| = r} = axis(q) + n − deg q
+//! certificate  G ≻ 0 and ρ²G − M_TᵀGM_T ⪰ 0, each by inertia  ⇒  E_G(M_T^m x) ≤ ρ^(2m) E_G(x)
+//! ```
+//!
+//! `G` is attained by any exterior means and certified inside exactly ([`Floquet::certify`] trusts
+//! nothing of how it was attained); the exterior means offered is the exact Stein solve
+//! `M_TᵀGM_T − ρ²G = −ρ²I` ([`attain_metric`]), whose solution is `Σ_k (M_T/ρ)^(kᵀ)(M_T/ρ)^k ≻ 0`
+//! when every multiplier lies inside `|μ| = ρ`. [`Floquet::decide`] reads the placement at the unit
+//! circle: **passive** (all inside; certified at `ρ = 1`), **the edge** (none outside, some on it; a
+//! turn or a shear, certified at `ρ = 1 + 2^(−g)`), or **growing** (one outside; the spectral radius
+//! enclosed at the grain by bisection on the placement, `lower` reached by a multiplier, certified
+//! at `ρ = upper`). A standing pump's multiplier is one exactly where its stiffness is singular
+//! (Lean `standing_fixed_point_iff`), on the in-phase axis at `k − 2p = 0`; below it the storage form
+//! is itself a certificate at `ρ = 1` (`storage_form_certifies_passive`).
+//!
+//! [proved-derived; implemented-exact] **The consumer** ([`Floquet::bound`], [`FloquetBound::reach`];
+//! Lean `HNN/Floquet.{floquet_tick_product, floquet_metric_change}`). The constitution's certified
+//! step reads the gain through a pumped resonator as
+//!
+//! ```text
+//! |x_(τ+s)|² ≤ (γ_hi/γ_lo) · max_(0 ≤ o < T) ρ^(2m_o) (max_t σ_t²)^(s − T m_o) · |x_τ|²,   m_o = ⌊(s − o)/T⌋
+//! γ_lo I ⪯ G ⪯ γ_hi I,   T_tᵀGT_t ⪯ σ_t²G        each by inertia at a dyadic grain
+//! ```
+//!
+//! where the passive medium's factor is one. The consumer equation: in the gain `κ²` of a loaded
+//! resonator at ring `r` (`hnn::constitution`'s header, "resonator r", the channel's with
+//! `G = 2Y_r`), each term of `Σ_j Σ_(τ < T_j) (1 + ω)^(2(T_j − τ − 1))` is multiplied by
+//! `reach_r(T_j − τ)`, the resonator's certified factor over the ticks its state carries the
+//! difference, and every other locus's gain through that ring by the same factor. Until the
+//! constitution reads it, a linear step through a pumped resonator stays refused
+//! (`HnnError::UncertifiedGain`).
+//!
+//! [proved-derived; implemented-exact] **Phase-sensitive amplification, read at the locked sheet**
+//! ([`lock`]; Lean `pumped_inphase_axis`, `inphase_growing`, `inphase_squeezed`,
+//! `inphase_growing_coordinate`, `cayley_tick_eigen`). Past the bifurcation the in-phase axis
+//! `a = e^(iψ/2)` boosts (its phase plane holds the growing and the squeezed quadratures) and the
+//! quadrature turns; the sheet the executed passage reaches is the sign of the seed's growing
+//! coordinate, `sign cos(φ_in − ψ/2)` for a seed on the displacement. It is linear, then threshold:
+//! odd under the half-turn of the seed.
+//!
+//! [proved-derived; implemented-exact] **The relative phase is read by the pump**
+//! ([`ReceivingBank`], [`BankReading`]; Lean `reflection_mul_reflection`,
+//! `reflection_pair_trace_carriers`, `no_linear_threshold_reads_relative_phase`). A relative phase
+//! `Re(z_a z̄_b)` is even under the half-turn, so no linear reading followed by a threshold reads it.
+//! The law's quadratic place is the pump: two ticks whose carriers the crossing cells modulate
+//! compose two reflections, whose product is the turn by the cells' relative phase (trace
+//! `2Re(c_a c̄_b)`), the square law; the bifurcation is the threshold. A bank of receiving parametrons
+//! at declared pump phases (member `j`: axis `1`, step `i^j`, carriers `(c_e, i^j c_l)`) locks at the
+//! member whose declared phase aligns the two cells, and every other member is certified silent; its
+//! class is that member. [agent-inferred] The bank's strength sits in its lock window: the aligned
+//! member grows exactly past the standing bifurcation (its two ticks are the standing pump's), and
+//! the nearest misaligned member only past a strength bracketed in development in
+//! `(361/512, 725/1024]`; the declared `p = 5/8` lies between.
+//!
 //! [proved-derived; implemented-exact] **The reference change at a junction port**
 //! ([`port_scattering`]). A wave arriving at port `p` of a junction meets the rest of the junction as
 //! one reference admittance `G_rest = W − G_p`: it reflects `Γ = (G_p − G_rest)/(G_p + G_rest)` and
@@ -146,6 +216,12 @@
 //! | `pump_half_turn_invariant`, `pump_blind_to_sheets`, `locked_sheet_receiver_face` | [`PumpDeclaration`], [`sheets`] |
 //! | `loaded_solve_chart_bound`, `loaded_state_split_bound` (with `abs_mulVec_le_rowNorm`, `abs_dot_le_l1`) | [`ResonatorStep::bound`], [`ResonatorStep::closes`] |
 //! | `gain_backtrack_midpoint` | `hnn::constitution::GainBacktrack`, [`ResonatorMaterial::with_gains`] |
+//! | `HNN/Floquet.{energy_transport, certificate_reading, floquet_energy_step, floquet_energy_iterate, floquet_passive}` | [`Floquet::certify`], [`FloquetCertificate::energy_factor`] |
+//! | `HNN/Floquet.{floquet_tick_product, floquet_metric_change}` (the consumer equation) | [`Floquet::bound`], [`FloquetBound::reach`] |
+//! | `HNN/Floquet.{standing_fixed_point_iff, storage_form_certifies_passive, pumped_inphase_axis, pumped_quadrature_axis}` | [`Floquet::decide`], [`Floquet::placement`] |
+//! | `HNN/Floquet.{inphase_growing, inphase_squeezed, inphase_growing_coordinate, quadrature_turns, cayley_eigen, cayley_tick_eigen}` | [`lock`], [`LockedSheets`] |
+//! | `HNN/Floquet.{reflection_sq, reflection_mul_reflection, reflection_pair_trace, reflection_pair_trace_carriers, relativePairing_halfTurn, no_linear_threshold_reads_relative_phase}` | [`PumpSchedule::modulated`], [`ReceivingBank::read`], [`BankReading::class`] |
+//! | `Objects/ParametronLock` (the lock's exchange polynomial, capacity as lock count, the winding as the carry, coupled locks, modal hearing) | the guide's §5; no Rust consumer beyond the bank's lock pattern |
 
 use num_bigint::{BigInt, BigUint};
 use num_traits::{One, Signed, ToPrimitive, Zero};
@@ -157,8 +233,9 @@ use crate::hnn::constitution::Lattice;
 use crate::hnn::contact::symmetric;
 use crate::holon::parametron::{Carrier, Parametron, threshold_sheet};
 use crate::ratio::linear::ExactRatMatrix;
-use crate::ratio::linear::inertia::inertia;
+use crate::ratio::linear::inertia::{Inertia, inertia};
 use crate::ratio::linear::vector::{add, dot, scale, sub};
+use crate::ratio::polynomial::{RationalPolynomial, half_plane_count};
 use crate::ratio::{Rat, integer};
 
 // -------------------------------------------------------------------------------------------
@@ -303,13 +380,118 @@ impl PumpDeclaration {
     /// **The node block** `−2p [[cos ψ, sin ψ], [sin ψ, −cos ψ]]` the pump adds to a node's `K`
     /// (Lean `HNN/Ring.pumpBlock`, read as `½ zᵀ K z`).
     pub fn block(&self, phase: usize) -> [[Rat; 2]; 2] {
-        let psi = self.carrier(phase);
-        let twice = integer(-2) * &self.strength;
-        [
-            [&twice * psi.cos(), &twice * psi.sin()],
-            [&twice * psi.sin(), -(&twice * psi.cos())],
-        ]
+        pump_block(&self.strength, &self.carrier(phase))
     }
+}
+
+/// `−2p R_ψ`, `R_ψ = [[cos ψ, sin ψ], [sin ψ, −cos ψ]]`: the reflection across the pump's axis
+/// `ψ/2`, scaled (Lean `HNN/Floquet.reflection`).
+fn pump_block(strength: &Rat, carrier: &Carrier) -> [[Rat; 2]; 2] {
+    let twice = integer(-2) * strength;
+    [
+        [&twice * carrier.cos(), &twice * carrier.sin()],
+        [&twice * carrier.sin(), -(&twice * carrier.cos())],
+    ]
+}
+
+/// [definition; re-derived September 29] **The pump schedule: the pump is a periodic modulation of
+/// the constitution** (module header, "The parametron re-derived"). Its strength `p ≥ 0` and one
+/// carrier `e^(iψ_t)` per tick of its period: tick `t` adds the reflection block `−2p R_(ψ_t)` to
+/// every node's stiffness. A declared pump is the schedule `a² s^t` over its order
+/// ([`PumpSchedule::declared`]). A pump whose carriers are multiplied by the carriers of the cells
+/// crossing the ring's section is modulated by them ([`PumpSchedule::modulated`]): the cells enter
+/// the constitution through the pump, the only place the law reads them quadratically.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct PumpSchedule {
+    strength: Rat,
+    carriers: Vec<Carrier>,
+}
+
+impl PumpSchedule {
+    /// A schedule of at least one tick at a nonnegative strength.
+    pub fn new(strength: Rat, carriers: Vec<Carrier>) -> Result<Self, HnnError> {
+        if strength.is_negative() {
+            return Err(HnnError::Resonator {
+                ring: usize::MAX,
+                what: "a pump's strength is nonnegative",
+            });
+        }
+        if carriers.is_empty() {
+            return Err(HnnError::Resonator {
+                ring: usize::MAX,
+                what: "a pump schedule has at least one tick",
+            });
+        }
+        Ok(Self { strength, carriers })
+    }
+
+    /// **The declared pump as a schedule**: `a² s^t` over the step's order.
+    pub fn declared(pump: &PumpDeclaration) -> Self {
+        Self {
+            strength: pump.strength.clone(),
+            carriers: (0..pump.phases())
+                .map(|phase| pump.carrier(phase))
+                .collect(),
+        }
+    }
+
+    /// **The declared pump modulated by the crossing cells**: one tick per cell, the carrier at tick
+    /// `t` the declared carrier `a² s^t` times the cell's carrier `c_t`. Its period is the cells'.
+    pub fn modulated(pump: &PumpDeclaration, cells: &[Carrier]) -> Result<Self, HnnError> {
+        Self::new(
+            pump.strength.clone(),
+            cells
+                .iter()
+                .enumerate()
+                .map(|(tick, cell)| compose(&pump.carrier(tick % pump.phases()), cell))
+                .collect(),
+        )
+    }
+
+    pub fn strength(&self) -> &Rat {
+        &self.strength
+    }
+
+    /// The ticks of one period.
+    pub fn period(&self) -> usize {
+        self.carriers.len()
+    }
+
+    /// The carrier at word tick `t`: the schedule's own clock, `t mod period`.
+    pub fn carrier(&self, tick: usize) -> &Carrier {
+        &self.carriers[tick % self.carriers.len()]
+    }
+
+    /// The node block at word tick `t`.
+    pub fn block(&self, tick: usize) -> [[Rat; 2]; 2] {
+        pump_block(&self.strength, self.carrier(tick))
+    }
+}
+
+/// `K` with a node block added on every node of the realified width.
+fn stiffened(
+    stiffness: &ExactRatMatrix,
+    block: &[[Rat; 2]; 2],
+) -> Result<ExactRatMatrix, HnnError> {
+    let n = stiffness.rows();
+    Ok(ExactRatMatrix::shaped(
+        n,
+        n,
+        (0..n)
+            .map(|i| {
+                (0..n)
+                    .map(|j| {
+                        let base = stiffness.get(i, j).expect("in range").clone();
+                        if i / 2 == j / 2 {
+                            base + &block[i % 2][j % 2]
+                        } else {
+                            base
+                        }
+                    })
+                    .collect()
+            })
+            .collect(),
+    )?)
 }
 
 /// **A node's sheet**: the half-turn sheet exactly when its amplitude lies on the far side of the
@@ -513,29 +695,10 @@ impl ResonatorMaterial {
 
     /// **The pumped stiffness** `K_j`: `K` with the pump's node block added on every node.
     pub fn pumped_stiffness(&self, phase: usize) -> Result<ExactRatMatrix, HnnError> {
-        let Some(pump) = &self.pump else {
-            return Ok(self.stiffness.clone());
-        };
-        let block = pump.block(phase);
-        let n = self.width();
-        Ok(ExactRatMatrix::shaped(
-            n,
-            n,
-            (0..n)
-                .map(|i| {
-                    (0..n)
-                        .map(|j| {
-                            let base = self.stiffness.get(i, j).expect("in range").clone();
-                            if i / 2 == j / 2 {
-                                base + &block[i % 2][j % 2]
-                            } else {
-                                base
-                            }
-                        })
-                        .collect()
-                })
-                .collect(),
-        )?)
+        match &self.pump {
+            Some(pump) => stiffened(&self.stiffness, &pump.block(phase)),
+            None => Ok(self.stiffness.clone()),
+        }
     }
 
     /// **The resonator's certificate** at hop `h` (module header): at every pump phase the signed
@@ -543,20 +706,21 @@ impl ResonatorMaterial {
     /// uniquely; refused with the first phase that is not.
     pub fn certify(&self, ring: usize, step: &Rat) -> Result<(), HnnError> {
         for phase in 0..self.phases() {
-            let form = self
-                .capacity
-                .scaled(&integer(2))
-                .add(&self.dissipation.scaled(step))?
-                .add(
-                    &self
-                        .pumped_stiffness(phase)?
-                        .scaled(&(step * step / integer(2))),
-                )?;
-            if inertia(&symmetric(&form)?).negative != 0 {
+            if !self.signed_form_holds(&self.pumped_stiffness(phase)?, step)? {
                 return Err(HnnError::UncertifiedResonator { ring, phase });
             }
         }
         Ok(())
+    }
+
+    /// `2C + hD + (h²/2) K ⪰ 0` for one phase's stiffness.
+    fn signed_form_holds(&self, stiffness: &ExactRatMatrix, step: &Rat) -> Result<bool, HnnError> {
+        let form = self
+            .capacity
+            .scaled(&integer(2))
+            .add(&self.dissipation.scaled(step))?
+            .add(&stiffness.scaled(&(step * step / integer(2))))?;
+        Ok(inertia(&symmetric(&form)?).negative == 0)
     }
 
     /// `E_Q(u, w) = ½⟨w, C w⟩ + ½⟨u, K_j u⟩` at pump phase `j`.
@@ -598,6 +762,14 @@ impl PhaseSolve {
             Self::Chart(chart) => chart.apply_transpose(vector),
         }
     }
+
+    /// The executed solve as its exact matrix: the law's inverse, or the chart's exact values.
+    fn matrix(&self) -> Result<ExactRatMatrix, HnnError> {
+        match self {
+            Self::Exact(inverse) => Ok(inverse.clone()),
+            Self::Chart(chart) => chart.to_matrix(),
+        }
+    }
 }
 
 /// One pump phase's operands: its stiffness `K_j`, its operator `M_j` with its largest absolute
@@ -609,6 +781,63 @@ struct Phase {
     operator_norm: Rat,
     solve: PhaseSolve,
     reading: Option<ResonatorChart>,
+}
+
+impl Phase {
+    /// One phase's operator `M_j = 2C + (h/Y)I + hD + (h²/2)K_j`, its largest absolute row sum and
+    /// its executed solve (the exact inverse, or the certified chart on `lattice` from a cold start).
+    fn of(
+        ring: usize,
+        material: &ResonatorMaterial,
+        stiffness: ExactRatMatrix,
+        admittance: &Rat,
+        step: &Rat,
+        lattice: Option<&WordLattice>,
+        phase: usize,
+    ) -> Result<Self, HnnError> {
+        let (capacity, _, dissipation) = material.forms();
+        let n = material.width();
+        let operator = capacity
+            .scaled(&integer(2))
+            .add(&ExactRatMatrix::identity(n)?.scaled(&(step / admittance)))?
+            .add(&dissipation.scaled(step))?
+            .add(&stiffness.scaled(&(step * step / integer(2))))?;
+        let operator_norm = (0..n)
+            .map(|i| {
+                operator
+                    .row(i)
+                    .expect("in range")
+                    .iter()
+                    .map(|x| x.abs())
+                    .sum::<Rat>()
+            })
+            .max()
+            .unwrap_or_else(Rat::zero);
+        let (solve, reading) = match lattice {
+            None => (PhaseSolve::Exact(operator.inverse()?), None),
+            Some(lattice) => {
+                let (chart, read): (ChartWords, ChartReading) =
+                    refine(ChartKey::Ring(ring), &operator, None, lattice)?;
+                (
+                    PhaseSolve::Chart(chart),
+                    Some(ResonatorChart {
+                        ring,
+                        phase,
+                        certificate: read.certificate,
+                        target: read.target,
+                        steps: read.steps,
+                    }),
+                )
+            }
+        };
+        Ok(Self {
+            stiffness,
+            operator,
+            operator_norm,
+            solve,
+            reading,
+        })
+    }
 }
 
 /// [definition] **A resonator chart's reading**: the ring, the pump phase, the certificate
@@ -631,6 +860,8 @@ pub struct ResonatorOperands {
     admittance: Rat,
     step: Rat,
     phases: Vec<Phase>,
+    /// A pump schedule in place of the material's declared pump ([`ResonatorOperands::scheduled`]).
+    schedule: Option<PumpSchedule>,
 }
 
 /// [definition] **One executed resonator tick**: the tick's pump phase, the energy before (at the
@@ -715,51 +946,17 @@ impl ResonatorOperands {
             return Err(HnnError::NonpositiveDeclaration);
         }
         material.certify(ring, step)?;
-        let (capacity, _, dissipation) = material.forms();
-        let n = material.width();
         let phases = (0..material.phases())
             .map(|phase| {
-                let stiffness = material.pumped_stiffness(phase)?;
-                let operator = capacity
-                    .scaled(&integer(2))
-                    .add(&ExactRatMatrix::identity(n)?.scaled(&(step / admittance)))?
-                    .add(&dissipation.scaled(step))?
-                    .add(&stiffness.scaled(&(step * step / integer(2))))?;
-                let operator_norm = (0..n)
-                    .map(|i| {
-                        operator
-                            .row(i)
-                            .expect("in range")
-                            .iter()
-                            .map(|x| x.abs())
-                            .sum::<Rat>()
-                    })
-                    .max()
-                    .unwrap_or_else(Rat::zero);
-                let (solve, reading) = match lattice {
-                    None => (PhaseSolve::Exact(operator.inverse()?), None),
-                    Some(lattice) => {
-                        let (chart, read): (ChartWords, ChartReading) =
-                            refine(ChartKey::Ring(ring), &operator, None, lattice)?;
-                        (
-                            PhaseSolve::Chart(chart),
-                            Some(ResonatorChart {
-                                ring,
-                                phase,
-                                certificate: read.certificate,
-                                target: read.target,
-                                steps: read.steps,
-                            }),
-                        )
-                    }
-                };
-                Ok(Phase {
-                    stiffness,
-                    operator,
-                    operator_norm,
-                    solve,
-                    reading,
-                })
+                Phase::of(
+                    ring,
+                    material,
+                    material.pumped_stiffness(phase)?,
+                    admittance,
+                    step,
+                    lattice,
+                    phase,
+                )
             })
             .collect::<Result<Vec<_>, HnnError>>()?;
         Ok(Self {
@@ -768,7 +965,54 @@ impl ResonatorOperands {
             admittance: admittance.clone(),
             step: step.clone(),
             phases,
+            schedule: None,
         })
+    }
+
+    /// **A ring's resonator operands under a pump schedule** (module header, "The pump is a periodic
+    /// modulation of the constitution"): the material is declared unpumped, and tick `t` of the
+    /// schedule's period is its own phase, with stiffness `K + ⊕ −2p R_(ψ_t)`, certified by its
+    /// signed form and solved as [`ResonatorOperands::at_cut`] solves a declared pump's phase.
+    pub fn scheduled(
+        ring: usize,
+        material: &ResonatorMaterial,
+        schedule: &PumpSchedule,
+        admittance: &Rat,
+        step: &Rat,
+        lattice: Option<&WordLattice>,
+    ) -> Result<Self, HnnError> {
+        if !admittance.is_positive() || !step.is_positive() {
+            return Err(HnnError::NonpositiveDeclaration);
+        }
+        if material.pump().is_some() {
+            return Err(HnnError::Resonator {
+                ring,
+                what: "a scheduled pump replaces the declared pump: the material is declared unpumped",
+            });
+        }
+        let (_, stiffness, _) = material.forms();
+        let phases = (0..schedule.period())
+            .map(|phase| {
+                let pumped = stiffened(stiffness, &schedule.block(phase))?;
+                if !material.signed_form_holds(&pumped, step)? {
+                    return Err(HnnError::UncertifiedResonator { ring, phase });
+                }
+                Phase::of(ring, material, pumped, admittance, step, lattice, phase)
+            })
+            .collect::<Result<Vec<_>, HnnError>>()?;
+        Ok(Self {
+            ring,
+            material: material.clone(),
+            admittance: admittance.clone(),
+            step: step.clone(),
+            phases,
+            schedule: Some(schedule.clone()),
+        })
+    }
+
+    /// The pump schedule, when the operands run one.
+    pub fn schedule(&self) -> Option<&PumpSchedule> {
+        self.schedule.as_ref()
     }
 
     pub fn ring(&self) -> usize {
@@ -789,9 +1033,13 @@ impl ResonatorOperands {
     }
 
     /// **The pump phase at word tick `t`**: the pump's clock's torus point
-    /// ([`PumpDeclaration::phase_at`]); an unpumped ring has the one phase.
+    /// ([`PumpDeclaration::phase_at`]), or the schedule's `t mod period`; an unpumped ring has the one
+    /// phase.
     pub fn phase_at(&self, tick: usize) -> usize {
-        self.material.pump().map_or(0, |pump| pump.phase_at(tick))
+        match &self.schedule {
+            Some(schedule) => tick % schedule.period(),
+            None => self.material.pump().map_or(0, |pump| pump.phase_at(tick)),
+        }
     }
 
     /// The pump phases the word visits.
@@ -1009,6 +1257,715 @@ fn sup(vector: &[Rat]) -> Rat {
         .map(|x| x.abs())
         .max()
         .unwrap_or_else(Rat::zero)
+}
+
+// -------------------------------------------------------------------------------------------
+// the Floquet monodromy and its certificate
+
+/// [definition] **Why a Floquet certificate is refused** ([`Floquet::certify`],
+/// [`attain_metric`]).
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub enum FloquetRefusal {
+    /// The declared growth `ρ` is negative.
+    NegativeGrowth,
+    /// The metric `G` is not a symmetric form on the state's width.
+    MetricShape,
+    /// `G` is not positive definite.
+    MetricNotDefinite,
+    /// `ρ²G − M_TᵀGM_T` has a negative direction: the energy can grow past `ρ²` in one period.
+    GrowthExceeded,
+    /// The exterior attainment's Stein operator is singular at the declared growth (`ρ² = μ_iμ_j`
+    /// for two multipliers).
+    Unattainable,
+}
+
+/// [definition] **The executed tick as a linear map of the state** (module header, "The Floquet
+/// monodromy"): `x′ = T x` on `x = (u, w)`, with `X` the executed solve,
+/// `T = [[I − h²XK, 2hXC], [−2hXK, 4XC − I]]`.
+fn tick_map(
+    solve: &ExactRatMatrix,
+    capacity: &ExactRatMatrix,
+    stiffness: &ExactRatMatrix,
+    hop: &Rat,
+) -> Result<ExactRatMatrix, HnnError> {
+    let n = capacity.rows();
+    let identity = ExactRatMatrix::identity(n)?;
+    let solved_stiffness = solve.multiply(stiffness)?;
+    let solved_capacity = solve.multiply(capacity)?;
+    let blocks = [
+        identity.subtract(&solved_stiffness.scaled(&(hop * hop)))?,
+        solved_capacity.scaled(&(integer(2) * hop)),
+        solved_stiffness.scaled(&(integer(-2) * hop)),
+        solved_capacity.scaled(&integer(4)).subtract(&identity)?,
+    ];
+    Ok(ExactRatMatrix::shaped(
+        2 * n,
+        2 * n,
+        (0..2 * n)
+            .map(|i| {
+                (0..2 * n)
+                    .map(|j| {
+                        blocks[2 * (i / n) + j / n]
+                            .get(i % n, j % n)
+                            .expect("in range")
+                            .clone()
+                    })
+                    .collect()
+            })
+            .collect(),
+    )?)
+}
+
+/// [proved-derived; implemented-exact] **The multipliers' placement about a circle** `|μ| = r`
+/// ([`Floquet::placement`]): exact counts of the Floquet multipliers outside, on and inside it,
+/// with multiplicity.
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq)]
+pub struct Placement {
+    pub outside: usize,
+    pub on: usize,
+    pub inside: usize,
+}
+
+/// [definition] **A pumped ring's Floquet monodromy** (module header, "The Floquet monodromy"): the
+/// executed ticks of one pump period as linear maps of the state, and their product
+/// `M_T = T_(T−1) ⋯ T_0`, the transport around the pump's cycle, with its characteristic
+/// polynomial.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct Floquet {
+    ring: usize,
+    ticks: Vec<ExactRatMatrix>,
+    monodromy: ExactRatMatrix,
+    characteristic: RationalPolynomial,
+}
+
+impl Floquet {
+    /// **The monodromy of the executed ticks** over one period of the operands' pump (the declared
+    /// pump's order, a schedule's period, one tick unpumped), each tick's solve the executed one:
+    /// the law's inverse, or the certified chart's exact matrix.
+    pub fn of(operands: &ResonatorOperands) -> Result<Self, HnnError> {
+        let (capacity, _, _) = operands.material().forms();
+        let ticks = operands
+            .phases
+            .iter()
+            .map(|phase| {
+                tick_map(
+                    &phase.solve.matrix()?,
+                    capacity,
+                    &phase.stiffness,
+                    operands.hop(),
+                )
+            })
+            .collect::<Result<Vec<_>, HnnError>>()?;
+        let mut monodromy = ExactRatMatrix::identity(2 * operands.width())?;
+        for tick in &ticks {
+            monodromy = tick.multiply(&monodromy)?;
+        }
+        let characteristic = monodromy.characteristic_polynomial()?;
+        Ok(Self {
+            ring: operands.ring(),
+            ticks,
+            monodromy,
+            characteristic,
+        })
+    }
+
+    /// `M_T`.
+    pub fn monodromy(&self) -> &ExactRatMatrix {
+        &self.monodromy
+    }
+
+    /// Each tick's map `T_t`, in the period's order.
+    pub fn ticks(&self) -> &[ExactRatMatrix] {
+        &self.ticks
+    }
+
+    /// `det(μ − M_T)`, monic.
+    pub fn characteristic(&self) -> &RationalPolynomial {
+        &self.characteristic
+    }
+
+    /// [proved-derived; implemented-exact] **The multipliers' placement about `|μ| = r`**. The
+    /// Cayley map `μ = r(1 + s)/(1 − s)` sends the circle to the imaginary axis and its outside to
+    /// the right half-plane, so `q(s) = (1 − s)^n χ(r(1 + s)/(1 − s)) = ∏_i ((r − μ_i) + (r + μ_i)s)`
+    /// has the root `(μ_i − r)/(μ_i + r)` for every multiplier but `−r`, which drops its degree.
+    /// The half-plane count of `q` (`ratio::polynomial::half_plane_count`, Routh–Hurwitz in its
+    /// Sturm form) counts the multipliers outside, on and inside exactly; each `−r` counts on.
+    pub fn placement(&self, radius: &Rat) -> Result<Placement, HnnError> {
+        if !radius.is_positive() {
+            return Err(HnnError::NonpositiveDeclaration);
+        }
+        let degree = self.monodromy.rows();
+        let plus = RationalPolynomial::new(vec![Rat::one(), Rat::one()]);
+        let minus = RationalPolynomial::new(vec![Rat::one(), -Rat::one()]);
+        let powers = |factor: &RationalPolynomial| {
+            let mut powers = vec![RationalPolynomial::one()];
+            for _ in 0..degree {
+                let next = powers.last().expect("one power at least").times(factor);
+                powers.push(next);
+            }
+            powers
+        };
+        let (plus_powers, minus_powers) = (powers(&plus), powers(&minus));
+        let mut image = RationalPolynomial::zero();
+        let mut scale = Rat::one();
+        for k in 0..=degree {
+            let coefficient = self.characteristic.coefficient(k);
+            if !coefficient.is_zero() {
+                image = image.plus(
+                    &plus_powers[k]
+                        .times(&minus_powers[degree - k])
+                        .scaled(&(coefficient * &scale)),
+                );
+            }
+            scale *= radius;
+        }
+        let image_degree = image.degree().unwrap_or(0);
+        let count = half_plane_count(&image).map_err(HnnError::from)?;
+        Ok(Placement {
+            outside: count.right,
+            on: count.axis + (degree - image_degree),
+            inside: count.left,
+        })
+    }
+
+    /// [proved-derived; implemented-exact] **The Floquet certificate** (module header): a metric
+    /// `G ≻ 0`, attained by any exterior means, and a growth `ρ ≥ 0` with `M_TᵀGM_T ⪯ ρ²G`, each
+    /// decided exactly by Sylvester inertia: `In(G) = (n, 0, 0)` and `ρ²G − M_TᵀGM_T` has no negative
+    /// direction. Then `E_G(M_T^m x) ≤ ρ^(2m) E_G(x)` (Lean `HNN/Floquet.floquet_energy_iterate`).
+    /// Refused with its reason; nothing about how `G` was attained is trusted.
+    pub fn certify(
+        &self,
+        metric: &ExactRatMatrix,
+        growth: &Rat,
+    ) -> Result<FloquetCertificate, HnnError> {
+        let refuse = |refusal| HnnError::UncertifiedFloquet {
+            ring: self.ring,
+            refusal,
+        };
+        if growth.is_negative() {
+            return Err(refuse(FloquetRefusal::NegativeGrowth));
+        }
+        let width = self.monodromy.rows();
+        if metric.rows() != width || metric.columns() != width || metric.transpose()? != *metric {
+            return Err(refuse(FloquetRefusal::MetricShape));
+        }
+        if inertia(&symmetric(metric)?).positive != width {
+            return Err(refuse(FloquetRefusal::MetricNotDefinite));
+        }
+        let carried = self
+            .monodromy
+            .transpose()?
+            .multiply(metric)?
+            .multiply(&self.monodromy)?;
+        let gap = inertia(&symmetric(
+            &metric.scaled(&(growth * growth)).subtract(&carried)?,
+        )?);
+        if gap.negative != 0 {
+            return Err(refuse(FloquetRefusal::GrowthExceeded));
+        }
+        Ok(FloquetCertificate {
+            metric: metric.clone(),
+            growth: growth.clone(),
+            period: self.ticks.len(),
+            gap,
+        })
+    }
+
+    /// [proved-derived; implemented-exact] **The exact decision** at the grain `2^(−g)` (module
+    /// header, "The bifurcation"):
+    /// - every multiplier strictly inside the unit circle: **passive**, certified at `ρ = 1`;
+    /// - one outside: **growing**, the spectral radius enclosed in `[lower, upper]`, `lower > 1` a
+    ///   radius some multiplier reaches (its placement counts one outside, or one on) and
+    ///   `upper − lower ≤ 2^(−g)`, certified at `ρ = upper`;
+    /// - none outside and some on the circle: **the edge** (a turn or a shear), certified at
+    ///   `ρ = 1 + 2^(−g)`.
+    ///
+    /// Each certificate's metric is attained by the exact Stein solve ([`attain_metric`]) and
+    /// certified by [`Floquet::certify`].
+    pub fn decide(&self, grain: u32) -> Result<FloquetReading, HnnError> {
+        let unit = Rat::one();
+        let cell = dyadic(grain);
+        let at_unit = self.placement(&unit)?;
+        if at_unit.outside == 0 {
+            if at_unit.on == 0 {
+                let metric = attain_metric(self.ring, &self.monodromy, &unit)?;
+                return Ok(FloquetReading::Passive {
+                    certificate: self.certify(&metric, &unit)?,
+                });
+            }
+            let edge = &unit + &cell;
+            let metric = attain_metric(self.ring, &self.monodromy, &edge)?;
+            return Ok(FloquetReading::Edge {
+                certificate: self.certify(&metric, &edge)?,
+                on_circle: at_unit.on,
+            });
+        }
+        let mut lower = unit;
+        let mut upper = integer(2);
+        loop {
+            let placed = self.placement(&upper)?;
+            if placed.outside == 0 && placed.on == 0 {
+                break;
+            }
+            if placed.outside > 0 || placed.on > 0 {
+                lower = upper.clone();
+            }
+            upper *= integer(2);
+        }
+        while &upper - &lower > cell {
+            let middle = (&lower + &upper) / integer(2);
+            let placed = self.placement(&middle)?;
+            if placed.outside > 0 {
+                lower = middle;
+            } else if placed.on == 0 {
+                upper = middle;
+            } else {
+                // A multiplier on the circle `|μ| = middle` and none outside: the spectral radius is
+                // `middle` exactly.
+                lower = middle;
+                break;
+            }
+        }
+        let metric = attain_metric(self.ring, &self.monodromy, &upper)?;
+        Ok(FloquetReading::Growing {
+            certificate: self.certify(&metric, &upper)?,
+            lower,
+        })
+    }
+
+    /// [proved-derived; implemented-exact] **The bound the constitution consumes** (module header,
+    /// "The consumer"): every tick's certified energy factor `σ_t²` in the certificate's metric
+    /// (`σ_t²G − T_tᵀGT_t ⪰ 0`, the least dyadic at the relative grain `2^(−g)`), and the metric's
+    /// certified equivalence to the state's Euclidean form, `γ_lo|x|² ≤ E_G(x) ≤ γ_hi|x|²`, each
+    /// decided by inertia.
+    pub fn bound(
+        &self,
+        certificate: &FloquetCertificate,
+        grain: u32,
+    ) -> Result<FloquetBound, HnnError> {
+        let metric = certificate.metric();
+        let width = metric.rows();
+        let identity = ExactRatMatrix::identity(width)?;
+        let semidefinite = |form: ExactRatMatrix| -> Result<bool, HnnError> {
+            Ok(inertia(&symmetric(&form)?).negative == 0)
+        };
+        let mut tick = Rat::zero();
+        for map in &self.ticks {
+            let carried = map.transpose()?.multiply(metric)?.multiply(map)?;
+            let factor = least_dyadic(grain, |value| {
+                semidefinite(metric.scaled(value).subtract(&carried)?)
+            })?;
+            tick = tick.max(factor);
+        }
+        let high = least_dyadic(grain, |value| {
+            semidefinite(identity.scaled(value).subtract(metric)?)
+        })?;
+        let low = greatest_dyadic(grain, |value| {
+            semidefinite(metric.subtract(&identity.scaled(value))?)
+        })?;
+        Ok(FloquetBound {
+            growth: certificate.growth().clone(),
+            period: certificate.period(),
+            tick,
+            low,
+            high,
+        })
+    }
+}
+
+/// `2^(−g)`.
+fn dyadic(grain: u32) -> Rat {
+    Rat::new(BigInt::one(), BigInt::one() << grain)
+}
+
+/// The least value at the relative grain `2^(−g)` where a monotone predicate (false below its
+/// threshold, true above) holds: doubled from one until it holds, halved while its half holds, then
+/// bisected until the bracket is within `2^(−g)` of its upper end.
+fn least_dyadic(
+    grain: u32,
+    holds: impl Fn(&Rat) -> Result<bool, HnnError>,
+) -> Result<Rat, HnnError> {
+    let two = integer(2);
+    let mut upper = Rat::one();
+    while !holds(&upper)? {
+        upper *= &two;
+    }
+    let mut lower = &upper / &two;
+    while holds(&lower)? {
+        if lower.is_zero() {
+            return Ok(lower);
+        }
+        upper = lower.clone();
+        lower /= &two;
+        if lower < dyadic(grain) * dyadic(grain) {
+            return Ok(if holds(&Rat::zero())? {
+                Rat::zero()
+            } else {
+                upper
+            });
+        }
+    }
+    while &upper - &lower > &upper * dyadic(grain) {
+        let middle = (&lower + &upper) / &two;
+        if holds(&middle)? {
+            upper = middle;
+        } else {
+            lower = middle;
+        }
+    }
+    Ok(upper)
+}
+
+/// The greatest positive value at the relative grain `2^(−g)` where a monotone predicate (true
+/// below its threshold, false above) holds; the predicate holds at some positive value.
+fn greatest_dyadic(
+    grain: u32,
+    holds: impl Fn(&Rat) -> Result<bool, HnnError>,
+) -> Result<Rat, HnnError> {
+    let two = integer(2);
+    let mut lower = Rat::one();
+    while !holds(&lower)? {
+        lower /= &two;
+    }
+    let mut upper = &lower * &two;
+    while holds(&upper)? {
+        lower = upper.clone();
+        upper *= &two;
+    }
+    while &upper - &lower > &lower * dyadic(grain) {
+        let middle = (&lower + &upper) / &two;
+        if holds(&middle)? {
+            lower = middle;
+        } else {
+            upper = middle;
+        }
+    }
+    Ok(lower)
+}
+
+/// [definition; agent-inferred] **The exterior attainment of a Floquet metric** (module header):
+/// the Stein solve `M_TᵀGM_T − ρ²G = −ρ²I` over the symmetric unknowns, exact. When every multiplier
+/// lies strictly inside `|μ| = ρ` its solution is `G = Σ_k (M_T/ρ)^(kᵀ)(M_T/ρ)^k ≻ 0`, so
+/// `ρ²G − M_TᵀGM_T = ρ²I ≻ 0`. It is one exterior means among any: [`Floquet::certify`] trusts none
+/// of it. A singular Stein operator (`ρ² = μ_iμ_j`) is refused.
+pub fn attain_metric(
+    ring: usize,
+    monodromy: &ExactRatMatrix,
+    growth: &Rat,
+) -> Result<ExactRatMatrix, HnnError> {
+    let n = monodromy.rows();
+    let pairs: Vec<(usize, usize)> = (0..n).flat_map(|i| (i..n).map(move |j| (i, j))).collect();
+    let position = |k: usize, l: usize| -> usize {
+        let (a, b) = (k.min(l), k.max(l));
+        // the packed upper triangle, row by row
+        a * n - a * (a + 1) / 2 + b
+    };
+    let squared = growth * growth;
+    let mut rows = vec![vec![Rat::zero(); pairs.len()]; pairs.len()];
+    let mut target = vec![Rat::zero(); pairs.len()];
+    for (row, &(i, j)) in pairs.iter().enumerate() {
+        for k in 0..n {
+            let left = monodromy.get(k, i)?;
+            if left.is_zero() {
+                continue;
+            }
+            for l in 0..n {
+                let right = monodromy.get(l, j)?;
+                if !right.is_zero() {
+                    rows[row][position(k, l)] += left * right;
+                }
+            }
+        }
+        rows[row][position(i, j)] -= &squared;
+        if i == j {
+            target[row] = -squared.clone();
+        }
+    }
+    let unattainable = HnnError::UncertifiedFloquet {
+        ring,
+        refusal: FloquetRefusal::Unattainable,
+    };
+    let Some((solution, kernel)) = ExactRatMatrix::new(rows)?.preimage_fibre(&target)? else {
+        return Err(unattainable);
+    };
+    if !kernel.is_empty() {
+        return Err(unattainable);
+    }
+    Ok(ExactRatMatrix::shaped(
+        n,
+        n,
+        (0..n)
+            .map(|i| (0..n).map(|j| solution[position(i, j)].clone()).collect())
+            .collect(),
+    )?)
+}
+
+/// [proved-derived; implemented-exact] **A Floquet certificate**: the metric `G ≻ 0`, the growth
+/// `ρ` per period with `M_TᵀGM_T ⪯ ρ²G`, the period and the gap's inertia, each decided exactly.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct FloquetCertificate {
+    metric: ExactRatMatrix,
+    growth: Rat,
+    period: usize,
+    gap: Inertia,
+}
+
+impl FloquetCertificate {
+    /// `G`.
+    pub fn metric(&self) -> &ExactRatMatrix {
+        &self.metric
+    }
+
+    /// `ρ`: the certified amplitude growth per period in `G`.
+    pub fn growth(&self) -> &Rat {
+        &self.growth
+    }
+
+    /// The ticks of one period.
+    pub fn period(&self) -> usize {
+        self.period
+    }
+
+    /// The inertia of `ρ²G − M_TᵀGM_T` (no negative direction).
+    pub fn gap(&self) -> &Inertia {
+        &self.gap
+    }
+
+    /// **`ρ^(2m)`: the certified energy factor over `m` periods** (Lean
+    /// `HNN/Floquet.floquet_energy_iterate`).
+    pub fn energy_factor(&self, periods: u64) -> Rat {
+        let squared = &self.growth * &self.growth;
+        (0..periods).fold(Rat::one(), |factor, _| factor * &squared)
+    }
+
+    /// `ρ ≤ 1`: the storage cannot grow over a period (Lean `HNN/Floquet.floquet_passive`).
+    pub fn is_passive(&self) -> bool {
+        self.growth <= Rat::one()
+    }
+}
+
+/// [proved-derived; implemented-exact] **The exact reading of a pumped ring's Floquet growth**
+/// ([`Floquet::decide`]).
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub enum FloquetReading {
+    /// Every multiplier strictly inside the unit circle: the storage decays; certified at `ρ = 1`.
+    Passive { certificate: FloquetCertificate },
+    /// None outside and `on_circle` on it: the lossless edge (a turn, or a shear at the tongue's
+    /// edge); certified at `ρ = 1 + 2^(−g)`.
+    Edge {
+        certificate: FloquetCertificate,
+        on_circle: usize,
+    },
+    /// A multiplier outside: the storage grows, its spectral radius at least `lower > 1` and at most
+    /// the certificate's `ρ`.
+    Growing {
+        certificate: FloquetCertificate,
+        lower: Rat,
+    },
+}
+
+impl FloquetReading {
+    pub fn certificate(&self) -> &FloquetCertificate {
+        match self {
+            Self::Passive { certificate }
+            | Self::Edge { certificate, .. }
+            | Self::Growing { certificate, .. } => certificate,
+        }
+    }
+
+    /// The ring locks: its storage grows past the bifurcation.
+    pub fn is_locked(&self) -> bool {
+        matches!(self, Self::Growing { .. })
+    }
+
+    /// The ring is certified silent: its storage decays.
+    pub fn is_silent(&self) -> bool {
+        matches!(self, Self::Passive { .. })
+    }
+}
+
+/// [proved-derived; implemented-exact] **The bound the constitution consumes** ([`Floquet::bound`];
+/// module header, "The consumer"): `ρ` per period, the period `T`, the largest tick factor
+/// `max_t σ_t²` in `G`, and `γ_lo|x|² ≤ E_G(x) ≤ γ_hi|x|²`.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct FloquetBound {
+    pub growth: Rat,
+    pub period: usize,
+    pub tick: Rat,
+    pub low: Rat,
+    pub high: Rat,
+}
+
+impl FloquetBound {
+    /// **The consumer's factor over `s` ticks from any phase**:
+    /// `|x_(τ+s)|² ≤ (γ_hi/γ_lo) · max_o ρ^(2m_o) (max_t σ_t²)^(s − T m_o) · |x_τ|²`, the span's first
+    /// full period starting after `o` ticks (`0 ≤ o < T`), `m_o = ⌊(s − o)/T⌋` whole periods (Lean
+    /// `HNN/Floquet.{floquet_tick_product, floquet_metric_change}`).
+    pub fn reach(&self, ticks: u64) -> Rat {
+        let period = self.period as u64;
+        let squared = &self.growth * &self.growth;
+        let power =
+            |base: &Rat, exponent: u64| (0..exponent).fold(Rat::one(), |value, _| value * base);
+        let worst = (0..period)
+            .map(|offset| {
+                let whole = ticks.saturating_sub(offset) / period;
+                power(&squared, whole) * power(&self.tick, ticks - whole * period)
+            })
+            .max()
+            .unwrap_or_else(Rat::one);
+        &self.high / &self.low * worst
+    }
+}
+
+// -------------------------------------------------------------------------------------------
+// the locked sheet and the receiving bank
+
+/// [proved-derived; implemented-exact] **The sheets a pumped resonator locks to from a seed**
+/// ([`lock`]): per node, the in-phase projection's side of the axis after the executed passage, or
+/// `None` exactly on the quadrature line (held); the final state; whether every executed tick's
+/// balance closed.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct LockedSheets {
+    pub sheets: Vec<Option<bool>>,
+    pub state: [Vec<Rat>; 2],
+    pub closed: bool,
+    pub ticks: usize,
+}
+
+/// [proved-derived; implemented-exact] **Phase-sensitive amplification read at its locked sheet**
+/// (module header, "Phase-sensitive amplification"): the executed, undriven passage of `periods`
+/// pump periods from the seed `(u, w)`, every tick's balance checked, then each node's in-phase
+/// projection `Re(z ā)` at the axis `a`. Past the bifurcation the in-phase quadrature grows by the
+/// Floquet multiplier and the rest does not, so the sheet is the sign of the seed's growing
+/// coordinate: for a seed on the displacement, the sign of `⟨u, a⟩`, a `cos(φ_in − φ_a)` reading
+/// (Lean `HNN/Floquet.{inphase_growing, inphase_growing_coordinate}`). It is linear, then
+/// threshold: odd under the half-turn of its seed.
+pub fn lock(
+    operands: &ResonatorOperands,
+    seed: [&[Rat]; 2],
+    periods: usize,
+    axis: &Carrier,
+) -> Result<LockedSheets, HnnError> {
+    let n = operands.width();
+    let drive = vec![Rat::zero(); n];
+    let remainders = ResonatorRemainders::zero(n);
+    let mut state = [seed[0].to_vec(), seed[1].to_vec()];
+    let mut closed = true;
+    let ticks = periods * operands.phases();
+    for tick in 0..ticks {
+        let step = operands.step(tick, &drive, [&state[0], &state[1]], &remainders, None)?;
+        closed &= step.closes();
+        state = step.state;
+    }
+    let sheets = state[0]
+        .chunks(2)
+        .map(|node| {
+            let in_phase =
+                &node[0] * axis.cos() + node.get(1).map_or_else(Rat::zero, |y| y * axis.sin());
+            (!in_phase.is_zero()).then(|| in_phase.is_negative())
+        })
+        .collect();
+    Ok(LockedSheets {
+        sheets,
+        state,
+        closed,
+        ticks,
+    })
+}
+
+/// [definition; agent-inferred, September 29] **A bank of receiving parametrons at declared pump
+/// phases** (module header, "The relative phase is read by the pump"): one unpumped resonator
+/// material, and per member a declared pump whose carriers the cells crossing the section modulate
+/// ([`PumpSchedule::modulated`]). Each member's Floquet growth is decided exactly
+/// ([`Floquet::decide`]); a member locks when its growth is certified past one and is silent when
+/// its passivity is certified.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct ReceivingBank {
+    material: ResonatorMaterial,
+    pumps: Vec<PumpDeclaration>,
+    admittance: Rat,
+    hop: Rat,
+    grain: u32,
+}
+
+impl ReceivingBank {
+    /// A bank of at least one member on an unpumped material, a positive port and hop.
+    pub fn new(
+        material: ResonatorMaterial,
+        pumps: Vec<PumpDeclaration>,
+        admittance: Rat,
+        hop: Rat,
+        grain: u32,
+    ) -> Result<Self, HnnError> {
+        if material.pump().is_some() || pumps.is_empty() {
+            return Err(HnnError::Resonator {
+                ring: usize::MAX,
+                what: "a receiving bank is one unpumped material and at least one declared pump",
+            });
+        }
+        if !admittance.is_positive() || !hop.is_positive() {
+            return Err(HnnError::NonpositiveDeclaration);
+        }
+        Ok(Self {
+            material,
+            pumps,
+            admittance,
+            hop,
+            grain,
+        })
+    }
+
+    /// The members' declared pumps.
+    pub fn pumps(&self) -> &[PumpDeclaration] {
+        &self.pumps
+    }
+
+    /// **The bank's reading of the cells crossing its section**: each member's pump modulated by
+    /// the cells (one tick a crossing), its executed operands, its monodromy and its exact
+    /// decision.
+    pub fn read(&self, cells: &[Carrier]) -> Result<BankReading, HnnError> {
+        let readings = self
+            .pumps
+            .iter()
+            .enumerate()
+            .map(|(member, pump)| {
+                let schedule = PumpSchedule::modulated(pump, cells)?;
+                let operands = ResonatorOperands::scheduled(
+                    member,
+                    &self.material,
+                    &schedule,
+                    &self.admittance,
+                    &self.hop,
+                    None,
+                )?;
+                Floquet::of(&operands)?.decide(self.grain)
+            })
+            .collect::<Result<Vec<_>, HnnError>>()?;
+        Ok(BankReading { readings })
+    }
+}
+
+/// [proved-derived; implemented-exact] **A bank's reading**: each member's exact Floquet reading.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct BankReading {
+    pub readings: Vec<FloquetReading>,
+}
+
+impl BankReading {
+    /// The members that lock.
+    pub fn locked(&self) -> Vec<usize> {
+        (0..self.readings.len())
+            .filter(|member| self.readings[*member].is_locked())
+            .collect()
+    }
+
+    /// **The bank's class**: the one member that locks while every other is certified silent; no
+    /// class otherwise (a plural lock, none, or an edge).
+    pub fn class(&self) -> Option<usize> {
+        let locked = self.locked();
+        let silent = self.readings.iter().filter(|r| r.is_silent()).count();
+        (locked.len() == 1 && silent + 1 == self.readings.len()).then(|| locked[0])
+    }
 }
 
 // -------------------------------------------------------------------------------------------

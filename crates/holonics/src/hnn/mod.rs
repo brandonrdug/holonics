@@ -178,7 +178,7 @@ pub use ratio::{Faces, HolonRatio, RatioCovector};
 pub use receiving::{ActiveAddress, LetterReader, ReceivingPhases, ReceivingRead};
 pub use reference::{Cut, Exposure, Reference, Resident};
 pub use retention::AeonBoundary;
-pub use ring::{PumpDeclaration, ResonatorMaterial};
+pub use ring::{Floquet, FloquetReading, PumpDeclaration, PumpSchedule, ResonatorMaterial};
 pub use word::{Released, ResonatorBalance, Word};
 
 #[cfg(test)]
@@ -197,6 +197,7 @@ use crate::ratio::Rat;
 use crate::ratio::algebraic::ExactValueError;
 use crate::ratio::exponentiated::RatioError;
 use crate::ratio::linear::ExactLinearError;
+use crate::ratio::polynomial::ExactPolynomialError;
 use crate::receiver::face::WidthRefusal;
 
 /// Every refusal of the HNN. Bad input is a typed return, never a panic, and every refusal names its
@@ -414,6 +415,13 @@ pub enum HnnError {
     UncertifiedResonator { ring: usize, phase: usize },
     #[error("ring {ring}'s resonator material is malformed: {what}")]
     Resonator { ring: usize, what: &'static str },
+    #[error("ring {ring}'s Floquet certificate is refused: {refusal:?}")]
+    UncertifiedFloquet {
+        ring: usize,
+        refusal: ring::FloquetRefusal,
+    },
+    #[error(transparent)]
+    Polynomial(Box<ExactPolynomialError>),
     #[error(
         "the chart {chart:?} did not refine below its certificate {certificate}: the target is {target}"
     )]
@@ -441,4 +449,5 @@ boxed_from!(
     Parametron(ParametronError),
     Compression(CompressionError),
     Aeon(AeonError),
+    Polynomial(ExactPolynomialError),
 );

@@ -43,8 +43,10 @@ This module joins them; it founds no second energy, mode or clock.
    pairing energy under `σ ↦ ¬σ`, while negating every carrier (`globalHalfTurn_composite`); the
    drive is what breaks the symmetry (`drive_breaks_halfTurn`).
 
-[open] Pump/Floquet locking dynamics (that the pump actually selects the two sheets as attracting
-basins) is not proved; the locked sheets are taken as given. The oscillator here is the exact
+[open] The pump's locking is the pumped ring's Floquet growth (`HNN/Floquet`: past the bifurcation
+the two sheets are the rays of the growing Floquet mode, chosen by the seed's growing coordinate);
+this module takes its locked sheets as given, and `Objects/ParametronLock` reads the lock as an
+Ising site. The linear law holds no saturated amplitude (#62). The oscillator here is the exact
 ring micro-step; the continuous section crossing of `A cos(ωt + φ)` is not identified with it by
 a theorem. No damping or hardware law is asserted.
 
