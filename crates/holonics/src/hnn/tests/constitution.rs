@@ -1812,3 +1812,43 @@ fn a_complex_bilinear_block_has_no_declaration() {
         &x[0] * &x[0] + &x[1] * &x[1]
     );
 }
+
+/// **The gains read the span factor term by term** (`hnn::constitution`, "The pumped medium's
+/// reach"; Lean `Holon/Deposition.{station_tick_gain, entry_span_gain}`): every tick's term
+/// `g^(2(T_j − τ − 1))` is multiplied by `F(T_j − τ)`, and each station's squared re-entry sum by
+/// `F` of its longest span; with no factor the passive medium's sums are read unchanged.
+#[test]
+fn the_gains_read_the_span_factor_term_by_term() {
+    let reach = crate::hnn::constitution::Reach {
+        receiver: 2,
+        stations: vec![3, 5],
+        entries: vec![0, 2],
+        phases: 1,
+    };
+    let growth = rat(9, 8);
+    let factor: Vec<Rat> = (0..=5)
+        .map(|s| integer(1) + rat(s, 2) * rat(s, 3))
+        .collect();
+    let power = |x: &Rat, k: u64| (0..k).fold(Rat::one(), |value, _| value * x);
+    let (mut ticks, mut passive_ticks) = (Rat::zero(), Rat::zero());
+    let (mut entries, mut passive_entries) = (Rat::zero(), Rat::zero());
+    for &station in &reach.stations {
+        for tau in 0..station {
+            let term = power(&(&growth * &growth), station - tau - 1);
+            ticks += &term * &factor[(station - tau) as usize];
+            passive_ticks += term;
+        }
+        let sum: Rat = reach
+            .entries
+            .iter()
+            .filter(|&&entry| entry <= station)
+            .map(|&entry| power(&growth, station - entry))
+            .sum();
+        entries += &sum * &sum * &factor[station as usize];
+        passive_entries += &sum * &sum;
+    }
+    assert_eq!(reach.tick_gain(&growth, Some(&factor)), ticks);
+    assert_eq!(reach.entry_gain(&growth, Some(&factor)), entries);
+    assert_eq!(reach.tick_gain(&growth, None), passive_ticks);
+    assert_eq!(reach.entry_gain(&growth, None), passive_entries);
+}

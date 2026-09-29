@@ -264,11 +264,13 @@ fn a_step_past_zero_backtracks_to_the_midpoint_and_is_named() {
     ));
 }
 
-/// A pumped resonator has no certified growth (its Floquet bound is owed in #62), so a step of its
-/// pump gain is refused before any candidate is formed (`UncertifiedGain`), and nothing is
-/// published.
+/// **A pumped ring's own gains are held and named** (`hnn::constitution`, "The pumped medium's
+/// reach"): the ring's reach is read by its Floquet bound, but a step of its own gains moves its
+/// monodromy along the ray, which no certified reach covers, and its pumped stiffness has no
+/// certified storage growth at the commit; so the family is held (nothing of it moves), the deposit
+/// is published, and its reading names the ring's reach and the held family.
 #[test]
-fn an_uncertified_pump_gain_refuses_without_publishing_any_part_of_the_candidate() {
+fn a_pumped_rings_own_gain_is_held_and_named() {
     let field = chain();
     let width = field.ring(0).width();
     let pump =
@@ -283,21 +285,115 @@ fn an_uncertified_pump_gain_refuses_without_publishing_any_part_of_the_candidate
     let theta = silent(&field, 303)
         .with_ring_resonator(&field, 0, material)
         .unwrap();
-    let before_bits = theta.exact_bits();
-    let error = theta
+    let (next, reading) = theta
         .deposited(&one_gain_step(0, 3, integer(2), Rat::zero()))
-        .unwrap_err();
-    assert!(matches!(error, HnnError::UncertifiedGain { ring: 0 }));
-    assert_eq!(theta.commit(), 0);
-    assert_eq!(theta.exact_bits(), before_bits);
-    assert!(
-        theta
-            .resonator(0)
-            .unwrap()
-            .gains()
-            .iter()
-            .all(|gain| gain == &Rat::one())
+        .unwrap();
+    assert_eq!(next.commit(), 1);
+    assert!(reading.steps.is_empty());
+    let pumped = reading.pumped.expect("the pumped ring's reach is read");
+    assert_eq!(pumped.rings.len(), 1);
+    assert_eq!(pumped.rings[0].ring, 0);
+    assert_eq!(
+        pumped.held,
+        vec![(
+            Locus::Resonator(0),
+            crate::hnn::constitution::Family::Resonator(3)
+        )]
     );
+    assert_eq!(
+        next.resonator(0).unwrap().gains(),
+        theta.resonator(0).unwrap().gains()
+    );
+}
+
+/// **A deposit through a pumped receiving ring is certified below and past its bifurcation**
+/// (`hnn::constitution`, "The pumped medium's reach"): the receiving ring's resonator, `C = I`,
+/// `K = I`, under a standing pump, is decided passive below the bifurcation and growing past it by
+/// its Floquet monodromy; the gains read its reach at every span, so the refinement's deposit
+/// through it is certified and taken (every step holding its certificate), its own gains held, and
+/// the step shrinks as the reach grows.
+#[test]
+fn a_deposit_through_a_pumped_receiving_ring_is_certified_below_and_past_its_bifurcation() {
+    use crate::hnn::chart::Charts;
+    use crate::hnn::prediction::{Refinement, deposit_of, stage};
+    use crate::hnn::ring::FloquetReading;
+    let field = chain();
+    let receiver = field.receivers()[0].ring;
+    let width = field.ring(receiver).width();
+    let (current, moment) = super::learning::moment(&field, 177, 11);
+    let stations = field.ring(receiver).period() as usize;
+    let refinement =
+        Refinement::declare(&field, receiver, 3, 2, stations, field.alphabet() - 1).unwrap();
+    let targets: Vec<usize> = (0..refinement.stations()).map(|j| j % 4).collect();
+    let mut readings = Vec::new();
+    for strength in [rat(1, 8), integer(2)] {
+        let pump =
+            PumpDeclaration::new(strength, PumpAxis::at(&Rat::zero()), PumpStep::Stand).unwrap();
+        let material = ResonatorMaterial::new(
+            ExactRatMatrix::identity(width).unwrap(),
+            ExactRatMatrix::identity(width).unwrap(),
+            ExactRatMatrix::zero(width, width).unwrap(),
+            Some(pump),
+        )
+        .unwrap();
+        let theta = generic(&field, 75)
+            .with_ring_resonator(&field, receiver, material)
+            .unwrap();
+        assert!(theta.amplitude().unwrap().is_none());
+        let staged = stage(
+            &field,
+            &theta,
+            &current,
+            &moment,
+            &refinement,
+            &targets,
+            &vec![false; refinement.stations()],
+            &mut Charts::new(),
+            false,
+        )
+        .unwrap();
+        let deposit =
+            deposit_of(&theta, &refinement, std::slice::from_ref(&staged.composed)).unwrap();
+        let (next, reading) = theta.deposited(&deposit).unwrap();
+        assert_eq!(next.commit(), 1);
+        assert!(!reading.steps.is_empty());
+        assert!(reading.steps.iter().all(|(_, step)| step.step.holds()));
+        let pumped = reading.pumped.expect("the receiving ring's reach is read");
+        assert_eq!(pumped.rings.len(), 1);
+        assert_eq!(pumped.rings[0].ring, receiver);
+        assert!(
+            pumped
+                .held
+                .iter()
+                .all(|(locus, _)| *locus == Locus::Resonator(receiver))
+        );
+        assert_eq!(
+            next.resonator(receiver).unwrap().gains(),
+            theta.resonator(receiver).unwrap().gains()
+        );
+        readings.push((pumped, reading.steps));
+    }
+    let (below, above) = (&readings[0], &readings[1]);
+    assert!(matches!(
+        below.0.rings[0].reading,
+        FloquetReading::Passive { .. }
+    ));
+    assert!(matches!(
+        above.0.rings[0].reading,
+        FloquetReading::Growing { .. }
+    ));
+    // The reach past the bifurcation is the larger at the longest span, and every step it rates is
+    // at most the one below it rates at the same locus and family.
+    assert!(above.0.factor > below.0.factor);
+    for (locus, step) in &above.1 {
+        if let Some((_, other)) = below
+            .1
+            .iter()
+            .find(|(at, other)| at == locus && other.family == step.family)
+        {
+            assert!(step.gain >= other.gain, "{locus:?} {:?}", step.family);
+        }
+    }
 }
 
 #[test]

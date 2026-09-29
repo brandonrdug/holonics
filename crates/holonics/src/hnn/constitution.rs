@@ -75,10 +75,69 @@
 //! `‖R + ηD‖₂ ≤ ‖R‖₂ + η‖D‖₂`, `‖W + ηD‖₁ ≤ ‖W‖₁ + η‖D‖₁`), so a step that raises another locus's
 //! gain is halved until every certificate holds at its own ray (the projection;
 //! [`Constitution::deposited`]). The
-//! gains assume the medium passive but for the contrast ports, whose growth `(1 + ω)²` they carry:
-//! a pumped resonator has no certified growth (the Floquet bound is owed in #62), and a declared
-//! boost's signed stiffness stores indefinite energy, so no step is certified through either
-//! ([`HnnError::UncertifiedGain`], [`HnnError::ActiveContact`]).
+//! gains read the medium passive but for the contrast ports, whose growth `(1 + ω)²` they carry,
+//! and the resonators not certified passive, whose growth is their Floquet reach ("The pumped
+//! medium's reach", below); a declared boost's signed stiffness stores indefinite energy, so no step
+//! is certified through it ([`HnnError::ActiveContact`]).
+//!
+//! [definition; agent-inferred, September 29] **The pumped medium's reach** (the
+//! [parametron's record](../../../../research/records/2026-09-29_THE_PARAMETRON_RE_DERIVED_THE_PUMP_READS_RELATIVE_PHASE_AND_THE_FLOQUET_CERTIFICATE_DECIDES_THE_LOCK.md)
+//! §1.8, its consumer equation; the
+//! [reach's record](../../../../research/records/2026-09-29_THE_CERTIFIED_STEP_READS_THE_FLOQUET_REACH_PINNED_BEFORE_ITS_RUNS.md);
+//! Lean `HNN/Floquet.{floquet_span_reach, partial_period_le_pow}`, `Holon/Deposition` §10). A
+//! resonator is **certified passive** when it is unpumped and its stiffness `K ⪰ 0` by exact
+//! inertia (`C, D ⪰ 0` by declaration): its tick keeps or dissipates `diag(K, C)`. Any other (a pump,
+//! or a signed stiffness) is read by its Floquet monodromy over its pump's period on the exact law
+//! (`hnn::ring::Floquet`), decided at its resonator lattice's grain `2^(−g)`, and bounded
+//! (`hnn::ring::FloquetBound::reach`): a span of `s` ticks from any pump phase carries the ring's
+//! state energy by at most
+//!
+//! ```text
+//! reach_r(s) = (γ_hi/γ_lo) · max_(0 ≤ o < T) ρ^(2m_o) (max_t σ_t²)^(s − T m_o),   m_o = ⌊(s − o)/T⌋
+//! ```
+//!
+//! with `G ≻ 0`, `M_TᵀGM_T ⪯ ρ²G`, `T_tᵀGT_t ⪯ σ_t²G` and `γ_lo I ⪯ G ⪯ γ_hi I` each decided by
+//! inertia. The metric is attained by any means ([`RingReach`]): the ladder of growths
+//! `ρ₀(1 + 2^k)`, `|k| ≤ g`, above the decided `ρ₀`, each attained by the exact Stein solve and
+//! certified, climbed from `k = 0` toward the least reach at the longest span; each span's reach is
+//! the least of the certified bounds'. [measured, the reach's record] The decided growth's own
+//! metric is ill-conditioned near a multiplier on or near its circle (on the chain's edge rings
+//! `γ_hi/γ_lo` lies between `2^16` and `2^17`), and the ladder lowers the reach at the longest span
+//! by many binary orders there. The medium's **span factor** is
+//! `F(s) = ∏_r max_(s′ ≤ s) reach_r(s′)` over those rings (`holon::deposition::span_factors`,
+//! Lean `pumped_span_factor`): a difference carried by several rings within a span of `s` ticks is
+//! carried by each for at most `s`, and the running maximum does not fall. The consumer equation
+//! enters every gain but the receiving map's (each sample one station's logits):
+//!
+//! ```text
+//! E_g        κ² = d ‖R‖² (Y_g/Y_R) Σ_j (Σ_(n: T_n ≤ T_j) (1+ω)^(T_j − T_n))² F(T_j − min_n T_n)     (entry_span_gain)
+//! W_c,r …    κ² = ‖R‖² (Y_r/Y_R) Σ_j Σ_(τ < T_j) (1+ω)^(2(T_j − τ − 1)) F(T_j − τ)                 (station_tick_gain)
+//! ```
+//!
+//! and likewise every factor family's tick sum (the element's, the standing's, a channel's and an
+//! unpumped resonator's): each span's energy gain is the medium's `(1 + ω)^(2(s − 1))` times the
+//! rings' `F(s)` (`span_transport_compose`), and the gain over the stations and ticks is the sum of
+//! the span gains (`station_tick_gain`, Cauchy–Schwarz over the ticks). With every resonator
+//! certified passive there is no factor, and every gain is read exactly as before.
+//! - **The ring's own gains are held.** A step of a reach-read ring's own gain families moves its
+//!   monodromy along the ray, and one certificate read at the ray's start does not cover its
+//!   interior; a pumped ring's stiffness is indefinite, so its storage growth has no certificate at
+//!   the commit either. Those families are held (their statistic moves, their entries do not) and
+//!   named ([`PumpedReading::held`]), always for a pumped ring, and for a signed stiffness unless
+//!   the readout is zero along the whole joint ray (then every gain is zero, whatever the reach).
+//! - **The refusal stays where no certificate exists.** A ring whose decided certificate is refused
+//!   (the Stein solve singular at the decided growth, `ρ₀² = μ_iμ_j`) refuses the deposit
+//!   ([`HnnError::UncertifiedGain`], with its reason). [measured, source-inspected] The exact
+//!   placement leaves that only to a degenerate tie: every finite monodromy has a certificate at
+//!   every growth above its spectral radius.
+//! - [scope] The consumer equation reads the pumped ring's undriven reach (the executed tick with
+//!   its port terminated, `hnn::ring`'s monodromy) as the transport of the difference its state
+//!   carries within a span, composed with the medium's passive and contrast ticks. The loop through
+//!   the field's return into the pumped ring within one span (the port's feedback, a supply-rate
+//!   certificate `E_G(x′) ≤ σ²E_G(x) + supply(e, s′)` of the driven ring) is not certified here: its
+//!   statement is owed in #62, with the reach along a ring's own gain ray (a tube of monodromies)
+//!   and a modulated pump's passage-dependent schedule. [`DepositReading::pumped`] reports each ring's
+//!   decision, bounds and reach, the span factor at the longest span and the families held.
 //!
 //! [definition; agent-inferred, September 29] **The factor families' certified step** (the
 //! [factor step's record](../../../../research/records/2026-09-29_THE_FACTOR_FAMILIES_CERTIFIED_STEP_PINNED_BEFORE_ITS_RUNS.md);
@@ -369,6 +428,7 @@
 //! | `HNN/Normal.reaction_deposit_storage_unchanged`, `reaction_deposits_keep_committed_energy`; `Holon/Deposition.committed_energy_bound` | [`DepositReading::storage_growth`], [`Constitution::storage_product`] (refused when uncertified: [`HnnError::UncertifiedStorage`]) |
 //! | `Holon/Deposition.{certified_step_descends, quadratic_upper_model, gauss_newton_curvature, joint_cauchy_schwarz}`, `HNN/Normal.certified_normal_step` | [`NormalLaw::prepare`] (the unit step and its readings), [`Constitution::deposited`] (the certified steps: [`StepReading`]) |
 //! | `Holon/Deposition.{active_element_growth, active_energy_growth}` | [`Constitution::amplitude`] (the per-tick growth `1 + ω`) |
+//! | `HNN/Floquet.{floquet_span_reach, partial_period_le_pow}`, `Holon/Deposition.{span_transport_compose, station_tick_gain, entry_span_gain, runningMax, le_runningMax, runningMax_mono, pumped_span_factor}` | the pumped medium's reach ([`RingReach`], [`MediumReach`], [`Constitution::medium_reach`], [`PumpedReading`], `Reach`'s gains, `holon::deposition::span_factors`) |
 //! | `Holon/Deposition.{factor_unit_step_alignment, square_ray_move, square_ray_deriv_bound, contracting_resolvent, transit_difference_power}` with `certified_step_descends`, `gauss_newton_curvature` | the factor families' certified step ([`FactorStep`], [`Family`], [`StepReading`], [`Constitution::deposited`]) |
 //! | `Holon/Deposition.{joint_move_triangle, joint_step_descends, gram_certificate_bound, adjoint_gram_certificate_bound, entrywise_error_bound}` | the tightened certificate ([`Constitution::deposited`], [`DepositReading::joint`], [`StepReading::bound`]; `holon::deposition::{JointReading, spectral_norm}`) |
 //! | `HNN/Normal.factorCarrier_psd` | the factor families ([`FactorGradient`]) |
@@ -403,11 +463,14 @@ use crate::hnn::port::Deposit;
 use crate::hnn::propagation::gram;
 use crate::hnn::realization::{indexed, outer_integral};
 use crate::hnn::receiving::{ReceivingStep, landmark_declaration, receiving_population};
-use crate::hnn::ring::ResonatorMaterial;
+use crate::hnn::ring::{
+    Floquet, FloquetBound, FloquetReading, ResonatorMaterial, ResonatorOperands, attain_metric,
+};
 use crate::holon::deposition::{
     CertifiedStep, CommittedEnergyBound, JointReading, root_ceiling, schur_norms, significant,
-    spectral_norm, sqrt_ceiling,
+    span_factors, spectral_norm, sqrt_ceiling,
 };
+use crate::ratio::linear::inertia::inertia;
 use crate::ratio::linear::vector::{
     Chart, IntegralMatrix, integer_dot, integral, lcm, matrix_form,
 };
@@ -2407,9 +2470,11 @@ pub struct Reach {
 }
 
 impl Reach {
-    /// `Σ_j (Σ_(n: T_n ≤ T_j) g^(T_j − T_n))²`: the re-entries' amplitude gains summed at every
-    /// station, for a per-tick amplitude growth `g`.
-    fn entry_gain(&self, growth: &Rat) -> Rat {
+    /// `Σ_j (Σ_(n: T_n ≤ T_j) g^(T_j − T_n))² · F(T_j − min_n T_n)`: the re-entries' amplitude gains
+    /// summed at every station, for a per-tick amplitude growth `g`, each station's multiplied by
+    /// the pumped medium's span factor at its longest span (module header, "The pumped medium's
+    /// reach"; Lean `Holon/Deposition.entry_span_gain`). No factor reads the passive medium's.
+    pub(crate) fn entry_gain(&self, growth: &Rat, factor: Option<&[Rat]>) -> Rat {
         let powers = Self::powers(growth, self.stations.iter().max().map_or(0, |t| t + 1));
         self.stations
             .iter()
@@ -2420,20 +2485,31 @@ impl Reach {
                     .filter(|&&entry| entry <= station)
                     .map(|&entry| powers[(station - entry) as usize].clone())
                     .sum();
-                &sum * &sum
+                let square = &sum * &sum;
+                let first = self.entries.iter().filter(|&&entry| entry <= station).min();
+                match (factor, first) {
+                    (Some(factor), Some(&first)) => square * &factor[(station - first) as usize],
+                    _ => square,
+                }
             })
             .sum()
     }
 
-    /// `Σ_j Σ_(τ < T_j) g^(2(T_j − τ − 1))`: every tick's energy gain to every station.
-    fn tick_gain(&self, growth: &Rat) -> Rat {
+    /// `Σ_j Σ_(τ < T_j) g^(2(T_j − τ − 1)) F(T_j − τ)`: every tick's energy gain to every station,
+    /// each span's multiplied by the pumped medium's span factor (module header, "The pumped
+    /// medium's reach"; Lean `Holon/Deposition.station_tick_gain`). No factor reads the passive
+    /// medium's.
+    pub(crate) fn tick_gain(&self, growth: &Rat, factor: Option<&[Rat]>) -> Rat {
         let top = self.stations.iter().max().copied().unwrap_or(0);
         let powers = Self::powers(&(growth * growth), top);
-        // `sums[t] = Σ_(k < t) g^(2k)`.
+        // `sums[t] = Σ_(k < t) g^(2k) F(k + 1)`.
         let mut sums = Vec::with_capacity(top as usize + 1);
         sums.push(Rat::zero());
-        for power in &powers {
-            let next = sums.last().expect("seeded") + power;
+        for (k, power) in powers.iter().enumerate() {
+            let next = match factor {
+                Some(factor) => sums.last().expect("seeded") + power * &factor[k + 1],
+                None => sums.last().expect("seeded") + power,
+            };
             sums.push(next);
         }
         self.stations
@@ -2513,6 +2589,11 @@ pub struct DepositReading {
     /// The lock's proposal, when the chart's steps turn a sheet the held successor keeps
     /// ([`Constitution::locked`]; module header, "At a node: the lock's half-turn").
     pub lock: Option<LockProposal>,
+    /// The pumped medium's reach the certified steps read: each ring not certified passive with
+    /// its Floquet decision and bound, the span factor at the longest span, and the families held
+    /// (`None` when every resonator is certified passive; module header, "The pumped medium's
+    /// reach").
+    pub pumped: Option<PumpedReading>,
 }
 
 impl DepositReading {
@@ -2528,6 +2609,52 @@ impl DepositReading {
             .find(|(at, reading)| *at == locus && reading.family == family)
             .map_or_else(Rat::zero, |(_, reading)| reading.step.step.clone())
     }
+}
+
+/// [definition; agent-inferred, September 29] **One ring's reach** (module header, "The pumped
+/// medium's reach"): a ring whose resonator is not certified passive, its Floquet monodromy decided
+/// exactly at its lattice's grain (passive, the edge or growing; `hnn::ring::Floquet::decide`); the
+/// bounds its certified growths give (`hnn::ring::FloquetBound`: `ρ` a period, the largest tick
+/// factor `σ²`, `γ_lo`, `γ_hi`), the decided growth's first and each on the ladder above it; and
+/// its reach over the spans `0..=S`, each span's the least of the bounds' (each certified, so their
+/// least is), at its ceiling on the certificate's face.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct RingReach {
+    pub ring: usize,
+    pub reading: FloquetReading,
+    pub bounds: Vec<FloquetBound>,
+    pub reach: Vec<Rat>,
+}
+
+/// [definition; agent-inferred, September 29] **The medium's reach** ([`Constitution::medium_reach`];
+/// module header, "The pumped medium's reach"): the contrast ports' per-tick amplitude growth
+/// `1 + ω`, each ring not certified passive with its reach, and the span factors
+/// `F(s) = ∏_r max_(s′ ≤ s) reach_r(s′)` over the spans `0..=S` (every factor one when every
+/// resonator is passive). A span of `s` ticks moves the energy by at most `(1 + ω)^(2s) F(s)`.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct MediumReach {
+    pub amplitude: Rat,
+    pub rings: Vec<RingReach>,
+    pub factors: Vec<Rat>,
+}
+
+impl MediumReach {
+    /// `F(s)` for a span within the declared ones (`None` past them: no factor is certified there).
+    pub fn factor(&self, span: u64) -> Option<&Rat> {
+        self.factors.get(span as usize)
+    }
+}
+
+/// [definition; agent-inferred, September 29] **What a deposit through a pumped medium read**
+/// ([`DepositReading::pumped`]; module header, "The pumped medium's reach"): each ring's reach, the
+/// longest span its stations read and the span factor there, and the families held: a ring's own
+/// gain families whose rays move its monodromy, so no certified reach covers them.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct PumpedReading {
+    pub rings: Vec<RingReach>,
+    pub span: u64,
+    pub factor: Rat,
+    pub held: Vec<(Locus, Family)>,
 }
 
 // -------------------------------------------------------------------------------------------
@@ -3925,7 +4052,8 @@ impl Constitution {
     /// **The storage forms a deposit can change** (module header, "The committed energy bound,
     /// enforced at the commit"): each contact's `C_a = c cᵀ` and `K_a = b bᵀ`, and each unpumped
     /// resonator's `C` and `K` (squared gains times their declared bases). A pumped resonator's
-    /// stiffness may be indefinite; its growth is not certified here.
+    /// stiffness may be indefinite; its growth is its Floquet reach, and its own gains are held
+    /// (module header, "The pumped medium's reach"), so no deposit changes its storage.
     fn storage_forms(&self) -> Result<Vec<ExactRatMatrix>, HnnError> {
         let mut forms = Vec::new();
         for material in &self.contacts {
@@ -3954,15 +4082,21 @@ impl Constitution {
     /// "The certified step"): `ω` the largest certified bound of a ring's contrast port
     /// (`holon::deposition::{schur_norms, sqrt_ceiling}` at the ring's element lattice), so a tick
     /// multiplies the power by at most `(1 + ω)²` (`holon::deposition::active_growth`). `None` when a
-    /// pumped resonator leaves the growth uncertified.
+    /// resonator is not certified passive: its growth is the medium's reach, read with the span
+    /// factor ([`Constitution::medium_reach`]; module header, "The pumped medium's reach").
     pub fn amplitude(&self) -> Result<Option<Rat>, HnnError> {
-        if self
-            .rings
-            .iter()
-            .any(|material| material.resonator.as_ref().is_some_and(pumped))
-        {
-            return Ok(None);
+        for material in &self.rings {
+            if let Some(resonator) = &material.resonator
+                && !certified_passive(resonator)?
+            {
+                return Ok(None);
+            }
         }
+        Ok(Some(self.contrast_amplitude()?))
+    }
+
+    /// `1 + ω`, the contrast ports' certified per-tick amplitude growth, whatever the resonators.
+    pub fn contrast_amplitude(&self) -> Result<Rat, HnnError> {
         let mut bound = Rat::zero();
         for (g, material) in self.rings.iter().enumerate() {
             let (column, row) = schur_norms(material.contrast.map());
@@ -3971,7 +4105,147 @@ impl Constitution {
                 bound = omega;
             }
         }
-        Ok(Some(Rat::one() + bound))
+        Ok(Rat::one() + bound)
+    }
+
+    /// [definition; agent-inferred, September 29] **Each ring's reach over the spans `0..=span`**
+    /// (module header, "The pumped medium's reach"): every ring whose resonator is not certified
+    /// passive, its Floquet monodromy over its pump's period on the exact law
+    /// (`hnn::ring::Floquet::of` at the ring's admittance and hop), decided at its resonator
+    /// lattice's grain `2^(−g)` (its growth `ρ₀`), and its growth's ladder `ρ₀(1 + 2^k)`,
+    /// `|k| ≤ g`, each metric attained by the exact Stein solve and certified by inertia
+    /// (`hnn::ring::{attain_metric, Floquet::certify, Floquet::bound}`). A metric near `ρ₀` is
+    /// ill-conditioned (`γ_hi/γ_lo` large); a growth far above it grows every period: the ladder
+    /// climbs from `k = 0` toward the rung whose reach at the longest span is least and stops where
+    /// it no longer falls, and each span's reach is the least of the certified bounds' (each a bound,
+    /// so their least is). When no rung certifies, the decided certificate's bound is read. A
+    /// refused decision is the refusal [`HnnError::UncertifiedGain`], with its reason: no step is
+    /// certified through that ring.
+    fn ring_reaches(&self, span: u64) -> Result<Vec<RingReach>, HnnError> {
+        let mut rings = Vec::new();
+        for (ring, material) in self.rings.iter().enumerate() {
+            let Some(resonator) = &material.resonator else {
+                continue;
+            };
+            if certified_passive(resonator)? {
+                continue;
+            }
+            let locus = Locus::Resonator(ring);
+            let hop = material
+                .resonator_step
+                .as_ref()
+                .ok_or(HnnError::Lattice { locus })?;
+            let grain = self.lattice(locus)?.exponent();
+            let refused = |error: HnnError| match error {
+                HnnError::UncertifiedFloquet { ring, refusal } => {
+                    HnnError::UncertifiedGain { ring, refusal }
+                }
+                other => other,
+            };
+            let operands =
+                ResonatorOperands::at_cut(ring, resonator, &self.admittances[ring], hop, None)?;
+            let floquet = Floquet::of(&operands)?;
+            let reading = floquet.decide(grain).map_err(refused)?;
+            let decided = reading.certificate().growth().clone();
+            let longest = span as usize;
+            // One rung: the growth `ρ₀(1 + 2^k)`, its metric attained by the exact Stein solve and
+            // certified by inertia; a growth the solve cannot attain (`ρ² = μ_iμ_j`) or the
+            // certificate refuses gives no bound.
+            let rung = |k: i64| -> Result<Option<(FloquetBound, Vec<Rat>)>, HnnError> {
+                let margin = if k < 0 {
+                    Rat::new(BigInt::one(), BigInt::one() << (-k) as usize)
+                } else {
+                    Rat::from_integer(BigInt::one() << k as usize)
+                };
+                let growth = &decided * (Rat::one() + margin);
+                let Ok(metric) = attain_metric(ring, floquet.monodromy(), &growth) else {
+                    return Ok(None);
+                };
+                let Ok(certificate) = floquet.certify(&metric, &growth) else {
+                    return Ok(None);
+                };
+                let bound = floquet.bound(&certificate, grain)?;
+                let table = (0..=span).map(|s| ceiling(&bound.reach(s))).collect();
+                Ok(Some((bound, table)))
+            };
+            // The ladder climbs from `k = 0` toward the rung whose reach at the longest span is
+            // least, one dyadic rung at a time within `|k| ≤ g`, and stops where it no longer falls.
+            let bound_k = i64::from(grain);
+            let mut read: Vec<(i64, FloquetBound, Vec<Rat>)> = Vec::new();
+            if let Some((bound, table)) = rung(0)? {
+                read.push((0, bound, table));
+            }
+            if let Some((_, _, at_zero)) = read.first().cloned() {
+                for direction in [-1i64, 1] {
+                    let mut best = at_zero[longest].clone();
+                    let mut k = direction;
+                    while k.abs() <= bound_k {
+                        let Some((bound, table)) = rung(k)? else {
+                            break;
+                        };
+                        let falls = table[longest] < best;
+                        if falls {
+                            best = table[longest].clone();
+                        }
+                        read.push((k, bound, table));
+                        if !falls {
+                            break;
+                        }
+                        k += direction;
+                    }
+                }
+            }
+            // No rung certified: the decided certificate's own bound.
+            if read.is_empty() {
+                let bound = floquet
+                    .bound(reading.certificate(), grain)
+                    .map_err(refused)?;
+                let table = (0..=span).map(|s| ceiling(&bound.reach(s))).collect();
+                read.push((i64::MIN, bound, table));
+            }
+            read.sort_by_key(|(k, ..)| *k);
+            let mut reach = read[0].2.clone();
+            for (_, _, table) in &read[1..] {
+                for (kept, value) in reach.iter_mut().zip(table) {
+                    if value < kept {
+                        *kept = value.clone();
+                    }
+                }
+            }
+            let bounds = read.into_iter().map(|(_, bound, _)| bound).collect();
+            rings.push(RingReach {
+                ring,
+                reading,
+                bounds,
+                reach,
+            });
+        }
+        Ok(rings)
+    }
+
+    /// The span factors `F(0..=span)` of the rings' reaches, each at its ceiling on the
+    /// certificate's face (`holon::deposition::span_factors`).
+    fn factors_of(rings: &[RingReach], span: u64) -> Vec<Rat> {
+        let tables: Vec<Vec<Rat>> = rings.iter().map(|ring| ring.reach.clone()).collect();
+        span_factors(&tables, span as usize)
+            .iter()
+            .map(ceiling)
+            .collect()
+    }
+
+    /// [definition; agent-inferred, September 29] **The medium's reach over the spans `0..=span`**
+    /// (module header, "The pumped medium's reach"): the contrast ports' `1 + ω`, each ring not
+    /// certified passive with its reach, and the span factors. A consumer's energy bound over a
+    /// refinement of `T` ticks reads `F(T)` beside `1 + ω` (Lean `Holon/Deposition.pumped_span_factor`:
+    /// every span within `T` is carried by `F(T)` at most). Refused where a ring's certificate is.
+    pub fn medium_reach(&self, span: u64) -> Result<MediumReach, HnnError> {
+        let rings = self.ring_reaches(span)?;
+        let factors = Self::factors_of(&rings, span);
+        Ok(MediumReach {
+            amplitude: self.contrast_amplitude()?,
+            rings,
+            factors,
+        })
     }
 
     /// **A linear locus's gain `κ²`** at a readout bound `‖R‖₂²` and an amplitude growth `1 + ω`
@@ -4029,8 +4303,10 @@ impl Constitution {
     /// certificate admits (`ηC ≤ a`, `ηc ≤ 1`); a step whose own certificate the readings at the rays'
     /// ends do not admit is halved, and while the joint certificate fails the family whose halving
     /// gains it most, `½ η (s m (2 Σ η m − ½ η m) − a)`, is halved, until both hold. Refused without a
-    /// reach, through a pumped resonator or a declared boost, and for a channel family through a
-    /// contact whose conductance has no bound.
+    /// reach, through a declared boost, through a ring whose Floquet decision is refused, and for a
+    /// channel family through a contact whose conductance has no bound. Every gain but the
+    /// receiving map's reads the pumped medium's span factor, and a reach-read ring's own gain
+    /// families are held (module header, "The pumped medium's reach").
     fn certify_steps(
         &self,
         reach: Option<&Reach>,
@@ -4104,16 +4380,9 @@ impl Constitution {
             }
         }
         if parts.is_empty() {
-            return Ok((BTreeMap::new(), None));
+            return Ok((BTreeMap::new(), None, None));
         }
         let reach = reach.ok_or(HnnError::MissingReach)?;
-        if let Some(ring) = self
-            .rings
-            .iter()
-            .position(|material| material.resonator.as_ref().is_some_and(pumped))
-        {
-            return Err(HnnError::UncertifiedGain { ring });
-        }
         if let Some(contact) = self
             .contacts
             .iter()
@@ -4128,11 +4397,6 @@ impl Constitution {
                 return Err(HnnError::UncertifiedConductance { contact });
             }
         }
-        let place: BTreeMap<(Locus, Family), usize> = parts
-            .iter()
-            .enumerate()
-            .map(|(index, (locus, family, _))| ((*locus, *family), index))
-            .collect();
         // `s`, the station score's curvature in its realified logits (module header).
         let score = rat(1, 2);
         let receiving = self
@@ -4145,6 +4409,50 @@ impl Constitution {
         // The readout's certified spectral norm `‖R‖₂` (module header, "The tightened certificate").
         let map = receiving.map();
         let readout_base = ceiling(&spectral_norm(map.rows(), map.columns(), map.entries()));
+        // The pumped medium's reach (module header, "The pumped medium's reach"): each ring not
+        // certified passive read by its Floquet bound (refused where its certificate is), the span
+        // factors over the stations' spans, and the ring's own gain families held where their rays
+        // would read a reach no certificate covers: always for a pumped ring (its pumped stiffness
+        // also has no certified storage growth at the commit), and for a signed stiffness unless
+        // the readout is zero along the whole joint ray (then every gain is zero, whatever the
+        // reach).
+        let span = reach.stations.iter().max().copied().unwrap_or(0);
+        let rings = self.ring_reaches(span)?;
+        let factors = (!rings.is_empty()).then(|| Self::factors_of(&rings, span));
+        let mut held = Vec::new();
+        if !rings.is_empty() {
+            let silent = readout_base.is_zero()
+                && !parts.iter().any(|(locus, family, _)| {
+                    *locus == Locus::ReceivingMap(reach.receiver) && *family == Family::Map
+                });
+            let holds = |locus: &Locus| match *locus {
+                Locus::Resonator(ring) => {
+                    rings.iter().any(|reached| reached.ring == ring)
+                        && (!silent || self.rings[ring].resonator.as_ref().is_some_and(pumped))
+                }
+                _ => false,
+            };
+            held = parts
+                .iter()
+                .filter(|(locus, ..)| holds(locus))
+                .map(|(locus, family, _)| (*locus, *family))
+                .collect();
+            parts.retain(|(locus, ..)| !holds(locus));
+        }
+        let pumped_reading = factors.as_ref().map(|factors| PumpedReading {
+            rings: rings.clone(),
+            span,
+            factor: factors.last().cloned().unwrap_or_else(Rat::one),
+            held: held.clone(),
+        });
+        if parts.is_empty() {
+            return Ok((BTreeMap::new(), None, pumped_reading));
+        }
+        let place: BTreeMap<(Locus, Family), usize> = parts
+            .iter()
+            .enumerate()
+            .map(|(index, (locus, family, _))| ((*locus, *family), index))
+            .collect();
         let contrast_base: Vec<(Rat, Rat)> = self
             .rings
             .iter()
@@ -4353,8 +4661,8 @@ impl Constitution {
         // pass.
         let sums = |amplitude: &Rat| {
             (
-                ceiling(&reach.tick_gain(amplitude)),
-                ceiling(&reach.entry_gain(amplitude)),
+                ceiling(&reach.tick_gain(amplitude, factors.as_deref())),
+                ceiling(&reach.entry_gain(amplitude, factors.as_deref())),
             )
         };
         let reading = |steps: &[Option<CertifiedStep>]| -> Result<Vec<(Rat, Rat)>, HnnError> {
@@ -4480,7 +4788,7 @@ impl Constitution {
                     )
                 })
                 .collect();
-            return Ok((readings, Some(joint)));
+            return Ok((readings, Some(joint), pumped_reading));
         }
     }
 
@@ -4604,7 +4912,7 @@ impl Constitution {
             return Err(refusal);
         }
         // The certificate reads every prepared step at once.
-        let (certified, joint) = {
+        let (certified, joint, pumped) = {
             let linear: Vec<(Locus, LinearLocus, &PreparedStep)> = regions
                 .iter()
                 .zip(&ready)
@@ -4786,6 +5094,7 @@ impl Constitution {
             backtracks,
             lobe,
             lock,
+            pumped,
         };
         Ok((next, reading))
     }
@@ -5304,9 +5613,14 @@ impl Constitution {
 /// steps met with the place of the refusing step in the deposit's order.
 type LocusDeposit = Result<(Locus, Carries, (BudgetedCarry, Vec<ChartReading>)), (usize, HnnError)>;
 
-/// A deposit's certified steps by family, and the joint certificate they hold together (`None` when
-/// no family stepped).
-type CertifiedSteps = (BTreeMap<(Locus, Family), StepReading>, Option<JointReading>);
+/// A deposit's certified steps by family, the joint certificate they hold together (`None` when
+/// no family stepped), and the pumped medium's reach they read (`None` when every resonator is
+/// certified passive).
+type CertifiedSteps = (
+    BTreeMap<(Locus, Family), StepReading>,
+    Option<JointReading>,
+    Option<PumpedReading>,
+);
 
 /// One locus's pass-1 preparation: its budgeted carry (opened by its first step), its linear step's
 /// place, kind and prepared unit step (none when its window reached nothing), and its factor
@@ -5707,6 +6021,19 @@ fn pumped(resonator: &ResonatorMaterial) -> bool {
     resonator
         .pump()
         .is_some_and(|pump| !pump.strength().is_zero())
+}
+
+/// [definition; agent-inferred, September 29] **A resonator certified passive** (module header, "The
+/// pumped medium's reach"): unpumped with its stiffness `K ⪰ 0` by exact inertia (its `C, D ⪰ 0` by
+/// declaration), so its tick keeps or dissipates its storage `diag(K, C)` (Lean
+/// `HNN/Floquet.storage_form_certifies_passive`). Otherwise (a pump, or a signed stiffness) its
+/// growth is its Floquet reach.
+fn certified_passive(resonator: &ResonatorMaterial) -> Result<bool, HnnError> {
+    if pumped(resonator) {
+        return Ok(false);
+    }
+    let (_, stiffness, _) = resonator.forms();
+    Ok(inertia(&crate::hnn::contact::symmetric(stiffness)?).negative == 0)
 }
 
 /// One step of a deposit at its locus.

@@ -722,8 +722,9 @@ fn the_loaded_source_matches_with_y4_and_hop_two() {
         2,
     );
     assert_eq!(compared.compares, 8);
-    // The pumped resonator's growth is not certified (the Floquet bound is owed in #62), so the
-    // certified step refuses every deposit whose families move through it, alike on both ports;
+    // Contact 0's declared boost stores indefinite energy in its signed stiffness, so the certified
+    // step refuses every deposit whose families move (`ActiveContact`), alike on both ports, before
+    // the pumped ring's Floquet reach is read (`hnn::constitution`, "The pumped medium's reach");
     // a deposit whose families move nothing is published and steps no family.
     assert!(compared.refused > 0);
     assert_eq!(compared.stepped_loci, 0);

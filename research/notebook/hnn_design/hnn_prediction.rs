@@ -21,6 +21,8 @@
 //! cargo run --release -p holonics --example hnn_prediction -- text .local/cuts/curated-u6-passage-cut.bin .local/cuts/u6-native-sections.txt
 //! cargo run --release -p holonics --example hnn_prediction -- develop copy|moire <train> <evaluate> [batch] [d] [K]
 //! cargo run --release -p holonics --example hnn_prediction -- develop text <cut> <train>
+//! cargo run --release -p holonics --example hnn_prediction -- develop pumped <train> <evaluate> <a> <b>
+//! cargo run --release -p holonics --example hnn_prediction -- pumped below|past
 //! ```
 //!
 //! [definition; agent-inferred, the record's pins] **What it executes.**
@@ -75,6 +77,14 @@
 //!   its continuation `x_t = x_(t−2) + 1 (mod 4)` the target, whose marginal is uniform; its
 //!   evaluation also counts the held-out stations the static marginal (the class most frequent in
 //!   the training targets) and the per-station marginal read right.
+//! - **The pumped receiving ring** (`pumped`; the
+//!   [reach's pins](../../records/2026-09-29_THE_CERTIFIED_STEP_READS_THE_FLOQUET_REACH_PINNED_BEFORE_ITS_RUNS.md);
+//!   `hnn::constitution`, "The pumped medium's reach"): the terrains' field and refinement on rings
+//!   of period `d = 4` with `m = 4` stations, the receiving ring's resonator `C = I`, `K = I`,
+//!   `D = 0` under a standing pump at `p = 1/4` (`below`) or `p = 1` (`past`) its bifurcation
+//!   `p = ½`, trained on the copy terrain with every check; the committed energy bound is read with
+//!   the span factor at the refinement's span, and the readout prints the rings' Floquet decisions,
+//!   bounds and reach, the certified steps and the families held.
 //! - **Guards**: the run stops at its deadline (the pin's projection bound) or at its resident cap,
 //!   and reports its partial evidence as incomplete. `train <pairs>` and `passes <n>` bound the text
 //!   run's training below the pinned 1,024 pairs and 2 passes (a bounded reading, reported as such).
@@ -101,7 +111,9 @@ use holonics::hnn::prediction::{
     Refinement, Section, comparison_code, deposit_of, generate, generate_by_bank, mask, stage,
     unreached_unchanged,
 };
-use holonics::hnn::ring::{PumpDeclaration, PumpStep, ReceivingBank, ResonatorMaterial};
+use holonics::hnn::ring::{
+    FloquetReading, PumpDeclaration, PumpStep, ReceivingBank, ResonatorMaterial,
+};
 use holonics::hnn::word::PowerForm;
 use holonics::holon::parametron::Carrier;
 use holonics::ratio::linear::ExactRatMatrix;
@@ -151,6 +163,9 @@ struct Declared {
     order: bool,
     /// The order-2 terrain's request length `n`.
     request: usize,
+    /// The receiving ring's standing pump strength `p`, as a ratio, when its resonator is declared
+    /// (`pumped`; module header, "The pumped receiving ring"); `None` on every other run.
+    pump: Option<(i64, i64)>,
 }
 
 /// **The field** (module header).
@@ -267,6 +282,14 @@ struct Tally {
     lock_taken: u64,
     lock_turned: u64,
     lock_ms: u128,
+    /// The pumped medium (`hnn::constitution`, "The pumped medium's reach"): the deposits whose steps
+    /// read it, the certified steps they took, the families held, the span factor at the
+    /// refinement's span at the last such deposit, and each ring's reading there.
+    pumped_deposits: u64,
+    pumped_steps: u64,
+    pumped_held: u64,
+    pumped_factor: Option<Rat>,
+    pumped_rings: Vec<String>,
 }
 
 /// **The comparison's code of a batch at a constitution** (the lock's exact comparison): each
@@ -388,8 +411,13 @@ impl Engine {
             declared.alphabet - 1,
         )
         .expect("the declared refinement");
-        let theta =
+        let mut theta =
             Constitution::initial(&field, CAMPAIGN_ONE_BUDGET).expect("the initial constitution");
+        if let Some((numerator, denominator)) = declared.pump {
+            theta = theta
+                .with_ring_resonator(&field, 0, pumped_resonator(&field, rat(numerator, denominator)))
+                .expect("the receiving ring's pumped resonator");
+        }
         Self {
             field,
             refinement,
@@ -517,13 +545,83 @@ impl Engine {
         let depositing = Instant::now();
         let deposit =
             deposit_of(&self.theta, &self.refinement, &composed).expect("the batch's deposit");
-        let amplitude = self
-            .theta
-            .amplitude()
-            .expect("the amplitude reads")
-            .expect("no pumped resonator on the declared field");
+        let passive = self.theta.amplitude().expect("the amplitude reads");
         let (mut next, reading) = self.theta.deposited(&deposit).expect("the deposit");
         self.tally.deposit_ms += depositing.elapsed().as_millis();
+        // The medium's per-tick growth and, through a pumped ring, the span factor at the
+        // refinement's span (`hnn::constitution`, "The pumped medium's reach"): the deposit's own
+        // reading when its steps read the reach, the medium's otherwise; one on a passive medium.
+        let (amplitude, factor) = match passive {
+            Some(amplitude) => (amplitude, Rat::from_integer(1.into())),
+            None => {
+                let span = self.refinement.last_epoch() as u64;
+                let factor = reading.pumped.as_ref().map_or_else(
+                    || {
+                        self.theta
+                            .medium_reach(span)
+                            .expect("the medium's reach")
+                            .factor(span)
+                            .expect("the span's factor")
+                            .clone()
+                    },
+                    |pumped| pumped.factor.clone(),
+                );
+                let amplitude = self
+                    .theta
+                    .contrast_amplitude()
+                    .expect("the contrast ports' growth");
+                (amplitude, factor)
+            }
+        };
+        if let Some(pumped) = &reading.pumped {
+            self.tally.pumped_deposits += 1;
+            self.tally.pumped_held += pumped.held.len() as u64;
+            self.tally.pumped_factor = Some(pumped.factor.clone());
+            self.tally.pumped_rings = pumped
+                .rings
+                .iter()
+                .map(|ring| {
+                    let class = match &ring.reading {
+                        FloquetReading::Passive { .. } => "passive".to_string(),
+                        FloquetReading::Edge { on_circle, .. } => {
+                            format!("the edge ({on_circle} multipliers on the unit circle)")
+                        }
+                        FloquetReading::Growing { lower, .. } => {
+                            format!("growing (spectral radius at least {lower})")
+                        }
+                    };
+                    format!(
+                        "ring {}: {class}, decided growth ρ₀ = {}; {} certified bounds read; reach over the spans 0..={}: {}; the bound the longest span read: ρ = {}, σ² = {}, γ_lo = {}, γ_hi = {}",
+                        ring.ring,
+                        ring.reading.certificate().growth(),
+                        ring.bounds.len(),
+                        pumped.span,
+                        ring.reach
+                            .iter()
+                            .map(ToString::to_string)
+                            .collect::<Vec<_>>()
+                            .join(", "),
+                        ring.bounds
+                            .iter()
+                            .min_by(|a, b| a.reach(pumped.span).cmp(&b.reach(pumped.span)))
+                            .map_or_else(|| "none".to_string(), |bound| bound.growth.to_string()),
+                        ring.bounds
+                            .iter()
+                            .min_by(|a, b| a.reach(pumped.span).cmp(&b.reach(pumped.span)))
+                            .map_or_else(|| "none".to_string(), |bound| bound.tick.to_string()),
+                        ring.bounds
+                            .iter()
+                            .min_by(|a, b| a.reach(pumped.span).cmp(&b.reach(pumped.span)))
+                            .map_or_else(|| "none".to_string(), |bound| bound.low.to_string()),
+                        ring.bounds
+                            .iter()
+                            .min_by(|a, b| a.reach(pumped.span).cmp(&b.reach(pumped.span)))
+                            .map_or_else(|| "none".to_string(), |bound| bound.high.to_string()),
+                    )
+                })
+                .collect();
+            self.tally.pumped_steps += reading.steps.len() as u64;
+        }
         // The standing's fold: the lobe held the standings in their lobes; where the lock chart's
         // steps turn a sheet, the lock compares the batch's code at both sheets exactly and takes
         // the half-turn only where the turned sheets are strictly better.
@@ -650,7 +748,9 @@ impl Engine {
                 )
                 .expect("the committed energy bound");
             self.tally.energy_checks += 1;
-            self.tally.energy_holds += u64::from(bound.holds);
+            // Through a pumped ring every span within the refinement's is carried by at most its
+            // factor (Lean `Holon/Deposition.pumped_span_factor`); on a passive medium it is one.
+            self.tally.energy_holds += u64::from(bound.committed <= &bound.bound * &factor);
         }
         for ((name, before), (_, after)) in families(&self.field, &self.theta)
             .into_iter()
@@ -767,6 +867,20 @@ impl Engine {
             t.lock_turned,
             t.lock_ms
         );
+        if t.pumped_deposits > 0 {
+            println!(
+                "  the pumped medium: {} deposits certified through it and taken, {} certified steps, {} own gain families held; the span factor at the refinement's span at the last deposit {}",
+                t.pumped_deposits,
+                t.pumped_steps,
+                t.pumped_held,
+                t.pumped_factor
+                    .as_ref()
+                    .map_or_else(|| "none".to_string(), ToString::to_string)
+            );
+            for ring in &t.pumped_rings {
+                println!("  {ring}");
+            }
+        }
         let factor = |name: &str| !["E", "R", "Wc"].iter().any(|linear| {
             name.strip_prefix(linear)
                 .is_some_and(|ring| ring.chars().all(|c| c.is_ascii_digit()))
@@ -912,6 +1026,7 @@ fn terrain_declared() -> Declared {
         batch: 16,
         order: false,
         request: ORDER_REQUEST,
+        pump: None,
     }
 }
 
@@ -950,6 +1065,43 @@ fn order_pairs(declared: &Declared, seed: u64, count: usize) -> Vec<(Vec<usize>,
         .collect()
 }
 
+/// **The pumped receiving ring's resonator** (module header, "The pumped receiving ring"): on the
+/// ring's realified width, `C = I`, `K = I`, no dissipation but its port, and a standing pump of
+/// strength `p` on the axis `1`; its standing bifurcation is `k − 2p = 0`, `p = ½`
+/// (Lean `HNN/Floquet.pumped_inphase_axis`).
+fn pumped_resonator(field: &Field, strength: Rat) -> ResonatorMaterial {
+    let width = field.ring(0).width();
+    let identity = ExactRatMatrix::identity(width).expect("identity");
+    let pump = PumpDeclaration::new(strength, Carrier::at(&Rat::zero()), PumpStep::Stand)
+        .expect("a standing pump");
+    ResonatorMaterial::new(
+        identity.clone(),
+        identity,
+        ExactRatMatrix::zero(width, width).expect("zero"),
+        Some(pump),
+    )
+    .expect("the pumped resonator")
+}
+
+/// **The pumped receiving ring's declaration** (module header, "The pumped receiving ring"): the
+/// terrains' refinement (`K = 2`, `w = 1`, `|A| = 5`, batch 16) on rings of period `d = 4` with
+/// `m = 4` stations, the receiving ring's resonator pumped at `p`.
+fn pumped_declared(strength: (i64, i64)) -> Declared {
+    Declared {
+        period: 4,
+        stations: 4,
+        pump: Some(strength),
+        ..terrain_declared()
+    }
+}
+
+/// The pins of the pumped runs: the strengths below and past the bifurcation, the training
+/// requests and the evaluation.
+const PUMP_BELOW: (i64, i64) = (1, 4);
+const PUMP_PAST: (i64, i64) = (1, 1);
+const PUMPED_TRAIN: usize = 256;
+const PUMPED_EVALUATE: usize = 64;
+
 /// The pins of a terrain run: training requests, the seeds, and the evaluation.
 const COPY_TRAIN: usize = 1536;
 const MOIRE_TRAIN: usize = 512;
@@ -984,6 +1136,12 @@ fn terrain(
         train.len(),
         evaluate.len()
     );
+    if let Some((numerator, denominator)) = declared.pump {
+        println!(
+            "  the receiving ring's resonator: C = I, K = I, D = 0, a standing pump p = {} (the standing bifurcation p = 1/2)",
+            rat(numerator, denominator)
+        );
+    }
     let mut complete = true;
     for batch in train.chunks(declared.batch) {
         if !guarded(&clock) {
@@ -1137,6 +1295,7 @@ fn text_declared() -> Declared {
         batch: 16,
         order: true,
         request: ORDER_REQUEST,
+        pump: None,
     }
 }
 
@@ -1454,6 +1613,22 @@ fn main() {
                         None,
                     );
                 }
+                // The pumped receiving ring at a strength `p = a/b` given as `a b`, at development
+                // seeds: `develop pumped <train> <evaluate> <a> <b>`.
+                Some("pumped") => {
+                    let strength = (
+                        arguments.get(5).and_then(|v| v.parse().ok()).expect("a"),
+                        arguments.get(6).and_then(|v| v.parse().ok()).expect("b"),
+                    );
+                    let declared = pumped_declared(strength);
+                    terrain(
+                        "develop pumped",
+                        declared,
+                        copy_pairs(&declared, 11, count(3)),
+                        copy_pairs(&declared, 12, count(4)),
+                        None,
+                    );
+                }
                 // Text: the choosing role's pairs only; the validation role is never read here.
                 Some("text") => {
                     let declared = text_declared();
@@ -1528,6 +1703,22 @@ fn main() {
                 order_pairs(&declared, TRAIN_SEED, ORDER_TRAIN),
                 order_pairs(&declared, EVALUATE_SEED, EVALUATE),
                 bank.then(|| (bank_strength(), BANK_GRAIN)),
+            );
+        }
+        // `pumped below | past`: the pinned pumped runs (module header, "The pumped receiving ring").
+        Some("pumped") => {
+            let strength = match arguments.get(2).map(String::as_str) {
+                Some("below") => PUMP_BELOW,
+                Some("past") => PUMP_PAST,
+                _ => panic!("pumped below | past"),
+            };
+            let declared = pumped_declared(strength);
+            terrain(
+                "pumped",
+                declared,
+                copy_pairs(&declared, TRAIN_SEED, PUMPED_TRAIN),
+                copy_pairs(&declared, EVALUATE_SEED, PUMPED_EVALUATE),
+                None,
             );
         }
         Some("copy") => {
