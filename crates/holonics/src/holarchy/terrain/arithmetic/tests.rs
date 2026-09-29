@@ -471,3 +471,184 @@ fn a_prime_window_emits_its_records_and_reads_its_density() {
         .is_err()
     );
 }
+
+/// Lean `ArithmeticContract.{carryWord_cons, carryWord_value, carryWord_lt, encode, decode}`: the
+/// cascade carries Brandon's `7 · 3` (`[1,2,2,1]` to `10101₂`, carries `[0,1,1,1,0]`) and
+/// `FF₁₆ · FF₁₆` (`[225,450,225]` to `FE01₁₆`, carries `[14,29,15,0]`), keeps the value and emits
+/// digits below the base on words of any naturals; encoding reads the odometer, decoding inverts it.
+#[test]
+fn the_carry_cascade_keeps_the_value_and_emits_digits() {
+    assert_eq!(
+        carry_cascade(2, &[1, 2, 2, 1]).unwrap(),
+        (vec![1, 0, 1, 0, 1], vec![0, 1, 1, 1, 0])
+    );
+    assert_eq!(
+        carry_cascade(16, &[225, 450, 225]).unwrap(),
+        (vec![1, 0, 14, 15], vec![14, 29, 15, 0])
+    );
+    assert_eq!(carry_cascade(10, &[0, 0]).unwrap(), (vec![], vec![]));
+    let mut draw = Draw::new(2_026_092_933);
+    for base in BASES {
+        for _ in 0..64 {
+            let word: Vec<u64> = (0..1 + draw.below(8))
+                .map(|_| draw.below(1 << 12) as u64)
+                .collect();
+            let (digits, _) = carry_cascade(base, &word).unwrap();
+            assert_eq!(decode(base, &digits), decode(base, &word));
+            assert!(digits.iter().all(|&digit| digit < base));
+            assert_ne!(digits.last(), Some(&0));
+        }
+    }
+    assert_eq!(
+        encode(10, &BigUint::from(1_770_394u32)).unwrap(),
+        vec![4, 9, 3, 0, 7, 7, 1]
+    );
+    assert_eq!(encode(2, &BigUint::zero()).unwrap(), Vec::<u64>::new());
+    assert_eq!(
+        decode(16, &[10, 9, 3, 0, 11, 1]),
+        BigUint::from(0x1B_039Au32)
+    );
+    assert!(encode(1, &BigUint::from(3u32)).is_err());
+}
+
+/// Lean `ArithmeticContract.{consumer_add, consumer_mul, consumer_pow, consumer_rebase}` and
+/// `PhaseCarry.carried_circle_is_not_the_split_product`: on seeded operands below `2^13` (exponents
+/// below 4) in bases 2, 10 and 16, every producer's native consequence decodes to its scalar `T`, its
+/// digits lie below the base, and it rebases alike; the carry-free sum's released windings are the
+/// operands' common bits, `a + c = (a ⊕ c) + 2 (a ∧ c)`. Fixtures: `347 ⊕ 5102 = 0x12B5 = 4789` with
+/// `347 ∧ 5102 = 0x14A = 330`, and `347^3 = 41781923`.
+#[test]
+fn every_producer_closes_the_consumer_square_and_rebases() {
+    let mut draw = Draw::new(2_026_092_943);
+    for base in BASES {
+        for _ in 0..64 {
+            let (a, c, e) = (
+                draw.below(1 << 13) as u64,
+                draw.below(1 << 13) as u64,
+                draw.below(4) as u64,
+            );
+            for producer in Producer::ALL {
+                let right = if producer == Producer::Power { e } else { c };
+                let (x, y) = (BigUint::from(a), BigUint::from(right));
+                let scalar = producer.scalar(&x, &y).unwrap();
+                let native = producer
+                    .consequence(base, &encode(base, &x).unwrap(), &encode(base, &y).unwrap())
+                    .unwrap();
+                assert_eq!(
+                    native.value(),
+                    scalar,
+                    "{producer:?} {a} {right} base {base}"
+                );
+                assert!(native.digits.iter().all(|&digit| digit < base));
+                for other in BASES {
+                    let rebased = producer
+                        .consequence(
+                            other,
+                            &encode(other, &x).unwrap(),
+                            &encode(other, &y).unwrap(),
+                        )
+                        .unwrap();
+                    assert_eq!(rebased.value(), scalar);
+                }
+                if producer == Producer::CarryFree {
+                    let common = decode(2, &native.carries[0]);
+                    assert_eq!(common, BigUint::from(a & c));
+                    assert_eq!(&scalar + &common * 2u32, BigUint::from(a + c));
+                }
+            }
+        }
+    }
+    let xor = Producer::CarryFree
+        .consequence(16, &[11, 5, 1], &[14, 14, 3, 1])
+        .unwrap();
+    assert_eq!(xor.digits, vec![5, 11, 2, 1]);
+    assert_eq!(decode(2, &xor.carries[0]), BigUint::from(330u32));
+    let power = Producer::Power.consequence(10, &[7, 4, 3], &[3]).unwrap();
+    assert_eq!(power.value(), BigUint::from(41_781_923u32));
+    assert_eq!(power.carries.len(), 3);
+    let zero = Producer::Power.consequence(10, &[], &[]).unwrap();
+    assert_eq!(zero.digits, vec![1]);
+}
+
+/// The record's §6 lines: `so 347 × 5102 = 1770394.`, `assert!(0x15B * 0x13EE == 0x1B039A);` and
+/// `example : 0x15B * 0x13EE = 0x1B039A := by norm_num`; the truth's result glyphs and the numeral's
+/// end; `1770394 = 2·347·2551`; the chart's `^` the power in prose and Lean and the carry-free sum in
+/// Rust; a request refused where its chart wears no glyph for the producer; the glyph set reads
+/// numerals back.
+#[test]
+fn the_three_charts_write_the_records_lines() {
+    let drawn = vec![
+        Drawn {
+            slot: Slot::Product,
+            left: 347,
+            right: 5102,
+            exponent: 3,
+        },
+        Drawn {
+            slot: Slot::Caret,
+            left: 347,
+            right: 5102,
+            exponent: 3,
+        },
+    ];
+    let text = |stream: &ExpressionStream| -> String {
+        String::from_utf8(stream.cells.iter().map(|&cell| cell as u8).collect()).unwrap()
+    };
+    let family = |base| ExpressionFamily {
+        base,
+        operands: 1 << 13,
+        exponents: 4,
+    };
+    let decimal = Expressions::new(family(10), drawn.clone()).unwrap();
+    let hex = Expressions::new(family(16), drawn).unwrap();
+    let prose = decimal.emit(Chart::Prose).unwrap();
+    assert_eq!(
+        text(&prose),
+        "so 347 × 5102 = 1770394.\nso 347 ^ 3 = 41781923.\n"
+    );
+    let rust = hex.emit(Chart::Rust).unwrap();
+    assert_eq!(
+        text(&rust),
+        "assert!(0x15B * 0x13EE == 0x1B039A);\nassert!(0x15B ^ 0x13EE == 0x12B5);\n"
+    );
+    let lean = hex.emit(Chart::Lean).unwrap();
+    assert_eq!(
+        text(&lean),
+        "example : 0x15B * 0x13EE = 0x1B039A := by norm_num\nexample : 0x15B ^ 0x3 = 0x27D8AA3 := by norm_num\n"
+    );
+    let truth = &rust.truths[0];
+    let glyphs: Vec<u8> = rust.cells[truth.result.clone()]
+        .iter()
+        .map(|&cell| cell as u8)
+        .collect();
+    assert_eq!(glyphs, b"0x1B039A");
+    assert_eq!(rust.cells[truth.end], usize::from(b')'));
+    assert_eq!(truth.value, BigUint::from(1_770_394u32));
+    assert_eq!(truth.factorization, Some(vec![(2, 1), (347, 1), (2551, 1)]));
+    assert_eq!(rust.truths[1].producer, Producer::CarryFree);
+    assert_eq!(lean.truths[1].producer, Producer::Power);
+    assert_eq!(lean.truths[1].operands, (347, 3));
+    assert_eq!(lean.cells[lean.truths[0].end], usize::from(b' '));
+    assert!(Chart::Rust.request(Producer::Power, 10, 2, 2).is_err());
+    assert!(Chart::Lean.request(Producer::CarryFree, 10, 2, 2).is_err());
+    assert_eq!(
+        read_numeral(b"0x1B039A"),
+        Some((16, BigUint::from(1_770_394u32)))
+    );
+    assert_eq!(read_numeral(b"0b101"), Some((2, BigUint::from(5u32))));
+    assert_eq!(read_numeral(b"0x"), None);
+    assert_eq!(read_numeral(b"12A"), None);
+    assert!(
+        Expressions::new(
+            family(10),
+            vec![Drawn {
+                slot: Slot::Sum,
+                left: 1 << 13,
+                right: 0,
+                exponent: 0
+            }]
+        )
+        .is_err()
+    );
+    assert!(Expressions::new(family(8), Vec::new()).is_err());
+}

@@ -44,8 +44,9 @@ module states what the record derives and proves.
    (`one_face_three_producers`). Along the right operand's clock the jets are
    `(a + k, 1, 0)`, `(a k, a, 0)` and `(a^k, a^k (a − 1), a^k (a − 1)²)` (`jet_add`, `jet_mul`,
    `jet_pow`); for `a ≥ 2` the jet to second order separates every two producers
-   (`jet_separates`), and the face with the first difference ties only `·` and `^`, only at
-   `(a, k) = (2, 1)` (`mul_pow_first_jet_tie_iff`). At `a = 0`, `·` and `^` are one species along
+   (`jet_separates`), whatever keys `a, a' ≥ 2` the two hold (`jet_separates_across_keys`); the
+   face with the first difference ties only `·` and `^`, only at `(a, k) = (2, 1)`
+   (`mul_pow_first_jet_tie_iff`). At `a = 0`, `·` and `^` are one species along
    that clock (`zero_mul_pow_species`) and the left operand's clock separates them
    (`left_clock_separates`). The sum and the product satisfy the recurrence with the double root
    `1` and no first-order one (`add_free_fall`, `mul_free_fall`, `add_no_single_mode`,
@@ -294,6 +295,32 @@ theorem jet_separates {a : ℕ} (ha : 2 ≤ a) (k : ℕ) {p q : Producer} (hpq :
   have ha' : (2 : ℤ) ≤ a := by exact_mod_cast ha
   have hpos : (0 : ℤ) < (a : ℤ) ^ k * ((a : ℤ) - 1) ^ 2 := by
     have : (0 : ℤ) < (a : ℤ) - 1 := by linarith
+    positivity
+  intro h
+  cases p <;> cases q <;> simp only [ne_eq, not_true_eq_false, reduceCtorEq] at hpq <;>
+    simp only [jet_add, jet_mul, jet_pow, Prod.mk.injEq] at h
+  · linarith [h.2.1]
+  · linarith [h.2.2]
+  · linarith [h.2.1]
+  · linarith [h.2.2]
+  · linarith [h.2.2]
+  · linarith [h.2.2]
+
+/-- [proved-derived; formal-checked] **The jet to second order separates two producers whatever
+their keys**: from left operands `a, a' ≥ 2` and any starts `k, k'`, the first difference parts the
+sum from the product (`1 ≠ a'`), and the second parts the power from both
+(`0 ≠ a^k (a − 1)²`). So on a faces-only run of one producer, every family of another producer,
+whatever keys it holds, dies by the third face (the acceptance run's control, THE_REBUILD U6
+item 3). -/
+theorem jet_separates_across_keys {a a' : ℕ} (ha : 2 ≤ a) (ha' : 2 ≤ a') (k k' : ℕ)
+    {p q : Producer} (hpq : p ≠ q) : p.jet a k ≠ q.jet a' k' := by
+  have h2 : (2 : ℤ) ≤ a := by exact_mod_cast ha
+  have h2' : (2 : ℤ) ≤ a' := by exact_mod_cast ha'
+  have hpos : (0 : ℤ) < (a : ℤ) ^ k * ((a : ℤ) - 1) ^ 2 := by
+    have : (0 : ℤ) < (a : ℤ) - 1 := by linarith
+    positivity
+  have hpos' : (0 : ℤ) < (a' : ℤ) ^ k' * ((a' : ℤ) - 1) ^ 2 := by
+    have : (0 : ℤ) < (a' : ℤ) - 1 := by linarith
     positivity
   intro h
   cases p <;> cases q <;> simp only [ne_eq, not_true_eq_false, reduceCtorEq] at hpq <;>
@@ -565,6 +592,7 @@ section Audit
 #print axioms one_face_three_producers
 #print axioms jets_at_two_two
 #print axioms jet_separates
+#print axioms jet_separates_across_keys
 #print axioms mul_pow_first_jet_tie_iff
 #print axioms zero_mul_pow_species
 #print axioms left_clock_separates

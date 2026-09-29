@@ -38,6 +38,15 @@
 //! read at the population: without it neither the carry egg nor the counter has a port (both hold
 //! state along the clock's phases), so the joint code without it is the population's other eggs.
 //!
+//! [definition; agent-inferred] **The numeral port and the expression egg** ([`ExpressionPort`],
+//! [`ExpressionEgg`]; the submodule `expressions`, the arithmetic contract's record of September 29,
+//! THE_REBUILD U6 item 3): on a written stream (prose, Rust, Lean) the port reads an expression's
+//! key from the coded past through one declared glyph set, and the egg codes its result under the
+//! holds sheet (the computed digit one-hot, or the byte tree's face), locates the plural glyph `^`
+//! per stream by which pairing's results hold, returns each closed expression's receipt (the
+//! carried producer, the fibre of producers sharing the face, each family's contribution), and
+//! releases a request's result by certified draws at tolerance zero ([`ExpressionEgg::release`]).
+//!
 //! [definition] The computational object is the helical pair interaction as eggs joined at ports:
 //! the clock's **helix** (the phase and its carry), the counter's odometer (its winding), **faces
 //! and placement** (each phase's face, the cheap faces and the gratings placed on the leading
@@ -62,6 +71,14 @@ use crate::holarchy::terrain::arithmetic::{
     CheapFaces, DigitOrder, PrimeEmission, PrimeWindow, ProductFamily, digit_product, grating_class,
 };
 use crate::ratio::Rat;
+
+mod expressions;
+
+pub use expressions::{
+    CellReading, EXPONENTS, ExpressionCounts, ExpressionEgg, ExpressionKey, ExpressionPhase,
+    ExpressionPort, ExpressionReceipt, ExpressionRelease, KeyReading, Operand, PLURAL,
+    PairingDeath, PairingKey, PortEvent, ReleasedResult,
+};
 
 /// **The Bombe a counter's key space is owed to** past the declared enumeration: its start read
 /// from one record's digits at the located phase (the odometer's reading at its port).
