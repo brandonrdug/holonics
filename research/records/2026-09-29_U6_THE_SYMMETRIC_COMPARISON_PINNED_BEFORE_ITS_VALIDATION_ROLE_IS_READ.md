@@ -1,4 +1,4 @@
-# U6 item 2: the symmetric comparison, pinned before its validation role is read
+# U6 item 2: the symmetric comparison, pinned before its validation role is read: the acceptance holds
 
 **Date:** 2026-09-29. Refs #63, #73, #148. **Scope:** item 2 of
 [the text chart's audit](2026-09-29_THE_TEXT_CHART_AUDITED_ONE_PREDICTOR_SEEN_CONVERSATIONS_AND_NO_ARITHMETIC.md)
@@ -212,3 +212,132 @@ resident set is at most 10,000,000,000 bytes: F0's egg pass (7,212,138,496) domi
 dropped before the control reads. The run is stopped at 700,000 ms and reported incomplete past it;
 its own guards stop a passage past 600,000 ms or 20,000,000,000 bytes. Available memory at the launch:
 24,566,611,968 bytes.
+
+## 3. The receipt: the acceptance holds
+
+The projection is commit `4e346d4e`. The run was made once after it:
+
+```sh
+cargo run --release -p holonics --example hnn_population -- u6-symmetric .local/cuts/curated-u6-passage-cut.bin .local/cuts/u6-symmetric-releases.json
+```
+
+It took 255,104 ms at a 7,223,922,688-byte peak resident set, within its projection (at most 655,000
+ms; about 240,000 when the releases stop at their own letters). Every guard held. The private log
+(`.local/cuts/u6-symmetric.log`) holds the exact endpoints, counts and codes only.
+
+**The events on the validation role** (524,009 cells in 11 conversations): 523,404 bytes (85,449
+human, 437,955 agent, no tool) and 605 section letters. The letters are 52 responses' ends, 214
+record boundaries within a turn, 329 turns, no switch and 10 openings. Each face read at a letter
+equalled the face its side charged there.
+
+**The charges.** The learned partition's description on this split's choosing cells is
+`39 + 11/16 + ε` bits. The candidate is charged `61 + 11/16 + ε` (17 + 5 + the description), and the
+control 3.
+
+**The code, candidate against control** (bits at `L_R = 16`, each `+ ε` with `0 ≤ ε < 1/16`; a
+letter's code is its end plus the letter given the end):
+
+| Event | Count | The candidate | The control | Candidate − control |
+|---|---|---|---|---|
+| Human bytes | 85,449 | `171118 + 8/16` | `171534 + 14/16` | `−417 + 10/16` |
+| Agent bytes | 437,955 | `849686 + 3/16` | `852829 + 5/16` | `−3144 + 14/16` |
+| **Every byte** | 523,404 | `1020804 + 12/16` | `1024364 + 4/16` | `−3560 + 8/16` |
+| A response's end | 52 | `441 + 8/16` | `386 + 1/16` | `+55 + 6/16` |
+| — its end | | `323 + 12/16` | `176 + 7/16` | `+147 + 5/16` |
+| — the letter given the end | | `117 + 11/16` | `209 + 10/16` | `−92 + 1/16` |
+| A record boundary within a turn | 214 | `523 + 13/16` | `833 + 2/16` | `−310 + 11/16` |
+| — its end | | `468 + 4/16` | `610 + 8/16` | `−143 + 12/16` |
+| — the letter given the end | | `55 + 8/16` | `222 + 9/16` | `−168 + 15/16` |
+| A turn | 329 | `931 + 13/16` | `1491 + 0/16` | `−560 + 13/16` |
+| — its end | | `774 + 14/16` | `1007 + 3/16` | `−233 + 11/16` |
+| — the letter given the end | | `156 + 14/16` | `483 + 13/16` | `−327 + 1/16` |
+| A switch | 0 | — | — | — |
+| An opening | 10 | `144 + 11/16` | `123 + 10/16` | `+21 + 0/16` |
+| — its end | | `72 + 5/16` | `50 + 1/16` | `+22 + 4/16` |
+| — the letter given the end | | `72 + 5/16` | `73 + 9/16` | `−2 + 12/16` |
+| **Every letter** | 605 | `2041 + 14/16` | `2833 + 14/16` | `−793 + 15/16` |
+| **Every cell, uncharged** | 524,009 | `1022846 + 10/16` | `1027198 + 2/16` | `−4352 + 7/16` |
+| The request's pointer | 529 parts | `280 + 12/16` | — | `+280 + 12/16` |
+| The declared charges | | `61 + 11/16` | `3 + 0/16` | `+58 + 11/16` |
+| **The charged total** | | `1023189 + 2/16` | `1027201 + 2/16` | **`−4013 + 15/16`** |
+
+- **The acceptance.** The charged difference is
+  `[−317864955545681736113676885556675/2^96, −317864955545681736113676885556667/2^96]` bits,
+  `−4013 + 15/16 + ε`. Its upper end lies strictly below `−m = −534`: **the acceptance holds.**
+  By the no-hypercompression bound (pin 8), the chance under the control of a gain this large is at
+  most `2^(−4012)`.
+- **Where the gain lies.** Bytes give `−3560 + 8/16 + ε`, of which agent bytes `−3144 + 14/16 + ε`.
+  Letters give `−793 + 15/16 + ε`. The pointer costs the candidate `280 + 12/16 + ε` and the
+  charges `58 + 11/16 + ε` more than the control's.
+- **Where the candidate loses.** It loses at a response's end, `+55 + 6/16 + ε`: its end costs
+  `+147 + 5/16 + ε` more than the control's, and it recovers `−92 + 1/16 + ε` on which letter
+  comes. It also loses at an opening, `+21 + 0/16 + ε`. It wins at turns (`−560 + 13/16 + ε`) and
+  record boundaries (`−310 + 11/16 + ε`), on both the end and the letter. [interpretation] The part
+  clock's hazard reads where an agent part is followed by more agent material better than the
+  control does, and where the human answers worse.
+- **Beside it, deciding nothing.**
+  - *F0's stops* (the letters closing an agent part), 529 in all: a response's end 52
+    (`+55 + 6/16 + ε`), a record boundary 189 (`−339 + 4/16 + ε`), a turn 280 (`−479 + 10/16 + ε`),
+    an opening 8 (`+23 + 0/16 + ε`).
+  - *The later human return's pointer*, entering no face: `45 + 4/16 + ε`.
+  - *Each validation conversation, uncharged*: the candidate is shorter on 10 of 11. Their cells
+    and differences:
+
+    | Cells | Difference |
+    |---|---|
+    | 8,795 | `−165 + 12/16` |
+    | 1,868 | `−49 + 0/16` |
+    | 29,568 | `−195 + 12/16` |
+    | 146,056 | `−601 + 12/16` |
+    | 11,076 | `+7 + 5/16` |
+    | 41,181 | `−1808 + 12/16` |
+    | 219,800 | `−719 + 12/16` |
+    | 20,720 | `−331 + 7/16` |
+    | 10,770 | `−77 + 7/16` |
+    | 3,372 | `−20 + 0/16` |
+    | 30,803 | `−399 + 4/16` |
+
+**The budgets, beside and deciding nothing.**
+- *The whole state after the passage* (1,048,021 cells), with nothing subtracted: the candidate's
+  2,200,544,099 bytes, 2,099 a cell (remainder 748,020); the control's 1,511,209,829 bytes, 1,441 a
+  cell (remainder 1,011,568). **Both are past 1,298.**
+- *The passage*: within. The validation readings took 52,611 ms (the candidate) and 15,693 ms (the
+  control) against 600,000. The choosing readings took 37,149 ms and 11,978 ms, and the setup
+  1,006 ms. The peak resident set was 7,223,922,688 bytes against 20,000,000,000.
+- *The complete warm response*: within. The candidate's longest was 29,182 ms (at the cap), its 8
+  in all 95,686 ms. The control's longest was 8,288 ms (at the cap), its 8 in all 33,711 ms.
+
+**The releases** (8 of 462 eligible; the text owner-only in `.local/cuts/u6-symmetric-releases.json`,
+mode 0600, and shown in the conversation beside the logged replies).
+- *The candidate*: 6 stopped at their own letter and 2 reached the cap.
+- *The control*: 6 stopped at their own letter, 1 reached the cap, and 1 stopped on a text-codec
+  separator (its bytes are not valid UTF-8 at the stop).
+
+In 7 of the 8 pairs the two sides opened with the same first bytes (the same keys drawn from nearby
+faces). Every release then recombined the development vocabulary, and neither side answered its
+request.
+
+`release_legibility.py` read the releases against the split's choosing vocabulary (6,282 words):
+
+| Reading | The candidate | The control tree | The logged replies | The requests |
+|---|---|---|---|---|
+| Texts (typed refusals) | 6 (2) | 6 (2) | 8 | 8 |
+| Valid UTF-8, of 8 | 7 | 7 | 8 | — |
+| Word tokens in the vocabulary | 276 of 338 | 513 of 629 | 1,118 of 1,214 | 2,949 of 3,234 |
+| `()` / `[]` / `{}` / `“”` balanced | 3 / 4 / 4 / 5 of 6 | 2 / 3 / 2 / 4 of 6 | 7 / 8 / 8 / 8 of 8 | 8 / 8 / 8 / 8 of 8 |
+| Backticks / straight quotes / bold even | 3 / 3 / 4 of 6 | 5 / 5 / 4 of 6 | 8 / 8 / 8 of 8 | 8 / 7 / 8 of 8 |
+
+The candidate's word rate is at the control's, a hair above (`276·629 = 173,604 > 513·338 = 173,394`),
+and both lie below the logged replies'.
+
+**Verdict.** U6 item 2's acceptance holds. On 11 unseen conversations, the candidate codes the same
+events shorter than the context tree over the whole stream, by `−4013 + 15/16 + ε` bits charged,
+against a margin of 534. This is the first transfer of the egg's gain that survives full accounting.
+F0's lopsided accounting had put the egg `+2122 + 14/16 + ε` above the flat stream.
+
+What the code does not decide stays open, measured beside it:
+- both whole states are past 1,298 bytes a cell;
+- the candidate's hazard loses at a response's end, the one stop kind that is a response ending;
+- both sides' releases are recombined vocabulary, not answers.
+
+Items 3–5 of the audit's §4 carry them.

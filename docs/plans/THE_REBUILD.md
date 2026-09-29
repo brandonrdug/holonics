@@ -569,6 +569,38 @@ branch; intervals that do not shorten the charged code are recorded and not adop
     smallest build that tests it.
 
   Its composition into the text chart's population reads item (1)'s protocol, built above.
+- **Item 2, the symmetric comparison, September 29: holds**
+  ([record](../../research/records/2026-09-29_U6_THE_SYMMETRIC_COMPARISON_PINNED_BEFORE_ITS_VALIDATION_ROLE_IS_READ.md);
+  the owner `46267d56`, the pins `9b849f54`, the streams and projection `4e346d4e`; Refs #73 #148
+  #63; only counts, bits and hashes).
+  - *The comparison*: the candidate (F0's admitted egg) and the control (the context tree over every
+    byte and letter, no slots, `D = 48`: `SectionSlots::Cells`, atlas
+    `hnn.landmark-section-address`) read the same 268-symbol stream, each conversation's context its
+    own. Every choice is charged to its side: the candidate its request pointer, the sweep's 17 bits,
+    F0's 5 and the learned partition's description; the control its 3. The margin is F0's recorded
+    range of the spent draws, `m = 534` bits [agent-inferred].
+  - *The passage*: item 1's split at F0's aperture, 1,048,021 cells (`c6e51a35…ca2d4e`, validation
+    524,009 cells in 11 conversations: 523,404 bytes and 605 letters). Its letters are 52 responses'
+    ends, 214 record boundaries, 329 turns, no switch and 10 openings.
+  - *The code, charged*: the candidate `1023189 + 2/16 + ε`, the control `1027201 + 2/16 + ε`, the
+    difference `−4013 + 15/16 + ε`, below `−534`. **The acceptance holds.** The terms:
+    - bytes `−3560 + 8/16 + ε` (agent `−3144 + 14/16 + ε`, human `−417 + 10/16 + ε`);
+    - letters `−793 + 15/16 + ε`: record boundaries `−310 + 11/16 + ε`, turns `−560 + 13/16 + ε`,
+      a response's end `+55 + 6/16 + ε` (its end `+147 + 5/16 + ε`), openings `+21 + 0/16 + ε`;
+    - the pointer `+280 + 12/16 + ε`;
+    - the charges `+58 + 11/16 + ε`.
+
+    Uncharged, the candidate is shorter on 10 of the 11 conversations.
+  - *Beside it*: the whole state is 2,099 bytes a cell for the candidate and 1,441 for the control,
+    **both past 1,298**. The validation readings took 52,611 and 15,693 ms, the peak resident set
+    was 7,223,922,688 bytes, and the run took 255,104 ms. The longest complete warm responses were
+    29,182 and 8,288 ms.
+  - *The releases*: 8 per side, each stopping at its own letter. The candidate stopped 6 and reached
+    the cap on 2; the control stopped 6, reached the cap on 1 and stopped on 1 text-codec separator.
+    Word tokens in the choosing vocabulary: 276 of 338 against 513 of 629 (the logged replies 1,118
+    of 1,214). Both recombine vocabulary, and neither answers.
+  - *What stays open*, measured: both states past the budget; the hazard at a response's end; the
+    releases. Items 3–5 carry them, and F0's release gate, F4's curated release and F5 wait on them.
 
 #### U7. The targets, alongside
 
