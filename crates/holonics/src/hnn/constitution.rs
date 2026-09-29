@@ -48,18 +48,19 @@
 //! ```text
 //! a = Σ_t w ⟨g_t, D f_t⟩            the unit step's first-order decrease, checked ≥ 0 (descent after pullback and chart)
 //! b = Σ_t w |D f_t|²                its feature moves
-//! C = B · s · κ² · b                its curvature along the ray; B the linear loci stepping together, s = ½
+//! C = s · κ² · b                    its own curvature along the ray, s = ½
 //! c = max_t |w g_t|_∞               the lattice's covector scale
-//! η = the largest 2^k with η C ≤ a and η c ≤ 1                          (holon::deposition::CertifiedStep)
+//! η = the largest 2^k with η C ≤ a and η c ≤ 1, then the joint moves   (holon::deposition::{CertifiedStep, JointReading})
 //! ```
 //!
 //! `s = ½` bounds the station score's curvature in its realified logits: the magnitude part is a
 //! base-two softmax, whose Hessian is `ln 2 (diag p − p pᵀ) ⪯ (ln 2 / 2) I ⪯ ½ I`, and the phase part
 //! `½ q_t Δ²` in `Δ = φ^T − Im f_t / 2` has curvature `q_t / 4 ≤ ¼` (`hnn::ratio`). `κ²` is the
 //! certified gain from the locus's output to the stacked station logits, read from the deposit's
-//! [`Reach`] and the medium's energy law ([`Constitution::amplitude`]): the receiving map's Schur
-//! bound `‖R‖₂² ≤ ‖R‖₁‖R‖_∞`, the admittances `Y`, and the per-tick amplitude growth `1 + ω` of the
-//! word, `ω` the contrast ports' certified bound (`holon::deposition::active_growth`):
+//! [`Reach`] and the medium's energy law ([`Constitution::amplitude`]): the receiving map's certified
+//! spectral bound `‖R‖₂²` ("The tightened certificate" below), the admittances `Y`, and the per-tick
+//! amplitude growth `1 + ω` of the word, `ω` the contrast ports' certified bound
+//! (`holon::deposition::active_growth`):
 //!
 //! ```text
 //! R_g      κ² = 1                                                   each sample one station's logits
@@ -70,9 +71,10 @@
 //! A station's anchor is the junction's participation mean, so `|v_R|² ≤ (4/h)P/Y_R` for the power
 //! `P` its change carries; an injection `δs` at ring `g` carries `(h/4)Y_g|δs|²`, an element output
 //! the same at its ring; each passive tick keeps the power and a contrast port's tick multiplies it
-//! by at most `(1 + ω)²`. The gains are read at the end of each ray (the triangle bound on the
-//! Schur norms, `‖R + ηD‖₁ ≤ ‖R‖₁ + η‖D‖₁`), so a step that raises another locus's gain is halved
-//! until every certificate holds at its own ray (the projection; [`Constitution::deposited`]). The
+//! by at most `(1 + ω)²`. The gains are read at the end of each ray (the triangle on the norms,
+//! `‖R + ηD‖₂ ≤ ‖R‖₂ + η‖D‖₂`, `‖W + ηD‖₁ ≤ ‖W‖₁ + η‖D‖₁`), so a step that raises another locus's
+//! gain is halved until every certificate holds at its own ray (the projection;
+//! [`Constitution::deposited`]). The
 //! gains assume the medium passive but for the contrast ports, whose growth `(1 + ω)²` they carry:
 //! a pumped resonator has no certified growth (the Floquet bound is owed in #62), and a declared
 //! boost's signed stiffness stores indefinite energy, so no step is certified through either
@@ -84,14 +86,14 @@
 //! contracting_resolvent, transit_difference_power}`). The declared factor step `η_x = ½` is
 //! retired: it moved the standing past the entry bound on text and grew a contact's storage by up to
 //! `2²⁸` in one deposit. A factor family `x` steps by the same certificate as a linear locus, in the
-//! same loop and the same count `B`. Its metric is its carried statistic `h_x′ = h_x + e` (`e`, the
-//! feature energy its window adds), so its unit step is `D = G_x / h_x′`:
+//! same loop and the same joint certificate. Its metric is its carried statistic `h_x′ = h_x + e`
+//! (`e`, the feature energy its window adds), so its unit step is `D = G_x / h_x′`:
 //!
 //! ```text
 //! a = ⟨G_x, D⟩ = |G_x|² / h_x′          checked ≥ 0 (factor_unit_step_alignment)
 //! c = max_t |g_t|_∞                     the covector one return carries at the family's output (FactorStep::covector)
-//! C = B · s · κ²_ℓ · b(η)               b(η) the output's moves along the whole ray [0, η], read at its end
-//! η = the largest 2^k with ηC ≤ a and ηc ≤ 1, halved with every other locus until each certificate holds
+//! C = s · κ²_ℓ · b(η)                   its own curvature; b(η) the output's moves along the whole ray [0, η], read at its end
+//! η = the largest 2^k with ηC ≤ a and ηc ≤ 1, halved with every other locus until each certificate and the joint one hold
 //! ```
 //!
 //! Each family's output is its carriers applied to its feature, so its moves read the Schur test
@@ -131,8 +133,48 @@
 //! its fold jumps, which no curvature bounds (owed in #62). No part of this reads a codec, an alphabet
 //! or a terrain.
 //!
+//! [definition; agent-inferred, September 29] **The tightened certificate** (the
+//! [tightening's record](../../../../research/records/2026-09-29_THE_TIGHTENED_CERTIFICATE_PINNED_BEFORE_ITS_RUNS.md);
+//! Lean `Holon/Deposition.{joint_move_triangle, joint_step_descends, gram_certificate_bound,
+//! adjoint_gram_certificate_bound, entrywise_error_bound}`). The factor families' certified steps sat
+//! below their lattice units on the prediction field (`2⁻²³` to `2⁻⁷`) because the curvature
+//! multiplied loose upper bounds. Two of them are replaced by sharper proved ones; no limit moves
+//! (`ηc ≤ 1` and each family's own `ηC ≤ a` stay):
+//! - **The joint moves, not the count `B`.** The families' logit moves along the joint ray add, and
+//!   the count `B` charged every family as if all stepped along the worst joint direction together
+//!   (`joint_cauchy_schwarz`). The cross terms are bounded instead by Cauchy–Schwarz on the joint ray
+//!   (`joint_move_triangle`): with `m_ℓ = √(κ²_ℓ b_ℓ)` at its dyadic ceiling
+//!   (`holon::deposition::root_ceiling`), the joint curvature term is at most `s (Σ η_ℓ m_ℓ)²`, and
+//!   the certificate is
+//!   ```text
+//!   η_ℓ C_ℓ ≤ a_ℓ,  η_ℓ c_ℓ ≤ 1  (each family, C_ℓ = s κ²_ℓ b_ℓ)      s (Σ_ℓ η_ℓ m_ℓ)² ≤ Σ_ℓ η_ℓ a_ℓ  (jointly)
+//!   ```
+//!   which descends by `½ Σ η_ℓ a_ℓ` through `certified_step_descends` (`joint_step_descends`: the
+//!   joint term apportioned to the families by their decreases). A family whose move is small next
+//!   to its decrease no longer pays for the others' moves: the count charged it `B` times its own.
+//!   [agent-inferred] The steps start at each family's own certificate and, while the joint one
+//!   fails, the family whose halving gains it most, `½ η (s m (2 Σ η m − ½ η m) − a)`, is halved (the
+//!   first in the deposit's order at a tie); a gain is positive for some family whenever the joint
+//!   certificate fails, so the halving ends.
+//! - **The readout's spectral bound, not its Schur test.** `‖R‖₂²` is read by the Gram certificate
+//!   (`holon::deposition::spectral_norm`): `R` on a dyadic face of 16 significant bits,
+//!   `R = 2^e N + E_f` with `|E_f| ≤ 2^(e−1)` entrywise (`entrywise_error_bound`), the Gram of
+//!   `N`'s smaller side over the integers, and a rational `μ` taken only where `μ I − G ⪰ 0` is
+//!   decided by exact inertia (`gram_certificate_bound`, `adjoint_gram_certificate_bound`); then
+//!   `‖R‖₂ ≤ 2^e(√μ + ½√(rows · columns))`. The receiving map's unit step is read the same way, and
+//!   the readout at its ray's end is `(‖R‖₂ + η‖D‖₂)²`. The contrast ports' `ω` keeps its Schur
+//!   test (on the prediction field `(1 + ω)²` stays within `(1 + 2⁻⁵)²`).
+//!
+//! The certificate reads no codec: the same `Constitution::deposited` runs on every field.
+//! [measured, the record's development reads] On the text's choosing pairs the two together raise
+//! the factor families' steps by about `2⁵` (the joint moves about `2³`, the spectral readout about
+//! `2²`). The stations' sum is not loose there: the stacked Gram `Σ_j P_jᵀ RᵀR P_j` of the 32
+//! stations' rotations of the one anchor reads `m ‖R‖₂²` within a factor 2. The bounds that stay (by
+//! source inspection, in the record): the factor families' moves read through their feature energy
+//! `Σ|x̄|²` (the deposit carries no feature Gram), and `s = ½`.
+//!
 //! [scope] The certificate is the Gauss–Newton curvature of the section's score along each locus's
-//! step, the other loci's moves entering through `B`; the model's own second-order terms (the
+//! step, the other loci's moves entering through the joint triangle; the model's own second-order terms (the
 //! bilinear coupling of `R` and `E`, a contrast port acting on its own downstream contrast, a square
 //! factor's own `2D Dᵀ` along its ray, the element's and the transit's resolvents differentiated
 //! twice) are not certified here: their statements are owed in #62. The executed word's deviation
@@ -273,6 +315,7 @@
 //! | `Holon/Deposition.{certified_step_descends, quadratic_upper_model, gauss_newton_curvature, joint_cauchy_schwarz}`, `HNN/Normal.certified_normal_step` | [`NormalLaw::prepare`] (the unit step and its readings), [`Constitution::deposited`] (the certified steps: [`StepReading`]) |
 //! | `Holon/Deposition.{active_element_growth, active_energy_growth}` | [`Constitution::amplitude`] (the per-tick growth `1 + ω`) |
 //! | `Holon/Deposition.{factor_unit_step_alignment, square_ray_move, square_ray_deriv_bound, contracting_resolvent, transit_difference_power}` with `certified_step_descends`, `gauss_newton_curvature` | the factor families' certified step ([`FactorStep`], [`Family`], [`StepReading`], [`Constitution::deposited`]) |
+//! | `Holon/Deposition.{joint_move_triangle, joint_step_descends, gram_certificate_bound, adjoint_gram_certificate_bound, entrywise_error_bound}` | the tightened certificate ([`Constitution::deposited`], [`DepositReading::joint`], [`StepReading::bound`]; `holon::deposition::{JointReading, spectral_norm}`) |
 //! | `HNN/Normal.factorCarrier_psd` | the factor families ([`FactorGradient`]) |
 //! | `HNN/Normal.standing_deposit`, `sheetClass_locally_constant` | [`FactorGradient::Standing`] |
 //! | `HNN/LatticeDeposit.{quot, rem, div_rem_spec, rem_bounds, quot_eq_zero_of_bounds, fine}` | [`Lattice::div_rem`] (the carry's fine split), [`Lattice::div_rem_coordinate`] (its coarse split) |
@@ -304,7 +347,8 @@ use crate::hnn::realization::{indexed, outer_integral};
 use crate::hnn::receiving::{ReceivingStep, landmark_declaration, receiving_population};
 use crate::hnn::ring::ResonatorMaterial;
 use crate::holon::deposition::{
-    CertifiedStep, CommittedEnergyBound, schur_norms, significant, sqrt_ceiling,
+    CertifiedStep, CommittedEnergyBound, JointReading, root_ceiling, schur_norms, significant,
+    spectral_norm, sqrt_ceiling,
 };
 use crate::ratio::linear::vector::{
     Chart, IntegralMatrix, integer_dot, integral, lcm, matrix_form,
@@ -2353,17 +2397,18 @@ impl Reach {
 }
 
 /// [definition; agent-inferred] **One family's certified step at a deposit** (module header, "The
-/// certified step", "The factor families' certified step"): the family it moves, the step with its
-/// alignment `a`, curvature `C = B·½·κ²·b` and covector scale `c`; the gain `κ²` read at the step's
-/// ray, and its parts: the output's moves `b` along the whole ray, the families stepping together
-/// `B`, the readout's Schur bound `‖R‖₂²` and the per-tick amplitude growth `1 + ω`.
+/// certified step", "The factor families' certified step", "The tightened certificate"): the family
+/// it moves, the step with its alignment `a`, its own curvature `C = ½·κ²·b` and covector scale `c`;
+/// the gain `κ²` read at the rays' ends, and its parts: the output's moves `b` along the whole ray,
+/// the bound `m ≥ √(κ² b)` on its logit move that the joint certificate reads, the readout's
+/// certified spectral bound `‖R‖₂²` and the per-tick amplitude growth `1 + ω`.
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct StepReading {
     pub family: Family,
     pub step: CertifiedStep,
     pub gain: Rat,
     pub moves: Rat,
-    pub together: u64,
+    pub bound: Rat,
     pub readout: Rat,
     pub amplitude: Rat,
 }
@@ -2387,6 +2432,9 @@ pub struct DepositReading {
     pub storage_growth: Rat,
     pub storage_product: Rat,
     pub steps: Vec<(Locus, StepReading)>,
+    /// The joint certificate the steps hold together, `s (Σ η m)² ≤ Σ η a` (`None` when no family
+    /// stepped).
+    pub joint: Option<JointReading>,
     pub amplitude: Option<Rat>,
     pub commit: u64,
     pub bits: u64,
@@ -3615,26 +3663,33 @@ impl Constitution {
     }
 
     /// **The certified steps of a deposit's families** (module header, "The certified step", "The
-    /// factor families' certified step"): each prepared unit step whose alignment is positive, a
-    /// normal law's or a factor family's, is certified (a negative alignment is refused); its
-    /// curvature `C = B s κ² b` is read with the gains and the moves at the end of every family's ray,
-    /// `B` every family stepping together; and a step whose certificate the readings at its ray do not
-    /// admit is halved, until every one holds. Refused without a reach, through a pumped resonator or
-    /// a declared boost, and for a channel family through a contact whose conductance has no bound.
+    /// factor families' certified step", "The tightened certificate"): each prepared unit step whose
+    /// alignment is positive, a normal law's or a factor family's, is certified (a negative alignment
+    /// is refused). Each family's own curvature `C = s κ² b` is read with the gains and the moves at
+    /// the end of every family's ray, and the families' joint moves by the triangle on the joint ray,
+    /// `s (Σ η m)² ≤ Σ η a` with `m = √(κ² b)` at its dyadic ceiling
+    /// ([`crate::holon::deposition::JointReading`]). Each family starts at the largest dyadic its own
+    /// certificate admits (`ηC ≤ a`, `ηc ≤ 1`); a step whose own certificate the readings at the rays'
+    /// ends do not admit is halved, and while the joint certificate fails the family whose halving
+    /// gains it most, `½ η (s m (2 Σ η m − ½ η m) − a)`, is halved, until both hold. Refused without a
+    /// reach, through a pumped resonator or a declared boost, and for a channel family through a
+    /// contact whose conductance has no bound.
     fn certify_steps(
         &self,
         reach: Option<&Reach>,
         linear: &[(Locus, LinearLocus, &PreparedStep)],
         factors: &[(Locus, &FactorPrepared)],
-    ) -> Result<BTreeMap<(Locus, Family), StepReading>, HnnError> {
+    ) -> Result<CertifiedSteps, HnnError> {
         /// A normal law's readings at the certificate's faces: its alignment at its floor, its
-        /// covector scale, feature moves and unit step's Schur norms at their ceilings.
+        /// covector scale, feature moves and unit step's Schur norms at their ceilings, and (the
+        /// receiving map's only) its unit step's certified spectral norm.
         struct LinearFace {
             kind: LinearLocus,
             alignment: Rat,
             covector: Rat,
             moves: Rat,
             unit: (Rat, Rat),
+            norm: Rat,
         }
         /// A family stepping in the deposit.
         enum Part<'p> {
@@ -3654,16 +3709,35 @@ impl Constitution {
         }
         let mut parts: Vec<(Locus, Family, Part<'_>)> = Vec::new();
         for (locus, kind, prepared) in linear {
+            let alignment = floor(&prepared.alignment);
+            let covector = ceiling(&prepared.covector);
+            if CertifiedStep::certify(&alignment, &Rat::zero(), &covector)?.is_none() {
+                continue;
+            }
+            // The receiving map's unit step moves the readout every other family's gain reads: its
+            // certified spectral norm (the other maps' rays read their Schur norms).
+            let norm = match kind {
+                LinearLocus::Receiving(_) => {
+                    let rows = prepared.unit.to_rows();
+                    let columns = rows.first().map_or(0, Vec::len);
+                    let entries: Vec<Rat> = rows.into_iter().flatten().collect();
+                    ceiling(&spectral_norm(
+                        entries.len() / columns.max(1),
+                        columns,
+                        &entries,
+                    ))
+                }
+                _ => Rat::zero(),
+            };
             let face = LinearFace {
                 kind: *kind,
-                alignment: floor(&prepared.alignment),
-                covector: ceiling(&prepared.covector),
+                alignment,
+                covector,
                 moves: ceiling(&prepared.moves),
                 unit: ceilings(&prepared.unit_norms),
+                norm,
             };
-            if CertifiedStep::certify(&face.alignment, &Rat::zero(), &face.covector)?.is_some() {
-                parts.push((*locus, Family::Map, Part::Linear(face)));
-            }
+            parts.push((*locus, Family::Map, Part::Linear(face)));
         }
         for (locus, prepared) in factors {
             if CertifiedStep::certify(&prepared.alignment, &Rat::zero(), &prepared.covector)?
@@ -3673,7 +3747,7 @@ impl Constitution {
             }
         }
         if parts.is_empty() {
-            return Ok(BTreeMap::new());
+            return Ok((BTreeMap::new(), None));
         }
         let reach = reach.ok_or(HnnError::MissingReach)?;
         if let Some(ring) = self
@@ -3702,8 +3776,8 @@ impl Constitution {
             .enumerate()
             .map(|(index, (locus, family, _))| ((*locus, *family), index))
             .collect();
-        let together = parts.len() as u64;
-        let factor = Rat::new(BigInt::from(together), BigInt::from(2));
+        // `s`, the station score's curvature in its realified logits (module header).
+        let score = rat(1, 2);
         let receiving = self
             .rings
             .get(reach.receiver)
@@ -3711,7 +3785,9 @@ impl Constitution {
             .ok_or(HnnError::MissingReceivingMap {
                 ring: reach.receiver,
             })?;
-        let readout_base = ceilings(&schur_norms(receiving.map()));
+        // The readout's certified spectral norm `‖R‖₂` (module header, "The tightened certificate").
+        let map = receiving.map();
+        let readout_base = ceiling(&spectral_norm(map.rows(), map.columns(), map.entries()));
         let contrast_base: Vec<(Rat, Rat)> = self
             .rings
             .iter()
@@ -3783,10 +3859,17 @@ impl Constitution {
                     Part::Factor(_) => None,
                 })
             };
-            let readout = ray(
-                &readout_base,
-                moved((Locus::ReceivingMap(reach.receiver), Family::Map)),
-            );
+            // `(‖R‖₂ + η‖D‖₂)²` at the end of the receiving map's ray (the triangle on the
+            // certified spectral norms).
+            let key = (Locus::ReceivingMap(reach.receiver), Family::Map);
+            let reached = place
+                .get(&key)
+                .and_then(|&index| match (&parts[index].2, steps[index].as_ref()) {
+                    (Part::Linear(face), Some(step)) => Some(&step.step * &face.norm),
+                    _ => None,
+                })
+                .map_or_else(|| readout_base.clone(), |moved| &readout_base + moved);
+            let readout = &reached * &reached;
             let omega = (0..self.rings.len())
                 .map(|r| {
                     sqrt_ceiling(
@@ -3930,7 +4013,8 @@ impl Constitution {
                 Part::Factor(prepared) => (prepared.alignment.clone(), prepared.covector.clone()),
             }
         };
-        // The first steps read the gains and moves at the current constitution.
+        // The first steps: each family's own certificate at the current constitution (its curvature
+        // `C = s κ² b`, the largest dyadic with `ηC ≤ a` and `ηc ≤ 1`).
         let none = vec![None; parts.len()];
         let first = reading(&none)?;
         let mut steps: Vec<Option<CertifiedStep>> = parts
@@ -3938,43 +4022,93 @@ impl Constitution {
             .zip(&first)
             .map(|((.., part), (gain, moves))| {
                 let (a, c) = alignment(part);
-                CertifiedStep::certify(&a, &(&factor * gain * moves), &c)
+                CertifiedStep::certify(&a, &(&score * gain * moves), &c)
             })
             .collect::<Result<_, _>>()?;
         loop {
-            let (readout, amplitude) = gains(&steps);
             let read = reading(&steps)?;
+            // Each family's own certificate at the rays' ends: a step it no longer admits is halved.
             let mut changed = false;
-            let mut readings = BTreeMap::new();
-            for (((locus, family, _), step), (gain, moves)) in
-                parts.iter().zip(steps.iter_mut()).zip(read)
-            {
+            for (step, (gain, moves)) in steps.iter_mut().zip(&read) {
                 let certified = step
                     .as_mut()
                     .expect("a positive alignment certifies a step");
-                let curvature = &factor * &gain * &moves;
-                if !certified.admits(&curvature) {
+                let curvature = &score * gain * moves;
+                if certified.admits(&curvature) {
+                    certified.curvature = curvature;
+                } else {
                     *certified = certified.halved();
                     changed = true;
-                    continue;
                 }
-                certified.curvature = curvature;
-                readings.insert(
-                    (*locus, *family),
-                    StepReading {
-                        family: *family,
-                        step: certified.clone(),
-                        gain,
-                        moves,
-                        together,
-                        readout: readout.clone(),
-                        amplitude: amplitude.clone(),
-                    },
-                );
             }
-            if !changed {
-                return Ok(readings);
+            if changed {
+                continue;
             }
+            // The joint moves by the triangle: `m = √(κ² b)` at its dyadic ceiling.
+            let bounds: Vec<Rat> = read
+                .iter()
+                .map(|(gain, moves)| root_ceiling(&ceiling(&(gain * moves))))
+                .collect();
+            let certified: Vec<&CertifiedStep> = steps
+                .iter()
+                .map(|step| {
+                    step.as_ref()
+                        .expect("a positive alignment certifies a step")
+                })
+                .collect();
+            let joint = JointReading::read(
+                &score,
+                certified
+                    .iter()
+                    .zip(&bounds)
+                    .map(|(step, bound)| (&step.step, &step.alignment, bound)),
+            );
+            if !joint.holds() {
+                // The family whose halving gains the joint certificate most,
+                // `½ η (s m (2 Σ η m − ½ η m) − a)`; the first in the deposit's order at a tie.
+                let total: Rat = certified
+                    .iter()
+                    .zip(&bounds)
+                    .map(|(step, bound)| &step.step * bound)
+                    .sum();
+                let two = rat(2, 1);
+                let mut worst: Option<(usize, Rat)> = None;
+                for (index, (step, bound)) in certified.iter().zip(&bounds).enumerate() {
+                    let moved = &step.step * bound;
+                    let gained = &step.step
+                        * (&score * bound * (&two * &total - &moved / &two) - &step.alignment)
+                        / &two;
+                    if worst.as_ref().is_none_or(|(_, kept)| gained > *kept) {
+                        worst = Some((index, gained));
+                    }
+                }
+                let (index, _) = worst.expect("a stepping family");
+                let step = steps[index].as_mut().expect("a stepping family");
+                *step = step.halved();
+                continue;
+            }
+            let (readout, amplitude) = gains(&steps);
+            let readings: BTreeMap<(Locus, Family), StepReading> = parts
+                .iter()
+                .zip(&steps)
+                .zip(read)
+                .zip(bounds)
+                .map(|((((locus, family, _), step), (gain, moves)), bound)| {
+                    (
+                        (*locus, *family),
+                        StepReading {
+                            family: *family,
+                            step: step.clone().expect("a positive alignment certifies a step"),
+                            gain,
+                            moves,
+                            bound,
+                            readout: readout.clone(),
+                            amplitude: amplitude.clone(),
+                        },
+                    )
+                })
+                .collect();
+            return Ok((readings, Some(joint)));
         }
     }
 
@@ -4098,7 +4232,7 @@ impl Constitution {
             return Err(refusal);
         }
         // The certificate reads every prepared step at once.
-        let certified = {
+        let (certified, joint) = {
             let linear: Vec<(Locus, LinearLocus, &PreparedStep)> = regions
                 .iter()
                 .zip(&ready)
@@ -4236,6 +4370,7 @@ impl Constitution {
                 .into_iter()
                 .map(|((locus, _), reading)| (locus, reading))
                 .collect(),
+            joint,
             amplitude: next.amplitude()?,
             commit: next.commit,
             bits,
@@ -4496,6 +4631,10 @@ impl Constitution {
 /// One locus's deposited carried remainders, budgeted carry and chart readings, or the refusal its
 /// steps met with the place of the refusing step in the deposit's order.
 type LocusDeposit = Result<(Locus, Carries, (BudgetedCarry, Vec<ChartReading>)), (usize, HnnError)>;
+
+/// A deposit's certified steps by family, and the joint certificate they hold together (`None` when
+/// no family stepped).
+type CertifiedSteps = (BTreeMap<(Locus, Family), StepReading>, Option<JointReading>);
 
 /// One locus's pass-1 preparation: its budgeted carry (opened by its first step), its linear step's
 /// place, kind and prepared unit step (none when its window reached nothing), and its factor

@@ -66,6 +66,16 @@ that fixed-material passivity does not see — the learned power `⟨e, L e⟩` 
    contraction at `m ⪰ 1` (`contracting_resolvent`), and its difference power is at most
    `(G/2h + ½(G/h)² c + ⅛ G² k) |δζ|²` (`transit_difference_power`); the loaded resonator is the
    case `G = 2Y`.
+9. **The tightened certificate** (September 29). Families stepping together by `η_ℓ ≥ 0` with
+   logit moves per unit step at most `m_ℓ` move the logits by at most `Σ η_ℓ m_ℓ`, so the joint
+   curvature term is at most `s (Σ η_ℓ m_ℓ)²` (`joint_move_triangle`: the cross terms by
+   Cauchy–Schwarz on the joint ray, in place of the count `|B|`); when it is at most
+   `Σ η_ℓ a_ℓ` the score falls by at least `½ Σ η_ℓ a_ℓ` (`joint_step_descends`, through
+   `certified_step_descends` with the joint curvature apportioned by decrease). A certified
+   `μ I − Tᵀ T ⪰ 0` bounds `‖T x‖² ≤ μ ‖x‖²` (`gram_certificate_bound`), the smaller side's Gram
+   suffices (`adjoint_gram_certificate_bound`), and a face whose entries are within `ε` moves a
+   vector by at most `m n ε²` times its squared length (`entrywise_error_bound`): the readout's
+   spectral bound that replaces its Schur test.
 
 [open] Owed in #62 ("The certified deposition step"): the model's own second-order terms when the
 logits are not linear in the step (the bilinear coupling of a receiving map with a source port, a
@@ -74,7 +84,8 @@ their rays (the square's own `2B(D, D)` paired with the station covector, the el
 `(I − ½K)⁻¹` and the transit's `m⁻¹` differentiated twice, the ticks' products); the composition of
 the per-tick growth over a word's stations and re-entries into the gains `κ²` the machine reads
 (`hnn::constitution`); the Schur test `‖W‖₂² ≤ ‖W‖₁‖W‖_∞` and its composition into the per-family
-moves; the station score's curvature bound `s = ½`; the standing's fold crossing (its certificate
+moves (the readout reads the Gram certificate of §9 instead, whose inertia decision is the exact
+congruence of `ratio::linear::inertia`); the station score's curvature bound `s = ½`; the standing's fold crossing (its certificate
 holds in its lock chart; a class that crosses its fold jumps, which no curvature bounds); and a
 declared boost's growth bound (its signed stiffness stores indefinite energy, so no gain is
 certified through it; a step through it is refused, like a pumped resonator's).
@@ -764,5 +775,147 @@ theorem transit_difference_power {E V : Type*} [NormedAddCommGroup E] [InnerProd
   nlinarith [hwaves, heq, hw, hu]
 
 end Factor
+
+/-! ## 9. The tightened certificate -/
+
+section Joint
+
+variable {𝕜 : Type*} [Field 𝕜] [LinearOrder 𝕜] [IsStrictOrderedRing 𝕜]
+
+/-- [proved-derived; formal-checked] **The joint certificate descends, through
+`certified_step_descends`.** Families `ℓ ∈ B` stepping together by `η_ℓ ≥ 0`, with first-order
+decreases `a_ℓ ≥ 0`, under the joint model `φ ≤ φ₀ − Σ η_ℓ a_ℓ + ½ Q` whose curvature term is at
+most the triangle's `s (Σ η_ℓ m_ℓ)²` (`joint_move_triangle`), descend by at least half their
+first-order decrease when `s (Σ η_ℓ m_ℓ)² ≤ Σ η_ℓ a_ℓ`. The joint curvature apportioned to the
+families by their decreases, `C_ℓ = s (Σ η m)² a_ℓ / (η_ℓ Σ η a)`, gives `η_ℓ C_ℓ ≤ a_ℓ` and
+`Σ η_ℓ² C_ℓ = s (Σ η m)²`: the hypotheses of `certified_step_descends`, which concludes. -/
+theorem joint_step_descends {ι : Type*} (B : Finset ι) {φ₀ φη Q s : 𝕜} {η a m : ι → 𝕜}
+    (hmodel : φη ≤ φ₀ - ∑ ℓ ∈ B, η ℓ * a ℓ + (1 / 2) * Q)
+    (hQ : Q ≤ s * (∑ ℓ ∈ B, η ℓ * m ℓ) ^ 2)
+    (hjoint : s * (∑ ℓ ∈ B, η ℓ * m ℓ) ^ 2 ≤ ∑ ℓ ∈ B, η ℓ * a ℓ)
+    (hη : ∀ ℓ ∈ B, 0 ≤ η ℓ) (ha : ∀ ℓ ∈ B, 0 ≤ a ℓ) :
+    φη ≤ φ₀ - (1 / 2) * ∑ ℓ ∈ B, η ℓ * a ℓ := by
+  set J := s * (∑ ℓ ∈ B, η ℓ * m ℓ) ^ 2
+  set A := ∑ ℓ ∈ B, η ℓ * a ℓ
+  have hA : 0 ≤ A := Finset.sum_nonneg fun ℓ hℓ => mul_nonneg (hη ℓ hℓ) (ha ℓ hℓ)
+  let C : ι → 𝕜 := fun ℓ => if η ℓ = 0 then 0 else J / A * a ℓ / η ℓ
+  have hterm : ∀ ℓ, η ℓ ^ 2 * C ℓ = J / A * (η ℓ * a ℓ) := by
+    intro ℓ
+    by_cases h : η ℓ = 0
+    · simp [C, h]
+    · simp only [C, h, if_false]
+      field_simp
+  refine certified_step_descends B (C := C) ?_ hη ?_
+  · -- The apportioned curvature carries the whole joint term.
+    have hsum : ∑ ℓ ∈ B, η ℓ ^ 2 * C ℓ = J / A * A := by
+      rw [Finset.sum_congr rfl fun ℓ _ => hterm ℓ, ← Finset.mul_sum]
+    rcases hA.lt_or_eq with hpos | hzero
+    · have : J / A * A = J := div_mul_cancel₀ J hpos.ne'
+      rw [hsum, this]
+      linarith
+    · have hJ : J ≤ 0 := hzero ▸ hjoint
+      rw [hsum, ← hzero]
+      simp only [mul_zero]
+      linarith
+  · intro ℓ hℓ
+    by_cases h : η ℓ = 0
+    · simp [C, h, ha ℓ hℓ]
+    · have hηa : η ℓ * C ℓ = J / A * a ℓ := by
+        simp only [C, h, if_false]
+        field_simp
+      rw [hηa]
+      rcases hA.lt_or_eq with hpos | hzero
+      · have hle : J / A ≤ 1 := (div_le_one hpos).mpr hjoint
+        have := mul_le_mul_of_nonneg_right hle (ha ℓ hℓ)
+        linarith
+      · rw [← hzero, div_zero, zero_mul]
+        exact ha ℓ hℓ
+
+end Joint
+
+/-- [proved-derived; formal-checked] **The joint moves' triangle** (Cauchy–Schwarz on the joint
+ray's cross terms, `2 η_ℓ η_k ⟨u_ℓ, u_k⟩ ≤ 2 η_ℓ η_k m_ℓ m_k`): families stepping together by
+`η_ℓ ≥ 0`, whose logit moves per unit step are at most `m_ℓ`, move the logits by at most
+`Σ η_ℓ m_ℓ`, so a score of curvature `s ≥ 0` has joint term `s‖Σ η_ℓ u_ℓ‖² ≤ s (Σ η_ℓ m_ℓ)²`.
+With `m_ℓ = κ_ℓ √b_ℓ` it is at most `gauss_newton_curvature`'s `|B| s Σ κ² b η²`, and far below it
+when the families' moves differ. -/
+theorem joint_move_triangle {E : Type*} [SeminormedAddCommGroup E] [NormedSpace ℝ E] {ι : Type*}
+    (B : Finset ι) {η m : ι → ℝ} (u : ι → E) (hη : ∀ ℓ ∈ B, 0 ≤ η ℓ)
+    (hu : ∀ ℓ ∈ B, ‖u ℓ‖ ≤ m ℓ) {s : ℝ} (hs : 0 ≤ s) :
+    s * ‖∑ ℓ ∈ B, η ℓ • u ℓ‖ ^ 2 ≤ s * (∑ ℓ ∈ B, η ℓ * m ℓ) ^ 2 := by
+  have htri : ‖∑ ℓ ∈ B, η ℓ • u ℓ‖ ≤ ∑ ℓ ∈ B, η ℓ * m ℓ := by
+    refine (norm_sum_le _ _).trans (Finset.sum_le_sum fun ℓ hℓ => ?_)
+    rw [norm_smul, Real.norm_of_nonneg (hη ℓ hℓ)]
+    exact mul_le_mul_of_nonneg_left (hu ℓ hℓ) (hη ℓ hℓ)
+  exact mul_le_mul_of_nonneg_left (pow_le_pow_left₀ (norm_nonneg _) htri 2) hs
+
+section Gram
+
+variable {E F : Type*} [NormedAddCommGroup E] [InnerProductSpace ℝ E] [NormedAddCommGroup F]
+  [InnerProductSpace ℝ F]
+
+/-- [proved-derived; formal-checked] **A Gram certificate bounds the map.** For `T` with adjoint
+`S` (`⟨T x, y⟩ = ⟨x, S y⟩`), a certified `μ I − S T ⪰ 0` (`⟨x, S T x⟩ ≤ μ‖x‖²`, decided in the
+machine by exact inertia) gives `‖T x‖² ≤ μ‖x‖²`: the spectral bound the readout's gain reads in
+place of the Schur test. -/
+theorem gram_certificate_bound (T : E →ₗ[ℝ] F) (S : F →ₗ[ℝ] E)
+    (hadj : ∀ x y, inner ℝ (T x) y = inner ℝ x (S y)) {μ : ℝ}
+    (hpsd : ∀ x, inner ℝ x (S (T x)) ≤ μ * ‖x‖ ^ 2) (x : E) : ‖T x‖ ^ 2 ≤ μ * ‖x‖ ^ 2 := by
+  rw [← real_inner_self_eq_norm_sq, hadj]
+  exact hpsd x
+
+/-- [proved-derived; formal-checked] **The smaller side's Gram suffices.** A bound
+`‖S y‖² ≤ μ‖y‖²` on the adjoint (its Gram `T S`, the smaller when `T` has fewer rows than
+columns) bounds `T` by the same `μ ≥ 0`. -/
+theorem adjoint_gram_certificate_bound (T : E →ₗ[ℝ] F) (S : F →ₗ[ℝ] E)
+    (hadj : ∀ x y, inner ℝ (T x) y = inner ℝ x (S y)) {μ : ℝ} (hμ : 0 ≤ μ)
+    (hS : ∀ y, ‖S y‖ ^ 2 ≤ μ * ‖y‖ ^ 2) (x : E) : ‖T x‖ ^ 2 ≤ μ * ‖x‖ ^ 2 := by
+  have h1 : ‖T x‖ ^ 2 = inner ℝ x (S (T x)) := by
+    rw [← real_inner_self_eq_norm_sq, hadj]
+  have h2 : inner ℝ x (S (T x)) ≤ ‖x‖ * ‖S (T x)‖ := real_inner_le_norm _ _
+  have h3 := hS (T x)
+  set t := ‖T x‖ ^ 2 with ht
+  have ht0 : 0 ≤ t := sq_nonneg _
+  have hx := norm_nonneg x
+  have hs := norm_nonneg (S (T x))
+  -- `t ≤ ‖x‖ ‖S T x‖` and `‖S T x‖² ≤ μ t` give `t² ≤ μ ‖x‖² t`.
+  have hsq : t ^ 2 ≤ μ * ‖x‖ ^ 2 * t := by
+    have htx : t ≤ ‖x‖ * ‖S (T x)‖ := h1 ▸ h2
+    have := pow_le_pow_left₀ ht0 htx 2
+    calc t ^ 2 ≤ (‖x‖ * ‖S (T x)‖) ^ 2 := this
+      _ = ‖x‖ ^ 2 * ‖S (T x)‖ ^ 2 := by ring
+      _ ≤ ‖x‖ ^ 2 * (μ * ‖T x‖ ^ 2) := mul_le_mul_of_nonneg_left h3 (sq_nonneg _)
+      _ = μ * ‖x‖ ^ 2 * t := by rw [ht]; ring
+  rcases ht0.lt_or_eq with hpos | hzero
+  · nlinarith
+  · rw [← hzero]
+    positivity
+
+end Gram
+
+/-- [proved-derived; formal-checked] **The face's entrywise error.** A matrix whose entries are at
+most `ε` in magnitude (the readout read on a dyadic face, `|E_ij| ≤ 2^(e−1)`) moves a vector by at
+most `m n ε²` times its squared length: `‖E v‖² ≤ m n ε² ‖v‖²` (Cauchy–Schwarz on each row). -/
+theorem entrywise_error_bound {m n : Type*} [Fintype m] [Fintype n] (E : Matrix m n ℝ) {ε : ℝ}
+    (hE : ∀ i j, |E i j| ≤ ε) (v : n → ℝ) :
+    (E *ᵥ v) ⬝ᵥ (E *ᵥ v) ≤ Fintype.card m * Fintype.card n * ε ^ 2 * (v ⬝ᵥ v) := by
+  have hrow : ∀ i, (E *ᵥ v) i * (E *ᵥ v) i ≤ Fintype.card n * ε ^ 2 * (v ⬝ᵥ v) := by
+    intro i
+    have hcs := Finset.sum_mul_sq_le_sq_mul_sq Finset.univ (fun j => E i j) v
+    have hentries : ∑ j, E i j ^ 2 ≤ Fintype.card n * ε ^ 2 := by
+      calc ∑ j, E i j ^ 2 ≤ ∑ _j : n, ε ^ 2 :=
+            Finset.sum_le_sum fun j _ => by
+              have := hE i j
+              nlinarith [abs_nonneg (E i j), sq_abs (E i j)]
+        _ = Fintype.card n * ε ^ 2 := by simp
+    have hv : 0 ≤ ∑ j, v j ^ 2 := Finset.sum_nonneg fun j _ => sq_nonneg _
+    have hdot : v ⬝ᵥ v = ∑ j, v j ^ 2 := by simp [dotProduct, sq]
+    calc (E *ᵥ v) i * (E *ᵥ v) i = (∑ j, E i j * v j) ^ 2 := by simp [Matrix.mulVec, dotProduct, sq]
+      _ ≤ (∑ j, E i j ^ 2) * ∑ j, v j ^ 2 := hcs
+      _ ≤ Fintype.card n * ε ^ 2 * ∑ j, v j ^ 2 := mul_le_mul_of_nonneg_right hentries hv
+      _ = Fintype.card n * ε ^ 2 * (v ⬝ᵥ v) := by rw [hdot]
+  calc (E *ᵥ v) ⬝ᵥ (E *ᵥ v) = ∑ i, (E *ᵥ v) i * (E *ᵥ v) i := rfl
+    _ ≤ ∑ _i : m, Fintype.card n * ε ^ 2 * (v ⬝ᵥ v) := Finset.sum_le_sum fun i _ => hrow i
+    _ = Fintype.card m * Fintype.card n * ε ^ 2 * (v ⬝ᵥ v) := by simp; ring
 
 end Holonics.HolonCore

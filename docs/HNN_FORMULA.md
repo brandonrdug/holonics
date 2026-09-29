@@ -1098,15 +1098,18 @@ carried Gram's solved chart. `η` is the largest dyadic `2^k` with `ηC ≤ a` a
 - `a = Σ_t w⟨g_t, D f_t⟩` is the unit step's first-order decrease. It is computed, and a negative
   one is refused (`HNN/Normal.certified_normal_step`: `a ≥ 0` at a positive semidefinite carried
   Gram).
-- `C` bounds the score's curvature along the whole ray: the Gauss–Newton bound
-  `B·s·κ²·Σ_t w|D f_t|²`, with `B` the loci stepping together, `s = ½` the station score's
-  curvature in its logits, and `κ²` the gain from the locus's output to the station logits over
-  every station and re-entry, certified by the medium's energy law (the contrast port's per-tick
-  growth `(1 + ω)²`, `Holon/Deposition.active_element_growth`).
+- `C` bounds the locus's own curvature along its whole ray: the Gauss–Newton bound
+  `s·κ²·Σ_t w|D f_t|²`, with `s = ½` the station score's curvature in its logits, and `κ²` the gain
+  from the locus's output to the station logits over every station and re-entry, certified by the
+  medium's energy law (the readout's Gram certificate `‖R‖₂²` and the contrast port's per-tick
+  growth `(1 + ω)²`, `Holon/Deposition.{gram_certificate_bound, active_element_growth}`).
 - `c` is the lattice's covector scale, `max_t |w g_t|_∞`.
 
-The score then falls by at least `½ηa` (`Holon/Deposition.{quadratic_upper_model,
-certified_step_descends, gauss_newton_curvature}`). The declared step `γ_U = 1` it replaces moved a
+The loci stepping together also hold the joint certificate `s(Σ_ℓ η_ℓ m_ℓ)² ≤ Σ_ℓ η_ℓ a_ℓ`, with
+`m_ℓ = √(κ²_ℓ b_ℓ)` their logit moves' bound (`Holon/Deposition.joint_move_triangle`: the cross
+terms by Cauchy–Schwarz on the joint ray, which replaced charging every locus the count of loci
+stepping). The score then falls by at least `½ Σ_ℓ η_ℓ a_ℓ` (`Holon/Deposition.{quadratic_upper_model,
+certified_step_descends, joint_step_descends}`). The declared step `γ_U = 1` it replaces moved a
 locus by the whole covector reaching it and overshot at `K = 4`. Owner: `hnn::constitution`,
 "The certified step"; the parts not yet certified are named there and owed in #62.
 
