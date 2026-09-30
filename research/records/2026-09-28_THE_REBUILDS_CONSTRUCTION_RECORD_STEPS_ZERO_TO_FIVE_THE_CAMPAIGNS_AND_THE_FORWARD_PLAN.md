@@ -829,21 +829,37 @@ harmless because its waves are released at the word's end (R2 C2c).
   nonpositive at 0, so the inequality holds at every `n ≥ n*` once it holds at `n*`.
   `Field::declare` finds `n*` by bisection on exact integers (`N(n) < |A|^n`, no float, no sample)
   and records it in the receipt.
-- **Measured** ([`capacity.py`](../notebook/hnn_design/capacity.py), certified at
-  `n* − 1` and `n*` by exact integers):
-  - three rings of periods 3, 4, 5 over `|A| = 2` (24 slots), every ring a source ring: `n* = 137`;
+- **Measured** ([`capacity.py`](https://github.com/brandonrdug/holonics/blob/d4596102/research/notebook/hnn_design/capacity.py),
+  certified at `n* − 1` and `n*` by exact integers; re-run September 30 before its retirement, every
+  reading below is its output):
+  - three rings of periods 3, 4, 5 over `|A| = 2` (24 slots), every ring a source ring: `n* = 137`
+    (`N(137) < 2^137` and `N(136) ≥ 2^136`);
   - campaign 1's declared field (source ring of period 5, bytes, `Δ = {1}`; 328,960 slots):
     `n* = 6,148` cells;
   - one byte ring of period 7 with `Δ = {1}`: `n* = 8,577`;
   - eight source rings of period 16 over bytes with one offset (8,421,376 slots):
     `n* = 3,641,698` cells.
 
-  The moment's exact dense code (each slot self-delimited) is a reading, not the capacity. It is
-  longer than `log₂N(n)`, so it crosses later: 138 bits at `n = 144` on the control; between
-  2^16 and 2^17 cells for the period-7 ring; and for the eight rings, with uniform counts, below the
-  source for good only from 4,243,457 cells (and briefly on a stretch between 2^21 and 2^22 cells,
-  since its bit lengths step). The third check's reading read this dense code, and the second
-  revision's was wrong.
+  On the control, `log₂N(n)` lies below `25, 51, 90, 112, 125, 135, 158, 206, 254` bits (`N(n)`'s
+  bit length) at `n = 2, 8, 32, 64, 96, 128, 256, 1024, 4096`: per source bit at most `25/2, 51/8,
+  45/16, 7/4, 125/96, 135/128, 79/128, 103/512, 127/2048`.
+
+  The moment's exact dense code (each slot self-delimited, `max(1, bit length) + 1` bits) is a
+  reading, not the capacity. It is longer than `log₂N(n)`, so it crosses later:
+  - on the control, the most over 50 seeded random sources: `56, 89, 111, 125, 135, 138, 158, 205,
+    252` bits at `n = 8, 32, 64, 96, 128, 144, 256, 1024, 4096`, per source bit `7, 89/32, 111/64,
+    125/96, 135/128, 23/24, 79/128, 205/1024, 63/1024`: above the source at `n = 128` (135 bits of
+    128), below it at `n = 144` (138 of 144);
+  - for the period-7 ring, with uniform counts: not below the source at any multiple of 1,000 cells
+    from 1,000 to 116,000, and below it at 117,000;
+  - for the eight rings, with uniform counts (its bit lengths step, so its ratio to the source is
+    not monotone): below the source from `n = 3,190,785` (the stretch's first cell, exact), not
+    below it again at `3,670,785` (the first such point of the step-1,000 grid from that start; both
+    lie between `2^21` and `2^22`), and below from `n = 4,243,457` (exact), checked
+    below at every 997th cell from there to 16,000,000. Per source bit it reads `9472/9375` (1 rem
+    97 over 9375) at `n = 4,200,000` and `132608/134375` at `n = 4,300,000`.
+
+  The third check's reading read this dense code, and the second revision's was wrong.
 - **The admitted regime is lossy by construction.** `Field::declare` refuses a declared population
   shorter than `n*`. Every receipt reports `log₂N(n)` per source bit against 1, and the moment's
   exact bits per source bit as a reading.
@@ -1069,10 +1085,18 @@ close    at an aeon boundary: the collapse onto what the admitted future disting
   - Its weights `G_a / (Y_r + Σ_a G_a)` are ring `r`'s normalized participation, the ring's face of
     its neighbours. They stay ring-relative through the normalization.
   - `G_a = κ_a Y_a` is the contact's port conductance at both ends. The first design put the
-    exponent on the ring (`β_r`), so a wave's weight changed in transit and the global power was
-    not conserved: it rose, then fell, over three ticks
-    (R2 [`swing_power.py`](../notebook/hnn_design/swing_power.py), re-run). With one
-    exponent per contact it is exactly the same at every tick.
+    exponent on the ring (`β_r`), so `κ_gh ≠ κ_hg` on a contact, a wave's weight changed in transit
+    and the global power was not conserved
+    (R2 [`swing_power.py`](https://github.com/brandonrdug/holonics/blob/d4596102/research/notebook/hnn_design/swing_power.py),
+    six rings in a cycle, re-run September 30 before its retirement). A long ratio reads as its
+    integer quotient plus its remainder's exact enclosure between continued-fraction convergents of
+    denominator at most `2^12`, with the exact ratio's size in bits. Over six ticks the weighted
+    power reads `73199/1920` (38 rem 239 over 1920); `37 + e`, `e ∈ [29/53, 2227/4070]` (205
+    bits); `44 + e`, `e ∈ [44/53, 3393/4087]` (366); `46 + e`, `e ∈ [2267/2837, 1221/1528]` (545);
+    `50 + e`, `e ∈ [2092/3731, 919/1639]` (704); `50 + e`, `e ∈ [3683/3851, 285/298]` (884);
+    `43 + e`, `e ∈ [1577/3270, 1074/2227]` (1,045): it falls at the first tick, rises through the
+    fifth and falls at the sixth. With one exponent per contact it is `648509/23040` (28 rem 3389
+    over 23040) exactly at every tick.
   - `o = 2v − a` is the point Swing about that anchor (objects §3): the reflection `2P_D − I` onto
     the junction's common-potential subspace, with `P_D` the `W`-orthogonal projector,
     `W = diag(Y_r, G_a)`.
@@ -1102,16 +1126,31 @@ close    at an aeon boundary: the collapse onto what the admitted future disting
     `W_c = 0` and every `K_a ⪰ 0`. Elsewhere `Π_c` is stated per tick in the receipt, and what it
     supplies is part of the change, released at the word's end. A word with fixed operands is one
     linear map, so its growth stays additive in bits.
-  - [established-bounded; measured] [`power.py`](../notebook/hnn_design/power.py)
-    checks this on six rings of widths 4, 2, 4, 6, 2, 4 (so `U_a` is a proper partial isometry),
-    the six-cycle plus a chord, with contacts that have storage and stiffness:
-    - lossless: `P` constant exactly over 8 ticks;
-    - dissipative: `P(t) − P(t+1)` equals the dissipation exactly at every tick;
-    - `W_c ≠ 0` with lossless contacts: `P(t+1) − P(t) = Π_c` exactly at every tick;
+  - [established-bounded; measured] [`power.py`](https://github.com/brandonrdug/holonics/blob/d4596102/research/notebook/hnn_design/power.py)
+    (on the exact tick of [`field.py`](https://github.com/brandonrdug/holonics/blob/d4596102/research/notebook/hnn_design/field.py);
+    re-run September 30 before their retirement, every reading below is its output, long ratios read
+    as above) checks this on six rings of widths 4, 2, 4, 6, 2, 4 (so `U_a` is a proper partial
+    isometry), the six-cycle plus a chord, with contacts that have storage and stiffness:
+    - lossless: `P = 627641/8640` (72 rem 5561 over 8640; 34 bits), constant exactly over 8 ticks;
+    - dissipative: `P(t) − P(t+1)` equals the dissipation exactly at every tick. `P` reads
+      `2524969/25920` (97 rem 10729 over 25920), then `92 + e`, `e ∈ [1848/2951, 2039/3256]`;
+      `88 + e`, `e ∈ [239/614, 1492/3833]`; `86 + e`, `e ∈ [2966/4095, 155/214]`; `85 + e`,
+      `e ∈ [1887/3433, 985/1792]`; `83 + e`, `e ∈ [873/2152, 1288/3175]`; `80 + e`,
+      `e ∈ [461/1188, 1409/3631]`; `78 + e`, `e ∈ [1169/2055, 1801/3166]`; `77 + e`,
+      `e ∈ [684/2617, 661/2529]`, exact ratios of 466, 1,045, 1,626, 2,206, 2,787, 3,367, 3,948 and
+      4,528 bits (579 to 581 bits more a tick);
+    - `W_c ≠ 0` (entries at scale `1/8`) with lossless contacts: `P(t+1) − P(t) = Π_c` exactly at
+      every tick, with `Π_c` reading `1 + e`, `e ∈ [3109/3222, 1018/1055]`; `3 + e`,
+      `e ∈ [327/3880, 52/617]`; `1 + e`, `e ∈ [463/605, 2853/3728]`; `5 + e`,
+      `e ∈ [241/3716, 105/1619]`; `2 + e`, `e ∈ [1327/3304, 688/1713]`; `9 + e`,
+      `e ∈ [122/1121, 435/3997]`; `9 + e`, `e ∈ [814/3793, 335/1561]`; `20 + e`,
+      `e ∈ [486/1193, 1469/3606]` (169 to 3,917 bits);
     - dissipation, passive `W_s` and `W_c ≠ 0` together: the balance above holds exactly at every
-      tick, the `W_s` term is `≤ 0`, and `Π_c` takes both signs over 8 starting states;
-    - with `W_c`'s entries 8 times larger the balance is still exact, and `P` grows 245-fold in 8
-      ticks: an active word.
+      tick, the `W_s` term is `≤ 0`, and `Π_c` takes both signs over 8 starting states of 8 ticks
+      each;
+    - with `W_c`'s entries 8 times larger (scale 1) the balance is still exact, and `P` grows in 8
+      ticks by `P(8)/P(0) = 244 + e`, `e ∈ [2626/3871, 251/370]` (an exact ratio of 7,580 bits):
+      an active word.
 - **The score is the pair quadrance of the two rings' screws (§8.6, review C5).**
   - `holon::contact::PairContact::of(ScrewPair)` supplies `Q`, `J = [v_g | −v_h]`, `DQ = 2J*Δ` and
     `D²Q`, at the two rings' phases. Ring `g`'s point at phase `τ` is

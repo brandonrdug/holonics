@@ -51,7 +51,6 @@ and every mode. A Python script needs only the standard library unless its docst
 | `development_families.py`, `family_passage.py` | The split by conversation with the development reserve (U6), the spent family splits (F-items, U2) behind `--read-reserve`, and their joined passages | `HOLONICS_ROOT=$PWD python3 research/notebook/hnn_design/development_families.py [U6]` | [F4](../../records/2026-09-27_F4_DEVELOPMENT_FAMILY_SPLIT_AND_RELEASE_GATE.md), [U2's acceptance run](../../records/2026-09-28_U2_F0S_MEMORY_ACCEPTANCE_RUN_PINNED_BEFORE_ITS_SPLIT_IS_READ.md) |
 | `f5_context.py` (tests: `f5_context_tests.py`) | F5's request context from declared provider-parent incidence (an exterior source codec) | `python3 research/notebook/hnn_design/f5_context_tests.py` | [F5](../../records/2026-09-27_F5_DEVELOPMENT_AND_BLIND_GATE.md) |
 | `athena_protocol.py`, `athena_file_protocol.py`, `athena_file_checkpoint.py`, `athena_blind.py` (tests: `athena_*_tests.py`) | Athena-0's exterior protocol, checkpoint transport and blind judging surface | `python3 research/notebook/hnn_design/athena_protocol_tests.py` | [F5](../../records/2026-09-27_F5_DEVELOPMENT_AND_BLIND_GATE.md), [the atomic standing audit](../../records/2026-09-27_F5_ATOMIC_STANDING_OWNER_AUDIT.md) |
-| `field.py`, `power.py`, `swing_power.py`, `capacity.py` | The step 4 design review's kept scripts: the revised tick's exact reference, its power balance, one exponent per ring against one per contact, and the capacity `n*` by counting | `python3 research/notebook/hnn_design/power.py` | the step 4 design ("The step 4 design scripts" below) |
 
 ## The baseline replay
 
@@ -77,13 +76,15 @@ the last line's wall milliseconds and resident-set bytes are masked. Exit 0 is a
 ## The retired harnesses
 
 Each retired harness with the commit that holds its source and the sections of this page, at that
-commit, that hold its receipts; its records hold the measurements. N1 is batch N1 of THE_REBUILD
-U6's consolidation (September 30), which retired the harnesses step 1 does not run
+commit, that hold its receipts; its records hold the measurements. N1 and N2 are batches N1 and N2
+of THE_REBUILD U6's consolidation (September 30): N1 retired the harnesses step 1 does not run
 ([the baseline record](../../records/2026-09-30_THE_BASELINE_BEFORE_THE_SEPTEMBER_30_RETIREMENTS.md)
-§6 lists every file with its permalink).
+§6 lists every file with its permalink), and N2 retired the last four step 4 design scripts once
+their readings were in the construction record.
 
 | Harness | What it measured | Retired | Source at | Receipts on this page at that commit |
 |---|---|---|---|---|
+| `field.py`, `power.py`, `swing_power.py`, `capacity.py` | The step 4 design review's last scripts: the revised tick's exact reference, its power balance, one exponent per ring against one per contact, and the capacity `n*` by counting | N2 | [`d4596102`](https://github.com/brandonrdug/holonics/tree/d4596102/research/notebook/hnn_design) | [the step 4 design scripts](https://github.com/brandonrdug/holonics/blob/d4596102/research/notebook/hnn_design/README.md#the-step-4-design-scripts); every reading is in the [construction record](../../records/2026-09-28_THE_REBUILDS_CONSTRUCTION_RECORD_STEPS_ZERO_TO_FIVE_THE_CAMPAIGNS_AND_THE_FORWARD_PLAN.md) (the capacity condition, participation, the tick's global power balance) |
 | `bank_causes.rs` and `bank_causes_probe/` (all but the two listing counters) | The causes' analysis of the bank's learning path: dumps of the declared field's placement, exact bank readings and `E` after each certified deposit; `native-release` (Stage 0, the station-framed refit's native read), `reentry`; the float fits `eO_fit.py`, `eP_rho_path.py`, `eR_fit.py` and their export | N1 | [`d4596102`](https://github.com/brandonrdug/holonics/tree/d4596102/research/notebook/hnn_design) | none: the September 30 records and their receipts |
 | `hnn_population.rs` with `hnn_population_{birth,census,curated,evolution,f0,u2,u6}.rs` | The egg population: terrain, evolution and species, the curated source with its merges and admitted receivers, F4, F5's native paths and checkpoints, F0's egg and acceptance run, U2's census and acceptance run, U6's symmetric comparison, residual-founded transport discovery | N1 | [`d4596102`](https://github.com/brandonrdug/holonics/blob/d4596102/research/notebook/hnn_design/hnn_population.rs) | [the egg population on terrain](https://github.com/brandonrdug/holonics/blob/d4596102/research/notebook/hnn_design/README.md#the-egg-population-on-terrain-rebuild-step-4-item-4-september-27), [the evolved prior](https://github.com/brandonrdug/holonics/blob/d4596102/research/notebook/hnn_design/README.md#the-evolved-prior-and-species-collapse-rebuild-step-4-item-7-september-27), [the curated source through the population](https://github.com/brandonrdug/holonics/blob/d4596102/research/notebook/hnn_design/README.md#the-curated-source-through-the-population-campaign-5-september-27), [the admitted receivers](https://github.com/brandonrdug/holonics/blob/d4596102/research/notebook/hnn_design/README.md#the-admitted-receivers-campaign-5-september-27), [merges](https://github.com/brandonrdug/holonics/blob/d4596102/research/notebook/hnn_design/README.md#merges-learned-byte-classes-and-shared-counts-campaign-5-september-27), [with the learned classes](https://github.com/brandonrdug/holonics/blob/d4596102/research/notebook/hnn_design/README.md#the-admitted-receivers-with-the-learned-classes-september-27), [F4](https://github.com/brandonrdug/holonics/blob/d4596102/research/notebook/hnn_design/README.md#f4-release-and-the-disjoint-development-families-september-27), [F0's first diagnosis](https://github.com/brandonrdug/holonics/blob/d4596102/research/notebook/hnn_design/README.md#f0-the-predictor-on-unseen-families-the-first-diagnosis-september-28), [U2's census](https://github.com/brandonrdug/holonics/blob/d4596102/research/notebook/hnn_design/README.md#u2-the-standing-census-of-f0s-egg-september-28), [U2's acceptance run](https://github.com/brandonrdug/holonics/blob/d4596102/research/notebook/hnn_design/README.md#u2-the-acceptance-run-of-f0s-memory-september-28), [F0's acceptance run](https://github.com/brandonrdug/holonics/blob/d4596102/research/notebook/hnn_design/README.md#f0-the-acceptance-run-the-predictor-on-unseen-families-september-28), [U6 item 2](https://github.com/brandonrdug/holonics/blob/d4596102/research/notebook/hnn_design/README.md#u6-item-2-the-symmetric-comparison-on-the-conversation-split-september-29), [residual-founded transport discovery](https://github.com/brandonrdug/holonics/blob/d4596102/research/notebook/hnn_design/README.md#residual-founded-transport-discovery-on-the-moiré-september-28) |
 | `hnn_landmark.rs` | The landmark tree, count-only: the depth sweep and the prequential passage; `letters`, `prior`, `wide`, `compact`, `capacity` | N1 | [`d4596102`](https://github.com/brandonrdug/holonics/blob/d4596102/research/notebook/hnn_design/hnn_landmark.rs) | [`hnn_landmark`](https://github.com/brandonrdug/holonics/blob/d4596102/research/notebook/hnn_design/README.md#hnn_landmark) |
@@ -195,46 +196,6 @@ unchanged).
 **Receipts.** 22,395 occurrences with cells in 87 conversations; sections from the declared turn (`part` 10,977, `turn` 6,992: 1,163 new declared turns and 5,829 record boundaries); 133 mirrors equal their first views, no conflicts, none refused; the cut 1,048,228 cells (1,627 letters), the flat twin 1,046,601 bytes
 
 **Through the population** (`hnn_population.rs curated`, retired September 30; the dated section "[The curated source through the population](https://github.com/brandonrdug/holonics/blob/d4596102/research/notebook/hnn_design/README.md#the-curated-source-through-the-population-campaign-5-september-27)" of this page at `d4596102`): The curated cut through the egg population (campaign 5): the curated cell tree and the typed tree (the channel read once at the section) as families, and the boundary egg (the part clock ⊳ the typed tree and the letter tree through the hazard law on a partition learned by priced merges on the development cells, the declared partition and the refused stage read on the same cells), one passage over the whole cut against the flat tree at `D = 48`; `merges` runs the learning alone; development receipts, counts and bits only Receipts: The boundary egg selected (`−log₂ w = 0 + 0/16 + ε`); learned classes 167 values → 4 (declared 6), shares refused (`7/16` above); the whole curated stream charged against the flat stream: development `−1072 + 15/16 + ε` (declared `−950 + 9/16`), held out `−369 + 8/16 + ε` (declared `−415 + 3/16`)
-
-### The step 4 design scripts
-
-Record: the step 4 design (THE_REBUILD) and #62; no dedicated record.
-
-[established-bounded; measured] The exact-arithmetic scripts behind measured numbers in the
-[step 4 design](../../records/2026-09-28_THE_REBUILDS_CONSTRUCTION_RECORD_STEPS_ZERO_TO_FIVE_THE_CAMPAIGNS_AND_THE_FORWARD_PLAN.md#step-4-design-the-hnn-law) and its #62 item on
-bounded bit growth ("Step 4 (#73) owed"). Every measured value is a `fractions.Fraction` or an exact
-integer, so each number is exact and seeded; `capacity.py` bisects on the exact integer test and
-certifies each `n*` at `n* − 1` and `n*`, with no float anywhere. No script prints a float or a decimal
-(a decimal is a collapse): `field.exact` prints a short ratio as `n/d (q rem r over d)`, its integer
-quotient and remainder, and a long one as its integer quotient `q` plus its remainder's exact
-enclosure between continued-fraction convergents with denominators at most `2^12`,
-`q + e, e in [a/b, c/d]`, with the exact ratio's size in bits. They need only the Python 3 standard
-library. Run one from the repository root:
-
-```sh
-python3 research/notebook/hnn_design/power.py
-```
-
-`field.py` is the exact reference of the revised tick: junction scattering (a parallel adaptor), the
-Cayley ring element with its passive part `W_s` and its contrast port `W_c` driving inside the
-midpoint, the contact's midpoint two-port and the global power. Its defaults (`W_s = W_c = 0`) draw
-exactly what the earlier scripts drew. `power.py` imports it, and `swing_power.py` and `capacity.py`
-its exact printing. `swing_power.py` answered the second review (R2); `power.py`'s contrast-port cases
-and the counting `capacity.py` answered the third (R3). `capacity.py` takes about 6 min (375,000 ms
-in the last run); the other two take seconds.
-
-These three stay because the construction record holds their readings only in part (the
-[baseline record](../../records/2026-09-30_THE_BASELINE_BEFORE_THE_SEPTEMBER_30_RETIREMENTS.md) §6
-says which). The other eight (`bits2.py`, `collapse_bezout.py`, `collapse_check.py`,
-`critical_cayley.py`, `deposit_bits.py`, `propagation.py`, `release.py`, `word_bits.py`) were retired
-on September 30 with every number they reproduce in the construction record; they and their rows
-of this table are at [`d4596102`](https://github.com/brandonrdug/holonics/blob/d4596102/research/notebook/hnn_design/README.md#the-step-4-design-scripts).
-
-| Script | What it measures | The design's number it reproduces |
-|---|---|---|
-| `power.py` | The global power `P` over 8 ticks on six rings of widths 4, 2, 4, 6, 2, 4: the six-cycle plus a chord | Lossless: `P` is constant exactly. Dissipative: `P(t) − P(t+1)` equals the dissipation exactly at every tick. With the contrast port `W_c ≠ 0`: `P(t+1) − P(t) = Π_c` exactly; with dissipation, passive `W_s` and `W_c` together, `P(t+1) − P(t) = −dissipation + (W_s term ≤ 0) + Π_c` exactly at every tick, and `Π_c` takes both signs over 8 starting states. With `W_c` 8 times larger the balance stays exact and `P` grows in 8 ticks by `P(8)/P(0) = 244 + e`, `e in [2626/3871, 251/370]` (an exact ratio of 7,580 bits) |
-| `swing_power.py` | Junction scattering's power with one exponent per ring against one per contact | Per ring (not conserved): `73199/1920` (38 rem 239 over 1920) at tick 0, `50 + e`, `e in [3683/3851, 285/298]` at tick 5, `43 + e`, `e in [1577/3270, 1074/2227]` at tick 6. Per contact: `648509/23040` (28 rem 3389 over 23040) at every tick |
-| `capacity.py` | The capacity `n*` by counting: the least `n` with `N(n) < \|A\|^n`, certified by exact integers at `n* − 1` and `n*`; the moment's dense code as a reading | `n* = 137` on three rings of periods 3, 4, 5 over `\|A\| = 2`; 6,148 cells on campaign 1's declared field; 8,577 for one byte ring of period 7 with `Δ = {1}`; 3,641,698 for eight source rings of period 16 (8,421,376 slots). The dense code: 135 bits at `n = 128` and 138 at 144 on the control; about 117,000 cells for the period-7 ring; for the eight rings, with uniform counts, below the source for good from 4,243,457 cells (the dense code over the source bits `9472/9375` (1 rem 97 over 9375) at `n = 4,200,000`, `132608/134375` at `n = 4,300,000`) |
 
 ### `hnn_exposure`
 
