@@ -9,6 +9,7 @@ import Holonics.Foundation.TransportWord
 import Holonics.Foundation.ReceiverHistoryCompression
 import Holonics.Foundation.ReceiverRelease
 import Holonics.Foundation.Standing
+import Holonics.Foundation.Unicity
 
 /-!
 # Situated objects, receivers, and causal composition
