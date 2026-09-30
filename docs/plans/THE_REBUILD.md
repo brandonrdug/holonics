@@ -719,7 +719,22 @@ that fires becomes the next loop's subject, and nothing downstream starts.
     `HNN/LatticeDeposit`, `hnn_exposure.rs`, `standing_cut.py`, atlas
     `receiver.population-species-future`) are cleared by the batch that owns each path. 1a changes
     `executed evaluate`'s listing, so the replay reference is regenerated on 1a's tip once the diff
-    is confirmed to be 1a's intended change and nothing else.
+    is confirmed to be 1a's intended change and nothing else. (Done at `7ca300bb`.)
+  - **N2 done** (merge `428e407c`). The step-1 harness is stripped to the executed loop:
+    `hnn_prediction.rs` went from 2,344 lines to 317, keeping `executed move, train, evaluate, spread,
+    slopes, counts`, and the face arm is gone. `executed evaluate`'s per-constitution clock now reads
+    the real generation time. `Relation`/`RelationKind` moved into `exterior.rs`. The chase's
+    landmark-tree control is gone (its last reading, "strictly below the tree's least on 16 of 16",
+    kept in the README). The four step-4 scripts' readings are written exactly into the construction
+    record, correcting "245-fold" to `244 + e` and "rose, then fell" to the rerun's shape, and the
+    scripts are retired. The replay matched twice, and the library tests stayed at 976.
+    - `exterior.rs`'s `read_curated`, `read_incidence` and `read_aeons` have no caller after the
+      strip. They read the kept data-protocol scripts' outputs and are held for step 4, the corpus,
+      which consumes them or retires them (U0's rule: a consumer or a date).
+    - For H, crate prose that still names retired notebook pieces: `hnn/tests/propagation.rs`
+      (`power.py`), `hnn/constitution.rs`, and `hnn/prediction.rs` (the copy and moiré terrains).
+      For P: `admitted.rs`'s `Relation`/`RelationKind`/`HUMAN`/`AGENT` and `TreeFamily` no longer
+      have notebook consumers.
   - **Workers and gates.** The order's C gives the sequence: the baseline freeze, N1 beside 1a, N2
     after 1a, then P and H in parallel with the minimal replay. The
     primary edits the shared plan files once at the join: THE_REBUILD, CONSTRUCTION_STATE, the

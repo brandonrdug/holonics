@@ -249,7 +249,7 @@ Every step 4 design number these eight reproduce is in the
 (its step 4 design and "Bits: what is bounded, and what is not"), and `release.py`'s six-ring path is
 also held by the crate's tests (`hnn/tests/{learning, retention}.rs`).
 
-**Kept against the audit** (it named twelve step 4 design scripts): `power.py`, `swing_power.py`
+**Kept against the audit at N1, then retired by N2** (their readings written into the construction record first, §8; it named twelve step 4 design scripts): `power.py`, `swing_power.py`
 and `capacity.py`, whose numbers are only partly recorded, and `field.py`, which the three import.
 - `power.py`: the construction record states the balance's cases and "grows 245-fold in 8 ticks";
   the exact reading, `P(8)/P(0) = 244 + e`, `e ∈ [2626/3871, 251/370]` (an exact ratio of 7,580
