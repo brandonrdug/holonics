@@ -532,8 +532,9 @@ that fires becomes the next loop's subject, and nothing downstream starts.
         apart. No pair crosses a request boundary.
       - Order-2 (`ℓ = 2, f = +1`) and the alternation (`ℓ = 2, f = id`) keep one rule across
         requests, so one key is scoped globally. The line's slope `s` changes between requests, so
-        it is read in the declared hierarchical family (a global lag, a per-request translation);
-        the global family is also read, where it must empty.
+        it is read in the declared hierarchical family (a global lag, a per-request translation,
+        with its prior and reset convention explicit and its survivors scoped to them). The global
+        family is also read: whether it empties on the actual finite passage is a tested result.
       - Unobserved arguments (map values at symbols never seen as `x_(t−ℓ)`) and lag aliases are
         counted explicitly.
     - **The stopping object and `n*_terrain`.** The stopping object is the survivors' observational
@@ -547,7 +548,9 @@ that fires becomes the next loop's subject, and nothing downstream starts.
     - **`n*_machine`.**
       - Exposure unit: training requests, with 8 station observations each; a move reads 8 requests.
       - Checkpoints after moves 1, 2, 4, 8 and 16. Each reads one predeclared validation set, 64
-        requests disjoint from training and from the final confirmation.
+        requests disjoint from training and from the final confirmation. The set is reused, so the
+        checkpoints give a comparable trajectory, not independent confirmations. Both counts are
+        reported in observations and in requests, with the partial-request rounding stated.
       - Success rule: every nonconstant validation request's section released whole, which is how
         the ideal listener behaves once it has reached its stopping object. The whole-section curve
         is reported beside it. If success never occurs, `n*_machine` is a lower bound in the same
@@ -601,8 +604,9 @@ that fires becomes the next loop's subject, and nothing downstream starts.
   4. **N2, after 1a:** the harness strip (the pre-executed modes, the face arm, `Relation` into
      `exterior.rs`), on 1a's tip.
   5. **P and H in parallel, after N2.** Each has a complete consumer check across every configured
-     target and every active worktree. The protein branch at `03ecec71` names only
-     `Population::{collapse, split}`, which is kept. Each batch runs the minimal replay after it,
+     target and every active worktree, including uncommitted source (the protein worktree carries
+     uncommitted changes, so its working tree is checked, not only its head `03ecec71`, which
+     names only the kept `Population::{collapse, split}`). Each batch runs the minimal replay after it,
      because build gates alone do not show behavioural equivalence.
   6. **Held until 1b's dependency decision names a retained owner or records the exact law:**
      `hnn::encoding`, birth, the retention and normal-update constructions, and the lawful
