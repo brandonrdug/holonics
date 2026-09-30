@@ -316,6 +316,10 @@ pub(super) fn train(
                     started.elapsed().as_millis()
                 );
                 theta = successor.clone();
+                // The adopted constitution written at every move, so a run stopped by its process
+                // guard leaves its last certified successor (a checkpoint, not a law).
+                #[allow(clippy::disallowed_methods)]
+                std::fs::write(out, write_port(&theta, engine.refinement.ring())).expect("write E");
             }
             None => {
                 refused += 1;
