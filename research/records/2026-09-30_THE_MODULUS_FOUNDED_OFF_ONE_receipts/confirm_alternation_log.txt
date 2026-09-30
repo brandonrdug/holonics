@@ -1,0 +1,5 @@
+  lossless (transport modulus 1): released 6, held 122, refused 0, refused certificates 0; whole sections 6 of 128; incorrect releases 0; reaching the termination 0; stations right 350 by station [60, 40, 47, 47, 38, 37, 38, 43]; first lock at a request-reading station (0 or 1) 0, first lock right 6
+  opening (transport modulus 102837/131072): released 121, held 7, refused 0, refused certificates 0; whole sections 6 of 128; incorrect releases 115; reaching the termination 0; stations right 274 by station [58, 42, 38, 39, 25, 27, 25, 20]; first lock at a request-reading station (0 or 1) 12, first lock right 20
+  executed-open (transport modulus 1670477/2097152): released 128, held 0, refused 0, refused certificates 0; whole sections 22 of 128; incorrect releases 106; reaching the termination 0; stations right 530 by station [64, 94, 67, 73, 58, 58, 50, 66]; first lock at a request-reading station (0 or 1) 50, first lock right 96
+executed evaluate: 717547 ms; resident 112189440 now, 112189440 peak
+exit 0 wall 717557 ms
