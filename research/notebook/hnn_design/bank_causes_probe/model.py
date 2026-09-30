@@ -85,11 +85,12 @@ DECAY = [1.0]
 
 
 def placement_counts(request, placed, station, cand):
-    """One candidate's placement on the passage (the owner's `BankPlacement::storage`, the passage
-    law of September 30): request cells at rotations 39..0 and the placed stations and the
-    candidate at rotation 59 - j, each datum at its transported weight rho^a / sum rho^a over the
-    span (a its age at the span's end; frame-free), at rho = 1 the one population nu(n + v), v the
-    placed count (candidate included)."""
+    """One candidate's placement on the passage read from its station (the owner's
+    `BankPlacement::storage`, the station-framed law of September 30): request cells at rotations
+    39..0 and the placed stations and the candidate at rotation 59 - j, each datum at its
+    transported weight rho^r / sum rho^r over the span, r its two-sided distance from the station
+    read (n + j - k for request cell k, |i - j| for station i); at rho = 1 the one population
+    nu(n + v), v the placed count (candidate included)."""
     C = np.zeros((D, CLASSES))
     cells = dict(placed)
     if station is not None:
@@ -103,8 +104,10 @@ def placement_counts(request, placed, station, cand):
         for j, x in cells.items():
             C[(D - 1 - j) % D, x] += w
         return C
-    ages = [M_ST + n - 1 - k for k in range(n)] + [M_ST - 1 - j for j in cells]
-    raw = [r ** a for a in ages]
+    if station is None:
+        raise ValueError('below modulus one a placement is read from a station')
+    distances = [n + station - k for k in range(n)] + [abs(i - station) for i in cells]
+    raw = [r ** a for a in distances]
     total = sum(raw)
     for k, x in enumerate(request):
         C[(n - 1 - k) % D, x] += raw[k] / total

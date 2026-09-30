@@ -589,6 +589,125 @@ theorem dissipative_term_modulus (u g : ℂ) (hu : ‖u‖ = 1) {ρ : ℝ} (hρ 
 
 end Transported
 
+/-! ## 5. Read from a station: the two-sided transport distance
+
+[definition; agent-inferred, September 30] (`holonics::hnn::prediction::BankPlacement`, the
+re-entry diagnosis §6.) The section is a joint field, refined whole: a candidate at station `j`
+reads every datum of the span at its two-sided transport distance from `j`,
+`w_j(k) = ρ^|τ_j − τ_k| / Σ_(l∈span) ρ^|τ_j − τ_l|` (`framedWeight`), the dissipative tube's
+stationary response falling by `ρ` a tick in both directions. The one-way weight read at the span's
+end, `ρ^(τ_end − τ_k)`, grows backward from `j`: a datum `r` ticks after the station read weighs
+`ρ^(−r)` times the station's own candidate (`oneway_later_weight_ratio`), which is how a late lock
+took the span's mass and quenched the earlier stations.
+
+* **Normalization and entry** (`framed_weight_mass`, `framed_weight_pos`): at `ρ > 0` the weights
+  read from any station carry unit mass, and every datum of the span enters with positive weight
+  (no datum is dropped by its distance: no window).
+* **One-sided on older data** (`framed_weight_one_sided`): on a span whose data lie no later than
+  the station read, the weights are the one-way law read at any later frame (the common factor
+  `ρ^(e − j)` cancels), so the open section and a station read after every lock read as before.
+* **A distant datum weighs little** (`framed_weight_ratio`, `framed_weight_le_pow`): read from `j`,
+  a datum `r` ticks away, on either side, weighs `ρ^r` times the station's own candidate, and, the
+  candidate in the span, at most `ρ^r`.
+* **Two-sided and translation-free** (`framed_weight_symmetric`, `framed_weight_translation`): data
+  at equal distance on either side weigh alike, and a common shift of every tick and the station
+  leaves every weight: the law reads only distances on the clock, whatever the modality.
+* **Lossless** (`framed_weight_lossless`): at `ρ = 1` the weights are the one population `1/|s|`. -/
+
+section Framed
+
+variable {ι : Type*}
+
+/-- [definition] **A datum's weight read from a station**: over a span `s` whose data cross at
+`tick`, read from the station's tick `j` through a transport of modulus `ρ` a tick, the datum `k`
+weighs `ρ^|j − tick k|` over the span's mass read from `j`. -/
+def framedWeight (s : Finset ι) (tick : ι → ℤ) (ρ : ℚ) (j : ℤ) (k : ι) : ℚ :=
+  transportedWeight s (fun l => ρ ^ (j - tick l).natAbs) k
+
+/-- [proved-derived; formal-checked] **The weights read from any station carry unit mass.** -/
+theorem framed_weight_mass {s : Finset ι} (hs : s.Nonempty) (tick : ι → ℤ) {ρ : ℚ} (hρ : 0 < ρ)
+    (j : ℤ) : ∑ k ∈ s, framedWeight s tick ρ j k = 1 :=
+  transported_weight_mass (Finset.sum_pos (fun _ _ => pow_pos hρ _) hs).ne'
+
+/-- [proved-derived; formal-checked] **Every datum of the span enters**: at `ρ > 0` each weighs
+strictly more than zero, whatever its distance from the station read. -/
+theorem framed_weight_pos {s : Finset ι} (tick : ι → ℤ) {ρ : ℚ} (hρ : 0 < ρ) (j : ℤ) {k : ι}
+    (hk : k ∈ s) : 0 < framedWeight s tick ρ j k :=
+  div_pos (pow_pos hρ _) (Finset.sum_pos (fun _ _ => pow_pos hρ _) ⟨k, hk⟩)
+
+/-- [proved-derived; formal-checked] **On data no later than the station read, the one-way law**:
+if every datum of the span crosses at or before `j`, the weights read from `j` are the one-way
+weights `ρ^(e − tick l)` read at any frame `e ≥ j` (the common factor `ρ^(e − j)` cancels). -/
+theorem framed_weight_one_sided {s : Finset ι} (tick : ι → ℤ) {ρ : ℚ} (hρ : ρ ≠ 0) {j e : ℤ}
+    (hpast : ∀ l ∈ s, tick l ≤ j) (hje : j ≤ e) {k : ι} (hk : k ∈ s) :
+    framedWeight s tick ρ j k = transportedWeight s (fun l => ρ ^ (e - tick l).toNat) k := by
+  have hsplit : ∀ l ∈ s,
+      ρ ^ (e - tick l).toNat = ρ ^ (e - j).toNat * ρ ^ (j - tick l).natAbs := by
+    intro l hl
+    rw [← pow_add]
+    congr 1
+    have := hpast l hl
+    omega
+  simp only [framedWeight, transportedWeight]
+  rw [Finset.sum_congr rfl hsplit, ← Finset.mul_sum, hsplit k hk,
+    mul_div_mul_left _ _ (pow_ne_zero _ hρ)]
+
+/-- [proved-derived; formal-checked] **Read from a station, a datum weighs `ρ^r` times the
+station's own candidate**, `r` its distance on either side. -/
+theorem framed_weight_ratio (s : Finset ι) (tick : ι → ℤ) (ρ : ℚ) {j : ℤ} {i : ι}
+    (hij : tick i = j) (k : ι) :
+    framedWeight s tick ρ j k = ρ ^ (j - tick k).natAbs * framedWeight s tick ρ j i := by
+  simp only [framedWeight, transportedWeight]
+  rw [hij, sub_self, Int.natAbs_zero, pow_zero, mul_one_div]
+
+/-- [proved-derived; formal-checked] **A datum `r` ticks from the station read weighs at most
+`ρ^r`**, when the station's own candidate is in the span (it weighs one before the normalization):
+a far lock no longer takes the span's mass. -/
+theorem framed_weight_le_pow {s : Finset ι} (tick : ι → ℤ) {ρ : ℚ} (h0 : 0 ≤ ρ) {j : ℤ} {i : ι}
+    (hi : i ∈ s) (hij : tick i = j) (k : ι) :
+    framedWeight s tick ρ j k ≤ ρ ^ (j - tick k).natAbs := by
+  simp only [framedWeight, transportedWeight]
+  have hmass : (1 : ℚ) ≤ ∑ l ∈ s, ρ ^ (j - tick l).natAbs := by
+    calc (1 : ℚ) = ρ ^ (j - tick i).natAbs := by rw [hij, sub_self, Int.natAbs_zero, pow_zero]
+      _ ≤ ∑ l ∈ s, ρ ^ (j - tick l).natAbs :=
+        Finset.single_le_sum (f := fun l => ρ ^ (j - tick l).natAbs)
+          (fun l _ => pow_nonneg h0 _) hi
+  exact div_le_self (pow_nonneg h0 _) hmass
+
+/-- [proved-derived; formal-checked] **The one-way law weighs a later datum `ρ^(−r)` times an
+earlier one**: read at the span's end `e`, a datum `i` crossing `r = tick k − tick i` ticks before
+`k` weighs `ρ^r` times `k`, so, read at the end, a lock `r` ticks after the station read weighs
+`ρ^(−r)` times the station's candidate (the re-entry diagnosis: the far lock took the mass). -/
+theorem oneway_later_weight_ratio (s : Finset ι) (tick : ι → ℤ) (ρ : ℚ) {e : ℤ} {i k : ι}
+    (hik : tick i ≤ tick k) (hke : tick k ≤ e) :
+    transportedWeight s (fun l => ρ ^ (e - tick l).toNat) i =
+      ρ ^ (tick k - tick i).toNat * transportedWeight s (fun l => ρ ^ (e - tick l).toNat) k := by
+  have h : (e - tick i).toNat = (tick k - tick i).toNat + (e - tick k).toNat := by omega
+  simp only [transportedWeight]
+  rw [h, pow_add, mul_div_assoc]
+
+/-- [proved-derived; formal-checked] **Two-sided**: two data at equal distance on either side of
+the station read weigh alike. -/
+theorem framed_weight_symmetric (s : Finset ι) (tick : ι → ℤ) (ρ : ℚ) {j : ℤ} {a b : ι}
+    (hab : tick a + tick b = 2 * j) : framedWeight s tick ρ j a = framedWeight s tick ρ j b := by
+  have h : (j - tick a).natAbs = (j - tick b).natAbs := by omega
+  simp only [framedWeight, transportedWeight]
+  rw [h]
+
+/-- [proved-derived; formal-checked] **The law reads only distances on the clock**: shifting every
+tick and the station read by one amount leaves every weight. -/
+theorem framed_weight_translation (s : Finset ι) (tick : ι → ℤ) (ρ : ℚ) (j c : ℤ) (k : ι) :
+    framedWeight s (fun l => tick l + c) ρ (j + c) k = framedWeight s tick ρ j k := by
+  simp only [framedWeight, add_sub_add_right_eq_sub]
+
+/-- [proved-derived; formal-checked] **At `ρ = 1` the framed law is the one population**, from any
+station. -/
+theorem framed_weight_lossless {s : Finset ι} (tick : ι → ℤ) (j : ℤ) {k : ι} (hk : k ∈ s) :
+    framedWeight s tick 1 j k = 1 / s.card :=
+  transported_weight_unitary (fun _ _ => one_pow _) hk
+
+end Framed
+
 section Audit
 
 #print axioms normalized_of_pos
@@ -624,6 +743,15 @@ section Audit
 #print axioms decayed_weight_lossless
 #print axioms lossless_term_modulus
 #print axioms dissipative_term_modulus
+#print axioms framed_weight_mass
+#print axioms framed_weight_pos
+#print axioms framed_weight_one_sided
+#print axioms framed_weight_ratio
+#print axioms framed_weight_le_pow
+#print axioms oneway_later_weight_ratio
+#print axioms framed_weight_symmetric
+#print axioms framed_weight_translation
+#print axioms framed_weight_lossless
 
 end Audit
 

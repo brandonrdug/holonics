@@ -476,7 +476,7 @@ pub(super) fn spread(terrain: &str, seed: u64, count: usize, arms: &[String]) {
                         .map(|class| {
                             let mut cells = vec![None; declared.stations];
                             cells[station] = Some(class);
-                            bank.read_turn(&turn(&placement.storage(&cells)), BANK_GRAIN)
+                            bank.read_turn(&turn(&placement.storage(station, &cells)), BANK_GRAIN)
                                 .expect("a reading")
                                 .joint
                         })
@@ -730,10 +730,10 @@ pub(super) fn stage_one(seed: u64, count: usize) {
             &engine.refinement,
         )
         .expect("the move's placement");
-        let amplitudes = turn(&at.storage(&reading.cells));
+        let amplitudes = turn(&at.storage(reading.station, &reading.cells));
         // The request's own storage moves with E too: the move's placement is the whole storage
         // move (base and section), linear in E.
-        let direction = turn(&along.storage(&reading.cells));
+        let direction = turn(&along.storage(reading.station, &reading.cells));
         let variation = bank
             .turn_variation(reading.member, &amplitudes, &direction)
             .expect("the variation");

@@ -341,6 +341,14 @@ pub enum HnnError {
     )]
     FaceTransport { ring: usize, modulus: Rat },
     #[error(
+        "ring {ring}'s readout reads every station from one anchor below modulus one, but station {station} is open while station {placed} after it is placed: each station reads the span from its own frame, and one anchor holds that frame only for stations after every placed datum (the readout's station-framed form is owed)"
+    )]
+    UnframedAnchor {
+        ring: usize,
+        station: usize,
+        placed: usize,
+    },
+    #[error(
         "locus {locus:?} declares the lattice exponent {declared}, coarser than the rule's {rule}: the carried Gram's positivity and the read's bound below the grain would not hold"
     )]
     LatticeBelowRule {

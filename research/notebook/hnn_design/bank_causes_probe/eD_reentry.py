@@ -37,13 +37,14 @@ pairs = [chosen[key] for key in sorted(chosen)]
 
 
 def denominator_counts(request, placed, station, cand):
-    """The span's weights with the placed data in its transported mass, their amplitudes absent."""
+    """The span's weights read from the station with the placed data in its transported mass, their
+    amplitudes absent (the station-framed law: distances from the station read)."""
     C = placement_counts(request, placed, station, cand)
-    ages = [M_ST + len(request) - 1 - k for k in range(len(request))]
-    ages += [M_ST - 1 - j for j in list(placed) + [station]]
-    total = sum(model.DECAY[0] ** a for a in ages)
+    distances = [len(request) + station - k for k in range(len(request))]
+    distances += [abs(j - station) for j in list(placed) + [station]]
+    total = sum(model.DECAY[0] ** a for a in distances)
     for j, x in placed.items():
-        C[(D - 1 - j) % D, x] -= model.DECAY[0] ** (M_ST - 1 - j) / total
+        C[(D - 1 - j) % D, x] -= model.DECAY[0] ** abs(j - station) / total
     return C
 
 

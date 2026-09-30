@@ -2335,13 +2335,13 @@ fn dump_read(seed: u64, count: usize, out: &str) {
             BankPlacement::of(&engine.field, &engine.theta, &current, &moment, &engine.refinement)
                 .expect("the placement");
         writeln!(s, "request {index} {:?} {:?}", request, target).unwrap();
-        let base = placement.storage(&vec![None; stations]);
+        let base = placement.storage(0, &vec![None; stations]);
         writeln!(s, "base {}", rats(&base)).unwrap();
         for station in 0..stations {
             for class in 0..declared.alphabet {
                 let mut cells = vec![None; stations];
                 cells[station] = Some(class);
-                let placed = placement.storage(&cells);
+                let placed = placement.storage(station, &cells);
                 let image: Vec<Rat> = placed.iter().zip(&base).map(|(a, b)| a - b).collect();
                 writeln!(s, "image {station} {class} {}", rats(&image)).unwrap();
             }
@@ -2357,19 +2357,19 @@ fn dump_read(seed: u64, count: usize, out: &str) {
     for class in 0..declared.alphabet {
         let mut cells = vec![None; stations];
         cells[0] = Some(class);
-        jobs.push(("s0", class, cells));
+        jobs.push(("s0", 0usize, class, cells));
         let mut cells = vec![None; stations];
         cells[0] = Some(target[0]);
         cells[1] = Some(target[1]);
         cells[2] = Some(class);
-        jobs.push(("s2", class, cells));
+        jobs.push(("s2", 2usize, class, cells));
     }
     use rayon::prelude::*;
     let clock = Instant::now();
     let read: Vec<String> = jobs
         .par_iter()
-        .map(|(label, class, cells)| {
-            let storage = placement.storage(cells);
+        .map(|(label, station, class, cells)| {
+            let storage = placement.storage(*station, cells);
             let reading = bank.read_turn(&turn(&storage), BANK_GRAIN).expect("a reading");
             let members: Vec<String> = reading
                 .members
@@ -2511,7 +2511,7 @@ fn native_release(input: &str, count: usize, out: &str) {
                     for class in 0..declared.alphabet {
                         let mut cells = placed.to_vec();
                         cells[station] = Some(class);
-                        let (ok, w) = admissible(&placement.storage(&cells));
+                        let (ok, w) = admissible(&placement.storage(station, &cells));
                         candidates += 1;
                         refused += u64::from(!ok);
                         widest = widest.clone().max(w);
@@ -2580,7 +2580,7 @@ fn native_release(input: &str, count: usize, out: &str) {
                             *cell = Some(target[k]);
                         }
                         cells[station] = Some(class);
-                        bank.read_turn(&turn(&placement.storage(&cells)), BANK_GRAIN)
+                        bank.read_turn(&turn(&placement.storage(station, &cells)), BANK_GRAIN)
                     })
                     .collect();
                 if reads.iter().any(Result::is_err) {
@@ -2788,12 +2788,14 @@ struct ReentryCounts {
 /// ordinary release records, the largest gap first) and, at every insertion, every open candidate is
 /// read by the bank (`ReceivingBank::read_turn`) from three storages routed through
 /// `BankPlacement`:
-/// - **full**: `storage(S ∪ {j: x})`, the passage's law;
+/// - **full**: `storage_j(S ∪ {j: x})`, the passage's law read from the candidate's station `j`
+///   (the station-framed law since September 30's repair; the one-way law read at the span's end
+///   before it);
 /// - **denominator**: the same storage less each re-entered datum's amplitude at its owner's weight,
-///   `storage(S ∪ {j: x}) − Σ_(i∈S) w_i P^(λ−c_i) E e_(t_i)` (`BankPlacement::weights`; the images
-///   held to the owner exactly), so every weight is read over the enlarged span's transported mass
-///   and no re-entered amplitude enters;
-/// - **none**: `storage({j: x})`, the open section.
+///   `storage_j(S ∪ {j: x}) − Σ_(i∈S) w_j(i) P^(λ−c_i) E e_(t_i)` (`BankPlacement::weights`; the
+///   images held to the owner exactly), so every weight is read over the enlarged span's transported
+///   mass and no re-entered amplitude enters;
+/// - **none**: `storage_j({j: x})`, the open section.
 ///
 /// Each open station's comparison is [`compared`]. Also the ordinary release (`generate_by_bank`)
 /// and the clock-order release (the owner's flip, threshold and certificate, one station a
@@ -2859,8 +2861,8 @@ fn reentry(input: &str, out: &str) {
                     let (mut a, mut b) = (vec![None; stations], vec![None; stations]);
                     a[station] = Some(class);
                     b[station] = Some(class - 1);
-                    let weight = placement.weights(&a).1[station].clone().expect("placed");
-                    let (za, zb) = (placement.storage(&a), placement.storage(&b));
+                    let weight = placement.weights(station, &a).1[station].clone().expect("placed");
+                    let (za, zb) = (placement.storage(station, &a), placement.storage(station, &b));
                     let (ia, ib) = (&images[station][class], &images[station][class - 1]);
                     assert!(
                         za.iter()
@@ -2871,10 +2873,10 @@ fn reentry(input: &str, out: &str) {
                     );
                 }
             }
-            let read = |cells: &[Option<usize>], strip: &[usize]| -> Read {
-                let mut z = placement.storage(cells);
+            let read = |station: usize, cells: &[Option<usize>], strip: &[usize]| -> Read {
+                let mut z = placement.storage(station, cells);
                 if !strip.is_empty() {
-                    let (_, weights) = placement.weights(cells);
+                    let (_, weights) = placement.weights(station, cells);
                     for &i in strip {
                         let class = cells[i].expect("a re-entered datum");
                         let w = weights[i].as_ref().expect("its weight");
@@ -2897,7 +2899,7 @@ fn reentry(input: &str, out: &str) {
                 .map(|j| {
                     (0..alphabet)
                         .into_par_iter()
-                        .map(|x| read(&single(j, x, &vec![None; stations]), &[]))
+                        .map(|x| read(j, &single(j, x, &vec![None; stations]), &[]))
                         .collect()
                 })
                 .collect();
@@ -2964,7 +2966,7 @@ fn reentry(input: &str, out: &str) {
             for j in 0..stations {
                 let reads: Vec<Read> = (0..alphabet)
                     .into_par_iter()
-                    .map(|x| read(&single(j, x, &clocked), &[]))
+                    .map(|x| read(j, &single(j, x, &clocked), &[]))
                     .collect();
                 if let Some(Err(error)) = reads.iter().find(|r| r.is_err()) {
                     clock_stop = format!("refused at station {j}: {error}");
@@ -2985,7 +2987,7 @@ fn reentry(input: &str, out: &str) {
                     break;
                 }
                 let cells = single(j, top, &clocked);
-                match bank.certify_turn(&turn(&placement.storage(&cells)), r[top], BANK_GRAIN) {
+                match bank.certify_turn(&turn(&placement.storage(j, &cells)), r[top], BANK_GRAIN) {
                     Ok(_) => clocked[j] = Some(top),
                     Err(error) => {
                         clock_stop = format!("the lock at station {j} refused its certificate: {error}");
@@ -3040,7 +3042,7 @@ fn reentry(input: &str, out: &str) {
                     } else {
                         jobs.par_iter()
                             .map(|&(j, x, d)| {
-                                read(&single(j, x, &placed), if d { &strip } else { &[] })
+                                read(j, &single(j, x, &placed), if d { &strip } else { &[] })
                             })
                             .collect()
                     };

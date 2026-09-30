@@ -12,10 +12,12 @@
 //! carried update of `E` alone (the pumps, the other families and the fold held).
 //!
 //! **The comparison.** For a request of `n` cells with locked partial section `S`, every open
-//! station `j` and class `x`, the actual storage is the passage's (`hnn::prediction`, "The section
-//! continues the request's passage"):
-//! `z_(S,j,x) = z_pairs + ν̂(n + |S| + 1)(Σ_c P^(λ−c) E M[c] + Σ_(k∈S) P^(r_k) E e_(S_k) + P^(r_j) E e_x)`
-//! (`BankPlacement::storage`), and the reading is `a_(j,x) = max_m ρ(M_m(z))` with exact enclosure
+//! station `j` and class `x`, the actual storage is the passage's read from `j` (`hnn::prediction`,
+//! "The section continues the request's passage" and "A candidate reads the span from its own
+//! station"):
+//! `z_(S,j,x) = z_pairs + Σ_c w_j(c) P^(λ−c) E M[c] + Σ_(k∈S) w_j(k) P^(r_k) E e_(S_k) + w_j(j) P^(r_j) E e_x`,
+//! `w_j(k) = ρ^|τ_j − τ_k| / Σ_l ρ^|τ_j − τ_l|` (every `w = ν̂(n + |S| + 1)` at modulus one;
+//! `BankPlacement::storage`), and the reading is `a_(j,x) = max_m ρ(M_m(z))` with exact enclosure
 //! `[L, U]` (`ReceivingBank::read_turn`). Against the target `t` of station `j`:
 //! - **class**: `L_(j,t) > U_(j,x)` for every `x ≠ t` ([`Predicate`]: holds, fails when some
 //!   rival's `L` reaches the target's `U`, else undecided);
@@ -58,7 +60,9 @@
 //! on the returns and carries `ηD` onto its lattice (`Constitution::stepped_source`). The source
 //! navigator's transport modulus `ρ` (`hnn::moment`, "One passage, its transported weights") moves
 //! with it [agent-inferred, September 30]: its slope `γ_ρ = Σ sign ⟨ĝ, ∂z/∂ρ⟩` over the proposal's
-//! contributions (`BankPlacement::modulus_derivative`), its unit move `Δρ = slope⁺/γ_ρ` carrying
+//! contributions (`BankPlacement::modulus_derivative`, each read from its contribution's station:
+//! `∂w_k/∂ρ = w_k (r_k − r̄)/ρ` with `r_k` the datum's distance from the station), its unit move
+//! `Δρ = slope⁺/γ_ρ` carrying
 //! the same first-order descent as the port's unit move (none upward from `ρ = 1`), carried as
 //! `ρ + ηΔρ` held within `[ρ/2, 1]` (passive) on the port's lattice. `η` starts at the first-order
 //! zero of `F` (`F⁻ / (−slope)`, never past it) held below the founding's entry scale, and halves
@@ -417,7 +421,7 @@ fn read_contexts<R: JointGrowth + Send + Sync>(
                 .map(|&(station, class)| {
                     let mut cells = placed.clone();
                     cells[station] = Some(class);
-                    read(&crate::hnn::ring::turn(&placement.storage(&cells)))
+                    read(&crate::hnn::ring::turn(&placement.storage(station, &cells)))
                 })
                 .collect::<Result<_, HnnError>>()?;
             Ok((
@@ -611,11 +615,12 @@ fn leading_member(candidate: &TurnCovector) -> Result<&MemberCovector, CovectorR
 }
 
 /// [definition; agent-inferred, September 30] **One storage contribution to the proposal**: the
-/// section the candidate's storage was read at, its member's storage covector (enclosed) and the
-/// term's sign on it (`+1` a rival, `−1` the target).
+/// station the candidate's storage was read from and the section it was read at, its member's
+/// storage covector (enclosed) and the term's sign on it (`+1` a rival, `−1` the target).
 #[derive(Clone, Debug)]
 struct Contribution {
     request: usize,
+    station: usize,
     cells: Vec<Option<usize>>,
     covector: Vec<ExactInterval>,
     sign: Rat,
@@ -667,6 +672,7 @@ fn propose(
             let one = Rat::one();
             let contribution = |class: usize, member: &MemberCovector, sign: Rat| Contribution {
                 request: request_index,
+                station,
                 cells: candidate_cells(refinement, station, class),
                 covector: member.storage().expect("a resolved member"),
                 sign,
@@ -730,9 +736,11 @@ fn propose(
 }
 
 /// [definition; agent-inferred, September 30] **The proposal's returns at the source port**
-/// (module header, "The covector"). Every contribution's storage is its passage's
-/// (`BankPlacement::storage`): each datum, the request's phase counts and the section's cells, at
-/// its transported weight `w_S` over the span its section `S` closes. Every datum returns in one
+/// (module header, "The covector"). Every contribution's storage is its passage's read from its
+/// station `j` (`BankPlacement::storage`): each datum, the request's phase counts and the section's
+/// cells, at its transported weight `w_S` from `j` over the span its section `S` closes (the
+/// storage stays linear in `E` at fixed weights, so the form of the returns is unchanged; only the
+/// weights are read from the contribution's station). Every datum returns in one
 /// form, one return a placement aggregated by its feature: one per phase of each request (feature
 /// the phase's counts `M[c]` at the weight `Σ w_S(c)²` over the contributions, covector their
 /// `w_S(c)`-weighted sum carried back through the phase's rotation `P^(c − λ)`, over that weight),
@@ -775,7 +783,8 @@ fn returns(
         let mut phase_weights = vec![Rat::zero(); phases.len()];
         for contribution in mine {
             let covector: Vec<Rat> = contribution.covector.iter().map(face).collect();
-            let (request_weights, station_weights) = placement.weights(&contribution.cells);
+            let (request_weights, station_weights) =
+                placement.weights(contribution.station, &contribution.cells);
             for ((sum, total), weight) in phase_sums
                 .iter_mut()
                 .zip(phase_weights.iter_mut())
@@ -854,7 +863,7 @@ fn modulus_slope(
     Ok(contributions
         .par_iter()
         .map(|c| {
-            let derivative = placements[c.request].modulus_derivative(&c.cells);
+            let derivative = placements[c.request].modulus_derivative(c.station, &c.cells);
             let paired: Rat = c
                 .covector
                 .iter()
@@ -879,7 +888,7 @@ pub(crate) fn proposal_returns(
     declared: &Refinement,
     bank: &ReceivingBank,
     grain: u32,
-) -> Result<(Vec<Sample>, Vec<(usize, Vec<Option<usize>>, Vec<Rat>, Rat)>), HnnError> {
+) -> Result<(Vec<Sample>, Vec<(usize, usize, Vec<Option<usize>>, Vec<Rat>, Rat)>), HnnError> {
     let read = |amplitudes: &[crate::ratio::GaussianRat]| bank.read_turn_covector(amplitudes, grain);
     let mut read_all = Vec::new();
     for request in requests {
@@ -897,6 +906,7 @@ pub(crate) fn proposal_returns(
             .map(|c| {
                 (
                     c.request,
+                    c.station,
                     c.cells.clone(),
                     c.covector.iter().map(face).collect(),
                     c.sign.clone(),
@@ -906,17 +916,17 @@ pub(crate) fn proposal_returns(
     ))
 }
 
-/// The storage moves of every contribution's section from a constitution to a carried successor:
-/// the successor's storage less the constitution's, exactly (at a transport of modulus one the
-/// storage is linear in `E`, so this is the move `ΔE`'s placement; a move of the modulus moves every
-/// weight).
+/// The storage moves of every contribution's section from a constitution to a carried successor,
+/// each read from its station: the successor's storage less the constitution's, exactly (the
+/// storage is linear in `E` at fixed weights, so at a fixed modulus this is the move `ΔE`'s
+/// placement; a move of the modulus moves every weight).
 fn storage_moves(
     field: &Field,
     constitution: &Constitution,
     successor: &Constitution,
     declared: &Refinement,
     requests: &[Request],
-    sections: &[(usize, Vec<Option<usize>>)],
+    sections: &[(usize, usize, Vec<Option<usize>>)],
 ) -> Result<Vec<Vec<Rat>>, HnnError> {
     use rayon::prelude::*;
     let placements = |theta: &Constitution| -> Result<Vec<BankPlacement>, HnnError> {
@@ -928,8 +938,11 @@ fn storage_moves(
     let (before, after) = (placements(constitution)?, placements(successor)?);
     Ok(sections
         .par_iter()
-        .map(|(request, cells)| {
-            let (old, new) = (before[*request].storage(cells), after[*request].storage(cells));
+        .map(|(request, station, cells)| {
+            let (old, new) = (
+                before[*request].storage(*station, cells),
+                after[*request].storage(*station, cells),
+            );
             new.iter().zip(&old).map(|(n, o)| n - o).collect()
         })
         .collect())
@@ -948,11 +961,11 @@ fn first_order(
     proposal: &Proposal,
     successor: &Constitution,
 ) -> Result<(ExactInterval, usize), HnnError> {
-    let mut sections: Vec<(usize, Vec<Option<usize>>)> = Vec::new();
+    let mut sections: Vec<(usize, usize, Vec<Option<usize>>)> = Vec::new();
     for term in &proposal.terms {
         for branch in &term.branches {
             for c in branch {
-                sections.push((c.request, c.cells.clone()));
+                sections.push((c.request, c.station, c.cells.clone()));
             }
         }
     }
@@ -1480,7 +1493,8 @@ fn face_read(
                     for class in 0..alphabet {
                         let mut cells = placed.clone();
                         cells[station] = Some(class);
-                        if !bank.admits(&crate::hnn::ring::turn(&placement.storage(&cells)))? {
+                        let storage = placement.storage(station, &cells);
+                        if !bank.admits(&crate::hnn::ring::turn(&storage))? {
                             return Ok(false);
                         }
                     }
@@ -1652,6 +1666,7 @@ fn power_below(x: &Rat) -> Rat {
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct PairingReading {
     pub request: usize,
+    pub station: usize,
     pub cells: Vec<Option<usize>>,
     pub member: usize,
     pub actual: ExactInterval,
@@ -1682,8 +1697,8 @@ pub fn pairing_receipt(
     }
     let proposal = propose(requests, &read_all, alphabet);
     let chosen: Vec<&Contribution> = proposal.contributions.iter().take(2 * count).collect();
-    let sections: Vec<(usize, Vec<Option<usize>>)> =
-        chosen.iter().map(|c| (c.request, c.cells.clone())).collect();
+    let sections: Vec<(usize, usize, Vec<Option<usize>>)> =
+        chosen.iter().map(|c| (c.request, c.station, c.cells.clone())).collect();
     let moves = storage_moves(field, before, after, declared, requests, &sections)?;
     let mut out = Vec::new();
     for (contribution, storage_move) in chosen.iter().zip(&moves) {
@@ -1692,7 +1707,9 @@ pub fn pairing_receipt(
             let placement =
                 BankPlacement::of(field, constitution, &request.current, &request.moment, declared)?;
             bank.read_turn_covector(
-                &crate::hnn::ring::turn(&placement.storage(&contribution.cells)),
+                &crate::hnn::ring::turn(
+                    &placement.storage(contribution.station, &contribution.cells),
+                ),
                 grain,
             )
         };
@@ -1703,6 +1720,7 @@ pub fn pairing_receipt(
         let (a, b) = (ln_of(&old.reading.members[member])?, ln_of(&new.reading.members[member])?);
         out.push(PairingReading {
             request: contribution.request,
+            station: contribution.station,
             cells: contribution.cells.clone(),
             member,
             actual: ExactInterval {

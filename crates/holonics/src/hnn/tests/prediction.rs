@@ -796,10 +796,11 @@ fn generation_locks_by_the_largest_gap_and_releases_at_width_zero() {
     }
 }
 
-/// **The bank's placement is the section's injection** (`prediction::BankPlacement`): the receiving
-/// ring's storage with any set of stations placed equals the open storage of the passage (the
-/// request's moment continued by the section, `SourceMoment::continued`), exactly, and with nothing
-/// placed it is the request's own.
+/// **The bank's placement is the section's injection** (`prediction::BankPlacement`): at a
+/// transport of modulus one the receiving ring's storage with any set of stations placed, read from
+/// any station, equals the open storage of the passage (the request's moment continued by the
+/// section, `SourceMoment::continued`), exactly, every datum at `ν̂(n + v)` in every frame; with
+/// nothing placed it is the request's own.
 #[test]
 fn the_bank_placement_is_the_sections_injection() {
     let field = joint();
@@ -818,33 +819,42 @@ fn the_bank_placement_is_the_sections_injection() {
     for cells in &patterns {
         let passage = refinement.passage(&field, &current, &request, cells).unwrap();
         let injected = passage.open_storage(&field, &theta, &current).unwrap();
-        assert_eq!(placement.storage(cells), injected[0]);
         let placed = cells.iter().filter(|cell| cell.is_some()).count() as u64;
         let nu = crate::hnn::moment::PopulationChart::of(&field)
             .value(request.population(0).unwrap() + placed);
-        let (request_weights, station_weights) = placement.weights(cells);
-        assert!(request_weights.iter().all(|w| *w == nu));
-        for (cell, weight) in cells.iter().zip(&station_weights) {
-            assert_eq!(weight.as_ref(), cell.map(|_| &nu));
+        for station in 0..4 {
+            assert_eq!(placement.storage(station, cells), injected[0]);
+            let (request_weights, station_weights) = placement.weights(station, cells);
+            assert!(request_weights.iter().all(|w| *w == nu));
+            for (cell, weight) in cells.iter().zip(&station_weights) {
+                assert_eq!(weight.as_ref(), cell.map(|_| &nu));
+            }
         }
     }
     let open = request.open_storage(&field, &theta, &current).unwrap();
-    assert_eq!(placement.storage(&[None; 4]), open[0]);
+    assert_eq!(placement.storage(0, &[None; 4]), open[0]);
 }
 
-/// **Under a dissipative transport the placement is the passage's, frame-free, and refused past
-/// one turn** (`hnn::moment`, "One passage, its transported weights"; Lean
-/// `HNN/IndexedOpen.{transported_weight_mass, decayed_weight_frame_free, decayed_weight_antitone}`):
-/// at a transport modulus `ρ = 3/4` the storage with any set of stations placed equals the continued
-/// passage's open exactly; every datum weighs `ρ^a` over the span's transported mass, read on the
-/// population chart, so an older datum weighs no more than a newer one and the weights carry unit
-/// mass within the chart's residual; the modulus's derivative matches the exact weights' central
-/// difference to the second order; and a request whose span with the stations exceeds one turn is
-/// refused, as is a modulus outside `(0, 1]`.
+/// **Under a dissipative transport a candidate reads the span from its own station**
+/// (`prediction::BankPlacement`, the station-framed law; Lean
+/// `HNN/IndexedOpen.{framed_weight_mass, framed_weight_one_sided, framed_weight_ratio,
+/// framed_weight_symmetric}`): at a transport modulus `ρ = 3/4`, read from station `j`,
+/// - every datum weighs `ρ^|τ_j − τ_k|` over the span's transported mass read from `j`, on the
+///   population chart: the weights carry unit mass within the chart's residual;
+/// - when no placed datum lies after `j`, the storage equals the continued passage's open (read
+///   at the span's last datum) exactly: the one-way law on past data;
+/// - a placed datum `r` ticks from `j`, on either side, weighs `ρ^r` times `j`'s own candidate
+///   (within the chart's residual), so two data at equal distance on either side weigh alike, and a
+///   lock after `j` weighs less than the candidate, where the one-way law read at the span's end
+///   weighs it `ρ^(−r)` times the candidate;
+/// - the modulus's derivative matches the exact weights' central difference to the second order;
+/// - a request whose span with the stations exceeds one turn is refused, as is a modulus outside
+///   `(0, 1]`; and the readout's one anchor refuses a lock after an open station below modulus one
+///   (`Refinement::anchor_frames`), `stage` with it.
 #[test]
 fn the_bank_placement_under_a_dissipative_transport() {
     use crate::hnn::HnnError;
-    use crate::hnn::moment::PopulationChart;
+    use crate::hnn::moment::{PopulationChart, modulus_power};
     let field = joint();
     let theta = generic(&field, 91);
     assert_eq!(theta.transport(0), Rat::one());
@@ -864,55 +874,124 @@ fn the_bank_placement_under_a_dissipative_transport() {
     let refinement = Refinement::declare(&field, 0, 2, 1, 4, 2).unwrap();
     let placement = BankPlacement::of(&field, &theta, &current, &request, &refinement).unwrap();
     let chart = PopulationChart::of(&field);
-    let patterns: [[Option<usize>; 4]; 5] = [
+    let near = |a: &Rat, b: &Rat, slack: &Rat| (a - b).abs() <= *slack;
+    let patterns: [[Option<usize>; 4]; 6] = [
         [None; 4],
         [Some(1), None, None, None],
         [None, Some(2), None, Some(0)],
         [Some(0), Some(0), Some(1), None],
         [Some(2), Some(1), Some(0), Some(1)],
+        [Some(0), Some(1), Some(2), Some(0)],
     ];
+    let mut two_sided = 0usize;
     for cells in &patterns {
         let passage = refinement.passage(&field, &current, &request, cells).unwrap();
         let injected = passage.open_storage(&field, &theta, &current).unwrap();
-        assert_eq!(placement.storage(cells), injected[0]);
-        let (request_weights, station_weights) = placement.weights(cells);
-        // Every datum's weight within the chart's residual of its exact transported weight, the
-        // exact weights summing to one: so the charted mass lies within one residual a datum.
-        let data: Vec<Rat> = request_weights
-            .iter()
-            .cloned()
-            .chain(station_weights.iter().flatten().cloned())
-            .collect();
-        let counted: Rat = data.iter().sum();
-        let slack = chart.residual() * Rat::from_integer(BigInt::from(data.len() as u64 + 2));
-        assert!((&counted - Rat::one()).abs() <= slack, "{counted}");
-        // Station weights fall with age: a later station is newer, so weighs no less.
-        let placed: Vec<Rat> = station_weights.iter().flatten().cloned().collect();
-        for pair in placed.windows(2) {
-            assert!(pair[0] <= pair[1]);
-        }
-        // The modulus's derivative against the exact weights' central difference: second order.
-        if cells.iter().any(Option::is_some) {
-            let derivative = placement.modulus_derivative(cells);
-            let residual = |h: &Rat| -> Rat {
-                let up = placement.exact_storage(cells, &(&modulus + h));
-                let down = placement.exact_storage(cells, &(&modulus - h));
-                up.iter()
-                    .zip(&down)
-                    .zip(&derivative)
-                    .map(|((u, d), g)| ((u - d) / (integer(2) * h) - g).abs())
-                    .max()
-                    .unwrap()
-            };
-            let (wide, narrow) = (residual(&rat(1, 64)), residual(&rat(1, 128)));
-            assert!(narrow * integer(3) <= wide, "the central difference is second order");
+        let last = cells.iter().rposition(Option::is_some);
+        for station in 0..4 {
+            let (request_weights, station_weights) = placement.weights(station, cells);
+            // Every datum's weight within the chart's residual of its exact transported weight, the
+            // exact weights summing to one: so the charted mass lies within one residual a datum.
+            let data: Vec<Rat> = request_weights
+                .iter()
+                .cloned()
+                .chain(station_weights.iter().flatten().cloned())
+                .collect();
+            let counted: Rat = data.iter().sum();
+            let slack = chart.residual() * Rat::from_integer(BigInt::from(data.len() as u64 + 2));
+            assert!((&counted - Rat::one()).abs() <= slack, "{counted}");
+            // On past data the one-way law, read at the span's last datum, exactly.
+            if last.is_none_or(|last| last <= station) {
+                assert_eq!(placement.storage(station, cells), injected[0]);
+            } else {
+                two_sided += 1;
+            }
+            // A placed datum r ticks away, on either side, weighs ρ^r times the station's own
+            // candidate (every weight within the chart's residual of its exact value).
+            if let Some(own) = &station_weights[station] {
+                let residual = chart.residual() * integer(2);
+                for (placed, weight) in station_weights.iter().enumerate() {
+                    let Some(weight) = weight else { continue };
+                    let r = placed.abs_diff(station) as u64;
+                    let power = modulus_power(&modulus, r);
+                    assert!(near(weight, &(own * &power), &residual), "ρ^{r} of the candidate");
+                    if placed > station {
+                        assert!(weight < own, "a later lock weighs less than the candidate");
+                    }
+                }
+                // Two data at equal distance on either side weigh alike.
+                if station >= 1 && station + 1 < 4 {
+                    if let (Some(before), Some(after)) =
+                        (&station_weights[station - 1], &station_weights[station + 1])
+                    {
+                        assert_eq!(before, after);
+                    }
+                }
+            }
+            // The modulus's derivative against the exact weights' central difference: second order.
+            if cells.iter().any(Option::is_some) {
+                let derivative = placement.modulus_derivative(station, cells);
+                let residual = |h: &Rat| -> Rat {
+                    let up = placement.exact_storage(station, cells, &(&modulus + h));
+                    let down = placement.exact_storage(station, cells, &(&modulus - h));
+                    up.iter()
+                        .zip(&down)
+                        .zip(&derivative)
+                        .map(|((u, d), g)| ((u - d) / (integer(2) * h) - g).abs())
+                        .max()
+                        .unwrap()
+                };
+                let (wide, narrow) = (residual(&rat(1, 64)), residual(&rat(1, 128)));
+                assert!(narrow * integer(3) <= wide, "the central difference is second order");
+            }
         }
     }
+    assert!(two_sided > 0, "some reading holds a lock after its station");
+    // The one-way law read at the span's end against the framed law, from station 0 with a lock at
+    // station 3: the end frame weighs the lock ρ^(−3) times station 0's candidate, the framed law
+    // ρ^3 times.
+    let cells = [Some(1), None, None, Some(0)];
+    let passage = refinement.passage(&field, &current, &request, &cells).unwrap();
+    let oneway = passage.phase_weights(&field, 0, &modulus).unwrap();
+    let phase = current.phase(&field, 0).unwrap() as usize;
+    let (at0, at3) = (&oneway[(phase + 1) % 6], &oneway[(phase + 4) % 6]);
+    let power = modulus_power(&modulus, 3);
+    let residual = chart.residual() * integer(2);
+    assert!(near(at0, &(at3 * &power), &residual));
+    let (_, framed) = placement.weights(0, &cells);
+    let (own, lock) = (framed[0].clone().unwrap(), framed[3].clone().unwrap());
+    assert!(near(&lock, &(&own * &power), &residual));
+    assert!(lock < own && at3 > at0);
     // Seven cells and four stations span more than the turn of six: refused below modulus one.
-    let (current, request) = moment(&field, 92, 7);
+    let (long_current, long_request) = moment(&field, 92, 7);
     assert!(matches!(
-        BankPlacement::of(&field, &theta, &current, &request, &refinement),
+        BankPlacement::of(&field, &theta, &long_current, &long_request, &refinement),
         Err(HnnError::AliasedAges { .. })
+    ));
+    // The readout's one anchor: a lock after an open station is refused below modulus one, and
+    // `stage` refuses it; a lock before every open station, or any lock at modulus one, is read.
+    assert!(refinement.anchor_frames(&theta, &[Some(0), None, None, None]).is_ok());
+    assert!(refinement.anchor_frames(&theta, &[Some(0), Some(1), None, None]).is_ok());
+    assert!(matches!(
+        refinement.anchor_frames(&theta, &[None, Some(1), None, None]),
+        Err(HnnError::UnframedAnchor { station: 0, placed: 1, .. })
+    ));
+    let unit = generic(&field, 91);
+    assert!(refinement.anchor_frames(&unit, &[None, Some(1), None, None]).is_ok());
+    let mut charts = Charts::new();
+    assert!(matches!(
+        stage(
+            &field,
+            &theta,
+            &current,
+            &request,
+            &refinement,
+            &[1, 2, 0, 1],
+            &[false, true, false, false],
+            &mut charts,
+            false,
+        ),
+        Err(HnnError::UnframedAnchor { station: 0, placed: 1, .. })
     ));
 }
 
@@ -1028,7 +1107,7 @@ fn the_banks_images_are_its_placements_readings() {
                     .map(|(&t, &l)| l.then_some(t))
                     .collect();
                 cells[reading.station] = Some(class);
-                chart.of_storage(&placement.storage(&cells)).unwrap().reading(&chart)
+                chart.of_storage(&placement.storage(reading.station, &cells)).unwrap().reading(&chart)
             };
             let total: Rat = (0..field.alphabet()).map(read).sum();
             assert_eq!(reading.total, total);
@@ -1077,7 +1156,7 @@ fn the_banks_returns_are_its_scores_differential_in_e() {
             .map(|(&t, &l)| l.then_some(t))
             .collect();
         cells[station] = Some(class);
-        chart.of_storage(&placement.storage(&cells)).unwrap().reading(&chart)
+        chart.of_storage(&placement.storage(station, &cells)).unwrap().reading(&chart)
     };
     let (mut expected, mut charge) = (Rat::zero(), Rat::zero());
     for ((now, up), down) in here.stations.iter().zip(&ahead.stations).zip(&behind.stations) {
@@ -1244,45 +1323,71 @@ fn the_release_comparison_reads_the_bank_release() {
 /// **The proposal's returns are its pullback to `E`** (`hnn::executed`, "The covector"): for a drawn
 /// move `ΔE` of the source port, the returns pair with it as the contributions' storage covectors
 /// (at their dyadic faces, with their signs) pair with the storage moves `ΔE` places, exactly:
-/// `Σ w ⟨g, ΔE f⟩ = −Σ_c sign_c ⟨ĝ_c, δz_c⟩`, each `δz_c` the section's storage with `ΔE` at the
-/// source port (the storage is linear in `E`).
+/// `Σ w ⟨g, ΔE f⟩ = −Σ_c sign_c ⟨ĝ_c, δz_c⟩`, each `δz_c` the section's storage read from the
+/// contribution's station with `ΔE` at the source port (the storage is linear in `E` at fixed
+/// weights). At a transport of modulus one (every weight `ν̂(n + v)`) and at `3/4`, where each
+/// contribution's weights are read from its own station (the station-framed law): the returns keep
+/// their form, and some contribution's section holds a placed datum after its station, so a
+/// two-sided weight enters the identity.
 #[test]
 fn the_proposals_returns_are_its_pullback_to_e() {
-    use crate::hnn::executed::{Context, proposal_returns};
+    use crate::hnn::executed::{Context, Request, proposal_returns};
     let field = joint();
-    let theta = generic(&field, 94);
     let refinement = Refinement::declare(&field, 0, 2, 1, 4, 2).unwrap();
     let bank = joint_bank();
-    let requests = executed_requests(&field, &[(95, [0, 1, 2, 1]), (97, [2, 0, 1, 1])], Context::Open);
-    let (samples, contributions) =
-        proposal_returns(&field, &theta, &requests, &refinement, &bank, 12).unwrap();
-    assert!(!contributions.is_empty());
-    let port = theta.source_port(0).unwrap().clone();
-    let direction = Draw::new(98).matrix(port.rows(), port.columns());
-    let moved = theta
-        .clone()
-        .with_ports(0, None, Some(direction.clone()), None)
-        .unwrap();
-    let mut paired = Rat::zero();
-    for sample in &samples {
-        let image = direction.apply(&sample.feature).unwrap();
-        paired += &sample.weight
-            * sample
-                .covector
-                .iter()
-                .zip(&image)
-                .map(|(g, m)| g * m)
-                .sum::<Rat>();
+    let cases: [(u64, [usize; 4]); 3] = [(95, [0, 1, 2, 1]), (97, [2, 0, 1, 1]), (96, [1, 1, 0, 2])];
+    for (modulus, cells) in [(Rat::one(), 8usize), (rat(3, 4), 2)] {
+        let theta = generic(&field, 94).with_transport(0, modulus.clone()).unwrap();
+        let requests: Vec<Request> = cases
+            .iter()
+            .map(|&(seed, targets)| {
+                let (current, moment) = moment(&field, seed, cells);
+                Request {
+                    current,
+                    moment,
+                    targets: targets.to_vec(),
+                    context: Context::Open,
+                }
+            })
+            .collect();
+        let (samples, contributions) =
+            proposal_returns(&field, &theta, &requests, &refinement, &bank, 12).unwrap();
+        assert!(!contributions.is_empty());
+        if !modulus.is_one() {
+            assert!(
+                contributions
+                    .iter()
+                    .any(|(_, station, cells, ..)| cells[*station + 1..].iter().any(Option::is_some)),
+                "a contribution reads a placed datum after its station"
+            );
+        }
+        let port = theta.source_port(0).unwrap().clone();
+        let direction = Draw::new(98).matrix(port.rows(), port.columns());
+        let moved = theta
+            .clone()
+            .with_ports(0, None, Some(direction.clone()), None)
+            .unwrap();
+        let mut paired = Rat::zero();
+        for sample in &samples {
+            let image = direction.apply(&sample.feature).unwrap();
+            paired += &sample.weight
+                * sample
+                    .covector
+                    .iter()
+                    .zip(&image)
+                    .map(|(g, m)| g * m)
+                    .sum::<Rat>();
+        }
+        let mut expected = Rat::zero();
+        for (request, station, cells, covector, sign) in &contributions {
+            let r = &requests[*request];
+            let placement =
+                BankPlacement::of(&field, &moved, &r.current, &r.moment, &refinement).unwrap();
+            let storage = placement.storage(*station, cells);
+            expected -= sign * covector.iter().zip(&storage).map(|(g, z)| g * z).sum::<Rat>();
+        }
+        assert_eq!(paired, expected, "at modulus {modulus}");
     }
-    let mut expected = Rat::zero();
-    for (request, cells, covector, sign) in &contributions {
-        let r = &requests[*request];
-        let placement =
-            BankPlacement::of(&field, &moved, &r.current, &r.moment, &refinement).unwrap();
-        let storage = placement.storage(cells);
-        expected -= sign * covector.iter().zip(&storage).map(|(g, z)| g * z).sum::<Rat>();
-    }
-    assert_eq!(paired, expected);
 }
 
 /// **The committed move descends the release's comparison, or refuses by type**

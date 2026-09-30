@@ -45,6 +45,15 @@
 //! modulus one (the leaky count it needs is owed). The retired reading, the section over its own
 //! population `v`, weighed a section datum `n/v` times a request cell.
 //!
+//! [definition; agent-inferred, September 30] **Read from a station** (`hnn::prediction`, "A
+//! candidate reads the span from its own station"; Lean `HNN/IndexedOpen.framedWeight`): a
+//! candidate at station `j` weighs each datum by its two-sided transport distance,
+//! `ρ^|τ_j − τ_k| / Σ_l ρ^|τ_j − τ_l|`, because the section is a joint field. [`SourceMoment::phase_weights`]
+//! reads the span from its last datum, which is station `j`'s framed law exactly when no datum lies
+//! after `j` (`framed_weight_one_sided`), and in every frame at modulus one; the bank reads each
+//! candidate from its own station (`BankPlacement`), and the readout's one anchor is refused below
+//! modulus one where a placed datum lies after an open station (`Refinement::anchor_frames`).
+//!
 //! [definition; agent-inferred, U6] **The pair buffer is the offset moment's one-step state**
 //! (Lean `Transport/SourceMoment.streamStep`'s previous value, `HNN/Moment.SourceDecl.StreamState`'s
 //! window): the offset-`δ` pair of cell `k` needs cell `k − δ`, so a cell stays in the buffer for
@@ -84,6 +93,7 @@
 //! | `HNN/IndexedOpen.{normalized_phase_counts_mass, normalized_open_population_invariant, normalized_zero_population}`; `HNN/Encoding.{whole_pair_read_counts, whole_pair_read_population_invariant, whole_pair_read_tape_free}` (the open reads no window) | [`PopulationChart`], [`SourceMoment::normalized_counts`], [`SourceMoment::offset_table`], [`SourceMoment::encode`] |
 //! | `moment_capacity` | [`capacity`], [`Capacity`] |
 //! | `HNN/Prediction.{placed_at_station, joint_residue_determines_position}` (a locked datum at its station's residue; a ring of period `∏ dᵢ`, pairwise coprime, places each datum at its joint residue class); `HNN/IndexedOpen.{passage_population, passage_read, passage_weight_one_population, separate_populations_ratio, transportedWeight, transported_weight_mass, transported_weight_frame_invariant, transported_weight_unitary, passage_weight_split_invariant, decayed_weight_antitone, decayed_weight_frame_free, decayed_weight_lossless, lossless_term_modulus, dissipative_term_modulus}` (the section continues the passage; each datum at its transported weight) | [`SourceMoment::continued`], [`SourceMoment::phase_weights`], [`SourceMoment::open_parts`] |
+//! | `HNN/IndexedOpen.{framedWeight, framed_weight_mass, framed_weight_pos, framed_weight_one_sided, framed_weight_ratio, framed_weight_le_pow, oneway_later_weight_ratio, framed_weight_symmetric, framed_weight_translation, framed_weight_lossless}` (a candidate reads the span from its own station, each datum at its two-sided transport distance; the one-way law on data no later than the station) | `hnn::prediction::BankPlacement::{weights, storage, modulus_derivative}`; [`SourceMoment::phase_weights`] is the law read from the span's last datum |
 
 use num_bigint::{BigInt, BigUint};
 use num_traits::{One, Signed, ToPrimitive, Zero};
@@ -708,8 +718,10 @@ impl SourceMoment {
     /// `0 < ρ < 1` a datum at phase `c` is `a(c) = (τ + e − c) mod d` ticks old at the passage's
     /// end (`τ` the request's last tick, `e` the section's extent), and weighs
     /// `ρ^(a(c)) / Σ_(c′) n(c′) ρ^(a(c′))` read on the population chart's lattice
-    /// ([`PopulationChart::chart`]); the ratio is the same in every frame, so the end is only its
-    /// reference. The ages are read from the phases, which identify the ticks only within one turn:
+    /// ([`PopulationChart::chart`]); the ratio is the same in every frame at or after the span's last
+    /// datum, so the end is only its reference: the station-framed law of a station no datum
+    /// follows (module header, "Read from a station"). The ages are read from the phases, which
+    /// identify the ticks only within one turn:
     /// a passage over more than `d` ticks, or one re-keyed within its span, is refused at `ρ < 1`
     /// ([`HnnError::AliasedAges`]); zero at an empty phase.
     pub fn phase_weights(&self, field: &Field, ring: usize, modulus: &Rat) -> Result<Vec<Rat>, HnnError> {

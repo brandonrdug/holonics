@@ -123,6 +123,23 @@
 //! lies; the transport's dissipation weighs the term at lag `r` by `ρ^r` (`dissipative_term_modulus`)
 //! and marks it. The weights are not a window: every crossing enters and none is dropped by length.
 //!
+//! [definition; agent-inferred, September 30; the
+//! [re-entry diagnosis](../../../../research/records/2026-09-30_THE_RE_ENTRY_DIAGNOSED_A_LATER_LOCK_TAKES_THE_SPANS_MASS_AND_QUENCHES_THE_EARLIER_STATIONS.md)
+//! §6] **A candidate reads the span from its own station.** The section is a joint field: a
+//! candidate at station `j` reads every datum of the span at its two-sided transport distance from
+//! `j`, `w_j(k) = ρ^|τ_j − τ_k| / Σ_l ρ^|τ_j − τ_l|` ([`BankPlacement`]; Lean
+//! `HNN/IndexedOpen.{framedWeight, framed_weight_mass, framed_weight_one_sided,
+//! framed_weight_le_pow}`). The weight read at the span's end, `ρ^(τ_end − τ_k)`, is the one-way
+//! transport: frame-free only on data no later than the frame, and a lock `r` ticks after the
+//! station read weighed `ρ^(−r)` times the station's own candidate, so the release's far-end-first
+//! locks took the span's mass from every earlier station and quenched it (the diagnosis: in the
+//! release's order 28 of the 35 first losses were the enlarged denominator's alone). Read from `j`
+//! the law is the one-way law on data no later than `j`, and a datum `r` ticks away, on either side,
+//! weighs at most `ρ^r`. The readout path reads every station from one anchor, so it realizes the
+//! law only where the anchor's frame, the span's last datum, is every unlocked station's own: below
+//! modulus one it refuses a passage with a placed datum after an unlocked station
+//! ([`HnnError::UnframedAnchor`], [`Refinement::anchor_frames`]; its station-framed form is owed).
+//!
 //! [definition; agent-inferred] **Every modality reads it the same way.** A cell is a datum placed
 //! at its residue on a ring's spectrum: a text cell at its byte tick, an image cell at its scan tick
 //! (row-major, so a row of width `w` is a residue class mod `w` when `w` divides a factor of `D`), an
@@ -140,8 +157,9 @@
 //!
 //! - **the candidates**: in a refinement, every unlocked station `j` and every class `x` of the
 //!   exterior chart, the receiving ring's storage with the locked data and `x` at station `j` placed
-//!   at their residues over the passage's one population `n + v` ([`BankPlacement::storage`], the
-//!   law of [`SourceMoment::continued`]), the other unlocked stations unplaced;
+//!   at their residues, each datum at its transported weight read from `j`
+//!   ([`BankPlacement::storage`], the station-framed law above; the one population `n + v` at
+//!   modulus one), the other unlocked stations unplaced;
 //! - **the reading**: the bank's turn of that storage (every node crossing the section pumps each
 //!   member) and its joint growth, enclosed exactly;
 //! - **the lock's flip**: a station's top candidate reads a growth strictly above every other
@@ -423,6 +441,33 @@ impl Refinement {
             });
         }
         moment.continued(field, current, self.ring, cells)
+    }
+
+    /// [definition; agent-inferred, September 30] **Whether one anchor reads the passage from every
+    /// unlocked station's frame** (module header, "A candidate reads the span from its own
+    /// station"): the readout path reads every station from one anchor, whose weights are read at
+    /// the span's last datum (`SourceMoment::phase_weights`). That is station `j`'s own framed law
+    /// exactly when no placed datum lies after `j` (Lean `HNN/IndexedOpen.framed_weight_one_sided`),
+    /// and at modulus one in every frame. Below modulus one a placed datum after an unlocked station
+    /// is refused ([`HnnError::UnframedAnchor`]); the readout's station-framed form is owed.
+    pub fn anchor_frames(
+        &self,
+        constitution: &impl ConstitutionRead,
+        cells: &[Option<usize>],
+    ) -> Result<(), HnnError> {
+        if constitution.transport(self.ring).is_one() {
+            return Ok(());
+        }
+        let last = cells.iter().rposition(Option::is_some);
+        let first_open = cells.iter().position(Option::is_none);
+        match (first_open, last) {
+            (Some(station), Some(placed)) if placed > station => Err(HnnError::UnframedAnchor {
+                ring: self.ring,
+                station,
+                placed,
+            }),
+            _ => Ok(()),
+        }
     }
 
     /// **The target phases of the section** (`hnn::ratio::TargetPhases`): each station's phase on
@@ -1201,6 +1246,7 @@ pub fn stage(
         .map(|(&target, &lock)| lock.then_some(target))
         .collect();
     // Nothing locked places nothing (the pinned September 29 path, on any receiving ring).
+    declared.anchor_frames(constitution, &cells)?;
     let passage = declared.passage(field, current, moment, &cells)?;
     let compared: Vec<bool> = locked.iter().map(|lock| !lock).collect();
     let operands = Operands::at_cut_charted(field, constitution, current, charts)?;
@@ -1272,6 +1318,7 @@ pub fn comparison_code(
         .zip(locked)
         .map(|(&target, &lock)| lock.then_some(target))
         .collect();
+    declared.anchor_frames(constitution, &cells)?;
     let passage = declared.passage(field, current, moment, &cells)?;
     let compared: Vec<bool> = locked.iter().map(|lock| !lock).collect();
     let section = Section::refine(field, constitution, current, &passage, declared, charts)?;
@@ -1294,7 +1341,8 @@ pub struct Generation {
 /// field with the locked data placed, and locks every unlocked station whose gap at the grain is the
 /// largest (ties together). It stops when every station is locked, released at width zero (each lock
 /// read a unique top cell), or when the largest gap is zero, held with the unlocked stations plural.
-/// At most `m` refinements; the operands are read once at the cut.
+/// At most `m` refinements; the operands are read once at the cut. Below modulus one a refinement
+/// whose locks lie after an open station is refused, typed ([`Refinement::anchor_frames`]).
 pub fn generate(
     field: &Field,
     constitution: &impl ConstitutionRead,
@@ -1316,6 +1364,7 @@ pub fn generate(
     let mut plural: Vec<usize> = Vec::new();
     let (mut refinements, mut balances_closed) = (0usize, 0usize);
     while locked.iter().any(Option::is_none) {
+        declared.anchor_frames(constitution, &locked)?;
         let passage = declared.passage(field, current, moment, &locked)?;
         let injection = passage.open_storage(field, constitution, current)?;
         let section = Section::refine_on(field, constitution, operands.clone(), injection, declared)?;
@@ -1425,8 +1474,9 @@ impl JointGrowth for TurnCovector {
 /// (module header, "The bank reads the superposed passage"). The request's placement is fixed and
 /// nothing is locked. In each refinement, for every unlocked station and every class of the
 /// exterior chart, the receiving ring's storage is the request's placement with the locked data
-/// and that candidate placed at their stations' residues (`SourceMoment::continued`'s law over the
-/// passage's one population, the other unlocked stations unplaced); the bank reads its turn
+/// and that candidate placed at their stations' residues, each datum at its transported weight
+/// read from the candidate's station ([`BankPlacement::storage`]; the passage's one population at
+/// modulus one), the other unlocked stations unplaced; the bank reads its turn
 /// ([`ReceivingBank::read_turn`]). A station's reading is the lock's flip: its top candidate's joint
 /// growth exceeds every other candidate's exactly ([`Growth::exceeds`], `θ = a/(a + K) > ½`) and the
 /// bank locks there ([`Growth::is_locked`]); its gap is the top's `lower` less the largest other
@@ -1493,10 +1543,11 @@ pub fn bank_release<R: JointGrowth + Send + Sync>(
     let (mut ticks_closed, mut ticks) = (0, 0);
     while locked.iter().any(Option::is_none) {
         let placed = locked.clone();
+        // Each candidate reads the span from its own station (the station-framed law).
         let storage = |station: usize, class: usize| -> Vec<Rat> {
             let mut cells = placed.clone();
             cells[station] = Some(class);
-            placement.storage(&cells)
+            placement.storage(station, &cells)
         };
         let open: Vec<(usize, usize)> = (0..stations)
             .filter(|&station| locked[station].is_none())
@@ -1633,32 +1684,61 @@ pub fn bank_release<R: JointGrowth + Send + Sync>(
     ))
 }
 
-/// [definition; agent-inferred, September 29; the passage law, September 30] **The receiving ring's
-/// storage under the passage** ([`generate_by_bank`]; module header, "The section continues the
-/// request's passage"): each occupied phase's read of the request's raw counts
-/// `P^(λ−c) E M[c]` on the receiving ring, the pair ports' normalized read, and, per station `j` and
-/// class `x`, the datum's image `P^(λ − c_j) E e_x`, `c_j = τ + 1 + j` (mod `d`). A section's cells
-/// `S` continue the request's passage, each datum at its transported weight over the span:
+/// [definition; agent-inferred, September 29; the passage law, September 30; the station-framed
+/// law, September 30] **The receiving ring's storage under the passage, read from a station**
+/// ([`generate_by_bank`]; module header, "The section continues the request's passage"): each
+/// occupied phase's read of the request's raw counts `P^(λ−c) E M[c]` on the receiving ring, the
+/// pair ports' normalized read, and, per station `j` and class `x`, the datum's image
+/// `P^(λ − c_j) E e_x`, `c_j = τ + 1 + j` (mod `d`). A candidate at station `j` reads the span, the
+/// request and the section's cells `S`, as one field, each datum weighed by its two-sided transport
+/// distance from `j`:
 ///
 /// ```text
-/// z(S) = z_pairs + Σ_c w_S(c) P^(λ−c) E M[c] + Σ_(j∈S) w_S(j) P^(λ − c_j) E e_(x_j)
-/// w_S(k) = chart(ρ^(a_k) / (Σ_c n(c) ρ^(a_c) + Σ_(j∈S) ρ^(a_j)))
+/// z_j(S) = z_pairs + Σ_c w_j(c) P^(λ−c) E M[c] + Σ_(i∈S) w_j(i) P^(λ − c_i) E e_(x_i)
+/// w_j(k) = chart(ρ^(r_j(k)) / (Σ_c n(c) ρ^(r_j(c)) + Σ_(i∈S) ρ^(r_j(i))))
+/// r_j(c) = 1 + j + ((τ − c) mod d)   (a request phase),   r_j(i) = |i − j|   (a station)
 /// ```
 ///
-/// with `a` each datum's age at the section's last station (`m + (τ − c mod d)` for a request
-/// phase, `m − 1 − j` for station `j`) and `ρ` the navigator's transport modulus: at `ρ = 1` every
-/// datum weighs `ν̂(n + |S|)`. The law of [`SourceMoment::continued`] then `open_storage`, read
-/// without re-encoding the request for every candidate; held to it exactly by the owner's tests.
-/// With nothing placed it is the request's own open.
+/// with `ρ` the navigator's transport modulus: at `ρ = 1` every datum weighs `ν̂(n + |S|)`, in
+/// every frame. **Why two-sided** [agent-inferred, the
+/// [re-entry diagnosis](../../../../research/records/2026-09-30_THE_RE_ENTRY_DIAGNOSED_A_LATER_LOCK_TAKES_THE_SPANS_MASS_AND_QUENCHES_THE_EARLIER_STATIONS.md)
+/// §6]: the section is a joint field, refined whole, not a stream read in time order, so the
+/// reading at station `j` is the dissipative tube's stationary response to each datum, which
+/// falls by `ρ` a tick in both directions of the tube (the tube's pairing reading, `ρ^|Δ|`, the
+/// stationary covariance of a transport of modulus `ρ` a tick); the one-way dilation
+/// `ρ^(τ_end − τ_k)` read at the span's end grows backward from `j`, so a lock `r` ticks after `j`
+/// weighed `ρ^(−r)` times `j`'s own candidate and took the span's mass (the diagnosis measured up to
+/// `[205/256, 103/128]` of it from station 0). Read from `j`:
+/// - **on data no later than `j` it is the one-way law exactly** (the common factor `ρ^(τ_end − τ_j)`
+///   cancels in the normalization; Lean `HNN/IndexedOpen.framed_weight_one_sided`), so the open
+///   section, which holds only the request and the candidate, reads as before, and so does a
+///   station read after every lock;
+/// - **a datum `r ≥ 1` ticks from `j` weighs at most `ρ^r`** of `j`'s span, the candidate's own
+///   datum weighing one before the normalization (`framed_weight_le_pow`), so a far lock no longer
+///   quenches an earlier station;
+/// - **every datum enters**, none is dropped by its distance or the span's length (no window), and
+///   each station's normalization is its own systolic reduction over the same carried powers
+///   `ρ^r`;
+/// - **every modality reads it the same way**: the law reads only the distance between two ticks
+///   of the ring's clock; a text cell, an image pixel at its scan tick (its row neighbours at
+///   distance one on either side, the pixels one row away at the row's width), an acoustic sample
+///   at its sample tick, a motor screw at its step.
+///
+/// The request's reads are kept once and every candidate is read without re-encoding the request;
+/// held to the explicit two-sided formula exactly by the owner's tests, and to the continued
+/// passage's open ([`SourceMoment::continued`], read at the span's last datum) exactly when no
+/// placed datum lies after the station read. With nothing placed it is the request's own open.
 #[derive(Clone, Debug)]
 pub struct BankPlacement {
+    /// Each occupied request phase: its lag `(τ − c) mod d` behind the request's last tick, its
+    /// count and its read.
     reads: Vec<(u64, u64, Vec<Rat>)>,
     pairs: Vec<Rat>,
     images: Vec<Vec<Vec<Rat>>>,
     chart: PopulationChart,
     modulus: Rat,
     stations: u64,
-    /// `ρ^a` for every age `a < d + m`.
+    /// `ρ^r` for every distance `r < d + m`.
     powers: Vec<Rat>,
     population: u64,
 }
@@ -1691,9 +1771,9 @@ impl BankPlacement {
             .into_iter()
             .map(|(c, read)| -> Result<(u64, u64, Vec<Rat>), HnnError> {
                 let c = c as u64;
-                let age = stations + (phase + period - c) % period;
+                let lag = (phase + period - c) % period;
                 let count: u64 = moment.phase_counts(ring, c as usize)?.iter().sum();
-                Ok((age, count, read))
+                Ok((lag, count, read))
             })
             .collect::<Result<Vec<_>, _>>()?;
         let lift = current.lift()[ring].clone();
@@ -1737,29 +1817,67 @@ impl BankPlacement {
         &self.modulus
     }
 
-    /// Station `j`'s age at the section's last station.
-    fn station_age(&self, station: usize) -> u64 {
-        self.stations - 1 - station as u64
+    /// The declared stations `m`.
+    pub fn stations(&self) -> usize {
+        self.stations as usize
     }
 
-    /// The span's transported mass `Σ_c n(c) ρ^(a_c) + Σ_(j∈S) ρ^(a_j)`, exactly.
-    fn mass(&self, cells: &[Option<usize>]) -> Rat {
-        let mut mass = Rat::zero();
-        for (age, count, _) in &self.reads {
-            mass += &self.powers[*age as usize] * Rat::from_integer(BigInt::from(*count));
-        }
-        for (station, cell) in cells.iter().enumerate() {
-            if cell.is_some() {
-                mass += &self.powers[self.station_age(station) as usize];
+    /// **A request phase's distance from the station read**: `1 + j + lag`, the ticks from the
+    /// phase's last crossing to station `j`'s.
+    fn request_distance(station: usize, lag: u64) -> u64 {
+        1 + station as u64 + lag
+    }
+
+    /// **A placed station's distance from the station read**: `|i − j|`, on either side.
+    fn station_distance(station: usize, placed: usize) -> u64 {
+        station.abs_diff(placed) as u64
+    }
+
+    /// Every datum of the span read from `station`: its distance, its count and its read (the
+    /// request's phases, then the placed stations in order).
+    fn data<'a>(
+        &'a self,
+        station: usize,
+        cells: &[Option<usize>],
+    ) -> Vec<(u64, Rat, &'a Vec<Rat>)> {
+        assert!(station < self.stations(), "the station read is a declared station");
+        let mut data: Vec<(u64, Rat, &Vec<Rat>)> = self
+            .reads
+            .iter()
+            .map(|(lag, count, read)| {
+                (
+                    Self::request_distance(station, *lag),
+                    Rat::from_integer(BigInt::from(*count)),
+                    read,
+                )
+            })
+            .collect();
+        for (placed, cell) in cells.iter().enumerate() {
+            if let Some(class) = cell {
+                data.push((
+                    Self::station_distance(station, placed),
+                    Rat::one(),
+                    &self.images[placed][*class],
+                ));
             }
         }
-        mass
+        data
     }
 
-    /// **The passage's weights** with the section's cells placed: each request phase's and each
-    /// placed station's `w_S`, on the population chart; at `ρ = 1` all `ν̂(n + |S|)`.
+    /// The span's transported mass read from `station`,
+    /// `Σ_c n(c) ρ^(r_j(c)) + Σ_(i∈S) ρ^(|i − j|)`, exactly.
+    fn mass(&self, station: usize, cells: &[Option<usize>]) -> Rat {
+        self.data(station, cells)
+            .iter()
+            .map(|(distance, count, _)| &self.powers[*distance as usize] * count)
+            .sum()
+    }
+
+    /// **The passage's weights read from a station**: each request phase's and each placed
+    /// station's `w_j`, on the population chart; at `ρ = 1` all `ν̂(n + |S|)`, in every frame.
     #[allow(clippy::type_complexity)]
-    pub fn weights(&self, cells: &[Option<usize>]) -> (Vec<Rat>, Vec<Option<Rat>>) {
+    pub fn weights(&self, station: usize, cells: &[Option<usize>]) -> (Vec<Rat>, Vec<Option<Rat>>) {
+        assert!(station < self.stations(), "the station read is a declared station");
         if self.modulus.is_one() {
             let placed = cells.iter().filter(|cell| cell.is_some()).count() as u64;
             let nu = self.chart.value(self.population + placed);
@@ -1768,31 +1886,35 @@ impl BankPlacement {
                 cells.iter().map(|cell| cell.map(|_| nu.clone())).collect(),
             );
         }
-        let mass = self.mass(cells);
-        let weigh = |age: u64| self.chart.chart(&(&self.powers[age as usize] / &mass));
+        let mass = self.mass(station, cells);
+        let weigh = |distance: u64| self.chart.chart(&(&self.powers[distance as usize] / &mass));
         (
-            self.reads.iter().map(|(age, _, _)| weigh(*age)).collect(),
+            self.reads
+                .iter()
+                .map(|(lag, _, _)| weigh(Self::request_distance(station, *lag)))
+                .collect(),
             cells
                 .iter()
                 .enumerate()
-                .map(|(station, cell)| cell.map(|_| weigh(self.station_age(station))))
+                .map(|(placed, cell)| cell.map(|_| weigh(Self::station_distance(station, placed))))
                 .collect(),
         )
     }
 
-    /// **The receiving ring's storage** with the section's cells placed (a station's class, or
-    /// unplaced): the pair ports' read plus every datum of the passage at its transported weight.
-    pub fn storage(&self, cells: &[Option<usize>]) -> Vec<Rat> {
-        let (request, section) = self.weights(cells);
+    /// **The receiving ring's storage read from a station** with the section's cells placed (a
+    /// station's class, or unplaced): the pair ports' read plus every datum of the passage at its
+    /// transported weight from `station`.
+    pub fn storage(&self, station: usize, cells: &[Option<usize>]) -> Vec<Rat> {
+        let (request, section) = self.weights(station, cells);
         let mut storage = self.pairs.clone();
         for ((_, _, read), weight) in self.reads.iter().zip(&request) {
             for (value, add) in storage.iter_mut().zip(read) {
                 *value += add * weight;
             }
         }
-        for (station, (cell, weight)) in cells.iter().zip(&section).enumerate() {
+        for (placed, (cell, weight)) in cells.iter().zip(&section).enumerate() {
             if let (Some(class), Some(weight)) = (cell, weight) {
-                for (value, add) in storage.iter_mut().zip(&self.images[station][*class]) {
+                for (value, add) in storage.iter_mut().zip(&self.images[placed][*class]) {
                     *value += add * weight;
                 }
             }
@@ -1800,25 +1922,21 @@ impl BankPlacement {
         storage
     }
 
-    /// The storage at the exact transported weights at a modulus (no chart): the test's reference
-    /// for [`BankPlacement::modulus_derivative`].
+    /// The storage read from a station at the exact transported weights at a modulus (no chart):
+    /// the test's reference for [`BankPlacement::modulus_derivative`].
     #[cfg(test)]
-    pub(crate) fn exact_storage(&self, cells: &[Option<usize>], modulus: &Rat) -> Vec<Rat> {
-        let power = |age: u64| crate::hnn::moment::modulus_power(modulus, age);
-        let mut data: Vec<(u64, Rat, &Vec<Rat>)> = self
-            .reads
-            .iter()
-            .map(|(age, count, read)| (*age, Rat::from_integer(BigInt::from(*count)), read))
-            .collect();
-        for (station, cell) in cells.iter().enumerate() {
-            if let Some(class) = cell {
-                data.push((self.station_age(station), Rat::one(), &self.images[station][*class]));
-            }
-        }
-        let mass: Rat = data.iter().map(|(age, count, _)| power(*age) * count).sum();
+    pub(crate) fn exact_storage(
+        &self,
+        station: usize,
+        cells: &[Option<usize>],
+        modulus: &Rat,
+    ) -> Vec<Rat> {
+        let power = |distance: u64| crate::hnn::moment::modulus_power(modulus, distance);
+        let data = self.data(station, cells);
+        let mass: Rat = data.iter().map(|(distance, count, _)| power(*distance) * count).sum();
         let mut storage = self.pairs.clone();
-        for (age, _, read) in data {
-            let weight = power(age) / &mass;
+        for (distance, _, read) in data {
+            let weight = power(distance) / &mass;
             for (value, add) in storage.iter_mut().zip(read) {
                 *value += add * &weight;
             }
@@ -1827,32 +1945,29 @@ impl BankPlacement {
     }
 
     /// [definition; agent-inferred, September 30] **The storage's derivative in the transport
-    /// modulus** at the exact weights `w_k = ρ^(a_k)/mass`: `∂w_k/∂ρ = w_k (a_k − ā)/ρ`, `ā` the
-    /// span's weighted mean age, so `∂z/∂ρ = Σ_k ∂w_k/∂ρ · (datum k's read)`; the modulus's
-    /// covector pairs with it (`hnn::executed`, "The committed move").
-    pub fn modulus_derivative(&self, cells: &[Option<usize>]) -> Vec<Rat> {
-        let mass = self.mass(cells);
-        let mut data: Vec<(u64, Rat, &Vec<Rat>)> = self
-            .reads
+    /// modulus**, read from a station, at the exact weights `w_k = ρ^(r_k)/mass`:
+    /// `∂w_k/∂ρ = w_k (r_k − r̄)/ρ`, `r_k` the datum's distance from the station read and `r̄` the
+    /// span's weighted mean distance, so `∂z/∂ρ = Σ_k ∂w_k/∂ρ · (datum k's read)`; the modulus's
+    /// covector pairs with it (`hnn::executed`, "The committed move"). The one-way law's form with
+    /// each age replaced by the distance from the station read.
+    pub fn modulus_derivative(&self, station: usize, cells: &[Option<usize>]) -> Vec<Rat> {
+        let data = self.data(station, cells);
+        let mass: Rat = data
             .iter()
-            .map(|(age, count, read)| (*age, Rat::from_integer(BigInt::from(*count)), read))
-            .collect();
-        for (station, cell) in cells.iter().enumerate() {
-            if let Some(class) = cell {
-                data.push((self.station_age(station), Rat::one(), &self.images[station][*class]));
-            }
-        }
+            .map(|(distance, count, _)| &self.powers[*distance as usize] * count)
+            .sum();
         let mean: Rat = data
             .iter()
-            .map(|(age, count, _)| {
-                &self.powers[*age as usize] * count * Rat::from_integer(BigInt::from(*age))
+            .map(|(distance, count, _)| {
+                &self.powers[*distance as usize] * count * Rat::from_integer(BigInt::from(*distance))
             })
             .sum::<Rat>()
             / &mass;
         let mut derivative = vec![Rat::zero(); self.pairs.len()];
-        for (age, _, read) in data {
-            let weight = &self.powers[age as usize] / &mass;
-            let slope = weight * (Rat::from_integer(BigInt::from(age)) - &mean) / &self.modulus;
+        for (distance, _, read) in data {
+            let weight = &self.powers[distance as usize] / &mass;
+            let slope =
+                weight * (Rat::from_integer(BigInt::from(distance)) - &mean) / &self.modulus;
             if slope.is_zero() {
                 continue;
             }
