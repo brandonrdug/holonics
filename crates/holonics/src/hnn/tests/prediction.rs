@@ -1478,6 +1478,60 @@ fn the_committed_move_descends_or_refuses_by_type() {
     }
 }
 
+/// **The move's receipts read its certificate** (`hnn::executed::{FirstOrderReading, TermSite}`;
+/// receipts only, the
+/// [two counts' pin](../../../../../research/records/2026-09-30_THE_TWO_COUNTS_PINNED_BEFORE_ITS_RUNS.md)
+/// §5): on the committed move's instance, every trial that read its first order carries one bound
+/// per term of the proposal, aligned with the move's sites, and their sum is the certificate
+/// exactly (a straddling term's bound hinged at zero); every site names a request of the batch and
+/// a station of the section; the leading branches' pairing on the carried move lies at or below the
+/// certificate's upper end (each leading branch is one of its term's active branches, paired with
+/// the same exact storage moves); the unit move's largest entry is read, and the adopted trial
+/// carries the adopted source step's reading.
+#[test]
+fn the_moves_receipts_read_its_certificate() {
+    use crate::hnn::executed::{Context, executed_move};
+    let field = joint();
+    let theta = generic(&field, 94);
+    let refinement = Refinement::declare(&field, 0, 2, 1, 4, 2).unwrap();
+    let bank = joint_bank();
+    let requests = executed_requests(&field, &[(95, [0, 1, 2, 1]), (96, [1, 1, 0, 2])], Context::Open);
+    let moved = executed_move(&field, &theta, &requests, &refinement, &bank, 12).unwrap();
+    assert!(moved.unit_largest.as_ref().is_some_and(|u| u.is_positive()));
+    assert_eq!(moved.sites.len(), moved.terms);
+    for site in &moved.sites {
+        assert!(site.request < requests.len());
+        assert!(site.station < 4);
+    }
+    let mut read = 0;
+    for trial in &moved.trials {
+        let Some(bound) = &trial.first_order else {
+            continue;
+        };
+        read += 1;
+        let terms = trial.terms.as_ref().expect("each term's bound");
+        assert_eq!(terms.len(), moved.sites.len());
+        let (mut lower, mut upper) = (Rat::zero(), Rat::zero());
+        for (term, site) in terms.iter().zip(&moved.sites) {
+            let Some(term) = term else { continue };
+            if !site.positive {
+                assert!(!term.lower.is_negative());
+            }
+            lower += &term.lower;
+            upper += &term.upper;
+        }
+        assert_eq!(lower, bound.lower);
+        assert_eq!(upper, bound.upper);
+        let leading = trial.leading.as_ref().expect("the leading branches' pairing");
+        assert!(leading.lower <= leading.upper);
+        assert!(leading.upper <= bound.upper);
+        assert!(trial.source.is_some());
+    }
+    assert!(read > 0);
+    let (_, step) = moved.adopted.as_ref().expect("the move on this instance is adopted");
+    assert_eq!(moved.trials.last().unwrap().source.as_ref(), Some(step));
+}
+
 /// **The committed move carries the transport modulus** (`hnn::executed`, "The committed move";
 /// `hnn::moment`, "One passage, its transported weights"): from a transport of modulus `3/4` on
 /// requests whose span with the stations fills one turn, the move reads the modulus's slope, and an

@@ -7,7 +7,18 @@
 //! cargo run --release -p holonics --example hnn_prediction -- executed train <arm> <terrain> <seed> <batch> <moves> <deadline ms> <out>
 //! cargo run --release -p holonics --example hnn_prediction -- executed evaluate <terrain> <seed> <count> <out> opening <label=E>…
 //! cargo run --release -p holonics --example hnn_prediction -- executed spread <terrain> <seed> <count> opening <label=E>…
+//! cargo run --release -p holonics --example hnn_prediction -- executed counts <terrain> <training seed> <count> <validation seed> <count> <out>
 //! ```
+//!
+//! - **The two counts** (U6 step 1, loop 1a; the
+//!   [pin](../../records/2026-09-30_THE_TWO_COUNTS_PINNED_BEFORE_ITS_RUNS.md)): `executed counts`
+//!   reads the declared reference family (lag `ℓ ∈ [1, 40]`, a map of `ℤ/4`; the line in the
+//!   hierarchical family too) along the machine's own training passage, its survivors at every
+//!   observation, `n*_terrain` at the stopping object and its certificate; read-only
+//!   instrumentation, never passed to the machine. `executed train` prints D1 (the step's descent)
+//!   and D2 (the comparison's operating point) on every move and writes the constitution after
+//!   moves 1, 2, 4, 8 and 16 (`<out>.m<k>`); `executed evaluate` reads constant and nonconstant
+//!   requests apart with the success rule (every nonconstant section whole).
 //!
 //! - **`executed train`, `executed evaluate`** (Stage 2, the
 //!   [pin](../../records/2026-09-30_THE_EXECUTED_COMPARISONS_BOUNDED_TEST_PINNED_BEFORE_ITS_RUNS.md)):
@@ -34,7 +45,9 @@ use holonics::hnn::executed::{
 };
 use holonics::hnn::prediction::BankPlacement;
 use holonics::hnn::ring::{MemberCovector, turn};
-use num_bigint::BigInt;
+use num_bigint::{BigInt, BigUint};
+use num_traits::One;
+use std::collections::BTreeSet;
 
 /// An enclosure read at the grain `1/g`: the cells `[⌊g·lower⌋/g, (⌊g·upper⌋ + 1)/g)` it lies in.
 pub(super) fn cell(interval: &ExactInterval, grain: i64) -> String {
@@ -383,6 +396,10 @@ pub(super) fn train(
         theta.transport(engine.refinement.ring()),
         bank_strength()
     );
+    // The two counts' instrumentation (the pin §5), read from the terrain's pairs alone and only
+    // printed: the ideal listener's bits on each move's batch, and which requests are constant.
+    let information = ideal_information(terrain, &pairs, batch);
+    let constant: Vec<bool> = pairs.iter().map(|(request, _)| constant_request(request)).collect();
     let (mut adopted, mut refused, mut readings) = (0usize, 0usize, 0usize);
     let mut complete = true;
     for (index, chunk) in requests.chunks(batch).enumerate() {
@@ -428,6 +445,22 @@ pub(super) fn train(
         } else {
             String::new()
         };
+        // D1 and D2 (the pin §5), read from the move's receipt at `θ` before it is replaced.
+        let targets: Vec<Vec<usize>> = chunk.iter().map(|r| r.targets.clone()).collect();
+        let ring = engine.refinement.ring();
+        let first = index * batch;
+        print_d1(index, &moved, &theta, ring, &targets, information.get(index).map_or("", String::as_str));
+        let carried = moved
+            .adopted
+            .as_ref()
+            .and_then(|_| moved.trials.last())
+            .or_else(|| moved.trials.iter().rev().find(|t| t.terms.is_some()));
+        print_d2(
+            index,
+            &moved,
+            &constant[first..first + chunk.len()],
+            carried.and_then(|t| t.terms.as_ref()),
+        );
         match &moved.adopted {
             Some((successor, step)) => {
                 adopted += 1;
@@ -461,6 +494,13 @@ pub(super) fn train(
                 );
                 println!("    move {index}{slopes}");
             }
+        }
+        // The checkpoints (the pin §4): the constitution after moves 1, 2, 4, 8 and 16.
+        if CHECKPOINTS.contains(&(index + 1)) {
+            let path = format!("{out}.m{}", index + 1);
+            #[allow(clippy::disallowed_methods)]
+            std::fs::write(&path, write_port(&theta, engine.refinement.ring())).expect("write E");
+            println!("  checkpoint after move {}: {path}", index + 1);
         }
     }
     #[allow(clippy::disallowed_methods)]
@@ -511,12 +551,18 @@ pub(super) fn evaluate(terrain: &str, seed: u64, count: usize, out: &str, arms: 
                 )
             })
             .collect();
+        let started = Instant::now();
         let (mut released, mut held, mut whole, mut incorrect, mut terminated) = (0, 0, 0, 0, 0);
         let (mut refused, mut uncertified) = (0, 0);
         let mut by_station = vec![0usize; declared.stations];
         let (mut first_request, mut first_right) = (0, 0);
+        // The two counts' split (the pin §4): nonconstant and constant requests apart, and the
+        // success rule, every nonconstant request's section released whole.
+        let (mut nonconstant, mut whole_nonconstant, mut whole_constant) = (0, 0, 0);
         writeln!(listing, "== {label} on {terrain}, seed {seed}").unwrap();
         for ((request, target), generation) in pairs.iter().zip(&generated) {
+            let is_constant = constant_request(request);
+            nonconstant += usize::from(!is_constant);
             let Ok(generation) = generation else {
                 refused += 1;
                 writeln!(listing, "{request:?} → refused").unwrap();
@@ -537,6 +583,11 @@ pub(super) fn evaluate(terrain: &str, seed: u64, count: usize, out: &str, arms: 
                 released += 1;
                 if right.iter().all(|r| *r) {
                     whole += 1;
+                    if is_constant {
+                        whole_constant += 1;
+                    } else {
+                        whole_nonconstant += 1;
+                    }
                 } else {
                     incorrect += 1;
                 }
@@ -545,20 +596,27 @@ pub(super) fn evaluate(terrain: &str, seed: u64, count: usize, out: &str, arms: 
             }
             writeln!(
                 listing,
-                "{} | target {:?} | {} {:?} | locks {:?}",
+                "{} | target {:?} | {} {:?} | locks {:?}{}",
                 request.iter().map(ToString::to_string).collect::<String>(),
                 target,
                 if generation.release.released() { "released" } else { "held" },
                 classes,
-                generation.locks
+                generation.locks,
+                if is_constant { " | constant request" } else { "" }
             )
             .unwrap();
         }
         println!(
-            "  {label} (transport modulus {}): released {released}, held {held}, refused {refused}, refused certificates {uncertified}; whole sections {whole} of {count}; incorrect releases {incorrect}; reaching the termination {terminated}; stations right {} by station {by_station:?}; first lock at a request-reading station (0 or 1) {first_request}, first lock right {first_right}",
+            "  {label} (transport modulus {}): released {released}, held {held}, refused {refused}, refused certificates {uncertified}; whole sections {whole} of {count} (nonconstant {whole_nonconstant} of {nonconstant}, constant {whole_constant} of {}); the success rule (every nonconstant section whole): {}; incorrect releases {incorrect}; reaching the termination {terminated}; stations right {} by station {by_station:?}; first lock at a request-reading station (0 or 1) {first_request}, first lock right {first_right}; {} ms",
             theta.transport(ring),
-            by_station.iter().sum::<usize>()
+            count - nonconstant,
+            if whole_nonconstant == nonconstant { "holds" } else { "does not hold" },
+            by_station.iter().sum::<usize>(),
+            started.elapsed().as_millis()
         );
+        // Written after each constitution, so a run stopped by its guard keeps what it read.
+        #[allow(clippy::disallowed_methods)]
+        std::fs::write(out, &listing).expect("write the sections");
     }
     #[allow(clippy::disallowed_methods)]
     std::fs::write(out, listing).expect("write the sections");
@@ -891,6 +949,1097 @@ pub(super) fn stage_one(seed: u64, count: usize) {
     let _ = MemberCovector::member;
     println!(
         "executed move: {} ms in all; resident {}",
+        clock.elapsed().as_millis(),
+        resident()
+    );
+}
+
+// -------------------------------------------------------------------------------------------
+// The two counts (THE_REBUILD U6, step 1, loop 1a; the
+// [pin](../../records/2026-09-30_THE_TWO_COUNTS_PINNED_BEFORE_ITS_RUNS.md)). Read-only
+// instrumentation: the declared reference family is computed from the terrain's pairs alone and is
+// printed; nothing of it (keys, survivors, lags, continuations) reaches the machine.
+
+/// [definition; the pin §1] **The declared reference family's lags** `ℓ ∈ [1, LAGS]` over the
+/// terrain's residue ring `ℤ/RESIDUES` (the alphabet less the termination).
+const LAGS: usize = 40;
+const RESIDUES: usize = 4;
+/// [definition; the pin §4] **The checkpoints**: the constitution written after these many moves.
+const CHECKPOINTS: [usize; 5] = [1, 2, 4, 8, 16];
+
+/// **An observation's argument** under lag `ℓ` (the pin §1, the emitter): station `j`'s cell
+/// `x_(n + j − ℓ)`, read from the request (the initial history) or from the same request's earlier
+/// stations; never across a request boundary.
+fn argument(request: &[usize], section: &[usize], station: usize, lag: usize) -> usize {
+    let at = request.len() + station - lag;
+    if at < request.len() {
+        request[at]
+    } else {
+        section[at - request.len()]
+    }
+}
+
+/// [definition; the pin §1] **A constant request**: its 40 cells one class, so every lag reads its
+/// one symbol and it separates no lag.
+fn constant_request(request: &[usize]) -> bool {
+    request.iter().all(|&x| x == request[0])
+}
+
+/// An observation count in both units (the pin §4): `q` requests plus `j` stations.
+fn both_units(observations: usize, stations: usize) -> String {
+    format!(
+        "{observations} observations ({} requests plus {} stations)",
+        observations / stations,
+        observations % stations
+    )
+}
+
+/// [definition; the pin §1] **One lag's fibre in the global family**: whether it lives, and its
+/// map's value at each residue (`None` unobserved: every value survives there).
+#[derive(Clone, Debug, PartialEq, Eq)]
+struct LagFibre {
+    alive: bool,
+    map: [Option<usize>; RESIDUES],
+}
+
+/// [definition; the pin §1] **One lag's fibre in the hierarchical family `H`**: whether it lives,
+/// the finished requests' translation counts multiplied, and the current request's consistent
+/// translations (reset to all of `ℤ/4` at each request boundary: the translation never carries
+/// across requests, the lag and its death do).
+#[derive(Clone, Debug)]
+struct TranslationFibre {
+    alive: bool,
+    past: BigUint,
+    current: [bool; RESIDUES],
+}
+
+/// [definition; the pin §1] **A declared reference family's survivors**, read along a passage in
+/// its order: the global family (one key for every request) or `H` (a global lag, a per-request
+/// translation, over a passage of `requests` requests, `begun` of them begun).
+#[derive(Clone, Debug)]
+enum ReferenceFamily {
+    Global(Vec<LagFibre>),
+    Hierarchical {
+        lags: Vec<TranslationFibre>,
+        requests: usize,
+        begun: usize,
+    },
+}
+
+impl ReferenceFamily {
+    fn global() -> Self {
+        Self::Global(vec![
+            LagFibre {
+                alive: true,
+                map: [None; RESIDUES],
+            };
+            LAGS
+        ])
+    }
+
+    fn hierarchical(requests: usize) -> Self {
+        Self::Hierarchical {
+            lags: vec![
+                TranslationFibre {
+                    alive: true,
+                    past: BigUint::from(1u32),
+                    current: [true; RESIDUES],
+                };
+                LAGS
+            ],
+            requests,
+            begun: 0,
+        }
+    }
+
+    fn name(&self) -> &'static str {
+        match self {
+            Self::Global(_) => "the global family",
+            Self::Hierarchical { .. } => "the hierarchical family H",
+        }
+    }
+
+    /// The family's size under its prior: `40 · 4⁴` keys, or `40 · 4^R` for `H`.
+    fn size(&self) -> BigUint {
+        let four = BigUint::from(RESIDUES as u32);
+        match self {
+            Self::Global(_) => BigUint::from(LAGS as u32) * four.pow(RESIDUES as u32),
+            Self::Hierarchical { requests, .. } => {
+                BigUint::from(LAGS as u32) * four.pow(*requests as u32)
+            }
+        }
+    }
+
+    /// **The survivors' count** `#S_k` (the pin §1): `Σ_(ℓ alive) 4^(u_ℓ)`, or for `H`
+    /// `Σ_(ℓ alive) Π_r #C_(ℓ,r)`, every unbegun request with its four translations.
+    fn count(&self) -> BigUint {
+        let four = BigUint::from(RESIDUES as u32);
+        match self {
+            Self::Global(lags) => lags
+                .iter()
+                .filter(|lag| lag.alive)
+                .map(|lag| four.pow(lag.map.iter().filter(|v| v.is_none()).count() as u32))
+                .sum(),
+            Self::Hierarchical {
+                lags,
+                requests,
+                begun,
+            } => lags
+                .iter()
+                .filter(|lag| lag.alive)
+                .map(|lag| {
+                    if *begun == 0 {
+                        four.pow(*requests as u32)
+                    } else {
+                        let current =
+                            BigUint::from(lag.current.iter().filter(|c| **c).count() as u32);
+                        &lag.past * current * four.pow((*requests - *begun) as u32)
+                    }
+                })
+                .sum(),
+        }
+    }
+
+    /// **A request boundary**: `H`'s translation fibre resets to all of `ℤ/4`, the finished
+    /// request's count joining the product (the pin §1, the reset convention).
+    fn begin(&mut self) {
+        if let Self::Hierarchical { lags, begun, .. } = self {
+            if *begun > 0 {
+                for lag in lags.iter_mut().filter(|lag| lag.alive) {
+                    let kept = lag.current.iter().filter(|c| **c).count();
+                    lag.past *= BigUint::from(kept as u32);
+                }
+            }
+            for lag in lags.iter_mut() {
+                lag.current = [true; RESIDUES];
+            }
+            *begun += 1;
+        }
+    }
+
+    /// **One observation**: station `j` of a request, its true value `section[j]` against every
+    /// alive key's emission (the pin §1).
+    fn observe(&mut self, request: &[usize], section: &[usize], station: usize) {
+        let value = section[station];
+        match self {
+            Self::Global(lags) => {
+                for (index, lag) in lags.iter_mut().enumerate().filter(|(_, lag)| lag.alive) {
+                    let a = argument(request, section, station, index + 1);
+                    match lag.map[a] {
+                        None => lag.map[a] = Some(value),
+                        Some(v) if v != value => lag.alive = false,
+                        Some(_) => {}
+                    }
+                }
+            }
+            Self::Hierarchical { lags, .. } => {
+                for (index, lag) in lags.iter_mut().enumerate().filter(|(_, lag)| lag.alive) {
+                    let a = argument(request, section, station, index + 1);
+                    let c = (value + RESIDUES - a) % RESIDUES;
+                    for (t, kept) in lag.current.iter_mut().enumerate() {
+                        *kept &= t == c;
+                    }
+                    if lag.current.iter().all(|kept| !kept) {
+                        lag.alive = false;
+                    }
+                }
+            }
+        }
+    }
+
+    /// The alive lags.
+    fn alive(&self) -> Vec<usize> {
+        match self {
+            Self::Global(lags) => (1..=LAGS).filter(|l| lags[l - 1].alive).collect(),
+            Self::Hierarchical { lags, .. } => (1..=LAGS).filter(|l| lags[l - 1].alive).collect(),
+        }
+    }
+
+    /// **The continuations the survivors emit on a fresh request** (the pin §4): each key run
+    /// freely over the request's `stations` (its own emissions its later arguments; an unobserved
+    /// argument emits every value; `H`'s fresh translation every value), stopping once `bound`
+    /// distinct continuations are found. With `given`, `H` reads the request's own first station
+    /// (its translation's one reading) and every continuation starts with it.
+    fn continuations(
+        &self,
+        request: &[usize],
+        stations: usize,
+        bound: usize,
+        given: Option<usize>,
+    ) -> BTreeSet<Vec<usize>> {
+        fn emit(
+            request: &[usize],
+            lag: usize,
+            map: [Option<usize>; RESIDUES],
+            section: &mut Vec<usize>,
+            stations: usize,
+            out: &mut BTreeSet<Vec<usize>>,
+            bound: usize,
+        ) {
+            if out.len() >= bound {
+                return;
+            }
+            if section.len() == stations {
+                out.insert(section.clone());
+                return;
+            }
+            let a = argument(request, section, section.len(), lag);
+            let values: Vec<usize> = match map[a] {
+                Some(y) => vec![y],
+                None => (0..RESIDUES).collect(),
+            };
+            for y in values {
+                let mut next = map;
+                next[a] = Some(y);
+                section.push(y);
+                emit(request, lag, next, section, stations, out, bound);
+                section.pop();
+            }
+        }
+        let mut out = BTreeSet::new();
+        for lag in self.alive() {
+            match self {
+                Self::Global(lags) => emit(
+                    request,
+                    lag,
+                    lags[lag - 1].map,
+                    &mut Vec::new(),
+                    stations,
+                    &mut out,
+                    bound,
+                ),
+                Self::Hierarchical { .. } => {
+                    let translations: Vec<usize> = match given {
+                        Some(first) => {
+                            vec![(first + RESIDUES - argument(request, &[], 0, lag)) % RESIDUES]
+                        }
+                        None => (0..RESIDUES).collect(),
+                    };
+                    for c in translations {
+                        let map: [Option<usize>; RESIDUES] =
+                            std::array::from_fn(|a| Some((a + c) % RESIDUES));
+                        emit(request, lag, map, &mut Vec::new(), stations, &mut out, bound);
+                    }
+                }
+            }
+            if out.len() >= bound {
+                break;
+            }
+        }
+        out
+    }
+
+    /// The survivor list, the certificate (the pin §4): every alive lag with its map (`·` an
+    /// unobserved argument, its fibre all of `ℤ/4`), or for `H` the lag and its current
+    /// translations; a key is marked an alias when it is not the terrain's generating key.
+    fn certificate(&self, generating: Option<(usize, [usize; RESIDUES])>) -> String {
+        match self {
+            Self::Global(lags) => self
+                .alive()
+                .iter()
+                .map(|&l| {
+                    let map = lags[l - 1].map;
+                    let shown: Vec<String> = map
+                        .iter()
+                        .map(|v| v.map_or_else(|| "·".to_string(), |y| y.to_string()))
+                        .collect();
+                    let alias = match generating {
+                        Some((lag, f))
+                            if lag == l && map.iter().zip(f).all(|(v, y)| *v == Some(y)) =>
+                        {
+                            ""
+                        }
+                        _ => " alias",
+                    };
+                    format!("ℓ {l} f [{}]{alias}", shown.join(" "))
+                })
+                .collect::<Vec<_>>()
+                .join("; "),
+            Self::Hierarchical { lags, .. } => self
+                .alive()
+                .iter()
+                .map(|&l| {
+                    let kept: Vec<usize> =
+                        (0..RESIDUES).filter(|&c| lags[l - 1].current[c]).collect();
+                    format!("ℓ {l} (current translations {kept:?})")
+                })
+                .collect::<Vec<_>>()
+                .join("; "),
+        }
+    }
+
+    /// Every alive lag's unobserved arguments (the global family).
+    fn unobserved(&self) -> String {
+        match self {
+            Self::Global(lags) => self
+                .alive()
+                .iter()
+                .filter_map(|&l| {
+                    let free: Vec<usize> =
+                        (0..RESIDUES).filter(|&a| lags[l - 1].map[a].is_none()).collect();
+                    (!free.is_empty()).then(|| format!("ℓ {l}: {free:?}"))
+                })
+                .collect::<Vec<_>>()
+                .join("; "),
+            Self::Hierarchical { .. } => String::new(),
+        }
+    }
+}
+
+/// The terrain's generating key in the global family, where it is one (the pin §2): order-2
+/// `(2, a ↦ a + 1)`, the alternation `(2, id)`; the line's law is no global key.
+fn generating_key(terrain: &str) -> Option<(usize, [usize; RESIDUES])> {
+    match terrain {
+        "order2" => Some((2, [1, 2, 3, 0])),
+        "alternation" => Some((2, [0, 1, 2, 3])),
+        _ => None,
+    }
+}
+
+/// `log₂` of an exact ratio of counts, enclosed on the declared grid.
+fn bits(ratio: &Rat) -> ExactInterval {
+    holonics::ratio::algebraic::log2_enclosure(ratio).expect("a positive ratio")
+}
+
+/// A ratio of two counts, exact.
+fn count_ratio(numerator: &BigUint, denominator: &BigUint) -> Rat {
+    Rat::new(BigInt::from(numerator.clone()), BigInt::from(denominator.clone()))
+}
+
+/// [definition; the pin §1, §4] **A family's reading along a passage**: the survivors' count
+/// before every observation and after the last (`counts[k] = #S_k`), and the family after the
+/// passage.
+struct PassageReading {
+    counts: Vec<BigUint>,
+    family: ReferenceFamily,
+}
+
+/// Read a family along the passage, observation by observation, in the passage's order; `at`
+/// sees the family after each observation `k` (its count `counts[k]` already pushed).
+fn read_passage(
+    mut family: ReferenceFamily,
+    pairs: &[(Vec<usize>, Vec<usize>)],
+    mut at: impl FnMut(usize, &ReferenceFamily, &[BigUint]),
+) -> PassageReading {
+    let mut counts = vec![family.count()];
+    for (request, section) in pairs {
+        family.begin();
+        for station in 0..section.len() {
+            family.observe(request, section, station);
+            counts.push(family.count());
+            at(counts.len() - 1, &family, &counts);
+        }
+    }
+    PassageReading { counts, family }
+}
+
+/// **The ideal listener's information on each batch of the passage** (D1; the pin §5): each
+/// move's exact ratio `#S_(64m)/#S_(64(m+1))` and its `log₂` enclosed, in bits.
+fn batch_information(counts: &[BigUint], per_batch: usize) -> Vec<(Rat, ExactInterval)> {
+    (0..(counts.len() - 1) / per_batch)
+        .map(|m| {
+            let ratio = count_ratio(&counts[m * per_batch], &counts[(m + 1) * per_batch]);
+            let b = bits(&ratio);
+            (ratio, b)
+        })
+        .collect()
+}
+
+/// **The ideal listener's information on each move's batch** (D1; the pin §5), from the terrain's
+/// pairs alone, per family, printed beside each move and never passed to it.
+fn ideal_information(terrain: &str, pairs: &[(Vec<usize>, Vec<usize>)], batch: usize) -> Vec<String> {
+    let stations = pairs.first().map_or(0, |(_, s)| s.len());
+    let per: Vec<(String, Vec<(Rat, ExactInterval)>)> = families_of(terrain, pairs.len())
+        .into_iter()
+        .map(|family| {
+            let name = family.name();
+            let reading = read_passage(family, pairs, |_, _, _| {});
+            (name.to_string(), batch_information(&reading.counts, batch * stations))
+        })
+        .collect();
+    (0..pairs.len() / batch)
+        .map(|m| {
+            per.iter()
+                .map(|(name, info)| {
+                    format!("{name}: ratio {}, {} bits", info[m].0, cell(&info[m].1, 1 << 8))
+                })
+                .collect::<Vec<_>>()
+                .join("; ")
+        })
+        .collect()
+}
+
+/// [definition; the pin §5] **One stratum of D2's readings**: the station comparisons of one
+/// decision kind and request kind, their class gaps and threshold margins (sign counts, sums,
+/// extremes; exact enclosures), the gaps' magnitudes summed, and their terms' derivatives along
+/// the carried move (exactly zero, below the term's grain, descending, rising, straddling; their
+/// sum).
+#[derive(Default)]
+struct Stratum {
+    count: usize,
+    gap: [usize; 3],
+    margin: [usize; 3],
+    gap_sum: (Rat, Rat),
+    margin_sum: (Rat, Rat),
+    magnitude: (Rat, Rat),
+    gap_least: Option<Rat>,
+    gap_most: Option<Rat>,
+    margin_least: Option<Rat>,
+    margin_most: Option<Rat>,
+    terms: usize,
+    derivative: [usize; 5],
+    derivative_sum: (Rat, Rat),
+}
+
+/// An enclosure's sign: 0 certainly positive, 1 certainly negative, 2 straddling zero.
+fn sign_of(lower: &Rat, upper: &Rat) -> usize {
+    if lower.is_positive() {
+        0
+    } else if upper.is_negative() {
+        1
+    } else {
+        2
+    }
+}
+
+impl Stratum {
+    fn station(&mut self, gap: &ExactInterval, margin: &ExactInterval) {
+        self.count += 1;
+        self.gap[sign_of(&gap.lower, &gap.upper)] += 1;
+        self.margin[sign_of(&margin.lower, &margin.upper)] += 1;
+        self.gap_sum.0 += &gap.lower;
+        self.gap_sum.1 += &gap.upper;
+        self.margin_sum.0 += &margin.lower;
+        self.margin_sum.1 += &margin.upper;
+        // |γ| ∈ [dist(0, γ), max(|γ⁻|, |γ⁺|)].
+        let far = gap.lower.abs().max(gap.upper.abs());
+        let near = if sign_of(&gap.lower, &gap.upper) == 2 {
+            Rat::zero()
+        } else {
+            gap.lower.abs().min(gap.upper.abs())
+        };
+        self.magnitude.0 += near;
+        self.magnitude.1 += far;
+        let least = |x: &mut Option<Rat>, v: &Rat| {
+            if x.as_ref().is_none_or(|y| v < y) {
+                *x = Some(v.clone());
+            }
+        };
+        let most = |x: &mut Option<Rat>, v: &Rat| {
+            if x.as_ref().is_none_or(|y| v > y) {
+                *x = Some(v.clone());
+            }
+        };
+        least(&mut self.gap_least, &gap.lower);
+        most(&mut self.gap_most, &gap.upper);
+        least(&mut self.margin_least, &margin.lower);
+        most(&mut self.margin_most, &margin.upper);
+    }
+
+    /// A term's derivative along the carried move, against its term's grain (the width of its own
+    /// enclosure): 0 exactly zero, 1 below the grain, 2 descending, 3 rising, 4 straddling.
+    fn derivative(&mut self, d: &ExactInterval, grain: &Rat) {
+        self.terms += 1;
+        let kind = if d.lower.is_zero() && d.upper.is_zero() {
+            0
+        } else if d.lower.abs().max(d.upper.abs()) < *grain {
+            1
+        } else {
+            match sign_of(&d.lower, &d.upper) {
+                1 => 2,
+                0 => 3,
+                _ => 4,
+            }
+        };
+        self.derivative[kind] += 1;
+        self.derivative_sum.0 += &d.lower;
+        self.derivative_sum.1 += &d.upper;
+    }
+
+    fn line(&self) -> String {
+        let pair = |p: &(Rat, Rat)| cell(&ExactInterval { lower: p.0.clone(), upper: p.1.clone() }, 1 << 8);
+        let point = |x: &Option<Rat>| {
+            x.as_ref()
+                .map_or_else(|| "-".to_string(), |v| cell(&ExactInterval::point(v.clone()), 1 << 8))
+        };
+        let mean = |p: &(Rat, Rat)| {
+            if self.count == 0 {
+                "-".to_string()
+            } else {
+                let n = Rat::from_integer(BigInt::from(self.count));
+                cell(
+                    &ExactInterval {
+                        lower: &p.0 / &n,
+                        upper: &p.1 / &n,
+                    },
+                    1 << 8,
+                )
+            }
+        };
+        format!(
+            "stations {}; class gap (+, −, straddling) {:?}, Σ ∈ {}, least {}, most {}, Σ|γ| ∈ {}, mean |γ| ∈ {}; threshold margin (+, −, straddling) {:?}, Σ ∈ {}, least {}, most {}; terms of F's support {}, their derivative along the carried move (exactly zero, below its term's grain, descending, rising, straddling) {:?}, Σ ∈ {} nats",
+            self.count,
+            self.gap,
+            pair(&self.gap_sum),
+            point(&self.gap_least),
+            point(&self.gap_most),
+            pair(&self.magnitude),
+            mean(&self.magnitude),
+            self.margin,
+            pair(&self.margin_sum),
+            point(&self.margin_least),
+            point(&self.margin_most),
+            self.terms,
+            self.derivative,
+            pair(&self.derivative_sum)
+        )
+    }
+}
+
+/// `ln` of a growth's enclosure (both ends positive: the comparison's own terms read them).
+fn ln_growth(growth: &holonics::hnn::ring::Growth) -> ExactInterval {
+    let ln = |x: &Rat| holonics::ratio::algebraic::ln_enclosure(x).expect("a positive growth");
+    ExactInterval {
+        lower: ln(&growth.lower).lower,
+        upper: ln(&growth.upper).upper,
+    }
+}
+
+/// [definition; the pin §5] **D2, the comparison's operating point**, printed for one move: every
+/// station comparison of the batch at `θ` (every refinement, and the open section apart), its
+/// class gap `ln a_t − ln a_r` and threshold margin `ln a_t` as exact enclosures, stratified by
+/// decision (right; wrong and eligible, a confident wrong decision the release would lock; wrong
+/// and not eligible) and by request (constant or not), with each term of `F`'s support's
+/// derivative along the carried move (`terms`, aligned with the move's `sites`).
+fn print_d2(
+    index: usize,
+    moved: &ExecutedMove,
+    constant: &[bool],
+    terms: Option<&Vec<Option<ExactInterval>>>,
+) {
+    use holonics::hnn::executed::StationComparison;
+    let kinds = ["right", "wrong, eligible (confident)", "wrong, not eligible"];
+    // strata[open][decision][constant]
+    let mut strata: Vec<Vec<Vec<Stratum>>> = (0..2)
+        .map(|_| (0..3).map(|_| (0..2).map(|_| Stratum::default()).collect()).collect())
+        .collect();
+    let mut decision_of: BTreeMap<(usize, usize, usize), (usize, &StationComparison)> =
+        BTreeMap::new();
+    for (r, request) in moved.before.requests.iter().enumerate() {
+        for s in &request.stations {
+            let eligible = request
+                .orders
+                .iter()
+                .find(|o| o.context == s.context)
+                .is_some_and(|o| o.eligible.iter().any(|(station, _, _, _)| *station == s.station));
+            let decision = if s.top == s.target {
+                0
+            } else if eligible {
+                1
+            } else {
+                2
+            };
+            let t = ln_growth(&s.target_growth);
+            let x = ln_growth(&s.rival_growth);
+            let gap = ExactInterval {
+                lower: &t.lower - &x.upper,
+                upper: &t.upper - &x.lower,
+            };
+            let c = usize::from(constant[r]);
+            strata[0][decision][c].station(&gap, &t);
+            if s.context == 0 {
+                strata[1][decision][c].station(&gap, &t);
+            }
+            decision_of.insert((r, s.context, s.station), (decision, s));
+        }
+    }
+    if let Some(terms) = terms {
+        for (site, term) in moved.sites.iter().zip(terms) {
+            let Some(d) = term else { continue };
+            let Some((decision, s)) = decision_of.get(&(site.request, site.context, site.station))
+            else {
+                continue;
+            };
+            let grain = &s.value.upper - &s.value.lower;
+            let c = usize::from(constant[site.request]);
+            strata[0][*decision][c].derivative(d, &grain);
+            if site.context == 0 {
+                strata[1][*decision][c].derivative(d, &grain);
+            }
+        }
+    }
+    for (open, scope) in ["every refinement", "the open section"].iter().enumerate() {
+        for (decision, kind) in kinds.iter().enumerate() {
+            for (c, request) in ["nonconstant", "constant"].iter().enumerate() {
+                let stratum = &strata[open][decision][c];
+                if stratum.count == 0 {
+                    continue;
+                }
+                println!("    D2 move {index}, {scope}, {kind}, {request} requests: {}", stratum.line());
+            }
+        }
+    }
+}
+
+/// [definition; the pin §5] **D1, the step's descent**, printed for one move: `F` at `θ` and its
+/// grain; the unit slope, the modulus's share and the ladder's start (the first-order zero against
+/// the entry scale, which binds); every trial; at the carried move (the adopted trial, else the last
+/// trial whose first order was read) the step's norm, the lattice, passive and entry bounds, the
+/// predicted descents (the certificate and the leading branches) against the measured, whether the
+/// trajectory changed, the decisions moved at the open section, and the ideal listener's bits on
+/// the batch.
+fn print_d1(
+    index: usize,
+    moved: &ExecutedMove,
+    theta: &Constitution,
+    ring: usize,
+    targets: &[Vec<usize>],
+    information: &str,
+) {
+    use holonics::hnn::constitution::Locus;
+    let before = &moved.before.value;
+    let grain = &before.upper - &before.lower;
+    let two = Rat::from_integer(BigInt::from(2));
+    let point = |x: &Rat, g: i64| cell(&ExactInterval::point(x.clone()), g);
+    let negated = |x: &ExactInterval| ExactInterval {
+        lower: -x.upper.clone(),
+        upper: -x.lower.clone(),
+    };
+    let mut line = format!(
+        "    D1 move {index}: F(θ) ∈ {}, its grain (enclosure width) ∈ {} nats",
+        cell(before, 1 << 12),
+        point(&grain, 1 << 16)
+    );
+    let (Some(slope), Some(gamma), Some(unit), Some(largest)) = (
+        &moved.slope,
+        &moved.modulus_slope,
+        &moved.modulus_unit,
+        &moved.unit_largest,
+    ) else {
+        println!(
+            "{line}; no descent proposed: {:?} (the unit slope {}); zero prediction",
+            moved.refusal,
+            moved.slope.as_ref().map_or_else(|| "not read".to_string(), |s| cell(s, 1 << 12))
+        );
+        println!("    D1 move {index}: the ideal listener on this batch: {information}");
+        return;
+    };
+    let share = gamma * unit;
+    let joint_upper = &slope.upper + &share;
+    let zero = if joint_upper.is_negative() {
+        Some(&before.lower / -joint_upper.clone())
+    } else {
+        None
+    };
+    let scale = Rat::new(BigInt::from(1), BigInt::from(2)) / largest;
+    let binds = match &zero {
+        Some(z) if *z <= scale => "the first-order zero",
+        Some(_) => "the entry scale",
+        None => "none (the joint slope is not negative)",
+    };
+    line += &format!(
+        "; the unit slope ∈ {}, the modulus's share γ_ρΔρ {}, the first-order zero F⁻/(−slope⁺) {}, the entry scale ½/u {} (u = {largest}), binding: {binds}",
+        cell(slope, 1 << 12),
+        point(&share, 1 << 12),
+        zero.as_ref().map_or_else(|| "none".to_string(), |z| point(z, 1 << 16)),
+        point(&scale, 1 << 16)
+    );
+    println!("{line}");
+    let trials: Vec<String> = moved
+        .trials
+        .iter()
+        .map(|t| {
+            format!(
+                "η {} {}",
+                t.step,
+                match &t.refusal {
+                    None => "adopted".to_string(),
+                    Some(holonics::hnn::executed::TrialRefusal::NotBelow(v)) =>
+                        format!("refused NotBelow(F ∈ {})", cell(v, 1 << 12)),
+                    Some(holonics::hnn::executed::TrialRefusal::FirstOrder(v)) =>
+                        format!("refused FirstOrder({})", cell(v, 1 << 12)),
+                    Some(other) => format!("refused {other:?}"),
+                }
+            )
+        })
+        .collect();
+    let entry_refusals = moved
+        .trials
+        .iter()
+        .filter(|t| matches!(t.refusal, Some(holonics::hnn::executed::TrialRefusal::EntryBound(_))))
+        .count();
+    println!(
+        "    D1 move {index}: the ladder: {} trials, {} halvings before {}; {}; trials refused by the entry bound {entry_refusals}",
+        moved.trials.len(),
+        moved.trials.len().saturating_sub(1),
+        if moved.adopted.is_some() { "adoption" } else { "refusal" },
+        trials.join(", ")
+    );
+    let Some(trial) = moved
+        .adopted
+        .as_ref()
+        .and_then(|_| moved.trials.last())
+        .or_else(|| moved.trials.iter().rev().find(|t| t.first_order.is_some()))
+    else {
+        println!("    D1 move {index}: no carried move read its first order: zero prediction");
+        println!("    D1 move {index}: the ideal listener on this batch: {information}");
+        return;
+    };
+    let lattice = theta.lattice(Locus::SourcePort(ring)).expect("the lattice").unit();
+    let modulus = theta.transport(ring);
+    let target = &modulus + &trial.step * unit;
+    let passive = if target > Rat::one() {
+        "at one"
+    } else if target < &modulus / &two {
+        "at ρ/2"
+    } else {
+        "not active"
+    };
+    let carried = trial.modulus.clone().unwrap_or_else(|| modulus.clone());
+    let clipped = target.clone().max(&modulus / &two).min(Rat::one());
+    let (squares, stepped, released) = match &trial.source {
+        Some(source) => {
+            let port = theta.source_port(ring).expect("E");
+            let successor = moved.adopted.as_ref().map(|(s, _)| s);
+            let squares = successor.map(|s| {
+                s.source_port(ring)
+                    .expect("E")
+                    .subtract(port)
+                    .expect("the move")
+                    .entries()
+                    .iter()
+                    .map(|x| x * x)
+                    .sum::<Rat>()
+            });
+            (squares, source.stepped, source.released.len())
+        }
+        None => (None, 0, 0),
+    };
+    println!(
+        "    D1 move {index}: the carried move at η {} ({}): ‖ΔE‖_∞ {}, Σ ΔE² {}, entries whose lattice coordinate moved {stepped}, residuals released {released}, E's lattice unit {lattice}; ρ {modulus} → {carried} (Δρ {}), its target ρ + ηΔρ {} (passive bound {passive}; the lattice's rounding {}); E's largest entry {} against the entry bound 8",
+        trial.step,
+        if moved.adopted.is_some() { "adopted" } else { "refused" },
+        trial.moved,
+        squares.map_or_else(|| "not adopted".to_string(), |s| s.to_string()),
+        &carried - &modulus,
+        point(&target, 1 << 21),
+        point(&(&carried - &clipped), 1 << 30),
+        trial.largest
+    );
+    let Some(bound) = &trial.first_order else {
+        return;
+    };
+    let certificate = negated(bound);
+    let leading = trial.leading.as_ref().map(&negated);
+    let measured = trial.value.as_ref().map(|after| ExactInterval {
+        lower: &before.lower - &after.upper,
+        upper: &before.upper - &after.lower,
+    });
+    let kind = if !certificate.upper.is_positive() {
+        "zero (not positive)"
+    } else if certificate.upper < grain {
+        "below the grain"
+    } else {
+        "above the grain"
+    };
+    let eighth = |m: &ExactInterval| {
+        let bar = &certificate.upper / Rat::from_integer(BigInt::from(8));
+        if m.lower >= bar {
+            "holds"
+        } else if m.upper < &certificate.lower / Rat::from_integer(BigInt::from(8)) {
+            "fails"
+        } else {
+            "undecided"
+        }
+    };
+    let agree = match (&leading, &measured) {
+        (Some(l), Some(m)) => {
+            let (a, b) = (sign_of(&l.lower, &l.upper), sign_of(&m.lower, &m.upper));
+            if a == 2 || b == 2 {
+                "undecided"
+            } else if a == b {
+                "agree"
+            } else {
+                "opposite"
+            }
+        }
+        _ => "not read",
+    };
+    println!(
+        "    D1 move {index}: predicted descent, the certificate −Σ sup Df ∈ {} (exact enclosure; approximate as a prediction), the leading branches −Σ sign⟨ĝ, Δz⟩ ∈ {}; measured C(θ) − C(θ+δ) ∈ {} (exact); the prediction {kind}; measured at least 1/8 of the certificate: {}; the leading branches' sign and the measured's: {agree}",
+        cell(&certificate, 1 << 12),
+        leading.as_ref().map_or_else(|| "not read".to_string(), |l| cell(l, 1 << 12)),
+        measured.as_ref().map_or_else(|| "not read".to_string(), |m| cell(m, 1 << 12)),
+        measured.as_ref().map_or("not read", eighth)
+    );
+    if let Some(after) = &trial.after {
+        let changed = moved
+            .before
+            .requests
+            .iter()
+            .zip(&after.requests)
+            .filter(|(a, b)| {
+                a.generation.as_ref().map(|g| &g.locks) != b.generation.as_ref().map(|g| &g.locks)
+            })
+            .count();
+        // [wrong→right, right→wrong, wrong→another wrong, right kept, wrong kept]
+        let mut moves = [0usize; 5];
+        for (a, b) in moved.before.requests.iter().zip(&after.requests) {
+            let open = |r: &holonics::hnn::executed::RequestComparison| -> BTreeMap<usize, (usize, usize)> {
+                r.stations
+                    .iter()
+                    .filter(|s| s.context == 0)
+                    .map(|s| (s.station, (s.top, s.target)))
+                    .collect()
+            };
+            let (x, y) = (open(a), open(b));
+            for (station, (top, target)) in &x {
+                let Some((next, _)) = y.get(station) else { continue };
+                let kind = match (top == target, next == target) {
+                    (false, true) => 0,
+                    (true, false) => 1,
+                    (false, false) if next != top => 2,
+                    (true, true) => 3,
+                    (false, false) => 4,
+                };
+                moves[kind] += 1;
+            }
+        }
+        let (whole, right, released) = after.sections(targets);
+        println!(
+            "    D1 move {index}: the successor's trajectory changed in {changed} of {} requests; at the open section, wrong→right {}, right→wrong {}, wrong→another wrong {}, right kept {}, wrong kept {}; the successor's batch: released {released}, whole {whole}, stations right {right}",
+            moved.before.requests.len(),
+            moves[0],
+            moves[1],
+            moves[2],
+            moves[3],
+            moves[4]
+        );
+    }
+    println!("    D1 move {index}: the ideal listener on this batch: {information}");
+}
+
+/// The families the pin reads on a terrain (§1): the global family, and on the line `H` too.
+fn families_of(terrain: &str, requests: usize) -> Vec<ReferenceFamily> {
+    if terrain == "line" {
+        vec![ReferenceFamily::global(), ReferenceFamily::hierarchical(requests)]
+    } else {
+        vec![ReferenceFamily::global()]
+    }
+}
+
+/// **The terrain's counts** (`executed counts <terrain> <training seed> <requests> <validation
+/// seed> <validation count> <out>`; the pin §1, §2, §4): the declared reference family read along
+/// the machine's own training passage (the training requests in their order, station by station),
+/// every observation's survivors and ratio written to `out`; `n*_terrain` at the stopping object
+/// (the nonconstant validation requests, and all of them), the syntactic class, the certificate,
+/// the unobserved arguments and lag aliases, the constant requests' bits apart, each batch's
+/// information, and the training/validation content overlap. The line is read in `H` too.
+pub(super) fn counts(
+    terrain: &str,
+    seed: u64,
+    count: usize,
+    validation_seed: u64,
+    validation_count: usize,
+    out: &str,
+) {
+    use std::fmt::Write as _;
+    let clock = Instant::now();
+    let declared = order_declared(false);
+    let stations = declared.stations;
+    let pairs = terrain_pairs(terrain, &declared, seed, count);
+    let validation = terrain_pairs(terrain, &declared, validation_seed, validation_count);
+    let batch = 8;
+    let constant: Vec<usize> =
+        (0..pairs.len()).filter(|&r| constant_request(&pairs[r].0)).collect();
+    let validation_constant = validation.iter().filter(|(r, _)| constant_request(r)).count();
+    let shared = validation
+        .iter()
+        .filter(|(v, _)| pairs.iter().any(|(t, _)| t == v))
+        .count();
+    let distinct_training: BTreeSet<&Vec<usize>> = pairs.iter().map(|(r, _)| r).collect();
+    let distinct_validation: BTreeSet<&Vec<usize>> = validation.iter().map(|(r, _)| r).collect();
+    println!(
+        "executed counts: {terrain}, the training passage at seed {seed} ({count} requests, {} observations), validation at seed {validation_seed} ({validation_count} requests); the family: lag in [1, {LAGS}], a map of Z/{RESIDUES}",
+        count * stations
+    );
+    println!(
+        "  constant requests: training {} of {count} (requests {constant:?}), validation {validation_constant} of {validation_count}; distinct requests: training {}, validation {}; validation requests whose 40 cells equal a training request's: {shared} of {validation_count}",
+        constant.len(),
+        distinct_training.len(),
+        distinct_validation.len()
+    );
+    let mut listing = String::new();
+    for family in families_of(terrain, count) {
+        let name = family.name();
+        let size = family.size();
+        let hierarchical = matches!(family, ReferenceFamily::Hierarchical { .. });
+        // The stopping object, read where the survivors change (they only shrink, so the
+        // continuations only shrink: the first count at which it holds is n*).
+        let unique = |f: &ReferenceFamily, v: &(Vec<usize>, Vec<usize>), given: bool| {
+            f.continuations(&v.0, stations, 2, given.then(|| v.1[0])).len() == 1
+        };
+        let holds = |f: &ReferenceFamily, all: bool, given: bool| {
+            validation
+                .iter()
+                .filter(|v| all || !constant_request(&v.0))
+                .all(|v| unique(f, v, given))
+        };
+        let (mut star, mut star_all, mut star_given) = (None, None, None);
+        let mut star_family = None;
+        let mut last_change = 0;
+        if hierarchical && holds(&family, false, true) {
+            star_given = Some(0);
+        }
+        let reading = read_passage(family, &pairs, |k, f, counts| {
+            if counts[k] != counts[k - 1] {
+                last_change = k;
+                if star.is_none() && holds(f, false, false) {
+                    star = Some(k);
+                    star_family = Some(f.clone());
+                }
+                if star_all.is_none() && holds(f, true, false) {
+                    star_all = Some(k);
+                }
+                if hierarchical && star_given.is_none() && holds(f, false, true) {
+                    star_given = Some(k);
+                }
+            }
+        });
+        let counts = &reading.counts;
+        writeln!(
+            listing,
+            "== {name} on {terrain}, seed {seed}: observation, request, station, value, #S, ratio #S_(k-1)/#S_k, its bits (2^-8 cells), the code log2(|K|/#S) (2^-8 cells)"
+        )
+        .unwrap();
+        writeln!(listing, "0 - - - {} - - [0/256, 0/256]", counts[0]).unwrap();
+        let mut constant_ratio = Rat::one();
+        let mut nonconstant_ratio = Rat::one();
+        for k in 1..counts.len() {
+            let request = (k - 1) / stations;
+            let station = (k - 1) % stations;
+            let ratio = count_ratio(&counts[k - 1], &counts[k]);
+            if constant.contains(&request) {
+                constant_ratio *= &ratio;
+            } else {
+                nonconstant_ratio *= &ratio;
+            }
+            let code = count_ratio(&size, &counts[k]);
+            writeln!(
+                listing,
+                "{k} {request} {station} {} {} {} {} {}",
+                pairs[request].1[station],
+                counts[k],
+                ratio,
+                cell(&bits(&ratio), 1 << 8),
+                cell(&bits(&code), 1 << 8)
+            )
+            .unwrap();
+        }
+        let end = counts.last().expect("a count");
+        println!(
+            "  {name}: |K| = {size}; after the passage #S = {end}, the code log2(|K|/#S) ∈ {} bits; the alphabet's lower bound clog4 10240 = 7 observations",
+            cell(&bits(&count_ratio(&size, end)), 1 << 8)
+        );
+        // The head of the ideal listener's curve (every observation in the receipts).
+        let head = star
+            .unwrap_or(0)
+            .max(last_change.min(4 * stations))
+            .min(counts.len() - 1);
+        let curve: Vec<String> = (1..=head)
+            .map(|k| format!("{k}:{}", count_ratio(&counts[k - 1], &counts[k])))
+            .collect();
+        println!(
+            "  {name}: the curve's head, observation:ratio #S_(k-1)/#S_k, through observation {head}: {}",
+            curve.join(" ")
+        );
+        println!(
+            "  {name}: #S at the request boundaries 0 to 8: {}",
+            (0..=8usize.min(count))
+                .map(|r| counts[r * stations].to_string())
+                .collect::<Vec<_>>()
+                .join(" ")
+        );
+        match (star, &star_family) {
+            (Some(k), Some(f)) => println!(
+                "  {name}: n*_terrain (every nonconstant validation request's continuation unique) at {}; #S = {}; the code ∈ {} bits; survivors: {}; unobserved arguments: {}",
+                both_units(k, stations),
+                counts[k],
+                cell(&bits(&count_ratio(&size, &counts[k])), 1 << 8),
+                f.certificate(generating_key(terrain)),
+                f.unobserved()
+            ),
+            _ => println!(
+                "  {name}: n*_terrain not reached in the passage's {}: the stopping object does not hold",
+                both_units(counts.len() - 1, stations)
+            ),
+        }
+        match star_all {
+            Some(k) => println!(
+                "  {name}: with the constant validation requests included, the stopping object at {}",
+                both_units(k, stations)
+            ),
+            None => println!(
+                "  {name}: with the constant validation requests included, not reached"
+            ),
+        }
+        if hierarchical {
+            match star_given {
+                Some(k) => println!(
+                    "  {name}: given each validation request's own first station (its translation's reading), stations 1 to 7 unique at {}",
+                    both_units(k, stations)
+                ),
+                None => println!(
+                    "  {name}: given each validation request's own first station, not unique in the passage"
+                ),
+            }
+        }
+        println!(
+            "  {name}: the syntactic class: the survivors last changed at {}; {end} survivors at the passage's end ({}); alive lags {:?}; survivors: {}; unobserved arguments: {}",
+            both_units(last_change, stations),
+            if *end == BigUint::from(1u32) { "one key" } else { "not one key" },
+            reading.family.alive(),
+            reading.family.certificate(generating_key(terrain)),
+            reading.family.unobserved()
+        );
+        let final_distinct: Vec<usize> = validation
+            .iter()
+            .map(|v| reading.family.continuations(&v.0, stations, 1 << 12, None).len())
+            .collect();
+        let unique_nonconstant = validation
+            .iter()
+            .zip(&final_distinct)
+            .filter(|(v, n)| !constant_request(&v.0) && **n == 1)
+            .count();
+        let unique_constant = validation
+            .iter()
+            .zip(&final_distinct)
+            .filter(|(v, n)| constant_request(&v.0) && **n == 1)
+            .count();
+        println!(
+            "  {name}: at the passage's end, validation requests with one admitted continuation: nonconstant {unique_nonconstant} of {}, constant {unique_constant} of {validation_constant}; distinct continuations per validation request (at most 4096 counted) {final_distinct:?}",
+            validation_count - validation_constant
+        );
+        println!(
+            "  {name}: the bits the constant training requests' observations carry: log2({constant_ratio}) ∈ {}; the nonconstant requests': log2({nonconstant_ratio}) ∈ {}",
+            cell(&bits(&constant_ratio), 1 << 8),
+            cell(&bits(&nonconstant_ratio), 1 << 8)
+        );
+        let per_batch = batch_information(counts, batch * stations);
+        println!(
+            "  {name}: each move's batch (8 requests, 64 observations), the ideal listener's ratio and bits: {}",
+            per_batch
+                .iter()
+                .enumerate()
+                .map(|(m, (ratio, b))| format!("move {m}: {ratio}, {}", cell(b, 1 << 8)))
+                .collect::<Vec<_>>()
+                .join("; ")
+        );
+    }
+    #[allow(clippy::disallowed_methods)]
+    std::fs::write(out, listing).expect("write the curve");
+    println!(
+        "executed counts: {} ms; resident {}",
         clock.elapsed().as_millis(),
         resident()
     );
