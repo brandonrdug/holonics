@@ -1,0 +1,12 @@
+step 0: rho 1.0000; held-out release: released 0, whole 0, stations 0, first lock at 0/1 0, first lock right 0, consistent 0; teacher-forced 234/1024; |E| max 0.500; 2 s
+step 50: rho 0.8159; held-out release: released 128, whole 0, stations 362, first lock at 0/1 69, first lock right 60, consistent 0; teacher-forced 324/1024; |E| max 1.303; 117 s
+step 100: rho 0.6748; held-out release: released 128, whole 36, stations 683, first lock at 0/1 5, first lock right 121, consistent 102; teacher-forced 716/1024; |E| max 1.703; 257 s
+step 150: rho 0.5839; held-out release: released 128, whole 47, stations 714, first lock at 0/1 0, first lock right 128, consistent 92; teacher-forced 990/1024; |E| max 2.228; 395 s
+step 200: rho 0.5764; held-out release: released 128, whole 41, stations 739, first lock at 0/1 0, first lock right 128, consistent 67; teacher-forced 1002/1024; |E| max 2.439; 532 s
+step 250: rho 0.5596; held-out release: released 128, whole 59, stations 829, first lock at 0/1 0, first lock right 128, consistent 72; teacher-forced 1019/1024; |E| max 2.499; 672 s
+step 300: rho 0.5329; held-out release: released 128, whole 60, stations 819, first lock at 0/1 0, first lock right 128, consistent 72; teacher-forced 1009/1024; |E| max 2.568; 811 s
+step 350: rho 0.5266; held-out release: released 128, whole 95, stations 919, first lock at 0/1 0, first lock right 128, consistent 103; teacher-forced 1007/1024; |E| max 2.589; 948 s
+step 400: rho 0.5248; held-out release: released 128, whole 96, stations 917, first lock at 0/1 0, first lock right 128, consistent 106; teacher-forced 1007/1024; |E| max 2.591; 1086 s
+rho final 0.5247994666158896
+eO_fit ['order2', '400', '256', '101', '0.03', '0.05', '1', '16']: 1086 s, peak 189997056 bytes
+exit 0 wall 1086233 ms; sampled peak resident 191139840 bytes

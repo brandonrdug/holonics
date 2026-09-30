@@ -1,0 +1,11 @@
+executed train: arm executed-open on line at seed 2026093015: 8 moves of 8 requests; the declared opening; the bank p = 5/8, grain 2^(-16)
+  move 0: adopted at step 1/4 (trial 1 of the ladder); value [338346/4096, 338350/4096) → [109173/4096, 109181/4096); E's largest entry 1739571/2097152; transport modulus 1 → 1; batch released 0, whole 0, stations right 0; 34238 ms
+  move 1: adopted at step 1/512 (trial 1 of the ladder); value [65414/4096, 65421/4096) → [53377/4096, 53386/4096); E's largest entry 1739671/2097152; transport modulus 1 → 1; batch released 4, whole 2, stations right 20; 72739 ms
+  move 2: adopted at step 1/512 (trial 1 of the ladder); value [96011/4096, 96023/4096) → [74560/4096, 74570/4096); E's largest entry 1740003/2097152; transport modulus 1 → 1; batch released 1, whole 0, stations right 2; 73438 ms
+  move 3: adopted at step 1/512 (trial 2 of the ladder); value [123451/4096, 123462/4096) → [104518/4096, 104530/4096); E's largest entry 435303/524288; transport modulus 1 → 2016281/2097152; batch released 2, whole 0, stations right 2; 74507 ms
+  move 4: adopted at step 1/512 (trial 4 of the ladder); value [123114/4096, 123123/4096) → [114426/4096, 114435/4096); E's largest entry 217769/262144; transport modulus 2016281/2097152 → 1005927/1048576; batch released 4, whole 1, stations right 15; 187946 ms
+  move 5: adopted at step 1/512 (trial 5 of the ladder); value [130420/4096, 130428/4096) → [123507/4096, 123515/4096); E's largest entry 872371/1048576; transport modulus 1005927/1048576 → 2008205/2097152; batch released 2, whole 0, stations right 6; 212683 ms
+  move 6: adopted at step 1/2048 (trial 4 of the ladder); value [97525/4096, 97536/4096) → [95025/4096, 95036/4096); E's largest entry 1744779/2097152; transport modulus 2008205/2097152 → 2005793/2097152; batch released 4, whole 1, stations right 16; 194176 ms
+  move 7: adopted at step 1/1024 (trial 4 of the ladder); value [76539/4096, 76553/4096) → [75365/4096, 75378/4096); E's largest entry 218121/262144; transport modulus 2005793/2097152 → 2002021/2097152; batch released 5, whole 0, stations right 14; 201322 ms
+executed train: arm executed-open: 8 moves adopted, 0 refused, 6805 readings at E; complete; 1051127 ms; resident 220688384 now, 223567872 peak
+exit 0 wall 1051440 ms; sampled peak resident 223567872 bytes

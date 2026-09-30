@@ -1,0 +1,11 @@
+executed train: arm executed-open on alternation at seed 2026093013: 8 moves of 8 requests; the declared opening; the bank p = 5/8, grain 2^(-16)
+  move 0: adopted at step 1/8 (trial 1 of the ladder); value [340232/4096, 340235/4096) → [227119/4096, 227127/4096); E's largest entry 374185/524288; transport modulus 1 → 1; batch released 0, whole 0, stations right 0; 33390 ms
+  move 1: adopted at step 1/16 (trial 2 of the ladder); value [241423/4096, 241434/4096) → [237687/4096, 237698/4096); E's largest entry 379765/524288; transport modulus 1 → 1; batch released 2, whole 0, stations right 5; 99616 ms
+  move 2: adopted at step 1/64 (trial 1 of the ladder); value [114262/4096, 114281/4096) → [82547/4096, 82563/4096); E's largest entry 1540583/2097152; transport modulus 1 → 1; batch released 7, whole 1, stations right 20; 80069 ms
+  move 3: adopted at step 1/4 (trial 4 of the ladder); value [207415/4096, 207426/4096) → [204174/4096, 204183/4096); E's largest entry 1542089/2097152; transport modulus 1 → 1; batch released 4, whole 1, stations right 16; 164513 ms
+  move 4: adopted at step 1/4 (trial 3 of the ladder); value [171958/4096, 171970/4096) → [160760/4096, 160772/4096); E's largest entry 1559087/2097152; transport modulus 1 → 1; batch released 5, whole 1, stations right 20; 105644 ms
+  move 5: adopted at step 4 (trial 1 of the ladder); value [343785/4096, 343791/4096) → [241906/4096, 241914/4096); E's largest entry 1970687/2097152; transport modulus 1 → 1; batch released 1, whole 0, stations right 4; 64353 ms
+  move 6: adopted at step 1/64 (trial 1 of the ladder); value [278835/4096, 278846/4096) → [236505/4096, 236516/4096); E's largest entry 1984321/2097152; transport modulus 1 → 1; batch released 3, whole 0, stations right 0; 69370 ms
+  move 7: adopted at step 1/4 (trial 1 of the ladder); value [210458/4096, 210468/4096) → [205336/4096, 205347/4096); E's largest entry 556799/524288; transport modulus 1 → 1; batch released 4, whole 1, stations right 13; 71923 ms
+executed train: arm executed-open: 8 moves adopted, 0 refused, 6340 readings at E; complete; 688954 ms; resident 218984448 now, 224559104 peak
+exit 0 wall 689183 ms; sampled peak resident 227450880 bytes

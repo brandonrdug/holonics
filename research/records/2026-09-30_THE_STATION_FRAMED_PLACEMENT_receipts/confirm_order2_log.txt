@@ -1,0 +1,4 @@
+  opening: released 0, held 128, refused 0, refused certificates 0; whole sections 0 of 128; incorrect releases 0; reaching the termination 35; stations right 239 by station [36, 27, 32, 21, 28, 28, 27, 40]; first lock at a request-reading station (0 or 1) 0, first lock right 0
+  executed-open: released 128, held 0, refused 0, refused certificates 0; whole sections 0 of 128; incorrect releases 128; reaching the termination 0; stations right 240 by station [21, 32, 31, 47, 23, 34, 30, 22]; first lock at a request-reading station (0 or 1) 17, first lock right 30
+executed evaluate: 481647 ms; resident 115535872 now, 115535872 peak
+exit 0 wall 482551 ms; sampled peak resident 115499008 bytes

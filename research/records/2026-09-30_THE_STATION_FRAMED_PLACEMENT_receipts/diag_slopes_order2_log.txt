@@ -1,0 +1,9 @@
+executed train: arm executed-open on order2 at seed 41: 3 moves of 8 requests; the declared opening; the bank p = 5/8, grain 2^(-16)
+  move 0: adopted at step 1/16 (trial 1 of the ladder); value [353558/4096, 353561/4096) → [289082/4096, 289086/4096); E's largest entry 739461/1048576; transport modulus 1 → 1; batch released 0, whole 0, stations right 0; 5047 ms
+    move 0; the port's first-order slope [-2873630/4096, -2873629/4096); the modulus's slope γ_ρ [-645906/4096, -645905/4096)
+  move 1: adopted at step 1/4 (trial 1 of the ladder); value [308359/4096, 308363/4096) → [189922/4096, 189926/4096); E's largest entry 998231/1048576; transport modulus 1 → 1; batch released 0, whole 0, stations right 0; 5869 ms
+    move 1; the port's first-order slope [-653220/4096, -653219/4096); the modulus's slope γ_ρ [-959949/4096, -959948/4096)
+  move 2: adopted at step 1/16 (trial 2 of the ladder); value [215035/4096, 215038/4096) → [197526/4096, 197533/4096); E's largest entry 1996077/2097152; transport modulus 1 → 1; batch released 0, whole 0, stations right 0; 62804 ms
+    move 2; the port's first-order slope [-1462480/4096, -1462479/4096); the modulus's slope γ_ρ [-6738/4096, -6737/4096)
+executed train: arm executed-open: 3 moves adopted, 0 refused, 960 readings at E; complete; 73770 ms; resident 176062464 now, 176062464 peak
+exit 0 wall 74259 ms; sampled peak resident 175996928 bytes

@@ -1,0 +1,3 @@
+requests 128: released 128, held 0, refused 0; whole 96; stations right 917 by station [113, 126, 103, 126, 99, 126, 99, 125]; first lock at station 0 or 1 0, first lock right 128; first-lock stations {3: 46, 4: 17, 5: 61, 7: 4}; consistent 106; native-float agreement 1024 of 1024; teacher-forced tops right 1007; members certified 4096 of 4096, ticks closed 245760 of 245760; candidates read 23040, past the signed form 0
+even stations (rule: seed x_38): {'both': 120, 'x_38': 294, 'neither': 43, 'x_39': 55}
+odd stations (rule: seed x_39): {'both': 148, 'x_39': 355, 'neither': 9}

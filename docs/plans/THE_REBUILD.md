@@ -505,6 +505,36 @@ named, and the program's loop stays its own counter, disclosed as such.
 
 #### U6. The text chart
 
+- **The station-framed placement, September 30: the refit reads both chains, and the certified move
+  keeps the modulus at one**
+  ([pin](../../research/records/2026-09-30_THE_STATION_FRAMED_PLACEMENT_PINNED_BEFORE_ITS_RUNS.md),
+  `b4c133f0`; [receipt](../../research/records/2026-09-30_THE_STATION_FRAMED_PLACEMENT_MEASURED_THE_REFIT_READS_BOTH_CHAINS_AND_THE_CERTIFIED_MOVE_KEEPS_THE_MODULUS_AT_ONE.md);
+  Refs #73 #148 #63).
+  - *Built* (`fb871bb5`, the re-entry diagnosis's repair in its owner): a candidate at station `j`
+    reads the span as a joint field, each datum at `ρ^|τ_j − τ_k|` over the span's mass read from
+    `j` (`hnn::prediction::BankPlacement`, `bank_release`); the executed comparison's returns, modulus
+    slope, storage moves and pairing read from each contribution's station, their form unchanged; the
+    readout's one anchor refused below modulus one where a lock follows an open station
+    (`Refinement::anchor_frames`); Lean `HNN/IndexedOpen` §5 (9 theorems: mass, positivity, the one-way
+    law on older data, the bound `ρ^r` on either side, the one-way law's `ρ^(−r)`, symmetry,
+    translation, lossless).
+  - *Measured*: the probe's on-policy refit under the new law, read natively on Stage 0's 128
+    held-out requests, releases 96 whole sections (against 17 and the passage law's 9), every first
+    lock right, both chains read (414 and 503 of 512 decisions), native and float equal at every
+    station; the frozen passage-law fit alone 11; the re-entry re-read: the far lock's quench is gone
+    (no open target below one at the first insertion under the denominator alone, against 78 of 112),
+    the first losses sit at the other chain one and three ticks away, the refit whole on 11 of 16
+    development requests; the order-2 confirmation fails (16 certified moves from the opening, `F`
+    falling on every fresh batch, 0 whole sections of 128 against the opening's 0), the alternation
+    12 → 19 and the line 9 → 15 whole.
+  - *What stays open*, by its measurement: on order-2 the certified move keeps the transport
+    modulus at one in every move (its slope `γ_ρ` negative on every opening move read: the release's
+    comparison asks `ρ` upward, past the passive bound), where the station-framed law is the one
+    population and no reading marks the frontier; the float fit's comparison takes `ρ` below `7/10`
+    and reads the rule. The next loop's subject, in `hnn::executed`'s modulus move. In #62: the framed
+    derivative, the stationary two-sided kernel, the phases' distances, the readout's framed form, the
+    modulus's move at the passive bound.
+
 - **The re-entry diagnosed, September 30** ([record](../../research/records/2026-09-30_THE_RE_ENTRY_DIAGNOSED_A_LATER_LOCK_TAKES_THE_SPANS_MASS_AND_QUENCHES_THE_EARLIER_STATIONS.md);
   Refs #73 #63): on the frozen fit, a later lock read at an earlier station weighs `ρ^(−Δ)` times its
   candidate and its mass quenches the bank (the denominator alone reproduces 28 of 35 first losses in

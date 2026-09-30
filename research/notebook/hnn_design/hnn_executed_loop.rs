@@ -236,6 +236,8 @@ const STAGE_TWO_MASK_SEED: u64 = 2_026_093_004;
 /// [`STAGE_TWO_MASK_SEED`]). Every arm starts from the declared opening, reads the same requests in
 /// the same batches, and moves by the one certified step's ladder; the moves are the work bound,
 /// the deadline a guard (reaching it is reported incomplete). The trained `E` is written to `out`.
+/// Each move also prints the port's first-order slope and the modulus's slope `γ_ρ` (added after
+/// the station-framed placement's pinned runs, to read why the modulus stays at one).
 #[allow(clippy::too_many_arguments)]
 pub(super) fn train(
     arm: &str,
@@ -293,6 +295,17 @@ pub(super) fn train(
         }
         .expect("the move");
         readings += moved.before.readings;
+        // The two slopes the move reads (a diagnostic added after the station-framed placement's
+        // pinned runs): the port's unit move's first order, and the modulus's `γ_ρ` (its sign
+        // decides whether the modulus may leave one: none upward from `ρ = 1`).
+        let slopes = format!(
+            "; the port's first-order slope {}; the modulus's slope γ_ρ {}",
+            moved.slope.as_ref().map_or_else(|| "none".to_string(), |s| cell(s, 1 << 12)),
+            moved
+                .modulus_slope
+                .as_ref()
+                .map_or_else(|| "none".to_string(), |g| cell(&ExactInterval::point(g.clone()), 1 << 12))
+        );
         let sections = if contexts == "open" {
             let targets: Vec<Vec<usize>> = chunk.iter().map(|r| r.targets.clone()).collect();
             let (whole, right, released) = moved.before.sections(&targets);
@@ -315,6 +328,7 @@ pub(super) fn train(
                     successor.transport(engine.refinement.ring()),
                     started.elapsed().as_millis()
                 );
+                println!("    move {index}{slopes}");
                 theta = successor.clone();
                 // The adopted constitution written at every move, so a run stopped by its process
                 // guard leaves its last certified successor (a checkpoint, not a law).
@@ -330,6 +344,7 @@ pub(super) fn train(
                     cell(&moved.before.value, 1 << 12),
                     started.elapsed().as_millis()
                 );
+                println!("    move {index}{slopes}");
             }
         }
     }

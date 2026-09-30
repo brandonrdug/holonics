@@ -1,0 +1,4 @@
+clock targets past one at insertion k (full / denominator alone / open stations): 1: 112/112/112 2: 96/96/96 3: 80/80/80 4: 64/64/64 5: 48/48/48 6: 32/32/32 7: 16/16/16
+gap targets past one at insertion k (full / denominator alone / open stations): 1: 112/112/112 2: 96/96/96 3: 80/80/80 4: 64/64/64 5: 48/46/48 6: 32/29/32 7: 16/13/16
+clock first lost comparisons (full) by distance to the nearest placed lock: {1: 1, 3: 4, 7: 3} ; of these, lost also by the denominator alone at that insertion: {}
+gap first lost comparisons (full) by distance to the nearest placed lock: {1: 19, 3: 7} ; of these, lost also by the denominator alone at that insertion: {1: 15, 3: 5}
