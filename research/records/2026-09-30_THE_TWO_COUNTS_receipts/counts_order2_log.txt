@@ -1,0 +1,12 @@
+executed counts: order2, the training passage at seed 2026093031 (128 requests, 1024 observations), validation at seed 2026093032 (64 requests); the family: lag in [1, 40], a map of Z/4
+  constant requests: training 0 of 128 (requests []), validation 0 of 64; distinct requests: training 128, validation 64; validation requests whose 40 cells equal a training request's: 0 of 64
+  the global family: |K| = 10240; after the passage #S = 1, the code log2(|K|/#S) ∈ [3410/256, 3411/256) bits; the alphabet's lower bound clog4 10240 = 7 observations
+  the global family: the curve's head, observation:ratio #S_(k-1)/#S_k, through observation 7: 1:4 2:160/29 3:29/3 4:12 5:2 6:1 7:2
+  the global family: #S at the request boundaries 0 to 8: 10240 1 1 1 1 1 1 1 1
+  the global family: n*_terrain (every nonconstant validation request's continuation unique) at 7 observations (0 requests plus 7 stations); #S = 1; the code ∈ [3410/256, 3411/256) bits; survivors: ℓ 2 f [1 2 3 0]; unobserved arguments: 
+  the global family: with the constant validation requests included, the stopping object at 7 observations (0 requests plus 7 stations)
+  the global family: the syntactic class: the survivors last changed at 7 observations (0 requests plus 7 stations); 1 survivors at the passage's end (one key); alive lags [2]; survivors: ℓ 2 f [1 2 3 0]; unobserved arguments: 
+  the global family: at the passage's end, validation requests with one admitted continuation: nonconstant 64 of 64, constant 0 of 0; distinct continuations per validation request (at most 4096 counted) [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
+  the global family: the bits the constant training requests' observations carry: log2(1) ∈ [0/256, 1/256); the nonconstant requests': log2(10240) ∈ [3410/256, 3411/256)
+  the global family: each move's batch (8 requests, 64 observations), the ideal listener's ratio and bits: move 0: 10240, [3410/256, 3411/256); move 1: 1, [0/256, 1/256); move 2: 1, [0/256, 1/256); move 3: 1, [0/256, 1/256); move 4: 1, [0/256, 1/256); move 5: 1, [0/256, 1/256); move 6: 1, [0/256, 1/256); move 7: 1, [0/256, 1/256); move 8: 1, [0/256, 1/256); move 9: 1, [0/256, 1/256); move 10: 1, [0/256, 1/256); move 11: 1, [0/256, 1/256); move 12: 1, [0/256, 1/256); move 13: 1, [0/256, 1/256); move 14: 1, [0/256, 1/256); move 15: 1, [0/256, 1/256)
+executed counts: 2950 ms; resident 4775936 now, 4775936 peak
