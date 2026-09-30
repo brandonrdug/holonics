@@ -315,6 +315,66 @@ theorem predicates_release_the_section {σ κ : Type*} (open_ locked : Finset σ
     (top target : σ → κ) (hsub : locked ⊆ open_) (hclass : ∀ j ∈ open_, top j = target j) :
     ∀ j ∈ locked, top j = target j := fun j hj => hclass j (hsub hj)
 
+/-! ## 6. The modulus's least-squares step
+
+[definition; agent-inferred, September 30] (`holonics::hnn::executed::executed_move`, the
+modulus's record.) The port's normal law fits its storage moves `ΔE f` to the proposal's descent
+covectors in least squares; the transport modulus has one feature, each contribution's storage
+derivative `v_c = ∂z_c/∂ρ`, and its unit move is that fit: with the signed covectors `g_c`
+(`sign_c ĝ_c`), `G = Σ ‖v_c‖²` and `γ = Σ ⟪g_c, v_c⟫`, the step `−γ/G` minimizes
+`Σ ‖x v_c + g_c‖²` over every `x` (`modulus_least_squares`), and its first-order share `γ · (−γ/G)`
+is `−γ²/G ≤ 0` (`modulus_least_squares_descends`): the move is proportional to the slope, never
+inverse to it. -/
+
+section LeastSquares
+
+variable {V : Type*} [NormedAddCommGroup V] [InnerProductSpace ℝ V] {κ : Type*}
+
+/-- The sum of squares along a ray, expanded: `Σ ‖x v + g‖² = x² G + 2 x γ + Σ ‖g‖²`. -/
+theorem ray_sum_sq (K : Finset κ) (v g : κ → V) (x : ℝ) :
+    ∑ c ∈ K, ‖x • v c + g c‖ ^ 2 =
+      x ^ 2 * ∑ c ∈ K, ‖v c‖ ^ 2 + 2 * x * ∑ c ∈ K, inner ℝ (g c) (v c) +
+        ∑ c ∈ K, ‖g c‖ ^ 2 := by
+  have h : ∀ c ∈ K, ‖x • v c + g c‖ ^ 2 =
+      x ^ 2 * ‖v c‖ ^ 2 + 2 * x * inner ℝ (g c) (v c) + ‖g c‖ ^ 2 := by
+    intro c _
+    rw [norm_add_sq_real, norm_smul, real_inner_smul_left, real_inner_comm, mul_pow,
+      Real.norm_eq_abs, sq_abs]
+    ring
+  rw [Finset.sum_congr rfl h, Finset.sum_add_distrib, Finset.sum_add_distrib, ← Finset.mul_sum,
+    ← Finset.mul_sum]
+
+/-- [proved-derived; formal-checked] **The modulus's least-squares step**: `−γ/G` minimizes the
+fit of the storage moves to the descent covectors over every step. -/
+theorem modulus_least_squares (K : Finset κ) (v g : κ → V) (hG : 0 < ∑ c ∈ K, ‖v c‖ ^ 2)
+    (x : ℝ) :
+    ∑ c ∈ K, ‖(-(∑ c ∈ K, inner ℝ (g c) (v c)) / ∑ c ∈ K, ‖v c‖ ^ 2) • v c + g c‖ ^ 2 ≤
+      ∑ c ∈ K, ‖x • v c + g c‖ ^ 2 := by
+  rw [ray_sum_sq, ray_sum_sq]
+  set G := ∑ c ∈ K, ‖v c‖ ^ 2
+  set γ := ∑ c ∈ K, inner ℝ (g c) (v c)
+  have hsq : 0 ≤ G * (x + γ / G) ^ 2 := mul_nonneg hG.le (sq_nonneg _)
+  have hG0 : G ≠ 0 := hG.ne'
+  have key : G * (x + γ / G) ^ 2 = x ^ 2 * G + 2 * x * γ + γ ^ 2 / G := by
+    field_simp
+    ring
+  have lhs : (-γ / G) ^ 2 * G + 2 * (-γ / G) * γ = -(γ ^ 2 / G) := by
+    field_simp
+    ring
+  nlinarith [hsq, key, lhs]
+
+/-- [proved-derived; formal-checked] **The least-squares step descends to first order**: its share
+of the joint first order is `γ · (−γ/G) = −γ²/G ≤ 0`, zero only where `γ = 0`. -/
+theorem modulus_least_squares_descends {γ G : ℝ} (hG : 0 < G) :
+    γ * (-γ / G) = -(γ ^ 2 / G) ∧ γ * (-γ / G) ≤ 0 := by
+  constructor
+  · ring
+  · have : γ * (-γ / G) = -(γ ^ 2 / G) := by ring
+    rw [this, neg_nonpos]
+    exact div_nonneg (sq_nonneg γ) hG.le
+
+end LeastSquares
+
 section Audit
 
 #print axioms passage_coeff_zero
@@ -328,6 +388,9 @@ section Audit
 #print axioms sum_max_descends
 #print axioms disjoint_enclosures_decrease
 #print axioms predicates_release_the_section
+#print axioms ray_sum_sq
+#print axioms modulus_least_squares
+#print axioms modulus_least_squares_descends
 
 end Audit
 

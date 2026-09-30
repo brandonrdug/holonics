@@ -995,6 +995,48 @@ fn the_bank_placement_under_a_dissipative_transport() {
     ));
 }
 
+/// **The transport is founded off the lossless boundary** (`Constitution::founding_transport`;
+/// Lean `HNN/IndexedOpen.{IsFounding, founded_modulus_pow_le, founded_modulus_greatest,
+/// founded_modulus_lt_one, order_founding}`): the founding modulus is the greatest on the source
+/// port's lattice whose one-turn transport is at most one unit of the weights' chart,
+/// `ρ₀^d ≤ 2^(−L_ν) < (ρ₀ + 2^(−L_s))^d`, strictly between zero and one; the order-2 declaration
+/// (`d = 60`, `L_ν = L_s = 21`) founds at `102837/131072`; on the joint field's ring of period 6 the
+/// founded constitution carries it, and a ring with no source port refuses it.
+#[test]
+fn the_transport_is_founded_off_the_lossless_boundary() {
+    use crate::hnn::HnnError;
+    use crate::hnn::constitution::{Locus, founding_modulus};
+    use crate::hnn::moment::PopulationChart;
+    let check = |lattice: u32, period: u64, chart: u32| -> Rat {
+        let modulus = founding_modulus(lattice, period, chart).unwrap();
+        let unit = Rat::new(BigInt::one(), BigInt::one() << lattice as usize);
+        let grain = Rat::new(BigInt::one(), BigInt::one() << chart as usize);
+        let power = |x: &Rat| (0..period).fold(Rat::one(), |p, _| p * x);
+        assert!(modulus.is_positive() && modulus < Rat::one());
+        assert!((&modulus / &unit).is_integer());
+        assert!(power(&modulus) <= grain);
+        assert!(power(&(&modulus + &unit)) > grain);
+        modulus
+    };
+    assert_eq!(check(21, 60, 21), rat(102837, 131072));
+    assert_eq!(check(21, 35, 21), rat(345901, 524288));
+    assert_eq!(founding_modulus(2, 3, 7), None);
+    let field = joint();
+    let theta = generic(&field, 91);
+    let lattice = theta.lattice(Locus::SourcePort(0)).unwrap().exponent();
+    let chart = PopulationChart::of(&field).exponent();
+    let founded = theta.clone().founded_transport(&field, 0).unwrap();
+    assert_eq!(
+        founded.transport(0),
+        check(lattice, field.ring(0).period(), chart)
+    );
+    assert_eq!(founded.transport(0), theta.founding_transport(&field, 0).unwrap());
+    assert!(matches!(
+        theta.founding_transport(&field, 1),
+        Err(HnnError::MissingSourcePort { ring: 1 })
+    ));
+}
+
 /// **The bank generates by its locks** (`prediction::generate_by_bank`): on the joint field's ring of
 /// period 6, a bank of the members whose period divides the turn (standing and half-turn) reads
 /// every unlocked station's candidates, locks the stations of the largest gap, each lock certified
@@ -1469,6 +1511,27 @@ fn the_committed_move_carries_the_transport_modulus() {
     let Some((successor, _)) = &moved.adopted else {
         panic!("the move on this instance is adopted: {:?}", moved.refusal);
     };
+    // The modulus's unit move is its least-squares step `−γ_ρ/G_ρ` (Lean
+    // `HNN/ExecutedComparison.modulus_least_squares`), proportional to its slope, and its
+    // first-order share `γ_ρΔρ = −γ_ρ²/G_ρ` is negative; the adopted trial carries `ρ + ηΔρ`
+    // on the port's lattice, nearest.
+    {
+        let gamma = moved.modulus_slope.clone().unwrap();
+        let curvature = moved.modulus_curvature.clone().unwrap();
+        let unit = moved.modulus_unit.clone().unwrap();
+        assert!(curvature.is_positive());
+        assert!(!gamma.is_zero());
+        assert_eq!(unit, -&gamma / &curvature);
+        assert!((&gamma * &unit).is_negative());
+        let last = moved.trials.last().unwrap();
+        let lattice = theta
+            .lattice(crate::hnn::constitution::Locus::SourcePort(0))
+            .unwrap()
+            .unit();
+        let target = (rat(3, 4) + &last.step * &unit).max(rat(3, 8)).min(Rat::one());
+        let carried = ((&target / &lattice) + rat(1, 2)).floor() * &lattice;
+        assert_eq!(last.modulus.as_ref(), Some(&carried));
+    }
     {
         let last = moved.trials.last().unwrap();
         assert!(last.refusal.is_none());

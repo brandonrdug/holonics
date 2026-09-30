@@ -45,6 +45,26 @@
 //! modulus one (the leaky count it needs is owed). The retired reading, the section over its own
 //! population `v`, weighed a section datum `n/v` times a request cell.
 //!
+//! [definition; agent-inferred, September 30; the
+//! [modulus's record](../../../../research/records/2026-09-30_THE_MODULUS_FOUNDED_OFF_ONE_PINNED_BEFORE_ITS_RUNS.md)]
+//! **The founding off the lossless boundary** (`Constitution::founding_transport`; Lean
+//! `HNN/IndexedOpen`, "The founding off the lossless boundary"). The modulus one is the passive
+//! set's boundary and the law's degenerate point: no recency is marked (`lossless_term_modulus`),
+//! and a datum a whole turn older weighs what the newer one does (`founded_modulus_alias` at
+//! `ρ = 1`), so the phase record, which carries a datum's age only within one turn, reads the
+//! transport only by not reading it. Founded there, the executed comparison's certified move stays
+//! there: at the opening its slope in `ρ` points outward (every term threshold-led, the target's
+//! growth rising toward the lossless mixture) and, on three of four development batches, turns
+//! inward by `63/64`: a boundary local minimum (the modulus's record, §1). The transport is
+//! founded instead at the
+//! largest modulus `ρ₀` on the source port's lattice whose one-turn transport carries a datum to
+//! one unit of the weights' chart, `ρ₀^d ≤ 2^(−L_ν)`: the least dissipative transport whose
+//! one-turn alias is at most one chart unit, the phase record sufficient at the chart's grain. It
+//! reads the ring's period and the chart's grain, nothing of a terrain; the order-2 declaration
+//! (`d = 60`, `L_ν = 21`) founds at `102837/131072`. The consumers that do not yet read a modulus
+//! below one (the card, the bank's face path, the readout's one anchor, a passage over one turn)
+//! keep the lossless founding and refuse it, typed.
+//!
 //! [definition; agent-inferred, September 30] **Read from a station** (`hnn::prediction`, "A
 //! candidate reads the span from its own station"; Lean `HNN/IndexedOpen.framedWeight`): a
 //! candidate at station `j` weighs each datum by its two-sided transport distance,

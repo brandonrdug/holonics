@@ -508,6 +508,19 @@ use crate::receiver::population::PortPopulation;
 /// The declared constitution budget of campaign 1: `B_Θ = 2^33` exact bits.
 pub const CAMPAIGN_ONE_BUDGET: u64 = 1 << 33;
 
+/// [definition; agent-inferred, September 30] **The founding modulus** on the lattice
+/// `2^(−lattice)ℤ` (Lean `HNN/IndexedOpen.IsFounding`; [`Constitution::founding_transport`]): the
+/// greatest `ρ₀ = k 2^(−lattice)` with `ρ₀^period ≤ 2^(−chart)`, `k` the integer `period`-th root
+/// of `2^(lattice·period − chart)`, read exactly. `None` where the lattice cannot carry it
+/// (`lattice·period < chart`, or `k = 0`).
+pub fn founding_modulus(lattice: u32, period: u64, chart: u32) -> Option<Rat> {
+    let power = (u64::from(lattice) * period).checked_sub(u64::from(chart))?;
+    let root = (num_bigint::BigUint::one() << usize::try_from(power).ok()?)
+        .nth_root(u32::try_from(period).ok()?);
+    let modulus = Rat::new(BigInt::from(root), BigInt::one() << lattice as usize);
+    modulus.is_positive().then_some(modulus)
+}
+
 // -------------------------------------------------------------------------------------------
 // the carrier lattice
 
@@ -3880,6 +3893,45 @@ impl Constitution {
             material.receiving = Some(NormalLaw::with_prior(receiving));
         }
         Ok(self)
+    }
+
+    /// [definition; agent-inferred, September 30; the
+    /// [modulus's record](../../../../research/records/2026-09-30_THE_MODULUS_FOUNDED_OFF_ONE_PINNED_BEFORE_ITS_RUNS.md)]
+    /// **The transport's founding off the lossless boundary** (`hnn::moment`, "The founding off
+    /// the lossless boundary"; Lean `HNN/IndexedOpen.{founded_modulus_alias, founded_modulus_lt_one,
+    /// founded_modulus_greatest}`): the largest modulus `ρ₀` on the source port's lattice
+    /// `2^(−L_s)` whose one-turn transport carries a datum to one unit of the weights' chart,
+    /// `ρ₀^d ≤ 2^(−L_ν)` (`d` the ring's period, `L_ν` the population chart's exponent,
+    /// `PopulationChart::of`): `ρ₀ = ⌊2^((L_s d − L_ν)/d)⌋ 2^(−L_s)`, the integer `d`-th root read
+    /// exactly. The phase record identifies a datum's age only within one turn, so its one-turn
+    /// alias weighs `ρ^d` of it (`framed_weight_ratio`); `ρ₀` is the least dissipative transport
+    /// whose alias is at most one chart unit, the record sufficient at the chart's grain. Refused
+    /// off a source ring, or where the lattice cannot carry a modulus that small (`ρ₀ = 0`).
+    pub fn founding_transport(&self, field: &Field, ring: usize) -> Result<Rat, HnnError> {
+        if self
+            .rings
+            .get(ring)
+            .is_none_or(|material| material.source.is_none())
+        {
+            return Err(HnnError::MissingSourcePort { ring });
+        }
+        let lattice = self.lattice(Locus::SourcePort(ring))?;
+        let period = field.ring(ring).period();
+        let chart = crate::hnn::moment::PopulationChart::of(field).exponent();
+        founding_modulus(lattice.exponent(), period, chart).ok_or(HnnError::Transport {
+            ring,
+            modulus: Rat::zero(),
+        })
+    }
+
+    /// **The constitution with its transport founded off the lossless boundary**
+    /// ([`Constitution::founding_transport`]) on a source ring: the executed comparison's declared
+    /// opening (`hnn::executed`, "The committed move"). The card, the bank's face path, the
+    /// readout's one anchor and a passage over more than one turn do not read a modulus below one
+    /// (each refuses it, typed); they keep the lossless founding until their forms are built.
+    pub fn founded_transport(self, field: &Field, ring: usize) -> Result<Self, HnnError> {
+        let modulus = self.founding_transport(field, ring)?;
+        self.with_transport(ring, modulus)
     }
 
     /// [definition; agent-inferred, September 30] **The source navigator's transport modulus set**

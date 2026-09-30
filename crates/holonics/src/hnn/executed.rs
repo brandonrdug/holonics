@@ -61,12 +61,28 @@
 //! navigator's transport modulus `ρ` (`hnn::moment`, "One passage, its transported weights") moves
 //! with it [agent-inferred, September 30]: its slope `γ_ρ = Σ sign ⟨ĝ, ∂z/∂ρ⟩` over the proposal's
 //! contributions (`BankPlacement::modulus_derivative`, each read from its contribution's station:
-//! `∂w_k/∂ρ = w_k (r_k − r̄)/ρ` with `r_k` the datum's distance from the station), its unit move
-//! `Δρ = slope⁺/γ_ρ` carrying
-//! the same first-order descent as the port's unit move (none upward from `ρ = 1`), carried as
+//! `∂w_k/∂ρ = w_k (r_k − r̄)/ρ` with `r_k` the datum's distance from the station), carried as
 //! `ρ + ηΔρ` held within `[ρ/2, 1]` (passive) on the port's lattice. `η` starts at the first-order
 //! zero of `F` (`F⁻ / (−slope)`, never past it) held below the founding's entry scale, and halves
-//! until the carried move moves no lattice coordinate. Each carried successor is
+//! until the carried move moves no lattice coordinate.
+//!
+//! [definition; agent-inferred, September 30; the
+//! [modulus's record](../../../../research/records/2026-09-30_THE_MODULUS_FOUNDED_OFF_ONE_PINNED_BEFORE_ITS_RUNS.md)]
+//! **The modulus's unit move is its least-squares step**, `Δρ = −γ_ρ / G_ρ` with the storage
+//! curvature `G_ρ = Σ_c |∂z_c/∂ρ|²` over the same contributions: the modulus's storage moves
+//! `(∂z_c/∂ρ)Δρ` fitted in least squares to the descent covectors `−sign_c ĝ_c`, the principle of
+//! the port's normal law (its storage moves `ΔE f` fitted to the same covectors) on the modulus's
+//! one feature (Lean `HNN/ExecutedComparison.modulus_least_squares`); its first-order share is
+//! `γ_ρΔρ = −γ_ρ²/G_ρ ≤ 0`; none upward from `ρ = 1`. It retires the equal-share unit
+//! `Δρ = slope⁺/γ_ρ`, which gave the one scalar the whole port's first-order descent and so moved
+//! it inversely to its own slope: from the founded opening it carried the modulus back to one in two
+//! moves (the second's carried target lay past one, held there only by the passive bound), where
+//! the release holds. The
+//! modulus is founded off the lossless boundary (`Constitution::founding_transport`): at `ρ = 1`
+//! the release's comparison at the opening slopes outward (the target's growth rises toward the
+//! lossless mixture), a boundary local minimum no certified first-order move leaves.
+//!
+//! Each carried successor is
 //! **re-read from the open section** (every context re-run: a changed branch or lock order is read,
 //! never assumed) and adopted only when every commit guard holds on it:
 //! - the entry bound, every entry of `E` at most `2^ENTRY_BOUND = 8` ([`entry_bound`]);
@@ -259,6 +275,8 @@ struct Term {
     top: usize,
     branches: Vec<Branch>,
     leading: Branch,
+    /// The class branch of the largest midpoint (the rival the class comparison reads first).
+    rival: usize,
 }
 
 fn ln_of(growth: &Growth) -> Result<ExactInterval, HnnError> {
@@ -320,6 +338,12 @@ fn station_term(joints: &[&Growth], target: usize) -> Result<Term, HnnError> {
         .max_by(|a, b| (&a.1.lower + &a.1.upper).cmp(&(&b.1.lower + &b.1.upper)))
         .map(|(branch, _)| *branch)
         .expect("a part");
+    let rival = parts
+        .iter()
+        .filter_map(|(branch, part)| branch.map(|x| (x, part)))
+        .max_by(|a, b| (&a.1.lower + &a.1.upper).cmp(&(&b.1.lower + &b.1.upper)))
+        .map(|(x, _)| x)
+        .expect("a rival");
     let target_growth = joints[target];
     let class = if (0..joints.len())
         .filter(|&x| x != target)
@@ -351,6 +375,7 @@ fn station_term(joints: &[&Growth], target: usize) -> Result<Term, HnnError> {
         top,
         branches,
         leading,
+        rival,
     })
 }
 
@@ -624,6 +649,37 @@ struct Contribution {
     cells: Vec<Option<usize>>,
     covector: Vec<ExactInterval>,
     sign: Rat,
+    /// The kind of the branch that leads its term.
+    kind: TermKind,
+}
+
+/// [definition; agent-inferred, September 30] **The kind of a station term's branch** (module
+/// header, "The comparison"): the threshold (the target against the unit, `−ln a_t`) or a class
+/// rival (`ln(a_x/a_t)`). The composition has no order term: the order is read beside `F`.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub enum TermKind {
+    Threshold,
+    Class,
+}
+
+/// [measured-diagnostic; agent-inferred, September 30] **The modulus's slope split by term kind**
+/// (the station-framed placement's record §7: which terms carry `γ_ρ < 0`): over the proposal's
+/// positive or undecided terms,
+/// - the terms led by the threshold and by a class rival, their counts and `Σ (f)_+` by kind;
+/// - `γ_ρ` of the leading contributions, by the leading kind (their sum is `γ_ρ`);
+/// - every term's two parts read alone: the target's `−⟨ĝ_t, ∂z_t/∂ρ⟩` (the threshold branch at
+///   every term) and its class rival's `+⟨ĝ_x, ∂z_x/∂ρ⟩` (the class branch at every term is their
+///   sum), each at the candidate's leading member.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct SlopeSplit {
+    pub threshold_led: usize,
+    pub class_led: usize,
+    pub threshold_value: ExactInterval,
+    pub class_value: ExactInterval,
+    pub led_threshold: Rat,
+    pub led_class: Rat,
+    pub target: Rat,
+    pub rival: Rat,
 }
 
 /// [definition; agent-inferred, September 30] **A term's branches for the first-order
@@ -643,6 +699,11 @@ struct Proposal {
     contributions: Vec<Contribution>,
     terms: Vec<TermBranches>,
     unresolved: Vec<CovectorRefusal>,
+    /// Every term's target part and class rival part read alone (the slope's split).
+    targets: Vec<Contribution>,
+    rivals: Vec<Contribution>,
+    /// The leading kinds' counts and `Σ (f)_+`.
+    led: [(usize, ExactInterval); 2],
 }
 
 fn candidate_cells(refinement: &BankRefinement<TurnCovector>, station: usize, class: usize) -> Vec<Option<usize>> {
@@ -659,6 +720,11 @@ fn propose(
     let mut contributions = Vec::new();
     let mut terms_out = Vec::new();
     let mut unresolved = Vec::new();
+    let (mut targets_alone, mut rivals_alone) = (Vec::new(), Vec::new());
+    let mut led = [
+        (0, ExactInterval::point(Rat::zero())),
+        (0, ExactInterval::point(Rat::zero())),
+    ];
     for (request_index, (contexts, terms)) in read.iter().enumerate() {
         let targets = &requests[request_index].targets;
         for (position, chunk_index, term) in terms {
@@ -670,12 +736,32 @@ fn propose(
             let station = refinement.open[chunk_index * alphabet].0;
             let target = targets[station];
             let one = Rat::one();
+            let kind = match term.leading {
+                None => TermKind::Threshold,
+                Some(_) => TermKind::Class,
+            };
             let contribution = |class: usize, member: &MemberCovector, sign: Rat| Contribution {
                 request: request_index,
                 station,
                 cells: candidate_cells(refinement, station, class),
                 covector: member.storage().expect("a resolved member"),
                 sign,
+                kind,
+            };
+            // The term's two parts read alone (the slope's split): the target's and its class
+            // rival's, each at its leading member.
+            if let (Ok(t), Ok(x)) =
+                (leading_member(&chunk[target]), leading_member(&chunk[term.rival]))
+            {
+                targets_alone.push(contribution(target, t, -one.clone()));
+                rivals_alone.push(contribution(term.rival, x, one.clone()));
+            }
+            let slot = &mut led[usize::from(kind == TermKind::Class)];
+            let part = positive_part(&term.value);
+            slot.0 += 1;
+            slot.1 = ExactInterval {
+                lower: &slot.1.lower + &part.lower,
+                upper: &slot.1.upper + &part.upper,
             };
             // The leading branch's contribution.
             let target_member = leading_member(&chunk[target]);
@@ -732,6 +818,9 @@ fn propose(
         contributions,
         terms: terms_out,
         unresolved,
+        targets: targets_alone,
+        rivals: rivals_alone,
+        led,
     }
 }
 
@@ -843,18 +932,54 @@ fn returns(
     Ok(samples)
 }
 
-/// [definition; agent-inferred, September 30] **The proposal's slope in the transport modulus**
-/// (module header, "The committed move"): `γ_ρ = Σ sign ⟨ĝ, ∂z/∂ρ⟩` over the proposal's
-/// contributions, each leading branch's storage covector at its dyadic face paired with its
-/// storage's exact derivative in `ρ` (`BankPlacement::modulus_derivative`): the proposal's
-/// first-order change of the compared terms per unit of `ρ`.
-fn modulus_slope(
+/// [definition; agent-inferred, September 30] **The modulus's normal reading** (module header,
+/// "The committed move"): the proposal's slope in the transport modulus
+/// `γ_ρ = Σ_c sign_c ⟨ĝ_c, ∂z_c/∂ρ⟩` (each leading branch's storage covector at its dyadic face
+/// paired with its storage's exact derivative, `BankPlacement::modulus_derivative`: the first-order
+/// change of the compared terms per unit of `ρ`) and its storage curvature
+/// `G_ρ = Σ_c |∂z_c/∂ρ|²` over the proposal's contributions, each storage read from its
+/// contribution's station; the least-squares unit move is `−γ_ρ/G_ρ` (Lean
+/// `HNN/ExecutedComparison.modulus_least_squares`).
+fn modulus_normal(
     field: &Field,
     constitution: &Constitution,
     declared: &Refinement,
     requests: &[Request],
     contributions: &[Contribution],
-) -> Result<Rat, HnnError> {
+) -> Result<(Rat, Rat), HnnError> {
+    use rayon::prelude::*;
+    let placements: Vec<BankPlacement> = requests
+        .iter()
+        .map(|r| BankPlacement::of(field, constitution, &r.current, &r.moment, declared))
+        .collect::<Result<_, _>>()?;
+    Ok(contributions
+        .par_iter()
+        .map(|c| {
+            let derivative = placements[c.request].modulus_derivative(c.station, &c.cells);
+            let paired: Rat = c
+                .covector
+                .iter()
+                .map(face)
+                .zip(&derivative)
+                .map(|(g, d)| g * d)
+                .sum();
+            let energy: Rat = derivative.iter().map(|d| d * d).sum();
+            (paired * &c.sign, energy)
+        })
+        .reduce(
+            || (Rat::zero(), Rat::zero()),
+            |(a, b), (c, d)| (a + c, b + d),
+        ))
+}
+
+/// Each contribution's `sign ⟨ĝ, ∂z/∂ρ⟩` ([`modulus_normal`]'s slope, term by term).
+fn modulus_pairings(
+    field: &Field,
+    constitution: &impl ConstitutionRead,
+    declared: &Refinement,
+    requests: &[Request],
+    contributions: &[Contribution],
+) -> Result<Vec<Rat>, HnnError> {
     use rayon::prelude::*;
     let placements: Vec<BankPlacement> = requests
         .iter()
@@ -873,7 +998,91 @@ fn modulus_slope(
                 .sum();
             paired * &c.sign
         })
-        .sum())
+        .collect())
+}
+
+/// [measured-diagnostic; agent-inferred, September 30] **The proposal's modulus slope split by
+/// term kind** ([`SlopeSplit`]).
+fn slope_split(
+    field: &Field,
+    constitution: &impl ConstitutionRead,
+    declared: &Refinement,
+    requests: &[Request],
+    proposal: &Proposal,
+) -> Result<SlopeSplit, HnnError> {
+    let led = modulus_pairings(field, constitution, declared, requests, &proposal.contributions)?;
+    let (mut led_threshold, mut led_class) = (Rat::zero(), Rat::zero());
+    for (c, value) in proposal.contributions.iter().zip(led) {
+        match c.kind {
+            TermKind::Threshold => led_threshold += value,
+            TermKind::Class => led_class += value,
+        }
+    }
+    let sum = |list: &[Contribution]| -> Result<Rat, HnnError> {
+        Ok(modulus_pairings(field, constitution, declared, requests, list)?
+            .into_iter()
+            .sum())
+    };
+    Ok(SlopeSplit {
+        threshold_led: proposal.led[0].0,
+        class_led: proposal.led[1].0,
+        threshold_value: proposal.led[0].1.clone(),
+        class_value: proposal.led[1].1.clone(),
+        led_threshold,
+        led_class,
+        target: sum(&proposal.targets)?,
+        rival: sum(&proposal.rivals)?,
+    })
+}
+
+/// [measured-diagnostic; agent-inferred, September 30] **The modulus's slope split by term kind at
+/// a constitution** ([`SlopeSplit`]; the station-framed placement's record §7), with the batch's
+/// comparison: the requests read with every candidate's covector in their contexts, the proposal
+/// formed as [`executed_move`] forms it, and no move made.
+pub fn modulus_slopes(
+    field: &Field,
+    constitution: &impl ConstitutionRead,
+    requests: &[Request],
+    declared: &Refinement,
+    bank: &ReceivingBank,
+    grain: u32,
+) -> Result<(BatchComparison, SlopeSplit), HnnError> {
+    use rayon::prelude::*;
+    let alphabet = field.alphabet();
+    let read = |amplitudes: &[crate::ratio::GaussianRat]| bank.read_turn_covector(amplitudes, grain);
+    #[allow(clippy::type_complexity)]
+    let joined: Vec<(RequestComparison, (Vec<ContextRead<TurnCovector>>, Vec<(usize, usize, Term)>))> =
+        requests
+            .par_iter()
+            .map(|request| {
+                let (generation, contexts) =
+                    read_contexts(field, constitution, request, declared, bank, grain, &read)?;
+                let (comparison, terms) =
+                    compare_request(request, generation, &contexts, alphabet)?;
+                Ok((comparison, (contexts, terms)))
+            })
+            .collect::<Result<_, HnnError>>()?;
+    let (mut compared, mut read_all) = (Vec::new(), Vec::new());
+    let (mut value, mut readings) = (ExactInterval::point(Rat::zero()), 0);
+    for (comparison, read) in joined {
+        value = ExactInterval {
+            lower: &value.lower + &comparison.value.lower,
+            upper: &value.upper + &comparison.value.upper,
+        };
+        readings += comparison.readings;
+        compared.push(comparison);
+        read_all.push(read);
+    }
+    let proposal = propose(requests, &read_all, alphabet);
+    let split = slope_split(field, constitution, declared, requests, &proposal)?;
+    Ok((
+        BatchComparison {
+            requests: compared,
+            value,
+            readings,
+        },
+        split,
+    ))
 }
 
 /// **The proposal's contributions and returns at `E`** (the owner's pullback test): each
@@ -1070,6 +1279,12 @@ pub struct ExecutedMove {
     pub unresolved_branches: usize,
     pub slope: Option<ExactInterval>,
     pub modulus_slope: Option<Rat>,
+    /// The modulus's storage curvature `G_ρ = Σ_c |∂z_c/∂ρ|²` and its least-squares unit move
+    /// `−γ_ρ/G_ρ` (zero upward at `ρ = 1`), where the modulus was read.
+    pub modulus_curvature: Option<Rat>,
+    pub modulus_unit: Option<Rat>,
+    /// The modulus's slope split by term kind ([`SlopeSplit`]), where the modulus was read.
+    pub split: Option<SlopeSplit>,
     pub trials: Vec<Trial>,
     pub adopted: Option<(Constitution, SourceStep)>,
     pub refusal: Option<MoveRefusal>,
@@ -1323,6 +1538,9 @@ pub fn executed_move(
             .count(),
         slope: None,
         modulus_slope: None,
+        modulus_curvature: None,
+        modulus_unit: None,
+        split: None,
         trials: Vec::new(),
         adopted: None,
         refusal: None,
@@ -1351,27 +1569,31 @@ pub fn executed_move(
         receipt.refusal = Some(MoveRefusal::NoDescent(slope));
         return Ok(receipt);
     }
-    // The transport modulus's unit move: its first-order descent equal to the source port's unit
-    // move's (`Δρ = slope⁺ / γ_ρ`), none where it would leave `(0, 1]` at `ρ = 1`.
-    let gamma = modulus_slope(field, constitution, declared, requests, &proposal.contributions)?;
+    // The transport modulus's unit move (module header, "The committed move"): the least-squares
+    // fit of its storage moves to the proposal's descent covectors, `Δρ = −γ_ρ / Σ_c |∂z_c/∂ρ|²`,
+    // the port's normal-law principle on the modulus's one feature; none where it would leave
+    // `(0, 1]` at `ρ = 1`.
+    let (gamma, curvature) =
+        modulus_normal(field, constitution, declared, requests, &proposal.contributions)?;
     receipt.modulus_slope = Some(gamma.clone());
-    let modulus_unit = if gamma.is_zero() {
+    receipt.modulus_curvature = Some(curvature.clone());
+    receipt.split = Some(slope_split(field, constitution, declared, requests, &proposal)?);
+    let modulus_unit = if gamma.is_zero() || !curvature.is_positive() {
         Rat::zero()
     } else {
-        let unit = &slope.upper / &gamma;
+        let unit = -&gamma / &curvature;
         if unit.is_positive() && constitution.transport(ring).is_one() {
             Rat::zero()
         } else {
             unit
         }
     };
-    let joint = if modulus_unit.is_zero() {
-        slope.clone()
-    } else {
-        ExactInterval {
-            lower: &slope.lower + &slope.upper,
-            upper: &slope.upper + &slope.upper,
-        }
+    receipt.modulus_unit = Some(modulus_unit.clone());
+    // The joint unit move's first order: the port's bound and the modulus's `γ_ρ Δρ = −γ_ρ²/G`.
+    let share = &gamma * &modulus_unit;
+    let joint = ExactInterval {
+        lower: &slope.lower + &share,
+        upper: &slope.upper + &share,
     };
     let first = |_: &ExactRatMatrix, successor: &Constitution| {
         first_order(field, constitution, declared, requests, &proposal, successor).map(|(b, _)| b)
@@ -1558,6 +1780,9 @@ pub fn face_move(
         unresolved_branches: 0,
         slope: None,
         modulus_slope: None,
+        modulus_curvature: None,
+        modulus_unit: None,
+        split: None,
         trials: Vec::new(),
         adopted: None,
         refusal: None,

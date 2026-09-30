@@ -505,6 +505,31 @@ named, and the program's loop stays its own counter, disclosed as such.
 
 #### U6. The text chart
 
+- **The modulus founded off one, September 30: the modulus stays below one, and order-2 training
+  learns the lag-1 copy**
+  ([pin](../../research/records/2026-09-30_THE_MODULUS_FOUNDED_OFF_ONE_PINNED_BEFORE_ITS_RUNS.md),
+  `3f4e3321`; [receipt](../../research/records/2026-09-30_THE_MODULUS_FOUNDED_OFF_ONE_MEASURED_THE_MODULUS_STAYS_BELOW_ONE_AND_ORDER_TWO_TRAINING_LEARNS_THE_LAG_ONE_COPY.md);
+  Refs #73 #148 #63).
+  - *Measured first* (development batches): at the lossless opening every term of the executed
+    comparison is threshold-led and its slope in the modulus points outward (4 of 4 batches),
+    inward by `63/64` (3 of 4): one is a boundary local minimum no certified move leaves; the old
+    equal-share unit, inverse to the modulus's slope, carried a founding below one back to one in
+    two moves.
+  - *Built* (`6dc1e5ae`): the transport founded at the greatest lattice modulus with
+    `ρ₀^d ≤ 2^(−L_ν)` (`102837/131072` for order-2; `Constitution::founding_transport`, Lean
+    `HNN/IndexedOpen` §6), and moved by its least-squares step `−γ_ρ/G_ρ` (`hnn::executed`, Lean
+    `HNN/ExecutedComparison` §6); the receipt splits `γ_ρ` by term kind.
+  - *Measured*: the modulus stays below one on every move of three trainings (order-2 ends at
+    `1750365/2097152`); order-2 confirmation 0 whole of 128 against 0 and 0 (stations 263 of 1,024);
+    the trained constitution continues each station by its lag-1 neighbour (532 of 896 adjacent pairs
+    equal) and favours class 3; the alternation 22 against 6 and 6, all 22 constant requests; the
+    line's confirmation stopped by the orchestrator before its trained constitution was read.
+  - *What stays open*, by its measurement: the unicity record's two counts. Order-2's key family can
+    be pinned in 7 readings and 1,024 rule steps did not lock it. Candidate causes named there: the
+    deposits far below what the comparison hears, and the comparison read past threshold. The next
+    loop's subject is that, not the modulus. In #62: the owner's root, the leaky count at the
+    founding, the modulus's statistic, the founding on the card, face path and readout.
+
 - **Unicity, September 30: step 1's learning loops read two counts**
   ([record](../../research/records/2026-09-30_UNICITY_THE_READINGS_LEAVE_ONE_KEY_AND_THE_HELIXS_CELLS_ARE_THE_FAREY_SEQUENCE.md);
   Lean `Foundation/Unicity`; Refs #73 #63). Brandon's lens ("when can you hear the music?") changes

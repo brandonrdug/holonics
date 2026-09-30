@@ -29,7 +29,8 @@
 
 use super::*;
 use holonics::hnn::executed::{
-    BatchComparison, Context, ExecutedMove, Predicate, Request, executed_move, pairing_receipt,
+    BatchComparison, Context, ExecutedMove, Predicate, Request, SlopeSplit, executed_move,
+    pairing_receipt,
 };
 use holonics::hnn::prediction::BankPlacement;
 use holonics::hnn::ring::{MemberCovector, turn};
@@ -227,6 +228,95 @@ fn read_port(path: &str) -> ExactRatMatrix {
     ExactRatMatrix::new(rows).expect("E")
 }
 
+/// **The modulus's slope split by term kind**, printed (`hnn::executed::SlopeSplit`): the terms led
+/// by the threshold and by a class rival with their `Σ (f)_+`, `γ_ρ` of the leading contributions
+/// by kind, and every term's target part and class rival part read alone (the class branch at every
+/// term is their sum).
+pub(super) fn split_line(split: &SlopeSplit) -> String {
+    let point = |x: &Rat| cell(&ExactInterval::point(x.clone()), 1 << 12);
+    format!(
+        "; split: threshold-led {} terms (Σ (f)_+ {}, γ {}), class-led {} terms (Σ (f)_+ {}, γ {}); every term read alone: the target's part {}, the class rival's part {}, the class branch {}",
+        split.threshold_led,
+        cell(&split.threshold_value, 1 << 12),
+        point(&split.led_threshold),
+        split.class_led,
+        cell(&split.class_value, 1 << 12),
+        point(&split.led_class),
+        point(&split.target),
+        point(&split.rival),
+        point(&(&split.target + &split.rival))
+    )
+}
+
+/// **The modulus's slope at constitutions** (`executed slopes <terrain> <seed> <count> <label=E>…`,
+/// a diagnostic, never a pinned run; `opening` the declared opening, a written port with its `ρ`
+/// otherwise, and `label=E@ρ` read at the modulus `ρ`, `label=@ρ` the opening at `ρ`): the batch compared along the machine's
+/// own trajectory, its whole sections, and `γ_ρ` split by term kind, no move made.
+pub(super) fn slopes(terrain: &str, seed: u64, count: usize, arms: &[String]) {
+    use holonics::hnn::executed::modulus_slopes;
+    let clock = Instant::now();
+    let declared = order_declared(false);
+    let engine = Engine::new(declared);
+    let bank = bank_of(declared.period, &bank_strength());
+    let ring = engine.refinement.ring();
+    let pairs = terrain_pairs(terrain, &declared, seed, count);
+    let requests: Vec<Request> = pairs
+        .iter()
+        .map(|(request, target)| {
+            let (current, moment) = ingest(&engine.field, request);
+            Request {
+                current,
+                moment,
+                targets: target.clone(),
+                context: Context::Open,
+            }
+        })
+        .collect();
+    let targets: Vec<Vec<usize>> = pairs.iter().map(|(_, t)| t.clone()).collect();
+    println!("executed slopes: {count} {terrain} requests at seed {seed}, along the machine's own trajectory");
+    for arm in arms {
+        let started = Instant::now();
+        let (label, path) = arm.split_once('=').unwrap_or((arm.as_str(), ""));
+        let (path, modulus) = match path.split_once('@') {
+            Some((path, modulus)) => (path, Some(modulus.parse::<Rat>().expect("a rational ρ"))),
+            None => (path, None),
+        };
+        let mut theta = match (path.is_empty(), &modulus) {
+            (true, None) => founded_opening(&engine),
+            (true, Some(_)) => engine.theta.clone(),
+            (false, _) => trained(&engine.theta, ring, path),
+        };
+        if let Some(modulus) = modulus {
+            theta = theta.with_transport(ring, modulus).expect("a passive modulus on the lattice");
+        }
+        let (batch, split) =
+            modulus_slopes(&engine.field, &theta, &requests, &engine.refinement, &bank, BANK_GRAIN)
+                .expect("the slopes");
+        let (whole, right, released) = batch.sections(&targets);
+        let gamma = &split.led_threshold + &split.led_class;
+        println!(
+            "  {label} (ρ = {}): F ∈ {}; released {released}, whole {whole}, stations right {right}; γ_ρ {}{}; {} ms",
+            theta.transport(ring),
+            cell(&batch.value, 1 << 12),
+            cell(&ExactInterval::point(gamma), 1 << 12),
+            split_line(&split),
+            started.elapsed().as_millis()
+        );
+    }
+    println!("executed slopes: {} ms; resident {}", clock.elapsed().as_millis(), resident());
+}
+
+/// **The executed comparison's declared opening** (`hnn::executed`, "The committed move"): the
+/// declared constitution with the source ring's transport founded off the lossless boundary
+/// (`Constitution::founded_transport`).
+pub(super) fn founded_opening(engine: &Engine) -> Constitution {
+    engine
+        .theta
+        .clone()
+        .founded_transport(&engine.field, engine.refinement.ring())
+        .expect("the founded transport")
+}
+
 /// The partitions' seed of Stage 2's partition arms (the readout's `mask` law), pinned.
 const STAGE_TWO_MASK_SEED: u64 = 2_026_093_004;
 
@@ -254,7 +344,13 @@ pub(super) fn train(
     let declared = order_declared(false);
     let engine = Engine::new(declared);
     let bank = bank_of(declared.period, &bank_strength());
-    let (comparison, contexts) = arm.split_once('-').expect("an arm: executed|face - open|partition");
+    // An arm may carry its opening's transport modulus (`executed-open@ρ`, a development read).
+    let (arm_name, opening_modulus) = match arm.split_once('@') {
+        Some((name, modulus)) => (name, Some(modulus.parse::<Rat>().expect("a rational ρ"))),
+        None => (arm, None),
+    };
+    let (comparison, contexts) =
+        arm_name.split_once('-').expect("an arm: executed|face - open|partition");
     let pairs = terrain_pairs(terrain, &declared, seed, batch * moves);
     let mut masks = Draw::new(STAGE_TWO_MASK_SEED);
     let requests: Vec<Request> = pairs
@@ -274,11 +370,19 @@ pub(super) fn train(
             }
         })
         .collect();
+    let mut theta = match &opening_modulus {
+        Some(modulus) => engine
+            .theta
+            .clone()
+            .with_transport(engine.refinement.ring(), modulus.clone())
+            .expect("a passive modulus on the lattice"),
+        None => founded_opening(&engine),
+    };
     println!(
-        "executed train: arm {arm} on {terrain} at seed {seed}: {moves} moves of {batch} requests; the declared opening; the bank p = {}, grain 2^(-{BANK_GRAIN})",
+        "executed train: arm {arm} on {terrain} at seed {seed}: {moves} moves of {batch} requests; the declared opening, its transport modulus {}; the bank p = {}, grain 2^(-{BANK_GRAIN})",
+        theta.transport(engine.refinement.ring()),
         bank_strength()
     );
-    let mut theta = engine.theta.clone();
     let (mut adopted, mut refused, mut readings) = (0usize, 0usize, 0usize);
     let mut complete = true;
     for (index, chunk) in requests.chunks(batch).enumerate() {
@@ -299,12 +403,23 @@ pub(super) fn train(
         // pinned runs): the port's unit move's first order, and the modulus's `γ_ρ` (its sign
         // decides whether the modulus may leave one: none upward from `ρ = 1`).
         let slopes = format!(
-            "; the port's first-order slope {}; the modulus's slope γ_ρ {}",
+            "; the port's first-order slope {}; the modulus's slope γ_ρ {}{}",
             moved.slope.as_ref().map_or_else(|| "none".to_string(), |s| cell(s, 1 << 12)),
             moved
                 .modulus_slope
                 .as_ref()
-                .map_or_else(|| "none".to_string(), |g| cell(&ExactInterval::point(g.clone()), 1 << 12))
+                .map_or_else(|| "none".to_string(), |g| cell(&ExactInterval::point(g.clone()), 1 << 12)),
+            moved.split.as_ref().map_or_else(String::new, split_line)
+        ) + &format!(
+            "; the modulus's curvature G_ρ {}, its least-squares unit move {}",
+            moved
+                .modulus_curvature
+                .as_ref()
+                .map_or_else(|| "none".to_string(), |g| cell(&ExactInterval::point(g.clone()), 1 << 12)),
+            moved
+                .modulus_unit
+                .as_ref()
+                .map_or_else(|| "none".to_string(), |u| cell(&ExactInterval::point(u.clone()), 1 << 16))
         );
         let sections = if contexts == "open" {
             let targets: Vec<Vec<usize>> = chunk.iter().map(|r| r.targets.clone()).collect();
@@ -376,10 +491,10 @@ pub(super) fn evaluate(terrain: &str, seed: u64, count: usize, out: &str, arms: 
     let mut listing = String::new();
     for arm in arms {
         let (label, path) = arm.split_once('=').unwrap_or((arm.as_str(), ""));
-        let theta = if path.is_empty() {
-            engine.theta.clone()
-        } else {
-            trained(&engine.theta, ring, path)
+        let theta = match (label, path.is_empty()) {
+            ("lossless", true) => engine.theta.clone(),
+            (_, true) => founded_opening(&engine),
+            (_, false) => trained(&engine.theta, ring, path),
         };
         let generated: Vec<_> = pairs
             .par_iter()
@@ -440,7 +555,8 @@ pub(super) fn evaluate(terrain: &str, seed: u64, count: usize, out: &str, arms: 
             .unwrap();
         }
         println!(
-            "  {label}: released {released}, held {held}, refused {refused}, refused certificates {uncertified}; whole sections {whole} of {count}; incorrect releases {incorrect}; reaching the termination {terminated}; stations right {} by station {by_station:?}; first lock at a request-reading station (0 or 1) {first_request}, first lock right {first_right}",
+            "  {label} (transport modulus {}): released {released}, held {held}, refused {refused}, refused certificates {uncertified}; whole sections {whole} of {count}; incorrect releases {incorrect}; reaching the termination {terminated}; stations right {} by station {by_station:?}; first lock at a request-reading station (0 or 1) {first_request}, first lock right {first_right}",
+            theta.transport(ring),
             by_station.iter().sum::<usize>()
         );
     }

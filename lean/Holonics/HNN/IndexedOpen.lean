@@ -708,6 +708,124 @@ theorem framed_weight_lossless {s : Finset ι} (tick : ι → ℤ) (j : ℤ) {k 
 
 end Framed
 
+/-! ## 6. The founding off the lossless boundary
+
+[definition; agent-inferred, September 30] (`holonics::hnn::constitution::Constitution::
+founding_transport`; the modulus's record,
+`research/records/2026-09-30_THE_MODULUS_FOUNDED_OFF_ONE_PINNED_BEFORE_ITS_RUNS.md`.) The
+modulus one is the passive set's boundary and the law's degenerate point: no recency is marked
+(`lossless_term_modulus`), and a datum a whole turn farther weighs what the nearer does
+(`lossless_alias`), so the phase record, which carries a datum's age only within one turn, reads
+the transport only by not reading it. Founded there, the executed comparison's certified move
+stays there (the record measures its slope at the opening pointing outward). The transport is
+founded at the largest lattice modulus whose one-turn transport carries a datum to one unit of the
+weights' chart.
+
+* **The alias** (`founded_modulus_alias`, `founded_modulus_alias_le`): read from a station, of two
+  data on its older side `d` ticks apart, the farther weighs `ρ^d` times the nearer; with
+  `ρ^d ≤ 2^(−L)` at most `2^(−L)` times it. At `ρ = 1` they weigh alike (`lossless_alias`).
+* **The founding** (`IsFounding`): the numerator `k` on the lattice `2^(−L_s)ℤ` with
+  `k^d 2^L ≤ (2^L_s)^d < (k + 1)^d 2^L`, so `ρ₀ = k 2^(−L_s)` has `ρ₀^d ≤ 2^(−L)`
+  (`founded_modulus_pow_le`), is the greatest such lattice modulus (`founded_modulus_greatest`), lies
+  strictly below one when `L ≥ 1` (`founded_modulus_lt_one`) and above zero when `L ≤ L_s d`
+  (`founded_modulus_pos`).
+* **The order-2 declaration's founding** (`order_founding`): `d = 60`, `L_ν = 21`, `L_s = 21`
+  found at `k = 1645392`, `ρ₀ = 102837/131072`. -/
+
+section Founding
+
+variable {ι : Type*}
+
+/-- [proved-derived; formal-checked] **A datum a whole turn farther weighs the turn's transport
+times the nearer**: read from `j`, of two data on its older side `d` ticks apart, the farther weighs
+`ρ^d` times the nearer. -/
+theorem founded_modulus_alias (s : Finset ι) (tick : ι → ℤ) (ρ : ℚ) {j : ℤ} {a b : ι} (d : ℕ)
+    (hturn : tick b + d = tick a) (ha : tick a ≤ j) :
+    framedWeight s tick ρ j b = ρ ^ d * framedWeight s tick ρ j a := by
+  have h : (j - tick b).natAbs = d + (j - tick a).natAbs := by omega
+  simp only [framedWeight, transportedWeight]
+  rw [h, pow_add, mul_div_assoc]
+
+/-- [proved-derived; formal-checked] **The founding's alias is at most one chart unit**: with
+`ρ^d ≤ 2^(−L)`, a datum a whole turn farther weighs at most `2^(−L)` times the nearer. -/
+theorem founded_modulus_alias_le (s : Finset ι) (tick : ι → ℤ) {ρ : ℚ} (h0 : 0 ≤ ρ) {j : ℤ}
+    {a b : ι} {d L : ℕ} (hturn : tick b + d = tick a) (ha : tick a ≤ j)
+    (hfound : ρ ^ d ≤ (1 / 2 : ℚ) ^ L) :
+    framedWeight s tick ρ j b ≤ (1 / 2 : ℚ) ^ L * framedWeight s tick ρ j a := by
+  rw [founded_modulus_alias s tick ρ d hturn ha]
+  exact mul_le_mul_of_nonneg_right hfound
+    (div_nonneg (pow_nonneg h0 _) (Finset.sum_nonneg fun _ _ => pow_nonneg h0 _))
+
+/-- [proved-derived; formal-checked] **At `ρ = 1` a whole turn farther weighs alike**: the phase
+record's one-turn alias is invisible to the lossless transport only because it reads no age. -/
+theorem lossless_alias (s : Finset ι) (tick : ι → ℤ) {j : ℤ} {a b : ι} (d : ℕ)
+    (hturn : tick b + d = tick a) (ha : tick a ≤ j) :
+    framedWeight s tick 1 j b = framedWeight s tick 1 j a := by
+  rw [founded_modulus_alias s tick 1 d hturn ha, one_pow, one_mul]
+
+/-- [definition] **The founding numerator** on the lattice `2^(−L_s)ℤ`: `k` with
+`k^d 2^L ≤ (2^L_s)^d < (k + 1)^d 2^L`, the greatest lattice modulus `k 2^(−L_s)` whose `d`-th
+power is at most `2^(−L)`. -/
+def IsFounding (Ls d L k : ℕ) : Prop :=
+  k ^ d * 2 ^ L ≤ (2 ^ Ls) ^ d ∧ (2 ^ Ls) ^ d < (k + 1) ^ d * 2 ^ L
+
+/-- [proved-derived; formal-checked] **The founding's one-turn transport is at most one chart
+unit**: `(k 2^(−L_s))^d ≤ 2^(−L)`. -/
+theorem founded_modulus_pow_le {Ls d L k : ℕ} (h : IsFounding Ls d L k) :
+    ((k : ℚ) / 2 ^ Ls) ^ d ≤ (1 / 2 : ℚ) ^ L := by
+  have hcast : ((k ^ d * 2 ^ L : ℕ) : ℚ) ≤ (((2 ^ Ls) ^ d : ℕ) : ℚ) := by exact_mod_cast h.1
+  push_cast at hcast
+  have hpos : (0 : ℚ) < (2 ^ Ls) ^ d := by positivity
+  have hL : (0 : ℚ) < 2 ^ L := by positivity
+  rw [div_pow, one_div_pow, div_le_div_iff₀ hpos hL, one_mul]
+  exact hcast
+
+/-- [proved-derived; formal-checked] **The founding is the greatest such lattice modulus**: any
+lattice numerator whose modulus's `d`-th power is at most `2^(−L)` is at most `k`. -/
+theorem founded_modulus_greatest {Ls d L k k' : ℕ} (h : IsFounding Ls d L k)
+    (h' : k' ^ d * 2 ^ L ≤ (2 ^ Ls) ^ d) : k' ≤ k := by
+  by_contra hlt
+  have hk : k + 1 ≤ k' := by omega
+  have hpow : (k + 1) ^ d * 2 ^ L ≤ k' ^ d * 2 ^ L :=
+    Nat.mul_le_mul_right _ (Nat.pow_le_pow_left hk d)
+  have := h.2
+  omega
+
+/-- [proved-derived; formal-checked] **The founding lies strictly below one**: with a chart grain
+`L ≥ 1`, `k < 2^L_s`, so `ρ₀ < 1`: the founding is off the lossless boundary. -/
+theorem founded_modulus_lt_one {Ls d L k : ℕ} (h : IsFounding Ls d L k) (hL : 1 ≤ L) :
+    k < 2 ^ Ls := by
+  by_contra hge
+  have hk : 2 ^ Ls ≤ k := by omega
+  have hpow : (2 ^ Ls) ^ d ≤ k ^ d := Nat.pow_le_pow_left hk d
+  have h2 : 2 ≤ 2 ^ L := by
+    calc 2 = 2 ^ 1 := by norm_num
+      _ ≤ 2 ^ L := Nat.pow_le_pow_right (by norm_num) hL
+  have hbig : (2 ^ Ls) ^ d * 2 ≤ k ^ d * 2 ^ L :=
+    Nat.mul_le_mul hpow h2
+  have hposd : 0 < (2 ^ Ls) ^ d := by positivity
+  have := h.1
+  omega
+
+/-- [proved-derived; formal-checked] **The founding lies above zero** when the lattice carries it,
+`L ≤ L_s d`. -/
+theorem founded_modulus_pos {Ls d L k : ℕ} (h : IsFounding Ls d L k) (hcarry : L ≤ Ls * d) :
+    0 < k := by
+  by_contra h0
+  have hk : k = 0 := by omega
+  have h2 := h.2
+  rw [hk, zero_add, one_pow, one_mul, ← pow_mul] at h2
+  exact absurd (Nat.pow_lt_pow_iff_right (by norm_num : 1 < 2) |>.mp h2) (by omega)
+
+/-- [proved-derived; formal-checked] **The order-2 declaration's founding**: the ring of period
+`d = 60`, the weights' chart `L_ν = 21` and the source port's lattice `L_s = 21` found at
+`k = 1645392`, `ρ₀ = 1645392/2^21 = 102837/131072`. -/
+theorem order_founding : IsFounding 21 60 21 1645392 := by
+  unfold IsFounding
+  constructor <;> norm_num
+
+end Founding
+
 section Audit
 
 #print axioms normalized_of_pos
@@ -752,6 +870,14 @@ section Audit
 #print axioms framed_weight_symmetric
 #print axioms framed_weight_translation
 #print axioms framed_weight_lossless
+#print axioms founded_modulus_alias
+#print axioms founded_modulus_alias_le
+#print axioms lossless_alias
+#print axioms founded_modulus_pow_le
+#print axioms founded_modulus_greatest
+#print axioms founded_modulus_lt_one
+#print axioms founded_modulus_pos
+#print axioms order_founding
 
 end Audit
 
