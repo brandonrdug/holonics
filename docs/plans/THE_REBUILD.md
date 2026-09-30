@@ -589,8 +589,11 @@ that fires becomes the next loop's subject, and nothing downstream starts.
       come from conservative certificates, the grain, feasibility, a wrong derivative, adaptable
       operands left out, or an unsuitable objective. Both, neither or another outcome is kept as it
       is.
-  - *Loop 1b, a candidate law, pinned only after 1a's receipt (now: its pin, reviewed by Astra
-    before any run).* The subject 1a names: a comparison whose descent must move decisions, one
+  - *Loop 1b, a candidate law, pinned only after 1a's receipt* ([pin](../../research/records/2026-09-30_STEP_1B_THE_CANDIDATE_COMPARISON_PINNED_BEFORE_ITS_RUNS.md),
+    merge `d39b5b83`; under Astra's review before any run). The candidate is the lock face
+    `ℓ = −log θ_t` over the executed growths. Its solved level `ℓ < log 2` implies the release's
+    predicates (Lean `HNN/ExecutedComparison` §7). It is read once per station, at the lock of the
+    machine's own release. The subject 1a names: a comparison whose descent must move decisions, one
     that holds a margin on right decisions, is not minimized on ties, and is read where a reading
     carries information about the key. The governing law "loss is the log of a ratio" is the
     candidate's first reference. The adaptable operands left out (the bank's members, the pumps)
