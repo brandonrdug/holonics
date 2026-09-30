@@ -2229,8 +2229,18 @@ fn main() {
                 &arguments[6],
                 &arguments[7..],
             ),
+            // The two counts' terrain reading (the pin
+            // research/records/2026-09-30_THE_TWO_COUNTS_PINNED_BEFORE_ITS_RUNS.md).
+            Some("counts") => executed_loop::counts(
+                &arguments[3],
+                arguments[4].parse().expect("a training seed"),
+                arguments[5].parse().expect("a training count"),
+                arguments[6].parse().expect("a validation seed"),
+                arguments[7].parse().expect("a validation count"),
+                &arguments[8],
+            ),
             _ => panic!(
-                "executed move <seed> <requests> | train <arm> <terrain> <seed> <batch> <moves> <deadline ms> <out> | evaluate <terrain> <seed> <count> <out> <label=E>…"
+                "executed move <seed> <requests> | train <arm> <terrain> <seed> <batch> <moves> <deadline ms> <out> | evaluate <terrain> <seed> <count> <out> <label=E>… | counts <terrain> <training seed> <count> <validation seed> <count> <out>"
             ),
         },
         // `pumped below | past`: the pinned pumped runs (module header, "The pumped receiving ring").

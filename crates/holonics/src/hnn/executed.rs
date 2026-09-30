@@ -682,15 +682,31 @@ pub struct SlopeSplit {
     pub rival: Rat,
 }
 
+/// [measured-diagnostic; agent-inferred, September 30; the
+/// [two counts' pin](../../../../research/records/2026-09-30_THE_TWO_COUNTS_PINNED_BEFORE_ITS_RUNS.md)
+/// §5] **A term's site**, a receipt only (the move never reads it): the request, the refinement of
+/// the machine's trajectory it was read in (zero on a partition), the station, and whether the
+/// term's value is certainly positive (else it straddles zero).
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub struct TermSite {
+    pub request: usize,
+    pub context: usize,
+    pub station: usize,
+    pub positive: bool,
+}
+
 /// [definition; agent-inferred, September 30] **A term's branches for the first-order
 /// certificate**: every active rival/threshold branch crossed with the active members of the two
 /// candidates it compares, each its storage covectors and sections; and whether the term is
-/// positive (else it straddles zero).
+/// positive (else it straddles zero). Its site and its leading branch's contributions are receipts
+/// only ([`TermSite`], [`FirstOrderReading`]).
 #[derive(Clone, Debug)]
 struct TermBranches {
     positive: bool,
     branches: Vec<Vec<Contribution>>,
     unresolved: Option<CovectorRefusal>,
+    site: TermSite,
+    leading: Vec<Contribution>,
 }
 
 /// The proposal: the leading branches' contributions and every positive or undecided term's
@@ -771,13 +787,16 @@ fn propose(
                 (Some(x), Ok(t)) => leading_member(&chunk[x])
                     .map(|m| vec![contribution(x, m, one.clone()), contribution(target, t, -one.clone())]),
             };
-            match leading {
-                Ok(leading) => contributions.extend(leading),
+            let leading = match leading {
+                Ok(leading) => {
+                    contributions.extend(leading.iter().cloned());
+                    leading
+                }
                 Err(refusal) => {
                     unresolved.push(refusal);
                     continue;
                 }
-            }
+            };
             // Every active branch, for the first-order certificate.
             let mut branches = Vec::new();
             let mut refused = None;
@@ -811,6 +830,13 @@ fn propose(
                 positive: term.value.lower.is_positive(),
                 branches,
                 unresolved: refused,
+                site: TermSite {
+                    request: request_index,
+                    context: contexts[*position].index,
+                    station,
+                    positive: term.value.lower.is_positive(),
+                },
+                leading,
             });
         }
     }
@@ -1157,11 +1183,37 @@ fn storage_moves(
         .collect())
 }
 
+/// [definition; agent-inferred, September 30] **A carried move's first-order reading**: the
+/// certificate `Σ_terms sup_(α active) Df_α[Δ]` enclosed (its upper end is the commit guard) and
+/// the terms whose active branches were not all resolved; and, as receipts only (the
+/// [two counts' pin](../../../../research/records/2026-09-30_THE_TWO_COUNTS_PINNED_BEFORE_ITS_RUNS.md)
+/// §5, D1 and D2; the move never reads them), each term's bound in the proposal's order (`None` for
+/// a term with no resolved branch; a straddling term's hinged at zero), aligned with
+/// [`ExecutedMove::sites`], and the leading branches' pairing `Σ_lead sign ⟨ĝ, Δz⟩`, the proposal's
+/// own gradient on the carried move (`None` for a comparison without branches, the face).
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct FirstOrderReading {
+    pub bound: ExactInterval,
+    pub unresolved: usize,
+    pub terms: Vec<Option<ExactInterval>>,
+    pub leading: Option<ExactInterval>,
+}
+
+/// A contribution's signed pairing `sign ⟨ĝ, Δz⟩`, enclosed, with its storage move.
+fn signed_pairing(c: &Contribution, moved: &[Rat]) -> ExactInterval {
+    let d = paired(&c.covector, moved);
+    let (a, b) = (&d.lower * &c.sign, &d.upper * &c.sign);
+    ExactInterval {
+        lower: a.clone().min(b.clone()),
+        upper: a.max(b),
+    }
+}
+
 /// [definition; agent-inferred, September 30] **The first-order certificate of a carried move**
 /// (module header): `Σ_terms sup_(α active) Df_α[Δ]`, each branch's covector enclosures paired with
 /// its candidates' exact storage moves to the carried successor, a term straddling zero bounded by
 /// `max(0, ·)`; the enclosure of the sum's bound (its upper end is the certificate), and the terms
-/// whose active branches were not all resolved.
+/// whose active branches were not all resolved ([`FirstOrderReading`], with its receipts).
 fn first_order(
     field: &Field,
     constitution: &Constitution,
@@ -1169,7 +1221,7 @@ fn first_order(
     requests: &[Request],
     proposal: &Proposal,
     successor: &Constitution,
-) -> Result<(ExactInterval, usize), HnnError> {
+) -> Result<FirstOrderReading, HnnError> {
     let mut sections: Vec<(usize, usize, Vec<Option<usize>>)> = Vec::new();
     for term in &proposal.terms {
         for branch in &term.branches {
@@ -1178,22 +1230,30 @@ fn first_order(
             }
         }
     }
+    // The leading branches' sections, after every branch's (a receipt: the proposal's own gradient
+    // paired with the same exact storage moves).
+    let leading_start = sections.len();
+    for term in &proposal.terms {
+        for c in &term.leading {
+            sections.push((c.request, c.station, c.cells.clone()));
+        }
+    }
     let moves = storage_moves(field, constitution, successor, declared, requests, &sections)?;
     let mut cursor = 0;
     let mut total = ExactInterval::point(Rat::zero());
     let mut unresolved = 0;
+    let mut terms = Vec::with_capacity(proposal.terms.len());
     for term in &proposal.terms {
         unresolved += usize::from(term.unresolved.is_some());
         let mut bound: Option<ExactInterval> = None;
         for branch in &term.branches {
             let mut derivative = ExactInterval::point(Rat::zero());
             for c in branch {
-                let d = paired(&c.covector, &moves[cursor]);
+                let d = signed_pairing(c, &moves[cursor]);
                 cursor += 1;
-                let (a, b) = (&d.lower * &c.sign, &d.upper * &c.sign);
                 derivative = ExactInterval {
-                    lower: &derivative.lower + a.clone().min(b.clone()),
-                    upper: &derivative.upper + a.max(b),
+                    lower: &derivative.lower + &d.lower,
+                    upper: &derivative.upper + &d.upper,
                 };
             }
             bound = Some(match bound {
@@ -1205,6 +1265,7 @@ fn first_order(
             });
         }
         let Some(mut bound) = bound else {
+            terms.push(None);
             continue;
         };
         if !term.positive {
@@ -1214,8 +1275,26 @@ fn first_order(
             lower: &total.lower + &bound.lower,
             upper: &total.upper + &bound.upper,
         };
+        terms.push(Some(bound));
     }
-    Ok((total, unresolved))
+    let mut leading = ExactInterval::point(Rat::zero());
+    let mut cursor = leading_start;
+    for term in &proposal.terms {
+        for c in &term.leading {
+            let d = signed_pairing(c, &moves[cursor]);
+            cursor += 1;
+            leading = ExactInterval {
+                lower: &leading.lower + &d.lower,
+                upper: &leading.upper + &d.upper,
+            };
+        }
+    }
+    Ok(FirstOrderReading {
+        bound: total,
+        unresolved,
+        terms,
+        leading: Some(leading),
+    })
 }
 
 /// [definition; agent-inferred, September 30] **Why a trial step is not adopted** (module header,
@@ -1240,6 +1319,12 @@ pub enum TrialRefusal {
 /// carried move's largest entry change and the successor's largest entry, the first-order bound on
 /// the carried move, the successor's declared comparison and its release comparison where they
 /// were read, and its refusal, if any.
+///
+/// Receipts only (the move never reads them; the two counts' pin §5): `terms`, each term's
+/// first-order bound on the carried move aligned with [`ExecutedMove::sites`], `leading`, the
+/// leading branches' pairing on it, and `source`, the carried source step's reading
+/// ([`SourceStep`]: the entries whose lattice coordinate moved, the released residuals), where
+/// the trial reached them.
 #[derive(Clone, Debug)]
 pub struct Trial {
     pub step: Rat,
@@ -1250,6 +1335,9 @@ pub struct Trial {
     pub value: Option<ExactInterval>,
     pub after: Option<BatchComparison>,
     pub refusal: Option<TrialRefusal>,
+    pub terms: Option<Vec<Option<ExactInterval>>>,
+    pub leading: Option<ExactInterval>,
+    pub source: Option<SourceStep>,
 }
 
 /// [definition; agent-inferred, September 30] **Why the move was refused as a whole**.
@@ -1288,6 +1376,11 @@ pub struct ExecutedMove {
     pub trials: Vec<Trial>,
     pub adopted: Option<(Constitution, SourceStep)>,
     pub refusal: Option<MoveRefusal>,
+    /// Receipts only (the two counts' pin §5): each term of the proposal's site, in the order of
+    /// every trial's `terms`, and the unit move's largest entry change (the ladder's entry scale
+    /// reads `½` over it).
+    pub sites: Vec<TermSite>,
+    pub unit_largest: Option<Rat>,
 }
 
 /// The source port's largest absolute entry.
@@ -1321,7 +1414,7 @@ type LadderOutcome = (Vec<Trial>, Option<(Constitution, SourceStep)>, Option<Mov
 
 /// A carried move's first-order certificate: from the source port's move and the carried successor.
 type FirstOrder<'a> =
-    dyn Fn(&ExactRatMatrix, &Constitution) -> Result<ExactInterval, HnnError> + Sync + 'a;
+    dyn Fn(&ExactRatMatrix, &Constitution) -> Result<FirstOrderReading, HnnError> + Sync + 'a;
 
 /// [definition; agent-inferred, September 30] **The certified step's ladder, one law for every
 /// declared comparison** (module header, "The committed move"): from the first-order zero of the
@@ -1374,6 +1467,9 @@ fn ladder(
             value: None,
             after: None,
             refusal: None,
+            terms: None,
+            leading: None,
+            source: None,
         };
         let stepped = match constitution.stepped_source(ring, samples, &step) {
             Ok(Some(stepped)) => stepped,
@@ -1387,6 +1483,7 @@ fn ladder(
             Err(error) => return Err(error),
         };
         let (successor, reading) = stepped;
+        trial.source = Some(reading.clone());
         // The transport modulus's part of the move (module header, "The committed move"): `ρ + ηΔρ`
         // held within `[ρ/2, 1]` (passive) and read on the source port's lattice, nearest.
         let (successor, modulus_moved) = match transport {
@@ -1421,7 +1518,10 @@ fn ladder(
             step /= &two;
             continue;
         }
-        let bound = first(&moved, &successor)?;
+        let first_reading = first(&moved, &successor)?;
+        let bound = first_reading.bound;
+        trial.terms = Some(first_reading.terms);
+        trial.leading = first_reading.leading;
         trial.first_order = Some(bound.clone());
         if !bound.upper.is_negative() {
             trial.refusal = Some(TrialRefusal::FirstOrder(bound));
@@ -1544,6 +1644,8 @@ pub fn executed_move(
         trials: Vec::new(),
         adopted: None,
         refusal: None,
+        sites: proposal.terms.iter().map(|t| t.site).collect(),
+        unit_largest: None,
     };
     if proposal.contributions.is_empty() {
         receipt.refusal = Some(MoveRefusal::Nothing);
@@ -1563,7 +1665,8 @@ pub fn executed_move(
         .source_port(ring)
         .ok_or(HnnError::MissingSourcePort { ring })?
         .subtract(&source)?;
-    let (slope, _) = first_order(field, constitution, declared, requests, &proposal, &unit)?;
+    let slope = first_order(field, constitution, declared, requests, &proposal, &unit)?.bound;
+    receipt.unit_largest = Some(largest_entry(&unit_move));
     receipt.slope = Some(slope.clone());
     if !slope.upper.is_negative() {
         receipt.refusal = Some(MoveRefusal::NoDescent(slope));
@@ -1596,7 +1699,7 @@ pub fn executed_move(
         upper: &slope.upper + &share,
     };
     let first = |_: &ExactRatMatrix, successor: &Constitution| {
-        first_order(field, constitution, declared, requests, &proposal, successor).map(|(b, _)| b)
+        first_order(field, constitution, declared, requests, &proposal, successor)
     };
     let reread = |successor: &Constitution| {
         executed_reread(field, successor, requests, declared, bank, grain)
@@ -1786,6 +1889,8 @@ pub fn face_move(
         trials: Vec::new(),
         adopted: None,
         refusal: None,
+        sites: Vec::new(),
+        unit_largest: None,
     };
     if samples.is_empty() {
         receipt.refusal = Some(MoveRefusal::Nothing);
@@ -1854,7 +1959,15 @@ pub fn face_move(
             refusal,
         })
     };
-    let first = |moved: &ExactRatMatrix, _: &Constitution| pairing(moved);
+    receipt.unit_largest = Some(largest_entry(&unit_move));
+    let first = |moved: &ExactRatMatrix, _: &Constitution| {
+        pairing(moved).map(|bound| FirstOrderReading {
+            bound,
+            unresolved: 0,
+            terms: Vec::new(),
+            leading: None,
+        })
+    };
     let (trials, adopted, refusal) = ladder(
         constitution,
         ring,
