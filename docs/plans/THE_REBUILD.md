@@ -505,6 +505,23 @@ named, and the program's loop stays its own counter, disclosed as such.
 
 #### U6. The text chart
 
+- **Unicity, September 30: step 1's learning loops read two counts**
+  ([record](../../research/records/2026-09-30_UNICITY_THE_READINGS_LEAVE_ONE_KEY_AND_THE_HELIXS_CELLS_ARE_THE_FAREY_SEQUENCE.md);
+  Lean `Foundation/Unicity`; Refs #73 #63). Brandon's lens ("when can you hear the music?") changes
+  the acceptance of step 1's learning loops, not their order (agent-inferred).
+  - Each known-truth terrain declares a key family. `n*_terrain`, the readings after which the
+    family's survivors are one class, is computed exactly by the terrain as a measurement, never a
+    receiver.
+  - `n*_machine` is read beside it: the readings taken in before the release locks the rule on fresh
+    confirmation.
+  - The ideal listener's surprise curve (the uniform mixture over the family) is read on the
+    machine's own passage, beside the machine's.
+  - Order-2: the family's key can be pinned in 7 readings (`clog₄ 10240`). The machine read 1,024
+    rule steps without locking it.
+  - The next learning loop's diagnostics are the per-move key information of the certified step
+    (heard against listened) and the comparison's information at its operating point (resonance
+    against saturation).
+
 - **The station-framed placement, September 30: the refit reads both chains, and the certified move
   keeps the modulus at one**
   ([pin](../../research/records/2026-09-30_THE_STATION_FRAMED_PLACEMENT_PINNED_BEFORE_ITS_RUNS.md),
