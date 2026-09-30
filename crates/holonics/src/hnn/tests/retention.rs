@@ -1,5 +1,6 @@
 //! The collapse onto what the admitted future distinguishes: the time-indexed diamond on the
-//! six-ring path of `release.py` (72 of 156 entries released at `A = 2`, 132 at `A = 1`), every
+//! six-ring path of the retired [`release.py`](https://github.com/brandonrdug/holonics/blob/d4596102/research/notebook/hnn_design/release.py) (72 of 156
+//! entries released at `A = 2`, 132 at `A = 1`), every
 //! admitted reading unchanged with the released items replaced by arbitrary values, each retained
 //! item tight, `deposit_descends`, whole-locus deletion, the pending ratios reached, and the
 //! boundary's refusals.
@@ -152,7 +153,8 @@ fn every_admitted_reading_is_identical_with_every_released_item_replaced() {
 }
 
 /// The rule is tight: replacing any one retained item alone changes some reading (12 of 12 at
-/// `A = 2`, 8 of 8 at `A = 1`, as in `release.py`), read on the four unit injections that decide
+/// `A = 2`, 8 of 8 at `A = 1`, as in the retired [`release.py`](https://github.com/brandonrdug/holonics/blob/d4596102/research/notebook/hnn_design/release.py)),
+/// read on the four unit injections that decide
 /// every injection ([`injections`]).
 #[test]
 fn replacing_any_one_retained_item_changes_some_reading() {

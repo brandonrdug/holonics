@@ -108,7 +108,9 @@ use crate::hnn::HnnError;
 use crate::hnn::chart::WordLattice;
 use crate::hnn::constitution::{Lattice, Locus};
 use crate::hnn::moment::{Capacity, PairPort, capacity};
-use crate::holarchy::{Gluing, GluingDefect, Holarchy};
+#[cfg(test)]
+use crate::holarchy::GluingDefect;
+use crate::holarchy::{Gluing, Holarchy};
 use crate::holon::contact::PairContact;
 use crate::holon::contact::menu::PortPermutation;
 use crate::holon::dirac::DiracStructure;
@@ -1523,7 +1525,8 @@ impl Field {
     /// cancels the interface power ([`GluingDefect::UncancelledPower`]). An unparted contact (index
     /// outside the field) is refused; a parted declaration that glued would contradict the law and
     /// is refused as a realization defect.
-    pub fn parted_holarchy(
+    #[cfg(test)]
+    pub(crate) fn parted_holarchy(
         &self,
         constitution: &impl ConstitutionRead,
         parted: usize,

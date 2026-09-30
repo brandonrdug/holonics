@@ -12,8 +12,11 @@ sheets of one lock, candidate `x` weighing the bank's second-order reading `A(x)
 face is the exchange face `θ_x = A(x)/Σ_y A(y)` (`Objects/ParametronLock`: for two sheets
 `θ = a/(a + K)`). The declared comparison with the target class `t` has the loss
 `ℓ = log θ_t⁻¹ = log Σ_y A(y) − log A(t)`, the logarithm of the ratio of the target to the produced
-face, and its covector on each log-reading is `θ_x − q_x` (the Rust owner
-`hnn::prediction::stage_bank`, module header "The bank's learning path").
+face, and its covector on each log-reading is `θ_x − q_x`. [historical] Its Rust owners
+(`hnn::prediction::stage_bank`, `hnn::ring::BankChart`, `hnn::constitution::BankReach`) were retired
+September 30 with the face path (batch H; at commit `f5fd8f3b`): the face's descent direction met the
+executed decision's at cosine `39/512`, and the release's own comparison (`HNN/ExecutedComparison`,
+`hnn::executed`) replaced it. The laws below stay.
 
 1. **The face's covector.** [proved-derived; formal-checked] Along any move `δ` of the
    log-readings, `d/dε (log Σ_y A_y e^(ε δ_y) − log(A_t e^(ε δ_t))) = Σ_y θ_y δ_y − δ_t`
@@ -23,19 +26,19 @@ face, and its covector on each log-reading is `θ_x − q_x` (the Rust owner
    resonance amplitude is linear in the placed amplitudes, so along `W + ηV` the power is
    `|W|² + 2η Re(W̄V) + η²|V|²` (`member_amplitude_ray`), and a unit-carrier resonance over `d`
    crossings reads at most `d` times the passage's energy (`resonance_gain`): the gain
-   `κ² = 2d Σ_m p_m²` of the chart (`hnn::ring::BankChart::gain`).
+   `κ² = 2d Σ_m p_m²` of the chart (the retired `hnn::ring::BankChart::gain`).
 3. **The score's endpoint bound.** [proved-derived; formal-checked] `log(1 + u) ≥ u − 2u²` for
    `u ≥ −1/2` (`log_one_add_ge`); so a station's score moves along a ray by at most
    `(A(η) − A₀)/A₀ − (a(η) − a₀)/a₀ + 2((a(η) − a₀)/a₀)²` wherever `a(η) ≥ a₀/2`
    (`bank_score_endpoint`), and with `a₁² ≤ 4a₀a₂`, `a₂ ≤ â₂` and `η²â₂ ≤ a₀/16` the last term is
    at most `(81/8) η² â₂/a₀` and `a(η) ≥ a₀/2` holds (`bank_score_trust`). This is the quadratic
    reading's second order in the certified step: `C = Σ (2Â₂/A₀ + (81/4) â₂/a₀)`, the trust scale
-   `ηc ≤ 1` with `c² = 16 â₂/a₀` (`hnn::constitution::BankReach::curvature`). The returns carry
+   `ηc ≤ 1` with `c² = 16 â₂/a₀` (the retired `hnn::constitution::BankReach::curvature`). The returns carry
    each reading's covector at a dyadic face within `e`; the true first-order decrease is at least
    their alignment less `e Σ_x |A′_x| ≤ 2e √(A₀ Â₂)` (`rounded_alignment`, `sum_sqrt_mul_le`).
 4. **The joint certificate with a score beside the logits.** [proved-derived; formal-checked] A
    readout's score within `−A_r + ½J` and the bank's within `−a_b + ½Q_b` descend together by half
-   their decrease when `J + Q_b ≤ A_r + a_b` (`joint_descends_beside`;
+   their decrease when `J + Q_b ≤ A_r + a_b` (`joint_descends_beside`; the retired
    `holon::deposition::JointReading::beside`).
 5. **Where the executed law departs from the kicked chart.** [proved-derived; formal-checked] The
    node plane's reflection `F = R(1)` conjugates a pump's reflection to its conjugate carrier's,
@@ -48,7 +51,8 @@ face, and its covector on each log-reading is `θ_x − q_x` (the Rust owner
    reads one sideband. The executed second order's pair terms are `Re(c_t c̄_s) Re(β ζ^(t−s))`, which
    read the resonance and its mirror equally,
    `Σ_(t,s) Re(c_t c̄_s) Re(β ζ^t conj ζ^s) = ½ Re β (|Σ_t c_t ζ^t|² + |Σ_t c_t ζ̄^t|²)`
-   (`sideband_pair_sum`): the bank's face reads both (`hnn::ring::BankChart`, `W⁺` and `W⁻`).
+   (`sideband_pair_sum`): the bank's face read both (the retired `hnn::ring::BankChart`, `W⁺` and
+   `W⁻`).
 
 [open] (#62) The executed law's full second order (its self term `p²|c|²` and the member's own
 frequency, `|Σ_t c_t|²`, which past the standing bifurcation boosts), and the ordering of

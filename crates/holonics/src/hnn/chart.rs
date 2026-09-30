@@ -522,7 +522,8 @@ fn newton_schulz(operator: &Operator, chart: &ChartWords) -> Result<ChartWords, 
 /// **One rounded Newton–Schulz step** of a chart of `A⁻¹` (Lean `nsStep`, then `latticeChart`):
 /// `X(2 − AX)` in integers, rounded to the chart's lattice, ties upward. The host's value of the
 /// step a device kernel computes.
-pub fn newton_schulz_step(
+#[cfg(test)]
+pub(crate) fn newton_schulz_step(
     matrix: &ExactRatMatrix,
     chart: &ChartWords,
 ) -> Result<ChartWords, HnnError> {

@@ -555,7 +555,7 @@
 //! falls with `c` through the declared family's edge.
 //!
 //! [definition; agent-inferred] **The depth, the family and the prior** are chosen on the development
-//! cells only (the exposure's measurement, `hnn::reference::{choose_depth, choose_prior}`): `D` increases from `max(1, forced)` while the
+//! cells only (the exposure's measurement, `hnn::reference::{choose_depth, choose_prior}`, retired September 30 after their consumer, the notebook's `hnn_landmark`: batch H, at `f5fd8f3b`): `D` increases from `max(1, forced)` while the
 //! development prequential code length decreases strictly (disjoint exact enclosures), every `D`
 //! tried is reported, and `⌈log₂⌉` of the family tried is charged as description bits; each stop
 //! prior of the declared family ([`prior_family`]: the global ladder `j = 1, …, J`, then the
@@ -600,7 +600,7 @@
 //! | a digit face's floor and the rounding's residual (the first-order bound fails downward) | `Compression/Landmark/Context/Tree.{digit_face_ge, digit_log_residual, host_digit_bound_fails_downward}` | [`Landmarks::face_rule`] |
 //! | the ideal tree weighting (the oracle) | `Compression/Landmark/Context/Tree.{landmark_step, mixture_is_probability, kraft_and_dominance, sequential_mixture}` | [`IdealLandmarks`] |
 //! | the declared stop prior: the mixture over pruned trees with its prior, the weights summing to one, the dominance, the founding at `β₀ = 2^(j_d) − 1` and the step unchanged; `½` the corollary | `Compression/Landmark/Context/Tree.{stop_mixture_over_trees, PrunedTree.prior_const, PrunedTree.prior_sum, stop_kraft_and_dominance, stop_weight_step, stop_ratio_step, stop_founding_step, ladder_founding, stopWeight_half}` | [`StopPrior`], [`LandmarkDeclaration::prior`], the founding charts (`Law::founding`, [`ArenaView::founding`]), [`IdealLandmarks`] |
-//! | the prior chosen on the development cells, charged `⌈log₂⌉` of the laws and of each law's depths | (a measurement, not a theorem) | [`ladder_top`], [`prior_family`]; the sweeps are the exposure's (`hnn::reference::{choose_prior, choose_depth_within, PriorSweep}`) |
+//! | the prior chosen on the development cells, charged `⌈log₂⌉` of the laws and of each law's depths | (a measurement, not a theorem) | [`ladder_top`], [`prior_family`]; the sweeps were the exposure's (`hnn::reference::{choose_prior, choose_depth_within, PriorSweep}`, retired September 30, batch H, at `f5fd8f3b`) |
 //! | a population's code is its faces' product, enclosed once | (a certified reading: integer bounds and the certified logarithm) | [`PassageCode`], [`ProductBound`] |
 //! | the stop-weight mixture per digit tree: the mixture over (law, pruned tree), its prior complete, within `−log₂ π_k − log₂ prior_(w_k)(S)`; the joins telescope to the Bayesian mixture, the executed chart's drift once | `Compression/Landmark/Context/LocalWeighing.{stop_mixture_per_tree, static_mixture, forward_executed}` | [`StopMixture`], [`JoinTree`], [`FaceJoins`] |
 //! | a window's phases in cell order: each reads the standing after the earlier phases' deposits | `Compression/Landmark/Context/Tree.{landmark_step, treeWeight_arrive_off}` | [`Landmarks::window`], [`Window`] |

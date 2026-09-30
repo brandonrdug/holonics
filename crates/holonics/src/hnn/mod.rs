@@ -75,11 +75,11 @@
 //! - [`contact`] (campaign 2): the contact's transfer and site kind, its certified boost, its lock
 //!   address and its break receipt, with [`contact_readings`], the lock and site readings the
 //!   receiving join consumes;
-//! - [`prediction`] (THE_REBUILD U6, native generation): a section of the receiving ring refined by
-//!   `K` continuing words from the request's moment, read jointly at every station from one
-//!   anchor, released at width zero through `receiver::release` (a plural section held), and
-//!   learned by its covector pulled back through the `K` words (`Word::continuing`,
-//!   `Word::pull_back_continuing`) and deposited at the certified step (`constitution`);
+//! - [`prediction`] (THE_REBUILD U6, native generation): the section's declaration, the partition
+//!   law and the receiving bank's lock iteration over the passage's station-framed placement,
+//!   released at width zero through `receiver::release` (a plural section held); the linear
+//!   readout (`K` continuing words read from one anchor) and the bank's face were retired
+//!   September 30 (batch H, at `f5fd8f3b`);
 //! - [`executed`] (THE_REBUILD U6, September 30): the release's own comparison (the receiving
 //!   bank's class, threshold, order and section predicates along the machine's own trajectory), its
 //!   exact pullback to `E` through the executed monodromy's certified eigen-derivative (`ring`), and
@@ -100,7 +100,8 @@
 //! sized once from the field and accepts closing source rings only; a [`Word`] borrows its field,
 //! is not `Clone`, and owns the only waves and contact states; [`Current`] holds the lift point and
 //! nothing else, so no change outlives its word, or, for a continuing word, the refinement that
-//! owns it until its return (`prediction`); `propagation` exposes only junction-local solves.
+//! owns it until its return (`word`'s "Continuing motion within a refinement"); `propagation`
+//! exposes only junction-local solves.
 //! Their `compile_fail` proofs are doctests on the types, and their runtime tests are in
 //! `tests/guards.rs`.
 //!
@@ -108,7 +109,7 @@
 //! |---|---|---|
 //! | the ring element | `HNN/Word.{reaction_stage_isometry, reaction_stage_balance, contrastPort_active}` | [`propagation::element_step`] |
 //! | the tick's global power | `HNN/Word.word_tick_balance` | [`propagation::global_power`], [`propagation::TickBalance`] |
-//! | the junction's scattering (a half-turn about the participation anchor) | `HNN/Propagation.{anchor_is_participation, junctionScattering_involutive, junctionScattering_isometry}` | [`propagation::junction_scattering`] |
+//! | the junction's scattering (a half-turn about the participation anchor) | `HNN/Propagation.{anchor_is_participation, junctionScattering_involutive, junctionScattering_isometry}` | [`propagation::participation`], [`propagation::scattering_about`] (`propagation::junction_scattering` the tests' exact reference) |
 //! | the contact two-port | `HNN/Propagation.{partialIsometry_transit, transit_balance, tick_well_defined}` | [`propagation::transit`], [`Contact`] |
 //! | the causal cone | `HNN/Word.word_tick_cone` (the concrete tick) | [`Word::support`] |
 //! | the word on declared lattices: certified inverse charts, error feedback, the executed adjoint, the balance up to the residual | `HNN/LatticeWord.{nsStep, rounded_refinement_certificate, roundedIter_certificate, warm_start_certificate, inverse_chart_deviation, feedback_tick, carried_word_accounting, executed_adjoint_unique, executed_adjoint_deviation, cayley_chart_energy}` | [`chart`], [`Word`], [`Word::pull_back`], [`propagation::TickBalance`] |
@@ -119,13 +120,13 @@
 //! | the word opens at zero | structural: [`Current`] has no wave field (`HNN/Retention.word_opens_at_zero` is the abstract trajectory's linearity) | [`Word::open`] |
 //! | keys | `HNN/Keys.{field_loop_fibre, selective_step_dormant, propagation_eq_edge_fibre, gauge_fix_unique}` | [`keys`], [`crate::compression::Menu::propagate`] |
 //! | the ring's mode tick, its pump and sheets, its clock, the junction's reference change (campaign 2) | `HNN/Ring.{ring_tick_conserves_mode_energy, ring_descriptor_tick_conserves, ring_cayley_denominator_nonsingular, ring_tick_executed_energy_balance, two_port_reference_balance, ring_crossings_are_epoch_ticks, pump_period_is_cycle, pump_half_turn_invariant, pump_blind_to_sheets, locked_sheet_receiver_face}` | [`ring`] |
-//! | the contact's transfer and site kind, its boost, its lock address, its break (campaign 2) | `HNN/Contact.{contact_transfer_kind_by_storage_sign, contact_mode_transfer, contact_boost_solve_or_singular_direction, contact_signed_storage_balance, contact_lock_address, lockAddress_unique, least_denominator_unique, lockAddress_closes}`, `HNN/ContactBreak.{break_release_balance, break_iff_release_covers_gluing, griffith_closed_port_case, parting_returns_gluing_defect}` | [`contact`], [`contact_readings`], [`Field::parted_holarchy`] |
+//! | the contact's transfer and site kind, its boost, its lock address, its break (campaign 2) | `HNN/Contact.{contact_transfer_kind_by_storage_sign, contact_mode_transfer, contact_boost_solve_or_singular_direction, contact_signed_storage_balance, contact_lock_address, lockAddress_unique, least_denominator_unique, lockAddress_closes}`, `HNN/ContactBreak.{break_release_balance, break_iff_release_covers_gluing, griffith_closed_port_case, parting_returns_gluing_defect}` | [`contact`], [`contact_readings`] (`Field::parted_holarchy` the tests') |
 //! | the loaded tick's field/resonator balance, separate element and returned-wave splits, the word's balance across the gain commit (the loaded resonator) | `HNN/Ring.{loaded_word_stage_balance, loaded_tick_executed_interconnection_balance}`, `HNN/Word.{field_commit_deposition}` | [`word::FieldBalance`], [`word::WordBalance`], [`word::PowerForm`] |
 //! | the ring's navigator | `Holon/Navigator.{mapRotor_order, map_pow_mod_order, map_turn_lossless}` | [`Ring::navigator`] over `navigator::Transport::Map` |
 //! | the block incidence, the contrast map read from its blocks, and the Holarchy chart | `Holon/Complex.{blockIncidence, block_flat_closed}`, `Holarchy/Join.interconnect` | [`Field::connection`], [`Field::contrast`], [`Field::holarchy`] |
 //! | the port's returns | `Holarchy/Reception.InteractionReturn` (the owner's, generic in its payloads) | [`ExecutionPort`] |
 //! | the mount certifies the Holarchy; its parametric orientation carries the aeons | `Holarchy/Join.interconnect`, `Holarchy/Join.Holarchy.parametric` | [`Reference`] (`mount_with`), [`reference::Resident::parametric`] |
-//! | native generation: the joint section, joint against marginals, the release at width zero, the consumer equation (U6) | `HNN/Prediction.{refine_iterate, jointSection, jointSection_receive, joint_not_marginals, release_width_zero, plural_section_held, consumer_eq}` | [`prediction`] |
+//! | native generation: the joint section, joint against marginals, the release at width zero, the consumer equation (U6) | `HNN/Prediction.{refine_iterate, jointSection, jointSection_receive, joint_not_marginals, release_width_zero, plural_section_held, consumer_eq}` | [`prediction`] (the bank's release; the linear readout that realized `refine_iterate` and `jointSection` was retired, batch H) |
 //! | the release's own comparison: the eigen-derivative at a simple root, a max comparison's descent, a strict decrease by disjoint enclosures (U6) | `HNN/ExecutedComparison.{product_deriv, simple_root_deriv, log_modulus_deriv, max_descends, sum_max_descends, disjoint_enclosures_decrease, predicates_release_the_section}` | [`executed`] |
 //! | the aeon at its boundary: readings, epochs as section flux, the carry-out's cycle | `Aeon/Clock/Winding.{reading_navigatorClock, torus_cycle_reads_whole_windings}`, `Aeon/Clock/Epoch.signed_count_is_flux`, `HNN/Retention.lift_reading` | [`retention::aeon_readings`], [`AeonBoundary`] |
 //! | the first law over an aeon, on enclosed code lengths, with the face against the literal | `Aeon/Production/FirstLaw.{ledger_telescopes, enclosed_telescopes}` | [`crate::aeon::EnclosedLedger`] in the resident; [`AeonBoundary::first_law`], [`AeonBoundary::literal`] |
@@ -336,18 +337,6 @@ pub enum HnnError {
         "ring {ring}'s passage spans {span} ticks against its period {period} (or was re-keyed): a transport of modulus below one reads each datum's age from its phase, which aliases past one turn; the leaky count is owed"
     )]
     AliasedAges { ring: usize, span: u64, period: u64 },
-    #[error(
-        "ring {ring}'s transport modulus {modulus} is below one: the bank's face reads one shared resonance a request, which holds only at modulus one (its dissipative form is owed)"
-    )]
-    FaceTransport { ring: usize, modulus: Rat },
-    #[error(
-        "ring {ring}'s readout reads every station from one anchor below modulus one, but station {station} is open while station {placed} after it is placed: each station reads the span from its own frame, and one anchor holds that frame only for stations after every placed datum (the readout's station-framed form is owed)"
-    )]
-    UnframedAnchor {
-        ring: usize,
-        station: usize,
-        placed: usize,
-    },
     #[error(
         "locus {locus:?} declares the lattice exponent {declared}, coarser than the rule's {rule}: the carried Gram's positivity and the read's bound below the grain would not hold"
     )]

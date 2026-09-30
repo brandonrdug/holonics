@@ -62,8 +62,9 @@
 //! one-turn alias is at most one chart unit, the phase record sufficient at the chart's grain. It
 //! reads the ring's period and the chart's grain, nothing of a terrain; the order-2 declaration
 //! (`d = 60`, `L_ν = 21`) founds at `102837/131072`. The consumers that do not yet read a modulus
-//! below one (the card, the bank's face path, the readout's one anchor, a passage over one turn)
-//! keep the lossless founding and refuse it, typed.
+//! below one (the card, a passage over one turn) keep the lossless founding and refuse it, typed;
+//! the bank's face path and the readout's one anchor refused it too until their retirement
+//! (September 30, batch H).
 //!
 //! [definition; agent-inferred, September 30] **Read from a station** (`hnn::prediction`, "A
 //! candidate reads the span from its own station"; Lean `HNN/IndexedOpen.framedWeight`): a
@@ -71,8 +72,7 @@
 //! `ρ^|τ_j − τ_k| / Σ_l ρ^|τ_j − τ_l|`, because the section is a joint field. [`SourceMoment::phase_weights`]
 //! reads the span from its last datum, which is station `j`'s framed law exactly when no datum lies
 //! after `j` (`framed_weight_one_sided`), and in every frame at modulus one; the bank reads each
-//! candidate from its own station (`BankPlacement`), and the readout's one anchor is refused below
-//! modulus one where a placed datum lies after an open station (`Refinement::anchor_frames`).
+//! candidate from its own station (`BankPlacement`).
 //!
 //! [definition; agent-inferred, U6] **The pair buffer is the offset moment's one-step state**
 //! (Lean `Transport/SourceMoment.streamStep`'s previous value, `HNN/Moment.SourceDecl.StreamState`'s
@@ -164,7 +164,8 @@ impl Capacity {
     }
 
     /// Whether the moment is lossy at `n` by counting: `N(n) < |A|^n`.
-    pub fn lossy_at(&self, n: u64) -> bool {
+    #[cfg(test)]
+    pub(crate) fn lossy_at(&self, n: u64) -> bool {
         lossy(
             n,
             &self.periods,
@@ -668,11 +669,6 @@ impl SourceMoment {
     /// The lift point at the open.
     pub fn opening(&self) -> &[BigInt] {
         &self.opening
-    }
-
-    /// The source rings, in order.
-    pub fn source_rings(&self) -> Vec<usize> {
-        self.rings.iter().map(|counts| counts.ring).collect()
     }
 
     fn counts(&self, ring: usize) -> Result<&RingCounts, HnnError> {

@@ -590,12 +590,15 @@ tests can comb through anything valuable").
 16. **No change outlives its word (R2 C2c, C3), or its refinement.** `Current` has no wave or
     contact-state field. Waves and contact states are fields of `Word` only, created at zero by its
     open and dropped at its return (`compile_fail` on building a `Current` from a `Word`'s waves).
-    [agent-inferred, amended September 29 for U6's native generation] Within one refinement
-    (`hnn::prediction`) a continuing word opens on the change the previous word of the same
-    refinement left (`Word::continuing`), so its waves, contact states and resonator states carry
-    across the word's boundary. The refinement owns its words until its return consumes them
-    (`Section::pull_back`), so the change still lives only inside one evaluation, bounded by its
-    `K·w + 1` junction steps and never by a source length, and nothing of it reaches `Current`, a
+    [agent-inferred, amended September 29 for U6's native generation] Within one refinement a
+    continuing word opens on the change the previous word of the same refinement left
+    (`Word::continuing`), so its waves, contact states and resonator states carry across the word's
+    boundary. The refinement owns its words until its return consumes them (the linear readout's
+    `Section::pull_back`, retired September 30 with the readout, batch H, at
+    [`f5fd8f3b`](https://github.com/brandonrdug/holonics/blob/f5fd8f3b/crates/holonics/src/hnn/prediction.rs);
+    the guard binds any refinement that opens one), so the change still lives only inside one
+    evaluation, bounded by its `K·w + 1` junction steps and never by a source length, and nothing
+    of it reaches `Current`, a
     pending ratio or the constitution except through a deposit's covectors. The reason: generation
     refines one joint field through the model's constituted dynamics (HNN_FORMULA, "Generation as
     field refinement"), which the word-local release would cut at every word.

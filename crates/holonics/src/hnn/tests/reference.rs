@@ -3,8 +3,7 @@
 //! joint clock's carry-out, keys located
 //! on the crib that closed each aeon (past cells only, never a held-out one), the budget stop, the
 //! cut checked against the declared population, and design (f)'s readout with `Kt` charging the
-//! located keys; and the landmark tree's prequential measurement on a cut and its development
-//! choices (the depth sweep and the stop-prior sweep read the development cells only).
+//! located keys; and the landmark tree's prequential measurement on a cut.
 //!
 //! [measured] Under the exact law the constitution's exact bits multiplied per deposit on the chain
 //! control (1,126 → 10,883 → 623,415 at the declared steps; 1,126 → 7,053 → 311,864 → 2,224,183
@@ -16,21 +15,20 @@
 //! its second commit, [`two_deposits`]), which is the stop rule's own case and keeps the exact
 //! deposits few, and the rest of the cut runs on the last published constitution.
 
-use num_bigint::{BigInt, BigUint};
+use num_bigint::BigInt;
 use num_traits::{One, Zero};
 
 use super::learning::{OPEN_BUDGET, chain, chain_of};
 use super::support::Draw;
 use crate::compression::landmark::context::{
     Capacity, LandmarkDeclaration, Landmarks, LetterFamily, StopPrior, address, cell_letters,
-    code_length, prior_family,
+    code_length,
 };
 use crate::hnn::HnnError;
 use crate::hnn::field::Current;
 use crate::hnn::port::{ExecutionPort, ReceiptDetail};
 use crate::hnn::reference::{
-    Cut, Exposure, ReadoutWall, Reference, WallTimes, choose_depth, choose_prior, one_hot,
-    prequential, tree_prequential,
+    Cut, Exposure, ReadoutWall, Reference, WallTimes, one_hot, prequential, tree_prequential,
 };
 use crate::ratio::Rat;
 use crate::ratio::algebraic::ExactInterval;
@@ -409,7 +407,7 @@ fn one_worker_and_many_return_the_same_values() {
 }
 
 // -------------------------------------------------------------------------------------------
-// the landmark tree's prequential measurement on a cut, and its development choices
+// the landmark tree's prequential measurement on a cut
 
 /// A cell-only tree declaration at the grain 16 under the `½` stop prior.
 fn tree_declaration(alphabet: usize, depth: usize) -> LandmarkDeclaration {
@@ -426,8 +424,7 @@ fn tree_declaration(alphabet: usize, depth: usize) -> LandmarkDeclaration {
 }
 
 /// **The prequential measurement**: the development and held-out sums are the replay's per-cell
-/// code lengths of the executed faces; the depth sweep reads the development cells only (changing
-/// the held-out cells changes no reading) and charges `⌈log₂⌉` of the family tried.
+/// code lengths of the executed faces.
 #[test]
 fn landmark_prequential_partitions_the_cut() {
     let cells: Vec<usize> = (0..48u64).map(|t| ((t * 3 + t / 5) % 4) as usize).collect();
@@ -465,30 +462,13 @@ fn landmark_prequential_partitions_the_cut() {
     assert_eq!(run.run.nodes, tree.nodes());
     assert_eq!(run.run.bits, tree.bits());
     assert!(run.run.largest_residual <= run.run.face_rule);
-
-    let sweep = choose_depth(&cut, &cell_letters(&cut.cells), &declared).unwrap();
-    let mut other = cut.clone();
-    for cell in &mut other.cells[36..] {
-        *cell = 3 - *cell;
-    }
-    assert_eq!(
-        choose_depth(&other, &cell_letters(&other.cells), &declared).unwrap(),
-        sweep
-    );
-    assert!(!sweep.tried.is_empty());
-    assert_eq!(
-        sweep.description_bits,
-        crate::compression::cost::ceil_log2(&BigUint::from(sweep.tried.len()))
-    );
 }
 
-/// **The prior sweep reads the development cells only** (the stop prior's choice): every law of the
-/// family runs its own depth sweep ([`crate::hnn::reference::choose_depth`]), changing the held-out cells changes nothing,
-/// the choice is charged `⌈log₂⌉` of the laws tried, the incumbent is the `½` stop prior, the chosen
-/// law is the incumbent or the least charged law strictly below it, and a family without `½` is
-/// refused. `tree_prequential` is `prequential`'s tree.
+/// **`tree_prequential` is `prequential`'s tree**: on a declared stop prior and depth, the tree
+/// alone reads the development and held-out code lengths and the run `prequential` reads beside
+/// the baselines, and its largest per-cell residual lies within the face's rule.
 #[test]
-fn landmark_prior_sweep_reads_the_development_cells_only() {
+fn the_tree_prequential_is_the_prequentials_tree() {
     let cells: Vec<usize> = (0..96u64)
         .map(|t| ((t * 3 + t / 5 + t * t / 7) % 4) as usize)
         .collect();
@@ -502,41 +482,6 @@ fn landmark_prior_sweep_reads_the_development_cells_only() {
         population: 96,
         ..tree_declaration(4, 1)
     };
-    let family = prior_family(3);
-    let sweep = choose_prior(&cut, &letters, &declared, &family).unwrap();
-    let mut other = cut.clone();
-    for cell in &mut other.cells[72..] {
-        *cell = 3 - *cell;
-    }
-    assert_eq!(
-        choose_prior(&other, &cell_letters(&other.cells), &declared, &family).unwrap(),
-        sweep
-    );
-    assert_eq!(sweep.incumbent, 0);
-    assert_eq!(sweep.description_bits, 4);
-    assert_eq!(sweep.tried.len(), 9);
-    for (prior, depths) in &sweep.tried {
-        let at = LandmarkDeclaration {
-            prior: prior.clone(),
-            ..declared.clone()
-        };
-        assert_eq!(&choose_depth(&cut, &letters, &at).unwrap(), depths);
-    }
-    let chosen = sweep.charged(sweep.chosen);
-    if sweep.chosen != sweep.incumbent {
-        assert!(chosen.upper < sweep.charged(sweep.incumbent).lower);
-        assert!((0..9).all(|index| chosen.upper <= sweep.charged(index).upper));
-    }
-    assert_eq!(
-        sweep.decided,
-        (0..9).all(|index| index == sweep.chosen || chosen.upper < sweep.charged(index).lower)
-    );
-    assert_eq!(
-        sweep.chosen_description(),
-        4 + sweep.tried[sweep.chosen].1.description_bits
-    );
-    assert!(choose_prior(&cut, &letters, &declared, &family[1..]).is_err());
-
     let at = LandmarkDeclaration {
         prior: StopPrior::per_depth(vec![1, 3]).unwrap(),
         depth: 2,

@@ -104,7 +104,9 @@ use crate::hnn::chart::{ChartKey, ChartReading, ChartWords, Charts, WordLattice,
 use crate::hnn::constitution::Lattice;
 use crate::hnn::field::{ConstitutionRead, Current, End, Field};
 use crate::hnn::realization::{entries, indexed};
-use crate::hnn::ring::{PortScattering, ResonatorOperands, port_scattering};
+use crate::hnn::ring::ResonatorOperands;
+#[cfg(test)]
+use crate::hnn::ring::{PortScattering, port_scattering};
 use crate::ratio::exponentiated::power_of_two;
 use crate::ratio::linear::ExactRatMatrix;
 use crate::ratio::linear::vector::{add, dot, integer_dot, integral, lcm, scale, sub};
@@ -1055,7 +1057,8 @@ impl Operands {
     /// **The reference change at every port of ring `r`'s junction** (Lean
     /// `HNN/Ring.two_port_reference_balance`; [`crate::hnn::ring::port_scattering`]): the storage
     /// port's first, then each incident contact's, each with `Γ² + T = 1`.
-    pub fn port_scatterings(&self, ring: usize) -> Result<Vec<PortScattering>, HnnError> {
+    #[cfg(test)]
+    pub(crate) fn port_scatterings(&self, ring: usize) -> Result<Vec<PortScattering>, HnnError> {
         let conductances: Vec<&Rat> = self.incident[ring]
             .iter()
             .map(|&a| self.contacts[a].conductance())
@@ -1099,7 +1102,8 @@ impl Operands {
     /// **The executed charts with no transient split**: every solve the executed chart's exact
     /// values and every junction weight the executed one, the word unsplit. The executed word's
     /// linear map, on which its return pairs exactly (Lean `HNN/LatticeWord.executed_adjoint_unique`,
-    /// the law's own tests, and the pairing check of every refinement, `hnn::prediction`).
+    /// the law's own tests; the retired linear readout's pairing check read it too).
+    #[cfg(test)]
     pub(crate) fn unsplit(mut self) -> Result<Self, HnnError> {
         let exact = |solve: &Solve| -> Result<Solve, HnnError> { Solve::exact(&solve.matrix()?) };
         for ring in &mut self.rings {
@@ -1192,7 +1196,8 @@ pub fn scattering_about(anchor: Vec<Rat>, storage: &[Rat], arrivals: &[&[Rat]]) 
 /// `HNN/Propagation.{anchor_is_participation, junctionScattering_involutive, junctionScattering_isometry}`):
 /// the reflection `2P_D − I` onto the common-potential subspace, `W = diag(Y_r, G_a)`, under the
 /// exact law. It divides by its own positive admittance sum only.
-pub fn junction_scattering(
+#[cfg(test)]
+pub(crate) fn junction_scattering(
     admittance: &Rat,
     storage: &[Rat],
     arrivals: &[(&Rat, &[Rat])],

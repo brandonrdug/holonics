@@ -45,7 +45,8 @@
 //! word, without the borrow of its field (`KeptWord`), for the compare at the same commit, whose
 //! return consumes it.
 //!
-//! [definition; agent-inferred, U6's native generation (`hnn::prediction`; Brandon, September 29)]
+//! [definition; agent-inferred, U6's native generation (Brandon, September 29); its consumer, the
+//! linear readout, retired September 30 (batch H, at `f5fd8f3b`), the law held here]
 //! **Continuing motion within a refinement.** A word may open on the change the previous word of
 //! the same refinement left ([`Word::continuing`]): its storage waves, arriving waves, contact
 //! states and resonator states carry across the word's boundary instead of being released, with a
@@ -1139,7 +1140,8 @@ impl<'c> Word<'c> {
     }
 
     /// The support of the change over the contacts' own states.
-    pub fn contact_support(&self) -> Vec<bool> {
+    #[cfg(test)]
+    pub(crate) fn contact_support(&self) -> Vec<bool> {
         self.states
             .iter()
             .map(|state| state.iter().flatten().any(|x| !x.is_zero()))
@@ -1600,31 +1602,9 @@ impl<'c> Word<'c> {
         ))
     }
 
-    /// The driven wave at junction step `step`: the element output `e` when a loaded resonator is
-    /// declared, otherwise the junction's storage wave `b = 2v−s`. `None` past the steps taken.
-    pub fn storage_waves(&self, step: usize) -> Option<Vec<Vec<Rat>>> {
-        let record = self.passage.get(step)?;
-        Some(
-            record
-                .anchors
-                .iter()
-                .zip(&record.storage)
-                .enumerate()
-                .map(|(ring, (anchor, storage))| {
-                    self.resonators[ring]
-                        .as_ref()
-                        .and_then(|resonance| resonance.steps.get(step))
-                        .map_or_else(
-                            || crate::geometry::swing::half_turn(anchor, storage),
-                            |resonance| resonance.drive.clone(),
-                        )
-                })
-                .collect(),
-        )
-    }
-
     /// **The whole word's balance**, read at any point of the word: [`WordBalance::of`] its release.
-    pub fn word_balance(&self) -> Result<WordBalance, HnnError> {
+    #[cfg(test)]
+    pub(crate) fn word_balance(&self) -> Result<WordBalance, HnnError> {
         Ok(WordBalance::of(&self.released()?))
     }
 

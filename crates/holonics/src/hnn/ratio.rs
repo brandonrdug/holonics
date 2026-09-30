@@ -53,7 +53,9 @@
 //! | `odometer_covector_descends`, `odometer_eq_face_at_integer_cells` (the magnitude part); `receivingPhase_phase_pullback` (the phase part) | [`RatioCovector`], [`Face::odometer_masses`] |
 //! | `Objects/Ratio.logFibre` (the undivided pair with its winding) | [`HolonRatio::log_ratio`] |
 
-use num_bigint::{BigInt, BigUint};
+use num_bigint::BigInt;
+#[cfg(test)]
+use num_bigint::BigUint;
 use num_traits::{One, ToPrimitive, Zero};
 
 use crate::aeon::Reading;
@@ -64,7 +66,9 @@ use crate::hnn::receiving::ReceivingRead;
 use crate::ratio::algebraic::{
     ExactInterval, interval_difference, interval_sum, log2_enclosure, log2_of_enclosure,
 };
-use crate::ratio::exponentiated::{CarriedPower, PhaseField, READING_BITS, power_of_two};
+use crate::ratio::exponentiated::{CarriedPower, PhaseField};
+#[cfg(test)]
+use crate::ratio::exponentiated::{READING_BITS, power_of_two};
 use crate::ratio::gaussian::GaussianRat;
 use crate::ratio::{LogRatio, Rat, integer};
 use crate::receiver::face::GrainCell;
@@ -75,7 +79,8 @@ use crate::receiver::face::GrainCell;
 
 /// **`2^x` of a rational, enclosed**: `2^⌊x⌋ · 2^(a/b)` with `a/b` the fractional part, its root
 /// bounded by an exact integer `b`-th root at [`READING_BITS`]. A reading, never a law's value.
-pub fn power_of_two_enclosure(x: &Rat) -> Result<ExactInterval, HnnError> {
+#[cfg(test)]
+pub(crate) fn power_of_two_enclosure(x: &Rat) -> Result<ExactInterval, HnnError> {
     let floor = x.floor().to_integer();
     let fraction = x - Rat::from_integer(floor.clone());
     let scale = power_of_two(&floor)?;

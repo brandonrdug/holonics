@@ -567,7 +567,9 @@ fn every_solve_the_word_executes_is_certified_below_its_target() {
 /// Lean `HNN/Word.word_tick_balance`: with dissipation, a passive element part and a contrast port
 /// together, `P(t+1) = P(t) − h Σ ω*Dω + (h/2) Σ Y ⟨x̄, W_s x̄⟩ + Π_c` exactly at every tick, the
 /// dissipation `≥ 0`, the passive term `≤ 0`, and `Π_c` of both signs over starting states (with
-/// `W_c` at 1/8 of the other operands' scale, as in `power.py`; a dominant `W_c` pumps, since
+/// `W_c` at 1/8 of the other operands' scale, as in the retired
+/// [`power.py`](https://github.com/brandonrdug/holonics/blob/d4596102/research/notebook/hnn_design/power.py), whose readings the construction record holds; a
+/// dominant `W_c` pumps, since
 /// `(I − ½K)⁻¹` has a positive-definite symmetric part for passive `K`).
 #[test]
 fn the_global_power_balance_closes_exactly_at_every_tick() {
@@ -635,7 +637,8 @@ fn an_impulse_propagates_one_contact_per_tick_inside_its_cone() {
     }
 }
 
-/// The measured cone of the design (`bits2.py`): with bare contacts on full channels, the front of
+/// The measured cone of the design (the retired [`bits2.py`](https://github.com/brandonrdug/holonics/blob/d4596102/research/notebook/hnn_design/bits2.py)): with
+/// bare contacts on full channels, the front of
 /// an impulse at ring 1 of the six-cycle is rings `{0, 2}` after one tick, then `{0, 1, 2, 3, 5}`,
 /// then all six.
 #[test]

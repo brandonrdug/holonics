@@ -737,18 +737,7 @@ impl JointReading {
         }
     }
 
-    /// [definition; agent-inferred, September 29] **A score beside the logits' joins the joint
-    /// term** (Lean `HNN/BankFace.joint_descends_beside`): a comparison read beside the logits (the
-    /// receiving bank's face, `hnn::constitution`, "The bank's learning path") whose own score moves
-    /// by at most its first-order decrease plus an endpoint term `Q_b` along the families' rays adds
-    /// `Q_b` to the joint curvature term; its decrease is already in each family's alignment. The
-    /// joint certificate `s (Σ η m)² + Q_b ≤ Σ η a` then descends by `½ Σ η a`.
-    pub fn beside(mut self, term: &Rat) -> Self {
-        self.curvature += term;
-        self
-    }
-
-    /// `s (Σ η m)² ≤ Σ η a` (the beside term included).
+    /// `s (Σ η m)² ≤ Σ η a`.
     pub fn holds(&self) -> bool {
         self.curvature <= self.decrease
     }
