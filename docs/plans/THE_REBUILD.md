@@ -505,6 +505,33 @@ named, and the program's loop stays its own counter, disclosed as such.
 
 #### U6. The text chart
 
+- **The passage law, September 30: the section continues the request, and the transport weighs its
+  frontier**
+  ([pin](../../research/records/2026-09-30_THE_PASSAGE_LAW_THE_SECTION_CONTINUES_THE_REQUEST_AND_THE_TRANSPORT_WEIGHS_ITS_FRONTIER.md),
+  `ad0c7b08`; [receipt](../../research/records/2026-09-30_THE_PASSAGE_LAW_MEASURED_THE_FRONTIER_READS_THE_REQUEST_AND_A_LOCKED_NEIGHBOUR_ERASES_THE_OTHER_CHAIN.md); Refs #73 #148 #63).
+  - *Built* (the placement's weights in their owners): the request and its section are one span of
+    the receiving ring read over its transported mass, each datum at `ρ^a / Σ ρ^(a_k)` (`hnn::moment`
+    `SourceMoment::{continued, phase_weights}`, `hnn::prediction::BankPlacement`, the readout path, the
+    face path and the executed comparison's returns); the source navigator's modulus `ρ ∈ (0, 1]` a
+    passive constitution locus, one at the founding, moved by the certified committed move beside `E`;
+    Lean `HNN/IndexedOpen` §4 (the span's weights, their frame and split invariance, the separate
+    populations' ratio `n/v`, and a unitary transport giving every crossing the same modulus at every
+    lag, so no reading marks the frontier). Refused and owed: a passage past one turn below modulus
+    one (the leaky count), the card and the face path below modulus one.
+  - *Measured* (the seed test, the probe's on-policy fit of `E` and `ρ` from the opening read natively
+    on Stage 0's 128 held-out requests): 9 whole sections against 17, the pinned improvement not met;
+    the first lock right at 128 against 57 (never at station 0 or 1: the far end locks first, from the
+    request's last cells), stations right 677 against 404, native and float equal at every station;
+    the chain seeded by `x_39` read, the chain seeded by `x_38` not. Confirmation and regressions not
+    run, by the pin.
+  - *What stays open*, by its measurement: from the open section the fitted constitution reads 972 of
+    1,024 station tops right; with the other chain's locked data placed at their truth, 273 of 1,024.
+    The lock iteration re-enters each locked datum at its tick's transported weight, and the other
+    chain's newest data, one tick away, erase a station whose rule reads two ticks back: the next
+    loop's subject, in `bank_release` and `BankPlacement`. In #62: the phases' ages within one turn,
+    the leaky count, the charted weights, the joint move's secant certificate, the card and the face
+    below modulus one.
+
 - **The executed comparison joined, September 30: a certified move descends the release's own
   comparison, and on order-2 training learns only that the termination is last**
   ([pin](../../research/records/2026-09-30_THE_EXECUTED_COMPARISONS_BOUNDED_TEST_PINNED_BEFORE_ITS_RUNS.md),

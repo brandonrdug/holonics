@@ -1,0 +1,4 @@
+native-release: the transport modulus 1452225/2097152 (fitted 6237259516612919/9007199254740992)
+native-release: E on the source port's lattice 2^(-21), the rounding's largest move 2146247983/9007199254740992; E's largest |entry| 2519969/1048576 (the entry bound 8)
+native-release: 128 requests in 500990 ms; resident 125001728 now, 133038080 peak
+exit 0 wall 501042 ms

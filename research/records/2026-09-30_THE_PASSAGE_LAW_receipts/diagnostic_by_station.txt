@@ -1,0 +1,4 @@
+teacher-forced (stations before j at truth): right by station [91, 74, 121, 118, 117, 102, 105, 105] of 128 each
+the other chain at truth: right by station [28, 29, 33, 26, 31, 28, 41, 57] of 128 each
+the same chain before j at truth: right by station [91, 117, 128, 128, 128, 128, 128, 128] of 128 each
+nothing placed: right by station [91, 117, 125, 127, 128, 128, 128, 128] of 128 each

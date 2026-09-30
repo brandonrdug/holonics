@@ -1,0 +1,1408 @@
+request 0: target [2, 2, 3, 3, 0, 0, 1, 1]; native released [3, 2, 3, 3, 1, 0, 2, 1] (right 5, the float release [3, 2, 3, 3, 1, 0, 2, 1] agrees at 8); refinements 8, readings 180, locks [[7], [5], [3], [1], [4], [2], [0], [6]]; members certified 32 of 32, ticks closed 1920 of 1920
+  lock station 7 class 1: joint [21068, 84273/4], runner-up [129597/128, 64799/64]
+  lock station 5 class 0: joint [68277, 68278], runner-up [103381/32, 51691/16]
+  lock station 3 class 3: joint [157484, 157486], runner-up [119007/8, 14876]
+  lock station 1 class 2: joint [172326, 172328], runner-up [127841/2, 63921]
+  lock station 4 class 1: joint [37661/2, 75323/4], runner-up [30301/2, 121205/8]
+  lock station 2 class 3: joint [84195/8, 21049/2], runner-up [39397/4, 78795/8]
+  lock station 0 class 3: joint [71941/8, 35971/4], runner-up [69019/8, 17255/2]
+  lock station 6 class 2: joint [60293/64, 120587/128], runner-up [96557/128, 48279/64]
+  admission: 180 candidates read, 0 past the signed form; largest |z|² 20215916270029765752484225/4835703278458516698824704
+  teacher-forced: flips to the target 8, to another class 0, undecided 0, top not past one 0, refused 0; exact top = target 8
+request 1: target [3, 1, 0, 2, 1, 3, 2, 0]; native released [3, 1, 3, 2, 3, 3, 1, 0] (right 5, the float release [3, 1, 3, 2, 3, 3, 1, 0] agrees at 8); refinements 8, readings 180, locks [[7], [3], [1], [5], [0], [2], [4], [6]]; members certified 32 of 32, ticks closed 1920 of 1920
+  lock station 7 class 0: joint [67698, 67699], runner-up [22359/2, 89437/8]
+  lock station 3 class 2: joint [211870, 211872], runner-up [36079/16, 72159/32]
+  lock station 1 class 1: joint [291340, 291344], runner-up [52650, 105301/2]
+  lock station 5 class 3: joint [292140, 292144], runner-up [112635/16, 28159/4]
+  lock station 0 class 3: joint [213292, 213294], runner-up [205032, 205034]
+  lock station 2 class 3: joint [90446, 90447], runner-up [84805, 84806]
+  lock station 4 class 3: joint [63857/4, 127715/8], runner-up [104405/8, 52203/4]
+  lock station 6 class 1: joint [71627/64, 17907/16], runner-up [60653/64, 121307/128]
+  admission: 180 candidates read, 0 past the signed form; largest |z|² 42683779789597218797976377/9671406556917033397649408
+  teacher-forced: flips to the target 8, to another class 0, undecided 0, top not past one 0, refused 0; exact top = target 8
+request 2: target [0, 3, 1, 0, 2, 1, 3, 2]; native released [0, 2, 1, 1, 2, 1, 3, 2] (right 6, the float release [0, 2, 1, 1, 2, 1, 3, 2] agrees at 8); refinements 8, readings 180, locks [[6], [4], [2], [0], [1], [3], [5], [7]]; members certified 32 of 32, ticks closed 1920 of 1920
+  lock station 6 class 3: joint [115063/4, 28766], runner-up [95715/64, 23929/16]
+  lock station 4 class 2: joint [109341, 109342], runner-up [45879/256, 91759/512]
+  lock station 2 class 1: joint [161462, 161464], runner-up [102969/4, 51485/2]
+  lock station 0 class 0: joint [196258, 196260], runner-up [79249, 79250]
+  lock station 1 class 2: joint [73863, 73864], runner-up [68151, 68152]
+  lock station 3 class 1: joint [18213, 72853/4], runner-up [118411/8, 29603/2]
+  lock station 5 class 1: joint [31815/16, 127261/64], runner-up [117119/64, 1830]
+  lock station 7 class 2: joint [51283/64, 102567/128], runner-up [86699/256, 21675/64]
+  admission: 180 candidates read, 0 past the signed form; largest |z|² 41269295309917971978453889/9671406556917033397649408
+  teacher-forced: flips to the target 8, to another class 0, undecided 0, top not past one 0, refused 0; exact top = target 8
+request 3: target [3, 3, 0, 0, 1, 1, 2, 2]; native released [2, 3, 3, 0, 0, 1, 1, 2] (right 4, the float release [2, 3, 3, 0, 0, 1, 1, 2] agrees at 8); refinements 8, readings 180, locks [[5], [3], [7], [1], [0], [2], [4], [6]]; members certified 32 of 32, ticks closed 1920 of 1920
+  lock station 5 class 1: joint [130335/4, 32584], runner-up [63543/32, 127087/64]
+  lock station 3 class 0: joint [109825, 109826], runner-up [78593/64, 39297/32]
+  lock station 7 class 2: joint [110903, 110904], runner-up [71269/64, 35635/32]
+  lock station 1 class 3: joint [108116, 108117], runner-up [106807/2, 53404]
+  lock station 0 class 2: joint [69794, 69795], runner-up [114561/2, 57281]
+  lock station 2 class 3: joint [32650, 130601/4], runner-up [59129/2, 118259/4]
+  lock station 4 class 0: joint [128681/16, 64341/8], runner-up [53495/8, 106991/16]
+  lock station 6 class 1: joint [14737/8, 117897/64], runner-up [40907/32, 81815/64]
+  admission: 180 candidates read, 0 past the signed form; largest |z|² 83594106373891549952728613/19342813113834066795298816
+  teacher-forced: flips to the target 7, to another class 1, undecided 0, top not past one 0, refused 0; exact top = target 7
+request 4: target [1, 3, 2, 0, 3, 1, 0, 2]; native released [1, 3, 2, 3, 3, 2, 0, 2] (right 6, the float release [1, 3, 2, 3, 3, 2, 0, 2] agrees at 8); refinements 8, readings 180, locks [[6], [2], [4], [0], [3], [1], [7], [5]]; members certified 32 of 32, ticks closed 1920 of 1920
+  lock station 6 class 0: joint [78767/2, 39384], runner-up [61547/8, 123095/16]
+  lock station 2 class 2: joint [127006, 127007], runner-up [69877/32, 34939/16]
+  lock station 4 class 3: joint [163200, 163202], runner-up [66771/32, 16693/8]
+  lock station 0 class 1: joint [202282, 202284], runner-up [75173, 75174]
+  lock station 3 class 3: joint [109527/4, 27382], runner-up [100015/4, 25004]
+  lock station 1 class 3: joint [71401/4, 35701/2], runner-up [106693/8, 53347/4]
+  lock station 7 class 2: joint [120427/512, 30107/128], runner-up [10311/128, 82489/1024]
+  lock station 5 class 2: joint [64345/256, 128691/512], runner-up [59307/256, 118615/512]
+  admission: 180 candidates read, 0 past the signed form; largest |z|² 79542530179956058660459573/19342813113834066795298816
+  teacher-forced: flips to the target 6, to another class 2, undecided 0, top not past one 0, refused 0; exact top = target 6
+request 5: target [1, 0, 2, 1, 3, 2, 0, 3]; native released [1, 0, 2, 1, 1, 2, 1, 3] (right 6, the float release [1, 0, 2, 1, 1, 2, 1, 3] agrees at 8); refinements 8, readings 180, locks [[7], [5], [1], [3], [4], [2], [0], [6]]; members certified 32 of 32, ticks closed 1920 of 1920
+  lock station 7 class 3: joint [46681, 93363/2], runner-up [88505/64, 44253/32]
+  lock station 5 class 2: joint [171068, 171070], runner-up [101327/256, 6333/16]
+  lock station 1 class 0: joint [313624, 313628], runner-up [68504, 68505]
+  lock station 3 class 1: joint [350060, 350064], runner-up [70312, 70313]
+  lock station 4 class 1: joint [47513, 95027/2], runner-up [88981/2, 44491]
+  lock station 2 class 2: joint [105233/4, 52617/2], runner-up [93843/4, 23461]
+  lock station 0 class 1: joint [78283/4, 19571], runner-up [74905/4, 37453/2]
+  lock station 6 class 1: joint [67031/32, 8379/4], runner-up [15829/8, 126633/64]
+  admission: 180 candidates read, 0 past the signed form; largest |z|² 40613439272104533339437929/9671406556917033397649408
+  teacher-forced: flips to the target 8, to another class 0, undecided 0, top not past one 0, refused 0; exact top = target 8
+request 6: target [1, 3, 2, 0, 3, 1, 0, 2]; native released [1, 3, 2, 3, 3, 2, 0, 2] (right 6, the float release [1, 3, 2, 3, 3, 2, 0, 2] agrees at 8); refinements 8, readings 180, locks [[6], [2], [4], [0], [1], [3], [7], [5]]; members certified 32 of 32, ticks closed 1920 of 1920
+  lock station 6 class 0: joint [37606, 75213/2], runner-up [94535/16, 11817/2]
+  lock station 2 class 2: joint [129561, 129562], runner-up [117289/32, 58645/16]
+  lock station 4 class 3: joint [183220, 183222], runner-up [9687/8, 77497/64]
+  lock station 0 class 1: joint [215792, 215794], runner-up [80037, 80038]
+  lock station 1 class 3: joint [90931, 90932], runner-up [87767, 87768]
+  lock station 3 class 3: joint [70417/4, 35209/2], runner-up [55347/4, 110695/8]
+  lock station 7 class 2: joint [122517/512, 61259/256], runner-up [116411/2048, 29103/512]
+  lock station 5 class 2: joint [130739/512, 32685/128], runner-up [58795/256, 117591/512]
+  admission: 180 candidates read, 0 past the signed form; largest |z|² 81618764184370446116015921/19342813113834066795298816
+  teacher-forced: flips to the target 5, to another class 3, undecided 0, top not past one 0, refused 0; exact top = target 5
+request 7: target [2, 3, 3, 0, 0, 1, 1, 2]; native released [2, 3, 3, 0, 0, 1, 1, 2] (right 8, the float release [2, 3, 3, 0, 0, 1, 1, 2] agrees at 8); refinements 8, readings 180, locks [[7], [3], [5], [1], [0], [2], [4], [6]]; members certified 32 of 32, ticks closed 1920 of 1920
+  lock station 7 class 2: joint [22719, 90877/4], runner-up [128255/128, 1002]
+  lock station 3 class 0: joint [104756, 104757], runner-up [117563/128, 29391/32]
+  lock station 5 class 1: joint [115850, 115851], runner-up [48501/16, 97003/32]
+  lock station 1 class 3: joint [112312, 112313], runner-up [54543, 109087/2]
+  lock station 0 class 2: joint [71904, 71905], runner-up [116013/2, 58007]
+  lock station 2 class 3: joint [33448, 66897/2], runner-up [119011/4, 29753]
+  lock station 4 class 0: joint [66103/8, 8263], runner-up [26553/4, 106213/16]
+  lock station 6 class 1: joint [7525/4, 120401/64], runner-up [81937/64, 40969/32]
+  admission: 180 candidates read, 0 past the signed form; largest |z|² 83035084071595161266061557/19342813113834066795298816
+  teacher-forced: flips to the target 7, to another class 1, undecided 0, top not past one 0, refused 0; exact top = target 7
+request 8: target [3, 0, 0, 1, 1, 2, 2, 3]; native released [1, 0, 2, 1, 1, 2, 1, 3] (right 5, the float release [1, 0, 2, 1, 1, 2, 1, 3] agrees at 8); refinements 8, readings 180, locks [[7], [3], [5], [1], [0], [4], [2], [6]]; members certified 32 of 32, ticks closed 1920 of 1920
+  lock station 7 class 3: joint [44454, 88909/2], runner-up [128275/64, 32069/16]
+  lock station 3 class 1: joint [168934, 168936], runner-up [86465/64, 43233/32]
+  lock station 5 class 2: joint [254960, 254962], runner-up [1284, 82177/64]
+  lock station 1 class 0: joint [338596, 338600], runner-up [127290, 127291]
+  lock station 0 class 1: joint [203944, 203946], runner-up [200278, 200280]
+  lock station 4 class 1: joint [33883, 67767/2], runner-up [124975/4, 31244]
+  lock station 2 class 2: joint [19834, 79337/4], runner-up [72239/4, 18060]
+  lock station 6 class 1: joint [68439/32, 8555/4], runner-up [31277/16, 125109/64]
+  admission: 180 candidates read, 0 past the signed form; largest |z|² 84335546307700377311250941/19342813113834066795298816
+  teacher-forced: flips to the target 6, to another class 2, undecided 0, top not past one 0, refused 0; exact top = target 6
+request 9: target [2, 0, 3, 1, 0, 2, 1, 3]; native released [1, 0, 2, 1, 1, 2, 1, 3] (right 5, the float release [1, 0, 2, 1, 1, 2, 1, 3] agrees at 8); refinements 8, readings 180, locks [[7], [3], [5], [1], [2], [4], [0], [6]]; members certified 32 of 32, ticks closed 1920 of 1920
+  lock station 7 class 3: joint [75923/4, 18981], runner-up [69457/32, 34729/16]
+  lock station 3 class 1: joint [157220, 157222], runner-up [49223/16, 98447/32]
+  lock station 5 class 2: joint [241740, 241742], runner-up [36649/32, 73299/64]
+  lock station 1 class 0: joint [314160, 314164], runner-up [117727, 117728]
+  lock station 2 class 2: joint [108963, 108964], runner-up [104093, 104094]
+  lock station 4 class 1: joint [96071/4, 24018], runner-up [40609/2, 81219/4]
+  lock station 0 class 1: joint [18075, 72301/4], runner-up [17172, 68689/4]
+  lock station 6 class 1: joint [127805/64, 63903/32], runner-up [117753/64, 58877/32]
+  admission: 180 candidates read, 0 past the signed form; largest |z|² 81082111587361915869702425/19342813113834066795298816
+  teacher-forced: flips to the target 6, to another class 2, undecided 0, top not past one 0, refused 0; exact top = target 6
+request 10: target [2, 0, 3, 1, 0, 2, 1, 3]; native released [1, 0, 2, 1, 1, 2, 1, 3] (right 5, the float release [1, 0, 2, 1, 1, 2, 1, 3] agrees at 8); refinements 8, readings 180, locks [[7], [3], [5], [1], [2], [4], [0], [6]]; members certified 32 of 32, ticks closed 1920 of 1920
+  lock station 7 class 3: joint [114199/4, 28550], runner-up [51359/16, 102719/32]
+  lock station 3 class 1: joint [149108, 149110], runner-up [71563/32, 17891/8]
+  lock station 5 class 2: joint [226394, 226396], runner-up [30515/32, 122061/128]
+  lock station 1 class 0: joint [301364, 301368], runner-up [114307, 114308]
+  lock station 2 class 2: joint [107642, 107643], runner-up [102507, 102508]
+  lock station 4 class 1: joint [96663/4, 24166], runner-up [80833/4, 40417/2]
+  lock station 0 class 1: joint [36489/2, 72979/4], runner-up [69405/4, 34703/2]
+  lock station 6 class 1: joint [8301/4, 66409/32], runner-up [59979/32, 119959/64]
+  admission: 180 candidates read, 0 past the signed form; largest |z|² 41441815689679334726794521/9671406556917033397649408
+  teacher-forced: flips to the target 5, to another class 3, undecided 0, top not past one 0, refused 0; exact top = target 5
+request 11: target [0, 3, 1, 0, 2, 1, 3, 2]; native released [2, 3, 3, 0, 2, 1, 1, 2] (right 5, the float release [2, 3, 3, 0, 2, 1, 1, 2] agrees at 8); refinements 8, readings 180, locks [[7], [1], [5], [3], [0], [2], [6], [4]]; members certified 32 of 32, ticks closed 1920 of 1920
+  lock station 7 class 2: joint [120701/4, 60351/2], runner-up [96683/64, 24171/16]
+  lock station 1 class 3: joint [112601, 112602], runner-up [87217/16, 43609/8]
+  lock station 5 class 1: joint [113739, 113740], runner-up [63737/32, 127475/64]
+  lock station 3 class 0: joint [103393, 103394], runner-up [25355, 101421/4]
+  lock station 0 class 2: joint [67490, 67491], runner-up [52598, 105197/2]
+  lock station 2 class 3: joint [128041/4, 64021/2], runner-up [57119/2, 114239/4]
+  lock station 6 class 1: joint [15143/4, 121145/32], runner-up [9169/4, 73353/32]
+  lock station 4 class 2: joint [124135/64, 15517/8], runner-up [60697/32, 121395/64]
+  admission: 180 candidates read, 0 past the signed form; largest |z|² 80553316751890972783839841/19342813113834066795298816
+  teacher-forced: flips to the target 7, to another class 1, undecided 0, top not past one 0, refused 0; exact top = target 7
+request 12: target [2, 3, 3, 0, 0, 1, 1, 2]; native released [2, 3, 3, 0, 0, 1, 1, 2] (right 8, the float release [2, 3, 3, 0, 0, 1, 1, 2] agrees at 8); refinements 8, readings 180, locks [[7], [1], [5], [3], [0], [2], [4], [6]]; members certified 32 of 32, ticks closed 1920 of 1920
+  lock station 7 class 2: joint [94117/2, 47059], runner-up [82599/64, 10325/8]
+  lock station 1 class 3: joint [155270, 155272], runner-up [28951/4, 115805/16]
+  lock station 5 class 1: joint [153598, 153600], runner-up [101095/32, 12637/4]
+  lock station 3 class 0: joint [132756, 132758], runner-up [74499/2, 37250]
+  lock station 0 class 2: joint [85214, 85215], runner-up [68801, 68802]
+  lock station 2 class 3: joint [77627/2, 38814], runner-up [34626, 69253/2]
+  lock station 4 class 0: joint [74743/8, 9343], runner-up [59163/8, 118327/16]
+  lock station 6 class 1: joint [3983/2, 127457/64], runner-up [43591/32, 87183/64]
+  admission: 180 candidates read, 0 past the signed form; largest |z|² 81049019555036650031531717/19342813113834066795298816
+  teacher-forced: flips to the target 7, to another class 1, undecided 0, top not past one 0, refused 0; exact top = target 7
+request 13: target [3, 1, 0, 2, 1, 3, 2, 0]; native released [2, 1, 3, 2, 3, 3, 1, 0] (right 4, the float release [2, 1, 3, 2, 3, 3, 1, 0] agrees at 8); refinements 8, readings 180, locks [[5], [7], [3], [1], [2], [4], [0], [6]]; members certified 32 of 32, ticks closed 1920 of 1920
+  lock station 5 class 3: joint [70292, 70293], runner-up [14515/8, 116121/64]
+  lock station 7 class 0: joint [181958, 181960], runner-up [17157/16, 68629/64]
+  lock station 3 class 2: joint [272604, 272608], runner-up [16306, 130449/8]
+  lock station 1 class 1: joint [330556, 330560], runner-up [117101, 117102]
+  lock station 2 class 3: joint [129429, 129430], runner-up [119239, 119240]
+  lock station 4 class 3: joint [84635/4, 21159], runner-up [67243/4, 16811]
+  lock station 0 class 2: joint [36365/2, 72731/4], runner-up [16353, 130825/8]
+  lock station 6 class 1: joint [20831/16, 83325/64], runner-up [77631/64, 1213]
+  admission: 180 candidates read, 0 past the signed form; largest |z|² 43270198353931030972009661/9671406556917033397649408
+  teacher-forced: flips to the target 8, to another class 0, undecided 0, top not past one 0, refused 0; exact top = target 8
+request 14: target [0, 2, 1, 3, 2, 0, 3, 1]; native released [3, 2, 3, 3, 1, 0, 2, 1] (right 4, the float release [3, 2, 3, 3, 1, 0, 2, 1] agrees at 8); refinements 8, readings 180, locks [[5], [3], [7], [1], [0], [2], [4], [6]]; members certified 32 of 32, ticks closed 1920 of 1920
+  lock station 5 class 0: joint [69928, 69929], runner-up [83033/128, 41517/64]
+  lock station 3 class 3: joint [133844, 133846], runner-up [63257/64, 126515/128]
+  lock station 7 class 1: joint [181990, 181992], runner-up [13023/32, 104185/256]
+  lock station 1 class 2: joint [193048, 193050], runner-up [74426, 74427]
+  lock station 0 class 3: joint [129555, 129556], runner-up [125242, 125243]
+  lock station 2 class 3: joint [104775/2, 52388], runner-up [98723/2, 49362]
+  lock station 4 class 1: joint [75073/8, 37537/4], runner-up [124685/16, 62343/8]
+  lock station 6 class 2: joint [111359/128, 870], runner-up [94083/128, 23521/32]
+  admission: 180 candidates read, 0 past the signed form; largest |z|² 80053267211726620672446857/19342813113834066795298816
+  teacher-forced: flips to the target 5, to another class 3, undecided 0, top not past one 0, refused 0; exact top = target 5
+request 15: target [2, 3, 3, 0, 0, 1, 1, 2]; native released [2, 3, 3, 0, 0, 1, 1, 2] (right 8, the float release [2, 3, 3, 0, 0, 1, 1, 2] agrees at 8); refinements 8, readings 180, locks [[7], [3], [5], [1], [0], [2], [4], [6]]; members certified 32 of 32, ticks closed 1920 of 1920
+  lock station 7 class 2: joint [88769/4, 44385/2], runner-up [71117/64, 35559/32]
+  lock station 3 class 0: joint [102349, 102350], runner-up [115463/128, 14433/16]
+  lock station 5 class 1: joint [112810, 112811], runner-up [99207/32, 12401/4]
+  lock station 1 class 3: joint [110518, 110519], runner-up [105483/2, 52742]
+  lock station 0 class 2: joint [70701, 70702], runner-up [114389/2, 57195]
+  lock station 2 class 3: joint [65819/2, 32910], runner-up [116555/4, 29139]
+  lock station 4 class 0: joint [66073/8, 33037/4], runner-up [12831/2, 102649/16]
+  lock station 6 class 1: joint [61407/32, 122815/64], runner-up [80569/64, 40285/32]
+  admission: 180 candidates read, 0 past the signed form; largest |z|² 83939723438085205622220089/19342813113834066795298816
+  teacher-forced: flips to the target 7, to another class 1, undecided 0, top not past one 0, refused 0; exact top = target 7
+request 16: target [2, 1, 3, 2, 0, 3, 1, 0]; native released [3, 1, 3, 2, 3, 3, 1, 0] (right 6, the float release [3, 1, 3, 2, 3, 3, 1, 0] agrees at 8); refinements 8, readings 180, locks [[7], [3], [5], [1], [0], [2], [4], [6]]; members certified 32 of 32, ticks closed 1920 of 1920
+  lock station 7 class 0: joint [57954, 115909/2], runner-up [82407/16, 10301/2]
+  lock station 3 class 2: joint [177660, 177662], runner-up [81253/32, 40627/16]
+  lock station 5 class 3: joint [216946, 216948], runner-up [83815/32, 10477/4]
+  lock station 1 class 1: joint [267516, 267520], runner-up [95248, 95249]
+  lock station 0 class 3: joint [194382, 194384], runner-up [187534, 187536]
+  lock station 2 class 3: joint [83437, 83438], runner-up [77302, 77303]
+  lock station 4 class 3: joint [61513/4, 123027/8], runner-up [50059/4, 100119/8]
+  lock station 6 class 1: joint [17953/16, 71813/64], runner-up [7793/8, 124689/128]
+  admission: 180 candidates read, 0 past the signed form; largest |z|² 83902816999793357702179525/19342813113834066795298816
+  teacher-forced: flips to the target 6, to another class 2, undecided 0, top not past one 0, refused 0; exact top = target 6
+request 17: target [3, 2, 0, 3, 1, 0, 2, 1]; native released [3, 2, 3, 3, 1, 0, 2, 1] (right 7, the float release [3, 2, 3, 3, 1, 0, 2, 1] agrees at 8); refinements 8, readings 180, locks [[5], [7], [1], [3], [4], [2], [0], [6]]; members certified 32 of 32, ticks closed 1920 of 1920
+  lock station 5 class 0: joint [97039/4, 24260], runner-up [11583/8, 92665/64]
+  lock station 7 class 1: joint [87686, 87687], runner-up [86841/64, 43421/32]
+  lock station 1 class 2: joint [194936, 194938], runner-up [104499/4, 26125]
+  lock station 3 class 3: joint [202476, 202478], runner-up [75855/2, 37928]
+  lock station 4 class 1: joint [86469/4, 43235/2], runner-up [17895, 71581/4]
+  lock station 2 class 3: joint [97521/8, 48761/4], runner-up [22475/2, 89901/8]
+  lock station 0 class 3: joint [42101/4, 84203/8], runner-up [80813/8, 40407/4]
+  lock station 6 class 2: joint [31721/32, 126885/128], runner-up [51839/64, 103679/128]
+  admission: 180 candidates read, 0 past the signed form; largest |z|² 20636055832484022555040865/4835703278458516698824704
+  teacher-forced: flips to the target 6, to another class 2, undecided 0, top not past one 0, refused 0; exact top = target 6
+request 18: target [1, 0, 2, 1, 3, 2, 0, 3]; native released [1, 0, 2, 1, 1, 2, 1, 3] (right 6, the float release [1, 0, 2, 1, 1, 2, 1, 3] agrees at 8); refinements 8, readings 180, locks [[7], [5], [1], [3], [0], [4], [2], [6]]; members certified 32 of 32, ticks closed 1920 of 1920
+  lock station 7 class 3: joint [110461/2, 55231], runner-up [116815/16, 7301]
+  lock station 5 class 2: joint [169310, 169312], runner-up [130895/256, 8181/16]
+  lock station 1 class 0: joint [315616, 315620], runner-up [68622, 68623]
+  lock station 3 class 1: joint [344232, 344236], runner-up [69530, 69531]
+  lock station 0 class 1: joint [203648, 203650], runner-up [201622, 201624]
+  lock station 4 class 1: joint [129943/4, 32486], runner-up [124783/4, 31196]
+  lock station 2 class 2: joint [18877, 75509/4], runner-up [69047/4, 17262]
+  lock station 6 class 1: joint [131063/64, 16383/8], runner-up [63099/32, 126199/64]
+  admission: 180 candidates read, 0 past the signed form; largest |z|² 83016931688419909856028813/19342813113834066795298816
+  teacher-forced: flips to the target 6, to another class 2, undecided 0, top not past one 0, refused 0; exact top = target 6
+request 19: target [1, 1, 2, 2, 3, 3, 0, 0]; native released [3, 1, 3, 2, 3, 3, 1, 0] (right 5, the float release [3, 1, 3, 2, 3, 3, 1, 0] agrees at 8); refinements 8, readings 180, locks [[7], [1], [3], [5], [0], [2], [4], [6]]; members certified 32 of 32, ticks closed 1920 of 1920
+  lock station 7 class 0: joint [51940, 103881/2], runner-up [71909/32, 35955/16]
+  lock station 1 class 1: joint [151448, 151450], runner-up [15919/4, 127353/32]
+  lock station 3 class 2: joint [219444, 219446], runner-up [124953/32, 62477/16]
+  lock station 5 class 3: joint [241324, 241326], runner-up [50521/8, 101043/16]
+  lock station 0 class 3: joint [179266, 179268], runner-up [169142, 169144]
+  lock station 2 class 3: joint [77568, 77569], runner-up [72850, 72851]
+  lock station 4 class 3: joint [57399/4, 114799/8], runner-up [94317/8, 47159/4]
+  lock station 6 class 1: joint [65189/64, 130379/128], runner-up [58671/64, 117343/128]
+  admission: 180 candidates read, 0 past the signed form; largest |z|² 80880283945306812237914645/19342813113834066795298816
+  teacher-forced: flips to the target 7, to another class 1, undecided 0, top not past one 0, refused 0; exact top = target 7
+request 20: target [2, 1, 3, 2, 0, 3, 1, 0]; native released [2, 1, 3, 2, 3, 3, 1, 0] (right 7, the float release [2, 1, 3, 2, 3, 3, 1, 0] agrees at 8); refinements 8, readings 180, locks [[7], [3], [5], [1], [2], [4], [0], [6]]; members certified 32 of 32, ticks closed 1920 of 1920
+  lock station 7 class 0: joint [85163, 85164], runner-up [19691/2, 78765/8]
+  lock station 3 class 2: joint [222500, 222502], runner-up [32429/8, 129717/32]
+  lock station 5 class 3: joint [247350, 247352], runner-up [38815/16, 77631/32]
+  lock station 1 class 1: joint [304484, 304488], runner-up [106974, 106975]
+  lock station 2 class 3: joint [125602, 125603], runner-up [115638, 115639]
+  lock station 4 class 3: joint [82907/4, 20727], runner-up [67617/4, 33809/2]
+  lock station 0 class 2: joint [71617/4, 35809/2], runner-up [128967/8, 16121]
+  lock station 6 class 1: joint [82561/64, 41281/32], runner-up [77239/64, 9655/8]
+  admission: 180 candidates read, 0 past the signed form; largest |z|² 41496703077618096013562497/9671406556917033397649408
+  teacher-forced: flips to the target 6, to another class 2, undecided 0, top not past one 0, refused 0; exact top = target 6
+request 21: target [0, 0, 1, 1, 2, 2, 3, 3]; native released [1, 0, 2, 1, 1, 2, 1, 3] (right 4, the float release [1, 0, 2, 1, 1, 2, 1, 3] agrees at 8); refinements 8, readings 180, locks [[7], [3], [5], [1], [2], [4], [0], [6]]; members certified 32 of 32, ticks closed 1920 of 1920
+  lock station 7 class 3: joint [130663/2, 65332], runner-up [20707/16, 82829/64]
+  lock station 3 class 1: joint [193904, 193906], runner-up [37009/16, 74019/32]
+  lock station 5 class 2: joint [286648, 286652], runner-up [69363/64, 17341/16]
+  lock station 1 class 0: joint [362324, 362328], runner-up [141594, 141596]
+  lock station 2 class 2: joint [123729, 123730], runner-up [117648, 117649]
+  lock station 4 class 1: joint [102503/4, 25626], runner-up [46855/2, 93711/4]
+  lock station 0 class 1: joint [38289/2, 76579/4], runner-up [18242, 72969/4]
+  lock station 6 class 1: joint [67427/32, 16857/8], runner-up [65897/32, 32949/16]
+  admission: 180 candidates read, 0 past the signed form; largest |z|² 41690616980915387694910993/9671406556917033397649408
+  teacher-forced: flips to the target 7, to another class 1, undecided 0, top not past one 0, refused 0; exact top = target 7
+request 22: target [3, 0, 0, 1, 1, 2, 2, 3]; native released [1, 0, 2, 1, 1, 2, 1, 3] (right 5, the float release [1, 0, 2, 1, 1, 2, 1, 3] agrees at 8); refinements 8, readings 180, locks [[7], [3], [5], [1], [2], [4], [0], [6]]; members certified 32 of 32, ticks closed 1920 of 1920
+  lock station 7 class 3: joint [39363, 78727/2], runner-up [12535/8, 100281/64]
+  lock station 3 class 1: joint [178524, 178526], runner-up [8277/4, 66217/32]
+  lock station 5 class 2: joint [277536, 277540], runner-up [11477/8, 91817/64]
+  lock station 1 class 0: joint [357232, 357236], runner-up [135124, 135126]
+  lock station 2 class 2: joint [122017, 122018], runner-up [115041, 115042]
+  lock station 4 class 1: joint [104671/4, 26168], runner-up [91465/4, 45733/2]
+  lock station 0 class 1: joint [19624, 78497/4], runner-up [74779/4, 18695]
+  lock station 6 class 1: joint [33309/16, 66619/32], runner-up [122985/64, 61493/32]
+  admission: 180 candidates read, 0 past the signed form; largest |z|² 84797252727861545584277149/19342813113834066795298816
+  teacher-forced: flips to the target 4, to another class 4, undecided 0, top not past one 0, refused 0; exact top = target 4
+request 23: target [2, 1, 3, 2, 0, 3, 1, 0]; native released [2, 1, 3, 2, 3, 3, 1, 0] (right 7, the float release [2, 1, 3, 2, 3, 3, 1, 0] agrees at 8); refinements 8, readings 180, locks [[5], [3], [7], [1], [2], [4], [0], [6]]; members certified 32 of 32, ticks closed 1920 of 1920
+  lock station 5 class 3: joint [96806, 96807], runner-up [95119/32, 5945/2]
+  lock station 3 class 2: joint [218028, 218030], runner-up [42103/64, 84207/128]
+  lock station 7 class 0: joint [278328, 278332], runner-up [60237/16, 120475/32]
+  lock station 1 class 1: joint [334284, 334288], runner-up [119625, 119626]
+  lock station 2 class 3: joint [133716, 133718], runner-up [123789, 123790]
+  lock station 4 class 3: joint [22047, 88189/4], runner-up [17450, 69801/4]
+  lock station 0 class 2: joint [75703/4, 18926], runner-up [68657/4, 34329/2]
+  lock station 6 class 1: joint [42737/32, 85475/64], runner-up [81819/64, 20455/16]
+  admission: 180 candidates read, 0 past the signed form; largest |z|² 82709089890808723164539201/19342813113834066795298816
+  teacher-forced: flips to the target 7, to another class 1, undecided 0, top not past one 0, refused 0; exact top = target 7
+request 24: target [0, 2, 1, 3, 2, 0, 3, 1]; native released [0, 2, 1, 1, 2, 1, 3, 2] (right 5, the float release [0, 2, 1, 1, 2, 1, 3, 2] agrees at 8); refinements 8, readings 180, locks [[6], [4], [2], [0], [1], [3], [7], [5]]; members certified 32 of 32, ticks closed 1920 of 1920
+  lock station 6 class 3: joint [84679/2, 42340], runner-up [46561/16, 93123/32]
+  lock station 4 class 2: joint [150762, 150764], runner-up [75835/512, 18959/128]
+  lock station 2 class 1: joint [198904, 198906], runner-up [34155, 68311/2]
+  lock station 0 class 0: joint [236502, 236504], runner-up [97862, 97863]
+  lock station 1 class 2: joint [87623, 87624], runner-up [84978, 84979]
+  lock station 3 class 1: joint [82095/4, 20524], runner-up [74475/4, 18619]
+  lock station 7 class 2: joint [35147/64, 70295/128], runner-up [114881/256, 57441/128]
+  lock station 5 class 1: joint [51015/64, 102031/128], runner-up [51723/128, 103447/256]
+  admission: 180 candidates read, 0 past the signed form; largest |z|² 78795006794126673030815845/19342813113834066795298816
+  teacher-forced: flips to the target 7, to another class 1, undecided 0, top not past one 0, refused 0; exact top = target 7
+request 25: target [3, 2, 0, 3, 1, 0, 2, 1]; native released [3, 2, 3, 3, 1, 0, 2, 1] (right 7, the float release [3, 2, 3, 3, 1, 0, 2, 1] agrees at 8); refinements 8, readings 180, locks [[5], [1], [7], [3], [4], [2], [0], [6]]; members certified 32 of 32, ticks closed 1920 of 1920
+  lock station 5 class 0: joint [35477, 70955/2], runner-up [78565/32, 39283/16]
+  lock station 1 class 2: joint [96351, 96352], runner-up [107499/128, 26875/32]
+  lock station 7 class 1: joint [197232, 197234], runner-up [41077/64, 82155/128]
+  lock station 3 class 3: joint [206466, 206468], runner-up [75027/2, 37514]
+  lock station 4 class 1: joint [87323/4, 21831], runner-up [72217/4, 36109/2]
+  lock station 2 class 3: joint [97973/8, 48987/4], runner-up [90373/8, 45187/4]
+  lock station 0 class 3: joint [10592, 84737/8], runner-up [81169/8, 40585/4]
+  lock station 6 class 2: joint [125823/128, 983], runner-up [13059/16, 104473/128]
+  admission: 180 candidates read, 0 past the signed form; largest |z|² 40722031773012890219165993/9671406556917033397649408
+  teacher-forced: flips to the target 7, to another class 1, undecided 0, top not past one 0, refused 0; exact top = target 7
+request 26: target [0, 0, 1, 1, 2, 2, 3, 3]; native released [1, 0, 2, 1, 1, 2, 1, 3] (right 4, the float release [1, 0, 2, 1, 1, 2, 1, 3] agrees at 8); refinements 8, readings 180, locks [[7], [5], [1], [3], [2], [4], [0], [6]]; members certified 32 of 32, ticks closed 1920 of 1920
+  lock station 7 class 3: joint [105419/2, 52710], runner-up [82995/64, 20749/16]
+  lock station 5 class 2: joint [193662, 193664], runner-up [8761/16, 70089/128]
+  lock station 1 class 0: joint [330192, 330196], runner-up [74998, 74999]
+  lock station 3 class 1: joint [347752, 347756], runner-up [72216, 72217]
+  lock station 2 class 2: joint [118536, 118537], runner-up [112983, 112984]
+  lock station 4 class 1: joint [100715/4, 25179], runner-up [22103, 88413/4]
+  lock station 0 class 1: joint [75163/4, 18791], runner-up [71721/4, 35861/2]
+  lock station 6 class 1: joint [129967/64, 8123/4], runner-up [123783/64, 15473/8]
+  admission: 180 candidates read, 0 past the signed form; largest |z|² 40628067627395910814276741/9671406556917033397649408
+  teacher-forced: flips to the target 6, to another class 2, undecided 0, top not past one 0, refused 0; exact top = target 6
+request 27: target [2, 0, 3, 1, 0, 2, 1, 3]; native released [1, 0, 2, 1, 1, 2, 1, 3] (right 5, the float release [1, 0, 2, 1, 1, 2, 1, 3] agrees at 8); refinements 8, readings 180, locks [[7], [3], [5], [1], [0], [2], [4], [6]]; members certified 32 of 32, ticks closed 1920 of 1920
+  lock station 7 class 3: joint [51887/2, 103775/4], runner-up [64489/32, 128979/64]
+  lock station 3 class 1: joint [159918, 159920], runner-up [77223/32, 9653/4]
+  lock station 5 class 2: joint [248230, 248232], runner-up [17785/16, 71141/64]
+  lock station 1 class 0: joint [333500, 333504], runner-up [123211, 123212]
+  lock station 0 class 1: joint [203062, 203064], runner-up [196152, 196154]
+  lock station 2 class 2: joint [76771, 76772], runner-up [73504, 73505]
+  lock station 4 class 1: joint [38037/2, 76075/4], runner-up [129669/8, 64835/4]
+  lock station 6 class 1: joint [68169/32, 34085/16], runner-up [121657/64, 60829/32]
+  admission: 180 candidates read, 0 past the signed form; largest |z|² 83424650161399932381613937/19342813113834066795298816
+  teacher-forced: flips to the target 7, to another class 1, undecided 0, top not past one 0, refused 0; exact top = target 7
+request 28: target [3, 3, 0, 0, 1, 1, 2, 2]; native released [3, 3, 0, 1, 1, 1, 2, 2] (right 7, the float release [3, 3, 0, 1, 1, 1, 2, 2] agrees at 8); refinements 8, readings 180, locks [[6], [2], [4], [0], [1], [5], [7], [3]]; members certified 32 of 32, ticks closed 1920 of 1920
+  lock station 6 class 2: joint [83733/4, 41867/2], runner-up [109069/64, 54535/32]
+  lock station 2 class 0: joint [115267/2, 57634], runner-up [74649/64, 37325/32]
+  lock station 4 class 1: joint [67511, 67512], runner-up [69603/32, 17401/8]
+  lock station 0 class 3: joint [68580, 68581], runner-up [65621/2, 32811]
+  lock station 1 class 3: joint [128263/4, 32066], runner-up [117311/4, 29328]
+  lock station 5 class 1: joint [119789/32, 59895/16], runner-up [37139/16, 74279/32]
+  lock station 7 class 2: joint [81333/64, 40667/32], runner-up [20467/64, 81869/256]
+  lock station 3 class 1: joint [65677/64, 32839/32], runner-up [7877/8, 126033/128]
+  admission: 180 candidates read, 0 past the signed form; largest |z|² 42709376455552339068294365/9671406556917033397649408
+  teacher-forced: flips to the target 6, to another class 2, undecided 0, top not past one 0, refused 0; exact top = target 6
+request 29: target [2, 1, 3, 2, 0, 3, 1, 0]; native released [2, 1, 3, 2, 3, 3, 1, 0] (right 7, the float release [2, 1, 3, 2, 3, 3, 1, 0] agrees at 8); refinements 8, readings 180, locks [[5], [3], [7], [1], [2], [4], [0], [6]]; members certified 32 of 32, ticks closed 1920 of 1920
+  lock station 5 class 3: joint [70103, 70104], runner-up [80705/32, 40353/16]
+  lock station 3 class 2: joint [171018, 171020], runner-up [86119/256, 10765/32]
+  lock station 7 class 0: joint [222490, 222492], runner-up [96701/32, 48351/16]
+  lock station 1 class 1: joint [275128, 275132], runner-up [95973, 95974]
+  lock station 2 class 3: joint [114471, 114472], runner-up [106323, 106324]
+  lock station 4 class 3: joint [38987/2, 77975/4], runner-up [15848, 126785/8]
+  lock station 0 class 2: joint [33783/2, 67567/4], runner-up [121461/8, 60731/4]
+  lock station 6 class 1: joint [80301/64, 40151/32], runner-up [37989/32, 75979/64]
+  admission: 180 candidates read, 0 past the signed form; largest |z|² 83769624133454494126118225/19342813113834066795298816
+  teacher-forced: flips to the target 7, to another class 1, undecided 0, top not past one 0, refused 0; exact top = target 7
+request 30: target [0, 3, 1, 0, 2, 1, 3, 2]; native released [2, 3, 3, 0, 2, 1, 1, 2] (right 5, the float release [2, 3, 3, 0, 2, 1, 1, 2] agrees at 8); refinements 8, readings 180, locks [[5], [3], [7], [1], [0], [2], [6], [4]]; members certified 32 of 32, ticks closed 1920 of 1920
+  lock station 5 class 1: joint [36428, 72857/2], runner-up [56303/64, 112607/128]
+  lock station 3 class 0: joint [119107, 119108], runner-up [39863/32, 79727/64]
+  lock station 7 class 2: joint [116247, 116248], runner-up [73661/64, 36831/32]
+  lock station 1 class 3: joint [111303, 111304], runner-up [112659/2, 56330]
+  lock station 0 class 2: joint [72251, 72252], runner-up [57132, 114265/2]
+  lock station 2 class 3: joint [33891, 67783/2], runner-up [122055/4, 30514]
+  lock station 6 class 1: joint [15383/4, 123065/32], runner-up [75713/32, 37857/16]
+  lock station 4 class 2: joint [126029/64, 63015/32], runner-up [122209/64, 61105/32]
+  admission: 180 candidates read, 0 past the signed form; largest |z|² 41368761437649033077120729/9671406556917033397649408
+  teacher-forced: flips to the target 7, to another class 1, undecided 0, top not past one 0, refused 0; exact top = target 7
+request 31: target [1, 0, 2, 1, 3, 2, 0, 3]; native released [1, 3, 2, 3, 3, 1, 0, 1] (right 4, the float release [1, 3, 2, 3, 3, 1, 0, 1] agrees at 8); refinements 8, readings 180, locks [[6], [4], [2], [0], [1], [3], [5], [7]]; members certified 32 of 32, ticks closed 1920 of 1920
+  lock station 6 class 0: joint [90787/2, 45394], runner-up [85329/16, 42665/8]
+  lock station 4 class 3: joint [119512, 119513], runner-up [101569/128, 50785/64]
+  lock station 2 class 2: joint [164666, 164668], runner-up [33357/4, 66715/8]
+  lock station 0 class 1: joint [192656, 192658], runner-up [70989, 70990]
+  lock station 1 class 3: joint [82487, 82488], runner-up [77112, 77113]
+  lock station 3 class 3: joint [118723/8, 29681/2], runner-up [24699/2, 98797/8]
+  lock station 5 class 1: joint [34039/32, 68079/64], runner-up [28149/32, 112597/128]
+  lock station 7 class 1: joint [101987/512, 25497/128], runner-up [3167/16, 101345/512]
+  admission: 180 candidates read, 0 past the signed form; largest |z|² 41949432631965717376716677/9671406556917033397649408
+  teacher-forced: flips to the target 6, to another class 2, undecided 0, top not past one 0, refused 0; exact top = target 6
+request 32: target [1, 3, 2, 0, 3, 1, 0, 2]; native released [1, 3, 2, 3, 3, 2, 0, 2] (right 6, the float release [1, 3, 2, 3, 3, 2, 0, 2] agrees at 8); refinements 8, readings 180, locks [[6], [2], [4], [0], [1], [3], [7], [5]]; members certified 32 of 32, ticks closed 1920 of 1920
+  lock station 6 class 0: joint [115499/4, 28875], runner-up [74771/16, 18693/4]
+  lock station 2 class 2: joint [110512, 110513], runner-up [124781/64, 62391/32]
+  lock station 4 class 3: joint [147680, 147682], runner-up [76067/64, 19017/16]
+  lock station 0 class 1: joint [181656, 181658], runner-up [66881, 66882]
+  lock station 1 class 3: joint [78659, 78660], runner-up [76378, 76379]
+  lock station 3 class 3: joint [128697/8, 64349/4], runner-up [48891/4, 97783/8]
+  lock station 7 class 2: joint [117813/512, 58907/256], runner-up [48303/512, 96607/1024]
+  lock station 5 class 2: joint [62825/256, 125651/512], runner-up [28017/128, 112069/512]
+  admission: 180 candidates read, 0 past the signed form; largest |z|² 40206256036891521264641861/9671406556917033397649408
+  teacher-forced: flips to the target 5, to another class 3, undecided 0, top not past one 0, refused 0; exact top = target 5
+request 33: target [0, 3, 1, 0, 2, 1, 3, 2]; native released [2, 3, 3, 0, 0, 1, 1, 2] (right 4, the float release [2, 3, 3, 0, 0, 1, 1, 2] agrees at 8); refinements 8, readings 180, locks [[5], [3], [7], [1], [0], [2], [4], [6]]; members certified 32 of 32, ticks closed 1920 of 1920
+  lock station 5 class 1: joint [74287/2, 37144], runner-up [126977/256, 63489/128]
+  lock station 3 class 0: joint [117223, 117224], runner-up [81843/64, 20461/16]
+  lock station 7 class 2: joint [118727, 118728], runner-up [87447/64, 10931/8]
+  lock station 1 class 3: joint [115084, 115085], runner-up [56664, 113329/2]
+  lock station 0 class 2: joint [74628, 74629], runner-up [59181, 118363/2]
+  lock station 2 class 3: joint [35048, 70097/2], runner-up [31158, 124633/4]
+  lock station 4 class 0: joint [69635/8, 17409/2], runner-up [55925/8, 111851/16]
+  lock station 6 class 1: joint [127177/64, 63589/32], runner-up [41987/32, 83975/64]
+  admission: 180 candidates read, 0 past the signed form; largest |z|² 84326446604462632948070729/19342813113834066795298816
+  teacher-forced: flips to the target 7, to another class 1, undecided 0, top not past one 0, refused 0; exact top = target 7
+request 34: target [0, 0, 1, 1, 2, 2, 3, 3]; native released [1, 0, 2, 1, 1, 2, 1, 3] (right 4, the float release [1, 0, 2, 1, 1, 2, 1, 3] agrees at 8); refinements 8, readings 180, locks [[7], [3], [5], [1], [2], [4], [0], [6]]; members certified 32 of 32, ticks closed 1920 of 1920
+  lock station 7 class 3: joint [50535, 101071/2], runner-up [10831/8, 86649/64]
+  lock station 3 class 1: joint [191544, 191546], runner-up [93893/32, 46947/16]
+  lock station 5 class 2: joint [285064, 285068], runner-up [103737/64, 51869/32]
+  lock station 1 class 0: joint [357120, 357124], runner-up [139624, 139626]
+  lock station 2 class 2: joint [122667, 122668], runner-up [115810, 115811]
+  lock station 4 class 1: joint [103283/4, 25821], runner-up [92749/4, 46375/2]
+  lock station 0 class 1: joint [19318, 77273/4], runner-up [36727/2, 73455/4]
+  lock station 6 class 1: joint [68219/32, 17055/8], runner-up [130901/64, 65451/32]
+  admission: 180 candidates read, 0 past the signed form; largest |z|² 40626221685141806971492113/9671406556917033397649408
+  teacher-forced: flips to the target 6, to another class 2, undecided 0, top not past one 0, refused 0; exact top = target 6
+request 35: target [1, 3, 2, 0, 3, 1, 0, 2]; native released [1, 3, 2, 3, 3, 2, 0, 2] (right 6, the float release [1, 3, 2, 3, 3, 2, 0, 2] agrees at 8); refinements 8, readings 180, locks [[6], [2], [4], [0], [3], [1], [7], [5]]; members certified 32 of 32, ticks closed 1920 of 1920
+  lock station 6 class 0: joint [126425/4, 63213/2], runner-up [4810, 76961/16]
+  lock station 2 class 2: joint [111878, 111879], runner-up [48459/32, 96919/64]
+  lock station 4 class 3: joint [143768, 143770], runner-up [46019/32, 92039/64]
+  lock station 0 class 1: joint [178858, 178860], runner-up [65583, 65584]
+  lock station 3 class 3: joint [24548, 98193/4], runner-up [89885/4, 44943/2]
+  lock station 1 class 3: joint [127699/8, 31925/2], runner-up [47919/4, 95839/8]
+  lock station 7 class 2: joint [14687/64, 117497/512], runner-up [125297/1024, 62649/512]
+  lock station 5 class 2: joint [62455/256, 124911/512], runner-up [113459/512, 28365/128]
+  admission: 180 candidates read, 0 past the signed form; largest |z|² 40846209902657519120722217/9671406556917033397649408
+  teacher-forced: flips to the target 5, to another class 3, undecided 0, top not past one 0, refused 0; exact top = target 5
+request 36: target [3, 1, 0, 2, 1, 3, 2, 0]; native released [2, 1, 3, 2, 3, 3, 1, 0] (right 4, the float release [2, 1, 3, 2, 3, 3, 1, 0] agrees at 8); refinements 8, readings 180, locks [[7], [3], [5], [1], [2], [4], [0], [6]]; members certified 32 of 32, ticks closed 1920 of 1920
+  lock station 7 class 0: joint [84745/2, 42373], runner-up [23847/4, 95389/16]
+  lock station 3 class 2: joint [167532, 167534], runner-up [93837/32, 46919/16]
+  lock station 5 class 3: joint [212688, 212690], runner-up [32841/16, 65683/32]
+  lock station 1 class 1: joint [269452, 269456], runner-up [92551, 92552]
+  lock station 2 class 3: joint [108785, 108786], runner-up [102543, 102544]
+  lock station 4 class 3: joint [18691, 74765/4], runner-up [57861/4, 115723/8]
+  lock station 0 class 2: joint [129449/8, 64725/4], runner-up [116715/8, 29179/2]
+  lock station 6 class 1: joint [9383/8, 75065/64], runner-up [36851/32, 73703/64]
+  admission: 180 candidates read, 0 past the signed form; largest |z|² 84668792715120873338341265/19342813113834066795298816
+  teacher-forced: flips to the target 7, to another class 1, undecided 0, top not past one 0, refused 0; exact top = target 7
+request 37: target [2, 1, 3, 2, 0, 3, 1, 0]; native released [3, 1, 3, 2, 3, 3, 1, 0] (right 6, the float release [3, 1, 3, 2, 3, 3, 1, 0] agrees at 8); refinements 8, readings 180, locks [[7], [3], [1], [5], [0], [2], [4], [6]]; members certified 32 of 32, ticks closed 1920 of 1920
+  lock station 7 class 0: joint [42594, 85189/2], runner-up [29101/8, 116405/32]
+  lock station 3 class 2: joint [150574, 150576], runner-up [18459/4, 73837/16]
+  lock station 1 class 1: joint [219248, 219250], runner-up [35892, 71785/2]
+  lock station 5 class 3: joint [235498, 235500], runner-up [103487/16, 6468]
+  lock station 0 class 3: joint [178000, 178002], runner-up [168892, 168894]
+  lock station 2 class 3: joint [78848, 78849], runner-up [73425, 73426]
+  lock station 4 class 3: joint [59341/4, 118683/8], runner-up [48149/4, 96299/8]
+  lock station 6 class 1: joint [68185/64, 34093/32], runner-up [121861/128, 60931/64]
+  admission: 180 candidates read, 0 past the signed form; largest |z|² 20493734645820191308506365/4835703278458516698824704
+  teacher-forced: flips to the target 6, to another class 2, undecided 0, top not past one 0, refused 0; exact top = target 6
+request 38: target [1, 0, 2, 1, 3, 2, 0, 3]; native released [1, 0, 2, 1, 1, 2, 1, 3] (right 6, the float release [1, 0, 2, 1, 1, 2, 1, 3] agrees at 8); refinements 8, readings 180, locks [[7], [5], [1], [3], [4], [2], [0], [6]]; members certified 32 of 32, ticks closed 1920 of 1920
+  lock station 7 class 3: joint [117083/2, 58542], runner-up [44241/4, 88483/8]
+  lock station 5 class 2: joint [175126, 175128], runner-up [125895/256, 15737/32]
+  lock station 1 class 0: joint [317208, 317212], runner-up [70418, 70419]
+  lock station 3 class 1: joint [340244, 340248], runner-up [70751, 70752]
+  lock station 4 class 1: joint [46054, 92109/2], runner-up [44522, 89045/2]
+  lock station 2 class 2: joint [102539/4, 25635], runner-up [93653/4, 46827/2]
+  lock station 0 class 1: joint [76331/4, 19083], runner-up [73277/4, 36639/2]
+  lock station 6 class 1: joint [65679/32, 4105/2], runner-up [126761/64, 63381/32]
+  admission: 180 candidates read, 0 past the signed form; largest |z|² 82283131180996551414296965/19342813113834066795298816
+  teacher-forced: flips to the target 8, to another class 0, undecided 0, top not past one 0, refused 0; exact top = target 8
+request 39: target [0, 0, 1, 1, 2, 2, 3, 3]; native released [1, 0, 2, 1, 1, 2, 1, 3] (right 4, the float release [1, 0, 2, 1, 1, 2, 1, 3] agrees at 8); refinements 8, readings 180, locks [[7], [3], [5], [1], [2], [4], [0], [6]]; members certified 32 of 32, ticks closed 1920 of 1920
+  lock station 7 class 3: joint [52525, 105051/2], runner-up [83661/16, 41831/8]
+  lock station 3 class 1: joint [180554, 180556], runner-up [93939/32, 23485/8]
+  lock station 5 class 2: joint [258338, 258340], runner-up [90901/64, 45451/32]
+  lock station 1 class 0: joint [333408, 333412], runner-up [130704, 130705]
+  lock station 2 class 2: joint [114270, 114271], runner-up [107493, 107494]
+  lock station 4 class 1: joint [49197/2, 98395/4], runner-up [21869, 87477/4]
+  lock station 0 class 1: joint [18440, 73761/4], runner-up [70185/4, 35093/2]
+  lock station 6 class 1: joint [128995/64, 32249/16], runner-up [119207/64, 14901/8]
+  admission: 180 candidates read, 0 past the signed form; largest |z|² 82729998100104716823566689/19342813113834066795298816
+  teacher-forced: flips to the target 4, to another class 4, undecided 0, top not past one 0, refused 0; exact top = target 4
+request 40: target [1, 2, 2, 3, 3, 0, 0, 1]; native released [3, 2, 3, 3, 1, 0, 2, 1] (right 4, the float release [3, 2, 3, 3, 1, 0, 2, 1] agrees at 8); refinements 8, readings 180, locks [[5], [1], [7], [3], [4], [2], [0], [6]]; members certified 32 of 32, ticks closed 1920 of 1920
+  lock station 5 class 0: joint [69232, 69233], runner-up [1535, 98241/64]
+  lock station 1 class 2: joint [124214, 124215], runner-up [68711/32, 8589/4]
+  lock station 7 class 1: joint [196464, 196466], runner-up [60403/256, 120807/512]
+  lock station 3 class 3: joint [198686, 198688], runner-up [82031/2, 41016]
+  lock station 4 class 1: joint [42969/2, 85939/4], runner-up [16431, 65725/4]
+  lock station 2 class 3: joint [92287/8, 11536], runner-up [11057, 88457/8]
+  lock station 0 class 3: joint [78825/8, 39413/4], runner-up [37377/4, 74755/8]
+  lock station 6 class 2: joint [118155/128, 29539/32], runner-up [95177/128, 47589/64]
+  admission: 180 candidates read, 0 past the signed form; largest |z|² 81019757139793859020514465/19342813113834066795298816
+  teacher-forced: flips to the target 6, to another class 2, undecided 0, top not past one 0, refused 0; exact top = target 6
+request 41: target [2, 1, 3, 2, 0, 3, 1, 0]; native released [3, 1, 3, 2, 3, 3, 1, 0] (right 6, the float release [3, 1, 3, 2, 3, 3, 1, 0] agrees at 8); refinements 8, readings 180, locks [[7], [3], [5], [1], [0], [2], [4], [6]]; members certified 32 of 32, ticks closed 1920 of 1920
+  lock station 7 class 0: joint [115379/4, 28845], runner-up [4673/2, 74769/32]
+  lock station 3 class 2: joint [132100, 132102], runner-up [105583/32, 6599/2]
+  lock station 5 class 3: joint [179816, 179818], runner-up [56757/32, 113515/64]
+  lock station 1 class 1: joint [231780, 231782], runner-up [79036, 79037]
+  lock station 0 class 3: joint [170604, 170606], runner-up [164358, 164360]
+  lock station 2 class 3: joint [74726, 74727], runner-up [68413, 68414]
+  lock station 4 class 3: joint [56163/4, 112327/8], runner-up [91131/8, 22783/2]
+  lock station 6 class 1: joint [33367/32, 66735/64], runner-up [118619/128, 29655/32]
+  admission: 180 candidates read, 0 past the signed form; largest |z|² 41908491230834774570852125/9671406556917033397649408
+  teacher-forced: flips to the target 6, to another class 2, undecided 0, top not past one 0, refused 0; exact top = target 6
+request 42: target [2, 1, 3, 2, 0, 3, 1, 0]; native released [3, 1, 3, 2, 3, 3, 1, 0] (right 6, the float release [3, 1, 3, 2, 3, 3, 1, 0] agrees at 8); refinements 8, readings 180, locks [[7], [3], [5], [1], [0], [2], [4], [6]]; members certified 32 of 32, ticks closed 1920 of 1920
+  lock station 7 class 0: joint [51194, 102389/2], runner-up [48399/16, 96799/32]
+  lock station 3 class 2: joint [165416, 165418], runner-up [17361/8, 69445/32]
+  lock station 5 class 3: joint [214432, 214434], runner-up [72511/32, 2266]
+  lock station 1 class 1: joint [263412, 263416], runner-up [93438, 93439]
+  lock station 0 class 3: joint [190360, 190362], runner-up [183642, 183644]
+  lock station 2 class 3: joint [80727, 80728], runner-up [75292, 75293]
+  lock station 4 class 3: joint [14952, 119617/8], runner-up [24029/2, 96117/8]
+  lock station 6 class 1: joint [17617/16, 70469/64], runner-up [30901/32, 123605/128]
+  admission: 180 candidates read, 0 past the signed form; largest |z|² 5195674711674398286700705/1208925819614629174706176
+  teacher-forced: flips to the target 6, to another class 2, undecided 0, top not past one 0, refused 0; exact top = target 6
+request 43: target [0, 1, 1, 2, 2, 3, 3, 0]; native released [2, 1, 3, 2, 3, 3, 1, 0] (right 4, the float release [2, 1, 3, 2, 3, 3, 1, 0] agrees at 8); refinements 8, readings 180, locks [[7], [3], [1], [5], [2], [4], [0], [6]]; members certified 32 of 32, ticks closed 1920 of 1920
+  lock station 7 class 0: joint [79416, 79417], runner-up [41191/4, 82383/8]
+  lock station 3 class 2: joint [240030, 240032], runner-up [50667/16, 101335/32]
+  lock station 1 class 1: joint [335628, 335632], runner-up [57700, 115401/2]
+  lock station 5 class 3: joint [336668, 336672], runner-up [122429/16, 61215/8]
+  lock station 2 class 3: joint [135016, 135018], runner-up [125339, 125340]
+  lock station 4 class 3: joint [90145/4, 45073/2], runner-up [69455/4, 17364]
+  lock station 0 class 2: joint [19330, 77321/4], runner-up [70449/4, 35225/2]
+  lock station 6 class 1: joint [21997/16, 87989/64], runner-up [83885/64, 41943/32]
+  admission: 180 candidates read, 0 past the signed form; largest |z|² 42352341610064448590323429/9671406556917033397649408
+  teacher-forced: flips to the target 7, to another class 1, undecided 0, top not past one 0, refused 0; exact top = target 7
+request 44: target [3, 3, 0, 0, 1, 1, 2, 2]; native released [2, 3, 3, 0, 2, 1, 1, 2] (right 4, the float release [2, 3, 3, 0, 2, 1, 1, 2] agrees at 8); refinements 8, readings 180, locks [[7], [1], [5], [3], [0], [2], [6], [4]]; members certified 32 of 32, ticks closed 1920 of 1920
+  lock station 7 class 2: joint [83579/4, 20895], runner-up [3517/2, 112545/64]
+  lock station 1 class 3: joint [88971, 88972], runner-up [12083/4, 96665/32]
+  lock station 5 class 1: joint [98671, 98672], runner-up [119049/64, 59525/32]
+  lock station 3 class 0: joint [93212, 93213], runner-up [24282, 97129/4]
+  lock station 0 class 2: joint [121317/2, 60659], runner-up [49489, 98979/2]
+  lock station 2 class 3: joint [115141/4, 57571/2], runner-up [25928, 103713/4]
+  lock station 6 class 1: joint [115111/32, 14389/4], runner-up [17595/8, 70381/32]
+  lock station 4 class 2: joint [118387/64, 29597/16], runner-up [29163/16, 116653/64]
+  admission: 180 candidates read, 0 past the signed form; largest |z|² 83747755942060908766857769/19342813113834066795298816
+  teacher-forced: flips to the target 6, to another class 2, undecided 0, top not past one 0, refused 0; exact top = target 6
+request 45: target [2, 2, 3, 3, 0, 0, 1, 1]; native released [3, 2, 3, 3, 1, 0, 2, 1] (right 5, the float release [3, 2, 3, 3, 1, 0, 2, 1] agrees at 8); refinements 8, readings 180, locks [[7], [5], [3], [1], [4], [2], [0], [6]]; members certified 32 of 32, ticks closed 1920 of 1920
+  lock station 7 class 1: joint [91671/4, 22918], runner-up [102907/64, 25727/16]
+  lock station 5 class 0: joint [92517, 92518], runner-up [123881/32, 61941/16]
+  lock station 3 class 3: joint [176990, 176992], runner-up [72507/4, 18127]
+  lock station 1 class 2: joint [191460, 191462], runner-up [74638, 74639]
+  lock station 4 class 1: joint [82677/4, 41339/2], runner-up [66673/4, 33337/2]
+  lock station 2 class 3: joint [11476, 91809/8], runner-up [85881/8, 42941/4]
+  lock station 0 class 3: joint [39391/4, 78783/8], runner-up [75217/8, 37609/4]
+  lock station 6 class 2: joint [31189/32, 124757/128], runner-up [12969/16, 103753/128]
+  admission: 180 candidates read, 0 past the signed form; largest |z|² 82093406271290400860772845/19342813113834066795298816
+  teacher-forced: flips to the target 8, to another class 0, undecided 0, top not past one 0, refused 0; exact top = target 8
+request 46: target [3, 2, 0, 3, 1, 0, 2, 1]; native released [3, 2, 3, 3, 1, 0, 2, 1] (right 7, the float release [3, 2, 3, 3, 1, 0, 2, 1] agrees at 8); refinements 8, readings 180, locks [[5], [7], [3], [1], [2], [0], [4], [6]]; members certified 32 of 32, ticks closed 1920 of 1920
+  lock station 5 class 0: joint [26697, 106789/4], runner-up [64969/32, 129939/64]
+  lock station 7 class 1: joint [87301, 87302], runner-up [9107/8, 72857/64]
+  lock station 3 class 3: joint [169648, 169650], runner-up [117395/8, 29349/2]
+  lock station 1 class 2: joint [185132, 185134], runner-up [67061, 67062]
+  lock station 2 class 3: joint [71318, 71319], runner-up [66811, 66812]
+  lock station 0 class 3: joint [108573/2, 54287], runner-up [51261, 102523/2]
+  lock station 4 class 1: joint [19749/2, 78997/8], runner-up [8446, 67569/8]
+  lock station 6 class 2: joint [122655/128, 3833/4], runner-up [49121/64, 98243/128]
+  admission: 180 candidates read, 0 past the signed form; largest |z|² 40724597568104518523580749/9671406556917033397649408
+  teacher-forced: flips to the target 5, to another class 3, undecided 0, top not past one 0, refused 0; exact top = target 5
+request 47: target [0, 0, 1, 1, 2, 2, 3, 3]; native released [1, 0, 2, 1, 1, 2, 1, 3] (right 4, the float release [1, 0, 2, 1, 1, 2, 1, 3] agrees at 8); refinements 8, readings 180, locks [[7], [1], [5], [3], [2], [4], [0], [6]]; members certified 32 of 32, ticks closed 1920 of 1920
+  lock station 7 class 3: joint [62155, 124311/2], runner-up [61991/16, 123983/32]
+  lock station 1 class 0: joint [189894, 189896], runner-up [103345/16, 51673/8]
+  lock station 5 class 2: joint [327856, 327860], runner-up [55915/128, 111831/256]
+  lock station 3 class 1: joint [339176, 339180], runner-up [77097, 77098]
+  lock station 2 class 2: joint [118748, 118749], runner-up [112859, 112860]
+  lock station 4 class 1: joint [51597/2, 103195/4], runner-up [90357/4, 45179/2]
+  lock station 0 class 1: joint [19327, 77309/4], runner-up [73855/4, 18464]
+  lock station 6 class 1: joint [68909/32, 34455/16], runner-up [127337/64, 63669/32]
+  admission: 180 candidates read, 0 past the signed form; largest |z|² 42348706819026335751117293/9671406556917033397649408
+  teacher-forced: flips to the target 6, to another class 2, undecided 0, top not past one 0, refused 0; exact top = target 6
+request 48: target [1, 3, 2, 0, 3, 1, 0, 2]; native released [1, 3, 2, 3, 3, 2, 0, 2] (right 6, the float release [1, 3, 2, 3, 3, 2, 0, 2] agrees at 8); refinements 8, readings 180, locks [[6], [2], [4], [0], [3], [1], [7], [5]]; members certified 32 of 32, ticks closed 1920 of 1920
+  lock station 6 class 0: joint [32268, 129073/4], runner-up [42769/8, 85539/16]
+  lock station 2 class 2: joint [112198, 112199], runner-up [92309/32, 46155/16]
+  lock station 4 class 3: joint [141358, 141360], runner-up [33321/16, 66643/32]
+  lock station 0 class 1: joint [181532, 181534], runner-up [66324, 66325]
+  lock station 3 class 3: joint [25668, 102673/4], runner-up [94745/4, 47373/2]
+  lock station 1 class 3: joint [68205/4, 34103/2], runner-up [102253/8, 51127/4]
+  lock station 7 class 2: joint [122739/512, 30685/128], runner-up [81179/1024, 20295/256]
+  lock station 5 class 2: joint [129869/512, 64935/256], runner-up [119507/512, 29877/128]
+  admission: 180 candidates read, 0 past the signed form; largest |z|² 79795609527636290088808085/19342813113834066795298816
+  teacher-forced: flips to the target 6, to another class 2, undecided 0, top not past one 0, refused 0; exact top = target 6
+request 49: target [1, 1, 2, 2, 3, 3, 0, 0]; native released [3, 1, 3, 2, 3, 3, 1, 0] (right 5, the float release [3, 1, 3, 2, 3, 3, 1, 0] agrees at 8); refinements 8, readings 180, locks [[7], [1], [3], [5], [0], [2], [4], [6]]; members certified 32 of 32, ticks closed 1920 of 1920
+  lock station 7 class 0: joint [71839, 71840], runner-up [111093/16, 55547/8]
+  lock station 1 class 1: joint [188454, 188456], runner-up [105427/16, 26357/4]
+  lock station 3 class 2: joint [253314, 253316], runner-up [30919/8, 123677/32]
+  lock station 5 class 3: joint [284496, 284500], runner-up [113281/16, 56641/8]
+  lock station 0 class 3: joint [203752, 203754], runner-up [194176, 194178]
+  lock station 2 class 3: joint [84568, 84569], runner-up [79902, 79903]
+  lock station 4 class 3: joint [121781/8, 60891/4], runner-up [99841/8, 49921/4]
+  lock station 6 class 1: joint [34093/32, 68187/64], runner-up [119101/128, 59551/64]
+  admission: 180 candidates read, 0 past the signed form; largest |z|² 21393903646476233885391705/4835703278458516698824704
+  teacher-forced: flips to the target 6, to another class 2, undecided 0, top not past one 0, refused 0; exact top = target 6
+request 50: target [3, 3, 0, 0, 1, 1, 2, 2]; native released [2, 3, 3, 0, 2, 1, 1, 2] (right 4, the float release [2, 3, 3, 0, 2, 1, 1, 2] agrees at 8); refinements 8, readings 180, locks [[7], [3], [5], [1], [0], [2], [6], [4]]; members certified 32 of 32, ticks closed 1920 of 1920
+  lock station 7 class 2: joint [45715/4, 91431/8], runner-up [33577/16, 67155/32]
+  lock station 3 class 0: joint [87747, 87748], runner-up [67755/64, 16939/16]
+  lock station 5 class 1: joint [101234, 101235], runner-up [81471/32, 2546]
+  lock station 1 class 3: joint [100663, 100664], runner-up [96335/2, 48168]
+  lock station 0 class 2: joint [129057/2, 64529], runner-up [52618, 105237/2]
+  lock station 2 class 3: joint [121429/4, 60715/2], runner-up [108587/4, 27147]
+  lock station 6 class 1: joint [118997/32, 59499/16], runner-up [18285/8, 73141/32]
+  lock station 4 class 2: joint [121153/64, 60577/32], runner-up [60083/32, 120167/64]
+  admission: 180 candidates read, 0 past the signed form; largest |z|² 10695006827823238613409825/2417851639229258349412352
+  teacher-forced: flips to the target 6, to another class 2, undecided 0, top not past one 0, refused 0; exact top = target 6
+request 51: target [0, 2, 1, 3, 2, 0, 3, 1]; native released [0, 2, 1, 1, 2, 1, 3, 2] (right 5, the float release [0, 2, 1, 1, 2, 1, 3, 2] agrees at 8); refinements 8, readings 180, locks [[6], [4], [0], [2], [1], [3], [7], [5]]; members certified 32 of 32, ticks closed 1920 of 1920
+  lock station 6 class 3: joint [37608, 75217/2], runner-up [67177/32, 33589/16]
+  lock station 4 class 2: joint [134076, 134078], runner-up [34197/256, 68395/512]
+  lock station 0 class 0: joint [199010, 199012], runner-up [104173/2, 52087]
+  lock station 2 class 1: joint [210006, 210008], runner-up [44085, 88171/2]
+  lock station 1 class 2: joint [78081, 78082], runner-up [73940, 73941]
+  lock station 3 class 1: joint [74827/4, 18707], runner-up [66873/4, 33437/2]
+  lock station 7 class 2: joint [68187/128, 17047/32], runner-up [6871/16, 109937/256]
+  lock station 5 class 1: joint [99845/128, 49923/64], runner-up [25861/64, 103445/256]
+  admission: 180 candidates read, 0 past the signed form; largest |z|² 79254508167203246315305657/19342813113834066795298816
+  teacher-forced: flips to the target 7, to another class 1, undecided 0, top not past one 0, refused 0; exact top = target 7
+request 52: target [3, 0, 0, 1, 1, 2, 2, 3]; native released [1, 0, 2, 1, 1, 2, 1, 3] (right 5, the float release [1, 0, 2, 1, 1, 2, 1, 3] agrees at 8); refinements 8, readings 180, locks [[7], [1], [5], [3], [0], [4], [2], [6]]; members certified 32 of 32, ticks closed 1920 of 1920
+  lock station 7 class 3: joint [38046, 76093/2], runner-up [51375/16, 102751/32]
+  lock station 1 class 0: joint [172064, 172066], runner-up [4232, 67713/16]
+  lock station 5 class 2: joint [324048, 324052], runner-up [15127/32, 121017/256]
+  lock station 3 class 1: joint [356688, 356692], runner-up [78420, 78421]
+  lock station 0 class 1: joint [214706, 214708], runner-up [209980, 209982]
+  lock station 4 class 1: joint [34713, 69427/2], runner-up [127331/4, 31833]
+  lock station 2 class 2: joint [20166, 80665/4], runner-up [36341/2, 72683/4]
+  lock station 6 class 1: joint [34413/16, 68827/32], runner-up [7673/4, 122769/64]
+  admission: 180 candidates read, 0 past the signed form; largest |z|² 83561959372687510673321441/19342813113834066795298816
+  teacher-forced: flips to the target 6, to another class 2, undecided 0, top not past one 0, refused 0; exact top = target 6
+request 53: target [1, 0, 2, 1, 3, 2, 0, 3]; native released [1, 0, 2, 1, 1, 2, 1, 3] (right 6, the float release [1, 0, 2, 1, 1, 2, 1, 3] agrees at 8); refinements 8, readings 180, locks [[7], [5], [1], [3], [4], [2], [0], [6]]; members certified 32 of 32, ticks closed 1920 of 1920
+  lock station 7 class 3: joint [50325, 100651/2], runner-up [5529/2, 88465/32]
+  lock station 5 class 2: joint [168032, 168034], runner-up [91007/256, 711/2]
+  lock station 1 class 0: joint [307692, 307696], runner-up [67198, 67199]
+  lock station 3 class 1: joint [335280, 335284], runner-up [67701, 67702]
+  lock station 4 class 1: joint [45863, 91727/2], runner-up [84137/2, 42069]
+  lock station 2 class 2: joint [101145/4, 50573/2], runner-up [90363/4, 22591]
+  lock station 0 class 1: joint [75223/4, 18806], runner-up [72219/4, 18055]
+  lock station 6 class 1: joint [129423/64, 8089/4], runner-up [15095/8, 120761/64]
+  admission: 180 candidates read, 0 past the signed form; largest |z|² 40581416988752849412904273/9671406556917033397649408
+  teacher-forced: flips to the target 7, to another class 1, undecided 0, top not past one 0, refused 0; exact top = target 7
+request 54: target [3, 1, 0, 2, 1, 3, 2, 0]; native released [3, 1, 3, 2, 3, 3, 1, 0] (right 5, the float release [3, 1, 3, 2, 3, 3, 1, 0] agrees at 8); refinements 8, readings 180, locks [[7], [3], [1], [5], [0], [2], [4], [6]]; members certified 32 of 32, ticks closed 1920 of 1920
+  lock station 7 class 0: joint [41560, 83121/2], runner-up [18011/2, 72045/8]
+  lock station 3 class 2: joint [169776, 169778], runner-up [49241/16, 98483/32]
+  lock station 1 class 1: joint [247130, 247132], runner-up [81249/2, 40625]
+  lock station 5 class 3: joint [265248, 265252], runner-up [22483/4, 89933/16]
+  lock station 0 class 3: joint [194014, 194016], runner-up [186798, 186800]
+  lock station 2 class 3: joint [83016, 83017], runner-up [77186, 77187]
+  lock station 4 class 3: joint [118827/8, 29707/2], runner-up [98067/8, 24517/2]
+  lock station 6 class 1: joint [33283/32, 66567/64], runner-up [3439/4, 110049/128]
+  admission: 180 candidates read, 0 past the signed form; largest |z|² 85388212815845151059317585/19342813113834066795298816
+  teacher-forced: flips to the target 8, to another class 0, undecided 0, top not past one 0, refused 0; exact top = target 8
+request 55: target [0, 0, 1, 1, 2, 2, 3, 3]; native released [1, 0, 2, 1, 1, 2, 1, 3] (right 4, the float release [1, 0, 2, 1, 1, 2, 1, 3] agrees at 8); refinements 8, readings 180, locks [[7], [5], [1], [3], [2], [4], [0], [6]]; members certified 32 of 32, ticks closed 1920 of 1920
+  lock station 7 class 3: joint [48989, 97979/2], runner-up [41175/16, 82351/32]
+  lock station 5 class 2: joint [206194, 206196], runner-up [18981/32, 75925/128]
+  lock station 1 class 0: joint [346300, 346304], runner-up [78762, 78763]
+  lock station 3 class 1: joint [365192, 365196], runner-up [76065, 76066]
+  lock station 2 class 2: joint [124568, 124569], runner-up [117641, 117642]
+  lock station 4 class 1: joint [103103/4, 25776], runner-up [45651/2, 91303/4]
+  lock station 0 class 1: joint [77025/4, 38513/2], runner-up [36683/2, 73367/4]
+  lock station 6 class 1: joint [4179/2, 66865/32], runner-up [16023/8, 128185/64]
+  admission: 180 candidates read, 0 past the signed form; largest |z|² 5117177957985047199819157/1208925819614629174706176
+  teacher-forced: flips to the target 6, to another class 2, undecided 0, top not past one 0, refused 0; exact top = target 6
+request 56: target [0, 1, 1, 2, 2, 3, 3, 0]; native released [3, 1, 3, 2, 3, 3, 1, 0] (right 4, the float release [3, 1, 3, 2, 3, 3, 1, 0] agrees at 8); refinements 8, readings 180, locks [[7], [3], [1], [5], [0], [2], [4], [6]]; members certified 32 of 32, ticks closed 1920 of 1920
+  lock station 7 class 0: joint [104449, 104450], runner-up [92359/8, 11545]
+  lock station 3 class 2: joint [273372, 273376], runner-up [63177/16, 126355/32]
+  lock station 1 class 1: joint [374264, 374268], runner-up [64722, 129445/2]
+  lock station 5 class 3: joint [352160, 352164], runner-up [35963/4, 71927/8]
+  lock station 0 class 3: joint [254898, 254900], runner-up [243400, 243402]
+  lock station 2 class 3: joint [106794, 106795], runner-up [97443, 97444]
+  lock station 4 class 3: joint [36979/2, 73959/4], runner-up [30133/2, 120533/8]
+  lock station 6 class 1: joint [19907/16, 79629/64], runner-up [1037, 66369/64]
+  admission: 180 candidates read, 0 past the signed form; largest |z|² 42365526448065664304295389/9671406556917033397649408
+  teacher-forced: flips to the target 7, to another class 1, undecided 0, top not past one 0, refused 0; exact top = target 7
+request 57: target [3, 3, 0, 0, 1, 1, 2, 2]; native released [3, 3, 0, 1, 1, 1, 2, 2] (right 7, the float release [3, 3, 0, 1, 1, 1, 2, 2] agrees at 8); refinements 8, readings 180, locks [[6], [2], [4], [0], [1], [5], [7], [3]]; members certified 32 of 32, ticks closed 1920 of 1920
+  lock station 6 class 2: joint [112351/8, 14044], runner-up [25303/16, 101213/64]
+  lock station 2 class 0: joint [53251, 106503/2], runner-up [21215/16, 84861/64]
+  lock station 4 class 1: joint [64371, 128743/2], runner-up [73259/32, 18315/8]
+  lock station 0 class 3: joint [130261/2, 65131], runner-up [125077/4, 62539/2]
+  lock station 1 class 3: joint [61557/2, 123115/4], runner-up [55681/2, 111363/4]
+  lock station 5 class 1: joint [115745/32, 57873/16], runner-up [74829/32, 37415/16]
+  lock station 7 class 2: joint [40813/32, 81627/64], runner-up [82891/256, 20723/64]
+  lock station 3 class 1: joint [129309/128, 64655/64], runner-up [63301/64, 126603/128]
+  admission: 180 candidates read, 0 past the signed form; largest |z|² 85732845911899779509285513/19342813113834066795298816
+  teacher-forced: flips to the target 7, to another class 1, undecided 0, top not past one 0, refused 0; exact top = target 7
+request 58: target [0, 0, 1, 1, 2, 2, 3, 3]; native released [1, 0, 2, 1, 1, 2, 1, 3] (right 4, the float release [1, 0, 2, 1, 1, 2, 1, 3] agrees at 8); refinements 8, readings 180, locks [[7], [3], [5], [1], [2], [4], [0], [6]]; members certified 32 of 32, ticks closed 1920 of 1920
+  lock station 7 class 3: joint [84441/2, 42221], runner-up [105293/32, 52647/16]
+  lock station 3 class 1: joint [186232, 186234], runner-up [55833/16, 111667/32]
+  lock station 5 class 2: joint [279164, 279168], runner-up [93189/64, 46595/32]
+  lock station 1 class 0: joint [352172, 352176], runner-up [136456, 136458]
+  lock station 2 class 2: joint [120587, 120588], runner-up [113267, 113268]
+  lock station 4 class 1: joint [101039/4, 25260], runner-up [90731/4, 22683]
+  lock station 0 class 1: joint [75721/4, 37861/2], runner-up [71925/4, 35963/2]
+  lock station 6 class 1: joint [68165/32, 34083/16], runner-up [129303/64, 16163/8]
+  admission: 180 candidates read, 0 past the signed form; largest |z|² 40441969111623131768108661/9671406556917033397649408
+  teacher-forced: flips to the target 6, to another class 2, undecided 0, top not past one 0, refused 0; exact top = target 6
+request 59: target [1, 1, 2, 2, 3, 3, 0, 0]; native released [2, 1, 3, 2, 3, 3, 1, 0] (right 5, the float release [2, 1, 3, 2, 3, 3, 1, 0] agrees at 8); refinements 8, readings 180, locks [[7], [3], [5], [1], [2], [4], [0], [6]]; members certified 32 of 32, ticks closed 1920 of 1920
+  lock station 7 class 0: joint [71093, 71094], runner-up [26263/4, 105053/16]
+  lock station 3 class 2: joint [194558, 194560], runner-up [82235/16, 20559/4]
+  lock station 5 class 3: joint [245398, 245400], runner-up [81439/32, 2545]
+  lock station 1 class 1: joint [303348, 303352], runner-up [103228, 103229]
+  lock station 2 class 3: joint [120546, 120547], runner-up [112616, 112617]
+  lock station 4 class 3: joint [20023, 80093/4], runner-up [127011/8, 31753/2]
+  lock station 0 class 2: joint [17205, 68821/4], runner-up [123941/8, 61971/4]
+  lock station 6 class 1: joint [1244, 79617/64], runner-up [37763/32, 75527/64]
+  admission: 180 candidates read, 0 past the signed form; largest |z|² 85217728867489218513441825/19342813113834066795298816
+  teacher-forced: flips to the target 6, to another class 2, undecided 0, top not past one 0, refused 0; exact top = target 6
+request 60: target [2, 0, 3, 1, 0, 2, 1, 3]; native released [1, 0, 2, 1, 1, 2, 1, 3] (right 5, the float release [1, 0, 2, 1, 1, 2, 1, 3] agrees at 8); refinements 8, readings 180, locks [[5], [7], [1], [3], [2], [4], [0], [6]]; members certified 32 of 32, ticks closed 1920 of 1920
+  lock station 5 class 2: joint [116341/4, 58171/2], runner-up [43045/32, 86091/64]
+  lock station 7 class 3: joint [146486, 146488], runner-up [37387/16, 74775/32]
+  lock station 1 class 0: joint [296748, 296752], runner-up [124089/2, 62045]
+  lock station 3 class 1: joint [330464, 330468], runner-up [68456, 68457]
+  lock station 2 class 2: joint [115242, 115243], runner-up [108789, 108790]
+  lock station 4 class 1: joint [24221, 96885/4], runner-up [42479/2, 84959/4]
+  lock station 0 class 1: joint [73103/4, 18276], runner-up [69135/4, 17284]
+  lock station 6 class 1: joint [8253/4, 66025/32], runner-up [125047/64, 15631/8]
+  admission: 180 candidates read, 0 past the signed form; largest |z|² 20384577608990701731804665/4835703278458516698824704
+  teacher-forced: flips to the target 8, to another class 0, undecided 0, top not past one 0, refused 0; exact top = target 8
+request 61: target [2, 1, 3, 2, 0, 3, 1, 0]; native released [2, 1, 3, 2, 3, 3, 1, 0] (right 7, the float release [2, 1, 3, 2, 3, 3, 1, 0] agrees at 8); refinements 8, readings 180, locks [[7], [3], [5], [1], [2], [4], [0], [6]]; members certified 32 of 32, ticks closed 1920 of 1920
+  lock station 7 class 0: joint [96498, 96499], runner-up [63611/8, 127223/16]
+  lock station 3 class 2: joint [243734, 243736], runner-up [4297, 68753/16]
+  lock station 5 class 3: joint [262772, 262776], runner-up [5905/2, 94481/32]
+  lock station 1 class 1: joint [320556, 320560], runner-up [113435, 113436]
+  lock station 2 class 3: joint [131420, 131422], runner-up [120645, 120646]
+  lock station 4 class 3: joint [21421, 85685/4], runner-up [69767/4, 17442]
+  lock station 0 class 2: joint [18448, 73793/4], runner-up [16686, 66745/4]
+  lock station 6 class 1: joint [10435/8, 83481/64], runner-up [39439/32, 78879/64]
+  admission: 180 candidates read, 0 past the signed form; largest |z|² 83406571624892940839175637/19342813113834066795298816
+  teacher-forced: flips to the target 7, to another class 1, undecided 0, top not past one 0, refused 0; exact top = target 7
+request 62: target [1, 3, 2, 0, 3, 1, 0, 2]; native released [2, 3, 3, 0, 2, 1, 1, 2] (right 4, the float release [2, 3, 3, 0, 2, 1, 1, 2] agrees at 8); refinements 8, readings 180, locks [[7], [1], [5], [3], [0], [2], [6], [4]]; members certified 32 of 32, ticks closed 1920 of 1920
+  lock station 7 class 2: joint [72329/4, 36165/2], runner-up [19893/16, 79573/64]
+  lock station 1 class 3: joint [76763, 76764], runner-up [89173/32, 44587/16]
+  lock station 5 class 1: joint [88645, 88646], runner-up [27075/16, 108301/64]
+  lock station 3 class 0: joint [87035, 87036], runner-up [91439/4, 22860]
+  lock station 0 class 2: joint [113405/2, 56703], runner-up [45834, 91669/2]
+  lock station 2 class 3: joint [27135, 108541/4], runner-up [96861/4, 48431/2]
+  lock station 6 class 1: joint [56811/16, 113623/32], runner-up [33169/16, 66339/32]
+  lock station 4 class 2: joint [115913/64, 57957/32], runner-up [7133/4, 114129/64]
+  admission: 180 candidates read, 0 past the signed form; largest |z|² 79924510090849693769191873/19342813113834066795298816
+  teacher-forced: flips to the target 6, to another class 2, undecided 0, top not past one 0, refused 0; exact top = target 6
+request 63: target [0, 1, 1, 2, 2, 3, 3, 0]; native released [3, 1, 3, 2, 3, 3, 1, 0] (right 4, the float release [3, 1, 3, 2, 3, 3, 1, 0] agrees at 8); refinements 8, readings 180, locks [[7], [1], [3], [5], [0], [2], [4], [6]]; members certified 32 of 32, ticks closed 1920 of 1920
+  lock station 7 class 0: joint [113365/2, 56683], runner-up [106679/16, 13335/2]
+  lock station 1 class 1: joint [183044, 183046], runner-up [47755/8, 95511/16]
+  lock station 3 class 2: joint [263748, 263752], runner-up [113187/32, 28297/8]
+  lock station 5 class 3: joint [265512, 265516], runner-up [119027/16, 29757/4]
+  lock station 0 class 3: joint [198636, 198638], runner-up [188078, 188080]
+  lock station 2 class 3: joint [85782, 85783], runner-up [80508, 80509]
+  lock station 4 class 3: joint [126987/8, 31747/2], runner-up [50949/4, 101899/8]
+  lock station 6 class 1: joint [18031/16, 72125/64], runner-up [125859/128, 31465/32]
+  admission: 180 candidates read, 0 past the signed form; largest |z|² 20849389925554237886644145/4835703278458516698824704
+  teacher-forced: flips to the target 6, to another class 2, undecided 0, top not past one 0, refused 0; exact top = target 6
+request 64: target [2, 2, 3, 3, 0, 0, 1, 1]; native released [3, 2, 3, 3, 1, 0, 2, 1] (right 5, the float release [3, 2, 3, 3, 1, 0, 2, 1] agrees at 8); refinements 8, readings 180, locks [[7], [5], [3], [1], [4], [2], [0], [6]]; members certified 32 of 32, ticks closed 1920 of 1920
+  lock station 7 class 1: joint [46251/2, 92503/4], runner-up [30671/32, 122685/128]
+  lock station 5 class 0: joint [79372, 79373], runner-up [46827/16, 93655/32]
+  lock station 3 class 3: joint [155558, 155560], runner-up [119029/8, 59515/4]
+  lock station 1 class 2: joint [169196, 169198], runner-up [62844, 125689/2]
+  lock station 4 class 1: joint [77335/4, 19334], runner-up [29835/2, 119341/8]
+  lock station 2 class 3: joint [10702, 85617/8], runner-up [10163, 81305/8]
+  lock station 0 class 3: joint [36691/4, 73383/8], runner-up [69885/8, 34943/4]
+  lock station 6 class 2: joint [30483/32, 121933/128], runner-up [96933/128, 48467/64]
+  admission: 180 candidates read, 0 past the signed form; largest |z|² 81050167072081726619491577/19342813113834066795298816
+  teacher-forced: flips to the target 8, to another class 0, undecided 0, top not past one 0, refused 0; exact top = target 8
+request 65: target [0, 3, 1, 0, 2, 1, 3, 2]; native released [2, 3, 3, 0, 0, 1, 1, 2] (right 4, the float release [2, 3, 3, 0, 0, 1, 1, 2] agrees at 8); refinements 8, readings 180, locks [[5], [3], [7], [1], [0], [2], [4], [6]]; members certified 32 of 32, ticks closed 1920 of 1920
+  lock station 5 class 1: joint [38842, 77685/2], runner-up [28379/32, 113517/128]
+  lock station 3 class 0: joint [120239, 120240], runner-up [81409/64, 40705/32]
+  lock station 7 class 2: joint [116105, 116106], runner-up [69221/64, 34611/32]
+  lock station 1 class 3: joint [110844, 110845], runner-up [112273/2, 56137]
+  lock station 0 class 2: joint [71982, 71983], runner-up [56612, 113225/2]
+  lock station 2 class 3: joint [33848, 67697/2], runner-up [120807/4, 30202]
+  lock station 4 class 0: joint [33409/4, 66819/8], runner-up [27335/4, 109341/16]
+  lock station 6 class 1: joint [60639/32, 121279/64], runner-up [80441/64, 40221/32]
+  admission: 180 candidates read, 0 past the signed form; largest |z|² 83169778850863765392552245/19342813113834066795298816
+  teacher-forced: flips to the target 8, to another class 0, undecided 0, top not past one 0, refused 0; exact top = target 8
+request 66: target [0, 3, 1, 0, 2, 1, 3, 2]; native released [2, 3, 3, 0, 0, 1, 1, 2] (right 4, the float release [2, 3, 3, 0, 0, 1, 1, 2] agrees at 8); refinements 8, readings 180, locks [[7], [1], [5], [3], [0], [2], [4], [6]]; members certified 32 of 32, ticks closed 1920 of 1920
+  lock station 7 class 2: joint [39039, 78079/2], runner-up [122427/64, 30607/16]
+  lock station 1 class 3: joint [131278, 131280], runner-up [66143/8, 8268]
+  lock station 5 class 1: joint [128476, 128477], runner-up [37701/16, 75403/32]
+  lock station 3 class 0: joint [113383, 113384], runner-up [116563/4, 29141]
+  lock station 0 class 2: joint [74127, 74128], runner-up [114847/2, 57424]
+  lock station 2 class 3: joint [69601/2, 34801], runner-up [30968, 123873/4]
+  lock station 4 class 0: joint [34509/4, 69019/8], runner-up [111419/16, 27855/4]
+  lock station 6 class 1: joint [125969/64, 62985/32], runner-up [81337/64, 40669/32]
+  admission: 180 candidates read, 0 past the signed form; largest |z|² 10429383618551830941725089/2417851639229258349412352
+  teacher-forced: flips to the target 7, to another class 1, undecided 0, top not past one 0, refused 0; exact top = target 7
+request 67: target [3, 1, 0, 2, 1, 3, 2, 0]; native released [2, 1, 3, 2, 3, 3, 1, 0] (right 4, the float release [2, 1, 3, 2, 3, 3, 1, 0] agrees at 8); refinements 8, readings 180, locks [[7], [3], [1], [5], [2], [4], [0], [6]]; members certified 32 of 32, ticks closed 1920 of 1920
+  lock station 7 class 0: joint [87633/2, 43817], runner-up [69909/8, 34955/4]
+  lock station 3 class 2: joint [157964, 157966], runner-up [27743/8, 110973/32]
+  lock station 1 class 1: joint [229148, 229150], runner-up [38998, 77997/2]
+  lock station 5 class 3: joint [241934, 241936], runner-up [21383/4, 85533/16]
+  lock station 2 class 3: joint [101998, 101999], runner-up [95498, 95499]
+  lock station 4 class 3: joint [35733/2, 71467/4], runner-up [28345/2, 113381/8]
+  lock station 0 class 2: joint [31127/2, 124509/8], runner-up [14080, 112641/8]
+  lock station 6 class 1: joint [73247/64, 2289/2], runner-up [17577/16, 70309/64]
+  admission: 180 candidates read, 0 past the signed form; largest |z|² 83092321118571207754748553/19342813113834066795298816
+  teacher-forced: flips to the target 7, to another class 1, undecided 0, top not past one 0, refused 0; exact top = target 7
+request 68: target [1, 1, 2, 2, 3, 3, 0, 0]; native released [3, 1, 3, 2, 3, 3, 1, 0] (right 5, the float release [3, 1, 3, 2, 3, 3, 1, 0] agrees at 8); refinements 8, readings 180, locks [[7], [1], [3], [5], [0], [2], [4], [6]]; members certified 32 of 32, ticks closed 1920 of 1920
+  lock station 7 class 0: joint [126411/2, 63206], runner-up [79321/32, 39661/16]
+  lock station 1 class 1: joint [170678, 170680], runner-up [83737/16, 41869/8]
+  lock station 3 class 2: joint [235518, 235520], runner-up [103889/32, 51945/16]
+  lock station 5 class 3: joint [257686, 257688], runner-up [102943/16, 6434]
+  lock station 0 class 3: joint [188920, 188922], runner-up [179016, 179018]
+  lock station 2 class 3: joint [80601, 80602], runner-up [75599, 75600]
+  lock station 4 class 3: joint [14738, 117905/8], runner-up [96929/8, 48465/4]
+  lock station 6 class 1: joint [8287/8, 66297/64], runner-up [117687/128, 14711/16]
+  admission: 180 candidates read, 0 past the signed form; largest |z|² 10154256364566553561601085/2417851639229258349412352
+  teacher-forced: flips to the target 8, to another class 0, undecided 0, top not past one 0, refused 0; exact top = target 8
+request 69: target [0, 3, 1, 0, 2, 1, 3, 2]; native released [0, 2, 1, 1, 2, 1, 3, 2] (right 6, the float release [0, 2, 1, 1, 2, 1, 3, 2] agrees at 8); refinements 8, readings 180, locks [[6], [4], [0], [2], [1], [3], [5], [7]]; members certified 32 of 32, ticks closed 1920 of 1920
+  lock station 6 class 3: joint [77853/2, 38927], runner-up [16543/4, 66173/16]
+  lock station 4 class 2: joint [137028, 137030], runner-up [65661/512, 32831/256]
+  lock station 0 class 0: joint [199992, 199994], runner-up [107123/2, 53562]
+  lock station 2 class 1: joint [210118, 210120], runner-up [94551/2, 47276]
+  lock station 1 class 2: joint [79494, 79495], runner-up [72073, 72074]
+  lock station 3 class 1: joint [37189/2, 74379/4], runner-up [31057/2, 124229/8]
+  lock station 5 class 1: joint [2125, 68001/32], runner-up [61445/32, 122891/64]
+  lock station 7 class 2: joint [13579/16, 108633/128], runner-up [90733/256, 45367/128]
+  admission: 180 candidates read, 0 past the signed form; largest |z|² 82530412430972033843511265/19342813113834066795298816
+  teacher-forced: flips to the target 6, to another class 2, undecided 0, top not past one 0, refused 0; exact top = target 6
+request 70: target [0, 0, 1, 1, 2, 2, 3, 3]; native released [1, 0, 2, 1, 1, 2, 1, 3] (right 4, the float release [1, 0, 2, 1, 1, 2, 1, 3] agrees at 8); refinements 8, readings 180, locks [[7], [1], [5], [3], [0], [2], [4], [6]]; members certified 32 of 32, ticks closed 1920 of 1920
+  lock station 7 class 3: joint [52215, 104431/2], runner-up [94435/16, 23609/4]
+  lock station 1 class 0: joint [185482, 185484], runner-up [101457/16, 50729/8]
+  lock station 5 class 2: joint [317600, 317604], runner-up [99733/256, 49867/128]
+  lock station 3 class 1: joint [342544, 342548], runner-up [77057, 77058]
+  lock station 0 class 1: joint [207044, 207046], runner-up [201410, 201412]
+  lock station 2 class 2: joint [78083, 78084], runner-up [75765, 75766]
+  lock station 4 class 1: joint [39267/2, 78535/4], runner-up [34857/2, 69715/4]
+  lock station 6 class 1: joint [70621/32, 35311/16], runner-up [128147/64, 32037/16]
+  admission: 180 candidates read, 0 past the signed form; largest |z|² 41472658556315233984121305/9671406556917033397649408
+  teacher-forced: flips to the target 6, to another class 2, undecided 0, top not past one 0, refused 0; exact top = target 6
+request 71: target [3, 2, 0, 3, 1, 0, 2, 1]; native released [3, 2, 3, 3, 1, 0, 2, 1] (right 7, the float release [3, 2, 3, 3, 1, 0, 2, 1] agrees at 8); refinements 8, readings 180, locks [[7], [5], [3], [1], [2], [0], [4], [6]]; members certified 32 of 32, ticks closed 1920 of 1920
+  lock station 7 class 1: joint [70767/2, 35384], runner-up [130173/32, 65087/16]
+  lock station 5 class 0: joint [102703, 102704], runner-up [123611/32, 30903/8]
+  lock station 3 class 3: joint [176148, 176150], runner-up [15956, 127649/8]
+  lock station 1 class 2: joint [188636, 188638], runner-up [69823, 69824]
+  lock station 2 class 3: joint [72099, 72100], runner-up [68177, 68178]
+  lock station 0 class 3: joint [109861/2, 54931], runner-up [51646, 103293/2]
+  lock station 4 class 1: joint [79041/8, 39521/4], runner-up [67533/8, 33767/4]
+  lock station 6 class 2: joint [119735/128, 14967/16], runner-up [98291/128, 24573/32]
+  admission: 180 candidates read, 0 past the signed form; largest |z|² 82528981813198763076329581/19342813113834066795298816
+  teacher-forced: flips to the target 6, to another class 2, undecided 0, top not past one 0, refused 0; exact top = target 6
+request 72: target [2, 0, 3, 1, 0, 2, 1, 3]; native released [2, 3, 3, 1, 0, 2, 1, 3] (right 7, the float release [2, 3, 3, 1, 0, 2, 1, 3] agrees at 8); refinements 8, readings 180, locks [[4], [6], [2], [0], [3], [1], [5], [7]]; members certified 32 of 32, ticks closed 1920 of 1920
+  lock station 4 class 0: joint [35028, 70057/2], runner-up [109459/128, 27365/32]
+  lock station 6 class 1: joint [93775, 93776], runner-up [102627/128, 25657/32]
+  lock station 2 class 3: joint [144696, 144698], runner-up [31313/2, 125253/8]
+  lock station 0 class 2: joint [151524, 151526], runner-up [59426, 118853/2]
+  lock station 3 class 1: joint [18399, 73597/4], runner-up [118861/8, 59431/4]
+  lock station 1 class 3: joint [84655/8, 10582], runner-up [39141/4, 78283/8]
+  lock station 5 class 2: joint [58925/64, 117851/128], runner-up [101813/128, 50907/64]
+  lock station 7 class 3: joint [48849/64, 97699/128], runner-up [70857/256, 35429/128]
+  admission: 180 candidates read, 0 past the signed form; largest |z|² 82660656874186973239038109/19342813113834066795298816
+  teacher-forced: flips to the target 6, to another class 2, undecided 0, top not past one 0, refused 0; exact top = target 6
+request 73: target [3, 3, 0, 0, 1, 1, 2, 2]; native released [2, 3, 3, 0, 2, 1, 1, 2] (right 4, the float release [2, 3, 3, 0, 2, 1, 1, 2] agrees at 8); refinements 8, readings 180, locks [[7], [3], [5], [1], [0], [2], [6], [4]]; members certified 32 of 32, ticks closed 1920 of 1920
+  lock station 7 class 2: joint [125091/8, 31273/2], runner-up [67309/64, 33655/32]
+  lock station 3 class 0: joint [84290, 84291], runner-up [60523/64, 121047/128]
+  lock station 5 class 1: joint [98230, 98231], runner-up [19945/8, 79781/32]
+  lock station 1 class 3: joint [97148, 97149], runner-up [94459/2, 47230]
+  lock station 0 class 2: joint [62785, 125571/2], runner-up [51159, 102319/2]
+  lock station 2 class 3: joint [29712, 118849/4], runner-up [26861, 107445/4]
+  lock station 6 class 1: joint [114507/32, 28627/8], runner-up [73029/32, 36515/16]
+  lock station 4 class 2: joint [119925/64, 59963/32], runner-up [116145/64, 58073/32]
+  admission: 180 candidates read, 0 past the signed form; largest |z|² 21168738656306249057156165/4835703278458516698824704
+  teacher-forced: flips to the target 8, to another class 0, undecided 0, top not past one 0, refused 0; exact top = target 8
+request 74: target [1, 3, 2, 0, 3, 1, 0, 2]; native released [2, 3, 3, 0, 0, 1, 1, 2] (right 4, the float release [2, 3, 3, 0, 0, 1, 1, 2] agrees at 8); refinements 8, readings 180, locks [[3], [5], [7], [1], [0], [2], [4], [6]]; members certified 32 of 32, ticks closed 1920 of 1920
+  lock station 3 class 0: joint [83473/2, 41737], runner-up [42595/128, 85191/256]
+  lock station 5 class 1: joint [109868, 109869], runner-up [14473/32, 115785/256]
+  lock station 7 class 2: joint [104074, 104075], runner-up [2655/2, 84961/64]
+  lock station 1 class 3: joint [104380, 104381], runner-up [48694, 97389/2]
+  lock station 0 class 2: joint [68041, 68042], runner-up [54844, 109689/2]
+  lock station 2 class 3: joint [129353/4, 64677/2], runner-up [57593/2, 115187/4]
+  lock station 4 class 0: joint [130223/16, 8139], runner-up [103359/16, 6460]
+  lock station 6 class 1: joint [120703/64, 1886], runner-up [78087/64, 9761/8]
+  admission: 180 candidates read, 0 past the signed form; largest |z|² 5212195829362647808166093/1208925819614629174706176
+  teacher-forced: flips to the target 5, to another class 3, undecided 0, top not past one 0, refused 0; exact top = target 5
+request 75: target [3, 3, 0, 0, 1, 1, 2, 2]; native released [2, 3, 3, 0, 0, 1, 1, 2] (right 4, the float release [2, 3, 3, 0, 0, 1, 1, 2] agrees at 8); refinements 8, readings 180, locks [[5], [3], [7], [1], [0], [2], [4], [6]]; members certified 32 of 32, ticks closed 1920 of 1920
+  lock station 5 class 1: joint [116615/4, 29154], runner-up [81641/64, 40821/32]
+  lock station 3 class 0: joint [111521, 111522], runner-up [46625/32, 93251/64]
+  lock station 7 class 2: joint [113075, 113076], runner-up [30491/32, 121965/128]
+  lock station 1 class 3: joint [109962, 109963], runner-up [54501, 109003/2]
+  lock station 0 class 2: joint [71353, 71354], runner-up [57743, 115487/2]
+  lock station 2 class 3: joint [66433/2, 33217], runner-up [30115, 120461/4]
+  lock station 4 class 0: joint [8137, 130193/16], runner-up [53669/8, 107339/16]
+  lock station 6 class 1: joint [3737/2, 119585/64], runner-up [39859/32, 79719/64]
+  admission: 180 candidates read, 0 past the signed form; largest |z|² 41776067453981987400652269/9671406556917033397649408
+  teacher-forced: flips to the target 6, to another class 2, undecided 0, top not past one 0, refused 0; exact top = target 6
+request 76: target [2, 3, 3, 0, 0, 1, 1, 2]; native released [2, 3, 3, 0, 0, 1, 1, 2] (right 8, the float release [2, 3, 3, 0, 0, 1, 1, 2] agrees at 8); refinements 8, readings 180, locks [[7], [1], [5], [3], [0], [2], [4], [6]]; members certified 32 of 32, ticks closed 1920 of 1920
+  lock station 7 class 2: joint [102741/4, 51371/2], runner-up [71873/64, 35937/32]
+  lock station 1 class 3: joint [109264, 109265], runner-up [59043/16, 118087/32]
+  lock station 5 class 1: joint [124740, 124741], runner-up [38767/16, 77535/32]
+  lock station 3 class 0: joint [114125, 114126], runner-up [30413, 121653/4]
+  lock station 0 class 2: joint [72884, 72885], runner-up [58878, 117757/2]
+  lock station 2 class 3: joint [67479/2, 33740], runner-up [120061/4, 60031/2]
+  lock station 4 class 0: joint [66593/8, 33297/4], runner-up [53053/8, 106107/16]
+  lock station 6 class 1: joint [120531/64, 30133/16], runner-up [82479/64, 5155/4]
+  admission: 180 candidates read, 0 past the signed form; largest |z|² 41323978679878339754272065/9671406556917033397649408
+  teacher-forced: flips to the target 7, to another class 1, undecided 0, top not past one 0, refused 0; exact top = target 7
+request 77: target [0, 0, 1, 1, 2, 2, 3, 3]; native released [1, 0, 2, 1, 1, 2, 1, 3] (right 4, the float release [1, 0, 2, 1, 1, 2, 1, 3] agrees at 8); refinements 8, readings 180, locks [[7], [5], [1], [3], [2], [4], [0], [6]]; members certified 32 of 32, ticks closed 1920 of 1920
+  lock station 7 class 3: joint [90951/2, 45476], runner-up [125821/32, 62911/16]
+  lock station 5 class 2: joint [176566, 176568], runner-up [53009/128, 106019/256]
+  lock station 1 class 0: joint [323924, 323928], runner-up [74070, 74071]
+  lock station 3 class 1: joint [339892, 339896], runner-up [76460, 76461]
+  lock station 2 class 2: joint [117504, 117505], runner-up [110864, 110865]
+  lock station 4 class 1: joint [101283/4, 25321], runner-up [22289, 89157/4]
+  lock station 0 class 1: joint [38059/2, 76119/4], runner-up [36061/2, 72123/4]
+  lock station 6 class 1: joint [68205/32, 34103/16], runner-up [123533/64, 61767/32]
+  admission: 180 candidates read, 0 past the signed form; largest |z|² 42386888646393146167029269/9671406556917033397649408
+  teacher-forced: flips to the target 4, to another class 4, undecided 0, top not past one 0, refused 0; exact top = target 4
+request 78: target [1, 0, 2, 1, 3, 2, 0, 3]; native released [1, 0, 2, 1, 1, 2, 1, 3] (right 6, the float release [1, 0, 2, 1, 1, 2, 1, 3] agrees at 8); refinements 8, readings 180, locks [[7], [3], [5], [1], [4], [2], [0], [6]]; members certified 32 of 32, ticks closed 1920 of 1920
+  lock station 7 class 3: joint [87139/2, 43570], runner-up [86377/32, 43189/16]
+  lock station 3 class 1: joint [139928, 139930], runner-up [82811/64, 20703/16]
+  lock station 5 class 2: joint [216818, 216820], runner-up [129165/128, 64583/64]
+  lock station 1 class 0: joint [287200, 287204], runner-up [108885, 108886]
+  lock station 4 class 1: joint [84491/2, 42246], runner-up [78107/2, 39054]
+  lock station 2 class 2: joint [23815, 95261/4], runner-up [43405/2, 86811/4]
+  lock station 0 class 1: joint [71429/4, 35715/2], runner-up [68451/4, 17113]
+  lock station 6 class 1: joint [16651/8, 66605/32], runner-up [120637/64, 60319/32]
+  admission: 180 candidates read, 0 past the signed form; largest |z|² 41246636073077214405039877/9671406556917033397649408
+  teacher-forced: flips to the target 7, to another class 1, undecided 0, top not past one 0, refused 0; exact top = target 7
+request 79: target [3, 0, 0, 1, 1, 2, 2, 3]; native released [1, 0, 2, 1, 1, 2, 1, 3] (right 5, the float release [1, 0, 2, 1, 1, 2, 1, 3] agrees at 8); refinements 8, readings 180, locks [[7], [3], [5], [1], [0], [4], [2], [6]]; members certified 32 of 32, ticks closed 1920 of 1920
+  lock station 7 class 3: joint [94091/2, 47046], runner-up [43827/32, 87655/64]
+  lock station 3 class 1: joint [173314, 173316], runner-up [102401/64, 51201/32]
+  lock station 5 class 2: joint [262086, 262088], runner-up [85829/64, 42915/32]
+  lock station 1 class 0: joint [343924, 343928], runner-up [130424, 130425]
+  lock station 0 class 1: joint [207996, 207998], runner-up [203970, 203972]
+  lock station 4 class 1: joint [68473/2, 34237], runner-up [63493/2, 126987/4]
+  lock station 2 class 2: joint [20067, 80269/4], runner-up [73119/4, 18280]
+  lock station 6 class 1: joint [17151/8, 68605/32], runner-up [125929/64, 62965/32]
+  admission: 180 candidates read, 0 past the signed form; largest |z|² 83348993025188242585776101/19342813113834066795298816
+  teacher-forced: flips to the target 5, to another class 3, undecided 0, top not past one 0, refused 0; exact top = target 5
+request 80: target [3, 0, 0, 1, 1, 2, 2, 3]; native released [1, 0, 2, 1, 1, 2, 1, 3] (right 5, the float release [1, 0, 2, 1, 1, 2, 1, 3] agrees at 8); refinements 8, readings 180, locks [[7], [3], [5], [1], [2], [4], [0], [6]]; members certified 32 of 32, ticks closed 1920 of 1920
+  lock station 7 class 3: joint [35752, 71505/2], runner-up [116295/128, 14537/16]
+  lock station 3 class 1: joint [162432, 162434], runner-up [26899/16, 107597/64]
+  lock station 5 class 2: joint [247654, 247656], runner-up [38527/32, 77055/64]
+  lock station 1 class 0: joint [342048, 342052], runner-up [127089, 127090]
+  lock station 2 class 2: joint [118264, 118265], runner-up [112564, 112565]
+  lock station 4 class 1: joint [26130, 104521/4], runner-up [89917/4, 44959/2]
+  lock station 0 class 1: joint [19660, 78641/4], runner-up [74727/4, 18682]
+  lock station 6 class 1: joint [33777/16, 67555/32], runner-up [126801/64, 63401/32]
+  admission: 180 candidates read, 0 past the signed form; largest |z|² 85359852019696200813912757/19342813113834066795298816
+  teacher-forced: flips to the target 6, to another class 2, undecided 0, top not past one 0, refused 0; exact top = target 6
+request 81: target [0, 2, 1, 3, 2, 0, 3, 1]; native released [0, 2, 1, 1, 2, 1, 3, 2] (right 5, the float release [0, 2, 1, 1, 2, 1, 3, 2] agrees at 8); refinements 8, readings 180, locks [[6], [4], [0], [2], [3], [1], [5], [7]]; members certified 32 of 32, ticks closed 1920 of 1920
+  lock station 6 class 3: joint [128745/4, 64373/2], runner-up [32349/8, 129397/32]
+  lock station 4 class 2: joint [120214, 120215], runner-up [68951/256, 8619/32]
+  lock station 0 class 0: joint [203940, 203942], runner-up [100621/2, 50311]
+  lock station 2 class 1: joint [218058, 218060], runner-up [97173/2, 48587]
+  lock station 3 class 1: joint [35066, 70133/2], runner-up [127955/4, 31989]
+  lock station 1 class 2: joint [20304, 81217/4], runner-up [36637/2, 73275/4]
+  lock station 5 class 1: joint [67519/32, 2110], runner-up [15301/8, 122409/64]
+  lock station 7 class 2: joint [49083/64, 98167/128], runner-up [21637/64, 86549/256]
+  admission: 180 candidates read, 0 past the signed form; largest |z|² 79629181341992554856549225/19342813113834066795298816
+  teacher-forced: flips to the target 6, to another class 2, undecided 0, top not past one 0, refused 0; exact top = target 6
+request 82: target [0, 2, 1, 3, 2, 0, 3, 1]; native released [0, 2, 1, 1, 2, 1, 3, 2] (right 5, the float release [0, 2, 1, 1, 2, 1, 3, 2] agrees at 8); refinements 8, readings 180, locks [[6], [4], [0], [2], [1], [3], [5], [7]]; members certified 32 of 32, ticks closed 1920 of 1920
+  lock station 6 class 3: joint [67251/2, 33626], runner-up [56263/64, 112527/128]
+  lock station 4 class 2: joint [115127, 115128], runner-up [93699/512, 23425/128]
+  lock station 0 class 0: joint [184942, 184944], runner-up [99043/2, 49522]
+  lock station 2 class 1: joint [196156, 196158], runner-up [91895/2, 45948]
+  lock station 1 class 2: joint [74904, 74905], runner-up [71943, 71944]
+  lock station 3 class 1: joint [75465/4, 37733/2], runner-up [66925/4, 33463/2]
+  lock station 5 class 1: joint [68039/32, 8505/4], runner-up [30889/16, 123557/64]
+  lock station 7 class 2: joint [101923/128, 25481/32], runner-up [24549/64, 98197/256]
+  admission: 180 candidates read, 0 past the signed form; largest |z|² 19926554653013096459701217/4835703278458516698824704
+  teacher-forced: flips to the target 6, to another class 2, undecided 0, top not past one 0, refused 0; exact top = target 6
+request 83: target [3, 3, 0, 0, 1, 1, 2, 2]; native released [3, 3, 0, 0, 1, 1, 2, 2] (right 8, the float release [3, 3, 0, 0, 1, 1, 2, 2] agrees at 8); refinements 8, readings 180, locks [[6], [0], [4], [2], [1], [3], [5], [7]]; members certified 32 of 32, ticks closed 1920 of 1920
+  lock station 6 class 2: joint [92821/4, 46411/2], runner-up [60469/32, 120939/64]
+  lock station 0 class 3: joint [66700, 66701], runner-up [88421/16, 44211/8]
+  lock station 4 class 1: joint [74830, 74831], runner-up [63595/32, 127191/64]
+  lock station 2 class 0: joint [69281, 69282], runner-up [19561, 78245/4]
+  lock station 1 class 3: joint [130553/4, 65277/2], runner-up [117683/4, 29421]
+  lock station 3 class 0: joint [64667/8, 129335/16], runner-up [53393/8, 106787/16]
+  lock station 5 class 1: joint [119933/64, 59967/32], runner-up [20079/16, 80317/64]
+  lock station 7 class 2: joint [125171/128, 31293/32], runner-up [31261/128, 125045/512]
+  admission: 180 candidates read, 0 past the signed form; largest |z|² 21114501055189619833466933/4835703278458516698824704
+  teacher-forced: flips to the target 6, to another class 2, undecided 0, top not past one 0, refused 0; exact top = target 6
+request 84: target [0, 0, 1, 1, 2, 2, 3, 3]; native released [1, 0, 2, 1, 1, 2, 1, 3] (right 4, the float release [1, 0, 2, 1, 1, 2, 1, 3] agrees at 8); refinements 8, readings 180, locks [[7], [1], [5], [3], [2], [4], [0], [6]]; members certified 32 of 32, ticks closed 1920 of 1920
+  lock station 7 class 3: joint [54434, 108869/2], runner-up [22421/4, 89685/16]
+  lock station 1 class 0: joint [182674, 182676], runner-up [24415/4, 97661/16]
+  lock station 5 class 2: joint [314544, 314548], runner-up [6165/16, 98641/256]
+  lock station 3 class 1: joint [328432, 328436], runner-up [74591, 74592]
+  lock station 2 class 2: joint [115019, 115020], runner-up [107842, 107843]
+  lock station 4 class 1: joint [99421/4, 49711/2], runner-up [87913/4, 43957/2]
+  lock station 0 class 1: joint [74715/4, 18679], runner-up [35679/2, 71359/4]
+  lock station 6 class 1: joint [69269/32, 34635/16], runner-up [31483/16, 125933/64]
+  admission: 180 candidates read, 0 past the signed form; largest |z|² 85176998716655068108111981/19342813113834066795298816
+  teacher-forced: flips to the target 6, to another class 2, undecided 0, top not past one 0, refused 0; exact top = target 6
+request 85: target [0, 2, 1, 3, 2, 0, 3, 1]; native released [3, 2, 3, 3, 1, 0, 2, 1] (right 4, the float release [3, 2, 3, 3, 1, 0, 2, 1] agrees at 8); refinements 8, readings 180, locks [[5], [3], [7], [1], [0], [4], [2], [6]]; members certified 32 of 32, ticks closed 1920 of 1920
+  lock station 5 class 0: joint [69143, 69144], runner-up [58693/64, 117387/128]
+  lock station 3 class 3: joint [127992, 127993], runner-up [122409/128, 61205/64]
+  lock station 7 class 1: joint [195906, 195908], runner-up [42085/128, 84171/256]
+  lock station 1 class 2: joint [201568, 201570], runner-up [80822, 80823]
+  lock station 0 class 3: joint [135844, 135846], runner-up [130317, 130318]
+  lock station 4 class 1: joint [67191/4, 16798], runner-up [54205/4, 108411/8]
+  lock station 2 class 3: joint [9685, 77481/8], runner-up [9018, 72145/8]
+  lock station 6 class 2: joint [889, 113793/128], runner-up [48147/64, 96295/128]
+  admission: 180 candidates read, 0 past the signed form; largest |z|² 80614015584486908256468749/19342813113834066795298816
+  teacher-forced: flips to the target 6, to another class 2, undecided 0, top not past one 0, refused 0; exact top = target 6
+request 86: target [2, 0, 3, 1, 0, 2, 1, 3]; native released [1, 0, 2, 1, 1, 2, 1, 3] (right 5, the float release [1, 0, 2, 1, 1, 2, 1, 3] agrees at 8); refinements 8, readings 180, locks [[5], [7], [1], [3], [0], [2], [4], [6]]; members certified 32 of 32, ticks closed 1920 of 1920
+  lock station 5 class 2: joint [80455/4, 20114], runner-up [32193/64, 128773/256]
+  lock station 7 class 3: joint [132282, 132284], runner-up [59603/32, 119207/64]
+  lock station 1 class 0: joint [281340, 281344], runner-up [115177/2, 57589]
+  lock station 3 class 1: joint [322708, 322712], runner-up [66331, 66332]
+  lock station 0 class 1: joint [195984, 195986], runner-up [189430, 189432]
+  lock station 2 class 2: joint [74053, 74054], runner-up [71331, 71332]
+  lock station 4 class 1: joint [73767/4, 18442], runner-up [127525/8, 63763/4]
+  lock station 6 class 1: joint [32787/16, 65575/32], runner-up [60733/32, 121467/64]
+  admission: 180 candidates read, 0 past the signed form; largest |z|² 81593117506215372231886945/19342813113834066795298816
+  teacher-forced: flips to the target 6, to another class 2, undecided 0, top not past one 0, refused 0; exact top = target 6
+request 87: target [0, 2, 1, 3, 2, 0, 3, 1]; native released [0, 2, 1, 1, 2, 1, 3, 2] (right 5, the float release [0, 2, 1, 1, 2, 1, 3, 2] agrees at 8); refinements 8, readings 180, locks [[6], [4], [0], [2], [1], [3], [7], [5]]; members certified 32 of 32, ticks closed 1920 of 1920
+  lock station 6 class 3: joint [83653/2, 41827], runner-up [32845/16, 65691/32]
+  lock station 4 class 2: joint [140138, 140140], runner-up [77505/512, 38753/256]
+  lock station 0 class 0: joint [211680, 211682], runner-up [115479/2, 57740]
+  lock station 2 class 1: joint [220432, 220434], runner-up [101109/2, 50555]
+  lock station 1 class 2: joint [82167, 82168], runner-up [78914, 78915]
+  lock station 3 class 1: joint [77755/4, 19439], runner-up [71353/4, 35677/2]
+  lock station 7 class 2: joint [4269/8, 68305/128], runner-up [111933/256, 55967/128]
+  lock station 5 class 1: joint [49909/64, 99819/128], runner-up [102207/256, 1597/4]
+  admission: 180 candidates read, 0 past the signed form; largest |z|² 79538266047110394451860445/19342813113834066795298816
+  teacher-forced: flips to the target 6, to another class 2, undecided 0, top not past one 0, refused 0; exact top = target 6
+request 88: target [1, 1, 2, 2, 3, 3, 0, 0]; native released [3, 1, 3, 2, 3, 3, 1, 0] (right 5, the float release [3, 1, 3, 2, 3, 3, 1, 0] agrees at 8); refinements 8, readings 180, locks [[7], [1], [3], [5], [0], [2], [4], [6]]; members certified 32 of 32, ticks closed 1920 of 1920
+  lock station 7 class 0: joint [48363, 96727/2], runner-up [20299/8, 81197/32]
+  lock station 1 class 1: joint [144868, 144870], runner-up [111733/32, 55867/16]
+  lock station 3 class 2: joint [212704, 212706], runner-up [8119/2, 129905/32]
+  lock station 5 class 3: joint [238712, 238714], runner-up [101037/16, 50519/8]
+  lock station 0 class 3: joint [177120, 177122], runner-up [167232, 167234]
+  lock station 2 class 3: joint [76598, 76599], runner-up [72230, 72231]
+  lock station 4 class 3: joint [114225/8, 57113/4], runner-up [93801/8, 46901/4]
+  lock station 6 class 1: joint [64593/64, 129187/128], runner-up [113781/128, 56891/64]
+  admission: 180 candidates read, 0 past the signed form; largest |z|² 40152292751371716619770445/9671406556917033397649408
+  teacher-forced: flips to the target 8, to another class 0, undecided 0, top not past one 0, refused 0; exact top = target 8
+request 89: target [3, 2, 0, 3, 1, 0, 2, 1]; native released [3, 2, 3, 3, 1, 0, 2, 1] (right 7, the float release [3, 2, 3, 3, 1, 0, 2, 1] agrees at 8); refinements 8, readings 180, locks [[7], [5], [1], [3], [2], [0], [4], [6]]; members certified 32 of 32, ticks closed 1920 of 1920
+  lock station 7 class 1: joint [23472, 93889/4], runner-up [51349/32, 102699/64]
+  lock station 5 class 0: joint [90024, 90025], runner-up [72275/16, 18069/4]
+  lock station 1 class 2: joint [196722, 196724], runner-up [25223, 100893/4]
+  lock station 3 class 3: joint [203910, 203912], runner-up [74901/2, 37451]
+  lock station 2 class 3: joint [78133, 78134], runner-up [73697, 73698]
+  lock station 0 class 3: joint [59938, 119877/2], runner-up [56189, 112379/2]
+  lock station 4 class 1: joint [42177/4, 84355/8], runner-up [18383/2, 73533/8]
+  lock station 6 class 2: joint [126281/128, 63141/64], runner-up [105341/128, 52671/64]
+  admission: 180 candidates read, 0 past the signed form; largest |z|² 82695262626297557703907945/19342813113834066795298816
+  teacher-forced: flips to the target 7, to another class 1, undecided 0, top not past one 0, refused 0; exact top = target 7
+request 90: target [1, 0, 2, 1, 3, 2, 0, 3]; native released [1, 0, 2, 1, 1, 2, 1, 3] (right 6, the float release [1, 0, 2, 1, 1, 2, 1, 3] agrees at 8); refinements 8, readings 180, locks [[7], [5], [1], [3], [2], [4], [0], [6]]; members certified 32 of 32, ticks closed 1920 of 1920
+  lock station 7 class 3: joint [48877, 97755/2], runner-up [7714, 123425/16]
+  lock station 5 class 2: joint [191994, 191996], runner-up [125419/512, 31355/128]
+  lock station 1 class 0: joint [322324, 322328], runner-up [72460, 72461]
+  lock station 3 class 1: joint [339604, 339608], runner-up [71102, 71103]
+  lock station 2 class 2: joint [116866, 116867], runner-up [113331, 113332]
+  lock station 4 class 1: joint [103607/4, 25902], runner-up [85807/4, 21452]
+  lock station 0 class 1: joint [38625/2, 77251/4], runner-up [18511, 74045/4]
+  lock station 6 class 1: joint [66527/32, 2079], runner-up [124847/64, 7803/4]
+  admission: 180 candidates read, 0 past the signed form; largest |z|² 41668902576052762812500089/9671406556917033397649408
+  teacher-forced: flips to the target 8, to another class 0, undecided 0, top not past one 0, refused 0; exact top = target 8
+request 91: target [0, 1, 1, 2, 2, 3, 3, 0]; native released [3, 1, 3, 2, 3, 3, 1, 0] (right 4, the float release [3, 1, 3, 2, 3, 3, 1, 0] agrees at 8); refinements 8, readings 180, locks [[7], [3], [1], [5], [0], [2], [4], [6]]; members certified 32 of 32, ticks closed 1920 of 1920
+  lock station 7 class 0: joint [75441/2, 37721], runner-up [66881/16, 33441/8]
+  lock station 3 class 2: joint [155332, 155334], runner-up [31905/8, 127621/32]
+  lock station 1 class 1: joint [242106, 242108], runner-up [36456, 72913/2]
+  lock station 5 class 3: joint [255078, 255080], runner-up [47897/8, 95795/16]
+  lock station 0 class 3: joint [190274, 190276], runner-up [181550, 181552]
+  lock station 2 class 3: joint [81696, 81697], runner-up [75929, 75930]
+  lock station 4 class 3: joint [60329/4, 120659/8], runner-up [24015/2, 96061/8]
+  lock station 6 class 1: joint [4303/4, 68849/64], runner-up [118461/128, 59231/64]
+  admission: 180 candidates read, 0 past the signed form; largest |z|² 86925345016348794874428325/19342813113834066795298816
+  teacher-forced: flips to the target 5, to another class 3, undecided 0, top not past one 0, refused 0; exact top = target 5
+request 92: target [1, 3, 2, 0, 3, 1, 0, 2]; native released [1, 3, 2, 3, 3, 2, 0, 2] (right 6, the float release [1, 3, 2, 3, 3, 2, 0, 2] agrees at 8); refinements 8, readings 180, locks [[6], [2], [4], [0], [3], [1], [7], [5]]; members certified 32 of 32, ticks closed 1920 of 1920
+  lock station 6 class 0: joint [41994, 83989/2], runner-up [28385/4, 113541/16]
+  lock station 2 class 2: joint [130014, 130015], runner-up [118581/64, 59291/32]
+  lock station 4 class 3: joint [156856, 156858], runner-up [18295/8, 73181/32]
+  lock station 0 class 1: joint [198676, 198678], runner-up [73150, 73151]
+  lock station 3 class 3: joint [109839/4, 27460], runner-up [24560, 98241/4]
+  lock station 1 class 3: joint [17887, 71549/4], runner-up [107245/8, 53623/4]
+  lock station 7 class 2: joint [115299/512, 28825/128], runner-up [94647/1024, 11831/128]
+  lock station 5 class 2: joint [62417/256, 124835/512], runner-up [58441/256, 116883/512]
+  admission: 180 candidates read, 0 past the signed form; largest |z|² 20226480967056206437813925/4835703278458516698824704
+  teacher-forced: flips to the target 5, to another class 3, undecided 0, top not past one 0, refused 0; exact top = target 5
+request 93: target [2, 0, 3, 1, 0, 2, 1, 3]; native released [2, 3, 3, 1, 0, 2, 1, 3] (right 7, the float release [2, 3, 3, 1, 0, 2, 1, 3] agrees at 8); refinements 8, readings 180, locks [[4], [6], [2], [0], [3], [1], [5], [7]]; members certified 32 of 32, ticks closed 1920 of 1920
+  lock station 4 class 0: joint [26853, 107413/4], runner-up [42355/64, 84711/128]
+  lock station 6 class 1: joint [80233, 80234], runner-up [73483/128, 18371/32]
+  lock station 2 class 3: joint [129299, 129300], runner-up [55121/4, 110243/8]
+  lock station 0 class 2: joint [137962, 137964], runner-up [106541/2, 53271]
+  lock station 3 class 1: joint [34425/2, 68851/4], runner-up [111433/8, 55717/4]
+  lock station 1 class 3: joint [79753/8, 39877/4], runner-up [18503/2, 74013/8]
+  lock station 5 class 2: joint [59553/64, 119107/128], runner-up [98553/128, 49277/64]
+  lock station 7 class 3: joint [101715/128, 25429/32], runner-up [36295/128, 72591/256]
+  admission: 180 candidates read, 0 past the signed form; largest |z|² 10586520720094405134422305/2417851639229258349412352
+  teacher-forced: flips to the target 7, to another class 1, undecided 0, top not past one 0, refused 0; exact top = target 7
+request 94: target [2, 3, 3, 0, 0, 1, 1, 2]; native released [2, 3, 3, 0, 0, 1, 1, 2] (right 8, the float release [2, 3, 3, 0, 0, 1, 1, 2] agrees at 8); refinements 8, readings 180, locks [[7], [1], [5], [3], [0], [2], [4], [6]]; members certified 32 of 32, ticks closed 1920 of 1920
+  lock station 7 class 2: joint [95407/4, 23852], runner-up [71089/64, 35545/32]
+  lock station 1 class 3: joint [109146, 109147], runner-up [104181/32, 52091/16]
+  lock station 5 class 1: joint [123904, 123905], runner-up [74467/32, 18617/8]
+  lock station 3 class 0: joint [112626, 112627], runner-up [116917/4, 58459/2]
+  lock station 0 class 2: joint [72239, 72240], runner-up [116193/2, 58097]
+  lock station 2 class 3: joint [33525, 67051/2], runner-up [119055/4, 29764]
+  lock station 4 class 0: joint [66517/8, 33259/4], runner-up [104335/16, 6521]
+  lock station 6 class 1: joint [29891/16, 119565/64], runner-up [79495/64, 9937/8]
+  admission: 180 candidates read, 0 past the signed form; largest |z|² 82898043031720883329004825/19342813113834066795298816
+  teacher-forced: flips to the target 7, to another class 1, undecided 0, top not past one 0, refused 0; exact top = target 7
+request 95: target [3, 3, 0, 0, 1, 1, 2, 2]; native released [2, 3, 3, 0, 2, 1, 1, 2] (right 4, the float release [2, 3, 3, 0, 2, 1, 1, 2] agrees at 8); refinements 8, readings 180, locks [[5], [3], [1], [7], [0], [2], [6], [4]]; members certified 32 of 32, ticks closed 1920 of 1920
+  lock station 5 class 1: joint [68099/2, 34050], runner-up [78717/64, 39359/32]
+  lock station 3 class 0: joint [119629, 119630], runner-up [45159/32, 90319/64]
+  lock station 1 class 3: joint [130853, 130854], runner-up [95509/4, 47755/2]
+  lock station 7 class 2: joint [105626, 105627], runner-up [91255/256, 11407/32]
+  lock station 0 class 2: joint [68405, 68406], runner-up [55797, 111595/2]
+  lock station 2 class 3: joint [32183, 128733/4], runner-up [116535/4, 29134]
+  lock station 6 class 1: joint [59639/16, 119279/32], runner-up [73521/32, 36761/16]
+  lock station 4 class 2: joint [61317/32, 122635/64], runner-up [119453/64, 59727/32]
+  admission: 180 candidates read, 0 past the signed form; largest |z|² 85834947176432491191651757/19342813113834066795298816
+  teacher-forced: flips to the target 7, to another class 1, undecided 0, top not past one 0, refused 0; exact top = target 7
+request 96: target [3, 1, 0, 2, 1, 3, 2, 0]; native released [3, 1, 3, 2, 3, 3, 1, 0] (right 5, the float release [3, 1, 3, 2, 3, 3, 1, 0] agrees at 8); refinements 8, readings 180, locks [[7], [3], [5], [1], [0], [2], [4], [6]]; members certified 32 of 32, ticks closed 1920 of 1920
+  lock station 7 class 0: joint [82205, 82206], runner-up [122961/16, 61481/8]
+  lock station 3 class 2: joint [223016, 223018], runner-up [118749/64, 59375/32]
+  lock station 5 class 3: joint [254358, 254360], runner-up [49635/16, 99271/32]
+  lock station 1 class 1: joint [310144, 310148], runner-up [111312, 111313]
+  lock station 0 class 3: joint [221360, 221362], runner-up [214854, 214856]
+  lock station 2 class 3: joint [92214, 92215], runner-up [86063, 86064]
+  lock station 4 class 3: joint [129903/8, 16238], runner-up [106613/8, 53307/4]
+  lock station 6 class 1: joint [18051/16, 72205/64], runner-up [122373/128, 61187/64]
+  admission: 180 candidates read, 0 past the signed form; largest |z|² 84916017937526516754874549/19342813113834066795298816
+  teacher-forced: flips to the target 8, to another class 0, undecided 0, top not past one 0, refused 0; exact top = target 8
+request 97: target [1, 0, 2, 1, 3, 2, 0, 3]; native released [1, 0, 2, 1, 1, 2, 1, 3] (right 6, the float release [1, 0, 2, 1, 1, 2, 1, 3] agrees at 8); refinements 8, readings 180, locks [[7], [3], [5], [1], [4], [2], [0], [6]]; members certified 32 of 32, ticks closed 1920 of 1920
+  lock station 7 class 3: joint [77631/2, 38816], runner-up [33687/8, 67375/16]
+  lock station 3 class 1: joint [137500, 137502], runner-up [20789/16, 83157/64]
+  lock station 5 class 2: joint [221052, 221054], runner-up [68399/64, 4275/4]
+  lock station 1 class 0: joint [290824, 290828], runner-up [112161, 112162]
+  lock station 4 class 1: joint [85589/2, 42795], runner-up [39396, 78793/2]
+  lock station 2 class 2: joint [48495/2, 96991/4], runner-up [88469/4, 44235/2]
+  lock station 0 class 1: joint [72873/4, 36437/2], runner-up [34793/2, 69587/4]
+  lock station 6 class 1: joint [33271/16, 66543/32], runner-up [63061/32, 126123/64]
+  admission: 180 candidates read, 0 past the signed form; largest |z|² 82466034227296672650302369/19342813113834066795298816
+  teacher-forced: flips to the target 5, to another class 3, undecided 0, top not past one 0, refused 0; exact top = target 5
+request 98: target [2, 1, 3, 2, 0, 3, 1, 0]; native released [2, 1, 3, 2, 3, 3, 1, 0] (right 7, the float release [2, 1, 3, 2, 3, 3, 1, 0] agrees at 8); refinements 8, readings 180, locks [[5], [3], [7], [1], [2], [4], [0], [6]]; members certified 32 of 32, ticks closed 1920 of 1920
+  lock station 5 class 3: joint [89359, 89360], runner-up [46923/16, 93847/32]
+  lock station 3 class 2: joint [198812, 198814], runner-up [82337/256, 41169/128]
+  lock station 7 class 0: joint [274312, 274316], runner-up [108865/32, 54433/16]
+  lock station 1 class 1: joint [327008, 327012], runner-up [116606, 116607]
+  lock station 2 class 3: joint [130563, 130564], runner-up [121316, 121317]
+  lock station 4 class 3: joint [86221/4, 43111/2], runner-up [17357, 69429/4]
+  lock station 0 class 2: joint [18532, 74129/4], runner-up [16698, 66793/4]
+  lock station 6 class 1: joint [10273/8, 82185/64], runner-up [40231/32, 80463/64]
+  admission: 180 candidates read, 0 past the signed form; largest |z|² 21147333336800989003921909/4835703278458516698824704
+  teacher-forced: flips to the target 7, to another class 1, undecided 0, top not past one 0, refused 0; exact top = target 7
+request 99: target [3, 3, 0, 0, 1, 1, 2, 2]; native released [2, 3, 3, 0, 2, 1, 1, 2] (right 4, the float release [2, 3, 3, 0, 2, 1, 1, 2] agrees at 8); refinements 8, readings 180, locks [[5], [3], [7], [1], [0], [2], [6], [4]]; members certified 32 of 32, ticks closed 1920 of 1920
+  lock station 5 class 1: joint [22595, 90381/4], runner-up [66833/32, 33417/16]
+  lock station 3 class 0: joint [94636, 94637], runner-up [32801/32, 65603/64]
+  lock station 7 class 2: joint [106114, 106115], runner-up [72537/64, 36269/32]
+  lock station 1 class 3: joint [103859, 103860], runner-up [51029, 102059/2]
+  lock station 0 class 2: joint [67505, 67506], runner-up [110759/2, 55380]
+  lock station 2 class 3: joint [127707/4, 31927], runner-up [115779/4, 28945]
+  lock station 6 class 1: joint [29733/8, 118933/32], runner-up [76033/32, 38017/16]
+  lock station 4 class 2: joint [3861/2, 123553/64], runner-up [119789/64, 59895/32]
+  admission: 180 candidates read, 0 past the signed form; largest |z|² 84885895647849361868077685/19342813113834066795298816
+  teacher-forced: flips to the target 8, to another class 0, undecided 0, top not past one 0, refused 0; exact top = target 8
+request 100: target [1, 0, 2, 1, 3, 2, 0, 3]; native released [1, 0, 2, 1, 1, 2, 1, 3] (right 6, the float release [1, 0, 2, 1, 1, 2, 1, 3] agrees at 8); refinements 8, readings 180, locks [[7], [5], [1], [3], [2], [4], [0], [6]]; members certified 32 of 32, ticks closed 1920 of 1920
+  lock station 7 class 3: joint [100787/2, 50394], runner-up [17069/2, 68277/8]
+  lock station 5 class 2: joint [158474, 158476], runner-up [97337/256, 48669/128]
+  lock station 1 class 0: joint [294344, 294348], runner-up [66310, 66311]
+  lock station 3 class 1: joint [319776, 319780], runner-up [67613, 67614]
+  lock station 2 class 2: joint [109968, 109969], runner-up [107682, 107683]
+  lock station 4 class 1: joint [98543/4, 24636], runner-up [21338, 85353/4]
+  lock station 0 class 1: joint [36807/2, 73615/4], runner-up [70423/4, 17606]
+  lock station 6 class 1: joint [63853/32, 127707/64], runner-up [60607/32, 121215/64]
+  admission: 180 candidates read, 0 past the signed form; largest |z|² 83305283681750965662922441/19342813113834066795298816
+  teacher-forced: flips to the target 8, to another class 0, undecided 0, top not past one 0, refused 0; exact top = target 8
+request 101: target [1, 2, 2, 3, 3, 0, 0, 1]; native released [3, 2, 3, 3, 1, 0, 2, 1] (right 4, the float release [3, 2, 3, 3, 1, 0, 2, 1] agrees at 8); refinements 8, readings 180, locks [[5], [1], [7], [3], [4], [2], [0], [6]]; members certified 32 of 32, ticks closed 1920 of 1920
+  lock station 5 class 0: joint [88962, 88963], runner-up [96623/128, 6039/8]
+  lock station 1 class 2: joint [142010, 142012], runner-up [78093/32, 39047/16]
+  lock station 7 class 1: joint [195826, 195828], runner-up [5363/16, 85809/256]
+  lock station 3 class 3: joint [198792, 198794], runner-up [82977/2, 41489]
+  lock station 4 class 1: joint [43891/2, 87783/4], runner-up [130953/8, 65477/4]
+  lock station 2 class 3: joint [23679/2, 94717/8], runner-up [90449/8, 45225/4]
+  lock station 0 class 3: joint [80983/8, 10123], runner-up [77043/8, 19261/2]
+  lock station 6 class 2: joint [123163/128, 30791/32], runner-up [95527/128, 11941/16]
+  admission: 180 candidates read, 0 past the signed form; largest |z|² 20354020432300734749399561/4835703278458516698824704
+  teacher-forced: flips to the target 8, to another class 0, undecided 0, top not past one 0, refused 0; exact top = target 8
+request 102: target [1, 3, 2, 0, 3, 1, 0, 2]; native released [1, 3, 2, 3, 3, 2, 0, 2] (right 6, the float release [1, 3, 2, 3, 3, 2, 0, 2] agrees at 8); refinements 8, readings 180, locks [[6], [2], [4], [0], [3], [1], [7], [5]]; members certified 32 of 32, ticks closed 1920 of 1920
+  lock station 6 class 0: joint [119975/4, 29994], runner-up [102253/16, 51127/8]
+  lock station 2 class 2: joint [110152, 110153], runner-up [85679/64, 5355/4]
+  lock station 4 class 3: joint [144608, 144610], runner-up [98823/64, 12353/8]
+  lock station 0 class 1: joint [184372, 184374], runner-up [67915, 67916]
+  lock station 3 class 3: joint [52429/2, 104859/4], runner-up [91089/4, 45545/2]
+  lock station 1 class 3: joint [34091/2, 68183/4], runner-up [12812, 102497/8]
+  lock station 7 class 2: joint [122405/512, 61203/256], runner-up [8107/64, 129713/1024]
+  lock station 5 class 2: joint [32451/128, 129805/512], runner-up [30423/128, 121693/512]
+  admission: 180 candidates read, 0 past the signed form; largest |z|² 81906932494481291629599961/19342813113834066795298816
+  teacher-forced: flips to the target 6, to another class 2, undecided 0, top not past one 0, refused 0; exact top = target 6
+request 103: target [3, 0, 0, 1, 1, 2, 2, 3]; native released [1, 0, 2, 1, 1, 2, 1, 3] (right 5, the float release [1, 0, 2, 1, 1, 2, 1, 3] agrees at 8); refinements 8, readings 180, locks [[5], [7], [1], [3], [2], [4], [0], [6]]; members certified 32 of 32, ticks closed 1920 of 1920
+  lock station 5 class 2: joint [89533/2, 44767], runner-up [81059/32, 20265/8]
+  lock station 7 class 3: joint [148582, 148584], runner-up [118735/64, 7421/4]
+  lock station 1 class 0: joint [318028, 318032], runner-up [66652, 66653]
+  lock station 3 class 1: joint [349700, 349704], runner-up [75628, 75629]
+  lock station 2 class 2: joint [119542, 119543], runner-up [114451, 114452]
+  lock station 4 class 1: joint [25620, 102481/4], runner-up [22701, 90805/4]
+  lock station 0 class 1: joint [76911/4, 19228], runner-up [73117/4, 36559/2]
+  lock station 6 class 1: joint [65159/32, 130319/64], runner-up [121535/64, 1899]
+  admission: 180 candidates read, 0 past the signed form; largest |z|² 5365718067939020379993061/1208925819614629174706176
+  teacher-forced: flips to the target 6, to another class 2, undecided 0, top not past one 0, refused 0; exact top = target 6
+request 104: target [2, 2, 3, 3, 0, 0, 1, 1]; native released [3, 2, 3, 3, 1, 0, 2, 1] (right 5, the float release [3, 2, 3, 3, 1, 0, 2, 1] agrees at 8); refinements 8, readings 180, locks [[7], [5], [3], [1], [4], [2], [0], [6]]; members certified 32 of 32, ticks closed 1920 of 1920
+  lock station 7 class 1: joint [110583/4, 27646], runner-up [108413/128, 54207/64]
+  lock station 5 class 0: joint [95749, 95750], runner-up [116381/32, 58191/16]
+  lock station 3 class 3: joint [178872, 178874], runner-up [17790, 71161/4]
+  lock station 1 class 2: joint [191180, 191182], runner-up [74489, 74490]
+  lock station 4 class 1: joint [20563, 82253/4], runner-up [16380, 131041/8]
+  lock station 2 class 3: joint [90073/8, 45037/4], runner-up [10671, 85369/8]
+  lock station 0 class 3: joint [9629, 77033/8], runner-up [36669/4, 73339/8]
+  lock station 6 class 2: joint [15421/16, 123369/128], runner-up [101645/128, 50823/64]
+  admission: 180 candidates read, 0 past the signed form; largest |z|² 20307491387347906096113785/4835703278458516698824704
+  teacher-forced: flips to the target 8, to another class 0, undecided 0, top not past one 0, refused 0; exact top = target 8
+request 105: target [0, 1, 1, 2, 2, 3, 3, 0]; native released [3, 1, 3, 2, 3, 3, 1, 0] (right 4, the float release [3, 1, 3, 2, 3, 3, 1, 0] agrees at 8); refinements 8, readings 180, locks [[5], [7], [3], [1], [0], [2], [4], [6]]; members certified 32 of 32, ticks closed 1920 of 1920
+  lock station 5 class 3: joint [67347/4, 16837], runner-up [8345/4, 66761/32]
+  lock station 7 class 0: joint [86816, 86817], runner-up [107673/64, 53837/32]
+  lock station 3 class 2: joint [159128, 159130], runner-up [19189/16, 76757/64]
+  lock station 1 class 1: joint [222790, 222792], runner-up [72787, 72788]
+  lock station 0 class 3: joint [168050, 168052], runner-up [161302, 161304]
+  lock station 2 class 3: joint [73593, 73594], runner-up [68489, 68490]
+  lock station 4 class 3: joint [112763/8, 28191/2], runner-up [89369/8, 44685/4]
+  lock station 6 class 1: joint [66759/64, 8345/8], runner-up [7209/8, 115345/128]
+  admission: 180 candidates read, 0 past the signed form; largest |z|² 84831665039976812291214893/19342813113834066795298816
+  teacher-forced: flips to the target 5, to another class 3, undecided 0, top not past one 0, refused 0; exact top = target 5
+request 106: target [1, 3, 2, 0, 3, 1, 0, 2]; native released [1, 3, 2, 3, 3, 2, 0, 2] (right 6, the float release [1, 3, 2, 3, 3, 2, 0, 2] agrees at 8); refinements 8, readings 180, locks [[6], [2], [4], [0], [1], [3], [7], [5]]; members certified 32 of 32, ticks closed 1920 of 1920
+  lock station 6 class 0: joint [42547, 85095/2], runner-up [82293/16, 41147/8]
+  lock station 2 class 2: joint [143394, 143396], runner-up [93165/32, 46583/16]
+  lock station 4 class 3: joint [191480, 191482], runner-up [77035/64, 19259/16]
+  lock station 0 class 1: joint [221866, 221868], runner-up [84278, 84279]
+  lock station 1 class 3: joint [94810, 94811], runner-up [91327, 91328]
+  lock station 3 class 3: joint [36715/2, 73431/4], runner-up [14512, 116097/8]
+  lock station 7 class 2: joint [31135/128, 124541/512], runner-up [1253/16, 80193/1024]
+  lock station 5 class 2: joint [65647/256, 4103/16], runner-up [59711/256, 119423/512]
+  admission: 180 candidates read, 0 past the signed form; largest |z|² 5158381162347656186498777/1208925819614629174706176
+  teacher-forced: flips to the target 6, to another class 2, undecided 0, top not past one 0, refused 0; exact top = target 6
+request 107: target [1, 1, 2, 2, 3, 3, 0, 0]; native released [1, 3, 2, 3, 3, 2, 0, 2] (right 4, the float release [1, 3, 2, 3, 3, 2, 0, 2] agrees at 8); refinements 8, readings 180, locks [[6], [2], [4], [0], [1], [3], [7], [5]]; members certified 32 of 32, ticks closed 1920 of 1920
+  lock station 6 class 0: joint [43192, 86385/2], runner-up [55429/16, 110859/32]
+  lock station 2 class 2: joint [132426, 132428], runner-up [4205/16, 67281/256]
+  lock station 4 class 3: joint [179514, 179516], runner-up [91245/32, 45623/16]
+  lock station 0 class 1: joint [219982, 219984], runner-up [81992, 81993]
+  lock station 1 class 3: joint [89687, 89688], runner-up [88080, 88081]
+  lock station 3 class 3: joint [130495/8, 16312], runner-up [108103/8, 13513]
+  lock station 7 class 2: joint [56403/256, 112807/512], runner-up [102781/1024, 51391/512]
+  lock station 5 class 2: joint [66779/256, 16695/64], runner-up [108597/512, 54299/256]
+  admission: 180 candidates read, 0 past the signed form; largest |z|² 41749152666406368521003509/9671406556917033397649408
+  teacher-forced: flips to the target 7, to another class 1, undecided 0, top not past one 0, refused 0; exact top = target 7
+request 108: target [1, 3, 2, 0, 3, 1, 0, 2]; native released [2, 3, 3, 0, 2, 1, 1, 2] (right 4, the float release [2, 3, 3, 0, 2, 1, 1, 2] agrees at 8); refinements 8, readings 180, locks [[7], [1], [5], [3], [0], [2], [6], [4]]; members certified 32 of 32, ticks closed 1920 of 1920
+  lock station 7 class 2: joint [100745/4, 50373/2], runner-up [110687/64, 3459/2]
+  lock station 1 class 3: joint [99917, 99918], runner-up [8205/2, 65641/16]
+  lock station 5 class 1: joint [104685, 104686], runner-up [37857/16, 75715/32]
+  lock station 3 class 0: joint [98153, 98154], runner-up [106147/4, 26537]
+  lock station 0 class 2: joint [64731, 129463/2], runner-up [51389, 102779/2]
+  lock station 2 class 3: joint [30950, 123801/4], runner-up [27827, 111309/4]
+  lock station 6 class 1: joint [121501/32, 60751/16], runner-up [71829/32, 35915/16]
+  lock station 4 class 2: joint [124521/64, 62261/32], runner-up [60069/32, 120139/64]
+  admission: 180 candidates read, 0 past the signed form; largest |z|² 40998657107197887697176749/9671406556917033397649408
+  teacher-forced: flips to the target 6, to another class 2, undecided 0, top not past one 0, refused 0; exact top = target 6
+request 109: target [2, 2, 3, 3, 0, 0, 1, 1]; native released [2, 0, 3, 1, 0, 2, 1, 3] (right 4, the float release [2, 0, 3, 1, 0, 2, 1, 3] agrees at 8); refinements 8, readings 180, locks [[4], [6], [2], [0], [3], [7], [5], [1]]; members certified 32 of 32, ticks closed 1920 of 1920
+  lock station 4 class 0: joint [73013/4, 36507/2], runner-up [37279/64, 74559/128]
+  lock station 6 class 1: joint [62907, 125815/2], runner-up [21723/32, 86893/128]
+  lock station 2 class 3: joint [111493, 111494], runner-up [92719/8, 11590]
+  lock station 0 class 2: joint [122739, 122740], runner-up [46276, 92553/2]
+  lock station 3 class 1: joint [122597/8, 61299/4], runner-up [23983/2, 95933/8]
+  lock station 7 class 3: joint [66407/128, 8301/16], runner-up [102821/256, 51411/128]
+  lock station 5 class 2: joint [35909/32, 71819/64], runner-up [130535/2048, 16317/256]
+  lock station 1 class 0: joint [65683/64, 16421/16], runner-up [50937/64, 101875/128]
+  admission: 180 candidates read, 0 past the signed form; largest |z|² 20411697614225457486652033/4835703278458516698824704
+  teacher-forced: flips to the target 8, to another class 0, undecided 0, top not past one 0, refused 0; exact top = target 8
+request 110: target [2, 3, 3, 0, 0, 1, 1, 2]; native released [2, 3, 3, 0, 0, 1, 1, 2] (right 8, the float release [2, 3, 3, 0, 0, 1, 1, 2] agrees at 8); refinements 8, readings 180, locks [[7], [1], [5], [3], [0], [2], [4], [6]]; members certified 32 of 32, ticks closed 1920 of 1920
+  lock station 7 class 2: joint [71663/2, 35832], runner-up [61477/64, 122955/128]
+  lock station 1 class 3: joint [122005, 122006], runner-up [45917/8, 91835/16]
+  lock station 5 class 1: joint [127455, 127456], runner-up [78007/32, 9751/4]
+  lock station 3 class 0: joint [113136, 113137], runner-up [120961/4, 60481/2]
+  lock station 0 class 2: joint [72872, 72873], runner-up [58750, 117501/2]
+  lock station 2 class 3: joint [33800, 67601/2], runner-up [119237/4, 59619/2]
+  lock station 4 class 0: joint [66511/8, 8314], runner-up [105657/16, 52829/8]
+  lock station 6 class 1: joint [120825/64, 60413/32], runner-up [80653/64, 40327/32]
+  admission: 180 candidates read, 0 past the signed form; largest |z|² 1273096744867891084065669/302231454903657293676544
+  teacher-forced: flips to the target 7, to another class 1, undecided 0, top not past one 0, refused 0; exact top = target 7
+request 111: target [1, 3, 2, 0, 3, 1, 0, 2]; native released [1, 3, 2, 3, 3, 2, 0, 2] (right 6, the float release [1, 3, 2, 3, 3, 2, 0, 2] agrees at 8); refinements 8, readings 180, locks [[6], [2], [4], [0], [3], [1], [7], [5]]; members certified 32 of 32, ticks closed 1920 of 1920
+  lock station 6 class 0: joint [55279/2, 110559/4], runner-up [24323/8, 97293/32]
+  lock station 2 class 2: joint [91643, 91644], runner-up [16557/8, 66229/32]
+  lock station 4 class 3: joint [137316, 137318], runner-up [71417/64, 35709/32]
+  lock station 0 class 1: joint [168116, 168118], runner-up [123673/2, 61837]
+  lock station 3 class 3: joint [95125/4, 47563/2], runner-up [41551/2, 83103/4]
+  lock station 1 class 3: joint [31023/2, 124093/8], runner-up [11853, 94825/8]
+  lock station 7 class 2: joint [62211/256, 124423/512], runner-up [90977/1024, 45489/512]
+  lock station 5 class 2: joint [129527/512, 16191/64], runner-up [30871/128, 123485/512]
+  admission: 180 candidates read, 0 past the signed form; largest |z|² 20800952673208463887206905/4835703278458516698824704
+  teacher-forced: flips to the target 6, to another class 2, undecided 0, top not past one 0, refused 0; exact top = target 6
+request 112: target [0, 0, 1, 1, 2, 2, 3, 3]; native released [1, 0, 2, 1, 1, 2, 1, 3] (right 4, the float release [1, 0, 2, 1, 1, 2, 1, 3] agrees at 8); refinements 8, readings 180, locks [[7], [5], [1], [3], [2], [4], [0], [6]]; members certified 32 of 32, ticks closed 1920 of 1920
+  lock station 7 class 3: joint [108735/2, 54368], runner-up [36059/16, 72119/32]
+  lock station 5 class 2: joint [197828, 197830], runner-up [72627/128, 18157/32]
+  lock station 1 class 0: joint [338712, 338716], runner-up [77719, 77720]
+  lock station 3 class 1: joint [359980, 359984], runner-up [74225, 74226]
+  lock station 2 class 2: joint [122835, 122836], runner-up [114893, 114894]
+  lock station 4 class 1: joint [50921/2, 101843/4], runner-up [91483/4, 22871]
+  lock station 0 class 1: joint [38073/2, 76147/4], runner-up [72493/4, 36247/2]
+  lock station 6 class 1: joint [67829/32, 33915/16], runner-up [65245/32, 130491/64]
+  admission: 180 candidates read, 0 past the signed form; largest |z|² 41153716165638219780848157/9671406556917033397649408
+  teacher-forced: flips to the target 7, to another class 1, undecided 0, top not past one 0, refused 0; exact top = target 7
+request 113: target [0, 1, 1, 2, 2, 3, 3, 0]; native released [3, 1, 3, 2, 3, 3, 1, 0] (right 4, the float release [3, 1, 3, 2, 3, 3, 1, 0] agrees at 8); refinements 8, readings 180, locks [[7], [1], [3], [5], [0], [2], [4], [6]]; members certified 32 of 32, ticks closed 1920 of 1920
+  lock station 7 class 0: joint [42122, 84245/2], runner-up [32931/4, 65863/8]
+  lock station 1 class 1: joint [166932, 166934], runner-up [32501/8, 130005/32]
+  lock station 3 class 2: joint [255310, 255312], runner-up [10225/4, 81801/32]
+  lock station 5 class 3: joint [266092, 266096], runner-up [100535/16, 12567/2]
+  lock station 0 class 3: joint [197518, 197520], runner-up [188790, 188792]
+  lock station 2 class 3: joint [84553, 84554], runner-up [78610, 78611]
+  lock station 4 class 3: joint [125473/8, 62737/4], runner-up [98325/8, 49163/4]
+  lock station 6 class 1: joint [17803/16, 71213/64], runner-up [29797/32, 119189/128]
+  admission: 180 candidates read, 0 past the signed form; largest |z|² 21037006500585375237325589/4835703278458516698824704
+  teacher-forced: flips to the target 6, to another class 2, undecided 0, top not past one 0, refused 0; exact top = target 6
+request 114: target [2, 3, 3, 0, 0, 1, 1, 2]; native released [2, 3, 3, 0, 0, 1, 1, 2] (right 8, the float release [2, 3, 3, 0, 0, 1, 1, 2] agrees at 8); refinements 8, readings 180, locks [[7], [1], [5], [3], [0], [2], [4], [6]]; members certified 32 of 32, ticks closed 1920 of 1920
+  lock station 7 class 2: joint [37711, 75423/2], runner-up [40895/32, 81791/64]
+  lock station 1 class 3: joint [138060, 138062], runner-up [86321/16, 43161/8]
+  lock station 5 class 1: joint [143558, 143560], runner-up [88743/32, 11093/4]
+  lock station 3 class 0: joint [125098, 125099], runner-up [68461/2, 34231]
+  lock station 0 class 2: joint [80348, 80349], runner-up [64668, 129337/2]
+  lock station 2 class 3: joint [73543/2, 36772], runner-up [32873, 65747/2]
+  lock station 4 class 0: joint [71941/8, 35971/4], runner-up [112761/16, 56381/8]
+  lock station 6 class 1: joint [122769/64, 61385/32], runner-up [41311/32, 82623/64]
+  admission: 180 candidates read, 0 past the signed form; largest |z|² 40940351896927362017616385/9671406556917033397649408
+  teacher-forced: flips to the target 7, to another class 1, undecided 0, top not past one 0, refused 0; exact top = target 7
+request 115: target [0, 1, 1, 2, 2, 3, 3, 0]; native released [3, 1, 3, 2, 3, 3, 1, 0] (right 4, the float release [3, 1, 3, 2, 3, 3, 1, 0] agrees at 8); refinements 8, readings 180, locks [[7], [3], [1], [5], [0], [2], [4], [6]]; members certified 32 of 32, ticks closed 1920 of 1920
+  lock station 7 class 0: joint [91813/2, 45907], runner-up [28583/4, 114333/16]
+  lock station 3 class 2: joint [158550, 158552], runner-up [102103/16, 12763/2]
+  lock station 1 class 1: joint [240578, 240580], runner-up [37628, 75257/2]
+  lock station 5 class 3: joint [245152, 245154], runner-up [117007/16, 7313]
+  lock station 0 class 3: joint [185682, 185684], runner-up [175356, 175358]
+  lock station 2 class 3: joint [81955, 81956], runner-up [75647, 75648]
+  lock station 4 class 3: joint [15097, 120777/8], runner-up [100919/8, 12615]
+  lock station 6 class 1: joint [67207/64, 8401/8], runner-up [56663/64, 113327/128]
+  admission: 180 candidates read, 0 past the signed form; largest |z|² 81920468120136225342270925/19342813113834066795298816
+  teacher-forced: flips to the target 5, to another class 3, undecided 0, top not past one 0, refused 0; exact top = target 5
+request 116: target [2, 3, 3, 0, 0, 1, 1, 2]; native released [2, 3, 3, 0, 0, 1, 1, 2] (right 8, the float release [2, 3, 3, 0, 0, 1, 1, 2] agrees at 8); refinements 8, readings 180, locks [[7], [3], [5], [1], [0], [2], [4], [6]]; members certified 32 of 32, ticks closed 1920 of 1920
+  lock station 7 class 2: joint [24722, 98889/4], runner-up [77325/64, 38663/32]
+  lock station 3 class 0: joint [99157, 99158], runner-up [97429/128, 48715/64]
+  lock station 5 class 1: joint [108408, 108409], runner-up [97247/32, 3039]
+  lock station 1 class 3: joint [106558, 106559], runner-up [102233/2, 51117]
+  lock station 0 class 2: joint [68606, 68607], runner-up [110335/2, 55168]
+  lock station 2 class 3: joint [64069/2, 128139/4], runner-up [28756, 115025/4]
+  lock station 4 class 0: joint [8058, 128929/16], runner-up [101913/16, 50957/8]
+  lock station 6 class 1: joint [120777/64, 60389/32], runner-up [78521/64, 39261/32]
+  admission: 180 candidates read, 0 past the signed form; largest |z|² 42055079737435493943889845/9671406556917033397649408
+  teacher-forced: flips to the target 7, to another class 1, undecided 0, top not past one 0, refused 0; exact top = target 7
+request 117: target [3, 0, 0, 1, 1, 2, 2, 3]; native released [1, 0, 2, 1, 1, 2, 1, 3] (right 5, the float release [1, 0, 2, 1, 1, 2, 1, 3] agrees at 8); refinements 8, readings 180, locks [[7], [3], [5], [1], [2], [4], [0], [6]]; members certified 32 of 32, ticks closed 1920 of 1920
+  lock station 7 class 3: joint [85843/2, 42922], runner-up [118453/32, 59227/16]
+  lock station 3 class 1: joint [175802, 175804], runner-up [118067/64, 29517/16]
+  lock station 5 class 2: joint [271004, 271008], runner-up [10041/8, 80329/64]
+  lock station 1 class 0: joint [360072, 360076], runner-up [133134, 133136]
+  lock station 2 class 2: joint [123388, 123389], runner-up [118868, 118869]
+  lock station 4 class 1: joint [108127/4, 27032], runner-up [23047, 92189/4]
+  lock station 0 class 1: joint [20231, 80925/4], runner-up [77241/4, 38621/2]
+  lock station 6 class 1: joint [17125/8, 68501/32], runner-up [127529/64, 63765/32]
+  admission: 180 candidates read, 0 past the signed form; largest |z|² 84528995186502673955424533/19342813113834066795298816
+  teacher-forced: flips to the target 6, to another class 2, undecided 0, top not past one 0, refused 0; exact top = target 6
+request 118: target [0, 3, 1, 0, 2, 1, 3, 2]; native released [0, 2, 1, 1, 2, 1, 3, 2] (right 6, the float release [0, 2, 1, 1, 2, 1, 3, 2] agrees at 8); refinements 8, readings 180, locks [[6], [4], [2], [0], [1], [3], [7], [5]]; members certified 32 of 32, ticks closed 1920 of 1920
+  lock station 6 class 3: joint [73023/2, 36512], runner-up [37953/8, 75907/16]
+  lock station 4 class 2: joint [130327, 130328], runner-up [42275/256, 84551/512]
+  lock station 2 class 1: joint [170538, 170540], runner-up [58911/2, 117823/4]
+  lock station 0 class 0: joint [201906, 201908], runner-up [84888, 84889]
+  lock station 1 class 2: joint [75969, 75970], runner-up [68960, 68961]
+  lock station 3 class 1: joint [35831/2, 71663/4], runner-up [30221/2, 120885/8]
+  lock station 7 class 2: joint [37739/64, 75479/128], runner-up [111007/256, 3469/8]
+  lock station 5 class 1: joint [107151/128, 6697/8], runner-up [54305/128, 108611/256]
+  admission: 180 candidates read, 0 past the signed form; largest |z|² 10275474412538765198892549/2417851639229258349412352
+  teacher-forced: flips to the target 8, to another class 0, undecided 0, top not past one 0, refused 0; exact top = target 8
+request 119: target [0, 3, 1, 0, 2, 1, 3, 2]; native released [0, 2, 1, 1, 2, 1, 3, 2] (right 6, the float release [0, 2, 1, 1, 2, 1, 3, 2] agrees at 8); refinements 8, readings 180, locks [[6], [4], [0], [2], [1], [3], [5], [7]]; members certified 32 of 32, ticks closed 1920 of 1920
+  lock station 6 class 3: joint [128329/4, 64165/2], runner-up [8081/4, 129297/64]
+  lock station 4 class 2: joint [102875, 102876], runner-up [78175/512, 2443/16]
+  lock station 0 class 0: joint [173010, 173012], runner-up [87261/2, 43631]
+  lock station 2 class 1: joint [190210, 190212], runner-up [43416, 86833/2]
+  lock station 1 class 2: joint [73417, 73418], runner-up [68141, 68142]
+  lock station 3 class 1: joint [73971/4, 18493], runner-up [119915/8, 29979/2]
+  lock station 5 class 1: joint [66265/32, 33133/16], runner-up [1851, 118465/64]
+  lock station 7 class 2: joint [105125/128, 52563/64], runner-up [87425/256, 43713/128]
+  admission: 180 candidates read, 0 past the signed form; largest |z|² 41842037677320126932837373/9671406556917033397649408
+  teacher-forced: flips to the target 7, to another class 1, undecided 0, top not past one 0, refused 0; exact top = target 7
+request 120: target [0, 1, 1, 2, 2, 3, 3, 0]; native released [3, 1, 3, 2, 3, 3, 1, 0] (right 4, the float release [3, 1, 3, 2, 3, 3, 1, 0] agrees at 8); refinements 8, readings 180, locks [[7], [3], [1], [5], [0], [2], [4], [6]]; members certified 32 of 32, ticks closed 1920 of 1920
+  lock station 7 class 0: joint [115399/4, 28850], runner-up [34925/8, 69851/16]
+  lock station 3 class 2: joint [130396, 130397], runner-up [40387/8, 80775/16]
+  lock station 1 class 1: joint [209292, 209294], runner-up [63087/2, 126175/4]
+  lock station 5 class 3: joint [219030, 219032], runner-up [27009/4, 108037/16]
+  lock station 0 class 3: joint [168550, 168552], runner-up [160612, 160614]
+  lock station 2 class 3: joint [75741, 75742], runner-up [70017, 70018]
+  lock station 4 class 3: joint [116023/8, 14503], runner-up [94985/8, 47493/4]
+  lock station 6 class 1: joint [67359/64, 2105/2], runner-up [113973/128, 56987/64]
+  admission: 180 candidates read, 0 past the signed form; largest |z|² 83238810796025427564923521/19342813113834066795298816
+  teacher-forced: flips to the target 5, to another class 3, undecided 0, top not past one 0, refused 0; exact top = target 5
+request 121: target [0, 0, 1, 1, 2, 2, 3, 3]; native released [1, 0, 2, 1, 1, 2, 1, 3] (right 4, the float release [1, 0, 2, 1, 1, 2, 1, 3] agrees at 8); refinements 8, readings 180, locks [[7], [5], [1], [3], [2], [4], [0], [6]]; members certified 32 of 32, ticks closed 1920 of 1920
+  lock station 7 class 3: joint [66209, 66210], runner-up [55563/16, 111127/32]
+  lock station 5 class 2: joint [212248, 212250], runner-up [89169/256, 44585/128]
+  lock station 1 class 0: joint [378236, 378240], runner-up [86764, 86765]
+  lock station 3 class 1: joint [392048, 392052], runner-up [87213, 87214]
+  lock station 2 class 2: joint [133232, 133234], runner-up [125662, 125663]
+  lock station 4 class 1: joint [55223/2, 110447/4], runner-up [49173/2, 98347/4]
+  lock station 0 class 1: joint [41243/2, 82487/4], runner-up [19589, 78357/4]
+  lock station 6 class 1: joint [70963/32, 17741/8], runner-up [130361/64, 65181/32]
+  admission: 180 candidates read, 0 past the signed form; largest |z|² 10657431063914328250810173/2417851639229258349412352
+  teacher-forced: flips to the target 4, to another class 4, undecided 0, top not past one 0, refused 0; exact top = target 4
+request 122: target [2, 2, 3, 3, 0, 0, 1, 1]; native released [3, 2, 3, 3, 1, 0, 2, 1] (right 5, the float release [3, 2, 3, 3, 1, 0, 2, 1] agrees at 8); refinements 8, readings 180, locks [[5], [7], [3], [1], [4], [2], [0], [6]]; members certified 32 of 32, ticks closed 1920 of 1920
+  lock station 5 class 0: joint [64473/4, 128947/8], runner-up [4967/8, 79473/128]
+  lock station 7 class 1: joint [69579, 69580], runner-up [105315/64, 26329/16]
+  lock station 3 class 3: joint [164758, 164760], runner-up [107879/8, 13485]
+  lock station 1 class 2: joint [181964, 181966], runner-up [67710, 67711]
+  lock station 4 class 1: joint [79277/4, 39639/2], runner-up [126925/8, 63463/4]
+  lock station 2 class 3: joint [43903/4, 87807/8], runner-up [83097/8, 41549/4]
+  lock station 0 class 3: joint [75611/8, 18903/2], runner-up [17997/2, 71989/8]
+  lock station 6 class 2: joint [123721/128, 61861/64], runner-up [101723/128, 25431/32]
+  admission: 180 candidates read, 0 past the signed form; largest |z|² 82320798588905060281357013/19342813113834066795298816
+  teacher-forced: flips to the target 8, to another class 0, undecided 0, top not past one 0, refused 0; exact top = target 8
+request 123: target [0, 3, 1, 0, 2, 1, 3, 2]; native released [2, 3, 3, 0, 0, 1, 1, 2] (right 4, the float release [2, 3, 3, 0, 0, 1, 1, 2] agrees at 8); refinements 8, readings 180, locks [[3], [5], [7], [1], [0], [2], [4], [6]]; members certified 32 of 32, ticks closed 1920 of 1920
+  lock station 3 class 0: joint [44022, 88045/2], runner-up [3135/4, 100321/128]
+  lock station 5 class 1: joint [124597, 124598], runner-up [33577/128, 67155/256]
+  lock station 7 class 2: joint [114208, 114209], runner-up [37541/32, 75083/64]
+  lock station 1 class 3: joint [110992, 110993], runner-up [54706, 109413/2]
+  lock station 0 class 2: joint [72490, 72491], runner-up [114479/2, 57240]
+  lock station 2 class 3: joint [68391/2, 34196], runner-up [30669, 122677/4]
+  lock station 4 class 0: joint [17041/2, 68165/8], runner-up [110725/16, 55363/8]
+  lock station 6 class 1: joint [61707/32, 123415/64], runner-up [81137/64, 40569/32]
+  admission: 180 candidates read, 0 past the signed form; largest |z|² 20826827889844859920644337/4835703278458516698824704
+  teacher-forced: flips to the target 6, to another class 2, undecided 0, top not past one 0, refused 0; exact top = target 6
+request 124: target [2, 2, 3, 3, 0, 0, 1, 1]; native released [3, 2, 3, 3, 1, 0, 2, 1] (right 5, the float release [3, 2, 3, 3, 1, 0, 2, 1] agrees at 8); refinements 8, readings 180, locks [[5], [7], [3], [1], [4], [2], [0], [6]]; members certified 32 of 32, ticks closed 1920 of 1920
+  lock station 5 class 0: joint [109165/4, 54583/2], runner-up [49677/64, 99355/128]
+  lock station 7 class 1: joint [94282, 94283], runner-up [20435/16, 81741/64]
+  lock station 3 class 3: joint [178544, 178546], runner-up [35913/2, 71827/4]
+  lock station 1 class 2: joint [189618, 189620], runner-up [74225, 74226]
+  lock station 4 class 1: joint [81513/4, 40757/2], runner-up [16502, 66009/4]
+  lock station 2 class 3: joint [45365/4, 90731/8], runner-up [21107/2, 84429/8]
+  lock station 0 class 3: joint [19461/2, 77845/8], runner-up [74505/8, 37253/4]
+  lock station 6 class 2: joint [125413/128, 62707/64], runner-up [6491/8, 103857/128]
+  admission: 180 candidates read, 0 past the signed form; largest |z|² 2541079306618297325381997/604462909807314587353088
+  teacher-forced: flips to the target 8, to another class 0, undecided 0, top not past one 0, refused 0; exact top = target 8
+request 125: target [1, 1, 2, 2, 3, 3, 0, 0]; native released [3, 1, 3, 2, 3, 3, 1, 0] (right 5, the float release [3, 1, 3, 2, 3, 3, 1, 0] agrees at 8); refinements 8, readings 180, locks [[7], [1], [3], [5], [0], [2], [4], [6]]; members certified 32 of 32, ticks closed 1920 of 1920
+  lock station 7 class 0: joint [100663/2, 50332], runner-up [94849/32, 47425/16]
+  lock station 1 class 1: joint [153636, 153638], runner-up [71825/16, 35913/8]
+  lock station 3 class 2: joint [221492, 221494], runner-up [119911/32, 14989/4]
+  lock station 5 class 3: joint [238968, 238970], runner-up [108319/16, 6770]
+  lock station 0 class 3: joint [179220, 179222], runner-up [168752, 168754]
+  lock station 2 class 3: joint [77574, 77575], runner-up [73637, 73638]
+  lock station 4 class 3: joint [116091/8, 29023/2], runner-up [93943/8, 11743]
+  lock station 6 class 1: joint [66095/64, 4131/4], runner-up [57889/64, 115779/128]
+  admission: 180 candidates read, 0 past the signed form; largest |z|² 82825505632286744541551725/19342813113834066795298816
+  teacher-forced: flips to the target 6, to another class 2, undecided 0, top not past one 0, refused 0; exact top = target 6
+request 126: target [0, 3, 1, 0, 2, 1, 3, 2]; native released [0, 2, 1, 1, 2, 1, 3, 2] (right 6, the float release [0, 2, 1, 1, 2, 1, 3, 2] agrees at 8); refinements 8, readings 180, locks [[6], [4], [0], [2], [1], [3], [7], [5]]; members certified 32 of 32, ticks closed 1920 of 1920
+  lock station 6 class 3: joint [70335/2, 35168], runner-up [33481/8, 66963/16]
+  lock station 4 class 2: joint [118592, 118593], runner-up [128069/1024, 64035/512]
+  lock station 0 class 0: joint [185614, 185616], runner-up [94495/2, 47248]
+  lock station 2 class 1: joint [200166, 200168], runner-up [86751/2, 43376]
+  lock station 1 class 2: joint [75812, 75813], runner-up [69652, 69653]
+  lock station 3 class 1: joint [18066, 72265/4], runner-up [15051, 120409/8]
+  lock station 7 class 2: joint [73635/128, 18409/32], runner-up [27641/64, 110565/256]
+  lock station 5 class 1: joint [103949/128, 51975/64], runner-up [52667/128, 105335/256]
+  admission: 180 candidates read, 0 past the signed form; largest |z|² 10164518300520605554417469/2417851639229258349412352
+  teacher-forced: flips to the target 8, to another class 0, undecided 0, top not past one 0, refused 0; exact top = target 8
+request 127: target [1, 1, 2, 2, 3, 3, 0, 0]; native released [2, 1, 3, 2, 3, 3, 1, 0] (right 5, the float release [2, 1, 3, 2, 3, 3, 1, 0] agrees at 8); refinements 8, readings 180, locks [[7], [3], [5], [1], [2], [4], [0], [6]]; members certified 32 of 32, ticks closed 1920 of 1920
+  lock station 7 class 0: joint [76123, 76124], runner-up [98565/16, 49283/8]
+  lock station 3 class 2: joint [202794, 202796], runner-up [109511/16, 13689/2]
+  lock station 5 class 3: joint [254324, 254326], runner-up [95783/32, 11973/4]
+  lock station 1 class 1: joint [309560, 309564], runner-up [106800, 106801]
+  lock station 2 class 3: joint [123822, 123823], runner-up [114287, 114288]
+  lock station 4 class 3: joint [80123/4, 20031], runner-up [33547/2, 67095/4]
+  lock station 0 class 2: joint [69147/4, 17287], runner-up [123805/8, 61903/4]
+  lock station 6 class 1: joint [77297/64, 38649/32], runner-up [70465/64, 35233/32]
+  admission: 180 candidates read, 0 past the signed form; largest |z|² 20841238960121308122614665/4835703278458516698824704
+  teacher-forced: flips to the target 7, to another class 1, undecided 0, top not past one 0, refused 0; exact top = target 7
