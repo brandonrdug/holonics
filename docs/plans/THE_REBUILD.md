@@ -505,6 +505,115 @@ named, and the program's loop stays its own counter, disclosed as such.
 
 #### U6. The text chart
 
+**U6's order from here** (September 30, agent-inferred; it replaces the order stated only in the
+[diagnosis](../../research/records/2026-09-30_THE_LEARNING_FAILURE_DIAGNOSED_THE_TRAINED_COMPARISON_IS_NOT_THE_ONE_THE_RELEASE_EXECUTES.md)
+§5 and in conversation). This block is the current order; the dated entries below it are its
+history, newest first. A step starts only when the step before it passes its acceptance. A falsifier
+that fires becomes the next loop's subject, and nothing downstream starts.
+
+- **Standing rule: consolidate as we move.** Each loop retires, in its own commit, whatever it
+  supersedes (a harness mode, an arm, an owner path), with the owner that keeps its law named. A
+  loop's harness replaces its predecessor's mode rather than adding one beside it. Batch C clears
+  what earlier loops left behind.
+- **C. Retirement batches** (disjoint owner paths, beside step 1): the inventory of the September 30
+  consolidation audit, under U0's acceptance. Each retirement names the owner that keeps its law, or
+  writes the law into its guide or record first. Nothing live may consume what is retired, and the
+  gates pass at every commit. The batches are listed in the entry "Consolidation, September 30" below.
+- **Step 1. Known truth at `E` alone, until fresh confirmation passes.** Terrains: order-2, the
+  alternation and the line (`hnn_prediction -- executed`, over `hnn::executed`).
+  - *Loop 1a, the two counts (now; measurement only, no law change).*
+    - The declared key family is "lag `ℓ ∈ [1, 40]`, map `f` of `ℤ/4`": `40 · 4⁴ = 10240 = 2¹¹·5`
+      keys. It holds all three rules (order-2 `ℓ = 2, f = +1`; alternation `ℓ = 2, f = id`; line
+      `ℓ = 1, f = +s`). The terrain counts its survivors exactly after each rule step of the machine's
+      own training passage, giving `n*_terrain` and the ideal listener's surprise curve. This is a
+      measurement (`Population.survivors`, `Foundation/Unicity`), never a receiver.
+    - `n*_machine` is read from fresh-confirmation whole sections at checkpoints along the training
+      (after moves 1, 2, 4, 8 and 16), or reported as a lower bound.
+    - D1, heard against listened: per move, the ideal listener's information in the batch, the
+      first-order descent the executed comparison offers, and the descent the certified step
+      realizes.
+    - D2, resonance against saturation: per move, the executed comparison's margins (class and
+      threshold) over the batch's decisions, the share past threshold, and the decision's
+      sensitivity along the covector.
+    - *Acceptance:* both counts and D1, D2 read exactly on all three terrains within their
+      projections, with the pinned prediction of which cause dominates. *Falsifier:* neither
+      separates, meaning the realized share of the offered descent is not small and the decisions are
+      not saturated.
+  - *Loop 1b, the law the measurement selects* (designed after 1a, pinned before its runs). If D1
+    dominates, deposition is joined to key location: survivors are eliminated by loop closure
+    (`hnn::keys`, the Bombe) with the executed comparison as the check, and keys are located, never
+    authored. If D2 dominates, the release's comparison is read near its resonance.
+    - *Acceptance:* on fresh confirmation, order-2 releases strictly more whole sections than both
+      openings, and `n*_machine` is reported against `n*_terrain`.
+    - *Regressions:* the alternation and the line pass, with constant requests counted apart (the
+      modulus loop's 22 alternation sections were all constant requests, which a lag-1 copy
+      completes).
+- **Step 2. Pumps and the other families under a declared receiving composition.** On the isotropic
+  bank a constant pump phase alone cannot change growth. Per-comparison descent is incoherent on
+  shared loci, so the composition's descent comes with its complete bound (the diagnosis §4).
+- **Step 3. Throughput.** The learning path moves onto the card: parallel staging over the immutable
+  constitution, deposits as reductions at one cut, and the systolic exact multiply-accumulate (U8).
+  Today one pass over the choosing role projects to about four hours of serial host arithmetic. The
+  projection is remade from step 1's repaired path.
+- **Step 4. The corpus.** The choosing role's 12,261 eligible pairs and the current source-context
+  export. Text sections are shown to Brandon whole.
+- **Alongside, on disjoint owners.** Codex and Astra take the Zeta side of unicity (#62, the Franel–
+  Landau composition joined to the actual-source owners) and their isolated RH work.
+
+- **Consolidation, September 30: batch C's inventory** (a read-only audit at `819c58f5`, with grep
+  evidence for every consumer; Refs #63 #73). Step 1 runs `hnn_prediction … executed` over
+  `hnn::executed`, the bank's release (`prediction::{bank_release, BankPlacement, generate_by_bank,
+  Refinement, section_release, mask}`), `ring::ReceivingBank`, `Constitution::{initial,
+  stepped_source, founding_transport}` and `SourceMoment`. It never runs `Word`, the readout path,
+  the face path or the text chart. Retirements follow U0's acceptance. Lean mathematics stays: no
+  Lean module exists only for a retiring path; only docstrings are repinned.
+  - **Batch N, the notebook** (`research/notebook/hnn_design/**`, the crate's example list; first,
+    because it only removes consumers).
+    - Retire: `bank_causes.rs` (a stale copy of `hnn_prediction.rs`) and `bank_causes_probe/`, except
+      its two listing counters; `hnn_population.rs` and its seven submodules; `hnn_landmark.rs`;
+      `hnn_parametron.rs`; the spent F1–F5 split scripts; the step-4 design scripts.
+    - Strip `hnn_prediction.rs` to the executed loop (the pre-executed modes and `Engine` methods
+      other than `new`) and remove the executed loop's spent "face" arm.
+    - Move `Relation`/`RelationKind` into `exterior.rs`: dataset roles are exterior codec
+      information. Drop the tree control from `hnn_chase.rs`.
+    - Keep `exterior.rs`, `hnn_exposure.rs` (campaign 1 and the card), `hnn_chase.rs` (F6), the
+      data-protocol scripts and the F5 shell.
+  - **Batch P, the receiver** (`receiver/**`, `compression/landmark/context/{spans, sections,
+    checkpoint, passage_checkpoint}.rs`; after N).
+    - Retire the byte-tree text line the antipattern record scheduled: `admitted` (the copy stage),
+      `boundary` (the sentence counter), `TreeFamily` and its checkpoint, `text_release`,
+      `releasing`, `provenance`, the population checkpoints, `merge`'s hazard partition, the text
+      hooks in `population.rs`, `spans`, and `Sections`.
+    - Rebase the test fixtures on key families. Keep `SectionChart`, which `exterior.rs` reads.
+    - Keep the population core (`Population`, `Family`, `Survivors`, `KeyFamily`: the unicity
+      loop's ideal listener), `PortPopulation`, `species`, the key families (gratings, rotor keys)
+      and the chaser (F6, #27). The chaser's plan reads the terrain's `pursuit` routines, to be
+      audited under "No catered machinery" at F6's next loop.
+  - **Batch H, `hnn`** (`hnn/**`; after N, in parallel with P).
+    - Retire the face path (`BankImages`, `stage_bank`, `bank_reach`, `deposit_with_bank`,
+      `face_read`, `face_move`, `BankChart`, `BankReach`, `HnnError::FaceTransport`; Lean
+      `HNN/BankFace` stays, imported by `ExecutedComparison`).
+    - Retire the linear readout's training and generation (`anchor_frames`, `RefinementBalance`,
+      `stage`, `comparison_code`, `generate`, `deposit_of`; Lean `HNN/Prediction`, `HNN/Normal`
+      stay).
+    - Retire `hnn::encoding`, which has no consumer (Lean `HNN/Encoding` stays; the lessons record
+      §4's keep-list is amended), and `reference.rs`'s count-only sweeps.
+    - Move the 25 public functions with only test callers under `cfg(test)` or delete them.
+    - Two of #62's three ρ < 1 refusals go with their paths. The card's stays.
+    - Keep the field law realized on the card (`word`, `chart`, `propagation`, `retention`,
+      `pending`, `receiving`, `realization`) and `keys` (step 1b's candidate).
+  - **Held to step 1b's close** (lawful population laws, stated in Lean, with no library consumer
+    today): `dormancy`, `composition`, `merge`'s blocks, `birth` with birth from reserved mass (its
+    abstaining-newborn law written into `docs/RECEIVER_HOLARCHY.md` first), and the evolved prior.
+    At 1b's close each has a named library consumer or is deleted: U0's rule, so that key location
+    does not delete and then rebuild them.
+  - **Workers and gates.** N starts at once. P and H start from N's tip and run in parallel. The
+    primary edits the shared plan files once at the join: THE_REBUILD, CONSTRUCTION_STATE, the
+    lessons keep-list, #62 item 4 and the atlas rows (about 41). Every commit passes
+    `cargo check --workspace --all-targets` and `cargo test -p holonics --lib`, plus
+    `bash tools/lean_check.sh` where docstrings change. No card-realized law changes, so the card
+    suite is not required.
+
 - **The modulus founded off one, September 30: the modulus stays below one, and order-2 training
   learns the lag-1 copy**
   ([pin](../../research/records/2026-09-30_THE_MODULUS_FOUNDED_OFF_ONE_PINNED_BEFORE_ITS_RUNS.md),
