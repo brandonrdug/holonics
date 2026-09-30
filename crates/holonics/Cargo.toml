@@ -57,3 +57,10 @@ path = "../../research/notebook/hnn_design/hnn_prediction.rs"
 [[example]]
 name = "hnn_parametron"
 path = "../../research/notebook/hnn_design/hnn_parametron.rs"
+
+# The causes' analysis of the bank's learning path (an exterior probe harness on synthetic
+# terrain: dumps of the declared field's placement, exact bank readings and `E` after each
+# certified deposit; never a pinned run).
+[[example]]
+name = "bank_causes"
+path = "../../research/notebook/hnn_design/bank_causes.rs"
