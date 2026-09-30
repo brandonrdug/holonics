@@ -1,5 +1,6 @@
-//! Fields, constitutions and cuts for the learning half's laws: the six-ring path of `release.py`,
-//! a small chain for the return's exactness, and generic exact constitutions (control charts).
+//! Fields, constitutions and cuts for the learning half's laws: the six-ring path of the retired
+//! [`release.py`](https://github.com/brandonrdug/holonics/blob/d4596102/research/notebook/hnn_design/release.py), a small chain for the return's exactness,
+//! and generic exact constitutions (control charts).
 
 use super::support::{Draw, contact, ring};
 use crate::hnn::constitution::{Constitution, Reach};
@@ -17,7 +18,7 @@ pub(super) const OPEN_BUDGET: u64 = 1 << 40;
 /// `D = 2` it is refused only from 1,712,317 = 233·7349 cells, where a lattice product itself passes 128 bits
 /// (the carrier past `u128` rebases, campaign 2: `compression::landmark::context`'s header).
 ///
-/// **The six-ring path of `release.py`**: rings of period 2 (realified width 4) joined `(g, g+1)` on
+/// **The six-ring path of the retired [`release.py`](https://github.com/brandonrdug/holonics/blob/d4596102/research/notebook/hnn_design/release.py)**: rings of period 2 (realified width 4) joined `(g, g+1)` on
 /// node 0 (channel width 2), exponents 0 (so `G_a = Y_a`), source ring 0, receiving ring 2 with
 /// the declared aperture, `|A| = 2`, junction admittances `Y_g` and contact admittances `Y_a`.
 pub(super) fn path_with(aperture: usize, junctions: &[Rat], contacts: &[Rat]) -> Field {

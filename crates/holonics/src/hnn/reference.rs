@@ -152,8 +152,8 @@ use crate::aeon::{ClockLift, EnclosedLedger};
 use crate::compression::cost::ceil_log2;
 use crate::compression::landmark::context::baseline::{BaselineCodes, Baselines};
 use crate::compression::landmark::context::{
-    ChartReport, IdealLandmarks, LandmarkDeclaration, Landmarks, Letter, PassageCode, StopPrior,
-    Widths, code_length, letter_address, log2_e_bound,
+    ChartReport, LandmarkDeclaration, Landmarks, Letter, PassageCode, Widths, code_length,
+    letter_address,
 };
 use crate::geometry::RatVec3;
 use crate::hnn::HnnError;
@@ -597,7 +597,8 @@ impl Resident {
     }
 
     /// Whether the joint clock has carried out and the aeon awaits `close_aeon`.
-    pub fn awaiting_boundary(&self) -> bool {
+    #[cfg(test)]
+    pub(crate) fn awaiting_boundary(&self) -> bool {
         self.aeon.awaiting
     }
 
@@ -1758,8 +1759,8 @@ pub struct ComposedReturn {
 /// opening covector against the moment's counts at the lift `anchor`, the loaded resonators and
 /// the contacts, each only at loci the diamond retains and the constitution has not released.
 /// The compare composes a word's return in its pending ratio's diamond and joins the landmark tree
-/// to it; U6's native generation (`hnn::prediction`) composes a refinement's joined return in the
-/// refinement's diamond and joins nothing else.
+/// to it; U6's retired linear readout (batch H) composed a refinement's joined return in the
+/// refinement's diamond and joined nothing else.
 pub fn compose_return(
     field: &Field,
     constitution: &Constitution,
@@ -3350,16 +3351,22 @@ where
 // -------------------------------------------------------------------------------------------
 // the landmark tree's prequential measurement on a cut
 
-/// [definition; agent-inferred] **The landmark tree's prequential measurement on a cut, and its
-/// development choices** (the tree is `compression::landmark::context`'s; the cut is the
-/// exposure's, [`Cut`]): the tree over the ticks' letters and the online baselines
-/// (`compression::landmark::context::baseline`) over the same cells in the same order, each cell
-/// scored at the current standing and then deposited, with exact enclosures on the development and
-/// held-out populations ([`prequential`]); the address depth and the stop prior chosen on the
-/// development cells alone ([`choose_depth`], [`choose_prior`]; the held-out cells are cut away
-/// before any reading); and the executed face against the reference oracle ([`oracle_cost`]). The
-/// laws of a stop-prior sweep run together on the host (the host realization; each reads the
-/// shared immutable development cells and writes its own sweep).
+/// [definition; agent-inferred] **The landmark tree's prequential measurement on a cut** (the tree
+/// is `compression::landmark::context`'s; the cut is the exposure's, [`Cut`]): the tree over the
+/// ticks' letters and the online baselines (`compression::landmark::context::baseline`) over the
+/// same cells in the same order, each cell scored at the current standing and then deposited, with
+/// exact enclosures on the development and held-out populations ([`prequential`], and the tree alone
+/// [`tree_prequential`]). [historical; September 30, batch H] The count-only development choices
+/// are retired with their last consumer, the notebook's `hnn_landmark` (N1): source at
+/// [`f5fd8f3b`](https://github.com/brandonrdug/holonics/blob/f5fd8f3b/crates/holonics/src/hnn/reference.rs),
+/// their readings in the landmark tree's September 26 records. Their rules, read on the
+/// development cells only: the depth sweep (`choose_depth`, `choose_depth_within`) raised `D` from
+/// `max(1, forced)` while the development code fell strictly by disjoint enclosures (or to a
+/// declared deepest depth), charged `⌈log₂⌉` of the depths tried; the stop-prior sweep
+/// (`choose_prior`) ran each declared law at its own depth sweep and chose the least charged law
+/// only when its enclosure lay strictly below the `½` incumbent's, charged `⌈log₂⌉` of the laws;
+/// `oracle_cost` compared the executed face with the reference oracle (`IdealLandmarks`) cell by
+/// cell against the certificate plus the oracle's own rule.
 
 fn measurement_shape(what: &'static str, expected: usize, found: usize) -> HnnError {
     HnnError::Shape {
@@ -3367,10 +3374,6 @@ fn measurement_shape(what: &'static str, expected: usize, found: usize) -> HnnEr
         expected,
         found,
     }
-}
-
-fn zero_bits() -> ExactInterval {
-    ExactInterval::point(Rat::zero())
 }
 
 /// [definition] **Code lengths on one population**, each an enclosure of the population's faces'
@@ -3407,51 +3410,6 @@ pub struct Prequential {
     pub development: Coded,
     pub held_out: Coded,
     pub run: TreeRun,
-}
-
-/// [definition] **A depth sweep on the development cells** ([`choose_depth`]): every depth tried with
-/// its development code length, the chosen depth and the description bits the choice is charged.
-#[derive(Clone, Debug, PartialEq, Eq)]
-pub struct DepthSweep {
-    pub tried: Vec<(usize, ExactInterval)>,
-    pub chosen: usize,
-    pub description_bits: u64,
-}
-
-impl DepthSweep {
-    /// **Whether a sweep continues past its last depth** ([`choose_depth`]'s rule): the last
-    /// depth's development code lies strictly below the one before it, by disjoint exact
-    /// enclosures (the first depth always continues).
-    pub fn decreasing(tried: &[(usize, ExactInterval)]) -> bool {
-        match tried {
-            [.., (_, previous), (_, last)] => last.upper < previous.lower,
-            _ => true,
-        }
-    }
-
-    /// **The sweep's choice from the depths tried** ([`choose_depth`]'s rule): the last depth, or
-    /// the one before it when the last did not decrease strictly; charged `⌈log₂⌉` of the depths
-    /// tried. Refused when nothing was tried.
-    pub fn of(tried: Vec<(usize, ExactInterval)>) -> Result<Self, HnnError> {
-        let Some((last, _)) = tried.last() else {
-            return Err(measurement_shape(
-                "a depth sweep of at least one depth",
-                1,
-                0,
-            ));
-        };
-        let chosen = if Self::decreasing(&tried) {
-            *last
-        } else {
-            tried[tried.len() - 2].0
-        };
-        let description_bits = ceil_log2(&BigUint::from(tried.len()));
-        Ok(Self {
-            tried,
-            chosen,
-            description_bits,
-        })
-    }
 }
 
 /// Refused unless there is one letter per cell.
@@ -3563,83 +3521,6 @@ pub fn prequential(
     })
 }
 
-/// **The development stream**: the cut with its held-out cells removed.
-pub fn development(cut: &Cut) -> Vec<usize> {
-    cut.cells
-        .iter()
-        .enumerate()
-        .filter(|(position, _)| !cut.held_out(*position))
-        .map(|(_, &cell)| cell)
-        .collect()
-}
-
-/// **The development letters**: the ticks' letters at the development positions.
-pub fn development_letters(cut: &Cut, letters: &[Letter]) -> Vec<Letter> {
-    letters
-        .iter()
-        .enumerate()
-        .filter(|(position, _)| !cut.held_out(*position))
-        .map(|(_, &letter)| letter)
-        .collect()
-}
-
-/// **The development code length of one declaration** (the harness's unit): the tree's
-/// prequential code length over the development cells and their letters, and its run.
-pub fn development_run(
-    cut: &Cut,
-    letters: &[Letter],
-    declaration: &LandmarkDeclaration,
-) -> Result<(ExactInterval, TreeRun), HnnError> {
-    aligned(&cut.cells, letters)?;
-    let cells = development(cut);
-    let letters = development_letters(cut, letters);
-    let never = |_: usize| false;
-    let ([bits, _], run) = run_tree(&cells, &letters, &never, declaration)?;
-    Ok((bits, run))
-}
-
-/// **Choose the address depth on the development cells** (the section header): `D = max(1, forced), …`
-/// while the development prequential code length decreases strictly; the declaration's own depth
-/// is ignored, and each depth derives its own widths.
-pub fn choose_depth(
-    cut: &Cut,
-    letters: &[Letter],
-    declaration: &LandmarkDeclaration,
-) -> Result<DepthSweep, HnnError> {
-    choose_depth_within(cut, letters, declaration, usize::MAX)
-}
-
-/// [definition; agent-inferred] **Choose the address depth within a declared deepest depth**
-/// (the wide cut: a memory cap bounds the tree's a-priori founded nodes, `n* B D`, and so its depth):
-/// [`choose_depth`]'s sweep, which also stops at `D = deepest`; the family tried is still charged
-/// `⌈log₂⌉` of its length.
-pub fn choose_depth_within(
-    cut: &Cut,
-    letters: &[Letter],
-    declaration: &LandmarkDeclaration,
-    deepest: usize,
-) -> Result<DepthSweep, HnnError> {
-    aligned(&cut.cells, letters)?;
-    let cells = development(cut);
-    let letters = development_letters(cut, letters);
-    let never = |_: usize| false;
-    let mut tried: Vec<(usize, ExactInterval)> = Vec::new();
-    let mut depth = declaration.forced.max(1);
-    loop {
-        let declared = LandmarkDeclaration {
-            depth,
-            ..declaration.clone()
-        };
-        let ([bits, _], _) = run_tree(&cells, &letters, &never, &declared)?;
-        tried.push((depth, bits));
-        if !DepthSweep::decreasing(&tried) || depth >= cells.len() || depth >= deepest {
-            break;
-        }
-        depth += 1;
-    }
-    DepthSweep::of(tried)
-}
-
 /// **One tree's prequential run on a cut, the tree alone** (the held-out pass of a law measured
 /// beside another's run of the baselines): every cell scored at the current standing before its
 /// own deposit, the code lengths enclosed on `[development, held-out]`, and the tree's run.
@@ -3651,171 +3532,4 @@ pub fn tree_prequential(
     aligned(&cut.cells, letters)?;
     let held_out = |position: usize| cut.held_out(position);
     run_tree(&cut.cells, letters, &held_out, declaration)
-}
-
-/// [definition] **A stop-prior sweep on the development cells** ([`choose_prior`]): every law tried
-/// with its own depth sweep, the incumbent (the `½` stop prior), the chosen law, whether the chosen
-/// law's charged code length is decided below every other law's by disjoint enclosures, and the
-/// description bits the choice is charged, `⌈log₂⌉` of the laws tried (each law's depths are
-/// charged beside it, [`PriorSweep::charged`]).
-#[derive(Clone, Debug, PartialEq, Eq)]
-pub struct PriorSweep {
-    pub tried: Vec<(StopPrior, DepthSweep)>,
-    pub incumbent: usize,
-    pub chosen: usize,
-    pub decided: bool,
-    pub description_bits: u64,
-}
-
-impl PriorSweep {
-    /// A law's development code length at its chosen depth.
-    pub fn bits(&self, index: usize) -> ExactInterval {
-        let sweep = &self.tried[index].1;
-        sweep
-            .tried
-            .iter()
-            .find(|(depth, _)| *depth == sweep.chosen)
-            .map(|(_, bits)| bits.clone())
-            .expect("the chosen depth was tried")
-    }
-
-    /// A law's development code length charged its depths' description bits `⌈log₂⌉` of the
-    /// depths it tried (the laws' own charge is common to every law, [`PriorSweep::description_bits`]).
-    pub fn charged(&self, index: usize) -> ExactInterval {
-        let bits = self.bits(index);
-        let depth = Rat::from_integer(BigInt::from(self.tried[index].1.description_bits));
-        ExactInterval {
-            lower: &bits.lower + &depth,
-            upper: &bits.upper + &depth,
-        }
-    }
-
-    /// The chosen law's whole description: the laws' `⌈log₂⌉` and its depths'.
-    pub fn chosen_description(&self) -> u64 {
-        self.description_bits + self.tried[self.chosen].1.description_bits
-    }
-}
-
-/// [definition; agent-inferred] **Choose the stop prior on the development cells** (the declared stop prior):
-/// each declared law of `family` chooses its own depth ([`choose_depth`], so the depth selection is
-/// campaign 1's) and reads its development code length there, the laws run together
-/// (the host realization: each reads the shared immutable development cells and writes its own sweep,
-/// so their effects commute). Each law is charged `⌈log₂⌉` of its depths tried, and the choice
-/// `⌈log₂ |family|⌉`. The chosen law is the least charged one (the first in the family's order at a
-/// tie) when its enclosure lies strictly below the incumbent's (the `½` stop prior, which the family
-/// must hold), and the incumbent otherwise; `decided` records whether it lies strictly below every
-/// other law's. The held-out cells never choose anything: they are cut away before any reading.
-pub fn choose_prior(
-    cut: &Cut,
-    letters: &[Letter],
-    declaration: &LandmarkDeclaration,
-    family: &[StopPrior],
-) -> Result<PriorSweep, HnnError> {
-    aligned(&cut.cells, letters)?;
-    let half = StopPrior::half();
-    let incumbent = family
-        .iter()
-        .position(|prior| *prior == half)
-        .ok_or(measurement_shape(
-            "a stop-prior family holding the ½ stop prior",
-            1,
-            0,
-        ))?;
-    let sweeps = indexed(family.len(), |index| {
-        let declared = LandmarkDeclaration {
-            prior: family[index].clone(),
-            ..declaration.clone()
-        };
-        choose_depth(cut, letters, &declared)
-    })?;
-    let mut sweep = PriorSweep {
-        tried: family.iter().cloned().zip(sweeps).collect(),
-        incumbent,
-        chosen: incumbent,
-        decided: false,
-        description_bits: ceil_log2(&BigUint::from(family.len())),
-    };
-    let charged: Vec<ExactInterval> = (0..family.len()).map(|i| sweep.charged(i)).collect();
-    let mut least = 0;
-    for (index, bits) in charged.iter().enumerate() {
-        if bits.upper < charged[least].upper {
-            least = index;
-        }
-    }
-    if charged[least].upper < charged[incumbent].lower {
-        sweep.chosen = least;
-    }
-    let chosen = &charged[sweep.chosen];
-    sweep.decided = charged
-        .iter()
-        .enumerate()
-        .all(|(index, bits)| index == sweep.chosen || chosen.upper < bits.lower);
-    Ok(sweep)
-}
-
-/// [definition] **The executed face's cost against the oracle** ([`oracle_cost`]), per population
-/// `[development, held-out]`: the oracle's reference width and rebases, both code lengths, the
-/// largest observed per-cell deviation (the upper bound `|q̂ − q|/min(q̂, q) · 3/2` bits of
-/// `|log₂(q̂/q)|`), the largest certificate, the oracle's own rule a cell, and whether every cell's
-/// observed deviation lay within its certificate plus the oracle's rule (the certificate bounds the
-/// distance to the ideal, the oracle's rule the oracle's).
-#[derive(Clone, Debug, PartialEq, Eq)]
-pub struct OracleCost {
-    pub reference_width: u64,
-    pub rebases: u64,
-    pub executed: [ExactInterval; 2],
-    pub ideal: [ExactInterval; 2],
-    pub largest_deviation: Rat,
-    pub largest_certificate: Rat,
-    pub drift_rule: Rat,
-    pub certified: bool,
-}
-
-/// **The executed face against the reference oracle on a cut** (the section header): both trees receive
-/// every cell in order at the reference width `W_o`; each cell's executed and ideal faces are
-/// read by [`code_length`] and compared exactly. Not on the hot path.
-pub fn oracle_cost(
-    cut: &Cut,
-    letters: &[Letter],
-    declaration: &LandmarkDeclaration,
-) -> Result<OracleCost, HnnError> {
-    aligned(&cut.cells, letters)?;
-    let reference_width = IdealLandmarks::reference_width(declaration);
-    let mut tree = Landmarks::new(declaration.clone())?;
-    let mut oracle = IdealLandmarks::new(declaration.clone(), Some(reference_width))?;
-    let drift_rule = oracle.drift_rule();
-    let (mut executed, mut ideal) = ([zero_bits(), zero_bits()], [zero_bits(), zero_bits()]);
-    let (mut largest_deviation, mut largest_certificate) = (Rat::zero(), Rat::zero());
-    let mut certified = true;
-    for (position, &class) in cut.cells.iter().enumerate() {
-        let here = letter_address(letters, position, declaration.depth);
-        let reading = tree.receive(&here, class)?;
-        let face = oracle.receive(&here, class)?;
-        let part = usize::from(cut.held_out(position));
-        executed[part] = interval_sum(&executed[part], &code_length(&reading.executed)?)?;
-        ideal[part] = interval_sum(&ideal[part], &code_length(&face)?)?;
-        let least = if reading.executed < face {
-            &reading.executed
-        } else {
-            &face
-        };
-        let deviation = (&reading.executed - &face).abs() / least * log2_e_bound();
-        certified &= deviation <= &reading.residual + &drift_rule;
-        if deviation > largest_deviation {
-            largest_deviation = deviation;
-        }
-        if reading.residual > largest_certificate {
-            largest_certificate = reading.residual;
-        }
-    }
-    Ok(OracleCost {
-        reference_width,
-        rebases: oracle.rebases(),
-        executed,
-        ideal,
-        largest_deviation,
-        largest_certificate,
-        drift_rule,
-        certified,
-    })
 }

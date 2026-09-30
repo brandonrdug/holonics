@@ -5,7 +5,7 @@
 [operator contract](ELEMENTARY_OBJECTS.md#operator-contract)'s HNN row: the word, deposition and
 the collapse of campaigns 1–2 and the loaded resonator (`hnn::ring`); a loaded ring's mode quotient
 (campaign 3's first construction) is Lean's `HNN/ModeQuotient` ([§4](#the-loaded-rings-mode-quotient)).
-Holonic Encoding's founding law on declared transports is `hnn::encoding` (Lean `HNN/Encoding`, [below](#holonic-encoding)); joint prediction's smallest form is `hnn::prediction` (U6, [below](#generation-as-field-refinement-and-boundary-radiation)); release through modes has no owner yet. [THE_MACHINE](THE_MACHINE.md) states the object,
+Holonic Encoding's founding law on declared transports is `hnn::encoding` (Lean `HNN/Encoding`, [below](#holonic-encoding)); joint prediction's native form is `hnn::prediction`, the receiving bank's lock iteration, with its learning signal the release's own comparison `hnn::executed` (U6, [below](#generation-as-field-refinement-and-boundary-radiation)); release through modes has no owner yet. [THE_MACHINE](THE_MACHINE.md) states the object,
 [THE_REBUILD](plans/THE_REBUILD.md) the order and [CONSTRUCTION_STATE](../CONSTRUCTION_STATE.md) the
 position; the [elementary objects](ELEMENTARY_OBJECTS.md) own the vocabulary.
 The HNN is the compression machine at scale ([the line](THE_MACHINE.md#the-line-the-rebuild-serves)):
@@ -545,6 +545,35 @@ through `R`, each station's phase binding and the `K` words in reverse (`Word::p
 composes it onto the refinement's diamond and deposits it by the normal law. The path reads no
 window, no landmark tree and no copy stage.
 
+[historical; September 30, batch H] **This linear readout is retired from Rust** (source at
+[`f5fd8f3b`](https://github.com/brandonrdug/holonics/blob/f5fd8f3b/crates/holonics/src/hnn/prediction.rs)),
+and so is the bank's face that was trained beside it (the
+[diagnosis](../research/records/2026-09-30_THE_LEARNING_FAILURE_DIAGNOSED_THE_TRAINED_COMPARISON_IS_NOT_THE_ONE_THE_RELEASE_EXECUTES.md)
+§3: the trained comparison was not the one the release executes). Generation is the receiving
+bank's lock iteration over the passage's station-framed placement (`hnn::prediction::{bank_release,
+generate_by_bank, BankPlacement}`), and learning the release's own comparison (`hnn::executed`).
+The readout's checks, stated here so the laws outlive their code:
+- **The refinement's balance.** Over the `K` words the field's power plus the resonators' energy
+  telescopes: `end = open − dissipation + resist + Π_c + residual + pump − resonator dissipation +
+  interconnection + injected`, every tick closing and chaining within and across the words, the
+  request's moment re-entering at each later word's open as the only jump, the executed residual
+  within its certified bound (Lean `HNN/Ring.loaded_tick_executed_interconnection_balance`); across
+  a commit the end change's power under the committed forms is the end plus the deposition work
+  `½⟨x, ΔΘ x⟩` (`HNN/Word.field_commit_deposition`).
+- **The committed energy bound of a refinement.** With the per-tick amplitude growth `g = 1 + ω`
+  and the commit's certified storage growth `ε_k`, the committed energy is at most
+  `(1 + ε_k)(Σ_(n<K) g^(K·w − n·w) √P_inj + g^(K·w) √((K·w + 1) r))²`, `P_inj` the injection's
+  power and `r` the executed residual's certified bound (Lean `Holon/Deposition.{committed_energy_bound,
+  active_element_growth}`, the square roots at their dyadic ceilings).
+- **The adjoint pairing.** On the executed charts with no transient split, the stations' covectors
+  paired with their logits equal the returned opening covectors paired with the injections, exactly
+  (`HNN/LatticeWord.executed_adjoint_unique`).
+- **The unreached loci.** Every locus outside the refinement's diamond keeps its material and deposit
+  clock across the deposit (`HNN/Retention.deposit_descends`).
+- **One anchor frames only the stations after every placed datum.** Below transport modulus one the
+  readout, reading every station from the span's last datum, refused a placed datum after an open
+  station (`framed_weight_one_sided`); the bank reads each candidate from its own station instead.
+
 ### Bounded exact transport-family inference
 
 [established-bounded; source-inspected] A finite deterministic construction shows how an exact
@@ -726,7 +755,8 @@ This couples exterior and interior currents; `D` is constitution, not a descript
 separate example. It is also a global instantaneous solve over the contact graph, which is action
 at a distance, so the HNN never takes it as its step (light record §8.1). The step 4 word below
 is local: junction scattering about the participation anchor, a half-turn about it
-(`hnn::propagation::junction_scattering`, Lean
+(`hnn::propagation::{participation, scattering_about}`, with `junction_scattering` the tests' exact
+reference; Lean
 `HNN/Propagation.{junctionScattering_involutive, junctionScattering_isometry}`), one contact hop per
 tick. This global scattering survives in two roles only:
 - as the overdamped continuum-limit reading of that local law (atlas `heat.telegraph-relaxation`);
@@ -783,9 +813,10 @@ receive   f_j = R[P_R^(τ_R) v_R(e_j)] at the receiving epochs, read at the rece
   finite remainder `pairScore_add_sub`).
 - **The sheet classes** `σ` are read from the standing's contrast `Δ_r = Σ_a U_(r←a) q_a − q_r`.
 - **At the word's end** the unread change is released, and nothing is carried to the next word.
-  The standing `q` moves only by deposition. Within one refinement (native generation,
-  `hnn::prediction`) a continuing word opens on the change the previous word left; the refinement
-  owns its words until its return (THE_MACHINE guard 16).
+  The standing `q` moves only by deposition. Within one refinement a continuing word opens on the
+  change the previous word left (`Word::continuing`; its consumer, the linear readout of
+  `hnn::prediction`, was retired September 30, batch H); the refinement owns its words until its
+  return (THE_MACHINE guard 16).
 - **What the word lacks.** It has no global `D/b`, no softmax drive, no boundary hold `H̄` and no
   relaxation `μ`. Those belonged to the prototype's word, which is kept in history at
   [`13f8c734`](https://github.com/brandonrdug/holonics/blob/13f8c734/docs/HNN_FORMULA.md#the-incident-word).

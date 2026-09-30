@@ -28,9 +28,10 @@ path = "../../research/notebook/hnn_design/hnn_exposure.rs"
 name = "hnn_chase"
 path = "../../research/notebook/hnn_design/hnn_chase.rs"
 
-# The notebook's native generation (`hnn::prediction`, THE_REBUILD U6): the copy and moiré terrains
-# with known truth, and text sections for the validation role's requests, each refinement checked
-# (research/notebook/hnn_design/README.md): run once in release, never a test.
+# The notebook's step-1 harness (THE_REBUILD U6): the release's own comparison (`hnn::executed`)
+# over the receiving bank's release (`hnn::prediction`) on known-truth terrains, order-2, the
+# alternation and the line (research/notebook/hnn_design/README.md): run once in release, never a
+# test.
 [[example]]
 name = "hnn_prediction"
 path = "../../research/notebook/hnn_design/hnn_prediction.rs"

@@ -94,11 +94,15 @@
 //! - the constitution's own guards (lattice, bit budget, committed storage growth).
 //!
 //! Otherwise the next step is tried, at most `LADDER_DEPTH` a move, and the move is refused,
-//! typed, when none holds. **One ladder for every declared comparison**: the bank's face on the
-//! same contexts moves by the same ladder and guards ([`face_move`], the matched control; its code
-//! `Σ −log₂ θ_t` in place of `F`, its returns' exact pairing as its first order). The operands
-//! are transient; nothing of the comparison is retained: the successor's `E` and its normal law's
-//! statistic are the only change.
+//! typed, when none holds. **One ladder for every declared comparison**: the ladder reads a
+//! comparison only through its value, its first-order certificate on the carried move and its
+//! re-read at the successor, so a declared comparison moves by the same guards. [historical] The
+//! bank's face on the same contexts was its matched control (`face_move`, its code `Σ −log₂ θ_t` in
+//! place of `F`, its returns' exact pairing as its first order), retired September 30 with the face
+//! path (batch H; source at
+//! [`f5fd8f3b`](https://github.com/brandonrdug/holonics/blob/f5fd8f3b/crates/holonics/src/hnn/executed.rs)).
+//! The operands are transient; nothing of the comparison is retained: the successor's `E` and its
+//! normal law's statistic are the only change.
 //!
 //! **Every modality reads it the same way**: the comparison reads the receiving ring's storage,
 //! which holds any chart's classes through `E` at their residues; nothing here reads a byte, a
@@ -1190,7 +1194,7 @@ fn storage_moves(
 /// §5, D1 and D2; the move never reads them), each term's bound in the proposal's order (`None` for
 /// a term with no resolved branch; a straddling term's hinged at zero), aligned with
 /// [`ExecutedMove::sites`], and the leading branches' pairing `Σ_lead sign ⟨ĝ, Δz⟩`, the proposal's
-/// own gradient on the carried move (`None` for a comparison without branches, the face).
+/// own gradient on the carried move (`None` for a declared comparison without branches).
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct FirstOrderReading {
     pub bound: ExactInterval,
@@ -1712,270 +1716,6 @@ pub fn executed_move(
         &joint,
         &largest_entry(&unit_move),
         Some(&modulus_unit),
-        &first,
-        &reread,
-    )?;
-    receipt.trials = trials;
-    receipt.adopted = adopted;
-    receipt.refusal = refusal;
-    Ok(receipt)
-}
-
-/// [definition; agent-inferred, September 30] **The face's contexts and code at a constitution**
-/// (the matched control of the bank's learning path, on the same contexts as the executed
-/// comparison): for a partition, the readout's `stage_bank` with the targets placed; along the
-/// machine's own trajectory, one `stage_bank` per refinement of the release the constitution
-/// executes, its locked stations at the classes the machine locked and its open stations compared
-/// with their targets. The code `Σ −log₂ θ_t` enclosed, the release comparisons where read, the
-/// staged comparisons (for the returns), and whether every candidate crossing is admissible.
-#[allow(clippy::type_complexity)]
-fn face_read(
-    field: &Field,
-    constitution: &Constitution,
-    requests: &[Request],
-    declared: &Refinement,
-    bank: &ReceivingBank,
-    grain: u32,
-) -> Result<(ExactInterval, Option<BatchComparison>, Vec<crate::hnn::prediction::BankStaged>, bool), HnnError>
-{
-    use crate::hnn::prediction::{BankImages, stage_bank};
-    use rayon::prelude::*;
-    let images = BankImages::of(field, constitution, declared, bank)?;
-    let open = requests.iter().any(|r| matches!(r.context, Context::Open));
-    let releases = if open {
-        match compare(field, constitution, requests, declared, bank, grain) {
-            Ok(batch) => Some(batch),
-            Err(HnnError::UncertifiedResonator { .. }) => {
-                return Ok((ExactInterval::point(Rat::zero()), None, Vec::new(), false));
-            }
-            Err(error) => return Err(error),
-        }
-    } else {
-        None
-    };
-    let stations = declared.stations();
-    let alphabet = field.alphabet();
-    let staged: Vec<Vec<(crate::hnn::prediction::BankStaged, Vec<Option<usize>>)>> = requests
-        .par_iter()
-        .enumerate()
-        .map(|(index, request)| {
-            let sections: Vec<Vec<Option<usize>>> = match &request.context {
-                Context::Partition(locked) => vec![
-                    (0..stations)
-                        .map(|j| locked[j].then_some(request.targets[j]))
-                        .collect(),
-                ],
-                Context::Open => {
-                    let generation = releases.as_ref().expect("the releases")
-                        .requests[index]
-                        .generation
-                        .as_ref()
-                        .expect("an open context's release");
-                    let mut placed = vec![None; stations];
-                    let mut sections = Vec::new();
-                    for lock in &generation.locks {
-                        sections.push(placed.clone());
-                        for &station in lock {
-                            placed[station] = Some(generation.release.classes[station]);
-                        }
-                    }
-                    if placed.iter().any(Option::is_none) {
-                        sections.push(placed);
-                    }
-                    sections
-                }
-            };
-            sections
-                .into_iter()
-                .map(|placed| {
-                    let targets: Vec<usize> = (0..stations)
-                        .map(|j| placed[j].unwrap_or(request.targets[j]))
-                        .collect();
-                    let locked: Vec<bool> = placed.iter().map(Option::is_some).collect();
-                    let staged = stage_bank(
-                        field,
-                        &request.current,
-                        &request.moment,
-                        declared,
-                        &images,
-                        &targets,
-                        &locked,
-                    )?;
-                    Ok((staged, placed))
-                })
-                .collect::<Result<Vec<_>, HnnError>>()
-        })
-        .collect::<Result<_, HnnError>>()?;
-    // Admission: every candidate crossing of every context the face compares.
-    let admitted = requests
-        .par_iter()
-        .zip(&staged)
-        .map(|(request, contexts)| {
-            let placement =
-                BankPlacement::of(field, constitution, &request.current, &request.moment, declared)?;
-            for (_, placed) in contexts {
-                for station in (0..stations).filter(|&j| placed[j].is_none()) {
-                    for class in 0..alphabet {
-                        let mut cells = placed.clone();
-                        cells[station] = Some(class);
-                        let storage = placement.storage(station, &cells);
-                        if !bank.admits(&crate::hnn::ring::turn(&storage))? {
-                            return Ok(false);
-                        }
-                    }
-                }
-            }
-            Ok(true)
-        })
-        .collect::<Result<Vec<bool>, HnnError>>()?
-        .into_iter()
-        .all(|a| a);
-    let mut code = ExactInterval::point(Rat::zero());
-    let mut all = Vec::new();
-    for contexts in staged {
-        for (staged, _) in contexts {
-            code = crate::ratio::algebraic::interval_sum(&code, &staged.code)?;
-            all.push(staged);
-        }
-    }
-    Ok((code, releases, all, admitted))
-}
-
-/// **The committed move of `E` on the bank's face** (the matched control, one law with
-/// [`executed_move`]): the face's code on the requests' contexts ([`face_read`]), its returns
-/// (`hnn::prediction::bank_reach`), the unit step's alignment as its first-order slope, then the
-/// same certified step's ladder, each successor's face code re-read on its own contexts and
-/// adopted only when the code is strictly lower by disjoint enclosures and every guard holds.
-pub fn face_move(
-    field: &Field,
-    constitution: &Constitution,
-    requests: &[Request],
-    declared: &Refinement,
-    bank: &ReceivingBank,
-    grain: u32,
-) -> Result<ExecutedMove, HnnError> {
-    use crate::hnn::prediction::{BankImages, bank_reach};
-    let ring = declared.ring();
-    let (code, releases, staged, admitted) =
-        face_read(field, constitution, requests, declared, bank, grain)?;
-    if !admitted {
-        return Err(HnnError::UncertifiedResonator { ring, phase: 0 });
-    }
-    let before = match releases {
-        Some(batch) => BatchComparison {
-            value: code.clone(),
-            ..batch
-        },
-        None => BatchComparison {
-            requests: Vec::new(),
-            value: code.clone(),
-            readings: 0,
-        },
-    };
-    let images = BankImages::of(field, constitution, declared, bank)?;
-    let samples = bank_reach(&images, &staged).samples;
-    let mut receipt = ExecutedMove {
-        before,
-        contributions: staged.iter().map(|s| s.stations.len()).sum(),
-        returns: samples.len(),
-        terms: staged.iter().map(|s| s.stations.len()).sum(),
-        unresolved: Vec::new(),
-        unresolved_branches: 0,
-        slope: None,
-        modulus_slope: None,
-        modulus_curvature: None,
-        modulus_unit: None,
-        split: None,
-        trials: Vec::new(),
-        adopted: None,
-        refusal: None,
-        sites: Vec::new(),
-        unit_largest: None,
-    };
-    if samples.is_empty() {
-        receipt.refusal = Some(MoveRefusal::Nothing);
-        return Ok(receipt);
-    }
-    // The face's first order along a carried move: `−Σ w ⟨g, ΔE f⟩`, its returns' descent
-    // covectors paired exactly with the move, in nats, read in bits (over `ln 2` enclosed) as the
-    // face's code is.
-    let ln_two = ln_enclosure(&Rat::from_integer(BigInt::from(2)))?;
-    let pairing = |moved: &ExactRatMatrix| -> Result<ExactInterval, HnnError> {
-        let mut sum = Rat::zero();
-        for sample in &samples {
-            let image = moved.apply(&sample.feature)?;
-            sum += &sample.weight
-                * sample
-                    .covector
-                    .iter()
-                    .zip(&image)
-                    .map(|(g, m)| g * m)
-                    .sum::<Rat>();
-        }
-        let nats = -sum;
-        let (a, b) = (&nats / &ln_two.lower, &nats / &ln_two.upper);
-        Ok(ExactInterval {
-            lower: a.clone().min(b.clone()),
-            upper: a.max(b),
-        })
-    };
-    let source = constitution
-        .source_port(ring)
-        .ok_or(HnnError::MissingSourcePort { ring })?
-        .clone();
-    let Some((unit, _)) = constitution.stepped_source(ring, &samples, &Rat::one())? else {
-        receipt.refusal = Some(MoveRefusal::Unreached);
-        return Ok(receipt);
-    };
-    let unit_move = unit
-        .source_port(ring)
-        .ok_or(HnnError::MissingSourcePort { ring })?
-        .subtract(&source)?;
-    let slope = pairing(&unit_move)?;
-    receipt.slope = Some(slope.clone());
-    if !slope.upper.is_negative() {
-        receipt.refusal = Some(MoveRefusal::NoDescent(slope));
-        return Ok(receipt);
-    }
-    let reread = |successor: &Constitution| -> Result<Reread, HnnError> {
-        let (code, releases, _, admitted) =
-            face_read(field, successor, requests, declared, bank, grain)?;
-        let floquet = releases.as_ref().is_some_and(|batch| {
-            batch
-                .requests
-                .iter()
-                .any(|r| r.generation.as_ref().is_some_and(|g| g.uncertified.is_some()))
-        });
-        let refusal = if !admitted {
-            Some(TrialRefusal::Admission)
-        } else if floquet {
-            Some(TrialRefusal::Floquet)
-        } else {
-            None
-        };
-        Ok(Reread {
-            value: code,
-            comparison: releases,
-            refusal,
-        })
-    };
-    receipt.unit_largest = Some(largest_entry(&unit_move));
-    let first = |moved: &ExactRatMatrix, _: &Constitution| {
-        pairing(moved).map(|bound| FirstOrderReading {
-            bound,
-            unresolved: 0,
-            terms: Vec::new(),
-            leading: None,
-        })
-    };
-    let (trials, adopted, refusal) = ladder(
-        constitution,
-        ring,
-        &samples,
-        &receipt.before.value.clone(),
-        &slope,
-        &largest_entry(&unit_move),
-        None,
         &first,
         &reread,
     )?;

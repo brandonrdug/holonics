@@ -213,7 +213,7 @@
 //!   (`chain_founding`). A component whose chart is singular cannot place its declared lobes off the
 //!   node: a single channel's two ends read `Δ` and `−Δ`, so its kernel fixes their sum
 //!   (`channel_fixed_node`). It stays on its node, and its slices are the field's **fixed nodes**
-//!   ([`Constitution::fixed_nodes`]): no within-lobe move reaches them, and only the lock can turn
+//!   (`Constitution::fixed_nodes`, the tests' reading): no within-lobe move reaches them, and only the lock can turn
 //!   them. Campaign 1's field has them (the channel between rings 2 and 3 past ring 1's width); the
 //!   prediction field has none.
 //! - **Within a lobe.** A standing's move is read on its carried lattice successor, exactly as the
@@ -243,9 +243,11 @@
 //!   lock** (`hnn::ring`, the parametron worker's target): the merged lock, reading the exchange
 //!   polynomial `Π = 1 + a/K` and its face `θ = a/(a + K)` on the two sheets, turns the sheet exactly
 //!   when `θ > ½`, `lock(a, K) = turn ⇔ a > K`, so `strictly_better(held, turned)` is its decision on
-//!   exact code enclosures. The prediction path takes the lock (`hnn_prediction`'s batch comparison
-//!   through `hnn::prediction::comparison_code`); a port that does not read the comparison twice
-//!   takes the held step and no half-turn, which is lawful: nothing jumps uncertified.
+//!   exact code enclosures. A port that does not read the comparison twice takes the held step and
+//!   no half-turn, which is lawful: nothing jumps uncertified. [historical] The linear readout took
+//!   the lock through its comparison's code (`hnn::prediction::comparison_code`, read by the
+//!   notebook's retired batch comparison), both retired (N2, batch H; at
+//!   [`f5fd8f3b`](https://github.com/brandonrdug/holonics/blob/f5fd8f3b/crates/holonics/src/hnn/prediction.rs)).
 //!
 //! [definition; agent-inferred, September 29] **The tightened certificate** (the
 //! [tightening's record](../../../../research/records/2026-09-29_THE_TIGHTENED_CERTIFICATE_PINNED_BEFORE_ITS_RUNS.md);
@@ -306,34 +308,22 @@
 //! source's input map and the receiver's readout: `E` supplies the injection whose power the bound
 //! scales, and `R` does no work on the field; both gains enter the certified step. A refinement's
 //! committed energy is then at most `(1 + ε_k)` times its driven bound
-//! `(Σ_n (1+ω)^(T − T_n) √P_inj + (1+ω)^T √(T · r))²`, `r` its executed residual's certified bound
-//! (`hnn::prediction::RefinementBalance::energy_bound`), checked at every commit.
+//! `(Σ_n (1+ω)^(T − T_n) √P_inj + (1+ω)^T √(T · r))²`, `r` its executed residual's certified bound.
+//! [historical] The linear readout read that bound after every commit
+//! (`hnn::prediction::RefinementBalance::energy_bound`, retired with the readout, batch H; at
+//! [`f5fd8f3b`](https://github.com/brandonrdug/holonics/blob/f5fd8f3b/crates/holonics/src/hnn/prediction.rs));
+//! the storage growth's certificate stays enforced at every commit here.
 //!
-//! [definition; agent-inferred, September 29] **The bank's learning path: a comparison beside the
-//! logits** ([`BankReach`], [`BankReach::curvature`]; `hnn::prediction`, "The bank's learning
-//! path"; Lean `HNN/BankFace`). The receiving bank reads the source port `E_g` through the
-//! placements' second-order readings, not through the field's words, and its station's score
-//! `ℓ = log Σ_x A(x) − log A(t)` is a comparison beside the readout's logits. Its returns join
-//! `E_g`'s window ([`NormalLaw::prepare`]: the metric, the unit step, its alignment and the covector
-//! scale), and its curvature is its own, read along the unit step `D` exactly:
-//!
-//! ```text
-//! δ_x = δ + ν P_j D e_x,  δ = Σ_c P_c D f_c                  every candidate's storage move
-//! Â₂ = κ² Σ_x |δ_x|²,  â₂ = κ² |δ_t|²                        the readings' second orders, κ² = 2dΣ p_m² (resonance_gain)
-//! ℓ(η) − ℓ(0) ≤ −η a + η² (Â₂/A₀ + (81/8) â₂/a₀)              wherever η² â₂ ≤ a₀/16 (bank_score_endpoint, bank_score_trust)
-//! C_bank = Σ (2Â₂/A₀ + (81/4) â₂/a₀),  c_bank = max √(16 â₂/a₀)
-//! a ← a − Σ 2e √(A₀ Â₂)                                      the returns' covector at its dyadic face, |c_x − ĉ_x| ≤ e (rounded_alignment)
-//! ```
-//!
-//! The returns carry each reading's covector at a dyadic face (64 significant bits), so their
-//! denominators are the readings' own powers of 2 and 5, not every station's normalizer's; the
-//! rounding is charged against the alignment, a lower bound on the true first-order decrease.
-//! `E_g`'s own certificate reads `η(s κ² b + C_bank) ≤ a` and `η max(c, c_bank) ≤ 1`, `b` its
-//! readout samples' feature moves alone, and the joint certificate adds the bank's endpoint term,
-//! `s (Σ η m)² + η_E² C_bank ≤ Σ η a` (`joint_descends_beside`; `JointReading::beside`). This is the
-//! quadratic reading's second order in the certified step; no limit moves (`s = ½`, `ηc ≤ 1`, the
-//! storage search, the entry bound, the lobes and the Floquet reach are as before). The bank's
-//! pumps are declared, not loci: their covector is read by the consumer and held.
+//! [historical; September 29–30] **The bank's learning path, a comparison beside the logits, is
+//! retired** (batch H; source at
+//! [`f5fd8f3b`](https://github.com/brandonrdug/holonics/blob/f5fd8f3b/crates/holonics/src/hnn/constitution.rs):
+//! `BankReach`, its curvature and trust scale, the returns read beside the logits' samples in
+//! [`NormalLaw::prepare`], `StepReading::bank`). Its second order in the certified step (the
+//! curvature `C_bank = Σ (2Â₂/A₀ + (81/4) â₂/a₀)`, the trust scale `c_bank = max √(16 â₂/a₀)` and
+//! the joint certificate's endpoint term) is Lean's `HNN/BankFace.{bank_score_endpoint,
+//! bank_score_trust, log_one_add_ge, resonance_gain, joint_descends_beside}`; the release's own
+//! comparison replaced it (`hnn::executed`, which steps `E` through
+//! [`Constitution::stepped_source`]).
 //!
 //! [definition; agent-inferred] **The landmark tree at the receiving locus.** The receiving map `R` keeps
 //! the prox step on its reached covectors (the lattice deposit and the lattice word), the covector of the ratio read on
@@ -457,12 +447,11 @@
 //! | `HNN/Floquet.{floquet_span_reach, partial_period_le_pow}`, `Holon/Deposition.{span_transport_compose, station_tick_gain, entry_span_gain, runningMax, le_runningMax, runningMax_mono, pumped_span_factor}` | the pumped medium's reach ([`RingReach`], [`MediumReach`], [`Constitution::medium_reach`], [`PumpedReading`], `Reach`'s gains, `holon::deposition::span_factors`) |
 //! | `Holon/Deposition.{factor_unit_step_alignment, square_ray_move, square_ray_deriv_bound, contracting_resolvent, transit_difference_power}` with `certified_step_descends`, `gauss_newton_curvature` | the factor families' certified step ([`FactorStep`], [`Family`], [`StepReading`], [`Constitution::deposited`]) |
 //! | `Holon/Deposition.{joint_move_triangle, joint_step_descends, gram_certificate_bound, adjoint_gram_certificate_bound, entrywise_error_bound}` | the tightened certificate ([`Constitution::deposited`], [`DepositReading::joint`], [`StepReading::bound`]; `holon::deposition::{JointReading, spectral_norm}`) |
-//! | `HNN/BankFace.{bank_score_endpoint, bank_score_trust, log_one_add_ge, resonance_gain, joint_descends_beside}` | the bank's learning path ([`BankReach::curvature`], [`NormalLaw::prepare`]'s returns beside the logits, [`StepReading::bank`], `holon::deposition::JointReading::beside`) |
 //! | `HNN/Normal.factorCarrier_psd` | the factor families ([`FactorGradient`]) |
 //! | `HNN/Normal.standing_deposit`, `sheetClass_locally_constant` | [`FactorGradient::Standing`] |
 //! | `HNN/Normal.{lobe_of_step_bound, lobe_ray_keeps_class, lobe_move_is_null, lobe_deposit_descends}` | the lobe law ([`Constitution::deposited`], [`LobeReading`]; the standing out of the joint certificate) |
 //! | `HNN/Normal.{lock_face_decides, lock_flip_descends}` | the lock's half-turn ([`LockProposal`], [`Constitution::locked`], `holon::deposition::strictly_better`) |
-//! | `HNN/Normal.{founding_off_node, chain_founding, channel_fixed_node}` | the founding ([`Constitution::initial`], [`Constitution::fixed_nodes`], [`Constitution::standing_contrasts`]) |
+//! | `HNN/Normal.{founding_off_node, chain_founding, channel_fixed_node}` | the founding ([`Constitution::initial`]; `Constitution::{fixed_nodes, standing_contrasts}` the tests' readings) |
 //! | `HNN/LatticeDeposit.{quot, rem, div_rem_spec, rem_bounds, quot_eq_zero_of_bounds, fine}` | [`Lattice::div_rem`] (the carry's fine split), [`Lattice::div_rem_coordinate`] (its coarse split) |
 //! | `HNN/LatticeDeposit.{gammaLength, gamma_kraft_lt_one}` | [`gamma_length`] |
 //! | `HNN/LatticeDeposit.{carry, release, carry_accounting, lattice_deposit_accounting, carry_zero, carry_entry_zero, carry_entry_below_grain}` | [`BudgetedCarry`], the carried deposit of every entry |
@@ -502,7 +491,7 @@ use crate::ratio::linear::vector::{
     Chart, IntegralMatrix, integer_dot, integral, lcm, matrix_form,
 };
 use crate::ratio::linear::{ExactLinearError, ExactRatMatrix};
-use crate::ratio::{Rat, integer, rat};
+use crate::ratio::{Rat, rat};
 use crate::receiver::population::PortPopulation;
 
 /// The declared constitution budget of campaign 1: `B_Θ = 2^33` exact bits.
@@ -947,7 +936,8 @@ pub enum Locus {
 impl Locus {
     /// **The design's operator-entry count** of a locus: an element's `n_g²`, a channel's `3k_a²`
     /// (its `C`, `K`, `D`), four scalar resonator gains, and zero for the other loci (design (a),
-    /// retention item 3, the count `release.py` reports).
+    /// retention item 3, the count the retired `release.py` reported:
+    /// [`d4596102`](https://github.com/brandonrdug/holonics/blob/d4596102/research/notebook/hnn_design/release.py)).
     pub fn entries(&self, field: &Field) -> usize {
         match *self {
             Locus::Element(ring) => field.ring(ring).width().pow(2),
@@ -1820,12 +1810,11 @@ impl NormalLaw {
     pub(crate) fn prepare(
         &self,
         samples: &[Sample],
-        beside: &[Sample],
         rule: &ChartRule,
         at: &mut BudgetedCarry,
     ) -> Result<Option<PreparedStep>, HnnError> {
         let (m, n) = (self.map.rows(), self.map.columns());
-        for sample in samples.iter().chain(beside) {
+        for sample in samples {
             if sample.feature.len() != n || sample.covector.len() != m {
                 return Err(HnnError::Shape {
                     what: "a normal sample (feature, covector)",
@@ -1834,17 +1823,11 @@ impl NormalLaw {
                 });
             }
         }
-        // The returns of a comparison read beside the logits (the receiving bank's face, module
-        // header, "The bank's learning path") enter the metric, the unit step, its alignment and
-        // the covector scale; their curvature is their own ([`BankReach`]), so they add no feature
-        // moves to the logits' Gauss–Newton curvature.
-        let active: Vec<(&Sample, Chart, bool)> = samples
+        let active: Vec<(&Sample, Chart)> = samples
             .iter()
-            .map(|sample| (sample, false))
-            .chain(beside.iter().map(|sample| (sample, true)))
-            .filter(|(sample, _)| !sample.weight.is_zero())
-            .filter(|(sample, _)| sample.feature.iter().any(|x| !x.is_zero()))
-            .map(|(sample, beside)| (sample, integral(&sample.feature), beside))
+            .filter(|sample| !sample.weight.is_zero())
+            .filter(|sample| sample.feature.iter().any(|x| !x.is_zero()))
+            .map(|sample| (sample, integral(&sample.feature)))
             .collect();
         if active.is_empty() {
             return Ok(None);
@@ -1855,7 +1838,7 @@ impl NormalLaw {
             n,
             active
                 .iter()
-                .map(|(sample, feature, _)| (&sample.weight, feature)),
+                .map(|(sample, feature)| (&sample.weight, feature)),
         );
         let mut gram: Vec<Rat> = self.gram.iter().flatten().cloned().collect();
         law.gram_carry
@@ -1864,7 +1847,7 @@ impl NormalLaw {
         // The chart of H', from the previous chart.
         let features: Vec<(&Rat, &Chart)> = active
             .iter()
-            .map(|(sample, feature, _)| (&sample.weight, feature))
+            .map(|(sample, feature)| (&sample.weight, feature))
             .collect();
         let (chart, refinement) = self.chart.deposited(&law.gram, &features, rule)?;
         law.chart = chart;
@@ -1874,7 +1857,7 @@ impl NormalLaw {
         // covector scale.
         let chart = &law.chart;
         let terms: Vec<(Rat, Chart, Chart, Rat, Rat)> = indexed(active.len(), |t| {
-            let (sample, feature, _) = &active[t];
+            let (sample, feature) = &active[t];
             let covector = integral(&sample.covector);
             let widest = covector
                 .0
@@ -1908,16 +1891,13 @@ impl NormalLaw {
         );
         // a = Σ w ⟨g, D f⟩ and b = Σ w |D f|², each sample's D f read once in the integral chart.
         let reads: Vec<(Rat, Rat)> = indexed(active.len(), |t| {
-            let (sample, feature, beside) = &active[t];
+            let (sample, feature) = &active[t];
             let (moved, denominator) = unit.apply(feature);
             let (covector, covector_denominator) = &terms[t].1;
             let alignment = Rat::new(
                 integer_dot(covector, &moved),
                 covector_denominator * &denominator,
             );
-            if *beside {
-                return Ok((&sample.weight * alignment, Rat::zero()));
-            }
             let squares: BigInt = moved.iter().map(|x| x * x).sum();
             let moves = Rat::new(squares, &denominator * &denominator);
             Ok((&sample.weight * alignment, &sample.weight * moves))
@@ -1958,7 +1938,7 @@ impl NormalLaw {
         rule: &ChartRule,
         at: &mut BudgetedCarry,
     ) -> Result<(Self, Option<ChartReading>), HnnError> {
-        match self.prepare(samples, &[], rule, at)? {
+        match self.prepare(samples, rule, at)? {
             None => Ok((self.clone(), None)),
             Some(prepared) => {
                 let (next, reading) = prepared.stepped(step, at)?;
@@ -2513,9 +2493,10 @@ pub struct FactorStep {
 /// its covectors summed before they reached the loci. The receiving ring its stations read; each
 /// station's read tick (the full ticks its change had run when the station read the ring's anchor);
 /// each tick at which the source moment entered the change; and the most phases one source moment
-/// occupied (the phase-binned counts one injection sums). A refinement of `K` words of `w` ticks
-/// read at `m` stations declares `m` stations at `K·w` and entries at `0, w, …, (K−1)w`; a word read
-/// at its receiving epochs declares one station at each epoch and one entry at `0`.
+/// occupied (the phase-binned counts one injection sums). A word read at its receiving epochs
+/// declares one station at each epoch and one entry at `0` (the retired linear readout's refinement
+/// of `K` words of `w` ticks read at `m` stations declared `m` stations at `K·w` and entries at
+/// `0, w, …, (K−1)w`).
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct Reach {
     pub receiver: usize,
@@ -2585,157 +2566,12 @@ impl Reach {
     }
 }
 
-/// [definition; agent-inferred, September 29] **The receiving bank's reach at a deposit** (module
-/// header, "The bank's learning path"; Lean `HNN/BankFace`): the source ring whose port `E_g` the
-/// bank reads; the bank's returns there (its descent covectors on `E_g`'s outputs, read beside the
-/// logits' samples: [`NormalLaw::prepare`]); the bank chart's gain `κ² = 2 d Σ_m p_m²`
-/// (`hnn::ring::BankChart::gain`); the exterior chart's classes; and each comparison's request, from
-/// which the certificate reads the bank's own curvature along the unit step
-/// ([`BankReach::curvature`]).
-#[derive(Clone, Debug, PartialEq, Eq)]
-pub struct BankReach {
-    pub ring: usize,
-    pub samples: Vec<Sample>,
-    pub gain: Rat,
-    pub classes: usize,
-    pub requests: Vec<BankRequest>,
-}
-
-/// [definition; agent-inferred, September 29] **One request's bank comparisons** ([`BankReach`]):
-/// every placement its candidates share (the request's phases and the locked stations), each with
-/// its rotation onto the receiving ring's storage (the images of the ring's nodes, `hnn::field::Ring::rotate`)
-/// and its feature (its normalized counts); the candidate's placement weight `ν̂(v + 1)`; and each
-/// compared station.
-#[derive(Clone, Debug, PartialEq, Eq)]
-pub struct BankRequest {
-    pub common: Vec<(Vec<usize>, Vec<Rat>)>,
-    pub weight: Rat,
-    pub stations: Vec<BankStation>,
-}
-
-/// [definition; agent-inferred, September 29] **One compared station of the bank** ([`BankReach`]):
-/// its candidate's rotation (node images), the face's normalizer `A₀ = Σ_x A(x)` and the target's
-/// reading `a₀ = A(t) > 0` at the cut, the target class `t`, and the bound `e` on its covector's
-/// rounding to the dyadic face, `|c_x − ĉ_x| ≤ e` for every candidate.
-#[derive(Clone, Debug, PartialEq, Eq)]
-pub struct BankStation {
-    pub images: Vec<usize>,
-    pub total: Rat,
-    pub target: Rat,
-    pub class: usize,
-    pub rounding: Rat,
-}
-
-impl BankReach {
-    /// [proved-derived; implemented-exact, September 29] **The bank's curvature and trust scale along
-    /// a unit step `D` of `E_g`** (module header, "The bank's learning path"; Lean
-    /// `HNN/BankFace.{bank_score_endpoint, bank_score_trust}`). Every candidate's storage moves by
-    /// `δ_x = δ + ν P_j D e_x`, `δ = Σ_c P_c D f_c` over the shared placements, exactly; its readings
-    /// move by `V_x` with `|V_x|² ≤ κ²|δ_x|²` (`resonance_gain`). With
-    /// `Â₂ = κ² Σ_x |δ_x|² = κ²(|A| |δ|² + 2ν⟨δ, P_j D𝟙⟩ + ν² Σ_x |D e_x|²)` and `â₂ = κ²|δ_t|²`, a
-    /// station's score moves along `ηD` by at most `−η a + η² (Â₂/A₀ + (81/8) â₂/a₀)` wherever
-    /// `η² â₂ ≤ a₀/16`: the curvature `C = Σ (2Â₂/A₀ + (81/4) â₂/a₀)` and the trust scale
-    /// `c = max √(16 â₂/a₀)` (at its dyadic ceiling), `ηc ≤ 1`. The returns carry each
-    /// reading's covector at its dyadic face `ĉ_x`, `|c_x − ĉ_x| ≤ e`, so the true first-order
-    /// decrease along `D` is at least the returns' alignment less the **charge**
-    /// `Σ e |Σ_x A′_x| ≤ Σ 2e √(A₀ Â₂)` (`|A′_x| ≤ 2√(A_x) κ|δ_x|`, Cauchy–Schwarz over the candidates;
-    /// Lean `HNN/BankFace.rounded_alignment`). Returned at the certificate's ceilings: the
-    /// curvature, the trust scale and the charge.
-    pub(crate) fn curvature(&self, unit: &IntegralMatrix) -> (Rat, Rat, Rat) {
-        let rows = unit.to_rows();
-        let m = rows.len();
-        let n = rows.first().map_or(0, Vec::len);
-        let columns: Vec<Vec<Rat>> = (0..n)
-            .map(|x| rows.iter().map(|row| row[x].clone()).collect())
-            .collect();
-        let squares: Rat = columns
-            .iter()
-            .map(|column| column.iter().map(|x| x * x).sum::<Rat>())
-            .sum();
-        let ones: Vec<Rat> = rows.iter().map(|row| row.iter().sum()).collect();
-        let rotate = |vector: &[Rat], images: &[usize]| -> Vec<Rat> {
-            let mut rotated = vec![Rat::zero(); vector.len()];
-            for (node, &target) in images.iter().enumerate() {
-                rotated[2 * target] = vector[2 * node].clone();
-                rotated[2 * target + 1] = vector[2 * node + 1].clone();
-            }
-            rotated
-        };
-        let dot = |a: &[Rat], b: &[Rat]| -> Rat { a.iter().zip(b).map(|(x, y)| x * y).sum() };
-        let classes = Rat::from_integer(BigInt::from(self.classes));
-        // Each request reads only its own placements and the unit step: the requests run together
-        // (co-present regions), their terms joined in order.
-        let terms: Vec<(Rat, Rat, Rat)> = self
-            .requests
-            .par_iter()
-            .map(|request| {
-                let (mut curvature, mut scale, mut charge) =
-                    (Rat::zero(), Rat::zero(), Rat::zero());
-                let mut moved = vec![Rat::zero(); m];
-                for (images, feature) in &request.common {
-                    let mut image = vec![Rat::zero(); m];
-                    for (x, count) in feature.iter().enumerate() {
-                        if count.is_zero() {
-                            continue;
-                        }
-                        for (entry, value) in image.iter_mut().zip(&columns[x]) {
-                            *entry += count * value;
-                        }
-                    }
-                    for (entry, value) in moved.iter_mut().zip(rotate(&image, images)) {
-                        *entry += value;
-                    }
-                }
-                let common = dot(&moved, &moved);
-                let nu = &request.weight;
-                for station in &request.stations {
-                    let candidate = rotate(&columns[station.class], &station.images);
-                    let target_move: Vec<Rat> = moved
-                        .iter()
-                        .zip(&candidate)
-                        .map(|(a, b)| a + nu * b)
-                        .collect();
-                    let target = &self.gain * dot(&target_move, &target_move);
-                    let summed = rotate(&ones, &station.images);
-                    let every = &self.gain
-                        * (&classes * &common
-                            + integer(2) * nu * dot(&moved, &summed)
-                            + nu * nu * &squares);
-                    curvature += integer(2) * &every / &station.total
-                        + rat(81, 4) * &target / &station.target;
-                    let trust = root_ceiling(&(integer(16) * &target / &station.target));
-                    if trust > scale {
-                        scale = trust;
-                    }
-                    if station.rounding.is_positive() {
-                        charge += integer(2)
-                            * &station.rounding
-                            * root_ceiling(&ceiling(&(&station.total * &every)));
-                    }
-                }
-                (curvature, scale, charge)
-            })
-            .collect();
-        let (mut curvature, mut scale, mut charge) = (Rat::zero(), Rat::zero(), Rat::zero());
-        for (c, t, g) in terms {
-            curvature += c;
-            if t > scale {
-                scale = t;
-            }
-            charge += g;
-        }
-        (ceiling(&curvature), scale, ceiling(&charge))
-    }
-}
-
 /// [definition; agent-inferred] **One family's certified step at a deposit** (module header, "The
 /// certified step", "The factor families' certified step", "The tightened certificate"): the family
 /// it moves, the step with its alignment `a`, its own curvature `C = ½·κ²·b` and covector scale `c`;
 /// the gain `κ²` read at the rays' ends, and its parts: the output's moves `b` along the whole ray,
 /// the bound `m ≥ √(κ² b)` on its logit move that the joint certificate reads, the readout's
-/// certified spectral bound `‖R‖₂²` and the per-tick amplitude growth `1 + ω`; and the curvature a
-/// comparison beside the logits adds (the receiving bank's, [`BankReach::curvature`]; zero for every
-/// family it does not reach).
+/// certified spectral bound `‖R‖₂²` and the per-tick amplitude growth `1 + ω`.
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct StepReading {
     pub family: Family,
@@ -2745,7 +2581,6 @@ pub struct StepReading {
     pub bound: Rat,
     pub readout: Rat,
     pub amplitude: Rat,
-    pub bank: Rat,
 }
 
 /// [definition; agent-inferred, September 30] **A carried source step's reading**
@@ -3472,7 +3307,8 @@ impl Constitution {
     }
 
     /// The factor families' statistics `h_x` of ring `g`: standing, passive, slices, pair port.
-    pub fn ring_scales(&self, ring: usize) -> [&Rat; 4] {
+    #[cfg(test)]
+    pub(crate) fn ring_scales(&self, ring: usize) -> [&Rat; 4] {
         let material = &self.rings[ring];
         [
             &material.standing_scale,
@@ -3814,7 +3650,7 @@ impl Constitution {
             .ok_or(HnnError::MissingSourcePort { ring })?;
         let rule = self.chart_rule(locus)?;
         let mut at = BudgetedCarry::new(self.lattice(locus)?, self.clock(locus) + 1);
-        let Some(prepared) = law.prepare(samples, &[], &rule, &mut at)? else {
+        let Some(prepared) = law.prepare(samples, &rule, &mut at)? else {
             return Ok(None);
         };
         let alignment = prepared.alignment.clone();
@@ -4169,7 +4005,8 @@ impl Constitution {
     /// reading chart, never published: it is off the lattice, and carries no remainder). Reading it
     /// against `Θ` measures what the carried remainders move at a receiver; with the released
     /// residuals it is the exact accumulation of what reached each locus.
-    pub fn with_remainders(&self) -> Result<Self, HnnError> {
+    #[cfg(test)]
+    pub(crate) fn with_remainders(&self) -> Result<Self, HnnError> {
         let mut exact = self.clone();
         for (locus, array, entry, r) in self.carried_remainders() {
             let ring = match locus {
@@ -4675,14 +4512,12 @@ impl Constitution {
     fn certify_steps(
         &self,
         reach: Option<&Reach>,
-        bank: Option<&BankReach>,
         linear: &[(Locus, LinearLocus, &PreparedStep)],
         factors: &[(Locus, &FactorPrepared)],
     ) -> Result<CertifiedSteps, HnnError> {
         /// A normal law's readings at the certificate's faces: its alignment at its floor, its
-        /// covector scale, feature moves and unit step's Schur norms at their ceilings, (the
-        /// receiving map's only) its unit step's certified spectral norm, and (the source port the
-        /// receiving bank reads) the bank's curvature along its unit step.
+        /// covector scale, feature moves and unit step's Schur norms at their ceilings, and (the
+        /// receiving map's only) its unit step's certified spectral norm.
         struct LinearFace {
             kind: LinearLocus,
             alignment: Rat,
@@ -4690,7 +4525,6 @@ impl Constitution {
             moves: Rat,
             unit: (Rat, Rat),
             norm: Rat,
-            bank: Rat,
         }
         /// A family stepping in the deposit.
         enum Part<'p> {
@@ -4730,19 +4564,6 @@ impl Constitution {
                 }
                 _ => Rat::zero(),
             };
-            // The receiving bank's own curvature along the source port's unit step, and its trust
-            // scale joining the lattice's covector scale (module header, "The bank's learning
-            // path").
-            let (bank_curvature, covector, alignment) = match (kind, bank) {
-                (LinearLocus::SourcePort(g), Some(bank)) if bank.ring == *g => {
-                    let (curvature, trust, charge) = bank.curvature(&prepared.unit);
-                    // The returns' rounding charged against the alignment: a lower bound on the
-                    // true first-order decrease, zero (no step) when the charge takes it all.
-                    let charged = floor(&(&prepared.alignment - &charge)).max(Rat::zero());
-                    (curvature, covector.max(trust), charged)
-                }
-                _ => (Rat::zero(), covector, alignment),
-            };
             if alignment.is_zero() {
                 continue;
             }
@@ -4753,7 +4574,6 @@ impl Constitution {
                 moves: ceiling(&prepared.moves),
                 unit: ceilings(&prepared.unit_norms),
                 norm,
-                bank: bank_curvature,
             };
             parts.push((*locus, Family::Map, Part::Linear(face)));
         }
@@ -5063,38 +4883,27 @@ impl Constitution {
                 Part::Factor(prepared) => (prepared.alignment.clone(), prepared.covector.clone()),
             }
         };
-        // The curvature a comparison beside the logits adds to a family (the receiving bank's, at
-        // the source port it reads; module header, "The bank's learning path"): its own score's
-        // endpoint term along the family's ray, which no other family moves.
-        let beside: Vec<Rat> = parts
-            .iter()
-            .map(|(.., part)| match part {
-                Part::Linear(face) => face.bank.clone(),
-                Part::Factor(_) => Rat::zero(),
-            })
-            .collect();
         // The first steps: each family's own certificate at the current constitution (its curvature
-        // `C = s κ² b` and the bank's beside it, the largest dyadic with `ηC ≤ a` and `ηc ≤ 1`).
+        // `C = s κ² b`, the largest dyadic with `ηC ≤ a` and `ηc ≤ 1`).
         let none = vec![None; parts.len()];
         let first = reading(&none)?;
         let mut steps: Vec<Option<CertifiedStep>> = parts
             .iter()
             .zip(&first)
-            .zip(&beside)
-            .map(|(((.., part), (gain, moves)), beside)| {
+            .map(|((.., part), (gain, moves))| {
                 let (a, c) = alignment(part);
-                CertifiedStep::certify(&a, &(&score * gain * moves + beside), &c)
+                CertifiedStep::certify(&a, &(&score * gain * moves), &c)
             })
             .collect::<Result<_, _>>()?;
         loop {
             let read = reading(&steps)?;
             // Each family's own certificate at the rays' ends: a step it no longer admits is halved.
             let mut changed = false;
-            for ((step, (gain, moves)), beside) in steps.iter_mut().zip(&read).zip(&beside) {
+            for (step, (gain, moves)) in steps.iter_mut().zip(&read) {
                 let certified = step
                     .as_mut()
                     .expect("a positive alignment certifies a step");
-                let curvature = &score * gain * moves + beside;
+                let curvature = &score * gain * moves;
                 if certified.admits(&curvature) {
                     certified.curvature = curvature;
                 } else {
@@ -5125,15 +4934,6 @@ impl Constitution {
                 .iter()
                 .map(|(_, family, _)| *family != Family::Standing)
                 .collect();
-            // The bank's score beside the logits adds its endpoint term `η² C_bank` at the family it
-            // reaches (Lean `HNN/BankFace.joint_descends_beside`).
-            let beside_term: Rat = certified
-                .iter()
-                .zip(&beside)
-                .zip(&realized)
-                .filter(|(_, realized)| **realized)
-                .map(|((step, beside), _)| &step.step * &step.step * beside)
-                .sum();
             let joint = JointReading::read(
                 &score,
                 certified
@@ -5142,8 +4942,7 @@ impl Constitution {
                     .zip(&realized)
                     .filter(|(_, realized)| **realized)
                     .map(|((step, bound), _)| (&step.step, &step.alignment, bound)),
-            )
-            .beside(&beside_term);
+            );
             if !joint.holds() {
                 // The family whose halving gains the joint certificate most,
                 // `½ η (s m (2 Σ η m − ½ η m) − a)`; the first in the deposit's order at a tie.
@@ -5161,11 +4960,9 @@ impl Constitution {
                         continue;
                     }
                     let moved = &step.step * bound;
-                    // Halving also takes three quarters of its beside term `η² C_bank`.
                     let gained = &step.step
                         * (&score * bound * (&two * &total - &moved / &two) - &step.alignment)
-                        / &two
-                        + rat(3, 4) * &step.step * &step.step * &beside[index];
+                        / &two;
                     if worst.as_ref().is_none_or(|(_, kept)| gained > *kept) {
                         worst = Some((index, gained));
                     }
@@ -5181,8 +4978,7 @@ impl Constitution {
                 .zip(&steps)
                 .zip(read)
                 .zip(bounds)
-                .zip(beside)
-                .map(|(((((locus, family, _), step), (gain, moves)), bound), bank)| {
+                .map(|((((locus, family, _), step), (gain, moves)), bound)| {
                     (
                         (*locus, *family),
                         StepReading {
@@ -5193,7 +4989,6 @@ impl Constitution {
                             bound,
                             readout: readout.clone(),
                             amplitude: amplitude.clone(),
-                            bank,
                         },
                     )
                 })
@@ -5220,20 +5015,6 @@ impl Constitution {
             return Err(HnnError::StaleDeposit {
                 staged: deposit.commit(),
                 published: self.commit,
-            });
-        }
-        // The receiving bank's returns join the source port's window (module header, "The bank's
-        // learning path"): a bank reach with no window there would be dropped, so it is refused.
-        if let Some(bank) = deposit.bank()
-            && !deposit
-                .linear()
-                .iter()
-                .any(|step| step.locus == LinearLocus::SourcePort(bank.ring))
-        {
-            return Err(HnnError::Shape {
-                what: "the receiving bank's returns join the source port's window",
-                expected: 1,
-                found: 0,
             });
         }
         let mut next = self.clone();
@@ -5317,7 +5098,7 @@ impl Constitution {
         let prepared: Vec<Result<Prepared, (usize, HnnError)>> = regions
             .par_iter_mut()
             .map(|(locus, steps, material, carries)| {
-                self.prepare_at(*locus, steps, material.as_mut(), carries, deposit.bank())
+                self.prepare_at(*locus, steps, material.as_mut(), carries)
             })
             .collect();
         let mut first: Option<(usize, HnnError)> = None;
@@ -5361,7 +5142,7 @@ impl Constitution {
                         .map(move |prepared| (*locus, prepared))
                 })
                 .collect();
-            self.certify_steps(deposit.reach(), deposit.bank(), &linear, &factors)?
+            self.certify_steps(deposit.reach(), &linear, &factors)?
         };
         let mut certified = certified;
         // The standing's fold (module header, "Within a lobe", "At a node"): each standing
@@ -5777,12 +5558,14 @@ impl Constitution {
     /// **The field's fixed nodes** (module header, "The founding"): the slices `(r, ρ)` of the lock
     /// chart's singular components, founded on their node, where a combination of the contrasts is
     /// fixed by the chart's kernel whatever the standings.
-    pub fn fixed_nodes(&self) -> &[(usize, usize)] {
+    #[cfg(test)]
+    pub(crate) fn fixed_nodes(&self) -> &[(usize, usize)] {
         &self.fixed
     }
 
     /// **The standing contrasts** `Δ_r = (M q)_r` of every ring, read through the lock chart.
-    pub fn standing_contrasts(&self) -> Vec<Vec<Rat>> {
+    #[cfg(test)]
+    pub(crate) fn standing_contrasts(&self) -> Vec<Vec<Rat>> {
         let standings: Vec<&[Rat]> = self
             .rings
             .iter()
@@ -5801,7 +5584,6 @@ impl Constitution {
         steps: &[(usize, LocusStep<'_>)],
         mut material: Option<&mut LocusMaterial<'_>>,
         carries: &mut Carries,
-        bank: Option<&BankReach>,
     ) -> Result<Prepared, (usize, HnnError)> {
         let mut prepared = Prepared {
             stroke: None,
@@ -5828,14 +5610,7 @@ impl Constitution {
                         .map_err(refused)?;
                     let at = self.stroke(locus, &mut prepared.stroke).map_err(refused)?;
                     let rule = self.chart_rule(locus).map_err(refused)?;
-                    // The receiving bank's returns at the source port it reads, beside the logits'.
-                    let beside: &[Sample] = match (step.locus, bank) {
-                        (LinearLocus::SourcePort(g), Some(bank)) if bank.ring == g => &bank.samples,
-                        _ => &[],
-                    };
-                    let step_prepared = law
-                        .prepare(&step.samples, beside, &rule, at)
-                        .map_err(refused)?;
+                    let step_prepared = law.prepare(&step.samples, &rule, at).map_err(refused)?;
                     prepared.linear = Some((*index, step.locus, step_prepared));
                 }
                 LocusStep::Factor(step) => {

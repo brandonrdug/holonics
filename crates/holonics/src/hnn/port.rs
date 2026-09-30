@@ -72,7 +72,7 @@ use crate::compression::{CompressionError, ResonanceSplit, resonance_split};
 use crate::hnn::HnnError;
 use crate::hnn::chart::{ChartReading, Remainders, carry};
 use crate::hnn::constitution::{
-    BankReach, DepositReading, FactorStep, LandmarkStep, Lattice, LinearStep, Locus, Reach,
+    DepositReading, FactorStep, LandmarkStep, Lattice, LinearStep, Locus, Reach,
 };
 use crate::hnn::field::{Current, Field, Ring};
 use crate::hnn::keys::KeyLocation;
@@ -454,7 +454,7 @@ pub struct Pullback {
 /// at: the linear loci's windows, the factor families' steps and the receiving parametron's
 /// landmark steps (the landmark tree), one per reached comparison in cell order; and its reach
 /// (`hnn::constitution::Reach`: the stations, re-entries and phases its covectors summed), which
-/// the certified step reads. Only a compare or a refinement builds one.
+/// the certified step reads. Only a compare builds one (`hnn::reference`).
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct Deposit {
     commit: u64,
@@ -464,7 +464,6 @@ pub struct Deposit {
     receiving: Vec<ReceivingStep>,
     reached: Vec<Locus>,
     reach: Option<Reach>,
-    bank: Option<BankReach>,
 }
 
 impl Deposit {
@@ -482,24 +481,7 @@ impl Deposit {
             receiving: Vec::new(),
             reached,
             reach: None,
-            bank: None,
         }
-    }
-
-    /// [definition; agent-inferred, September 29] **The deposit with the receiving bank's reach**
-    /// (`hnn::constitution`, "The bank's learning path"): its returns at the source port the bank
-    /// reads, beside the logits' samples there, and the comparisons whose curvature the certified
-    /// step reads.
-    pub(crate) fn with_bank(self, bank: BankReach) -> Self {
-        Self {
-            bank: Some(bank),
-            ..self
-        }
-    }
-
-    /// The receiving bank's reach, when its comparison is deposited.
-    pub fn bank(&self) -> Option<&BankReach> {
-        self.bank.as_ref()
     }
 
     /// The deposit with its reach (the certified step's reading of its covectors' sums).
@@ -795,12 +777,13 @@ pub struct ResonatorPullback {
     pub energy: [Rat; 4],
 }
 
-/// [definition; agent-inferred] **A covector on a word's change** (U6's native generation,
-/// `hnn::prediction`; `hnn::word`'s "Continuing motion within a refinement"): one covector per
-/// part of the change a continuing word opens on, in the change's own shape (the storage waves per
-/// ring, the arriving waves per contact `[at from, at to]`, the contact states `[u, w]`, and each
-/// declared resonator's state `[u, w]`). A continuing word's return reads the covector on its end
-/// change (the next word's opening covector) and returns the covector on its opening change.
+/// [definition; agent-inferred] **A covector on a word's change** (U6's native generation, whose
+/// linear readout consumed it until its retirement, batch H; `hnn::word`'s "Continuing motion
+/// within a refinement"): one covector per part of the change a continuing word opens on, in the
+/// change's own shape (the storage waves per ring, the arriving waves per contact
+/// `[at from, at to]`, the contact states `[u, w]`, and each declared resonator's state `[u, w]`). A
+/// continuing word's return reads the covector on its end change (the next word's opening covector)
+/// and returns the covector on its opening change.
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct ChangeCovector {
     pub storage: Vec<Vec<Rat>>,
@@ -844,13 +827,14 @@ impl<'c> Word<'c> {
         reverse(&self, covector, map, lift, phases)
     }
 
-    /// [definition; agent-inferred] **A continuing word's return** (U6's native generation,
-    /// `hnn::prediction`): the same reverse sweep over the word's own per-tick waves, the transpose
-    /// of the linear map each tick executed at its fixed operands, read from two sources. `anchors`
-    /// holds, per junction step, the covector on the receiving ring `receiving`'s anchor at that
-    /// step (a section's station reads, already pulled back through its receiving map and phase
-    /// bindings); `end` is the covector on the change the word ends with, which a word that ended
-    /// at a last junction does not continue (refused there). It returns the word's return (its
+    /// [definition; agent-inferred] **A continuing word's return** (U6's native generation; its
+    /// consumer, the linear readout, retired September 30, batch H): the same reverse sweep over
+    /// the word's own per-tick waves, the transpose of the linear map each tick executed at its
+    /// fixed operands, read from two sources. `anchors` holds, per junction step, the covector on
+    /// the receiving ring `receiving`'s anchor at that step (a section's station reads, already
+    /// pulled back through its receiving map and phase bindings); `end` is the covector on the
+    /// change the word ends with, which a word that ended at a last junction does not continue
+    /// (refused there). It returns the word's return (its
     /// `reads` empty: the caller holds the stations' reads) and the covector on the word's opening
     /// change, which the previous word of the refinement reads as its `end`. The word is consumed
     /// (guard 2).
@@ -1004,7 +988,7 @@ fn reverse(
 /// **The reverse sweep** over a word's own per-tick waves (module header, "The word's return"):
 /// from the covector on the receiving ring's anchor at each junction step (`read_covector`, carried
 /// on the transients' lattice as it enters) and, for a word that did not end at a last junction,
-/// the covector on its end change (`end`, a continuing word's; `hnn::prediction`). Every step of a
+/// the covector on its end change (`end`, a continuing word's). Every step of a
 /// word that ended at its last junction but that last one reverses its element, loaded resonator
 /// and transit; every step of a continuing word does. Returns the word's return (its `reads`
 /// empty) and the covector on the word's opening change.

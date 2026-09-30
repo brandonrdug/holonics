@@ -740,7 +740,8 @@ impl ActiveAddress {
     }
 
     /// **A register of depth `D` with a declared reader**, before any cell.
-    pub fn of_reader(depth: usize, reader: LetterReader) -> Self {
+    #[cfg(test)]
+    pub(crate) fn of_reader(depth: usize, reader: LetterReader) -> Self {
         Self {
             letters: vec![Letter::Boundary; depth],
             reader,
@@ -842,9 +843,12 @@ impl ActiveAddress {
 }
 
 /// [definition; agent-inferred] **The field's declared letter family** (campaign 2, decided on the
-/// development cells by `hnn_landmark`'s harness, the development harness): the receiving letters every
-/// receiver's tree is addressed by. The harness's receipt (the notebook README's `hnn_landmark`
-/// row) chose the cell-only family: at the horizon bounds no clock-only family and no contact
+/// development cells by the development harness, the notebook's retired
+/// [`hnn_landmark`](https://github.com/brandonrdug/holonics/blob/d4596102/research/notebook/hnn_design/hnn_landmark.rs)):
+/// the receiving letters every receiver's tree is addressed by. The harness's receipt (the notebook
+/// [README](https://github.com/brandonrdug/holonics/blob/d4596102/research/notebook/hnn_design/README.md)
+/// at that commit, its `hnn_landmark` row) chose the cell-only family: at the horizon bounds no
+/// clock-only family and no contact
 /// family coded below the constant-slot control of its slots by its description charge (every
 /// `Δ_letters` decided positive), so no letter carried information the preceding cells do not.
 pub fn letter_family(_field: &Field) -> FeatureFamily {
