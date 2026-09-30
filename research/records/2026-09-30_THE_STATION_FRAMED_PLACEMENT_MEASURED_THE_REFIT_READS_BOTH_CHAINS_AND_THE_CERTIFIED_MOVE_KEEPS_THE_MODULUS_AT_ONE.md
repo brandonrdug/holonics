@@ -323,9 +323,10 @@ bound, symmetry, translation and the lossless case, and the one-way law's backwa
 
 Gates at `fb871bb5`, unchanged since in the library and the Lean: `cargo check --workspace
 --all-targets` clean; `cargo test -p holonics --lib` 974 passed; `bash tools/lean_check.sh Holonics
-HolonicsResearch` 10,251 jobs, no `sorry`. The card suite (`holonics-cuda`) was not run from the
-isolated worktree; the card crate did not change, and at modulus one, the only modulus the card
-accepts, the new law is the old one. The primary runs it after the merge.
+HolonicsResearch` 10,251 jobs, no `sorry`. The card suite at `ccbb2dd5`, alone on the card under
+the main checkout's card lock (`flock … cargo test -p holonics-cuda -- --include-ignored
+--test-threads=1`): 32 passed in 62,492 ms. The card crate did not change; at modulus one, the only
+modulus the card accepts, the new law is the old one.
 
 The receipts (`2026-09-30_THE_STATION_FRAMED_PLACEMENT_receipts/`): the fit's log and export, both
 native traces and their counts, both re-entry traces with summaries, distances and float prototypes,
