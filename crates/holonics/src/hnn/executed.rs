@@ -33,11 +33,18 @@
 //! **The composition descended** [agent-inferred]. Each open station's class and threshold join in
 //! one max comparison, in nats: `f_(j) = max(max_(x≠t) ln(a_x/a_t), −ln a_t)`, which is negative
 //! exactly when both hold; the declared comparison of a batch is `F = Σ_(contexts, open j) (f_j)_+`.
-//! Along the machine's own trajectory `F = 0` makes every open station's top its target and every
-//! station eligible, so every lock is correct (the order holds) and the section is released whole:
-//! class and threshold at every open station of every refinement the release executes are
-//! sufficient for order and section, which are read exactly beside `F`, not descended separately
-//! (an order comparison has no branch where it matters most, when no correct station is eligible).
+//! Class and threshold holding strictly at every open station of every refinement the release
+//! executes make every station's top its target and every station eligible, so every lock is correct
+//! (the order holds) and the section is released whole: they are sufficient for order and section,
+//! which are read exactly beside `F`, not descended separately (an order comparison has no branch
+//! where it matters most, when no correct station is eligible). **`F = 0` does not supply them**
+//! (the two counts' #62 item 4): the hinge's zero set is the closed predicate set, every candidate tie
+//! above threshold included, where the class fails and the release holds (Lean
+//! `HNN/ExecutedComparison.{hinge_zero_iff, hinge_zero_at_tie}`), and a right decision leaves `F`
+//! with no covector (`hinge_right_leaves`). Step 1b's candidate, the lock face read at the release's
+//! decisions, is pinned in
+//! [its record](../../../../research/records/2026-09-30_STEP_1B_THE_CANDIDATE_COMPARISON_PINNED_BEFORE_ITS_RUNS.md)
+//! with its Lean (`HNN/ExecutedComparison` §7) and is not built here.
 //! `F` is one scalar of the whole batch: per-comparison descent is incoherent on a shared locus
 //! (two stations can require opposite moves of one entry of `E`; Astra's challenge, the diagnosis
 //! §4), and a composition's descent is not.
