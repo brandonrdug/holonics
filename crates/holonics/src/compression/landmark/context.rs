@@ -94,15 +94,12 @@
 //! `Compression/Landmark/Context/Address.bundle_code_injective`); in a tree each typed letter is a child's key under
 //! its parent, `0` for the boundary and `1 + value` otherwise.
 //!
-//! [definition; agent-inferred] **A section's slots, read once** ([`sections`]): on a curated
-//! stream whose section letters open its parts (`B + C·k + c`), a tick's bundle carries the slots of
-//! the part it lies in, the channel (and optionally the kind), read at the part's letter and carried
-//! by every bundle of the part ([`Sections`]); the curated source's typed address.
-//!
-//! [definition; agent-inferred] **A span located from a reading part** ([`spans`]): the joint
-//! address across two ports, the longest suffix of a part (a response) that recurs in a closed span
-//! on another port (its request) and the span's cell after it ([`SpanReading`], [`Located`]); the
-//! admitted receivers read it (`receiver::population::admitted`).
+//! [definition; agent-inferred] **The section chart** ([`sections`]): a curated stream whose
+//! section letters open its parts (`B + C·k + c`), each letter read as its kind and channel
+//! ([`SectionChart`]); the exterior reads its cuts on it. Its typed address (a tick's bundle carrying
+//! its part's slots, `Sections`), the located spans the admitted receivers read (`spans`) and the
+//! native standing codecs (`checkpoint`, `passage_checkpoint`) were retired September 30 with the
+//! byte-tree text line (history at `f5fd8f3b`).
 //!
 //! [definition; agent-inferred] **The declared family and its finite partitions** ([`LetterFamily`],
 //! the slots' alphabets; the HNN's readers of them, `hnn::receiving::{Feature, FeatureFamily}`),
@@ -632,14 +629,8 @@ use crate::receiver::face::{GrainRefusal, grain_exponent};
 
 pub mod baseline;
 pub mod sections;
-pub mod spans;
 
-pub use sections::{Section, SectionChart, SectionSlots, Sections};
-pub use spans::{Located, SpanReading};
-mod checkpoint;
-pub use checkpoint::StandingCodecError;
-mod passage_checkpoint;
-pub use passage_checkpoint::PassageCodecError;
+pub use sections::{Section, SectionChart};
 
 // -------------------------------------------------------------------------------------------
 // the refusals
@@ -3593,32 +3584,6 @@ impl Landmarks {
         check(&self.law.declaration, address, class)?;
         let reads = self.law.reads(&self.nodes, address, class);
         Ok(self.law.reading(&self.nodes, &reads))
-    }
-
-    /// **Score one class digit by digit** at an address at the current standing, with nothing
-    /// deposited: [`Self::receive_digits`]'s reading and each opened digit's dyadic cell, digit,
-    /// executed digit-0 numerator and certificate (its increment zero: nothing is deposited). The
-    /// admitted receivers read a located class's face within the bytes from it
-    /// (`receiver::population::admitted`).
-    pub fn score_digits(
-        &self,
-        address: &[Letter],
-        class: usize,
-    ) -> Result<DigitsReading, ContextError> {
-        check(&self.law.declaration, address, class)?;
-        let reads = self.law.reads(&self.nodes, address, class);
-        let reading = self.law.reading(&self.nodes, &reads);
-        let digits = reads
-            .iter()
-            .map(|digit| DigitReading {
-                dyadic: digit.dyadic,
-                symbol: digit.symbol,
-                split: digit.face,
-                certificate: self.law.digit_certificate(&self.nodes, digit),
-                increment: 0,
-            })
-            .collect();
-        Ok(DigitsReading { reading, digits })
     }
 
     /// **The opened paths of one class** at an address, with their executed lattice faces: per

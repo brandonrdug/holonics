@@ -51,7 +51,7 @@ impl Family for Scripted {
     fn likelihood(&self) -> Likelihood {
         Likelihood::Exact(self.likelihood.clone())
     }
-    fn readout(&self) -> Readout<'_> {
+    fn readout(&self) -> Readout {
         Readout::Keys(super::KeyReadout {
             spaces: Vec::new(),
             survivors: Vec::new(),

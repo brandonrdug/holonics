@@ -268,6 +268,56 @@ them from here.
   simplex never certifies a draw: every key is held. F5's numerical health (radius, robust count,
   operator bound, contraction) is still a missing term.
 
+<a id="the-retired-byte-tree-text-line"></a>
+
+## The retired byte-tree text line
+
+[definition] THE_REBUILD U6's order (item C.5) retired the byte-tree text line from
+`receiver::population` and `compression::landmark::context` on September 30 (history at
+[`f5fd8f3b`](https://github.com/brandonrdug/holonics/tree/f5fd8f3b); the
+[antipattern record](../research/records/2026-09-29_ANTIPATTERN_CATERED_MACHINERY_A_TASKS_SOLUTION_ROUTINE_NEVER_STANDS_IN_FOR_LEARNING.md),
+instance 3). Its catered layers carry no law forward: the depth-limited context window read as a
+family (`TreeFamily`, with its address per aeon and its curated typed address `Sections`), the part
+clock's sentence counter (`boundary`), and the copy stage with its located span (`admitted`,
+`context::spans`: the longest recurring suffix). The laws the line stated, and where each is kept:
+- [proved-derived; formal-checked] **The staged face** (the boundary egg and the admitted
+  receivers): `q_t(c) = h_t(σ c) · r_t(c)` is a face, and its code is the stage's code plus the
+  conditioned code (Lean `Compression/Landmark/Context/Composition.{stagedFace_nonneg,
+  stagedFace_sum_one, staged_chain_rule, staged_code}`). The hazard's and the copy stage's faces are
+  KT faces over a declared partition (`Tree.{ktFace, ktFace_pos, ktFace_sum}`).
+- [proved-derived; formal-checked] **The hazard's learned partition** was the merge law read on the
+  hazard's cells: a priced merge adopted only where the complete code falls (Lean
+  `Merge.{merge_cost_mass_iff, restaurant_merge_ratio}`; `receiver::population::merge::Blocks`,
+  which stays).
+- [definition] **The release of a population.** The release view copies the scored face,
+  `P_release(c | request, Θ) = P_scored(c | request, Θ)` for every class, the stopping class
+  included. The family draw reads the mixture as the marginal of a once-chosen family and its
+  whole future path, `Σ_f w_f P_f(y) = P_population(y)` (Lean `Population.population_mixture`): a
+  family drawn once from the posterior enclosure by the certified draw (`receiver::release::draw`,
+  which stays) is `Unresolved` where the enclosure leaves it plural, so the released submeasure
+  proves no equality of full distributions. A response is one certified draw a cell under either
+  law; it stops at the first drawn section letter, which is emitted, and a byte drawn when the
+  aperture keeps no room for the stop is not emitted (`NoContinuationBridges`). The exterior text
+  chart's square is `D(UTF8(s)) = s` and `UTF8(s ◦ c) = UTF8(s) ◦ UTF8(c)`.
+- [definition] **A face's family provenance**: `q(c) = Σ_f w_f P_f(c)`, each family's share
+  enclosed by the outward bounds of `w_f P_f(c)` (a dead family's is zero). The mixture attributes
+  mass to families only: the producing key and the causal source stay missing terms.
+- [definition] **A partition's reading**: the passage's cells declared into parts, each part's
+  population code `Σ_(t∈P_j) (−log₂ W_(t+1) + log₂ W_t)` and each family's
+  `−log₂ ∏_(t∈P_j) P_f(x_t | past)`, the parts summing to the passage's codes (the telescope of
+  `Population.population_mixture`). A receipt, never a record.
+- [definition] **A future branch and a native checkpoint** are consequences of the retention law
+  ([objects §8](ELEMENTARY_OBJECTS.md#8-deposition); Lean `Foundation/Standing`), not new laws: a
+  branch continues each family's contemporary constitution, `face(branch H) = face(H)`, and never
+  reconstructs by replay; an exact codec satisfies `D(E(Θ)) = Θ`, `face(D(E(Θ))) = face(Θ)` and
+  `E(receive(D(E(Θ)), x)) = E(receive(Θ, x))`.
+- [definition] **The planned incidence and the present retention** (a request's relation planned
+  before its target part, a port's run held in its aeon) were the admitted receivers' plumbing and
+  leave with them. Dataset roles stay exterior codec information (the notebook's `exterior.rs`).
+
+The atlas keeps each expression with its history owner (`receiver.population-*`,
+`context.span-located`, `receiver.native-standing-checkpoint`, `receiver.text-boundary-square`).
+
 ## A displayed body is a cut; its plates can be continuing bodies
 
 [definition] A rendered frame is a present spatial/receiving cut of a world-tube and its

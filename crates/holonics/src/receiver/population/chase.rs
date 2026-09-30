@@ -243,7 +243,7 @@ impl Family for ChaseFamily {
     }
 
     /// The candidate as the one surviving key of its family's space.
-    fn readout(&self) -> Readout<'_> {
+    fn readout(&self) -> Readout {
         Readout::Keys(KeyReadout {
             spaces: vec![self.candidates],
             survivors: vec![vec![vec![self.index as u64]]],

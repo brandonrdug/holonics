@@ -51,39 +51,23 @@
 //! blocks before and after, every accepted merge with its gain enclosed, the pairs left undecided,
 //! and the likelihood's and the description's code before and after.
 //!
-//! [definition; agent-inferred] **The hazard's learned partition** ([`learn_hazard_partition`]; the
-//! boundary egg's `HazardPartition`), decided on the cells it is given (the development cells only):
-//! the part clock reads them, the hazard counts every fine cell (a port's channel with its last
-//! byte's value, or after a sentence close its kind, phase and carry classes), then
-//! 1. **the last-byte classes**: the byte values met on the declared `Other` branch are items, the
-//!    channels their lanes, one group; the learned classes are adopted when their complete code
-//!    (the development code under them plus their restaurant description) is below the declared
-//!    classes' code (the declared classes are the sweep's law, charged there). A value never met is
-//!    classed with the block of most values (the restaurant's most probable seating, `m/(N + α)`);
-//! 2. **the shared counts**: the partition's cells are items, each group one rest (a cell read
-//!    without its channel), one lane: a port's cell merged into another port's shares its counts
-//!    (the thin human port's with the agent's). Adopted when the complete code falls below the
-//!    first stage's.
-//!
-//! The receipt ([`PartitionReceipt`]) reads the cells before and after each stage, the codes and the
-//! description charged, and the frozen standing's species (the learned cells whose faces agree at
-//! the end of the cells: a release, which would change no face).
+//! [definition] **The hazard's learned partition** (`learn_hazard_partition`, the boundary egg's
+//! last-byte classes and shared port counts learned by these merges) was retired September 30 with
+//! the byte-tree text line (history at `f5fd8f3b`); the merge law it read stays here and in Lean.
 //!
 //! [definition] The computational object is the helical pair interaction, read here as the
 //! receiver's cells and their merges. Of the winding guide's six general objects this owner touches
-//! **faces and placement** (the cells of a partition and their faces), the **tower thread** (a merge
-//! is a coarsening: members restrict to their block, a split refines back) and, through the part
-//! clock's port, the **helix** (the phase and the carry a cell is read at); the pair, the cell
-//! holonomy and the tube stay attached through the trees' and the clock's owners.
+//! **faces and placement** (the cells of a partition and their faces) and the **tower thread** (a
+//! merge is a coarsening: members restrict to their block, a split refines back); the helix, the
+//! pair, the cell holonomy and the tube stay attached through the owners whose cells it reads.
 
-use std::collections::{BTreeMap, BTreeSet};
+use std::collections::BTreeMap;
 
 use num_bigint::{BigInt, BigUint};
 use num_traits::{One, Zero};
 
-use super::boundary::{BYTE_VALUES, HazardCell, HazardPartition, HazardRest, PartClock};
 use super::{PopulationError, refuse};
-use crate::compression::landmark::context::{ProductBound, SectionChart, ratio_code_length};
+use crate::compression::landmark::context::{ProductBound, ratio_code_length};
 use crate::ratio::Rat;
 use crate::ratio::algebraic::{ExactInterval, LOG_OCTAVES, interval_sum};
 
@@ -514,215 +498,6 @@ impl Blocks {
             description: [description_before, self.description_bits()?],
         })
     }
-}
-
-/// [definition] **The hazard's learned partition's receipt** (module header).
-#[derive(Clone, Debug, PartialEq, Eq)]
-pub struct PartitionReceipt {
-    /// The hazard's deposits read, and the fine cells met.
-    pub deposits: u64,
-    pub fine_cells: usize,
-    /// The declared partition's cells met and its code on the cells (`−log₂ W`).
-    pub declared_cells: usize,
-    pub declared_code: ExactInterval,
-    /// The last-byte values met on the `Other` branch, and the first stage's learning; its classes
-    /// adopted or not, the partition's cells and code after it.
-    pub values_met: usize,
-    pub classes: MergeReceipt,
-    pub classes_adopted: bool,
-    pub classes_cells: usize,
-    pub classes_code: ExactInterval,
-    /// The second stage's learning (the shared counts), its partition and its code, adopted or not.
-    pub shares: MergeReceipt,
-    pub shares_adopted: bool,
-    pub shared: HazardPartition,
-    pub shared_code: ExactInterval,
-    /// The learned partition's cells met, its code on the cells, and its description charged (the
-    /// adopted stages' restaurant codes).
-    pub learned_cells: usize,
-    pub learned_code: ExactInterval,
-    pub description: ExactInterval,
-    /// The frozen standing's species: the learned cells whose faces agree (a release).
-    pub species: usize,
-}
-
-/// `−log₂ W` of a hazard's cells' counts, enclosed.
-fn hazard_code(
-    tables: &mut KtTables,
-    counts: &BTreeMap<HazardCell, [u64; 2]>,
-) -> Result<ExactInterval, PopulationError> {
-    let (mut numerator, mut denominator) = (ONE, ONE);
-    for pair in counts.values() {
-        let (n, d) = tables.mass(pair);
-        numerator = times(numerator, n);
-        denominator = times(denominator, d);
-    }
-    Ok(negated(&log_ratio(numerator, denominator)?))
-}
-
-/// The fine counts pooled by a partition.
-fn pooled_by(
-    fine: &BTreeMap<HazardCell, [u64; 2]>,
-    partition: &HazardPartition,
-) -> BTreeMap<HazardCell, [u64; 2]> {
-    let mut counts: BTreeMap<HazardCell, [u64; 2]> = BTreeMap::new();
-    for (cell, pair) in fine {
-        let pooled = counts.entry(partition.coarse(cell)).or_insert([0, 0]);
-        pooled[0] += pair[0];
-        pooled[1] += pair[1];
-    }
-    counts
-}
-
-/// **Learn the hazard's partition from the cells** (module header): the part clock reads them, the
-/// hazard counts every fine cell, then the last-byte classes and the shared counts, each adopted
-/// only where its complete code falls. Nothing else reads the cells.
-pub fn learn_hazard_partition(
-    chart: SectionChart,
-    cells: &[usize],
-) -> Result<(HazardPartition, PartitionReceipt), PopulationError> {
-    let alphabet = chart.alphabet();
-    let mut clock = PartClock::new(chart);
-    let mut hazard = super::boundary::Hazard::with_partition(HazardPartition::finest());
-    let mut deposits = 0;
-    for &cell in cells {
-        if cell >= alphabet {
-            return Err(PopulationError::CellOutside { cell, alphabet });
-        }
-        let port = clock.port();
-        if port.section.is_some() {
-            deposits += 1;
-        }
-        hazard.deposit(&port, chart.section(cell).is_some());
-        clock.advance(cell);
-    }
-    let fine = hazard.fine_counts().clone();
-    let mut tables = KtTables::new(2)?;
-    let declared = HazardPartition::declared();
-    let declared_counts = pooled_by(&fine, &declared);
-    let declared_code = hazard_code(&mut tables, &declared_counts)?;
-    let declared_cells = declared_counts.len();
-
-    // 1. The last-byte classes: the values met on the `Other` branch, the channels as lanes.
-    let channels = chart.channels();
-    let mut values: BTreeMap<usize, Vec<Vec<u64>>> = BTreeMap::new();
-    for (cell, pair) in &fine {
-        if let HazardRest::Other { class } = cell.rest {
-            values
-                .entry(class)
-                .or_insert_with(|| vec![vec![0, 0]; channels])[cell.channel] = pair.to_vec();
-        }
-    }
-    let met: Vec<usize> = values.keys().copied().collect();
-    let items = values
-        .into_values()
-        .map(|counts| Item { group: 0, counts })
-        .collect();
-    let mut blocks = Blocks::new(2, channels, items)?;
-    let classes_receipt = blocks.learn()?;
-    let learned_blocks = blocks.blocks();
-    let default = learned_blocks
-        .iter()
-        .enumerate()
-        .max_by(|(i, x), (j, y)| x.len().cmp(&y.len()).then(j.cmp(i)))
-        .map_or(0, |(index, _)| index);
-    let mut classes = vec![default; BYTE_VALUES];
-    for (index, members) in learned_blocks.iter().enumerate() {
-        for &item in members {
-            classes[met[item]] = index;
-        }
-    }
-    let first = HazardPartition::learned(classes, BTreeMap::new())?;
-    let first_counts = pooled_by(&fine, &first);
-    let first_code = hazard_code(&mut tables, &first_counts)?;
-    let classes_complete = add(&first_code, &classes_receipt.description[1])?;
-    let classes_adopted = classes_complete.upper < declared_code.lower;
-    let (base, base_counts, base_code) = if classes_adopted {
-        (first, first_counts, first_code)
-    } else {
-        (declared, declared_counts, declared_code.clone())
-    };
-    let (classes_cells, classes_code) = (base_counts.len(), base_code.clone());
-
-    // 2. The shared counts: the base partition's cells, grouped by their rest, one lane.
-    let rests: Vec<HazardRest> = base_counts
-        .keys()
-        .map(|cell| cell.rest)
-        .collect::<BTreeSet<_>>()
-        .into_iter()
-        .collect();
-    let cells_of: Vec<HazardCell> = base_counts.keys().copied().collect();
-    let items = base_counts
-        .iter()
-        .map(|(cell, pair)| Item {
-            group: rests.binary_search(&cell.rest).unwrap_or(0),
-            counts: vec![pair.to_vec()],
-        })
-        .collect();
-    let mut shared = Blocks::new(2, 1, items)?;
-    let shares_receipt = shared.learn()?;
-    let mut shares: BTreeMap<HazardRest, Vec<usize>> = BTreeMap::new();
-    for members in shared.blocks() {
-        if members.len() < 2 {
-            continue;
-        }
-        let rest = cells_of[members[0]].rest;
-        let keep = members
-            .iter()
-            .map(|&item| cells_of[item].channel)
-            .min()
-            .unwrap_or(0);
-        let map = shares
-            .entry(rest)
-            .or_insert_with(|| (0..channels).collect());
-        for &item in &members {
-            map[cells_of[item].channel] = keep;
-        }
-    }
-    let second = HazardPartition::learned(base.classes().to_vec(), shares)?;
-    let second_counts = pooled_by(&fine, &second);
-    let second_code = hazard_code(&mut tables, &second_counts)?;
-    let shares_complete = add(&second_code, &shares_receipt.description[1])?;
-    let shares_adopted = shares_complete.upper < base_code.lower;
-    let mut description = zero_interval();
-    if classes_adopted {
-        description = add(&description, &classes_receipt.description[1])?;
-    }
-    let (shared, shared_code) = (second.clone(), second_code.clone());
-    let (partition, counts, code) = if shares_adopted {
-        description = add(&description, &shares_receipt.description[1])?;
-        (second, second_counts, second_code)
-    } else {
-        (base, base_counts, base_code)
-    };
-    let items = counts
-        .values()
-        .map(|pair| Item {
-            group: 0,
-            counts: vec![pair.to_vec()],
-        })
-        .collect();
-    let species = Blocks::new(2, 1, items)?.species().len();
-    let receipt = PartitionReceipt {
-        deposits,
-        fine_cells: fine.len(),
-        declared_cells,
-        declared_code,
-        values_met: met.len(),
-        classes: classes_receipt,
-        classes_adopted,
-        classes_cells,
-        classes_code,
-        shares: shares_receipt,
-        shares_adopted,
-        shared,
-        shared_code,
-        learned_cells: counts.len(),
-        learned_code: code,
-        description,
-        species,
-    };
-    Ok((partition, receipt))
 }
 
 #[cfg(test)]

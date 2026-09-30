@@ -693,7 +693,7 @@ impl Family for DormantFamily {
         Likelihood::Enclosed(self.passage)
     }
 
-    fn readout(&self) -> Readout<'_> {
+    fn readout(&self) -> Readout {
         Readout::Keys(KeyReadout {
             spaces: self.factors.iter().map(Dormancy::keys).collect(),
             survivors: self

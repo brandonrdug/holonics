@@ -5,8 +5,9 @@
 //! (the arithmetic eggs that were these fixtures are retired as catered machinery, history at
 //! `1b374d46`): a moiré's grating read at its port as its sheet, the first ring of a sheet tuple
 //! as the keystone of the rest (the chain rule against the factorized grating family), a ring
-//! stepped by a clock's carry (a nested composition locating both keys), the stepped ring at an
-//! unheld port (the keystone's value), and the partition's reading summing to the passage's code.
+//! stepped by a clock's carry (a nested composition locating both keys), and the stepped ring at an
+//! unheld port (the keystone's value). The partition's reading (read by a tree beside the composed
+//! egg) was retired with the byte-tree text line on September 30 (history at `f5fd8f3b`).
 
 use std::sync::Arc;
 
@@ -17,9 +18,7 @@ use super::composition::{
     Composed, Conditioned, Keystone, Port, PortPath, PortReader, PortedEmitters, Unheld,
 };
 use super::*;
-use crate::compression::landmark::context::{
-    Capacity, LandmarkDeclaration, LetterFamily, StopPrior, ratio_code_length,
-};
+use crate::compression::landmark::context::ratio_code_length;
 use crate::holarchy::terrain::{Draw, Grating, Moire, MoireClass, MoireFamily};
 use crate::ratio::algebraic::{ExactInterval, interval_difference};
 use crate::ratio::surprisal::SymbolicSurprisal;
@@ -116,7 +115,7 @@ impl Family for ByPhase {
     fn likelihood(&self) -> Likelihood {
         Likelihood::Exact(self.likelihood.clone())
     }
-    fn readout(&self) -> Readout<'_> {
+    fn readout(&self) -> Readout {
         Readout::Keys(KeyReadout {
             spaces: Vec::new(),
             survivors: Vec::new(),
@@ -689,9 +688,7 @@ fn a_ring_stepped_by_a_clock_locates_the_offset_and_the_ring() {
         mirror.denominator(),
         mirror.phase()
     ]));
-    let Readout::Keys(keys) = composed.readout() else {
-        panic!("a key readout");
-    };
+    let Readout::Keys(keys) = composed.readout();
     assert_eq!(keys.survivors, vec![vec![vec![offset]], located]);
     let truth =
         SymbolicSurprisal::log2_of_ratio(&rational((period * gratings) as i64, joint.len() as i64))
@@ -752,86 +749,4 @@ fn the_stepped_ring_at_an_unheld_port_reads_the_gratings_prior() {
     }
     let held = held.likelihood().code().unwrap().unwrap();
     assert!(held.upper < code.lower, "the ring's value is positive");
-}
-
-fn tree(alphabet: usize, depth: usize, population: usize) -> Box<dyn Family> {
-    Box::new(
-        TreeFamily::new(
-            LandmarkDeclaration {
-                alphabet,
-                depth,
-                forced: 0,
-                population: population as u64,
-                grain: 16,
-                family: LetterFamily::cells(),
-                prior: StopPrior::half(),
-                capacity: Capacity::Unbounded,
-            },
-            1,
-        )
-        .expect("a tree"),
-    )
-}
-
-/// The partition's reading on the drawn sheet tuple, read by a tree and the composed egg over parts
-/// declared before the passage (each cell's class, before the horizon and past it): the parts sum
-/// to the population's code and to each family's, their cells to the passage, the composed egg is
-/// selected, and past the horizon it pays nothing (its faces there are exactly one), so its code
-/// before the horizon is its whole code.
-#[test]
-fn the_partition_reads_the_passage_code_whole_and_selects_the_composed_egg() {
-    let family = two_rings();
-    let moire = drawn_sheets();
-    let reach = horizon(&family);
-    let classes = moire.alphabet();
-    let cells = moire.emit(4 * reach);
-    let parts: Vec<usize> = cells
-        .iter()
-        .enumerate()
-        .map(|(t, &cell)| cell + classes * usize::from(t >= reach))
-        .collect();
-    let mut population = Population::new(vec![
-        tree(classes, 2, cells.len()),
-        Box::new(sheet_tuple_egg(&family, 1)),
-    ])
-    .unwrap();
-    let (_, readings) = population
-        .receive_partitioned(&cells, &parts, 2 * classes)
-        .unwrap();
-    let receipt = population.receipt().unwrap();
-    assert_eq!(receipt.selected, Some(1));
-    let sum = |values: Vec<&ExactInterval>| {
-        values
-            .into_iter()
-            .fold(ExactInterval::point(Rat::zero()), |total, value| {
-                ExactInterval::new(&total.lower + &value.lower, &total.upper + &value.upper)
-                    .unwrap()
-            })
-    };
-    near(
-        &sum(readings.iter().map(|part| &part.population).collect()),
-        &receipt.code,
-    );
-    for (index, family) in receipt.families.iter().enumerate() {
-        let parts = readings
-            .iter()
-            .map(|part| part.families[index].as_ref().expect("alive"))
-            .collect();
-        near(&sum(parts), family.code.as_ref().expect("alive"));
-    }
-    assert_eq!(
-        readings.iter().map(|part| part.cells).sum::<usize>(),
-        cells.len()
-    );
-    let zero = ExactInterval::point(Rat::zero());
-    for part in &readings[classes..] {
-        near(part.families[1].as_ref().unwrap(), &zero);
-    }
-    near(
-        &sum(readings[..classes]
-            .iter()
-            .map(|part| part.families[1].as_ref().unwrap())
-            .collect()),
-        receipt.families[1].code.as_ref().unwrap(),
-    );
 }

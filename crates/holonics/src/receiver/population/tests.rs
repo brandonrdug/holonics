@@ -1,24 +1,21 @@
 //! The population's laws checked exactly on small fixtures: the telescope of the replicator's
 //! faces to the families' likelihoods (against a mixture stepped in ℚ), survivor filtering as
 //! uniform Bayes against brute force, the sheet tuple's factorization, death at zero likelihood,
-//! the refusals naming the Bombe, a rotor crib's drawn key in its located fibre, the tree family
-//! scored as the prequential harness scores the tree, and selection of the family that made the
-//! terrain.
+//! the refusals naming the Bombe, a rotor crib's drawn key in its located fibre, and selection of
+//! the family that made the terrain. The tree family's fixtures and its prequential check were
+//! retired with the byte-tree text line on September 30 (history at `f5fd8f3b`): where a test
+//! needs a family that never dies (a death's survivor, a switch of aeons) it reads the fixed face,
+//! and where the tree made a terrain the gratings of another declared family do.
 
 use num_bigint::{BigInt, BigUint};
 use num_traits::{One, Zero};
 
 use super::families::{GratingParity, GratingSheet, MOIRE_BOMBE, ROTOR_BOMBE};
 use super::*;
-use crate::compression::landmark::context::{
-    Capacity, LandmarkDeclaration, LetterFamily, StopPrior, cell_letters, code_length,
-};
-use crate::hnn::Cut;
+use crate::compression::landmark::context::code_length;
 use crate::hnn::field::{Field, FieldDeclaration};
-use crate::hnn::reference::tree_prequential;
 use crate::holarchy::terrain::{
-    Draw, Grating, Moire, MoireClass, MoireFamily, RotorCrib, TreeSource, TreeSourceFamily,
-    rotor_crib,
+    Draw, Grating, Moire, MoireClass, MoireFamily, RotorCrib, rotor_crib,
 };
 use crate::holon::contact::menu::PortPermutation;
 use crate::ratio::algebraic::interval_difference;
@@ -62,7 +59,7 @@ impl Family for Fixed {
     fn likelihood(&self) -> Likelihood {
         Likelihood::Exact(self.likelihood.clone())
     }
-    fn readout(&self) -> Readout<'_> {
+    fn readout(&self) -> Readout {
         Readout::Keys(KeyReadout {
             spaces: vec![1],
             survivors: vec![vec![Vec::new()]],
@@ -103,19 +100,6 @@ fn small_family() -> MoireFamily {
     MoireFamily {
         rings: 2,
         denominator: 4,
-    }
-}
-
-fn tree(alphabet: usize, depth: usize, population: usize) -> LandmarkDeclaration {
-    LandmarkDeclaration {
-        alphabet,
-        depth,
-        forced: 0,
-        population: population as u64,
-        grain: 16,
-        family: LetterFamily::cells(),
-        prior: StopPrior::half(),
-        capacity: Capacity::Unbounded,
     }
 }
 
@@ -237,9 +221,7 @@ fn survivor_filtering_is_uniform_bayes_over_the_key_space() {
             })
         })
         .collect();
-    let Readout::Keys(readout) = keys.readout() else {
-        unreachable!()
-    };
+    let Readout::Keys(readout) = keys.readout();
     let mut survivors = readout.survivors[0].clone();
     let mut brute_sorted = brute.clone();
     survivors.sort();
@@ -290,22 +272,20 @@ fn the_sheet_tuple_factorizes_per_ring() {
         keys.likelihood(),
         Likelihood::Exact(rat(alive.len() as i64, 256))
     );
-    let Readout::Keys(readout) = keys.readout() else {
-        unreachable!()
-    };
+    let Readout::Keys(readout) = keys.readout();
     assert_eq!(readout.count(), BigUint::from(alive.len()));
 }
 
 /// Lean `HolonicAdjointNormalization.replicator_eq_zero_iff`: the gratings die exactly at the first
 /// cell no surviving key emits (a cell flipped in the moiré's passage), their posterior is exactly
-/// zero thereafter and they are never read again; the population's code is then the tree's charged
-/// code, and when only the gratings are declared the population is extinct.
+/// zero thereafter and they are never read again; the population's code is then the fair coin's
+/// charged code, and when only the gratings are declared the population is extinct.
 #[test]
 fn a_family_dies_exactly_at_zero_likelihood() {
     let mut cells = hand_moire(MoireClass::Parity).emit(60);
     cells[36] = 1 - cells[36];
     let mut population = Population::new(vec![
-        Box::new(TreeFamily::new(tree(2, 3, 60), 1).unwrap()),
+        Box::new(Fixed::new(vec![rat(1, 2), rat(1, 2)], 1)) as Box<dyn Family>,
         Box::new(KeyFamily::gratings(&small_family(), MoireClass::Parity, 1 << 16, 1).unwrap()),
     ])
     .unwrap();
@@ -413,9 +393,7 @@ fn the_rotor_family_keeps_the_drawn_key_in_its_gauge_orbit() {
     for &cell in &crib.cells {
         assert!(!keys.receive(cell).unwrap().is_zero());
     }
-    let Readout::Keys(readout) = keys.readout() else {
-        unreachable!()
-    };
+    let Readout::Keys(readout) = keys.readout();
     assert_eq!(readout.space(), BigUint::from(7u32 * 7 * 5040));
     let truth: Vec<u64> = [crib.truth.start as u64, crib.truth.key]
         .into_iter()
@@ -441,49 +419,28 @@ fn the_rotor_family_keeps_the_drawn_key_in_its_gauge_orbit() {
     assert_eq!(keys.likelihood(), Likelihood::Exact(rat(1, 35280)));
 }
 
-/// The tree family scores each cell by the tree's executed face at the current standing, then
-/// deposits it: its likelihood's code is `hnn::reference::tree_prequential`'s on the same cells.
-#[test]
-fn the_tree_family_scores_as_the_prequential_harness() {
-    let cells = hand_moire(MoireClass::Sheets).emit(200);
-    let declaration = tree(4, 3, 200);
-    let mut family = TreeFamily::new(declaration.clone(), 0).unwrap();
-    for &cell in &cells {
-        family.receive(cell).unwrap();
-    }
-    let cut = Cut {
-        cells: cells.clone(),
-        held_out: Vec::new(),
-    };
-    let ([development, _], _) =
-        tree_prequential(&cut, &cell_letters(&cells), &declaration).unwrap();
-    assert_eq!(family.likelihood().code().unwrap(), Some(development));
-}
-
-/// The population selects the family that made the terrain: on a drawn tree source the gratings die
-/// and a tree family's posterior is decided above one half; on the hand moiré the gratings' is.
+/// The population selects the family that made the terrain: on one ring's sheet (`2/5 @ 1/5`) the
+/// two-ring parity gratings (joint periods dividing 12) die and the one-ring families' joint
+/// posterior is exactly one; on the hand moiré (joint period 12, past every one ring's period of at
+/// most 6) the one-ring families die and the two-ring gratings are selected.
 #[test]
 fn the_population_selects_the_family_that_made_the_terrain() {
     let n = 1 << 10;
+    let one_ring = |denominator| MoireFamily {
+        rings: 1,
+        denominator,
+    };
     let population_of = || {
         Population::new(vec![
-            Box::new(TreeFamily::new(tree(2, 2, n), 2).unwrap()) as Box<dyn Family>,
-            Box::new(TreeFamily::new(tree(2, 6, n), 2).unwrap()),
+            Box::new(KeyFamily::gratings(&one_ring(5), MoireClass::Parity, 1 << 16, 2).unwrap())
+                as Box<dyn Family>,
+            Box::new(KeyFamily::gratings(&one_ring(6), MoireClass::Parity, 1 << 16, 2).unwrap()),
             Box::new(KeyFamily::gratings(&small_family(), MoireClass::Parity, 1 << 16, 2).unwrap()),
         ])
         .unwrap()
     };
-    let mut draw = Draw::new(7);
-    let source = TreeSource::draw(
-        &TreeSourceFamily {
-            alphabet: 2,
-            depth: 2,
-            grid: 16,
-        },
-        &mut draw,
-    )
-    .unwrap();
-    let cells = source.emit(n, &mut draw);
+    let ring = Moire::new(vec![Grating::new(2, 5, 1).unwrap()], MoireClass::Parity).unwrap();
+    let cells = ring.emit(n);
     let mut population = population_of();
     population.receive_passage(&cells).unwrap();
     let receipt = population.receipt().unwrap();
@@ -498,6 +455,7 @@ fn the_population_selects_the_family_that_made_the_terrain() {
     let cells = hand_moire(MoireClass::Parity).emit(n);
     let mut population = population_of();
     population.receive_passage(&cells).unwrap();
+    assert!(population.died(0).is_some() && population.died(1).is_some());
     assert_eq!(population.receipt().unwrap().selected, Some(2));
 }
 
@@ -727,9 +685,7 @@ fn a_dormant_ring_keeps_its_key_through_its_silent_aeon() {
         DormantFamily::gratings(&family, MoireClass::Sheets, 1 << 16, rung, 0).unwrap();
     let truth = [vec![1u64, 4, 0], vec![1, 3, 1]];
     let ring = |family: &DormantFamily| -> (Vec<Vec<u64>>, Vec<Rat>, Rat) {
-        let Readout::Keys(readout) = family.readout() else {
-            unreachable!()
-        };
+        let Readout::Keys(readout) = family.readout();
         (
             readout.survivors[0].clone(),
             readout.masses[0].clone(),
@@ -864,7 +820,7 @@ impl Family for Refusing {
     fn likelihood(&self) -> Likelihood {
         self.inner.likelihood()
     }
-    fn readout(&self) -> Readout<'_> {
+    fn readout(&self) -> Readout {
         self.inner.readout()
     }
     fn declaration(&self) -> Declaration {
@@ -879,13 +835,14 @@ impl Family for Refusing {
 }
 
 /// **A refusal moves nothing**: every living family's admission is read before any family
-/// receives, so a cell one family refuses, a passage past a tree's declared population and a cell
-/// outside the alphabet leave every family, the cells received and the code as they were.
+/// receives, so a cell one family refuses, a passage past a collapsed key family's admitted future
+/// (the gratings collapsed over the next 5 ticks at tick 3) and a cell outside the alphabet leave
+/// every family, the cells received and the code as they were.
 #[test]
 fn a_refusal_moves_nothing() {
     let mut population = Population::new(vec![
         Box::new(Fixed::new(vec![rat(1, 3), rat(2, 3)], 1)) as Box<dyn Family>,
-        Box::new(TreeFamily::new(tree(2, 2, 8), 2).unwrap()),
+        Box::new(KeyFamily::gratings(&small_family(), MoireClass::Parity, 1 << 16, 2).unwrap()),
         Box::new(Refusing {
             inner: Fixed::new(vec![rat(1, 2), rat(1, 2)], 2),
             refused: 1,
@@ -893,6 +850,7 @@ fn a_refusal_moves_nothing() {
     ])
     .unwrap();
     population.receive_passage(&[0, 0, 0]).unwrap();
+    population.collapse(1, AdmittedFuture::Ticks(5)).unwrap();
     let code = population.code().unwrap();
     assert!(population.receive(1).is_err());
     assert!(population.receive_passage(&[0, 1]).is_err());
@@ -1043,9 +1001,7 @@ fn the_parity_fibre_is_one_word_not_one_rate() {
             }
         }
     }
-    let Readout::Keys(readout) = keys.readout() else {
-        unreachable!()
-    };
+    let Readout::Keys(readout) = keys.readout();
     let mut survivors = readout.survivors[0].clone();
     survivors.sort();
     brute.sort();
@@ -1081,7 +1037,7 @@ fn the_parity_fibre_is_one_word_not_one_rate() {
 /// re-founds the seed from its reserved mass at a section whose residual passes the charge. Each
 /// seed that dies in the second aeon returns to the dead family; the one re-founded as the third
 /// aeon opens codes it near its unswitched code (the seed's surviving fibre) plus its birth
-/// charge, not the tree's.
+/// charge, below the fair coin's.
 #[test]
 fn a_death_keeps_the_seed_and_the_seed_is_refounded() {
     let family = MoireFamily {
@@ -1116,7 +1072,7 @@ fn a_death_keeps_the_seed_and_the_seed_is_refounded() {
         })
         .collect();
     let mut population = Population::new(vec![
-        Box::new(TreeFamily::new(tree(2, 4, n), 2).unwrap()) as Box<dyn Family>,
+        Box::new(Fixed::new(vec![rat(1, 2), rat(1, 2)], 2)) as Box<dyn Family>,
         Box::new(KeyFamily::gratings(&family, MoireClass::Parity, 1 << 24, 2).unwrap()),
     ])
     .unwrap()
@@ -1136,7 +1092,7 @@ fn a_death_keeps_the_seed_and_the_seed_is_refounded() {
     let seed = death.seed.as_ref().expect("a key family's seed");
     assert!(seed.survivors[0].contains(&vec![3, 7, 2, 5, 8, 1]));
     let at_opening = population.code().unwrap();
-    let tree_at_opening = population.receipt().unwrap().families[0]
+    let coin_at_opening = population.receipt().unwrap().families[0]
         .code
         .clone()
         .unwrap();
@@ -1163,8 +1119,8 @@ fn a_death_keeps_the_seed_and_the_seed_is_refounded() {
     );
     let receipt = population.receipt().unwrap();
     let paid = interval_difference(&receipt.code, &at_opening).unwrap();
-    let tree_paid =
-        interval_difference(receipt.families[0].code.as_ref().unwrap(), &tree_at_opening).unwrap();
+    let coin_paid =
+        interval_difference(receipt.families[0].code.as_ref().unwrap(), &coin_at_opening).unwrap();
     // Near the unswitched code plus the birth charge: its posterior at its birth is its mass over
     // the founded mass, and the seed's survivors keep one word.
     let founded_at_birth = population.founded().clone();
@@ -1173,5 +1129,5 @@ fn a_death_keeps_the_seed_and_the_seed_is_refounded() {
         paid.upper < &charge.upper + Rat::one(),
         "paid {paid:?}, charge {charge:?}"
     );
-    assert!(paid.upper < tree_paid.lower, "the tree pays more");
+    assert!(paid.upper < coin_paid.lower, "the fair coin pays more");
 }

@@ -3,7 +3,9 @@
 //! no deaths) with its normalization and code bound, founding at a declared mass, species collapse
 //! (no code moves over the admitted future, a collapsed family refuses past it, and a species splits
 //! when the future grows), species within a composed egg, the composed egg re-founded from its
-//! seed, and the work each family reports.
+//! seed, and the work each family reports. The tree family's fixtures were retired with the
+//! byte-tree text line on September 30 (history at `f5fd8f3b`): a family that never dies is the
+//! fixed face, and a second family on the same terrain is the gratings of a wider declared family.
 
 use std::sync::Arc;
 
@@ -17,9 +19,7 @@ use super::composition_tests::{
 };
 use super::tests::Fixed;
 use super::*;
-use crate::compression::landmark::context::{
-    Capacity, LandmarkDeclaration, LetterFamily, StopPrior, ratio_code_length,
-};
+use crate::compression::landmark::context::ratio_code_length;
 use crate::hnn::field::{Field, FieldDeclaration};
 use crate::holarchy::terrain::{
     Draw, Grating, Moire, MoireClass, MoireFamily, RotorCrib, TreeSource, TreeSourceFamily,
@@ -44,21 +44,18 @@ fn small_family() -> MoireFamily {
     }
 }
 
-fn tree(alphabet: usize, depth: usize, population: usize) -> LandmarkDeclaration {
-    LandmarkDeclaration {
-        alphabet,
-        depth,
-        forced: 0,
-        population: population as u64,
-        grain: 16,
-        family: LetterFamily::cells(),
-        prior: StopPrior::half(),
-        capacity: Capacity::Unbounded,
-    }
-}
-
 fn gratings(class: MoireClass, description: u64) -> KeyFamily {
     KeyFamily::gratings(&small_family(), class, 1 << 16, description).unwrap()
+}
+
+/// The parity gratings of a wider declared family (two rings, denominators up to 5), which holds
+/// the hand moiré's rings too: a second key family on the same terrain.
+fn wider_gratings(description: u64) -> KeyFamily {
+    let family = MoireFamily {
+        rings: 2,
+        denominator: 5,
+    };
+    KeyFamily::gratings(&family, MoireClass::Parity, 1 << 16, description).unwrap()
 }
 
 /// `−log₂ x`, enclosed.
@@ -67,8 +64,8 @@ fn bits(x: &Rat) -> ExactInterval {
 }
 
 /// A family's identity is its declaration and description: the same declaration built again, in a
-/// new aeon or re-founded from its seed, carries it; a tree's is independent of the aeon's
-/// alphabet and passage; another description or class is another identity.
+/// new aeon or re-founded from its seed, carries it; another description or class is another
+/// identity.
 #[test]
 fn a_familys_identity_is_its_declaration_across_aeons_and_refounding() {
     let parity = gratings(MoireClass::Parity, 3);
@@ -89,13 +86,7 @@ fn a_familys_identity_is_its_declaration_across_aeons_and_refounding() {
         .expect("a moiré's rings wind without the cells");
     assert_ne!(reseeded.label(), parity.label());
     assert_eq!(reseeded.identity(), parity.identity());
-    let short = TreeFamily::new(tree(2, 4, 64), 3).unwrap();
-    let wide = TreeFamily::new(tree(13, 4, 1 << 20), 3).unwrap();
-    assert_eq!(short.identity(), wide.identity());
-    assert_ne!(
-        short.identity(),
-        TreeFamily::new(tree(2, 8, 64), 3).unwrap().identity()
-    );
+    assert_ne!(parity.identity(), wider_gratings(3).identity());
     let family = two_rings();
     let composed = sheet_tuple_egg(&family, 1);
     assert_eq!(composed.identity(), sheet_tuple_egg(&family, 1).identity());
@@ -171,7 +162,7 @@ fn the_survival_pseudo_count_is_kts_half_until_a_death() {
 }
 
 /// Two aeons read into the retention (a moiré, where the gratings are selected; a tree source,
-/// where they die and the tree is selected), then the evolved prior of the third: its Dirichlet
+/// where they die and the fair coin is selected), then the evolved prior of the third: its Dirichlet
 /// face is exact, KT after the first aeon, normalized, mixed at `λ = ½` with the description
 /// prior; the evolved population keeps the static total mass; and the third aeon's code is at most
 /// the selected family's code plus `−log₂` of its evolved prior.
@@ -179,7 +170,7 @@ fn the_survival_pseudo_count_is_kts_half_until_a_death() {
 fn the_evolved_prior_is_the_dirichlet_face_of_the_retained_counts() {
     let aeon = |cells: &[usize], selections: Option<&Selections>| {
         let families: Vec<Box<dyn Family>> = vec![
-            Box::new(TreeFamily::new(tree(2, 2, 1 << 10), 2).unwrap()),
+            Box::new(Fixed::new(vec![rat(1, 2), rat(1, 2)], 2)),
             Box::new(gratings(MoireClass::Parity, 2)),
         ];
         let mut population = match selections {
@@ -226,7 +217,7 @@ fn the_evolved_prior_is_the_dirichlet_face_of_the_retained_counts() {
             died: 1
         }
     );
-    // D: tree (1 + ½), gratings (1 + 3/10), over 28/10.
+    // D: fair coin (1 + ½), gratings (1 + 3/10), over 28/10.
     assert_eq!(
         selections.face(&declared).unwrap(),
         vec![rat(15, 28), rat(13, 28)]
@@ -305,19 +296,22 @@ fn the_evolved_aeon_bound_with_a_birth_is_over_the_founded_mass() {
 }
 
 /// Founding at a declared rational mass: the newborn draws it from the reserve and the population's
-/// code does not move.
+/// code does not move (the gratings' code before the birth is the exact `5` bits, `log₂ 256 −
+/// log₂ 8`; after it the newborn's inherited likelihood is carried by its kept bounds, and their
+/// enclosure holds that exact code).
 #[test]
 fn a_family_is_founded_at_a_declared_mass() {
     let cells = hand_moire(MoireClass::Parity).emit(12);
-    let mut population =
-        Population::new(vec![Box::new(TreeFamily::new(tree(2, 2, 64), 1).unwrap())]).unwrap();
+    let mut population = Population::new(vec![Box::new(gratings(MoireClass::Parity, 1))]).unwrap();
     population.receive_passage(&cells).unwrap();
     let before = population.code().unwrap();
+    assert_eq!(before, ExactInterval::point(rat(5, 1)));
     let birth = population
         .found_with(Box::new(gratings(MoireClass::Parity, 3)), rat(3, 16), None)
         .unwrap();
     assert_eq!((birth.mass, birth.reserved), (rat(3, 16), rat(5, 16)));
-    assert_eq!(population.code().unwrap(), before);
+    let after = population.code().unwrap();
+    assert!(after.lower <= before.lower && before.upper <= after.upper);
     assert!(
         population
             .found_with(Box::new(gratings(MoireClass::Parity, 3)), rat(1, 2), None)
@@ -327,14 +321,14 @@ fn a_family_is_founded_at_a_declared_mass() {
 
 /// Every surviving parity key emits one word forever, so over the whole future the survivors are
 /// one species: the collapse keeps one member at their summed posterior, the population's code,
-/// face and posteriors do not move, and the collapsed population codes every later cell as its
-/// uncollapsed twin does.
+/// face and posteriors do not move (a wider grating family reads the same moiré beside it), and the
+/// collapsed population codes every later cell as its uncollapsed twin does.
 #[test]
 fn a_collapse_over_the_whole_future_changes_no_code() {
     let cells = hand_moire(MoireClass::Parity).emit(64);
     let declare = || {
         Population::new(vec![
-            Box::new(TreeFamily::new(tree(2, 2, 64), 1).unwrap()) as Box<dyn Family>,
+            Box::new(wider_gratings(1)) as Box<dyn Family>,
             Box::new(gratings(MoireClass::Parity, 1)),
         ])
         .unwrap()
@@ -347,9 +341,9 @@ fn a_collapse_over_the_whole_future_changes_no_code() {
     let survivors = twin
         .families()
         .nth(1)
-        .map(|family| match family.readout() {
-            Readout::Keys(keys) => keys.count(),
-            _ => unreachable!(),
+        .map(|family| {
+            let Readout::Keys(keys) = family.readout();
+            keys.count()
         })
         .unwrap();
     assert_eq!(BigUint::from(collapse.before()), survivors);
@@ -582,9 +576,9 @@ fn keystone_keys_reading_one_word_are_one_species_and_split_from_their_seed() {
 /// with face one.
 #[test]
 fn a_composed_egg_is_refounded_from_its_seed() {
-    let keys = |family: &dyn Family| match family.readout() {
-        Readout::Keys(keys) => (keys.survivors, keys.masses),
-        _ => unreachable!(),
+    let keys = |family: &dyn Family| {
+        let Readout::Keys(keys) = family.readout();
+        (keys.survivors, keys.masses)
     };
     let family = two_rings();
     let reach = horizon(&family);
@@ -665,18 +659,14 @@ fn a_composed_egg_refuses_refounding_past_a_conditioned_collapse() {
         vec![(0, 1)],
         "the keystone merges nothing"
     );
-    let Readout::Keys(keys) = composed.readout() else {
-        unreachable!()
-    };
+    let Readout::Keys(keys) = composed.readout();
     assert_eq!(
         keys.survivors[1],
         vec![vec![1]],
         "offsets 1 and 3 are one species"
     );
     let within = composed.reseed(5).expect("within the admitted future");
-    let Readout::Keys(keys) = within.readout() else {
-        unreachable!()
-    };
+    let Readout::Keys(keys) = within.readout();
     assert_eq!(
         keys.survivors[1],
         vec![vec![1]],
@@ -688,7 +678,7 @@ fn a_composed_egg_refuses_refounding_past_a_conditioned_collapse() {
     );
 
     let mut population = Population::new(vec![
-        Box::new(TreeFamily::new(tree(2, 2, 64), 1).unwrap()) as Box<dyn Family>,
+        Box::new(Fixed::new(vec![rat(1, 2), rat(1, 2)], 1)) as Box<dyn Family>,
         Box::new(pass_clock_half(1)),
     ])
     .unwrap();
@@ -706,29 +696,35 @@ fn a_composed_egg_refuses_refounding_past_a_conditioned_collapse() {
     );
 }
 
-/// The work each family reports: a key family's reads are its survivors before each cell, a tree's
-/// deposits are its cells, and a composed egg's work is its keystone keys weighed at each cell and
-/// every conditioned family's reads, the living and the dead (each key's family stepped apart until
-/// it dies).
+/// The work each family reports: a key family's reads are its survivors before each cell (each
+/// member of a population reporting its own), and a composed egg's work is its keystone keys
+/// weighed at each cell and every conditioned family's reads, the living and the dead (each key's
+/// family stepped apart until it dies).
 #[test]
 fn the_cost_receipt_reports_each_familys_work() {
     let cells = hand_moire(MoireClass::Parity).emit(20);
-    let mut family = gratings(MoireClass::Parity, 0);
-    let mut reads = 0u64;
-    for &cell in &cells {
-        reads += family.factors()[0].survivors().len() as u64;
-        family.receive(cell).unwrap();
-    }
-    assert_eq!(family.work().of(Act::Read), reads);
+    let reads_of = |mut family: KeyFamily| {
+        let mut reads = 0u64;
+        for &cell in &cells {
+            reads += family.factors()[0].survivors().len() as u64;
+            family.receive(cell).unwrap();
+        }
+        assert_eq!(family.work().of(Act::Read), reads);
+        reads
+    };
+    let (wider, reads) = (
+        reads_of(wider_gratings(0)),
+        reads_of(gratings(MoireClass::Parity, 0)),
+    );
+    assert!(wider > reads, "the wider family reads more keys");
     let mut population = Population::new(vec![
-        Box::new(TreeFamily::new(tree(2, 3, 64), 1).unwrap()) as Box<dyn Family>,
+        Box::new(wider_gratings(1)) as Box<dyn Family>,
         Box::new(gratings(MoireClass::Parity, 1)),
     ])
     .unwrap();
     population.receive_passage(&cells).unwrap();
     let receipt = population.receipt().unwrap();
-    assert_eq!(receipt.families[0].work.of(Act::Deposit), 20);
-    assert!(receipt.families[0].work.of(Act::Node) > 0);
+    assert_eq!(receipt.families[0].work.of(Act::Read), wider);
     assert_eq!(receipt.families[1].work.of(Act::Read), reads);
 
     let family = two_rings();

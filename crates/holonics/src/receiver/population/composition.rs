@@ -375,7 +375,7 @@ impl Family for Unheld {
     }
 
     /// An unheld port locates no key: the readout holds no factor.
-    fn readout(&self) -> Readout<'_> {
+    fn readout(&self) -> Readout {
         Readout::Keys(KeyReadout {
             spaces: Vec::new(),
             survivors: Vec::new(),
@@ -599,7 +599,7 @@ impl Family for Composed {
 
     /// The keystone's surviving keys with their posteriors (the first factor), then, once one key
     /// survives, its conditioned family's own located keys.
-    fn readout(&self) -> Readout<'_> {
+    fn readout(&self) -> Readout {
         let mut readout = KeyReadout {
             spaces: vec![self.keystone.keys()],
             survivors: vec![
@@ -616,9 +616,8 @@ impl Family for Composed {
             ],
             dormant: Vec::new(),
         };
-        if let [member] = self.held.as_slice()
-            && let Readout::Keys(inner) = member.family.readout()
-        {
+        if let [member] = self.held.as_slice() {
+            let Readout::Keys(inner) = member.family.readout();
             for (factor, survivors) in inner.survivors.into_iter().enumerate() {
                 readout.spaces.push(inner.spaces[factor]);
                 readout.survivors.push(survivors);

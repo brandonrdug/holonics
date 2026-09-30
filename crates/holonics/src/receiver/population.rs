@@ -49,7 +49,7 @@
 //! deterministic family's face is zero on the classes no survivor emits, and its death (zero
 //! likelihood) is the replicator's law, which a positive carried ratio cannot reach. So the
 //! population carries no weights at all: each family carries its own likelihood (exact for
-//! survivors, `#S/|K|`; the tree's product of executed dyadic faces enclosed by
+//! survivors, `#S/|K|`; a dormant or composed family's product of executed faces enclosed by
 //! `compression::landmark::context::PassageCode`'s outward bounds), and the population's code, its
 //! posteriors and its face are read from them through the telescope, each an exact enclosure
 //! ([`Population::receipt`]). The bounds are kept at [`PRECISION`] significant bits, rounded
@@ -62,7 +62,7 @@
 //! population is what the receiver retains over its families: each family's retained state and its
 //! likelihood, never a record of the cells). The families it declares ([`families`]) read their
 //! key spaces from the terrain's own declarations (`holarchy::terrain::MoireFamily`, the field's
-//! ring for a rotor crib) and the receiving tree from `compression::landmark::context`.
+//! ring for a rotor crib).
 //!
 //! [proved-derived; formal-checked] **Dormancy** ([`dormancy`]; Lean
 //! `Compression/Landmark/Context/Dormancy`). A static family of fixed keys cannot follow an aeon
@@ -148,30 +148,14 @@
 //! record of September 29); its tests read families of the machine's own kind, a moiré's gratings
 //! as keystones and readers.
 //!
-//! [proved-derived; formal-checked] **The curated source's readers and the boundary egg**
-//! ([`families`], [`boundary`]; Lean `Composition.{stagedFace_nonneg, stagedFace_sum_one,
-//! staged_chain_rule, staged_code}`; campaign 5). On a curated stream the receiving tree is a family
-//! over its cells (bytes and section letters) or over its typed ticks, each cell bundled with its
-//! part's channel read once at the section ([`TreeFamily::sectioned`],
-//! `compression::landmark::context::sections`). The part clock ([`PartClock`]) is a keystone of one
-//! key read from the coded past (bytes since the section letter, sentence closes among them, the last
-//! byte's class), and the boundary egg ([`BoundaryEgg`]) factors each cell's face through its stage:
-//! the hazard law ([`Hazard`], a KT face per cell of a declared partition of the port) times the byte
-//! tree's face within the bytes or the letter tree's face of the letter. Its code is the hazard's
-//! plus the conditioned faces', by the chain rule at every tick, and its byte tree read alone is its
-//! unheld port, so the part clock's value is exact.
-//!
-//! [proved-derived; formal-checked] **The admitted receivers** ([`admitted`]; HNN_FORMULA's source
-//! contract, item 7; Lean `Composition.{stagedFace_nonneg, stagedFace_sum_one, staged_chain_rule,
-//! staged_code}` at a tick's own stage map). The curated source's declared incidence places a
-//! response's request, and a later human part's response, on a port the reading part is located
-//! on (`compression::landmark::context::spans`: the longest suffix of the part that recurs in the
-//! target's span, and the span's byte after it). The admitted egg ([`AdmittedEgg`]) factors the
-//! boundary egg's face through a copy stage, a KT face per cell of a declared partition (the
-//! located length's and the inner egg's odds' dyadic classes) of whether the located byte comes
-//! next; the later human's stage is a receipt only, never the family's face. Its inner egg read
-//! alone is the port unheld, and the incidence is coded where it arrives and charged beside the
-//! cells.
+//! [definition] **The retired byte-tree text line** (September 30, THE_REBUILD U6's order, C.5;
+//! the antipattern record of September 29, instance 3). The receiving tree read as a family, the
+//! curated source's typed address, the boundary egg with its part clock and hazard, the admitted
+//! receivers with their copy stage and located spans, the hazard's learned partition, the text
+//! release with its scored view, family draw and face provenance, the partition's reading, the
+//! future branch and the native checkpoints were retired together (history at `f5fd8f3b`). Each
+//! law they stated is kept by its Lean owner or in `docs/RECEIVER_HOLARCHY.md`, "The retired
+//! byte-tree text line".
 //!
 //! [definition; agent-inferred] **Identity** ([`evolution`]). A family's identity across aeons is
 //! its declaration ([`Family::declaration`]: the generator family's kind, declared integers and the
@@ -208,35 +192,21 @@
 //! `release_merge_iff_future_equivalent`), or a **priced merge** that pools counts and is accepted
 //! exactly when it lowers the complete code, the description's restaurant mass at `α = ½` times the
 //! likelihood (`merge_cost_mass_iff`, `restaurant_merge_ratio`), decided by integer bounds. Every
-//! member keeps its counts, so a merged block splits exactly. The boundary egg's hazard reads a
-//! partition learned this way on the development cells ([`learn_hazard_partition`]: the last-byte
-//! classes, then the ports' shared counts, each adopted where its complete code falls).
+//! member keeps its counts, so a merged block splits exactly.
 //!
 //! [definition; agent-inferred] **Maintenance work** ([`Work`], [`Act`]). Beside a family's
 //! description and code its receipt reports the work it has spent, as exact counts of what it
 //! executed: a key family's emissions read against received cells, a dormant family's states read
-//! and kernel shares, a tree's deposits and held nodes, and a composed egg's keystone keys weighed
-//! and its constituents' work, the living and the dead. No family here is pumped against
-//! dissipation (every ring is a lossless exact clock), so no pump work is claimed: the counts are
-//! the computation the families actually execute.
+//! and kernel shares, a founded family's classes advanced by its transport, and a composed egg's
+//! keystone keys weighed and its constituents' work, the living and the dead. No family here is
+//! pumped against dissipation (every ring is a lossless exact clock), so no pump work is claimed:
+//! the counts are the computation the families actually execute.
 //!
-//! [definition; agent-inferred] **A partition's reading** ([`Population::receive_partitioned`],
-//! [`PartReading`]). A receipt is a field of readings over a partition: the passage's cells declared
-//! into parts (a product record's operand, mark, trailing, middle and leading cells), and on each
-//! part the population's code (`Σ_(t ∈ part) −log₂ q_t(x_t)`, read as the population's code after
-//! each cell less its code before) and each family's code (`−log₂` of its faces' product over the
-//! part). The population keeps only each part's sums while reading, never the cells: a receipt, not
-//! a record.
-//!
-//! [definition] **Release** ([`releasing`], [`text_release`]; THE_REBUILD U3). The population
-//! emits through the one decision law of `receiver::release`: the scored face view
-//! ([`PopulationRelease`], `P_release = P_scored`), the family draw ([`Population::select_family`])
-//! and the response ([`Population::release_response`]) return that law's certified draws, stop law
-//! and typed refusals; a response under the scored law carries each drawn cell's family provenance
-//! ([`Population::face_contributors`]). The chaser ([`chaser`]) returns the law's certified capture
-//! (`Released` at tolerance zero on the capture-within-`m` reading) and its probe (`Ask`, with the
-//! partition it is chosen by); its cornering commit is a declared separate arm, whose separating
-//! term is the price of a tick.
+//! [definition] **Release** (THE_REBUILD U3). The population emits through the one decision law of
+//! `receiver::release`. The chaser ([`chaser`]) returns the law's certified capture (`Released` at
+//! tolerance zero on the capture-within-`m` reading) and its probe (`Ask`, with the partition it is
+//! chosen by); its cornering commit is a declared separate arm, whose separating term is the price
+//! of a tick.
 //!
 //! [definition] The computational object is the helical pair interaction, read here as a
 //! receiver's population of candidate eggs through aeons. Of the winding guide's six general objects
@@ -244,9 +214,9 @@
 //! carry, read at its half-turn sheet, which keeps winding while its layer is silent; a rotor key's
 //! stage steps with the field's carry), the **tube** (the passage, one cell a tick, and an aeon's span
 //! at one activity), **faces and placement** (each family's face on the receiver's cell alphabet,
-//! and the population's face, exact or enclosed) and the **tower thread** (the tree family's
-//! restrictions of the address). The **pair** (a moiré's pairs lock, which a grating key names but
-//! no family reads) and the **cell holonomy** (none is claimed) stay attached.
+//! and the population's face, exact or enclosed) and the **tower thread** (a merge coarsens a
+//! partition's cells, and a split refines them back). The **pair** (a moiré's pairs lock, which a
+//! grating key names but no family reads) and the **cell holonomy** (none is claimed) stay attached.
 //!
 //! | Lean | Rust |
 //! |---|---|
@@ -257,7 +227,7 @@
 //! | `Compression/Landmark/Context/Population.survivors_product` | [`KeyFamily`]'s factors |
 //! | `Compression/Landmark/Context/Population.{seqLik_escaped_survivor, escaped_fibre_is_mode}` | [`ChaseFamily`] (the escaped face), [`selected_fibre`] |
 //! | `Compression/Landmark/Context/Population.death_is_an_exchange` | [`DeathReceipt`] (the exchange of [`Population::receive`]) |
-//! | `Compression/Landmark/Context/Population.{certified_inverseCDF_class, certified_draw_is_released_at_zero_tolerance, plural_draw_is_held}` | `receiver::release::draw`, read by [`Population::select_family`] and [`Population::release_response`] |
+//! | `Compression/Landmark/Context/Population.{certified_inverseCDF_class, certified_draw_is_released_at_zero_tolerance, plural_draw_is_held}` | `receiver::release::draw` (its population readers, the family draw and the text response, retired September 30; history at `f5fd8f3b`) |
 //! | `Compression/Landmark/Context/Dormancy.{forward_dominance_nonneg, dormant_survivor_code, layer_survivors, productKernel_stochastic, productKernel_path}` | [`Dormancy`], [`DormantFamily`] |
 //! | `Compression/Landmark/Context/Dormancy.{share_path_code, stay_code_le, share_path_code_le}` | the declared rate `α = 2^(−j)` of [`Dormancy::new`] |
 //! | `Compression/Landmark/Context/Birth.{opening_finrank, ladder_stable_forever, strict_steps_le_chart, ladder_stabilizes, founded_invariant, founded_le, exists_transport_matrices, founding_intertwines, encode_reads, encode_iterate, founded_reads_iterate, silent_invariant, eigenvalue_of_finite_order}` | [`Closure`] (the ladder, its rungs and `U_a`, checked `E T_a = U_a E`; `D E = ρ` by [`Closure::readout`]), [`FoundedFamily`], [`TransportBirth`], [`SectionFounding`] |
@@ -267,35 +237,23 @@
 //! | `Compression/Landmark/Context/Evolution.{survivalPseudo_zero_deaths, survivalPseudo_death_lt, dirichletFace_isPrior, kt_face, dirichletFace_no_deaths, descriptionPrior_isPrior, evolved_isPrior, masses_total}` | [`Tally::pseudo`], [`Selections::face`], [`Selections::prior`], [`Population::evolved`] |
 //! | `Compression/Landmark/Context/Evolution.{evolved_code_le_face, evolved_code_le_description, evolved_aeon_code}` | the evolved population's code against its selected family's |
 //! | `Compression/Landmark/Context/Evolution.{speciesWeight_isPrior, species_mixture, species_face, species_collapse_code, species_split}` | [`Population::collapse`], [`Population::split`], [`Collapse`] |
-//! | `Compression/Landmark/Context/Composition.{stagedFace_nonneg, stagedFace_sum_one, staged_chain_rule, staged_code}` | [`BoundaryEgg`] (its staged face and its code by stage, [`BoundaryReadout`]) |
-//! | `Compression/Landmark/Context/Tree.{ktFace, ktFace_pos, ktFace_sum}` (over `{byte, letter}`) | [`Hazard`] |
-//! | `Compression/Landmark/Context/Composition.{stagedFace_nonneg, stagedFace_sum_one}` at each tick's `σ_t`, `{staged_chain_rule, staged_code}` at `σ = id` | [`AdmittedEgg`] (the copy stage over the inner egg, [`StageReadout`]) |
-//! | `Compression/Landmark/Context/Tree.{ktFace, ktFace_pos, ktFace_sum}` (over `{miss, copy}`, the pointer's sides) | [`CopyStage`], [`PointerReadout`] |
+//! | `Compression/Landmark/Context/Composition.{stagedFace_nonneg, stagedFace_sum_one, staged_chain_rule, staged_code}` | none since September 30 (the boundary egg and the admitted receivers, history at `f5fd8f3b`) |
 //! | `Compression/Landmark/Context/Merge.{merge_cost_iff, merge_cost_mass_iff, merge_cost_nat}` | [`Blocks::price`] (accepted exactly when `P·W < P′·W′`) |
 //! | `Compression/Landmark/Context/Merge.{restaurant_found, restaurant_join, restaurant_step_sum, restaurant_merge_ratio, restaurant_merge_ratio_ge_two}` | [`restaurant_ratio`], [`Blocks::description_bits`] |
 //! | `Compression/Landmark/Context/Merge.{expand_merge, expansion_sum, mergedFace_isPrior}` | [`Blocks`] (a block's pooled counts; every member's seed, [`Blocks::split`]) |
 //! | `Compression/Landmark/Context/Merge.{release_merge_iff_future_equivalent, release_merge_code}` | [`Blocks::species`] (the release reading) |
 //! | `Compression/Landmark/Context/Merge.{segmentation_mass, parse_given_sum, parse_code, segmentation_code_le}`, `{square_iff_no_separator, encoding_square_or_separator, merged_square_of_compatible}` | owed consumers: word merges over segmentation lattices and the merged encoding's square (campaign 5) |
 
-pub mod admitted;
 pub mod birth;
-pub use checkpoint::{
-    AdmittedMemberManifest, PopulationCheckpointError, PopulationMemberManifest, TreeMemberManifest,
-};
-pub mod boundary;
 pub mod chase;
 pub mod chaser;
-pub mod checkpoint;
 pub mod composition;
 pub mod dormancy;
 pub mod evolution;
 pub mod families;
 pub mod merge;
 pub mod port;
-pub mod provenance;
-pub mod releasing;
 pub mod species;
-pub mod text_release;
 
 #[cfg(test)]
 mod birth_tests;
@@ -304,28 +262,12 @@ mod composition_tests;
 #[cfg(test)]
 mod evolution_tests;
 #[cfg(test)]
-mod future_branch_tests;
-#[cfg(test)]
 mod port_tests;
 #[cfg(test)]
-mod provenance_tests;
-#[cfg(test)]
-mod releasing_tests;
-#[cfg(test)]
 mod tests;
-#[cfg(test)]
-mod text_release_tests;
 
-pub use admitted::{
-    AdmittedEgg, AdmittedReadout, CopyCell, CopyLaw, CopyStage, PointerReadout, Relation,
-    RelationKind, StageReadout, odds_class,
-};
 pub use birth::{
     BirthError, Closure, Founded, FoundedFamily, FoundingReceipt, SectionFounding, TransportBirth,
-};
-pub use boundary::{
-    BYTE_VALUES, BoundaryEgg, BoundaryReadout, Hazard, HazardCell, HazardComparison,
-    HazardPartition, HazardRest, LastByte, PartClock, PartPort, byte_index, dyadic_class,
 };
 pub use chase::{ChaseFamily, selected_fibre};
 pub use chaser::{
@@ -336,20 +278,11 @@ pub use composition::{
 };
 pub use dormancy::{Dormancy, DormantFamily, Layered, Weight};
 pub use evolution::{Declaration, Identity, Selections, Tally};
-pub use families::{GratingParity, GratingSheet, RotorKeys, TreeFamily};
-pub use merge::{
-    Blocks, Item, KtTables, MergeReceipt, PartitionReceipt, Price, learn_hazard_partition,
-    restaurant_ratio,
-};
+pub use families::{GratingParity, GratingSheet, RotorKeys};
+pub use merge::{Blocks, Item, KtTables, MergeReceipt, Price, restaurant_ratio};
 pub use port::PortPopulation;
-pub use provenance::{FaceContribution, MissingProducerTerm};
-pub use releasing::{FamilyReleaseError, PopulationRelease, ReleaseRefusal};
 pub use species::{
     AdmittedFuture, Collapse, FactorSpecies, KeystoneMember, KeystoneSpecies, Seed, Species,
-};
-pub use text_release::{
-    ResponseLaw, ResponseRefusal, ResponseRelease, TextAppend, TextDecoder, TextRelease,
-    TextReleaseError, TextSeparator, verify_scored_text_path,
 };
 
 use std::collections::BTreeMap;
@@ -360,7 +293,7 @@ use rayon::prelude::*;
 use thiserror::Error;
 
 use crate::compression::landmark::context::{
-    ContextError, Landmarks, PassageCode, ProductBound, ratio_code_length,
+    ContextError, PassageCode, ProductBound, ratio_code_length,
 };
 use crate::hnn::HnnError;
 use crate::holarchy::terrain::TerrainError;
@@ -395,10 +328,6 @@ pub enum PopulationError {
         "every family's likelihood reached zero by cell {cell}: no declared family made the passage"
     )]
     Extinct { cell: usize },
-    #[error("family {label} does not expose a contemporary standing for future branching")]
-    FutureBranchUnsupported { label: String },
-    #[error("a population with a live founding closure cannot be branched")]
-    FutureBranchFounding,
     #[error(transparent)]
     Context(#[from] ContextError),
     #[error(transparent)]
@@ -522,45 +451,17 @@ impl KeyReadout {
     }
 }
 
-/// [definition] **A family's readout**: a key family's surviving keys, a tree family's standing, a
-/// boundary egg's code by stage and channel, or the admitted receivers' (their inner egg's, their
-/// copy stages' and their incidence's code).
+/// [definition] **A family's readout**: a key family's surviving keys (the tree family's standing,
+/// the boundary egg's and the admitted receivers' readouts retired September 30 with the byte-tree
+/// text line; history at `f5fd8f3b`).
 #[derive(Clone, Debug, PartialEq)]
-pub enum Readout<'a> {
+pub enum Readout {
     Keys(KeyReadout),
-    Standing(&'a Landmarks),
-    Boundary(Box<BoundaryReadout>),
-    Admitted(Box<AdmittedReadout>),
 }
 
 /// [definition] **A declared navigator family** (module header): a candidate egg read by the
 /// receiver.
 pub trait Family: Send {
-    /// Canonical contemporary checkpoint bytes for owners with a declared native codec.
-    /// Unsupported family owners return `None`; the population codec refuses them.
-    fn tree_checkpoint(&self) -> Option<Vec<u8>> {
-        None
-    }
-    /// Cell ticks already received by a tree owner that exposes the tree-only checkpoint.
-    fn tree_received_cells(&self) -> Option<u64> {
-        None
-    }
-    /// Canonical contemporary checkpoint for the admitted request/response receiver, when owned.
-    fn admitted_checkpoint(
-        &self,
-    ) -> Option<Result<Vec<u8>, crate::receiver::population::admitted::AdmittedStageCheckpointError>>
-    {
-        None
-    }
-    /// Cell ticks already received by the admitted egg's inner boundary receiver.
-    fn admitted_received_cells(&self) -> Option<u64> {
-        None
-    }
-    /// An ephemeral continuation at this family's contemporary standing. Implementations must
-    /// copy only the state needed to continue admitted futures; they must not reconstruct by replay.
-    fn branch_future(&self) -> Option<Box<dyn Family>> {
-        None
-    }
     /// The family's declaration, for a receipt.
     fn label(&self) -> String;
     /// The declared cell alphabet.
@@ -574,7 +475,7 @@ pub trait Family: Send {
     /// `L_f`: the product of the faces received so far.
     fn likelihood(&self) -> Likelihood;
     /// The decoder's readout.
-    fn readout(&self) -> Readout<'_>;
+    fn readout(&self) -> Readout;
     /// **Whether the family admits a passage** before anything moves: a declared refusal (a cell
     /// outside the alphabet, a passage past a declared population) is read here, so a population
     /// refuses a cell before any family receives it.
@@ -585,19 +486,6 @@ pub trait Family: Send {
             None => Ok(()),
         }
     }
-    /// Whether this family actually owns planned request/response incidence. An unrelated family
-    /// may share the population's alphabet but cannot make a requested relation effective.
-    fn owns_planned_relation(&self) -> bool {
-        false
-    }
-    /// Validate a receiver incidence planned before its target part arrives. Families that do
-    /// not own admitted request/response incidence ignore this operation.
-    fn validate_planned_relation(&self, _relation: Relation) -> Result<(), PopulationError> {
-        Ok(())
-    }
-    /// Commit a relation after every living family has validated it. This operation is infallible
-    /// so a later family cannot reject after an earlier one has already changed its standing.
-    fn commit_planned_relation(&mut self, _relation: Relation) {}
     /// The factor whose every key the killing cell contradicted, once the family has died there.
     fn exhausted(&self) -> Option<usize> {
         None
@@ -1225,7 +1113,7 @@ impl Family for KeyFamily {
         Likelihood::Exact(self.factors.iter().map(Survivors::likelihood).product())
     }
 
-    fn readout(&self) -> Readout<'_> {
+    fn readout(&self) -> Readout {
         Readout::Keys(KeyReadout {
             spaces: self.factors.iter().map(Survivors::space).collect(),
             survivors: self
@@ -1272,14 +1160,8 @@ pub enum Act {
     State,
     /// One share of the dormancy kernel: a layer's stay or switch on one key's activity.
     Share,
-    /// A cell deposited into a receiving tree along its address.
-    Deposit,
-    /// A node a receiving tree holds: the storage it maintains.
-    Node,
     /// A keystone key weighed at a received cell: its conditioned family read, its weight moved.
     Weigh,
-    /// A stage counted in a cell of a declared partition (the boundary egg's hazard law).
-    Count,
     /// A founded family's class of chart states advanced by its founded transport `U_a`
     /// (`birth`).
     Transport,
@@ -1606,17 +1488,6 @@ impl Reception {
     }
 }
 
-/// [definition; agent-inferred] **One part's reading** (module header, "A partition's reading"):
-/// the part's cells, the population's code on them (the sum of `−log₂ q_t(x_t)` over the part,
-/// each the population's code after the cell less its code before, enclosed), and each family's
-/// code on them (`−log₂` of its faces' product over the part, enclosed; none once the family died).
-#[derive(Clone, Debug, PartialEq, Eq)]
-pub struct PartReading {
-    pub cells: usize,
-    pub population: ExactInterval,
-    pub families: Vec<Option<ExactInterval>>,
-}
-
 /// [definition] **The population's receipt**: the cells received, the declared total mass `M` and
 /// the founded mass `M_n` (`M` plus every newborn's), the population's code `−log₂ W` (exact
 /// enclosure), each family's receipt, and the family the population selects: the one whose
@@ -1783,32 +1654,6 @@ impl Population {
         self.alphabet
     }
 
-    /// Plan an admitted request/response incidence before receiving its target part. Validation
-    /// runs across all living families before any family is mutated; unrelated families ignore it.
-    pub fn plan_relation(&mut self, relation: Relation) -> Result<(), PopulationError> {
-        if !self
-            .members
-            .iter()
-            .any(|member| member.died.is_none() && member.family.owns_planned_relation())
-        {
-            return Err(refuse(
-                "a planned admitted relation",
-                "at least one living family owns the request/response incidence",
-            ));
-        }
-        for member in &self.members {
-            if member.died.is_none() {
-                member.family.validate_planned_relation(relation)?;
-            }
-        }
-        for member in &mut self.members {
-            if member.died.is_none() {
-                member.family.commit_planned_relation(relation);
-            }
-        }
-        Ok(())
-    }
-
     /// **The declared total mass** `M = Σ_f 2^(−ℓ_f)` of the declared families.
     pub fn mass(&self) -> &Rat {
         &self.mass
@@ -1827,42 +1672,6 @@ impl Population {
     /// The cells received.
     pub fn cells(&self) -> usize {
         self.cells
-    }
-
-    /// Make an ephemeral branch from the current standing. The exact current face and receipt are
-    /// preserved by continuing family-owned state, likelihoods, masses, clocks and counters as-is.
-    /// Unsupported owners and populations with a non-cloneable founding closure return refusals.
-    pub fn branch_future(&self) -> Result<Self, PopulationError> {
-        if self.founding.is_some() {
-            return Err(PopulationError::FutureBranchFounding);
-        }
-        let mut members = Vec::with_capacity(self.members.len());
-        for member in &self.members {
-            let Some(family) = member.family.branch_future() else {
-                return Err(PopulationError::FutureBranchUnsupported {
-                    label: member.family.label(),
-                });
-            };
-            members.push(Member {
-                family,
-                mass: member.mass.clone(),
-                prior: member.prior.clone(),
-                born: member.born,
-                inherited: member.inherited.clone(),
-                died: member.died,
-                reseeded: member.reseeded,
-                origin: member.origin,
-            });
-        }
-        Ok(Self {
-            members,
-            alphabet: self.alphabet,
-            mass: self.mass.clone(),
-            founded: self.founded.clone(),
-            cells: self.cells,
-            founding: None,
-            section: self.section.clone(),
-        })
     }
 
     /// The families, in their declared order, newborns after.
@@ -1959,15 +1768,6 @@ impl Population {
     /// One admitted cell: the families read it together on the host's cores, each writing only its
     /// own state (the hardware law), then the deaths are exchanged and the founding read.
     fn receive_admitted(&mut self, cell: usize) -> Result<Reception, PopulationError> {
-        Ok(self.receive_faces(cell)?.0)
-    }
-
-    /// One admitted cell ([`Population::receive_admitted`]), returning beside the reception each
-    /// member's face of the cell (none for a member already dead).
-    fn receive_faces(
-        &mut self,
-        cell: usize,
-    ) -> Result<(Reception, Vec<Option<Rat>>), PopulationError> {
         let position = self.cells;
         let read: Vec<Option<(Likelihood, Rat)>> = self
             .members
@@ -1995,10 +1795,6 @@ impl Population {
         if read.iter().flatten().all(|(_, face)| face.is_zero()) {
             return Err(PopulationError::Extinct { cell: position });
         }
-        let faces = read
-            .iter()
-            .map(|entry| entry.as_ref().map(|(_, face)| face.clone()))
-            .collect();
         let mut reception = Reception::default();
         if !dying.is_empty() {
             reception.deaths = self.exchange(position, cell, &read, &dying)?;
@@ -2014,7 +1810,7 @@ impl Population {
         if let Some(birth) = self.found_at_section()? {
             reception.births.push(birth);
         }
-        Ok((reception, faces))
+        Ok(reception)
     }
 
     /// **Death is an exchange** (module header): each dying family's mass `w_f` before the cell and
@@ -2115,9 +1911,9 @@ impl Population {
                     mass: mass_code(&mass.0, &mass.1)?,
                     shares,
                     exact: exchange,
-                    seed: match member.family.readout() {
-                        Readout::Keys(keys) => Some(keys),
-                        _ => None,
+                    seed: {
+                        let Readout::Keys(keys) = member.family.readout();
+                        Some(keys)
                     },
                 })
             })
@@ -2136,73 +1932,6 @@ impl Population {
             reception.extend(self.receive_admitted(cell)?);
         }
         Ok(reception)
-    }
-
-    /// **Receive a passage read over a declared partition of its cells** (module header, "A
-    /// partition's reading"): cell `t` belongs to part `parts[t] < count`. Admitted whole before any
-    /// cell moves, then received cell by cell exactly as [`Population::receive_passage`] receives
-    /// it; returns the reception and each part's reading.
-    pub fn receive_partitioned(
-        &mut self,
-        cells: &[usize],
-        parts: &[usize],
-        count: usize,
-    ) -> Result<(Reception, Vec<PartReading>), PopulationError> {
-        if parts.len() != cells.len() || parts.iter().any(|&part| part >= count) {
-            return Err(refuse(
-                "a partition of a passage",
-                "it names one declared part for every cell",
-            ));
-        }
-        self.admit(cells)?;
-        let mut codes = vec![vec![PassageCode::new(); self.members.len()]; count];
-        let mut population = vec![ExactInterval::point(Rat::zero()); count];
-        let mut sizes = vec![0usize; count];
-        let mut reception = Reception::default();
-        let mut before = self.code()?;
-        for (&cell, &part) in cells.iter().zip(parts) {
-            if self.members.iter().any(|member| member.born > 0) {
-                self.admit(&[cell])?;
-            }
-            let (received, faces) = self.receive_faces(cell)?;
-            reception.extend(received);
-            for row in &mut codes {
-                row.resize(self.members.len(), PassageCode::new());
-            }
-            for (family, face) in faces.iter().enumerate() {
-                if let Some(face) = face
-                    && face.is_positive()
-                {
-                    codes[part][family].face(face)?;
-                }
-            }
-            let after = self.code()?;
-            population[part] =
-                interval_sum(&population[part], &interval_difference(&after, &before)?)?;
-            before = after;
-            sizes[part] += 1;
-        }
-        let readings = codes
-            .into_iter()
-            .zip(population)
-            .zip(sizes)
-            .map(|((row, population), cells)| {
-                let families = row
-                    .iter()
-                    .zip(&self.members)
-                    .map(|(code, member)| match member.died {
-                        Some(_) => Ok(None),
-                        None => Ok(Some(code.bits()?)),
-                    })
-                    .collect::<Result<Vec<_>, PopulationError>>()?;
-                Ok(PartReading {
-                    cells,
-                    population,
-                    families,
-                })
-            })
-            .collect::<Result<Vec<_>, PopulationError>>()?;
-        Ok((reception, readings))
     }
 
     /// **Found a family from the reserved mass** (module header, "Birth from reserved mass"): its
@@ -2499,9 +2228,9 @@ impl Population {
                     None
                 },
                 posterior,
-                keys: match member.family.readout() {
-                    Readout::Keys(keys) => Some(keys),
-                    _ => None,
+                keys: {
+                    let Readout::Keys(keys) = member.family.readout();
+                    Some(keys)
                 },
                 drift: member.family.drift(),
                 work: member.family.work(),
@@ -2558,7 +2287,7 @@ impl Population {
     }
 
     /// Family `f`'s readout.
-    pub fn readout(&self, family: usize) -> Option<Readout<'_>> {
+    pub fn readout(&self, family: usize) -> Option<Readout> {
         self.members
             .get(family)
             .map(|member| member.family.readout())

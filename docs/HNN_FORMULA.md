@@ -289,9 +289,13 @@ input and step 8's curation. Its first build (`curated_source.py`) meets items 1
 the intervals between turns, so it does not meet item 9; its learned byte classes are a lens inside
 the population, as item 10 requires.
 
-[established-bounded; measured] Item 7 is consumed (`receiver::population::admitted`,
-`compression::landmark::context::spans`; the
-[notebook receipt](https://github.com/brandonrdug/holonics/blob/d4596102/research/notebook/hnn_design/README.md#the-admitted-receivers-campaign-5-september-27)).
+[established-bounded; measured] Item 7 was consumed by the admitted receivers
+([`receiver::population::admitted`](https://github.com/brandonrdug/holonics/blob/f5fd8f3b/crates/holonics/src/receiver/population/admitted.rs),
+[`compression::landmark::context::spans`](https://github.com/brandonrdug/holonics/blob/f5fd8f3b/crates/holonics/src/compression/landmark/context/spans.rs);
+the
+[notebook receipt](https://github.com/brandonrdug/holonics/blob/d4596102/research/notebook/hnn_design/README.md#the-admitted-receivers-campaign-5-september-27)),
+retired September 30 with the byte-tree text line as catered machinery (a copy stage); the item
+has no current consumer.
 `curated_incidence.py` places the request→response and response→later-human relations on the
 pinned cut. The request→response receiver locates a response on its request's span and factors the
 boundary egg's face through a copy stage, with the request's pointer coded where it arrives and
