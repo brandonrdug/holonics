@@ -929,7 +929,7 @@ impl Family for FoundedFamily {
         Likelihood::Exact(self.likelihood.clone())
     }
 
-    fn readout(&self) -> Readout<'_> {
+    fn readout(&self) -> Readout {
         let mut states: Vec<u64> = self
             .classes
             .iter()

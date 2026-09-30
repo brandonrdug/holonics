@@ -1,5 +1,5 @@
-//! **The section chart and the typed address it reads: a channel slot read once at its section**
-//! (campaign 5's curated source under HNN_FORMULA's source contract, items 1–3; #73, #148).
+//! **The section chart: a curated stream's parts opened by their section letters** (campaign 5's
+//! curated source under HNN_FORMULA's source contract, items 1–3; #73, #148).
 //!
 //! [definition; agent-inferred] **The chart** ([`SectionChart`]): a stream whose cells are the
 //! exterior chart's `B` cells (the UTF-8 bytes of a part, `B = 256`) followed by the **section
@@ -8,29 +8,19 @@
 //! `|A| = 256 + 12`). A part opens with its one letter, so the channel a cell lies on is never
 //! supplied: it is read from the coded past, at the part's section.
 //!
-//! [definition; agent-inferred] **The typed address** ([`Sections`]): each tick's letter is its cell
-//! bundled with the declared slots of the part it lies in (a section letter's own part: the one it
-//! opens), `Bundle { cell, features }` over the family [`SectionSlots::family`] declares: the
-//! channel alone (`[C]`), or the channel and the kind (`[C, K]`, the typed reader of September 27).
-//! The slot is read **once**, at the section letter, and carried by every bundle of its part; the
-//! address of cell `j` is the preceding `D` bundles, newest first (`letter_address`), so it is causal.
-//! The reader refuses a cell outside the chart and a byte before any section letter (a cut opens at
-//! a letter: the codec's pin), before anything moves.
+//! [definition] **Retired September 30** with the byte-tree text line (THE_REBUILD U6's order,
+//! C.5; history at `f5fd8f3b`): the typed address the receiving tree read over the chart
+//! (`Sections`, each tick's letter bundled with its part's slots, the channel alone or with the
+//! kind, read once at the section letter; `SectionSlots::Cells`, the whole-stream control). The
+//! chart stays: the exterior reads the curated cuts on it (the notebook's `exterior.rs`).
 //!
-//! [definition; agent-inferred] **No slots** ([`SectionSlots::Cells`], the empty family `[]`): each
-//! tick's letter is its cell alone, as on the cell-only tree, and the chart's sections are read only
-//! where a part opens. It is the control over a curated stream (THE_REBUILD U6, item 2, the symmetric
-//! comparison): a context tree over every byte and every section letter, with no channel or kind
-//! carried by its address, whose conversations (aeons) are entered at the letter that opens their
-//! part exactly as the typed tree enters them (`receiver::population::TreeFamily::enter_aeon`).
-//!
-//! [definition] The computational object is the helical pair interaction, read here as the receiving
-//! tree's address over a curated passage. Of the winding guide's six general objects this owner
-//! touches **faces and placement** (the ports: a cell's channel placed on its bundle) and the **tower
-//! thread** (sections restrict the passage: a part is the span between two letters); the helix, pair,
-//! cell holonomy and tube stay attached through the tree's owner.
+//! [definition] The computational object is the helical pair interaction, read here as a curated
+//! passage's chart. Of the winding guide's six general objects this owner touches **faces and
+//! placement** (the ports: a section letter's channel) and the **tower thread** (sections restrict
+//! the passage: a part is the span between two letters); the helix, pair, cell holonomy and tube
+//! stay attached through the owners that read the chart.
 
-use super::{Bundle, ContextError, Letter, LetterFamily, shape};
+use super::{ContextError, shape};
 
 /// [definition] **A section letter's reading**: the kind of section it opens and its channel.
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash, PartialOrd, Ord)]
@@ -132,125 +122,5 @@ impl SectionChart {
             ));
         }
         Ok(self.bytes + self.channels * section.kind + section.channel)
-    }
-}
-
-/// [definition; agent-inferred] **The slots a typed address carries** (module header): none (the
-/// cells alone), the channel alone, or the channel and the kind.
-#[derive(Clone, Copy, Debug, PartialEq, Eq, Hash)]
-pub enum SectionSlots {
-    Cells,
-    Channel,
-    ChannelKind,
-}
-
-impl SectionSlots {
-    /// **The declared letter family** of the slots over a chart: `[]` (the cell-only family), `[C]`
-    /// or `[C, K]`. Refused where a slot would hold one letter (a chart of one kind carries no kind
-    /// slot).
-    pub fn family(self, chart: &SectionChart) -> Result<LetterFamily, ContextError> {
-        match self {
-            SectionSlots::Cells => Ok(LetterFamily::cells()),
-            SectionSlots::Channel => LetterFamily::new(vec![chart.channels as u64]),
-            SectionSlots::ChannelKind => {
-                LetterFamily::new(vec![chart.channels as u64, chart.kinds as u64])
-            }
-        }
-    }
-
-    /// The slots' values of a section.
-    fn values(self, section: Section) -> Vec<u64> {
-        match self {
-            SectionSlots::Cells => Vec::new(),
-            SectionSlots::Channel => vec![section.channel as u64],
-            SectionSlots::ChannelKind => vec![section.channel as u64, section.kind as u64],
-        }
-    }
-}
-
-/// [definition; agent-inferred] **The typed address's reader** (module header): the chart, the
-/// declared slots and their family, and the open section, read once at its letter.
-#[derive(Clone, Debug, PartialEq, Eq)]
-pub struct Sections {
-    chart: SectionChart,
-    slots: SectionSlots,
-    family: LetterFamily,
-    open: Option<Section>,
-}
-
-impl Sections {
-    /// The reader over a chart with the declared slots, no section open yet.
-    pub fn new(chart: SectionChart, slots: SectionSlots) -> Result<Self, ContextError> {
-        Ok(Self {
-            family: slots.family(&chart)?,
-            chart,
-            slots,
-            open: None,
-        })
-    }
-
-    /// The chart.
-    pub fn chart(&self) -> &SectionChart {
-        &self.chart
-    }
-
-    /// The declared slots.
-    pub fn slots(&self) -> SectionSlots {
-        self.slots
-    }
-
-    /// The slots' letter family (the tree's declared family).
-    pub fn family(&self) -> &LetterFamily {
-        &self.family
-    }
-
-    /// The open section: the part the next byte lies in.
-    pub fn open(&self) -> Option<Section> {
-        self.open
-    }
-
-    /// Restore the contemporary open part from a durable standing. The section is checked against
-    /// this reader's immutable chart before the state changes.
-    pub(crate) fn restore_open(&mut self, open: Option<Section>) -> Result<(), ContextError> {
-        if let Some(section) = open {
-            self.chart.letter(section)?;
-        }
-        self.open = open;
-        Ok(())
-    }
-
-    /// **The letter a cell would read**, nothing moved: the cell bundled with its part's slots
-    /// (a section letter's own), or the cell alone under no slots. Refused outside the chart and at
-    /// a byte before any section.
-    pub fn letter_of(&self, cell: usize) -> Result<Letter, ContextError> {
-        let alphabet = self.chart.alphabet();
-        if cell >= alphabet {
-            return Err(ContextError::CellOutside {
-                code: cell,
-                alphabet,
-            });
-        }
-        let section = self
-            .chart
-            .section(cell)
-            .or(self.open)
-            .ok_or_else(|| shape("a section letter before the first byte", 1, 0))?;
-        if self.family.is_empty() {
-            return Ok(Letter::Cell(cell));
-        }
-        Ok(Letter::Bundle(Bundle {
-            cell,
-            features: self.family.encode(&self.slots.values(section))?,
-        }))
-    }
-
-    /// **Read one tick** (module header): its letter ([`Self::letter_of`]), and a section letter
-    /// opens its part. Refused, with nothing moved, where `letter_of` refuses.
-    pub fn read(&mut self, cell: usize) -> Result<Letter, ContextError> {
-        let letter = self.letter_of(cell)?;
-        if let Some(section) = self.chart.section(cell) {
-            self.open = Some(section);
-        }
-        Ok(letter)
     }
 }

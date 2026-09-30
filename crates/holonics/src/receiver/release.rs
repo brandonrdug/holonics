@@ -51,14 +51,15 @@
 //! class. It does not turn the certified submeasure into the full mixture: over a point face the
 //! certified cells partition `[0, 1)` and the drawn class follows the face, while over an interval
 //! face the unresolved keys are mass the release does not emit. No claim of distributional
-//! equality rests on the draw. `P_release = P_scored` is the face identity of the population's
-//! release view (`receiver::population::PopulationRelease`), which the draw reads.
+//! equality rests on the draw. `P_release = P_scored` was the face identity of the population's
+//! release view, which the draw read (retired September 30 with the byte-tree text line; the law is
+//! kept in `docs/RECEIVER_HOLARCHY.md`, "The retired byte-tree text line").
 //!
 //! [definition] **The consumers.** The HNN's release (`hnn::reference`, the CUDA port) is a
-//! threshold commit at its receiving phases' grain. The population's release pipeline
-//! (`receiver::population::{releasing, text_release}`) returns this law's arms: the family draw
-//! (`Population::select_family`), one certified draw per response cell, the stop law and the
-//! typed refusals (`receiver::population::Population::release_response`). The chaser
+//! threshold commit at its receiving phases' grain. The population's text release pipeline
+//! (`receiver::population::{releasing, text_release}`: the family draw, one certified draw per
+//! response cell, the stop law and the typed refusals) read [`draw`] and [`draw_exact`] until its
+//! retirement on September 30 (history at `f5fd8f3b`); no library owner reads them since. The chaser
 //! (`receiver::population::chaser`, THE_REBUILD U3's second loop) returns two of its arms: the
 //! certified capture is `Released` at tolerance zero on the capture-within-`m` reading over the
 //! population's selected fibre (width zero is the capture basin's certificate over every member),

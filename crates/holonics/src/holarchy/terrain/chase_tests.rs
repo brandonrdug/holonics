@@ -2,9 +2,10 @@
 //! inadmissible change and the slip a demand beyond it causes, a slip held for its declared ticks,
 //! the wall law keeping every mover inside, capture ending the passage, the key description, and
 //! reception on hash-seeded arenas: the population's selected fibre is the surviving fibre, it holds
-//! the truth, its code lies within the naming margin of the truth's own code and strictly below the
-//! landmark tree's on the same cells; a plural fibre the ground cannot split is one future class
-//! under every admitted pursuer word. The action phase (`pursuit`): the runner's viable tube, its
+//! the truth, and its code lies within the naming margin of the truth's own code (the landmark
+//! tree's control, retired with the byte-tree text line on September 30, last read strictly above on
+//! all three seeds; history at `f5fd8f3b`); a plural fibre the ground cannot split is one future
+//! class under every admitted pursuer word. The action phase (`pursuit`): the runner's viable tube, its
 //! Pre recursion matching a brute-force enumeration of runner and chaser words on a tiny arena; every
 //! motion a chaser releases (the machine and both controls) within its traction bound, a chaser
 //! outside it refused; the controls' laws; and the machine's certified captures kept.
@@ -18,14 +19,10 @@ use super::chase::*;
 use super::pursuit::*;
 use super::sensing::*;
 use super::{Draw, TerrainError};
-use crate::compression::landmark::context::{
-    Capacity, LandmarkDeclaration, LetterFamily, StopPrior,
-};
-use crate::ratio::algebraic::ExactInterval;
 use crate::ratio::{Rat, rat};
 use crate::receiver::population::{
-    ChaseFamily, Family, MachineChaser, MachineDeclaration, Plan, Population, Posterior, Release,
-    TreeFamily, selected_fibre,
+    ChaseFamily, MachineChaser, MachineDeclaration, Plan, Population, Posterior, Release,
+    selected_fibre,
 };
 
 /// The declared arena: `16 × 16` positions, patches of side 4, classes ice `1/2`, grass `1`, track
@@ -389,40 +386,12 @@ fn the_truth_names_its_key() {
     assert!(bad.check().is_err());
 }
 
-fn tree(alphabet: usize, depth: usize, population: usize) -> LandmarkDeclaration {
-    LandmarkDeclaration {
-        alphabet,
-        depth,
-        forced: 0,
-        population: population as u64,
-        grain: 16,
-        family: LetterFamily::cells(),
-        prior: StopPrior::half(),
-        capacity: Capacity::Unbounded,
-    }
-}
-
-/// The landmark tree's least code alone over a ladder of depths, reading the same cells.
-fn tree_code(cells: &[usize], alphabet: usize) -> ExactInterval {
-    [1usize, 2, 4]
-        .iter()
-        .map(|&depth| {
-            let mut family = TreeFamily::new(tree(alphabet, depth, cells.len()), 0).unwrap();
-            for &cell in cells {
-                family.receive(cell).unwrap();
-            }
-            family.likelihood().code().unwrap().unwrap()
-        })
-        .min_by(|a, b| a.lower.cmp(&b.lower))
-        .unwrap()
-}
-
 /// Reception on hash-seeded arenas (F6's reception acceptance): the surviving fibre holds the
 /// truth; the population's selected fibre (its greatest posterior, read exactly) is the surviving
 /// fibre, and the family it selects, when one is decided, lies in it; the fibre's joint posterior is
 /// decided above one half; the population's code lies within the naming margin `⌈log₂ N⌉` of the
-/// truth family's own code and strictly below the landmark tree's least code on the same cells. The
-/// seeds are the harness's: a circle runner that slips, a zig-zag runner and a flee runner.
+/// truth family's own code. The seeds are the harness's: a circle runner that slips, a zig-zag
+/// runner and a flee runner.
 #[test]
 fn reception_selects_the_surviving_fibre() {
     let declaration = declaration();
@@ -449,12 +418,6 @@ fn reception_selects_the_surviving_fibre() {
         assert!(
             &receipt.code.upper - &truth.lower <= margin,
             "seed {seed:#x}: {:?} against {truth:?}",
-            receipt.code
-        );
-        let tree = tree_code(&chase.cells, chase.ports.moves.alphabet());
-        assert!(
-            receipt.code.upper < tree.lower,
-            "seed {seed:#x}: {:?} against the tree's {tree:?}",
             receipt.code
         );
         let futures = chase.futures(&family, &fibre, &pursuer(), 3).unwrap();

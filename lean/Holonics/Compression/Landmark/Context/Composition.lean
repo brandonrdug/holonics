@@ -41,7 +41,9 @@ filtered by the family that reads it.**
   alike), `code(A⊳B) = (log₂ |κ| − log₂ #S_n) − log₂ ℓ`: the keystone's key plus the conditioned
   family's code under the located key.
 
-**The staged face** (the boundary egg, Rust `receiver::population::boundary`): a keystone of one
+**The staged face** (the boundary egg, Rust `receiver::population::boundary`, retired September 30
+with the byte-tree text line and without a Rust consumer since:
+[history](https://github.com/brandonrdug/holonics/blob/f5fd8f3b/crates/holonics/src/receiver/population/boundary.rs)): a keystone of one
 key whose port is read from the coded past (the part clock) locates nothing, and the family reading
 it factors each tick's face through a stage map `σ : C → S` of the classes (a byte or a section
 letter): `q_t(c) = h_t(σ c) · r_t(c)`, the stage's face (the hazard) times the conditioned face within
