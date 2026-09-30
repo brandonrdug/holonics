@@ -28,8 +28,11 @@ when its derivation returns.
 - The egg population's survivors and the mixture's likelihood telescope (Lean `Population`:
   `survivor_code`, `survivors_product`, `population_mixture`).
 - The relevance kernel (Lean `Foundation/CausalRelevance`, atlas `info.relevance-kernel`), the
-  Bombe's publication rule in `hnn::keys` (publish when the fibre is one gauge orbit), and the pair
-  contact's Farey lock address.
+  Bombe's publication rule in `hnn::keys` (publish when the fibre is one gauge orbit; Lean
+  `Compression/Core/Keys.fibre_eq_orbit`, under gauge reachability and boundary pinning), observed-
+  prefix agreement and next-step separation (`Computation/NavigatorObservationScope`), and the pair
+  contact's Farey lock address. These are scoped identification laws, not a universal encounter
+  count, and this record stays within their scopes.
 
 ## 1. Unicity in the objects
 
@@ -45,8 +48,10 @@ log of a ratio of two counts.** Under the uniform mixture, the face of the true 
 per-reading constraint is the ratio `R_t = #S_t/#S_(t+1)`, and its log is the surprise crossing the
 receiver's section. This is the governing law "loss is the log of a ratio" read on counts: pathwise
 and exact, with no expectation taken. Under any prior the mixture codes within `−log₂ π(key)` of the
-true key (`population_mixture`): the total surprise an ignorant receiver ever pays above the keyed
-one is at most the key's own description.
+true key (`population_mixture`): the realized surprise an ignorant receiver pays above the keyed one
+is at most `−log₂ π(key)`, the true key's own description under the prior. It is not bounded by the
+key entropy `H(K)` in general. `H(K)` bounds it only in expectation, under a declared joint
+probability model of keys and readings (correction, Codex review).
 
 [proved-derived; formal-checked, `Unicity.survivors_card_succ_eq_iff`] **A null reading.** `R_t = 1`
 (surprise zero) exactly when every survivor makes the true reading. A reading constrains only
@@ -63,11 +68,13 @@ Identification is only ever up to the admitted-future quotient, which is retenti
 `clog_classes_le_of_separating`] **The pigeonhole count.** If `n` readings over an alphabet `C`
 separate every two classes, the class count is at most `|C|ⁿ`, so `n ≥ clog_|C|(classes)`.
 
-[proved-standard] **Shannon's form is the expected face of the same law.** Under the random-cipher
-hypothesis the expected number of spurious keys after `n` readings is at least `2^(H(K) − nD) − 1`,
-with `D = log|A| − h` the redundancy per reading (`D(P‖U)`), which gives `n* ≈ H(K)/D`. The pathwise
-law above needs no random-cipher hypothesis. The expected form is its average when the survivors
-split like a random partition.
+[proved-standard] **Shannon's form is a statistical crossover, not a certificate.** In the
+random-cipher model with `M` equally likely keys, the expected number of spurious keys after `n`
+readings is `(M − 1)·2^(−nD)`, with `D = log₂|A| − h` the redundancy per reading (`D(P‖U)`). At
+`nD = log₂ M` the expected number of survivors is `2 − 1/M`, not one: `n* = H(K)/D` marks where the
+expected spurious count crosses one, and it certifies no singleton. The law depends on the source,
+the key law and their dependence. The pathwise laws above certify a class exactly and need no
+random-cipher model.
 
 ## 2. Residues: the constraint is a divisor of the modulus
 
@@ -100,6 +107,10 @@ separated at the least denominator among the fractions in the half-open interval
 Farey neighbours `p/q < p'/q'` (`p'q − pq' = 1`) every `N < q'` readings agree, and the reading at
 `q'` separates them. There `q'·(p'/q')` is the integer `p'` and the neighbour below falls short of
 it. The helix hears a periodic key at its own period: completeness, not duration (the cycle's law).
+Scope: this is unicity within a finite key family, the rationals of height at most `Q`, where every
+two keys are separated within `Q` readings. A real key's Farey cell has positive measure at every
+`N` and never shrinks to a point: a continuous key never becomes a singleton, and a positive-measure
+survivor set is not a located key.
 
 [proved-standard] The `N`-th reading adds, in each unit interval, the `φ(N)` reduced fractions of
 denominator `N` (Euler's totient). After `N` readings a unit interval of keys holds
@@ -123,11 +134,19 @@ redundant.
    composition (§7).
 3. [proved-standard] **The prime count.** von Koch (1901): RH holds if and only if
    `π(x) − Li(x) = O(√x log x)`: the actual count against the count the density receiver predicts.
-   Equivalently `M(x) = Σ_(n≤x) μ(n) = O(x^(1/2+ε))`. [interpretation] In the explicit formula each
-   zero contributes `x^ρ = x^β e^(iγ log x)`. On the clock `log x` that is a Swing with boost rate `β`
-   and turn rate `γ`. RH says every boost is the common ½, so after the `√x` normalization every mode
-   is a pure turn. A zero off the line would be a mode louder than the square-root floor: a key a
-   receiver could lock onto.
+   Equivalently `M(x) = Σ_(n≤x) μ(n) = O(x^(1/2+ε))`. [interpretation; a restatement, not
+   evidence] Each actual zero `ρ = β + iγ` of multiplicity `m_ρ` enters `ψ(x)` with coefficient
+   `−m_ρ/ρ`, and `x^ρ = x^β e^(iγ log x)` is, on the clock `log x`, a Swing with boost rate `β` and
+   turn rate `γ` (`Geometry/Motion.complex_rate_split`). After the `√x` normalization its boost is
+   `β − ½`. RH is exactly the statement that every normalized boost is zero, so reading every mode
+   as a pure turn already assumes RH (correction, Codex review). A zero with `β > ½` would be a
+   mode louder than the square-root floor. The `π − Li` receiver needs, beyond `ψ`, the prime powers
+   removed and partial summation. The repository's actual-source owners
+   (`Zeta/ExplicitFormulaFiniteHeight.explicit_formula_finite_height`, with entire test weights,
+   zero-free rectangle boundaries, multiplicities and both horizontal edges;
+   `SpectralKernelDecay.explicit_formula_limit_weil` and
+   `PrimeSideConverges.explicit_formula_classical_weil`, with smooth compactly supported kernels)
+   do not directly prove an unsmoothed `π − Li` receiver.
 4. [proved-standard] **Hearing and nullity** (September 25). Lapidus–Maier: the geometry of a
    fractal string of dimension `D` is heard from its spectrum exactly when ζ has no zero on
    `Re s = D`. So RH is equivalent to the hearing being unique at every dimension but ½. The zeros are
@@ -139,15 +158,19 @@ redundant.
    of a drum?") in the negative. A receiver that reads fixed-point counts (the splitting of primes,
    closed geodesics, a trace formula) cannot separate Gassmann-equivalent keys. Its unicity is infinite
    on that fibre, and only a different kind of reading closes it.
-6. [proved-standard; interpretation for the reading] **The parity problem** (Selberg): sieve
-   readings leave the Liouville direction `λ(n)` in their kernel, so no amount of sieve data locates
-   it (infinite unicity for that receiver). Chowla's conjecture and Sarnak's Möbius disjointness
+6. [proved-standard; interpretation for the reading] **The parity problem** (Selberg): at a
+   declared level of distribution and error budget, sieve inputs cannot distinguish sets that differ
+   by the parity of their prime-factor count, so that sieve receiver cannot locate the Liouville
+   direction `λ(n)`. This is scoped to the sieve receiver, its level and its error terms. It does not
+   establish that `λ` lies in `futureCollapsed` under every admitted transport. Chowla's conjecture and Sarnak's Möbius disjointness
    conjecture (μ uncorrelated with every zero-entropy sequence) say, in this language, that no
    zero-entropy navigator locates μ. Both are conjectures.
 7. **A correction to the brief sent to Astra.** For a deterministic helix, the Farey keys of height
    `Q` are separated by `Q` readings (§3), not `Q²`. The large sieve's `N − 1 + Q²` concerns another
    receiver: detecting energy at Farey frequencies in an arbitrary sequence, with the amplitudes
-   unknown. Whether the `√x` level of Bombieri–Vinogradov is exactly that receiver's unicity threshold
+   unknown. The upper energy inequality and the Farey separation do not by themselves give
+   injectivity or a noise-stable inverse, so a uniqueness claim there needs the actual observation
+   map and a lower bound (Codex review). Whether the `√x` level of Bombieri–Vinogradov is exactly that receiver's unicity threshold
    is left open for Astra.
 
 ## 5. The HNN: hearing against listening

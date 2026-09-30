@@ -50,8 +50,9 @@ taken:
   lies in the half-open interval between them. Rational keys of height `≤ N` are separated by `N`
   readings (`rational_keys_separated`). Farey neighbours `p/q < p'/q'` stay unseparated for
   every `N < q'` (`farey_neighbours_agree_below`) and are separated at `q'`
-  (`farey_neighbours_separate_at`). The helix's unicity for a key of height `q'` is `q'`
-  readings, and its partition after `N` readings is the Farey sequence `F_N`.
+  (`farey_neighbours_separate_at`). Within the rationals of height at most `Q`, every two keys are
+  separated within `Q` readings, and the partition after `N` readings is the Farey sequence `F_N`.
+  A real key's cell keeps positive measure: a continuous key never becomes a singleton.
 
 [proved-standard; not formalized here] Franel and Landau (1924): RH holds if and only if the Farey
 sequence's discrepancy from equal spacing is `O(N^(1/2+ε))` (Landau's `L¹` form). By the helix's
