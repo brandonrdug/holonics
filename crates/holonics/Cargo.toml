@@ -20,22 +20,6 @@ rayon = "1.12"
 name = "hnn_exposure"
 path = "../../research/notebook/hnn_design/hnn_exposure.rs"
 
-# The notebook's measurement of the landmark tree (count-only) on the standing real
-# cut: the depth sweeps on the development cells and the prequential run against the online
-# baselines (research/notebook/hnn_design/README.md): a measurement run once in release, never a
-# test.
-[[example]]
-name = "hnn_landmark"
-path = "../../research/notebook/hnn_design/hnn_landmark.rs"
-
-# The notebook's egg population on terrain a declared Holarchy made (`receiver::population` over
-# `holarchy::terrain`: the tree at a ladder of depths, a moiré's gratings, a rotor crib's keys,
-# selecting the family that made the terrain; research/notebook/hnn_design/README.md): count-only
-# development receipts run once in release, never a test.
-[[example]]
-name = "hnn_population"
-path = "../../research/notebook/hnn_design/hnn_population.rs"
-
 # The notebook's chase terrain in its reception phase (`holarchy::terrain::chase`, the population of
 # candidate runners `receiver::population::ChaseFamily`; THE_REBUILD F6;
 # research/notebook/hnn_design/README.md): count-only development receipts run once in release,
@@ -50,17 +34,3 @@ path = "../../research/notebook/hnn_design/hnn_chase.rs"
 [[example]]
 name = "hnn_prediction"
 path = "../../research/notebook/hnn_design/hnn_prediction.rs"
-
-# The notebook's parametron re-derived (`hnn::ring`: the Floquet certificate on declared pumped
-# rings, and the receiving bank's reading of relative phase on known truth; THE_REBUILD U6;
-# research/notebook/hnn_design/README.md): run once in release, never a test.
-[[example]]
-name = "hnn_parametron"
-path = "../../research/notebook/hnn_design/hnn_parametron.rs"
-
-# The causes' analysis of the bank's learning path (an exterior probe harness on synthetic
-# terrain: dumps of the declared field's placement, exact bank readings and `E` after each
-# certified deposit; never a pinned run).
-[[example]]
-name = "bank_causes"
-path = "../../research/notebook/hnn_design/bank_causes.rs"

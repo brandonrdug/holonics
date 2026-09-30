@@ -12,7 +12,7 @@ declared receiver the exact merges beyond the chains are essentially empty, so e
 is a declared coarser receiver priced against the finer by its code-length pair
 (`Context/Merge.coarsening_within_margin_iff`: within `m` bits exactly when `P·W ≤ 2^m·P′·W′`).
 The census it starts from is `hnn_population f0-census` on F4's passage
-([notebook](../notebook/hnn_design/README.md#u2-the-standing-census-of-f0s-egg-september-28)).
+([notebook](https://github.com/brandonrdug/holonics/blob/d4596102/research/notebook/hnn_design/README.md#u2-the-standing-census-of-f0s-egg-september-28)).
 
 The computational object is the helical pair interaction, read as the receiving tree's storage. Of
 the winding guide's six objects the run touches **faces and placement** (the receiving face read at

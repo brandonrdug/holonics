@@ -117,7 +117,7 @@ on the admitted egg, and the trees beyond depth 24 add at most 20 bits.
        166,113 ms.
   2. **A family wins where it is closest: measured, not adopted, September 28**
      ([record](2026-09-28_A_NUMBER_IS_A_HELIX_ITS_BASE_IS_A_FACE_AND_A_FAMILY_WINS_WHERE_IT_IS_CLOSEST.md#5-the-population-a-family-wins-where-it-is-closest);
-     [receipt](../notebook/hnn_design/README.md#f0-candidate-2-a-family-wins-where-it-is-closest-september-28)).
+     [receipt](https://github.com/brandonrdug/holonics/blob/d4596102/research/notebook/hnn_design/README.md#f0-candidate-2-a-family-wins-where-it-is-closest-september-28)).
      `receiver::population::LocalMixture` keeps each member's posterior at each gating context,
      the last `d` cells (node-local Bayes; Lean `Population.{local_telescope, local_mixture_code,
      local_of_constant}`). Its executed chart holds a member at `2^(−64)` of its context's leader,
@@ -1031,7 +1031,7 @@ close    at an aeon boundary: the collapse onto what the admitted future disting
   - [agent-inferred; measured] Reading `K_r` from the evolving state compounds bit length about
     `(n+1)`-fold per tick: 46 → 804,289 bits in 7 ticks at 4 real dimensions. Reading it from the
     sheet class grows additively: 44, 85, 127, 209, 374, 705 bits at ticks 1, 2, 4, 8, 16, 32. On
-    the revised six-ring tick ([`word_bits.py`](../notebook/hnn_design/word_bits.py))
+    the revised six-ring tick ([`word_bits.py`](https://github.com/brandonrdug/holonics/blob/d4596102/research/notebook/hnn_design/word_bits.py))
     one word peaks at 77, 482, 1,461, 3,512 and 7,623 bits at 2, 4, 8, 16 and 32 ticks: additive,
     about 240 bits per tick, set by the operands' denominators.
 - **The causal cone (§8.1, review A1; Brandon's rulings of September 1, 11 and 22 are quoted in
@@ -1304,7 +1304,7 @@ aeon admits deposits (R3 R4).
      counting, while its clock keeps stepping in `λ`. `n*` is recomputed on the remaining source
      rings and reported.
 
-   [established-bounded; measured] [`release.py`](../notebook/hnn_design/release.py)
+   [established-bounded; measured] [`release.py`](https://github.com/brandonrdug/holonics/blob/d4596102/research/notebook/hnn_design/release.py)
    runs the two recursions on a path of six rings, with source ring 0 and receiving ring 2
    (`e_0 = 2`, `A = 2`, `e_last = 3`, `e_max = 4`):
    - Retained: the elements and junctions of rings 0–2, and the channels (0,1), (1,2) and (2,3).
@@ -1388,17 +1388,17 @@ aeon admits deposits (R3 R4).
 | Source moment on a closing period-5 ring with selective stepping | its largest count: 1, 2, 3, 5, 7, 9 bits at `n` = 2, 8, 32, 128, 1,024, 4,096 | counts, `O(log n)` per slot; lossy only past `n*` (the capacity above) |
 | Reaction within a word, operands read from the evolving state | 46 → 804,289 bits in 7 ticks | not the law |
 | Reaction within a word, operands read from the sheet class | 44 → 705 bits in 32 ticks | the law: additive within a word |
-| The revised six-ring word ([`word_bits.py`](../notebook/hnn_design/word_bits.py)) | 77, 482, 1,461, 3,512, 7,623 bits at 2, 4, 8, 16, 32 ticks | additive within a word |
+| The revised six-ring word ([`word_bits.py`](https://github.com/brandonrdug/holonics/blob/d4596102/research/notebook/hnn_design/word_bits.py)) | 77, 482, 1,461, 3,512, 7,623 bits at 2, 4, 8, 16, 32 ticks | additive within a word |
 | The same change carried from word to word (the first design's published `s′, b′`) | 11,728, 24,057, 48,707, 98,004 bits after 8, 16, 32, 64 words of 6 ticks; one lossless ring element: 77 → 6,272 bits over 256 words (R2) | not the law (R2 C2c) |
 | The same change released at each word's end | at most 963 bits in any word of 6 ticks, over 32 words | the law: bounded by one word |
-| The first design's case (5): a period-5 ring and a dissipative contact, one injection per epoch, collapsed every 8 epochs | no collapse: 47, 221, 912, 1,831 bits at epochs 8, 32, 128, 256. The spectral (Bezout) projector that design stated: 72, 74, 77, 78, max 121 ([`collapse_bezout.py`](../notebook/hnn_design/collapse_bezout.py), independent of R2's Sylvester solve). Its certified release: refused at 32 of 32 boundaries | withdrawn: its "3, 5, 7, 7, max 52" zeroed the wrong coordinates (R2 C2a) |
-| Deposited receiving map `R` (not an operand of its own feature), `γ = 1` | 155, 176, 180, 196 bits after 8, 32, 128, 256 deposits ([`deposit_bits.py`](../notebook/hnn_design/deposit_bits.py)) | slow: a function of `(H, B)` only, whose denominators the fixed word shares |
+| The first design's case (5): a period-5 ring and a dissipative contact, one injection per epoch, collapsed every 8 epochs | no collapse: 47, 221, 912, 1,831 bits at epochs 8, 32, 128, 256. The spectral (Bezout) projector that design stated: 72, 74, 77, 78, max 121 ([`collapse_bezout.py`](https://github.com/brandonrdug/holonics/blob/d4596102/research/notebook/hnn_design/collapse_bezout.py), independent of R2's Sylvester solve). Its certified release: refused at 32 of 32 boundaries | withdrawn: its "3, 5, 7, 7, max 52" zeroed the wrong coordinates (R2 C2a) |
+| Deposited receiving map `R` (not an operand of its own feature), `γ = 1` | 155, 176, 180, 196 bits after 8, 32, 128, 256 deposits ([`deposit_bits.py`](https://github.com/brandonrdug/holonics/blob/d4596102/research/notebook/hnn_design/deposit_bits.py)) | slow: a function of `(H, B)` only, whose denominators the fixed word shares |
 | The same, `γ = 1/2` | 1,001, 5,172, 22,477, 46,784 bits | linear in deposits: the previous map enters its own target |
 | Deposited source port `E` (an operand of the word that forms its covector), `γ = 1` | 612, 3,237, 14,852 bits after 8, 32, 128 deposits | linear in deposits |
 
 **The revised collapse's own projector.** In a learning aeon, the only kind campaign 1 admits, `V`
 deletes loci: a 0/1 projection. The retained entries keep their exact values, and no denominator
-is introduced. In [`release.py`](../notebook/hnn_design/release.py), 72 of 156 entries
+is introduced. In [`release.py`](https://github.com/brandonrdug/holonics/blob/d4596102/research/notebook/hnn_design/release.py), 72 of 156 entries
 are released and the other 84 are unchanged. A frozen aeon's value-level `V` moves to campaign 3
 with its descended tick.
 
@@ -1623,7 +1623,7 @@ The additions outside `hnn`, each in its owner and with its Lean:
    - **Its work** is `keys × d × edges`, where enumerating `PortImages::injections` costs
      `keys × d!/(d − m)!`, past `IMAGE_FAMILY_CEILING`.
    - [established-bounded; measured]
-     [`propagation.py`](../notebook/hnn_design/propagation.py), `d = 7`: propagation
+     [`propagation.py`](https://github.com/brandonrdug/holonics/blob/d4596102/research/notebook/hnn_design/propagation.py), `d = 7`: propagation
      equals brute force over all 5,040 plugboards on every menu tried, at 322–3,822 steps against
      35,280.
 8. `receiver::release::DecisionRule`: the data form of the declared decision laws, implementing
@@ -2197,7 +2197,7 @@ regression controls are controls, never milestones:
       reports each ring's jump.
     - Pending ratios keep their producing anchor `λ`, a clock reading from before the jump.
   - [established-bounded; measured]
-    [`propagation.py`](../notebook/hnn_design/propagation.py), `d = 7`, cuts produced
+    [`propagation.py`](https://github.com/brandonrdug/holonics/blob/d4596102/research/notebook/hnn_design/propagation.py), `d = 7`, cuts produced
     by a true machine:
     - the fibre always contains the truth;
     - 16 independent crib pairs pin it to the truth's rotor-gauge orbit (7 members), and the gauge
