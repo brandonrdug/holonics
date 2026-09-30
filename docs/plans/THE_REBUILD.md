@@ -1000,6 +1000,44 @@ branch; intervals that do not shorten the charged code are recorded and not adop
     against the second order, the line's symmetry, the Schur–Cohn test, and the bank's learning
     path.
 
+- **The bank's learning path, September 29: training moves the readings and no lock, and the
+  fold's flips do not transfer**
+  ([pin](../../research/records/2026-09-29_THE_BANKS_LEARNING_PATH_PINNED_BEFORE_ITS_RUNS.md),
+  `d84692dc`;
+  [receipt](../../research/records/2026-09-29_THE_BANKS_LEARNING_PATH_TRAINING_MOVES_THE_READINGS_AND_NO_LOCK_AND_THE_FOLDS_FLIPS_DO_NOT_TRANSFER.md);
+  `6b9b1cee`; Refs #73 #148 #63).
+  - *Built* (the bank receipt's open item: the covector of the lock's decision):
+    - the lock read at a declared temperature: the station's candidates are one lock's sheets, each
+      weighing the passage's second order at each member's parametric resonance and its mirror,
+      `A = Σ_m p_m² (|W⁺_m|² + |W⁻_m|²)`; the face `θ_x = A(x)/Σ A`, the covector `θ − q`
+      (`hnn::ring::{BankChart, Resonance}`);
+    - the comparison on the readout's partition, its returns carried to `E` beside the readout's
+      and deposited under the certified step, with the bank's own curvature, trust region and
+      rounding charge; the pumps' covector read and held
+      (`hnn::prediction::{BankImages, stage_bank, bank_reach}`, `hnn::constitution::BankReach`);
+    - Lean `HNN/BankFace`, 12 theorems: the face's covector, the score's endpoint bound, and where
+      the executed law departs from the kicked chart (it reads a passage and its conjugate alike,
+      both sidebands).
+  - *Measured*:
+    - every check holds on both runs;
+    - order-2: training moves the bank's readings and turns no lock (0 of 256 stations
+      differ from the opening's); the bank 508 of 2,048 (marginals 512 and 520; the readout 609 on
+      this build, 866 at its receipt); the face's training top is the target at 332 of 2,244;
+    - the fold's 31 flips, all taken on the training code, code a held-out probe strictly shorter
+      at 15 and strictly longer at 16;
+    - text: 7 sections released and 1 held, none legible; four changed against the readout-trained
+      bank's.
+  - *What stays open*, by its measurement:
+    - `E` moves by less than `2^(−10)` in its largest entry over 32 certified deposits, while the
+      locks' least margin is `1585/4096` in growth: the readings move and no decision does;
+    - the face codes the order-2 comparisons longer than the flat face (its readings are set by the
+      candidate's own image, and the second order carries no lag-2 relative phase);
+    - the fold's jump must be decided on the declared future receiver, a probe no deposit reads, not
+      on the batch that proposed it (the receipt's §5).
+
+    In #62: the executed law's full second order, the growth against the face, the pumps' step, the
+    lock's temperature, the jump at the future receiver.
+
 #### U7. The targets, alongside
 
 Every existing target obligation stays (RH, Hodge, complex Euler and Navier–Stokes, BSD, their Lean
