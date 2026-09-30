@@ -3,7 +3,7 @@
 //! and the path's reading of no landmark tree.
 
 use num_bigint::BigInt;
-use num_traits::{One, Zero};
+use num_traits::{One, Signed, Zero};
 
 use super::learning::{OPEN_BUDGET, chain, generic, moment, six_path};
 use super::support::Draw;
@@ -13,7 +13,8 @@ use crate::hnn::constitution::Constitution;
 use crate::hnn::field::{ConstitutionRead, Current, Field};
 use crate::hnn::moment::{PairPort, SourceMoment};
 use crate::hnn::prediction::{
-    BankPlacement, Refinement, Section, deposit_of, generate_by_bank, injection, stage,
+    BankImages, BankPlacement, Refinement, Section, bank_reach, deposit_of, generate_by_bank,
+    injection, stage, stage_bank,
     unreached_unchanged,
 };
 use crate::hnn::propagation::Operands;
@@ -810,4 +811,206 @@ fn the_bank_generates_by_its_certified_locks() {
         assert_eq!(generated.refinements, generated.locks.len() + 1);
         assert!(!generated.release.plural.is_empty());
     }
+}
+
+// -------------------------------------------------------------------------------------------
+// the bank's learning path
+
+/// The bank of the joint field's tests: one node `C = I`, `K = I`, `Y = 16`, `h = 1`, the members
+/// whose period divides the ring's 6 (standing and half-turn), at `p = 5/8`.
+fn joint_bank() -> ReceivingBank {
+    let identity = ExactRatMatrix::identity(2).unwrap();
+    let axis = Carrier::new(Rat::one(), Rat::zero()).unwrap();
+    ReceivingBank::new(
+        ResonatorMaterial::new(
+            identity.clone(),
+            identity,
+            ExactRatMatrix::zero(2, 2).unwrap(),
+            None,
+        )
+        .unwrap(),
+        [PumpStep::Stand, PumpStep::Half]
+            .into_iter()
+            .map(|step| PumpDeclaration::new(rat(5, 8), axis.clone(), step).unwrap())
+            .collect(),
+        integer(16),
+        Rat::one(),
+        6,
+    )
+    .unwrap()
+}
+
+/// **The bank's images are its placements' readings** (`prediction::{BankImages, stage_bank}`): at
+/// every compared station, the face's normalizer `Σ_x A(x)` and the target's reading `A(t)` read
+/// from the images equal the bank chart's reading of `BankPlacement::storage` with that candidate
+/// placed and the locked targets beside it, exactly.
+#[test]
+fn the_banks_images_are_its_placements_readings() {
+    let field = joint();
+    let theta = generic(&field, 91);
+    let (current, request) = moment(&field, 92, 7);
+    let refinement = Refinement::declare(&field, 0, 2, 1, 4, 2).unwrap();
+    let bank = joint_bank();
+    let images = BankImages::of(&field, &theta, &refinement, &bank).unwrap();
+    let placement = BankPlacement::of(&field, &theta, &current, &request, &refinement).unwrap();
+    let chart = bank.chart(6).unwrap();
+    let targets = [1usize, 0, 2, 1];
+    for locked in [
+        [false; 4],
+        [true, false, false, false],
+        [false, true, false, true],
+        [true, true, true, false],
+    ] {
+        let staged =
+            stage_bank(&field, &current, &request, &refinement, &images, &targets, &locked)
+                .unwrap();
+        assert_eq!(staged.skipped + staged.stations.len(), locked.iter().filter(|l| !**l).count());
+        for reading in &staged.stations {
+            let read = |class: usize| -> Rat {
+                let mut cells: Vec<Option<usize>> = targets
+                    .iter()
+                    .zip(&locked)
+                    .map(|(&t, &l)| l.then_some(t))
+                    .collect();
+                cells[reading.station] = Some(class);
+                chart.of_storage(&placement.storage(&cells)).unwrap().reading(&chart)
+            };
+            let total: Rat = (0..field.alphabet()).map(read).sum();
+            assert_eq!(reading.total, total);
+            assert_eq!(reading.reading, read(reading.target));
+            assert_eq!(reading.mass, &reading.reading / &reading.total);
+        }
+    }
+}
+
+/// **The bank's returns are its score's differential in `E`, within their charged rounding** (module
+/// header, "The bank's learning path"): the samples `bank_reach` carries give `G = Σ w g fᵀ` with
+/// each reading's covector at its dyadic face `ĉ_x`; for a drawn move `δE` of the source port,
+/// `−⟨G, δE⟩` differs from the derivative of the stations' scores
+/// `Σ_j (log Σ_x A_j(x) − log A_j(t_j))` along `E + η δE` at `η = 0` by at most
+/// `Σ_j e_j Σ_x |A′_j(x)|`, each station's rounding bound times its readings' derivatives, all read
+/// exactly (each reading is quadratic in `η`, so its derivative is `(A(1) − A(−1))/2`).
+#[test]
+fn the_banks_returns_are_its_scores_differential_in_e() {
+    let field = joint();
+    let theta = generic(&field, 91);
+    let (current, request) = moment(&field, 93, 9);
+    let refinement = Refinement::declare(&field, 0, 2, 1, 4, 2).unwrap();
+    let bank = joint_bank();
+    let chart = bank.chart(6).unwrap();
+    let targets = [2usize, 1, 0, 1];
+    let locked = [false, true, false, false];
+    let port = theta.source_port(0).unwrap().clone();
+    let mut draw = Draw::new(97);
+    let direction = draw.matrix(port.rows(), port.columns());
+    let moved = |eta: Rat| {
+        let moved = port.add(&direction.scaled(&eta)).unwrap();
+        theta.clone().with_ports(0, None, Some(moved), None).unwrap()
+    };
+    let at = |theta: &Constitution| {
+        let images = BankImages::of(&field, theta, &refinement, &bank).unwrap();
+        stage_bank(&field, &current, &request, &refinement, &images, &targets, &locked).unwrap()
+    };
+    let (ahead_theta, behind_theta) = (moved(Rat::one()), moved(-Rat::one()));
+    let (here, ahead, behind) = (at(&theta), at(&ahead_theta), at(&behind_theta));
+    let reading = |theta: &Constitution, station: usize, class: usize| -> Rat {
+        let placement =
+            BankPlacement::of(&field, theta, &current, &request, &refinement).unwrap();
+        let mut cells: Vec<Option<usize>> = targets
+            .iter()
+            .zip(&locked)
+            .map(|(&t, &l)| l.then_some(t))
+            .collect();
+        cells[station] = Some(class);
+        chart.of_storage(&placement.storage(&cells)).unwrap().reading(&chart)
+    };
+    let (mut expected, mut charge) = (Rat::zero(), Rat::zero());
+    for ((now, up), down) in here.stations.iter().zip(&ahead.stations).zip(&behind.stations) {
+        expected += (&up.total - &down.total) / (integer(2) * &now.total)
+            - (&up.reading - &down.reading) / (integer(2) * &now.reading);
+        let derivatives: Rat = (0..field.alphabet())
+            .map(|class| {
+                ((reading(&ahead_theta, now.station, class)
+                    - reading(&behind_theta, now.station, class))
+                    / integer(2))
+                .abs()
+            })
+            .sum();
+        charge += &now.rounding * derivatives;
+    }
+    let images = BankImages::of(&field, &theta, &refinement, &bank).unwrap();
+    let reach = bank_reach(&images, std::slice::from_ref(&here));
+    let mut paired = Rat::zero();
+    for sample in &reach.samples {
+        let moved = direction.apply(&sample.feature).unwrap();
+        paired += &sample.weight
+            * sample
+                .covector
+                .iter()
+                .zip(&moved)
+                .map(|(g, m)| g * m)
+                .sum::<Rat>();
+    }
+    assert!(charge.is_positive());
+    assert!((-paired - &expected).abs() <= charge);
+}
+
+/// **The bank's deposit is certified and its score falls** (module header, "The bank's learning
+/// path"; Lean `HNN/BankFace.{bank_score_endpoint, joint_descends_beside}`): a deposit carrying only
+/// the bank's returns at the source port steps `E` by a certified step whose curvature is the
+/// bank's (`StepReading::bank > 0`, within the trust scale), and at the successor the product of
+/// the stations' target masses `Π θ_t` is strictly larger: every station's score
+/// `−log θ_t` falls together.
+#[test]
+fn the_banks_deposit_is_certified_and_its_score_falls() {
+    let field = joint();
+    let theta = generic(&field, 91);
+    let refinement = Refinement::declare(&field, 0, 2, 1, 4, 2).unwrap();
+    let bank = joint_bank();
+    let requests: Vec<(Current, SourceMoment)> = [101u64, 102, 103]
+        .into_iter()
+        .map(|seed| moment(&field, seed, 8))
+        .collect();
+    let targets = [[0usize, 1, 2, 1], [2, 2, 0, 1], [1, 0, 0, 2]];
+    let locked = [false, true, false, false];
+    let masses = |theta: &Constitution| -> (Rat, Vec<crate::hnn::prediction::BankStaged>) {
+        let images = BankImages::of(&field, theta, &refinement, &bank).unwrap();
+        let staged: Vec<_> = requests
+            .iter()
+            .zip(&targets)
+            .map(|((current, request), targets)| {
+                stage_bank(&field, current, request, &refinement, &images, targets, &locked)
+                    .unwrap()
+            })
+            .collect();
+        let product = staged
+            .iter()
+            .flat_map(|s| s.stations.iter().map(|r| r.mass.clone()))
+            .product();
+        (product, staged)
+    };
+    let (before, staged) = masses(&theta);
+    let images = BankImages::of(&field, &theta, &refinement, &bank).unwrap();
+    let reach = bank_reach(&images, &staged);
+    let deposit = crate::hnn::port::Deposit::new(
+        theta.commit(),
+        vec![crate::hnn::constitution::LinearStep {
+            locus: crate::hnn::constitution::LinearLocus::SourcePort(0),
+            samples: Vec::new(),
+        }],
+        Vec::new(),
+        vec![crate::hnn::constitution::Locus::SourcePort(0)],
+    )
+    .with_reach(refinement.reach(6))
+    .with_bank(reach);
+    let (next, reading) = theta.deposited(&deposit).unwrap();
+    let (_, step) = reading
+        .steps
+        .iter()
+        .find(|(locus, _)| *locus == crate::hnn::constitution::Locus::SourcePort(0))
+        .expect("the source port steps");
+    assert!(step.bank.is_positive());
+    assert!(step.step.holds());
+    let (after, _) = masses(&next);
+    assert!(after > before);
 }

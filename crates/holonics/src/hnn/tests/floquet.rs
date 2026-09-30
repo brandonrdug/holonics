@@ -662,3 +662,165 @@ fn the_bank_reads_a_passages_spectral_line_and_its_flip_continues_it() {
         }
     }
 }
+
+// -------------------------------------------------------------------------------------------
+// the bank's second-order face
+
+/// The bank of these tests: one node `C = I`, `K = I`, `Y = 16`, `h = 1`, the four members at
+/// `p = 5/8`.
+fn declared_bank() -> ReceivingBank {
+    ReceivingBank::new(
+        node(Rat::one(), None),
+        members(rat(5, 8)),
+        integer(16),
+        Rat::one(),
+        6,
+    )
+    .unwrap()
+}
+
+/// **The kicked chart's transport is the node's lossless Cayley multiplier**: `C = I`, `K = I`,
+/// `h = 1` give `v = (2 + i)/(2 − i) = (3 + 4i)/5`; a node whose `h√(k/c)` is irrational is
+/// refused.
+#[test]
+fn the_banks_transport_is_the_nodes_lossless_cayley_multiplier() {
+    assert_eq!(
+        declared_bank().transport().unwrap(),
+        GaussianRat::new(rat(3, 5), rat(4, 5))
+    );
+    let irrational = ReceivingBank::new(
+        node(integer(2), None),
+        members(rat(5, 8)),
+        integer(16),
+        Rat::one(),
+        6,
+    )
+    .unwrap();
+    assert!(irrational.transport().is_err());
+}
+
+/// **The executed turn reads a passage and its conjugate alike** (module header, "The bank's
+/// face": the departure from the kicked chart). The executed tick is `A ⊗ I + p B ⊗ R(c)`, the
+/// transport on the phase plane and the reflection on the node plane, and the node plane's
+/// reflection `F` conjugates `R(c)` to `R(c̄)`: member `m` on `z` and member `−m` on `z̄` have the
+/// same characteristic polynomial exactly. The kicked chart `Rot_v(1 + pR_u)` puts its transport
+/// on the node plane, where `F Rot_v F = Rot_v̄`, so its trace differs for `u` and `ū`: the executed
+/// second order reads the resonance and its mirror, the kicked chart one sideband.
+#[test]
+fn the_executed_turn_reads_a_passage_and_its_conjugate_alike() {
+    let material = node(Rat::one(), None);
+    let pumps = members(rat(5, 8));
+    let characteristic = |pump: &PumpDeclaration, amplitudes: &[GaussianRat]| {
+        let schedule = PumpSchedule::placed(pump, amplitudes).unwrap();
+        let operands =
+            ResonatorOperands::scheduled(0, &material, &schedule, &integer(16), &Rat::one(), None)
+                .unwrap();
+        Floquet::of(&operands).unwrap().characteristic().clone()
+    };
+    for seed in [3u64, 5, 8] {
+        let turn = drawn_turn(seed, 8, 5);
+        let conjugate: Vec<GaussianRat> = turn.iter().map(GaussianRat::conj).collect();
+        for member in 0..4 {
+            assert_eq!(
+                characteristic(&pumps[member], &turn),
+                characteristic(&pumps[(4 - member) % 4], &conjugate)
+            );
+        }
+    }
+    // The kicked chart: the product of `Rot_v (1 + p R_u)` over the carriers, its trace.
+    let v = GaussianRat::new(rat(3, 5), rat(4, 5));
+    let p = rat(5, 8);
+    let kicked_trace = |carriers: &[GaussianRat]| -> Rat {
+        // 2×2 real matrices as [[a, b], [c, d]].
+        let mul = |x: [[Rat; 2]; 2], y: [[Rat; 2]; 2]| -> [[Rat; 2]; 2] {
+            std::array::from_fn(|i| {
+                std::array::from_fn(|j| &x[i][0] * &y[0][j] + &x[i][1] * &y[1][j])
+            })
+        };
+        let rotation = [[v.re.clone(), -v.im.clone()], [v.im.clone(), v.re.clone()]];
+        let mut product = [[Rat::one(), Rat::zero()], [Rat::zero(), Rat::one()]];
+        for u in carriers {
+            let kick = [
+                [Rat::one() + &p * &u.re, &p * &u.im],
+                [&p * &u.im, Rat::one() - &p * &u.re],
+            ];
+            product = mul(mul(rotation.clone(), kick), product);
+        }
+        &product[0][0] + &product[1][1]
+    };
+    let turn = drawn_turn(3, 8, 5);
+    let conjugate: Vec<GaussianRat> = turn.iter().map(GaussianRat::conj).collect();
+    assert_ne!(kicked_trace(&turn), kicked_trace(&conjugate));
+}
+
+/// **The face on a spectral line** (module header, "The bank's face"; the known truth of
+/// [`ReceivingBank::read_turn`]'s test above). On a line of 8 unit cells stepping one quarter-turn
+/// class a crossing, the two quarter-turn neighbours read equal powers (the mirror sideband: the
+/// executed law reads them alike, `[1061/16, 531/8]` each) and the largest; and with the last cell
+/// open, the candidate completing the line reads the face's reading strictly above every other, as
+/// the executed lock's flip does. [measured] The face orders the line's own member below the
+/// half-turn partner, where the executed growth orders it above (`[46, 1473/32]` against the silent
+/// `[827/1024, 1655/2048]`): the own member's static boost past the standing bifurcation is not a
+/// second-order reading (the ordering past the perturbative regime is owed, #62).
+#[test]
+fn the_banks_face_reads_a_spectral_line_and_its_completion() {
+    let bank = declared_bank();
+    let chart = bank.chart(8).unwrap();
+    for class in 0..4usize {
+        for offset in 0..4usize {
+            let cell = |t: usize| quarter(offset + 4 * 8 - (class * t) % 4).as_gaussian();
+            let line: Vec<GaussianRat> = (0..8).map(cell).collect();
+            let powers = chart.resonance(&line).unwrap().powers();
+            let by_difference = |d: usize| powers[(class + d) % 4].clone();
+            assert_eq!(by_difference(1), by_difference(3));
+            assert!(by_difference(1) > by_difference(0));
+            assert!(by_difference(1) > by_difference(2));
+            assert!(by_difference(0) < by_difference(2));
+            let readings: Vec<Rat> = (0..4)
+                .map(|candidate| {
+                    let mut turn = line.clone();
+                    turn[7] = quarter(candidate).as_gaussian();
+                    chart.resonance(&turn).unwrap().reading(&chart)
+                })
+                .collect();
+            let completing = (offset + 4 * 8 - (class * 7) % 4) % 4;
+            for (candidate, reading) in readings.iter().enumerate() {
+                if candidate != completing {
+                    assert!(readings[completing] > *reading);
+                }
+            }
+        }
+    }
+}
+
+/// **The face's covector is the reading's exact differential** (module header, "The bank's face"):
+/// along a ray `z + η δ` of the turn, `A(η) = A + η ⟨Ω(K), δ⟩ + η² A(δ)` exactly, with `K` the
+/// reading's gradient coefficients at `c = 1` and `A(δ)` the reading of the move (Lean
+/// `HNN/BankFace.member_amplitude_ray`); and the reading is within the chart's gain,
+/// `A(δ) ≤ κ²|δ|²`.
+#[test]
+fn the_banks_reading_is_quadratic_along_a_ray_and_its_covector_exact() {
+    let bank = declared_bank();
+    let chart = bank.chart(8).unwrap();
+    let storage = |turn: &[GaussianRat]| -> Vec<Rat> {
+        let mut storage = vec![Rat::zero(); 16];
+        for (tick, z) in turn.iter().enumerate() {
+            storage[2 * (7 - tick)] = z.re.clone();
+            storage[2 * (7 - tick) + 1] = z.im.clone();
+        }
+        storage
+    };
+    let base = storage(&drawn_turn(11, 8, 5));
+    let step = storage(&drawn_turn(12, 8, 5));
+    let at = |eta: &Rat| -> Rat {
+        let moved: Vec<Rat> = base.iter().zip(&step).map(|(x, y)| x + eta * y).collect();
+        chart.of_storage(&moved).unwrap().reading(&chart)
+    };
+    let resonance = chart.of_storage(&base).unwrap();
+    let first = dot(&chart.covector(&resonance.gradient(&chart, &Rat::one())), &step);
+    let second = chart.of_storage(&step).unwrap().reading(&chart);
+    for eta in [rat(1, 3), rat(-2, 5), integer(3)] {
+        assert_eq!(at(&eta), at(&Rat::zero()) + &eta * &first + &eta * &eta * &second);
+    }
+    assert!(second <= chart.gain() * dot(&step, &step));
+}

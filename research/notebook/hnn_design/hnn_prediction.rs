@@ -123,8 +123,8 @@ use holonics::hnn::field::{
 };
 use holonics::hnn::moment::SourceMoment;
 use holonics::hnn::prediction::{
-    Refinement, Section, comparison_code, deposit_of, generate, generate_by_bank, mask, stage,
-    unreached_unchanged,
+    BankImages, Refinement, Section, bank_reach, comparison_code, deposit_of, deposit_with_bank,
+    generate, generate_by_bank, mask, stage, stage_bank, unreached_unchanged,
 };
 use holonics::hnn::ring::{
     FloquetReading, PumpDeclaration, PumpStep, ReceivingBank, ResonatorMaterial,
@@ -354,6 +354,38 @@ struct Engine {
     /// The receiving bank's generation (the bank pin): the bank and its grain, and its tally.
     bank: Option<(ReceivingBank, u32)>,
     bank_tally: BankTally,
+    /// The bank's learning path (the learning pin): the bank whose face each training request is
+    /// compared by beside the readout, and its tally.
+    learning: Option<ReceivingBank>,
+    learning_tally: LearningTally,
+    /// The flips' held-out probe (the learning pin): fresh requests no run trains on, with their
+    /// partitions, each lock proposal's comparison read on them at both sheets.
+    probe: Vec<(Current, SourceMoment, Vec<usize>, Vec<bool>)>,
+}
+
+/// [definition] **The bank's learning tally**: comparisons staged and skipped (a target the bank
+/// reads with no power), those whose face's top is the target, the face's training code, each
+/// member's pump covector's signs (the gradient on `p_m²` raised, lowered or zero at a deposit), the
+/// source port's bank curvature and step at each deposit (least and largest), the images' and the
+/// comparisons' time; and the flips read on the held-out probe: each proposal taken or refused by
+/// the training code, and whether the probe's code at the turned sheets is strictly lower, strictly
+/// higher, or undecided (overlapping enclosures).
+#[derive(Default)]
+struct LearningTally {
+    comparisons: u64,
+    skipped: u64,
+    top_right: u64,
+    code: Option<ExactInterval>,
+    pumps: Vec<(u64, u64, u64)>,
+    curvature: Option<(Rat, Rat)>,
+    steps: Option<(i64, i64)>,
+    ms: u128,
+    flips_taken: (u64, u64, u64),
+    flips_refused: (u64, u64, u64),
+    probe_ms: u128,
+    /// The source port's certificate at the first and the last deposit: its alignment `a`, its
+    /// whole curvature `C` and the bank's part of it, its covector scale `c`, its step `2^k`.
+    certificates: Vec<(Rat, Rat, Rat, Rat, i64)>,
 }
 
 /// [definition] **The bank's generation tally**: refinements, turn readings, the members certified
@@ -445,6 +477,9 @@ impl Engine {
             generation_balances: 0,
             bank: None,
             bank_tally: BankTally::default(),
+            learning: None,
+            learning_tally: LearningTally::default(),
+            probe: Vec::new(),
         }
     }
 
@@ -502,6 +537,56 @@ impl Engine {
             .collect()
     }
 
+    fn report_learning(&self) {
+        let t = &self.learning_tally;
+        if self.learning.is_none() {
+            return;
+        }
+        println!(
+            "  the bank's learning path: {} comparisons staged ({} skipped: a target read with no power), the face's top the target at {}; {} ms (the images and the comparisons); the training's staging {} ms and deposits {} ms in all",
+            t.comparisons, t.skipped, t.top_right, t.ms, self.tally.stage_ms, self.tally.deposit_ms
+        );
+        if let Some(code) = &t.code {
+            println!("  the bank face's training code, sum of -log2 theta_t: {}", reading_of(code, 16));
+        }
+        for (member, (lowered, raised, zero)) in t.pumps.iter().enumerate() {
+            println!(
+                "  member {member}'s pump covector over a deposit (held: the bank's pumps are declared): the descent raises p^2 at {lowered}, lowers it at {raised}, zero at {zero}"
+            );
+        }
+        if let (Some((least, largest)), Some((low, high))) = (&t.curvature, &t.steps) {
+            println!(
+                "  the source port's bank curvature from {least} to {largest}; its certified steps 2^k for k from {low} to {high}"
+            );
+        }
+        for (label, (a, curvature, bank, covector, k)) in
+            ["first", "last"].iter().zip(&t.certificates)
+        {
+            // Which bound sets the step: `ηC ≤ a` (the curvature) or `ηc ≤ 1` (the covector scale).
+            let binding = if covector.is_zero() || (!curvature.is_zero() && a / curvature <= Rat::from_integer(1.into()) / covector) {
+                "the curvature"
+            } else {
+                "the covector scale"
+            };
+            println!(
+                "  the source port's certificate at the {label} deposit: a = {}, C = {} (the bank's {}), c = {}; step 2^{k}, set by {binding}",
+                holonics::holon::deposition::significant(a, 16, false),
+                holonics::holon::deposition::significant(curvature, 16, true),
+                holonics::holon::deposition::significant(bank, 16, true),
+                holonics::holon::deposition::significant(covector, 16, true),
+            );
+        }
+        if !self.probe.is_empty() {
+            let (better, worse, open) = t.flips_taken;
+            let (r_better, r_worse, r_open) = t.flips_refused;
+            println!(
+                "  the flips read on the held-out probe ({} requests): of the proposals taken, the probe's code at the turned sheets strictly lower at {better}, strictly higher at {worse}, undecided at {open}; of the proposals refused, strictly lower at {r_better}, strictly higher at {r_worse}, undecided at {r_open}; {} ms",
+                self.probe.len(),
+                t.probe_ms
+            );
+        }
+    }
+
     fn report_bank(&self) {
         let t = &self.bank_tally;
         println!(
@@ -525,6 +610,15 @@ impl Engine {
         let mut composed = Vec::with_capacity(batch.len());
         let mut balances = Vec::with_capacity(batch.len());
         let mut windows = Vec::with_capacity(batch.len());
+        // The bank's images at the cut (the learning pin): every class's column of `E` at every
+        // rotation, read once per deposit.
+        let learning_clock = Instant::now();
+        let images = self.learning.as_ref().map(|bank| {
+            BankImages::of(&self.field, &self.theta, &self.refinement, bank)
+                .expect("the bank's images")
+        });
+        self.learning_tally.ms += learning_clock.elapsed().as_millis();
+        let mut bank_staged = Vec::new();
         for (request, target) in batch {
             let (current, moment) = ingest(&self.field, request);
             let locked = if self.order {
@@ -558,14 +652,64 @@ impl Engine {
             self.tally.peak_bits = self.tally.peak_bits.max(staged.peak_bits);
             self.tally
                 .add_code(&staged.ratio.code_length().expect("the section's code"));
+            if let Some(images) = &images {
+                let comparing = Instant::now();
+                let bank = stage_bank(
+                    &self.field,
+                    &current,
+                    &moment,
+                    &self.refinement,
+                    images,
+                    target,
+                    &locked,
+                )
+                .expect("the bank's comparison");
+                let t = &mut self.learning_tally;
+                t.comparisons += bank.stations.len() as u64;
+                t.skipped += bank.skipped as u64;
+                t.top_right += bank.stations.iter().filter(|r| r.top == r.target).count() as u64;
+                t.code = Some(match &t.code {
+                    Some(total) => interval_sum(total, &bank.code).expect("enclosures add"),
+                    None => bank.code.clone(),
+                });
+                t.ms += comparing.elapsed().as_millis();
+                bank_staged.push(bank);
+            }
             balances.push((current.clone(), staged.end, staged.balance));
             composed.push(staged.composed);
             windows.push((current, moment, target.clone(), locked));
         }
         self.tally.stage_ms += staging.elapsed().as_millis();
         let depositing = Instant::now();
-        let deposit =
-            deposit_of(&self.theta, &self.refinement, &composed).expect("the batch's deposit");
+        let deposit = match &images {
+            Some(images) => {
+                // Each member's pump covector over the batch: its sign, reported; the pumps are
+                // the bank's declared constitution and are held (the learning pin).
+                let members = images.chart().members();
+                let t = &mut self.learning_tally;
+                t.pumps.resize(members, (0, 0, 0));
+                for member in 0..members {
+                    let covector: Rat = bank_staged.iter().map(|b| b.pumps[member].clone()).sum();
+                    let entry = &mut t.pumps[member];
+                    if covector.is_negative() {
+                        entry.0 += 1;
+                    } else if covector.is_positive() {
+                        entry.1 += 1;
+                    } else {
+                        entry.2 += 1;
+                    }
+                }
+                deposit_with_bank(
+                    &self.theta,
+                    &self.refinement,
+                    &composed,
+                    bank_reach(images, &bank_staged),
+                )
+                .expect("the batch's deposit with the bank")
+            }
+            None => deposit_of(&self.theta, &self.refinement, &composed)
+                .expect("the batch's deposit"),
+        };
         let passive = self.theta.amplitude().expect("the amplitude reads");
         let (mut next, reading) = self.theta.deposited(&deposit).expect("the deposit");
         self.tally.deposit_ms += depositing.elapsed().as_millis();
@@ -665,12 +809,65 @@ impl Engine {
                 batch_code(&self.field, &turned, &self.refinement, &windows, &mut self.charts);
             self.tally.lock_proposals += 1;
             self.tally.lock_proposed += proposal.crossings().len() as u64;
-            if strictly_better(&held_code, &turned_code) {
+            let taken = strictly_better(&held_code, &turned_code);
+            self.tally.lock_ms += locking.elapsed().as_millis();
+            // The flip read on the held-out probe (the learning pin): the same comparison's code
+            // at both sheets on requests no run trains on. A reading only: it decides nothing.
+            if !self.probe.is_empty() {
+                let probing = Instant::now();
+                let probe = std::mem::take(&mut self.probe);
+                let held_probe =
+                    batch_code(&self.field, &next, &self.refinement, &probe, &mut self.charts);
+                let turned_probe =
+                    batch_code(&self.field, &turned, &self.refinement, &probe, &mut self.charts);
+                self.probe = probe;
+                let tally = if taken {
+                    &mut self.learning_tally.flips_taken
+                } else {
+                    &mut self.learning_tally.flips_refused
+                };
+                if strictly_better(&held_probe, &turned_probe) {
+                    tally.0 += 1;
+                } else if strictly_better(&turned_probe, &held_probe) {
+                    tally.1 += 1;
+                } else {
+                    tally.2 += 1;
+                }
+                self.learning_tally.probe_ms += probing.elapsed().as_millis();
+            }
+            if taken {
                 self.tally.lock_taken += 1;
                 self.tally.lock_turned += proposal.crossings().len() as u64;
                 next = turned;
             }
-            self.tally.lock_ms += locking.elapsed().as_millis();
+        }
+        for (_, step) in reading.steps.iter().filter(|(_, step)| step.bank.is_positive()) {
+            let t = &mut self.learning_tally;
+            let range = t
+                .curvature
+                .get_or_insert((step.bank.clone(), step.bank.clone()));
+            if step.bank < range.0 {
+                range.0 = step.bank.clone();
+            }
+            if step.bank > range.1 {
+                range.1 = step.bank.clone();
+            }
+            let exponent = step.step.exponent;
+            let steps = t.steps.get_or_insert((exponent, exponent));
+            steps.0 = steps.0.min(exponent);
+            steps.1 = steps.1.max(exponent);
+            let certificate = (
+                step.step.alignment.clone(),
+                step.step.curvature.clone(),
+                step.bank.clone(),
+                step.step.covector.clone(),
+                exponent,
+            );
+            if t.certificates.len() < 2 {
+                t.certificates.push(certificate);
+            } else {
+                t.certificates[1] = certificate;
+            }
         }
         for (locus, step) in &reading.steps {
             let entry = self
@@ -968,10 +1165,20 @@ fn families(field: &Field, theta: &Constitution) -> Vec<(String, Vec<Rat>)> {
 
 /// The resident set at its peak against the cap, and the deadline.
 fn guarded(clock: &Instant) -> bool {
-    let within_time = clock.elapsed().as_millis() < DEADLINE_MS;
+    guarded_within(clock, DEADLINE_MS)
+}
+
+/// The resident set at its peak against the cap, and a run's own training deadline.
+fn guarded_within(clock: &Instant, deadline: u128) -> bool {
+    let within_time = clock.elapsed().as_millis() < deadline;
     let within_memory = resident_set().is_none_or(|(_, peak)| peak < RESIDENT_CAP);
     within_time && within_memory
 }
+
+/// [agent-inferred, the learning pin] **The learning path's training stop**: the bank's comparison
+/// and the flips' probe beside the readout's training, projected from the development reads (the
+/// pin's §4); the other modes keep `DEADLINE_MS`.
+const LEARNING_DEADLINE_MS: u128 = 1_200_000;
 
 fn resident() -> String {
     resident_set().map_or_else(|| "unread".to_string(), |(now, peak)| format!("{now} now, {peak} peak"))
@@ -1131,6 +1338,22 @@ const EVALUATE: usize = 256;
 const EVALUATE_SEED: u64 = 2_026_092_902;
 const MOIRE_SEED: u64 = 2_026_092_903;
 
+/// [definition] **A bank run's declaration**: the bank's strength and the turn's relative grain, and
+/// whether training compares every request by the bank's face beside the readout (the learning
+/// pin), with the flips' held-out probe (its requests and partitions; empty on text).
+struct BankRun {
+    strength: Rat,
+    grain: u32,
+    learning: bool,
+    probe: Vec<(Vec<usize>, Vec<usize>)>,
+}
+
+/// The flips' held-out probe (the learning pin): fresh order-2 requests from their own seed (no run
+/// trains on or evaluates them), each with a partition from its own seed.
+const PROBE_SEED: u64 = 2_026_092_905;
+const PROBE_MASK_SEED: u64 = 2_026_092_906;
+const PROBE: usize = 16;
+
 /// **A terrain run**: train over the pinned pairs in batches within the guards, then evaluate each
 /// held-out pair's released section against its truth.
 fn terrain(
@@ -1138,10 +1361,29 @@ fn terrain(
     declared: Declared,
     train: Vec<(Vec<usize>, Vec<usize>)>,
     evaluate: Vec<(Vec<usize>, Vec<usize>)>,
-    bank: Option<(Rat, u32)>,
+    bank: Option<BankRun>,
 ) {
     let clock = Instant::now();
     let mut engine = Engine::new(declared);
+    if let Some(run) = bank.as_ref().filter(|run| run.learning) {
+        engine.learning = Some(bank_of(declared.period, &run.strength));
+        let mut partitions = Draw::new(PROBE_MASK_SEED);
+        engine.probe = run
+            .probe
+            .iter()
+            .map(|(request, target)| {
+                let (current, moment) = ingest(&engine.field, request);
+                let locked = mask(&mut partitions, engine.refinement.stations());
+                (current, moment, target.clone(), locked)
+            })
+            .collect();
+        println!(
+            "  the bank's learning path: {} members at p = {}; the flips' held-out probe {} requests",
+            engine.learning.as_ref().map_or(0, |bank| bank.pumps().len()),
+            run.strength,
+            engine.probe.len()
+        );
+    }
     println!(
         "hnn_prediction {name}: {}, n = {}, d = {}, |A| = {} (termination {}), K = {}, w = {}, m = {}, batch {}, n* = {}, training pairs {}, evaluated {}",
         if declared.order { "the order repair" } else { "the pinned September 29 readout" },
@@ -1164,8 +1406,13 @@ fn terrain(
         );
     }
     let mut complete = true;
+    let deadline = if engine.learning.is_some() {
+        LEARNING_DEADLINE_MS
+    } else {
+        DEADLINE_MS
+    };
     for batch in train.chunks(declared.batch) {
-        if !guarded(&clock) {
+        if !guarded_within(&clock, deadline) {
             complete = false;
             break;
         }
@@ -1174,6 +1421,7 @@ fn terrain(
     let trained = clock.elapsed().as_millis();
     let train = &train;
     engine.report("training");
+    engine.report_learning();
     println!(
         "  training {} ms{}; resident {}",
         trained,
@@ -1241,7 +1489,7 @@ fn terrain(
         engine.generation_balances,
         generation_clock.elapsed().as_millis()
     );
-    let Some((strength, grain)) = bank else {
+    let Some(BankRun { strength, grain, .. }) = bank else {
         return;
     };
     // The receiving bank's generation on the same constitution and the same held-out requests.
@@ -1487,7 +1735,7 @@ fn text_passage(cut_path: &str, declared: &Declared, bound: usize, validation: b
 }
 
 #[allow(clippy::disallowed_types, clippy::disallowed_methods)]
-fn text(cut_path: &str, out_path: &str, bound: usize, passes: usize, bank: bool) {
+fn text(cut_path: &str, out_path: &str, bound: usize, passes: usize, bank: bool, learn: bool) {
     let clock = Instant::now();
     let declared = text_declared();
     let termination = declared.alphabet - 1;
@@ -1500,6 +1748,9 @@ fn text(cut_path: &str, out_path: &str, bound: usize, passes: usize, bank: bool)
         selected,
     } = text_passage(cut_path, &declared, bound, true);
     let mut engine = Engine::new(declared);
+    if learn {
+        engine.learning = Some(bank_of(declared.period, &bank_strength()));
+    }
     println!(
         "hnn_prediction text: the passage {cells} cells, the choosing role's first {development}; choosing request pairs {eligible}, trained on the first {}; validation eligible {validation_eligible}, released {}; d = {}, |A| = {}, K = {}, w = {}, m = {}, batch {}; reserve excluded {}",
         train.len(),
@@ -1513,9 +1764,10 @@ fn text(cut_path: &str, out_path: &str, bound: usize, passes: usize, bank: bool)
         if reserve_read() { "NO (--read-reserve)" } else { RESERVE_SHA256 }
     );
     let mut complete = true;
+    let deadline = if learn { LEARNING_DEADLINE_MS } else { DEADLINE_MS };
     'passes: for _ in 0..passes {
         for batch in train.chunks(declared.batch) {
-            if !guarded(&clock) {
+            if !guarded_within(&clock, deadline) {
                 complete = false;
                 break 'passes;
             }
@@ -1523,6 +1775,7 @@ fn text(cut_path: &str, out_path: &str, bound: usize, passes: usize, bank: bool)
         }
     }
     engine.report("training");
+    engine.report_learning();
     println!(
         "  training ({passes} passes) {} ms{}; resident {}",
         clock.elapsed().as_millis(),
@@ -1700,7 +1953,31 @@ fn main() {
                         declared,
                         order_pairs(&declared, 21, count(3)),
                         order_pairs(&declared, 22, count(4)),
-                        Some((strength, count(7) as u32)),
+                        Some(BankRun {
+                            strength,
+                            grain: count(7) as u32,
+                            learning: false,
+                            probe: Vec::new(),
+                        }),
+                    );
+                }
+                // The bank's learning path's development reads (before the learning pin): the
+                // training with the bank's face beside the readout at the development seeds, the
+                // flips' probe at development seed 23, then the bank's generation:
+                // `develop learn <train> <evaluate> <probe>`.
+                Some("learn") => {
+                    let declared = order_declared(false);
+                    terrain(
+                        "develop order2 learn",
+                        declared,
+                        order_pairs(&declared, 21, count(3)),
+                        order_pairs(&declared, 22, count(4)),
+                        Some(BankRun {
+                            strength: bank_strength(),
+                            grain: BANK_GRAIN,
+                            learning: true,
+                            probe: order_pairs(&declared, 23, count(5)),
+                        }),
                     );
                 }
                 Some("copy") => terrain(
@@ -1742,7 +2019,9 @@ fn main() {
                 // pairs, then the bank's sections for the first two choosing requests (already read),
                 // their bytes written to the owner-only file and only their counts and times printed:
                 // `develop bank-text <cut> <train> <out>`.
-                Some("bank-text") => {
+                // `develop learn-text <cut> <train> <out>`: the same with the bank's face beside
+                // the readout in training (the learning pin's development read).
+                Some(mode @ ("bank-text" | "learn-text")) => {
                     let declared = text_declared();
                     let passage = text_passage(
                         arguments.get(3).map(String::as_str).expect("the passage cut"),
@@ -1752,10 +2031,15 @@ fn main() {
                     );
                     let clock = Instant::now();
                     let mut engine = Engine::new(declared);
+                    if mode == "learn-text" {
+                        engine.learning = Some(bank_of(declared.period, &bank_strength()));
+                    }
                     for batch in passage.train.chunks(declared.batch) {
                         engine.learn(batch);
                     }
-                    println!("  develop bank-text: training {} ms", clock.elapsed().as_millis());
+                    println!("  develop {mode}: training {} ms", clock.elapsed().as_millis());
+                    engine.report("develop");
+                    engine.report_learning();
                     engine.bank = Some((bank_of(declared.period, &bank_strength()), BANK_GRAIN));
                     let start = Instant::now();
                     let requests: Vec<&[usize]> =
@@ -1854,19 +2138,35 @@ fn main() {
             // `order2 bank`: the order repair's training and generation, then the receiving bank's
             // generation on the same constitution and requests (the bank pin).
             let bank = arguments.get(2).is_some_and(|value| value == "bank");
+            // `order2 learn`: the bank's learning path (the learning pin): the training compares
+            // every request by the bank's face beside the readout, the flips read on the held-out
+            // probe; then the order repair's and the bank's generations and the opening's
+            // diagnostic, as `order2 bank`.
+            let learn = arguments.get(2).is_some_and(|value| value == "learn");
             let declared = order_declared(pinned);
             terrain(
                 if pinned {
                     "order2 pinned"
                 } else if bank {
                     "order2 bank"
+                } else if learn {
+                    "order2 learn"
                 } else {
                     "order2"
                 },
                 declared,
                 order_pairs(&declared, TRAIN_SEED, ORDER_TRAIN),
                 order_pairs(&declared, EVALUATE_SEED, EVALUATE),
-                bank.then(|| (bank_strength(), BANK_GRAIN)),
+                (bank || learn).then(|| BankRun {
+                    strength: bank_strength(),
+                    grain: BANK_GRAIN,
+                    learning: learn,
+                    probe: if learn {
+                        order_pairs(&declared, PROBE_SEED, PROBE)
+                    } else {
+                        Vec::new()
+                    },
+                }),
             );
         }
         // `pumped below | past`: the pinned pumped runs (module header, "The pumped receiving ring").
@@ -1941,8 +2241,11 @@ fn main() {
         }
         Some("text") => {
             let (mut bound, mut passes) = (TEXT_TRAIN, TEXT_PASSES);
-            // `text <cut> <out> … bank`: the sections generated by the receiving bank (the bank pin).
-            let bank = arguments.last().is_some_and(|value| value == "bank");
+            // `text <cut> <out> … bank`: the sections generated by the receiving bank (the bank pin);
+            // `… learn`: the training compares every request by the bank's face beside the readout
+            // (the learning pin), then the bank's sections.
+            let learn = arguments.last().is_some_and(|value| value == "learn");
+            let bank = learn || arguments.last().is_some_and(|value| value == "bank");
             let options = &arguments[4..arguments.len() - usize::from(bank)];
             for pair in options.chunks(2) {
                 match pair {
@@ -1957,6 +2260,7 @@ fn main() {
                 bound,
                 passes,
                 bank,
+                learn,
             )
         }
         _ => panic!(

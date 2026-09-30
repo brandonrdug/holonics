@@ -241,6 +241,48 @@
 //!   the same bits and certifies it by inertia on the exact monodromy. What is attained is trusted
 //!   nowhere.
 //!
+//! [definition; agent-inferred, September 29] **The bank's face: the lock's decision at a declared
+//! temperature** ([`ReceivingBank::transport`], [`ReceivingBank::chart`], [`BankChart`],
+//! [`Resonance`]; Lean `HNN/BankFace`; the consumer `hnn::prediction::stage_bank`). The bank decides
+//! a station by the lock's flip on the executed growth, which has no smooth face. Its learning path
+//! reads the same lock at a declared temperature: a station's candidates are the sheets of one lock,
+//! candidate `x` weighing the bank's second-order reading of its passage,
+//!
+//! ```text
+//! transport    v = (2 + ihω)/(2 − ihω),  ω² = k/c                                    the node's lossless Cayley multiplier
+//! resonance    W^±_m = Σ_t a_m² s_m^t ζ^(±t) z_t,  ζ = v̄²                              the pair sum at the parametric resonance, and its mirror
+//! reading      A = Σ_m p_m² (|W⁺_m|² + |W⁻_m|²)                                      at most κ²|z|², κ² = 2dΣ_m p_m²
+//! face         θ_x = A(x) / Σ_y A(y)                                                 the exchange face; two sheets: θ = a/(a + K)
+//! ```
+//!
+//! and its differential is exact and quadratic: along a move `δ` of the placed amplitudes,
+//! `A(z + ηδ) = A(z) + η Σ Re(conj(K) W(δ)) + η² A(δ)` with `K^±_m = 2p_m² W^±_m`
+//! ([`Resonance::gradient`], [`BankChart::covector`]), and in a member's pump
+//! `∂A/∂(p_m²) = |W⁺_m|² + |W⁻_m|²`.
+//! - **What the face reads, and where the executed law departs from the kicked chart**
+//!   [proved-derived; formal-checked]. The kicked chart `Rot_v(1 + pR_u)` puts its transport on the
+//!   node plane; its second order reads the carriers at `ζ = v̄²` (`HNN/FloquetPassage.passage_coeff_two`),
+//!   one sideband. The executed tick is `A ⊗ 1 + p B ⊗ R(c)`: its transport acts on the phase plane
+//!   `(u, w)`, its reflection on the node plane, and the node plane's reflection conjugates `R(c)` to
+//!   `R(c̄)` (Lean `flip_reflection`), so the executed growth reads a passage and its conjugate alike
+//!   (the owner's test `the_executed_turn_reads_a_passage_and_its_conjugate_alike`: member `m` on `z`
+//!   and member `−m` on `z̄` have one characteristic polynomial; the kicked chart's traces differ). Its
+//!   pair terms `Re(c_t c̄_s) Re(β ζ^(t−s))` read the resonance and its mirror equally
+//!   (`sideband_pair_sum`), so the face reads both, `W⁺` and `W⁻`. Three departures stay: the
+//!   executed transport is the lossy `λ = (24 + i√1023)/41` (its phase within `1/1535` in tangent of
+//!   `v`'s, `4/3 − √1023/24 = 1/(24(32 + √1023))`), the executed tick carries a self term in `p²|c|²`,
+//!   and its pair kernel has a part independent of the lag, which reads the member's own frequency
+//!   `|Σ_t c_t|²`: the standing reading, which past the standing bifurcation boosts. [measured] On the
+//!   spectral line the face orders the quarter-turn neighbours equal and highest and the completing
+//!   candidate strictly first, as the executed growth does, but the line's own member below the
+//!   half-turn partner, where the executed growth orders it above (its static boost): the ordering
+//!   past the perturbative regime is owed (#62).
+//! - **The pumps are held** [agent-inferred]. The bank's members are declared (the parametron record's
+//!   bank); the covector reaching a member's `p_m²` is read and reported, and not deposited: the bank
+//!   is no locus of the constitution, and a pumped ring's own gains are held by the certified step's
+//!   law until a certificate covers the monodromy along their ray (`hnn::constitution`, "The pumped
+//!   medium's reach"; #62).
+//!
 //! [proved-derived; implemented-exact] **The reference change at a junction port**
 //! ([`port_scattering`]). A wave arriving at port `p` of a junction meets the rest of the junction as
 //! one reference admittance `G_rest = W − G_p`: it reflects `Γ = (G_p − G_rest)/(G_p + G_rest)` and
@@ -269,6 +311,7 @@
 //! | `Objects/ParametronLock` (the lock's exchange polynomial, capacity as lock count, the winding as the carry, coupled locks, modal hearing) | the guide's §5; no Rust consumer beyond the bank's lock pattern |
 //! | `HNN/FloquetPassage.{reflection_mul_rotation, rotation_mul_reflection, reflection_transport_reflection, reflection_transport_reflection_carriers, rotation_trace_carrier, kick_coeff_zero, kick_coeff_one, kick_coeff_two, passage_coeff_zero, passage_coeff_one, passage_coeff_two, pair_sum_power_spectrum}` (the passage's monodromy at second order, the kicked chart) | [`PumpSchedule::placed`], [`ReceivingBank::read_turn`], [`turn`] |
 //! | `Objects/ParametronLock.lockFace_logistic` (`θ = a/(a + K) > ½ ⇔ a > K`) | [`Growth::exceeds`] (the lock's flip on exact enclosures), `hnn::prediction::generate_by_bank` |
+//! | `HNN/BankFace.{member_amplitude_ray, resonance_gain, flip_reflection, flip_rotation, sideband_pair_sum}` (the bank's face) | [`ReceivingBank::transport`], [`ReceivingBank::chart`], [`BankChart`], [`Resonance`] |
 
 use num_bigint::{BigInt, BigUint};
 use num_traits::{One, Signed, ToPrimitive, Zero};
@@ -2538,6 +2581,247 @@ impl BankReading {
         let locked = self.locked();
         let silent = self.readings.iter().filter(|r| r.is_silent()).count();
         (locked.len() == 1 && silent + 1 == self.readings.len()).then(|| locked[0])
+    }
+}
+
+// -------------------------------------------------------------------------------------------
+// the bank's second-order face
+
+impl ReceivingBank {
+    /// [definition; agent-inferred, September 29] **The node's transport between two crossings in
+    /// the kicked chart** (module header, "The bank's face"): the lossless Cayley multiplier of the
+    /// node's own oscillation, `v = (2 + ihω)/(2 − ihω) = ((4 − h²ω²) + 4ihω)/(4 + h²ω²)`,
+    /// `ω² = k/c`, a unit Gaussian rational. The bank's material is one node with `C = cI`,
+    /// `K = kI`, and `hω` rational; any other material is refused (its transport is no Gaussian
+    /// rational, and the chart would need its algebraic number).
+    pub fn transport(&self) -> Result<GaussianRat, HnnError> {
+        let refuse = HnnError::Resonator {
+            ring: usize::MAX,
+            what: "the bank's face reads one node with C = cI, K = kI and h√(k/c) rational",
+        };
+        let (capacity, stiffness, _) = self.material.forms();
+        if capacity.rows() != 2 {
+            return Err(refuse);
+        }
+        let scalar = |form: &ExactRatMatrix| -> Option<Rat> {
+            let value = form.get(0, 0).ok()?.clone();
+            let off = form.get(0, 1).ok()?.is_zero() && form.get(1, 0).ok()?.is_zero();
+            (off && form.get(1, 1).ok()? == &value).then_some(value)
+        };
+        let (Some(c), Some(k)) = (scalar(capacity), scalar(stiffness)) else {
+            return Err(refuse);
+        };
+        if !c.is_positive() || k.is_negative() {
+            return Err(refuse);
+        }
+        let square = &self.hop * &self.hop * &k / &c;
+        let root = |x: &BigInt| -> Option<BigInt> {
+            let r = x.sqrt();
+            (&r * &r == *x).then_some(r)
+        };
+        let (Some(numerator), Some(denominator)) = (root(square.numer()), root(square.denom()))
+        else {
+            return Err(refuse);
+        };
+        let rate = Rat::new(numerator, denominator);
+        let four = integer(4);
+        let squared = &rate * &rate;
+        let norm = &four + &squared;
+        Ok(GaussianRat::new(
+            (&four - &squared) / &norm,
+            &four * &rate / &norm,
+        ))
+    }
+
+    /// [definition; agent-inferred, September 29] **The bank's resonance chart over a turn of
+    /// `ticks` crossings** (module header, "The bank's face"): each member's squared strength
+    /// `p_m²` and its weights `ω^±_(m,t) = a_m² s_m^t ζ^(±t)`, `ζ = v̄²` the doubled transport. Every
+    /// member's pump period divides the turn (so the turn is a cycle of its clock), as
+    /// [`ReceivingBank::read_turn`] requires.
+    pub fn chart(&self, ticks: usize) -> Result<BankChart, HnnError> {
+        let transport = self.transport()?;
+        let zeta = transport.conj().mul(&transport.conj());
+        let mut powers = Vec::with_capacity(ticks);
+        let mut power = GaussianRat::one();
+        for _ in 0..ticks {
+            powers.push(power.clone());
+            power = power.mul(&zeta);
+        }
+        let members = self
+            .pumps
+            .iter()
+            .enumerate()
+            .map(|(member, pump)| {
+                if !ticks.is_multiple_of(pump.phases()) {
+                    return Err(HnnError::Resonator {
+                        ring: member,
+                        what: "a member reads a turn only when its pump's period divides the turn",
+                    });
+                }
+                let weights = |mirror: bool| -> Vec<GaussianRat> {
+                    powers
+                        .iter()
+                        .enumerate()
+                        .map(|(tick, power)| {
+                            let power = if mirror { power.conj() } else { power.clone() };
+                            pump.carrier(tick % pump.phases()).as_gaussian().mul(&power)
+                        })
+                        .collect()
+                };
+                let strength = pump.strength();
+                Ok((strength * strength, [weights(false), weights(true)]))
+            })
+            .collect::<Result<Vec<_>, HnnError>>()?;
+        Ok(BankChart { members, ticks })
+    }
+}
+
+/// [definition; agent-inferred, September 29] **The bank's resonance chart** ([`ReceivingBank::chart`];
+/// module header, "The bank's face"): per member its squared strength and its two sidebands'
+/// weights over the turn.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct BankChart {
+    members: Vec<(Rat, [Vec<GaussianRat>; 2])>,
+    ticks: usize,
+}
+
+impl BankChart {
+    /// The crossings of one turn.
+    pub fn ticks(&self) -> usize {
+        self.ticks
+    }
+
+    /// The members.
+    pub fn members(&self) -> usize {
+        self.members.len()
+    }
+
+    /// Each member's squared strength `p_m²`.
+    pub fn strengths(&self) -> Vec<Rat> {
+        self.members.iter().map(|(p, _)| p.clone()).collect()
+    }
+
+    /// [proved-derived; implemented-exact] **The resonance amplitudes of a turn**
+    /// `W^±_m = Σ_t ω^±_(m,t) z_t` (Lean `HNN/BankFace.member_amplitude_ray`): the second order's
+    /// pair sum at the member's parametric resonance, `+` the kicked chart's sideband and `−` its
+    /// mirror. Refused unless the turn has the chart's ticks.
+    pub fn resonance(&self, amplitudes: &[GaussianRat]) -> Result<Resonance, HnnError> {
+        if amplitudes.len() != self.ticks {
+            return Err(HnnError::Shape {
+                what: "a turn of the bank's chart",
+                expected: self.ticks,
+                found: amplitudes.len(),
+            });
+        }
+        let amplitudes = self
+            .members
+            .iter()
+            .map(|(_, weights)| {
+                std::array::from_fn(|side| {
+                    weights[side]
+                        .iter()
+                        .zip(amplitudes)
+                        .filter(|(_, z)| !z.is_zero())
+                        .fold(GaussianRat::zero(), |sum, (w, z)| sum.add(&w.mul(z)))
+                })
+            })
+            .collect();
+        Ok(Resonance { amplitudes })
+    }
+
+    /// **The resonance of a storage vector**: its turn ([`turn`]) read by [`BankChart::resonance`].
+    pub fn of_storage(&self, storage: &[Rat]) -> Result<Resonance, HnnError> {
+        self.resonance(&turn(storage))
+    }
+
+    /// [proved-derived; implemented-exact] **The storage covector of resonance coefficients**
+    /// `K^±_m`: the realified `Ω(K)` with `⟨Ω(K), y⟩ = Σ_(m,±) Re(conj(K^±_m) W^±_m(y))` for every
+    /// storage `y`; node `d − 1 − t` carries `Σ_(m,±) conj(ω^±_(m,t)) K^±_m`.
+    pub fn covector(&self, coefficients: &[[GaussianRat; 2]]) -> Vec<Rat> {
+        let mut covector = vec![Rat::zero(); 2 * self.ticks];
+        for ((_, weights), coefficient) in self.members.iter().zip(coefficients) {
+            for side in 0..2 {
+                if coefficient[side].is_zero() {
+                    continue;
+                }
+                for (tick, weight) in weights[side].iter().enumerate() {
+                    let value = weight.conj().mul(&coefficient[side]);
+                    let node = self.ticks - 1 - tick;
+                    covector[2 * node] += &value.re;
+                    covector[2 * node + 1] += &value.im;
+                }
+            }
+        }
+        covector
+    }
+
+    /// [proved-derived; implemented-exact] **The chart's gain** `κ² = 2 d Σ_m p_m²`: every
+    /// storage's reading is at most `κ²|y|²`, since each weight is a unit carrier
+    /// (`|Σ_t ω_t z_t|² ≤ d Σ_t |z_t|²`, Cauchy–Schwarz over the turn; Lean
+    /// `HNN/BankFace.resonance_gain`).
+    pub fn gain(&self) -> Rat {
+        let strengths: Rat = self.members.iter().map(|(p, _)| p.clone()).sum();
+        integer(2) * Rat::from_integer(BigInt::from(self.ticks)) * strengths
+    }
+}
+
+/// [proved-derived; implemented-exact, September 29] **A turn's resonance** ([`BankChart::resonance`]):
+/// each member's two sideband amplitudes `(W⁺_m, W⁻_m)`. Linear in the turn, so a placement's
+/// resonance is the sum of its parts' ([`Resonance::plus`]).
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct Resonance {
+    pub amplitudes: Vec<[GaussianRat; 2]>,
+}
+
+impl Resonance {
+    /// The resonance of nothing placed, over `members`.
+    pub fn zero(members: usize) -> Self {
+        Self {
+            amplitudes: vec![[GaussianRat::zero(), GaussianRat::zero()]; members],
+        }
+    }
+
+    /// `self + scale · other`.
+    pub fn plus(&self, other: &Self, scale: &Rat) -> Self {
+        Self {
+            amplitudes: self
+                .amplitudes
+                .iter()
+                .zip(&other.amplitudes)
+                .map(|(a, b)| std::array::from_fn(|side| a[side].add(&b[side].scale(scale))))
+                .collect(),
+        }
+    }
+
+    /// **Each member's power** `a_m = |W⁺_m|² + |W⁻_m|²`.
+    pub fn powers(&self) -> Vec<Rat> {
+        self.amplitudes
+            .iter()
+            .map(|[plus, minus]| plus.norm_sq() + minus.norm_sq())
+            .collect()
+    }
+
+    /// [definition; agent-inferred] **The bank's reading** `A = Σ_m p_m² a_m` (module header, "The
+    /// bank's face").
+    pub fn reading(&self, chart: &BankChart) -> Rat {
+        self.powers()
+            .iter()
+            .zip(&chart.members)
+            .map(|(power, (strength, _))| strength * power)
+            .sum()
+    }
+
+    /// **The coefficients of the reading's gradient** at a covector `c` on the reading:
+    /// `K^±_m = 2 c p_m² W^±_m`, so `d(cA) = Σ_(m,±) Re(conj(K^±_m) dW^±_m)`.
+    pub fn gradient(&self, chart: &BankChart, covector: &Rat) -> Vec<[GaussianRat; 2]> {
+        self.amplitudes
+            .iter()
+            .zip(&chart.members)
+            .map(|(amplitudes, (strength, _))| {
+                let scale = integer(2) * covector * strength;
+                std::array::from_fn(|side| amplitudes[side].scale(&scale))
+            })
+            .collect()
     }
 }
 

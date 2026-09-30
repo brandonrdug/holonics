@@ -132,12 +132,38 @@
 //! - **the release**: every station locked, at width zero through `receiver::release`; no station
 //!   with a positive gap, held with the unlocked stations plural.
 //!
-//! **What it learns** [agent-inferred]. Nothing is deposited here: the bank's members are declared
-//! and the placement is the constitution's source port `E` at its cut, trained by the certified
-//! deposition through the linear readout. The bank's reading enters no comparison: no covector of
-//! the lock's decision reaches `E` or a member's pump, and the field's words run their resonators'
-//! declared pumps, never one modulated by the passage. The certified step now reads a pumped ring's
-//! reach (`hnn::constitution`, "The pumped medium's reach"), but that path is linear in the data.
+//! [definition; agent-inferred, September 29] **The bank's learning path** ([`BankImages`],
+//! [`stage_bank`], [`bank_reach`], [`deposit_with_bank`]; `hnn::ring`, "The bank's face"; Lean
+//! `HNN/BankFace`). Generation decides by the lock's flip on the executed growth; training compares
+//! the same lock at a declared temperature, on the readout's partition ([`mask`]):
+//!
+//! ```text
+//! candidates   at every compared station j, every class x placed with the locked targets over ν̂(v + 1)
+//! face         θ_x = A(x) / Σ_y A(y),   A the bank's second-order reading of x's storage
+//! loss         ℓ = log θ_t⁻¹ = log Σ_y A(y) − log A(t)                     (nats; the ratio of the target to the face)
+//! covector     ∂ℓ/∂A(x) = 1/Σ_y A(y) − [x = t]/A(t)                        on log A(x): θ_x − q_x (Lean bank_face_covector)
+//! to E         A(x) = Σ_m p_m² |W_m(x)|²,  W(x) = W_shared + ν Φ(P^(r_j) E e_x),  Φ linear
+//! ```
+//!
+//! - **Every storage the bank reads is a sum of images.** `Φ(P^r E e_x)` for every rotation and
+//!   class is read once per constitution ([`BankImages`]); a request's shared resonance (its phases'
+//!   normalized counts and the locked targets) and each candidate's are sums of them, held to
+//!   [`BankPlacement::storage`] exactly by the owner's test. The station's rotation is `P^(λ − c_j)`,
+//!   `c_j = τ + 1 + j`.
+//! - **The returns.** The gradient on each candidate's resonance, `K = 2cp²W`, is carried to the
+//!   storage by the chart (`BankChart::covector`) and back through each placement's rotation to `E`:
+//!   one return per shared phase of each request (its feature the phase's counts, its covector the
+//!   stations' summed gradient), and one per class over the batch (feature `e_x` at the weight
+//!   `Σ ν²` of every candidate placement, covector their `ν`-weighted sum over it: the unit step,
+//!   its alignment and the metric equal those of one return a placement). They join `E`'s window
+//!   beside the readout's ([`deposit_with_bank`]; `hnn::constitution`, "The bank's learning path"),
+//!   which certifies the step with the bank's own curvature. The owner's test holds `−⟨G, δE⟩` to the
+//!   stations' score derivative exactly.
+//! - **The pumps' covector** `∂ℓ/∂(p_m²) = Σ_x c_x |W_m(x)|²` is read ([`BankStaged::pumps`]) and
+//!   held: the bank's members are declared (`hnn::ring`, "The bank's face").
+//! - [agent-inferred] **The expected blocker** is the located cause of the bank's record (§5 there):
+//!   a lone candidate weighs one and a request cell one over the request's length, so the candidate's
+//!   own image sets most of its reading; the face learns first what depends on the candidate alone.
 //!
 //! **Every modality reads it the same way**: the bank reads the ring's storage, which holds any
 //! chart's classes through `E` at their residues; an image's pixels at their scan ticks and an
@@ -167,6 +193,7 @@
 //! | the refinement's balance | `HNN/Ring.loaded_tick_executed_interconnection_balance`, `HNN/Word.field_commit_deposition` | [`RefinementBalance`] |
 //! | the diamond over the refinement | `HNN/Retention.{diamond_recursion, deposit_descends}` | [`Refinement::diamond`], [`unreached_unchanged`] |
 //! | the bank's reading of the superposed passage and the lock's flip | `HNN/FloquetPassage.{reflection_transport_reflection_carriers, kick_coeff_two, pair_sum_power_spectrum}`, `Objects/ParametronLock.lockFace_logistic`, `HNN/Prediction.{placed_at_station, release_width_zero}` | [`generate_by_bank`], [`BankPlacement`] |
+//! | the bank's learning path: the face's covector and its returns to `E` | `HNN/BankFace.{bank_face_covector, member_amplitude_ray}`, `Objects/ParametronLock.bias_susceptibility` | [`BankImages`], [`stage_bank`], [`bank_reach`], [`deposit_with_bank`] |
 
 use std::collections::BTreeMap;
 
@@ -176,7 +203,8 @@ use num_traits::{One, Signed, ToPrimitive, Zero};
 use crate::hnn::HnnError;
 use crate::hnn::chart::{Charts, Remainders, WordLattice};
 use crate::hnn::constitution::{
-    Constitution, FactorGradient, FactorStep, LinearLocus, LinearStep, Locus, Reach,
+    BankReach, BankRequest, BankStation, Constitution, FactorGradient, FactorStep, LinearLocus,
+    LinearStep, Locus, Reach, Sample,
 };
 use crate::hnn::field::{ConstitutionRead, Current, Field};
 use crate::hnn::moment::{PopulationChart, SourceMoment};
@@ -187,11 +215,12 @@ use crate::hnn::realization::apply_rows;
 use crate::hnn::receiving::ReceivingRead;
 use crate::hnn::reference::{ComposedReturn, compose_return};
 use crate::hnn::retention::{Diamond, loci};
-use crate::hnn::ring::{Growth, ReceivingBank, TurnReading, turn};
+use crate::hnn::ring::{BankChart, Growth, ReceivingBank, Resonance, TurnReading, turn};
 use crate::hnn::word::{CommitWork, EndChange, PowerForm, Word};
 use crate::holarchy::terrain::Draw;
-use crate::holon::deposition::{power, sqrt_ceiling};
+use crate::holon::deposition::{power, significant, sqrt_ceiling};
 use crate::ratio::algebraic::ExactInterval;
+use crate::ratio::gaussian::GaussianRat;
 use crate::ratio::linear::ExactRatMatrix;
 use crate::ratio::linear::vector::{add, dot};
 use crate::ratio::Rat;
@@ -1561,6 +1590,463 @@ impl BankPlacement {
         let nu = self.chart.value(population);
         add(&self.base, &placed.iter().map(|x| x * &nu).collect::<Vec<_>>())
     }
+}
+
+// -------------------------------------------------------------------------------------------
+// the bank's learning path
+
+/// [definition; agent-inferred, September 29] **The bank's images at a constitution** (module
+/// header, "The bank's learning path"): every class's column of the source port `E` placed at every
+/// rotation `r` of the receiving ring, read by the bank's resonance chart, `Φ(P^r E e_x)`; and each
+/// rotation's node images (`hnn::field::Ring::rotate`). Every storage the bank reads in training is a
+/// sum of these images over its placements (held to [`BankPlacement::storage`] exactly by the
+/// owner's test), so a request's readings are sums, not new turns. Read once per constitution; the
+/// images are co-present regions (shared `E`, one output each).
+#[derive(Clone, Debug)]
+pub struct BankImages {
+    chart: BankChart,
+    ring: usize,
+    classes: usize,
+    images: Vec<Vec<Resonance>>,
+    rotations: Vec<Vec<usize>>,
+}
+
+impl BankImages {
+    /// The images of `E` at the constitution's cut on the refinement's receiving ring. Refused
+    /// unless the ring is a source ring and the field declares no pair offset (the bank's comparison
+    /// reads the first-order moment through `E` alone).
+    pub fn of(
+        field: &Field,
+        constitution: &impl ConstitutionRead,
+        declared: &Refinement,
+        bank: &ReceivingBank,
+    ) -> Result<Self, HnnError> {
+        use rayon::prelude::*;
+        let ring = declared.ring;
+        if !field.offsets().is_empty() {
+            return Err(HnnError::Shape {
+                what: "the bank's comparison on a field with no pair offset",
+                expected: 0,
+                found: field.offsets().len(),
+            });
+        }
+        let port = constitution
+            .source_port(ring)
+            .ok_or(HnnError::MissingSourcePort { ring })?;
+        let geometry = field.ring(ring);
+        let period = geometry.period() as usize;
+        let chart = bank.chart(period)?;
+        let classes = field.alphabet();
+        let columns: Vec<Vec<Rat>> = (0..classes)
+            .map(|class| {
+                (0..port.rows())
+                    .map(|row| port.get(row, class).cloned())
+                    .collect::<Result<Vec<_>, _>>()
+            })
+            .collect::<Result<Vec<_>, _>>()?;
+        let pairs: Vec<(usize, usize)> = (0..period)
+            .flat_map(|r| (0..classes).map(move |x| (r, x)))
+            .collect();
+        let read: Vec<Resonance> = pairs
+            .par_iter()
+            .map(|&(r, x)| chart.of_storage(&geometry.rotate(&columns[x], &BigInt::from(r))))
+            .collect::<Result<Vec<_>, HnnError>>()?;
+        let images = read.chunks(classes).map(<[Resonance]>::to_vec).collect();
+        let indices: Vec<Rat> = (0..geometry.width())
+            .map(|i| Rat::from_integer(BigInt::from(i / 2)))
+            .collect();
+        let rotations = (0..period)
+            .map(|r| {
+                let rotated = geometry.rotate(&indices, &BigInt::from(r));
+                let mut images = vec![0usize; period];
+                for target in 0..period {
+                    let node = rotated[2 * target]
+                        .to_integer()
+                        .to_usize()
+                        .expect("a rotation permutes the nodes");
+                    images[node] = target;
+                }
+                images
+            })
+            .collect();
+        Ok(Self {
+            chart,
+            ring,
+            classes,
+            images,
+            rotations,
+        })
+    }
+
+    /// The bank's resonance chart over the ring's turn.
+    pub fn chart(&self) -> &BankChart {
+        &self.chart
+    }
+
+    /// `Φ(P^r E e_x)`.
+    pub fn image(&self, rotation: usize, class: usize) -> &Resonance {
+        &self.images[rotation][class]
+    }
+
+    /// The rotation `r ∈ [0, d)` of a lift difference.
+    fn rotation(&self, shift: &BigInt) -> usize {
+        let period = BigInt::from(self.rotations.len());
+        ((shift % &period + &period) % &period)
+            .to_usize()
+            .expect("a rotation lies below the period")
+    }
+
+    /// `(P^r)ᵀ v = P^(−r) v`, on the node images: a storage covector carried back through a
+    /// placement's rotation.
+    fn rotate_back(&self, vector: &[Rat], rotation: usize) -> Vec<Rat> {
+        let mut back = vec![Rat::zero(); vector.len()];
+        for (node, &target) in self.rotations[rotation].iter().enumerate() {
+            back[2 * node] = vector[2 * target].clone();
+            back[2 * node + 1] = vector[2 * target + 1].clone();
+        }
+        back
+    }
+}
+
+/// [definition; agent-inferred, September 29] **One request's bank comparison, staged**
+/// ([`stage_bank`]; module header, "The bank's learning path"): each compared station's reading
+/// (its target, the face's mass at the target `θ_t` exact, the face's top class, `A₀` and `a₀`);
+/// the request's shared placements (each phase's rotation and feature) with the score's gradient
+/// coefficients on their shared resonance; each compared station's rotation and every candidate's
+/// gradient coefficients; the candidates' placement weight `ν̂(v + 1)`; the gradient on each member's
+/// `p_m²`; the comparisons skipped (a target the bank reads with no power has no finite code); and
+/// the code `Σ −log₂ θ_t`, enclosed.
+#[derive(Clone, Debug)]
+pub struct BankStaged {
+    pub stations: Vec<BankStationReading>,
+    common: Vec<(usize, Vec<Rat>)>,
+    shared: Vec<[GaussianRat; 2]>,
+    candidates: Vec<(usize, Vec<Vec<[GaussianRat; 2]>>)>,
+    weight: Rat,
+    pub pumps: Vec<Rat>,
+    pub skipped: usize,
+    pub code: ExactInterval,
+}
+
+/// [definition] **One compared station's bank reading** ([`BankStaged`]): its station and target,
+/// the face's exact mass at the target, the face's top class, `A₀` and `a₀`, and the bound on its
+/// covector's rounding to the dyadic face (at its ceiling).
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct BankStationReading {
+    pub station: usize,
+    pub target: usize,
+    pub mass: Rat,
+    pub top: usize,
+    pub total: Rat,
+    pub reading: Rat,
+    pub rounding: Rat,
+}
+
+/// [definition; agent-inferred] **The bank covector's dyadic face**: each reading's covector at 64
+/// significant bits (the certificate's face), so the returns' denominators are the readings' own
+/// powers of 2 and 5 and not every station's normalizer; the rounding is charged exactly
+/// (`hnn::constitution::BankReach::curvature`), and its bound is read at 16 significant bits.
+const COVECTOR_BITS: u32 = 64;
+const ROUNDING_BITS: u32 = 16;
+
+/// [definition; agent-inferred, September 29] **Stage one request's bank comparison** (module
+/// header, "The bank's learning path"; Lean `HNN/BankFace`). The partition is the readout's
+/// ([`mask`]): the locked stations' targets placed, and at every compared station `j` every class
+/// `x` placed there with them over the section's population `v + 1` (generation's candidates,
+/// [`generate_by_bank`]). The bank reads each candidate's storage by its second-order face
+/// `A(x) = Σ_m p_m² (|W⁺_m|² + |W⁻_m|²)`; the station's face is the lock's exchange face over the
+/// candidates, `θ_x = A(x)/Σ_y A(y)`, compared with the target class: the loss
+/// `ℓ = log(θ_t)⁻¹ = log Σ_y A(y) − log A(t)` (nats), its covector on each reading
+/// `∂ℓ/∂A(x) = 1/Σ_y A(y) − [x = t]/A(t)` (on `log A(x)`: `θ_x − q_x`), carried to the resonances by
+/// `d|W|² = 2 Re(conj W dW)` and to the storage through the chart (`BankChart::covector`), then to
+/// `E` through each placement; `E` is read through the images ([`BankImages::of`], at the cut).
+/// Nothing is deposited here.
+pub fn stage_bank(
+    field: &Field,
+    current: &Current,
+    moment: &SourceMoment,
+    declared: &Refinement,
+    images: &BankImages,
+    targets: &[usize],
+    locked: &[bool],
+) -> Result<BankStaged, HnnError> {
+    let ring = declared.ring;
+    if images.ring != ring {
+        return Err(HnnError::MissingSourcePort { ring });
+    }
+    if targets.len() != declared.stations || locked.len() != declared.stations {
+        return Err(HnnError::Shape {
+            what: "one target and one lock per station",
+            expected: declared.stations,
+            found: targets.len().min(locked.len()),
+        });
+    }
+    let chart = images.chart();
+    let period = chart.ticks();
+    let lift = current.lift()[ring].clone();
+    let phase = current.phase(field, ring)? as usize;
+    let station_rotation = |station: usize| -> usize {
+        images.rotation(&(&lift - BigInt::from((phase + 1 + station) % period)))
+    };
+    let placed = locked.iter().filter(|&&lock| lock).count() as u64;
+    let weight = PopulationChart::of(field).value(placed + 1);
+    // The shared placements: the request's phases and the locked stations, by phase.
+    let mut common: Vec<(usize, Vec<Rat>)> = Vec::new();
+    for c in 0..period {
+        let mut feature = if moment.phase_counts(ring, c)?.iter().any(|&n| n != 0) {
+            Some(moment.normalized_counts(field, ring, c)?)
+        } else {
+            None
+        };
+        for (station, &lock) in locked.iter().enumerate() {
+            if lock && (phase + 1 + station) % period == c {
+                let feature = feature.get_or_insert_with(|| vec![Rat::zero(); images.classes]);
+                feature[targets[station]] += &weight;
+            }
+        }
+        if let Some(feature) = feature {
+            common.push((images.rotation(&(&lift - BigInt::from(c))), feature));
+        }
+    }
+    let mut shared_resonance = Resonance::zero(chart.members());
+    for (rotation, feature) in &common {
+        for (class, count) in feature.iter().enumerate() {
+            if !count.is_zero() {
+                shared_resonance = shared_resonance.plus(images.image(*rotation, class), count);
+            }
+        }
+    }
+    let members = chart.members();
+    let mut shared = vec![[GaussianRat::zero(), GaussianRat::zero()]; members];
+    let mut candidates = Vec::new();
+    let mut stations = Vec::new();
+    let mut pumps = vec![Rat::zero(); members];
+    let mut skipped = 0;
+    let mut code = ExactInterval::point(Rat::zero());
+    // Each compared station reads only the shared resonance and the images: the stations are
+    // co-present regions, each returning its reading, joined below in station order.
+    type StationRead = (
+        usize,
+        Vec<Vec<[GaussianRat; 2]>>,
+        Vec<Rat>,
+        ExactInterval,
+        BankStationReading,
+    );
+    let compared: Vec<usize> = (0..declared.stations).filter(|&j| !locked[j]).collect();
+    let read_station = |station: usize| -> Result<Option<StationRead>, HnnError> {
+        let rotation = station_rotation(station);
+        let read: Vec<Resonance> = (0..images.classes)
+            .map(|class| shared_resonance.plus(images.image(rotation, class), &weight))
+            .collect();
+        let readings: Vec<Rat> = read.iter().map(|w| w.reading(chart)).collect();
+        let total: Rat = readings.iter().sum();
+        let target = targets[station];
+        let at_target = readings[target].clone();
+        if !at_target.is_positive() {
+            return Ok(None);
+        }
+        let mass = &at_target / &total;
+        let code = crate::ratio::algebraic::interval_difference(
+            &ExactInterval::point(Rat::zero()),
+            &crate::ratio::algebraic::log2_enclosure(&mass)?,
+        )?;
+        let top = (0..images.classes)
+            .max_by(|&a, &b| readings[a].cmp(&readings[b]).then(b.cmp(&a)))
+            .expect("a class");
+        // The covector on each reading at its dyadic face (module header, "The bank's learning
+        // path"): 64 significant bits toward zero, its exact rounding bounded per station and
+        // charged by the certificate (`hnn::constitution::BankReach::curvature`).
+        let mut rounding = Rat::zero();
+        let mut pumps = vec![Rat::zero(); members];
+        let coefficients: Vec<Vec<[GaussianRat; 2]>> = read
+            .iter()
+            .enumerate()
+            .map(|(class, resonance)| {
+                let mut exact = Rat::one() / &total;
+                if class == target {
+                    exact -= Rat::one() / &at_target;
+                }
+                let covector = if exact.is_negative() {
+                    -significant(&-&exact, COVECTOR_BITS, false)
+                } else {
+                    significant(&exact, COVECTOR_BITS, false)
+                };
+                let error = (&exact - &covector).abs();
+                if error > rounding {
+                    rounding = error;
+                }
+                for (pump, power) in pumps.iter_mut().zip(resonance.powers()) {
+                    *pump += &covector * power;
+                }
+                resonance.gradient(chart, &covector)
+            })
+            .collect();
+        Ok(Some((
+            rotation,
+            coefficients,
+            pumps,
+            code,
+            BankStationReading {
+                station,
+                target,
+                mass,
+                top,
+                total,
+                reading: at_target,
+                rounding: significant(&rounding, ROUNDING_BITS, true),
+            },
+        )))
+    };
+    let read: Vec<Option<StationRead>> = {
+        use rayon::prelude::*;
+        compared
+            .par_iter()
+            .map(|&station| read_station(station))
+            .collect::<Result<Vec<_>, HnnError>>()?
+    };
+    for station in read {
+        let Some((rotation, coefficients, station_pumps, station_code, reading)) = station else {
+            skipped += 1;
+            continue;
+        };
+        code = crate::ratio::algebraic::interval_sum(&code, &station_code)?;
+        for (pump, add) in pumps.iter_mut().zip(station_pumps) {
+            *pump += add;
+        }
+        for per_class in &coefficients {
+            for (sum, add) in shared.iter_mut().zip(per_class) {
+                for side in 0..2 {
+                    sum[side] = sum[side].add(&add[side]);
+                }
+            }
+        }
+        candidates.push((rotation, coefficients));
+        stations.push(reading);
+    }
+    Ok(BankStaged {
+        stations,
+        common,
+        shared,
+        candidates,
+        weight,
+        pumps,
+        skipped,
+        code,
+    })
+}
+
+/// [definition; agent-inferred, September 29] **The bank's reach over a batch** (module header, "The
+/// bank's learning path"; `hnn::constitution::BankReach`): the bank's returns at the source port,
+/// one per shared phase of each request (its feature the phase's normalized counts, its covector the
+/// shared gradient carried back through the phase's rotation) and one per class over the batch (its
+/// feature `e_x` at the weight `Σ ν²` over every candidate placement, its covector their
+/// `ν`-weighted sum over that weight: the same unit step, alignment and metric as one return a
+/// placement), each the descent covector; and the certificate's data.
+pub fn bank_reach(images: &BankImages, staged: &[BankStaged]) -> BankReach {
+    let chart = images.chart();
+    let classes = images.classes;
+    let negated = |v: Vec<Rat>| -> Vec<Rat> { v.into_iter().map(|x| -x).collect() };
+    let mut samples = Vec::new();
+    let mut requests = Vec::new();
+    let period = images.rotations.len();
+    let members = chart.members();
+    // Λ[x][r]: the candidates' ν-weighted coefficients by class and rotation.
+    let mut sums: Vec<Vec<Vec<[GaussianRat; 2]>>> =
+        vec![vec![vec![[GaussianRat::zero(), GaussianRat::zero()]; members]; period]; classes];
+    let mut weight = Rat::zero();
+    for request in staged {
+        if request.stations.is_empty() {
+            continue;
+        }
+        let shared = chart.covector(&request.shared);
+        for (rotation, feature) in &request.common {
+            let back = images.rotate_back(&shared, *rotation);
+            samples.push(Sample {
+                weight: Rat::one(),
+                feature: feature.clone(),
+                covector: negated(back),
+            });
+        }
+        for (rotation, coefficients) in &request.candidates {
+            weight += &request.weight * &request.weight;
+            for (class, per_class) in coefficients.iter().enumerate() {
+                for (sum, add) in sums[class][*rotation].iter_mut().zip(per_class) {
+                    for side in 0..2 {
+                        sum[side] = sum[side].add(&add[side].scale(&request.weight));
+                    }
+                }
+            }
+        }
+        requests.push(BankRequest {
+            common: request
+                .common
+                .iter()
+                .map(|(rotation, feature)| (images.rotations[*rotation].clone(), feature.clone()))
+                .collect(),
+            weight: request.weight.clone(),
+            stations: request
+                .stations
+                .iter()
+                .zip(&request.candidates)
+                .map(|(reading, (rotation, _))| BankStation {
+                    images: images.rotations[*rotation].clone(),
+                    total: reading.total.clone(),
+                    target: reading.reading.clone(),
+                    class: reading.target,
+                    rounding: reading.rounding.clone(),
+                })
+                .collect(),
+        });
+    }
+    if weight.is_positive() {
+        // Each class's return reads only its own sums: the classes are co-present regions.
+        use rayon::prelude::*;
+        let by_class: Vec<Option<Sample>> = sums
+            .par_iter()
+            .enumerate()
+            .map(|(class, by_rotation)| {
+                let mut covector: Option<Vec<Rat>> = None;
+                for (rotation, coefficients) in by_rotation.iter().enumerate() {
+                    if coefficients.iter().all(|pair| pair.iter().all(GaussianRat::is_zero)) {
+                        continue;
+                    }
+                    let back = images.rotate_back(&chart.covector(coefficients), rotation);
+                    covector = Some(match covector {
+                        Some(sum) => add(&sum, &back),
+                        None => back,
+                    });
+                }
+                let covector = covector?;
+                let mut feature = vec![Rat::zero(); classes];
+                feature[class] = Rat::one();
+                Some(Sample {
+                    weight: weight.clone(),
+                    feature,
+                    covector: covector.iter().map(|x| -(x / &weight)).collect(),
+                })
+            })
+            .collect();
+        samples.extend(by_class.into_iter().flatten());
+    }
+    BankReach {
+        ring: images.ring,
+        samples,
+        gain: chart.gain(),
+        classes,
+        requests,
+    }
+}
+
+/// **The deposit of a batch with the receiving bank's comparison beside it** (module header, "The
+/// bank's learning path"): [`deposit_of`] with the bank's reach, whose returns join the source
+/// port's window and whose curvature the certified step reads.
+pub fn deposit_with_bank(
+    constitution: &Constitution,
+    declared: &Refinement,
+    composed: &[ComposedReturn],
+    bank: BankReach,
+) -> Result<Deposit, HnnError> {
+    Ok(deposit_of(constitution, declared, composed)?.with_bank(bank))
 }
 
 /// **The deposit of a set of staged refinements at one commit** (module header): every linear

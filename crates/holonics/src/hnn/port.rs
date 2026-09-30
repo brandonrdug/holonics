@@ -72,7 +72,7 @@ use crate::compression::{CompressionError, ResonanceSplit, resonance_split};
 use crate::hnn::HnnError;
 use crate::hnn::chart::{ChartReading, Remainders, carry};
 use crate::hnn::constitution::{
-    DepositReading, FactorStep, LandmarkStep, Lattice, LinearStep, Locus, Reach,
+    BankReach, DepositReading, FactorStep, LandmarkStep, Lattice, LinearStep, Locus, Reach,
 };
 use crate::hnn::field::{Current, Field, Ring};
 use crate::hnn::keys::KeyLocation;
@@ -464,6 +464,7 @@ pub struct Deposit {
     receiving: Vec<ReceivingStep>,
     reached: Vec<Locus>,
     reach: Option<Reach>,
+    bank: Option<BankReach>,
 }
 
 impl Deposit {
@@ -481,7 +482,24 @@ impl Deposit {
             receiving: Vec::new(),
             reached,
             reach: None,
+            bank: None,
         }
+    }
+
+    /// [definition; agent-inferred, September 29] **The deposit with the receiving bank's reach**
+    /// (`hnn::constitution`, "The bank's learning path"): its returns at the source port the bank
+    /// reads, beside the logits' samples there, and the comparisons whose curvature the certified
+    /// step reads.
+    pub(crate) fn with_bank(self, bank: BankReach) -> Self {
+        Self {
+            bank: Some(bank),
+            ..self
+        }
+    }
+
+    /// The receiving bank's reach, when its comparison is deposited.
+    pub fn bank(&self) -> Option<&BankReach> {
+        self.bank.as_ref()
     }
 
     /// The deposit with its reach (the certified step's reading of its covectors' sums).
