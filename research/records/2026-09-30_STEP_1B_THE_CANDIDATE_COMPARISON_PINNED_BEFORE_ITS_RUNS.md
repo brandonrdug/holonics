@@ -582,3 +582,77 @@ It builds nothing in Rust beyond the owner's corrected header, runs nothing meas
 notebook harness, and reads no confirmation seed. The Lean §7 and the atlas rows land with this
 record's commits; the composition, the reading, the certificate and the harness's arms are built
 only after Astra's review of this pin.
+
+## 13. Amended after Astra's review, before any implementation [definition; agent-inferred]
+
+GPT-6 Astra reviewed this pin against main `abf25d0d`. It found the lock face coherent: it repairs
+the old objective's tie zeros, its covector `θ − q` matches the log-growth covector
+(`ring.rs`), and the test "target lower bound against one plus the rivals' upper bounds" is sound. It
+asked for the amendments below. Each one governs over any conflicting statement in §2–§12.
+
+1. **Two readings, kept apart.** The eight terms at `r*` are retained, including the first wrong
+   lock and the held stations. When an earlier error moves `r*` back, their contexts change.
+   - *The fixed incumbent reading* supplies the local derivative and the descent account. Each
+     proposal and its re-read are evaluated on one fixed conditional-context mask, the incumbent's
+     own release trajectory, so the first order and the certified decrease compare like with like.
+   - *The candidate's own-release reading* supplies behaviour: its own trajectory, re-read after the
+     move.
+   - A decrease of the recomputed endogenous `ℓ` is reported as a decrease of that declared score.
+     It is not decision progress, and it does not validate the fixed-context linearization across a
+     change of branch. Where the context changes, its contribution is reported beside the decrease.
+   - Every count is kept: attempted, unresolved, absent, post-error, support and coverage. No
+     universal per-move non-regression requirement is added.
+2. **Normalization and scope.** The resting weight one comes from the fixed rest/threshold
+   normalization the release actually uses. That makes the candidate compatible with the law; it
+   does not force it.
+   - The solved test `1 + Σ_(x≠t) U_x < L_t` is stronger than the release's per-rival predicate
+     (`L_t > U_x` for each `x`, and `L_t > 1`), and it is read per station, never as an aggregate
+     average.
+   - "No zero and no minimizer" (§2, `lockFace_pos`, `lockFace_strictAnti`) is a statement in
+     unconstrained growth coordinates. It is not a fact about the bounded constitution.
+3. **A feasibility witness before any long run (gate A).** The implementation exhibits one
+   constitution admissible under the current bounds: the entry bound on the lattice, the declared
+   bank and the founded transport. At it, the solved test holds at every station of a declared
+   development set; otherwise it reports the largest solved fraction it reached and how. The
+   station-framed refit is not that witness. If no witness is found, 1b stops at gate A and the
+   failure becomes the next loop's subject.
+4. **Guards symmetric across every arm.** Two certificate issues in today's shared move
+   (`hnn::executed`):
+   - an unresolved active member does not block adoption under the old hinge;
+   - the early slope test on `E`'s unit alone can refuse before the joint direction with the modulus
+     is formed.
+
+   Both are repaired in the shared move for **every** arm, the old-`F` controls included, so that no
+   candidate-only repair can pass as an objective gain. 1a's measured runs stand as the reference
+   under the old guards. The implementation also validates the target indices and the support, and
+   keeps all eight station obligations on holds and refusals.
+5. **The ladder's start is derived, not a claimed slope.** `X = Σ_j (ℓ_j − ln 2)_+` sums only the
+   unsolved terms. Its piecewise directional derivative along `δ` is the sum of `Dℓ_j[δ]` over the
+   terms with `ℓ_j > ln 2`, plus `max(Dℓ_j[δ], 0)` over the terms at `ℓ_j = ln 2`. That derivative,
+   read on the fixed incumbent mask, starts the ladder. The earlier `X/(−s_L)` is withdrawn: its
+   `s_L` included solved terms and is not `D X`.
+6. **The continuing state and its consumer.** Today a checkpoint writes `E` and `ρ` only, and a
+   remount (`Constitution::with_ports`) rebuilds the normal law from its prior, losing the carried
+   Gram, the chart and the clocks. The implementation checkpoints the complete continuing state:
+   `E`, `ρ`, the normal law's carried Gram and chart, the locus clocks and the carried remainders.
+   A test holds that one move from a restored checkpoint equals the same move continued without
+   one, exactly. This is the persistent-state consumer THE_REBUILD's goal names. A remount without
+   the full state is labelled as such wherever one is read.
+7. **Persistence and coverage stay obligations.** `decisions_release_the_section` is conditional
+   correctness of attained locks. It does not give eligibility, finite progress, whole coverage or
+   termination; those stay owed (#62). Measured instead, per move: every decision solved at a
+   refinement is re-read after the later locks of the same section, counting how many stay solved
+   and how many do not.
+8. **Staged gates, each decided before the next opens.**
+   - Gate A: the normalization, guard, context-mask, target-index and continuation tests, then the
+     constrained feasibility witness.
+   - Gate B: the predeclared order-2 controls, crossing objective and location (the lock face at
+     the lock, the lock face at every refinement, the old `F` at the decisions, the old `F` at its
+     old reading), with the teacher-forced left-to-right reading as a diagnostic. Observation and
+     move budgets are matched across arms, and any extra computation is reported.
+   - Gate C: the alternation and line regressions, with constant requests counted apart.
+   - The candidate and every rule are frozen before the final confirmation (`2_026_093_033/036/039`)
+     is opened, once, after gates A–C are decided. It is never used to redesign or to choose a next
+     phase.
+   - Projection: the full pipeline is 5 h 33 m to 6 h 40 m, with an 8 h 27 m guard span; that is
+     not a six-hour ceiling. Each gate is projected and reported on its own.

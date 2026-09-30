@@ -595,7 +595,17 @@ that fires becomes the next loop's subject, and nothing downstream starts.
     merge `d39b5b83`; under Astra's review before any run). The candidate is the lock face
     `ℓ = −log θ_t` over the executed growths. Its solved level `ℓ < log 2` implies the release's
     predicates (Lean `HNN/ExecutedComparison` §7). It is read once per station, at the lock of the
-    machine's own release. The subject 1a names: a comparison whose descent must move decisions, one
+    machine's own release. Amended after Astra's review (the pin's §13):
+    - two readings: a fixed incumbent mask for the descent account, the candidate's own release for
+      behaviour;
+    - a constrained feasibility witness before any long run;
+    - both certificate guards repaired for every arm;
+    - the ladder started from `X`'s piecewise directional derivative;
+    - the complete continuing state checkpointed, with a test that a restored move equals the
+      continued one;
+    - solved decisions re-read after later locks;
+    - gates A (tests and witness), B (order-2's objective-by-location controls) and C (the
+      regressions), each decided before the next opens, and the final confirmation opened once, last. The subject 1a names: a comparison whose descent must move decisions, one
     that holds a margin on right decisions, is not minimized on ties, and is read where a reading
     carries information about the key. The governing law "loss is the log of a ratio" is the
     candidate's first reference. The adaptable operands left out (the bank's members, the pumps)
