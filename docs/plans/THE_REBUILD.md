@@ -964,6 +964,41 @@ branch; intervals that do not shorten the charged code are recorded and not adop
     discharges the consumer equation's factorization), the reach along a ring's own gain ray, the
     per-tick growth of the executed ticks, a modulated pump's reach per passage, and the executed
     chart's monodromy.
+- **The bank reads a superposed passage, September 29: the locks continue a spectral line, and the
+  order-2 terrain stays at the marginal**
+  ([pin](../../research/records/2026-09-29_THE_BANK_READS_A_SUPERPOSED_PASSAGE_PINNED_BEFORE_ITS_RUNS.md),
+  `24691714`;
+  [receipt](../../research/records/2026-09-29_THE_BANK_READS_A_SUPERPOSED_PASSAGE_THE_LOCKS_CONTINUE_A_SPECTRAL_LINE_AND_THE_ORDER_TWO_TERRAIN_STAYS_AT_THE_MARGINAL.md);
+  `e70e992f`; Refs #73 #148 #63).
+  - *Built* (the parametron record's open item: the monodromy through every crossing cell's pump):
+    - the receiving ring's placed storage crosses the section node by node as the ring turns, each
+      crossing pumping every member at its placed amplitude (`PumpSchedule::placed`); the turn's
+      monodromy on integers and its growth enclosed exactly by the Schur–Cohn test, certified by
+      inertia and the executed turn's balances (`hnn::ring::{ReceivingBank::read_turn, Growth}`);
+    - generation by the bank's locks: every unlocked station's every class placed, the bank's
+      joint growth read, the lock's flip on exact enclosures, the release through
+      `receiver::release` (`hnn::prediction::{generate_by_bank, BankPlacement}`);
+    - Lean `HNN/FloquetPassage`: the transported pair `R_u Rot_v R_w = Rot(u v̄ w̄)`, the passage's
+      second order in closed form over every ordered pair, and its trace at a whole turn as the
+      power spectrum.
+  - *Measured*:
+    - known truth: on a spectral line the lock pattern names the class (the half-turn partner
+      certified silent), and the candidate completing the line reads the strictly largest joint
+      growth: the lock's flip continues a line;
+    - every check holds (the order-2 run's 8,192 member certificates and 491,520 executed ticks);
+    - on the order-2 terrain the bank reads 508 of 2,048 stations (0 of 256 exact) against the
+      marginals' 512 and 520; the order repair's linear readout on the same run reads 638 (its
+      receipt at `af5e7de6`, 866); the bank on the declared opening equals the trained one on 256 of
+      256 stations of 32 requests;
+    - text (385 choosing pairs, two passes, `D = 35`, the standing member alone) releases 8
+      sections, none legible: one small set of bytes recurs across the requests, and identical
+      requests give identical sections.
+  - *What stays open*, by its measurement: the declared bank reads the passage's own spectral lines,
+    and the order-2 rule is not a line of the request; which relative phase at which lag a
+    continuation keeps is a key the bank does not learn, because its reading enters no comparison
+    (the training reaches nothing it reads). In #62: the executed law's second order, the growth
+    against the second order, the line's symmetry, the Schur–Cohn test, and the bank's learning
+    path.
 
 #### U7. The targets, alongside
 

@@ -422,6 +422,22 @@ hearing        c_v = ⟨s, Mv⟩⟨r, v⟩ = 0 exactly when one coupling vanishe
   every other member is certified silent: the lock pattern is the relative phase's class, decided by
   the Floquet certificate (Rust `hnn::ring::{ReceivingBank, BankReading}`; the record's counts).
   Retired: the reading of the linear lock as a square-law reading of relative phase.
+- **The bank reads a superposed passage.** [proved-derived; formal-checked in the kicked chart,
+  implemented-exact; September 29,
+  [record](../research/records/2026-09-29_THE_BANK_READS_A_SUPERPOSED_PASSAGE_THE_LOCKS_CONTINUE_A_SPECTRAL_LINE_AND_THE_ORDER_TWO_TERRAIN_STAYS_AT_THE_MARGINAL.md)]
+  The receiving ring holds the passage superposed through the source port; as it turns, each node
+  crosses the section and pumps every member at its placed amplitude, and the passage's monodromy is
+  the ordered product over one turn. Two crossings separated by the ring's transport compose to the
+  turn by their relative phase less the transport, `R_u Rot_v R_w = Rot(u v̄ w̄)`; one crossing more
+  pairs with every earlier one; at a whole turn the second order's trace is the passage's power
+  spectrum, `2 Re Σ_t w_t conj(Σ_(s<t) w_s) = |Σ w|² − Σ |w|²` (Lean `HNN/FloquetPassage`). The growth
+  is enclosed exactly on either side of one by the Schur–Cohn test (Rust
+  `hnn::ring::{ReceivingBank::read_turn, Growth}`). [measured] On a spectral line the lock pattern
+  names the class (the half-turn partner certified silent), and with a crossing open the candidate
+  completing the line reads the strictly largest joint growth: the lock's flip continues a line
+  (`hnn::prediction::generate_by_bank`). A declared bank reads the passage's own lines; which relative
+  phase at which lag a continuation keeps is a key the bank does not yet learn: its reading enters no
+  comparison.
 - **The lock is an Ising site.** [definition; proved-derived; formal-checked] A two-sheet lock under
   the bias `a` has the exchange polynomial `Π = 1 + a/K` (its partition function read at the resting
   sheet) and the logistic face `θ = a/(a + K)`, whose susceptibility is at most `¼`
@@ -444,7 +460,7 @@ hearing        c_v = ⟨s, Mv⟩⟨r, v⟩ = 0 exactly when one coupling vanishe
   (`modal_silent_iff`, `dormant_mode_reopens`). A bank's silent members are dormant: the
   modulation that aligns a member's pump reopens it, and it locks.
 
-Owners: Lean `Objects/{Parametron,ParametronLock}`, `HNN/{Ring,Floquet}`,
+Owners: Lean `Objects/{Parametron,ParametronLock}`, `HNN/{Ring,Floquet,FloquetPassage}`,
 `Physics/{PhaseCarrier,CoupledIncidence,HolonicMeasuredParametron}` and the torus realizations; Rust
 `holonics::holon::parametron`, `holonics::hnn::ring` (the device refinement at `13f8c734`,
 [`complex_parametron.rs`](https://github.com/brandonrdug/holonics/blob/13f8c734/crates/holonics-cuda/src/cuda_refine/complex_parametron.rs),
@@ -453,9 +469,9 @@ crossings as `RationalClockPassage` ticks (`d ≥ 2`), and the threshold unit as
 energy-minimizing locked sheet. [open] The rotating pump's tongue boundaries and its subharmonic
 multiplier below `−1`; a saturation (the law is linear, so a locked amplitude grows until a
 certified step or a declared saturation bounds it); the continuous crossing of `A cos(ωt + φ)` as
-the micro-step ring; the bank's reading of more than two superposed cells, where the monodromy
-through every crossing cell's pump reads the passage's spectrum at the ring's parametric
-resonance.
+the micro-step ring; the executed law's second order through a passage (the kicked chart's is
+proved); the bank's learning path, a covector of the lock's decision reaching the placement and the
+members' pumps.
 
 ### 6. Tube and tower
 
