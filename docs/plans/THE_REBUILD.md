@@ -171,8 +171,10 @@ Owners: Lean `Foundation/Standing` (its Rust chart `receiver::standing` retired 
 
 #### U3. One release contract
 
-Owners: `receiver::release`, `population::{releasing, text_release, provenance}`,
-`population::chaser`.
+Owners: `receiver::release`, `population::chaser`. (`population::{releasing, text_release, provenance}`
+and `Population::release_response` were retired September 30 with the byte-tree text line, batch P;
+their laws are in [RECEIVER_HOLARCHY](../RECEIVER_HOLARCHY.md), "The retired byte-tree text line". The
+history below names them as they were.)
 - **Contract.** Every emission is a `ReleaseReturn` of one decision law; its arms are the certified
   draw (the inverse CDF), the threshold commit, the probe and the typed refusal. `P_release = P_scored`
   is kept, and so are the stop law, the unresolved draw mass and the refusals. The chaser's rule is
@@ -738,6 +740,20 @@ that fires becomes the next loop's subject, and nothing downstream starts.
       (`power.py`), `hnn/constitution.rs`, and `hnn/prediction.rs` (the copy and moiré terrains).
       For P: `admitted.rs`'s `Relation`/`RelationKind`/`HUMAN`/`AGENT` and `TreeFamily` no longer
       have notebook consumers.
+  - **P done** (merge `26183ae0`). The byte-tree text line is retired from the receiver: 42 files,
+    11,517 lines deleted. That covers the copy stage, the sentence counter, `TreeFamily`, the text
+    release, releasing, provenance, the population and context checkpoints, `spans`, `Sections`,
+    the hazard partition and the text hooks. The laws not already in Lean are written into
+    RECEIVER_HOLARCHY, "The retired byte-tree text line", which names the catered layers as such.
+    - The fixtures are rebased on key families. Where a test needs a family that never dies, it uses
+      the fixed-face fixture, since every key family dies at its first contradiction.
+    - The held items were touched only by a forced one-line signature change.
+    - 21 atlas rows are repointed, with the new owner form `H:<path>@f5fd8f3b`.
+    - The library tests went from 976 to 888 (the 88 removed tested the retired layers), and the
+      replay matched.
+    - Newly without a library caller: `receiver::release::{draw, draw_exact}`, the population's
+      certified draw, is held with the population's release for step 4 (F5's product);
+      `hnn::reference::tree_prequential` is retired after H if nothing then calls it.
   - **Workers and gates.** The order's C gives the sequence: the baseline freeze, N1 beside 1a, N2
     after 1a, then P and H in parallel with the minimal replay. The
     primary edits the shared plan files once at the join: THE_REBUILD, CONSTRUCTION_STATE, the
