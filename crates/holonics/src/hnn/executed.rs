@@ -66,7 +66,10 @@
 //! - `F` strictly lower by disjoint exact enclosures, `F(E′)⁺ < F(E)⁻`;
 //! - the constitution's own guards (lattice, bit budget, committed storage growth).
 //!
-//! Otherwise the next step is tried, and the move is refused, typed, when none holds. The operands
+//! Otherwise the next step is tried, at most `LADDER_DEPTH` a move, and the move is refused,
+//! typed, when none holds. **One ladder for every declared comparison**: the bank's face on the
+//! same contexts moves by the same ladder and guards ([`face_move`], the matched control; its code
+//! `Σ −log₂ θ_t` in place of `F`, its returns' exact pairing as its first order). The operands
 //! are transient; nothing of the comparison is retained: the successor's `E` and its normal law's
 //! statistic are the only change.
 //!
@@ -1003,13 +1006,15 @@ pub enum TrialRefusal {
 
 /// [definition; agent-inferred, September 30] **One trial of the committed move**: its step, the
 /// carried move's largest entry change and the successor's largest entry, the first-order bound on
-/// the carried move, the successor's comparison where it was read, and its refusal, if any.
+/// the carried move, the successor's declared comparison and its release comparison where they
+/// were read, and its refusal, if any.
 #[derive(Clone, Debug)]
 pub struct Trial {
     pub step: Rat,
     pub moved: Rat,
     pub largest: Rat,
     pub first_order: Option<ExactInterval>,
+    pub value: Option<ExactInterval>,
     pub after: Option<BatchComparison>,
     pub refusal: Option<TrialRefusal>,
 }
@@ -1055,10 +1060,162 @@ fn largest_entry(matrix: &ExactRatMatrix) -> Rat {
         .unwrap_or_else(Rat::zero)
 }
 
+/// [definition; agent-inferred, September 30] **What a declared comparison reads at a carried
+/// successor**: its value enclosed, the release's comparison where it was read, and the guard that
+/// refused it (admission, Floquet), if one did.
+pub struct Reread {
+    pub value: ExactInterval,
+    pub comparison: Option<BatchComparison>,
+    pub refusal: Option<TrialRefusal>,
+}
+
+/// [definition; agent-inferred, September 30] **The ladder's depth**: at most 8 trial steps a move,
+/// from the first-order zero of the comparison down to `2^(−7)` of it. Every trial re-reads the whole
+/// batch from the open section, so the depth bounds a move's work; a comparison that does not fall
+/// within `2^(−7)` of its first-order zero along the proposal is refused there (typed), never
+/// searched further. One depth for every declared comparison.
+const LADDER_DEPTH: usize = 8;
+
+/// The ladder's outcome: every trial, the adopted successor with its carried step, or the refusal.
+type LadderOutcome = (Vec<Trial>, Option<(Constitution, SourceStep)>, Option<MoveRefusal>);
+
+/// [definition; agent-inferred, September 30] **The certified step's ladder, one law for every
+/// declared comparison** (module header, "The committed move"): from the first-order zero of the
+/// comparison (`F⁻ / (−slope)`, never past it), held so that no entry of `E` moves by more than the
+/// founding's entry scale `½` in one move, halving until the carried move moves no lattice
+/// coordinate; each carried successor adopted only when every commit guard holds on it: the entry
+/// bound, the first-order certificate on the carried move (`first`, negative), the successor's
+/// guards and value (`reread`), and a strict decrease by disjoint enclosures.
+#[allow(clippy::too_many_arguments)]
+fn ladder(
+    constitution: &Constitution,
+    ring: usize,
+    samples: &[Sample],
+    before: &ExactInterval,
+    slope: &ExactInterval,
+    unit_largest: &Rat,
+    first: &(dyn Fn(&ExactRatMatrix) -> Result<ExactInterval, HnnError> + Sync),
+    reread: &(dyn Fn(&Constitution) -> Result<Reread, HnnError> + Sync),
+) -> Result<LadderOutcome, HnnError> {
+    let source = constitution
+        .source_port(ring)
+        .ok_or(HnnError::MissingSourcePort { ring })?
+        .clone();
+    let polyak = &before.lower / -slope.upper.clone();
+    let scale_cap = if unit_largest.is_positive() {
+        Rat::new(BigInt::one(), BigInt::from(2)) / unit_largest
+    } else {
+        Rat::one()
+    };
+    let mut step = power_below(&polyak.min(scale_cap).max(Rat::zero()));
+    let lattice_unit = constitution
+        .lattice(crate::hnn::constitution::Locus::SourcePort(ring))?
+        .unit();
+    let two = Rat::from_integer(BigInt::from(2));
+    let mut trials = Vec::new();
+    loop {
+        if step.is_zero()
+            || &step * unit_largest * &two < lattice_unit
+            || trials.len() >= LADDER_DEPTH
+        {
+            return Ok((trials, None, Some(MoveRefusal::Guards)));
+        }
+        let mut trial = Trial {
+            step: step.clone(),
+            moved: Rat::zero(),
+            largest: Rat::zero(),
+            first_order: None,
+            value: None,
+            after: None,
+            refusal: None,
+        };
+        let stepped = match constitution.stepped_source(ring, samples, &step) {
+            Ok(Some(stepped)) => stepped,
+            Ok(None) => return Ok((trials, None, Some(MoveRefusal::Unreached))),
+            Err(error @ (HnnError::ConstitutionBudget { .. } | HnnError::UncertifiedStorage)) => {
+                trial.refusal = Some(TrialRefusal::Constitution(error.to_string()));
+                trials.push(trial);
+                step /= &two;
+                continue;
+            }
+            Err(error) => return Err(error),
+        };
+        let (successor, reading) = stepped;
+        let moved = successor
+            .source_port(ring)
+            .ok_or(HnnError::MissingSourcePort { ring })?
+            .subtract(&source)?;
+        trial.moved = largest_entry(&moved);
+        trial.largest = reading.largest.clone();
+        if trial.moved.is_zero() {
+            return Ok((trials, None, Some(MoveRefusal::Guards)));
+        }
+        if reading.largest > entry_bound() {
+            trial.refusal = Some(TrialRefusal::EntryBound(reading.largest.clone()));
+            trials.push(trial);
+            step /= &two;
+            continue;
+        }
+        let bound = first(&moved)?;
+        trial.first_order = Some(bound.clone());
+        if !bound.upper.is_negative() {
+            trial.refusal = Some(TrialRefusal::FirstOrder(bound));
+            trials.push(trial);
+            step /= &two;
+            continue;
+        }
+        let read = reread(&successor)?;
+        trial.value = Some(read.value.clone());
+        trial.after = read.comparison;
+        trial.refusal = match read.refusal {
+            Some(refusal) => Some(refusal),
+            None if read.value.upper < before.lower => None,
+            None => Some(TrialRefusal::NotBelow(read.value.clone())),
+        };
+        let adopted = trial.refusal.is_none();
+        trials.push(trial);
+        if adopted {
+            return Ok((trials, Some((successor, reading)), None));
+        }
+        step /= &two;
+    }
+}
+
+/// The successor's release comparison as a reread: an inadmissible crossing and a refused lock
+/// certificate are its guards.
+fn executed_reread(
+    field: &Field,
+    successor: &Constitution,
+    requests: &[Request],
+    declared: &Refinement,
+    bank: &ReceivingBank,
+    grain: u32,
+) -> Result<Reread, HnnError> {
+    match compare(field, successor, requests, declared, bank, grain) {
+        Ok(after) => {
+            let floquet = after
+                .requests
+                .iter()
+                .any(|r| r.generation.as_ref().is_some_and(|g| g.uncertified.is_some()));
+            Ok(Reread {
+                value: after.value.clone(),
+                comparison: Some(after),
+                refusal: floquet.then_some(TrialRefusal::Floquet),
+            })
+        }
+        Err(HnnError::UncertifiedResonator { .. }) => Ok(Reread {
+            value: ExactInterval::point(Rat::zero()),
+            comparison: None,
+            refusal: Some(TrialRefusal::Admission),
+        }),
+        Err(error) => Err(error),
+    }
+}
+
 /// **The committed move of `E` on the release's own comparison** (module header, "The committed
 /// move"): the batch read at `E` with every candidate's covector, the proposal and its returns, the
-/// unit step's first-order slope, then the trial steps from the first-order zero of `F` down, each
-/// carried successor re-read from the open section and adopted only when every commit guard holds.
+/// unit step's first-order slope, then the certified step's ladder ([`ladder`]), each carried
+/// successor re-read from the open section and adopted only when every commit guard holds.
 pub fn executed_move(
     field: &Field,
     constitution: &Constitution,
@@ -1067,9 +1224,9 @@ pub fn executed_move(
     bank: &ReceivingBank,
     grain: u32,
 ) -> Result<ExecutedMove, HnnError> {
+    use rayon::prelude::*;
     let ring = declared.ring();
     let alphabet = field.alphabet();
-    use rayon::prelude::*;
     let read = |amplitudes: &[crate::ratio::GaussianRat]| bank.read_turn_covector(amplitudes, grain);
     // The requests are co-present regions (the shared constitution at its cut, one reading each).
     #[allow(clippy::type_complexity)]
@@ -1143,101 +1300,273 @@ pub fn executed_move(
         receipt.refusal = Some(MoveRefusal::NoDescent(slope));
         return Ok(receipt);
     }
-    // The first trial: the first-order zero of F (never past it), held so that no entry moves by
-    // more than the founding's entry scale ½ in one move; a power of two.
-    let unit_largest = largest_entry(&unit_move);
-    let polyak = &before.value.lower / -slope.upper.clone();
-    let scale_cap = if unit_largest.is_positive() {
-        Rat::new(BigInt::one(), BigInt::from(2)) / &unit_largest
-    } else {
-        Rat::one()
+    let first = |moved: &ExactRatMatrix| {
+        first_order(field, constitution, declared, requests, &proposal, moved).map(|(b, _)| b)
     };
-    let mut step = power_below(&polyak.min(scale_cap).max(Rat::zero()));
-    let lattice_unit = constitution.lattice(crate::hnn::constitution::Locus::SourcePort(ring))?.unit();
-    loop {
-        if step.is_zero() || &step * &unit_largest * Rat::from_integer(BigInt::from(2)) < lattice_unit {
-            receipt.refusal = Some(MoveRefusal::Guards);
-            return Ok(receipt);
-        }
-        let mut trial = Trial {
-            step: step.clone(),
-            moved: Rat::zero(),
-            largest: Rat::zero(),
-            first_order: None,
-            after: None,
-            refusal: None,
-        };
-        let stepped = match constitution.stepped_source(ring, &samples, &step) {
-            Ok(Some(stepped)) => stepped,
-            Ok(None) => {
-                receipt.refusal = Some(MoveRefusal::Unreached);
-                return Ok(receipt);
-            }
-            Err(error @ (HnnError::ConstitutionBudget { .. } | HnnError::UncertifiedStorage)) => {
-                trial.refusal = Some(TrialRefusal::Constitution(error.to_string()));
-                receipt.trials.push(trial);
-                step /= Rat::from_integer(BigInt::from(2));
-                continue;
-            }
-            Err(error) => return Err(error),
-        };
-        let (successor, reading) = stepped;
-        let next_source = successor
-            .source_port(ring)
-            .ok_or(HnnError::MissingSourcePort { ring })?
-            .clone();
-        let moved = next_source.subtract(&source)?;
-        trial.moved = largest_entry(&moved);
-        trial.largest = reading.largest.clone();
-        if trial.moved.is_zero() {
-            receipt.refusal = Some(MoveRefusal::Guards);
-            return Ok(receipt);
-        }
-        if reading.largest > entry_bound() {
-            trial.refusal = Some(TrialRefusal::EntryBound(reading.largest.clone()));
-            receipt.trials.push(trial);
-            step /= Rat::from_integer(BigInt::from(2));
-            continue;
-        }
-        let (bound, _) = first_order(field, constitution, declared, requests, &proposal, &moved)?;
-        trial.first_order = Some(bound.clone());
-        if !bound.upper.is_negative() {
-            trial.refusal = Some(TrialRefusal::FirstOrder(bound));
-            receipt.trials.push(trial);
-            step /= Rat::from_integer(BigInt::from(2));
-            continue;
-        }
-        let after = match compare(field, &successor, requests, declared, bank, grain) {
-            Ok(after) => after,
+    let reread = |successor: &Constitution| {
+        executed_reread(field, successor, requests, declared, bank, grain)
+    };
+    let (trials, adopted, refusal) = ladder(
+        constitution,
+        ring,
+        &samples,
+        &before.value,
+        &slope,
+        &largest_entry(&unit_move),
+        &first,
+        &reread,
+    )?;
+    receipt.trials = trials;
+    receipt.adopted = adopted;
+    receipt.refusal = refusal;
+    Ok(receipt)
+}
+
+/// [definition; agent-inferred, September 30] **The face's contexts and code at a constitution**
+/// (the matched control of the bank's learning path, on the same contexts as the executed
+/// comparison): for a partition, the readout's `stage_bank` with the targets placed; along the
+/// machine's own trajectory, one `stage_bank` per refinement of the release the constitution
+/// executes, its locked stations at the classes the machine locked and its open stations compared
+/// with their targets. The code `Σ −log₂ θ_t` enclosed, the release comparisons where read, the
+/// staged comparisons (for the returns), and whether every candidate crossing is admissible.
+#[allow(clippy::type_complexity)]
+fn face_read(
+    field: &Field,
+    constitution: &Constitution,
+    requests: &[Request],
+    declared: &Refinement,
+    bank: &ReceivingBank,
+    grain: u32,
+) -> Result<(ExactInterval, Option<BatchComparison>, Vec<crate::hnn::prediction::BankStaged>, bool), HnnError>
+{
+    use crate::hnn::prediction::{BankImages, stage_bank};
+    use rayon::prelude::*;
+    let images = BankImages::of(field, constitution, declared, bank)?;
+    let open = requests.iter().any(|r| matches!(r.context, Context::Open));
+    let releases = if open {
+        match compare(field, constitution, requests, declared, bank, grain) {
+            Ok(batch) => Some(batch),
             Err(HnnError::UncertifiedResonator { .. }) => {
-                trial.refusal = Some(TrialRefusal::Admission);
-                receipt.trials.push(trial);
-                step /= Rat::from_integer(BigInt::from(2));
-                continue;
+                return Ok((ExactInterval::point(Rat::zero()), None, Vec::new(), false));
             }
             Err(error) => return Err(error),
-        };
-        let floquet = after
-            .requests
-            .iter()
-            .any(|r| r.generation.as_ref().is_some_and(|g| g.uncertified.is_some()));
-        let below = after.value.upper < before.value.lower;
-        trial.refusal = if floquet {
+        }
+    } else {
+        None
+    };
+    let stations = declared.stations();
+    let alphabet = field.alphabet();
+    let staged: Vec<Vec<(crate::hnn::prediction::BankStaged, Vec<Option<usize>>)>> = requests
+        .par_iter()
+        .enumerate()
+        .map(|(index, request)| {
+            let sections: Vec<Vec<Option<usize>>> = match &request.context {
+                Context::Partition(locked) => vec![
+                    (0..stations)
+                        .map(|j| locked[j].then_some(request.targets[j]))
+                        .collect(),
+                ],
+                Context::Open => {
+                    let generation = releases.as_ref().expect("the releases")
+                        .requests[index]
+                        .generation
+                        .as_ref()
+                        .expect("an open context's release");
+                    let mut placed = vec![None; stations];
+                    let mut sections = Vec::new();
+                    for lock in &generation.locks {
+                        sections.push(placed.clone());
+                        for &station in lock {
+                            placed[station] = Some(generation.release.classes[station]);
+                        }
+                    }
+                    if placed.iter().any(Option::is_none) {
+                        sections.push(placed);
+                    }
+                    sections
+                }
+            };
+            sections
+                .into_iter()
+                .map(|placed| {
+                    let targets: Vec<usize> = (0..stations)
+                        .map(|j| placed[j].unwrap_or(request.targets[j]))
+                        .collect();
+                    let locked: Vec<bool> = placed.iter().map(Option::is_some).collect();
+                    let staged = stage_bank(
+                        field,
+                        &request.current,
+                        &request.moment,
+                        declared,
+                        &images,
+                        &targets,
+                        &locked,
+                    )?;
+                    Ok((staged, placed))
+                })
+                .collect::<Result<Vec<_>, HnnError>>()
+        })
+        .collect::<Result<_, HnnError>>()?;
+    // Admission: every candidate crossing of every context the face compares.
+    let admitted = requests
+        .par_iter()
+        .zip(&staged)
+        .map(|(request, contexts)| {
+            let placement =
+                BankPlacement::of(field, constitution, &request.current, &request.moment, declared)?;
+            for (_, placed) in contexts {
+                for station in (0..stations).filter(|&j| placed[j].is_none()) {
+                    for class in 0..alphabet {
+                        let mut cells = placed.clone();
+                        cells[station] = Some(class);
+                        if !bank.admits(&crate::hnn::ring::turn(&placement.storage(&cells)))? {
+                            return Ok(false);
+                        }
+                    }
+                }
+            }
+            Ok(true)
+        })
+        .collect::<Result<Vec<bool>, HnnError>>()?
+        .into_iter()
+        .all(|a| a);
+    let mut code = ExactInterval::point(Rat::zero());
+    let mut all = Vec::new();
+    for contexts in staged {
+        for (staged, _) in contexts {
+            code = crate::ratio::algebraic::interval_sum(&code, &staged.code)?;
+            all.push(staged);
+        }
+    }
+    Ok((code, releases, all, admitted))
+}
+
+/// **The committed move of `E` on the bank's face** (the matched control, one law with
+/// [`executed_move`]): the face's code on the requests' contexts ([`face_read`]), its returns
+/// (`hnn::prediction::bank_reach`), the unit step's alignment as its first-order slope, then the
+/// same certified step's ladder, each successor's face code re-read on its own contexts and
+/// adopted only when the code is strictly lower by disjoint enclosures and every guard holds.
+pub fn face_move(
+    field: &Field,
+    constitution: &Constitution,
+    requests: &[Request],
+    declared: &Refinement,
+    bank: &ReceivingBank,
+    grain: u32,
+) -> Result<ExecutedMove, HnnError> {
+    use crate::hnn::prediction::{BankImages, bank_reach};
+    let ring = declared.ring();
+    let (code, releases, staged, admitted) =
+        face_read(field, constitution, requests, declared, bank, grain)?;
+    if !admitted {
+        return Err(HnnError::UncertifiedResonator { ring, phase: 0 });
+    }
+    let before = match releases {
+        Some(batch) => BatchComparison {
+            value: code.clone(),
+            ..batch
+        },
+        None => BatchComparison {
+            requests: Vec::new(),
+            value: code.clone(),
+            readings: 0,
+        },
+    };
+    let images = BankImages::of(field, constitution, declared, bank)?;
+    let samples = bank_reach(&images, &staged).samples;
+    let mut receipt = ExecutedMove {
+        before,
+        contributions: staged.iter().map(|s| s.stations.len()).sum(),
+        returns: samples.len(),
+        terms: staged.iter().map(|s| s.stations.len()).sum(),
+        unresolved: Vec::new(),
+        unresolved_branches: 0,
+        slope: None,
+        trials: Vec::new(),
+        adopted: None,
+        refusal: None,
+    };
+    if samples.is_empty() {
+        receipt.refusal = Some(MoveRefusal::Nothing);
+        return Ok(receipt);
+    }
+    // The face's first order along a carried move: `−Σ w ⟨g, ΔE f⟩`, its returns' descent
+    // covectors paired exactly with the move, in nats, read in bits (over `ln 2` enclosed) as the
+    // face's code is.
+    let ln_two = ln_enclosure(&Rat::from_integer(BigInt::from(2)))?;
+    let pairing = |moved: &ExactRatMatrix| -> Result<ExactInterval, HnnError> {
+        let mut sum = Rat::zero();
+        for sample in &samples {
+            let image = moved.apply(&sample.feature)?;
+            sum += &sample.weight
+                * sample
+                    .covector
+                    .iter()
+                    .zip(&image)
+                    .map(|(g, m)| g * m)
+                    .sum::<Rat>();
+        }
+        let nats = -sum;
+        let (a, b) = (&nats / &ln_two.lower, &nats / &ln_two.upper);
+        Ok(ExactInterval {
+            lower: a.clone().min(b.clone()),
+            upper: a.max(b),
+        })
+    };
+    let source = constitution
+        .source_port(ring)
+        .ok_or(HnnError::MissingSourcePort { ring })?
+        .clone();
+    let Some((unit, _)) = constitution.stepped_source(ring, &samples, &Rat::one())? else {
+        receipt.refusal = Some(MoveRefusal::Unreached);
+        return Ok(receipt);
+    };
+    let unit_move = unit
+        .source_port(ring)
+        .ok_or(HnnError::MissingSourcePort { ring })?
+        .subtract(&source)?;
+    let slope = pairing(&unit_move)?;
+    receipt.slope = Some(slope.clone());
+    if !slope.upper.is_negative() {
+        receipt.refusal = Some(MoveRefusal::NoDescent(slope));
+        return Ok(receipt);
+    }
+    let reread = |successor: &Constitution| -> Result<Reread, HnnError> {
+        let (code, releases, _, admitted) =
+            face_read(field, successor, requests, declared, bank, grain)?;
+        let floquet = releases.as_ref().is_some_and(|batch| {
+            batch
+                .requests
+                .iter()
+                .any(|r| r.generation.as_ref().is_some_and(|g| g.uncertified.is_some()))
+        });
+        let refusal = if !admitted {
+            Some(TrialRefusal::Admission)
+        } else if floquet {
             Some(TrialRefusal::Floquet)
-        } else if !below {
-            Some(TrialRefusal::NotBelow(after.value.clone()))
         } else {
             None
         };
-        trial.after = Some(after);
-        let adopted = trial.refusal.is_none();
-        receipt.trials.push(trial);
-        if adopted {
-            receipt.adopted = Some((successor, reading));
-            return Ok(receipt);
-        }
-        step /= Rat::from_integer(BigInt::from(2));
-    }
+        Ok(Reread {
+            value: code,
+            comparison: releases,
+            refusal,
+        })
+    };
+    let (trials, adopted, refusal) = ladder(
+        constitution,
+        ring,
+        &samples,
+        &receipt.before.value.clone(),
+        &slope,
+        &largest_entry(&unit_move),
+        &pairing,
+        &reread,
+    )?;
+    receipt.trials = trials;
+    receipt.adopted = adopted;
+    receipt.refusal = refusal;
+    Ok(receipt)
 }
 
 /// The largest power of two at or below `x > 0`; zero at zero.

@@ -117,6 +117,289 @@ pub(super) fn print_batch(label: &str, batch: &BatchComparison, targets: &[Vec<u
     }
 }
 
+/// **A known-truth terrain's pairs** (only the terrain computes truth): `order2`, `x_t = x_(t−2) + 1
+/// (mod 4)` after 40 drawn cells; `alternation`, two drawn classes alternating, `x_t = x_(t−2)`;
+/// `line`, a drawn start and step, `x_t = x_0 + s t (mod 4)`.
+pub(super) fn terrain_pairs(
+    terrain: &str,
+    declared: &Declared,
+    seed: u64,
+    count: usize,
+) -> Vec<(Vec<usize>, Vec<usize>)> {
+    let symbols = declared.alphabet - 1;
+    let (n, m) = (declared.request, declared.stations);
+    let mut draw = Draw::new(seed);
+    match terrain {
+        "order2" => order_pairs(declared, seed, count),
+        "alternation" => (0..count)
+            .map(|_| {
+                let (a, b) = (draw.below(symbols), draw.below(symbols));
+                let mut passage: Vec<usize> =
+                    (0..n + m).map(|t| if t % 2 == 0 { a } else { b }).collect();
+                let target = passage.split_off(n);
+                (passage, target)
+            })
+            .collect(),
+        "line" => (0..count)
+            .map(|_| {
+                let (x0, s) = (draw.below(symbols), draw.below(symbols));
+                let mut passage: Vec<usize> = (0..n + m).map(|t| (x0 + s * t) % symbols).collect();
+                let target = passage.split_off(n);
+                (passage, target)
+            })
+            .collect(),
+        _ => panic!("a terrain: order2 | alternation | line"),
+    }
+}
+
+/// The source port as rows of rationals (`E rows cols`, then its realified rows).
+fn write_port(theta: &Constitution, ring: usize) -> String {
+    let port = theta.source_port(ring).expect("E");
+    let mut s = format!("E {} {}\n", port.rows(), port.columns());
+    for i in 0..port.rows() {
+        let row: Vec<String> = (0..port.columns())
+            .map(|j| port.get(i, j).expect("in range").to_string())
+            .collect();
+        s.push_str(&row.join(" "));
+        s.push('\n');
+    }
+    s
+}
+
+/// A source port read back from [`write_port`]'s text.
+fn read_port(path: &str) -> ExactRatMatrix {
+    #[allow(clippy::disallowed_methods)]
+    let text = std::fs::read_to_string(path).expect("read the port");
+    let mut lines = text.lines();
+    let head: Vec<usize> = lines
+        .next()
+        .expect("E")
+        .split_whitespace()
+        .skip(1)
+        .map(|x| x.parse().expect("a shape"))
+        .collect();
+    let rows: Vec<Vec<Rat>> = (0..head[0])
+        .map(|_| {
+            lines
+                .next()
+                .expect("a row")
+                .split_whitespace()
+                .map(|x| x.parse::<Rat>().expect("a rational"))
+                .collect()
+        })
+        .collect();
+    ExactRatMatrix::new(rows).expect("E")
+}
+
+/// The partitions' seed of Stage 2's partition arms (the readout's `mask` law), pinned.
+const STAGE_TWO_MASK_SEED: u64 = 2_026_093_004;
+
+/// **Stage 2: one arm's training** (`executed train <arm> <terrain> <seed> <batch> <moves>
+/// <deadline ms> <out>`). The arm is the declared comparison (`executed` or `face`) crossed with the
+/// contexts (`open`: the machine's own trajectory; `partition`: the readout's partitions at
+/// [`STAGE_TWO_MASK_SEED`]). Every arm starts from the declared opening, reads the same requests in
+/// the same batches, and moves by the one certified step's ladder; the moves are the work bound,
+/// the deadline a guard (reaching it is reported incomplete). The trained `E` is written to `out`.
+#[allow(clippy::too_many_arguments)]
+pub(super) fn train(
+    arm: &str,
+    terrain: &str,
+    seed: u64,
+    batch: usize,
+    moves: usize,
+    deadline: u128,
+    out: &str,
+) {
+    use holonics::hnn::executed::face_move;
+    use holonics::hnn::prediction::mask;
+    let clock = Instant::now();
+    let declared = order_declared(false);
+    let engine = Engine::new(declared);
+    let bank = bank_of(declared.period, &bank_strength());
+    let (comparison, contexts) = arm.split_once('-').expect("an arm: executed|face - open|partition");
+    let pairs = terrain_pairs(terrain, &declared, seed, batch * moves);
+    let mut masks = Draw::new(STAGE_TWO_MASK_SEED);
+    let requests: Vec<Request> = pairs
+        .iter()
+        .map(|(request, target)| {
+            let (current, moment) = ingest(&engine.field, request);
+            let context = match contexts {
+                "open" => Context::Open,
+                "partition" => Context::Partition(mask(&mut masks, declared.stations)),
+                _ => panic!("contexts: open | partition"),
+            };
+            Request {
+                current,
+                moment,
+                targets: target.clone(),
+                context,
+            }
+        })
+        .collect();
+    println!(
+        "executed train: arm {arm} on {terrain} at seed {seed}: {moves} moves of {batch} requests; the declared opening; the bank p = {}, grain 2^(-{BANK_GRAIN})",
+        bank_strength()
+    );
+    let mut theta = engine.theta.clone();
+    let (mut adopted, mut refused, mut readings) = (0usize, 0usize, 0usize);
+    let mut complete = true;
+    for (index, chunk) in requests.chunks(batch).enumerate() {
+        if clock.elapsed().as_millis() > deadline {
+            complete = false;
+            println!("  deadline reached before move {index}: incomplete");
+            break;
+        }
+        let started = Instant::now();
+        let moved = match comparison {
+            "executed" => executed_move(&engine.field, &theta, chunk, &engine.refinement, &bank, BANK_GRAIN),
+            "face" => face_move(&engine.field, &theta, chunk, &engine.refinement, &bank, BANK_GRAIN),
+            _ => panic!("a comparison: executed | face"),
+        }
+        .expect("the move");
+        readings += moved.before.readings;
+        let sections = if contexts == "open" {
+            let targets: Vec<Vec<usize>> = chunk.iter().map(|r| r.targets.clone()).collect();
+            let (whole, right, released) = moved.before.sections(&targets);
+            format!("; batch released {released}, whole {whole}, stations right {right}")
+        } else {
+            String::new()
+        };
+        match &moved.adopted {
+            Some((successor, step)) => {
+                adopted += 1;
+                let last = moved.trials.last().expect("the adopted trial");
+                println!(
+                    "  move {index}: adopted at step {} (trial {} of the ladder); value {} → {}; E's largest entry {}{sections}; {} ms",
+                    step.step,
+                    moved.trials.len(),
+                    cell(&moved.before.value, 1 << 12),
+                    last.value.as_ref().map_or_else(String::new, |v| cell(v, 1 << 12)),
+                    step.largest,
+                    started.elapsed().as_millis()
+                );
+                theta = successor.clone();
+            }
+            None => {
+                refused += 1;
+                println!(
+                    "  move {index}: refused {:?} after {} trials; value {}{sections}; {} ms",
+                    moved.refusal,
+                    moved.trials.len(),
+                    cell(&moved.before.value, 1 << 12),
+                    started.elapsed().as_millis()
+                );
+            }
+        }
+    }
+    #[allow(clippy::disallowed_methods)]
+    std::fs::write(out, write_port(&theta, engine.refinement.ring())).expect("write E");
+    println!(
+        "executed train: arm {arm}: {adopted} moves adopted, {refused} refused, {readings} readings at E; {}; {} ms; resident {}",
+        if complete { "complete" } else { "incomplete (deadline)" },
+        clock.elapsed().as_millis(),
+        resident()
+    );
+}
+
+/// **Stage 2's confirmation** (`executed evaluate <terrain> <seed> <count> <out> <label=E>…`, a
+/// label `opening` reading the declared opening): every constitution generates every confirmation
+/// request by `generate_by_bank` from the open section; the complete sections are written to `out`
+/// and the counts printed: released and held, whole sections equal to their targets, stations
+/// right by station, sections reaching the termination, incorrect releases, the first lock's
+/// station and correctness, and the refused certificates.
+pub(super) fn evaluate(terrain: &str, seed: u64, count: usize, out: &str, arms: &[String]) {
+    use rayon::prelude::*;
+    use std::fmt::Write as _;
+    let clock = Instant::now();
+    let declared = order_declared(false);
+    let engine = Engine::new(declared);
+    let bank = bank_of(declared.period, &bank_strength());
+    let ring = engine.refinement.ring();
+    let pairs = terrain_pairs(terrain, &declared, seed, count);
+    let mut listing = String::new();
+    for arm in arms {
+        let (label, path) = arm.split_once('=').unwrap_or((arm.as_str(), ""));
+        let theta = if path.is_empty() {
+            engine.theta.clone()
+        } else {
+            engine
+                .theta
+                .clone()
+                .with_ports(ring, None, Some(read_port(path)), None)
+                .expect("the trained E")
+        };
+        let generated: Vec<_> = pairs
+            .par_iter()
+            .map(|(request, _)| {
+                let (current, moment) = ingest(&engine.field, request);
+                generate_by_bank(
+                    &engine.field,
+                    &theta,
+                    &current,
+                    &moment,
+                    &engine.refinement,
+                    &bank,
+                    BANK_GRAIN,
+                )
+            })
+            .collect();
+        let (mut released, mut held, mut whole, mut incorrect, mut terminated) = (0, 0, 0, 0, 0);
+        let (mut refused, mut uncertified) = (0, 0);
+        let mut by_station = vec![0usize; declared.stations];
+        let (mut first_request, mut first_right) = (0, 0);
+        writeln!(listing, "== {label} on {terrain}, seed {seed}").unwrap();
+        for ((request, target), generation) in pairs.iter().zip(&generated) {
+            let Ok(generation) = generation else {
+                refused += 1;
+                writeln!(listing, "{request:?} → refused").unwrap();
+                continue;
+            };
+            let classes = &generation.release.classes;
+            uncertified += usize::from(generation.uncertified.is_some());
+            let right: Vec<bool> = classes.iter().zip(target).map(|(a, b)| a == b).collect();
+            for (j, r) in right.iter().enumerate() {
+                by_station[j] += usize::from(*r);
+            }
+            terminated += usize::from(generation.release.terminated.is_some());
+            if let Some(first) = generation.locks.first().and_then(|lock| lock.first()) {
+                first_request += usize::from(*first < 2);
+                first_right += usize::from(classes[*first] == target[*first]);
+            }
+            if generation.release.released() {
+                released += 1;
+                if right.iter().all(|r| *r) {
+                    whole += 1;
+                } else {
+                    incorrect += 1;
+                }
+            } else {
+                held += 1;
+            }
+            writeln!(
+                listing,
+                "{} | target {:?} | {} {:?} | locks {:?}",
+                request.iter().map(ToString::to_string).collect::<String>(),
+                target,
+                if generation.release.released() { "released" } else { "held" },
+                classes,
+                generation.locks
+            )
+            .unwrap();
+        }
+        println!(
+            "  {label}: released {released}, held {held}, refused {refused}, refused certificates {uncertified}; whole sections {whole} of {count}; incorrect releases {incorrect}; reaching the termination {terminated}; stations right {} by station {by_station:?}; first lock at a request-reading station (0 or 1) {first_request}, first lock right {first_right}",
+            by_station.iter().sum::<usize>()
+        );
+    }
+    #[allow(clippy::disallowed_methods)]
+    std::fs::write(out, listing).expect("write the sections");
+    println!(
+        "executed evaluate: {} ms; resident {}",
+        clock.elapsed().as_millis(),
+        resident()
+    );
+}
+
 /// The order-2 declaration, its bank and a batch of requests compared along the machine's own
 /// trajectory.
 pub(super) fn order_batch(
@@ -188,9 +471,9 @@ pub(super) fn stage_one(seed: u64, count: usize) {
                 .as_ref()
                 .map_or_else(|| "not read".to_string(), |b| cell(b, 1 << 16)),
             trial
-                .after
+                .value
                 .as_ref()
-                .map_or_else(|| "not read".to_string(), |a| cell(&a.value, 1 << 16)),
+                .map_or_else(|| "not read".to_string(), |v| cell(v, 1 << 16)),
             trial.refusal.as_ref().map(|r| match r {
                 holonics::hnn::executed::TrialRefusal::NotBelow(v) =>
                     format!("NotBelow(F ∈ {})", cell(v, 1 << 16)),

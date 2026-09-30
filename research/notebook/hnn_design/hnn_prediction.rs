@@ -2201,7 +2201,25 @@ fn main() {
                 arguments[3].parse().expect("a seed"),
                 arguments[4].parse().expect("a count"),
             ),
-            _ => panic!("executed move <seed> <requests>"),
+            Some("train") => executed_loop::train(
+                &arguments[3],
+                &arguments[4],
+                arguments[5].parse().expect("a seed"),
+                arguments[6].parse().expect("a batch"),
+                arguments[7].parse().expect("moves"),
+                arguments[8].parse().expect("a deadline in ms"),
+                &arguments[9],
+            ),
+            Some("evaluate") => executed_loop::evaluate(
+                &arguments[3],
+                arguments[4].parse().expect("a seed"),
+                arguments[5].parse().expect("a count"),
+                &arguments[6],
+                &arguments[7..],
+            ),
+            _ => panic!(
+                "executed move <seed> <requests> | train <arm> <terrain> <seed> <batch> <moves> <deadline ms> <out> | evaluate <terrain> <seed> <count> <out> <label=E>…"
+            ),
         },
         // `pumped below | past`: the pinned pumped runs (module header, "The pumped receiving ring").
         Some("pumped") => {

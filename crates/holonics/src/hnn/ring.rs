@@ -3155,6 +3155,23 @@ impl ReceivingBank {
         Ok((map, [re?, im?]))
     }
 
+    /// **Whether every crossing of a turn is admissible** for every member: each tick's pumped
+    /// stiffness passes the signed form `2C + hD + (h²/2)K_t ⪰ 0` ([`ReceivingBank::read_turn`]
+    /// refuses a turn that does not), read without solving a tick.
+    pub fn admits(&self, amplitudes: &[GaussianRat]) -> Result<bool, HnnError> {
+        let (_, stiffness, _) = self.material.forms();
+        for pump in &self.pumps {
+            for (tick, amplitude) in amplitudes.iter().enumerate() {
+                let carrier = pump.carrier(tick % pump.phases()).as_gaussian().mul(amplitude);
+                let pumped = stiffened(stiffness, &pump_block(pump.strength(), &carrier))?;
+                if !self.material.signed_form_holds(&pumped, &self.hop)? {
+                    return Ok(false);
+                }
+            }
+        }
+        Ok(true)
+    }
+
     /// Every member's turn (its maps, the integer product and scale), its characteristic
     /// polynomial and its growth enclosure.
     #[allow(clippy::type_complexity)]

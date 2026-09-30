@@ -1175,3 +1175,30 @@ fn the_committed_move_descends_or_refuses_by_type() {
         None => panic!("the move on this instance is adopted: {:?}", moved.refusal),
     }
 }
+
+/// **The face's move is the same ladder on the face's code** (`hnn::executed::face_move`, the
+/// matched control): on partition contexts the face's code at an adopted successor lies strictly
+/// below its code at `E` by disjoint enclosures, its first order is negative, and `E`'s entries hold
+/// the bound; every earlier trial names its guard.
+#[test]
+fn the_faces_move_is_the_same_ladder_on_the_faces_code() {
+    use crate::hnn::executed::{Context, entry_bound, face_move};
+    let field = joint();
+    let theta = generic(&field, 94);
+    let refinement = Refinement::declare(&field, 0, 2, 1, 4, 2).unwrap();
+    let bank = joint_bank();
+    let requests = executed_requests(
+        &field,
+        &[(95, [0, 1, 2, 1]), (96, [1, 1, 0, 2])],
+        Context::Partition(vec![false, true, false, false]),
+    );
+    let moved = face_move(&field, &theta, &requests, &refinement, &bank, 12).unwrap();
+    for trial in &moved.trials[..moved.trials.len().saturating_sub(1)] {
+        assert!(trial.refusal.is_some());
+    }
+    let (_, step) = moved.adopted.as_ref().expect("the face's move is adopted here");
+    let last = moved.trials.last().unwrap();
+    assert!(last.value.as_ref().unwrap().upper < moved.before.value.lower);
+    assert!(last.first_order.as_ref().unwrap().upper.is_negative());
+    assert!(step.largest <= entry_bound());
+}
