@@ -480,6 +480,23 @@ The falsifiers:
   families) and the release's order (the first lock lands on a request-reading station in at most 25
   of 64 validation sections) were not read here.
 
+## 6a. Qualifications from Astra's source audit (at `7ca300bb`), kept with this record's scope
+
+- Some wrong decisions' targets stay below threshold while the wrong winner is eligible, so "every
+  wrong decision is confident" holds of the winner, not of the target's own reading.
+- One supported term has a derivative exactly zero (D2's "1 exactly zero").
+- On three order-2 moves the measured-over-predicted ratio falls below `1/8`, while the independent
+  finite-descent guard still holds.
+- `clog₄ 10240 = 7` is a necessary worst-case capacity bound for separating every key. It does not
+  prove that seven observations separate all pairs, and one passage isolating a key in six does not
+  contradict it.
+- The ideal listener's zero further key bits after the first batch do not mean zero useful
+  corrective signal for the machine as it is. Information sufficiency and the rate of adaptation
+  are separate quantities.
+
+None of these negates the objective's defect (§6). The alternation's and the line's m16 reads stay
+incomplete.
+
 ## 7. Time and memory
 
 | Run | Measured ms | Projection / deadline | Peak resident bytes |
