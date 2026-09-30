@@ -505,6 +505,15 @@ named, and the program's loop stays its own counter, disclosed as such.
 
 #### U6. The text chart
 
+- **The learning failure diagnosed, September 30** ([record](../../research/records/2026-09-30_THE_LEARNING_FAILURE_DIAGNOSED_THE_TRAINED_COMPARISON_IS_NOT_THE_ONE_THE_RELEASE_EXECUTES.md)). The trained
+  comparison (the bank's exchange face) is not the one the release executes (the largest member's
+  executed growth, the threshold and the gap order from an open section). The next loop joins the
+  release's own comparison to its exact pullback (the simple-root eigen-derivative of the executed
+  monodromy, collisions typed unresolved), a carried update certified on the actual successor, and a
+  full release receipt, at `E` alone on known truth; then face against executed comparison crossed with
+  partition against open-section contexts. Counted guards become commit guards. The corpus pass and the
+  card realization are projected from the repaired path.
+
 - **Lessons, September 29** ([record](../../research/records/2026-09-29_LESSONS_THE_FAILURES_THAT_REPEATED_AFTER_THEY_WERE_RECORDED.md)). Today's native text builds (`hnn::encoding`'s
   passage founding, `hnn::prediction`) repeated recorded failures: counts as the learner, text on its
   codec's grain, the byte-marginal readout located on September 25 and carried unrepaired, and an

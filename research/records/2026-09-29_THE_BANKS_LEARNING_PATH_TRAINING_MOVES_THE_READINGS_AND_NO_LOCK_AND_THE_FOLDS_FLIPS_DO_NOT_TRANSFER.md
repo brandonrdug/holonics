@@ -1,5 +1,11 @@
 # The bank's learning path: training moves the readings and no lock, and the fold's flips do not transfer
 
+> **Corrected September 30** ([diagnosis](2026-09-30_THE_LEARNING_FAILURE_DIAGNOSED_THE_TRAINED_COMPARISON_IS_NOT_THE_ONE_THE_RELEASE_EXECUTES.md)). Two claims here are withdrawn: that the fold's flips
+> carry no information (the 15-against-16 split shows only that training-code improvement did not predict
+> improvement on that probe), and that future-sufficient retention implies descent of the admitted future's
+> expected code (sufficiency orders no two constitutions' losses). The trained face is not the comparison
+> the release executes; that misalignment, not only the step's size, is the located cause.
+
 **Date.** September 29. **Issues.** #73, #148, #63 (THE_REBUILD U6). **Grade.** [measured] for the
 runs (§3), each run once under the [pins](2026-09-29_THE_BANKS_LEARNING_PATH_PINNED_BEFORE_ITS_RUNS.md)
 (`d84692dc`) at the build `6b9b1cee`; [proved-derived; formal-checked] for the Lean (§2);

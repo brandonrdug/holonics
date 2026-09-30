@@ -65,7 +65,7 @@ Most repeated first. Each line: the failure; where it was first recorded; where 
    "resource refusal became permission to try harder". Again: today's pinned run stopped at 660 s,
    rerun at 900 s.
 10. **Too little data.** First: `2026-09-07_AC2_THE_HOMOGENEOUS_MOMENT…`. Again: today's generation
-    trained on 385 pairs from 6,148 bytes; the field's cost (`107 rem 21` ms a window) is what caps
+    trained on 385 pairs from a 523,215-byte tail of the choosing role (whose full 11,666,048 bytes hold 12,261 eligible pairs; corrected September 30, the earlier "6,148 bytes" was the standing cut's size); the cost per pair (host exact arithmetic, serial) is what caps
     the data.
 
 The process failures that surround them, from Brandon's corrections: claiming progress without
