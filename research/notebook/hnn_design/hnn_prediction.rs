@@ -2216,6 +2216,12 @@ fn main() {
                 arguments[5].parse().expect("a count"),
                 &arguments[6..],
             ),
+            Some("slopes") => executed_loop::slopes(
+                &arguments[3],
+                arguments[4].parse().expect("a seed"),
+                arguments[5].parse().expect("a count"),
+                &arguments[6..],
+            ),
             Some("evaluate") => executed_loop::evaluate(
                 &arguments[3],
                 arguments[4].parse().expect("a seed"),
