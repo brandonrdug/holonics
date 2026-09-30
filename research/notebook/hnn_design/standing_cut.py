@@ -29,10 +29,11 @@ never from the data.
     python3 research/notebook/hnn_design/standing_cut.py wide <population>
 
 writes the **wide cut** (THE_REBUILD Decision 35): the development stream's last `population`
-cells (a power of two, `2^20` by the notebook's memory derivation, `hnn_landmark -- … wide`), of
-which the final `population/8` are held out, into `.local/cuts/wide-real-cut.{bin,json}`. It holds
-the standing cut (both are the stream's tail), and the evaluation partition stays unread. Run from
-the main checkout, or set `HOLONICS_ROOT` to it.
+cells (a power of two, `2^20` by the memory derivation of `hnn_landmark -- … wide`, retired
+September 30 and at commit `d4596102`), of which the final `population/8` are held out, into
+`.local/cuts/wide-real-cut.{bin,json}`. It holds the standing cut (both are the stream's tail),
+and the evaluation partition stays unread. Run from the main checkout, or set `HOLONICS_ROOT` to
+it.
 
 **The development reserve** (`development_families.py`, THE_REBUILD U6): both cuts skip the reserve's
 conversations and name it as excluded in their manifests (`reserve_excluded`), unless the logged flag

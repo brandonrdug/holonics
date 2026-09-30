@@ -74,7 +74,8 @@
 //! response (60 s for the declared validation passage's longest agent response, at the run's mean a
 //! window) and the declared validation passage (ten minutes, at the same mean), the last two read
 //! from the cut's manifest (`declared_validation_cells`, `longest_agent_response`, written by
-//! `f2_capacity_probe.py`). The card's memory is read outside the process.
+//! `f2_capacity_probe.py`, retired September 30 and at commit `d4596102`). The card's memory is read
+//! outside the process.
 //!
 //! ```sh
 //! cargo run --release -p holonics --example hnn_exposure -- held-out 6132 windows 16 gate f2   # the smoke, public

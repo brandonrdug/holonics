@@ -138,13 +138,17 @@ cargo run --release -q -p holonics --example hnn_prediction -- executed evaluate
 
 It writes the listing (the harness's stdout, then the section listing written to `<out>`) and diffs
 it against the reference [`replay_reference.txt`](2026-09-30_THE_BASELINE_receipts/replay_reference.txt)
-(41 lines, 6,160 bytes, SHA-256 `e2c0ca40035532ce8a39c8844f9d02d29f270dfe3914fa590585281a3497f2cd`).
+(41 lines, 6,616 bytes, SHA-256 `9e10a890dcf935fd7ef158d9cc6681658578ec401ddd45618c80dc7e4b1cb050`,
+regenerated at step 1a's join `7ca300bb` once its diff was confirmed to be only 1a's constant and
+nonconstant strata and a per-constitution time; the baseline's first reference was 6,160 bytes,
+SHA-256 `e2c0ca40035532ce8a39c8844f9d02d29f270dfe3914fa590585281a3497f2cd`).
 
-- **What is masked, exactly.** One line: the harness's last,
+- **What is masked, exactly.** The harness's last line,
   `executed evaluate: <ms> ms; resident <now> now, <peak> peak` (or `resident unread`), whose three
   integers (wall milliseconds, the resident set now and at its peak, in bytes) are replaced by
-  `<ms>`, `<now>` and `<peak>`. Every other byte is compared, the transport moduli, counts, requests,
-  targets, released classes and lock orders included.
+  `<ms>`, `<now>` and `<peak>`; and, since step 1a, the wall milliseconds ending each
+  constitution's summary line (`first lock right <n>; <ms> ms`). Every other byte is compared, the
+  transport moduli, counts, requests, targets, released classes and lock orders included.
 - **What it reads.** Development seed 41 is the modulus pin's development batch (read there at 8
   requests too); no pinned training, confirmation or final-confirmation seed is read. The four
   constitutions are the controls of §4: lossless, founded, the trained order-2 port and the refit.
@@ -287,3 +291,56 @@ README keeps for it.
   §6 names.
 - **The replay after N1**: the listing matches the reference byte for byte (164,855 ms, peak
   resident 89,366,528 bytes; the host was shared with another worker's runs).
+
+## 8. N2's receipt
+
+[measured; source-inspected] Batch N2 (THE_REBUILD U6, the order's C.4), on step 1a's tip
+`7ca300bb`, in two commits.
+
+- **The step 4 scripts.** `power.py`, `swing_power.py` and `capacity.py` were re-run (`capacity.py`
+  in 370 s) and printed the readings §6 names. Every reading they print that the
+  [construction record](2026-09-28_THE_REBUILDS_CONSTRUCTION_RECORD_STEPS_ZERO_TO_FIVE_THE_CAMPAIGNS_AND_THE_FORWARD_PLAN.md)
+  did not hold is now written there exactly: the power balance's `P` and `Π_c` at every tick with
+  their bit sizes and `P(8)/P(0) = 244 + e`, `e ∈ [2626/3871, 251/370]` (replacing "245-fold"); the
+  per-ring power at every tick (replacing "rose, then fell": it falls at the first tick, rises
+  through the fifth and falls at the sixth) and the per-contact `648509/23040`; the control's
+  `log₂N(n)` bounds and dense code at every `n` read (135 bits at `n = 128`, 138 at 144), the
+  period-7 ring below the source at 117,000 and at no multiple of 1,000 before it, the eight rings'
+  stretches (from 3,190,785, not below again at 3,670,785, below from 4,243,457) and the ratios
+  `9472/9375` and `132608/134375`. Then `field.py`, `power.py`, `swing_power.py` and
+  `capacity.py` were deleted (232, 64, 39 and 126 lines: 461), with the record's three links
+  repinned to `d4596102`.
+- **The harness strip.** `hnn_prediction.rs` keeps only the declaration the executed loop reads
+  (`Declared`, `declare`, `ingest`, `Engine` with `new` and its field, refinement and opening,
+  `bank_of`, `bank_strength`, `order_declared`, `order_pairs`, `resident`) and the dispatch of
+  `executed move | train | evaluate | spread | slopes | counts`; 2,344 lines to 317. Retired: the
+  modes `copy`, `moire`, `divergence`, `order2 [pinned|bank|learn]`, `pumped below|past`, `text`,
+  `probe` and `develop …`, the `Engine`'s methods `learn`, `generate`, `generate_banks`, `report`,
+  `report_bank` and `report_learning`, their tallies (`Tally`, `LearningTally`, `BankTally`) and
+  their terrains, pins and guards. `hnn_executed_loop.rs` loses `executed train`'s `face` arm (the
+  arm name keeps its form, `executed-open` or `executed-partition`). The source of all of it is at
+  `7ca300bb`.
+- **The per-constitution clock.** `executed evaluate`'s clock for each constitution started after
+  its parallel generation, so every summary line printed `0 ms`; it now starts before the
+  generation. The replay masks that field.
+- **The exterior relations.** `Relation` and `RelationKind` are defined in `exterior.rs`, and
+  `read_incidence` returns them; the crate's `receiver::population::admitted` keeps its own
+  definitions until batch P retires it. `HUMAN` and `AGENT` were not moved: after the strip no
+  notebook file reads them.
+- **The chase's tree control.** `hnn_chase.rs`'s reception phase no longer reads the landmark tree
+  at depths 1, 2, 4, 8. Its output at `7ca300bb` and after the change, run once each: 414 and 334
+  lines, identical outside the 64 per-depth code lines, the 16 ordering lines, the summary's tail
+  (the old run: strictly below the tree's least on 16 of 16) and the wall times.
+- **The consumer checks** (before the deletions): no file in this worktree, the main checkout's
+  working tree (its three untracked `tools/agent_mailbox*` files included) or the protein
+  worktree's working tree (names and imports only; its new crates `holonics-figures` and
+  `holonics-protein`) imports `field.py` or the three scripts, includes `hnn_prediction.rs` or
+  `hnn_executed_loop.rs`, or names a removed harness function. The crate's own mentions (prose in
+  `hnn/tests/propagation.rs`, `hnn/constitution.rs` and `hnn/prediction.rs`) are batch H's.
+- **The gates after N2**: `cargo check --workspace --all-targets` clean, no warning;
+  `cargo test -p holonics --lib` 976 passed, as before the batch; the kept Python tests pass
+  (`athena_blind_tests.py` 5, `athena_file_checkpoint_tests.py` 11,
+  `athena_file_protocol_tests.py` 8, `athena_protocol_tests.py` 14, `f5_context_tests.py` 5).
+- **The replay after N2**: the listing matches the reference byte for byte (the harness 91,160 ms,
+  peak resident 84,869,120 bytes). The four constitutions' own times, now read: lossless 768 ms,
+  the founded opening 18,107, the trained order-2 port 36,162 and the refit 36,071.

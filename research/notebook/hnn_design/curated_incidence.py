@@ -1,12 +1,13 @@
 """The curated cut's admitted relations (HNN_FORMULA, "The source and release contract", item 7;
-`holonics::receiver::population::admitted`; #73, #148).
+read at the notebook's exterior boundary by `exterior.rs`, `read_incidence` into its `Relation`s;
+#73, #148).
 
 An exterior codec step, stdlib only, run once after `curated_source.py`. It reads the curated
 source's manifest and incidence file (`.local/cuts/curated-source.json`,
 `curated-source.incidence.jsonl`) and the pinned cut (`curated-cut.bin`), and writes the relations
-the admitted receivers read, placed on the cut's ticks, into `.local/cuts/` (each file created mode
-0600, `standing_cut.private_write`). Nothing it writes is published, and it prints counts and hashes
-only, never any text.
+a receiver of the curated cut reads, placed on the cut's ticks, into `.local/cuts/` (each file
+created mode 0600, `standing_cut.private_write`). Nothing it writes is published, and it prints
+counts and hashes only, never any text.
 
 The relations (agent-inferred from the data rules at `13f8c734:docs/CONVERSATION_DATA.md`, "The
 primary distinction"):

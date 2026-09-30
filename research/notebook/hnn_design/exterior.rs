@@ -355,13 +355,35 @@ pub fn read_curated(path: &str, chart: &SectionChart) -> CuratedCut {
     }
 }
 
+/// [definition; agent-inferred] **An admitted relation's kind**: exterior codec information, the
+/// dataset's roles as the curated source's incidence file declares them (`curated_incidence.py`),
+/// never a native semantic ID. A response (an agent part) reaches its request (a human part, the
+/// source's `comparison-request`), or a later human part reaches the response it follows (an agent
+/// part, `later-human-after-agent`).
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Hash, PartialOrd, Ord)]
+pub enum RelationKind {
+    /// A response (agent part) reaches its request (human part): `comparison-request`.
+    Request,
+    /// A later human part reaches the response it follows (agent part): `later-human-after-agent`.
+    LaterHuman,
+}
+
+/// [definition] **A declared relation**: the reading part's letter tick, its kind, and the target
+/// part's letter tick, earlier in the passage. A relation whose target lies outside the passage is
+/// not declared.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub struct Relation {
+    pub letter: u64,
+    pub kind: RelationKind,
+    pub target: u64,
+}
+
 /// **The curated cut's declared relations** (`curated-cut.incidence.bin`, written by
 /// `curated_incidence.py` beside the curated cut: three little-endian u32 a relation, the reading
 /// part's letter tick, the kind, `0` a request and `1` a later human return, and the target's
 /// letter tick), in letter order; their count must be the manifest's. Only counts are printed.
 #[allow(clippy::disallowed_types, clippy::disallowed_methods)]
-pub fn read_incidence(curated_path: &str) -> Vec<holonics::receiver::population::Relation> {
-    use holonics::receiver::population::{Relation, RelationKind};
+pub fn read_incidence(curated_path: &str) -> Vec<Relation> {
     let path = curated_path.strip_suffix(".bin").map_or_else(
         || format!("{curated_path}.incidence.bin"),
         |stem| format!("{stem}.incidence.bin"),

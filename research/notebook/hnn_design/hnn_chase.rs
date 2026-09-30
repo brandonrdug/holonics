@@ -46,11 +46,11 @@
 //! `2^8` ticks ended by capture: the truth (the candidate, its key description, the openings, the
 //! friction field's classes by patch count, the slips, wall meetings and the capture tick); the
 //! population's code, the truth family's own code and their exact difference against the naming
-//! margin; the landmark tree's code alone at each depth of `1, 2, 4, 8` over the same cells and the
-//! population's ordering against its least; the selected family (posterior decided above one half)
-//! or none; the population's selected fibre against the surviving fibre; the fibre's joint
-//! posterior; and the fibre's future classes over every admitted pursuer word of five ticks, with a
-//! separating word where one exists. Bits are enclosures with exact endpoints read at `L_R = 16` as
+//! margin; the selected family (posterior decided above one half) or none; the population's selected
+//! fibre against the surviving fibre; the fibre's joint posterior; and the fibre's future classes
+//! over every admitted pursuer word of five ticks, with a separating word where one exists. (The
+//! landmark tree's code at depths `1, 2, 4, 8`, a control, was retired September 30 with batch N2;
+//! it is at `7ca300bb`.) Bits are enclosures with exact endpoints read at `L_R = 16` as
 //! `n + k/16 + ε`; no decimal is printed.
 //!
 //! [definition; agent-inferred] **The action phase.** Passages of at most `2^9` ticks from the
@@ -97,9 +97,6 @@ mod exterior;
 use std::sync::Arc;
 use std::time::Instant;
 
-use holonics::compression::landmark::context::{
-    Capacity, LandmarkDeclaration, LetterFamily, StopPrior,
-};
 use holonics::geometry::motion::{Move, MoveKind};
 use holonics::holarchy::terrain::{
     ActionDeclaration, ActionPassage, AeonFamily, ArenaDeclaration, Basin, BasinMemo, CHANNELS,
@@ -108,17 +105,16 @@ use holonics::holarchy::terrain::{
     Pursuer, Reception, RunnerFamily, RunnerLaw, RunnerState, Switches, act_drawn, capture_ticks,
     classes, expected_ticks, viable_tube,
 };
-use holonics::ratio::algebraic::ExactInterval;
 use holonics::ratio::surprisal::SymbolicSurprisal;
 use holonics::ratio::{Rat, rat};
 use holonics::receiver::population::{
-    ChaseFamily, Family, MachineChaser, MachineDeclaration, MachineReceipt, MachineRelease, Plan,
-    Population, PopulationError, Posterior, Release, TreeFamily, selected_fibre,
+    ChaseFamily, MachineChaser, MachineDeclaration, MachineReceipt, MachineRelease, Plan,
+    Population, PopulationError, Posterior, Release, selected_fibre,
 };
 use holonics::receiver::release::ReleaseReturn;
 use num_bigint::{BigInt, BigUint};
 
-use exterior::{against, difference, enclosure, per};
+use exterior::{difference, enclosure, per};
 
 /// The terrain notebook's seed.
 const SEED: u64 = 20_260_927;
@@ -187,9 +183,6 @@ const ESCAPE: u32 = 12;
 /// The future classes' horizon.
 const HORIZON: usize = 5;
 
-/// The tree's depth ladder.
-const DEPTHS: [usize; 4] = [1, 2, 4, 8];
-
 fn declaration() -> ArenaDeclaration {
     ArenaDeclaration {
         width: 16,
@@ -246,19 +239,6 @@ fn factored(value: &BigUint) -> String {
         })
         .collect();
     format!("{value} = {}", factors.join("·"))
-}
-
-fn tree(alphabet: usize, depth: usize, population: usize) -> LandmarkDeclaration {
-    LandmarkDeclaration {
-        alphabet,
-        depth,
-        forced: 0,
-        population: population as u64,
-        grain: GRAIN,
-        family: LetterFamily::cells(),
-        prior: StopPrior::half(),
-        capacity: Capacity::Unbounded,
-    }
 }
 
 fn posterior_line(posterior: &Posterior) -> String {
@@ -1873,7 +1853,7 @@ fn reception() {
         pursuer.law.traction,
         pursuer.capture,
     );
-    let (mut within, mut below, mut in_fibre, mut singletons) = (0, 0, 0, 0);
+    let (mut within, mut in_fibre, mut singletons) = (0, 0, 0);
     for s in 0..SEEDS {
         let seed = SEED + s;
         let started = Instant::now();
@@ -1941,34 +1921,6 @@ fn reception() {
         let is_within = &receipt.code.upper - &truth_code.lower <= margin_rat;
         within += usize::from(is_within);
         println!("    within the naming margin of {margin} bits: {is_within}");
-        let mut least: Option<ExactInterval> = None;
-        for depth in DEPTHS {
-            let mut tree_family =
-                TreeFamily::new(tree(moves.alphabet(), depth, ticks), 0).expect("a declared tree");
-            for &cell in &chase.cells {
-                tree_family.receive(cell).expect("a tree cell");
-            }
-            let code = tree_family
-                .likelihood()
-                .code()
-                .expect("a code")
-                .expect("a tree never dies");
-            println!(
-                "  the landmark tree D = {depth}, code alone: {}",
-                enclosure(&code, GRAIN)
-            );
-            if least.as_ref().is_none_or(|l| code.lower < l.lower) {
-                least = Some(code);
-            }
-        }
-        let least = least.expect("a ladder");
-        let is_below = receipt.code.upper < least.lower;
-        below += usize::from(is_below);
-        println!(
-            "  the population against the tree's least: {} by {}",
-            against(&receipt.code, &least),
-            difference(&receipt.code, &least, GRAIN)
-        );
         match receipt.selected {
             Some(index) => println!(
                 "  selected (posterior decided above ½): {}",
@@ -2015,6 +1967,6 @@ fn reception() {
     }
     println!();
     println!(
-        "over {SEEDS} seeds: the selected fibre is the surviving fibre and holds the truth on {in_fibre}; a single candidate survives on {singletons}; the population's code lies within the naming margin on {within} and strictly below the tree's least on {below}"
+        "over {SEEDS} seeds: the selected fibre is the surviving fibre and holds the truth on {in_fibre}; a single candidate survives on {singletons}; the population's code lies within the naming margin on {within}"
     );
 }

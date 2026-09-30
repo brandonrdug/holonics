@@ -28,9 +28,12 @@ output. The development control's cut is pinned: `docs/plans/THE_REBUILD.md` at 
 never from the live file.
 
 `exterior.rs` is the notebook's shared exterior boundary: the cut file and its manifest
-(`read_cut`, `manifest_number`), the process's resident set (`resident_set`, read from the
-kernel's status for the harnesses' memory receipts) and the exact presentation of readings. The
-examples include it by `#[path]`.
+(`read_cut`, `manifest_number`), the curated cut with its declared relations and aeons
+(`read_curated`, `read_incidence`, `read_aeons`; the relations' kinds `Relation` and `RelationKind`
+live here, since dataset roles are exterior codec information), the development reserve's guard
+(`admit_reserve_flag`), the process's resident set (`resident_set`, read from the kernel's status
+for the harnesses' memory receipts) and the exact presentation of readings. The examples include
+it by `#[path]`.
 
 ## Index
 
@@ -40,18 +43,17 @@ and every mode. A Python script needs only the standard library unless its docst
 
 | Harness | What it measures | Command | Record |
 |---|---|---|---|
-| `hnn_prediction.rs` (with `hnn_executed_loop.rs`) | **Step 1's harness** (THE_REBUILD U6): `hnn::executed` on the known-truth terrains (order-2, the alternation, the line) at `E` alone. `executed move`: one committed move of `E` on the release's own comparison, printed whole; `executed train`: an arm's certified training from the declared or founded opening, its `E` written; `executed evaluate`: every constitution's release from the open section, its counts and every section; `executed spread` and `executed slopes`: diagnostics at the open section. The modes before the executed comparison (`copy`, `moire`, `text`, `probe`, `develop`, `pumped below\|past`, native generation of September 29) remain until batch N2 strips them | `cargo run --release -p holonics --example hnn_prediction -- executed evaluate <terrain> <seed> <count> <out> <label[=E]>…` | [the baseline](../../records/2026-09-30_THE_BASELINE_BEFORE_THE_SEPTEMBER_30_RETIREMENTS.md), [the modulus founded off one](../../records/2026-09-30_THE_MODULUS_FOUNDED_OFF_ONE_MEASURED_THE_MODULUS_STAYS_BELOW_ONE_AND_ORDER_TWO_TRAINING_LEARNS_THE_LAG_ONE_COPY.md), [the station-framed placement](../../records/2026-09-30_THE_STATION_FRAMED_PLACEMENT_MEASURED_THE_REFIT_READS_BOTH_CHAINS_AND_THE_CERTIFIED_MOVE_KEEPS_THE_MODULUS_AT_ONE.md), [the executed comparison](../../records/2026-09-30_THE_EXECUTED_COMPARISON_JOINED_A_CERTIFIED_MOVE_DESCENDS_IT_AND_ORDER_TWO_LEARNS_ONLY_THE_TERMINATION.md), [native generation](../../records/2026-09-29_NATIVE_GENERATION_THE_MOIRE_CONTINUES_EXACTLY_THE_COPY_IS_NEAR_AND_TEXT_IS_ILLEGIBLE.md) |
+| `hnn_prediction.rs` (with `hnn_executed_loop.rs`) | **Step 1's harness** (THE_REBUILD U6): `hnn::executed` on the known-truth terrains (order-2, the alternation, the line) at `E` alone, over one declaration (`hnn_prediction.rs`'s header). `executed move`: one committed move of `E` on the release's own comparison, printed whole; `executed train`: the executed comparison's certified training from the declared or founded opening (`executed-open` or `executed-partition`), with D1, D2 and the checkpoints after moves 1, 2, 4, 8 and 16, its `E` written; `executed evaluate`: every constitution's release from the open section, its counts (constant and nonconstant requests apart) and every section; `executed spread` and `executed slopes`: diagnostics at the open section; `executed counts`: the declared reference family's survivors and `n*_terrain` along the training passage (read-only instrumentation) | `cargo run --release -p holonics --example hnn_prediction -- executed evaluate <terrain> <seed> <count> <out> <label[=E]>…` | [the two counts](../../records/2026-09-30_THE_TWO_COUNTS_MEASURED_THE_TERRAIN_PINS_ORDER_TWO_IN_SEVEN_READINGS_AND_THE_CERTIFIED_STEP_DESCENDS_TOWARD_TIES_WHILE_ITS_DECISIONS_STAY_AT_A_GUESS.md), [the baseline](../../records/2026-09-30_THE_BASELINE_BEFORE_THE_SEPTEMBER_30_RETIREMENTS.md), [the modulus founded off one](../../records/2026-09-30_THE_MODULUS_FOUNDED_OFF_ONE_MEASURED_THE_MODULUS_STAYS_BELOW_ONE_AND_ORDER_TWO_TRAINING_LEARNS_THE_LAG_ONE_COPY.md), [the station-framed placement](../../records/2026-09-30_THE_STATION_FRAMED_PLACEMENT_MEASURED_THE_REFIT_READS_BOTH_CHAINS_AND_THE_CERTIFIED_MOVE_KEEPS_THE_MODULUS_AT_ONE.md), [the executed comparison](../../records/2026-09-30_THE_EXECUTED_COMPARISON_JOINED_A_CERTIFIED_MOVE_DESCENDS_IT_AND_ORDER_TWO_LEARNS_ONLY_THE_TERMINATION.md) |
 | `replay_baseline.sh` | The minimal replay: `executed evaluate` on development seed 41, 8 requests, over the lossless and founded openings, the trained order-2 constitution and the station-framed refit, diffed byte for byte against the committed reference, the wall time and the resident set masked | `bash research/notebook/hnn_design/replay_baseline.sh` | [the baseline](../../records/2026-09-30_THE_BASELINE_BEFORE_THE_SEPTEMBER_30_RETIREMENTS.md) §5 |
 | `bank_causes_probe/eF_confirmation_counts.py`, `bank_causes_probe/eM_section_shapes.py` | Exact counts of an `executed evaluate` listing, per constitution: released and held, whole sections, the first lock at station 0 or 1 and its stations; the released sections' shapes (the classes, adjacent stations equal, the terrain's rule among a section's own stations) | `python3 research/notebook/hnn_design/bank_causes_probe/eM_section_shapes.py <listing> <order2\|alternation\|line>` | [the station-framed placement](../../records/2026-09-30_THE_STATION_FRAMED_PLACEMENT_MEASURED_THE_REFIT_READS_BOTH_CHAINS_AND_THE_CERTIFIED_MOVE_KEEPS_THE_MODULUS_AT_ONE.md), [the modulus founded off one](../../records/2026-09-30_THE_MODULUS_FOUNDED_OFF_ONE_MEASURED_THE_MODULUS_STAYS_BELOW_ONE_AND_ORDER_TWO_TRAINING_LEARNS_THE_LAG_ONE_COPY.md) §3 |
 | `hnn_exposure.rs` | Campaign 1's exposure on a cut: the model face (the receiver's population over the landmark tree and the combined face), the baselines, keys, aeons and the first law; on the host or the card (`realization card`); the loaded resonator (`resonator source`); F2's adoption gate (`gate f2`: the population with and without the field on the held-out cells, work, memory and budgets) | `cargo run --release -p holonics --example hnn_exposure -- cut-file .local/cuts/standing-real-cut-campaign-1.bin cells all` | [campaign 1 meets its criterion](../../records/2026-09-26_CAMPAIGN_ONE_MEETS_ITS_CRITERION_THE_TREE_RECEIVES_AND_THE_WAVE_IS_WEIGHED.md), [the resonator](../../records/2026-09-26_THE_RESONATOR_RETURNS_ITS_WAVE_AND_THE_COMPARISON_REACHES_ITS_MATERIAL.md), [campaign 2](../../records/2026-09-26_CAMPAIGN_TWO_THE_RINGS_AND_CONTACTS_ARE_LAWFUL_AND_ADD_NO_BITS_ON_TEXT.md), [F2's adoption gate](../../../docs/plans/THE_REBUILD.md#f2-the-field-as-a-family-step-4-73) |
-| `hnn_chase.rs` | F6's chase terrain: the reception phase, the action phase's choosing sweep (`choose`) and its acceptance (`action`, with U4's move reading and U3's release reading); U4's next loop: the failure's diagnosis (`diagnose`) and the fresh population (`fresh`); F6's switches and their attribution (`switches`) | `cargo run --release -p holonics --example hnn_chase` | [the learner must move](../../records/2026-09-27_THE_LEARNER_MUST_MOVE_A_CHASE_TERRAIN_DATA_AS_PARTICLES_WITH_FLUX_AND_RELEASE_AS_A_THRESHOLD_COMMIT.md) (no dedicated record; the receipts below) |
+| `hnn_chase.rs` | F6's chase terrain: the reception phase (the population against the truth family's own code; its landmark-tree control was retired September 30), the action phase's choosing sweep (`choose`) and its acceptance (`action`, with U4's move reading and U3's release reading); U4's next loop: the failure's diagnosis (`diagnose`) and the fresh population (`fresh`); F6's switches and their attribution (`switches`) | `cargo run --release -p holonics --example hnn_chase` | [the learner must move](../../records/2026-09-27_THE_LEARNER_MUST_MOVE_A_CHASE_TERRAIN_DATA_AS_PARTICLES_WITH_FLUX_AND_RELEASE_AS_A_THRESHOLD_COMMIT.md) (no dedicated record; the receipts below) |
 | `exterior.rs` | The shared exterior boundary the examples include | | |
 | `standing_cut.py` | Pins the standing real cut (`6148`) and the wide cut (`wide 1048576`) | `python3 research/notebook/hnn_design/standing_cut.py 6148` | [campaign 1 meets its criterion](../../records/2026-09-26_CAMPAIGN_ONE_MEETS_ITS_CRITERION_THE_TREE_RECEIVES_AND_THE_WAVE_IS_WEIGHED.md), [at scale](../../records/2026-09-26_THE_LANDMARK_TREE_AT_SCALE_THE_STOP_PRIOR_LOCAL_WEIGHING_THE_WIDE_CUT_AND_THE_STORAGE_WHERE_PATHS_PART.md) |
 | `curated_source.py`, `curated_incidence.py` | The curated source, its pinned cut and flat twin; the admitted relations on the cut | `HOLONICS_ROOT=$PWD python3 research/notebook/hnn_design/curated_source.py 1048576` | [the receiving population](../../records/2026-09-27_THE_RECEIVING_POPULATION_WAS_BUILT_ON_TERRAIN_WITH_KNOWN_TRUTH_AND_THE_CURATED_SOURCE_NOW_CODES_BELOW_THE_FLAT_STREAM.md) |
 | `development_families.py`, `family_passage.py` | The split by conversation with the development reserve (U6), the spent family splits (F-items, U2) behind `--read-reserve`, and their joined passages | `HOLONICS_ROOT=$PWD python3 research/notebook/hnn_design/development_families.py [U6]` | [F4](../../records/2026-09-27_F4_DEVELOPMENT_FAMILY_SPLIT_AND_RELEASE_GATE.md), [U2's acceptance run](../../records/2026-09-28_U2_F0S_MEMORY_ACCEPTANCE_RUN_PINNED_BEFORE_ITS_SPLIT_IS_READ.md) |
 | `f5_context.py` (tests: `f5_context_tests.py`) | F5's request context from declared provider-parent incidence (an exterior source codec) | `python3 research/notebook/hnn_design/f5_context_tests.py` | [F5](../../records/2026-09-27_F5_DEVELOPMENT_AND_BLIND_GATE.md) |
 | `athena_protocol.py`, `athena_file_protocol.py`, `athena_file_checkpoint.py`, `athena_blind.py` (tests: `athena_*_tests.py`) | Athena-0's exterior protocol, checkpoint transport and blind judging surface | `python3 research/notebook/hnn_design/athena_protocol_tests.py` | [F5](../../records/2026-09-27_F5_DEVELOPMENT_AND_BLIND_GATE.md), [the atomic standing audit](../../records/2026-09-27_F5_ATOMIC_STANDING_OWNER_AUDIT.md) |
-| `field.py`, `power.py`, `swing_power.py`, `capacity.py` | The step 4 design review's kept scripts: the revised tick's exact reference, its power balance, one exponent per ring against one per contact, and the capacity `n*` by counting | `python3 research/notebook/hnn_design/power.py` | the step 4 design ("The step 4 design scripts" below) |
 
 ## The baseline replay
 
@@ -77,13 +79,18 @@ the last line's wall milliseconds and resident-set bytes are masked. Exit 0 is a
 ## The retired harnesses
 
 Each retired harness with the commit that holds its source and the sections of this page, at that
-commit, that hold its receipts; its records hold the measurements. N1 is batch N1 of THE_REBUILD
-U6's consolidation (September 30), which retired the harnesses step 1 does not run
+commit, that hold its receipts; its records hold the measurements. N1 and N2 are batches N1 and N2
+of THE_REBUILD U6's consolidation (September 30): N1 retired the harnesses step 1 does not run
 ([the baseline record](../../records/2026-09-30_THE_BASELINE_BEFORE_THE_SEPTEMBER_30_RETIREMENTS.md)
-§6 lists every file with its permalink).
+§6 lists every file with its permalink), and N2 stripped step 1's harness to the executed loop,
+dropped the chase's landmark-tree control and retired the last four step 4 design scripts once
+their readings were in the construction record (the baseline record §8).
 
 | Harness | What it measured | Retired | Source at | Receipts on this page at that commit |
 |---|---|---|---|---|
+| `hnn_prediction.rs`'s modes before the executed comparison: `copy`, `moire [K]`, `divergence`, `order2 [pinned\|bank\|learn]`, `pumped below\|past`, `text <cut> <out> … [bank\|learn]`, `probe copy\|moire\|text`, `develop …`; the `Engine`'s readout training, generation, bank and learning paths and their tallies; `hnn_executed_loop.rs`'s `face` arm of `executed train` | Native generation on the copy, moiré and text; the certified deposition step, the factor families' step, the tightened certificate and the standing's fold on them; the order repair; the receiving bank's generation and its learning path; the pumped receiving ring's Floquet reach; Stage 2's `face` arm (the bank's face as the comparison) | N2 | [`7ca300bb`](https://github.com/brandonrdug/holonics/blob/7ca300bb/research/notebook/hnn_design/hnn_prediction.rs) | [U6 native generation](https://github.com/brandonrdug/holonics/blob/7ca300bb/research/notebook/hnn_design/README.md#u6-native-generation-a-section-refined-and-released-whole-september-29), [the passage's own transports](https://github.com/brandonrdug/holonics/blob/7ca300bb/research/notebook/hnn_design/README.md#u6-the-passages-own-transports-the-founded-port-chart-september-29); the September 29 records (native generation, the certified deposition step, the factor families' step, the tightened certificate, the standing's fold, the order repair, the bank reads a superposed passage, the bank's learning path, the Floquet reach) and [the executed comparison](../../records/2026-09-30_THE_EXECUTED_COMPARISON_JOINED_A_CERTIFIED_MOVE_DESCENDS_IT_AND_ORDER_TWO_LEARNS_ONLY_THE_TERMINATION.md) for the `face` arm |
+| `hnn_chase.rs`'s landmark-tree control | The landmark tree's code alone at depths `1, 2, 4, 8` over each reception passage's cells, and the population's ordering against its least | N2 | [`7ca300bb`](https://github.com/brandonrdug/holonics/blob/7ca300bb/research/notebook/hnn_design/hnn_chase.rs) | [F6 chase terrain: the reception phase](#f6-chase-terrain-the-reception-phase-september-28) (kept below, with the tree's column as read) |
+| `field.py`, `power.py`, `swing_power.py`, `capacity.py` | The step 4 design review's last scripts: the revised tick's exact reference, its power balance, one exponent per ring against one per contact, and the capacity `n*` by counting | N2 | [`d4596102`](https://github.com/brandonrdug/holonics/tree/d4596102/research/notebook/hnn_design) | [the step 4 design scripts](https://github.com/brandonrdug/holonics/blob/d4596102/research/notebook/hnn_design/README.md#the-step-4-design-scripts); every reading is in the [construction record](../../records/2026-09-28_THE_REBUILDS_CONSTRUCTION_RECORD_STEPS_ZERO_TO_FIVE_THE_CAMPAIGNS_AND_THE_FORWARD_PLAN.md) (the capacity condition, participation, the tick's global power balance) |
 | `bank_causes.rs` and `bank_causes_probe/` (all but the two listing counters) | The causes' analysis of the bank's learning path: dumps of the declared field's placement, exact bank readings and `E` after each certified deposit; `native-release` (Stage 0, the station-framed refit's native read), `reentry`; the float fits `eO_fit.py`, `eP_rho_path.py`, `eR_fit.py` and their export | N1 | [`d4596102`](https://github.com/brandonrdug/holonics/tree/d4596102/research/notebook/hnn_design) | none: the September 30 records and their receipts |
 | `hnn_population.rs` with `hnn_population_{birth,census,curated,evolution,f0,u2,u6}.rs` | The egg population: terrain, evolution and species, the curated source with its merges and admitted receivers, F4, F5's native paths and checkpoints, F0's egg and acceptance run, U2's census and acceptance run, U6's symmetric comparison, residual-founded transport discovery | N1 | [`d4596102`](https://github.com/brandonrdug/holonics/blob/d4596102/research/notebook/hnn_design/hnn_population.rs) | [the egg population on terrain](https://github.com/brandonrdug/holonics/blob/d4596102/research/notebook/hnn_design/README.md#the-egg-population-on-terrain-rebuild-step-4-item-4-september-27), [the evolved prior](https://github.com/brandonrdug/holonics/blob/d4596102/research/notebook/hnn_design/README.md#the-evolved-prior-and-species-collapse-rebuild-step-4-item-7-september-27), [the curated source through the population](https://github.com/brandonrdug/holonics/blob/d4596102/research/notebook/hnn_design/README.md#the-curated-source-through-the-population-campaign-5-september-27), [the admitted receivers](https://github.com/brandonrdug/holonics/blob/d4596102/research/notebook/hnn_design/README.md#the-admitted-receivers-campaign-5-september-27), [merges](https://github.com/brandonrdug/holonics/blob/d4596102/research/notebook/hnn_design/README.md#merges-learned-byte-classes-and-shared-counts-campaign-5-september-27), [with the learned classes](https://github.com/brandonrdug/holonics/blob/d4596102/research/notebook/hnn_design/README.md#the-admitted-receivers-with-the-learned-classes-september-27), [F4](https://github.com/brandonrdug/holonics/blob/d4596102/research/notebook/hnn_design/README.md#f4-release-and-the-disjoint-development-families-september-27), [F0's first diagnosis](https://github.com/brandonrdug/holonics/blob/d4596102/research/notebook/hnn_design/README.md#f0-the-predictor-on-unseen-families-the-first-diagnosis-september-28), [U2's census](https://github.com/brandonrdug/holonics/blob/d4596102/research/notebook/hnn_design/README.md#u2-the-standing-census-of-f0s-egg-september-28), [U2's acceptance run](https://github.com/brandonrdug/holonics/blob/d4596102/research/notebook/hnn_design/README.md#u2-the-acceptance-run-of-f0s-memory-september-28), [F0's acceptance run](https://github.com/brandonrdug/holonics/blob/d4596102/research/notebook/hnn_design/README.md#f0-the-acceptance-run-the-predictor-on-unseen-families-september-28), [U6 item 2](https://github.com/brandonrdug/holonics/blob/d4596102/research/notebook/hnn_design/README.md#u6-item-2-the-symmetric-comparison-on-the-conversation-split-september-29), [residual-founded transport discovery](https://github.com/brandonrdug/holonics/blob/d4596102/research/notebook/hnn_design/README.md#residual-founded-transport-discovery-on-the-moiré-september-28) |
 | `hnn_landmark.rs` | The landmark tree, count-only: the depth sweep and the prequential passage; `letters`, `prior`, `wide`, `compact`, `capacity` | N1 | [`d4596102`](https://github.com/brandonrdug/holonics/blob/d4596102/research/notebook/hnn_design/hnn_landmark.rs) | [`hnn_landmark`](https://github.com/brandonrdug/holonics/blob/d4596102/research/notebook/hnn_design/README.md#hnn_landmark) |
@@ -163,9 +170,10 @@ milestone. Its declarations (agent-inferred from the
   `previous_record` is `event − 1` in every development view (the capture predecessor), so it is a
   coordinate, never a parent. The admitted receivers (the contract's item 7: request→response and
   response→later-human, the `comparison-request` and `later-human-after-agent` relations) are
-  carried in the incidence file and consumed by `receiver::population::admitted` ("The admitted
-  receivers", on this page at
-  [`d4596102`](https://github.com/brandonrdug/holonics/blob/d4596102/research/notebook/hnn_design/README.md#the-admitted-receivers-campaign-5-september-27)).
+  carried in the incidence file and read at the notebook's exterior boundary by `exterior.rs`
+  (`read_incidence` into its `Relation`s: dataset roles are exterior codec information). Their
+  first consumer's receipts are "The admitted receivers", on this page at
+  [`d4596102`](https://github.com/brandonrdug/holonics/blob/d4596102/research/notebook/hnn_design/README.md#the-admitted-receivers-campaign-5-september-27).
 
 Counts: 22,449 development families (617 evaluation and 1,702 deferred, read for their partition
 label only), 87 conversations, 22,395 occurrences with cells; human 2,142 parts and 1,557,801
@@ -195,46 +203,6 @@ unchanged).
 **Receipts.** 22,395 occurrences with cells in 87 conversations; sections from the declared turn (`part` 10,977, `turn` 6,992: 1,163 new declared turns and 5,829 record boundaries); 133 mirrors equal their first views, no conflicts, none refused; the cut 1,048,228 cells (1,627 letters), the flat twin 1,046,601 bytes
 
 **Through the population** (`hnn_population.rs curated`, retired September 30; the dated section "[The curated source through the population](https://github.com/brandonrdug/holonics/blob/d4596102/research/notebook/hnn_design/README.md#the-curated-source-through-the-population-campaign-5-september-27)" of this page at `d4596102`): The curated cut through the egg population (campaign 5): the curated cell tree and the typed tree (the channel read once at the section) as families, and the boundary egg (the part clock ⊳ the typed tree and the letter tree through the hazard law on a partition learned by priced merges on the development cells, the declared partition and the refused stage read on the same cells), one passage over the whole cut against the flat tree at `D = 48`; `merges` runs the learning alone; development receipts, counts and bits only Receipts: The boundary egg selected (`−log₂ w = 0 + 0/16 + ε`); learned classes 167 values → 4 (declared 6), shares refused (`7/16` above); the whole curated stream charged against the flat stream: development `−1072 + 15/16 + ε` (declared `−950 + 9/16`), held out `−369 + 8/16 + ε` (declared `−415 + 3/16`)
-
-### The step 4 design scripts
-
-Record: the step 4 design (THE_REBUILD) and #62; no dedicated record.
-
-[established-bounded; measured] The exact-arithmetic scripts behind measured numbers in the
-[step 4 design](../../records/2026-09-28_THE_REBUILDS_CONSTRUCTION_RECORD_STEPS_ZERO_TO_FIVE_THE_CAMPAIGNS_AND_THE_FORWARD_PLAN.md#step-4-design-the-hnn-law) and its #62 item on
-bounded bit growth ("Step 4 (#73) owed"). Every measured value is a `fractions.Fraction` or an exact
-integer, so each number is exact and seeded; `capacity.py` bisects on the exact integer test and
-certifies each `n*` at `n* − 1` and `n*`, with no float anywhere. No script prints a float or a decimal
-(a decimal is a collapse): `field.exact` prints a short ratio as `n/d (q rem r over d)`, its integer
-quotient and remainder, and a long one as its integer quotient `q` plus its remainder's exact
-enclosure between continued-fraction convergents with denominators at most `2^12`,
-`q + e, e in [a/b, c/d]`, with the exact ratio's size in bits. They need only the Python 3 standard
-library. Run one from the repository root:
-
-```sh
-python3 research/notebook/hnn_design/power.py
-```
-
-`field.py` is the exact reference of the revised tick: junction scattering (a parallel adaptor), the
-Cayley ring element with its passive part `W_s` and its contrast port `W_c` driving inside the
-midpoint, the contact's midpoint two-port and the global power. Its defaults (`W_s = W_c = 0`) draw
-exactly what the earlier scripts drew. `power.py` imports it, and `swing_power.py` and `capacity.py`
-its exact printing. `swing_power.py` answered the second review (R2); `power.py`'s contrast-port cases
-and the counting `capacity.py` answered the third (R3). `capacity.py` takes about 6 min (375,000 ms
-in the last run); the other two take seconds.
-
-These three stay because the construction record holds their readings only in part (the
-[baseline record](../../records/2026-09-30_THE_BASELINE_BEFORE_THE_SEPTEMBER_30_RETIREMENTS.md) §6
-says which). The other eight (`bits2.py`, `collapse_bezout.py`, `collapse_check.py`,
-`critical_cayley.py`, `deposit_bits.py`, `propagation.py`, `release.py`, `word_bits.py`) were retired
-on September 30 with every number they reproduce in the construction record; they and their rows
-of this table are at [`d4596102`](https://github.com/brandonrdug/holonics/blob/d4596102/research/notebook/hnn_design/README.md#the-step-4-design-scripts).
-
-| Script | What it measures | The design's number it reproduces |
-|---|---|---|
-| `power.py` | The global power `P` over 8 ticks on six rings of widths 4, 2, 4, 6, 2, 4: the six-cycle plus a chord | Lossless: `P` is constant exactly. Dissipative: `P(t) − P(t+1)` equals the dissipation exactly at every tick. With the contrast port `W_c ≠ 0`: `P(t+1) − P(t) = Π_c` exactly; with dissipation, passive `W_s` and `W_c` together, `P(t+1) − P(t) = −dissipation + (W_s term ≤ 0) + Π_c` exactly at every tick, and `Π_c` takes both signs over 8 starting states. With `W_c` 8 times larger the balance stays exact and `P` grows in 8 ticks by `P(8)/P(0) = 244 + e`, `e in [2626/3871, 251/370]` (an exact ratio of 7,580 bits) |
-| `swing_power.py` | Junction scattering's power with one exponent per ring against one per contact | Per ring (not conserved): `73199/1920` (38 rem 239 over 1920) at tick 0, `50 + e`, `e in [3683/3851, 285/298]` at tick 5, `43 + e`, `e in [1577/3270, 1074/2227]` at tick 6. Per contact: `648509/23040` (28 rem 3389 over 23040) at every tick |
-| `capacity.py` | The capacity `n*` by counting: the least `n` with `N(n) < \|A\|^n`, certified by exact integers at `n* − 1` and `n*`; the moment's dense code as a reading | `n* = 137` on three rings of periods 3, 4, 5 over `\|A\| = 2`; 6,148 cells on campaign 1's declared field; 8,577 for one byte ring of period 7 with `Δ = {1}`; 3,641,698 for eight source rings of period 16 (8,421,376 slots). The dense code: 135 bits at `n = 128` and 138 at 144 on the control; about 117,000 cells for the period-7 ring; for the eight rings, with uniform counts, below the source for good from 4,243,457 cells (the dense code over the source bits `9472/9375` (1 rem 97 over 9375) at `n = 4,200,000`, `132608/134375` at `n = 4,300,000`) |
 
 ### `hnn_exposure`
 
@@ -515,7 +483,9 @@ host. On all 16:
 - the population's selected fibre, read exactly as its greatest `π_f L_f`, is the surviving
   fibre and holds the truth;
 - its code lies within the 6-bit naming margin of the truth family's own code;
-- its code lies strictly below the landmark tree's least code over depths `1, 2, 4, 8`.
+- its code lies strictly below the landmark tree's least code over depths `1, 2, 4, 8` (the tree
+  control was retired September 30 with batch N2; the harness no longer prints it, and its reading
+  is reproduced at [`7ca300bb`](https://github.com/brandonrdug/holonics/blob/7ca300bb/research/notebook/hnn_design/hnn_chase.rs)).
 
 Six of the sixteen seeds, read at `L_R = 16` (the harness prints every seed with exact endpoints):
 
@@ -581,65 +551,6 @@ HOLONICS_ROOT=$PWD python3 research/notebook/hnn_design/development_families.py 
 
 The roles' streams (`curated_source.py 524288 <role>`, `curated_incidence.py <role>`,
 `family_passage.py`) are generated by the loop that measures them, after its pins.
-
-### U6: native generation, a section refined and released whole (September 29)
-
-Records: [the pins](../../records/2026-09-29_NATIVE_GENERATION_PINNED_BEFORE_ITS_RUNS.md) (committed
-at `70a572e7` before any run) and [the receipt](../../records/2026-09-29_NATIVE_GENERATION_THE_MOIRE_CONTINUES_EXACTLY_THE_COPY_IS_NEAR_AND_TEXT_IS_ILLEGIBLE.md);
-plan: THE_REBUILD U6. Refs #73 #148 #63.
-
-```sh
-cargo run --release -p holonics --example hnn_prediction -- copy
-cargo run --release -p holonics --example hnn_prediction -- moire
-cargo run --release -p holonics --example hnn_prediction -- text .local/cuts/curated-u6-passage-cut.bin .local/cuts/u6-native-sections.txt
-```
-
-`hnn_prediction.rs` declares three rings of 32 in a chain with no pair offset, campaign 1's
-constitution and steps, `K = 2` continuing words of one tick, and a batch of 16 refinements a
-deposit. The computational object is the helical pair interaction: the section is a span of the
-receiving ring's helix (**the helix**), the refinement is **the tube**, the joint readout is **faces
-and placement**, and the contacts' transit carries **the pair**; the cell holonomy and the tower
-thread stay attached through the field's complex and carry chain.
-
-- **The checks** hold on all 2,818 refinements: every balance, every exact pairing on the executed
-  charts, every commit's deposition work, and every locus outside a refinement's diamond unchanged.
-- **Known truth.** The moiré (two gratings, least period 6): all 6 windows continue exactly after 512
-  windows. The copy (8 of 4 symbols): 234 of 256 fresh requests echoed exactly, 2,026 of 2,048
-  stations, after 1,536 requests; the pin asked for 256.
-- **Text.** Two passes over the passage's 385 choosing pairs; the 8 validation requests (F0's rule)
-  gave 7 sections of 32 bytes and one typed refusal, strings of `e`, `o`, `r` and spaces: illegible.
-  The text is owner-only.
-- **Cost.** 447,718, 142,464 and 389,739 ms; peak resident sets 401,580,032, 381,526,016 and
-  819,576,832 bytes.
-
-### U6: the passage's own transports, the founded port chart (September 29)
-
-Records: [the pin](../../records/2026-09-29_THE_PASSAGES_OWN_TRANSPORTS_PINNED_BEFORE_ITS_RUNS.md)
-(`962d038e`) and [the receipt](../../records/2026-09-29_THE_PASSAGES_OWN_TRANSPORTS_THE_MOIRE_FOUNDS_ITS_RANKS_WITH_NO_TRANSPORT_DECLARED_AND_TEXT_CODES_BELOW_THE_CELL_CHART.md);
-plan: THE_REBUILD U6. Refs #73 #148 #63.
-
-```sh
-cargo run --release -p holonics --example hnn_exposure -- cut-file .local/cuts/u6-encoding-probe.bin cells all ports passage expansions <owner-only file>
-cargo run --release -p holonics --example hnn_exposure -- found-only yes            # the founding alone, on the public control
-cargo run --release -p holonics --example hnn_prediction -- text .local/cuts/curated-u6-passage-cut.bin <owner-only file> founding .local/cuts/u6-encoding-probe.bin [train <pairs>] [passes <n>]
-cargo run --release -p holonics --example hnn_prediction -- develop text .local/cuts/curated-u6-passage-cut.bin 385 1 .local/cuts/u6-encoding-probe.bin
-```
-
-[historical] These commands ran at `96d8940b`. The founding and its modes (`ports passage`,
-`expansions`, `found-only`, `founding <cut>`) and the keyed latent were retired on September 29
-([lessons](../../records/2026-09-29_LESSONS_THE_FAILURES_THAT_REPEATED_AFTER_THEY_WERE_RECORDED.md)
-§4); every field now reads the declared residue chart.
-
-- **The founding** (development cells only): the public control's 4,958 cells found 41 classes from
-  101 reached cells in 29,254 ms; the probe's 4,096 found 36 from 65 in 9,647 ms.
-- **The exposure**: the held-out field face `5461 + 10/16 + ε` against the 65-cell chart's
-  `5463 + 9/16 + ε`; 437,281 ms, peak 381,263,872 bytes. On the public control (a development
-  reading) ring 0's lock admitted 2,128 of 4,958 development cells and the joint clock closed 37
-  aeons (484,315 ms of exposure).
-- **The prediction**: the pinned text run passed its bound (660 s, then 900 s) with no section; the
-  founded `E_0` grows a batch's stage to 55,433 ms from the ninth deposit, against at most 6,047 on
-  the residue chart (`develop text`, one pass). A bounded reading (`train 128 passes 1`) released 8
-  illegible sections, six empty. The text is owner-only.
 
 ### F6 chase terrain: the action phase (September 28)
 
