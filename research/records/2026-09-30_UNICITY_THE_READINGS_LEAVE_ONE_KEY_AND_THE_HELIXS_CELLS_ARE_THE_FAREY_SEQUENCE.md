@@ -189,7 +189,9 @@ against which the machine's own surprise curve is read.
 `40 · 4⁴ = 10240 = 2¹¹·5` keys, and `clog₄ 10240 = 7` (`Unicity.order2_family_count`,
 `order2_unicity_lower`). One request shows 8 rule steps. The machine read 128 training requests
 (1,024 rule steps) and released 0 whole sections of 128 on fresh confirmation (the
-modulus loop's confirmation, September 30, with the transport founded off one).
+[modulus record](2026-09-30_THE_MODULUS_FOUNDED_OFF_ONE_MEASURED_THE_MODULUS_STAYS_BELOW_ONE_AND_ORDER_TWO_TRAINING_LEARNS_THE_LAG_ONE_COPY.md)'s
+confirmation, with the transport founded off one; the trained constitution copies the lag-1
+neighbour).
 `n*_machine` exceeds 1,024 readings, against a family whose count can pin the key in 7.
 
 [interpretation; the experiment named] **The mechanism, in the September 25 record's terms: the
