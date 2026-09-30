@@ -505,6 +505,12 @@ named, and the program's loop stays its own counter, disclosed as such.
 
 #### U6. The text chart
 
+- **The re-entry diagnosed, September 30** ([record](../../research/records/2026-09-30_THE_RE_ENTRY_DIAGNOSED_A_LATER_LOCK_TAKES_THE_SPANS_MASS_AND_QUENCHES_THE_EARLIER_STATIONS.md);
+  Refs #73 #63): on the frozen fit, a later lock read at an earlier station weighs `ρ^(−Δ)` times its
+  candidate and its mass quenches the bank (the denominator alone reproduces 28 of 35 first losses in
+  the release's order), clock order does not rescue (2 whole against 1; the open section's tops 9 of
+  16), and the repair is `BankPlacement`'s two-sided modulus read from the station, not yet built.
+
 - **The passage law, September 30: the section continues the request, and the transport weighs its
   frontier**
   ([pin](../../research/records/2026-09-30_THE_PASSAGE_LAW_THE_SECTION_CONTINUES_THE_REQUEST_AND_THE_TRANSPORT_WEIGHS_ITS_FRONTIER.md),

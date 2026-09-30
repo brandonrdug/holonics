@@ -1,0 +1,31 @@
+reentry: the transport modulus 1452225/2097152 (fitted 6237259516612919/9007199254740992)
+reentry: E on the source port's lattice 2^(-21), the rounding's largest move 2146247983/9007199254740992; E's largest |entry| 2519969/1048576 (the entry bound 8)
+reentry: 16 of 16 requests read
+order clock, full: comparisons holding by insertion 120/128 105/112 95/96 77/80 64/64 46/48 30/32 14/16; first loss at insertion 1..7: [5, 1, 2, 0, 1, 1, 2], none 4
+order clock, denominator: comparisons holding by insertion 120/128 108/112 93/96 64/80 33/64 8/48 0/32 0/16; first loss at insertion 1..7: [2, 2, 8, 4, 0, 0, 0], none 0
+order clock, none: comparisons holding by insertion 120/128 110/112 96/96 80/80 64/64 48/48 32/32 16/16; first loss at insertion 1..7: [0, 0, 0, 0, 0, 0, 0], none 16
+order clock: at the full placement's first loss, lost also by the denominator alone 4, lost only with the amplitude 9
+order gap, full: comparisons holding by insertion 120/128 71/112 47/96 32/80 15/64 11/48 8/32 9/16; first loss at insertion 1..7: [15, 0, 0, 0, 0, 0, 0], none 1
+order gap, denominator: comparisons holding by insertion 120/128 39/112 17/96 16/80 14/64 10/48 5/32 2/16; first loss at insertion 1..7: [16, 0, 0, 0, 0, 0, 0], none 0
+order gap, none: comparisons holding by insertion 120/128 104/112 89/96 74/80 58/64 46/48 30/32 16/16; first loss at insertion 1..7: [0, 0, 0, 0, 0, 0, 0], none 16
+order gap: at the full placement's first loss, lost also by the denominator alone 28, lost only with the amplitude 7
+comparisons not holding from the open section (before any re-entry): 8 of 128
+ordinary release: 15 requests with a wrong lock; the first wrong lock before any re-entry 0; its station's open-section comparison not holding (no re-entry does not restore it) 4
+request 0: ordinary 2 1 3 2 3 3 1 0 (right 5, whole false); clock 1 1 2 2 3 3 0 0 (right 8, whole true); first wrong lock Some((4, 4, 2, true))
+request 1: ordinary 3 2 3 3 1 0 2 1 (right 4, whole false); clock 2 2 2 3 3 0 0 1 (right 7, whole false); first wrong lock Some((4, 4, 4, true))
+request 2: ordinary 2 3 3 0 0 1 1 2 (right 4, whole false); clock 1 3 2 0 3 0 0 1 (right 6, whole false); first wrong lock Some((4, 4, 0, true))
+request 3: ordinary 1 3 2 3 3 1 0 1 (right 4, whole false); clock 1 2 2 2 3 3 0 0 (right 4, whole false); first wrong lock Some((4, 4, 1, true))
+request 4: ordinary 3 1 3 2 3 3 1 0 (right 6, whole false); clock 1 2 2 2 3 3 0 0 (right 3, whole false); first wrong lock Some((4, 4, 0, false))
+request 5: ordinary 3 2 3 3 1 0 2 1 (right 5, whole false); clock 2 2 2 3 3 0 0 1 (right 5, whole false); first wrong lock Some((4, 4, 4, true))
+request 6: ordinary 2 3 3 0 0 1 1 2 (right 8, whole true); clock 2 2 3 3 0 0 1 1 (right 4, whole false); first wrong lock None
+request 7: ordinary 2 3 3 1 0 2 1 3 (right 7, whole false); clock 2 2 3 3 0 0 1 1 (right 4, whole false); first wrong lock Some((5, 5, 1, true))
+request 8: ordinary 3 1 3 2 3 3 1 0 (right 5, whole false); clock 3 1 0 1 1 2 2 2 (right 5, whole false); first wrong lock Some((5, 5, 2, true))
+request 9: ordinary 3 2 3 3 1 0 2 1 (right 7, whole false); clock 3 2 0 3 1 0 2 1 (right 8, whole true); first wrong lock Some((4, 4, 2, true))
+request 10: ordinary 2 3 3 0 0 1 1 2 (right 4, whole false); clock 2 2 2 3 1 0 2 1 (right 2, whole false); first wrong lock Some((4, 4, 0, false))
+request 11: ordinary 1 0 2 1 1 2 1 3 (right 5, whole false); clock 2 0 3 1 0 2 1 3 (right 4, whole false); first wrong lock Some((4, 4, 2, true))
+request 12: ordinary 3 1 3 2 3 3 1 0 (right 4, whole false); clock 2 1 3 2 0 3 0 0 (right 4, whole false); first wrong lock Some((4, 4, 0, false))
+request 13: ordinary 3 2 3 3 1 0 2 1 (right 4, whole false); clock 0 2 1 3 2 0 3 0 (right 7, whole false); first wrong lock Some((4, 4, 4, true))
+request 14: ordinary 2 3 3 0 2 1 1 2 (right 5, whole false); clock 2 2 2 2 2 2 2 2 (right 2, whole false); first wrong lock Some((4, 4, 0, false))
+request 15: ordinary 1 0 2 1 1 2 1 3 (right 4, whole false); clock 0 0 1 1 2 2 2 3 (right 7, whole false); first wrong lock Some((4, 4, 2, true))
+whole sections: ordinary 1, clock order 2 of 16
+reentry: 16 requests in 138067 ms; resident 105271296 now, 105271296 peak
