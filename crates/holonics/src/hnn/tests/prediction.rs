@@ -14,7 +14,7 @@ use crate::hnn::field::{ConstitutionRead, Current, Field};
 use crate::hnn::moment::{PairPort, SourceMoment};
 use crate::hnn::prediction::{
     BankImages, BankPlacement, Refinement, Section, bank_reach, deposit_of, generate_by_bank,
-    injection, stage, stage_bank,
+    stage, stage_bank,
     unreached_unchanged,
 };
 use crate::hnn::propagation::Operands;
@@ -177,7 +177,7 @@ fn the_refinement_balance_closes_with_the_injection_the_pump_and_the_commit() {
         &field,
         &theta,
         &current,
-        &[&moment],
+        &moment,
         &refinement,
         &mut Charts::new(),
     )
@@ -253,7 +253,7 @@ fn the_refinement_balance_closes_with_the_injection_the_pump_and_the_commit() {
         &field,
         &theta,
         &current,
-        &[&moment],
+        &moment,
         &refinement,
         &mut Charts::new(),
     )
@@ -337,7 +337,7 @@ fn the_release_holds_a_plural_section_and_releases_a_determined_one() {
         &field,
         &initial,
         &current,
-        &[&moment],
+        &moment,
         &refinement,
         &mut Charts::new(),
     )
@@ -361,7 +361,7 @@ fn the_release_holds_a_plural_section_and_releases_a_determined_one() {
         &field,
         &theta,
         &current,
-        &[&moment],
+        &moment,
         &refinement,
         &mut Charts::new(),
     )
@@ -467,7 +467,7 @@ fn the_section_reads_no_landmark_tree() {
         &field,
         &theta,
         &current,
-        &[&moment],
+        &moment,
         &refinement,
         &mut Charts::new(),
     )
@@ -478,7 +478,7 @@ fn the_section_reads_no_landmark_tree() {
         &field,
         &NoTree(&theta),
         &current,
-        &[&moment],
+        &moment,
         &refinement,
         &mut Charts::new(),
     )
@@ -501,7 +501,7 @@ fn every_station_is_read_from_the_one_anchor() {
         &field,
         &theta,
         &current,
-        &[&moment],
+        &moment,
         &refinement,
         &mut Charts::new(),
     )
@@ -560,38 +560,98 @@ fn joint() -> Field {
     .unwrap()
 }
 
-/// **A placed datum is read at its station's residue** (`SourceMoment::section`): the datum locked
-/// at station `j` is counted at the receiving ring's residue `τ + 1 + j`, and station `j`'s rotation
-/// `P^(1+j)` of its open storage is the datum's column of `E` over its population, `E e_x ν̂(1)`.
+/// **A placed datum is read at its station's residue, in the passage's one population**
+/// (`SourceMoment::continued`; Lean `HNN/IndexedOpen.{passage_population, passage_read}`): the
+/// datum locked at station `j` is counted into the request's phase counts at the receiving ring's
+/// residue `τ + 1 + j`, the passage's population is the request's `n` plus the placed data, and the
+/// open storage is the request's counts and the datum's column of `E`, rotated to station `j`'s
+/// frame by `P^(1+j)`, together over `ν̂(n + 1)`.
 #[test]
 fn a_placed_datum_is_read_at_its_station_residue() {
     let field = joint();
     let theta = generic(&field, 91);
-    let (current, _) = moment(&field, 92, 7);
+    let (current, request) = moment(&field, 92, 7);
     let refinement = Refinement::declare(&field, 0, 2, 1, 4, 2).unwrap();
     let phase = current.phase(&field, 0).unwrap() as usize;
-    let nu = crate::hnn::moment::PopulationChart::of(&field).value(1);
+    let n = request.population(0).unwrap();
+    let nu = crate::hnn::moment::PopulationChart::of(&field).value(n + 1);
     let port = theta.source_port(0).unwrap();
+    let ring = field.ring(0);
+    let (reads, pairs) = request.open_parts(&field, &theta, &current, 0).unwrap();
+    assert!(pairs.iter().all(Rat::is_zero));
+    let mut marginal = vec![Rat::zero(); ring.width()];
+    for (_, read) in &reads {
+        for (value, add) in marginal.iter_mut().zip(read) {
+            *value += add;
+        }
+    }
     for station in 0..4 {
         for code in 0..field.alphabet() {
             let mut cells = vec![None; 4];
             cells[station] = Some(code);
-            let placed = refinement.section(&field, &current, &cells).unwrap();
-            assert_eq!(placed.cells(), 1);
+            let passage = refinement.passage(&field, &current, &request, &cells).unwrap();
+            assert_eq!(passage.cells(), request.cells() + 1);
+            assert_eq!(passage.population(0).unwrap(), n + 1);
+            let residue = (phase + 1 + station) % 6;
             assert_eq!(
-                placed.phase_counts(0, (phase + 1 + station) % 6).unwrap()[code],
-                1
+                passage.phase_counts(0, residue).unwrap()[code],
+                request.phase_counts(0, residue).unwrap()[code] + 1
             );
-            let open = placed.open_storage(&field, &theta, &current).unwrap();
-            let read = field
-                .ring(0)
-                .rotate(&open[0], &BigInt::from(station as u64 + 1));
-            let column: Vec<Rat> = (0..field.ring(0).width())
-                .map(|row| port.get(row, code).unwrap() * &nu)
+            let open = passage.open_storage(&field, &theta, &current).unwrap();
+            let read = ring.rotate(&open[0], &BigInt::from(station as u64 + 1));
+            let column: Vec<Rat> = (0..ring.width())
+                .map(|row| port.get(row, code).unwrap().clone())
                 .collect();
-            assert_eq!(read, column);
+            let request_read = ring.rotate(&marginal, &BigInt::from(station as u64 + 1));
+            let expected: Vec<Rat> = request_read
+                .iter()
+                .zip(&column)
+                .map(|(r, c)| (r + c) * &nu)
+                .collect();
+            assert_eq!(read, expected);
         }
     }
+}
+
+/// **One passage weighs every datum alike** (the September 30 located cause, repaired; Lean
+/// `HNN/IndexedOpen.{passage_weight_one_population, separate_populations_ratio}`): in the passage's
+/// open, a request cell and a section datum at the same class and residue class enter with the
+/// same weight `ν̂(n + v)`, so moving a crossing from the request to the section moves nothing but
+/// its tick; read over separate populations, the section's datum weighed `n/v` times the request's.
+#[test]
+fn one_passage_weighs_every_datum_alike() {
+    let field = joint();
+    let theta = generic(&field, 91);
+    let refinement = Refinement::declare(&field, 0, 2, 1, 4, 2).unwrap();
+    // Seven cells ingested and their continuation by one placed datum, against eight cells
+    // ingested: the same passage, split at a different tick.
+    let cells = [2usize, 0, 1, 1, 0, 2, 1, 0];
+    let (whole_current, whole) = {
+        let mut current = Current::at_rest(&field);
+        let mut moment = SourceMoment::open(&field, &current);
+        moment.ingest(&field, &mut current, &cells).unwrap();
+        (current, moment)
+    };
+    let (current, request) = {
+        let mut current = Current::at_rest(&field);
+        let mut moment = SourceMoment::open(&field, &current);
+        moment.ingest(&field, &mut current, &cells[..7]).unwrap();
+        (current, moment)
+    };
+    // The joint field's receiving ring steps every cell, so the continuation's station 0 is the
+    // eighth cell's tick.
+    let passage = refinement
+        .passage(&field, &current, &request, &[Some(cells[7]), None, None, None])
+        .unwrap();
+    assert_eq!(passage.population(0).unwrap(), whole.population(0).unwrap());
+    for c in 0..6 {
+        assert_eq!(passage.phase_counts(0, c).unwrap(), whole.phase_counts(0, c).unwrap());
+    }
+    // The same counts and population: the same open, read at the request's frame (the whole
+    // passage's frame is one tick on, the rotation between them).
+    let open = passage.open_storage(&field, &theta, &current).unwrap();
+    let whole_open = whole.open_storage(&field, &theta, &whole_current).unwrap();
+    assert_eq!(field.ring(0).rotate(&open[0], &BigInt::one()), whole_open[0]);
 }
 
 /// **A compared station never reads its own target**, and the partition's ratio is the whole
@@ -614,12 +674,12 @@ fn a_compared_station_never_reads_its_own_target() {
             .zip(&locked)
             .map(|(&t, &lock)| lock.then_some(t))
             .collect();
-        let placed = refinement.section(&field, &current, &cells).unwrap();
+        let passage = refinement.passage(&field, &current, &moment, &cells).unwrap();
         Section::refine(
             &field,
             &theta,
             &current,
-            &[&moment, &placed],
+            &passage,
             &refinement,
             &mut Charts::new(),
         )
@@ -724,7 +784,7 @@ fn generation_locks_by_the_largest_gap_and_releases_at_width_zero() {
         &field,
         &theta,
         &current,
-        &[&moment],
+        &moment,
         &refinement,
         &mut Charts::new(),
     )
@@ -737,8 +797,9 @@ fn generation_locks_by_the_largest_gap_and_releases_at_width_zero() {
 }
 
 /// **The bank's placement is the section's injection** (`prediction::BankPlacement`): the receiving
-/// ring's storage with any set of stations placed equals `injection` of the request's moment and the
-/// section's `SourceMoment::section`, exactly, and with nothing placed it is the request's own.
+/// ring's storage with any set of stations placed equals the open storage of the passage (the
+/// request's moment continued by the section, `SourceMoment::continued`), exactly, and with nothing
+/// placed it is the request's own.
 #[test]
 fn the_bank_placement_is_the_sections_injection() {
     let field = joint();
@@ -755,10 +816,104 @@ fn the_bank_placement_is_the_sections_injection() {
         [Some(2), Some(1), Some(0), Some(1)],
     ];
     for cells in &patterns {
-        let section = refinement.section(&field, &current, cells).unwrap();
-        let injected = injection(&field, &theta, &current, &[&request, &section]).unwrap();
+        let passage = refinement.passage(&field, &current, &request, cells).unwrap();
+        let injected = passage.open_storage(&field, &theta, &current).unwrap();
         assert_eq!(placement.storage(cells), injected[0]);
+        let placed = cells.iter().filter(|cell| cell.is_some()).count() as u64;
+        let nu = crate::hnn::moment::PopulationChart::of(&field)
+            .value(request.population(0).unwrap() + placed);
+        let (request_weights, station_weights) = placement.weights(cells);
+        assert!(request_weights.iter().all(|w| *w == nu));
+        for (cell, weight) in cells.iter().zip(&station_weights) {
+            assert_eq!(weight.as_ref(), cell.map(|_| &nu));
+        }
     }
+    let open = request.open_storage(&field, &theta, &current).unwrap();
+    assert_eq!(placement.storage(&[None; 4]), open[0]);
+}
+
+/// **Under a dissipative transport the placement is the passage's, frame-free, and refused past
+/// one turn** (`hnn::moment`, "One passage, its transported weights"; Lean
+/// `HNN/IndexedOpen.{transported_weight_mass, decayed_weight_frame_free, decayed_weight_antitone}`):
+/// at a transport modulus `ρ = 3/4` the storage with any set of stations placed equals the continued
+/// passage's open exactly; every datum weighs `ρ^a` over the span's transported mass, read on the
+/// population chart, so an older datum weighs no more than a newer one and the weights carry unit
+/// mass within the chart's residual; the modulus's derivative matches the exact weights' central
+/// difference to the second order; and a request whose span with the stations exceeds one turn is
+/// refused, as is a modulus outside `(0, 1]`.
+#[test]
+fn the_bank_placement_under_a_dissipative_transport() {
+    use crate::hnn::HnnError;
+    use crate::hnn::moment::PopulationChart;
+    let field = joint();
+    let theta = generic(&field, 91);
+    assert_eq!(theta.transport(0), Rat::one());
+    assert!(matches!(
+        theta.clone().with_transport(0, Rat::zero()),
+        Err(HnnError::Transport { .. })
+    ));
+    assert!(matches!(
+        theta.clone().with_transport(0, rat(5, 4)),
+        Err(HnnError::Transport { .. })
+    ));
+    let modulus = rat(3, 4);
+    let theta = theta.with_transport(0, modulus.clone()).unwrap();
+    assert_eq!(theta.transport(0), modulus);
+    // Two cells and four stations fill the ring's turn of six ticks.
+    let (current, request) = moment(&field, 92, 2);
+    let refinement = Refinement::declare(&field, 0, 2, 1, 4, 2).unwrap();
+    let placement = BankPlacement::of(&field, &theta, &current, &request, &refinement).unwrap();
+    let chart = PopulationChart::of(&field);
+    let patterns: [[Option<usize>; 4]; 5] = [
+        [None; 4],
+        [Some(1), None, None, None],
+        [None, Some(2), None, Some(0)],
+        [Some(0), Some(0), Some(1), None],
+        [Some(2), Some(1), Some(0), Some(1)],
+    ];
+    for cells in &patterns {
+        let passage = refinement.passage(&field, &current, &request, cells).unwrap();
+        let injected = passage.open_storage(&field, &theta, &current).unwrap();
+        assert_eq!(placement.storage(cells), injected[0]);
+        let (request_weights, station_weights) = placement.weights(cells);
+        // Every datum's weight within the chart's residual of its exact transported weight, the
+        // exact weights summing to one: so the charted mass lies within one residual a datum.
+        let data: Vec<Rat> = request_weights
+            .iter()
+            .cloned()
+            .chain(station_weights.iter().flatten().cloned())
+            .collect();
+        let counted: Rat = data.iter().sum();
+        let slack = chart.residual() * Rat::from_integer(BigInt::from(data.len() as u64 + 2));
+        assert!((&counted - Rat::one()).abs() <= slack, "{counted}");
+        // Station weights fall with age: a later station is newer, so weighs no less.
+        let placed: Vec<Rat> = station_weights.iter().flatten().cloned().collect();
+        for pair in placed.windows(2) {
+            assert!(pair[0] <= pair[1]);
+        }
+        // The modulus's derivative against the exact weights' central difference: second order.
+        if cells.iter().any(Option::is_some) {
+            let derivative = placement.modulus_derivative(cells);
+            let residual = |h: &Rat| -> Rat {
+                let up = placement.exact_storage(cells, &(&modulus + h));
+                let down = placement.exact_storage(cells, &(&modulus - h));
+                up.iter()
+                    .zip(&down)
+                    .zip(&derivative)
+                    .map(|((u, d), g)| ((u - d) / (integer(2) * h) - g).abs())
+                    .max()
+                    .unwrap()
+            };
+            let (wide, narrow) = (residual(&rat(1, 64)), residual(&rat(1, 128)));
+            assert!(narrow * integer(3) <= wide, "the central difference is second order");
+        }
+    }
+    // Seven cells and four stations span more than the turn of six: refused below modulus one.
+    let (current, request) = moment(&field, 92, 7);
+    assert!(matches!(
+        BankPlacement::of(&field, &theta, &current, &request, &refinement),
+        Err(HnnError::AliasedAges { .. })
+    ));
 }
 
 /// **The bank generates by its locks** (`prediction::generate_by_bank`): on the joint field's ring of
@@ -1173,6 +1328,58 @@ fn the_committed_move_descends_or_refuses_by_type() {
             assert_eq!(successor.commit(), theta.commit() + 1);
         }
         None => panic!("the move on this instance is adopted: {:?}", moved.refusal),
+    }
+}
+
+/// **The committed move carries the transport modulus** (`hnn::executed`, "The committed move";
+/// `hnn::moment`, "One passage, its transported weights"): from a transport of modulus `3/4` on
+/// requests whose span with the stations fills one turn, the move reads the modulus's slope, and an
+/// adopted successor keeps a passive modulus on the source port's lattice (the trial's), lowers the
+/// comparison by disjoint enclosures with its first order certified negative on the carried move,
+/// and holds every lock's certificate; every earlier trial names its guard.
+#[test]
+fn the_committed_move_carries_the_transport_modulus() {
+    use crate::hnn::executed::{Context, Request, executed_move};
+    let field = joint();
+    let theta = generic(&field, 94).with_transport(0, rat(3, 4)).unwrap();
+    let refinement = Refinement::declare(&field, 0, 2, 1, 4, 2).unwrap();
+    let bank = joint_bank();
+    let requests: Vec<Request> = [(95u64, [0usize, 1, 2, 1]), (96, [1, 1, 0, 2]), (97, [2, 0, 1, 1])]
+        .iter()
+        .map(|&(seed, targets)| {
+            let (current, moment) = moment(&field, seed, 2);
+            Request {
+                current,
+                moment,
+                targets: targets.to_vec(),
+                context: Context::Open,
+            }
+        })
+        .collect();
+    let moved = executed_move(&field, &theta, &requests, &refinement, &bank, 12).unwrap();
+    assert!(moved.modulus_slope.is_some() || moved.refusal.is_some());
+    for trial in &moved.trials[..moved.trials.len().saturating_sub(1)] {
+        assert!(trial.refusal.is_some());
+    }
+    let Some((successor, _)) = &moved.adopted else {
+        panic!("the move on this instance is adopted: {:?}", moved.refusal);
+    };
+    {
+        let last = moved.trials.last().unwrap();
+        assert!(last.refusal.is_none());
+        let modulus = successor.transport(0);
+        assert!(modulus.is_positive() && modulus <= Rat::one());
+        // On this instance the modulus moves with `E`: the comparison falls with a newer
+        // frontier (the carried modulus below `3/4`).
+        assert_eq!(Some(&modulus), last.modulus.as_ref());
+        assert!(modulus < rat(3, 4));
+        let after = last.after.as_ref().unwrap();
+        assert!(after.value.upper < moved.before.value.lower);
+        assert!(last.first_order.as_ref().unwrap().upper.is_negative());
+        assert!(after
+            .requests
+            .iter()
+            .all(|r| r.generation.as_ref().unwrap().uncertified.is_none()));
     }
 }
 

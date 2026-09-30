@@ -79,22 +79,37 @@ def order2_random_lag2(rng, count, n=N_REQ, m=M_ST):
 # ---------------------------------------------------------------------------------------------
 # placements: C[b, r, x] = weight of class x at rotation r (a datum of age r)
 
+# The source navigator's transport modulus rho (the owner's `ConstitutionRead::transport`): one at
+# the founding; the fits set it.
+DECAY = [1.0]
+
+
 def placement_counts(request, placed, station, cand):
-    """One candidate's placement: request cells at ages 39..0 over nu(40); placed stations and the
-    candidate at rotation 59 - j over nu(v), v the placed count (candidate included)."""
+    """One candidate's placement on the passage (the owner's `BankPlacement::storage`, the passage
+    law of September 30): request cells at rotations 39..0 and the placed stations and the
+    candidate at rotation 59 - j, each datum at its transported weight rho^a / sum rho^a over the
+    span (a its age at the span's end; frame-free), at rho = 1 the one population nu(n + v), v the
+    placed count (candidate included)."""
     C = np.zeros((D, CLASSES))
-    w = nu_hat(len(request))
-    n = len(request)
-    for k, x in enumerate(request):
-        C[(n - 1 - k) % D, x] += w
     cells = dict(placed)
     if station is not None:
         cells[station] = cand
-    v = len(cells)
-    if v:
-        wv = nu_hat(v)
+    n = len(request)
+    r = DECAY[0]
+    if r == 1.0:
+        w = nu_hat(n + len(cells))
+        for k, x in enumerate(request):
+            C[(n - 1 - k) % D, x] += w
         for j, x in cells.items():
-            C[(D - 1 - j) % D, x] += wv
+            C[(D - 1 - j) % D, x] += w
+        return C
+    ages = [M_ST + n - 1 - k for k in range(n)] + [M_ST - 1 - j for j in cells]
+    raw = [r ** a for a in ages]
+    total = sum(raw)
+    for k, x in enumerate(request):
+        C[(n - 1 - k) % D, x] += raw[k] / total
+    for i, (j, x) in enumerate(cells.items()):
+        C[(D - 1 - j) % D, x] += raw[n + i] / total
     return C
 
 

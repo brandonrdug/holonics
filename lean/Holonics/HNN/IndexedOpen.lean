@@ -436,6 +436,159 @@ theorem pairRead_offsetCounts {P : (Module.End ℚ S)ˣ} {d : ℕ} (hd : 0 < d) 
 
 end Read
 
+/-! ## 4. The passage continued by its section: one span and its transported weights
+
+[definition; agent-inferred, September 30] (`holonics::hnn::moment::SourceMoment::continued`,
+`holonics::hnn::prediction::BankPlacement`.) A generated section continues the request's passage
+along the receiving ring's clock: the request's cells cross at the ring's ticks up to `τ`, the
+section's stations at `τ + 1 + j`, one clocked span. Each crossing's datum is carried to the reading
+frame by the ring's transport and the span is read over its transported mass:
+`w_k = m_k / Σ_(l∈span) m_l` (`transportedWeight`), `m_k` the transport's modulus from the
+crossing's tick. The weights sum to one (`transported_weight_mass`), do not depend on the frame the
+span is read in (`transported_weight_frame_invariant`, `decayed_weight_frame_free`), and do not
+depend on where the request ends and the section begins (`passage_weight_split_invariant`).
+
+* **A unitary transport** (a closing rotor ring: a rotation, modulus one on every node) weighs
+  every crossing `1/(n + v)` (`transported_weight_unitary`, `decayed_weight_lossless`): the
+  request's counts and the section's are one table (`passage`, `passage_population`), read over
+  one population (`passage_weight_one_population`, `passage_read`). The retired reading placed the
+  section over its own population `v` and the request over its own `n`, which weighs a section
+  datum `n/v` times a request cell, one only when `n = v` (`separate_populations_ratio`).
+* **A dissipative transport** of modulus `0 < ρ ≤ 1` a tick weighs a crossing `a` ticks old by
+  `ρ^a` over the span's sum: older crossings weigh no more (`decayed_weight_antitone`), none past
+  its own crossing, and every crossing still enters.
+* **Why the frontier needs dissipation**: in a phase-carried face `Σ_k u^(r_k) g_k` at a unit
+  phase `u`, a lossless transport gives every crossing's term its own modulus at every lag
+  (`lossless_term_modulus`), so no reading of the face can mark the span's frontier; a transport of
+  modulus `ρ` weighs the term at lag `r` by `ρ^r` (`dissipative_term_modulus`). -/
+
+section Passage
+
+variable {X S : Type*} [AddCommGroup X] [Module ℚ X] [AddCommGroup S] [Module ℚ S]
+
+/-- [definition] **The passage's counts**: the request's phase counts `M` with its section's `N`
+counted into the same table. -/
+def passage (M N : ℕ → A → ℕ) : ℕ → A → ℕ := fun c x => M c x + N c x
+
+/-- [proved-derived; formal-checked] **The passage's population** is the request's plus the
+section's. -/
+theorem passage_population (d : ℕ) (M N : ℕ → A → ℕ) :
+    population d (passage M N) = population d M + population d N := by
+  simp [population, passage, Finset.sum_add_distrib]
+
+/-- [proved-derived; formal-checked] **One population weighs every datum alike**: a request cell
+and a section datum at `(c, x)` enter the passage's normalized counts over the one population
+`n + v`. -/
+theorem passage_weight_one_population {d : ℕ} {M N : ℕ → A → ℕ}
+    (h : 0 < population d M + population d N) (c : ℕ) (x : A) :
+    normalized d (passage M N) c x =
+      ((M c x : ℚ) + N c x) / ((population d M : ℚ) + population d N) := by
+  have hp : 0 < population d (passage M N) := by rw [passage_population]; exact h
+  rw [normalized_of_pos hp, passage_population]
+  simp [passage]
+
+/-- [proved-derived; formal-checked] **The passage's read** is the request's count read plus the
+section's, over the one population (`BankPlacement::storage`'s law at a unitary transport). -/
+theorem passage_read [DecidableEq A] (P : (Module.End ℚ S)ˣ) (I : X →ₗ[ℚ] S) (E : (A → ℚ) →ₗ[ℚ] X) {d : ℕ}
+    {M N : ℕ → A → ℕ} (h : 0 < population d M + population d N) :
+    marginalRead P I E d (normalized d (passage M N)) =
+      ((population d M : ℚ) + population d N)⁻¹ •
+        (marginalRead P I E d (fun c x => (M c x : ℚ)) +
+          marginalRead P I E d (fun c x => (N c x : ℚ))) := by
+  have hp : 0 < population d (passage M N) := by rw [passage_population]; exact h
+  rw [normalized_marginal_eq_scaled_read P I E hp, passage_population]
+  congr 1
+  · push_cast; rfl
+  · simp only [marginalRead, passage, Nat.cast_add, add_smul, Finset.sum_add_distrib]
+
+/-- [proved-derived; formal-checked] **Separate populations weigh a section datum `n/v` times a
+request cell** (the September 30 located cause: at the open section `v = 1` and `n = 40`), and the
+two weigh alike only when `n = v`. -/
+theorem separate_populations_ratio {n v : ℕ} (hn : 0 < n) (hv : 0 < v) :
+    (v : ℚ)⁻¹ / (n : ℚ)⁻¹ = (n : ℚ) / v ∧ ((v : ℚ)⁻¹ / (n : ℚ)⁻¹ = 1 ↔ n = v) := by
+  have hn' : (n : ℚ) ≠ 0 := by exact_mod_cast hn.ne'
+  have hv' : (v : ℚ) ≠ 0 := by exact_mod_cast hv.ne'
+  have hratio : (v : ℚ)⁻¹ / (n : ℚ)⁻¹ = (n : ℚ) / v := by field_simp
+  refine ⟨hratio, ?_⟩
+  rw [hratio, div_eq_one_iff_eq hv']
+  exact_mod_cast Iff.rfl
+
+end Passage
+
+section Transported
+
+variable {ι : Type*}
+
+/-- [definition] **A crossing's transported weight** over a span `s`: its transport's modulus `m k`
+to the reading frame over the span's transported mass `Σ_(l∈s) m l`. -/
+def transportedWeight (s : Finset ι) (m : ι → ℚ) (k : ι) : ℚ := m k / ∑ l ∈ s, m l
+
+/-- [proved-derived; formal-checked] **The transported weights carry unit mass.** -/
+theorem transported_weight_mass {s : Finset ι} {m : ι → ℚ} (h : (∑ l ∈ s, m l) ≠ 0) :
+    ∑ k ∈ s, transportedWeight s m k = 1 := by
+  simp only [transportedWeight, ← Finset.sum_div]
+  exact div_self h
+
+/-- [proved-derived; formal-checked] **The weights are frame-free**: a common factor of every
+modulus (another reading frame) leaves every weight. -/
+theorem transported_weight_frame_invariant (s : Finset ι) (m : ι → ℚ) {c : ℚ} (hc : c ≠ 0)
+    (k : ι) : transportedWeight s (fun l => c * m l) k = transportedWeight s m k := by
+  simp only [transportedWeight, ← Finset.mul_sum]
+  by_cases h : ∑ l ∈ s, m l = 0
+  · simp [h]
+  · rw [mul_div_mul_left _ _ hc]
+
+/-- [proved-derived; formal-checked] **A unitary transport weighs every crossing of the span
+alike**: `1/|s|`, the one population. -/
+theorem transported_weight_unitary {s : Finset ι} {m : ι → ℚ} (hm : ∀ l ∈ s, m l = 1) {k : ι}
+    (hk : k ∈ s) : transportedWeight s m k = 1 / s.card := by
+  simp only [transportedWeight, hm k hk, Finset.sum_congr rfl hm, Finset.sum_const, nsmul_eq_mul,
+    mul_one]
+
+/-- [proved-derived; formal-checked] **The span, not its split, sets the weights**: two splits of one
+span into request and section give one weight to every crossing. -/
+theorem passage_weight_split_invariant [DecidableEq ι] {R N R' N' : Finset ι}
+    (h : R ∪ N = R' ∪ N') (m : ι → ℚ) :
+    transportedWeight (R ∪ N) m = transportedWeight (R' ∪ N') m := by
+  rw [h]
+
+/-- [proved-derived; formal-checked] **A dissipative transport's moduli fall with age**: at
+`0 ≤ ρ ≤ 1` a tick, a crossing `b ≥ a` ticks old weighs no more than one `a` ticks old, and no
+modulus exceeds one (passive). -/
+theorem decayed_weight_antitone {ρ : ℚ} (h0 : 0 ≤ ρ) (h1 : ρ ≤ 1) {a b : ℕ} (hab : a ≤ b) :
+    ρ ^ b ≤ ρ ^ a ∧ ρ ^ a ≤ 1 :=
+  ⟨pow_le_pow_of_le_one h0 h1 hab, pow_le_one₀ h0 h1⟩
+
+/-- [proved-derived; formal-checked] **A dissipative transport's weights are frame-free**: reading
+the span `shift` ticks later multiplies every modulus by `ρ^shift`, which leaves every weight. -/
+theorem decayed_weight_frame_free (s : Finset ι) (age : ι → ℕ) {ρ : ℚ} (hρ : ρ ≠ 0)
+    (shift : ℕ) (k : ι) :
+    transportedWeight s (fun l => ρ ^ (age l + shift)) k =
+      transportedWeight s (fun l => ρ ^ age l) k := by
+  have hfun : (fun l => ρ ^ (age l + shift)) = fun l => ρ ^ shift * ρ ^ age l := by
+    funext l
+    rw [pow_add, mul_comm]
+  rw [hfun, transported_weight_frame_invariant s _ (pow_ne_zero _ hρ)]
+
+/-- [proved-derived; formal-checked] **At `ρ = 1` the dissipative law is the one population.** -/
+theorem decayed_weight_lossless {s : Finset ι} (age : ι → ℕ) {k : ι} (hk : k ∈ s) :
+    transportedWeight s (fun l => (1 : ℚ) ^ age l) k = 1 / s.card :=
+  transported_weight_unitary (fun _ _ => one_pow _) hk
+
+/-- [proved-derived; formal-checked] **A lossless transport cannot mark the frontier**: in a
+phase-carried face `Σ_k u^(r_k) g_k` at a unit phase `u`, the term of a crossing at lag `r` has the
+modulus of its datum's `g` whatever `r` is. -/
+theorem lossless_term_modulus (u g : ℂ) (hu : ‖u‖ = 1) (r : ℕ) : ‖u ^ r * g‖ = ‖g‖ := by
+  rw [norm_mul, norm_pow, hu, one_pow, one_mul]
+
+/-- [proved-derived; formal-checked] **A dissipative transport weighs the term at lag `r` by
+`ρ^r`**: at modulus `ρ ≥ 0` a tick, the term of a crossing `r` ticks back has modulus `ρ^r |g|`. -/
+theorem dissipative_term_modulus (u g : ℂ) (hu : ‖u‖ = 1) {ρ : ℝ} (hρ : 0 ≤ ρ) (r : ℕ) :
+    ‖((ρ : ℂ) * u) ^ r * g‖ = ρ ^ r * ‖g‖ := by
+  rw [norm_mul, norm_pow, norm_mul, hu, mul_one, Complex.norm_real, Real.norm_of_nonneg hρ]
+
+end Transported
+
 section Audit
 
 #print axioms normalized_of_pos
@@ -458,6 +611,19 @@ section Audit
 #print axioms normalized_marginal_eq_scaled_read
 #print axioms marginalRead_counts
 #print axioms pairRead_offsetCounts
+#print axioms passage_population
+#print axioms passage_weight_one_population
+#print axioms passage_read
+#print axioms separate_populations_ratio
+#print axioms transported_weight_mass
+#print axioms transported_weight_frame_invariant
+#print axioms transported_weight_unitary
+#print axioms passage_weight_split_invariant
+#print axioms decayed_weight_antitone
+#print axioms decayed_weight_frame_free
+#print axioms decayed_weight_lossless
+#print axioms lossless_term_modulus
+#print axioms dissipative_term_modulus
 
 end Audit
 

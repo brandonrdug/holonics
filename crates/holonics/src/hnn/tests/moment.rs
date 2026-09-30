@@ -194,7 +194,7 @@ fn the_encoder_covector_is_the_exact_directional_derivative() {
         &moment.open_storage(field, &medium, &current).unwrap()[0],
     );
     let gradient = moment
-        .encoder_covector(field, &current, 0, &covector)
+        .encoder_covector(field, &current, 0, &covector, &crate::ratio::integer(1))
         .unwrap();
     let direction = draw.matrix(4, 4);
     let pairing: Rat = gradient
@@ -285,7 +285,7 @@ fn the_open_reads_the_normalized_counts_and_no_window() {
     let n = cells.len() as u64;
     assert_eq!(moment.population(0).unwrap(), n);
     let mass: Rat = (0..field.ring(0).period() as usize)
-        .flat_map(|phase| moment.normalized_counts(field, 0, phase).unwrap())
+        .flat_map(|phase| moment.normalized_counts(field, 0, phase, &crate::ratio::integer(1)).unwrap())
         .sum();
     assert_eq!(mass, Rat::from_integer(BigInt::from(n)) * chart.value(n));
     assert!(

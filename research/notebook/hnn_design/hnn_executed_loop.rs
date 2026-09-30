@@ -175,7 +175,31 @@ fn write_port(theta: &Constitution, ring: usize) -> String {
         s.push_str(&row.join(" "));
         s.push('\n');
     }
+    s.push_str(&format!("rho {}\n", theta.transport(ring)));
     s
+}
+
+/// A trained constitution read back from [`write_port`]'s text: the source port `E` and, when the
+/// file carries one, the source navigator's transport modulus `ρ` (the passage law of
+/// September 30); the declared opening elsewhere.
+pub(super) fn trained(opening: &Constitution, ring: usize, path: &str) -> Constitution {
+    let theta = opening
+        .clone()
+        .with_ports(ring, None, Some(read_port(path)), None)
+        .expect("the trained E");
+    match read_modulus(path) {
+        Some(modulus) => theta.with_transport(ring, modulus).expect("the trained ρ"),
+        None => theta,
+    }
+}
+
+/// The transport modulus line `rho <ρ>` of a written port, if any.
+fn read_modulus(path: &str) -> Option<Rat> {
+    #[allow(clippy::disallowed_methods)]
+    let text = std::fs::read_to_string(path).expect("read the port");
+    text.lines()
+        .find_map(|line| line.strip_prefix("rho "))
+        .map(|value| value.trim().parse::<Rat>().expect("a rational ρ"))
 }
 
 /// A source port read back from [`write_port`]'s text.
@@ -281,12 +305,14 @@ pub(super) fn train(
                 adopted += 1;
                 let last = moved.trials.last().expect("the adopted trial");
                 println!(
-                    "  move {index}: adopted at step {} (trial {} of the ladder); value {} → {}; E's largest entry {}{sections}; {} ms",
+                    "  move {index}: adopted at step {} (trial {} of the ladder); value {} → {}; E's largest entry {}; transport modulus {} → {}{sections}; {} ms",
                     step.step,
                     moved.trials.len(),
                     cell(&moved.before.value, 1 << 12),
                     last.value.as_ref().map_or_else(String::new, |v| cell(v, 1 << 12)),
                     step.largest,
+                    theta.transport(engine.refinement.ring()),
+                    successor.transport(engine.refinement.ring()),
                     started.elapsed().as_millis()
                 );
                 theta = successor.clone();
@@ -334,11 +360,7 @@ pub(super) fn evaluate(terrain: &str, seed: u64, count: usize, out: &str, arms: 
         let theta = if path.is_empty() {
             engine.theta.clone()
         } else {
-            engine
-                .theta
-                .clone()
-                .with_ports(ring, None, Some(read_port(path)), None)
-                .expect("the trained E")
+            trained(&engine.theta, ring, path)
         };
         let generated: Vec<_> = pairs
             .par_iter()
@@ -429,11 +451,7 @@ pub(super) fn spread(terrain: &str, seed: u64, count: usize, arms: &[String]) {
         let theta = if path.is_empty() {
             engine.theta.clone()
         } else {
-            engine
-                .theta
-                .clone()
-                .with_ports(ring, None, Some(read_port(path)), None)
-                .expect("the trained E")
+            trained(&engine.theta, ring, path)
         };
         let read: Vec<(Vec<usize>, Rat, Rat)> = pairs
             .par_iter()

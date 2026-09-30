@@ -25,6 +25,26 @@
 //! Each `1/n` is carried by the [`PopulationChart`] on its declared lattice, so the open stays
 //! dyadic and the card carries it in parity; an empty population contributes nothing.
 //!
+//! [definition; agent-inferred, September 30] **One passage, its transported weights**
+//! ([`SourceMoment::continued`], [`SourceMoment::phase_weights`]; Lean `HNN/IndexedOpen`, "The
+//! passage continued by its section"; the
+//! [record](../../../../research/records/2026-09-30_THE_PASSAGE_LAW_THE_SECTION_CONTINUES_THE_REQUEST_AND_THE_TRANSPORT_WEIGHS_ITS_FRONTIER.md)).
+//! A generated section continues the request's passage along the receiving ring's clock, so its
+//! locked data are counted into the request's phase counts at their residues: one span, one tube.
+//! Each crossing's datum is carried to the reading frame by the source navigator's transport, a
+//! rotation–dilation of modulus `ρ_g ∈ (0, 1]` a tick (the constitution's
+//! [`ConstitutionRead::transport`], one at the founding), and the span is read over its
+//! transported mass: a datum `a` ticks old at the span's end weighs `ρ^a / Σ_k ρ^(a_k)`, the same in
+//! every frame, whichever side of the request's last tick it lies on. At `ρ = 1` (a closing rotor
+//! ring, nothing lost) every datum weighs `ν̂(n + v)`, the one population. Below one the span's
+//! frontier weighs most and every crossing still enters: the lossless reading gives every crossing's
+//! term in a phase-carried face the same modulus at every lag, so no reading marks the frontier a
+//! continuation depends on (Lean `lossless_term_modulus`), and the transport's dissipation, a locus
+//! the executed comparison learns (`hnn::executed`), is what marks it. The weights read the ages
+//! from the phases, exact within one turn; a passage over more than one turn is refused below
+//! modulus one (the leaky count it needs is owed). The retired reading, the section over its own
+//! population `v`, weighed a section datum `n/v` times a request cell.
+//!
 //! [definition; agent-inferred, U6] **The pair buffer is the offset moment's one-step state**
 //! (Lean `Transport/SourceMoment.streamStep`'s previous value, `HNN/Moment.SourceDecl.StreamState`'s
 //! window): the offset-`δ` pair of cell `k` needs cell `k − δ`, so a cell stays in the buffer for
@@ -63,10 +83,10 @@
 //! | `exteriorOffset_independent_of_E` | [`SourceMoment::offset_counts`], [`PairPort::apply_table`] |
 //! | `HNN/IndexedOpen.{normalized_phase_counts_mass, normalized_open_population_invariant, normalized_zero_population}`; `HNN/Encoding.{whole_pair_read_counts, whole_pair_read_population_invariant, whole_pair_read_tape_free}` (the open reads no window) | [`PopulationChart`], [`SourceMoment::normalized_counts`], [`SourceMoment::offset_table`], [`SourceMoment::encode`] |
 //! | `moment_capacity` | [`capacity`], [`Capacity`] |
-//! | `HNN/Prediction.{placed_at_station, joint_residue_determines_position}` (a locked datum at its station's residue; a ring of period `∏ dᵢ`, pairwise coprime, places each datum at its joint residue class) | [`SourceMoment::section`] |
+//! | `HNN/Prediction.{placed_at_station, joint_residue_determines_position}` (a locked datum at its station's residue; a ring of period `∏ dᵢ`, pairwise coprime, places each datum at its joint residue class); `HNN/IndexedOpen.{passage_population, passage_read, passage_weight_one_population, separate_populations_ratio, transportedWeight, transported_weight_mass, transported_weight_frame_invariant, transported_weight_unitary, passage_weight_split_invariant, decayed_weight_antitone, decayed_weight_frame_free, decayed_weight_lossless, lossless_term_modulus, dissipative_term_modulus}` (the section continues the passage; each datum at its transported weight) | [`SourceMoment::continued`], [`SourceMoment::phase_weights`], [`SourceMoment::open_parts`] |
 
 use num_bigint::{BigInt, BigUint};
-use num_traits::{One, ToPrimitive, Zero};
+use num_traits::{One, Signed, ToPrimitive, Zero};
 
 use crate::hnn::HnnError;
 use crate::hnn::field::{ConstitutionRead, Current, Field};
@@ -383,6 +403,14 @@ impl PopulationChart {
         )
     }
 
+    /// **A weight read on the chart**: `⌊2^(L_ν) w + ½⌋ 2^(−L_ν)` (nearest, ties up), within
+    /// `2^(−L_ν−1)` of `w`; at `w = 1/n` it is `ν̂(n)`.
+    pub fn chart(&self, weight: &Rat) -> Rat {
+        let scale = Rat::from_integer(BigInt::one() << self.exponent as usize);
+        let half = Rat::new(BigInt::one(), BigInt::from(2));
+        (weight * &scale + half).floor() / scale
+    }
+
     /// The certified residual `|ν̂ − 1/n| ≤ 2^(−L_ν−1)`.
     pub fn residual(&self) -> Rat {
         Rat::new(BigInt::one(), BigInt::one() << (self.exponent as usize + 1))
@@ -419,6 +447,14 @@ struct RingCounts {
     first: Vec<u64>,
     /// `C_g(δ)` per declared offset: `d_g × |A| × |A|`.
     offset: Vec<Vec<u64>>,
+    /// The ring's phase at the open.
+    start: u64,
+    /// The ring's phase after the last ingested cell (the request's last tick `τ_g`).
+    end: u64,
+    /// The ring's advances since the open.
+    ticks: u64,
+    /// The ticks a continuing section extends the passage past `end` (`SourceMoment::continued`).
+    extent: u64,
 }
 
 /// What one ingest did: the cells consumed, and whether it stopped at the joint clock's carry-out.
@@ -464,6 +500,9 @@ impl SourceMoment {
             .iter()
             .map(|&ring| {
                 let period = field.ring(ring).placements().len();
+                let phase = current
+                    .phase(field, ring)
+                    .expect("a declared source ring reads its phase");
                 RingCounts {
                     ring,
                     period,
@@ -472,6 +511,10 @@ impl SourceMoment {
                         .iter()
                         .map(|_| vec![0; period * alphabet * alphabet])
                         .collect(),
+                    start: phase,
+                    end: phase,
+                    ticks: 0,
+                    extent: 0,
                 }
             })
             .collect();
@@ -501,6 +544,8 @@ impl SourceMoment {
             let step = current.step(field, code)?;
             for counts in &mut self.rings {
                 let phase = current.phase(field, counts.ring)? as usize;
+                counts.end = phase as u64;
+                counts.ticks += u64::from(step.ticks[counts.ring]);
                 bump(&mut counts.first[phase * a + code])?;
                 for (index, &offset) in self.offsets.iter().enumerate() {
                     if let Some(earlier) = earlier(&self.window, self.cursor, offset) {
@@ -526,25 +571,39 @@ impl SourceMoment {
         })
     }
 
-    /// [definition; agent-inferred, U6's order repair] **The section's placement** (`hnn::prediction`'s
-    /// header, "Order is carried by residues and relative phases"): a refinement's locked data placed on the receiving
-    /// ring's spectrum at their stations' residues. Station `j` lies at the receiving ring's clock
-    /// unwound one tick a station from the request's last tick (`hnn::prediction`'s header), so its
-    /// datum is counted at the residue `τ_R + 1 + j (mod d_R)`: the same phase-carried law as the
-    /// request's, `m = Σ Ĝ(τ)⁻¹ E u`, read at the same frame, with its own population (the section
-    /// is its own port: the response's channel, source contract item 2). An unlocked station places
-    /// nothing. No offset pair is counted and nothing is kept but the counts: the placement of `v`
-    /// locked data is `v` counts on one ring. Refused unless `ring` is a source ring.
-    pub fn section(
+    /// [definition; agent-inferred, September 30] **The passage continued by its section**
+    /// (`hnn::prediction`'s header, "The section continues the request's passage"; Lean
+    /// `HNN/IndexedOpen.{passage_population, passage_read, passage_weight_one_population}`): the
+    /// request's moment with a refinement's locked data counted into the same phase counts at their
+    /// stations' residues. Station `j` lies at the receiving ring's clock one tick a station past the
+    /// request's last tick (`hnn::prediction`'s header), so its datum is counted at the residue
+    /// `τ_R + 1 + j (mod d_R)`: the same phase-carried law as the request's, `m = Σ Ĝ(τ)⁻¹ E u`, at
+    /// the same frame, and in the same population. The request and its section are one span of the
+    /// receiving ring's clock (one tube), whose transport is the ring's rotation, unit modulus on
+    /// every node, so every crossing of the span is carried to the reading frame with the same weight
+    /// and the open reads the span's counts over its one population `n + v`
+    /// ([`SourceMoment::encode`]): the relative weight of two crossings does not depend on which
+    /// side of the request's last tick they lie (the September 30 located cause: a section read over
+    /// its own population weighed its datum `n/v` times a request cell's, `40` at the open section).
+    /// An unlocked station places nothing. No offset pair of the section is counted (the pair
+    /// port reads the request's pairs over their own population, as before), and nothing is kept
+    /// but the counts: `v` locked data are `v` more counts on the receiving ring. Refused unless
+    /// `ring` is a source ring.
+    pub fn continued(
+        &self,
         field: &Field,
         current: &Current,
         ring: usize,
         cells: &[Option<usize>],
     ) -> Result<Self, HnnError> {
-        let mut moment = Self::open(field, current);
-        let a = moment.alphabet;
+        let mut passage = self.clone();
+        // Nothing placed continues nothing, on any ring (the request's own passage).
+        if cells.iter().all(Option::is_none) {
+            return Ok(passage);
+        }
+        let a = passage.alphabet;
         let phase = current.phase(field, ring)? as usize;
-        let counts = moment
+        let counts = passage
             .rings
             .iter_mut()
             .find(|counts| counts.ring == ring)
@@ -559,10 +618,11 @@ impl SourceMoment {
                 return Err(HnnError::CellOutside { code, alphabet: a });
             }
             bump(&mut counts.first[((phase + 1 + station) % period) * a + code])?;
+            counts.extent = counts.extent.max(station as u64 + 1);
             placed += 1;
         }
-        moment.cells = placed;
-        Ok(moment)
+        passage.cells += placed;
+        Ok(passage)
     }
 
     /// `|A|`, the exterior chart the moment counts on.
@@ -640,19 +700,83 @@ impl SourceMoment {
         Ok(self.counts(ring)?.offset[index].iter().sum())
     }
 
-    /// **The normalized phase counts** `M_g[c] ν̂(n_g)` of one phase (ruling B): the counts times
-    /// the population chart of `1/n_g`, zero at an empty population.
+    /// [definition; agent-inferred, September 30] **The passage's transported weights** on one
+    /// source ring (module header, "One passage, its transported weights"; Lean
+    /// `HNN/IndexedOpen.{transportedWeight, transported_weight_unitary, decayed_weight_frame_free}`):
+    /// at each phase `c`, the weight a datum counted there enters the open with. At the navigator's
+    /// transport modulus `ρ = 1` it is the one population's `ν̂(n)` at every occupied phase. At
+    /// `0 < ρ < 1` a datum at phase `c` is `a(c) = (τ + e − c) mod d` ticks old at the passage's
+    /// end (`τ` the request's last tick, `e` the section's extent), and weighs
+    /// `ρ^(a(c)) / Σ_(c′) n(c′) ρ^(a(c′))` read on the population chart's lattice
+    /// ([`PopulationChart::chart`]); the ratio is the same in every frame, so the end is only its
+    /// reference. The ages are read from the phases, which identify the ticks only within one turn:
+    /// a passage over more than `d` ticks, or one re-keyed within its span, is refused at `ρ < 1`
+    /// ([`HnnError::AliasedAges`]); zero at an empty phase.
+    pub fn phase_weights(&self, field: &Field, ring: usize, modulus: &Rat) -> Result<Vec<Rat>, HnnError> {
+        let counts = self.counts(ring)?;
+        let a = self.alphabet;
+        let d = counts.period;
+        let chart = PopulationChart::of(field);
+        let populations: Vec<u64> = (0..d)
+            .map(|c| counts.first[c * a..(c + 1) * a].iter().sum())
+            .collect();
+        if !modulus.is_positive() || *modulus > Rat::one() {
+            return Err(HnnError::Transport {
+                ring,
+                modulus: modulus.clone(),
+            });
+        }
+        if modulus.is_one() {
+            let nu = chart.value(populations.iter().sum());
+            return Ok(populations
+                .iter()
+                .map(|&n| if n == 0 { Rat::zero() } else { nu.clone() })
+                .collect());
+        }
+        let period = d as u64;
+        let span = counts.ticks + counts.extent;
+        if span > period || (counts.start + counts.ticks) % period != counts.end {
+            return Err(HnnError::AliasedAges { ring, span, period });
+        }
+        let reference = counts.end + counts.extent;
+        let ages: Vec<u64> = (0..period)
+            .map(|c| (reference + period - c) % period)
+            .collect();
+        let mut powers = vec![Rat::one(); d];
+        let mut mass = Rat::zero();
+        for c in 0..d {
+            if populations[c] == 0 {
+                continue;
+            }
+            powers[c] = modulus_power(modulus, ages[c]);
+            mass += &powers[c] * Rat::from_integer(BigInt::from(populations[c]));
+        }
+        Ok((0..d)
+            .map(|c| {
+                if populations[c] == 0 {
+                    Rat::zero()
+                } else {
+                    chart.chart(&(&powers[c] / &mass))
+                }
+            })
+            .collect())
+    }
+
+    /// **The weighted phase counts** `M_g[c] w(c)` of one phase: the counts at the passage's
+    /// transported weight at the navigator's transport modulus ([`SourceMoment::phase_weights`];
+    /// at `ρ = 1` ruling B's `M_g[c] ν̂(n_g)`), zero at an empty population.
     pub fn normalized_counts(
         &self,
         field: &Field,
         ring: usize,
         phase: usize,
+        modulus: &Rat,
     ) -> Result<Vec<Rat>, HnnError> {
-        let nu = PopulationChart::of(field).value(self.population(ring)?);
+        let weight = self.phase_weights(field, ring, modulus)?[phase].clone();
         Ok(self
             .phase_counts(ring, phase)?
             .iter()
-            .map(|&count| Rat::from_integer(BigInt::from(count)) * &nu)
+            .map(|&count| Rat::from_integer(BigInt::from(count)) * &weight)
             .collect())
     }
 
@@ -685,15 +809,62 @@ impl SourceMoment {
 
     /// **The source moment `m̃_g`** of one source ring at the constitution's ports, computed from
     /// the counts and never stored, on the normalized open that reads no window (module header):
-    /// `Σ_c P_g^(−c)(E_g M_g[c] ν̂(n_g) + Σ_δ Σ_(x,a) C_g(δ)[c, x, a] ν̂(n_(g,δ)) E_g^(δ)(e_x ⊗ e_a))`.
+    /// `Σ_c P_g^(−c)(E_g M_g[c] w(c) + Σ_δ Σ_(x,a) C_g(δ)[c, x, a] ν̂(n_(g,δ)) E_g^(δ)(e_x ⊗ e_a))`,
+    /// `w(c)` the passage's transported weight ([`SourceMoment::phase_weights`]; `ν̂(n_g)` at a
+    /// transport of modulus one).
     pub fn encode(
         &self,
         field: &Field,
         constitution: &impl ConstitutionRead,
         ring: usize,
     ) -> Result<Vec<Rat>, HnnError> {
+        let weights = self.phase_weights(field, ring, &constitution.transport(ring))?;
+        let (reads, pairs) = self.moment_parts(field, constitution, ring)?;
+        let mut moment = pairs;
+        for (phase, read) in reads {
+            for (value, add) in moment.iter_mut().zip(read) {
+                *value += add * &weights[phase];
+            }
+        }
+        Ok(moment)
+    }
+
+    /// **The open's two ports on one source ring**, at the lift (`P_g^(τ_g)` applied): each
+    /// occupied phase's marginal read of its raw counts, `P^τ P^(−c) E M[c]` (not yet weighted),
+    /// and the pair ports' normalized read. The open is the phases' reads at their transported
+    /// weights plus the pairs' ([`SourceMoment::encode`]); `hnn::prediction::BankPlacement` weighs
+    /// them over the passage.
+    #[allow(clippy::type_complexity)]
+    pub fn open_parts(
+        &self,
+        field: &Field,
+        constitution: &impl ConstitutionRead,
+        current: &Current,
+        ring: usize,
+    ) -> Result<(Vec<(usize, Vec<Rat>)>, Vec<Rat>), HnnError> {
+        let (reads, pairs) = self.moment_parts(field, constitution, ring)?;
+        let geometry = field.ring(ring);
+        let lift = &current.lift()[ring];
+        Ok((
+            reads
+                .into_iter()
+                .map(|(phase, read)| (phase, geometry.rotate(&read, lift)))
+                .collect(),
+            geometry.rotate(&pairs, lift),
+        ))
+    }
+
+    /// The moment's two ports before the lift: each occupied phase's `P^(−c) E M[c]` on the raw
+    /// counts, and `Σ_c P^(−c) Σ_δ Σ_(x,a) C(δ)[c, x, a] ν̂(n_δ) E^(δ)(e_x ⊗ e_a)` on the whole
+    /// normalized offset moments.
+    #[allow(clippy::type_complexity)]
+    fn moment_parts(
+        &self,
+        field: &Field,
+        constitution: &impl ConstitutionRead,
+        ring: usize,
+    ) -> Result<(Vec<(usize, Vec<Rat>)>, Vec<Rat>), HnnError> {
         let counts = self.counts(ring)?;
-        let nu = PopulationChart::of(field).value(self.population(ring)?);
         let tables = self
             .offsets
             .iter()
@@ -712,18 +883,25 @@ impl SourceMoment {
             });
         }
         let a = self.alphabet;
-        let mut moment = vec![Rat::zero(); width];
+        let mut reads = Vec::new();
+        let mut pairs = vec![Rat::zero(); width];
         for phase in 0..counts.period {
             let mut binned = vec![Rat::zero(); width];
+            let mut occupied = false;
             for (code, &count) in counts.first[phase * a..(phase + 1) * a].iter().enumerate() {
                 if count == 0 {
                     continue;
                 }
-                let count = Rat::from_integer(BigInt::from(count)) * &nu;
+                occupied = true;
+                let count = Rat::from_integer(BigInt::from(count));
                 for (row, value) in binned.iter_mut().enumerate() {
                     *value += &count * port.get(row, code)?;
                 }
             }
+            if occupied {
+                reads.push((phase, geometry.rotate(&binned, &-BigInt::from(phase))));
+            }
+            let mut driven_sum: Option<Vec<Rat>> = None;
             for (&offset, table) in self.offsets.iter().zip(&tables) {
                 let Some(table) = table else {
                     continue;
@@ -732,16 +910,19 @@ impl SourceMoment {
                     .pair_port(ring, offset)
                     .ok_or(HnnError::MissingSourcePort { ring })?;
                 let driven = pair.apply_table(table, phase, a, width);
-                for (value, add) in binned.iter_mut().zip(driven) {
+                driven_sum = Some(match driven_sum {
+                    Some(sum) => sum.iter().zip(driven).map(|(s, d)| s + d).collect(),
+                    None => driven,
+                });
+            }
+            if let Some(driven) = driven_sum {
+                let carried = geometry.rotate(&driven, &-BigInt::from(phase));
+                for (value, add) in pairs.iter_mut().zip(carried) {
                     *value += add;
                 }
             }
-            let carried = geometry.rotate(&binned, &-BigInt::from(phase));
-            for (value, add) in moment.iter_mut().zip(carried) {
-                *value += add;
-            }
         }
-        Ok(moment)
+        Ok((reads, pairs))
     }
 
     /// **The word's open on the source rings**: `s_g(0) = P_g^(τ_g) m̃_g` on `g ∈ 𝒮`, zero on every
@@ -768,8 +949,9 @@ impl SourceMoment {
 
     /// **The encoder covector, tape-free** (Lean `HNN/Moment.encoder_covector_tape_free`): for a
     /// covector `g` on the open storage `s_g(0)`, the derivative of `⟨g, s_g(0)⟩` in `E_g` is
-    /// `Σ_c (P_g^(c−τ_g) g) ⊗ M_g[c] ν̂(n_g)` (`2d_g × |A|`; ruling B's normalized marginal), read
-    /// from the counts, the population chart and `g` alone.
+    /// `Σ_c (P_g^(c−τ_g) g) ⊗ M_g[c] w(c)` (`2d_g × |A|`; `w(c)` the passage's transported weight,
+    /// ruling B's `ν̂(n_g)` at a transport of modulus one), read from the counts, the weights on the
+    /// population chart and `g` alone.
     ///
     /// [definition; agent-inferred] `g` is read once in the integral chart (integers over its least
     /// common denominator); each phase's `P_g^(c−τ_g)` permutes those integers, the counts multiply
@@ -780,11 +962,16 @@ impl SourceMoment {
         current: &Current,
         ring: usize,
         covector: &[Rat],
+        modulus: &Rat,
     ) -> Result<ExactRatMatrix, HnnError> {
         let counts = self.counts(ring)?;
         let chart = PopulationChart::of(field);
-        let nu = BigInt::from(chart.numerator(self.population(ring)?));
         let scale = BigInt::one() << chart.exponent() as usize;
+        let weights: Vec<BigInt> = self
+            .phase_weights(field, ring, modulus)?
+            .into_iter()
+            .map(|w| (w * Rat::from_integer(scale.clone())).to_integer())
+            .collect();
         let geometry = field.ring(ring);
         let width = geometry.width();
         if covector.len() != width {
@@ -817,7 +1004,7 @@ impl SourceMoment {
                 }
                 for (sum, &count) in sums[row].iter_mut().zip(binned) {
                     if count != 0 {
-                        *sum += value * count;
+                        *sum += value * count * &weights[phase];
                     }
                 }
             }
@@ -826,7 +1013,7 @@ impl SourceMoment {
             .into_iter()
             .map(|row| {
                 row.into_iter()
-                    .map(|sum| Rat::new(sum * &nu, &denominator * &scale))
+                    .map(|sum| Rat::new(sum, &denominator * &scale))
                     .collect()
             })
             .collect();
@@ -848,6 +1035,15 @@ impl SourceMoment {
         let cell = crate::compression::cost::ceil_log2(&BigUint::from(self.alphabet)) + 1;
         counts + cell * self.window.len() as u64
     }
+}
+
+/// `ρ^a`, exactly.
+pub(crate) fn modulus_power(modulus: &Rat, age: u64) -> Rat {
+    let mut power = Rat::one();
+    for _ in 0..age {
+        power *= modulus;
+    }
+    power
 }
 
 fn bump(count: &mut u64) -> Result<(), HnnError> {

@@ -2,9 +2,15 @@
 terrain (float Adam on log-growth logits), then read train and held-out; alignment (A): the same
 search on the face's code, read by the executed lock.
 
-usage: eR_fit.py <terrain> <objective executed|face> <steps> <train requests> <seed> <lr> <mode causal|partition>"""
+usage: eR_fit.py <terrain> <objective executed|face> <steps> <train requests> <seed> <lr> <mode causal|partition>
+
+The placement is the one passage's (`model.placement_counts`); every step is held inside the entry
+bound's box, the native move's commit guard (`hnn::executed::entry_bound`: every realified entry of
+`E` within `[−8, 8]`), so the fit stays inside what the native move may adopt."""
 from fit import *
 import bankprobe
+
+BOUND = 8.0
 
 tname = sys.argv[1]
 terrain = {'order2': order2, 'alternation': alternation, 'line': spectral_line, 'lag2': order2_random_lag2}[tname]
@@ -55,6 +61,7 @@ for step in range(steps + 1):
     dE = opt.step(GE)
     path += float(np.sqrt((np.abs(dE) ** 2).sum()))
     E = E + dE
+    E = np.clip(E.real, -BOUND, BOUND) + 1j * np.clip(E.imag, -BOUND, BOUND)
 score, E, at = best
 np.save(f'{DIR}/E_{tname}_{objective}_{mode}_{seed}.npy', E)
 print(f'best by training ({mode}) at step {at}: {score}')

@@ -1686,7 +1686,7 @@ pub fn compose(
         &diamond,
         ratio.anchor(),
         &ratio.current(field)?,
-        &[ratio.moment()],
+        ratio.moment(),
         back,
     )?;
     // The receiving parametron's landmark tree (`compression::landmark::context`): each compared target deposits on
@@ -1766,17 +1766,10 @@ pub fn compose_return(
     diamond: &Diamond,
     anchor: &[BigInt],
     current: &Current,
-    placements: &[&SourceMoment],
+    moment: &SourceMoment,
     back: &WordReturn,
 ) -> Result<ComposedReturn, HnnError> {
     use crate::ratio::linear::vector::{Chart, combination, integral};
-    let Some(&moment) = placements.first() else {
-        return Err(HnnError::Shape {
-            what: "a return's placements (the request's moment first)",
-            expected: 1,
-            found: 0,
-        });
-    };
     let released = constitution.released();
     let retained = |locus: Locus| diamond.retains(field, locus) && !released.contains(&locus);
     let alphabet = field.alphabet();
@@ -1887,40 +1880,32 @@ pub fn compose_return(
         let source = constitution
             .source_port(g)
             .ok_or(HnnError::MissingSourcePort { ring: g })?;
-        // Every placement enters through the same `E_g` at the same frame, so its encoder
-        // covector is the sum of theirs (each read from its own counts and population).
-        let mut gradient = moment.encoder_covector(field, &current, g, opening)?;
-        for placement in &placements[1..] {
-            gradient = gradient.add(&placement.encoder_covector(field, &current, g, opening)?)?;
-        }
+        // The passage (the request, continued by any placed section, in its one population,
+        // `hnn::moment`) enters through `E_g` at the request's frame.
+        let modulus = constitution.transport(g);
+        let gradient = moment.encoder_covector(field, &current, g, opening, &modulus)?;
         let source_t = source.transpose()?;
-        // The covector on the moment's counts at their population (ruling B: the open reads
-        // `M ν̂(n)`, so `∂/∂M = ν̂ Eᵀ h` with the population held).
-        let nu = PopulationChart::of(field).value(moment.population(g)?);
+        // The covector on the moment's counts at their weights (ruling B: the open reads
+        // `M[c] w(c)`, so `∂/∂M[c] = w(c) Eᵀ h` with the weights held; at a transport of modulus
+        // one `w = ν̂(n)` at every phase, an empty one included).
+        let weights = if modulus.is_one() {
+            vec![PopulationChart::of(field).value(moment.population(g)?); turned.len()]
+        } else {
+            moment.phase_weights(field, g, &modulus)?
+        };
         let moment_covector = indexed(turned.len(), |c| {
             Ok(apply_rows(&source_t, &turned[c])?
                 .into_iter()
-                .map(|x| x * &nu)
+                .map(|x| x * &weights[c])
                 .collect())
         })?;
-        // One sample per occupied phase: its feature the placements' normalized counts summed
-        // (each over its own population), since `E_g` reads each at the same phase and frame.
+        // One sample per occupied phase: its feature the passage's normalized counts.
         let mut source_samples = Vec::new();
         for (c, h) in turned.iter().enumerate() {
-            let mut feature: Option<Vec<Rat>> = None;
-            for placement in placements {
-                if placement.phase_counts(g, c)?.iter().all(|x| *x == 0) {
-                    continue;
-                }
-                let counts = placement.normalized_counts(field, g, c)?;
-                feature = Some(match feature {
-                    Some(sum) => add(&sum, &counts),
-                    None => counts,
-                });
-            }
-            let Some(feature) = feature else {
+            if moment.phase_counts(g, c)?.iter().all(|x| *x == 0) {
                 continue;
-            };
+            }
+            let feature = moment.normalized_counts(field, g, c, &modulus)?;
             source_samples.push(Sample {
                 weight: one.clone(),
                 feature,
@@ -1937,10 +1922,7 @@ pub fn compose_return(
             // The whole normalized offset moment of each phase `(x, a, C_c[x, a] ν̂)` over its pair
             // population (`hnn::moment`: the open reads no window), read once; none at an empty
             // population.
-            let tables = placements
-                .iter()
-                .map(|placement| placement.offset_table(field, g, offset))
-                .collect::<Result<Vec<_>, HnnError>>()?;
+            let tables = [moment.offset_table(field, g, offset)?];
             let mut nonzero: Vec<Vec<(usize, usize, Rat)>> = Vec::with_capacity(d);
             let mut energy = Rat::zero();
             for c in 0..d {

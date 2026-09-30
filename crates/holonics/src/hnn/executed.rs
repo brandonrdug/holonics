@@ -11,9 +11,10 @@
 //! release executes, in the contexts it executes, and joins that comparison to its pullback and to a
 //! carried update of `E` alone (the pumps, the other families and the fold held).
 //!
-//! **The comparison.** For a request with locked partial section `S`, every open station `j` and
-//! class `x`, the actual storage is
-//! `z_(S,j,x) = z_request + ν̂(|S| + 1)(Σ_(k∈S) P^(r_k) E e_(S_k) + P^(r_j) E e_x)`
+//! **The comparison.** For a request of `n` cells with locked partial section `S`, every open
+//! station `j` and class `x`, the actual storage is the passage's (`hnn::prediction`, "The section
+//! continues the request's passage"):
+//! `z_(S,j,x) = z_pairs + ν̂(n + |S| + 1)(Σ_c P^(λ−c) E M[c] + Σ_(k∈S) P^(r_k) E e_(S_k) + P^(r_j) E e_x)`
 //! (`BankPlacement::storage`), and the reading is `a_(j,x) = max_m ρ(M_m(z))` with exact enclosure
 //! `[L, U]` (`ReceivingBank::read_turn`). Against the target `t` of station `j`:
 //! - **class**: `L_(j,t) > U_(j,x)` for every `x ≠ t` ([`Predicate`]: holds, fails when some
@@ -54,15 +55,21 @@
 //! branch leaves the first order uncertified and is named.
 //!
 //! **The committed move** ([`executed_move`]). The source port's normal law prepares the unit step
-//! on the returns and carries `ηD` onto its lattice (`Constitution::stepped_source`). `η` starts at
-//! the first-order zero of `F` (`F⁻ / (−slope)`, never past it) held below the founding's entry
-//! scale, and halves until the carried move moves no lattice coordinate. Each carried successor is
+//! on the returns and carries `ηD` onto its lattice (`Constitution::stepped_source`). The source
+//! navigator's transport modulus `ρ` (`hnn::moment`, "One passage, its transported weights") moves
+//! with it [agent-inferred, September 30]: its slope `γ_ρ = Σ sign ⟨ĝ, ∂z/∂ρ⟩` over the proposal's
+//! contributions (`BankPlacement::modulus_derivative`), its unit move `Δρ = slope⁺/γ_ρ` carrying
+//! the same first-order descent as the port's unit move (none upward from `ρ = 1`), carried as
+//! `ρ + ηΔρ` held within `[ρ/2, 1]` (passive) on the port's lattice. `η` starts at the first-order
+//! zero of `F` (`F⁻ / (−slope)`, never past it) held below the founding's entry scale, and halves
+//! until the carried move moves no lattice coordinate. Each carried successor is
 //! **re-read from the open section** (every context re-run: a changed branch or lock order is read,
 //! never assumed) and adopted only when every commit guard holds on it:
 //! - the entry bound, every entry of `E` at most `2^ENTRY_BOUND = 8` ([`entry_bound`]);
 //! - every candidate crossing of every re-read refinement admissible (the signed form);
 //! - every lock's Floquet certificate certified (a refused one refuses the release);
-//! - the first-order descent certified on the carried move;
+//! - the first-order descent certified on the carried move (the covectors paired with the exact
+//!   storage moves to the carried successor, the modulus's included);
 //! - `F` strictly lower by disjoint exact enclosures, `F(E′)⁺ < F(E)⁻`;
 //! - the constitution's own guards (lattice, bit budget, committed storage growth).
 //!
@@ -91,21 +98,17 @@ use num_traits::{One, Signed, Zero};
 use crate::hnn::HnnError;
 use crate::hnn::constitution::{Constitution, Sample, SourceStep};
 use crate::hnn::field::{ConstitutionRead, Current, Field};
-use crate::hnn::moment::PairPort;
-use crate::hnn::moment::{PopulationChart, SourceMoment};
+use crate::hnn::moment::SourceMoment;
 use crate::hnn::prediction::{
     BankGeneration, BankPlacement, BankRefinement, JointGrowth, Refinement, bank_release,
 };
 use crate::hnn::ring::{
-    CovectorRefusal, Growth, MemberCovector, ReceivingBank, ResonatorMaterial, TurnCovector,
-    TurnReading,
+    CovectorRefusal, Growth, MemberCovector, ReceivingBank, TurnCovector, TurnReading,
 };
 use crate::holon::deposition::significant;
 use crate::ratio::algebraic::{ExactInterval, ln_enclosure};
 use crate::ratio::linear::ExactRatMatrix;
 use crate::ratio::Rat;
-use crate::compression::landmark::context::Landmarks;
-use crate::receiver::population::PortPopulation;
 
 /// [definition; agent-inferred, September 30] **The entry bound** `2³`: every entry of `E` at most
 /// three binary orders above the founding's unit scale (the certified step's pins, acceptance 1;
@@ -561,66 +564,6 @@ pub fn compare(
     })
 }
 
-/// A constitution read with its source port replaced (a direction's placement: the storage is
-/// linear in `E`, so the placement of a move `ΔE` is the storages' move).
-struct SourceMove<'a, C: ConstitutionRead> {
-    base: &'a C,
-    ring: usize,
-    source: ExactRatMatrix,
-}
-
-impl<C: ConstitutionRead> ConstitutionRead for SourceMove<'_, C> {
-    fn standing(&self, ring: usize) -> &[Rat] {
-        self.base.standing(ring)
-    }
-    fn passive_factor(&self, ring: usize) -> &ExactRatMatrix {
-        self.base.passive_factor(ring)
-    }
-    fn contrast_port(&self, ring: usize) -> &ExactRatMatrix {
-        self.base.contrast_port(ring)
-    }
-    fn slices(&self, ring: usize) -> &[(Vec<Rat>, Vec<Rat>)] {
-        self.base.slices(ring)
-    }
-    fn source_port(&self, ring: usize) -> Option<&ExactRatMatrix> {
-        if ring == self.ring {
-            Some(&self.source)
-        } else {
-            self.base.source_port(ring)
-        }
-    }
-    fn pair_port(&self, ring: usize, offset: usize) -> Option<&PairPort> {
-        self.base.pair_port(ring, offset)
-    }
-    fn contact_storage(&self, contact: usize) -> &ExactRatMatrix {
-        self.base.contact_storage(contact)
-    }
-    fn contact_stiffness(&self, contact: usize) -> &ExactRatMatrix {
-        self.base.contact_stiffness(contact)
-    }
-    fn contact_dissipation(&self, contact: usize) -> &ExactRatMatrix {
-        self.base.contact_dissipation(contact)
-    }
-    fn receiving_map(&self, ring: usize) -> Option<&ExactRatMatrix> {
-        self.base.receiving_map(ring)
-    }
-    fn landmarks(&self, ring: usize) -> Option<&Landmarks> {
-        self.base.landmarks(ring)
-    }
-    fn population(&self, ring: usize) -> Option<&PortPopulation> {
-        self.base.population(ring)
-    }
-    fn contact_stiffness_signature(&self, contact: usize) -> Option<&[bool]> {
-        self.base.contact_stiffness_signature(contact)
-    }
-    fn contact_surface_storage(&self, contact: usize) -> Option<&Rat> {
-        self.base.contact_surface_storage(contact)
-    }
-    fn ring_resonator(&self, ring: usize) -> Option<&ResonatorMaterial> {
-        self.base.ring_resonator(ring)
-    }
-}
-
 /// An enclosure's dyadic face: its midpoint at [`FACE_BITS`] significant bits toward zero.
 fn face(interval: &ExactInterval) -> Rat {
     let middle = (&interval.lower + &interval.upper) / Rat::from_integer(BigInt::from(2));
@@ -787,13 +730,18 @@ fn propose(
 }
 
 /// [definition; agent-inferred, September 30] **The proposal's returns at the source port**
-/// (module header, "The covector"): one per phase of each request's moment (its feature the phase's
-/// normalized counts, its covector the request's summed storage covector carried back through the
-/// phase's rotation, `P^(c − τ)`), and one per class over the batch for the sections' placements
-/// (feature `e_x` at the weight `Σ ν²`, covector their `ν`-weighted sum over it: the same unit step,
-/// alignment and metric as one return a placement); each the descent covector.
+/// (module header, "The covector"). Every contribution's storage is its passage's
+/// (`BankPlacement::storage`): each datum, the request's phase counts and the section's cells, at
+/// its transported weight `w_S` over the span its section `S` closes. Every datum returns in one
+/// form, one return a placement aggregated by its feature: one per phase of each request (feature
+/// the phase's counts `M[c]` at the weight `Σ w_S(c)²` over the contributions, covector their
+/// `w_S(c)`-weighted sum carried back through the phase's rotation `P^(c − λ)`, over that weight),
+/// and one per class over the batch for the sections' placements (feature `e_x` at the weight
+/// `Σ w_S(j)²`, covector their `w_S(j)`-weighted sum over it): the same gradient, unit step,
+/// alignment and metric as one return a placement; each the descent covector.
 fn returns(
     field: &Field,
+    constitution: &Constitution,
     declared: &Refinement,
     requests: &[Request],
     contributions: &[Contribution],
@@ -803,45 +751,70 @@ fn returns(
     let period = geometry.period() as usize;
     let width = geometry.width();
     let alphabet = field.alphabet();
-    let chart = PopulationChart::of(field);
     let mut samples = Vec::new();
     let mut section_sums = vec![vec![Rat::zero(); width]; alphabet];
     let mut section_weights = vec![Rat::zero(); alphabet];
     for (index, request) in requests.iter().enumerate() {
+        let mine: Vec<&Contribution> = contributions.iter().filter(|c| c.request == index).collect();
+        if mine.is_empty() {
+            continue;
+        }
+        let placement =
+            BankPlacement::of(field, constitution, &request.current, &request.moment, declared)?;
         let lift = request.current.lift()[ring].clone();
-        let mut shared = vec![Rat::zero(); width];
-        for contribution in contributions.iter().filter(|c| c.request == index) {
+        let phase = request.current.phase(field, ring)? as usize;
+        let phases: Vec<usize> = (0..period)
+            .filter(|&c| {
+                request
+                    .moment
+                    .phase_counts(ring, c)
+                    .is_ok_and(|counts| counts.iter().any(|&n| n != 0))
+            })
+            .collect();
+        let mut phase_sums = vec![vec![Rat::zero(); width]; phases.len()];
+        let mut phase_weights = vec![Rat::zero(); phases.len()];
+        for contribution in mine {
             let covector: Vec<Rat> = contribution.covector.iter().map(face).collect();
-            for (sum, value) in shared.iter_mut().zip(&covector) {
-                *sum += value * &contribution.sign;
+            let (request_weights, station_weights) = placement.weights(&contribution.cells);
+            for ((sum, total), weight) in phase_sums
+                .iter_mut()
+                .zip(phase_weights.iter_mut())
+                .zip(&request_weights)
+            {
+                let scale = weight * &contribution.sign;
+                for (value, add) in sum.iter_mut().zip(&covector) {
+                    *value += add * &scale;
+                }
+                *total += weight * weight;
             }
-            // The section's placements: each placed station's class at its phase, over ν̂(v).
-            let phase = request.current.phase(field, ring)? as usize;
-            let placed = contribution.cells.iter().filter(|c| c.is_some()).count() as u64;
-            let nu = chart.value(placed);
-            for (station, cell) in contribution.cells.iter().enumerate() {
-                let Some(class) = cell else { continue };
+            // The section's placements: each placed station's class at its phase and weight.
+            for (station, (cell, weight)) in
+                contribution.cells.iter().zip(&station_weights).enumerate()
+            {
+                let (Some(class), Some(weight)) = (cell, weight) else { continue };
                 let at = (phase + 1 + station) % period;
                 let rotated = geometry.rotate(&covector, &(BigInt::from(at) - &lift));
                 for (sum, value) in section_sums[*class].iter_mut().zip(&rotated) {
-                    *sum += value * &nu * &contribution.sign;
+                    *sum += value * weight * &contribution.sign;
                 }
-                section_weights[*class] += &nu * &nu;
+                section_weights[*class] += weight * weight;
             }
         }
-        if shared.iter().all(Zero::is_zero) {
-            continue;
-        }
-        for c in 0..period {
-            if request.moment.phase_counts(ring, c)?.iter().all(|&n| n == 0) {
+        for ((c, sum), weight) in phases.iter().zip(phase_sums).zip(phase_weights) {
+            if !weight.is_positive() || sum.iter().all(Zero::is_zero) {
                 continue;
             }
-            let feature = request.moment.normalized_counts(field, ring, c)?;
-            let rotated = geometry.rotate(&shared, &(BigInt::from(c) - &lift));
+            let feature = request
+                .moment
+                .phase_counts(ring, *c)?
+                .iter()
+                .map(|&count| Rat::from_integer(BigInt::from(count)))
+                .collect();
+            let rotated = geometry.rotate(&sum, &(BigInt::from(*c as u64) - &lift));
             samples.push(Sample {
-                weight: Rat::one(),
+                covector: rotated.into_iter().map(|x| -(x / &weight)).collect(),
+                weight,
                 feature,
-                covector: rotated.into_iter().map(|x| -x).collect(),
             });
         }
     }
@@ -859,6 +832,39 @@ fn returns(
         });
     }
     Ok(samples)
+}
+
+/// [definition; agent-inferred, September 30] **The proposal's slope in the transport modulus**
+/// (module header, "The committed move"): `γ_ρ = Σ sign ⟨ĝ, ∂z/∂ρ⟩` over the proposal's
+/// contributions, each leading branch's storage covector at its dyadic face paired with its
+/// storage's exact derivative in `ρ` (`BankPlacement::modulus_derivative`): the proposal's
+/// first-order change of the compared terms per unit of `ρ`.
+fn modulus_slope(
+    field: &Field,
+    constitution: &Constitution,
+    declared: &Refinement,
+    requests: &[Request],
+    contributions: &[Contribution],
+) -> Result<Rat, HnnError> {
+    use rayon::prelude::*;
+    let placements: Vec<BankPlacement> = requests
+        .iter()
+        .map(|r| BankPlacement::of(field, constitution, &r.current, &r.moment, declared))
+        .collect::<Result<_, _>>()?;
+    Ok(contributions
+        .par_iter()
+        .map(|c| {
+            let derivative = placements[c.request].modulus_derivative(&c.cells);
+            let paired: Rat = c
+                .covector
+                .iter()
+                .map(face)
+                .zip(&derivative)
+                .map(|(g, d)| g * d)
+                .sum();
+            paired * &c.sign
+        })
+        .sum())
 }
 
 /// **The proposal's contributions and returns at `E`** (the owner's pullback test): each
@@ -882,7 +888,7 @@ pub(crate) fn proposal_returns(
         read_all.push((contexts, terms));
     }
     let proposal = propose(requests, &read_all, field.alphabet());
-    let samples = returns(field, declared, requests, &proposal.contributions)?;
+    let samples = returns(field, constitution, declared, requests, &proposal.contributions)?;
     Ok((
         samples,
         proposal
@@ -900,43 +906,47 @@ pub(crate) fn proposal_returns(
     ))
 }
 
-/// The storage moves of every contribution's section under a move `ΔE` of the source port.
+/// The storage moves of every contribution's section from a constitution to a carried successor:
+/// the successor's storage less the constitution's, exactly (at a transport of modulus one the
+/// storage is linear in `E`, so this is the move `ΔE`'s placement; a move of the modulus moves every
+/// weight).
 fn storage_moves(
     field: &Field,
     constitution: &Constitution,
+    successor: &Constitution,
     declared: &Refinement,
     requests: &[Request],
-    moved: &ExactRatMatrix,
     sections: &[(usize, Vec<Option<usize>>)],
 ) -> Result<Vec<Vec<Rat>>, HnnError> {
     use rayon::prelude::*;
-    let direction = SourceMove {
-        base: constitution,
-        ring: declared.ring(),
-        source: moved.clone(),
+    let placements = |theta: &Constitution| -> Result<Vec<BankPlacement>, HnnError> {
+        requests
+            .iter()
+            .map(|r| BankPlacement::of(field, theta, &r.current, &r.moment, declared))
+            .collect()
     };
-    let placements: Vec<BankPlacement> = requests
-        .iter()
-        .map(|r| BankPlacement::of(field, &direction, &r.current, &r.moment, declared))
-        .collect::<Result<_, _>>()?;
+    let (before, after) = (placements(constitution)?, placements(successor)?);
     Ok(sections
         .par_iter()
-        .map(|(request, cells)| placements[*request].storage(cells))
+        .map(|(request, cells)| {
+            let (old, new) = (before[*request].storage(cells), after[*request].storage(cells));
+            new.iter().zip(&old).map(|(n, o)| n - o).collect()
+        })
         .collect())
 }
 
 /// [definition; agent-inferred, September 30] **The first-order certificate of a carried move**
-/// (module header): `Σ_terms sup_(α active) Df_α[ΔE]`, each branch's covector enclosures paired with
-/// its candidates' exact storage moves, a term straddling zero bounded by `max(0, ·)`; the enclosure
-/// of the sum's bound (its upper end is the certificate), and the terms whose active branches were
-/// not all resolved.
+/// (module header): `Σ_terms sup_(α active) Df_α[Δ]`, each branch's covector enclosures paired with
+/// its candidates' exact storage moves to the carried successor, a term straddling zero bounded by
+/// `max(0, ·)`; the enclosure of the sum's bound (its upper end is the certificate), and the terms
+/// whose active branches were not all resolved.
 fn first_order(
     field: &Field,
     constitution: &Constitution,
     declared: &Refinement,
     requests: &[Request],
     proposal: &Proposal,
-    moved: &ExactRatMatrix,
+    successor: &Constitution,
 ) -> Result<(ExactInterval, usize), HnnError> {
     let mut sections: Vec<(usize, Vec<Option<usize>>)> = Vec::new();
     for term in &proposal.terms {
@@ -946,7 +956,7 @@ fn first_order(
             }
         }
     }
-    let moves = storage_moves(field, constitution, declared, requests, moved, &sections)?;
+    let moves = storage_moves(field, constitution, successor, declared, requests, &sections)?;
     let mut cursor = 0;
     let mut total = ExactInterval::point(Rat::zero());
     let mut unresolved = 0;
@@ -1011,6 +1021,7 @@ pub enum TrialRefusal {
 #[derive(Clone, Debug)]
 pub struct Trial {
     pub step: Rat,
+    pub modulus: Option<Rat>,
     pub moved: Rat,
     pub largest: Rat,
     pub first_order: Option<ExactInterval>,
@@ -1045,6 +1056,7 @@ pub struct ExecutedMove {
     pub unresolved: Vec<CovectorRefusal>,
     pub unresolved_branches: usize,
     pub slope: Option<ExactInterval>,
+    pub modulus_slope: Option<Rat>,
     pub trials: Vec<Trial>,
     pub adopted: Option<(Constitution, SourceStep)>,
     pub refusal: Option<MoveRefusal>,
@@ -1079,6 +1091,10 @@ const LADDER_DEPTH: usize = 8;
 /// The ladder's outcome: every trial, the adopted successor with its carried step, or the refusal.
 type LadderOutcome = (Vec<Trial>, Option<(Constitution, SourceStep)>, Option<MoveRefusal>);
 
+/// A carried move's first-order certificate: from the source port's move and the carried successor.
+type FirstOrder<'a> =
+    dyn Fn(&ExactRatMatrix, &Constitution) -> Result<ExactInterval, HnnError> + Sync + 'a;
+
 /// [definition; agent-inferred, September 30] **The certified step's ladder, one law for every
 /// declared comparison** (module header, "The committed move"): from the first-order zero of the
 /// comparison (`F⁻ / (−slope)`, never past it), held so that no entry of `E` moves by more than the
@@ -1094,7 +1110,8 @@ fn ladder(
     before: &ExactInterval,
     slope: &ExactInterval,
     unit_largest: &Rat,
-    first: &(dyn Fn(&ExactRatMatrix) -> Result<ExactInterval, HnnError> + Sync),
+    transport: Option<&Rat>,
+    first: &FirstOrder<'_>,
     reread: &(dyn Fn(&Constitution) -> Result<Reread, HnnError> + Sync),
 ) -> Result<LadderOutcome, HnnError> {
     let source = constitution
@@ -1122,6 +1139,7 @@ fn ladder(
         }
         let mut trial = Trial {
             step: step.clone(),
+            modulus: None,
             moved: Rat::zero(),
             largest: Rat::zero(),
             first_order: None,
@@ -1141,13 +1159,32 @@ fn ladder(
             Err(error) => return Err(error),
         };
         let (successor, reading) = stepped;
+        // The transport modulus's part of the move (module header, "The committed move"): `ρ + ηΔρ`
+        // held within `[ρ/2, 1]` (passive) and read on the source port's lattice, nearest.
+        let (successor, modulus_moved) = match transport {
+            Some(unit) if !unit.is_zero() => {
+                let modulus = constitution.transport(ring);
+                let target = (&modulus + &step * unit)
+                    .max(&modulus / &two)
+                    .min(Rat::one());
+                let carried = ((&target / &lattice_unit)
+                    + Rat::new(BigInt::one(), BigInt::from(2)))
+                .floor()
+                    * &lattice_unit;
+                let carried = carried.min(Rat::one()).max(lattice_unit.clone());
+                trial.modulus = Some(carried.clone());
+                let moved_modulus = carried != modulus;
+                (successor.with_transport(ring, carried)?, moved_modulus)
+            }
+            _ => (successor, false),
+        };
         let moved = successor
             .source_port(ring)
             .ok_or(HnnError::MissingSourcePort { ring })?
             .subtract(&source)?;
         trial.moved = largest_entry(&moved);
         trial.largest = reading.largest.clone();
-        if trial.moved.is_zero() {
+        if trial.moved.is_zero() && !modulus_moved {
             return Ok((trials, None, Some(MoveRefusal::Guards)));
         }
         if reading.largest > entry_bound() {
@@ -1156,7 +1193,7 @@ fn ladder(
             step /= &two;
             continue;
         }
-        let bound = first(&moved)?;
+        let bound = first(&moved, &successor)?;
         trial.first_order = Some(bound.clone());
         if !bound.upper.is_negative() {
             trial.refusal = Some(TrialRefusal::FirstOrder(bound));
@@ -1272,6 +1309,7 @@ pub fn executed_move(
             .filter(|t| t.unresolved.is_some())
             .count(),
         slope: None,
+        modulus_slope: None,
         trials: Vec::new(),
         adopted: None,
         refusal: None,
@@ -1280,7 +1318,7 @@ pub fn executed_move(
         receipt.refusal = Some(MoveRefusal::Nothing);
         return Ok(receipt);
     }
-    let samples = returns(field, declared, requests, &proposal.contributions)?;
+    let samples = returns(field, constitution, declared, requests, &proposal.contributions)?;
     receipt.returns = samples.len();
     let source = constitution
         .source_port(ring)
@@ -1294,14 +1332,36 @@ pub fn executed_move(
         .source_port(ring)
         .ok_or(HnnError::MissingSourcePort { ring })?
         .subtract(&source)?;
-    let (slope, _) = first_order(field, constitution, declared, requests, &proposal, &unit_move)?;
+    let (slope, _) = first_order(field, constitution, declared, requests, &proposal, &unit)?;
     receipt.slope = Some(slope.clone());
     if !slope.upper.is_negative() {
         receipt.refusal = Some(MoveRefusal::NoDescent(slope));
         return Ok(receipt);
     }
-    let first = |moved: &ExactRatMatrix| {
-        first_order(field, constitution, declared, requests, &proposal, moved).map(|(b, _)| b)
+    // The transport modulus's unit move: its first-order descent equal to the source port's unit
+    // move's (`Δρ = slope⁺ / γ_ρ`), none where it would leave `(0, 1]` at `ρ = 1`.
+    let gamma = modulus_slope(field, constitution, declared, requests, &proposal.contributions)?;
+    receipt.modulus_slope = Some(gamma.clone());
+    let modulus_unit = if gamma.is_zero() {
+        Rat::zero()
+    } else {
+        let unit = &slope.upper / &gamma;
+        if unit.is_positive() && constitution.transport(ring).is_one() {
+            Rat::zero()
+        } else {
+            unit
+        }
+    };
+    let joint = if modulus_unit.is_zero() {
+        slope.clone()
+    } else {
+        ExactInterval {
+            lower: &slope.lower + &slope.upper,
+            upper: &slope.upper + &slope.upper,
+        }
+    };
+    let first = |_: &ExactRatMatrix, successor: &Constitution| {
+        first_order(field, constitution, declared, requests, &proposal, successor).map(|(b, _)| b)
     };
     let reread = |successor: &Constitution| {
         executed_reread(field, successor, requests, declared, bank, grain)
@@ -1311,8 +1371,9 @@ pub fn executed_move(
         ring,
         &samples,
         &before.value,
-        &slope,
+        &joint,
         &largest_entry(&unit_move),
+        Some(&modulus_unit),
         &first,
         &reread,
     )?;
@@ -1482,6 +1543,7 @@ pub fn face_move(
         unresolved: Vec::new(),
         unresolved_branches: 0,
         slope: None,
+        modulus_slope: None,
         trials: Vec::new(),
         adopted: None,
         refusal: None,
@@ -1553,6 +1615,7 @@ pub fn face_move(
             refusal,
         })
     };
+    let first = |moved: &ExactRatMatrix, _: &Constitution| pairing(moved);
     let (trials, adopted, refusal) = ladder(
         constitution,
         ring,
@@ -1560,7 +1623,8 @@ pub fn face_move(
         &receipt.before.value.clone(),
         &slope,
         &largest_entry(&unit_move),
-        &pairing,
+        None,
+        &first,
         &reread,
     )?;
     receipt.trials = trials;
@@ -1608,7 +1672,6 @@ pub fn pairing_receipt(
     grain: u32,
     count: usize,
 ) -> Result<Vec<PairingReading>, HnnError> {
-    let ring = declared.ring();
     let alphabet = field.alphabet();
     let read = |amplitudes: &[crate::ratio::GaussianRat]| bank.read_turn_covector(amplitudes, grain);
     let mut read_all = Vec::new();
@@ -1618,14 +1681,10 @@ pub fn pairing_receipt(
         read_all.push((contexts, terms));
     }
     let proposal = propose(requests, &read_all, alphabet);
-    let moved = after
-        .source_port(ring)
-        .ok_or(HnnError::MissingSourcePort { ring })?
-        .subtract(before.source_port(ring).ok_or(HnnError::MissingSourcePort { ring })?)?;
     let chosen: Vec<&Contribution> = proposal.contributions.iter().take(2 * count).collect();
     let sections: Vec<(usize, Vec<Option<usize>>)> =
         chosen.iter().map(|c| (c.request, c.cells.clone())).collect();
-    let moves = storage_moves(field, before, declared, requests, &moved, &sections)?;
+    let moves = storage_moves(field, before, after, declared, requests, &sections)?;
     let mut out = Vec::new();
     for (contribution, storage_move) in chosen.iter().zip(&moves) {
         let request = &requests[contribution.request];

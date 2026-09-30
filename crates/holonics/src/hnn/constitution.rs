@@ -2156,6 +2156,11 @@ struct RingMaterial {
     resonator_scales: [Rat; 4],
     /// The hop at which every candidate resonator material is certified.
     resonator_step: Option<Rat>,
+    /// [definition; agent-inferred, September 30] **The source navigator's transport modulus**
+    /// `ρ_g ∈ (0, 1]` a tick (`hnn::moment`, "One passage, its transported weights"): a crossing
+    /// `a` ticks old is carried to the reading frame at `ρ^a`. One (a rotation, nothing lost) at the
+    /// founding; part of the source port's locus, on its lattice.
+    transport: Rat,
 }
 
 #[derive(Clone, Debug, PartialEq, Eq)]
@@ -3365,6 +3370,7 @@ impl Constitution {
                     resonator: None,
                     resonator_scales: std::array::from_fn(|_| Rat::one()),
                     resonator_step: None,
+                    transport: Rat::one(),
                 })
             })
             .collect::<Result<Vec<_>, HnnError>>()?;
@@ -3873,6 +3879,35 @@ impl Constitution {
         if let Some(receiving) = receiving {
             material.receiving = Some(NormalLaw::with_prior(receiving));
         }
+        Ok(self)
+    }
+
+    /// [definition; agent-inferred, September 30] **The source navigator's transport modulus set**
+    /// (`hnn::moment`, "One passage, its transported weights"): `0 < ρ ≤ 1` (the transport is
+    /// passive: its energy a tick `ρ² ≤ 1`, its dissipation `1 − ρ² ≥ 0`), on the source port's
+    /// lattice. Refused off a source ring, outside `(0, 1]`, or off the lattice. The executed
+    /// comparison's move adopts it only when every commit guard holds (`hnn::executed`).
+    pub fn with_transport(mut self, ring: usize, modulus: Rat) -> Result<Self, HnnError> {
+        let material = self
+            .rings
+            .get_mut(ring)
+            .filter(|material| material.source.is_some())
+            .ok_or(HnnError::MissingSourcePort { ring })?;
+        if !modulus.is_positive() || modulus > Rat::one() {
+            return Err(HnnError::Transport { ring, modulus });
+        }
+        let unit = self
+            .lattices
+            .get(&Locus::SourcePort(ring))
+            .copied()
+            .ok_or(HnnError::Lattice {
+                locus: Locus::SourcePort(ring),
+            })?
+            .unit();
+        if !(&modulus / &unit).is_integer() {
+            return Err(HnnError::Transport { ring, modulus });
+        }
+        material.transport = modulus;
         Ok(self)
     }
 
@@ -6454,6 +6489,7 @@ impl<'a> LocusMaterial<'a> {
                 resonator,
                 resonator_scales,
                 resonator_step,
+                transport: _,
             } = material;
             let width = standing.len();
             if named.contains_key(&Locus::Element(g)) {
@@ -6807,6 +6843,9 @@ impl ConstitutionRead for Constitution {
     }
     fn source_port(&self, ring: usize) -> Option<&ExactRatMatrix> {
         self.rings[ring].source.as_ref().map(NormalLaw::map)
+    }
+    fn transport(&self, ring: usize) -> Rat {
+        self.rings[ring].transport.clone()
     }
     fn pair_port(&self, ring: usize, offset: usize) -> Option<&PairPort> {
         self.rings[ring]

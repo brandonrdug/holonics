@@ -1039,7 +1039,7 @@ impl Engine {
                 &self.field,
                 &self.theta,
                 &current,
-                &[&moment],
+                &moment,
                 &self.refinement,
                 &mut self.charts,
             )

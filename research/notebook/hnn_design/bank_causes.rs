@@ -1014,7 +1014,7 @@ impl Engine {
                 &self.field,
                 &self.theta,
                 &current,
-                &[&moment],
+                &moment,
                 &self.refinement,
                 &mut self.charts,
             )
@@ -2409,6 +2409,15 @@ fn dump_learn(seed: u64, deposits: usize, out: &str) {
 }
 
 
+/// The exported transport modulus (`rho <ρ>`), if the export carries one.
+fn read_export_modulus(input: &str) -> Option<Rat> {
+    #[allow(clippy::disallowed_methods)]
+    let text = std::fs::read_to_string(input).expect("read the export");
+    text.lines()
+        .find_map(|line| line.strip_prefix("rho "))
+        .map(|value| value.trim().parse::<Rat>().expect("a rational ρ"))
+}
+
 /// Parse an exported `E` (`E rows cols`, then its realified rows of rationals) and the pairs
 /// (`pair i <request> <target> float <section> <released>`) with the teacher-forced float tops.
 fn read_export(input: &str) -> (Vec<Vec<Rat>>, Vec<(Vec<usize>, Vec<usize>, Vec<i64>)>, Vec<usize>) {
@@ -2492,6 +2501,17 @@ fn native_release(input: &str, count: usize, out: &str) {
         .clone()
         .with_ports(0, None, Some(port), None)
         .expect("the fitted E at the source port");
+    // The fitted transport modulus (the passage law of September 30), rounded to the source port's
+    // lattice likewise; one when the export carries none.
+    let theta = match read_export_modulus(input) {
+        Some(modulus) => {
+            let (q, _) = lattice.div_rem(&modulus);
+            let rounded = Rat::from_integer(q) * lattice.unit();
+            println!("native-release: the transport modulus {rounded} (fitted {modulus})");
+            theta.with_transport(0, rounded).expect("a passive modulus on the lattice")
+        }
+        None => theta,
+    };
     let bank = bank_of(declared.period, &bank_strength());
     let p = bank_strength();
     let admissible = |storage: &[Rat]| -> (bool, Rat) {

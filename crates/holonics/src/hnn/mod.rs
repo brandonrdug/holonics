@@ -329,6 +329,18 @@ pub enum HnnError {
     )]
     Lattice { locus: Locus },
     #[error(
+        "ring {ring}'s transport modulus {modulus} is not a passive modulus on the source port's lattice (0 < ρ ≤ 1)"
+    )]
+    Transport { ring: usize, modulus: Rat },
+    #[error(
+        "ring {ring}'s passage spans {span} ticks against its period {period} (or was re-keyed): a transport of modulus below one reads each datum's age from its phase, which aliases past one turn; the leaky count is owed"
+    )]
+    AliasedAges { ring: usize, span: u64, period: u64 },
+    #[error(
+        "ring {ring}'s transport modulus {modulus} is below one: the bank's face reads one shared resonance a request, which holds only at modulus one (its dissipative form is owed)"
+    )]
+    FaceTransport { ring: usize, modulus: Rat },
+    #[error(
         "locus {locus:?} declares the lattice exponent {declared}, coarser than the rule's {rule}: the carried Gram's positivity and the read's bound below the grain would not hold"
     )]
     LatticeBelowRule {

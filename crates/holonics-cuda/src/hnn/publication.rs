@@ -237,6 +237,14 @@ impl Loci {
         }
         let mut sources = Vec::with_capacity(field.sources().len());
         for &g in field.sources() {
+            // The card's open reads the one population (`ν̂(n)` numerators); a source transport
+            // below modulus one weighs each datum by its age (`holonics::hnn::moment`), which the
+            // card does not yet realize.
+            if constitution.transport(g) != Rat::from_integer(BigInt::from(1)) {
+                return Err(refused(
+                    "a source transport below modulus one (the card's open reads one population)",
+                ));
+            }
             let sp = lattice(field, Locus::SourcePort(g))?;
             let port = constitution
                 .source_port(g)

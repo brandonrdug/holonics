@@ -178,6 +178,12 @@ pub trait ConstitutionRead: Sync {
     fn ring_resonator(&self, _ring: usize) -> Option<&crate::hnn::ring::ResonatorMaterial> {
         None
     }
+    /// **A source navigator's transport modulus** `ρ_g ∈ (0, 1]` a tick (`hnn::moment`, "One
+    /// passage, its transported weights"): one, a rotation that loses nothing, unless the
+    /// constitution carries another.
+    fn transport(&self, _ring: usize) -> Rat {
+        Rat::one()
+    }
 }
 
 // -------------------------------------------------------------------------------------------

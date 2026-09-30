@@ -1046,7 +1046,7 @@ fn the_integral_chart_equals_the_termwise_arithmetic() {
     let ring = field.ring(0);
     let covector = draw.vector(ring.width());
     let chart = moment
-        .encoder_covector(&field, &current, 0, &covector)
+        .encoder_covector(&field, &current, 0, &covector, &Rat::one())
         .unwrap();
     for row in 0..ring.width() {
         for code in 0..field.alphabet() {
@@ -1054,7 +1054,8 @@ fn the_integral_chart_equals_the_termwise_arithmetic() {
                 .map(|phase| {
                     let turned =
                         ring.rotate(&covector, &(BigInt::from(phase) - &current.lift()[0]));
-                    &turned[row] * &moment.normalized_counts(&field, 0, phase).unwrap()[code]
+                    &turned[row]
+                        * &moment.normalized_counts(&field, 0, phase, &Rat::one()).unwrap()[code]
                 })
                 .sum();
             assert_eq!(chart.get(row, code).unwrap(), &termwise);

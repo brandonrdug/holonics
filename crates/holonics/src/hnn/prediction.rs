@@ -90,10 +90,9 @@
 //!   a sum of per-factor functions (`joint_class_not_additive`), so a field that summed the factors'
 //!   residue histograms would read three tables without their index.
 //! - **Relative phases between placed data: the section's own order.** The section's locked data are
-//!   placed on the same spectrum at their stations' residues ([`SourceMoment::section`], the
-//!   response's port with its own population), and every refinement reads the request's placement
-//!   and the section's together, so a station reads its neighbours' locked data by their relative
-//!   phases. Generation ([`generate`]) opens with nothing locked and refines: in each refinement
+//!   placed on the same spectrum at their stations' residues, continuing the request's passage in
+//!   its one population ([`Refinement::passage`], [`SourceMoment::continued`]; below), so a station
+//!   reads its neighbours' locked data, and the request's last cells, by their relative phases. Generation ([`generate`]) opens with nothing locked and refines: in each refinement
 //!   every unlocked station is read jointly from the one refined field, and the stations whose top
 //!   grain cell leads its runner-up by the largest gap lock together (a gap of zero is a plural
 //!   reading); a locked datum re-enters as placed data and drives the others. It stops when every
@@ -102,6 +101,27 @@
 //!   the locked ones placed, so no station reads its own target (`HolonRatio::compare_partition`).
 //!   The lock's order is the field's own (the largest drive locks first, ties together); it is not an
 //!   output index, and a locked station is never redrawn.
+//!
+//! [definition; agent-inferred, September 30; the
+//! [placement's record](../../../../research/records/2026-09-30_THE_PASSAGE_LAW_THE_SECTION_CONTINUES_THE_REQUEST_AND_THE_TRANSPORT_WEIGHS_ITS_FRONTIER.md)]
+//! **The section continues the request's passage.** The request's cells cross the receiving ring's
+//! section at its ticks up to `τ`, and the section's stations at `τ + 1 + j`: one clocked span (one
+//! tube). Each crossing's datum is carried to the reading frame by the source navigator's transport
+//! and the span is read over its transported mass ([`SourceMoment::continued`], [`BankPlacement`];
+//! `hnn::moment`, "One passage, its transported weights"; Lean
+//! `HNN/IndexedOpen.{transportedWeight, passage_weight_split_invariant, decayed_weight_frame_free}`):
+//! a datum `a` ticks old at the span's end weighs `ρ^a / Σ_k ρ^(a_k)`, `ρ ∈ (0, 1]` the
+//! transport's modulus, a constitution locus the executed comparison learns (one at the founding,
+//! where every datum weighs `ν̂(n + v)`). The weights are set by the span, not by where the request
+//! ends, so a relation the release reads among the section's stations reads the same across the
+//! request's last tick. The retired reading placed the section over its own population and the
+//! request over its own, weighing a section datum `n/v` times a request cell
+//! (`separate_populations_ratio`): at the open section the request's last two cells, on which an
+//! order-2 continuation depends, entered at `ν̂(40)` against the candidate's `ν̂(1) = 1`. At `ρ = 1`
+//! every crossing's term in the bank's phase-carried face has the same modulus at every lag
+//! (`lossless_term_modulus`), so no reading marks the span's frontier, where a continuation's seed
+//! lies; the transport's dissipation weighs the term at lag `r` by `ρ^r` (`dissipative_term_modulus`)
+//! and marks it. The weights are not a window: every crossing enters and none is dropped by length.
 //!
 //! [definition; agent-inferred] **Every modality reads it the same way.** A cell is a datum placed
 //! at its residue on a ring's spectrum: a text cell at its byte tick, an image cell at its scan tick
@@ -120,8 +140,8 @@
 //!
 //! - **the candidates**: in a refinement, every unlocked station `j` and every class `x` of the
 //!   exterior chart, the receiving ring's storage with the locked data and `x` at station `j` placed
-//!   at their residues over the section's population ([`BankPlacement::storage`], the law of
-//!   [`SourceMoment::section`] and [`injection`]), the other unlocked stations unplaced;
+//!   at their residues over the passage's one population `n + v` ([`BankPlacement::storage`], the
+//!   law of [`SourceMoment::continued`]), the other unlocked stations unplaced;
 //! - **the reading**: the bank's turn of that storage (every node crossing the section pumps each
 //!   member) and its joint growth, enclosed exactly;
 //! - **the lock's flip**: a station's top candidate reads a growth strictly above every other
@@ -149,7 +169,7 @@
 //! the same lock at a declared temperature, on the readout's partition ([`mask`]):
 //!
 //! ```text
-//! candidates   at every compared station j, every class x placed with the locked targets over ν̂(v + 1)
+//! candidates   at every compared station j, every class x placed with the request and the locked targets over ν̂(n + v + 1)
 //! face         θ_x = A(x) / Σ_y A(y),   A the bank's second-order reading of x's storage
 //! loss         ℓ = log θ_t⁻¹ = log Σ_y A(y) − log A(t)                     (nats; the ratio of the target to the face)
 //! covector     ∂ℓ/∂A(x) = 1/Σ_y A(y) − [x = t]/A(t)                        on log A(x): θ_x − q_x (Lean bank_face_covector)
@@ -158,7 +178,8 @@
 //!
 //! - **Every storage the bank reads is a sum of images.** `Φ(P^r E e_x)` for every rotation and
 //!   class is read once per constitution ([`BankImages`]); a request's shared resonance (its phases'
-//!   normalized counts and the locked targets) and each candidate's are sums of them, held to
+//!   counts and the locked targets, over the passage's population) and each candidate's are sums of
+//!   them, held to
 //!   [`BankPlacement::storage`] exactly by the owner's test. The station's rotation is `P^(λ − c_j)`,
 //!   `c_j = τ + 1 + j`.
 //! - **The returns.** The gradient on each candidate's resonance, `K = 2cp²W`, is carried to the
@@ -172,9 +193,9 @@
 //!   stations' score derivative exactly.
 //! - **The pumps' covector** `∂ℓ/∂(p_m²) = Σ_x c_x |W_m(x)|²` is read ([`BankStaged::pumps`]) and
 //!   held: the bank's members are declared (`hnn::ring`, "The bank's face").
-//! - [agent-inferred] **The expected blocker** is the located cause of the bank's record (§5 there):
-//!   a lone candidate weighs one and a request cell one over the request's length, so the candidate's
-//!   own image sets most of its reading; the face learns first what depends on the candidate alone.
+//! - [agent-inferred] **The located cause of the bank's record** (§5 there), a lone candidate
+//!   weighing one against a request cell's one over the request's length, is repaired by the
+//!   passage law (below): every datum of the passage weighs `ν̂(n + v)`.
 //!
 //! **Every modality reads it the same way**: the bank reads the ring's storage, which holds any
 //! chart's classes through `E` at their residues; an image's pixels at their scan ticks and an
@@ -383,13 +404,15 @@ impl Refinement {
         )
     }
 
-    /// **The section's placement** (module header, "Order is carried by residues and relative
-    /// phases"): the locked data `cells[j]` (an unlocked station `None`) placed on the receiving
-    /// ring's spectrum at their stations' residues ([`SourceMoment::section`]).
-    pub fn section(
+    /// **The passage with its section placed** (module header, "The section continues the
+    /// request's passage"): the request's moment continued by the locked data `cells[j]` (an
+    /// unlocked station `None`) at their stations' residues on the receiving ring, one population
+    /// ([`SourceMoment::continued`]).
+    pub fn passage(
         &self,
         field: &Field,
         current: &Current,
+        moment: &SourceMoment,
         cells: &[Option<usize>],
     ) -> Result<SourceMoment, HnnError> {
         if cells.len() != self.stations {
@@ -399,7 +422,7 @@ impl Refinement {
                 found: cells.len(),
             });
         }
-        SourceMoment::section(field, current, self.ring, cells)
+        moment.continued(field, current, self.ring, cells)
     }
 
     /// **The target phases of the section** (`hnn::ratio::TargetPhases`): each station's phase on
@@ -645,19 +668,20 @@ pub struct Section<'c> {
 
 impl<'c> Section<'c> {
     /// **Refine a section** (module header): the operands read once at the cut (every word of the
-    /// refinement reads the same medium), the change opened at rest with the request's moment
-    /// injected at the source rings, `K` words of `w` full ticks with the motion continuing, the last
-    /// ending at its last junction, and every station read from its anchor.
+    /// refinement reads the same medium), the change opened at rest with the passage's moment (the
+    /// request's, continued by any placed section, [`Refinement::passage`]) injected at the source
+    /// rings, `K` words of `w` full ticks with the motion continuing, the last ending at its last
+    /// junction, and every station read from its anchor.
     pub fn refine(
         field: &'c Field,
         constitution: &impl ConstitutionRead,
         current: &Current,
-        placements: &[&SourceMoment],
+        passage: &SourceMoment,
         declared: &Refinement,
         charts: &mut Charts,
     ) -> Result<Self, HnnError> {
         let operands = Operands::at_cut_charted(field, constitution, current, charts)?;
-        let injection = injection(field, constitution, current, placements)?;
+        let injection = passage.open_storage(field, constitution, current)?;
         Self::refine_on(field, constitution, operands, injection, declared)
     }
 
@@ -980,33 +1004,6 @@ fn section_release(
     })
 }
 
-/// **The injection of several placements** at one frame: each placement's open storage
-/// `P_g^(τ_g) m̃_g` ([`SourceMoment::open_storage`]) at the request's lift, summed ring by ring
-/// (every placement enters through the same `E_g`, each over its own population).
-pub fn injection(
-    field: &Field,
-    constitution: &impl ConstitutionRead,
-    current: &Current,
-    placements: &[&SourceMoment],
-) -> Result<Vec<Vec<Rat>>, HnnError> {
-    let mut storage: Vec<Vec<Rat>> = field
-        .rings()
-        .iter()
-        .map(|ring| vec![Rat::zero(); ring.width()])
-        .collect();
-    for placement in placements {
-        for (total, wave) in storage
-            .iter_mut()
-            .zip(placement.open_storage(field, constitution, current)?)
-        {
-            if wave.iter().any(|x| !x.is_zero()) {
-                *total = add(total, &wave);
-            }
-        }
-    }
-    Ok(storage)
-}
-
 /// **A station's lock reading** at the grain `L`: its top class (the greatest grain cell, the
 /// least class on a tie) and the gap in grain steps `(n_top − n_2) L + (k_top − k_2)` to the
 /// runner-up cell, zero exactly when the top cell is shared (a plural reading).
@@ -1174,10 +1171,11 @@ pub struct Staged {
 /// **Refine, compare and return one section** at the constitution's commit (module header,
 /// "Learning"): the targets at the `locked` stations placed as the section's data ([`mask`] draws
 /// the partition; none locked is the pinned September 29 path), the section refined at the cut with
-/// the request's placement and the section's, released, compared at its unlocked stations only, its
-/// covector pulled back through the `K` words and composed onto every locus inside the refinement's
-/// diamond, both placements entering through `E_g`. With `check`, the refinement is also run on the
-/// executed charts with no transient split and its return's pairing read ([`Pairing`]).
+/// the passage (the request continued by the locked data, one population, [`Refinement::passage`]),
+/// released, compared at its unlocked stations only, its covector pulled back through the `K` words
+/// and composed onto every locus inside the refinement's diamond, the passage entering through
+/// `E_g`. With `check`, the refinement is also run on the executed charts with no transient split
+/// and its return's pairing read ([`Pairing`]).
 #[allow(clippy::too_many_arguments)]
 pub fn stage(
     field: &Field,
@@ -1203,15 +1201,10 @@ pub fn stage(
         .map(|(&target, &lock)| lock.then_some(target))
         .collect();
     // Nothing locked places nothing (the pinned September 29 path, on any receiving ring).
-    let placed = if locked.iter().any(|&lock| lock) {
-        Some(declared.section(field, current, &cells)?)
-    } else {
-        None
-    };
-    let placements: Vec<&SourceMoment> = std::iter::once(moment).chain(placed.as_ref()).collect();
+    let passage = declared.passage(field, current, moment, &cells)?;
     let compared: Vec<bool> = locked.iter().map(|lock| !lock).collect();
     let operands = Operands::at_cut_charted(field, constitution, current, charts)?;
-    let injection = injection(field, constitution, current, &placements)?;
+    let injection = passage.open_storage(field, constitution, current)?;
     let pairing = if check {
         let unsplit = operands.clone().unsplit()?;
         let section =
@@ -1236,7 +1229,7 @@ pub fn stage(
         &declared.diamond(field),
         current.lift(),
         current,
-        &placements,
+        &passage,
         &back.joined,
     )?;
     Ok(Staged {
@@ -1253,8 +1246,8 @@ pub fn stage(
 
 /// [definition; agent-inferred, September 29] **The comparison's code at a constitution** (the
 /// lock's exact comparison, `hnn::constitution`, "At a node: the lock's half-turn"): the forward
-/// half of [`stage`], its section refined at the cut with the request's placement and the locked
-/// targets placed, compared at its unlocked stations, and read as its code's enclosure. Nothing is
+/// half of [`stage`], its section refined at the cut with the passage (the request continued by the
+/// locked targets), compared at its unlocked stations, and read as its code's enclosure. Nothing is
 /// returned or deposited.
 #[allow(clippy::too_many_arguments)]
 pub fn comparison_code(
@@ -1279,14 +1272,9 @@ pub fn comparison_code(
         .zip(locked)
         .map(|(&target, &lock)| lock.then_some(target))
         .collect();
-    let placed = if locked.iter().any(|&lock| lock) {
-        Some(declared.section(field, current, &cells)?)
-    } else {
-        None
-    };
-    let placements: Vec<&SourceMoment> = std::iter::once(moment).chain(placed.as_ref()).collect();
+    let passage = declared.passage(field, current, moment, &cells)?;
     let compared: Vec<bool> = locked.iter().map(|lock| !lock).collect();
-    let section = Section::refine(field, constitution, current, &placements, declared, charts)?;
+    let section = Section::refine(field, constitution, current, &passage, declared, charts)?;
     section.compare_partition(targets, &compared)?.code_length()
 }
 
@@ -1328,8 +1316,8 @@ pub fn generate(
     let mut plural: Vec<usize> = Vec::new();
     let (mut refinements, mut balances_closed) = (0usize, 0usize);
     while locked.iter().any(Option::is_none) {
-        let placed = declared.section(field, current, &locked)?;
-        let injection = injection(field, constitution, current, &[moment, &placed])?;
+        let passage = declared.passage(field, current, moment, &locked)?;
+        let injection = passage.open_storage(field, constitution, current)?;
         let section = Section::refine_on(field, constitution, operands.clone(), injection, declared)?;
         refinements += 1;
         balances_closed += usize::from(section.balance().closes());
@@ -1437,8 +1425,8 @@ impl JointGrowth for TurnCovector {
 /// (module header, "The bank reads the superposed passage"). The request's placement is fixed and
 /// nothing is locked. In each refinement, for every unlocked station and every class of the
 /// exterior chart, the receiving ring's storage is the request's placement with the locked data
-/// and that candidate placed at their stations' residues (`SourceMoment::section`'s law over the
-/// section's own population, the other unlocked stations unplaced); the bank reads its turn
+/// and that candidate placed at their stations' residues (`SourceMoment::continued`'s law over the
+/// passage's one population, the other unlocked stations unplaced); the bank reads its turn
 /// ([`ReceivingBank::read_turn`]). A station's reading is the lock's flip: its top candidate's joint
 /// growth exceeds every other candidate's exactly ([`Growth::exceeds`], `θ = a/(a + K) > ½`) and the
 /// bank locks there ([`Growth::is_locked`]); its gap is the top's `lower` less the largest other
@@ -1645,21 +1633,40 @@ pub fn bank_release<R: JointGrowth + Send + Sync>(
     ))
 }
 
-/// [definition; agent-inferred, September 29] **The receiving ring's storage under a section's
-/// placement** ([`generate_by_bank`]): the request's open storage `P^τ m̃` on the receiving ring and,
-/// per station `j` and class `x`, the datum's image `P^(λ − c_j) E e_x`, `c_j = τ + 1 + j` (mod `d`),
-/// so a section's cells place `Σ_j P^(λ − c_j) E e_(x_j) ν̂(v)` over their own population `v`: the
-/// law of `SourceMoment::section` then `open_storage`, and [`injection`]'s sum, read without
-/// re-encoding the request for every candidate. Held to [`injection`] exactly by the owner's tests.
+/// [definition; agent-inferred, September 29; the passage law, September 30] **The receiving ring's
+/// storage under the passage** ([`generate_by_bank`]; module header, "The section continues the
+/// request's passage"): each occupied phase's read of the request's raw counts
+/// `P^(λ−c) E M[c]` on the receiving ring, the pair ports' normalized read, and, per station `j` and
+/// class `x`, the datum's image `P^(λ − c_j) E e_x`, `c_j = τ + 1 + j` (mod `d`). A section's cells
+/// `S` continue the request's passage, each datum at its transported weight over the span:
+///
+/// ```text
+/// z(S) = z_pairs + Σ_c w_S(c) P^(λ−c) E M[c] + Σ_(j∈S) w_S(j) P^(λ − c_j) E e_(x_j)
+/// w_S(k) = chart(ρ^(a_k) / (Σ_c n(c) ρ^(a_c) + Σ_(j∈S) ρ^(a_j)))
+/// ```
+///
+/// with `a` each datum's age at the section's last station (`m + (τ − c mod d)` for a request
+/// phase, `m − 1 − j` for station `j`) and `ρ` the navigator's transport modulus: at `ρ = 1` every
+/// datum weighs `ν̂(n + |S|)`. The law of [`SourceMoment::continued`] then `open_storage`, read
+/// without re-encoding the request for every candidate; held to it exactly by the owner's tests.
+/// With nothing placed it is the request's own open.
 #[derive(Clone, Debug)]
 pub struct BankPlacement {
-    base: Vec<Rat>,
+    reads: Vec<(u64, u64, Vec<Rat>)>,
+    pairs: Vec<Rat>,
     images: Vec<Vec<Vec<Rat>>>,
     chart: PopulationChart,
+    modulus: Rat,
+    stations: u64,
+    /// `ρ^a` for every age `a < d + m`.
+    powers: Vec<Rat>,
+    population: u64,
 }
 
 impl BankPlacement {
-    /// The request's storage and every station's class images on the receiving ring.
+    /// The request's reads and every station's class images on the receiving ring. Refused, at a
+    /// transport below modulus one, when the request and its declared stations span more than one
+    /// turn ([`HnnError::AliasedAges`]).
     pub fn of(
         field: &Field,
         constitution: &impl ConstitutionRead,
@@ -1673,8 +1680,22 @@ impl BankPlacement {
             .ok_or(HnnError::MissingSourcePort { ring })?;
         let geometry = field.ring(ring);
         let period = geometry.period();
-        let base = injection(field, constitution, current, &[moment])?[ring].clone();
+        let modulus = constitution.transport(ring);
+        let stations = declared.stations as u64;
+        // The span's check: the moment read over its declared stations (every station placed).
+        let full = moment.continued(field, current, ring, &vec![Some(0); declared.stations])?;
+        full.phase_weights(field, ring, &modulus)?;
+        let (raw, pairs) = moment.open_parts(field, constitution, current, ring)?;
         let phase = current.phase(field, ring)?;
+        let reads = raw
+            .into_iter()
+            .map(|(c, read)| -> Result<(u64, u64, Vec<Rat>), HnnError> {
+                let c = c as u64;
+                let age = stations + (phase + period - c) % period;
+                let count: u64 = moment.phase_counts(ring, c as usize)?.iter().sum();
+                Ok((age, count, read))
+            })
+            .collect::<Result<Vec<_>, _>>()?;
         let lift = current.lift()[ring].clone();
         let columns: Vec<Vec<Rat>> = (0..field.alphabet())
             .map(|class| {
@@ -1693,29 +1714,153 @@ impl BankPlacement {
                     .collect()
             })
             .collect();
+        let mut powers = Vec::with_capacity((period + stations) as usize);
+        let mut power = Rat::one();
+        for _ in 0..period + stations {
+            powers.push(power.clone());
+            power *= &modulus;
+        }
         Ok(Self {
-            base,
+            reads,
+            pairs,
             images,
             chart: PopulationChart::of(field),
+            modulus,
+            stations,
+            powers,
+            population: moment.population(ring)?,
         })
     }
 
-    /// **The receiving ring's storage** with the section's cells placed (a station's class, or
-    /// unplaced): the request's storage plus the placed images over the section's population.
-    pub fn storage(&self, cells: &[Option<usize>]) -> Vec<Rat> {
-        let mut placed = vec![Rat::zero(); self.base.len()];
-        let mut population = 0u64;
-        for (station, class) in cells.iter().enumerate() {
-            if let Some(class) = class {
-                placed = add(&placed, &self.images[station][*class]);
-                population += 1;
+    /// The navigator's transport modulus the placement weighs at.
+    pub fn modulus(&self) -> &Rat {
+        &self.modulus
+    }
+
+    /// Station `j`'s age at the section's last station.
+    fn station_age(&self, station: usize) -> u64 {
+        self.stations - 1 - station as u64
+    }
+
+    /// The span's transported mass `Σ_c n(c) ρ^(a_c) + Σ_(j∈S) ρ^(a_j)`, exactly.
+    fn mass(&self, cells: &[Option<usize>]) -> Rat {
+        let mut mass = Rat::zero();
+        for (age, count, _) in &self.reads {
+            mass += &self.powers[*age as usize] * Rat::from_integer(BigInt::from(*count));
+        }
+        for (station, cell) in cells.iter().enumerate() {
+            if cell.is_some() {
+                mass += &self.powers[self.station_age(station) as usize];
             }
         }
-        if population == 0 {
-            return self.base.clone();
+        mass
+    }
+
+    /// **The passage's weights** with the section's cells placed: each request phase's and each
+    /// placed station's `w_S`, on the population chart; at `ρ = 1` all `ν̂(n + |S|)`.
+    #[allow(clippy::type_complexity)]
+    pub fn weights(&self, cells: &[Option<usize>]) -> (Vec<Rat>, Vec<Option<Rat>>) {
+        if self.modulus.is_one() {
+            let placed = cells.iter().filter(|cell| cell.is_some()).count() as u64;
+            let nu = self.chart.value(self.population + placed);
+            return (
+                vec![nu.clone(); self.reads.len()],
+                cells.iter().map(|cell| cell.map(|_| nu.clone())).collect(),
+            );
         }
-        let nu = self.chart.value(population);
-        add(&self.base, &placed.iter().map(|x| x * &nu).collect::<Vec<_>>())
+        let mass = self.mass(cells);
+        let weigh = |age: u64| self.chart.chart(&(&self.powers[age as usize] / &mass));
+        (
+            self.reads.iter().map(|(age, _, _)| weigh(*age)).collect(),
+            cells
+                .iter()
+                .enumerate()
+                .map(|(station, cell)| cell.map(|_| weigh(self.station_age(station))))
+                .collect(),
+        )
+    }
+
+    /// **The receiving ring's storage** with the section's cells placed (a station's class, or
+    /// unplaced): the pair ports' read plus every datum of the passage at its transported weight.
+    pub fn storage(&self, cells: &[Option<usize>]) -> Vec<Rat> {
+        let (request, section) = self.weights(cells);
+        let mut storage = self.pairs.clone();
+        for ((_, _, read), weight) in self.reads.iter().zip(&request) {
+            for (value, add) in storage.iter_mut().zip(read) {
+                *value += add * weight;
+            }
+        }
+        for (station, (cell, weight)) in cells.iter().zip(&section).enumerate() {
+            if let (Some(class), Some(weight)) = (cell, weight) {
+                for (value, add) in storage.iter_mut().zip(&self.images[station][*class]) {
+                    *value += add * weight;
+                }
+            }
+        }
+        storage
+    }
+
+    /// The storage at the exact transported weights at a modulus (no chart): the test's reference
+    /// for [`BankPlacement::modulus_derivative`].
+    #[cfg(test)]
+    pub(crate) fn exact_storage(&self, cells: &[Option<usize>], modulus: &Rat) -> Vec<Rat> {
+        let power = |age: u64| crate::hnn::moment::modulus_power(modulus, age);
+        let mut data: Vec<(u64, Rat, &Vec<Rat>)> = self
+            .reads
+            .iter()
+            .map(|(age, count, read)| (*age, Rat::from_integer(BigInt::from(*count)), read))
+            .collect();
+        for (station, cell) in cells.iter().enumerate() {
+            if let Some(class) = cell {
+                data.push((self.station_age(station), Rat::one(), &self.images[station][*class]));
+            }
+        }
+        let mass: Rat = data.iter().map(|(age, count, _)| power(*age) * count).sum();
+        let mut storage = self.pairs.clone();
+        for (age, _, read) in data {
+            let weight = power(age) / &mass;
+            for (value, add) in storage.iter_mut().zip(read) {
+                *value += add * &weight;
+            }
+        }
+        storage
+    }
+
+    /// [definition; agent-inferred, September 30] **The storage's derivative in the transport
+    /// modulus** at the exact weights `w_k = ρ^(a_k)/mass`: `∂w_k/∂ρ = w_k (a_k − ā)/ρ`, `ā` the
+    /// span's weighted mean age, so `∂z/∂ρ = Σ_k ∂w_k/∂ρ · (datum k's read)`; the modulus's
+    /// covector pairs with it (`hnn::executed`, "The committed move").
+    pub fn modulus_derivative(&self, cells: &[Option<usize>]) -> Vec<Rat> {
+        let mass = self.mass(cells);
+        let mut data: Vec<(u64, Rat, &Vec<Rat>)> = self
+            .reads
+            .iter()
+            .map(|(age, count, read)| (*age, Rat::from_integer(BigInt::from(*count)), read))
+            .collect();
+        for (station, cell) in cells.iter().enumerate() {
+            if let Some(class) = cell {
+                data.push((self.station_age(station), Rat::one(), &self.images[station][*class]));
+            }
+        }
+        let mean: Rat = data
+            .iter()
+            .map(|(age, count, _)| {
+                &self.powers[*age as usize] * count * Rat::from_integer(BigInt::from(*age))
+            })
+            .sum::<Rat>()
+            / &mass;
+        let mut derivative = vec![Rat::zero(); self.pairs.len()];
+        for (age, _, read) in data {
+            let weight = &self.powers[age as usize] / &mass;
+            let slope = weight * (Rat::from_integer(BigInt::from(age)) - &mean) / &self.modulus;
+            if slope.is_zero() {
+                continue;
+            }
+            for (value, add) in derivative.iter_mut().zip(read) {
+                *value += add * &slope;
+            }
+        }
+        derivative
     }
 }
 
@@ -1756,6 +1901,13 @@ impl BankImages {
                 expected: 0,
                 found: field.offsets().len(),
             });
+        }
+        // The face's shared resonance is one per request only at a transport of modulus one: below
+        // it, each candidate's station sets the span's mass (module header, "The section continues
+        // the request's passage"). The face's dissipative form is owed.
+        let modulus = constitution.transport(ring);
+        if !modulus.is_one() {
+            return Err(HnnError::FaceTransport { ring, modulus });
         }
         let port = constitution
             .source_port(ring)
@@ -1840,7 +1992,7 @@ impl BankImages {
 /// (its target, the face's mass at the target `θ_t` exact, the face's top class, `A₀` and `a₀`);
 /// the request's shared placements (each phase's rotation and feature) with the score's gradient
 /// coefficients on their shared resonance; each compared station's rotation and every candidate's
-/// gradient coefficients; the candidates' placement weight `ν̂(v + 1)`; the gradient on each member's
+/// gradient coefficients; the passage's weight `ν̂(n + v + 1)`; the gradient on each member's
 /// `p_m²`; the comparisons skipped (a target the bank reads with no power has no finite code); and
 /// the code `Σ −log₂ θ_t`, enclosed.
 #[derive(Clone, Debug)]
@@ -1879,8 +2031,8 @@ const ROUNDING_BITS: u32 = 16;
 /// [definition; agent-inferred, September 29] **Stage one request's bank comparison** (module
 /// header, "The bank's learning path"; Lean `HNN/BankFace`). The partition is the readout's
 /// ([`mask`]): the locked stations' targets placed, and at every compared station `j` every class
-/// `x` placed there with them over the section's population `v + 1` (generation's candidates,
-/// [`generate_by_bank`]). The bank reads each candidate's storage by its second-order face
+/// `x` placed there with them and the request over the passage's population `n + v + 1`
+/// (generation's candidates, [`generate_by_bank`]). The bank reads each candidate's storage by its second-order face
 /// `A(x) = Σ_m p_m² (|W⁺_m|² + |W⁻_m|²)`; the station's face is the lock's exchange face over the
 /// candidates, `θ_x = A(x)/Σ_y A(y)`, compared with the target class: the loss
 /// `ℓ = log(θ_t)⁻¹ = log Σ_y A(y) − log A(t)` (nats), its covector on each reading
@@ -1916,12 +2068,20 @@ pub fn stage_bank(
         images.rotation(&(&lift - BigInt::from((phase + 1 + station) % period)))
     };
     let placed = locked.iter().filter(|&&lock| lock).count() as u64;
-    let weight = PopulationChart::of(field).value(placed + 1);
+    // The passage's one population (module header, "The section continues the request's
+    // passage"): the request's cells, the locked stations and the candidate.
+    let weight = PopulationChart::of(field).value(moment.population(ring)? + placed + 1);
     // The shared placements: the request's phases and the locked stations, by phase.
     let mut common: Vec<(usize, Vec<Rat>)> = Vec::new();
     for c in 0..period {
-        let mut feature = if moment.phase_counts(ring, c)?.iter().any(|&n| n != 0) {
-            Some(moment.normalized_counts(field, ring, c)?)
+        let counts = moment.phase_counts(ring, c)?;
+        let mut feature = if counts.iter().any(|&n| n != 0) {
+            Some(
+                counts
+                    .iter()
+                    .map(|&count| Rat::from_integer(BigInt::from(count)) * &weight)
+                    .collect::<Vec<_>>(),
+            )
         } else {
             None
         };
@@ -2064,7 +2224,8 @@ pub fn stage_bank(
 
 /// [definition; agent-inferred, September 29] **The bank's reach over a batch** (module header, "The
 /// bank's learning path"; `hnn::constitution::BankReach`): the bank's returns at the source port,
-/// one per shared phase of each request (its feature the phase's normalized counts, its covector the
+/// one per shared phase of each request (its feature the phase's counts over the passage's
+/// population, its covector the
 /// shared gradient carried back through the phase's rotation) and one per class over the batch (its
 /// feature `e_x` at the weight `Σ ν²` over every candidate placement, its covector their
 /// `ν`-weighted sum over that weight: the same unit step, alignment and metric as one return a
