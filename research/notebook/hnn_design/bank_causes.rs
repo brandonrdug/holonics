@@ -2275,6 +2275,12 @@ fn main() {
         // Exact bank readings of given storages (`exact-turns <in> <out>`): each input line an id
         // and the receiving ring's storage (realified, node order) as rationals.
         Some("exact-turns") => exact_turns(&arguments[2], &arguments[3]),
+        // Stage 0 of the executed comparison's loop (`native-release <export> <count> <out>`).
+        Some("native-release") => native_release(
+            &arguments[2],
+            arguments[3].parse().expect("count"),
+            &arguments[4],
+        ),
         Some("dump-learn") => dump_learn(
             arguments[2].parse().expect("seed"),
             arguments[3].parse().expect("deposits"),
@@ -2402,6 +2408,245 @@ fn dump_learn(seed: u64, deposits: usize, out: &str) {
     std::fs::write(out, s).expect("write the dump");
 }
 
+
+/// Parse an exported `E` (`E rows cols`, then its realified rows of rationals) and the pairs
+/// (`pair i <request> <target> float <section> <released>`) with the teacher-forced float tops.
+fn read_export(input: &str) -> (Vec<Vec<Rat>>, Vec<(Vec<usize>, Vec<usize>, Vec<i64>)>, Vec<usize>) {
+    #[allow(clippy::disallowed_methods)]
+    let text = std::fs::read_to_string(input).expect("read the export");
+    let mut lines = text.lines();
+    let head: Vec<usize> = lines
+        .next()
+        .expect("E")
+        .split_whitespace()
+        .skip(1)
+        .map(|x| x.parse().expect("a shape"))
+        .collect();
+    let rows: Vec<Vec<Rat>> = (0..head[0])
+        .map(|_| {
+            lines
+                .next()
+                .expect("a row")
+                .split_whitespace()
+                .map(|x| x.parse::<Rat>().expect("a rational"))
+                .collect()
+        })
+        .collect();
+    let list = |s: &str| -> Vec<usize> { s.split(',').map(|x| x.parse().expect("a class")).collect() };
+    let mut pairs = Vec::new();
+    let mut causal = Vec::new();
+    for line in lines {
+        let parts: Vec<&str> = line.split_whitespace().collect();
+        match parts.first() {
+            Some(&"pair") => pairs.push((
+                list(parts[2]),
+                list(parts[3]),
+                parts[5].split(',').map(|x| x.parse().expect("a class")).collect(),
+            )),
+            Some(&"causal") => causal = list(parts[1]),
+            _ => {}
+        }
+    }
+    (rows, pairs, causal)
+}
+
+/// **Stage 0 of the executed comparison's loop** (the diagnosis record's falsifier 1; exterior
+/// harness): an exported `E` rounded to the source port's lattice (nearest, ties upward), read by
+/// the native owner: `generate_by_bank` from the fully open section on every exported request (the
+/// complete trace), every candidate of every refinement it ran checked against the crossing's
+/// signed-form admission `p|z| ≤ 5/2` (the bank's `2C + hD + (h²/2)K_t ⪰ 0` at `C = I`, `D = 0`,
+/// `h = 1`, `K_t = I − 2pR(c)`), and the teacher-forced decisions (stations before `j` placed at
+/// their truth) read exactly.
+fn native_release(input: &str, count: usize, out: &str) {
+    use holonics::hnn::constitution::Locus;
+    use holonics::hnn::prediction::BankPlacement;
+    use holonics::hnn::ring::turn;
+    use rayon::prelude::*;
+    use std::fmt::Write as _;
+    let declared = order_declared(false);
+    let engine = Engine::new(declared);
+    let (rows, pairs, causal) = read_export(input);
+    let lattice = engine
+        .theta
+        .lattice(Locus::SourcePort(0))
+        .expect("the source port's lattice");
+    let mut moved = Rat::zero();
+    let mut largest = Rat::zero();
+    let rounded: Vec<Vec<Rat>> = rows
+        .iter()
+        .map(|row| {
+            row.iter()
+                .map(|x| {
+                    let (q, r) = lattice.div_rem(x);
+                    moved = moved.clone().max(r.abs());
+                    let value = Rat::from_integer(q) * lattice.unit();
+                    largest = largest.clone().max(value.abs());
+                    value
+                })
+                .collect()
+        })
+        .collect();
+    let port = ExactRatMatrix::new(rounded).expect("E");
+    let theta = engine
+        .theta
+        .clone()
+        .with_ports(0, None, Some(port), None)
+        .expect("the fitted E at the source port");
+    let bank = bank_of(declared.period, &bank_strength());
+    let p = bank_strength();
+    let admissible = |storage: &[Rat]| -> (bool, Rat) {
+        // p²|z|² ≤ (5/2)² at every node.
+        let bound = rat(25, 4) / (&p * &p);
+        let widest = storage
+            .chunks(2)
+            .map(|z| &z[0] * &z[0] + &z[1] * &z[1])
+            .max()
+            .unwrap_or_else(Rat::zero);
+        (widest <= bound, widest)
+    };
+    println!(
+        "native-release: E on the source port's lattice 2^(-{}), the rounding's largest move {moved}; E's largest |entry| {largest} (the entry bound 8)",
+        lattice.exponent()
+    );
+    let (field, refinement, stations) = (&engine.field, &engine.refinement, declared.stations);
+    let chosen = &pairs[..count.min(pairs.len())];
+    let clock = Instant::now();
+    let results: Vec<String> = chosen
+        .par_iter()
+        .enumerate()
+        .map(|(index, (request, target, float))| {
+            let (current, moment) = ingest(field, request);
+            let placement = BankPlacement::of(field, &theta, &current, &moment, refinement)
+                .expect("the placement");
+            let mut s = String::new();
+            let generated =
+                generate_by_bank(field, &theta, &current, &moment, refinement, &bank, BANK_GRAIN);
+            // The candidates each refinement read, from the locks' order.
+            let mut placed = vec![None; stations];
+            let (mut candidates, mut refused, mut widest) = (0u64, 0u64, Rat::zero());
+            let mut check = |placed: &[Option<usize>]| {
+                for station in (0..stations).filter(|&j| placed[j].is_none()) {
+                    for class in 0..declared.alphabet {
+                        let mut cells = placed.to_vec();
+                        cells[station] = Some(class);
+                        let (ok, w) = admissible(&placement.storage(&cells));
+                        candidates += 1;
+                        refused += u64::from(!ok);
+                        widest = widest.clone().max(w);
+                    }
+                }
+            };
+            match &generated {
+                Ok(generation) => {
+                    for lock in &generation.locks {
+                        check(&placed);
+                        for &station in lock {
+                            placed[station] = Some(generation.release.classes[station]);
+                        }
+                    }
+                    if generation.locks.len() < generation.refinements {
+                        check(&placed);
+                    }
+                    let classes = &generation.release.classes;
+                    let right = classes.iter().zip(target).filter(|(a, b)| a == b).count();
+                    let agrees = classes
+                        .iter()
+                        .zip(float)
+                        .filter(|(a, b)| **a as i64 == **b)
+                        .count();
+                    writeln!(
+                        s,
+                        "request {index}: target {target:?}; native {} {classes:?} (right {right}, the float release {float:?} agrees at {agrees}); refinements {}, readings {}, locks {:?}; members certified {} of {}, ticks closed {} of {}",
+                        if generation.release.released() { "released" } else { "held" },
+                        generation.refinements,
+                        generation.readings,
+                        generation.locks,
+                        generation.certified,
+                        generation.members,
+                        generation.ticks_closed,
+                        generation.ticks
+                    )
+                    .unwrap();
+                    for (station, class, growth, runner) in &generation.decisions {
+                        writeln!(
+                            s,
+                            "  lock station {station} class {class}: joint [{}, {}], runner-up [{}, {}]",
+                            growth.lower, growth.upper, runner.lower, runner.upper
+                        )
+                        .unwrap();
+                    }
+                }
+                Err(error) => {
+                    check(&placed);
+                    writeln!(s, "request {index}: target {target:?}; native REFUSED: {error}")
+                        .unwrap();
+                }
+            }
+            writeln!(
+                s,
+                "  admission: {candidates} candidates read, {refused} past the signed form; largest |z|² {widest}"
+            )
+            .unwrap();
+            // Teacher-forced decisions: stations before j placed at their truth.
+            let mut decided = [0u64; 5];
+            let mut tf_refused = 0u64;
+            for station in 0..stations {
+                let reads: Vec<Result<holonics::hnn::ring::TurnReading, _>> = (0..declared.alphabet)
+                    .map(|class| {
+                        let mut cells: Vec<Option<usize>> = vec![None; stations];
+                        for (k, cell) in cells.iter_mut().enumerate().take(station) {
+                            *cell = Some(target[k]);
+                        }
+                        cells[station] = Some(class);
+                        bank.read_turn(&turn(&placement.storage(&cells)), BANK_GRAIN)
+                    })
+                    .collect();
+                if reads.iter().any(Result::is_err) {
+                    tf_refused += 1;
+                    continue;
+                }
+                let reads: Vec<_> = reads.into_iter().map(Result::unwrap).collect();
+                let top = (0..declared.alphabet)
+                    .max_by(|&a, &b| reads[a].joint.lower.cmp(&reads[b].joint.lower).then(b.cmp(&a)))
+                    .expect("a class");
+                let flips = (0..declared.alphabet)
+                    .filter(|&c| c != top)
+                    .all(|c| reads[top].joint.exceeds(&reads[c].joint));
+                let slot = if !flips {
+                    2
+                } else if !reads[top].joint.is_locked() {
+                    3
+                } else if top == target[station] {
+                    0
+                } else {
+                    1
+                };
+                decided[slot] += 1;
+                decided[4] += u64::from(top == target[station]);
+                let _ = causal.get(index * stations + station);
+            }
+            writeln!(
+                s,
+                "  teacher-forced: flips to the target {}, to another class {}, undecided {}, top not past one {}, refused {}; exact top = target {}",
+                decided[0], decided[1], decided[2], decided[3], tf_refused, decided[4]
+            )
+            .unwrap();
+            s
+        })
+        .collect();
+    let mut all = String::new();
+    for r in &results {
+        all.push_str(r);
+    }
+    #[allow(clippy::disallowed_methods)]
+    std::fs::write(out, &all).expect("write the trace");
+    println!(
+        "native-release: {} requests in {} ms; resident {}",
+        chosen.len(),
+        clock.elapsed().as_millis(),
+        resident()
+    );
+}
 
 /// Exact bank readings (the declared order-2 bank at `p = 5/8`, grain `2^(−16)`) of storages read
 /// from a file: every member's growth enclosure, one output line per input line.
