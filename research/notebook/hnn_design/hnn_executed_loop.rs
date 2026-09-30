@@ -22,9 +22,10 @@
 //!
 //! - **`executed train`, `executed evaluate`** (Stage 2, the
 //!   [pin](../../records/2026-09-30_THE_EXECUTED_COMPARISONS_BOUNDED_TEST_PINNED_BEFORE_ITS_RUNS.md)):
-//!   one arm (`executed` or `face` × `open` or `partition`) trained from the declared opening by the
-//!   one ladder, its `E` written; every constitution's confirmation from the open section, its counts
-//!   and every section.
+//!   one arm (the executed comparison, `executed-open` or `executed-partition`) trained from the
+//!   declared opening by the one ladder, its `E` written; every constitution's confirmation from the
+//!   open section, its counts and every section. (Stage 2's `face` arm, the bank's face as the
+//!   comparison, was retired on September 30 with batch N2; its source is at `7ca300bb`.)
 //! - **`executed spread`** (a diagnostic after Stage 2, never a pinned run): at the open section, the
 //!   target's and the termination's ranks among each station's candidates, the station terms and the
 //!   readings' spread.
@@ -268,7 +269,7 @@ pub(super) fn split_line(split: &SlopeSplit) -> String {
 pub(super) fn slopes(terrain: &str, seed: u64, count: usize, arms: &[String]) {
     use holonics::hnn::executed::modulus_slopes;
     let clock = Instant::now();
-    let declared = order_declared(false);
+    let declared = order_declared();
     let engine = Engine::new(declared);
     let bank = bank_of(declared.period, &bank_strength());
     let ring = engine.refinement.ring();
@@ -334,7 +335,7 @@ pub(super) fn founded_opening(engine: &Engine) -> Constitution {
 const STAGE_TWO_MASK_SEED: u64 = 2_026_093_004;
 
 /// **Stage 2: one arm's training** (`executed train <arm> <terrain> <seed> <batch> <moves>
-/// <deadline ms> <out>`). The arm is the declared comparison (`executed` or `face`) crossed with the
+/// <deadline ms> <out>`). The arm is the executed comparison (`executed`) crossed with the
 /// contexts (`open`: the machine's own trajectory; `partition`: the readout's partitions at
 /// [`STAGE_TWO_MASK_SEED`]). Every arm starts from the declared opening, reads the same requests in
 /// the same batches, and moves by the one certified step's ladder; the moves are the work bound,
@@ -351,10 +352,9 @@ pub(super) fn train(
     deadline: u128,
     out: &str,
 ) {
-    use holonics::hnn::executed::face_move;
     use holonics::hnn::prediction::mask;
     let clock = Instant::now();
-    let declared = order_declared(false);
+    let declared = order_declared();
     let engine = Engine::new(declared);
     let bank = bank_of(declared.period, &bank_strength());
     // An arm may carry its opening's transport modulus (`executed-open@ρ`, a development read).
@@ -363,7 +363,8 @@ pub(super) fn train(
         None => (arm, None),
     };
     let (comparison, contexts) =
-        arm_name.split_once('-').expect("an arm: executed|face - open|partition");
+        arm_name.split_once('-').expect("an arm: executed-open | executed-partition");
+    assert_eq!(comparison, "executed", "the comparison: executed");
     let pairs = terrain_pairs(terrain, &declared, seed, batch * moves);
     let mut masks = Draw::new(STAGE_TWO_MASK_SEED);
     let requests: Vec<Request> = pairs
@@ -409,12 +410,8 @@ pub(super) fn train(
             break;
         }
         let started = Instant::now();
-        let moved = match comparison {
-            "executed" => executed_move(&engine.field, &theta, chunk, &engine.refinement, &bank, BANK_GRAIN),
-            "face" => face_move(&engine.field, &theta, chunk, &engine.refinement, &bank, BANK_GRAIN),
-            _ => panic!("a comparison: executed | face"),
-        }
-        .expect("the move");
+        let moved = executed_move(&engine.field, &theta, chunk, &engine.refinement, &bank, BANK_GRAIN)
+            .expect("the move");
         readings += moved.before.readings;
         // The two slopes the move reads (a diagnostic added after the station-framed placement's
         // pinned runs): the port's unit move's first order, and the modulus's `γ_ρ` (its sign
@@ -523,7 +520,7 @@ pub(super) fn evaluate(terrain: &str, seed: u64, count: usize, out: &str, arms: 
     use rayon::prelude::*;
     use std::fmt::Write as _;
     let clock = Instant::now();
-    let declared = order_declared(false);
+    let declared = order_declared();
     let engine = Engine::new(declared);
     let bank = bank_of(declared.period, &bank_strength());
     let ring = engine.refinement.ring();
@@ -536,6 +533,9 @@ pub(super) fn evaluate(terrain: &str, seed: u64, count: usize, out: &str, arms: 
             (_, true) => founded_opening(&engine),
             (_, false) => trained(&engine.theta, ring, path),
         };
+        // The constitution's own clock: its requests' generation (run in parallel on the host's
+        // cores) and their tally, read before the listing is written.
+        let started = Instant::now();
         let generated: Vec<_> = pairs
             .par_iter()
             .map(|(request, _)| {
@@ -551,7 +551,6 @@ pub(super) fn evaluate(terrain: &str, seed: u64, count: usize, out: &str, arms: 
                 )
             })
             .collect();
-        let started = Instant::now();
         let (mut released, mut held, mut whole, mut incorrect, mut terminated) = (0, 0, 0, 0, 0);
         let (mut refused, mut uncertified) = (0, 0);
         let mut by_station = vec![0usize; declared.stations];
@@ -634,7 +633,7 @@ pub(super) fn evaluate(terrain: &str, seed: u64, count: usize, out: &str, arms: 
 /// `ln(a_top/a_bottom)`, each summed at the grain `2^(−8)`.
 pub(super) fn spread(terrain: &str, seed: u64, count: usize, arms: &[String]) {
     use rayon::prelude::*;
-    let declared = order_declared(false);
+    let declared = order_declared();
     let engine = Engine::new(declared);
     let bank = bank_of(declared.period, &bank_strength());
     let ring = engine.refinement.ring();
@@ -721,7 +720,7 @@ pub(super) fn order_batch(
     seed: u64,
     count: usize,
 ) -> (Engine, ReceivingBank, Vec<Request>, Vec<Vec<usize>>) {
-    let declared = order_declared(false);
+    let declared = order_declared();
     let engine = Engine::new(declared);
     let bank = bank_of(declared.period, &bank_strength());
     let pairs = order_pairs(&declared, seed, count);
@@ -1845,7 +1844,7 @@ pub(super) fn counts(
 ) {
     use std::fmt::Write as _;
     let clock = Instant::now();
-    let declared = order_declared(false);
+    let declared = order_declared();
     let stations = declared.stations;
     let pairs = terrain_pairs(terrain, &declared, seed, count);
     let validation = terrain_pairs(terrain, &declared, validation_seed, validation_count);
