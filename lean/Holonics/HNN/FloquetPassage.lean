@@ -23,10 +23,13 @@ executed law's own second-order identity is owed in #62.
 2. **The passage's expansion in the pump.** [proved-derived; formal-checked] The kicked tick is the
    polynomial `C(Rot_v) + X·C(Rot_v R_u)` with matrix coefficients (`kick`); one crossing more
    composes the passage's coefficients as `c₀′ = Rot_v c₀`, `c₁′ = Rot_v c₁ + Rot_v R_u c₀`,
-   `c₂′ = Rot_v c₂ + Rot_v R_u c₁` (`kick_coeff_zero`, `kick_coeff_one`, `kick_coeff_two`). So the
-   second order is the sum over ordered pairs of crossings `s < t`, each the transported pair of
-   (1): `Rot_v^(N−t) R_(u_t) Rot_v^(t−s) R_(u_s) Rot_v^s = Rot(v^N w_t w̄_s)`, `w_t = u_t v̄^(2t)`,
-   the carriers read at the ring's parametric resonance (the doubled transport).
+   `c₂′ = Rot_v c₂ + Rot_v R_u c₁` (`kick_coeff_zero`, `kick_coeff_one`, `kick_coeff_two`). Over
+   the whole passage (`passage`): `c₀ = Rot(v^n)`, `c₁ = Σ_t R(v^(n−t) u_t v̄^t)`, and the second order
+   is the sum over ordered pairs of crossings `s < t`, each the transported pair of (1),
+   `c₂ = Σ_(t<n) Σ_(s<t) Rot(v^(n−t) v̄^(t−s) v^s u_t ū_s)` (`passage_coeff_zero`,
+   `passage_coeff_one`, `passage_coeff_two`). For a unit transport the pair's turn is
+   `v^n (u_t v̄^(2t)) conj(u_s v̄^(2s))`: the carriers read at the ring's parametric resonance (the
+   doubled transport).
 3. **At a whole turn the second order's trace is the passage's power spectrum.**
    [proved-derived; formal-checked] `2 Re Σ_t w_t conj(Σ_(s<t) w_s) = |Σ_t w_t|² − Σ_t |w_t|²`
    (`pair_sum_power_spectrum`): every crossing read against everything that crossed before it, the
@@ -134,6 +137,96 @@ theorem kick_coeff_two (v u : ℂ) (P : (Matrix (Fin 2) (Fin 2) ℝ)[X]) :
   rw [coeff_mul, Finset.Nat.sum_antidiagonal_eq_sum_range_succ_mk]
   simp [Finset.sum_range_succ, kick_coeff]
 
+/-- A turn at a carrier, `Rot z`. -/
+abbrev Rot (z : ℂ) : Matrix (Fin 2) (Fin 2) ℝ := rotation z.re z.im
+
+/-- A reflection at a carrier, `R_z`. -/
+abbrev Ref (z : ℂ) : Matrix (Fin 2) (Fin 2) ℝ := reflection z.re z.im
+
+theorem rot_mul_rot (a b : ℂ) : Rot a * Rot b = Rot (a * b) := by
+  ext i j
+  fin_cases i <;> fin_cases j <;>
+    simp [rotation, Matrix.mul_apply, Fin.sum_univ_two, Complex.mul_re, Complex.mul_im] <;> ring
+
+theorem rot_mul_ref (a u : ℂ) : Rot a * Ref u = Ref (a * u) := by
+  ext i j
+  fin_cases i <;> fin_cases j <;>
+    simp [rotation, reflection, Matrix.mul_apply, Fin.sum_univ_two, Complex.mul_re,
+      Complex.mul_im] <;> ring
+
+theorem ref_mul_rot (u b : ℂ) : Ref u * Rot b = Ref (u * star b) := by
+  ext i j
+  fin_cases i <;> fin_cases j <;>
+    simp [rotation, reflection, Matrix.mul_apply, Fin.sum_univ_two, Complex.mul_re,
+      Complex.mul_im]
+  ring
+
+theorem ref_mul_ref (u w : ℂ) : Ref u * Ref w = Rot (u * star w) := by
+  ext i j
+  fin_cases i <;> fin_cases j <;>
+    simp [rotation, reflection, Matrix.mul_apply, Fin.sum_univ_two, Complex.mul_re,
+      Complex.mul_im] <;> ring
+
+/-- [definition] **The passage's monodromy as a polynomial in the pump**: `M_0 = 1`,
+`M_(n+1) = kick(v, u_n) · M_n`, the crossings in their own order. -/
+def passage (v : ℂ) (u : ℕ → ℂ) : ℕ → (Matrix (Fin 2) (Fin 2) ℝ)[X]
+  | 0 => 1
+  | n + 1 => kick v (u n) * passage v u n
+
+theorem passage_coeff_zero (v : ℂ) (u : ℕ → ℂ) (n : ℕ) :
+    (passage v u n).coeff 0 = Rot (v ^ n) := by
+  induction n with
+  | zero => simp [passage, rotation, Matrix.one_fin_two]
+  | succ n ih => rw [passage, kick_coeff_zero, ih, rot_mul_rot, pow_succ, mul_comm]
+
+/-- [proved-derived; formal-checked] **The first order**: every crossing's reflection carried by the
+transport after it and before it, `Σ_t R(v^(n−t) u_t v̄^t)`. -/
+theorem passage_coeff_one (v : ℂ) (u : ℕ → ℂ) (n : ℕ) :
+    (passage v u n).coeff 1 =
+      ∑ t ∈ Finset.range n, Ref (v ^ (n - t) * u t * star v ^ t) := by
+  induction n with
+  | zero => simp [passage, Polynomial.coeff_one]
+  | succ n ih =>
+    rw [passage, kick_coeff_one, ih, passage_coeff_zero, Finset.mul_sum, Finset.sum_range_succ]
+    change ∑ t ∈ Finset.range n, Rot v * Ref (v ^ (n - t) * u t * star v ^ t) +
+        Rot v * Ref (u n) * Rot (v ^ n) = _
+    congr 1
+    · refine Finset.sum_congr rfl fun t ht => ?_
+      have ht : t < n := Finset.mem_range.mp ht
+      rw [rot_mul_ref, Nat.succ_sub (le_of_lt ht), pow_succ]
+      ring_nf
+    · rw [mul_assoc, ref_mul_rot, rot_mul_ref, Nat.add_sub_cancel_left, pow_one, star_pow]
+      ring_nf
+
+/-- [proved-derived; formal-checked] **The passage's second order**: the sum over ordered pairs of
+crossings `s < t`, each the transported pair `Rot(v^(n−t) v̄^(t−s) v^s u_t ū_s)`: the pair's relative
+phase `u_t ū_s` turned by the transport after, between and before them. For a unit transport
+(`v̄ = v⁻¹`) the pair's turn is `v^n (u_t v̄^(2t)) conj(u_s v̄^(2s))`: the carriers read at the
+ring's parametric resonance, whose power spectrum `pair_sum_power_spectrum` reads at a whole turn. -/
+theorem passage_coeff_two (v : ℂ) (u : ℕ → ℂ) (n : ℕ) :
+    (passage v u n).coeff 2 =
+      ∑ t ∈ Finset.range n, ∑ s ∈ Finset.range t,
+        Rot (v ^ (n - t) * star v ^ (t - s) * v ^ s * u t * star (u s)) := by
+  induction n with
+  | zero => simp [passage, Polynomial.coeff_one]
+  | succ n ih =>
+    rw [passage, kick_coeff_two, ih, passage_coeff_one, Finset.mul_sum, Finset.mul_sum,
+      Finset.sum_range_succ]
+    change ∑ t ∈ Finset.range n, Rot v * ∑ s ∈ Finset.range t,
+          Rot (v ^ (n - t) * star v ^ (t - s) * v ^ s * u t * star (u s)) +
+        ∑ s ∈ Finset.range n, Rot v * Ref (u n) * Ref (v ^ (n - s) * u s * star v ^ s) = _
+    congr 1
+    · refine Finset.sum_congr rfl fun t ht => ?_
+      have ht : t < n := Finset.mem_range.mp ht
+      rw [Finset.mul_sum]
+      refine Finset.sum_congr rfl fun s _ => ?_
+      rw [rot_mul_rot, Nat.succ_sub (le_of_lt ht), pow_succ]
+      ring_nf
+    · refine Finset.sum_congr rfl fun s _ => ?_
+      rw [mul_assoc, ref_mul_ref, rot_mul_rot, Nat.add_sub_cancel_left, pow_one]
+      simp only [star_mul', star_pow, star_star]
+      ring_nf
+
 end Expansion
 
 /-! ## 3. At a whole turn the second order's trace is the power spectrum -/
@@ -174,6 +267,13 @@ section Audit
 #print axioms kick_coeff_zero
 #print axioms kick_coeff_one
 #print axioms kick_coeff_two
+#print axioms rot_mul_rot
+#print axioms rot_mul_ref
+#print axioms ref_mul_rot
+#print axioms ref_mul_ref
+#print axioms passage_coeff_zero
+#print axioms passage_coeff_one
+#print axioms passage_coeff_two
 #print axioms pair_sum_power_spectrum
 
 end Audit

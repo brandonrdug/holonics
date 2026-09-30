@@ -216,11 +216,11 @@
 //! - **What the growth reads.** In the kicked chart two crossings separated by the ring's transport
 //!   compose to the turn by their relative phase less the transport (Lean
 //!   `reflection_transport_reflection_carriers`), and one crossing more pairs the new crossing with
-//!   every earlier one (`kick_coeff_two`): the monodromy's second order is the sum over ordered pairs
-//!   of the passage's relative phases read at the ring's parametric resonance, and at a whole turn
-//!   its trace is the passage's power spectrum there (`pair_sum_power_spectrum`). The square law is
-//!   the pump's; the bifurcation is the threshold. The executed law's own second order is owed
-//!   (#62).
+//!   every earlier one (`kick_coeff_two`): over the whole passage the monodromy's second order is
+//!   `Σ_(t<n) Σ_(s<t) Rot(v^(n−t) v̄^(t−s) v^s u_t ū_s)` (`passage_coeff_two`), the passage's relative
+//!   phases read at the ring's parametric resonance, and at a whole turn its trace is the passage's
+//!   power spectrum there (`pair_sum_power_spectrum`). The square law is the pump's; the bifurcation
+//!   is the threshold. The executed law's own second order is owed (#62).
 //! - **The bank's members.** The declared bank's member `j` (axis `1`, step `i^j`) reads the passage
 //!   modulated by `i^(jt)`: its frequency shifted by `j` quarter turns. A member reads a turn only
 //!   when its pump's period divides the turn, so the turn is a cycle of its clock and the product
@@ -267,7 +267,7 @@
 //! | `HNN/Floquet.{inphase_growing, inphase_squeezed, inphase_growing_coordinate, quadrature_turns, cayley_eigen, cayley_tick_eigen}` | [`lock`], [`LockedSheets`] |
 //! | `HNN/Floquet.{reflection_sq, reflection_mul_reflection, reflection_pair_trace, reflection_pair_trace_carriers, relativePairing_halfTurn, no_linear_threshold_reads_relative_phase}` | [`PumpSchedule::modulated`], [`ReceivingBank::read`], [`BankReading::class`] |
 //! | `Objects/ParametronLock` (the lock's exchange polynomial, capacity as lock count, the winding as the carry, coupled locks, modal hearing) | the guide's §5; no Rust consumer beyond the bank's lock pattern |
-//! | `HNN/FloquetPassage.{reflection_mul_rotation, rotation_mul_reflection, reflection_transport_reflection, reflection_transport_reflection_carriers, rotation_trace_carrier, kick_coeff_zero, kick_coeff_one, kick_coeff_two, pair_sum_power_spectrum}` (the passage's monodromy at second order, the kicked chart) | [`PumpSchedule::placed`], [`ReceivingBank::read_turn`], [`turn`] |
+//! | `HNN/FloquetPassage.{reflection_mul_rotation, rotation_mul_reflection, reflection_transport_reflection, reflection_transport_reflection_carriers, rotation_trace_carrier, kick_coeff_zero, kick_coeff_one, kick_coeff_two, passage_coeff_zero, passage_coeff_one, passage_coeff_two, pair_sum_power_spectrum}` (the passage's monodromy at second order, the kicked chart) | [`PumpSchedule::placed`], [`ReceivingBank::read_turn`], [`turn`] |
 //! | `Objects/ParametronLock.lockFace_logistic` (`θ = a/(a + K) > ½ ⇔ a > K`) | [`Growth::exceeds`] (the lock's flip on exact enclosures), `hnn::prediction::generate_by_bank` |
 
 use num_bigint::{BigInt, BigUint};
