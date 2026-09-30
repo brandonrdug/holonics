@@ -193,6 +193,12 @@ against which the machine's own surprise curve is read.
 confirmation, with the transport founded off one; the trained constitution copies the lag-1
 neighbour).
 `n*_machine` exceeds 1,024 readings, against a family whose count can pin the key in 7.
+[measured, the [two counts](2026-09-30_THE_TWO_COUNTS_MEASURED_THE_TERRAIN_PINS_ORDER_TWO_IN_SEVEN_READINGS_AND_THE_CERTIFIED_STEP_DESCENDS_TOWARD_TIES_WHILE_ITS_DECISIONS_STAY_AT_A_GUESS.md)]
+On the machine's own training passage the survivors reach order-2's key at exactly 7
+observations. `clog₄ 10240 = 7` bounds the readings that separate every pair of keys, not those
+that isolate one key along one passage: a development passage isolated it in 6. The line's global
+family keeps the aliases `(4k, id)` and does not empty, and the alternation keeps its even-lag class
+`(2k, id)`. These are classes that never collapse, as §1 states.
 
 [interpretation; the experiment named] **The mechanism, in the September 25 record's terms: the
 machine hears and does not listen.** The comparison's covector reaches the locus (heard). The

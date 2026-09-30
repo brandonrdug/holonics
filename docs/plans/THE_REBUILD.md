@@ -522,7 +522,12 @@ that fires becomes the next loop's subject, and nothing downstream starts.
   alternation and the line (`hnn_prediction -- executed`, over `hnn::executed`; declared request
   `n = 40` cells drawn from `ℤ/4`, `m = 8` stations, alphabet 5 with the termination, ring period
   `60`).
-  - *Loop 1a, the two counts (now; measurement only, no law change). Its pin record fixes:*
+  - *Loop 1a, the two counts: done* (merge `36c3c805`; [receipt](../../research/records/2026-09-30_THE_TWO_COUNTS_MEASURED_THE_TERRAIN_PINS_ORDER_TWO_IN_SEVEN_READINGS_AND_THE_CERTIFIED_STEP_DESCENDS_TOWARD_TIES_WHILE_ITS_DECISIONS_STAY_AT_A_GUESS.md)). It motivates 1b's subject:
+    the executed comparison's composition `F = Σ(f)₊` is zero on ties and holds no margin on a
+    right decision. Its certified descent shrinks every contrast toward ties while the decisions
+    stay at a guess, and it is read far past threshold, where every wrong decision is already
+    locked. Not the step's size, the derivative, feasibility, the grain or saturation. *Its pin
+    record fixed:*
     - **The declared reference family.** "Lag `ℓ ∈ [1, 40]`, map `f` of `ℤ/4`", `40 · 4⁴ = 10240 =
       2¹¹·5` keys under the uniform prior. It is a declared reference, not the machine's hypothesis
       class and not a learning optimum.
@@ -584,7 +589,12 @@ that fires becomes the next loop's subject, and nothing downstream starts.
       come from conservative certificates, the grain, feasibility, a wrong derivative, adaptable
       operands left out, or an unsuitable objective. Both, neither or another outcome is kept as it
       is.
-  - *Loop 1b, a candidate law, pinned only after 1a's receipt.* 1a's measurement motivates a
+  - *Loop 1b, a candidate law, pinned only after 1a's receipt (now: its pin, reviewed by Astra
+    before any run).* The subject 1a names: a comparison whose descent must move decisions, one
+    that holds a margin on right decisions, is not minimized on ties, and is read where a reading
+    carries information about the key. The governing law "loss is the log of a ratio" is the
+    candidate's first reference. The adaptable operands left out (the bank's members, the pumps)
+    and the release's order stay attached. 1a's measurement motivates a
     candidate. It does not by itself select one (for example, key location by loop closure through
     `hnn::keys`, or reading near resonance). The candidate comes with its independence tests.
     Acceptance: on the final confirmation, order-2 releases strictly more whole sections than both
@@ -624,6 +634,30 @@ that fires becomes the next loop's subject, and nothing downstream starts.
 - **Alongside, on disjoint owners.** Codex takes a bounded normalized Farey count-receiver identity
   and its explicit join to `Foundation/Unicity`. The analytic Franel–Landau estimate and the
   actual-current cancellation stay open obligations (#62). Codex's isolated RH work continues.
+
+- **The two counts, September 30: the terrain pins order-2 in seven readings, and the certified
+  step descends toward ties while its decisions stay at a guess**
+  ([pin](../../research/records/2026-09-30_THE_TWO_COUNTS_PINNED_BEFORE_ITS_RUNS.md), `fb52c27a`;
+  [receipt](../../research/records/2026-09-30_THE_TWO_COUNTS_MEASURED_THE_TERRAIN_PINS_ORDER_TWO_IN_SEVEN_READINGS_AND_THE_CERTIFIED_STEP_DESCENDS_TOWARD_TIES_WHILE_ITS_DECISIONS_STAY_AT_A_GUESS.md); Refs #73 #148 #63).
+  - *`n*_terrain`* (the declared lag-map family on the machine's own training passage, exact):
+    order-2 has one key at 7 observations. The alternation keeps its even-lag class `(2k, id)` at
+    33. The line's global family keeps `(4k, id)` at 20 and does not empty. The hierarchical family
+    never reaches unicity: every lag survives, and a fresh request has no unique continuation there.
+  - *`n*_machine`*: on order-2, above 128 training requests (1,024 observations), with 0 whole
+    sections of 64 at both openings and all five checkpoints and stations right between 98 and 135
+    of 512 (a guess reads 128). On the alternation and the line, above 64 requests as far as read
+    (m8). Their m16 validation reads passed the deadline and were stopped by the guard: incomplete,
+    not rerun.
+  - *D1:* the certified step descends `F` on all 48 moves, with the sign agreeing with the prediction
+    and no bound active. The first order over-predicts, because lock orders change.
+  - *D2:* every wrong decision is confident, already locked and eligible. `F`'s support is almost
+    all wrong decisions (3,512 of 3,528 terms on order-2). A right decision leaves `F`, and nothing
+    holds its margin. The derivatives are not saturated.
+  - *Built*: `executed counts`, D1 and D2 with checkpoints in `executed train`, and the constant /
+    nonconstant strata in `executed evaluate`. `hnn::executed` gains receipt-only fields (`TermSite`,
+    `FirstOrderReading`), held by `the_moves_receipts_read_its_certificate`. No law changed. The
+    replay reference was regenerated on this tip after its diff was confirmed to be only the new
+    strata and a per-constitution timing, now masked.
 
 - **Consolidation, September 30: batch C's inventory** (a read-only audit at `819c58f5`, with grep
   evidence for every consumer; Refs #63 #73). Step 1 runs `hnn_prediction … executed` over

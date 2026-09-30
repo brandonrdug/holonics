@@ -52,9 +52,11 @@ elif (( status != 0 )); then
 fi
 
 # The harness's last stdout line is `executed evaluate: <ms> ms; resident <now> now, <peak> peak`
-# (or `resident unread`); only those numbers are masked.
+# (or `resident unread`), and since step 1a each constitution's summary line ends in its own wall
+# time `; <ms> ms`; only those numbers are masked.
 {
   sed -E \
+    -e 's/(first lock right [0-9]+); [0-9]+ ms$/\1; <ms> ms/' \
     -e 's/^executed evaluate: [0-9]+ ms; resident [0-9]+ now, [0-9]+ peak$/executed evaluate: <ms> ms; resident <now> now, <peak> peak/' \
     -e 's/^executed evaluate: [0-9]+ ms; resident unread$/executed evaluate: <ms> ms; resident <now> now, <peak> peak/' \
     "$out/stdout.txt"
