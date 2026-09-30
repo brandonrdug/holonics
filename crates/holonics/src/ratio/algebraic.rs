@@ -224,6 +224,12 @@ pub fn log2_enclosure(value: &Rat) -> Result<ExactInterval, ExactValueError> {
     ExactInterval::new(lower, upper)?.round_out(LOG_OCTAVES)
 }
 
+/// **`ln` of a positive rational, enclosed** at the declared series terms, held on the declared
+/// grid; a point at one. Refused at a value that is not positive.
+pub fn ln_enclosure(value: &Rat) -> Result<ExactInterval, ExactValueError> {
+    natural_log_enclosure(value, LOG_TERMS, LOG_OCTAVES)
+}
+
 /// `ln 2`'s enclosure at the declared series terms and octaves: a constant of the grid, formed once.
 fn ln_two() -> Result<&'static ExactInterval, ExactValueError> {
     static LN_TWO: std::sync::OnceLock<Result<ExactInterval, ExactValueError>> =

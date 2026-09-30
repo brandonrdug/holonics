@@ -27,6 +27,7 @@ use num_bigint::BigInt;
 use num_rational::BigRational;
 
 pub mod algebraic;
+pub mod disk;
 pub mod exponentiated;
 pub mod gaussian;
 pub mod linear;

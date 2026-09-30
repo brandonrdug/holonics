@@ -283,6 +283,37 @@
 //!   law until a certificate covers the monodromy along their ray (`hnn::constitution`, "The pumped
 //!   medium's reach"; #62).
 //!
+//! [proved-derived; implemented-exact, September 30] **The executed growth's covector**
+//! ([`ReceivingBank::read_turn_covector`], [`dominant_multiplier`], [`MemberCovector`];
+//! `hnn::executed`; Lean `HNN/ExecutedComparison`; the
+//! [diagnosis record](../../../../research/records/2026-09-30_THE_LEARNING_FAILURE_DIAGNOSED_THE_TRAINED_COMPARISON_IS_NOT_THE_ONE_THE_RELEASE_EXECUTES.md)
+//! §5). The release decides by the largest member's executed growth, so its learning signal is the
+//! derivative of `log ρ(M)` through the executed tick and its solve, where it exists:
+//!
+//! ```text
+//! variation    ΔM = Σ_t T_(>t) ΔT_t T_(<t),  ΔT_t through ΔX_t = −X_t ΔM_t X_t, ΔM_t = (h²/2)ΔK_t
+//! simple root  D log|μ|[ΔM] = Re(ℓᵀ ΔM r / (μ ℓᵀ r)),   r, ℓᵀ a column and a row of adj(μ − M)
+//! per crossing ∂ log|μ| / ∂ Re z_t = Re(b_tᵀ ∂T_t f_t / (μ ℓᵀr)) = Re(a_tᵀ ∂K_t r_t / (μ ℓᵀr))
+//! ```
+//!
+//! - **Where it is valid.** Only at a certified simple dominant multiplier: its disk passes the
+//!   Krawczyk test (`ratio::disk`; exactly one simple root inside), is real or disjoint from its
+//!   conjugate (a conjugate pair moves its modulus together), and every other multiplier lies
+//!   strictly inside a circle below its modulus (every root isolated in disjoint disks, or the
+//!   exact placement count). Otherwise the member's covector is a typed refusal
+//!   ([`CovectorRefusal`]): a collision (a multiple root, or roots too close for the precision), a
+//!   tie in modulus, or a defective eigen-pairing. Nothing is guessed at a refusal.
+//! - **The joint's active branches.** `max_m ρ_m` has a derivative only where one member attains
+//!   it; every member whose enclosure reaches the joint's lower end is returned as a branch, and the
+//!   max comparison's consumer reads them all (`hnn::executed`).
+//! - **Exact, then enclosed.** The monodromy, its variation and its characteristic polynomial are
+//!   exact; the multiplier and the eigenvectors are algebraic and enclosed in disks with exact dyadic
+//!   endpoints, so every covector entry is an enclosure. Three routes of one number agree on every
+//!   tested turn: the covector paired with a move, the eigen-pairing on the exact variation, and the
+//!   trace `tr(adj(μ − M)ΔM)/(μχ′(μ))`; the forward (dual) and reverse (prefix–suffix) variations are
+//!   equal exactly ([`ReceivingBank::turn_variation`], [`ReceivingBank::directional_routes`]).
+//! - [agent-inferred] The operands are the turn's own and transient; nothing is retained.
+//!
 //! [proved-derived; implemented-exact] **The reference change at a junction port**
 //! ([`port_scattering`]). A wave arriving at port `p` of a junction meets the rest of the junction as
 //! one reference admittance `G_rest = W − G_p`: it reflects `Γ = (G_p − G_rest)/(G_p + G_rest)` and
@@ -312,6 +343,7 @@
 //! | `HNN/FloquetPassage.{reflection_mul_rotation, rotation_mul_reflection, reflection_transport_reflection, reflection_transport_reflection_carriers, rotation_trace_carrier, kick_coeff_zero, kick_coeff_one, kick_coeff_two, passage_coeff_zero, passage_coeff_one, passage_coeff_two, pair_sum_power_spectrum}` (the passage's monodromy at second order, the kicked chart) | [`PumpSchedule::placed`], [`ReceivingBank::read_turn`], [`turn`] |
 //! | `Objects/ParametronLock.lockFace_logistic` (`θ = a/(a + K) > ½ ⇔ a > K`) | [`Growth::exceeds`] (the lock's flip on exact enclosures), `hnn::prediction::generate_by_bank` |
 //! | `HNN/BankFace.{member_amplitude_ray, resonance_gain, flip_reflection, flip_rotation, sideband_pair_sum}` (the bank's face) | [`ReceivingBank::transport`], [`ReceivingBank::chart`], [`BankChart`], [`Resonance`] |
+//! | `HNN/ExecutedComparison.{product_deriv, simple_root_deriv, log_modulus_deriv}` (the executed growth's covector) | [`ReceivingBank::read_turn_covector`], [`ReceivingBank::turn_variation`], [`ReceivingBank::directional_routes`], [`dominant_multiplier`] |
 
 use num_bigint::{BigInt, BigUint};
 use num_traits::{One, Signed, ToPrimitive, Zero};
@@ -325,6 +357,8 @@ use crate::holon::parametron::{Carrier, Parametron, threshold_sheet};
 use crate::ratio::linear::ExactRatMatrix;
 use crate::ratio::linear::inertia::{Inertia, inertia};
 use crate::ratio::gaussian::GaussianRat;
+use crate::ratio::algebraic::ExactInterval;
+use crate::ratio::disk::{Disk, DyadicDisk, attained_roots, isolate, quotient, root_upper};
 use crate::ratio::linear::vector::{add, common_denominator, dot, scale, sub};
 use crate::ratio::polynomial::{RationalPolynomial, half_plane_count};
 use crate::ratio::{Rat, integer};
@@ -1816,7 +1850,7 @@ fn strictly_inside(characteristic: &RationalPolynomial, radius: &Rat) -> bool {
 /// cheap to test), bisected there to the grain, then certified on `q` itself by two exact tests:
 /// what the shift attains is trusted nowhere. A bracket the exact tests refuse falls back to the
 /// exact bracket and bisection.
-fn growth_of(characteristic: &[BigInt], scale: &BigInt, grain: u32) -> Growth {
+pub(crate) fn growth_of(characteristic: &[BigInt], scale: &BigInt, grain: u32) -> Growth {
     let mut power = BigInt::one();
     let exact: Vec<BigInt> = characteristic
         .iter()
@@ -1865,7 +1899,7 @@ fn integer_product(left: &[Vec<BigInt>], right: &[Vec<BigInt>]) -> Vec<Vec<BigIn
 /// `det(μ − A)`, monic, by the Faddeev–LeVerrier recurrence `M_k = A M_(k−1) + c_(n−k+1) I`,
 /// `c_(n−k) = −tr(A M_k)/k`, whose divisions are exact over the integers (every coefficient is an
 /// integer).
-fn integer_characteristic(matrix: &[Vec<BigInt>]) -> Vec<BigInt> {
+pub(crate) fn integer_characteristic(matrix: &[Vec<BigInt>]) -> Vec<BigInt> {
     let n = matrix.len();
     let mut coefficients = vec![BigInt::one()];
     let mut standing: Vec<Vec<BigInt>> = vec![vec![BigInt::zero(); n]; n];
@@ -2333,18 +2367,7 @@ impl ReceivingBank {
                 Ok(growth_of(&integer_characteristic(&product), &scale, grain))
             })
             .collect::<Result<Vec<_>, HnnError>>()?;
-        let joint = Growth {
-            lower: members
-                .iter()
-                .map(|growth| growth.lower.clone())
-                .max()
-                .expect("a bank has a member"),
-            upper: members
-                .iter()
-                .map(|growth| growth.upper.clone())
-                .max()
-                .expect("a bank has a member"),
-        };
+        let joint = joint_of(&members);
         Ok(TurnReading { members, joint })
     }
 
@@ -2581,6 +2604,965 @@ impl BankReading {
         let locked = self.locked();
         let silent = self.readings.iter().filter(|r| r.is_silent()).count();
         (locked.len() == 1 && silent + 1 == self.readings.len()).then(|| locked[0])
+    }
+}
+
+// -------------------------------------------------------------------------------------------
+// the executed growth's covector
+
+/// [definition; agent-inferred, September 30] **The significant bits of the covector's disks**
+/// (`ratio::disk`). Every disk is an enclosure at any precision; the precision decides only whether
+/// a certificate passes (fewer bits return a typed refusal, never a wrong covector). At 192 bits the
+/// passage's rounding, at most the product of the ticks' row norms times `2^(−192)` relative, stays
+/// many binary orders below the readings' own grain on the declared turns (their row norms' product
+/// over 60 crossings is below `2^120`).
+const COVECTOR_BITS: u32 = 192;
+
+/// The attainment's precision and iterations (an exterior means, trusted nowhere: a root it does
+/// not reach fails the Krawczyk test and is refused as a collision). Newton's steps in [`isolate`]
+/// carry a 96-bit attainment to the disks' precision.
+const ROOT_ATTAINMENT_BITS: u32 = 96;
+const ATTAINMENT_ITERATIONS: usize = 64;
+
+/// [definition; agent-inferred, September 30] **The separation's relative grain** `2^(−48)`: every
+/// other multiplier must lie inside the dominant's modulus less this fraction of it. A multiplier
+/// within it is a tie at the declared grain (typed), never an ordering guessed; 48 bits lie far below
+/// the growth's own grain (`2^(−16)` on the declared runs) and far above the half-plane count's
+/// resolution (`2^(−96)`).
+const SEPARATION_BITS: u32 = 48;
+
+/// [definition; agent-inferred, September 30] **Why a member's growth covector is not returned**
+/// (module header, "The executed growth's covector"): the largest modulus has no derivative there,
+/// or its certificate did not pass at the declared precision.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub enum CovectorRefusal {
+    /// No disk about the attained dominant multiplier passes the Krawczyk test (a multiple root, or
+    /// roots too close for the declared precision), or the disk's modulus disagrees with the growth
+    /// enclosure: a collision.
+    Collision,
+    /// A multiplier other than the dominant one and its conjugate lies at or outside the dominant's
+    /// modulus lower bound: a tie in modulus, where `max |μ|` is not differentiable.
+    Tie,
+    /// The adjugate at the multiplier has no row or column clear of zero, or `ℓᵀr` or `μ` is not
+    /// clear of zero: the eigen-derivative's denominator is not certified.
+    Defective,
+}
+
+/// [definition; agent-inferred, September 30] **A member's dominant multiplier, certified**
+/// ([`dominant_multiplier`]): a disk holding exactly one simple multiplier (the upper one of a
+/// conjugate pair), in the monodromy's own units; whether it is a conjugate pair (else real); and a
+/// radius `inner` below its modulus that every other multiplier lies strictly inside.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct DominantMultiplier {
+    pub disk: Disk,
+    pub pair: bool,
+    pub inner: Rat,
+}
+
+/// [definition; agent-inferred, September 30] **A member's growth covector** (module header, "The
+/// executed growth's covector"): the certified multiplier and, per crossing `t` of the turn, the
+/// enclosures of `∂ log|μ| / ∂ Re z_t` and `∂ log|μ| / ∂ Im z_t`; or the typed refusal.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub enum MemberCovector {
+    Resolved {
+        member: usize,
+        multiplier: DominantMultiplier,
+        covector: Vec<[ExactInterval; 2]>,
+    },
+    Unresolved {
+        member: usize,
+        refusal: CovectorRefusal,
+    },
+}
+
+impl MemberCovector {
+    /// The member.
+    pub fn member(&self) -> usize {
+        match self {
+            Self::Resolved { member, .. } | Self::Unresolved { member, .. } => *member,
+        }
+    }
+
+    /// **The covector on the ring's storage** (realified node order), each entry an enclosure:
+    /// crossing `t` reads node `d − 1 − t` ([`turn`]). `None` when unresolved.
+    pub fn storage(&self) -> Option<Vec<ExactInterval>> {
+        let Self::Resolved { covector, .. } = self else {
+            return None;
+        };
+        let nodes = covector.len();
+        let mut storage = vec![ExactInterval::point(Rat::zero()); 2 * nodes];
+        for (tick, [re, im]) in covector.iter().enumerate() {
+            let node = nodes - 1 - tick;
+            storage[2 * node] = re.clone();
+            storage[2 * node + 1] = im.clone();
+        }
+        Some(storage)
+    }
+}
+
+/// [definition; agent-inferred, September 30] **A turn's reading with the covectors of its active
+/// members** ([`ReceivingBank::read_turn_covector`]): the reading, and one covector for every
+/// member whose enclosure reaches the joint's lower end (the members that may attain
+/// `max_m ρ_m`: the max comparison's active branches).
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct TurnCovector {
+    pub reading: TurnReading,
+    pub active: Vec<MemberCovector>,
+}
+
+/// [definition; agent-inferred, September 30] **The monodromy's variation along a move of the
+/// crossing amplitudes, read two ways** ([`ReceivingBank::turn_variation`]): the monodromy `M`,
+/// its variation `ΔM` accumulated forward (the dual product `(P, P′) ← (T P, ΔT P + T P′)`) and in
+/// reverse (`Σ_t T_(>t) ΔT_t T_(<t)` from the prefix and suffix products); exact, and equal.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct TurnVariation {
+    pub monodromy: ExactRatMatrix,
+    pub forward: ExactRatMatrix,
+    pub reverse: ExactRatMatrix,
+}
+
+/// [definition; agent-inferred, September 30] **The directional derivative of `log |μ|` along a move,
+/// read three ways** ([`ReceivingBank::directional_routes`]): the covector paired with the move, the
+/// eigen-pairing `Re(ℓᵀ ΔM r / (μ ℓᵀr))` on the exact variation, and the trace
+/// `Re(tr(adj(μ − M) ΔM) / (μ χ′(μ)))`; three enclosures of one number.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct DirectionalRoutes {
+    pub covector: ExactInterval,
+    pub eigen: ExactInterval,
+    pub trace: ExactInterval,
+}
+
+impl DirectionalRoutes {
+    /// Whether the three enclosures share a point.
+    pub fn agree(&self) -> bool {
+        let lower = self
+            .covector
+            .lower
+            .clone()
+            .max(self.eigen.lower.clone())
+            .max(self.trace.lower.clone());
+        let upper = self
+            .covector
+            .upper
+            .clone()
+            .min(self.eigen.upper.clone())
+            .min(self.trace.upper.clone());
+        lower <= upper
+    }
+}
+
+/// [proved-standard; implemented-exact] **The adjugate's coefficients**: `adj(νI − N) = Σ_k ν^k A_k`
+/// for `det(νI − N) = Σ_k c_k ν^k` (monic), `A_(n−1) = I`, `A_(k−1) = N A_k + c_k I`, on integers;
+/// `N A_0 + c_0 I = 0` closes the recurrence (Cayley–Hamilton), checked.
+fn adjugate_coefficients(
+    product: &[Vec<BigInt>],
+    characteristic: &[BigInt],
+) -> Option<Vec<Vec<Vec<BigInt>>>> {
+    let n = product.len();
+    let identity: Vec<Vec<BigInt>> = (0..n)
+        .map(|i| (0..n).map(|j| BigInt::from(u8::from(i == j))).collect())
+        .collect();
+    let mut coefficients = vec![identity; n];
+    for k in (1..n).rev() {
+        let mut next = integer_product(product, &coefficients[k]);
+        for (i, row) in next.iter_mut().enumerate() {
+            row[i] += &characteristic[k];
+        }
+        coefficients[k - 1] = next;
+    }
+    let mut closing = integer_product(product, &coefficients[0]);
+    for (i, row) in closing.iter_mut().enumerate() {
+        row[i] += &characteristic[0];
+    }
+    closing
+        .iter()
+        .all(|row| row.iter().all(Zero::is_zero))
+        .then_some(coefficients)
+}
+
+/// [definition; agent-inferred, September 30] **The dominant multiplier of `M = N/Δ`, certified**
+/// (module header, "The executed growth's covector"), from the integer coefficients of
+/// `det(νI − N)` (ascending, monic), the scale `Δ` and the growth enclosure:
+/// - in the chart `μ = σs`, `σ = 2^e` the least power of two above the growth's upper end, the
+///   monic `p(s) = χ_M(σs)/σ^n` has every root in the unit disc; its coefficients
+///   `c_k/(Δσ)^(n−k)` are held as disks by one division each ([`quotient`]);
+/// - every root is attained ([`attained_roots`]) and isolated by the Krawczyk test ([`isolate`]):
+///   on the real axis when its attained point is (its disk symmetric, its root real), else off it;
+///   when the `n` disks are pairwise disjoint they hold the `n` roots, each simple;
+/// - the dominant disk (the largest center) is real, or disjoint from its conjugate with exactly
+///   one other disk (its conjugate partner) meeting its conjugate: a conjugate pair;
+/// - every other disk lies strictly inside `inner`, the dominant's modulus lower bound less a
+///   relative `2^(−SEPARATION_BITS)`: no other multiplier ties it in modulus.
+///
+/// When not every root is isolated (a small root the precision does not reach), the dominant one
+/// alone is isolated and the placement at `inner` counts the multipliers at or outside it exactly
+/// ([`Floquet::placement`]'s law), one (real) or two (the pair). Otherwise refused:
+/// [`CovectorRefusal::Collision`] (no disk, overlapping disks, an ambiguous partner) or
+/// [`CovectorRefusal::Tie`] (another multiplier at the dominant's modulus).
+pub fn dominant_multiplier(
+    characteristic: &[BigInt],
+    scale: &BigInt,
+    growth: &Growth,
+) -> Result<Result<DominantMultiplier, CovectorRefusal>, HnnError> {
+    let n = characteristic.len() - 1;
+    let exponent = crate::ratio::disk::floor_log2(&growth.upper) + 1;
+    let sigma = power_of_two(exponent);
+    // p_k = c_k / (Δ^(n−k) 2^(e(n−k))), each by one division.
+    let mut disks = vec![Disk::real(Rat::zero()); n + 1];
+    let mut power = BigInt::one();
+    for k in (0..=n).rev() {
+        disks[k] = quotient(
+            &characteristic[k],
+            &power,
+            exponent * (n - k) as i64,
+            COVECTOR_BITS,
+        );
+        power *= scale;
+    }
+    let centers: Vec<GaussianRat> = disks.iter().map(|d| d.center.clone()).collect();
+    let attained = attained_roots(&centers, ROOT_ATTAINMENT_BITS, ATTAINMENT_ITERATIONS);
+    if attained.len() != n {
+        return Ok(Err(CovectorRefusal::Collision));
+    }
+    let near_real = |z: &GaussianRat| -> bool {
+        let grain = root_upper(&z.norm_sq())
+            * Rat::new(BigInt::one(), BigInt::one() << (ROOT_ATTAINMENT_BITS / 2) as usize);
+        z.im.abs() <= grain
+    };
+    let isolated: Vec<Option<Disk>> = attained
+        .iter()
+        .map(|z| {
+            if near_real(z) {
+                isolate(&disks, z, true, COVECTOR_BITS)
+                    .or_else(|| isolate(&disks, z, false, COVECTOR_BITS))
+            } else {
+                isolate(&disks, z, false, COVECTOR_BITS)
+            }
+        })
+        .collect();
+    let dominant = (0..n)
+        .max_by(|&a, &b| attained[a].norm_sq().cmp(&attained[b].norm_sq()))
+        .expect("a root");
+    let Some(mut disk) = isolated[dominant].clone() else {
+        return Ok(Err(CovectorRefusal::Collision));
+    };
+    let mut pair = !disk.center.is_real();
+    if pair {
+        if disk.center.im.is_negative() {
+            disk = disk.conj();
+        }
+        if !disk.disjoint(&disk.conj()) {
+            return Ok(Err(CovectorRefusal::Collision));
+        }
+    }
+    let inner_s = disk.modulus_lower();
+    if !inner_s.is_positive() {
+        return Ok(Err(CovectorRefusal::Collision));
+    }
+    let shrink = Rat::one() - Rat::new(BigInt::one(), BigInt::one() << SEPARATION_BITS as usize);
+    let inner = crate::holon::deposition::significant(
+        &(&inner_s * &sigma * shrink),
+        SEPARATION_BITS,
+        false,
+    );
+    let inner_chart = &inner / &sigma;
+    let every = isolated.iter().all(Option::is_some)
+        && (0..n).all(|i| {
+            ((i + 1)..n).all(|j| {
+                isolated[i]
+                    .as_ref()
+                    .zip(isolated[j].as_ref())
+                    .is_some_and(|(a, b)| a.disjoint(b))
+            })
+        });
+    if every {
+        // Every root in its own disk: the conjugate partner is the one disk meeting the dominant's
+        // conjugate; every other disk must lie strictly inside `inner`.
+        let conjugate = isolated[dominant].as_ref().expect("isolated").conj();
+        let partners: Vec<usize> = (0..n)
+            .filter(|&j| j != dominant)
+            .filter(|&j| {
+                !isolated[j]
+                    .as_ref()
+                    .expect("isolated")
+                    .disjoint(&conjugate)
+            })
+            .collect();
+        if pair && partners.len() != 1 {
+            return Ok(Err(CovectorRefusal::Collision));
+        }
+        if !pair && !partners.is_empty() {
+            // A real dominant root's conjugate is itself.
+            return Ok(Err(CovectorRefusal::Collision));
+        }
+        for j in (0..n).filter(|&j| j != dominant && !partners.contains(&j)) {
+            if isolated[j].as_ref().expect("isolated").modulus_upper() >= inner_chart {
+                return Ok(Err(CovectorRefusal::Tie));
+            }
+        }
+    } else {
+        // The exact count at `inner` (the slower route, read only where the precision does not
+        // isolate every root).
+        let rational = RationalPolynomial::new(
+            (0..=n)
+                .map(|k| {
+                    Rat::from_integer(characteristic[k].clone())
+                        / Rat::from_integer(scale.pow((n - k) as u32))
+                })
+                .collect(),
+        );
+        let placed = match placement_of(&rational, n, &inner) {
+            Ok(placed) => placed,
+            // A multiplier on or too near the separation circle for the exact count: a tie there.
+            Err(HnnError::Polynomial(_)) => return Ok(Err(CovectorRefusal::Tie)),
+            Err(error) => return Err(error),
+        };
+        let expected = if pair { 2 } else { 1 };
+        let reached = placed.outside + placed.on;
+        if reached > expected {
+            return Ok(Err(CovectorRefusal::Tie));
+        }
+        if reached < expected {
+            return Ok(Err(CovectorRefusal::Collision));
+        }
+    }
+    pair = pair && disk.disjoint(&disk.conj());
+    let upper = disk.modulus_upper() * &sigma;
+    if upper < growth.lower || inner > growth.upper {
+        return Ok(Err(CovectorRefusal::Collision));
+    }
+    Ok(Ok(DominantMultiplier {
+        disk: Disk::new(disk.center.scale(&sigma), &disk.radius * &sigma),
+        pair,
+        inner,
+    }))
+}
+
+/// `2^e`.
+fn power_of_two(exponent: i64) -> Rat {
+    if exponent >= 0 {
+        Rat::from_integer(BigInt::one() << exponent as usize)
+    } else {
+        Rat::new(BigInt::one(), BigInt::one() << (-exponent) as usize)
+    }
+}
+
+/// `T v` over disks, `T` exact.
+fn apply_disks(matrix: &ExactRatMatrix, vector: &[Disk], transpose: bool) -> Vec<Disk> {
+    let n = vector.len();
+    (0..n)
+        .map(|i| {
+            let mut sum = Disk::real(Rat::zero());
+            for (j, v) in vector.iter().enumerate() {
+                let entry = if transpose {
+                    matrix.get(j, i)
+                } else {
+                    matrix.get(i, j)
+                }
+                .expect("in range");
+                if !entry.is_zero() {
+                    sum = sum.add(&v.scale(entry, COVECTOR_BITS), COVECTOR_BITS);
+                }
+            }
+            sum
+        })
+        .collect()
+}
+
+/// `uᵀ A v` over disks, `A` exact.
+fn bilinear_disks(left: &[Disk], matrix: &ExactRatMatrix, right: &[Disk]) -> Disk {
+    let moved = apply_disks(matrix, right, false);
+    let mut sum = Disk::real(Rat::zero());
+    for (l, m) in left.iter().zip(&moved) {
+        sum = sum.add(&l.mul(m, COVECTOR_BITS), COVECTOR_BITS);
+    }
+    sum
+}
+
+/// The eigen data of a certified multiplier: `adj(μ − M)` over disks (as the scaled
+/// `adj(ν − N)/(Δσ)^(n−1)`), its chosen column `r` and row `ℓ`, and `p′(s)` at the multiplier in the
+/// chart `μ = σs`.
+struct EigenDisks {
+    adjugate: Vec<Vec<Disk>>,
+    right: Vec<Disk>,
+    left: Vec<Disk>,
+    slope: Disk,
+    multiplier: Disk,
+}
+
+impl EigenDisks {
+    fn of(
+        product: &[Vec<BigInt>],
+        characteristic: &[BigInt],
+        scale: &BigInt,
+        multiplier: &DominantMultiplier,
+        growth: &Growth,
+    ) -> Result<Option<Self>, HnnError> {
+        let n = product.len();
+        let Some(coefficients) = adjugate_coefficients(product, characteristic) else {
+            return Ok(None);
+        };
+        let exponent = crate::ratio::disk::floor_log2(&growth.upper) + 1;
+        let sigma = power_of_two(exponent);
+        let s = Disk::new(
+            multiplier.disk.center.scale(&(Rat::one() / &sigma)),
+            &multiplier.disk.radius / &sigma,
+        );
+        // B(s) = Σ_k s^k (Δσ)^(k − (n − 1)) A_k by Horner over k, each entry of A_k held by one
+        // division by Δ^(n − 1 − k).
+        let powers: Vec<BigInt> = (0..n).map(|k| scale.pow(k as u32)).collect();
+        let mut adjugate = vec![vec![Disk::real(Rat::zero()); n]; n];
+        for k in (0..n).rev() {
+            let depth = n - 1 - k;
+            for i in 0..n {
+                for j in 0..n {
+                    let term = quotient(
+                        &coefficients[k][i][j],
+                        &powers[depth],
+                        exponent * depth as i64,
+                        COVECTOR_BITS,
+                    );
+                    adjugate[i][j] = adjugate[i][j].mul(&s, COVECTOR_BITS).add(&term, COVECTOR_BITS);
+                }
+            }
+        }
+        let size = |v: &[Disk]| -> Rat { v.iter().map(|d| d.center.norm_sq()).sum() };
+        let column = (0..n)
+            .max_by(|&a, &b| {
+                let ca: Vec<Disk> = (0..n).map(|i| adjugate[i][a].clone()).collect();
+                let cb: Vec<Disk> = (0..n).map(|i| adjugate[i][b].clone()).collect();
+                size(&ca).cmp(&size(&cb))
+            })
+            .expect("a column");
+        let row = (0..n)
+            .max_by(|&a, &b| size(&adjugate[a]).cmp(&size(&adjugate[b])))
+            .expect("a row");
+        let right: Vec<Disk> = (0..n).map(|i| adjugate[i][column].clone()).collect();
+        let left = adjugate[row].clone();
+        if !right.iter().any(Disk::excludes_zero) || !left.iter().any(Disk::excludes_zero) {
+            return Ok(None);
+        }
+        // p′(s) in the chart: Σ k p_k s^(k−1), p_k = c_k/(Δσ)^(n−k).
+        let mut slope = Disk::real(Rat::zero());
+        let mut power = BigInt::one();
+        let mut terms = vec![Disk::real(Rat::zero()); n + 1];
+        for k in (1..=n).rev() {
+            terms[k] = quotient(
+                &(&characteristic[k] * BigInt::from(k)),
+                &power,
+                exponent * (n - k) as i64,
+                COVECTOR_BITS,
+            );
+            power *= scale;
+        }
+        for term in terms.iter().skip(1).rev() {
+            slope = slope.mul(&s, COVECTOR_BITS).add(term, COVECTOR_BITS);
+        }
+        Ok(Some(Self {
+            adjugate,
+            right,
+            left,
+            slope,
+            multiplier: multiplier.disk.clone(),
+        }))
+    }
+
+    /// `ℓᵀr · μ`, the eigen-derivative's denominator, or `None` when it is not clear of zero.
+    fn denominator(&self) -> Option<Disk> {
+        let mut pairing = Disk::real(Rat::zero());
+        for (l, r) in self.left.iter().zip(&self.right) {
+            pairing = pairing.add(&l.mul(r, COVECTOR_BITS), COVECTOR_BITS);
+        }
+        let denominator = pairing.mul(&self.multiplier, COVECTOR_BITS);
+        denominator.excludes_zero().then_some(denominator)
+    }
+}
+
+impl ReceivingBank {
+    /// **One crossing's executed tick map and its derivatives** in the crossing amplitude's two
+    /// coordinates (module header, "The executed growth's covector"): with the carrier
+    /// `c = w z`, `w = a² s^t`, the node block `−2pR(c)` is linear in `z`, so
+    /// `∂K_t/∂Re z = −2pR(w)`, `∂K_t/∂Im z = −2pR(iw)` on every node; the operator moves by
+    /// `ΔM = (h²/2)ΔK`, the executed solve by `ΔX = −X ΔM X` (the solve's derivative), and the tick
+    /// `T = [[I − h²XK, 2hXC], [−2hXK, 4XC − I]]` by
+    /// `ΔT = [[−h²(ΔX K + X ΔK), 2h ΔX C], [−2h(ΔX K + X ΔK), 4 ΔX C]]`.
+    fn crossing_variation(
+        &self,
+        member: usize,
+        amplitude: &GaussianRat,
+        tick: usize,
+    ) -> Result<(ExactRatMatrix, [ExactRatMatrix; 2]), HnnError> {
+        let pump = &self.pumps[member];
+        let carrier = pump.carrier(tick % pump.phases()).as_gaussian();
+        let (capacity, stiffness, _) = self.material.forms();
+        let pumped = stiffened(stiffness, &pump_block(pump.strength(), &carrier.mul(amplitude)))?;
+        if !self.material.signed_form_holds(&pumped, &self.hop)? {
+            return Err(HnnError::UncertifiedResonator {
+                ring: member,
+                phase: tick,
+            });
+        }
+        let phase = Phase::of(
+            member,
+            &self.material,
+            pumped,
+            &self.admittance,
+            &self.hop,
+            None,
+            tick,
+        )?;
+        let solve = phase.solve.matrix()?;
+        let map = tick_map(&solve, capacity, &phase.stiffness, &self.hop)?;
+        let n = capacity.rows();
+        let zero = ExactRatMatrix::zero(n, n)?;
+        let h = &self.hop;
+        let half_square = h * h / integer(2);
+        let variations = [carrier.clone(), carrier.mul(&GaussianRat::i())].map(|direction| {
+            let d_stiffness = stiffened(&zero, &pump_block(pump.strength(), &direction))?;
+            let d_operator = d_stiffness.scaled(&half_square);
+            let d_solve = solve
+                .multiply(&d_operator)?
+                .multiply(&solve)?
+                .scaled(&integer(-1));
+            let d_solved_stiffness = d_solve
+                .multiply(&phase.stiffness)?
+                .add(&solve.multiply(&d_stiffness)?)?;
+            let d_solved_capacity = d_solve.multiply(capacity)?;
+            let blocks = [
+                d_solved_stiffness.scaled(&(-(h * h))),
+                d_solved_capacity.scaled(&(integer(2) * h)),
+                d_solved_stiffness.scaled(&(integer(-2) * h)),
+                d_solved_capacity.scaled(&integer(4)),
+            ];
+            Ok::<ExactRatMatrix, HnnError>(ExactRatMatrix::shaped(
+                2 * n,
+                2 * n,
+                (0..2 * n)
+                    .map(|i| {
+                        (0..2 * n)
+                            .map(|j| {
+                                blocks[2 * (i / n) + j / n]
+                                    .get(i % n, j % n)
+                                    .expect("in range")
+                                    .clone()
+                            })
+                            .collect()
+                    })
+                    .collect(),
+            )?)
+        });
+        let [re, im] = variations;
+        Ok((map, [re?, im?]))
+    }
+
+    /// Every member's turn (its maps, the integer product and scale), its characteristic
+    /// polynomial and its growth enclosure.
+    #[allow(clippy::type_complexity)]
+    fn members_turn(
+        &self,
+        amplitudes: &[GaussianRat],
+        grain: u32,
+    ) -> Result<Vec<(Vec<ExactRatMatrix>, Vec<Vec<BigInt>>, BigInt, Vec<BigInt>, Growth)>, HnnError>
+    {
+        (0..self.pumps.len())
+            .map(|member| {
+                let (maps, product, scale) = self.turn_monodromy(member, amplitudes)?;
+                let characteristic = integer_characteristic(&product);
+                let growth = growth_of(&characteristic, &scale, grain);
+                Ok((maps, product, scale, characteristic, growth))
+            })
+            .collect()
+    }
+
+    /// [proved-derived; implemented-exact] **The turn's reading with its active members' growth
+    /// covectors** (module header, "The executed growth's covector"). The reading is
+    /// [`ReceivingBank::read_turn`]'s. A member is active when its enclosure reaches the joint's
+    /// lower end (`upper_m ≥ lower_joint`: it may attain the largest growth). For each active
+    /// member, its dominant multiplier is certified ([`dominant_multiplier`]); its eigenvectors are
+    /// a column `r` and a row `ℓ` of `adj(μ − M)` over disks; the forward vectors
+    /// `f_t = T_(t−1)⋯T_0 r` and backward `b_t = (T_(T−1)⋯T_(t+1))ᵀ ℓ` pass through the executed
+    /// ticks; and crossing `t`'s entries are `Re(b_tᵀ ∂T_t f_t / (μ ℓᵀr))` in each coordinate, the
+    /// simple root's eigen-derivative `D log|μ|[ΔM] = Re(ℓᵀ ΔM r / (μ ℓᵀ r))` with
+    /// `ΔM = Σ_t T_(>t) ΔT_t T_(<t)`. The operands are the turn's own and transient; nothing is
+    /// retained.
+    pub fn read_turn_covector(
+        &self,
+        amplitudes: &[GaussianRat],
+        grain: u32,
+    ) -> Result<TurnCovector, HnnError> {
+        let turns = self.members_turn(amplitudes, grain)?;
+        let members: Vec<Growth> = turns.iter().map(|turn| turn.4.clone()).collect();
+        let joint = joint_of(&members);
+        let reading = TurnReading { members, joint };
+        let active = (0..self.pumps.len())
+            .filter(|&member| reading.members[member].upper >= reading.joint.lower)
+            .map(|member| {
+                let (maps, product, scale, characteristic, growth) = &turns[member];
+                self.member_covector(member, amplitudes, maps, product, scale, characteristic, growth)
+            })
+            .collect::<Result<Vec<_>, HnnError>>()?;
+        Ok(TurnCovector { reading, active })
+    }
+
+    /// One crossing's operands over disks: the executed solve `X_t` and the pumped stiffness `K_t`,
+    /// and the stiffness's derivatives in the amplitude's two coordinates (`−2pR(w)`, `−2pR(iw)` on
+    /// every node, `w = a² s^t`).
+    fn crossing_disks(
+        &self,
+        member: usize,
+        amplitude: &GaussianRat,
+        tick: usize,
+    ) -> Result<[Vec<Vec<DyadicDisk>>; 4], HnnError> {
+        let pump = &self.pumps[member];
+        let carrier = pump.carrier(tick % pump.phases()).as_gaussian();
+        let (_, stiffness, _) = self.material.forms();
+        let pumped = stiffened(stiffness, &pump_block(pump.strength(), &carrier.mul(amplitude)))?;
+        if !self.material.signed_form_holds(&pumped, &self.hop)? {
+            return Err(HnnError::UncertifiedResonator {
+                ring: member,
+                phase: tick,
+            });
+        }
+        let phase = Phase::of(
+            member,
+            &self.material,
+            pumped,
+            &self.admittance,
+            &self.hop,
+            None,
+            tick,
+        )?;
+        let n = stiffness.rows();
+        let zero = ExactRatMatrix::zero(n, n)?;
+        let disks = |matrix: &ExactRatMatrix| -> Vec<Vec<DyadicDisk>> {
+            (0..n)
+                .map(|i| {
+                    (0..n)
+                        .map(|j| {
+                            DyadicDisk::real(matrix.get(i, j).expect("in range"), COVECTOR_BITS)
+                        })
+                        .collect()
+                })
+                .collect()
+        };
+        let d_re = stiffened(&zero, &pump_block(pump.strength(), &carrier))?;
+        let d_im = stiffened(
+            &zero,
+            &pump_block(pump.strength(), &carrier.mul(&GaussianRat::i())),
+        )?;
+        Ok([
+            disks(&phase.solve.matrix()?),
+            disks(&phase.stiffness),
+            disks(&d_re),
+            disks(&d_im),
+        ])
+    }
+
+    /// One active member's covector ([`ReceivingBank::read_turn_covector`]).
+    ///
+    /// [proved-derived; implemented-exact] **The passage by blocks.** With `C`, `K_t` and `X_t`
+    /// symmetric (the material's forms are checked symmetric, the pump block is, so `M_t` and its
+    /// solve are), the tick `T = [[I − h²XK, 2hXC], [−2hXK, 4XC − I]]` acts on `f = (f₁, f₂)` as
+    /// `y = X(−h²Kf₁ + 2hCf₂)`, `Tf = (f₁ + y, −f₂ + (2/h)y)`, and its transpose on `b = (b₁, b₂)` as
+    /// `u = h²b₁ + 2hb₂`, `a = Xu`, `Tᵀb = (b₁ − Ka, −b₂ + (2/h)Ca)`. Its variation
+    /// `ΔT = [[−h²(ΔX K + X ΔK), 2h ΔX C], [−2h(ΔX K + X ΔK), 4 ΔX C]]` with `ΔX = −(h²/2) X ΔK X` pairs as
+    /// `bᵀ ΔT f = aᵀ ΔK r`, `r = −y/2 − f₁`: expanding, `bᵀΔTf = −uᵀ(ΔX Kf₁ + X ΔK f₁) + (2/h)uᵀ ΔX Cf₂`,
+    /// and `−uᵀΔX p = (h²/2)aᵀΔK Xp`, `uᵀXΔKf₁ = aᵀΔKf₁`, `(2/h)uᵀΔX q = −h aᵀΔK Xq` with `p = Kf₁`,
+    /// `q = Cf₂`, so `bᵀΔTf = aᵀΔK(X((h²/2)p − hq) − f₁)` and `X((h²/2)p − hq) = −y/2`. So each
+    /// crossing's entries are `Re(a_tᵀ ∂K r_t / (μ ℓᵀr))`.
+    ///
+    /// [definition; agent-inferred, September 30] **The passage runs on the exact tick maps**, held as
+    /// dyadic disks ([`DyadicDisk`]), and the blocks read only each crossing's own `r_t` and `a_t`: a
+    /// disk's radius grows by the absolute entries of what it passes through, and the blocks'
+    /// absolute entries lose the cancellation inside `I − h²XK` (measured on a drawn turn of 60
+    /// crossings: the passage by blocks widened the covector to an enclosure of width between 4 and 5, the
+    /// passage by the maps to one below `2^(−56)`). Held to the exact variation, three ways, by the
+    /// owner's tests (`hnn::tests::executed`).
+    #[allow(clippy::too_many_arguments)]
+    fn member_covector(
+        &self,
+        member: usize,
+        amplitudes: &[GaussianRat],
+        maps: &[ExactRatMatrix],
+        product: &[Vec<BigInt>],
+        scale: &BigInt,
+        characteristic: &[BigInt],
+        growth: &Growth,
+    ) -> Result<MemberCovector, HnnError> {
+        let multiplier = match dominant_multiplier(characteristic, scale, growth)? {
+            Ok(multiplier) => multiplier,
+            Err(refusal) => return Ok(MemberCovector::Unresolved { member, refusal }),
+        };
+        let refuse = |refusal| Ok(MemberCovector::Unresolved { member, refusal });
+        let Some(eigen) = EigenDisks::of(product, characteristic, scale, &multiplier, growth)?
+        else {
+            return refuse(CovectorRefusal::Defective);
+        };
+        let Some(denominator) = eigen.denominator() else {
+            return refuse(CovectorRefusal::Defective);
+        };
+        let Some(inverse) = denominator.inverse(COVECTOR_BITS) else {
+            return refuse(CovectorRefusal::Defective);
+        };
+        let ticks = maps.len();
+        let n = self.material.width();
+        let (capacity, _, _) = self.material.forms();
+        let capacity: Vec<Vec<DyadicDisk>> = (0..n)
+            .map(|i| {
+                (0..n)
+                    .map(|j| DyadicDisk::real(capacity.get(i, j).expect("in range"), COVECTOR_BITS))
+                    .collect()
+            })
+            .collect();
+        let h = &self.hop;
+        let (h_square, twice_h) = (h * h, integer(2) * h);
+        let half = Rat::new(BigInt::one(), BigInt::from(2));
+        let operands: Vec<[Vec<Vec<DyadicDisk>>; 4]> = (0..ticks)
+            .map(|tick| self.crossing_disks(member, &amplitudes[tick], tick))
+            .collect::<Result<_, HnnError>>()?;
+        let apply = |matrix: &[Vec<DyadicDisk>], vector: &[DyadicDisk]| -> Vec<DyadicDisk> {
+            matrix
+                .iter()
+                .map(|row| {
+                    row.iter().zip(vector).fold(DyadicDisk::zero(), |sum, (m, v)| {
+                        if m.is_zero() {
+                            sum
+                        } else {
+                            sum.add(&m.mul(v, COVECTOR_BITS), COVECTOR_BITS)
+                        }
+                    })
+                })
+                .collect()
+        };
+        let combine =
+            |a: &[DyadicDisk], x: &Rat, b: &[DyadicDisk], y: &Rat| -> Vec<DyadicDisk> {
+                a.iter()
+                    .zip(b)
+                    .map(|(p, q)| {
+                        p.scale(x, COVECTOR_BITS)
+                            .add(&q.scale(y, COVECTOR_BITS), COVECTOR_BITS)
+                    })
+                    .collect()
+            };
+        let of = |v: &[Disk]| -> Vec<DyadicDisk> {
+            v.iter().map(|d| DyadicDisk::of(d, COVECTOR_BITS)).collect()
+        };
+        let inverse = DyadicDisk::of(&inverse, COVECTOR_BITS);
+        // The passage itself through each exact tick map (its entries' own cancellations kept, so
+        // a disk's radius grows by the map's absolute entries, not by its blocks'); the blocks read
+        // only each crossing's own terms.
+        let map_disks: Vec<Vec<Vec<DyadicDisk>>> = maps
+            .iter()
+            .map(|map| {
+                (0..2 * n)
+                    .map(|i| {
+                        (0..2 * n)
+                            .map(|j| DyadicDisk::real(map.get(i, j).expect("in range"), COVECTOR_BITS))
+                            .collect()
+                    })
+                    .collect()
+            })
+            .collect();
+        let transposed = |matrix: &[Vec<DyadicDisk>]| -> Vec<Vec<DyadicDisk>> {
+            (0..matrix.len())
+                .map(|j| matrix.iter().map(|row| row[j].clone()).collect())
+                .collect()
+        };
+        // Forward: r_t = −y_t/2 − f₁ at each crossing, y_t = X_t(−h²K_t f₁ + 2hC f₂).
+        let mut residues = Vec::with_capacity(ticks);
+        let mut vector = of(&eigen.right);
+        for ([solve, stiffness, _, _], map) in operands.iter().zip(&map_disks) {
+            let (first, second) = vector.split_at(n);
+            let pushed = apply(stiffness, first);
+            let stored = apply(&capacity, second);
+            let y = apply(solve, &combine(&pushed, &-h_square.clone(), &stored, &twice_h));
+            residues.push(combine(&y, &-half.clone(), first, &-Rat::one()));
+            vector = apply(map, &vector);
+        }
+        // Backward: a_t = X_t u_t at each crossing, u_t = h²b₁ + 2hb₂.
+        let mut lifts = vec![Vec::new(); ticks];
+        let mut vector = of(&eigen.left);
+        for tick in (0..ticks).rev() {
+            let [solve, _, _, _] = &operands[tick];
+            let (first, second) = vector.split_at(n);
+            let u = combine(first, &h_square, second, &twice_h);
+            lifts[tick] = apply(solve, &u);
+            vector = apply(&transposed(&map_disks[tick]), &vector);
+        }
+        let covector = (0..ticks)
+            .map(|tick| {
+                let [_, _, d_re, d_im] = &operands[tick];
+                [d_re, d_im].map(|variation| {
+                    let moved = apply(variation, &residues[tick]);
+                    lifts[tick]
+                        .iter()
+                        .zip(&moved)
+                        .fold(DyadicDisk::zero(), |sum, (a, m)| {
+                            sum.add(&a.mul(m, COVECTOR_BITS), COVECTOR_BITS)
+                        })
+                        .mul(&inverse, COVECTOR_BITS)
+                        .disk()
+                        .real_part()
+                })
+            })
+            .collect();
+        Ok(MemberCovector::Resolved {
+            member,
+            multiplier,
+            covector,
+        })
+    }
+
+    /// Each crossing's variation along a move `δ` of the amplitudes:
+    /// `ΔT_t = ∂T_t/∂Re z · Re δ_t + ∂T_t/∂Im z · Im δ_t`.
+    fn crossing_moves(
+        &self,
+        member: usize,
+        amplitudes: &[GaussianRat],
+        direction: &[GaussianRat],
+    ) -> Result<(Vec<ExactRatMatrix>, Vec<ExactRatMatrix>), HnnError> {
+        let mut maps = Vec::with_capacity(amplitudes.len());
+        let mut moves = Vec::with_capacity(amplitudes.len());
+        for (tick, (amplitude, delta)) in amplitudes.iter().zip(direction).enumerate() {
+            let (map, [re, im]) = self.crossing_variation(member, amplitude, tick)?;
+            moves.push(re.scaled(&delta.re).add(&im.scaled(&delta.im))?);
+            maps.push(map);
+        }
+        Ok((maps, moves))
+    }
+
+    /// [proved-derived; implemented-exact] **The monodromy's variation, forward and in reverse**
+    /// ([`TurnVariation`]): exact, and equal by the product rule.
+    pub fn turn_variation(
+        &self,
+        member: usize,
+        amplitudes: &[GaussianRat],
+        direction: &[GaussianRat],
+    ) -> Result<TurnVariation, HnnError> {
+        let (maps, moves) = self.crossing_moves(member, amplitudes, direction)?;
+        let n = 2 * self.material.width();
+        let identity = ExactRatMatrix::identity(n)?;
+        let (mut product, mut tangent) = (identity.clone(), ExactRatMatrix::zero(n, n)?);
+        for (map, moved) in maps.iter().zip(&moves) {
+            tangent = moved.multiply(&product)?.add(&map.multiply(&tangent)?)?;
+            product = map.multiply(&product)?;
+        }
+        let ticks = maps.len();
+        let mut prefix = vec![identity.clone(); ticks + 1];
+        for tick in 0..ticks {
+            prefix[tick + 1] = maps[tick].multiply(&prefix[tick])?;
+        }
+        let mut suffix = vec![identity; ticks + 1];
+        for tick in (0..ticks).rev() {
+            suffix[tick] = suffix[tick + 1].multiply(&maps[tick])?;
+        }
+        let mut reverse = ExactRatMatrix::zero(n, n)?;
+        for tick in 0..ticks {
+            reverse = reverse.add(
+                &suffix[tick + 1]
+                    .multiply(&moves[tick])?
+                    .multiply(&prefix[tick])?,
+            )?;
+        }
+        Ok(TurnVariation {
+            monodromy: product,
+            forward: tangent,
+            reverse,
+        })
+    }
+
+    /// [proved-derived; implemented-exact] **The directional derivative of a member's `log |μ|`
+    /// along a move `δ`, three ways** ([`DirectionalRoutes`]): the covector paired with `δ`
+    /// (`Σ_t` of its enclosures times `Re δ_t`, `Im δ_t`), the eigen-pairing on the exact forward
+    /// variation, and the trace of the adjugate against it over `μ p′`; `None` when the member's
+    /// covector is refused.
+    pub fn directional_routes(
+        &self,
+        member: usize,
+        amplitudes: &[GaussianRat],
+        direction: &[GaussianRat],
+        grain: u32,
+    ) -> Result<Option<DirectionalRoutes>, HnnError> {
+        let (maps, product, scale) = self.turn_monodromy(member, amplitudes)?;
+        let characteristic = integer_characteristic(&product);
+        let growth = growth_of(&characteristic, &scale, grain);
+        let MemberCovector::Resolved {
+            multiplier,
+            covector,
+            ..
+        } = self.member_covector(
+            member,
+            amplitudes,
+            &maps,
+            &product,
+            &scale,
+            &characteristic,
+            &growth,
+        )?
+        else {
+            return Ok(None);
+        };
+        let mut paired = ExactInterval::point(Rat::zero());
+        for ([re, im], delta) in covector.iter().zip(direction) {
+            for (entry, coordinate) in [(re, &delta.re), (im, &delta.im)] {
+                let (a, b) = (&entry.lower * coordinate, &entry.upper * coordinate);
+                paired = ExactInterval {
+                    lower: &paired.lower + a.clone().min(b.clone()),
+                    upper: &paired.upper + a.max(b),
+                };
+            }
+        }
+        let variation = self.turn_variation(member, amplitudes, direction)?.forward;
+        let Some(eigen) = EigenDisks::of(&product, &characteristic, &scale, &multiplier, &growth)?
+        else {
+            return Ok(None);
+        };
+        let Some(denominator) = eigen.denominator() else {
+            return Ok(None);
+        };
+        let eigen_route = bilinear_disks(&eigen.left, &variation, &eigen.right)
+            .div(&denominator, COVECTOR_BITS)
+            .map(|d| d.real_part());
+        // tr(adj(μ − M) ΔM)/(μ χ′(μ)) = tr(B ΔM)/(μ p′(s)) in the chart (module header).
+        let n = variation.rows();
+        let mut trace = Disk::real(Rat::zero());
+        for i in 0..n {
+            for j in 0..n {
+                let entry = variation.get(j, i)?;
+                if !entry.is_zero() {
+                    trace = trace.add(&eigen.adjugate[i][j].scale(entry, COVECTOR_BITS), COVECTOR_BITS);
+                }
+            }
+        }
+        let trace_route = eigen
+            .slope
+            .mul(&multiplier.disk, COVECTOR_BITS)
+            .inverse(COVECTOR_BITS)
+            .map(|inverse| trace.mul(&inverse, COVECTOR_BITS).real_part());
+        let (Some(eigen_route), Some(trace_route)) = (eigen_route, trace_route) else {
+            return Ok(None);
+        };
+        Ok(Some(DirectionalRoutes {
+            covector: paired,
+            eigen: eigen_route,
+            trace: trace_route,
+        }))
+    }
+}
+
+/// The joint reading of the members' enclosures: the largest member's.
+fn joint_of(members: &[Growth]) -> Growth {
+    Growth {
+        lower: members
+            .iter()
+            .map(|growth| growth.lower.clone())
+            .max()
+            .expect("a bank has a member"),
+        upper: members
+            .iter()
+            .map(|growth| growth.upper.clone())
+            .max()
+            .expect("a bank has a member"),
     }
 }
 

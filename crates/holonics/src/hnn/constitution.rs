@@ -2730,6 +2730,24 @@ pub struct StepReading {
     pub bank: Rat,
 }
 
+/// [definition; agent-inferred, September 30] **A carried source step's reading**
+/// ([`Constitution::stepped_source`]): the step `η`, the unit step's alignment `a` with its returns
+/// and its largest absolute column sum, the entries whose lattice coordinate moved, the residuals
+/// the carry released (exact), the chart's reading, the certified storage growth, the successor's
+/// largest absolute entry of the source port, and its exact bits.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct SourceStep {
+    pub step: Rat,
+    pub alignment: Rat,
+    pub unit: Rat,
+    pub stepped: u64,
+    pub released: Vec<Rat>,
+    pub chart: ChartReading,
+    pub storage_growth: Rat,
+    pub largest: Rat,
+    pub bits: u64,
+}
+
 /// [definition] **What a deposit's publication reads** (module header, "The committed energy bound,
 /// enforced at the commit"): the certified storage growth `ε_k` of the storage forms the deposit
 /// changes (`Q_(k+1) ⪯ (1 + ε_k) Q_k`; a deposit with none certified is refused) and the product
@@ -3749,6 +3767,83 @@ impl Constitution {
     /// The loaded resonator on ring `g`, if that ring declares one.
     pub fn resonator(&self, ring: usize) -> Option<&ResonatorMaterial> {
         self.rings[ring].resonator.as_ref()
+    }
+
+    /// [definition; agent-inferred, September 30] **The source port carried by a declared
+    /// comparison's returns at a step `η`** (`hnn::executed`, "The committed move"): the source
+    /// port's normal law prepared on the returns ([`NormalLaw::prepare`]: `ΔH = Σ w f fᵀ` carried,
+    /// the chart of `H′` refined, the unit step `D = Σ w g (X̂f)ᵀ`, its alignment `a = Σ w⟨g, Df⟩`)
+    /// and stepped by `ηD` through the locus's budgeted carry ([`PreparedStep::stepped`]), the
+    /// locus's clock advanced when an entry moved, the commit counted, and the successor refused
+    /// past the budget or when its committed storage growth is uncertified (the guards of
+    /// [`Constitution::deposited`]). `None` when the returns reach nothing. It publishes nothing:
+    /// the executed comparison's move adopts the successor only when every commit guard holds on it
+    /// (`hnn::executed::executed_move`), so it is visible to the crate alone.
+    pub(crate) fn stepped_source(
+        &self,
+        ring: usize,
+        samples: &[Sample],
+        step: &Rat,
+    ) -> Result<Option<(Self, SourceStep)>, HnnError> {
+        let locus = Locus::SourcePort(ring);
+        if self.released.contains(&locus) {
+            return Err(HnnError::ReleasedLocus { locus });
+        }
+        let law = self.rings[ring]
+            .source
+            .as_ref()
+            .ok_or(HnnError::MissingSourcePort { ring })?;
+        let rule = self.chart_rule(locus)?;
+        let mut at = BudgetedCarry::new(self.lattice(locus)?, self.clock(locus) + 1);
+        let Some(prepared) = law.prepare(samples, &[], &rule, &mut at)? else {
+            return Ok(None);
+        };
+        let alignment = prepared.alignment.clone();
+        let (unit, _) = prepared.unit_norms.clone();
+        let (stepped, chart) = prepared.stepped(step, &mut at)?;
+        let mut next = self.clone();
+        next.rings[ring].source = Some(stepped);
+        next.commit += 1;
+        if at.moved() {
+            next.clocks.insert(locus, at.clock());
+        }
+        let storage_growth =
+            certify_storage_growth(&self.storage_forms()?, &next.storage_forms()?)?
+                .ok_or(HnnError::UncertifiedStorage)?;
+        next.storage_product = &self.storage_product * (Rat::one() + &storage_growth);
+        let bits = next.exact_bits();
+        if bits > self.budget {
+            return Err(HnnError::ConstitutionBudget {
+                bits,
+                budget: self.budget,
+                commit: self.commit,
+                loci: vec![locus],
+            });
+        }
+        let largest = next.rings[ring]
+            .source
+            .as_ref()
+            .map(|law| {
+                law.map()
+                    .entries()
+                    .iter()
+                    .map(|x| x.abs())
+                    .max()
+                    .unwrap_or_else(Rat::zero)
+            })
+            .unwrap_or_else(Rat::zero);
+        let reading = SourceStep {
+            step: step.clone(),
+            alignment,
+            unit,
+            stepped: at.stepped(),
+            released: at.released().into_iter().map(|(.., e)| e).collect(),
+            chart,
+            storage_growth,
+            largest,
+            bits,
+        };
+        Ok(Some((next, reading)))
     }
 
     /// **Replace one ring's standing, source port or receiving map** (a test and control chart).

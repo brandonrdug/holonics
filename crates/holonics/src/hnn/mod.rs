@@ -79,7 +79,11 @@
 //!   `K` continuing words from the request's moment, read jointly at every station from one
 //!   anchor, released at width zero through `receiver::release` (a plural section held), and
 //!   learned by its covector pulled back through the `K` words (`Word::continuing`,
-//!   `Word::pull_back_continuing`) and deposited at the certified step (`constitution`).
+//!   `Word::pull_back_continuing`) and deposited at the certified step (`constitution`);
+//! - [`executed`] (THE_REBUILD U6, September 30): the release's own comparison (the receiving
+//!   bank's class, threshold, order and section predicates along the machine's own trajectory), its
+//!   exact pullback to `E` through the executed monodromy's certified eigen-derivative (`ring`), and
+//!   a carried update of `E` adopted only when every commit guard holds on the re-read successor.
 //!
 //! [definition; agent-inferred, U2] A loaded ring's mode quotient (campaign 3's first construction)
 //! is Lean's (`HNN/ModeQuotient`); its Rust realization (`hnn::modes`, at commit `1bdacc8f`) was
@@ -122,6 +126,7 @@
 //! | the port's returns | `Holarchy/Reception.InteractionReturn` (the owner's, generic in its payloads) | [`ExecutionPort`] |
 //! | the mount certifies the Holarchy; its parametric orientation carries the aeons | `Holarchy/Join.interconnect`, `Holarchy/Join.Holarchy.parametric` | [`Reference`] (`mount_with`), [`reference::Resident::parametric`] |
 //! | native generation: the joint section, joint against marginals, the release at width zero, the consumer equation (U6) | `HNN/Prediction.{refine_iterate, jointSection, jointSection_receive, joint_not_marginals, release_width_zero, plural_section_held, consumer_eq}` | [`prediction`] |
+//! | the release's own comparison: the eigen-derivative at a simple root, a max comparison's descent, a strict decrease by disjoint enclosures (U6) | `HNN/ExecutedComparison.{product_deriv, simple_root_deriv, log_modulus_deriv, max_descends, sum_max_descends, disjoint_enclosures_decrease, predicates_release_the_section}` | [`executed`] |
 //! | the aeon at its boundary: readings, epochs as section flux, the carry-out's cycle | `Aeon/Clock/Winding.{reading_navigatorClock, torus_cycle_reads_whole_windings}`, `Aeon/Clock/Epoch.signed_count_is_flux`, `HNN/Retention.lift_reading` | [`retention::aeon_readings`], [`AeonBoundary`] |
 //! | the first law over an aeon, on enclosed code lengths, with the face against the literal | `Aeon/Production/FirstLaw.{ledger_telescopes, enclosed_telescopes}` | [`crate::aeon::EnclosedLedger`] in the resident; [`AeonBoundary::first_law`], [`AeonBoundary::literal`] |
 //!
@@ -139,6 +144,7 @@ pub mod chart;
 pub mod constitution;
 pub mod contact;
 pub mod encoding;
+pub mod executed;
 pub mod field;
 pub mod keys;
 pub mod moment;

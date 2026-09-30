@@ -130,7 +130,18 @@
 //!   stations of the largest gap lock together, each lock's reading certified (every member's
 //!   Floquet certificate at the joint growth, the executed turn's balances);
 //! - **the release**: every station locked, at width zero through `receiver::release`; no station
-//!   with a positive gap, held with the unlocked stations plural.
+//!   with a positive gap, held with the unlocked stations plural;
+//! - **one owner** [agent-inferred, September 30]: the lock iteration is [`bank_release`], which
+//!   `generate_by_bank` reads with the turn's reading and the release's own comparison
+//!   (`hnn::executed`) with each candidate's covector, so the comparison compares exactly what the
+//!   release executes;
+//! - **a refused certificate refuses the release** [proved-derived, September 30]: a lock whose
+//!   Floquet certificate is refused stops the release, held with the refused station first
+//!   ([`BankGeneration::uncertified`]). A certificate is a commit guard, never a tally (the
+//!   diagnosis record §4): the certificate is read at the reading's upper end strictly outside every
+//!   multiplier (Schur–Cohn), where the exact Stein solve of the exact monodromy always certifies
+//!   (its operator's eigenvalues `μ_iμ_j − ρ²` are nonzero and its solution `Σ_k (M/ρ)^(kᵀ)(M/ρ)^k`
+//!   is positive definite), so a refusal can only mean the reading is wrong.
 //!
 //! [definition; agent-inferred, September 29] **The bank's learning path** ([`BankImages`],
 //! [`stage_bank`], [`bank_reach`], [`deposit_with_bank`]; `hnn::ring`, "The bank's face"; Lean
@@ -215,7 +226,9 @@ use crate::hnn::realization::apply_rows;
 use crate::hnn::receiving::ReceivingRead;
 use crate::hnn::reference::{ComposedReturn, compose_return};
 use crate::hnn::retention::{Diamond, loci};
-use crate::hnn::ring::{BankChart, Growth, ReceivingBank, Resonance, TurnReading, turn};
+use crate::hnn::ring::{
+    BankChart, Growth, ReceivingBank, Resonance, TurnCovector, TurnReading, turn,
+};
 use crate::hnn::word::{CommitWork, EndChange, PowerForm, Word};
 use crate::holarchy::terrain::Draw;
 use crate::holon::deposition::{power, significant, sqrt_ceiling};
@@ -1366,7 +1379,9 @@ pub fn generate(
 /// ([`generate_by_bank`]): its release, the refinements it took, the stations each locked, the turn
 /// readings made, and at every lock the bank's certificate (the members certified at the locked
 /// reading's growth, and the executed turn's ticks whose balance closed, of those run), with each
-/// lock's station, class, growth and runner-up growth.
+/// lock's station, class, growth and runner-up growth; and the lock whose Floquet certificate was
+/// refused, if one was, where the release stopped and held (September 30: a refused certificate is
+/// a commit guard, never a tally).
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct BankGeneration {
     pub release: SectionRelease,
@@ -1378,6 +1393,44 @@ pub struct BankGeneration {
     pub ticks_closed: usize,
     pub ticks: usize,
     pub decisions: Vec<(usize, usize, Growth, Growth)>,
+    pub uncertified: Option<(usize, usize)>,
+}
+
+/// [definition; agent-inferred, September 30] **One refinement of the bank's lock iteration**
+/// ([`bank_release`]): the section placed before it, every open candidate `(station, class)` in
+/// station-major order with its reading, each open station's top class, the eligible stations
+/// (the top's flip and lock both certified) with their gaps, and the stations it locked.
+#[derive(Clone, Debug)]
+pub struct BankRefinement<R> {
+    pub placed: Vec<Option<usize>>,
+    pub open: Vec<(usize, usize)>,
+    pub read: Vec<R>,
+    pub tops: Vec<(usize, usize)>,
+    pub eligible: Vec<(usize, usize, Rat)>,
+    pub locked: Vec<usize>,
+}
+
+/// [definition; agent-inferred, September 30] **A candidate's reading as the lock iteration reads
+/// it**: its joint growth enclosure.
+pub trait JointGrowth {
+    /// The turn's reading.
+    fn reading(&self) -> &TurnReading;
+    /// Its joint growth enclosure.
+    fn joint(&self) -> &Growth {
+        &self.reading().joint
+    }
+}
+
+impl JointGrowth for TurnReading {
+    fn reading(&self) -> &TurnReading {
+        self
+    }
+}
+
+impl JointGrowth for TurnCovector {
+    fn reading(&self) -> &TurnReading {
+        &self.reading
+    }
 }
 
 /// [definition; agent-inferred, September 29] **Generate a section by the receiving bank's locks**
@@ -1392,8 +1445,9 @@ pub struct BankGeneration {
 /// `upper`. Every station of the largest positive gap locks (ties together), its reading certified
 /// ([`ReceivingBank::certify_turn`]); a locked datum is placed for the next refinement. It stops when
 /// every station is locked, released at width zero through `receiver::release` ([`Section::release`]'s
-/// law), or when no unlocked station has a positive gap, held with them plural. Nothing is
-/// deposited: the constitution is read at its cut (`E`, placed through the source port), and the
+/// law), or when no unlocked station has a positive gap, held with them plural, or when a lock's
+/// Floquet certificate is refused, held with the open stations plural (the refusal named). Nothing
+/// is deposited: the constitution is read at its cut (`E`, placed through the source port), and the
 /// bank's members are declared. The readings of one refinement are co-present regions: shared
 /// immutable input, one output each, so they run on the host's cores.
 #[allow(clippy::too_many_arguments)]
@@ -1406,19 +1460,47 @@ pub fn generate_by_bank(
     bank: &ReceivingBank,
     grain: u32,
 ) -> Result<BankGeneration, HnnError> {
-    use rayon::prelude::*;
     let ring = declared.ring;
     if !field.is_source(ring) {
         return Err(HnnError::MissingSourcePort { ring });
     }
-    let alphabet = field.alphabet();
-    let stations = declared.stations;
     let placement = BankPlacement::of(field, constitution, current, moment, declared)?;
+    let (generation, _) = bank_release(
+        &placement,
+        declared,
+        field.alphabet(),
+        bank,
+        grain,
+        |amplitudes| bank.read_turn(amplitudes, grain),
+        false,
+    )?;
+    Ok(generation)
+}
+
+/// [definition; agent-inferred, September 30] **The bank's lock iteration, its one owner**
+/// ([`generate_by_bank`]'s law, read by the release's own comparison `hnn::executed` with each
+/// candidate's covector): every refinement reads every open candidate by `read`, decides each
+/// open station's lock's flip and gap, locks the stations of the largest positive gap together,
+/// certifies each lock's reading, and stops at the whole section, at a plural refinement, or at a
+/// refused certificate. With `keep`, each refinement's readings are returned.
+pub fn bank_release<R: JointGrowth + Send + Sync>(
+    placement: &BankPlacement,
+    declared: &Refinement,
+    alphabet: usize,
+    bank: &ReceivingBank,
+    grain: u32,
+    read: impl Fn(&[GaussianRat]) -> Result<R, HnnError> + Sync,
+    keep: bool,
+) -> Result<(BankGeneration, Vec<BankRefinement<R>>), HnnError> {
+    use rayon::prelude::*;
+    let stations = declared.stations;
     let mut locked: Vec<Option<usize>> = vec![None; stations];
     let mut tops: Vec<usize> = vec![declared.termination; stations];
     let mut locks: Vec<Vec<usize>> = Vec::new();
     let mut plural: Vec<usize> = Vec::new();
     let mut decisions = Vec::new();
+    let mut kept = Vec::new();
+    let mut uncertified = None;
     let (mut refinements, mut readings, mut certified, mut members) = (0, 0, 0, 0);
     let (mut ticks_closed, mut ticks) = (0, 0);
     while locked.iter().any(Option::is_none) {
@@ -1432,28 +1514,36 @@ pub fn generate_by_bank(
             .filter(|&station| locked[station].is_none())
             .flat_map(|station| (0..alphabet).map(move |class| (station, class)))
             .collect();
-        let read: Vec<TurnReading> = open
+        let read: Vec<R> = open
             .par_iter()
-            .map(|&(station, class)| bank.read_turn(&turn(&storage(station, class)), grain))
+            .map(|&(station, class)| read(&turn(&storage(station, class))))
             .collect::<Result<Vec<_>, HnnError>>()?;
         refinements += 1;
         readings += read.len();
         // Each unlocked station's lock's flip: its top candidate and gap.
         let mut gaps: Vec<(usize, usize, Rat)> = Vec::new();
+        let mut station_tops = Vec::new();
         for (index, chunk) in read.chunks(alphabet).enumerate() {
             let station = open[index * alphabet].0;
             let best = (0..alphabet)
-                .max_by(|&a, &b| chunk[a].joint.lower.cmp(&chunk[b].joint.lower).then(b.cmp(&a)))
+                .max_by(|&a, &b| {
+                    chunk[a]
+                        .joint()
+                        .lower
+                        .cmp(&chunk[b].joint().lower)
+                        .then(b.cmp(&a))
+                })
                 .expect("a class");
             tops[station] = best;
-            let top = &chunk[best].joint;
+            station_tops.push((station, best));
+            let top = chunk[best].joint();
             let runner = (0..alphabet)
                 .filter(|&class| class != best)
-                .map(|class| chunk[class].joint.upper.clone())
+                .map(|class| chunk[class].joint().upper.clone())
                 .max();
             let flips = (0..alphabet)
                 .filter(|&class| class != best)
-                .all(|class| top.exceeds(&chunk[class].joint));
+                .all(|class| top.exceeds(chunk[class].joint()));
             if flips && top.is_locked() {
                 let gap = match &runner {
                     Some(runner) => &top.lower - runner,
@@ -1462,60 +1552,97 @@ pub fn generate_by_bank(
                 gaps.push((station, best, gap));
             }
         }
-        let Some(largest) = gaps.iter().map(|(_, _, gap)| gap.clone()).max() else {
-            plural = open.iter().map(|&(station, _)| station).collect();
-            plural.dedup();
-            break;
+        let largest = gaps.iter().map(|(_, _, gap)| gap.clone()).max();
+        let now: Vec<usize> = match &largest {
+            Some(largest) => gaps
+                .iter()
+                .filter(|(_, _, gap)| gap == largest)
+                .map(|&(station, _, _)| station)
+                .collect(),
+            None => Vec::new(),
         };
-        let now: Vec<usize> = gaps
-            .iter()
-            .filter(|(_, _, gap)| *gap == largest)
-            .map(|&(station, _, _)| station)
-            .collect();
+        let mut taken = Vec::new();
         for &station in &now {
             let class = tops[station];
             let index = open
                 .iter()
                 .position(|&pair| pair == (station, class))
                 .expect("a read candidate");
-            let reading = &read[index];
+            let reading = read[index].joint().clone();
             let amplitudes = turn(&storage(station, class));
-            match bank.certify_turn(&amplitudes, reading, grain) {
+            match bank.certify_turn(&amplitudes, read[index].reading(), grain) {
                 Ok(certificate) => {
                     certified += certificate.certificates.len();
                     ticks_closed += certificate.closed;
                     ticks += certificate.ticks;
                 }
-                Err(HnnError::UncertifiedFloquet { .. }) => {}
+                // A refused certificate refuses the lock and the release (a commit guard): with
+                // the reading's upper end strictly outside every multiplier, the exact Stein solve
+                // of the exact monodromy always certifies, so a refusal can only mean the reading
+                // itself is wrong.
+                Err(HnnError::UncertifiedFloquet { .. }) => {
+                    uncertified = Some((station, class));
+                    break;
+                }
                 Err(error) => return Err(error),
             }
             members += bank.pumps().len();
             let runner = (0..alphabet)
                 .filter(|&other| other != class)
-                .map(|other| read[index - class + other].joint.clone())
+                .map(|other| read[index - class + other].joint().clone())
                 .max_by(|a, b| a.upper.cmp(&b.upper))
                 .expect("a runner-up");
-            decisions.push((station, class, reading.joint.clone(), runner));
+            decisions.push((station, class, reading, runner));
             locked[station] = Some(class);
+            taken.push(station);
         }
-        locks.push(now);
+        let stop = now.is_empty() || uncertified.is_some();
+        if stop {
+            plural = (0..stations)
+                .filter(|&station| locked[station].is_none())
+                .collect();
+            if let Some((station, _)) = uncertified {
+                plural.retain(|&s| s != station);
+                plural.insert(0, station);
+            }
+        }
+        if keep {
+            kept.push(BankRefinement {
+                placed: placed.clone(),
+                open,
+                read,
+                tops: station_tops,
+                eligible: gaps,
+                locked: taken.clone(),
+            });
+        }
+        if !taken.is_empty() {
+            locks.push(taken);
+        }
+        if stop {
+            break;
+        }
     }
     let classes: Vec<usize> = locked
         .iter()
         .zip(&tops)
         .map(|(lock, &top)| lock.unwrap_or(top))
         .collect();
-    Ok(BankGeneration {
-        release: section_release(declared, classes, plural)?,
-        refinements,
-        locks,
-        readings,
-        certified,
-        members,
-        ticks_closed,
-        ticks,
-        decisions,
-    })
+    Ok((
+        BankGeneration {
+            release: section_release(declared, classes, plural)?,
+            refinements,
+            locks,
+            readings,
+            certified,
+            members,
+            ticks_closed,
+            ticks,
+            decisions,
+            uncertified,
+        },
+        kept,
+    ))
 }
 
 /// [definition; agent-inferred, September 29] **The receiving ring's storage under a section's

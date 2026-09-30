@@ -4,6 +4,7 @@
 mod chart;
 mod constitution;
 mod encoding;
+mod executed;
 mod field;
 mod floquet;
 mod guards;

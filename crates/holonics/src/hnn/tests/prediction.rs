@@ -1014,3 +1014,164 @@ fn the_banks_deposit_is_certified_and_its_score_falls() {
     let (after, _) = masses(&next);
     assert!(after > before);
 }
+
+// -------------------------------------------------------------------------------------------
+// the release's own comparison (`hnn::executed`)
+
+/// The joint field's requests at drawn moments, with their targets and context.
+fn executed_requests(
+    field: &Field,
+    cases: &[(u64, [usize; 4])],
+    context: crate::hnn::executed::Context,
+) -> Vec<crate::hnn::executed::Request> {
+    cases
+        .iter()
+        .map(|&(seed, targets)| {
+            let (current, moment) = moment(field, seed, 8);
+            crate::hnn::executed::Request {
+                current,
+                moment,
+                targets: targets.to_vec(),
+                context: context.clone(),
+            }
+        })
+        .collect()
+}
+
+/// **The release's own comparison reads the release** (`hnn::executed::compare`): on an open
+/// context its release is `generate_by_bank`'s exactly, every refinement's open stations are
+/// compared, each station's class and threshold predicates agree with its target's and leading
+/// rival's enclosures, a refinement's lock is safe exactly when every station it locked reads its
+/// target, and `F` is the sum of the stations' positive parts.
+#[test]
+fn the_release_comparison_reads_the_bank_release() {
+    use crate::hnn::executed::{Context, Predicate, compare};
+    let field = joint();
+    let theta = generic(&field, 94);
+    let refinement = Refinement::declare(&field, 0, 2, 1, 4, 2).unwrap();
+    let bank = joint_bank();
+    let requests = executed_requests(&field, &[(95, [0, 1, 2, 1]), (96, [1, 1, 0, 2])], Context::Open);
+    let batch = compare(&field, &theta, &requests, &refinement, &bank, 12).unwrap();
+    let mut total = Rat::zero();
+    for (request, compared) in requests.iter().zip(&batch.requests) {
+        let generated = generate_by_bank(
+            &field,
+            &theta,
+            &request.current,
+            &request.moment,
+            &refinement,
+            &bank,
+            12,
+        )
+        .unwrap();
+        assert_eq!(compared.generation.as_ref(), Some(&generated));
+        assert_eq!(compared.orders.len(), generated.refinements);
+        for station in &compared.stations {
+            let (t, r) = (&station.target_growth, &station.rival_growth);
+            assert_eq!(station.class == Predicate::Holds, t.exceeds(r));
+            assert_eq!(station.threshold == Predicate::Holds, t.is_locked());
+            assert!(station.value.lower <= station.value.upper);
+            total += station.value.lower.clone().max(Rat::zero());
+        }
+        for order in &compared.orders {
+            if let Some(safe) = order.safe {
+                let right = order
+                    .locked
+                    .iter()
+                    .all(|&s| generated.release.classes[s] == request.targets[s]);
+                assert_eq!(safe, right);
+            }
+        }
+    }
+    assert_eq!(batch.value.lower, total);
+}
+
+/// **The proposal's returns are its pullback to `E`** (`hnn::executed`, "The covector"): for a drawn
+/// move `ΔE` of the source port, the returns pair with it as the contributions' storage covectors
+/// (at their dyadic faces, with their signs) pair with the storage moves `ΔE` places, exactly:
+/// `Σ w ⟨g, ΔE f⟩ = −Σ_c sign_c ⟨ĝ_c, δz_c⟩`, each `δz_c` the section's storage with `ΔE` at the
+/// source port (the storage is linear in `E`).
+#[test]
+fn the_proposals_returns_are_its_pullback_to_e() {
+    use crate::hnn::executed::{Context, proposal_returns};
+    let field = joint();
+    let theta = generic(&field, 94);
+    let refinement = Refinement::declare(&field, 0, 2, 1, 4, 2).unwrap();
+    let bank = joint_bank();
+    let requests = executed_requests(&field, &[(95, [0, 1, 2, 1]), (97, [2, 0, 1, 1])], Context::Open);
+    let (samples, contributions) =
+        proposal_returns(&field, &theta, &requests, &refinement, &bank, 12).unwrap();
+    assert!(!contributions.is_empty());
+    let port = theta.source_port(0).unwrap().clone();
+    let direction = Draw::new(98).matrix(port.rows(), port.columns());
+    let moved = theta
+        .clone()
+        .with_ports(0, None, Some(direction.clone()), None)
+        .unwrap();
+    let mut paired = Rat::zero();
+    for sample in &samples {
+        let image = direction.apply(&sample.feature).unwrap();
+        paired += &sample.weight
+            * sample
+                .covector
+                .iter()
+                .zip(&image)
+                .map(|(g, m)| g * m)
+                .sum::<Rat>();
+    }
+    let mut expected = Rat::zero();
+    for (request, cells, covector, sign) in &contributions {
+        let r = &requests[*request];
+        let placement =
+            BankPlacement::of(&field, &moved, &r.current, &r.moment, &refinement).unwrap();
+        let storage = placement.storage(cells);
+        expected -= sign * covector.iter().zip(&storage).map(|(g, z)| g * z).sum::<Rat>();
+    }
+    assert_eq!(paired, expected);
+}
+
+/// **The committed move descends the release's comparison, or refuses by type**
+/// (`hnn::executed::executed_move`): on two requests along the machine's own trajectory the move
+/// is adopted, and its successor reads `F` strictly lower by disjoint enclosures, holds every entry
+/// of `E` within the bound, certifies its first order, admits every crossing, certifies every lock
+/// and counts one commit; every trial before the adopted one names the guard that refused it.
+#[test]
+fn the_committed_move_descends_or_refuses_by_type() {
+    use crate::hnn::executed::{Context, entry_bound, executed_move};
+    let field = joint();
+    let theta = generic(&field, 94);
+    let refinement = Refinement::declare(&field, 0, 2, 1, 4, 2).unwrap();
+    let bank = joint_bank();
+    let requests = executed_requests(&field, &[(95, [0, 1, 2, 1]), (96, [1, 1, 0, 2])], Context::Open);
+    let moved = executed_move(&field, &theta, &requests, &refinement, &bank, 12).unwrap();
+    for trial in &moved.trials[..moved.trials.len().saturating_sub(1)] {
+        assert!(trial.refusal.is_some());
+    }
+    match &moved.adopted {
+        Some((successor, step)) => {
+            let last = moved.trials.last().unwrap();
+            assert!(last.refusal.is_none());
+            let after = last.after.as_ref().unwrap();
+            assert!(after.value.upper < moved.before.value.lower);
+            assert!(last.first_order.as_ref().unwrap().upper.is_negative());
+            assert!(step.largest <= entry_bound());
+            assert_eq!(
+                &step.largest,
+                &successor
+                    .source_port(0)
+                    .unwrap()
+                    .entries()
+                    .iter()
+                    .map(|x| x.abs())
+                    .max()
+                    .unwrap()
+            );
+            assert!(after
+                .requests
+                .iter()
+                .all(|r| r.generation.as_ref().unwrap().uncertified.is_none()));
+            assert_eq!(successor.commit(), theta.commit() + 1);
+        }
+        None => panic!("the move on this instance is adopted: {:?}", moved.refusal),
+    }
+}

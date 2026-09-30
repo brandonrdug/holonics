@@ -108,6 +108,8 @@
 
 #[path = "exterior.rs"]
 mod exterior;
+#[path = "hnn_executed_loop.rs"]
+mod executed_loop;
 
 use std::collections::BTreeMap;
 use std::time::Instant;
@@ -271,6 +273,9 @@ struct Tally {
     /// The committed energy bound read on every refinement at its commit, and how many held.
     energy_checks: u64,
     energy_holds: u64,
+    /// The deposits refused at their commit by the energy bound or the entry bound (commit guards,
+    /// September 30).
+    refused: u64,
     /// Every certified step's exponent `k` (the step `2^k`), by locus: the least and the largest.
     exponents: BTreeMap<String, (i64, i64)>,
     /// The largest absolute entry of each learned map after each deposit (the source port, the
@@ -938,6 +943,8 @@ impl Engine {
                 *kept = value.clone();
             }
         }
+        let maps_after = maps.clone();
+        let mut refusals: Vec<String> = Vec::new();
         if self.tally.trajectory.len() < 8 {
             self.tally.trajectory.push(maps);
         }
@@ -968,7 +975,25 @@ impl Engine {
             self.tally.energy_checks += 1;
             // Through a pumped ring every span within the refinement's is carried by at most its
             // factor (Lean `Holon/Deposition.pumped_span_factor`); on a passive medium it is one.
-            self.tally.energy_holds += u64::from(bound.committed <= &bound.bound * &factor);
+            let holds = bound.committed <= &bound.bound * &factor;
+            self.tally.energy_holds += u64::from(holds);
+            if !holds {
+                refusals.push("the committed energy bound".to_string());
+            }
+        }
+        // The commit guards (September 30, the diagnosis record §4: counted guards become commit
+        // guards): a deposit whose committed energy bound fails on any refinement, or whose
+        // successor carries a learned map's entry past the entry bound `2³`, is refused and the
+        // predecessor stays published.
+        for (name, value) in maps_after.iter() {
+            if value > &Rat::from_integer(8.into()) {
+                refusals.push(format!("the entry bound at {name} ({value})"));
+            }
+        }
+        if !refusals.is_empty() {
+            self.tally.refused += 1;
+            eprintln!("  deposit refused at its commit: {}", refusals.join("; "));
+            return;
         }
         for ((name, before), (_, after)) in families(&self.field, &self.theta)
             .into_iter()
@@ -1057,9 +1082,10 @@ impl Engine {
             );
         }
         println!(
-            "  the committed energy bound held at {} of {} refinements' commits; the certified storage growth's product since the founding {}",
+            "  the committed energy bound held at {} of {} refinements' commits; deposits refused at their commit (energy or entry bound) {}; the certified storage growth's product since the founding {}",
             t.energy_holds,
             t.energy_checks,
+            t.refused,
             t.storage_product
                 .as_ref()
                 .map_or_else(|| "none".to_string(), ToString::to_string)
@@ -2169,6 +2195,14 @@ fn main() {
                 }),
             );
         }
+        // The executed comparison's loop (`hnn_executed_loop.rs`): `executed move <seed> <requests>`.
+        Some("executed") => match arguments.get(2).map(String::as_str) {
+            Some("move") => executed_loop::stage_one(
+                arguments[3].parse().expect("a seed"),
+                arguments[4].parse().expect("a count"),
+            ),
+            _ => panic!("executed move <seed> <requests>"),
+        },
         // `pumped below | past`: the pinned pumped runs (module header, "The pumped receiving ring").
         Some("pumped") => {
             let strength = match arguments.get(2).map(String::as_str) {
