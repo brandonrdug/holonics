@@ -2281,6 +2281,9 @@ fn main() {
             arguments[3].parse().expect("count"),
             &arguments[4],
         ),
+        // The re-entry diagnostic (`reentry <export> <out>`): the correct partial section replayed
+        // in clock order and in the release's lock order, three storages a candidate.
+        Some("reentry") => reentry(&arguments[2], &arguments[3]),
         Some("dump-learn") => dump_learn(
             arguments[2].parse().expect("seed"),
             arguments[3].parse().expect("deposits"),
@@ -2467,51 +2470,14 @@ fn read_export(input: &str) -> (Vec<Vec<Rat>>, Vec<(Vec<usize>, Vec<usize>, Vec<
 /// `h = 1`, `K_t = I − 2pR(c)`), and the teacher-forced decisions (stations before `j` placed at
 /// their truth) read exactly.
 fn native_release(input: &str, count: usize, out: &str) {
-    use holonics::hnn::constitution::Locus;
     use holonics::hnn::prediction::BankPlacement;
     use holonics::hnn::ring::turn;
     use rayon::prelude::*;
     use std::fmt::Write as _;
     let declared = order_declared(false);
     let engine = Engine::new(declared);
-    let (rows, pairs, causal) = read_export(input);
-    let lattice = engine
-        .theta
-        .lattice(Locus::SourcePort(0))
-        .expect("the source port's lattice");
-    let mut moved = Rat::zero();
-    let mut largest = Rat::zero();
-    let rounded: Vec<Vec<Rat>> = rows
-        .iter()
-        .map(|row| {
-            row.iter()
-                .map(|x| {
-                    let (q, r) = lattice.div_rem(x);
-                    moved = moved.clone().max(r.abs());
-                    let value = Rat::from_integer(q) * lattice.unit();
-                    largest = largest.clone().max(value.abs());
-                    value
-                })
-                .collect()
-        })
-        .collect();
-    let port = ExactRatMatrix::new(rounded).expect("E");
-    let theta = engine
-        .theta
-        .clone()
-        .with_ports(0, None, Some(port), None)
-        .expect("the fitted E at the source port");
-    // The fitted transport modulus (the passage law of September 30), rounded to the source port's
-    // lattice likewise; one when the export carries none.
-    let theta = match read_export_modulus(input) {
-        Some(modulus) => {
-            let (q, _) = lattice.div_rem(&modulus);
-            let rounded = Rat::from_integer(q) * lattice.unit();
-            println!("native-release: the transport modulus {rounded} (fitted {modulus})");
-            theta.with_transport(0, rounded).expect("a passive modulus on the lattice")
-        }
-        None => theta,
-    };
+    let (_, pairs, causal) = read_export(input);
+    let theta = fitted_constitution(&engine, input, "native-release");
     let bank = bank_of(declared.period, &bank_strength());
     let p = bank_strength();
     let admissible = |storage: &[Rat]| -> (bool, Rat) {
@@ -2524,10 +2490,6 @@ fn native_release(input: &str, count: usize, out: &str) {
             .unwrap_or_else(Rat::zero);
         (widest <= bound, widest)
     };
-    println!(
-        "native-release: E on the source port's lattice 2^(-{}), the rounding's largest move {moved}; E's largest |entry| {largest} (the entry bound 8)",
-        lattice.exponent()
-    );
     let (field, refinement, stations) = (&engine.field, &engine.refinement, declared.stations);
     let chosen = &pairs[..count.min(pairs.len())];
     let clock = Instant::now();
@@ -2663,6 +2625,572 @@ fn native_release(input: &str, count: usize, out: &str) {
     println!(
         "native-release: {} requests in {} ms; resident {}",
         chosen.len(),
+        clock.elapsed().as_millis(),
+        resident()
+    );
+}
+
+/// **An export's fitted constitution** (exterior harness): the exported `E` rounded to the source
+/// port's lattice (nearest, ties upward) and placed at the source port, and the fitted transport
+/// modulus rounded to the same lattice (one when the export carries none), each rounding printed.
+fn fitted_constitution(engine: &Engine, input: &str, label: &str) -> Constitution {
+    use holonics::hnn::constitution::Locus;
+    let (rows, _, _) = read_export(input);
+    let lattice = engine
+        .theta
+        .lattice(Locus::SourcePort(0))
+        .expect("the source port's lattice");
+    let mut moved = Rat::zero();
+    let mut largest = Rat::zero();
+    let rounded: Vec<Vec<Rat>> = rows
+        .iter()
+        .map(|row| {
+            row.iter()
+                .map(|x| {
+                    let (q, r) = lattice.div_rem(x);
+                    moved = moved.clone().max(r.abs());
+                    let value = Rat::from_integer(q) * lattice.unit();
+                    largest = largest.clone().max(value.abs());
+                    value
+                })
+                .collect()
+        })
+        .collect();
+    let port = ExactRatMatrix::new(rounded).expect("E");
+    let theta = engine
+        .theta
+        .clone()
+        .with_ports(0, None, Some(port), None)
+        .expect("the fitted E at the source port");
+    // The fitted transport modulus (the passage law of September 30), rounded to the source port's
+    // lattice likewise; one when the export carries none.
+    let theta = match read_export_modulus(input) {
+        Some(modulus) => {
+            let (q, _) = lattice.div_rem(&modulus);
+            let rounded = Rat::from_integer(q) * lattice.unit();
+            println!("{label}: the transport modulus {rounded} (fitted {modulus})");
+            theta.with_transport(0, rounded).expect("a passive modulus on the lattice")
+        }
+        None => theta,
+    };
+    println!(
+        "{label}: E on the source port's lattice 2^(-{}), the rounding's largest move {moved}; E's largest |entry| {largest} (the entry bound 8)",
+        lattice.exponent()
+    );
+    theta
+}
+
+/// The re-entry diagnostic's deadline (its projection's bound; the record's §3).
+const REENTRY_DEADLINE_MS: u128 = 900_000;
+
+/// A candidate's bank reading, or the crossing's refusal.
+type Read = Result<holonics::hnn::ring::TurnReading, String>;
+
+/// [definition; agent-inferred, September 30] **A station's executed comparison against its target**
+/// (`hnn::executed`'s class predicate): the rival is the other class of the largest joint `upper`;
+/// the margin's exact enclosure is `[L_t − U_r, U_t − L_r]`; it holds when `L_t > U_r`
+/// (`Growth::exceeds`), fails when some rival's `L` reaches `U_t`, and is undecided otherwise; the
+/// threshold is `L_t > 1`; the top is the lock iteration's (the largest `lower`, the lower class on a
+/// tie).
+struct Compared {
+    status: &'static str,
+    top: usize,
+    rival: usize,
+    margin: (Rat, Rat),
+    threshold: bool,
+}
+
+fn compared(reads: &[Read], target: usize) -> Compared {
+    if reads.iter().any(Result::is_err) {
+        return Compared {
+            status: "refused",
+            top: target,
+            rival: target,
+            margin: (Rat::zero(), Rat::zero()),
+            threshold: false,
+        };
+    }
+    let joint = |x: usize| &reads[x].as_ref().expect("a reading").joint;
+    let classes = reads.len();
+    let top = (0..classes)
+        .max_by(|&a, &b| joint(a).lower.cmp(&joint(b).lower).then(b.cmp(&a)))
+        .expect("a class");
+    let rival = (0..classes)
+        .filter(|&x| x != target)
+        .max_by(|&a, &b| joint(a).upper.cmp(&joint(b).upper).then(b.cmp(&a)))
+        .expect("a rival");
+    let (t, r) = (joint(target), joint(rival));
+    let status = if t.exceeds(r) {
+        "holds"
+    } else if (0..classes).any(|x| x != target && joint(x).lower >= t.upper) {
+        "fails"
+    } else {
+        "undecided"
+    };
+    Compared {
+        status,
+        top,
+        rival,
+        margin: (&t.lower - &r.upper, &t.upper - &r.lower),
+        threshold: t.is_locked(),
+    }
+}
+
+/// One comparison as the trace writes it: status, the margin's enclosure, the rival, the top, the
+/// threshold; with `members`, the target's and the rival's member growths.
+fn compared_line(reads: &[Read], target: usize, members: bool) -> String {
+    let c = compared(reads, target);
+    let mut s = format!(
+        "{} [{}, {}] rival {} top {} past-one {}",
+        c.status, c.margin.0, c.margin.1, c.rival, c.top, c.threshold
+    );
+    if members && c.status != "refused" {
+        for (name, class) in [("target", target), ("rival", c.rival)] {
+            let reading = reads[class].as_ref().expect("a reading");
+            s.push_str(&format!(" {name}"));
+            for m in &reading.members {
+                s.push_str(&format!(" [{}, {}]", m.lower, m.upper));
+            }
+        }
+    }
+    s
+}
+
+/// A request's counts for the diagnostic's summary.
+#[derive(Clone, Default)]
+struct ReentryCounts {
+    /// `[order][variant][insertion]`: open stations whose comparison holds, and open stations.
+    holding: Vec<Vec<Vec<(u64, u64)>>>,
+    /// `[order][variant]`: the first insertion at which a comparison holding from the open section
+    /// is lost, with the stations lost there.
+    first: Vec<Vec<Option<(usize, Vec<usize>)>>>,
+    /// `[order]`: at the full placement's first loss, each lost station's status under the
+    /// denominator alone.
+    attribution: Vec<Vec<&'static str>>,
+    /// Stations whose comparison does not hold from the open section.
+    wrong_open: usize,
+    ordinary: String,
+    ordinary_whole: bool,
+    ordinary_right: usize,
+    /// The ordinary release's first wrong lock: its refinement, the data placed before it, its
+    /// station, and whether the open section's comparison holds there.
+    first_wrong: Option<(usize, usize, usize, bool)>,
+    clock: String,
+    clock_whole: bool,
+    clock_right: usize,
+}
+
+/// [definition; agent-inferred, September 30] **The re-entry diagnostic** (exterior harness, not a
+/// pinned run; THE_REBUILD U6; the passage law's measured record §3): why the order-2 release loses
+/// whole sections once locked data re-enter. The export's fitted `E` and `ρ` (frozen, on the source
+/// port's lattice) and its requests; truth supplies only the placements and the assessment. For each
+/// request, the correct partial section is replayed in two orders (clock order; the lock order its
+/// ordinary release records, the largest gap first) and, at every insertion, every open candidate is
+/// read by the bank (`ReceivingBank::read_turn`) from three storages routed through
+/// `BankPlacement`:
+/// - **full**: `storage(S ∪ {j: x})`, the passage's law;
+/// - **denominator**: the same storage less each re-entered datum's amplitude at its owner's weight,
+///   `storage(S ∪ {j: x}) − Σ_(i∈S) w_i P^(λ−c_i) E e_(t_i)` (`BankPlacement::weights`; the images
+///   held to the owner exactly), so every weight is read over the enlarged span's transported mass
+///   and no re-entered amplitude enters;
+/// - **none**: `storage({j: x})`, the open section.
+///
+/// Each open station's comparison is [`compared`]. Also the ordinary release (`generate_by_bank`)
+/// and the clock-order release (the owner's flip, threshold and certificate, one station a
+/// refinement in clock order: a diagnostic order, not a law).
+fn reentry(input: &str, out: &str) {
+    use holonics::hnn::prediction::BankPlacement;
+    use holonics::hnn::ring::{TurnReading, turn};
+    use num_bigint::BigInt;
+    use rayon::prelude::*;
+    use std::fmt::Write as _;
+    const ORDERS: [&str; 2] = ["clock", "gap"];
+    const VARIANTS: [&str; 3] = ["full", "denominator", "none"];
+    let declared = order_declared(false);
+    let engine = Engine::new(declared);
+    let (_, pairs, _) = read_export(input);
+    let theta = fitted_constitution(&engine, input, "reentry");
+    let bank = bank_of(declared.period, &bank_strength());
+    let (field, refinement) = (&engine.field, &engine.refinement);
+    let (stations, alphabet, ring) = (declared.stations, declared.alphabet, refinement.ring());
+    let clock = Instant::now();
+    let symbols = |cells: &[Option<usize>]| -> String {
+        cells
+            .iter()
+            .map(|c| c.map_or("?".to_string(), |x| x.to_string()))
+            .collect::<Vec<_>>()
+            .join(" ")
+    };
+    let results: Vec<(String, Option<ReentryCounts>)> = pairs
+        .par_iter()
+        .enumerate()
+        .map(|(index, (request, target, _))| {
+            let mut s = String::new();
+            if !guarded_within(&clock, REENTRY_DEADLINE_MS) {
+                writeln!(s, "request {index}: not read (past the deadline)").unwrap();
+                return (s, None);
+            }
+            let (current, moment) = ingest(field, request);
+            let placement = BankPlacement::of(field, &theta, &current, &moment, refinement)
+                .expect("the placement");
+            // Each station's class images `P^(λ − c_j) E e_x` (the owner's law), held to the owner:
+            // two classes at one station weigh alike, so their storages differ exactly by the
+            // weight times their images' difference.
+            let port = theta.source_port(ring).expect("the source port");
+            let geometry = field.ring(ring);
+            let period = geometry.period();
+            let phase = current.phase(field, ring).expect("the receiving ring's phase");
+            let lift = current.lift()[ring].clone();
+            let images: Vec<Vec<Vec<Rat>>> = (0..stations)
+                .map(|station| {
+                    let rotation = &lift - BigInt::from((phase + 1 + station as u64) % period);
+                    (0..alphabet)
+                        .map(|class| {
+                            let column: Vec<Rat> = (0..port.rows())
+                                .map(|row| port.get(row, class).expect("in range").clone())
+                                .collect();
+                            geometry.rotate(&column, &rotation)
+                        })
+                        .collect()
+                })
+                .collect();
+            for station in 0..stations {
+                for class in 1..alphabet {
+                    let (mut a, mut b) = (vec![None; stations], vec![None; stations]);
+                    a[station] = Some(class);
+                    b[station] = Some(class - 1);
+                    let weight = placement.weights(&a).1[station].clone().expect("placed");
+                    let (za, zb) = (placement.storage(&a), placement.storage(&b));
+                    let (ia, ib) = (&images[station][class], &images[station][class - 1]);
+                    assert!(
+                        za.iter()
+                            .zip(&zb)
+                            .zip(ia.iter().zip(ib))
+                            .all(|((x, y), (u, v))| x - y == &weight * (u - v)),
+                        "the images agree with the owner's placement"
+                    );
+                }
+            }
+            let read = |cells: &[Option<usize>], strip: &[usize]| -> Read {
+                let mut z = placement.storage(cells);
+                if !strip.is_empty() {
+                    let (_, weights) = placement.weights(cells);
+                    for &i in strip {
+                        let class = cells[i].expect("a re-entered datum");
+                        let w = weights[i].as_ref().expect("its weight");
+                        for (value, add) in z.iter_mut().zip(&images[i][class]) {
+                            *value -= add * w;
+                        }
+                    }
+                }
+                bank.read_turn(&turn(&z), BANK_GRAIN).map_err(|e| e.to_string())
+            };
+            let single = |station: usize, class: usize, base: &[Option<usize>]| {
+                let mut cells = base.to_vec();
+                cells[station] = Some(class);
+                cells
+            };
+            let mut counts = ReentryCounts::default();
+            // The open section: every station's candidates with nothing placed.
+            let open: Vec<Vec<Read>> = (0..stations)
+                .into_par_iter()
+                .map(|j| {
+                    (0..alphabet)
+                        .into_par_iter()
+                        .map(|x| read(&single(j, x, &vec![None; stations]), &[]))
+                        .collect()
+                })
+                .collect();
+            let base: Vec<bool> =
+                (0..stations).map(|j| compared(&open[j], target[j]).status == "holds").collect();
+            counts.wrong_open = base.iter().filter(|b| !**b).count();
+            // The ordinary release (the owner's lock iteration, the largest gap first).
+            let mut gap_order: Vec<usize> = Vec::new();
+            match generate_by_bank(field, &theta, &current, &moment, refinement, &bank, BANK_GRAIN) {
+                Ok(generation) => {
+                    let classes = &generation.release.classes;
+                    let cells: Vec<Option<usize>> = (0..stations)
+                        .map(|j| (!generation.release.plural.contains(&j)).then_some(classes[j]))
+                        .collect();
+                    counts.ordinary = symbols(&cells);
+                    counts.ordinary_right =
+                        cells.iter().zip(target).filter(|(c, t)| **c == Some(**t)).count();
+                    counts.ordinary_whole = counts.ordinary_right == stations;
+                    let mut placed_before = 0;
+                    'locks: for (refinement_index, lock) in generation.locks.iter().enumerate() {
+                        for &station in lock {
+                            if classes[station] != target[station] {
+                                counts.first_wrong = Some((
+                                    refinement_index,
+                                    placed_before,
+                                    station,
+                                    base[station],
+                                ));
+                                break 'locks;
+                            }
+                        }
+                        placed_before += lock.len();
+                    }
+                    gap_order = generation.locks.iter().flatten().copied().collect();
+                    writeln!(
+                        s,
+                        "request {index}: seed pair {} {}; target {}; ordinary release {} ({}, right {}), lock order {:?}; members certified {} of {}",
+                        request[request.len() - 2],
+                        request[request.len() - 1],
+                        symbols(&target.iter().map(|&t| Some(t)).collect::<Vec<_>>()),
+                        counts.ordinary,
+                        if generation.release.released() { "released" } else { "held" },
+                        counts.ordinary_right,
+                        generation.locks,
+                        generation.certified,
+                        generation.members
+                    )
+                    .unwrap();
+                }
+                Err(error) => {
+                    counts.ordinary = format!("refused: {error}");
+                    writeln!(s, "request {index}: ordinary release refused: {error}").unwrap();
+                }
+            }
+            for j in 0..stations {
+                if !gap_order.contains(&j) {
+                    gap_order.push(j);
+                }
+            }
+            // The clock-order release: the owner's flip, threshold and certificate, one station a
+            // refinement in clock order.
+            let mut clocked: Vec<Option<usize>> = vec![None; stations];
+            let mut clock_stop = String::from("released");
+            for j in 0..stations {
+                let reads: Vec<Read> = (0..alphabet)
+                    .into_par_iter()
+                    .map(|x| read(&single(j, x, &clocked), &[]))
+                    .collect();
+                if let Some(Err(error)) = reads.iter().find(|r| r.is_err()) {
+                    clock_stop = format!("refused at station {j}: {error}");
+                    break;
+                }
+                let r: Vec<&TurnReading> = reads.iter().map(|r| r.as_ref().expect("read")).collect();
+                let top = (0..alphabet)
+                    .max_by(|&a, &b| r[a].joint.lower.cmp(&r[b].joint.lower).then(b.cmp(&a)))
+                    .expect("a class");
+                let flips = (0..alphabet)
+                    .filter(|&x| x != top)
+                    .all(|x| r[top].joint.exceeds(&r[x].joint));
+                if !(flips && r[top].joint.is_locked()) {
+                    clock_stop = format!(
+                        "held at station {j} (top {top}, flips {flips}, past one {})",
+                        r[top].joint.is_locked()
+                    );
+                    break;
+                }
+                let cells = single(j, top, &clocked);
+                match bank.certify_turn(&turn(&placement.storage(&cells)), r[top], BANK_GRAIN) {
+                    Ok(_) => clocked[j] = Some(top),
+                    Err(error) => {
+                        clock_stop = format!("the lock at station {j} refused its certificate: {error}");
+                        break;
+                    }
+                }
+            }
+            counts.clock = symbols(&clocked);
+            counts.clock_right = clocked.iter().zip(target).filter(|(c, t)| **c == Some(**t)).count();
+            counts.clock_whole = counts.clock_right == stations;
+            writeln!(
+                s,
+                "  clock-order release {} ({clock_stop}, right {})",
+                counts.clock, counts.clock_right
+            )
+            .unwrap();
+            writeln!(
+                s,
+                "  open section (no re-entry), each station: {}",
+                (0..stations)
+                    .map(|j| format!("{j}: {}", compared_line(&open[j], target[j], true)))
+                    .collect::<Vec<_>>()
+                    .join("; ")
+            )
+            .unwrap();
+            // The replay: the correct partial section in each order, three storages a candidate.
+            let orders = [(0..stations).collect::<Vec<_>>(), gap_order];
+            counts.holding = vec![vec![vec![(0, 0); stations]; VARIANTS.len()]; ORDERS.len()];
+            counts.first = vec![vec![None; VARIANTS.len()]; ORDERS.len()];
+            counts.attribution = vec![Vec::new(); ORDERS.len()];
+            for (o, order) in orders.iter().enumerate() {
+                writeln!(s, "  order {} {:?}", ORDERS[o], order).unwrap();
+                for k in 0..stations {
+                    if !guarded_within(&clock, REENTRY_DEADLINE_MS) {
+                        writeln!(s, "  INCOMPLETE: past the deadline at insertion {k}").unwrap();
+                        return (s, None);
+                    }
+                    let mut placed: Vec<Option<usize>> = vec![None; stations];
+                    for &i in &order[..k] {
+                        placed[i] = Some(target[i]);
+                    }
+                    let strip: Vec<usize> = order[..k].to_vec();
+                    let open_st: Vec<usize> = (0..stations).filter(|&j| placed[j].is_none()).collect();
+                    let jobs: Vec<(usize, usize, bool)> = open_st
+                        .iter()
+                        .flat_map(|&j| {
+                            (0..alphabet).flat_map(move |x| [(j, x, false), (j, x, true)])
+                        })
+                        .collect();
+                    let replayed: Vec<Read> = if k == 0 {
+                        Vec::new()
+                    } else {
+                        jobs.par_iter()
+                            .map(|&(j, x, d)| {
+                                read(&single(j, x, &placed), if d { &strip } else { &[] })
+                            })
+                            .collect()
+                    };
+                    if k > 0 {
+                        writeln!(
+                            s,
+                            "   insertion {k}: station {} placed at {}",
+                            order[k - 1],
+                            target[order[k - 1]]
+                        )
+                        .unwrap();
+                    }
+                    let mut lost: Vec<Vec<usize>> = vec![Vec::new(); VARIANTS.len()];
+                    for (n, &j) in open_st.iter().enumerate() {
+                        let variant = |v: usize| -> Vec<Read> {
+                            if k == 0 || v == 2 {
+                                return open[j].clone();
+                            }
+                            (0..alphabet)
+                                .map(|x| replayed[(n * alphabet + x) * 2 + v].clone())
+                                .collect()
+                        };
+                        let reads: Vec<Vec<Read>> = (0..VARIANTS.len()).map(variant).collect();
+                        if k > 0 {
+                            writeln!(
+                                s,
+                                "    station {j} (target {}): full {} | denominator {}",
+                                target[j],
+                                compared_line(&reads[0], target[j], true),
+                                compared_line(&reads[1], target[j], true)
+                            )
+                            .unwrap();
+                        }
+                        for (v, r) in reads.iter().enumerate() {
+                            let holds = compared(r, target[j]).status == "holds";
+                            let cell = &mut counts.holding[o][v][k];
+                            cell.0 += u64::from(holds);
+                            cell.1 += 1;
+                            if k > 0 && base[j] && !holds {
+                                lost[v].push(j);
+                            }
+                        }
+                    }
+                    for v in 0..VARIANTS.len() {
+                        if counts.first[o][v].is_none() && !lost[v].is_empty() {
+                            if v == 0 {
+                                counts.attribution[o] = lost[0]
+                                    .iter()
+                                    .map(|j| {
+                                        if lost[1].contains(j) {
+                                            "normalization suffices"
+                                        } else {
+                                            "amplitude required"
+                                        }
+                                    })
+                                    .collect();
+                            }
+                            writeln!(
+                                s,
+                                "   FIRST LOSS ({} order, {}): insertion {k}, stations {:?}",
+                                ORDERS[o], VARIANTS[v], lost[v]
+                            )
+                            .unwrap();
+                            counts.first[o][v] = Some((k, lost[v].clone()));
+                        }
+                    }
+                }
+            }
+            (s, Some(counts))
+        })
+        .collect();
+    let mut trace = String::new();
+    for (s, _) in &results {
+        trace.push_str(s);
+    }
+    #[allow(clippy::disallowed_methods)]
+    std::fs::write(out, &trace).expect("write the trace");
+    // The summary over the requests read.
+    let read: Vec<&ReentryCounts> = results.iter().filter_map(|(_, c)| c.as_ref()).collect();
+    println!("reentry: {} of {} requests read", read.len(), results.len());
+    for (o, order) in ORDERS.iter().enumerate() {
+        for (v, variant) in VARIANTS.iter().enumerate() {
+            let by_k: Vec<String> = (0..stations)
+                .map(|k| {
+                    let (h, n) = read.iter().fold((0, 0), |(h, n), c| {
+                        (h + c.holding[o][v][k].0, n + c.holding[o][v][k].1)
+                    });
+                    format!("{h}/{n}")
+                })
+                .collect();
+            let mut first = vec![0u64; stations + 1];
+            for c in &read {
+                match &c.first[o][v] {
+                    Some((k, _)) => first[*k] += 1,
+                    None => first[stations] += 1,
+                }
+            }
+            println!(
+                "order {order}, {variant}: comparisons holding by insertion {}; first loss at insertion 1..{}: {:?}, none {}",
+                by_k.join(" "),
+                stations - 1,
+                &first[1..stations],
+                first[stations]
+            );
+        }
+        let (mut normalization, mut amplitude) = (0, 0);
+        for c in &read {
+            for a in &c.attribution[o] {
+                if *a == "normalization suffices" {
+                    normalization += 1;
+                } else {
+                    amplitude += 1;
+                }
+            }
+        }
+        println!(
+            "order {order}: at the full placement's first loss, lost also by the denominator alone {normalization}, lost only with the amplitude {amplitude}"
+        );
+    }
+    let wrong_open: usize = read.iter().map(|c| c.wrong_open).sum();
+    println!(
+        "comparisons not holding from the open section (before any re-entry): {wrong_open} of {}",
+        read.len() * stations
+    );
+    let (mut before, mut unrestored, mut firsts) = (0, 0, 0);
+    for c in &read {
+        if let Some((_, placed, _, restored)) = c.first_wrong {
+            firsts += 1;
+            before += usize::from(placed == 0);
+            unrestored += usize::from(!restored);
+        }
+    }
+    println!(
+        "ordinary release: {firsts} requests with a wrong lock; the first wrong lock before any re-entry {before}; its station's open-section comparison not holding (no re-entry does not restore it) {unrestored}"
+    );
+    for (index, c) in read.iter().enumerate() {
+        println!(
+            "request {index}: ordinary {} (right {}, whole {}); clock {} (right {}, whole {}); first wrong lock {:?}",
+            c.ordinary, c.ordinary_right, c.ordinary_whole, c.clock, c.clock_right, c.clock_whole, c.first_wrong
+        );
+    }
+    println!(
+        "whole sections: ordinary {}, clock order {} of {}",
+        read.iter().filter(|c| c.ordinary_whole).count(),
+        read.iter().filter(|c| c.clock_whole).count(),
+        read.len()
+    );
+    println!(
+        "reentry: {} requests in {} ms; resident {}",
+        results.len(),
         clock.elapsed().as_millis(),
         resident()
     );
