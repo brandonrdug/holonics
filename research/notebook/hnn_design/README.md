@@ -103,13 +103,6 @@ U6's consolidation (September 30), which retired the harnesses step 1 does not r
 | `hnn_population`'s `composition` and `arithmetic` modes (`hnn_population_{composition,arithmetic}.rs`) | Eggs composed at ports: the arithmetic eggs (catered machinery) | September 29 | [`1b374d46`](https://github.com/brandonrdug/holonics/blob/1b374d46/research/notebook/hnn_design/hnn_population_arithmetic.rs) | [eggs composed at ports](https://github.com/brandonrdug/holonics/blob/d4596102/research/notebook/hnn_design/README.md#eggs-composed-at-ports-the-arithmetic-eggs-rebuild-step-4-item-6-september-27) |
 | the curated source's own navigators | Measured and retired | September 27 (commit `38b0b81c`, reverted) | [`38b0b81c`](https://github.com/brandonrdug/holonics/commit/38b0b81c) | [the curated source's own navigators](https://github.com/brandonrdug/holonics/blob/d4596102/research/notebook/hnn_design/README.md#the-curated-sources-own-navigators-measured-and-retired-commit-38b0b81c-reverted) |
 
-### F0 candidate 2: a family wins where it is closest (September 28)
-
-Retired September 28 (`hnn_population_local.rs`, last at `2d34b819`). Its receipts are on this
-page at [`d4596102`](https://github.com/brandonrdug/holonics/blob/d4596102/research/notebook/hnn_design/README.md#f0-candidate-2-a-family-wins-where-it-is-closest-september-28); its record is
-[a number is a helix](../../records/2026-09-28_A_NUMBER_IS_A_HELIX_ITS_BASE_IS_A_FACE_AND_A_FAMILY_WINS_WHERE_IT_IS_CLOSEST.md).
-(This heading keeps the anchor THE_REBUILD's F0 entry links to.)
-
 ## Receipts
 
 The kept harnesses' receipts, per harness and then by date, each pointing to its record.

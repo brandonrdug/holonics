@@ -673,6 +673,19 @@ that fires becomes the next loop's subject, and nothing downstream starts.
     `docs/RECEIVER_HOLARCHY.md` first, and the evolved prior), `hnn::encoding`, and the retention and
     normal-update constructions. Each gets a named retained owner or its exact law recorded, so that
     key location does not delete and then rebuild them.
+  - **N1 done** (merge `3a23e14b`;
+    [baseline](../../research/records/2026-09-30_THE_BASELINE_BEFORE_THE_SEPTEMBER_30_RETIREMENTS.md)).
+    52 files and 18,132 lines retired, with 18 links repinned to `d4596102`. The replay
+    (`replay_baseline.sh`) matched twice on the baseline and once after N1, and the library tests
+    stayed at 975. Kept against the audit: `power.py`, `swing_power.py` and `capacity.py`, whose
+    readings are not all in a record, and `field.py`, which they import. N2 writes those readings
+    into the construction record and retires the four. The refit's native read (96 of 128) ran
+    through the retired probe and `bank_causes`, so it now replays only at `d4596102`; the kept
+    replay reads its lattice port. Stale prose mentions of retired files (crate docs and tests,
+    `HNN/LatticeDeposit`, `hnn_exposure.rs`, `standing_cut.py`, atlas
+    `receiver.population-species-future`) are cleared by the batch that owns each path. 1a changes
+    `executed evaluate`'s listing, so the replay reference is regenerated on 1a's tip once the diff
+    is confirmed to be 1a's intended change and nothing else.
   - **Workers and gates.** The order's C gives the sequence: the baseline freeze, N1 beside 1a, N2
     after 1a, then P and H in parallel with the minimal replay. The
     primary edits the shared plan files once at the join: THE_REBUILD, CONSTRUCTION_STATE, the
@@ -1468,7 +1481,7 @@ on the admitted egg, and the trees beyond depth 24 add at most 20 bits.
        166,113 ms.
   2. **A family wins where it is closest: measured, not adopted, September 28**
      ([record](../../research/records/2026-09-28_A_NUMBER_IS_A_HELIX_ITS_BASE_IS_A_FACE_AND_A_FAMILY_WINS_WHERE_IT_IS_CLOSEST.md#5-the-population-a-family-wins-where-it-is-closest);
-     [receipt](../../research/notebook/hnn_design/README.md#f0-candidate-2-a-family-wins-where-it-is-closest-september-28)).
+     [receipt](https://github.com/brandonrdug/holonics/blob/d4596102/research/notebook/hnn_design/README.md#f0-candidate-2-a-family-wins-where-it-is-closest-september-28)).
      `receiver::population::LocalMixture` keeps each member's posterior at each gating context,
      the last `d` cells (node-local Bayes; Lean `Population.{local_telescope, local_mixture_code,
      local_of_constant}`). Its executed chart holds a member at `2^(−64)` of its context's leader,
