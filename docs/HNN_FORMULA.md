@@ -291,7 +291,7 @@ the population, as item 10 requires.
 
 [established-bounded; measured] Item 7 is consumed (`receiver::population::admitted`,
 `compression::landmark::context::spans`; the
-[notebook receipt](../research/notebook/hnn_design/README.md#the-admitted-receivers-campaign-5-september-27)).
+[notebook receipt](https://github.com/brandonrdug/holonics/blob/d4596102/research/notebook/hnn_design/README.md#the-admitted-receivers-campaign-5-september-27)).
 `curated_incidence.py` places the request→response and response→later-human relations on the
 pinned cut. The request→response receiver locates a response on its request's span and factors the
 boundary egg's face through a copy stage, with the request's pointer coded where it arrives and

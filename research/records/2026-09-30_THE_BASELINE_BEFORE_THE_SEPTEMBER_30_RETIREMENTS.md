@@ -260,3 +260,30 @@ and `capacity.py`, whose numbers are only partly recorded, and `field.py`, which
 
 **Kept in `bank_causes_probe/`**: `eF_confirmation_counts.py` and `eM_section_shapes.py`, which
 count `executed evaluate` listings (the modulus record §3 reads them).
+
+## 7. N1's receipt
+
+[measured; source-inspected] N1 deleted the 52 files of §6 (18,132 lines), removed the
+`[[example]]` entries of `hnn_landmark`, `hnn_population`, `hnn_parametron` and `bank_causes` from
+`crates/holonics/Cargo.toml`, rewrote the notebook README as a route to what remains (the kept
+harnesses' index and receipts, the replay, and the retired harnesses with the commit holding each and
+the README sections, at that commit, holding their receipts; 2,855 lines to 1,359), and repinned
+every markdown link to a deleted file or to a removed README section onto its permalink at
+`d4596102`: 18 links in `docs/HNN_FORMULA.md` and five records (F1, F4, F5, the construction record,
+U2's pin). THE_REBUILD's link to the README's "F0 candidate 2" section resolves to a heading the
+README keeps for it.
+
+- **The consumer checks** (before the deletions): the only code consumers were the four
+  `[[example]]` entries; no `#[path]` include, Python import, script call or test outside the deleted
+  set names a deleted file. The step-1a worktree changes only `hnn_prediction.rs` and
+  `hnn_executed_loop.rs`, and neither names a deleted file. The protein worktree's working tree
+  differs from its head `03ecec71` only in its workspace manifest and its new crates, none of which
+  names a deleted file.
+- **The gates after N1**: `cargo check --workspace --all-targets` clean, no warning (the remaining
+  examples re-checked); `cargo test -p holonics --lib` 975 passed, as at the baseline; the kept
+  Python tests pass (`athena_blind_tests.py` 5, `athena_file_checkpoint_tests.py` 11,
+  `athena_file_protocol_tests.py` 8, `athena_protocol_tests.py` 14, `f5_context_tests.py` 5); the
+  two listing counters read the replay's listing; `power.py` and `swing_power.py` print the readings
+  §6 names.
+- **The replay after N1**: the listing matches the reference byte for byte (164,855 ms, peak
+  resident 89,366,528 bytes; the host was shared with another worker's runs).
