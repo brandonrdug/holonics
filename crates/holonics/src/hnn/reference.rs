@@ -3356,7 +3356,7 @@ where
 /// ticks' letters and the online baselines (`compression::landmark::context::baseline`) over the
 /// same cells in the same order, each cell scored at the current standing and then deposited, with
 /// exact enclosures on the development and held-out populations ([`prequential`], and the tree alone
-/// [`tree_prequential`]). [historical; September 30, batch H] The count-only development choices
+/// `tree_prequential` (retired September 30 after batch P; last at `8a1b41cf`)). [historical; September 30, batch H] The count-only development choices
 /// are retired with their last consumer, the notebook's `hnn_landmark` (N1): source at
 /// [`f5fd8f3b`](https://github.com/brandonrdug/holonics/blob/f5fd8f3b/crates/holonics/src/hnn/reference.rs),
 /// their readings in the landmark tree's September 26 records. Their rules, read on the
@@ -3521,15 +3521,3 @@ pub fn prequential(
     })
 }
 
-/// **One tree's prequential run on a cut, the tree alone** (the held-out pass of a law measured
-/// beside another's run of the baselines): every cell scored at the current standing before its
-/// own deposit, the code lengths enclosed on `[development, held-out]`, and the tree's run.
-pub fn tree_prequential(
-    cut: &Cut,
-    letters: &[Letter],
-    declaration: &LandmarkDeclaration,
-) -> Result<([ExactInterval; 2], TreeRun), HnnError> {
-    aligned(&cut.cells, letters)?;
-    let held_out = |position: usize| cut.held_out(position);
-    run_tree(&cut.cells, letters, &held_out, declaration)
-}

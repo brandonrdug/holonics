@@ -226,7 +226,7 @@ stated here: they have no consumer yet.
 
 The Rust consumer is `crates/holonics/src/compression/landmark/context.rs` (`compression::landmark::context`, written beside this
 owner): `StopPrior` (item 12's declared law on the dyadic ladder, founding each node at
-`β₀ = 2^(j_d) − 1`; `choose_prior` chooses it on the development cells), `Capacity` (item 13's node
+`β₀ = 2^(j_d) − 1`; the count-only `choose_prior`, retired September 30, chose it on the development cells), `Capacity` (item 13's node
 law at the capped register, Decision 39), `Landmarks` (the tree
 executed on the lattice: its all-class face `Landmarks::face`, a
 window's faces in cell order `Landmarks::window_faces`, `probability`, `score`, its deposit

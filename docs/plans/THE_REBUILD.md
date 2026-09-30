@@ -754,6 +754,29 @@ that fires becomes the next loop's subject, and nothing downstream starts.
     - Newly without a library caller: `receiver::release::{draw, draw_exact}`, the population's
       certified draw, is held with the population's release for step 4 (F5's product);
       `hnn::reference::tree_prequential` is retired after H if nothing then calls it.
+  - **H done** (merge `8a1b41cf`). 32 files, 4,212 lines deleted.
+    - Retired: the face path (the bank's images, reach and deposit, `face_read`/`face_move`,
+      `BankChart`, `BankReach` and the bank threaded through the normal law), the linear readout's
+      training and generation, and `reference.rs`'s count-only sweeps.
+    - Laws kept: Lean `HNN/BankFace`, `HNN/Prediction` and their owners. The refinement's balance,
+      driven energy bound, adjoint pairing and one-anchor refusal are written into HNN_FORMULA,
+      "The smallest native form".
+    - Of the 25 test-only functions: 15 moved under `cfg(test)`, 3 deleted, and 6 kept for the
+      card's parity tests, plus `with_surface_storage`, the only declaration of #31's surface
+      storage.
+    - Two of the three ρ < 1 refusals went with their paths; the card's stays.
+    - The atlas conflict with the 1b pin was resolved field by field: the pin's corrected reading of
+      `hnn.release-comparison`, and H's owners for `hnn.executed-move`.
+    - Gates on the merged tree: cargo check clean, 872 library tests, Lean 10,252 jobs with no
+      `sorry`, the card suite 32 passed (on H's branch: `NormalLaw::deposited`, which the card
+      mirrors, changed), and the replay matched.
+    - After it: `tree_prequential` had only its own test and is retired, and a Lean docstring naming
+      the retired `choose_prior` is fixed. The library tests are now 871.
+    - Held to 1b's dependency decision, beside `hnn::encoding`: `Word::pull_back_continuing` (no
+      consumer), `Word::continuing` (tests only) and `Refinement`'s `words`, `span`, `termination`
+      and `grain` accessors. The lessons record keeps "the continuing word with its exact adjoint".
+    - Brandon's protein branch at `03ecec71` still carries the retired `hnn_landmark.rs`, which
+      calls the retired sweeps. That consumer disappears when the branch rebases onto main.
   - **Workers and gates.** The order's C gives the sequence: the baseline freeze, N1 beside 1a, N2
     after 1a, then P and H in parallel with the minimal replay. The
     primary edits the shared plan files once at the join: THE_REBUILD, CONSTRUCTION_STATE, the

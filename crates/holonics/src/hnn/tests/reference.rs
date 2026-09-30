@@ -28,7 +28,7 @@ use crate::hnn::HnnError;
 use crate::hnn::field::Current;
 use crate::hnn::port::{ExecutionPort, ReceiptDetail};
 use crate::hnn::reference::{
-    Cut, Exposure, ReadoutWall, Reference, WallTimes, one_hot, prequential, tree_prequential,
+    Cut, Exposure, ReadoutWall, Reference, WallTimes, one_hot, prequential,
 };
 use crate::ratio::Rat;
 use crate::ratio::algebraic::ExactInterval;
@@ -462,37 +462,4 @@ fn landmark_prequential_partitions_the_cut() {
     assert_eq!(run.run.nodes, tree.nodes());
     assert_eq!(run.run.bits, tree.bits());
     assert!(run.run.largest_residual <= run.run.face_rule);
-}
-
-/// **`tree_prequential` is `prequential`'s tree**: on a declared stop prior and depth, the tree
-/// alone reads the development and held-out code lengths and the run `prequential` reads beside
-/// the baselines, and its largest per-cell residual lies within the face's rule.
-#[test]
-fn the_tree_prequential_is_the_prequentials_tree() {
-    let cells: Vec<usize> = (0..96u64)
-        .map(|t| ((t * 3 + t / 5 + t * t / 7) % 4) as usize)
-        .collect();
-    let tail = 72..96;
-    let cut = Cut {
-        cells: cells.clone(),
-        held_out: vec![tail],
-    };
-    let letters = cell_letters(&cut.cells);
-    let declared = LandmarkDeclaration {
-        population: 96,
-        ..tree_declaration(4, 1)
-    };
-    let at = LandmarkDeclaration {
-        prior: StopPrior::per_depth(vec![1, 3]).unwrap(),
-        depth: 2,
-        ..declared
-    };
-    let ([development, held], run) = tree_prequential(&cut, &letters, &at).unwrap();
-    let both = prequential(&cut, &letters, &at).unwrap();
-    assert_eq!(
-        (development, held),
-        (both.development.tree, both.held_out.tree)
-    );
-    assert_eq!(run, both.run);
-    assert!(run.largest_residual <= run.face_rule);
 }
