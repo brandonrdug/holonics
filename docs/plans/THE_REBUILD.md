@@ -505,6 +505,36 @@ named, and the program's loop stays its own counter, disclosed as such.
 
 #### U6. The text chart
 
+- **The executed comparison joined, September 30: a certified move descends the release's own
+  comparison, and on order-2 training learns only that the termination is last**
+  ([pin](../../research/records/2026-09-30_THE_EXECUTED_COMPARISONS_BOUNDED_TEST_PINNED_BEFORE_ITS_RUNS.md),
+  `f2cb7db0`; [receipt](../../research/records/2026-09-30_THE_EXECUTED_COMPARISON_JOINED_A_CERTIFIED_MOVE_DESCENDS_IT_AND_ORDER_TWO_LEARNS_ONLY_THE_TERMINATION.md); Refs #73 #148 #63).
+  - *Built* (the diagnosis's next loop): the executed growth's covector, the simple dominant
+    multiplier certified by the Krawczyk test on disks with exact dyadic endpoints and its
+    eigen-derivative carried through the executed tick and its solve, collisions, ties and
+    defective pairings typed (`hnn::ring`, `ratio::disk`); the lock iteration's one owner, a refused
+    certificate refusing the release (`hnn::prediction::bank_release`); the release's own comparison
+    along the machine's own trajectory or a partition, its pullback to `E`, and the committed move and
+    the face's move on one ladder, every guard a commit guard (`hnn::executed`); the harness's energy
+    and entry bounds refusing adoption; Lean `HNN/ExecutedComparison` (13 theorems).
+  - *Measured*:
+    - Stage 0: the fitted `E` read natively reproduces the float release at 1,024 of 1,024
+      stations and the teacher-forced 869 of 1,024, every candidate admissible; from the open section
+      it releases 404 stations and 17 whole sections of 128;
+    - Stage 1: one committed move on 8 requests lowers `F` from `[36427840, 36428159)/65536` to
+      `[22047021, 22047335)/65536` nats by disjoint enclosures; the six requirements pass;
+    - Stage 2 (order-2, 24 moves of 8 an arm): on 128 fresh requests every constitution releases 0
+      whole sections (the opening 255 stations, the repaired arm 245, `executed-partition` 252,
+      `face-open` 253; `face-partition` unread, the confirmation's bound reached); the repaired arm's
+      comparison fell on unseen batches while every trained arm learned only that the termination
+      ranks last; on the alternation the repaired arm rose from 14 to 21 whole sections, and
+      on the line from 11 to 13 (stations from 341 to 526).
+  - *What stays open*, by its measurement: after 22 certified moves the target ranks at chance among
+    the four symbols at the open section; the order-2 continuation reads the request's last two
+    cells at `ν̂(40)`, the next loop's subject in its owner (the placement's weights). In #62: the root
+    path at a simple root, Jacobi's formula at the adjugate, the Krawczyk test on disks, the tick's
+    block identity, the passage's rounding bound.
+
 - **The learning failure diagnosed, September 30** ([record](../../research/records/2026-09-30_THE_LEARNING_FAILURE_DIAGNOSED_THE_TRAINED_COMPARISON_IS_NOT_THE_ONE_THE_RELEASE_EXECUTES.md)). The trained
   comparison (the bank's exchange face) is not the one the release executes (the largest member's
   executed growth, the threshold and the gap order from an open section). The next loop joins the

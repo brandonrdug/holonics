@@ -2210,6 +2210,12 @@ fn main() {
                 arguments[8].parse().expect("a deadline in ms"),
                 &arguments[9],
             ),
+            Some("spread") => executed_loop::spread(
+                &arguments[3],
+                arguments[4].parse().expect("a seed"),
+                arguments[5].parse().expect("a count"),
+                &arguments[6..],
+            ),
             Some("evaluate") => executed_loop::evaluate(
                 &arguments[3],
                 arguments[4].parse().expect("a seed"),

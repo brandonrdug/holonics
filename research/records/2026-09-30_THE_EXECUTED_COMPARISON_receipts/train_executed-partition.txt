@@ -1,0 +1,26 @@
+executed train: arm executed-partition on order2 at seed 2026093001: 24 moves of 8 requests; the declared opening; the bank p = 5/8, grain 2^(-16)
+  move 0: adopted at step 1/64 (trial 1 of the ladder); value [201101/4096, 201105/4096) → [181830/4096, 181833/4096); E's largest entry 1249397/2097152; 2743 ms
+  move 1: adopted at step 1/16 (trial 1 of the ladder); value [210405/4096, 210409/4096) → [163414/4096, 163418/4096); E's largest entry 1307227/2097152; 3324 ms
+  move 2: adopted at step 1/16 (trial 2 of the ladder); value [106373/4096, 106376/4096) → [97138/4096, 97141/4096); E's largest entry 169423/262144; 4664 ms
+  move 3: adopted at step 1/4 (trial 1 of the ladder); value [263047/4096, 263052/4096) → [183480/4096, 183484/4096); E's largest entry 170201/262144; 4103 ms
+  move 4: adopted at step 1/4 (trial 1 of the ladder); value [164882/4096, 164886/4096) → [122993/4096, 122996/4096); E's largest entry 169597/262144; 3809 ms
+  move 5: adopted at step 1/8 (trial 1 of the ladder); value [190841/4096, 190845/4096) → [150154/4096, 150159/4096); E's largest entry 176445/262144; 3979 ms
+  move 6: adopted at step 1/4 (trial 1 of the ladder); value [164130/4096, 164134/4096) → [131624/4096, 131628/4096); E's largest entry 733413/1048576; 4070 ms
+  move 7: adopted at step 1/2 (trial 1 of the ladder); value [166769/4096, 166773/4096) → [120237/4096, 120241/4096); E's largest entry 725545/1048576; 3763 ms
+  move 8: adopted at step 1/2 (trial 1 of the ladder); value [187288/4096, 187292/4096) → [130418/4096, 130422/4096); E's largest entry 369527/524288; 3177 ms
+  move 9: adopted at step 1/2 (trial 1 of the ladder); value [101798/4096, 101801/4096) → [70871/4096, 70875/4096); E's largest entry 1504345/2097152; 2901 ms
+  move 10: adopted at step 1/2 (trial 1 of the ladder); value [212208/4096, 212212/4096) → [146986/4096, 146990/4096); E's largest entry 756499/1048576; 4224 ms
+  move 11: adopted at step 1 (trial 1 of the ladder); value [128359/4096, 128362/4096) → [86613/4096, 86616/4096); E's largest entry 778595/1048576; 3701 ms
+  move 12: adopted at step 1/4 (trial 1 of the ladder); value [105236/4096, 105239/4096) → [72093/4096, 72096/4096); E's largest entry 1604123/2097152; 3571 ms
+  move 13: adopted at step 1 (trial 1 of the ladder); value [105150/4096, 105154/4096) → [50333/4096, 50336/4096); E's largest entry 96759/131072; 2947 ms
+  move 14: adopted at step 1/4 (trial 1 of the ladder); value [83062/4096, 83066/4096) → [71813/4096, 71816/4096); E's largest entry 98229/131072; 3252 ms
+  move 15: adopted at step 1 (trial 1 of the ladder); value [42769/4096, 42771/4096) → [32866/4096, 32869/4096); E's largest entry 1612869/2097152; 2338 ms
+  move 16: adopted at step 1 (trial 1 of the ladder); value [94379/4096, 94383/4096) → [65355/4096, 65358/4096); E's largest entry 1726207/2097152; 3090 ms
+  move 17: adopted at step 1/2 (trial 1 of the ladder); value [156701/4096, 156705/4096) → [96058/4096, 96061/4096); E's largest entry 1632567/2097152; 3517 ms
+  move 18: adopted at step 1/2 (trial 1 of the ladder); value [91156/4096, 91160/4096) → [77577/4096, 77581/4096); E's largest entry 1632567/2097152; 3452 ms
+  move 19: adopted at step 2 (trial 1 of the ladder); value [82437/4096, 82441/4096) → [62957/4096, 62960/4096); E's largest entry 1632567/2097152; 3585 ms
+  move 20: adopted at step 4 (trial 1 of the ladder); value [60198/4096, 60201/4096) → [35634/4096, 35636/4096); E's largest entry 1652599/2097152; 2565 ms
+  move 21: adopted at step 1 (trial 1 of the ladder); value [107802/4096, 107806/4096) → [64019/4096, 64022/4096); E's largest entry 1646325/2097152; 3678 ms
+  move 22: adopted at step 2 (trial 1 of the ladder); value [70124/4096, 70127/4096) → [68451/4096, 68454/4096); E's largest entry 1666343/2097152; 2740 ms
+  move 23: adopted at step 2 (trial 1 of the ladder); value [113411/4096, 113414/4096) → [87925/4096, 87929/4096); E's largest entry 847735/1048576; 3799 ms
+executed train: arm executed-partition: 24 moves adopted, 0 refused, 4510 readings at E; complete; 83138 ms; resident 164036608 now, 167903232 peak

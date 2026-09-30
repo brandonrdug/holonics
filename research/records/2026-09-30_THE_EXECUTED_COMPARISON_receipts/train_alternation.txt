@@ -1,0 +1,14 @@
+executed train: arm executed-open on alternation at seed 2026093005: 12 moves of 8 requests; the declared opening; the bank p = 5/8, grain 2^(-16)
+  move 0: adopted at step 1/16 (trial 1 of the ladder); value [1403991/4096, 1404005/4096) → [1369773/4096, 1369790/4096); E's largest entry 1317283/2097152; batch released 8, whole 1, stations right 36; 62583 ms
+  move 1: adopted at step 1/8 (trial 1 of the ladder); value [1649125/4096, 1649145/4096) → [1109972/4096, 1109989/4096); E's largest entry 827287/1048576; batch released 8, whole 0, stations right 20; 93269 ms
+  move 2: adopted at step 1/4 (trial 1 of the ladder); value [1547513/4096, 1547533/4096) → [709148/4096, 709162/4096); E's largest entry 446283/524288; batch released 8, whole 1, stations right 16; 81783 ms
+  move 3: adopted at step 1/4 (trial 1 of the ladder); value [857391/4096, 857407/4096) → [854635/4096, 854653/4096); E's largest entry 934523/1048576; batch released 8, whole 1, stations right 27; 89846 ms
+  move 4: adopted at step 1/4 (trial 1 of the ladder); value [1058500/4096, 1058519/4096) → [835901/4096, 835917/4096); E's largest entry 246087/262144; batch released 8, whole 0, stations right 14; 81206 ms
+  move 5: adopted at step 1/4 (trial 1 of the ladder); value [830729/4096, 830742/4096) → [684326/4096, 684340/4096); E's largest entry 1969857/2097152; batch released 8, whole 2, stations right 36; 80334 ms
+  move 6: adopted at step 1/2 (trial 1 of the ladder); value [513862/4096, 513875/4096) → [427303/4096, 427316/4096); E's largest entry 2011709/2097152; batch released 8, whole 1, stations right 30; 80168 ms
+  move 7: adopted at step 1/4 (trial 2 of the ladder); value [854982/4096, 854998/4096) → [776362/4096, 776378/4096); E's largest entry 1984667/2097152; batch released 8, whole 0, stations right 28; 118738 ms
+  move 8: adopted at step 1/64 (trial 7 of the ladder); value [549074/4096, 549089/4096) → [536712/4096, 536726/4096); E's largest entry 1983167/2097152; batch released 8, whole 1, stations right 26; 306976 ms
+  move 9: adopted at step 1/2 (trial 2 of the ladder); value [632863/4096, 632879/4096) → [538751/4096, 538765/4096); E's largest entry 1983167/2097152; batch released 8, whole 1, stations right 23; 118351 ms
+  move 10: adopted at step 1/2 (trial 2 of the ladder); value [401210/4096, 401221/4096) → [365109/4096, 365119/4096); E's largest entry 1983167/2097152; batch released 8, whole 2, stations right 40; 117385 ms
+  move 11: adopted at step 1/4 (trial 1 of the ladder); value [376862/4096, 376871/4096) → [320043/4096, 320052/4096); E's largest entry 1983167/2097152; batch released 8, whole 3, stations right 45; 79576 ms
+executed train: arm executed-open: 12 moves adopted, 0 refused, 17280 readings at E; complete; 1310327 ms; resident 202571776 now, 210952192 peak

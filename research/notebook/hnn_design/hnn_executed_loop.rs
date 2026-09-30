@@ -4,7 +4,19 @@
 //!
 //! ```sh
 //! cargo run --release -p holonics --example hnn_prediction -- executed move <seed> <requests>
+//! cargo run --release -p holonics --example hnn_prediction -- executed train <arm> <terrain> <seed> <batch> <moves> <deadline ms> <out>
+//! cargo run --release -p holonics --example hnn_prediction -- executed evaluate <terrain> <seed> <count> <out> opening <label=E>…
+//! cargo run --release -p holonics --example hnn_prediction -- executed spread <terrain> <seed> <count> opening <label=E>…
 //! ```
+//!
+//! - **`executed train`, `executed evaluate`** (Stage 2, the
+//!   [pin](../../records/2026-09-30_THE_EXECUTED_COMPARISONS_BOUNDED_TEST_PINNED_BEFORE_ITS_RUNS.md)):
+//!   one arm (`executed` or `face` × `open` or `partition`) trained from the declared opening by the
+//!   one ladder, its `E` written; every constitution's confirmation from the open section, its counts
+//!   and every section.
+//! - **`executed spread`** (a diagnostic after Stage 2, never a pinned run): at the open section, the
+//!   target's and the termination's ranks among each station's candidates, the station terms and the
+//!   readings' spread.
 //!
 //! - **`executed move`** (Stage 1): one committed move of `E` on the release's own comparison, from
 //!   the declared opening (`Constitution::initial`), on `requests` order-2 requests drawn at `seed`,
@@ -398,6 +410,98 @@ pub(super) fn evaluate(terrain: &str, seed: u64, count: usize, out: &str, arms: 
         clock.elapsed().as_millis(),
         resident()
     );
+}
+
+/// **The first refinement's spread** (`executed spread <terrain> <seed> <count> <label=E>…`, a
+/// diagnostic after Stage 2, not a pinned run): at the open section of each request, every
+/// station's five candidates read exactly; per constitution, the target's rank among them (by the
+/// lower end, 0 the top), the station's term `f = max(max ln(a_x/a_t), −ln a_t)` and the spread
+/// `ln(a_top/a_bottom)`, each summed at the grain `2^(−8)`.
+pub(super) fn spread(terrain: &str, seed: u64, count: usize, arms: &[String]) {
+    use rayon::prelude::*;
+    let declared = order_declared(false);
+    let engine = Engine::new(declared);
+    let bank = bank_of(declared.period, &bank_strength());
+    let ring = engine.refinement.ring();
+    let pairs = terrain_pairs(terrain, &declared, seed, count);
+    for arm in arms {
+        let (label, path) = arm.split_once('=').unwrap_or((arm.as_str(), ""));
+        let theta = if path.is_empty() {
+            engine.theta.clone()
+        } else {
+            engine
+                .theta
+                .clone()
+                .with_ports(ring, None, Some(read_port(path)), None)
+                .expect("the trained E")
+        };
+        let read: Vec<(Vec<usize>, Rat, Rat)> = pairs
+            .par_iter()
+            .map(|(request, target)| {
+                let (current, moment) = ingest(&engine.field, request);
+                let placement = BankPlacement::of(
+                    &engine.field,
+                    &theta,
+                    &current,
+                    &moment,
+                    &engine.refinement,
+                )
+                .expect("the placement");
+                let mut ranks = vec![0usize; 2 * declared.alphabet];
+                let (mut terms, mut spreads) = (Rat::zero(), Rat::zero());
+                for (station, &t) in target.iter().enumerate() {
+                    let joints: Vec<holonics::hnn::ring::Growth> = (0..declared.alphabet)
+                        .map(|class| {
+                            let mut cells = vec![None; declared.stations];
+                            cells[station] = Some(class);
+                            bank.read_turn(&turn(&placement.storage(&cells)), BANK_GRAIN)
+                                .expect("a reading")
+                                .joint
+                        })
+                        .collect();
+                    let rank = joints
+                        .iter()
+                        .filter(|g| g.lower > joints[t].lower)
+                        .count();
+                    ranks[rank] += 1;
+                    // The termination's own rank, beside the target's (the last class).
+                    let end = declared.alphabet - 1;
+                    let end_rank = joints
+                        .iter()
+                        .filter(|g| g.lower > joints[end].lower)
+                        .count();
+                    ranks[declared.alphabet + end_rank] += 1;
+                    let ln = |x: &Rat| {
+                        holonics::ratio::algebraic::ln_enclosure(x).expect("a logarithm").lower
+                    };
+                    let lt = ln(&joints[t].lower);
+                    let top = joints.iter().map(|g| ln(&g.lower)).max().expect("a class");
+                    let bottom = joints.iter().map(|g| ln(&g.lower)).min().expect("a class");
+                    let f = (top.clone() - &lt).max(-lt);
+                    terms += f.max(Rat::zero());
+                    spreads += top - bottom;
+                }
+                (ranks, terms, spreads)
+            })
+            .collect();
+        let mut ranks = vec![0usize; 2 * declared.alphabet];
+        let (mut terms, mut spreads) = (Rat::zero(), Rat::zero());
+        for (r, t, s) in read {
+            for (a, b) in ranks.iter_mut().zip(r) {
+                *a += b;
+            }
+            terms += t;
+            spreads += s;
+        }
+        let point = |x: &Rat| cell(&ExactInterval::point(x.clone()), 1 << 8);
+        println!(
+            "  {label}: the target's rank at the open section (0 the top) {:?}, the termination's {:?}; Σ (f)_+ at the lower ends {}; Σ ln(a_top/a_bottom) {}",
+            &ranks[..declared.alphabet],
+            &ranks[declared.alphabet..],
+            point(&terms),
+            point(&spreads)
+        );
+    }
 }
 
 /// The order-2 declaration, its bank and a batch of requests compared along the machine's own

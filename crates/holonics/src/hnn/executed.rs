@@ -59,7 +59,7 @@
 //! scale, and halves until the carried move moves no lattice coordinate. Each carried successor is
 //! **re-read from the open section** (every context re-run: a changed branch or lock order is read,
 //! never assumed) and adopted only when every commit guard holds on it:
-//! - the entry bound, every entry of `E` at most [`ENTRY_BOUND`];
+//! - the entry bound, every entry of `E` at most `2^ENTRY_BOUND = 8` ([`entry_bound`]);
 //! - every candidate crossing of every re-read refinement admissible (the signed form);
 //! - every lock's Floquet certificate certified (a refused one refuses the release);
 //! - the first-order descent certified on the carried move;
@@ -115,7 +115,7 @@ pub fn entry_bound() -> Rat {
     Rat::from_integer(BigInt::from(8))
 }
 
-/// Alias read by the module header.
+/// The entry bound's binary exponent (the bound is `2^ENTRY_BOUND`).
 pub const ENTRY_BOUND: u32 = 3;
 
 /// [definition; agent-inferred] **The covector's dyadic face**: each proposal covector entry at

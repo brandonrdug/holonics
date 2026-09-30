@@ -1,0 +1,26 @@
+executed train: arm face-partition on order2 at seed 2026093001: 24 moves of 8 requests; the declared opening; the bank p = 5/8, grain 2^(-16)
+  move 0: adopted at step 4 (trial 1 of the ladder); value [331397/4096, 331398/4096) → [275184/4096, 275185/4096); E's largest entry 1555565/2097152; 3426 ms
+  move 1: adopted at step 16 (trial 1 of the ladder); value [319108/4096, 319109/4096) → [296160/4096, 296161/4096); E's largest entry 2065361/2097152; 3554 ms
+  move 2: adopted at step 64 (trial 1 of the ladder); value [307937/4096, 307938/4096) → [288740/4096, 288741/4096); E's largest entry 122469/131072; 3552 ms
+  move 3: adopted at step 64 (trial 1 of the ladder); value [397970/4096, 397971/4096) → [381850/4096, 381851/4096); E's largest entry 2774867/2097152; 3582 ms
+  move 4: adopted at step 64 (trial 1 of the ladder); value [358192/4096, 358193/4096) → [330891/4096, 330892/4096); E's largest entry 626065/524288; 3563 ms
+  move 5: adopted at step 128 (trial 1 of the ladder); value [368424/4096, 368425/4096) → [355731/4096, 355732/4096); E's largest entry 3032891/2097152; 3575 ms
+  move 6: adopted at step 128 (trial 1 of the ladder); value [366366/4096, 366367/4096) → [343568/4096, 343569/4096); E's largest entry 397417/262144; 3577 ms
+  move 7: adopted at step 128 (trial 1 of the ladder); value [351143/4096, 351144/4096) → [327668/4096, 327669/4096); E's largest entry 435913/262144; 3537 ms
+  move 8: adopted at step 256 (trial 1 of the ladder); value [279973/4096, 279974/4096) → [252556/4096, 252557/4096); E's largest entry 4077269/2097152; 3460 ms
+  move 9: adopted at step 256 (trial 1 of the ladder); value [250652/4096, 250653/4096) → [238811/4096, 238812/4096); E's largest entry 3909947/2097152; 3402 ms
+  move 10: adopted at step 256 (trial 1 of the ladder); value [372362/4096, 372363/4096) → [353529/4096, 353530/4096); E's largest entry 2047387/1048576; 3473 ms
+  move 11: adopted at step 256 (trial 1 of the ladder); value [342978/4096, 342979/4096) → [317067/4096, 317068/4096); E's largest entry 2354223/1048576; 3452 ms
+  move 12: adopted at step 256 (trial 1 of the ladder); value [344674/4096, 344675/4096) → [334059/4096, 334060/4096); E's largest entry 146535/65536; 3540 ms
+  move 13: adopted at step 512 (trial 1 of the ladder); value [253300/4096, 253301/4096) → [235713/4096, 235714/4096); E's largest entry 5140161/2097152; 3395 ms
+  move 14: adopted at step 512 (trial 1 of the ladder); value [292354/4096, 292355/4096) → [275053/4096, 275054/4096); E's largest entry 2616249/1048576; 3510 ms
+  move 15: adopted at step 512 (trial 1 of the ladder); value [186548/4096, 186549/4096) → [173287/4096, 173288/4096); E's largest entry 5563363/2097152; 3427 ms
+  move 16: adopted at step 256 (trial 1 of the ladder); value [257824/4096, 257825/4096) → [247867/4096, 247868/4096); E's largest entry 2815745/1048576; 3440 ms
+  move 17: adopted at step 256 (trial 1 of the ladder); value [325128/4096, 325129/4096) → [301382/4096, 301383/4096); E's largest entry 2729857/1048576; 3503 ms
+  move 18: adopted at step 1024 (trial 1 of the ladder); value [293485/4096, 293486/4096) → [290113/4096, 290114/4096); E's largest entry 363129/131072; 3495 ms
+  move 19: adopted at step 512 (trial 1 of the ladder); value [323208/4096, 323209/4096) → [306996/4096, 306997/4096); E's largest entry 6295741/2097152; 3496 ms
+  move 20: adopted at step 1024 (trial 1 of the ladder); value [202794/4096, 202795/4096) → [195737/4096, 195738/4096); E's largest entry 6079411/2097152; 3413 ms
+  move 21: adopted at step 256 (trial 1 of the ladder); value [354684/4096, 354685/4096) → [337882/4096, 337883/4096); E's largest entry 6261333/2097152; 3540 ms
+  move 22: adopted at step 1024 (trial 1 of the ladder); value [225063/4096, 225064/4096) → [211428/4096, 211429/4096); E's largest entry 3183829/1048576; 3492 ms
+  move 23: adopted at step 512 (trial 1 of the ladder); value [348348/4096, 348349/4096) → [326086/4096, 326087/4096); E's largest entry 3265301/1048576; 3471 ms
+executed train: arm face-partition: 24 moves adopted, 0 refused, 0 readings at E; complete; 84012 ms; resident 120803328 now, 125935616 peak
