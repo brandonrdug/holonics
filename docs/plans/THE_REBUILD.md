@@ -505,49 +505,109 @@ named, and the program's loop stays its own counter, disclosed as such.
 
 #### U6. The text chart
 
-**U6's order from here** (September 30, agent-inferred; it replaces the order stated only in the
+**U6's order from here** (September 30, agent-inferred and revised after Astra's review; it replaces
+the order stated only in the
 [diagnosis](../../research/records/2026-09-30_THE_LEARNING_FAILURE_DIAGNOSED_THE_TRAINED_COMPARISON_IS_NOT_THE_ONE_THE_RELEASE_EXECUTES.md)
 §5 and in conversation). This block is the current order; the dated entries below it are its
 history, newest first. A step starts only when the step before it passes its acceptance. A falsifier
 that fires becomes the next loop's subject, and nothing downstream starts.
 
+- **The goal step 1 serves.** The goal stays the native, continuing adaptation (no frozen phase) with
+  a concrete consumer of the persistent state: the retained constitution that the next aeon reads.
+  A synthetic step's acceptance measures that learning; it never defines it.
 - **Standing rule: consolidate as we move.** Each loop retires, in its own commit, whatever it
-  supersedes (a harness mode, an arm, an owner path), with the owner that keeps its law named. A
-  loop's harness replaces its predecessor's mode rather than adding one beside it. Batch C clears
-  what earlier loops left behind.
-- **C. Retirement batches** (disjoint owner paths, beside step 1): the inventory of the September 30
-  consolidation audit, under U0's acceptance. Each retirement names the owner that keeps its law, or
-  writes the law into its guide or record first. Nothing live may consume what is retired, and the
-  gates pass at every commit. The batches are listed in the entry "Consolidation, September 30" below.
+  supersedes (a harness mode, an arm, an owner path), with the owner that keeps its law named.
+  Evidence is kept in history: prototypes are not kept running.
 - **Step 1. Known truth at `E` alone, until fresh confirmation passes.** Terrains: order-2, the
-  alternation and the line (`hnn_prediction -- executed`, over `hnn::executed`).
-  - *Loop 1a, the two counts (now; measurement only, no law change).*
-    - The declared key family is "lag `ℓ ∈ [1, 40]`, map `f` of `ℤ/4`": `40 · 4⁴ = 10240 = 2¹¹·5`
-      keys. It holds all three rules (order-2 `ℓ = 2, f = +1`; alternation `ℓ = 2, f = id`; line
-      `ℓ = 1, f = +s`). The terrain counts its survivors exactly after each rule step of the machine's
-      own training passage, giving `n*_terrain` and the ideal listener's surprise curve. This is a
-      measurement (`Population.survivors`, `Foundation/Unicity`), never a receiver.
-    - `n*_machine` is read from fresh-confirmation whole sections at checkpoints along the training
-      (after moves 1, 2, 4, 8 and 16), or reported as a lower bound.
-    - D1, heard against listened: per move, the ideal listener's information in the batch, the
-      first-order descent the executed comparison offers, and the descent the certified step
-      realizes.
-    - D2, resonance against saturation: per move, the executed comparison's margins (class and
-      threshold) over the batch's decisions, the share past threshold, and the decision's
-      sensitivity along the covector.
-    - *Acceptance:* both counts and D1, D2 read exactly on all three terrains within their
-      projections, with the pinned prediction of which cause dominates. *Falsifier:* neither
-      separates, meaning the realized share of the offered descent is not small and the decisions are
-      not saturated.
-  - *Loop 1b, the law the measurement selects* (designed after 1a, pinned before its runs). If D1
-    dominates, deposition is joined to key location: survivors are eliminated by loop closure
-    (`hnn::keys`, the Bombe) with the executed comparison as the check, and keys are located, never
-    authored. If D2 dominates, the release's comparison is read near its resonance.
-    - *Acceptance:* on fresh confirmation, order-2 releases strictly more whole sections than both
-      openings, and `n*_machine` is reported against `n*_terrain`.
-    - *Regressions:* the alternation and the line pass, with constant requests counted apart (the
-      modulus loop's 22 alternation sections were all constant requests, which a lag-1 copy
-      completes).
+  alternation and the line (`hnn_prediction -- executed`, over `hnn::executed`; declared request
+  `n = 40` cells drawn from `ℤ/4`, `m = 8` stations, alphabet 5 with the termination, ring period
+  `60`).
+  - *Loop 1a, the two counts (now; measurement only, no law change). Its pin record fixes:*
+    - **The declared reference family.** "Lag `ℓ ∈ [1, 40]`, map `f` of `ℤ/4`", `40 · 4⁴ = 10240 =
+      2¹¹·5` keys under the uniform prior. It is a declared reference, not the machine's hypothesis
+      class and not a learning optimum.
+      - Emitter: `x_t = f(x_(t−ℓ))` at each station `t ∈ [n, n + m)`, reading `x_(t−ℓ)` from the
+        request or the same request's earlier stations. Initial history: the request's 40 cells.
+      - Each station is one observation. The termination is not a rule step and is reported
+        apart. No pair crosses a request boundary.
+      - Order-2 (`ℓ = 2, f = +1`) and the alternation (`ℓ = 2, f = id`) keep one rule across
+        requests, so one key is scoped globally. The line's slope `s` changes between requests, so
+        it is read in the declared hierarchical family (a global lag, a per-request translation);
+        the global family is also read, where it must empty.
+      - Unobserved arguments (map values at symbols never seen as `x_(t−ℓ)`) and lag aliases are
+        counted explicitly.
+    - **The stopping object and `n*_terrain`.** The stopping object is the survivors' observational
+      class: survivors that emit the same continuation on every request of a declared validation
+      set (the unique admitted continuation). The syntactic class is reported beside it.
+      `n*_terrain` is the first observation count, over the machine's own training passage in its
+      order, at which the stopping object holds. The survivor list is its certificate.
+      `clog₄ 10240 = 7` is only the alphabet lower bound. Constant requests, which leave many keys
+      indistinguishable, are counted apart. Information is `log₂` of survivor ratios under the
+      uniform prior. It is never a label for a loss decrease.
+    - **`n*_machine`.**
+      - Exposure unit: training requests, with 8 station observations each; a move reads 8 requests.
+      - Checkpoints after moves 1, 2, 4, 8 and 16. Each reads one predeclared validation set, 64
+        requests disjoint from training and from the final confirmation.
+      - Success rule: every nonconstant validation request's section released whole, which is how
+        the ideal listener behaves once it has reached its stopping object. The whole-section curve
+        is reported beside it. If success never occurs, `n*_machine` is a lower bound in the same
+        unit.
+      - The final confirmation set stays unread until 1b's law is selected. The station-framed
+        refit's 96 of 128 is kept as a scoped representation control, not as evidence of native
+        learning.
+    - **D1, the step's descent.** Per move, with the batch, the objective (the executed comparison
+      `C`), the other operands and the evaluation convention frozen, and `δ` the actually applied
+      step:
+      - the predicted descent `−g·δ` and the measured `C(θ) − C(θ + δ)`, each with its enclosure and
+        whether it is exact or approximate;
+      - the projection and clipping, the ladder's halvings, the step's norm and the active bounds
+        (passive, lattice, entry);
+      - moves whose predicted descent is zero or below the grain, reported separately;
+      - the ideal listener's information in the same batch, reported in its own unit and never
+        equated with the descents without a proved normalization.
+    - **D2, the comparison's operating point.** Per move:
+      - the class gaps and the threshold margins, separately and with their signs;
+      - stratified by correct against wrong decision and by constant against nonconstant request;
+      - the derivative of the executed objective along the actual feasible direction, with the
+        zero and below-grain cases kept.
+
+      A large margin alone is not saturation, and a confident wrong decision is never pooled with
+      a solved one.
+    - **Instrumentation is read-only.** The family, its survivors, the true lag and the answer never
+      enter the native receiver, its initialization, its update or its release. The training
+      comparison's use of the terrain's targets is documented as a separate, declared input.
+    - *Acceptance:* the pinned quantities read exactly on all three terrains within their
+      projections. D1 and D2 are candidate causes, not an exhaustive split. Weak descent can also
+      come from conservative certificates, the grain, feasibility, a wrong derivative, adaptable
+      operands left out, or an unsuitable objective. Both, neither or another outcome is kept as it
+      is.
+  - *Loop 1b, a candidate law, pinned only after 1a's receipt.* 1a's measurement motivates a
+    candidate. It does not by itself select one (for example, key location by loop closure through
+    `hnn::keys`, or reading near resonance). The candidate comes with its independence tests.
+    Acceptance: on the final confirmation, order-2 releases strictly more whole sections than both
+    openings, with `n*_machine` against `n*_terrain`. The alternation and the line are regressions
+    with constant requests counted apart: the modulus loop's 22 alternation sections were all
+    constant requests, which a lag-1 copy completes. The 1b design states its law as continuing
+    deposition, not as a training phase.
+- **C. Retirement, serialized against step 1** (the entry "Consolidation, September 30" below holds
+  the inventory).
+  1. **Baseline freeze first.** A record fixes the baseline commit, the harness, its seeds and
+     configurations, and the exact source and output artifacts. It also gives a minimal replay
+     (development listings whose text must match byte for byte, timings aside) for the refit and
+     native controls. Evidence stays in history.
+  2. **N1, alongside 1a:** the notebook's dead files only, disjoint from 1a (`bank_causes`, the
+     population, landmark and parametron harnesses, the spent scripts, the example list).
+  3. **1a.** It edits the harness.
+  4. **N2, after 1a:** the harness strip (the pre-executed modes, the face arm, `Relation` into
+     `exterior.rs`), on 1a's tip.
+  5. **P and H in parallel, after N2.** Each has a complete consumer check across every configured
+     target and every active worktree. The protein branch at `03ecec71` names only
+     `Population::{collapse, split}`, which is kept. Each batch runs the minimal replay after it,
+     because build gates alone do not show behavioural equivalence.
+  6. **Held until 1b's dependency decision names a retained owner or records the exact law:**
+     `hnn::encoding`, birth, the retention and normal-update constructions, and the lawful
+     population laws (`dormancy`, `composition`, `merge`'s blocks, birth from reserved mass, the
+     evolved prior). This is a narrow hold, not a promise to keep every unused path.
 - **Step 2. Pumps and the other families under a declared receiving composition.** On the isotropic
   bank a constant pump phase alone cannot change growth. Per-comparison descent is incoherent on
   shared loci, so the composition's descent comes with its complete bound (the diagnosis §4).
@@ -557,8 +617,9 @@ that fires becomes the next loop's subject, and nothing downstream starts.
   projection is remade from step 1's repaired path.
 - **Step 4. The corpus.** The choosing role's 12,261 eligible pairs and the current source-context
   export. Text sections are shown to Brandon whole.
-- **Alongside, on disjoint owners.** Codex and Astra take the Zeta side of unicity (#62, the Franel–
-  Landau composition joined to the actual-source owners) and their isolated RH work.
+- **Alongside, on disjoint owners.** Codex takes a bounded normalized Farey count-receiver identity
+  and its explicit join to `Foundation/Unicity`. The analytic Franel–Landau estimate and the
+  actual-current cancellation stay open obligations (#62). Codex's isolated RH work continues.
 
 - **Consolidation, September 30: batch C's inventory** (a read-only audit at `819c58f5`, with grep
   evidence for every consumer; Refs #63 #73). Step 1 runs `hnn_prediction … executed` over
@@ -596,18 +657,20 @@ that fires becomes the next loop's subject, and nothing downstream starts.
     - Retire the linear readout's training and generation (`anchor_frames`, `RefinementBalance`,
       `stage`, `comparison_code`, `generate`, `deposit_of`; Lean `HNN/Prediction`, `HNN/Normal`
       stay).
-    - Retire `hnn::encoding`, which has no consumer (Lean `HNN/Encoding` stays; the lessons record
-      §4's keep-list is amended), and `reference.rs`'s count-only sweeps.
+    - Retire `reference.rs`'s count-only sweeps. `hnn::encoding` has no consumer today, but it is
+      held to 1b's dependency decision (the order's C.6).
     - Move the 25 public functions with only test callers under `cfg(test)` or delete them.
     - Two of #62's three ρ < 1 refusals go with their paths. The card's stays.
     - Keep the field law realized on the card (`word`, `chart`, `propagation`, `retention`,
       `pending`, `receiving`, `realization`) and `keys` (step 1b's candidate).
-  - **Held to step 1b's close** (lawful population laws, stated in Lean, with no library consumer
-    today): `dormancy`, `composition`, `merge`'s blocks, `birth` with birth from reserved mass (its
-    abstaining-newborn law written into `docs/RECEIVER_HOLARCHY.md` first), and the evolved prior.
-    At 1b's close each has a named library consumer or is deleted: U0's rule, so that key location
-    does not delete and then rebuild them.
-  - **Workers and gates.** N starts at once. P and H start from N's tip and run in parallel. The
+  - **Held to 1b's dependency decision** (the order's C.6): the lawful population laws, stated in
+    Lean with no library consumer today (`dormancy`, `composition`, `merge`'s blocks, `birth` with
+    birth from reserved mass, whose abstaining-newborn law is written into
+    `docs/RECEIVER_HOLARCHY.md` first, and the evolved prior), `hnn::encoding`, and the retention and
+    normal-update constructions. Each gets a named retained owner or its exact law recorded, so that
+    key location does not delete and then rebuild them.
+  - **Workers and gates.** The order's C gives the sequence: the baseline freeze, N1 beside 1a, N2
+    after 1a, then P and H in parallel with the minimal replay. The
     primary edits the shared plan files once at the join: THE_REBUILD, CONSTRUCTION_STATE, the
     lessons keep-list, #62 item 4 and the atlas rows (about 41). Every commit passes
     `cargo check --workspace --all-targets` and `cargo test -p holonics --lib`, plus
