@@ -308,13 +308,13 @@ fn read_port(path: &str) -> ExactRatMatrix {
 }
 
 /// **The modulus's slope split by term kind**, printed (`hnn::executed::SlopeSplit`): the terms led
-/// by the threshold and by a class rival with their `Σ (f)_+`, `γ_ρ` of the leading contributions
-/// by kind, and every term's target part and class rival part read alone (the class branch at every
-/// term is their sum).
+/// by the threshold and by a class rival with their terms' sum (the hinge's `Σ (f)_+`; every
+/// lock-face term counted class-led with its `ℓ`), `γ_ρ` of the leading contributions by kind, and
+/// every term's target part and rival part read alone (their sum is the slope).
 pub(super) fn split_line(split: &SlopeSplit) -> String {
     let point = |x: &Rat| cell(&ExactInterval::point(x.clone()), 1 << 12);
     format!(
-        "; split: threshold-led {} terms (Σ (f)_+ {}, γ {}), class-led {} terms (Σ (f)_+ {}, γ {}); every term read alone: the target's part {}, the class rival's part {}, the class branch {}",
+        "; split: threshold-led {} terms (their terms Σ {}, γ {}), class-led {} terms (their terms Σ {}, γ {}); every term read alone: the target's part {}, the class rival's part {}, the class branch {}",
         split.threshold_led,
         cell(&split.threshold_value, 1 << 12),
         point(&split.led_threshold),
@@ -2230,7 +2230,7 @@ fn print_d1(
         _ => "not read",
     };
     println!(
-        "    D1 move {index}: predicted descent, the certificate −Σ bound ∈ {} (exact enclosure; approximate as a prediction), the leading contributions −Σ c⟨ĝ, Δz⟩ ∈ {}; measured on the fixed mask {c}(θ) − {c}_mask(θ+δ) ∈ {} (exact); the prediction {kind}; the leading contributions' sign and the measured's: {agree}; the successor's own release {c}_own(θ+δ) ∈ {}, the context change {c}_own − {c}_mask ∈ {} (a decrease of the declared score, not decision progress)",
+        "    D1 move {index}: predicted descent, the certificate −Σ bound ∈ {} (exact enclosure; approximate as a prediction), the leading contributions −Σ c⟨ĝ, Δz⟩ ∈ {}; measured on the fixed mask {c}(θ) − {c}_mask(θ+δ) ∈ {} (exact); the prediction {kind}; the leading contributions' sign and the measured's: {agree}; the successor's own release {c}_own(θ+δ) ∈ {}, the context change {c}_own − {c}_mask ∈ {} (the own release's composition is a declared score: its change is never decision progress)",
         cell(&certificate, 1 << 12),
         leading.as_ref().map_or_else(|| "not read".to_string(), |l| cell(l, 1 << 12)),
         measured.as_ref().map_or_else(|| "not read".to_string(), |m| cell(m, 1 << 12)),

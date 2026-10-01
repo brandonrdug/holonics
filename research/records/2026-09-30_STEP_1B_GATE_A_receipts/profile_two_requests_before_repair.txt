@@ -1,0 +1,12 @@
+executed train: arm lock-dec (LockFace read at Decisions) on order2 at seed 2026093062: 1 moves of 2 requests; the opening's transport modulus 102837/131072, its source clock 0; the bank p = 5/8, grain 2^(-16)
+PHASE incumbent 16690 ms
+PHASE propose 16794 ms
+PHASE persistence 17019 ms
+PHASE returns 19049 ms
+PHASE unit_step 19084 ms
+PHASE modulus_normal 21760 ms
+PHASE slope_split 26839 ms
+PHASE port_first_order 27223 ms
+PHASE joint_first_order 207885 ms
+TRIAL stepped 31 ms
+TRIAL first 420 ms
