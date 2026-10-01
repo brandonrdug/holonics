@@ -3520,12 +3520,24 @@ pub fn executed_move_in(
                 receipt.refusal = Some(MoveRefusal::Reversed([alpha, beta]));
                 return Ok(receipt);
             }
+            // The witness's exact step stays in its form (the receipt); the ladder carries it at
+            // the face grain, toward zero (October 1: carried exactly, `α` reached a 1229-digit
+            // denominator). Every trial is a carried successor read whole by every guard, so the
+            // grain moves which step is tried, never what certifies it; the residual is the form's
+            // exact step less the held one.
+            let held = |x: Rat| {
+                if x.is_negative() {
+                    -significant(&-x, FACE_BITS, false)
+                } else {
+                    significant(&x, FACE_BITS, false)
+                }
+            };
             let unit = if constitution.transport(ring).is_one() && beta.is_positive() {
                 Rat::zero()
             } else {
-                &beta / &alpha
+                held(&beta / &alpha)
             };
-            (unit, Some(alpha))
+            (unit, Some(held(alpha)))
         }
     };
     receipt.modulus_unit = Some(modulus_unit.clone());

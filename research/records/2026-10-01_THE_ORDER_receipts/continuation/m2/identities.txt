@@ -1,0 +1,4 @@
+638f4f5d46d5611495d512d962cfd54aee772491
+b960ee8a3f3edf47486f7bd75fe21c22791ef7b98d3e19d8a2c18f5cd3c7d63e
+args executed move-once order2 2026093061 8 .local/oc/m2 m2=.local/oc/m1/m1-witness.state order-dec witness
+wall 230841 ms; exit 0; early stop 0
