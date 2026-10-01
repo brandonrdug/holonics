@@ -1,0 +1,2 @@
+c1.state at 12 threads: byte-identical to gate A's saved state
+gate A's three lines at 12 threads: identical (wall times and the persistence split masked)

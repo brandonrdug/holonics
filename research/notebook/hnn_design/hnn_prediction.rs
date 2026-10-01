@@ -325,7 +325,9 @@ fn main() {
         // Loop 1c (the pin
         // research/records/2026-10-01_LOOP_1C_PERSISTENCE_REPRESENTATION_AND_REACH_PINNED_BEFORE_ITS_RUNS.md):
         // the exact replay of written states, persistence and coupling, and the representation
-        // search.
+        // search; the restore check of complete states, no reading made (the launcher's
+        // `check-replay`).
+        (Some("executed"), Some("restore")) => loop_1c::restore(&arguments[3..]),
         (Some("executed"), Some("replay")) => loop_1c::replay(
             &arguments[3],
             arguments[4].parse().expect("a seed"),
@@ -366,7 +368,7 @@ fn main() {
             &arguments[8],
         ),
         _ => panic!(
-            "executed move <seed> <requests> | train <arm> <terrain> <seed> <batch> <moves> <deadline ms> <out> | evaluate <terrain> <seed> <count> <out> <label[=E]>… | spread <terrain> <seed> <count> <label[=E]>… | slopes <terrain> <seed> <count> <label[=E]>… | counts <terrain> <training seed> <count> <validation seed> <count> <out> | witness <terrain> <seed> <count> <moves> <deadline ms> <out> [<states dir>] | causal <terrain> <seed> <count> <label[=E]>… | replay <terrain> <seed> <count> <label=state>… | coupling <terrain> <seed> <count> <deadline ms> <label=state>… | represent <terrain> <seed> <count> <iterates> <deadline ms> <out> [<held-out seed>]"
+            "executed move <seed> <requests> | train <arm> <terrain> <seed> <batch> <moves> <deadline ms> <out> | evaluate <terrain> <seed> <count> <out> <label[=E]>… | spread <terrain> <seed> <count> <label[=E]>… | slopes <terrain> <seed> <count> <label[=E]>… | counts <terrain> <training seed> <count> <validation seed> <count> <out> | witness <terrain> <seed> <count> <moves> <deadline ms> <out> [<states dir>] | causal <terrain> <seed> <count> <label[=E]>… | restore <label=state>… | replay <terrain> <seed> <count> <label=state|label=partial:file>… | coupling <terrain> <seed> <count> <deadline ms> <label=state|label=partial:file|label=opening>… | represent <terrain> <seed> <count> <iterates> <deadline ms> <out> [<held-out seed>]"
         ),
     }
 }

@@ -1,0 +1,9 @@
+cost-replay: exit 0; 39429 ms
+check-cost-replay: exit 0; 7 ms
+cost-move: exit 0; 154083 ms
+check-cost-move: exit 0; 8 ms
+cost-coupling: exit 0; 76423 ms
+cost-split: exit 0; 301278 ms
+every cost read done; 571233 ms
+
+[exited with code 0]
