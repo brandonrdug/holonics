@@ -11,6 +11,7 @@
 //! cargo run --release -p holonics --example hnn_prediction -- executed witness <terrain> <seed> <count> <moves> <deadline ms> <out>
 //! cargo run --release -p holonics --example hnn_prediction -- executed causal <terrain> <seed> <count> <label[=E]>…
 //! cargo run --release -p holonics --example hnn_prediction -- executed segment <terrain> <seed> <count> <label=source>…
+//! cargo run --release -p holonics --example hnn_prediction -- executed rho-slopes <terrain> <seed> <count> <arm> <label=source>…
 //! ```
 //!
 //! - **Step 1b** (the
@@ -1176,6 +1177,70 @@ fn segment_source(engine: &Engine, ring: usize, spec: &str) -> Constitution {
         "lossless" => engine.theta.clone(),
         path => remount(&engine.theta, ring, path),
     }
+}
+
+/// [definition; agent-inferred, October 1; the
+/// [pin](../../records/2026-10-01_THE_MODULUS_SLOPE_PINNED_BEFORE_ITS_RUN.md)] **The modulus's slope
+/// at constitutions** (`executed rho-slopes <terrain> <seed> <count> <arm> <label=source>…`, the arm
+/// as [`arm_comparison`], sources as [`segment_source`]): read-only. Per constitution, the arm's
+/// comparison on the declared requests, the proposal formed as `executed_move` forms it, and its
+/// modulus part (`hnn::executed::modulus_slopes`): `γ_ρ` (the composition's first-order slope in
+/// `ρ`) with its target and rival parts, the storage curvature `G_ρ` and the least-squares unit
+/// move `−γ_ρ/G_ρ`, beside the comparison's value and the release's counts. No move is made.
+pub(super) fn rho_slopes(terrain: &str, seed: u64, count: usize, arm: &str, sources: &[String]) {
+    use holonics::hnn::executed::modulus_slopes;
+    let clock = Instant::now();
+    let declared = order_declared();
+    let engine = Engine::new(declared);
+    let bank = bank_of(declared.period, &bank_strength());
+    let ring = engine.refinement.ring();
+    let pairs = terrain_pairs(terrain, &declared, seed, count);
+    let requests = open_requests(&engine, &pairs);
+    let targets: Vec<Vec<usize>> = pairs.iter().map(|(_, t)| t.clone()).collect();
+    let (comparison, partition) = arm_comparison(arm);
+    assert!(!partition, "the modulus's slope is read on the open section");
+    println!(
+        "executed rho-slopes: {count} {terrain} requests at development seed {seed}, the arm {arm}; the bank p = {}, grain 2^(-{BANK_GRAIN})",
+        bank_strength()
+    );
+    let point = |x: &Rat, grain: i64| cell(&ExactInterval::point(x.clone()), grain);
+    for source in sources {
+        let started = Instant::now();
+        let (label, spec) = source.split_once('=').expect("<label>=<source>");
+        let theta = segment_source(&engine, ring, spec);
+        let (batch, split) = modulus_slopes(
+            &engine.field,
+            &theta,
+            &requests,
+            &engine.refinement,
+            &bank,
+            BANK_GRAIN,
+            comparison,
+        )
+        .expect("the modulus's slope");
+        let slope = &split.led_threshold + &split.led_class;
+        let unit = if split.curvature.is_zero() {
+            "none (G_ρ = 0)".to_string()
+        } else {
+            point(&(-(&slope / &split.curvature)), 1 << 21)
+        };
+        let (solved, all) = solved_terms(&batch);
+        let (whole, right, released) = batch.sections(&targets);
+        println!(
+            "  {label}: ρ {}; {} ∈ {} nats; solved {solved} of {all}; whole {whole} of {count} (released {released}, stations right {right}); γ_ρ ∈ {} (target part {}, rival part {}); G_ρ ∈ {}; the least-squares unit move −γ_ρ/G_ρ ∈ {unit}; terms led by the threshold {}, by a class {}; {} ms",
+            theta.transport(ring),
+            symbol(&comparison),
+            cell(&batch.value, 1 << 12),
+            point(&slope, 1 << 12),
+            point(&split.target, 1 << 12),
+            point(&split.rival, 1 << 12),
+            point(&split.curvature, 1 << 12),
+            split.threshold_led,
+            split.class_led,
+            started.elapsed().as_millis()
+        );
+    }
+    println!("executed rho-slopes: {} ms; resident {}", clock.elapsed().as_millis(), resident());
 }
 
 /// [definition; agent-inferred, October 1; the

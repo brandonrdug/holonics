@@ -1454,7 +1454,10 @@ pub enum TermKind {
 /// - `γ_ρ` of the leading contributions, by the leading kind (their sum is `γ_ρ`);
 /// - every term's target part and its rival part read alone (the hinge: the target's
 ///   `−⟨ĝ_t, ∂z_t/∂ρ⟩` and its class rival's `+⟨ĝ_x, ∂z_x/∂ρ⟩`; the lock face: the target's
-///   `(θ_t − 1)⟨ĝ_t, ∂z_t/∂ρ⟩` and the rivals' `Σ θ_x ⟨ĝ_x, ∂z_x/∂ρ⟩`).
+///   `(θ_t − 1)⟨ĝ_t, ∂z_t/∂ρ⟩` and the rivals' `Σ θ_x ⟨ĝ_x, ∂z_x/∂ρ⟩`);
+/// - the storage curvature `G_ρ = Σ_c |∂z_c/∂ρ|²` over the leading contributions, so the committed
+///   move's least-squares unit move `−γ_ρ/G_ρ` is read beside its slope (the segment probe's record
+///   §4, October 1).
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct SlopeSplit {
     pub threshold_led: usize,
@@ -1465,6 +1468,7 @@ pub struct SlopeSplit {
     pub led_class: Rat,
     pub target: Rat,
     pub rival: Rat,
+    pub curvature: Rat,
 }
 
 /// A term's first-order certificate (module header, "The first-order certificate").
@@ -1916,8 +1920,9 @@ fn slope_split(
     proposal: &Proposal,
 ) -> Result<SlopeSplit, HnnError> {
     let led = modulus_pairings(field, constitution, declared, requests, &proposal.contributions)?;
-    let (mut led_threshold, mut led_class) = (Rat::zero(), Rat::zero());
-    for (c, (value, _)) in proposal.contributions.iter().zip(led) {
+    let (mut led_threshold, mut led_class, mut curvature) = (Rat::zero(), Rat::zero(), Rat::zero());
+    for (c, (value, energy)) in proposal.contributions.iter().zip(led) {
+        curvature += energy;
         match c.kind {
             TermKind::Threshold => led_threshold += value,
             TermKind::Class | TermKind::Lock => led_class += value,
@@ -1938,6 +1943,7 @@ fn slope_split(
         led_class,
         target: sum(&proposal.targets)?,
         rival: sum(&proposal.rivals)?,
+        curvature,
     })
 }
 

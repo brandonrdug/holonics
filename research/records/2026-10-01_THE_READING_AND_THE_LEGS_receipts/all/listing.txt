@@ -1,0 +1,2 @@
+executed rho-slopes: 8 order2 requests at development seed 2026093061, the arm lock-all; the bank p = 5/8, grain 2^(-16)
+  opening: ρ 102837/131072; L ∈ [2180496/4096, 2180516/4096) nats; solved 2 of 285; whole 0 of 8 (released 7, stations right 15); γ_ρ ∈ [-551096/4096, -551095/4096) (target part [9772222/4096, 9772223/4096), rival part [-10323319/4096, -10323318/4096)); G_ρ ∈ [560452498/4096, 560452499/4096); the least-squares unit move −γ_ρ/G_ρ ∈ [2062/2097152, 2063/2097152); terms led by the threshold 0, by a class 285; 440159 ms

@@ -652,10 +652,25 @@ that fires becomes the next loop's subject, and nothing downstream starts.
       - The refit solves 45 of 64 decision terms, reads 55 stations right and 5 sections whole, at
         `L` far below gate A's lowest. The chord from the founded opening descends strictly to it.
         At the founded modulus, its `E` reads 22 right and locks the far end first.
-      - The blocker is the native move's path, with the modulus held near `ρ₀`. Next: the modulus's
-        part of the lock face at the decisions (`γ_ρ`'s sign, the least-squares unit move and the
-        joint step's `ηΔρ`), at gate A's constitutions and along the chord. It separates a sign
-        obstruction from a scale obstruction, read-only.
+      - The blocker is the native move's path, with the modulus held near `ρ₀`.
+    - *The modulus's slope, then the reading and the legs, October 1*
+      ([slope](../../research/records/2026-10-01_THE_MODULUS_SLOPE_MEASURED_THE_NATIVE_COMPARISON_ASKS_FOR_THE_HIGHER_TRANSPORT_UNTIL_E_READS_THE_RULE.md);
+      [legs](../../research/records/2026-10-01_THE_READING_AND_THE_LEGS_MEASURED_E_ALONE_DESCENDS_TO_THE_REFITS_E_AT_THE_FOUNDED_MODULUS_AND_EVERY_REFINEMENT_SHARES_THE_SIGN.md)).
+      Read-only.
+      - Gate A's comparison has `γ_ρ < 0` at its constitutions 0, 1 and 2: it asks for the higher
+        transport there, and its least-squares unit moves are gate A's actual modulus changes.
+        `γ_ρ > 0` only where `E` already reads the rule, and there the chord is 56 to 287 unit
+        moves.
+      - Every refinement (`lock-all`) shares the sign at the opening, so the reading is not the
+        cause.
+      - At the founded `ρ₀`, `E` alone descends strictly from the opening to the refit's `E`, and
+        the modulus's slope turns down within the first quarter. `ρ` alone then descends strictly
+        to the refit.
+      - The failure is located in gate A's `E` direction at the founded modulus. Next, read-only:
+        the native unit step at the opening against `E* − E₀` (alignment, exactly) and the own
+        release's `L` along it at a ladder of steps. That separates a direction pointing away (the
+        covector or the normal law's chart) from a step that overshoots into another trajectory
+        (the ladder's start).
   - *1b's subject, as 1a named it*: a comparison whose descent must move decisions, one
     that holds a margin on right decisions, is not minimized on ties, and is read where a reading
     carries information about the key. The governing law "loss is the log of a ratio" is the
