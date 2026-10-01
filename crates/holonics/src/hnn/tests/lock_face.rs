@@ -465,7 +465,7 @@ fn the_decisions_read_each_station_once_along_the_consistent_prefix() {
 
 /// The arms of gate B: the lock face at the decisions, at every refinement and teacher-forced; the
 /// hinge at the decisions and at every refinement.
-fn arms() -> [Comparison; 6] {
+fn arms() -> [Comparison; 7] {
     let arm = |composition, reading| Comparison {
         composition,
         reading,
@@ -477,6 +477,7 @@ fn arms() -> [Comparison; 6] {
         arm(Composition::Hinge, Reading::Every),
         arm(Composition::LockFace, Reading::TeacherForced),
         arm(Composition::LockOrder, Reading::Decisions),
+        arm(Composition::LockOrder, Reading::Every),
     ]
 }
 
@@ -1052,7 +1053,7 @@ fn the_order_term_reads_the_first_lock_as_a_lock_over_the_stations() {
     ];
     let (face, face_probe) = three_stations(Composition::LockFace, growths.clone());
     let (batch, probe) = three_stations(Composition::LockOrder, growths);
-    let order = batch.requests[0].order.clone().unwrap();
+    let order = batch.requests[0].order_terms[0].clone();
     let stations: Vec<(usize, usize, Rat)> =
         order.sheets.iter().map(|s| (s.station, s.top, s.gap.clone())).collect();
     assert_eq!(stations, vec![(0, 0, integer(3)), (1, 0, integer(7))]);
@@ -1090,7 +1091,7 @@ fn the_order_is_solved_past_the_wrong_gaps_and_absent_without_a_right_top() {
         [rat(1, 2), rat(1, 4), integer(3)],
     ];
     let (batch, _) = three_stations(Composition::LockOrder, solved);
-    let order = batch.requests[0].order.clone().unwrap();
+    let order = batch.requests[0].order_terms[0].clone();
     assert_eq!(order.solved, Predicate::Holds);
     assert_eq!(order.kind, Excess::Solved);
     assert_eq!(order.excess, ExactInterval::point(Rat::zero()));
@@ -1100,7 +1101,7 @@ fn the_order_is_solved_past_the_wrong_gaps_and_absent_without_a_right_top() {
         [integer(3), rat(1, 4), rat(1, 2)],
     ];
     let (batch, _) = three_stations(Composition::LockOrder, wrong);
-    assert!(batch.requests[0].order.is_none());
+    assert!(batch.requests[0].order_terms.is_empty());
 }
 
 fn plus_interval(a: &ExactInterval, b: &ExactInterval) -> ExactInterval {

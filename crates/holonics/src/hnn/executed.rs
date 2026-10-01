@@ -367,9 +367,10 @@ pub struct RequestComparison {
     pub stations: Vec<StationComparison>,
     pub orders: Vec<OrderReading>,
     pub terms: Vec<TermReading>,
-    /// The order term at the decision refinement ([`Composition::LockOrder`] only; `None` where no
-    /// eligible station's top is its target).
-    pub order: Option<OrderTerm>,
+    /// The order terms ([`Composition::LockOrder`] only): at the decisions, one at the decision
+    /// refinement; at every refinement, one at each refinement the release executed. A refinement
+    /// where no eligible station's top is its target has none.
+    pub order_terms: Vec<OrderTerm>,
     pub consistent: Option<usize>,
     pub value: ExactInterval,
     pub excess: ExactInterval,
@@ -1204,14 +1205,39 @@ pub struct OrderTerm {
 
 /// The order term of a request's decision terms ([`OrderTerm`]), from the candidates read at their
 /// sites; `None` when no site carries a refinement or no eligible station's top is its target.
-fn order_term<R: JointGrowth>(
+fn order_terms<R: JointGrowth>(
+    sites: &[TermSite],
+    reads: &[Vec<R>],
+    targets: &[usize],
+    reading: Reading,
+) -> Result<Vec<OrderTerm>, HnnError> {
+    let contexts: Vec<usize> = match reading {
+        // At the decisions: the decision refinement, the latest the terms are read at.
+        Reading::Decisions => sites.iter().filter_map(|s| s.context).max().into_iter().collect(),
+        // At every refinement: each refinement the release executed (its open stations' sites).
+        _ => sites
+            .iter()
+            .filter_map(|s| s.context)
+            .collect::<std::collections::BTreeSet<_>>()
+            .into_iter()
+            .collect(),
+    };
+    let mut out = Vec::new();
+    for context in contexts {
+        if let Some(order) = order_at(context, sites, reads, targets)? {
+            out.push(order);
+        }
+    }
+    Ok(out)
+}
+
+/// The order term at one refinement `context` ([`OrderTerm`]) from the stations read there.
+fn order_at<R: JointGrowth>(
+    context: usize,
     sites: &[TermSite],
     reads: &[Vec<R>],
     targets: &[usize],
 ) -> Result<Option<OrderTerm>, HnnError> {
-    let Some(context) = sites.iter().filter_map(|s| s.context).max() else {
-        return Ok(None);
-    };
     let one = Rat::one();
     let mut eligible: Vec<(usize, usize, usize, usize, Rat, bool)> = Vec::new();
     for (index, (site, read)) in sites.iter().zip(reads).enumerate() {
@@ -1349,13 +1375,15 @@ fn compare_request(
         alphabet,
     );
     let (reads, made) = site_reads(&sites, &refinements, &placement, alphabet, &read)?;
-    let order = match comparison.composition {
-        Composition::LockOrder => order_term(&sites, &reads, &request.targets)?,
-        _ => None,
+    let order_terms = match comparison.composition {
+        Composition::LockOrder => {
+            order_terms(&sites, &reads, &request.targets, comparison.reading)?
+        }
+        _ => Vec::new(),
     };
     let (terms, mut value, mut excess) =
         terms_of(comparison.composition, &request.targets, sites, &reads, termination)?;
-    if let Some(order) = &order {
+    for order in &order_terms {
         value = plus(&value, &order.value);
         excess = plus(&excess, &order.excess);
     }
@@ -1366,7 +1394,7 @@ fn compare_request(
             stations,
             orders,
             terms,
-            order,
+            order_terms,
             consistent,
             value,
             excess,
@@ -1487,13 +1515,15 @@ fn incumbent_request(
         alphabet,
     );
     let (reads, made) = site_reads(&sites, &refinements, &placement, alphabet, &covector)?;
-    let order = match comparison.composition {
-        Composition::LockOrder => order_term(&sites, &reads, &request.targets)?,
-        _ => None,
+    let order_terms = match comparison.composition {
+        Composition::LockOrder => {
+            order_terms(&sites, &reads, &request.targets, comparison.reading)?
+        }
+        _ => Vec::new(),
     };
     let (terms, mut value, mut excess) =
         terms_of(comparison.composition, &request.targets, sites, &reads, termination)?;
-    if let Some(order) = &order {
+    for order in &order_terms {
         value = plus(&value, &order.value);
         excess = plus(&excess, &order.excess);
     }
@@ -1504,7 +1534,7 @@ fn incumbent_request(
             stations,
             orders,
             terms,
-            order,
+            order_terms,
             consistent,
             value,
             excess,
@@ -1945,7 +1975,7 @@ fn propose(
                 }
             }
         }
-        if let Some(order) = &compared.order {
+        for order in &compared.order_terms {
             let mut pieces = Vec::with_capacity(order.sheets.len());
             let mut leading = Vec::new();
             let mut refused = None;
@@ -3245,13 +3275,15 @@ fn mask_reads(
                 compare_request(field, successor, index, request, declared, bank, grain, comparison)?;
             let sites = mask[index].clone();
             let (reads, made) = site_reads(&sites, &refinements, &placement, alphabet, &read)?;
-            let order = match comparison.composition {
-                Composition::LockOrder => order_term(&sites, &reads, &request.targets)?,
-                _ => None,
+            let order_terms = match comparison.composition {
+                Composition::LockOrder => {
+                    order_terms(&sites, &reads, &request.targets, comparison.reading)?
+                }
+                _ => Vec::new(),
             };
             let (terms, mut value, mut excess) =
                 terms_of(comparison.composition, &request.targets, sites, &reads, termination)?;
-            if let Some(order) = &order {
+            for order in &order_terms {
                 value = plus(&value, &order.value);
                 excess = plus(&excess, &order.excess);
             }
@@ -4308,13 +4340,13 @@ pub(crate) fn synthetic_batch(
 ) -> Result<BatchComparison, HnnError> {
     let mut compared = Vec::new();
     for ((targets, sites), reads) in targets.iter().zip(sites).zip(reads) {
-        let order = match comparison.composition {
-            Composition::LockOrder => order_term(&sites, reads, targets)?,
-            _ => None,
+        let order_terms = match comparison.composition {
+            Composition::LockOrder => order_terms(&sites, reads, targets, comparison.reading)?,
+            _ => Vec::new(),
         };
         let (terms, mut value, mut excess) =
             terms_of(comparison.composition, targets, sites, reads, termination)?;
-        if let Some(order) = &order {
+        for order in &order_terms {
             value = plus(&value, &order.value);
             excess = plus(&excess, &order.excess);
         }
@@ -4323,7 +4355,7 @@ pub(crate) fn synthetic_batch(
             stations: Vec::new(),
             orders: Vec::new(),
             terms,
-            order,
+            order_terms,
             consistent: None,
             value,
             excess,

@@ -1,0 +1,4 @@
+ae235eb3b65996fe049a2540048d73ffe8186611
+6037f53fb86c2f68a83bef9f12275d0218f7ddf57e801745bff062028c2227db
+args executed move-once order2 2026093061 8 .local/la c6=research/records/2026-10-01_THE_GUARDED_WITNESS_receipts/c6.state lock-all witness
+wall 911081 ms; exit 124; early stop 0
