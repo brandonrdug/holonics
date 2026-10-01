@@ -1,6 +1,7 @@
 //! **`hnn_prediction`: step 1's harness, the executed comparison on known-truth terrain**
 //! (THE_REBUILD U6, step 1; #73, #148, #63). Its modes are the `executed …` subcommands of
-//! `hnn_executed_loop.rs`, whose header states each mode and its pins; this file holds the
+//! `hnn_executed_loop.rs` and, for loop 1c, `hnn_loop_1c.rs`, whose headers state each mode and its
+//! pins; this file holds the
 //! declaration they share and dispatches to them. Committed commands run once in release, never a
 //! test.
 //!
@@ -11,7 +12,10 @@
 //! cargo run --release -p holonics --example hnn_prediction -- executed spread <terrain> <seed> <count> <label[=E]>…
 //! cargo run --release -p holonics --example hnn_prediction -- executed slopes <terrain> <seed> <count> <label[=E]>…
 //! cargo run --release -p holonics --example hnn_prediction -- executed counts <terrain> <training seed> <count> <validation seed> <count> <out>
-//! cargo run --release -p holonics --example hnn_prediction -- executed witness <terrain> <seed> <count> <moves> <deadline ms> <out>
+//! cargo run --release -p holonics --example hnn_prediction -- executed witness <terrain> <seed> <count> <moves> <deadline ms> <out> [<states dir>]
+//! cargo run --release -p holonics --example hnn_prediction -- executed replay <terrain> <seed> <count> <label=state>…
+//! cargo run --release -p holonics --example hnn_prediction -- executed coupling <terrain> <seed> <count> <deadline ms> <label=state|label=opening>…
+//! cargo run --release -p holonics --example hnn_prediction -- executed represent <terrain> <seed> <count> <iterates> <deadline ms> <out> [<held-out seed>]
 //! cargo run --release -p holonics --example hnn_prediction -- executed causal <terrain> <seed> <count> <label[=E]>…
 //! ```
 //!
@@ -44,6 +48,8 @@
 mod exterior;
 #[path = "hnn_executed_loop.rs"]
 mod executed_loop;
+#[path = "hnn_loop_1c.rs"]
+mod loop_1c;
 
 use std::collections::BTreeMap;
 use std::time::Instant;
@@ -305,6 +311,8 @@ fn main() {
         // Step 1b's gate A: the constrained feasibility witness (the pin
         // research/records/2026-09-30_STEP_1B_THE_CANDIDATE_COMPARISON_PINNED_BEFORE_ITS_RUNS.md
         // §13.3 and its gate-A addendum).
+        // With a ninth argument, every constitution read is written as its complete continuing
+        // state into that directory (loop 1c's replay, its pin §1.1).
         (Some("executed"), Some("witness")) => executed_loop::witness(
             &arguments[3],
             arguments[4].parse().expect("a seed"),
@@ -312,6 +320,33 @@ fn main() {
             arguments[6].parse().expect("moves"),
             arguments[7].parse().expect("a deadline in ms"),
             &arguments[8],
+            arguments.get(9).map(String::as_str),
+        ),
+        // Loop 1c (the pin
+        // research/records/2026-10-01_LOOP_1C_PERSISTENCE_REPRESENTATION_AND_REACH_PINNED_BEFORE_ITS_RUNS.md):
+        // the exact replay of written states, persistence and coupling, and the representation
+        // search.
+        (Some("executed"), Some("replay")) => loop_1c::replay(
+            &arguments[3],
+            arguments[4].parse().expect("a seed"),
+            arguments[5].parse().expect("a count"),
+            &arguments[6..],
+        ),
+        (Some("executed"), Some("coupling")) => loop_1c::coupling(
+            &arguments[3],
+            arguments[4].parse().expect("a seed"),
+            arguments[5].parse().expect("a count"),
+            arguments[6].parse().expect("a deadline in ms"),
+            &arguments[7..],
+        ),
+        (Some("executed"), Some("represent")) => loop_1c::represent(
+            &arguments[3],
+            arguments[4].parse().expect("a seed"),
+            arguments[5].parse().expect("a count"),
+            arguments[6].parse().expect("iterates"),
+            arguments[7].parse().expect("a deadline in ms"),
+            &arguments[8],
+            arguments.get(9).map(|s| s.parse().expect("a held-out seed")),
         ),
         // Step 1b's causal reading (I6).
         (Some("executed"), Some("causal")) => executed_loop::causal(
@@ -331,7 +366,7 @@ fn main() {
             &arguments[8],
         ),
         _ => panic!(
-            "executed move <seed> <requests> | train <arm> <terrain> <seed> <batch> <moves> <deadline ms> <out> | evaluate <terrain> <seed> <count> <out> <label[=E]>… | spread <terrain> <seed> <count> <label[=E]>… | slopes <terrain> <seed> <count> <label[=E]>… | counts <terrain> <training seed> <count> <validation seed> <count> <out> | witness <terrain> <seed> <count> <moves> <deadline ms> <out> | causal <terrain> <seed> <count> <label[=E]>…"
+            "executed move <seed> <requests> | train <arm> <terrain> <seed> <batch> <moves> <deadline ms> <out> | evaluate <terrain> <seed> <count> <out> <label[=E]>… | spread <terrain> <seed> <count> <label[=E]>… | slopes <terrain> <seed> <count> <label[=E]>… | counts <terrain> <training seed> <count> <validation seed> <count> <out> | witness <terrain> <seed> <count> <moves> <deadline ms> <out> [<states dir>] | causal <terrain> <seed> <count> <label[=E]>… | replay <terrain> <seed> <count> <label=state>… | coupling <terrain> <seed> <count> <deadline ms> <label=state>… | represent <terrain> <seed> <count> <iterates> <deadline ms> <out> [<held-out seed>]"
         ),
     }
 }

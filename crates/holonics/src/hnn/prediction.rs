@@ -167,6 +167,8 @@
 //! | the consumer equation | `HNN/Prediction.consumer_eq` over `Holon.ofEvolution_receive_eq_encoded` | the notebook's `hnn_prediction … executed` terrains |
 //! | the bank's reading of the superposed passage and the lock's flip | `HNN/FloquetPassage.{reflection_transport_reflection_carriers, kick_coeff_two, pair_sum_power_spectrum}`, `Objects/ParametronLock.lockFace_logistic`, `HNN/Prediction.{placed_at_station, release_width_zero}` | [`generate_by_bank`], [`bank_release`], [`BankPlacement`] |
 //! | the passage's transported and station-framed weights | `HNN/IndexedOpen.{transportedWeight, framedWeight, framed_weight_mass, framed_weight_one_sided, framed_weight_le_pow}` | [`BankPlacement`] |
+//! | a landing's normalization and entry, read apart (loop 1c's diagnostic, never a law) | `HNN/IndexedOpen.{transported_weight_insert, transported_weight_insert_scale}` | [`BankPlacement::storage_over`] |
+//! | the release's order read as a diagnostic factor (the law is [`LockOrder::Gap`]) | abstracted in `HNN/ExecutedComparison.decisions_release_the_section` | [`LockOrder`], [`bank_release_ordered`] |
 
 use num_bigint::BigInt;
 use num_traits::{One, Signed, ToPrimitive, Zero};
@@ -503,6 +505,41 @@ pub fn bank_release<R: JointGrowth + Send + Sync>(
     read: impl Fn(&[GaussianRat]) -> Result<R, HnnError> + Sync,
     keep: bool,
 ) -> Result<(BankGeneration, Vec<BankRefinement<R>>), HnnError> {
+    bank_release_ordered(placement, declared, alphabet, bank, grain, read, keep, LockOrder::Gap)
+}
+
+/// [definition; agent-inferred, loop 1c's
+/// [pin](../../../../research/records/2026-10-01_LOOP_1C_PERSISTENCE_REPRESENTATION_AND_REACH_PINNED_BEFORE_ITS_RUNS.md)
+/// §2.4] **Which eligible stations a refinement locks.** The release's law is [`LockOrder::Gap`]:
+/// the stations of the largest positive gap, together (the field's own order). The other two are
+/// diagnostics of the release's order, never a law: among the same eligible stations (each top's
+/// flip and lock certified, its gap positive) a refinement locks the one of least station index
+/// ([`LockOrder::Ascending`], the receiving ring's clock direction from the request's last tick) or
+/// of greatest ([`LockOrder::Descending`]), one lock a refinement. Eligibility, the readings, the
+/// certificates and the stopping rules are the release's own under every order.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub enum LockOrder {
+    /// The release's law: the stations of the largest positive gap lock together.
+    Gap,
+    /// A diagnostic: the eligible station of least index locks alone.
+    Ascending,
+    /// A diagnostic: the eligible station of greatest index locks alone.
+    Descending,
+}
+
+/// **The bank's lock iteration under a declared order** ([`bank_release`] at [`LockOrder::Gap`];
+/// the other orders are diagnostics of the release's order, [`LockOrder`]).
+#[allow(clippy::too_many_arguments)]
+pub fn bank_release_ordered<R: JointGrowth + Send + Sync>(
+    placement: &BankPlacement,
+    declared: &Refinement,
+    alphabet: usize,
+    bank: &ReceivingBank,
+    grain: u32,
+    read: impl Fn(&[GaussianRat]) -> Result<R, HnnError> + Sync,
+    keep: bool,
+    order: LockOrder,
+) -> Result<(BankGeneration, Vec<BankRefinement<R>>), HnnError> {
     use rayon::prelude::*;
     let stations = declared.stations;
     let mut locked: Vec<Option<usize>> = vec![None; stations];
@@ -564,14 +601,20 @@ pub fn bank_release<R: JointGrowth + Send + Sync>(
                 gaps.push((station, best, gap));
             }
         }
-        let largest = gaps.iter().map(|(_, _, gap)| gap.clone()).max();
-        let now: Vec<usize> = match &largest {
-            Some(largest) => gaps
-                .iter()
-                .filter(|(_, _, gap)| gap == largest)
-                .map(|&(station, _, _)| station)
-                .collect(),
-            None => Vec::new(),
+        let now: Vec<usize> = match order {
+            LockOrder::Gap => {
+                let largest = gaps.iter().map(|(_, _, gap)| gap.clone()).max();
+                match &largest {
+                    Some(largest) => gaps
+                        .iter()
+                        .filter(|(_, _, gap)| gap == largest)
+                        .map(|&(station, _, _)| station)
+                        .collect(),
+                    None => Vec::new(),
+                }
+            }
+            LockOrder::Ascending => gaps.iter().map(|&(station, _, _)| station).min().into_iter().collect(),
+            LockOrder::Descending => gaps.iter().map(|&(station, _, _)| station).max().into_iter().collect(),
         };
         let mut taken = Vec::new();
         for &station in &now {
@@ -850,16 +893,29 @@ impl BankPlacement {
     /// station's `w_j`, on the population chart; at `ρ = 1` all `ν̂(n + |S|)`, in every frame.
     #[allow(clippy::type_complexity)]
     pub fn weights(&self, station: usize, cells: &[Option<usize>]) -> (Vec<Rat>, Vec<Option<Rat>>) {
+        self.weights_over(station, cells, cells)
+    }
+
+    /// The weights of the data `cells` read from `station`, normalized over the span `mass` places
+    /// (the request's phases and the stations `mass` places; only which stations are placed counts,
+    /// never their classes). At `mass = cells` it is [`BankPlacement::weights`].
+    #[allow(clippy::type_complexity)]
+    fn weights_over(
+        &self,
+        station: usize,
+        cells: &[Option<usize>],
+        mass: &[Option<usize>],
+    ) -> (Vec<Rat>, Vec<Option<Rat>>) {
         assert!(station < self.stations(), "the station read is a declared station");
         if self.modulus.is_one() {
-            let placed = cells.iter().filter(|cell| cell.is_some()).count() as u64;
+            let placed = mass.iter().filter(|cell| cell.is_some()).count() as u64;
             let nu = self.chart.value(self.population + placed);
             return (
                 vec![nu.clone(); self.reads.len()],
                 cells.iter().map(|cell| cell.map(|_| nu.clone())).collect(),
             );
         }
-        let mass = self.mass(station, cells);
+        let mass = self.mass(station, mass);
         let weigh = |distance: u64| self.chart.chart(&(&self.powers[distance as usize] / &mass));
         (
             self.reads
@@ -878,7 +934,29 @@ impl BankPlacement {
     /// station's class, or unplaced): the pair ports' read plus every datum of the passage at its
     /// transported weight from `station`.
     pub fn storage(&self, station: usize, cells: &[Option<usize>]) -> Vec<Rat> {
-        let (request, section) = self.weights(station, cells);
+        self.storage_over(station, cells, cells)
+    }
+
+    /// [measured-diagnostic; agent-inferred, loop 1c's
+    /// [pin](../../../../research/records/2026-10-01_LOOP_1C_PERSISTENCE_REPRESENTATION_AND_REACH_PINNED_BEFORE_ITS_RUNS.md)
+    /// §2.3; a diagnostic, never a law] **The storage read from a station with its normalization
+    /// taken over another span**: the data `cells` enter (the request's phases and the stations
+    /// `cells` places, the candidate's own among them), each at its transported weight from `station`
+    /// over the mass of the span `mass` places, `chart(ρ^(r(k)) / M_j(mass))`. At `mass = cells` it is
+    /// [`BankPlacement::storage`] exactly. A later lock `k` landing on a section `S` read from `j`
+    /// splits into two parts (Lean `HNN/IndexedOpen.transported_weight_insert`): **the
+    /// normalization**, every earlier datum's weight scaled by `M_j(S)/M_j(S ∪ k)` (the span's mass
+    /// taken by `k`; `storage_over(j, S, S ∪ k)`), and **the entry**, `k`'s own image at its weight
+    /// (`storage_over(j, S ∪ k, S)` adds it over the earlier mass). On the chart, with one mass the
+    /// common data read one weight, so `storage(j, S ∪ k) − storage_over(j, S, S ∪ k)` and
+    /// `storage_over(j, S ∪ k, S) − storage(j, S)` are each exactly `k`'s entry (the owner's test).
+    pub fn storage_over(
+        &self,
+        station: usize,
+        cells: &[Option<usize>],
+        mass: &[Option<usize>],
+    ) -> Vec<Rat> {
+        let (request, section) = self.weights_over(station, cells, mass);
         let mut storage = self.pairs.clone();
         for ((_, _, read), weight) in self.reads.iter().zip(&request) {
             for (value, add) in storage.iter_mut().zip(read) {

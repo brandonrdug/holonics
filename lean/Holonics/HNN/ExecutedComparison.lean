@@ -1,4 +1,5 @@
 import Holonics.HNN.BankFace
+import Holonics.Foundation.Standing
 import Mathlib.Analysis.Calculus.Deriv.Comp
 import Mathlib.Analysis.Calculus.Deriv.Prod
 import Mathlib.Analysis.Calculus.Deriv.Slope
@@ -864,6 +865,89 @@ theorem sum_upper_dini_descends {κ : Type*} (K : Finset κ) (T : κ → ℝ →
 
 end LockFaceFirstOrder
 
+/-! ## 8. Loop 1c: the landing's paired factorial and the restore law
+
+[definition; agent-inferred, October 1] Loop 1c's pin (§1.1, §2.3;
+`research/records/2026-10-01_LOOP_1C_PERSISTENCE_REPRESENTATION_AND_REACH_PINNED_BEFORE_ITS_RUNS.md`).
+A later lock landing on a solved station's section is two parts, its normalization and its entry
+(`IndexedOpen.transported_weight_insert`), and the paired counterfactual reads the four cells. A
+sequential telescoping attribution depends on the order of the parts by exactly their interaction
+(`telescoping_orders_differ_by_interaction`), and on a binary criterion it can name either part
+(`sequential_attribution_depends_on_order`): no order is reported as the cause. The exact replay of a
+complete continuing state reproduces the native continuation on every admitted future when the
+restore inverts the state on the admitted constitutions (`restoreStanding`,
+`restored_continuation_agrees`, `equal_states_agree`); that inversion is the Rust owner's
+(`hnn::constitution::{ContinuingState, Constitution::continued}`), held by its test
+`a_restored_checkpoint_continues_exactly_over_successive_receptions` and measured by the loop's
+replay. -/
+
+section LoopOneC
+
+/-- [proved-derived; formal-checked] **The two telescoping orders of a two-part landing differ by
+its interaction**: with the cells `f00` (neither part: the decision's reading), `f10` (the
+normalization alone), `f01` (the entry alone) and `f11` (both: the native landing), the
+normalization's step read first (`f10 − f00`) and read second (`f11 − f01`) differ by the
+interaction `f11 − f10 − f01 + f00`, the entry's likewise, and each order sums to the whole change.
+A telescoping attribution is order-free exactly when the interaction is zero. -/
+theorem telescoping_orders_differ_by_interaction (f00 f10 f01 f11 : ℝ) :
+    (f11 - f01) - (f10 - f00) = f11 - f10 - f01 + f00 ∧
+      (f11 - f10) - (f01 - f00) = f11 - f10 - f01 + f00 ∧
+      (f10 - f00) + (f11 - f10) = f11 - f00 ∧
+      (f01 - f00) + (f11 - f01) = f11 - f00 :=
+  ⟨by ring, by ring, by ring, by ring⟩
+
+/-- [counterexample; formal-checked] **On a binary criterion a sequential attribution names either
+part, by its order**: a station solved with neither part, with the normalization alone and with the
+entry alone, and not solved with both. Read the normalization first, the entry's step undoes it;
+read the entry first, the normalization's step does. -/
+theorem sequential_attribution_depends_on_order :
+    (fun n e : Bool => !(n && e)) true false = true ∧
+      (fun n e : Bool => !(n && e)) true true = false ∧
+      (fun n e : Bool => !(n && e)) false true = true :=
+  ⟨rfl, rfl, rfl⟩
+
+/-- [definition] **The restore law as a standing law** (gate A's owed item 3, stated here): with
+`retain` the complete continuing state of a constitution and `restore` its continuation onto the
+declared opening, `restore (retain θ) = θ` on the admitted constitutions makes the state a
+`Foundation/Standing.StandingLaw`: every admitted future observation, any receiver after any word
+of receptions, is read off the state alone. -/
+def restoreStanding {Generator Receiver Source Retained Face : Type*}
+    (transport : Generator → Source → Source) (observe : Receiver → Source → Face)
+    (retain : Source → Retained) (restore : Retained → Source)
+    (hrestore : ∀ θ, restore (retain θ) = θ) :
+    Holonics.Foundation.Standing.StandingLaw Generator Receiver Source Retained Face where
+  transport := transport
+  observe := observe
+  retain := retain
+  reopen receiver word state :=
+    observe receiver (Holonics.Foundation.Chronology.transportWord transport word (restore state))
+  sufficient receiver word θ := by rw [hrestore]
+
+/-- [proved-derived; formal-checked] **The restored continuation is the native one**: under the
+restore law, every admitted future observation from the restored constitution equals the native
+continuation's. -/
+theorem restored_continuation_agrees {Generator Receiver Source Retained Face : Type*}
+    (transport : Generator → Source → Source) (observe : Receiver → Source → Face)
+    (retain : Source → Retained) (restore : Retained → Source)
+    (hrestore : ∀ θ, restore (retain θ) = θ) (θ : Source) (receiver : Receiver)
+    (word : List Generator) :
+    observe receiver
+        (Holonics.Foundation.Chronology.transportWord transport word (restore (retain θ))) =
+      observe receiver (Holonics.Foundation.Chronology.transportWord transport word θ) := by
+  rw [hrestore]
+
+/-- [proved-derived; formal-checked] **Equal continuing states agree on every admitted future**
+(`StandingLaw.futureAgreement_of_retain_eq` on `restoreStanding`): two constitutions with one state
+are indistinguishable by every admitted receiver after every word. -/
+theorem equal_states_agree {Generator Receiver Source Retained Face : Type*}
+    (transport : Generator → Source → Source) (observe : Receiver → Source → Face)
+    (retain : Source → Retained) (restore : Retained → Source)
+    (hrestore : ∀ θ, restore (retain θ) = θ) {θ θ' : Source} (h : retain θ = retain θ') :
+    Holonics.Foundation.CausalRelevance.NonLinear.futureAgreement observe transport θ θ' :=
+  (restoreStanding transport observe retain restore hrestore).futureAgreement_of_retain_eq h
+
+end LoopOneC
+
 section Audit
 
 #print axioms passage_coeff_zero
@@ -899,6 +983,10 @@ section Audit
 #print axioms sup_upper_dini
 #print axioms lockFace_first_order
 #print axioms sum_upper_dini_descends
+#print axioms telescoping_orders_differ_by_interaction
+#print axioms sequential_attribution_depends_on_order
+#print axioms restored_continuation_agrees
+#print axioms equal_states_agree
 
 end Audit
 
