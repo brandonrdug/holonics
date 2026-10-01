@@ -1,0 +1,4 @@
+35a81746e311b7fa3a7fd6b1ee2c1650a92cccb6
+adf8266f4a762686a5fba189127bf49a92b804633dbb38ee49384907be4682b6
+args executed witness order2 2026093061 8 8 6974736 .local/gw/best.state .local/gw
+wall 1564001 ms; exit 0; early stop 0

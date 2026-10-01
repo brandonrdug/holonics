@@ -3238,6 +3238,217 @@ pub fn unit_direction(
     Ok(reading)
 }
 
+/// [definition; agent-inferred, October 1; the
+/// [witness's metric record](../../../../research/records/2026-10-01_THE_MOVES_METRIC_IS_ITS_WITNESSS_THE_LOCKS_FISHER_FORM_ON_THE_MOVES_PLANE.md)]
+/// **One lock-face term read on the move's plane**: each candidate's share `θ_x` (its dyadic face;
+/// the resting sheet holds `1 − Σθ`), its covector weight `θ_x − [x = t]`, and its log-reading's
+/// change along the plane's two unit directions, `δ_x = (⟨ĝ_x, Δz_x(ΔE)⟩, ⟨ĝ_x, ∂z_x/∂ρ⟩)`.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct PlaneTerm {
+    pub shares: Vec<Rat>,
+    pub weights: Vec<Rat>,
+    pub along: Vec<[Rat; 2]>,
+}
+
+/// [definition; agent-inferred, October 1] **The witness's form on the move's plane** (the record
+/// above). A move's metric is a reading: the quadratic form by which a receiver measures a change,
+/// its energy of the change. The witness of the executed comparison is the lock at each decision,
+/// and its energy account is the relative entropy of its reading (free energy
+/// `F(p) − F(q) = k_B T · D(p‖q)`). To second order in the log-readings `u_x = log a_x` that is the
+/// curvature of the lock's log mass `log Π`, `Π = 1 + Σ_x a_x` (the resting sheet's weight one is
+/// the lossless ring's return): `∂²ℓ/∂u_x∂u_y = θ_x[x = y] − θ_x θ_y`, the lock face's own Hessian
+/// (`ℓ = log Π − u_t`; the target's part is linear). Pulled back through the readings onto the plane
+/// of the port's unit move `ΔE` and the modulus, it is
+/// `G = Σ_j Σ_(x,y) δ_x (θ_x[x = y] − θ_x θ_y) δ_yᵀ` (`form`: `G_EE`, `G_Eρ`, `G_ρρ`), beside the
+/// gradient `g = Σ_j Σ_x (θ_x − [x = t]) δ_x` (its `ρ` part is the move's `γ_ρ`). Every `δ` is a
+/// change of the witness's own reading, so `G` and `g` are unchanged by a storage rechart
+/// `z′ = Bz` (`ĝ′ = B⁻ᵀĝ`), and a rescaled plane direction rescales the step's coordinate inversely
+/// (the step itself unchanged). The coordinate control `−γ_ρ/Σ|∂z/∂ρ|²` has neither property.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct WitnessForm {
+    pub form: [Rat; 3],
+    pub gradient: [Rat; 2],
+}
+
+impl WitnessForm {
+    /// The determinant `G_EE G_ρρ − G_Eρ²`.
+    pub fn determinant(&self) -> Rat {
+        &self.form[0] * &self.form[2] - &self.form[1] * &self.form[1]
+    }
+
+    /// The witness's step on the plane, `(α, β) = −G⁻¹g` (its unit along `ΔE` and its move of
+    /// `ρ`), where `G ≻ 0`; `None` where the plane is degenerate to the witness.
+    pub fn step(&self) -> Option<[Rat; 2]> {
+        let det = self.determinant();
+        if !det.is_positive() || !self.form[0].is_positive() {
+            return None;
+        }
+        let [a, b, c] = &self.form;
+        let [p, q] = &self.gradient;
+        Some([
+            -(c * p - b * q) / &det,
+            -(a * q - b * p) / &det,
+        ])
+    }
+
+    /// Each coordinate's step with the cross term dropped, `−g_i/G_ii` (the negative control).
+    pub fn decoupled(&self) -> [Option<Rat>; 2] {
+        let one = |g: &Rat, m: &Rat| m.is_positive().then(|| -g / m);
+        [
+            one(&self.gradient[0], &self.form[0]),
+            one(&self.gradient[1], &self.form[2]),
+        ]
+    }
+
+    /// The second-order model's change at the witness's step, `½ gᵀ(α, β) = −½ gᵀG⁻¹g`.
+    pub fn predicted(&self) -> Option<Rat> {
+        self.step().map(|[a, b]| {
+            (&self.gradient[0] * &a + &self.gradient[1] * &b) / Rat::from_integer(BigInt::from(2))
+        })
+    }
+}
+
+/// The witness's form from its terms on the plane ([`WitnessForm`]), exactly.
+pub fn witness_form(terms: &[PlaneTerm]) -> WitnessForm {
+    let mut form = [Rat::zero(), Rat::zero(), Rat::zero()];
+    let mut gradient = [Rat::zero(), Rat::zero()];
+    for term in terms {
+        let mut mean = [Rat::zero(), Rat::zero()];
+        for ((theta, weight), delta) in term.shares.iter().zip(&term.weights).zip(&term.along) {
+            for i in 0..2 {
+                mean[i] += theta * &delta[i];
+                gradient[i] += weight * &delta[i];
+            }
+            form[0] += theta * &delta[0] * &delta[0];
+            form[1] += theta * &delta[0] * &delta[1];
+            form[2] += theta * &delta[1] * &delta[1];
+        }
+        form[0] -= &mean[0] * &mean[0];
+        form[1] -= &mean[0] * &mean[1];
+        form[2] -= &mean[1] * &mean[1];
+    }
+    WitnessForm { form, gradient }
+}
+
+/// [measured-diagnostic; agent-inferred, October 1] **The committed move's plane read by its
+/// witness** (the record above): the incumbent's comparison and, where [`executed_move`] would form
+/// its step, the port's unit move `ΔE` and the coordinate control (`γ_ρ`, `G_ρ`, `−γ_ρ/G_ρ`)
+/// exactly as it forms them ([`unit_step`]), and the witness's form on the plane of `ΔE` and `ρ`
+/// ([`WitnessForm`]) over the proposal's lock-face terms. Each `δ` is the candidate's leading
+/// member's covector at its dyadic faces paired exactly with its storage's move, then held at
+/// [`JOINT_BITS`] significant bits (a reading's grain far below the readings' `2^(−16)`). The hinge
+/// has no lock and no witness's form here. No step is taken; nothing is retained.
+#[derive(Clone, Debug)]
+pub struct PlaneReading {
+    pub before: BatchComparison,
+    pub refusal: Option<MoveRefusal>,
+    pub unit_move: Option<ExactRatMatrix>,
+    pub modulus_slope: Option<Rat>,
+    pub modulus_curvature: Option<Rat>,
+    pub modulus_unit: Option<Rat>,
+    pub witness: Option<WitnessForm>,
+    pub terms: usize,
+}
+
+/// [measured-diagnostic] The committed move's plane read by its witness ([`PlaneReading`]).
+pub fn witness_plane(
+    field: &Field,
+    constitution: &Constitution,
+    requests: &[Request],
+    declared: &Refinement,
+    bank: &ReceivingBank,
+    grain: u32,
+    comparison: Comparison,
+) -> Result<PlaneReading, HnnError> {
+    use rayon::prelude::*;
+    let (before, reads) = incumbent(field, constitution, requests, declared, bank, grain, comparison)?;
+    let proposal = propose(comparison.composition, &before, &reads);
+    drop(reads);
+    let mut reading = PlaneReading {
+        before,
+        refusal: certificate_refusal(&proposal),
+        unit_move: None,
+        modulus_slope: None,
+        modulus_curvature: None,
+        modulus_unit: None,
+        witness: None,
+        terms: 0,
+    };
+    if reading.refusal.is_some() {
+        return Ok(reading);
+    }
+    let (_, step) = unit_step(field, constitution, declared, requests, &proposal)?;
+    let Some(step) = step else {
+        reading.refusal = Some(MoveRefusal::Unreached);
+        return Ok(reading);
+    };
+    reading.modulus_slope = Some(step.gamma.clone());
+    reading.modulus_curvature = Some(step.curvature.clone());
+    reading.modulus_unit = Some(step.modulus_unit.clone());
+    if comparison.composition == Composition::LockFace {
+        let moves = section_moves(
+            field,
+            constitution,
+            &step.unit,
+            declared,
+            requests,
+            &proposal.sections,
+            None,
+        )?;
+        let placements = placements_of(field, constitution, requests, declared)?;
+        let derivatives: Vec<Vec<Rat>> = proposal
+            .sections
+            .par_iter()
+            .map(|(request, station, cells)| placements[*request].modulus_derivative(*station, cells))
+            .collect();
+        let held = |x: Rat| {
+            if x.is_zero() {
+                x
+            } else if x.is_negative() {
+                -significant(&-x, JOINT_BITS, false)
+            } else {
+                significant(&x, JOINT_BITS, false)
+            }
+        };
+        let terms: Vec<PlaneTerm> = proposal
+            .terms
+            .par_iter()
+            .filter_map(|term| match &term.certificate {
+                Certificate::Lock { candidates, .. } => Some((term, candidates)),
+                Certificate::Hinge(_) => None,
+            })
+            .map(|(term, candidates)| {
+                let mut out = PlaneTerm {
+                    shares: Vec::with_capacity(candidates.len()),
+                    weights: Vec::with_capacity(candidates.len()),
+                    along: Vec::with_capacity(candidates.len()),
+                };
+                for (c, (_, _, share)) in term.leading.iter().zip(candidates) {
+                    let covector: Vec<Rat> = c.covector.iter().map(face).collect();
+                    let along_e: Rat = covector
+                        .iter()
+                        .zip(&moves[c.section])
+                        .map(|(g, d)| g * &d.lower)
+                        .sum();
+                    let along_rho: Rat = covector
+                        .iter()
+                        .zip(&derivatives[c.section])
+                        .map(|(g, d)| g * d)
+                        .sum();
+                    out.shares.push(face(share));
+                    out.weights.push(c.weight.clone());
+                    out.along.push([held(along_e), held(along_rho)]);
+                }
+                out
+            })
+            .collect();
+        reading.terms = terms.len();
+        reading.witness = Some(witness_form(&terms));
+    }
+    reading.unit_move = Some(step.unit_move);
+    Ok(reading)
+}
+
 /// The largest power of two at or below `x > 0`; zero at zero.
 fn power_below(x: &Rat) -> Rat {
     if !x.is_positive() {

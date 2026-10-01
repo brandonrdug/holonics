@@ -1,0 +1,5 @@
+executed witness-plane: 8 order2 requests at development seed 2026093061, the arm lock-dec, toward research/records/2026-09-30_THE_MODULUS_FOUNDED_OFF_ONE_receipts/refit_on_lattice.txt; the bank p = 5/8, grain 2^(-16)
+  c0: ρ 102837/131072; L ∈ [500197/4096, 500203/4096) nats; solved 0 of 64; whole 0 (released 7, stations right 15); toward's ρ less this ρ: -68101/262144; 49954 ms
+    the coordinate control: γ_ρ -10636625/131072, G_ρ 4345377/64, Δρ_c 10266827/8589934592 (24 bits); ΔE's largest entry 602475/1048576
+    the witness (64 lock terms): G_EE 9871287/16384, G_Eρ 1806923/4096, G_ρρ 4399651/512, det 4982678; g_E -1187493/8192, g_ρ -10636625/131072 (24 bits); decoupled α₀ Some(Ratio { numer: 8073041, denom: 33554432 }), β₀ Some(Ratio { numer: 633761, denom: 67108864 })
+    the witness's step: α 2036817/8388608, β -3244055/1073741824 (24 bits); the model's change -9162359/524288; β over toward's ρ change 12487475/1073741824; the control's αΔρ_c over it -1199485/1073741824
