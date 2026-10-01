@@ -715,6 +715,11 @@ that fires becomes the next loop's subject, and nothing downstream starts.
     - *The witness's span, October 1* ([record](../../research/records/2026-10-01_THE_WITNESSS_DIRECTION_IN_THE_SPAN_OF_THE_RETURNS.md)). The witness's direction
       over the requests' pullbacks descends far deeper and moves `ρ` a tenth of the chord, with no
       decision gained. Next: the comparison's agreement with the decisions.
+    - *Agreement, and the corrected move from the opening, October 1*
+      ([agreement](../../research/records/2026-10-01_THE_COMPARISONS_AGREEMENT_WITH_THE_DECISIONS.md);
+      [R3](../../research/records/2026-10-01_THE_CORRECTED_MOVE_FROM_THE_OPENING_MEASURED_R3_THE_SAME_VALLEY.md)). The order term or every refinement lifts the comparison's
+      agreement with stations right from chance to 40 against 18 over 12 states. The corrected move
+      from the opening still descends without decisions (R3). Next: agreement between nearby states.
   - *1b's subject, as 1a named it*: a comparison whose descent must move decisions, one
     that holds a margin on right decisions, is not minimized on ties, and is read where a reading
     carries information about the key. The governing law "loss is the log of a ratio" is the
