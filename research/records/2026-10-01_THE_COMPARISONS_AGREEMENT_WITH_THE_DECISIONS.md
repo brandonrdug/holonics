@@ -54,7 +54,12 @@ every refinement (`order-all`: an order term at each refinement the release exec
 decision in its own context), reads 39 against 19: no further gain on these 12 states. Either
 remedy alone carries the agreement. The open question is which one's descent reaches decisions:
 the order term at the decisions was measured ([the order](2026-10-01_THE_ORDER_MEASURED_ONE_MOVE_FROM_C6_GAINS_STATIONS_WHERE_THE_LOCK_FACE_ALONE_LOST_THEM.md));
-the lock face at every refinement is read next by one guarded move from c6.
+the lock face at every refinement was tried by one guarded witness-metric move from c6 and is
+**incomplete**: it passed its deadline of 911 s before its first line (receipts in
+`lock-all-move-incomplete/`). Its covectors are read at every refinement; one such read at the
+opening alone took 440,159 ms. It was not relaunched with a larger deadline. The order at the
+decisions carries the same agreement at about a quarter of the cost, so it stays the main line's
+comparison.
 
 ## 4. Time
 
@@ -62,5 +67,6 @@ the lock face at every refinement is read next by one guarded move from c6.
 |---|---|---|---|---|
 | 12 states × 3 comparisons, 19 threads | `36 · 48,927 = 1,761,372` ms | `timeout 1762`, per-line 48,927 ms | 1,391,724 ms, exit 0 | 83,374,080 bytes (at exit) |
 | 12 states × `order-all` (`order-all/`) | `12 · 48,927 = 587,124` ms | `timeout 588` | 460,551 ms, exit 0 | 82,309,120 bytes (at exit) |
+| one `lock-all` witness move from c6 | `440,159 + 78,889 + 8 · 48,927 = 910,464` ms | `timeout 911` | 911,081 ms, **incomplete** (deadline) | |
 
 Measured over projected: `1391724/1761372` and `460551/587124`.

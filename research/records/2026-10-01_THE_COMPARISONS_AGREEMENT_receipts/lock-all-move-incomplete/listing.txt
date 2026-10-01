@@ -1,0 +1,1 @@
+executed move-once: 8 order2 requests at development seed 2026093061, the candidate arm, from c6 (ρ 1642461/2097152); the bank p = 5/8, grain 2^(-16)
