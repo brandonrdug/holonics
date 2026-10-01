@@ -1131,6 +1131,113 @@ pub struct RationalRootCensus {
     pub work: CensusWork,
 }
 
+/// A checked source-coordinate branch, with its producing census and companion certificate.
+///
+/// The source root uses the existing [`AlgebraicRoot`] representation. The borrowed origin keeps
+/// the original rational coefficients, positive scale and native branch attached; an isolating
+/// interval is never replaced by a point. This view certifies coordinate transport, not the
+/// census's enclosure, work or rational-population completeness.
+#[derive(Clone, Debug)]
+pub struct SourceRoot<'a> {
+    census: &'a RationalRootCensus,
+    companion: &'a CensusedRealRoot,
+    isolating: AlgebraicRoot,
+}
+
+impl<'a> SourceRoot<'a> {
+    pub fn census(&self) -> &'a RationalRootCensus {
+        self.census
+    }
+
+    pub fn companion(&self) -> &'a CensusedRealRoot {
+        self.companion
+    }
+
+    /// The source primitive polynomial and its checked source-coordinate isolation certificate.
+    pub fn isolating(&self) -> &AlgebraicRoot {
+        &self.isolating
+    }
+
+    /// The rational value, when present, is already in source coordinates.
+    pub fn rational_value(&self) -> Option<&'a Rat> {
+        self.companion.rational_value.as_ref()
+    }
+}
+
+impl RationalRootCensus {
+    /// Decode `z = c*x` using `B(c*x) = c^(n-1)*A(x)`, with `A` the source's primitive form.
+    ///
+    /// [agent-inferred] The existing root and census carry the required operands. A borrowed
+    /// checked view preserves their provenance rather than introducing another root scalar.
+    /// Re-derive the source/scale/companion identity before division, verify each producing
+    /// certificate, and certify each source branch against `A`. Positive `c` preserves order.
+    /// Application denominators remain the application's domain; no cancellation occurs here.
+    pub fn source_roots(&self) -> Result<Vec<SourceRoot<'_>>, ExactPolynomialError> {
+        if self
+            .source
+            .coefficients()
+            .iter()
+            .any(|q| q.denom().is_zero())
+        {
+            return Err(ExactPolynomialError::MalformedCensusTransport);
+        }
+        let primitive = self.source.primitive_integer_form()?;
+        if primitive != self.primitive
+            || self.leading_coefficient <= BigInt::zero()
+            || primitive.coefficients.last() != Some(&self.leading_coefficient)
+            || self.roots.len() != self.distinct_real_roots as usize
+        {
+            return Err(ExactPolynomialError::MalformedCensusTransport);
+        }
+        check_companion_declared_size(&primitive, &self.leading_coefficient)?;
+        if monic_companion_of(&primitive, &self.leading_coefficient)? != self.monic_companion {
+            return Err(ExactPolynomialError::MalformedCensusTransport);
+        }
+        let companion_sturm = SturmChain::of(&self.monic_companion)?;
+        let source_sturm = SturmChain::of(&primitive)?;
+        let scale = Rat::from_integer(self.leading_coefficient.clone());
+        let mut previous: Option<&ExactInterval> = None;
+        let mut decoded = Vec::with_capacity(self.roots.len());
+        for root in &self.roots {
+            let interval = &root.isolating.isolating_interval;
+            if root.isolating.polynomial != self.monic_companion
+                || interval.lower.denom().is_zero()
+                || interval.upper.denom().is_zero()
+                || previous.is_some_and(|last| last.upper > interval.lower)
+            {
+                return Err(ExactPolynomialError::MalformedCensusTransport);
+            }
+            let native = AlgebraicRoot::isolate_with(
+                &companion_sturm,
+                ExactInterval::new(interval.lower.clone(), interval.upper.clone())?,
+            )?;
+            if native.certificate != root.isolating.certificate {
+                return Err(ExactPolynomialError::MalformedCensusTransport);
+            }
+            let isolating = AlgebraicRoot::isolate_with(
+                &source_sturm,
+                ExactInterval::new(&interval.lower / &scale, &interval.upper / &scale)?,
+            )?;
+            if let Some(value) = &root.rational_value {
+                if value.denom().is_zero()
+                    || value <= &isolating.isolating_interval.lower
+                    || value >= &isolating.isolating_interval.upper
+                    || !self.source.evaluate(value).is_zero()
+                {
+                    return Err(ExactPolynomialError::CensusRootDoesNotVanish);
+                }
+            }
+            previous = Some(interval);
+            decoded.push(SourceRoot {
+                census: self,
+                companion: root,
+                isolating,
+            });
+        }
+        Ok(decoded)
+    }
+}
+
 /// Exact work, in operations, never in elapsed time.
 ///
 /// A cost is measured in work; a clock may measure but never selects, and nothing here consults
@@ -2108,6 +2215,8 @@ pub enum ExactPolynomialError {
     IsolationRefused,
     #[error("a censused rational root did not vanish on the source polynomial")]
     CensusRootDoesNotVanish,
+    #[error("the census source, scale, companion, ordered branches or certificates disagree")]
+    MalformedCensusTransport,
     #[error(
         "a root enclosure whose interval does not agree with its own bounds, or whose bounds are \
          not positive, is not an enclosure and is refused at the boundary"
