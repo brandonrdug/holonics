@@ -1,0 +1,4 @@
+caa4f49e2ddf20ca3f128a03a4e4ede8d595556a
+b8c837c33ee6059ee9799ae1d446959b8bbbc0e56d30230c1bbb126e1300f46d
+args executed direction order2 2026093061 8 lock-dec opening research/records/2026-09-30_THE_MODULUS_FOUNDED_OFF_ONE_receipts/refit_on_lattice.txt@102837/131072 .local/dir 1/2 1/8 1/32 1/128 1/512
+wall 262876 ms; exit 0; early stop 0

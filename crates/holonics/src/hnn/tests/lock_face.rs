@@ -607,6 +607,16 @@ fn the_guards_hold_symmetrically_on_every_arm() {
                     .requests
                     .iter()
                     .all(|r| r.generation.as_ref().unwrap().uncertified.is_none()));
+                // The executed release's composition falls strictly too (the native direction
+                // record's guard), and every earlier trial refused on the mask or the own release
+                // carried its kind.
+                assert!(own.value.upper < moved.before.value.lower);
+                for trial in &moved.trials[..moved.trials.len() - 1] {
+                    if let Some(crate::hnn::executed::TrialRefusal::OwnNotBelow(v)) = &trial.refusal {
+                        assert!(trial.value.as_ref().unwrap().upper < moved.before.value.lower);
+                        assert!(v.upper >= moved.before.value.lower);
+                    }
+                }
                 // The mask's value at the successor is the incumbent's sections re-read there.
                 let (value, _, reread_own, _) = mask_reread(
                     &field,

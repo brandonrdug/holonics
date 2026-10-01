@@ -117,8 +117,15 @@
 //!   adopted only when every commit guard holds on it: the entry bound `2^ENTRY_BOUND = 8`
 //!   ([`entry_bound`]); the first-order certificate negative on the carried move; every crossing of
 //!   its own release admissible and every lock's Floquet certificate certified; every reading
-//!   supported; the constitution's own guards; and **the fixed incumbent mask's composition strictly
-//!   lower by disjoint enclosures**, `C_mask(Θ′)⁺ < C(Θ)⁻`;
+//!   supported; the constitution's own guards; **the fixed incumbent mask's composition strictly
+//!   lower by disjoint enclosures**, `C_mask(Θ′)⁺ < C(Θ)⁻`; and **the composition the successor's own
+//!   release executes strictly lower too**, `C_own(Θ′)⁺ < C(Θ)⁻` (October 1, the
+//!   [native direction record](../../../../research/records/2026-10-01_THE_NATIVE_DIRECTION_MEASURED_THE_STEP_DESCENDS_THE_EXECUTED_RELEASE_WITHIN_ITS_CELL_AND_GATE_A_ADOPTED_SIXTEEN_TIMES_BEYOND_IT.md):
+//!   the mask's first order holds only within the trajectory cell where the mask and the own release
+//!   coincide, and gate A's first move certified the mask's decrease sixteen times past that cell
+//!   while the executed release rose). Within the cell the second guard is the first; past it, a
+//!   step is adopted only while the executed comparison still descends, so over moves on a fixed
+//!   batch the executed composition falls strictly at every adopted move;
 //! - otherwise the next step is tried, at most [`LADDER_DEPTH`] a move, and the move is refused,
 //!   typed, when none holds.
 //!
@@ -127,9 +134,8 @@
 //! the successor's re-read compare like with like. The mask is transient within the move: it is
 //! formed from the incumbent's release, read once at each trial and discarded with the move; no
 //! event, no replay history is retained. The successor's **own release** is read beside it for
-//! behaviour and for its guards; its recomputed composition is reported as a decrease of that
-//! declared score only, never as decision progress, with the context change (own less mask) beside
-//! it. Every count is kept ([`TermCounts`]): attempted, unresolved, absent, post-error, held,
+//! behaviour and for its guards, its recomputed composition a commit guard (it must fall) and never
+//! read as decision progress, with the context change (own less mask) beside it. Every count is kept ([`TermCounts`]): attempted, unresolved, absent, post-error, held,
 //! support, coverage. The persistence reads (the pin §13.7, [`Persistence`]) re-read each decision
 //! solved at its refinement after the later locks of its section.
 //!
@@ -2466,6 +2472,10 @@ pub enum TrialRefusal {
     FirstOrder(ExactInterval),
     /// The fixed mask's composition not strictly lower by disjoint enclosures.
     NotBelow(ExactInterval),
+    /// The fixed mask's composition lower, the successor's own release's executed composition not
+    /// strictly lower by disjoint enclosures: the step left the trajectory cell and the executed
+    /// comparison did not descend.
+    OwnNotBelow(ExactInterval),
     /// The constitution's own guard (budget, storage growth).
     Constitution(String),
 }
@@ -2791,10 +2801,14 @@ fn ladder(
         });
         trial.readings = read.readings;
         trial.after = read.comparison;
-        trial.refusal = match read.refusal {
-            Some(refusal) => Some(refusal),
-            None if read.value.upper < before.lower => None,
-            None => Some(TrialRefusal::NotBelow(read.value.clone())),
+        trial.refusal = match (read.refusal, &trial.after) {
+            (Some(refusal), _) => Some(refusal),
+            (None, _) if read.value.upper >= before.lower => {
+                Some(TrialRefusal::NotBelow(read.value.clone()))
+            }
+            (None, Some(own)) if own.value.upper < before.lower => None,
+            (None, Some(own)) => Some(TrialRefusal::OwnNotBelow(own.value.clone())),
+            (None, None) => Some(TrialRefusal::Unsupported),
         };
         let adopted = trial.refusal.is_none();
         trials.push(trial);

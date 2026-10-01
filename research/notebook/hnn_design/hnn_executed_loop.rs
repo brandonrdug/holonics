@@ -911,6 +911,43 @@ pub(super) fn move_line(index: usize, moved: &ExecutedMove, ms: u128) -> String 
     )
 }
 
+/// **A move's trials whole** (the native direction record's guard): each trial's step, its carried
+/// modulus, the fixed mask's composition, the own release's executed composition, and its refusal by
+/// kind, so a step refused past the trajectory cell (`OwnNotBelow`) is read apart from one refused on
+/// the mask (`NotBelow`).
+pub(super) fn trial_line(moved: &ExecutedMove) -> String {
+    let trials: Vec<String> = moved
+        .trials
+        .iter()
+        .map(|t| {
+            format!(
+                "η {} ρ {} mask {} own {} {}",
+                t.step,
+                t.modulus.as_ref().map_or_else(|| "unmoved".to_string(), ToString::to_string),
+                t.value.as_ref().map_or_else(|| "not read".to_string(), |v| cell(v, 1 << 12)),
+                t.after
+                    .as_ref()
+                    .map_or_else(|| "not read".to_string(), |a| cell(&a.value, 1 << 12)),
+                match &t.refusal {
+                    None => "adopted".to_string(),
+                    Some(holonics::hnn::executed::TrialRefusal::NotBelow(_)) => "NotBelow".to_string(),
+                    Some(holonics::hnn::executed::TrialRefusal::OwnNotBelow(_)) => "OwnNotBelow".to_string(),
+                    Some(holonics::hnn::executed::TrialRefusal::FirstOrder(_)) => "FirstOrder".to_string(),
+                    Some(other) => format!("{other:?}"),
+                }
+            )
+        })
+        .collect();
+    format!(
+        "      trials: {}; γ_ρ {}",
+        trials.join("; "),
+        moved
+            .modulus_slope
+            .as_ref()
+            .map_or_else(|| "not read".to_string(), |g| cell(&ExactInterval::point(g.clone()), 1 << 12))
+    )
+}
+
 /// [definition; agent-inferred, step 1b's gate A: the pin §13.3 and its gate-A addendum] **The
 /// constrained feasibility witness** (`executed witness <terrain> <seed> <count> <moves> <deadline
 /// ms> <out>`). From the founded opening, the candidate's own certified move (the lock face at the
@@ -1016,6 +1053,7 @@ pub(super) fn witness(
             break;
         }
         println!("{}", move_line(index, &moved, started.elapsed().as_millis()));
+        println!("{}", trial_line(&moved));
         match moved.adopted {
             Some((successor, _)) => theta = successor,
             None => {
@@ -2520,6 +2558,8 @@ fn print_d1(
                     None => "adopted".to_string(),
                     Some(holonics::hnn::executed::TrialRefusal::NotBelow(v)) =>
                         format!("refused NotBelow({c}_mask ∈ {})", cell(v, 1 << 12)),
+                    Some(holonics::hnn::executed::TrialRefusal::OwnNotBelow(v)) =>
+                        format!("refused OwnNotBelow({c}_own ∈ {})", cell(v, 1 << 12)),
                     Some(holonics::hnn::executed::TrialRefusal::FirstOrder(v)) =>
                         format!("refused FirstOrder({})", cell(v, 1 << 12)),
                     Some(other) => format!("refused {other:?}"),
