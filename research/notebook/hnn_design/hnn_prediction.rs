@@ -371,6 +371,15 @@ fn main() {
             arguments[5].parse().expect("a count"),
             &arguments[6..],
         ),
+        // The modulus's slope (the pin
+        // research/records/2026-10-01_THE_MODULUS_SLOPE_PINNED_BEFORE_ITS_RUN.md): read-only.
+        (Some("executed"), Some("rho-slopes")) => executed_loop::rho_slopes(
+            &arguments[3],
+            arguments[4].parse().expect("a seed"),
+            arguments[5].parse().expect("a count"),
+            &arguments[6],
+            &arguments[7..],
+        ),
         (Some("executed"), Some("causal")) => executed_loop::causal(
             &arguments[3],
             arguments[4].parse().expect("a seed"),
