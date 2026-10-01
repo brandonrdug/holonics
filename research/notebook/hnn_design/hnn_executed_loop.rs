@@ -1875,7 +1875,7 @@ pub(super) fn agreement(terrain: &str, seed: u64, count: usize, arms: &str, sour
 /// (station, top, gap; the right one first), `ℓ_o` and whether it is solved.
 fn print_orders(what: &str, batch: &BatchComparison) {
     for (index, request) in batch.requests.iter().enumerate() {
-        if let Some(order) = &request.order {
+        for order in &request.order_terms {
             let sheets: Vec<String> = order
                 .sheets
                 .iter()

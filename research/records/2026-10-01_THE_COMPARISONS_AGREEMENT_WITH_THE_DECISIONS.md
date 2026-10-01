@@ -1,4 +1,4 @@
-# The comparison's agreement with the decisions: at the decisions it is chance; every refinement and the order both agree
+# The comparison's agreement with the decisions: at the decisions it is chance; every refinement and the order each agree
 
 **Date.** October 1. **Issues.** #73, #63 (THE_REBUILD U6, step 1). **Grade.** [measured], read-only;
 [agent-inferred] where marked. Receipts:
@@ -41,6 +41,7 @@ release is the same under each; only the terms read differ.
 | lock face at the decisions (`lock-dec`) | 29 | 29 | 8 |
 | lock face at every refinement (`lock-all`) | 40 | 18 | 8 |
 | lock face and order at the decisions (`order-dec`) | 40 | 18 | 8 |
+| lock face and order at every refinement (`order-all`) | 39 | 19 | 8 |
 
 [agent-inferred] Both remedies of [the decision margins](2026-10-01_THE_DECISION_MARGINS_THROUGH_THE_ACCEPTED_MOVE.md)
 raise the agreement from chance to 40 against 18:
@@ -48,14 +49,18 @@ raise the agreement from chance to 40 against 18:
 - reading the first lock's order.
 
 The lock face at the decisions sees neither. It is the composition the moves descended, which is
-why they could fall without the decisions following. The next comparison joins both: the lock face
-at every refinement with the order of every refinement. That covers every decision the release
-makes, each in the context it was made.
+why they could fall without the decisions following. Joining both, the lock face and the order at
+every refinement (`order-all`: an order term at each refinement the release executed, covering every
+decision in its own context), reads 39 against 19: no further gain on these 12 states. Either
+remedy alone carries the agreement. The open question is which one's descent reaches decisions:
+the order term at the decisions was measured ([the order](2026-10-01_THE_ORDER_MEASURED_ONE_MOVE_FROM_C6_GAINS_STATIONS_WHERE_THE_LOCK_FACE_ALONE_LOST_THEM.md));
+the lock face at every refinement is read next by one guarded move from c6.
 
 ## 4. Time
 
 | Run | Projection | Deadline | Measured wall | Peak resident |
 |---|---|---|---|---|
-| 12 states × 3 comparisons, 19 threads | `36 · 48,927 = 1,761,372` ms | `timeout 1762`, per-line 48,927 ms | 1,391,724 ms, exit 0 | in the listing |
+| 12 states × 3 comparisons, 19 threads | `36 · 48,927 = 1,761,372` ms | `timeout 1762`, per-line 48,927 ms | 1,391,724 ms, exit 0 | 83,374,080 bytes (at exit) |
+| 12 states × `order-all` (`order-all/`) | `12 · 48,927 = 587,124` ms | `timeout 588` | 460,551 ms, exit 0 | 82,309,120 bytes (at exit) |
 
-Measured over projected: `1391724/1761372`.
+Measured over projected: `1391724/1761372` and `460551/587124`.
