@@ -1,0 +1,4 @@
+ae87ed5547bd90954f103301e0d1dde7e3f750b6
+9a5d9570a28a243a7810edd8f58cfd17bc6ccd082fca5e7ec8506aa3dc085d76
+args executed span order2 2026093061 8 lock-dec research/records/2026-09-30_THE_MODULUS_FOUNDED_OFF_ONE_receipts/refit_on_lattice.txt opening=opening
+wall 214135 ms; exit 0; early stop 0

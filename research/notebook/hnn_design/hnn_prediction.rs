@@ -435,6 +435,16 @@ fn main() {
             &arguments[8],
             &arguments[9..],
         ),
+        // The witness's direction in the span of the returns (the record
+        // research/records/2026-10-01_THE_WITNESSS_DIRECTION_IN_THE_SPAN_OF_THE_RETURNS.md): read-only.
+        (Some("executed"), Some("span")) => executed_loop::span(
+            &arguments[3],
+            arguments[4].parse().expect("a seed"),
+            arguments[5].parse().expect("a count"),
+            &arguments[6],
+            &arguments[7],
+            &arguments[8..],
+        ),
         (Some("executed"), Some("causal")) => executed_loop::causal(
             &arguments[3],
             arguments[4].parse().expect("a seed"),

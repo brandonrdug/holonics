@@ -1,0 +1,4 @@
+remount research/records/2026-09-30_THE_MODULUS_FOUNDED_OFF_ONE_receipts/refit_on_lattice.txt: partial (E and rho alone; the normal law's Gram, chart, remainders and clock are the prior's)
+executed span: 2 order2 requests at development seed 2026093061, the arm lock-dec, toward research/records/2026-09-30_THE_MODULUS_FOUNDED_OFF_ONE_receipts/refit_on_lattice.txt; the bank p = 5/8, grain 2^(-16)
+  opening: ρ 102837/131072; L ∈ [130257/4096, 130260/4096) nats; 85 returns; the witness's form inertia Inertia { positive: 80, zero: 6, negative: 0 }; the port's unit move: squared cosine with the route + 13803133/8589934592; the witness's E move: none (None); its ρ move over the chord none; the model's change none; 283944 ms
+executed span: 283989 ms; resident 2154786816 now, 2154876928 peak

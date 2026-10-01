@@ -784,12 +784,16 @@ fn state_of(theta: &Constitution) -> ContinuingState {
 // the move's metric is its witness's
 
 /// A plane term on the lock's own normalized reading at point readings `a`.
+fn to_vecs(along: &[Vec<[Rat; 2]>]) -> Vec<Vec<Vec<Rat>>> {
+    along.iter().map(|t| t.iter().map(|d| d.to_vec()).collect()).collect()
+}
+
 fn term(target: usize, readings: &[Rat], along: &[[Rat; 2]]) -> PlaneTerm {
     let joints: Vec<Growth> = readings.iter().cloned().map(at).collect();
     PlaneTerm {
         target,
         sheets: lock_face(&joints, target).unwrap().sheets,
-        along: along.to_vec(),
+        along: along.iter().map(|d| d.to_vec()).collect(),
     }
 }
 
@@ -810,8 +814,8 @@ fn the_witness_form_is_the_locks_normalized_jacobian_pulled_back() {
         (w.form.at(0, 0), w.form.at(0, 1), w.form.at(1, 1)),
         (&rat(3, 2), &integer(-1), &(rat(19, 4) - rat(49, 16)))
     );
-    assert_eq!(w.gradient, [integer(-2), rat(3, 4)]);
-    let [a, b] = w.step().unwrap();
+    assert_eq!(w.gradient, vec![integer(-2), rat(3, 4)]);
+    let (a, b) = { let v = w.step().unwrap(); (v[0].clone(), v[1].clone()) };
     assert_eq!(w.form.at(0, 0) * &a + w.form.at(0, 1) * &b, integer(2));
     assert_eq!(w.form.at(0, 1) * &a + w.form.at(1, 1) * &b, rat(-3, 4));
     assert!(w.predicted().unwrap().is_negative());
@@ -856,7 +860,7 @@ fn one_lock_reading_serves_the_comparison_the_covector_and_the_metric() {
         assert_eq!(*w, lock.weight(x, 0));
     }
     let along = vec![vec![[integer(1), integer(0)]; 3]];
-    let w = probe.plane(&along).unwrap();
+    let w = probe.plane(&to_vecs(&along)).unwrap();
     assert_eq!(w.form.at(0, 0), &rat(15, 256));
     assert_eq!(inertia(&w.form).negative, 0);
     assert!(w.step().is_none());
@@ -865,7 +869,7 @@ fn one_lock_reading_serves_the_comparison_the_covector_and_the_metric() {
         [integer(1), integer(1)],
         [integer(1), integer(-1)],
     ]];
-    assert!(probe.plane(&seen).unwrap().step().is_some());
+    assert!(probe.plane(&to_vecs(&seen)).unwrap().step().is_some());
 }
 
 /// **The witness's step is chart-free; the coordinate control is not** (Astra's `z′ = 2z`
@@ -904,8 +908,8 @@ fn the_witness_step_is_chart_free_and_the_coordinate_control_is_not() {
             [pair(&moves_e[x]), pair(&moves_rho[x]) / &k]
         })
         .collect();
-    let [a, b] = w1.step().unwrap();
-    let [a3, b3] = witness_form(&[term(0, &readings, &along)]).unwrap().step().unwrap();
+    let (a, b) = { let v = w1.step().unwrap(); (v[0].clone(), v[1].clone()) };
+    let (a3, b3) = { let v = witness_form(&[term(0, &readings, &along)]).unwrap().step().unwrap(); (v[0].clone(), v[1].clone()) };
     assert_eq!((a3, b3), (a, b * &k));
 }
 
@@ -922,16 +926,16 @@ fn dropping_the_cross_term_changes_the_step_only_where_the_witness_couples_the_p
     )])
     .unwrap();
     assert!(!coupled.form.at(0, 1).is_zero());
-    let [a, b] = coupled.step().unwrap();
-    assert_ne!(coupled.decoupled(), [Some(a), Some(b)]);
+    let (a, b) = { let v = coupled.step().unwrap(); (v[0].clone(), v[1].clone()) };
+    assert_ne!(coupled.decoupled(), vec![Some(a), Some(b)]);
     let apart = witness_form(&[
         term(0, &readings, &[[integer(2), integer(0)], [integer(-1), integer(0)]]),
         term(0, &readings, &[[integer(0), integer(1)], [integer(0), integer(-1)]]),
     ])
     .unwrap();
     assert!(apart.form.at(0, 1).is_zero());
-    let [a, b] = apart.step().unwrap();
-    assert_eq!(apart.decoupled(), [Some(a), Some(b)]);
+    let (a, b) = { let v = apart.step().unwrap(); (v[0].clone(), v[1].clone()) };
+    assert_eq!(apart.decoupled(), vec![Some(a), Some(b)]);
 }
 
 /// **The machine's plane reading agrees with its move, and the witness's metric moves under the
@@ -974,7 +978,7 @@ fn the_machines_plane_reading_agrees_with_its_move() {
     assert_eq!(witnessed.metric, MoveMetric::Witness);
     assert_eq!(witnessed.witness.as_ref(), Some(&form));
     assert_eq!(witnessed.modulus_slope, moved.modulus_slope);
-    match (form.step(), &witnessed.refusal) {
+    match (form.step().and_then(|v| <[Rat; 2]>::try_from(v).ok()), &witnessed.refusal) {
         (None, Some(MoveRefusal::Invisible)) => {}
         (Some([a, _]), Some(MoveRefusal::Reversed(_))) => assert!(!a.is_positive()),
         (Some([a, b]), _) => {

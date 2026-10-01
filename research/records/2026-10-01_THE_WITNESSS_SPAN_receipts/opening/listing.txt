@@ -1,0 +1,6 @@
+executed span: 8 order2 requests at development seed 2026093061, the arm lock-dec, toward research/records/2026-09-30_THE_MODULUS_FOUNDED_OFF_ONE_receipts/refit_on_lattice.txt; the bank p = 5/8, grain 2^(-16)
+  opening: ρ 102837/131072; L ∈ [500197/4096, 500203/4096) nats; 325 returns; the witness's form inertia Inertia { positive: 9, zero: 0, negative: 0 }; the port's unit move: squared cosine with the route + 16185495/17179869184; the witness's E move: + 14180265/2147483648; its ρ move over the chord 9213081/67108864; the model's change -5662175/131072; 85874 ms
+  opening span step × 1: ρ 1570597/2097152; L ∈ [476738/4096, 476744/4096) nats; solved 6 of 64; whole 0 (released 8, stations right 15); 42369 ms
+  opening span step × 1/2: ρ 803997/1048576; L ∈ [439805/4096, 439811/4096) nats; solved 0 of 64; whole 0 (released 8, stations right 15); 43625 ms
+  opening span step × 1/4: ρ 1626693/2097152; L ∈ [438523/4096, 438528/4096) nats; solved 0 of 64; whole 0 (released 6, stations right 12); 41760 ms
+executed span: 213707 ms; resident 99373056 now, 478838784 peak
