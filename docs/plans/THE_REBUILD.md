@@ -692,6 +692,13 @@ that fires becomes the next loop's subject, and nothing downstream starts.
       term, is chart-free. Read on c0 and c6, it turns `ρ` toward `ρ*` where the control pushed it
       away, and moves it between 46 and 47 times further at c6. Still, it covers less than `1/12`
       of the chord a step: the witness is stiff in `ρ` at the current `E`.
+    - *One lock reading, and one guarded move from c6, October 1*
+      ([record](../../research/records/2026-10-01_ONE_GUARDED_MOVE_MEASURED_THE_WITNESSS_METRIC_ESCAPES_C6_WHERE_THE_CONTROL_IS_REFUSED_AND_THE_DECISIONS_DO_NOT_FOLLOW.md)).
+      The lock face owns one normalized reading; the comparison's covector and the witness's metric
+      read it, and the move takes a declared metric under the same guards. From c6 the coordinate
+      control is refused at every trial; the witness's metric is adopted, `ρ` moves toward `ρ*` and
+      the executed `L` falls, but no decision improves (stations right 15 to 13). The next subject is
+      what the comparison's covector at the decisions carries.
   - *1b's subject, as 1a named it*: a comparison whose descent must move decisions, one
     that holds a margin on right decisions, is not minimized on ties, and is read where a reading
     carries information about the key. The governing law "loss is the log of a ratio" is the
