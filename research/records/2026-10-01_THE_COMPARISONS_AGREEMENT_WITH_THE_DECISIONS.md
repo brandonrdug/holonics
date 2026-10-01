@@ -42,6 +42,7 @@ release is the same under each; only the terms read differ.
 | lock face at every refinement (`lock-all`) | 40 | 18 | 8 |
 | lock face and order at the decisions (`order-dec`) | 40 | 18 | 8 |
 | lock face and order at every refinement (`order-all`) | 39 | 19 | 8 |
+| lock face teacher-forced, each station with the earlier at their targets (`lock-tf`) | 38 | 20 | 8 |
 
 [agent-inferred] Both remedies of [the decision margins](2026-10-01_THE_DECISION_MARGINS_THROUGH_THE_ACCEPTED_MOVE.md)
 raise the agreement from chance to 40 against 18:
@@ -61,12 +62,32 @@ opening alone took 440,159 ms. It was not relaunched with a larger deadline. The
 decisions carries the same agreement at about a quarter of the cost, so it stays the main line's
 comparison.
 
-## 4. Time
+## 4. Between neighbouring states
+
+Agreement over all pairs is carried by far-apart states. On the actual moves between neighbouring
+states (c0 to c6, c6 to the order's moves, 11 moves, 3 with no change in stations right):
+
+| Comparison | Agree | Disagree |
+|---|---|---|
+| `lock-dec` | 2 | 6 |
+| `lock-all` | 5 | 3 |
+| `order-dec` | 4 | 4 |
+| `order-all` | 4 | 4 |
+| `lock-tf` | 5 | 3 |
+
+[agent-inferred] No comparison tracks the decisions between neighbours. The release decides in a
+cascade: one early lock that changes moves every later decision's context, so stations right jumps
+while any smooth comparison moves a little. The teacher-forced reading removes the cascade from the
+comparison but not from the release. Its terms are never solved on these states (0 of 64 at every
+one), while its value falls steadily from c0 to c6 (`[488501/4096, …)` to `[443837/4096, …)`).
+
+## 5. Time
 
 | Run | Projection | Deadline | Measured wall | Peak resident |
 |---|---|---|---|---|
 | 12 states × 3 comparisons, 19 threads | `36 · 48,927 = 1,761,372` ms | `timeout 1762`, per-line 48,927 ms | 1,391,724 ms, exit 0 | 83,374,080 bytes (at exit) |
 | 12 states × `order-all` (`order-all/`) | `12 · 48,927 = 587,124` ms | `timeout 588` | 460,551 ms, exit 0 | 82,309,120 bytes (at exit) |
+| 12 states × `lock-tf` (`lock-tf/`) | `12 · 48,927 = 587,124` ms | `timeout 588` | 475,814 ms, exit 0 | |
 | one `lock-all` witness move from c6 | `440,159 + 78,889 + 8 · 48,927 = 910,464` ms | `timeout 911` | 911,081 ms, **incomplete** (deadline) | |
 
-Measured over projected: `1391724/1761372` and `460551/587124`.
+Measured over projected: `1391724/1761372`, `460551/587124` and `475814/587124`.
