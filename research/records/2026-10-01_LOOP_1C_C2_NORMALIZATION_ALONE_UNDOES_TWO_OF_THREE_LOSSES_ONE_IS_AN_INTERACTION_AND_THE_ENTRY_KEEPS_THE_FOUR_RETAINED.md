@@ -88,3 +88,33 @@ are the per-decision readings only. How a frozen denominator would change the re
 - It does not show that no per-station objective can make sections whole, that any representation is
   impossible, or that the learned state is durable. Native continual learning was not tested.
 - No escalation was run.
+
+## Corrected after Astra's review of this receipt (October 1)
+
+Two points of the reading above are corrected. They govern over the statements they amend.
+
+1. **Request 7, station 7 is a joint-only threshold crossing, not a pure interaction.**
+   - Neither factor alone crosses the solved level. Their additive counterfactual,
+     `ℓ10 + ℓ01 − ℓ00`, already lies in `[55021, 55025)/65536`, above `ln 2`'s upper
+     `45427/65536`.
+   - The nonadditive interaction, `[−2712, −2709)/65536`, is negative: it reduces the loss and is not
+     its cause.
+   - The blanket normalization explanation stays rejected, because normalization alone holds there.
+     "Pure interaction" is withdrawn.
+2. **Re-reading a decided station has no behavioural consumer.**
+   - The release reads only unlocked stations, commits each lock's class, and derives the section
+     from those assignments.
+   - Persistence is receipt data. It is formed after the proposal and is consumed by no release or
+     update.
+   - So a decided station's later re-reading, frozen-denominator or not, changes no release decision:
+     whole sections stay 0 of 8, stations right 15, releases 8.
+   - The `N0D1` cells above already give that reporting result, and no run is needed for it.
+   - The frozen-denominator arm proposed in "What it motivates" is withdrawn as a behavioural test.
+
+**What follows.** The persistence losses do not explain why no section is whole. The causal consumer
+is the decision at its own lock: at gate A's best constitution, 7 of 64 decision terms were solved
+there. A behavioural counterfactual must be prospective. At a native prefix, for the unlocked
+stations, it would compare the current normalization with a declared predecessor-occupancy
+normalization, recomputed under the current source port, transport modulus and population chart,
+and read every candidate the next selection and certification need. Such an intervention is
+constitutive, and is neither a missing coordinate transport nor a law. It is not run here.
