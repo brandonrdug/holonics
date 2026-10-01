@@ -1057,18 +1057,37 @@ impl BankPlacement {
             })
             .sum::<Rat>()
             / &mass;
+        // [agent-inferred, October 1] Each datum's slope and each product are held at
+        // `DERIVATIVE_BITS` significant bits toward zero: the exact entries carry the transported
+        // mass's denominators (powers of `ρ` over thousands of bits), and the exact products cost
+        // 603,039 ms of a 635,681 ms forced read at the opening. Every consumer already reads the
+        // derivative at a grain (the joint direction at `JOINT_BITS`, the witness's `δ` at 128 bits).
+        let held = |x: Rat| -> Rat {
+            if x.is_zero() {
+                x
+            } else if x.is_negative() {
+                -crate::holon::deposition::significant(&-x, DERIVATIVE_BITS, false)
+            } else {
+                crate::holon::deposition::significant(&x, DERIVATIVE_BITS, false)
+            }
+        };
         let mut derivative = vec![Rat::zero(); self.pairs.len()];
         for (distance, _, read) in data {
             let weight = &self.powers[distance as usize] / &mass;
             let slope =
-                weight * (Rat::from_integer(BigInt::from(distance)) - &mean) / &self.modulus;
+                held(weight * (Rat::from_integer(BigInt::from(distance)) - &mean) / &self.modulus);
             if slope.is_zero() {
                 continue;
             }
             for (value, add) in derivative.iter_mut().zip(read) {
-                *value += add * &slope;
+                *value += held(add * &slope);
             }
         }
         derivative
     }
 }
+
+/// The significant bits a storage derivative in `ρ` is held at ([`BankPlacement::modulus_derivative`]):
+/// above every consumer's own grain (`JOINT_BITS = 128` in the joint direction, the witness's `δ` at
+/// 128 bits).
+const DERIVATIVE_BITS: u32 = 192;

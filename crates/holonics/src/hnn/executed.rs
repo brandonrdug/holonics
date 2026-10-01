@@ -1562,12 +1562,30 @@ fn incumbent_request(
         ));
     }
     let placement = BankPlacement::of(field, constitution, &request.current, &request.moment, declared)?;
-    let (generation, refinements) =
-        release_of(&placement, request, declared, alphabet, bank, grain, &covector)?;
-    let (stations, orders) = receipts(request, &refinements, alphabet, termination)?;
-    let (refinements, forced) = sites_refinements(
-        &placement, request, declared, alphabet, bank, grain, &covector, comparison.reading, refinements,
-    )?;
+    // Under a forced reading the release's own refinements carry only its receipts: they are read
+    // by value, and only the forced release's candidates carry covectors (its terms' sections).
+    let forced_reading = matches!(comparison.reading, Reading::Forced | Reading::ForcedDecisions)
+        && matches!(request.context, Context::Open);
+    let (generation, stations, orders, refinements, forced) = if forced_reading {
+        let value = |amplitudes: &[GaussianRat]| bank.read_turn(amplitudes, grain);
+        let (generation, own) =
+            release_of(&placement, request, declared, alphabet, bank, grain, &value)?;
+        let (stations, orders) = receipts(request, &own, alphabet, termination)?;
+        let own_reads: usize = own.iter().map(|r| r.read.len()).sum();
+        // The forced refinements' reads are counted with the sites below; the release's own here.
+        let (refinements, _) = sites_refinements(
+            &placement, request, declared, alphabet, bank, grain, &covector, comparison.reading, Vec::new(),
+        )?;
+        (generation, stations, orders, refinements, own_reads)
+    } else {
+        let (generation, refinements) =
+            release_of(&placement, request, declared, alphabet, bank, grain, &covector)?;
+        let (stations, orders) = receipts(request, &refinements, alphabet, termination)?;
+        let (refinements, forced) = sites_refinements(
+            &placement, request, declared, alphabet, bank, grain, &covector, comparison.reading, refinements,
+        )?;
+        (generation, stations, orders, refinements, forced)
+    };
     let (sites, consistent) = sites_of(
         index,
         request,
@@ -1816,6 +1834,8 @@ struct Proposal {
     targets: Vec<Contribution>,
     rivals: Vec<Contribution>,
     led: [(usize, ExactInterval); 2],
+    /// Every section's storage derivative in `ρ` at the incumbent, read once ([`section_derivatives`]).
+    derivatives: std::sync::OnceLock<Vec<Vec<Rat>>>,
 }
 
 impl Proposal {
@@ -2115,6 +2135,7 @@ fn propose(
         targets: targets_alone,
         rivals: rivals_alone,
         led,
+        derivatives: std::sync::OnceLock::new(),
     }
 }
 
@@ -2241,25 +2262,52 @@ fn placements_of(
         .collect()
 }
 
-/// Each contribution's `c ⟨ĝ, ∂z/∂ρ⟩` and `|∂z/∂ρ|²` (the modulus's normal reading, term by term).
+/// [agent-inferred, October 1] **Every section's storage derivative in `ρ`, read once a proposal**
+/// (`BankPlacement::modulus_derivative`, exact): the modulus's normal reading, its split and the
+/// witness's plane all read the same sections at the same incumbent. Each had read them anew, the
+/// split three times over; under the forced reading that cost 603,039 ms of a 635,681 ms read at
+/// the opening, the incumbent's covectors 28,739 ms (the forced release's record).
+fn section_derivatives<'a>(
+    field: &Field,
+    constitution: &impl ConstitutionRead,
+    declared: &Refinement,
+    requests: &[Request],
+    proposal: &'a Proposal,
+) -> Result<&'a [Vec<Rat>], HnnError> {
+    use rayon::prelude::*;
+    if let Some(derivatives) = proposal.derivatives.get() {
+        return Ok(derivatives);
+    }
+    let placements = placements_of(field, constitution, requests, declared)?;
+    let derivatives: Vec<Vec<Rat>> = proposal
+        .sections
+        .par_iter()
+        .map(|(request, station, cells)| placements[*request].modulus_derivative(*station, cells))
+        .collect();
+    Ok(proposal.derivatives.get_or_init(|| derivatives))
+}
+
+/// Each contribution's `c ⟨ĝ, ∂z/∂ρ⟩` and `|∂z/∂ρ|²` (the modulus's normal reading, term by term),
+/// every contribution a section of `proposal`.
 fn modulus_pairings(
     field: &Field,
     constitution: &impl ConstitutionRead,
     declared: &Refinement,
     requests: &[Request],
+    proposal: &Proposal,
     contributions: &[Contribution],
 ) -> Result<Vec<(Rat, Rat)>, HnnError> {
     use rayon::prelude::*;
-    let placements = placements_of(field, constitution, requests, declared)?;
+    let derivatives = section_derivatives(field, constitution, declared, requests, proposal)?;
     Ok(contributions
         .par_iter()
         .map(|c| {
-            let derivative = placements[c.request].modulus_derivative(c.station, &c.cells);
+            let derivative = &derivatives[c.section];
             let paired: Rat = c
                 .covector
                 .iter()
                 .map(face)
-                .zip(&derivative)
+                .zip(derivative)
                 .map(|(g, d)| g * d)
                 .sum();
             let energy: Rat = derivative.iter().map(|d| d * d).sum();
@@ -2279,10 +2327,10 @@ fn modulus_normal(
     constitution: &Constitution,
     declared: &Refinement,
     requests: &[Request],
-    contributions: &[Contribution],
+    proposal: &Proposal,
 ) -> Result<(Rat, Rat), HnnError> {
     Ok(
-        modulus_pairings(field, constitution, declared, requests, contributions)?
+        modulus_pairings(field, constitution, declared, requests, proposal, &proposal.contributions)?
             .into_iter()
             .fold((Rat::zero(), Rat::zero()), |(a, b), (c, d)| (a + c, b + d)),
     )
@@ -2297,7 +2345,8 @@ fn slope_split(
     requests: &[Request],
     proposal: &Proposal,
 ) -> Result<SlopeSplit, HnnError> {
-    let led = modulus_pairings(field, constitution, declared, requests, &proposal.contributions)?;
+    let led =
+        modulus_pairings(field, constitution, declared, requests, proposal, &proposal.contributions)?;
     let (mut led_threshold, mut led_class, mut curvature) = (Rat::zero(), Rat::zero(), Rat::zero());
     for (c, (value, energy)) in proposal.contributions.iter().zip(led) {
         curvature += energy;
@@ -2307,7 +2356,7 @@ fn slope_split(
         }
     }
     let sum = |list: &[Contribution]| -> Result<Rat, HnnError> {
-        Ok(modulus_pairings(field, constitution, declared, requests, list)?
+        Ok(modulus_pairings(field, constitution, declared, requests, proposal, list)?
             .into_iter()
             .map(|(value, _)| value)
             .sum())
@@ -3729,7 +3778,7 @@ fn unit_step(
         .ok_or(HnnError::MissingSourcePort { ring })?
         .subtract(&source)?;
     let (gamma, curvature) =
-        modulus_normal(field, constitution, declared, requests, &proposal.contributions)?;
+        modulus_normal(field, constitution, declared, requests, proposal)?;
     let modulus_unit = if gamma.is_zero() || !curvature.is_positive() {
         Rat::zero()
     } else {
@@ -3970,12 +4019,7 @@ fn plane_terms(
         .iter()
         .map(|unit| section_moves(field, constitution, unit, declared, requests, &proposal.sections, None))
         .collect::<Result<_, HnnError>>()?;
-    let placements = placements_of(field, constitution, requests, declared)?;
-    let derivatives: Vec<Vec<Rat>> = proposal
-        .sections
-        .par_iter()
-        .map(|(request, station, cells)| placements[*request].modulus_derivative(*station, cells))
-        .collect();
+    let derivatives = section_derivatives(field, constitution, declared, requests, proposal)?;
     let held = |x: Rat| {
         if x.is_zero() {
             x
