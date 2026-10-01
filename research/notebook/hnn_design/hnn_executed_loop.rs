@@ -16,6 +16,7 @@
 //! cargo run --release -p holonics --example hnn_prediction -- executed witness-plane <terrain> <seed> <count> <arm> <toward> <out> <label=source>…
 //! cargo run --release -p holonics --example hnn_prediction -- executed move-once <terrain> <seed> <count> <out> <label=state> <arm> <metric>…
 //! cargo run --release -p holonics --example hnn_prediction -- executed margins <terrain> <seed> <count> <before state> <after state>
+//! cargo run --release -p holonics --example hnn_prediction -- executed agreement <terrain> <seed> <count> <arm,arm,…> <label=source>…
 //! cargo run --release -p holonics --example hnn_prediction -- executed span <terrain> <seed> <count> <arm> <toward> <label=source>…
 //! cargo run --release -p holonics --example hnn_prediction -- executed route-plane <terrain> <seed> <count> <arm> <both|route|port> <toward> <label=state>…
 //! ```
@@ -1819,6 +1820,55 @@ pub(super) fn span(terrain: &str, seed: u64, count: usize, arm: &str, toward: &s
         }
     }
     println!("executed span: {} ms; resident {}", clock.elapsed().as_millis(), resident());
+}
+
+/// [measured-diagnostic; agent-inferred, October 1; the
+/// [agreement record](../../records/2026-10-01_THE_COMPARISONS_AGREEMENT_WITH_THE_DECISIONS.md)]
+/// **Each constitution under several declared comparisons** (`executed agreement <terrain> <seed>
+/// <count> <arm,arm,…> <label=source>…`, sources as [`segment_source`]): read-only. One line per
+/// constitution and arm: the composition's value, solved terms, whole sections and stations right
+/// (the release is the same under every arm; only the terms read differ).
+pub(super) fn agreement(terrain: &str, seed: u64, count: usize, arms: &str, sources: &[String]) {
+    let clock = Instant::now();
+    let declared = order_declared();
+    let engine = Engine::new(declared);
+    let bank = bank_of(declared.period, &bank_strength());
+    let ring = engine.refinement.ring();
+    let pairs = terrain_pairs(terrain, &declared, seed, count);
+    let requests = open_requests(&engine, &pairs);
+    let targets: Vec<Vec<usize>> = pairs.iter().map(|(_, t)| t.clone()).collect();
+    println!(
+        "executed agreement: {count} {terrain} requests at development seed {seed}, the arms {arms}; the bank p = {}, grain 2^(-{BANK_GRAIN})",
+        bank_strength()
+    );
+    for source in sources {
+        let (label, spec) = source.split_once('=').expect("<label>=<source>");
+        let theta = segment_source(&engine, ring, spec);
+        for arm in arms.split(',') {
+            let started = Instant::now();
+            let (comparison, partition) = arm_comparison(arm);
+            assert!(!partition, "the open section");
+            let batch = compare(
+                &engine.field,
+                &theta,
+                &requests,
+                &engine.refinement,
+                &bank,
+                BANK_GRAIN,
+                comparison,
+            )
+            .expect("the reading");
+            let (solved, all) = solved_terms(&batch);
+            let (whole, right, released) = batch.sections(&targets);
+            println!(
+                "  {label} {arm}: ρ {}; value ∈ {} nats; solved {solved} of {all}; whole {whole} (released {released}, stations right {right}); {} ms",
+                theta.transport(ring),
+                cell(&batch.value, 1 << 12),
+                started.elapsed().as_millis()
+            );
+        }
+    }
+    println!("executed agreement: {} ms; resident {}", clock.elapsed().as_millis(), resident());
 }
 
 /// Every request's order term ([`holonics::hnn::executed::OrderTerm`]), where read: its sheets

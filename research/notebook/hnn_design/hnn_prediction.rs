@@ -445,6 +445,15 @@ fn main() {
             &arguments[7],
             &arguments[8..],
         ),
+        // Each constitution under several declared comparisons (the record
+        // research/records/2026-10-01_THE_COMPARISONS_AGREEMENT_WITH_THE_DECISIONS.md): read-only.
+        (Some("executed"), Some("agreement")) => executed_loop::agreement(
+            &arguments[3],
+            arguments[4].parse().expect("a seed"),
+            arguments[5].parse().expect("a count"),
+            &arguments[6],
+            &arguments[7..],
+        ),
         (Some("executed"), Some("causal")) => executed_loop::causal(
             &arguments[3],
             arguments[4].parse().expect("a seed"),
