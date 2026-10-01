@@ -16,6 +16,7 @@
 //! cargo run --release -p holonics --example hnn_prediction -- executed witness-plane <terrain> <seed> <count> <arm> <toward> <out> <label=source>…
 //! cargo run --release -p holonics --example hnn_prediction -- executed move-once <terrain> <seed> <count> <out> <label=state> <arm> <metric>…
 //! cargo run --release -p holonics --example hnn_prediction -- executed margins <terrain> <seed> <count> <before state> <after state>
+//! cargo run --release -p holonics --example hnn_prediction -- executed span <terrain> <seed> <count> <arm> <toward> <label=source>…
 //! cargo run --release -p holonics --example hnn_prediction -- executed route-plane <terrain> <seed> <count> <arm> <both|route|port> <toward> <label=state>…
 //! ```
 //!
@@ -1460,7 +1461,7 @@ pub(super) fn move_once(terrain: &str, seed: u64, count: usize, out: &str, sourc
                 at_bits(w.form.at(1, 1)),
                 at_bits(&w.gradient[0]),
                 at_bits(&w.gradient[1]),
-                w.step().map(|[a, b]| (at_bits(&a), at_bits(&b))),
+                w.step().map(|v| (at_bits(&v[0]), at_bits(&v[1]))),
             );
         }
         println!(
@@ -1674,8 +1675,8 @@ pub(super) fn route_plane(
                         at_bits(w.form.at(1, 1)),
                         at_bits(&w.gradient[0]),
                         at_bits(&w.gradient[1]),
-                        step.as_ref().map(|[a, b]| (at_bits(a), at_bits(b))),
-                        step.as_ref().map_or_else(|| "none".to_string(), |[_, b]| at_bits(&(b / &chord)).to_string()),
+                        step.as_ref().map(|v| (at_bits(&v[0]), at_bits(&v[1]))),
+                        step.as_ref().map_or_else(|| "none".to_string(), |v| at_bits(&(&v[1] / &chord)).to_string()),
                         w.decoupled()[1].as_ref().map_or_else(|| "none".to_string(), |b| at_bits(&(b / &chord)).to_string()),
                     )
                 }
@@ -1690,6 +1691,134 @@ pub(super) fn route_plane(
         }
     }
     println!("executed route-plane: {} ms; resident {}", clock.elapsed().as_millis(), resident());
+}
+
+/// [measured-diagnostic; agent-inferred, October 1; the
+/// [witness's span record](../../records/2026-10-01_THE_WITNESSS_DIRECTION_IN_THE_SPAN_OF_THE_RETURNS.md)]
+/// **The witness's direction in the span of the returns** (`executed span <terrain> <seed> <count>
+/// <arm> <toward> <label=source>…`, sources as [`segment_source`]): read-only. At each source,
+/// `hnn::executed::witness_span`: the number of returns, the witness's step's `E` move and `ρ` move,
+/// and each `E` move's squared cosine with the route `E_toward − E` (the witness's and the port's
+/// unit move), `ρ`'s move over the chord, and the Gauss–Newton model's change.
+pub(super) fn span(terrain: &str, seed: u64, count: usize, arm: &str, toward: &str, sources: &[String]) {
+    use holonics::hnn::executed::witness_span;
+    use holonics::ratio::linear::inertia::inertia;
+    let clock = Instant::now();
+    let declared = order_declared();
+    let engine = Engine::new(declared);
+    let bank = bank_of(declared.period, &bank_strength());
+    let ring = engine.refinement.ring();
+    let pairs = terrain_pairs(terrain, &declared, seed, count);
+    let requests = open_requests(&engine, &pairs);
+    let targets: Vec<Vec<usize>> = pairs.iter().map(|(_, t)| t.clone()).collect();
+    let (comparison, partition) = arm_comparison(arm);
+    assert!(!partition, "the span is read on the open section");
+    let goal = segment_source(&engine, ring, toward);
+    println!(
+        "executed span: {count} {terrain} requests at development seed {seed}, the arm {arm}, toward {toward}; the bank p = {}, grain 2^(-{BANK_GRAIN})",
+        bank_strength()
+    );
+    for source in sources {
+        let started = Instant::now();
+        let (label, spec) = source.split_once('=').expect("<label>=<source>");
+        let theta = segment_source(&engine, ring, spec);
+        let e = theta.source_port(ring).expect("E").clone();
+        let route = goal.source_port(ring).expect("E").subtract(&e).expect("one shape");
+        let chord = goal.transport(ring) - theta.transport(ring);
+        let reading = witness_span(
+            &engine.field,
+            &theta,
+            &requests,
+            &engine.refinement,
+            &bank,
+            BANK_GRAIN,
+            comparison,
+        )
+        .expect("the span");
+        let cosine = |m: &ExactRatMatrix| {
+            let (p, n, r) = (frobenius(m, &route), frobenius(m, m), frobenius(&route, &route));
+            if n.is_zero() || r.is_zero() {
+                "none".to_string()
+            } else {
+                format!(
+                    "{} {}",
+                    if p.is_positive() { "+" } else { "-" },
+                    at_bits(&(&p * &p / (&n * &r)))
+                )
+            }
+        };
+        let inertia_line = reading
+            .witness
+            .as_ref()
+            .map(|w| format!("{:?}", inertia(&w.form)))
+            .unwrap_or_else(|| "none".to_string());
+        println!(
+            "  {label}: ρ {}; {} ∈ {} nats; {} returns; the witness's form inertia {}; the port's unit move: squared cosine with the route {}; the witness's E move: {}; its ρ move over the chord {}; the model's change {}; {} ms",
+            theta.transport(ring),
+            symbol(&comparison),
+            cell(&reading.before.value, 1 << 12),
+            reading.returns,
+            inertia_line,
+            reading.unit_move.as_ref().map_or_else(|| "none".to_string(), cosine),
+            reading.witness_move.as_ref().map_or_else(|| format!("none ({:?})", reading.refusal), cosine),
+            reading.modulus_move.as_ref().map_or_else(|| "none".to_string(), |b| at_bits(&(b / &chord)).to_string()),
+            reading.witness.as_ref().and_then(|w| w.predicted()).map_or_else(|| "none".to_string(), |p| at_bits(&p).to_string()),
+            started.elapsed().as_millis()
+        );
+        // The span's step taken whole, by half and by a quarter (E carried onto the source port's
+        // lattice, nearest; ρ floored onto it), each read by the arm's comparison.
+        let (Some(moved), Some(rho_move)) = (&reading.witness_move, &reading.modulus_move) else {
+            continue;
+        };
+        let lattice = engine
+            .theta
+            .lattice(holonics::hnn::constitution::Locus::SourcePort(ring))
+            .expect("the source port's lattice")
+            .unit();
+        let half = Rat::new(BigInt::one(), BigInt::from(2));
+        for fraction in [Rat::one(), half.clone(), Rat::new(BigInt::one(), BigInt::from(4))] {
+            let started = Instant::now();
+            let rows: Vec<Vec<Rat>> = e
+                .to_rows()
+                .iter()
+                .zip(moved.to_rows())
+                .map(|(a, d)| {
+                    a.iter()
+                        .zip(&d)
+                        .map(|(x, y)| ((x + &(&fraction * y)) / &lattice + &half).floor() * &lattice)
+                        .collect()
+                })
+                .collect();
+            let modulus = ((theta.transport(ring) + &fraction * rho_move) / &lattice).floor() * &lattice;
+            let modulus = modulus.max(lattice.clone()).min(Rat::one());
+            let successor = engine
+                .theta
+                .clone()
+                .with_ports(ring, None, Some(ExactRatMatrix::new(rows).expect("E")), None)
+                .expect("the successor's E")
+                .with_transport(ring, modulus.clone())
+                .expect("a passive modulus on the lattice");
+            let batch = compare(
+                &engine.field,
+                &successor,
+                &requests,
+                &engine.refinement,
+                &bank,
+                BANK_GRAIN,
+                comparison,
+            )
+            .expect("the successor's reading");
+            let (solved, all) = solved_terms(&batch);
+            let (whole, right, released) = batch.sections(&targets);
+            println!(
+                "  {label} span step × {fraction}: ρ {modulus}; {} ∈ {} nats; solved {solved} of {all}; whole {whole} (released {released}, stations right {right}); {} ms",
+                symbol(&comparison),
+                cell(&batch.value, 1 << 12),
+                started.elapsed().as_millis()
+            );
+        }
+    }
+    println!("executed span: {} ms; resident {}", clock.elapsed().as_millis(), resident());
 }
 
 /// Every request's order term ([`holonics::hnn::executed::OrderTerm`]), where read: its sheets
@@ -1826,7 +1955,7 @@ pub(super) fn witness_plane(
         let gamma = reading.modulus_slope.clone().expect("γ_ρ");
         let curvature = reading.modulus_curvature.clone().expect("G_ρ");
         let (ee, er, rr) = (witness.form.at(0, 0), witness.form.at(0, 1), witness.form.at(1, 1));
-        let [ge, gr] = &witness.gradient;
+        let (ge, gr) = (&witness.gradient[0], &witness.gradient[1]);
         let decoupled = witness.decoupled();
         println!(
             "    the coordinate control: γ_ρ {}, G_ρ {}, Δρ_c {} (24 bits); ΔE's largest entry {}",
@@ -1847,7 +1976,7 @@ pub(super) fn witness_plane(
             decoupled[0].as_ref().map(at_bits),
             decoupled[1].as_ref().map(at_bits),
         );
-        let Some([alpha, beta]) = witness.step() else {
+        let Some([alpha, beta]) = witness.step().and_then(|v| <[Rat; 2]>::try_from(v).ok()) else {
             println!("    the plane is degenerate to the witness; {} ms", started.elapsed().as_millis());
             continue;
         };

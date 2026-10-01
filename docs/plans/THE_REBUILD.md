@@ -712,6 +712,9 @@ that fires becomes the next loop's subject, and nothing downstream starts.
       direction: the stall is a basin of the comparison, and the chord to the refit rises before it
       falls. The next law is the witness's direction in all of `E`, which chooses the valley at the
       opening.
+    - *The witness's span, October 1* ([record](../../research/records/2026-10-01_THE_WITNESSS_DIRECTION_IN_THE_SPAN_OF_THE_RETURNS.md)). The witness's direction
+      over the requests' pullbacks descends far deeper and moves `ρ` a tenth of the chord, with no
+      decision gained. Next: the comparison's agreement with the decisions.
   - *1b's subject, as 1a named it*: a comparison whose descent must move decisions, one
     that holds a margin on right decisions, is not minimized on ties, and is read where a reading
     carries information about the key. The governing law "loss is the log of a ratio" is the

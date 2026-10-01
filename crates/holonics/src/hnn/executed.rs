@@ -3512,7 +3512,7 @@ pub fn executed_move_in(
             let form = plane_form(field, constitution, declared, requests, &proposal, &unit)?;
             let step = form.as_ref().and_then(WitnessForm::step);
             receipt.witness = form;
-            let Some([alpha, beta]) = step else {
+            let Some([alpha, beta]) = step.and_then(|s| <[Rat; 2]>::try_from(s).ok()) else {
                 receipt.refusal = Some(MoveRefusal::Invisible);
                 return Ok(receipt);
             };
@@ -3749,13 +3749,14 @@ fn lock_sheets(readings: &[Rat]) -> Option<Vec<Rat>> {
 
 /// [definition; agent-inferred, October 1] **One lock-face term on the move's plane**: its target,
 /// the lock's one normalized reading (`sheets`, the resting sheet first: [`LockFace`]'s), and every
-/// candidate's log-reading change along the plane's two unit directions,
-/// `δ_x = (⟨ĝ_x, Δz_x(ΔE)⟩, ⟨ĝ_x, ∂z_x/∂ρ⟩)` (the resting sheet does not move).
+/// candidate's log-reading change along each of the span's directions, on the plane
+/// `δ_x = (⟨ĝ_x, Δz_x(ΔE)⟩, ⟨ĝ_x, ∂z_x/∂ρ⟩)` (the resting sheet does not move). Every term of one
+/// form has the same number of directions.
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct PlaneTerm {
     pub target: usize,
     pub sheets: Vec<Rat>,
-    pub along: Vec<[Rat; 2]>,
+    pub along: Vec<Vec<Rat>>,
 }
 
 /// [definition; agent-inferred, October 1] **The witness's form on the move's plane** (the record
@@ -3780,39 +3781,37 @@ pub struct PlaneTerm {
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct WitnessForm {
     pub form: SymmetricForm,
-    pub gradient: [Rat; 2],
+    pub gradient: Vec<Rat>,
 }
 
 impl WitnessForm {
-    /// The determinant `G_EE G_ρρ − G_Eρ²`.
+    /// The determinant `G_EE G_ρρ − G_Eρ²` of a plane's form (two directions).
     pub fn determinant(&self) -> Rat {
         self.form.at(0, 0) * self.form.at(1, 1) - self.form.at(0, 1) * self.form.at(0, 1)
     }
 
-    /// The witness's step on the plane, `(α, β) = −G⁻¹g`, where `G ≻ 0` ([`inertia`]); `None` where
-    /// some plane direction lies in the witness's kernel.
-    pub fn step(&self) -> Option<[Rat; 2]> {
-        if inertia(&self.form).positive != 2 {
+    /// The witness's step on the span, `−G⁻¹g` (on the plane `(α, β)`), where `G ≻ 0`
+    /// ([`inertia`]); `None` where some direction of the span lies in the witness's kernel.
+    pub fn step(&self) -> Option<Vec<Rat>> {
+        if inertia(&self.form).positive != self.form.extent() {
             return None;
         }
         let inverse = self.form.as_matrix().ok()?.inverse().ok()?;
-        let step = inverse.apply(&self.gradient).ok()?;
-        Some([-step[0].clone(), -step[1].clone()])
+        Some(inverse.apply(&self.gradient).ok()?.into_iter().map(|x| -x).collect())
     }
 
-    /// Each coordinate's step with the cross term dropped, `−g_i/G_ii` (the negative control).
-    pub fn decoupled(&self) -> [Option<Rat>; 2] {
-        let one = |g: &Rat, m: &Rat| m.is_positive().then(|| -g / m);
-        [
-            one(&self.gradient[0], self.form.at(0, 0)),
-            one(&self.gradient[1], self.form.at(1, 1)),
-        ]
+    /// Each coordinate's step with the cross terms dropped, `−g_i/G_ii` (the negative control).
+    pub fn decoupled(&self) -> Vec<Option<Rat>> {
+        (0..self.gradient.len())
+            .map(|i| self.form.at(i, i).is_positive().then(|| -&self.gradient[i] / self.form.at(i, i)))
+            .collect()
     }
 
-    /// The Gauss–Newton model's change at the witness's step, `½ gᵀ(α, β) = −½ gᵀG⁻¹g`.
+    /// The Gauss–Newton model's change at the witness's step, `½ gᵀs = −½ gᵀG⁻¹g`.
     pub fn predicted(&self) -> Option<Rat> {
-        self.step().map(|[a, b]| {
-            (&self.gradient[0] * &a + &self.gradient[1] * &b) / Rat::from_integer(BigInt::from(2))
+        self.step().map(|step| {
+            self.gradient.iter().zip(&step).map(|(g, s)| g * s).sum::<Rat>()
+                / Rat::from_integer(BigInt::from(2))
         })
     }
 }
@@ -3821,15 +3820,19 @@ impl WitnessForm {
 /// joined by direct sum and pulled back once. `None` when a term's reading is not a normalized face
 /// (refused by the Jacobian's admission) or its shapes disagree.
 pub fn witness_form(terms: &[PlaneTerm]) -> Option<WitnessForm> {
+    let width = terms.iter().flat_map(|t| t.along.first()).map(Vec::len).next().unwrap_or(2);
     let mut joined = SymmetricForm::zeros(0);
     let mut rows: Vec<Vec<Rat>> = Vec::new();
     let mut covector: Vec<Rat> = Vec::new();
     for term in terms {
-        if term.along.len() + 1 != term.sheets.len() || term.target >= term.along.len() {
+        if term.along.len() + 1 != term.sheets.len()
+            || term.target >= term.along.len()
+            || term.along.iter().any(|d| d.len() != width)
+        {
             return None;
         }
         joined = joined.direct_sum(&crate::receiver::face::softmax_jacobian(&term.sheets).ok()?);
-        rows.push(vec![Rat::zero(), Rat::zero()]);
+        rows.push(vec![Rat::zero(); width]);
         covector.push(term.sheets[0].clone());
         for (x, delta) in term.along.iter().enumerate() {
             rows.push(delta.to_vec());
@@ -3839,17 +3842,14 @@ pub fn witness_form(terms: &[PlaneTerm]) -> Option<WitnessForm> {
     }
     if rows.is_empty() {
         return Some(WitnessForm {
-            form: SymmetricForm::zeros(2),
-            gradient: [Rat::zero(), Rat::zero()],
+            form: SymmetricForm::zeros(width),
+            gradient: vec![Rat::zero(); width],
         });
     }
     let map = ExactRatMatrix::new(rows).ok()?;
     let form = joined.pullback(&map).ok()?;
     let gradient = map.transpose().ok()?.apply(&covector).ok()?;
-    Some(WitnessForm {
-        form,
-        gradient: [gradient[0].clone(), gradient[1].clone()],
-    })
+    Some(WitnessForm { form, gradient })
 }
 
 /// [definition; agent-inferred, October 1] **The proposal's terms on the move's plane** and the
@@ -3868,10 +3868,13 @@ fn plane_terms(
     declared: &Refinement,
     requests: &[Request],
     proposal: &Proposal,
-    unit: &Constitution,
+    directions: &[&Constitution],
 ) -> Result<Vec<PlaneTerm>, HnnError> {
     use rayon::prelude::*;
-    let moves = section_moves(field, constitution, unit, declared, requests, &proposal.sections, None)?;
+    let moves: Vec<Vec<Vec<ExactInterval>>> = directions
+        .iter()
+        .map(|unit| section_moves(field, constitution, unit, declared, requests, &proposal.sections, None))
+        .collect::<Result<_, HnnError>>()?;
     let placements = placements_of(field, constitution, requests, declared)?;
     let derivatives: Vec<Vec<Rat>> = proposal
         .sections
@@ -3887,12 +3890,15 @@ fn plane_terms(
             significant(&x, JOINT_BITS, false)
         }
     };
-    let pair = |covector: &[ExactInterval], section: usize| -> [Rat; 2] {
+    let pair = |covector: &[ExactInterval], section: usize| -> Vec<Rat> {
         let covector: Vec<Rat> = covector.iter().map(face).collect();
-        [
-            held(covector.iter().zip(&moves[section]).map(|(g, d)| g * &d.lower).sum()),
-            held(covector.iter().zip(&derivatives[section]).map(|(g, d)| g * d).sum()),
-        ]
+        moves
+            .iter()
+            .map(|m| held(covector.iter().zip(&m[section]).map(|(g, d)| g * &d.lower).sum()))
+            .chain(std::iter::once(held(
+                covector.iter().zip(&derivatives[section]).map(|(g, d)| g * d).sum(),
+            )))
+            .collect()
     };
     Ok(proposal
         .terms
@@ -3918,7 +3924,10 @@ fn plane_terms(
                             pair(&p.runner.leading, p.runner.section),
                         );
                         let (a, b) = (face(&p.top.growth), face(&p.runner.growth));
-                        std::array::from_fn(|i| held((&a * &top[i] - &b * &runner[i]) / &p.gap))
+                        top.iter()
+                            .zip(&runner)
+                            .map(|(t, r)| held((&a * t - &b * r) / &p.gap))
+                            .collect()
                     })
                     .collect(),
             }),
@@ -3937,7 +3946,7 @@ fn plane_form(
     proposal: &Proposal,
     unit: &Constitution,
 ) -> Result<Option<WitnessForm>, HnnError> {
-    let terms = plane_terms(field, constitution, declared, requests, proposal, unit)?;
+    let terms = plane_terms(field, constitution, declared, requests, proposal, &[unit])?;
     Ok(if terms.is_empty() { None } else { witness_form(&terms) })
 }
 
@@ -4024,9 +4033,120 @@ pub fn witness_plane_along(
         }
         None => &step.unit,
     };
-    let terms = plane_terms(field, constitution, declared, requests, &proposal, direction)?;
+    let terms = plane_terms(field, constitution, declared, requests, &proposal, &[direction])?;
     reading.terms = terms.len();
     reading.witness = (!terms.is_empty()).then(|| witness_form(&terms)).flatten();
+    reading.unit_move = Some(step.unit_move);
+    Ok(reading)
+}
+
+/// [measured-diagnostic; agent-inferred, October 1; the
+/// [witness's span record](../../../../research/records/2026-10-01_THE_WITNESSS_DIRECTION_IN_THE_SPAN_OF_THE_RETURNS.md)]
+/// **The witness's direction in the span of the requests' pullbacks**: the source port changes only
+/// along covectors that reached it (deposition), so `E`'s directions are the returns' own. One
+/// direction a request, `D_r = Σ_t w_t g_t f_tᵀ` over the returns its contributions make alone
+/// (the per-return rank-one pieces number about 40 a request, and on two requests their form had a
+/// six-dimensional kernel). The witness's form on the span of every `D_r` and `ρ`
+/// ([`witness_form`], [`plane_terms`]) gives its step `s = −G⁻¹g`, weighing the requests against
+/// each other by its own measure; its `E` move is `Σ_r s_r D_r` and its `ρ` move `s_ρ`. Each
+/// `D_r`'s scale is immaterial: the step is covariant in every direction's chart. Beside it, the port's own unit move
+/// `ΔE` (the normal law's chart over the same returns). No step is taken.
+#[derive(Clone, Debug)]
+pub struct SpanReading {
+    pub before: BatchComparison,
+    pub refusal: Option<MoveRefusal>,
+    pub returns: usize,
+    pub witness: Option<WitnessForm>,
+    pub unit_move: Option<ExactRatMatrix>,
+    pub witness_move: Option<ExactRatMatrix>,
+    pub modulus_move: Option<Rat>,
+}
+
+/// [measured-diagnostic] The witness's direction in the span of the returns ([`SpanReading`]).
+pub fn witness_span(
+    field: &Field,
+    constitution: &Constitution,
+    requests: &[Request],
+    declared: &Refinement,
+    bank: &ReceivingBank,
+    grain: u32,
+    comparison: Comparison,
+) -> Result<SpanReading, HnnError> {
+    let ring = declared.ring();
+    let (before, reads) = incumbent(field, constitution, requests, declared, bank, grain, comparison)?;
+    let proposal = propose(comparison.composition, &before, &reads);
+    drop(reads);
+    let mut reading = SpanReading {
+        before,
+        refusal: certificate_refusal(&proposal),
+        returns: 0,
+        witness: None,
+        unit_move: None,
+        witness_move: None,
+        modulus_move: None,
+    };
+    if reading.refusal.is_some() {
+        return Ok(reading);
+    }
+    let (samples, step) = unit_step(field, constitution, declared, requests, &proposal)?;
+    reading.returns = samples.len();
+    let Some(step) = step else {
+        reading.refusal = Some(MoveRefusal::Unreached);
+        return Ok(reading);
+    };
+    let e = constitution
+        .source_port(ring)
+        .ok_or(HnnError::MissingSourcePort { ring })?
+        .clone();
+    // One direction a request: its own pullback `Σ_t w_t g_t f_tᵀ` over the returns its
+    // contributions make alone (its phases and its sections' placements).
+    let (rows, columns) = (e.rows(), e.columns());
+    let pieces: Vec<ExactRatMatrix> = (0..requests.len())
+        .filter_map(|index| {
+            let own: Vec<Contribution> =
+                proposal.contributions.iter().filter(|c| c.request == index).cloned().collect();
+            (!own.is_empty()).then_some(own)
+        })
+        .map(|own| -> Result<ExactRatMatrix, HnnError> {
+            let mut pullback = vec![vec![Rat::zero(); columns]; rows];
+            for sample in returns(field, constitution, declared, requests, &own)? {
+                for (row, g) in pullback.iter_mut().zip(&sample.covector) {
+                    let scaled = &sample.weight * g;
+                    for (entry, f) in row.iter_mut().zip(&sample.feature) {
+                        if !f.is_zero() {
+                            *entry += &scaled * f;
+                        }
+                    }
+                }
+            }
+            Ok(ExactRatMatrix::new(pullback)?)
+        })
+        .collect::<Result<_, _>>()?;
+    let successors: Vec<Constitution> = pieces
+        .iter()
+        .map(|d| {
+            let moved = ExactRatMatrix::new(
+                e.to_rows().iter().zip(d.to_rows()).map(|(a, b)| a.iter().zip(&b).map(|(x, y)| x + y).collect()).collect(),
+            )?;
+            constitution.clone().with_ports(ring, None, Some(moved), None)
+        })
+        .collect::<Result<_, HnnError>>()?;
+    let directions: Vec<&Constitution> = successors.iter().collect();
+    let terms = plane_terms(field, constitution, declared, requests, &proposal, &directions)?;
+    let form = (!terms.is_empty()).then(|| witness_form(&terms)).flatten();
+    if let Some(s) = form.as_ref().and_then(WitnessForm::step) {
+        let mut moved = vec![vec![Rat::zero(); columns]; rows];
+        for (coefficient, piece) in s.iter().zip(&pieces) {
+            for (row, piece_row) in moved.iter_mut().zip(piece.to_rows()) {
+                for (entry, x) in row.iter_mut().zip(&piece_row) {
+                    *entry += coefficient * x;
+                }
+            }
+        }
+        reading.witness_move = Some(ExactRatMatrix::new(moved)?);
+        reading.modulus_move = s.last().cloned();
+    }
+    reading.witness = form;
     reading.unit_move = Some(step.unit_move);
     Ok(reading)
 }
@@ -4147,7 +4267,7 @@ impl ProposalProbe {
 
     /// The witness's form on the plane from the proposal's lock-face terms, each candidate's plane
     /// change given term by term ([`witness_form`] on the proposal's own sheets).
-    pub(crate) fn plane(&self, along: &[Vec<[Rat; 2]>]) -> Option<WitnessForm> {
+    pub(crate) fn plane(&self, along: &[Vec<Vec<Rat>>]) -> Option<WitnessForm> {
         let terms: Vec<PlaneTerm> = self
             .proposal
             .terms
