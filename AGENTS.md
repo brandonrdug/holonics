@@ -311,7 +311,9 @@ foreground shell time went to wait loops.
   other workers' declared budgets. Each pin declares its thread budget, and a serial schedule of
   independent runs states its reason.
 - **Isolate scratch.** A worker's run artifacts live in its own worktree's `.local/` or a
-  per-agent directory, never under a shared scratch name.
+  per-agent directory, never under a shared scratch name. Any artifact a record cites (timing reads, listings,
+  states) is copied into that record's receipts directory and committed before the worktree is
+  removed: `.local/` is not tracked, and removing a worktree deletes it.
 - **Receipts carry time.** Each run's receipt states its projection, deadline, measured wall time
   and peak resident set, and the record keeps the ratio of measured to projected.
 - **The orchestrator waits on notifications** (task notifications, a Monitor on the mailbox), never
