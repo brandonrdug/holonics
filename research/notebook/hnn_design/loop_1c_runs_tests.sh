@@ -15,7 +15,14 @@
 #    admitted; `build` is refused inside a running phase; a run refuses a binary changed since the
 #    build;
 # 5. `schedule` composes the chains under the same rules: a mismatched replay stops the coupling
-#    and reach while the independent witness check still runs.
+#    and reach while the independent witness check still runs;
+# 6. `exp-c2`: the harness's identity mismatch (5), its own early stop (3), a refused input (4), a
+#    panic (101) and the outer guard (124) each stop the step with that status, the check never
+#    runs and nothing is stamped; a run that exits 0 with a line unlike gate A's, another
+#    persistence tuple, a refused re-read or no capture is refused by the check (10), unstamped; the
+#    run is refused beside a live 12-thread run; a verified run is launched once, with the declared
+#    arguments, at 12 threads under its 606 s guard, and stamped, and a later run removes that stamp
+#    first.
 #
 # The restore check runs the real parser (`executed restore` of the worktree's release binary, built
 # by `loop_1c_runs.sh build`); every other harness mode is a stub that writes the outputs its
@@ -89,6 +96,45 @@ case "$2" in
         echo "executed replay: witness, declared partial, refused: inadmissible: the entry 9 lies outside the entry box ±8"
         exit 4 ;;
     esac
+    ;;
+  resume-coupling)
+    # executed resume-coupling order2 <seed> <count> <c1 state> <receipt> <move bound ms> <capture>
+    echo "RAYON_NUM_THREADS=${RAYON_NUM_THREADS:-unset}" >> "$STUB_LOG"
+    receipt=$7
+    capture=$9
+    echo "executed resume-coupling: a stub"
+    case "${STUB_C2:-match}" in
+      timeout) exec sleep 30 ;;
+      panic) echo "thread 'main' panicked" >&2; exit 101 ;;
+      refused)
+        echo "executed resume-coupling: refused before the move: constitution 1 refused: not a complete continuing state"
+        exit 4 ;;
+      incomplete)
+        echo "executed resume-coupling: the move passed its bound of $8 ms before it ended; stopped incomplete"
+        exit 3 ;;
+    esac
+    cp "$GATE_A/witness_best.state" "$capture/c2.state"
+    echo "c2 contexts: a stub" > "$capture/c2_contexts.txt"
+    [[ ${STUB_C2:-match} == nocapture ]] && rm -f "$capture/c2_contexts.txt"
+    if [[ ${STUB_C2:-match} == lying ]]; then
+      grep '^  constitution 1 (before move 1): ' "$receipt" | sed 's/solved 7 of 64/solved 8 of 64/'
+    else
+      grep '^  constitution 1 (before move 1): ' "$receipt"
+    fi
+    grep '^    move 1: ' "$receipt" | sed -E 's/ \}; [0-9]+ ms$/, reversed: 0, uncertified: 0 }; 1 ms/'
+    grep '^  constitution 2 (before move 2): ' "$receipt"
+    if [[ ${STUB_C2:-match} == mismatch ]]; then
+      echo "executed resume-coupling: identity: the persistence reads at constitution 2: stay 5, gate A's 4; stopped, nothing further read"
+      exit 5
+    fi
+    tuple=$(grep '^    move 2: ' "$receipt" | grep -o 'Persistence { [^}]*' | sed 's/ $//')
+    refused=0
+    case "${STUB_C2:-match}" in
+      tuple) tuple=${tuple/stay: 4, fall: 3/stay: 5, fall: 2} ;;
+      refusal) refused=1 ;;
+    esac
+    echo "  persistence at constitution 2: $tuple, reversed: 2, uncertified: 1 }; refused $refused; the release re-reads 1 ms"
+    echo "executed resume-coupling: complete; a stub"
     ;;
   *) echo "the stub has no mode $2" >&2; exit 2 ;;
 esac
@@ -293,6 +339,62 @@ expect "a schedule whose replay mismatches exits 10 though its witness validates
 expect "  the coupling is never launched" is "$(launched "$dir" '^executed coupling [^w]*$')" 0
 expect "  the witness, independent of the replay, is checked" test -s "$dir/stamps/witness.ok"
 expect "  reach is refused for the unverified replay" grep -q 'check-replay has not passed' "$dir/launcher.log"
+
+echo "6. the c2 diagnostic: every exit propagates, and only a verified run is stamped"
+
+for scenario in "mismatch 5" "incomplete 3" "refused 4" "panic 101"; do
+  read -r name code <<< "$scenario"
+  dir=$(fresh)
+  status=$(launch "$dir" exp-c2 STUB_C2="$name")
+  expect "c2 $name: exp-c2 exits $code: $status" is "$status" "$code"
+  expect "  launched once" is "$(launched "$dir" '^executed resume-coupling ')" 1
+  expect "  the check never runs" test ! -e "$dir/check_c2.diff"
+  expect "  no c2 stamp" test ! -e "$dir/stamps/c2.ok"
+done
+
+dir=$(fresh)
+status=$(launch "$dir" exp-c2 STUB_C2=timeout LOOP_1C_GUARD_CAP=2)
+expect "c2 timeout: exp-c2 exits 124 (the outer guard): $status" is "$status" 124
+expect "  its receipt records the guard" grep -q '^exit 124 (124: the outer guard of 2 s)' "$dir/c2.time"
+expect "  the check never runs" test ! -e "$dir/check_c2.diff"
+expect "  no c2 stamp" test ! -e "$dir/stamps/c2.ok"
+
+for scenario in lying tuple refusal nocapture; do
+  dir=$(fresh)
+  status=$(launch "$dir" exp-c2 STUB_C2="$scenario")
+  expect "c2 exits 0 but $scenario: the check refuses 10: $status" is "$status" 10
+  expect "  no c2 stamp" test ! -e "$dir/stamps/c2.ok"
+done
+dir=$(fresh)
+status=$(launch "$dir" exp-c2 STUB_C2=lying)
+expect "  a line unlike gate A's: the difference is kept" grep -q 'solved 8 of 64' "$dir/check_c2.diff"
+
+dir=$(fresh)
+mkdir -p "$dir/threads"
+sleep 60 &
+sleeper=$!
+echo "$sleeper 12" > "$dir/threads/phase"
+status=$(launch "$dir" exp-c2 STUB_C2=match)
+expect "c2 beside a live 12-thread run: refused 12: $status" is "$status" 12
+expect "  never launched" is "$(launched "$dir" '^executed resume-coupling ')" 0
+kill "$sleeper" 2> /dev/null || true
+wait "$sleeper" 2> /dev/null || true
+sleeper=
+
+dir=$(fresh)
+status=$(launch "$dir" exp-c2 STUB_C2=match)
+rel=research/records/2026-09-30_STEP_1B_GATE_A_receipts
+expect "positive control: a run that reproduces gate A is verified: $status" is "$status" 0
+expect "  stamped" test -s "$dir/stamps/c2.ok"
+expect "  launched once, with the declared arguments" \
+  is "$(launched "$dir" "^executed resume-coupling order2 2026093061 8 $rel/witness_best.state $rel/witness.txt 210494 $dir/c2_capture\$")" 1
+expect "  at 12 threads" is "$(launched "$dir" '^RAYON_NUM_THREADS=12$')" 1
+expect "  under its outer guard of 606 s" grep -q '^exit 0 (124: the outer guard of 606 s)' "$dir/c2.time"
+expect "  the stamp covers the listing and the capture" \
+  is "$(grep -cE '(c2\.txt|c2\.state|c2_contexts\.txt)$' "$dir/stamps/c2.ok")" 3
+status=$(launch "$dir" exp-c2 STUB_C2=mismatch)
+expect "a later mismatching run exits 5 and removes the earlier stamp first: $status" is "$status" 5
+expect "  no c2 stamp" test ! -e "$dir/stamps/c2.ok"
 
 echo
 if (( failures == 0 )); then

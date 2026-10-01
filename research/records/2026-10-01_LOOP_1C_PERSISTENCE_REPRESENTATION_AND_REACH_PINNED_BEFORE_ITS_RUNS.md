@@ -775,3 +775,115 @@ Kept as Astra accepted:
 | `bash research/notebook/hnn_design/replay_baseline.sh` | the listing matches the baseline reference (41 lines); the read 95,213 ms, peak resident 79,740,928 bytes |
 | `bash tools/lean_check.sh` | not run: no Lean changed |
 | the GPU suite | not run: no card-mirrored code changed |
+
+## Built after the incomplete read on constitution 1, narrowed by Astra's review: the c2 diagnostic (not run)
+
+**Occasion.** The coupling read restored gate A's saved constitution 1 whole and reached its guard
+before its first reading was printed ([`small/`](2026-10-01_LOOP_1C_receipts/small/), exit 124).
+The primary's brief: resume constitution 1 by one native update to constitution 2, check it
+against gate A's receipt, and read the coupling at constitution 2 over its 7 re-reads. Astra's
+review of that consumer cleared building and unit-testing, **not running**, and narrowed it: the
+native order only; reuse the contexts the resumed move itself read; capture constitution 2 before
+any diagnostic read; keep the identity checks, all 7 re-reads (3 lost, 4 retained), Fails and
+Undecided apart, and the paired factorial with its interaction. Only the unit tests and the gates
+were run. This section governs over any statement above it that conflicts.
+
+**The operation** (`executed resume-coupling`, `hnn_loop_1c.rs`'s header; `loop_1c_runs.sh exp-c2`):
+
+1. Gate A's receipt (`witness.txt`) is read and constitution 1 (`witness_best.state`) restored
+   whole, each refused before the move (exit 4). A complete state is never remounted partially.
+2. One native update through `hnn::executed::executed_move` (the lock face at the decisions, every
+   commit guard) on the batch gate A's move 1 read: seed `2_026_093_061`, 8 order-2 requests. Past
+   210,494 ms a guard thread stops the run then, incomplete (exit 3).
+3. The move's own reading of its adopted successor, the adopted trial's release at constitution 2,
+   is reused: constitution 2's summary line; every lock's refinement, class and lock face at its own
+   lock (the owner's receipt of that refinement); every decision section; the terminal assignment.
+   No release is read again.
+4. Constitution 2's complete continuing state and those contexts are written (`c2.state`,
+   `c2_contexts.txt`, the lock faces' exact endpoints) before any diagnostic read.
+5. Each step gated by the one before (a mismatch exits 5 and reads nothing further):
+   - the move's two lines and constitution 2's summary line equal gate A's (wall times and the
+     persistence split masked);
+   - the persistence reads' locks, solved and re-reads, from the kept contexts with no reading,
+     equal gate A's at constitution 2 (its move 2 line: 64, 7, 7);
+   - the re-reads, lost and retained, are counted and admitted within 7 before any is read (past
+     it, exit 3, never truncated);
+   - each re-read at the release, `N1D1` (the owner's persistence re-read): stay and fall must be
+     gate A's 4 and 3, and none refused;
+   - then each re-read's normalization alone, `N1D0`, and entry alone, `N0D1`.
+6. Per re-read, its four cells with Fails, Undecided and refusals apart, the contrasts in both
+   orders and the interaction enclosed; the patterns counted by status at the release.
+
+**Choices** [agent-inferred], each with its reason:
+- Constitution 1's line and constitution 2's line join move 1's line and the tuple in the identity.
+  Both are free: the move prints the first, and the second is the move's own reading of its
+  successor. Constitution 2's line carries falsifier 2's decision-term count (gate A's 1 of 64).
+- The capture precedes the identity checks, so a mismatch keeps the successor it measured;
+  `check-c2` stamps it only when every check passes.
+- The decision sections are rebuilt from the release's locks (`bank_release`: a refinement's placed
+  cells are the earlier refinements' locks) and checked against every one of the owner's term sites,
+  which carry their refinement's placed cells. A difference refuses the run.
+- A refused reading at the release is counted apart from Fails and Undecided, and refused by the
+  identity, since the owner's persistence read never returns one.
+- `check-c2` re-reads the listing beside the harness's own gates: the three lines diffed against
+  gate A's, the tuple, none refused, the completion line and the capture.
+
+**Not built**: the ascending and descending orders, the landings' lattice, each landing alone, the
+later stations entered at their targets, and any frozen-denominator or entry-gating arm (such an
+arm is diagnostic only and never a production law).
+
+**The call counts.**
+
+| | Count |
+|---|---|
+| Native release reads | 2, both inside the owner's move: constitution 1's (the incumbent) and constitution 2's (the adopted trial's own release; gate A's move 1 adopted at its first trial). After the move: none |
+| Lock faces read after the move | 21, each re-read's `N1D1`, `N1D0` and `N0D1`: 105 turn readings of 5 candidates |
+| Kept, not read again | each re-read's `N0D0` (35 turn readings); constitution 2's 64 locks with their contexts and faces, the 8 terminal assignments, its summary line |
+| Placements at constitution 2 | at most 7, one for each request holding a re-read, made on its first reading |
+
+The older coupling read makes, at one constitution, 24 releases (3 orders of 8 requests) and every
+locked station's release and factorial cells: 6,840 readings at the timing seed's opening before
+its events.
+
+**The budget derived from these counts** (for Astra's review; no guard is changed):
+
+| Unit | Evidence | Upper (ms) |
+|---|---|---|
+| Setup and restore | 17 complete states restored in one process at 1 thread, 206 ms wall; the process's setup under 50 ms (§6.2) | 256 |
+| The move | gate A's move 1, 145,447 ms at 24 threads, times move 0's 159,075/109,917 (12 threads beside the fit, over 24): `210,495 + 2,610/109,917`. A cross-thread-count projection; move 1 was never measured at 12 threads | 210,494, the brief's bound; the exact ratio's ceiling is 210,496 |
+| The reads after the move | 105 turn readings at constitution 1's measured rate, its release read at 12 threads 45,592 ms for 1,440 turn readings, 8 placements and 64 certificates: `105 · 45,592/1,440 = 3,324 + 5/12`. Upper end: one whole such read | 3,325 projected; 45,592 upper |
+| In all | | 214,075 projected; 256,342 upper, a guard of 257 s |
+
+The capture's two writes are not measured separately. The launcher keeps the brief's guard of
+606 s, labelled as the projection of the broader three-order read (the move 210,494; the releases
+`82,983 · 7/2`; the events `13,093 · 7/5 · 7/2`; the restore under 40,000; 605,091 in all). That
+figure is a cross-state, cross-thread-count projection, not a demonstrated upper bound.
+
+**The tests.** `cargo test -p holonics --example hnn_prediction` adds six, none of which takes the
+move or reads constitution 2 (synthetic locks and readings; gate A's receipt and state read as
+files):
+- `a_malformed_c1_state_is_refused_before_the_move`;
+- `an_identity_mismatch_stops_before_any_reading_of_constitution_2`;
+- `more_than_seven_rereads_is_refused_as_incomplete`;
+- `the_factorial_is_read_for_lost_and_retained_rereads`;
+- `fails_and_undecided_are_counted_apart`;
+- `the_move_past_its_bound_stops_the_run`.
+
+`loop_1c_runs_tests.sh` adds 39 checks of `exp-c2`: the harness's exits 5, 3, 4 and 101 and the
+outer guard's 124 each stop the step with that status, the check never runs and nothing is
+stamped; a run that exits 0 with a line unlike gate A's, another tuple, a refused re-read or no
+capture is refused by the check (10), unstamped; the run is refused beside a live 12-thread run; a
+verified run is launched once, with the declared arguments, at 12 threads under its guard, and
+stamped; and a later run removes the stamp first.
+
+**The gates** [measured], on the worktree's build:
+
+| Gate | Result |
+|---|---|
+| `cargo check --workspace --all-targets` | clean, no warning |
+| `cargo test -p holonics --lib` (the launcher's `gate-tests`, 19 processors) | **886 passed**, 0 failed, as at the base (no library code changed); 191,518 ms with its build |
+| `cargo test -p holonics --example hnn_prediction` | 9 passed: the 3 above and the 6 new |
+| `bash research/notebook/hnn_design/loop_1c_runs_tests.sh` | 108 checks pass (69 and the 39 new) |
+| `bash research/notebook/hnn_design/replay_baseline.sh` (the launcher's `gate-replay`) | the listing matches the baseline reference (41 lines); the read 95,950 ms, peak resident 79,306,752 bytes |
+| `bash tools/lean_check.sh` | not run: no Lean changed |
+| the GPU suite | not run: no card-mirrored code changed |
