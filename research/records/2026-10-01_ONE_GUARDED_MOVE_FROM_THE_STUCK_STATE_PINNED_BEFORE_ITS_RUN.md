@@ -46,10 +46,19 @@ size is a constitutive change, not a velocity or an elapsed time.
 ## 3. The run
 
 `executed move-once order2 2026093061 8 <out> c6=<the guarded witness's c6.state> coordinate witness`.
-The run makes one real move from the state where the guarded witness stopped (its move 6 was
-refused at all 8 trials), under each metric, both on the corrected lock reading. The coordinate move
-is the control on consistent operands. Each move prints its incumbent, every trial with its refusal
-kind, the witness's form where read, and the adopted successor's own release.
+The state is restored whole (`ContinuingState` and `Constitution::continued`, no `E`/`ρ` fallback),
+and every arm starts from that same restored c6. The order follows Astra's attribution:
+- the coordinate metric first, on the corrected lock reading;
+- if it is adopted, the run stops: the reading's repair alone explains the escape;
+- only if it is refused, the witness's metric from the same restored c6, with its direction, form
+  and ladder prepared afresh there.
+
+Each move prints its incumbent, every trial with its refusal kind, the witness's form where read, and
+the adopted successor's own release. The incumbent's `L` is checked against the guarded witness's
+`[373776/4096, 373781/4096)`. The lock reading changes only the covector's weights, not the
+comparison's value, so it should match exactly. `E`'s trial steps are carried by the source port's
+own prepared step at each `η` (`PreparedStep::stepped`), never a carried unit move rescaled. This is
+a test of escape from an existing state, not the sixth iterate of a corrected trajectory.
 
 **The outcome rules, fixed before the run:**
 - **(M1) the witness's move is adopted and the control's is refused.** The corrected metric admits
@@ -57,8 +66,8 @@ kind, the witness's form where read, and the adopted successor's own release.
   against the chord to the refit's `ρ*`, the executed `L`, and the decisions (solved, right, whole).
   A larger `ρ` change or a lower smooth `L` alone is not success. Only then does a longer
   continuation have information value, and it is put to Brandon with its own projection.
-- **(M2) both are adopted.** The corrected reading alone unblocked the state. Report both moves
-  side by side; the metric's effect is their difference.
+- **(M2) the control is adopted.** The corrected reading alone unblocked the state, and the witness
+  is not attempted. Report the move.
 - **(M3) both are refused.** Stop. The obstruction is read from the trials' refusal kinds:
   - the mask's descent (`NotBelow`);
   - the executed release's descent (`OwnNotBelow`);
@@ -67,8 +76,6 @@ kind, the witness's form where read, and the adopted successor's own release.
   - the witness's domain (`Invisible`, `Reversed`).
 
   That kind is the next subject. A refusal at c6 does not show the architecture cannot learn.
-- **(M4) only the control is adopted.** The witness's direction fails where the coordinate one
-  passes. Report the witness's trials and refusal.
 
 ## 4. Time, threads and the stopping rule
 
@@ -79,7 +86,8 @@ kind, the witness's form where read, and the adopted successor's own release.
   - The witness's move adds the plane's terms. The plane read at c6, an incumbent read, the unit
     step and the plane, took 78,889 ms, so the witness's move is bounded by
     `440,346 + 78,889 = 519,235` ms.
-- **Projection** `440,346 + 519,235 = 959,581` ms, so `timeout 960`. One harness line per move
+- **Projection** `440,346 + 519,235 = 959,581` ms (both arms, when the control refuses), so
+  `timeout 960`. One harness line per move
   (its incumbent's report), so the probe's per-line bound is the larger move, 519,235 ms.
 - **Threads.** `RAYON_NUM_THREADS=19`, beside nothing else.
 - **Early stop.** The launcher stops the run when a move passes 519,235 ms, reported incomplete.

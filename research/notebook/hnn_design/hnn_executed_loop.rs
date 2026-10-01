@@ -1386,11 +1386,14 @@ pub(super) fn direction(
 /// [measured-diagnostic; agent-inferred, October 1; the
 /// [one-move pin](../../records/2026-10-01_ONE_GUARDED_MOVE_FROM_THE_STUCK_STATE_PINNED_BEFORE_ITS_RUN.md)]
 /// **One committed move from a state under each declared metric** (`executed move-once <terrain>
-/// <seed> <count> <label=source> <metric>…`, `metric` `coordinate` or `witness`, sources as
-/// [`segment_source`]): the candidate arm's real proposal, guards, ladder and state carry
-/// (`hnn::executed::executed_move_in`). Each metric prints the incumbent's reading, the move's line
-/// with every trial, the witness's form where read, and the adopted successor's own release (its
-/// trial's reading), written to `<out>/<label>-<metric>.state` when adopted.
+/// <seed> <count> <out> <label=state> <metric>…`, `metric` `coordinate` or `witness`, the state
+/// a complete continuing state, restored with no `E`/`ρ` fallback ([`remounted`])): the candidate
+/// arm's real proposal, guards, ladder and state carry (`hnn::executed::executed_move_in`), every
+/// metric from the same restored state. The metrics are attempted in order and the first adopted
+/// move ends the run (Astra's attribution: the control first; the witness only if it refuses). Each
+/// prints the incumbent's reading, the move's line with every trial, the witness's form where read,
+/// and the adopted successor's own release (its trial's reading), written to
+/// `<out>/<label>-<metric>.state`.
 pub(super) fn move_once(terrain: &str, seed: u64, count: usize, out: &str, source: &str, metrics: &[String]) {
     use holonics::hnn::executed::{MoveMetric, executed_move_in};
     let clock = Instant::now();
@@ -1403,7 +1406,7 @@ pub(super) fn move_once(terrain: &str, seed: u64, count: usize, out: &str, sourc
     let targets: Vec<Vec<usize>> = pairs.iter().map(|(_, t)| t.clone()).collect();
     let comparison = Comparison::LOCK_DECISIONS;
     let (label, spec) = source.split_once('=').expect("<label>=<source>");
-    let theta = segment_source(&engine, ring, spec);
+    let theta = remounted(&engine.theta, spec);
     println!(
         "executed move-once: {count} {terrain} requests at development seed {seed}, the candidate arm, from {label} (ρ {}); the bank p = {}, grain 2^(-{BANK_GRAIN})",
         theta.transport(ring),
@@ -1472,6 +1475,8 @@ pub(super) fn move_once(terrain: &str, seed: u64, count: usize, out: &str, sourc
                 #[allow(clippy::disallowed_methods)]
                 std::fs::write(format!("{out}/{label}-{name}.state"), write_state(successor, ring))
                     .expect("write the successor's state");
+                println!("  {label}: {name} adopted; the later metrics are not attempted");
+                break;
             }
             None => println!(
                 "  {label} {name}: refused, {:?}; {} ms",
