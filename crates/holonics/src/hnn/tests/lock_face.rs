@@ -1,0 +1,769 @@
+//! Step 1b's gate A (the
+//! [pin](../../../../../research/records/2026-09-30_STEP_1B_THE_CANDIDATE_COMPARISON_PINNED_BEFORE_ITS_RUNS.md)
+//! §13; `hnn::executed`): the lock face and its normalization against its resting sheet; the zero and
+//! unsupported targets and the declared input's validation; the ladder's start and its boundary
+//! cases; the two repaired guards on every composition; active-face ties; the readings' sites (the
+//! decisions along the key-consistent prefix on a release, a hold and a refused certificate); the
+//! fixed incumbent mask; the guards on every arm; and the complete continuing state restored and
+//! continued over successive receptions. One test per stated law and per boundary case.
+
+use num_traits::{One, Signed, Zero};
+
+use super::learning::{generic, moment};
+use super::prediction::{executed_requests, joint, joint_bank};
+use crate::hnn::HnnError;
+use crate::hnn::constitution::{Constitution, ContinuingState, Locus};
+use crate::hnn::executed::{
+    Comparison, Composition, Context, Excess, LadderStart, MoveRefusal, Predicate, ProposalProbe,
+    Reading, Request, TermSite, compare, executed_move, ladder_start, lock_face, mask_reread,
+    proposal_returns, station_predicates, synthetic_batch,
+};
+use crate::hnn::field::{ConstitutionRead, Field};
+use crate::hnn::prediction::{BankRefinement, Refinement};
+use crate::hnn::ring::{
+    CovectorRefusal, DominantMultiplier, Growth, MemberCovector, TurnCovector, TurnReading,
+};
+use crate::ratio::algebraic::{ExactInterval, ln_enclosure};
+use crate::ratio::disk::Disk;
+use crate::ratio::linear::ExactRatMatrix;
+use crate::ratio::{Rat, integer, rat};
+
+fn growth(lower: Rat, upper: Rat) -> Growth {
+    Growth { lower, upper }
+}
+
+fn at(x: Rat) -> Growth {
+    growth(x.clone(), x)
+}
+
+/// A resolved member whose covector on a one-tick storage is `(re, im)` exactly.
+fn resolved(member: usize, re: i64, im: i64) -> MemberCovector {
+    MemberCovector::Resolved {
+        member,
+        multiplier: DominantMultiplier {
+            disk: Disk::real(Rat::one()),
+            pair: false,
+            inner: Rat::zero(),
+        },
+        covector: vec![[
+            ExactInterval::point(integer(re)),
+            ExactInterval::point(integer(im)),
+        ]],
+    }
+}
+
+fn unresolved(member: usize) -> MemberCovector {
+    MemberCovector::Unresolved {
+        member,
+        refusal: CovectorRefusal::Tie,
+    }
+}
+
+/// A candidate read at `joint` (every member at the joint), with the given active members.
+fn candidate(joint: Growth, active: Vec<MemberCovector>) -> TurnCovector {
+    let count = active.iter().map(|m| m.member() + 1).max().unwrap_or(1);
+    TurnCovector {
+        reading: TurnReading {
+            members: vec![joint.clone(); count],
+            joint,
+        },
+        active,
+    }
+}
+
+/// A one-station request's site at the open section.
+fn site(station: usize, stations: usize) -> TermSite {
+    TermSite {
+        request: 0,
+        station,
+        cells: vec![None; stations],
+        context: Some(0),
+        post_error: false,
+        held: false,
+    }
+}
+
+/// One synthetic term of a one-station request (target `0`), its proposal probed.
+fn probe(composition: Composition, candidates: Vec<TurnCovector>) -> (ProposalProbe, Rat) {
+    let reads = vec![vec![candidates]];
+    let batch = synthetic_batch(
+        Comparison {
+            composition,
+            reading: Reading::Decisions,
+        },
+        &[vec![0]],
+        vec![vec![site(0, 1)]],
+        &reads,
+        candidate_count(&reads) - 1,
+    )
+    .unwrap();
+    (ProposalProbe::of(&batch, &reads), batch.excess.lower)
+}
+
+fn candidate_count(reads: &[Vec<Vec<TurnCovector>>]) -> usize {
+    reads[0][0].len()
+}
+
+/// Each section's move: its first storage entry `m` (the one-tick covectors pair it with their real
+/// part), class by class (the probe's sections are indexed class by class for one term).
+fn moves(probe: &ProposalProbe, first: &[Rat]) -> Vec<Vec<Rat>> {
+    probe
+        .sections
+        .iter()
+        .map(|(_, station, cells)| {
+            let class = cells[*station].expect("a candidate's section");
+            vec![first[class].clone(), Rat::zero()]
+        })
+        .collect()
+}
+
+// -------------------------------------------------------------------------------------------
+// the lock face
+
+/// **The lock face reads the lock whole against its resting sheet** (Lean
+/// `HNN/ExecutedComparison.{lockFace_lt_log_two_iff, lockFace_enclosure_sublevel,
+/// lockFace_ge_log_two_of_rival}`; the pin §2.3, §13.2): at the flip exactly (`a_t = 1 + Σ a_x`) the
+/// face reads `ln 2` and the station is not solved; the shares and the resting sheet's `1/Π` sum to
+/// one; past the flip the rational test holds and the excess is exactly zero; the rational test is
+/// strictly stronger than the release's per-rival predicates; the resting weight is the release's
+/// threshold; a tie of every candidate lies above the level (where the hinge is zero); overlapping
+/// enclosures leave the test undecided.
+#[test]
+fn the_lock_face_reads_the_lock_whole_against_its_resting_sheet() {
+    let ln2 = ln_enclosure(&integer(2)).unwrap();
+    let half = || at(rat(1, 2));
+    // At the flip exactly: a_t = 3 = 1 + 4 · 1/2.
+    let flip = [at(integer(3)), half(), half(), half(), half()];
+    let face = lock_face(&flip, 0).unwrap();
+    assert!(face.value.lower <= ln2.upper && ln2.lower <= face.value.upper);
+    assert_eq!(face.solved, Predicate::Fails);
+    assert!(!face.above);
+    assert_eq!(face.kind(), Excess::Boundary);
+    assert!(face.excess.lower.is_zero());
+    assert_eq!(face.shares[0], ExactInterval::point(rat(1, 2)));
+    for share in &face.shares[1..] {
+        assert_eq!(*share, ExactInterval::point(rat(1, 12)));
+    }
+    let shares: Rat = face.shares.iter().map(|s| s.lower.clone()).sum();
+    assert_eq!(shares + rat(1, 6), Rat::one());
+    // Past the flip: a_t = 4 > 3.
+    let solved = [at(integer(4)), half(), half(), half(), half()];
+    let face = lock_face(&solved, 0).unwrap();
+    assert_eq!(face.solved, Predicate::Holds);
+    assert_eq!(face.kind(), Excess::Solved);
+    assert_eq!(face.excess, ExactInterval::point(Rat::zero()));
+    assert!(face.value.upper < ln2.lower);
+    // Stronger than the per-rival predicates: 3 exceeds every rival and the unit, 1 + 3 ≥ 3.
+    let per_rival = [at(integer(3)), at(Rat::one()), at(Rat::one()), half(), half()];
+    let (_, class, threshold) = station_predicates(&per_rival, 0).unwrap();
+    assert_eq!((class, threshold), (Predicate::Holds, Predicate::Holds));
+    let face = lock_face(&per_rival, 0).unwrap();
+    assert_eq!(face.solved, Predicate::Fails);
+    assert_eq!(face.kind(), Excess::Above);
+    // The resting sheet is the release's threshold: a target at the unit is never solved.
+    let tiny = || at(rat(1, 1 << 20));
+    let unit = [at(Rat::one()), tiny(), tiny(), tiny(), tiny()];
+    assert_eq!(lock_face(&unit, 0).unwrap().solved, Predicate::Fails);
+    // A tie of the five: ℓ = ln(11/2) > ln 5, above the level; the hinge's term is zero there.
+    let tie: Vec<Growth> = (0..5).map(|_| at(integer(2))).collect();
+    let face = lock_face(&tie, 0).unwrap();
+    assert_eq!(face.kind(), Excess::Above);
+    assert!(face.value.lower > ln_enclosure(&integer(5)).unwrap().upper);
+    let (f, class, _) = station_predicates(&tie, 0).unwrap();
+    assert!(!f.lower.is_positive() && !f.upper.is_negative());
+    assert_eq!(class, Predicate::Fails);
+    // Overlapping enclosures: 1 + 4 < 5 fails and 1 + 2 ≥ 6 fails.
+    let rival = || growth(rat(1, 2), Rat::one());
+    let overlap = [growth(integer(5), integer(6)), rival(), rival(), rival(), rival()];
+    let face = lock_face(&overlap, 0).unwrap();
+    assert_eq!(face.solved, Predicate::Undecided);
+    assert_eq!(face.kind(), Excess::Boundary);
+    assert!(face.excess.lower.is_zero());
+}
+
+/// **A zero or unsupported target is refused, typed, and the declared input is validated on every
+/// arm** (the pin §13.4, §13.5): a target whose lower end is zero has no finite upper end of `ℓ` and
+/// refuses the face (never solved, never divided by); a target outside the candidates and a
+/// negative enclosure refuse; a zero rival is read. A request's targets must be one per station and
+/// each a class of the chart, and a partition's mask one flag per station, before anything is read.
+#[test]
+fn a_zero_or_unsupported_target_is_refused_typed() {
+    let zero = [growth(Rat::zero(), rat(1, 4)), at(Rat::one())];
+    assert!(matches!(lock_face(&zero, 0), Err(HnnError::NonpositiveDeclaration)));
+    let zero_rival = [at(integer(3)), at(Rat::zero())];
+    assert_eq!(lock_face(&zero_rival, 0).unwrap().solved, Predicate::Holds);
+    assert!(matches!(lock_face(&[at(Rat::one())], 1), Err(HnnError::Shape { .. })));
+    let negative = [at(Rat::one()), growth(integer(-1), Rat::one())];
+    assert!(matches!(lock_face(&negative, 0), Err(HnnError::NonpositiveDeclaration)));
+    let field = joint();
+    let theta = generic(&field, 94);
+    let refinement = Refinement::declare(&field, 0, 2, 1, 4, 2).unwrap();
+    let bank = joint_bank();
+    for comparison in arms() {
+        let mut requests = executed_requests(&field, &[(95, [0, 1, 2, 1])], Context::Open);
+        requests[0].targets.pop();
+        assert!(matches!(
+            compare(&field, &theta, &requests, &refinement, &bank, 12, comparison),
+            Err(HnnError::Shape { .. })
+        ));
+        assert!(matches!(
+            executed_move(&field, &theta, &requests, &refinement, &bank, 12, comparison),
+            Err(HnnError::Shape { .. })
+        ));
+        requests[0].targets = vec![0, 1, 3, 1];
+        assert!(matches!(
+            executed_move(&field, &theta, &requests, &refinement, &bank, 12, comparison),
+            Err(HnnError::CellOutside { code: 3, alphabet: 3 })
+        ));
+        requests[0].targets = vec![0, 1, 2, 1];
+        requests[0].context = Context::Partition(vec![true, false]);
+        assert!(matches!(
+            compare(&field, &theta, &requests, &refinement, &bank, 12, comparison),
+            Err(HnnError::Shape { .. })
+        ));
+    }
+}
+
+// -------------------------------------------------------------------------------------------
+// the ladder's start
+
+/// **The ladder starts from the excess's first-order zero, and a zero excess or a nonnegative
+/// slope never enters a division** (the pin §2.6, §13.5): `η₀ = 2^⌊log₂ min(X⁻/(−s_X⁺), ½/u)⌋`, the
+/// entry scale alone when `X⁻ = 0` (with a station at exactly `ℓ = ln 2` still unsolved) or when
+/// `s_X⁺ ≥ 0` (`X > 0` with a nonnegative derivative), and `1` in place of `½/u` at `u = 0`.
+#[test]
+fn the_ladder_starts_from_the_excess_and_never_divides_by_zero() {
+    let u = rat(1, 4);
+    assert_eq!(ladder_start(&Rat::zero(), &integer(-1), &u), (integer(2), LadderStart::ExcessZero));
+    assert_eq!(ladder_start(&rat(1, 8), &Rat::zero(), &u), (integer(2), LadderStart::ExcessRising));
+    assert_eq!(ladder_start(&rat(1, 8), &integer(3), &u), (integer(2), LadderStart::ExcessRising));
+    assert_eq!(ladder_start(&rat(1, 8), &integer(-1), &u), (rat(1, 8), LadderStart::FirstOrderZero));
+    assert_eq!(ladder_start(&rat(3, 16), &integer(-1), &u), (rat(1, 8), LadderStart::FirstOrderZero));
+    assert_eq!(ladder_start(&integer(3), &rat(-1, 2), &u), (integer(2), LadderStart::EntryScale));
+    assert_eq!(
+        ladder_start(&Rat::zero(), &integer(-1), &Rat::zero()),
+        (Rat::one(), LadderStart::ExcessZero)
+    );
+    // X = 0 with a station at exactly ln 2, beside a solved one: X⁻ = 0, the entry scale; the
+    // station stays unsolved by the rational predicate.
+    let half = || at(rat(1, 2));
+    let flip = lock_face(&[at(integer(3)), half(), half(), half(), half()], 0).unwrap();
+    let solved = lock_face(&[at(integer(4)), half(), half(), half(), half()], 0).unwrap();
+    let excess = &flip.excess.lower + &solved.excess.lower;
+    assert!(excess.is_zero());
+    assert_eq!(ladder_start(&excess, &integer(-1), &u).1, LadderStart::ExcessZero);
+    assert_eq!(flip.solved, Predicate::Fails);
+}
+
+// -------------------------------------------------------------------------------------------
+// the repaired guards
+
+/// **An unresolved active member refuses the move on every composition** (the pin §13.4): the lock
+/// face reads every candidate's active members, so an unresolved member of the target or of any
+/// rival refuses; the hinge reads its active branches' members, so an unresolved member of its
+/// target or of an active rival refuses, and one of a rival whose branch is not active is not read by
+/// its certificate. A refused term is never bounded by its resolved members alone.
+#[test]
+fn an_unresolved_active_member_refuses_every_composition() {
+    // Target 1/2 (below threshold: in every support); rival 1 active (its branch reads ln 2 as the
+    // threshold does), rival 2 at 1/4 not active in the hinge's max.
+    let growths = [at(rat(1, 2)), at(Rat::one()), at(rat(1, 4))];
+    for composition in [Composition::Hinge, Composition::LockFace] {
+        for unresolved_on in 0..3 {
+            let candidates = growths
+                .iter()
+                .enumerate()
+                .map(|(x, g)| {
+                    let mut active = vec![resolved(0, 1, 0)];
+                    if x == unresolved_on {
+                        active.push(unresolved(1));
+                    }
+                    candidate(g.clone(), active)
+                })
+                .collect();
+            let (probe, _) = probe(composition, candidates);
+            let read = composition == Composition::LockFace || unresolved_on < 2;
+            let first = probe.first_order(&moves(&probe, &[Rat::one(), Rat::one(), Rat::one()]));
+            if read {
+                assert_eq!(probe.unresolved_terms, 1, "{composition:?} {unresolved_on}");
+                assert_eq!(probe.refusal(), Some(MoveRefusal::Unresolved(1)));
+                assert_eq!(first.unresolved, 1);
+            } else {
+                assert_eq!(probe.unresolved_terms, 0);
+                assert_eq!(probe.refusal(), None);
+            }
+        }
+    }
+}
+
+/// **The slope is read on the joint direction** (the pin §13.4): on a lock-face term above its level
+/// (every reading 1, `θ = 1/4` each), a port move that raises only the rivals' storages reads a
+/// first-order bound `1/2 ≥ 0` and would refuse alone; joined by the modulus's storage move, which
+/// raises the target's, the joint bound is `−1 < 0` and the move proceeds, its ladder started at the
+/// excess's first-order zero from the joint derivative.
+#[test]
+fn the_slope_is_read_on_the_joint_direction() {
+    let candidates = (0..3).map(|_| candidate(at(Rat::one()), vec![resolved(0, 1, 0)])).collect();
+    let (probe, excess) = probe(Composition::LockFace, candidates);
+    assert!(excess.is_positive());
+    let port = probe.first_order(&moves(&probe, &[Rat::zero(), Rat::one(), Rat::one()]));
+    assert_eq!(port.bound, ExactInterval::point(rat(1, 2)));
+    assert!(matches!(ProposalProbe::slope_refusal(&port), Some(MoveRefusal::NoDescent(_))));
+    // The modulus's part: +2 on the target's storage.
+    let joint = probe.first_order(&moves(&probe, &[integer(2), Rat::one(), Rat::one()]));
+    assert_eq!(joint.bound, ExactInterval::point(integer(-1)));
+    assert_eq!(joint.excess, joint.bound);
+    assert_eq!(ProposalProbe::slope_refusal(&joint), None);
+    // X⁻ = ln 4 − ln 2 enclosed below; its first-order zero X⁻/1 ∈ [1/2, 1) under the entry scale 2.
+    assert_eq!(
+        ladder_start(&excess, &joint.excess.upper, &rat(1, 4)),
+        (rat(1, 2), LadderStart::FirstOrderZero)
+    );
+    // The proposal's weights: θ_x = 1/4 on the rivals, θ_t − 1 = −3/4 on the target.
+    let mut weights = probe.contributions.clone();
+    weights.sort_by(|a, b| a.1.cmp(&b.1));
+    assert_eq!(weights[0].1, rat(-3, 4));
+    assert!(weights[1..].iter().all(|(_, w)| *w == rat(1, 4)));
+}
+
+/// **Active-face ties are read by every active member** (Lean
+/// `HNN/ExecutedComparison.{lockFace_first_order, sup_upper_dini, sum_max_descends}`): a lock-face
+/// term whose target has two active members (slopes `+1` and `−1`) and a rival with two (`−2`, `+3`)
+/// is bounded by the rival's largest and the target's least,
+/// `(1/4)(3) + (1/4)(0) + (−3/4)(−1) = 3/2`; a hinge term whose two rivals tie with its threshold
+/// (every branch active) is bounded by its largest branch, `max(−1, 2 − 1, −5 − 1) = 1`.
+#[test]
+fn active_face_ties_are_read_by_every_active_member() {
+    let lock = vec![
+        candidate(at(Rat::one()), vec![resolved(0, 1, 0), resolved(1, -1, 0)]),
+        candidate(at(Rat::one()), vec![resolved(0, -2, 0), resolved(1, 3, 0)]),
+        candidate(at(Rat::one()), vec![resolved(0, 0, 0)]),
+    ];
+    let (probe_lock, _) = probe(Composition::LockFace, lock);
+    let bound = probe_lock.first_order(&moves(&probe_lock, &[Rat::one(), Rat::one(), Rat::one()]));
+    assert_eq!(bound.bound, ExactInterval::point(rat(3, 2)));
+    let hinge = vec![
+        candidate(at(rat(1, 2)), vec![resolved(0, 1, 0)]),
+        candidate(at(Rat::one()), vec![resolved(0, 2, 0)]),
+        candidate(at(Rat::one()), vec![resolved(0, -5, 0)]),
+    ];
+    let (probe_hinge, _) = probe(Composition::Hinge, hinge);
+    let bound = probe_hinge.first_order(&moves(&probe_hinge, &[Rat::one(), Rat::one(), Rat::one()]));
+    assert_eq!(bound.bound, ExactInterval::point(Rat::one()));
+}
+
+// -------------------------------------------------------------------------------------------
+// the readings' sites
+
+/// A synthetic refinement of the joint field's 4 stations and 3 classes: its placed section, its
+/// open stations and the stations it locked.
+fn refinement(placed: [Option<usize>; 4], locked: Vec<usize>) -> BankRefinement<()> {
+    let open: Vec<(usize, usize)> = (0..4)
+        .filter(|&s| placed[s].is_none())
+        .flat_map(|s| (0..3).map(move |x| (s, x)))
+        .collect();
+    BankRefinement {
+        placed: placed.to_vec(),
+        read: vec![(); open.len()],
+        open,
+        tops: Vec::new(),
+        eligible: Vec::new(),
+        locked,
+    }
+}
+
+/// `(context, station, held, post_error)` of each site.
+fn read_sites(sites: &[TermSite]) -> Vec<(Option<usize>, usize, bool, bool)> {
+    sites
+        .iter()
+        .map(|s| (s.context, s.station, s.held, s.post_error))
+        .collect()
+}
+
+/// **The decisions read each station once along the key-consistent prefix, on a release, a hold
+/// and a refused certificate** (the pin §2.4, §13.1, §13.4): `d(j)` is the refinement locking `j`
+/// when that is before `r*`, else `r*`, the last refinement whose placed cells equal their targets;
+/// every station has exactly one site (the obligations kept), the held stations are those read at a
+/// refinement that did not lock them, and no decision is read after an error. The every-refinement
+/// reading marks the refinements after `r*` post-error; the teacher-forced reading places the
+/// earlier targets, at a refinement only where the release executed that section; a partition reads
+/// its one refinement.
+#[test]
+fn the_decisions_read_each_station_once_along_the_consistent_prefix() {
+    let sites_of = |request: &Request, refinements: &[BankRefinement<()>], reading: Reading| {
+        crate::hnn::executed::sites_of(0, request, refinements, reading, 4, 3)
+    };
+    let field = joint();
+    let request = executed_requests(&field, &[(95, [0, 1, 2, 1])], Context::Open).remove(0);
+    // A release: station 2 locked right at 0, station 0 locked wrong (1 for 0) at 1, the rest at 2.
+    let release = vec![
+        refinement([None; 4], vec![2]),
+        refinement([None, None, Some(2), None], vec![0]),
+        refinement([Some(1), None, Some(2), None], vec![1, 3]),
+    ];
+    let (sites, consistent) = sites_of(&request, &release, Reading::Decisions);
+    assert_eq!(consistent, Some(1));
+    assert_eq!(
+        read_sites(&sites),
+        vec![
+            (Some(1), 0, false, false),
+            (Some(1), 1, true, false),
+            (Some(0), 2, false, false),
+            (Some(1), 3, true, false),
+        ]
+    );
+    assert_eq!(sites[0].cells, vec![None, None, Some(2), None]);
+    let (every, _) = sites_of(&request, &release, Reading::Every);
+    assert_eq!(every.len(), 4 + 3 + 2);
+    assert_eq!(every.iter().filter(|s| s.post_error).count(), 2);
+    assert!(every.iter().filter(|s| s.post_error).all(|s| s.context == Some(2)));
+    let (forced, _) = sites_of(&request, &release, Reading::TeacherForced);
+    assert_eq!(
+        forced.iter().map(|s| s.context).collect::<Vec<_>>(),
+        vec![Some(0), None, None, None]
+    );
+    assert_eq!(forced[2].cells, vec![Some(0), Some(1), None, None]);
+    assert!(forced.iter().all(|s| !s.post_error));
+    // A hold at the open section: nothing eligible, every station read there, held.
+    let hold = vec![refinement([None; 4], Vec::new())];
+    let (sites, consistent) = sites_of(&request, &hold, Reading::Decisions);
+    assert_eq!(consistent, Some(0));
+    assert_eq!(
+        read_sites(&sites),
+        (0..4).map(|s| (Some(0), s, true, false)).collect::<Vec<_>>()
+    );
+    // A refused certificate at refinement 1 (nothing it would lock taken): r* = 1.
+    let refused = vec![
+        refinement([None; 4], vec![2]),
+        refinement([None, None, Some(2), None], Vec::new()),
+    ];
+    let (sites, consistent) = sites_of(&request, &refused, Reading::Decisions);
+    assert_eq!(consistent, Some(1));
+    assert_eq!(
+        read_sites(&sites),
+        vec![
+            (Some(1), 0, true, false),
+            (Some(1), 1, true, false),
+            (Some(0), 2, false, false),
+            (Some(1), 3, true, false),
+        ]
+    );
+    // A partition reads its one refinement's open stations.
+    let mut partition = request.clone();
+    partition.context = Context::Partition(vec![false, true, false, true]);
+    let placed = refinement([None, Some(1), None, Some(1)], Vec::new());
+    let (sites, consistent) = sites_of(&partition, &[placed], Reading::Decisions);
+    assert_eq!(consistent, None);
+    assert_eq!(
+        read_sites(&sites),
+        vec![(None, 0, false, false), (None, 2, false, false)]
+    );
+}
+
+// -------------------------------------------------------------------------------------------
+// the moves on the joint field
+
+/// The arms of gate B: the lock face at the decisions, at every refinement and teacher-forced; the
+/// hinge at the decisions and at every refinement.
+fn arms() -> [Comparison; 5] {
+    let arm = |composition, reading| Comparison {
+        composition,
+        reading,
+    };
+    [
+        arm(Composition::LockFace, Reading::Decisions),
+        arm(Composition::LockFace, Reading::Every),
+        arm(Composition::Hinge, Reading::Decisions),
+        arm(Composition::Hinge, Reading::Every),
+        arm(Composition::LockFace, Reading::TeacherForced),
+    ]
+}
+
+/// The fixed mask of a batch's terms.
+fn mask_of(batch: &crate::hnn::executed::BatchComparison) -> Vec<Vec<TermSite>> {
+    batch
+        .requests
+        .iter()
+        .map(|r| r.terms.iter().map(|t| t.site.clone()).collect())
+        .collect()
+}
+
+/// **The fixed incumbent mask re-reads the incumbent's sections** (the pin §13.1): at the incumbent
+/// itself the mask's composition and excess are the comparison's exactly and the own reading is the
+/// comparison; on every arm.
+#[test]
+fn the_fixed_mask_rereads_the_incumbents_sections() {
+    let field = joint();
+    let theta = generic(&field, 94);
+    let refinement = Refinement::declare(&field, 0, 2, 1, 4, 2).unwrap();
+    let bank = joint_bank();
+    let requests =
+        executed_requests(&field, &[(95, [0, 1, 2, 1]), (96, [1, 1, 0, 2])], Context::Open);
+    for comparison in arms() {
+        let batch = compare(&field, &theta, &requests, &refinement, &bank, 12, comparison).unwrap();
+        let (value, excess, own, refusal) = mask_reread(
+            &field,
+            &theta,
+            &requests,
+            &refinement,
+            &bank,
+            12,
+            comparison,
+            &mask_of(&batch),
+        )
+        .unwrap();
+        assert_eq!(value, batch.value);
+        assert_eq!(excess, batch.excess);
+        assert_eq!(own.as_ref(), Some(&batch));
+        assert!(refusal.is_none());
+    }
+}
+
+/// **A hold keeps every station obligation** (the pin §13.4): at `E = 0` every candidate of a
+/// station reads one storage, nothing flips and the release holds at the open section; the
+/// decisions and the teacher-forced readings read `m` terms a request, every one held, none absent.
+#[test]
+fn a_hold_keeps_every_station_obligation() {
+    let field = joint();
+    let base = generic(&field, 94);
+    let port = base.source_port(0).unwrap();
+    let theta = base
+        .clone()
+        .with_ports(0, None, Some(ExactRatMatrix::zero(port.rows(), port.columns()).unwrap()), None)
+        .unwrap();
+    let refinement = Refinement::declare(&field, 0, 2, 1, 4, 2).unwrap();
+    let bank = joint_bank();
+    let requests =
+        executed_requests(&field, &[(95, [0, 1, 2, 1]), (96, [1, 1, 0, 2])], Context::Open);
+    for comparison in arms() {
+        let batch = compare(&field, &theta, &requests, &refinement, &bank, 12, comparison).unwrap();
+        for request in &batch.requests {
+            assert!(!request.generation.as_ref().unwrap().release.released());
+        }
+        let counts = batch.counts(4);
+        assert_eq!(counts.obligations, 8);
+        assert_eq!(counts.absent, 0);
+        assert_eq!(counts.coverage, 8);
+        if comparison.reading != Reading::Every {
+            assert_eq!(counts.attempted, 8);
+        }
+        if comparison.reading == Reading::Decisions {
+            assert_eq!(counts.held, 8);
+            assert_eq!(counts.post_error, 0);
+        }
+    }
+}
+
+/// **The guards hold symmetrically on every arm** (the pin §13.4): on the joint field's two requests,
+/// every arm's move either refuses by type (an unresolved member with its count and no trial, a
+/// joint slope not negative, every trial refused by a named guard) or adopts a successor whose
+/// fixed-mask composition is strictly lower by disjoint enclosures (its re-read at the successor on
+/// the incumbent's sections), whose first order is certified negative on the carried move, whose own
+/// release certifies every lock, and whose entries stay within the bound; the ladder starts at its
+/// stated start; the port's slope alone is only a receipt (equal to the joint's where the modulus
+/// does not move); every station obligation is covered; the persistence reads are consistent. The
+/// candidate arm (the lock face at the decisions) is adopted on this instance.
+#[test]
+fn the_guards_hold_symmetrically_on_every_arm() {
+    let field = joint();
+    let theta = generic(&field, 94);
+    let refinement = Refinement::declare(&field, 0, 2, 1, 4, 2).unwrap();
+    let bank = joint_bank();
+    let requests =
+        executed_requests(&field, &[(95, [0, 1, 2, 1]), (96, [1, 1, 0, 2])], Context::Open);
+    for comparison in arms() {
+        let moved =
+            executed_move(&field, &theta, &requests, &refinement, &bank, 12, comparison).unwrap();
+        assert_eq!(moved.comparison, comparison);
+        assert_eq!(moved.sites.len(), moved.terms);
+        assert_eq!(moved.counts.absent, 0);
+        assert_eq!(moved.counts.coverage, 8);
+        if comparison.reading != Reading::Every {
+            assert_eq!(moved.counts.attempted, 8);
+        }
+        let p = moved.persistence;
+        assert_eq!(p.stay + p.fall, p.reread);
+        assert!(p.reread <= p.solved && p.solved <= p.locks);
+        for trial in &moved.trials[..moved.trials.len().saturating_sub(1)] {
+            assert!(trial.refusal.is_some());
+        }
+        if moved.modulus_unit.as_ref().is_some_and(Zero::is_zero) {
+            assert_eq!(moved.port_slope, moved.slope);
+        }
+        match (&moved.adopted, &moved.refusal) {
+            (Some((successor, step)), None) => {
+                assert_eq!(moved.unresolved_branches, 0);
+                assert!(moved.slope.as_ref().unwrap().upper.is_negative());
+                let (start, _) = moved.start.clone().unwrap();
+                assert_eq!(moved.trials[0].step, start);
+                let last = moved.trials.last().unwrap();
+                assert!(last.refusal.is_none());
+                assert!(last.value.as_ref().unwrap().upper < moved.before.value.lower);
+                assert!(last.first_order.as_ref().unwrap().upper.is_negative());
+                assert!(step.largest <= crate::hnn::executed::entry_bound());
+                let own = last.after.as_ref().unwrap();
+                assert!(own
+                    .requests
+                    .iter()
+                    .all(|r| r.generation.as_ref().unwrap().uncertified.is_none()));
+                // The mask's value at the successor is the incumbent's sections re-read there.
+                let (value, _, reread_own, _) = mask_reread(
+                    &field,
+                    successor,
+                    &requests,
+                    &refinement,
+                    &bank,
+                    12,
+                    comparison,
+                    &mask_of(&moved.before),
+                )
+                .unwrap();
+                assert_eq!(Some(&value), last.value.as_ref());
+                assert_eq!(reread_own.as_ref(), Some(own));
+                let change = last.change.as_ref().unwrap();
+                assert_eq!(change.lower, &own.value.lower - &value.upper);
+                assert_eq!(successor.commit(), theta.commit() + 1);
+            }
+            (None, Some(MoveRefusal::Unresolved(n))) => {
+                assert_eq!(*n, moved.unresolved_branches);
+                assert!(*n > 0 && moved.trials.is_empty());
+            }
+            (None, Some(MoveRefusal::NoDescent(bound))) => {
+                assert_eq!(Some(bound), moved.slope.as_ref());
+                assert!(!bound.upper.is_negative());
+                assert!(moved.trials.is_empty());
+            }
+            (None, Some(MoveRefusal::Nothing)) => assert_eq!(moved.contributions, 0),
+            (None, Some(_)) => assert!(moved.trials.iter().all(|t| t.refusal.is_some())),
+            other => panic!("a move adopts or refuses, never both: {other:?}"),
+        }
+        if comparison == Comparison::LOCK_DECISIONS {
+            assert!(moved.adopted.is_some(), "the candidate arm: {:?}", moved.refusal);
+        }
+    }
+}
+
+// -------------------------------------------------------------------------------------------
+// the continuing state
+
+/// Requests on the joint field whose span with the stations fills one turn (`n = 2` cells), so a
+/// modulus below one reads them.
+fn short_requests(field: &Field, cases: &[(u64, [usize; 4])]) -> Vec<Request> {
+    cases
+        .iter()
+        .map(|&(seed, targets)| {
+            let (current, moment) = moment(field, seed, 2);
+            Request {
+                current,
+                moment,
+                targets: targets.to_vec(),
+                context: Context::Open,
+            }
+        })
+        .collect()
+}
+
+/// **A restored checkpoint continues exactly, over successive receptions** (the pin §13.6): after one
+/// adopted move of the candidate arm, the complete continuing state written as text and restored
+/// onto the declared opening is the continued constitution exactly (the port, the carried Gram, the
+/// chart, the remainders, the modulus, the clock, the commit and the storage product); then over
+/// three successive receptions the restored and the continued constitutions return the same
+/// observations (the comparisons), the same pullbacks (the returns at `E`) and deposits (every
+/// trial, its first order, its re-reads and its carried source step), the same clock and section
+/// behaviour, and the same subsequent state. A remount of `E` and `ρ` alone is partial: its text has
+/// no state and is refused as a continuing state, its constitution loses the Gram, and its next
+/// move deposits otherwise while it reads the same release.
+#[test]
+fn a_restored_checkpoint_continues_exactly_over_successive_receptions() {
+    let field = joint();
+    let opening = generic(&field, 94).with_transport(0, rat(3, 4)).unwrap();
+    let refinement = Refinement::declare(&field, 0, 2, 1, 4, 2).unwrap();
+    let bank = joint_bank();
+    let comparison = Comparison::LOCK_DECISIONS;
+    let receptions = [
+        short_requests(&field, &[(95, [0, 1, 2, 1]), (96, [1, 1, 0, 2]), (97, [2, 0, 1, 1])]),
+        short_requests(&field, &[(98, [1, 0, 2, 0]), (99, [0, 2, 1, 1]), (100, [2, 2, 0, 1])]),
+        short_requests(&field, &[(101, [0, 0, 1, 2]), (102, [1, 2, 2, 0]), (103, [2, 1, 0, 0])]),
+        short_requests(&field, &[(104, [1, 1, 1, 0]), (105, [0, 1, 0, 2]), (106, [2, 0, 2, 1])]),
+    ];
+    let step = |theta: &Constitution, requests: &[Request]| {
+        executed_move(&field, theta, requests, &refinement, &bank, 12, comparison).unwrap()
+    };
+    let first = step(&opening, &receptions[0]);
+    let (continued, _) = first.adopted.clone().expect("the first reception adopts a move");
+    let locus = Locus::SourcePort(0);
+    assert!(continued.clock(locus) >= 1);
+    let text = continued.continuing_state(0).unwrap().to_text();
+    let state = ContinuingState::from_text(&text).unwrap();
+    assert_eq!(state, continued.continuing_state(0).unwrap());
+    let restored = opening.clone().continued(&state).unwrap();
+    assert_eq!(restored, continued);
+    let (mut a, mut b) = (continued.clone(), restored);
+    let mut adopted = 0;
+    for requests in &receptions[1..] {
+        let (ma, mb) = (step(&a, requests), step(&b, requests));
+        assert_eq!(ma.before, mb.before);
+        assert_eq!(
+            proposal_returns(&field, &a, requests, &refinement, &bank, 12, comparison).unwrap(),
+            proposal_returns(&field, &b, requests, &refinement, &bank, 12, comparison).unwrap()
+        );
+        assert_eq!((ma.slope.clone(), ma.start.clone()), (mb.slope.clone(), mb.start.clone()));
+        assert_eq!(ma.trials.len(), mb.trials.len());
+        for (ta, tb) in ma.trials.iter().zip(&mb.trials) {
+            assert_eq!(
+                (&ta.step, &ta.modulus, &ta.first_order, &ta.value, &ta.after, &ta.refusal),
+                (&tb.step, &tb.modulus, &tb.first_order, &tb.value, &tb.after, &tb.refusal)
+            );
+            assert_eq!((&ta.terms, &ta.source), (&tb.terms, &tb.source));
+        }
+        assert_eq!(ma.refusal, mb.refusal);
+        assert_eq!(ma.adopted, mb.adopted);
+        if let (Some((sa, _)), Some((sb, _))) = (ma.adopted, mb.adopted) {
+            assert_eq!(sa.clock(locus), sb.clock(locus));
+            adopted += 1;
+            a = sa;
+            b = sb;
+        }
+        assert_eq!(a, b);
+        let state = a.continuing_state(0).unwrap();
+        assert_eq!(ContinuingState::from_text(&state.to_text()).unwrap(), state);
+    }
+    assert!(adopted >= 1, "a later reception adopts a move");
+    // The partial remount: E and ρ alone.
+    let rows = continued.source_port(0).unwrap().rows();
+    let partial_text: String = text
+        .lines()
+        .take(rows + 2)
+        .map(|line| format!("{line}\n"))
+        .collect();
+    assert!(matches!(
+        ContinuingState::from_text(&partial_text),
+        Err(HnnError::ContinuingState { .. })
+    ));
+    let partial = opening
+        .clone()
+        .with_ports(0, None, Some(continued.source_port(0).unwrap().clone()), None)
+        .unwrap()
+        .with_transport(0, continued.transport(0))
+        .unwrap();
+    assert_ne!(partial, continued);
+    assert_ne!(
+        partial.source_law(0).unwrap().gram(),
+        continued.source_law(0).unwrap().gram()
+    );
+    let (from_partial, from_continued) = (step(&partial, &receptions[1]), step(&continued, &receptions[1]));
+    assert_eq!(from_partial.before, from_continued.before);
+    if let (Some((p, _)), Some((c, _))) = (&from_partial.adopted, &from_continued.adopted) {
+        assert_ne!(p, c);
+    }
+    // A checkpoint is refused where another locus has moved or onto a constitution that is not the
+    // declared opening.
+    assert!(matches!(
+        continued.clone().continued(&state_of(&continued)),
+        Err(HnnError::ContinuingState { .. })
+    ));
+}
+
+fn state_of(theta: &Constitution) -> ContinuingState {
+    theta.continuing_state(0).unwrap()
+}

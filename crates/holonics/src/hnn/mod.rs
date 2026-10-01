@@ -389,6 +389,8 @@ pub enum HnnError {
     StaleDeposit { staged: u64, published: u64 },
     #[error("the locus {locus:?} is released; no deposit reaches it")]
     ReleasedLocus { locus: Locus },
+    #[error("the continuing state refused: {what}")]
+    ContinuingState { what: &'static str },
     #[error("the admitted family adds receivers on rings {receivers:?} to the previous boundary's")]
     AdmittedGrowth { receivers: Vec<usize> },
     #[error("the resident holds no open handle {handle:?}")]

@@ -1,0 +1,2 @@
+executed train: arm lock-dec (LockFace read at Decisions) on order2 at seed 2026093062: 1 moves of 8 requests; the opening's transport modulus 102837/131072, its source clock 0; the bank p = 5/8, grain 2^(-16)
+timeout 1800 target/release/examples/hnn_prediction executed train lock-dec    5838.28s user 48.70s system 327% cpu 30:00.13 total

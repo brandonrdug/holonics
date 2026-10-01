@@ -656,3 +656,75 @@ asked for the amendments below. Each one governs over any conflicting statement 
      phase.
    - Projection: the full pipeline is 5 h 33 m to 6 h 40 m, with an 8 h 27 m guard span; that is
      not a six-hour ceiling. Each gate is projected and reported on its own.
+
+## 14. Gate A's addendum: the build's inferences, and the witness's procedure and budget, pinned before its run [definition; agent-inferred]
+
+Written after the build (`c48c864f`, `d8cc9298`) and its tests, before the witness runs; the gate-A
+record states the build and its receipts. It governs gate A over §6.3; gates B and C keep their
+own projections, to be remade from gate A's measured move.
+
+### 14.1 Choices the build made from the mathematics
+
+- **The descent account is read on the fixed incumbent mask for every arm** (§13.1, §13.4). The
+  mask is the incumbent's terms' sections under the arm's own reading (the decisions; every
+  refinement; the teacher-forced sections), and the successor's re-read of exactly those sections
+  carries the strict decrease. The hinge at every refinement therefore re-reads the incumbent's
+  refinements at the successor, where 1a read the successor's own; 1a's runs stand under the old
+  guards.
+- **One ladder start for both compositions** (§2.6, §13.5): for the hinge `X = F`, and the entry
+  scale applies where `F⁻ = 0` (1a's ladder started at a zero step there and refused). A hinge term
+  whose `f⁺` is exactly zero is in the hinge's certificate, hinged at zero (1a's proposal skipped
+  it): the same repair as §13.4's, on a case of measure zero.
+- **A target whose lower end is not positive** refuses, typed: at the incumbent the comparison's
+  `HnnError::NonpositiveDeclaration`, at a successor the trial (`TrialRefusal::Unsupported`). It is
+  never solved and never divided by.
+- **Under the decisions and the teacher-forced readings** the release reads the joint growths
+  alone, and each term's five candidates are read with their covectors at its section (forty a
+  request); under every refinement the release reads every candidate's covector, as 1a did. The
+  readings are one function; only the covector work differs, and each move prints its readings.
+- **The joint direction's modulus part is enclosed** at 128 significant bits (`JOINT_BITS`): the
+  exact product cost minutes a batch (the build's second commit states the measurement); the
+  certificate stays an enclosure with its rounding charged.
+- **"The founded transport"** (§13.3) is read as the opening's modulus `ρ₀` carried by the law: the
+  witness's `ρ` moves only by the candidate's own least-squares step within its passive bound, on
+  the lattice, and is reported.
+
+### 14.2 The witness's procedure
+
+- **The development set** (§6.2's development seeds; never a training, validation or final seed):
+  order-2, seed `2_026_093_061`, 8 requests (one epoch's size), 64 station obligations. Order-2
+  only: it is the acceptance's terrain; the alternation and the line are gate C's regressions. The
+  timing move read seed `2_026_093_062`, so nothing of `061` was read before this pin.
+- **The procedure** (`hnn_prediction -- executed witness order2 2026093061 8 16 7907328 <out>`):
+  from the founded opening (`ρ₀ = 102837/131072`), the candidate's own certified move (the lock face
+  at the decisions, every commit guard, the entry bound `2³` on the lattice, the declared bank) is
+  applied to the same 8 requests each epoch. At every constitution read, the release's actual
+  executed contexts give each station's decision term, and the strict rational test
+  `1 + Σ_(x≠t) U_x < L_t` is read at each. It stops at the first constitution where the test holds
+  at all 64 (a witness), at a refused move (the batch is fixed: a refused move leaves the
+  constitution and the next reading unchanged, so it would repeat exactly), when the moves are
+  spent (the last successor read once more), or at the deadline (checked before each move). The
+  best constitution read (the most stations solved, the earliest among equals) is written as its
+  complete continuing state and printed whole, every decision term with its enclosures.
+- **The move budget is the pinned passage's**: 16 moves, the certified moves one gate-B arm makes
+  on its whole training passage (§6.1), here all on one epoch's requests.
+- **No search beyond it**: no restart, no other opening, no other seed, no relaxed test, no larger
+  budget, no second run. A failure reports "no witness found within this procedure and budget" with
+  the best solved count and how it was reached; it is not mathematical infeasibility, and 1b stops
+  at gate A with the failure as the next loop's subject.
+
+### 14.3 The budget, projected from measured times
+
+Measured on this host (24 hardware threads, a game running beside the runs), alone: the
+candidate's development move on seed `2_026_093_062`, 8 requests, took 164,736 ms with two trials
+(the first refused `NotBelow`, the second adopted), at 1,204 of 2,400 percent, resident
+196,288,512 bytes at its peak. On two of its requests, profiled, the part before the ladder took
+30,363 ms and one trial 31,716 ms, nearly equal. A move is that part `A` plus one to eight trials
+`B`; with `A = B` and `A + 2B = 164,736`, `A = B = 54,912`, and a move lies in
+`[109,824, 494,208]` ms.
+
+| Run | Projection (ms) | Deadline, checked before each move (ms) | Outer guard (ms) | Memory |
+|---|---|---|---|---|
+| the witness, 16 moves at most, alone on 24 threads | 1,757,184–7,907,328 (near 16 · 164,736 = 2,635,776 at two trials a move) | 7,907,328 | 8,401,536 (the deadline and one move's upper end) | under 1 GB |
+
+A run past its outer guard is reported incomplete and not rerun; the budget is never raised.

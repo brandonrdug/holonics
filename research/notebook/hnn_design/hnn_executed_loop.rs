@@ -8,7 +8,20 @@
 //! cargo run --release -p holonics --example hnn_prediction -- executed evaluate <terrain> <seed> <count> <out> opening <label=E>…
 //! cargo run --release -p holonics --example hnn_prediction -- executed spread <terrain> <seed> <count> opening <label=E>…
 //! cargo run --release -p holonics --example hnn_prediction -- executed counts <terrain> <training seed> <count> <validation seed> <count> <out>
+//! cargo run --release -p holonics --example hnn_prediction -- executed witness <terrain> <seed> <count> <moves> <deadline ms> <out>
+//! cargo run --release -p holonics --example hnn_prediction -- executed causal <terrain> <seed> <count> <label[=E]>…
 //! ```
+//!
+//! - **Step 1b** (the
+//!   [pin](../../records/2026-09-30_STEP_1B_THE_CANDIDATE_COMPARISON_PINNED_BEFORE_ITS_RUNS.md) §13):
+//!   `executed train`'s arms are `<composition>-<reading>` (`lock-dec` the candidate, `lock-all`,
+//!   `hinge-dec`, `hinge-all` 1a's law, `lock-tf` the teacher-forced diagnostic; `@ρ` or
+//!   `~<checkpoint>` an opening), every arm on the same epochs under the same guards; each move
+//!   prints D1 and D2 with the fixed mask's descent account beside the successor's own release, the
+//!   terms' counts, the persistence reads, I4 at the release's locks and I7's ranks; checkpoints
+//!   carry the complete continuing state (`Constitution::continuing_state`), and a remount of `E`
+//!   and `ρ` alone is labelled partial. `executed witness` is gate A's constrained feasibility
+//!   witness; `executed causal` is the causal reading (I6).
 //!
 //! - **The two counts** (U6 step 1, loop 1a; the
 //!   [pin](../../records/2026-09-30_THE_TWO_COUNTS_PINNED_BEFORE_ITS_RUNS.md)): `executed counts`
@@ -40,15 +53,55 @@
 //!   against the exact change of the readings).
 
 use super::*;
+use holonics::hnn::constitution::ContinuingState;
 use holonics::hnn::executed::{
-    BatchComparison, Context, ExecutedMove, Predicate, Request, SlopeSplit, executed_move,
-    pairing_receipt,
+    BatchComparison, Comparison, Composition, Context, Excess, ExecutedMove, Predicate, Reading,
+    Request, SlopeSplit, compare, executed_move, pairing_receipt,
 };
 use holonics::hnn::prediction::BankPlacement;
 use holonics::hnn::ring::{MemberCovector, turn};
 use num_bigint::{BigInt, BigUint};
 use num_traits::One;
 use std::collections::BTreeSet;
+
+/// [definition; agent-inferred, step 1b's pin §13.8] **An arm's declared comparison** by name:
+/// `<composition>-<reading>`, the composition `hinge` (1a's `F`) or `lock` (the lock face `L`), the
+/// reading `all` (every refinement), `dec` (the decisions), `tf` (teacher-forced left to right) or
+/// `partition` (Stage 2's partitions, read with the hinge or the face at their one refinement).
+/// Gate B's arms: `lock-dec` (the candidate), `lock-all`, `hinge-dec`, `hinge-all` (1a's law) and
+/// `lock-tf` (the diagnostic), each from the same opening on the same epochs.
+pub(super) fn arm_comparison(arm: &str) -> (Comparison, bool) {
+    let (composition, reading) = arm
+        .split_once('-')
+        .expect("an arm: <hinge|lock>-<all|dec|tf|partition>");
+    let composition = match composition {
+        "hinge" => Composition::Hinge,
+        "lock" => Composition::LockFace,
+        _ => panic!("a composition: hinge | lock"),
+    };
+    let (reading, partition) = match reading {
+        "all" => (Reading::Every, false),
+        "dec" => (Reading::Decisions, false),
+        "tf" => (Reading::TeacherForced, false),
+        "partition" => (Reading::Every, true),
+        _ => panic!("a reading: all | dec | tf | partition"),
+    };
+    (
+        Comparison {
+            composition,
+            reading,
+        },
+        partition,
+    )
+}
+
+/// The composition's symbol in the receipts: `F` the hinge, `L` the lock face.
+fn symbol(comparison: &Comparison) -> &'static str {
+    match comparison.composition {
+        Composition::Hinge => "F",
+        Composition::LockFace => "L",
+    }
+}
 
 /// An enclosure read at the grain `1/g`: the cells `[⌊g·lower⌋/g, (⌊g·upper⌋ + 1)/g)` it lies in.
 pub(super) fn cell(interval: &ExactInterval, grain: i64) -> String {
@@ -69,7 +122,8 @@ fn predicate(p: Predicate) -> &'static str {
 /// Every request's release and predicates, whole.
 pub(super) fn print_batch(label: &str, batch: &BatchComparison, targets: &[Vec<usize>]) {
     println!(
-        "  {label}: F ∈ {} nats over {} readings; class and threshold hold at {} of {} compared stations",
+        "  {label}: {} ∈ {} nats over {} readings; class and threshold hold at {} of {} compared stations",
+        symbol(&batch.comparison),
         cell(&batch.value, 1 << 16),
         batch.readings,
         batch.holding().0,
@@ -111,7 +165,7 @@ pub(super) fn print_batch(label: &str, batch: &BatchComparison, targets: &[Vec<u
             let stations: Vec<String> = request
                 .stations
                 .iter()
-                .filter(|s| s.context == order.context)
+                .filter(|s| s.context == Some(order.context))
                 .map(|s| {
                     format!(
                         "{}:{}→{} class {} threshold {} f ∈ {}",
@@ -179,25 +233,27 @@ pub(super) fn terrain_pairs(
     }
 }
 
-/// The source port as rows of rationals (`E rows cols`, then its realified rows).
-fn write_port(theta: &Constitution, ring: usize) -> String {
-    let port = theta.source_port(ring).expect("E");
-    let mut s = format!("E {} {}\n", port.rows(), port.columns());
-    for i in 0..port.rows() {
-        let row: Vec<String> = (0..port.columns())
-            .map(|j| port.get(i, j).expect("in range").to_string())
-            .collect();
-        s.push_str(&row.join(" "));
-        s.push('\n');
-    }
-    s.push_str(&format!("rho {}\n", theta.transport(ring)));
-    s
+/// [definition; agent-inferred, step 1b's pin §13.6] **A checkpoint: the complete continuing state**
+/// (`Constitution::continuing_state`): `E rows cols`, its rows and `rho ρ` first (the form a partial
+/// remount reads), then the normal law's carried Gram and chart, its carried remainders, the
+/// locus's clock, the commit and the storage product.
+fn write_state(theta: &Constitution, ring: usize) -> String {
+    theta
+        .continuing_state(ring)
+        .expect("the executed move moves the source port alone")
+        .to_text()
 }
 
-/// A trained constitution read back from [`write_port`]'s text: the source port `E` and, when the
+/// **A partial remount**: a written constitution read back as its source port `E` and, when the
 /// file carries one, the source navigator's transport modulus `ρ` (the passage law of
-/// September 30); the declared opening elsewhere.
+/// September 30), on the declared opening; the normal law rebuilt from its prior (its carried Gram,
+/// chart, remainders and clock lost). Exact for every reading of the release (which reads `E` and
+/// `ρ` alone), partial for a continuing deposit: labelled so on stderr wherever one is read (stdout
+/// is left to the readings, so the baseline's replay listing is unchanged).
 pub(super) fn trained(opening: &Constitution, ring: usize, path: &str) -> Constitution {
+    eprintln!(
+        "remount {path}: partial (E and rho alone; the normal law's Gram, chart, remainders and clock are the prior's)"
+    );
     let theta = opening
         .clone()
         .with_ports(ring, None, Some(read_port(path)), None)
@@ -206,6 +262,15 @@ pub(super) fn trained(opening: &Constitution, ring: usize, path: &str) -> Consti
         Some(modulus) => theta.with_transport(ring, modulus).expect("the trained ρ"),
         None => theta,
     }
+}
+
+/// **A full remount**: a checkpoint's complete continuing state restored onto the declared opening
+/// (`Constitution::continued`); refused where the file holds `E` and `ρ` alone.
+pub(super) fn remounted(opening: &Constitution, path: &str) -> Constitution {
+    #[allow(clippy::disallowed_methods)]
+    let text = std::fs::read_to_string(path).expect("read the checkpoint");
+    let state = ContinuingState::from_text(&text).expect("a complete continuing state");
+    opening.clone().continued(&state).expect("the checkpoint continues the declared opening")
 }
 
 /// The transport modulus line `rho <ρ>` of a written port, if any.
@@ -243,13 +308,13 @@ fn read_port(path: &str) -> ExactRatMatrix {
 }
 
 /// **The modulus's slope split by term kind**, printed (`hnn::executed::SlopeSplit`): the terms led
-/// by the threshold and by a class rival with their `Σ (f)_+`, `γ_ρ` of the leading contributions
-/// by kind, and every term's target part and class rival part read alone (the class branch at every
-/// term is their sum).
+/// by the threshold and by a class rival with their terms' sum (the hinge's `Σ (f)_+`; every
+/// lock-face term counted class-led with its `ℓ`), `γ_ρ` of the leading contributions by kind, and
+/// every term's target part and rival part read alone (their sum is the slope).
 pub(super) fn split_line(split: &SlopeSplit) -> String {
     let point = |x: &Rat| cell(&ExactInterval::point(x.clone()), 1 << 12);
     format!(
-        "; split: threshold-led {} terms (Σ (f)_+ {}, γ {}), class-led {} terms (Σ (f)_+ {}, γ {}); every term read alone: the target's part {}, the class rival's part {}, the class branch {}",
+        "; split: threshold-led {} terms (their terms Σ {}, γ {}), class-led {} terms (their terms Σ {}, γ {}); every term read alone: the target's part {}, the class rival's part {}, the class branch {}",
         split.threshold_led,
         cell(&split.threshold_value, 1 << 12),
         point(&split.led_threshold),
@@ -303,9 +368,17 @@ pub(super) fn slopes(terrain: &str, seed: u64, count: usize, arms: &[String]) {
         if let Some(modulus) = modulus {
             theta = theta.with_transport(ring, modulus).expect("a passive modulus on the lattice");
         }
-        let (batch, split) =
-            modulus_slopes(&engine.field, &theta, &requests, &engine.refinement, &bank, BANK_GRAIN)
-                .expect("the slopes");
+        // 1a's comparison, the hinge at every refinement (the diagnostic's own).
+        let (batch, split) = modulus_slopes(
+            &engine.field,
+            &theta,
+            &requests,
+            &engine.refinement,
+            &bank,
+            BANK_GRAIN,
+            Comparison::HINGE_EVERY,
+        )
+        .expect("the slopes");
         let (whole, right, released) = batch.sections(&targets);
         let gamma = &split.led_threshold + &split.led_class;
         println!(
@@ -334,14 +407,16 @@ pub(super) fn founded_opening(engine: &Engine) -> Constitution {
 /// The partitions' seed of Stage 2's partition arms (the readout's `mask` law), pinned.
 const STAGE_TWO_MASK_SEED: u64 = 2_026_093_004;
 
-/// **Stage 2: one arm's training** (`executed train <arm> <terrain> <seed> <batch> <moves>
-/// <deadline ms> <out>`). The arm is the executed comparison (`executed`) crossed with the
-/// contexts (`open`: the machine's own trajectory; `partition`: the readout's partitions at
-/// [`STAGE_TWO_MASK_SEED`]). Every arm starts from the declared opening, reads the same requests in
-/// the same batches, and moves by the one certified step's ladder; the moves are the work bound,
-/// the deadline a guard (reaching it is reported incomplete). The trained `E` is written to `out`.
-/// Each move also prints the port's first-order slope and the modulus's slope `γ_ρ` (added after
-/// the station-framed placement's pinned runs, to read why the modulus stays at one).
+/// **One arm's training** (`executed train <arm> <terrain> <seed> <batch> <moves> <deadline ms>
+/// <out>`; Stage 2, and step 1b's gate-B arms). The arm is `<composition>-<reading>`
+/// ([`arm_comparison`]) with its opening: `<arm>@ρ` the declared opening at the modulus `ρ` (a
+/// development read), `<arm>~<checkpoint>` a complete continuing state restored onto the declared
+/// opening (a full remount), the founded opening otherwise. Every arm reads the same requests in the
+/// same epochs under the same ladder depth and guards (matched observation and move budgets; each
+/// move's readings, its trials' and its wall time printed, so any extra computation is read). The
+/// moves are the work bound, the deadline a guard (reaching it is reported incomplete). The complete
+/// continuing state is written to `out` after every adopted move, and at the checkpoints after moves
+/// 1, 2, 4, 8 and 16 (`<out>.m<k>`).
 #[allow(clippy::too_many_arguments)]
 pub(super) fn train(
     arm: &str,
@@ -357,24 +432,25 @@ pub(super) fn train(
     let declared = order_declared();
     let engine = Engine::new(declared);
     let bank = bank_of(declared.period, &bank_strength());
-    // An arm may carry its opening's transport modulus (`executed-open@ρ`, a development read).
-    let (arm_name, opening_modulus) = match arm.split_once('@') {
-        Some((name, modulus)) => (name, Some(modulus.parse::<Rat>().expect("a rational ρ"))),
-        None => (arm, None),
+    let ring = engine.refinement.ring();
+    let (arm_name, opening) = match (arm.split_once('~'), arm.split_once('@')) {
+        (Some((name, path)), _) => (name, Some(Err(path))),
+        (None, Some((name, modulus))) => {
+            (name, Some(Ok(modulus.parse::<Rat>().expect("a rational ρ"))))
+        }
+        (None, None) => (arm, None),
     };
-    let (comparison, contexts) =
-        arm_name.split_once('-').expect("an arm: executed-open | executed-partition");
-    assert_eq!(comparison, "executed", "the comparison: executed");
+    let (comparison, partition) = arm_comparison(arm_name);
     let pairs = terrain_pairs(terrain, &declared, seed, batch * moves);
     let mut masks = Draw::new(STAGE_TWO_MASK_SEED);
     let requests: Vec<Request> = pairs
         .iter()
         .map(|(request, target)| {
             let (current, moment) = ingest(&engine.field, request);
-            let context = match contexts {
-                "open" => Context::Open,
-                "partition" => Context::Partition(mask(&mut masks, declared.stations)),
-                _ => panic!("contexts: open | partition"),
+            let context = if partition {
+                Context::Partition(mask(&mut masks, declared.stations))
+            } else {
+                Context::Open
             };
             Request {
                 current,
@@ -384,17 +460,22 @@ pub(super) fn train(
             }
         })
         .collect();
-    let mut theta = match &opening_modulus {
-        Some(modulus) => engine
+    let mut theta = match &opening {
+        Some(Ok(modulus)) => engine
             .theta
             .clone()
-            .with_transport(engine.refinement.ring(), modulus.clone())
+            .with_transport(ring, modulus.clone())
             .expect("a passive modulus on the lattice"),
+        Some(Err(path)) => remounted(&engine.theta, path),
         None => founded_opening(&engine),
     };
     println!(
-        "executed train: arm {arm} on {terrain} at seed {seed}: {moves} moves of {batch} requests; the declared opening, its transport modulus {}; the bank p = {}, grain 2^(-{BANK_GRAIN})",
-        theta.transport(engine.refinement.ring()),
+        "executed train: arm {arm} ({:?} read at {:?}{}) on {terrain} at seed {seed}: {moves} moves of {batch} requests; the opening's transport modulus {}, its source clock {}; the bank p = {}, grain 2^(-{BANK_GRAIN})",
+        comparison.composition,
+        comparison.reading,
+        if partition { ", on partitions" } else { "" },
+        theta.transport(ring),
+        theta.clock(holonics::hnn::constitution::Locus::SourcePort(ring)),
         bank_strength()
     );
     // The two counts' instrumentation (the pin §5), read from the terrain's pairs alone and only
@@ -410,41 +491,47 @@ pub(super) fn train(
             break;
         }
         let started = Instant::now();
-        let moved = executed_move(&engine.field, &theta, chunk, &engine.refinement, &bank, BANK_GRAIN)
-            .expect("the move");
-        readings += moved.before.readings;
-        // The two slopes the move reads (a diagnostic added after the station-framed placement's
-        // pinned runs): the port's unit move's first order, and the modulus's `γ_ρ` (its sign
-        // decides whether the modulus may leave one: none upward from `ρ = 1`).
+        let moved = executed_move(
+            &engine.field,
+            &theta,
+            chunk,
+            &engine.refinement,
+            &bank,
+            BANK_GRAIN,
+            comparison,
+        )
+        .expect("the move");
+        let trial_readings: usize = moved.trials.iter().map(|t| t.readings).sum();
+        readings += moved.before.readings + trial_readings;
+        // The slopes the move reads: the joint unit move's first order (the guard), the port's part
+        // alone (a receipt), the excess's piecewise derivative (the ladder's start), and the
+        // modulus's `γ_ρ` (none upward from `ρ = 1`).
+        let point = |x: &Option<Rat>, g: i64| {
+            x.as_ref()
+                .map_or_else(|| "none".to_string(), |v| cell(&ExactInterval::point(v.clone()), g))
+        };
+        let interval = |x: &Option<ExactInterval>| {
+            x.as_ref().map_or_else(|| "none".to_string(), |v| cell(v, 1 << 12))
+        };
         let slopes = format!(
-            "; the port's first-order slope {}; the modulus's slope γ_ρ {}{}",
-            moved.slope.as_ref().map_or_else(|| "none".to_string(), |s| cell(s, 1 << 12)),
-            moved
-                .modulus_slope
-                .as_ref()
-                .map_or_else(|| "none".to_string(), |g| cell(&ExactInterval::point(g.clone()), 1 << 12)),
-            moved.split.as_ref().map_or_else(String::new, split_line)
-        ) + &format!(
-            "; the modulus's curvature G_ρ {}, its least-squares unit move {}",
-            moved
-                .modulus_curvature
-                .as_ref()
-                .map_or_else(|| "none".to_string(), |g| cell(&ExactInterval::point(g.clone()), 1 << 12)),
-            moved
-                .modulus_unit
-                .as_ref()
-                .map_or_else(|| "none".to_string(), |u| cell(&ExactInterval::point(u.clone()), 1 << 16))
+            "; the joint unit slope {}, the port's alone {}, the excess's {}; the modulus's slope γ_ρ {}{}; the modulus's curvature G_ρ {}, its least-squares unit move {}",
+            interval(&moved.slope),
+            interval(&moved.port_slope),
+            interval(&moved.excess_slope),
+            point(&moved.modulus_slope, 1 << 12),
+            moved.split.as_ref().map_or_else(String::new, split_line),
+            point(&moved.modulus_curvature, 1 << 12),
+            point(&moved.modulus_unit, 1 << 16)
         );
-        let sections = if contexts == "open" {
+        let sections = if partition {
+            String::new()
+        } else {
             let targets: Vec<Vec<usize>> = chunk.iter().map(|r| r.targets.clone()).collect();
             let (whole, right, released) = moved.before.sections(&targets);
             format!("; batch released {released}, whole {whole}, stations right {right}")
-        } else {
-            String::new()
         };
-        // D1 and D2 (the pin §5), read from the move's receipt at `θ` before it is replaced.
+        // D1 and D2 (the pin §5; step 1b's §9), read from the move's receipt at `θ`.
         let targets: Vec<Vec<usize>> = chunk.iter().map(|r| r.targets.clone()).collect();
-        let ring = engine.refinement.ring();
         let first = index * batch;
         print_d1(index, &moved, &theta, ring, &targets, information.get(index).map_or("", String::as_str));
         let carried = moved
@@ -458,35 +545,41 @@ pub(super) fn train(
             &constant[first..first + chunk.len()],
             carried.and_then(|t| t.terms.as_ref()),
         );
+        print_ranks(index, &moved.before, declared.alphabet);
         match &moved.adopted {
             Some((successor, step)) => {
                 adopted += 1;
                 let last = moved.trials.last().expect("the adopted trial");
                 println!(
-                    "  move {index}: adopted at step {} (trial {} of the ladder); value {} → {}; E's largest entry {}; transport modulus {} → {}{sections}; {} ms",
+                    "  move {index}: adopted at step {} (trial {} of the ladder); {} {} → {} on the fixed mask (the successor's own release {}); E's largest entry {}; transport modulus {} → {}{sections}; readings at θ {}, in the trials {trial_readings}; {} ms",
                     step.step,
                     moved.trials.len(),
+                    symbol(&comparison),
                     cell(&moved.before.value, 1 << 12),
                     last.value.as_ref().map_or_else(String::new, |v| cell(v, 1 << 12)),
+                    last.after.as_ref().map_or_else(String::new, |a| cell(&a.value, 1 << 12)),
                     step.largest,
-                    theta.transport(engine.refinement.ring()),
-                    successor.transport(engine.refinement.ring()),
+                    theta.transport(ring),
+                    successor.transport(ring),
+                    moved.before.readings,
                     started.elapsed().as_millis()
                 );
                 println!("    move {index}{slopes}");
                 theta = successor.clone();
-                // The adopted constitution written at every move, so a run stopped by its process
-                // guard leaves its last certified successor (a checkpoint, not a law).
+                // The adopted constitution's complete continuing state written at every move, so
+                // a run stopped by its process guard leaves its last certified successor.
                 #[allow(clippy::disallowed_methods)]
-                std::fs::write(out, write_port(&theta, engine.refinement.ring())).expect("write E");
+                std::fs::write(out, write_state(&theta, ring)).expect("write the state");
             }
             None => {
                 refused += 1;
                 println!(
-                    "  move {index}: refused {:?} after {} trials; value {}{sections}; {} ms",
+                    "  move {index}: refused {:?} after {} trials; {} {}{sections}; readings at θ {}, in the trials {trial_readings}; {} ms",
                     moved.refusal,
                     moved.trials.len(),
+                    symbol(&comparison),
                     cell(&moved.before.value, 1 << 12),
+                    moved.before.readings,
                     started.elapsed().as_millis()
                 );
                 println!("    move {index}{slopes}");
@@ -496,14 +589,14 @@ pub(super) fn train(
         if CHECKPOINTS.contains(&(index + 1)) {
             let path = format!("{out}.m{}", index + 1);
             #[allow(clippy::disallowed_methods)]
-            std::fs::write(&path, write_port(&theta, engine.refinement.ring())).expect("write E");
-            println!("  checkpoint after move {}: {path}", index + 1);
+            std::fs::write(&path, write_state(&theta, ring)).expect("write the state");
+            println!("  checkpoint after move {} (the complete continuing state): {path}", index + 1);
         }
     }
     #[allow(clippy::disallowed_methods)]
-    std::fs::write(out, write_port(&theta, engine.refinement.ring())).expect("write E");
+    std::fs::write(out, write_state(&theta, ring)).expect("write the state");
     println!(
-        "executed train: arm {arm}: {adopted} moves adopted, {refused} refused, {readings} readings at E; {}; {} ms; resident {}",
+        "executed train: arm {arm}: {adopted} moves adopted, {refused} refused, {readings} readings (at θ and in the trials); {}; {} ms; resident {}",
         if complete { "complete" } else { "incomplete (deadline)" },
         clock.elapsed().as_millis(),
         resident()
@@ -714,6 +807,301 @@ pub(super) fn spread(terrain: &str, seed: u64, count: usize, arms: &[String]) {
     }
 }
 
+/// A written constitution remounted onto the declared opening: whole where the file holds a complete
+/// continuing state, else partial (`E` and `ρ` alone, labelled on stderr by [`trained`]).
+fn remount(opening: &Constitution, ring: usize, path: &str) -> Constitution {
+    #[allow(clippy::disallowed_methods)]
+    let text = std::fs::read_to_string(path).expect("read the constitution");
+    match ContinuingState::from_text(&text) {
+        Ok(state) => opening
+            .clone()
+            .continued(&state)
+            .expect("the checkpoint continues the declared opening"),
+        Err(_) => trained(opening, ring, path),
+    }
+}
+
+/// The requests of a known-truth terrain, each ingested, compared along the machine's own release.
+fn open_requests(engine: &Engine, pairs: &[(Vec<usize>, Vec<usize>)]) -> Vec<Request> {
+    pairs
+        .iter()
+        .map(|(request, target)| {
+            let (current, moment) = ingest(&engine.field, request);
+            Request {
+                current,
+                moment,
+                targets: target.clone(),
+                context: Context::Open,
+            }
+        })
+        .collect()
+}
+
+/// The decision terms in the lock face's solved level (the strict rational test), of those read.
+fn solved_terms(batch: &BatchComparison) -> (usize, usize) {
+    let terms = batch.requests.iter().flat_map(|r| &r.terms);
+    let (mut solved, mut all) = (0, 0);
+    for term in terms {
+        all += 1;
+        solved += usize::from(term.comparison.solved == Predicate::Holds);
+    }
+    (solved, all)
+}
+
+/// Every decision term of a batch, whole: its request, station, decision refinement, target and top,
+/// the lock face `ℓ` enclosed, its solved test, `θ_t`, and the target's and leading rival's joint
+/// enclosures; with each request's release.
+fn print_terms(label: &str, batch: &BatchComparison, targets: &[Vec<usize>]) {
+    for (index, (request, target)) in batch.requests.iter().zip(targets).enumerate() {
+        let released = request.generation.as_ref().map_or_else(
+            || "not released".to_string(),
+            |g| {
+                format!(
+                    "{} {:?}, locks {:?}",
+                    if g.release.released() { "released" } else { "held" },
+                    g.release.classes,
+                    g.locks
+                )
+            },
+        );
+        println!("    {label} request {index}: target {target:?}; {released}; r* {:?}", request.consistent);
+        for term in &request.terms {
+            let s = &term.comparison;
+            println!(
+                "      station {} at refinement {:?}: target {}, top {}, ℓ ∈ {} nats, solved {:?} ({:?}), θ_t ∈ {}, target [{}, {}], leading rival [{}, {}]",
+                s.station,
+                term.site.context,
+                s.target,
+                s.top,
+                cell(&s.lock, 1 << 16),
+                s.solved,
+                term.kind,
+                cell(&s.share, 1 << 16),
+                s.target_growth.lower,
+                s.target_growth.upper,
+                s.rival_growth.lower,
+                s.rival_growth.upper
+            );
+        }
+    }
+}
+
+/// [definition; agent-inferred, step 1b's gate A: the pin §13.3 and its gate-A addendum] **The
+/// constrained feasibility witness** (`executed witness <terrain> <seed> <count> <moves> <deadline
+/// ms> <out>`). From the founded opening, the candidate's own certified move (the lock face at the
+/// decisions, every commit guard) is iterated on one declared development batch, every epoch the
+/// same `count` requests, read from the open section by the release's actual executed contexts.
+/// It stops at a witness (the strict solved test `1 + Σ_(x≠t) U_x < L_t` at every station's
+/// decision term of every request), at a refused move (the batch is fixed, so a refused move leaves
+/// the constitution and the next move's reading unchanged: it would repeat exactly), when the moves
+/// are spent, or at the deadline (checked before each move). Every constitution read prints its
+/// solved stations, whole sections, `L`, `X` and the source port's largest entry and modulus; the
+/// best (the most stations solved, the earliest among equals) is written to `out` as its complete
+/// continuing state, and printed whole. The procedure and its budget are pinned in the pin's gate-A
+/// addendum before the run; the budget is never raised.
+pub(super) fn witness(terrain: &str, seed: u64, count: usize, moves: usize, deadline: u128, out: &str) {
+    let clock = Instant::now();
+    let declared = order_declared();
+    let engine = Engine::new(declared);
+    let bank = bank_of(declared.period, &bank_strength());
+    let ring = engine.refinement.ring();
+    let pairs = terrain_pairs(terrain, &declared, seed, count);
+    let requests = open_requests(&engine, &pairs);
+    let targets: Vec<Vec<usize>> = pairs.iter().map(|(_, t)| t.clone()).collect();
+    let comparison = Comparison::LOCK_DECISIONS;
+    let mut theta = founded_opening(&engine);
+    println!(
+        "executed witness: {count} {terrain} requests at development seed {seed}; the candidate's move (the lock face at the decisions) iterated on them from the founded opening (ρ = {}), at most {moves} moves, deadline {deadline} ms; the bank p = {}, grain 2^(-{BANK_GRAIN})",
+        theta.transport(ring),
+        bank_strength()
+    );
+    let largest = |theta: &Constitution| {
+        theta
+            .source_port(ring)
+            .expect("E")
+            .entries()
+            .iter()
+            .map(|x| x.abs())
+            .max()
+            .unwrap_or_else(Rat::zero)
+    };
+    let report = |label: &str, theta: &Constitution, batch: &BatchComparison, ms: u128| {
+        let (solved, all) = solved_terms(batch);
+        let (whole, right, released) = batch.sections(&targets);
+        println!(
+            "  {label}: solved {solved} of {all} decision terms; whole sections {whole} of {count} (released {released}, stations right {right}); L ∈ {} nats, X ∈ {} nats; E's largest entry {}, ρ {}; the terms {:?}; {ms} ms",
+            cell(&batch.value, 1 << 12),
+            cell(&batch.excess, 1 << 12),
+            largest(theta),
+            theta.transport(ring),
+            batch.counts(declared.stations)
+        );
+        (solved, all)
+    };
+    let mut best: Option<(usize, String, Constitution, BatchComparison)> = None;
+    let mut keep = |solved: usize, label: String, theta: &Constitution, batch: &BatchComparison| {
+        if best.as_ref().is_none_or(|(s, ..)| solved > *s) {
+            best = Some((solved, label, theta.clone(), batch.clone()));
+        }
+    };
+    let mut found = false;
+    let mut stop = "the moves are spent".to_string();
+    for index in 0..moves {
+        if clock.elapsed().as_millis() > deadline {
+            stop = format!("the deadline, before move {index} (incomplete)");
+            break;
+        }
+        let started = Instant::now();
+        let moved = executed_move(
+            &engine.field,
+            &theta,
+            &requests,
+            &engine.refinement,
+            &bank,
+            BANK_GRAIN,
+            comparison,
+        )
+        .expect("the move");
+        let label = format!("constitution {index} (before move {index})");
+        let (solved, all) = report(&label, &theta, &moved.before, started.elapsed().as_millis());
+        keep(solved, label, &theta, &moved.before);
+        if solved == all {
+            found = true;
+            stop = format!("a witness at constitution {index}");
+            break;
+        }
+        println!(
+            "    move {index}: {}; the ladder's start {:?}; trials {}; persistence {:?}; {} ms",
+            match &moved.adopted {
+                Some((_, step)) => format!("adopted at step {}", step.step),
+                None => format!("refused {:?}", moved.refusal),
+            },
+            moved.start,
+            moved
+                .trials
+                .iter()
+                .map(|t| format!("η {} {:?}", t.step, t.refusal.as_ref().map(|_| "refused")))
+                .collect::<Vec<_>>()
+                .join(", "),
+            moved.persistence,
+            started.elapsed().as_millis()
+        );
+        match moved.adopted {
+            Some((successor, _)) => theta = successor,
+            None => {
+                stop = format!("move {index} refused, {:?} (the batch is fixed: the next move would repeat it)", moved.refusal);
+                break;
+            }
+        }
+        if index + 1 == moves {
+            let started = Instant::now();
+            let last = compare(
+                &engine.field,
+                &theta,
+                &requests,
+                &engine.refinement,
+                &bank,
+                BANK_GRAIN,
+                comparison,
+            )
+            .expect("the last constitution's reading");
+            let label = format!("constitution {} (after the last move)", index + 1);
+            let (solved, all) = report(&label, &theta, &last, started.elapsed().as_millis());
+            keep(solved, label, &theta, &last);
+            if solved == all {
+                found = true;
+                stop = format!("a witness at constitution {}", index + 1);
+            }
+        }
+    }
+    let (solved, label, theta_best, batch) = best.expect("at least one constitution read");
+    #[allow(clippy::disallowed_methods)]
+    std::fs::write(out, write_state(&theta_best, ring)).expect("write the state");
+    let all = solved_terms(&batch).1;
+    if found {
+        println!("executed witness: FOUND at {label}: the strict solved test holds at all {all} decision terms; written to {out}");
+    } else {
+        println!(
+            "executed witness: no witness found within this procedure and budget (stopped at {stop}); the best: {solved} of {all} decision terms solved, at {label}; written to {out}"
+        );
+    }
+    print_terms(&label, &batch, &targets);
+    println!(
+        "executed witness: stopped at {stop}; {} ms; resident {}",
+        clock.elapsed().as_millis(),
+        resident()
+    );
+}
+
+/// [definition; step 1b's pin §8 I6] **The causal reading** (`executed causal <terrain> <seed>
+/// <count> <label[=E]>…`, `lossless` the declared opening, `opening` the founded one, a written
+/// constitution remounted otherwise): per constitution, each request's stations read at the
+/// teacher-forced section (every earlier station at its target, the rest open), the five candidates
+/// by the joint growth: the stations whose class predicate holds, whose threshold holds, in the lock
+/// face's solved level, and the target's rank among the five (0 the top), by station; beside them,
+/// the release's first lock's station and whether it is right.
+pub(super) fn causal(terrain: &str, seed: u64, count: usize, arms: &[String]) {
+    let clock = Instant::now();
+    let declared = order_declared();
+    let engine = Engine::new(declared);
+    let bank = bank_of(declared.period, &bank_strength());
+    let ring = engine.refinement.ring();
+    let pairs = terrain_pairs(terrain, &declared, seed, count);
+    let requests = open_requests(&engine, &pairs);
+    let comparison = Comparison {
+        composition: Composition::LockFace,
+        reading: Reading::TeacherForced,
+    };
+    println!("executed causal: {count} {terrain} requests at seed {seed}, each station read with the earlier stations at their targets");
+    for arm in arms {
+        let started = Instant::now();
+        let (label, path) = arm.split_once('=').unwrap_or((arm.as_str(), ""));
+        let theta = match (label, path.is_empty()) {
+            ("lossless", true) => engine.theta.clone(),
+            (_, true) => founded_opening(&engine),
+            (_, false) => remount(&engine.theta, ring, path),
+        };
+        let batch = compare(
+            &engine.field,
+            &theta,
+            &requests,
+            &engine.refinement,
+            &bank,
+            BANK_GRAIN,
+            comparison,
+        )
+        .expect("the causal reading");
+        let stations = declared.stations;
+        let (mut class, mut threshold, mut solved) = (vec![0usize; stations], vec![0usize; stations], vec![0usize; stations]);
+        let mut ranks = vec![0usize; declared.alphabet];
+        let (mut first, mut first_right) = (BTreeMap::<usize, usize>::new(), 0usize);
+        for (request, (_, target)) in batch.requests.iter().zip(&pairs) {
+            for term in &request.terms {
+                let s = &term.comparison;
+                class[s.station] += usize::from(s.class == Predicate::Holds);
+                threshold[s.station] += usize::from(s.threshold == Predicate::Holds);
+                solved[s.station] += usize::from(term.kind == Excess::Solved);
+                ranks[s.rank.min(declared.alphabet - 1)] += 1;
+            }
+            if let Some(generation) = &request.generation
+                && let Some((station, class, ..)) = generation.decisions.first()
+            {
+                *first.entry(*station).or_default() += 1;
+                first_right += usize::from(*class == target[*station]);
+            }
+        }
+        println!(
+            "  {label} (ρ = {}): class holds {} by station {class:?}; threshold holds {} by station {threshold:?}; solved {} by station {solved:?}; the target's rank among the five (0 the top) {ranks:?}; the first lock's station {first:?}, right {first_right}; {} ms",
+            theta.transport(ring),
+            class.iter().sum::<usize>(),
+            threshold.iter().sum::<usize>(),
+            solved.iter().sum::<usize>(),
+            started.elapsed().as_millis()
+        );
+    }
+    println!("executed causal: {} ms; resident {}", clock.elapsed().as_millis(), resident());
+}
+
 /// The order-2 declaration, its bank and a batch of requests compared along the machine's own
 /// trajectory.
 pub(super) fn order_batch(
@@ -748,6 +1136,8 @@ pub(super) fn stage_one(seed: u64, count: usize) {
         "executed move: {count} order-2 requests at seed {seed}, compared along the machine's own open-section trajectory; E at the declared opening; the bank p = {}, grain 2^(-{BANK_GRAIN})",
         bank_strength()
     );
+    // Stage 1's comparison: 1a's hinge at every refinement.
+    let comparison = Comparison::HINGE_EVERY;
     let moved: ExecutedMove = executed_move(
         &engine.field,
         &engine.theta,
@@ -755,6 +1145,7 @@ pub(super) fn stage_one(seed: u64, count: usize) {
         &engine.refinement,
         &bank,
         BANK_GRAIN,
+        comparison,
     )
     .expect("the executed move");
     println!("  read and proposed in {} ms", clock.elapsed().as_millis());
@@ -817,11 +1208,16 @@ pub(super) fn stage_one(seed: u64, count: usize) {
         step.largest,
         step.bits
     );
+    let masked = moved
+        .trials
+        .last()
+        .and_then(|t| t.value.clone())
+        .expect("the adopted trial's fixed-mask value");
     println!(
-        "  the certificate: F(E′)⁺ < F(E)⁻, {} < {}: {}",
-        cell(&ExactInterval::point(after.value.upper.clone()), 1 << 16),
+        "  the certificate on the fixed mask: F(E′)⁺ < F(E)⁻, {} < {}: {}",
+        cell(&ExactInterval::point(masked.upper.clone()), 1 << 16),
         cell(&ExactInterval::point(moved.before.value.lower.clone()), 1 << 16),
-        after.value.upper < moved.before.value.lower
+        masked.upper < moved.before.value.lower
     );
     print_batch("after", &after, &targets);
     // Requirement 3: the covector paired with the carried move against the exact change.
@@ -833,6 +1229,7 @@ pub(super) fn stage_one(seed: u64, count: usize) {
         &engine.refinement,
         &bank,
         BANK_GRAIN,
+        comparison,
         4,
     )
     .expect("the pairing receipt");
@@ -880,6 +1277,7 @@ pub(super) fn stage_one(seed: u64, count: usize) {
         &engine.refinement,
         &bank,
         BANK_GRAIN,
+        comparison,
         4,
     )
     .expect("the small step's pairing");
@@ -1368,14 +1766,17 @@ fn ideal_information(terrain: &str, pairs: &[(Vec<usize>, Vec<usize>)], batch: u
         .collect()
 }
 
-/// [definition; the pin §5] **One stratum of D2's readings**: the station comparisons of one
-/// decision kind and request kind, their class gaps and threshold margins (sign counts, sums,
-/// extremes; exact enclosures), the gaps' magnitudes summed, and their terms' derivatives along
-/// the carried move (exactly zero, below the term's grain, descending, rising, straddling; their
-/// sum).
+/// [definition; the pin §5; step 1b's pin §8 I5] **One stratum of D2's readings**: the station
+/// comparisons of one decision kind and request kind, their class gaps and threshold margins (sign
+/// counts, sums, extremes; exact enclosures), the gaps' magnitudes summed, the stations in the lock
+/// face's solved level (the rational test) and the target's share `θ_t` summed, and their terms'
+/// derivatives along the carried move (exactly zero, below the term's grain, descending, rising,
+/// straddling; their sum).
 #[derive(Default)]
 struct Stratum {
     count: usize,
+    solved: usize,
+    share_sum: (Rat, Rat),
     gap: [usize; 3],
     margin: [usize; 3],
     gap_sum: (Rat, Rat),
@@ -1402,8 +1803,16 @@ fn sign_of(lower: &Rat, upper: &Rat) -> usize {
 }
 
 impl Stratum {
-    fn station(&mut self, gap: &ExactInterval, margin: &ExactInterval) {
+    fn station(
+        &mut self,
+        gap: &ExactInterval,
+        margin: &ExactInterval,
+        s: &holonics::hnn::executed::StationComparison,
+    ) {
         self.count += 1;
+        self.solved += usize::from(s.solved == Predicate::Holds);
+        self.share_sum.0 += &s.share.lower;
+        self.share_sum.1 += &s.share.upper;
         self.gap[sign_of(&gap.lower, &gap.upper)] += 1;
         self.margin[sign_of(&margin.lower, &margin.upper)] += 1;
         self.gap_sum.0 += &gap.lower;
@@ -1476,8 +1885,10 @@ impl Stratum {
             }
         };
         format!(
-            "stations {}; class gap (+, −, straddling) {:?}, Σ ∈ {}, least {}, most {}, Σ|γ| ∈ {}, mean |γ| ∈ {}; threshold margin (+, −, straddling) {:?}, Σ ∈ {}, least {}, most {}; terms of F's support {}, their derivative along the carried move (exactly zero, below its term's grain, descending, rising, straddling) {:?}, Σ ∈ {} nats",
+            "stations {}, in the lock face's solved level {}, mean θ_t ∈ {}; class gap (+, −, straddling) {:?}, Σ ∈ {}, least {}, most {}, Σ|γ| ∈ {}, mean |γ| ∈ {}; threshold margin (+, −, straddling) {:?}, Σ ∈ {}, least {}, most {}; terms of the composition's support {}, their derivative along the carried move (exactly zero, below its term's grain, descending, rising, straddling) {:?}, Σ ∈ {} nats",
             self.count,
+            self.solved,
+            mean(&self.share_sum),
             self.gap,
             pair(&self.gap_sum),
             point(&self.gap_least),
@@ -1504,73 +1915,96 @@ fn ln_growth(growth: &holonics::hnn::ring::Growth) -> ExactInterval {
     }
 }
 
-/// [definition; the pin §5] **D2, the comparison's operating point**, printed for one move: every
-/// station comparison of the batch at `θ` (every refinement, and the open section apart), its
-/// class gap `ln a_t − ln a_r` and threshold margin `ln a_t` as exact enclosures, stratified by
-/// decision (right; wrong and eligible, a confident wrong decision the release would lock; wrong
-/// and not eligible) and by request (constant or not), with each term of `F`'s support's
-/// derivative along the carried move (`terms`, aligned with the move's `sites`).
+/// [definition; the pin §5; step 1b's pin §9] **D2, the comparison's operating point**, printed
+/// for one move: every station comparison of the batch at `θ` (every refinement, the open section
+/// apart) and the declared reading's terms, their class gap `ln a_t − ln a_r` and threshold margin
+/// `ln a_t` as exact enclosures, the lock face's solved level and `θ_t`, stratified by decision
+/// (right; wrong and eligible, a confident wrong decision the release would lock; wrong and not
+/// eligible, or read at a section the release did not execute) and by request (constant or not),
+/// with each term of the composition's support's derivative along the carried move (`terms`,
+/// aligned with the move's `sites`).
 fn print_d2(
     index: usize,
     moved: &ExecutedMove,
     constant: &[bool],
     terms: Option<&Vec<Option<ExactInterval>>>,
 ) {
-    use holonics::hnn::executed::StationComparison;
+    use holonics::hnn::executed::{RequestComparison, StationComparison};
     let kinds = ["right", "wrong, eligible (confident)", "wrong, not eligible"];
-    // strata[open][decision][constant]
-    let mut strata: Vec<Vec<Vec<Stratum>>> = (0..2)
+    let scopes = ["every refinement", "the open section", "the declared reading's terms"];
+    // strata[scope][decision][constant]
+    let mut strata: Vec<Vec<Vec<Stratum>>> = (0..3)
         .map(|_| (0..3).map(|_| (0..2).map(|_| Stratum::default()).collect()).collect())
         .collect();
-    let mut decision_of: BTreeMap<(usize, usize, usize), (usize, &StationComparison)> =
-        BTreeMap::new();
-    for (r, request) in moved.before.requests.iter().enumerate() {
-        for s in &request.stations {
-            let eligible = request
+    let decision = |request: &RequestComparison, s: &StationComparison| {
+        let eligible = s.context.is_some_and(|k| {
+            request
                 .orders
                 .iter()
-                .find(|o| o.context == s.context)
-                .is_some_and(|o| o.eligible.iter().any(|(station, _, _, _)| *station == s.station));
-            let decision = if s.top == s.target {
-                0
-            } else if eligible {
-                1
-            } else {
-                2
-            };
-            let t = ln_growth(&s.target_growth);
-            let x = ln_growth(&s.rival_growth);
-            let gap = ExactInterval {
+                .find(|o| o.context == k)
+                .is_some_and(|o| o.eligible.iter().any(|(station, _, _, _)| *station == s.station))
+        });
+        if s.top == s.target {
+            0
+        } else if eligible {
+            1
+        } else {
+            2
+        }
+    };
+    let read = |s: &StationComparison| {
+        let t = ln_growth(&s.target_growth);
+        let x = ln_growth(&s.rival_growth);
+        (
+            ExactInterval {
                 lower: &t.lower - &x.upper,
                 upper: &t.upper - &x.lower,
-            };
-            let c = usize::from(constant[r]);
-            strata[0][decision][c].station(&gap, &t);
-            if s.context == 0 {
-                strata[1][decision][c].station(&gap, &t);
+            },
+            t,
+        )
+    };
+    for (r, request) in moved.before.requests.iter().enumerate() {
+        let c = usize::from(constant[r]);
+        for s in &request.stations {
+            let (gap, margin) = read(s);
+            let d = decision(request, s);
+            strata[0][d][c].station(&gap, &margin, s);
+            if s.context == Some(0) {
+                strata[1][d][c].station(&gap, &margin, s);
             }
-            decision_of.insert((r, s.context, s.station), (decision, s));
+        }
+        for term in &request.terms {
+            let (gap, margin) = read(&term.comparison);
+            strata[2][decision(request, &term.comparison)][c].station(
+                &gap,
+                &margin,
+                &term.comparison,
+            );
         }
     }
     if let Some(terms) = terms {
-        for (site, term) in moved.sites.iter().zip(terms) {
-            let Some(d) = term else { continue };
-            let Some((decision, s)) = decision_of.get(&(site.request, site.context, site.station))
-            else {
+        for (site, bound) in moved.sites.iter().zip(terms) {
+            let Some(d) = bound else { continue };
+            let request = &moved.before.requests[site.request];
+            let Some(term) = request.terms.iter().find(|t| &t.site == site) else {
                 continue;
             };
-            let grain = &s.value.upper - &s.value.lower;
+            let grain = &term.value.upper - &term.value.lower;
             let c = usize::from(constant[site.request]);
-            strata[0][*decision][c].derivative(d, &grain);
-            if site.context == 0 {
-                strata[1][*decision][c].derivative(d, &grain);
+            let k = decision(request, &term.comparison);
+            strata[2][k][c].derivative(d, &grain);
+            if site.context.is_some() {
+                strata[0][k][c].derivative(d, &grain);
+            }
+            if site.context == Some(0) {
+                strata[1][k][c].derivative(d, &grain);
             }
         }
     }
-    for (open, scope) in ["every refinement", "the open section"].iter().enumerate() {
+    for (scope_index, scope) in scopes.iter().enumerate() {
         for (decision, kind) in kinds.iter().enumerate() {
             for (c, request) in ["nonconstant", "constant"].iter().enumerate() {
-                let stratum = &strata[open][decision][c];
+                let stratum = &strata[scope_index][decision][c];
                 if stratum.count == 0 {
                     continue;
                 }
@@ -1580,13 +2014,55 @@ fn print_d2(
     }
 }
 
-/// [definition; the pin §5] **D1, the step's descent**, printed for one move: `F` at `θ` and its
-/// grain; the unit slope, the modulus's share and the ladder's start (the first-order zero against
-/// the entry scale, which binds); every trial; at the carried move (the adopted trial, else the last
-/// trial whose first order was read) the step's norm, the lattice, passive and entry bounds, the
-/// predicted descents (the certificate and the leading branches) against the measured, whether the
-/// trajectory changed, the decisions moved at the open section, and the ideal listener's bits on
-/// the batch.
+/// [definition; step 1b's pin §8 I7] **The relation that needs no request**, per move at the
+/// epoch's open section: the target's rank among the four symbols (the termination left out, 0 the
+/// top) and the termination's rank among the five, as histograms over the stations.
+fn print_ranks(index: usize, batch: &BatchComparison, alphabet: usize) {
+    let mut symbols = vec![0usize; alphabet];
+    let mut termination = vec![0usize; alphabet + 1];
+    for request in &batch.requests {
+        for s in request.stations.iter().filter(|s| s.context == Some(0)) {
+            if let Some(rank) = s.symbol_rank {
+                symbols[rank] += 1;
+            }
+            termination[s.termination_rank.min(alphabet)] += 1;
+        }
+    }
+    println!(
+        "    I7 move {index}: at the open section, the target's rank among the four symbols (0 the top) {:?}; the termination's rank among the five {:?}",
+        &symbols[..alphabet - 1],
+        &termination[..alphabet]
+    );
+}
+
+/// Each station's decision in a release: `Some(right)` where it locked, `None` where it was held.
+fn decisions_of(batch: &BatchComparison, targets: &[Vec<usize>]) -> Vec<Vec<Option<bool>>> {
+    batch
+        .requests
+        .iter()
+        .zip(targets)
+        .map(|(request, target)| {
+            let mut out = vec![None; target.len()];
+            if let Some(generation) = &request.generation {
+                for (station, class, ..) in &generation.decisions {
+                    out[*station] = Some(*class == target[*station]);
+                }
+            }
+            out
+        })
+        .collect()
+}
+
+/// [definition; the pin §5; step 1b's pin §9, §13.1] **D1, the step's descent**, printed for one
+/// move: the composition `C` at `θ`, its grain and its excess `X` over the solved level, the terms'
+/// counts, the unresolved members and the persistence reads; the joint unit slope, the port's part
+/// alone, the excess's piecewise derivative, the modulus's share and the ladder's start with the
+/// bound that set it; every trial with its readings; at the carried move (the adopted trial, else the
+/// last trial whose first order was read) the step's norm, the lattice, passive and entry bounds, the
+/// predicted descents (the certificate and the leading contributions) against the measured on the
+/// fixed mask, the successor's own release's composition and the context change (own less mask),
+/// the decisions moved at the open section and at the release's locks (I4), the successor's terms'
+/// counts, and the ideal listener's bits on the batch.
 fn print_d1(
     index: usize,
     moved: &ExecutedMove,
@@ -1596,6 +2072,7 @@ fn print_d1(
     information: &str,
 ) {
     use holonics::hnn::constitution::Locus;
+    let c = symbol(&moved.comparison);
     let before = &moved.before.value;
     let grain = &before.upper - &before.lower;
     let two = Rat::from_integer(BigInt::from(2));
@@ -1604,61 +2081,59 @@ fn print_d1(
         lower: -x.upper.clone(),
         upper: -x.lower.clone(),
     };
-    let mut line = format!(
-        "    D1 move {index}: F(θ) ∈ {}, its grain (enclosure width) ∈ {} nats",
+    let stations = targets.first().map_or(0, Vec::len);
+    println!(
+        "    D1 move {index}: {c}(θ) ∈ {}, its grain (enclosure width) ∈ {} nats; the excess X(θ) ∈ {} nats; the terms {:?}; unresolved: {} leading members {:?}, {} terms reading an unresolved active member; persistence {:?}",
         cell(before, 1 << 12),
-        point(&grain, 1 << 16)
+        point(&grain, 1 << 16),
+        cell(&moved.before.excess, 1 << 12),
+        moved.before.counts(stations),
+        moved.unresolved.len(),
+        moved.unresolved,
+        moved.unresolved_branches,
+        moved.persistence
     );
-    let (Some(slope), Some(gamma), Some(unit), Some(largest)) = (
-        &moved.slope,
-        &moved.modulus_slope,
-        &moved.modulus_unit,
-        &moved.unit_largest,
-    ) else {
+    let (Some(slope), Some(unit), Some(largest)) =
+        (&moved.slope, &moved.modulus_unit, &moved.unit_largest)
+    else {
         println!(
-            "{line}; no descent proposed: {:?} (the unit slope {}); zero prediction",
+            "    D1 move {index}: no descent proposed: {:?} (the joint unit slope {}); zero prediction",
             moved.refusal,
             moved.slope.as_ref().map_or_else(|| "not read".to_string(), |s| cell(s, 1 << 12))
         );
         println!("    D1 move {index}: the ideal listener on this batch: {information}");
         return;
     };
-    let share = gamma * unit;
-    let joint_upper = &slope.upper + &share;
-    let zero = if joint_upper.is_negative() {
-        Some(&before.lower / -joint_upper.clone())
-    } else {
-        None
-    };
-    let scale = Rat::new(BigInt::from(1), BigInt::from(2)) / largest;
-    let binds = match &zero {
-        Some(z) if *z <= scale => "the first-order zero",
-        Some(_) => "the entry scale",
-        None => "none (the joint slope is not negative)",
-    };
-    line += &format!(
-        "; the unit slope ∈ {}, the modulus's share γ_ρΔρ {}, the first-order zero F⁻/(−slope⁺) {}, the entry scale ½/u {} (u = {largest}), binding: {binds}",
+    let share = moved
+        .modulus_slope
+        .as_ref()
+        .map_or_else(Rat::zero, |gamma| gamma * unit);
+    println!(
+        "    D1 move {index}: the joint unit slope ∈ {} (the port's alone {}, the modulus's leading share γ_ρΔρ {}), the excess's piecewise derivative s_X ∈ {}; the ladder's start {} ({:?}; the entry scale ½/u {}, u = {largest})",
         cell(slope, 1 << 12),
+        moved.port_slope.as_ref().map_or_else(|| "not read".to_string(), |s| cell(s, 1 << 12)),
         point(&share, 1 << 12),
-        zero.as_ref().map_or_else(|| "none".to_string(), |z| point(z, 1 << 16)),
-        point(&scale, 1 << 16)
+        moved.excess_slope.as_ref().map_or_else(|| "not read".to_string(), |s| cell(s, 1 << 12)),
+        moved.start.as_ref().map_or_else(|| "none".to_string(), |(s, _)| s.to_string()),
+        moved.start.as_ref().map(|(_, kind)| *kind),
+        point(&(Rat::new(BigInt::from(1), BigInt::from(2)) / largest), 1 << 16)
     );
-    println!("{line}");
     let trials: Vec<String> = moved
         .trials
         .iter()
         .map(|t| {
             format!(
-                "η {} {}",
+                "η {} {} (readings {})",
                 t.step,
                 match &t.refusal {
                     None => "adopted".to_string(),
                     Some(holonics::hnn::executed::TrialRefusal::NotBelow(v)) =>
-                        format!("refused NotBelow(F ∈ {})", cell(v, 1 << 12)),
+                        format!("refused NotBelow({c}_mask ∈ {})", cell(v, 1 << 12)),
                     Some(holonics::hnn::executed::TrialRefusal::FirstOrder(v)) =>
                         format!("refused FirstOrder({})", cell(v, 1 << 12)),
                     Some(other) => format!("refused {other:?}"),
-                }
+                },
+                t.readings
             )
         })
         .collect();
@@ -1741,16 +2216,6 @@ fn print_d1(
     } else {
         "above the grain"
     };
-    let eighth = |m: &ExactInterval| {
-        let bar = &certificate.upper / Rat::from_integer(BigInt::from(8));
-        if m.lower >= bar {
-            "holds"
-        } else if m.upper < &certificate.lower / Rat::from_integer(BigInt::from(8)) {
-            "fails"
-        } else {
-            "undecided"
-        }
-    };
     let agree = match (&leading, &measured) {
         (Some(l), Some(m)) => {
             let (a, b) = (sign_of(&l.lower, &l.upper), sign_of(&m.lower, &m.upper));
@@ -1765,11 +2230,12 @@ fn print_d1(
         _ => "not read",
     };
     println!(
-        "    D1 move {index}: predicted descent, the certificate −Σ sup Df ∈ {} (exact enclosure; approximate as a prediction), the leading branches −Σ sign⟨ĝ, Δz⟩ ∈ {}; measured C(θ) − C(θ+δ) ∈ {} (exact); the prediction {kind}; measured at least 1/8 of the certificate: {}; the leading branches' sign and the measured's: {agree}",
+        "    D1 move {index}: predicted descent, the certificate −Σ bound ∈ {} (exact enclosure; approximate as a prediction), the leading contributions −Σ c⟨ĝ, Δz⟩ ∈ {}; measured on the fixed mask {c}(θ) − {c}_mask(θ+δ) ∈ {} (exact); the prediction {kind}; the leading contributions' sign and the measured's: {agree}; the successor's own release {c}_own(θ+δ) ∈ {}, the context change {c}_own − {c}_mask ∈ {} (the own release's composition is a declared score: its change is never decision progress)",
         cell(&certificate, 1 << 12),
         leading.as_ref().map_or_else(|| "not read".to_string(), |l| cell(l, 1 << 12)),
         measured.as_ref().map_or_else(|| "not read".to_string(), |m| cell(m, 1 << 12)),
-        measured.as_ref().map_or("not read", eighth)
+        trial.after.as_ref().map_or_else(|| "not read".to_string(), |a| cell(&a.value, 1 << 12)),
+        trial.change.as_ref().map_or_else(|| "not read".to_string(), |d| cell(d, 1 << 12))
     );
     if let Some(after) = &trial.after {
         let changed = moved
@@ -1787,7 +2253,7 @@ fn print_d1(
             let open = |r: &holonics::hnn::executed::RequestComparison| -> BTreeMap<usize, (usize, usize)> {
                 r.stations
                     .iter()
-                    .filter(|s| s.context == 0)
+                    .filter(|s| s.context == Some(0))
                     .map(|s| (s.station, (s.top, s.target)))
                     .collect()
             };
@@ -1804,15 +2270,42 @@ fn print_d1(
                 moves[kind] += 1;
             }
         }
+        // I4 at the release's locks: [wrong→right, right→wrong, held→right, held→wrong,
+        // right→held, wrong→held].
+        let mut locks = [0usize; 6];
+        for (a, b) in decisions_of(&moved.before, targets)
+            .iter()
+            .zip(&decisions_of(after, targets))
+        {
+            for (x, y) in a.iter().zip(b) {
+                let kind = match (x, y) {
+                    (Some(false), Some(true)) => 0,
+                    (Some(true), Some(false)) => 1,
+                    (None, Some(true)) => 2,
+                    (None, Some(false)) => 3,
+                    (Some(true), None) => 4,
+                    (Some(false), None) => 5,
+                    _ => continue,
+                };
+                locks[kind] += 1;
+            }
+        }
         let (whole, right, released) = after.sections(targets);
         println!(
-            "    D1 move {index}: the successor's trajectory changed in {changed} of {} requests; at the open section, wrong→right {}, right→wrong {}, wrong→another wrong {}, right kept {}, wrong kept {}; the successor's batch: released {released}, whole {whole}, stations right {right}",
+            "    D1 move {index}: the successor's trajectory changed in {changed} of {} requests; at the open section, wrong→right {}, right→wrong {}, wrong→another wrong {}, right kept {}, wrong kept {}; at the release's locks (I4), wrong→right {}, right→wrong {}, held→right {}, held→wrong {}, right→held {}, wrong→held {}; the successor's batch: released {released}, whole {whole}, stations right {right}; its terms {:?}",
             moved.before.requests.len(),
             moves[0],
             moves[1],
             moves[2],
             moves[3],
-            moves[4]
+            moves[4],
+            locks[0],
+            locks[1],
+            locks[2],
+            locks[3],
+            locks[4],
+            locks[5],
+            after.counts(stations)
         );
     }
     println!("    D1 move {index}: the ideal listener on this batch: {information}");

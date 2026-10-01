@@ -11,6 +11,8 @@
 //! cargo run --release -p holonics --example hnn_prediction -- executed spread <terrain> <seed> <count> <label[=E]>…
 //! cargo run --release -p holonics --example hnn_prediction -- executed slopes <terrain> <seed> <count> <label[=E]>…
 //! cargo run --release -p holonics --example hnn_prediction -- executed counts <terrain> <training seed> <count> <validation seed> <count> <out>
+//! cargo run --release -p holonics --example hnn_prediction -- executed witness <terrain> <seed> <count> <moves> <deadline ms> <out>
+//! cargo run --release -p holonics --example hnn_prediction -- executed causal <terrain> <seed> <count> <label[=E]>…
 //! ```
 //!
 //! [definition; agent-inferred, the order pin and the bank pin] **The declaration**
@@ -300,6 +302,24 @@ fn main() {
             &arguments[6],
             &arguments[7..],
         ),
+        // Step 1b's gate A: the constrained feasibility witness (the pin
+        // research/records/2026-09-30_STEP_1B_THE_CANDIDATE_COMPARISON_PINNED_BEFORE_ITS_RUNS.md
+        // §13.3 and its gate-A addendum).
+        (Some("executed"), Some("witness")) => executed_loop::witness(
+            &arguments[3],
+            arguments[4].parse().expect("a seed"),
+            arguments[5].parse().expect("a count"),
+            arguments[6].parse().expect("moves"),
+            arguments[7].parse().expect("a deadline in ms"),
+            &arguments[8],
+        ),
+        // Step 1b's causal reading (I6).
+        (Some("executed"), Some("causal")) => executed_loop::causal(
+            &arguments[3],
+            arguments[4].parse().expect("a seed"),
+            arguments[5].parse().expect("a count"),
+            &arguments[6..],
+        ),
         // The two counts' terrain reading (the pin
         // research/records/2026-09-30_THE_TWO_COUNTS_PINNED_BEFORE_ITS_RUNS.md).
         (Some("executed"), Some("counts")) => executed_loop::counts(
@@ -311,7 +331,7 @@ fn main() {
             &arguments[8],
         ),
         _ => panic!(
-            "executed move <seed> <requests> | train <arm> <terrain> <seed> <batch> <moves> <deadline ms> <out> | evaluate <terrain> <seed> <count> <out> <label[=E]>… | spread <terrain> <seed> <count> <label[=E]>… | slopes <terrain> <seed> <count> <label[=E]>… | counts <terrain> <training seed> <count> <validation seed> <count> <out>"
+            "executed move <seed> <requests> | train <arm> <terrain> <seed> <batch> <moves> <deadline ms> <out> | evaluate <terrain> <seed> <count> <out> <label[=E]>… | spread <terrain> <seed> <count> <label[=E]>… | slopes <terrain> <seed> <count> <label[=E]>… | counts <terrain> <training seed> <count> <validation seed> <count> <out> | witness <terrain> <seed> <count> <moves> <deadline ms> <out> | causal <terrain> <seed> <count> <label[=E]>…"
         ),
     }
 }
