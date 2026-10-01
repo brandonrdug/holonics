@@ -1,0 +1,5 @@
+b2bcaa68583c7cb437ca2e526dbc90395463d654
+0ee7c9931bee520e9ee041b7312214286ed651ec69cc41c5016b58cea77511c1
+5d8c4a2c7369ef23cbfbe7bdf80ea3dbe398b97e191f5fafcba39fa2d97f7fa5  research/records/2026-09-30_THE_MODULUS_FOUNDED_OFF_ONE_receipts/refit_on_lattice.txt
+697ecec94d86e4abf242e8e1541cabe176b1d70c75c360cd3bb399d58f3e3073  research/records/2026-09-30_STEP_1B_GATE_A_receipts/witness_best.state
+wall 259811 ms; exit 0; early stop 0

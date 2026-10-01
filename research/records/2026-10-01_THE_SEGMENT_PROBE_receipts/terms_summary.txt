@@ -1,0 +1,7 @@
+refit: terms 64; target on top 57; kinds {'Above': 19, 'Solved': 45}; bands {'ln 2 ≤ ℓ < ln 5': 17, 'ℓ < ln 2': 45, 'ℓ ≥ ln 5': 2}
+refit-founded: terms 64; target on top 33; kinds {'Above': 49, 'Solved': 15}; bands {'ln 2 ≤ ℓ < ln 5': 35, 'ℓ < ln 2': 15, 'ℓ ≥ ln 5': 14}
+gateA-best: terms 64; target on top 14; kinds {'Above': 57, 'Solved': 7}; bands {'ℓ ≥ ln 5': 40, 'ln 2 ≤ ℓ < ln 5': 17, 'ℓ < ln 2': 7}
+chord-3/4: terms 64; target on top 37; kinds {'Solved': 27, 'Above': 37}; bands {'ℓ < ln 2': 27, 'ln 2 ≤ ℓ < ln 5': 14, 'ℓ ≥ ln 5': 23}
+chord-1/2: terms 64; target on top 20; kinds {'Above': 54, 'Solved': 10}; bands {'ln 2 ≤ ℓ < ln 5': 29, 'ℓ ≥ ln 5': 25, 'ℓ < ln 2': 10}
+chord-1/4: terms 64; target on top 13; kinds {'Above': 64}; bands {'ℓ ≥ ln 5': 34, 'ln 2 ≤ ℓ < ln 5': 30}
+opening: terms 64; target on top 13; kinds {'Above': 64}; bands {'ℓ ≥ ln 5': 44, 'ln 2 ≤ ℓ < ln 5': 20}

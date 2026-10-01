@@ -637,12 +637,26 @@ that fires becomes the next loop's subject, and nothing downstream starts.
     - *Narrowed under Astra's reviews, and run once* ([c2](../../research/records/2026-10-01_LOOP_1C_C2_NORMALIZATION_ALONE_UNDOES_TWO_OF_THREE_LOSSES_ONE_IS_AN_INTERACTION_AND_THE_ENTRY_KEEPS_THE_FOUR_RETAINED.md)). The long
       replay and the fit were withdrawn. One native update from gate A's saved c1 reproduced gate A
       exactly.
-      - At c2, the normalization alone undoes two of the three losses. One loss is a pure
-        interaction, so the blanket normalization explanation is rejected. The entry compensates in
-        all four retained decisions.
-      - The frozen-denominator reading holds in all seven at c2, and in three of six at the opening.
-      - Next, pinned and reviewed before any run: one diagnostic release arm, with each decided
-        station read under the span's normalization at its own lock, on the retained states. The subject 1a names: a comparison whose descent must move decisions, one
+      - At c2, the normalization alone undoes two of the three losses. The third is a joint-only
+        threshold crossing (corrected after Astra's review), so the blanket normalization
+        explanation is rejected. The entry compensates in all four retained decisions.
+      - Re-reading a decided station has no behavioural consumer: the release reads only open
+        stations. The frozen-denominator arm is withdrawn, and the causal consumer is the decision
+        at its own lock.
+    - *The segment probe, October 1* ([pin](../../research/records/2026-10-01_THE_SEGMENT_PROBE_PINNED_BEFORE_ITS_RUN.md);
+      [receipt](../../research/records/2026-10-01_THE_SEGMENT_PROBE_MEASURED_THE_LOCK_FACE_SEES_THE_REFIT_THE_CHORD_DESCENDS_AND_THE_READING_NEEDS_THE_LOWER_MODULUS.md)).
+      Read-only, on gate A's batch.
+      - The predecessor-occupancy arm is withdrawn from the mathematics: the station-framed law
+        already normalizes over exactly what a decision's prefix holds. The exterior fit is
+        withdrawn: the refit is an existing representation control.
+      - The refit solves 45 of 64 decision terms, reads 55 stations right and 5 sections whole, at
+        `L` far below gate A's lowest. The chord from the founded opening descends strictly to it.
+        At the founded modulus, its `E` reads 22 right and locks the far end first.
+      - The blocker is the native move's path, with the modulus held near `ρ₀`. Next: the modulus's
+        part of the lock face at the decisions (`γ_ρ`'s sign, the least-squares unit move and the
+        joint step's `ηΔρ`), at gate A's constitutions and along the chord. It separates a sign
+        obstruction from a scale obstruction, read-only.
+  - *1b's subject, as 1a named it*: a comparison whose descent must move decisions, one
     that holds a margin on right decisions, is not minimized on ties, and is read where a reading
     carries information about the key. The governing law "loss is the log of a ratio" is the
     candidate's first reference. The adaptable operands left out (the bank's members, the pumps)
