@@ -3970,6 +3970,25 @@ pub fn witness_plane(
     grain: u32,
     comparison: Comparison,
 ) -> Result<PlaneReading, HnnError> {
+    witness_plane_along(field, constitution, None, requests, declared, bank, grain, comparison)
+}
+
+/// [measured-diagnostic; agent-inferred, October 1] **A plane read by the move's witness, its `E`
+/// direction declared**: as [`witness_plane`], with the plane's `E` direction `E_along − E` (the
+/// source port of `along`, read at this constitution's `ρ`) in place of the port's unit move when
+/// `along` is given. Reads whether the witness's stiffness in `ρ` belongs to the plane's `E`
+/// direction or to the witness itself. `unit_move` stays the port's own.
+#[allow(clippy::too_many_arguments)]
+pub fn witness_plane_along(
+    field: &Field,
+    constitution: &Constitution,
+    along: Option<&Constitution>,
+    requests: &[Request],
+    declared: &Refinement,
+    bank: &ReceivingBank,
+    grain: u32,
+    comparison: Comparison,
+) -> Result<PlaneReading, HnnError> {
     let (before, reads) = incumbent(field, constitution, requests, declared, bank, grain, comparison)?;
     let proposal = propose(comparison.composition, &before, &reads);
     drop(reads);
@@ -3994,7 +4013,18 @@ pub fn witness_plane(
     reading.modulus_slope = Some(step.gamma.clone());
     reading.modulus_curvature = Some(step.curvature.clone());
     reading.modulus_unit = Some(step.modulus_unit.clone());
-    let terms = plane_terms(field, constitution, declared, requests, &proposal, &step.unit)?;
+    let direction = match along {
+        Some(along) => {
+            let ring = declared.ring();
+            let e = along
+                .source_port(ring)
+                .ok_or(HnnError::MissingSourcePort { ring })?
+                .clone();
+            &constitution.clone().with_ports(ring, None, Some(e), None)?
+        }
+        None => &step.unit,
+    };
+    let terms = plane_terms(field, constitution, declared, requests, &proposal, direction)?;
     reading.terms = terms.len();
     reading.witness = (!terms.is_empty()).then(|| witness_form(&terms)).flatten();
     reading.unit_move = Some(step.unit_move);
