@@ -1,4 +1,4 @@
-# The order measured: one move from c6 gains stations where the lock face alone lost them
+# The order measured: one move from c6 gains stations where the lock face alone lost them, and four more reach 19 then stall
 
 **Date.** October 1. **Issues.** #73, #63 (THE_REBUILD U6, step 1). **Grade.** [measured] under the
 [pin](2026-10-01_THE_ORDER_AS_A_TERM_OF_THE_COMPARISON_PINNED_BEFORE_ITS_RUN.md) (source
@@ -38,16 +38,42 @@ The far station still dominates the order. In request 2 station 7's gap fell fro
 decision that sends the release into the uncompared contexts: the far station's gap against the
 right station's. One move of it gains stations where the lock face alone lost them.
 
-## 3. What follows
+## 3. Four more moves
 
-A short continuation from the adopted state, under the same arm and metric, reads whether the gain
-holds over several moves. Each move is the real guarded move from the previous one's continuing
-state, with every guard.
+The same arm and metric, each move the real guarded move from the previous adopted continuing
+state (`continuation/continue.sh`, receipts in `continuation/m1` to `m4`). Every move was adopted.
+
+| State | `ρ` (`/2^21`) | `L + O` (`/4096` nats) | Solved | Stations right | Trial adopted |
+|---|---|---|---|---|---|
+| c6 | 1642461 | `[441372, …)` | 2 | 15 | |
+| move 0 | 1633145 | `[437814, …)` | 2 | 16 | 3rd of 8 |
+| move 1 | 1626995 | `[429006, …)` | 2 | 12 | 4th |
+| move 2 | 1627257 | `[425516, …)` | 1 | **19** | 2nd |
+| move 3 | 1625149 | `[424353, …)` | 1 | 19 | 4th |
+| move 4 | 1624995 | `[424163, …)` | 1 | 18 | 6th |
+
+- **Stations right** reached 19, above every constitution of the guarded witness (at most 18) and
+  below gate A's best of 24. They are not monotone: move 1 fell to 12.
+- **Solved** fell from 2 to 1. No section was whole, and no order term was solved.
+- **The descent is slowing.** The comparison's fall over moves 1 to 4 shrank (`8808`, `3490`,
+  `1163` and `190`, `/4096` nats), and the ladder adopted ever deeper (up to its 6th trial).
+- **`ρ` moved `17466/2^21` in five moves** against a chord of `541877/2^21`.
+- **The order's balance.** In every request the right station's gap is still below the wrong ones'
+  together (no order term solved).
+  The order terms' values fell in most requests, and two first locks moved to a right station and
+  one away.
+
+[agent-inferred] The order term reaches the decisions, which the lock face alone did not: stations
+right rose where the lock face's move lost them. But on this batch it converges to a stall well short
+of solving the order: the witness admits small `ρ` moves only, and the wrong stations' gaps keep their lead.
+The stall is the next subject. It is not a reason to raise the ladder or the number of moves.
 
 ## 4. Time
 
 | Run | Projection | Deadline | Measured wall | Peak resident |
 |---|---|---|---|---|
 | one move, 19 threads | 519,235 ms | `timeout 520` | 262,896 ms, exit 0 | 226,062,336 bytes |
+| four continued moves, 19 threads | 2,076,940 ms (4 × 519,235) | `timeout 520` a move | 1,264,481 ms (312,038 + 230,841 + 321,209 + 400,393), all exit 0 | 228,278,272 bytes |
 
-Measured over projected: `262896/519235`.
+Measured over projected: `262896/519235` and `1264481/2076940`. The continuation's first launch read
+no binary (its build directory was not exported), ran nothing, and was relaunched unchanged.

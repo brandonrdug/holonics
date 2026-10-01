@@ -979,10 +979,15 @@ fn the_machines_plane_reading_agrees_with_its_move() {
         (Some([a, _]), Some(MoveRefusal::Reversed(_))) => assert!(!a.is_positive()),
         (Some([a, b]), _) => {
             assert!(a.is_positive());
-            assert_eq!(witnessed.modulus_unit, Some(&b / &a));
+            // The ladder carries the witness's exact step at the face grain, toward zero.
+            let grain = Rat::new(1.into(), num_bigint::BigInt::from(1) << 63usize);
+            let near = |held: &Rat, exact: &Rat| {
+                held.abs() <= exact.abs() && (exact - held).abs() <= exact.abs() * &grain
+            };
+            assert!(near(witnessed.modulus_unit.as_ref().unwrap(), &(&b / &a)));
             let (start, kind) = witnessed.start.clone().unwrap();
             match kind {
-                LadderStart::Witness => assert_eq!(start, a),
+                LadderStart::Witness => assert!(near(&start, &a)),
                 LadderStart::WitnessEntryScale => assert!(start < a),
                 other => panic!("the witness's ladder starts at its own step: {other:?}"),
             }
