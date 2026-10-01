@@ -1,4 +1,4 @@
-251ac395cf9284645369fc7f7159fff071dbf69f
-b6eae793dc1d7f00380982e792344a8cce4a413b8724f2a1a339f8f86f4ed70c
-args executed witness-plane order2 2026093061 8 lock-dec research/records/2026-09-30_THE_MODULUS_FOUNDED_OFF_ONE_receipts/refit_on_lattice.txt .local/wp c0=research/records/2026-10-01_THE_GUARDED_WITNESS_receipts/c0.state c6=research/records/2026-10-01_THE_GUARDED_WITNESS_receipts/c6.state
-wall 287019 ms; exit 0; early stop 0
+ce19d35b7a904d0bdbd578dd78a95c7089b9370b
+b9444b022fa105ef54c910fd00215ba0c62e75abc121cba4bfaa0ece68e437ac
+args executed witness-plane order2 2026093061 8 lock-dec research/records/2026-09-30_THE_MODULUS_FOUNDED_OFF_ONE_receipts/refit_on_lattice.txt .local/wp-2 c0=research/records/2026-10-01_THE_GUARDED_WITNESS_receipts/c0.state c6=research/records/2026-10-01_THE_GUARDED_WITNESS_receipts/c6.state
+wall 288038 ms; exit 0; early stop 0

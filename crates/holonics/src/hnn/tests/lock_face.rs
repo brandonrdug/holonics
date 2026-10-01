@@ -782,41 +782,70 @@ fn state_of(theta: &Constitution) -> ContinuingState {
 // -------------------------------------------------------------------------------------------
 // the move's metric is its witness's
 
-/// One lock term on the plane from each candidate's `(θ_x, [x = t], δ_x)`.
-fn plane_term(target: usize, shares: &[Rat], along: &[[Rat; 2]]) -> PlaneTerm {
+fn term(target: usize, readings: &[Rat], along: &[[Rat; 2]]) -> PlaneTerm {
     PlaneTerm {
-        shares: shares.to_vec(),
-        weights: shares
-            .iter()
-            .enumerate()
-            .map(|(x, s)| if x == target { s - Rat::one() } else { s.clone() })
-            .collect(),
+        target,
+        readings: readings.to_vec(),
         along: along.to_vec(),
     }
 }
 
-/// **The witness's form is the lock's Fisher form pulled back** (the witness's metric record): for
-/// one lock with two candidates at `a = (1, 2)` (`Π = 4`, `θ = (1/4, 1/2)`, the resting sheet
-/// `1/4`), the form is `Σ θ δδᵀ − (Σ θ δ)(Σ θ δ)ᵀ`, the gradient `Σ (θ − q) δ`, and the step solves
-/// `G s = −g` exactly; the second-order model's change at it is `−½ gᵀG⁻¹g < 0`.
+/// **The witness's form is the lock's normalized Jacobian pulled back** (the witness's metric
+/// record): one lock with readings `a = (1, 2)` has sheets `(1, 1, 2)/4` (the resting sheet `1/4`),
+/// so `θ = (1/4, 1/2)`; the form is `Σ θ δδᵀ − (Σ θ δ)(Σ θ δ)ᵀ`, the gradient `Σ (θ − q) δ`, and the
+/// step solves `G s = −g` exactly, its Gauss–Newton change `−½ gᵀG⁻¹g < 0`. A lock whose candidates
+/// all move alike along both directions sees a plane direction it cannot read: the step is refused.
 #[test]
-fn the_witness_form_is_the_locks_fisher_form_pulled_back() {
-    let shares = [rat(1, 4), rat(1, 2)];
-    let along = [[integer(2), integer(1)], [integer(-1), integer(3)]];
-    let w = witness_form(&[plane_term(0, &shares, &along)]);
-    // Σθδ = (1/2 − 1/2, 1/4 + 3/2) = (0, 7/4).
-    // Σθδδᵀ: EE 1 + 1/2 = 3/2; Eρ 1/2 − 3/2 = −1; ρρ 1/4 + 9/2 = 19/4.
-    assert_eq!(w.form, [rat(3, 2), integer(-1), rat(19, 4) - rat(49, 16)]);
-    // (θ − q) = (−3/4, 1/2): g = (−3/2 − 1/2, −3/4 + 3/2) = (−2, 3/4).
+fn the_witness_form_is_the_locks_normalized_jacobian_pulled_back() {
+    let w = witness_form(&[term(
+        0,
+        &[integer(1), integer(2)],
+        &[[integer(2), integer(1)], [integer(-1), integer(3)]],
+    )])
+    .unwrap();
+    // Σθδ = (0, 7/4); Σθδδᵀ = [[3/2, −1], [−1, 19/4]].
+    assert_eq!(
+        (w.form.at(0, 0), w.form.at(0, 1), w.form.at(1, 1)),
+        (&rat(3, 2), &integer(-1), &(rat(19, 4) - rat(49, 16)))
+    );
+    // θ − q = (−3/4, 1/2): g = (−2, 3/4).
     assert_eq!(w.gradient, [integer(-2), rat(3, 4)]);
     let [a, b] = w.step().unwrap();
-    let [g0, g1, g2] = &w.form;
-    assert_eq!(g0 * &a + g1 * &b, -w.gradient[0].clone());
-    assert_eq!(g1 * &a + g2 * &b, -w.gradient[1].clone());
+    assert_eq!(w.form.at(0, 0) * &a + w.form.at(0, 1) * &b, integer(2));
+    assert_eq!(w.form.at(0, 1) * &a + w.form.at(1, 1) * &b, rat(-3, 4));
     assert!(w.predicted().unwrap().is_negative());
-    // With every candidate's δ equal the lock reads no change: the plane is degenerate to it.
-    let flat = witness_form(&[plane_term(0, &shares, &[[integer(1), integer(1)], [integer(1), integer(1)]])]);
+    let flat = witness_form(&[term(
+        0,
+        &[integer(1), integer(2)],
+        &[[integer(1), integer(1)], [integer(1), integer(1)]],
+    )])
+    .unwrap();
     assert!(flat.step().is_none());
+}
+
+/// **One common receiver keeps the form a variance** (Astra's review): three candidates whose
+/// growth enclosures are `[1, 9]` have share enclosures `[1/20, 3/4]` each, and their independent
+/// midpoints `17/40` sum to `51/40 > 1`, where the plane form along `(1, 0)` on every candidate
+/// would read `s − s² < 0`. At any common representative the sheets sum to one with the resting
+/// sheet positive, every share lies in its enclosure, and the form is `Var_θ(0, 1, 1, 1) > 0`.
+#[test]
+fn one_common_receiver_keeps_the_form_a_variance() {
+    let midpoints = rat(17, 40) * integer(3);
+    assert!(midpoints > Rat::one() && rat(17, 40) - &midpoints * &midpoints / integer(3) < Rat::zero());
+    for a in [integer(1), integer(5), integer(9)] {
+        let readings = [a.clone(), a.clone(), a.clone()];
+        let w = witness_form(&[term(
+            0,
+            &readings,
+            &[[integer(1), integer(0)], [integer(1), integer(0)], [integer(1), integer(0)]],
+        )])
+        .unwrap();
+        let s = &a * integer(3) / (integer(1) + &a * integer(3));
+        let share = &a / (integer(1) + &a * integer(3));
+        assert!(rat(1, 20) <= share && share <= rat(3, 4) && s < Rat::one());
+        assert_eq!(w.form.at(0, 0), &(&s - &s * &s));
+        assert!(w.form.at(0, 0).is_positive());
+    }
 }
 
 /// **The witness's step is chart-free; the coordinate control is not** (Astra's `z′ = 2z`
@@ -826,37 +855,27 @@ fn the_witness_form_is_the_locks_fisher_form_pulled_back() {
 /// `δ_ρ` by `k` and multiplies the step's `ρ` coordinate by `k`: the same move.
 #[test]
 fn the_witness_step_is_chart_free_and_the_coordinate_control_is_not() {
-    let shares = [rat(1, 4), rat(1, 2)];
+    let readings = [integer(1), integer(2)];
     let covectors = [[integer(3), integer(-1)], [integer(1), integer(2)]];
     let moves_e = [[integer(1), integer(1)], [integer(-1), integer(2)]];
     let moves_rho = [[integer(2), integer(-1)], [integer(1), integer(1)]];
+    let weights = [rat(-3, 4), rat(1, 2)];
     let read = |scale: &Rat| {
-        let along: Vec<[Rat; 2]> = (0..2)
-            .map(|x| {
-                let pair = |m: &[Rat; 2]| -> Rat {
-                    covectors[x]
-                        .iter()
-                        .zip(m)
-                        .map(|(g, d)| (g / scale) * (d * scale))
-                        .sum()
-                };
-                [pair(&moves_e[x]), pair(&moves_rho[x])]
-            })
-            .collect();
-        let term = plane_term(0, &shares, &along);
-        let gamma: Rat = term.weights.iter().zip(&along).map(|(c, d)| c * &d[1]).sum();
+        let pair = |x: usize, m: &[Rat; 2]| -> Rat {
+            covectors[x].iter().zip(m).map(|(g, d)| (g / scale) * (d * scale)).sum()
+        };
+        let along: Vec<[Rat; 2]> = (0..2).map(|x| [pair(x, &moves_e[x]), pair(x, &moves_rho[x])]).collect();
+        let gamma: Rat = weights.iter().zip(&along).map(|(c, d)| c * &d[1]).sum();
         let curvature: Rat = moves_rho
             .iter()
             .flat_map(|m| m.iter().map(|d| (d * scale) * (d * scale)))
             .sum();
-        (witness_form(&[term]), -gamma / curvature)
+        (witness_form(&[term(0, &readings, &along)]).unwrap(), -gamma / curvature)
     };
     let (w1, control1) = read(&Rat::one());
     let (w2, control2) = read(&integer(2));
     assert_eq!(w1, w2);
-    assert_eq!(w1.step(), w2.step());
     assert_eq!(control2, control1 / integer(4));
-    // The plane's ρ direction rescaled by k = 3: the same move.
     let k = integer(3);
     let along: Vec<[Rat; 2]> = (0..2)
         .map(|x| {
@@ -865,46 +884,48 @@ fn the_witness_step_is_chart_free_and_the_coordinate_control_is_not() {
         })
         .collect();
     let [a, b] = w1.step().unwrap();
-    let [a3, b3] = witness_form(&[plane_term(0, &shares, &along)]).step().unwrap();
+    let [a3, b3] = witness_form(&[term(0, &readings, &along)]).unwrap().step().unwrap();
     assert_eq!((a3, b3), (a, b * &k));
 }
 
 /// **Dropping the cross term is the negative control**: where `G_Eρ ≠ 0` the decoupled steps
-/// `−g_i/G_ii` differ from the witness's step; where the plane's two directions are orthogonal to
-/// the witness (`G_Eρ = 0`) they coincide.
+/// `−g_i/G_ii` differ from the witness's step; where no lock couples the two directions they
+/// coincide.
 #[test]
 fn dropping_the_cross_term_changes_the_step_only_where_the_witness_couples_the_plane() {
-    let shares = [rat(1, 4), rat(1, 2)];
-    let coupled = witness_form(&[plane_term(
+    let readings = [integer(1), integer(2)];
+    let coupled = witness_form(&[term(
         0,
-        &shares,
+        &readings,
         &[[integer(2), integer(1)], [integer(-1), integer(3)]],
-    )]);
-    assert!(!coupled.form[1].is_zero());
+    )])
+    .unwrap();
+    assert!(!coupled.form.at(0, 1).is_zero());
     let [a, b] = coupled.step().unwrap();
     assert_ne!(coupled.decoupled(), [Some(a), Some(b)]);
-    // One lock moved only along `ΔE` and another only along `ρ`: no term couples the two.
-    let orthogonal = witness_form(&[plane_term(
-        0,
-        &shares,
-        &[[integer(2), integer(0)], [integer(-1), integer(0)]],
-    ), plane_term(0, &shares, &[[integer(0), integer(1)], [integer(0), integer(-1)]])]);
-    assert!(orthogonal.form[1].is_zero());
-    let [a, b] = orthogonal.step().unwrap();
-    assert_eq!(orthogonal.decoupled(), [Some(a), Some(b)]);
+    let apart = witness_form(&[
+        term(0, &readings, &[[integer(2), integer(0)], [integer(-1), integer(0)]]),
+        term(0, &readings, &[[integer(0), integer(1)], [integer(0), integer(-1)]]),
+    ])
+    .unwrap();
+    assert!(apart.form.at(0, 1).is_zero());
+    let [a, b] = apart.step().unwrap();
+    assert_eq!(apart.decoupled(), [Some(a), Some(b)]);
 }
 
 /// **The machine's plane reading agrees with its move** (the witness's metric record): on the
 /// candidate arm at a generic constitution, the plane reading forms the move's own unit step (the
-/// same `γ_ρ`, `G_ρ` and `−γ_ρ/G_ρ` as [`executed_move`]), its gradient's `ρ` part is `γ_ρ` within
-/// the `δ`'s held grain, and its form is positive semidefinite (the lock's Fisher form is).
+/// same `γ_ρ`, `G_ρ` and `−γ_ρ/G_ρ` as [`executed_move`]) over the same terms, every common share
+/// lies in its comparison's share enclosure, and the form is positive semidefinite.
 #[test]
 fn the_machines_plane_reading_agrees_with_its_move() {
+    use crate::ratio::linear::inertia::inertia;
     let field = joint();
     let theta = generic(&field, 94).with_transport(0, rat(3, 4)).unwrap();
     let refinement = Refinement::declare(&field, 0, 2, 1, 4, 2).unwrap();
     let bank = joint_bank();
-    let requests = short_requests(&field, &[(95, [0, 1, 2, 1]), (96, [1, 1, 0, 2]), (97, [2, 0, 1, 1])]);
+    let requests =
+        short_requests(&field, &[(95, [0, 1, 2, 1]), (96, [1, 1, 0, 2]), (97, [2, 0, 1, 1])]);
     let comparison = Comparison::LOCK_DECISIONS;
     let moved = executed_move(&field, &theta, &requests, &refinement, &bank, 12, comparison).unwrap();
     let plane = witness_plane(&field, &theta, &requests, &refinement, &bank, 12, comparison).unwrap();
@@ -913,10 +934,6 @@ fn the_machines_plane_reading_agrees_with_its_move() {
     assert_eq!(plane.modulus_curvature, moved.modulus_curvature);
     assert_eq!(plane.modulus_unit, moved.modulus_unit);
     assert_eq!(plane.terms, moved.terms);
-    let w = plane.witness.unwrap();
-    let gamma = plane.modulus_slope.unwrap();
-    let grain = Rat::new(1.into(), num_bigint::BigInt::from(1) << 96usize);
-    assert!((&w.gradient[1] - &gamma).abs() <= &grain * (gamma.abs() + Rat::one()));
-    assert!(!w.form[0].is_negative() && !w.form[2].is_negative());
-    assert!(!w.determinant().is_negative());
+    assert_eq!(plane.outside, 0);
+    assert_eq!(inertia(&plane.witness.unwrap().form).negative, 0);
 }

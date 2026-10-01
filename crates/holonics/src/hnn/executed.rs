@@ -184,6 +184,7 @@ use crate::ratio::GaussianRat;
 use crate::ratio::Rat;
 use crate::ratio::algebraic::{ExactInterval, ln_enclosure};
 use crate::ratio::linear::ExactRatMatrix;
+use crate::ratio::linear::inertia::{SymmetricForm, inertia};
 
 /// [definition; agent-inferred, September 30] **The entry bound** `2³`: every entry of `E` at most
 /// three binary orders above the founding's unit scale (the certified step's pins, acceptance 1;
@@ -1483,10 +1484,12 @@ enum Certificate {
     /// The hinge: every active branch, each its contributions (rival at `+1`, target at `−1`).
     Hinge(Vec<Vec<Contribution>>),
     /// The lock face: every candidate's section, its active resolved members' covectors and its
-    /// share `θ_x` enclosed.
+    /// share `θ_x` enclosed; and every candidate's reading at one common representative (its joint
+    /// growth enclosure's dyadic face), from which the lock's sheets are normalized jointly.
     Lock {
         target: usize,
         candidates: Vec<(usize, Vec<Vec<ExactInterval>>, ExactInterval)>,
+        readings: Vec<Rat>,
     },
 }
 
@@ -1724,10 +1727,23 @@ fn propose(
                         candidates.push((section, members, lock.shares[x].clone()));
                     }
                     contributions.extend(leading.iter().cloned());
+                    let readings = joints
+                        .iter()
+                        .map(|g| {
+                            face(&ExactInterval {
+                                lower: g.lower.clone(),
+                                upper: g.upper.clone(),
+                            })
+                        })
+                        .collect();
                     terms_out.push(TermCertificate {
                         site: site.clone(),
                         kind: term.kind,
-                        certificate: Certificate::Lock { target, candidates },
+                        certificate: Certificate::Lock {
+                            target,
+                            candidates,
+                            readings,
+                        },
                         unresolved: refused,
                         leading,
                     });
@@ -2425,7 +2441,9 @@ fn term_bound(term: &TermCertificate, moves: &[Vec<ExactInterval>]) -> Option<Ex
                 }
             })
         }
-        Certificate::Lock { target, candidates } => lock_term_bound(*target, candidates, moves),
+        Certificate::Lock {
+            target, candidates, ..
+        } => lock_term_bound(*target, candidates, moves),
     }
 }
 
@@ -3240,67 +3258,88 @@ pub fn unit_direction(
 
 /// [definition; agent-inferred, October 1; the
 /// [witness's metric record](../../../../research/records/2026-10-01_THE_MOVES_METRIC_IS_ITS_WITNESSS_THE_LOCKS_FISHER_FORM_ON_THE_MOVES_PLANE.md)]
-/// **One lock-face term read on the move's plane**: each candidate's share `θ_x` (its dyadic face;
-/// the resting sheet holds `1 − Σθ`), its covector weight `θ_x − [x = t]`, and its log-reading's
-/// change along the plane's two unit directions, `δ_x = (⟨ĝ_x, Δz_x(ΔE)⟩, ⟨ĝ_x, ∂z_x/∂ρ⟩)`.
+/// **A lock's sheets at one common representative**: the resting sheet's weight one and every
+/// candidate's reading `a_x > 0`, normalized jointly, `(1, a_0, …)/Π` with `Π = 1 + Σ a_x`. One
+/// representative for every sheet makes it one categorical receiver (`Σ = 1`, the resting sheet's
+/// share `1/Π > 0`); independent per-candidate faces of the shares' enclosures need not sum to one
+/// (Astra's review: three readings in `[1, 9]` give share faces summing to `51/40`). `None` when a
+/// reading is not positive.
+fn lock_sheets(readings: &[Rat]) -> Option<Vec<Rat>> {
+    if readings.iter().any(|a| !a.is_positive()) {
+        return None;
+    }
+    let mass = Rat::one() + readings.iter().sum::<Rat>();
+    Some(
+        std::iter::once(Rat::one())
+            .chain(readings.iter().cloned())
+            .map(|w| w / &mass)
+            .collect(),
+    )
+}
+
+/// [definition; agent-inferred, October 1] **One lock-face term on the move's plane**: its target,
+/// every candidate's reading at the common representative ([`lock_sheets`]), and every candidate's
+/// log-reading change along the plane's two unit directions,
+/// `δ_x = (⟨ĝ_x, Δz_x(ΔE)⟩, ⟨ĝ_x, ∂z_x/∂ρ⟩)` (the resting sheet does not move).
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct PlaneTerm {
-    pub shares: Vec<Rat>,
-    pub weights: Vec<Rat>,
+    pub target: usize,
+    pub readings: Vec<Rat>,
     pub along: Vec<[Rat; 2]>,
 }
 
 /// [definition; agent-inferred, October 1] **The witness's form on the move's plane** (the record
-/// above). A move's metric is a reading: the quadratic form by which a receiver measures a change,
-/// its energy of the change. The witness of the executed comparison is the lock at each decision,
-/// and its energy account is the relative entropy of its reading (free energy
-/// `F(p) − F(q) = k_B T · D(p‖q)`). To second order in the log-readings `u_x = log a_x` that is the
-/// curvature of the lock's log mass `log Π`, `Π = 1 + Σ_x a_x` (the resting sheet's weight one is
-/// the lossless ring's return): `∂²ℓ/∂u_x∂u_y = θ_x[x = y] − θ_x θ_y`, the lock face's own Hessian
-/// (`ℓ = log Π − u_t`; the target's part is linear). Pulled back through the readings onto the plane
-/// of the port's unit move `ΔE` and the modulus, it is
-/// `G = Σ_j Σ_(x,y) δ_x (θ_x[x = y] − θ_x θ_y) δ_yᵀ` (`form`: `G_EE`, `G_Eρ`, `G_ρρ`), beside the
-/// gradient `g = Σ_j Σ_x (θ_x − [x = t]) δ_x` (its `ρ` part is the move's `γ_ρ`). Every `δ` is a
-/// change of the witness's own reading, so `G` and `g` are unchanged by a storage rechart
-/// `z′ = Bz` (`ĝ′ = B⁻ᵀĝ`), and a rescaled plane direction rescales the step's coordinate inversely
-/// (the step itself unchanged). The coordinate control `−γ_ρ/Σ|∂z/∂ρ|²` has neither property.
+/// above). A move's metric is a reading: the quadratic form by which a receiver measures a change.
+/// The executed comparison's witness is the lock at each decision, a normalized receiver over its
+/// sheets, whose form in the log-readings is the normalized face's Jacobian
+/// `J_θ = diag θ − θθᵀ` ([`crate::receiver::face::softmax_jacobian`], Lean
+/// `Holon/Law.softmaxJacobian`): the Fisher form, and the lock face's Hessian in the log-readings
+/// (`ℓ = log Π − u_t`). Each lock's map `D_j` (sheets × plane; the resting sheet's row zero) pulls it
+/// back, and the terms join as one direct sum:
+/// `G = Dᵀ(⊕_j J_θj)D` ([`SymmetricForm::direct_sum`], [`SymmetricForm::pullback`]), beside
+/// `g = Dᵀ(⊕_j (θ_j − e_t))`.
+/// - **Kernel** (Astra's review): `vᵀGv = Σ_j Var_θj(0, (D_j v)_x)`, a variance over each lock's
+///   sheets with the resting sheet at zero, so `ker G = ∩_j ker D_j`: a plane direction the
+///   witness cannot see in any reading. The step `−G⁻¹g` is defined exactly where `G ≻ 0`,
+///   decided by [`inertia`].
+/// - **Scope**: `G` is the Gauss–Newton (Fisher) pullback, not the comparison's full Hessian on the
+///   plane, which adds `Σ_j Σ_x (θ_x − [x = t]) Hess(u_x)`.
+/// - **Charts**: every `δ` is a change of the witness's own reading, so `G`, `g` and the step are
+///   unchanged by a storage rechart `z′ = Bz` (`ĝ′ = B⁻ᵀĝ`), and a rescaled plane direction rescales
+///   its coordinate inversely. The coordinate control `−γ_ρ/Σ|∂z/∂ρ|²` has neither property.
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct WitnessForm {
-    pub form: [Rat; 3],
+    pub form: SymmetricForm,
     pub gradient: [Rat; 2],
 }
 
 impl WitnessForm {
     /// The determinant `G_EE G_ρρ − G_Eρ²`.
     pub fn determinant(&self) -> Rat {
-        &self.form[0] * &self.form[2] - &self.form[1] * &self.form[1]
+        self.form.at(0, 0) * self.form.at(1, 1) - self.form.at(0, 1) * self.form.at(0, 1)
     }
 
-    /// The witness's step on the plane, `(α, β) = −G⁻¹g` (its unit along `ΔE` and its move of
-    /// `ρ`), where `G ≻ 0`; `None` where the plane is degenerate to the witness.
+    /// The witness's step on the plane, `(α, β) = −G⁻¹g`, where `G ≻ 0` ([`inertia`]); `None` where
+    /// some plane direction lies in the witness's kernel.
     pub fn step(&self) -> Option<[Rat; 2]> {
-        let det = self.determinant();
-        if !det.is_positive() || !self.form[0].is_positive() {
+        if inertia(&self.form).positive != 2 {
             return None;
         }
-        let [a, b, c] = &self.form;
-        let [p, q] = &self.gradient;
-        Some([
-            -(c * p - b * q) / &det,
-            -(a * q - b * p) / &det,
-        ])
+        let inverse = self.form.as_matrix().ok()?.inverse().ok()?;
+        let step = inverse.apply(&self.gradient).ok()?;
+        Some([-step[0].clone(), -step[1].clone()])
     }
 
     /// Each coordinate's step with the cross term dropped, `−g_i/G_ii` (the negative control).
     pub fn decoupled(&self) -> [Option<Rat>; 2] {
         let one = |g: &Rat, m: &Rat| m.is_positive().then(|| -g / m);
         [
-            one(&self.gradient[0], &self.form[0]),
-            one(&self.gradient[1], &self.form[2]),
+            one(&self.gradient[0], self.form.at(0, 0)),
+            one(&self.gradient[1], self.form.at(1, 1)),
         ]
     }
 
-    /// The second-order model's change at the witness's step, `½ gᵀ(α, β) = −½ gᵀG⁻¹g`.
+    /// The Gauss–Newton model's change at the witness's step, `½ gᵀ(α, β) = −½ gᵀG⁻¹g`.
     pub fn predicted(&self) -> Option<Rat> {
         self.step().map(|[a, b]| {
             (&self.gradient[0] * &a + &self.gradient[1] * &b) / Rat::from_integer(BigInt::from(2))
@@ -3308,36 +3347,59 @@ impl WitnessForm {
     }
 }
 
-/// The witness's form from its terms on the plane ([`WitnessForm`]), exactly.
-pub fn witness_form(terms: &[PlaneTerm]) -> WitnessForm {
-    let mut form = [Rat::zero(), Rat::zero(), Rat::zero()];
-    let mut gradient = [Rat::zero(), Rat::zero()];
+/// The witness's form from its terms on the plane ([`WitnessForm`]), exactly: the locks' Jacobians
+/// joined by direct sum and pulled back once. `None` when a term's reading is not positive or its
+/// shapes disagree.
+pub fn witness_form(terms: &[PlaneTerm]) -> Option<WitnessForm> {
+    let mut joined = SymmetricForm::zeros(0);
+    let mut rows: Vec<Vec<Rat>> = Vec::new();
+    let mut covector: Vec<Rat> = Vec::new();
     for term in terms {
-        let mut mean = [Rat::zero(), Rat::zero()];
-        for ((theta, weight), delta) in term.shares.iter().zip(&term.weights).zip(&term.along) {
-            for i in 0..2 {
-                mean[i] += theta * &delta[i];
-                gradient[i] += weight * &delta[i];
-            }
-            form[0] += theta * &delta[0] * &delta[0];
-            form[1] += theta * &delta[0] * &delta[1];
-            form[2] += theta * &delta[1] * &delta[1];
+        if term.along.len() != term.readings.len() || term.target >= term.readings.len() {
+            return None;
         }
-        form[0] -= &mean[0] * &mean[0];
-        form[1] -= &mean[0] * &mean[1];
-        form[2] -= &mean[1] * &mean[1];
+        let sheets = lock_sheets(&term.readings)?;
+        joined = joined.direct_sum(&crate::receiver::face::softmax_jacobian(&sheets).ok()?);
+        rows.push(vec![Rat::zero(), Rat::zero()]);
+        covector.push(sheets[0].clone());
+        for (x, delta) in term.along.iter().enumerate() {
+            rows.push(delta.to_vec());
+            let theta = &sheets[x + 1];
+            covector.push(if x == term.target { theta - Rat::one() } else { theta.clone() });
+        }
     }
-    WitnessForm { form, gradient }
+    if rows.is_empty() {
+        return Some(WitnessForm {
+            form: SymmetricForm::zeros(2),
+            gradient: [Rat::zero(), Rat::zero()],
+        });
+    }
+    let map = ExactRatMatrix::new(rows).ok()?;
+    let form = joined.pullback(&map).ok()?;
+    let gradient = map.transpose().ok()?.apply(&covector).ok()?;
+    Some(WitnessForm {
+        form,
+        gradient: [gradient[0].clone(), gradient[1].clone()],
+    })
 }
 
 /// [measured-diagnostic; agent-inferred, October 1] **The committed move's plane read by its
 /// witness** (the record above): the incumbent's comparison and, where [`executed_move`] would form
 /// its step, the port's unit move `ΔE` and the coordinate control (`γ_ρ`, `G_ρ`, `−γ_ρ/G_ρ`)
 /// exactly as it forms them ([`unit_step`]), and the witness's form on the plane of `ΔE` and `ρ`
-/// ([`WitnessForm`]) over the proposal's lock-face terms. Each `δ` is the candidate's leading
-/// member's covector at its dyadic faces paired exactly with its storage's move, then held at
-/// [`JOINT_BITS`] significant bits (a reading's grain far below the readings' `2^(−16)`). The hinge
-/// has no lock and no witness's form here. No step is taken; nothing is retained.
+/// ([`WitnessForm`]) over the proposal's lock-face terms.
+/// - **What `δ` differentiates.** The candidate's leading member's covector (the simple-root
+///   derivative of `log ρ(M)` through the executed tick, at its dyadic faces) paired exactly with
+///   its storage's move: along `ΔE` the exact difference of the placed storage (linear in `E` at
+///   fixed weights), along `ρ` the placement's exact derivative of its unrounded transported
+///   weights (`BankPlacement::modulus_derivative`). Each `δ` is then held at [`JOINT_BITS`]
+///   significant bits.
+/// - **The common receiver.** The lock's sheets are normalized jointly at the candidates' readings'
+///   faces ([`lock_sheets`]); `outside` counts the candidates whose common share leaves the
+///   comparison's share enclosure (the explicit residual; the enclosure holds every
+///   representative, so it is zero unless the faces are inconsistent).
+///
+/// The hinge has no lock and no witness's form here. No step is taken; nothing is retained.
 #[derive(Clone, Debug)]
 pub struct PlaneReading {
     pub before: BatchComparison,
@@ -3348,6 +3410,7 @@ pub struct PlaneReading {
     pub modulus_unit: Option<Rat>,
     pub witness: Option<WitnessForm>,
     pub terms: usize,
+    pub outside: usize,
 }
 
 /// [measured-diagnostic] The committed move's plane read by its witness ([`PlaneReading`]).
@@ -3373,6 +3436,7 @@ pub fn witness_plane(
         modulus_unit: None,
         witness: None,
         terms: 0,
+        outside: 0,
     };
     if reading.refusal.is_some() {
         return Ok(reading);
@@ -3410,40 +3474,55 @@ pub fn witness_plane(
                 significant(&x, JOINT_BITS, false)
             }
         };
-        let terms: Vec<PlaneTerm> = proposal
+        let read: Vec<(PlaneTerm, usize)> = proposal
             .terms
             .par_iter()
             .filter_map(|term| match &term.certificate {
-                Certificate::Lock { candidates, .. } => Some((term, candidates)),
+                Certificate::Lock {
+                    target,
+                    candidates,
+                    readings,
+                } => Some((term, *target, candidates, readings)),
                 Certificate::Hinge(_) => None,
             })
-            .map(|(term, candidates)| {
-                let mut out = PlaneTerm {
-                    shares: Vec::with_capacity(candidates.len()),
-                    weights: Vec::with_capacity(candidates.len()),
-                    along: Vec::with_capacity(candidates.len()),
-                };
-                for (c, (_, _, share)) in term.leading.iter().zip(candidates) {
-                    let covector: Vec<Rat> = c.covector.iter().map(face).collect();
-                    let along_e: Rat = covector
+            .map(|(term, target, candidates, readings)| {
+                let along = term
+                    .leading
+                    .iter()
+                    .map(|c| {
+                        let covector: Vec<Rat> = c.covector.iter().map(face).collect();
+                        let pair = |moved: &mut dyn Iterator<Item = Rat>| -> Rat {
+                            covector.iter().zip(moved).map(|(g, d)| g * d).sum()
+                        };
+                        [
+                            held(pair(&mut moves[c.section].iter().map(|d| d.lower.clone()))),
+                            held(pair(&mut derivatives[c.section].iter().cloned())),
+                        ]
+                    })
+                    .collect();
+                let outside = lock_sheets(readings).map_or(candidates.len(), |sheets| {
+                    candidates
                         .iter()
-                        .zip(&moves[c.section])
-                        .map(|(g, d)| g * &d.lower)
-                        .sum();
-                    let along_rho: Rat = covector
-                        .iter()
-                        .zip(&derivatives[c.section])
-                        .map(|(g, d)| g * d)
-                        .sum();
-                    out.shares.push(face(share));
-                    out.weights.push(c.weight.clone());
-                    out.along.push([held(along_e), held(along_rho)]);
-                }
-                out
+                        .zip(&sheets[1..])
+                        .filter(|((_, _, share), theta)| {
+                            **theta < share.lower || **theta > share.upper
+                        })
+                        .count()
+                });
+                (
+                    PlaneTerm {
+                        target,
+                        readings: readings.clone(),
+                        along,
+                    },
+                    outside,
+                )
             })
             .collect();
-        reading.terms = terms.len();
-        reading.witness = Some(witness_form(&terms));
+        reading.terms = read.len();
+        reading.outside = read.iter().map(|(_, n)| n).sum();
+        let terms: Vec<PlaneTerm> = read.into_iter().map(|(t, _)| t).collect();
+        reading.witness = witness_form(&terms);
     }
     reading.unit_move = Some(step.unit_move);
     Ok(reading)

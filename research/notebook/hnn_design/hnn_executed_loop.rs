@@ -1494,7 +1494,7 @@ pub(super) fn witness_plane(
         };
         let gamma = reading.modulus_slope.clone().expect("γ_ρ");
         let curvature = reading.modulus_curvature.clone().expect("G_ρ");
-        let [ee, er, rr] = &witness.form;
+        let (ee, er, rr) = (witness.form.at(0, 0), witness.form.at(0, 1), witness.form.at(1, 1));
         let [ge, gr] = &witness.gradient;
         let decoupled = witness.decoupled();
         println!(
@@ -1505,8 +1505,9 @@ pub(super) fn witness_plane(
             largest_of(unit)
         );
         println!(
-            "    the witness ({} lock terms): G_EE {}, G_Eρ {}, G_ρρ {}, det {}; g_E {}, g_ρ {} (24 bits); decoupled α₀ {:?}, β₀ {:?}",
+            "    the witness ({} lock terms, {} common shares outside their enclosures): G_EE {}, G_Eρ {}, G_ρρ {}, det {}; g_E {}, g_ρ {} (24 bits); decoupled α₀ {:?}, β₀ {:?}",
             reading.terms,
+            reading.outside,
             at_bits(ee),
             at_bits(er),
             at_bits(rr),

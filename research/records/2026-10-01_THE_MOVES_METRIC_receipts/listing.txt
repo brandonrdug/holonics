@@ -1,14 +1,14 @@
 executed witness-plane: 8 order2 requests at development seed 2026093061, the arm lock-dec, toward research/records/2026-09-30_THE_MODULUS_FOUNDED_OFF_ONE_receipts/refit_on_lattice.txt; the bank p = 5/8, grain 2^(-16)
-  c0: ρ 102837/131072; L ∈ [500197/4096, 500203/4096) nats; solved 0 of 64; whole 0 (released 7, stations right 15); toward's ρ less this ρ: -68101/262144; 49985 ms
+  c0: ρ 102837/131072; L ∈ [500197/4096, 500203/4096) nats; solved 0 of 64; whole 0 (released 7, stations right 15); toward's ρ less this ρ: -68101/262144; 50865 ms
     the coordinate control: γ_ρ -10636625/131072, G_ρ 4345377/64, Δρ_c 10266827/8589934592 (24 bits); ΔE's largest entry 602475/1048576
-    the witness (64 lock terms): G_EE 9871287/16384, G_Eρ 1806923/4096, G_ρρ 4399651/512, det 4982678; g_E -1187493/8192, g_ρ -10636625/131072 (24 bits); decoupled α₀ Some(Ratio { numer: 8073041, denom: 33554432 }), β₀ Some(Ratio { numer: 633761, denom: 67108864 })
+    the witness (64 lock terms, 0 common shares outside their enclosures): G_EE 9871287/16384, G_Eρ 1806923/4096, G_ρρ 4399651/512, det 4982678; g_E -1187493/8192, g_ρ -10636625/131072 (24 bits); decoupled α₀ Some(Ratio { numer: 8073041, denom: 33554432 }), β₀ Some(Ratio { numer: 633761, denom: 67108864 })
     the witness's step: α 2036817/8388608, β -3244055/1073741824 (24 bits); the model's change -9162359/524288; β over toward's ρ change 12487475/1073741824; the control's αΔρ_c over it -1199485/1073741824
-  c0 witness: ρ 1639055/2097152; E's largest entry 1341147/2097152; L ∈ [464807/4096, 464812/4096) nats; solved 5 of 64; whole 0 (released 8, stations right 15); first locks 7- 6- 7- 7- 7- 7+ 7+ 7-; 38845 ms
-  c0 control: ρ 102875/131072; E's largest entry 1341147/2097152; L ∈ [494147/4096, 494153/4096) nats; solved 3 of 64; whole 0 (released 8, stations right 15); first locks 7- 2- 6- 5+ 7- 7+ 7+ 7-; 39382 ms
-  c6: ρ 1642461/2097152; L ∈ [373776/4096, 373781/4096) nats; solved 2 of 64; whole 0 (released 8, stations right 15); toward's ρ less this ρ: -541877/2097152; 78177 ms
+  c0 witness: ρ 1639055/2097152; E's largest entry 1341147/2097152; L ∈ [464807/4096, 464812/4096) nats; solved 5 of 64; whole 0 (released 8, stations right 15); first locks 7- 6- 7- 7- 7- 7+ 7+ 7-; 39184 ms
+  c0 control: ρ 102875/131072; E's largest entry 1341147/2097152; L ∈ [494147/4096, 494153/4096) nats; solved 3 of 64; whole 0 (released 8, stations right 15); first locks 7- 2- 6- 5+ 7- 7+ 7+ 7-; 39122 ms
+  c6: ρ 1642461/2097152; L ∈ [373776/4096, 373781/4096) nats; solved 2 of 64; whole 0 (released 8, stations right 15); toward's ρ less this ρ: -541877/2097152; 78889 ms
     the coordinate control: γ_ρ 9794427/524288, G_ρ 8323335/128, Δρ_c -2467809/8589934592 (24 bits); ΔE's largest entry 101741/2097152
-    the witness (64 lock terms): G_EE 12223969/2097152, G_Eρ 8564877/65536, G_ρρ 5445405/512, det 11497781/256; g_E -12848055/2097152, g_ρ 9794427/524288 (24 bits); decoupled α₀ Some(Ratio { numer: 8816881, denom: 8388608 }), β₀ Some(Ratio { numer: -3772061, denom: 2147483648 })
+    the witness (64 lock terms, 0 common shares outside their enclosures): G_EE 12223969/2097152, G_Eρ 8564877/65536, G_ρρ 5445405/512, det 11497781/256; g_E -12848055/2097152, g_ρ 9794427/524288 (24 bits); decoupled α₀ Some(Ratio { numer: 8816881, denom: 8388608 }), β₀ Some(Ratio { numer: -3772061, denom: 2147483648 })
     the witness's step: α 12625805/8388608, β -10872347/536870912 (24 bits); the model's change -10065589/2097152; β over toward's ρ change 10519437/134217728; the control's αΔρ_c over it 14375069/8589934592
-  c6 witness: ρ 799995/1048576; E's largest entry 765033/1048576; L ∈ [415717/4096, 415722/4096) nats; solved 2 of 64; whole 0 (released 8, stations right 21); first locks 7+ 7- 7+ 7+ 6+ 7+ 7- 5+; 39720 ms
-  c6 control: ρ 820777/1048576; E's largest entry 765033/1048576; L ∈ [398240/4096, 398245/4096) nats; solved 1 of 64; whole 0 (released 8, stations right 20); first locks 7+ 7- 7+ 7+ 2+ 7+ 7- 6+; 39711 ms
-executed witness-plane: 286088 ms; resident 171397120 now, 171397120 peak
+  c6 witness: ρ 799995/1048576; E's largest entry 765033/1048576; L ∈ [415717/4096, 415722/4096) nats; solved 2 of 64; whole 0 (released 8, stations right 21); first locks 7+ 7- 7+ 7+ 6+ 7+ 7- 5+; 39273 ms
+  c6 control: ρ 820777/1048576; E's largest entry 765033/1048576; L ∈ [398240/4096, 398245/4096) nats; solved 1 of 64; whole 0 (released 8, stations right 20); first locks 7+ 7- 7+ 7+ 2+ 7+ 7- 6+; 39382 ms
+executed witness-plane: 287630 ms; resident 173199360 now, 201814016 peak

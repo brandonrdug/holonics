@@ -158,8 +158,24 @@ impl SymmetricForm {
             .collect()
     }
 
-    fn as_matrix(&self) -> Result<ExactRatMatrix, InertiaError> {
+    pub(crate) fn as_matrix(&self) -> Result<ExactRatMatrix, InertiaError> {
         Ok(ExactRatMatrix::new(self.rows())?)
+    }
+
+    /// [proved-standard] **The form pulled back through a linear map** `Mᵀ A M`, for any `M` whose
+    /// rows match the form's extent (unlike [`congruence`], `M` need not be square or invertible:
+    /// the inertia may change, a positive semidefinite form stays positive semidefinite, and
+    /// `vᵀ(MᵀAM)v = (Mv)ᵀA(Mv)`). Routed back through the validating constructor.
+    pub fn pullback(&self, map: &ExactRatMatrix) -> Result<Self, InertiaError> {
+        if map.rows() != self.extent {
+            return Err(InertiaError::BasisShapeMismatch {
+                extent: self.extent,
+                rows: map.rows(),
+                columns: map.columns(),
+            });
+        }
+        let pulled = map.transpose()?.multiply(&self.as_matrix()?)?.multiply(map)?;
+        Self::from_rows(pulled.to_rows())
     }
 }
 
