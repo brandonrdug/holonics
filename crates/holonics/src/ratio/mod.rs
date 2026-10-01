@@ -109,6 +109,72 @@ pub fn integer(value: i64) -> Rat {
     Rat::from_integer(BigInt::from(value))
 }
 
+/// **Finite rational order without a recursive continued-fraction comparison.**
+///
+/// Compare the integer pairs by `n_left d_right` and `n_right d_left`, reversing the
+/// order when the denominator signs differ. Equal denominators or numerators need no
+/// products. The products may be wider than their operands; this is a stack bound, not
+/// a claim that multiplication is always cheaper than division.
+///
+/// A raw negative denominator is supported. A raw zero denominator is not a rational
+/// and is refused by panic, as in [`rat`]. No scalar quotient is formed.
+pub fn compare(left: &Rat, right: &Rat) -> Ordering {
+    use num_traits::{Signed, Zero};
+    assert!(
+        !left.denom().is_zero() && !right.denom().is_zero(),
+        "a rational comparison requires nonzero denominators"
+    );
+    if left.denom() == right.denom() {
+        let order = left.numer().cmp(right.numer());
+        return if left.denom().is_negative() {
+            order.reverse()
+        } else {
+            order
+        };
+    }
+    let flipped = left.denom().is_negative() ^ right.denom().is_negative();
+    let order = if left.numer() == right.numer() {
+        if left.numer().is_zero() {
+            return Ordering::Equal;
+        }
+        let order = left.denom().cmp(right.denom());
+        if left.numer().is_negative() {
+            order
+        } else {
+            order.reverse()
+        }
+    } else {
+        (left.numer() * right.denom()).cmp(&(right.numer() * left.denom()))
+    };
+    if flipped { order.reverse() } else { order }
+}
+
+#[cfg(test)]
+mod comparison_tests {
+    use super::*;
+
+    #[test]
+    fn signed_and_unreduced_pairs_keep_the_exact_finite_order() {
+        for n in -2..=2 {
+            for d in [-3, -1, 1, 3] {
+                for m in -2..=2 {
+                    for e in [-3, -1, 1, 3] {
+                        let left = Rat::new_raw(n.into(), d.into());
+                        let right = Rat::new_raw(m.into(), e.into());
+                        assert_eq!(compare(&left, &right), rat(n, d).cmp(&rat(m, e)));
+                    }
+                }
+            }
+        }
+    }
+
+    #[test]
+    #[should_panic(expected = "a rational comparison requires nonzero denominators")]
+    fn a_raw_zero_denominator_has_no_finite_order() {
+        compare(&Rat::new_raw(1.into(), 0.into()), &integer(1));
+    }
+}
+
 /// **Euclid's greatest common divisor** of two integers, nonnegative, with `gcd(0, 0) = 0`: the
 /// remainder face of division, iterated. The crate's one owner of it.
 pub(crate) fn gcd(left: &BigInt, right: &BigInt) -> BigInt {
