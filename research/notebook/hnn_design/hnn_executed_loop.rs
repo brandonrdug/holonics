@@ -94,8 +94,9 @@ pub(super) fn arm_comparison(arm: &str) -> (Comparison, bool) {
         "dec" => (Reading::Decisions, false),
         "tf" => (Reading::TeacherForced, false),
         "forced" => (Reading::Forced, false),
+        "fdec" => (Reading::ForcedDecisions, false),
         "partition" => (Reading::Every, true),
-        _ => panic!("a reading: all | dec | tf | forced | partition"),
+        _ => panic!("a reading: all | dec | tf | forced | fdec | partition"),
     };
     (
         Comparison {

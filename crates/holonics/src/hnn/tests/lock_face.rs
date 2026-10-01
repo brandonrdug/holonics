@@ -465,7 +465,7 @@ fn the_decisions_read_each_station_once_along_the_consistent_prefix() {
 
 /// The arms of gate B: the lock face at the decisions, at every refinement and teacher-forced; the
 /// hinge at the decisions and at every refinement.
-fn arms() -> [Comparison; 9] {
+fn arms() -> [Comparison; 10] {
     let arm = |composition, reading| Comparison {
         composition,
         reading,
@@ -480,6 +480,7 @@ fn arms() -> [Comparison; 9] {
         arm(Composition::LockOrder, Reading::Every),
         arm(Composition::LockFace, Reading::Forced),
         arm(Composition::LockOrder, Reading::Forced),
+        arm(Composition::LockOrder, Reading::ForcedDecisions),
     ]
 }
 

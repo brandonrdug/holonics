@@ -1,0 +1,4 @@
+230b3eaa4aca852d2a117de99c976f3d1307135e
+7e4747ba94a8c946fe4c023d3e9c2fd059285a9ab4ded75d6a286eb67b6b6ed3
+args executed move-once order2 2026093061 8 .local/fm m0=research/records/2026-10-01_THE_GUARDED_WITNESS_receipts/c0.state order-forced witness
+wall 983944 ms; exit 143; early stop 1
