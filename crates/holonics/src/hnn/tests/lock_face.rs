@@ -465,7 +465,7 @@ fn the_decisions_read_each_station_once_along_the_consistent_prefix() {
 
 /// The arms of gate B: the lock face at the decisions, at every refinement and teacher-forced; the
 /// hinge at the decisions and at every refinement.
-fn arms() -> [Comparison; 7] {
+fn arms() -> [Comparison; 9] {
     let arm = |composition, reading| Comparison {
         composition,
         reading,
@@ -478,6 +478,8 @@ fn arms() -> [Comparison; 7] {
         arm(Composition::LockFace, Reading::TeacherForced),
         arm(Composition::LockOrder, Reading::Decisions),
         arm(Composition::LockOrder, Reading::Every),
+        arm(Composition::LockFace, Reading::Forced),
+        arm(Composition::LockOrder, Reading::Forced),
     ]
 }
 
@@ -580,7 +582,8 @@ fn the_guards_hold_symmetrically_on_every_arm() {
         assert_eq!(moved.sites.len(), moved.terms);
         assert_eq!(moved.counts.absent, 0);
         assert_eq!(moved.counts.coverage, 8);
-        if comparison.reading != Reading::Every {
+        // Every refinement's open stations are read under the every-refinement and forced readings.
+        if !matches!(comparison.reading, Reading::Every | Reading::Forced) {
             assert_eq!(moved.counts.attempted, 8);
         }
         let p = moved.persistence;
@@ -1108,5 +1111,45 @@ fn plus_interval(a: &ExactInterval, b: &ExactInterval) -> ExactInterval {
     ExactInterval {
         lower: &a.lower + &b.lower,
         upper: &a.upper + &b.upper,
+    }
+}
+
+/// **The forced release reads every decision along the right trajectory** (the forced release's
+/// record): under the forced reading every term's section holds only target cells (each earlier lock
+/// placed at its target), every refinement's open stations are read, and the release itself (its
+/// sections and receipts) is the release's own, the same as under the decisions reading.
+#[test]
+fn the_forced_release_reads_every_decision_along_the_right_trajectory() {
+    let field = joint();
+    let theta = generic(&field, 94);
+    let refinement = Refinement::declare(&field, 0, 2, 1, 4, 2).unwrap();
+    let bank = joint_bank();
+    let requests =
+        executed_requests(&field, &[(95, [0, 1, 2, 1]), (96, [1, 1, 0, 2])], Context::Open);
+    let forced = Comparison {
+        composition: Composition::LockFace,
+        reading: Reading::Forced,
+    };
+    let batch = compare(&field, &theta, &requests, &refinement, &bank, 12, forced).unwrap();
+    let native =
+        compare(&field, &theta, &requests, &refinement, &bank, 12, Comparison::LOCK_DECISIONS).unwrap();
+    for ((request, own), r) in batch.requests.iter().zip(&native.requests).zip(&requests) {
+        assert_eq!(request.generation, own.generation);
+        assert!(!request.terms.is_empty());
+        for term in &request.terms {
+            for (cell, target) in term.site.cells.iter().zip(&r.targets) {
+                if let Some(class) = cell {
+                    assert_eq!(class, target);
+                }
+            }
+        }
+        // Every refinement's open stations: the first refinement reads every station.
+        let first: Vec<usize> = request
+            .terms
+            .iter()
+            .filter(|t| t.site.context == Some(0))
+            .map(|t| t.site.station)
+            .collect();
+        assert_eq!(first, (0..r.targets.len()).collect::<Vec<_>>());
     }
 }

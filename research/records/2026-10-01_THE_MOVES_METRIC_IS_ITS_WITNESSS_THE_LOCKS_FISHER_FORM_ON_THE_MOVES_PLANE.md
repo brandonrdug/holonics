@@ -12,8 +12,13 @@ thing read in different charts.
 
 [definition; agent-inferred] A metric on a move is a reading. It is the quadratic form by which a
 receiver measures the size of a change, which is that receiver's energy of the change. The receiver
-is the witness, its form is its inertia (mass), and the covector it returns is momentum: a step is
-inverse mass times momentum. Choosing a move's metric therefore chooses its witness, and the
+is the witness, and its form sizes the change; the covector it returns is paired with the step
+through that form. ~~Its form is its inertia (mass): a step is inverse mass times momentum.~~
+[Corrected October 1, Astra's theory handoff: a Fisher covariance is not an inertial mass without a
+separate constitutive map. The source's own kinetic form `M` and a reading `A` give the receiver's
+face form `M_F = (AM⁻¹A*)⁻¹`, and the minimum-energy source move with reading change `w` is
+`M⁻¹A*M_F w`. The Fisher form here is the lock's quadratic measurement of its readings, not that
+face, and not a mass.] Choosing a move's metric therefore chooses its witness, and the
 "energy account" and "the metric" are one act. The guides already say so. There is no global
 gradient, quantities belong to `view(receiver, grain, clock)`, and the Swing splits a rate "against
 a receiver's metric" ([objects](../../docs/ELEMENTARY_OBJECTS.md)). Probability is a receiver
