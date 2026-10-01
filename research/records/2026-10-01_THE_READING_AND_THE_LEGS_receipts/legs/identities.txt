@@ -1,0 +1,4 @@
+000acd2c71db2d394f5a7f4421a1501682bd2d01
+6458807bc93f0a1112d75d08b799694600115d3b4ce4c8385328e86d3639a09b
+args executed rho-slopes order2 2026093061 8 lock-dec e-1/4=opening+research/records/2026-09-30_THE_MODULUS_FOUNDED_OFF_ONE_receipts/refit_on_lattice.txt@102837/131072:1/4 e-1/2=opening+research/records/2026-09-30_THE_MODULUS_FOUNDED_OFF_ONE_receipts/refit_on_lattice.txt@102837/131072:1/2 e-3/4=opening+research/records/2026-09-30_THE_MODULUS_FOUNDED_OFF_ONE_receipts/refit_on_lattice.txt@102837/131072:3/4 rho-1/2=research/records/2026-09-30_THE_MODULUS_FOUNDED_OFF_ONE_receipts/refit_on_lattice.txt@1372988/2097152
+wall 273859 ms; exit 0; early stop 0

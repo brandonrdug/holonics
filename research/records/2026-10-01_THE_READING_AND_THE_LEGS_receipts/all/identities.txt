@@ -1,0 +1,4 @@
+000acd2c71db2d394f5a7f4421a1501682bd2d01
+6458807bc93f0a1112d75d08b799694600115d3b4ce4c8385328e86d3639a09b
+args executed rho-slopes order2 2026093061 8 lock-all opening=opening gateA-c1=research/records/2026-09-30_STEP_1B_GATE_A_receipts/witness_best.state
+wall 441181 ms; exit 143; early stop 1

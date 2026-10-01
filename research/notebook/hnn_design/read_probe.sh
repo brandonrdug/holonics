@@ -22,8 +22,18 @@ start=$(date +%s%3N)
 RAYON_NUM_THREADS=19 setsid timeout "$deadline" "$bin" "$@" > "$out/listing.txt" 2> "$out/stderr.txt" &
 pid=$!
 stopped=0
+# One line per constitution (`  <label>…; <ms> ms`). The run stops when the read in progress has
+# taken longer than the unit since the last such line (or since launch), not only once a slow line
+# has been printed.
+lines=0
+mark=$(date +%s%3N)
 while kill -0 "$pid" 2>/dev/null; do
-  if awk -v unit="$unit" '/^  [^ ].*; [0-9]+ ms$/ { if ($(NF-1) + 0 > unit) bad = 1 } END { exit !bad }' "$out/listing.txt"; then
+  now=$(date +%s%3N)
+  count=$(grep -cE '^  [^ ].*; [0-9]+ ms$' "$out/listing.txt" || true)
+  if (( count > lines )); then
+    lines=$count
+    mark=$now
+  elif (( now - mark > unit )); then
     kill -- "-$pid" 2>/dev/null || true
     stopped=1
     break
