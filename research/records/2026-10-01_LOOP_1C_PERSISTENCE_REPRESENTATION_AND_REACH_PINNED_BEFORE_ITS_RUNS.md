@@ -3,9 +3,9 @@
 **Date.** October 1 (written September 30). **Issues.** #73, #148, #63 (THE_REBUILD U6, step 1,
 loop 1c); #62. **Grade.** [definition; agent-inferred] for the experiments, their factors, the
 search, the alignment, the budgets and the schedule; [measured] for the development cost reads
-(§6.1) only; [proved-derived; formal-checked] for the Lean statements named in §7; owed (#62) as
-§7 states. **No run of loop 1c's experiments has been made.** GPT-6 Astra reviews this pin before
-anything runs.
+(§6.1) only; [proved-derived; formal-checked] for the Lean statements named in
+§7; owed (#62) as §7 states. **No run of loop 1c's experiments has been made.** GPT-6 Astra reviews
+this pin before anything runs.
 
 **Occasion.** Gate A of step 1b stopped
 ([record](2026-09-30_STEP_1B_GATE_A_NO_FEASIBILITY_WITNESS_WITHIN_ITS_BUDGET_THE_CANDIDATES_OWN_MOVE_SOLVES_AT_MOST_SEVEN_OF_SIXTY_FOUR_DECISIONS.md)):
@@ -434,10 +434,12 @@ owner, and nothing the release, the move or the retained state reads changed.
 - `executed witness … [<states dir>]`: gate A's procedure unchanged, writing every constitution's
   complete continuing state when given a directory.
 - `hnn_loop_1c.rs`: `executed replay` (a complete state restored whole and written back, or a file of
-  `E` and `ρ` alone read as a labelled partial remount), `executed coupling` and `executed represent`,
-  each stated in the module's header.
+  `E` and `ρ` alone read as a partial remount only when declared `partial:`, amended below),
+  `executed coupling` and `executed represent`, each stated in the module's header; `executed
+  restore`, the restore check with no reading, added by the amendment below.
 - `loop_1c_runs.sh`: the cost reads and their checks, and the experiments' runs with §6.2's fixed
-  guards and §6.3's thread counts. None of the experiments' runs has been launched.
+  guards and §6.3's thread counts, fail-closed since the amendment below. None of the experiments'
+  runs has been launched.
 
 **Not built**: the reach mode (§4), which is built only if a witness exists, against the law fixed
 here; its first constitution is its own development read under §6.4's early stop.
@@ -567,3 +569,98 @@ amendments govern over any conflicting statement above.
 The controls, the exact certification, the thread reservation (at most 19 threads, beside Codex's
 5) and the fixed deadlines of §6 are unchanged. Gates B and C stay closed, and the final
 confirmation `2_026_093_033/036/039` stays unread.
+
+## Amended after Astra's review of `722c3334`: the launcher and the harness fail closed
+
+Astra's review found that a failed or incomplete step could still feed its consumer. Four repairs
+were made, each with a negative test beside its positive control. **No experiment of this loop has
+run.** This section governs over any statement above it that conflicts.
+
+1. **The coupling's event bound** (§6.2: at most 6 native events a constitution, each of at most 7
+   landings). `executed coupling` read a seventh event without refusing. It now counts every native
+   event of a constitution before reading any (`native_events` in `hnn_loop_1c.rs`). Past 6 events,
+   or past 7 landings in one event, the run stops with exit 3 (incomplete) and the constitution is
+   recorded incomplete. It is never truncated to six events. Test:
+   `a_seventh_coupling_event_refuses_the_constitution_as_incomplete`.
+2. **Failure propagation.**
+   - Every run's exit now propagates (`loop_1c_runs.sh`'s `run`), and the step stops with it. The
+     outer guard gives 124. A harness that stops at its own deadline exits 3: `executed witness`,
+     `executed coupling` and `executed represent` all do. A refused input exits 4.
+   - `chain-continuation` runs `exp-replay`, then `check-replay`, then `exp-coupling`. Each step runs
+     only if the one before it passed.
+   - `check-replay` stamps the replay only when all of these hold:
+     - the replay exited 0 and its 33 lines match gate A's;
+     - its stop line says the moves are spent;
+     - `c1.state` is byte-identical to gate A's saved state;
+     - every one of the 17 states restores whole and writes back byte for byte. `executed restore`
+       checks this without making a reading: 186 ms for 17 states, guard 5 s.
+   - A checkpoint mismatch now fails rather than warns.
+   - Arms are declared: `label=<state>` for a complete state, `label=partial:<file>` for `E` and `ρ`
+     alone, `label=opening` for the opening. A complete state that does not parse, continue or write
+     back is refused (exit 4). It is never read as a partial remount.
+   - Every arm is restored before any reading.
+   - Tests: the shell chain's replay mismatch (exit 10), replay timeout (124), panic (101), own
+     deadline (3) and malformed full checkpoint (4, refused by the real parser). In each, the
+     coupling is never launched and no stamp is written. On the Rust side,
+     `a_malformed_full_checkpoint_is_refused_never_remounted_partially`.
+3. **Dependencies are enforced in the launcher.**
+   - A check that passes writes a stamp: the sha256 of every artifact it verified and of the binary
+     that read them. `exp-coupling` refuses unless `check-replay`'s stamp holds. `exp-reach` refuses
+     unless both `check-replay`'s and `check-witness`'s stamps hold. A producing run removes its
+     consumers' stamps first.
+   - `check-witness` checks falsifier 5 before it stamps anything or reads the witness's coupling:
+     - the search exited 0 with a witness;
+     - its `E` and `ρ`, declared partial, are read in a fresh process that exits 0;
+     - that read solves 64 of 64 and prints the witness admissible and certified.
+   - `exp-reach` still refuses after both checks (exit 13), because reach is not built (§4, §8).
+   - **Build staging.** `build` is run once, alone, before the schedule, at `-j 19`. A thread ledger
+     (`<out>/threads/`) refuses `build` while any run of this loop is live. Every run checks the
+     binary against the build's stamp and never builds. The ledger also refuses any run whose
+     declared threads, added to the live runs', would pass 19. The gates hold all 19 threads. A run
+     clears its own earlier receipts before its guards, so a run refused before launch never leaves
+     an older `exit 0` for a check to read.
+   - `schedule` runs §6.3 as one command. [agent-inferred] Phase 3 (`check-witness`, then reach)
+     starts once both the fit and the continuation chain have ended, not when the fit alone ends. A
+     witness found early would otherwise put the check's 12 threads beside the coupling's 12, which
+     passes 19.
+   - Tests: coupling without a passing `check-replay`, or after a verified state changed (both 11);
+     an unvalidated witness (a fresh read solving 63 of 64, a refused read, or no witness), each
+     refused with no stamp and nothing launched after it, and reach refused (11); a witness file
+     changed after its check; a 12-thread run beside a live 12 (refused 12; a 7-thread run is
+     admitted); `build` inside a running phase (refused 12); a binary changed since the build
+     (refused 11).
+4. **The frozen-context witness label.** The search now grants every label under one guard: the
+   all-64 witness, the frozen-context witness and the best. The guard has two parts:
+   - `bounds`, read on the constitution itself: `E` of the declared shape, every entry on the source
+     port's lattice and within `±2³`, `ρ` passive on the lattice, and the exact bits within the
+     budget;
+   - `certification`: every request released and every lock's Floquet certificate certified.
+
+   The witness's count is the declared 64 decision terms (stations × requests), never the number of
+   terms a reading happened to make. Test: `an_inadmissible_frozen_context_witness_is_refused_the_label`.
+   A trial past the entry bound, off the lattice, uncertified or unreleased is refused both labels.
+
+Kept as Astra accepted:
+- The exterior diagnostic's own-release adoption rule (an admissible trial whose own release's
+  excess is lower by disjoint enclosures) stays distinct from a fixed-context certified-descent
+  claim.
+- The all-64 witness and the later-context persistence readings stay distinct. Neither implies
+  perpetual certification.
+
+**The tests.**
+- `cargo test -p holonics --example hnn_prediction`: the harness's 3 tests.
+- `bash research/notebook/hnn_design/loop_1c_runs_tests.sh`: the launcher's 69 checks in seconds.
+  The restore check runs on the release binary; the other modes are stubs that write declared
+  outputs and log their invocations.
+
+**The gates** [measured], each held to 19 processors:
+
+| Gate | Result |
+|---|---|
+| `cargo check --workspace --all-targets` | clean, no warning |
+| `cargo test -p holonics --lib` | **886 passed**, 0 failed, as at the base (no library code changed); 183,119 ms with its build |
+| `cargo test -p holonics --example hnn_prediction` | the 3 negative tests above pass |
+| `bash research/notebook/hnn_design/loop_1c_runs_tests.sh` | the 69 checks pass, 3,302 ms |
+| `bash research/notebook/hnn_design/replay_baseline.sh` | the listing matches the baseline reference (41 lines); the read 95,213 ms, peak resident 79,740,928 bytes |
+| `bash tools/lean_check.sh` | not run: no Lean changed |
+| the GPU suite | not run: no card-mirrored code changed |

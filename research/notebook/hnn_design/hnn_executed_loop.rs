@@ -963,9 +963,11 @@ pub(super) fn witness(
     };
     let mut found = false;
     let mut stop = "the moves are spent".to_string();
+    let mut incomplete = false;
     for index in 0..moves {
         if clock.elapsed().as_millis() > deadline {
             stop = format!("the deadline, before move {index} (incomplete)");
+            incomplete = true;
             break;
         }
         let started = Instant::now();
@@ -1050,6 +1052,11 @@ pub(super) fn witness(
         clock.elapsed().as_millis(),
         resident()
     );
+    // Loop 1c's launcher (Astra's review of `722c3334`): a procedure stopped by its own deadline is
+    // incomplete and exits so, never read as success; its listing is unchanged.
+    if incomplete {
+        std::process::exit(super::loop_1c::INCOMPLETE);
+    }
 }
 
 /// [definition; step 1b's pin §8 I6] **The causal reading** (`executed causal <terrain> <seed>
