@@ -1331,20 +1331,60 @@ fn face(interval: &ExactInterval) -> Rat {
     }
 }
 
-/// `⟨covector, move⟩` of an enclosed covector with an exact move.
-fn paired(covector: &[ExactInterval], moved: &[Rat]) -> ExactInterval {
+/// `⟨covector, move⟩` of an enclosed covector with an enclosed move (an exact move is its point
+/// enclosure).
+fn paired(covector: &[ExactInterval], moved: &[ExactInterval]) -> ExactInterval {
     let mut sum = nought();
     for (entry, delta) in covector.iter().zip(moved) {
-        if delta.is_zero() {
+        if delta.lower.is_zero() && delta.upper.is_zero() {
             continue;
         }
-        let (a, b) = (&entry.lower * delta, &entry.upper * delta);
-        sum = ExactInterval {
-            lower: &sum.lower + a.clone().min(b.clone()),
-            upper: &sum.upper + a.max(b),
+        let part = if delta.lower == delta.upper {
+            let (a, b) = (&entry.lower * &delta.lower, &entry.upper * &delta.lower);
+            ExactInterval {
+                lower: a.clone().min(b.clone()),
+                upper: a.max(b),
+            }
+        } else {
+            product(entry, delta)
         };
+        sum = plus(&sum, &part);
     }
     sum
+}
+
+/// Exact moves as their point enclosures.
+#[cfg(test)]
+fn points(moved: &[Rat]) -> Vec<ExactInterval> {
+    moved.iter().cloned().map(ExactInterval::point).collect()
+}
+
+/// [definition; agent-inferred, September 30] **The joint direction's modulus part, enclosed**:
+/// each entry of `(∂z/∂ρ)Δρ` is enclosed outward on dyadics of [`JOINT_BITS`] significant bits
+/// (the derivative's entry and the modulus's unit move each enclosed, their product's corners
+/// taken), so the certificate on the joint direction is an enclosure of its exact value with its
+/// rounding charged. The exact product of the transported weights' derivatives (powers of the
+/// founded modulus over the passage's mass) with the least-squares move carries thousands of bits
+/// a coordinate and made the joint certificate cost minutes a batch; the enclosure keeps it at the
+/// port's cost. 128 bits lie far below the readings' grain (`2^(−16)` relative).
+const JOINT_BITS: u32 = 128;
+
+/// A rational's outward dyadic enclosure at `bits` significant bits.
+fn dyadic_enclosure(x: &Rat, bits: u32) -> ExactInterval {
+    if x.is_zero() {
+        nought()
+    } else if x.is_positive() {
+        ExactInterval {
+            lower: significant(x, bits, false),
+            upper: significant(x, bits, true),
+        }
+    } else {
+        let magnitude = -x.clone();
+        ExactInterval {
+            lower: -significant(&magnitude, bits, true),
+            upper: -significant(&magnitude, bits, false),
+        }
+    }
 }
 
 /// The leading active member of a candidate: the resolved active member of the largest midpoint
@@ -1720,13 +1760,12 @@ fn returns(
     let mut samples = Vec::new();
     let mut section_sums = vec![vec![Rat::zero(); width]; alphabet];
     let mut section_weights = vec![Rat::zero(); alphabet];
-    for (index, request) in requests.iter().enumerate() {
+    let placements = placements_of(field, constitution, requests, declared)?;
+    for (index, (request, placement)) in requests.iter().zip(&placements).enumerate() {
         let mine: Vec<&Contribution> = contributions.iter().filter(|c| c.request == index).collect();
         if mine.is_empty() {
             continue;
         }
-        let placement =
-            BankPlacement::of(field, constitution, &request.current, &request.moment, declared)?;
         let lift = request.current.lift()[ring].clone();
         let phase = request.current.phase(field, ring)? as usize;
         let phases: Vec<usize> = (0..period)
@@ -1801,6 +1840,21 @@ fn returns(
     Ok(samples)
 }
 
+/// Every request's placement at a constitution: co-present regions (the shared constitution at
+/// its cut, one placement each), formed on the host's cores in request order.
+fn placements_of(
+    field: &Field,
+    constitution: &impl ConstitutionRead,
+    requests: &[Request],
+    declared: &Refinement,
+) -> Result<Vec<BankPlacement>, HnnError> {
+    use rayon::prelude::*;
+    requests
+        .par_iter()
+        .map(|r| BankPlacement::of(field, constitution, &r.current, &r.moment, declared))
+        .collect()
+}
+
 /// Each contribution's `c ⟨ĝ, ∂z/∂ρ⟩` and `|∂z/∂ρ|²` (the modulus's normal reading, term by term).
 fn modulus_pairings(
     field: &Field,
@@ -1810,10 +1864,7 @@ fn modulus_pairings(
     contributions: &[Contribution],
 ) -> Result<Vec<(Rat, Rat)>, HnnError> {
     use rayon::prelude::*;
-    let placements: Vec<BankPlacement> = requests
-        .iter()
-        .map(|r| BankPlacement::of(field, constitution, &r.current, &r.moment, declared))
-        .collect::<Result<_, _>>()?;
+    let placements = placements_of(field, constitution, requests, declared)?;
     Ok(contributions
         .par_iter()
         .map(|c| {
@@ -1982,7 +2033,8 @@ pub(crate) fn proposal_returns(
 /// its station: the successor's storage less the constitution's, exactly (the storage is linear in
 /// `E` at fixed weights, so at a fixed modulus this is the move `ΔE`'s placement; a move of the
 /// modulus moves every weight). With `modulus = Some(Δρ)` each move adds the modulus's first-order
-/// storage move `(∂z/∂ρ)Δρ` read at the constitution: the joint unit direction's storage move.
+/// storage move `(∂z/∂ρ)Δρ` read at the constitution, enclosed outward at [`JOINT_BITS`]: the joint
+/// unit direction's storage move. Each move is an enclosure (a point where exact).
 fn section_moves(
     field: &Field,
     constitution: &Constitution,
@@ -1991,15 +2043,12 @@ fn section_moves(
     requests: &[Request],
     sections: &[(usize, usize, Vec<Option<usize>>)],
     modulus: Option<&Rat>,
-) -> Result<Vec<Vec<Rat>>, HnnError> {
+) -> Result<Vec<Vec<ExactInterval>>, HnnError> {
     use rayon::prelude::*;
-    let placements = |theta: &Constitution| -> Result<Vec<BankPlacement>, HnnError> {
-        requests
-            .iter()
-            .map(|r| BankPlacement::of(field, theta, &r.current, &r.moment, declared))
-            .collect()
-    };
-    let (before, after) = (placements(constitution)?, placements(successor)?);
+    let (before, after) = (
+        placements_of(field, constitution, requests, declared)?,
+        placements_of(field, successor, requests, declared)?,
+    );
     Ok(sections
         .par_iter()
         .map(|(request, station, cells)| {
@@ -2007,11 +2056,19 @@ fn section_moves(
                 before[*request].storage(*station, cells),
                 after[*request].storage(*station, cells),
             );
-            let mut moved: Vec<Rat> = new.iter().zip(&old).map(|(n, o)| n - o).collect();
+            let mut moved: Vec<ExactInterval> = new
+                .iter()
+                .zip(&old)
+                .map(|(n, o)| ExactInterval::point(n - o))
+                .collect();
             if let Some(delta) = modulus.filter(|d| !d.is_zero()) {
+                let delta = dyadic_enclosure(delta, JOINT_BITS);
                 let derivative = before[*request].modulus_derivative(*station, cells);
                 for (value, d) in moved.iter_mut().zip(derivative) {
-                    *value += d * delta;
+                    if d.is_zero() {
+                        continue;
+                    }
+                    *value = plus(value, &product(&dyadic_enclosure(&d, JOINT_BITS), &delta));
                 }
             }
             moved
@@ -2036,7 +2093,7 @@ pub struct FirstOrderReading {
 }
 
 /// A contribution's weighted pairing `c ⟨ĝ, Δz⟩`, enclosed, with its storage move.
-fn weighted_pairing(c: &Contribution, moved: &[Rat]) -> ExactInterval {
+fn weighted_pairing(c: &Contribution, moved: &[ExactInterval]) -> ExactInterval {
     let d = paired(&c.covector, moved);
     product(&d, &ExactInterval::point(c.weight.clone()))
 }
@@ -2047,7 +2104,7 @@ fn weighted_pairing(c: &Contribution, moved: &[Rat]) -> ExactInterval {
 fn lock_term_bound(
     target: usize,
     candidates: &[(usize, Vec<Vec<ExactInterval>>, ExactInterval)],
-    moves: &[Vec<Rat>],
+    moves: &[Vec<ExactInterval>],
 ) -> Option<ExactInterval> {
     let one = Rat::one();
     let mut bound = nought();
@@ -2076,40 +2133,20 @@ fn lock_term_bound(
 /// storage moves** (module header, "The first-order certificate"), a pure function of the moves:
 /// each term's bound (the hinge's max over its active branches, a boundary term's hinged at zero;
 /// the lock face's [`lock_term_bound`]); their sum; the excess's piecewise bound; the unresolved
-/// terms; the leading contributions' pairing.
-fn first_order_on(proposal: &Proposal, moves: &[Vec<Rat>]) -> FirstOrderReading {
+/// terms; the leading contributions' pairing. The terms' bounds are co-present readings of one set
+/// of moves (shared immutable input, one output each): they run on the host's cores and are summed
+/// in the proposal's order.
+fn first_order_on(proposal: &Proposal, moves: &[Vec<ExactInterval>]) -> FirstOrderReading {
+    use rayon::prelude::*;
     let mut total = nought();
     let mut excess = nought();
     let mut terms = Vec::with_capacity(proposal.terms.len());
-    for term in &proposal.terms {
-        let bound = match &term.certificate {
-            Certificate::Hinge(branches) => {
-                let mut bound: Option<ExactInterval> = None;
-                for branch in branches {
-                    let mut derivative = nought();
-                    for c in branch {
-                        derivative = plus(&derivative, &weighted_pairing(c, &moves[c.section]));
-                    }
-                    bound = Some(match bound {
-                        None => derivative,
-                        Some(b) => ExactInterval {
-                            lower: b.lower.max(derivative.lower),
-                            upper: b.upper.max(derivative.upper),
-                        },
-                    });
-                }
-                bound.map(|b| {
-                    if term.kind == Excess::Above {
-                        b
-                    } else {
-                        positive_part(&b)
-                    }
-                })
-            }
-            Certificate::Lock { target, candidates } => {
-                lock_term_bound(*target, candidates, moves)
-            }
-        };
+    let bounds: Vec<Option<ExactInterval>> = proposal
+        .terms
+        .par_iter()
+        .map(|term| term_bound(term, moves))
+        .collect();
+    for (term, bound) in proposal.terms.iter().zip(bounds) {
         let Some(bound) = bound else {
             terms.push(None);
             continue;
@@ -2135,6 +2172,37 @@ fn first_order_on(proposal: &Proposal, moves: &[Vec<Rat>]) -> FirstOrderReading 
         unresolved: proposal.unresolved_terms(),
         terms,
         leading: Some(leading),
+    }
+}
+
+/// One term's bound on the moves: the hinge's max over its active branches (a term not certainly
+/// above its level hinged at zero), the lock face's [`lock_term_bound`].
+fn term_bound(term: &TermCertificate, moves: &[Vec<ExactInterval>]) -> Option<ExactInterval> {
+    match &term.certificate {
+        Certificate::Hinge(branches) => {
+            let mut bound: Option<ExactInterval> = None;
+            for branch in branches {
+                let mut derivative = nought();
+                for c in branch {
+                    derivative = plus(&derivative, &weighted_pairing(c, &moves[c.section]));
+                }
+                bound = Some(match bound {
+                    None => derivative,
+                    Some(b) => ExactInterval {
+                        lower: b.lower.max(derivative.lower),
+                        upper: b.upper.max(derivative.upper),
+                    },
+                });
+            }
+            bound.map(|b| {
+                if term.kind == Excess::Above {
+                    b
+                } else {
+                    positive_part(&b)
+                }
+            })
+        }
+        Certificate::Lock { target, candidates } => lock_term_bound(*target, candidates, moves),
     }
 }
 
@@ -2924,7 +2992,8 @@ impl ProposalProbe {
     }
 
     pub(crate) fn first_order(&self, moves: &[Vec<Rat>]) -> FirstOrderReading {
-        first_order_on(&self.proposal, moves)
+        let moves: Vec<Vec<ExactInterval>> = moves.iter().map(|m| points(m)).collect();
+        first_order_on(&self.proposal, &moves)
     }
 
     /// The move's guard before any step ([`certificate_refusal`]).
