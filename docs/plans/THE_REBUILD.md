@@ -620,7 +620,11 @@ that fires becomes the next loop's subject, and nothing downstream starts.
         that did not lock their station. From move 3 on, no decision solved at its refinement
         stayed solved after its section's later locks.
       - Gates B and C stay closed, and the final confirmation stays unread.
-  - *Loop 1c, the next subject* (measurement only, to be pinned after Astra's review). It
+  - *Loop 1c, the next subject* (measurement only; [pin](../../research/records/2026-10-01_LOOP_1C_PERSISTENCE_REPRESENTATION_AND_REACH_PINNED_BEFORE_ITS_RUNS.md),
+    under Astra's review before any run: the exact replay of gate A's continuation first, then the
+    three solved notions and the paired landing factorial (normalization × entry × the release's
+    order, with the landings' lattice), the exterior fit's representation search, and reach only
+    if a witness exists; fixed deadlines from measured development reads, 19 threads). It
     separates the obstruction gate A met into three parts:
     - persistence and coupling: which term of the joint field undoes a solved decision when a later
       lock lands (the placement's normalization, the later datum's entry into the span, or the
