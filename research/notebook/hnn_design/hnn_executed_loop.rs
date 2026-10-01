@@ -14,7 +14,7 @@
 //! cargo run --release -p holonics --example hnn_prediction -- executed direction <terrain> <seed> <count> <arm> <from> <toward> <out> <η>…
 //! cargo run --release -p holonics --example hnn_prediction -- executed rho-slopes <terrain> <seed> <count> <arm> <label=source>…
 //! cargo run --release -p holonics --example hnn_prediction -- executed witness-plane <terrain> <seed> <count> <arm> <toward> <out> <label=source>…
-//! cargo run --release -p holonics --example hnn_prediction -- executed move-once <terrain> <seed> <count> <out> <label=source> <metric>…
+//! cargo run --release -p holonics --example hnn_prediction -- executed move-once <terrain> <seed> <count> <out> <label=state> <arm> <metric>…
 //! cargo run --release -p holonics --example hnn_prediction -- executed margins <terrain> <seed> <count> <before state> <after state>
 //! ```
 //!
@@ -83,7 +83,8 @@ pub(super) fn arm_comparison(arm: &str) -> (Comparison, bool) {
     let composition = match composition {
         "hinge" => Composition::Hinge,
         "lock" => Composition::LockFace,
-        _ => panic!("a composition: hinge | lock"),
+        "order" => Composition::LockOrder,
+        _ => panic!("a composition: hinge | lock | order"),
     };
     let (reading, partition) = match reading {
         "all" => (Reading::Every, false),
@@ -106,6 +107,7 @@ fn symbol(comparison: &Comparison) -> &'static str {
     match comparison.composition {
         Composition::Hinge => "F",
         Composition::LockFace => "L",
+        Composition::LockOrder => "L+O",
     }
 }
 
@@ -1387,7 +1389,8 @@ pub(super) fn direction(
 /// [measured-diagnostic; agent-inferred, October 1; the
 /// [one-move pin](../../records/2026-10-01_ONE_GUARDED_MOVE_FROM_THE_STUCK_STATE_PINNED_BEFORE_ITS_RUN.md)]
 /// **One committed move from a state under each declared metric** (`executed move-once <terrain>
-/// <seed> <count> <out> <label=state> <metric>…`, `metric` `coordinate` or `witness`, the state
+/// <seed> <count> <out> <label=state> <arm> <metric>…`, the arm as [`arm_comparison`], `metric`
+/// `coordinate` or `witness`, the state
 /// a complete continuing state, restored with no `E`/`ρ` fallback ([`remounted`])): the candidate
 /// arm's real proposal, guards, ladder and state carry (`hnn::executed::executed_move_in`), every
 /// metric from the same restored state. The metrics are attempted in order and the first adopted
@@ -1395,7 +1398,7 @@ pub(super) fn direction(
 /// prints the incumbent's reading, the move's line with every trial, the witness's form where read,
 /// and the adopted successor's own release (its trial's reading), written to
 /// `<out>/<label>-<metric>.state`.
-pub(super) fn move_once(terrain: &str, seed: u64, count: usize, out: &str, source: &str, metrics: &[String]) {
+pub(super) fn move_once(terrain: &str, seed: u64, count: usize, out: &str, source: &str, arm: &str, metrics: &[String]) {
     use holonics::hnn::executed::{MoveMetric, executed_move_in};
     let clock = Instant::now();
     let declared = order_declared();
@@ -1405,7 +1408,8 @@ pub(super) fn move_once(terrain: &str, seed: u64, count: usize, out: &str, sourc
     let pairs = terrain_pairs(terrain, &declared, seed, count);
     let requests = open_requests(&engine, &pairs);
     let targets: Vec<Vec<usize>> = pairs.iter().map(|(_, t)| t.clone()).collect();
-    let comparison = Comparison::LOCK_DECISIONS;
+    let (comparison, partition) = arm_comparison(arm);
+    assert!(!partition, "one move reads the open section");
     let (label, spec) = source.split_once('=').expect("<label>=<source>");
     let theta = remounted(&engine.theta, spec);
     println!(
@@ -1446,6 +1450,7 @@ pub(super) fn move_once(terrain: &str, seed: u64, count: usize, out: &str, sourc
             &theta.transport(ring),
             started.elapsed().as_millis(),
         );
+        print_orders("the incumbent", &moved.before);
         if let Some(w) = &moved.witness {
             println!(
                 "    the witness: G_EE {}, G_Eρ {}, G_ρρ {}; g_E {}, g_ρ {}; step {:?} (24 bits)",
@@ -1473,6 +1478,7 @@ pub(super) fn move_once(terrain: &str, seed: u64, count: usize, out: &str, sourc
                     &successor.transport(ring),
                     started.elapsed().as_millis(),
                 );
+                print_orders("the successor", own);
                 #[allow(clippy::disallowed_methods)]
                 std::fs::write(format!("{out}/{label}-{name}.state"), write_state(successor, ring))
                     .expect("write the successor's state");
@@ -1569,6 +1575,25 @@ pub(super) fn margins(terrain: &str, seed: u64, count: usize, before: &str, afte
             section(&read.before, index),
             section(&read.after, index)
         );
+        // The release's order at its first refinement: every eligible station (its top flipped and
+        // locked), its top, its gap and whether its top is its target; the stations it locked.
+        for (what, batch) in [("before", &read.before), ("after", &read.after)] {
+            if let Some(order) = batch.requests[index].orders.first() {
+                let eligible: Vec<String> = order
+                    .eligible
+                    .iter()
+                    .map(|(s, top, gap, right)| {
+                        format!("{s}:{top}{} gap {}", if *right { "+" } else { "-" }, at_bits(gap))
+                    })
+                    .collect();
+                println!(
+                    "      {what} order at refinement {}: eligible [{}]; locked {:?}",
+                    order.context,
+                    eligible.join(", "),
+                    order.locked
+                );
+            }
+        }
     }
     for (what, batch) in [("before", &read.before), ("after", &read.after)] {
         let (solved, all) = solved_terms(batch);
@@ -1580,6 +1605,27 @@ pub(super) fn margins(terrain: &str, seed: u64, count: usize, before: &str, afte
         );
     }
     println!("executed margins: {} ms; resident {}", clock.elapsed().as_millis(), resident());
+}
+
+/// Every request's order term ([`holonics::hnn::executed::OrderTerm`]), where read: its sheets
+/// (station, top, gap; the right one first), `ℓ_o` and whether it is solved.
+fn print_orders(what: &str, batch: &BatchComparison) {
+    for (index, request) in batch.requests.iter().enumerate() {
+        if let Some(order) = &request.order {
+            let sheets: Vec<String> = order
+                .sheets
+                .iter()
+                .map(|s| format!("{}:{} gap {}", s.station, s.top, at_bits(&s.gap)))
+                .collect();
+            println!(
+                "      {what} request {index} order at refinement {}: [{}]; ℓ_o ∈ {} nats, {:?}",
+                order.context,
+                sheets.join(", "),
+                cell(&order.value, 1 << 16),
+                order.solved
+            );
+        }
+    }
 }
 
 /// A rational read at 24 significant bits toward zero (`m/2^k`, exact as printed).

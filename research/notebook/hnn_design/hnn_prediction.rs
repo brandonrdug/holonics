@@ -412,7 +412,8 @@ fn main() {
             arguments[5].parse().expect("a count"),
             &arguments[6],
             &arguments[7],
-            &arguments[8..],
+            &arguments[8],
+            &arguments[9..],
         ),
         // An accepted move read decision by decision (the record
         // research/records/2026-10-01_THE_DECISION_MARGINS_THROUGH_THE_ACCEPTED_MOVE.md): read-only.

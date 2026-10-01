@@ -237,6 +237,10 @@ pub enum Composition {
     Hinge,
     /// Step 1b's lock face `L = Σ ℓ`, `ℓ = log(Π/a_t)`; its solved level `log 2`.
     LockFace,
+    /// The lock face joined by each request's order term at its decision refinement ([`OrderTerm`];
+    /// the [order's pin](../../../../research/records/2026-10-01_THE_ORDER_AS_A_TERM_OF_THE_COMPARISON_PINNED_BEFORE_ITS_RUN.md)):
+    /// the release's first lock read as a lock over the stations. Its solved level `log 2`.
+    LockOrder,
 }
 
 /// [definition; agent-inferred, September 30; step 1b's pin §2.4, §13.1] **Where a composition
@@ -363,6 +367,9 @@ pub struct RequestComparison {
     pub stations: Vec<StationComparison>,
     pub orders: Vec<OrderReading>,
     pub terms: Vec<TermReading>,
+    /// The order term at the decision refinement ([`Composition::LockOrder`] only; `None` where no
+    /// eligible station's top is its target).
+    pub order: Option<OrderTerm>,
     pub consistent: Option<usize>,
     pub value: ExactInterval,
     pub excess: ExactInterval,
@@ -473,7 +480,7 @@ impl BatchComparison {
 /// (the face has no zero), the hinge's terms not certainly solved.
 fn in_support(composition: Composition, kind: Excess) -> bool {
     match composition {
-        Composition::LockFace => true,
+        Composition::LockFace | Composition::LockOrder => true,
         Composition::Hinge => kind != Excess::Solved,
     }
 }
@@ -863,7 +870,9 @@ fn term_reading(
             };
             (part.clone(), part, kind)
         }
-        Composition::LockFace => (lock.value.clone(), lock.excess.clone(), lock.kind()),
+        Composition::LockFace | Composition::LockOrder => {
+            (lock.value.clone(), lock.excess.clone(), lock.kind())
+        }
     };
     TermReading {
         site,
@@ -1160,6 +1169,130 @@ fn site_reads<R: JointGrowth + Clone + Send + Sync>(
 }
 
 /// The declared composition's terms at their sites, and their sums.
+/// [definition; agent-inferred, October 1; the
+/// [order's pin](../../../../research/records/2026-10-01_THE_ORDER_AS_A_TERM_OF_THE_COMPARISON_PINNED_BEFORE_ITS_RUN.md)]
+/// **One sheet of the order's lock**: a station eligible at the decision refinement (its top flips
+/// past every other candidate and locks), its term's index among the sites, its top and runner
+/// classes, its release gap `g` (the top's `lower` less the runner's `upper`, exactly the quantity
+/// the release compares), its share `θ = g/Σ_S g` and its covector weight `θ − [x = r]`.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct OrderSheet {
+    pub site: usize,
+    pub station: usize,
+    pub top: usize,
+    pub runner: usize,
+    pub gap: Rat,
+    pub share: Rat,
+    pub weight: Rat,
+}
+
+/// [definition; agent-inferred, October 1] **The order term** (the pin above): at a request's
+/// decision refinement `r*` (the latest refinement its decision terms are read at), the eligible
+/// stations `E` with their release gaps, the right ones `R` (top = target), `r = argmax_R g` (the
+/// least station among ties) and the sheets `S = {r} ∪ (E ∖ R)`, `r` first:
+/// `ℓ_o = log(Σ_S g / g_r)`, enclosed; solved exactly when `g_r > Σ_(E∖R) g`, which makes the
+/// release lock a right station first; its excess `(ℓ_o − ln 2)_+`, zero where solved.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct OrderTerm {
+    pub context: usize,
+    pub sheets: Vec<OrderSheet>,
+    pub value: ExactInterval,
+    pub excess: ExactInterval,
+    pub solved: Predicate,
+    pub kind: Excess,
+}
+
+/// The order term of a request's decision terms ([`OrderTerm`]), from the candidates read at their
+/// sites; `None` when no site carries a refinement or no eligible station's top is its target.
+fn order_term<R: JointGrowth>(
+    sites: &[TermSite],
+    reads: &[Vec<R>],
+    targets: &[usize],
+) -> Result<Option<OrderTerm>, HnnError> {
+    let Some(context) = sites.iter().filter_map(|s| s.context).max() else {
+        return Ok(None);
+    };
+    let one = Rat::one();
+    let mut eligible: Vec<(usize, usize, usize, usize, Rat, bool)> = Vec::new();
+    for (index, (site, read)) in sites.iter().zip(reads).enumerate() {
+        if site.context != Some(context) {
+            continue;
+        }
+        let joints: Vec<&Growth> = read.iter().map(JointGrowth::joint).collect();
+        let top = (0..joints.len())
+            .max_by(|&a, &b| joints[a].lower.cmp(&joints[b].lower).then(b.cmp(&a)))
+            .expect("a class");
+        let Some(runner) = (0..joints.len())
+            .filter(|&x| x != top)
+            .max_by(|&a, &b| joints[a].upper.cmp(&joints[b].upper).then(b.cmp(&a)))
+        else {
+            continue;
+        };
+        let flips = (0..joints.len()).filter(|&x| x != top).all(|x| joints[top].exceeds(joints[x]));
+        if flips && joints[top].is_locked() {
+            let gap = &joints[top].lower - &joints[runner].upper;
+            eligible.push((index, site.station, top, runner, gap, top == targets[site.station]));
+        }
+    }
+    let Some(best) = eligible
+        .iter()
+        .filter(|e| e.5)
+        .max_by(|a, b| a.4.cmp(&b.4).then(b.1.cmp(&a.1)))
+        .cloned()
+    else {
+        return Ok(None);
+    };
+    let members: Vec<(usize, usize, usize, usize, Rat, bool)> = std::iter::once(best.clone())
+        .chain(eligible.into_iter().filter(|e| !e.5))
+        .collect();
+    let total: Rat = members.iter().map(|e| e.4.clone()).sum();
+    let wrong = &total - &best.4;
+    let sheets = members
+        .iter()
+        .enumerate()
+        .map(|(x, (site, station, top, runner, gap, _))| {
+            let share = gap / &total;
+            OrderSheet {
+                site: *site,
+                station: *station,
+                top: *top,
+                runner: *runner,
+                gap: gap.clone(),
+                weight: if x == 0 { &share - &one } else { share.clone() },
+                share,
+            }
+        })
+        .collect();
+    let value = ln_enclosure(&(&total / &best.4))?;
+    let (solved, kind) = if best.4 > wrong {
+        (Predicate::Holds, Excess::Solved)
+    } else if best.4 == wrong {
+        (Predicate::Fails, Excess::Boundary)
+    } else {
+        (Predicate::Fails, Excess::Above)
+    };
+    let ln2 = ln_two()?;
+    let excess = match kind {
+        Excess::Solved => nought(),
+        Excess::Above => ExactInterval {
+            lower: (&value.lower - &ln2.upper).max(Rat::zero()),
+            upper: &value.upper - &ln2.lower,
+        },
+        Excess::Boundary => ExactInterval {
+            lower: Rat::zero(),
+            upper: (&value.upper - &ln2.lower).max(Rat::zero()),
+        },
+    };
+    Ok(Some(OrderTerm {
+        context,
+        sheets,
+        value,
+        excess,
+        solved,
+        kind,
+    }))
+}
+
 fn terms_of<R: JointGrowth>(
     composition: Composition,
     targets: &[usize],
@@ -1216,8 +1349,16 @@ fn compare_request(
         alphabet,
     );
     let (reads, made) = site_reads(&sites, &refinements, &placement, alphabet, &read)?;
-    let (terms, value, excess) =
+    let order = match comparison.composition {
+        Composition::LockOrder => order_term(&sites, &reads, &request.targets)?,
+        _ => None,
+    };
+    let (terms, mut value, mut excess) =
         terms_of(comparison.composition, &request.targets, sites, &reads, termination)?;
+    if let Some(order) = &order {
+        value = plus(&value, &order.value);
+        excess = plus(&excess, &order.excess);
+    }
     let readings = refinements.iter().map(|r| r.read.len()).sum::<usize>() + made;
     Ok((
         RequestComparison {
@@ -1225,6 +1366,7 @@ fn compare_request(
             stations,
             orders,
             terms,
+            order,
             consistent,
             value,
             excess,
@@ -1345,8 +1487,16 @@ fn incumbent_request(
         alphabet,
     );
     let (reads, made) = site_reads(&sites, &refinements, &placement, alphabet, &covector)?;
-    let (terms, value, excess) =
+    let order = match comparison.composition {
+        Composition::LockOrder => order_term(&sites, &reads, &request.targets)?,
+        _ => None,
+    };
+    let (terms, mut value, mut excess) =
         terms_of(comparison.composition, &request.targets, sites, &reads, termination)?;
+    if let Some(order) = &order {
+        value = plus(&value, &order.value);
+        excess = plus(&excess, &order.excess);
+    }
     let readings = refinements.iter().map(|r| r.read.len()).sum::<usize>() + made;
     Ok((
         RequestComparison {
@@ -1354,6 +1504,7 @@ fn incumbent_request(
             stations,
             orders,
             terms,
+            order,
             consistent,
             value,
             excess,
@@ -1524,6 +1675,30 @@ enum Certificate {
         candidates: Vec<(usize, Vec<Vec<ExactInterval>>, ExactInterval)>,
         sheets: Vec<Rat>,
     },
+    /// The order term ([`OrderTerm`]): every sheet's covector weight over its gap `(θ − [x = r])/g`,
+    /// its share `θ`, and its top's and runner's sections, active resolved members' covectors,
+    /// leading covectors and joint enclosures. `dg = a_top du_top − a_runner du_runner`.
+    Order(Vec<OrderPiece>),
+}
+
+/// One sheet of an order term's certificate ([`Certificate::Order`]).
+#[derive(Clone, Debug)]
+struct OrderPiece {
+    ratio: Rat,
+    share: Rat,
+    gap: Rat,
+    top: OrderEnd,
+    runner: OrderEnd,
+}
+
+/// The top or the runner of an order sheet: its section, its active resolved members' covectors,
+/// its leading member's covector and its joint enclosure.
+#[derive(Clone, Debug)]
+struct OrderEnd {
+    section: usize,
+    members: Vec<Vec<ExactInterval>>,
+    leading: Vec<ExactInterval>,
+    growth: ExactInterval,
 }
 
 /// One term of the certificate's support: its site, where it lies against its level, its
@@ -1717,7 +1892,7 @@ fn propose(
                         leading,
                     });
                 }
-                Composition::LockFace => {
+                Composition::LockFace | Composition::LockOrder => {
                     let joints: Vec<&Growth> = chunk.iter().map(JointGrowth::joint).collect();
                     let lock = lock_face_of(&joints, target).expect("a term already read");
                     let slot = &mut led[1];
@@ -1769,6 +1944,74 @@ fn propose(
                     });
                 }
             }
+        }
+        if let Some(order) = &compared.order {
+            let mut pieces = Vec::with_capacity(order.sheets.len());
+            let mut leading = Vec::new();
+            let mut refused = None;
+            for sheet in &order.sheets {
+                let site = &compared.terms[sheet.site].site;
+                let chunk = &request_reads[sheet.site];
+                let ratio = &sheet.weight / &sheet.gap;
+                let mut end = |class: usize, sign: Rat| -> Option<OrderEnd> {
+                    let candidate = &chunk[class];
+                    refused = refused.or(unresolved_member(candidate));
+                    let member = match leading_member(candidate) {
+                        Ok(member) => member,
+                        Err(refusal) => {
+                            unresolved.push(refusal);
+                            return None;
+                        }
+                    };
+                    let growth = candidate.joint();
+                    let growth = ExactInterval {
+                        lower: growth.lower.clone(),
+                        upper: growth.upper.clone(),
+                    };
+                    let covector = member.storage().expect("resolved");
+                    let weight = &ratio * &face(&growth) * &sign;
+                    let c = contribute(
+                        &mut sections,
+                        request,
+                        site,
+                        class,
+                        covector.clone(),
+                        weight,
+                        TermKind::Lock,
+                    );
+                    let section = c.section;
+                    leading.push(c);
+                    Some(OrderEnd {
+                        section,
+                        members: candidate
+                            .active
+                            .iter()
+                            .filter_map(MemberCovector::storage)
+                            .collect(),
+                        leading: covector,
+                        growth,
+                    })
+                };
+                let top = end(sheet.top, Rat::one());
+                let runner = end(sheet.runner, -Rat::one());
+                if let (Some(top), Some(runner)) = (top, runner) {
+                    pieces.push(OrderPiece {
+                        ratio,
+                        share: sheet.share.clone(),
+                        gap: sheet.gap.clone(),
+                        top,
+                        runner,
+                    });
+                }
+            }
+            contributions.extend(leading.iter().cloned());
+            terms_out.push(TermCertificate {
+                site: compared.terms[order.sheets[0].site].site.clone(),
+                kind: order.kind,
+                certificate: Certificate::Order(pieces),
+                unresolved: refused,
+                leading,
+            });
         }
     }
     Proposal {
@@ -2388,6 +2631,28 @@ fn lock_term_bound(
     Some(bound)
 }
 
+/// One order term's bound on the moves: `Σ_x ((θ_x − [x = r])/g_x)(a_top D_top − a_runner D_runner)`
+/// enclosed, each `a` its joint enclosure and each `D` the hull of its active members' pairings with
+/// its section's move; `None` when a sheet has no resolved active member.
+fn order_term_bound(pieces: &[OrderPiece], moves: &[Vec<ExactInterval>]) -> Option<ExactInterval> {
+    let hull = |end: &OrderEnd| -> Option<ExactInterval> {
+        let pairings: Vec<ExactInterval> =
+            end.members.iter().map(|m| paired(m, &moves[end.section])).collect();
+        Some(ExactInterval {
+            lower: pairings.iter().map(|p| p.lower.clone()).min()?,
+            upper: pairings.iter().map(|p| p.upper.clone()).max()?,
+        })
+    };
+    let minus = ExactInterval::point(-Rat::one());
+    let mut bound = nought();
+    for piece in pieces {
+        let top = product(&piece.top.growth, &hull(&piece.top)?);
+        let runner = product(&minus, &product(&piece.runner.growth, &hull(&piece.runner)?));
+        bound = plus(&bound, &product(&ExactInterval::point(piece.ratio.clone()), &plus(&top, &runner)));
+    }
+    Some(bound)
+}
+
 /// [definition; agent-inferred, September 30] **The first-order reading of a proposal on the given
 /// storage moves** (module header, "The first-order certificate"), a pure function of the moves:
 /// each term's bound (the hinge's max over its active branches, a boundary term's hinged at zero;
@@ -2464,6 +2729,7 @@ fn term_bound(term: &TermCertificate, moves: &[Vec<ExactInterval>]) -> Option<Ex
         Certificate::Lock {
             target, candidates, ..
         } => lock_term_bound(*target, candidates, moves),
+        Certificate::Order(pieces) => order_term_bound(pieces, moves),
     }
 }
 
@@ -2979,8 +3245,16 @@ fn mask_reads(
                 compare_request(field, successor, index, request, declared, bank, grain, comparison)?;
             let sites = mask[index].clone();
             let (reads, made) = site_reads(&sites, &refinements, &placement, alphabet, &read)?;
-            let (terms, value, excess) =
+            let order = match comparison.composition {
+                Composition::LockOrder => order_term(&sites, &reads, &request.targets)?,
+                _ => None,
+            };
+            let (terms, mut value, mut excess) =
                 terms_of(comparison.composition, &request.targets, sites, &reads, termination)?;
+            if let Some(order) = &order {
+                value = plus(&value, &order.value);
+                excess = plus(&excess, &order.excess);
+            }
             Ok((own, terms, value, excess, made))
         })
         .collect()
@@ -3601,33 +3875,42 @@ fn plane_terms(
             significant(&x, JOINT_BITS, false)
         }
     };
+    let pair = |covector: &[ExactInterval], section: usize| -> [Rat; 2] {
+        let covector: Vec<Rat> = covector.iter().map(face).collect();
+        [
+            held(covector.iter().zip(&moves[section]).map(|(g, d)| g * &d.lower).sum()),
+            held(covector.iter().zip(&derivatives[section]).map(|(g, d)| g * d).sum()),
+        ]
+    };
     Ok(proposal
         .terms
         .par_iter()
         .filter_map(|term| match &term.certificate {
-            Certificate::Lock { target, sheets, .. } => Some((term, *target, sheets)),
-            Certificate::Hinge(_) => None,
-        })
-        .map(|(term, target, sheets)| {
-            let along = term
-                .leading
-                .iter()
-                .map(|c| {
-                    let covector: Vec<Rat> = c.covector.iter().map(face).collect();
-                    let pair = |moved: &mut dyn Iterator<Item = Rat>| -> Rat {
-                        covector.iter().zip(moved).map(|(g, d)| g * d).sum()
-                    };
-                    [
-                        held(pair(&mut moves[c.section].iter().map(|d| d.lower.clone()))),
-                        held(pair(&mut derivatives[c.section].iter().cloned())),
-                    ]
-                })
-                .collect();
-            PlaneTerm {
-                target,
+            Certificate::Lock { target, sheets, .. } => Some(PlaneTerm {
+                target: *target,
                 sheets: sheets.clone(),
-                along,
-            }
+                along: term.leading.iter().map(|c| pair(&c.covector, c.section)).collect(),
+            }),
+            // The order's lock over stations: no resting sheet, its sheets' log-gaps moving by
+            // `(a_top δ_top − a_runner δ_runner)/g`.
+            Certificate::Order(pieces) => Some(PlaneTerm {
+                target: 0,
+                sheets: std::iter::once(Rat::zero())
+                    .chain(pieces.iter().map(|p| p.share.clone()))
+                    .collect(),
+                along: pieces
+                    .iter()
+                    .map(|p| {
+                        let (top, runner) = (
+                            pair(&p.top.leading, p.top.section),
+                            pair(&p.runner.leading, p.runner.section),
+                        );
+                        let (a, b) = (face(&p.top.growth), face(&p.runner.growth));
+                        std::array::from_fn(|i| held((&a * &top[i] - &b * &runner[i]) / &p.gap))
+                    })
+                    .collect(),
+            }),
+            Certificate::Hinge(_) => None,
         })
         .collect())
 }
@@ -3829,7 +4112,7 @@ impl ProposalProbe {
             .iter()
             .filter_map(|t| match &t.certificate {
                 Certificate::Lock { target, sheets, .. } => Some((*target, sheets.clone())),
-                Certificate::Hinge(_) => None,
+                Certificate::Order(_) | Certificate::Hinge(_) => None,
             })
             .zip(along)
             .map(|((target, sheets), along)| PlaneTerm {
@@ -3863,13 +4146,22 @@ pub(crate) fn synthetic_batch(
 ) -> Result<BatchComparison, HnnError> {
     let mut compared = Vec::new();
     for ((targets, sites), reads) in targets.iter().zip(sites).zip(reads) {
-        let (terms, value, excess) =
+        let order = match comparison.composition {
+            Composition::LockOrder => order_term(&sites, reads, targets)?,
+            _ => None,
+        };
+        let (terms, mut value, mut excess) =
             terms_of(comparison.composition, targets, sites, reads, termination)?;
+        if let Some(order) = &order {
+            value = plus(&value, &order.value);
+            excess = plus(&excess, &order.excess);
+        }
         compared.push(RequestComparison {
             generation: None,
             stations: Vec::new(),
             orders: Vec::new(),
             terms,
+            order,
             consistent: None,
             value,
             excess,
