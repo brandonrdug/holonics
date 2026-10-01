@@ -11,6 +11,7 @@ mod guards;
 mod keys;
 mod learning;
 mod loaded_scalar;
+mod lock_face;
 mod moment;
 mod pending;
 mod physics;

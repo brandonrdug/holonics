@@ -138,7 +138,7 @@ fn continuing_words_carry_waves_contact_and_resonator_states() {
 /// node on every node at exponent 0; ring 0 the source and receiving ring, stepping every cell (its
 /// lock every port), rings 1 and 2 stepping by carries; no pair offset; `|A| = 3`, the last class
 /// the termination.
-fn joint() -> Field {
+pub(super) fn joint() -> Field {
     Field::declare(
         crate::hnn::field::FieldDeclaration {
             rings: vec![
@@ -554,7 +554,7 @@ fn the_bank_generates_by_its_certified_locks() {
 
 /// The bank of the joint field's tests: one node `C = I`, `K = I`, `Y = 16`, `h = 1`, the members
 /// whose period divides the ring's 6 (standing and half-turn), at `p = 5/8`.
-fn joint_bank() -> ReceivingBank {
+pub(super) fn joint_bank() -> ReceivingBank {
     let identity = ExactRatMatrix::identity(2).unwrap();
     let axis = Carrier::new(Rat::one(), Rat::zero()).unwrap();
     ReceivingBank::new(
@@ -580,7 +580,7 @@ fn joint_bank() -> ReceivingBank {
 // the release's own comparison (`hnn::executed`)
 
 /// The joint field's requests at drawn moments, with their targets and context.
-fn executed_requests(
+pub(super) fn executed_requests(
     field: &Field,
     cases: &[(u64, [usize; 4])],
     context: crate::hnn::executed::Context,
@@ -606,13 +606,13 @@ fn executed_requests(
 /// target, and `F` is the sum of the stations' positive parts.
 #[test]
 fn the_release_comparison_reads_the_bank_release() {
-    use crate::hnn::executed::{Context, Predicate, compare};
+    use crate::hnn::executed::{Comparison, Context, Predicate, compare};
     let field = joint();
     let theta = generic(&field, 94);
     let refinement = Refinement::declare(&field, 0, 2, 1, 4, 2).unwrap();
     let bank = joint_bank();
     let requests = executed_requests(&field, &[(95, [0, 1, 2, 1]), (96, [1, 1, 0, 2])], Context::Open);
-    let batch = compare(&field, &theta, &requests, &refinement, &bank, 12).unwrap();
+    let batch = compare(&field, &theta, &requests, &refinement, &bank, 12, Comparison::HINGE_EVERY).unwrap();
     let mut total = Rat::zero();
     for (request, compared) in requests.iter().zip(&batch.requests) {
         let generated = generate_by_bank(
@@ -658,7 +658,7 @@ fn the_release_comparison_reads_the_bank_release() {
 /// two-sided weight enters the identity.
 #[test]
 fn the_proposals_returns_are_its_pullback_to_e() {
-    use crate::hnn::executed::{Context, Request, proposal_returns};
+    use crate::hnn::executed::{Comparison, Context, Request, proposal_returns};
     let field = joint();
     let refinement = Refinement::declare(&field, 0, 2, 1, 4, 2).unwrap();
     let bank = joint_bank();
@@ -678,7 +678,7 @@ fn the_proposals_returns_are_its_pullback_to_e() {
             })
             .collect();
         let (samples, contributions) =
-            proposal_returns(&field, &theta, &requests, &refinement, &bank, 12).unwrap();
+            proposal_returns(&field, &theta, &requests, &refinement, &bank, 12, Comparison::HINGE_EVERY).unwrap();
         assert!(!contributions.is_empty());
         if !modulus.is_one() {
             assert!(
@@ -724,13 +724,13 @@ fn the_proposals_returns_are_its_pullback_to_e() {
 /// and counts one commit; every trial before the adopted one names the guard that refused it.
 #[test]
 fn the_committed_move_descends_or_refuses_by_type() {
-    use crate::hnn::executed::{Context, entry_bound, executed_move};
+    use crate::hnn::executed::{Comparison, Context, entry_bound, executed_move};
     let field = joint();
     let theta = generic(&field, 94);
     let refinement = Refinement::declare(&field, 0, 2, 1, 4, 2).unwrap();
     let bank = joint_bank();
     let requests = executed_requests(&field, &[(95, [0, 1, 2, 1]), (96, [1, 1, 0, 2])], Context::Open);
-    let moved = executed_move(&field, &theta, &requests, &refinement, &bank, 12).unwrap();
+    let moved = executed_move(&field, &theta, &requests, &refinement, &bank, 12, Comparison::HINGE_EVERY).unwrap();
     for trial in &moved.trials[..moved.trials.len().saturating_sub(1)] {
         assert!(trial.refusal.is_some());
     }
@@ -739,7 +739,8 @@ fn the_committed_move_descends_or_refuses_by_type() {
             let last = moved.trials.last().unwrap();
             assert!(last.refusal.is_none());
             let after = last.after.as_ref().unwrap();
-            assert!(after.value.upper < moved.before.value.lower);
+            // The descent account is read on the fixed incumbent mask (the pin §13.1).
+            assert!(last.value.as_ref().unwrap().upper < moved.before.value.lower);
             assert!(last.first_order.as_ref().unwrap().upper.is_negative());
             assert!(step.largest <= entry_bound());
             assert_eq!(
@@ -775,13 +776,13 @@ fn the_committed_move_descends_or_refuses_by_type() {
 /// carries the adopted source step's reading.
 #[test]
 fn the_moves_receipts_read_its_certificate() {
-    use crate::hnn::executed::{Context, executed_move};
+    use crate::hnn::executed::{Comparison, Context, executed_move};
     let field = joint();
     let theta = generic(&field, 94);
     let refinement = Refinement::declare(&field, 0, 2, 1, 4, 2).unwrap();
     let bank = joint_bank();
     let requests = executed_requests(&field, &[(95, [0, 1, 2, 1]), (96, [1, 1, 0, 2])], Context::Open);
-    let moved = executed_move(&field, &theta, &requests, &refinement, &bank, 12).unwrap();
+    let moved = executed_move(&field, &theta, &requests, &refinement, &bank, 12, Comparison::HINGE_EVERY).unwrap();
     assert!(moved.unit_largest.as_ref().is_some_and(|u| u.is_positive()));
     assert_eq!(moved.sites.len(), moved.terms);
     for site in &moved.sites {
@@ -799,7 +800,13 @@ fn the_moves_receipts_read_its_certificate() {
         let (mut lower, mut upper) = (Rat::zero(), Rat::zero());
         for (term, site) in terms.iter().zip(&moved.sites) {
             let Some(term) = term else { continue };
-            if !site.positive {
+            let kind = moved.before.requests[site.request]
+                .terms
+                .iter()
+                .find(|t| &t.site == site)
+                .expect("each site is a term of the incumbent's reading")
+                .kind;
+            if kind != crate::hnn::executed::Excess::Above {
                 assert!(!term.lower.is_negative());
             }
             lower += &term.lower;
@@ -825,7 +832,7 @@ fn the_moves_receipts_read_its_certificate() {
 /// and holds every lock's certificate; every earlier trial names its guard.
 #[test]
 fn the_committed_move_carries_the_transport_modulus() {
-    use crate::hnn::executed::{Context, Request, executed_move};
+    use crate::hnn::executed::{Comparison, Context, Request, executed_move};
     let field = joint();
     let theta = generic(&field, 94).with_transport(0, rat(3, 4)).unwrap();
     let refinement = Refinement::declare(&field, 0, 2, 1, 4, 2).unwrap();
@@ -842,7 +849,7 @@ fn the_committed_move_carries_the_transport_modulus() {
             }
         })
         .collect();
-    let moved = executed_move(&field, &theta, &requests, &refinement, &bank, 12).unwrap();
+    let moved = executed_move(&field, &theta, &requests, &refinement, &bank, 12, Comparison::HINGE_EVERY).unwrap();
     assert!(moved.modulus_slope.is_some() || moved.refusal.is_some());
     for trial in &moved.trials[..moved.trials.len().saturating_sub(1)] {
         assert!(trial.refusal.is_some());
@@ -881,7 +888,7 @@ fn the_committed_move_carries_the_transport_modulus() {
         assert_eq!(Some(&modulus), last.modulus.as_ref());
         assert!(modulus < rat(3, 4));
         let after = last.after.as_ref().unwrap();
-        assert!(after.value.upper < moved.before.value.lower);
+        assert!(last.value.as_ref().unwrap().upper < moved.before.value.lower);
         assert!(last.first_order.as_ref().unwrap().upper.is_negative());
         assert!(after
             .requests

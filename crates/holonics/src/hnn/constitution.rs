@@ -6643,6 +6643,324 @@ fn certify_storage_growth(
     Ok(Some(candidates[least].clone()))
 }
 
+// -------------------------------------------------------------------------------------------
+// the continuing state
+
+/// [definition; agent-inferred, September 30; step 1b's pin §13.6] **The complete continuing state
+/// of a source ring's port**: what the executed comparison's move changes and the next epoch reads,
+/// the source port's normal law whole (the map `E`, the carried Gram `H`, the solved chart `X̂` with
+/// its lattice, support and certificate, and the carried remainders of `W` and `H`), the source
+/// navigator's transport modulus `ρ`, the locus's deposit clock `m` (its budgeted carry's precision
+/// reads it), the commit counter and the committed storage growth's product. Nothing else of the
+/// constitution moves under that move, and the state is refused, typed, where anything else has
+/// moved (another locus's clock, a released locus, a factor family's remainder), so a restored
+/// state is never partial silently.
+///
+/// Its consumer: [`Constitution::continued`] restores it onto the declared opening, and one move
+/// from the restored constitution equals the same move continued without a checkpoint, exactly
+/// (the owner's test over successive receptions). A remount of `E` and `ρ` alone
+/// ([`Constitution::with_ports`] and [`Constitution::with_transport`]) rebuilds the normal law from
+/// its prior, losing the Gram, the chart, the remainders and the clock: it is partial, and every
+/// reader of one says so.
+///
+/// The text ([`ContinuingState::to_text`]) opens with the port's rows and its modulus in the form
+/// the harness's partial remount reads (`E rows cols`, the rows, `rho ρ`), so a checkpoint is also a
+/// partial remount's input; the rest follows it line by line, every value exact.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct ContinuingState {
+    ring: usize,
+    law: NormalLaw,
+    transport: Rat,
+    clock: u64,
+    commit: u64,
+    storage_product: Rat,
+}
+
+impl Constitution {
+    /// **The complete continuing state of ring `g`'s source port** ([`ContinuingState`]): refused off
+    /// a source ring, and where a locus other than the source port has a clock, a locus is released,
+    /// or a factor family carries a remainder (the state would not be complete).
+    pub fn continuing_state(&self, ring: usize) -> Result<ContinuingState, HnnError> {
+        let law = self
+            .rings
+            .get(ring)
+            .and_then(|material| material.source.clone())
+            .ok_or(HnnError::MissingSourcePort { ring })?;
+        let locus = Locus::SourcePort(ring);
+        if self.clocks.keys().any(|other| *other != locus) {
+            return Err(HnnError::ContinuingState {
+                what: "a locus other than the source port has moved",
+            });
+        }
+        if !self.released.is_empty() {
+            return Err(HnnError::ContinuingState {
+                what: "a locus is released",
+            });
+        }
+        if self.carries.values().any(|carry| !carry.0.is_empty()) {
+            return Err(HnnError::ContinuingState {
+                what: "a factor family carries a remainder",
+            });
+        }
+        Ok(ContinuingState {
+            ring,
+            law,
+            transport: self.rings[ring].transport.clone(),
+            clock: self.clock(locus),
+            commit: self.commit,
+            storage_product: self.storage_product.clone(),
+        })
+    }
+
+    /// **The constitution continued from a checkpoint** ([`ContinuingState`]): the state's source
+    /// port, modulus, clock, commit and storage product placed on this constitution, which must be
+    /// the declared opening the state continued from (no locus moved, none released, no factor
+    /// remainder: refused, typed, otherwise), with the state's port of the declared shape.
+    pub fn continued(mut self, state: &ContinuingState) -> Result<Self, HnnError> {
+        let ring = state.ring;
+        let shape = self
+            .rings
+            .get(ring)
+            .and_then(|material| material.source.as_ref())
+            .map(|law| (law.map.rows(), law.map.columns()))
+            .ok_or(HnnError::MissingSourcePort { ring })?;
+        if shape != (state.law.map.rows(), state.law.map.columns()) {
+            return Err(HnnError::Shape {
+                what: "a continuing state's source port against the declared port",
+                expected: shape.0 * shape.1,
+                found: state.law.map.rows() * state.law.map.columns(),
+            });
+        }
+        if !self.clocks.is_empty()
+            || !self.released.is_empty()
+            || self.carries.values().any(|carry| !carry.0.is_empty())
+        {
+            return Err(HnnError::ContinuingState {
+                what: "the constitution it is restored onto is not the declared opening",
+            });
+        }
+        let lattice = self.lattice(Locus::SourcePort(ring))?;
+        if !state.law.on_lattice(&lattice) {
+            return Err(HnnError::ContinuingState {
+                what: "the state's port or Gram lies off the source port's lattice",
+            });
+        }
+        self.rings[ring].source = Some(state.law.clone());
+        self = self.with_transport(ring, state.transport.clone())?;
+        if state.clock > 0 {
+            self.clocks.insert(Locus::SourcePort(ring), state.clock);
+        }
+        self.commit = state.commit;
+        self.storage_product = state.storage_product.clone();
+        Ok(self)
+    }
+}
+
+impl ContinuingState {
+    /// The source ring.
+    pub fn ring(&self) -> usize {
+        self.ring
+    }
+
+    /// `E`.
+    pub fn port(&self) -> &ExactRatMatrix {
+        &self.law.map
+    }
+
+    /// `ρ`.
+    pub fn transport(&self) -> &Rat {
+        &self.transport
+    }
+
+    /// The source port's deposit clock.
+    pub fn clock(&self) -> u64 {
+        self.clock
+    }
+
+    /// **The state as text**, every value exact (the type's header): `E rows cols`, the rows,
+    /// `rho ρ`, then `state g`, `gram n` with its rows, `chart L_s δ`, `support k` with the support,
+    /// `block` with the chart's integer coordinates, `map-carry k` and `gram-carry k` each with
+    /// `index value` lines, `clock m`, `commit c`, `storage-product p`, `end`.
+    pub fn to_text(&self) -> String {
+        let join = |values: &mut dyn Iterator<Item = String>| values.collect::<Vec<_>>().join(" ");
+        let map = &self.law.map;
+        let mut s = format!("E {} {}\n", map.rows(), map.columns());
+        for i in 0..map.rows() {
+            s += &join(&mut (0..map.columns()).map(|j| map.get(i, j).expect("in range").to_string()));
+            s.push('\n');
+        }
+        s += &format!("rho {}\n", self.transport);
+        s += &format!("state {}\n", self.ring);
+        s += &format!("gram {}\n", self.law.gram.len());
+        for row in &self.law.gram {
+            s += &join(&mut row.iter().map(ToString::to_string));
+            s.push('\n');
+        }
+        let chart = &self.law.chart;
+        s += &format!("chart {} {}\n", chart.exponent, chart.certificate);
+        s += &format!("support {}\n", chart.support.len());
+        s += &join(&mut chart.support.iter().map(ToString::to_string));
+        s.push('\n');
+        s += "block\n";
+        s += &join(&mut chart.block.iter().map(ToString::to_string));
+        s.push('\n');
+        for (name, carry) in [("map-carry", &self.law.map_carry), ("gram-carry", &self.law.gram_carry)] {
+            s += &format!("{name} {}\n", carry.0.len());
+            for (index, value) in &carry.0 {
+                s += &format!("{index} {value}\n");
+            }
+        }
+        s += &format!("clock {}\n", self.clock);
+        s += &format!("commit {}\n", self.commit);
+        s += &format!("storage-product {}\n", self.storage_product);
+        s += "end\n";
+        s
+    }
+
+    /// **The state read back from its text** ([`ContinuingState::to_text`]); refused, typed, on any
+    /// line out of its form (a remount of `E` and `ρ` alone has no `state` line and is refused here:
+    /// it is partial).
+    pub fn from_text(text: &str) -> Result<Self, HnnError> {
+        fn refuse<T>(what: &'static str) -> Result<T, HnnError> {
+            Err(HnnError::ContinuingState { what })
+        }
+        let mut lines = text.lines();
+        let mut next = |what: &'static str| lines.next().ok_or(HnnError::ContinuingState { what });
+        let rats = |line: &str, what: &'static str| -> Result<Vec<Rat>, HnnError> {
+            line.split_whitespace()
+                .map(|x| x.parse::<Rat>().map_err(|_| HnnError::ContinuingState { what }))
+                .collect()
+        };
+        let head = |line: &str, key: &str, what: &'static str| -> Result<Vec<String>, HnnError> {
+            let mut words = line.split_whitespace();
+            if words.next() != Some(key) {
+                return refuse(what);
+            }
+            Ok(words.map(str::to_string).collect())
+        };
+        let number = |word: Option<&String>, what: &'static str| -> Result<usize, HnnError> {
+            word.and_then(|w| w.parse().ok())
+                .ok_or(HnnError::ContinuingState { what })
+        };
+        let shape = head(next("the port's head")?, "E", "the port's head")?;
+        let (rows, columns) = (
+            number(shape.first(), "the port's rows")?,
+            number(shape.get(1), "the port's columns")?,
+        );
+        let mut map_rows = Vec::with_capacity(rows);
+        for _ in 0..rows {
+            let row = rats(next("a port row")?, "a port row")?;
+            if row.len() != columns {
+                return refuse("a port row's width");
+            }
+            map_rows.push(row);
+        }
+        let map = ExactRatMatrix::shaped(rows, columns, map_rows)?;
+        let rho = head(next("the modulus")?, "rho", "the modulus")?;
+        let transport = rho
+            .first()
+            .and_then(|x| x.parse::<Rat>().ok())
+            .ok_or(HnnError::ContinuingState { what: "the modulus" })?;
+        let ring = number(
+            head(next("the state line (a partial remount has none)")?, "state", "the state line")?
+                .first(),
+            "the state's ring",
+        )?;
+        let n = number(head(next("the Gram's head")?, "gram", "the Gram's head")?.first(), "the Gram's width")?;
+        let mut gram = Vec::with_capacity(n);
+        for _ in 0..n {
+            let row = rats(next("a Gram row")?, "a Gram row")?;
+            if row.len() != n {
+                return refuse("a Gram row's width");
+            }
+            gram.push(row);
+        }
+        let chart_head = head(next("the chart's head")?, "chart", "the chart's head")?;
+        let exponent = number(chart_head.first(), "the chart's exponent")? as u32;
+        let certificate = chart_head
+            .get(1)
+            .and_then(|x| x.parse::<Rat>().ok())
+            .ok_or(HnnError::ContinuingState { what: "the chart's certificate" })?;
+        let k = number(head(next("the support's head")?, "support", "the support's head")?.first(), "the support's size")?;
+        let support: Vec<usize> = next("the support")?
+            .split_whitespace()
+            .map(|x| x.parse().map_err(|_| HnnError::ContinuingState { what: "the support" }))
+            .collect::<Result<_, _>>()?;
+        if support.len() != k {
+            return refuse("the support's size");
+        }
+        head(next("the block's head")?, "block", "the block's head")?;
+        let block: Vec<i128> = next("the block")?
+            .split_whitespace()
+            .map(|x| x.parse().map_err(|_| HnnError::ContinuingState { what: "the block" }))
+            .collect::<Result<_, _>>()?;
+        if block.len() != k * k {
+            return refuse("the block's size");
+        }
+        let mut carries = Vec::with_capacity(2);
+        for key in ["map-carry", "gram-carry"] {
+            let count = number(head(next("a carry's head")?, key, "a carry's head")?.first(), "a carry's count")?;
+            let mut carry = BTreeMap::new();
+            for _ in 0..count {
+                let line = next("a carried remainder")?;
+                let mut words = line.split_whitespace();
+                let index: usize = words
+                    .next()
+                    .and_then(|w| w.parse().ok())
+                    .ok_or(HnnError::ContinuingState { what: "a remainder's index" })?;
+                let value: Rat = words
+                    .next()
+                    .and_then(|w| w.parse().ok())
+                    .ok_or(HnnError::ContinuingState { what: "a remainder's value" })?;
+                if value.is_zero() {
+                    return refuse("a zero remainder (never stored)");
+                }
+                carry.insert(index, value);
+            }
+            carries.push(Carry(carry));
+        }
+        let mut scalar = |key: &str, what: &'static str| -> Result<String, HnnError> {
+            head(next(what)?, key, what)?
+                .into_iter()
+                .next()
+                .ok_or(HnnError::ContinuingState { what })
+        };
+        let clock: u64 = scalar("clock", "the clock")?
+            .parse()
+            .map_err(|_| HnnError::ContinuingState { what: "the clock" })?;
+        let commit: u64 = scalar("commit", "the commit")?
+            .parse()
+            .map_err(|_| HnnError::ContinuingState { what: "the commit" })?;
+        let storage_product: Rat = scalar("storage-product", "the storage product")?
+            .parse()
+            .map_err(|_| HnnError::ContinuingState { what: "the storage product" })?;
+        if next("the end")?.trim() != "end" {
+            return refuse("the end");
+        }
+        let gram_carry = carries.pop().expect("two carries");
+        let map_carry = carries.pop().expect("two carries");
+        Ok(Self {
+            ring,
+            law: NormalLaw {
+                map,
+                gram,
+                chart: SolvedChart {
+                    exponent,
+                    support,
+                    block,
+                    certificate,
+                },
+                map_carry,
+                gram_carry,
+            },
+            transport,
+            clock,
+            commit,
+            storage_product,
+        })
+    }
+}
+
 impl ConstitutionRead for Constitution {
     fn standing(&self, ring: usize) -> &[Rat] {
         &self.rings[ring].standing
