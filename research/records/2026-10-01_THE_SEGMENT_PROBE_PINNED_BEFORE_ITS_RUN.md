@@ -138,5 +138,6 @@ Gate A's lowest `L` is `L_A = [342226/4096, 342231/4096)`, and its most stations
 - **Early stop.** Each constitution prints one line with its milliseconds. If any line exceeds
   45,592 ms, the run is stopped there and reported incomplete with the measured rate.
 - **Receipts** (`2026-10-01_THE_SEGMENT_PROBE_receipts/`): the listing, the error stream (the
-  partial-remount labels), `/usr/bin/time`'s wall time and peak resident set, and the identities:
-  the source commit and the binary's sha256.
+  partial-remount labels), the launcher's wall time, the harness's own resident line (now and
+  peak), and the identities: the source commit and the binary's sha256. (`/usr/bin/time` is not on
+  this host: the first launch failed to start the harness, exit 127 in 1,004 ms, nothing read.)

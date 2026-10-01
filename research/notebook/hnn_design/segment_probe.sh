@@ -18,7 +18,7 @@ bin=${CARGO_TARGET_DIR:-target}/release/examples/hnn_prediction
 unit=45592
 { git rev-parse HEAD; sha256sum "$bin" | cut -d' ' -f1; sha256sum "$refit" "$best"; } > "$out/identities.txt"
 start=$(date +%s%3N)
-RAYON_NUM_THREADS=19 setsid /usr/bin/time -v -o "$out/segment.time" timeout 320 "$bin" \
+RAYON_NUM_THREADS=19 setsid timeout 320 "$bin" \
   executed segment order2 2026093061 8 \
   "refit=$refit" \
   "refit-founded=$refit@102837/131072" \
