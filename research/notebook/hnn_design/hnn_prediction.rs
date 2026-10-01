@@ -363,6 +363,14 @@ fn main() {
             arguments.get(9).map(|s| s.parse().expect("a held-out seed")),
         ),
         // Step 1b's causal reading (I6).
+        // The segment probe (the pin
+        // research/records/2026-10-01_THE_SEGMENT_PROBE_PINNED_BEFORE_ITS_RUN.md): read-only.
+        (Some("executed"), Some("segment")) => executed_loop::segment(
+            &arguments[3],
+            arguments[4].parse().expect("a seed"),
+            arguments[5].parse().expect("a count"),
+            &arguments[6..],
+        ),
         (Some("executed"), Some("causal")) => executed_loop::causal(
             &arguments[3],
             arguments[4].parse().expect("a seed"),

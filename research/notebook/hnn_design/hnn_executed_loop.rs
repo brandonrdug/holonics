@@ -10,6 +10,7 @@
 //! cargo run --release -p holonics --example hnn_prediction -- executed counts <terrain> <training seed> <count> <validation seed> <count> <out>
 //! cargo run --release -p holonics --example hnn_prediction -- executed witness <terrain> <seed> <count> <moves> <deadline ms> <out>
 //! cargo run --release -p holonics --example hnn_prediction -- executed causal <terrain> <seed> <count> <label[=E]>…
+//! cargo run --release -p holonics --example hnn_prediction -- executed segment <terrain> <seed> <count> <label=source>…
 //! ```
 //!
 //! - **Step 1b** (the
@@ -1133,6 +1134,129 @@ pub(super) fn causal(terrain: &str, seed: u64, count: usize, arms: &[String]) {
         );
     }
     println!("executed causal: {} ms; resident {}", clock.elapsed().as_millis(), resident());
+}
+
+/// A constitution by its source ([`segment`]): `opening` the founded opening, `lossless` the declared
+/// opening, `<source>@<ρ>` the source's `E` at the modulus `ρ`, `<A>+<B>:<s>` the chord
+/// `(1 − s)Θ_A + sΘ_B` in `E` and `ρ` (each entry exact; `ρ` must lie on the source port's lattice),
+/// a written constitution otherwise ([`remount`]).
+fn segment_source(engine: &Engine, ring: usize, spec: &str) -> Constitution {
+    if let Some((ends, s)) = spec.rsplit_once(':')
+        && let Some((a, b)) = ends.split_once('+')
+    {
+        let s = s.parse::<Rat>().expect("a rational s");
+        let (a, b) = (segment_source(engine, ring, a), segment_source(engine, ring, b));
+        let (ea, eb) = (a.source_port(ring).expect("E"), b.source_port(ring).expect("E"));
+        let columns = ea.columns();
+        let mixed: Vec<Rat> = ea
+            .entries()
+            .iter()
+            .zip(eb.entries())
+            .map(|(x, y)| x + &(&s * &(y - x)))
+            .collect();
+        let rows = mixed.chunks(columns).map(<[Rat]>::to_vec).collect();
+        let (ra, rb) = (a.transport(ring), b.transport(ring));
+        let modulus = &ra + &(&s * &(&rb - &ra));
+        return engine
+            .theta
+            .clone()
+            .with_ports(ring, None, Some(ExactRatMatrix::new(rows).expect("E")), None)
+            .expect("the chord's E")
+            .with_transport(ring, modulus)
+            .expect("the chord's ρ on the lattice");
+    }
+    if let Some((source, modulus)) = spec.rsplit_once('@') {
+        let modulus = modulus.parse::<Rat>().expect("a rational ρ");
+        return segment_source(engine, ring, source)
+            .with_transport(ring, modulus)
+            .expect("a passive modulus on the lattice");
+    }
+    match spec {
+        "opening" => founded_opening(engine),
+        "lossless" => engine.theta.clone(),
+        path => remount(&engine.theta, ring, path),
+    }
+}
+
+/// [definition; agent-inferred, October 1; the
+/// [pin](../../records/2026-10-01_THE_SEGMENT_PROBE_PINNED_BEFORE_ITS_RUN.md)] **The segment probe**
+/// (`executed segment <terrain> <seed> <count> <label=source>…`, sources as [`segment_source`]):
+/// read-only. Each constitution is read on the declared requests by gate A's comparison (the lock
+/// face at the decisions, `Comparison::LOCK_DECISIONS`, as `executed witness` reads its
+/// constitutions) and reported in the witness's line, beside the stations right by station, the
+/// class and threshold predicates at the decision terms, the first lock's station and whether it is
+/// right, and every request's release and terms whole. No move and no update; nothing is written but
+/// the listing.
+pub(super) fn segment(terrain: &str, seed: u64, count: usize, arms: &[String]) {
+    let clock = Instant::now();
+    let declared = order_declared();
+    let engine = Engine::new(declared);
+    let bank = bank_of(declared.period, &bank_strength());
+    let ring = engine.refinement.ring();
+    let pairs = terrain_pairs(terrain, &declared, seed, count);
+    let requests = open_requests(&engine, &pairs);
+    let targets: Vec<Vec<usize>> = pairs.iter().map(|(_, t)| t.clone()).collect();
+    let comparison = Comparison::LOCK_DECISIONS;
+    println!(
+        "executed segment: {count} {terrain} requests at development seed {seed}, each constitution read by the lock face at the decisions; the bank p = {}, grain 2^(-{BANK_GRAIN})",
+        bank_strength()
+    );
+    for arm in arms {
+        let started = Instant::now();
+        let (label, spec) = arm.split_once('=').expect("<label>=<source>");
+        let theta = segment_source(&engine, ring, spec);
+        let batch = compare(
+            &engine.field,
+            &theta,
+            &requests,
+            &engine.refinement,
+            &bank,
+            BANK_GRAIN,
+            comparison,
+        )
+        .expect("the segment's reading");
+        let (solved, all) = solved_terms(&batch);
+        let (whole, right, released) = batch.sections(&targets);
+        let largest = theta
+            .source_port(ring)
+            .expect("E")
+            .entries()
+            .iter()
+            .map(|x| x.abs())
+            .max()
+            .unwrap_or_else(Rat::zero);
+        let mut by_station = vec![0usize; declared.stations];
+        let (mut first, mut first_right) = (BTreeMap::<usize, usize>::new(), 0usize);
+        for (request, target) in batch.requests.iter().zip(&targets) {
+            if let Some(generation) = &request.generation {
+                if generation.release.released() {
+                    for (station, (a, b)) in generation.release.classes.iter().zip(target).enumerate() {
+                        by_station[station] += usize::from(a == b);
+                    }
+                }
+                if let Some((station, class, ..)) = generation.decisions.first() {
+                    *first.entry(*station).or_default() += 1;
+                    first_right += usize::from(*class == target[*station]);
+                }
+            }
+        }
+        let terms = batch.requests.iter().flat_map(|r| &r.terms);
+        let (mut class, mut threshold) = (0usize, 0usize);
+        for term in terms {
+            class += usize::from(term.comparison.class == Predicate::Holds);
+            threshold += usize::from(term.comparison.threshold == Predicate::Holds);
+        }
+        println!(
+            "  {label} ({spec}): solved {solved} of {all} decision terms; class holds {class}, threshold holds {threshold}; whole sections {whole} of {count} (released {released}, stations right {right} by station {by_station:?}); first lock's station {first:?}, right {first_right}; L ∈ {} nats, X ∈ {} nats; E's largest entry {largest}, ρ {}; the terms {:?}; {} ms",
+            cell(&batch.value, 1 << 12),
+            cell(&batch.excess, 1 << 12),
+            theta.transport(ring),
+            batch.counts(declared.stations),
+            started.elapsed().as_millis()
+        );
+        print_terms(label, &batch, &targets);
+    }
+    println!("executed segment: {} ms; resident {}", clock.elapsed().as_millis(), resident());
 }
 
 /// The order-2 declaration, its bank and a batch of requests compared along the machine's own
