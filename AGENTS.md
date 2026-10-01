@@ -284,6 +284,39 @@ Athena text milestone claimed before a test of use was retracted or retired.
 - A failed gate is the next loop's subject. Work on the failure, not past it, and name the blocker
   by its measurement ("the predictor codes above flat on unseen families"), not as a missing part.
 
+[project-postulate] **Waiting, deadlines and concurrency** (Brandon, September 30: "they're wasting a
+ton of time waiting repeatedly and we need standards for this so that they don't freely keep raising
+the limit"; [the audit](research/records/2026-09-30_AUDIT_WAITING_DEADLINES_AND_CONCURRENCY_THE_WORKERS_BLOCKED_ON_THEIR_OWN_RUNS.md)). Since the reset, 87,780 s of the workers' 194,986 s of
+foreground shell time went to wait loops.
+- **Launch, do not block.** A command expected to run past 60 s runs in the background, and the
+  harness notifies at its exit. The agent does other work or ends its turn. No foreground
+  `sleep N; …` (the harness blocks it: 97 blocked calls), and no wait loops chained in 600-second
+  chunks (231 calls in 42 chains).
+- **Progress is an event, not a poll.** A long run prints one line per unit of work with its elapsed
+  milliseconds. When progress matters, one Monitor watches that line with a filter that also matches
+  every failure (`error`, `panic`, `Killed`, `exit`). When only completion matters, nothing watches.
+- **Project, then fix the deadline once.** Before launch, a measured development read gives the time
+  per unit. The projection is the declared count times the measured upper time per unit, and the
+  deadline is the projection's upper end, enforced by an outer `timeout`. The shell tool's own
+  timeout is a guard set from the same projection, never a way of waiting.
+- **Stop early on evidence.** When the first units run slower than the projection's per-unit upper
+  bound, stop the run, report it incomplete with the measured rate, and report the projection error
+  as such. Do not wait out the deadline.
+- **Never raise a limit** (lesson 9). A run past its deadline is reported incomplete and is not
+  relaunched with a larger deadline, timeout or budget (the audit found 9 deadline raises and 20
+  tool-timeout raises). The next loop changes the law, the partition or the declared read, and says
+  why.
+- **Run independent work together.** The host has 24 cores and 32,746,147,840 bytes of memory.
+  Independent runs launch together when their declared threads and resident sets fit beside the
+  other workers' declared budgets. Each pin declares its thread budget, and a serial schedule of
+  independent runs states its reason.
+- **Isolate scratch.** A worker's run artifacts live in its own worktree's `.local/` or a
+  per-agent directory, never under a shared scratch name.
+- **Receipts carry time.** Each run's receipt states its projection, deadline, measured wall time
+  and peak resident set, and the record keeps the ratio of measured to projected.
+- **The orchestrator waits on notifications** (task notifications, a Monitor on the mailbox), never
+  by sleeping.
+
 [project-postulate] **Lenses join the work without resetting it.** A lens from Brandon is derived,
 recorded in a dated record and joined to the owners it touches. It changes the forward plan's order
 only when it changes an item's law or its acceptance, and the plan then says so. A direct request
@@ -334,6 +367,8 @@ older one.
   - which of the six general objects of the [winding guide](docs/WINDING_CARRY_AND_PLACEMENT.md) it
     touches (helix, pair, faces and placement, cell holonomy, tube, tower thread), keeping the rest
     attached.
+  - the waiting standard above: background launch, the projection and its fixed deadline, early
+    stop, no raised limit, the thread budget and isolated scratch.
 - The primary inspects source and integrates the returns; worker measurements are receipts.
 - Honour a request to work without agents.
 
