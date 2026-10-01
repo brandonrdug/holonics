@@ -465,7 +465,7 @@ fn the_decisions_read_each_station_once_along_the_consistent_prefix() {
 
 /// The arms of gate B: the lock face at the decisions, at every refinement and teacher-forced; the
 /// hinge at the decisions and at every refinement.
-fn arms() -> [Comparison; 5] {
+fn arms() -> [Comparison; 6] {
     let arm = |composition, reading| Comparison {
         composition,
         reading,
@@ -476,6 +476,7 @@ fn arms() -> [Comparison; 5] {
         arm(Composition::Hinge, Reading::Decisions),
         arm(Composition::Hinge, Reading::Every),
         arm(Composition::LockFace, Reading::TeacherForced),
+        arm(Composition::LockOrder, Reading::Decisions),
     ]
 }
 
@@ -994,5 +995,108 @@ fn the_machines_plane_reading_agrees_with_its_move() {
             }
         }
         other => panic!("the witness's move: {other:?}"),
+    }
+}
+
+// -------------------------------------------------------------------------------------------
+// the order as a term of the comparison
+
+/// One request of three stations read at the open section, its candidates at the given point
+/// growths (each candidate one resolved member), under the given composition.
+fn three_stations(
+    composition: Composition,
+    growths: [[Rat; 3]; 3],
+) -> (crate::hnn::executed::BatchComparison, ProposalProbe) {
+    let reads = vec![
+        growths
+            .iter()
+            .map(|g| g.iter().map(|a| candidate(at(a.clone()), vec![resolved(0, 1, 0)])).collect())
+            .collect::<Vec<Vec<TurnCovector>>>(),
+    ];
+    let batch = synthetic_batch(
+        Comparison {
+            composition,
+            reading: Reading::Decisions,
+        },
+        &[vec![0, 1, 2]],
+        vec![(0..3).map(|s| site(s, 3)).collect()],
+        &reads,
+        2,
+    )
+    .unwrap();
+    let probe = ProposalProbe::of(&batch, &reads);
+    (batch, probe)
+}
+
+/// **The order term reads the release's first lock as a lock over the stations** (the order's
+/// pin): station 0's top is its target with gap `5 − 2 = 3`, station 1's top is wrong with gap
+/// `9 − 2 = 7`, station 2's top is right with gap `3 − 1/2 = 5/2`. The right station of the largest
+/// gap is 0; the sheets are `{0, 1}`, `ℓ_o = ln(10/3)`, not solved (`3 ≤ 7`: the release would lock
+/// the wrong station 1 first). Each sheet returns through its top and runner,
+/// `((θ − [x = r])/g)(a_top du_top − a_runner du_runner)`; the lock face's terms are unchanged.
+#[test]
+fn the_order_term_reads_the_first_lock_as_a_lock_over_the_stations() {
+    let growths = [
+        [integer(5), integer(2), integer(1)],
+        [integer(9), integer(2), integer(1)],
+        [rat(1, 2), rat(1, 4), integer(3)],
+    ];
+    let (face, face_probe) = three_stations(Composition::LockFace, growths.clone());
+    let (batch, probe) = three_stations(Composition::LockOrder, growths);
+    let order = batch.requests[0].order.clone().unwrap();
+    let stations: Vec<(usize, usize, Rat)> =
+        order.sheets.iter().map(|s| (s.station, s.top, s.gap.clone())).collect();
+    assert_eq!(stations, vec![(0, 0, integer(3)), (1, 0, integer(7))]);
+    assert_eq!(
+        order.sheets.iter().map(|s| s.weight.clone()).collect::<Vec<_>>(),
+        vec![rat(-7, 10), rat(7, 10)]
+    );
+    assert_eq!(order.solved, Predicate::Fails);
+    assert_eq!(order.kind, Excess::Above);
+    let ln = ln_enclosure(&rat(10, 3)).unwrap();
+    assert_eq!(order.value, ln);
+    assert_eq!(batch.value, plus_interval(&face.value, &ln));
+    // The lock face's 9 contributions, then the order's top and runner for each sheet.
+    assert_eq!(face_probe.contributions.len(), 9);
+    assert_eq!(probe.contributions[..9], face_probe.contributions[..]);
+    let order_weights: Vec<(usize, Rat)> = probe.contributions[9..].to_vec();
+    assert_eq!(
+        order_weights,
+        vec![
+            (0, rat(-7, 6)),
+            (0, rat(7, 15)),
+            (1, rat(9, 10)),
+            (1, rat(-1, 5)),
+        ]
+    );
+}
+
+/// **The order is solved exactly when the right station's gap exceeds every wrong one's together**,
+/// and absent where no eligible station's top is its target.
+#[test]
+fn the_order_is_solved_past_the_wrong_gaps_and_absent_without_a_right_top() {
+    let solved = [
+        [integer(20), integer(2), integer(1)],
+        [integer(9), integer(2), integer(1)],
+        [rat(1, 2), rat(1, 4), integer(3)],
+    ];
+    let (batch, _) = three_stations(Composition::LockOrder, solved);
+    let order = batch.requests[0].order.clone().unwrap();
+    assert_eq!(order.solved, Predicate::Holds);
+    assert_eq!(order.kind, Excess::Solved);
+    assert_eq!(order.excess, ExactInterval::point(Rat::zero()));
+    let wrong = [
+        [integer(1), integer(5), integer(1)],
+        [integer(9), integer(2), integer(1)],
+        [integer(3), rat(1, 4), rat(1, 2)],
+    ];
+    let (batch, _) = three_stations(Composition::LockOrder, wrong);
+    assert!(batch.requests[0].order.is_none());
+}
+
+fn plus_interval(a: &ExactInterval, b: &ExactInterval) -> ExactInterval {
+    ExactInterval {
+        lower: &a.lower + &b.lower,
+        upper: &a.upper + &b.upper,
     }
 }
