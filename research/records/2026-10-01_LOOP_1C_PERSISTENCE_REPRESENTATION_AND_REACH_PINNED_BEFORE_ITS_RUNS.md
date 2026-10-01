@@ -536,3 +536,34 @@ mathematics with its own review.
 is negative, or whose decisions at the witness's sections do not rise, motivate the move's
 direction; a falling distance with no decisional rise is the case "geometric distance alone need not
 track decision progress", motivating a decisional reading of reach, not a metric one.
+
+## Amended after Astra's focused source review (October 1), before any run
+
+Astra checked the 128-significant-bit enclosure of the joint certificate. It is interval arithmetic
+with exact floor and ceiling, correct reversal of negative endpoints, four-corner products and
+enclosures retained into later pairings; no rounding error is dropped. Deriving the precision from
+the grain stays owed (#62) as an efficiency and contract obligation, not a soundness one. Two
+amendments govern over any conflicting statement above.
+
+1. **Checkpoint availability.** Gate A's harness wrote only its best constitution (`c1`). The other
+   16 states are not saved. They are regenerated deterministically by gate A's own procedure
+   (`exp-replay`), under its own measured budget (unit upper 298,438 ms a move, deadline 4,476,570
+   ms, guard 4,820 s) and with full-state identity checks: gate A's 33 constitution and move lines,
+   with wall times masked, and `c1.state` byte-identical to the saved one. No state is claimed as
+   saved that was regenerated.
+2. **Persistence has three statuses, never pooled.** The owner's receipt (`hnn::executed::
+   Persistence`) now separates the decisions that do not stay solved into `reversed` (the strict
+   test proved to fail: a proved loss) and `uncertified` (undecided on the enclosures: lost
+   certification, not a proved reversal). `fall` is their sum, kept because gate A printed it, and
+   the replay's comparison masks only the two new fields. Every reading and every counterfactual
+   attribution in §1–§2 reports the three statuses apart: solved, reversed, uncertified. A decision
+   that is no longer certified is never counted as reversed.
+3. **Intermediate contexts against terminal assignments.** Placement depends on the placed cells, so
+   each release-order comparison (native, ascending, descending) reports, for each decision, its
+   reading at its own lock, in the intermediate context the order produced, and at the release, the
+   terminal assignment, separately. The coupling mode's line already reads "solved at the lock"
+   apart from "at the release solved, not solved, undecided".
+
+The controls, the exact certification, the thread reservation (at most 19 threads, beside Codex's
+5) and the fixed deadlines of §6 are unchanged. Gates B and C stay closed, and the final
+confirmation `2_026_093_033/036/039` stays unread.

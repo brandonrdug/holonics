@@ -583,6 +583,7 @@ fn the_guards_hold_symmetrically_on_every_arm() {
         }
         let p = moved.persistence;
         assert_eq!(p.stay + p.fall, p.reread);
+        assert_eq!(p.reversed + p.uncertified, p.fall);
         assert!(p.reread <= p.solved && p.solved <= p.locks);
         for trial in &moved.trials[..moved.trials.len().saturating_sub(1)] {
             assert!(trial.refusal.is_some());

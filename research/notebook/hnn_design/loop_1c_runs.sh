@@ -104,7 +104,9 @@ case "${1:-}" in
   check-replay)
     # §1 items 1 and 2: every constitution and move line against gate A's receipt (wall times
     # masked), and constitution 1's state against the saved one.
-    mask='s/; [0-9]+ ms$//'
+    # The persistence receipt's split (`reversed`, `uncertified`; Astra's review, October 1) is
+    # new beside gate A's `fall`, its sum: masked here, and read in the record.
+    mask='s/; [0-9]+ ms$//; s/, reversed: [0-9]+, uncertified: [0-9]+//g'
     diff <(sed -n '2,34p' "$gate_a/witness.txt" | sed -E "$mask") \
       <(sed -n '2,34p' "$out/replay.txt" | sed -E "$mask")
     cmp "$out/states/c1.state" "$gate_a/witness_best.state"

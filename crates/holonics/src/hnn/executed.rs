@@ -2575,6 +2575,9 @@ fn slope_refusal(joint: &FirstOrderReading) -> Option<MoveRefusal> {
 /// the locks of the incumbent's releases, those whose lock face was solved at their refinement
 /// (the rational test), those of them with a later lock in their section, and of those, re-read with
 /// every later lock placed (the station open), the ones that stay solved and the ones that do not.
+/// Those that do not are split (Astra's review, October 1): `reversed`, the strict test proved to
+/// fail (a proved loss), and `uncertified`, the test undecided on the enclosures (lost
+/// certification, not a proved reversal). `fall` is their sum, kept as gate A printed it.
 #[derive(Clone, Copy, Debug, Default, PartialEq, Eq)]
 pub struct Persistence {
     pub locks: usize,
@@ -2582,6 +2585,8 @@ pub struct Persistence {
     pub reread: usize,
     pub stay: usize,
     pub fall: usize,
+    pub reversed: usize,
+    pub uncertified: usize,
 }
 
 /// [definition; agent-inferred, September 30] **The committed move's receipt**: the declared
@@ -2938,10 +2943,16 @@ fn persistence(
                         })
                         .collect::<Result<_, HnnError>>()?;
                     let lock = lock_face(&joints, request.targets[station])?;
-                    if lock.solved == Predicate::Holds {
-                        out.stay += 1;
-                    } else {
-                        out.fall += 1;
+                    match lock.solved {
+                        Predicate::Holds => out.stay += 1,
+                        Predicate::Fails => {
+                            out.fall += 1;
+                            out.reversed += 1;
+                        }
+                        Predicate::Undecided => {
+                            out.fall += 1;
+                            out.uncertified += 1;
+                        }
                     }
                 }
             }
@@ -2954,6 +2965,8 @@ fn persistence(
         reread: a.reread + b.reread,
         stay: a.stay + b.stay,
         fall: a.fall + b.fall,
+        reversed: a.reversed + b.reversed,
+        uncertified: a.uncertified + b.uncertified,
     }))
 }
 
