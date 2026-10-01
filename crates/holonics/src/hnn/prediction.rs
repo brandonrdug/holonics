@@ -540,6 +540,43 @@ pub fn bank_release_ordered<R: JointGrowth + Send + Sync>(
     keep: bool,
     order: LockOrder,
 ) -> Result<(BankGeneration, Vec<BankRefinement<R>>), HnnError> {
+    release_iteration(placement, declared, alphabet, bank, grain, read, keep, order, None)
+}
+
+/// [measured-diagnostic; agent-inferred, October 1; the
+/// [forced release's record](../../../../research/records/2026-10-01_THE_FORCED_RELEASE.md)]
+/// **The forced release**: the release's own lock iteration under its own law ([`LockOrder::Gap`]:
+/// which stations lock, from their own readings), each lock placed at its declared target class
+/// instead of its top. Its refinements are the contexts the release would read had every earlier
+/// lock been right: a comparison read there covers every decision the release faces along the
+/// right trajectory, so if every one is solved the section is whole, lock by lock. A placed target
+/// is a reading context, not a commit: its Floquet certificate is not read. Never a release law.
+#[allow(clippy::too_many_arguments)]
+pub fn bank_release_forced<R: JointGrowth + Send + Sync>(
+    placement: &BankPlacement,
+    declared: &Refinement,
+    alphabet: usize,
+    bank: &ReceivingBank,
+    grain: u32,
+    read: impl Fn(&[GaussianRat]) -> Result<R, HnnError> + Sync,
+    targets: &[usize],
+) -> Result<(BankGeneration, Vec<BankRefinement<R>>), HnnError> {
+    release_iteration(placement, declared, alphabet, bank, grain, read, true, LockOrder::Gap, Some(targets))
+}
+
+/// The lock iteration ([`bank_release_ordered`], [`bank_release_forced`]).
+#[allow(clippy::too_many_arguments)]
+fn release_iteration<R: JointGrowth + Send + Sync>(
+    placement: &BankPlacement,
+    declared: &Refinement,
+    alphabet: usize,
+    bank: &ReceivingBank,
+    grain: u32,
+    read: impl Fn(&[GaussianRat]) -> Result<R, HnnError> + Sync,
+    keep: bool,
+    order: LockOrder,
+    forced: Option<&[usize]>,
+) -> Result<(BankGeneration, Vec<BankRefinement<R>>), HnnError> {
     use rayon::prelude::*;
     let stations = declared.stations;
     let mut locked: Vec<Option<usize>> = vec![None; stations];
@@ -618,15 +655,21 @@ pub fn bank_release_ordered<R: JointGrowth + Send + Sync>(
         };
         let mut taken = Vec::new();
         for &station in &now {
-            let class = tops[station];
+            let class = forced.map_or(tops[station], |targets| targets[station]);
             let index = open
                 .iter()
                 .position(|&pair| pair == (station, class))
                 .expect("a read candidate");
             let reading = read[index].joint().clone();
             let amplitudes = turn(&storage(station, class));
-            match bank.certify_turn(&amplitudes, read[index].reading(), grain) {
-                Ok(certificate) => {
+            let certificate = if forced.is_some() {
+                Ok(None)
+            } else {
+                bank.certify_turn(&amplitudes, read[index].reading(), grain).map(Some)
+            };
+            match certificate {
+                Ok(None) => {}
+                Ok(Some(certificate)) => {
                     certified += certificate.certificates.len();
                     ticks_closed += certificate.closed;
                     ticks += certificate.ticks;

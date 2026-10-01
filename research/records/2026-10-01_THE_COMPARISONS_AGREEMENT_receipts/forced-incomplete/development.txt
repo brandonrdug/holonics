@@ -1,0 +1,4 @@
+executed agreement: 8 order2 requests at development seed 2026093061, the arms order-forced,lock-forced; the bank p = 5/8, grain 2^(-16)
+  c6 order-forced: ρ 1642461/2097152; value ∈ [2236260/4096, 2236280/4096) nats; solved 2 of 288; whole 0 (released 8, stations right 15); 51159 ms
+  c6 lock-forced: ρ 1642461/2097152; value ∈ [1912757/4096, 1912778/4096) nats; solved 2 of 288; whole 0 (released 8, stations right 15); 51000 ms
+executed agreement: 102205 ms; resident 79949824 now, 79949824 peak

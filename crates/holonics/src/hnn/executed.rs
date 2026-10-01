@@ -253,6 +253,11 @@ pub enum Reading {
     Decisions,
     /// Each station once, at the section with every earlier station at its target (a diagnostic).
     TeacherForced,
+    /// Every open station of every refinement of the forced release (`prediction::bank_release_forced`:
+    /// the release's own lock order, each lock placed at its target): every decision the release
+    /// faces along the right trajectory, each in its own context (the
+    /// [forced release's record](../../../../research/records/2026-10-01_THE_FORCED_RELEASE.md)).
+    Forced,
 }
 
 /// [definition; agent-inferred, September 30] **A declared comparison**: its composition and its
@@ -916,6 +921,37 @@ fn validate(requests: &[Request], stations: usize, alphabet: usize) -> Result<()
 
 /// A request's release from the open section (every refinement kept), or its partition's one
 /// refinement, each candidate read by `read`.
+/// The refinements a declared reading's sites are read on: the forced release's
+/// (`prediction::bank_release_forced`, with its readings made) for [`Reading::Forced`] on an open
+/// context, else the release's own.
+#[allow(clippy::too_many_arguments)]
+fn sites_refinements<R: JointGrowth + Send + Sync>(
+    placement: &BankPlacement,
+    request: &Request,
+    declared: &Refinement,
+    alphabet: usize,
+    bank: &ReceivingBank,
+    grain: u32,
+    read: &(impl Fn(&[GaussianRat]) -> Result<R, HnnError> + Sync),
+    reading: Reading,
+    refinements: Vec<BankRefinement<R>>,
+) -> Result<(Vec<BankRefinement<R>>, usize), HnnError> {
+    if reading != Reading::Forced || !matches!(request.context, Context::Open) {
+        return Ok((refinements, 0));
+    }
+    let (_, forced) = crate::hnn::prediction::bank_release_forced(
+        placement,
+        declared,
+        alphabet,
+        bank,
+        grain,
+        read,
+        &request.targets,
+    )?;
+    let made = forced.iter().map(|r| r.read.len()).sum();
+    Ok((forced, made))
+}
+
 fn release_of<R: JointGrowth + Send + Sync>(
     placement: &BankPlacement,
     request: &Request,
@@ -1080,7 +1116,7 @@ pub fn sites_of<R>(
         .iter()
         .rposition(|refinement| consistent_section(&refinement.placed, &request.targets));
     let sites = match reading {
-        Reading::Every => refinements
+        Reading::Every | Reading::Forced => refinements
             .iter()
             .enumerate()
             .flat_map(|(k, refinement)| {
@@ -1366,6 +1402,9 @@ fn compare_request(
     let (generation, refinements) =
         release_of(&placement, request, declared, alphabet, bank, grain, &read)?;
     let (stations, orders) = receipts(request, &refinements, alphabet, termination)?;
+    let (refinements, forced) = sites_refinements(
+        &placement, request, declared, alphabet, bank, grain, &read, comparison.reading, refinements,
+    )?;
     let (sites, consistent) = sites_of(
         index,
         request,
@@ -1375,6 +1414,7 @@ fn compare_request(
         alphabet,
     );
     let (reads, made) = site_reads(&sites, &refinements, &placement, alphabet, &read)?;
+    let made = made + forced;
     let order_terms = match comparison.composition {
         Composition::LockOrder => {
             order_terms(&sites, &reads, &request.targets, comparison.reading)?
@@ -1478,7 +1518,8 @@ fn incumbent_request(
     let alphabet = field.alphabet();
     let termination = declared.termination();
     let covector = |amplitudes: &[GaussianRat]| bank.read_turn_covector(amplitudes, grain);
-    let every = comparison.reading == Reading::Every || !matches!(request.context, Context::Open);
+    let every = matches!(comparison.reading, Reading::Every | Reading::Forced)
+        || !matches!(request.context, Context::Open);
     if !every {
         let (compared, _, placement) = compare_request(
             field,
@@ -1506,6 +1547,9 @@ fn incumbent_request(
     let (generation, refinements) =
         release_of(&placement, request, declared, alphabet, bank, grain, &covector)?;
     let (stations, orders) = receipts(request, &refinements, alphabet, termination)?;
+    let (refinements, forced) = sites_refinements(
+        &placement, request, declared, alphabet, bank, grain, &covector, comparison.reading, refinements,
+    )?;
     let (sites, consistent) = sites_of(
         index,
         request,
@@ -1515,6 +1559,7 @@ fn incumbent_request(
         alphabet,
     );
     let (reads, made) = site_reads(&sites, &refinements, &placement, alphabet, &covector)?;
+    let made = made + forced;
     let order_terms = match comparison.composition {
         Composition::LockOrder => {
             order_terms(&sites, &reads, &request.targets, comparison.reading)?
