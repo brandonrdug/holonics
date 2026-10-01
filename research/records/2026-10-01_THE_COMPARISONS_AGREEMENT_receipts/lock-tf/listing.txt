@@ -1,0 +1,14 @@
+executed agreement: 8 order2 requests at development seed 2026093061, the arms lock-tf; the bank p = 5/8, grain 2^(-16)
+  c0 lock-tf: ρ 102837/131072; value ∈ [488501/4096, 488507/4096) nats; solved 0 of 64; whole 0 (released 7, stations right 15); 20793 ms
+  c1 lock-tf: ρ 1646019/2097152; value ∈ [481787/4096, 481792/4096) nats; solved 0 of 64; whole 0 (released 8, stations right 15); 40808 ms
+  c2 lock-tf: ρ 103169/131072; value ∈ [476935/4096, 476941/4096) nats; solved 0 of 64; whole 0 (released 8, stations right 16); 41263 ms
+  c3 lock-tf: ρ 821347/1048576; value ∈ [469010/4096, 469015/4096) nats; solved 0 of 64; whole 0 (released 8, stations right 16); 41406 ms
+  c4 lock-tf: ρ 1652819/2097152; value ∈ [453885/4096, 453890/4096) nats; solved 0 of 64; whole 0 (released 8, stations right 13); 41232 ms
+  c5 lock-tf: ρ 206193/262144; value ∈ [447105/4096, 447111/4096) nats; solved 0 of 64; whole 0 (released 8, stations right 18); 41543 ms
+  c6 lock-tf: ρ 1642461/2097152; value ∈ [443837/4096, 443843/4096) nats; solved 0 of 64; whole 0 (released 8, stations right 15); 41991 ms
+  o0 lock-tf: ρ 1633145/2097152; value ∈ [445938/4096, 445944/4096) nats; solved 0 of 64; whole 0 (released 8, stations right 16); 41458 ms
+  o1 lock-tf: ρ 1626995/2097152; value ∈ [447187/4096, 447193/4096) nats; solved 0 of 64; whole 0 (released 8, stations right 12); 41026 ms
+  o2 lock-tf: ρ 1627257/2097152; value ∈ [446702/4096, 446708/4096) nats; solved 0 of 64; whole 0 (released 8, stations right 19); 41039 ms
+  o3 lock-tf: ρ 1625149/2097152; value ∈ [447029/4096, 447035/4096) nats; solved 0 of 64; whole 0 (released 8, stations right 19); 41631 ms
+  o4 lock-tf: ρ 1624995/2097152; value ∈ [447049/4096, 447054/4096) nats; solved 0 of 64; whole 0 (released 8, stations right 18); 41069 ms
+executed agreement: 475349 ms; resident 82022400 now, 82022400 peak
