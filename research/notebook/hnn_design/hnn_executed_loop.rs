@@ -11,6 +11,7 @@
 //! cargo run --release -p holonics --example hnn_prediction -- executed witness <terrain> <seed> <count> <moves> <deadline ms> <out>
 //! cargo run --release -p holonics --example hnn_prediction -- executed causal <terrain> <seed> <count> <label[=E]>…
 //! cargo run --release -p holonics --example hnn_prediction -- executed segment <terrain> <seed> <count> <label=source>…
+//! cargo run --release -p holonics --example hnn_prediction -- executed direction <terrain> <seed> <count> <arm> <from> <toward> <out> <η>…
 //! cargo run --release -p holonics --example hnn_prediction -- executed rho-slopes <terrain> <seed> <count> <arm> <label=source>…
 //! ```
 //!
@@ -1177,6 +1178,174 @@ fn segment_source(engine: &Engine, ring: usize, spec: &str) -> Constitution {
         "lossless" => engine.theta.clone(),
         path => remount(&engine.theta, ring, path),
     }
+}
+
+/// The Frobenius pairing of two matrices of one shape, exactly.
+fn frobenius(a: &ExactRatMatrix, b: &ExactRatMatrix) -> Rat {
+    a.entries().iter().zip(b.entries()).map(|(x, y)| x * y).sum()
+}
+
+/// [definition; agent-inferred, October 1; the
+/// [pin](../../records/2026-10-01_THE_NATIVE_DIRECTION_PINNED_BEFORE_ITS_RUN.md)] **The native
+/// direction** (`executed direction <terrain> <seed> <count> <arm> <from> <toward> <out> <η>…`,
+/// sources as [`segment_source`]): read-only. At `from`, the committed move's unit step as
+/// `executed_move` forms it (`hnn::executed::unit_direction`): `ΔE` through the normal law's chart,
+/// the plain pullback `G` of the same returns, and `Δρ`. Each is paired with `E_toward − E_from`
+/// (the pairing's sign and its squared cosine, exactly). Then for each `η`, the constitution
+/// `(E + ηΔE, ρ + ηΔρ)` (`ρ` floored onto the source port's lattice) is read by the arm's comparison
+/// and written to `<out>/eta-<k>.txt` (`E` and `ρ`, a partial remount's form). No move is made.
+#[allow(clippy::too_many_arguments)]
+pub(super) fn direction(
+    terrain: &str,
+    seed: u64,
+    count: usize,
+    arm: &str,
+    from: &str,
+    toward: &str,
+    out: &str,
+    steps: &[String],
+) {
+    use holonics::hnn::executed::unit_direction;
+    let clock = Instant::now();
+    let declared = order_declared();
+    let engine = Engine::new(declared);
+    let bank = bank_of(declared.period, &bank_strength());
+    let ring = engine.refinement.ring();
+    let pairs = terrain_pairs(terrain, &declared, seed, count);
+    let requests = open_requests(&engine, &pairs);
+    let targets: Vec<Vec<usize>> = pairs.iter().map(|(_, t)| t.clone()).collect();
+    let (comparison, partition) = arm_comparison(arm);
+    assert!(!partition, "the direction is read on the open section");
+    println!(
+        "executed direction: {count} {terrain} requests at development seed {seed}, the arm {arm}, from {from} toward {toward}; the bank p = {}, grain 2^(-{BANK_GRAIN})",
+        bank_strength()
+    );
+    let theta = segment_source(&engine, ring, from);
+    let goal = segment_source(&engine, ring, toward);
+    let started = Instant::now();
+    let reading = unit_direction(
+        &engine.field,
+        &theta,
+        &requests,
+        &engine.refinement,
+        &bank,
+        BANK_GRAIN,
+        comparison,
+    )
+    .expect("the unit direction");
+    let e = theta.source_port(ring).expect("E").clone();
+    let route = goal.source_port(ring).expect("E").subtract(&e).expect("one shape");
+    let route_rho = goal.transport(ring) - theta.transport(ring);
+    let route_norm = frobenius(&route, &route);
+    let point = |x: &Rat, grain: i64| cell(&ExactInterval::point(x.clone()), grain);
+    let align = |m: &ExactRatMatrix| {
+        let pairing = frobenius(m, &route);
+        let norm = frobenius(m, m);
+        let cosine = if norm.is_zero() || route_norm.is_zero() {
+            "none".to_string()
+        } else {
+            point(&(&pairing * &pairing / (&norm * &route_norm)), 1 << 12)
+        };
+        let sign = if pairing.is_positive() {
+            "positive"
+        } else if pairing.is_zero() {
+            "zero"
+        } else {
+            "negative"
+        };
+        format!("pairing with the route {sign}, squared cosine {cosine}, largest entry {}", largest_of(m))
+    };
+    let (solved, all) = solved_terms(&reading.before);
+    let (whole, right, released) = reading.before.sections(&targets);
+    let (Some(unit), Some(pullback), Some(modulus)) =
+        (&reading.unit_move, &reading.pullback, &reading.modulus_unit)
+    else {
+        println!(
+            "  from: refused before the step, {:?}; {} ms",
+            reading.refusal,
+            started.elapsed().as_millis()
+        );
+        return;
+    };
+    println!(
+        "  from ({from}): ρ {}; {} ∈ {} nats; solved {solved} of {all}; whole {whole} (released {released}, stations right {right}); the route's ρ change {}; ΔE (through the chart): {}; G (the plain pullback): {}; Δρ ∈ {} (γ_ρ ∈ {}); {} ms",
+        theta.transport(ring),
+        symbol(&comparison),
+        cell(&reading.before.value, 1 << 12),
+        route_rho,
+        align(unit),
+        align(pullback),
+        point(modulus, 1 << 21),
+        point(reading.modulus_slope.as_ref().expect("γ_ρ"), 1 << 12),
+        started.elapsed().as_millis()
+    );
+    let lattice = Rat::new(BigInt::one(), BigInt::from(1u64 << 21));
+    for (k, step) in steps.iter().enumerate() {
+        let started = Instant::now();
+        let eta = step.parse::<Rat>().expect("a rational step");
+        let moved: Vec<Rat> = e
+            .entries()
+            .iter()
+            .zip(unit.entries())
+            .map(|(x, d)| x + &(&eta * d))
+            .collect();
+        let rows: Vec<Vec<Rat>> = moved.chunks(e.columns()).map(<[Rat]>::to_vec).collect();
+        let raw = theta.transport(ring) + &eta * modulus;
+        let modulus_eta = (&raw / &lattice).floor() * &lattice;
+        let successor = engine
+            .theta
+            .clone()
+            .with_ports(ring, None, Some(ExactRatMatrix::new(rows.clone()).expect("E")), None)
+            .expect("the successor's E")
+            .with_transport(ring, modulus_eta.clone())
+            .expect("a passive modulus on the lattice");
+        let mut text = format!("E {} {}\n", rows.len(), e.columns());
+        for row in &rows {
+            text.push_str(&row.iter().map(ToString::to_string).collect::<Vec<_>>().join(" "));
+            text.push('\n');
+        }
+        text.push_str(&format!("rho {modulus_eta}\n"));
+        #[allow(clippy::disallowed_methods)]
+        std::fs::write(format!("{out}/eta-{k}.txt"), text).expect("write the successor");
+        let batch = compare(
+            &engine.field,
+            &successor,
+            &requests,
+            &engine.refinement,
+            &bank,
+            BANK_GRAIN,
+            comparison,
+        )
+        .expect("the successor's reading");
+        let (solved, all) = solved_terms(&batch);
+        let (whole, right, released) = batch.sections(&targets);
+        let first: Vec<String> = batch
+            .requests
+            .iter()
+            .zip(&targets)
+            .filter_map(|(r, t)| {
+                r.generation.as_ref().and_then(|g| {
+                    g.decisions.first().map(|(s, c, ..)| {
+                        format!("{s}{}", if *c == t[*s] { "+" } else { "-" })
+                    })
+                })
+            })
+            .collect();
+        println!(
+            "  η {eta} (eta-{k}): ρ {modulus_eta}; {} ∈ {} nats; solved {solved} of {all}; whole {whole} (released {released}, stations right {right}); first locks {}; the terms {:?}; {} ms",
+            symbol(&comparison),
+            cell(&batch.value, 1 << 12),
+            first.join(" "),
+            batch.counts(declared.stations),
+            started.elapsed().as_millis()
+        );
+    }
+    println!("executed direction: {} ms; resident {}", clock.elapsed().as_millis(), resident());
+}
+
+/// The largest entry's magnitude of a matrix.
+fn largest_of(m: &ExactRatMatrix) -> Rat {
+    m.entries().iter().map(|x| x.abs()).max().unwrap_or_else(Rat::zero)
 }
 
 /// [definition; agent-inferred, October 1; the
