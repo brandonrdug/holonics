@@ -424,6 +424,17 @@ fn main() {
             &arguments[6],
             &arguments[7],
         ),
+        // The witness's plane along the port's move and along the route (the record
+        // research/records/2026-10-01_THE_STIFFNESS_IN_RHO.md): read-only.
+        (Some("executed"), Some("route-plane")) => executed_loop::route_plane(
+            &arguments[3],
+            arguments[4].parse().expect("a seed"),
+            arguments[5].parse().expect("a count"),
+            &arguments[6],
+            &arguments[7],
+            &arguments[8],
+            &arguments[9..],
+        ),
         (Some("executed"), Some("causal")) => executed_loop::causal(
             &arguments[3],
             arguments[4].parse().expect("a seed"),

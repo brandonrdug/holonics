@@ -1,0 +1,4 @@
+7352010a501619d6177e79dcdc5c40d5a33551a1
+c9f32c71805c3aa4148f3d108e94f16ca08ce50856eeead187a113cc1ee59b4b
+args executed route-plane order2 2026093061 8 order-dec route research/records/2026-09-30_THE_MODULUS_FOUNDED_OFF_ONE_receipts/refit_on_lattice.txt c6=research/records/2026-10-01_THE_GUARDED_WITNESS_receipts/c6.state m3=research/records/2026-10-01_THE_ORDER_receipts/continuation/m3/m3-witness.state
+wall 187831 ms; exit 0; early stop 0

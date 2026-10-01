@@ -708,6 +708,10 @@ that fires becomes the next loop's subject, and nothing downstream starts.
     - *The order as a term, October 1* ([record](../../research/records/2026-10-01_THE_ORDER_MEASURED_ONE_MOVE_FROM_C6_GAINS_STATIONS_WHERE_THE_LOCK_FACE_ALONE_LOST_THEM.md)).
       The first lock read as a lock over the stations joins the comparison. One witness-metric move
       from c6 gains a station and a right first lock, where the lock face alone lost two stations.
+    - *The stiffness in ρ, October 1* ([record](../../research/records/2026-10-01_THE_STIFFNESS_IN_RHO.md)). Not the plane's `E`
+      direction: the stall is a basin of the comparison, and the chord to the refit rises before it
+      falls. The next law is the witness's direction in all of `E`, which chooses the valley at the
+      opening.
   - *1b's subject, as 1a named it*: a comparison whose descent must move decisions, one
     that holds a margin on right decisions, is not minimized on ties, and is read where a reading
     carries information about the key. The governing law "loss is the log of a ratio" is the

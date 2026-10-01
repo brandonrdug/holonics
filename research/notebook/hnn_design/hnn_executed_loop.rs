@@ -16,6 +16,7 @@
 //! cargo run --release -p holonics --example hnn_prediction -- executed witness-plane <terrain> <seed> <count> <arm> <toward> <out> <label=source>…
 //! cargo run --release -p holonics --example hnn_prediction -- executed move-once <terrain> <seed> <count> <out> <label=state> <arm> <metric>…
 //! cargo run --release -p holonics --example hnn_prediction -- executed margins <terrain> <seed> <count> <before state> <after state>
+//! cargo run --release -p holonics --example hnn_prediction -- executed route-plane <terrain> <seed> <count> <arm> <both|route|port> <toward> <label=state>…
 //! ```
 //!
 //! - **Step 1b** (the
@@ -1607,6 +1608,90 @@ pub(super) fn margins(terrain: &str, seed: u64, count: usize, before: &str, afte
     println!("executed margins: {} ms; resident {}", clock.elapsed().as_millis(), resident());
 }
 
+/// [measured-diagnostic; agent-inferred, October 1; the
+/// [ρ stiffness record](../../records/2026-10-01_THE_STIFFNESS_IN_RHO.md)]
+/// **The witness's plane along the port's unit move and along the route** (`executed route-plane
+/// <terrain> <seed> <count> <arm> <both|route|port> <toward> <label=state>…`, states restored
+/// whole): at each state the
+/// witness's form, its step `(α, β)` and `β` over the chord to `toward`'s `ρ`, on the plane of the
+/// port's unit move `ΔE` (the move's own) and on the plane of the route `E_toward − E`
+/// (`hnn::executed::witness_plane_along`). No move is made.
+pub(super) fn route_plane(
+    terrain: &str,
+    seed: u64,
+    count: usize,
+    arm: &str,
+    planes: &str,
+    toward: &str,
+    sources: &[String],
+) {
+    use holonics::hnn::executed::witness_plane_along;
+    let clock = Instant::now();
+    let declared = order_declared();
+    let engine = Engine::new(declared);
+    let bank = bank_of(declared.period, &bank_strength());
+    let ring = engine.refinement.ring();
+    let pairs = terrain_pairs(terrain, &declared, seed, count);
+    let requests = open_requests(&engine, &pairs);
+    let (comparison, partition) = arm_comparison(arm);
+    assert!(!partition, "the plane is read on the open section");
+    let goal = segment_source(&engine, ring, toward);
+    println!(
+        "executed route-plane: {count} {terrain} requests at development seed {seed}, the arm {arm}, toward {toward} (ρ {}); the bank p = {}, grain 2^(-{BANK_GRAIN})",
+        goal.transport(ring),
+        bank_strength()
+    );
+    for source in sources {
+        let (label, spec) = source.split_once('=').expect("<label>=<state>");
+        let theta = remounted(&engine.theta, spec);
+        let chord = goal.transport(ring) - theta.transport(ring);
+        let both = [("the port's unit move", None), ("the route", Some(&goal))];
+        let chosen: Vec<_> = both
+            .into_iter()
+            .filter(|(_, along)| planes == "both" || (planes == "route") == along.is_some())
+            .collect();
+        for (plane, along) in chosen {
+            let started = Instant::now();
+            let reading = witness_plane_along(
+                &engine.field,
+                &theta,
+                along,
+                &requests,
+                &engine.refinement,
+                &bank,
+                BANK_GRAIN,
+                comparison,
+            )
+            .expect("the plane");
+            let line = match &reading.witness {
+                None => format!("no witness's form ({:?})", reading.refusal),
+                Some(w) => {
+                    let step = w.step();
+                    format!(
+                        "G_EE {}, G_Eρ {}, G_ρρ {}; g_E {}, g_ρ {}; step {:?}; β over the chord {}; decoupled β₀ over the chord {}",
+                        at_bits(w.form.at(0, 0)),
+                        at_bits(w.form.at(0, 1)),
+                        at_bits(w.form.at(1, 1)),
+                        at_bits(&w.gradient[0]),
+                        at_bits(&w.gradient[1]),
+                        step.as_ref().map(|[a, b]| (at_bits(a), at_bits(b))),
+                        step.as_ref().map_or_else(|| "none".to_string(), |[_, b]| at_bits(&(b / &chord)).to_string()),
+                        w.decoupled()[1].as_ref().map_or_else(|| "none".to_string(), |b| at_bits(&(b / &chord)).to_string()),
+                    )
+                }
+            };
+            println!(
+                "  {label}, {plane}: ρ {}, chord {chord}; {} ∈ {} nats; {line}; {} ms",
+                theta.transport(ring),
+                symbol(&comparison),
+                cell(&reading.before.value, 1 << 12),
+                started.elapsed().as_millis()
+            );
+        }
+    }
+    println!("executed route-plane: {} ms; resident {}", clock.elapsed().as_millis(), resident());
+}
+
 /// Every request's order term ([`holonics::hnn::executed::OrderTerm`]), where read: its sheets
 /// (station, top, gap; the right one first), `ℓ_o` and whether it is solved.
 fn print_orders(what: &str, batch: &BatchComparison) {
@@ -1908,7 +1993,8 @@ pub(super) fn rho_slopes(terrain: &str, seed: u64, count: usize, arm: &str, sour
 
 /// [definition; agent-inferred, October 1; the
 /// [pin](../../records/2026-10-01_THE_SEGMENT_PROBE_PINNED_BEFORE_ITS_RUN.md)] **The segment probe**
-/// (`executed segment <terrain> <seed> <count> <label=source>…`, sources as [`segment_source`]):
+/// (`executed segment <terrain> <seed> <count> [arm=<arm>] <label=source>…`, sources as
+/// [`segment_source`]):
 /// read-only. Each constitution is read on the declared requests by gate A's comparison (the lock
 /// face at the decisions, `Comparison::LOCK_DECISIONS`, as `executed witness` reads its
 /// constitutions) and reported in the witness's line, beside the stations right by station, the
@@ -1924,9 +2010,15 @@ pub(super) fn segment(terrain: &str, seed: u64, count: usize, arms: &[String]) {
     let pairs = terrain_pairs(terrain, &declared, seed, count);
     let requests = open_requests(&engine, &pairs);
     let targets: Vec<Vec<usize>> = pairs.iter().map(|(_, t)| t.clone()).collect();
-    let comparison = Comparison::LOCK_DECISIONS;
+    // A first argument `arm=<arm>` declares the comparison (as [`arm_comparison`]); gate A's
+    // otherwise.
+    let (comparison, arms) = match arms.first().and_then(|a| a.strip_prefix("arm=")) {
+        Some(arm) => (arm_comparison(arm).0, &arms[1..]),
+        None => (Comparison::LOCK_DECISIONS, arms),
+    };
     println!(
-        "executed segment: {count} {terrain} requests at development seed {seed}, each constitution read by the lock face at the decisions; the bank p = {}, grain 2^(-{BANK_GRAIN})",
+        "executed segment: {count} {terrain} requests at development seed {seed}, each constitution read by {:?}; the bank p = {}, grain 2^(-{BANK_GRAIN})",
+        comparison,
         bank_strength()
     );
     for arm in arms {
