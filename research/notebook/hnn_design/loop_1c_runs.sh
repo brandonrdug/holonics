@@ -197,12 +197,13 @@ build() {
 
 exp_replay() {
   # §1: gate A's procedure re-run at 12 threads, every constitution's state written. Unit upper
-  # 298438 ms a move; the procedure's own deadline (checked before each move) 4476570 ms leaves one
-  # move and the last read inside the guard of 4820 s (projection upper 4819466 ms).
+  # 306738 ms a move (the larger of the two measured reads, §6.2′); the procedure's own deadline
+  # (checked before each move) 4601070 ms leaves one move and the last read (45592 ms) inside the
+  # guard of 4954 s (projection upper 4953400 ms).
   rm -f "$stamps/replay.ok"
   rm -rf "$out/states"
   mkdir -p "$out/states"
-  run replay 12 4820 executed witness order2 2026093061 8 16 4476570 \
+  run replay 12 4954 executed witness order2 2026093061 8 16 4601070 \
     "$out/replay_best.state" "$out/states" \
     || refuse $? "the replay failed, was refused, stopped incomplete or reached its guard"
 }
@@ -250,24 +251,25 @@ exp_coupling() {
 exp_represent() {
   # §3: the exterior fit at 7 threads, 16 iterates. Unit upper 849557 ms an iterate (the gradients,
   # the Gram and eight trials); the run's own deadline (checked before each iterate) 12743355 ms
-  # leaves an iterate, the last read and the scope read inside the guard of 13755 s (projection
+  # leaves an iterate, the last read and the scope read (94874 ms each, §6.2′) inside the guard of
+  # 13783 s (projection
   # upper 13754940 ms).
   rm -f "$stamps/witness.ok"
-  run represent 7 13755 executed represent order2 2026093061 8 16 12743355 \
+  run represent 7 13783 executed represent order2 2026093061 8 16 12743355 \
     "$out/represent_best.txt" 2026100101 \
     || refuse $? "the representation search failed, was refused, stopped incomplete or reached its guard"
 }
 
 check_witness() {
   # §9 falsifier 5, only if a witness: the search exited 0 with a witness; its E and ρ, declared
-  # partial, read in a fresh process at 12 threads (guard 45 s: the measured 44458 ms read) must be
+  # partial, read in a fresh process at 12 threads (guard 46 s: the larger measured read, 45592 ms, §6.2′) must be
   # admissible and certified, and solve all 64 decision terms. Passing, it stamps the witness; then
   # its coupling reads (§3.3), one constitution (unit upper 126822 ms at k = 0).
   exited_zero represent || refuse 10 "the representation search did not exit 0"
   grep -q '^executed represent: a witness FOUND at ' "$out/represent.txt" \
     || refuse 10 "the representation search found no witness: check-witness and reach are not launched"
   [[ -s $out/represent_best.txt ]] || refuse 10 "the witness's file is missing"
-  run witness_check 12 45 executed replay order2 2026093061 8 "witness=partial:$out/represent_best.txt" \
+  run witness_check 12 46 executed replay order2 2026093061 8 "witness=partial:$out/represent_best.txt" \
     || refuse $? "the witness's fresh read failed, was refused or reached its guard: the claim is withdrawn"
   grep -q '^  witness: solved 64 of 64 decision terms; ' "$out/witness_check.txt" \
     || refuse 10 "the witness's fresh read does not solve all 64 decision terms: the claim is withdrawn"

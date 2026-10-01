@@ -434,6 +434,24 @@ and the primary decides.
 - **`exp-coupling`.** It stays inside every bound: the upper projection is 2,216,028 ms, and its own
   deadline plus constitution 16's unit is 2,656,493, against a guard of 2,693 s.
 
+### 6.2′ The deadlines corrected before any run [definition; the primary's decision]
+
+No experiment has been launched. A projection uses the **largest measured value of each unit over
+every measurement taken before launch**: a re-measurement before launch updates it, and after launch
+nothing changes (CLAUDE.md, "Waiting, deadlines and concurrency"). This applies §6.2's own rule to
+all the evidence. It is not a limit raised after a refusal. The three units past their first bounds
+take the larger reads (§6.1′), and every other unit keeps its first, larger, bound. Recomputed by
+§6.2's formulas:
+
+| Run | Unit upper (ms) | Projection upper (ms) | Own deadline (ms) | Outer guard |
+|---|---|---|---|---|
+| `exp-replay` (12 threads) | a move 306,738; the last read 45,592 | `16 · 306,738 + 45,592 = 4,953,400` | `4,953,400 − 306,738 − 45,592 = 4,601,070` | `timeout 4954` (was 4820) |
+| `exp-represent` (7 threads) | an iterate 849,557 (the first bound, larger); the last and scope reads 94,874 each | `16 · 849,557 + 2 · 94,874 = 13,782,660` | `13,782,660 − 849,557 − 189,748 = 12,743,355` (unchanged) | `timeout 13783` (was 13755) |
+| `check-witness`'s fresh read (12 threads) | 45,592 | 45,592 | — | `timeout 46` (was 45) |
+
+`exp-coupling` and reach keep §6.2's bounds, which the re-measured units stay within. These are the
+deadlines the runs launch with. From launch on, none is changed.
+
 ### 6.2 The projections and the fixed deadlines
 
 Each projection is the declared count of units times the measured upper time a unit, at the

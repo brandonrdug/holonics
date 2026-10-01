@@ -298,7 +298,9 @@ foreground shell time went to wait loops.
 - **Project, then fix the deadline once.** Before launch, a measured development read gives the time
   per unit. The projection is the declared count times the measured upper time per unit, and the
   deadline is the projection's upper end, enforced by an outer `timeout`. The shell tool's own
-  timeout is a guard set from the same projection, never a way of waiting.
+  timeout is a guard set from the same projection, never a way of waiting. A projection uses the largest measured value of
+  each unit over every measurement taken before launch: a re-measurement before launch updates it,
+  and from launch on nothing changes.
 - **Stop early on evidence.** When the first units run slower than the projection's per-unit upper
   bound, stop the run, report it incomplete with the measured rate, and report the projection error
   as such. Do not wait out the deadline.

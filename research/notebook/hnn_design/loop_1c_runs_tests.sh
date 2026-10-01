@@ -251,7 +251,7 @@ mkdir -p "$dir/threads"
 sleep 60 &
 sleeper=$!
 echo "$sleeper 12" > "$dir/threads/phase"
-echo "exit 0 (124: the outer guard of 4820 s)" > "$dir/replay.time"
+echo "exit 0 (124: the outer guard of 4954 s)" > "$dir/replay.time"
 status=$(launch "$dir" exp-replay STUB_REPLAY=match)
 expect "a 12-thread run beside a live 12: refused 12: $status" is "$status" 12
 expect "  never launched" is "$(launched "$dir" '^executed witness ')" 0
