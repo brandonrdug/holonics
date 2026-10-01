@@ -392,6 +392,18 @@ fn main() {
             &arguments[9],
             &arguments[10..],
         ),
+        // The move's plane read by its witness (the record
+        // research/records/2026-10-01_THE_MOVES_METRIC_IS_ITS_WITNESSS_THE_LOCKS_FISHER_FORM_ON_THE_MOVES_PLANE.md):
+        // read-only.
+        (Some("executed"), Some("witness-plane")) => executed_loop::witness_plane(
+            &arguments[3],
+            arguments[4].parse().expect("a seed"),
+            arguments[5].parse().expect("a count"),
+            &arguments[6],
+            &arguments[7],
+            &arguments[8],
+            &arguments[9..],
+        ),
         (Some("executed"), Some("causal")) => executed_loop::causal(
             &arguments[3],
             arguments[4].parse().expect("a seed"),

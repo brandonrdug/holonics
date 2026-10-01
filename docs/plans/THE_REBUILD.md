@@ -680,9 +680,18 @@ that fires becomes the next loop's subject, and nothing downstream starts.
       - `executed_move` now adopts only when the executed composition also falls
         (`TrialRefusal::OwnNotBelow`), symmetric across every arm. The tests pass and the replay
         matches.
-      - The guarded witness (gate A's procedure, 8 moves) was in flight at the handoff to the
-        desktop session; CONSTRUCTION_STATE's Immediate work row says where its artifacts are and
-        how to finish it.
+      - [The guarded witness](../../research/records/2026-10-01_THE_GUARDED_WITNESS_MEASURED_THE_SIGN_TURNED_BUT_RHO_STAYED_AND_THE_GUARD_REFUSED_MOVE_SIX.md): G3. Six moves
+        were adopted and the executed `L` fell at each. `γ_ρ` turned positive from constitution 2,
+        but `ρ`'s largest step covered `8010/541877` of the chord, and move 6 was refused at every
+        step. At most 18 stations were right and no section was whole.
+    - *The move's metric is its witness's, October 1*
+      ([record](../../research/records/2026-10-01_THE_MOVES_METRIC_IS_ITS_WITNESSS_THE_LOCKS_FISHER_FORM_ON_THE_MOVES_PLANE.md)).
+      Brandon's lens: a metric is a witness's measurement, so the move's metric and its energy
+      account are one act. `−γ_ρ/G_ρ` measured `ρ`'s move in the storage coordinates, which are no
+      receiver. The lock's Fisher form, pulled back onto the plane of `ΔE` and `ρ` with its cross
+      term, is chart-free. Read on c0 and c6, it turns `ρ` toward `ρ*` where the control pushed it
+      away, and moves it between 46 and 47 times further at c6. Still, it covers less than `1/12`
+      of the chord a step: the witness is stiff in `ρ` at the current `E`.
   - *1b's subject, as 1a named it*: a comparison whose descent must move decisions, one
     that holds a margin on right decisions, is not minimized on ties, and is read where a reading
     carries information about the key. The governing law "loss is the log of a ratio" is the

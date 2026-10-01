@@ -13,6 +13,7 @@
 //! cargo run --release -p holonics --example hnn_prediction -- executed segment <terrain> <seed> <count> <label=source>…
 //! cargo run --release -p holonics --example hnn_prediction -- executed direction <terrain> <seed> <count> <arm> <from> <toward> <out> <η>…
 //! cargo run --release -p holonics --example hnn_prediction -- executed rho-slopes <terrain> <seed> <count> <arm> <label=source>…
+//! cargo run --release -p holonics --example hnn_prediction -- executed witness-plane <terrain> <seed> <count> <arm> <toward> <out> <label=source>…
 //! ```
 //!
 //! - **Step 1b** (the
@@ -1379,6 +1380,216 @@ pub(super) fn direction(
         );
     }
     println!("executed direction: {} ms; resident {}", clock.elapsed().as_millis(), resident());
+}
+
+/// A rational read at 24 significant bits toward zero (`m/2^k`, exact as printed).
+fn at_bits(x: &Rat) -> Rat {
+    use holonics::holon::deposition::significant;
+    if x.is_zero() {
+        x.clone()
+    } else if x.is_negative() {
+        -significant(&-x.clone(), 24, false)
+    } else {
+        significant(x, 24, false)
+    }
+}
+
+/// [measured-diagnostic; agent-inferred, October 1; the
+/// [witness's metric record](../../records/2026-10-01_THE_MOVES_METRIC_IS_ITS_WITNESSS_THE_LOCKS_FISHER_FORM_ON_THE_MOVES_PLANE.md)]
+/// **The move's plane read by its witness** (`executed witness-plane <terrain> <seed> <count> <arm>
+/// <toward> <out> <label=source>…`, sources as [`segment_source`]): read-only. At each source, the
+/// committed move's unit step `ΔE` and its coordinate control `Δρ_c = −γ_ρ/G_ρ` as `executed_move`
+/// forms them, and the witness's form on the plane of `ΔE` and `ρ`
+/// (`hnn::executed::witness_plane`): its step `(α, β)`, the steps with the cross term dropped, and
+/// the second-order model's change, beside `toward`'s `ρ` less the source's. Then two successors
+/// share the witness's `E + αΔE`, carried onto the source port's lattice entry by entry (nearest),
+/// as the machine's own move carries it (off the lattice, `α`'s bits multiply every storage's and a
+/// read passed its bound: the record §3): the witness's `ρ + β` and the control's `ρ + αΔρ_c`
+/// (each floored onto the lattice and held in `[unit, 1]`), each read by the arm's
+/// comparison and written to `<out>/<label>-{witness,control}.txt`. No move is made.
+#[allow(clippy::too_many_arguments)]
+pub(super) fn witness_plane(
+    terrain: &str,
+    seed: u64,
+    count: usize,
+    arm: &str,
+    toward: &str,
+    out: &str,
+    sources: &[String],
+) {
+    let clock = Instant::now();
+    let declared = order_declared();
+    let engine = Engine::new(declared);
+    let bank = bank_of(declared.period, &bank_strength());
+    let ring = engine.refinement.ring();
+    let pairs = terrain_pairs(terrain, &declared, seed, count);
+    let requests = open_requests(&engine, &pairs);
+    let targets: Vec<Vec<usize>> = pairs.iter().map(|(_, t)| t.clone()).collect();
+    let (comparison, partition) = arm_comparison(arm);
+    assert!(!partition, "the plane is read on the open section");
+    println!(
+        "executed witness-plane: {count} {terrain} requests at development seed {seed}, the arm {arm}, toward {toward}; the bank p = {}, grain 2^(-{BANK_GRAIN})",
+        bank_strength()
+    );
+    let goal = segment_source(&engine, ring, toward).transport(ring);
+    let lattice = engine
+        .theta
+        .lattice(holonics::hnn::constitution::Locus::SourcePort(ring))
+        .expect("the source port's lattice")
+        .unit();
+    let half = Rat::new(BigInt::one(), BigInt::from(2));
+    let on_lattice = |x: Rat| {
+        ((&x / &lattice).floor() * &lattice)
+            .max(lattice.clone())
+            .min(Rat::one())
+    };
+    let first_locks = |batch: &BatchComparison| -> String {
+        batch
+            .requests
+            .iter()
+            .zip(&targets)
+            .filter_map(|(r, t)| {
+                r.generation.as_ref().and_then(|g| {
+                    g.decisions
+                        .first()
+                        .map(|(s, c, ..)| format!("{s}{}", if *c == t[*s] { "+" } else { "-" }))
+                })
+            })
+            .collect::<Vec<_>>()
+            .join(" ")
+    };
+    for source in sources {
+        let started = Instant::now();
+        let (label, spec) = source.split_once('=').expect("<label>=<source>");
+        let theta = segment_source(&engine, ring, spec);
+        let rho = theta.transport(ring);
+        let reading = holonics::hnn::executed::witness_plane(
+            &engine.field,
+            &theta,
+            &requests,
+            &engine.refinement,
+            &bank,
+            BANK_GRAIN,
+            comparison,
+        )
+        .expect("the plane");
+        let (solved, all) = solved_terms(&reading.before);
+        let (whole, right, released) = reading.before.sections(&targets);
+        println!(
+            "  {label}: ρ {rho}; {} ∈ {} nats; solved {solved} of {all}; whole {whole} (released {released}, stations right {right}); toward's ρ less this ρ: {}; {} ms",
+            symbol(&comparison),
+            cell(&reading.before.value, 1 << 12),
+            &goal - &rho,
+            started.elapsed().as_millis()
+        );
+        let (Some(unit), Some(witness), Some(control)) =
+            (&reading.unit_move, &reading.witness, &reading.modulus_unit)
+        else {
+            println!(
+                "    refused before the plane, {:?}; {} ms",
+                reading.refusal,
+                started.elapsed().as_millis()
+            );
+            continue;
+        };
+        let gamma = reading.modulus_slope.clone().expect("γ_ρ");
+        let curvature = reading.modulus_curvature.clone().expect("G_ρ");
+        let (ee, er, rr) = (witness.form.at(0, 0), witness.form.at(0, 1), witness.form.at(1, 1));
+        let [ge, gr] = &witness.gradient;
+        let decoupled = witness.decoupled();
+        println!(
+            "    the coordinate control: γ_ρ {}, G_ρ {}, Δρ_c {} (24 bits); ΔE's largest entry {}",
+            at_bits(&gamma),
+            at_bits(&curvature),
+            at_bits(control),
+            largest_of(unit)
+        );
+        println!(
+            "    the witness ({} lock terms, {} common shares outside their enclosures): G_EE {}, G_Eρ {}, G_ρρ {}, det {}; g_E {}, g_ρ {} (24 bits); decoupled α₀ {:?}, β₀ {:?}",
+            reading.terms,
+            reading.outside,
+            at_bits(ee),
+            at_bits(er),
+            at_bits(rr),
+            at_bits(&witness.determinant()),
+            at_bits(ge),
+            at_bits(gr),
+            decoupled[0].as_ref().map(at_bits),
+            decoupled[1].as_ref().map(at_bits),
+        );
+        let Some([alpha, beta]) = witness.step() else {
+            println!("    the plane is degenerate to the witness; {} ms", started.elapsed().as_millis());
+            continue;
+        };
+        let route = &goal - &rho;
+        let ratio = |x: &Rat| {
+            if route.is_zero() {
+                "none".to_string()
+            } else {
+                at_bits(&(x / &route)).to_string()
+            }
+        };
+        let control_move = &alpha * control;
+        println!(
+            "    the witness's step: α {}, β {} (24 bits); the model's change {}; β over toward's ρ change {}; the control's αΔρ_c over it {}",
+            at_bits(&alpha),
+            at_bits(&beta),
+            at_bits(&witness.predicted().expect("a step")),
+            ratio(&beta),
+            ratio(&control_move),
+        );
+        let e = theta.source_port(ring).expect("E").clone();
+        let moved: Vec<Rat> = e
+            .entries()
+            .iter()
+            .zip(unit.entries())
+            .map(|(x, d)| ((x + &(&alpha * d)) / &lattice + &half).floor() * &lattice)
+            .collect();
+        let rows: Vec<Vec<Rat>> = moved.chunks(e.columns()).map(<[Rat]>::to_vec).collect();
+        let largest = moved.iter().map(|x| x.abs()).max().unwrap_or_else(Rat::zero);
+        for (kind, modulus) in [
+            ("witness", on_lattice(&rho + &beta)),
+            ("control", on_lattice(&rho + &control_move)),
+        ] {
+            let started = Instant::now();
+            let successor = engine
+                .theta
+                .clone()
+                .with_ports(ring, None, Some(ExactRatMatrix::new(rows.clone()).expect("E")), None)
+                .expect("the successor's E")
+                .with_transport(ring, modulus.clone())
+                .expect("a passive modulus on the lattice");
+            let mut text = format!("E {} {}\n", rows.len(), e.columns());
+            for row in &rows {
+                text.push_str(&row.iter().map(ToString::to_string).collect::<Vec<_>>().join(" "));
+                text.push('\n');
+            }
+            text.push_str(&format!("rho {modulus}\n"));
+            #[allow(clippy::disallowed_methods)]
+            std::fs::write(format!("{out}/{label}-{kind}.txt"), text).expect("write the successor");
+            let batch = compare(
+                &engine.field,
+                &successor,
+                &requests,
+                &engine.refinement,
+                &bank,
+                BANK_GRAIN,
+                comparison,
+            )
+            .expect("the successor's reading");
+            let (solved, all) = solved_terms(&batch);
+            let (whole, right, released) = batch.sections(&targets);
+            println!(
+                "  {label} {kind}: ρ {modulus}; E's largest entry {}; {} ∈ {} nats; solved {solved} of {all}; whole {whole} (released {released}, stations right {right}); first locks {}; {} ms",
+                at_bits(&largest),
+                symbol(&comparison),
+                cell(&batch.value, 1 << 12),
+                first_locks(&batch),
+                started.elapsed().as_millis()
+            );
+        }
+    }
+    println!("executed witness-plane: {} ms; resident {}", clock.elapsed().as_millis(), resident());
 }
 
 /// The largest entry's magnitude of a matrix.
