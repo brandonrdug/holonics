@@ -671,6 +671,18 @@ that fires becomes the next loop's subject, and nothing downstream starts.
         release's `L` along it at a ladder of steps. That separates a direction pointing away (the
         covector or the normal law's chart) from a step that overshoots into another trajectory
         (the ladder's start).
+    - *The native direction, and the move guarded by the executed release's descent, October 1*
+      ([direction](../../research/records/2026-10-01_THE_NATIVE_DIRECTION_MEASURED_THE_STEP_DESCENDS_THE_EXECUTED_RELEASE_WITHIN_ITS_CELL_AND_GATE_A_ADOPTED_SIXTEEN_TIMES_BEYOND_IT.md);
+      [guarded witness pin](../../research/records/2026-10-01_THE_GUARDED_WITNESS_PINNED_BEFORE_ITS_RUN.md)).
+      - At the founded opening the unit step pairs positively but nearly orthogonally with the
+        descending `E` route. Along it the executed release keeps its trajectory and descends in
+        proportion to `η` up to `1/32`, and rises at gate A's adopted `1/2`.
+      - `executed_move` now adopts only when the executed composition also falls
+        (`TrialRefusal::OwnNotBelow`), symmetric across every arm. The tests pass and the replay
+        matches.
+      - The guarded witness (gate A's procedure, 8 moves) was in flight at the handoff to the
+        desktop session; CONSTRUCTION_STATE's Immediate work row says where its artifacts are and
+        how to finish it.
   - *1b's subject, as 1a named it*: a comparison whose descent must move decisions, one
     that holds a margin on right decisions, is not minimized on ties, and is read where a reading
     carries information about the key. The governing law "loss is the log of a ratio" is the
