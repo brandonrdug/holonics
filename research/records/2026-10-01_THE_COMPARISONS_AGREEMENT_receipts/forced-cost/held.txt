@@ -1,0 +1,3 @@
+executed rho-slopes: 8 order2 requests at development seed 2026093061, the arm order-forced; the bank p = 5/8, grain 2^(-16)
+  c0: ρ 102837/131072; L+O ∈ [2437919/4096, 2437940/4096) nats; solved 0 of 285; whole 0 of 8 (released 7, stations right 15); γ_ρ ∈ [2384414/4096, 2384415/4096) (target part [8661608/4096, 8661609/4096), rival part [-8918610/4096, -8918609/4096)); G_ρ ∈ [721978890/4096, 721978891/4096); the least-squares unit move −γ_ρ/G_ρ ∈ [-6927/2097152, -6926/2097152); terms led by the threshold 0, by a class 285; 39388 ms
+executed rho-slopes: 39423 ms; resident 393064448 now, 406405120 peak

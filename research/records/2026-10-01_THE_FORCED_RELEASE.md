@@ -1,4 +1,4 @@
-# The forced release: every decision along the right trajectory, the best agreement, and a move the host cannot afford
+# The forced release: every decision along the right trajectory, the best agreement, and a cost that was the derivative, not the covectors
 
 **Date.** October 1. **Issues.** #73, #76, #63 (THE_REBUILD U6, step 1). **Grade.** [definition;
 agent-inferred] for §1; [measured] for §2 and §3. Receipts in
@@ -41,20 +41,25 @@ it asks for the lower transport, toward the refit's `ρ*`. Under the lock face a
 same slope is negative there. This is the first comparison read whose `ρ` direction at the opening
 agrees with the refit (`forced-incumbent-cost/`).
 
-## 3. Its move does not fit the host
+## 3. ~~Its move does not fit the host~~ Its cost was the exact derivative in `ρ`
 
-One incumbent read with covectors at every forced refinement took 649,026 ms at the opening: 285
-terms, about four and a half times the decisions' candidates, each with its executed growth's
-covector. Two guarded witness moves under `order-forced` from the opening were incomplete:
-- the first at its 984 s deadline, from a bound not yet measured on this unit;
-- the second at 1,141 s, a bound built from the measured incumbent (649,026 ms), the plane
-  (78,889 ms) and eight trials (8 · 51,634 ms).
+One read of the forced comparison with every covector took 649,026 ms at the opening, and two guarded
+witness moves under `order-forced` were incomplete: the first at 984 s, the second at 1,141 s. Neither
+was relaunched with a larger limit.
 
-Neither printed a line, and neither was relaunched with a larger limit.
+~~The blocker is the covector cost on the host's exact arithmetic; the bank's turn covector needs its
+device realization (#76).~~ **Corrected the same day, by measurement.** The read split as follows:
+- the incumbent with every covector: **28,739 ms**;
+- the proposal: 1,212 ms;
+- the modulus's slope split: **603,039 ms**. These are the exact storage derivatives in `ρ`
+  (`BankPlacement::modulus_derivative`), each entry carrying the transported mass's denominators,
+  read anew by every consumer.
 
-[agent-inferred] The forced comparison is the induction-sound objective. It has the best agreement
-measured, and its `ρ` slope at the opening points where the refit lies. Its covector cost on the
-host's exact arithmetic is the blocker, named by its measurement: a move at the opening exceeds
-1,141 s. The executed growth's covector (`ReceivingBank::read_turn_covector`) has no device
-realization (`holonics-cuda` carries the word, port, readout and moment, not the bank's turn
-covector). Moving it to the card (#76) is what makes this objective affordable.
+Two repairs followed:
+- the sections' derivatives are read once a proposal and shared (`section_derivatives`), which gave
+  579,754 ms;
+- the derivative is held at 192 significant bits toward zero (`DERIVATIVE_BITS`, above every
+  consumer's own grain), which gave **39,388 ms**, with `γ_ρ` unchanged at its printed grain.
+
+The 15-fold speedup applies to every arm's moves, not only the forced one. The covectors were never
+the blocker, so no device port is needed for this objective.
