@@ -21,7 +21,7 @@
 #    runs and nothing is stamped; a run that exits 0 with a line unlike gate A's, another
 #    persistence tuple, a refused re-read or no capture is refused by the check (10), unstamped; the
 #    run is refused beside a live 12-thread run; a verified run is launched once, with the declared
-#    arguments, at 12 threads under its 606 s guard, and stamped, and a later run removes that stamp
+#    arguments, at 12 threads under its 257 s guard, and stamped, and a later run removes that stamp
 #    first.
 #
 # The restore check runs the real parser (`executed restore` of the worktree's release binary, built
@@ -387,9 +387,9 @@ rel=research/records/2026-09-30_STEP_1B_GATE_A_receipts
 expect "positive control: a run that reproduces gate A is verified: $status" is "$status" 0
 expect "  stamped" test -s "$dir/stamps/c2.ok"
 expect "  launched once, with the declared arguments" \
-  is "$(launched "$dir" "^executed resume-coupling order2 2026093061 8 $rel/witness_best.state $rel/witness.txt 210494 $dir/c2_capture\$")" 1
+  is "$(launched "$dir" "^executed resume-coupling order2 2026093061 8 $rel/witness_best.state $rel/witness.txt 210496 $dir/c2_capture\$")" 1
 expect "  at 12 threads" is "$(launched "$dir" '^RAYON_NUM_THREADS=12$')" 1
-expect "  under its outer guard of 606 s" grep -q '^exit 0 (124: the outer guard of 606 s)' "$dir/c2.time"
+expect "  under its outer guard of 257 s" grep -q '^exit 0 (124: the outer guard of 257 s)' "$dir/c2.time"
 expect "  the stamp covers the listing and the capture" \
   is "$(grep -cE '(c2\.txt|c2\.state|c2_contexts\.txt)$' "$dir/stamps/c2.ok")" 3
 status=$(launch "$dir" exp-c2 STUB_C2=mismatch)

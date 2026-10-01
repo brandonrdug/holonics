@@ -301,18 +301,19 @@ exp_c2() {
   # restored whole; one native update at 12 threads on the batch gate A's move 1 read; the identity
   # against gate A's receipt (the harness exits 5 on a mismatch, reading nothing further); then the
   # 7 re-reads at constitution 2, at most 7 admitted (past it, exit 3). The harness stops the move
-  # itself past 210494 ms (gate A's move 1, 145447 ms at 24 threads, times move 0's measured
-  # 159075/109917 at 12 threads over 24), exit 3.
-  # The outer guard of 606 s is the primary's projection for the broader three-order coupling read
-  # (the move 210494, the releases 82983 · 7/2, the events 13093 · 7/5 · 7/2, the restore under
-  # 40000: 605091 ms): a cross-state, cross-thread-count projection, not a demonstrated upper bound.
-  # The narrowed operation's own budget, derived from its call counts, is stated in its record for
-  # review; no guard is changed here.
+  # itself past 210496 ms: gate A's move 1 (145447 ms at 24 threads) times move 0's measured
+  # 159075/109917 at 12 threads over 24, whose exact ceiling is 210495 + 2610/109917 -> 210496
+  # (the brief's 210494 was the primary's arithmetic slip, corrected before any launch), exit 3.
+  # The outer guard of 257 s is the narrowed operation's own budget from its call counts (the pin's
+  # final section): setup and restore 256, the move 210496, the 105 turn readings after the move at
+  # most one whole 12-thread release read 45592, so 256344 ms. It is a projection from measured
+  # units across states and thread counts, not a demonstrated upper bound, and it replaces the
+  # earlier 606 s projection for the broader three-order read before any launch. Never raised.
   rm -f "$stamps/c2.ok"
   rm -rf "$out/c2_capture"
   mkdir -p "$out/c2_capture"
-  run c2 12 606 executed resume-coupling order2 2026093061 8 \
-    "$gate_a/witness_best.state" "$gate_a/witness.txt" 210494 "$out/c2_capture" \
+  run c2 12 257 executed resume-coupling order2 2026093061 8 \
+    "$gate_a/witness_best.state" "$gate_a/witness.txt" 210496 "$out/c2_capture" \
     || refuse $? "the c2 diagnostic failed, was refused, stopped at an identity mismatch, stopped incomplete or reached its guard"
   check_c2
 }
