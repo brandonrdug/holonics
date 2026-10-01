@@ -237,7 +237,7 @@ pub(super) fn terrain_pairs(
 /// (`Constitution::continuing_state`): `E rows cols`, its rows and `rho ρ` first (the form a partial
 /// remount reads), then the normal law's carried Gram and chart, its carried remainders, the
 /// locus's clock, the commit and the storage product.
-fn write_state(theta: &Constitution, ring: usize) -> String {
+pub(super) fn write_state(theta: &Constitution, ring: usize) -> String {
     theta
         .continuing_state(ring)
         .expect("the executed move moves the source port alone")
@@ -809,7 +809,7 @@ pub(super) fn spread(terrain: &str, seed: u64, count: usize, arms: &[String]) {
 
 /// A written constitution remounted onto the declared opening: whole where the file holds a complete
 /// continuing state, else partial (`E` and `ρ` alone, labelled on stderr by [`trained`]).
-fn remount(opening: &Constitution, ring: usize, path: &str) -> Constitution {
+pub(super) fn remount(opening: &Constitution, ring: usize, path: &str) -> Constitution {
     #[allow(clippy::disallowed_methods)]
     let text = std::fs::read_to_string(path).expect("read the constitution");
     match ContinuingState::from_text(&text) {
@@ -822,7 +822,7 @@ fn remount(opening: &Constitution, ring: usize, path: &str) -> Constitution {
 }
 
 /// The requests of a known-truth terrain, each ingested, compared along the machine's own release.
-fn open_requests(engine: &Engine, pairs: &[(Vec<usize>, Vec<usize>)]) -> Vec<Request> {
+pub(super) fn open_requests(engine: &Engine, pairs: &[(Vec<usize>, Vec<usize>)]) -> Vec<Request> {
     pairs
         .iter()
         .map(|(request, target)| {
@@ -838,7 +838,7 @@ fn open_requests(engine: &Engine, pairs: &[(Vec<usize>, Vec<usize>)]) -> Vec<Req
 }
 
 /// The decision terms in the lock face's solved level (the strict rational test), of those read.
-fn solved_terms(batch: &BatchComparison) -> (usize, usize) {
+pub(super) fn solved_terms(batch: &BatchComparison) -> (usize, usize) {
     let terms = batch.requests.iter().flat_map(|r| &r.terms);
     let (mut solved, mut all) = (0, 0);
     for term in terms {
@@ -851,7 +851,7 @@ fn solved_terms(batch: &BatchComparison) -> (usize, usize) {
 /// Every decision term of a batch, whole: its request, station, decision refinement, target and top,
 /// the lock face `ℓ` enclosed, its solved test, `θ_t`, and the target's and leading rival's joint
 /// enclosures; with each request's release.
-fn print_terms(label: &str, batch: &BatchComparison, targets: &[Vec<usize>]) {
+pub(super) fn print_terms(label: &str, batch: &BatchComparison, targets: &[Vec<usize>]) {
     for (index, (request, target)) in batch.requests.iter().zip(targets).enumerate() {
         let released = request.generation.as_ref().map_or_else(
             || "not released".to_string(),
@@ -899,7 +899,15 @@ fn print_terms(label: &str, batch: &BatchComparison, targets: &[Vec<usize>]) {
 /// best (the most stations solved, the earliest among equals) is written to `out` as its complete
 /// continuing state, and printed whole. The procedure and its budget are pinned in the pin's gate-A
 /// addendum before the run; the budget is never raised.
-pub(super) fn witness(terrain: &str, seed: u64, count: usize, moves: usize, deadline: u128, out: &str) {
+pub(super) fn witness(
+    terrain: &str,
+    seed: u64,
+    count: usize,
+    moves: usize,
+    deadline: u128,
+    out: &str,
+    states: Option<&str>,
+) {
     let clock = Instant::now();
     let declared = order_declared();
     let engine = Engine::new(declared);
@@ -938,6 +946,15 @@ pub(super) fn witness(terrain: &str, seed: u64, count: usize, moves: usize, dead
         );
         (solved, all)
     };
+    // Loop 1c's replay (its pin §1.1): with a states directory, every constitution read is written
+    // as its complete continuing state, `c<k>.state`; nothing else of the procedure changes.
+    let keep_state = |index: usize, theta: &Constitution| {
+        if let Some(dir) = states {
+            #[allow(clippy::disallowed_methods)]
+            std::fs::write(format!("{dir}/c{index}.state"), write_state(theta, ring))
+                .expect("write a constitution's state");
+        }
+    };
     let mut best: Option<(usize, String, Constitution, BatchComparison)> = None;
     let mut keep = |solved: usize, label: String, theta: &Constitution, batch: &BatchComparison| {
         if best.as_ref().is_none_or(|(s, ..)| solved > *s) {
@@ -964,6 +981,7 @@ pub(super) fn witness(terrain: &str, seed: u64, count: usize, moves: usize, dead
         .expect("the move");
         let label = format!("constitution {index} (before move {index})");
         let (solved, all) = report(&label, &theta, &moved.before, started.elapsed().as_millis());
+        keep_state(index, &theta);
         keep(solved, label, &theta, &moved.before);
         if solved == all {
             found = true;
@@ -1007,6 +1025,7 @@ pub(super) fn witness(terrain: &str, seed: u64, count: usize, moves: usize, dead
             .expect("the last constitution's reading");
             let label = format!("constitution {} (after the last move)", index + 1);
             let (solved, all) = report(&label, &theta, &last, started.elapsed().as_millis());
+            keep_state(index + 1, &theta);
             keep(solved, label, &theta, &last);
             if solved == all {
                 found = true;

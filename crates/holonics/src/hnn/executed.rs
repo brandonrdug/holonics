@@ -154,6 +154,8 @@
 //! | decisions read along the key-consistent prefix release the section | `HNN/ExecutedComparison.decisions_release_the_section` | [`Reading::Decisions`] |
 //! | the modulus's least-squares step | `HNN/ExecutedComparison.modulus_least_squares` | [`executed_move`]'s modulus |
 //! | the excess's piecewise directional derivative; the chord against the line | owed (#62) | [`ladder_start`], [`FirstOrderReading::excess`] |
+//! | loop 1c's representation readings: each decision term's lock face pulled back to `E` and `ρ`, and the comparison re-read on frozen sites (a search's readings, never a move) | `HNN/ExecutedComparison.lockFace_covector`; the pullback's joined statement owed (#62) | [`site_gradients`], [`frozen_reread`] |
+//! | the restore law as a standing law (the continuing state's consumer) | `HNN/ExecutedComparison.{restoreStanding, restored_continuation_agrees, equal_states_agree}` | `hnn::constitution::{ContinuingState, Constitution::continued}` |
 
 use std::collections::BTreeMap;
 use std::sync::OnceLock;
@@ -976,8 +978,10 @@ fn consistent_section(placed: &[Option<usize>], targets: &[usize]) -> bool {
 /// sites of one request** from its refinements (module header, "The readings"), with `r*` on an open
 /// context. A pure function of the refinements' sections, locks and open stations: a release, a
 /// hold and a refused certificate are read by one rule, and on an open context every station has
-/// exactly one site under the decisions and the teacher-forced readings.
-pub(crate) fn sites_of<R>(
+/// exactly one site under the decisions and the teacher-forced readings. Public for loop 1c's
+/// readings of a release under a declared order (`prediction::bank_release_ordered`), which read
+/// their decision sites by this one rule.
+pub fn sites_of<R>(
     index: usize,
     request: &Request,
     refinements: &[BankRefinement<R>],
@@ -1989,6 +1993,213 @@ pub fn modulus_slopes(
     let proposal = propose(comparison.composition, &before, &reads);
     let split = slope_split(field, constitution, declared, requests, &proposal)?;
     Ok((before, split))
+}
+
+// -------------------------------------------------------------------------------------------
+// loop 1c's representation readings (a search's readings, never a move)
+
+/// [measured-diagnostic; agent-inferred, loop 1c's
+/// [pin](../../../../research/records/2026-10-01_LOOP_1C_PERSISTENCE_REPRESENTATION_AND_REACH_PINNED_BEFORE_ITS_RUNS.md)
+/// §3] **A decision term's lock face and its gradient at the constitution**: its site, target,
+/// `ℓ` enclosed and where it lies against `ln 2`, and, where every candidate's leading member is
+/// resolved, `∂ℓ/∂E` (the port's rows by the chart's classes) and `∂ℓ/∂ρ`, each the lock face's
+/// covector `θ − q` at the shares' dyadic faces paired through the candidates' leading members'
+/// storage covectors at their dyadic faces (the proposal's own contributions, [`executed_move`]'s
+/// law), pulled back to `E` at the placement's fixed weights (the storage is linear in `E` there)
+/// and to `ρ` through `BankPlacement::modulus_derivative`. A reading for an exterior search: no
+/// move is made, and nothing is retained.
+#[derive(Clone, Debug)]
+pub struct SiteGradient {
+    pub site: TermSite,
+    pub target: usize,
+    pub lock: ExactInterval,
+    pub kind: Excess,
+    pub gradient: Option<(ExactRatMatrix, Rat)>,
+}
+
+/// One contribution's pullback to the source port at its placement's fixed weights:
+/// `∂⟨ĝ, z⟩/∂E`, the covector at its dyadic face carried back through each request phase's rotation
+/// against the phase's counts and through each placed station's rotation against its class
+/// ([`returns`]' law for one contribution, unaggregated), times the contribution's weight.
+fn pullback(
+    field: &Field,
+    declared: &Refinement,
+    request: &Request,
+    placement: &BankPlacement,
+    contribution: &Contribution,
+) -> Result<Vec<Vec<Rat>>, HnnError> {
+    let ring = declared.ring();
+    let geometry = field.ring(ring);
+    let period = geometry.period() as usize;
+    let width = geometry.width();
+    let alphabet = field.alphabet();
+    let lift = request.current.lift()[ring].clone();
+    let phase = request.current.phase(field, ring)? as usize;
+    let phases: Vec<usize> = (0..period)
+        .filter(|&c| {
+            request
+                .moment
+                .phase_counts(ring, c)
+                .is_ok_and(|counts| counts.iter().any(|&n| n != 0))
+        })
+        .collect();
+    let covector: Vec<Rat> = contribution.covector.iter().map(face).collect();
+    let (request_weights, station_weights) =
+        placement.weights(contribution.station, &contribution.cells);
+    let mut gradient = vec![vec![Rat::zero(); alphabet]; width];
+    for (c, weight) in phases.iter().zip(&request_weights) {
+        let scale = weight * &contribution.weight;
+        if scale.is_zero() {
+            continue;
+        }
+        let rotated = geometry.rotate(&covector, &(BigInt::from(*c as u64) - &lift));
+        let counts = request.moment.phase_counts(ring, *c)?;
+        for (row, value) in gradient.iter_mut().zip(&rotated) {
+            let value = value * &scale;
+            for (entry, &count) in row.iter_mut().zip(counts) {
+                if count != 0 {
+                    *entry += &value * Rat::from_integer(BigInt::from(count));
+                }
+            }
+        }
+    }
+    for (station, (cell, weight)) in contribution.cells.iter().zip(&station_weights).enumerate() {
+        let (Some(class), Some(weight)) = (cell, weight) else { continue };
+        let at = (phase + 1 + station) % period;
+        let rotated = geometry.rotate(&covector, &(BigInt::from(at) - &lift));
+        let scale = weight * &contribution.weight;
+        for (row, value) in gradient.iter_mut().zip(&rotated) {
+            row[*class] += value * &scale;
+        }
+    }
+    Ok(gradient)
+}
+
+/// [measured-diagnostic; agent-inferred, loop 1c's pin §3] **Every decision term's lock face and
+/// gradient at a constitution** ([`SiteGradient`]), with the batch's comparison (the lock face at
+/// the decisions, [`Comparison::LOCK_DECISIONS`], read as [`executed_move`] reads its incumbent):
+/// the exterior fit's linearization at the release's actual decision contexts. No move is made.
+pub fn site_gradients(
+    field: &Field,
+    constitution: &Constitution,
+    requests: &[Request],
+    declared: &Refinement,
+    bank: &ReceivingBank,
+    grain: u32,
+) -> Result<(BatchComparison, Vec<SiteGradient>), HnnError> {
+    use rayon::prelude::*;
+    let comparison = Comparison::LOCK_DECISIONS;
+    let (before, reads) = incumbent(field, constitution, requests, declared, bank, grain, comparison)?;
+    let proposal = propose(comparison.composition, &before, &reads);
+    drop(reads);
+    let placements = placements_of(field, constitution, requests, declared)?;
+    let alphabet = field.alphabet();
+    let rows = constitution
+        .source_port(declared.ring())
+        .ok_or(HnnError::MissingSourcePort {
+            ring: declared.ring(),
+        })?
+        .rows();
+    let terms: Vec<&TermReading> = before.requests.iter().flat_map(|r| &r.terms).collect();
+    let gradients: Vec<SiteGradient> = proposal
+        .terms
+        .par_iter()
+        .zip(terms.par_iter())
+        .map(|(certificate, term)| -> Result<SiteGradient, HnnError> {
+            let gradient = if certificate.leading.len() == alphabet {
+                let mut port = vec![vec![Rat::zero(); alphabet]; rows];
+                let mut modulus = Rat::zero();
+                for c in &certificate.leading {
+                    let request = &requests[c.request];
+                    let placement = &placements[c.request];
+                    for (row, add) in port
+                        .iter_mut()
+                        .zip(pullback(field, declared, request, placement, c)?)
+                    {
+                        for (entry, add) in row.iter_mut().zip(add) {
+                            *entry += add;
+                        }
+                    }
+                    let derivative = placement.modulus_derivative(c.station, &c.cells);
+                    let paired: Rat = c
+                        .covector
+                        .iter()
+                        .map(face)
+                        .zip(&derivative)
+                        .map(|(g, d)| g * d)
+                        .sum();
+                    modulus += paired * &c.weight;
+                }
+                Some((ExactRatMatrix::new(port)?, modulus))
+            } else {
+                None
+            };
+            Ok(SiteGradient {
+                site: certificate.site.clone(),
+                target: term.comparison.target,
+                lock: term.comparison.lock.clone(),
+                kind: term.kind,
+                gradient,
+            })
+        })
+        .collect::<Result<_, HnnError>>()?;
+    Ok((before, gradients))
+}
+
+/// [measured-diagnostic; agent-inferred, loop 1c's pin §3] **A declared comparison read at a
+/// constitution on its own release and on frozen sites**: the own release's comparison (every
+/// request's release and its declared terms), and the terms re-read at the given sites (each a
+/// request's station at a section, read from the own release's refinement where it executed the
+/// same section, else read there), as [`executed_move`]'s fixed mask is read, with the readings
+/// made. The representation search's frozen contexts: a constitution that solves the frozen sites
+/// but not its own release's is a frozen-context witness only. Errors are the comparison's (an
+/// inadmissible crossing, an unsupported reading).
+pub fn frozen_reread(
+    field: &Field,
+    constitution: &impl ConstitutionRead,
+    requests: &[Request],
+    declared: &Refinement,
+    bank: &ReceivingBank,
+    grain: u32,
+    comparison: Comparison,
+    sites: &[Vec<TermSite>],
+) -> Result<(BatchComparison, Vec<Vec<TermReading>>, usize), HnnError> {
+    use rayon::prelude::*;
+    validate(requests, declared.stations(), field.alphabet())?;
+    let alphabet = field.alphabet();
+    let termination = declared.termination();
+    let read = |amplitudes: &[GaussianRat]| bank.read_turn(amplitudes, grain);
+    #[allow(clippy::type_complexity)]
+    let joined: Vec<(RequestComparison, Vec<TermReading>, usize)> = requests
+        .par_iter()
+        .enumerate()
+        .map(|(index, request)| {
+            let (own, refinements, placement) = compare_request(
+                field,
+                constitution,
+                index,
+                request,
+                declared,
+                bank,
+                grain,
+                comparison,
+            )?;
+            let frozen = sites[index].clone();
+            let (reads, made) = site_reads(&frozen, &refinements, &placement, alphabet, &read)?;
+            let (terms, _, _) =
+                terms_of(comparison.composition, &request.targets, frozen, &reads, termination)?;
+            Ok((own, terms, made))
+        })
+        .collect::<Result<_, HnnError>>()?;
+    let mut own = Vec::with_capacity(joined.len());
+    let mut frozen = Vec::with_capacity(joined.len());
+    let mut made = 0;
+    for (o, f, m) in joined {
+        own.push(o);
+        frozen.push(f);
+        made += m;
+    }
+    Ok((batch_of(comparison, own), frozen, made))
 }
 
 /// **The proposal's contributions and returns at `E`** (the owner's pullback test): each

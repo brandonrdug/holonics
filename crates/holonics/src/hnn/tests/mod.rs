@@ -3,6 +3,7 @@
 
 mod chart;
 mod constitution;
+mod coupling;
 mod encoding;
 mod executed;
 mod field;

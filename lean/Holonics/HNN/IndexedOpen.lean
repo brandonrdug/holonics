@@ -587,6 +587,43 @@ theorem dissipative_term_modulus (u g : ℂ) (hu : ‖u‖ = 1) {ρ : ℝ} (hρ 
     ‖((ρ : ℂ) * u) ^ r * g‖ = ρ ^ r * ‖g‖ := by
   rw [norm_mul, norm_pow, norm_mul, hu, mul_one, Complex.norm_real, Real.norm_of_nonneg hρ]
 
+/-- [proved-derived; formal-checked] **A later datum's landing splits into its normalization and its
+entry** (loop 1c's pin §2.3; `holonics::hnn::prediction::BankPlacement::storage_over`). Over a span
+`s` of positive transported mass, a datum `k ∉ s` of positive modulus lands: the read of
+`insert k s` is the read of `s` scaled by `M(s)/M(insert k s)` (**the normalization**: `k`'s share
+of the mass taken from every earlier datum alike) plus `k`'s own image at its weight (**the entry**).
+The two parts are the paired counterfactual's two factors; the realization charts each weight
+(`PopulationChart::chart`), so on the chart the identity holds per cell, not across cells. -/
+theorem transported_weight_insert [DecidableEq ι] {V : Type*} [AddCommGroup V] [Module ℚ V]
+    {s : Finset ι} {k : ι} (hk : k ∉ s) (m : ι → ℚ) (hs : 0 < ∑ l ∈ s, m l) (hmk : 0 < m k)
+    (v : ι → V) :
+    ∑ l ∈ insert k s, transportedWeight (insert k s) m l • v l =
+      ((∑ l ∈ s, m l) / ∑ l ∈ insert k s, m l) • ∑ l ∈ s, transportedWeight s m l • v l +
+        transportedWeight (insert k s) m k • v k := by
+  have hM : (∑ l ∈ s, m l) ≠ 0 := hs.ne'
+  have hM' : (∑ l ∈ insert k s, m l) ≠ 0 := by
+    rw [Finset.sum_insert hk]
+    exact (add_pos hmk hs).ne'
+  rw [Finset.sum_insert hk, add_comm, Finset.smul_sum]
+  congr 1
+  refine Finset.sum_congr rfl fun l _ => ?_
+  rw [smul_smul]
+  congr 1
+  simp only [transportedWeight]
+  field_simp
+
+/-- [proved-derived; formal-checked] **The normalization's scale lies strictly between zero and
+one**: a landing of positive modulus takes a positive share of a positive span's mass, never all of
+it. -/
+theorem transported_weight_insert_scale [DecidableEq ι] {s : Finset ι} {k : ι} (hk : k ∉ s)
+    (m : ι → ℚ) (hs : 0 < ∑ l ∈ s, m l) (hmk : 0 < m k) :
+    0 < (∑ l ∈ s, m l) / (∑ l ∈ insert k s, m l) ∧
+      (∑ l ∈ s, m l) / (∑ l ∈ insert k s, m l) < 1 := by
+  rw [Finset.sum_insert hk]
+  refine ⟨div_pos hs (add_pos hmk hs), ?_⟩
+  rw [div_lt_one (add_pos hmk hs)]
+  linarith
+
 end Transported
 
 /-! ## 5. Read from a station: the two-sided transport distance
@@ -855,6 +892,8 @@ section Audit
 #print axioms transported_weight_mass
 #print axioms transported_weight_frame_invariant
 #print axioms transported_weight_unitary
+#print axioms transported_weight_insert
+#print axioms transported_weight_insert_scale
 #print axioms passage_weight_split_invariant
 #print axioms decayed_weight_antitone
 #print axioms decayed_weight_frame_free
