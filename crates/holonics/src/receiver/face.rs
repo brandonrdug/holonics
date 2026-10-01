@@ -47,7 +47,7 @@ use std::fmt::Debug;
 
 use crate::ratio::Rat;
 use num_bigint::{BigInt, BigUint};
-use num_traits::{Signed, ToPrimitive, Zero};
+use num_traits::{One, Signed, ToPrimitive, Zero};
 use thiserror::Error;
 
 use crate::holon::HolonError;
@@ -369,8 +369,15 @@ impl ActiveReceiver {
 
 /// [definition] **The normalized face's Jacobian** `J_p = diag p − p pᵀ`, exactly
 /// (`Holon/Law.softmaxJacobian`); it is symmetric (`softmaxJacobian_transpose`), so the
-/// normalized receiver's covector return `J_p g` is a power-preserving pullback.
+/// normalized receiver's covector return `J_p g` is a power-preserving pullback. Admitted only on a
+/// normalized face, every `p_i ≥ 0` and `Σ p = 1` (every sheet, a resting one included): there its
+/// rows vanish on the constant (`softmaxJacobian_mulVec_one`) and `vᵀJ_p v` is the variance of `v`
+/// under `p`, so the form is positive semidefinite. Anything else (independent marginal faces whose
+/// sum is not one) is refused ([`HolonError::NotAdmitted`]).
 pub fn softmax_jacobian(p: &[Rat]) -> Result<SymmetricForm, HolonError> {
+    if p.iter().any(|x| x.is_negative()) || p.iter().sum::<Rat>() != Rat::one() {
+        return Err(HolonError::NotAdmitted);
+    }
     let m = matrix(p.len(), p.len(), |row, column| {
         let outer = &p[row] * &p[column];
         if row == column {

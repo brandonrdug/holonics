@@ -14,6 +14,7 @@
 //! cargo run --release -p holonics --example hnn_prediction -- executed direction <terrain> <seed> <count> <arm> <from> <toward> <out> <η>…
 //! cargo run --release -p holonics --example hnn_prediction -- executed rho-slopes <terrain> <seed> <count> <arm> <label=source>…
 //! cargo run --release -p holonics --example hnn_prediction -- executed witness-plane <terrain> <seed> <count> <arm> <toward> <out> <label=source>…
+//! cargo run --release -p holonics --example hnn_prediction -- executed move-once <terrain> <seed> <count> <out> <label=source> <metric>…
 //! ```
 //!
 //! - **Step 1b** (the
@@ -1382,6 +1383,111 @@ pub(super) fn direction(
     println!("executed direction: {} ms; resident {}", clock.elapsed().as_millis(), resident());
 }
 
+/// [measured-diagnostic; agent-inferred, October 1; the
+/// [one-move pin](../../records/2026-10-01_ONE_GUARDED_MOVE_FROM_THE_STUCK_STATE_PINNED_BEFORE_ITS_RUN.md)]
+/// **One committed move from a state under each declared metric** (`executed move-once <terrain>
+/// <seed> <count> <out> <label=state> <metric>…`, `metric` `coordinate` or `witness`, the state
+/// a complete continuing state, restored with no `E`/`ρ` fallback ([`remounted`])): the candidate
+/// arm's real proposal, guards, ladder and state carry (`hnn::executed::executed_move_in`), every
+/// metric from the same restored state. The metrics are attempted in order and the first adopted
+/// move ends the run (Astra's attribution: the control first; the witness only if it refuses). Each
+/// prints the incumbent's reading, the move's line with every trial, the witness's form where read,
+/// and the adopted successor's own release (its trial's reading), written to
+/// `<out>/<label>-<metric>.state`.
+pub(super) fn move_once(terrain: &str, seed: u64, count: usize, out: &str, source: &str, metrics: &[String]) {
+    use holonics::hnn::executed::{MoveMetric, executed_move_in};
+    let clock = Instant::now();
+    let declared = order_declared();
+    let engine = Engine::new(declared);
+    let bank = bank_of(declared.period, &bank_strength());
+    let ring = engine.refinement.ring();
+    let pairs = terrain_pairs(terrain, &declared, seed, count);
+    let requests = open_requests(&engine, &pairs);
+    let targets: Vec<Vec<usize>> = pairs.iter().map(|(_, t)| t.clone()).collect();
+    let comparison = Comparison::LOCK_DECISIONS;
+    let (label, spec) = source.split_once('=').expect("<label>=<source>");
+    let theta = remounted(&engine.theta, spec);
+    println!(
+        "executed move-once: {count} {terrain} requests at development seed {seed}, the candidate arm, from {label} (ρ {}); the bank p = {}, grain 2^(-{BANK_GRAIN})",
+        theta.transport(ring),
+        bank_strength()
+    );
+    let report = |what: &str, batch: &BatchComparison, rho: &Rat, ms: u128| {
+        let (solved, all) = solved_terms(batch);
+        let (whole, right, released) = batch.sections(&targets);
+        println!(
+            "  {what}: ρ {rho}; L ∈ {} nats, X ∈ {} nats; solved {solved} of {all}; whole {whole} (released {released}, stations right {right}); {ms} ms",
+            cell(&batch.value, 1 << 12),
+            cell(&batch.excess, 1 << 12),
+        );
+    };
+    for name in metrics {
+        let metric = match name.as_str() {
+            "coordinate" => MoveMetric::Coordinate,
+            "witness" => MoveMetric::Witness,
+            other => panic!("a metric, coordinate or witness: {other}"),
+        };
+        let started = Instant::now();
+        let moved = executed_move_in(
+            &engine.field,
+            &theta,
+            &requests,
+            &engine.refinement,
+            &bank,
+            BANK_GRAIN,
+            comparison,
+            metric,
+        )
+        .expect("the move");
+        report(
+            &format!("{label} {name}: the incumbent"),
+            &moved.before,
+            &theta.transport(ring),
+            started.elapsed().as_millis(),
+        );
+        if let Some(w) = &moved.witness {
+            println!(
+                "    the witness: G_EE {}, G_Eρ {}, G_ρρ {}; g_E {}, g_ρ {}; step {:?} (24 bits)",
+                at_bits(w.form.at(0, 0)),
+                at_bits(w.form.at(0, 1)),
+                at_bits(w.form.at(1, 1)),
+                at_bits(&w.gradient[0]),
+                at_bits(&w.gradient[1]),
+                w.step().map(|[a, b]| (at_bits(&a), at_bits(&b))),
+            );
+        }
+        println!(
+            "    γ_ρ {:?}, Δρ per unit of E's step {:?} (24 bits)",
+            moved.modulus_slope.as_ref().map(at_bits),
+            moved.modulus_unit.as_ref().map(at_bits)
+        );
+        println!("{}", move_line(0, &moved, started.elapsed().as_millis()));
+        println!("{}", trial_line(&moved));
+        match &moved.adopted {
+            Some((successor, _)) => {
+                let own = moved.trials.last().and_then(|t| t.after.as_ref()).expect("the adopted trial's own release");
+                report(
+                    &format!("{label} {name}: the adopted successor's own release"),
+                    own,
+                    &successor.transport(ring),
+                    started.elapsed().as_millis(),
+                );
+                #[allow(clippy::disallowed_methods)]
+                std::fs::write(format!("{out}/{label}-{name}.state"), write_state(successor, ring))
+                    .expect("write the successor's state");
+                println!("  {label}: {name} adopted; the later metrics are not attempted");
+                break;
+            }
+            None => println!(
+                "  {label} {name}: refused, {:?}; {} ms",
+                moved.refusal,
+                started.elapsed().as_millis()
+            ),
+        }
+    }
+    println!("executed move-once: {} ms; resident {}", clock.elapsed().as_millis(), resident());
+}
+
 /// A rational read at 24 significant bits toward zero (`m/2^k`, exact as printed).
 fn at_bits(x: &Rat) -> Rat {
     use holonics::holon::deposition::significant;
@@ -1505,9 +1611,8 @@ pub(super) fn witness_plane(
             largest_of(unit)
         );
         println!(
-            "    the witness ({} lock terms, {} common shares outside their enclosures): G_EE {}, G_Eρ {}, G_ρρ {}, det {}; g_E {}, g_ρ {} (24 bits); decoupled α₀ {:?}, β₀ {:?}",
+            "    the witness ({} lock terms): G_EE {}, G_Eρ {}, G_ρρ {}, det {}; g_E {}, g_ρ {} (24 bits); decoupled α₀ {:?}, β₀ {:?}",
             reading.terms,
-            reading.outside,
             at_bits(ee),
             at_bits(er),
             at_bits(rr),

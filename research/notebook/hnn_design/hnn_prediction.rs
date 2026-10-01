@@ -404,6 +404,16 @@ fn main() {
             &arguments[8],
             &arguments[9..],
         ),
+        // One committed move from a state under each declared metric (the pin
+        // research/records/2026-10-01_ONE_GUARDED_MOVE_FROM_THE_STUCK_STATE_PINNED_BEFORE_ITS_RUN.md).
+        (Some("executed"), Some("move-once")) => executed_loop::move_once(
+            &arguments[3],
+            arguments[4].parse().expect("a seed"),
+            arguments[5].parse().expect("a count"),
+            &arguments[6],
+            &arguments[7],
+            &arguments[8..],
+        ),
         (Some("executed"), Some("causal")) => executed_loop::causal(
             &arguments[3],
             arguments[4].parse().expect("a seed"),

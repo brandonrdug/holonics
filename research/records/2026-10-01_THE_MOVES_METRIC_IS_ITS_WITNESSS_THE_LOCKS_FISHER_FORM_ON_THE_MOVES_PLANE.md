@@ -70,10 +70,10 @@ G = Dᵀ(⊕_j J_θj)D,     g = Dᵀ(⊕_j (θ_j − e_t)),     (α, β) = −G�
   midpoint of its share enclosure, and those need not sum to one: three readings in `[1, 9]` give
   share midpoints summing to `51/40`, where `G` can be indefinite. The sheets are now normalized
   jointly at one representative of the readings (each joint growth enclosure's dyadic face), so
-  `Σ = 1` and the resting sheet's share is positive. The residual is explicit: the reading counts the
-  common shares that leave the comparison's share enclosures (zero on every read). The committed
-  move's own lock-face weights `θ_x − [x = t]` still use independent midpoints; that is the same
-  defect in the move, to be repaired with the move's law.
+  `Σ = 1` and the resting sheet's share is positive. The residual is explicit: `LockFace::within` checks that
+  every common share lies in its enclosure (none left it on any read). The committed
+  move's own lock-face weights `θ_x − [x = t]` used independent midpoints too; they now read the
+  lock face's one reading ([one guarded move](2026-10-01_ONE_GUARDED_MOVE_FROM_THE_STUCK_STATE_PINNED_BEFORE_ITS_RUN.md) §1).
 - **Kernel** (Astra). `vᵀGv = Σ_j Var_θj(0, (D_j v)_x)`, so `ker G = ∩_j ker D_j`: a plane direction
   no lock reads. The step is defined exactly where `G ≻ 0`, decided by exact inertia.
 - **Scope.** `G` is the Gauss–Newton (Fisher) pullback, not the comparison's full Hessian on the
