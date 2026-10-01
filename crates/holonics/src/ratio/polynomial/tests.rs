@@ -46,6 +46,139 @@ fn a_real_root_that_is_not_rational_is_retained_with_its_certificate() {
 }
 
 #[test]
+fn source_roots_preserve_nonmonic_irrational_branches_and_original_coefficients() {
+    // P(x) = 5 - (3/2)x^2; A(x) = -10 + 3x^2; B(z) = -30 + z^2, z = 3x.
+    let source = RationalPolynomial::new(vec![integer(5), integer(0), rat(-3, 2)]);
+    let census = rational_root_census(&source).unwrap();
+    let roots = census.source_roots().unwrap();
+    assert_eq!(roots.len(), 2);
+    assert_eq!(census.leading_coefficient, BigInt::from(3));
+    assert!(roots[0].isolating().isolating_interval.upper < integer(0));
+    assert!(roots[1].isolating().isolating_interval.lower > integer(0));
+    let primitive = RationalPolynomial::new(
+        census
+            .primitive
+            .coefficients
+            .iter()
+            .cloned()
+            .map(Rat::from_integer)
+            .collect(),
+    );
+    let companion = RationalPolynomial::new(
+        census
+            .monic_companion
+            .coefficients
+            .iter()
+            .cloned()
+            .map(Rat::from_integer)
+            .collect(),
+    );
+    assert_eq!(
+        companion.composed_with(&RationalPolynomial::variable().scaled(&integer(3))),
+        primitive.scaled(&integer(3)),
+    );
+    // Exact evaluation in the source-root quotient, not evaluation at an interval midpoint.
+    let (quotient, remainder) = source.divided_by(&primitive).unwrap();
+    assert_eq!(quotient, RationalPolynomial::constant(rat(-1, 2)));
+    assert!(remainder.is_zero());
+    for (root, native) in roots.iter().zip(&census.roots) {
+        assert!(std::ptr::eq(root.census(), &census));
+        assert!(std::ptr::eq(root.companion(), native));
+        assert_eq!(root.census().source, source);
+        assert_eq!(root.isolating().polynomial, census.primitive);
+        let interval = &root.isolating().isolating_interval;
+        assert_eq!(
+            &interval.lower * integer(3),
+            native.isolating.isolating_interval.lower
+        );
+        assert_eq!(
+            &interval.upper * integer(3),
+            native.isolating.isolating_interval.upper
+        );
+        assert!(root.rational_value().is_none());
+        assert_eq!(
+            root.isolating().certificate.variations_at_lower
+                - root.isolating().certificate.variations_at_upper,
+            1
+        );
+        assert!(
+            !source
+                .evaluate(&((&interval.lower + &interval.upper) / integer(2)))
+                .is_zero()
+        );
+    }
+}
+
+#[test]
+fn source_roots_do_not_rescale_rational_values_a_second_time() {
+    let census = rational_root_census(&polynomial(&[1, -5, 6])).unwrap();
+    let roots = census.source_roots().unwrap();
+    assert_eq!(
+        roots
+            .iter()
+            .map(|r| r.rational_value().unwrap().clone())
+            .collect::<Vec<_>>(),
+        vec![rat(1, 3), rat(1, 2)]
+    );
+    for root in roots {
+        assert!(
+            census
+                .source
+                .evaluate(root.rational_value().unwrap())
+                .is_zero()
+        );
+    }
+}
+
+#[test]
+fn source_roots_refuse_broken_transport_and_producing_certificates() {
+    let original = rational_root_census(&polynomial(&[1, -5, 6])).unwrap();
+    let mut cases = Vec::new();
+    let mut bad = original.clone();
+    bad.source = polynomial(&[1, -5, 7]);
+    cases.push(bad);
+    let mut bad = original.clone();
+    bad.primitive.coefficients.clear();
+    cases.push(bad);
+    for scale in [0, -6, 7] {
+        let mut bad = original.clone();
+        bad.leading_coefficient = BigInt::from(scale);
+        cases.push(bad);
+    }
+    let mut bad = original.clone();
+    bad.monic_companion.coefficients.pop();
+    cases.push(bad);
+    let mut bad = original.clone();
+    bad.roots[0].isolating.polynomial = bad.primitive.clone();
+    cases.push(bad);
+    let mut bad = original.clone();
+    bad.roots[0].isolating.certificate.variations_at_lower += 1;
+    cases.push(bad);
+    let mut bad = original.clone();
+    bad.roots.reverse();
+    cases.push(bad);
+    let mut bad = original.clone();
+    bad.distinct_real_roots += 1;
+    cases.push(bad);
+    let mut bad = original.clone();
+    bad.roots[0].isolating.isolating_interval.upper =
+        bad.roots[0].isolating.isolating_interval.lower.clone();
+    cases.push(bad);
+    let mut bad = original.clone();
+    bad.roots[0].rational_value = Some(integer(0));
+    cases.push(bad);
+    let mut bad = original.clone();
+    bad.roots[0].isolating.isolating_interval.lower = Rat::new_raw(BigInt::one(), BigInt::zero());
+    cases.push(bad);
+    for census in cases {
+        assert!(
+            census.source_roots().is_err(),
+            "accepted malformed transport: {census:?}"
+        );
+    }
+}
+
+#[test]
 fn composition_and_reduction_agree_with_direct_evaluation() {
     let outer = polynomial(&[1, 2, 3]);
     let inner = polynomial(&[-1, 1]);
