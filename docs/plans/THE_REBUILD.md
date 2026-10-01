@@ -720,6 +720,10 @@ that fires becomes the next loop's subject, and nothing downstream starts.
       [R3](../../research/records/2026-10-01_THE_CORRECTED_MOVE_FROM_THE_OPENING_MEASURED_R3_THE_SAME_VALLEY.md)). The order term or every refinement lifts the comparison's
       agreement with stations right from chance to 40 against 18 over 12 states. The corrected move
       from the opening still descends without decisions (R3). Next: agreement between nearby states.
+    - *The forced release, October 1* ([record](../../research/records/2026-10-01_THE_FORCED_RELEASE.md)). Every decision along the
+      right trajectory, each in its own context: the best agreement and a `ρ` slope toward the refit,
+      but its covectors cost more than a move's budget on the host. Next: the bank's turn covector
+      on the card (#76).
   - *1b's subject, as 1a named it*: a comparison whose descent must move decisions, one
     that holds a margin on right decisions, is not minimized on ties, and is read where a reading
     carries information about the key. The governing law "loss is the log of a ratio" is the

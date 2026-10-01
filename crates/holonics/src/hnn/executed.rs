@@ -258,6 +258,10 @@ pub enum Reading {
     /// faces along the right trajectory, each in its own context (the
     /// [forced release's record](../../../../research/records/2026-10-01_THE_FORCED_RELEASE.md)).
     Forced,
+    /// Each station once, at the forced release's refinement that locks it (every earlier lock at
+    /// its target), the order read at the first refinement: the forced release's decisions at the
+    /// decisions' cost (its every-refinement covectors exceeded a move's measured bound).
+    ForcedDecisions,
 }
 
 /// [definition; agent-inferred, September 30] **A declared comparison**: its composition and its
@@ -936,7 +940,9 @@ fn sites_refinements<R: JointGrowth + Send + Sync>(
     reading: Reading,
     refinements: Vec<BankRefinement<R>>,
 ) -> Result<(Vec<BankRefinement<R>>, usize), HnnError> {
-    if reading != Reading::Forced || !matches!(request.context, Context::Open) {
+    if !matches!(reading, Reading::Forced | Reading::ForcedDecisions)
+        || !matches!(request.context, Context::Open)
+    {
         return Ok((refinements, 0));
     }
     let (_, forced) = crate::hnn::prediction::bank_release_forced(
@@ -1143,6 +1149,16 @@ pub fn sites_of<R>(
                 })
                 .collect()
         }
+        Reading::ForcedDecisions if refinements.is_empty() => Vec::new(),
+        Reading::ForcedDecisions => (0..stations)
+            .map(|station| {
+                let k = refinements
+                    .iter()
+                    .position(|refinement| refinement.locked.contains(&station))
+                    .unwrap_or(refinements.len().saturating_sub(1));
+                site(Some(k), station, refinements[k].placed.clone())
+            })
+            .collect(),
         Reading::TeacherForced => (0..stations)
             .map(|station| {
                 let cells: Vec<Option<usize>> = (0..stations)
@@ -1250,6 +1266,8 @@ fn order_terms<R: JointGrowth>(
     let contexts: Vec<usize> = match reading {
         // At the decisions: the decision refinement, the latest the terms are read at.
         Reading::Decisions => sites.iter().filter_map(|s| s.context).max().into_iter().collect(),
+        // The forced release's first lock: every station open.
+        Reading::ForcedDecisions => sites.iter().filter_map(|s| s.context).min().into_iter().collect(),
         // At every refinement: each refinement the release executed (its open stations' sites).
         _ => sites
             .iter()
