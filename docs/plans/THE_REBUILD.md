@@ -605,7 +605,31 @@ that fires becomes the next loop's subject, and nothing downstream starts.
       continued one;
     - solved decisions re-read after later locks;
     - gates A (tests and witness), B (order-2's objective-by-location controls) and C (the
-      regressions), each decided before the next opens, and the final confirmation opened once, last. The subject 1a names: a comparison whose descent must move decisions, one
+      regressions), each decided before the next opens, and the final confirmation opened once, last.
+    - *Gate A, decided: 1b stops* (merge recorded in the [gate-A record](../../research/records/2026-09-30_STEP_1B_GATE_A_NO_FEASIBILITY_WITNESS_WITHIN_ITS_BUDGET_THE_CANDIDATES_OWN_MOVE_SOLVES_AT_MOST_SEVEN_OF_SIXTY_FOUR_DECISIONS.md)).
+      - The candidate is built with its contract: the lock face, the fixed mask beside its own
+        release, both guards repaired for every arm, the derived ladder start, the complete
+        continuing state, and the persistence reads.
+      - Its tests pass, including restore-equals-continued over three receptions. The library
+        tests are 882, and the replay matched.
+      - The feasibility witness was not found within its pinned procedure and budget (16 of the
+        candidate's own moves on development seed `2_026_093_061`). The best constitution solved 7
+        of 64 decision terms, which were exactly the stations whose target is the class every
+        release locked: a class preference, not the key.
+      - No section was whole. Between 45 and 56 of the 64 decision terms were read at refinements
+        that did not lock their station. From move 3 on, no decision solved at its refinement
+        stayed solved after its section's later locks.
+      - Gates B and C stay closed, and the final confirmation stays unread.
+  - *Loop 1c, the next subject* (measurement only, to be pinned after Astra's review). It
+    separates the obstruction gate A met into three parts:
+    - persistence and coupling: which term of the joint field undoes a solved decision when a later
+      lock lands (the placement's normalization, the later datum's entry into the span, or the
+      release's order), read on gate A's saved states;
+    - representation: whether any admissible constitution solves every development station,
+      searched by a procedure other than the candidate's own move (an exterior fit of the lock
+      face, projected onto the lattice and certified exactly). It reports "found" or "not found
+      within its budget";
+    - reach: whether the certified move approaches such a witness once one exists. The subject 1a names: a comparison whose descent must move decisions, one
     that holds a margin on right decisions, is not minimized on ties, and is read where a reading
     carries information about the key. The governing law "loss is the log of a ratio" is the
     candidate's first reference. The adaptable operands left out (the bank's members, the pumps)
