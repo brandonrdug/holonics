@@ -886,6 +886,28 @@ pub(super) fn print_terms(label: &str, batch: &BatchComparison, targets: &[Vec<u
     }
 }
 
+/// **A move's line in gate A's witness format** (`executed witness`, exactly): its adoption or
+/// refusal, the ladder's start, every trial's step and refusal, the owner's persistence reads at the
+/// incumbent, and the move's wall time. Loop 1c's `executed resume-coupling` prints its move through
+/// this one formatter, so its identity check reads the same text gate A printed.
+pub(super) fn move_line(index: usize, moved: &ExecutedMove, ms: u128) -> String {
+    format!(
+        "    move {index}: {}; the ladder's start {:?}; trials {}; persistence {:?}; {ms} ms",
+        match &moved.adopted {
+            Some((_, step)) => format!("adopted at step {}", step.step),
+            None => format!("refused {:?}", moved.refusal),
+        },
+        moved.start,
+        moved
+            .trials
+            .iter()
+            .map(|t| format!("η {} {:?}", t.step, t.refusal.as_ref().map(|_| "refused")))
+            .collect::<Vec<_>>()
+            .join(", "),
+        moved.persistence,
+    )
+}
+
 /// [definition; agent-inferred, step 1b's gate A: the pin §13.3 and its gate-A addendum] **The
 /// constrained feasibility witness** (`executed witness <terrain> <seed> <count> <moves> <deadline
 /// ms> <out>`). From the founded opening, the candidate's own certified move (the lock face at the
@@ -990,22 +1012,7 @@ pub(super) fn witness(
             stop = format!("a witness at constitution {index}");
             break;
         }
-        println!(
-            "    move {index}: {}; the ladder's start {:?}; trials {}; persistence {:?}; {} ms",
-            match &moved.adopted {
-                Some((_, step)) => format!("adopted at step {}", step.step),
-                None => format!("refused {:?}", moved.refusal),
-            },
-            moved.start,
-            moved
-                .trials
-                .iter()
-                .map(|t| format!("η {} {:?}", t.step, t.refusal.as_ref().map(|_| "refused")))
-                .collect::<Vec<_>>()
-                .join(", "),
-            moved.persistence,
-            started.elapsed().as_millis()
-        );
+        println!("{}", move_line(index, &moved, started.elapsed().as_millis()));
         match moved.adopted {
             Some((successor, _)) => theta = successor,
             None => {

@@ -28,7 +28,7 @@
 # Exit statuses: 0 success; 2 usage; 10 a check failed; 11 a dependency not verified (no stamp, or
 # its artifacts or the binary changed since); 12 the thread reservation or the build staging
 # refused; 13 reach is not built; 124 a run's outer guard; any other: the harness's own (3
-# incomplete, 4 a refused input, 101 a panic).
+# incomplete, 4 a refused input, 5 an identity mismatch against gate A's receipt, 101 a panic).
 #
 # Every run's artifacts are in `<out>` (the worktree's `.local/1c/`): `<name>.txt` its stdout,
 # `<name>.err` its stderr, `<name>.time` its wall and CPU times and exit (the peak resident set is
@@ -42,6 +42,8 @@
 #   cost-represent, cost-split the development cost reads (the pin §6.1)
 #   exp-replay, check-replay, exp-coupling, exp-represent, check-witness, exp-reach
 #                              the experiments and their checks (the pin §1–§4, §6.2–§6.3)
+#   exp-c2, check-c2           the c2 diagnostic (gate A's constitution 1 resumed by one native
+#                              update, then the re-reads at constitution 2), and its check and stamp
 #   chain-continuation         exp-replay, then check-replay, then exp-coupling
 #   schedule                   the pin §6.3 whole: chain-continuation beside exp-represent; then,
 #                              only if a witness, check-witness and exp-reach
@@ -292,6 +294,55 @@ exp_reach() {
   refuse 13 "reach is not built (the pin §4, §8): the witness and the replay are verified; build reach against the pin's law, its first constitution its own development read"
 }
 
+exp_c2() {
+  # The c2 diagnostic (`executed resume-coupling`, narrowed by Astra's review of the c2 consumer:
+  # the native order only; the move's own reading of its successor reused, never re-released; the
+  # successor and its contexts captured before any diagnostic read). Gate A's saved constitution 1
+  # restored whole; one native update at 12 threads on the batch gate A's move 1 read; the identity
+  # against gate A's receipt (the harness exits 5 on a mismatch, reading nothing further); then the
+  # 7 re-reads at constitution 2, at most 7 admitted (past it, exit 3). The harness stops the move
+  # itself past 210494 ms (gate A's move 1, 145447 ms at 24 threads, times move 0's measured
+  # 159075/109917 at 12 threads over 24), exit 3.
+  # The outer guard of 606 s is the primary's projection for the broader three-order coupling read
+  # (the move 210494, the releases 82983 · 7/2, the events 13093 · 7/5 · 7/2, the restore under
+  # 40000: 605091 ms): a cross-state, cross-thread-count projection, not a demonstrated upper bound.
+  # The narrowed operation's own budget, derived from its call counts, is stated in its record for
+  # review; no guard is changed here.
+  rm -f "$stamps/c2.ok"
+  rm -rf "$out/c2_capture"
+  mkdir -p "$out/c2_capture"
+  run c2 12 606 executed resume-coupling order2 2026093061 8 \
+    "$gate_a/witness_best.state" "$gate_a/witness.txt" 210494 "$out/c2_capture" \
+    || refuse $? "the c2 diagnostic failed, was refused, stopped at an identity mismatch, stopped incomplete or reached its guard"
+  check_c2
+}
+
+check_c2() {
+  # Beside the harness's own gates, read from its listing: the run exited 0; constitution 1's line,
+  # move 1's line and constitution 2's line equal gate A's (wall times and the persistence split
+  # masked); the persistence reads at constitution 2 are gate A's move-2 tuple with none refused;
+  # the run completed; the capture holds constitution 2's state and contexts. Passing, it stamps the
+  # listing and the capture.
+  exited_zero c2 || refuse 10 "the c2 diagnostic did not exit 0"
+  local mask='s/; [0-9]+ ms$//; s/, reversed: [0-9]+, uncertified: [0-9]+//g'
+  local lines='^(  constitution 1 \(before move 1\)|    move 1|  constitution 2 \(before move 2\)): '
+  diff <(grep -E "$lines" "$gate_a/witness.txt" | sed -E "$mask") \
+    <(grep -E "$lines" "$out/c2.txt" | sed -E "$mask") > "$out/check_c2.diff" \
+    || refuse 10 "the c2 diagnostic's move and constitution lines differ from gate A's ($out/check_c2.diff)"
+  local tuple
+  tuple=$(grep '^    move 2: ' "$gate_a/witness.txt" | grep -o 'Persistence { [^}]*' | sed 's/ $//')
+  [[ -n $tuple ]] || refuse 10 "gate A's receipt holds no persistence reads at constitution 2"
+  grep -qF "  persistence at constitution 2: $tuple, reversed: " "$out/c2.txt" \
+    || refuse 10 "the persistence reads at constitution 2 are not gate A's ($tuple)"
+  grep -qE '^  persistence at constitution 2: .* \}; refused 0; ' "$out/c2.txt" \
+    || refuse 10 "a re-read at constitution 2 was refused"
+  grep -q '^executed resume-coupling: complete; ' "$out/c2.txt" || refuse 10 "the c2 diagnostic did not complete"
+  [[ -s $out/c2_capture/c2.state && -s $out/c2_capture/c2_contexts.txt ]] \
+    || refuse 10 "the capture of constitution 2 is missing"
+  stamp c2 "$out/c2.txt" "$out/c2_capture/c2.state" "$out/c2_capture/c2_contexts.txt"
+  echo "check-c2: gate A's move 1 and constitution 2 reproduced, its persistence reads at constitution 2 read, the capture kept; stamped"
+}
+
 chain_continuation() {
   exp_replay
   check_replay
@@ -405,6 +456,8 @@ case "${1:-}" in
   exp-represent) exp_represent ;;
   check-witness) check_witness ;;
   exp-reach) exp_reach ;;
+  exp-c2) exp_c2 ;;
+  check-c2) check_c2 ;;
   chain-continuation) chain_continuation ;;
   schedule) schedule ;;
   gate-tests)
@@ -417,7 +470,7 @@ case "${1:-}" in
     hold gate_lean bash tools/lean_check.sh Holonics HolonicsResearch || refuse $? "the Lean build failed"
     ;;
   *)
-    echo "a step: build | cost-replay | check-cost-replay | cost-move | check-cost-move | cost-coupling | cost-coupling-12 | cost-represent | cost-split | exp-replay | check-replay | exp-coupling | exp-represent | check-witness | exp-reach | chain-continuation | schedule | gate-tests | gate-replay | gate-lean" >&2
+    echo "a step: build | cost-replay | check-cost-replay | cost-move | check-cost-move | cost-coupling | cost-coupling-12 | cost-represent | cost-split | exp-replay | check-replay | exp-coupling | exp-represent | check-witness | exp-reach | exp-c2 | check-c2 | chain-continuation | schedule | gate-tests | gate-replay | gate-lean" >&2
     exit 2
     ;;
 esac

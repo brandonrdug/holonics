@@ -8,6 +8,7 @@
 //! cargo run --release -p holonics --example hnn_prediction -- executed replay <terrain> <seed> <count> <label=state|label=partial:file>…
 //! cargo run --release -p holonics --example hnn_prediction -- executed coupling <terrain> <seed> <count> <deadline ms> <label=state|label=partial:file|label=opening>…
 //! cargo run --release -p holonics --example hnn_prediction -- executed represent <terrain> <seed> <count> <iterates> <deadline ms> <out> [<held-out seed>]
+//! cargo run --release -p holonics --example hnn_prediction -- executed resume-coupling <terrain> <seed> <count> <c1 state> <gate A receipt> <move bound ms> <capture dir>
 //! ```
 //!
 //! **Fail-closed** (Astra's review of `722c3334`). Every arm is declared (`label=<state>`, a
@@ -46,21 +47,39 @@
 //!   release's excess falls by disjoint enclosures. Every label (the witness, the frozen-context
 //!   witness, the best) is granted only to an admissible reading, one guard for all ([`bounds`],
 //!   [`certification`]). A representation diagnostic, never a learning result.
+//! - **`executed resume-coupling`** (the c2 diagnostic; the primary's brief, narrowed by Astra's
+//!   review of the c2 consumer): gate A's saved constitution 1 restored whole (refused, exit
+//!   [`REFUSED`], never remounted partially), and one native update through the owner
+//!   (`hnn::executed::executed_move`, the lock face at the decisions, every commit guard) on the
+//!   batch gate A's move 1 read; past its bound the move stops the run then, incomplete ([`Watch`]).
+//!   Nothing after the move is re-released: the move's own reading of its adopted successor (the
+//!   trial's release) supplies constitution 2's summary, every lock's context at its own lock with
+//!   its lock face, and the terminal assignment ([`locks_of`]). Constitution 2's complete state and
+//!   those contexts are written ([`capture`]) before any diagnostic read. Then, each gated by the one
+//!   before ([`resumed`]): the move's lines and constitution 2's reading equal gate A's receipt, and
+//!   the persistence reads' locks, solved and re-reads (no reading); the re-reads, lost and
+//!   retained, admitted within [`REREAD_BOUND`]; each re-read at the release (`N1D1`), whose stay
+//!   and fall must be gate A's (else exit [`MISMATCH`], nothing further read); then its
+//!   normalization alone and entry alone (`N1D0`, `N0D1`), with the contrasts in both orders and the
+//!   interaction. The native order only; Fails, Undecided and refusals apart everywhere.
 //!
 //! Every unit prints one line with its elapsed milliseconds; the deadline is checked before each
 //! unit, and a run past it stops, reported incomplete.
 
 use super::executed_loop::{
-    cell, founded_opening, open_requests, print_terms, solved_terms, terrain_pairs, write_state,
+    cell, founded_opening, move_line, open_requests, print_terms, solved_terms, terrain_pairs,
+    write_state,
 };
 use super::*;
 use holonics::hnn::HnnError;
 use holonics::hnn::constitution::{ContinuingState, Locus};
 use holonics::hnn::executed::{
-    BatchComparison, Comparison, LockFace, Predicate, Reading, Request, TermSite, compare,
-    entry_bound, frozen_reread, lock_face, site_gradients, sites_of,
+    BatchComparison, Comparison, LockFace, Predicate, Reading, Request, RequestComparison, TermSite,
+    compare, entry_bound, executed_move, frozen_reread, lock_face, site_gradients, sites_of,
 };
 use std::fmt;
+use std::sync::{OnceLock, mpsc};
+use std::time::Duration;
 use holonics::hnn::prediction::{BankGeneration, BankPlacement, BankRefinement, LockOrder, bank_release_ordered};
 use holonics::hnn::ring::{Growth, TurnReading, turn};
 use holonics::holon::deposition::significant;
@@ -94,6 +113,13 @@ fn mark(p: Predicate) -> &'static str {
 
 /// gate A's summary line of a constitution's reading (`executed witness`'s format, exactly).
 fn summary(label: &str, theta: &Constitution, batch: &BatchComparison, targets: &[Vec<usize>], stations: usize, ms: u128) -> (usize, usize) {
+    let (line, solved, all) = summary_line(label, theta, batch, targets, stations, ms);
+    println!("{line}");
+    (solved, all)
+}
+
+/// [`summary`]'s line, with the solved decision terms and those read.
+fn summary_line(label: &str, theta: &Constitution, batch: &BatchComparison, targets: &[Vec<usize>], stations: usize, ms: u128) -> (String, usize, usize) {
     let ring = 0;
     let (solved, all) = solved_terms(batch);
     let (whole, right, released) = batch.sections(targets);
@@ -105,7 +131,7 @@ fn summary(label: &str, theta: &Constitution, batch: &BatchComparison, targets: 
         .map(|x| x.abs())
         .max()
         .unwrap_or_else(Rat::zero);
-    println!(
+    let line = format!(
         "  {label}: solved {solved} of {all} decision terms; whole sections {whole} of {} (released {released}, stations right {right}); L ∈ {} nats, X ∈ {} nats; E's largest entry {}, ρ {}; the terms {:?}; {ms} ms",
         targets.len(),
         cell(&batch.value, 1 << 12),
@@ -114,7 +140,7 @@ fn summary(label: &str, theta: &Constitution, batch: &BatchComparison, targets: 
         theta.transport(ring),
         batch.counts(stations)
     );
-    (solved, all)
+    (line, solved, all)
 }
 
 // -------------------------------------------------------------------------------------------
@@ -443,10 +469,13 @@ pub(super) fn replay(terrain: &str, seed: u64, count: usize, arms: &[String]) {
 // -------------------------------------------------------------------------------------------
 // persistence and coupling
 
-/// A lock face read at a section with its station open, or the typed refusal of the reading.
+/// A lock face read at a section with its station open, or the typed refusal of the reading; or
+/// one the release already read and kept (`Kept`: its `ℓ` enclosure and solved predicate, from the
+/// owner's receipt of the refinement that locked the station, reused rather than read again).
 #[derive(Clone, Debug)]
 enum Face {
     Read(LockFace),
+    Kept { value: ExactInterval, solved: Predicate },
     Refused(String),
 }
 
@@ -461,6 +490,7 @@ impl Face {
     fn solved(&self) -> Option<Predicate> {
         match self {
             Face::Read(face) => Some(face.solved),
+            Face::Kept { solved, .. } => Some(*solved),
             Face::Refused(_) => None,
         }
     }
@@ -472,6 +502,7 @@ impl Face {
     fn lock(&self) -> Option<&ExactInterval> {
         match self {
             Face::Read(face) => Some(&face.value),
+            Face::Kept { value, .. } => Some(value),
             Face::Refused(_) => None,
         }
     }
@@ -479,8 +510,14 @@ impl Face {
     fn show(&self) -> String {
         match self {
             Face::Read(face) => format!("{} ℓ {}", mark(face.solved), cell(&face.value, 1 << 16)),
+            Face::Kept { value, solved } => format!("{} ℓ {}", mark(*solved), cell(value, 1 << 16)),
             Face::Refused(why) => format!("refused ({why})"),
         }
+    }
+
+    /// The face's mark: `H`, `F`, `U`, or `R` (refused); Fails and Undecided never pooled.
+    fn mark(&self) -> &'static str {
+        self.solved().map_or("R", mark)
     }
 }
 
@@ -653,9 +690,14 @@ fn plus(a: &ExactInterval, b: &ExactInterval) -> ExactInterval {
 /// The landing factorial's contrasts on `ℓ` (the pin §2.3): the normalization first then the entry,
 /// the entry first then the normalization, and the interaction, each enclosed.
 fn contrasts(row: &Station) -> Option<String> {
-    let (l00, l11) = (row.at_lock.lock()?, row.at_release.lock()?);
-    let l10 = row.normalization.as_ref()?.lock()?;
-    let l01 = row.entry.as_ref()?.lock()?;
+    contrasts_of(&row.at_lock, row.normalization.as_ref()?, row.entry.as_ref()?, &row.at_release)
+}
+
+/// [`contrasts`] on the four cells `N0D0, N1D0, N0D1, N1D1`.
+fn contrasts_of(n0d0: &Face, n1d0: &Face, n0d1: &Face, n1d1: &Face) -> Option<String> {
+    let (l00, l11) = (n0d0.lock()?, n1d1.lock()?);
+    let l10 = n1d0.lock()?;
+    let l01 = n0d1.lock()?;
     let interaction = plus(&minus(l11, l10), &minus(l00, l01));
     Some(format!(
         "N then D: {} then {}; D then N: {} then {}; interaction {}",
@@ -1409,6 +1451,684 @@ pub(super) fn represent(
 }
 
 // -------------------------------------------------------------------------------------------
+// the c2 diagnostic: one native update resumed from gate A's saved constitution 1, then the native
+// release's re-reads at constitution 2 (narrowed by Astra's review of the c2 consumer)
+
+/// The exit status of an identity mismatch: the resumed move's lines, its successor's reading or the
+/// persistence reads at the successor differ from gate A's receipt. Every read after it is withheld.
+pub(super) const MISMATCH: i32 = 5;
+
+/// [definition; the primary's c2 brief and Astra's review of the c2 consumer] **The re-reads
+/// admitted at constitution 2**: gate A's persistence reads there (its move 2 line) re-read 7 solved
+/// locks with a later lock, 4 staying solved and 3 not. Every re-read, lost and retained alike, is
+/// counted before any is read; past the bound the run is refused incomplete, never truncated.
+const REREAD_BOUND: usize = 7;
+
+/// The receipt's lines the identity reads: constitution 1's summary and move 1's line (the move's
+/// own printed lines), constitution 2's summary, and move 2's line, whose persistence reads are the
+/// owner's at constitution 2.
+const RECEIPT_C1: &str = "  constitution 1 (before move 1): ";
+const RECEIPT_MOVE_1: &str = "    move 1: ";
+const RECEIPT_C2: &str = "  constitution 2 (before move 2): ";
+const RECEIPT_MOVE_2: &str = "    move 2: ";
+
+/// The owner's persistence fields gate A printed (`hnn::executed::Persistence` before the split of
+/// Astra's review of October 1, which is compared wherever a receipt carries it).
+const TUPLE: [&str; 5] = ["locks", "solved", "reread", "stay", "fall"];
+
+/// **A unit's early stop** (CLAUDE.md, "Stop early on evidence"): a guard thread that calls
+/// `expired` when the unit has not ended within its bound, so a unit past its projection's upper
+/// bound stops the run then, not at the outer guard; ended in time, it calls nothing.
+struct Watch {
+    ended: Option<mpsc::Sender<()>>,
+    guard: Option<std::thread::JoinHandle<()>>,
+}
+
+impl Watch {
+    fn start(bound: Duration, expired: impl FnOnce() + Send + 'static) -> Self {
+        let (ended, waiting) = mpsc::channel::<()>();
+        let guard = std::thread::spawn(move || {
+            if matches!(waiting.recv_timeout(bound), Err(mpsc::RecvTimeoutError::Timeout)) {
+                expired();
+            }
+        });
+        Watch { ended: Some(ended), guard: Some(guard) }
+    }
+
+    /// The unit ended: the guard returns without calling `expired`, unless the bound had passed.
+    fn end(mut self) {
+        drop(self.ended.take());
+        if let Some(guard) = self.guard.take() {
+            let _ = guard.join();
+        }
+    }
+}
+
+/// A printed line as the identity compares it: the wall time `; <n> ms` at its end removed, and the
+/// persistence split `, reversed: <n>, uncertified: <n>` (which gate A's receipt predates) removed
+/// wherever printed. Nothing else is masked.
+fn masked(line: &str) -> String {
+    let mut text = line.to_string();
+    let mut from = 0;
+    while let Some(found) = text[from..].find(", reversed: ") {
+        let at = from + found;
+        let after = at + ", reversed: ".len();
+        let digits = text[after..].chars().take_while(char::is_ascii_digit).count();
+        let tail = after + digits;
+        let Some(rest) = text[tail..].strip_prefix(", uncertified: ") else {
+            from = after;
+            continue;
+        };
+        let more = rest.chars().take_while(char::is_ascii_digit).count();
+        if digits == 0 || more == 0 {
+            from = after;
+            continue;
+        }
+        let end = tail + ", uncertified: ".len() + more;
+        text.replace_range(at..end, "");
+        from = at;
+    }
+    if let Some(at) = text.rfind("; ")
+        && let Some(n) = text[at + 2..].strip_suffix(" ms")
+        && !n.is_empty()
+        && n.chars().all(|c| c.is_ascii_digit())
+    {
+        text.truncate(at);
+    }
+    text
+}
+
+/// A printed `Persistence { … }`'s fields by name.
+fn persistence_fields(line: &str) -> Option<BTreeMap<String, usize>> {
+    let body = line.split_once("Persistence { ")?.1.split_once(" }")?.0;
+    body.split(", ")
+        .map(|field| {
+            let (name, value) = field.split_once(": ")?;
+            Some((name.to_string(), value.parse().ok()?))
+        })
+        .collect()
+}
+
+/// **Gate A's receipt of move 1 and of constitution 2** (`witness.txt`), read before the move: the
+/// move's two printed lines, constitution 2's summary line, and the owner's persistence reads at
+/// constitution 2 (move 2's line), by field. Each line found exactly once, or refused.
+#[derive(Clone, Debug, PartialEq, Eq)]
+struct Receipt {
+    moved: [String; 2],
+    successor: String,
+    persistence: BTreeMap<String, usize>,
+}
+
+impl Receipt {
+    fn read(text: &str) -> Result<Self, String> {
+        let line = |prefix: &str| -> Result<String, String> {
+            let mut found = text.lines().filter(|line| line.starts_with(prefix));
+            let first = found
+                .next()
+                .ok_or_else(|| format!("gate A's receipt has no line `{}…`", prefix.trim_start()))?;
+            if found.next().is_some() {
+                return Err(format!("gate A's receipt has more than one line `{}…`", prefix.trim_start()));
+            }
+            Ok(first.to_string())
+        };
+        let moved = [line(RECEIPT_C1)?, line(RECEIPT_MOVE_1)?];
+        let successor = line(RECEIPT_C2)?;
+        let persistence = persistence_fields(&line(RECEIPT_MOVE_2)?)
+            .ok_or_else(|| "gate A's move 2 line: its persistence reads do not parse".to_string())?;
+        if let Some(field) = TUPLE.iter().find(|field| !persistence.contains_key(**field)) {
+            return Err(format!("gate A's move 2 line: its persistence reads have no `{field}`"));
+        }
+        Ok(Self { moved, successor, persistence })
+    }
+}
+
+/// **The resumed read's inputs, each refused before the move**: gate A's receipt ([`Receipt::read`])
+/// and gate A's saved constitution 1 restored whole ([`restore_whole`]: a state that does not parse,
+/// does not continue the declared opening or does not write back to its own text is refused, never
+/// remounted partially).
+fn resume_inputs(engine: &Engine, ring: usize, state: &str, receipt: &str) -> Result<(Constitution, Receipt), String> {
+    let receipt = Receipt::read(receipt)?;
+    let theta = restore_whole(engine, ring, state)
+        .map_err(|why| format!("constitution 1 refused: {why}; a complete state is never read as a partial remount"))?;
+    Ok((theta, receipt))
+}
+
+/// **The persistence reads at constitution 2, every status apart** (the owner's
+/// `hnn::executed::Persistence`, read by its rule): the native release's locks, those solved at their
+/// own lock, those of them with a later lock (the re-reads), and of the re-reads at the release:
+/// solved (`stay`), the strict test failing (`reversed`), undecided (`uncertified`), or the reading
+/// refused (`refused`, which the owner's read never returns). `fall` is reversed and uncertified
+/// together, as gate A printed it; nothing is pooled with a refusal.
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq)]
+struct Tally {
+    locks: usize,
+    solved: usize,
+    reread: usize,
+    stay: usize,
+    reversed: usize,
+    uncertified: usize,
+    refused: usize,
+}
+
+impl Tally {
+    fn fall(&self) -> usize {
+        self.reversed + self.uncertified
+    }
+
+    fn field(&self, name: &str) -> Option<usize> {
+        Some(match name {
+            "locks" => self.locks,
+            "solved" => self.solved,
+            "reread" => self.reread,
+            "stay" => self.stay,
+            "fall" => self.fall(),
+            "reversed" => self.reversed,
+            "uncertified" => self.uncertified,
+            _ => return None,
+        })
+    }
+
+    /// The receipt's fields among `names` that differ from this tally's (a field the receipt does
+    /// not carry is not compared).
+    fn differing(&self, receipt: &BTreeMap<String, usize>, names: &[&str]) -> Vec<String> {
+        names
+            .iter()
+            .filter_map(|&name| {
+                let want = *receipt.get(name)?;
+                let found = self.field(name)?;
+                (want != found).then(|| format!("{name} {found}, gate A's {want}"))
+            })
+            .collect()
+    }
+}
+
+impl fmt::Display for Tally {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(
+            f,
+            "Persistence {{ locks: {}, solved: {}, reread: {}, stay: {}, fall: {}, reversed: {}, uncertified: {} }}; refused {}",
+            self.locks,
+            self.solved,
+            self.reread,
+            self.stay,
+            self.fall(),
+            self.reversed,
+            self.uncertified,
+            self.refused
+        )
+    }
+}
+
+/// **One lock of the native release at constitution 2**, as the resumed move's own reading of its
+/// adopted successor holds it (the trial's release, reused; no reading made): its request, station
+/// and target; the refinement that locked it (`λ(j)`, its own lock's context) and its class; the
+/// stations locked with it and at later refinements; the decision section `S_λ(j)` (the cells
+/// placed when `λ(j)` was read) and the release section `S_rel(j)` (the terminal assignment), each
+/// with the station open; and its lock face at its own lock, kept from the owner's receipt.
+#[derive(Clone, Debug)]
+struct Lock {
+    request: usize,
+    station: usize,
+    target: usize,
+    refinement: usize,
+    class: usize,
+    co: Vec<usize>,
+    later: Vec<usize>,
+    decision: Vec<Option<usize>>,
+    released: Vec<Option<usize>>,
+    at_lock: Face,
+}
+
+impl Lock {
+    /// The owner's re-read: solved at its own lock, with a later lock in its section.
+    fn reread(&self) -> bool {
+        self.at_lock.holds() && !self.later.is_empty()
+    }
+}
+
+/// **A request's locks from the move's own reading of the successor**, reused: the terminal
+/// assignment from the release's decisions; each refinement's placed cells, every lock of an earlier
+/// refinement (`bank_release`'s law), checked against every one of the owner's term sites, which
+/// carry their refinement's placed cells; each lock's face at its own lock from the owner's receipt
+/// of that refinement. Refused where the reading does not hold them.
+fn locks_of(request: usize, compared: &RequestComparison, targets: &[usize], stations: usize) -> Result<Vec<Lock>, String> {
+    let generation = compared
+        .generation
+        .as_ref()
+        .ok_or_else(|| format!("request {request} has no release"))?;
+    let mut section: Vec<Option<usize>> = vec![None; stations];
+    for (station, class, ..) in &generation.decisions {
+        section[*station] = Some(*class);
+    }
+    let placed = |k: usize| -> Vec<Option<usize>> {
+        let mut cells = vec![None; stations];
+        for order in compared.orders.iter().filter(|o| o.context < k) {
+            for &s in &order.locked {
+                cells[s] = section[s];
+            }
+        }
+        cells
+    };
+    for term in &compared.terms {
+        if let Some(k) = term.site.context
+            && term.site.cells != placed(k)
+        {
+            return Err(format!(
+                "request {request} station {}: the owner's site at refinement {k} holds {:?}, the locks before it {:?}",
+                term.site.station,
+                term.site.cells,
+                placed(k)
+            ));
+        }
+    }
+    let mut locks = Vec::new();
+    for order in &compared.orders {
+        let k = order.context;
+        for &j in &order.locked {
+            let seen = compared
+                .stations
+                .iter()
+                .find(|s| s.context == Some(k) && s.station == j)
+                .ok_or_else(|| format!("request {request} station {j}: no reading at its own lock (refinement {k})"))?;
+            let mut released = section.clone();
+            released[j] = None;
+            locks.push(Lock {
+                request,
+                station: j,
+                target: targets[j],
+                refinement: k,
+                class: section[j].ok_or_else(|| format!("request {request} station {j}: locked with no decision"))?,
+                co: order.locked.iter().copied().filter(|&s| s != j).collect(),
+                later: compared
+                    .orders
+                    .iter()
+                    .filter(|o| o.context > k)
+                    .flat_map(|o| o.locked.iter().copied())
+                    .collect(),
+                decision: placed(k),
+                released,
+                at_lock: Face::Kept { value: seen.lock.clone(), solved: seen.solved },
+            });
+        }
+    }
+    Ok(locks)
+}
+
+/// **Every re-read admitted before any is read** (lost and retained alike; [`REREAD_BOUND`]): past
+/// the bound, their count and nothing read (the caller stops incomplete), never the first seven.
+fn admit(locks: &[Vec<Lock>], bound: usize) -> Result<Vec<Lock>, usize> {
+    let rereads: Vec<Lock> = locks.iter().flatten().filter(|lock| lock.reread()).cloned().collect();
+    if rereads.len() > bound { Err(rereads.len()) } else { Ok(rereads) }
+}
+
+/// **A re-read's paired factorial** at constitution 2 (the pin §2.3; the native order only): `N0D0`
+/// the decision's own at its lock (kept), `N1D0` the normalization alone (the decision's data over
+/// the release's mass), `N0D1` the entry alone (the release's data over the decision's mass), `N1D1`
+/// the release's own (the owner's persistence re-read at the terminal assignment).
+#[derive(Clone, Debug)]
+struct Factorial {
+    n0d0: Face,
+    n1d0: Face,
+    n0d1: Face,
+    n1d1: Face,
+}
+
+impl Factorial {
+    /// The four cells' marks, `N0D0 N1D0 N0D1 N1D1`, Fails and Undecided apart.
+    fn pattern(&self) -> String {
+        [&self.n0d0, &self.n1d0, &self.n0d1, &self.n1d1].map(Face::mark).concat()
+    }
+}
+
+/// A stop of the resumed read: its exit status and its reason.
+#[derive(Clone, Debug, PartialEq, Eq)]
+struct Halt {
+    status: i32,
+    reason: String,
+}
+
+/// What the resumed move printed: constitution 1's summary and move 1's line, and constitution 2's
+/// summary from the move's own reading of its adopted successor (`None` when it adopted none or its
+/// adopted trial holds no reading).
+struct Printed {
+    moved: [String; 2],
+    successor: Option<String>,
+}
+
+/// What the resumed read returns: the persistence reads at constitution 2 and every re-read with
+/// its factorial.
+struct Resumed {
+    tally: Tally,
+    rereads: Vec<(Lock, Factorial)>,
+}
+
+/// A station's lock face read at constitution 2: the lock (its request, station and target), the
+/// data entering, the mass the span is read over.
+type ReadFace<'a> = dyn Fn(&Lock, &[Option<usize>], &[Option<usize>]) -> Face + Sync + 'a;
+
+/// **The c2 diagnostic after the move, each step gated by the one before** (module header). Every
+/// fresh reading goes through `read`; steps 1–4 make none:
+/// 1. the move's two lines equal gate A's (masked);
+/// 2. constitution 2's reading, the move's own of its successor, equals gate A's;
+/// 3. the persistence reads' locks, solved and re-reads, from the kept contexts, equal gate A's at
+///    constitution 2;
+/// 4. the re-reads, lost and retained, are admitted within [`REREAD_BOUND`] (else incomplete);
+/// 5. each re-read is read at the release (`N1D1`, the owner's re-read), and its stay and fall must
+///    equal gate A's with none refused (the only readings made before the whole identity holds);
+/// 6. each re-read's normalization alone and entry alone are read (`N1D0`, `N0D1`).
+fn resumed(
+    receipt: &Receipt,
+    printed: &Printed,
+    locks: Option<&[Vec<Lock>]>,
+    read: &ReadFace<'_>,
+    log: &mut dyn FnMut(String),
+) -> Result<Resumed, Halt> {
+    let mismatch = |reason: String| Halt {
+        status: MISMATCH,
+        reason: format!("executed resume-coupling: identity: {reason}; stopped, nothing further read"),
+    };
+    for (found, want) in printed.moved.iter().zip(&receipt.moved) {
+        if masked(found) != masked(want) {
+            return Err(mismatch(format!("the move's line differs from gate A's (masked)\n  found: {found}\n  gate A: {want}")));
+        }
+    }
+    log("identity: constitution 1's reading and move 1's line equal gate A's (wall times and the persistence split masked)".to_string());
+    let Some(found) = &printed.successor else {
+        return Err(mismatch(
+            "the move adopted no successor, or holds no reading of it; gate A's move 1 adopted one and read it".to_string(),
+        ));
+    };
+    if masked(found) != masked(&receipt.successor) {
+        return Err(mismatch(format!(
+            "constitution 2's reading differs from gate A's (masked)\n  found: {found}\n  gate A: {}",
+            receipt.successor
+        )));
+    }
+    log("identity: constitution 2's reading (the move's own reading of its successor, reused) equals gate A's (the wall time masked)".to_string());
+    let Some(locks) = locks else {
+        return Err(mismatch("the move's own reading of its successor holds no release".to_string()));
+    };
+    let mut tally = Tally::default();
+    for lock in locks.iter().flatten() {
+        tally.locks += 1;
+        tally.solved += usize::from(lock.at_lock.holds());
+        tally.reread += usize::from(lock.reread());
+    }
+    let differ = tally.differing(&receipt.persistence, &["locks", "solved", "reread"]);
+    if !differ.is_empty() {
+        return Err(mismatch(format!("the native release's locks at constitution 2 (kept, no reading): {}", differ.join("; "))));
+    }
+    let rereads = admit(locks, REREAD_BOUND).map_err(|count| Halt {
+        status: INCOMPLETE,
+        reason: format!(
+            "executed resume-coupling: {count} re-reads at constitution 2, past the bound of {REREAD_BOUND}; refused as incomplete before any is read (never truncated)"
+        ),
+    })?;
+    log(format!("re-reads at constitution 2: {} within the bound of {REREAD_BOUND}, every one admitted before any is read", rereads.len()));
+    let started = Instant::now();
+    let n1d1: Vec<Face> = rereads.par_iter().map(|lock| read(lock, &lock.released, &lock.released)).collect();
+    for face in &n1d1 {
+        match face.solved() {
+            Some(Predicate::Holds) => tally.stay += 1,
+            Some(Predicate::Fails) => tally.reversed += 1,
+            Some(Predicate::Undecided) => tally.uncertified += 1,
+            None => tally.refused += 1,
+        }
+    }
+    log(format!("persistence at constitution 2: {tally}; the release re-reads {} ms", started.elapsed().as_millis()));
+    let mut differ = tally.differing(&receipt.persistence, &["stay", "fall", "reversed", "uncertified"]);
+    if tally.refused > 0 {
+        differ.push(format!("refused {}, which the owner's persistence read never returns", tally.refused));
+    }
+    if !differ.is_empty() {
+        return Err(mismatch(format!("the persistence reads at constitution 2: {}", differ.join("; "))));
+    }
+    log("identity: the persistence reads at constitution 2 equal gate A's (its move 2 line)".to_string());
+    let started = Instant::now();
+    let singles: Vec<(Face, Face)> = rereads
+        .par_iter()
+        .map(|lock| (read(lock, &lock.decision, &lock.released), read(lock, &lock.released, &lock.decision)))
+        .collect();
+    log(format!("the normalization and the entry alone: {} ms", started.elapsed().as_millis()));
+    let rereads = rereads
+        .into_iter()
+        .zip(n1d1)
+        .zip(singles)
+        .map(|((lock, n1d1), (n1d0, n0d1))| {
+            let factorial = Factorial { n0d0: lock.at_lock.clone(), n1d0, n0d1, n1d1 };
+            (lock, factorial)
+        })
+        .collect();
+    Ok(Resumed { tally, rereads })
+}
+
+/// **The capture, written before any diagnostic read** (Astra's review of the c2 consumer):
+/// constitution 2's complete continuing state (`c2.state`), and the native release's contexts the
+/// move read at it (`c2_contexts.txt`): every request's terminal assignment and every lock's
+/// refinement, class, decision section and its lock face at its own lock, exactly (`ℓ`'s endpoints,
+/// no cell). Unverified until the identity holds; the launcher stamps it only then.
+fn capture(
+    dir: &str,
+    successor: &Constitution,
+    ring: usize,
+    reading: &BatchComparison,
+    locks: &Result<Vec<Vec<Lock>>, String>,
+    targets: &[Vec<usize>],
+) -> std::io::Result<()> {
+    let state = format!("{dir}/c2.state");
+    let contexts = format!("{dir}/c2_contexts.txt");
+    let mut text = String::from(
+        "c2 contexts: the native release of constitution 2 as move 1 read its adopted successor (the trial's own release under the lock face at the decisions, reused); unverified until the identity checks of the run's listing pass\n",
+    );
+    for (q, request) in reading.requests.iter().enumerate() {
+        let release = request.generation.as_ref().map_or_else(
+            || "no release".to_string(),
+            |g| {
+                let mut terminal: Vec<Option<usize>> = vec![None; targets[q].len()];
+                for (station, class, ..) in &g.decisions {
+                    terminal[*station] = Some(*class);
+                }
+                format!(
+                    "{} {:?}, locks {:?}; terminal assignment {terminal:?}",
+                    if g.release.released() { "released" } else { "held" },
+                    g.release.classes,
+                    g.locks
+                )
+            },
+        );
+        text += &format!("request {q}: target {:?}; {release}; r* {:?}\n", targets[q], request.consistent);
+        if let Ok(locks) = locks {
+            for lock in &locks[q] {
+                let face = match &lock.at_lock {
+                    Face::Kept { value, solved } => format!("{} ℓ ∈ [{}, {}]", mark(*solved), value.lower, value.upper),
+                    other => other.show(),
+                };
+                text += &format!(
+                    "  station {}: locked {} at refinement {} with {:?}, later locks {:?}; decision section {:?}; at its own lock {face}\n",
+                    lock.station, lock.class, lock.refinement, lock.co, lock.later, lock.decision
+                );
+            }
+        }
+    }
+    if let Err(why) = locks {
+        text += &format!("the locks refused: {why}\n");
+    }
+    #[allow(clippy::disallowed_methods)]
+    std::fs::write(&state, write_state(successor, ring))?;
+    #[allow(clippy::disallowed_methods)]
+    std::fs::write(&contexts, text)?;
+    println!("capture: constitution 2's complete continuing state written to {state}, its native release's contexts to {contexts}, before any diagnostic read");
+    Ok(())
+}
+
+/// **The c2 diagnostic** (module header): `executed resume-coupling <terrain> <seed> <count> <c1
+/// state> <gate A's receipt> <the move's bound ms> <capture dir>`.
+#[allow(clippy::too_many_arguments)]
+pub(super) fn resume_coupling(
+    terrain: &str,
+    seed: u64,
+    count: usize,
+    state: &str,
+    receipt: &str,
+    move_bound: u128,
+    capture_dir: &str,
+) {
+    let clock = Instant::now();
+    let declared = order_declared();
+    let engine = Engine::new(declared);
+    let bank = bank_of(declared.period, &bank_strength());
+    let ring = engine.refinement.ring();
+    let alphabet = engine.field.alphabet();
+    let stations = declared.stations;
+    let pairs = terrain_pairs(terrain, &declared, seed, count);
+    let requests = open_requests(&engine, &pairs);
+    let targets: Vec<Vec<usize>> = pairs.iter().map(|(_, t)| t.clone()).collect();
+    println!(
+        "executed resume-coupling: {count} {terrain} requests at development seed {seed}; gate A's constitution 1 restored whole, one native update taken (the lock face at the decisions, every commit guard) on the batch gate A's move 1 read; its lines and constitution 2's reading checked against gate A's receipt; constitution 2 and its native release's contexts captured before any diagnostic read; then every re-read at constitution 2 (lost and retained, at most {REREAD_BOUND}) at its own lock (kept) and at the release, with its normalization and its entry alone; the native order only; the move's bound {move_bound} ms; {} threads",
+        rayon::current_num_threads()
+    );
+    let read_text = |what: &str, path: &str| -> String {
+        #[allow(clippy::disallowed_methods)]
+        std::fs::read_to_string(path)
+            .unwrap_or_else(|error| stop(REFUSED, &format!("executed resume-coupling: {what} ({path}) refused: unreadable ({error})")))
+    };
+    let (theta, expected) = resume_inputs(&engine, ring, &read_text("constitution 1", state), &read_text("gate A's receipt", receipt))
+        .unwrap_or_else(|why| stop(REFUSED, &format!("executed resume-coupling: refused before the move: {why}")));
+    println!("constitution 1: {state} restored whole onto the declared opening; written back identical to its file");
+    // The one native update, watched: past its bound the run stops then, incomplete.
+    let started = Instant::now();
+    let bound = Duration::from_millis(u64::try_from(move_bound).unwrap_or(u64::MAX));
+    let watch = Watch::start(bound, move || {
+        stop(
+            INCOMPLETE,
+            &format!("executed resume-coupling: the move passed its bound of {move_bound} ms before it ended; stopped incomplete, nothing after it read (the projection's error, reported as such); resident {}", resident()),
+        )
+    });
+    let moved = executed_move(&engine.field, &theta, &requests, &engine.refinement, &bank, BANK_GRAIN, Comparison::LOCK_DECISIONS);
+    watch.end();
+    let move_ms = started.elapsed().as_millis();
+    if move_ms > move_bound {
+        stop(INCOMPLETE, &format!("executed resume-coupling: the move took {move_ms} ms, past its bound of {move_bound} ms; stopped incomplete, nothing after it read"));
+    }
+    let moved = moved.unwrap_or_else(|error| stop(REFUSED, &format!("executed resume-coupling: the move refused its reading ({error})")));
+    let (c1_line, ..) = summary_line("constitution 1 (before move 1)", &theta, &moved.before, &targets, stations, move_ms);
+    let move_1 = move_line(1, &moved, move_ms);
+    println!("{c1_line}");
+    println!("{move_1}");
+    // The move's own reading of its adopted successor: the adopted trial's release, reused.
+    let own = moved.adopted.as_ref().and_then(|(successor, _)| {
+        moved
+            .trials
+            .iter()
+            .rev()
+            .find(|trial| trial.refusal.is_none())
+            .and_then(|trial| trial.after.as_ref())
+            .map(|reading| (successor, reading))
+    });
+    let c2_line = own.map(|(successor, reading)| summary_line("constitution 2 (before move 2)", successor, reading, &targets, stations, move_ms).0);
+    if let Some(line) = &c2_line {
+        println!("{line}");
+        println!("    (constitution 2's reading is the move's own reading of its adopted successor, reused: no reading made)");
+    }
+    let locks: Option<Result<Vec<Vec<Lock>>, String>> = own.map(|(_, reading)| {
+        reading
+            .requests
+            .iter()
+            .enumerate()
+            .map(|(q, request)| locks_of(q, request, &targets[q], stations))
+            .collect()
+    });
+    // Capture first: nothing the diagnostic reads below can lose constitution 2 or its contexts.
+    if let (Some((successor, reading)), Some(locks)) = (own, &locks) {
+        capture(capture_dir, successor, ring, reading, locks, &targets)
+            .unwrap_or_else(|error| stop(REFUSED, &format!("executed resume-coupling: the capture could not be written to {capture_dir} ({error})")));
+    }
+    let locks = match locks {
+        Some(Err(why)) => stop(REFUSED, &format!("executed resume-coupling: the move's own reading of its successor refused as contexts: {why}")),
+        Some(Ok(locks)) => Some(locks),
+        None => None,
+    };
+    // Every fresh reading at constitution 2 through one function; each request's placement made
+    // on its first reading, none before the move's lines, constitution 2's reading and the kept
+    // part of the tuple hold.
+    let successor = own.map(|(successor, _)| successor);
+    let placements: Vec<OnceLock<Result<BankPlacement, String>>> = requests.iter().map(|_| OnceLock::new()).collect();
+    let read = |lock: &Lock, data: &[Option<usize>], mass: &[Option<usize>]| -> Face {
+        let Some(successor) = successor else {
+            return Face::Refused("no successor".to_string());
+        };
+        let request = &requests[lock.request];
+        let placement = placements[lock.request].get_or_init(|| {
+            BankPlacement::of(&engine.field, successor, &request.current, &request.moment, &engine.refinement).map_err(|error| error.to_string())
+        });
+        match placement {
+            Ok(placement) => read_face(placement, &bank, alphabet, lock.station, data, mass, lock.target),
+            Err(why) => Face::Refused(format!("the placement at constitution 2 refused ({why})")),
+        }
+    };
+    let reads_started = Instant::now();
+    let start_readings = READINGS.load(Ordering::Relaxed);
+    let printed = Printed { moved: [c1_line, move_1], successor: c2_line };
+    let mut log = |line: String| println!("  {line}");
+    let resumed = resumed(&expected, &printed, locks.as_deref(), &read, &mut log).unwrap_or_else(|halt| stop(halt.status, &halt.reason));
+    let reads_ms = reads_started.elapsed().as_millis();
+    // Every re-read whole: its lock, its status at the release, its four cells and the contrasts in
+    // both orders with the interaction; nothing named a cause.
+    let mut patterns: BTreeMap<(&'static str, String), usize> = BTreeMap::new();
+    for (lock, factorial) in &resumed.rereads {
+        let status = match factorial.n1d1.solved() {
+            Some(Predicate::Holds) => "retained",
+            Some(Predicate::Fails) => "lost, reversed",
+            Some(Predicate::Undecided) => "lost, uncertified",
+            None => "refused",
+        };
+        *patterns.entry((status, factorial.pattern())).or_default() += 1;
+        println!(
+            "  re-read: request {} station {} (target {}): locked {} at refinement {} with {:?}, later locks {:?} at classes {:?}; {status}; factorial (N0D0, N1D0, N0D1, N1D1) ({}, {}, {}, {}): N0D0 (kept) {}, N1D0 {}, N0D1 {}, N1D1 {}; {}",
+            lock.request,
+            lock.station,
+            lock.target,
+            lock.class,
+            lock.refinement,
+            lock.co,
+            lock.later,
+            lock.later.iter().map(|&k| lock.released[k]).collect::<Vec<_>>(),
+            factorial.n0d0.mark(),
+            factorial.n1d0.mark(),
+            factorial.n0d1.mark(),
+            factorial.n1d1.mark(),
+            factorial.n0d0.show(),
+            factorial.n1d0.show(),
+            factorial.n0d1.show(),
+            factorial.n1d1.show(),
+            contrasts_of(&factorial.n0d0, &factorial.n1d0, &factorial.n0d1, &factorial.n1d1)
+                .unwrap_or_else(|| "contrasts refused".to_string())
+        );
+    }
+    let t = &resumed.tally;
+    println!(
+        "  re-reads {}: retained {}, lost {} (reversed {}, uncertified {}), refused {}",
+        resumed.rereads.len(),
+        t.stay,
+        t.fall(),
+        t.reversed,
+        t.uncertified,
+        t.refused
+    );
+    for ((status, pattern), n) in &patterns {
+        println!("  pattern (N0D0 N1D0 N0D1 N1D1) {pattern}, {status}: {n}");
+    }
+    let made = READINGS.load(Ordering::Relaxed) - start_readings;
+    println!(
+        "executed resume-coupling: complete; the move {move_ms} ms of its bound {move_bound} ms; the reads at constitution 2 {reads_ms} ms; {made} turn readings made after the move, {} kept from the move's own reading (each re-read's lock face at its own lock: {} re-reads of {alphabet} candidates); {} ms; resident {}",
+        resumed.rereads.len() * alphabet,
+        resumed.rereads.len(),
+        clock.elapsed().as_millis(),
+        resident()
+    );
+}
+
+// -------------------------------------------------------------------------------------------
 // the fail-closed repairs' negative tests (Astra's review of `722c3334`), each with its positive
 // control: `cargo test -p holonics --example hnn_prediction`
 
@@ -1563,5 +2283,297 @@ mod tests {
         text += &format!("rho {}\n", opening.transport(ring));
         let refused = remount_partial(&engine, ring, &text).expect_err("past the entry bound");
         assert!(refused.contains("entry box"), "{refused}");
+    }
+
+    // ---------------------------------------------------------------------------------------
+    // the c2 diagnostic (`executed resume-coupling`): synthetic locks and readings stand in for the
+    // move and the turn readings, so nothing here takes the move or reads constitution 2; gate A's
+    // receipt and saved state are read as files only.
+
+    /// Gate A's printed receipt (`witness.txt`).
+    fn gate_a_receipt() -> String {
+        let path = concat!(
+            env!("CARGO_MANIFEST_DIR"),
+            "/../../research/records/2026-09-30_STEP_1B_GATE_A_receipts/witness.txt"
+        );
+        #[allow(clippy::disallowed_methods)]
+        std::fs::read_to_string(path).expect("gate A's receipt")
+    }
+
+    fn read_at(solved: Predicate, value: i64) -> Face {
+        let zero = ExactInterval::point(Rat::zero());
+        Face::Read(LockFace {
+            value: ExactInterval::point(Rat::from_integer(value.into())),
+            solved,
+            above: false,
+            shares: Vec::new(),
+            excess: zero,
+        })
+    }
+
+    /// 8 requests of 8 stations, one lock a refinement from station 7 down (gate A's constitution 1
+    /// listing), so station `j` has later locks `j − 1 … 0`; solved at its own lock where `solved`.
+    fn locks_with(solved: impl Fn(usize, usize) -> bool) -> Vec<Vec<Lock>> {
+        (0..8)
+            .map(|q| {
+                (0..8)
+                    .map(|j| {
+                        let mut released = vec![Some(1); 8];
+                        released[j] = None;
+                        let at = if solved(q, j) { Predicate::Holds } else { Predicate::Fails };
+                        Lock {
+                            request: q,
+                            station: j,
+                            target: 1,
+                            refinement: 7 - j,
+                            class: 1,
+                            co: Vec::new(),
+                            later: (0..j).rev().collect(),
+                            decision: (0..8).map(|s| (s > j).then_some(1)).collect(),
+                            released,
+                            at_lock: Face::Kept { value: ExactInterval::point(Rat::from_integer(1.into())), solved: at },
+                        }
+                    })
+                    .collect()
+            })
+            .collect()
+    }
+
+    /// Gate A's constitution 2 in synthetic form: 64 locks, 7 solved at their own lock, each with
+    /// later locks (requests 0–6, station 1).
+    fn gate_a_locks() -> Vec<Vec<Lock>> {
+        locks_with(|q, j| q < 7 && j == 1)
+    }
+
+    /// What the resumed move prints when it reproduces gate A: the receipt's lines with other wall
+    /// times and the persistence split beside `fall`.
+    fn reproduced(receipt: &Receipt) -> Printed {
+        let retimed = |line: &str| format!("{}; 1 ms", masked(line));
+        Printed {
+            moved: [retimed(&receipt.moved[0]), retimed(&receipt.moved[1]).replace(" }; ", ", reversed: 0, uncertified: 0 }; ")],
+            successor: Some(retimed(&receipt.successor)),
+        }
+    }
+
+    /// Which cell a synthetic reading was asked for.
+    #[derive(Clone, Copy, Debug, PartialEq, Eq, PartialOrd, Ord)]
+    enum Cell {
+        N1D0,
+        N0D1,
+        N1D1,
+    }
+
+    /// A synthetic reader: at the release (`N1D1`) requests 0–3 stay solved, 4 and 6 fail, 5 is
+    /// undecided (gate A's `stay 4, fall 3`); the normalization alone fails for request 0 (a retained
+    /// re-read the entry compensates) and the entry alone is undecided for request 4. Every call is
+    /// logged by its request, station and cell.
+    struct Reader {
+        calls: std::sync::Mutex<Vec<(usize, usize, Cell)>>,
+        refuse: Option<usize>,
+    }
+
+    impl Reader {
+        fn new() -> Self {
+            Reader { calls: std::sync::Mutex::new(Vec::new()), refuse: None }
+        }
+
+        fn read(&self, lock: &Lock, data: &[Option<usize>], mass: &[Option<usize>]) -> Face {
+            let cell = match (data == lock.released.as_slice(), mass == lock.released.as_slice()) {
+                (true, true) => Cell::N1D1,
+                (false, true) if data == lock.decision.as_slice() => Cell::N1D0,
+                (true, false) if mass == lock.decision.as_slice() => Cell::N0D1,
+                _ => panic!("a reading at no declared cell"),
+            };
+            self.calls.lock().expect("calls").push((lock.request, lock.station, cell));
+            let q = lock.request;
+            match cell {
+                Cell::N1D1 if self.refuse == Some(q) => Face::Refused("a synthetic refusal".to_string()),
+                Cell::N1D1 if q < 4 => read_at(Predicate::Holds, 0),
+                Cell::N1D1 if q == 5 => read_at(Predicate::Undecided, 2),
+                Cell::N1D1 => read_at(Predicate::Fails, 3),
+                Cell::N1D0 if q == 0 => read_at(Predicate::Fails, 4),
+                Cell::N0D1 if q == 4 => read_at(Predicate::Undecided, 5),
+                _ => read_at(Predicate::Holds, -1),
+            }
+        }
+
+        fn calls(&self) -> Vec<(usize, usize, Cell)> {
+            let mut calls = self.calls.lock().expect("calls").clone();
+            calls.sort();
+            calls
+        }
+    }
+
+    fn resume_with(receipt: &Receipt, printed: &Printed, locks: Option<&[Vec<Lock>]>, reader: &Reader) -> Result<Resumed, Halt> {
+        let read = |lock: &Lock, data: &[Option<usize>], mass: &[Option<usize>]| reader.read(lock, data, mass);
+        resumed(receipt, printed, locks, &read, &mut |_| {})
+    }
+
+    #[test]
+    fn a_malformed_c1_state_is_refused_before_the_move() {
+        let engine = Engine::new(order_declared());
+        let ring = engine.refinement.ring();
+        let (state, receipt) = (gate_a_state(), gate_a_receipt());
+        // Positive control: gate A's saved state restores whole, and its receipt reads constitution
+        // 2's persistence reads `locks 64, solved 7, reread 7, stay 4, fall 3`.
+        let (_, read) = resume_inputs(&engine, ring, &state, &receipt).expect("gate A's state and receipt");
+        let tuple: Vec<usize> = TUPLE.iter().map(|field| read.persistence[*field]).collect();
+        assert_eq!(tuple, vec![64, 7, 7, 4, 3]);
+        assert!(read.moved[1].starts_with("    move 1: adopted at step 1/2; "));
+        // Truncated after `rho` (E and ρ intact): refused, never remounted partially.
+        let rho = state.lines().position(|line| line.starts_with("rho ")).expect("rho");
+        let truncated: String = state.lines().take(rho + 1).map(|line| format!("{line}\n")).collect();
+        let refused = resume_inputs(&engine, ring, &truncated, &receipt).expect_err("a truncated state");
+        assert!(refused.contains("not a complete continuing state"), "{refused}");
+        assert!(refused.contains("never read as a partial remount"), "{refused}");
+        // Off its written form: parses, does not write back to its own text.
+        let edited = state.replace("\nclock ", "\nclock 0");
+        let refused = resume_inputs(&engine, ring, &edited, &receipt).expect_err("a state off its written form");
+        assert!(refused.contains("written back differs"), "{refused}");
+        // A receipt without move 2's line (constitution 2's persistence reads) is refused too.
+        let without: String = receipt.lines().filter(|line| !line.starts_with(RECEIPT_MOVE_2)).map(|line| format!("{line}\n")).collect();
+        let refused = resume_inputs(&engine, ring, &state, &without).expect_err("no move 2 line");
+        assert!(refused.contains("no line `move 2: …`"), "{refused}");
+    }
+
+    #[test]
+    fn an_identity_mismatch_stops_before_any_reading_of_constitution_2() {
+        let receipt = Receipt::read(&gate_a_receipt()).expect("gate A's receipt");
+        let locks = gate_a_locks();
+        // The move's line perturbed (another step): stopped, nothing read.
+        let mut printed = reproduced(&receipt);
+        printed.moved[1] = printed.moved[1].replace("adopted at step 1/2", "adopted at step 1/4");
+        let reader = Reader::new();
+        let halt = resume_with(&receipt, &printed, Some(&locks), &reader).err().expect("a perturbed move line");
+        assert_eq!(halt.status, MISMATCH);
+        assert!(reader.calls().is_empty());
+        // Constitution 1's reading perturbed, constitution 2's perturbed, or no successor: the same.
+        for perturb in [0, 1, 2] {
+            let mut printed = reproduced(&receipt);
+            match perturb {
+                0 => printed.moved[0] = printed.moved[0].replace("solved 7 of 64", "solved 8 of 64"),
+                1 => printed.successor = printed.successor.map(|line| line.replace("solved 1 of 64", "solved 2 of 64")),
+                _ => printed.successor = None,
+            }
+            let reader = Reader::new();
+            let halt = resume_with(&receipt, &printed, Some(&locks), &reader).err().expect("a perturbed line");
+            assert_eq!(halt.status, MISMATCH, "{perturb}");
+            assert!(reader.calls().is_empty(), "{perturb}");
+        }
+        // The tuple perturbed in its kept part (gate A's re-reads 8): stopped before any reading.
+        let printed = reproduced(&receipt);
+        let mut tuple = receipt.clone();
+        tuple.persistence.insert("reread".to_string(), 8);
+        let reader = Reader::new();
+        let halt = resume_with(&tuple, &printed, Some(&locks), &reader).err().expect("a perturbed reread");
+        assert_eq!(halt.status, MISMATCH);
+        assert!(halt.reason.contains("reread 7, gate A's 8"), "{}", halt.reason);
+        assert!(reader.calls().is_empty());
+        // The tuple perturbed in its read part (stay 5, fall 2): only the release re-reads are made,
+        // the normalization and the entry are never read.
+        let mut tuple = receipt.clone();
+        tuple.persistence.insert("stay".to_string(), 5);
+        tuple.persistence.insert("fall".to_string(), 2);
+        let reader = Reader::new();
+        let halt = resume_with(&tuple, &printed, Some(&locks), &reader).err().expect("a perturbed stay");
+        assert_eq!(halt.status, MISMATCH);
+        assert!(halt.reason.contains("stay 4, gate A's 5"), "{}", halt.reason);
+        let calls = reader.calls();
+        assert_eq!(calls.len(), 7);
+        assert!(calls.iter().all(|&(_, _, cell)| cell == Cell::N1D1));
+        // Positive control: the reproduced lines (other wall times, the split printed) pass.
+        let reader = Reader::new();
+        assert!(resume_with(&receipt, &printed, Some(&locks), &reader).is_ok());
+    }
+
+    #[test]
+    fn more_than_seven_rereads_is_refused_as_incomplete() {
+        let receipt = Receipt::read(&gate_a_receipt()).expect("gate A's receipt");
+        let printed = reproduced(&receipt);
+        // Eight re-reads, the receipt made to agree so the bound alone decides.
+        let eight = locks_with(|q, j| j == 1 && q < 8);
+        let mut agreeing = receipt.clone();
+        agreeing.persistence.insert("solved".to_string(), 8);
+        agreeing.persistence.insert("reread".to_string(), 8);
+        assert_eq!(admit(&eight, REREAD_BOUND).err(), Some(8), "refused whole, never the first seven");
+        let reader = Reader::new();
+        let halt = resume_with(&agreeing, &printed, Some(&eight), &reader).err().expect("past the bound");
+        assert_eq!(halt.status, INCOMPLETE);
+        assert!(halt.reason.contains("8 re-reads at constitution 2, past the bound of 7"), "{}", halt.reason);
+        assert!(reader.calls().is_empty(), "nothing read past the bound");
+        // Positive control: seven, the lost and the retained alike, are admitted.
+        let seven = admit(&gate_a_locks(), REREAD_BOUND).expect("seven within the bound");
+        assert_eq!(seven.len(), REREAD_BOUND);
+        // A solved lock with no later lock (station 0 locks last) is no re-read.
+        let last = locks_with(|_, j| j == 0);
+        assert_eq!(admit(&last, REREAD_BOUND).map(|r| r.len()), Ok(0));
+    }
+
+    #[test]
+    fn the_factorial_is_read_for_lost_and_retained_rereads() {
+        let receipt = Receipt::read(&gate_a_receipt()).expect("gate A's receipt");
+        let locks = gate_a_locks();
+        let reader = Reader::new();
+        let read = resume_with(&receipt, &reproduced(&receipt), Some(&locks), &reader).ok().expect("gate A's c2 in synthetic form");
+        assert_eq!(read.rereads.len(), 7);
+        // Every re-read, retained (requests 0–3) and lost (4–6), read at the release and at its
+        // normalization and its entry alone: three cells each, and nothing else read.
+        let mut expected: Vec<(usize, usize, Cell)> = (0..7).flat_map(|q| [Cell::N1D0, Cell::N0D1, Cell::N1D1].map(|c| (q, 1, c))).collect();
+        expected.sort();
+        assert_eq!(reader.calls(), expected);
+        for (lock, factorial) in &read.rereads {
+            // N0D0 is the lock face the move kept, never read again.
+            assert!(matches!(factorial.n0d0, Face::Kept { solved: Predicate::Holds, .. }), "{lock:?}");
+            for cell in [&factorial.n1d0, &factorial.n0d1, &factorial.n1d1] {
+                assert!(matches!(cell, Face::Read(_)), "{lock:?}");
+            }
+            assert!(contrasts_of(&factorial.n0d0, &factorial.n1d0, &factorial.n0d1, &factorial.n1d1).is_some_and(|c| c.contains("interaction")));
+        }
+        // The retained re-read whose normalization alone fails while the release holds (a
+        // compensation control) keeps its whole pattern.
+        let retained = read.rereads.iter().find(|(lock, _)| lock.request == 0).expect("request 0");
+        assert_eq!(retained.1.pattern(), "HFHH");
+        // The interaction enclosed exactly: ℓ₁₁ − ℓ₁₀ − ℓ₀₁ + ℓ₀₀ = 0 − 4 − (−1) + 1 = −2.
+        let contrasts = contrasts_of(&retained.1.n0d0, &retained.1.n1d0, &retained.1.n0d1, &retained.1.n1d1).expect("contrasts");
+        assert!(contrasts.ends_with("interaction [-131072/65536, -131071/65536)"), "{contrasts}");
+    }
+
+    #[test]
+    fn fails_and_undecided_are_counted_apart() {
+        let receipt = Receipt::read(&gate_a_receipt()).expect("gate A's receipt");
+        let locks = gate_a_locks();
+        let read = resume_with(&receipt, &reproduced(&receipt), Some(&locks), &Reader::new()).ok().expect("gate A's c2 in synthetic form");
+        let t = read.tally;
+        assert_eq!((t.locks, t.solved, t.reread, t.stay), (64, 7, 7, 4));
+        assert_eq!((t.reversed, t.uncertified, t.refused, t.fall()), (2, 1, 0, 3));
+        assert_eq!(
+            t.to_string(),
+            "Persistence { locks: 64, solved: 7, reread: 7, stay: 4, fall: 3, reversed: 2, uncertified: 1 }; refused 0"
+        );
+        // The lost re-reads keep their own marks: a failing and an undecided release are patterns apart.
+        let pattern = |q: usize| read.rereads.iter().find(|(lock, _)| lock.request == q).expect("a re-read").1.pattern();
+        assert_eq!(pattern(4), "HHUF");
+        assert_eq!(pattern(5), "HHHU");
+        assert_eq!(pattern(6), "HHHF");
+        // A refused reading at the release is neither: counted refused, and refused by the identity
+        // (the owner's read never returns one), before the normalization and the entry are read.
+        let reader = Reader { refuse: Some(6), ..Reader::new() };
+        let halt = resume_with(&receipt, &reproduced(&receipt), Some(&locks), &reader).err().expect("a refused re-read");
+        assert_eq!(halt.status, MISMATCH);
+        assert!(halt.reason.contains("fall 2, gate A's 3") && halt.reason.contains("refused 1"), "{}", halt.reason);
+        assert!(reader.calls().iter().all(|&(_, _, cell)| cell == Cell::N1D1));
+    }
+
+    #[test]
+    fn the_move_past_its_bound_stops_the_run() {
+        // Past its bound the guard calls the stop (the harness's stops the process incomplete).
+        let (fired, heard) = mpsc::channel();
+        let watch = Watch::start(Duration::from_millis(10), move || fired.send(()).expect("heard"));
+        assert!(heard.recv_timeout(Duration::from_secs(10)).is_ok());
+        watch.end();
+        // Positive control: a unit ended within its bound calls nothing.
+        let (fired, heard) = mpsc::channel();
+        Watch::start(Duration::from_secs(600), move || fired.send(()).expect("heard")).end();
+        assert!(heard.try_recv().is_err());
     }
 }

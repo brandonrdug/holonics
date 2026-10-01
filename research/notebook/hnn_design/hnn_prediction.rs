@@ -16,6 +16,7 @@
 //! cargo run --release -p holonics --example hnn_prediction -- executed replay <terrain> <seed> <count> <label=state>…
 //! cargo run --release -p holonics --example hnn_prediction -- executed coupling <terrain> <seed> <count> <deadline ms> <label=state|label=opening>…
 //! cargo run --release -p holonics --example hnn_prediction -- executed represent <terrain> <seed> <count> <iterates> <deadline ms> <out> [<held-out seed>]
+//! cargo run --release -p holonics --example hnn_prediction -- executed resume-coupling <terrain> <seed> <count> <c1 state> <gate A receipt> <move bound ms> <capture dir>
 //! cargo run --release -p holonics --example hnn_prediction -- executed causal <terrain> <seed> <count> <label[=E]>…
 //! ```
 //!
@@ -341,6 +342,17 @@ fn main() {
             arguments[6].parse().expect("a deadline in ms"),
             &arguments[7..],
         ),
+        // Loop 1c's c2 diagnostic: gate A's saved constitution 1 resumed by one native update, its
+        // identity checked against gate A's receipt, then the re-reads at constitution 2.
+        (Some("executed"), Some("resume-coupling")) => loop_1c::resume_coupling(
+            &arguments[3],
+            arguments[4].parse().expect("a seed"),
+            arguments[5].parse().expect("a count"),
+            &arguments[6],
+            &arguments[7],
+            arguments[8].parse().expect("the move's bound in ms"),
+            &arguments[9],
+        ),
         (Some("executed"), Some("represent")) => loop_1c::represent(
             &arguments[3],
             arguments[4].parse().expect("a seed"),
@@ -368,7 +380,7 @@ fn main() {
             &arguments[8],
         ),
         _ => panic!(
-            "executed move <seed> <requests> | train <arm> <terrain> <seed> <batch> <moves> <deadline ms> <out> | evaluate <terrain> <seed> <count> <out> <label[=E]>… | spread <terrain> <seed> <count> <label[=E]>… | slopes <terrain> <seed> <count> <label[=E]>… | counts <terrain> <training seed> <count> <validation seed> <count> <out> | witness <terrain> <seed> <count> <moves> <deadline ms> <out> [<states dir>] | causal <terrain> <seed> <count> <label[=E]>… | restore <label=state>… | replay <terrain> <seed> <count> <label=state|label=partial:file>… | coupling <terrain> <seed> <count> <deadline ms> <label=state|label=partial:file|label=opening>… | represent <terrain> <seed> <count> <iterates> <deadline ms> <out> [<held-out seed>]"
+            "executed move <seed> <requests> | train <arm> <terrain> <seed> <batch> <moves> <deadline ms> <out> | evaluate <terrain> <seed> <count> <out> <label[=E]>… | spread <terrain> <seed> <count> <label[=E]>… | slopes <terrain> <seed> <count> <label[=E]>… | counts <terrain> <training seed> <count> <validation seed> <count> <out> | witness <terrain> <seed> <count> <moves> <deadline ms> <out> [<states dir>] | causal <terrain> <seed> <count> <label[=E]>… | restore <label=state>… | replay <terrain> <seed> <count> <label=state|label=partial:file>… | coupling <terrain> <seed> <count> <deadline ms> <label=state|label=partial:file|label=opening>… | represent <terrain> <seed> <count> <iterates> <deadline ms> <out> [<held-out seed>] | resume-coupling <terrain> <seed> <count> <c1 state> <gate A receipt> <move bound ms> <capture dir>"
         ),
     }
 }
