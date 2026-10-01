@@ -1,0 +1,2 @@
+executed coupling: 8 order2 requests at seed 2026093061; at each constitution the release under the orders ["gap (native)", "ascending", "descending"], every station at its lock, at the release and at its decision term, the landing factorial, the native events' lattices, and the earlier constitutions' solved stations re-read in their fixed contexts; deadline 120000 ms; 12 threads
+constitution 1: the restored state written back is identical to its file
