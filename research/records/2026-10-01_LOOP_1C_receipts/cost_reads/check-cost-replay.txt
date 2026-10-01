@@ -1,0 +1,1 @@
+the restored state's reading matches gate A's receipt (1 summary line, 72 term lines), and the state writes back to its file

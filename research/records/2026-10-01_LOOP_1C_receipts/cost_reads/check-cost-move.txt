@@ -1,0 +1,1 @@
+gate A's first move replays exactly: 3 lines, and constitution 1's complete continuing state is byte-identical to gate A's saved state

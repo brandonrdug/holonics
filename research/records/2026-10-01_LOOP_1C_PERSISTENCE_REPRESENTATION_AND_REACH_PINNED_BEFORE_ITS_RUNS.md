@@ -3,7 +3,7 @@
 **Date.** October 1 (written September 30). **Issues.** #73, #148, #63 (THE_REBUILD U6, step 1,
 loop 1c); #62. **Grade.** [definition; agent-inferred] for the experiments, their factors, the
 search, the alignment, the budgets and the schedule; [measured] for the development cost reads
-(§6.1) only; [proved-derived; formal-checked] for the Lean statements named in
+(§6.1, re-measured in §6.1′) only; [proved-derived; formal-checked] for the Lean statements named in
 §7; owed (#62) as §7 states. **No run of loop 1c's experiments has been made.** GPT-6 Astra reviews
 this pin before anything runs.
 
@@ -340,6 +340,99 @@ gate A's printed output, and the coupling and fit reads run on gate A's timing s
 The coupling read's first form read the three orders one after another; reading them as co-present
 regions (one placement, one output each) took the constitution from 113,417 to 76,525 ms with the
 listing unchanged, and that form is the one projected.
+
+### 6.1′ The reads re-measured, with their logs committed [measured]
+
+**Why they were re-run.** The first reads' logs were kept in the pin worker's untracked `.local/` and
+were deleted with its worktree, so Astra could not inspect them.
+
+**How they were run.** On October 1 (written September 30) the reads were re-run through the
+fail-closed launcher (the amendment at the end of this record):
+- the same commands, seeds and thread counts, on this host, with no other worker's run beside them;
+- each in the background under its unchanged outer guard, in the pin's order;
+- in all 571,233 ms against a projection of 715,476 (the sum of the first reads).
+
+`cost-split` now runs the whole measured schedule: the move at 12 threads beside the fit at 7, then,
+when the move ends, the coupling read at 12 beside the continuing fit. The binary was the patch's
+build. One later one-line fix (the iterate-level label counts the declared 64 terms) changes no
+reading.
+
+**Where the logs are.** Every run's stdout, stderr and timing receipt is in
+[`2026-10-01_LOOP_1C_receipts/cost_reads/`](2026-10-01_LOOP_1C_receipts/cost_reads/), with output paths
+written `<out>`. The directory also holds the checks' outputs and the driver's step lines.
+
+**The reproductions hold again.**
+- `cost-replay` reproduces gate A's summary line and its 72 term lines, and writes the state back
+  to its own file.
+- `cost-move` reproduces gate A's three lines and `c1.state` byte for byte. The move at 12 threads
+  does the same.
+- Both coupling reads give the native `Persistence { locks: 64, solved: 6, reread: 6, stay: 1,
+  fall: 5 }` and 4 of 64 decision terms, with 5 events, within the bound of 6. Their 794-line
+  listings at 19 and at 12 threads are identical but for the milliseconds, the thread count and the
+  resident set.
+- The fit's iterate adopted its first trial at `η = 1`, so it read one trial where the first read
+  had three.
+
+| Run | Threads | Outer guard (s) | Projected: the first read's wall (ms) | Measured wall (ms) | Measured / projected | Peak resident (bytes) |
+|---|---|---|---|---|---|---|
+| `cost-replay` | 19 | 600 | 38,982 | 39,418 | 39,418/38,982 | 97,460,224 |
+| `cost-move` | 19 | 900 | 154,921 | 154,071 | 154,071/154,921 | 189,124,608 |
+| `cost-coupling` | 19 | 1,800 | 76,567 | 76,412 | 76,412/76,567 | 76,439,552 |
+| `cost-split`: the move | 12 | 900 | 199,296 | 204,729 | 204,729/199,296 | 181,084,160 |
+| `cost-split`: the fit | 7 | 2,400 | 445,006 | 288,391 | 288,391/445,006 | 152,788,992 |
+| `cost-split`: the coupling beside the fit | 12 | 1,800 | 113,489 | 96,530 | 96,530/113,489 | 70,651,904 |
+
+| Read | First read (ms) | Re-measured (ms) | Re-measured − first (ms) |
+|---|---|---|---|
+| `cost-replay`: the restore and one release read (the harness's own) | 38,939 | 39,410 | +471 |
+| `cost-move`: move 0, 19 threads | 115,542 | 115,164 | −378 |
+| `cost-move`: constitution 1's read, 19 threads | 39,316 | 38,850 | −466 |
+| `cost-coupling`: releases and stations, 6,840 readings, 19 threads | 64,808 | 64,732 | −76 |
+| `cost-coupling`: events, 2,865 readings, 19 threads | 11,321 | 11,236 | −85 |
+| `cost-split`: move 0 at 12 | 154,771 | 159,075 | +4,304 |
+| `cost-split`: constitution 1's read at 12 | 44,458 | 45,592 | +1,134 |
+| `cost-split`: the fit's gradients at 7 | 83,271 | 81,083 | −2,188 |
+| `cost-split`: the Gram and the step | 18,894 | 20,610 | +1,716 |
+| `cost-split`: trial 0 (the slowest of the first read's three: 93,424) | 93,424 | 91,802 | −1,622 |
+| `cost-split`: the iterate | 363,939 | 193,501 | one trial read, not three |
+| `cost-split`: the fit's last read (the run's ms less the iterate's) | 81,014 | 94,874 | +13,860 |
+| `cost-split`: releases and stations at 12, beside the fit | 95,349 | 82,983 | −12,366 |
+| `cost-split`: events at 12, beside the fit | 17,667 | 13,093 | −4,574 |
+
+**§6.2's units recomputed from these rates** by §6.2's own formulas (each a ceiling of an exact
+ratio):
+
+| Unit | Pinned upper (ms) | From the re-measured rates (ms) | Within the pinned bound |
+|---|---|---|---|
+| `exp-replay`'s move, `211,948 · 159,075/109,917` | 298,438 | 306,738 | **no, by 8,300** |
+| the replay's last read; `check-witness`'s fresh read (constitution 1's read at 12) | 44,458 | 45,592 | **no, by 1,134** |
+| `exp-coupling`'s constitution 0 (and `check-witness`'s coupling read) | 126,822 | 106,956 | yes |
+| `exp-coupling`'s constitution 16 | 189,967 | 153,753 | yes |
+| `exp-represent`'s iterate (the gradients, the Gram, eight trials at the slowest read) | 849,557 | 836,109 | yes |
+| `exp-represent`'s last read and scope read | 81,014 | 94,874 | **no, by 13,860** |
+| reach's constitution (640 readings) | 8,922 | 7,765 | yes |
+| reach's gauge (15 rotations of 320 readings) | 66,912 | 58,234 | yes |
+
+**Past the pinned bounds.** These are reported here only: no deadline, guard or budget is raised,
+and the primary decides.
+- **`exp-replay`.**
+  - Its upper projection becomes `16 · 306,738 + 45,592 = 4,953,400` ms. That passes the guard of
+    4,820 s by 133,400 ms.
+  - Its own deadline, one move and the last read sum to 4,828,900 ms, which passes the guard by
+    8,900.
+  - The expected projection, `⌈(159,075/109,917) · 2,726,567⌉ + 45,592 = 3,991,558` ms, stays
+    inside its own deadline of 4,476,570.
+- **`check-witness`'s fresh read.** At 45,592 ms it passes its outer guard of 45 s by 592 ms. A
+  fresh read at this rate would be stopped by the guard and reported incomplete (exit 124), never a
+  validated witness.
+- **`exp-represent`.**
+  - Its upper projection, `16 · 836,109 + 2 · 94,874 = 13,567,492` ms, stays inside the guard of
+    13,755 s.
+  - Its own deadline, one iterate and the last and scope reads sum to 13,769,212 ms. That passes the
+    guard by 14,212, so a run that reaches its own deadline just before an iterate would lose its
+    scope read to the guard.
+- **`exp-coupling`.** It stays inside every bound: the upper projection is 2,216,028 ms, and its own
+  deadline plus constitution 16's unit is 2,656,493, against a guard of 2,693 s.
 
 ### 6.2 The projections and the fixed deadlines
 
