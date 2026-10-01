@@ -8,7 +8,7 @@
 //! algebraic root named by its minimal polynomial and an isolating interval ([`AlgebraicRoot`]).
 //! Nothing here is a float.
 
-use crate::ratio::{ExactOrdering, Rat};
+use crate::ratio::{ExactOrdering, Rat, compare};
 use num_bigint::{BigInt, BigUint};
 use num_traits::{One, Signed, Zero};
 use thiserror::Error;
@@ -91,15 +91,21 @@ pub(crate) fn natural_log_enclosure(
     .round_out(octaves)
 }
 
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, Eq)]
 pub struct ExactInterval {
     pub lower: Rat,
     pub upper: Rat,
 }
 
+impl PartialEq for ExactInterval {
+    fn eq(&self, other: &Self) -> bool {
+        compare(&self.lower, &other.lower).is_eq() && compare(&self.upper, &other.upper).is_eq()
+    }
+}
+
 impl ExactInterval {
     pub fn new(lower: Rat, upper: Rat) -> Result<Self, ExactValueError> {
-        if lower > upper {
+        if compare(&lower, &upper).is_gt() {
             return Err(ExactValueError::ReversedInterval);
         }
         Ok(Self { lower, upper })
@@ -113,7 +119,7 @@ impl ExactInterval {
     }
 
     pub fn is_point(&self) -> bool {
-        self.lower == self.upper
+        compare(&self.lower, &self.upper).is_eq()
     }
 
     /// **Widen outward onto a dyadic grid, so a chain of enclosures cannot grow its denominator
@@ -160,10 +166,10 @@ impl ExactInterval {
         let mut lower = corners[0].clone();
         let mut upper = corners[0].clone();
         for corner in &corners[1..] {
-            if *corner < lower {
+            if compare(corner, &lower).is_lt() {
                 lower = corner.clone();
             }
-            if *corner > upper {
+            if compare(corner, &upper).is_gt() {
                 upper = corner.clone();
             }
         }
@@ -171,11 +177,12 @@ impl ExactInterval {
     }
 
     pub fn disjoint_order(&self, other: &Self) -> ExactOrdering {
-        if self.upper < other.lower {
+        if compare(&self.upper, &other.lower).is_lt() {
             ExactOrdering::Less
-        } else if self.lower > other.upper {
+        } else if compare(&self.lower, &other.upper).is_gt() {
             ExactOrdering::Greater
-        } else if self.is_point() && other.is_point() && self.lower == other.lower {
+        } else if self.is_point() && other.is_point() && compare(&self.lower, &other.lower).is_eq()
+        {
             ExactOrdering::Equal
         } else {
             ExactOrdering::Open
@@ -1084,6 +1091,42 @@ fn sturm_sequence(polynomial: &IntegerPolynomial) -> Vec<Vec<Rat>> {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    /// Retained failure: the dyadic enclosure of x² = 10 and its reciprocal chart
+    /// share a long continued-fraction prefix at grain 2^(-16384). The old scalar
+    /// comparison aborted a 2 MiB stack; the integer-pair comparison must not recurse.
+    #[test]
+    fn deep_shared_fraction_keeps_interval_and_presentation_order_stack_safe() {
+        use crate::ratio::{Presentation, integer};
+        let bits: usize = 16_384;
+        let root = (BigUint::from(10u32) << (2 * bits)).sqrt();
+        let scale = BigInt::one() << bits;
+        let interval = ExactInterval::new(
+            Rat::new(BigInt::from(root.clone()), scale.clone()),
+            Rat::new(BigInt::from(root + 1u32), scale),
+        )
+        .unwrap();
+        let mirror =
+            ExactInterval::new(integer(10) / &interval.upper, integer(10) / &interval.lower)
+                .unwrap();
+        assert_eq!(interval.disjoint_order(&mirror), ExactOrdering::Open);
+        assert!(!interval.is_point());
+        assert!(!mirror.is_point());
+        assert_ne!(interval, mirror);
+        assert_eq!(interval, interval.clone());
+        assert!(ExactInterval::point(interval.lower.clone()).is_point());
+        assert!(compare(&interval.lower, &mirror.upper).is_lt());
+        assert!(compare(&mirror.upper, &interval.lower).is_gt());
+        assert_eq!(
+            ExactInterval::new(mirror.upper.clone(), interval.lower.clone()),
+            Err(ExactValueError::ReversedInterval),
+        );
+        let left = Presentation::new(interval.lower.clone(), integer(1));
+        let right = Presentation::new(mirror.upper.clone(), integer(1));
+        assert_eq!(left.compare(&right), ExactOrdering::Less);
+        assert!(!left.projectively_equal(&right));
+        assert!(left.projectively_equal(&left));
+    }
     use crate::ratio::{integer, rat};
 
     /// A Sturm certificate isolates `√2` in `[1, 2]` with one sign variation lost, and a rational

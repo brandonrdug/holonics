@@ -15,7 +15,7 @@
 
 use num_traits::{Signed, Zero};
 
-use crate::ratio::{ExactOrdering, Rat};
+use crate::ratio::{ExactOrdering, Rat, compare};
 
 /// A numerator and a denominator, never divided.
 #[derive(Clone, Debug, PartialEq, Eq)]
@@ -66,7 +66,11 @@ impl Presentation {
     pub fn projectively_equal(&self, other: &Self) -> bool {
         !self.is_degenerate()
             && !other.is_degenerate()
-            && &self.numerator * &other.denominator == &other.numerator * &self.denominator
+            && compare(
+                &(&self.numerator * &other.denominator),
+                &(&other.numerator * &self.denominator),
+            )
+            .is_eq()
     }
 
     /// The order of two ratios by cross-multiplication, reading each denominator's sign first.
@@ -78,7 +82,7 @@ impl Presentation {
         let left = &self.numerator * &other.denominator;
         let right = &other.numerator * &self.denominator;
         let flipped = self.denominator.is_negative() ^ other.denominator.is_negative();
-        let order = left.cmp(&right);
+        let order = compare(&left, &right);
         ExactOrdering::from(if flipped { order.reverse() } else { order })
     }
 
