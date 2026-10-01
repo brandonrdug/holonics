@@ -633,7 +633,16 @@ that fires becomes the next loop's subject, and nothing downstream starts.
       searched by a procedure other than the candidate's own move (an exterior fit of the lock
       face, projected onto the lattice and certified exactly). It reports "found" or "not found
       within its budget";
-    - reach: whether the certified move approaches such a witness once one exists. The subject 1a names: a comparison whose descent must move decisions, one
+    - reach: whether the certified move approaches such a witness once one exists.
+    - *Narrowed under Astra's reviews, and run once* ([c2](../../research/records/2026-10-01_LOOP_1C_C2_NORMALIZATION_ALONE_UNDOES_TWO_OF_THREE_LOSSES_ONE_IS_AN_INTERACTION_AND_THE_ENTRY_KEEPS_THE_FOUR_RETAINED.md)). The long
+      replay and the fit were withdrawn. One native update from gate A's saved c1 reproduced gate A
+      exactly.
+      - At c2, the normalization alone undoes two of the three losses. One loss is a pure
+        interaction, so the blanket normalization explanation is rejected. The entry compensates in
+        all four retained decisions.
+      - The frozen-denominator reading holds in all seven at c2, and in three of six at the opening.
+      - Next, pinned and reviewed before any run: one diagnostic release arm, with each decided
+        station read under the span's normalization at its own lock, on the retained states. The subject 1a names: a comparison whose descent must move decisions, one
     that holds a margin on right decisions, is not minimized on ties, and is read where a reading
     carries information about the key. The governing law "loss is the log of a ratio" is the
     candidate's first reference. The adaptable operands left out (the bank's members, the pumps)
