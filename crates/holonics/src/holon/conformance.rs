@@ -623,9 +623,7 @@ mod tests {
             .law()
             .advance(&HolonState::new(configuration), &input)
             .unwrap();
-        let mut reached = received.next_source().to_vec();
-        reached.extend_from_slice(received.next_receiver());
-        assert_eq!(step.state.configuration, reached);
+        assert_eq!(step.state.configuration, received.next_state().configuration);
         let storage = joint.law().kinds(&step).unwrap().storage;
         assert!(is_zero(&storage.effort()[joint.source_extent()..]));
         assert_eq!(

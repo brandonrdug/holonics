@@ -2907,26 +2907,7 @@ fn executed_reread(
     comparison: Comparison,
     mask: &[Vec<TermSite>],
 ) -> Result<Reread, HnnError> {
-    use rayon::prelude::*;
-    let alphabet = field.alphabet();
-    let termination = declared.termination();
-    let read = |amplitudes: &[GaussianRat]| bank.read_turn(amplitudes, grain);
-    #[allow(clippy::type_complexity)]
-    let joined: Result<Vec<(RequestComparison, ExactInterval, ExactInterval, usize)>, HnnError> =
-        requests
-            .par_iter()
-            .enumerate()
-            .map(|(index, request)| {
-                let (own, refinements, placement) = compare_request(
-                    field, successor, index, request, declared, bank, grain, comparison,
-                )?;
-                let sites = mask[index].clone();
-                let (reads, made) = site_reads(&sites, &refinements, &placement, alphabet, &read)?;
-                let (_, value, excess) =
-                    terms_of(comparison.composition, &request.targets, sites, &reads, termination)?;
-                Ok((own, value, excess, made))
-            })
-            .collect();
+    let joined = mask_reads(field, successor, requests, declared, bank, grain, comparison, mask);
     let joined = match joined {
         Ok(joined) => joined,
         Err(HnnError::UncertifiedResonator { .. }) => {
@@ -2951,7 +2932,7 @@ fn executed_reread(
     };
     let (mut value, mut excess, mut made) = (nought(), nought(), 0);
     let mut own = Vec::with_capacity(joined.len());
-    for (compared, v, x, m) in joined {
+    for (compared, _, v, x, m) in joined {
         value = plus(&value, &v);
         excess = plus(&excess, &x);
         made += m;
@@ -2969,6 +2950,89 @@ fn executed_reread(
         comparison: Some(own),
         readings,
         refusal: floquet.then_some(TrialRefusal::Floquet),
+    })
+}
+
+/// Each request's own release at the successor and the fixed mask's terms re-read there (each
+/// site's candidates from the own release's refinement at the same section when it executed one,
+/// else read there), with the mask's composition, excess and the readings made.
+#[allow(clippy::too_many_arguments, clippy::type_complexity)]
+fn mask_reads(
+    field: &Field,
+    successor: &Constitution,
+    requests: &[Request],
+    declared: &Refinement,
+    bank: &ReceivingBank,
+    grain: u32,
+    comparison: Comparison,
+    mask: &[Vec<TermSite>],
+) -> Result<Vec<(RequestComparison, Vec<TermReading>, ExactInterval, ExactInterval, usize)>, HnnError> {
+    use rayon::prelude::*;
+    let alphabet = field.alphabet();
+    let termination = declared.termination();
+    let read = |amplitudes: &[GaussianRat]| bank.read_turn(amplitudes, grain);
+    requests
+        .par_iter()
+        .enumerate()
+        .map(|(index, request)| {
+            let (own, refinements, placement) =
+                compare_request(field, successor, index, request, declared, bank, grain, comparison)?;
+            let sites = mask[index].clone();
+            let (reads, made) = site_reads(&sites, &refinements, &placement, alphabet, &read)?;
+            let (terms, value, excess) =
+                terms_of(comparison.composition, &request.targets, sites, &reads, termination)?;
+            Ok((own, terms, value, excess, made))
+        })
+        .collect()
+}
+
+/// [measured-diagnostic; agent-inferred, October 1; the
+/// [margins record](../../../../research/records/2026-10-01_THE_DECISION_MARGINS_THROUGH_THE_ACCEPTED_MOVE.md)]
+/// **An accepted move read decision by decision**: from `before` to `after`, the incumbent's
+/// comparison at `before`; at `after`, the own release and every incumbent term re-read on its own
+/// fixed section (the mask, so a term's change is the constitution's alone); and each incumbent
+/// term's first-order bound on the exact storage move from `before` to `after` (the proposal's own
+/// certificate, `None` for a term with no resolved branch), aligned with `sites`, the proposal's
+/// terms. The mask's terms align with the incumbent's; the own release's terms are its own sites.
+/// No move is made.
+pub struct MoveMargins {
+    pub before: BatchComparison,
+    pub after: BatchComparison,
+    pub mask: Vec<Vec<TermReading>>,
+    pub first_order: Vec<Option<ExactInterval>>,
+    pub sites: Vec<TermSite>,
+}
+
+/// [measured-diagnostic] An accepted move read decision by decision ([`MoveMargins`]).
+#[allow(clippy::too_many_arguments)]
+pub fn move_margins(
+    field: &Field,
+    before: &Constitution,
+    after: &Constitution,
+    requests: &[Request],
+    declared: &Refinement,
+    bank: &ReceivingBank,
+    grain: u32,
+    comparison: Comparison,
+) -> Result<MoveMargins, HnnError> {
+    let (incumbent, reads) = incumbent(field, before, requests, declared, bank, grain, comparison)?;
+    let proposal = propose(comparison.composition, &incumbent, &reads);
+    drop(reads);
+    let first = first_order(field, before, declared, requests, &proposal, after, None)?;
+    let mask: Vec<Vec<TermSite>> = incumbent
+        .requests
+        .iter()
+        .map(|r| r.terms.iter().map(|t| t.site.clone()).collect())
+        .collect();
+    let joined = mask_reads(field, after, requests, declared, bank, grain, comparison, &mask)?;
+    let (own, terms): (Vec<RequestComparison>, Vec<Vec<TermReading>>) =
+        joined.into_iter().map(|(o, t, ..)| (o, t)).unzip();
+    Ok(MoveMargins {
+        before: incumbent,
+        after: batch_of(comparison, own),
+        mask: terms,
+        first_order: first.terms,
+        sites: proposal.terms.iter().map(|t| t.site.clone()).collect(),
     })
 }
 
