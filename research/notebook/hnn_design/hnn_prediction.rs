@@ -380,6 +380,18 @@ fn main() {
             &arguments[6],
             &arguments[7..],
         ),
+        // The native direction (the pin
+        // research/records/2026-10-01_THE_NATIVE_DIRECTION_PINNED_BEFORE_ITS_RUN.md): read-only.
+        (Some("executed"), Some("direction")) => executed_loop::direction(
+            &arguments[3],
+            arguments[4].parse().expect("a seed"),
+            arguments[5].parse().expect("a count"),
+            &arguments[6],
+            &arguments[7],
+            &arguments[8],
+            &arguments[9],
+            &arguments[10..],
+        ),
         (Some("executed"), Some("causal")) => executed_loop::causal(
             &arguments[3],
             arguments[4].parse().expect("a seed"),

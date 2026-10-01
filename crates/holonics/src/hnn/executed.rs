@@ -117,8 +117,15 @@
 //!   adopted only when every commit guard holds on it: the entry bound `2^ENTRY_BOUND = 8`
 //!   ([`entry_bound`]); the first-order certificate negative on the carried move; every crossing of
 //!   its own release admissible and every lock's Floquet certificate certified; every reading
-//!   supported; the constitution's own guards; and **the fixed incumbent mask's composition strictly
-//!   lower by disjoint enclosures**, `C_mask(Θ′)⁺ < C(Θ)⁻`;
+//!   supported; the constitution's own guards; **the fixed incumbent mask's composition strictly
+//!   lower by disjoint enclosures**, `C_mask(Θ′)⁺ < C(Θ)⁻`; and **the composition the successor's own
+//!   release executes strictly lower too**, `C_own(Θ′)⁺ < C(Θ)⁻` (October 1, the
+//!   [native direction record](../../../../research/records/2026-10-01_THE_NATIVE_DIRECTION_MEASURED_THE_STEP_DESCENDS_THE_EXECUTED_RELEASE_WITHIN_ITS_CELL_AND_GATE_A_ADOPTED_SIXTEEN_TIMES_BEYOND_IT.md):
+//!   the mask's first order holds only within the trajectory cell where the mask and the own release
+//!   coincide, and gate A's first move certified the mask's decrease sixteen times past that cell
+//!   while the executed release rose). Within the cell the second guard is the first; past it, a
+//!   step is adopted only while the executed comparison still descends, so over moves on a fixed
+//!   batch the executed composition falls strictly at every adopted move;
 //! - otherwise the next step is tried, at most [`LADDER_DEPTH`] a move, and the move is refused,
 //!   typed, when none holds.
 //!
@@ -127,9 +134,8 @@
 //! the successor's re-read compare like with like. The mask is transient within the move: it is
 //! formed from the incumbent's release, read once at each trial and discarded with the move; no
 //! event, no replay history is retained. The successor's **own release** is read beside it for
-//! behaviour and for its guards; its recomputed composition is reported as a decrease of that
-//! declared score only, never as decision progress, with the context change (own less mask) beside
-//! it. Every count is kept ([`TermCounts`]): attempted, unresolved, absent, post-error, held,
+//! behaviour and for its guards, its recomputed composition a commit guard (it must fall) and never
+//! read as decision progress, with the context change (own less mask) beside it. Every count is kept ([`TermCounts`]): attempted, unresolved, absent, post-error, held,
 //! support, coverage. The persistence reads (the pin §13.7, [`Persistence`]) re-read each decision
 //! solved at its refinement after the later locks of its section.
 //!
@@ -2466,6 +2472,10 @@ pub enum TrialRefusal {
     FirstOrder(ExactInterval),
     /// The fixed mask's composition not strictly lower by disjoint enclosures.
     NotBelow(ExactInterval),
+    /// The fixed mask's composition lower, the successor's own release's executed composition not
+    /// strictly lower by disjoint enclosures: the step left the trajectory cell and the executed
+    /// comparison did not descend.
+    OwnNotBelow(ExactInterval),
     /// The constitution's own guard (budget, storage growth).
     Constitution(String),
 }
@@ -2791,10 +2801,14 @@ fn ladder(
         });
         trial.readings = read.readings;
         trial.after = read.comparison;
-        trial.refusal = match read.refusal {
-            Some(refusal) => Some(refusal),
-            None if read.value.upper < before.lower => None,
-            None => Some(TrialRefusal::NotBelow(read.value.clone())),
+        trial.refusal = match (read.refusal, &trial.after) {
+            (Some(refusal), _) => Some(refusal),
+            (None, _) if read.value.upper >= before.lower => {
+                Some(TrialRefusal::NotBelow(read.value.clone()))
+            }
+            (None, Some(own)) if own.value.upper < before.lower => None,
+            (None, Some(own)) => Some(TrialRefusal::OwnNotBelow(own.value.clone())),
+            (None, None) => Some(TrialRefusal::Unsupported),
         };
         let adopted = trial.refusal.is_none();
         trials.push(trial);
@@ -3034,39 +3048,24 @@ pub fn executed_move(
         receipt.refusal = refused;
         return Ok(receipt);
     }
-    let samples = returns(field, constitution, declared, requests, &proposal.contributions)?;
+    let (samples, step) = unit_step(field, constitution, declared, requests, &proposal)?;
     receipt.returns = samples.len();
-    let source = constitution
-        .source_port(ring)
-        .ok_or(HnnError::MissingSourcePort { ring })?
-        .clone();
-    let Some((unit, _)) = constitution.stepped_source(ring, &samples, &Rat::one())? else {
+    let Some(UnitStep {
+        unit,
+        unit_move,
+        gamma,
+        curvature,
+        modulus_unit,
+    }) = step
+    else {
         receipt.refusal = Some(MoveRefusal::Unreached);
         return Ok(receipt);
     };
-    let unit_move = unit
-        .source_port(ring)
-        .ok_or(HnnError::MissingSourcePort { ring })?
-        .subtract(&source)?;
     let unit_largest = largest_entry(&unit_move);
     receipt.unit_largest = Some(unit_largest.clone());
-    // The transport modulus's unit move: the least-squares fit of its storage moves to the
-    // proposal's descent covectors, `Δρ = −γ_ρ / Σ_c |∂z_c/∂ρ|²`; none upward from `ρ = 1`.
-    let (gamma, curvature) =
-        modulus_normal(field, constitution, declared, requests, &proposal.contributions)?;
-    receipt.modulus_slope = Some(gamma.clone());
-    receipt.modulus_curvature = Some(curvature.clone());
+    receipt.modulus_slope = Some(gamma);
+    receipt.modulus_curvature = Some(curvature);
     receipt.split = Some(slope_split(field, constitution, declared, requests, &proposal)?);
-    let modulus_unit = if gamma.is_zero() || !curvature.is_positive() {
-        Rat::zero()
-    } else {
-        let unit = -&gamma / &curvature;
-        if unit.is_positive() && constitution.transport(ring).is_one() {
-            Rat::zero()
-        } else {
-            unit
-        }
-    };
     receipt.modulus_unit = Some(modulus_unit.clone());
     // The second repaired guard (the pin §13.4): the slope is read on the joint unit direction, the
     // modulus's storage move joined, before any refusal. The port's part alone is a receipt.
@@ -3110,6 +3109,133 @@ pub fn executed_move(
     receipt.adopted = adopted;
     receipt.refusal = refusal;
     Ok(receipt)
+}
+
+/// **The committed move's unit step, formed and not taken** ([`executed_move`] and
+/// [`unit_direction`] read it from this one function): the proposal's returns at `E` ([`returns`]),
+/// the source port's normal law prepared and stepped at `η = 1` (`Constitution::stepped_source`) with
+/// its move `ΔE`, and the transport modulus's unit move, the least-squares fit of its storage moves
+/// to the proposal's descent covectors, `Δρ = −γ_ρ / Σ_c |∂z_c/∂ρ|²`, none upward from `ρ = 1`.
+/// `None` beside the returns when they reach nothing.
+struct UnitStep {
+    unit: Constitution,
+    unit_move: ExactRatMatrix,
+    gamma: Rat,
+    curvature: Rat,
+    modulus_unit: Rat,
+}
+
+fn unit_step(
+    field: &Field,
+    constitution: &Constitution,
+    declared: &Refinement,
+    requests: &[Request],
+    proposal: &Proposal,
+) -> Result<(Vec<Sample>, Option<UnitStep>), HnnError> {
+    let ring = declared.ring();
+    let samples = returns(field, constitution, declared, requests, &proposal.contributions)?;
+    let source = constitution
+        .source_port(ring)
+        .ok_or(HnnError::MissingSourcePort { ring })?
+        .clone();
+    let Some((unit, _)) = constitution.stepped_source(ring, &samples, &Rat::one())? else {
+        return Ok((samples, None));
+    };
+    let unit_move = unit
+        .source_port(ring)
+        .ok_or(HnnError::MissingSourcePort { ring })?
+        .subtract(&source)?;
+    let (gamma, curvature) =
+        modulus_normal(field, constitution, declared, requests, &proposal.contributions)?;
+    let modulus_unit = if gamma.is_zero() || !curvature.is_positive() {
+        Rat::zero()
+    } else {
+        let unit = -&gamma / &curvature;
+        if unit.is_positive() && constitution.transport(ring).is_one() {
+            Rat::zero()
+        } else {
+            unit
+        }
+    };
+    Ok((
+        samples,
+        Some(UnitStep {
+            unit,
+            unit_move,
+            gamma,
+            curvature,
+            modulus_unit,
+        }),
+    ))
+}
+
+/// [measured-diagnostic; agent-inferred, October 1; the
+/// [direction probe's pin](../../../../research/records/2026-10-01_THE_NATIVE_DIRECTION_PINNED_BEFORE_ITS_RUN.md)]
+/// **The committed move's unit step at a constitution, not taken**: the incumbent's comparison and,
+/// where [`executed_move`] would form its step, the step exactly as it forms it ([`unit_step`]): the
+/// source port's unit move `ΔE` (the normal law's step at `η = 1`, through its solved chart), the
+/// plain pullback of the same returns `G = Σ_t w_t g_t f_tᵀ` (the step before the chart: `ΔE` with
+/// `X̂` replaced by the identity), and the modulus's slope, curvature and least-squares unit move.
+/// No step is taken; nothing is retained.
+#[derive(Clone, Debug)]
+pub struct DirectionReading {
+    pub before: BatchComparison,
+    pub refusal: Option<MoveRefusal>,
+    pub unit_move: Option<ExactRatMatrix>,
+    pub pullback: Option<ExactRatMatrix>,
+    pub modulus_slope: Option<Rat>,
+    pub modulus_curvature: Option<Rat>,
+    pub modulus_unit: Option<Rat>,
+}
+
+/// [measured-diagnostic] The committed move's unit step at a constitution ([`DirectionReading`]).
+pub fn unit_direction(
+    field: &Field,
+    constitution: &Constitution,
+    requests: &[Request],
+    declared: &Refinement,
+    bank: &ReceivingBank,
+    grain: u32,
+    comparison: Comparison,
+) -> Result<DirectionReading, HnnError> {
+    let (before, reads) = incumbent(field, constitution, requests, declared, bank, grain, comparison)?;
+    let proposal = propose(comparison.composition, &before, &reads);
+    drop(reads);
+    let mut reading = DirectionReading {
+        before,
+        refusal: certificate_refusal(&proposal),
+        unit_move: None,
+        pullback: None,
+        modulus_slope: None,
+        modulus_curvature: None,
+        modulus_unit: None,
+    };
+    if reading.refusal.is_some() {
+        return Ok(reading);
+    }
+    let (samples, step) = unit_step(field, constitution, declared, requests, &proposal)?;
+    let Some(step) = step else {
+        reading.refusal = Some(MoveRefusal::Unreached);
+        return Ok(reading);
+    };
+    let (rows, columns) = (step.unit_move.rows(), step.unit_move.columns());
+    let mut pullback = vec![vec![Rat::zero(); columns]; rows];
+    for sample in &samples {
+        for (row, g) in pullback.iter_mut().zip(&sample.covector) {
+            let scaled = &sample.weight * g;
+            for (entry, f) in row.iter_mut().zip(&sample.feature) {
+                if !f.is_zero() {
+                    *entry += &scaled * f;
+                }
+            }
+        }
+    }
+    reading.pullback = Some(ExactRatMatrix::new(pullback)?);
+    reading.unit_move = Some(step.unit_move);
+    reading.modulus_slope = Some(step.gamma);
+    reading.modulus_curvature = Some(step.curvature);
+    reading.modulus_unit = Some(step.modulus_unit);
+    Ok(reading)
 }
 
 /// The largest power of two at or below `x > 0`; zero at zero.
