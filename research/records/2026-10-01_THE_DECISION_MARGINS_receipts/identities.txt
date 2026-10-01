@@ -1,0 +1,4 @@
+cc9d28d565570637edd88635d5e9c88669d11d75
+cc2a4c321a51d8c87443f623b87ffc461bc9b419032a1ebaa66aab465528d56d
+args executed margins order2 2026093061 8 research/records/2026-10-01_THE_GUARDED_WITNESS_receipts/c6.state research/records/2026-10-01_ONE_GUARDED_MOVE_receipts/c6-witness.state
+wall 83276 ms; exit 0; early stop 0

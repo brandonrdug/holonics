@@ -452,6 +452,17 @@ pub struct JointStep {
 }
 
 impl JointStep {
+    /// The reached joint point, in the producing law's source ⊕ receiver storage order.
+    ///
+    /// `JointLaw::interact` already checked and solved this point. Preserve both returned
+    /// blocks and that solve's commit; reading it again does not execute another step. No
+    /// caller-supplied configuration, split or commit is accepted at this boundary.
+    pub fn next_state(&self) -> HolonState {
+        let mut configuration = self.next_source.clone();
+        configuration.extend_from_slice(&self.next_receiver);
+        HolonState::at(configuration, self.commit)
+    }
+
     pub fn next_source(&self) -> &[Rat] {
         &self.next_source
     }
@@ -615,13 +626,13 @@ mod tests {
         let energy = |x: &[Rat], commit| {
             crate::holon::element::storage_energy(law.law().holon().storage_at(commit), x).unwrap()
         };
-        let mut after = returned.next_source().to_vec();
-        after.extend_from_slice(returned.next_receiver());
+        let after = returned.next_state();
         assert_eq!(
             returned.stored_before().joint(),
             energy(&state.configuration, 0)
         );
-        assert_eq!(returned.stored_after().joint(), energy(&after, 1));
+        assert_eq!(after.commit, returned.commit());
+        assert_eq!(returned.stored_after().joint(), energy(&after.configuration, after.commit));
         assert_eq!(
             returned.stored_after().joint() - returned.stored_before().joint(),
             returned.balance().stored_change
@@ -630,6 +641,36 @@ mod tests {
         assert_eq!(
             returned.balance().port,
             law.law().step() * returned.boundary().power()
+        );
+    }
+
+    /// The producer validates the originating layout; continuation uses its returned commit,
+    /// rather than committing the already reached point a second time.
+    #[test]
+    fn continuation_keeps_both_blocks_and_the_producing_commit() {
+        let law = joint(&[&[0, -1], &[1, 0]], &zero(2, 2), &zero(2, 0), None);
+        let face = ReceiverFace::receiver_state(1, 1).unwrap();
+        let receipt = no_receipt(2);
+        let mut state = HolonState::at(ints(&[1, 0]), 1);
+        for expected_commit in [2, 3] {
+            let returned = law.interact(&state, &[], &face, &receipt).unwrap();
+            let step = returned.step().unwrap();
+            let mut old_configuration = step.next_source().to_vec();
+            old_configuration.extend_from_slice(step.next_receiver());
+            let next = step.next_state();
+            assert_eq!(next, HolonState::at(old_configuration, expected_commit));
+            assert_eq!(&next.configuration[..1], step.next_source());
+            assert_eq!(&next.configuration[1..], step.next_receiver());
+            assert_eq!(step.next_state(), next);
+            state = next;
+        }
+        assert_eq!(
+            law.interact(&HolonState::at(ints(&[1]), 1), &[], &face, &receipt),
+            Err(HolonError::Shape {
+                what: "state configuration",
+                expected: 2,
+                found: 1,
+            })
         );
     }
 
@@ -756,9 +797,8 @@ mod tests {
             .unwrap();
         assert_eq!(returned.face(), &[&read[0] + &h * &chart_rate]);
         // The medium's field at the midpoint, `Q = 1`.
-        let mut reached = returned.next_source().to_vec();
-        reached.extend_from_slice(returned.next_receiver());
-        let midpoint = scale(&rat(1, 2), &add(&state.configuration, &reached));
+        let reached = returned.next_state();
+        let midpoint = scale(&rat(1, 2), &add(&state.configuration, &reached.configuration));
         let drift = sub(
             &omega.apply(&midpoint).unwrap(),
             &resistance.apply(&midpoint).unwrap(),

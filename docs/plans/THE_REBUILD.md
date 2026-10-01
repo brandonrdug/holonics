@@ -699,6 +699,12 @@ that fires becomes the next loop's subject, and nothing downstream starts.
       control is refused at every trial; the witness's metric is adopted, `ρ` moves toward `ρ*` and
       the executed `L` falls, but no decision improves (stations right 15 to 13). The next subject is
       what the comparison's covector at the decisions carries.
+    - *The decision margins, October 1*
+      ([record](../../research/records/2026-10-01_THE_DECISION_MARGINS_THROUGH_THE_ACCEPTED_MOVE.md)).
+      With a wrong first lock the comparison reads every station at the open section. The move
+      improved those readings, with the first order's sign right on 60 of 64, while the release decided
+      the rest in contexts no term reads. Next: the order, the gap rule that picks the first lock, as
+      a term of the comparison.
   - *1b's subject, as 1a named it*: a comparison whose descent must move decisions, one
     that holds a margin on right decisions, is not minimized on ties, and is read where a reading
     carries information about the key. The governing law "loss is the log of a ratio" is the

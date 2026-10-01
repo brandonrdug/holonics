@@ -15,6 +15,7 @@
 //! cargo run --release -p holonics --example hnn_prediction -- executed rho-slopes <terrain> <seed> <count> <arm> <label=source>…
 //! cargo run --release -p holonics --example hnn_prediction -- executed witness-plane <terrain> <seed> <count> <arm> <toward> <out> <label=source>…
 //! cargo run --release -p holonics --example hnn_prediction -- executed move-once <terrain> <seed> <count> <out> <label=source> <metric>…
+//! cargo run --release -p holonics --example hnn_prediction -- executed margins <terrain> <seed> <count> <before state> <after state>
 //! ```
 //!
 //! - **Step 1b** (the
@@ -1486,6 +1487,99 @@ pub(super) fn move_once(terrain: &str, seed: u64, count: usize, out: &str, sourc
         }
     }
     println!("executed move-once: {} ms; resident {}", clock.elapsed().as_millis(), resident());
+}
+
+/// [measured-diagnostic; agent-inferred, October 1; the
+/// [margins record](../../records/2026-10-01_THE_DECISION_MARGINS_THROUGH_THE_ACCEPTED_MOVE.md)]
+/// **An accepted move read decision by decision** (`executed margins <terrain> <seed> <count>
+/// <before state> <after state>`, complete continuing states restored with no fallback):
+/// `hnn::executed::move_margins` on the candidate arm. Per incumbent decision term: its site, target,
+/// and at `before` and at `after` on the same fixed section, the lock face `ℓ`, its solved predicate,
+/// the top class, the target's and the leading rival's growth enclosures (the ordering margin) and
+/// the first-order bound on the exact storage move; then each request's released section before and
+/// after against its targets. Every term is printed, none selected after the outcome.
+pub(super) fn margins(terrain: &str, seed: u64, count: usize, before: &str, after: &str) {
+    use holonics::hnn::executed::move_margins;
+    let clock = Instant::now();
+    let declared = order_declared();
+    let engine = Engine::new(declared);
+    let bank = bank_of(declared.period, &bank_strength());
+    let pairs = terrain_pairs(terrain, &declared, seed, count);
+    let requests = open_requests(&engine, &pairs);
+    let targets: Vec<Vec<usize>> = pairs.iter().map(|(_, t)| t.clone()).collect();
+    let comparison = Comparison::LOCK_DECISIONS;
+    let (theta, successor) = (remounted(&engine.theta, before), remounted(&engine.theta, after));
+    println!(
+        "executed margins: {count} {terrain} requests at development seed {seed}, the candidate arm; from {before} to {after}; the bank p = {}, grain 2^(-{BANK_GRAIN})",
+        bank_strength()
+    );
+    let read = move_margins(
+        &engine.field,
+        &theta,
+        &successor,
+        &requests,
+        &engine.refinement,
+        &bank,
+        BANK_GRAIN,
+        comparison,
+    )
+    .expect("the margins");
+    let first: BTreeMap<(usize, usize), &Option<ExactInterval>> = read
+        .sites
+        .iter()
+        .zip(&read.first_order)
+        .map(|(site, bound)| ((site.request, site.station), bound))
+        .collect();
+    let growth = |g: &holonics::hnn::ring::Growth| format!("[{}, {}]", at_bits(&g.lower), at_bits(&g.upper));
+    for (index, (request, mask)) in read.before.requests.iter().zip(&read.mask).enumerate() {
+        for (b, a) in request.terms.iter().zip(mask) {
+            let (sb, sa) = (&b.comparison, &a.comparison);
+            println!(
+                "    request {index} station {} (refinement {:?}, {} placed): target {}; before ℓ ∈ {} {:?} top {} target {} rival {}; after ℓ ∈ {} {:?} top {} target {} rival {}; first order {}",
+                sb.station,
+                b.site.context,
+                b.site.cells.iter().filter(|c| c.is_some()).count(),
+                sb.target,
+                cell(&sb.lock, 1 << 16),
+                sb.solved,
+                sb.top,
+                growth(&sb.target_growth),
+                growth(&sb.rival_growth),
+                cell(&sa.lock, 1 << 16),
+                sa.solved,
+                sa.top,
+                growth(&sa.target_growth),
+                growth(&sa.rival_growth),
+                first
+                    .get(&(index, sb.station))
+                    .and_then(|b| b.as_ref())
+                    .map_or_else(|| "none".to_string(), |b| cell(b, 1 << 16)),
+            );
+        }
+    }
+    let section = |batch: &BatchComparison, index: usize| {
+        batch.requests[index]
+            .generation
+            .as_ref()
+            .map_or_else(|| "not released".to_string(), |g| format!("{:?}, locks {:?}", g.release.classes, g.locks))
+    };
+    for (index, target) in targets.iter().enumerate() {
+        println!(
+            "    request {index}: target {target:?}; before {}; after {}",
+            section(&read.before, index),
+            section(&read.after, index)
+        );
+    }
+    for (what, batch) in [("before", &read.before), ("after", &read.after)] {
+        let (solved, all) = solved_terms(batch);
+        let (whole, right, released) = batch.sections(&targets);
+        println!(
+            "  {what}: L ∈ {} nats; solved {solved} of {all}; whole {whole} (released {released}, stations right {right}); {} ms",
+            cell(&batch.value, 1 << 12),
+            clock.elapsed().as_millis()
+        );
+    }
+    println!("executed margins: {} ms; resident {}", clock.elapsed().as_millis(), resident());
 }
 
 /// A rational read at 24 significant bits toward zero (`m/2^k`, exact as printed).

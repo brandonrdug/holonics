@@ -414,6 +414,15 @@ fn main() {
             &arguments[7],
             &arguments[8..],
         ),
+        // An accepted move read decision by decision (the record
+        // research/records/2026-10-01_THE_DECISION_MARGINS_THROUGH_THE_ACCEPTED_MOVE.md): read-only.
+        (Some("executed"), Some("margins")) => executed_loop::margins(
+            &arguments[3],
+            arguments[4].parse().expect("a seed"),
+            arguments[5].parse().expect("a count"),
+            &arguments[6],
+            &arguments[7],
+        ),
         (Some("executed"), Some("causal")) => executed_loop::causal(
             &arguments[3],
             arguments[4].parse().expect("a seed"),
