@@ -1,0 +1,33 @@
+Element(0) Map: a 16607325/17592186044416 C 2956397/134217728 eta 1/32768 vanished true
+Element(0) Passive: a 6111977/17592186044416 C 9604475/134217728 eta 1/262144 vanished true
+Element(0) Slices: a 12376359/8796093022208 C 2777789/4194304 eta 1/524288 vanished true
+Element(1) Map: a 8356063/2199023255552 C 11180713/2147483648 eta 1/2048 vanished true
+Element(1) Passive: a 11088749/1099511627776 C 3124837/1048576 eta 1/524288 vanished true
+Element(1) Slices: a 5686297/137438953472 C 2589955/131072 eta 1/524288 vanished true
+Element(2) Map: a 13041139/2199023255552 C 2308621/68719476736 eta 1/8 vanished true
+Element(2) Passive: a 3526377/137438953472 C 3915193/268435456 eta 1/1024 vanished true
+Element(2) Slices: a 10224623/274877906944 C 16163469/536870912 eta 1/1024 vanished true
+Channel(0) Factor(0): a 16136597/137438953472 C 2258657/16 eta 1/2147483648 vanished true
+Channel(0) Factor(1): a 10929323/274877906944 C 12523331/2048 eta 1/268435456 vanished true
+Channel(0) Factor(2): a 787323/8589934592 C 13246381/2048 eta 1/134217728 vanished true
+Channel(1) Factor(0): a 8686315/68719476736 C 6699011/8192 eta 1/8388608 vanished true
+Channel(1) Factor(1): a 16727083/274877906944 C 12475641/262144 eta 1/1048576 vanished true
+Channel(1) Factor(2): a 10733913/274877906944 C 9001191/524288 eta 1/524288 vanished true
+SourcePort(0) Map: a 7184351/274877906944 C 14912165/524288 eta 1/2097152 vanished true
+SourcePort(0) Pair(1): a 13373081/34359738368 C 1812433/4 eta 1/2147483648 vanished true
+Standing(0) Standing: a 2436909/68719476736 C 8744413/16384 eta 1/16777216 vanished true
+Standing(1) Standing: a 8833977/274877906944 C 12233201/16384 eta 1/33554432 vanished true
+Standing(2) Standing: a 13417181/549755813888 C 8835699/32768 eta 1/16777216 vanished true
+ReceivingMap(2) Map: a 3494603/17179869184 C 13480029/1125899906842624 eta 1 vanished false
+carried after: {"Channel(0) FactorScale(0)": 1, "Channel(0) FactorScale(1)": 1, "Channel(1) FactorScale(0)": 1, "Element(0) Gram": 8, "Element(0) PassiveScale": 1, "Element(0) SliceScale": 1, "Element(1) Gram": 7, "ReceivingMap(2) Map": 6, "SourcePort(0) Gram": 1, "Standing(0) StandingScale": 1}
+released: {"Channel(0) Factor(0)": 16, "Channel(0) Factor(1)": 16, "Channel(0) Factor(2)": 16, "Channel(0) FactorScale(0)": 1, "Channel(0) FactorScale(1)": 1, "Channel(0) FactorScale(2)": 1, "Channel(1) Factor(0)": 16, "Channel(1) Factor(1)": 16, "Channel(1) Factor(2)": 16, "Channel(1) FactorScale(0)": 1, "Channel(1) FactorScale(1)": 1, "Channel(1) FactorScale(2)": 1, "Element(0) Gram": 16, "Element(0) Map": 16, "Element(0) Passive": 16, "Element(0) PassiveScale": 1, "Element(0) SliceScale": 1, "Element(0) Slices": 32, "Element(1) Gram": 16, "Element(1) Map": 24, "Element(1) Passive": 36, "Element(1) PassiveScale": 1, "Element(1) SliceScale": 1, "Element(1) Slices": 72, "Element(2) Gram": 16, "Element(2) Map": 16, "Element(2) Passive": 16, "Element(2) PassiveScale": 1, "Element(2) SliceScale": 1, "Element(2) Slices": 32, "ReceivingMap(2) Gram": 16, "ReceivingMap(2) Map": 24, "SourcePort(0) Gram": 10, "SourcePort(0) Map": 16, "SourcePort(0) Pair { offset: 1, family: 0 }": 16, "SourcePort(0) Pair { offset: 1, family: 1 }": 14, "SourcePort(0) Pair { offset: 1, family: 2 }": 14, "Standing(0) Standing": 4, "Standing(0) StandingScale": 1, "Standing(1) Standing": 6, "Standing(1) StandingScale": 1, "Standing(2) Standing": 4, "Standing(2) StandingScale": 1}
+joint Element(0) Passive: a 3918681/268435456 eta 1/131072 vanished true
+joint Element(0) Slices: a 1386991/33554432 eta 1/262144 vanished true
+joint Channel(0) Factor(0): a 11902121/4294967296 eta 1/268435456 vanished true
+joint Channel(0) Factor(1): a 10138403/68719476736 eta 1/16777216 vanished true
+joint Channel(0) Factor(2): a 10219377/8589934592 eta 1/16777216 vanished true
+joint SourcePort(0) Map: a 742569/1048576 eta 1/524288 vanished false
+joint Standing(0) Standing: a 2178911/134217728 eta 1/4194304 vanished true
+joint Standing(1) Standing: a 2234235/134217728 eta 1/4194304 vanished true
+joint ReceivingMap(0) Map: a 7827375/16777216 eta 1 vanished false
+commit e45ce0d576fcbd9c04e71a56a0bab3acfcad7c55; tests hnn::tests::reference::family_sensitivity_probe{,_joint}
