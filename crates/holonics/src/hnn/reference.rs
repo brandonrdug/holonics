@@ -2999,7 +2999,7 @@ pub struct CumulativeContacts {
     pub held: ExactInterval,
     pub reverted: ExactInterval,
     /// Over the following windows with both constitutions frozen (no deposit), up to the next
-    /// carry-out or `INFORMATION_WINDOWS`: the readings compared, and `Σ Var_p(δ)` over them in
+    /// carry-out or [`AblationOptions::information`] windows: the readings compared, and `Σ Var_p(δ)` over them in
     /// bits² (`δ_c = v′_c − v_c` between the opening-contacts and the learned readings, `p` the
     /// learned face's masses at their enclosures' midpoints). The information the receiver gains
     /// about the contacts is `(ln 2/2) Σ Var_p(δ)` to second order (the record's §11, step 2).
@@ -3012,12 +3012,21 @@ pub struct CumulativeContacts {
     pub better: usize,
     pub worse: usize,
     pub undecided: usize,
+    /// The receiving map `R` at this close: its largest entry, and its largest entry change since
+    /// the previous close (the opening for the first) over that largest entry.
+    pub receiving_largest: Rat,
+    pub receiving_change: Rat,
 }
 
-/// The windows over which [`CumulativeContacts`] accumulates the receiver's information: `2^6`, set
-/// by the read's cost (the October 2 run at `2^8` passed its 1,800 s deadline, the contact loop
-/// record §14), not by the receiver.
-pub const INFORMATION_WINDOWS: usize = 64;
+/// [measured-diagnostic] **What [`contact_ablation`] reads beside its windows**: the frozen windows
+/// of the information read at each close (`0` skips it) and whether each deposit's realized descent
+/// is read (two more reads a window).
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub struct AblationOptions {
+    pub information: usize,
+    pub descent: bool,
+}
+
 
 /// [measured-diagnostic; agent-inferred, October 2; the contact loop record §15] **One deposit's
 /// realized descent, split** (the Lean thread's condition, PR #151): the window read against its own
@@ -3045,7 +3054,18 @@ pub struct AblationRun {
     pub cumulative: Vec<CumulativeContacts>,
     pub receiver: Vec<ReceiverStep>,
     pub descents: Vec<DepositDescent>,
-    pub released: BTreeMap<(Locus, Carrier, usize), (Rat, Rat, usize)>,
+    pub released: BTreeMap<(Locus, Carrier, usize), Released>,
+}
+
+/// One contact factor entry's released residuals over a run: their sum `S`, the sum of their
+/// magnitudes, the sum of their squares `Q` and their count. The coherence statistic is
+/// `Z = S/√Q` (the Lean thread's test: coherent when `|Z| > √(2 ln(2/α))`).
+#[derive(Clone, Debug, Default, PartialEq, Eq)]
+pub struct Released {
+    pub sum: Rat,
+    pub magnitude: Rat,
+    pub squares: Rat,
+    pub count: usize,
 }
 
 /// [measured-diagnostic] **One deposit's receiving-map step** in [`contact_ablation`]: its aeon, the
@@ -3073,16 +3093,23 @@ pub fn contact_ablation(
     field: &Field,
     cells: &[usize],
     windows: usize,
+    options: AblationOptions,
     on_boundary: &mut dyn FnMut(&CumulativeContacts, &[ContactAblation], &[ReceiverStep]),
 ) -> Result<AblationRun, HnnError> {
     let mut resident = reference.mount(field, &Current::at_rest(field))?;
     let opening = resident.constitution().clone();
+    let receiving_ring = resident
+        .admitted()
+        .first()
+        .map(|p| p.ring())
+        .ok_or(HnnError::Shape { what: "a declared receiver", expected: 1, found: 0 })?;
+    let mut last_receiving = opening.receiving_map(receiving_ring).cloned();
     let family = resident.admitted().to_vec();
     let mut aeon = 0usize;
     let mut cumulative = Vec::new();
     let mut receiver = Vec::new();
     let mut descents = Vec::new();
-    let mut released: BTreeMap<(Locus, Carrier, usize), (Rat, Rat, usize)> = BTreeMap::new();
+    let mut released: BTreeMap<(Locus, Carrier, usize), Released> = BTreeMap::new();
     let mut boundary = false;
     let phases = resident
         .admitted()
@@ -3233,7 +3260,7 @@ pub fn contact_ablation(
             tally(&code_difference.clone(), &mut counts);
             let mut faces_pair = (held_faces.clone(), back_faces.clone());
             let mut j = k;
-            loop {
+            while options.information > 0 {
                 if let (Some(a), Some(b)) = (&faces_pair.0, &faces_pair.1) {
                     for (fa, fb) in a.faces.iter().zip(&b.faces) {
                         let value = |c: &crate::receiver::face::GrainCell, grain: u64| {
@@ -3268,7 +3295,7 @@ pub fn contact_ablation(
                     break;
                 }
                 j += 1;
-                if j >= spans.len() || j >= k + INFORMATION_WINDOWS || cells[spans[j].clone()].len() != aperture {
+                if j >= spans.len() || j >= k + options.information || cells[spans[j].clone()].len() != aperture {
                     break;
                 }
                 let next_window = &cells[spans[j].clone()];
@@ -3292,6 +3319,30 @@ pub fn contact_ablation(
                 better: counts.0,
                 worse: counts.1,
                 undecided: counts.2,
+                receiving_largest: resident
+                    .constitution()
+                    .receiving_map(receiving_ring)
+                    .map(|m| m.entries().iter().map(|x| x.abs()).max().unwrap_or_else(Rat::zero))
+                    .unwrap_or_else(Rat::zero),
+                receiving_change: {
+                    let now = resident.constitution().receiving_map(receiving_ring).cloned();
+                    let change = match (&last_receiving, &now) {
+                        (Some(a), Some(b)) => {
+                            let scale = b.entries().iter().map(|x| x.abs()).max().unwrap_or_else(Rat::zero);
+                            let moved = a
+                                .entries()
+                                .iter()
+                                .zip(b.entries())
+                                .map(|(x, y)| (x - y).abs())
+                                .max()
+                                .unwrap_or_else(Rat::zero);
+                            if scale.is_positive() { moved / scale } else { Rat::zero() }
+                        }
+                        _ => Rat::zero(),
+                    };
+                    last_receiving = now;
+                    change
+                },
             });
             on_boundary(cumulative.last().expect("pushed"), &out, &receiver);
         }
@@ -3415,10 +3466,15 @@ pub fn contact_ablation(
                 }
             }
         }
-        let mut pre = resident.clone();
-        let (before_code, _, before_faces) = read(reference, &mut pre, window)?;
+        let before = if options.descent {
+            let mut pre = resident.clone();
+            Some(read(reference, &mut pre, window)?)
+        } else {
+            None
+        };
         match reference.deposit(&mut resident, staged) {
             Ok(returned) => {
+                if let Some((before_code, _, before_faces)) = before {
                 let mut post = resident.clone();
                 let (after_code, _, after_faces) = read(reference, &mut post, window)?;
                 let (mut a_plus, mut a_minus) = (Rat::zero(), Rat::zero());
@@ -3456,15 +3512,15 @@ pub fn contact_ablation(
                     before: before_code,
                     after: after_code,
                 });
+                }
                 if let Component::Present(reading) = &returned.deposit {
                     for (locus, carrier, entry, residual) in &reading.released {
                         if matches!(locus, Locus::Channel(_)) {
-                            let slot = released
-                                .entry((*locus, *carrier, *entry))
-                                .or_insert((Rat::zero(), Rat::zero(), 0));
-                            slot.0 += residual;
-                            slot.1 += residual.abs();
-                            slot.2 += 1;
+                            let slot = released.entry((*locus, *carrier, *entry)).or_default();
+                            slot.sum += residual;
+                            slot.magnitude += residual.abs();
+                            slot.squares += residual * residual;
+                            slot.count += 1;
                         }
                     }
                     for (locus, step) in &reading.steps {

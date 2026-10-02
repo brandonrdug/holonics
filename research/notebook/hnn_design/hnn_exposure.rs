@@ -228,6 +228,8 @@ fn main() {
     let mut loaded = false;
     let mut gate = false;
     let mut ablation: Option<usize> = None;
+    let mut information = 0usize;
+    let mut descent = false;
     for pair in arguments.chunks(2) {
         match pair {
             [key, value] if key == "cells" => cells = Some(value.clone()),
@@ -248,6 +250,10 @@ fn main() {
             [key, value] if key == "ablation" => {
                 ablation = Some(value.parse().expect("a count of windows"));
             }
+            [key, value] if key == "information" => {
+                information = value.parse().expect("a count of frozen windows");
+            }
+            [key, value] if key == "descent" => descent = value == "on",
             _ => {
                 println!(
                     "usage: hnn_exposure [cut-file <path>] [cells <N|all>] [held-out <cells>] [windows <deadline>] [realization <host|card>] [resonator <none|source>] [gate f2]"
@@ -359,7 +365,7 @@ fn main() {
     );
     println!("setup (cut read, fields declared): {setup} ms wall");
     if let Some(count) = ablation {
-        contact_ablation_run(&field, &cut, count);
+        contact_ablation_run(&field, &cut, count, information, descent);
         return;
     }
 
@@ -971,7 +977,7 @@ fn rounding(exposure: &Exposure) {
 /// work of that commit on the window's end change, and the next window's code at the predecessor
 /// and at the contacts-only successor, with their exact order. One line per window with its
 /// elapsed milliseconds.
-fn contact_ablation_run(field: &Field, cut: &Cut, windows: usize) {
+fn contact_ablation_run(field: &Field, cut: &Cut, windows: usize, information: usize, descent: bool) {
     use holonics::hnn::reference::contact_ablation;
     let clock = Instant::now();
     use holonics::hnn::reference::{ContactAblation, CumulativeContacts, ReceiverStep};
@@ -1006,7 +1012,7 @@ fn contact_ablation_run(field: &Field, cut: &Cut, windows: usize) {
     };
     let cumulative_line = |c: &CumulativeContacts| {
         println!(
-            "  after aeon {} (window at {}): the contacts' cumulative change {} bits at an exponent span of {} bits; over {} readings frozen: sum Var_p(delta) {} bits^2 (24 bits); code (opening's contacts less learned) summed [{}, {}) bits, better {}, worse {}, undecided {}; {} ms",
+            "  after aeon {} (window at {}): the contacts' cumulative change {} bits at an exponent span of {} bits; over {} readings frozen: sum Var_p(delta) {} bits^2 (24 bits); code (opening's contacts less learned) summed [{}, {}) bits, better {}, worse {}, undecided {}; R's largest entry {}, its largest change since the last close over it {} (24 bits); {} ms",
             c.aeon,
             c.position,
             c.exponent_shift,
@@ -1018,6 +1024,8 @@ fn contact_ablation_run(field: &Field, cut: &Cut, windows: usize) {
             c.better,
             c.worse,
             c.undecided,
+            holonics::holon::deposition::significant(&c.receiving_largest, 24, false),
+            holonics::holon::deposition::significant(&c.receiving_change, 24, false),
             clock.elapsed().as_millis()
         );
     };
@@ -1026,6 +1034,7 @@ fn contact_ablation_run(field: &Field, cut: &Cut, windows: usize) {
         field,
         &cut.cells,
         windows,
+        holonics::hnn::reference::AblationOptions { information, descent },
         &mut |c, readings, receiver| {
             aeon_line(c.aeon - 1, readings, receiver);
             cumulative_line(c);
@@ -1073,23 +1082,36 @@ fn contact_ablation_run(field: &Field, cut: &Cut, windows: usize) {
             run.descents.len() - n,
         );
     }
-    // The released residuals' coherence per contact: |sum| over the sum of magnitudes, entries pooled.
+    // The released residuals' coherence per contact: |sum| over the sum of magnitudes, entries
+    // pooled; and per entry the statistic Z = S/sqrt(Q), coherent at alpha = 1/20 when
+    // Z^2 > 2 ln 40, decided exactly by Z^2 = S^2/Q against the enclosure ln 40 in (3688/1000, 3689/1000).
     {
         use std::collections::BTreeMap;
-        let mut pooled: BTreeMap<String, (Rat, Rat, usize, usize)> = BTreeMap::new();
-        for ((locus, _, _), (sum, magnitude, count)) in &run.released {
-            let slot = pooled.entry(format!("{locus:?}")).or_insert((Rat::zero(), Rat::zero(), 0, 0));
-            slot.0 += sum.abs();
-            slot.1 += magnitude;
-            slot.2 += count;
+        let threshold_low = Rat::new(BigInt::from(2 * 3688), BigInt::from(1000));
+        let threshold_high = Rat::new(BigInt::from(2 * 3689), BigInt::from(1000));
+        let mut pooled: BTreeMap<String, (Rat, Rat, usize, usize, usize, usize)> = BTreeMap::new();
+        for ((locus, _, _), r) in &run.released {
+            let slot = pooled
+                .entry(format!("{locus:?}"))
+                .or_insert((Rat::zero(), Rat::zero(), 0, 0, 0, 0));
+            slot.0 += r.sum.abs();
+            slot.1 += &r.magnitude;
+            slot.2 += r.count;
             slot.3 += 1;
+            if r.squares.is_positive() {
+                let z2 = &r.sum * &r.sum / &r.squares;
+                if z2 > threshold_high {
+                    slot.4 += 1;
+                } else if z2 <= threshold_low {
+                    slot.5 += 1;
+                }
+            }
         }
-        for (locus, (net, magnitude, count, entries)) in &pooled {
+        for (locus, (net, magnitude, count, entries, coherent, not)) in &pooled {
             let ratio = if magnitude.is_positive() { net / magnitude } else { Rat::zero() };
             println!(
-                "  released at {locus}: {count} residuals over {entries} entries; per entry |sum| summed over magnitudes summed {} (24 bits); a random sign would give about 1/sqrt({}) per entry",
+                "  released at {locus}: {count} residuals over {entries} entries; |sum| over magnitudes pooled {} (24 bits); entries coherent at alpha 1/20 (Z^2 > 2 ln 40): {coherent}, not: {not}, of {entries}",
                 holonics::holon::deposition::significant(&ratio, 24, false),
-                count / (*entries).max(1)
             );
         }
     }
