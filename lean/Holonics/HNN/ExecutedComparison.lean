@@ -86,6 +86,13 @@ the laws that covector and its certified step stand on (the diagnosis record,
    change and its certificate are mass-free, and a deposit raises the step's kinetic energy
    (`deposit_raises_native_energy`) (§11).
 
+12. **The readings' curvature.** [proved-derived; formal-checked] On a hidden direction only the
+   curvature `C = Σ c_k ∇²r_k` and the mass act (`hidden_curvature`). The damped Newton form
+   `AᵀFA + C + s M` is positive definite when `C + s₀ M ⪰ 0` and `s > s₀` (`newtonForm_posDef`); its
+   step descends and rests only where `∇L = 0` (`newton_step`), and it is native exactly when `C v`
+   lies in the readings' covectors (`newton_step_hidden_iff`; without `C`, always,
+   `gaussNewton_regularized_native`) (§12).
+
 [open] (#62) The existence of the differentiable root path (the implicit function theorem at a
 simple root, from `Φ`'s strict differentiability), Jacobi's formula `∂_η det(λ − M − ηΔM) =
 −tr(adj(λ − M) ΔM)` with the adjugate's rank-one form at a simple root, and the certificate's
@@ -1507,6 +1514,106 @@ theorem deposit_raises_native_energy {M K : Matrix n n ℝ} (hM : M.PosDef) (hK 
 
 end PortMass
 
+/-! ## 12. The readings' curvature: the term the Gauss–Newton law drops
+
+[definition; agent-inferred, October 2] Rebuild step U6, step 1: the native law for a gain in the
+hidden directions (`research/records/2026-10-02_THE_READINGS_CURVATURE_IS_THE_ONLY_NATIVE_SOURCE_OF_HIDDEN_MOTION.md`).
+On a hidden direction only the readings' curvature and the mass act (`hidden_curvature`). The
+damped Newton form is positive definite once the damping exceeds the curvature's most negative
+part against the mass (`newtonForm_posDef`); its step descends and keeps `L`'s fixed points
+(`newton_step`); and it has a hidden part exactly where the curvature's action leaves the readings'
+covectors (`newton_step_hidden_iff`, `gaussNewton_regularized_native`). -/
+
+section ReadingCurvature
+
+open Matrix Holonics.HolonCore.KineticFace
+
+variable {n m : Type*} [Fintype n] [Fintype m] [DecidableEq n] [DecidableEq m]
+
+/-- [definition; agent-inferred] **The damped Newton form of the comparison in `E`**,
+`Q_s = AᵀFA + C + s M`: the witness's Gauss–Newton form `AᵀFA`, the readings' curvature
+`C = Σ_k c_k ∇²r_k` (symmetric, the term the Gauss–Newton law drops), and the port's mass damped by
+`s`. -/
+def newtonForm (M : Matrix n n ℝ) (A : Matrix m n ℝ) (F : Matrix m m ℝ) (C : Matrix n n ℝ)
+    (s : ℝ) : Matrix n n ℝ :=
+  Aᵀ * F * A + C + s • M
+
+omit [DecidableEq n] [DecidableEq m] in
+/-- [proved-derived; formal-checked] **`hidden_curvature`: on a hidden direction only the
+curvature and the mass act.** If `A h = 0`, then `Q_s h = (C + s M) h` and the first-order term
+`⟨Aᵀc, h⟩` is zero: the Gauss–Newton form and the comparison's covector do not see `h`. -/
+theorem hidden_curvature (M : Matrix n n ℝ) (A : Matrix m n ℝ) (F : Matrix m m ℝ)
+    (C : Matrix n n ℝ) (s : ℝ) (c : m → ℝ) {h : n → ℝ} (hh : A *ᵥ h = 0) :
+    newtonForm M A F C s *ᵥ h = (C + s • M) *ᵥ h ∧ (Aᵀ *ᵥ c) ⬝ᵥ h = 0 := by
+  constructor
+  · simp only [newtonForm, add_mulVec, ← mulVec_mulVec, hh, mulVec_zero, zero_add, add_assoc]
+  · rw [dotProduct_comm, dotProduct_transpose_mulVec, hh, dotProduct_zero]
+
+omit [DecidableEq n] [DecidableEq m] in
+/-- [proved-derived; formal-checked] **`newtonForm_posDef`: when the step is well defined.** The
+curvature `C` has either sign (`c_k = θ_k − [k = t]`). If `C + s₀ M ⪰ 0` and `s > s₀`, then
+`Q_s ≻ 0`, so the damped model has one minimizer. `s₀` is the most negative curvature of `C`
+measured against the port's mass. -/
+theorem newtonForm_posDef {M : Matrix n n ℝ} (hM : M.PosDef) (A : Matrix m n ℝ)
+    {F : Matrix m m ℝ} (hF : F.PosSemidef) {C : Matrix n n ℝ} {s₀ s : ℝ}
+    (hC : (C + s₀ • M).PosSemidef) (hs : s₀ < s) :
+    (newtonForm M A F C s).PosDef := by
+  have hGN : (Aᵀ * F * A).PosSemidef := by
+    simpa only [conjTranspose_eq_transpose_of_trivial, transpose_transpose] using
+      hF.conjTranspose_mul_mul_same A
+  have hsplit : newtonForm M A F C s = (Aᵀ * F * A + (C + s₀ • M)) + (s - s₀) • M := by
+    simp only [newtonForm, sub_smul]; abel
+  rw [hsplit]
+  exact PosDef.posSemidef_add (hGN.add hC) (hM.smul (sub_pos.mpr hs))
+
+/-- [proved-derived; formal-checked] **`newton_step_hidden_iff`: the curvature is the only
+source of hidden motion.** For `s ≠ 0` and `Q_s v = −Aᵀc`, the step `v` is native (no hidden part)
+exactly when `C v` is a combination of the readings' covectors. -/
+theorem newton_step_hidden_iff {M : Matrix n n ℝ} (hM : M.PosDef) (A : Matrix m n ℝ)
+    (hA : Function.Surjective A.mulVec) (F : Matrix m m ℝ) (C : Matrix n n ℝ) {s : ℝ}
+    (hs : s ≠ 0) (c : m → ℝ) {v : n → ℝ}
+    (hv : newtonForm M A F C s *ᵥ v = -(Aᵀ *ᵥ c)) :
+    hidden M A v = 0 ↔ ∃ ν : m → ℝ, C *ᵥ v = Aᵀ *ᵥ ν := by
+  have hbal : s • (M *ᵥ v) = -(Aᵀ *ᵥ c) - Aᵀ *ᵥ (F *ᵥ (A *ᵥ v)) - C *ᵥ v := by
+    rw [← hv]
+    simp only [newtonForm, add_mulVec, ← mulVec_mulVec, Matrix.smul_mulVec]
+    abel
+  rw [hidden_eq_zero_iff M A hM hA]
+  constructor
+  · rintro ⟨μ, hμ⟩
+    refine ⟨-c - F *ᵥ (A *ᵥ v) - s • μ, ?_⟩
+    have : C *ᵥ v = -(Aᵀ *ᵥ c) - Aᵀ *ᵥ (F *ᵥ (A *ᵥ v)) - s • (M *ᵥ v) := by
+      rw [hbal]; abel
+    rw [this, hμ, mulVec_sub, mulVec_sub, mulVec_neg, mulVec_smul]
+  · rintro ⟨ν, hν⟩
+    refine ⟨s⁻¹ • (-c - F *ᵥ (A *ᵥ v) - ν), ?_⟩
+    rw [mulVec_smul, mulVec_sub, mulVec_sub, mulVec_neg, ← hν, ← hbal, smul_smul,
+      inv_mul_cancel₀ hs, one_smul]
+
+/-- [proved-derived; formal-checked] **`gaussNewton_regularized_native`**: without the
+curvature term (`C = 0`), the damped Gauss–Newton step is native. -/
+theorem gaussNewton_regularized_native {M : Matrix n n ℝ} (hM : M.PosDef) (A : Matrix m n ℝ)
+    (hA : Function.Surjective A.mulVec) (F : Matrix m m ℝ) {s : ℝ} (hs : s ≠ 0) (c : m → ℝ)
+    {v : n → ℝ} (hv : newtonForm M A F 0 s *ᵥ v = -(Aᵀ *ᵥ c)) : hidden M A v = 0 :=
+  (newton_step_hidden_iff hM A hA F 0 hs c hv).mpr ⟨0, by simp⟩
+
+omit [DecidableEq m] in
+/-- [proved-derived; formal-checked] **`newton_step`: the step and its descent.** At `Q_s ≻ 0`
+the step `v = −Q_s⁻¹Aᵀc` solves the damped model and descends, `⟨Aᵀc, v⟩ < 0`. It is the metric
+step of `P = Q_s⁻¹ ≻ 0`, so it rests exactly where `∇L = 0` (`metric_step_zero_iff`). Its kinetic
+energy splits into its reading change's least energy plus the hidden part's energy
+(`KineticFace.energy_split`); the second term is its cost over the native lift. -/
+theorem newton_step {M : Matrix n n ℝ} {A : Matrix m n ℝ} {F : Matrix m m ℝ} {C : Matrix n n ℝ}
+    {s : ℝ} (hQ : (newtonForm M A F C s).PosDef) (c : m → ℝ) (hg : Aᵀ *ᵥ c ≠ 0) :
+    (newtonForm M A F C s) *ᵥ (-((newtonForm M A F C s)⁻¹ *ᵥ (Aᵀ *ᵥ c))) = -(Aᵀ *ᵥ c) ∧
+      (Aᵀ *ᵥ c) ⬝ᵥ (-((newtonForm M A F C s)⁻¹ *ᵥ (Aᵀ *ᵥ c))) < 0 := by
+  constructor
+  · have hi := mul_nonsing_inv _ ((Matrix.isUnit_iff_isUnit_det _).mp hQ.isUnit)
+    rw [mulVec_neg, mulVec_mulVec, hi, one_mulVec]
+  · exact metric_step_descends hQ.inv hg
+
+end ReadingCurvature
+
 section Audit
 
 #print axioms passage_coeff_zero
@@ -1572,6 +1679,11 @@ section Audit
 #print axioms feature_deposit_makes_native
 #print axioms feature_deposit_native_needs
 #print axioms deposit_raises_native_energy
+#print axioms hidden_curvature
+#print axioms newtonForm_posDef
+#print axioms newton_step_hidden_iff
+#print axioms gaussNewton_regularized_native
+#print axioms newton_step
 
 end Audit
 
