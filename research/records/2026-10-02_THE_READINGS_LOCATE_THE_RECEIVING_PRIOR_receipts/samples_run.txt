@@ -1,0 +1,32 @@
+projection: 1800 s (aeon closes measured at 410271 and 1042242 ms on the first run); deadline 2400 s
+hnn_exposure: campaign 1's declared field over fed5488ce70eb5ffbc90f2f03d23638be9d69189:docs/plans/THE_REBUILD.md
+resonator: none (campaign 1)
+cut: the first 6148 of the pinned cut's 171754 bytes (the declared population; n* = 6148); 3074 receiving windows of A = 2 cells
+held out: cells 4958..6148 (1190 cells, the manifest's range or the declared tail); training: cells 0..4958
+reference: campaign 1 (every locus's certified step, the normal laws' and the factor families', B_Theta = 2^33 bits, pending capacity 64); deadline: none
+carrier lattices L: Element(0) 9, Element(1) 9, Element(2) 10, Element(3) 10, Channel(0) 9, Channel(1) 9, Channel(2) 10, Channel(3) 9, SourcePort(0) 18, Standing(0) 9, Standing(1) 9, Standing(2) 10, Standing(3) 10, ReceivingMap(2) 10
+setup (cut read, fields declared): 252 ms wall
+  aeon 0: the receiver's exponent span, largest 43738519/33554432 bits; one deposit's contact change, largest 15467/33554432 bits; contacts-only commits 534: channel families certified 6384, vanished 5816; the contacts' return a, median 5355065/536870912, total 11363277/1048576 (24 bits); R's steps 534: moved 534, its a median 3269885/33554432 (24 bits), its step median 1; 356355 ms
+  after aeon 1 (window at 1070): the contacts' cumulative change 14147/16777216 bits at an exponent span of 17381579/16777216 bits; over 0 readings frozen: sum Var_p(delta) 0 bits^2 (24 bits); code (opening's contacts less learned) summed [-8845760267/79228162514264337593543950336, 8845760267/79228162514264337593543950336) bits, better 0, worse 0, undecided 1; R's largest entry 20485/1024, its largest change since the last close over it 1 (24 bits); 356355 ms
+  samples written: 1070 inputs, 2 maps
+  aeon 1: the receiver's exponent span, largest 13893005/8388608 bits; one deposit's contact change, largest 8199/16777216 bits; contacts-only commits 560: channel families certified 6720, vanished 6505; the contacts' return a, median 3062591/134217728, total 5858719/262144 (24 bits); R's steps 561: moved 561, its a median 3242261/33554432 (24 bits), its step median 1; 941445 ms
+  after aeon 2 (window at 2192): the contacts' cumulative change 143/262144 bits at an exponent span of 21784487/16777216 bits; over 0 readings frozen: sum Var_p(delta) 0 bits^2 (24 bits); code (opening's contacts less learned) summed [-8998789355/79228162514264337593543950336, 8998789355/79228162514264337593543950336) bits, better 0, worse 0, undecided 1; R's largest entry 299/16, its largest change since the last close over it 1754677/2097152 (24 bits); 941445 ms
+  samples written: 2192 inputs, 3 maps
+  aeon 2: the receiver's exponent span, largest 914761/524288 bits; one deposit's contact change, largest 7245/16777216 bits; contacts-only commits 568: channel families certified 6816, vanished 6685; the contacts' return a, median 15378139/536870912, total 15173943/524288 (24 bits); R's steps 569: moved 569, its a median 11721175/134217728 (24 bits), its step median 1; 1802577 ms
+  after aeon 3 (window at 3330): the contacts' cumulative change 43845/33554432 bits at an exponent span of 26761661/16777216 bits; over 0 readings frozen: sum Var_p(delta) 0 bits^2 (24 bits); code (opening's contacts less learned) summed [-4313771563/39614081257132168796771975168, 4313771563/39614081257132168796771975168) bits, better 0, worse 0, undecided 1; R's largest entry 9917/512, its largest change since the last close over it 5501191/8388608 (24 bits); 1802577 ms
+  samples written: 3330 inputs, 4 maps
+  samples written: 3400 inputs, 4 maps
+  aeon 3: the receiver's exponent span, largest 23510407/16777216 bits; one deposit's contact change, largest 0 bits; contacts-only commits 35: channel families certified 420, vanished 414; the contacts' return a, median 10873579/536870912, total 9869147/8388608 (24 bits); R's steps 35: moved 35, its a median 2845881/33554432 (24 bits), its step median 1; 1865006 ms
+  deposits 0: A-/A+ median 0, upper quartile 0, largest 0 (24 bits); past 5/9 at 0 of 0 (A+ zero at 0); the window's own code fell at 0, rose at 0, undecided 0; of those past 5/9 or with A+ zero: fell 0, rose 0
+  released at Channel(0): 513931 residuals over 303 entries; |sum| over magnitudes pooled 108003/524288 (24 bits); entries coherent at alpha 1/20 (Z^2 > 2 ln 40): 1, not: 302, of 303
+  released at Channel(1): 1002787 residuals over 591 entries; |sum| over magnitudes pooled 3769997/16777216 (24 bits); entries coherent at alpha 1/20 (Z^2 > 2 ln 40): 3, not: 588, of 591
+  released at Channel(2): 2462197 residuals over 1455 entries; |sum| over magnitudes pooled 3800613/16777216 (24 bits); entries coherent at alpha 1/20 (Z^2 > 2 ln 40): 8, not: 1447, of 1455
+  released at Channel(3): 513951 residuals over 303 entries; |sum| over magnitudes pooled 3249797/16777216 (24 bits); entries coherent at alpha 1/20 (Z^2 > 2 ln 40): 2, not: 301, of 303
+  exponent spread by quarter of the windows (largest each): 3508855/4194304, 11767621/8388608, 13893005/8388608, 914761/524288
+  fresh exponent shift (bits): median 0, upper quartile 0, largest 8199/16777216; at least 1/16 at 0, at least 1/21 at 0 of 1697
+  continued exponent shift (bits): median 0, upper quartile 0, largest 11237/8388608; at least 1/16 at 0, at least 1/21 at 0 of 1697
+  relative factor change exponent shift (bits): median 0, upper quartile 1/514, largest 1/257; at least 1/16 at 0, at least 1/21 at 0 of 1697
+  relative anchor change (continued) exponent shift (bits): median 0, upper quartile 0, largest 1/138; at least 1/16 at 0, at least 1/21 at 0 of 1697
+  exponent spread (continued, held) exponent shift (bits): median 12916049/16777216, upper quartile 17837685/16777216, largest 914761/524288; at least 1/16 at 1695, at least 1/21 at 1695 of 1697
+contact ablation: 1697 windows read; a contact moved at 664; the next window's contact states differ at 106, its logits at 34, its grain faces at 34 (above the fibre at 2); continued from the window's own change: anchors at 98, logits at 98, grain faces at 98 (above the fibre at 12); the next window's code strictly lower 0, strictly higher 2, equal 1695, overlapping 0; 1867538 ms; resident 309493760 now, 309493760 peak
+exit 0 wall_ms 1868087 peak_rss_kib 301776

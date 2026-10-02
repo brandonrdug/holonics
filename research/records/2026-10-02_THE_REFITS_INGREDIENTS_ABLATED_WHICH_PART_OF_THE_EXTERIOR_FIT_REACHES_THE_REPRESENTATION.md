@@ -420,8 +420,12 @@ with spread `κ < 14` keeps its `cos² ≥ 4κ/(κ+1)² > 56/225 = (1019 + 101/2
 weights act on the terms, and `d = −Aᵀc` sums the terms' pullbacks, so the bound reaches `d` only
 where those pullbacks are pairwise orthogonal. Terms that share rows of `E` (below) are not: their
 pullbacks can cancel in `d`, and reweighting them can then turn `d` further. Whether the `1/θ_t`
-weights alone stay at `[1019, 1020)` or above against `d` is not read here; the step with
-`μ_t = 1/θ_t` and `K` left out would read it.
+weights alone stay at `[1019, 1020)` or above against `d` is read by Q11 (runner 1, `77afd16`;
+`q11_kinetic_coupling.txt`; projection `1400` s from Q10's read, timeout `1800` s, wall `1399930` ms,
+peak resident `244817920` bytes). The step with `K` left out, `μ = w = −F⁻¹c` (for a lock term its
+target's unit `e_t` over `θ_t`: the `1/θ_t` weights alone), lies at `[1942, 1943)` (Euclidean) and
+`[1870, 1871)` (`M`'s metric). It stays above `[1019, 1020)`, but that is measured;
+the bound does not give it.
 
 **No single block of the reading Gram carries the turn.** The step is `M⁻¹Aᵀμ`: the chart
 `M⁻¹ = H′⁻¹` applied to the readings' pullback, with `μ` from the conjugate-gradient solve of the
@@ -431,12 +435,14 @@ turns nothing: its first iterate `M⁻¹d` lies at `[4068, 4069)`. With `K` cut 
 
 | `K` read as | Euclidean | `M`'s metric | Solve |
 |---|---|---|---|
+| left out, `μ_t = 1/θ_t` | `[1942, 1943)` | `[1870, 1871)` | closed form |
 | its diagonal, `μ_t = (1/θ_t)/K_tt` | `[662, 663)` | `[621, 622)` | closed form |
 | 64 term blocks | `[852, 853)` | `[800, 801)` | all converged at 5 iterates |
 | 8 request blocks (8 terms each) | `[355, 356)` | `[339, 340)` | 4 converged at 38–40, 4 exhausted at 40 |
 | whole | `[37, 38)` | `[37, 38)` | exhausted at 320 |
 
-The per-target weight `1/(θ_t K_tt)` makes most of the turn. Coupling inside a term partly undoes it,
+The `1/θ_t` weight alone takes `d` to `[1942, 1943)`, dividing by `K_tt` takes it to `[662, 663)`, and
+together they make most of the turn. Coupling inside a term partly undoes it,
 coupling inside a request takes it to `[355, 356)`, and the coupling across requests through shared
 `E` completes it. The derivations thread's prediction, term blocks in the Coordinate band and request
 blocks reaching `[37, 38)`, fails on both counts.
@@ -447,8 +453,11 @@ monotonically: `[4068, 4069)` at 1, `[2659, 2660)` at 2, `[653, 654)` at 8, `[25
 258 to 320. So the direction holds to one cell over its last 63 iterates, and the turn belongs to `K`,
 not to where the solve stopped. In exact arithmetic the solve reaches `K⁻¹w` within its 320 reading
 coordinates. Holding every iterate at `JOINT_BITS` (`joint_held`) breaks that, and the solve ends
-without its `2⁻³²` energy floor. [agent-inferred] That is a law of the solve's representation, owed
-with its residual read, not a property of the metric.
+without its `2⁻³²` energy floor. Q11 reads the residual energy over the opening's: `[10933, 10934)/2^32`
+at iterate 188, `[262, 263)/2^32` at 258 and `[16, 17)/2^32` at 320. So the deposited step stops at `[16, 17)/2^32`,
+four bits above the `2⁻³²` floor (`16 = 2^4`), and its direction settled at iterate 258 while the
+residual fell by a factor in `(262/17, 263/16)`, an interval holding `2^4`.
+[agent-inferred] That is a law of the solve's representation, not a property of the metric.
 
 **The throw runs under strict descent, so its control does too.** The throw chain (#240) calls
 `move-once`, which holds `ReleaseExcursion::monotone()`. Q2's chains run #202's interval, in which a
