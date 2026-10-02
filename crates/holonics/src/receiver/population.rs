@@ -174,8 +174,11 @@
 //! most the selected family's code plus `−log₂ π(f)` in an aeon without births
 //! (`evolved_aeon_code`). A birth renormalizes the declared priors to `m_f/M_n`, so once births have
 //! founded the mass `M_n` the bound gains `log₂(M_n/M)` ([`evolution`]; Lean
-//! `Evolution.evolved_code_with_births`). A family is founded at a declared rational mass with
-//! [`Population::found_with`].
+//! `Evolution.evolved_code_with_births`). Across aeons the selected families' Dirichlet faces
+//! telescope to the Dirichlet-multinomial face of the counts, so the summed code over `K` aeons is
+//! at most the selected families' own codes plus `K(−log₂ λ)` plus that face's code (Lean
+//! `Evolution.{dirichlet_telescope, evolved_aeons_code}`). A family is founded at a declared rational
+//! mass with [`Population::found_with`].
 //!
 //! [proved-derived; formal-checked] **Species collapse** ([`species`]; Lean `Evolution.{species_face,
 //! species_collapse_code, species_split}`). Surviving keys whose conditioned faces agree for every
@@ -238,7 +241,9 @@
 //! | `Compression/Landmark/Context/Composition.{chain_rule, chain_rule_of_species}` | [`Composed`]'s code over a keystone's keys; [`PortedEmitters`] under `KeyFamily` (a deterministic reader: `log₂ \|K_A\| − log₂ #S`) |
 //! | `Compression/Landmark/Context/Evolution.{survivalPseudo_zero_deaths, survivalPseudo_death_lt, dirichletFace_isPrior, kt_face, dirichletFace_no_deaths, descriptionPrior_isPrior, evolved_isPrior, masses_total}` | [`Tally::pseudo`], [`Selections::face`], [`Selections::prior`], [`Population::evolved`] |
 //! | `Compression/Landmark/Context/Evolution.{evolved_code_le_face, evolved_code_le_description, evolved_aeon_code, evolved_code_with_births}` | the evolved population's code against its selected family's |
+//! | `Compression/Landmark/Context/Evolution.{selection_telescope, dirichlet_telescope, dirichlet_telescope_counts, dirichlet_telescope_le, evolved_aeons_code}` | [`Selections`] (the counts retained across aeons), the evolved population's code over a sequence of aeons |
 //! | `Compression/Landmark/Context/Evolution.{speciesWeight_isPrior, species_mixture, species_face, species_collapse_code, species_split}` | [`Population::collapse`], [`Population::split`], [`Collapse`] |
+//! | `Compression/Landmark/Context/Evolution.{leastPeriod_dvd, agree_forever_iff, shiftHolds_iff, leastPeriod_isLeast, signature_eq_iff}` | [`Emitters::signature`] under [`AdmittedFuture::Whole`] |
 //! | `Compression/Landmark/Context/Composition.{stagedFace_nonneg, stagedFace_sum_one, staged_chain_rule, staged_code}` | none since September 30 (the boundary egg and the admitted receivers, history at `f5fd8f3b`) |
 //! | `Compression/Landmark/Context/Merge.{merge_cost_iff, merge_cost_mass_iff, merge_cost_nat}` | [`Blocks::price`] (accepted exactly when `P·W < P′·W′`) |
 //! | `Compression/Landmark/Context/Merge.{restaurant_found, restaurant_join, restaurant_step_sum, restaurant_merge_ratio, restaurant_merge_ratio_ge_two}` | [`restaurant_ratio`], [`Blocks::description_bits`] |
@@ -601,7 +606,9 @@ pub trait Emitters: Send {
     /// keys with equal signatures emit one class at every admitted tick of every admitted passage.
     /// Over `h` ticks it is the word of the next `h` classes; over the whole future the word of one
     /// least period from the current tick (two periodic words agree forever exactly when their least
-    /// periods and one period's words agree). None when the emitters declare no exact check.
+    /// periods and one period's words agree, Lean `Evolution.signature_eq_iff`; the least divisor of
+    /// the declared period passing the shift test is the least period, `Evolution.leastPeriod_isLeast`).
+    /// None when the emitters declare no exact check.
     fn signature(&self, key: u64, future: AdmittedFuture) -> Option<Vec<usize>> {
         match future {
             AdmittedFuture::Ticks(ticks) => (0..ticks).map(|t| self.ahead(key, t)).collect(),
