@@ -638,11 +638,15 @@
 //! | stored where paths part: a chain with its bottom is one node at the summed rung (`1 − ρ_top = 2^(−S)(1 − ρ_bottom)`, founded at `2^S − 1`), a chain to `D` one KT node, the split's two ratios, the landmark tree's face exactly, at most `2n − 1` nodes a tree | `Compression/Landmark/Context/Compaction.{chain_ratio, chain_ratio_dyadic, leaf_chain_is_one_node, chain_split, compacted_is_the_full_tree, compacted_node_bound}` | [`Landmarks`], [`LandmarkDeclaration::rung_sums`], the split ([`Beta::split`], `Law::part`, `Law::chain`), [`Landmarks::face_rule`], [`Landmarks::tree_sizes`], [`IdealLandmarks`] |
 //! | which merges and releases are future-sufficient: equal present faces do not merge; a coarser receiver is priced by its code-length pair within a margin | `Compression/Landmark/Context/Merge.{square_iff_no_separator, equal_present_faces_do_not_merge, coarsening_within_margin_iff}`; `Tree.{release_rule, budget_eviction_changes_face}` | the section above; the census `hnn_population f0-census` |
 //!
-//! [open] Owed in #62 (Lean `Compression/Landmark/Context/Tree`'s `[open]`): the passage-level composition of the
-//! drift bound (the subtree sum over the tree and the passage, from `lattice_node_telescope`,
-//! `weight_log_lipschitz` and `mix_ratio_bound`) into the per-cell rule, and the certified binary
-//! logarithm's squaring invariant; both are checked by the tests, the first cell by cell against
-//! the oracle.
+//! [proved-derived] The passage-level composition of the drift bound (the subtree sum over the
+//! tree and the passage, from `lattice_node_telescope`, `weight_log_lipschitz` and
+//! `mix_ratio_bound`) into the per-cell rule is Lean `Compression/Landmark/Context/Drift`
+//! (`ExecutedTree.passage_drift`, `ExecutedTree.cell_drift`, `ExecutedTree.cell_drift_uniform`),
+//! for the full executed tree: each node's `excess` counts its factors once (the doubled rebase
+//! units here are conservative), and the passage's code is within `N((2D + 1)u + Dρ)` of the
+//! ideal, far inside the rule summed over the cells. [open] Owed in #62: the compacted storage read
+//! as that tree's instance, the executed join's drift, and the certified binary logarithm's
+//! squaring invariant; all are checked by the tests, the drift cell by cell against the oracle.
 
 use std::collections::HashMap;
 
