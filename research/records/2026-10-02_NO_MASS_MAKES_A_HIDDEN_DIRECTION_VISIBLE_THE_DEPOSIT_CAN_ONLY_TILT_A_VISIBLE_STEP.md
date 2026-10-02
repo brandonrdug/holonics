@@ -36,16 +36,19 @@ For a target `δ` with `A δ ≠ 0`:
   definite, the feature deposit `k = Zᵀ (Z Δᵀ)⁻¹ Z ⪰ 0`, of rank at most the number of rows, gives
   `Δ (H + k) = X`.
 - **And the condition is needed** (`feature_deposit_native_needs`): any feature deposit `k ⪰ 0`
-  with `Δ (H + k) = X` makes `(X − Δ H) Δᵀ = Δ k Δᵀ` positive semidefinite. A target fails it
-  whenever its rows disagree on the feature direction they need, because one Gram serves every row.
+  with `Δ (H + k) = X` makes `(X − Δ H) Δᵀ = Δ k Δᵀ` positive semidefinite. Its entry `(i, j)`
+  pairs row `i`'s needed change `Z_i` with row `j`'s target `Δ_j`: one Gram serves every row, so the
+  condition binds every pair of rows. A target fails it wherever a row's needed change opposes its
+  own target, `⟨Z_i, Δ_i⟩ < 0`.
 
 ## 3. The cost in the Fisher form
 
 - **At first order, nothing.** A native step's reading change is the same under every mass
   (`KineticFace.horizontal_reads`), so its first-order decrease `⟨c, D c⟩` and its Fisher-form
   certificate on the readings (`reading_scale_descends`) are unchanged.
-- **The step's kinetic energy rises.** After a deposit `K ⪰ 0`, the least energy of a reading change
-  `w`, `½⟨w, (A M⁻¹ Aᵀ)⁻¹ w⟩`, does not fall (`deposit_raises_native_energy`).
+- **The step's kinetic energy never falls.** After a deposit `K ⪰ 0`, the least energy of a reading
+  change `w`, `½⟨w, (A M⁻¹ Aᵀ)⁻¹ w⟩`, is at most its value under `M + K`
+  (`deposit_raises_native_energy`).
 - **At second order, only through the readings' curvature.** [derived] For a hidden part `h`
   (`A h = 0`), the second-order change of `L` is `½ hᵀ (AᵀFA + Σ_k c_k ∇²r_k) h = ½ Σ_k c_k hᵀ∇²r_k h`,
   since the Gauss–Newton term `AᵀFA` vanishes on `h`. The same tensor `∇²r_k` is how `h` changes the

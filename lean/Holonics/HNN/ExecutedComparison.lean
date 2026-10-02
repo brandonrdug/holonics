@@ -83,7 +83,7 @@ the laws that covector and its certified step stand on (the diagnosis record,
    `δ` native exactly when `A δ ≠ 0` (`native_under_some_mass_iff`). The smallest additive change
    is rank one (`deposit_makes_native`); through the feature Gram it is `k = Zᵀ (Z Δᵀ)⁻¹ Z`, needing
    `(X − Δ H) Δᵀ ⪰ 0` (`feature_deposit_makes_native`, `feature_deposit_native_needs`). The reading
-   change and its certificate are mass-free, and a deposit raises the step's kinetic energy
+   change and its certificate are mass-free, and a deposit never lowers the step's kinetic energy
    (`deposit_raises_native_energy`) (§11).
 
 [open] (#62) The existence of the differentiable root path (the implicit function theorem at a
@@ -1372,9 +1372,9 @@ the directions no reading sees, what change of the port's mass `M = I ⊗ H′` 
 A direction no reading sees is never native under any mass (`hidden_never_native`); a mass change
 can only tilt the lift of a visible reading change (`native_under_some_mass_iff`), by a rank-one
 addition (`deposit_makes_native`) or, through the feature Gram, a deposit of rank at most the rows'
-under a row-by-row condition (`feature_deposit_makes_native`, `feature_deposit_native_needs`). The
-change leaves the step's reading change and its Fisher-form certificate unchanged and raises its
-kinetic energy (`deposit_raises_native_energy`). -/
+under a condition on every pair of rows (`feature_deposit_makes_native`,
+`feature_deposit_native_needs`). The change leaves the step's reading change and its Fisher-form
+certificate unchanged and never lowers its kinetic energy (`deposit_raises_native_energy`). -/
 
 section PortMass
 
@@ -1472,8 +1472,9 @@ omit [Fintype m] [DecidableEq m] [DecidableEq n] in
 /-- [proved-derived; formal-checked] **`feature_deposit_native_needs`: and it is needed.** If a
 positive semidefinite feature deposit `k` gives `Δ (H + k) = X`, then `(X − Δ H) Δᵀ = Δ k Δᵀ` is
 positive semidefinite. So a feature deposit can make `Δ` native toward `X` only where
-`(X − Δ H) Δᵀ` is symmetric and positive semidefinite: one row-by-row condition on the readings'
-weights, which a target fails whenever its rows disagree on the feature direction they need. -/
+`(X − Δ H) Δᵀ` is symmetric and positive semidefinite. Its entry `(i, j)` pairs row `i`'s needed
+change `Z_i` with row `j`'s target `Δ_j`, so one Gram serving every row binds every pair of rows; a
+target fails it wherever a row's needed change opposes its own target, `⟨Z_i, Δ_i⟩ < 0`. -/
 theorem feature_deposit_native_needs {r : Type*} [Fintype r] [DecidableEq r]
     (Δ X : Matrix r n ℝ) (H k : Matrix n n ℝ) (hk : k.PosSemidef) (hX : Δ * (H + k) = X) :
     ((X - Δ * H) * Δᵀ).PosSemidef := by
