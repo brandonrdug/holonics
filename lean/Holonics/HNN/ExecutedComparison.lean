@@ -115,7 +115,9 @@ the laws that covector and its certified step stand on (the diagnosis record,
    (`certifiedLock_largest`), the true largest gap locks (`leader_locks`), a lone lock has the
    strictly largest true gap (`lone_lock_is_largest`), a certified order is swapped only by a
    crossing (`certified_order_needs_crossing`), and exact readings give the largest gap with its
-   ties (`certifiedLock_exact`) (§14).
+   ties (`certifiedLock_exact`); the order term, the right station's certain gap against the wrong
+   stations' reaches, locks no wrong station where it is solved (`order_solved_locks_no_wrong`)
+   (§14).
 
 [open] (#62) The existence of the differentiable root path (the implicit function theorem at a
 simple root, from `Φ`'s strict differentiability), Jacobi's formula `∂_η det(λ − M − ηΔM) =
@@ -1880,14 +1882,19 @@ reach** (`certifiedLock`). Then:
   station certified below another at one state locks alone at a later one only if their true gaps
   cross (`certified_order_needs_crossing`);
 - on exact readings it is the largest gap with its ties, the rule as it stood
-  (`certifiedLock_exact`). -/
+  (`certifiedLock_exact`);
+- the comparison's order term reads the same two ends, the right station's certain gap against
+  each wrong station's reach, so where it is solved no wrong station locks
+  (`order_solved_locks_no_wrong`): one law for the release and the term. -/
 
 section CertifiedLock
 
 variable {ι : Type*}
 
 /-- [definition; agent-inferred, October 2] **A station locks when no station's certain gap
-exceeds its reach.** -/
+exceeds its reach.** Inferred: the release reads its other orderings of enclosures only where they
+are certified and an uncertified one plural, and this reads the gap order the same way; no owner
+states that convention for the gap order. -/
 def certifiedLock (lo hi : ι → ℝ) (j : ι) : Prop := ∀ i, lo i ≤ hi j
 
 /-- [proved-derived; formal-checked] **The station of the largest certain gap locks.** -/
@@ -1928,6 +1935,15 @@ theorem certified_order_needs_crossing [Finite ι] [Nonempty ι] {lo hi g lo' hi
     (hhi' : ∀ i, g' i ≤ hi' i) {j k : ι} (hjk : j ≠ k) (hbelow : hi j < lo k)
     (hlone : ∀ i, i ≠ j → ¬ certifiedLock lo' hi' i) : g j < g k ∧ g' k < g' j :=
   ⟨by linarith [hhi j, hlo k], lone_lock_is_largest hlo' hhi' hlone k (Ne.symm hjk)⟩
+
+/-- [proved-derived; formal-checked] **The order term solved locks no wrong station**: the right
+station `r`'s certain gap past the wrong stations' reaches together (each reach nonnegative) leaves
+every wrong station `j` short of `r`'s certain gap, so none locks. This is the order term's solved
+level (`hnn::executed::OrderTerm`) on the rule `certifiedLock`. -/
+theorem order_solved_locks_no_wrong {lo hi : ι → ℝ} (W : Finset ι) (r : ι)
+    (hhi : ∀ j ∈ W, 0 ≤ hi j) (hsolved : ∑ j ∈ W, hi j < lo r) :
+    ∀ j ∈ W, ¬ certifiedLock lo hi j := fun _ hj hlock =>
+  absurd ((hlock r).trans (Finset.single_le_sum hhi hj)) (not_le.mpr hsolved)
 
 end CertifiedLock
 
@@ -2022,6 +2038,7 @@ section Audit
 #print axioms certifiedLock_exact
 #print axioms lone_lock_is_largest
 #print axioms certified_order_needs_crossing
+#print axioms order_solved_locks_no_wrong
 
 end Audit
 

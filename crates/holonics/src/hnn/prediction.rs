@@ -536,8 +536,8 @@ pub enum LockOrder {
     Descending,
 }
 
-/// [proved-derived; formal-checked, October 2] **The stations the readings do not certify below
-/// the largest gap** ([`LockOrder::Gap`]): each eligible station's gap is enclosed by its certain
+/// [definition; agent-inferred, October 2; its consequences proved-derived, formal-checked] **The
+/// stations the readings do not certify below the largest gap** ([`LockOrder::Gap`]): each eligible station's gap is enclosed by its certain
 /// gap `L_top − max_(x≠top) U_x` and its reach `U_top − max_(x≠top) L_x`; a station locks when its
 /// reach meets the largest certain gap. The station of the largest certain gap always locks, so a
 /// refinement with an eligible station locks one (Lean
@@ -545,7 +545,8 @@ pub enum LockOrder {
 /// (`leader_locks`); a station that locks alone has the strictly largest true gap
 /// (`lone_lock_is_largest`), so no move makes a station certified below another lock alone before it
 /// unless their true gaps cross (`certified_order_needs_crossing`). On exact readings it is the
-/// largest gap with its ties (`certifiedLock_exact`).
+/// largest gap with its ties (`certifiedLock_exact`). The comparison's order term reads the same
+/// two ends (`hnn::executed::OrderTerm`; `order_solved_locks_no_wrong`).
 pub(crate) fn uncertified_largest(gaps: &[(usize, usize, Rat)], reaches: &[Rat]) -> Vec<usize> {
     let largest = gaps.iter().map(|(_, _, gap)| gap).max();
     match largest {

@@ -3,7 +3,8 @@
 **Date.** October 2. **Issues.** #73, #63 (THE_REBUILD U6, step 1), #62. **Grade.** [proved-derived;
 formal-checked] for the statements cited to `HNN/ExecutedComparison` §13 and §14; [measured] for the
 main line's numbers in §4a; [derived] from the owners'
-code where marked; [agent-inferred] where marked. No run here. The lock rule changes in Rust (§5).
+code where marked; [agent-inferred] where marked, the lock rule of §5 among them. No run here. The
+lock rule and the order term that reads it change in Rust (§5).
 Follows [the release guard](2026-10-02_THE_RELEASE_GUARD_CERTIFIES_THE_FIXED_MASK_AND_CHARGES_THE_FLIP_OVER_A_WINDOW.md)
 (its §1 holds `m7`'s measurement: at every rung from `η = 1/16` to `1/2048` the own release reads
 `34038/4096` nats above the fixed mask at the same `E`).
@@ -24,7 +25,9 @@ paid.
 The main line's read (§4a) places `m7`'s flip in the lock rule's ranking of near-tied gaps, which
 the rule read on cell ends. §5 gives the rule that locks together every station the readings do not
 certify below the largest gap. No move can swap a certified order without the readings crossing.
-The rule is forced by the release's own reading of its other decisions.
+The rule is inferred from the release's own reading of its other decisions; no owner states that
+reading for the gap order. The comparison's order term reads the same two ends, so the release and
+the term keep one law.
 
 ## 1. Where a decision changes: the lock rule's margin
 
@@ -143,7 +146,8 @@ cannot pay for it, which is §12's `one_move_closes_iff` read from the other sid
     order, but it bounds nothing over the segment.
   - No owner bounds a root's separation, or the monodromy's variation, over `[Θ, Θ′]`.
 - **The order term is the closest existing law** (`Composition::LockOrder`). It is the comparison's
-  term on the same margin, the right station's gap against the wrong ones' at `r*`. Descending it
+  term on the same margin, the right station's certain gap against the wrong ones' reaches at `r*`
+  (§5). Descending it
   pushes kind-A margins away from zero at first order. It is still a term to descend, not a
   certificate. Under `Reading::Decisions` it is read only at `r*`, so a kind-A flip at `r₀ < r*` is
   outside it.
@@ -229,18 +233,31 @@ it stood. What follows (Lean §14, `section CertifiedLock`):
   move certifies one above the other. Its cost is the split's (§2, kind C: the value of the first
   datum to the second).
 
-**Forced or chosen.** [derived] Forced by the release's own reading of its other decisions:
+**Forced or chosen.** [agent-inferred] Inferred from the release's own reading of its other
+decisions; no owner states that reading for the gap order, so the rule is graded agent-inferred
+here and in Lean (`certifiedLock`):
 - A top exceeds its rivals only when its `L` exceeds every rival's `U`, and a station locks only
   when its `L` exceeds one. Both are certified orderings of enclosures.
 - An ordering the enclosures do not certify is read plural: "no positive gap is a plural reading",
   "ties lock together".
 - The gap ranking was the one decision that compared bare cell ends as if they were readings.
-- Reading it the same way leaves nothing to choose. The comparison `≥` (reach meeting the largest)
+- Reading it the same way leaves nothing further to choose. The comparison `≥` (reach meeting the largest)
   keeps a possible true tie together, as the exact rule does. The cells are the receiver's declared
   grain.
 
 [agent-inferred] The one alternative, refining the cells until near ties order, changes the
 receiver's grain, which the release does not own. So it is refused.
+
+**The order term reads the same ends.** The comparison's order term (`hnn::executed::OrderTerm`,
+`Composition::LockOrder`) read the right station's certain gap against the wrong stations' certain
+gaps: `solved` was `lo_r > Σ_(E∖R) lo`. Under the rule above a wrong station `j` locks whenever its
+reach meets the largest certain gap, so that `solved` no longer certified that no wrong station
+locks. The term now reads each wrong sheet at its reach and the right sheet at its certain gap:
+`ℓ_o = log((lo_r + Σ_(E∖R) hi)/lo_r)`, solved exactly when `lo_r > Σ_(E∖R) hi`. Each reach is
+nonnegative (an eligible top exceeds every rival), so solved gives `lo_r > hi_j ≥ lo_j` for every
+wrong `j`: none locks (Lean `order_solved_locks_no_wrong`). Each wrong sheet's covector returns
+through its top and the rival of its reach (the largest lower end). On exact readings `hi = lo` and
+the term is the pin's. One law, read by the release and by the comparison.
 
 **What it would have done at `m7`.** [agent-inferred; to be measured by the main line]
 - **At the incumbent.** If the swapped stations' gap enclosures overlap there, as a swap within
@@ -265,11 +282,14 @@ receiver's grain, which the release does not own. So it is refused.
   `lake env lean Holonics/HNN/ExecutedComparison.lean`: no errors, no `sorry`.
 - **Lean, §14** (`section CertifiedLock`): `certifiedLock`, `certifiedLock_largest`,
   `leader_locks`, `certifiedLock_exact`, `lone_lock_is_largest`,
-  `certified_order_needs_crossing`; the same axioms only.
+  `certified_order_needs_crossing`, `order_solved_locks_no_wrong`; the same axioms only.
 - **Rust.** The lock rule's owner, `hnn::prediction`:
   - `uncertified_largest` decides `LockOrder::Gap` from each eligible station's certain gap and
     reach; it is the only change to the release;
   - test `a_gap_the_readings_do_not_order_below_the_largest_locks_with_it`;
+  - the order term's owner, `hnn::executed::order_at`, reads the wrong sheets at their reach
+    (`GapRead`), with test
+    `the_order_term_reads_the_wrong_sheets_at_the_reach_the_lock_rule_compares`;
   - the trial's `change` field (own less mask) already reads `J`.
 - **Owed (#62).** No new obligation from this record. The segment bound `Λ` is a missing owner, not
   an owed proof of an existing statement.

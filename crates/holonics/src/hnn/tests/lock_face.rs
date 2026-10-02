@@ -1108,6 +1108,66 @@ fn the_order_is_solved_past_the_wrong_gaps_and_absent_without_a_right_top() {
     assert!(batch.requests[0].order_terms.is_empty());
 }
 
+/// **The order term reads each wrong sheet at its reach, the end the lock rule compares**: station
+/// 0 is right with enclosure `[5, 6]` over its rivals' `2` and `1` (certain gap `3`, reach `4`);
+/// station 1's top is wrong with `[4, 6]` (certain gap `2`, reach `4`); station 2 is right with
+/// certain gap `5/2`. The certain gaps alone would call the order solved (`3 > 2`), yet the release
+/// locks the wrong station 1 with station 0 (its reach `4` meets the largest certain gap `3`). The
+/// term reads `ℓ_o = ln((3 + 4)/3)`, not solved, in agreement with the lock rule. Narrowing station
+/// 1's top to `[4, 9/2]` (reach `5/2 < 3`) solves the order, and the release locks station 0 alone.
+#[test]
+fn the_order_term_reads_the_wrong_sheets_at_the_reach_the_lock_rule_compares() {
+    use crate::hnn::executed::GapRead;
+    use crate::hnn::prediction::uncertified_largest;
+    let batch_of = |top: Growth| {
+        let growths = [
+            [growth(integer(5), integer(6)), at(integer(2)), at(integer(1))],
+            [top, at(integer(2)), at(integer(1))],
+            [at(rat(1, 2)), at(rat(1, 4)), at(integer(3))],
+        ];
+        let reads = vec![
+            growths
+                .iter()
+                .map(|g| g.iter().map(|a| candidate(a.clone(), vec![resolved(0, 1, 0)])).collect())
+                .collect::<Vec<Vec<TurnCovector>>>(),
+        ];
+        synthetic_batch(
+            Comparison {
+                composition: Composition::LockOrder,
+                reading: Reading::Decisions,
+            },
+            &[vec![0, 1, 2]],
+            vec![(0..3).map(|s| site(s, 3)).collect()],
+            &reads,
+            2,
+        )
+        .unwrap()
+    };
+    let gaps = [(0, 0, integer(3)), (1, 0, integer(2)), (2, 2, rat(5, 2))];
+    let batch = batch_of(growth(integer(4), integer(6)));
+    let order = batch.requests[0].order_terms[0].clone();
+    let sheets: Vec<(usize, usize, GapRead, Rat)> =
+        order.sheets.iter().map(|s| (s.station, s.runner, s.read, s.gap.clone())).collect();
+    assert_eq!(
+        sheets,
+        vec![(0, 1, GapRead::Certain, integer(3)), (1, 1, GapRead::Reach, integer(4))]
+    );
+    assert_eq!(
+        order.sheets.iter().map(|s| s.weight.clone()).collect::<Vec<_>>(),
+        vec![rat(-4, 7), rat(4, 7)]
+    );
+    assert_eq!(order.value, ln_enclosure(&rat(7, 3)).unwrap());
+    assert_eq!(order.solved, Predicate::Fails);
+    assert_eq!(order.kind, Excess::Above);
+    assert_eq!(uncertified_largest(&gaps, &[integer(4), integer(4), rat(5, 2)]), vec![0, 1]);
+    let batch = batch_of(growth(integer(4), rat(9, 2)));
+    let order = batch.requests[0].order_terms[0].clone();
+    assert_eq!(order.sheets[1].gap, rat(5, 2));
+    assert_eq!(order.solved, Predicate::Holds);
+    assert_eq!(order.kind, Excess::Solved);
+    assert_eq!(uncertified_largest(&gaps, &[integer(4), rat(5, 2), rat(5, 2)]), vec![0]);
+}
+
 fn plus_interval(a: &ExactInterval, b: &ExactInterval) -> ExactInterval {
     ExactInterval {
         lower: &a.lower + &b.lower,
