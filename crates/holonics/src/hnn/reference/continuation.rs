@@ -194,3 +194,43 @@ fn native_contact_return_refuses_another_source_and_stale_deposit_without_cache_
     ));
     assert_eq!(charts, before);
 }
+
+// [proved-derived] At an opening receiving map `R = 0` (`Constitution::initial`) the face is the
+// tree's and every covector the comparison sends into the passage is `Rᵀ g = 0`: no adjoint solve
+// moves, and the contact storage's pull `Σ 2 r̄ (w − ω)ᵀ` is zero, while the face's own covector
+// `g` and the feature `f` that `R`'s step reads are not (Lean
+// `HNN/ReceivingReach.{zero_map_reads_nothing, storage_covector_dual}`). The first comparison on
+// an opening constitution can move `R` alone; `C` is reached from the second on.
+#[test]
+fn a_zero_receiving_map_returns_no_covector_to_the_contact() {
+    let field = boundary().with_exact_word();
+    let theta = resolved(&field);
+    let ring = field.receivers()[0].ring;
+    let map = theta.receiving_map(ring).unwrap();
+    let zero = ExactRatMatrix::zero(map.rows(), map.columns()).unwrap();
+    let theta = theta.with_ports(ring, None, None, Some(zero)).unwrap();
+    let (current, source) = learning::moment(&field, 82, 9);
+    let source = Arc::new(source);
+    let mut charts = Charts::new();
+    let phases = learning::phases(&field, &theta, &current);
+    let mut word = Word::open_source(&field, &theta, &current, source, &mut charts).unwrap();
+    word.run(phases.last_epoch() + 1).unwrap();
+    let targets: Vec<_> = (0..phases.aperture()).map(|i| (i + 1) % field.alphabet()).collect();
+    let (_, returned) = word.compare_contact_storage(0, 0, &targets).unwrap();
+    let back = returned.pullback.present().unwrap();
+    // The face's covector and the feature it pairs with are present: `R`'s step has its samples.
+    assert!(back.reads.iter().any(|(f, _)| f.iter().any(|x| !x.is_zero())));
+    assert!(back.reads.iter().any(|(_, g)| g.iter().any(|x| !x.is_zero())));
+    // Nothing enters the passage: every adjoint solve and every opening covector is zero.
+    assert!(back.transits.iter().flatten().all(|tick| tick.solved.iter().all(Rat::is_zero)));
+    assert!(back.opening.iter().flatten().all(Rat::is_zero));
+    // So the contact storage's pull is zero.
+    let deposit = returned.deposit.present().unwrap();
+    assert_eq!(deposit.factors().len(), 1);
+    for step in deposit.factors() {
+        let FactorGradient::Storage { gradient, .. } = &step.gradient else {
+            panic!("the contact return composes contact storage alone");
+        };
+        assert!(gradient.entries().iter().all(Rat::is_zero));
+    }
+}
