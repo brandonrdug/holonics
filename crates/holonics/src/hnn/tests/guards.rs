@@ -19,10 +19,10 @@ use crate::ratio::{Rat, rat};
 use crate::receiver::face::GrainCell;
 
 /// Guard 1: the moment is sized once from the field, and ingest never grows it (on the chain
-/// control: ring 0's two phases, each `|A|` phase counts and `|A|²` offset counts, and the offset
-/// window); `log₂N(n)` per source bit is at least 1 below `n*` and below 1 past it (the count, not
-/// one slot's bits). The refusal of a population below `n*` is the field's own law
-/// (`tests/field.rs`, `a_population_below_capacity_is_refused`).
+/// control: ring 0's two phases, each `|A|` phase counts and `|A|²` offset counts, and the codes
+/// held for the declared offsets); `log₂N(n)` per source bit is at least 1 below `n*` and below 1
+/// past it (the count, not one slot's bits). The refusal of a population below `n*` is the field's
+/// own law (`tests/field.rs`, `a_population_below_capacity_is_refused`).
 #[test]
 fn guard_one_the_moment_is_sized_once_and_lossy_past_its_capacity() {
     let field = chain();

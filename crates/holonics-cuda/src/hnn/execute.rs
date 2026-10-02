@@ -273,7 +273,7 @@ fn gather(field: &Field, ring: usize, k: &BigInt) -> Vec<i64> {
 }
 
 impl WordPlan {
-    /// **Form a word's plan** at a lift point on a publication, for a receiving window (module
+    /// **Form a word's plan** at a lift point on a publication, for a receiving epoch (module
     /// header), with the moment's count layout (its phase rows' and offset blocks' bases).
     pub(crate) fn form(
         field: &Field,
@@ -543,7 +543,7 @@ impl WordPlan {
         for (a, offset) in selection_offsets.iter().enumerate() {
             plan[contact_table + a * WC_STRIDE + WC_SELECTION] = (selections_at + offset) as i64;
         }
-        // The receiving window and its gather.
+        // The receiving epoch and its gather.
         let receiver = phases.ring();
         let map = loci.maps[receiver]
             .as_ref()

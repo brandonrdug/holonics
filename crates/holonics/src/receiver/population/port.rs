@@ -33,7 +33,7 @@
 //! the combined face at matched priors, one bit of description each, so `π = ½/½` and nothing is
 //! reserved. At that prior the population is the sequential mixture (Lean
 //! `Compression/Landmark/Context/LocalWeighing.two_face_prior` at `π = ½`: `priorMix (1/2) = seqMix`),
-//! stepped cell by cell in the receiver's prequential order, deposits inside a receiving window
+//! stepped cell by cell in the receiver's prequential order, deposits inside a receiving epoch
 //! included. The retired carried ratio `β` of `hnn::receiving::Mixture` (THE_REBUILD U1, history at
 //! `19f1eb61`) stepped the same law
 //! through a rational chart and a rebase; against it this population's face differs at cell `t` by
@@ -44,7 +44,7 @@
 //! [definition] The computational object is the helical pair interaction read at the receiving port.
 //! Of the winding guide's six general objects this owner touches **faces and placement** (each
 //! family's face of the received class and the population's weighed face) and the **tube** (the
-//! receiving window as a clocked span, its cells received in cell order); the helix, the pair, the
+//! receiving epoch as a clocked span, its cells received in cell order); the helix, the pair, the
 //! cell holonomy and the tower thread stay attached through the families' own owners (the field's
 //! word and the landmark tree's address).
 //!

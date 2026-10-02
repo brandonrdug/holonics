@@ -440,7 +440,7 @@ extern "C" __global__ void hnn_inverse_certificate(
 //
 // [definition] Campaign 2, the deposit phase on the card where its arithmetic is dyadic
 // (`holonics::hnn::constitution::NormalLaw::deposited`, Lean `HNN/Normal.normal_prox_step`,
-// `HNN/LatticeDeposit.carry`). A window's samples `(a_t, l_t, r_t)` with dyadic coordinates
+// `HNN/LatticeDeposit.carry`). A deposit's samples `(a_t, l_t, r_t)` with dyadic coordinates
 // `a = α·2^(−σ_a)`, `l = λ·2^(−σ_l)`, `r = ϱ·2^(−σ_r)` give the update's entries
 //
 //   U_ij = Σ_t α_t λ_(t,i) ϱ_(t,j)            on 2^(−S)ℤ, S = σ_a + σ_l + σ_r
