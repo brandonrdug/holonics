@@ -159,3 +159,20 @@ on the joint field) are too small to move it. So the statement of §6 holds for 
 for the machine. The contact loop belongs on the text configuration, where contacts move. Its
 harness (`hnn_prediction develop`) was retired with the linear readout on September 30, so running
 it means porting a harness, and that choice goes to Astra with its cost.
+
+## 7. On real text the interior moves
+
+The live configuration needs no port. Campaign 1's exposure (`hnn_exposure`, the reference
+machine on its own field, reading real text) now records each deposit's rounding refusals
+(`CurvePoint::vanished`), and the harness prints a rounding census. The smoke run `windows 8` on the
+development control ([receipt](2026-10-02_THE_CONTACT_LOOP_receipts/exposure_windows8.txt), 752 ms):
+- **Contacts 1 and 2 move.** Contact 1's factors moved at 5, 6 and 6 of 6 certified deposits, and
+  contact 2's at 6 of 6 each, with steps from `2^3` to `2^11`.
+- **Contacts 0 and 3 barely move.** They moved at 0 of 6, except contact 3's dissipation at 1.
+- **Every element's map, passive factor and slices move at 6 of 6.** The source port moves at 6 of
+  6, and the standings at 1 to 4 of 6. The pair port never moves.
+
+So the return-driven contact change Astra asked for is present on real text. A reached return moves
+contacts 1 and 2 at nearly every deposit. The old develop-text harness isn't needed. Next, on this
+configuration, the same later drive read at the predecessor and at a successor that differs only in
+the contacts' deposited steps, with the deposition work accounted.
