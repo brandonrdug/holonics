@@ -989,8 +989,8 @@ omit [DecidableEq n] in
 /-- [proved-standard; formal-checked] **`metric_step_zero_iff`: a metric's step rests only where the
 comparison does.** For a positive definite metric `P`, `P g = 0` exactly when `g = 0`: every move
 `−P ∇L` (the normal law, the witness's span, the kinetic solve's first iterate, and an exterior
-`sgd`, `rms` or `adam` step, whose `P` is diagonal) has the stationary points of `L` as its fixed
-points, whatever `P`, step size or schedule. -/
+`sgd` or `rms` step, or `adam`'s without momentum, whose `P` is diagonal) has the stationary points
+of `L` as its fixed points, whatever `P`, step size or schedule. -/
 theorem metric_step_zero_iff {P : Matrix n n ℝ} (hP : P.PosDef) (g : n → ℝ) :
     P *ᵥ g = 0 ↔ g = 0 := by
   constructor
@@ -1011,9 +1011,10 @@ theorem metric_step_descends {P : Matrix n n ℝ} (hP : P.PosDef) {g : n → ℝ
 
 /-- [proved-derived; formal-checked] **`diagonal_reach_iff`: a per-coordinate scale reaches exactly the
 sign-consistent directions.** `d = −diag(p) g` for some `p > 0` iff every entry of `d` is zero where
-`g` is and of the opposite sign where `g` is not. An exterior `adam` or `rms` step is of this form
-(its first `adam` step is `−η sign g`), so its one-step reach from a state is fixed by the signs of
-the comparison's covector there. -/
+`g` is and of the opposite sign where `g` is not. An exterior `rms` step, and an `adam` step without
+momentum, is of this form (`adam`'s first step is `−η g/(|g| + ε)`, which is `−η sign g` at `ε = 0`;
+with momentum it steps along its running average, not along `g`), so its one-step reach from a state
+is fixed by the signs of the comparison's covector there. -/
 theorem diagonal_reach_iff (g d : n → ℝ) :
     (∃ p : n → ℝ, (∀ i, 0 < p i) ∧ d = -(diagonal p *ᵥ g)) ↔
       ∀ i, (g i = 0 → d i = 0) ∧ (g i ≠ 0 → d i * g i < 0) := by

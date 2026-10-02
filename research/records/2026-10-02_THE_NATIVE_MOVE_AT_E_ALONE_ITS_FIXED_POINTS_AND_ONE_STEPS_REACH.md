@@ -14,7 +14,8 @@ stated baseline.
 Every move in question is a metric's step `−P ∇_E L` with `P` positive definite at each state:
 - the normal law's deposition `−M⁻¹Aᵀc`, with `M = I ⊗ H′` the port's retained Gram and `Aᵀc = ∇_E L`;
 - the witness's span direction, and every iterate of the kinetic solve, `M⁻¹Aᵀμ_k`;
-- an exterior `sgd` step (`P = ηI`), and `rms` and `adam` steps (`P` diagonal and positive);
+- an exterior `sgd` step (`P = ηI`), and `rms` steps and `adam`'s without momentum (`P` diagonal
+  and positive; with momentum `adam` steps along its running average, not along `g`);
 - momentum at rest (zero velocity).
 
 `metric_step_zero_iff`: `P g = 0` exactly when `g = 0`. The kinetic solve's least-energy minimizer of
@@ -35,7 +36,7 @@ From one state with covector `g = ∇_E L ≠ 0`:
   `−P g` for a positive definite `P`.
 - **A per-coordinate scale reaches exactly the sign-consistent directions** (`diagonal_reach_iff`):
   `d = −diag(p) g` with `p > 0` iff `d_i = 0` where `g_i = 0` and `d_i g_i < 0` elsewhere. `adam`'s first
-  step is `−η sign g`.
+  step is `−η g/(|g| + ε)`, which is `−η sign g` at `ε = 0`.
 - **The native family reaches exactly the readings' horizontal space** (`native_step_horizontal`):
   a step `M⁻¹Aᵀμ` is the least-energy lift of its own reading change and has no hidden part. Any
   target `δ` splits `M`-orthogonally into `horizontal(Aδ)` and `hidden(δ)`, with its energy split
@@ -47,7 +48,7 @@ From one state with covector `g = ∇_E L ≠ 0`:
 
 Gate A's batch, the lock face at the decisions, `ρ = ρ₀ = 1645392/2^21`:
 
-| State | `L` (`/4096` nats) | Solved of 64 | Stations right |
+| State | `L` (`/4096` nats, its enclosure's lower endpoint) | Solved of 64 | Stations right |
 |---|---|---|---|
 | the opening `E₀` | 500197 | 0 | 15 |
 | the kinetic chain's last adopted move (native, guarded) | 337896 | 1 | 13 |
