@@ -1404,7 +1404,7 @@ pub(super) fn direction(
 /// [one-move pin](../../records/2026-10-01_ONE_GUARDED_MOVE_FROM_THE_STUCK_STATE_PINNED_BEFORE_ITS_RUN.md)]
 /// **One committed move from a state under each declared metric** (`executed move-once <terrain>
 /// <seed> <count> <out> <label=state> <arm> <metric>…`, the arm as [`arm_comparison`], `metric`
-/// `coordinate` or `witness`, the state
+/// `coordinate`, `witness`, `kinetic` or `kinetic-modulus`, the state
 /// a complete continuing state, restored with no `E`/`ρ` fallback ([`remounted`])): the candidate
 /// arm's real proposal, guards, ladder and state carry (`hnn::executed::executed_move_in`), every
 /// metric from the same restored state. The metrics are attempted in order and the first adopted
@@ -1457,7 +1457,7 @@ pub(super) fn move_once(terrain: &str, seed: u64, count: usize, out: &str, sourc
             "witness" => MoveMetric::Witness,
             "kinetic" => MoveMetric::Kinetic,
             "kinetic-modulus" => MoveMetric::KineticModulus,
-            other => panic!("a metric, coordinate, witness or kinetic: {other}"),
+            other => panic!("a metric, coordinate, witness, kinetic or kinetic-modulus: {other}"),
         };
         let started = Instant::now();
         let moved = executed_move_guarded(
@@ -1500,6 +1500,24 @@ pub(super) fn move_once(terrain: &str, seed: u64, count: usize, out: &str, sourc
                 k.residuals.last().map_or_else(|| "none".to_string(), |r| at_bits(r).to_string()),
                 at_bits(&k.predicted),
             );
+            if let Some((own, supplied)) = &k.modulus_drive {
+                println!(
+                    "    the joined direction: Δρ {:?}, own {}, supplied {} (24 bits)",
+                    k.modulus.as_ref().map(at_bits),
+                    at_bits(own),
+                    at_bits(supplied)
+                );
+            }
+        }
+        if let Some(held) = &moved.modulus_held {
+            if let Some((own, supplied)) = &held.modulus_drive {
+                println!(
+                    "    the bound held an upward ask: Δρ {:?}, own {}, supplied {} (24 bits)",
+                    held.modulus.as_ref().map(at_bits),
+                    at_bits(own),
+                    at_bits(supplied)
+                );
+            }
         }
         let modulus_line = |what: &str, k: &holonics::hnn::executed::KineticSolve| {
             if let (Some(step), Some((own, supplied))) = (&k.modulus, &k.modulus_drive) {
@@ -4232,6 +4250,7 @@ pub(super) fn kinetic(terrain: &str, seed: u64, count: usize, arm: &str, toward:
             &bank,
             BANK_GRAIN,
             comparison,
+            false,
         )
         .expect("the kinetic reading");
         println!(
@@ -4267,4 +4286,72 @@ pub(super) fn kinetic(terrain: &str, seed: u64, count: usize, arm: &str, toward:
         );
     }
     println!("executed kinetic: {} ms; resident {}", clock.elapsed().as_millis(), resident());
+}
+
+/// [measured-diagnostic; agent-inferred, October 2; the
+/// [transport modulus record](../../records/2026-10-02_THE_TRANSPORT_MODULUS_JOINS_THE_RECEIVERS_MINIMUM_ENERGY_MOVE.md)
+/// §4c] **The joined move's direction at each source, read and not taken** (`executed joined
+/// <terrain> <seed> <count> <arm> <label=source>…`): `hnn::executed::kinetic_reading` with the joined
+/// solve. Prints the source's `ρ` and the founding's `ρ₀`, the comparison, the solve's `Δρ` before any
+/// bound, and its two drives: the readings' own ask along `ρ` and what `E`'s move already supplies
+/// (`Δρ = (own − supplied)/s`). Nothing is moved.
+pub(super) fn joined(terrain: &str, seed: u64, count: usize, arm: &str, sources: &[String]) {
+    use holonics::hnn::executed::kinetic_reading;
+    let clock = Instant::now();
+    let declared = order_declared();
+    let engine = Engine::new(declared);
+    let bank = bank_of(declared.period, &bank_strength());
+    let ring = engine.refinement.ring();
+    let pairs = terrain_pairs(terrain, &declared, seed, count);
+    let requests = open_requests(&engine, &pairs);
+    let (comparison, partition) = arm_comparison(arm);
+    assert!(!partition, "the solve is read on the open section");
+    println!(
+        "executed joined: {count} {terrain} requests at development seed {seed}, the arm {arm}; the bank p = {}, grain 2^(-{BANK_GRAIN})",
+        bank_strength()
+    );
+    for source in sources {
+        let started = Instant::now();
+        let (label, spec) = source.split_once('=').expect("<label>=<source>");
+        let theta = segment_source(&engine, ring, spec);
+        let founding = theta.founding_transport(&engine.field, ring).expect("the founding");
+        let reading = kinetic_reading(
+            &engine.field,
+            &theta,
+            None,
+            &requests,
+            &engine.refinement,
+            &bank,
+            BANK_GRAIN,
+            comparison,
+            true,
+        )
+        .expect("the joined reading");
+        println!(
+            "  {label}: ρ {}, ρ₀ {founding}; {} ∈ {} nats; {} returns; {} ms",
+            theta.transport(ring),
+            symbol(&comparison),
+            cell(&reading.before.value, 1 << 12),
+            reading.returns,
+            started.elapsed().as_millis()
+        );
+        let Some(solve) = &reading.solve else {
+            println!("  {label}: no solve ({:?})", reading.refusal);
+            continue;
+        };
+        match &solve.modulus_drive {
+            Some((own, supplied)) => println!(
+                "    Δρ {:?}; own {}, supplied {}, own − supplied {} (24 bits); stop {:?} after {}; {} ms",
+                solve.modulus.as_ref().map(at_bits),
+                at_bits(own),
+                at_bits(supplied),
+                at_bits(&(own - supplied)),
+                solve.stop,
+                solve.residuals.len(),
+                started.elapsed().as_millis()
+            ),
+            None => println!("    no modulus drive; stop {:?}; {} ms", solve.stop, started.elapsed().as_millis()),
+        }
+    }
+    println!("executed joined: {} ms; resident {}", clock.elapsed().as_millis(), resident());
 }

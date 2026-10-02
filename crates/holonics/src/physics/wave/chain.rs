@@ -563,6 +563,32 @@ impl WaveChain {
             .collect())
     }
 
+    /// Decode the Holon's storage coordinates `(q, phi) = (C V, L I)` in this material.
+    /// [agent-inferred] A material return holds q and phi, so its voltages and currents must be
+    /// decoded with the successor C and L; keeping the predecessor V and I changes the point.
+    /// `configuration(decode_configuration(x)) = x` exactly. This is a spatial/material decoder;
+    /// it does not convert a midpoint state into a staggered-time state or advance a clock.
+    pub fn decode_configuration(&self, configuration: &[Rat]) -> Result<WaveState, WaveError> {
+        let nodes = self.incidence.nodes();
+        check_len(
+            "charge and flux coordinates",
+            nodes + self.incidence.junctions().len(),
+            configuration.len(),
+        )?;
+        Ok(WaveState {
+            voltage: configuration[..nodes]
+                .iter()
+                .zip(&self.material.capacitance)
+                .map(|(charge, capacitance)| charge / capacitance)
+                .collect(),
+            current: configuration[nodes..]
+                .iter()
+                .zip(&self.material.inductance)
+                .map(|(flux, inductance)| flux / inductance)
+                .collect(),
+        })
+    }
+
     /// [definition] **The front factor** of a junction toward the node it reaches:
     /// `gain · coupling = 2h/(2C + hG) · h/L` (Lean `Physics/Wave/Telegrapher.frontFactor`).
     pub fn front_factor(&self, junction: usize, reached: usize) -> Result<Rat, WaveError> {

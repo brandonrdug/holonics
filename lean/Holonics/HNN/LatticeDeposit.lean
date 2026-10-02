@@ -256,7 +256,7 @@ theorem gamma_kraft_lt_one (M : ℕ) : ∑ m ∈ Finset.Icc 1 M, gammaWeight m <
     _ = 1 - ((2 : ℚ) ^ (Nat.log 2 M + 1))⁻¹ := gamma_prefix _
     _ < 1 := by linarith
 
-/-- Any window of clocks weighs less than one. -/
+/-- Any interval of clocks weighs less than one. -/
 theorem gamma_window_lt_one (a b : ℕ) : ∑ m ∈ Finset.Ioc a b, gammaWeight m < 1 := by
   calc ∑ m ∈ Finset.Ioc a b, gammaWeight m ≤ ∑ m ∈ Finset.Ioc 0 b, gammaWeight m :=
         Finset.sum_le_sum_of_subset_of_nonneg (Finset.Ioc_subset_Ioc_left (Nat.zero_le a))

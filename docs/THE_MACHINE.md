@@ -34,17 +34,17 @@ results from them.
   families are not yet Holons joined at power ports: their update and code identities are their own
   laws, and their join to the Holon's energy balance is owed (the unified plan, U1 and §4).
 - **The aeon.** Its passage is an aeon on the Holarchy's parametric orientation (the lift of the
-  rings' joint clock torus): a receiving window is an epoch at the receiver's section; a pump
-  period or a clock closure is a cycle; the aeon boundary is the collapse; and the first law over
-  the aeon is `aeon::EnclosedLedger`. `hnn::Reference::expose` is a cut's passage through the
-  resident's aeons, one closed at each joint-clock carry-out.
+  rings' joint clock torus): the receiver reads it by epochs, the cells between two crossings of its
+  section; a pump period or a clock closure is a cycle; the aeon boundary is the collapse; and the
+  first law over the aeon is `aeon::EnclosedLedger`. `hnn::Reference::expose` is a cut's passage
+  through the resident's aeons, one closed at each joint-clock carry-out.
 - **What the code joins** (read from source at this commit): the resident's aeon is an
   `aeon::Aeon` on the parametric orientation from its opening lift point to the joint clock's
   carry-out; each ring's epochs are the flux through its own ring section; the carry-out is an
   `aeon::Cycle` of the last ring's clock when that ring opened on its section; the boundary runs
-  the collapse; and the resident carries the `EnclosedLedger`. Since the unified plan's U5: a
-  receiving window is an `aeon::Epochs` reading, an epoch of the cut's cell clock at the
-  receiver's section (`hnn::receiving::ReceivingPhases::windows`, which the exposure reads); a
+  the collapse; and the resident carries the `EnclosedLedger`. Since the unified plan's U5: the
+  receiver's spans of cells are an `aeon::Epochs` reading, the epochs of the cut's cell clock at
+  the receiver's section (`hnn::receiving::ReceivingPhases::windows`, which the exposure reads); a
   pump's period is an `aeon::Cycle` of its own clock (`hnn::ring::PumpDeclaration::period`); every
   ring clock is its navigator's `navigator::Clock` (`hnn::field::Ring::clock_at`), and the
   selective step's carry is its jumps, the flux of its section (Lean
@@ -399,9 +399,9 @@ kernel/cokernel statement, a landmark), not in a problem-named silo.
   unspent for the outcomes' frozen task splits (step 8). Cells are the UTF-8 bytes of each family's
   first view's visible parts in the dataset's declared order; roles and provenance are not
   encoded. The population is `n* = 6,148`, the smallest the declared field admits, which keeps the
-  exposure near the projected six hours (3,074 windows); the held-out length is one mean aeon of
-  the joint clock on uniform bytes, `⌈5·7·11·13·2⁸/1,077⌉ = 1,190`, set from the field, not the
-  data. `research/notebook/hnn_design/standing_cut.py` writes the cut and its manifest (hashes,
+  exposure near the projected six hours (3,074 receiving epochs); the held-out length is one mean
+  aeon of the joint clock on uniform bytes, `⌈5·7·11·13·2⁸/1,077⌉ = 1,190`, set from the field, not
+  the data. `research/notebook/hnn_design/standing_cut.py` writes the cut and its manifest (hashes,
   counts, held-out range) to `.local/cuts/`; `hnn_exposure -- cut-file` reads the held-out range
   from the manifest; the notebook reports the cut by scope and counts only, and #73 records its
   hashes. (Agent-inferred from review E1, the ruling above and the dataset's declared partition.)
@@ -427,8 +427,8 @@ kernel/cokernel statement, a landmark), not in a problem-named silo.
   workstation's memory budget at the measured bytes a node; the worker derives it and refuses a
   larger cut. The evaluation partition stays unspent. The count-only receivers' laws are chosen on
   its development cells, then one held-out pass is read. The HNN's full exposure stays on the
-  standing cut until its cost per window falls. The file is `.local/cuts/wide-real-cut.{bin,json}`,
-  with the standing cut as its tail, byte for byte.
+  standing cut until its cost per receiving epoch falls. The file is
+  `.local/cuts/wide-real-cut.{bin,json}`, with the standing cut as its tail, byte for byte.
 - **A larger cut re-measures the laws already chosen,** one prequential passage each, in minutes.
   A family is re-swept only when the scale could change its choice, and only at a cost stated in
   advance. (Agent-inferred; the first wide run re-swept 529 stop laws with their depth sweeps for
@@ -490,7 +490,7 @@ them into one readout, `hnn::reference::Exposure`, whose fields are named below.
    - Cold setup, generation, update, ingestion, rest and egress are reported separately.
 6. **Locality.** The loci reached per deposit (the diamond), each ring's tick count, and the cone
    per word. Beside them, the openness of the source-to-receiver path (review C2): `open_windows` of
-   the `windows` read, the receiving windows whose refine receipt's `PathAttenuation` was open at
+   the `windows` read, the receiving epochs whose refine receipt's `PathAttenuation` was open at
    their cut, so a shielded receiver is reported as a located cause.
 7. **Numerical health.** The receivers' fibres, and the device's ball radii and residual
    certificate (step 5). No committed-face residual exists.
@@ -596,7 +596,7 @@ tests can comb through anything valuable").
     boundary. The refinement owns its words until its return consumes them (the linear readout's
     `Section::pull_back`, retired September 30 with the readout, batch H, at
     [`f5fd8f3b`](https://github.com/brandonrdug/holonics/blob/f5fd8f3b/crates/holonics/src/hnn/prediction.rs);
-    the guard binds any refinement that opens one), so the change still lives only inside one
+    that ownership binds any refinement that opens one), so the change still lives only inside one
     evaluation, bounded by its `K·w + 1` junction steps and never by a source length, and nothing
     of it reaches `Current`, a
     pending ratio or the constitution except through a deposit's covectors. The reason: generation

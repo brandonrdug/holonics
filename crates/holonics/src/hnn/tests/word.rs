@@ -1,5 +1,5 @@
-//! The word: it opens at zero change whatever preceded it, runs its receiving window, and releases
-//! the change at its end.
+//! The word: it opens at zero change whatever preceded it, runs through the epoch the receiver
+//! reads, and releases the change at its end.
 
 use num_bigint::BigInt;
 use num_traits::Zero;
@@ -27,7 +27,7 @@ fn cut(field: &Field) -> (Medium, Current, SourceMoment) {
 }
 
 /// Lean `HNN/Retention.word_opens_at_zero`: a word opens with every wave and contact state zero
-/// and storage only on the source rings, and a word opened after another word's full window reads
+/// and storage only on the source rings, and a word opened after another word's full epoch reads
 /// exactly what the first read: nothing of the earlier change persists.
 #[test]
 fn a_word_opens_at_zero_change_whatever_preceded_it() {

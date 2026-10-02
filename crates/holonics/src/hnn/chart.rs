@@ -17,10 +17,10 @@
 //!
 //! The rounded step keeps the certificate below `δ² + ‖A‖∞·n·2^(−L_c)/2`
 //! (`rounded_refinement_certificate`); for `δ ≤ c ≤ 1/2` and a rounding term at most `c/2` it never
-//! grows past `c` (`roundedIter_certificate`). A window **warm-starts** from the chart the last
-//! window left for the same operator, since a deposit moves `A` by `D_A` and the start's residual
-//! grows by at most `‖D_A‖∞‖X̂‖∞` (`warm_start_certificate`); the warm start is taken when that
-//! certificate is at most `1/2`, the certified regime ([`ChartStart::Warm`]).
+//! grows past `c` (`roundedIter_certificate`). An epoch's read **warm-starts** from the chart the
+//! last epoch left for the same operator, since a deposit moves `A` by `D_A` and the start's
+//! residual grows by at most `‖D_A‖∞‖X̂‖∞` (`warm_start_certificate`); the warm start is taken when
+//! that certificate is at most `1/2`, the certified regime ([`ChartStart::Warm`]).
 //!
 //! [definition; agent-inferred] **The cold start is Newton–Schulz from the scaled transpose**
 //! `2^(−p)Aᵀ`, `2^p ≥ ‖A‖₁‖A‖∞` ([`ChartStart::Transpose`]), for the first chart of an operator and
@@ -538,7 +538,7 @@ pub(crate) fn newton_schulz_step(
     newton_schulz(&Operator::of(matrix)?, chart)
 }
 
-/// [definition] **Where a window's refinement started**: the chart the last window left (warm),
+/// [definition] **Where an epoch's refinement started**: the chart the last epoch left (warm),
 /// Newton–Schulz from the scaled transpose `2^(−p)Aᵀ` (cold), or one exact inverse, rounded (the
 /// fallback when neither reaches the certified regime).
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
@@ -549,8 +549,8 @@ pub enum ChartStart {
 }
 
 /// [definition] **What a chart's refinement reports**: the chart's key and width, its certificate
-/// against the target, where it started, and the rounded Newton–Schulz steps it took this window
-/// (the cold start's included).
+/// against the target, where it started, and the rounded Newton–Schulz steps it took in this
+/// epoch's read (the cold start's included).
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct ChartReading {
     pub key: ChartKey,
@@ -732,13 +732,13 @@ pub fn refine(
 // -------------------------------------------------------------------------------------------
 // the charts a resident keeps
 
-/// [definition; agent-inferred] **The executed charts a resident keeps between windows**: the last
+/// [definition; agent-inferred] **The executed charts a resident keeps between epochs**: the last
 /// chart of each ring's `(I − ½K_r)⁻¹` and each contact's `m_a⁻¹` per conductance carry, the start
-/// of the next window's refinement (the warm start). A chart is a function of its operator only
-/// through its certificate: every window re-certifies it against the published constitution and
-/// refines it when the certificate is above the target, so a read at an unchanged operator returns
-/// the same chart. The charts are the executed operators' representation, like the constitution's
-/// solved charts, so the resident counts their bits ([`Charts::bits`]).
+/// of the next epoch's refinement (the warm start). A chart is a function of its operator only
+/// through its certificate: every epoch's read re-certifies it against the published constitution
+/// and refines it when the certificate is above the target, so a read at an unchanged operator
+/// returns the same chart. The charts are the executed operators' representation, like the
+/// constitution's solved charts, so the resident counts their bits ([`Charts::bits`]).
 #[derive(Clone, Debug, Default, PartialEq, Eq)]
 pub struct Charts {
     charts: BTreeMap<ChartKey, ChartWords>,

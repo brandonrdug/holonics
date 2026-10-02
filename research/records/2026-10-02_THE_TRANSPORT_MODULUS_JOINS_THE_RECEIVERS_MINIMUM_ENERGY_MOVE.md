@@ -125,10 +125,16 @@ splits it between `E` and `ρ`.
   weights is `YH′⁻¹`. The coupling's part `−x_ρ bH′⁻¹` enters as one more covector on each return:
   a return of feature `f` and weight `W` carries `−Δρ (S/W) E f`, with `S = Σ w² s` over the same data
   (`returns_coupled`). It is the storage change of `ρ`'s move, returned to the port through the data
-  that carry it, so `E` still changes only by covectors that reached it.
+  that carry it, so `E` still changes only by covectors that reached it. The solve reads `b` and `g`
+  over all the proposal's contributions, while the returns carry the coupling only for the leading
+  members whose kinetic weight is nonzero (`kinetic_contributions`); the two data sets agree when
+  every leading member carries weight.
 - **`ρ`'s part.** `ρ + ηΔρ` on the port's lattice, nearest, between `ρ/2` and the bound
-  `max(ρ₀, ρ)`. The ladder starts at the Gauss–Newton step, at most the entry scale, and every guard
-  certifies each trial whole as before.
+  `max(ρ₀, ρ)`. The first trial step is the Gauss–Newton step, at most the entry scale, and each
+  trial is certified whole before it is adopted, as before: its comparison's upper end below the
+  incumbent's lower end, its entries within the entry bound, its first order certified negative, its
+  crossings admissible, its locks certified, its readings supported, and the constitution's bit
+  budget and storage growth certified on its deposit.
 
 ## 4. Where the comparison asks for more reach than the alias allows
 
@@ -147,8 +153,12 @@ not along the whole path of `E`.
 - **The bound-active rule.** The joined problem minimizes a convex energy over an affine set of moves
   (the readings' Gauss–Newton change) intersected with the half-space `ρ + Δρ ≤ ρ₀`. Where `ρ` stands
   at the bound and the unconstrained least-energy move has `Δρ > 0`, the constrained minimizer lies on
-  the boundary `Δρ = 0`. There the move is `Kinetic`'s, over `E` alone. The move implements exactly
-  this and keeps the refused joined solve on its receipt (`ExecutedMove::modulus_held`). Its Lean
+  the boundary `Δρ = 0`. There the move is `Kinetic`'s, over `E` alone. The move implements this
+  exactly where `ρ` already stands at the bound, and keeps the refused joined solve on its receipt
+  (`ExecutedMove::modulus_held`). Below the bound the joined solve is taken whole, and a trial whose
+  `ρ + ηΔρ` passes the bound is held at it (`Trial::modulus` shows the held value) while `E` keeps
+  the full joined part `−x_ρ bH′⁻¹`. That trial is not the constrained minimizer, but it is sound:
+  every trial is re-read whole and adopted only where its comparison is certified lower. Its Lean
   statement is owed in #62.
 
 ## 4a. Two basins: `E` and `ρ` adapt together
@@ -230,13 +240,76 @@ Two things follow:
 across the whole passage, not near the opening, and the direction law is local. What the opening does
 decide is the first move's direction, the sign of `own − supplied` there.
 
-## 5. The other metrics' upper bound: a separate finding
+## 4d. When a descent's basin is decided
 
-`Coordinate` and `Witness` hold `ρ + ηΔρ` within `[ρ/2, 1]`, the passive bound. So they can carry `ρ`
-above `ρ₀`, past the alias bound. The alias law does not depend on the metric, so those paths should
-take `ρ ≤ max(ρ₀, ρ)` too. This change leaves them unchanged so that it alters only the new metric's
-behaviour. The fix is the same ceiling passed to `ladder`, one line for each metric, and their
-measured records were read under the old bound.
+[derived] The move certifies the comparison only at its two endpoints: the adopted successor's `L`
+lies strictly below the incumbent's by disjoint enclosures. Between them the carried path passes
+through the cuts of #211 (the step's candidate states), and nothing bounds `L` there. So a move can
+step over a pass narrower than the step, and the law needs a condition:
+
+- **A move stays in its sublevel component when every carried cut between its endpoints has
+  `L < L(start)`.** The carried states are lattice points and consecutive states on a carried path
+  are adjacent, so connectedness and paths are taken through carried states. A sequence of such
+  moves never leaves the connected part of `{L ≤ L(start)}` that holds the start: each move's path
+  lies within `{L ≤ L(its start)}`, and each later start lies lower. The basin is then decided at
+  the first state whose `L` lies below the lowest pass between the two basins (the least, over
+  carried paths joining them, of the largest `L` along the path). Below that level the basins lie in
+  different parts of the sublevel set.
+- **Without the condition, a move whose step is longer than the pass's width along it can land in
+  the other basin.** The endpoint certificate does not rule that out. Above the pass level, or for an
+  unchecked step, only the path decides, and the local direction (§4c) is the only law that acts.
+- The condition can be read, `L` at each carried cut of an adopted move (#211 gives their positions
+  in `η` exactly), but the move does not certify it today.
+
+**Numbers from the chain.** On the lock face, the kinetic chain's founded opening reads
+`500197/4096` and its `m6` `338257/4096`; `w16` reads `195744/4096` at `ρ₀`, and the refit's `E`
+`133292/4096` at `ρ*` and `310210/4096` at `ρ₀`. A path that bounds the pass must end in each basin:
+at `(E_w16, ρ₀)`, which the chain reached, and at the refit's state `(E_refit, ρ*)`, since
+`(E_refit, ρ₀)` need not lie in the refit's basin. Two such paths, both inside the founding bound
+(`ρ* < ρ₀`), each read through the carried states along it:
+
+1. `E` moved straight from `w16`'s to the refit's at `ρ₀`, then `ρ` walked down from `ρ₀` to `ρ*` at
+   the refit's `E`. Its largest `L` is at least `310210/4096`; both interiors are unmeasured.
+2. The joined straight segment from `(E_w16, ρ₀)` to `(E_refit, ρ*)`.
+
+Either bounds the pass from above; the lower of the two is the tighter bound. If it lies below `m6`'s
+`338257/4096`, then neither the opening nor `m6` decides the basin.
+
+**The direction at the opening.** `executed joined <terrain> <seed> <count> <arm> <label=source>…`
+reads the joined solve's `Δρ` and its two drives at each source, before any bound and without moving.
+At the founded opening (order 2, development seed `2026093061`, 8 requests, the arm `order-dec`,
+`ρ = ρ₀ = 102837/131072`, `L+O ∈ [569492/4096, 569498/4096)` nats, 325 returns) the solve reads
+`own = 11159663/2048`, `supplied = 14383585/4096`, `own − supplied = 15871483/8192` and
+`Δρ = 16767753/268435456`, each read on its own at 24 significant bits toward zero (a lower end
+within one unit of its last bit; the difference is not the difference of the two printed values),
+with the recurrence stopped at as many iterations as readings (370).
+
+The joined direction at the opening asks for a **longer** memory: the readings' own ask outweighs
+what `E`'s move supplies. At `ρ₀` the bound holds that ask, so the joined chain's first move from the
+opening is `E`'s alone, the same as the kinetic chain's. The joined chain parts from the kinetic one
+only where `own − supplied` turns negative, and the main line's per-move reads locate that state.
+Receipt: one read, projection `2200000` ms, measured `879473` ms (`879473/2200000`), peak resident
+`180666368` bytes, 4 cores.
+
+## 5. The other metrics' upper bound: now the founding bound
+
+`Coordinate` and `Witness` held `ρ + ηΔρ` within `[ρ/2, 1]`, the passive bound, so they could carry
+`ρ` above `ρ₀`, past the alias bound. The alias law does not depend on the metric. Since October 2
+(the follow-up to #220) every metric is held within `[ρ/2, max(ρ₀, ρ)]`: the move computes one
+ceiling, `founding_transport(field, ring).max(transport(ring))`, and the halving trials read it.
+
+- **The defect, reproduced before the fix.** From `generic(92)` at its founded `ρ₀` the slope asks
+  for a longer memory (`γ_ρ < 0`), and the coordinate move carried a trial with `ρ > ρ₀`
+  (`the_founding_bound_holds_the_coordinate_and_witness_moduli` failed on main at `4c5c311d`). After
+  the fix, every coordinate and witness trial holds `ρ ≤ ρ₀`.
+- **Campaign 1 does not read these metrics.** Outside the tests, `executed_move` and its metrics are
+  called only by the order-2 chain's harness (`research/notebook/hnn_design/hnn_executed_loop.rs`,
+  `hnn_loop_1c.rs`). The text campaign's contact loop and its normal-law deposition
+  (`Constitution::receiving_class_metric`) do not go through the executed move, so the fix needs no
+  campaign 1 read.
+- **The chain's earlier states.** Coordinate or witness states read before the fix were reached
+  under the old bound; any whose `ρ` stands above `ρ₀` stays there (the ceiling is `max(ρ₀, ρ)`), and
+  from such a state no move raises it further.
 
 ## 6. Verification
 
