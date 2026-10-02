@@ -6069,21 +6069,6 @@ impl Constitution {
     }
 }
 
-/// [definition; agent-inferred, October 2; the
-/// [contact loop record](../../../../research/records/2026-10-02_THE_CONTACT_LOOP_THE_RETURN_REACHES_EVERY_CONTACT_AND_ITS_CHANGE_IS_RELEASED_BEFORE_THE_LATER_CUT.md)
-/// §18] **The receiving map's step in its own Fisher form.** A receiving read's code in bits is
-/// `f(v) = −v_t + log₂ Σ_c 2^(v_c)`, whose Hessian in the exponents is `ln 2 (diag p − p pᵀ)`, so
-/// `δᵀ ∇²f δ = ln 2 · Var_p(δ)`. A logit change `Δ` multiplies every class's mass by at most
-/// `2^(osc Δ)`, `osc Δ = max Δ − min Δ`, so along the whole ray `[0, η]` with `η · osc ≤ 1` the
-/// second derivative is at most `2 ln 2 · Var_p(Δ)` (the bound `f(v + Δ) ≤ f + gᵀΔ +
-/// (e^(osc)/2) Var_p(Δ)` in nats, carried to bits). The covector's masses are the odometer chart
-/// `p̃` (`p̃ − q`, the HNN adjoint's), and `p_c/p̃_c ≤ 17/16` (`2^x/(1 + x)` lies in `[0.94, 1]` on
-/// `[0, 1)`), so `Var_p(Δ) ≤ E_p[(Δ − E_p̃ Δ)²] ≤ (17/16) Var_p̃(Δ)`. The phase part's curvature is
-/// at most `¼` (module header, "The certified step"). With `ln 2 ≤ 7/10`, each read's curvature
-/// along the unit step `Δ_t = D f_t` is at most `(119/80) Var_p̃(Δ_t^Re) + ¼ |Δ_t^Im|²`. The
-/// certificate's `C = s κ² b` with `s = ½`, `κ² = 1` then takes `b = 2 Σ_t (…)`, and its covector
-/// scale is the largest magnitude oscillation `max_t osc(Δ_t^Re)` (`ηc ≤ 1` is `η · osc ≤ 1`).
-/// `None`, leaving the worst-case readings, when a covector is not a face's `q − p̃`.
 /// [definition; agent-inferred, October 2; the contact loop record §19] **The receiving readings'
 /// class metric**: the inverse of their mean class Fisher eigenvalue on the zero-sum classes,
 /// `λ̄ = mean_t (1 − Σ_c p̃_(t,c)²)/(|A| − 1)` (the trace of `diag p̃ − p̃ p̃ᵀ` over its rank), held at
@@ -6116,6 +6101,24 @@ pub(crate) fn receiving_class_metric(samples: &[Sample]) -> Option<Rat> {
     })
 }
 
+/// [definition; agent-inferred, October 2; the
+/// [contact loop record](../../../../research/records/2026-10-02_THE_CONTACT_LOOP_THE_RETURN_REACHES_EVERY_CONTACT_AND_ITS_CHANGE_IS_RELEASED_BEFORE_THE_LATER_CUT.md)
+/// §18] **The receiving map's step in its own Fisher form.** A receiving read's code in bits is
+/// `f(v) = −v_t + log₂ Σ_c 2^(v_c)`, whose Hessian in the exponents is `ln 2 (diag p − p pᵀ)`, so
+/// `δᵀ ∇²f δ = ln 2 · Var_p(δ)`. A logit change `Δ` multiplies every class's mass by at most
+/// `2^(osc Δ)`, `osc Δ = max Δ − min Δ`, so along the whole ray `[0, η]` with `η · osc ≤ 1` the
+/// second derivative is at most `2 ln 2 · Var_p(Δ)` (the bound `f(v + Δ) ≤ f + gᵀΔ +
+/// (e^(osc)/2) Var_p(Δ)` in nats, carried to bits). The covector's masses are the odometer chart
+/// `p̃` (`p̃ − q`, the HNN adjoint's), and on the grain `p_c/p̃_c ≤ 2/(e ln 2) < 17/16`
+/// (`2^x/(1 + x)` lies in `[e ln 2/2, 1]` on `[0, 1]`), so
+/// `Var_p(Δ) ≤ E_p[(Δ − E_p̃ Δ)²] ≤ (17/16) Var_p̃(Δ)`. The phase part's curvature is at most `¼`
+/// (module header, "The certified step"). With `ln 2 ≤ 7/10`, each read's curvature
+/// along the unit step `Δ_t = D f_t` is at most `(119/80) Var_p̃(Δ_t^Re) + ¼ |Δ_t^Im|²`. The
+/// certificate's `C = s κ² b` with `s = ½`, `κ² = 1` then takes `b = 2 Σ_t (…)`, and its covector
+/// scale is the largest magnitude oscillation `max_t osc(Δ_t^Re)` (`ηc ≤ 1` is `η · osc ≤ 1`).
+/// `None`, leaving the worst-case readings, when a covector is not a face's `q − p̃`. Lean
+/// `HNN/Ratio/Certificate.{codeLength_add_le_fisher, face_mass_le_odometer_on_grain,
+/// codeLength_add_le_odometer}` (the magnitude part, at half this second-derivative bound).
 fn receiving_fisher_face(samples: &[Sample], unit: &[Vec<Rat>]) -> Option<(Rat, Rat)> {
     let (mut curvature, mut oscillation) = (Rat::zero(), Rat::zero());
     for sample in samples.iter().filter(|s| !s.weight.is_zero()) {
