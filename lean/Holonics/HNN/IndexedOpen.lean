@@ -641,7 +641,7 @@ took the span's mass and quenched the earlier stations.
 
 * **Normalization and entry** (`framed_weight_mass`, `framed_weight_pos`): at `ρ > 0` the weights
   read from any station carry unit mass, and every datum of the span enters with positive weight
-  (no datum is dropped by its distance: no window).
+  (no datum is dropped by its distance).
 * **One-sided on older data** (`framed_weight_one_sided`): on a span whose data lie no later than
   the station read, the weights are the one-way law read at any later frame (the common factor
   `ρ^(e − j)` cancels), so the open section and a station read after every lock read as before.

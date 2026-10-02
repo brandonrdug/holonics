@@ -2,8 +2,8 @@
 //! chart's certificate, warm start and refinement, the statistic's standing, the budgeted carry (its
 //! accounting, its bound since the founding, remainder bits, the carried Gram's positivity and the
 //! zero update), the squares' positivity with no clamp, the energy growth of reaction deposits,
-//! the budget's refusal, the standing's lock chart, the causal diamond's window, the declared
-//! initial constitution, and the refusal of a complex-bilinear block at declaration.
+//! the budget's refusal, the standing's lock chart, what reaches a locus inside its causal diamond,
+//! the declared initial constitution, and the refusal of a complex-bilinear block at declaration.
 
 use std::collections::BTreeMap;
 use std::sync::OnceLock;
@@ -1679,8 +1679,8 @@ fn the_standing_is_founded_off_its_nodes() {
 
 /// Lean `HNN/Normal.deposit_local`, `windowGram_apply_eq_zero`, `HNN/Retention.deposit_descends`:
 /// on the six-ring path a compare's deposit reaches only the causal diamond; every locus outside it
-/// is unchanged, and each element's statistic (carried value plus remainder) sums only over its
-/// window (one tick each here).
+/// is unchanged, and each element's statistic (carried value plus remainder) sums only over the
+/// ticks inside its causal diamond (one tick each here).
 #[test]
 fn a_deposit_reaches_only_the_diamond_and_sums_only_its_window() {
     let field = six_path(2);
@@ -1710,7 +1710,7 @@ fn a_deposit_reaches_only_the_diamond_and_sums_only_its_window() {
     let (_, deposit) = compose(&field, &theta, &pending, &back, &targets, &[]).unwrap();
     for step in deposit.linear() {
         if let LinearLocus::Contrast(g) = step.locus {
-            assert_eq!(step.samples.len(), 1, "ring {g}'s window is one tick");
+            assert_eq!(step.samples.len(), 1, "ring {g}'s diamond holds one tick");
             let tick = back.elements[g].iter().find(|tick| tick.tick == g).unwrap();
             assert_eq!(step.samples[0].feature, tick.contrast);
         }

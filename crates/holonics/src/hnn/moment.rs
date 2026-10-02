@@ -14,14 +14,15 @@
 //! s_g(0) = P_g^(τ_g) m̃_g                                          the word's open on g ∈ 𝒮
 //! ```
 //!
-//! [definition; agent-inferred, U6] **The open is normalized and reads no window** (the
+//! [definition; agent-inferred, U6] **The open is normalized and reads no held cell** (the
 //! [encoding pin](../../../../research/records/2026-09-29_HOLONIC_ENCODING_FOR_THE_FIELD_PINNED_BEFORE_ITS_RUN.md)
 //! §1.4; Lean `HNN/IndexedOpen.{pairPopulation, pairNormalized}`, `HNN/Encoding.whole_pair_read_*`):
 //! the marginal reads the phase counts over their population, and the pair port reads the whole
 //! oriented offset moment over its pair population, so the open's amplitude does not grow with the
 //! ingested cells (`normalized_open_population_invariant`) and depends on no raw cell. The read at
 //! the address the buffer supplied (the primary's ruling B, the first repair's open) conditioned the
-//! open on the last `max Δ` raw cells, a depth-limited context window on the source; it is retired.
+//! open on the last `max Δ` raw cells, a context cut off at depth `max Δ` on the source; it is
+//! retired.
 //! Each `1/n` is carried by the [`PopulationChart`] on its declared lattice, so the open stays
 //! dyadic and the card carries it in parity; an empty population contributes nothing.
 //!
@@ -113,11 +114,11 @@
 //!
 //! [definition; agent-inferred, U6] **The pair buffer is the offset moment's one-step state**
 //! (Lean `Transport/SourceMoment.streamStep`'s previous value, `HNN/Moment.SourceDecl.StreamState`'s
-//! window): the offset-`δ` pair of cell `k` needs cell `k − δ`, so a cell stays in the buffer for
-//! `max Δ` ingests until every pair it joins is counted, and then leaves. No receiver reads the
+//! held cells): the offset-`δ` pair of cell `k` needs cell `k − δ`, so a cell stays in the buffer
+//! for `max Δ` ingests until every pair it joins is counted, and then leaves. No receiver reads the
 //! buffer, and nothing of the source is discarded by length: every cell is counted once in every
 //! source ring's phase counts, and every pair at every declared offset in its offset counts, over the
-//! moment's whole passage (the window tests in `hnn::tests::moment`).
+//! moment's whole passage (the tests in `hnn::tests::moment` that nothing is discarded by length).
 //!
 //! Every slot is sized once from the field; nothing grows with the cells but the counts'
 //! `O(log n)` bits. Ingest stops at a carry-out of the joint clock: the aeon boundary belongs to the
@@ -147,7 +148,7 @@
 //! | `encoderMoment_contract` (`m̃_g = ⟨M_g, E_g⟩`) | [`SourceMoment::encode`] |
 //! | `encoder_covector_tape_free` | [`SourceMoment::encoder_covector`] |
 //! | `exteriorOffset_independent_of_E` | [`SourceMoment::offset_counts`], [`PairPort::apply_table`] |
-//! | `HNN/IndexedOpen.{normalized_phase_counts_mass, normalized_open_population_invariant, normalized_zero_population}`; `HNN/Encoding.{whole_pair_read_counts, whole_pair_read_population_invariant, whole_pair_read_tape_free}` (the open reads no window) | [`PopulationChart`], [`SourceMoment::normalized_counts`], [`SourceMoment::offset_table`], [`SourceMoment::encode`] |
+//! | `HNN/IndexedOpen.{normalized_phase_counts_mass, normalized_open_population_invariant, normalized_zero_population}`; `HNN/Encoding.{whole_pair_read_counts, whole_pair_read_population_invariant, whole_pair_read_tape_free}` (the open reads no held cell) | [`PopulationChart`], [`SourceMoment::normalized_counts`], [`SourceMoment::offset_table`], [`SourceMoment::encode`] |
 //! | `moment_capacity` | [`capacity`], [`Capacity`] |
 //! | `HNN/Prediction.{placed_at_station, joint_residue_determines_position}` (a locked datum at its station's residue; a ring of period `∏ dᵢ`, pairwise coprime, places each datum at its joint residue class); `HNN/IndexedOpen.{passage_population, passage_read, passage_weight_one_population, separate_populations_ratio, transportedWeight, transported_weight_mass, transported_weight_frame_invariant, transported_weight_unitary, passage_weight_split_invariant, decayed_weight_antitone, decayed_weight_frame_free, decayed_weight_lossless, lossless_term_modulus, dissipative_term_modulus}` (the section continues the passage; each datum at its transported weight) | [`SourceMoment::continued`], [`SourceMoment::phase_weights`], [`SourceMoment::open_parts`] |
 //! | `HNN/IndexedOpen.{framedWeight, framed_weight_mass, framed_weight_pos, framed_weight_one_sided, framed_weight_ratio, framed_weight_le_pow, oneway_later_weight_ratio, framed_weight_symmetric, framed_weight_translation, framed_weight_lossless}` (a candidate reads the span from its own station, each datum at its two-sided transport distance; the one-way law on data no later than the station) | `hnn::prediction::BankPlacement::{weights, storage, modulus_derivative}`; [`SourceMoment::phase_weights`] is the law read from the span's last datum |
@@ -657,7 +658,7 @@ pub struct Ingested {
 
 /// [definition] **The source moment on the closing source rings.** Sized once from the [`Field`]
 /// (guard 1): every slot exists from the open, and ingest only adds to counts and overwrites the
-/// window. It holds no cell list and no per-occurrence record.
+/// held cells. It holds no cell list and no per-occurrence record.
 ///
 /// It opens only on a declared [`Field`], and `Field::declare` builds only closing rotor rings, so
 /// a rotation transport has no ingest port. The guarantee is structural; the doctest shows a
@@ -682,7 +683,7 @@ pub struct SourceMoment {
 }
 
 impl SourceMoment {
-    /// **Open a moment** at the current lift point: every count zero, the window empty.
+    /// **Open a moment** at the current lift point: every count zero, no cell held.
     pub fn open(field: &Field, current: &Current) -> Self {
         let alphabet = field.alphabet();
         let offsets = field.offsets().to_vec();
@@ -743,8 +744,8 @@ impl SourceMoment {
     }
 
     /// **Ingest cells in order**: the lift point's selective step, then the phase-binned and offset
-    /// counts on every source ring, then the window. Stops after the cell whose step carries the
-    /// joint clock out, and reports it.
+    /// counts on every source ring, then the held cells. Stops after the cell whose step carries
+    /// the joint clock out, and reports it.
     pub fn ingest(
         &mut self,
         field: &Field,
@@ -1088,7 +1089,7 @@ impl SourceMoment {
     }
 
     /// **The source moment `m̃_g`** of one source ring at the constitution's ports, computed from
-    /// the counts and never stored, on the normalized open that reads no window (module header):
+    /// the counts and never stored, on the normalized open that reads no held cell (module header):
     /// `Σ_c P_g^(−c)(E_g M_g[c] w(c) + Σ_δ Σ_(x,a) C_g(δ)[c, x, a] ν̂(n_(g,δ)) E_g^(δ)(e_x ⊗ e_a))`,
     /// `w(c)` the passage's transported weight ([`SourceMoment::phase_weights`]; `ν̂(n_g)` at a
     /// transport of modulus one).
@@ -1382,7 +1383,7 @@ impl SourceMoment {
     }
 
     /// **The moment's dense code bits**, a reading (design R2 H1): each slot self-delimited,
-    /// `max(1, bits) + 1`, plus the window's raw cells at `⌈log₂|A|⌉ + 1` bits each.
+    /// `max(1, bits) + 1`, plus the held raw cells at `⌈log₂|A|⌉ + 1` bits each.
     pub fn dense_bits(&self) -> u64 {
         let slot = |count: &u64| u64::from((u64::BITS - count.leading_zeros()).max(1)) + 1;
         let counts: u64 = self
@@ -1412,7 +1413,7 @@ fn bump(count: &mut u64) -> Result<(), HnnError> {
     Ok(())
 }
 
-/// The window's cell `offset` cells before the next write.
+/// The held cell `offset` cells before the next write.
 fn earlier(window: &[Option<usize>], cursor: usize, offset: usize) -> Option<usize> {
     if offset == 0 || offset > window.len() {
         return None;
