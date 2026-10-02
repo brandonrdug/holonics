@@ -200,9 +200,13 @@ lengthens, and move farther along the persistent part of the gradient per deposi
 
 **The claim fixed first.** From the opening `c0.state` on gate A's batch (`order2`, seed
 `2026093061`, 8 requests) under `lock-dec`:
-- the 16-move throw chain ends with `L` below the Coordinate and the Witness chains' at the same
-  move count;
-- and its held-out whole sections are at least theirs.
+- the 16-move throw chain ends with `L` below the Coordinate chain's at the same move count;
+- and its held-out whole sections are at least the Coordinate chain's.
+
+The comparison chain is Coordinate's: the main line's chain runs under Coordinate because the
+Witness move lowers `ρ` by `25/2097152` against `γ_ρ < 0` at the opening. At the opening both
+moves lie close to `G` and to `ΔE` (each step's `cos²` with `ΔE` in `[4095, 4096)/4096`, with `G`
+in `[4069, 4070)/4096`).
 
 Anything less is reported as what it measured: per move, `L`, solved decisions, whole sections and
 stations right, the halvings at adoption, the flight's length and whether its coast was carried.
