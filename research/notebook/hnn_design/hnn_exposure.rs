@@ -427,7 +427,7 @@ fn main() {
         return;
     }
     if let Some(count) = ablation {
-        contact_ablation_run(&field, &cut, count, information, descent, samples_out.as_deref(), founded);
+        contact_ablation_run(&field, &cut, count, information, descent, samples_out.as_deref(), founded, memory);
         return;
     }
 
@@ -1083,6 +1083,7 @@ fn contact_ablation_run(
     descent: bool,
     samples_out: Option<&str>,
     founded: bool,
+    memory: Option<u32>,
 ) {
     use holonics::hnn::reference::contact_ablation;
     let clock = Instant::now();
@@ -1148,6 +1149,7 @@ fn contact_ablation_run(
             descent,
             samples: samples_out.is_some(),
             founded,
+            memory,
         },
         &mut |c, readings, receiver, samples, trees, maps| {
             aeon_line(c.aeon - 1, readings, receiver);

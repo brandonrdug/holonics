@@ -1064,7 +1064,10 @@ eight masses in each digit tree, the stop mixture's own form, codes 18 bits belo
 the cut: a lead, not adopted. On the choosing cut (§26) the same replica's mixture codes
 `15466633/2^4` bits on the development cells and `9179687/2^6` held out, against `j = 3`'s
 `15503406/2^4` and `9191720/2^6`: about 2,298 and 188 bits less, a quarter and an eighth of a
-percent. It would carry eight trees and their joins on host and card for that.
+percent. It would carry eight trees and their joins on host and card for that. A mixture at
+each node instead, the masses weighed by each node's own counts, codes worse than the one mass
+there (`15521631/2^4` and `9210873/2^6`): a node seen a few times cannot tell the masses apart, and
+pays for asking.
 
 **The gate: campaign 1's exposure at `n*`**
 ([exposure](2026-10-02_THE_CONTACT_LOOP_receipts/prior_mass_exposure.txt), 686,915 ms against
@@ -1134,3 +1137,57 @@ limit on text at this scale. The anchors, phases and locks are driven by the clo
 passage's counts; what is specific to the content reaches the receiver through the tree's cell
 letters. Campaign 1 keeps the lossless open and the prior mass `2^(−3)`. A larger share for the
 medium needs a different entry of the source into the field, not a better receiver or memory.
+
+## 27. How the text enters the field, and what an entry must do to carry what the tree cannot
+
+A derivation from the owners, before any build.
+
+**The entry, as the code runs it.**
+- The moment's open on ring 0 (`SourceMoment::encode`, `open_storage`) is
+  `s_0(0) = P_0^(τ_0) Σ_c P_0^(−c) (E_0 M̂_0[c] + Σ_δ E_0^(δ) Ĉ_0(δ)[c])`, with `M̂` and `Ĉ` the
+  phase-binned cell and pair counts over their populations (or decayed, under the leaky count).
+  `E_0` is `2d_0 × |A| = 10 × 256`, so the open is ten numbers, a linear function of the passage's
+  frequencies.
+- Within the word every stage is linear in the change. The ring element is a Cayley step with fixed
+  `K` and `W` (`propagation::element_step`), the transit is a fixed solve from its two ends' waves
+  and its state (`transit_solve`), and a declared resonator is a periodic modulation of the
+  constitution: linear, time-varying. The contacts' attenuation `exp(−β_a Q)` depends on the
+  rings' placements, that is, on the clock. So the anchor at the receiving epoch is
+  `v_j = T_j(τ, Θ) s_0(0)`, with `T_j` fixed by the joint phase and the constitution.
+- The receiver reads `f = R P_2^(τ_2) v_j` (`ReceivingPhases::read`), linear again.
+
+So the wave's logits are `R P_2^(τ_2) T_j(τ, Θ) P_0^(τ_0) Σ_c P_0^(−c) E_0 M̂_0[c]`: a
+clock-indexed linear map, of rank at most ten, of the passage's phase-binned frequencies. §23–26
+measured exactly what this form allows. It carries the passage's global statistics (the thirtieth
+of a bit a reading at modulus one), it cannot carry the identity of a recent context (§23's
+anchors are no closer for shared contexts), a short memory only repeats the depth-4 tree (§24), and
+no memory scale lifts its share past nine bits (§26). The clock-indexed transfer gives one content
+a different anchor at each joint phase, which a linear readout cannot undo, and campaign 2's phase
+and lock letters carry the clock alone.
+
+**What the tree cannot carry.** The tree reads the last `D = 4` cells exactly and nothing older,
+except through its counts' slow adaptation, and its contexts share no statistics. What lies
+beyond its address, older cells and similarity between contexts, is the field's possible share.
+
+**What an entry must do** [agent-inferred, from the form above].
+1. **Time-local over a span longer than the address.** The leaky count gives it (`open_with`), with
+   a memory of `2^k ≥ 2^4` ticks so the span reaches past `D` cells.
+2. **Read so that the clock cancels.** The common rotation of the joint phase must drop out of what
+   the receiver reads. A relative phase does: the parametron's sheet, the side of a node's
+   amplitude against its pump's axis (`ring::sheets`, `Objects/Parametron.sheetReading`), reads the
+   wave against a clocked reference, and the elementary objects state the same ("relative phase is
+   read through the pump; no linear threshold reads it").
+3. **Nonlinear, and addressed by the tree.** A sheet is a sign: a nonlinear feature of the span
+   that a linear receiver cannot form. Supplied as address letters (a `Feature` beside the cell, the
+   enlarged tree's bundle branch), the tree weighs it by its own evidence. The enlarged tree's
+   dominance bounds the cost at one bit a dyadic cell plus the features' description
+   (`cell_only_dominance_with_feature_charge`), and the module's own law already says it: "the
+   wave earns its computation by supplying address letters the tree weights in".
+
+**The first test, before any owner changes.** The information test: on samples whose source has a
+memory past the address, read candidate relative-phase sheets from the receiving anchors (each
+node's side against a reference node, which the common rotation leaves fixed), add them as letters
+to the replica tree, and score the held-out cells. If the letters do not lower the held-out code
+beyond their charge, the entry is refused before it is built. Otherwise the build is a sheet
+`Feature` read from the word at the receiving epoch, pushed into the address register, with its
+consumer stated at the tree: `face(address ⊕ sheets) ≤ face(address) + charge`.
