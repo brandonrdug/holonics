@@ -1,0 +1,3 @@
+  r13close (transport modulus 168127/262144): released 128, held 0, refused 0, refused certificates 0; whole sections 0 of 128 (nonconstant 0 of 128, constant 0 of 0); the success rule (every nonconstant section whole): does not hold; incorrect releases 128; reaching the termination 0; stations right 291 by station [34, 39, 47, 52, 23, 10, 28, 58]; first lock at a request-reading station (0 or 1) 0, first lock right 61; 1082713 ms
+executed evaluate: 1082892 ms; resident 69439488 now, 69439488 peak
+exit 0 wall 1082906 ms
