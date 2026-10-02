@@ -84,8 +84,15 @@ entries took a nonzero lattice coordinate, so its move was released whole. The t
 on every reached contact family, deposited whole and alone with every other locus frozen: a family's
 factor moves exactly when the deposit does not name it. Today all six are named.
 
-**Steps 2 and 3, next.** Predecessor and successor continued from the same retained `EndChange`,
-clock and later drive through `Word::continuing`, compared on contact states, outgoing currents and
-receiver readings with the whole energy account and `r = z − Kx` retained. Then the
-contact-to-receiver certificate tightened from the actual finite transit sensitivity plus its
-certified remainder.
+**Step 2, built** (test `hnn::tests::prediction::a_contact_change_is_read_by_the_continued_word_with_its_work`).
+Under the exact law, one word's retained change `x` continues at the predecessor and at a successor
+whose contact 0 storage factor moved. The successor is a control chart until the deposit's own
+contact moves land. Both continue with the same later drive and clock. The successor's continued
+word opens on `x` at exactly the predecessor's power plus `PowerForm::deposition_work`'s
+`½⟨x, ΔΘ x⟩`. Every tick of both closes, and the moved contact's states, its outgoing waves and the
+receiving ring's storage differ after four ticks. The consumer reads a contact change with its
+work accounted. What remains is that the deposit's own contact move reaches it. The reflected
+interior residual `r = z − Kx` is not yet a term of this word, and it is owed with step 3.
+
+**Step 3, next.** The contact-to-receiver certificate, tightened from the actual finite transit
+sensitivity plus its certified remainder. Its bounded cost and acceptance go to Astra before any run.
