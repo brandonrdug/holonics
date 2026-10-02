@@ -52,3 +52,35 @@ RAYON_NUM_THREADS=12 timeout 7200 $B executed spectrum order2 2026093061 8 m7=$S
 ```
 Report the header (the lattice unit), each read's cut index, and every wall (its two cut indices,
 its jump `J`, the requests it changes).
+
+## P4. The exposure protocol's held-out code at m6 and w16 (record §7's restated gate)
+
+**Running in the cloud since October 2, 21:28 UTC**, both sources together at 2 threads each. The
+cloud's 4 cores are otherwise idle, and the PC's 24 threads are full (P3 at 8 per direction, Q4
+at 8). The PC takes P4 only if the cloud run stops before its deadline. In that case P4 launches
+when P3 exits, both sources together at 2 threads each:
+```
+RAYON_NUM_THREADS=2 timeout 36000 $B executed expose 2026093061 2026093012 128 all m6=$S/m6.state
+RAYON_NUM_THREADS=2 timeout 36000 $B executed expose 2026093061 2026093012 128 all w16=$S/w16.state
+```
+Projection, from the 200-window smoke at m6 in the cloud:
+- 294297 ms for 200 windows, with user time 425 s over a real time of 294 s;
+- peak resident set 665231360 bytes per source;
+- the full cut is 21845 windows (`2^16` cells, three per window), so 32144589 ms per source,
+  and the deadline is 36000 s.
+
+The run prints no per-window progress line, so it cannot stop early on evidence; the deadline
+is fixed and is not raised.
+
+Gate: w16's held-out combined code below m6's by at least `1024·1/16 = 64` bits. Report the held-out and
+training lines whole.
+
+## P5. The joint held-out read of the three move-16 states (waits on all three)
+
+When Q2's Coordinate chain, Q2's Kinetic control and the throw chain (#240) each store their move-16
+state, the main line names the three paths here, and the PC reads them in one call at 16 threads:
+```
+RAYON_NUM_THREADS=16 timeout 5096 $B executed evaluate order2 2026093012 128 out/p5-move16 coord16=<path> kin16=<path> throw16=<path>
+```
+The deadline is three times the measured 566219 ms per state at 16 threads, times three states (`9·566219 = 5095971` ms):
+`timeout 5096`. Report whole sections and stations right by station for each state.
