@@ -41,11 +41,14 @@ the case of one activity.
   executed filter codes within the certified drift.** With the opening at scale `c`, every rounding
   a factor in `(1 − 2^(−j), 1]` and `r` of them counted, the executed code is within
   `dormant_survivor_code`'s bound plus `3 r 2^(−j)` bits; at `j = 62` this is Rust
-  `Dormancy::drift`. [agent-inferred] That the Rust's counted roundings bound the factors: each
-  `Weight::sum` and `Weight::of` rounds down once by a factor in `(1 − 2^(−62), 1]`; a state's weight
-  after the kernel passes `L` share roundings and the opening `#active` products, a class sum one
-  rounding per added weight and per chunk join, and the counter `roundings` adds all of them, more
-  than any one face or weight needs.
+  `Dormancy::drift`. [established-bounded; source-inspected, computational-witness] That the Rust's
+  counted roundings bound the factors: each `Weight::sum` and `Weight::of` rounds down once by a
+  factor in `(1 − 2^(−62), 1]`; a state's weight after the kernel passes `L` share roundings and the
+  opening `#active` products, a class sum one rounding per added weight and per chunk join, and the
+  counter `roundings` adds all of them, more than any one face or weight needs. The Rust test
+  `the_roundings_counted_cover_every_factor_the_lean_takes` checks each chain's factor and the
+  count against the exact step from the executed weights (`hopen`, `hup`, `hdown`, `hq` and
+  `hround`'s per-cell factors).
 
 The computational object is the helical pair interaction read as a receiver's population of eggs
 through aeons; of the winding guide's six general objects this module touches the **helix** (the key

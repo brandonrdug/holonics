@@ -52,10 +52,15 @@
 //! `3 · r · 2^(−62)` bits, `r` the roundings counted ([`Dormancy::drift`]; Lean
 //! `Dormancy.{forward_executed_nonneg, dormant_survivor_executed, dormant_executed_code}`, the
 //! nonnegative-face form of `LocalWeighing.forward_executed` with the rounding on the weight after
-//! the kernel). [agent-inferred] That `r` bounds every factor the Lean takes is read from this
-//! code: the counter adds every share, opening, accumulation and join rounding. The test
-//! `the_dormant_filter_executes_the_exact_forward_mixture` checks the executed faces against the
-//! exact mixture stepped in ℚ.
+//! the kernel). [established-bounded; source-inspected, computational-witness] That `r` bounds
+//! every factor the Lean takes is read from this code (the counter adds every share, opening,
+//! accumulation and join rounding, more than any one chain needs) and checked on the chart by the
+//! test `the_roundings_counted_cover_every_factor_the_lean_takes`: against the exact step from the
+//! executed weights, the opening is within `1 − L·2^(−62)` of its prior, each weight after the
+//! kernel within `1 − L·2^(−62)` of the exact kernel and never above it, the scored class sum
+//! within `1 − m·2^(−62)` of its exact sum, `m` the weights and chunk pieces it adds, and each cell
+//! counts at least `m + L`. The test `the_dormant_filter_executes_the_exact_forward_mixture` checks
+//! the executed faces against the exact mixture stepped in ℚ.
 //!
 //! [definition] Of the winding guide's six objects this owner touches the **helix** (a ring's clock
 //! keeps winding while its layer is silent, and its key is read at its continued phase), the
@@ -748,3 +753,7 @@ impl Family for DormantFamily {
         work
     }
 }
+
+#[cfg(test)]
+#[path = "dormancy_tests.rs"]
+mod tests;
