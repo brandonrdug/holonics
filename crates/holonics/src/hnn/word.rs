@@ -1661,9 +1661,10 @@ impl<'c> Word<'c> {
         Ok(())
     }
 
-    /// **The forward word for one receiving window**: `e_max − 1` full ticks and the last junction,
-    /// returning the receiving ring's anchors `v_R(e_j)` at its epochs `e_0 … e_last`. A word runs
-    /// its window once, from its open.
+    /// **The forward word over one epoch the receiver reads**: `e_max − 1` full ticks and the last
+    /// junction, returning the receiving ring's anchors `v_R(e_j)` at the ring's own epochs
+    /// `e_0 … e_last`, its ticks, which that one coarser epoch merges. A word runs through those
+    /// cells once, from its open.
     pub fn forward(&mut self, phases: &ReceivingPhases) -> Result<Vec<Vec<Rat>>, HnnError> {
         if !self.passage.is_empty() {
             return Err(HnnError::WordEnded {

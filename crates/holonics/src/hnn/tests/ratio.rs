@@ -103,9 +103,9 @@ fn the_real_covector_is_the_face_minus_the_target_at_the_cell_representative() {
 }
 
 /// Lean `HNN/Ratio.alignCost_turns`, `receivingPhase_phase_pullback`: the phase covector is
-/// `−½ q_c Δ_c` on `Im f_c` (`−q_c Δ_c` on the phase in turns), zero off the target class, with
-/// `Δ` the windowed gap; the cut's winding is the log's branch and never enters the covector or
-/// the excess `½ Δ²`.
+/// `−½ q_c Δ_c` on `Im f_c` (`−q_c Δ_c` on the phase in turns), zero off the target class, with `Δ`
+/// the gap past the cut's winding; that winding is the log's branch and never enters the covector
+/// or the excess `½ Δ²`.
 #[test]
 fn the_phase_covector_is_minus_the_windowed_gap_and_the_winding_its_branch() {
     let values = [(integer(0), integer(3)), (integer(1), rat(1, 2))];
@@ -123,7 +123,7 @@ fn the_phase_covector_is_minus_the_windowed_gap_and_the_winding_its_branch() {
     assert!(covector.logits()[0][1].is_zero());
     let lift = ratio.log_ratio(0).unwrap();
     assert_eq!(lift.winding, 7);
-    // The same window at another cut's winding: the covector and the excess do not move.
+    // The same epoch read at another cut's winding: the covector and the excess do not move.
     let faces = Faces::of_reads(&[read(logits(&values), 16)], 16).unwrap();
     let far = HolonRatio::compare(faces, &[1], &window(521, vec![target_phase])).unwrap();
     assert_eq!(far.covector().unwrap(), covector);
@@ -132,7 +132,7 @@ fn the_phase_covector_is_minus_the_windowed_gap_and_the_winding_its_branch() {
 }
 
 /// Review C1: over a long stream the receiving ring's clock winds without bound (`τ_R/d_R` passes
-/// hundreds of turns), but every window's target phase, read in its cut's frame, stays in
+/// hundreds of turns), but every epoch's target phase, read in its cut's frame, stays in
 /// `[0, 1 + 2A/d_R)`, and its branch is the cut's winding; so the phase covector against a produced
 /// phase of zero stays below one, the scale of the magnitude part (on the chain control, whose
 /// receiving ring of period 2 steps only by carry).

@@ -185,16 +185,17 @@
 //! [proved-derived; implemented-exact] **The relative phase is read by the pump**
 //! ([`ReceivingBank`], [`BankReading`]; Lean `reflection_mul_reflection`,
 //! `reflection_pair_trace_carriers`, `no_linear_threshold_reads_relative_phase`). A relative phase
-//! `Re(z_a z̄_b)` is even under the half-turn, so no linear reading followed by a threshold reads it.
-//! The law's quadratic place is the pump: two ticks whose carriers the crossing cells modulate
+//! `Re(z_a z̄_b)` is even under the half-turn, so no linear reading followed by a threshold reads
+//! it. The law's quadratic place is the pump: two ticks whose carriers the crossing cells modulate
 //! compose two reflections, whose product is the turn by the cells' relative phase (trace
-//! `2Re(c_a c̄_b)`), the square law; the bifurcation is the threshold. A bank of receiving parametrons
-//! at declared pump phases (member `j`: axis `1`, step `i^j`, carriers `(c_e, i^j c_l)`) locks at the
-//! member whose declared phase aligns the two cells, and every other member is certified silent; its
-//! class is that member. [agent-inferred] The bank's strength sits in its lock window: the aligned
-//! member grows exactly past the standing bifurcation (its two ticks are the standing pump's), and
-//! the nearest misaligned member only past a strength bracketed in development in
-//! `(361/512, 725/1024]`; the declared `p = 5/8` lies between.
+//! `2Re(c_a c̄_b)`), the square law; the bifurcation is the threshold. A bank of receiving
+//! parametrons at declared pump phases (member `j`: axis `1`, step `i^j`, carriers
+//! `(c_e, i^j c_l)`) locks at the member whose declared phase aligns the two cells, and every other
+//! member is certified silent; its class is that member. [agent-inferred] The bank's pump strength
+//! sits in its locking range, the strengths at which the aligned member grows and no misaligned
+//! member does: the aligned member grows exactly past the standing bifurcation (its two ticks are
+//! the standing pump's), and the nearest misaligned member only past a strength bracketed in
+//! development in `(361/512, 725/1024]`; the declared `p = 5/8` lies between.
 //!
 //! [proved-derived; implemented-exact, September 29] **The passage's monodromy: the bank reads a
 //! superposed passage** ([`ReceivingBank::read_turn`], [`turn`], [`Growth`]; Lean

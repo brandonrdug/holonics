@@ -162,7 +162,7 @@ pub trait ConstitutionRead: Sync {
     fn landmarks(&self, ring: usize) -> Option<&Landmarks>;
     /// **The receiver's population** over the tree's face and the combined face (ruling A;
     /// `hnn::receiving::receiving_population`, THE_REBUILD U1) on a receiving ring, which scores the
-    /// window at compare; `None` elsewhere.
+    /// epoch at compare; `None` elsewhere.
     fn population(&self, ring: usize) -> Option<&PortPopulation>;
     /// **A contact's stiffness signature** (campaign 2, `hnn::contact`): the sign of each column of
     /// its stiffness factor, `K_a = b_a diag(σ) b_aᵀ`. `None`, every constitution of campaign 1, is
@@ -383,10 +383,10 @@ impl FieldDeclaration {
     /// attenuates by `1`, `1/4` or `1/16`, and the source-to-receiver path is open (at least the
     /// receiver's grain `1/16`) on 4,328 of campaign 1's 5,005 phase configurations (receipt: the
     /// notebook's `hnn_lattice_growth -- openness configurations`, retired at `2d34b819`; its
-    /// `uniform` and `cut` modes read the windows of `n*` uniform bytes and of the notebook's
+    /// `uniform` and `cut` modes read the epochs of `n*` uniform bytes and of the notebook's
     /// pinned cut). The earlier
     /// sixteen points of `x² + y² = 65` put distinct nodes at `Q ≥ 4` apart and up to 260, which
-    /// shielded the receiver below `2^(−10)` on about 96% of windows (review C2).
+    /// shielded the receiver below `2^(−10)` on about 96% of epochs (review C2).
     pub fn quarter_turn(node: u64, period: u64) -> RatVec3 {
         let (x, y) = QUARTER_TURNS[((4 * node) / period.max(1)) as usize % 4];
         RatVec3::from_i64(x, y, 0)
