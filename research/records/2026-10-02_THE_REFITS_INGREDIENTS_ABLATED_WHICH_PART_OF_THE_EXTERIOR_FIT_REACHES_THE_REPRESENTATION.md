@@ -479,3 +479,139 @@ opening value, the first deposit moves `R` alone, and `C` and `E` learn from the
 `executed expose` deposits once per window. Its held-out cells come after every training cell, so they
 are read after about 21500 deposits from each state, and the gate is not decided by the features'
 Gram at the first deposit.
+
+## 9. The wall at m7, the run that crosses it, and the paired held-out reads
+
+The receipts are in this record's receipts directory under `s9/`, copied from `claude/pc-receipts`
+(the PC, `51e5792c` and after) and `claude/cloud-runs-2-5aw27d` (runner 2, `9c560e9`). Every code
+length is in nats over `/4096` cells, quoted by its lower end where a difference is taken. The
+development batch is 8 order-2 requests at seed `2026093061` on the arm lock-dec. The held-out batch
+is 128 requests at seed `2026093012`, 1024 station cells. σ over 64 decisions is
+`[11356, 11357)/4096`.
+
+**The wall (P3; `p3_m6_spectrum.txt`, `p3_m7_spectrum.txt`).** Along the Kinetic direction from m7,
+over `η ∈ [0, 1/2048]` on the lattice unit `2^(−21)`, the held sheet falls from the incumbent
+`[337896, 337901)` by `22` or `23` per `η` step of `1/32768`. The released comparison
+equals it up to two decision changes, both in request 3:
+- at cut `765968 → 765969` (`η 1801125/2^32 → 900563/2^31`), stations 2 and 5 lock together,
+  `[[0],[2],[4],[5],[6],[7],[3],[1]] → [[0],[2,5],[7],[6],[4],[3],[1]]`, at `J = 0`;
+- at cut `778015 → 778016` (`η 228683/2^29 → 914733/2^31`), the pair reverses, station 2 falling
+  below 3, at `J = 34037`. The held sheet there is `[337582, 337587)` and the release above it is
+  `[371619, 371624)`.
+
+So the co-lock is free for `12047` cuts and the reversal is then paid at once. From m6 over
+`[1/2048, 1/1024]` the same pair co-locks at cut `1675548` (`η 7799875/2^33`) and reverses at cut
+`1687863` (`η 1964289/2^31`), at `J = 34040`, with the held sheet at `[337582, 337587)` again. The
+wall lies between `1/4096` and `1/2048` from m7 and between `1/2048` and `1/1024` from m6. That is why
+m7 stopped: every trial from `1/2048` up pays `J`. Every bisection read on either side agrees with its cut index: a read at cut `778016` or above releases at the jumped value, and one at `778015` or below at the held sheet.
+
+**Below the wall (Q12; `q12/`).** Its claim was fixed before the run: a Kinetic step from m7 at
+`η 1/4096` releases at the held sheet, strictly inside `[337582, 337901)`. It does.
+- The step-state reads held sheet = released = `[337715, 337720)`, lowering `L` by a margin in
+  `(176, 186)`.
+- `executed locks` on the stepped state reads `ρ 102837/131072`, solved 1 of 64, whole 0, released
+  7, stations right 13. Those are m7's stations: the step at cut `445930` stays below the co-lock.
+- Its smallest margin is `49152/2^24`, at request 7, refinement 6, station 4.
+- The direction read from m7 at `η 1/1048576` gives `γ_ρ ∈ [584710, 584711)/4096`, the same value
+  as Q3's first opening, and `Δρ ∈ [−3018, −3017)/2^21`.
+
+So below the wall the Kinetic step lowers the comparison without changing a decision.
+
+**The run of moves crosses it (Q3; `q3_run.txt`).** This is the Kinetic driver from m7 under #236's
+run (cap 32), opening `[337896, 337901)`, solved 1, stations right 13. Each move adopts its first
+trial:
+
+| move | η | released | solved | stations right | wall (ms) |
+|---|---|---|---|---|---|
+| 0 | 1/16 | `[378440, 378445)` | 2 | 18 | 493539 |
+| 1 | 1/32 | `[332893, 332898)` | 0 | 19 | 857217 |
+| 2 | 1/16 | `[324907, 324912)` | 0 | 22 | 1433622 |
+
+Move 0 releases above the opening, past the wall, and strict descent would refuse it. The run closes
+at move 3, since `324907 < 337896 − 11357 = 326539`. The closing state is m7-3.
+
+**From r13 (Q5; `q5_run.txt`).** The Kinetic driver at `ρ 168127/262144` under the same run, opening
+`[269593, 269597)`, solved 15, stations right 17. Moves at `η 1/8, 1/8, 1/4, 1/8`, all first
+trials, release `295903, 269925, 259601, 224839`, with stations right `15, 15, 23, 20`. The run closes
+at move 4, since `224839 < 269593 − 11357 = 258236`. The closing state is m13-4. Wall `1056768` ms.
+
+**The joined chain (Q4; `q4_chain.txt`).** The joined `(E, ρ)` driver from w3 under #202's interval,
+16 moves. Its runs close at moves 1, 2, 6, 9 and 11, and moves 12 to 16 stay open at the limit, so the
+chain restores the held state q411:
+- `ρ 802987/1048576`, released `[192495, 192499)`, held sheet `[187575, 187579)`;
+- solved 37, whole 1, stations right 26.
+
+Kinetic w16 at the same count releases `195744` at `ρ0`, solved 37, so the joined chain ends `3249`
+lower. Its `γ_ρ` changes sign from move to move.
+
+**Held out.** Each state is read with `executed evaluate`, and each pair with `paired/paired.py` on
+the two states' sections. b counts stations right only in the first state, c those right only in the
+second, and the tail is `P[X ≥ b | X ~ Bin(b + c, 1/2)]`, exact.
+
+| state | stations right | by station | whole |
+|---|---|---|---|
+| w16 | 329 | | 0 |
+| r13 | 272 | | 0 |
+| m7 | 231 | `[25, 25, 27, 24, 19, 28, 38, 45]` (127 released, 1 held) | 0 |
+| m7-3 | 279 | `[30, 32, 37, 38, 22, 35, 40, 45]` | 0 |
+| m13-4 | 291 | `[34, 39, 47, 52, 23, 10, 28, 58]` | 0 |
+| q411 | 345 | | 1 |
+
+| pair (first vs second) | b | c | tail |
+|---|---|---|---|
+| m7-3 vs m7 | 128 | 80 | `[560, 561)/2^20`, inside `[2, 3)/4096` |
+| w16 vs r13 | 226 | 169 | `[9, 10)/4096` |
+| m13-4 vs r13 | 165 | 146 | `[629, 630)/4096` |
+| q411 vs w16 | 199 | 183 | `[906, 907)/4096` |
+| m13-4 vs w16 | 184 | 222 | `[3987, 3988)/4096` |
+| m7-3 vs w16 | 154 | 204 | `[4081, 4082)/4096` |
+
+Each `b − c` equals the difference in stations right. The pairs against w16 are not like for like.
+w16 is 16 Kinetic moves under #202's interval, while m7-3 is 7 Coordinate moves and 3 Kinetic moves,
+and q411 is a joined chain.
+
+**#236 is released.** The rule was fixed before the reads: #236's acceptance is released at a paired
+tail of at most `1/64` on a closed run against its opening state. Two reads were made:
+- m13-4 against r13 did not separate;
+- m7-3 against m7 did, at `[560, 561)/2^20`.
+
+That is also below `1/128 = 8192/2^20`, the bound for two reads, so the release holds for both reads
+together. What it shows is that crossing m7's wall with a run of moves carries 48 held-out stations
+that strict descent left behind. It does not show that Coordinate beats Kinetic: m7-3 is below w16.
+The same question on a second wall, the at-rest throw's at m9 (below), is queued as Q13 against the
+bound `1/128`.
+
+**The at-rest throw meets a wall at m9.** The at-rest arm releases from rest at every move under
+strict descent at `ρ0`:
+- m6 `385082 → 375945`, solved 2, stations 18;
+- m7 `→ 364068`, solved 5, stations 19;
+- m8 `→ 352438`, solved 4, stations 17.
+
+At m9 the ladder starts at `η 8` (FirstOrderZero) and every trial down to `1/16` is refused:
+- `η 8` and `4` are refused NotBelow, with masks `408679, 368605`;
+- `η 2, 1, 1/2, 1/4` are refused OwnNotBelow: the held sheets `347714, 345518, 348089, 349957` fall
+  below `352438`, while the releases `370563, 356745, 354258, 361265` rise above it;
+- `1/8` and `1/16` are refused the same way.
+
+That is the m7 picture again, a held sheet that falls while the released comparison jumps. m8 is the
+arm's end under its law, and P5 pairs the other throw arms against it at m8.
+
+**Two chains stopped past a fitted per-move bound.** Both the whole-move throw's m2 and the
+strict-descent Coordinate control's m7 ran past `1349692` ms, which is `253092 + 8·137075`. That
+bound came from a two-point fit to the development moves m0 (`527242` ms, 2 rereads) and m1
+(`390167` ms, 1 reread), not from measured upper times.
+- The whole-move m2's rereads took `151812` and `203871` ms.
+- The Coordinate control's moves grew from `533372` to `923456` ms as refused trials accumulated:
+  one at m4, two at m6.
+
+Each is recorded as stopped incomplete, and as a projection error. Neither is relaunched with a
+larger move bound. Each runs again from its last state as a new launch, with the run's read declared
+per unit:
+- each kind of unit (incumbent read, persistence, slope, each trial's reread) prints a line;
+- each kind is bounded by the largest time measured for it before launch;
+- the run stops early when a unit passes its kind's bound.
+
+The guard is the sum over one move at the law's depth: the non-reread units once each, plus 8
+rereads. The ladder's depth bounds the trial count, so this bound is an upper time, which the fitted
+one was not. A unit past its bound after launch ends the chain incomplete, and its cost becomes the
+next subject.

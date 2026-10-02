@@ -1,0 +1,61 @@
+executed spectrum: 8 order2 requests at seed 2026093061, from m6; steps [1/2048, 1/1024], the lattice unit 1/2097152, at most 64 reads
+  read η 1/2048: cut index Some(901009), ρ None, held-sheet [337896/4096, 337901/4096), released [337896/4096, 337901/4096); 320612 ms
+  read η 17/32768: cut index Some(957315), ρ None, held-sheet [337873/4096, 337878/4096), released [337873/4096, 337878/4096); 74376 ms
+  read η 9/16384: cut index Some(1013629), ρ None, held-sheet [337851/4096, 337855/4096), released [337851/4096, 337855/4096); 69440 ms
+  read η 19/32768: cut index Some(1069947), ρ None, held-sheet [337828/4096, 337833/4096), released [337828/4096, 337833/4096); 68370 ms
+  read η 5/8192: cut index Some(1126256), ρ None, held-sheet [337806/4096, 337810/4096), released [337806/4096, 337810/4096); 68284 ms
+  read η 21/32768: cut index Some(1182578), ρ None, held-sheet [337783/4096, 337788/4096), released [337783/4096, 337788/4096); 67097 ms
+  read η 11/16384: cut index Some(1238899), ρ None, held-sheet [337760/4096, 337765/4096), released [337760/4096, 337765/4096); 73373 ms
+  read η 23/32768: cut index Some(1295202), ρ None, held-sheet [337738/4096, 337743/4096), released [337738/4096, 337743/4096); 75038 ms
+  read η 3/4096: cut index Some(1351518), ρ None, held-sheet [337716/4096, 337720/4096), released [337716/4096, 337720/4096); 66162 ms
+  read η 25/32768: cut index Some(1407832), ρ None, held-sheet [337693/4096, 337698/4096), released [337693/4096, 337698/4096); 67606 ms
+  read η 13/16384: cut index Some(1464142), ρ None, held-sheet [337670/4096, 337675/4096), released [337670/4096, 337675/4096); 68535 ms
+  read η 27/32768: cut index Some(1520457), ρ None, held-sheet [337648/4096, 337653/4096), released [337648/4096, 337653/4096); 65470 ms
+  read η 7/8192: cut index Some(1576767), ρ None, held-sheet [337626/4096, 337630/4096), released [337626/4096, 337630/4096); 72298 ms
+  read η 29/32768: cut index Some(1633076), ρ None, held-sheet [337603/4096, 337608/4096), released [337603/4096, 337608/4096); 70907 ms
+  read η 15/16384: cut index Some(1689396), ρ None, held-sheet [337581/4096, 337586/4096), released [371621/4096, 371626/4096); 73196 ms
+  read η 31/32768: cut index Some(1745694), ρ None, held-sheet [337559/4096, 337564/4096), released [371600/4096, 371605/4096); 73423 ms
+  read η 1/1024: cut index Some(1802037), ρ None, held-sheet [337536/4096, 337541/4096), released [371578/4096, 371583/4096); 68165 ms
+  read η 59/65536: cut index Some(1661242), ρ None, held-sheet [337592/4096, 337597/4096), released [337592/4096, 337597/4096); 70615 ms
+  read η 119/131072: cut index Some(1675318), ρ None, held-sheet [337587/4096, 337592/4096), released [337587/4096, 337592/4096); 79455 ms
+  read η 239/262144: cut index Some(1682354), ρ None, held-sheet [337584/4096, 337589/4096), released [337584/4096, 337589/4096); 76325 ms
+  read η 477/524288: cut index Some(1678834), ρ None, held-sheet [337585/4096, 337590/4096), released [337585/4096, 337590/4096); 76945 ms
+  read η 953/1048576: cut index Some(1677076), ρ None, held-sheet [337586/4096, 337591/4096), released [337586/4096, 337591/4096); 77551 ms
+  read η 1905/2097152: cut index Some(1676204), ρ None, held-sheet [337586/4096, 337591/4096), released [337586/4096, 337591/4096); 66632 ms
+  read η 3809/4194304: cut index Some(1675769), ρ None, held-sheet [337586/4096, 337591/4096), released [337586/4096, 337591/4096); 74242 ms
+  read η 7617/8388608: cut index Some(1675535), ρ None, held-sheet [337586/4096, 337591/4096), released [337586/4096, 337591/4096); 71417 ms
+  read η 15235/16777216: cut index Some(1675642), ρ None, held-sheet [337587/4096, 337591/4096), released [337587/4096, 337591/4096); 65172 ms
+  read η 30469/33554432: cut index Some(1675585), ρ None, held-sheet [337587/4096, 337591/4096), released [337587/4096, 337591/4096); 66959 ms
+  read η 60937/67108864: cut index Some(1675560), ρ None, held-sheet [337587/4096, 337591/4096), released [337587/4096, 337591/4096); 67305 ms
+  read η 121873/134217728: cut index Some(1675546), ρ None, held-sheet [337586/4096, 337591/4096), released [337586/4096, 337591/4096); 66454 ms
+  read η 243747/268435456: cut index Some(1675555), ρ None, held-sheet [337587/4096, 337591/4096), released [337587/4096, 337591/4096); 71126 ms
+  read η 487493/536870912: cut index Some(1675551), ρ None, held-sheet [337587/4096, 337591/4096), released [337587/4096, 337591/4096); 67724 ms
+  read η 974985/1073741824: cut index Some(1675550), ρ None, held-sheet [337587/4096, 337591/4096), released [337587/4096, 337591/4096); 66266 ms
+  read η 1949969/2147483648: cut index Some(1675548), ρ None, held-sheet [337587/4096, 337591/4096), released [337587/4096, 337591/4096); 66556 ms
+  read η 3899937/4294967296: cut index Some(1675546), ρ None, held-sheet [337586/4096, 337591/4096), released [337586/4096, 337591/4096); 63831 ms
+  read η 7799875/8589934592: cut index Some(1675548), ρ None, held-sheet [337587/4096, 337591/4096), released [337587/4096, 337591/4096); 70058 ms
+  read η 15599749/17179869184: cut index Some(1675547), ρ None, held-sheet [337586/4096, 337591/4096), released [337586/4096, 337591/4096); 71945 ms
+  read η 479/524288: cut index Some(1685864), ρ None, held-sheet [337582/4096, 337587/4096), released [337582/4096, 337587/4096); 63872 ms
+  read η 959/1048576: cut index Some(1687645), ρ None, held-sheet [337582/4096, 337587/4096), released [337582/4096, 337587/4096); 65626 ms
+  read η 1919/2097152: cut index Some(1688520), ρ None, held-sheet [337581/4096, 337586/4096), released [371622/4096, 371627/4096); 66246 ms
+  read η 3837/4194304: cut index Some(1688082), ρ None, held-sheet [337582/4096, 337586/4096), released [371622/4096, 371627/4096); 65568 ms
+  read η 7673/8388608: cut index Some(1687860), ρ None, held-sheet [337582/4096, 337587/4096), released [337582/4096, 337587/4096); 72278 ms
+  read η 15347/16777216: cut index Some(1687979), ρ None, held-sheet [337582/4096, 337587/4096), released [371622/4096, 371627/4096); 67502 ms
+  read η 30693/33554432: cut index Some(1687921), ρ None, held-sheet [337582/4096, 337587/4096), released [371622/4096, 371627/4096); 64627 ms
+  read η 61385/67108864: cut index Some(1687891), ρ None, held-sheet [337582/4096, 337587/4096), released [371622/4096, 371627/4096); 65935 ms
+  read η 122769/134217728: cut index Some(1687877), ρ None, held-sheet [337582/4096, 337587/4096), released [371622/4096, 371627/4096); 66443 ms
+  read η 245537/268435456: cut index Some(1687867), ρ None, held-sheet [337582/4096, 337587/4096), released [371622/4096, 371627/4096); 69606 ms
+  read η 491073/536870912: cut index Some(1687865), ρ None, held-sheet [337582/4096, 337587/4096), released [371622/4096, 371627/4096); 71233 ms
+  read η 982145/1073741824: cut index Some(1687863), ρ None, held-sheet [337582/4096, 337587/4096), released [371622/4096, 371627/4096); 54434 ms
+  read η 1964289/2147483648: cut index Some(1687863), ρ None, held-sheet [337582/4096, 337587/4096), released [371622/4096, 371627/4096); 51958 ms
+  read η 3928577/4294967296: cut index Some(1687861), ρ None, held-sheet [337582/4096, 337587/4096), released [337582/4096, 337587/4096); 49831 ms
+  read η 7857155/8589934592: cut index Some(1687862), ρ None, held-sheet [337582/4096, 337587/4096), released [337582/4096, 337587/4096); 48751 ms
+  m6: the incumbent: L ∈ [338257/4096, 338262/4096) nats; 51 reads; 3722899 ms
+  entries n = Some(600); at η 1/1024 the cut index is Some(1802037)
+  the walls, smallest step first (J in /4096 nats, lower ends):
+    cut Some(1675547) -> Some(1675548) (η 15599749/17179869184 -> 7799875/8589934592): J 0
+      request 3: order [[0], [2], [4], [5], [6], [7], [3], [1]] -> [[0], [2, 5], [7], [6], [4], [3], [1]]
+    cut Some(1687862) -> Some(1687863) (η 7857155/8589934592 -> 1964289/2147483648): J 34040
+      request 3: order [[0], [2, 5], [7], [6], [4], [3], [1]] -> [[0], [5], [7], [6], [4], [3], [2], [1]]
+executed spectrum: 3722942 ms; resident 259796992 now, 267550720 peak
+exit 0 wall 3722975 ms

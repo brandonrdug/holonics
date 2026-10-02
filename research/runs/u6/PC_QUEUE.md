@@ -55,10 +55,12 @@ its jump `J`, the requests it changes).
 
 ## P4. The exposure protocol's held-out code at m6 and w16 (record §7's restated gate)
 
-**Running in the cloud since October 2, 21:28 UTC**, both sources together at 2 threads each. The
-cloud's 4 cores are otherwise idle, and the PC's 24 threads are full (P3 at 8 per direction, Q4
-at 8). The PC takes P4 only if the cloud run stops before its deadline. In that case P4 launches
-when P3 exits, both sources together at 2 threads each:
+**Running in two places.** The cloud launched it on October 2 at 21:28 UTC, at 2 threads per
+source. A container restart at about 23:00 lost that run: only the header line had been written, since
+the run prints no per-window progress. The cloud relaunched it at 23:07 under the same deadline. The
+deadline is not raised, because the restart stopped the run, not its deadline. The PC also runs it,
+from `1e32c868`, under this fallback, because a further restart would lose the cloud copy again.
+Whichever copy finishes first is the receipt. The command, both sources together at 2 threads each:
 ```
 RAYON_NUM_THREADS=2 timeout 36000 $B executed expose 2026093061 2026093012 128 all m6=$S/m6.state
 RAYON_NUM_THREADS=2 timeout 36000 $B executed expose 2026093061 2026093012 128 all w16=$S/w16.state
@@ -75,25 +77,40 @@ is fixed and is not raised.
 Gate: w16's held-out combined code below m6's by at least `1024·1/16 = 64` bits. Report the held-out and
 training lines whole.
 
-## P5. The joint held-out read of the six move-16 states (waits on all six)
+## P5. The joint held-out read of the arms' end states, paired by move count
 
-When these chains each store their move-16 state, the main line names the six paths here, and the PC
-reads them in one call at 16 threads:
+Each chain stores every move's state. When a chain ends, at m16 or earlier, the main line names its
+end state here. A chain ends in one of three ways: at m16; under its own law, where every trial is
+refused; or incomplete, past a per-kind bound. The PC reads the end states in one call at 16 threads.
+The arms are:
 - Q2's Coordinate chain and Q2's Kinetic control, both under #202's interval acceptance;
 - the at-rest throw: the throw chain through m5 (every move released from rest), then its own chain
-  from `m5-throw.state` to m16, releasing from rest at every move (ρ held);
+  from `m5-throw.state`, releasing from rest at every move (ρ held). **It ended under its law at m8**
+  (`claude/pc-receipts`, `research/runs/throw-rest/m8/m8-throw.state`): at m9, strict descent refused
+  every trial from η 8 down to 1/16;
 - the coast-alone throw: the original throw chain, which first carried its coast at m6 (#240's rule
   before `5f254c2d`);
 - the whole-move throw (#240's whole-move power test, `−⟨∇L, ηD + c⟩` along `w = D + c/η₀`);
 - the strict-descent Coordinate control, the same driver with `coordinate`, as the baseline. It
-  matches the throw through m1 and leaves it at m2, where Coordinate moves ρ.
+  matches the throw through m1 and leaves it at m2, where Coordinate moves ρ. It ended incomplete
+  at m7 under its first, fitted bound, and runs again from m6 under per-kind bounds.
 
 The last four use strict descent. Each throw is read against the at-rest throw, which has the same
-driver, the same acceptance and ρ held; only the carried momentum differs. Pairs follow the paired
-rule: per held-out station, `b` (right in A only), `c` (right in B only), and the exact one-sided sign
-tail on `b` of `b + c` at `1/2`, released only at a tail of at most `1/64`.
+driver, the same acceptance and ρ held; only the carried momentum differs.
+
+**Like for like by move count.** A pair compares two states at the same move count:
+- the coast-alone and whole-move throws at m8, against the at-rest m8;
+- the strict-descent Coordinate control at its end, against the throw arms at the same move.
+
+When an arm ends short of another, the call adds the other arm's state at that move as an extra
+label. Each arm's own end state is read as well, but it is paired only at equal move counts.
+
+Pairs follow the paired rule: per held-out station, `b` (right in A only), `c` (right in B only), and
+the exact one-sided sign tail on `b` of `b + c` at `1/2`, released only at a tail of at most `1/64`.
+The labels below are the six end states. Pairing labels added for equal move counts extend the call
+and its deadline (three times the largest per-state read, per state).
 ```
-RAYON_NUM_THREADS=16 timeout 19493 $B executed evaluate order2 2026093012 128 out/p5-move16.sections coord16=<path> kin16=<path> rest16=<path> coast16=<path> whole16=<path> tctl16=<path>
+RAYON_NUM_THREADS=16 timeout 19493 $B executed evaluate order2 2026093012 128 out/p5-ends.sections coord=<end> kin=<end> rest=<m8> coast=<end> whole=<end> tctl=<end> [coast8=<m8> whole8=<m8> ...]
 ```
 Pass a file path for the sections, not a directory. `evaluate` writes it with `std::fs::write`, which
 creates no parent directory, so `out/` must exist before launch.
