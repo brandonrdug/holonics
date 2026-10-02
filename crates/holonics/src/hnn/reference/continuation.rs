@@ -194,3 +194,103 @@ fn native_contact_return_refuses_another_source_and_stale_deposit_without_cache_
     ));
     assert_eq!(charts, before);
 }
+
+// [derivation] **A storage deposit reaches the next contact passage only through the rate's jump.**
+// With both words at the same representatives, the transit's right side differs by `2ΔC w` and its
+// operator by `(G/h)ΔC`, so under the exact solve `m′(ζ′ − ζ) = 2ΔC(w − ω) = ΔC(w − w⁺)`, `w⁺ = 2ω − w`
+// the predecessor's next rate before its split. Summed over the ticks the representatives agree,
+// the rate jumps telescope: `Σ(w_t − w⁺_t) = (w_0 − w_N) + (ρ_0 − ρ_N) + (G/h)(r_0 − r_N)` (rate and
+// solve remainders). While the representatives agree, the two words' solve remainders differ by the
+// accumulated image difference, so a deposit is forced into the next passage only once that sum
+// reaches one word unit. Record
+// `research/records/2026-10-02_A_STORAGE_DEPOSIT_IS_FELT_ONLY_THROUGH_THE_RATE_S_JUMP_AND_THE_WORD_HOLDS_IT_BELOW_ONE_UNIT.md`;
+// Lean `HNN/StorageResolution`.
+#[test]
+fn storage_deposit_reaches_the_next_contact_only_through_the_rate_jump() {
+    storage_response(true, 1);
+    storage_response(false, 4096);
+}
+
+fn storage_response(exact: bool, ticks: usize) {
+    use crate::ratio::linear::vector::{add, sub};
+    let started = std::time::Instant::now();
+    let scale = |c: &Rat, v: &[Rat]| v.iter().map(|x| c * x).collect::<Vec<_>>();
+    let field = if exact { boundary().with_exact_word() } else { boundary() };
+    let theta = resolved(&field);
+    let (current, source) = learning::moment(&field, 82, 9);
+    let source = Arc::new(source);
+    let mut charts = Charts::new();
+    let (cut, deposit) = contact_comparison(&field, &theta, &current, &source, &mut charts);
+    let change = cut.change().clone();
+    let next_tick = cut.next_tick();
+    let before_operands = if exact {
+        Operands::exact_at_cut(&field, &theta, &current).unwrap()
+    } else {
+        Operands::at_cut_charted(&field, &theta, &current, &mut charts).unwrap()
+    };
+    let nothing: Vec<_> = change.storage.iter().map(|s| vec![Rat::zero(); s.len()]).collect();
+    let mut predecessor =
+        Word::continuing(&field, before_operands, &change, &nothing, next_tick).unwrap();
+    let (_, returned) = cut
+        .continue_deposited(&field, &current, &source, &deposit, &mut charts)
+        .unwrap();
+    let mut successor = returned.forward.into_present().unwrap();
+    let (before, after) = (&predecessor.operands().contacts()[0], &successor.operands().contacts()[0]);
+    let h = predecessor.operands().step().clone();
+    assert_eq!(&h, successor.operands().step());
+    let g = before.conductance().clone();
+    assert_eq!(&g, after.conductance());
+    assert_eq!(before.forms().1, after.forms().1);
+    assert_eq!(before.forms().2, after.forms().2);
+    let delta = after.forms().0.subtract(before.forms().0).unwrap();
+    let operator = after.operator().clone();
+    let inverse = operator.inverse().unwrap();
+    let unit = if exact { Rat::zero() } else { field.word_lattice().unwrap().transient().unit() };
+    eprintln!("storage response exact={exact} h={h} G={g} G/h={} unit={unit} dC={:?} m'={:?}",
+        &g / &h, delta.to_rows(), operator.to_rows());
+    assert_eq!(predecessor.solve_remainders(), successor.solve_remainders());
+    let rate0 = predecessor.change().unwrap().states[0][1].clone();
+    let (mut accumulated, mut material, mut parted) =
+        (vec![Rat::zero(); rate0.len()], vec![Rat::zero(); rate0.len()], None);
+    for tick in 0..ticks {
+        let r_before = predecessor.solve_remainders()[0].clone();
+        let r_after = successor.solve_remainders()[0].clone();
+        predecessor.run(1).unwrap();
+        successor.run(1).unwrap();
+        let (p, s) = (predecessor.recorded().last().unwrap(), successor.recorded().last().unwrap());
+        assert_eq!(p.states, s.states, "the two words entered this tick at one representative");
+        let rate = &p.states[0][1];
+        // ζ = ζ̂ + r_(t+1) − r_t, ζ̂ = (2h/G) ω.
+        let image = |omega: &[Rat], r0: &[Rat], r1: &[Rat]| {
+            add(&scale(&(&(&h * Rat::from_integer(2.into())) / &g), omega), &sub(r1, r0))
+        };
+        let zeta = image(&p.rates[0], &r_before, &predecessor.solve_remainders()[0]);
+        let zeta_after = image(&s.rates[0], &r_after, &successor.solve_remainders()[0]);
+        let difference = sub(&zeta_after, &zeta);
+        let jump = sub(&scale(&Rat::from_integer(2.into()), rate), &scale(&(&g / &h), &zeta));
+        let response = inverse.apply(&delta.apply(&jump).unwrap()).unwrap();
+        if exact {
+            assert_eq!(operator.apply(&difference).unwrap(), delta.apply(&jump).unwrap(),
+                "m'(ζ' − ζ) = ΔC(w − w⁺) under the exact solve");
+        }
+        accumulated = add(&accumulated, &difference);
+        material = add(&material, &response);
+        let remainders = sub(&successor.solve_remainders()[0], &predecessor.solve_remainders()[0]);
+        let (pc, sc) = (predecessor.change().unwrap(), successor.change().unwrap());
+        let equal = pc == sc;
+        if !exact && equal {
+            assert_eq!(remainders, accumulated, "equal representatives carry the image difference");
+        }
+        if tick < 4 || (tick + 1).is_power_of_two() || !equal {
+            eprintln!("storage tick={} w={:?} accumulated={:?} material={:?} chart={:?} equal={} elapsed_ms={}",
+                tick + 1, rate, accumulated, material, sub(&accumulated, &material), equal,
+                started.elapsed().as_millis());
+        }
+        if !equal {
+            parted = Some(tick + 1);
+            break;
+        }
+    }
+    eprintln!("storage response exact={exact} parted={parted:?} rate_excursion={:?}",
+        sub(&rate0, &predecessor.change().unwrap().states[0][1]));
+}
