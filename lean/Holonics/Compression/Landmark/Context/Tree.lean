@@ -219,12 +219,15 @@ gradient only once a metric is supplied.
 prior-mass case `½ log₂ n + j`, `priorMass_regret_bits`), and its composition with the dominance
 into the tree's full bound, at any rung and any stop weights, is
 `Context/PriorMass.priorMass_tree_redundancy` (the leaves' charges summed, not in the concave form
-`|S| γ(N/|S|)`). [open] **The lattice chart's passage-level drift** (#62, "the landmark lattice's drift"): the
-composition over the tree and the passage of `lattice_node_telescope`, `weight_log_lipschitz` and
-`mix_ratio_bound` into `|ln β̂_s − ln β_s| ≤ Σ_(subtree)(θ + 2|ln(1 − r)|) + Σ_s |ln(1 − r)|` and the
-per-cell rule `(3/2) B [(n* D² + 2D + 1) 2^(−M−1)/μ̂ + n* D² 2^(1−W)]` (Rust `landmark::face_bits`,
-`carrier_width`, `Landmarks::face_rule`), and **the certified binary logarithm's squaring
-invariant** (Rust `landmark::binary_log`); both are checked by the Rust tests. The finite-cut orderings (the count-only tree below online order-0, order-1 and PPM-2
+`|S| γ(N/|S|)`). The lattice chart's passage-level drift, the composition over the tree and the
+passage of `lattice_node_telescope`, `weight_log_lipschitz` and `mix_ratio_bound`, is
+`Context/Drift`: `|ln β̂_s − ln β_s| ≤ Σ_(subtree)(θ + |ln c|) + Σ_s |ln c|` (`split_drift`,
+`tree_drift_below`), the passage's code within `Σ_t Σ_(d ≤ D)(θ_d + |ln c_d|)`
+(`ExecutedTree.passage_drift`), and the per-cell rule `(n* D² + 2D + 1) 2^(−M−1)/μ̂ + n* D² ρ`
+before `(3/2) B` (`ExecutedTree.cell_drift_uniform`; Rust `landmark::face_bits`, `carrier_width`,
+`Landmarks::face_rule`), for the full executed tree. [open] Its reading on the compacted storage,
+and **the certified binary logarithm's squaring invariant** (Rust `landmark::binary_log`), are
+owed in #62; both are checked by the Rust tests. The finite-cut orderings (the count-only tree below online order-0, order-1 and PPM-2
 on the standing real cut) are measurement receipts, not theorems. The campaign 5 merge laws are not
 stated here: they have no consumer yet.
 
