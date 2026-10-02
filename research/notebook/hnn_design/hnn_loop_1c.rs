@@ -1178,6 +1178,12 @@ fn power_below(x: &Rat) -> Rat {
     p
 }
 
+/// [definition; agent-inferred, October 2] **The exterior fit's step sizes**: at most 8 a trial,
+/// halving from its first. A declared bound on an exterior search's work, recorded with its runs
+/// (`hnn_loop_1c`'s receipts); it is not the machine's move, whose halvings end at the lattice's
+/// resolution (`hnn::executed`).
+const REFIT_HALVINGS: usize = 8;
+
 /// **The representation search** (module header; the pin §3).
 #[allow(clippy::too_many_arguments)]
 pub(super) fn represent(
@@ -1209,7 +1215,7 @@ pub(super) fn represent(
         "executed represent: {count} {terrain} requests at development seed {seed}; the exterior fit (least-norm Gauss–Newton on the lock faces above (15/16) ln 2, projected onto the lattice 2^(-{}) and the entry box ±{bound}, certified through the actual release) from the founded opening (ρ = {}), at most {iterates} iterates, the ladder at most {} trials, deadline {deadline} ms; {} threads",
         opening.lattice(Locus::SourcePort(ring)).expect("lattice").exponent(),
         opening.transport(ring),
-        holonics::hnn::executed::LADDER_DEPTH,
+        REFIT_HALVINGS,
         rayon::current_num_threads()
     );
     let mut theta = opening.clone();
@@ -1306,7 +1312,7 @@ pub(super) fn represent(
         let sites: Vec<Vec<TermSite>> = batch.requests.iter().map(|r| r.terms.iter().map(|t| t.site.clone()).collect()).collect();
         let mut step = if largest.is_positive() { power_below(&(&bound / &largest)).min(Rat::one()) } else { Rat::one() };
         let mut adopted = None;
-        for trial in 0..holonics::hnn::executed::LADDER_DEPTH {
+        for trial in 0..REFIT_HALVINGS {
             let trial_started = Instant::now();
             let moved: Vec<Vec<Rat>> = (0..rows_e)
                 .map(|r| {

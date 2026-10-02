@@ -1575,6 +1575,137 @@ pub(super) fn move_once(terrain: &str, seed: u64, count: usize, out: &str, sourc
     println!("executed move-once: {} ms; resident {}", clock.elapsed().as_millis(), resident());
 }
 
+/// [measured-diagnostic; agent-inferred, October 2; the
+/// [run-end record](../../records/2026-10-02_A_RUN_CLOSES_ON_A_CONDITION_NOT_A_LENGTH_AND_THE_HALVINGS_END_AT_THE_LATTICE.md)
+/// §6] **A release run from an opening state to its close or a refusal** (`executed run <terrain>
+/// <seed> <count> <out> <label=state> <arm> <metric> <cap> <deadline ms>`, the arm as
+/// [`arm_comparison`], `metric` as [`move_once`], `cap` the most adopted moves or `none`, the state a
+/// complete continuing state restored with no fallback ([`remounted`])): `hnn::executed::release_run`
+/// with `σ` one receiver grain over every declared decision term, `stations · count` at the declared
+/// tolerance. Each move prints its line, its trials (the halvings run to the lattice's resolution)
+/// and the successor's own release, and writes the successor to `<out>/<label>-<k>.state`. The run's
+/// end is printed: closed (with the closing state), refused (typed), or incomplete at the cap or the
+/// deadline, which exits [`super::loop_1c::INCOMPLETE`] and is never a refusal. One move (`cap` 1)
+/// reads a state's move with the excursion unchecked, as inside a run.
+#[allow(clippy::too_many_arguments)]
+pub(super) fn run(
+    terrain: &str,
+    seed: u64,
+    count: usize,
+    out: &str,
+    source: &str,
+    arm: &str,
+    metric: &str,
+    cap: &str,
+    deadline: u128,
+) {
+    use holonics::hnn::executed::{MoveMetric, ReleaseExcursion, RunEnd, release_run};
+    let clock = Instant::now();
+    let declared = order_declared();
+    let engine = Engine::new(declared);
+    let bank = bank_of(declared.period, &bank_strength());
+    let ring = engine.refinement.ring();
+    let pairs = terrain_pairs(terrain, &declared, seed, count);
+    let requests = open_requests(&engine, &pairs);
+    let targets: Vec<Vec<usize>> = pairs.iter().map(|(_, t)| t.clone()).collect();
+    let (comparison, partition) = arm_comparison(arm);
+    assert!(!partition, "a run reads the open section");
+    let metric = match metric {
+        "coordinate" => MoveMetric::Coordinate,
+        "witness" => MoveMetric::Witness,
+        "kinetic" => MoveMetric::Kinetic,
+        "kinetic-modulus" => MoveMetric::KineticModulus,
+        other => panic!("a metric, coordinate, witness, kinetic or kinetic-modulus: {other}"),
+    };
+    let cap = match cap {
+        "none" => None,
+        n => Some(n.parse::<std::num::NonZeroUsize>().expect("a cap: a positive count or none")),
+    };
+    let (label, spec) = source.split_once('=').expect("<label>=<source>");
+    let theta = remounted(&engine.theta, spec);
+    let decisions = declared.stations * count;
+    let decrease = ReleaseExcursion::grain(decisions, &rat(TOLERANCE.0, TOLERANCE.1)).expect("σ");
+    println!(
+        "executed run: {count} {terrain} requests at development seed {seed}, the arm {arm}, {metric:?}, from {label} (ρ {}; the source port's lattice 2^(-{})); σ over {decisions} decisions {} nats; cap {cap:?}, deadline {deadline} ms; the bank p = {}, grain 2^(-{BANK_GRAIN})",
+        theta.transport(ring),
+        theta
+            .lattice(holonics::hnn::constitution::Locus::SourcePort(ring))
+            .expect("the source port's lattice")
+            .exponent(),
+        cell(&ExactInterval::point(decrease.clone()), 1 << 12),
+        bank_strength()
+    );
+    let mut stopped = false;
+    let ran = release_run(
+        &engine.field,
+        &theta,
+        &requests,
+        &engine.refinement,
+        &bank,
+        BANK_GRAIN,
+        comparison,
+        metric,
+        &decrease,
+        cap,
+        |k, moved| {
+            let ms = clock.elapsed().as_millis();
+            if k == 0 {
+                let (solved, all) = solved_terms(&moved.before);
+                let (whole, right, released) = moved.before.sections(&targets);
+                println!(
+                    "  the opening: L ∈ {} nats; solved {solved} of {all}; whole {whole} (released {released}, stations right {right})",
+                    cell(&moved.before.value, 1 << 12)
+                );
+            }
+            println!("{}", move_line(k, moved, ms));
+            println!("{}", trial_line(moved));
+            if let Some((successor, _)) = &moved.adopted {
+                let own = moved.trials.last().and_then(|t| t.after.as_ref()).expect("the adopted trial's own release");
+                let (solved, all) = solved_terms(own);
+                let (whole, right, released) = own.sections(&targets);
+                println!(
+                    "  move {k}: adopted; ρ {}; L ∈ {} nats; solved {solved} of {all}; whole {whole} (released {released}, stations right {right}); {ms} ms",
+                    successor.transport(ring),
+                    cell(&own.value, 1 << 12)
+                );
+                #[allow(clippy::disallowed_methods)]
+                std::fs::write(format!("{out}/{label}-{}.state", k + 1), write_state(successor, ring))
+                    .expect("write the successor's state");
+            }
+            stopped = ms >= deadline;
+            !stopped
+        },
+    )
+    .expect("the run");
+    println!(
+        "  the opening L ∈ {} nats, σ {} nats",
+        cell(&ran.opening, 1 << 12),
+        cell(&ExactInterval::point(ran.decrease.clone()), 1 << 12)
+    );
+    let incomplete = match &ran.end {
+        RunEnd::Closed { moves, end, .. } => {
+            println!(
+                "executed run: closed at move {moves}: L ∈ {} nats below the opening's lower end less σ; the closing state is {out}/{label}-{moves}.state",
+                cell(end, 1 << 12)
+            );
+            false
+        }
+        RunEnd::Refused { moves, refusal } => {
+            println!("executed run: refused at the move after {moves} adopted moves: {refusal:?}");
+            false
+        }
+        RunEnd::Incomplete { moves, .. } => {
+            let why = if stopped { format!("its deadline {deadline} ms") } else { format!("its cap {cap:?}") };
+            println!("executed run: INCOMPLETE at {why}, after {moves} adopted moves, neither closed nor refused");
+            true
+        }
+    };
+    println!("executed run: {} ms; resident {}", clock.elapsed().as_millis(), resident());
+    if incomplete {
+        std::process::exit(super::loop_1c::INCOMPLETE);
+    }
+}
+
 /// [measured-diagnostic; October 2] **A batch's requests and targets, printed** (`executed pairs
 /// <terrain> <seed> <count>`): one line a pair, `<request cells> ; <target cells>`, so an exterior
 /// float fit trains on the very requests the native chain reads.
