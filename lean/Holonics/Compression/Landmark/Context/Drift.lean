@@ -79,13 +79,13 @@ receiver's resolution.
 - **The factors.** A mantissa rebase is `c = x/m'` with `|ln c| < 2^(1−W)`
   (`Tree.rebase_log_residual`); a carrier release lies in `[1, 1 + 1/D̂)` (`Carrier`), of the
   opposite sign, which item 2 allows.
-- **Stored where paths part** (agent-inferred, not formalized). `ExecutedTree` is the full tree.
-  The compacted executed tree (`Compaction`, Decision 37) is read as an instance: a stored chain's
-  implicit nodes read their faces exactly (`θ = 0`, `c = 1`, by `Compaction.chain_ratio`, an
-  identity in the chain's bottom split mass), its rebases are factors at its bottom, its rounding
-  at its top, and a split's two `W`-bit carries are factors at the two parts' bottoms on the
-  arrival before the split. That instance, and the count of splits behind the rule's
-  `(2n* + 1) P² 2^(1−W)`, stay owed in #62.
+- **Stored where paths part.** `ExecutedTree` is the full tree; the compacted executed tree
+  (`Compaction`, Decision 37) is its instance in `Context/StoredDrift`: each stored chain's
+  discrepancy sits at its bottom node and every implicit node reads exactly, so the weight and the
+  split mass are within the subtree's discrepancies (`StoredDrift.ConsistentTree.drift_le_tot`), the
+  passage within their changes and the root's read jumps (`StoredDrift.stored_passage`), and a split
+  charges `u + 2ℓ` to the upper part's drift and `2(u + ℓ)` to the increment
+  (`StoredDrift.split_charge`; the Rust now carries these).
 - **Not stated here**: the enlarged tree's join (`Context/LocalWeighing`'s executed join tree,
   whose two sides are both executed, adds its own drift; each dyadic cell's join costs at most one
   bit against either branch), and the certified binary logarithm's squaring invariant
