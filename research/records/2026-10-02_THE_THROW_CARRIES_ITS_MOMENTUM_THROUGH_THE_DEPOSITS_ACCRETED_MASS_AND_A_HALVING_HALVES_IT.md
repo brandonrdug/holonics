@@ -257,7 +257,34 @@ read overlapped a 12 s Lean build.
 per-move bound is `253092 + 8 · 137075 = 1349692` ms, and the chain's deadline is 16 times
 `1350` s, `21600` s, launched as `timeout 21596` around `run.sh .local/throw 1349692 1350`.
 
-## 7. Verification
+## 7. The floor along the coast (after the development read)
+
+**The read.** At m0's stored state, the plain pullback `G` (the descent covector on m0's own
+sections) pairs positively with `E_c0 − E_m0`, with `cos²` in `[354, 355)/4096`. So
+`⟨∇L(m0), ΔE_0⟩ > 0`: on its own sections m0 lies past the floor of its own line. On c0's fixed
+sections the same line still fell at m0 (the mask's cells `[430625/4096, 430630/4096)` at `η 1/4`
+and `[473652/4096, 473658/4096)` at `η 1/2`). The step's flipped commitments raised the released code
+length to `[495714/4096, 495719/4096)`, and that jump is what turned the line (#207's crossing law).
+
+**The law** [derived; the profile along the line is the hypothesis]. Along the carried line
+`L(τ) = L(E + τc)`, with slope `s` at `τ = 0` (the power test) and curvature `κ`:
+- *Apex, `s ≥ 0`.* With `L` convex along the coast, the coast does not lower it
+  (`coast_apex_no_floor_ahead`). The floor is not ahead, so the coast that stops at the floor is
+  none, and the move is released from rest: the inelastic limit of the deposit's own sticking. This
+  is #240's rule, now derived. Where `L` is concave along the line, no forward floor exists either.
+- *Carried, `s < 0`.* The floor is at `τ* = −s/κ` (`coast_floor`), and the coast that stops there
+  is `min(1, τ*)·c`. #240 carries `τ = 1` and lets the halvings scale it, so a coast with `τ* < 1`
+  overshoots its floor and the next move releases.
+- *The curvature without a constant.* The power test already builds the coast-only successor. One
+  reread of its own comparison gives the secant `κ_c = 2(L(c) − L(0) − s)`
+  (`coast_secant_curvature`), with exact enclosures. On the own release the secant includes any
+  crossing's jump along the coast, upward or downward.
+
+**What it changes.** The apex moves are unchanged. Carried moves with `τ* < 1` would carry less
+coast. So the law changes only what follows the running chain, whose receipts stay those of
+§2's rule. It is to be built as its own arm after the chain, held for measurement like this one.
+
+## 8. Verification
 
 - `cargo check -p holonics --all-targets`: clean.
 - The two tests above and `the_kinetic_move_deposits_the_solve_and_keeps_every_guard`, in release:

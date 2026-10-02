@@ -38,12 +38,14 @@ the pump's reflection block `−2p R_c` to its stiffness, `c` the placed carrier
    stiffness; a carried velocity accumulates a push that keeps its sign.
 9. **The throw through the accreted mass** (`accretion_loss`, `accretion_dissipates`,
    `thrown_move`, `throw_velocity_le_terminal`, `throw_velocity_rises`, `leap_velocity_le`,
-   `throw_velocity_le_unaccreted`, `throw_reach_le_free_fall`): a
+   `throw_velocity_le_unaccreted`, `throw_reach_le_free_fall`, `coast_apex_no_floor_ahead`,
+   `coast_floor`, `coast_secant_curvature`): a
    deposit accretes mass onto the port and conserves the carried momentum, so its kinetic reading
    falls by exactly `p² f/(2m(m + f))`; the thrown move is the impulse plus the coast, the leap's
    impulse alone from rest; under a constant impulse the throw's velocity rises toward the impulse
    over the per-deposit mass while the leap's falls like `1/k`; and a throw from rest reaches no
-   further than free fall `(i/m₀)·n(n + 1)/2` (the record
+   further than free fall `(i/m₀)·n(n + 1)/2`; at the apex the floor is not ahead, and a carried
+   coast's floor is `−s/κ`, its curvature read from the coast's own end (the record
    `research/records/2026-10-02_THE_THROW_CARRIES_ITS_MOMENTUM_THROUGH_THE_DEPOSITS_ACCRETED_MASS_AND_A_HALVING_HALVES_IT.md`).
 -/
 
@@ -404,5 +406,29 @@ theorem throw_reach_le_free_fall (i m₀ f : ℝ) (hi : 0 ≤ i) (hm : 0 < m₀)
       field_simp
       ring
     linarith
+
+/-- **At the apex the floor is not ahead**: if the comparison is convex along the whole coast and
+its slope at the start is not negative (the power test's apex), the coast does not lower it, so the
+coast that stops at the floor is none and the move is released from rest. -/
+theorem coast_apex_no_floor_ahead {f : ℝ → ℝ} {s : ℝ} (hf : ConvexOn ℝ (Set.Icc 0 1) f)
+    (hd : HasDerivWithinAt f s (Set.Ioi 0) 0) (hs : 0 ≤ s) : f 0 ≤ f 1 := by
+  have := convex_chord_slope_le hf hd
+  linarith
+
+/-- **The floor along a carried coast**: on the quadratic `a + sτ + κτ²/2` with `κ > 0`, the
+fraction `τ* = −s/κ` is lowest. -/
+theorem coast_floor (a s κ τ : ℝ) (hκ : 0 < κ) :
+    a + s * (-s / κ) + κ * (-s / κ) ^ 2 / 2 ≤ a + s * τ + κ * τ ^ 2 / 2 := by
+  have e : a + s * τ + κ * τ ^ 2 / 2 - (a + s * (-s / κ) + κ * (-s / κ) ^ 2 / 2)
+      = κ / 2 * (τ + s / κ) ^ 2 := by
+    field_simp
+    ring
+  nlinarith [mul_nonneg (by linarith : (0 : ℝ) ≤ κ / 2) (sq_nonneg (τ + s / κ))]
+
+/-- **The coast's curvature is read from its own end**: on that quadratic, the secant reading
+`2(L(1) − L(0) − s)` is `κ`. -/
+theorem coast_secant_curvature (a s κ : ℝ) :
+    2 * ((a + s * 1 + κ * 1 ^ 2 / 2) - a - s) = κ := by
+  ring
 
 end Holonics.HNN.MoveDirection
