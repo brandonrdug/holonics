@@ -1130,7 +1130,11 @@ impl std::fmt::Display for Capacity {
 /// level past the last stored one reads `π_0` (a node with no arrival), the code is the root weight
 /// over the based own weights and complete, the floor holds on every path, and the redundancy is
 /// `Even`'s plus at most `c(k) + c(m)` a leaf, `c(K + 1) ≤ 1 + 3/2^(j+2)(1 + ln K)`: under 4 bits a
-/// leaf at campaign 1.
+/// leaf at campaign 1. These need the base read before the arrival's own deposit: a root base read
+/// after it gives either digit `11/16` on an empty passage at `j = 3`, `11/8` in all (Lean
+/// `deposit_first_overcounts`). `Landmarks::receive_digits` reads every face, the root's counts
+/// included, at the standing before it applies the cell (test
+/// `the_roots_base_is_read_before_the_arrivals_deposit`).
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash)]
 pub enum BaseMeasure {
     Even,

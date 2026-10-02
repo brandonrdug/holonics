@@ -2350,3 +2350,44 @@ fn the_roots_base_keeps_the_rule_and_leans_on_the_unconditional_split() {
     };
     assert_eq!(fresh(BaseMeasure::Root), fresh(BaseMeasure::Even));
 }
+
+/// **The root's base is read before the arrival's own deposit** ([`BaseMeasure::Root`]; Lean
+/// `Compression/Landmark/Context/BaseMeasure.deposit_first_overcounts`: a root base read after the
+/// deposit gives either digit `11/16` on an empty passage at `j = 3`, `11/8` in all). At campaign
+/// 1's prior mass `2^(−3)`, every receipt's executed mass is the score read at the standing before
+/// its deposit, and those scores sum to one over the classes; a fresh binary tree reads `½` for
+/// either digit's first arrival.
+#[test]
+fn the_roots_base_is_read_before_the_arrivals_deposit() {
+    use crate::compression::landmark::context::BaseMeasure;
+    let alphabet = 5;
+    let stream: Vec<usize> = (0..60u64)
+        .map(|t| if t % 4 == 3 { ((t * 7 + t / 3) % 5) as usize } else { 1 })
+        .collect();
+    let declared = LandmarkDeclaration {
+        mass: 3,
+        base: BaseMeasure::Root,
+        ..declaration(alphabet, 3)
+    };
+    let mut tree = Landmarks::new(declared).unwrap();
+    for (position, &cell) in stream.iter().enumerate() {
+        let here = address(&stream, position, 3);
+        let before: Vec<Rat> = (0..alphabet)
+            .map(|class| tree.probability(&here, class).unwrap())
+            .collect();
+        assert_eq!(before.iter().cloned().sum::<Rat>(), Rat::one(), "position {position}");
+        let reading = tree.receive(&here, cell).unwrap();
+        assert_eq!(reading.executed, before[cell], "position {position}");
+    }
+    for digit in 0..2 {
+        let mut fresh = Landmarks::new(LandmarkDeclaration {
+            mass: 3,
+            base: BaseMeasure::Root,
+            ..declaration(2, 2)
+        })
+        .unwrap();
+        let here = [Letter::Boundary, Letter::Boundary];
+        assert_eq!(fresh.receive(&here, digit).unwrap().executed, rat(1, 2));
+        assert!(fresh.probability(&here, digit).unwrap() > rat(1, 2));
+    }
+}

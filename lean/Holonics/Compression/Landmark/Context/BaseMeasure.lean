@@ -58,17 +58,22 @@ tree       −log₂ ∏_t q_0(x_t) ≤ −log₂ prior_w(S)
    notebook's `½` was not. It keeps every base mass at least `¼` by item 1.
 3. **The code** (`basedOwn`, `basedOwn_snoc`, `baseEmitted`, `baseEmitted_face_normalized`,
    `baseEmitted_eq_weight`, `baseEmitted_sum`, `rootBaseOf`): for **any** base read from the
-   passage before each arrival (positive and normalized), the emitted code is the product of
+   passage before each arrival (positive and normalized), which may differ from node to node
+   (`Base` reads the node), the emitted code is the product of
    positive normalized path faces, it is the root's weight over the based own weights
    (`Tree.own_weight_step₀` at depth `0`), and under a causal context it sums to one over the words
    of each length. The root's base (`rootBaseOf`) reads only the counts the root holds before the
    arrival, every arrival being routed through the root, the root itself included: the code stays a
-   normalized sequential code using only past data.
-4. **The floor** (`basedFace_ge`, `rootBase_face_ge`, `rootBase_path_face_ge`): with each base
-   mass at least `¼`, a node with at most `n*` arrivals reads each digit value at least at
-   `1/(2(2^j n* + 2))`, and so does the opened path's face at every depth under any stop weights in
-   `[0, 1]`. This is the doubled floor the Rust's `based_floor` gives `face_bits_at`. It does not
-   depend on the depth.
+   normalized sequential code using only past data. The order is necessary
+   (`deposit_first_overcounts`): a root base read after the arrival's own deposit gives either
+   digit `11/16` on an empty passage at `j = 3`, `11/8` in all.
+4. **The floor** (`basedFace_ge`, `rootBase_face_ge`, `rootBase_path_face_ge`,
+   `basedPath_face_ge`): with each base mass at least `¼`, a node with at most `n*` arrivals reads
+   each digit value at least at `1/(2(2^j n* + 2))`, and so does the opened path's face at every
+   depth under any stop weights in `[0, 1]`. This is the doubled floor the Rust's `based_floor`
+   gives `face_bits_at`. It does not depend on the depth. `basedFace_ge` reads only the node's own
+   base mass, so the floor holds for any base with every mass at least `¼` at every node, on the
+   opened path too (`basedPath_face_ge`).
 5. **The widths at depth 63** (`campaign_face_bits`, `campaign_carrier_bits`,
    `campaign_mass_operand`, `campaign_operands`, `campaign_rule_floor`): campaign 1's `M_p = 50` (one more than the even
    base's 49), `W = 37`, `κ = 20` bits of `16(2^3·6148 + 2)`, so the β step's mantissa division
@@ -76,16 +81,31 @@ tree       −log₂ ∏_t q_0(x_t) ≤ −log₂ prior_w(S)
    Rust (`Widths::operand_bits`, `admitted`) and the card (`single_division_admitted`) ask for is at
    most 127 bits. The rule (`Landmarks::face_rule`) reads `⌊2^(M_p)/based_floor⌋`; doubling the
    floor's reciprocal raises `M_p` by exactly one bit (`⌈log₂ 2x⌉ = ⌈log₂ x⌉ + 1`), so
-   `⌊2^(M_p + 1)/(2K)⌋ = ⌊2^(M_p)/K⌋` and the rule at depth 63 is the even base's.
+   `⌊2^(M_p + 1)/(2K)⌋ = ⌊2^(M_p)/K⌋` and the rule at depth 63 is the even base's. These widths read
+   only the floor and `16M`, so they hold for any base at the grain `1/16` with every mass at least
+   `¼` (`sixteenthsBase`, `sixteenthsBase_face`: the face's denominator is `16M` at every
+   sixteenths base).
 6. **The cost over the even base** (`baseGain`, `basedOwn_half`, `basedOwn_ge`, `baseCost`,
    `baseCost_succ_le`, `baseCost_campaign`, `leaf_cost_campaign`, `base_tree_redundancy`,
    `rootBase_tree_redundancy`): at each node the based own weight is at least the even base's urn
    weight times `g(k)·g(m)`, `g(K) = ∏_(r<K) (2^j r + ½)/(2^j r + 1)`, because every base mass is at
-   least `¼`. So the tree's redundancy against **every** pruned tree `S` with positive prior under
+   least `¼` at that node. So the tree's redundancy against **every** pruned tree `S` with positive prior under
    any stop weights in `[0, 1)` is `PriorMass.priorMass_tree_redundancy`'s, plus at most
    `c(k_s) + c(m_s)` bits a leaf, `c = −log₂ g`. `c(K + 1) ≤ 1 + 3/2^(j+2)(1 + ln K)` (the first
    arrival of a value costs at most one bit, each later one `log₂ e · ½/(2^j r + ½)`); at campaign
    1's `j = 3` and `n* = 6148`, `c < 2` bits a value and `c(k) + c(m) < 4` bits a leaf.
+
+[proved-derived; formal-checked] **Any base past-only with mass at least `¼`.** Items 3, 4 and 6 and
+the widths of item 5 take a base per node, read from the observations before the arrival, with
+every mass at least `¼` (at the grain `1/16` for the widths): the root's base is one instance. A
+parent base (each node's base its parent's face at the parent's own base, mixed with the even split
+at `½`) has every mass above `¼` because the parent's face lies in `(0, 1)`, as in item 1, so items
+3, 4 and 6 cover it, and item 5's widths too if it is held at the grain `1/16`. The condition the
+Rust has to meet is the order `Base` encodes: every ancestor's face read before the cell's deposit
+at every level (`deposit_first_overcounts` shows what fails otherwise). The main line measured that
+base and does not build it for campaign 1 (the contact-loop record §35: `18444/2^12` held-out bits
+lost on campaign 1's cut, `96370/2^8` gained at 200,000 cells). Its storage would also need a law
+for a chain whose levels read different bases, which is not stated here.
 
 [agent-inferred] **The worst case is a one-sided leaf against the root.** The bound of item 6 is
 attained in the limit by a leaf that sees only one value while the root's base sits at `¼` for that
@@ -262,6 +282,33 @@ theorem rootBase_face_sixteenths (j : ℕ) (n0 n : Bool → ℕ) (b : Bool) :
     push_cast [Nat.cast_sub hr]
     field_simp
 
+/-- [definition] **A base held at the grain `1/16`**: `π_0 = r/16`, `π_1 = (16 − r)/16`. The root's
+base is one (`rootBase_eq_sixteenths`). -/
+def sixteenthsBase (r : ℕ) : Bool → ℚ := fun b => if b then (16 - (r : ℚ)) / 16 else (r : ℚ) / 16
+
+theorem rootBase_eq_sixteenths (j : ℕ) (n : Bool → ℕ) :
+    rootBase j n = sixteenthsBase (rootSixteenths j n) := rfl
+
+/-- [proved-derived; formal-checked] **`sixteenthsBase_face`: every base at the grain `1/16` keeps
+the Rust's face form.** For `r ≤ 16` the face is `(16·2^j n_b + 2·16π_b)/(16M)`, so its denominator
+is `16M ≤ 16(2^j n* + 2)` whatever the base: the operand `κ` (`mass_operand`) does not depend on
+which sixteenths base a node reads. A base off the grain would carry its own denominator into
+every face. -/
+theorem sixteenthsBase_face (j : ℕ) {r : ℕ} (hr : r ≤ 16) (n : Bool → ℕ) (b : Bool) :
+    basedFace j (sixteenthsBase r) n b =
+      ((16 * (2 ^ j * n b) + 2 * (if b then 16 - r else r) : ℕ) : ℚ) /
+        ((16 * (2 ^ j * (n true + n false) + 2) : ℕ) : ℚ) := by
+  have hM : (0 : ℚ) < 2 ^ j * ((n true : ℚ) + n false) + 2 := by positivity
+  cases b
+  · unfold basedFace sixteenthsBase
+    simp only [Bool.false_eq_true, if_false]
+    push_cast
+    field_simp
+  · unfold basedFace sixteenthsBase
+    simp only [if_true]
+    push_cast [Nat.cast_sub hr]
+    field_simp
+
 /-- A node with no arrival reads the base. -/
 theorem basedFace_zero (j : ℕ) (π : Bool → ℚ) (b : Bool) :
     basedFace j π (fun _ => 0) b = π b := by
@@ -319,6 +366,26 @@ theorem rootBase_path_face_ge {Ltr : Type*} (j : ℕ) (n0 : Bool → ℕ) (N : T
   exact (path_face_ge_min _ lam D b hl).1 _ d hd fun d' _ h2 =>
     rootBase_face_ge j n0 (N (a.take d')) (hn d' h2) b
 
+/-- [proved-derived; formal-checked] **`basedPath_face_ge`: the path's floor at any per-node
+base.** If the node at depth `d` of the opened path reads its own base `π d`, every mass at least
+`¼`, and holds at most `n` arrivals, the path face at every depth is at least `1/(2(2^j n + 2))`
+under any stop weights `λ_d ∈ [0, 1]`. `rootBase_path_face_ge` is the case of one base shared by
+the path. -/
+theorem basedPath_face_ge {Ltr : Type*} (j : ℕ) (π : ℕ → Bool → ℚ)
+    (hπ : ∀ d b, 1 / 4 ≤ π d b) (N : TreeStanding Ltr Bool) (lam : ℕ → ℚ) (D : ℕ)
+    (hl : ∀ d < D, 0 ≤ lam d ∧ lam d ≤ 1) (a : List Ltr) (n : ℕ)
+    (hn : ∀ d ≤ D, N (a.take d) true + N (a.take d) false ≤ n) (b : Bool) :
+    ∀ d ≤ D, 1 / (2 * (2 ^ j * (n : ℚ) + 2)) ≤
+      pathFace (fun d => basedFace j (π d) (N (a.take d))) lam D d b := by
+  intro d hd
+  have hd0 : (0 : ℚ) < 2 ^ j * (n : ℚ) + 2 := by positivity
+  have hfloor : 1 / (2 * (2 ^ j * (n : ℚ) + 2)) = 2 * (1 / 4) / (2 ^ j * (n : ℚ) + 2) := by
+    field_simp
+    ring
+  exact (path_face_ge_min _ lam D b hl).1 _ d hd fun d' _ h2 => by
+    rw [hfloor]
+    exact basedFace_ge j (by norm_num) (N (a.take d')) (hn d' h2) b (hπ d' b)
+
 /-! ### 4. The widths at campaign 1's depth 63 -/
 
 /-- [proved-derived; formal-checked] **`campaign_face_bits`: `M_p = 50`.** At `n* = 6148`,
@@ -372,16 +439,18 @@ section Code
 
 variable {Ltr : Type*} [Fintype Ltr] [DecidableEq Ltr]
 
-/-- [definition] **A base read from the passage**: the base an arrival meets is a function of the
-observations before it (oldest first). -/
-abbrev Base (Ltr : Type*) := List (List Ltr × Bool) → Bool → ℚ
+/-- [definition] **A base read from the passage**: the base node `s` reads for an arrival is a
+function of the observations before that arrival (oldest first) and of the node. A digit tree whose
+nodes share one base (the root's) ignores the node; a base that differs by node (a parent's face
+mixed down the chain) reads it. Either way the base never sees the arrival's own digit. -/
+abbrev Base (Ltr : Type*) := List (List Ltr × Bool) → List Ltr → Bool → ℚ
 
 /-- [definition] The counts routed to node `s`. -/
 def countsAt (obs : List (List Ltr × Bool)) (s : List Ltr) : Bool → ℕ := fun b => routedCount obs s b
 
 /-- [definition] **The face node `s` reads** after the observations `obs`, at the base they give. -/
 def faceAt (j : ℕ) (base : Base Ltr) (obs : List (List Ltr × Bool)) (s : List Ltr) : Bool → ℚ :=
-  basedFace j (base obs) (countsAt obs s)
+  basedFace j (base obs s) (countsAt obs s)
 
 /-- [definition] The based own weights, newest observation first. -/
 def ownRev (j : ℕ) (base : Base Ltr) : List (List Ltr × Bool) → List Ltr → ℚ
@@ -418,7 +487,7 @@ theorem routed_root (obs : List (List Ltr × Bool)) : routed obs [] = obs.map Pr
   simp [routed]
 
 omit [Fintype Ltr] in
-theorem basedOwn_pos (j : ℕ) {base : Base Ltr} (hb : ∀ obs b, 0 < base obs b) :
+theorem basedOwn_pos (j : ℕ) {base : Base Ltr} (hb : ∀ obs s b, 0 < base obs s b) :
     ∀ obs s, 0 < basedOwn j base obs s := by
   intro obs s
   induction obs using List.reverseRecOn with
@@ -427,7 +496,7 @@ theorem basedOwn_pos (j : ℕ) {base : Base Ltr} (hb : ∀ obs b, 0 < base obs b
     obtain ⟨a, c⟩ := o
     rw [basedOwn_snoc]
     split_ifs
-    · exact mul_pos ih (basedFace_pos j (hb obs) _ c)
+    · exact mul_pos ih (basedFace_pos j (hb obs s) _ c)
     · exact ih
 
 /-- [definition] The emitted code, newest observation first. -/
@@ -453,21 +522,22 @@ theorem baseEmitted_snoc (j : ℕ) (base : Base Ltr) (w : ℕ → ℚ) (D : ℕ)
 /-- [proved-derived; formal-checked] **`baseEmitted_face_normalized`: every path face is positive
 and normalized**, at every depth, under any stop weights in `[0, 1)`, for any positive normalized
 base. -/
-theorem baseEmitted_face_normalized (j : ℕ) {base : Base Ltr} (hb : ∀ obs b, 0 < base obs b)
-    (hs : ∀ obs, base obs true + base obs false = 1) {w : ℕ → ℚ} (hw : StopLaw₀ w) (D : ℕ)
+theorem baseEmitted_face_normalized (j : ℕ) {base : Base Ltr} (hb : ∀ obs s b, 0 < base obs s b)
+    (hs : ∀ obs s, base obs s true + base obs s false = 1) {w : ℕ → ℚ} (hw : StopLaw₀ w) (D : ℕ)
     (obs : List (List Ltr × Bool)) (a : List Ltr) :
     ∀ d ≤ D, (∀ c, 0 < pathFace (fun d => faceAt j base obs (a.take d))
         (ownLam w (basedOwn j base obs) D a) D d c) ∧
       ∑ c, pathFace (fun d => faceAt j base obs (a.take d))
         (ownLam w (basedOwn j base obs) D a) D d c = 1 :=
   own_face_positive_normalized hw (basedOwn_pos j hb obs) _ D a
-    (fun _ _ c => basedFace_pos j (hb obs) _ c) fun _ _ => basedFace_sum j (hs obs) _
+    (fun d _ c => basedFace_pos j (hb obs (a.take d)) _ c)
+    fun d _ => basedFace_sum j (hs obs (a.take d)) _
 
 /-- [proved-derived; formal-checked] **`baseEmitted_eq_weight`: the emitted code is the root's
 weight.** When every address reaches depth `D`, the product of the path faces over the passage is
 the tree's weight at the root over the based own weights, for **any** positive base read from the
 passage before each arrival (`Tree.own_weight_step₀` at depth `0`, from `Tree.ownWeight_one`). -/
-theorem baseEmitted_eq_weight (j : ℕ) {base : Base Ltr} (hb : ∀ obs b, 0 < base obs b)
+theorem baseEmitted_eq_weight (j : ℕ) {base : Base Ltr} (hb : ∀ obs s b, 0 < base obs s b)
     {w : ℕ → ℚ} (hw : StopLaw₀ w) (D : ℕ) (obs : List (List Ltr × Bool))
     (hD : ∀ o ∈ obs, D ≤ o.1.length) :
     baseEmitted j base w D obs = ownWeight w (basedOwn j base obs) D [] := by
@@ -493,8 +563,8 @@ theorem baseEmitted_eq_weight (j : ℕ) {base : Base Ltr} (hb : ∀ obs b, 0 < b
 /-- [proved-derived; formal-checked] **`baseEmitted_sum`: the based code is complete.** Under a
 causal context, the emitted masses of the `2^n` binary words of length `n` sum to one, for any
 positive normalized base read from the passage and any stop weights in `[0, 1)`. -/
-theorem baseEmitted_sum (j : ℕ) {base : Base Ltr} (hb : ∀ obs b, 0 < base obs b)
-    (hs : ∀ obs, base obs true + base obs false = 1) {w : ℕ → ℚ} (hw : StopLaw₀ w)
+theorem baseEmitted_sum (j : ℕ) {base : Base Ltr} (hb : ∀ obs s b, 0 < base obs s b)
+    (hs : ∀ obs s, base obs s true + base obs s false = 1) {w : ℕ → ℚ} (hw : StopLaw₀ w)
     (ctx : List Bool → List Ltr) (D n : ℕ) :
     ∑ v : Fin n → Bool, baseEmitted j base w D (observations ctx (List.ofFn v)) = 1 := by
   have hn : wordSum n (fun h => baseEmitted j base w D (observations ctx h)) = 1 := by
@@ -512,20 +582,31 @@ theorem baseEmitted_sum (j : ℕ) {base : Base Ltr} (hb : ∀ obs b, 0 < base ob
 
 /-- [definition] **The root's base read from the passage** (Rust `BaseMeasure::Root`): the root's
 counts before the arrival, every arrival routed through the root (`routed_root`). -/
-def rootBaseOf (j : ℕ) : Base Ltr := fun obs => rootBase j (countsAt obs [])
+def rootBaseOf (j : ℕ) : Base Ltr := fun obs _ => rootBase j (countsAt obs [])
 
 omit [Fintype Ltr] in
-theorem rootBaseOf_pos (j : ℕ) : ∀ obs b, 0 < rootBaseOf (Ltr := Ltr) j obs b :=
-  fun _ _ => rootBase_pos j _ _
+theorem rootBaseOf_pos (j : ℕ) : ∀ obs s b, 0 < rootBaseOf (Ltr := Ltr) j obs s b :=
+  fun _ _ _ => rootBase_pos j _ _
 
 omit [Fintype Ltr] in
-theorem rootBaseOf_sum (j : ℕ) : ∀ obs, rootBaseOf (Ltr := Ltr) j obs true +
-    rootBaseOf j obs false = 1 :=
-  fun _ => rootBase_sum j _
+theorem rootBaseOf_sum (j : ℕ) : ∀ obs s, rootBaseOf (Ltr := Ltr) j obs s true +
+    rootBaseOf j obs s false = 1 :=
+  fun _ _ => rootBase_sum j _
 
 omit [Fintype Ltr] in
-theorem rootBaseOf_quarter (j : ℕ) : ∀ obs b, 1 / 4 ≤ rootBaseOf (Ltr := Ltr) j obs b :=
-  fun _ _ => (rootBase_quarter j _ _).1
+theorem rootBaseOf_quarter (j : ℕ) : ∀ obs s b, 1 / 4 ≤ rootBaseOf (Ltr := Ltr) j obs s b :=
+  fun _ _ _ => (rootBase_quarter j _ _).1
+
+/-- [proved-derived; formal-checked] **`deposit_first_overcounts`: a base read after the arrival's
+own deposit is not a code.** On an empty passage at `j = 3`, a root base read from the counts that
+already hold the arriving digit `c` gives `c` the mass `11/16` whichever digit arrives, so the two
+digits' masses sum to `11/8 > 1`. The order `Base` encodes, every node and every ancestor it reads
+taken before the cell's deposit, is what `baseEmitted_sum` needs; a base that reads its ancestors
+(a parent's face) must meet it at every level. -/
+theorem deposit_first_overcounts :
+    ∑ c : Bool, basedFace 3 (rootBase 3 fun b => if b = c then 1 else 0) (fun _ => 0) c = 11 / 8 := by
+  simp [basedFace, rootBase, rootSixteenths]
+  norm_num
 
 end Code
 
@@ -564,7 +645,7 @@ section Redundancy
 variable {Ltr : Type*} [Fintype Ltr] [DecidableEq Ltr]
 
 /-- [definition] The even base `½` as a base read from the passage. -/
-def halfBase : Base Ltr := fun _ _ => 1 / 2
+def halfBase : Base Ltr := fun _ _ _ => 1 / 2
 
 omit [Fintype Ltr] in
 /-- [proved-derived; formal-checked] **At the even base the based own weight is the urn's
@@ -579,7 +660,7 @@ theorem basedOwn_half (j : ℕ) : ∀ (obs : List (List Ltr × Bool)) s,
     obtain ⟨a, c⟩ := o
     rw [basedOwn_snoc, countsAt_snoc, countsAt_snoc]
     by_cases h : a.take s.length = s
-    · rw [if_pos h, ih, faceAt, show (halfBase obs : Bool → ℚ) = fun _ => 1 / 2 from rfl,
+    · rw [if_pos h, ih, faceAt, show (halfBase obs s : Bool → ℚ) = fun _ => 1 / 2 from rfl,
         basedFace_half_urn]
       cases c
       · simp only [h, true_and, Bool.false_eq_true, if_true, if_false, add_zero]
@@ -591,7 +672,8 @@ theorem basedOwn_half (j : ℕ) : ∀ (obs : List (List Ltr × Bool)) s,
 omit [Fintype Ltr] in
 /-- [proved-derived; formal-checked] **`basedOwn_ge`: a base with every mass at least `μ` keeps
 `g(k) g(m)` of the even base's weight** at every node: `E^π_s ≥ E^½_s · g(k_s) · g(m_s)`. -/
-theorem basedOwn_ge (j : ℕ) {base : Base Ltr} {μ : ℚ} (hμ : 0 < μ) (hb : ∀ obs b, μ ≤ base obs b) :
+theorem basedOwn_ge (j : ℕ) {base : Base Ltr} {μ : ℚ} (hμ : 0 < μ)
+    (hb : ∀ obs s b, μ ≤ base obs s b) :
     ∀ (obs : List (List Ltr × Bool)) s,
       basedOwn j halfBase obs s * baseGain j μ (countsAt obs s true) *
         baseGain j μ (countsAt obs s false) ≤ basedOwn j base obs s := by
@@ -602,7 +684,7 @@ theorem basedOwn_ge (j : ℕ) {base : Base Ltr} {μ : ℚ} (hμ : 0 < μ) (hb : 
     obtain ⟨a, c⟩ := o
     have hpos : 0 ≤ basedOwn j halfBase obs s * baseGain j μ (countsAt obs s true) *
         baseGain j μ (countsAt obs s false) :=
-      (mul_pos (mul_pos (basedOwn_pos j (fun _ _ => by norm_num [halfBase]) obs s)
+      (mul_pos (mul_pos (basedOwn_pos j (fun _ _ _ => by norm_num [halfBase]) obs s)
         (baseGain_pos j hμ _)) (baseGain_pos j hμ _)).le
     rw [basedOwn_snoc, basedOwn_snoc, countsAt_snoc, countsAt_snoc]
     by_cases h : a.take s.length = s
@@ -614,10 +696,10 @@ theorem basedOwn_ge (j : ℕ) {base : Base Ltr} {μ : ℚ} (hμ : 0 < μ) (hb : 
         rw [baseGain_succ]
         have := gain_step (E := basedOwn j halfBase obs s) (G1 := baseGain j μ (countsAt obs s false))
           (G2 := baseGain j μ (countsAt obs s true)) (Eπ := basedOwn j base obs s)
-          (x := 2 ^ j * (countsAt obs s false : ℚ)) (π := base obs false) (μ := μ)
+          (x := 2 ^ j * (countsAt obs s false : ℚ)) (π := base obs s false) (μ := μ)
           (N := 2 ^ j * ((countsAt obs s true : ℚ) + countsAt obs s false) + 2)
           (f := 2 ^ j * (countsAt obs s false : ℚ) + 2 * (1 / 2))
-          (by linarith [hpos]) (by linarith [ih]) (by positivity) hN hμ (hb obs false) (by ring)
+          (by linarith [hpos]) (by linarith [ih]) (by positivity) hN hμ (hb obs s false) (by ring)
         unfold faceAt basedFace
         simp only [halfBase]
         linarith [this]
@@ -625,10 +707,10 @@ theorem basedOwn_ge (j : ℕ) {base : Base Ltr} {μ : ℚ} (hμ : 0 < μ) (hb : 
         rw [baseGain_succ]
         have := gain_step (E := basedOwn j halfBase obs s) (G1 := baseGain j μ (countsAt obs s true))
           (G2 := baseGain j μ (countsAt obs s false)) (Eπ := basedOwn j base obs s)
-          (x := 2 ^ j * (countsAt obs s true : ℚ)) (π := base obs true) (μ := μ)
+          (x := 2 ^ j * (countsAt obs s true : ℚ)) (π := base obs s true) (μ := μ)
           (N := 2 ^ j * ((countsAt obs s true : ℚ) + countsAt obs s false) + 2)
           (f := 2 ^ j * (countsAt obs s true : ℚ) + 2 * (1 / 2))
-          hpos ih (by positivity) hN hμ (hb obs true) (by ring)
+          hpos ih (by positivity) hN hμ (hb obs s true) (by ring)
         unfold faceAt basedFace
         simp only [halfBase]
         linarith [this]
@@ -752,7 +834,7 @@ fixed digit probability's code, `½ log₂ n_s + j`, and the base's cost `c(k_s)
 even base. It is `PriorMass.priorMass_tree_redundancy`'s composition (`baseEmitted_eq_weight`,
 `PriorMass.own_dominance₀`, `PriorMass.node_code_le`) with `basedOwn_ge` at `μ = ¼`. -/
 theorem base_tree_redundancy {j : ℕ} (hj : 1 ≤ j) {base : Base Ltr}
-    (hb : ∀ obs b, 1 / 4 ≤ base obs b) {w : ℕ → ℚ} (hw : StopLaw₀ w) (D : ℕ)
+    (hb : ∀ obs s b, 1 / 4 ≤ base obs s b) {w : ℕ → ℚ} (hw : StopLaw₀ w) (D : ℕ)
     (obs : List (List Ltr × Bool)) (hD : ∀ o ∈ obs, D ≤ o.1.length) (S : PrunedTree Ltr D)
     (hS : 0 < PrunedTree.prior w D 0 S) :
     codeBits (baseEmitted j base w D obs) ≤
@@ -760,7 +842,7 @@ theorem base_tree_redundancy {j : ℕ} (hj : 1 ≤ j) {base : Base Ltr}
         leafSum (fun s => codeBits (bestFixed (routedCount obs s true) (routedCount obs s false)) +
           leafCharge j (routedCount obs s true) (routedCount obs s false) +
           baseCost j (routedCount obs s true) + baseCost j (routedCount obs s false)) D [] S := by
-  have hbpos : ∀ obs b, 0 < base obs b := fun obs b => lt_of_lt_of_le (by norm_num) (hb obs b)
+  have hbpos : ∀ obs s b, 0 < base obs s b := fun obs s b => lt_of_lt_of_le (by norm_num) (hb obs s b)
   set E := basedOwn j base obs with hEdef
   have hE : ∀ s, 0 < E s := basedOwn_pos j hbpos obs
   rw [baseEmitted_eq_weight j hbpos hw D obs hD]
@@ -834,6 +916,7 @@ section Audit
 #print axioms basedFace_ge
 #print axioms rootBase_face_ge
 #print axioms rootBase_path_face_ge
+#print axioms basedPath_face_ge
 #print axioms campaign_face_bits
 #print axioms campaign_carrier_bits
 #print axioms campaign_mass_operand
@@ -843,6 +926,8 @@ section Audit
 #print axioms baseEmitted_eq_weight
 #print axioms baseEmitted_sum
 #print axioms rootBaseOf_quarter
+#print axioms sixteenthsBase_face
+#print axioms deposit_first_overcounts
 #print axioms basedOwn_half
 #print axioms basedOwn_ge
 #print axioms baseCost_succ_le
