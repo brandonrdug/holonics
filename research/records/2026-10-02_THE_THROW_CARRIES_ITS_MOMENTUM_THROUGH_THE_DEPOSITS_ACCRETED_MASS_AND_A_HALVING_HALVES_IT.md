@@ -238,6 +238,23 @@ watch), which is then reported incomplete. No bound is raised after launch.
 **Threads.** `RAYON_NUM_THREADS` declares the probe's thread budget (19 by default, the PC's). On the
 cloud host with 4 cores it is 4, and the per-move bound comes from the same host's development read.
 
+**The development read** (cloud host, 4 cores, `RAYON_NUM_THREADS=4`, 3000 s a move; receipts in
+`2026-10-02_THE_THROW_receipts/dev/`):
+
+| Move | Flight in | Power along the coast | Coast | Trials | `L` after (nats) | Wall |
+|---|---|---|---|---|---|---|
+| m0 | at rest | none | none | `η 1/2` refused, `η 1/4` adopted | `[495714/4096, 495719/4096)` | 527242 ms |
+| m1 | 1 move | `[21607/4096, 21609/4096)` | released from rest | `η 1/2` adopted | `[447159/4096, 447165/4096)` | 390167 ms |
+
+The opening's `L` is `[500197/4096, 500203/4096)`. At m1 the comparison rises along the coast at first
+order, so the first flight ends at its apex after one move and m1 is the leap from m0's state. m0's
+read overlapped a 12 s Lean build.
+
+**The projection, fixed at launch.** The unit is a trial. The two moves give a base of
+`253092` ms and `137075` ms a trial (m1 at one trial, m0 at two). With `LADDER_DEPTH`'s 8 trials the
+per-move bound is `253092 + 8 · 137075 = 1349692` ms, and the chain's deadline is 16 times
+`1350` s, `21600` s, launched as `timeout 21596` around `run.sh .local/throw 1349692 1350`.
+
 ## 7. Verification
 
 - `cargo check -p holonics --all-targets`: clean.
