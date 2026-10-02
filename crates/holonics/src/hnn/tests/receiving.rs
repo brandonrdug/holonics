@@ -99,8 +99,8 @@ fn an_aperture_beyond_the_observability_rank_is_refused() {
 
 /// **The active suffix address and each phase's causal address** (module header of
 /// `hnn::receiving`): the register shifted at every cell holds the last `D` cells newest first,
-/// `Boundary` before the first; at a window opening at `p` with its targets known, phase `j`'s
-/// address is `compression::landmark::context::address(cells, p + j, D)` exactly, so no two phases of a window pool
+/// `Boundary` before the first; at an epoch opening at `p` with its targets known, phase `j`'s
+/// address is `compression::landmark::context::address(cells, p + j, D)` exactly, so no two phases of an epoch pool
 /// their lags; with no target known (a release) every phase reads the opening address.
 #[test]
 fn the_phase_address_is_the_trees_causal_address() {
@@ -201,7 +201,7 @@ fn the_field_declares_the_tree_and_codes_it() {
 
 /// The read is `f_j = k(a_j)/L_R + R · P_R^(τ_R) v_R` (the combined face): the wave rotated to the
 /// receiving ring's phase, plus the tree face's grain logits at phase `j`'s address, read after the
-/// window's earlier targets (cell order); each class's
+/// epoch's earlier targets (cell order); each class's
 /// real logit read at the grain, its imaginary logit (the wave's alone) halved into turns. The
 /// tree logits lie on the grain, so each cell is the wave's shifted by `k_c/L_R` exactly and keeps
 /// the wave's fibre; the tree's face sums to one exactly and its grain logits alone code each class
@@ -211,7 +211,7 @@ fn the_read_adds_the_trees_face_to_the_rotated_wave() {
     let field = &chain();
     let mut medium = Medium::encoding(field, 12);
     // A tree that received a short passage, so its face differs from address to address; the
-    // window's two cells are not yet deposited.
+    // epoch's two cells are not yet deposited.
     let declared = landmark_declaration(field, &field.receivers()[0]).unwrap();
     let mut tree = Landmarks::new(declared).unwrap();
     let passage = [1usize, 1, 3, 0, 1, 2, 1, 1, 3, 0, 1];
@@ -235,7 +235,7 @@ fn the_read_adds_the_trees_face_to_the_rotated_wave() {
     let targets = [passage[9], passage[10]];
     let faces = phases.tree_faces(&medium, &register, &targets).unwrap();
     assert_eq!(faces.len(), 2);
-    // Phase j reads the tree after the window's earlier targets (cell order).
+    // Phase j reads the tree after the epoch's earlier targets (cell order).
     let mut deposited = tree.clone();
     for (j, face) in faces.iter().enumerate() {
         let here = address(&passage, 9 + j, 2);
@@ -327,7 +327,7 @@ fn the_compare_deposits_its_targets_on_their_own_addresses() {
     assert_eq!(
         steps[1].address,
         vec![Letter::Cell(1), Letter::Cell(3)],
-        "phase 1 reads its own lag-one cell, the window's first target"
+        "phase 1 reads its own lag-one cell, the epoch's first target"
     );
     assert!(steps.iter().all(|step| step.ring == 2 && step.class == 1));
     assert!(deposit.loci().contains(&Locus::ReceivingMap(2)));
@@ -515,13 +515,13 @@ fn tree_face(
 
 /// **The receiver's population weighs the tree against the combined face, cell by cell** (ruling
 /// A, THE_REBUILD U1; Lean `Compression/Landmark/Context/{LocalWeighing.two_face_prior,
-/// Tree.sequential_mixture}`): it opens at ½/½; phase `j` of a window reads the population after
-/// the earlier phases' faces, so the window's product is `½ A + ½ B` (the tree's and the combined
+/// Tree.sequential_mixture}`): it opens at ½/½; phase `j` of an epoch reads the population after
+/// the earlier phases' faces, so the epoch's product is `½ A + ½ B` (the tree's and the combined
 /// face's likelihoods) exactly enclosed, with no chart, and a weight read before phase 0's step
 /// (½/½ at phase 1) is excluded; each phase's code length encloses
 /// `−log₂(w_T q_T + w_C q_C)` with `q_C` the combined face's exact class mass, and the tree's own
 /// `−log₂ q_T` is returned beside it; the steps carry the families' faces of the targets in cell
-/// order, and a window without one tree face a phase is refused.
+/// order, and an epoch without one tree face a phase is refused.
 #[test]
 fn the_population_weighs_the_tree_against_the_combined_face() {
     use crate::hnn::receiving::{COMBINED, TREE, receiving_population, score};
@@ -556,7 +556,7 @@ fn the_population_weighs_the_tree_against_the_combined_face() {
     assert!(code(rat(3, 16)).lower <= scored.model[0].upper);
     // The tree's own code lengths: two bits each.
     assert_eq!(scored.tree, vec![code(rat(1, 4)), code(rat(1, 4))]);
-    // Phase 1 at w_T = (1/4)/(1/4 + 1/8) = 2/3: q_T = 1/4, q_C = 2/5, q = 3/10. The window's
+    // Phase 1 at w_T = (1/4)/(1/4 + 1/8) = 2/3: q_T = 1/4, q_C = 2/5, q = 3/10. The epoch's
     // product is (A + B)/2 = (1/16 + 1/20)/2 = 9/160; a weight left at ½/½ would read
     // 3/16 · 13/40 = 39/640.
     let window = crate::hnn::reference::window_code_length(&scored.model).unwrap();
@@ -564,7 +564,7 @@ fn the_population_weighs_the_tree_against_the_combined_face() {
     assert!(window.lower <= ideal.upper && ideal.lower <= window.upper);
     assert!(
         stale.upper < window.lower,
-        "the stale weight (which codes this window shorter) is excluded"
+        "the stale weight (which codes this epoch shorter) is excluded"
     );
     assert_eq!(scored.steps.len(), 2);
     assert!(scored.steps.iter().all(|step| step.ring == 2));
@@ -572,7 +572,7 @@ fn the_population_weighs_the_tree_against_the_combined_face() {
     for step in &scored.steps {
         assert!(step.combined.lower > Rat::zero() && step.combined.lower <= step.combined.upper);
     }
-    // The staged steps received in cell order reach the population the window was scored through.
+    // The staged steps received in cell order reach the population the epoch was scored through.
     let mut received = population.clone();
     for step in &scored.steps {
         received.receive(&step.faces()).unwrap();
@@ -671,9 +671,9 @@ fn the_receivers_population_weighs_by_likelihood_cell_by_cell() {
 /// exposure's tree sum, its combined code the combined sum), so its log-odds is `L_C − L_T`; and the
 /// tree's code length is the count-only prequential tree's over the same cut
 /// (`hnn::reference::prequential`, which encloses the faces' product once, `PassageCode`, where the
-/// exposure sums its windows' enclosures): the two enclosures meet and each is narrower than
+/// exposure sums its epochs' enclosures): the two enclosures meet and each is narrower than
 /// `2^(−60)` bits, far below the least move one cell's face read at a different standing would
-/// make, so every phase of every window read the tree after every earlier cell.
+/// make, so every phase of every epoch read the tree after every earlier cell.
 #[test]
 fn the_receiving_face_codes_within_one_bit_of_the_better_face() {
     use super::learning::chain_of;
@@ -697,7 +697,7 @@ fn the_receiving_face_codes_within_one_bit_of_the_better_face() {
     let exposure = Reference::new(64, OPEN_BUDGET)
         .expose(&field, &cut)
         .unwrap();
-    assert!(exposure.complete, "every window deposited");
+    assert!(exposure.complete, "every epoch deposited");
     let total = |pick: fn(&crate::hnn::reference::Bits) -> &ExactInterval| {
         let (a, b) = (pick(&exposure.training), pick(&exposure.held_out));
         ExactInterval::new(&a.lower + &b.lower, &a.upper + &b.upper).unwrap()
@@ -766,8 +766,8 @@ fn clock_family() -> FeatureFamily {
 /// `Compression/Landmark/Context/Address.{bundle_causal, address_descends_retention}`): over a passage long enough
 /// for the joint clock's carry-outs and their re-keyings, a register that receives each cell (its
 /// clock stepping as the lift point does, synchronized after each re-keying) holds
-/// `letter_address` of the replayed clock letters at every window, and each phase's address, read
-/// by a copy of the register's clock over the window's earlier targets, is the letter address at
+/// `letter_address` of the replayed clock letters at every epoch, and each phase's address, read
+/// by a copy of the register's clock over the epoch's earlier targets, is the letter address at
 /// `p + j`. Changing every cell from `j` on changes no letter of the address at `j`: no bundle reads
 /// the cell it predicts. The register's clock agrees with the lift point throughout.
 #[test]
@@ -1049,13 +1049,13 @@ fn the_letter_partitions_are_finite_and_their_codes_injective() {
 /// **The contact letters are the contact owner's readings, read from the register's retained state
 /// before the cell they predict** (campaign 2; Lean `Compression/Landmark/Context/Address.bundle_causal`,
 /// `HNN/Contact.contact_lock_address`). Over a passage through carry-outs and re-keyings, with the
-/// register refreshed from a constitution after each window's ingest (the site kinds changing where
-/// a boost is declared on contact 0 for a stretch of windows):
+/// register refreshed from a constitution after each epoch's ingest (the site kinds changing where
+/// a boost is declared on contact 0 for a stretch of epochs):
 /// - each tick's contact letters are `hnn::contact::contact_readings` of the lift point after the
 ///   tick, from the aeon's opening, at the constitution of the last refresh (`ContactReading::letter`);
-/// - each phase's address, read at the window's cut by a copy of the register (as a pending ratio
+/// - each phase's address, read at the epoch's cut by a copy of the register (as a pending ratio
 ///   copies it), is the address the register's own letters give at `p + j`: the compare and the
-///   ingest read the same letters, since no refresh falls inside a window;
+///   ingest read the same letters, since no refresh falls inside an epoch;
 /// - the register's clock agrees with the lift point, windings since the opening included;
 /// - the replay `clock_letters` with the kinds held at each tick gives the register's letters, and
 ///   changing every cell from `j` on changes no letter of the address at `j`.
@@ -1102,7 +1102,7 @@ fn the_contact_letters_are_read_from_the_register_before_the_cell_they_predict()
     let mut p = 0;
     while p + aperture <= cells.len() {
         let window = p / aperture;
-        // Published after this window's ingest; the window's ticks hold the previous window's.
+        // Published after this epoch's ingest; the epoch's ticks hold the previous epoch's.
         let published = if (300..700).contains(&window) {
             &boosted
         } else {
@@ -1153,7 +1153,7 @@ fn the_contact_letters_are_read_from_the_register_before_the_cell_they_predict()
                 rekeyed += 1;
             }
         }
-        // The resident refreshes after the window's ingest, from the constitution then published.
+        // The resident refreshes after the epoch's ingest, from the constitution then published.
         register.refresh(&field, published).unwrap();
         p += aperture;
     }
@@ -1182,12 +1182,13 @@ fn the_contact_letters_are_read_from_the_register_before_the_cell_they_predict()
     }
 }
 
-/// The receiving windows are the epochs of the cell clock at the receiver's section (U5; Lean
-/// `Aeon/Clock/Epoch.{forward_epoch_is_window, mem_epoch_digitTicks, odometer_tower}`): for every
-/// aperture `A` and passage of `n` cells, the windows tile the passage as `[kA, min((k + 1)A, n))`,
-/// the window of cell `c` is its epoch `⌊c/A⌋`, the windows that close number the section's flux
-/// `⌊n/A⌋`, and the cell clock's own grain coarsens to the receiver's by the carry `winding A`.
-/// The declared receiver reads its windows through the same law, and `A = 0` is no section.
+/// The receiver's spans of cells are the epochs of the cell clock at the receiver's section (U5;
+/// Lean `Aeon/Clock/Epoch.{forward_epoch_is_window, mem_epoch_digitTicks, odometer_tower}`): for
+/// every aperture `A` and passage of `n` cells, the epochs tile the passage as
+/// `[kA, min((k + 1)A, n))`, cell `c` is read in its epoch `⌊c/A⌋`, the epochs that close number
+/// the section's flux `⌊n/A⌋`, and the cell clock's own grain coarsens to the receiver's by the
+/// carry `winding A`. The declared receiver reads its epochs through the same law, and `A = 0` is
+/// no section.
 #[test]
 fn the_receiving_windows_are_the_epochs_of_the_cell_clock() {
     use crate::aeon::{ClockLift, EpochTower, epochs};

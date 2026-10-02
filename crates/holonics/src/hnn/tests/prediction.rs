@@ -433,6 +433,11 @@ fn the_bank_placement_under_a_dissipative_transport() {
             // The modulus's derivative against the exact weights' central difference: second order.
             if cells.iter().any(Option::is_some) {
                 let derivative = placement.modulus_derivative(station, cells);
+                // Each datum's reach slope rebuilds it, datum by datum, within the held grain.
+                let grain = Rat::new(1.into(), BigInt::from(1) << 160usize);
+                for (rebuilt, d) in placement.reach_derivative(station, cells).iter().zip(&derivative) {
+                    assert!((rebuilt - d).abs() <= grain, "the reach slopes rebuild ∂z/∂ρ");
+                }
                 let residual = |h: &Rat| -> Rat {
                     let up = placement.exact_storage(station, cells, &(&modulus + h));
                     let down = placement.exact_storage(station, cells, &(&modulus - h));
@@ -738,7 +743,7 @@ fn the_proposals_returns_are_its_pullback_to_e() {
 /// (`hnn::executed::executed_move`): on two requests along the machine's own trajectory the move
 /// is adopted, and its successor reads `F` strictly lower by disjoint enclosures, holds every entry
 /// of `E` within the bound, certifies its first order, admits every crossing, certifies every lock
-/// and counts one commit; every trial before the adopted one names the guard that refused it.
+/// and counts one commit; every trial before the adopted one names the condition that refused it.
 #[test]
 fn the_committed_move_descends_or_refuses_by_type() {
     use crate::hnn::executed::{Comparison, Context, entry_bound, executed_move};
@@ -786,7 +791,7 @@ fn the_committed_move_descends_or_refuses_by_type() {
 /// [two counts' pin](../../../../../research/records/2026-09-30_THE_TWO_COUNTS_PINNED_BEFORE_ITS_RUNS.md)
 /// §5): on the committed move's instance, every trial that read its first order carries one bound
 /// per term of the proposal, aligned with the move's sites, and their sum is the certificate
-/// exactly (a straddling term's bound hinged at zero); every site names a request of the batch and
+/// exactly (a straddling term's bound hinged at zero); every site names one of the requests and
 /// a station of the section; the leading branches' pairing on the carried move lies at or below the
 /// certificate's upper end (each leading branch is one of its term's active branches, paired with
 /// the same exact storage moves); the unit move's largest entry is read, and the adopted trial
@@ -846,7 +851,7 @@ fn the_moves_receipts_read_its_certificate() {
 /// requests whose span with the stations fills one turn, the move reads the modulus's slope, and an
 /// adopted successor keeps a passive modulus on the source port's lattice (the trial's), lowers the
 /// comparison by disjoint enclosures with its first order certified negative on the carried move,
-/// and holds every lock's certificate; every earlier trial names its guard.
+/// and holds every lock's certificate; every earlier trial names the condition that refused it.
 #[test]
 fn the_committed_move_carries_the_transport_modulus() {
     use crate::hnn::executed::{Comparison, Context, Request, executed_move};
@@ -1260,4 +1265,26 @@ fn native_opening_uses_the_scheduled_previous_phase() {
     assert!(!resonance.steps[0].pump.is_zero());
     assert!(ResonatorBalance::of(0,resonance).closes());
     assert!(WordBalance::of(&word.release().unwrap()).closes());
+}
+
+/// **The lock rule locks every station the readings do not certify below the largest gap**: a
+/// near tie within the enclosures locks together, a gap certified below stays open, and on exact
+/// readings (reach equal to the certain gap) it is the largest gap with its ties.
+#[test]
+fn a_gap_the_readings_do_not_order_below_the_largest_locks_with_it() {
+    use crate::hnn::prediction::uncertified_largest;
+    // Station 4's certain gap 5/8 is the largest; station 2's reaches 3/4 ≥ 5/8 (a near tie inside
+    // the cells); station 7's reach 1/2 is certified below.
+    let gaps = vec![(2, 0, rat(1, 2)), (4, 1, rat(5, 8)), (7, 0, rat(1, 4))];
+    let reaches = vec![rat(3, 4), rat(7, 8), rat(1, 2)];
+    assert_eq!(uncertified_largest(&gaps, &reaches), vec![2, 4]);
+    // A reach just below the largest certain gap is certified below: the leader locks alone.
+    let reaches = vec![rat(5, 8) - rat(1, 1024), rat(7, 8), rat(1, 2)];
+    assert_eq!(uncertified_largest(&gaps, &reaches), vec![4]);
+    // Exact readings: the reach is the gap, and the rule is the largest gap with its ties.
+    let gaps = vec![(0, 0, rat(1, 2)), (1, 0, rat(1, 3)), (3, 2, rat(1, 2))];
+    let exact: Vec<Rat> = gaps.iter().map(|(_, _, gap)| gap.clone()).collect();
+    assert_eq!(uncertified_largest(&gaps, &exact), vec![0, 3]);
+    // No eligible station: nothing locks.
+    assert!(uncertified_largest(&[], &[]).is_empty());
 }

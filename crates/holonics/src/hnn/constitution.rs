@@ -233,7 +233,7 @@
 //! - **At a node: the lock's half-turn.** The crossings the chart's step offered are the lock's
 //!   proposal ([`LockProposal`]): the standings at the chart's certified step, turning each proposed
 //!   sheet by a half-turn. It is a separate move and a commit of its own ([`Constitution::locked`]),
-//!   taken by the machine that holds the comparison's window only where the lock's exact comparison
+//!   taken by the machine that holds the epoch's comparison only where the lock's exact comparison
 //!   of the comparison's code at both sheets says the turned sheets are strictly better
 //!   ([`crate::holon::deposition::strictly_better`]: the turned code's enclosure lies strictly below
 //!   the held one's). It is the two-state lock's own decision, no threshold: with the sheets'
@@ -408,7 +408,7 @@
 //! and refined by rounded Newton–Schulz steps until `δ ≤ δ_ℓ`, both declared by rule
 //! ([`ChartRule`]) so that the prox identity's released residual moves a read by less than the
 //! receiver's grain. The exact solved chart it replaces grew by the Hadamard bound of the carried
-//! Gram (0.40 Mbit over 24 windows of the standing real cut, still growing). [proved-derived;
+//! Gram (0.40 Mbit over 24 epochs of the standing real cut, still growing). [proved-derived;
 //! formal-checked] **The carried Gram stays positive
 //! definite with no clamp** (Lean `carried_gram_posDef`, `carried_gram_posDef_rule`): every entry
 //! of `H` is within one unit of the exact Gram `H_exact = I + Σ w f fᵀ ⪰ I`
@@ -3785,10 +3785,10 @@ impl Constitution {
     /// the chart of `H′` refined, the unit step `D = Σ w g (X̂f)ᵀ`, its alignment `a = Σ w⟨g, Df⟩`)
     /// and stepped by `ηD` through the locus's budgeted carry ([`PreparedStep::stepped`]), the
     /// locus's clock advanced when an entry moved, the commit counted, and the successor refused
-    /// past the budget or when its committed storage growth is uncertified (the guards of
+    /// past the budget or when its committed storage growth is uncertified (the refusals of
     /// [`Constitution::deposited`]). `None` when the returns reach nothing. It publishes nothing:
-    /// the executed comparison's move adopts the successor only when every commit guard holds on it
-    /// (`hnn::executed::executed_move`), so it is visible to the crate alone.
+    /// the executed comparison's move adopts the successor only when every condition of adoption
+    /// holds on it (`hnn::executed::executed_move`), so it is visible to the crate alone.
     pub(crate) fn stepped_source(
         &self,
         ring: usize,
@@ -3930,7 +3930,7 @@ impl Constitution {
     /// (`hnn::moment`, "One passage, its transported weights"): `0 < ρ ≤ 1` (the transport is
     /// passive: its energy a tick `ρ² ≤ 1`, its dissipation `1 − ρ² ≥ 0`), on the source port's
     /// lattice. Refused off a source ring, outside `(0, 1]`, or off the lattice. The executed
-    /// comparison's move adopts it only when every commit guard holds (`hnn::executed`).
+    /// comparison's move adopts it only when every condition of adoption holds (`hnn::executed`).
     pub fn with_transport(mut self, ring: usize, modulus: Rat) -> Result<Self, HnnError> {
         let material = self
             .rings

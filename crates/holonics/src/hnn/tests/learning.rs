@@ -80,8 +80,8 @@ pub(super) fn chain_with(first_admittance: Rat) -> Field {
 /// `population` cells (an exposure's cut is exactly its field's population). Without the offset
 /// counts its capacity is `n* = 17` cells (`71` with `Δ = {1}`), the smallest cut on which the
 /// exposure's protocol runs its aeons, keys and budget stop. Its receiver's tree reads the active
-/// suffix address, which the resident keeps beside the tree whether or not the moment retains a
-/// window (the landmark tree).
+/// suffix address, which the resident keeps beside the tree whether or not the moment keeps earlier
+/// cells for its offset counts (the landmark tree).
 pub(super) fn chain_of(population: u64) -> Field {
     chain_declared(integer(2), population, Vec::new())
 }
@@ -129,7 +129,7 @@ pub(super) fn chain() -> Field {
 }
 
 /// **A hand-built deposit's reach** on the chain (its receiver ring 2 read at ticks 1 and 2, the
-/// moment entering once at the open, one phase): the certified step's reading of a window a compare
+/// moment entering once at the open, one phase): the certified step's reading of an epoch a compare
 /// did not compose.
 pub(super) fn chain_reach() -> Reach {
     Reach {
@@ -144,7 +144,7 @@ pub(super) fn chain_reach() -> Reach {
 /// every lattice `L ≥ 1`, so a deposit's denominators stay the updates' own): the passive factor,
 /// the contrast port, generic slices, a mixed standing, the source and receiving maps, nonzero
 /// pair-port outputs, and generic channel factors.
-pub(super) fn generic(field: &Field, seed: u64) -> Constitution {
+pub(crate) fn generic(field: &Field, seed: u64) -> Constitution {
     let mut draw = Draw::new(seed);
     let a = field.alphabet();
     let mut theta = Constitution::initial(field, OPEN_BUDGET).unwrap();
@@ -196,7 +196,7 @@ pub(super) fn generic(field: &Field, seed: u64) -> Constitution {
 
 /// A moment of `cells` drawn codes ingested from rest (past any carry-out: the moment's own law
 /// continues; only the resident waits for the boundary).
-pub(super) fn moment(field: &Field, seed: u64, cells: usize) -> (Current, SourceMoment) {
+pub(crate) fn moment(field: &Field, seed: u64, cells: usize) -> (Current, SourceMoment) {
     let mut draw = Draw::new(seed);
     let codes: Vec<usize> = (0..cells).map(|_| draw.below(field.alphabet())).collect();
     let mut current = Current::at_rest(field);
@@ -212,7 +212,7 @@ pub(super) fn moment(field: &Field, seed: u64, cells: usize) -> (Current, Source
 }
 
 /// The declared receiver's phases at a constitution.
-pub(super) fn phases(field: &Field, theta: &Constitution, current: &Current) -> ReceivingPhases {
+pub(crate) fn phases(field: &Field, theta: &Constitution, current: &Current) -> ReceivingPhases {
     ReceivingPhases::declare(field, theta, current, &field.receivers()[0]).unwrap()
 }
 

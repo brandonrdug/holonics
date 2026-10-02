@@ -10,22 +10,23 @@
 //! over the word, and reports that rank (review C7).
 //!
 //! ```text
-//! a_j = [x_(p+j−1), …, x_p, x_(p−1), …]_D        phase j's address: the window's earlier targets, then the active suffix address
+//! a_j = [x_(p+j−1), …, x_p, x_(p−1), …]_D        phase j's address: the epoch's earlier targets, then the active suffix address
 //! f_j = k(a_j)/L_R + R · P_R^(τ_R) v_R(e_j)      complex logits over |A| classes, realified [Re, Im, …]
 //! 2^(k_c) ≤ q(c | a_j)^(L_R) < 2^(k_c+1)         the tree face's grain exponent (integer comparisons)
 //! Re f_c = n_c + k_c/L_R + ε_c,  ε_c ∈ [0, 1/L_R)   the grain cell (carry, phase class) and the fibre
 //! φ^H_c = Im f_c / 2                             each class's phase, in turns
 //! ```
 //!
-//! [definition; agent-inferred, U5] **The receiving window is an epoch.** Two clocks meet at a
-//! window. Over the passage, the source's cell clock (an unwound `navigator::Clock`, one tick a
-//! cell) is crossed by the receiver's section every `A` cells: the windows are the epochs of the
-//! passage's aeon at that section, the digit clock of base `A` ([`ReceivingPhases::windows`], the
-//! exposure's windows; Lean `Aeon/Clock/Epoch.{forward_epoch_is_window, mem_epoch_digitTicks}`). Inside a
-//! word, the word's own unwound clock (`hnn::word::Word`, one tick a junction step) is read by the
-//! receiver at its ticks `e_0 … e_last` ([`ReceivingPhases::epochs`]), the epochs of the word's aeon
-//! at its unit section, which is every tick; phase `j` at word tick `e_0 + j` reads cell `p + j` of
-//! the window opening at `p`. The inferred choice: the window's cell span is the aeon owner's
+//! [definition; agent-inferred, U5] **The receiver reads the passage by epochs.** Two clocks meet
+//! there. Over the passage, the source's cell clock (an unwound `navigator::Clock`, one tick a
+//! cell) is crossed by the receiver's section every `A` cells: the cells between two crossings are
+//! an epoch of the passage's aeon at that section, the digit clock of base `A`
+//! ([`ReceivingPhases::windows`], the exposure's epochs; Lean
+//! `Aeon/Clock/Epoch.{forward_epoch_is_window, mem_epoch_digitTicks}`). Inside a word, the word's
+//! own unwound clock (`hnn::word::Word`, one tick a junction step) is read by the receiver at its
+//! ticks `e_0 … e_last` ([`ReceivingPhases::epochs`]), the epochs of the word's aeon at its unit
+//! section, which is every tick; phase `j` at word tick `e_0 + j` reads cell `p + j` of the
+//! passage's epoch opening at `p`. The inferred choice: the epoch's cell span is the aeon owner's
 //! reading, not a loop's stride, and the word's tick index is its clock's, disclosed as such.
 //!
 //! [definition; agent-inferred] **The receiving parametron's storage is the landmark tree**
@@ -44,27 +45,27 @@
 //! the suffix restriction of the source navigator's word). The last `D` cells the receiver has
 //! received, newest first, `Boundary` before the passage's first cell. It is the receiving
 //! parametron's own state, kept by the resident beside the tree and shifted at every ingested
-//! cell. It is not the source moment's state: the word never reads it, so the moment's window
-//! stays `max Δ` and the capacity `n*` (which counts the source state the word reads) is unchanged
+//! cell. It is not the source moment's state: the word never reads it, so the moment still holds
+//! `max Δ` cells and the capacity `n*` (which counts the source state the word reads) is unchanged
 //! by construction. Its bits count in the resident's state bits, and the aeon collapse keeps it
 //! with the tree whole (Lean `Compression/Landmark/Context/Tree.release_rule` proves that nodes deeper than `D` are
 //! releasable, of which the tree founds none, and that a retention is lawful exactly when it
 //! refines the causal signature; it does not prove that no shallower merge is lawful, and the
 //! collapse attempts none). A pending ratio copies it at its cut, an operand like the moment's
 //! counts.
-//! **The address is per cell and causal**: phase `j` of the window opening at `p` reads the tree at
-//! `a_j = [x_(p+j−1), …, x_p]` (the window's own earlier targets, known at compare) followed by the
+//! **The address is per cell and causal**: phase `j` of the epoch opening at `p` reads the tree at
+//! `a_j = [x_(p+j−1), …, x_p]` (the epoch's own earlier targets, known at compare) followed by the
 //! copied suffix `[x_(p−1), …]`, truncated to `D` ([`ActiveAddress::phase`]). It equals
 //! `compression::landmark::context::address(cells, p + j, D)` exactly (the test
-//! `the_phase_address_is_the_trees_causal_address`), so an aperture-two window reads its two
+//! `the_phase_address_is_the_trees_causal_address`), so an aperture-two epoch reads its two
 //! phases at their own addresses (the located failure pooled lags one and two at one region).
-//! **The window is read in cell order** (prequential scoring within a window): phase `j`'s tree face is read
-//! at the standing after the window's earlier phases' tree deposits (their targets are known at
-//! compare), on a working overlay of the nodes those deposits write
+//! **The epoch is read in cell order** (prequential scoring within an epoch): phase `j`'s tree face
+//! is read at the standing after the epoch's earlier phases' tree deposits (their targets are known
+//! at compare), on a working overlay of the nodes those deposits write
 //! ([`window_faces`], over `compression::landmark::context::Landmarks::window`); the deposit then applies exactly those steps to the
 //! published tree, in cell order, so the tree it publishes is the overlay's last standing plus the
-//! last phase's step. The wave's part of a window is the one refine's, read at the window's opening
-//! standing: the wave's maps are deposited once a window, by the normal law.
+//! last phase's step. The wave's part of an epoch is the one refine's, read at the standing where
+//! the epoch opens: the wave's maps are deposited once an epoch, by the normal law.
 //!
 //! [definition; agent-inferred] **The receiving letters** (campaign 2; Lean
 //! `Compression/Landmark/Context/Address`). The address register holds typed bundles, not bare cells: each earlier
@@ -76,7 +77,7 @@
 //! `λ_g mod d_g`, stepped by the selective step at every received cell, synchronized with the lift
 //! point at the mount and after every re-keying, and checked against it at every ingest), reads each
 //! tick's letter after the tick, and never reads it again; a pending ratio copies the register, its
-//! clock included, at its cut, so each phase's letters of the window's known targets are read by a
+//! clock included, at its cut, so each phase's letters of the epoch's known targets are read by a
 //! copy of that clock (`bundle_causal`). A ring's phase class at its declared grain is read by
 //! [`GrainCell::of`] of the phase in turns. A contact's letter is its owner's reading
 //! ([`ContactReading`], `hnn::contact`): its lock address from its rings' whole windings since the
@@ -107,8 +108,8 @@
 //! ([`receiving_population`], the primary's ruling A; THE_REBUILD U1): the population at the
 //! receiving port (`receiver::population::port`) over the tree's face and the combined face at
 //! ½/½, its weights read from the two families' likelihoods in Θ at the receiving locus, as a tree
-//! node weighs its own face against its split, received after every cell in cell order, within a
-//! window too ([`score`]). The wave keeps learning from the combined face's covector.
+//! node weighs its own face against its split, received after every cell in cell order, within an
+//! epoch too ([`score`]). The wave keeps learning from the combined face's covector.
 //!
 //! [definition] **Exact inside, grain only at the face.** The logits are exact rationals. The grain
 //! reading returns the carry `n_c`, the phase class `k_c ∈ ℤ/L_R` and the fibre `ε_c`, the
@@ -120,7 +121,7 @@
 //! |---|---|
 //! | `HNN/Ratio.face_constant_on_fibre` (the face reads only `(n, k)`; the owner's, `receiver::face`) | [`GrainCell`] |
 //! | `HNN/Ratio.grain_of_tolerance` (`L_R = ⌈1/ε_bits⌉`) | [`ReceivingPhases::declare`] |
-//! | `Aeon/Clock/Epoch.{forward_epoch_is_window, crossingTicks_forwardWord, mem_epoch_digitTicks, odometer_tower}` (the windows are the digit clock's epochs) | [`ReceivingPhases::windows`] |
+//! | `Aeon/Clock/Epoch.{forward_epoch_is_window, crossingTicks_forwardWord, mem_epoch_digitTicks, odometer_tower}` (the receiver's spans of cells are the digit clock's epochs) | [`ReceivingPhases::windows`] |
 //! | `HNN/RegionCounts.{grain_face_residual, grain_code_residual}` (the grain exponent is `receiver::face::grain_exponent`'s, `grainExponent_spec`, `grain_log_iff_pow_bounds`) | [`grain_logits`] |
 //! | `receiver::reception::ReceiverFace::read` with `C_S = R P_R^(τ_R) Π_R` | [`ReceivingPhases::read`] |
 //! | `HNN/RegionCounts.{combinedLogits, combined_face_pullback, combined_code_pullback}` | [`ReceivingRead::combined`], [`ReceivingPhases::combine`] |
@@ -234,11 +235,11 @@ impl ReceivingRead {
 }
 
 // -------------------------------------------------------------------------------------------
-// the tree's window read on the host: the phases run together
+// the tree's read over an epoch on the host: the phases run together
 
-/// **The class faces of a window's splits** (`LandmarkFace::of_splits` per phase): the phases read
+/// **The class faces of an epoch's splits** (`LandmarkFace::of_splits` per phase): the phases read
 /// alone and run together (`hnn::realization`: each reads its own splits and writes its own face).
-/// The host's window read and every device realization's form their faces here.
+/// The host's read over an epoch and every device realization's form their faces here.
 pub fn faces_of_splits(
     declaration: &LandmarkDeclaration,
     splits: &[Splits],
@@ -249,9 +250,9 @@ pub fn faces_of_splits(
     })
 }
 
-/// [definition; agent-inferred] **A window's splits in cell order, the phases run together** (the
+/// [definition; agent-inferred] **An epoch's splits in cell order, the phases run together** (the
 /// host realization of `compression::landmark::context::Landmarks::window`): the tree builds the
-/// window's working overlays in cell order, and each phase then reads its own overlay alone
+/// epoch's working overlays in cell order, and each phase then reads its own overlay alone
 /// (`hnn::realization`: nothing is written, so the reads commute). The quantity a card's read
 /// returns.
 pub fn window_splits(
@@ -263,7 +264,7 @@ pub fn window_splits(
     indexed(window.phases(), |j| Ok(window.splits(j)))
 }
 
-/// **A window's all-class faces in cell order** at `grain` ([`window_splits`], then
+/// **An epoch's all-class faces in cell order** at `grain` ([`window_splits`], then
 /// [`faces_of_splits`]): phase `j` at the standing after the deposits of the known earlier phases.
 pub fn window_faces(
     tree: &Landmarks,
@@ -426,7 +427,7 @@ struct ClockRing {
 /// as the aeon's opening moves there), and its site kind from the kinds held
 /// (`hnn::contact::site_kinds`). The kinds are the constitution's at the reader's last
 /// [`LetterReader::refresh`], which the resident takes after each ingest, never inside one: a
-/// deposit between a window's cut and its ingest therefore reaches no letter of that window's
+/// deposit between an epoch's cut and its ingest therefore reaches no letter of that epoch's
 /// ticks, so the letters the compare reads by a copy of the register ([`ActiveAddress::phase`])
 /// are the letters the register reads at the ingest, and the site kinds step only between ticks,
 /// as a re-keying does (Lean `bundle_causal`: the letters already read keep their ticks' values).
@@ -807,14 +808,14 @@ impl ActiveAddress {
     }
 
     /// **Phase `j`'s address** (module header; Lean `Compression/Landmark/Context/Address.bundle_causal`): the
-    /// letters of the window's cells before phase `j` that are known, newest first (read by a copy
+    /// letters of the epoch's cells before phase `j` that are known, newest first (read by a copy
     /// of the register's reader, its clock and held site kinds, stepped over `known[0], …,
     /// known[j−1]`, at most the `known.len()` of them), then this suffix, truncated to its depth. At
     /// a compare every earlier target is known, so this is `compression::landmark::context::letter_address` of the
     /// passage's letters at `p + j`, contact letters included (the register reads the same kinds at
-    /// the window's ingest: [`LetterReader`]); at a release no cell of the window is known and every
-    /// phase reads the window's opening address (`hnn::port`'s release). The target of phase `j`
-    /// is never read.
+    /// the epoch's ingest: [`LetterReader`]); at a release no cell of the epoch is known and every
+    /// phase reads the address where the epoch opens (`hnn::port`'s release). The target of phase
+    /// `j` is never read.
     pub fn phase(&self, known: &[usize], j: usize) -> Result<Vec<Letter>, HnnError> {
         let depth = self.letters.len();
         let mut reader = self.reader.clone();
@@ -855,12 +856,12 @@ pub fn letter_family(_field: &Field) -> FeatureFamily {
     FeatureFamily::cells()
 }
 
-/// [definition; agent-inferred, U5] **The receiving windows of `n` cells at aperture `A`**
+/// [definition; agent-inferred, U5] **The receiver's epochs over `n` cells at aperture `A`**
 /// ([`ReceivingPhases::windows`], module header): the epochs of the cell clock's forward aeon of
 /// `n` cells at the receiver's section of grain `A`, each as the span of cells whose leaving
 /// micro-state it holds (Lean `Aeon/Clock/Epoch.forward_epoch_is_window`: the forward walk's ticks
 /// at the section are the digit clock's, and its epoch `k` is `[kA, (k + 1)A)`); a last epoch with
-/// no cell is not a window. Refused at `A = 0`, which is no
+/// no cell is not read. Refused at `A = 0`, which is no
 /// section (`aeon::AeonError::ZeroPeriod`).
 pub fn receiving_windows(cells: usize, aperture: usize) -> Result<Vec<Range<usize>>, HnnError> {
     // One cell a tick: the cell clock's declared duration is the cell.
@@ -998,7 +999,7 @@ impl ReceivingStep {
     }
 }
 
-/// [definition] **A window scored by the receiving face**: each phase's code length under the
+/// [definition] **An epoch scored by the receiving face**: each phase's code length under the
 /// receiver's population (the model's), and under the tree's executed face `q_T` alone (the face the
 /// population weighs, `compression::landmark::context::code_length` of `q_T(t_j)`), and the steps its
 /// deposit applies in cell order.
@@ -1033,8 +1034,8 @@ pub const COMBINED: usize = 1;
 /// weighs its own face against its split: at `π = ½` the population is that two-face mixture (Lean
 /// `Compression/Landmark/Context/LocalWeighing.two_face_prior`, `priorMix (1/2) = seqMix`; the
 /// telescope and the bounds are `Tree.{sequential_mixture, sequential_mixture_bounds}`), which hold
-/// only when each cell's weights are the likelihoods after every earlier cell: phase `j` of a
-/// window reads the population after phases `< j`. Its weights are read from the families'
+/// only when each cell's weights are the likelihoods after every earlier cell: phase `j` of an
+/// epoch reads the population after phases `< j`. Its weights are read from the families'
 /// likelihoods, held in `Θ` at the receiving locus, never from a carried ratio: `q_C(x)` lives in
 /// `ℚ(θ)` and enters as its exact enclosure (Lean `Population.population_mixture_enclosed`), so the
 /// population's code encloses the true mixture's and no chart drift enters it. The wave still
@@ -1053,9 +1054,9 @@ pub fn receiving_population() -> PortPopulation {
     PortPopulation::new(&[1, 1]).expect("two families of one bit each fit Kraft's sum")
 }
 
-/// **Score a window in cell order** (the receiver's population; Lean
+/// **Score an epoch in cell order** (the receiver's population; Lean
 /// `Compression/Landmark/Context/Tree.sequential_mixture`): phase `j` reads the population after the
-/// window's earlier phases' faces (their targets are known at compare), the tree's face
+/// epoch's earlier phases' faces (their targets are known at compare), the tree's face
 /// `q_T,j(t_j)` and the combined face's exact enclosure `q_C,j(t_j) ∈ [lo, hi]`, so its code length
 /// is the population's code of the target, enclosed ([`PortPopulation::code_of`]); its step is
 /// received on a local copy of the population and staged, so the deposit, which receives the staged
@@ -1271,22 +1272,22 @@ impl ReceivingPhases {
     }
 
     /// The receiving epochs `e_0 … e_last`: the word clock's ticks at which the receiver reads
-    /// (module header, "The receiving window is an epoch").
+    /// (module header, "The receiver reads the passage by epochs").
     pub fn epochs(&self) -> Range<usize> {
         self.first_epoch..self.first_epoch + self.aperture
     }
 
-    /// [definition; agent-inferred, U5] **The receiving windows of a passage of `n` cells**
-    /// (module header, "The receiving window is an epoch"): the epochs of the cell clock's forward
-    /// aeon at the receiver's section. The cell clock is the source's unwound navigator clock, one
-    /// tick a cell (`navigator::Clock::unwound`, period one, lifted by
+    /// [definition; agent-inferred, U5] **The receiver's epochs over a passage of `n` cells**
+    /// (module header, "The receiver reads the passage by epochs"): the epochs of the cell clock's
+    /// forward aeon at the receiver's section. The cell clock is the source's unwound navigator
+    /// clock, one tick a cell (`navigator::Clock::unwound`, period one, lifted by
     /// `aeon::ClockLift::of_clocks`); the receiver's section is its sub-section at grain `A`, the
-    /// aperture (`aeon::ClockLift::ring_section`), the digit clock of base `A`. So window `k` is
-    /// epoch `k` ([`crate::aeon::Epochs::intervals`]), its cells those whose leaving micro-state
-    /// lies in it, `[kA, min((k + 1)A, n))`; the window of cell `c` is its epoch `⌊c/A⌋`, and the
-    /// windows that close are the section's flux `⌊n/A⌋` (Lean `Aeon/Clock/Epoch.{epochOf_digitTicks,
-    /// forward_epoch_is_window, odometer_tower}`). A last epoch that holds no cell (`A | n`, the last
-    /// micro-state alone) is not a window.
+    /// aperture (`aeon::ClockLift::ring_section`), the digit clock of base `A`. So the receiver's
+    /// span `k` is epoch `k` ([`crate::aeon::Epochs::intervals`]), its cells those whose leaving
+    /// micro-state lies in it, `[kA, min((k + 1)A, n))`; cell `c` is read in its epoch `⌊c/A⌋`, and
+    /// the epochs that close are the section's flux `⌊n/A⌋` (Lean
+    /// `Aeon/Clock/Epoch.{epochOf_digitTicks, forward_epoch_is_window, odometer_tower}`). A last
+    /// epoch that holds no cell (`A | n`, the last micro-state alone) is not read.
     pub fn windows(&self, cells: usize) -> Result<Vec<Range<usize>>, HnnError> {
         receiving_windows(cells, self.aperture)
     }
@@ -1348,8 +1349,8 @@ impl ReceivingPhases {
         Ok(ReceivingRead::of_logits(wave, self.grain))
     }
 
-    /// **The window's phase addresses** (module header): phase `j` at
-    /// [`ActiveAddress::phase`] of the window's known targets. Refused when the suffix is not of
+    /// **The epoch's phase addresses** (module header): phase `j` at
+    /// [`ActiveAddress::phase`] of the epoch's known targets. Refused when the suffix is not of
     /// the receiver's depth.
     pub fn addresses(
         &self,
@@ -1368,7 +1369,7 @@ impl ReceivingPhases {
             .collect()
     }
 
-    /// **The tree faces of one window, in cell order** (module header): the receiving parametron's
+    /// **The tree faces of one epoch, in cell order** (module header): the receiving parametron's
     /// tree read at each phase's address, every class's executed face with its grain exponent,
     /// phase `j` at the standing after the deposits of the known earlier phases' targets
     /// ([`window_faces`] over `compression::landmark::context::Landmarks::window`: a working
@@ -1388,7 +1389,7 @@ impl ReceivingPhases {
         window_faces(tree, &addresses, known, self.grain)
     }
 
-    /// **The combined faces of one window** (module header): each phase's wave logits plus its tree
+    /// **The combined faces of one epoch** (module header): each phase's wave logits plus its tree
     /// face's grain logits, read at the grain. Refused unless there is one tree face per phase.
     pub fn combine(&self, waves: &Faces, trees: &[LandmarkFace]) -> Result<Faces, HnnError> {
         if waves.logits.len() != trees.len() {

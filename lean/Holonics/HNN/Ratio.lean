@@ -35,10 +35,10 @@ exactly in `ℚ(θ_R)`, `θ_R^(L_R) = 2`, and returns `ε` as its fibre. Nothing
    (`closing_period_is_load_bearing`).
 3. **The phase cost in turns, in the cut's frame** (`alignCost_turns`): with the receiving clock
    `τ_R(j) = d_R·w + ρ_j`, `w = ⌊λ_R/d_R⌋` the cut's winding, the absolute gap is `w` plus the
-   windowed gap `ρ_j/d_R − φ^H`; `w` is the branch of the log and never a magnitude of the cost,
-   which is exact over `ℚ` on the windowed gap; the owner's gradient `−½ q_c Δ_c` holds there, so
-   the phase covector stays at the window's scale however long the stream; a common winding
-   cancels. `ρ/d` splits by `Winding.ratio_split`.
+   gap past the cut's winding, `ρ_j/d_R − φ^H`; `w` is the branch of the log and never a
+   magnitude of the cost, which is exact over `ℚ` on that gap; the owner's gradient `−½ q_c Δ_c`
+   holds there, so the phase covector stays at the epoch's scale however long the stream; a common
+   winding cancels. `ρ/d` splits by `Winding.ratio_split`.
 4. **The carried power** is its owner's, `Objects/Ratio/CarriedPower` (`carriedPower_exact`): in
    `ℚ(θ) = ℚ[X]/(X^L − 2)`, `θ^L = 2`; the carried power `2^n θ^k` carries by multiplication by `2`
    and multiplies with carry; `ℚ(θ)` is a field; the real chart sends `2^n θ^k` to `2^(n + k/L)`.
@@ -250,17 +250,17 @@ variable {Index : Type*} [Fintype Index] [DecidableEq Index]
 /-- [proved-derived; formal-checked] **The receiving phase in turns, read in the cut's frame.**
 The receiving clock of a `d`-step ring is `τ_i = d·w + ρ_i`, where `w = ⌊λ_R/d⌋` is the cut's
 winding (the anchor's whole turns since the stream began) and `ρ_i` the lift measured from `d·w`.
-The windowed target phase `ρ/d`:
+The target phase past the cut's winding, `ρ/d`:
 * splits into its own winding `ρ / d` and open phase with `d · open = ρ mod d`
   (`Winding.ratio_split`);
-* carries the stream's winding only as the branch: the absolute gap is `w` plus the windowed gap,
+* carries the stream's winding only as the branch: the absolute gap is `w` plus the gap past it,
   `Δ^abs_c = w + (ρ_c/d − y_c/2)`, so the cut's winding is the log's branch `2πn` and never a
   magnitude of the cost;
-* has an exact rational alignment cost `½ Σ_c q_c (ρ_c/d − y_c/2)²` on the windowed gap;
+* has an exact rational alignment cost `½ Σ_c q_c (ρ_c/d − y_c/2)²` on that gap;
 * has the owner's gradient `−½ q_c (ρ_c/d − y_c/2)` there (`hasDerivAt_alignCost`), so the phase
-  covector stays at the scale of the window (`ρ` is the anchor's open phase plus the window's
+  covector stays at the scale of the epoch (`ρ` is the anchor's open phase plus the epoch's
   ticks), not of the stream's length;
-* and a common winding of target and produced cancels from the windowed gap. -/
+* and a common winding of target and produced cancels from that gap. -/
 theorem alignCost_turns (d : ℕ) (hd : 0 < d) (w : ℤ) (ρ : Index → ℤ) (q y : Index → ℚ)
     (c : Index) :
     (∀ i, windings ((ρ i : ℚ) / d) = ρ i / (d : ℤ) ∧

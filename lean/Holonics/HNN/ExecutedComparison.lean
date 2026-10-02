@@ -58,7 +58,11 @@ the laws that covector and its certified step stand on (the diagnosis record,
    enclosures (`lockFace_enclosure_sublevel`); read at each station's decision refinement it releases
    the section whole (`decisions_release_the_section`); its covector is `θ − q` and its first-order
    certificate is Danskin's bound over the members (`lockFace_first_order`,
-   `sum_upper_dini_descends`). Step 1b's candidate (§7).
+   `sum_upper_dini_descends`). Step 1b's candidate (§7). Read over `n` periods of the same passage
+   every candidate reads `a_x^n`, so the shares are a Gibbs state at inverse temperature `n`, and
+   the lock face lies within `log(2 + |s|)` above `n` times the hinge's positive part
+   (`lockFace_periods_hinge`); per period it tends to the hinge's positive part
+   (`lockFace_per_period_tendsto`): step 1a's hinge is step 1b's lock face at zero temperature.
 
 9. **The move's fixed points and one step's reach.** [proved-derived; formal-checked] A positive
    definite metric's step `−P g` rests exactly where `g = 0` (`metric_step_zero_iff`) and descends
@@ -86,22 +90,44 @@ the laws that covector and its certified step stand on (the diagnosis record,
    change and its certificate are mass-free, and a deposit never lowers the step's kinetic energy
    (`deposit_raises_native_energy`) (§11).
 
-12. **The release guard.** [proved-derived; formal-checked] A move's change in the own release is
-   its fixed mask's change, continuous and certified at first order, plus the flip of the
-   successor's own decisions read against the incumbent's (`own_telescopes`). Each step certifies
-   the fixed mask's fall. The own release is guarded over a window from a checkpoint: below the
-   checkpoint's plus a height `h` throughout, and closing at most `W` steps on below the checkpoint's
-   less `σ ≥ 0`, which holds exactly when the window's fixed-mask decreases exceed its flips by `σ`
-   (`window_closes_iff`). `W = 1`, `h = 0` is the monotone guard (`checkpoint_one_iff`). The
-   checkpoints descend by the certified decreases (`checkpoint_descends`), nothing exceeds the
-   opening by more than `h` (`excursion_le_start`), and the decreases are summable
-   (`checkpoints_sum_le`, `large_windows_card`). A divergent step sum, which the lattice floor
-   supplies (`floor_steps_diverge`), drives the windows' least slope below every `ε`
-   (`schedule_frequently_small`, `floor_large_slopes_card`). The parameters follow from the laws:
-   a bounded comparison supplies the height (`excursion_of_bounded`); a window of one answers no
-   flip (`one_move_closes_iff`) and a closing window is at least its flips over the largest
-   per-move decrease (`window_length_lower`); a grain's decrease per window ends the chain
+12. **The released code length between two endpoint states.** [proved-derived; formal-checked]
+   Along a path of depositions the released code length changes by its change with the
+   incumbent's commitments held, continuous and certified at first order, plus the jump where a
+   ring's commitment switches (`own_telescopes`). The jump is set by placement, not by the step's
+   length, so the code length is compared between the two endpoint states of an interval of the
+   path: the closing state below the opening by `σ ≥ 0`, at least one receiver grain, at most `W`
+   steps on, with the states between free and bounded by the code length's range `h`. The interval
+   closes exactly when its held-commitment decreases exceed its jumps by `σ`
+   (`window_closes_iff`); one step and no excursion is strict descent (`checkpoint_one_iff`). The
+   opening states descend by the certified decreases (`checkpoint_descends`), nothing exceeds the
+   first opening by more than `h` (`excursion_le_start`), and the decreases are summable
+   (`checkpoints_sum_le`, `large_windows_card`). A divergent step sum, which the lattice's step
+   floor supplies (`floor_steps_diverge`), drives the intervals' least slope below every `ε`
+   (`schedule_frequently_small`, `floor_large_slopes_card`). The range `h` is finite exactly when
+   each target's reading has a floor (`lockFace_le_of_floor`; without one the term is unbounded,
+   `lockFace_unbounded`), and the lattice supplies it (`HNN/Floquet.integer_monodromy_floor`), so a
+   bounded code length supplies `h` (`excursion_of_bounded`). An interval of one step answers no
+   jump (`one_move_closes_iff`), a closing interval is at least its jumps over the largest per-step
+   decrease (`window_length_lower`), and one grain per interval ends the path
    (`grain_windows_bounded`) (§12).
+
+13. **The flip, a switch of a ring's all-or-nothing commitment.** [proved-derived;
+   formal-checked] A flip present on every small step defeats
+   every first-order bound (`flip_defeats_first_order`); one at `η_c` needs a curvature constant
+   of its cost over `η_c²` (`flip_curvature_lower`); a margin moving at a bounded rate certifies no
+   flip within it (`no_flip_within_margin`); a visible cell end holds until the true reading reaches
+   its cut and moves there (`cell_holds_until_cut`, `cell_moves_at_cut`), at a step set by the
+   reading's place inside its cell (`cut_within_cell`) (§13).
+
+14. **The commitment order the readings resolve.** [proved-derived; formal-checked; the rule
+   itself agent-inferred] A ring commits when no ring's certain gap exceeds its upper end
+   (`certifiedLock`): rings whose gaps the readings cannot order commit together. The largest
+   certain gap commits (`certifiedLock_largest`), the true largest gap commits (`leader_locks`), a
+   lone commitment has the strictly largest true gap (`lone_lock_is_largest`), a resolved order is
+   swapped only by a crossing (`certified_order_needs_crossing`), and exact readings give the
+   largest gap with its ties (`certifiedLock_exact`); the order term, the right ring's certain gap
+   against the wrong rings' upper ends, commits no wrong ring where it is solved
+   (`order_solved_locks_no_wrong`) (§14).
 
 [open] (#62) The existence of the differentiable root path (the implicit function theorem at a
 simple root, from `Φ`'s strict differentiability), Jacobi's formula `∂_η det(λ − M − ηΔM) =
@@ -648,6 +674,132 @@ theorem decisions_release_the_section {σ κ : Type*} (locks : ℕ → Finset σ
   intro r
   induction r using Nat.strong_induction_on with
   | _ r ih => exact hdec r fun r' hr' => ih r' hr'
+
+/-! ### The lock face over `n` periods: its inverse temperature and its zero-temperature face
+
+A member read over `n` repetitions of the same passage has the monodromy `M^n`, whose spectral
+radius is `ρ(M)^n`; so every candidate reads `A_x^n`, while the resting sheet, the lossless ring's
+return, stays `1`. The shares become `A_x^n/(1 + Σ A^n)`, a Gibbs state at inverse temperature `n`
+over the levels `−log A_x`: the lock face's temperature is the reciprocal of the number of periods
+the comparison reads, and the release reads one (the code-length map record, §3). -/
+
+/-- [proved-derived; formal-checked] **The lock face over `n` periods lies within the log of its
+sheet count above `n` times the hinge's positive part**:
+`n (f)_+ ≤ ℓ_n ≤ n (f)_+ + log(2 + |s|)`, `ℓ_n = lockFace (A_t^n) (Σ_(x∈s) A_x^n)`, with `f` the
+hinge term (`hingeTerm`) of the same readings. At one period (`n = 1`) the lock face exceeds the
+hinge's positive part by at most `log(2 + |s|)`. -/
+theorem lockFace_periods_hinge (s : Finset ι) (hs : s.Nonempty) (A : ι → ℝ) (t : ι)
+    (hA : ∀ x ∈ s, 0 < A x) (ht : 0 < A t) (n : ℕ) :
+    (n : ℝ) * max (hingeTerm s hs A t) 0 ≤ lockFace (A t ^ n) (∑ x ∈ s, A x ^ n) ∧
+      lockFace (A t ^ n) (∑ x ∈ s, A x ^ n) ≤
+        (n : ℝ) * max (hingeTerm s hs A t) 0 + Real.log (2 + s.card) := by
+  set M := max (hingeTerm s hs A t) 0 with hM
+  set a := A t ^ n with ha_def
+  set r := ∑ x ∈ s, A x ^ n with hr_def
+  have ha : 0 < a := pow_pos ht n
+  have hr : 0 ≤ r := Finset.sum_nonneg fun x hx => (pow_pos (hA x hx) n).le
+  have htot : 0 < 1 + a + r := by linarith
+  have hL : lockFace a r = Real.log (1 + a + r) - (n : ℝ) * Real.log (A t) := by
+    unfold lockFace
+    rw [Real.log_div htot.ne' ha.ne', ha_def, Real.log_pow]
+  -- the three faces bounded by `M`
+  have hsup : ∀ x ∈ s, Real.log (A x / A t) ≤ M := fun x hx =>
+    le_trans (Finset.le_sup' (fun x => Real.log (A x / A t)) hx)
+      (le_trans (le_max_left _ _) (le_max_left _ _))
+  have hrest : -Real.log (A t) ≤ M := le_trans (le_max_right _ _) (le_max_left _ _)
+  have hzero : (0 : ℝ) ≤ M := le_max_right _ _
+  constructor
+  · -- lower: `n M ≤ ℓ_n`, face by face
+    have hface : ∀ c : ℝ, (∀ k : ℕ, Real.exp ((k : ℝ) * c) * A t ^ k ≤
+        1 + A t ^ k + ∑ x ∈ s, A x ^ k) → (n : ℝ) * c ≤ lockFace a r := by
+      intro c hc
+      rw [hL]
+      have h := hc n
+      have hpos : 0 < Real.exp ((n : ℝ) * c) * A t ^ n := mul_pos (Real.exp_pos _) (pow_pos ht n)
+      have := Real.log_le_log hpos h
+      rw [Real.log_mul (Real.exp_pos _).ne' (pow_pos ht n).ne', Real.log_exp, Real.log_pow] at this
+      linarith
+    have hM' : M = max (hingeTerm s hs A t) 0 := rfl
+    rcases le_total (hingeTerm s hs A t) 0 with hneg | hpos
+    · rw [hM', max_eq_right hneg]
+      apply hface 0
+      intro k
+      simp only [mul_zero, Real.exp_zero, one_mul]
+      have : 0 ≤ ∑ x ∈ s, A x ^ k := Finset.sum_nonneg fun x hx => (pow_pos (hA x hx) k).le
+      linarith
+    · rw [hM', max_eq_left hpos]
+      unfold hingeTerm
+      rcases le_total (s.sup' hs fun x => Real.log (A x / A t)) (-Real.log (A t)) with h1 | h1
+      · rw [max_eq_right h1]
+        apply hface
+        intro k
+        rw [show Real.exp ((k : ℝ) * -Real.log (A t)) * A t ^ k = 1 by
+          rw [mul_neg, ← Real.log_pow, Real.exp_neg, Real.exp_log (pow_pos ht k)]
+          exact inv_mul_cancel₀ (pow_pos ht k).ne']
+        have : 0 ≤ ∑ x ∈ s, A x ^ k := Finset.sum_nonneg fun x hx => (pow_pos (hA x hx) k).le
+        linarith [pow_pos ht k]
+      · rw [max_eq_left h1]
+        obtain ⟨y, hy, hyeq⟩ := Finset.exists_mem_eq_sup' hs fun x => Real.log (A x / A t)
+        rw [hyeq]
+        apply hface
+        intro k
+        rw [show Real.exp ((k : ℝ) * Real.log (A y / A t)) * A t ^ k = A y ^ k by
+          rw [← Real.log_pow, Real.exp_log (pow_pos (div_pos (hA y hy) ht) k), div_pow,
+            div_mul_cancel₀ _ (pow_pos ht k).ne']]
+        have hle : A y ^ k ≤ ∑ x ∈ s, A x ^ k :=
+          Finset.single_le_sum (f := fun x => A x ^ k)
+            (fun x hx => (pow_pos (hA x hx) k).le) hy
+        linarith [pow_pos ht k]
+  · -- upper: every sheet below `B^n`, `B = e^M A_t`
+    set B := Real.exp M * A t with hB
+    have hBpos : 0 < B := mul_pos (Real.exp_pos _) ht
+    have hlogB : Real.log B = M + Real.log (A t) := by
+      rw [hB, Real.log_mul (Real.exp_pos _).ne' ht.ne', Real.log_exp]
+    have hle_of_log : ∀ c : ℝ, 0 < c → Real.log c ≤ Real.log B → c ≤ B := fun c hc h =>
+      (Real.log_le_log_iff hc hBpos).mp h
+    have h1B : 1 ≤ B := by
+      have := hle_of_log 1 one_pos (by rw [Real.log_one, hlogB]; linarith)
+      exact this
+    have htB : A t ≤ B := hle_of_log (A t) ht (by rw [hlogB]; linarith)
+    have hxB : ∀ x ∈ s, A x ≤ B := fun x hx => hle_of_log (A x) (hA x hx) (by
+      rw [hlogB]
+      have := hsup x hx
+      rw [Real.log_div (hA x hx).ne' ht.ne'] at this
+      linarith)
+    have hsum : r ≤ s.card * B ^ n := by
+      rw [hr_def]
+      have := Finset.sum_le_card_nsmul s (fun x => A x ^ n) (B ^ n) fun x hx =>
+        pow_le_pow_left₀ (hA x hx).le (hxB x hx) n
+      simpa [nsmul_eq_mul] using this
+    have htot_le : 1 + a + r ≤ (2 + s.card) * B ^ n := by
+      have h1 : (1 : ℝ) ≤ B ^ n := one_le_pow₀ h1B
+      have h2 : a ≤ B ^ n := pow_le_pow_left₀ ht.le htB n
+      nlinarith
+    have hlog := Real.log_le_log htot htot_le
+    have hcard : (0 : ℝ) < 2 + s.card := by positivity
+    rw [Real.log_mul hcard.ne' (pow_pos hBpos n).ne', Real.log_pow, hlogB] at hlog
+    rw [hL]
+    nlinarith
+
+/-- [proved-derived; formal-checked] **The hinge is the lock face's zero-temperature face**: per
+period, the lock face read over `n` periods tends to the hinge's positive part,
+`ℓ_n / n → (f)_+`. Step 1a's comparison is step 1b's in the limit of many periods. -/
+theorem lockFace_per_period_tendsto (s : Finset ι) (hs : s.Nonempty) (A : ι → ℝ) (t : ι)
+    (hA : ∀ x ∈ s, 0 < A x) (ht : 0 < A t) :
+    Tendsto (fun n : ℕ => lockFace (A t ^ n) (∑ x ∈ s, A x ^ n) / n) atTop
+      (𝓝 (max (hingeTerm s hs A t) 0)) := by
+  set M := max (hingeTerm s hs A t) 0
+  have hgap : Tendsto (fun n : ℕ => M + Real.log (2 + s.card) / n) atTop (𝓝 M) := by
+    simpa using (tendsto_const_div_atTop_nhds_zero_nat (Real.log (2 + s.card))).const_add M
+  refine tendsto_of_tendsto_of_tendsto_of_le_of_le' tendsto_const_nhds hgap ?_ ?_
+  · filter_upwards [eventually_ge_atTop 1] with n hn
+    have hnpos : (0 : ℝ) < n := by exact_mod_cast hn
+    rw [le_div_iff₀ hnpos, mul_comm]
+    exact (lockFace_periods_hinge s hs A t hA ht n).1
+  · filter_upwards [eventually_ge_atTop 1] with n hn
+    have hnpos : (0 : ℝ) < n := by exact_mod_cast hn
+    rw [div_le_iff₀ hnpos, add_mul, div_mul_cancel₀ _ hnpos.ne', mul_comm]
+    exact (lockFace_periods_hinge s hs A t hA ht n).2
 
 end LockFace
 
@@ -1525,32 +1677,38 @@ theorem deposit_raises_native_energy {M K : Matrix n n ℝ} (hM : M.PosDef) (hK 
 
 end PortMass
 
-/-! ## 12. The release guard: a certified fixed-mask step and an excursion above a checkpoint
+/-! ## 12. The released code length between two endpoint states
 
-The release guard (`OwnNotBelow` in the Rust owner) adopted a successor only when its own release's
-comparison fell strictly below the incumbent's (§4). The plain-gradient path that reaches the
-sections does not: its own comparison rises above its opening before it falls. This section states
-what the guard compares and the law that follows that path.
+Every term here names a quantity of the receiving bank. The **released code length** `f k` is the
+comparison (the targets' code length in nats, §4) read through the release's own commitments at the
+`k`-th state of a path of depositions; `m k` is the same code length at the successor with the
+incumbent's commitments held. At the incumbent the two agree, so
+`f (k+1) − f k = (m k − f k) + (f (k+1) − m k)` (`own_telescopes`). The first term is continuous in
+the step and certified at first order (§3, §4). The second is the **flip**: the jump where a
+ring's all-or-nothing commitment switches (§13), set by which data are placed beside which and not
+by how far the constitution moved. It is first read as the next step's incumbent.
 
-**What changes along a move.** Let `f k` be the own release's comparison at the `k`-th adopted
-state and `m k` the incumbent's fixed mask read at the successor (the incumbent's decisions kept).
-At the incumbent the two agree, so `f (k+1) − f k = (m k − f k) + (f (k+1) − m k)`. The first term
-is the fixed mask's change, continuous along the move and the object of the first-order certificate
-(§3, §4); the second is the **flip**, the successor's own decisions read against the incumbent's on
-the same `E`, discontinuous where a decision changes (`own_telescopes`). The flip is re-read once,
-at the next move, whose incumbent is the successor's own release.
+**What is compared, between which two states.** Because no step's certificate reaches the jump, the
+code length is compared between the two endpoint states of an interval of the path: its opening
+state `t n` and its closing state `t (n+1)`, at most `W` steps on. The closing must lie below the
+opening by `σ n ≥ 0`, at least one grain of the receiver (the smallest code-length difference it
+resolves). **Why the states between are free, and what bounds them.** Only a later step can repay
+a jump, so the intermediate states are not each required to lower the code length; they are
+bounded by the code length's range `h` on the admitted states (`excursion_of_bounded`). That range
+is finite only with a floor on every target's reading (`lockFace_le_of_floor`,
+`lockFace_unbounded`), which the lattice supplies: a reading is zero or at least `1/Δ`
+(`HNN/Floquet.integer_monodromy_floor`), and a zero target is refused, never admitted. The
+interval closes exactly when its held-commitment decreases exceed its jumps by `σ`
+(`window_closes_iff`). One step with no excursion is the strict descent the release kept before
+(`checkpoint_one_iff`).
 
-**The law.** Each adopted step certifies the fixed mask's fall (unchanged). The own release is
-guarded over a window: from a checkpoint `t n`, every comparison until the next checkpoint stays
-below the checkpoint's plus a height `h`, and the next checkpoint, at most `W` steps on, lies below
-the checkpoint's less a certified decrease `σ n ≥ 0`. A window that does not close returns to its
-checkpoint. `W = 1` and `h = 0` is the monotone guard (`checkpoint_one_iff`). The window closes
-exactly when the certified fixed-mask decreases exceed the window's net flips by `σ`
-(`window_closes_iff`). -/
+**What has no physical statement.** An interval that does not close is discarded and the path
+restarts from its opening state. No process of the ring undoes a deposition: this is a selection
+among paths made by the receiver, not an evolution of the bank. -/
 
 section ReleaseGuard
 
-/-- [proved-derived; formal-checked] **A move's change is its fixed mask's change and its flip**:
+/-- [proved-derived; formal-checked] **A step's change is its held-commitment change and its jump**:
 `f n − f 0 = Σ_(k<n) (m k − f k) + Σ_(k<n) (f (k+1) − m k)`. -/
 theorem own_telescopes (f m : ℕ → ℝ) (n : ℕ) :
     f n - f 0 = ∑ k ∈ Finset.range n, (m k - f k) + ∑ k ∈ Finset.range n, (f (k + 1) - m k) := by
@@ -1558,8 +1716,8 @@ theorem own_telescopes (f m : ℕ → ℝ) (n : ℕ) :
   simp only [sub_add_sub_cancel']
   exact (Finset.sum_range_sub f n).symm
 
-/-- [proved-derived; formal-checked] **A window closes exactly when its fixed-mask decreases exceed
-its flips**: from `a` to `b ≥ a`, `f b ≤ f a − σ` iff
+/-- [proved-derived; formal-checked] **An interval closes exactly when its held-commitment decreases
+exceed its jumps**: from `a` to `b ≥ a`, `f b ≤ f a − σ` iff
 `Σ_(a≤k<b) (f (k+1) − m k) ≤ Σ_(a≤k<b) (f k − m k) − σ`. -/
 theorem window_closes_iff (f m : ℕ → ℝ) {a b : ℕ} (hab : a ≤ b) (σ : ℝ) :
     f b ≤ f a - σ ↔
@@ -1572,9 +1730,9 @@ theorem window_closes_iff (f m : ℕ → ℝ) {a b : ℕ} (hab : a ≤ b) (σ : 
     exact Finset.sum_congr rfl fun k _ => by ring
   constructor <;> intro h <;> linarith
 
-/-- The checkpoint guard on a chain of comparisons `f` with checkpoints `t` (`t 0 = 0`): every
-comparison of the `n`-th window lies below its checkpoint's plus `h`, and the window closes at most
-`W` steps on, below its checkpoint's less `σ n`. -/
+/-- The endpoint condition on a path's released code lengths `f` with opening states `t`
+(`t 0 = 0`): every state of the `n`-th interval lies below its opening's code length plus `h`, and
+the interval closes at most `W` steps on, below its opening's less `σ n`. -/
 structure CheckpointGuard (f : ℕ → ℝ) (t : ℕ → ℕ) (W : ℕ) (h : ℝ) (σ : ℕ → ℝ) : Prop where
   start : t 0 = 0
   advances : ∀ n, t n < t (n + 1)
@@ -1582,8 +1740,8 @@ structure CheckpointGuard (f : ℕ → ℝ) (t : ℕ → ℕ) (W : ℕ) (h : ℝ
   excursion : ∀ n j, t n ≤ j → j ≤ t (n + 1) → f j ≤ f (t n) + h
   closes : ∀ n, f (t (n + 1)) ≤ f (t n) - σ n
 
-/-- [proved-derived; formal-checked] **The guard of one step and no height is the monotone
-guard**: checkpoints at every step with `h = 0` hold exactly when `f (n+1) ≤ f n − σ n` for every
+/-- [proved-derived; formal-checked] **Intervals of one step with no excursion are strict
+descent**: opening states at every step with `h = 0` hold exactly when `f (n+1) ≤ f n − σ n` for every
 `n`, with `σ ≥ 0`. -/
 theorem checkpoint_one_iff (f σ : ℕ → ℝ) (hσ : ∀ n, 0 ≤ σ n) :
     CheckpointGuard f id 1 0 σ ↔ ∀ n, f (n + 1) ≤ f n - σ n := by
@@ -1598,7 +1756,7 @@ theorem checkpoint_one_iff (f σ : ℕ → ℝ) (hσ : ∀ n, 0 ≤ σ n) :
     · linarith [hf n, hσ n]
     · rw [le_antisymm (Nat.lt_succ_iff.mp hlt) hlo]
 
-/-- [proved-derived; formal-checked] **The checkpoints descend by the certified decreases**:
+/-- [proved-derived; formal-checked] **The opening states descend by the certified decreases**:
 `f (t n) ≤ f 0 − Σ_(b<n) σ b`. -/
 theorem checkpoint_descends {f : ℕ → ℝ} {t : ℕ → ℕ} {W : ℕ} {h : ℝ} {σ : ℕ → ℝ}
     (g : CheckpointGuard f t W h σ) (n : ℕ) :
@@ -1610,7 +1768,7 @@ theorem checkpoint_descends {f : ℕ → ℝ} {t : ℕ → ℕ} {W : ℕ} {h : �
     linarith [g.closes n]
 
 /-- [proved-derived; formal-checked] **No comparison exceeds the opening's by more than the
-height**: in the `n`-th window, `f j ≤ f 0 + h` (with `σ ≥ 0`). -/
+height**: in the `n`-th interval, `f j ≤ f 0 + h` (with `σ ≥ 0`). -/
 theorem excursion_le_start {f : ℕ → ℝ} {t : ℕ → ℕ} {W : ℕ} {h : ℝ} {σ : ℕ → ℝ}
     (g : CheckpointGuard f t W h σ) (hσ : ∀ n, 0 ≤ σ n) {n j : ℕ} (hlo : t n ≤ j)
     (hhi : j ≤ t (n + 1)) : f j ≤ f 0 + h := by
@@ -1619,9 +1777,9 @@ theorem excursion_le_start {f : ℕ → ℝ} {t : ℕ → ℕ} {W : ℕ} {h : �
   have h3 : 0 ≤ ∑ b ∈ Finset.range n, σ b := Finset.sum_nonneg fun b _ => hσ b
   linarith
 
-/-- [proved-derived; formal-checked] **The excursion check on enclosures is sound**: with the
-checkpoint's comparison at least `L` and the successor's at most `U`, `U ≤ L + h` gives
-`f ≤ f_checkpoint + h`; at `h = 0` with strict `<` it is §4's disjoint enclosures. -/
+/-- [proved-derived; formal-checked] **The excursion read on enclosures is sound**: with the
+opening's code length at least `L` and the successor's at most `U`, `U ≤ L + h` gives
+`f ≤ f_opening + h`; at `h = 0` with strict `<` it is §4's disjoint enclosures. -/
 theorem excursion_enclosure {F F' L U h : ℝ} (hF : L ≤ F) (hF' : F' ≤ U) (hcheck : U ≤ L + h) :
     F' ≤ F + h := by
   linarith
@@ -1633,8 +1791,8 @@ theorem checkpoints_sum_le {f : ℕ → ℝ} {t : ℕ → ℕ} {W : ℕ} {h : �
     ∑ b ∈ Finset.range n, σ b ≤ f 0 - m := by
   linarith [checkpoint_descends g n, hm (t n)]
 
-/-- [proved-derived; formal-checked] **Few windows certify much**: with `σ ≥ 0`, at most
-`(f 0 − m)/ε` of the first `n` windows certify `ε` or more. -/
+/-- [proved-derived; formal-checked] **Few intervals certify much**: with `σ ≥ 0`, at most
+`(f 0 − m)/ε` of the first `n` intervals certify `ε` or more. -/
 theorem large_windows_card {f : ℕ → ℝ} {t : ℕ → ℕ} {W : ℕ} {h : ℝ} {σ : ℕ → ℝ}
     (g : CheckpointGuard f t W h σ) (hσ : ∀ n, 0 ≤ σ n) {m : ℝ} (hm : ∀ k, m ≤ f k) {ε : ℝ}
     (n : ℕ) : (((Finset.range n).filter fun b => ε ≤ σ b).card : ℝ) * ε ≤ f 0 - m := by
@@ -1648,11 +1806,12 @@ theorem large_windows_card {f : ℕ → ℝ} {t : ℕ → ℕ} {W : ℕ} {h : �
     exact Finset.sum_le_sum fun b hb => (Finset.mem_filter.mp hb).2
   linarith
 
-/-- [proved-derived; formal-checked] **The schedule's condition**: let each window's certified
+/-- [proved-derived; formal-checked] **The schedule's condition**: let each interval's certified
 decrease be `s b = η b · q b` with steps `η b ≥ 0` whose sum diverges (every bound is passed by some
-partial sum). If the decreases sum below `C`, then `q` falls below every `ε > 0` in windows beyond
-every `N`. With `q b` the window's least certified slope this is the guarded path reaching the
-neighbourhood of `L`'s fixed points; with a summable `η` nothing is certified. -/
+partial sum). If the decreases sum below `C`, then `q` falls below every `ε > 0` in intervals
+beyond every `N`. With `q b` the interval's least certified slope this is the path compared at its
+endpoints reaching the neighbourhood of `L`'s fixed points; with a summable `η` nothing is
+certified. -/
 theorem schedule_frequently_small (η q : ℕ → ℝ) (hη : ∀ b, 0 ≤ η b)
     (hdiv : ∀ C, ∃ n, C < ∑ b ∈ Finset.range n, η b) {C : ℝ}
     (hsum : ∀ n, ∑ b ∈ Finset.range n, η b * q b ≤ C) (hq : ∀ b, 0 ≤ q b) {ε : ℝ} (hε : 0 < ε)
@@ -1680,9 +1839,9 @@ theorem schedule_frequently_small (η q : ℕ → ℝ) (hη : ∀ b, 0 ≤ η b)
     rw [div_lt_iff₀ hε] at hn
     nlinarith
 
-/-- [proved-derived; formal-checked] **A step floor makes the step sum diverge**: every adopted move
-of the ladder moves at least one lattice coordinate, so its step is at least `c > 0` (with the unit
-move's largest entry bounded); then every bound is passed by some partial sum. -/
+/-- [proved-derived; formal-checked] **A step floor makes the step sum diverge**: every adopted step
+of the descent moves at least one lattice coordinate, so its step is at least `c > 0` (with the unit
+step's largest entry bounded); then every bound is passed by some partial sum. -/
 theorem floor_steps_diverge (η : ℕ → ℝ) {c : ℝ} (hc : 0 < c) (hη : ∀ k, c ≤ η k) (C : ℝ) :
     ∃ n, C < ∑ k ∈ Finset.range n, η k := by
   obtain ⟨n, hn⟩ := exists_nat_gt (C / c)
@@ -1694,9 +1853,9 @@ theorem floor_steps_diverge (η : ℕ → ℝ) {c : ℝ} (hc : 0 < c) (hη : ∀
   linarith
 
 /-- [proved-derived; formal-checked] **Under a step floor the slopes themselves are summable**: if
-each window's certified decrease is at least `c · q n` with `c > 0` (a positive margin times the floor
-step), at most `(f 0 − m)/(c ε)` of the first `n` windows have least slope `q ≥ ε`: the slope falls
-below every `ε` in all but finitely many windows. -/
+each interval's certified decrease is at least `c · q n` with `c > 0` (a positive margin times the floor
+step), at most `(f 0 − m)/(c ε)` of the first `n` intervals have least slope `q ≥ ε`: the slope falls
+below every `ε` in all but finitely many intervals. -/
 theorem floor_large_slopes_card {f : ℕ → ℝ} {t : ℕ → ℕ} {W : ℕ} {h : ℝ} {σ q : ℕ → ℝ}
     (g : CheckpointGuard f t W h σ) {c : ℝ} (hc : 0 < c) (hs : ∀ n, c * q n ≤ σ n)
     (hq0 : ∀ n, 0 ≤ q n) {m : ℝ} (hm : ∀ k, m ≤ f k) {ε : ℝ} (n : ℕ) :
@@ -1714,16 +1873,17 @@ theorem floor_large_slopes_card {f : ℕ → ℝ} {t : ℕ → ℕ} {W : ℕ} {h
       mul_le_mul_of_nonneg_left (Finset.mem_filter.mp hb).2 hc.le
   linarith
 
-/-- [proved-derived; formal-checked] **A window of one move must pay its flip from the same move**:
-`f (a+1) ≤ f a − σ` iff the move's flip is at most its fixed-mask decrease less `σ`. The decrease
-was certified before the flip was read, so this window answers no flip. -/
+/-- [proved-derived; formal-checked] **An interval of one step must pay its jump from the same
+step**:
+`f (a+1) ≤ f a − σ` iff the step's jump is at most its held-commitment decrease less `σ`. The decrease
+was certified before the jump was read, so this interval answers no jump. -/
 theorem one_move_closes_iff (f m : ℕ → ℝ) (a : ℕ) (σ : ℝ) :
     f (a + 1) ≤ f a - σ ↔ f (a + 1) - m a ≤ (f a - m a) - σ := by
   constructor <;> intro h <;> linarith
 
-/-- [proved-derived; formal-checked] **A window's length is at least its flips over the largest
-per-move decrease**: if a window from `a` to `b` closes, every move's certified fixed-mask decrease
-is at most `d`, and its flips sum to `F`, then `F + σ ≤ (b − a) d`. -/
+/-- [proved-derived; formal-checked] **An interval's length is at least its jumps over the largest
+per-step decrease**: if an interval from `a` to `b` closes, every step's certified held-commitment
+decrease is at most `d`, and its jumps sum to `F`, then `F + σ ≤ (b − a) d`. -/
 theorem window_length_lower (f m : ℕ → ℝ) {a b : ℕ} (hab : a ≤ b) {σ d : ℝ}
     (hclose : f b ≤ f a - σ) (hd : ∀ k ∈ Finset.Ico a b, f k - m k ≤ d) :
     ∑ k ∈ Finset.Ico a b, (f (k + 1) - m k) + σ ≤ ((b - a : ℕ) : ℝ) * d := by
@@ -1733,16 +1893,47 @@ theorem window_length_lower (f m : ℕ → ℝ) {a b : ℕ} (hab : a ≤ b) {σ 
   rw [Finset.sum_const, Nat.card_Ico, nsmul_eq_mul] at hsum
   linarith
 
-/-- [proved-derived; formal-checked] **A bounded comparison supplies the height**: if every adopted
-comparison lies in `[m, B]`, every window's excursion holds with `h = B − m`, so the height is not a
-free parameter once the comparison is bounded (the entry bound bounds it). -/
+/-- [proved-derived; formal-checked] **A target's term is bounded by its reading's floor**: with the
+target's reading at least `ρ₀ > 0` and its rivals summing to at most `R`,
+`ℓ = log((1 + a + r)/a) ≤ log(1 + (1 + R)/ρ₀)`. -/
+theorem lockFace_le_of_floor {a r ρ₀ R : ℝ} (hρ : 0 < ρ₀) (ha : ρ₀ ≤ a) (hr : 0 ≤ r)
+    (hR : r ≤ R) : lockFace a r ≤ Real.log (1 + (1 + R) / ρ₀) := by
+  have ha0 : 0 < a := hρ.trans_le ha
+  unfold lockFace
+  apply Real.log_le_log (div_pos (by linarith) ha0)
+  have h1 : (1 + a + r) / a = 1 + (1 + r) / a := by field_simp; ring
+  rw [h1]
+  have h2 : (1 + r) / a ≤ (1 + R) / ρ₀ :=
+    div_le_div₀ (by linarith) (by linarith) hρ ha
+  linarith
+
+/-- [proved-derived; formal-checked] **Without a floor the term is unbounded**: for every `B` some
+positive reading `a` has `lockFace a 0 > B`. -/
+theorem lockFace_unbounded (B : ℝ) : ∃ a, 0 < a ∧ B < lockFace a 0 := by
+  refine ⟨Real.exp (-B), Real.exp_pos _, ?_⟩
+  unfold lockFace
+  have he := Real.exp_pos (-B)
+  have h1 : (1 + Real.exp (-B) + 0) / Real.exp (-B) = 1 / Real.exp (-B) + 1 := by
+    field_simp; ring
+  rw [h1]
+  have h2 : Real.log (1 / Real.exp (-B)) = B := by
+    rw [one_div, Real.log_inv, Real.log_exp, neg_neg]
+  have h3 : Real.log (1 / Real.exp (-B)) < Real.log (1 / Real.exp (-B) + 1) :=
+    Real.log_lt_log (by positivity) (by linarith)
+  linarith
+
+/-- [proved-derived; formal-checked] **A bounded code length supplies the excursion**: if every
+admitted code length lies in `[m, B]`, every interval's excursion holds with `h = B − m`. The entry
+bound alone does not bound it: a target's term grows without bound as its reading falls to zero
+(`lockFace_unbounded`). It is bounded with a floor on every target's reading
+(`lockFace_le_of_floor`), which the lattice supplies (`HNN/Floquet.integer_monodromy_floor`). -/
 theorem excursion_of_bounded (f : ℕ → ℝ) (t : ℕ → ℕ) {m B : ℝ} (hm : ∀ k, m ≤ f k)
     (hB : ∀ k, f k ≤ B) (n j : ℕ) : f j ≤ f (t n) + (B - m) := by
   linarith [hm (t n), hB j]
 
-/-- [proved-derived; formal-checked] **A decrease of one grain per window ends the chain**: with
-every `σ n ≥ g > 0`, `n` closed windows need `n g ≤ f 0 − m`, so at most `(f 0 − m)/g` windows
-close: the chain releases at the receiver's grain. -/
+/-- [proved-derived; formal-checked] **A decrease of one grain per interval ends the path**: with
+every `σ n ≥ g > 0`, `n` closed intervals need `n g ≤ f 0 − m`, so at most `(f 0 − m)/g` close:
+the path releases at the receiver's grain. -/
 theorem grain_windows_bounded {f : ℕ → ℝ} {t : ℕ → ℕ} {W : ℕ} {h : ℝ} {σ : ℕ → ℝ}
     (g : CheckpointGuard f t W h σ) {γ : ℝ} (hγ : ∀ n, γ ≤ σ n) {m : ℝ} (hm : ∀ k, m ≤ f k)
     (n : ℕ) : (n : ℝ) * γ ≤ f 0 - m := by
@@ -1752,6 +1943,241 @@ theorem grain_windows_bounded {f : ℕ → ℝ} {t : ℕ → ℕ} {W : ℕ} {h :
   linarith
 
 end ReleaseGuard
+
+/-! ## 13. The flip: where a station's commitment switches, and what the move can certify
+
+Each station is a tick of the receiving ring's clock, and each candidate a class placed there. A
+reading is the bank's growth over one turn of the passage with that class placed, known to the
+receiver only as a cell `[L, U]` of its dyadic bisection at the release's grain. Past the threshold
+(`L_top > 1`) the release commits a station to its dominant class outright, the zero-temperature
+limit of the lock, and the stations commit in order of the gap `g_j = L_top − U_runner`, the
+dominant class's excess multiplier over its strongest rival. Each commitment places a datum the
+later stations read. The **margin** at a refinement is the largest gap less the next (zero at a
+tie), with each committed station's threshold margin `L_top − 1` and gap beside it. Because the
+commitment is all or nothing, a move **flips** (switches a commitment) exactly where a margin's
+value at the cell ends changes sign or a tie splits. The code length then jumps by the comparison
+re-read on the successor's sections against the incumbent's, the second sum of `own_telescopes`: a
+jump set by which data are placed beside which, not by the step's length.
+
+What a native move can certify about it, each statement on one coordinate `η` of the move:
+- **No first-order bound survives a flip on every small step** (`flip_defeats_first_order`): a
+  positive jump present at every `η ∈ (0, δ)` exceeds `own 0 − η s + K η²` for some `η`, whatever
+  `s` and `K`.
+- **A flip at `η_c` needs a curvature constant of its cost over `η_c²`**
+  (`flip_curvature_lower`): `J − η_c (s₁ − s) ≤ K η_c²`.
+- **A margin moving at most `Λ η` certifies no flip below `μ 0 / Λ`** (`no_flip_within_margin`).
+  The chain has no such `Λ` over a segment (this section's record, §3b).
+- **A visible end stays until the true reading reaches its cell's cut, and moves there**
+  (`cell_holds_until_cut`, `cell_moves_at_cut`); the first such step lies anywhere in
+  `(0, w/v]` (`cut_within_cell`), set by the reading's place inside its cell, which the enclosure
+  does not carry. A tie, or a margin within the summed cell widths, can therefore flip at an
+  arbitrarily small step.
+- **A crossing's lock faces cost at most twice the re-read stations' log changes**
+  (`lockFace_sub_abs_le`, `crossing_cost_le`): the jump is read at one constitution, the first
+  carried state past the cut, on both commitment orders, so it does not shrink with the step. Its
+  lock faces' part is bounded by how much the different placed data change the re-read stations'
+  readings, which no owner bounds before the crossing is read; under `LockOrder` the order term's
+  change is read beside it. -/
+
+section Flip
+
+/-- [proved-derived; formal-checked] **A flip on every small step defeats every first-order bound**:
+if `own η = g η + J` on `(0, δ)` with `J > 0`, `own 0 = g 0` and `g` right-continuous at `0`,
+then for every slope `s` and curvature `K` some `η ∈ (0, δ)` has `own 0 − η s + K η² < own η`. -/
+theorem flip_defeats_first_order {own g : ℝ → ℝ} {J δ : ℝ} (hJ : 0 < J) (hδ : 0 < δ)
+    (hflip : ∀ η ∈ Set.Ioo 0 δ, own η = g η + J) (h0 : own 0 = g 0)
+    (hg : ContinuousWithinAt g (Set.Ioi 0) 0) (s K : ℝ) :
+    ∃ η ∈ Set.Ioo 0 δ, own 0 - η * s + K * η ^ 2 < own η := by
+  have hid : Tendsto (fun η : ℝ => η) (𝓝[>] (0 : ℝ)) (𝓝 0) :=
+    tendsto_nhdsWithin_of_tendsto_nhds tendsto_id
+  have hlim : Tendsto (fun η => g η + J - (g 0 - η * s + K * η ^ 2)) (𝓝[>] (0 : ℝ))
+      (𝓝 (g 0 + J - (g 0 - 0 * s + K * 0 ^ 2))) :=
+    ((hg.tendsto.add_const J).sub ((tendsto_const_nhds.sub (hid.mul_const s)).add
+      ((hid.pow 2).const_mul K)))
+  have hval : g 0 + J - (g 0 - 0 * s + K * 0 ^ 2) = J := by ring
+  rw [hval] at hlim
+  have hev := (hlim.eventually (eventually_gt_nhds hJ)).and (Ioo_mem_nhdsGT hδ)
+  obtain ⟨η, hpos, hmem⟩ := hev.exists
+  refine ⟨η, hmem, ?_⟩
+  rw [hflip η hmem, h0]
+  linarith
+
+/-- [proved-derived; formal-checked] **A smooth bound across a flip carries its cost over the
+step squared**: if the own release jumps by `J` at `η` over a continuous part falling at most at
+slope `s₁`, a bound `own η ≤ own 0 − η s + K η²` forces `J − η (s₁ − s) ≤ K η²`. -/
+theorem flip_curvature_lower {own g : ℝ → ℝ} {η J s s₁ K : ℝ} (hflip : own η = g η + J)
+    (h0 : own 0 = g 0) (hg : g 0 - η * s₁ ≤ g η) (hbound : own η ≤ own 0 - η * s + K * η ^ 2) :
+    J - η * (s₁ - s) ≤ K * η ^ 2 := by
+  linarith
+
+/-- [proved-derived; formal-checked] **A margin with a bounded rate certifies no flip within it**:
+if `|μ η − μ 0| ≤ Λ η` for `η ≥ 0`, then `μ η > 0` wherever `Λ η < μ 0`. -/
+theorem no_flip_within_margin {μ : ℝ → ℝ} {Λ : ℝ} (hlip : ∀ η, 0 ≤ η → |μ η - μ 0| ≤ Λ * η)
+    {η : ℝ} (hη : 0 ≤ η) (hmargin : Λ * η < μ 0) : 0 < μ η := by
+  have := (abs_le.mp (hlip η hη)).1
+  linarith
+
+/-- [proved-derived; formal-checked] **A visible end holds until the true reading reaches its
+cell's cut**: on a lattice of width `w`, a reading `x` moving at rate `v > 0` keeps its cell
+`⌊x/w⌋` for every `η` below `(w(⌊x/w⌋ + 1) − x)/v`. -/
+theorem cell_holds_until_cut {w x v : ℝ} (hw : 0 < w) (hv : 0 < v) {η : ℝ} (hη : 0 ≤ η)
+    (hlt : η < (w * (⌊x / w⌋ + 1) - x) / v) : ⌊(x + η * v) / w⌋ = ⌊x / w⌋ := by
+  rw [Int.floor_eq_iff]
+  have hx := Int.floor_le (x / w)
+  have h1 : (⌊x / w⌋ : ℝ) * w ≤ x := by rwa [le_div_iff₀ hw] at hx
+  have h2 : η * v < w * (⌊x / w⌋ + 1) - x := by rwa [lt_div_iff₀ hv] at hlt
+  constructor
+  · rw [le_div_iff₀ hw]; nlinarith
+  · rw [div_lt_iff₀ hw]; nlinarith
+
+/-- [proved-derived; formal-checked] **…and moves to the next cell there.** -/
+theorem cell_moves_at_cut {w x v : ℝ} (hw : 0 < w) (hv : 0 < v) :
+    ⌊(x + (w * (⌊x / w⌋ + 1) - x) / v * v) / w⌋ = ⌊x / w⌋ + 1 := by
+  rw [div_mul_cancel₀ _ hv.ne']
+  have : (x + (w * (⌊x / w⌋ + 1) - x)) / w = ((⌊x / w⌋ + 1 : ℤ) : ℝ) := by
+    push_cast; field_simp; ring
+  rw [this, Int.floor_intCast]
+
+/-- [proved-derived; formal-checked] **The step to the cut lies anywhere in `(0, w/v]`**: it is set
+by the reading's place inside its cell, which the cell's ends do not carry. -/
+theorem cut_within_cell {w x v : ℝ} (hw : 0 < w) (hv : 0 < v) :
+    0 < (w * (⌊x / w⌋ + 1) - x) / v ∧ (w * (⌊x / w⌋ + 1) - x) / v ≤ w / v := by
+  have hx := Int.floor_le (x / w)
+  have hx' := Int.lt_floor_add_one (x / w)
+  have h1 : (⌊x / w⌋ : ℝ) * w ≤ x := by rwa [le_div_iff₀ hw] at hx
+  have h2 : x < (⌊x / w⌋ + 1) * w := by rwa [div_lt_iff₀ hw] at hx'
+  constructor
+  · apply div_pos _ hv; nlinarith
+  · apply div_le_div_of_nonneg_right _ hv.le; nlinarith
+
+/-- [proved-derived; formal-checked] **A lock face moves by at most twice its readings' largest
+log change.** If the target's reading and the rivals' sum each change by at most a factor `e^δ`
+either way, the face `ℓ = log(1 + a + r) − log a` changes by at most `2δ`: `log(1 + a + r)` by at
+most `δ` (the resting weight one only dilutes the change), and `log a` by at most `δ`. -/
+theorem lockFace_sub_abs_le {a r a' r' δ : ℝ} (ha : 0 < a) (hr : 0 ≤ r) (ha' : 0 < a')
+    (hr' : 0 ≤ r') (hδ : 0 ≤ δ) (ha1 : a' ≤ Real.exp δ * a) (ha2 : a ≤ Real.exp δ * a')
+    (hr1 : r' ≤ Real.exp δ * r) (hr2 : r ≤ Real.exp δ * r') :
+    |lockFace a' r' - lockFace a r| ≤ 2 * δ := by
+  have he : 1 ≤ Real.exp δ := Real.one_le_exp hδ
+  have hep : 0 < Real.exp δ := Real.exp_pos δ
+  have hP : 0 < 1 + a + r := by linarith
+  have hP' : 0 < 1 + a' + r' := by linarith
+  have hP1 : 1 + a' + r' ≤ Real.exp δ * (1 + a + r) := by nlinarith
+  have hP2 : 1 + a + r ≤ Real.exp δ * (1 + a' + r') := by nlinarith
+  have hlog : ∀ {x y : ℝ}, 0 < x → 0 < y → x ≤ Real.exp δ * y → Real.log x ≤ δ + Real.log y := by
+    intro x y hx hy hxy
+    have := Real.log_le_log hx hxy
+    rwa [Real.log_mul hep.ne' hy.ne', Real.log_exp] at this
+  have l1 := hlog hP' hP hP1
+  have l2 := hlog hP hP' hP2
+  have l3 := hlog ha' ha ha1
+  have l4 := hlog ha ha' ha2
+  unfold lockFace
+  rw [Real.log_div hP'.ne' ha'.ne', Real.log_div hP.ne' ha.ne', abs_le]
+  constructor <;> linarith
+
+/-- [proved-derived; formal-checked] **A crossing costs at most twice the re-read stations' log
+changes.** A crossing re-reads the stations `D` with different placed data before them. If station
+`j`'s target reading and rivals' sum change by at most a factor `e^(δ j)` between its two contexts,
+the lock faces' part of the jump, `J = Σ_(j∈D) (ℓ′_j − ℓ_j)`, has `|J| ≤ 2 Σ_(j∈D) δ j` (an order
+term, where the comparison carries one, is not covered). -/
+theorem crossing_cost_le {ι : Type*} (D : Finset ι) (a r a' r' δ : ι → ℝ)
+    (ha : ∀ j ∈ D, 0 < a j) (hr : ∀ j ∈ D, 0 ≤ r j) (ha' : ∀ j ∈ D, 0 < a' j)
+    (hr' : ∀ j ∈ D, 0 ≤ r' j) (hδ : ∀ j ∈ D, 0 ≤ δ j)
+    (ha1 : ∀ j ∈ D, a' j ≤ Real.exp (δ j) * a j) (ha2 : ∀ j ∈ D, a j ≤ Real.exp (δ j) * a' j)
+    (hr1 : ∀ j ∈ D, r' j ≤ Real.exp (δ j) * r j) (hr2 : ∀ j ∈ D, r j ≤ Real.exp (δ j) * r' j) :
+    |∑ j ∈ D, (lockFace (a' j) (r' j) - lockFace (a j) (r j))| ≤ 2 * ∑ j ∈ D, δ j := by
+  rw [Finset.mul_sum]
+  refine (Finset.abs_sum_le_sum_abs _ _).trans (Finset.sum_le_sum fun j hj => ?_)
+  exact lockFace_sub_abs_le (ha j hj) (hr j hj) (ha' j hj) (hr' j hj) (hδ j hj) (ha1 j hj)
+    (ha2 j hj) (hr1 j hj) (hr2 j hj)
+
+end Flip
+
+/-! ## 14. The commitment order the readings resolve
+
+Each eligible station's gap (its dominant class's excess multiplier) is enclosed by the readings
+between its certain gap `lo j = L_top − max U`, the least they allow, and its upper end
+`hi j = U_top − max L`, the greatest. Committing only the strictly largest certain gap orders two
+stations whose enclosures overlap by where their cells' cuts fall, a quantity no reading carries.
+(`m7`'s swap is not this case: there the two gaps cross, certified one way at the incumbent and the
+other way at the successor, the case `certified_order_needs_crossing` names.) Two gaps whose
+enclosures overlap have no order at the receiver's resolution, so their commitments are simultaneous for it, as two events closer than one tick have no order on
+that clock. The release's other decisions (a top exceeds its rivals, a station passes its
+threshold) are orderings the enclosures resolve; read the same way, a station is below the largest
+only when its upper end is below the largest certain gap. **A station commits when no station's
+certain gap exceeds its upper end** (`certifiedLock`). Then:
+- the station of the largest certain gap locks, so the rule is a nonempty lock set wherever one
+  station is eligible (`certifiedLock_largest`), and §8's decisions law applies unchanged;
+- the true largest gap always locks (`leader_locks`);
+- a station that locks alone has the strictly largest true gap (`lone_lock_is_largest`), so a
+  station certified below another at one state locks alone at a later one only if their true gaps
+  cross (`certified_order_needs_crossing`);
+- on exact readings it is the largest gap with its ties, the rule as it stood
+  (`certifiedLock_exact`);
+- the comparison's order term reads the same two ends, the right station's certain gap against each
+  wrong station's upper end, so where it is solved no wrong station locks
+  (`order_solved_locks_no_wrong`): one law for the release and the term. -/
+
+section CertifiedLock
+
+variable {ι : Type*}
+
+/-- [definition; agent-inferred, October 2] **A station commits when no station's certain gap
+exceeds its upper end.** Inferred: the release reads its other orderings of enclosures only where they
+are certified and an uncertified one plural, and this reads the gap order the same way; no owner
+states that convention for the gap order. -/
+def certifiedLock (lo hi : ι → ℝ) (j : ι) : Prop := ∀ i, lo i ≤ hi j
+
+/-- [proved-derived; formal-checked] **The station of the largest certain gap locks.** -/
+theorem certifiedLock_largest {lo hi : ι → ℝ} (hlohi : ∀ i, lo i ≤ hi i) {k : ι}
+    (hk : ∀ i, lo i ≤ lo k) : certifiedLock lo hi k :=
+  fun i => (hk i).trans (hlohi k)
+
+/-- [proved-derived; formal-checked] **The true largest gap always locks**: with every true gap
+`g i ∈ [lo i, hi i]`, a station whose true gap is the largest locks. -/
+theorem leader_locks {lo hi g : ι → ℝ} (hlo : ∀ i, lo i ≤ g i) (hhi : ∀ i, g i ≤ hi i) {k : ι}
+    (hk : ∀ i, g i ≤ g k) : certifiedLock lo hi k :=
+  fun i => (hlo i).trans ((hk i).trans (hhi k))
+
+/-- [proved-derived; formal-checked] **On exact readings the rule is the largest gap with its
+ties.** -/
+theorem certifiedLock_exact {g : ι → ℝ} {j : ι} : certifiedLock g g j ↔ ∀ i, g i ≤ g j :=
+  Iff.rfl
+
+/-- [proved-derived; formal-checked] **A station that locks alone has the strictly largest true
+gap.** -/
+theorem lone_lock_is_largest [Finite ι] [Nonempty ι] {lo hi g : ι → ℝ} (hlo : ∀ i, lo i ≤ g i)
+    (hhi : ∀ i, g i ≤ hi i) {k : ι} (hlone : ∀ j, j ≠ k → ¬ certifiedLock lo hi j) :
+    ∀ j, j ≠ k → g j < g k := by
+  obtain ⟨m, hm⟩ := Finite.exists_max g
+  have hmk : m = k := by
+    by_contra h
+    exact hlone m h (leader_locks hlo hhi hm)
+  subst hmk
+  intro j hj
+  obtain ⟨i, hi⟩ := not_forall.mp (hlone j hj)
+  linarith [hhi j, hlo i, hm i, lt_of_not_ge hi]
+
+/-- [proved-derived; formal-checked] **A resolved order is swapped only by a crossing**: if `j`'s
+upper end is below `k`'s certain gap at one state and `j` locks alone at another, the true gaps
+cross: `g j < g k` before and `g′ k < g′ j` after. -/
+theorem certified_order_needs_crossing [Finite ι] [Nonempty ι] {lo hi g lo' hi' g' : ι → ℝ}
+    (hlo : ∀ i, lo i ≤ g i) (hhi : ∀ i, g i ≤ hi i) (hlo' : ∀ i, lo' i ≤ g' i)
+    (hhi' : ∀ i, g' i ≤ hi' i) {j k : ι} (hjk : j ≠ k) (hbelow : hi j < lo k)
+    (hlone : ∀ i, i ≠ j → ¬ certifiedLock lo' hi' i) : g j < g k ∧ g' k < g' j :=
+  ⟨by linarith [hhi j, hlo k], lone_lock_is_largest hlo' hhi' hlone k (Ne.symm hjk)⟩
+
+/-- [proved-derived; formal-checked] **The order term solved commits no wrong station**: the right
+station `r`'s certain gap past the wrong stations' upper ends together (each nonnegative) leaves
+every wrong station `j`'s upper end short of `r`'s certain gap, so none commits. This is the order term's solved
+level (`hnn::executed::OrderTerm`) on the rule `certifiedLock`. -/
+theorem order_solved_locks_no_wrong {lo hi : ι → ℝ} (W : Finset ι) (r : ι)
+    (hhi : ∀ j ∈ W, 0 ≤ hi j) (hsolved : ∑ j ∈ W, hi j < lo r) :
+    ∀ j ∈ W, ¬ certifiedLock lo hi j := fun _ hj hlock =>
+  absurd ((hlock r).trans (Finset.single_le_sum hhi hj)) (not_le.mpr hsolved)
+
+end CertifiedLock
 
 section Audit
 
@@ -1782,6 +2208,8 @@ section Audit
 #print axioms lockFace_covector
 #print axioms lockFace_share_lt_one
 #print axioms decisions_release_the_section
+#print axioms lockFace_periods_hinge
+#print axioms lockFace_per_period_tendsto
 #print axioms lockTerm_eq
 #print axioms lockTerm_mono
 #print axioms lockTerm_line
@@ -1831,8 +2259,24 @@ section Audit
 #print axioms floor_large_slopes_card
 #print axioms one_move_closes_iff
 #print axioms window_length_lower
+#print axioms lockFace_le_of_floor
+#print axioms lockFace_unbounded
 #print axioms excursion_of_bounded
 #print axioms grain_windows_bounded
+#print axioms flip_defeats_first_order
+#print axioms flip_curvature_lower
+#print axioms no_flip_within_margin
+#print axioms cell_holds_until_cut
+#print axioms cell_moves_at_cut
+#print axioms cut_within_cell
+#print axioms certifiedLock_largest
+#print axioms leader_locks
+#print axioms certifiedLock_exact
+#print axioms lone_lock_is_largest
+#print axioms certified_order_needs_crossing
+#print axioms lockFace_sub_abs_le
+#print axioms crossing_cost_le
+#print axioms order_solved_locks_no_wrong
 
 end Audit
 

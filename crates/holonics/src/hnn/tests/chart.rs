@@ -237,6 +237,80 @@ fn the_carrier_refuses_a_sum_past_its_certificate() {
     ));
 }
 
+/// The certificate's refusal depends on the terms alone (Lean `HNN/LatticeWord.{foldl_certify,
+/// Reduction.order_free, Reduction.refused_iff, Reduction.read_of_bound_lt}`): the host's pass is
+/// the left comb of the certificate's saturated addition, so every order of the same terms is
+/// refused or admitted alike, as the card's block tree is. The terms `2^k`, `k = 0, …, 126`, sum to
+/// `2^127 − 1`: admitted in every order tried, and read as that integer. One more unit term reaches
+/// `2^127`: refused in every order. `2^126 − 2^125 − 2^125` is refused in every order although its
+/// value is zero.
+#[test]
+fn the_carriers_refusal_depends_on_the_terms_not_their_order() {
+    let power = |k: u32| BigInt::one() << k;
+    // 2^k as a product of two signed 64-bit words.
+    let factors = |k: u32| -> (BigInt, BigInt) {
+        match k {
+            0..=124 => {
+                let q = k.min(62);
+                (power(q), power(k - q))
+            }
+            125 => (-power(63), -power(62)),
+            _ => (-power(63), -power(63)),
+        }
+    };
+    // The terms read in `order`, as one row of a chart on `2^0ℤ` against an integral operand.
+    let read = |terms: &[(BigInt, BigInt)], order: &[usize]| {
+        let coordinates: Vec<BigInt> = order.iter().map(|&j| terms[j].0.clone()).collect();
+        let operand: Vec<Rat> = order
+            .iter()
+            .map(|&j| Rat::from_integer(terms[j].1.clone()))
+            .collect();
+        ChartWords::of_coordinates(1, order.len(), 0, &coordinates)
+            .unwrap()
+            .apply(&operand)
+    };
+    // `j ↦ m·j mod n` for `m` prime to `n`: a permutation of the terms.
+    let orders = |n: usize, multipliers: &[usize]| -> Vec<Vec<usize>> {
+        multipliers
+            .iter()
+            .map(|&m| (0..n).map(|j| j * m % n).collect())
+            .collect()
+    };
+    let mut terms: Vec<(BigInt, BigInt)> = (0..=126).map(factors).collect();
+    let below = Rat::from_integer((power(127)) - 1);
+    // 127 is prime, so every multiplier below it permutes.
+    for order in orders(127, &[1, 3, 5, 77, 126]) {
+        assert_eq!(read(&terms, &order).unwrap(), vec![below.clone()]);
+    }
+    terms.push((BigInt::one(), BigInt::one()));
+    // Odd multipliers permute 128 terms.
+    for order in orders(128, &[1, 3, 5, 77, 127]) {
+        assert!(matches!(
+            read(&terms, &order),
+            Err(HnnError::Carrier { .. })
+        ));
+    }
+    let cancelling = [
+        factors(126),
+        (-(power(63)), power(62)),
+        (power(62), -(power(63))),
+    ];
+    let every = [
+        [0, 1, 2],
+        [0, 2, 1],
+        [1, 0, 2],
+        [1, 2, 0],
+        [2, 0, 1],
+        [2, 1, 0],
+    ];
+    for order in every {
+        assert!(matches!(
+            read(&cancelling, &order),
+            Err(HnnError::Carrier { .. })
+        ));
+    }
+}
+
 /// A resident's warm start (the lattice word): operands read at a cut refine every chart and keep it;
 /// read again at the same constitution they start warm, take no step and execute the same charts,
 /// so a read at an unchanged operator returns the same word.

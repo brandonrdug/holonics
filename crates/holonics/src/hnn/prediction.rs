@@ -24,13 +24,13 @@
 //!   terrain knows `T` (the notebook's `hnn_prediction … executed` terrains, order-2, the alternation
 //!   and the line).
 //! - **Learning** is the release's own comparison (`hnn::executed`): the bank's class, threshold,
-//!   order and section predicates along the machine's own trajectory, pulled back to `E` through the
-//!   executed monodromy's eigen-derivative, and a carried update adopted only under its commit
-//!   guards. The lock iteration has one owner, [`bank_release`], which generation and the comparison
-//!   both read.
-//! - **No window anywhere.** The path reads the request only through its phase-carried moment and
-//!   the section only through its own placement (below); it reads no landmark tree, no suffix
-//!   address, no copy stage and no byte context.
+//!   order and section predicates along the machine's own trajectory, pulled back to `E` through
+//!   the executed monodromy's eigen-derivative, and a carried update adopted only where its re-read
+//!   comparison is certified lower. The lock iteration has one owner, [`bank_release`], which
+//!   generation and the comparison both read.
+//! - **No datum is cut off by its age.** The path reads the request only through its phase-carried
+//!   moment and the section only through its own placement (below); it reads no landmark tree, no
+//!   suffix address, no copy stage and no byte context.
 //!
 //! [historical; September 30, batch H] **The linear readout and the bank's face are retired from
 //! Rust** (source at [`f5fd8f3b`](https://github.com/brandonrdug/holonics/blob/f5fd8f3b/crates/holonics/src/hnn/prediction.rs);
@@ -54,7 +54,7 @@
 //! residues and relative phases.** The located failure: every station read one ring's placement
 //! through one map, so the section saw a residue histogram, the table without its index, and each
 //! station's top class was read alone; its best reading was the marginal. The repair has two parts,
-//! neither a window nor a table of pairs:
+//! neither a cut-off of earlier cells nor a table of pairs:
 //!
 //! - **Remainders: the joint residue class.** Each datum is placed on the receiving ring's spectrum
 //!   at its residue ([`SourceMoment`], `m = Σ_k Ĝ(τ_k)⁻¹ E u_k`, unchanged). A field declares that
@@ -72,13 +72,14 @@
 //!   its one population ([`SourceMoment::continued`], [`BankPlacement`]; below), so a station reads
 //!   its neighbours' locked data, and the request's last cells, by their relative phases. Generation
 //!   opens with nothing locked and refines: in each refinement every unlocked station is read jointly,
-//!   and the stations whose top candidate leads its runner-up by the largest gap lock together (no
-//!   positive gap is a plural reading); a locked datum re-enters as placed data and drives the
+//!   and the stations whose top candidate leads its runner-up by the largest gap lock together, a
+//!   gap the readings do not certify below the largest locking with it (no positive gap is a
+//!   plural reading); a locked datum re-enters as placed data and drives the
 //!   others. It stops when every station is locked (released at width zero) or no unlocked station
 //!   has a positive gap (held, typed). A training comparison over a drawn partition ([`mask`]) places
 //!   the locked stations' targets and compares the others, so no station reads its own target. The
-//!   lock's order is the field's own (the largest drive locks first, ties together); it is not an
-//!   output index, and a locked station is never redrawn.
+//!   lock's order is the field's own (the largest drive locks first, the stations not certified
+//!   below it together); it is not an output index, and a locked station is never redrawn.
 //!
 //! [definition; agent-inferred, September 30; the
 //! [placement's record](../../../../research/records/2026-09-30_THE_PASSAGE_LAW_THE_SECTION_CONTINUES_THE_REQUEST_AND_THE_TRANSPORT_WEIGHS_ITS_FRONTIER.md)]
@@ -99,7 +100,7 @@
 //! every crossing's term in the bank's phase-carried reading has the same modulus at every lag
 //! (`lossless_term_modulus`), so no reading marks the span's frontier, where a continuation's seed
 //! lies; the transport's dissipation weighs the term at lag `r` by `ρ^r` (`dissipative_term_modulus`)
-//! and marks it. The weights are not a window: every crossing enters and none is dropped by length.
+//! and marks it. The weights cut nothing off: every crossing enters and none is dropped by length.
 //!
 //! [definition; agent-inferred, September 30; the
 //! [re-entry diagnosis](../../../../research/records/2026-09-30_THE_RE_ENTRY_DIAGNOSED_A_LATER_LOCK_TAKES_THE_SPANS_MASS_AND_QUENCHES_THE_EARLIER_STATIONS.md)
@@ -138,9 +139,13 @@
 //!   member) and its joint growth, enclosed exactly;
 //! - **the lock's flip**: a station's top candidate reads a growth strictly above every other
 //!   candidate's (`θ = a/(a + K) > ½ ⇔ a > K`, on exact enclosures) and the bank locks there (its
-//!   growth certified past one); its gap is the top's `lower` less the largest other `upper`; the
-//!   stations of the largest gap lock together, each lock's reading certified (every member's
-//!   Floquet certificate at the joint growth, the executed turn's balances);
+//!   growth certified past one); its gap is enclosed by the top's `lower` less the largest other
+//!   `upper` (the certain gap) and the top's `upper` less the largest other `lower` (its upper end); a
+//!   station locks when its upper end meets the largest certain gap, so every station the readings do
+//!   not certify below the largest locks with it (exact ties when the readings are exact; the
+//!   [flip record](../../../../research/records/2026-10-02_A_FLIP_IS_SET_BY_THE_LOCK_RULES_MARGIN_AND_NO_LAW_IN_THE_CHAIN_CERTIFIES_IT_BEFORE_THE_SUCCESSOR_IS_READ.md)
+//!   §5), each lock's reading certified (every member's Floquet certificate at the joint growth,
+//!   the executed turn's balances);
 //! - **the release**: every station locked, at width zero through `receiver::release`; no station
 //!   with a positive gap, held with the unlocked stations plural;
 //! - **one owner** [agent-inferred, September 30]: the lock iteration is [`bank_release`], which
@@ -149,11 +154,12 @@
 //!   release executes;
 //! - **a refused certificate refuses the release** [proved-derived, September 30]: a lock whose
 //!   Floquet certificate is refused stops the release, held with the refused station first
-//!   ([`BankGeneration::uncertified`]). A certificate is a commit guard, never a tally (the
-//!   diagnosis record §4): the certificate is read at the reading's upper end strictly outside every
-//!   multiplier (Schur–Cohn), where the exact Stein solve of the exact monodromy always certifies
-//!   (its operator's eigenvalues `μ_iμ_j − ρ²` are nonzero and its solution `Σ_k (M/ρ)^(kᵀ)(M/ρ)^k`
-//!   is positive definite), so a refusal can only mean the reading is wrong.
+//!   ([`BankGeneration::uncertified`]). A certificate decides whether the lock stands, never a
+//!   tally (the diagnosis record §4): the certificate is read at the reading's upper end strictly
+//!   outside every multiplier (Schur–Cohn), where the exact Stein solve of the exact monodromy
+//!   always certifies (its operator's eigenvalues `μ_iμ_j − ρ²` are nonzero and its solution
+//!   `Σ_k (M/ρ)^(kᵀ)(M/ρ)^k` is positive definite), so a refusal can only mean the reading is
+//!   wrong.
 //!
 //! **Every modality reads it the same way**: the bank reads the ring's storage, which holds any
 //! chart's classes through `E` at their residues; an image's pixels at their scan ticks and an
@@ -169,6 +175,7 @@
 //! | the passage's transported and station-framed weights | `HNN/IndexedOpen.{transportedWeight, framedWeight, framed_weight_mass, framed_weight_one_sided, framed_weight_le_pow}` | [`BankPlacement`] |
 //! | a landing's normalization and entry, read apart (loop 1c's diagnostic, never a law) | `HNN/IndexedOpen.{transported_weight_insert, transported_weight_insert_scale}` | [`BankPlacement::storage_over`] |
 //! | the release's order read as a diagnostic factor (the law is [`LockOrder::Gap`]) | abstracted in `HNN/ExecutedComparison.decisions_release_the_section` | [`LockOrder`], [`bank_release_ordered`] |
+//! | the lock set: every station the readings do not certify below the largest gap | `HNN/ExecutedComparison.{certifiedLock_largest, leader_locks, lone_lock_is_largest, certified_order_needs_crossing, certifiedLock_exact}` | [`uncertified_largest`] |
 
 use num_bigint::BigInt;
 use num_traits::{One, Signed, ToPrimitive, Zero};
@@ -392,8 +399,8 @@ pub fn mask(draw: &mut Draw, stations: usize) -> Vec<bool> {
 /// readings made, and at every lock the bank's certificate (the members certified at the locked
 /// reading's growth, and the executed turn's ticks whose balance closed, of those run), with each
 /// lock's station, class, growth and runner-up growth; and the lock whose Floquet certificate was
-/// refused, if one was, where the release stopped and held (September 30: a refused certificate is
-/// a commit guard, never a tally).
+/// refused, if one was, where the release stopped and held (September 30: a refused certificate
+/// refuses the lock, never a tally).
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct BankGeneration {
     pub release: SectionRelease,
@@ -455,7 +462,8 @@ impl JointGrowth for TurnCovector {
 /// ([`ReceivingBank::read_turn`]). A station's reading is the lock's flip: its top candidate's joint
 /// growth exceeds every other candidate's exactly ([`Growth::exceeds`], `θ = a/(a + K) > ½`) and the
 /// bank locks there ([`Growth::is_locked`]); its gap is the top's `lower` less the largest other
-/// `upper`. Every station of the largest positive gap locks (ties together), its reading certified
+/// `upper`, its upper end the top's `upper` less the largest other `lower`. Every station whose upper end
+/// meets the largest positive gap locks (the readings do not order it below), its reading certified
 /// ([`ReceivingBank::certify_turn`]); a locked datum is placed for the next refinement. It stops when
 /// every station is locked, released at width zero through `receiver::release` (`section_release`),
 /// or when no unlocked station has a positive gap, held with them plural, or when a lock's
@@ -493,7 +501,8 @@ pub fn generate_by_bank(
 /// [definition; agent-inferred, September 30] **The bank's lock iteration, its one owner**
 /// ([`generate_by_bank`]'s law, read by the release's own comparison `hnn::executed` with each
 /// candidate's covector): every refinement reads every open candidate by `read`, decides each
-/// open station's lock's flip and gap, locks the stations of the largest positive gap together,
+/// open station's lock's flip and gap, locks together the stations not certified below the largest
+/// positive gap,
 /// certifies each lock's reading, and stops at the whole section, at a plural refinement, or at a
 /// refused certificate. With `keep`, each refinement's readings are returned.
 pub fn bank_release<R: JointGrowth + Send + Sync>(
@@ -511,7 +520,8 @@ pub fn bank_release<R: JointGrowth + Send + Sync>(
 /// [definition; agent-inferred, loop 1c's
 /// [pin](../../../../research/records/2026-10-01_LOOP_1C_PERSISTENCE_REPRESENTATION_AND_REACH_PINNED_BEFORE_ITS_RUNS.md)
 /// §2.4] **Which eligible stations a refinement locks.** The release's law is [`LockOrder::Gap`]:
-/// the stations of the largest positive gap, together (the field's own order). The other two are
+/// the stations whose gap the readings do not certify below the largest, together (the field's
+/// own order). The other two are
 /// diagnostics of the release's order, never a law: among the same eligible stations (each top's
 /// flip and lock certified, its gap positive) a refinement locks the one of least station index
 /// ([`LockOrder::Ascending`], the receiving ring's clock direction from the request's last tick) or
@@ -519,12 +529,36 @@ pub fn bank_release<R: JointGrowth + Send + Sync>(
 /// certificates and the stopping rules are the release's own under every order.
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub enum LockOrder {
-    /// The release's law: the stations of the largest positive gap lock together.
+    /// The release's law: the stations not certified below the largest positive gap lock together.
     Gap,
     /// A diagnostic: the eligible station of least index locks alone.
     Ascending,
     /// A diagnostic: the eligible station of greatest index locks alone.
     Descending,
+}
+
+/// [definition; agent-inferred, October 2; its consequences proved-derived, formal-checked] **The
+/// stations the readings do not certify below the largest gap** ([`LockOrder::Gap`]): each eligible station's gap is enclosed by its certain
+/// gap `L_top − max_(x≠top) U_x` and its upper end `U_top − max_(x≠top) L_x`; a station locks when its
+/// upper end meets the largest certain gap. The station of the largest certain gap always locks, so a
+/// refinement with an eligible station locks one (Lean
+/// `HNN/ExecutedComparison.certifiedLock_largest`); the true largest gap always locks
+/// (`leader_locks`); a station that locks alone has the strictly largest true gap
+/// (`lone_lock_is_largest`), so no move makes a station certified below another lock alone before it
+/// unless their true gaps cross (`certified_order_needs_crossing`). On exact readings it is the
+/// largest gap with its ties (`certifiedLock_exact`). The comparison's order term reads the same
+/// two ends (`hnn::executed::OrderTerm`; `order_solved_locks_no_wrong`).
+pub(crate) fn uncertified_largest(gaps: &[(usize, usize, Rat)], gap_uppers: &[Rat]) -> Vec<usize> {
+    let largest = gaps.iter().map(|(_, _, gap)| gap).max();
+    match largest {
+        Some(largest) => gaps
+            .iter()
+            .zip(gap_uppers)
+            .filter(|(_, gap_upper)| *gap_upper >= largest)
+            .map(|(&(station, _, _), _)| station)
+            .collect(),
+        None => Vec::new(),
+    }
 }
 
 /// **The bank's lock iteration under a declared order** ([`bank_release`] at [`LockOrder::Gap`];
@@ -606,8 +640,10 @@ fn release_iteration<R: JointGrowth + Send + Sync>(
             .collect::<Result<Vec<_>, HnnError>>()?;
         refinements += 1;
         readings += read.len();
-        // Each unlocked station's lock's flip: its top candidate and gap.
+        // Each unlocked station's lock's flip: its top candidate and its gap's enclosure, the
+        // certain gap `L_top − max U` (the gap read) and its upper end `U_top − max L`.
         let mut gaps: Vec<(usize, usize, Rat)> = Vec::new();
+        let mut gap_uppers: Vec<Rat> = Vec::new();
         let mut station_tops = Vec::new();
         for (index, chunk) in read.chunks(alphabet).enumerate() {
             let station = open[index * alphabet].0;
@@ -635,21 +671,20 @@ fn release_iteration<R: JointGrowth + Send + Sync>(
                     Some(runner) => &top.lower - runner,
                     None => top.lower.clone(),
                 };
+                let floor = (0..alphabet)
+                    .filter(|&class| class != best)
+                    .map(|class| chunk[class].joint().lower.clone())
+                    .max();
+                let gap_upper = match &floor {
+                    Some(floor) => &top.upper - floor,
+                    None => top.upper.clone(),
+                };
                 gaps.push((station, best, gap));
+                gap_uppers.push(gap_upper);
             }
         }
         let now: Vec<usize> = match order {
-            LockOrder::Gap => {
-                let largest = gaps.iter().map(|(_, _, gap)| gap.clone()).max();
-                match &largest {
-                    Some(largest) => gaps
-                        .iter()
-                        .filter(|(_, _, gap)| gap == largest)
-                        .map(|&(station, _, _)| station)
-                        .collect(),
-                    None => Vec::new(),
-                }
-            }
+            LockOrder::Gap => uncertified_largest(&gaps, &gap_uppers),
             LockOrder::Ascending => gaps.iter().map(|&(station, _, _)| station).min().into_iter().collect(),
             LockOrder::Descending => gaps.iter().map(|&(station, _, _)| station).max().into_iter().collect(),
         };
@@ -674,10 +709,10 @@ fn release_iteration<R: JointGrowth + Send + Sync>(
                     ticks_closed += certificate.closed;
                     ticks += certificate.ticks;
                 }
-                // A refused certificate refuses the lock and the release (a commit guard): with
-                // the reading's upper end strictly outside every multiplier, the exact Stein solve
-                // of the exact monodromy always certifies, so a refusal can only mean the reading
-                // itself is wrong.
+                // A refused certificate refuses the lock and the release: with the reading's upper
+                // end strictly outside every multiplier, the exact Stein solve of the exact
+                // monodromy always certifies, so a refusal can only mean the reading itself is
+                // wrong.
                 Err(HnnError::UncertifiedFloquet { .. }) => {
                     uncertified = Some((station, class));
                     break;
@@ -775,9 +810,8 @@ fn release_iteration<R: JointGrowth + Send + Sync>(
 /// - **a datum `r ≥ 1` ticks from `j` weighs at most `ρ^r`** of `j`'s span, the candidate's own
 ///   datum weighing one before the normalization (`framed_weight_le_pow`), so a far lock no longer
 ///   quenches an earlier station;
-/// - **every datum enters**, none is dropped by its distance or the span's length (no window), and
-///   each station's normalization is its own systolic reduction over the same carried powers
-///   `ρ^r`;
+/// - **every datum enters**, none is dropped by its distance or the span's length, and each
+///   station's normalization is its own systolic reduction over the same carried powers `ρ^r`;
 /// - **every modality reads it the same way**: the law reads only the distance between two ticks
 ///   of the ring's clock; a text cell, an image pixel at its scan tick (its row neighbours at
 ///   distance one on either side, the pixels one row away at the row's width), an acoustic sample
@@ -1016,6 +1050,31 @@ impl BankPlacement {
         storage
     }
 
+    /// The storage's derivative in the modulus rebuilt from each datum's reach slope,
+    /// `Σ_k (ρ^(r_k)/M) s_k read_k` ([`BankPlacement::reach_slopes`] against
+    /// [`BankPlacement::modulus_derivative`], the owner's test).
+    #[cfg(test)]
+    pub(crate) fn reach_derivative(&self, station: usize, cells: &[Option<usize>]) -> Vec<Rat> {
+        let mass = self.mass(station, cells);
+        let (request, section) = self.reach_slopes(station, cells);
+        let mut derivative = vec![Rat::zero(); self.pairs.len()];
+        let mut add = |distance: u64, slope: &Rat, read: &[Rat]| {
+            let factor = &self.powers[distance as usize] / &mass * slope;
+            for (value, x) in derivative.iter_mut().zip(read) {
+                *value += x * &factor;
+            }
+        };
+        for ((lag, _, read), slope) in self.reads.iter().zip(&request) {
+            add(Self::request_distance(station, *lag), slope, read);
+        }
+        for (placed, (cell, slope)) in cells.iter().zip(&section).enumerate() {
+            if let (Some(class), Some(slope)) = (cell, slope) {
+                add(Self::station_distance(station, placed), slope, &self.images[placed][*class]);
+            }
+        }
+        derivative
+    }
+
     /// The storage read from a station at the exact transported weights at a modulus (no chart):
     /// the test's reference for [`BankPlacement::modulus_derivative`].
     #[cfg(test)]
@@ -1084,6 +1143,54 @@ impl BankPlacement {
             }
         }
         derivative
+    }
+
+    /// [definition; agent-inferred, October 2; the
+    /// [joined move's record](../../../../research/records/2026-10-02_THE_TRANSPORT_MODULUS_JOINS_THE_RECEIVERS_MINIMUM_ENERGY_MOVE.md)]
+    /// **Each datum's reach slope** read from a station, aligned with [`BankPlacement::weights`]:
+    /// `s_k = (r_k − r̄)/ρ`, the log-derivative of datum `k`'s transported weight in the modulus,
+    /// `∂w_k/∂ρ = w_k s_k` (the factor [`BankPlacement::modulus_derivative`] applies), with `r̄` the
+    /// span's weighted mean distance at the exact weights. Each slope is held at the derivative's
+    /// grain. The request's phases come first, then the placed stations (`None` where unplaced).
+    #[allow(clippy::type_complexity)]
+    pub fn reach_slopes(
+        &self,
+        station: usize,
+        cells: &[Option<usize>],
+    ) -> (Vec<Rat>, Vec<Option<Rat>>) {
+        let data = self.data(station, cells);
+        let mass: Rat = data
+            .iter()
+            .map(|(distance, count, _)| &self.powers[*distance as usize] * count)
+            .sum();
+        let mean: Rat = data
+            .iter()
+            .map(|(distance, count, _)| {
+                &self.powers[*distance as usize] * count * Rat::from_integer(BigInt::from(*distance))
+            })
+            .sum::<Rat>()
+            / &mass;
+        let slope = |distance: u64| -> Rat {
+            let x = (Rat::from_integer(BigInt::from(distance)) - &mean) / &self.modulus;
+            if x.is_zero() {
+                x
+            } else if x.is_negative() {
+                -crate::holon::deposition::significant(&-x, DERIVATIVE_BITS, false)
+            } else {
+                crate::holon::deposition::significant(&x, DERIVATIVE_BITS, false)
+            }
+        };
+        (
+            self.reads
+                .iter()
+                .map(|(lag, _, _)| slope(Self::request_distance(station, *lag)))
+                .collect(),
+            cells
+                .iter()
+                .enumerate()
+                .map(|(placed, cell)| cell.map(|_| slope(Self::station_distance(station, placed))))
+                .collect(),
+        )
     }
 }
 

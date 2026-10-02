@@ -185,16 +185,17 @@
 //! [proved-derived; implemented-exact] **The relative phase is read by the pump**
 //! ([`ReceivingBank`], [`BankReading`]; Lean `reflection_mul_reflection`,
 //! `reflection_pair_trace_carriers`, `no_linear_threshold_reads_relative_phase`). A relative phase
-//! `Re(z_a z̄_b)` is even under the half-turn, so no linear reading followed by a threshold reads it.
-//! The law's quadratic place is the pump: two ticks whose carriers the crossing cells modulate
+//! `Re(z_a z̄_b)` is even under the half-turn, so no linear reading followed by a threshold reads
+//! it. The law's quadratic place is the pump: two ticks whose carriers the crossing cells modulate
 //! compose two reflections, whose product is the turn by the cells' relative phase (trace
-//! `2Re(c_a c̄_b)`), the square law; the bifurcation is the threshold. A bank of receiving parametrons
-//! at declared pump phases (member `j`: axis `1`, step `i^j`, carriers `(c_e, i^j c_l)`) locks at the
-//! member whose declared phase aligns the two cells, and every other member is certified silent; its
-//! class is that member. [agent-inferred] The bank's strength sits in its lock window: the aligned
-//! member grows exactly past the standing bifurcation (its two ticks are the standing pump's), and
-//! the nearest misaligned member only past a strength bracketed in development in
-//! `(361/512, 725/1024]`; the declared `p = 5/8` lies between.
+//! `2Re(c_a c̄_b)`), the square law; the bifurcation is the threshold. A bank of receiving
+//! parametrons at declared pump phases (member `j`: axis `1`, step `i^j`, carriers
+//! `(c_e, i^j c_l)`) locks at the member whose declared phase aligns the two cells, and every other
+//! member is certified silent; its class is that member. [agent-inferred] The bank's pump strength
+//! sits in its locking range, the strengths at which the aligned member grows and no misaligned
+//! member does: the aligned member grows exactly past the standing bifurcation (its two ticks are
+//! the standing pump's), and the nearest misaligned member only past a strength bracketed in
+//! development in `(361/512, 725/1024]`; the declared `p = 5/8` lies between.
 //!
 //! [proved-derived; implemented-exact, September 29] **The passage's monodromy: the bank reads a
 //! superposed passage** ([`ReceivingBank::read_turn`], [`turn`], [`Growth`]; Lean
@@ -1829,7 +1830,24 @@ fn strictly_inside(characteristic: &RationalPolynomial, radius: &Rat) -> bool {
 /// cheap to test), bisected there to the grain, then certified on `q` itself by two exact tests:
 /// what the shift attains is trusted nowhere. A bracket the exact tests refuse falls back to the
 /// exact bracket and bisection.
+///
+/// [proved-derived; formal-checked] **The lattice's floor.** `N` is an integer matrix, so a
+/// monodromy with any nonzero multiplier has `ρ(M) ≥ 1/Δ` (Lean
+/// `HNN/Floquet.integer_monodromy_floor` for an invertible `N`; the singular case by the same
+/// argument on the nonzero multipliers, owed in #62). Only a nilpotent `N` (every coefficient below
+/// the leading one zero) has its growth below `1/Δ`, and then every multiplier is zero: its growth
+/// is the floor's cell `[0, 1/Δ)`, read without bisection, which would halve toward zero without
+/// end. A target read there has no finite code length and its lock face is refused
+/// ([`crate::hnn::executed::lock_face`]).
 pub(crate) fn growth_of(characteristic: &[BigInt], scale: &BigInt, grain: u32) -> Growth {
+    if let Some((_, below)) = characteristic.split_last()
+        && below.iter().all(Zero::is_zero)
+    {
+        return Growth {
+            lower: Rat::zero(),
+            upper: Rat::new(BigInt::one(), scale.clone()),
+        };
+    }
     let mut power = BigInt::one();
     let exact: Vec<BigInt> = characteristic
         .iter()

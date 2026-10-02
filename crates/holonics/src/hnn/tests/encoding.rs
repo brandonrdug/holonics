@@ -25,7 +25,7 @@ use crate::receiver::population::Closure;
 /// block Hankel matrix `[y_(i+j)]` over `blocks` block rows and columns, `y_t` the one-hot of cell
 /// `t` over `classes` classes (the cells hold at least `2 blocks − 1` ticks).
 fn hankel_rank(cells: &[usize], classes: usize, blocks: usize) -> usize {
-    assert!(cells.len() + 1 >= 2 * blocks, "the emission covers the Hankel window");
+    assert!(cells.len() + 1 >= 2 * blocks, "the emission fills the Hankel matrix");
     let rows = (0..blocks)
         .flat_map(|i| {
             (0..classes).map(move |class| {

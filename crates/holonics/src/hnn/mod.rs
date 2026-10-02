@@ -14,10 +14,10 @@
 //!   [`Field`] is the Holarchy's declaration, a chart of it; the constitution `Θ` holds its element
 //!   relations.
 //! - **The aeon.** Its passage is an aeon on the Holarchy's parametric orientation
-//!   ([`crate::holarchy::Holarchy::parametric`], the lift of the rings' joint clock torus): a
-//!   receiving window is an epoch at the receiver's section; a pump period or a clock closure is a
-//!   cycle; the aeon boundary is the collapse; and the first law over the aeon is
-//!   [`crate::aeon::EnclosedLedger`]. [`Reference::expose`] is a cut's passage through the
+//!   ([`crate::holarchy::Holarchy::parametric`], the lift of the rings' joint clock torus): the
+//!   cells a receiver reads between two crossings of its section are an epoch; a pump period or a
+//!   clock closure is a cycle; the aeon boundary is the collapse; and the first law over the aeon
+//!   is [`crate::aeon::EnclosedLedger`]. [`Reference::expose`] is a cut's passage through the
 //!   resident's aeons, one closed at each joint-clock carry-out (`close_aeon`).
 //! - **What the code joins** (read from source): the resident's aeon is an [`crate::aeon::Aeon`] on
 //!   the parametric orientation, from its opening lift point to the joint clock's carry-out; each
@@ -25,15 +25,15 @@
 //!   is an [`crate::aeon::Cycle`] of the last ring's clock when that ring opened on its section;
 //!   the boundary runs the collapse; and the resident carries the ledger
 //!   ([`retention::aeon_readings`], [`AeonBoundary`], [`Reference`]'s header).
-//! - **The clocks are aeons** (THE_REBUILD U5; agent-inferred, each choice in its owner). A
-//!   receiving window is an [`crate::aeon::Epochs`] reading: an epoch of the cut's cell clock at the
-//!   receiver's section ([`ReceivingPhases::windows`], which the exposure reads). A pump's period
-//!   is an [`crate::aeon::Cycle`] of its own clock ([`PumpDeclaration::period`]; the mode
+//! - **The clocks are aeons** (THE_REBUILD U5; agent-inferred, each choice in its owner). The
+//!   receiver's spans of cells are an [`crate::aeon::Epochs`] reading: the epochs of the cut's cell
+//!   clock at the receiver's section ([`ReceivingPhases::windows`], which the exposure reads). A
+//!   pump's period is an [`crate::aeon::Cycle`] of its own clock ([`PumpDeclaration::period`]; the mode
 //!   quotient's lift period, Lean `HNN/ModeQuotient.periodic_lift_exact`, is that cycle's). Every
 //!   ring clock the machine keeps is its navigator's `navigator::Clock` (`field`'s header, "The
 //!   rings' clocks"), and the selective step's carry is its jumps, the flux of its section. The
 //!   word's clock is an unwound `navigator::Clock` whose ticks the receiver reads at `e_0 … e_last`.
-//!   The exposure's own counters (compares, deposits, the deadline in windows) are the program's,
+//!   The exposure's own counters (compares, deposits, the deadline in epochs) are the program's,
 //!   disclosed as such in [`reference::Exposure`].
 //! - [open] One join the sentence names is not yet in the code: the receiving tree is storage read
 //!   by the receiving face, not a Holon joined at ports in [`Field::holarchy`] (U1 named the missing
@@ -50,7 +50,7 @@
 //!   [`PassageChart`]), its squares `D E = ρ`, `E T = U E` and the injection square, its Preimage
 //!   Fibre and separator;
 //! - [`moment`]: the phase-binned [`SourceMoment`] on closing source rings, its pair buffer, the
-//!   pair port read over the whole offset moment (no window), and its capacity `n*`;
+//!   pair port read over the whole offset moment (no held cell), and its capacity `n*`;
 //! - [`propagation`]: the junction Swing, the ring element's Cayley step with its contrast port,
 //!   the contact's midpoint two-port, the global power and the causal cone;
 //! - [`word`]: a [`Word`], one evaluation at one cut's fixed operands, opening at zero change and
@@ -62,7 +62,7 @@
 //!   ([`ActiveAddress`]), its letters' readers (`receiving::{Feature, FeatureFamily}`, whose
 //!   alphabets the tree reads) and the read at the receiver's grain `L_R`: the combined face of the
 //!   context tree's face at each phase's causal address and the wave (the region table and the
-//!   context tree), the tree's window read with its phases run together;
+//!   context tree), the tree's read over an epoch with its phases run together;
 //! - the receiving parametron's storage is the context tree, the shift navigator's landmarks
 //!   ([`crate::compression::landmark::context`]): a mixture over the candidate standings of the
 //!   pruned context trees, each node's arrivals the epochs of its section; typed address letters,
@@ -83,7 +83,8 @@
 //! - [`executed`] (THE_REBUILD U6, September 30): the release's own comparison (the receiving
 //!   bank's class, threshold, order and section predicates along the machine's own trajectory), its
 //!   exact pullback to `E` through the executed monodromy's certified eigen-derivative (`ring`), and
-//!   a carried update of `E` adopted only when every commit guard holds on the re-read successor.
+//!   a carried update of `E` adopted only where the re-read successor's comparison is certified
+//!   lower and its certificates hold.
 //!
 //! [definition; agent-inferred, U2] A loaded ring's mode quotient (campaign 3's first construction)
 //! is Lean's (`HNN/ModeQuotient`); its Rust realization (`hnn::modes`, at commit `1bdacc8f`) was
@@ -113,7 +114,7 @@
 //! | the contact two-port | `HNN/Propagation.{partialIsometry_transit, transit_balance, tick_well_defined}` | [`propagation::transit`], [`Contact`] |
 //! | the causal cone | `HNN/Word.word_tick_cone` (the concrete tick) | [`Word::support`] |
 //! | the word on declared lattices: certified inverse charts, error feedback, the executed adjoint, the balance up to the residual | `HNN/LatticeWord.{nsStep, rounded_refinement_certificate, roundedIter_certificate, warm_start_certificate, inverse_chart_deviation, feedback_tick, carried_word_accounting, executed_adjoint_unique, executed_adjoint_deviation, cayley_chart_energy}` | [`chart`], [`Word`], [`Word::pull_back`], [`propagation::TickBalance`] |
-//! | the moment | `HNN/Moment.{encoderMoment_contract, encoder_covector_tape_free, closingRing_moment_is_phaseBinned, exteriorOffset_independent_of_E, selective_position, moment_capacity}`; the open with no window `HNN/Encoding.{whole_pair_read_counts, whole_pair_read_offset_moment}` | [`SourceMoment`], [`moment::capacity`] |
+//! | the moment | `HNN/Moment.{encoderMoment_contract, encoder_covector_tape_free, closingRing_moment_is_phaseBinned, exteriorOffset_independent_of_E, selective_position, moment_capacity}`; the open that reads no held cell `HNN/Encoding.{whole_pair_read_counts, whole_pair_read_offset_moment}` | [`SourceMoment`], [`moment::capacity`] |
 //! | Holonic Encoding (U6) | `HNN/Encoding.{injection_square, encoding_reduced_recurrence, moment_reduced_recurrence, encoding_separator, encoding_descends_iff}`, `Compression/Landmark/Context/Birth.founding_intertwines` | [`encoding`] |
 //! | the receiving face: the landmark tree's face at each phase's causal address, read at the grain, plus the wave (the region table and the landmark tree; the region table is the depth-one forced case of the whole-cell emission, kept in Lean, not of the digit tree) | `HNN/RegionCounts.{grain_log_iff_pow_bounds, grain_code_residual, combined_face_pullback}`, `Compression/Landmark/Context/Tree.{depth_one_is_the_whole_cell_table, release_rule}` | [`receiving`], [`ReceivingRead::combined`], [`ActiveAddress`]; the grain read is [`crate::receiver::face::grain_exponent`]'s |
 //! | the receiving face compresses landmarks: the tree's path face, its opened-path deposit and telescope, the executed dyadic face (the landmark tree) | `Compression/Landmark/Context/Tree.{path_face_normalized, weight_step, landmark_step, path_telescope_exact, depth_one_is_the_whole_cell_table, executed_split_laws, cell_faces_partition, digit_log_residual}` (the owner's header has the rest) | [`crate::compression::landmark::context`] |
@@ -312,9 +313,9 @@ pub enum HnnError {
     Observability { aperture: usize, rank: usize },
     #[error("the code tolerance must be a positive rational, found {tolerance}")]
     Tolerance { tolerance: Rat },
-    #[error("the release guard's excursion height must be nonnegative, found {height}")]
+    #[error("the released code length's excursion height must be nonnegative, found {height}")]
     ExcursionHeight { height: Rat },
-    #[error("a release window's certified decrease must be nonnegative, found {decrease}")]
+    #[error("an excursion's certified decrease must be nonnegative, found {decrease}")]
     WindowDecrease { decrease: Rat },
     #[error("the word has run its {ticks} junction steps")]
     WordEnded { ticks: usize },
@@ -368,11 +369,11 @@ pub enum HnnError {
     )]
     MissingReach,
     #[error(
-        "the deposit steps locus {locus:?} by more than one linear step; its certified step reads one window"
+        "the deposit steps locus {locus:?} by more than one linear step; its certified step reads one compare's returns at a locus, through the deposit's one reach"
     )]
     RepeatedLinearStep { locus: Locus },
     #[error(
-        "the deposit steps the family {family:?} of locus {locus:?} more than once; its certified step reads one window"
+        "the deposit steps the family {family:?} of locus {locus:?} more than once; its certified step reads one compare's returns at a family, through the deposit's one reach"
     )]
     RepeatedFactorStep {
         locus: Locus,

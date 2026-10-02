@@ -1,8 +1,15 @@
 //! Propagation: the telegrapher's constitution on LC cells over a supplied incidence.
 
 use num_traits::{One, Signed, Zero};
+use std::sync::Arc;
 
 use crate::holon::{Holon, HolonError, PortHolon};
+use crate::holon::law::{ReferenceHolon, Scheme};
+use crate::navigator::Clock;
+use crate::ratio::linear::ExactRatMatrix;
+use crate::receiver::receipt::ReceiptLaw;
+use crate::receiver::reception::{InteractionReturn, JointLaw};
+use crate::receiver::reception::continuation::{BoundJointState, JointProducer, StorageReturn};
 use crate::ratio::linear::inertia::SymmetricForm;
 use crate::ratio::linear::vector::matrix;
 use crate::ratio::{Rat, integer};
@@ -561,6 +568,81 @@ impl WaveChain {
                     .map(|(current, inductance)| inductance * current),
             )
             .collect())
+    }
+
+    /// Derive the native midpoint joint receiver law from this material and its declared reader.
+    fn joint_receiver(&self, reader: &ExactRatMatrix) -> Result<JointLaw, WaveError> {
+        let law = ReferenceHolon::new(self.holon()?, self.tick.clone(), Scheme::Midpoint)?;
+        Ok(JointLaw::reading(&law, reader)?)
+    }
+
+    /// Bind a native source and clock to the law derived here, without a caller-supplied law.
+    pub fn bind_receiver(
+        source: &Arc<Self>, clock: &Arc<Clock>, reader: &ExactRatMatrix,
+    ) -> Result<JointProducer<Self>, WaveError> {
+        Ok(JointProducer::declared(source.joint_receiver(reader)?, source.clone(), clock.clone())?)
+    }
+
+    /// Authenticate the current native law/reader, derive the successor from its material, and
+    /// decode the same returned charges/fluxes. The caller supplies no successor law or decoder.
+    /// [agent-inferred] This first native return authenticates its full producing source material.
+    /// The returned joint law continues its reached point; no caller-supplied decoder is used.
+    pub fn return_material(
+        &self, source: &Arc<Self>, producer: &JointProducer<Self>,
+        reached: &BoundJointState<Self>, clock: &Arc<Clock>, successor: &Self,
+        reader: &ExactRatMatrix, epsilon: Rat, receipt: &ReceiptLaw,
+    ) -> Result<
+        (JointProducer<Self>, InteractionReturn<BoundJointState<Self>, (), StorageReturn>, WaveState),
+        WaveError,
+    > {
+        let same_ports = |a: &Self, b: &Self| a.incidence == b.incidence
+            && a.material.leakage == b.material.leakage && a.tick == b.tick;
+        if self != source.as_ref() || !same_ports(self, successor)
+            || producer.law() != &self.joint_receiver(reader)? {
+            return Err(HolonError::ConformanceFailed {
+                what: "the wave material return uses its derived producing law, reader, incidence and clock",
+            }.into());
+        }
+        let next_law = successor.joint_receiver(reader)?;
+        let (next_producer, returned) = producer.return_storage(
+            reached, source, clock, next_law, epsilon, receipt,
+        )?;
+        let point = &returned.forward.present().ok_or(HolonError::ConformanceFailed {
+            what: "the wave material return carries its reached point",
+        })?.state().configuration[..next_producer.law().source_extent()];
+        let reading = successor.decode_configuration(point)?;
+        if successor.configuration(&reading)? != point {
+            return Err(HolonError::ConformanceFailed {
+                what: "the native wave successor decoder re-encodes the returned point",
+            }.into());
+        }
+        Ok((next_producer, returned, reading))
+    }
+
+    /// Decode the Holon's storage coordinates `(q, phi) = (C V, L I)` in this material.
+    /// [agent-inferred] A material return holds q and phi, so its voltages and currents must be
+    /// decoded with the successor C and L; keeping the predecessor V and I changes the point.
+    /// `configuration(decode_configuration(x)) = x` exactly. This is a spatial/material decoder;
+    /// it does not convert a midpoint state into a staggered-time state or advance a clock.
+    pub fn decode_configuration(&self, configuration: &[Rat]) -> Result<WaveState, WaveError> {
+        let nodes = self.incidence.nodes();
+        check_len(
+            "charge and flux coordinates",
+            nodes + self.incidence.junctions().len(),
+            configuration.len(),
+        )?;
+        Ok(WaveState {
+            voltage: configuration[..nodes]
+                .iter()
+                .zip(&self.material.capacitance)
+                .map(|(charge, capacitance)| charge / capacitance)
+                .collect(),
+            current: configuration[nodes..]
+                .iter()
+                .zip(&self.material.inductance)
+                .map(|(flux, inductance)| flux / inductance)
+                .collect(),
+        })
     }
 
     /// [definition] **The front factor** of a junction toward the node it reaches:

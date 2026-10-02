@@ -571,8 +571,8 @@ fn lattice_read_matches_the_host_on_small_fixtures() {
 }
 
 /// Ingest parity on the small chain: batch by batch, the device's `Ingested`, lift point and phase
-/// classes equal the host moment's, across carry-outs, tiles and the window's three cells; at the
-/// end every phase-binned and offset count and the window are equal.
+/// classes equal the host moment's, across carry-outs, tiles and the three held cells; at the
+/// end every phase-binned and offset count and the held cells are equal.
 #[test]
 #[ignore = "needs the CUDA card; run alone with --include-ignored --test-threads=1"]
 fn moment_ingest_matches_the_host_moment() {

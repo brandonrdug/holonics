@@ -2031,7 +2031,7 @@ pub fn compose_return(
                 .ok_or(HnnError::MissingSourcePort { ring: g })?;
             let rank = pair.rank();
             // The whole normalized offset moment of each phase `(x, a, C_c[x, a] ν̂)` over its pair
-            // population (`hnn::moment`: the open reads no window), read once; none at an empty
+            // population (`hnn::moment`: the open reads no held cell), read once; none at an empty
             // population.
             let tables = [moment.offset_table(field, g, offset)?];
             let mut nonzero: Vec<Vec<(usize, usize, Rat)>> = Vec::with_capacity(d);
@@ -2457,7 +2457,7 @@ fn compose_ring(
 /// integral chart, the three forms' pulls `C̄ = Σ 2 r̄ (w − ω)ᵀ`, `K̄ = −h Σ r̄ (u + ½hω)ᵀ`,
 /// `D̄ = −h Σ r̄ ωᵀ` (the three together), its factor steps (when retained) and its pullback.
 #[allow(clippy::too_many_arguments)]
-fn compose_contact(
+pub(crate) fn compose_contact(
     field: &Field,
     constitution: &Constitution,
     back: &WordReturn,
@@ -4343,3 +4343,6 @@ pub fn prequential(
     })
 }
 
+
+#[cfg(test)]
+mod continuation;

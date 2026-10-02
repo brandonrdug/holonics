@@ -379,7 +379,7 @@ extern "C" __global__ void hnn_scatter_words(
 //
 // [definition] `holonics::hnn::PairPort::apply_table`: at phase `c`, rank `ρ`, the weight
 // `w_(c,ρ) = Σ_(x,y) C_c[x, y] ν a_ρ[x] b_ρ[y]` of the whole offset moment (row the current cell,
-// column the earlier; the open reads no window), each count times the pair population's chart
+// column the earlier; the open reads no held cell), each count times the pair population's chart
 // numerator `ν`, exact at the pair port's scale `2σ` (`a`, `b` on `2^(−σ)ℤ`). Block `(c, ρ)`; thread
 // `t` takes the current cells `x ≡ t` and loops over the earlier cells, summing `C·(a b)` as a word
 // times a carrier word; the block joins the sums by the shared tree. Every block writes its own

@@ -100,7 +100,7 @@ exponent `v`. No temperature enters: the receiving map's gain, which plays the r
    `measured_aeon_code_bound`). These are arithmetic on the record's inputs, and each reading of
    them is conditional: it treats the `1190` readings of an aeon as independent draws from one of
    the two faces (`1190` is the exposure's mean aeon length, and its readings are not independent
-   samples), it uses `7/2^18` bits, the largest change the record measured over 256 windows, as a
+   samples), it uses `7/2^18` bits, the largest change the record measured over 256 epochs, as a
    bound at every reading, which is not certified, and "readable" means the one-bit convention
    (Stein's lemma gives the convention, not an exact threshold). None of them is a measured
    physical fact about the machine.
@@ -122,7 +122,7 @@ exponent `v`. No temperature enters: the receiving map's gain, which plays the r
   aeon's readings as independent, which they are not.
 
 [definition] **The finding's margins, corrected.** With the record's `max|δ| = 7/2^18` bits (the
-largest change measured over 256 windows, used as a bound at every reading, which is not certified),
+largest change measured over 256 epochs, used as a bound at every reading, which is not certified),
 and treating an aeon's `1190` readings as independent draws from one face, at the one-bit convention:
 * it lies between `2^10` and `2^11` times below the resolution, not more than `2^12` times
   (`measured_change_ratio`);
@@ -1421,7 +1421,7 @@ end Refining
 [definition] Every statement here is arithmetic on the record's inputs. Read as claims about the
 machine, each is conditional: `N = 1190` is the exposure's mean aeon length, and treating its
 readings as independent draws from one face is an assumption they do not meet; `7/2^18` bits is the
-largest change the record measured over 256 windows, and using it as a bound at every reading is not
+largest change the record measured over 256 epochs, and using it as a bound at every reading is not
 certified; and "readable" is the one-bit convention. -/
 
 section Campaign
@@ -1449,7 +1449,7 @@ theorem declared_grain_vs_resolution :
   constructor <;> linarith
 
 /-- [proved-derived; formal-checked] **The record's change against the resolution.** The record's
-largest change over 256 windows, `7/2^18` bits (a bound at every reading only by assumption), lies
+largest change over 256 epochs, `7/2^18` bits (a bound at every reading only by assumption), lies
 between `2^10` and `2^11` times below the independent-readings resolution, so not more than `2^12`
 times below it. -/
 theorem measured_change_ratio :

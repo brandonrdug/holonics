@@ -84,8 +84,8 @@ extern "C" __global__ void hnn_lattice_read(
 // `x_k`, in carry order, ring `g` advances `c_g(x_k) = [port_g(x_k) ∈ N_g]` plus its
 // predecessor's carry, and carries when its phase before the step plus the advance reaches its
 // period; then on every source ring, at its phase `c` after the step, `M_g[c][x_k] += 1` and, for
-// each declared offset `δ` whose earlier cell exists, `C_g(δ)[c][x_k][x_(k−δ)] += 1`; the window
-// keeps the last `max Δ` cells. Ingest stops after the cell whose step carries the last ring out
+// each declared offset `δ` whose earlier cell exists, `C_g(δ)[c][x_k][x_(k−δ)] += 1`; the moment
+// holds the last `max Δ` cells. Ingest stops after the cell whose step carries the last ring out
 // (the joint clock's carry-out) and reports it.
 //
 // The lock chart `fits[g][code] = [port_g(code) ∈ N_g]` is the field's, read off the host owner at
@@ -98,7 +98,7 @@ extern "C" __global__ void hnn_lattice_read(
 // lane is an atomic minimum. The counts are atomic additions into the resident moment: integer
 // addition commutes, and the moment's cell count certifies that no count leaves its 64-bit word.
 //
-// Window: `window[0]` is the number of valid cells, `window[1 …]` the cells, oldest first.
+// Held cells: `window[0]` is the number of valid cells, `window[1 …]` the cells, oldest first.
 // Receipt: `[consumed, carried out, advance_0, …, advance_(G−1)]`.
 //
 // Shared: `rings` 8-octet advance totals, `rings` 4-octet phases, `rings · blockDim.x` 4-octet
@@ -199,7 +199,7 @@ extern "C" __global__ void hnn_moment_ingest(
         __syncthreads();
     }
     if (t == 0) {
-        // The window's overwrite: the last cells of (window ++ consumed cells), copied forward in
+        // The held cells' overwrite: the last cells of (held ++ consumed cells), copied forward in
         // place (each read lies at or after the position it fills).
         const uint32_t total = valid + consumed;
         const uint32_t keep = total < window_extent ? total : window_extent;
@@ -440,7 +440,7 @@ extern "C" __global__ void hnn_inverse_certificate(
 //
 // [definition] Campaign 2, the deposit phase on the card where its arithmetic is dyadic
 // (`holonics::hnn::constitution::NormalLaw::deposited`, Lean `HNN/Normal.normal_prox_step`,
-// `HNN/LatticeDeposit.carry`). A window's samples `(a_t, l_t, r_t)` with dyadic coordinates
+// `HNN/LatticeDeposit.carry`). A deposit's samples `(a_t, l_t, r_t)` with dyadic coordinates
 // `a = α·2^(−σ_a)`, `l = λ·2^(−σ_l)`, `r = ϱ·2^(−σ_r)` give the update's entries
 //
 //   U_ij = Σ_t α_t λ_(t,i) ϱ_(t,j)            on 2^(−S)ℤ, S = σ_a + σ_l + σ_r
