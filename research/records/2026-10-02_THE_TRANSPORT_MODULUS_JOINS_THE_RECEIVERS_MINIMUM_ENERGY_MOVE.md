@@ -232,23 +232,34 @@ decide is the first move's direction, the sign of `own − supplied` there.
 
 ## 4d. When a descent's basin is decided
 
-[derived] A descent with certified strict decrease (every adopted move lowers the comparison by
-disjoint enclosures) cannot leave the connected part of the sublevel set `{L ≤ L(start)}` that holds
-its start. So:
+[derived] The move certifies the comparison only at its two endpoints: the adopted successor's `L`
+lies strictly below the incumbent's by disjoint enclosures. Between them the carried path passes
+through the cuts of #211 (the step's candidate states), and nothing bounds `L` there. So a move can
+step over a pass narrower than the step, and the law needs a condition:
 
-- The basin is decided at the first state whose `L` lies below the lowest pass between the two basins
-  (the least, over paths joining them, of the largest `L` along the path). Below that level the two
-  basins lie in different parts of the sublevel set, and no certified descent crosses.
-- Above it, only the path decides, and the local direction (§4c) is the only law that acts.
+- **A move stays in its sublevel component when every carried cut between its endpoints has
+  `L < L(start)`.** A sequence of such moves never leaves the connected part of `{L < L(start)}`
+  that holds the start. The basin is then decided at the first state whose `L` lies below the lowest
+  pass between the two basins (the least, over paths joining them, of the largest `L` along the
+  path). Below that level the basins lie in different parts of the sublevel set.
+- **Without the condition, a move whose step is longer than the pass's width along it can land in
+  the other basin.** The endpoint certificate does not rule that out. Above the pass level, or for an
+  unchecked step, only the path decides, and the local direction (§4c) is the only law that acts.
+- The condition can be read, `L` at each carried cut of an adopted move (#211 gives their positions
+  in `η` exactly), but the move does not certify it today.
 
-**Numbers from the chain.** The founded opening reads `L = 500197/4096`, `m6` reads `338257/4096`,
-`w16` `195744/4096` at `ρ₀`, and the refit's `E` `133292/4096` at `ρ*` and `310210/4096` at `ρ₀`. A
-path joining the two endpoints is `E` moved straight from `w16`'s to the refit's at `ρ₀`, then `ρ`
-walked from `ρ₀` to `ρ*` at the refit's `E`. Its largest `L` bounds the pass from above and is at
-least `310210/4096`. The `E` segment's interior is unmeasured. If its largest `L` lies below `m6`'s
-`338257/4096`, then neither the opening nor `m6` decides the basin, and the joined chain's first state
-below that level does. The main line reads the segment in `L` at a few points (`executed direction`
-reads a declared `E` leg).
+**Numbers from the chain.** On the lock face, the kinetic chain's founded opening reads
+`500197/4096` and its `m6` `338257/4096`; `w16` reads `195744/4096` at `ρ₀`, and the refit's `E`
+`133292/4096` at `ρ*` and `310210/4096` at `ρ₀`. A path that bounds the pass must end at each basin's
+own state, `(E_w16, ρ₀)` and the refit's minimum `(E_refit, ρ*)`, since `(E_refit, ρ₀)` need not lie
+in the refit's basin. Two such paths, both inside the founding bound (`ρ* < ρ₀`):
+
+1. `E` moved straight from `w16`'s to the refit's at `ρ₀`, then `ρ` walked down from `ρ₀` to `ρ*` at
+   the refit's `E`. Its largest `L` is at least `310210/4096`; both interiors are unmeasured.
+2. The joined straight segment from `(E_w16, ρ₀)` to `(E_refit, ρ*)`.
+
+Either bounds the pass from above; the lower of the two is the tighter bound. If it lies below `m6`'s
+`338257/4096`, then neither the opening nor `m6` decides the basin.
 
 **The direction at the opening.** `executed joined <terrain> <seed> <count> <arm> <label=source>…`
 reads the joined solve's `Δρ` and its two drives at each source, before any bound and without moving.
