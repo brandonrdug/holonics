@@ -1341,3 +1341,14 @@ inside the 800 s deadline; library tests 926 passed; GPU suite 32 of 32). Held o
 the wave `−3 + 10/16 + ε`; training `−1688 + 15/16 + ε`. The model codes the 1,190 held-out cells
 in about `3353 + ε` bits, about 233 below PPM order 4. Campaign 1 declares the root's base
 (`ReceiverDeclaration::base`, coded in the field's description).
+
+**The declared values under the root's base** ([receipt](2026-10-02_THE_CONTACT_LOOP_receipts/root_base_choices.txt)).
+- On the standing cut the development cells still choose the prior mass `2^(−3)`
+  (`17453 + 5/16 + ε` bits, against `17588 + 10/16` at `2^(−2)` and `17506 + 2/16` at `2^(−4)`).
+- On the choosing cut at depth 16 the root's base at `2^(−3)` codes `906302 + 12/16 + ε` development
+  and `133631 + 8/16 + ε` held-out bits, against the even base's `916377 + 0/16` and
+  `134954 + 1/16`: about one percent less on each, and `2^(−3)` is the least of the three masses
+  read there too.
+- The depth's limit depends on the population. At 523,215 cells the widths refuse depth 63 (an
+  operand of 132 bits), so the deepest the carriers admit sets it there; at campaign 1's 6,148 cells
+  the card's kernel path does.

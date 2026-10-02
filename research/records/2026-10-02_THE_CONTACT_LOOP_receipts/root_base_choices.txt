@@ -1,0 +1,17 @@
+== the standing cut, the receiver's declaration (depth 63, the root's base), the prior-mass ladder
+  j = 1: development 17997 + 14/16 + ε; held out 3611 + 15/16 + ε; 156 ms
+  j = 2: development 17588 + 10/16 + ε; held out 3442 + 3/16 + ε; 155 ms
+  j = 3: development 17453 + 5/16 + ε; held out 3357 + 2/16 + ε; 157 ms
+  j = 4: development 17506 + 2/16 + ε; held out 3334 + 8/16 + ε; 158 ms
+  j = 5: development 17645 + 8/16 + ε; held out 3347 + 0/16 + ε; 158 ms
+  j = 6: development 17813 + 10/16 + ε; held out 3375 + 5/16 + ε; 160 ms
+  j = 7: development 17978 + 4/16 + ε; held out 3404 + 5/16 + ε; 161 ms
+  j = 8: development 18127 + 15/16 + ε; held out 3428 + 6/16 + ε; 161 ms
+== the choosing cut at depth 16 (depth 63 is refused there: 'derived widths whose operands fit u128', 132 bits)
+even   j = 2: development 925621 + 1/16 + ε; held out 135643 + 5/16 + ε; 23108 ms
+root   j = 2: development 913280 + 11/16 + ε; held out 134128 + 2/16 + ε; 23469 ms
+even   j = 3: development 916377 + 0/16 + ε; held out 134954 + 1/16 + ε; 22162 ms
+root   j = 3: development 906302 + 12/16 + ε; held out 133631 + 8/16 + ε; 23007 ms
+even   j = 4: development 916444 + 4/16 + ε; held out 135340 + 0/16 + ε; 23444 ms
+root   j = 4: development 907666 + 7/16 + ε; held out 134194 + 4/16 + ε; 23539 ms
+args: hnn_exposure prior-mass ladder; hnn_exposure cut-file .local/cuts/curated-u6-choosing-flat-cut.bin cells all prior-mass j tree-base even|root tree-depth 16, six processes together, each about 23 s
