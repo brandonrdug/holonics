@@ -107,7 +107,10 @@ transient amplification, so the receiver reads the resolvent `C_x(iωI − A_x)�
 modes. [proved-derived; formal-checked] `Foundation/CausalChord` proves the resolvent identity,
 poles ⊆ eigenvalues with strict inclusion for an unexcited or unobserved mode
 (`cancellation_is_strict`), and invariance of the whole transfer object under a chart change
-(`rebase_transfer`).
+(`rebase_transfer`). A rectangular chart that closes the squares, `V A = Ā V`, `V B = B̄`,
+`C = C̄ V`, leaves the chord unchanged (`transfer_descend`); when it is onto, `det(sI − Ā)` divides
+`det(sI − A)` and already clears every entry, so a release removes only factors every entry
+cancels (`release_cancels`).
 
 [definition] **Its Rust realization is retired.** `holonics::receiver::causal_chord` built
 `H(s) = C adj(sI − A) B / det(sI − A)` exactly over `ℚ`. Once `hnn::modes` retired (U2) it had no

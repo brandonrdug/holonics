@@ -33,7 +33,7 @@
 //! −log₂ π(f) ≤ −log₂ λ − log₂ D(f),   −log₂ π(f) ≤ −log₂(1 − λ) + ℓ_f + log₂ M
 //! ```
 //!
-//! [proved-derived] **The aeon's code bound with births.** A birth draws its mass `m_g` from the
+//! [proved-derived; formal-checked] **The aeon's code bound with births.** A birth draws its mass `m_g` from the
 //! reserve and renormalizes every prior over the founded mass `M_n = M + Σ_g m_g` (the population's
 //! "Birth from reserved mass"), so a declared family's prior at `n` is `m_f/M_n = π(f) M/M_n`, and
 //! over an aeon with births the bound is
@@ -42,7 +42,8 @@
 //! −log₂ W_n ≤ −log₂(m_f/M_n) − log₂ L_f = −log₂ π(f) + log₂(M_n/M) − log₂ L_f     every living declared f
 //! ```
 //!
-//! (the birth telescope, whose Lean statement is owed with the abstaining newborn's, #62).
+//! (the birth telescope, Lean `Compression/Landmark/Context/Evolution.evolved_code_with_births`,
+//! through the abstaining newborn's `founded_code`).
 //! `evolved_aeon_code` proves the no-birth form (`M_n = M`). The no-birth form does not hold across
 //! a birth: when every newborn dies, `W_n = Σ_f m_f L_f/M_n`, and the code exceeds it by up to
 //! `log₂(M_n/M)` (one family at `M = ½, π = 1` and a newborn of mass `¼` that dies at the next

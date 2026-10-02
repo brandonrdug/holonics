@@ -9,7 +9,9 @@ linear system per pump phase: its word-local state `x = (u, w)` moves by `x′ =
 returns `s′ = ρ_t x + D_t e`, the phase `t mod P`. Its Rust realization (`holonics::hnn::modes`, at
 commit `1bdacc8f`) was retired at U2: the word-local state it quotients leaves at every word's end,
 so the aeon's retention contract has nothing of it to collapse. The laws only that realization
-checked (the descended chord, the later-phase witness) are in `docs/HNN_FORMULA.md` §4.
+checked (the descended chord, the later-phase witness) are in `docs/HNN_FORMULA.md` §4; the
+descended chord is proved in `Foundation/CausalChord` (`Linearization.transfer_descend`,
+`Linearization.release_cancels`).
 
 [proved-derived; formal-checked] What is proved.
 

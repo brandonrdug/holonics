@@ -118,7 +118,9 @@
 //! `section_period` cells, when the code paid since the previous section passes a founding's charge (the opening
 //! section only opens the reading), the most recently dead family's seed is re-founded (with
 //! `reseed`), else the next declared candidate. The prior of every founding is declared, never tuned
-//! on the cells. [open] Owed (#62): the specialists' telescope of the abstaining newborn in Lean.
+//! on the cells. [proved-derived; formal-checked] The abstaining newborn's telescope is Lean
+//! `Compression/Landmark/Context/Evolution.{abstaining_face, abstaining_mixture, newborn_likelihood,
+//! founded_likelihood, founded_code}`.
 //!
 //! [proved-derived; formal-checked] **Residual-founded transport discovery** ([`birth`]; Lean
 //! `Compression/Landmark/Context/Birth`; the learner record's §14.1). With the admitted transports
@@ -171,8 +173,8 @@
 //! until a death), at the static total mass `M` (the reserve unchanged), and the aeon's code is at
 //! most the selected family's code plus `−log₂ π(f)` in an aeon without births
 //! (`evolved_aeon_code`). A birth renormalizes the declared priors to `m_f/M_n`, so once births have
-//! founded the mass `M_n` the bound gains `log₂(M_n/M)` ([`evolution`]; its Lean owed with the
-//! newborn's telescope, #62). A family is founded at a declared rational mass with
+//! founded the mass `M_n` the bound gains `log₂(M_n/M)` ([`evolution`]; Lean
+//! `Evolution.evolved_code_with_births`). A family is founded at a declared rational mass with
 //! [`Population::found_with`].
 //!
 //! [proved-derived; formal-checked] **Species collapse** ([`species`]; Lean `Evolution.{species_face,
@@ -231,11 +233,11 @@
 //! | `Compression/Landmark/Context/Dormancy.{forward_dominance_nonneg, dormant_survivor_code, layer_survivors, productKernel_stochastic, productKernel_path}` | [`Dormancy`], [`DormantFamily`] |
 //! | `Compression/Landmark/Context/Dormancy.{share_path_code, stay_code_le, share_path_code_le}` | the declared rate `α = 2^(−j)` of [`Dormancy::new`] |
 //! | `Compression/Landmark/Context/Birth.{opening_finrank, ladder_stable_forever, strict_steps_le_chart, ladder_stabilizes, founded_invariant, founded_le, exists_transport_matrices, founding_intertwines, encode_reads, encode_iterate, founded_reads_iterate, silent_invariant, eigenvalue_of_finite_order}` | [`Closure`] (the ladder, its rungs and `U_a`, checked `E T_a = U_a E`; `D E = ρ` by [`Closure::readout`]), [`FoundedFamily`], [`TransportBirth`], [`SectionFounding`] |
-//! | owed (#62): the abstaining newborn's telescope | [`Population::found`], [`Population::refound`] |
+//! | `Compression/Landmark/Context/Evolution.{abstaining_face, abstaining_mixture, abstaining_exists, newborn_likelihood, founded_likelihood, newborn_code, founded_code}` | [`Population::found`], [`Population::refound`] (the newborn abstains before its birth and is born at its mass from the reserve) |
 //! | `Compression/Landmark/Context/Composition.{composedFace_received, composedFace_nonneg, composedFace_sum_one, composedFace_pos, composed_telescope}` | [`Composed`] (its face and its likelihood) |
 //! | `Compression/Landmark/Context/Composition.{chain_rule, chain_rule_of_species}` | [`Composed`]'s code over a keystone's keys; [`PortedEmitters`] under `KeyFamily` (a deterministic reader: `log₂ \|K_A\| − log₂ #S`) |
 //! | `Compression/Landmark/Context/Evolution.{survivalPseudo_zero_deaths, survivalPseudo_death_lt, dirichletFace_isPrior, kt_face, dirichletFace_no_deaths, descriptionPrior_isPrior, evolved_isPrior, masses_total}` | [`Tally::pseudo`], [`Selections::face`], [`Selections::prior`], [`Population::evolved`] |
-//! | `Compression/Landmark/Context/Evolution.{evolved_code_le_face, evolved_code_le_description, evolved_aeon_code}` | the evolved population's code against its selected family's |
+//! | `Compression/Landmark/Context/Evolution.{evolved_code_le_face, evolved_code_le_description, evolved_aeon_code, evolved_code_with_births}` | the evolved population's code against its selected family's |
 //! | `Compression/Landmark/Context/Evolution.{speciesWeight_isPrior, species_mixture, species_face, species_collapse_code, species_split}` | [`Population::collapse`], [`Population::split`], [`Collapse`] |
 //! | `Compression/Landmark/Context/Composition.{stagedFace_nonneg, stagedFace_sum_one, staged_chain_rule, staged_code}` | none since September 30 (the boundary egg and the admitted receivers, history at `f5fd8f3b`) |
 //! | `Compression/Landmark/Context/Merge.{merge_cost_iff, merge_cost_mass_iff, merge_cost_nat}` | [`Blocks::price`] (accepted exactly when `P·W < P′·W′`) |
