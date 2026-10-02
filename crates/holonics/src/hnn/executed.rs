@@ -3513,6 +3513,9 @@ fn ladder(
         }
     };
     loop {
+        // One progress line per trial on stderr (the waiting standard): its deposit and first-order
+        // bound, or its refusal before them; the reread prints its own line.
+        let started = std::time::Instant::now();
         if schedule.is_none()
             && (step.is_zero() || &step * unit_largest * &two < lattice_unit || trials.len() >= LADDER_DEPTH)
         {
@@ -3544,6 +3547,7 @@ fn ladder(
             Ok(None) => return Ok((trials, None, Some(MoveRefusal::Unreached))),
             Err(error @ (HnnError::ConstitutionBudget { .. } | HnnError::UncertifiedStorage)) => {
                 trial.refusal = Some(TrialRefusal::Constitution(error.to_string()));
+                eprintln!("  a trial's deposit, refused by the constitution; {} ms", started.elapsed().as_millis());
                 trials.push(trial);
                 match next(&trials, &step) {
                     Some(n) => step = n,
@@ -3590,6 +3594,7 @@ fn ladder(
         }
         if reading.largest > entry_bound() {
             trial.refusal = Some(TrialRefusal::EntryBound(reading.largest.clone()));
+            eprintln!("  a trial's deposit, refused at the entry bound; {} ms", started.elapsed().as_millis());
             trials.push(trial);
             match next(&trials, &step) {
                 Some(n) => step = n,
@@ -3598,6 +3603,7 @@ fn ladder(
             continue;
         }
         let first_reading = first(&moved, &successor)?;
+        eprintln!("  a trial's deposit and first-order bound; {} ms", started.elapsed().as_millis());
         let bound = first_reading.bound;
         trial.terms = Some(first_reading.terms);
         trial.leading = first_reading.leading;
@@ -4041,7 +4047,8 @@ fn executed_move_flown(
     let ring = declared.ring();
     let composition = comparison.composition;
     // Progress lines on stderr, one per unit of the move's work with its elapsed milliseconds (the
-    // waiting standard): the incumbent's read, its persistence read, and each trial's reread.
+    // waiting standard): the incumbent's read, its persistence read, its returns and slope, each
+    // trial's deposit and first-order bound (in `ladder`), and each trial's reread.
     let mut mark = std::time::Instant::now();
     let (before, reads) = incumbent(field, constitution, requests, declared, bank, grain, comparison)?;
     eprintln!("  the move's incumbent read; {} ms", mark.elapsed().as_millis());
