@@ -19,6 +19,7 @@
 //! cargo run --release -p holonics --example hnn_prediction -- executed margins <terrain> <seed> <count> <before state> <after state>
 //! cargo run --release -p holonics --example hnn_prediction -- executed agreement <terrain> <seed> <count> <arm,arm,…> <label=source>…
 //! cargo run --release -p holonics --example hnn_prediction -- executed span <terrain> <seed> <count> <arm> <toward> <label=source>…
+//! cargo run --release -p holonics --example hnn_prediction -- executed metric-steps <terrain> <seed> <count> <arm> <label=source>…
 //! cargo run --release -p holonics --example hnn_prediction -- executed route-plane <terrain> <seed> <count> <arm> <both|route|port> <toward> <label=state>…
 //! ```
 //!
@@ -3853,6 +3854,111 @@ pub(super) fn kinetic(terrain: &str, seed: u64, count: usize, arm: &str, toward:
         );
     }
     println!("executed kinetic: {} ms; resident {}", clock.elapsed().as_millis(), resident());
+}
+
+/// [measured-diagnostic; agent-inferred, October 2] **Each declared metric's unit step beside the
+/// native gradient** (`executed metric-steps <terrain> <seed> <count> <arm> <label=source>…`, sources
+/// as [`segment_source`]): `hnn::executed::metric_steps` at each source. Prints the comparison, then
+/// per metric (`coordinate`, `witness`, `kinetic`, `kinetic-modulus`) the step's `E` part against the
+/// native descent gradient `d = −Aᵀc` and against the plain pullback of the returns, each as the signed
+/// squared cosine `⟨a,b⟩|⟨a,b⟩|/(|a|²|b|²)` enclosed at `/4096` (positive: the step descends along
+/// it), the step's `Δρ` beside the modulus's slope `γ_ρ`; and the lock terms' target shares `θ_t`:
+/// the least, the largest, and the spread `max(1/θ_t)/min(1/θ_t) = max θ_t / min θ_t`, exactly and
+/// enclosed. Nothing is moved.
+pub(super) fn metric_steps(terrain: &str, seed: u64, count: usize, arm: &str, sources: &[String]) {
+    use holonics::hnn::executed::metric_steps;
+    let clock = Instant::now();
+    let declared = order_declared();
+    let engine = Engine::new(declared);
+    let bank = bank_of(declared.period, &bank_strength());
+    let ring = engine.refinement.ring();
+    let pairs = terrain_pairs(terrain, &declared, seed, count);
+    let requests = open_requests(&engine, &pairs);
+    let targets: Vec<Vec<usize>> = pairs.iter().map(|(_, t)| t.clone()).collect();
+    let (comparison, partition) = arm_comparison(arm);
+    assert!(!partition, "the steps are read on the open section");
+    println!(
+        "executed metric-steps: {count} {terrain} requests at development seed {seed}, the arm {arm}; the bank p = {}, grain 2^(-{BANK_GRAIN})",
+        bank_strength()
+    );
+    let signed = |a: &ExactRatMatrix, b: &ExactRatMatrix| -> String {
+        let (ab, aa, bb) = (frobenius(a, b), frobenius(a, a), frobenius(b, b));
+        if aa.is_zero() || bb.is_zero() {
+            return "none".to_string();
+        }
+        cell(&ExactInterval::point(&ab * ab.abs() / (aa * bb)), 1 << 12)
+    };
+    let point = |x: &Rat, grain: i64| cell(&ExactInterval::point(x.clone()), grain);
+    for source in sources {
+        let started = Instant::now();
+        let (label, spec) = source.split_once('=').expect("<label>=<source>");
+        let theta = segment_source(&engine, ring, spec);
+        let reading = metric_steps(
+            &engine.field,
+            &theta,
+            &requests,
+            &engine.refinement,
+            &bank,
+            BANK_GRAIN,
+            comparison,
+        )
+        .expect("the metric steps");
+        let (solved, all) = solved_terms(&reading.before);
+        let (whole, right, released) = reading.before.sections(&targets);
+        println!(
+            "  {label}: ρ {}; {} ∈ {} nats; solved {solved} of {all}; whole {whole} (released {released}, stations right {right}); {} ms",
+            theta.transport(ring),
+            symbol(&comparison),
+            cell(&reading.before.value, 1 << 12),
+            started.elapsed().as_millis()
+        );
+        let shares = &reading.target_shares;
+        if let (Some(least), Some(most)) = (shares.iter().min(), shares.iter().max()) {
+            let spread = most / least;
+            println!(
+                "    target shares θ_t over {} lock terms: least {least} ∈ {}, largest {most} ∈ {}; max(1/θ_t)/min(1/θ_t) = {spread} ∈ {}",
+                shares.len(),
+                point(least, 1 << 12),
+                point(most, 1 << 12),
+                point(&spread, 1)
+            );
+            let mut sorted = shares.clone();
+            sorted.sort();
+            println!(
+                "    θ_t ascending (/4096 cells): {}",
+                sorted.iter().map(|x| point(x, 1 << 12)).collect::<Vec<_>>().join(" ")
+            );
+        }
+        let (Some(gradient), Some(pullback)) = (&reading.gradient, &reading.pullback) else {
+            println!("    refused before the step, {:?}", reading.refusal);
+            continue;
+        };
+        println!(
+            "    the native gradient d = −Aᵀc against the plain pullback: {}; γ_ρ {}",
+            signed(gradient, pullback),
+            reading.modulus_slope.as_ref().map_or_else(|| "none".to_string(), |x| point(x, 1 << 21)),
+        );
+        for (metric, step) in &reading.steps {
+            match step {
+                Ok((delta, rho)) => println!(
+                    "    {metric:?}: ΔE against d {}, against the pullback {}; Δρ per unit {} ∈ {}",
+                    signed(delta, gradient),
+                    signed(delta, pullback),
+                    rho,
+                    point(rho, 1 << 21)
+                ),
+                Err(refusal) => println!("    {metric:?}: refused, {refusal:?}"),
+            }
+        }
+        let formed: Vec<_> = reading.steps.iter().filter_map(|(m, s)| s.as_ref().ok().map(|(d, _)| (m, d))).collect();
+        for (i, (a, da)) in formed.iter().enumerate() {
+            for (b, db) in &formed[i + 1..] {
+                println!("    {a:?} against {b:?}: {}", signed(da, db));
+            }
+        }
+        println!("    {label}: {} ms", started.elapsed().as_millis());
+    }
+    println!("executed metric-steps: {} ms; resident {}", clock.elapsed().as_millis(), resident());
 }
 
 /// [measured-diagnostic; agent-inferred, October 2; the

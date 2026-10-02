@@ -3948,44 +3948,19 @@ pub fn executed_move_guarded(
         .founding_transport(field, ring)?
         .max(constitution.transport(ring).clone());
     let (samples, unit, unit_move, kinetic_modulus) = if metric == MoveMetric::Kinetic || joined {
-        let mut solve =
-            kinetic_solve(field, constitution, declared, requests, &proposal, &samples, None, joined)?;
-        // At the bound an upward `Δρ` is held, and the least-energy move is `E`'s alone.
-        if solve
-            .as_ref()
-            .and_then(|s| s.modulus.as_ref())
-            .is_some_and(|x| x.is_positive() && constitution.transport(ring) >= ceiling)
-        {
-            receipt.modulus_held = solve;
-            solve = kinetic_solve(field, constitution, declared, requests, &proposal, &samples, None, false)?;
-        }
+        let (held, solve, formed) =
+            kinetic_unit(field, constitution, declared, requests, &proposal, &samples, joined, &ceiling)?;
+        receipt.modulus_held = held;
         let Some(solve) = solve else {
             receipt.refusal = Some(MoveRefusal::Invisible);
             return Ok(receipt);
         };
-        let weighted = kinetic_contributions(&proposal, &solve);
         let modulus = solve.modulus.clone();
         receipt.kinetic = Some(solve);
-        let port = constitution
-            .source_port(ring)
-            .ok_or(HnnError::MissingSourcePort { ring })?
-            .clone();
-        let samples = returns_coupled(
-            field,
-            constitution,
-            declared,
-            requests,
-            &weighted,
-            modulus.as_ref().map(|x| (x, &port)),
-        )?;
-        let Some((unit, _)) = constitution.stepped_source(ring, &samples, &Rat::one())? else {
+        let Some((samples, unit, unit_move)) = formed else {
             receipt.refusal = Some(MoveRefusal::Unreached);
             return Ok(receipt);
         };
-        let unit_move = unit
-            .source_port(ring)
-            .ok_or(HnnError::MissingSourcePort { ring })?
-            .subtract(&constitution.source_port(ring).ok_or(HnnError::MissingSourcePort { ring })?.clone())?;
         (samples, unit, unit_move, modulus)
     } else {
         (samples, unit, unit_move, None)
@@ -4094,6 +4069,66 @@ pub fn executed_move_guarded(
     receipt.adopted = adopted;
     receipt.refusal = refusal;
     Ok(receipt)
+}
+
+/// The kinetic solve held at its bound: the joined solve whose upward `Δρ` the bound held, if any.
+type KineticHeld = Option<KineticSolve>;
+/// The kinetic deposition's returns, its unit constitution and the port's unit move.
+type KineticFormed = Option<(Vec<Sample>, Constitution, ExactRatMatrix)>;
+
+/// **The kinetic metrics' unit step, formed and not taken** ([`MoveMetric::Kinetic`],
+/// [`MoveMetric::KineticModulus`]; [`executed_move_guarded`] and [`metric_steps`] read it from this
+/// one function): the receiver's solve (joined where `joined`; at the bound `ceiling` an upward `Δρ`
+/// is held, that solve returned first, and the least-energy move is `E`'s alone), then the normal
+/// law's deposition from the returns at the solve's reading weights, each carrying the coupling's
+/// covector where `ρ` moves, stepped at `η = 1`. `None` for the solve where nothing is visible, and
+/// for the step where its returns reach nothing.
+#[allow(clippy::too_many_arguments)]
+fn kinetic_unit(
+    field: &Field,
+    constitution: &Constitution,
+    declared: &Refinement,
+    requests: &[Request],
+    proposal: &Proposal,
+    samples: &[Sample],
+    joined: bool,
+    ceiling: &Rat,
+) -> Result<(KineticHeld, Option<KineticSolve>, KineticFormed), HnnError> {
+    let ring = declared.ring();
+    let mut held = None;
+    let mut solve = kinetic_solve(field, constitution, declared, requests, proposal, samples, None, joined)?;
+    if solve
+        .as_ref()
+        .and_then(|s| s.modulus.as_ref())
+        .is_some_and(|x| x.is_positive() && &constitution.transport(ring) >= ceiling)
+    {
+        held = solve;
+        solve = kinetic_solve(field, constitution, declared, requests, proposal, samples, None, false)?;
+    }
+    let Some(solve) = solve else {
+        return Ok((held, None, None));
+    };
+    let weighted = kinetic_contributions(proposal, &solve);
+    let port = constitution
+        .source_port(ring)
+        .ok_or(HnnError::MissingSourcePort { ring })?
+        .clone();
+    let samples = returns_coupled(
+        field,
+        constitution,
+        declared,
+        requests,
+        &weighted,
+        solve.modulus.as_ref().map(|x| (x, &port)),
+    )?;
+    let Some((unit, _)) = constitution.stepped_source(ring, &samples, &Rat::one())? else {
+        return Ok((held, Some(solve), None));
+    };
+    let unit_move = unit
+        .source_port(ring)
+        .ok_or(HnnError::MissingSourcePort { ring })?
+        .subtract(&port)?;
+    Ok((held, Some(solve), Some((samples, unit, unit_move))))
 }
 
 /// **The committed move's unit step, formed and not taken** ([`executed_move`] and
@@ -4220,6 +4255,141 @@ pub fn unit_direction(
     reading.modulus_slope = Some(step.gamma);
     reading.modulus_curvature = Some(step.curvature);
     reading.modulus_unit = Some(step.modulus_unit);
+    Ok(reading)
+}
+
+/// [measured-diagnostic; agent-inferred, October 2] **Each declared metric's unit step at one
+/// constitution beside the native gradient, not taken** ([`metric_steps`]): the incumbent's reading,
+/// the native descent gradient `d = −Aᵀc` the kinetic solve opens from (the readings' covector
+/// `c = θ − e_t` pulled back through every leading member's reading gradient onto `E`), the plain
+/// pullback of the returns `Σ_t w_t g_t f_tᵀ` ([`DirectionReading::pullback`]), every lock term's
+/// target share `θ_t`, and per metric its step `(ΔE, Δρ)` per unit move as [`executed_move_guarded`]
+/// forms it: `Coordinate` the normal law's `ΔE` with `−γ_ρ/G_ρ`; `Witness` the plane step
+/// `(αΔE, β)`; `Kinetic` and `KineticModulus` the receiver's solve deposited by the normal law, with
+/// the joined solve's `Δρ`. A metric that refuses before its step reads its refusal. Nothing moves.
+#[derive(Clone, Debug)]
+pub struct MetricSteps {
+    pub before: BatchComparison,
+    pub refusal: Option<MoveRefusal>,
+    pub gradient: Option<ExactRatMatrix>,
+    pub pullback: Option<ExactRatMatrix>,
+    pub modulus_slope: Option<Rat>,
+    /// Every lock term's target share `θ_t`, in the proposal's term order.
+    pub target_shares: Vec<Rat>,
+    pub steps: Vec<(MoveMetric, Result<(ExactRatMatrix, Rat), MoveRefusal>)>,
+}
+
+/// [measured-diagnostic] Each declared metric's unit step at a constitution ([`MetricSteps`]).
+pub fn metric_steps(
+    field: &Field,
+    constitution: &Constitution,
+    requests: &[Request],
+    declared: &Refinement,
+    bank: &ReceivingBank,
+    grain: u32,
+    comparison: Comparison,
+) -> Result<MetricSteps, HnnError> {
+    let ring = declared.ring();
+    let (before, reads) = incumbent(field, constitution, requests, declared, bank, grain, comparison)?;
+    let proposal = propose(comparison.composition, &before, &reads);
+    drop(reads);
+    let terms = kinetic_readings(&proposal);
+    let target_shares = proposal
+        .terms
+        .iter()
+        .zip(&terms)
+        .filter(|(t, _)| matches!(t.certificate, Certificate::Lock { .. }))
+        .map(|(_, (theta, target, _))| theta[*target].clone())
+        .collect();
+    let mut reading = MetricSteps {
+        before,
+        refusal: certificate_refusal(&proposal),
+        gradient: None,
+        pullback: None,
+        modulus_slope: None,
+        target_shares,
+        steps: Vec::new(),
+    };
+    if reading.refusal.is_some() {
+        return Ok(reading);
+    }
+    let (samples, step) = unit_step(field, constitution, declared, requests, &proposal)?;
+    let Some(step) = step else {
+        reading.refusal = Some(MoveRefusal::Unreached);
+        return Ok(reading);
+    };
+    let (rows, columns) = (step.unit_move.rows(), step.unit_move.columns());
+    // The plain pullback of the returns, as `unit_direction` reads it.
+    let mut pullback = vec![vec![Rat::zero(); columns]; rows];
+    for sample in &samples {
+        for (row, g) in pullback.iter_mut().zip(&sample.covector) {
+            let scaled = &sample.weight * g;
+            for (entry, f) in row.iter_mut().zip(&sample.feature) {
+                if !f.is_zero() {
+                    *entry += &scaled * f;
+                }
+            }
+        }
+    }
+    reading.pullback = Some(ExactRatMatrix::new(pullback)?);
+    // The native descent gradient `−Aᵀc`, exactly: each reading coordinate's covector entry
+    // (`θ_x − [x = t]`, as the kinetic solve's opening residual) on its members' reading gradients.
+    let members: Vec<&Contribution> = proposal.terms.iter().flat_map(|t| &t.leading).collect();
+    let gradients = reading_gradients(field, constitution, declared, requests, &members)?;
+    let mut weights = vec![Rat::zero(); members.len()];
+    for (theta, target, coordinates) in &terms {
+        for (x, (share, row)) in theta.iter().zip(coordinates).enumerate() {
+            let c = if x == *target { share - Rat::one() } else { share.clone() };
+            for (m, k) in row {
+                weights[*m] -= k * &c;
+            }
+        }
+    }
+    let mut gradient = vec![Rat::zero(); rows * columns];
+    for (g, w) in gradients.iter().zip(&weights).filter(|(_, w)| !w.is_zero()) {
+        for (entry, x) in gradient.iter_mut().zip(g) {
+            *entry += x * w;
+        }
+    }
+    reading.gradient = Some(ExactRatMatrix::new(gradient.chunks(columns).map(<[Rat]>::to_vec).collect())?);
+    reading.modulus_slope = Some(step.gamma.clone());
+    let ceiling = constitution
+        .founding_transport(field, ring)?
+        .max(constitution.transport(ring).clone());
+    for metric in [MoveMetric::Coordinate, MoveMetric::Witness, MoveMetric::Kinetic, MoveMetric::KineticModulus] {
+        let formed = match metric {
+            MoveMetric::Coordinate => Ok((step.unit_move.clone(), step.modulus_unit.clone())),
+            MoveMetric::Witness => {
+                let form = plane_form(field, constitution, declared, requests, &proposal, &step.unit)?;
+                match form.as_ref().and_then(WitnessForm::step).and_then(|s| <[Rat; 2]>::try_from(s).ok()) {
+                    None => Err(MoveRefusal::Invisible),
+                    Some([alpha, beta]) if !alpha.is_positive() => Err(MoveRefusal::Reversed([alpha, beta])),
+                    Some([alpha, beta]) => {
+                        let scaled: Vec<Vec<Rat>> = step
+                            .unit_move
+                            .to_rows()
+                            .into_iter()
+                            .map(|row| row.into_iter().map(|x| &alpha * x).collect())
+                            .collect();
+                        Ok((ExactRatMatrix::new(scaled)?, beta))
+                    }
+                }
+            }
+            MoveMetric::Kinetic | MoveMetric::KineticModulus => {
+                let joined = metric == MoveMetric::KineticModulus;
+                let (_, solve, formed) =
+                    kinetic_unit(field, constitution, declared, requests, &proposal, &samples, joined, &ceiling)?;
+                match (solve, formed) {
+                    (None, _) => Err(MoveRefusal::Invisible),
+                    (Some(_), None) => Err(MoveRefusal::Unreached),
+                    (Some(solve), Some((_, _, unit_move))) => {
+                        Ok((unit_move, solve.modulus.unwrap_or_else(Rat::zero)))
+                    }
+                }
+            }
+        };
+        reading.steps.push((metric, formed));
+    }
     Ok(reading)
 }
 
