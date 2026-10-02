@@ -92,11 +92,17 @@ exponent `v`. No temperature enters: the receiving map's gain, which plays the r
    dyadic, for example `2^⌈log₂ L(N)⌉`, which meets the criterion because it is at least `L(N)`.
    At every count, same-cell media carry less than one bit over the readings
    (`refiningGrain_unconfirmable`). Re-basing a carrier's lattice onto the finer grain is proved
-   in `HNN/LatticeDeposit/Rebase`: it keeps value plus carry exactly, and the releases since the
-   founding stay below half the founding unit.
+   in `HNN/LatticeDeposit/Rebase` over any number of re-bases: value plus carry is kept exactly,
+   and the releases since the founding stay below half the founding unit
+   (`history_release_lt`).
 10. **Campaign 1's numbers** (`resolution_aeon_bounds`, `declared_grain_vs_resolution`,
    `measured_change_ratio`, `measured_change_readings`, `measured_aeon_test_bound`,
-   `measured_aeon_code_bound`).
+   `measured_aeon_code_bound`). These are arithmetic on the record's inputs, and each reading of
+   them is conditional: it treats the `1190` readings of an aeon as independent draws from one of
+   the two faces (`1190` is the exposure's mean aeon length, and its readings are not independent
+   samples), it takes `7/2^18` bits from the record's variance surrogate, which is not certified,
+   and "readable" means the one-bit convention (Stein's lemma gives the convention, not an exact
+   threshold). None of them is a measured physical fact about the machine.
 
 [definition] **The record's steps, checked.**
 
@@ -107,12 +113,16 @@ exponent `v`. No temperature enters: the receiving map's gain, which plays the r
   threshold `N·D ≥ 1` bit is a declared error level, not derived (at `N·D = 1` bit the best test
   still has `α + β ≥ 1 − √(ln 2) > 1/7`). And the readings' outcomes must be drawn from one of the
   two faces, independently (item 2; sequential readings need the chain rule, not formalized here).
-  The inequality the finding uses, unreadable whenever `max|δ| < √(2/(N ln 2))`, holds exactly under
-  that criterion (`klBits_face_shift_le_abs`).
-* Step 4 holds: `√(2/(1190 ln 2)) ∈ (1/21, 1/20)`, and the declared `1/16` lies above it by less
-  than `4/3`. `N = 1190` is the exposure's declared aeon, itself a declared constant.
+  The inequality the finding uses, below one bit whenever `max|δ| < √(2/(N ln 2))`, holds exactly
+  for `N` independent readings (`klBits_face_shift_le_abs`); "unreadable" names only that
+  convention.
+* Step 4 holds as arithmetic: `√(2/(1190 ln 2)) ∈ (1/21, 1/20)`, and the declared `1/16` lies above
+  it by less than `4/3`. `N = 1190` is the exposure's mean aeon length; using it as `N` treats the
+  aeon's readings as independent, which they are not.
 
-[definition] **The finding's margins, corrected.** With the measured `max|δ| = 7/2^18` bits:
+[definition] **The finding's margins, corrected.** With the record's `max|δ| = 7/2^18` bits (read
+through its uncertified variance surrogate), and treating an aeon's `1190` readings as independent
+draws from one face, at the one-bit convention:
 * it lies between `2^10` and `2^11` times below the resolution, not more than `2^12` times
   (`measured_change_ratio`);
 * telling the media apart at one bit needs more than `2^21` aeons (`2^31` readings), not about
@@ -120,8 +130,9 @@ exponent `v`. No temperature enters: the receiving map's gain, which plays the r
 * over one aeon every test errs with `α + β ≥ 1 − 2^(−11)` (`measured_aeon_test_bound`);
 * on real text, which no face produced, the two media's code over one aeon differs by less than
   `1/15` bit, and a coherent change would reach one bit after about 16 aeons
-  (`measured_aeon_code_bound`). The statistical margin is very large; the margin of the code on
-  real text is not.
+  (`measured_aeon_code_bound`; this one needs no independence, only the `7/2^18` bound at each
+  reading). Under those assumptions the statistical margin is very large; the margin of the code on
+  real text is not. Without them the margins are not established.
 
 No `axiom`, no `sorry`, no `native_decide`.
 -/
@@ -1404,13 +1415,19 @@ theorem refiningGrain_unconfirmable {ι ρ : Type*} [Fintype ι] [Nonempty ι] [
 
 end Refining
 
-/-! ## 10. Campaign 1's numbers -/
+/-! ## 10. Campaign 1's numbers
+
+[definition] Every statement here is arithmetic on the record's inputs. Read as claims about the
+machine, each is conditional: `N = 1190` is the exposure's mean aeon length, and treating its
+readings as independent draws from one face is an assumption they do not meet; `7/2^18` bits comes
+from the record's uncertified variance surrogate; and "readable" is the one-bit convention. -/
 
 section Campaign
 
 
-/-- [proved-derived; formal-checked] **The resolution at one aeon.** With `N = 1190` readings and
-the one-bit criterion, `√(2/(1190 ln 2))` lies in `(1/21, 1/20)`. -/
+/-- [proved-derived; formal-checked] **The resolution at one aeon, if its readings were
+independent.** With `N = 1190` (the mean aeon length, taken as a count of independent readings) and
+the one-bit convention, `√(2/(1190 ln 2))` lies in `(1/21, 1/20)`. -/
 theorem resolution_aeon_bounds :
     1 / 21 < Real.sqrt (2 / (1190 * Real.log 2)) ∧ Real.sqrt (2 / (1190 * Real.log 2)) < 1 / 20 := by
   obtain ⟨hlo, hhi⟩ := log_two_bounds
@@ -1429,9 +1446,9 @@ theorem declared_grain_vs_resolution :
   obtain ⟨h1, h2⟩ := resolution_aeon_bounds
   constructor <;> linarith
 
-/-- [proved-derived; formal-checked] **The measured change against the resolution.** The largest
-measured change `7/2^18` bits lies between `2^10` and `2^11` times below the resolution, so not
-more than `2^12` times below it. -/
+/-- [proved-derived; formal-checked] **The record's change against the resolution.** The record's
+largest change `7/2^18` bits (from its uncertified variance surrogate) lies between `2^10` and `2^11`
+times below the independent-readings resolution, so not more than `2^12` times below it. -/
 theorem measured_change_ratio :
     2 ^ 10 * (7 / 2 ^ 18 : ℝ) < Real.sqrt (2 / (1190 * Real.log 2)) ∧
       Real.sqrt (2 / (1190 * Real.log 2)) < 2 ^ 11 * (7 / 2 ^ 18 : ℝ) ∧
@@ -1439,9 +1456,10 @@ theorem measured_change_ratio :
   obtain ⟨h1, h2⟩ := resolution_aeon_bounds
   refine ⟨by linarith, by linarith, by intro h; linarith⟩
 
-/-- [proved-derived; formal-checked] **How many readings the measured change needs.** If `N`
-readings of the measured change accumulate one bit under the bound `(ln 2/2)·M²`, then
-`N > 1190·2^21`: more than `2^21` aeons, hence more than `2^31` readings. -/
+/-- [proved-derived; formal-checked] **How many readings the record's change needs.** If `N`
+independent readings of a change bounded by `7/2^18` bits accumulate one bit under the bound
+`(ln 2/2)·M²`, then `N > 1190·2^21`: more than `2^21` mean aeon lengths, hence more than `2^31`
+readings. -/
 theorem measured_change_readings (N : ℝ) (h : 1 ≤ N * (Real.log 2 / 2 * (7 / 2 ^ 18) ^ 2)) :
     1190 * 2 ^ 21 < N ∧ (2 : ℝ) ^ 31 < N := by
   obtain ⟨_, hhi⟩ := log_two_bounds
@@ -1455,9 +1473,10 @@ theorem measured_change_readings (N : ℝ) (h : 1 ≤ N * (Real.log 2 / 2 * (7 /
     mul_le_mul_of_nonneg_left (by nlinarith) hN
   constructor <;> nlinarith
 
-/-- [proved-derived; formal-checked] **Over one aeon every test errs almost as a coin does.** With
-`|δ| ≤ 7/2^18` bits at each of `1190` readings, `√(1190 (ln 2)² M²/2) < 2^(−11)`, so
-`receiver_cannot_tell` gives `α + β > 1 − 2^(−11)`. -/
+/-- [proved-derived; formal-checked] **Over one aeon, if its readings were independent, every test
+errs almost as a coin does.** With `|δ| ≤ 7/2^18` bits at each of `1190` independent readings drawn
+from one face, `√(1190 (ln 2)² M²/2) < 2^(−11)`, so `receiver_cannot_tell` gives
+`α + β > 1 − 2^(−11)`. -/
 theorem measured_aeon_test_bound :
     Real.sqrt (1190 * ((Real.log 2) ^ 2 * (7 / 2 ^ 18) ^ 2 / 2)) < 1 / 2 ^ 11 := by
   obtain ⟨hlo, hhi⟩ := log_two_bounds
@@ -1466,9 +1485,10 @@ theorem measured_aeon_test_bound :
   have hsq : (Real.log 2) ^ 2 < 0.4806 := by nlinarith
   nlinarith
 
-/-- [proved-derived; formal-checked] **On real text the code's margin is small.** Over one aeon
-the two media's code lengths differ by at most `1190·(2·7/2^18) < 1/15` bit, and a change that moved
-every reading's code the same way would reach one bit only after more than `15` aeons. -/
+/-- [proved-derived; formal-checked] **On real text the code's margin is small.** If every one of
+`1190` readings has `|δ| ≤ 7/2^18` bits, the two media's code lengths differ by at most
+`1190·(2·7/2^18) < 1/15` bit, and a change that moved every reading's code the same way would reach
+one bit only after more than `15` such spans. This needs no independence. -/
 theorem measured_aeon_code_bound :
     (1190 : ℝ) * (2 * (7 / 2 ^ 18)) < 1 / 15 ∧
       ∀ N : ℝ, 1 ≤ N * (2 * (7 / 2 ^ 18)) → 15 * 1190 < N := by

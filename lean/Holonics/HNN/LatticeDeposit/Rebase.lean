@@ -7,9 +7,10 @@ import Holonics.HNN.LatticeDeposit
 count (`HNN/Ratio/Resolution.refiningGrain`, `L(N) = ⌈√(N ln 2/2)⌉`). It does not refine by integer
 factors, so a schedule that keeps every coarser read is dyadic, `2^⌈log₂ L(N)⌉`
 (`HNN/Ratio/Resolution.grainRead_of_refined`). A carrier on the lattice `2^(−L)ℤ` then moves to
-`2^(−L−j)ℤ`. This module states that move for the lattice deposit's carrier (`HNN/LatticeDeposit`,
-realized by `hnn::constitution`'s `BudgetedCarry` and `Carry`) and proves that it loses nothing the
-carrier stored. It is the item #62 owed after PR #151.
+`2^(−L−j)ℤ`. This module states that move for the lattice deposit's carrier (`HNN/LatticeDeposit`)
+and proves that it loses nothing the carrier stored, over any number of re-bases. It is the item
+#62 owed after PR #151. The re-base has no Rust owner yet: `hnn::constitution`'s `BudgetedCarry`
+holds one fixed lattice per locus and never re-bases it.
 
 **The re-base.** The carried remainder `r ∈ [−u/2, u/2)` is divided at the finer unit
 `u′ = 2^(−L−j)`, `r = q′u′ + r′` with `r′ ∈ [−u′/2, u′/2)` (the owner's `div_rem_spec`). The value
@@ -22,24 +23,27 @@ so the precision schedule `k_m` continues. Nothing is released.
    `rebase_clock`). `value′ + r′ = value + r` at every entry: the stored accumulation is unchanged.
    The value moves by `r − r′`, lands on the finer lattice, and the remainder is in the finer half
    cell and on the finer fine lattice of the same clock.
-2. **The accounting runs across a re-base** (`rebase_run_accounting`). Deposits before the re-base
-   at `L`, the re-base, then deposits at `L + j`: the final value and remainder plus both segments'
-   releases equal the starting value and remainder plus every exact update. The re-base adds no
-   term.
-3. **The release bound across a re-base** (`release_across_rebase_le`,
-   `release_across_rebase_lt`, `within_founding_unit_across_rebase`). Each deposit releases at most
-   half its own fine cell, and the clock does not reset, so the two segments' releases together
-   are at most `(u/2) Σ_(m ∈ (c₀, c₂]) 2^(−k_m) < u/2`, with `u` the unit before the re-base. The
-   value stays within `u/2 + u′/2` of the exact accumulation.
+2. **Any history of deposits and re-bases** (`Move`, `Tracked`, `Invariant`, `invariant_deposit`,
+   `invariant_rebase`, `invariant_history`). A history interleaves deposit runs on the current
+   lattice with re-bases onto finer ones, as many as it likes. One invariant holds after every move:
+   the stored accumulation plus the releases equals the founding accumulation plus the updates, and
+   the releases are at most half the founding unit times the Kraft weight of the clocks since the
+   founding. A deposit run keeps it because its releases are at most half its own unit times its
+   clocks' weight (`released_le`), its unit is at most the founding one (`unit_anti`), and its
+   clocks follow the earlier ones. A re-base keeps it because it keeps value plus carry and the
+   clock and releases nothing.
+3. **What every history guarantees** (`history_accounting`, `history_release_lt`,
+   `history_within_founding_unit`). Re-bases add no term to the accounting. The releases since the
+   founding total less than `u/2`, with `u` the founding unit, because the clock never resets and
+   the Kraft sum over all its clocks is below one. The value stays within `u/2 + u_now/2` of the
+   exact accumulation, with `u_now` the current unit.
 
 [definition] **What this means for the contacts.** The bound is in the founding unit, not the
-current one. After a re-base the half-cap at the current unit `u′/2` no longer holds: the releases
-since the founding can reach `u/2`, which is `2^(j−1)` current units. So under a refining grain a
-contact's dropped residuals are still bounded, but by the coarsest unit it was carried on; the
-drift relative to the current grain grows with every refinement. The same proof iterates over any
-number of re-bases: each deposit's release is at most half its own cell, every unit is at most the
-founding one, and the Kraft sum over the whole clock is below one, so the total stays below the
-founding `u/2`.
+current one. After re-bases totalling `j` levels the half-cap at the current unit no longer holds:
+the releases since the founding are below `u/2` and can come arbitrarily close to it (before any
+re-base already, `Freeze.release_bound_tight`), which is just under `2^(j−1)` current units. So
+under a refining grain a contact's dropped residuals stay bounded, but by the coarsest unit it was
+carried on; measured in the current grain, that bound grows with every refinement.
 
 No `axiom`, no `sorry`, no `native_decide`.
 -/
@@ -104,78 +108,145 @@ theorem rebase_clock (s : Carried L E) (j : ℕ) : (s.rebase j).clock = s.clock 
 
 end Rebase
 
-/-! ## 2. The accounting and the release bound across a re-base -/
+/-! ## 2. Any history of deposits and re-bases -/
 
-section Across
+section History
 
-/-- [proved-derived; formal-checked] **`rebase_run_accounting`.** Deposits `Δs₁` at `L`, a re-base
-by `j`, then deposits `Δs₂` at `L + j`: the final value and remainder plus both segments' releases
-equal the starting value and remainder plus every exact update. -/
-theorem rebase_run_accounting (s : Carried L E) (j : ℕ) (Δs₁ Δs₂ : List (E → ℚ)) (i : E) :
-    (run ((run s Δs₁).rebase j) Δs₂).value i + (run ((run s Δs₁).rebase j) Δs₂).rem i +
-        released s Δs₁ i + released ((run s Δs₁).rebase j) Δs₂ i =
-      s.value i + s.rem i + (Δs₁.map (· i)).sum + (Δs₂.map (· i)).sum := by
-  have h1 := run_accounting s Δs₁ i
-  have h2 := run_accounting ((run s Δs₁).rebase j) Δs₂ i
-  have hr := rebase_value_add_rem (run s Δs₁) j i
+/-- A coarser lattice has the larger unit. -/
+theorem unit_anti {a b : ℕ} (h : a ≤ b) : unit b ≤ unit a := by
+  obtain ⟨k, rfl⟩ := Nat.exists_eq_add_of_le h
+  have e := unit_eq_pow_mul a k
+  have hp : (1 : ℚ) ≤ 2 ^ k := one_le_pow₀ (by norm_num)
+  have hu := unit_pos (a + k)
+  nlinarith
+
+/-- [definition] **One move of a carrier's history**: a run of deposits on its current lattice, or
+a re-base onto the lattice `j` levels finer. -/
+inductive Move (E : Type*) where
+  | deposit (Δs : List (E → ℚ))
+  | rebase (j : ℕ)
+
+/-- [definition] **A carrier with its history's totals**: its current lattice and carrier, and, per
+entry, the exact updates and the releases since the history began. The totals are bookkeeping for
+the statement, not state the machine keeps. -/
+structure Tracked (E : Type*) where
+  lat : ℕ
+  carrier : Carried lat E
+  acc : E → ℚ
+  rel : E → ℚ
+
+/-- [definition] The start of a history: the carrier, no updates, no releases. -/
+def Tracked.start (s : Carried L E) : Tracked E := ⟨L, s, 0, 0⟩
+
+/-- [definition] One move: a deposit run adds its updates and releases; a re-base adds neither. -/
+noncomputable def Tracked.step (σ : Tracked E) : Move E → Tracked E
+  | .deposit Δs => ⟨σ.lat, run σ.carrier Δs, fun i => σ.acc i + (Δs.map (· i)).sum,
+      fun i => σ.rel i + released σ.carrier Δs i⟩
+  | .rebase j => ⟨σ.lat + j, σ.carrier.rebase j, σ.acc, σ.rel⟩
+
+/-- [definition] A history: the moves in order. -/
+noncomputable def Tracked.history (σ : Tracked E) (ms : List (Move E)) : Tracked E :=
+  ms.foldl Tracked.step σ
+
+/-- [definition] **The invariant** against the founding carrier `s₀` on `2^(−L)ℤ`: the lattice is at
+least as fine as the founding one, the clock has not gone back, the stored accumulation plus the
+releases equals the founding accumulation plus the updates, and the releases are at most half the
+founding unit times the Kraft weight of the clocks since the founding. -/
+def Invariant (s₀ : Carried L E) (σ : Tracked E) : Prop :=
+  L ≤ σ.lat ∧ s₀.clock ≤ σ.carrier.clock ∧ ∀ i,
+    σ.carrier.value i + σ.carrier.rem i + σ.rel i = s₀.value i + s₀.rem i + σ.acc i ∧
+    |σ.rel i| ≤ unit L / 2 * ∑ m ∈ Finset.Ioc s₀.clock σ.carrier.clock, gammaWeight m
+
+theorem invariant_start (s₀ : Carried L E) : Invariant s₀ (Tracked.start s₀) := by
+  refine ⟨le_refl _, le_refl _, fun i => ⟨?_, ?_⟩⟩ <;> simp [Tracked.start]
+
+/-- [proved-derived; formal-checked] **A deposit run keeps the invariant.** Its releases are at most
+half its own unit times the Kraft weight of its clocks (`released_le`); its unit is at most the
+founding one, and its clocks follow the earlier ones. -/
+theorem invariant_deposit {s₀ : Carried L E} {σ : Tracked E} (h : Invariant s₀ σ)
+    (Δs : List (E → ℚ)) : Invariant s₀ (σ.step (.deposit Δs)) := by
+  obtain ⟨hL, hc, hi⟩ := h
+  have hc1 := run_clock_ge σ.carrier Δs
+  refine ⟨hL, hc.trans hc1, fun i => ⟨?_, ?_⟩⟩
+  · have hacc := run_accounting σ.carrier Δs i
+    have := (hi i).1
+    simp only [Tracked.step]
+    linarith
+  · simp only [Tracked.step]
+    have hrel := released_le σ.carrier Δs i
+    have hu : unit σ.lat / 2 ≤ unit L / 2 := by linarith [unit_anti hL]
+    have hw : 0 ≤ ∑ m ∈ Finset.Ioc σ.carrier.clock (run σ.carrier Δs).clock, gammaWeight m :=
+      Finset.sum_nonneg fun m _ => gammaWeight_nonneg m
+    have hsplit : ∑ m ∈ Finset.Ioc s₀.clock (run σ.carrier Δs).clock, gammaWeight m =
+        ∑ m ∈ Finset.Ioc s₀.clock σ.carrier.clock, gammaWeight m +
+          ∑ m ∈ Finset.Ioc σ.carrier.clock (run σ.carrier Δs).clock, gammaWeight m := by
+      rw [← Finset.sum_union (Finset.disjoint_left.mpr fun m h1 h2 => by
+        simp only [Finset.mem_Ioc] at h1 h2; omega)]
+      congr 1
+      ext m; simp only [Finset.mem_Ioc, Finset.mem_union]; omega
+    rw [hsplit, mul_add]
+    calc |σ.rel i + released σ.carrier Δs i|
+        ≤ |σ.rel i| + |released σ.carrier Δs i| := abs_add_le _ _
+      _ ≤ _ := add_le_add (hi i).2 (hrel.trans (mul_le_mul_of_nonneg_right hu hw))
+
+/-- [proved-derived; formal-checked] **A re-base keeps the invariant**: it keeps value plus carry and
+the clock, and releases nothing. -/
+theorem invariant_rebase {s₀ : Carried L E} {σ : Tracked E} (h : Invariant s₀ σ) (j : ℕ) :
+    Invariant s₀ (σ.step (.rebase j)) := by
+  obtain ⟨hL, hc, hi⟩ := h
+  refine ⟨le_trans hL (Nat.le_add_right _ _), hc, fun i => ⟨?_, (hi i).2⟩⟩
+  have := rebase_value_add_rem σ.carrier j i
+  have := (hi i).1
+  simp only [Tracked.step]
   linarith
 
-/-- [proved-derived; formal-checked] **The two segments' releases share one Kraft sum.** Measured
-in the unit before the re-base, they are at most `(u/2) Σ_(m ∈ (c₀, c₂]) 2^(−k_m)`. -/
-theorem release_across_rebase_le (s : Carried L E) (j : ℕ) (Δs₁ Δs₂ : List (E → ℚ)) (i : E) :
-    |released s Δs₁ i + released ((run s Δs₁).rebase j) Δs₂ i| ≤
-      unit L / 2 * ∑ m ∈ Finset.Ioc s.clock (run ((run s Δs₁).rebase j) Δs₂).clock,
-        gammaWeight m := by
-  set t := (run s Δs₁).rebase j
-  have h1 := released_le s Δs₁ i
-  have h2 := released_le t Δs₂ i
-  have hct : t.clock = (run s Δs₁).clock := rfl
-  have hc1 := run_clock_ge s Δs₁
-  have hc2 := run_clock_ge t Δs₂
-  rw [hct] at h2 hc2
-  have hfine : unit (L + j) / 2 ≤ unit L / 2 := by
-    have := unit_eq_pow_mul L j
-    have hp : (1 : ℚ) ≤ 2 ^ j := one_le_pow₀ (by norm_num)
-    have hu := unit_pos (L + j)
-    nlinarith
-  have hw : 0 ≤ ∑ m ∈ Finset.Ioc (run s Δs₁).clock (run t Δs₂).clock, gammaWeight m :=
-    Finset.sum_nonneg fun m _ => gammaWeight_nonneg m
-  have hsplit : ∑ m ∈ Finset.Ioc s.clock (run t Δs₂).clock, gammaWeight m =
-      ∑ m ∈ Finset.Ioc s.clock (run s Δs₁).clock, gammaWeight m +
-        ∑ m ∈ Finset.Ioc (run s Δs₁).clock (run t Δs₂).clock, gammaWeight m := by
-    rw [← Finset.sum_union (Finset.disjoint_left.mpr fun m h1 h2 => by
-      simp only [Finset.mem_Ioc] at h1 h2; omega)]
-    congr 1
-    ext m; simp only [Finset.mem_Ioc, Finset.mem_union]; omega
-  rw [hsplit, mul_add]
-  calc |released s Δs₁ i + released t Δs₂ i|
-      ≤ |released s Δs₁ i| + |released t Δs₂ i| := abs_add_le _ _
-    _ ≤ _ := add_le_add h1 (h2.trans (mul_le_mul_of_nonneg_right hfine hw))
+/-- [proved-derived; formal-checked] **Every history keeps the invariant**, whatever its deposits
+and however many re-bases. -/
+theorem invariant_history {s₀ : Carried L E} {σ : Tracked E} (h : Invariant s₀ σ)
+    (ms : List (Move E)) : Invariant s₀ (σ.history ms) := by
+  induction ms generalizing σ with
+  | nil => exact h
+  | cons m ms ih =>
+    have hstep : Invariant s₀ (σ.step m) := by
+      cases m with
+      | deposit Δs => exact invariant_deposit h Δs
+      | rebase j => exact invariant_rebase h j
+    exact ih hstep
 
-/-- [proved-derived; formal-checked] **`release_across_rebase_lt`.** Since the founding, across a
-re-base, the releases at an entry total less than half the unit before the re-base. -/
-theorem release_across_rebase_lt (s : Carried L E) (j : ℕ) (Δs₁ Δs₂ : List (E → ℚ)) (i : E) :
-    |released s Δs₁ i + released ((run s Δs₁).rebase j) Δs₂ i| < unit L / 2 := by
+/-- [proved-derived; formal-checked] **`history_accounting`.** After any history of deposits and
+re-bases from `s₀`, the value and remainder plus the releases equal the founding value and remainder
+plus every exact update: re-bases add no term. -/
+theorem history_accounting (s₀ : Carried L E) (ms : List (Move E)) (i : E) :
+    ((Tracked.start s₀).history ms).carrier.value i + ((Tracked.start s₀).history ms).carrier.rem i +
+        ((Tracked.start s₀).history ms).rel i =
+      s₀.value i + s₀.rem i + ((Tracked.start s₀).history ms).acc i :=
+  ((invariant_history (invariant_start s₀) ms).2.2 i).1
+
+/-- [proved-derived; formal-checked] **`history_release_lt`.** After any history of deposits and
+re-bases, the releases at an entry since the founding total less than half the founding unit. -/
+theorem history_release_lt (s₀ : Carried L E) (ms : List (Move E)) (i : E) :
+    |((Tracked.start s₀).history ms).rel i| < unit L / 2 := by
+  have h := ((invariant_history (invariant_start s₀) ms).2.2 i).2
   have hu : 0 < unit L / 2 := by have := unit_pos L; positivity
-  calc _ ≤ _ := release_across_rebase_le s j Δs₁ Δs₂ i
+  calc _ ≤ _ := h
     _ < unit L / 2 * 1 := mul_lt_mul_of_pos_left (gamma_window_lt_one _ _) hu
     _ = unit L / 2 := mul_one _
 
-/-- [proved-derived; formal-checked] **`within_founding_unit_across_rebase`.** After a re-base the
-value stays within `u/2 + u′/2` of the exact accumulation since the founding: the carried remainder
-is in the finer half cell, and the releases are below half the coarser unit. -/
-theorem within_founding_unit_across_rebase (s : Carried L E) (j : ℕ)
-    (Δs₁ Δs₂ : List (E → ℚ)) (i : E) :
-    |(run ((run s Δs₁).rebase j) Δs₂).value i -
-        (s.value i + s.rem i + (Δs₁.map (· i)).sum + (Δs₂.map (· i)).sum)| <
-      unit L / 2 + unit (L + j) / 2 := by
-  have hacc := rebase_run_accounting s j Δs₁ Δs₂ i
-  have hrel := release_across_rebase_lt s j Δs₁ Δs₂ i
-  have hb := (run ((run s Δs₁).rebase j) Δs₂).rem_bounded i
+/-- [proved-derived; formal-checked] **`history_within_founding_unit`.** After any history, the value
+is within half the founding unit plus half the current unit of the exact accumulation since the
+founding: the carried remainder lies in the current half cell, and the releases below the founding
+half unit. -/
+theorem history_within_founding_unit (s₀ : Carried L E) (ms : List (Move E)) (i : E) :
+    |((Tracked.start s₀).history ms).carrier.value i - (s₀.value i + s₀.rem i +
+        ((Tracked.start s₀).history ms).acc i)| <
+      unit L / 2 + unit ((Tracked.start s₀).history ms).lat / 2 := by
+  have hacc := history_accounting s₀ ms i
+  have hrel := history_release_lt s₀ ms i
+  have hb := ((Tracked.start s₀).history ms).carrier.rem_bounded i
   rw [abs_lt] at hrel ⊢
   constructor <;> linarith [hb.1, hb.2, hrel.1, hrel.2]
 
-end Across
+end History
 
 section Audit
 
@@ -183,10 +254,13 @@ section Audit
 #print axioms rebase_value_add_rem
 #print axioms rebase_shift
 #print axioms rebase_onLattice
-#print axioms rebase_run_accounting
-#print axioms release_across_rebase_le
-#print axioms release_across_rebase_lt
-#print axioms within_founding_unit_across_rebase
+#print axioms unit_anti
+#print axioms invariant_deposit
+#print axioms invariant_rebase
+#print axioms invariant_history
+#print axioms history_accounting
+#print axioms history_release_lt
+#print axioms history_within_founding_unit
 
 end Audit
 

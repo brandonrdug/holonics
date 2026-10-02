@@ -79,9 +79,10 @@ used here, deposit `i` moves an entry by at most `κ` times the share of the sta
    reach `(u/2)·√N/4`, a whole unit from `N = 64`. The half-unit conclusion holds because the
    code's cell refines as `1/m²`, which is summable; a cell refining as `1/√m` is not.
    Here the coarse unit `u` is held fixed, as the carrier fixes `L`. If the coarse unit itself
-   refines with the grain, the carrier is re-based (`HNN/LatticeDeposit/Rebase`): the re-base
-   keeps value plus carry exactly, and the releases since the founding stay below half the
-   founding unit, which is `2^(j−1)` units of a grain refined `j` times.
+   refines with the grain, the carrier is re-based (`HNN/LatticeDeposit/Rebase`): over any number
+   of re-bases value plus carry is kept exactly, and the releases since the founding stay below
+   half the founding unit, just under `2^(j−1)` units of a grain refined `j` levels
+   (`history_release_lt`).
 
 [definition] **The condition, in what the main line measures.** The carried remainder's own sign is
 not the statistic: it lies in `[−u/2, u/2)` and changes sign every time the entry moves. The
