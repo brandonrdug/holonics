@@ -2097,3 +2097,21 @@ fn a_contacts_channel_rebases_with_its_carried_remainders() {
         Err(HnnError::ReleasedLocus { .. })
     ));
 }
+
+/// **The receiving step pairs the original covector** (Astra's counterexample, October 2): a uniform
+/// two-class reading with target class 0 (`g = (½, 0, −½, 0)`), a unit feature and the class
+/// metric's move `D = (½, 0, −½, 0)ᵀ` read the alignment `½`, not the scaled covector's `1`.
+#[test]
+fn the_receiving_step_pairs_the_original_covector() {
+    use crate::hnn::constitution::{Sample, receiving_fisher_face_probe};
+    let half = Rat::new(1.into(), 2.into());
+    let sample = Sample {
+        weight: Rat::from_integer(1.into()),
+        feature: vec![Rat::from_integer(1.into())],
+        covector: vec![half.clone(), Rat::zero(), -half.clone(), Rat::zero()],
+    };
+    let unit = vec![vec![half.clone()], vec![Rat::zero()], vec![-half.clone()], vec![Rat::zero()]];
+    let (_, oscillation, alignment) = receiving_fisher_face_probe(&[sample], &unit).unwrap();
+    assert_eq!(alignment, half);
+    assert_eq!(oscillation, Rat::from_integer(1.into()));
+}

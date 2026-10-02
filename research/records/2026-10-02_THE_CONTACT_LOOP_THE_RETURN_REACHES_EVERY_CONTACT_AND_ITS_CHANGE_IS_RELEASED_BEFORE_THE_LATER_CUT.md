@@ -1485,3 +1485,25 @@ held-out code by more than six bits on campaign 1 or 25 at 200,000 cells. The da
 weight. [agent-inferred] The ½ is the two-face mixture's uniform prior (the even split and the root,
 with no evidence between them), the same form as the stop prior's and the join's, and it keeps the
 floor one bit from the even base; it stays declared, with that reason, rather than chosen.
+
+## 36. The receiving step's certificate pairs the original covector (Astra's review)
+
+Astra's source review (October 2, the counterexample executed against native code): §19's step
+handed the class-metric-scaled samples to `NormalLaw::prepare`, which forms the move `D` and its
+alignment `a = Σ_t w ⟨g_t, D f_t⟩` from the same samples, so `a` paired the scaled covector `κg` with
+the move. The certified decrease then overstated the original code's by the metric's factor: on a
+uniform two-class reading with a unit feature, `κ = 2`, `D = (½, −½)`, the original pairing is `½`,
+the scaled one `1`, while the smooth score falls by `log₂(4/3) < ½`. Right, and repaired:
+`receiving_fisher_face` now also returns the original comparison's alignment, which replaces the
+scaled one, so the metric shapes `D` and the certificate bounds the original code
+(`the_receiving_step_pairs_the_original_covector`; Astra's standalone diagnostic
+`class_metric_direction_pairs_with_the_original_comparison_covector` joins the suite with the
+rebase boundary regression).
+
+**What it changes on campaign 1: nothing measured.** The repaired exposure reads every held-out and
+training figure of §31 to the last digit (model − PPM-2 `−560 + 15/16 + ε` held out), and the receiving
+map's steps stay `2^(−1)..2^0`
+([receipt](2026-10-02_THE_CONTACT_LOOP_receipts/pairing_repair_exposure.txt), 791,782 ms). The step is
+held by its unit-step cap `η · max(osc, 1) ≤ 1` below what the corrected certificate admits, so the
+§19 gain was certified all along; the overstatement had no consumer on this cut. Every later
+section's figures stand.
