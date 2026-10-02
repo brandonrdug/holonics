@@ -529,7 +529,8 @@ theorem coast_floor (a s κ τ : ℝ) (hκ : 0 < κ) :
 
 /-- **Without certified curvature the end is the floor**: on `a + sτ + κτ²/2` with `s ≤ 0` and
 `κ ≤ 0`, the line's end `τ = 1` is lowest over `[0, 1]`: a floor stop carries the whole line
-where its curvature reading's lower end is not positive. -/
+where its curvature reading's upper end `κ⁺` is not positive (`line_falls_to` gives the stop for
+every `κ⁺`). -/
 theorem coast_floor_at_end (a s κ τ : ℝ) (hs : s ≤ 0) (hκ : κ ≤ 0) (hτ0 : 0 ≤ τ) (hτ1 : τ ≤ 1) :
     a + s * 1 + κ * 1 ^ 2 / 2 ≤ a + s * τ + κ * τ ^ 2 / 2 := by
   have h1 : s * 1 ≤ s * τ := by nlinarith

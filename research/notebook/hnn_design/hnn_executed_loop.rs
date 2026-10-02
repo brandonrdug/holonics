@@ -1545,10 +1545,11 @@ pub(super) fn move_once(terrain: &str, seed: u64, count: usize, out: &str, sourc
         }
         if let Some(throw) = &moved.throw {
             println!(
-                "    the throw: flight of {} moves, {}; power on the whole move {}; coast {}; kinetic reading {}; impulse step {:?}",
+                "    the throw: flight of {} moves, {}; power on the whole move {}; along the coast alone {}; coast {}; kinetic reading {}; impulse step {:?}",
                 throw.flight.moves,
                 if throw.flight.velocity.is_some() { "moving" } else { "at rest" },
                 throw.power.as_ref().map_or_else(|| "none".to_string(), |p| cell(p, 1 << 12)),
+                throw.coast_power.as_ref().map_or_else(|| "none".to_string(), |p| cell(p, 1 << 12)),
                 if throw.carried { "carried" } else { "released from rest" },
                 throw
                     .coast

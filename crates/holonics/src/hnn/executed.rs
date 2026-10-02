@@ -3179,6 +3179,9 @@ pub struct ThrowReading {
     pub flight: Flight,
     pub coast: Option<SourceCoast>,
     pub power: Option<ExactInterval>,
+    /// The composition's first-order bound along the coast alone, at the incumbent: a receipt the
+    /// power test does not read.
+    pub coast_power: Option<ExactInterval>,
     pub carried: bool,
     pub impulse_step: Option<Rat>,
     pub next: Flight,
@@ -4066,6 +4069,7 @@ fn executed_move_flown(
             flight: flight.cloned().unwrap_or_default(),
             coast: None,
             power: None,
+            coast_power: None,
             carried: false,
             impulse_step: None,
             next: Flight::default(),
@@ -4264,7 +4268,16 @@ fn executed_move_flown(
             // decide the release.
             let mut whole = None;
             let mut power = None;
+            let mut coast_power = None;
             if let Some(read) = &read {
+                // The coast alone at the incumbent, a receipt the power test does not read: where it
+                // climbs while the whole move falls, the momentum is carried across its old line's
+                // floor.
+                match constitution.stepped_source_coasting(ring, &samples, &Rat::zero(), Some(&read.coast)) {
+                    Ok(Some((coasted, _))) => coast_power = Some(first(&read.coast, &coasted)?.bound),
+                    Ok(None) | Err(HnnError::ConstitutionBudget { .. } | HnnError::UncertifiedStorage) => {}
+                    Err(error) => return Err(error),
+                }
                 let per_step = read.coast.scaled(&(Rat::one() / &start));
                 let effective = &unit_largest + largest_entry(&per_step);
                 let scale = Rat::new(BigInt::one(), BigInt::from(2)) / &effective;
@@ -4278,6 +4291,8 @@ fn executed_move_flown(
                         }
                         power = Some(bound);
                     }
+                    // [agent-inferred] A first trial refused by the budget or the storage certificate
+                    // releases from rest rather than halving the carried line (the record §2).
                     Ok(None) | Err(HnnError::ConstitutionBudget { .. } | HnnError::UncertifiedStorage) => {}
                     Err(error) => return Err(error),
                 }
@@ -4285,6 +4300,7 @@ fn executed_move_flown(
             if let Some(throw) = receipt.throw.as_mut() {
                 throw.coast = read;
                 throw.power = power;
+                throw.coast_power = coast_power;
                 throw.carried = whole.is_some();
                 throw.impulse_step = Some(start.clone());
             }

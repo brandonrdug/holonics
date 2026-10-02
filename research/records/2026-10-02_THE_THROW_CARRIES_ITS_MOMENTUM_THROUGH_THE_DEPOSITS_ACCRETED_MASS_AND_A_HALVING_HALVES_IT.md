@@ -153,10 +153,23 @@ then its own at-rest throw, move for move. A leap stopped exactly at its floor l
 `⟨∇L, c⟩ = 0`, so the coast alone never descends at first order, while the whole move still does,
 through `⟨∇L, ηD⟩ < 0`. That is the conjugate-direction case, the one where momentum pays.
 
-[derived] **Why release at the apex.** The first-order bound's sign is shared along `w`, so where
-the whole move climbs every halving on that line meets the same refused certificate. Carrying the
-coast would spend the move's trials on steps that cannot be adopted. Releasing from rest keeps the
-move the normal law's, whose impulse descends.
+[derived] **Why release at the apex.** On the exact move the first-order bound's sign is shared
+along `w`: every term bound is homogeneous of degree one, and with `ρ` held the storage is linear in
+`E`. So where the whole move climbs, every halving on that line meets the same refused certificate,
+and carrying the coast would spend the move's trials on steps that cannot be adopted. Releasing from
+rest keeps the move the normal law's, whose impulse descends. The trials carry the lattice-rounded
+move, so a halving keeps the sign only where its margin covers the rounding (the carried cuts'
+margin law): the rule holds above the lattice's resolution. Adoption itself does not rest on it,
+since each trial re-reads its own bound and is refused (`FirstOrder`) where it is not negative.
+
+[agent-inferred] **A first trial refused by the budget or the storage certificate** releases the
+move from rest rather than halving the carried line. That is a choice: the corrected chain at
+`5f254c2d` measures it as built.
+
+**The receipt.** Each move also reads the bound along the coast alone, at the incumbent
+(`ThrowReading::coast_power`, "along the coast alone" in the listing). The power test does not read
+it; where it climbs while the whole move falls, the momentum is carried across its old line's
+floor.
 
 **The halvings.** The trials halve the whole carried move. A trial adopted at `2^(−j)` of the first
 carries `2^(−j)` of the momentum, since its move is the next velocity. The halving is the time step:
@@ -311,7 +324,7 @@ length to `[495714/4096, 495719/4096)`, and that jump is what turned the line (#
   (`line_falls_to`). So with `s ≤ s⁺ < 0` and `κ ≤ κ⁺` the stop `min(1, −s⁺/κ⁺)`, the whole line
   where `κ⁺ ≤ 0`, is derived without certifying the sign of `κ`. #240's first floor stop carried the
   whole coast where `κ⁻ ≤ 0 < κ⁺`; that straddling case was chosen, and the derived stop replaces
-  it.
+  it. The stop is unbuilt: no code reads `κ` or stops a move at its floor.
 - *What a stop dissipates.* The adopted move is the next velocity, so a move stopped at `τ` hands on
   `τ` of its momentum: `(1 − τ)` is dropped at the floor, a dissipation of the same kind as a
   halving's.

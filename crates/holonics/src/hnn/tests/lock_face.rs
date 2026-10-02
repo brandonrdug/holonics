@@ -1490,10 +1490,10 @@ fn the_thrown_move_carries_its_momentum_through_the_accreted_mass() {
 }
 
 /// **The power is read on the whole move, not on the coast alone** (the throw's record §2): the
-/// fixture's released flight reversed, `−d`, carries the reversed coast `−c`, which climbs at first
-/// order wherever `c` falls. Scaled by the least `2^(−k)` at which the impulse outweighs it, the
-/// whole move `η₁D − (η₁/η₀)c` falls and the reversed coast is carried; the power test is the first
-/// trial's own first-order bound, and an adopted trial lowers the comparison with `ρ` held.
+/// fixture's released flight reversed, `−d`, carries the reversed coast `−c`. Its bound along the
+/// coast alone, at the incumbent, is not negative: alone it would be released. The whole move
+/// `η₁D − (η₁/η₀)c` falls, so the reversed coast is carried; the power test is the first trial's own
+/// first-order bound, and an adopted trial lowers the comparison with `ρ` held.
 #[test]
 fn a_coast_that_climbs_alone_is_carried_when_the_whole_move_falls() {
     use crate::hnn::executed::{
@@ -1537,21 +1537,16 @@ fn a_coast_that_climbs_alone_is_carried_when_the_whole_move_falls() {
         .unwrap()
     };
     let forward = move_from(&flight);
-    let forward_power = forward.throw.as_ref().unwrap().power.clone().expect("the power test");
-    assert!(forward_power.upper.is_negative());
-    let (thrown, k) = (0..=12)
-        .find_map(|k| {
-            let reversed = Flight {
-                velocity: Some(velocity.scaled(&rat(-1, 1 << k))),
-                moves: flight.moves,
-            };
-            let thrown = move_from(&reversed);
-            thrown.throw.as_ref().unwrap().carried.then_some((thrown, k))
-        })
-        .expect("some reversed flight is carried with the impulse");
+    let forward = forward.throw.as_ref().unwrap();
+    assert!(forward.power.as_ref().expect("the power test").upper.is_negative());
+    assert!(forward.coast_power.as_ref().expect("the coast alone").upper.is_negative());
+    let reversed = Flight { velocity: Some(velocity.scaled(&rat(-1, 1))), moves: flight.moves };
+    let thrown = move_from(&reversed);
     let throw = thrown.throw.as_ref().unwrap();
-    let power = throw.power.as_ref().unwrap();
-    assert!(power.upper.is_negative(), "the reversed flight at 2^(-{k})");
+    let alone = throw.coast_power.as_ref().expect("the coast alone");
+    assert!(!alone.upper.is_negative(), "the reversed coast climbs alone: {alone:?}");
+    let power = throw.power.as_ref().expect("the power test");
+    assert!(throw.carried && power.upper.is_negative(), "the whole move falls: {power:?}");
     assert_eq!(thrown.trials[0].first_order.as_ref(), Some(power));
     if let Some((successor, _)) = &thrown.adopted {
         let last = thrown.trials.last().unwrap();
