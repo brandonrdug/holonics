@@ -6,7 +6,7 @@ main line's numbers in §4a; [derived] from the owners'
 code where marked; [agent-inferred] where marked, the lock rule of §5 among them. No run here. The
 lock rule and the order term that reads it change in Rust (§5).
 Follows [the release's record](2026-10-02_THE_RELEASE_GUARD_CERTIFIES_THE_FIXED_MASK_AND_CHARGES_THE_FLIP_OVER_A_WINDOW.md)
-(its §1 holds `m7`'s measurement: at every rung from `η = 1/16` to `1/2048` the own release reads
+(its §1 holds `m7`'s measurement: at every step size from `η = 1/16` to `1/2048` the own release reads
 `34038/4096` nats above the fixed mask at the same `E`).
 
 The question: what sets a flip's sign and size, expressed through the lock rule's margin and the
@@ -22,8 +22,10 @@ on how far a reading moves over a step's segment. **No law in the chain certifie
 successor is read.** It is read exactly when the successor is read, at each step size, and it is
 paid over a run of steps between two endpoint states (Lean §12; the release's record).
 
-The main line's read (§4a) places `m7`'s flip in the lock rule's ranking of near-tied gaps, which
-the rule read on cell ends. §5 gives the rule that locks together every station the readings do not
+The main line's first read (§4a) placed `m7`'s flip in the lock rule's ranking of gaps. Its replay
+(§5) finds a true crossing, certain at both ends: the pair is certified one way at the incumbent by
+about 140 cell widths and the other way at the successor by about 20. The rule of §5 does not
+address it. §5 gives the rule that locks together every station the readings do not
 certify below the largest gap. No move can swap a certified order without the readings crossing.
 The rule is inferred from the release's own reading of its other decisions; no owner states that
 reading for the gap order. The comparison's order term reads the same two ends, so the release and
@@ -34,38 +36,52 @@ the term keep one law.
 [derived where cited; agent-inferred where marked] Every term below names a quantity of the
 receiving bank or a process it undergoes.
 
-- **A station is a parametron ring, and its candidates are its sheets.** A candidate's reading `a`
-  is the Floquet multiplier of the ring's monodromy over one turn of the passage
-  (`hnn::ring::ReceivingBank::read_turn`): the factor by which that sheet's amplitude grows per
-  cycle of the pump. The receiver knows it only as an enclosure `[L, U]` of relative width at most
-  `2^(−g)` at its upper end. That width is the receiver's resolution; nothing finer is a reading.
-- **A lock is the ring committing to one sheet.** Past the parametron's threshold (`a > 1`), a sheet
-  whose multiplier exceeds every rival's outgrows them every cycle. The release commits the ring
-  to that sheet and places its datum. The commitment is all or nothing: the ring is given its
-  dominant sheet outright. That is the zero-temperature limit of the lock. At a finite temperature
-  each sheet would hold a share `θ_x` (the lock face's shares), continuous in the multipliers; the
-  release keeps only the largest.
-- **The gap is the dominant sheet's excess multiplier**, `g = a_top − a_runner`: how much more per
-  cycle the dominant sheet grows than its strongest rival. The readings enclose it between its
+- **A station is a crossing on the receiving ring's helix, and a candidate is a class placed
+  there.** A station is tick `τ + 1 + j` of the receiving ring's clock (`hnn::prediction`, "The
+  section"), and a candidate is a class `x` of the exterior chart placed at that tick ("the
+  candidates"). The candidate's reading `a_x` is the bank's growth over one turn of the passage
+  with that class placed (`hnn::ring::ReceivingBank::read_turn`): the largest member's dominant
+  Floquet multiplier modulus. A member reads the turn only when its pump's period divides it, so
+  one turn can hold several pump periods. The receiver knows the reading only as an enclosure
+  `[L, U]` of relative width at most `2^(−g)` at its upper end. That width is the receiver's
+  resolution; nothing finer is a reading.
+- **A lock is the station committing to one class.** Past the threshold (`a > 1`), a class whose
+  multiplier exceeds every rival's outgrows them every turn. The release commits the station to
+  that class and places its datum, all or nothing. [derived] That is the lock face at zero
+  temperature. The face (`ExecutedComparison.lockFace`, `ℓ = log((1+a+r)/a)`) is `−log θ_t` with
+  shares `θ_t = a_t/(1 + Σ_y a_y)`, the resting state at weight one. Raising each weight to `1/T`
+  gives `θ_x = a_x^(1/T)/(1 + Σ_y a_y^(1/T))`. As `T → 0` the shares go to the top class when
+  `a_top > 1`, to rest when every `a_x < 1`, and split evenly among tied tops. That gives both the
+  threshold `a > 1` and tied stations committing together (`ParametronLock`: "the threshold is
+  this face at zero temperature"). The release keeps only that limit.
+- **The gap is the dominant class's excess multiplier**, `g = a_top − a_runner`: how much more per
+  turn the dominant class grows than its strongest rival. The readings enclose it between its
   **certain gap** `lo = L_top − max U` (the least value the readings allow) and its **upper end**
-  `hi = U_top − max L` (the greatest). Rings commit in order of the gap, the largest first, and each
-  commitment changes the section the later rings read: a placed datum enters every station's
-  storage. [agent-inferred] That the excess multiplier, and not its logarithm, sets the order is the
-  release's existing law; it is not derived here.
+  `hi = U_top − max L` (the greatest). Stations commit in order of the gap, the largest first, and
+  each commitment changes the section the later stations read: a placed datum enters every later
+  station's storage. [agent-inferred] The face's own variable is the log ratio: two shares stand in
+  the ratio `(a_top/a_runner)^(1/T)`, so the face orders by `ln(a_top/a_runner)`. Ordering by the
+  difference `a_top − a_runner` is the release's existing law, and it is the one term here the face
+  does not derive.
 - **The comparison is a code length.** Each station's term `ℓ = −log θ_t` is the code length, in
   nats, of its target under the lock's shares, and the comparison sums it over the decisions.
-  Against an equilibrium it is a free energy over `k_B T` (the guide's cross-entropy law). It is
-  read on the released sections, so it depends on the commitments.
+  Exactly, `−log θ_t = D(δ_t‖θ)`: the relative entropy of the target state over the lock's
+  equilibrium shares. Read in units of `k_B T` it is the free energy of the target state above that
+  equilibrium; that reading is an interpretation, as `ParametronLock` grades the lock's Boltzmann
+  reading, not a theorem. It is read on the released sections, so it depends on the commitments.
 - **Why a decision changes discontinuously.** The commitment is all or nothing, so the released
   sections are piecewise constant in the constitution. They change only where two gaps change order
   or a multiplier crosses the threshold. Across such a boundary the stations read different placed
   sections, and the code length jumps by `J` (§2). The jump is set by which data are placed beside
-  which, not by how far the constitution moved, so it does not shrink with the step. No equilibrium
-  phase transition fits: at one, the free energy is continuous and only its derivative jumps. This
-  jump comes from reading the code length through a zero-temperature commitment. [agent-inferred]
-  At a finite temperature the commitment would be a continuous occupation, and the jump a steep but
-  continuous change. The chain runs no finite-temperature release, and this record proposes none.
-- **Why rings whose gaps the readings cannot order commit together.** Two gaps whose enclosures
+  which, not by how far the constitution moved, so it does not shrink with the step. [derived] This
+  is a zero-temperature first-order switch, a level crossing. At temperature `T` the lock's log mass
+  `T log(1 + Σ_x a_x^(1/T))` tends to `log max(1, a_top)`: continuous in the multipliers, with a
+  kink where the top changes. The code length is not that quantity. It is read on the sections the
+  commitments produced, so it jumps where the selection switches, as an order parameter does across
+  a coexistence line. At a finite temperature the commitment would be a continuous occupation and
+  the jump a steep but continuous change: the same transition rounded by temperature. The chain
+  runs no finite-temperature release, and this record proposes none.
+- **Why stations whose gaps the readings cannot order commit together.** Two gaps whose enclosures
   overlap have no order this receiver can measure. Committing one first would make the release
   depend on where each multiplier lies inside its cell, which no reading carries. So the receiver
   treats the two commitments as simultaneous. Events its resolution cannot order are co-present for
@@ -162,10 +178,10 @@ cannot pay for it, which is §12's `one_move_closes_iff` read from the other sid
   `own 0 − η s + K η² < own η`.
 - **A flip at a positive `η_c` needs a curvature constant of at least its cost over `η_c²`**
   (`flip_curvature_lower`): `J − η_c (s₁ − s) ≤ K η_c²`. Here `s₁` bounds the continuous part's fall.
-  At `m7` the flip is present at `η = 1/2048` on a ladder that starts at `1/16`. So its `η_c` lies
+  At `m7` the flip is present at `η = 1/2048` among step sizes halved from `1/16`. So its `η_c` lies
   at or below `1/2048`, and a smooth bound through it would need
   `K ≥ 34038 · 2^10 − 2048 (s₁ − s)` nats per unit step squared, on a comparison whose
-  first-order slope the ladder reads at order one. No such constant is in the chain, and none
+  first-order slope the release reads at order one. No such constant is in the chain, and none
   would be a property of the comparison rather than of the flip.
 
 ### 3b. By the lock rule's own law: only with a bound the chain does not have
@@ -210,7 +226,7 @@ read monodromy. Until it exists, a flip-free step can be predicted but not certi
 
 ## 4. What the main line's per-decision read decides
 
-[agent-inferred] The `m7` flip persists at every rung down to `1/2048`. That is what §3a describes
+[agent-inferred] The `m7` flip persists at every step size down to `1/2048`. That is what §3a describes
 when a margin lies within the summed cell widths (or a tie), or when `μ/|μ′|` is below `1/2048`.
 Three readings at the incumbent of `m7`'s first refused move settle which:
 1. **The first changed refinement.** `r₀`, its kind (A, B or C), and the stations it re-reads.
@@ -224,7 +240,7 @@ If it is a kind-A flip within the cell widths, the flip is set by the release's 
 step. No step size, no length of the run that pays it, and no first-order bound reaches it. What
 remains is to change the commitment or the grain it is read at, not the condition on the successor.
 
-### 4a. The main line's read: a near-tie swap of the lock order (kind C)
+### 4a. The main line's read: a swap of the lock order (kind C)
 
 [measured, by the main line, cited] At `η = 1/2048`, `m7`'s flip is one decision chain in one
 request, and it is of kind C, not the kind A this record expected:
@@ -232,13 +248,13 @@ request, and it is of kind C, not the kind A this record expected:
   other seven requests fall by `306/4096` in total.
 - **The released section is unchanged.** It reads `[3,3,3,3,3,3,3,3]` before and after, wrong at six
   of eight stations: a degenerate release.
-- **The lock order changes.** Among near-tied gaps the ranking swaps which station locks first. Six
+- **The lock order changes.** The ranking of gaps swaps which station locks first. Six
   stations are read at different partial sections, and three terms' tops flip (stations 3, 6, 7).
 - **Per station** (each a lower end over `4096`, good to within `6/4096`): `ℓ` moves
   - station 1 by `+2742`, station 3 by `+6100`, station 4 by `+11986`, station 6 by `+9452`,
     station 7 by `+3815`;
   - station 2 by `−105`, station 0 by `−4`, station 5 by `−2`.
-- **Per rung**, as (realized fixed-mask decrease `d`, flip, own less incumbent), each over `4096`:
+- **Per step size**, as (realized fixed-mask decrease `d`, flip, own less incumbent), each over `4096`:
 
   | `η` | `d` | flip | own less incumbent |
   |---|---|---|---|
@@ -257,8 +273,8 @@ request, and it is of kind C, not the kind A this record expected:
   both signs and nets negative, and per term is at most `227/4096`, against `m7`'s about
   `532/4096`. Its rises are continuous: minibatch steps on other requests raise its own read mask.
 
-So the flip sits in the lock rule's ranking of near-tied gaps, which §1 shows is read on cell ends.
-§5 takes the rule itself.
+So the flip sits in the lock rule's ranking of gaps, which §1 shows is read on cell ends. §5 takes
+the rule itself, and its replay at `m7` finds a true crossing.
 
 ## 5. The lock order the readings certify
 
@@ -267,7 +283,8 @@ So the flip sits in the lock rule's ranking of near-tied gaps, which §1 shows i
   `lo = L_top − max U` (what the release reads) and its **upper end** `hi = U_top − max L`.
 - The rule as it stood locked only the strictly largest certain gap.
 - So two stations whose gap enclosures overlap were ordered by where their cells' cuts fell, not by
-  their readings. A move too small to change any reading's order still swapped them, as at `m7`.
+  their readings. A move too small to change any reading's order could still swap them. (`m7`'s
+  swap is not this case: its pair crosses, certified at both ends, §5's replay.)
 
 **The rule, in the lock rule's owner, with no second rule.** A station locks when no station's
 certain gap exceeds its upper end: every station the readings do not certify below the largest
@@ -296,33 +313,55 @@ here and in Lean (`certifiedLock`):
   keeps a possible true tie together, as the exact rule does. The cells are the receiver's declared
   grain.
 
-[agent-inferred] The one alternative, refining the cells until near ties order, changes the
+[agent-inferred] The one alternative, refining the cells until overlapping gaps order, changes the
 receiver's grain, which the release does not own. So it is refused.
 
 **The order term reads the same ends.** The comparison's order term (`hnn::executed::OrderTerm`,
 `Composition::LockOrder`) read the right station's certain gap against the wrong stations' certain
 gaps: `solved` was `lo_r > Σ_(E∖R) lo`. Under the rule above a wrong station `j` locks whenever its
 upper end meets the largest certain gap, so that `solved` no longer certified that no wrong station
-locks. The term now reads each wrong sheet at its upper end and the right sheet at its certain gap:
+locks. The term now reads each wrong station at its upper end and the right station at its certain
+gap:
 `ℓ_o = log((lo_r + Σ_(E∖R) hi)/lo_r)`, solved exactly when `lo_r > Σ_(E∖R) hi`. Each upper end is
 nonnegative (an eligible top exceeds every rival), so solved gives `lo_r > hi_j ≥ lo_j` for every
-wrong `j`: none locks (Lean `order_solved_locks_no_wrong`). Each wrong sheet's covector returns
+wrong `j`: none locks (Lean `order_solved_locks_no_wrong`). Each wrong station's covector returns
 through its top and the rival of its upper end (the largest lower end). On exact readings `hi = lo` and
 the term is the pin's. One law, read by the release and by the comparison.
 
-**What it would have done at `m7`.** [agent-inferred; to be measured by the main line]
-- **At the incumbent.** If the swapped stations' gap enclosures overlap there, as a swap within
-  every rung down to `1/2048` indicates, they lock together. The incumbent's own release then
-  changes too: different sections and a different incumbent comparison.
-- **At `η = 1/2048`.** Their true gaps move by about `η` times their slope. They stay uncertified
-  unless that motion exceeds the overlap, and then both rule outputs keep them together. The swap,
-  and with it request 3's `+33987/4096`, is gone; the rung adopts on the fixed mask's decrease.
-- **At larger rungs.** They split if the move certifies one above the other, and only then pay a
-  split's cost.
-- **To measure.** Re-run `m7`'s incumbent and its first refused move on this rule. Read:
-  - the two stations' certain gaps and upper ends at the incumbent;
-  - the own less incumbent per rung;
-  - whether any rung still flips.
+**What it would have done at `m7`.** [agent-inferred before the read below]
+- **At the incumbent.** If the swapped stations' gap enclosures overlapped there, as a swap within
+  every step size down to `1/2048` suggested, they would lock together and the swap would be gone.
+- **At larger step sizes.** They split if the move certifies one above the other, and only then pay
+  a split's cost.
+
+**What the main line read** [measured, by the main line, cited; coordinator's relay, October 2]:
+- At `m7` the rule releases exactly what the old rule does. In every refinement of all 8 requests,
+  no other eligible station's upper end meets the largest certain gap.
+- In request 3 the closest pair is at the second freeze: station 2's certain gap `187540480/2^24`
+  against station 5's upper end `187166208/2^24`. The order is certified by
+  `374272/2^24 = 17·43/2^15`, about 140 cell widths.
+
+So `m7`'s flip is **not** a swap of gaps the readings could not order at the incumbent, and this
+rule does not remove it.
+
+**The replay: a true crossing, certain at both ends** [measured, by the main line, cited]. Request
+3, second freeze, values over `2^24`:
+- At `m7` station 2 locks second, by `374272`. At the successor at `η = 1/2048` station 5 locks
+  second, by `55808` (about 20 cell widths). The margin moved from `+374272` to `−55808`, a change of
+  `430080 = 2^12·3·5·7`, more than the margin it started with. Along the step station 2's gap fell
+  `203264` and station 5's rose `231936`. Under linear motion the pair crosses at `731/840` of the
+  step (`374272/430080` reduced).
+- No station is unranked at either state (0 of 64 refinements in each of the 8 requests), so the
+  rule above changes nothing at `m7`.
+- The freezing order goes from `[0],[2],[4],[5],[6],[7],[3],[1]` to `[0],[5],[7],[6],[4],[3],[2],[1]`.
+  The released classes are unchanged (all `3`). The later stations are read with different data
+  placed before them, and that is request 3's `+33987/4096`.
+
+So the rule of this section removes only swaps the readings cannot rank; `m7`'s is a crossing of
+true gaps by the readings' first-order motion, which `certified_order_needs_crossing` allows. Its
+location along the step is the carried-cuts record's prediction
+([§4b](2026-10-02_THE_STEPS_CANDIDATE_STATES_ARE_THE_CUTS_OF_THE_CARRIED_PATH_AND_THEIR_COUNT_IS_A_WEYL_LAW.md), #211): a margin change larger than `μ₀` over the step makes
+`j_f ≥ j*` consistent.
 
 ## 6. Owner and verification
 
@@ -338,7 +377,7 @@ the term is the pin's. One law, read by the release and by the comparison.
   - `uncertified_largest` decides `LockOrder::Gap` from each eligible station's certain gap and
     upper end; it is the only change to the release;
   - test `a_gap_the_readings_do_not_order_below_the_largest_locks_with_it`;
-  - the order term's owner, `hnn::executed::order_at`, reads the wrong sheets at their upper end
+  - the order term's owner, `hnn::executed::order_at`, reads the wrong stations at their upper end
     (`GapEnd`), with test
     `the_order_term_reads_the_wrong_sheets_at_the_upper_end_the_lock_rule_compares`;
   - the trial's `change` field (own less mask) already reads `J`.
