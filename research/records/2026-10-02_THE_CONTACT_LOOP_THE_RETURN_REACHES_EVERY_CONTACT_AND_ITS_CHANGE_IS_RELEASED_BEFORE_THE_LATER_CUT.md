@@ -1228,3 +1228,47 @@ development bits (§25). [agent-inferred] With the prior mass making a context s
 the depth a passage supports grows with the passage; at scale it is the tree's next declared value
 to choose, by the development cells against its storage, and the field's share stays the few bits
 §26 measured until the source enters it otherwise.
+
+## 29. The depth is a storage limit; the field's best linear share at scale
+
+**The depth law.** Raising a tree's maximum depth from `D` to `D + k` costs any fixed pruned tree
+exactly `−log₂ w_D` bits for each of its leaves at the old maximum, one bit at the half stop prior
+the receiver declares, and changes neither the estimator's charges nor the best fixed codes (Lean,
+#170, at any depth). So a deeper tree cannot do worse than the shallower one's bound by more than a
+bit a boundary leaf, and the depth's limit reads as storage [inferred, not proved; the measurement
+side follows]. Stored where paths part, the arena's nodes bound no depth, and the carriers' widths
+admit depths past `2^11` at `n* = 6,148`; the binding limit is the card's kernel path of 64 nodes.
+Campaign 1 now declares `D = 63` (`FieldDeclaration::campaign_one`; its widths `M_p = 49`, `W = 37`).
+The tree alone at `2^(−3)` ([receipt](2026-10-02_THE_CONTACT_LOOP_receipts/depth_law.txt)):
+
+| `D` | 4 | 8 | 16 | 32 | 63 |
+|---|---|---|---|---|---|
+| standing cut, development (`+ ε`) | `17959 + 1/16` | `17951 + 6/16` | `17951 + 12/16` | `17951 + 12/16` | `17951 + 12/16` |
+| standing cut, held out | `3467 + 8/16` | `3456 + 14/16` | `3456 + 9/16` | `3456 + 9/16` | `3456 + 9/16` |
+| choosing cut, held out | `143620 + 10/16` | `135327 + 10/16` | `134954 + 1/16` | `134953 + 1/16` | `134953 + 0/16` |
+
+The code saturates by depth 16 on both cuts, and a full pass at depth 63 takes 157 ms against
+132 ms at depth 4 on the standing cut.
+
+**The gate** ([exposure](2026-10-02_THE_CONTACT_LOOP_receipts/depth63_exposure.txt), 620,507 ms inside
+the 800 s deadline; library tests 925 passed; GPU suite 32 of 32). Held out, model − PPM-2
+`−462 + 2/16 + ε` bits (at `D = 4`: `−453 + 13/16 + ε`), the tree alone `−458 + 11/16 + ε`, the
+wave `−5 + 7/16 + ε`; training `−1247 + 12/16 + ε`. Eight bits more, as the tree alone predicted.
+
+**The field's best linear share** ([receipt](2026-10-02_THE_CONTACT_LOOP_receipts/field_ceiling.txt),
+`field_ceiling.py`). §27's entry in its best case for a linear receiver: no clock between the source
+and the receiver, the passage's cells decayed at `1 − 2^(−k)` a cell, a full `256 × 256` readout
+learned online by `R`'s own law with the machine's one-bit cap, on top of the tree's replica (a rank
+far above the field's ten).
+- On the standing cut every memory from 4 to 256 cells raises the code: the online readout pays
+  more to learn than the passage repays.
+- On the choosing cut's first 120,000 cells, scoring the last 20,000 after 100,000 of learning, the
+  memory of 256 cells lowers the scored cells by `128` bits of `12869625/2^8` (about a quarter of a
+  percent, a 156th of a bit a cell) and raises the learning cells by about 1,760 bits; shorter memories
+  raise both.
+
+[agent-inferred] On text the tree's own laws carried the line's gains this session: the prior mass
+six percent and the depth up to six more at scale. The field's best linear share, even with the
+clock removed and a full-rank readout, is a fraction of a percent at a hundred thousand cells,
+while the medium's deposits take about half of each window's time (117 of 223 ms at `D = 4`). What
+the field would have to supply is not a linear image of the recent passage.

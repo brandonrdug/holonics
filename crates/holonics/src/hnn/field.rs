@@ -296,8 +296,12 @@ impl FieldDeclaration {
     /// `∅` on ring 3; reflectors `p ↦ −p mod d_g`; every ring at phase 0; one axis `e_z` through the
     /// origin, pitch 0, node `k` of ring `g` at the quarter turn `⌊4k/d_g⌋` of the unit circle
     /// ([`FieldDeclaration::quarter_turn`]); `β_a = 2`, `L = 1`; `h = 1`, `Y_g = Y_a = 2`; `L_R = 16`
-    /// (tolerance 1/16 bit); the receiver's landmark tree at address depth `D = 4` (the landmark tree, chosen
-    /// on the development cells in the landmark receipt) and prior mass `2^(−3)` (chosen on the
+    /// (tolerance 1/16 bit); the receiver's landmark tree at address depth `D = 63`, the deepest the
+    /// card's kernel paths hold (`TREE_MAX_DEPTH = 64` nodes): raising the depth costs a fixed pruned
+    /// tree exactly `−log₂ w_D` bits a leaf at the old maximum depth, one bit at the half stop prior
+    /// (Lean, #170), so the depth's limit is read as the realizations' storage, not a choice
+    /// (inferred; the contact loop record §28–29 measures it; it was `4`,
+    /// chosen on the development cells in the landmark receipt), and prior mass `2^(−3)` (chosen on the
     /// development cells over the ladder `2^(−j)`, `j = 1..B`, charged `⌈log₂ B⌉ = 3` bits: the
     /// contact loop record §25);
     /// `Δ = {1}`; the crib `W_crib = 64` at offset 1. The population is the cut's length. The carrier
@@ -352,7 +356,7 @@ impl FieldDeclaration {
                 ring: 2,
                 aperture: 2,
                 tolerance: rat(1, 16),
-                depth: 4,
+                depth: 63,
                 prior: StopPrior::half(),
                 mass: 3,
             }],
