@@ -1,0 +1,2 @@
+nontrivial fixing elements: []
+most entries agreeing under one element: (151, 0, 7) of 300
