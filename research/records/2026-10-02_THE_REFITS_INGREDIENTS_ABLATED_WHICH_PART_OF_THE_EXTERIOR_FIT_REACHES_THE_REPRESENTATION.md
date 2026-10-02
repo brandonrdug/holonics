@@ -412,14 +412,18 @@ in this record's receipts directory: `q1_metric_steps.txt` (runner 1, `fe9c58e9`
 `q10_kinetic_coupling.txt` (runner 1, `eeafdf7`). Every cosine is a signed squared cosine against the
 native gradient `d = −Aᵀc`, in `/4096` cells.
 
-**The target shares cannot carry the turn.** The Coordinate and Witness unit steps lie along `d` at
+**The target shares' spread is small.** The Coordinate and Witness unit steps lie along `d` at
 `[4068, 4069)`. The Kinetic and KineticModulus steps lie at `[37, 38)`, which needs a condition number
 near 440 (#235). The 64 lock terms' target shares run from `153439/4769705` to `269508/620323`, so
-`max(1/θ_t)/min(1/θ_t) = 34742531220/2572479481 ∈ [13, 14)`. A diagonal reweighting with spread
-`κ < 14` keeps `cos² ≥ 4κ/(κ+1)² > 56/225 = (1019 + 101/225)/4096`, so the `1/θ_t` weights alone stay
-in `[1019, 1020)` or above.
+`max(1/θ_t)/min(1/θ_t) = 34742531220/2572479481 ∈ [13, 14)`. Reweighting a vector's own coordinates
+with spread `κ < 14` keeps its `cos² ≥ 4κ/(κ+1)² > 56/225 = (1019 + 101/225)/4096`. The `1/θ_t`
+weights act on the terms, and `d = −Aᵀc` sums the terms' pullbacks, so the bound reaches `d` only
+where those pullbacks are pairwise orthogonal. Terms that share rows of `E` (below) are not: their
+pullbacks can cancel in `d`, and reweighting them can then turn `d` further. Whether the `1/θ_t`
+weights alone stay at `[1019, 1020)` or above against `d` is not read here; the step with
+`μ_t = 1/θ_t` and `K` left out would read it.
 
-**No single block of the reading Gram carries it either.** The step is `M⁻¹Aᵀμ`: the chart
+**No single block of the reading Gram carries the turn.** The step is `M⁻¹Aᵀμ`: the chart
 `M⁻¹ = H′⁻¹` applied to the readings' pullback, with `μ` from the conjugate-gradient solve of the
 witness's form `F = diag(θ) − θθᵀ` against `K = A M⁻¹ Aᵀ` (`kinetic_lift`). `F` acts term by term, so
 any coupling across terms comes only through `K`, from terms that share rows of `E`. The chart alone
@@ -439,7 +443,7 @@ blocks reaching `[37, 38)`, fails on both counts.
 
 **The deposited step is the solve's 320th iterate, not a converged `K⁻¹w`.** The joint iterates fall
 monotonically: `[4068, 4069)` at 1, `[2659, 2660)` at 2, `[653, 654)` at 8, `[258, 259)` at 16,
-`[110, 111)` at 32, `[54, 55)` at 64, `[42, 43)` at 128, `[38, 39)` from 250 to 257, and `[37, 38)` from
+`[110, 111)` at 32, `[54, 55)` at 64, `[42, 43)` at 128, `[38, 39)` from 188 to 257, and `[37, 38)` from
 258 to 320. So the direction holds to one cell over its last 63 iterates, and the turn belongs to `K`,
 not to where the solve stopped. In exact arithmetic the solve reaches `K⁻¹w` within its 320 reading
 coordinates. Holding every iterate at `JOINT_BITS` (`joint_held`) breaks that, and the solve ends
