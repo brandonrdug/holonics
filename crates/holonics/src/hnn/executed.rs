@@ -2919,9 +2919,9 @@ pub enum TrialRefusal {
     /// The fixed mask's composition not strictly lower by disjoint enclosures.
     NotBelow(ExactInterval),
     /// The fixed mask's composition lower, the successor's own release's executed composition not
-    /// strictly below the release window's ceiling less its certified decrease ([`ReleaseWindow`];
-    /// with the window of one, not strictly lower by disjoint enclosures): the step left the
-    /// trajectory cell and the executed comparison did not descend.
+    /// strictly below its checkpoint's plus the excursion's height ([`ReleaseExcursion`]; with the
+    /// monotone guard, not strictly lower by disjoint enclosures): the step's flip took the executed
+    /// comparison past what the window admits.
     OwnNotBelow(ExactInterval),
     /// The constitution's own guard (budget, storage growth).
     Constitution(String),
@@ -3158,50 +3158,53 @@ pub struct Reread {
     pub refusal: Option<TrialRefusal>,
 }
 
-/// [definition; proved-derived, October 2] **The release guard's window**
-/// (`HNN/ExecutedComparison` §12): a successor's own release is adopted when its executed comparison
-/// lies strictly below the window's ceiling, the largest lower end among the incumbent's comparison
-/// and the `earlier` adopted comparisons the chain carries, less `margin` times the carried move's
-/// certified first-order descent. The window's length (`earlier.len() + 1`) and `margin ≥ 0` are the
-/// chain's parameters, set from measurement; [`ReleaseWindow::one`] is the incumbent alone with no
-/// margin, the strict decrease by disjoint enclosures (`windowGuard_zero_iff`).
+/// [definition; proved-derived, October 2] **The release guard's excursion**
+/// (`HNN/ExecutedComparison` §12). A move's change in the own release is the fixed mask's change,
+/// continuous and certified at first order, plus the **flip**: the successor's own decisions read
+/// against the incumbent's on the same `E` (`own_telescopes`; a trial's `change`, the own reading
+/// less the mask's, encloses it). Each adopted step certifies the fixed mask's fall (`NotBelow`,
+/// unchanged). The own release is guarded over a window from a checkpoint: each successor's own
+/// comparison strictly below the checkpoint's lower end plus `height`
+/// ([`ReleaseExcursion::admits`], `excursion_enclosure`), and the window, at most `W` adopted
+/// moves, closing strictly below the checkpoint's lower end less a certified decrease `σ ≥ 0`
+/// ([`ReleaseExcursion::closes`]). It closes exactly when its fixed-mask decreases exceed its flips
+/// by `σ` (`window_closes_iff`). A window that does not close returns to its checkpoint; the chain
+/// holds the checkpoint, the window's length and `σ`, set from measurement.
+/// [`ReleaseExcursion::monotone`] (the incumbent as checkpoint, no height) is the strict decrease by
+/// disjoint enclosures, the former rule (`checkpoint_one_iff`).
 ///
-/// What the parameters must satisfy (§12): `margin ≥ 0`, so the ceiling never rises
-/// (`windowMax_antitone`) and no adopted comparison exceeds the opening's (`le_start`); `margin > 0`
-/// for the whole-window certificate to bound the windows' first-order descents
-/// (`windowMax_block`, `blocks_sum_le`, `large_blocks_card`). The guard reads lower ends, which is
-/// sound (`window_enclosures_guard`). The chain supplies `earlier`; a move reads only what it is given.
+/// What the parameters must satisfy (§12): `height ≥ 0`, which bounds every adopted comparison by
+/// the opening's plus `height` (`excursion_le_start`); `σ ≥ 0`, so the checkpoints descend
+/// (`checkpoint_descends`); `σ` at least a positive share of the window's certified first-order
+/// descent, for the windows' slopes to be summable (`floor_large_slopes_card`).
 #[derive(Clone, Debug, PartialEq, Eq)]
-pub struct ReleaseWindow {
-    /// The lower ends of the adopted comparisons before the incumbent, at most the window's length
-    /// less one.
-    pub earlier: Vec<Rat>,
-    /// The share of the carried move's certified first-order descent the successor must clear.
-    pub margin: Rat,
+pub struct ReleaseExcursion {
+    /// The checkpoint's own comparison; `None` is the incumbent's.
+    pub checkpoint: Option<ExactInterval>,
+    /// How far the own release may rise above the checkpoint within the window.
+    pub height: Rat,
 }
 
-impl ReleaseWindow {
-    /// The window of one: the incumbent's comparison alone, no margin.
-    pub fn one() -> Self {
+impl ReleaseExcursion {
+    /// The monotone guard: the incumbent as checkpoint, no height.
+    pub fn monotone() -> Self {
         Self {
-            earlier: Vec::new(),
-            margin: Rat::zero(),
+            checkpoint: None,
+            height: Rat::zero(),
         }
     }
 
-    /// The ceiling: the largest lower end among the incumbent's and the earlier comparisons.
-    pub fn ceiling(&self, before: &ExactInterval) -> Rat {
-        self.earlier
-            .iter()
-            .fold(before.lower.clone(), |ceiling, x| ceiling.max(x.clone()))
+    /// The step's guard on a successor's own comparison: `own.upper < checkpoint.lower + height`,
+    /// the checkpoint the incumbent's (`before`) when none is held.
+    pub fn admits(&self, before: &ExactInterval, own: &ExactInterval) -> bool {
+        let checkpoint = self.checkpoint.as_ref().unwrap_or(before);
+        own.upper < &checkpoint.lower + &self.height
     }
 
-    /// The guard on a successor's own comparison: `own.upper < ceiling − margin · (−slope.upper)`,
-    /// with `slope` the carried move's certified first-order bound (negative once the first-order
-    /// guard has held).
-    pub fn admits(&self, before: &ExactInterval, own: &ExactInterval, slope: &ExactInterval) -> bool {
-        let descent = (-&slope.upper).max(Rat::zero());
-        own.upper < self.ceiling(before) - &self.margin * descent
+    /// The window's close: the own comparison at its end strictly below the checkpoint's lower end
+    /// less the certified decrease `σ`.
+    pub fn closes(checkpoint: &ExactInterval, end: &ExactInterval, decrease: &Rat) -> bool {
+        end.upper < &checkpoint.lower - decrease
     }
 }
 
@@ -3224,7 +3227,7 @@ type FirstOrder<'a> =
 /// carried move moves no lattice coordinate; each carried successor adopted only when every commit
 /// guard holds on it: the entry bound, the first-order certificate on the carried move (`first`,
 /// negative), the successor's guards and the fixed mask's value (`reread`) strictly lower by disjoint
-/// enclosures, and its own release below the release window's ceiling ([`ReleaseWindow`]).
+/// enclosures, and its own release within the release guard's excursion ([`ReleaseExcursion`]).
 #[allow(clippy::too_many_arguments)]
 fn ladder(
     constitution: &Constitution,
@@ -3236,7 +3239,7 @@ fn ladder(
     transport: Option<&Rat>,
     first: &FirstOrder<'_>,
     reread: &(dyn Fn(&Constitution) -> Result<Reread, HnnError> + Sync),
-    window: &ReleaseWindow,
+    excursion: &ReleaseExcursion,
 ) -> Result<LadderOutcome, HnnError> {
     let source = constitution
         .source_port(ring)
@@ -3345,7 +3348,7 @@ fn ladder(
             (None, _) if read.value.upper >= before.lower => {
                 Some(TrialRefusal::NotBelow(read.value.clone()))
             }
-            (None, Some(own)) if window.admits(before, &own.value, &bound) => None,
+            (None, Some(own)) if excursion.admits(before, &own.value) => None,
             (None, Some(own)) => Some(TrialRefusal::OwnNotBelow(own.value.clone())),
             (None, None) => Some(TrialRefusal::Unsupported),
         };
@@ -3645,7 +3648,7 @@ pub fn executed_move_in(
     comparison: Comparison,
     metric: MoveMetric,
 ) -> Result<ExecutedMove, HnnError> {
-    executed_move_windowed(
+    executed_move_guarded(
         field,
         constitution,
         requests,
@@ -3654,15 +3657,15 @@ pub fn executed_move_in(
         grain,
         comparison,
         metric,
-        &ReleaseWindow::one(),
+        &ReleaseExcursion::monotone(),
     )
 }
 
-/// **The committed move under a declared metric and release window** ([`ReleaseWindow`];
-/// [`executed_move_in`] is the window of one's): the same proposal, guards, ladder and receipts, the
-/// own release adopted below the window's ceiling.
+/// **The committed move under a declared metric and the release guard's excursion**
+/// ([`ReleaseExcursion`]; [`executed_move_in`] is the monotone guard's): the same proposal, guards,
+/// ladder and receipts, the own release adopted within the excursion.
 #[allow(clippy::too_many_arguments)]
-pub fn executed_move_windowed(
+pub fn executed_move_guarded(
     field: &Field,
     constitution: &Constitution,
     requests: &[Request],
@@ -3671,7 +3674,7 @@ pub fn executed_move_windowed(
     grain: u32,
     comparison: Comparison,
     metric: MoveMetric,
-    window: &ReleaseWindow,
+    excursion: &ReleaseExcursion,
 ) -> Result<ExecutedMove, HnnError> {
     let ring = declared.ring();
     let composition = comparison.composition;
@@ -3851,7 +3854,7 @@ pub fn executed_move_windowed(
         Some(&modulus_unit),
         &first,
         &reread,
-        window,
+        excursion,
     )?;
     receipt.trials = trials;
     receipt.adopted = adopted;
