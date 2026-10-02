@@ -22,9 +22,10 @@
 //! script's last run, so a target directory seeded by copying (newer times than the checked-out
 //! kernels) kept an older build's kernels and ran them against newer host code (the U6 PC runner's
 //! gate 3 of October 2). The script now reruns on every build (it watches a path that never exists
-//! in `OUT_DIR`), hashes the kernel sources, the architecture and `nvcc`'s path with SHA-256, and
-//! calls `nvcc` only when that digest differs from the one stamped beside the images; the digest
-//! enters the crate as `HOLONICS_CUDA_KERNEL_SOURCES`, so a changed image recompiles the crate.
+//! in `OUT_DIR`), hashes the kernel sources, this script (which carries `nvcc`'s arguments), the
+//! architecture, and `nvcc`'s path and `--version` output with SHA-256, and calls `nvcc` only when
+//! that digest differs from the one stamped beside the images; the digest enters the crate as
+//! `HOLONICS_CUDA_KERNEL_SOURCES`, so a changed image recompiles the crate.
 
 use std::env;
 use std::path::{Path, PathBuf};
@@ -196,9 +197,17 @@ fn main() {
         addressed.extend(std::fs::read(source).unwrap_or_else(|error| panic!("{source}: {error}")));
         addressed.push(0);
     }
+    // This script carries `nvcc`'s arguments, so a change to them changes the address.
+    addressed.extend_from_slice(include_bytes!("build.rs"));
+    addressed.push(0);
     addressed.extend_from_slice(architecture.as_bytes());
     addressed.push(0);
     addressed.extend_from_slice(nvcc.as_os_str().as_encoded_bytes());
+    addressed.push(0);
+    // A toolkit upgraded in place keeps its path; its version line tells the two apart.
+    if let Ok(version) = Command::new(&nvcc).arg("--version").output() {
+        addressed.extend_from_slice(&version.stdout);
+    }
     let digest = sha256(&addressed);
     println!("cargo:rustc-env=HOLONICS_CUDA_KERNEL_SOURCES={digest}");
     let stamp = out_dir.join("kernels.sha256");
