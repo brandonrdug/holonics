@@ -1,4 +1,5 @@
 import Holonics.HNN.Ratio
+import Holonics.HNN.Ratio.Resolution
 import Holonics.Holon.Law.Fisher
 import Mathlib.Analysis.Calculus.Deriv.MeanValue
 import Mathlib.Analysis.SpecialFunctions.ExpDeriv
@@ -71,6 +72,15 @@ codeLength(z + Δ) ≤ codeLength(z) + ⟨g, Δ⟩ + (ln 2/2) · 2^(osc Δ) · V
    `|x_ij| ≤ X` and `2X` times the path length of `W` since reading `i` at most `ω`, the length
    measured in the row norm `max_c Σ_j |V_cj|` (the operator norm from `ℓ∞` inputs to `ℓ∞`
    logits), the drift's spread is at most `ω`, so the accumulated certificate holds along the path.
+8. **In the odometer chart, as the Rust step reads it** (`faceVariance_le_of_mass_le`,
+   `face_mass_le_odometer_on_grain`, `codeLength_add_le_chart`, `codeLength_add_le_odometer`).
+   If `p_c ≤ κ r_c` then `Var_p ≤ κ Var_r` (the variance is the least second moment over
+   centres). On the grain the face's masses are at most `2/(e ln 2) < 17/16` times the odometer
+   chart's, so with the spread capped at `1` the curvature term is at most
+   `ln 2 · (17/16) · Var_p̃(Δ) ≤ (119/160) Var_p̃(Δ)`. Its double, `(119/80) Var_p̃(Δ)`, is the
+   second-derivative bound `hnn::constitution::receiving_fisher_face` reads along the unit step;
+   the first-order term here is still the face's `⟨p − e_t, Δ⟩`, while the Rust step pairs the
+   odometer covector `p̃ − q`, whose shortfall is `HNN/Ratio/Resolution.odometer_pairing_ratio`.
 
 [definition] The factor `2^ω` is the price of reading the curvature at the current face instead
 of along the whole step: as `ω → 0` the model is the second-order Taylor model
@@ -79,8 +89,9 @@ of along the whole step: as `ω → 0` the model is the second-order Taylor mode
 `Var_p(Δ)` is about `Σ Δ_c²/n`, so the Fisher model wins by about `n/2^(ω+1)`. Both are theorems,
 so a certificate may read whichever term is smaller. Hoeffding's bound
 (`HNN/Ratio/Resolution.log_mean_exp_sub_mean_le`, `(ln 2/8)·osc²`) reads the spread alone and does
-not shrink with the face's variance. [agent-inferred] The Rust owner of `R`'s certificate is named
-here once the main line's certificate code is on main.
+not shrink with the face's variance. The Rust owner of the one-reading certificate is
+`hnn::constitution::receiving_fisher_face` (item 8); the accumulated certificate's is the main
+line's stored-statistics step once it lands.
 
 No `axiom`, no `sorry`, no `native_decide`.
 -/
@@ -672,6 +683,155 @@ theorem accumulated_code_le_of_path (s : Finset K) (x : K → X → ℝ) (t : K 
 
 end Accumulated
 
+/-! ## 6. In the odometer chart: the Rust step's reading -/
+
+section Odometer
+
+variable {ι : Type*} [Fintype ι]
+
+/-- [proved-derived; formal-checked] **A variance about another centre.** With `Σ p = 1`,
+`Σ p (v − m)² = Var_p(v) + (⟨p, v⟩ − m)²`. -/
+theorem faceVariance_add_sq (p v : ι → ℝ) (hp1 : ∑ i, p i = 1) (m : ℝ) :
+    ∑ i, p i * (v i - m) ^ 2 = faceVariance p v + (∑ i, p i * v i - m) ^ 2 := by
+  unfold faceVariance
+  obtain ⟨μ, hμ⟩ : ∃ μ, μ = ∑ j, p j * v j := ⟨_, rfl⟩
+  rw [← hμ]
+  have e : ∀ (c : ℝ) i, p i * (v i - c) ^ 2 = p i * v i ^ 2 - 2 * c * (p i * v i) + c ^ 2 * p i :=
+    fun c i => by ring
+  rw [Finset.sum_congr rfl fun i _ => e m i, Finset.sum_congr rfl fun i _ => e μ i]
+  simp only [Finset.sum_add_distrib, Finset.sum_sub_distrib, ← Finset.mul_sum, ← hμ, hp1]
+  ring
+
+/-- [proved-derived; formal-checked] **A face's variance through a dominating chart.** With
+`Σ p = 1` and `p_c ≤ κ r_c` for every class, `Var_p(v) ≤ κ Var_r(v)`: the variance is
+the least second moment over centres, and `r`'s mean is one of them. -/
+theorem faceVariance_le_of_mass_le (p r v : ι → ℝ) (hp1 : ∑ i, p i = 1) {κ : ℝ} (hpr : ∀ i, p i ≤ κ * r i) : faceVariance p v ≤ κ * faceVariance r v := by
+  have h := faceVariance_add_sq p v hp1 (∑ j, r j * v j)
+  have hle : ∑ i, p i * (v i - ∑ j, r j * v j) ^ 2 ≤
+      κ * ∑ i, r i * (v i - ∑ j, r j * v j) ^ 2 := by
+    rw [Finset.mul_sum]
+    refine Finset.sum_le_sum fun i _ => ?_
+    have := mul_le_mul_of_nonneg_right (hpr i) (sq_nonneg (v i - ∑ j, r j * v j))
+    linarith
+  unfold faceVariance at h hle ⊢
+  nlinarith [sq_nonneg (∑ i, p i * v i - ∑ j, r j * v j)]
+
+/-- [proved-standard; formal-checked] **`2/(e ln 2) < 17/16`.** -/
+theorem two_div_e_log_two_lt : 2 / (Real.exp 1 * Real.log 2) < 17 / 16 := by
+  have he := Real.exp_one_gt_d9
+  have hl := Real.log_two_gt_d9
+  have hpos : 0 < Real.exp 1 * Real.log 2 := by positivity
+  rw [div_lt_iff₀ hpos]
+  nlinarith
+
+variable [Nonempty ι]
+
+/-- [proved-derived; formal-checked] **At the grain the face's masses lie within `17/16` of the
+odometer chart's.** With every exponent on the grain, `x_c = n_c + k_c/L`, `k_c ≤ L`, the face's
+mass is at most `2/(e ln 2) < 17/16` times the odometer mass `p̃_c = ω_c/Σ ω`: the face's weight is
+at most the chart's (`face_weight_le_odometer`), and the face's partition at least `e ln 2/2` of the
+chart's (`Resolution.odometer_le_face_weight`). Off the grain `Resolution.face_mass_le_odometer`
+carries the further `2^(1/L)`. -/
+theorem face_mass_le_odometer_on_grain (n : ι → ℤ) (k : ι → ℕ) {L : ℕ} (hL : 0 < L)
+    (hk : ∀ c, k c ≤ L) (c : ι) :
+    (2 : ℝ) ^ ((n c : ℝ) + (k c : ℝ) / L) / ∑ d, (2 : ℝ) ^ ((n d : ℝ) + (k d : ℝ) / L) ≤
+      17 / 16 * (odometerWeight (n c) (k c) L / ∑ d, odometerWeight (n d) (k d) L) := by
+  have hμ : 0 < Real.exp 1 * Real.log 2 / 2 := by
+    have := Real.log_pos (show (1 : ℝ) < 2 by norm_num); positivity
+  have hω : ∀ d, 0 < odometerWeight (n d) (k d) L := fun d => by
+    unfold odometerWeight; have := zpow_pos (show (0 : ℝ) < 2 by norm_num) (n d); positivity
+  have hW : 0 < ∑ d, odometerWeight (n d) (k d) L :=
+    Finset.sum_pos (fun d _ => hω d) Finset.univ_nonempty
+  have hA : 0 < ∑ d, (2 : ℝ) ^ ((n d : ℝ) + (k d : ℝ) / L) :=
+    Finset.sum_pos (fun d _ => by positivity) Finset.univ_nonempty
+  have hwc := face_weight_le_odometer (n c) hL (hk c)
+  have hWA : Real.exp 1 * Real.log 2 / 2 * ∑ d, odometerWeight (n d) (k d) L ≤
+      ∑ d, (2 : ℝ) ^ ((n d : ℝ) + (k d : ℝ) / L) := by
+    rw [Finset.mul_sum]
+    exact Finset.sum_le_sum fun d _ => Resolution.odometer_le_face_weight (n d) (k d) L
+  have hK : 1 / (Real.exp 1 * Real.log 2 / 2) < 17 / 16 := by
+    have := two_div_e_log_two_lt
+    rwa [one_div_div]
+  rw [div_le_iff₀ hA]
+  calc (2 : ℝ) ^ ((n c : ℝ) + (k c : ℝ) / L) ≤ odometerWeight (n c) (k c) L := hwc
+    _ = 1 / (Real.exp 1 * Real.log 2 / 2) *
+          (odometerWeight (n c) (k c) L / ∑ d, odometerWeight (n d) (k d) L) *
+          (Real.exp 1 * Real.log 2 / 2 * ∑ d, odometerWeight (n d) (k d) L) := by
+        field_simp
+    _ ≤ 17 / 16 * (odometerWeight (n c) (k c) L / ∑ d, odometerWeight (n d) (k d) L) *
+          ∑ d, (2 : ℝ) ^ ((n d : ℝ) + (k d : ℝ) / L) := by
+        have hq : 0 ≤ odometerWeight (n c) (k c) L / ∑ d, odometerWeight (n d) (k d) L :=
+          div_nonneg (hω c).le hW.le
+        apply mul_le_mul _ hWA (mul_nonneg hμ.le hW.le) (by positivity)
+        exact mul_le_mul_of_nonneg_right hK.le hq
+
+/-- [proved-derived; formal-checked] **The bound read in a dominating chart.** If the face's
+masses at `f` are at most `κ` times the masses `r` (`p_c ≤ κ r_c`) and the step's spread is at
+most `ω ≤ 1`, the curvature term is at most `ln 2 · κ · Var_r(Δ)`:
+`code(f + Δ) ≤ code(f) + ⟨p − e_t, Δ⟩ + ln 2 · κ · Var_r(Δ)`. -/
+theorem codeLength_add_le_chart [DecidableEq ι] (f Δ r : ι → ℝ) {κ : ℝ}
+    (hpr : ∀ c, (2 : ℝ) ^ f c / ∑ d, (2 : ℝ) ^ f d ≤ κ * r c) {ω : ℝ} (hω : ω ≤ 1)
+    (hosc : ∀ c d, Δ c - Δ d ≤ ω) (t : ι) :
+    codeLength (fun c => f c + Δ c) t ≤ codeLength f t +
+      ∑ c, ((2 : ℝ) ^ f c / ∑ d, (2 : ℝ) ^ f d - (Pi.single t (1 : ℝ) : ι → ℝ) c) * Δ c +
+        Real.log 2 * κ * faceVariance r Δ := by
+  set p : ι → ℝ := fun c => (2 : ℝ) ^ f c / ∑ d, (2 : ℝ) ^ f d with hpdef
+  have h := codeLength_add_le f Δ p (fun c => rfl) hosc t
+  have hpz : ∀ c, p c = Real.exp (f c * Real.log 2) / ∑ d, Real.exp (f d * Real.log 2) :=
+    fun c => by simp only [hpdef, two_rpow_eq_exp]
+  have hp1 := face_sum_one _ p hpz
+  have hp0 := face_nonneg _ p hpz
+  have hvar := faceVariance_le_of_mass_le p r Δ hp1 hpr
+  have h2 : (2 : ℝ) ^ ω ≤ 2 := by
+    calc (2 : ℝ) ^ ω ≤ (2 : ℝ) ^ (1 : ℝ) :=
+          Real.rpow_le_rpow_of_exponent_le (by norm_num) hω
+      _ = 2 := Real.rpow_one 2
+  have hl : 0 < Real.log 2 := Real.log_pos (by norm_num)
+  have hV0 := faceVariance_nonneg p Δ hp0
+  have h2ω : 0 < (2 : ℝ) ^ ω := by positivity
+  have : Real.log 2 / 2 * (2 : ℝ) ^ ω * faceVariance p Δ ≤ Real.log 2 * κ * faceVariance r Δ := by
+    calc Real.log 2 / 2 * (2 : ℝ) ^ ω * faceVariance p Δ ≤ Real.log 2 / 2 * 2 * faceVariance p Δ :=
+          mul_le_mul_of_nonneg_right (mul_le_mul_of_nonneg_left h2 (by positivity)) hV0
+      _ = Real.log 2 * faceVariance p Δ := by ring
+      _ ≤ Real.log 2 * (κ * faceVariance r Δ) := mul_le_mul_of_nonneg_left hvar hl.le
+      _ = _ := by ring
+  linarith
+
+/-- [proved-derived; formal-checked] **The receiving map's step as the Rust reads it.** On the
+grain (`f_c = n_c + k_c/L`, `k_c ≤ L`) with the odometer chart `p̃_c = ω_c/Σ ω` and a step of spread
+at most `1`, the curvature term is at most `(119/160) Var_p̃(Δ)`:
+`code(f + Δ) ≤ code(f) + ⟨p − e_t, Δ⟩ + (119/160) Var_p̃(Δ)`, from `ln 2 < 7/10` and
+`p ≤ (17/16) p̃`. `(119/80) Var_p̃(Δ)` is its second-derivative bound along the ray, the
+magnitude part of `hnn::constitution::receiving_fisher_face`'s curvature. -/
+theorem codeLength_add_le_odometer [DecidableEq ι] (n : ι → ℤ) (k : ι → ℕ) {L : ℕ} (hL : 0 < L)
+    (hk : ∀ c, k c ≤ L) (Δ : ι → ℝ) {ω : ℝ} (hω : ω ≤ 1) (hosc : ∀ c d, Δ c - Δ d ≤ ω)
+    (t : ι) :
+    codeLength (fun c => ((n c : ℝ) + (k c : ℝ) / L) + Δ c) t ≤
+      codeLength (fun c => (n c : ℝ) + (k c : ℝ) / L) t +
+      ∑ c, ((2 : ℝ) ^ ((n c : ℝ) + (k c : ℝ) / L) /
+          ∑ d, (2 : ℝ) ^ ((n d : ℝ) + (k d : ℝ) / L) - (Pi.single t (1 : ℝ) : ι → ℝ) c) * Δ c +
+        119 / 160 * faceVariance
+          (fun c => odometerWeight (n c) (k c) L / ∑ d, odometerWeight (n d) (k d) L) Δ := by
+  have hω0 : ∀ d, 0 < odometerWeight (n d) (k d) L := fun d => by
+    unfold odometerWeight; have := zpow_pos (show (0 : ℝ) < 2 by norm_num) (n d); positivity
+  have hW : 0 < ∑ d, odometerWeight (n d) (k d) L :=
+    Finset.sum_pos (fun d _ => hω0 d) Finset.univ_nonempty
+  have hr : ∀ c, 0 ≤ odometerWeight (n c) (k c) L / ∑ d, odometerWeight (n d) (k d) L :=
+    fun c => div_nonneg (hω0 c).le hW.le
+  have h := codeLength_add_le_chart (fun c => (n c : ℝ) + (k c : ℝ) / L) Δ _
+    (face_mass_le_odometer_on_grain n k hL hk) hω hosc t
+  have hV := faceVariance_nonneg
+    (fun c => odometerWeight (n c) (k c) L / ∑ d, odometerWeight (n d) (k d) L) Δ hr
+  have hl := Real.log_two_lt_d9
+  have : Real.log 2 * (17 / 16) *
+      faceVariance (fun c => odometerWeight (n c) (k c) L / ∑ d, odometerWeight (n d) (k d) L) Δ ≤
+      119 / 160 *
+      faceVariance (fun c => odometerWeight (n c) (k c) L / ∑ d, odometerWeight (n d) (k d) L) Δ :=
+    mul_le_mul_of_nonneg_right (by nlinarith) hV
+  linarith
+
+end Odometer
+
 /-! ## Audit -/
 
 #print axioms exp_remainder_le
@@ -693,5 +853,10 @@ end Accumulated
 #print axioms accumulated_code_le
 #print axioms drift_spread_le
 #print axioms accumulated_code_le_of_path
+#print axioms faceVariance_le_of_mass_le
+#print axioms two_div_e_log_two_lt
+#print axioms face_mass_le_odometer_on_grain
+#print axioms codeLength_add_le_chart
+#print axioms codeLength_add_le_odometer
 
 end Holonics.HNN.Ratio.Certificate
