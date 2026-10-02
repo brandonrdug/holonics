@@ -32,6 +32,10 @@ the pump's reflection block `−2p R_c` to its stiffness, `c` the placed carrier
    points away; along a path whose energy does not rise the comparison never exceeds the opening
    energy, so a move from rest never crosses a pass above its start; in one quadratic mode the throw
    from rest moves only toward and past its equilibrium, at most twice as far.
+8. **Why the receiver's step turns from the gradient** (`fisher_step_target_only`,
+   `throw_le_free_fall`, `carried_velocity`): one lock's Gauss–Newton change raises only its target,
+   by `1/θ_t`; a throw's flight caps every mode at the force's free fall `|g|t²/2`, whatever its
+   stiffness; a carried velocity accumulates a push that keeps its sign.
 -/
 
 namespace Holonics.HNN.MoveDirection
@@ -266,5 +270,49 @@ theorem throw_between (xs ω t : ℝ) :
   have h2 := Real.neg_one_le_cos (ω * t)
   unfold throw
   constructor <;> nlinarith [sq_nonneg xs]
+
+/-! ## 8. Why the receiver's step turns from the gradient -/
+
+/-- **The Gauss–Newton change of one lock's readings raises only the target, by the inverse of its
+share**: with the Fisher form `F = diag θ − θθᵀ` on the non-resting sheets and the covector
+`c = θ − e_t`, the readings' change `w = e_t/θ_t` solves `Fw = −c`. The gradient weighs the same
+target by `1 − θ_t`, so the step reweighs each station by about `1/θ_t` against the gradient: the
+worst-read targets dominate it. -/
+theorem fisher_step_target_only {k : Type*} [Fintype k] [DecidableEq k] (θ : k → ℝ) (t : k)
+    (ht : θ t ≠ 0) :
+    (Matrix.diagonal θ - Matrix.vecMulVec θ θ) *ᵥ Pi.single t (1 / θ t) =
+      -(θ - Pi.single t 1) := by
+  ext i
+  have hv : ∀ j, Matrix.vecMulVec θ θ i j = θ i * θ j := fun j => rfl
+  simp only [Matrix.mulVec, dotProduct, Pi.single_apply, mul_ite, mul_zero,
+    Finset.sum_ite_eq', Finset.mem_univ, if_true, Matrix.sub_apply, Matrix.diagonal_apply, hv,
+    Pi.neg_apply, Pi.sub_apply]
+  by_cases hi : i = t
+  · subst hi; simp only [if_true]; field_simp; ring
+  · simp only [hi, if_false]; field_simp; ring
+
+/-- **A throw's flight caps every mode at the force's free fall**: in a mode of stiffness `ω²`
+pushed by a force `g`, the throw from rest toward `x* = g/ω²` has moved at most `|g| t²/2` by time
+`t`, whatever `ω`. The leap moves the same mode by `|g|/ω²`, without bound as the mode softens. -/
+theorem throw_le_free_fall (g ω t : ℝ) (hω : ω ≠ 0) : |throw (g / ω ^ 2) ω t| ≤ |g| * t ^ 2 / 2 := by
+  unfold throw
+  have h1 : 1 - Real.cos (ω * t) ≤ (ω * t) ^ 2 / 2 := by
+    have := Real.one_sub_sq_div_two_le_cos (x := ω * t)
+    linarith
+  have h0 : 0 ≤ 1 - Real.cos (ω * t) := by linarith [Real.cos_le_one (ω * t)]
+  rw [abs_mul, abs_of_nonneg h0, abs_div, abs_of_pos (by positivity : (0 : ℝ) < ω ^ 2)]
+  calc |g| / ω ^ 2 * (1 - Real.cos (ω * t)) ≤ |g| / ω ^ 2 * ((ω * t) ^ 2 / 2) :=
+        mul_le_mul_of_nonneg_left h1 (by positivity)
+    _ = |g| * t ^ 2 / 2 := by field_simp
+
+/-- **A carried velocity accumulates a persistent push**: with `v (k+1) = β v k + a` from rest,
+`v k = a (1 − β^k)/(1 − β)`, so a push that keeps its sign builds toward `a/(1 − β)` while one that
+alternates averages out. -/
+theorem carried_velocity {β a : ℝ} (hβ : β ≠ 1) (v : ℕ → ℝ) (h0 : v 0 = 0)
+    (hv : ∀ k, v (k + 1) = β * v k + a) (k : ℕ) : v k = a * (1 - β ^ k) / (1 - β) := by
+  have hne : (1 - β) ≠ 0 := sub_ne_zero.mpr (Ne.symm hβ)
+  induction k with
+  | zero => simp [h0]
+  | succ k ih => rw [hv, ih, pow_succ]; field_simp; ring
 
 end Holonics.HNN.MoveDirection

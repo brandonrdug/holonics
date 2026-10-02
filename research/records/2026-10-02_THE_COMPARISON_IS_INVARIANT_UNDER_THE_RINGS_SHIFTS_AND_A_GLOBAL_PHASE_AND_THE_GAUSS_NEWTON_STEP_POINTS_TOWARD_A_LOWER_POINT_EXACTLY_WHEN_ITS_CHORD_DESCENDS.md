@@ -39,6 +39,14 @@ leap checked against a tolerance, where the release should be predictive, a thro
    twice as far. What a throw adds is energy. It crosses a pass when its carried kinetic energy
    exceeds the pass's height above the current level. A move from rest never does, unless one
    endpoint lands past the pass and below its start.
+4. **The main line's read decides the case: it is the metric** (§8). At the opening, the native
+   gradient and the normal-law step both align with the float descent, while the kinetic step is
+   nearly orthogonal to the gradient. The receiver's Gauss–Newton change of each lock raises only
+   its target, by `1/θ_t` (`fisher_step_target_only`), where the gradient weighs it by `1 − θ_t`.
+   So the worst-read targets dominate the step. The kinetic step is the static leap to the
+   stiffness's equilibrium. The normal-law step is the overdamped flow under mass-proportional
+   damping. A throw over a finite flight moves each soft mode at most as far as the force's free
+   fall (`throw_le_free_fall`), which removes the soft modes' domination.
 
 The computational object is the helical pair interaction; the rings are complex parametrons. Of the
 [winding guide](../../docs/WINDING_CARRY_AND_PLACEMENT.md)'s six objects this touches **the helix**
@@ -234,7 +242,84 @@ A throw is built only if read 2 says pass and read 3 shows a rise within the ene
 carry. Building it changes HNN behaviour, so it is measured on campaign 1's held-out sections before
 it merges.
 
-## 7. Verification and what is owed
+## 8. The main line's read: the metric turns the step
+
+**Measured** (main line, relayed by the coordinator). At one shared start, the float probe's opening
+equals the native opening exactly, both at `ρ₀`. Signed squared cosines, in units of `1/4096`:
+
+| Pair | Signed cos² |
+|---|---|
+| native gradient `G` vs the float descent `−∇L_float` | `+1693` |
+| native normal-law step `ΔE` vs `−∇L_float` | `+1702` |
+| `G` vs the kinetic step `k` | `+37` |
+| `ΔE` vs `k` | `+35` |
+| `G` vs `fit − start` | `+2` |
+| `ΔE` vs `fit − start` | `+4` |
+
+The native gradient and the float objective's descent agree. The gradient points toward the fit,
+weakly, so §4's case is not a pass at the start: it is the metric. The kinetic step turns away
+from the gradient that both objectives share.
+
+**(a) Why the receiver's form is so anisotropic.** On one lock, with `F = diag θ − θθᵀ` on the
+non-resting sheets and `c = θ − e_t`, the Gauss–Newton change of the readings is `w = e_t/θ_t`
+(`fisher_step_target_only`). It raises only the target, by the inverse of its share, and asks every
+rival reading to stay where it is. The gradient weighs the same target by `1 − θ_t` and also lowers
+the rivals. Relative to the gradient, the step therefore reweighs each station by about `1/θ_t`,
+and the worst-read targets, those with the smallest share, dominate it. In the mass-whitened
+coordinates, where the readings' Jacobian has singular values `σ_i`, the gradient's components go as
+`σ_i` and the step's as `1/σ_i`. The step is carried by the weakly read directions, and the
+gradient by the well-read ones. [proved-standard; Kantorovich] For a positive form `P` with
+condition number `κ` on the gradient's span, `cos(g, Pg) ≥ 2√κ/(1 + κ)`. The measured
+`cos² = 37/4096` therefore needs `κ > 440`: at `κ = 441`, `4κ/(1 + κ)² = 1764/195364`, which lies
+below `37/4096`. The suppressed directions are the well-read ones. The fit's path follows the
+gradient (`+1693`), so they carry it.
+
+**(b) The leap, the overdamped flow and the throw.** The mass is the storage's inertia
+`M = I ⊗ H′`, and the stiffness is the Fisher pullback `K = AᵀFA` (§5). For the motion
+`M Ë + D Ė + ∇L = 0`:
+- **The kinetic step is the static leap.** It jumps to the quadratic model's equilibrium `Kx = −g`,
+  where `M` only settles the directions `K` does not read. It is independent of the damping, and
+  each mode `i` moves `g_i/ω_i²`, without bound as the mode softens.
+- **The overdamped flow under mass-proportional damping `D = γM` is the normal-law step.** That flow
+  is `Ė = −M⁻¹g/γ`, the direction of `ΔE`. The main line's `+1702` says this native direction
+  already follows the fit's descent.
+- **The underdamped throw over a finite flight.** From rest, each mode moves at most the force's
+  free fall `|g_i| τ²/2` by time `τ`, whatever its stiffness (`throw_le_free_fall`). Stiff modes
+  (`ω_i τ ≫ 1`) reach their equilibrium as the leap does. Soft modes stay at free fall instead of
+  the leap's `g_i/ω_i²`. The flight time cuts exactly the soft-mode amplification that turns the
+  kinetic step.
+- **A persistent push accumulates.** With `v_(k+1) = β v_k + a`, the velocity is
+  `a(1 − β^k)/(1 − β)` (`carried_velocity`). A push that keeps its sign builds toward `a/(1 − β)`,
+  while one that alternates averages out. The suppressed well-read directions are where the gradient
+  keeps its sign (the gradient's `+1693` with the fit's descent), so a carried velocity grows along
+  them. The steps that point away were the kinetic steps; a velocity carried from the normal-law
+  steps is a different sum.
+
+**What is exact.** Everything in the throw is rational on the lattice:
+- the mass `M = I ⊗ H′`, a Gram of the passage's rational features at rational weights;
+- the velocity, carried as a rational moment of the returns (`v ← βv − hM⁻¹g`);
+- the position, deposited as every deposit is, rounded toward zero on the `2⁻²¹` lattice.
+
+[agent-inferred] **The flight and the damping.** The flight is the excursion's interval: `W` moves
+between its opening and its close, admitted while the energy `H = ½⟨Mv, v⟩ + L_held` falls
+(§5). The damping is read from the modes. Critical damping of the softest admitted mode,
+`β = 1 − 2hω_min`, is rational once `ω²_min` is enclosed at a rational grain. The kinetic solve's
+iterates enclose it. Owed (#62): the discrete energy law at the lattice and the enclosure of
+`ω_min`.
+
+**Outside yardstick only.** The float fit (Adam: momentum and a near-sign diagonal scale) shows what
+a carried, nearly diagonal motion reaches. It is not the mechanism. The native counterpart is
+built from `M`, the returns and the excursion's interval above.
+
+**(c) Which native metric is near the identity on `E`.** The normal law's chart is `M⁻¹ = I ⊗
+H′⁻¹`. It acts identically on all 120 rows, and on the 5 columns through the feature Gram, which the
+one-hot station features make close to diagonal in the class basis. The `Coordinate` metric moves
+`E` by this law. The `Witness` metric moves `E` along the port's unit move, the same direction, and
+sizes only its plane with `ρ`. [agent-inferred] Both should therefore read like `ΔE` against `G`
+(`+1702` against the float descent). Only `Kinetic` and `KineticModulus` carry the anisotropic
+reweighting. The main line's read of the Coordinate and Witness steps against `G` tests this.
+
+## 9. Verification and what is owed
 
 - `bash tools/lean_check.sh HolonicsResearch.HNN.MoveDirection`: "Build completed successfully
   (8706 jobs)", no warnings, no `sorry`.
