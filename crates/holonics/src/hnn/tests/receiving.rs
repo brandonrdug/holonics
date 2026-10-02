@@ -182,6 +182,8 @@ fn the_field_declares_the_tree_and_codes_it() {
     let theta = Constitution::initial(&campaign, CAMPAIGN_ONE_BUDGET).unwrap();
     let tree = theta.landmarks(2).unwrap();
     assert_eq!(tree.declaration(), &declared);
+    // The root base's doubled floor keeps the rule below half a grain at depth 63.
+    assert!(tree.face_rule() < Rat::new(1.into(), 32.into()));
     assert_eq!((tree.nodes(), tree.passed()), (0, 0));
     assert!(theta.landmarks(0).is_none());
     let map = theta.receiving_map(2).unwrap();
