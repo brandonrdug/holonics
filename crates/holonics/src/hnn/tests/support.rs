@@ -119,7 +119,7 @@ pub(super) fn ring(period: u64, lock: Vec<u64>) -> RingDeclaration {
 }
 
 /// A contact matching the first `nodes` nodes of both ends, `Y_a = 2`, with exponent `β`.
-pub(super) fn contact(from: usize, to: usize, nodes: usize, exponent: i64) -> ContactDeclaration {
+pub(crate) fn contact(from: usize, to: usize, nodes: usize, exponent: i64) -> ContactDeclaration {
     ContactDeclaration {
         from,
         to,
@@ -131,7 +131,7 @@ pub(super) fn contact(from: usize, to: usize, nodes: usize, exponent: i64) -> Co
 
 /// A small field for the tick's laws: rings of periods `periods` (all locks `{0}`), the declared
 /// contacts, source ring 0, `|A| = 2`, `Δ = {1}`, receiver ring `receiver` with aperture 1.
-pub(super) fn small_field(
+pub(crate) fn small_field(
     periods: &[u64],
     contacts: Vec<ContactDeclaration>,
     receiver: usize,

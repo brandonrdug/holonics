@@ -2457,7 +2457,7 @@ fn compose_ring(
 /// integral chart, the three forms' pulls `C̄ = Σ 2 r̄ (w − ω)ᵀ`, `K̄ = −h Σ r̄ (u + ½hω)ᵀ`,
 /// `D̄ = −h Σ r̄ ωᵀ` (the three together), its factor steps (when retained) and its pullback.
 #[allow(clippy::too_many_arguments)]
-fn compose_contact(
+pub(crate) fn compose_contact(
     field: &Field,
     constitution: &Constitution,
     back: &WordReturn,
@@ -4343,3 +4343,6 @@ pub fn prequential(
     })
 }
 
+
+#[cfg(test)]
+mod continuation;
