@@ -220,7 +220,11 @@ grain cells be compared before the score
 | Consumer | Anchors or contact states differ | Exact logits differ | Faces differ | Grain cells above the fibre differ |
 |---|---|---|---|---|
 | the exposure's (a fresh word at the next cut) | 251 | 232 | 232 | **14** |
-| the continuing word (the window's own change) | 250 | 250 | 250 | **36** |
+| the continuing word (the window's own change; a two-junction read, see below) | 250 | 250 | 250 | **36** |
+
+*The continuing read is a two-junction computation, not a seamless continuation* (Astra, October 2):
+`WordBalance.change` is taken after the word's last junction, and `Word::continuing` opens with
+another junction. The read is valid as that computation.
 
 The next window's code changes at exactly 14 windows (strictly lower 4, strictly higher 10), the
 windows where the fresh consumer's grain cells differ above the fibre. A face's code length reads
@@ -247,7 +251,9 @@ instantiation on one contact, from the executed transit (`hnn::propagation::tran
   `u′ = u + (G/2) S(2C_a w − h K_a u) + (Gh/2) S(α_g − α_h)` and
   `w′ = −w + (G/h) S(2C_a w − h K_a u) + G S(α_g − α_h)`. The outgoing waves are
   `α_g − S(α_g − α_h) − (1/h) S(2C_a w − h K_a u)` and the same with the signs reversed.
-- **The chart.** `K = (I − D)⁻¹ C`, the contact's quasi-static elimination: the interior state a
+- **The chart.** `K = (I − D)⁻¹ C`, defined where `I − D` is invertible, which needs an invertible
+  stiffness `K_a` (Astra, October 2). A singular stiffness keeps its compatible fibre or
+  obstruction. It is the contact's quasi-static elimination: the interior state a
   steady boundary holds. Then `r = z − K x` is the contact's motion that the boundary does not
   determine, and Lean's `ReflectedBoundaryMemory.reflectedResidual_step` gives its next value with
   the next chart. Across a commit `K` changes, and the retained `z` reads `r′ = z − K′x`, the
@@ -259,6 +265,9 @@ instantiation on one contact, from the executed transit (`hnn::propagation::tran
   predecessor's chart and the successor's. That needs the channel's incoming waves `x`, which the
   word's per-tick record (`Passage`) does not yet keep. Recording them is the first build step.
   Until that build lands, the residual stays owed (#62).
+- **Its owner** (the division of work, October 2): the returned-state and storage boundary, the
+  reflected residual included, is Astra's. This instantiation is handed over, and its receipt is
+  consumed here when it lands.
 
 ## 11. The receiver's resolution, derived, and the contacts' change against it
 
@@ -295,6 +304,20 @@ into bits.
    `√(2/(1190 ln 2))` bits, which lies in `(1/21, 1/20)` because `1190 · ln 2 / 2` lies in
    `(400, 441)`. The declared `1/16` is coarser than this by less than a factor of `4/3`. That
    discrepancy is real, but it is small next to what follows.
+
+**Its assumptions, stated** (Astra's foveation review, October 2). The bound is the statistical
+case of the receiver's tolerance, not its law. It assumes:
+- **(a) the decision:** a two-hypothesis test between the two media;
+- **(b) the error criterion:** Stein's exponent at one bit, `N·D ≥ 1`;
+- **(c) the accumulation:** independent readings within one retained state, `N = 1,190` for one aeon.
+
+Each of the three is a modelling choice and changes the number. The general criterion recovered
+from the foveation work (the laboratory's July 25 joint-receiver grain; the
+[September 14 synthesis](2026-09-14_HEAR_THE_MUSIC_SITUATED_RELEASE_AND_SELF_MOTION.md)) is
+decision-dependent. A receiver refines where an admitted consequence differs and coarsens where
+distinctions factor (`Holarchy::refine`). The resolution is the receiver's, adaptive, and never a
+global constant. A second bound also applies on real text: no face produces the targets, so the code
+length moves at first order in the change, not second order. §14 measures which bound governs.
 
 **The contacts' change, measured** ([receipt](2026-10-02_THE_CONTACT_LOOP_receipts/readability_256.txt)).
 Over 256 windows, take the largest change of the next window's exponents `v` over its phases and
@@ -408,3 +431,52 @@ three aeons of the contacts' learning, and the receiver's span stops growing nea
 next measurement is the information itself, over many windows rather than one: the accumulated
 `Σ D(p′‖p)` between the learned and the opening contacts over a whole aeon of readings, which
 decides readability without the `max |δ|` bound.
+
+## 14. Information, first-order code, and why contacts freeze (incomplete: two aeons)
+
+Both runs of this read are incomplete. The first, with 256 frozen windows per aeon, passed its
+1,800 s deadline without printing
+([receipt](2026-10-02_THE_CONTACT_LOOP_receipts/information_first_attempt.txt)). The read was then
+changed, not relaunched with a larger limit: 64 frozen windows per aeon
+(`INFORMATION_WINDOWS = 2^6`, a cost choice), a line printed per aeon as it closes, and the
+first-order code difference added. That run was stopped on evidence after the second aeon's line.
+The first aeon took 245,316 ms against the projection's 205 s per aeon
+([receipt](2026-10-02_THE_CONTACT_LOOP_receipts/information_incomplete.txt)).
+
+**Why the contacts stop moving: rounding, not a shrinking return.**
+
+| Aeon | Contacts-only commits | Channel families certified / vanished | The return reaching the contacts, `a` median | `R`'s steps moved / its `a` median |
+|---|---|---|---|---|
+| 0 | 534 | 6,384 / 3,284 | `3842973/2^42` | 534 of 534 / `10550203/2^33` |
+| 1 | 560 | 6,720 / 6,549 | `4237223/2^36` | 561 of 561 / `9383943/2^32` |
+
+The return reaching the contacts grows by about `2^6` from the first aeon to the second, yet the
+share of families that vanish rises from about half to 97 percent. A unit step is `D = G/h′` with
+the family's statistic `h′` accumulating the feature energy of every passage, while the fine lattice
+refines only as `2⌊log₂ m⌋ + 1` in the locus's clock. So the step shrinks faster than the lattice
+refines, and the contacts freeze by rounding. The cumulative change of §13 is therefore what the
+current lattice permits, not a trend. `R`, whose step is `η = 1` at every deposit, keeps moving.
+
+**The information (second order).** The receiver's readings were compared over 128 frozen readings
+(64 windows) after each close, the opening's contacts against the learned:
+- after aeon 1, `Σ Var_p(δ) = 16713691/2^38` bits²;
+- after aeon 2, `797049/2^31` bits².
+
+To second order the information is `(ln 2/2) Σ Var`, below `2^(−13)` and below `2^(−11)` bits over
+the 128 readings. That is far below one bit.
+
+**The code on the actual targets (first order).** The code with the opening's contacts less the
+code with the learned contacts, summed over the same 64 windows:
+- after aeon 1, between `73869077799743960577887037/2^95` and
+  `73869077799744495918701667/2^95` bits, about `+1/536`: 19 windows better, 15 worse, 30
+  undecided;
+- after aeon 2, about `−1/74` bit: 20 better, 27 worse, 17 undecided.
+
+The difference changes sign and the windows split nearly evenly, so the learned contacts are not
+consistently better on the actual targets. Two points cannot separate linear growth from
+square-root growth. The sign change and the even split point to incoherent accumulation, so neither
+bound shows a contact improvement accruing.
+
+[agent-inferred] On this cut, the contacts' learning, frozen by rounding after the first aeon, does
+not produce a change the receiver gains from. This is the statement the measurement supports, and
+the bounds above are its evidence.

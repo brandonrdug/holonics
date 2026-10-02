@@ -974,32 +974,65 @@ fn rounding(exposure: &Exposure) {
 fn contact_ablation_run(field: &Field, cut: &Cut, windows: usize) {
     use holonics::hnn::reference::contact_ablation;
     let clock = Instant::now();
-    let (readings, cumulative) =
-        contact_ablation(&Reference::campaign_one(), field, &cut.cells, windows)
-            .expect("the contact ablation");
-    // The receiver's exponent span, largest per aeon, and the contacts' cumulative change at each
-    // aeon's close (the contact loop record §13).
-    let aeons = readings.iter().map(|r| r.aeon).max().map_or(0, |a| a + 1);
-    for a in 0..aeons {
-        let largest = readings
-            .iter()
-            .filter(|r| r.aeon == a)
-            .map(|r| r.exponent_spread.clone())
-            .max()
-            .unwrap_or_else(Rat::zero);
-        let single = readings
-            .iter()
-            .filter(|r| r.aeon == a)
-            .map(|r| r.exponent_shift.clone())
-            .max()
-            .unwrap_or_else(Rat::zero);
-        println!("  aeon {a}: the receiver's exponent span, largest {largest} bits; one deposit's contact change, largest {single} bits");
-    }
-    for c in &cumulative {
+    use holonics::hnn::reference::{ContactAblation, CumulativeContacts, ReceiverStep};
+    // One aeon's summary: the receiver's exponent span, one deposit's contact change, the
+    // contacts-only commits (families certified and vanished, the return's size `a`) and R's steps.
+    let aeon_line = |a: usize, readings: &[ContactAblation], receiver: &[ReceiverStep]| {
+        let here: Vec<&ContactAblation> = readings.iter().filter(|r| r.aeon == a).collect();
+        let largest = here.iter().map(|r| r.exponent_spread.clone()).max().unwrap_or_else(Rat::zero);
+        let single = here.iter().map(|r| r.exponent_shift.clone()).max().unwrap_or_else(Rat::zero);
+        let families: usize = here.iter().map(|r| r.contact_families).sum();
+        let vanished: usize = here.iter().map(|r| r.contact_vanished).sum();
+        let total: Rat = here.iter().map(|r| r.contact_alignment.clone()).sum();
+        let mut aligns: Vec<Rat> = here.iter().map(|r| r.contact_alignment.clone()).collect();
+        aligns.sort();
+        let median = aligns.get(aligns.len() / 2).cloned().unwrap_or_else(Rat::zero);
+        let steps: Vec<&ReceiverStep> = receiver.iter().filter(|s| s.aeon == a).collect();
+        let r_moved = steps.iter().filter(|s| s.moved).count();
+        let mut r_aligns: Vec<Rat> = steps.iter().map(|s| s.alignment.clone()).collect();
+        r_aligns.sort();
+        let r_median = r_aligns.get(r_aligns.len() / 2).cloned().unwrap_or_else(Rat::zero);
+        let held = |x: &Rat| holonics::holon::deposition::significant(x, 24, false);
         println!(
-            "  after aeon {} (window at {}): the contacts' cumulative change {} bits at an exponent span of {} bits; code held [{}, {}) with the opening's contacts [{}, {})",
-            c.aeon, c.position, c.exponent_shift, c.spread, c.held.lower, c.held.upper, c.reverted.lower, c.reverted.upper
+            "  aeon {a}: the receiver's exponent span, largest {largest} bits; one deposit's contact change, largest {single} bits; contacts-only commits {}: channel families certified {families}, vanished {vanished}; the contacts' return a, median {}, total {} (24 bits); R's steps {}: moved {r_moved}, its a median {} (24 bits); {} ms",
+            here.len(),
+            held(&median),
+            held(&total),
+            steps.len(),
+            held(&r_median),
+            clock.elapsed().as_millis()
         );
+    };
+    let cumulative_line = |c: &CumulativeContacts| {
+        println!(
+            "  after aeon {} (window at {}): the contacts' cumulative change {} bits at an exponent span of {} bits; over {} readings frozen: sum Var_p(delta) {} bits^2 (24 bits); code (opening's contacts less learned) summed [{}, {}) bits, better {}, worse {}, undecided {}; {} ms",
+            c.aeon,
+            c.position,
+            c.exponent_shift,
+            c.spread,
+            c.readings,
+            holonics::holon::deposition::significant(&c.variance, 24, false),
+            c.code_difference.lower,
+            c.code_difference.upper,
+            c.better,
+            c.worse,
+            c.undecided,
+            clock.elapsed().as_millis()
+        );
+    };
+    let (readings, _cumulative, receiver) = contact_ablation(
+        &Reference::campaign_one(),
+        field,
+        &cut.cells,
+        windows,
+        &mut |c, readings, receiver| {
+            aeon_line(c.aeon - 1, readings, receiver);
+            cumulative_line(c);
+        },
+    )
+    .expect("the contact ablation");
+    if let Some(last) = readings.iter().map(|r| r.aeon).max() {
+        aeon_line(last, &readings, &receiver);
     }
     let (mut lower, mut higher, mut equal, mut overlap, mut moved) = (0, 0, 0, 0, 0);
     let (mut states, mut logits, mut faces) = (0, 0, 0);
