@@ -3,6 +3,7 @@ import Holonics.HNN.Word
 import Holonics.HNN.Moment
 import Holonics.HNN.Normal
 import Holonics.HNN.LatticeDeposit
+import Holonics.HNN.LatticeDeposit.Freeze
 import Holonics.HNN.LatticeWord
 import Holonics.HNN.Ratio
 import Holonics.HNN.TargetFace
@@ -36,6 +37,7 @@ design: the HNN law", table (b) rows 1–8, stated before their Rust owners in `
 | `HNN/Moment` | 3. selective stepping, the phase-binned moment, its adjoint and capacity | `hnn::moment` |
 | `HNN/Normal` | 4. the normal constitution and deposition, per locus | `hnn::constitution` |
 | `HNN/LatticeDeposit` | 4. deposition on a declared carrier lattice with a carried remainder | `hnn::constitution::{Lattice, NormalLaw}` |
+| `HNN/LatticeDeposit/Freeze` | 4. why a contact stops moving: the step's logarithm law, the coherence of its updates, the release bound's tightness and its dependence on the precision schedule | `hnn::constitution::{BudgetedCarry, Carry}` |
 | `HNN/LatticeWord` | Decision 24: transients and inverse charts on declared lattices, certified residuals | `hnn::{word, propagation, constitution}` |
 | `HNN/Ratio` | 5. the Holon ratio at the receiver's face, and the carried power | `hnn::ratio` |
 | `HNN/TargetFace` | Decision 26: the target's code face, the margin rule, the receiving locus's exogenous normal law | `hnn::{ratio, constitution}` |
