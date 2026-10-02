@@ -1,0 +1,1 @@
+args: eO_ablate.py (eO_fit.py at e214ccc8^ with its optimizer ablated by ARM) order2 400 256 <seed> 0.03 0.05 1 16, the probe's modules restored from e214ccc8^ into a scratch directory; seed 101 four arms together at two threads (about 1,100 to 1,240 s), seeds 202 and 303 eight arms together at one thread; deadline 2,700 s and 3,000 s
