@@ -135,6 +135,7 @@ fn declare(declared: &Declared) -> Field {
                 depth: 1,
                 prior: StopPrior::half(),
                 mass: 1,
+                base: holonics::compression::landmark::context::BaseMeasure::Even,
             }],
             crib: CribDeclaration {
                 window: 16,

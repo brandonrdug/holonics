@@ -1316,3 +1316,28 @@ by one bit. The grain is the receiver's own, `1/16`; at `1/64` the code is the s
 own unconditional split, which the tree already holds. The next build is that law in the tree
 owner, its oracle and the card's kernel, gated on held-out code, with its Lean counterpart in #62:
 the node law then reads its digit tree's root, a state beyond the arrivals reaching the node.
+
+## 31. The root's base, built: held out 99 bits lower
+
+**The law** (`compression::landmark::context::BaseMeasure::Root`, `Topology::kt_based`,
+`base_sixteenths`; the card's `tree_kt`). Every node of a digit tree, its root included, splits its
+prior masses by one base read from the root's masses before the cell's deposit:
+`16π_0 = ⌊16(½ k_root(0) + ¼) + ½⌋` (nearest, ties up), `k_root(0) = (2^j n_0 + 1)/(2^j n + 2)` the
+root's face at the even base, and a node's face is `(2^(j+4) n_b + 2·16π_b)/(2^(j+4) n + 32)`. A
+level past the last stored one reads the base's split in place of `½`; a digit tree with no root
+reads `½`. The floor is `1/(2(2^j n* + 2))` (`face_bits_at`) and `κ` reads `16(2^j n* + 2)`; campaign
+1's widths are `M_p = 50`, `W = 37`. The executed tree matches the replica's `shared-g4` mode to
+the bit on the standing cut (development `17453 + 5/16 + ε` against `8936120/2^9`, held out
+`3357 + 2/16 + ε` against `13750868/2^12`), so the storage where paths part stays exact under the
+shared base. The test reads the faces normalized, within the rule and within their certificates of
+the oracle (`the_roots_base_keeps_the_rule_and_leans_on_the_unconditional_split`). The Lean
+counterpart is in progress on the replica's form; the Rust differs from it only in rounding exact
+ties upward (Python rounds them to even) and in reading the base's split at the levels past the last
+stored one.
+
+**The gate** ([exposure](2026-10-02_THE_CONTACT_LOOP_receipts/root_base_exposure.txt), 661,783 ms
+inside the 800 s deadline; library tests 926 passed; GPU suite 32 of 32). Held out, model − PPM-2
+`−560 + 15/16 + ε` bits (with the even base `−462 + 2/16 + ε`), the tree alone `−557 + 4/16 + ε`,
+the wave `−3 + 10/16 + ε`; training `−1688 + 15/16 + ε`. The model codes the 1,190 held-out cells
+in about `3353 + ε` bits, about 233 below PPM order 4. Campaign 1 declares the root's base
+(`ReceiverDeclaration::base`, coded in the field's description).

@@ -43,6 +43,7 @@ fn rotor_field(rings: &[(u64, Vec<u64>)]) -> Field {
                 depth: 2,
                 prior: crate::compression::landmark::context::StopPrior::half(),
                 mass: 1,
+                base: crate::compression::landmark::context::BaseMeasure::Even,
             }],
             crib: CribDeclaration {
                 window: 64,

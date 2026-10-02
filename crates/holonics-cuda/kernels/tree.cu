@@ -61,6 +61,8 @@ struct TreeLaw {
     uint32_t sums_stride;
     // The masses' increment an arrival adds, `2^j` at the prior mass `2^(−j)` (KT's 2 at j = 1).
     uint32_t unit;
+    // The base measure: 0 the even split, 1 the digit tree's root (the host's `BaseMeasure`).
+    uint32_t base;
 };
 
 struct TreeArena {
@@ -405,6 +407,26 @@ __device__ void tree_split(uint64_t n, uint64_t d, int64_t e, uint32_t upper_run
 // when `n_0 + n_1 ≥ L = 2^c`, that is `h_0 + h_1 ≥ 2L + 2 = ceiling`, each `n_b ← ⌈n_b/2⌉`, that is
 // `h_b ← 2⌊(h_b + 1)/4⌋ + 1`. The sum is read in 64 bits, so the unbounded ceiling `u64::MAX` is
 // never reached.
+// A node's face of `symbol` at the declared base (the host's `Topology::kt_based`): the masses
+// `(m_b, M)` at the even base, `(16 m_b − 16 + 2·16π_b, 16M)` at the root's, with
+// `16π_0 = ⌊(2(8 m_0 + 4M_root) + M_root)/(2 M_root)⌋` read from the root's masses.
+__device__ __forceinline__ void tree_kt(const TreeLaw& law, const uint32_t* halves, uint32_t node,
+                                        uint32_t root, uint32_t symbol, u128* u, u128* v) {
+    uint64_t mass = halves[2 * (uint64_t)node + symbol];
+    uint64_t total = (uint64_t)halves[2 * (uint64_t)node] + halves[2 * (uint64_t)node + 1];
+    if (law.base == 0) {
+        *u = mass;
+        *v = total;
+        return;
+    }
+    uint64_t r0 = halves[2 * (uint64_t)root];
+    uint64_t rt = r0 + halves[2 * (uint64_t)root + 1];
+    uint64_t zero = (2 * (8 * r0 + 4 * rt) + rt) / (2 * rt);
+    uint64_t split = symbol == 0 ? zero : 16 - zero;
+    *u = 16 * mass - 16 + 2 * split;
+    *v = 16 * total;
+}
+
 __device__ __forceinline__ void tree_carry(uint32_t* halves, uint64_t ceiling) {
     if ((uint64_t)halves[0] + halves[1] >= ceiling) {
         halves[0] = 2u * ((halves[0] + 1u) / 4u) + 1u;
@@ -570,8 +592,15 @@ __device__ void tree_read(const TreeLaw& law, const TreeArena& a, uint32_t branc
     uint32_t level_top = read.leaf ? read.count - 1 : read.count;
     if (read.leaf) {
         uint32_t leaf = read.nodes[level_top];
-        u128 u = a.halves[2 * leaf], v = (u128)a.halves[2 * leaf] + a.halves[2 * leaf + 1];
+        u128 u, v;
+        tree_kt(law, a.halves, leaf, read.nodes[0], 0, &u, &v);
         read.faces[level_top] = tree_round(u << law.face, v, law.face);
+    } else if (law.base != 0 && read.count > 0) {
+        // Past the last stored level the prior: the base's split, read from the root's masses.
+        uint64_t r0 = a.halves[2 * (uint64_t)read.nodes[0]];
+        uint64_t rt = r0 + a.halves[2 * (uint64_t)read.nodes[0] + 1];
+        uint64_t zero = (2 * (8 * r0 + 4 * rt) + rt) / (2 * rt);
+        read.faces[level_top] = (full >> 4) * zero;
     } else {
         read.faces[level_top] = full / 2;
     }
@@ -580,7 +609,8 @@ __device__ void tree_read(const TreeLaw& law, const TreeArena& a, uint32_t branc
             read.faces[level] = read.faces[level + 1];
         } else {
             uint32_t at = read.nodes[level];
-            u128 u = a.halves[2 * at], v = (u128)a.halves[2 * at] + a.halves[2 * at + 1];
+            u128 u, v;
+            tree_kt(law, a.halves, at, read.nodes[0], 0, &u, &v);
             u128 stop = (read.parting != TREE_NONE && (uint32_t)level + 1 == read.count)
                             ? read.upper.stop
                             : a.charts[at].stop;
@@ -767,8 +797,8 @@ extern "C" __global__ void hnn_tree_deposit(TreeLaw law, TreeArena a, const uint
             if (read.bottoms[level] < forced) break;
             if ((uint32_t)level >= level_top) continue;
             uint32_t node = read.nodes[level];
-            u128 u = a.halves[2 * node + symbol];
-            u128 v = (u128)a.halves[2 * node] + a.halves[2 * node + 1];
+            u128 u, v;
+            tree_kt(law, a.halves, node, read.nodes[0], symbol, &u, &v);
             u128 below = tree_side(read.faces[level + 1], symbol, law.face);
             bool upper = parts && (uint32_t)level + 1 == read.count;
             TreeChart chart = upper ? read.upper : a.charts[node];

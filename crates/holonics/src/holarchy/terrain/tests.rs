@@ -249,6 +249,7 @@ fn standing_of(cells: &[usize]) -> Landmarks {
         prior: StopPrior::half(),
         capacity: Capacity::Unbounded,
         mass: 1,
+        base: crate::compression::landmark::context::BaseMeasure::Even,
     };
     let mut standing = Landmarks::new(declaration).unwrap();
     for (position, &cell) in cells.iter().enumerate() {

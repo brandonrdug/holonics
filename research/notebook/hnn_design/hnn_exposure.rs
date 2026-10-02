@@ -237,6 +237,7 @@ fn main() {
     let mut ladder = false;
     let mut ladder_masses: Option<u32> = None;
     let mut ladder_depth: Option<usize> = None;
+    let mut ladder_base: Option<bool> = None;
     for pair in arguments.chunks(2) {
         match pair {
             [key, value] if key == "cells" => cells = Some(value.clone()),
@@ -271,6 +272,9 @@ fn main() {
             [key, value] if key == "prior-mass" => {
                 ladder = true;
                 ladder_masses = Some(value.parse().expect("a prior mass exponent"));
+            }
+            [key, value] if key == "tree-base" && (value == "even" || value == "root") => {
+                ladder_base = Some(value == "root");
             }
             [key, value] if key == "tree-depth" => {
                 ladder_depth = Some(value.parse().expect("a tree depth"));
@@ -423,7 +427,7 @@ fn main() {
     );
     println!("setup (cut read, fields declared): {setup} ms wall");
     if ladder {
-        prior_mass_ladder(&field, &cut, ladder_masses, ladder_depth);
+        prior_mass_ladder(&field, &cut, ladder_masses, ladder_depth, ladder_base);
         return;
     }
     if let Some(count) = ablation {
@@ -1628,20 +1632,31 @@ fn tree_alone(field: &Field, cut: &Cut, scored: usize) -> TreeAlone {
 /// at each prior mass `2^(−j)`, `j = 1..B` (`B` the odometer digits), its development (training)
 /// and held-out codes. The development cells choose `j`, charged `⌈log₂ B⌉` bits for the family,
 /// the declared stop prior's method (the September 26 record, §1). `prior-mass j` reads one rung,
-/// `tree-depth D` another address depth.
-fn prior_mass_ladder(field: &Field, cut: &Cut, only: Option<u32>, depth: Option<usize>) {
+/// `tree-depth D` another address depth, `tree-base even|root` another base measure.
+fn prior_mass_ladder(
+    field: &Field,
+    cut: &Cut,
+    only: Option<u32>,
+    depth: Option<usize>,
+    root: Option<bool>,
+) {
+    use holonics::compression::landmark::context::BaseMeasure;
     let mut base =
         landmark_declaration(field, &field.receivers()[0]).expect("the receiver's declared tree");
     if let Some(depth) = depth {
         base.depth = depth;
     }
+    if let Some(root) = root {
+        base.base = if root { BaseMeasure::Root } else { BaseMeasure::Even };
+    }
     let grain = base.grain;
     let digits = holonics::compression::landmark::context::odometer_digits(base.alphabet) as u32;
     let letters = cell_letters(&cut.cells);
     println!(
-        "prior-mass ladder over the cut's {} cells (B = {digits}, depth {})",
+        "prior-mass ladder over the cut's {} cells (B = {digits}, depth {}, base {:?})",
         cut.cells.len(),
-        base.depth
+        base.depth,
+        base.base
     );
     for mass in (1..=digits).filter(|j| only.is_none_or(|o| o == *j)) {
         let started = Instant::now();

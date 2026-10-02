@@ -100,7 +100,7 @@ use num_traits::{One, Signed, ToPrimitive, Zero};
 
 use crate::aeon::{ClockLift, Reading};
 use crate::compression::ReflectorMachine;
-use crate::compression::landmark::context::{Landmarks, StopPrior};
+use crate::compression::landmark::context::{BaseMeasure, Landmarks, StopPrior};
 use crate::geometry::RatVec3;
 use crate::geometry::complex::{CellComplex, ConnectionIncidence};
 use crate::geometry::screw::{ScrewAxis, ScrewGenerator, ScrewPair, SituatedScrew};
@@ -239,7 +239,8 @@ pub struct ContactDeclaration {
 /// root's split forced is the region table; the tree's declared stop-weight law
 /// (the declared stop prior; `compression::landmark::context::StopPrior`, the `½` stop prior at `StopPrior::half`);
 /// and its nodes' prior mass exponent `j`, each digit's masses starting at `2^(−j)`
-/// (`compression::landmark::context::LandmarkDeclaration::mass`; KT at `j = 1`).
+/// (`compression::landmark::context::LandmarkDeclaration::mass`; KT at `j = 1`), and the base
+/// measure those masses are split by (`compression::landmark::context::BaseMeasure`).
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct ReceiverDeclaration {
     pub ring: usize,
@@ -248,6 +249,7 @@ pub struct ReceiverDeclaration {
     pub depth: usize,
     pub prior: StopPrior,
     pub mass: u32,
+    pub base: BaseMeasure,
 }
 
 /// [definition] **The crib as declared**: the `window` cells that open each aeon, read at `offset`.
@@ -303,7 +305,7 @@ impl FieldDeclaration {
     /// (inferred; the contact loop record §28–29 measures it; it was `4`,
     /// chosen on the development cells in the landmark receipt), and prior mass `2^(−3)` (chosen on the
     /// development cells over the ladder `2^(−j)`, `j = 1..B`, charged `⌈log₂ B⌉ = 3` bits: the
-    /// contact loop record §25);
+    /// contact loop record §25), split by its digit tree's root (`BaseMeasure::Root`, §30–31);
     /// `Δ = {1}`; the crib `W_crib = 64` at offset 1. The population is the cut's length. The carrier
     /// lattices follow [`FieldDeclaration::lattice_by_rule`]: `L = 9, 9, 10, 10` for the four rings'
     /// elements and standings, `10` for ring 2's receiving map, `9, 9, 10, 9` for the four channels,
@@ -359,6 +361,7 @@ impl FieldDeclaration {
                 depth: 63,
                 prior: StopPrior::half(),
                 mass: 3,
+                base: BaseMeasure::Root,
             }],
             crib: CribDeclaration {
                 window: 64,
@@ -1819,6 +1822,7 @@ impl Field {
                 .collect();
             naturals(&mut code, &rungs);
             natural(&mut code, u64::from(receiver.mass));
+            natural(&mut code, u64::from(receiver.base == BaseMeasure::Root));
         }
         natural(&mut code, self.crib.window as u64);
         natural(&mut code, self.crib.offset as u64);
