@@ -1,0 +1,14 @@
+opening (opening):
+    request 0 refinement 0: least turn 4..4; 0:gap [4807/4096, 4808/4096) turn 7, 1:gap [301/4096, 302/4096) turn 69, 2:gap [39/4096, 40/4096) turn [484,486], 3:gap [1953/4096, 1954/4096) turn 20, 4:gap [7668/4096, 7669/4096) turn 7, 5:gap [21379/4096, 21380/4096) turn 4, 6:gap [27926/4096, 27927/4096) turn 6, 7*:gap [45268/4096, 45269/4096) turn 5
+    request 0 refinement 1: least turn 5..5; 0:gap [3762/4096, 3763/4096) turn 8, 1:gap [1428/4096, 1429/4096) turn 14, 2:gap [1335/4096, 1336/4096) turn 15, 3:gap [85/4096, 86/4096) turn [316,317], 4:gap [4515/4096, 4516/4096) turn 7, 5:gap [15118/4096, 15119/4096) turn 5, 6*:gap [19879/4096, 19880/4096) turn 6
+    request 0 refinement 2: least turn 9..9; 0:gap [1336/4096, 1337/4096) turn 16, 1:gap [2240/4096, 2241/4096) turn 10, 2:gap [2429/4096, 2430/4096) turn 9, 3*:gap [3999/4096, 4000/4096) turn 9, 4:gap [247/4096, 248/4096) turn 79, 5:gap [783/4096, 784/4096) turn 49
+    request 0 refinement 3: least turn 9..9; 0:gap [767/4096, 768/4096) turn 22, 1:gap [2719/4096, 2720/4096) turn 9, 2:gap [42/4096, 43/4096) turn [630,634], 4:gap [5/4096, 6/4096) turn [4241,4347], 5*:gap [3681/4096, 3682/4096) turn 15
+    request 0 refinement 4: least turn 12..12; 0:gap [85/4096, 86/4096) turn [194,195], 1:gap [1679/4096, 1680/4096) turn 12, 2:gap [547/4096, 548/4096) turn 45, 4*:gap [4001/4096, 4002/4096) turn 14
+    request 0 refinement 5: least turn 10..10; 0:gap [643/4096, 644/4096) turn 26, 1*:gap [2025/4096, 2026/4096) turn 10, 2:gap [2012/4096, 2013/4096) turn 11
+    request 0 refinement 6: least turn 8..8; 0:gap [3334/4096, 3335/4096) turn 8, 2*:gap [3965/4096, 3966/4096) turn 8
+    request 0 refinement 7: least turn 8..8; 0*:gap [4419/4096, 4420/4096) turn 8
+    request 0: 8 refinements read, 25272 ms
+  opening: 8 refinements with an eligible station; the gap order's locks are the whole-turn law's first set at 2, a strict part of it at 2, a later turn at 4; enclosures left a turn open at 4; single-station gap locks 8
+  opening: commitment turns (n_hi) of the gap order's locks: {5: 1, 6: 1, 8: 2, 9: 1, 10: 1, 14: 1, 15: 1}
+  opening: wall time 25273 ms
+receipt: exit 0, wall 25354 ms, peak resident 54095872 bytes
