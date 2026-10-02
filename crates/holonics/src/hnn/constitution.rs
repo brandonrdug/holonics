@@ -1836,8 +1836,9 @@ impl NormalLaw {
     /// [receiving prior's record](../../../../research/records/2026-10-02_THE_RECEIVING_PRIOR_IS_THE_ANCHORS_UNIT_AND_THE_CAP_IS_THE_SAME_CONSTANT.md)]
     /// Its shape is the ring's storage form; its scale is the features' amplitude unit (a prior
     /// `c² I` on features `c f` reads as `I` on `f`, Lean `HNN/ReceivingPrior`), and on the receiving
-    /// map it enters the certified move only as the floor of the unit-step cap. On campaign 1 the
-    /// readings' prequential code is worse at every scale below `I` and flat from `I` to `2^4 I`.
+    /// map it enters the certified move only as the floor of the unit-step cap. On campaign 1's
+    /// first 2,192 readings the readings' prequential code is worse at every scale below `I`, and
+    /// `I` codes within the family's charge of the best scale, `2^2 I`.
     pub fn with_prior(map: ExactRatMatrix) -> Self {
         let n = map.columns();
         let identity: Vec<Vec<Rat>> = (0..n).map(|i| unit(n, i)).collect();

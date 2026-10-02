@@ -8,8 +8,8 @@ The receiving map's normal law opens at `R₀ = 0` with the prior Gram `H₀ = I
 ([the opening record](2026-10-02_THE_RECEIVING_MAP_OPENS_AT_ZERO_AND_THE_SOURCE_MAP_REACHES_THE_CONTACT_ONLY_AS_MOTION.md)
 §1 left `H₀` declared). This record asks whether `H₀ = I` is derived or can be released. The
 answer has three parts: its shape is derived, its scale is the anchors' amplitude unit, and on
-campaign 1 the readings' own code puts that scale at `I` within two binary orders above and
-penalizes every scale below it.
+the first 2,192 readings of campaign 1 the readings' own code puts that scale at `I` within two
+binary orders above and penalizes every scale below it.
 
 ## 1. Where `H₀` acts
 
@@ -67,7 +67,7 @@ The opening `R₀ = 0` is not a reading ([the opening record](2026-10-02_THE_REC
 §1), so it carries no Fisher information about `R`. The information-theoretic prior is `s = 0`,
 which is the trust-region regime with no margin. The opening cannot derive `s`.
 
-## 4. Campaign 1: the receiving map never leaves its prior
+## 4. Campaign 1's first 2,192 readings: the readings' Gram never outweighs the prior
 
 The anchors and the landmark tree's exponents were read on the host reference (`hnn_exposure
 ablation 1700 samples`, main at `193fc9b6`, cloud, four cores). The run was stopped by a container
@@ -82,10 +82,19 @@ written at 21:57 UTC; its peak resident set was lost with the container).
 | mean anchor energy | `10608674/2^35` |
 | accumulated `tr F = Σ |z|²` | `726694169/2^30` (below `1`) |
 
-Every reading is more than `2^7` below the prior, and the accumulated Gram's trace stays below the
-prior's single eigenvalue. The opening keeps more than `127/128` of every reading's correction,
-and the normal law's Newton part never engages. On campaign 1, `R` steps the class-metric
-gradient `κ G`, scaled by `1/s`, with `η = 1`: the step median is `1` in the run's log.
+Over these readings every reading is more than `2^7` below the prior, and the accumulated Gram's
+trace stays below the prior's single eigenvalue. The opening keeps more than `128/129` of each
+single reading's correction (`first_read_share` at `|z|² < 2^(−7) s`). Every eigenvalue of `F` is
+at most `tr F < 1 = s`, so along every direction the prior keeps more than
+`2^30/(2^30 + 726694169) = 1073741824/1800435993 > 1/2` of the step (`opening_outweighs_iff` read
+on each eigenvalue): the readings' Gram shapes the metric but never outweighs the prior. `R`
+steps the class-metric gradient `κ G` through `(I + F)⁻¹`, within that share of the prior's
+`1/s` along each direction, with `η = 1`: the step median is `1` in the run's log.
+
+The trace below `1` is a reading at 2,192 readings, not of the campaign. At the measured mean the
+trace reaches `1` at 3,239 readings (`3239 · 10608674/2^35 ≥ 1 > 3238 · 10608674/2^35`), before
+the campaign's 3,400, so over the whole campaign the accumulated Gram may outweigh the prior along
+its leading direction. The third aeon is not read here.
 
 ## 5. The readings' code locates the scale
 
@@ -112,10 +121,17 @@ dyadic, given as a carry plus `k/16` plus `ε`
 
 The full table (every even `k` from `−14` to `4`) is in the output. The prequential code is the
 readings' description length under the law, which is the evidence for the prior. It is strictly
-worse at every scale below `I`, by `33` to `180` bits, and every such prior codes worse than the
-tree alone. From `I` to `2^4 I` the code is flat within `3` bits, about the `log₂ 10` bits the
-ten-member family charges. The unit-information prior, the statistical candidate for a derived
-scale, is the worst member.
+worse at every scale below `I`: worse than `I` by `37919/1024` bits (`2^(−2) I`) to `11727/64`
+bits (the unit-information prior), and worse than the tree alone. The unit-information prior,
+the statistical candidate for a derived scale, is the worst member.
+
+The family is eleven priors, the ten scales `2^k I` and the unit-information prior. Naming one of
+them charges `log₂ 11` bits, in `(3 + 7/16, 3 + 8/16)`; the ten scales alone charge `log₂ 10`, in
+`(3 + 5/16, 3 + 6/16)`. From the output's totals (`I` `8708421/2^10`, `2^2 I` `8705917/2^10`,
+`2^4 I` `8709717/2^10` bits), the best member is `2^2 I`. `I` codes `313/128` bits above it,
+inside either charge (`2^313 < 10^128`). `2^4 I` codes `475/128` bits above it, outside both
+(`2^475 > 11^128`). At 2,192 readings the code is flat over `I` and `2^2 I` and already rises at
+`2^4 I`; the odd scales were not replayed.
 
 ## 6. Decision
 
@@ -125,8 +141,9 @@ in scale:
 - the shape `I` is the receiving ring's storage form (§2);
 - the scale is the anchors' unit (§3, proved). Releasing it toward the opening's own information,
   `s → 0`, is measured worse on campaign 1, and so is the unit-information prior (§5);
-- the readings' code is flat from `I` to `2^4 I`, and `I` is the least prior on that plateau: the
-  most plastic one the code does not penalize. It is also the scale at which the prior's floor and
+- the readings' code puts `I` within the family's charge of its best member `2^2 I`, and every
+  scale below `I` more than `37` bits outside it, so `I` is the least prior the code does not
+  penalize: the most plastic one. It is also the scale at which the prior's floor and
   the cap's `1` coincide (§3), so the law carries one constant there, not two.
 
 The plateau is a property of campaign 1's anchors. By §3, a medium whose anchors are `c` times
