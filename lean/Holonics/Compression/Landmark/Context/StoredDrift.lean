@@ -73,7 +73,10 @@ cell       |ln q̂_0 − ln q_0| ≤ Σ_(levels ≤ L) θ_i + Σ_(levels < L) |l
 
 [agent-inferred] **The instance** (Rust `compression::landmark::context`, the host `Arena` and its
 `Law`; the card's `holonics_cuda::hnn::tree::CardTree`, `hnn_tree_deposit`, which mirrors the host
-split and carries no certificates).
+split and carries no certificates). The placement of `K`, the read of the arena as a
+`ConsistentTree`, exact leaf chains and the split's closed forms are proved in
+`Context/StoredInstance` (`instTree`, `instance_read`, `instK_implicit`, `split_closed_form`); the
+Rust's read of its arena as `execFrom` stays agent-inferred there.
 - **A stored chain** `s_0 … s_(k−1)` over a stored bottom `s_k` is one node at its summed rung
   `S = Σ j_i` (`κ_i = 1 − w_i = 2^(−j_i)`), weight `ladder S · E + 2^(−S) X̂` with `X̂ = (2^S − 1) E/β̂`
   (`Compaction.chain_ratio`, an identity in the bottom split mass). Placing the chain's discrepancy
