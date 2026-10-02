@@ -233,11 +233,12 @@ pub(super) fn cut_at(field: Field, theta: Constitution) -> Cut {
 
 /// A real comparison composes loaded resonator gain steps, and the deposit of only that reached
 /// material return certifies the capacity gain's step (its alignment positive, its curvature read
-/// through the loaded resonator's power gain) and advances its statistic by the window's energy. The
-/// step moves the gain by `η G / h′` exactly: the budgeted carry holds it as the lattice carries any
-/// update, the gain's coordinate, remainder and released residual summing to that move. On this
-/// fixture the reached gradient is far below the gain's lattice unit, so the published gain and the
-/// next logits are unchanged; a declared factor step once moved it past the lattice (September 29).
+/// through the loaded resonator's power gain) and advances its statistic by the energy of the
+/// returns that reached it. The step moves the gain by `η G / h′` exactly: the budgeted carry holds
+/// it as the lattice carries any update, the gain's coordinate, remainder and released residual
+/// summing to that move. On this fixture the reached gradient is far below the gain's lattice unit,
+/// so the published gain and the next logits are unchanged; a declared factor step once moved it
+/// past the lattice (September 29).
 #[test]
 fn loaded_comparison_composes_a_certified_gain_deposit() {
     let field = chain().with_exact_word();
@@ -1144,7 +1145,7 @@ fn every_port_method_returns_its_six_components() {
 }
 
 /// Design (c), `release` and `close_aeon` (review §4): the release reads its width from its
-/// receiving phases (the largest fibre of the window's faces, a certified bound on the code
+/// receiving phases (the largest fibre of the epoch's faces, a certified bound on the code
 /// lengths' movement over the receiver's fibre, below the grain), returns the RIDE/FOUND split as a
 /// reading (declared absent on campaign 1's unit-weight rings, whose capacity is singular), and
 /// takes the decision as data; `close_aeon` returns, per carried pending ratio, the transpose of

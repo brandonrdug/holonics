@@ -369,11 +369,11 @@ pub enum HnnError {
     )]
     MissingReach,
     #[error(
-        "the deposit steps locus {locus:?} by more than one linear step; its certified step reads one window"
+        "the deposit steps locus {locus:?} by more than one linear step; its certified step reads one compare's returns at a locus, through the deposit's one reach"
     )]
     RepeatedLinearStep { locus: Locus },
     #[error(
-        "the deposit steps the family {family:?} of locus {locus:?} more than once; its certified step reads one window"
+        "the deposit steps the family {family:?} of locus {locus:?} more than once; its certified step reads one compare's returns at a family, through the deposit's one reach"
     )]
     RepeatedFactorStep {
         locus: Locus,
