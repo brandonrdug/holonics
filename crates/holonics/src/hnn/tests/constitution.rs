@@ -684,6 +684,13 @@ fn updates(
         };
         let (m, n) = (law.map().rows(), law.map().columns());
         let solved = law.solved();
+        // The receiving map's covectors pass through its class metric (the constitution's law).
+        let metric = match step.locus {
+            LinearLocus::Receiving(_) => {
+                crate::hnn::constitution::receiving_class_metric(&step.samples)
+            }
+            _ => None,
+        };
         let (mut gram, mut map) = (vec![Rat::zero(); n * n], vec![Rat::zero(); m * n]);
         for s in &step.samples {
             let reach: Vec<Rat> = (0..n)
@@ -700,7 +707,11 @@ fn updates(
             }
             for i in 0..m {
                 for j in 0..n {
-                    map[i * n + j] += &certified * &s.weight * &s.covector[i] * &reach[j];
+                    let covector = match (&metric, i % 2) {
+                        (Some(scale), 0) => &s.covector[i] * scale,
+                        _ => s.covector[i].clone(),
+                    };
+                    map[i * n + j] += &certified * &s.weight * covector * &reach[j];
                 }
             }
         }
