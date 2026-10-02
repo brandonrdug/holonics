@@ -3,6 +3,7 @@
 
 mod chart;
 mod constitution;
+mod contact_residual;
 mod coupling;
 mod encoding;
 mod executed;
