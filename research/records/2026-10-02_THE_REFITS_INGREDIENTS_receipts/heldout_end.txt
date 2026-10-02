@@ -1,0 +1,3 @@
+  w16end (transport modulus 102837/131072): released 128, held 0, refused 0, refused certificates 0; whole sections 0 of 128 (nonconstant 0 of 128, constant 0 of 0); the success rule (every nonconstant section whole): does not hold; incorrect releases 128; reaching the termination 2; stations right 329 by station [51, 54, 37, 45, 32, 41, 32, 37]; first lock at a request-reading station (0 or 1) 1, first lock right 33; 566127 ms
+executed evaluate: 566190 ms; resident 60809216 now, 77979648 peak
+exit 0 wall 566219 ms

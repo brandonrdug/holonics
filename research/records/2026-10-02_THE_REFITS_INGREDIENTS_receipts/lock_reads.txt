@@ -1,0 +1,90 @@
+executed locks: 8 order2 requests at seed 2026093061, from w10 (ρ 102837/131072); L ∈ [221392/4096, 221396/4096) nats, X ∈ [56227/4096, 56230/4096) nats; solved 27 of 64; whole 0 (released 8, stations right 29)
+  w10: 64 refinements; 0 with a station not ranked below the largest that did not lock with it (0 stations); 523536 ms
+exit 0 wall 523616 ms
+executed locks: 8 order2 requests at seed 2026093061, from w11 (ρ 102837/131072); L ∈ [237729/4096, 237733/4096) nats, X ∈ [74273/4096, 74276/4096) nats; solved 26 of 64; whole 1 (released 8, stations right 33)
+  w11: 64 refinements; 0 with a station not ranked below the largest that did not lock with it (0 stations); 531967 ms
+exit 0 wall 532023 ms
+executed locks: 8 order2 requests at seed 2026093061, from w12 (ρ 102837/131072); L ∈ [224965/4096, 224969/4096) nats, X ∈ [69338/4096, 69341/4096) nats; solved 28 of 64; whole 0 (released 8, stations right 26)
+  w12: 64 refinements; 0 with a station not ranked below the largest that did not lock with it (0 stations); 537857 ms
+exit 0 wall 537927 ms
+executed locks: 8 order2 requests at seed 2026093061, from w13 (ρ 102837/131072); L ∈ [233599/4096, 233603/4096) nats, X ∈ [80502/4096, 80506/4096) nats; solved 30 of 64; whole 0 (released 8, stations right 24)
+  w13: 64 refinements; 0 with a station not ranked below the largest that did not lock with it (0 stations); 592763 ms
+exit 0 wall 592823 ms
+executed locks: 8 order2 requests at seed 2026093061, from w14 (ρ 102837/131072); L ∈ [222169/4096, 222173/4096) nats, X ∈ [67858/4096, 67861/4096) nats; solved 28 of 64; whole 0 (released 8, stations right 31)
+  w14: 64 refinements; 0 with a station not ranked below the largest that did not lock with it (0 stations); 516998 ms
+exit 0 wall 517056 ms
+executed locks: 8 order2 requests at seed 2026093061, from w15 (ρ 102837/131072); L ∈ [210489/4096, 210493/4096) nats, X ∈ [59737/4096, 59739/4096) nats; solved 32 of 64; whole 0 (released 8, stations right 39)
+  w15: 64 refinements; 0 with a station not ranked below the largest that did not lock with it (0 stations); 395506 ms
+exit 0 wall 395569 ms
+executed locks: 8 order2 requests at seed 2026093061, from w16 (ρ 102837/131072); L ∈ [195744/4096, 195748/4096) nats, X ∈ [52990/4096, 52993/4096) nats; solved 37 of 64; whole 0 (released 8, stations right 27)
+  w16: 64 refinements; 0 with a station not ranked below the largest that did not lock with it (0 stations); 570144 ms
+exit 0 wall 570239 ms
+executed locks: 8 order2 requests at seed 2026093061, from w1 (ρ 102837/131072); L ∈ [379492/4096, 379497/4096) nats, X ∈ [198136/4096, 198141/4096) nats; solved 1 of 64
+  w1: 64 refinements; 0 with a station not ranked below the largest that did not lock with it (0 stations); 381134 ms
+exit 0 wall 381190 ms
+executed locks: 8 order2 requests at seed 2026093061, from w2 (ρ 102837/131072); L ∈ [315459/4096, 315464/4096) nats, X ∈ [133966/4096, 133971/4096) nats; solved 1 of 64
+  w2: 64 refinements; 0 with a station not ranked below the largest that did not lock with it (0 stations); 473103 ms
+exit 0 wall 473150 ms
+executed locks: 8 order2 requests at seed 2026093061, from w3 (ρ 102837/131072); L ∈ [320014/4096, 320019/4096) nats, X ∈ [138592/4096, 138597/4096) nats; solved 1 of 64; whole 0 (released 8, stations right 18)
+  w3: 64 refinements; 0 with a station not ranked below the largest that did not lock with it (0 stations); 395185 ms
+exit 0 wall 395223 ms
+executed locks: 8 order2 requests at seed 2026093061, from w4 (ρ 102837/131072); L ∈ [306955/4096, 306959/4096) nats, X ∈ [126832/4096, 126836/4096) nats; solved 2 of 64; whole 0 (released 8, stations right 22)
+  w4: 64 refinements; 0 with a station not ranked below the largest that did not lock with it (0 stations); 407129 ms
+exit 0 wall 407138 ms
+executed locks: 8 order2 requests at seed 2026093061, from w5 (ρ 102837/131072); L ∈ [284831/4096, 284836/4096) nats, X ∈ [106744/4096, 106748/4096) nats; solved 11 of 64; whole 0 (released 8, stations right 28)
+  w5: 64 refinements; 0 with a station not ranked below the largest that did not lock with it (0 stations); 433309 ms
+exit 0 wall 433371 ms
+executed locks: 8 order2 requests at seed 2026093061, from w6 (ρ 102837/131072); L ∈ [264885/4096, 264889/4096) nats, X ∈ [87364/4096, 87368/4096) nats; solved 12 of 64; whole 1 (released 8, stations right 28)
+  w6: 64 refinements; 0 with a station not ranked below the largest that did not lock with it (0 stations); 492026 ms
+exit 0 wall 492104 ms
+executed locks: 8 order2 requests at seed 2026093061, from w7 (ρ 102837/131072); L ∈ [265678/4096, 265682/4096) nats, X ∈ [93200/4096, 93204/4096) nats; solved 20 of 64; whole 0 (released 8, stations right 18)
+  w7: 64 refinements; 0 with a station not ranked below the largest that did not lock with it (0 stations); 484745 ms
+exit 0 wall 484803 ms
+executed locks: 8 order2 requests at seed 2026093061, from w8 (ρ 102837/131072); L ∈ [249661/4096, 249665/4096) nats, X ∈ [79647/4096, 79651/4096) nats; solved 20 of 64; whole 0 (released 8, stations right 30)
+  w8: 64 refinements; 0 with a station not ranked below the largest that did not lock with it (0 stations); 463979 ms
+exit 0 wall 464023 ms
+executed locks: 8 order2 requests at seed 2026093061, from w9 (ρ 102837/131072); L ∈ [226300/4096, 226304/4096) nats, X ∈ [58711/4096, 58714/4096) nats; solved 25 of 64; whole 0 (released 8, stations right 20)
+  request 1, refinement 0: locked [5], not ranked below it [6]
+  w9: 64 refinements; 1 with a station not ranked below the largest that did not lock with it (1 stations); 566617 ms
+exit 0 wall 566691 ms
+executed locks: 8 order2 requests at seed 2026093061, from m7; L ∈ [337896/4096, 337901/4096) nats
+  request 3: locks [[0], [2], [4], [5], [6], [7], [3], [1]], released [3, 3, 3, 3, 3, 3, 3, 3]
+  m7: 64 refinements; 0 with a station not ranked below the largest that did not lock with it (0 stations); 437633 ms
+exit 0 wall 437688 ms
+executed locks: 8 order2 requests at seed 2026093061, from m7s; L ∈ [371575/4096, 371580/4096) nats
+  request 3: locks [[0], [5], [7], [6], [4], [3], [2], [1]], released [3, 3, 3, 3, 3, 3, 3, 3]
+  m7s: 64 refinements; 0 with a station not ranked below the largest that did not lock with it (0 stations); 388740 ms
+exit 0 wall 388809 ms
+remount research/records/2026-09-30_THE_MODULUS_FOUNDED_OFF_ONE_receipts/refit_on_lattice.txt: partial (E and rho alone; the normal law's Gram, chart, remainders and clock are the prior's)
+executed locks: 8 order2 requests at seed 2026093061, from refit (ρ 137573/262144); L ∈ [133292/4096, 133295/4096) nats, X ∈ [34021/4096, 34023/4096) nats; solved 45 of 64
+  refit: 64 refinements; 0 with a station not ranked below the largest that did not lock with it (0 stations); 344384 ms
+exit 0 wall 344438 ms
+remount .local/states/refit8_port.txt: partial (E and rho alone; the normal law's Gram, chart, remainders and clock are the prior's)
+executed locks: 8 order2 requests at seed 2026093061, from refit8 (ρ 168127/262144); L ∈ [93355/4096, 93358/4096) nats, X ∈ [8014/4096, 8015/4096) nats; solved 57 of 64; whole 7 (released 8, stations right 61)
+  refit8: 64 refinements; 0 with a station not ranked below the largest that did not lock with it (0 stations); 1376964 ms
+exit 0 wall 1377060 ms
+remount .local/states/refit_at_chain_rho.txt: partial (E and rho alone; the normal law's Gram, chart, remainders and clock are the prior's)
+executed locks: 8 order2 requests at seed 2026093061, from refitC (ρ 102837/131072); L ∈ [310210/4096, 310215/4096) nats, X ∈ [147888/4096, 147892/4096) nats; solved 15 of 64
+  refitC: 64 refinements; 0 with a station not ranked below the largest that did not lock with it (0 stations); 482245 ms
+exit 0 wall 482300 ms
+executed locks: 8 order2 requests at seed 2026093061, from w16R (ρ 137573/262144); L ∈ [574640/4096, 574645/4096) nats, X ∈ [429220/4096, 429224/4096) nats; solved 20 of 64; whole 0 (released 8, stations right 20)
+  w16R: 64 refinements; 0 with a station not ranked below the largest that did not lock with it (0 stations); 406851 ms
+exit 0 wall 406874 ms
+executed locks: 8 order2 requests at seed 2026093061, from w16r101813_131072 (ρ 101813/131072); L ∈ [218712/4096, 218716/4096) nats, X ∈ [78119/4096, 78122/4096) nats; solved 35 of 64; whole 0 (released 8, stations right 29)
+  w16r101813_131072: 64 refinements; 0 with a station not ranked below the largest that did not lock with it (0 stations); 398856 ms
+exit 0 wall 398866 ms
+executed locks: 8 order2 requests at seed 2026093061, from w16r102709_131072 (ρ 102709/131072); L ∈ [196331/4096, 196335/4096) nats, X ∈ [53808/4096, 53811/4096) nats; solved 37 of 64; whole 0 (released 8, stations right 25)
+  w16r102709_131072: 64 refinements; 0 with a station not ranked below the largest that did not lock with it (0 stations); 369862 ms
+exit 0 wall 369872 ms
+executed locks: 8 order2 requests at seed 2026093061, from w16r11_16 (ρ 11/16); L ∈ [384896/4096, 384900/4096) nats, X ∈ [240950/4096, 240954/4096) nats; solved 26 of 64; whole 0 (released 8, stations right 20)
+  w16r11_16: 64 refinements; 0 with a station not ranked below the largest that did not lock with it (0 stations); 398396 ms
+exit 0 wall 398441 ms
+executed locks: 8 order2 requests at seed 2026093061, from w16r3_4 (ρ 3/4); L ∈ [279406/4096, 279410/4096) nats, X ∈ [137900/4096, 137904/4096) nats; solved 35 of 64; whole 0 (released 8, stations right 19)
+  w16r3_4: 64 refinements; 0 with a station not ranked below the largest that did not lock with it (0 stations); 401050 ms
+exit 0 wall 401092 ms
+executed locks: 8 order2 requests at seed 2026093061, from w16r5_8 (ρ 5/8); L ∈ [475236/4096, 475241/4096) nats, X ∈ [328710/4096, 328714/4096) nats; solved 24 of 64; whole 0 (released 8, stations right 18)
+  w16r5_8: 64 refinements; 0 with a station not ranked below the largest that did not lock with it (0 stations); 430182 ms
+exit 0 wall 430225 ms
+executed locks: 8 order2 requests at seed 2026093061, from w16r9_16 (ρ 9/16); L ∈ [547651/4096, 547656/4096) nats, X ∈ [403415/4096, 403419/4096) nats; solved 24 of 64; whole 0 (released 8, stations right 16)
+  w16r9_16: 64 refinements; 0 with a station not ranked below the largest that did not lock with it (0 stations); 430829 ms
+exit 0 wall 430870 ms

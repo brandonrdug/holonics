@@ -1,0 +1,25 @@
+source port lattice exponent L = 21 (unit 2^-21); entries n = 600
+opening -> 8-request fit: largest entry change 4266283/2097152 = 4266283 units; l1 578174061 units; l2^2 905139285303281 units^2; least moves at 1/2 an entry per move: 5
+opening -> 256-request refit: largest entry change 2192949/1048576 = 4385898 units; l1 498476943 units; l2^2 668570178065567 units^2; least moves at 1/2 an entry per move: 5
+m6 -> 8-request fit: largest entry change 1102791/524288 = 4411164 units; l1 668546589 units; l2^2 1167450574121765 units^2; least moves at 1/2 an entry per move: 5
+m6 -> 256-request refit: largest entry change 4653291/2097152 = 4653291 units; l1 597609923 units; l2^2 962867956617791 units^2; least moves at 1/2 an entry per move: 5
+w16 -> 8-request fit: largest entry change 1614663/524288 = 6458652 units; l1 933306286 units; l2^2 2389837228461638 units^2; least moves at 1/2 an entry per move: 7
+w16 -> 256-request refit: largest entry change 3497781/1048576 = 6995562 units; l1 903114678 units; l2^2 2254986064767784 units^2; least moves at 1/2 an entry per move: 7
+w16 - m6: signed cos^2 with (fit - start) -[60/4096, 61/4096); fraction of the distance covered along it [-452/4096, -451/4096); |disp|^2/|to|^2 [3386/4096, 3387/4096)
+r13 - opening (rho 168127/262144): signed cos^2 with (fit - start) +[0/4096, 1/4096); fraction of the distance covered along it [28/4096, 29/4096); |disp|^2/|to|^2 [2593/4096, 2594/4096)
+move 1: signed cos^2 of (E_k - E_(k-1)) with (fit - E_(k-1)) -[94/4096, 95/4096)
+move 2: signed cos^2 of (E_k - E_(k-1)) with (fit - E_(k-1)) -[18/4096, 19/4096)
+move 3: signed cos^2 of (E_k - E_(k-1)) with (fit - E_(k-1)) -[133/4096, 134/4096)
+move 4: signed cos^2 of (E_k - E_(k-1)) with (fit - E_(k-1)) -[46/4096, 47/4096)
+move 5: signed cos^2 of (E_k - E_(k-1)) with (fit - E_(k-1)) -[44/4096, 45/4096)
+move 6: signed cos^2 of (E_k - E_(k-1)) with (fit - E_(k-1)) -[59/4096, 60/4096)
+move 7: signed cos^2 of (E_k - E_(k-1)) with (fit - E_(k-1)) -[85/4096, 86/4096)
+move 8: signed cos^2 of (E_k - E_(k-1)) with (fit - E_(k-1)) -[4/4096, 5/4096)
+move 9: signed cos^2 of (E_k - E_(k-1)) with (fit - E_(k-1)) -[24/4096, 25/4096)
+move 10: signed cos^2 of (E_k - E_(k-1)) with (fit - E_(k-1)) -[22/4096, 23/4096)
+move 11: signed cos^2 of (E_k - E_(k-1)) with (fit - E_(k-1)) -[97/4096, 98/4096)
+move 12: signed cos^2 of (E_k - E_(k-1)) with (fit - E_(k-1)) -[1/4096, 2/4096)
+move 13: signed cos^2 of (E_k - E_(k-1)) with (fit - E_(k-1)) -[41/4096, 42/4096)
+move 14: signed cos^2 of (E_k - E_(k-1)) with (fit - E_(k-1)) -[64/4096, 65/4096)
+move 15: signed cos^2 of (E_k - E_(k-1)) with (fit - E_(k-1)) -[10/4096, 11/4096)
+move 16: signed cos^2 of (E_k - E_(k-1)) with (fit - E_(k-1)) -[67/4096, 68/4096)

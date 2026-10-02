@@ -95,7 +95,14 @@ Frobenius norm `frobSq`; a certificate is a declared rational bound, never a flo
    transpose of the residual's rounding, which `XH ≈ 1` no longer absorbs:
    `‖1 − X''H‖∞ ≤ δ² + n·2^(−L)/2·(1 + 2‖X‖∞)·‖H‖∞` (`solved_refinement_certificate`), and a
    certificate at most `c ≤ 1/2` stays there when twice that rounding term is at most `c`
-   (`solved_refinement_stays`).
+   (`solved_refinement_stays`). The chart's own norm is bounded by its residual under the Gram's
+   margin, with no inverse formed: `‖X‖∞ ≤ ρ` once `n(1 + ‖1 − XH‖∞)² ≤ c₀²ρ²`
+   (`chart_rowNorm_le_of_margin`, from `l1_sq_le_card_mul`). So the lattice
+   `L = D + ⌈log₂ n⌉ + ⌈log₂ ‖H‖∞⌉ + k`, with `k` least such that `36n ≤ (2^k − 1)²`, keeps every
+   certificate at most `δ_ℓ = 2^(−D)` at the carried Gram's margin `c₀ ≥ 1/2`
+   (`solved_chart_lattice_stays`). The executed chart rule (`ChartRule`) does not count `k`:
+   counting it raised campaign 1's held-out code length (the record
+   `2026-10-02_THE_MIRRORED_CHART_IS_BOUNDED_BY_ITS_RESIDUAL_AND_COUNTING_ITS_NORM_RAISES_THE_HELD_OUT_CODE.md`).
 9. **The deposition's balance.** The covectors that reach a locus inside its causal diamond,
    `(w, f_t, g_t)` (`HNN/Normal.Window`), move the Gram by `F = Σ_t w f_t f_tᵀ` and the map by
    `γ G X̂`, read through a chart `X̂` of the deposited Gram; each is published with its carry term
@@ -1364,6 +1371,110 @@ theorem solved_refinement_stays (L : ℕ) {H X : Matrix n n ℚ} (hX : Xᵀ = X)
       (mul_le_mul_of_nonneg_left (by linarith) hu) (rowNorm_nonneg H)
   nlinarith
 
+omit [DecidableEq n] [LinearOrder n] in
+/-- [proved-standard; formal-checked] `‖v‖₁² ≤ n|v|²` over `ℚ` (Cauchy–Schwarz against the ones
+vector). -/
+theorem l1_sq_le_card_mul (v : n → ℚ) : l1 v ^ 2 ≤ Fintype.card n * (v ⬝ᵥ v) := by
+  unfold l1
+  have h := sq_sum_le_card_mul_sum_sq (s := (Finset.univ : Finset n)) (f := fun j => |v j|)
+  simp only [Finset.card_univ, sq_abs] at h
+  simpa [dotProduct, sq] using h
+
+omit [LinearOrder n] in
+/-- [proved-derived; formal-checked] **A symmetric chart of a Gram with a margin is bounded by its
+residual**: if `Xᵀ = X`, `Hᵀ = H`, `c₀|v|² ≤ vᵀHv` for every `v` (`c₀ > 0`), `ρ ≥ 0` and
+`n(1 + ‖1 − XH‖∞)² ≤ c₀²ρ²`, then `‖X‖∞ ≤ ρ`. Column `j` of `X` solves `Hx = ((XH)ᵀ)_j`
+(symmetry), whose ℓ1 is at most `1 + ‖1 − XH‖∞`; the margin bounds `|x|` (`solve_energy_le`) and
+`‖x‖₁ ≤ √n|x|` gives the row (the column, by symmetry). No inverse is formed. -/
+theorem chart_rowNorm_le_of_margin {H X : Matrix n n ℚ} (hX : Xᵀ = X) (hH : Hᵀ = H) {c₀ ρ : ℚ}
+    (hc₀ : 0 < c₀) (hmargin : ∀ v : n → ℚ, c₀ * ∑ i, v i ^ 2 ≤ ∑ i, ∑ j, v i * H i j * v j)
+    (hρ : 0 ≤ ρ)
+    (hbound : Fintype.card n * (1 + rowNorm (1 - X * H)) ^ 2 ≤ c₀ ^ 2 * ρ ^ 2) :
+    rowNorm X ≤ ρ := by
+  have hHX : H * X = (1 - (1 - X * H))ᵀ := by
+    rw [sub_sub_cancel, transpose_mul, hX, hH]
+  refine rowNorm_le hρ fun j => ?_
+  set x : n → ℚ := fun i => X i j with hx
+  set b : n → ℚ := fun i => (1 - (1 - X * H)) j i with hb
+  have hsolve : H *ᵥ x = b := by
+    funext i
+    have := congrFun (congrFun hHX i) j
+    simp only [Matrix.mul_apply, transpose_apply] at this
+    simp only [mulVec, dotProduct, hx, hb]
+    rw [← this]
+  have hrow : ∑ i, |X j i| = l1 x := by
+    unfold l1; congr 1; funext i; rw [hx]; dsimp only; rw [← transpose_apply X j i, hX]
+  have hb1 : l1 b ≤ 1 + rowNorm (1 - X * H) := by
+    have h1 : l1 b ≤ rowNorm (1 - (1 - X * H)) := row_sum_le_rowNorm _ j
+    exact h1.trans ((rowNorm_sub_le _ _).trans (add_le_add rowNorm_one_le le_rfl))
+  have hb0 : 0 ≤ l1 b := Finset.sum_nonneg fun i _ => abs_nonneg _
+  have henergy := solve_energy_le hc₀ hmargin hsolve
+  have hbb := dot_self_le_l1_sq b
+  have hxx := l1_sq_le_card_mul x
+  have hn : (0 : ℚ) ≤ Fintype.card n := Nat.cast_nonneg _
+  have hδ : 0 ≤ 1 + rowNorm (1 - X * H) := by linarith [rowNorm_nonneg (1 - X * H)]
+  have hl1x : 0 ≤ l1 x := Finset.sum_nonneg fun i _ => abs_nonneg _
+  have key : c₀ ^ 2 * l1 x ^ 2 ≤ c₀ ^ 2 * ρ ^ 2 := by
+    calc c₀ ^ 2 * l1 x ^ 2 ≤ c₀ ^ 2 * (Fintype.card n * (x ⬝ᵥ x)) :=
+          mul_le_mul_of_nonneg_left hxx (sq_nonneg _)
+      _ = Fintype.card n * (c₀ ^ 2 * (x ⬝ᵥ x)) := by ring
+      _ ≤ Fintype.card n * l1 b ^ 2 :=
+          mul_le_mul_of_nonneg_left (henergy.trans hbb) hn
+      _ ≤ Fintype.card n * (1 + rowNorm (1 - X * H)) ^ 2 :=
+          mul_le_mul_of_nonneg_left (pow_le_pow_left₀ hb0 hb1 2) hn
+      _ ≤ c₀ ^ 2 * ρ ^ 2 := hbound
+  have hsq : l1 x ^ 2 ≤ ρ ^ 2 := le_of_mul_le_mul_left key (by positivity)
+  rw [hrow]
+  exact (pow_le_pow_iff_left₀ hl1x hρ two_ne_zero).mp hsq
+
+/-- [proved-derived; formal-checked] **A lattice that counts the chart's norm covers the mirror.** Let the
+carried Gram `H` be symmetric with margin `c₀ ≥ 1/2`, the target `δ_ℓ = 2^(−D) ≤ 1/2`, the width
+`n ≤ 2^a`, `‖H‖∞ ≤ 2^b`, and `k` with `36n ≤ (2^k − 1)²`. On the lattice `L = D + a + b + k`, a
+symmetric chart whose residual is at most `δ_ℓ` keeps it at most `δ_ℓ` under the executed
+refinement. Every such chart has `‖X‖∞ ≤ ρ = (2^k − 1)/2` (`chart_rowNorm_le_of_margin`, since
+`n(1 + δ_ℓ)² ≤ 9n/4 ≤ c₀²ρ²`), so `1 + 2ρ = 2^k` and twice the rounding term
+`n·2^(−L)·2^k·‖H‖∞` is at most `2^(−D)` (`solved_refinement_stays`). -/
+theorem solved_chart_lattice_stays {H X : Matrix n n ℚ} (hX : Xᵀ = X) (hH : Hᵀ = H) {c₀ : ℚ}
+    (hc₀ : 1 / 2 ≤ c₀) (hmargin : ∀ v : n → ℚ, c₀ * ∑ i, v i ^ 2 ≤ ∑ i, ∑ j, v i * H i j * v j)
+    {D a b k : ℕ} (hD : 1 ≤ D) (ha : (Fintype.card n : ℚ) ≤ 2 ^ a) (hb : rowNorm H ≤ 2 ^ b)
+    (hk : 36 * (Fintype.card n : ℚ) ≤ (2 ^ k - 1) ^ 2)
+    (h0 : rowNorm (1 - X * H) ≤ unit D) :
+    rowNorm (1 - solvedRefine (D + a + b + k) H X * H) ≤ unit D := by
+  have hu : unit D ≤ 1 / 2 := by
+    unfold unit
+    rw [inv_le_comm₀ (by positivity) (by norm_num)]
+    calc ((1 / 2 : ℚ))⁻¹ = 2 ^ 1 := by norm_num
+      _ ≤ 2 ^ D := pow_le_pow_right₀ (by norm_num) hD
+  have hk1 : (1 : ℚ) ≤ 2 ^ k := one_le_pow₀ (by norm_num)
+  set ρ : ℚ := (2 ^ k - 1) / 2 with hρdef
+  have hρ0 : 0 ≤ ρ := by rw [hρdef]; linarith
+  have hδ0 := rowNorm_nonneg (1 - X * H)
+  have hn0 : (0 : ℚ) ≤ Fintype.card n := Nat.cast_nonneg _
+  have hρX : rowNorm X ≤ ρ := by
+    refine chart_rowNorm_le_of_margin hX hH (by linarith) hmargin hρ0 ?_
+    have h1 : (1 + rowNorm (1 - X * H)) ^ 2 ≤ (3 / 2) ^ 2 :=
+      pow_le_pow_left₀ (by linarith) (by linarith) 2
+    have h2 : (1 / 2 : ℚ) ^ 2 ≤ c₀ ^ 2 := pow_le_pow_left₀ (by norm_num) hc₀ 2
+    have h3 : Fintype.card n * (3 / 2 : ℚ) ^ 2 ≤ (1 / 2) ^ 2 * ρ ^ 2 := by
+      rw [hρdef]; nlinarith [hk]
+    calc Fintype.card n * (1 + rowNorm (1 - X * H)) ^ 2
+        ≤ Fintype.card n * (3 / 2) ^ 2 := mul_le_mul_of_nonneg_left h1 hn0
+      _ ≤ (1 / 2) ^ 2 * ρ ^ 2 := h3
+      _ ≤ c₀ ^ 2 * ρ ^ 2 := mul_le_mul_of_nonneg_right h2 (sq_nonneg _)
+  refine solved_refinement_stays (D + a + b + k) hX hH hu hρX ?_ h0
+  have hsplit : unit D = 2 ^ a * 2 ^ b * 2 ^ k * unit (D + a + b + k) := by
+    rw [Holonics.HNN.LatticeDeposit.unit_eq_pow_mul D (a + b + k)]; ring_nf
+  have hU := unit_pos (D + a + b + k)
+  have hH0 := rowNorm_nonneg H
+  have hone : 1 + 2 * ρ = 2 ^ k := by rw [hρdef]; ring
+  rw [hone, hsplit]
+  have e1 : 2 * (Fintype.card n * (unit (D + a + b + k) / 2) * 2 ^ k * rowNorm H) =
+      (Fintype.card n * rowNorm H) * (2 ^ k * unit (D + a + b + k)) := by ring
+  have e2 : 2 ^ a * 2 ^ b * 2 ^ k * unit (D + a + b + k) =
+      (2 ^ a * 2 ^ b) * (2 ^ k * unit (D + a + b + k)) := by ring
+  rw [e1, e2]
+  exact mul_le_mul_of_nonneg_right (mul_le_mul ha hb hH0 (by positivity)) (by positivity)
+
 end SolvedRefinement
 
 /-! ## 9. The deposition's balance: the chart's residual at the deposited Gram, and the two carries -/
@@ -1548,6 +1659,9 @@ section Audit
 #print axioms carry_value_eq
 #print axioms carryDefect_bounded
 #print axioms carried_deposition_balance
+#print axioms l1_sq_le_card_mul
+#print axioms chart_rowNorm_le_of_margin
+#print axioms solved_chart_lattice_stays
 
 end Audit
 

@@ -1,0 +1,13 @@
+hnn_exposure: campaign 1's declared field over fed5488ce70eb5ffbc90f2f03d23638be9d69189:docs/plans/THE_REBUILD.md
+resonator: none (campaign 1)
+cut: the first 6148 of the pinned cut's 171754 bytes (the declared population; n* = 6148); 3074 receiving windows of A = 2 cells
+held out: cells 4958..6148 (1190 cells, the manifest's range or the declared tail); training: cells 0..4958
+reference: campaign 1 (every locus's certified step, the normal laws' and the factor families', B_Theta = 2^33 bits, pending capacity 64); deadline: none
+carrier lattices L: Element(0) 9, Element(1) 9, Element(2) 10, Element(3) 10, Channel(0) 9, Channel(1) 9, Channel(2) 10, Channel(3) 9, SourcePort(0) 18, Standing(0) 9, Standing(1) 9, Standing(2) 10, Standing(3) 10, ReceivingMap(2) 10
+setup (cut read, fields declared): 63 ms wall
+  aeon 0: the receiver's exponent span, largest 43738519/33554432 bits; one deposit's contact change, largest 15467/33554432 bits; contacts-only commits 534: channel families certified 6384, vanished 5816; the contacts' return a, median 5355065/536870912, total 11363277/1048576 (24 bits); R's steps 534: moved 534, its a median 3269885/33554432 (24 bits), its step median 1; 410271 ms
+  after aeon 1 (window at 1070): the contacts' cumulative change 14147/16777216 bits at an exponent span of 17381579/16777216 bits; over 0 readings frozen: sum Var_p(delta) 0 bits^2 (24 bits); code (opening's contacts less learned) summed [-8845760267/79228162514264337593543950336, 8845760267/79228162514264337593543950336) bits, better 0, worse 0, undecided 1; R's largest entry 20485/1024, its largest change since the last close over it 1 (24 bits); 410272 ms
+  samples written: 1070 inputs, 2 maps
+  aeon 1: the receiver's exponent span, largest 13893005/8388608 bits; one deposit's contact change, largest 8199/16777216 bits; contacts-only commits 560: channel families certified 6720, vanished 6505; the contacts' return a, median 3062591/134217728, total 5858719/262144 (24 bits); R's steps 561: moved 561, its a median 3242261/33554432 (24 bits), its step median 1; 1042242 ms
+  after aeon 2 (window at 2192): the contacts' cumulative change 143/262144 bits at an exponent span of 21784487/16777216 bits; over 0 readings frozen: sum Var_p(delta) 0 bits^2 (24 bits); code (opening's contacts less learned) summed [-8998789355/79228162514264337593543950336, 8998789355/79228162514264337593543950336) bits, better 0, worse 0, undecided 1; R's largest entry 299/16, its largest change since the last close over it 1754677/2097152 (24 bits); 1042242 ms
+  samples written: 2192 inputs, 3 maps
