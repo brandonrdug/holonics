@@ -13,6 +13,7 @@ import Holonics.Compression.Landmark.Context.ConvergenceFounding
 import Holonics.Compression.Landmark.Context.Compaction
 import Holonics.Compression.Landmark.Context.Capacity
 import Holonics.Compression.Landmark.Context.Epoch
+import Holonics.Compression.Landmark.Context.PriorMass
 
 /-!
 # The receiving tree: the shift navigator's landmarks
@@ -60,6 +61,7 @@ The joins to the framework ([proved-derived; formal-checked]):
 | `Context/Compaction` | the tree stored where paths part: a unary chain is one node at its summed rung, the compacted tree is the full tree code for code (`compacted_is_the_full_tree`) under any node law, with at most `2n − 1` nodes | `compression::landmark::context::Landmarks` (its arena) |
 | `Context/Capacity` | a landmark's register has a capacity: the capped register is a node law, its carry only lowers the register, `c = ∞` and every unreached ceiling are KT's | `compression::landmark::context::Capacity` |
 | `Context/Epoch` | a node's arrivals are the epochs of its section; the register, capped or not, is read on them | `compression::landmark::context::Capacity` (the deposit's count register) |
+| `Context/PriorMass` | the node's prior mass `2^(−j)`: its face the Pólya urn at that weight and a node law, at most `j − 1` bits over KT at every count, the regret against the best fixed digit probability at most `½ log₂ n + j` (KT's `½ log₂ n + 1`), the one-sided gain, the floor `1/(2^j n* + 2)`, and the ladder `j = 1..8` charged 3 bits a valid two-part code | `compression::landmark::context::{LandmarkDeclaration, face_bits}` (the deposit's unit `2^j`), `hnn::field::ReceiverDeclaration`; the card's `holonics_cuda::hnn::tree::CardTree` (`hnn_tree_deposit`) |
 
 `HNN/RegionCounts` (the receiving face's region table, grain read and combined face) stays with
 the HNN; `Context/Tree` reads its KT count laws.
