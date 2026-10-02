@@ -1,0 +1,25 @@
+  aeon 0: the receiver's exponent span, largest 16504115/2097152 bits; one deposit's contact change, largest 20089/33554432 bits; contacts-only commits 534: channel families certified 6384, vanished 6359; the contacts' return a, median 2942065/16777216, total 12853605/65536 (24 bits); R's steps 534: moved 534, its a median 10163719/32768 (24 bits), its step median 1/2; 388728 ms
+  samples written: 1070 inputs, 2 maps
+  aeon 1: the receiver's exponent span, largest 365413515/33554432 bits; one deposit's contact change, largest 24707/16777216 bits; contacts-only commits 560: channel families certified 6720, vanished 6688; the contacts' return a, median 3826417/16777216, total 1817343/8192 (24 bits); R's steps 561: moved 561, its a median 4082779/16384 (24 bits), its step median 1/2; 1151091 ms
+  samples written: 2192 inputs, 3 maps
+args: hnn_exposure ablation 1700 samples .local/samples_leaky.txt transport founded; projection 1,321 s (the lossless run's 1,320,724 ms), deadline 1,400 s; stopped by its deadline (exit 124) after two closes: incomplete
+readings 1122 (aeon 1 onward); overall mean squared pair distance 9662845/2^30
+lag profile (mean squared distance at the lag over the overall): 1 11953380/2^24; 2 11031550/2^24; 3 15160466/2^24; 4 13418015/2^24; 8 15689874/2^24; 16 16475648/2^24; 64 16340384/2^24; 256 8457734/2^23; 1024 8647491/2^23
+depth 1: 1108 readings in repeated contexts, 37751 pairs; within over overall 9089989/2^23, within over the same lags 9080097/2^23
+depth 2: 960 readings in repeated contexts, 4043 pairs; within over overall 8460468/2^23, within over the same lags 8453558/2^23
+depth 3: 670 readings in repeated contexts, 1207 pairs; within over overall 9069592/2^23, within over the same lags 9062046/2^23
+depth 4: 453 readings in repeated contexts, 581 pairs; within over overall 9287144/2^23, within over the same lags 9272217/2^23
+depth 6: 202 readings in repeated contexts, 217 pairs; within over overall 8464540/2^23, within over the same lags 8439663/2^23
+depth 8: 105 readings in repeated contexts, 117 pairs; within over overall 16499369/2^24, within over the same lags 16429509/2^24
+depth 12: 28 readings in repeated contexts, 25 pairs; within over overall 11667403/2^23, within over the same lags 11579567/2^23
+phase 0: 560 readings; innovation over the anchors' variance 13899272/2^24; the transport's largest eigenvalue moduli 15784016/2^25 9816244/2^24 9816244/2^24 13308105/2^24
+  the innovation grouped by the two cells entered: 1071 pairs; within over overall 15977362/2^24
+  the innovation grouped by the cell before: 8849 pairs; within over overall 15337135/2^24
+phase 1: 560 readings; innovation over the anchors' variance 14007927/2^24; the transport's largest eigenvalue moduli 15281203/2^25 9761481/2^24 9761481/2^24 13617004/2^24
+  the innovation grouped by the two cells entered: 928 pairs; within over overall 8753314/2^23
+  the innovation grouped by the cell before: 10150 pairs; within over overall 9362740/2^23
+ridge 1: close 1: next aeon's 1122 readings, combined code in bits a reading: tree alone 14967487/2^22, R in the machine 15299596/2^22, fitted (ridge 8388608/2^23) 14966385/2^22, class-metric replay 873623650304
+ridge 16: close 1: next aeon's 1122 readings, combined code in bits a reading: tree alone 14967487/2^22, R in the machine 15299596/2^22, fitted (ridge 8388608/2^19) 14967413/2^22, class-metric replay 873623650304
+ridge 256: close 1: next aeon's 1122 readings, combined code in bits a reading: tree alone 14967487/2^22, R in the machine 15299596/2^22, fitted (ridge 8388608/2^15) 14967482/2^22, class-metric replay 873623650304
+ridge 4096: close 1: next aeon's 1122 readings, combined code in bits a reading: tree alone 14967487/2^22, R in the machine 15299596/2^22, fitted (ridge 8388608/2^11) 14967487/2^22, class-metric replay 873623650304
+the shift-invariant spectrum, within over overall: depth 1 9137415/2^23; depth 2 14441653/2^24; depth 3 14848212/2^24; depth 4 15326368/2^24

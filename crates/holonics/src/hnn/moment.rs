@@ -42,8 +42,8 @@
 //! continuation depends on (Lean `lossless_term_modulus`), and the transport's dissipation, a locus
 //! the executed comparison learns (`hnn::executed`), is what marks it. The weights read the ages
 //! from the phases, exact within one turn; a passage over more than one turn is refused below
-//! modulus one (the leaky count it needs is owed). The retired reading, the section over its own
-//! population `v`, weighed a section datum `n/v` times a request cell.
+//! modulus one unless the moment carries the leaky count (below). The retired reading, the section
+//! over its own population `v`, weighed a section datum `n/v` times a request cell.
 //!
 //! [definition; agent-inferred, September 30; the
 //! [modulus's record](../../../../research/records/2026-09-30_THE_MODULUS_FOUNDED_OFF_ONE_PINNED_BEFORE_ITS_RUNS.md)]
@@ -62,9 +62,32 @@
 //! one-turn alias is at most one chart unit, the phase record sufficient at the chart's grain. It
 //! reads the ring's period and the chart's grain, nothing of a terrain; the order-2 declaration
 //! (`d = 60`, `L_ν = 21`) founds at `102837/131072`. The consumers that do not yet read a modulus
-//! below one (the card, a passage over one turn) keep the lossless founding and refuse it, typed;
+//! below one (the card; a passage over one turn on a moment without the leaky count) keep the lossless founding and refuse it, typed;
 //! the bank's face path and the readout's one anchor refused it too until their retirement
 //! (September 30, batch H).
+//!
+//! [definition; agent-inferred, October 2; the
+//! [contact loop record](../../../../research/records/2026-10-02_THE_CONTACT_LOOP_THE_RETURN_REACHES_EVERY_CONTACT_AND_ITS_CHANGE_IS_RELEASED_BEFORE_THE_LATER_CUT.md)
+//! §24] **The leaky count** (#62's owed item: "per-phase counts decayed at the founding modulus
+//! read a passage of any length within one chart unit of its transported weights"). A moment
+//! opened at a source ring whose transport has modulus `ρ < 1` ([`SourceMoment::open_with`])
+//! carries, beside the raw counts, its counts decayed by the transport: at each of the ring's ticks
+//! every decayed count is multiplied by `ρ`, and the cell then enters at its phase with weight one,
+//!
+//! ```text
+//! L_g[c] ← ρ^t L_g[c]  (t the ring's ticks at the step),   L_g[τ_g mod d_g] += x_k,
+//! L_g(δ)[c] likewise for the offset counts,                  w = L / Σ L   (the transported mass)
+//! ```
+//!
+//! so a datum `a` ticks old weighs `ρ^a / Σ_k ρ^(a_k)`, the transported weight, whatever the span:
+//! the age is carried by the decay, not read from the phase, and nothing aliases past one turn.
+//! The counts are carried on the lattice `2^(−L_ν−m)`, `m = ⌈log₂(1/(1 − ρ))⌉`, each product read at
+//! the nearest point (ties up); a count's carried value then stays within
+//! `2^(−L_ν−m−1)/(1 − ρ) ≤ 2^(−L_ν−1)` of the exact decayed count, half a population-chart unit.
+//! A count that decays below half a lattice unit leaves the record, so the record holds only what
+//! the transport still carries. It is a quotient of the passage sufficient for the transported
+//! open, never a list of cells. The modulus is the one the moment was opened at; a moment read at
+//! another modulus is refused ([`HnnError::Transport`]).
 //!
 //! [definition; agent-inferred, September 30] **Read from a station** (`hnn::prediction`, "A
 //! candidate reads the span from its own station"; Lean `HNN/IndexedOpen.framedWeight`): a
@@ -114,6 +137,8 @@
 //! | `moment_capacity` | [`capacity`], [`Capacity`] |
 //! | `HNN/Prediction.{placed_at_station, joint_residue_determines_position}` (a locked datum at its station's residue; a ring of period `∏ dᵢ`, pairwise coprime, places each datum at its joint residue class); `HNN/IndexedOpen.{passage_population, passage_read, passage_weight_one_population, separate_populations_ratio, transportedWeight, transported_weight_mass, transported_weight_frame_invariant, transported_weight_unitary, passage_weight_split_invariant, decayed_weight_antitone, decayed_weight_frame_free, decayed_weight_lossless, lossless_term_modulus, dissipative_term_modulus}` (the section continues the passage; each datum at its transported weight) | [`SourceMoment::continued`], [`SourceMoment::phase_weights`], [`SourceMoment::open_parts`] |
 //! | `HNN/IndexedOpen.{framedWeight, framed_weight_mass, framed_weight_pos, framed_weight_one_sided, framed_weight_ratio, framed_weight_le_pow, oneway_later_weight_ratio, framed_weight_symmetric, framed_weight_translation, framed_weight_lossless}` (a candidate reads the span from its own station, each datum at its two-sided transport distance; the one-way law on data no later than the station) | `hnn::prediction::BankPlacement::{weights, storage, modulus_derivative}`; [`SourceMoment::phase_weights`] is the law read from the span's last datum |
+
+use std::collections::BTreeMap;
 
 use num_bigint::{BigInt, BigUint};
 use num_traits::{One, Signed, ToPrimitive, Zero};
@@ -355,12 +380,8 @@ impl PairPort {
         width: usize,
     ) -> Vec<Rat> {
         let mut weights = vec![Rat::zero(); self.rank()];
-        for (slot, &count) in table.phase(phase, alphabet).iter().enumerate() {
-            if count == 0 {
-                continue;
-            }
+        for (slot, count) in table.normalized(phase, alphabet) {
             let (x, a) = (slot / alphabet, slot % alphabet);
-            let count = Rat::from_integer(BigInt::from(count)) * &table.weight;
             for (rho, weight) in weights.iter_mut().enumerate() {
                 *weight += &count * &self.current[rho][x] * &self.earlier[rho][a];
             }
@@ -456,6 +477,9 @@ pub struct OffsetTable {
     pub counts: Vec<u64>,
     pub population: u64,
     pub weight: Rat,
+    /// Below modulus one, the leaky count's normalized entries by slot (module header, "The leaky
+    /// count"), which replace `counts · weight`.
+    pub transported: Option<BTreeMap<usize, Rat>>,
 }
 
 impl OffsetTable {
@@ -463,6 +487,25 @@ impl OffsetTable {
     pub fn phase(&self, phase: usize, alphabet: usize) -> &[u64] {
         let block = alphabet * alphabet;
         &self.counts[phase * block..(phase + 1) * block]
+    }
+
+    /// **The phase's normalized entries** `(slot, value)` within the phase (`slot = x|A| + a`),
+    /// nonzero only: `C[c, x, a] ν̂` at modulus one, the leaky count's `L[c, x, a]/Σ L` below it.
+    pub fn normalized(&self, phase: usize, alphabet: usize) -> Vec<(usize, Rat)> {
+        let block = alphabet * alphabet;
+        match &self.transported {
+            Some(entries) => entries
+                .range(phase * block..(phase + 1) * block)
+                .map(|(&slot, value)| (slot - phase * block, value.clone()))
+                .collect(),
+            None => self
+                .phase(phase, alphabet)
+                .iter()
+                .enumerate()
+                .filter(|(_, count)| **count != 0)
+                .map(|(slot, &count)| (slot, Rat::from_integer(BigInt::from(count)) * &self.weight))
+                .collect(),
+        }
     }
 }
 
@@ -486,6 +529,108 @@ struct RingCounts {
     ticks: u64,
     /// The ticks a continuing section extends the passage past `end` (`SourceMoment::continued`).
     extent: u64,
+    /// The counts decayed by the ring's transport (module header, "The leaky count"), when it was
+    /// opened below modulus one.
+    leaky: Option<Leaky>,
+}
+
+/// [definition; agent-inferred, October 2] **One ring's leaky count** (module header): the decayed
+/// phase and offset counts as integer coordinates on `2^(−unit)`, nonzero entries only, at the
+/// modulus `ρ = numerator · 2^(−shift)` they were opened at.
+#[derive(Clone, Debug, PartialEq, Eq)]
+struct Leaky {
+    modulus: Rat,
+    numerator: BigInt,
+    shift: u32,
+    unit: u32,
+    first: BTreeMap<usize, BigInt>,
+    offset: Vec<BTreeMap<usize, BigInt>>,
+}
+
+impl Leaky {
+    /// The leaky count of a ring whose transport has modulus `ρ < 1`, on `2^(−L_ν−m)`,
+    /// `m = ⌈log₂(1/(1 − ρ))⌉`. Refused unless `0 < ρ < 1` is dyadic.
+    fn open(ring: usize, modulus: &Rat, chart: u32, offsets: usize) -> Result<Self, HnnError> {
+        let refused = || HnnError::Transport {
+            ring,
+            modulus: modulus.clone(),
+        };
+        if !modulus.is_positive() || *modulus >= Rat::one() {
+            return Err(refused());
+        }
+        let denominator = modulus.denom();
+        if denominator.magnitude().count_ones() != 1 {
+            return Err(refused());
+        }
+        let shift = u32::try_from(denominator.trailing_zeros().ok_or_else(refused)?)
+            .map_err(|_| refused())?;
+        // m = ⌈log₂(1/(1 − ρ))⌉: the least m with 2^m (1 − ρ) ≥ 1.
+        let gap = Rat::one() - modulus;
+        let mut m = 0u32;
+        while Rat::from_integer(BigInt::one() << m as usize) * &gap < Rat::one() {
+            m += 1;
+        }
+        Ok(Self {
+            modulus: modulus.clone(),
+            numerator: modulus.numer().clone(),
+            shift,
+            unit: chart + m,
+            first: BTreeMap::new(),
+            offset: vec![BTreeMap::new(); offsets],
+        })
+    }
+
+    /// One tick of the transport: every coordinate `v ← ⌊(2vk + 2^s)/2^(s+1)⌋` (`ρ = k 2^(−s)`, the
+    /// nearest lattice point, ties up); a coordinate at zero leaves the record.
+    fn decay(&mut self, ticks: u64) {
+        let half = BigInt::one() << self.shift as usize;
+        let twice = BigInt::one() << (self.shift as usize + 1);
+        let numerator = &self.numerator;
+        let tick = |map: &mut BTreeMap<usize, BigInt>| {
+            map.retain(|_, v| {
+                let product: BigInt = BigInt::from(2) * &*v * numerator + &half;
+                // Counts are nonnegative, so truncation is the floor.
+                *v = &product / &twice;
+                !v.is_zero()
+            });
+        };
+        for _ in 0..ticks {
+            if self.first.is_empty() && self.offset.iter().all(BTreeMap::is_empty) {
+                return;
+            }
+            tick(&mut self.first);
+            for map in &mut self.offset {
+                tick(map);
+            }
+        }
+    }
+
+    /// One datum entering at `slot` with weight `ρ^age`, read at the nearest lattice point.
+    fn enter(map: &mut BTreeMap<usize, BigInt>, slot: usize, unit: u32, modulus: &Rat, age: u64) {
+        let scale = Rat::from_integer(BigInt::one() << unit as usize);
+        let half = Rat::new(BigInt::one(), BigInt::from(2));
+        let value = (modulus_power(modulus, age) * scale + half).floor().to_integer();
+        if value.is_zero() {
+            return;
+        }
+        let entry = map.entry(slot).or_insert_with(BigInt::zero);
+        *entry += value;
+    }
+
+    /// The normalized entries `L[slot]/Σ L` of one map, read on the population chart; empty at a
+    /// zero mass.
+    fn normalized(map: &BTreeMap<usize, BigInt>, chart: &PopulationChart) -> BTreeMap<usize, Rat> {
+        let mass: BigInt = map.values().sum();
+        if mass.is_zero() {
+            return BTreeMap::new();
+        }
+        map.iter()
+            .filter_map(|(&slot, v)| {
+                let w = chart.chart(&Rat::new(v.clone(), mass.clone()));
+                (!w.is_zero()).then_some((slot, w))
+            })
+            .collect()
+    }
 }
 
 /// What one ingest did: the cells consumed, and whether it stopped at the joint clock's carry-out.
@@ -546,6 +691,7 @@ impl SourceMoment {
                     end: phase,
                     ticks: 0,
                     extent: 0,
+                    leaky: None,
                 }
             })
             .collect();
@@ -559,6 +705,26 @@ impl SourceMoment {
             cells: 0,
             opening: current.lift().to_vec(),
         }
+    }
+
+    /// [definition; agent-inferred, October 2] **Open a moment at the constitution's transports**:
+    /// [`SourceMoment::open`], with a leaky count on every source ring whose transport has modulus
+    /// below one (module header, "The leaky count").
+    pub fn open_with(
+        field: &Field,
+        current: &Current,
+        constitution: &impl ConstitutionRead,
+    ) -> Result<Self, HnnError> {
+        let mut moment = Self::open(field, current);
+        let chart = PopulationChart::of(field).exponent();
+        let offsets = moment.offsets.len();
+        for counts in &mut moment.rings {
+            let modulus = constitution.transport(counts.ring);
+            if !modulus.is_one() {
+                counts.leaky = Some(Leaky::open(counts.ring, &modulus, chart, offsets)?);
+            }
+        }
+        Ok(moment)
     }
 
     /// **Ingest cells in order**: the lift point's selective step, then the phase-binned and offset
@@ -578,9 +744,19 @@ impl SourceMoment {
                 counts.end = phase as u64;
                 counts.ticks += u64::from(step.ticks[counts.ring]);
                 bump(&mut counts.first[phase * a + code])?;
+                if let Some(leaky) = &mut counts.leaky {
+                    leaky.decay(u64::from(step.ticks[counts.ring]));
+                    let one = BigInt::one() << leaky.unit as usize;
+                    *leaky.first.entry(phase * a + code).or_insert_with(BigInt::zero) += &one;
+                }
                 for (index, &offset) in self.offsets.iter().enumerate() {
                     if let Some(earlier) = earlier(&self.window, self.cursor, offset) {
-                        bump(&mut counts.offset[index][phase * a * a + code * a + earlier])?;
+                        let slot = phase * a * a + code * a + earlier;
+                        bump(&mut counts.offset[index][slot])?;
+                        if let Some(leaky) = &mut counts.leaky {
+                            let one = BigInt::one() << leaky.unit as usize;
+                            *leaky.offset[index].entry(slot).or_insert_with(BigInt::zero) += one;
+                        }
                     }
                 }
             }
@@ -641,6 +817,7 @@ impl SourceMoment {
             .ok_or(HnnError::MissingSourcePort { ring })?;
         let period = counts.period;
         let mut placed = 0u64;
+        let before = counts.extent;
         for (station, cell) in cells.iter().enumerate() {
             let Some(code) = *cell else {
                 continue;
@@ -651,6 +828,18 @@ impl SourceMoment {
             bump(&mut counts.first[((phase + 1 + station) % period) * a + code])?;
             counts.extent = counts.extent.max(station as u64 + 1);
             placed += 1;
+        }
+        // The leaky count reads the span at its end: the request's counts decay over the section's
+        // new extent, and station `j`'s datum enters `extent − 1 − j` ticks old.
+        if let Some(leaky) = &mut counts.leaky {
+            leaky.decay(counts.extent - before);
+            let (unit, modulus) = (leaky.unit, leaky.modulus.clone());
+            for (station, cell) in cells.iter().enumerate() {
+                if let Some(code) = *cell {
+                    let slot = ((phase + 1 + station) % period) * a + code;
+                    Leaky::enter(&mut leaky.first, slot, unit, &modulus, counts.extent - 1 - station as u64);
+                }
+            }
         }
         passage.cells += placed;
         Ok(passage)
@@ -754,6 +943,31 @@ impl SourceMoment {
                 modulus: modulus.clone(),
             });
         }
+        if let Some(leaky) = &counts.leaky {
+            // The leaky count: the open reads `L[c]/Σ L`, so the weight of a decayed count is the
+            // one inverse mass, at every phase the record still holds.
+            if leaky.modulus != *modulus {
+                return Err(HnnError::Transport {
+                    ring,
+                    modulus: modulus.clone(),
+                });
+            }
+            let mass: BigInt = leaky.first.values().sum();
+            let mut held = vec![false; d];
+            for slot in leaky.first.keys() {
+                held[slot / a] = true;
+            }
+            return Ok(held
+                .into_iter()
+                .map(|h| {
+                    if h && !mass.is_zero() {
+                        chart.chart(&Rat::new(BigInt::one() << leaky.unit as usize, mass.clone()))
+                    } else {
+                        Rat::zero()
+                    }
+                })
+                .collect());
+        }
         if modulus.is_one() {
             let nu = chart.value(populations.iter().sum());
             return Ok(populations
@@ -800,6 +1014,22 @@ impl SourceMoment {
         phase: usize,
         modulus: &Rat,
     ) -> Result<Vec<Rat>, HnnError> {
+        let counts = self.counts(ring)?;
+        if let Some(leaky) = &counts.leaky {
+            if leaky.modulus != *modulus {
+                return Err(HnnError::Transport {
+                    ring,
+                    modulus: modulus.clone(),
+                });
+            }
+            let a = self.alphabet;
+            let entries = Leaky::normalized(&leaky.first, &PopulationChart::of(field));
+            let mut row = vec![Rat::zero(); a];
+            for (slot, value) in entries.range(phase * a..(phase + 1) * a) {
+                row[slot - phase * a] = value.clone();
+            }
+            return Ok(row);
+        }
         let weight = self.phase_weights(field, ring, modulus)?[phase].clone();
         Ok(self
             .phase_counts(ring, phase)?
@@ -823,15 +1053,22 @@ impl SourceMoment {
             .iter()
             .position(|declared| *declared == offset)
             .ok_or(HnnError::Offset { offset })?;
-        let counts = self.counts(ring)?.offset[index].clone();
+        let ring_counts = self.counts(ring)?;
+        let counts = ring_counts.offset[index].clone();
         let population: u64 = counts.iter().sum();
         if population == 0 {
             return Ok(None);
         }
+        let chart = PopulationChart::of(field);
+        let transported = ring_counts
+            .leaky
+            .as_ref()
+            .map(|leaky| Leaky::normalized(&leaky.offset[index], &chart));
         Ok(Some(OffsetTable {
             counts,
             population,
-            weight: PopulationChart::of(field).value(population),
+            weight: chart.value(population),
+            transported,
         }))
     }
 
@@ -846,7 +1083,33 @@ impl SourceMoment {
         constitution: &impl ConstitutionRead,
         ring: usize,
     ) -> Result<Vec<Rat>, HnnError> {
-        let weights = self.phase_weights(field, ring, &constitution.transport(ring))?;
+        let modulus = constitution.transport(ring);
+        if let Some(features) = self.transported_features(field, ring, &modulus)? {
+            // The leaky count: each phase's normalized decayed counts through `E_g`, carried back
+            // by `P_g^(−c)`, plus the pairs' (their tables read the leaky entries).
+            let (_, mut moment) = self.moment_parts(field, constitution, ring)?;
+            let geometry = field.ring(ring);
+            let port = constitution
+                .source_port(ring)
+                .ok_or(HnnError::MissingSourcePort { ring })?;
+            for (phase, feature) in features {
+                let mut binned = vec![Rat::zero(); geometry.width()];
+                for (code, value) in feature.iter().enumerate() {
+                    if value.is_zero() {
+                        continue;
+                    }
+                    for (row, entry) in binned.iter_mut().enumerate() {
+                        *entry += value * port.get(row, code)?;
+                    }
+                }
+                let carried = geometry.rotate(&binned, &-BigInt::from(phase));
+                for (entry, add) in moment.iter_mut().zip(carried) {
+                    *entry += add;
+                }
+            }
+            return Ok(moment);
+        }
+        let weights = self.phase_weights(field, ring, &modulus)?;
         let (reads, pairs) = self.moment_parts(field, constitution, ring)?;
         let mut moment = pairs;
         for (phase, read) in reads {
@@ -855,6 +1118,33 @@ impl SourceMoment {
             }
         }
         Ok(moment)
+    }
+
+    /// The leaky count's normalized phase rows `(c, L[c]/Σ L)`, occupied phases only; `None` on a
+    /// ring opened at modulus one. Refused at a modulus other than the one it was opened at.
+    #[allow(clippy::type_complexity)]
+    fn transported_features(
+        &self,
+        field: &Field,
+        ring: usize,
+        modulus: &Rat,
+    ) -> Result<Option<Vec<(usize, Vec<Rat>)>>, HnnError> {
+        let counts = self.counts(ring)?;
+        let Some(leaky) = &counts.leaky else {
+            return Ok(None);
+        };
+        if leaky.modulus != *modulus {
+            return Err(HnnError::Transport {
+                ring,
+                modulus: modulus.clone(),
+            });
+        }
+        let a = self.alphabet;
+        let mut rows: BTreeMap<usize, Vec<Rat>> = BTreeMap::new();
+        for (slot, value) in Leaky::normalized(&leaky.first, &PopulationChart::of(field)) {
+            rows.entry(slot / a).or_insert_with(|| vec![Rat::zero(); a])[slot % a] = value;
+        }
+        Ok(Some(rows.into_iter().collect()))
     }
 
     /// **The open's two ports on one source ring**, at the lift (`P_g^(τ_g)` applied): each
@@ -994,6 +1284,34 @@ impl SourceMoment {
     ) -> Result<ExactRatMatrix, HnnError> {
         let counts = self.counts(ring)?;
         let chart = PopulationChart::of(field);
+        if let Some(features) = self.transported_features(field, ring, modulus)? {
+            // The leaky count: `Σ_c (P_g^(c−τ_g) g) ⊗ L[c]/Σ L`.
+            let geometry = field.ring(ring);
+            let width = geometry.width();
+            if covector.len() != width {
+                return Err(HnnError::Shape {
+                    what: "open storage covector",
+                    expected: width,
+                    found: covector.len(),
+                });
+            }
+            let mut rows = vec![vec![Rat::zero(); self.alphabet]; width];
+            for (phase, feature) in features {
+                let turned =
+                    geometry.rotate(covector, &(BigInt::from(phase) - &current.lift()[ring]));
+                for (row, value) in rows.iter_mut().zip(&turned) {
+                    if value.is_zero() {
+                        continue;
+                    }
+                    for (entry, f) in row.iter_mut().zip(&feature) {
+                        if !f.is_zero() {
+                            *entry += value * f;
+                        }
+                    }
+                }
+            }
+            return Ok(ExactRatMatrix::shaped(width, self.alphabet, rows)?);
+        }
         let scale = BigInt::one() << chart.exponent() as usize;
         let weights: Vec<BigInt> = self
             .phase_weights(field, ring, modulus)?

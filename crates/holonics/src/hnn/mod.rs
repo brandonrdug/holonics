@@ -346,7 +346,7 @@ pub enum HnnError {
     )]
     Transport { ring: usize, modulus: Rat },
     #[error(
-        "ring {ring}'s passage spans {span} ticks against its period {period} (or was re-keyed): a transport of modulus below one reads each datum's age from its phase, which aliases past one turn; the leaky count is owed"
+        "ring {ring}'s passage spans {span} ticks against its period {period} (or was re-keyed): a transport of modulus below one reads each datum's age from its phase, which aliases past one turn; a moment opened at the constitution carries the leaky count instead (`SourceMoment::open_with`)"
     )]
     AliasedAges { ring: usize, span: u64, period: u64 },
     #[error(

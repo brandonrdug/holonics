@@ -388,3 +388,77 @@ fn nothing_of_the_source_is_discarded_by_length() {
     let (other, _) = ingest_split(field, &changed, &[]);
     assert_ne!(other, moment, "the first of 4,096 cells is still in the moment");
 }
+
+/// The leaky count (`hnn::moment`, "The leaky count"): on campaign 1's field at the founded
+/// transport, a passage of many turns reads each phase's normalized decayed counts within one
+/// population-chart unit of the exact transported weights `Σ_k ρ^(a_k) [slot_k] / Σ_k ρ^(a_k)`
+/// (half a unit from the carried decay, half from the chart's read); no age aliases, and at modulus
+/// one the moment opened at the constitution reads what the plain moment reads.
+#[test]
+fn the_leaky_count_reads_the_transported_weights_over_many_turns() {
+    use crate::hnn::constitution::Constitution;
+    use crate::hnn::field::FieldDeclaration;
+    use crate::hnn::moment::PopulationChart;
+    let field = &Field::declare(FieldDeclaration::campaign_one(6_148)).unwrap();
+    let lossless = Constitution::initial(field, 1 << 33).unwrap();
+    let founded = lossless.clone().founded_transport(field, 0).unwrap();
+    let modulus = founded.transport(0);
+    assert!(modulus < Rat::from_integer(1.into()));
+    let mut draw = Draw::new(24);
+    let cells: Vec<usize> = (0..400).map(|_| draw.below(256)).collect();
+    let chart = PopulationChart::of(field);
+    let unit = Rat::new(BigInt::from(1), BigInt::from(1u64 << chart.exponent()));
+
+    // The exact transported weights, by brute force over the passage's ticks.
+    let mut walk = Current::at_rest(field);
+    let mut entered = Vec::new();
+    let mut ticks = 0u64;
+    for &code in &cells {
+        let step = walk.step(field, code).unwrap();
+        ticks += u64::from(step.ticks[0]);
+        entered.push((walk.phase(field, 0).unwrap() as usize, code, ticks));
+        if step.carry_out {
+            break;
+        }
+    }
+    let fed = entered.len();
+    assert!(ticks > 5 * field.ring(0).period(), "a passage of many turns: {ticks} ticks");
+    let weight = |age: u64| {
+        if age > 64 { Rat::zero() } else { crate::hnn::moment::modulus_power(&modulus, age) }
+    };
+    let mass: Rat = entered.iter().map(|(_, _, t)| weight(ticks - t)).sum();
+
+    let mut current = Current::at_rest(field);
+    let mut moment = SourceMoment::open_with(field, &current, &founded).unwrap();
+    moment.ingest(field, &mut current, &cells[..fed]).unwrap();
+    let mut plain_current = Current::at_rest(field);
+    let mut plain = SourceMoment::open_with(field, &plain_current, &lossless).unwrap();
+    plain.ingest(field, &mut plain_current, &cells[..fed]).unwrap();
+    let mut reference_current = Current::at_rest(field);
+    let mut reference = SourceMoment::open(field, &reference_current);
+    reference.ingest(field, &mut reference_current, &cells[..fed]).unwrap();
+    let one = Rat::from_integer(1.into());
+    for phase in 0..field.ring(0).period() as usize {
+        let read = moment.normalized_counts(field, 0, phase, &modulus).unwrap();
+        for (code, value) in read.iter().enumerate() {
+            let exact: Rat = entered
+                .iter()
+                .filter(|(c, x, _)| *c == phase && *x == code)
+                .map(|(_, _, t)| weight(ticks - t))
+                .sum::<Rat>()
+                / &mass;
+            assert!((value - &exact).abs() <= unit, "phase {phase}, class {code}");
+        }
+        assert_eq!(
+            plain.normalized_counts(field, 0, phase, &one).unwrap(),
+            reference.normalized_counts(field, 0, phase, &one).unwrap()
+        );
+    }
+    assert_eq!(
+        plain.open_storage(field, &lossless, &plain_current).unwrap(),
+        reference.open_storage(field, &lossless, &reference_current).unwrap()
+    );
+    // The phase weights read the leaky count, not the aliased phases; another modulus is refused.
+    assert!(moment.phase_weights(field, 0, &modulus).is_ok());
+    assert!(moment.normalized_counts(field, 0, 0, &one).is_err());
+}

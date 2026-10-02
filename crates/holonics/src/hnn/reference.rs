@@ -995,7 +995,7 @@ impl ExecutionPort for Reference {
                 let id = MomentId(resident.fresh());
                 resident
                     .moments
-                    .insert(id, SourceMoment::open(&field, &resident.current));
+                    .insert(id, SourceMoment::open_with(&field, &resident.current, &resident.constitution)?);
                 id
             }
         };
@@ -2039,11 +2039,7 @@ pub fn compose_return(
             for c in 0..d {
                 let mut slots = Vec::new();
                 for table in tables.iter().flatten() {
-                    for (slot, &count) in table.phase(c, alphabet).iter().enumerate() {
-                        if count == 0 {
-                            continue;
-                        }
-                        let value = Rat::from_integer(BigInt::from(count)) * &table.weight;
+                    for (slot, value) in table.normalized(c, alphabet) {
                         energy += &value * &value;
                         slots.push((slot / alphabet, slot % alphabet, value));
                     }
@@ -3139,6 +3135,9 @@ pub struct AblationOptions {
     pub descent: bool,
     /// Whether to collect the receiving map's inputs and targets ([`AblationRun::samples`]).
     pub samples: bool,
+    /// Whether the source rings' transport is founded off the lossless boundary
+    /// ([`Constitution::founded_transport`]), read by the leaky count (the contact loop record §24).
+    pub founded: bool,
 }
 
 
@@ -3223,7 +3222,15 @@ pub fn contact_ablation(
         &[crate::ratio::linear::ExactRatMatrix],
     ),
 ) -> Result<AblationRun, HnnError> {
-    let mut resident = reference.mount(field, &Current::at_rest(field))?;
+    let mut resident = if options.founded {
+        let mut initial = Constitution::initial(field, reference.budget)?;
+        for &ring in field.sources() {
+            initial = initial.founded_transport(field, ring)?;
+        }
+        reference.mount_with(field, &Current::at_rest(field), initial)?
+    } else {
+        reference.mount(field, &Current::at_rest(field))?
+    };
     let opening = resident.constitution().clone();
     let receiving_ring = resident
         .admitted()
