@@ -1,0 +1,5 @@
+close 1: 1070 readings seen; R: mean code 16769246/2^21 bits, span 11011564/2^27 bits; fitted: mean code 16737089/2^21 bits, span 8820633/2^25 bits; on the next aeon's 1122 readings: R 16759842/2^21 bits, fitted 16683173/2^21 bits
+close 2: 2192 readings seen; R: mean code 16757695/2^21 bits, span 11600898/2^26 bits; fitted: mean code 16541577/2^21 bits, span 11545267/2^23 bits; on the next aeon's 1138 readings: R 16746804/2^21 bits, fitted 16399855/2^21 bits
+close 3: 3330 readings seen; R: mean code 16751147/2^21 bits, span 15628272/2^26 bits; fitted: mean code 16266735/2^21 bits, span 10852723/2^22 bits; on the next aeon's 70 readings: R 16737913/2^21 bits, fitted 15911273/2^21 bits
+exit 0 wall 55 s
+args: python3 research/notebook/hnn_design/receiver_oracle.py .local/samples.txt; 400 backtracking gradient steps per close; wall 55 s

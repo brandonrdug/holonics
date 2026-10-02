@@ -185,6 +185,8 @@ pub struct Word<'c> {
 /// executed ticks in order.
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct Resonance {
+    /// Opening storage at the carried state and actual previous pump phase.
+    pub open: Rat,
     pub state: [Vec<Rat>; 2],
     pub remainders: ResonatorRemainders,
     pub steps: Vec<ResonatorStep>,
@@ -192,7 +194,7 @@ pub struct Resonance {
 
 /// [definition] **A resonator's balance over one word** (campaign 2, `hnn::ring`; Lean
 /// `HNN/Ring.ring_tick_executed_energy_balance` summed over the word's ticks): its ring, its ticks,
-/// its storage at the word's end (it opens at zero with the word), its pump, port and dissipation
+/// its storage at the word's open and end, its pump, port and dissipation
 /// work, its chart defect and its split summed over the ticks with their certified bound
 /// ([`crate::hnn::ring::ResonatorStep::bound`] summed), and the remainders its end releases. It is
 /// what the word's release returns of a resonator, so every realization of the port reads it alike
@@ -201,6 +203,7 @@ pub struct Resonance {
 pub struct ResonatorBalance {
     pub ring: usize,
     pub ticks: usize,
+    pub open: Rat,
     pub end: Rat,
     pub pump: Rat,
     pub port: Rat,
@@ -220,10 +223,11 @@ impl ResonatorBalance {
         Self {
             ring,
             ticks: resonance.steps.len(),
+            open: resonance.open.clone(),
             end: resonance
                 .steps
                 .last()
-                .map_or_else(Rat::zero, |step| step.after.clone()),
+                .map_or_else(|| resonance.open.clone(), |step| step.after.clone()),
             pump: sum(|step| &step.pump),
             port: sum(|step| &step.port),
             dissipation: sum(|step| &step.dissipation),
@@ -234,10 +238,10 @@ impl ResonatorBalance {
         }
     }
 
-    /// **It closes**: `E_end = pump + port − dissipation + chart + split`, from zero at the open,
+    /// **It closes**: `E_end − E_open = pump + port − dissipation + chart + split`,
     /// with `|chart + split| ≤ bound`.
     pub fn closes(&self) -> bool {
-        self.end == &self.pump + &self.port - &self.dissipation + &self.chart + &self.split
+        &self.end - &self.open == &self.pump + &self.port - &self.dissipation + &self.chart + &self.split
             && (&self.chart + &self.split).abs() <= self.bound
     }
 }
@@ -513,7 +517,7 @@ pub struct CommitWork {
 /// from its release on every realization of the port, [`WordBalance::of`]): the field's power at the
 /// open (after the opening split) and at the end, every tick's stated terms summed, the defects
 /// (the ticks' residuals) and the last junction's residual with their certified bound, the
-/// resonators' storage at the end with their terms (they open at zero), the signed port pairing,
+/// resonators' storage at both endpoints with their terms, the signed port pairing,
 /// the end change the commit reads, the commit when one follows
 /// ([`WordBalance::commit`]), and the remainders the end releases, the word's and the resonators'.
 /// Its certified bound covers the executed residual of the field and of the resonators alike: the
@@ -528,6 +532,7 @@ pub struct WordBalance {
     pub defects: Rat,
     pub last: Rat,
     pub bound: Rat,
+    pub resonator_open: Rat,
     pub resonator_end: Rat,
     pub pump: Rat,
     pub port: Rat,
@@ -576,6 +581,7 @@ impl WordBalance {
             last: released.last.clone(),
             bound: sum(|t| &t.bound) + &released.last_bound + &resonator_bound,
             resonator_bound,
+            resonator_open: resonators(|r| &r.open),
             resonator_end: resonators(|r| &r.end),
             pump: resonators(|r| &r.pump),
             interconnection: &port + loaded_port,
@@ -624,13 +630,13 @@ impl WordBalance {
 
     /// **The word closes with its stated defects, the combined system in one identity** (Lean
     /// `HNN/Word.{field_executed_balance_with_defects, field_commit_deposition}`):
-    /// `P_end + E_end = P_open − dissipation + resist + Π_c +
+    /// `P_end + E_end = P_open + E_open − dissipation + resist + Π_c +
     /// defects + last + pump − resonator dissipation + resonator chart + resonator split +
     /// interconnection`, with `P_end` the committed power and `deposition` added when a commit
     /// follows; and the executed residual, the resonators' chart and split included, lies within
     /// its certified bound.
     pub fn closes(&self) -> bool {
-        let terms = &self.open - &self.dissipation
+        let terms = &self.open + &self.resonator_open - &self.dissipation
             + &self.resist
             + &self.contrast
             + self.residual()
@@ -875,7 +881,7 @@ impl<'c> Word<'c> {
             arrivals,
             states,
             resonators: resonator_states,
-            ..
+            resonator_phases,
         } = change;
         let widths: Vec<usize> = field.rings().iter().map(|ring| ring.width()).collect();
         let shaped = storage.len() == widths.len()
@@ -892,6 +898,7 @@ impl<'c> Word<'c> {
                         && pair[1].len() == widths[to]
                         && state.iter().all(|x| x.len() == contact.width())
                 })
+            && resonator_phases.len() == widths.len()
             && resonator_states.len() == widths.len()
             && resonator_states
                 .iter()
@@ -909,6 +916,28 @@ impl<'c> Word<'c> {
                 expected: widths.len(),
                 found: storage.len(),
             });
+        }
+        // [agent-inferred] A supplied phase certifies this clock; it never requests a new clock.
+        // An absent state/phase opens at rest in that clock. A supplied phase must fit even at
+        // rest; a present state must supply its frame. No phase exists on an undeclared resonator.
+        for (ring, ((state, phase), declared)) in resonator_states
+            .iter().zip(&resonator_phases).zip(operands.resonators()).enumerate()
+        {
+            match declared {
+                Some(resonator) => {
+                    let expected = resonator.phase_at(opened_at.saturating_sub(1));
+                    if phase.is_some_and(|phase|phase!=expected) || (state.is_some() && phase.is_none()) {
+                        return Err(HnnError::Resonator {
+                            ring,
+                            what: "the carried resonator phase does not fit the opening clock",
+                        });
+                    }
+                }
+                None if phase.is_some() => return Err(HnnError::Resonator {
+                    ring, what:"an opening phase was supplied without a declared resonator",
+                }),
+                None => {},
+            }
         }
         let lattice = operands.lattice().map(|word| word.transient());
         let mut carried = Carried {
@@ -952,17 +981,21 @@ impl<'c> Word<'c> {
             .resonators()
             .iter()
             .zip(resonator_states)
-            .map(|(resonator, state)| {
-                resonator.as_ref().map(|resonator| {
-                    let n = resonator.width();
-                    Resonance {
-                        state: state.unwrap_or_else(|| [zeros(n), zeros(n)]),
-                        remainders: ResonatorRemainders::default(),
-                        steps: Vec::new(),
-                    }
-                })
+            .map(|(resonator, state)| -> Result<Option<Resonance>, HnnError> {
+                let Some(resonator) = resonator else { return Ok(None) };
+                let n = resonator.width();
+                let state = state.unwrap_or_else(|| [zeros(n), zeros(n)]);
+                let open = resonator.energy_at(
+                    resonator.phase_at(opened_at.saturating_sub(1)), &state[0], &state[1],
+                )?;
+                Ok(Some(Resonance {
+                    open,
+                    state,
+                    remainders: ResonatorRemainders::default(),
+                    steps: Vec::new(),
+                }))
             })
-            .collect();
+            .collect::<Result<Vec<_>, HnnError>>()?;
         // The hop clock reads the refinement's ticks: a continuing word's clock opens where the
         // previous word's stopped.
         let mut clock = Clock::unwound(field.step().clone())?;
@@ -1811,6 +1844,14 @@ pub(crate) struct KeptWord {
 }
 
 impl KeptWord {
+    /// The kept word's anchor at a junction step on a ring (read-only; [`Word::anchor`]'s).
+    pub(crate) fn anchor(&self, step: usize, ring: usize) -> Option<&[Rat]> {
+        self.passage
+            .get(step)
+            .and_then(|record| record.anchors.get(ring))
+            .map(Vec::as_slice)
+    }
+
     /// **Resume the word on its field**: the field it was read on, which the resident owns.
     pub(crate) fn resume(self, field: &Field) -> Word<'_> {
         let KeptWord {
