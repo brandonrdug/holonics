@@ -418,6 +418,10 @@ fn resonator_balance(
     holonics::hnn::word::ResonatorBalance {
         ring: resonator.ring,
         ticks: full,
+        // Device-opening contract: hnn_word_forward (hnn_word.cuh, "the open") sets res_u and
+        // res_w to zero on every invocation, before recording any tick; the terminal junction
+        // does not move them. This device word presently opens at rest, including zero full ticks.
+        open: Rat::zero(),
         end,
         pump,
         port,

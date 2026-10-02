@@ -1252,7 +1252,7 @@ impl ResonatorOperands {
             .collect()
     }
 
-    fn energy_at(&self, phase: usize, displacement: &[Rat], rate: &[Rat]) -> Result<Rat, HnnError> {
+    pub(crate) fn energy_at(&self, phase: usize, displacement: &[Rat], rate: &[Rat]) -> Result<Rat, HnnError> {
         let (capacity, _, _) = self.material.forms();
         Ok((dot(rate, &capacity.apply(rate)?)
             + dot(
