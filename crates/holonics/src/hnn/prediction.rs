@@ -140,8 +140,8 @@
 //! - **the lock's flip**: a station's top candidate reads a growth strictly above every other
 //!   candidate's (`θ = a/(a + K) > ½ ⇔ a > K`, on exact enclosures) and the bank locks there (its
 //!   growth certified past one); its gap is enclosed by the top's `lower` less the largest other
-//!   `upper` (the certain gap) and the top's `upper` less the largest other `lower` (its reach); a
-//!   station locks when its reach meets the largest certain gap, so every station the readings do
+//!   `upper` (the certain gap) and the top's `upper` less the largest other `lower` (its upper end); a
+//!   station locks when its upper end meets the largest certain gap, so every station the readings do
 //!   not certify below the largest locks with it (exact ties when the readings are exact; the
 //!   [flip record](../../../../research/records/2026-10-02_A_FLIP_IS_SET_BY_THE_LOCK_RULES_MARGIN_AND_NO_LAW_IN_THE_CHAIN_CERTIFIES_IT_BEFORE_THE_SUCCESSOR_IS_READ.md)
 //!   §5), each lock's reading certified (every member's Floquet certificate at the joint growth,
@@ -461,7 +461,7 @@ impl JointGrowth for TurnCovector {
 /// ([`ReceivingBank::read_turn`]). A station's reading is the lock's flip: its top candidate's joint
 /// growth exceeds every other candidate's exactly ([`Growth::exceeds`], `θ = a/(a + K) > ½`) and the
 /// bank locks there ([`Growth::is_locked`]); its gap is the top's `lower` less the largest other
-/// `upper`, its reach the top's `upper` less the largest other `lower`. Every station whose reach
+/// `upper`, its upper end the top's `upper` less the largest other `lower`. Every station whose upper end
 /// meets the largest positive gap locks (the readings do not order it below), its reading certified
 /// ([`ReceivingBank::certify_turn`]); a locked datum is placed for the next refinement. It stops when
 /// every station is locked, released at width zero through `receiver::release` (`section_release`),
@@ -538,8 +538,8 @@ pub enum LockOrder {
 
 /// [definition; agent-inferred, October 2; its consequences proved-derived, formal-checked] **The
 /// stations the readings do not certify below the largest gap** ([`LockOrder::Gap`]): each eligible station's gap is enclosed by its certain
-/// gap `L_top − max_(x≠top) U_x` and its reach `U_top − max_(x≠top) L_x`; a station locks when its
-/// reach meets the largest certain gap. The station of the largest certain gap always locks, so a
+/// gap `L_top − max_(x≠top) U_x` and its upper end `U_top − max_(x≠top) L_x`; a station locks when its
+/// upper end meets the largest certain gap. The station of the largest certain gap always locks, so a
 /// refinement with an eligible station locks one (Lean
 /// `HNN/ExecutedComparison.certifiedLock_largest`); the true largest gap always locks
 /// (`leader_locks`); a station that locks alone has the strictly largest true gap
@@ -547,13 +547,13 @@ pub enum LockOrder {
 /// unless their true gaps cross (`certified_order_needs_crossing`). On exact readings it is the
 /// largest gap with its ties (`certifiedLock_exact`). The comparison's order term reads the same
 /// two ends (`hnn::executed::OrderTerm`; `order_solved_locks_no_wrong`).
-pub(crate) fn uncertified_largest(gaps: &[(usize, usize, Rat)], reaches: &[Rat]) -> Vec<usize> {
+pub(crate) fn uncertified_largest(gaps: &[(usize, usize, Rat)], gap_uppers: &[Rat]) -> Vec<usize> {
     let largest = gaps.iter().map(|(_, _, gap)| gap).max();
     match largest {
         Some(largest) => gaps
             .iter()
-            .zip(reaches)
-            .filter(|(_, reach)| *reach >= largest)
+            .zip(gap_uppers)
+            .filter(|(_, gap_upper)| *gap_upper >= largest)
             .map(|(&(station, _, _), _)| station)
             .collect(),
         None => Vec::new(),
@@ -640,9 +640,9 @@ fn release_iteration<R: JointGrowth + Send + Sync>(
         refinements += 1;
         readings += read.len();
         // Each unlocked station's lock's flip: its top candidate and its gap's enclosure, the
-        // certain gap `L_top − max U` (the gap read) and its reach `U_top − max L`.
+        // certain gap `L_top − max U` (the gap read) and its upper end `U_top − max L`.
         let mut gaps: Vec<(usize, usize, Rat)> = Vec::new();
-        let mut reaches: Vec<Rat> = Vec::new();
+        let mut gap_uppers: Vec<Rat> = Vec::new();
         let mut station_tops = Vec::new();
         for (index, chunk) in read.chunks(alphabet).enumerate() {
             let station = open[index * alphabet].0;
@@ -674,16 +674,16 @@ fn release_iteration<R: JointGrowth + Send + Sync>(
                     .filter(|&class| class != best)
                     .map(|class| chunk[class].joint().lower.clone())
                     .max();
-                let reach = match &floor {
+                let gap_upper = match &floor {
                     Some(floor) => &top.upper - floor,
                     None => top.upper.clone(),
                 };
                 gaps.push((station, best, gap));
-                reaches.push(reach);
+                gap_uppers.push(gap_upper);
             }
         }
         let now: Vec<usize> = match order {
-            LockOrder::Gap => uncertified_largest(&gaps, &reaches),
+            LockOrder::Gap => uncertified_largest(&gaps, &gap_uppers),
             LockOrder::Ascending => gaps.iter().map(|&(station, _, _)| station).min().into_iter().collect(),
             LockOrder::Descending => gaps.iter().map(|&(station, _, _)| station).max().into_iter().collect(),
         };

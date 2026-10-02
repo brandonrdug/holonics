@@ -103,21 +103,23 @@ the laws that covector and its certified step stand on (the diagnosis record,
    per-move decrease (`window_length_lower`); a grain's decrease per window ends the chain
    (`grain_windows_bounded`) (§12).
 
-13. **The flip.** [proved-derived; formal-checked] A flip present on every small step defeats
+13. **The flip, a switch of a ring's all-or-nothing commitment.** [proved-derived;
+   formal-checked] A flip present on every small step defeats
    every first-order bound (`flip_defeats_first_order`); one at `η_c` needs a curvature constant
    of its cost over `η_c²` (`flip_curvature_lower`); a margin moving at a bounded rate certifies no
    flip within it (`no_flip_within_margin`); a visible cell end holds until the true reading reaches
    its cut and moves there (`cell_holds_until_cut`, `cell_moves_at_cut`), at a step set by the
    reading's place inside its cell (`cut_within_cell`) (§13).
 
-14. **The certified lock order.** [proved-derived; formal-checked] A station locks when no
-   station's certain gap exceeds its reach (`certifiedLock`): the largest certain gap locks
-   (`certifiedLock_largest`), the true largest gap locks (`leader_locks`), a lone lock has the
-   strictly largest true gap (`lone_lock_is_largest`), a certified order is swapped only by a
-   crossing (`certified_order_needs_crossing`), and exact readings give the largest gap with its
-   ties (`certifiedLock_exact`); the order term, the right station's certain gap against the wrong
-   stations' reaches, locks no wrong station where it is solved (`order_solved_locks_no_wrong`)
-   (§14).
+14. **The commitment order the readings resolve.** [proved-derived; formal-checked; the rule
+   itself agent-inferred] A ring commits when no ring's certain gap exceeds its upper end
+   (`certifiedLock`): rings whose gaps the readings cannot order commit together. The largest
+   certain gap commits (`certifiedLock_largest`), the true largest gap commits (`leader_locks`), a
+   lone commitment has the strictly largest true gap (`lone_lock_is_largest`), a resolved order is
+   swapped only by a crossing (`certified_order_needs_crossing`), and exact readings give the
+   largest gap with its ties (`certifiedLock_exact`); the order term, the right ring's certain gap
+   against the wrong rings' upper ends, commits no wrong ring where it is solved
+   (`order_solved_locks_no_wrong`) (§14).
 
 [open] (#62) The existence of the differentiable root path (the implicit function theorem at a
 simple root, from `Φ`'s strict differentiability), Jacobi's formula `∂_η det(λ − M − ηΔM) =
@@ -1769,15 +1771,20 @@ theorem grain_windows_bounded {f : ℕ → ℝ} {t : ℕ → ℕ} {W : ℕ} {h :
 
 end ReleaseGuard
 
-/-! ## 13. The flip: where the lock rule changes a decision, and what the move can certify
+/-! ## 13. The flip: where a ring's commitment switches, and what the move can certify
 
-The release locks, at each refinement, the eligible stations of the strictly largest gap
-`g_j = L_top − U_runner` (ties together), each `L`, `U` the end of the reading's dyadic bisection
-cell at the release's grain. The lock rule's **margin** at a refinement is the largest gap less the
-next (zero at a tie), with each locked station's threshold `L_top − 1` and gap beside it. A move
-**flips** a decision exactly where a margin's visible value changes sign or a tie splits; the
-flip's cost is the comparison re-read on the successor's sections against the incumbent's, the
-second sum of `own_telescopes`.
+Each station is a parametron ring and each candidate one of its sheets. A reading is the sheet's
+Floquet multiplier over one turn, its growth per cycle, known to the receiver only as a cell
+`[L, U]` of its dyadic bisection at the release's grain. Past the threshold (`L_top > 1`) the
+release commits a ring to its dominant sheet outright, the zero-temperature limit of the lock, and
+the rings commit in order of the gap `g_j = L_top − U_runner`, the dominant sheet's excess
+multiplier over its strongest rival. Each commitment places a datum the later rings read. The
+**margin** at a refinement is the largest gap less the next (zero at a tie), with each committed
+ring's threshold margin `L_top − 1` and gap beside it. Because the commitment is all or nothing, a
+move **flips** (switches a commitment) exactly where a margin's value at the cell ends changes sign
+or a tie splits. The code length then jumps by the comparison re-read on the successor's sections
+against the incumbent's, the second sum of `own_telescopes`: a jump set by which data are placed
+beside which, not by the step's length.
 
 What a native move can certify about it, each statement on one coordinate `η` of the move:
 - **No first-order bound survives a flip on every small step** (`flip_defeats_first_order`): a
@@ -1866,15 +1873,18 @@ theorem cut_within_cell {w x v : ℝ} (hw : 0 < w) (hv : 0 < v) :
 
 end Flip
 
-/-! ## 14. The lock order the readings certify
+/-! ## 14. The commitment order the readings resolve
 
-Each eligible station's gap is enclosed: its certain gap `lo j = L_top − max U` (the gap the
-release reads) and its reach `hi j = U_top − max L`. The rule that locks only the strictly largest
-certain gap orders two stations whose enclosures overlap by where their cells' cuts fall, which is
-`m7`'s swap. The release's other decisions (a top exceeds its rivals, a lock passes one) are
-certified orderings of enclosures; read the same way, a station is below the largest only when its
-reach is below the largest certain gap. **A station locks when no station's certain gap exceeds its
-reach** (`certifiedLock`). Then:
+Each eligible ring's gap (its dominant sheet's excess multiplier) is enclosed by the readings
+between its certain gap `lo j = L_top − max U`, the least they allow, and its upper end
+`hi j = U_top − max L`, the greatest. Committing only the strictly largest certain gap orders two
+rings whose enclosures overlap by where their cells' cuts fall, a quantity no reading carries:
+that is `m7`'s swap. Two gaps whose enclosures overlap have no order at the receiver's resolution,
+so their commitments are simultaneous for it, as two events closer than one tick have no order on
+that clock. The release's other decisions (a top exceeds its rivals, a ring passes its threshold)
+are orderings the enclosures resolve; read the same way, a ring is below the largest only when its
+upper end is below the largest certain gap. **A ring commits when no ring's certain gap exceeds its
+upper end** (`certifiedLock`). Then:
 - the station of the largest certain gap locks, so the rule is a nonempty lock set wherever one
   station is eligible (`certifiedLock_largest`), and §8's decisions law applies unchanged;
 - the true largest gap always locks (`leader_locks`);
@@ -1883,16 +1893,16 @@ reach** (`certifiedLock`). Then:
   cross (`certified_order_needs_crossing`);
 - on exact readings it is the largest gap with its ties, the rule as it stood
   (`certifiedLock_exact`);
-- the comparison's order term reads the same two ends, the right station's certain gap against
-  each wrong station's reach, so where it is solved no wrong station locks
+- the comparison's order term reads the same two ends, the right ring's certain gap against each
+  wrong ring's upper end, so where it is solved no wrong station locks
   (`order_solved_locks_no_wrong`): one law for the release and the term. -/
 
 section CertifiedLock
 
 variable {ι : Type*}
 
-/-- [definition; agent-inferred, October 2] **A station locks when no station's certain gap
-exceeds its reach.** Inferred: the release reads its other orderings of enclosures only where they
+/-- [definition; agent-inferred, October 2] **A ring commits when no ring's certain gap exceeds its
+upper end.** Inferred: the release reads its other orderings of enclosures only where they
 are certified and an uncertified one plural, and this reads the gap order the same way; no owner
 states that convention for the gap order. -/
 def certifiedLock (lo hi : ι → ℝ) (j : ι) : Prop := ∀ i, lo i ≤ hi j
@@ -1927,8 +1937,8 @@ theorem lone_lock_is_largest [Finite ι] [Nonempty ι] {lo hi g : ι → ℝ} (h
   obtain ⟨i, hi⟩ := not_forall.mp (hlone j hj)
   linarith [hhi j, hlo i, hm i, lt_of_not_ge hi]
 
-/-- [proved-derived; formal-checked] **A certified order is swapped only by a crossing**: if `j`'s
-reach is below `k`'s certain gap at one state and `j` locks alone at another, the true gaps cross:
+/-- [proved-derived; formal-checked] **A resolved order is swapped only by a crossing**: if `j`'s
+upper end is below `k`'s certain gap at one state and `j` locks alone at another, the true gaps cross:
 `g j < g k` before and `g′ k < g′ j` after. -/
 theorem certified_order_needs_crossing [Finite ι] [Nonempty ι] {lo hi g lo' hi' g' : ι → ℝ}
     (hlo : ∀ i, lo i ≤ g i) (hhi : ∀ i, g i ≤ hi i) (hlo' : ∀ i, lo' i ≤ g' i)
@@ -1936,9 +1946,9 @@ theorem certified_order_needs_crossing [Finite ι] [Nonempty ι] {lo hi g lo' hi
     (hlone : ∀ i, i ≠ j → ¬ certifiedLock lo' hi' i) : g j < g k ∧ g' k < g' j :=
   ⟨by linarith [hhi j, hlo k], lone_lock_is_largest hlo' hhi' hlone k (Ne.symm hjk)⟩
 
-/-- [proved-derived; formal-checked] **The order term solved locks no wrong station**: the right
-station `r`'s certain gap past the wrong stations' reaches together (each reach nonnegative) leaves
-every wrong station `j` short of `r`'s certain gap, so none locks. This is the order term's solved
+/-- [proved-derived; formal-checked] **The order term solved commits no wrong ring**: the right ring
+`r`'s certain gap past the wrong rings' upper ends together (each nonnegative) leaves every wrong
+ring `j`'s upper end short of `r`'s certain gap, so none commits. This is the order term's solved
 level (`hnn::executed::OrderTerm`) on the rule `certifiedLock`. -/
 theorem order_solved_locks_no_wrong {lo hi : ι → ℝ} (W : Finset ι) (r : ι)
     (hhi : ∀ j ∈ W, 0 ≤ hi j) (hsolved : ∑ j ∈ W, hi j < lo r) :

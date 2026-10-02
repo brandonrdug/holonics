@@ -1108,16 +1108,16 @@ fn the_order_is_solved_past_the_wrong_gaps_and_absent_without_a_right_top() {
     assert!(batch.requests[0].order_terms.is_empty());
 }
 
-/// **The order term reads each wrong sheet at its reach, the end the lock rule compares**: station
-/// 0 is right with enclosure `[5, 6]` over its rivals' `2` and `1` (certain gap `3`, reach `4`);
-/// station 1's top is wrong with `[4, 6]` (certain gap `2`, reach `4`); station 2 is right with
+/// **The order term reads each wrong sheet at its upper end, the end the lock rule compares**: station
+/// 0 is right with enclosure `[5, 6]` over its rivals' `2` and `1` (certain gap `3`, upper end `4`);
+/// station 1's top is wrong with `[4, 6]` (certain gap `2`, upper end `4`); station 2 is right with
 /// certain gap `5/2`. The certain gaps alone would call the order solved (`3 > 2`), yet the release
-/// locks the wrong station 1 with station 0 (its reach `4` meets the largest certain gap `3`). The
+/// locks the wrong station 1 with station 0 (its upper end `4` meets the largest certain gap `3`). The
 /// term reads `ℓ_o = ln((3 + 4)/3)`, not solved, in agreement with the lock rule. Narrowing station
-/// 1's top to `[4, 9/2]` (reach `5/2 < 3`) solves the order, and the release locks station 0 alone.
+/// 1's top to `[4, 9/2]` (upper end `5/2 < 3`) solves the order, and the release locks station 0 alone.
 #[test]
-fn the_order_term_reads_the_wrong_sheets_at_the_reach_the_lock_rule_compares() {
-    use crate::hnn::executed::GapRead;
+fn the_order_term_reads_the_wrong_sheets_at_the_upper_end_the_lock_rule_compares() {
+    use crate::hnn::executed::GapEnd;
     use crate::hnn::prediction::uncertified_largest;
     let batch_of = |top: Growth| {
         let growths = [
@@ -1146,11 +1146,11 @@ fn the_order_term_reads_the_wrong_sheets_at_the_reach_the_lock_rule_compares() {
     let gaps = [(0, 0, integer(3)), (1, 0, integer(2)), (2, 2, rat(5, 2))];
     let batch = batch_of(growth(integer(4), integer(6)));
     let order = batch.requests[0].order_terms[0].clone();
-    let sheets: Vec<(usize, usize, GapRead, Rat)> =
-        order.sheets.iter().map(|s| (s.station, s.runner, s.read, s.gap.clone())).collect();
+    let sheets: Vec<(usize, usize, GapEnd, Rat)> =
+        order.sheets.iter().map(|s| (s.station, s.runner, s.end, s.gap.clone())).collect();
     assert_eq!(
         sheets,
-        vec![(0, 1, GapRead::Certain, integer(3)), (1, 1, GapRead::Reach, integer(4))]
+        vec![(0, 1, GapEnd::Lower, integer(3)), (1, 1, GapEnd::Upper, integer(4))]
     );
     assert_eq!(
         order.sheets.iter().map(|s| s.weight.clone()).collect::<Vec<_>>(),

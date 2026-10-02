@@ -32,7 +32,7 @@
 //!   `HNN/ExecutedComparison.lockFace_enclosure_sublevel`) and is strictly stronger than the
 //!   release's per-rival predicate; read per station, never as an aggregate;
 //! - **order** (the machine's own refinements): the eligible stations and gap enclosures the
-//!   release read, every station whose reach meets the largest certain gap locking together; the
+//!   release read, every station whose upper end meets the largest certain gap locking together; the
 //!   lock is safe when every station it locks is correct ([`OrderReading`]);
 //! - **section**: the complete release, its termination and any refusal (`BankGeneration`).
 //!
@@ -1224,12 +1224,12 @@ fn site_reads<R: JointGrowth + Clone + Send + Sync>(
 /// The declared composition's terms at their sites, and their sums.
 /// [definition; agent-inferred, October 1; the
 /// [order's pin](../../../../research/records/2026-10-01_THE_ORDER_AS_A_TERM_OF_THE_COMPARISON_PINNED_BEFORE_ITS_RUN.md);
-/// the reach, October 2, the
+/// the gap's upper end, October 2, the
 /// [flip's record §5](../../../../research/records/2026-10-02_A_FLIP_IS_SET_BY_THE_LOCK_RULES_MARGIN_AND_NO_LAW_IN_THE_CHAIN_CERTIFIES_IT_BEFORE_THE_SUCCESSOR_IS_READ.md)]
 /// **One sheet of the order's lock**: a station eligible at the decision refinement (its top flips
 /// past every other candidate and locks), its term's index among the sites, its top, the rival its
-/// gap is read against, the gap read ([`GapRead`]: the right sheet's certain gap, a wrong sheet's
-/// reach, exactly the two ends the release's lock rule compares), its share `θ = gap/Σ_S gap` and
+/// gap is read against, the gap read ([`GapEnd`]: the right sheet's certain gap, a wrong sheet's
+/// upper end, exactly the two ends the release's lock rule compares), its share `θ = gap/Σ_S gap` and
 /// its covector weight `θ − [x = r]`.
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct OrderSheet {
@@ -1237,30 +1237,32 @@ pub struct OrderSheet {
     pub station: usize,
     pub top: usize,
     pub runner: usize,
-    pub read: GapRead,
+    pub end: GapEnd,
     pub gap: Rat,
     pub share: Rat,
     pub weight: Rat,
 }
 
-/// Which end of a station's gap enclosure an order sheet reads: the **certain gap**
-/// `L_top − max_(x≠top) U_x` (its rival the largest upper end) or the **reach**
-/// `U_top − max_(x≠top) L_x` (its rival the largest lower end); the release's lock rule locks a
-/// station whose reach meets the largest certain gap (`hnn::prediction`, Lean
+/// Which end of a station's gap enclosure an order sheet reads. The gap is the dominant sheet's excess
+/// Floquet multiplier over its strongest rival; the readings enclose it between the **certain gap**
+/// `L_top − max_(x≠top) U_x` (the least they allow, its rival the largest upper end) and the
+/// **upper end** `U_top − max_(x≠top) L_x` (the greatest, its rival the largest lower end); the
+/// release's lock rule locks a
+/// station whose upper end meets the largest certain gap (`hnn::prediction`, Lean
 /// `HNN/ExecutedComparison.certifiedLock`).
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
-pub enum GapRead {
-    Certain,
-    Reach,
+pub enum GapEnd {
+    Lower,
+    Upper,
 }
 
-/// [definition; agent-inferred, October 1; the reach, October 2] **The order term** (the pin
+/// [definition; agent-inferred, October 1; the gap's upper end, October 2] **The order term** (the pin
 /// above): at a request's decision refinement `r*` (the latest refinement its decision terms are
 /// read at), the eligible stations `E` with their gap enclosures `[lo, hi]`, the right ones `R`
 /// (top = target), `r = argmax_R lo` (the least station among ties) and the sheets
 /// `S = {r} ∪ (E ∖ R)`, `r` first, the right sheet read at its certain gap and each wrong sheet at
-/// its reach: `ℓ_o = log((lo_r + Σ_(E∖R) hi)/lo_r)`, enclosed; solved exactly when
-/// `lo_r > Σ_(E∖R) hi`, which makes `r`'s certain gap exceed every wrong station's reach, so the
+/// its upper end: `ℓ_o = log((lo_r + Σ_(E∖R) hi)/lo_r)`, enclosed; solved exactly when
+/// `lo_r > Σ_(E∖R) hi`, which makes `r`'s certain gap exceed every wrong station's upper end, so the
 /// release's lock rule locks no wrong station there (Lean
 /// `HNN/ExecutedComparison.order_solved_locks_no_wrong`); its excess `(ℓ_o − ln 2)_+`, zero where
 /// solved. On exact readings (`lo = hi`) it is the gap term the pin stated.
@@ -1305,14 +1307,14 @@ fn order_terms<R: JointGrowth>(
 }
 
 /// One eligible station at a refinement: its site index, station, top, its gap enclosure's two ends
-/// with their rivals (`(rival, value)` for the certain gap, then for the reach), and whether its top
+/// with their rivals (`(rival, value)` for the certain gap, then for the upper end), and whether its top
 /// is its target.
 struct Eligible {
     index: usize,
     station: usize,
     top: usize,
-    certain: (usize, Rat),
-    reach: (usize, Rat),
+    gap_lower: (usize, Rat),
+    gap_upper: (usize, Rat),
     right: bool,
 }
 
@@ -1347,8 +1349,8 @@ fn order_at<R: JointGrowth>(
                 index,
                 station: site.station,
                 top,
-                certain: (runner, &joints[top].lower - &joints[runner].upper),
-                reach: (nearest, &joints[top].upper - &joints[nearest].lower),
+                gap_lower: (runner, &joints[top].lower - &joints[runner].upper),
+                gap_upper: (nearest, &joints[top].upper - &joints[nearest].lower),
                 right: top == targets[site.station],
             });
         }
@@ -1356,28 +1358,28 @@ fn order_at<R: JointGrowth>(
     let Some(best) = eligible
         .iter()
         .filter(|e| e.right)
-        .max_by(|a, b| a.certain.1.cmp(&b.certain.1).then(b.station.cmp(&a.station)))
+        .max_by(|a, b| a.gap_lower.1.cmp(&b.gap_lower.1).then(b.station.cmp(&a.station)))
     else {
         return Ok(None);
     };
-    // The right sheet at its certain gap, each wrong sheet at its reach.
-    let members: Vec<(&Eligible, GapRead, &(usize, Rat))> = std::iter::once((best, GapRead::Certain, &best.certain))
-        .chain(eligible.iter().filter(|e| !e.right).map(|e| (e, GapRead::Reach, &e.reach)))
+    // The right sheet at its certain gap, each wrong sheet at its upper end.
+    let members: Vec<(&Eligible, GapEnd, &(usize, Rat))> = std::iter::once((best, GapEnd::Lower, &best.gap_lower))
+        .chain(eligible.iter().filter(|e| !e.right).map(|e| (e, GapEnd::Upper, &e.gap_upper)))
         .collect();
     let total: Rat = members.iter().map(|(_, _, (_, gap))| gap.clone()).sum();
-    let right = &best.certain.1;
+    let right = &best.gap_lower.1;
     let wrong = &total - right;
     let sheets = members
         .iter()
         .enumerate()
-        .map(|(x, (e, read, (runner, gap)))| {
+        .map(|(x, (e, end, (runner, gap)))| {
             let share = gap / &total;
             OrderSheet {
                 site: e.index,
                 station: e.station,
                 top: e.top,
                 runner: *runner,
-                read: *read,
+                end: *end,
                 gap: gap.clone(),
                 weight: if x == 0 { &share - &one } else { share.clone() },
                 share,
