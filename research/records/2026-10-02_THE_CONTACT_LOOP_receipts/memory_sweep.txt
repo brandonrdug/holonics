@@ -1,0 +1,59 @@
+== transport-memory 2 (modulus 1 - 2^-2)
+held out: cells 4958..6148 (1190 cells, the manifest's range or the declared tail); training: cells 0..4958
+training: 4958 targets
+  the model is below PPM order 2; model − PPM order 2: at L_R = 16: -1192 + 15/16 + ε, ε ∈ [804307751922098524885204403/2^96, 804307752118455148841142861/2^96] ⊂ [0, 1/16)
+  L_C − L_T, the combined face (tree + wave) against the tree's executed face: below it; at L_R = 16: -27 + 12/16 + ε, ε ∈ [297846455738571527866486243/2^95, 595692911477163649181653189/2^96] ⊂ [0, 1/16)
+held out: 1190 targets
+  the model is below PPM order 2; model − PPM order 2: at L_R = 16: -438 + 13/16 + ε, ε ∈ [2958618550623245650873666531/2^96, 1479309275366435006758903701/2^95] ⊂ [0, 1/16)
+  L_C − L_T, the combined face (tree + wave) against the tree's executed face: above it; at L_R = 16: 9 + 3/16 + ε, ε ∈ [104713212208840805989327089/2^93, 26178303052210356432204829/2^91] ⊂ [0, 1/16)
+wall time (exterior): setup 45 ms; exposure 749104 ms over 3074 windows (per window 243 rem 2122 over 3074, in ms)
+resident set (exterior, /proc/self/status): now 338608128 bytes, peak 398364672 bytes
+exit 0 wall 749683 ms
+== transport-memory 3 (modulus 1 - 2^-3)
+held out: cells 4958..6148 (1190 cells, the manifest's range or the declared tail); training: cells 0..4958
+training: 4958 targets
+  the model is below PPM order 2; model − PPM order 2: at L_R = 16: -1230 + 10/16 + ε, ε ∈ [1688516567593917588225814821/2^96, 422129141948842502427104581/2^94] ⊂ [0, 1/16)
+  L_C − L_T, the combined face (tree + wave) against the tree's executed face: below it; at L_R = 16: -65 + 7/16 + ε, ε ∈ [1479900287424711535809436101/2^96, 1479900287424732118360464541/2^96] ⊂ [0, 1/16)
+held out: 1190 targets
+  the model is below PPM order 2; model − PPM order 2: at L_R = 16: -444 + 3/16 + ε, ε ∈ [1331991664551327108854989525/2^96, 665995832330385922553507903/2^95] ⊂ [0, 1/16)
+  L_C − L_T, the combined face (tree + wave) against the tree's executed face: above it; at L_R = 16: 2 + 8/16 + ε, ε ∈ [1040498697499331634419827121/2^94, 2080997394998665745467869721/2^95] ⊂ [0, 1/16)
+wall time (exterior): setup 45 ms; exposure 774713 ms over 3074 windows (per window 252 rem 65 over 3074, in ms)
+resident set (exterior, /proc/self/status): now 315203584 bytes, peak 359555072 bytes
+exit 0 wall 775361 ms
+== transport-memory 4 (modulus 1 - 2^-4)
+held out: cells 4958..6148 (1190 cells, the manifest's range or the declared tail); training: cells 0..4958
+training: 4958 targets
+  the model is below PPM order 2; model − PPM order 2: at L_R = 16: -1239 + 15/16 + ε, ε ∈ [1329857973546803423589019075/2^96, 1329857973748769772543446619/2^96] ⊂ [0, 1/16)
+  L_C − L_T, the combined face (tree + wave) against the tree's executed face: below it; at L_R = 16: -74 + 12/16 + ε, ε ∈ [280310423344463581983393235/2^94, 70077605836117180741516777/2^92] ⊂ [0, 1/16)
+held out: 1190 targets
+  the model is below PPM order 2; model − PPM order 2: at L_R = 16: -448 + 1/16 + ε, ε ∈ [575742222761588858632904195/2^95, 575742222816306255533607323/2^95] ⊂ [0, 1/16)
+  L_C − L_T, the combined face (tree + wave) against the tree's executed face: below it; at L_R = 16: -2 + 6/16 + ε, ε ∈ [3981487570969172188991478957/2^96, 3981487570969177135834660871/2^96] ⊂ [0, 1/16)
+wall time (exterior): setup 45 ms; exposure 803095 ms over 3074 windows (per window 261 rem 781 over 3074, in ms)
+resident set (exterior, /proc/self/status): now 394891264 bytes, peak 413601792 bytes
+exit 0 wall 803810 ms
+== transport-memory 5 (modulus 1 - 2^-5)
+held out: cells 4958..6148 (1190 cells, the manifest's range or the declared tail); training: cells 0..4958
+training: 4958 targets
+  the model is below PPM order 2; model − PPM order 2: at L_R = 16: -1239 + 12/16 + ε, ε ∈ [997303078262989496924541287/2^94, 997303078313595708971127531/2^94] ⊂ [0, 1/16)
+  L_C − L_T, the combined face (tree + wave) against the tree's executed face: below it; at L_R = 16: -74 + 9/16 + ε, ε ∈ [3780596032883238205805682329/2^96, 945149008220814695262274591/2^94] ⊂ [0, 1/16)
+held out: 1190 targets
+  the model is below PPM order 2; model − PPM order 2: at L_R = 16: -453 + 15/16 + ε, ε ∈ [4580838172944696506151190961/2^96, 2290419086527209526511520711/2^95] ⊂ [0, 1/16)
+  L_C − L_T, the combined face (tree + wave) against the tree's executed face: below it; at L_R = 16: -6 + 5/16 + ε, ε ∈ [2459081141249313741951415899/2^96, 614770285312329674305578273/2^94] ⊂ [0, 1/16)
+wall time (exterior): setup 44 ms; exposure 834602 ms over 3074 windows (per window 271 rem 1548 over 3074, in ms)
+resident set (exterior, /proc/self/status): now 333565952 bytes, peak 374136832 bytes
+exit 0 wall 835318 ms
+== transport-memory 6 (modulus 1 - 2^-6)
+held out: cells 4958..6148 (1190 cells, the manifest's range or the declared tail); training: cells 0..4958
+training: 4958 targets
+  the model is below PPM order 2; model − PPM order 2: at L_R = 16: -1238 + 7/16 + ε, ε ∈ [1282920695761526875789794241/2^95, 641460347931431445242807231/2^94] ⊂ [0, 1/16)
+  L_C − L_T, the combined face (tree + wave) against the tree's executed face: below it; at L_R = 16: -73 + 4/16 + ε, ε ∈ [2357225111354457541992276071/2^96, 2357225111354478099950495649/2^96] ⊂ [0, 1/16)
+held out: 1190 targets
+  the model is below PPM order 2; model − PPM order 2: at L_R = 16: -454 + 9/16 + ε, ε ∈ [764069222285929115023377707/2^95, 764069222340845935712483149/2^95] ⊂ [0, 1/16)
+  L_C − L_T, the combined face (tree + wave) against the tree's executed face: below it; at L_R = 16: -8 + 14/16 + ε, ε ∈ [272383848126128263066764717/2^92, 4358141570018057171585872627/2^96] ⊂ [0, 1/16)
+wall time (exterior): setup 44 ms; exposure 875680 ms over 3074 windows (per window 284 rem 2664 over 3074, in ms)
+resident set (exterior, /proc/self/status): now 366571520 bytes, peak 384847872 bytes
+exit 0 wall 876553 ms
+== transport-memory 8 (modulus 1 - 2^-8)
+held out: cells 4958..6148 (1190 cells, the manifest's range or the declared tail); training: cells 0..4958
+exit 124 wall 900025 ms
+args: hnn_exposure transport-memory k (main 8f963a8c plus the argument; campaign 1 at the prior mass 2^-3), six runs together, one thread each; projection 687 s (the lossless run's 686,915 ms), deadline 900 s each; k = 8 passed its deadline and is incomplete (the leaky record grows with the memory: k = 2..6 took 749,683 to 876,553 ms)

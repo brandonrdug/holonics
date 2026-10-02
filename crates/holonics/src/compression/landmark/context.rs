@@ -87,7 +87,8 @@
 //!
 //! [definition; proved-derived, formal-checked] **The prior mass** ([`LandmarkDeclaration::mass`],
 //! `j ≥ 1`). Each digit's two masses start at one half-unit and an arrival adds `2^j` (the deposit's
-//! unit, `Arena::count`; the card's `hnn_tree_deposit` adds `TreeLaw.unit` alike), so the node's face
+//! unit: the executed tree's [`Landmarks::deposit`] through `Law`'s unit, the ideal tree's
+//! `Arena::count`; the card's `hnn_tree_deposit` adds `TreeLaw.unit` alike), so the node's face
 //! is `(2^j n_b + 1)/(2^j n + 2)`: the Pólya urn at weight `2^(−j)` per digit value, KT at `j = 1`
 //! (Lean `Compression/Landmark/Context/PriorMass.{priorMass_face, massLaw_read}`). Against KT it costs
 //! at most `j − 1` bits a node at every count (`priorMass_ge_kt`, `priorMass_code_le_kt`), so its
@@ -97,8 +98,8 @@
 //! `2^j + 1` arrivals cost at most 2 bits together (`priorMass_one_sided_ge_kt`,
 //! `priorMass_one_sided_two_bits`). Its floor is `1/(2^j n* + 2)` at the node and along the
 //! opened path under any stop weights (`priorMass_face_ge`, `priorMass_digit_face_ge`), which
-//! widens the lattice by `j − 1` bits ([`face_bits`]). The rung is chosen on the development cells
-//! from the ladder `j = 1..8` and charged 3 bits, a valid two-part code for any choice
+//! widens the lattice by at most `j − 1` bits ([`face_bits`]). The rung is chosen on the
+//! development cells from the ladder `j = 1..8` and charged 3 bits, a valid two-part code for any choice
 //! (`priorMass_two_part`). A register's ceiling stays on KT's half-unit masses.
 //!
 //! [definition] **Typed address letters** ([`Letter`]): `Boundary` (before the cut's first cell),
@@ -617,7 +618,7 @@
 //! | the ideal tree weighting (the oracle) | `Compression/Landmark/Context/Tree.{landmark_step, mixture_is_probability, kraft_and_dominance, sequential_mixture}` | [`IdealLandmarks`] |
 //! | the declared stop prior: the mixture over pruned trees with its prior, the weights summing to one, the dominance, the founding at `β₀ = 2^(j_d) − 1` and the step unchanged; `½` the corollary | `Compression/Landmark/Context/Tree.{stop_mixture_over_trees, PrunedTree.prior_const, PrunedTree.prior_sum, stop_kraft_and_dominance, stop_weight_step, stop_ratio_step, stop_founding_step, ladder_founding, stopWeight_half}` | [`StopPrior`], [`LandmarkDeclaration::prior`], the founding charts (`Law::founding`, [`ArenaView::founding`]), [`IdealLandmarks`] |
 //! | the prior chosen on the development cells, charged `⌈log₂⌉` of the laws and of each law's depths | (a measurement, not a theorem) | [`ladder_top`], [`prior_family`]; the sweeps were the exposure's (`hnn::reference::{choose_prior, choose_depth_within, PriorSweep}`, retired September 30, batch H, at `f5fd8f3b`) |
-//! | the prior mass: the face at `2^(−j)` is the Pólya urn and a node law, at most `j − 1` bits over KT at every count, the regret against the best fixed digit probability at most `½ log₂ n + j` (KT's `½ log₂ n + 1`), the one-sided gain, the floor `1/(2^j n* + 2)`, and the ladder `j = 1..8` charged 3 bits a valid two-part code | `Compression/Landmark/Context/PriorMass.{priorMass_face, massLaw_read, priorMass_ge_kt, priorMass_code_le_kt, kt_regret, priorMass_regret_bits, priorMass_one_sided_ge_kt, priorMass_one_sided_two_bits, priorMass_face_ge, priorMass_digit_face_ge, two_part_kraft, priorMass_two_part}` | [`LandmarkDeclaration::mass`], `Arena::count`, [`face_bits`]; the card's `holonics_cuda::hnn::tree::CardTree` (`hnn_tree_deposit`) |
+//! | the prior mass: the face at `2^(−j)` is the Pólya urn and a node law, at most `j − 1` bits over KT at every count, the regret against the best fixed digit probability at most `½ log₂ n + j` (KT's `½ log₂ n + 1`), the one-sided gain, the floor `1/(2^j n* + 2)`, and the ladder `j = 1..8` charged 3 bits a valid two-part code | `Compression/Landmark/Context/PriorMass.{priorMass_face, massLaw_read, priorMass_ge_kt, priorMass_code_le_kt, kt_regret, priorMass_regret_bits, priorMass_one_sided_ge_kt, priorMass_one_sided_two_bits, priorMass_face_ge, priorMass_digit_face_ge, two_part_kraft, priorMass_two_part}` | [`LandmarkDeclaration::mass`], [`Landmarks::deposit`] (`Law`'s unit), `Arena::count`, [`face_bits`]; the card's `holonics_cuda::hnn::tree::CardTree` (`hnn_tree_deposit`) |
 //! | a population's code is its faces' product, enclosed once | (a certified reading: integer bounds and the certified logarithm) | [`PassageCode`], [`ProductBound`] |
 //! | the stop-weight mixture per digit tree: the mixture over (law, pruned tree), its prior complete, within `−log₂ π_k − log₂ prior_(w_k)(S)`; the joins telescope to the Bayesian mixture, the executed chart's drift once | `Compression/Landmark/Context/LocalWeighing.{stop_mixture_per_tree, static_mixture, forward_executed}` | [`StopMixture`], [`JoinTree`], [`FaceJoins`] |
 //! | a window's phases in cell order: each reads the standing after the earlier phases' deposits | `Compression/Landmark/Context/Tree.{landmark_step, treeWeight_arrive_off}` | [`Landmarks::window`], [`Window`] |

@@ -1034,9 +1034,17 @@ aeon to within two bits
 **The law** (`compression::landmark::context`, `LandmarkDeclaration::mass`; the card's kernel
 mirrors it). A node's two masses start at `2^(−j)`, so its face is `(2^j n_b + 1)/(2^j n + 2)`, KT at
 `j = 1`. Its floor is `1/(2^j n* + 2)`, so the path lattice `M_p` widens by `j − 1` bits (`41` for
-campaign 1 at `j = 3`); the rule, the certificates and the exact normalization are unchanged
-(`the_prior_mass_reads_its_masses_and_keeps_the_rule`). A register's ceiling stays on KT's
-half-unit masses and is refused at another mass.
+campaign 1 at `j = 3`); the exact normalization holds and the test reads the executed faces within
+the rule and their certificates (`the_prior_mass_reads_its_masses_and_keeps_the_rule`). [Edit,
+October 2: the rule's derivation rests on the path-level floor, which Lean states for KT only
+(`digit_face_ge`); its statement at mass `2^(−j)` is owed in #62.] A register's ceiling stays on
+KT's half-unit masses and is refused at another mass.
+
+**Where the gain and the cost sit** (the Lean thread's per-node bounds, #166). At rung `j` a node
+costs at most `j − 1` bits more than KT, the worst case on balanced counts; a node that only ever
+sees one digit value is never worse than KT and pays at most two bits for its first `2^j + 1`
+arrivals. The 246 bits below come from skewed, recurring contexts, and one global `j` trades them
+against balanced nodes.
 
 **The choice, by the declared stop prior's method** (the September 26 record, §1: development cells
 only, the family charged). The family is the dyadic ladder `j = 1..B`, `B = 8` the odometer digits:
@@ -1053,7 +1061,10 @@ ladder`, 1,333 ms):
 The development cells choose `j = 3`, charged `⌈log₂ 8⌉ = 3` bits. Campaign 1 declares it
 (`FieldDeclaration::campaign_one`, coded in the field's description). In the replica a mixture of the
 eight masses in each digit tree, the stop mixture's own form, codes 18 bits below the chosen mass over
-the cut: a lead, not adopted.
+the cut: a lead, not adopted. On the choosing cut (§26) the same replica's mixture codes
+`15466633/2^4` bits on the development cells and `9179687/2^6` held out, against `j = 3`'s
+`15503406/2^4` and `9191720/2^6`: about 2,298 and 188 bits less, a quarter and an eighth of a
+percent. It would carry eight trees and their joins on host and card for that.
 
 **The gate: campaign 1's exposure at `n*`**
 ([exposure](2026-10-02_THE_CONTACT_LOOP_receipts/prior_mass_exposure.txt), 686,915 ms against
@@ -1089,3 +1100,37 @@ tree's own estimator, not from the wave, the contacts or the receiver. The wave'
   half stays. Depths 3, 4, 5, 6 and 8 code `9293089/2^9`, `9195040/2^9`, `9192629/2^9`,
   `9192086/2^9` and `9191120/2^9`: past depth 4 the gain is at most eight bits over the development
   cells, below what a depth sweep's charge and a deeper tree's storage cost, so depth 4 stays.
+
+## 26. The prior mass transfers; the wave's share is not a matter of memory
+
+**The prior mass on larger, reserve-excluded cuts**
+([receipt](2026-10-02_THE_CONTACT_LOOP_receipts/prior_mass_transfer.txt); the tree alone, the
+receiver's declaration at each rung, about 16 s a pass). The choosing cut (523,215 cells, its last
+65,464 held out) chooses `j = 3` again: development `968962 + 14/16 + ε` bits against KT's
+`992822 + 7/16 + ε`, held out `143620 + 10/16 + ε` against `145441 + 8/16 + ε`, and `j = 3` is the
+least held-out rung too. The validation cut's confirmation pass, KT against `j = 3`, reads
+`137529 + 2/16 + ε` and `136046 + 1/16 + ε` bits held out. The gain shrinks with the passage (about
+a hundredth of the held-out code at half a million cells against a fifteenth at 6,148), as it
+should: a node's counts grow and its prior matters less. The wide cut (`2^20` cells) does not name
+the development reserve as excluded, so its read is refused and was not forced.
+
+**The source's memory against the wave's share** ([receipt](2026-10-02_THE_CONTACT_LOOP_receipts/memory_sweep.txt);
+the leaky count at `ρ = 1 − 2^(−k)`, a memory of about `2^k` of ring 0's ticks, campaign 1 at the
+prior mass `2^(−3)`, a diagnostic sweep, not a law):
+
+| Memory `2^k` ticks | 4 | 8 | 16 | 32 | 64 | all (lossless) |
+|---|---|---|---|---|---|---|
+| held out, the wave's contribution (bits, `+ ε`) | `+9 + 3/16` | `+2 + 8/16` | `−2 + 6/16` | `−6 + 5/16` | `−8 + 14/16` | `−6 + 3/16` |
+| held out, model − PPM-2 | `−438 + 13/16` | `−444 + 3/16` | `−448 + 1/16` | `−453 + 15/16` | `−454 + 9/16` | `−453 + 13/16` |
+
+`k = 8` passed its 900 s deadline and is incomplete: the leaky record grows with the memory.
+Short memories hurt (they repeat the depth-4 tree), and from 32 ticks on the wave's share stays
+between six and nine bits held out. The best, 64 ticks, is less than three bits better than the
+lossless open. No memory scale gives the wave a share worth a law.
+
+[agent-inferred] Together with §23–24 and campaign 2's letters (the record of September 26: no
+phase or lock letter carries information beyond the preceding cells), this locates the medium's
+limit on text at this scale. The anchors, phases and locks are driven by the clock and by the
+passage's counts; what is specific to the content reaches the receiver through the tree's cell
+letters. Campaign 1 keeps the lossless open and the prior mass `2^(−3)`. A larger share for the
+medium needs a different entry of the source into the field, not a better receiver or memory.

@@ -1,0 +1,4 @@
+1 development 15885159/2^4 held out 9308256/2^6 17 s
+3 development 15503406/2^4 held out 9191720/2^6 17 s
+mix development 15466633/2^4 held out 9179687/2^6 176 s
+args: tree_estimator.py's count face (ctw_codes, digit_tree_mixture) over .local/cuts/curated-u6-choosing-flat-cut.bin, held out from 457,751; each a separate process; the alpha = 2^-3 row matches the machine's development code (968962 + 14/16 + eps) within a bit
