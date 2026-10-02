@@ -50,13 +50,13 @@ an exterior target. It is kept, unrenamed, for the internal loci.
    next solve is `B'H'⁻¹ = W + (T − WF)H'⁻¹`, and it is the only map solving `W'H' = B'`.
    `exogenous_chart_residual` (and its `ℚ` certificate `exogenous_chart_certificate`, in
    `HNN/LatticeWord`'s `rowNorm`): the executed chart step leaves exactly the chart's left
-   residual. `exogenousDeposit_solves`: the receiving locus's deposit on its window is solved.
+   residual. `exogenousDeposit_solves`: the receiving locus's deposit on what reached it is solved.
    `prior_weight_identity`, `prior_decay_fixed_target`, `prior_weight_eigen`: the prior's weight
    is `W_0 H_0 H_n⁻¹`; under a fixed exact target it is the whole deviation; at `H_0 = 1` it is
    `1/(1 + λ)` along an eigen-direction of eigenvalue `λ ≥ 0`.
-   `normal_statistic_future_sufficient`: the next map is a function of `(H, B)` and the window,
-   and `W` alone is not sufficient (`W = 0`, `B = 0`, `H = 1` versus `H = 2`, one sample
-   `f = y = 1`: `1/2` versus `1/3`).
+   `normal_statistic_future_sufficient`: the next map is a function of `(H, B)` and what reaches
+   the locus, and `W` alone is not sufficient (`W = 0`, `B = 0`, `H = 1` versus `H = 2`, one
+   sample `f = y = 1`: `1/2` versus `1/3`).
 
 [open] Descent of the scored cross-entropy face is **not** claimed. The quadratic objective this
 law minimizes is the squared additive-chart log ratio against the declared code face, named as
@@ -345,13 +345,14 @@ section Exogenous
 variable {𝕜 : Type*} [Field 𝕜] {σ τ : Type*} [Fintype σ] [DecidableEq σ]
 
 /-- [definition] **The exogenous step** executed at a chart `X` of `H'⁻¹`: `W + (T − W F) X`. The
-innovation `T − W F` is the window's target cross moment less the map's own prediction of it. -/
+innovation `T − W F` is the target cross moment of what reached the locus less the map's own
+prediction of it. -/
 def exogenousStep (W : Matrix τ σ 𝕜) (F : Matrix σ σ 𝕜) (T : Matrix τ σ 𝕜)
     (X : Matrix σ σ 𝕜) : Matrix τ σ 𝕜 :=
   W + (T - W * F) * X
 
 /-- [proved-derived; formal-checked] **The exogenous normal step.** At a solved locus `W H = B`,
-with the window's Gram `F = Σ w f fᵀ` and target cross moment `T = Σ w χ_R(T) fᵀ`, and
+with the Gram of what reached it `F = Σ w f fᵀ` and its target cross moment `T = Σ w χ_R(T) fᵀ`, and
 `H' = H + F` invertible:
 * the next solve is `B' H'⁻¹ = W + (T − W F) H'⁻¹`, `B' = B + T`;
 * it is the only map solving `W' H' = B'`.
@@ -404,14 +405,14 @@ theorem proxy_target_innovation (W : Matrix τ σ 𝕜) (w γ : 𝕜) (f : σ �
     w • vecMulVec (W *ᵥ f + γ • g) f - W * (w • vecMulVec f f) = (w * γ) • vecMulVec g f := by
   rw [proxCross_eq, add_sub_cancel_left]
 
-/-- [definition] **The receiving window** of the exogenous law: each reached comparison's weight,
-feature and target code face `χ_R(T) = m·e_t`. Its `windowGram` is `F` and its `windowCovector`
-(the window's cross moment, here against the target face) is `T`. -/
+/-- [definition] **What reaches the receiving locus** under the exogenous law: each reached
+comparison's weight, feature and target code face `χ_R(T) = m·e_t`. Its `windowGram` is `F` and
+its `windowCovector` (the cross moment of what reached it, here against the target face) is `T`. -/
 def targetWindow (m : ℕ) (data : List (𝕜 × (σ → 𝕜) × τ)) [DecidableEq τ] : Window 𝕜 σ τ :=
   data.map fun d => (d.1, d.2.1, codeFace m d.2.2)
 
-/-- [definition] **The receiving locus's exogenous deposit**: the statistic sums over the window,
-`(H, B) ← (H + F, B + T)`, and the map is the exogenous step at the exact inverse. The executed
+/-- [definition] **The receiving locus's exogenous deposit**: the statistic sums over what reached
+it, `(H, B) ← (H + F, B + T)`, and the map is the exogenous step at the exact inverse. The executed
 form replaces `(H + F)⁻¹` by the certified chart (`exogenous_chart_residual`). -/
 def exogenousDeposit (θ : LocusState 𝕜 σ τ) (data : Window 𝕜 σ τ) : LocusState 𝕜 σ τ where
   map := exogenousStep θ.map (windowGram data) (windowCovector data)
@@ -489,7 +490,7 @@ theorem prior_weight_eigen {K : Type*} [Field K] [LinearOrder K] [IsStrictOrdere
 
 /-- [proved-derived; formal-checked] **`(H, B)` is future-sufficient; the map alone is not.**
 * Two solved maps of one statistic, `W₁ H = B = W₂ H`, take the same next map at every future
-  window `(F, T)` with `H + F` invertible, namely `(B + T)(H + F)⁻¹`; the next statistic is
+  arrival `(F, T)` with `H + F` invertible, namely `(B + T)(H + F)⁻¹`; the next statistic is
   `(H + F, B + T)`. The future solutions are a function of `(H, B)`.
 * The map alone is not sufficient: on `ℚ¹`, the states `W = 0, H = 1, B = 0` and
   `W = 0, H = 2, B = 0` are both solved with one map, and one sample `w = f = y = 1`

@@ -9,8 +9,9 @@ import Holonics.Transport.SourceMoment
 
 [definition] Item 4 of the step 4 design (`docs/plans/THE_REBUILD.md`, "The laws stated in Lean
 first"). Every learned map of the HNN is one **locus** `U` with its own normal law `W_U H_U = B_U`
-and its own statistics; there is no global Gram. A deposit reads, at the ticks of the locus's
-diamond window, a weight `w`, a feature `f_t` and a covector `g_t`:
+and its own statistics; there is no global Gram. A deposit reads what reaches the locus inside its
+causal diamond: at each tick a covector reaches it, a weight `w`, a feature `f_t` and the covector
+`g_t`:
 
 ```text
 H_U ← H_U + Σ_t w f_t f_tᵀ ,   B_U ← B_U + Σ_t w (W_U f_t + γ_U g_t) f_tᵀ ,   W_U H_U = B_U
@@ -40,12 +41,13 @@ transposes. The complex chart of the same identities is the owner
    `normalResidual_preserved_of_gain_receipt` with `normalProxyTarget_residual_eq_scaled_covector`
    (`normal_prox_step_complex`). The solved state `W H = B` and the invertible Gram are
    load-bearing (`normal_prox_step_needs_the_solve`, `normal_prox_step_needs_invertible_gram`).
-3. **Deposition is per locus** (`deposit_local`). A locus with an empty diamond window keeps its
-   map and statistics; a locus whose covectors all vanish keeps its map while its Gram grows; each
-   locus reads only its own window; a Gram entry `(i, j)` moves only where some window feature is
-   nonzero at both `i` and `j`. The solved state is carried by a deposit (`depositLocus_solves`).
-   The complex chart iterates the owner's `normal_law_local` (`deposit_local_complex`). A nonempty
-   window with a nonzero covector moves the map (`nonempty_window_moves_the_map`).
+3. **Deposition is per locus** (`deposit_local`). A locus that nothing reaches inside its causal
+   diamond keeps its map and statistics; a locus whose covectors all vanish keeps its map while its
+   Gram grows; each locus reads only what reaches it; a Gram entry `(i, j)` moves only where some
+   feature that reached the locus is nonzero at both `i` and `j`. The solved state is carried by a
+   deposit (`depositLocus_solves`). The complex chart iterates the owner's `normal_law_local`
+   (`deposit_local_complex`). A nonzero covector reaching the locus moves its map
+   (`nonempty_window_moves_the_map`).
 4. **Reaction deposits do no deposition work** (`reaction_deposit_storage_unchanged`): a deposit
    that changes only the reaction material leaves the storage `Q`, so the owner's `commit_balance`
    loses its work term and is the word balance; with passive words the owner's
@@ -84,11 +86,11 @@ transposes. The complex chart of the same identities is the owner
    declared lobes (`channel_fixed_node`).
 7. **The certified normal step** (`certified_normal_step`, September 29). The deposit at step `η`
    is `W' = W + η D` with the unit step `D = (Σ_t w g_t f_tᵀ) H'⁻¹`; its first-order decrease
-   `a = Σ_t w ⟨g_t, D f_t⟩` is the chart's quadratic form on the rows of the window covector
-   (`window_alignment_eq`, `frobenius_chart`), so `a ≥ 0` at a positive semidefinite invertible
-   carried Gram (`inv_psd`): the solved chart descends. The step `η` itself is the owner's
-   `Holon/Deposition.certified_step_descends`; the running chart `X̂` is the lattice's refined
-   solve, so the machine checks `a ≥ 0` rather than assuming it.
+   `a = Σ_t w ⟨g_t, D f_t⟩` is the chart's quadratic form on the rows of the covector that reached
+   the locus, `Σ_t w g_t f_tᵀ` (`window_alignment_eq`, `frobenius_chart`), so `a ≥ 0` at a positive
+   semidefinite invertible carried Gram (`inv_psd`): the solved chart descends. The step `η` itself
+   is the owner's `Holon/Deposition.certified_step_descends`; the running chart `X̂` is the
+   lattice's refined solve, so the machine checks `a ≥ 0` rather than assuming it.
 
 [definition; agent-inferred] **What runs is the carried law** (Decision 22 of the step 4 design).
 The laws here are exact, and a map that is an operand of its own covector grows in bits under them.
@@ -321,7 +323,7 @@ theorem normal_prox_step_complex {Source Target : Type*} [Fintype Source] [Finty
 
 end Prox
 
-/-! ## 3. Deposition acts per locus, inside its diamond window -/
+/-! ## 3. Deposition acts per locus, on what reaches it inside its causal diamond -/
 
 section Local
 
@@ -333,19 +335,20 @@ structure LocusState (𝕜 σ τ : Type*) where
   gram : Matrix σ σ 𝕜
   cross : Matrix τ σ 𝕜
 
-/-- [definition] A locus's window data: `(w, f_t, g_t)` at each tick of its diamond window. -/
+/-- [definition] What reaches a locus: `(w, f_t, g_t)` at each tick at which a covector reaches it
+inside its causal diamond. -/
 abbrev Window (𝕜 σ τ : Type*) := List (𝕜 × (σ → 𝕜) × (τ → 𝕜))
 
-/-- [definition] The window Gram `Σ_t w f_t f_tᵀ`. -/
+/-- [definition] The Gram of the features that reached the locus, `Σ_t w f_t f_tᵀ`. -/
 def windowGram (data : Window 𝕜 σ τ) : Matrix σ σ 𝕜 :=
   (data.map fun d => d.1 • vecMulVec d.2.1 d.2.1).sum
 
-/-- [definition] The window covector `Σ_t w g_t f_tᵀ`. -/
+/-- [definition] The covector that reached the locus, `Σ_t w g_t f_tᵀ`. -/
 def windowCovector (data : Window 𝕜 σ τ) : Matrix τ σ 𝕜 :=
   (data.map fun d => d.1 • vecMulVec d.2.2 d.2.1).sum
 
-/-- [definition] **The deposit of one locus** with proxy step `γ`: the statistics sum over the
-window only, and the map is the prox solve `W + γ (Σ w g fᵀ) H'⁻¹`. -/
+/-- [definition] **The deposit of one locus** with proxy step `γ`: the statistics sum only over
+what reached it, and the map is the prox solve `W + γ (Σ w g fᵀ) H'⁻¹`. -/
 def depositLocus (γ : 𝕜) (θ : LocusState 𝕜 σ τ) (data : Window 𝕜 σ τ) : LocusState 𝕜 σ τ where
   map := θ.map + γ • windowCovector data * (θ.gram + windowGram data)⁻¹
   gram := θ.gram + windowGram data
@@ -401,10 +404,13 @@ theorem windowGram_apply_eq_zero (data : Window 𝕜 σ τ) (i j : σ)
 
 /-- [proved-derived; formal-checked] **Deposition is per locus.** For a family of loci, each with
 its own feature and target widths, the deposit at locus `ℓ`:
-* reads only `ℓ`'s own state and window (two families agreeing there deposit identically there);
-* leaves `ℓ` unchanged when its diamond window is empty;
-* keeps `ℓ`'s map when no covector reached it, although its Gram grows by the window's features;
-* moves a Gram entry `(i, j)` only where some window feature is nonzero at both `i` and `j`. -/
+* reads only `ℓ`'s own state and what reached it (two families agreeing there deposit identically
+  there);
+* leaves `ℓ` unchanged when nothing reaches it inside its causal diamond;
+* keeps `ℓ`'s map when every covector that reached it is zero, although its Gram grows by the
+  features that reached it;
+* moves a Gram entry `(i, j)` only where some feature that reached `ℓ` is nonzero at both `i` and
+  `j`. -/
 theorem deposit_local {Locus : Type*} {σ' τ' : Locus → Type*} [∀ ℓ, Fintype (σ' ℓ)]
     [∀ ℓ, Fintype (τ' ℓ)] [∀ ℓ, DecidableEq (σ' ℓ)] (γ : Locus → 𝕜)
     (Θ Θ' : ∀ ℓ, LocusState 𝕜 (σ' ℓ) (τ' ℓ)) (data data' : ∀ ℓ, Window 𝕜 (σ' ℓ) (τ' ℓ))
@@ -426,8 +432,8 @@ theorem deposit_local {Locus : Type*} {σ' τ' : Locus → Type*} [∀ ℓ, Fint
   · simp [depositLocus, windowGram_apply_eq_zero _ i j h]
 
 /-- [counterexample; formal-checked] **A reached locus moves.** On `ℚ¹` at `W = 0`, `H = 1`, one
-window tick with `w = f = g = 1` and `γ = 1` moves the map to `1/2`: an empty window is
-load-bearing in `deposit_local`. -/
+tick reaching the locus with `w = f = g = 1` and `γ = 1` moves the map to `1/2`: that nothing
+reached the locus is load-bearing in `deposit_local`. -/
 theorem nonempty_window_moves_the_map :
     (depositLocus (1 : ℚ) ⟨0, 1, 0⟩ [((1 : ℚ), ![1], ![1])]).map 0 0 = 1 / 2 := by
   have hgram : (1 : Matrix (Fin 1) (Fin 1) ℚ) + windowGram [((1 : ℚ), ![1], ![1])] = !![2] := by
@@ -440,8 +446,8 @@ theorem nonempty_window_moves_the_map :
 
 open Holonics.Physics.AccumulatedNormalResponse Holonics.Objects.Deposition in
 /-- [proved-derived; formal-checked] **The complex chart of entrywise locality**, iterating the
-owner's `normal_law_local` over a window: a Gram entry `(i, j)` is unchanged when every window
-feature vanishes at `i` or at `j`. -/
+owner's `normal_law_local` over what reached the locus: a Gram entry `(i, j)` is unchanged when
+every feature that reached it vanishes at `i` or at `j`. -/
 theorem deposit_local_complex {ι : Type*} [Fintype ι] (H : Matrix ι ι ℂ) (xs : List (Column ι))
     (i j : ι) (h : ∀ x ∈ xs, x i () = 0 ∨ x j () = 0) :
     (xs.foldl updatedGram H) i j = H i j := by
@@ -840,8 +846,8 @@ section Certified
 variable {𝕜 : Type*} [Field 𝕜] {σ τ : Type*} [Fintype σ] [Fintype τ] [DecidableEq σ]
 
 omit [DecidableEq σ] in
-/-- [proved-derived; formal-checked] **A window pairs a unit step as its Frobenius pairing with
-the window covector**: `Σ_t w ⟨g_t, D f_t⟩ = ⟨D, Σ_t w g_t f_tᵀ⟩`. -/
+/-- [proved-derived; formal-checked] **What reached a locus pairs a unit step as its Frobenius
+pairing with the covector that reached it**: `Σ_t w ⟨g_t, D f_t⟩ = ⟨D, Σ_t w g_t f_tᵀ⟩`. -/
 theorem window_alignment_eq (D : Matrix τ σ 𝕜) (data : Window 𝕜 σ τ) :
     (data.map fun d => d.1 * (d.2.2 ⬝ᵥ (D *ᵥ d.2.1))).sum =
       ∑ i, ∑ j, D i j * windowCovector data i j := by
@@ -881,8 +887,8 @@ theorem inv_psd {H : Matrix σ σ 𝕜} (hpsd : ∀ v, 0 ≤ v ⬝ᵥ (H *ᵥ v)
 
 /-- [proved-derived; formal-checked] **The certified normal step.** The deposit at step `η` is
 `W' = W + η D` with the unit step `D = (Σ_t w g_t f_tᵀ) H'⁻¹`, and the unit step's first-order
-decrease `a = Σ_t w ⟨g_t, D f_t⟩` is the solved chart's quadratic form on the rows of the window
-covector, nonnegative at a positive semidefinite invertible carried Gram `H'`. -/
+decrease `a = Σ_t w ⟨g_t, D f_t⟩` is the solved chart's quadratic form on the rows of the covector
+that reached the locus, nonnegative at a positive semidefinite invertible carried Gram `H'`. -/
 theorem certified_normal_step (η : 𝕜) (θ : LocusState 𝕜 σ τ) (data : Window 𝕜 σ τ)
     (hpsd : ∀ v, 0 ≤ v ⬝ᵥ ((θ.gram + windowGram data) *ᵥ v))
     (hunit : IsUnit (θ.gram + windowGram data).det) :

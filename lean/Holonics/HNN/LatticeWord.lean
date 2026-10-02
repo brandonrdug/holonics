@@ -70,15 +70,15 @@ Frobenius norm `frobSq`; a certificate is a declared rational bound, never a flo
 6. **The prox step at an inverse chart** (`prox_chart_residual`, `prox_chart_certificate`): with
    `W' = W + wγ g fᵀ X̂`, `W'H' − B' = −wγ g fᵀ(1 − X̂H')`, the left residual of the chart of
    `H'⁻¹`; with the exact inverse it is `HNN/Normal.normal_prox_step`.
-7. **The window's warm start, the release's read and the carrier.** The window's rank-one steps
-   `X₀ = X̂ − X̂F S⁻¹FᵀX̂`, `S = Ω⁻¹ + FᵀX̂F`, give `1 − X₀(H + FΩFᵀ) = (1 − X̂F S⁻¹Fᵀ)(1 − X̂H)` in
-   any ring (`warm_start_window`), so an exact chart stays exact (`warm_start_window_exact`) and
-   a certified one keeps its residual up to that factor (`warm_start_window_certificate`). A
-   release `ρ` moves a read at `x` by `|(ρH'⁻¹x)_i| ≤ ‖ρ‖∞‖x‖₁/c` under the Gram's margin `c`
-   (`chart_release_read`), `c = 1 − 1/(2L_R)` at the carried Gram
-   (`carried_chart_release_read`). Under the ℓ1 certificate `Σ|p_j| < 2^127`, every partial sum
-   in any order lies in `(−2^127, 2^127)` (`carrier_partial_sum`), so the 128-bit ring read is
-   the integer sum (`carrier_ring_read`).
+7. **The warm start after a deposition, the release's read and the carrier.** The rank-one steps of
+   the returns that reached the locus, `X₀ = X̂ − X̂F S⁻¹FᵀX̂`, `S = Ω⁻¹ + FᵀX̂F`, give
+   `1 − X₀(H + FΩFᵀ) = (1 − X̂F S⁻¹Fᵀ)(1 − X̂H)` in any ring (`warm_start_window`), so an exact
+   chart stays exact (`warm_start_window_exact`) and a certified one keeps its residual up to that
+   factor (`warm_start_window_certificate`). A release `ρ` moves a read at `x` by
+   `|(ρH'⁻¹x)_i| ≤ ‖ρ‖∞‖x‖₁/c` under the Gram's margin `c` (`chart_release_read`),
+   `c = 1 − 1/(2L_R)` at the carried Gram (`carried_chart_release_read`). Under the ℓ1 certificate
+   `Σ|p_j| < 2^127`, every partial sum in any order lies in `(−2^127, 2^127)`
+   (`carrier_partial_sum`), so the 128-bit ring read is the integer sum (`carrier_ring_read`).
 8. **The solved chart's refinement, with both the residual and the chart rounded.** With the
    residual read at the chart's lattice, `R̃ = R + E`, and the product rounded, `X'' = X + R̃X + Δ`,
    `1 − X''H = R² − E·XH − ΔH` in any ring (`rounded_residual_refinement_left`), so
@@ -152,8 +152,8 @@ theorem newton_schulz_left (A X : M) : 1 - nsStep A X * A = (1 - X * A) ^ 2 := b
 /-- [definition] `k` exact refinements. -/
 def nsIter (A X : M) (k : ℕ) : M := (nsStep A)^[k] X
 
-/-- [proved-derived; formal-checked] The next refinement refines the last chart (a window's warm
-start). -/
+/-- [proved-derived; formal-checked] The next refinement refines the last chart (the warm start
+after a deposition). -/
 theorem nsIter_succ (A X : M) (k : ℕ) : nsIter A X (k + 1) = nsStep A (nsIter A X k) :=
   Function.iterate_succ_apply' _ _ _
 
@@ -373,8 +373,8 @@ def roundedIter (L : ℕ) (A X : Matrix n n ℚ) : ℕ → Matrix n n ℚ
 /-- [proved-derived; formal-checked] **The certificate does not grow.** If `c ≤ 1/2`, twice the
 rounding term `‖A‖∞·n·2^(−L)/2` is at most `c`, and the starting chart's residual is at most `c`,
 then every rounded refinement's residual is at most `c`: `δ² + ε ≤ c² + c/2 ≤ c`. In HNN terms, a
-precision `L` declared by rule holds each inverse chart's certificate below its declared bound for
-the whole window, with every chart on the lattice. -/
+precision `L` declared by rule holds each inverse chart's certificate below its declared bound at
+every refinement, with every chart on the lattice. -/
 theorem roundedIter_certificate (L : ℕ) (A X : Matrix n n ℚ) {c : ℚ} (hc : c ≤ 1 / 2)
     (hε : 2 * (rowNorm A * (Fintype.card n * (unit L / 2))) ≤ c)
     (h0 : rowNorm (1 - A * X) ≤ c) (k : ℕ) :
@@ -392,7 +392,7 @@ theorem roundedIter_certificate (L : ℕ) (A X : Matrix n n ℚ) {c : ℚ} (hc :
 
 /-- [proved-derived; formal-checked] **A warm start's certificate**: after a deposit moves
 `A → A + D`, the last chart's residual is at most `‖1 − AX‖∞ + ‖D‖∞‖X‖∞`, so one deposit's
-movement bounds what the window's first refinement must square away. -/
+movement bounds what the first refinement after it must square away. -/
 theorem warm_start_certificate (A D X : Matrix n n ℚ) :
     rowNorm (1 - (A + D) * X) ≤ rowNorm (1 - A * X) + rowNorm D * rowNorm X := by
   rw [warm_start_residual]
@@ -876,7 +876,7 @@ theorem prox_chart_certificate {W : Matrix τ σ ℚ} {H : Matrix σ σ ℚ} {B 
 
 end Prox
 
-/-! ## 7. The window's warm start, the release's read and the ℓ1 carrier
+/-! ## 7. The warm start after a deposition, the release's read and the ℓ1 carrier
 
 Three statements of Decision 24's executed charts, each at its Rust consumer:
 `hnn::constitution::SolvedChart` (the warm start), `hnn::constitution::ChartRule::read` (the
@@ -887,8 +887,9 @@ section WarmStart
 variable {R : Type*} [Ring R] {n m : Type*} [Fintype n] [Fintype m] [DecidableEq n]
   [DecidableEq m]
 
-/-- [proved-derived; formal-checked] **The window's warm start keeps the chart's residual.** After
-a window of returns `F` with weights `Ω` moves the Gram to `H + FΩFᵀ`, the rank-one steps give
+/-- [proved-derived; formal-checked] **The warm start after a deposition keeps the chart's
+residual.** After the returns `F` that reached the locus, with weights `Ω`, move the Gram to
+`H + FΩFᵀ`, the rank-one steps give
 `X₀ = X̂ − X̂F S⁻¹ FᵀX̂` with `S = Ω⁻¹ + FᵀX̂F`, and in any ring
 `1 − X₀(H + FΩFᵀ) = (1 − X̂F S⁻¹Fᵀ)(1 − X̂H)`. The inverses enter only as left inverses
 (`Ωi Ω = 1`, `Si S = 1`): the difference of the two sides is `X̂F[Si(FᵀX̂F)Ω + Si − Ω]Fᵀ`, and
@@ -913,8 +914,8 @@ theorem warm_start_window (Xh H : Matrix n n R) (F : Matrix n m R) (Ω Ωi Si : 
     Matrix.mul_one, Matrix.one_mul]
   abel
 
-/-- [proved-derived; formal-checked] **An exact chart stays exact** under the window's warm start:
-`X̂H = 1` gives `X₀(H + FΩFᵀ) = 1`. -/
+/-- [proved-derived; formal-checked] **An exact chart stays exact** under the warm start after a
+deposition: `X̂H = 1` gives `X₀(H + FΩFᵀ) = 1`. -/
 theorem warm_start_window_exact (Xh H : Matrix n n R) (F : Matrix n m R) (Ω Ωi Si : Matrix m m R)
     (hΩ : Ωi * Ω = 1) (hS : Si * (Ωi + Fᵀ * Xh * F) = 1) (hX : Xh * H = 1) :
     (Xh - Xh * F * Si * Fᵀ * Xh) * (H + F * Ω * Fᵀ) = 1 := by
@@ -927,11 +928,10 @@ end WarmStart
 section WarmStartRat
 
 variable {n m : Type*} [Fintype n] [Fintype m] [DecidableEq n] [DecidableEq m]
-
-/-- [proved-derived; formal-checked] **The warm start's certificate**: over `ℚ`, the window's warm
-start has `‖1 − X₀H'‖∞ ≤ ‖1 − X̂F S⁻¹Fᵀ‖∞ ‖1 − X̂H‖∞`, so a certified chart keeps its residual up to
-the factor the window's returns read. Unlike `warm_start_certificate`, the deposit's size does not
-enter additively. -/
+/-- [proved-derived; formal-checked] **The warm start's certificate**: over `ℚ`, the warm start
+after a deposition has `‖1 − X₀H'‖∞ ≤ ‖1 − X̂F S⁻¹Fᵀ‖∞ ‖1 − X̂H‖∞`, so a certified chart keeps its
+residual up to the factor the returns that reached the locus read. Unlike `warm_start_certificate`,
+the deposit's size does not enter additively. -/
 theorem warm_start_window_certificate (Xh H : Matrix n n ℚ) (F : Matrix n m ℚ)
     (Ω Ωi Si : Matrix m m ℚ) (hΩ : Ωi * Ω = 1) (hS : Si * (Ωi + Fᵀ * Xh * F) = 1) :
     rowNorm (1 - (Xh - Xh * F * Si * Fᵀ * Xh) * (H + F * Ω * Fᵀ)) ≤

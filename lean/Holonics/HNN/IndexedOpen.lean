@@ -11,7 +11,7 @@ its phase counts `M_g[c, x]` and, per declared offset `δ`, its pair counts `C^�
 `offsetCounts` and `StreamState.{bins, pairBins}`). The unnormalized open reads the counts
 themselves, so its amplitude grows with every ingested cell. The repair opens on the counts
 normalized by their populations, as exact ratios, and reads the pair port only at the address the
-retained window supplies:
+held cells supply:
 
 ```text
 populations   n_g = Σ_(c,x) M_g[c,x] ,  N_(g,δ,a) = Σ_(c,x) C^δ_g[c,x,a] ,  n_(g,δ) = Σ_a N_(g,δ,a)
@@ -21,9 +21,9 @@ open          Σ_(c,x) (M/n)[c,x] P^(−c) I E(e_x)
                 + Σ_δ Σ_(c,x) P^δ_(g,a_δ)[c,x] P^(−c) I F^δ(e_x ⊗ e_(a_δ))
 ```
 
-The address `a_δ` is the navigator address the already retained window supplies (the shift
-register of `HNN/Moment`, most recent first, so the cell `δ` back is `window[δ − 1]`); it selects
-a column of the existing pair-count table, and no earlier-cell tape is added. No rounded
+The address `a_δ` is the navigator address the cells already held supply (the last `max Δ` cells
+of `HNN/Moment`, a delay line most recent first, so the cell `δ` back is `window[δ − 1]`); it
+selects a column of the existing pair-count table, and no earlier-cell tape is added. No rounded
 probability is stored: the ratios are read exactly from the integer tables. A zero population is
 an unsupported fibre: it contributes nothing, and no conditional value is invented.
 
@@ -49,9 +49,9 @@ an unsupported fibre: it contributes nothing, and no conditional value is invent
    is exactly a column of zero counts and its indexed read is zero under every port, and an
    unavailable address contributes nothing (`pairTerm_none`).
 6. **Tape freedom and the owner's joins** (`indexed_open_tape_free`, `marginalRead_counts`,
-   `pairRead_offsetCounts`, `normalized_marginal_eq_scaled_read`): equal retained tables and window
-   give equal opens under every contemporary encoder and port; on a closing ring the marginal read
-   of the counts is `HNN/Moment.encoderMoment` and the pair read of the offset counts is
+   `pairRead_offsetCounts`, `normalized_marginal_eq_scaled_read`): equal retained tables and held
+   cells give equal opens under every contemporary encoder and port; on a closing ring the marginal
+   read of the counts is `HNN/Moment.encoderMoment` and the pair read of the offset counts is
    `HNN/Moment.offsetContribution`, and the normalized marginal open is the moment divided by its
    population.
 
@@ -246,8 +246,8 @@ on the address coordinate `a`. -/
 def addressedSlice (d : ℕ) (C : ℕ → A → A → ℕ) (a : A) : ℕ → A → A → ℚ :=
   fun c x b => if b = a then conditional d C a c x else 0
 
-/-- [definition] **The pair term of one offset** at the address the window supplies: nothing when
-the window holds no cell `δ` back, the pair read on the addressed slice otherwise. -/
+/-- [definition] **The pair term of one offset** at the address the held cells supply: nothing when
+no cell `δ` back is held, the pair read on the addressed slice otherwise. -/
 def pairTerm (P : (Module.End ℚ S)ˣ) (I : X →ₗ[ℚ] S) (F : (A × A → ℚ) →ₗ[ℚ] X) (d : ℕ)
     (C : ℕ → A → A → ℕ) : Option A → S
   | none => 0
@@ -376,8 +376,9 @@ theorem normalized_open_population_invariant (P : (Module.End ℚ S)ˣ) (I : X �
     simp only [pairTerm, hs]
 
 /-- [proved-derived; formal-checked] **The open needs no tape.** Two source states with equal phase
-counts and pair counts below the period and one window give one open under every contemporary
-encoder `E` and pair ports `F^δ`: the open is read off the retained tables and window alone. -/
+counts and pair counts below the period and the same held cells give one open under every
+contemporary encoder `E` and pair ports `F^δ`: the open is read off the retained tables and held
+cells alone. -/
 theorem indexed_open_tape_free (P : (Module.End ℚ S)ˣ) (I : X →ₗ[ℚ] S) (d : ℕ)
     {M M' : ℕ → A → ℕ} {C C' : ℕ → ℕ → A → A → ℕ} (offsets : Finset ℕ) (window : List A)
     (hM : ∀ c < d, ∀ x, M c x = M' c x) (hC : ∀ δ, ∀ c < d, ∀ x a, C δ c x a = C' δ c x a)

@@ -91,11 +91,11 @@ below `u/2` since the locus's founding.
    entry of magnitude at most `M` has an integer coordinate of at most `⌈log₂(⌊M·2^L⌋ + 1)⌉` bits,
    and so at most `⌈log₂(⌊M·2^L⌋ + 1)⌉ + 1` with its sign; as a reduced rational (the Rust count,
    numerator and denominator), at most `⌈log₂(⌊M·2^L⌋ + 1)⌉ + L + 1` bits.
-8. **Descent** (`lattice_deposit_descends`): the carried locus reads only its lattice value and an
-   empty window's update is zero, so by `carry_zero` `HNN/Retention.deposit_descends` applies
-   verbatim: the budgeted deposit agrees with or without the collapse. The aeon collapse releases
-   only exact complements, and a carried remainder is not one (releasing it could move a later
-   lattice value by a unit, and so a later admitted reading), so it releases no remainder of a
+8. **Descent** (`lattice_deposit_descends`): the carried locus reads only its lattice value, and the
+   update of a locus nothing reaches is zero, so by `carry_zero` `HNN/Retention.deposit_descends`
+   applies verbatim: the budgeted deposit agrees with or without the collapse. The aeon collapse
+   releases only exact complements, and a carried remainder is not one (releasing it could move a
+   later lattice value by a unit, and so a later admitted reading), so it releases no remainder of a
    retained locus and resets no clock; a locus it releases leaves whole.
 
 [established-bounded; measured] The measured bits per deposit (entries, remainders, solved charts
@@ -834,8 +834,8 @@ def carriedRel (rel : (y z : B) → Ent y z → ℚ) : (y z : B) → Carried L (
   fun y z => Carried.fresh (rel y z)
 
 /-- [definition] **The lattice deposit law** of a locus law `upd` (its exact update from its own
-lattice value and its window's data, `HNN/Normal`): the exact update, carried with its budgeted
-release. -/
+lattice value and the data that reached it, `HNN/Normal`): the exact update, carried with its
+budgeted release. -/
 noncomputable def latticeLaw
     (upd : (y z : B) → (Ent y z → ℚ) → List (M z × Module.Dual K (M y)) → (Ent y z → ℚ)) :
     (y z : B) → Carried L (Ent y z) → List (M z × Module.Dual K (M y)) → Carried L (Ent y z) :=
