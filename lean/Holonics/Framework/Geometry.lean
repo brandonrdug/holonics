@@ -9,6 +9,7 @@ import Holonics.Geometry.CrossRatio
 import Holonics.Geometry.Gyrogroup
 import Holonics.Geometry.ExteriorBoundary
 import Holonics.Geometry.ScrewGeometry
+import Holonics.Geometry.FrameTransport
 import Holonics.Geometry.PhaseCarry
 import Holonics.Geometry.PairResonance
 import Holonics.Geometry.ConnectionCalculus
