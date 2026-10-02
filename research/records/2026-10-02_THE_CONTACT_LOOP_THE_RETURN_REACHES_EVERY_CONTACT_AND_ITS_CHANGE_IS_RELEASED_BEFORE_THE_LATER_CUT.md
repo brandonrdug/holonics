@@ -2,7 +2,7 @@
 
 **Date.** October 2. **Issues.** #73, #63. **Grade.** [measured-diagnostic], an owner-to-consumer
 read with one reproducing test, no run.
-Test: `hnn::tests::reference::a_reached_return_steps_every_contact_and_the_later_cut_reads_the_successor`.
+Test: `hnn::tests::reference::a_reached_contact_family_moves_or_is_named_a_rounding_refusal`.
 
 ## 1. The check
 
@@ -39,7 +39,7 @@ On the chain (two contacts) with a generic constitution, one word, its compare a
   difference comes from the element, source port, standing and receiving-map steps, because no
   contact moved.
 
-**The contacts alone** (test `the_contacts_steps_alone_move_the_contacts_and_the_later_cut_reads_them`).
+**The contacts alone.**
 The same six channel families deposited without the other loci give the same steps. Deposited one
 family at a time, each at its own certificate with no joint halving, they still give the same
 steps. So the joint certificate is not what shrinks them: each family's own curvature `C = s·κ²·b`
@@ -71,3 +71,21 @@ The next loop works on this measurement: a contact's step certified by the conta
 balance (the word's `TickBalance` dissipation and the pair contact's slip law in
 `holon::contact`), so that a reached return changes the contact and the same later drive reads the
 change. It is checked on the word before it joins the bank.
+
+## 5. The rounding refusal (Astra's first unit, October 2)
+
+Astra's reply (October 2) corrects §4. The contact's power already enters its certificate: the
+transit's difference power is carried to the station logits. So the fix tightens that chain rather
+than replacing it with local dissipation, which would void the score-descent claim. I withdrew the
+separate conduction law I had proposed. Astra's smallest unit is in three steps.
+
+**Step 1, built.** `DepositReading::vanished` names every family certified at `η > 0` none of whose
+entries took a nonzero lattice coordinate, so its move was released whole. The test asserts the law
+on every reached contact family, deposited whole and alone with every other locus frozen: a family's
+factor moves exactly when the deposit does not name it. Today all six are named.
+
+**Steps 2 and 3, next.** Predecessor and successor continued from the same retained `EndChange`,
+clock and later drive through `Word::continuing`, compared on contact states, outgoing currents and
+receiver readings with the whole energy account and `r = z − Kx` retained. Then the
+contact-to-receiver certificate tightened from the actual finite transit sensitivity plus its
+certified remainder.
