@@ -313,3 +313,50 @@ contact change is real, conserved in the energy account and carried to the recei
 the receiver at a size its own statistics cannot resolve. Moving the grain or scoring the fibre would
 read a difference the receiver itself cannot distinguish, which is an exterior readout, and neither
 is done.
+
+## 12. Why the coupling is weak: the receiver's gain, not the path
+
+The same ablation over the first aeon ([receipt](2026-10-02_THE_CONTACT_LOOP_receipts/coupling_aeon.txt):
+534 windows to the first carry-out, 175,763 ms; 256-window read
+[here](2026-10-02_THE_CONTACT_LOOP_receipts/coupling_256.txt)). Each link of the chain from a
+contacts-only commit to the receiver's exponents was measured.
+
+| Link | Measured (median; upper quartile; largest) |
+|---|---|
+| contacts' relative factor change at the commit, `ρ_f` (largest entry change over the factor's largest entry) | `1/257`; `1/256`; `9/515` |
+| next window's relative anchor change on the receiving ring, `ρ_a` (continuing consumer) | `1/436`; `1/287`; `1/104` |
+| the receiver's exponent span across classes within a phase, `σ` | `29443/2^23`; `395629/2^25`; `2076909/2^25` bits |
+| the change of the receiver's exponents, `δ` (continuing consumer) | `23/2^23`; `75/2^24`; `7/2^18` bits |
+
+By quarter of the aeon, the largest `σ` was `62561/2^24`, `104193/2^24`, `903579/2^25` and
+`2076909/2^25` bits. It grows over the aeon, as the receiving map `R` learns.
+
+**The derivation.**
+1. A contacts-only commit leaves `R` fixed, so the exponents move by `δv = R δa`. The exponents' own
+   span is `σ ~ |R a|` across classes. Hence `δ ~ ρ_a · σ`, up to the alignment of `δa` with `R`'s
+   discriminating rows. Measured, the medians give `ρ_a σ = (1/436)(29443/2^23)`, about `2^(−17)`,
+   against `δ = 23/2^23`, about `2^(−18.5)`. The alignment factor is below one.
+2. The path transmits the change. `ρ_a` is within a factor of two of `ρ_f`, so contacts 1 and 2 lie
+   on the receiving ring's main path. Nothing along the path attenuates the change.
+3. `ρ_f` is about one lattice quantum. The channel lattices are `L = 9` and `10` (`2^(−9)`,
+   `2^(−10)`) against factor entries of order `½`, so one deposit moves a contact by about `2^(−8)`
+   relative.
+4. The receiver's gain is the bottleneck. Over the first aeon, `σ` stays below `2^(−4)` bits: the
+   receiver's readings differ across classes by less than one sixteenth of a bit. A relative change
+   of `2^(−8)` in what it reads can only move its exponents by `2^(−8) σ`.
+
+**What the readability bound requires.** With `δ ≈ ρ_a σ` and the resolution `√(2/(1190 ln 2))`
+bits (§11), one deposit's contact change becomes readable within an aeon only when
+`ρ_a σ ≳ 1/20`. At `ρ_a ≈ 2^(−8)` that is `σ ≳ 13` bits: the receiver would need to separate its
+classes by odds of about `2^13` before a single contact deposit could register. The aeon's largest
+`σ`, `2076909/2^25` bits (about `1/16` bit), is more than `2^7` below that.
+
+[agent-inferred] The weak coupling is the receiver's own low gain at this stage of learning, not an
+attenuating path, and not the contacts alone. Two things would change it, both measurable: the
+receiver's gain growing over later aeons (`σ` rose sixteenfold over the first), and successive
+contact deposits adding coherently. This ablation reads one deposit at a time and does not
+measure the second.
+
+Time: the run stopped at the first aeon's carry-out, by `contact_ablation`'s declared stop (it
+closes no aeon), at 534 of the 3,074 projected windows. Its wall, 175,763 ms over 534 windows, is
+within the per-window projection.
