@@ -1641,6 +1641,178 @@ pub(super) fn step_state(terrain: &str, seed: u64, count: usize, out: &str, sour
     println!("  written {path}");
 }
 
+/// [measured-diagnostic; October 2; the
+/// [refit-ingredients record](../../records/2026-10-02_THE_REFITS_INGREDIENTS_ABLATED_WHICH_PART_OF_THE_EXTERIOR_FIT_REACHES_THE_REPRESENTATION.md)
+/// §6] **Each station read through the continuing contact path beside the bank** (`executed
+/// word-read <terrain> <seed> <count> <label=source>…`, sources as [`segment_source`]): per request,
+/// a `Word` opened on the constitution at the request's own current and moment
+/// (`Word::open_charted`), run forward over the receiver's epochs (`Word::forward`), each epoch's
+/// anchor read by the declared receiver (`ReceivingPhases::read`); a station's class is its read's
+/// largest real logit among the data classes. Beside it, the bank's reads of the same open section
+/// (the release's first refinement: each station's top before any station is placed) and the bank's
+/// release. Prints, per source, stations right by station under the three reads and the receiver's
+/// epoch count. Nothing is moved.
+pub(super) fn word_read(terrain: &str, seed: u64, count: usize, sources: &[String]) {
+    use holonics::hnn::chart::Charts;
+    use holonics::hnn::executed::compare;
+    use holonics::hnn::prediction::{BankPlacement, bank_release};
+    use holonics::hnn::receiving::ReceivingPhases;
+    use holonics::hnn::Word;
+    let clock = Instant::now();
+    let declared = order_declared();
+    let engine = Engine::new(declared);
+    let bank = bank_of(declared.period, &bank_strength());
+    let ring = engine.refinement.ring();
+    let pairs = terrain_pairs(terrain, &declared, seed, count);
+    let requests = open_requests(&engine, &pairs);
+    let (comparison, _) = arm_comparison("lock-dec");
+    let field = &engine.field;
+    let symbols = declared.alphabet - 1;
+    let receiver = field.receivers().first().expect("the declared receiver").clone();
+    println!("executed word-read: {count} {terrain} requests at seed {seed}; the receiver on ring {}", receiver.ring);
+    for source in sources {
+        let started = Instant::now();
+        let (label, spec) = source.split_once('=').expect("<label>=<source>");
+        let theta = segment_source(&engine, ring, spec);
+        let stations = declared.stations;
+        let (mut word_right, mut open_right, mut released_right) =
+            (vec![0usize; stations], vec![0usize; stations], vec![0usize; stations]);
+        let mut epochs = None;
+        let mut zero_reads = 0usize;
+        let receiving_zero = theta.receiving_map(receiver.ring).is_some_and(|map| map.entries().iter().all(|x| x.is_zero()));
+        for (request, (_, targets)) in requests.iter().zip(&pairs) {
+            let mut charts = Charts::new();
+            let phases = ReceivingPhases::declare(field, &theta, &request.current, &receiver).expect("the receiving phases");
+            let mut word = Word::open_charted(field, &theta, &request.current, &request.moment, &mut charts).expect("the word");
+            let anchors = word.forward(&phases).expect("the forward word");
+            epochs.get_or_insert(anchors.len());
+            for (station, anchor) in anchors.iter().enumerate().take(stations) {
+                let read = phases.read(field, &theta, &request.current, anchor).expect("the receiving read");
+                zero_reads += usize::from(read.logits.iter().all(|l| l.is_zero()));
+                let top = (0..symbols).max_by(|&a, &b| read.logits[2 * a].cmp(&read.logits[2 * b]).then(b.cmp(&a))).expect("a class");
+                word_right[station] += usize::from(top == targets[station]);
+            }
+            let placement = BankPlacement::of(field, &theta, &request.current, &request.moment, &engine.refinement).expect("the placement");
+            let (_, kept) = bank_release(&placement, &engine.refinement, field.alphabet(), &bank, BANK_GRAIN, |a| bank.read_turn(a, BANK_GRAIN), true).expect("the release");
+            if let Some(first) = kept.first() {
+                for &(station, top) in &first.tops {
+                    open_right[station] += usize::from(top == targets[station]);
+                }
+            }
+        }
+        let batch = compare(field, &theta, &requests, &engine.refinement, &bank, BANK_GRAIN, comparison).expect("the batch");
+        for (r, (_, targets)) in batch.requests.iter().zip(&pairs) {
+            if let Some(g) = &r.generation {
+                for (station, class) in g.release.emitted.iter().enumerate().take(stations) {
+                    released_right[station] += usize::from(class == &targets[station]);
+                }
+            }
+        }
+        let sum = |v: &[usize]| v.iter().sum::<usize>();
+        println!(
+            "  {label} (ρ {}): the receiving map R zero: {receiving_zero}; station reads with every logit zero: {zero_reads}; the receiver's epochs {epochs:?}; stations right of {}: the word {} {:?}, the bank's open section {} {:?}, the bank's release {} {:?}; {} ms",
+            theta.transport(ring),
+            count * stations,
+            sum(&word_right), word_right,
+            sum(&open_right), open_right,
+            sum(&released_right), released_right,
+            started.elapsed().as_millis()
+        );
+    }
+    println!("executed word-read: {} ms; resident {}", clock.elapsed().as_millis(), resident());
+}
+
+/// [measured-diagnostic; October 2; the
+/// [refit-ingredients record](../../records/2026-10-02_THE_REFITS_INGREDIENTS_ABLATED_WHICH_PART_OF_THE_EXTERIOR_FIT_REACHES_THE_REPRESENTATION.md)
+/// §7] **§6's gate on a formed receiver** (`executed expose <train seed> <held seed> <held count>
+/// <windows|all> <label=source>…`, sources as [`segment_source`]): campaign 1's exposure protocol
+/// (`Reference::expose_with`) on the prediction field, from each source's constitution, over one cut
+/// of the field's declared population: order-2 passages at the training seed, then `held count`
+/// passages at the held seed whose stations are held out (each passage's request is read and
+/// deposited on, its 8 stations coded and never deposited on). The receiver's own comparison
+/// deposits into every locus the protocol admits (the receiving map, the tree, the contacts, the
+/// source port) from the same opening material; only the source differs between runs. Prints, per
+/// source, the held-out stations' code (model, tree, combined, and the baselines), the training
+/// code, the windows read and whether the run completed.
+pub(super) fn expose_read(train_seed: u64, held_seed: u64, held: usize, windows: &str, sources: &[String]) {
+    use holonics::hnn::reference::Cut;
+    use holonics::hnn::Reference;
+    let clock = Instant::now();
+    let declared = order_declared();
+    let engine = Engine::new(declared);
+    let field = &engine.field;
+    let ring = engine.refinement.ring();
+    let population = usize::try_from(field.population()).expect("a population in memory");
+    let passage = declared.request + declared.stations;
+    let held_pairs = terrain_pairs("order2", &declared, held_seed, held);
+    let held_cells = held * passage;
+    assert!(held_cells < population, "the held-out passages fit inside the declared population");
+    let training_cells = population - held_cells;
+    let training_pairs = terrain_pairs("order2", &declared, train_seed, training_cells.div_ceil(passage));
+    let mut cells: Vec<usize> =
+        training_pairs.iter().flat_map(|(r, t)| r.iter().chain(t).copied()).collect();
+    // The first passage is entered part way: the cut keeps the training passages' last cells.
+    let cells_dropped = cells.len() - training_cells;
+    cells.drain(..cells_dropped);
+    let mut held_out = Vec::with_capacity(held);
+    for (request, target) in &held_pairs {
+        cells.extend(request);
+        let start = cells.len();
+        cells.extend(target);
+        held_out.push(start..cells.len());
+    }
+    assert_eq!(cells.len(), population);
+    let cut = Cut { cells, held_out };
+    let reference = match windows {
+        "all" => Reference::campaign_one(),
+        n => Reference::campaign_one().with_deadline(n.parse().expect("a window count or all")),
+    };
+    let grain = 16;
+    println!(
+        "executed expose: a cut of {population} cells, {} training passages from seed {train_seed} (the first entered after {cells_dropped} cells), {held} held-out passages from seed {held_seed} with {} station cells held out; windows {windows}",
+        training_pairs.len(),
+        held * declared.stations
+    );
+    for source in sources {
+        let started = Instant::now();
+        let (label, spec) = source.split_once('=').expect("<label>=<source>");
+        let theta = segment_source(&engine, ring, spec);
+        let exposure = reference.expose_with(field, &cut, theta).expect("the exposure");
+        let bits = |name: &str, b: &holonics::hnn::reference::Bits| {
+            println!(
+                "    {name}: {} cells; model {}; tree {}; combined {}; uniform {}; order-0 {}; order-1 {}; ppm {}",
+                b.cells,
+                exterior::enclosure(&b.model, grain),
+                exterior::enclosure(&b.tree, grain),
+                exterior::enclosure(&b.combined, grain),
+                exterior::enclosure(&b.uniform, grain),
+                exterior::enclosure(&b.order_zero, grain),
+                exterior::enclosure(&b.order_one, grain),
+                exterior::enclosure(&b.ppm, grain),
+            );
+        };
+        println!(
+            "  {label} (ρ {}): windows {} (open {}), complete {}, stopped at cell {:?}, compares {}, deposits {}; {} ms",
+            theta_transport(&engine, ring, spec),
+            exposure.windows,
+            exposure.open_windows,
+            exposure.complete,
+            exposure.deadline,
+            exposure.compares,
+            exposure.deposits,
+            started.elapsed().as_millis()
+        );
+        bits("held out", &exposure.held_out);
+        bits("training", &exposure.training);
+    }
+    println!("executed expose: {} ms; resident {}", clock.elapsed().as_millis(), resident());
+}
+
+/// The source's transport on the receiving ring, read again from its spec.
+fn theta_transport(engine: &Engine, ring: usize, spec: &str) -> Rat {
+    segment_source(engine, ring, spec).transport(ring)
+}
+
 /// [measured-diagnostic; October 2] **The release's lock order read at its resolution**
 /// (`executed locks <terrain> <seed> <count> <label=source> <arm> [request]`, sources as
 /// [`segment_source`]): the batch's released
