@@ -95,7 +95,9 @@ the laws that covector and its certified step stand on (the diagnosis record,
    window's least certified decrease (`windowMax_block`); the windows' decreases sum below
    `f 0 − m` (`windowMax_blocks`, `blocks_sum_le`), so at most `(f 0 − m)/ε` windows certify `ε` or
    more (`large_blocks_card`). With decreases `η · q` and a divergent step sum, `q` falls below every
-   `ε` in windows beyond every point (`schedule_frequently_small`) (§12).
+   `ε` in windows beyond every point (`schedule_frequently_small`). A step floor makes the step sum
+   diverge (`floor_steps_diverge`), and with a positive margin it bounds the number of windows
+   whose least slope is `ε` or more (`floor_large_slopes_card`) (§12).
 
 [open] (#62) The existence of the differentiable root path (the implicit function theorem at a
 simple root, from `Φ`'s strict differentiability), Jacobi's formula `∂_η det(λ − M − ηΔM) =
@@ -1688,6 +1690,36 @@ theorem schedule_frequently_small (η q : ℕ → ℝ) (hη : ∀ b, 0 ≤ η b)
     rw [div_lt_iff₀ hε] at hn
     nlinarith
 
+/-- [proved-derived; formal-checked] **A step floor makes the step sum diverge**: every adopted move
+of the ladder moves at least one lattice coordinate, so its step is at least `c > 0` (with the unit
+move's largest entry bounded); then every bound is passed by some partial sum. -/
+theorem floor_steps_diverge (η : ℕ → ℝ) {c : ℝ} (hc : 0 < c) (hη : ∀ k, c ≤ η k) (C : ℝ) :
+    ∃ n, C < ∑ k ∈ Finset.range n, η k := by
+  obtain ⟨n, hn⟩ := exists_nat_gt (C / c)
+  refine ⟨n, ?_⟩
+  have hsum : (n : ℝ) * c ≤ ∑ k ∈ Finset.range n, η k := by
+    have := Finset.sum_le_sum fun k (_ : k ∈ Finset.range n) => hη k
+    simpa [Finset.sum_const, Finset.card_range, nsmul_eq_mul] using this
+  rw [div_lt_iff₀ hc] at hn
+  linarith
+
+/-- [proved-derived; formal-checked] **Under a step floor the slopes themselves are summable**: if
+each window's certified decreases are at least `c · q b` with `c > 0` (a positive margin times the
+floor step), at most `(f 0 − m)/(c ε)` of the first `n` windows have least slope `q b ≥ ε`. The
+guarded chain's slope falls below every `ε` in all but finitely many windows, not only frequently. -/
+theorem floor_large_slopes_card (f σ q : ℕ → ℝ) (w : ℕ) (hσ : ∀ k, 0 ≤ σ k)
+    (hg : ∀ k, f (k + 1) ≤ windowMax f w k - σ k) {c : ℝ} (hc : 0 < c)
+    (hs : ∀ b, ∀ i ≤ w, c * q b ≤ σ (b * (w + 1) + i)) (hq0 : ∀ b, 0 ≤ q b) {m : ℝ}
+    (hm : ∀ k, m ≤ f k) {ε : ℝ} (n : ℕ) :
+    (((Finset.range n).filter fun b => ε ≤ q b).card : ℝ) * (c * ε) ≤ f 0 - m := by
+  have h := large_blocks_card f σ (fun b => c * q b) w hσ hg hs
+    (fun b => mul_nonneg hc.le (hq0 b)) hm (ε := c * ε) n
+  have hfil : ((Finset.range n).filter fun b => c * ε ≤ c * q b) =
+      (Finset.range n).filter fun b => ε ≤ q b :=
+    Finset.filter_congr fun b _ => ⟨fun h => le_of_mul_le_mul_left h hc,
+      fun h => mul_le_mul_of_nonneg_left h hc.le⟩
+  simpa only [hfil] using h
+
 end WindowGuard
 
 section Audit
@@ -1767,6 +1799,8 @@ section Audit
 #print axioms blocks_sum_le
 #print axioms large_blocks_card
 #print axioms schedule_frequently_small
+#print axioms floor_steps_diverge
+#print axioms floor_large_slopes_card
 
 end Audit
 

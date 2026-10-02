@@ -74,10 +74,61 @@ What the parameters must satisfy:
   is refused by every window. If the main line measures such a rise, the rule this record proves does
   not admit it, and the guard's law must then carry an excursion above its checkpoint.
 
-## 5. Verification
+## 5. The chain's own schedules: none is summable
+
+§3's condition is a divergent step sum. The question is whether a step schedule the native chain
+already uses has a finite sum, which would make §3's guarantee void for the chain as built. Each
+schedule, read from its owner:
+
+1. **The committed move of `E` (the ladder).** It declares no decaying schedule. Each move starts at
+   `power_below(min(excess/|slope|, ½/U_k))` (`ladder_start`), with `U_k` the unit move's largest
+   entry, and halves at most seven times (`LADDER_DEPTH`). A rung is refused before it is read when
+   `η · U_k · 2 < u`, with `u` the source port's lattice unit. So **every adopted step moves at least
+   one lattice coordinate**: `η_k ≥ u/(2 U_k)`. With `U_k ≤ Ū` (a bounded unit move), every adopted
+   step is at least `c = u/(2Ū) > 0`, and `floor_steps_diverge` gives `Σ η = ∞` along any chain that
+   keeps adopting.
+2. **The normal law's deposits.** The step is `ΔW = η Σ w g (H′⁻¹ f)ᵀ`, with the carried Gram
+   `H′ = I + Σ w f fᵀ` within one unit of the exact statistic (constitution module, "the carried
+   Gram"). With each return's feature energy at most `F`, `‖H′‖ ≤ 1 + mF` after `m` deposits. The
+   metric step is then at least `1/(1 + mF)` along every direction, a harmonic lower bound, so its
+   sum diverges. The certified step `η` (the largest `2^k` with `ηC ≤ a` and `ηc ≤ 1`) does not shrink
+   with `H′`. `a` is linear in the unit step `D` and `C` quadratic, so `a/C` grows as `D` shrinks,
+   and the cap `ηc ≤ 1` reads the covector, not `D`. The factor families' unit step
+   `D = G_x/h_x′` with `h_x′ = h_x + e` has the same harmonic bound.
+3. **The `1/m²` of the contact freeze is not a step size.** It is the fine lattice's cell,
+   `2^(−k_m)` with `k_m = 2⌊log₂ m⌋ + 1`, below which a deposit's residual is released. Its Kraft sum
+   bounds what rounding drops in total (`release_bounded_since_founding`). It does not scale any
+   step: the remainder above the cell is carried, and the applied quotient is the update's own.
+4. **The ladder's rungs** are dyadic within one move. They select the step and reset at the next
+   move, so they are not a schedule across moves.
+
+[proved-derived for the arithmetic; agent-inferred for the bounds `U_k ≤ Ū` and `F`, read from the
+owners and not measured] **So no step schedule the native chain uses is summable, and §3's
+condition holds for every chain that keeps adopting.** Under the step floor the guarantee is stronger
+than §3's (`floor_large_slopes_card`). With `σ k ≥ c · q` (a positive margin times the floor step),
+at most `(f 0 − m)/(c ε)` windows have least slope `ε` or more. So the slope falls below every `ε` in
+all but finitely many windows.
+
+**What the stall is, then.** The native move does not stall because its steps shrink. It stalls
+because they cannot shrink below the floor. Along a ray with curvature at most `K`, a step `η`
+along a direction of slope `−q` lowers `f` by at least `η q − ½ K η² |d|²`. That is positive only
+while `q > ½ K η |d|²`. At the floor `η ≥ c`, near a point whose slope is below `½ K c |d|²`, every
+rung's step can be too large to descend. The ladder then refuses at every rung: on the comparison
+(`NotBelow`, `OwnNotBelow`) for the larger rungs, or on the lattice (`Guards`) once a rung moves no
+coordinate. [agent-inferred] The guard needs no declared schedule. Its divergent step sum is
+supplied by the lattice floor, and the floor in turn sets the slope at which the chain must stop.
+That slope is about `K u Ū/4`, which only a finer source lattice lowers. The lattice rule already
+refines a locus as its Gram grows (`L_s = D_ℓ + ⌈log₂ n⌉ + ⌈log₂ ‖H′‖∞⌉ + 2`). Whether the source
+port's `u` follows that rule during the move chain is the read that separates the two causes:
+- If the kinetic chain's terminal refusals are `Guards` with the slope at `K u Ū/4`, the stall is the
+  lattice floor.
+- If they are `OwnNotBelow` with the slope well above it, as at move 8 of the kinetic chain, the
+  stall is the guard, and §1–§4's window is the remedy.
+
+## 6. Verification
 
 - `lake build Holonics.HNN.ExecutedComparison` builds with no `sorry`; its audit block prints the
-  axioms of the twelve new theorems (`propext`, `Classical.choice`, `Quot.sound`).
+  axioms of the fourteen new theorems (`propext`, `Classical.choice`, `Quot.sound`).
 - `cargo check --workspace --all-targets` is clean.
 - `hnn::tests::executed::the_release_window_of_one_is_the_strict_decrease_and_a_longer_window_admits_a_bounded_rise`
   passes. It checks that the window of one agrees with the former rule on seven enclosures, and that
