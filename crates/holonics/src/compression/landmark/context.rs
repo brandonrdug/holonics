@@ -1322,7 +1322,9 @@ pub fn face_bits_at(
 /// `P` levels (Lean `Compression/Landmark/Context/StoredDrift.split_charge`), at most `4n* P`, which
 /// the count `(n* + 1) P²` covers for `P ≥ 4` and the maximum covers at every depth. For `P ≥ 4` it
 /// is `(2n* + 1) P²`. The count, per cell at most `n* D² + 4n* D` for `D ≤ P`, is Lean
-/// `StoredDrift.{arrival_units_le, cell_units, rule_units}`.
+/// `StoredDrift.{walk_units, unit_le, arrivalUnits_add, arrival_units_le, cell_units, rule_units}`:
+/// `Law::apply_branch`'s bottom-first `carried` in closed form, each `ceil_div` rebase or split
+/// rounding at most one unit, and the carrier releases counted apart (`n* D²`, the rule's `ρ_c`).
 fn mantissa_units(population: u64, depth: u64) -> BigUint {
     let (n, d) = (BigUint::from(population), BigUint::from(depth));
     let paths = &n * &d * &d;
