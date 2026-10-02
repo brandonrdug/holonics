@@ -26,7 +26,7 @@
 //!   `Aeon/Clock/Lock.cycle_iff_period_dvd`), so the forward aeon of `T` ticks on the joint torus
 //!   is a cycle and no proper divisor's is (the tests close it with `aeon::Cycle::close`);
 //! - **the emission's least period**, a divisor of `T` (the least period of a periodic word divides
-//!   each of its periods), and its **determining depth**: the least `D` such that the `D` cells
+//!   each of its periods, Lean `Compression/Landmark/Context/Evolution.leastPeriod_dvd`), and its **determining depth**: the least `D` such that the `D` cells
 //!   before every tick determine its cell, read on one cyclic period (the moiré's own context
 //!   tree's depth, so a receiving tree shallower than it cannot code a period to zero);
 //! - **each pair's lock** ([`PairLock`]): the rate ratio `r_i/r_j`, its Farey lock address and
