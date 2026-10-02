@@ -90,10 +90,12 @@
 //! entry adds up to `2^(−L_ν−m−1)` to its count's bound (`leaky_count_error_le`). The read
 //! `L[slot]/Σ L` carries every slot's error in its mass: with each count within `δ` over `N` slots
 //! it is within `(δ + w N δ)/Σ L` of the transported weight `w` before the chart rounds it
-//! (`leaky_read_error`), and not within one chart unit in general: at campaign 1's founding, 256
-//! data entering one phase between two ticks put the newest datum's read more than seven chart
-//! units from its weight (`leaky_read_exceeds_chart_unit`); one chart unit is an instance's reading
-//! (the test's passage), not the law's. A count that decays below half a lattice unit leaves the
+//! (`leaky_read_error`), and not within one chart unit in general: at campaign 1's founding, 205
+//! data entering one phase of ring 0 (a code its lock selects, then the 204 it does not), followed
+//! by two of its ticks, put the newest datum's read more than eight chart units below its weight
+//! (`leaky_read_exceeds_chart_unit`, read on this ingest by the test
+//! `the_leaky_read_is_not_within_one_chart_unit_in_general`); one chart unit is an instance's
+//! reading (the many-turn test's passage), not the law's. A count that decays below half a lattice unit leaves the
 //! record, so the record holds only what the transport still carries. It is a quotient of the
 //! passage sufficient for the transported open, never a list of cells. The modulus is the one the
 //! moment was opened at; a moment read at another modulus is refused ([`HnnError::Transport`]).

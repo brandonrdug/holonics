@@ -896,9 +896,10 @@ read          w = chart(L̂[slot] / Σ L̂)
   weight `w_k`, before the chart rounds it (half a chart unit more). The slots' errors add in the
   mass, so the read is not within one chart unit in general:
   `leaky_read_exceeds_chart_unit` is the law's own instance at campaign 1's founding
-  (`campaign_one_founding`, `ρ₀ = 10809/2^17`, `L_ν = 18`, `m = 1`), with 256 data entering one
-  phase between two of the ring's ticks, where the newest datum's read is more than eight chart
-  units from its transported weight. -/
+  (`campaign_one_founding`, `ρ₀ = 10809/2^17`, `L_ν = 18`, `m = 1`) on a passage the ingest takes:
+  205 data entering one phase of ring 0 (a code its lock selects, then the 204 it does not), then
+  two of its ticks, where the newest datum's read is more than eight chart units from its
+  transported weight, before and after the chart rounds it. -/
 
 section Leaky
 
@@ -1055,51 +1056,61 @@ theorem leaky_read_error {ι : Type*} (s : Finset ι) (Lh L : ι → ℚ) {δ : 
       exact add_le_add (hδ k hk) (mul_le_mul_of_nonneg_left hmass hw)
 
 /-- [proved-derived; formal-checked] **Campaign 1's founding**: period `d = 5`, chart `L_ν = 18`
-and the lattice `2^(−17)` found ring 0 at `k = 10809`, `ρ₀ = 10809/2^17`; there `m = 1`
-(`2 (1 − ρ₀) ≥ 1`). -/
+and the source port's lattice `2^(−18)` (both `⌈log₂(32 n*)⌉` at a declared population
+`4096 < n* ≤ 8192`, as in the leaky-count tests' `campaign_one(6148)`) found ring 0 at `k = 21618`,
+`ρ₀ = 21618/2^18 = 10809/2^17`; there `m = 1` (`2 (1 − ρ₀) ≥ 1`). -/
 theorem campaign_one_founding :
-    IsFounding 17 5 18 10809 ∧ (1 : ℚ) ≤ 2 ^ 1 * (1 - 10809 / 2 ^ 17) := by
+    IsFounding 18 5 18 21618 ∧ (21618 / 2 ^ 18 : ℚ) = 10809 / 2 ^ 17 ∧
+      (1 : ℚ) ≤ 2 ^ 1 * (1 - 10809 / 2 ^ 17) := by
   unfold IsFounding
-  refine ⟨⟨by norm_num, by norm_num⟩, by norm_num⟩
+  refine ⟨⟨by norm_num, by norm_num⟩, by norm_num, by norm_num⟩
 
 /-- [proved-derived; formal-checked] **The read is not within one chart unit in general**: at
-campaign 1's founding (`ρ₀ = 10809/2^17`, lattice `2^(−19)`, chart `2^(−18)`), let 256 data enter
-256 slots of one phase between two of the ring's ticks, the ring tick twice, and one datum enter a
-new slot. Each old slot carries `3566` against its exact `ρ₀² 2^19 = 116834481/2^15`, a rounding of
-the same sign in every slot, so the mass is off by `256 · 16207/2^15 = 126 + 79/128` lattice units, and the newest
-datum's read `2^19/(2^19 + 256·3566)` is more than eight chart units from its transported weight
-`1/(1 + 256 ρ₀²)`; after the chart rounds the read (`nearest` at `2^18`), more than seven. -/
+campaign 1's founding (`ρ₀ = 10809/2^17`, lattice `2^(−19)`, chart `2^(−18)`), on a passage the
+ingest takes. Ring 0 ticks only at the codes its lock selects (`x ≡ 0 mod 5` on the residue port
+chart), and each tick's datum enters at the new phase, so code 5 and then the 204 codes the lock
+does not select enter 205 slots of one phase; codes 0 and 10 then tick the ring twice, each entering
+a new slot. Each of the 205 slots carries `3566` against its exact `ρ₀² 2^19 = 116834481/2^15`, a
+rounding of the same sign in every slot, so the mass is off by `205 · 16207/2^15 = 101 +
+12867/2^15` lattice units; the middle datum carries `43236 = ρ₀ 2^19` exactly. The newest datum's
+read `2^19/(2^19 + 43236 + 205·3566)` is more than eight chart units from its transported weight
+`1/(1 + ρ₀ + 205 ρ₀²)`, and so is the chart's read of it, `nearest` at `2^18`, `105840/2^18`
+(`holonics::hnn::tests::moment::the_leaky_read_is_not_within_one_chart_unit_in_general` reads this
+value on the Rust ingest). -/
 theorem leaky_read_exceeds_chart_unit :
+    carried (10809 / 2 ^ 17) 0 [.unit (2 ^ 19), .tick] = 43236 ∧
+    exactCount (10809 / 2 ^ 17) 0 [.unit (2 ^ 19), .tick] = 43236 ∧
     carried (10809 / 2 ^ 17) 0 [.unit (2 ^ 19), .tick, .tick] = 3566 ∧
     exactCount (10809 / 2 ^ 17) 0 [.unit (2 ^ 19), .tick, .tick] = 116834481 / 2 ^ 15 ∧
     8 * (1 / 2 : ℚ) ^ 18 <
-      1 / (1 + 256 * (10809 / 2 ^ 17) ^ 2) - 2 ^ 19 / (2 ^ 19 + 256 * 3566) ∧
-    7 * (1 / 2 : ℚ) ^ 18 <
-      1 / (1 + 256 * (10809 / 2 ^ 17) ^ 2)
-        - (nearest (2 ^ 18 * (2 ^ 19 / (2 ^ 19 + 256 * 3566))) : ℚ) / 2 ^ 18 := by
-  have h8 : 8 * (1 / 2 : ℚ) ^ 18 <
-      1 / (1 + 256 * (10809 / 2 ^ 17) ^ 2) - 2 ^ 19 / (2 ^ 19 + 256 * 3566) := by norm_num
-  refine ⟨?_, ?_, h8, ?_⟩
-  rotate_left 2
-  · have hr := (abs_le.mp (nearest_sub_le (2 ^ 18 * (2 ^ 19 / (2 ^ 19 + 256 * 3566) : ℚ)))).2
-    have : (nearest (2 ^ 18 * (2 ^ 19 / (2 ^ 19 + 256 * 3566) : ℚ)) : ℚ) / 2 ^ 18
-        ≤ 2 ^ 19 / (2 ^ 19 + 256 * 3566) + (1 / 2) * (1 / 2) ^ 18 := by
-      rw [div_le_iff₀ (by norm_num)]
-      have e : (1 / 2 : ℚ) ^ 18 * 2 ^ 18 = 1 := by norm_num
-      nlinarith
-    have e7 : (7 : ℚ) * (1 / 2) ^ 18 + (1 / 2) * (1 / 2) ^ 18 < 8 * (1 / 2) ^ 18 := by norm_num
-    linarith
-  · have h1 : nearest (10809 / 2 ^ 17 * ((0 + 2 ^ 19 : ℤ) : ℚ)) = 43236 := by
-      unfold nearest
-      rw [Int.floor_eq_iff]
-      norm_num
-    have h2 : nearest (10809 / 2 ^ 17 * ((43236 : ℤ) : ℚ)) = 3566 := by
-      unfold nearest
-      rw [Int.floor_eq_iff]
-      norm_num
-    simp only [carried]
+      1 / (1 + 10809 / 2 ^ 17 + 205 * (10809 / 2 ^ 17) ^ 2)
+        - 2 ^ 19 / (2 ^ 19 + 43236 + 205 * 3566) ∧
+    nearest (2 ^ 18 * (2 ^ 19 / (2 ^ 19 + 43236 + 205 * 3566))) = 105840 ∧
+    8 * (1 / 2 : ℚ) ^ 18 <
+      1 / (1 + 10809 / 2 ^ 17 + 205 * (10809 / 2 ^ 17) ^ 2)
+        - (nearest (2 ^ 18 * (2 ^ 19 / (2 ^ 19 + 43236 + 205 * 3566))) : ℚ) / 2 ^ 18 := by
+  have h1 : nearest (10809 / 2 ^ 17 * ((0 + 2 ^ 19 : ℤ) : ℚ)) = 43236 := by
+    unfold nearest
+    rw [Int.floor_eq_iff]
+    norm_num
+  have h2 : nearest (10809 / 2 ^ 17 * ((43236 : ℤ) : ℚ)) = 3566 := by
+    unfold nearest
+    rw [Int.floor_eq_iff]
+    norm_num
+  have hn : nearest (2 ^ 18 * (2 ^ 19 / (2 ^ 19 + 43236 + 205 * 3566))) = 105840 := by
+    unfold nearest
+    rw [Int.floor_eq_iff]
+    norm_num
+  refine ⟨?_, ?_, ?_, ?_, by norm_num, hn, ?_⟩
+  · simp only [carried]
+    rw [h1]
+  · simp only [exactCount]
+    norm_num
+  · simp only [carried]
     rw [h1, h2]
   · simp only [exactCount]
+    norm_num
+  · rw [hn]
     norm_num
 
 end Leaky
