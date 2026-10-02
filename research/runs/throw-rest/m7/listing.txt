@@ -1,0 +1,12 @@
+  the release guard: ReleaseExcursion { checkpoint: None, height: Some(Ratio { numer: 0, denom: 1 }) }
+executed move-once: 8 order2 requests at development seed 2026093061, the candidate arm, from m7 (ρ 102837/131072); the bank p = 5/8, grain 2^(-16)
+    the incumbent's own comparison, exact: 7271844498755134405950472534405/79228162514264337593543950336 1817981066908963241607610905885/19807040628566084398385987584
+  m7 throw: the incumbent: ρ 102837/131072; L ∈ [375945/4096, 375950/4096) nats, X ∈ [194773/4096, 194778/4096) nats; solved 2 of 64; whole 0 (released 8, stations right 18); 270578 ms
+    the throw: flight of 0 moves, at rest; power along the coast none; coast released from rest; kinetic reading none; impulse step Some(Ratio { numer: 16, denom: 1 })
+    γ_ρ Some(Ratio { numer: 9055555, denom: 131072 }), Δρ per unit of E's step Some(Ratio { numer: 0, denom: 1 }) (24 bits)
+    move 0: adopted at step 4; the ladder's start Some((Ratio { numer: 16, denom: 1 }, EntryScale)); trials η 16 Some("refused"), η 8 Some("refused"), η 4 None; persistence Persistence { locks: 64, solved: 3, reread: 3, stay: 0, fall: 3, reversed: 3, uncertified: 0 }; 270579 ms
+      trials: η 16 ρ unmoved mask [376424/4096, 376429/4096) own [396255/4096, 396261/4096) NotBelow; η 8 ρ unmoved mask [358919/4096, 358924/4096) own [381915/4096, 381920/4096) OwnNotBelow; η 4 ρ unmoved mask [360266/4096, 360271/4096) own [364068/4096, 364073/4096) adopted; γ_ρ [282986/4096, 282987/4096)
+  m7 throw: the adopted successor's own release: ρ 102837/131072; L ∈ [364068/4096, 364073/4096) nats, X ∈ [184781/4096, 184786/4096) nats; solved 5 of 64; whole 0 (released 8, stations right 19); 270579 ms
+    the successor's own comparison, exact: 3521057834443374633563327295027/39614081257132168796771975168 7042194941904773047463749048619/79228162514264337593543950336
+  m7: throw adopted; the later metrics are not attempted
+executed move-once: 270627 ms; resident 177557504 now, 182140928 peak
