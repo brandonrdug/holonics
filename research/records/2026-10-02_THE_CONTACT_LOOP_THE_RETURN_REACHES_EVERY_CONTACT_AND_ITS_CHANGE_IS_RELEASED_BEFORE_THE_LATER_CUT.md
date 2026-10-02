@@ -937,3 +937,79 @@ The lever is the source passage's entry into the anchor, the moments
 over the transport's own motion. The next read separates the innovation's parts at their owner:
 the term `E_g(u_k)` against the transport `Ĝ_g(τ_g(k))⁻¹`, with the anchors read before the
 clock's rotation as well as after it.
+
+## 24. The leaky count, built; recency at the founding duplicates the tree
+
+**The cause of §23, at its owner.** The word opens on the source ring with
+`s_g(0) = P_g^(τ_g) m̃_g`, and campaign 1's transport has modulus one, so the open is the whole
+passage's phase counts over their population: `M_g[c] ν̂(n)`. Every cell weighs `1/n`, the newest as
+much as the first. A cell therefore moves the anchor by about `1/n` of its size, which is what §23
+measured. Below modulus one the open weighs a datum `ρ^a / Σ ρ^(a_k)`, but the phases carry a
+datum's age only within one turn, so a passage over one turn was refused
+(`HnnError::AliasedAges`), and #62 owed "the leaky count".
+
+**The law, built** (`hnn::moment`, "The leaky count"; `SourceMoment::open_with`). A moment opened at
+a transport below one also carries its counts decayed by the transport: at each of the ring's
+ticks every count is multiplied by `ρ`, and the cell then enters at its phase. A datum `a` ticks old
+weighs its transported weight over a passage of any length, because the age is carried by the decay
+and not read from the phase. The counts are carried on `2^(−L_ν−m)`, `m = ⌈log₂(1/(1 − ρ))⌉`, each
+product read at the nearest point. A carried count then stays within `2^(−L_ν−m−1)/(1 − ρ) ≤
+2^(−L_ν−1)` of the exact decayed count, and a count below half a unit leaves the record. The offset
+counts decay the same way. The test reads a 400-cell passage of many turns on campaign 1's field
+within one population-chart unit of the brute-force transported weights; at modulus one the moment
+reads what it read before (the 267 `hnn` tests pass). The record is a quotient sufficient for the
+transported open, not a list of cells, and is read only at the modulus it was opened at.
+
+**Campaign 1 at the founding modulus.** `Constitution::founded_transport` founds ring 0 at
+`ρ₀ = 10809/2^17` (`ρ₀^5 ≤ 2^(−18)`: period 5, `L_ν = 18`). A datum one tick old weighs about a
+twelfth, and ring 0 ticks only at the cells its port selects
+([exposure](2026-10-02_THE_CONTACT_LOOP_receipts/leaky_count_exposure.txt): 538,546 ms against
+596 s projected, inside the 720 s deadline).
+
+| Reading | Lossless (§19) | Leaky count at `ρ₀` |
+|---|---|---|
+| held out, model − PPM-2 | `−208 + 0/16 + ε` bits | `−196 + 7/16 + ε` bits (the tree alone's) |
+| held out, the wave's contribution | `−13 + 9/16 + ε` bits | `+62 + 14/16 + ε` bits |
+| training, the wave's contribution | `−115 + 15/16 + ε` bits | `+237 + 13/16 + ε` bits |
+| the receiver's span, first aeon | `32642301/2^24` bits | `16504115/2^21` bits |
+
+The gate fails: the wave raises the code by 63 bits held out and 238 in training, and the
+population falls back to the tree. The fitted receiver tells why
+([anchors](2026-10-02_THE_CONTACT_LOOP_receipts/leaky_count_anchors.txt); the samples run passed its
+1,400 s deadline after two closes and is incomplete). On the second aeon, fitted on the first, the
+best ridge of four saves `1102/2^22` bit a reading against the tree alone. The online replay
+diverges. The short memory carries nothing the depth-4 landmark tree does not already hold, and the
+anchors are large enough (the span quadruples) that `R` pays for every wrong swing. Campaign 1 keeps
+the lossless transport. The leaky count is the law for any modulus below one, and the modulus is the
+executed comparison's learned locus; the founding's reason (the phase record's one-turn alias) no
+longer binds a leaky moment.
+
+**Even the leaky anchors do not separate recent contexts.** Readings sharing their preceding one to
+four cells have anchors `9080097/2^23` to `9272217/2^23` as far apart as pairs at the same lags. On
+the anchors' shift-invariant spectrum (the 11-point transform's magnitudes, which remove the ring's
+rotation) the ratios are `9137415/2^23`, `14441653/2^24`, `14848212/2^24` and `15326368/2^24`. The
+lossless anchors' spectrum gives `16621667/2^24` to `16060674/2^24`. The word carries the open from
+ring 0 through the contacts to ring 2, and the contacts' attenuation depends on the joint phase
+(the openness census in `FieldDeclaration::quarter_turn`), so the same open reaches the receiver
+through different transfers.
+
+**Where PPM-4's 119 bits are**
+([receipt](2026-10-02_THE_CONTACT_LOOP_receipts/context_orders.txt), each aeon's code). Bits per
+aeon, PPM order 4 against the tree alone (from the class-metric exposure's course by aeon):
+
+| Aeon | 0 | 1 | 2 | 3 | 4 | 5 |
+|---|---|---|---|---|---|---|
+| PPM-4 | `10301794/2^11` | `16592879/2^12` | `15084394/2^12` | `8678180/2^11` | `9277217/2^11` | `11255845/2^14` |
+| tree | `4945 + 10/16 + ε` | `4004 + 8/16 + ε` | `3779 + 3/16 + ε` | `4180 + 15/16 + ε` | `4629 + 8/16 + ε` | `717 + 14/16 + ε` |
+
+The tree codes below PPM-4 in aeons 0, 1 and 3, and above it by about 96, 100 and 31 bits in aeons
+2, 4 and 5. Aeon 2 favours order 3 more still (`15031399/2^12`). The gap is the tree's adaptation
+to contexts of three and four cells where the passage repeats them, inside the same depth-4
+address.
+
+[agent-inferred] The measured headroom is in the landmark tree's estimator on recurring contexts,
+not in the wave. The wave's useful content so far is the long-range one (§21, a thirtieth of a bit a
+reading), and recency at the founding duplicates the tree. The next loop reads why the depth-4 tree
+lags on the aeons whose contexts recur: its estimator at a context seen a few times, against what
+its own counts would support. A classical compressor stays an exterior yardstick, never a machine
+part.

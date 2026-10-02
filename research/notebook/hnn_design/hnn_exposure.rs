@@ -232,6 +232,7 @@ fn main() {
     let mut descent = false;
     let mut samples_out: Option<String> = None;
     let mut refining = false;
+    let mut founded = false;
     for pair in arguments.chunks(2) {
         match pair {
             [key, value] if key == "cells" => cells = Some(value.clone()),
@@ -258,6 +259,7 @@ fn main() {
             [key, value] if key == "descent" => descent = value == "on",
             [key, value] if key == "samples" => samples_out = Some(value.clone()),
             [key, value] if key == "grain" && value == "refining" => refining = true,
+            [key, value] if key == "transport" && value == "founded" => founded = true,
             _ => {
                 println!(
                     "usage: hnn_exposure [cut-file <path>] [cells <N|all>] [held-out <cells>] [windows <deadline>] [realization <host|card>] [resonator <none|source>] [gate f2]"
@@ -328,7 +330,25 @@ fn main() {
     } else {
         reference
     };
-    let constitution = loaded.then(|| loaded_constitution(&field));
+    let constitution = if founded {
+        // The source rings' transport founded off the lossless boundary, read by the leaky count
+        // (the contact loop record §24).
+        let mut initial = loaded.then(|| loaded_constitution(&field)).unwrap_or_else(|| {
+            Constitution::initial(&field, CAMPAIGN_ONE_BUDGET).expect("the initial constitution")
+        });
+        for &ring in field.sources() {
+            initial = initial
+                .founded_transport(&field, ring)
+                .expect("the founded transport");
+            println!(
+                "transport: ring {ring} founded at {} (the leaky count)",
+                initial.founding_transport(&field, ring).expect("the founding")
+            );
+        }
+        Some(initial)
+    } else {
+        loaded.then(|| loaded_constitution(&field))
+    };
     let setup = setup.elapsed().as_millis();
     let aperture = field.receivers()[0].aperture;
     println!("hnn_exposure: campaign 1's declared field over {source}");
@@ -375,7 +395,7 @@ fn main() {
     );
     println!("setup (cut read, fields declared): {setup} ms wall");
     if let Some(count) = ablation {
-        contact_ablation_run(&field, &cut, count, information, descent, samples_out.as_deref());
+        contact_ablation_run(&field, &cut, count, information, descent, samples_out.as_deref(), founded);
         return;
     }
 
@@ -1030,6 +1050,7 @@ fn contact_ablation_run(
     information: usize,
     descent: bool,
     samples_out: Option<&str>,
+    founded: bool,
 ) {
     use holonics::hnn::reference::contact_ablation;
     let clock = Instant::now();
@@ -1090,7 +1111,12 @@ fn contact_ablation_run(
         field,
         &cut.cells,
         windows,
-        holonics::hnn::reference::AblationOptions { information, descent, samples: samples_out.is_some() },
+        holonics::hnn::reference::AblationOptions {
+            information,
+            descent,
+            samples: samples_out.is_some(),
+            founded,
+        },
         &mut |c, readings, receiver, samples, trees, maps| {
             aeon_line(c.aeon - 1, readings, receiver);
             cumulative_line(c);

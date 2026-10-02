@@ -8,7 +8,8 @@ the same group over the mean squared distance between two anchors overall (pairs
 aeon's readings onward from aeon 1, groups of at least two). It also reports
 the distance at each time lag, and each context's distance over the distance at its pairs' own lags.
 A ratio well below one means the anchor separates that context. Last, per phase, the anchors'
-linear transport over two readings and its residual (the innovation), grouped by the cells entered. Floating point is a search outside the machine; each value is reported as
+linear transport over two readings and its residual (the innovation), grouped by the cells entered,
+and the context test on the anchors' shift-invariant spectrum (the ring's rotation removed). Floating point is a search outside the machine; each value is reported as
 the exact dyadic of its float at 24 significant bits.
 """
 import sys
@@ -83,6 +84,26 @@ def main(samples_path, cut_path):
                     within += len(members) * ((G - G.mean(axis=0)) ** 2).sum()
                     pairs += len(members) * (len(members) - 1) // 2
             print(f"  the innovation grouped by {name}: {pairs} pairs; within over overall {exact(within / pairs / overall)}")
+
+    # The same context test on the anchors' shift-invariant spectrum: the magnitudes of the 11-point
+    # transform of the complex node values, unchanged by a cyclic rotation of the ring.
+    spectrum = np.abs(np.fft.fft(Z[:, 0::2] + 1j * Z[:, 1::2], axis=1))
+    Sk = spectrum[keep]
+    overall = 2 * ((Sk - Sk.mean(axis=0)) ** 2).sum(axis=1).mean()
+    line = []
+    for depth in (1, 2, 3, 4):
+        groups = defaultdict(list)
+        for i in keep:
+            if i >= depth:
+                groups[cut[i - depth:i]].append(i)
+        within, pairs = 0.0, 0
+        for members in groups.values():
+            if len(members) >= 2:
+                G = spectrum[members]
+                within += len(members) * ((G - G.mean(axis=0)) ** 2).sum()
+                pairs += len(members) * (len(members) - 1) // 2
+        line.append(f"depth {depth} {exact(within / pairs / overall)}")
+    print("the shift-invariant spectrum, within over overall: " + "; ".join(line))
 
 
 if __name__ == "__main__":

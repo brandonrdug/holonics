@@ -6,7 +6,8 @@ the law `compression::landmark::context::baseline::Ppm` states, run online over 
 cells for orders 0 to 8, prequential (each cell coded at the counts before it). Masses are exact
 fractions; each total code length is reported as the exact dyadic of its float sum of logarithms at
 24 significant bits (the logarithm is an exterior search). Arguments: the cut file, n*, the held-out
-start. It prints, per order, the training and held-out code in bits.
+start, and optionally the aeons' closing cells (comma-separated). It prints, per order, the training
+and held-out code in bits, and with the closes each aeon's code.
 """
 import math
 import sys
@@ -46,16 +47,20 @@ def ppm_codes(cells, order, alphabet=256):
     return codes
 
 
-def main(path, n_star, held):
+def main(path, n_star, held, closes=None):
     cells = list(open(path, "rb").read()[:n_star])
     for order in range(0, 9):
         codes = ppm_codes(cells, order)
-        print(
+        line = (
             f"PPM order {order}: training {exact(sum(codes[:held]))} bits over {held} cells, "
-            f"held out {exact(sum(codes[held:]))} bits over {n_star - held} cells",
-            flush=True,
+            f"held out {exact(sum(codes[held:]))} bits over {n_star - held} cells"
         )
+        if closes:
+            bounds = [0] + closes + [n_star]
+            line += "; by aeon " + ", ".join(exact(sum(codes[a:b])) for a, b in zip(bounds, bounds[1:]))
+        print(line, flush=True)
 
 
 if __name__ == "__main__":
-    main(sys.argv[1], int(sys.argv[2]), int(sys.argv[3]))
+    extra = [int(x) for x in sys.argv[4].split(",")] if len(sys.argv) > 4 else None
+    main(sys.argv[1], int(sys.argv[2]), int(sys.argv[3]), extra)

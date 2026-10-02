@@ -15,4 +15,5 @@ phase 0: 1162 readings; innovation over the anchors' variance 15980795/2^26; the
 phase 1: 1162 readings; innovation over the anchors' variance 16247760/2^26; the transport's largest eigenvalue moduli 15620423/2^24 15846648/2^24 15846648/2^24 16342757/2^24
   the innovation grouped by the two cells entered: 4150 pairs; within over overall 15587670/2^24
   the innovation grouped by the cell before: 40795 pairs; within over overall 8953740/2^23
+the shift-invariant spectrum, within over overall: depth 1 16621667/2^24; depth 2 16060674/2^24; depth 3 16535104/2^24; depth 4 16362334/2^24
 args: anchor_memory.py over the same samples and the pinned cut; under 60 s

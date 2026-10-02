@@ -1,10 +1,10 @@
-PPM order 0: training 12886028/2^9 bits over 4958 cells, held out 12894750/2^11 bits over 1190 cells
-PPM order 1: training 10980741/2^9 bits over 4958 cells, held out 9597120/2^11 bits over 1190 cells
-PPM order 2: training 9791935/2^9 bits over 4958 cells, held out 16031226/2^12 bits over 1190 cells
-PPM order 3: training 9506802/2^9 bits over 4958 cells, held out 14871358/2^12 bits over 1190 cells
-PPM order 4: training 9539207/2^9 bits over 4958 cells, held out 14691963/2^12 bits over 1190 cells
-PPM order 5: training 9592309/2^9 bits over 4958 cells, held out 14789372/2^12 bits over 1190 cells
-PPM order 6: training 9631889/2^9 bits over 4958 cells, held out 14855218/2^12 bits over 1190 cells
-PPM order 7: training 9646956/2^9 bits over 4958 cells, held out 14905952/2^12 bits over 1190 cells
-PPM order 8: training 9654132/2^9 bits over 4958 cells, held out 14919225/2^12 bits over 1190 cells
-args: context_orders.py over the pinned cut's first n* = 6148 cells, held out from 4958; PPM order 2 matches the exposure's (held out 3913 + 13/16 + eps bits, training 19124 + 13/16 + eps); wall under 1 s
+PPM order 0: training 12886028/2^9 bits over 4958 cells, held out 12894750/2^11 bits over 1190 cells; by aeon 11721802/2^11, 11264029/2^11, 11383647/2^11, 12484619/2^11, 14747798/2^11, 11347871/2^13
+PPM order 1: training 10980741/2^9 bits over 4958 cells, held out 9597120/2^11 bits over 1190 cells; by aeon 10545620/2^11, 9686874/2^11, 9381644/2^11, 10336897/2^11, 11475312/2^11, 16749882/2^14
+PPM order 2: training 9791935/2^9 bits over 4958 cells, held out 16031226/2^12 bits over 1190 cells; by aeon 10254528/2^11, 8489789/2^11, 15837898/2^12, 9053943/2^11, 9843580/2^11, 12980494/2^14
+PPM order 3: training 9506802/2^9 bits over 4958 cells, held out 14871358/2^12 bits over 1190 cells; by aeon 10288551/2^11, 16477706/2^12, 15031399/2^12, 8657919/2^11, 9333779/2^11, 11424676/2^14
+PPM order 4: training 9539207/2^9 bits over 4958 cells, held out 14691963/2^12 bits over 1190 cells; by aeon 10301794/2^11, 16592879/2^12, 15084394/2^12, 8678180/2^11, 9277217/2^11, 11255845/2^14
+PPM order 5: training 9592309/2^9 bits over 4958 cells, held out 14789372/2^12 bits over 1190 cells; by aeon 10309339/2^11, 16675523/2^12, 15226357/2^12, 8748439/2^11, 9333761/2^11, 11371537/2^14
+PPM order 6: training 9631889/2^9 bits over 4958 cells, held out 14855218/2^12 bits over 1190 cells; by aeon 10311458/2^11, 16726798/2^12, 15349808/2^12, 8810099/2^11, 9351530/2^11, 11550191/2^14
+PPM order 7: training 9646956/2^9 bits over 4958 cells, held out 14905952/2^12 bits over 1190 cells; by aeon 10312308/2^11, 16770702/2^12, 15375372/2^12, 8831586/2^11, 9369051/2^11, 11638550/2^14
+PPM order 8: training 9654132/2^9 bits over 4958 cells, held out 14919225/2^12 bits over 1190 cells; by aeon 10313158/2^11, 8396166/2^11, 15397471/2^12, 8841785/2^11, 9368025/2^11, 11666165/2^14
+args: context_orders.py over the pinned cut's first n* = 6148 cells, held out from 4958, the aeons closing at the exposure's cells 1070, 2192, 3330, 4485 and 5874; PPM order 2 matches the exposure's (held out 3913 + 13/16 + eps bits, training 19124 + 13/16 + eps); wall under 2 s

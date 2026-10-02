@@ -3863,8 +3863,9 @@ impl Constitution {
     /// **The constitution with its transport founded off the lossless boundary**
     /// ([`Constitution::founding_transport`]) on a source ring: the executed comparison's declared
     /// opening (`hnn::executed`, "The committed move"). The card, the bank's face path, the
-    /// readout's one anchor and a passage over more than one turn do not read a modulus below one
-    /// (each refuses it, typed); they keep the lossless founding until their forms are built.
+    /// readout's one anchor and a passage over more than one turn on a moment without the leaky
+    /// count (`hnn::moment`, "The leaky count") do not read a modulus below one (each refuses it,
+    /// typed); they keep the lossless founding until their forms are built.
     pub fn founded_transport(self, field: &Field, ring: usize) -> Result<Self, HnnError> {
         let modulus = self.founding_transport(field, ring)?;
         self.with_transport(ring, modulus)
