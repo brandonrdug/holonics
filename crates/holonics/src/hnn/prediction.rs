@@ -72,13 +72,14 @@
 //!   its one population ([`SourceMoment::continued`], [`BankPlacement`]; below), so a station reads
 //!   its neighbours' locked data, and the request's last cells, by their relative phases. Generation
 //!   opens with nothing locked and refines: in each refinement every unlocked station is read jointly,
-//!   and the stations whose top candidate leads its runner-up by the largest gap lock together (no
-//!   positive gap is a plural reading); a locked datum re-enters as placed data and drives the
+//!   and the stations whose top candidate leads its runner-up by the largest gap lock together, a
+//!   gap the readings do not certify below the largest locking with it (no positive gap is a
+//!   plural reading); a locked datum re-enters as placed data and drives the
 //!   others. It stops when every station is locked (released at width zero) or no unlocked station
 //!   has a positive gap (held, typed). A training comparison over a drawn partition ([`mask`]) places
 //!   the locked stations' targets and compares the others, so no station reads its own target. The
-//!   lock's order is the field's own (the largest drive locks first, ties together); it is not an
-//!   output index, and a locked station is never redrawn.
+//!   lock's order is the field's own (the largest drive locks first, the stations not certified
+//!   below it together); it is not an output index, and a locked station is never redrawn.
 //!
 //! [definition; agent-inferred, September 30; the
 //! [placement's record](../../../../research/records/2026-09-30_THE_PASSAGE_LAW_THE_SECTION_CONTINUES_THE_REQUEST_AND_THE_TRANSPORT_WEIGHS_ITS_FRONTIER.md)]
@@ -138,9 +139,13 @@
 //!   member) and its joint growth, enclosed exactly;
 //! - **the lock's flip**: a station's top candidate reads a growth strictly above every other
 //!   candidate's (`θ = a/(a + K) > ½ ⇔ a > K`, on exact enclosures) and the bank locks there (its
-//!   growth certified past one); its gap is the top's `lower` less the largest other `upper`; the
-//!   stations of the largest gap lock together, each lock's reading certified (every member's
-//!   Floquet certificate at the joint growth, the executed turn's balances);
+//!   growth certified past one); its gap is enclosed by the top's `lower` less the largest other
+//!   `upper` (the certain gap) and the top's `upper` less the largest other `lower` (its upper end); a
+//!   station locks when its upper end meets the largest certain gap, so every station the readings do
+//!   not certify below the largest locks with it (exact ties when the readings are exact; the
+//!   [flip record](../../../../research/records/2026-10-02_A_FLIP_IS_SET_BY_THE_LOCK_RULES_MARGIN_AND_NO_LAW_IN_THE_CHAIN_CERTIFIES_IT_BEFORE_THE_SUCCESSOR_IS_READ.md)
+//!   §5), each lock's reading certified (every member's Floquet certificate at the joint growth,
+//!   the executed turn's balances);
 //! - **the release**: every station locked, at width zero through `receiver::release`; no station
 //!   with a positive gap, held with the unlocked stations plural;
 //! - **one owner** [agent-inferred, September 30]: the lock iteration is [`bank_release`], which
@@ -170,6 +175,7 @@
 //! | the passage's transported and station-framed weights | `HNN/IndexedOpen.{transportedWeight, framedWeight, framed_weight_mass, framed_weight_one_sided, framed_weight_le_pow}` | [`BankPlacement`] |
 //! | a landing's normalization and entry, read apart (loop 1c's diagnostic, never a law) | `HNN/IndexedOpen.{transported_weight_insert, transported_weight_insert_scale}` | [`BankPlacement::storage_over`] |
 //! | the release's order read as a diagnostic factor (the law is [`LockOrder::Gap`]) | abstracted in `HNN/ExecutedComparison.decisions_release_the_section` | [`LockOrder`], [`bank_release_ordered`] |
+//! | the lock set: every station the readings do not certify below the largest gap | `HNN/ExecutedComparison.{certifiedLock_largest, leader_locks, lone_lock_is_largest, certified_order_needs_crossing, certifiedLock_exact}` | [`uncertified_largest`] |
 
 use num_bigint::BigInt;
 use num_traits::{One, Signed, ToPrimitive, Zero};
@@ -456,7 +462,8 @@ impl JointGrowth for TurnCovector {
 /// ([`ReceivingBank::read_turn`]). A station's reading is the lock's flip: its top candidate's joint
 /// growth exceeds every other candidate's exactly ([`Growth::exceeds`], `θ = a/(a + K) > ½`) and the
 /// bank locks there ([`Growth::is_locked`]); its gap is the top's `lower` less the largest other
-/// `upper`. Every station of the largest positive gap locks (ties together), its reading certified
+/// `upper`, its upper end the top's `upper` less the largest other `lower`. Every station whose upper end
+/// meets the largest positive gap locks (the readings do not order it below), its reading certified
 /// ([`ReceivingBank::certify_turn`]); a locked datum is placed for the next refinement. It stops when
 /// every station is locked, released at width zero through `receiver::release` (`section_release`),
 /// or when no unlocked station has a positive gap, held with them plural, or when a lock's
@@ -494,7 +501,8 @@ pub fn generate_by_bank(
 /// [definition; agent-inferred, September 30] **The bank's lock iteration, its one owner**
 /// ([`generate_by_bank`]'s law, read by the release's own comparison `hnn::executed` with each
 /// candidate's covector): every refinement reads every open candidate by `read`, decides each
-/// open station's lock's flip and gap, locks the stations of the largest positive gap together,
+/// open station's lock's flip and gap, locks together the stations not certified below the largest
+/// positive gap,
 /// certifies each lock's reading, and stops at the whole section, at a plural refinement, or at a
 /// refused certificate. With `keep`, each refinement's readings are returned.
 pub fn bank_release<R: JointGrowth + Send + Sync>(
@@ -512,7 +520,8 @@ pub fn bank_release<R: JointGrowth + Send + Sync>(
 /// [definition; agent-inferred, loop 1c's
 /// [pin](../../../../research/records/2026-10-01_LOOP_1C_PERSISTENCE_REPRESENTATION_AND_REACH_PINNED_BEFORE_ITS_RUNS.md)
 /// §2.4] **Which eligible stations a refinement locks.** The release's law is [`LockOrder::Gap`]:
-/// the stations of the largest positive gap, together (the field's own order). The other two are
+/// the stations whose gap the readings do not certify below the largest, together (the field's
+/// own order). The other two are
 /// diagnostics of the release's order, never a law: among the same eligible stations (each top's
 /// flip and lock certified, its gap positive) a refinement locks the one of least station index
 /// ([`LockOrder::Ascending`], the receiving ring's clock direction from the request's last tick) or
@@ -520,12 +529,36 @@ pub fn bank_release<R: JointGrowth + Send + Sync>(
 /// certificates and the stopping rules are the release's own under every order.
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub enum LockOrder {
-    /// The release's law: the stations of the largest positive gap lock together.
+    /// The release's law: the stations not certified below the largest positive gap lock together.
     Gap,
     /// A diagnostic: the eligible station of least index locks alone.
     Ascending,
     /// A diagnostic: the eligible station of greatest index locks alone.
     Descending,
+}
+
+/// [definition; agent-inferred, October 2; its consequences proved-derived, formal-checked] **The
+/// stations the readings do not certify below the largest gap** ([`LockOrder::Gap`]): each eligible station's gap is enclosed by its certain
+/// gap `L_top − max_(x≠top) U_x` and its upper end `U_top − max_(x≠top) L_x`; a station locks when its
+/// upper end meets the largest certain gap. The station of the largest certain gap always locks, so a
+/// refinement with an eligible station locks one (Lean
+/// `HNN/ExecutedComparison.certifiedLock_largest`); the true largest gap always locks
+/// (`leader_locks`); a station that locks alone has the strictly largest true gap
+/// (`lone_lock_is_largest`), so no move makes a station certified below another lock alone before it
+/// unless their true gaps cross (`certified_order_needs_crossing`). On exact readings it is the
+/// largest gap with its ties (`certifiedLock_exact`). The comparison's order term reads the same
+/// two ends (`hnn::executed::OrderTerm`; `order_solved_locks_no_wrong`).
+pub(crate) fn uncertified_largest(gaps: &[(usize, usize, Rat)], gap_uppers: &[Rat]) -> Vec<usize> {
+    let largest = gaps.iter().map(|(_, _, gap)| gap).max();
+    match largest {
+        Some(largest) => gaps
+            .iter()
+            .zip(gap_uppers)
+            .filter(|(_, gap_upper)| *gap_upper >= largest)
+            .map(|(&(station, _, _), _)| station)
+            .collect(),
+        None => Vec::new(),
+    }
 }
 
 /// **The bank's lock iteration under a declared order** ([`bank_release`] at [`LockOrder::Gap`];
@@ -607,8 +640,10 @@ fn release_iteration<R: JointGrowth + Send + Sync>(
             .collect::<Result<Vec<_>, HnnError>>()?;
         refinements += 1;
         readings += read.len();
-        // Each unlocked station's lock's flip: its top candidate and gap.
+        // Each unlocked station's lock's flip: its top candidate and its gap's enclosure, the
+        // certain gap `L_top − max U` (the gap read) and its upper end `U_top − max L`.
         let mut gaps: Vec<(usize, usize, Rat)> = Vec::new();
+        let mut gap_uppers: Vec<Rat> = Vec::new();
         let mut station_tops = Vec::new();
         for (index, chunk) in read.chunks(alphabet).enumerate() {
             let station = open[index * alphabet].0;
@@ -636,21 +671,20 @@ fn release_iteration<R: JointGrowth + Send + Sync>(
                     Some(runner) => &top.lower - runner,
                     None => top.lower.clone(),
                 };
+                let floor = (0..alphabet)
+                    .filter(|&class| class != best)
+                    .map(|class| chunk[class].joint().lower.clone())
+                    .max();
+                let gap_upper = match &floor {
+                    Some(floor) => &top.upper - floor,
+                    None => top.upper.clone(),
+                };
                 gaps.push((station, best, gap));
+                gap_uppers.push(gap_upper);
             }
         }
         let now: Vec<usize> = match order {
-            LockOrder::Gap => {
-                let largest = gaps.iter().map(|(_, _, gap)| gap.clone()).max();
-                match &largest {
-                    Some(largest) => gaps
-                        .iter()
-                        .filter(|(_, _, gap)| gap == largest)
-                        .map(|&(station, _, _)| station)
-                        .collect(),
-                    None => Vec::new(),
-                }
-            }
+            LockOrder::Gap => uncertified_largest(&gaps, &gap_uppers),
             LockOrder::Ascending => gaps.iter().map(|&(station, _, _)| station).min().into_iter().collect(),
             LockOrder::Descending => gaps.iter().map(|&(station, _, _)| station).max().into_iter().collect(),
         };

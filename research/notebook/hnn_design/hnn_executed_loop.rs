@@ -11,6 +11,7 @@
 //! cargo run --release -p holonics --example hnn_prediction -- executed witness <terrain> <seed> <count> <moves> <deadline ms> <out>
 //! cargo run --release -p holonics --example hnn_prediction -- executed causal <terrain> <seed> <count> <label[=E]>…
 //! cargo run --release -p holonics --example hnn_prediction -- executed segment <terrain> <seed> <count> <label=source>…
+//! cargo run --release -p holonics --example hnn_prediction -- executed instants <terrain> <seed> <count> <label=source>…
 //! cargo run --release -p holonics --example hnn_prediction -- executed direction <terrain> <seed> <count> <arm> <from> <toward> <out> <η>…
 //! cargo run --release -p holonics --example hnn_prediction -- executed rho-slopes <terrain> <seed> <count> <arm> <label=source>…
 //! cargo run --release -p holonics --example hnn_prediction -- executed witness-plane <terrain> <seed> <count> <arm> <toward> <out> <label=source>…
@@ -4047,4 +4048,208 @@ pub(super) fn joined(terrain: &str, seed: u64, count: usize, arm: &str, sources:
         }
     }
     println!("executed joined: {} ms; resident {}", clock.elapsed().as_millis(), resident());
+}
+
+/// [measured-diagnostic; agent-inferred, October 2; the
+/// [turn-clock record](../../records/2026-10-02_THE_COMMITMENT_IS_READ_ON_THE_TURN_CLOCK_ITS_ORDER_IS_RESOLVED_TO_ONE_TURN_AND_A_CROSSING_JUMPS_ONLY_AT_A_WHOLE_TURN.md)
+/// §4, §9; read-only, never a law] **The whole-turn commitment turns beside the gap order**
+/// (`executed instants`). Each request's release runs under its own law (`LockOrder::Gap`), its
+/// refinements kept. At every refinement, each eligible station's commitment turn is read from its
+/// candidates' joint growths: the least whole `n` at which the commitment residual
+/// `R(n) = a_top^(−n) + Σ_y (a_y/a_top)^n` places the top within the grain, `(1 + R(n))^16 ≤ 2`
+/// (`τ = 1/16` bit; Lean `HNN/OrderTemperature.commit_turn_iff`). The turn is enclosed: `[n_lo, n_hi]`
+/// from the readings' two ends, each power carried by squaring with every product rounded outward on
+/// `2^(−64)ℤ`, so the enclosure is sound. A refinement is read against the whole-turn law: the
+/// eligible stations of least turn commit together.
+pub(super) fn instants(terrain: &str, seed: u64, count: usize, sources: &[String]) {
+    use holonics::hnn::prediction::bank_release;
+    use holonics::hnn::ring::Growth;
+    use rayon::prelude::*;
+    let declared = order_declared();
+    let engine = Engine::new(declared);
+    let bank = bank_of(declared.period, &bank_strength());
+    let ring = engine.refinement.ring();
+    let alphabet = engine.field.alphabet();
+    let pairs = terrain_pairs(terrain, &declared, seed, count);
+    let scale = BigInt::one() << 64u32;
+    // x rounded on 2^(−64)ℤ, up or down.
+    let round = |x: &Rat, up: bool| -> Rat {
+        let scaled = x * Rat::from_integer(scale.clone());
+        let n = if up { scaled.ceil() } else { scaled.floor() }.to_integer();
+        Rat::new(n, scale.clone())
+    };
+    // x^n for 0 ≤ x, carried by squaring with every product rounded the same way.
+    let power = |x: &Rat, n: u64, up: bool| -> Rat {
+        let (mut base, mut exp, mut acc) = (round(x, up), n, Rat::one());
+        while exp > 0 {
+            if exp & 1 == 1 {
+                acc = round(&(&acc * &base), up);
+            }
+            base = round(&(&base * &base), up);
+            exp >>= 1;
+        }
+        acc
+    };
+    // The residual's test at a whole turn, read at one end of the enclosures.
+    let commits = |inverse_top: &Rat, ratios: &[Rat], n: u64, up: bool| -> bool {
+        let mut residual = power(inverse_top, n, up);
+        for r in ratios {
+            residual += power(r, n, up);
+        }
+        let one_plus = Rat::one() + residual;
+        let mut sixteenth = one_plus.clone();
+        for _ in 0..4 {
+            sixteenth = &sixteenth * &sixteenth;
+        }
+        sixteenth <= Rat::from_integer(BigInt::from(2))
+    };
+    // The least whole turn at which the test holds: doubling, then bisection.
+    let least = |inverse_top: &Rat, ratios: &[Rat], up: bool| -> u64 {
+        let mut high = 1u64;
+        while !commits(inverse_top, ratios, high, up) {
+            high = high.checked_mul(2).expect("a commitment turn below 2^64");
+        }
+        let mut low = high / 2;
+        while low + 1 < high {
+            let middle = low + (high - low) / 2;
+            if commits(inverse_top, ratios, middle, up) {
+                high = middle;
+            } else {
+                low = middle;
+            }
+        }
+        high
+    };
+    // A station's turn enclosure [n_lo, n_hi] from its candidates' joints and its top.
+    let turns = |joints: &[&Growth], top: usize| -> (u64, u64) {
+        let top_growth = joints[top];
+        let at = |a_top: &Rat, rival: &dyn Fn(&Growth) -> Rat, up: bool| -> u64 {
+            let inverse = Rat::one() / a_top;
+            let ratios: Vec<Rat> = (0..joints.len())
+                .filter(|&y| y != top)
+                .map(|y| rival(joints[y]) / a_top)
+                .collect();
+            least(&inverse, &ratios, up)
+        };
+        let n_hi = at(&top_growth.lower, &|g: &Growth| g.upper.clone(), true);
+        let n_lo = at(&top_growth.upper, &|g: &Growth| g.lower.clone(), false);
+        (n_lo, n_hi)
+    };
+    for source in sources {
+        let (label, spec) = source.split_once('=').unwrap_or((source.as_str(), "opening"));
+        let theta = segment_source(&engine, ring, spec);
+        let started = Instant::now();
+        let per_request: Vec<(Vec<String>, [usize; 6], Vec<u64>)> = pairs
+            .par_iter()
+            .enumerate()
+            .map(|(index, (request, _))| {
+                let unit = Instant::now();
+                let (current, moment) = ingest(&engine.field, request);
+                let placement =
+                    BankPlacement::of(&engine.field, &theta, &current, &moment, &engine.refinement)
+                        .expect("the placement");
+                let (_, refinements) = bank_release(
+                    &placement,
+                    &engine.refinement,
+                    alphabet,
+                    &bank,
+                    BANK_GRAIN,
+                    |amplitudes| bank.read_turn(amplitudes, BANK_GRAIN),
+                    true,
+                )
+                .expect("the release");
+                // [refinements, agree, coarser (whole-turn locks more together), inverted
+                // (gap locks a station of later turn), enclosure open (n_lo < n_hi somewhere),
+                // single-station gap locks]
+                let mut tally = [0usize; 6];
+                let mut lines = Vec::new();
+                let mut locked_turns = Vec::new();
+                for (k, refinement) in refinements.iter().enumerate() {
+                    if refinement.eligible.is_empty() {
+                        continue;
+                    }
+                    tally[0] += 1;
+                    let mut read: Vec<(usize, Rat, (u64, u64))> = Vec::new();
+                    for (station, top, gap) in &refinement.eligible {
+                        let first = refinement
+                            .open
+                            .iter()
+                            .position(|&(s, _)| s == *station)
+                            .expect("an open station");
+                        let joints: Vec<&Growth> = (0..alphabet)
+                            .map(|class| &refinement.read[first + class].joint)
+                            .collect();
+                        read.push((*station, gap.clone(), turns(&joints, *top)));
+                    }
+                    let open = read.iter().any(|(_, _, (lo, hi))| lo < hi);
+                    tally[4] += usize::from(open);
+                    let least_hi = read.iter().map(|(_, _, (_, hi))| *hi).min().expect("eligible");
+                    let least_lo = read.iter().map(|(_, _, (lo, _))| *lo).min().expect("eligible");
+                    // The whole-turn law's first set, where the enclosures decide it.
+                    let first_set: Vec<usize> = read
+                        .iter()
+                        .filter(|(_, _, (_, hi))| *hi == least_hi)
+                        .map(|(s, _, _)| *s)
+                        .collect();
+                    let locked: Vec<usize> = refinement.locked.clone();
+                    tally[5] += usize::from(locked.len() == 1);
+                    for (s, _, (_, hi)) in &read {
+                        if locked.contains(s) {
+                            locked_turns.push(*hi);
+                        }
+                    }
+                    let inverted = read
+                        .iter()
+                        .any(|(s, _, (lo, _))| locked.contains(s) && *lo > least_hi);
+                    if inverted {
+                        tally[3] += 1;
+                    } else if !open && locked.iter().all(|s| first_set.contains(s)) {
+                        if locked.len() == first_set.len() {
+                            tally[1] += 1;
+                        } else {
+                            tally[2] += 1;
+                        }
+                    }
+                    let listing: Vec<String> = read
+                        .iter()
+                        .map(|(s, gap, (lo, hi))| {
+                            let turn = if lo == hi { format!("{hi}") } else { format!("[{lo},{hi}]") };
+                            let mark = if locked.contains(s) { "*" } else { "" };
+                            format!("{s}{mark}:gap {} turn {turn}", cell(&ExactInterval::point(gap.clone()), 1 << 12))
+                        })
+                        .collect();
+                    lines.push(format!(
+                        "    request {index} refinement {k}: least turn {least_lo}..{least_hi}; {}",
+                        listing.join(", ")
+                    ));
+                }
+                lines.push(format!(
+                    "    request {index}: {} refinements read, {} ms",
+                    tally[0],
+                    unit.elapsed().as_millis()
+                ));
+                (lines, tally, locked_turns)
+            })
+            .collect();
+        let mut total = [0usize; 6];
+        let mut histogram: BTreeMap<u64, usize> = BTreeMap::new();
+        println!("{label} ({spec}):");
+        for (lines, tally, locked_turns) in &per_request {
+            for line in lines {
+                println!("{line}");
+            }
+            for (t, x) in total.iter_mut().zip(tally) {
+                *t += x;
+            }
+            for n in locked_turns {
+                *histogram.entry(*n).or_insert(0) += 1;
+            }
+        }
+        println!(
+            "  {label}: {} refinements with an eligible station; the gap order's locks are the whole-turn law's first set at {}, a strict part of it at {}, a later turn at {}; enclosures left a turn open at {}; single-station gap locks {}",
+            total[0], total[1], total[2], total[3], total[4], total[5]
+        );
+        println!("  {label}: commitment turns (n_hi) of the gap order's locks: {histogram:?}");
+        println!("  {label}: wall time {} ms", started.elapsed().as_millis());
+    }
 }
