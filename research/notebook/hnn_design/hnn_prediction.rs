@@ -232,7 +232,7 @@ fn bank_of(period: u64, strength: &Rat) -> ReceivingBank {
 const BANK_DECISION_GRAIN: u32 = 6;
 
 /// [agent-inferred, the bank pin] **The bank's strength**: the parametron record's declared bank,
-/// unchanged, `p = 5/8` (its lock window on unit cells; the development reads at `p = 5/8` and
+/// unchanged, `p = 5/8` (its lock interval on unit cells; the development reads at `p = 5/8` and
 /// `p = 1` read alike). **The turn's relative grain** `2^(−16)`: the least margin the development
 /// read locked on was past `2^(−8)` of its growth, so every lock was decided far inside it.
 fn bank_strength() -> Rat {
