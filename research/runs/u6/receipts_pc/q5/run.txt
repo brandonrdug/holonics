@@ -1,0 +1,18 @@
+executed run: 8 order2 requests at development seed 2026093061, the arm lock-dec, Kinetic, from m13 (ρ 168127/262144; the source port's lattice 2^(-21)); σ over 64 decisions [11356/4096, 11357/4096) nats; cap Some(32), deadline 38400000 ms; the bank p = 5/8, grain 2^(-16)
+  the opening: L ∈ [269593/4096, 269597/4096) nats; solved 15 of 64; whole 0 (released 8, stations right 17)
+    move 0: adopted at step 1/8; the ladder's start Some((Ratio { numer: 1, denom: 8 }, KineticEntryScale)); trials η 1/8 None; persistence Persistence { locks: 64, solved: 9, reread: 8, stay: 7, fall: 1, reversed: 1, uncertified: 0 }; 261569 ms
+      trials: η 1/8 ρ unmoved mask [255170/4096, 255174/4096) own [295903/4096, 295908/4096) adopted; γ_ρ [-545954/4096, -545953/4096)
+  move 0: adopted; ρ 168127/262144; L ∈ [295903/4096, 295908/4096) nats; solved 15 of 64; whole 0 (released 8, stations right 15); 261569 ms
+    move 1: adopted at step 1/8; the ladder's start Some((Ratio { numer: 1, denom: 8 }, KineticEntryScale)); trials η 1/8 None; persistence Persistence { locks: 64, solved: 13, reread: 13, stay: 12, fall: 1, reversed: 1, uncertified: 0 }; 526191 ms
+      trials: η 1/8 ρ unmoved mask [266158/4096, 266162/4096) own [269925/4096, 269930/4096) adopted; γ_ρ [-856305/4096, -856304/4096)
+  move 1: adopted; ρ 168127/262144; L ∈ [269925/4096, 269930/4096) nats; solved 20 of 64; whole 0 (released 8, stations right 15); 526191 ms
+    move 2: adopted at step 1/4; the ladder's start Some((Ratio { numer: 1, denom: 4 }, KineticEntryScale)); trials η 1/4 None; persistence Persistence { locks: 64, solved: 13, reread: 13, stay: 11, fall: 2, reversed: 2, uncertified: 0 }; 794169 ms
+      trials: η 1/4 ρ unmoved mask [248525/4096, 248529/4096) own [259601/4096, 259605/4096) adopted; γ_ρ [-952575/4096, -952574/4096)
+  move 2: adopted; ρ 168127/262144; L ∈ [259601/4096, 259605/4096) nats; solved 29 of 64; whole 0 (released 8, stations right 23); 794169 ms
+    move 3: adopted at step 1/8; the ladder's start Some((Ratio { numer: 1, denom: 8 }, KineticEntryScale)); trials η 1/8 None; persistence Persistence { locks: 64, solved: 14, reread: 14, stay: 8, fall: 6, reversed: 6, uncertified: 0 }; 1056751 ms
+      trials: η 1/8 ρ unmoved mask [207223/4096, 207227/4096) own [224839/4096, 224843/4096) adopted; γ_ρ [-437878/4096, -437877/4096)
+  move 3: adopted; ρ 168127/262144; L ∈ [224839/4096, 224843/4096) nats; solved 33 of 64; whole 0 (released 8, stations right 20); 1056751 ms
+  the opening L ∈ [269593/4096, 269597/4096) nats, σ [11356/4096, 11357/4096) nats
+executed run: closed at move 4: L ∈ [224839/4096, 224843/4096) nats below the opening's lower end less σ; the closing state is out/q5/m13-4.state
+executed run: 1056753 ms; resident 228749312 now, 233992192 peak
+exit 0 wall 1056768 ms
