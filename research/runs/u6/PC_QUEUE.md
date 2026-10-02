@@ -22,19 +22,16 @@ the l1 certificate), each with a host-parity test. So:
 - **Today's U6 reads have no card path**: the executed comparison, the bank release, the kinetic
   and joined moves, `evaluate`, `word-read`, `spectrum` and `run` are host code over `rayon`
   (`hnn::executed`, `hnn::prediction`). They run on the PC's 24 cores.
-- **What could take the card without leaving exact arithmetic**: the contact-path read (P1) is a
-  word's forward passage and receiving read, which `hnn_word_forward` already realizes exactly; the
-  per-request observability rank is one word per source coordinate, the same kernel. Wiring the
-  notebook's read through `Resident` is a build, queued after P1's host measurement. The bank
-  release, the lock order and the move's solve are rational host laws with no card owner; porting
-  them is not exact-integer work yet and is not queued.
+- **What could take the card without leaving exact arithmetic**: a word's forward passage and
+  receiving read (`hnn_word_forward`) and the per-request observability rank (one word per source
+  coordinate, the same kernel). The bank release, the lock order and the move's solve are rational
+  host laws with no card owner; porting them is not exact-integer work yet and is not queued.
 
-## P1. Record §6's gate: the contact path over all 8 stations, at m6 and w16 (held out)
+## P1. Withdrawn
 
-Pending its build on `claude/main-line-cloud-iia3qw` (the main line). `executed word-read` as first
-built (Q9) reads only the receiver's 3 epochs (aperture `K·w + 1 = 3`), not the 8 stations, so it
-is not run at 128. The 8-station read places each station's class and continues the word on it;
-its command is added here with its projection when its cloud smoke passes.
+§6's contact-path read reads a receiving map that is zero at every U6 state (the record's §7). Its
+replacement, the work of each move's deposit and the changed passage, is a single-request read and
+runs in the cloud.
 
 ## P2. Held-out reads of the cloud chains' final states (16 threads, one at a time)
 

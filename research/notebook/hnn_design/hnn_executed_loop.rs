@@ -1678,6 +1678,8 @@ pub(super) fn word_read(terrain: &str, seed: u64, count: usize, sources: &[Strin
         let (mut word_right, mut open_right, mut released_right) =
             (vec![0usize; stations], vec![0usize; stations], vec![0usize; stations]);
         let mut epochs = None;
+        let mut zero_reads = 0usize;
+        let receiving_zero = theta.receiving_map(receiver.ring).is_some_and(|map| map.entries().iter().all(|x| x.is_zero()));
         for (request, (_, targets)) in requests.iter().zip(&pairs) {
             let mut charts = Charts::new();
             let phases = ReceivingPhases::declare(field, &theta, &request.current, &receiver).expect("the receiving phases");
@@ -1686,6 +1688,7 @@ pub(super) fn word_read(terrain: &str, seed: u64, count: usize, sources: &[Strin
             epochs.get_or_insert(anchors.len());
             for (station, anchor) in anchors.iter().enumerate().take(stations) {
                 let read = phases.read(field, &theta, &request.current, anchor).expect("the receiving read");
+                zero_reads += usize::from(read.logits.iter().all(|l| l.is_zero()));
                 let top = (0..symbols).max_by(|&a, &b| read.logits[2 * a].cmp(&read.logits[2 * b]).then(b.cmp(&a))).expect("a class");
                 word_right[station] += usize::from(top == targets[station]);
             }
@@ -1707,7 +1710,7 @@ pub(super) fn word_read(terrain: &str, seed: u64, count: usize, sources: &[Strin
         }
         let sum = |v: &[usize]| v.iter().sum::<usize>();
         println!(
-            "  {label} (ρ {}): the receiver's epochs {epochs:?}; stations right of {}: the word {} {:?}, the bank's open section {} {:?}, the bank's release {} {:?}; {} ms",
+            "  {label} (ρ {}): the receiving map R zero: {receiving_zero}; station reads with every logit zero: {zero_reads}; the receiver's epochs {epochs:?}; stations right of {}: the word {} {:?}, the bank's open section {} {:?}, the bank's release {} {:?}; {} ms",
             theta.transport(ring),
             count * stations,
             sum(&word_right), word_right,

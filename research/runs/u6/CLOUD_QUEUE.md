@@ -108,16 +108,7 @@ timeout 10800 $B executed spectrum order2 2026093061 8 m7=$S/m7.state lock-dec k
 Report the header (the lattice unit), each read's cut index, and every wall (its two cut indices,
 its jump `J`, and the requests it changes).
 
-## Q9. Each station through the continuing contact path (record §6's gate)
+## Q9. Withdrawn
 
-At m6 and at w16, the same 128 held-out requests read three ways: a `Word` opened on the
-constitution at each request's own current and moment, run forward over the receiver's epochs and
-read by the declared receiver (the contact path); the bank's reads of the same open section (the
-release's first refinement); and the bank's release.
-```
-timeout 5400 $B executed word-read order2 2026093012 128 m6=$S/m6.state w16=$S/w16.state
-```
-Report the line per source: the receiver's epoch count and stations right by station under each of
-the three reads. The gate (record §6): the word's stations right at w16 exceed m6's by at least 28 of
-1024. The receiver's epoch count must equal the 8 stations; if it does not, report it and stop.
-Smoke first on 2 requests (`… 2026093012 2 …`), then the 128.
+`executed word-read` reads the declared receiver's 3 epochs through a receiving map that is zero at
+every U6 state (the record's §7): it cannot decide §6's gate. Do not run it.

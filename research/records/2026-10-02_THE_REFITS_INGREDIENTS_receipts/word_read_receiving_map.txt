@@ -1,0 +1,5 @@
+executed word-read: 1 order2 requests at seed 2026093012; the receiver on ring 0
+  m6 (ρ 102837/131072): the receiving map R zero: true; station reads with every logit zero: 3; the receiver's epochs Some(3); stations right of 8: the word 0 [0, 0, 0, 0, 0, 0, 0, 0], the bank's open section 4 [1, 1, 0, 0, 0, 1, 1, 0], the bank's release 4 [0, 1, 1, 0, 1, 1, 0, 0]; 122455 ms
+  w16 (ρ 102837/131072): the receiving map R zero: true; station reads with every logit zero: 3; the receiver's epochs Some(3); stations right of 8: the word 0 [0, 0, 0, 0, 0, 0, 0, 0], the bank's open section 2 [0, 1, 0, 1, 0, 0, 0, 0], the bank's release 4 [0, 1, 1, 1, 0, 1, 0, 0]; 124533 ms
+executed word-read: 247050 ms; resident 124440576 now, 144216064 peak
+exit 0

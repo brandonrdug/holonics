@@ -1,0 +1,4 @@
+executed word-read: 2 order2 requests at seed 2026093012; the receiver on ring 0
+  m6 (ρ 102837/131072): the receiver's epochs Some(3); stations right of 16: the word 2 [1, 1, 0, 0, 0, 0, 0, 0], the bank's open section 6 [1, 2, 0, 0, 0, 1, 2, 0], the bank's release 6 [0, 1, 1, 0, 1, 1, 1, 1]; 206619 ms
+executed word-read: 206668 ms; resident 123305984 now, 144588800 peak
+exit 0 wall 206700 ms

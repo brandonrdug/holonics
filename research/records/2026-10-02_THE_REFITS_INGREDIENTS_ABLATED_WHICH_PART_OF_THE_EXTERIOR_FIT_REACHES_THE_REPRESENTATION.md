@@ -345,3 +345,30 @@ It runs on Astra's landed continuation (`receiver::reception::continuation`, `98
   run on it, and the executed comparison is rebuilt to read its stations through the contact path
   before any further move. The step-size scan (#211) and the joined move (#220) are then measured on
   that rebuilt comparison, not on the bank.
+
+## 7. The contact-path read of §6 reads nothing at these states
+
+`executed word-read` (`ce4252e7`, Q9) opens a `Word` on the constitution at each request's own
+current and moment, runs it over the declared receiver's epochs, and reads each station's class as
+the largest real logit of `R P_R v_R`. Read at m6 and w16 on held-out requests
+([receipts](2026-10-02_THE_REFITS_INGREDIENTS_receipts/): `word_read_smoke_m6.txt`,
+`word_read_receiving_map.txt`):
+- **The receiver reads 3 epochs, not 8 stations.** Its aperture is `K·w + 1 = 3`
+  (`hnn_prediction.rs`, the declared receiver), so one word reads the next three cells.
+- **Its receiving map is zero.** `Constitution::initial` declares `R = 0` on the receiving ring with
+  an empty landmark tree, and the U6 chain deposits only into the source port `E` (the move's
+  `stepped_source`, a normal-law step from the bank comparison's returns) and holds ρ. At m6 and at
+  w16 every station read has every logit zero (3 of 3 reads each), so the word's "class" is the tie's
+  first class and its stations right count only targets equal to it: 0 of 8 at both states on one
+  request; 2 of 16 at m6 on two. The bank's open section reads 4 and 2 of 8, its release 4 and 4.
+- **Reading the stations through `R P_R^(1+j) v_R` is the linear readout retired on September 30**
+  (`hnn::prediction`'s header: its descent direction met the executed decision's at `39/512`).
+
+So §6's deciding number is withdrawn: no word read at a U6 state can separate m6 from w16 while the
+receiving map holds nothing, and forming one would revive the retired readout. In the generation
+law the station reader is the receiving bank (`ρ(F^K(I_h)) = T`; `hnn::prediction`), and the U6
+move already deposits into `E` natively. What §6 owes is its other two reads, on the move as
+executed: the work of each move's deposit at the reached point, `W_dep = E(x; Θ′) − E(x; Θ)`, closing
+under Astra's continuation (`receiver::reception::continuation`), and the next passage reading the
+changed material. Times: one request at m6 and w16 together `247050` ms on 4 cores, peak resident
+`144216064` bytes.
