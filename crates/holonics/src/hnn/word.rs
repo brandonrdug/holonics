@@ -1844,6 +1844,14 @@ pub(crate) struct KeptWord {
 }
 
 impl KeptWord {
+    /// The kept word's anchor at a junction step on a ring (read-only; [`Word::anchor`]'s).
+    pub(crate) fn anchor(&self, step: usize, ring: usize) -> Option<&[Rat]> {
+        self.passage
+            .get(step)
+            .and_then(|record| record.anchors.get(ring))
+            .map(Vec::as_slice)
+    }
+
     /// **Resume the word on its field**: the field it was read on, which the resident owns.
     pub(crate) fn resume(self, field: &Field) -> Word<'_> {
         let KeptWord {
