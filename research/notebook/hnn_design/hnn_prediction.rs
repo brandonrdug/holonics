@@ -434,6 +434,12 @@ fn main() {
             &arguments[9],
             &arguments[10],
         ),
+        (Some("executed"), Some("word-read")) => executed_loop::word_read(
+            &arguments[3],
+            arguments[4].parse().expect("a seed"),
+            arguments[5].parse().expect("a count"),
+            &arguments[6..],
+        ),
         (Some("executed"), Some("locks")) => executed_loop::locks(
             &arguments[3],
             arguments[4].parse().expect("a seed"),

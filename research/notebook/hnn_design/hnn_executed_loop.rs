@@ -1641,6 +1641,84 @@ pub(super) fn step_state(terrain: &str, seed: u64, count: usize, out: &str, sour
     println!("  written {path}");
 }
 
+/// [measured-diagnostic; October 2; the
+/// [refit-ingredients record](../../records/2026-10-02_THE_REFITS_INGREDIENTS_ABLATED_WHICH_PART_OF_THE_EXTERIOR_FIT_REACHES_THE_REPRESENTATION.md)
+/// §6] **Each station read through the continuing contact path beside the bank** (`executed
+/// word-read <terrain> <seed> <count> <label=source>…`, sources as [`segment_source`]): per request,
+/// a `Word` opened on the constitution at the request's own current and moment
+/// (`Word::open_charted`), run forward over the receiver's epochs (`Word::forward`), each epoch's
+/// anchor read by the declared receiver (`ReceivingPhases::read`); a station's class is its read's
+/// largest real logit among the data classes. Beside it, the bank's reads of the same open section
+/// (the release's first refinement: each station's top before any station is placed) and the bank's
+/// release. Prints, per source, stations right by station under the three reads and the receiver's
+/// epoch count. Nothing is moved.
+pub(super) fn word_read(terrain: &str, seed: u64, count: usize, sources: &[String]) {
+    use holonics::hnn::chart::Charts;
+    use holonics::hnn::executed::compare;
+    use holonics::hnn::prediction::{BankPlacement, bank_release};
+    use holonics::hnn::receiving::ReceivingPhases;
+    use holonics::hnn::Word;
+    let clock = Instant::now();
+    let declared = order_declared();
+    let engine = Engine::new(declared);
+    let bank = bank_of(declared.period, &bank_strength());
+    let ring = engine.refinement.ring();
+    let pairs = terrain_pairs(terrain, &declared, seed, count);
+    let requests = open_requests(&engine, &pairs);
+    let (comparison, _) = arm_comparison("lock-dec");
+    let field = &engine.field;
+    let symbols = declared.alphabet - 1;
+    let receiver = field.receivers().first().expect("the declared receiver").clone();
+    println!("executed word-read: {count} {terrain} requests at seed {seed}; the receiver on ring {}", receiver.ring);
+    for source in sources {
+        let started = Instant::now();
+        let (label, spec) = source.split_once('=').expect("<label>=<source>");
+        let theta = segment_source(&engine, ring, spec);
+        let stations = declared.stations;
+        let (mut word_right, mut open_right, mut released_right) =
+            (vec![0usize; stations], vec![0usize; stations], vec![0usize; stations]);
+        let mut epochs = None;
+        for (request, (_, targets)) in requests.iter().zip(&pairs) {
+            let mut charts = Charts::new();
+            let phases = ReceivingPhases::declare(field, &theta, &request.current, &receiver).expect("the receiving phases");
+            let mut word = Word::open_charted(field, &theta, &request.current, &request.moment, &mut charts).expect("the word");
+            let anchors = word.forward(&phases).expect("the forward word");
+            epochs.get_or_insert(anchors.len());
+            for (station, anchor) in anchors.iter().enumerate().take(stations) {
+                let read = phases.read(field, &theta, &request.current, anchor).expect("the receiving read");
+                let top = (0..symbols).max_by(|&a, &b| read.logits[2 * a].cmp(&read.logits[2 * b]).then(b.cmp(&a))).expect("a class");
+                word_right[station] += usize::from(top == targets[station]);
+            }
+            let placement = BankPlacement::of(field, &theta, &request.current, &request.moment, &engine.refinement).expect("the placement");
+            let (_, kept) = bank_release(&placement, &engine.refinement, field.alphabet(), &bank, BANK_GRAIN, |a| bank.read_turn(a, BANK_GRAIN), true).expect("the release");
+            if let Some(first) = kept.first() {
+                for &(station, top) in &first.tops {
+                    open_right[station] += usize::from(top == targets[station]);
+                }
+            }
+        }
+        let batch = compare(field, &theta, &requests, &engine.refinement, &bank, BANK_GRAIN, comparison).expect("the batch");
+        for (r, (_, targets)) in batch.requests.iter().zip(&pairs) {
+            if let Some(g) = &r.generation {
+                for (station, class) in g.release.emitted.iter().enumerate().take(stations) {
+                    released_right[station] += usize::from(class == &targets[station]);
+                }
+            }
+        }
+        let sum = |v: &[usize]| v.iter().sum::<usize>();
+        println!(
+            "  {label} (ρ {}): the receiver's epochs {epochs:?}; stations right of {}: the word {} {:?}, the bank's open section {} {:?}, the bank's release {} {:?}; {} ms",
+            theta.transport(ring),
+            count * stations,
+            sum(&word_right), word_right,
+            sum(&open_right), open_right,
+            sum(&released_right), released_right,
+            started.elapsed().as_millis()
+        );
+    }
+    println!("executed word-read: {} ms; resident {}", clock.elapsed().as_millis(), resident());
+}
+
 /// [measured-diagnostic; October 2] **The release's lock order read at its resolution**
 /// (`executed locks <terrain> <seed> <count> <label=source> <arm> [request]`, sources as
 /// [`segment_source`]): the batch's released
