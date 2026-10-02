@@ -79,6 +79,13 @@ Frobenius norm `frobSq`; a certificate is a declared rational bound, never a flo
    `c = 1 − 1/(2L_R)` at the carried Gram (`carried_chart_release_read`). Under the ℓ1 certificate
    `Σ|p_j| < 2^127`, every partial sum in any order lies in `(−2^127, 2^127)`
    (`carrier_partial_sum`), so the 128-bit ring read is the integer sum (`carrier_ring_read`).
+   The certificate is itself order-free. Its saturated addition `min(a + b, M)` is the card's
+   branch form (`certify_eq_branch`), commutative and associative (`certify_comm`,
+   `certify_assoc`). Every reduction tree over the same terms carries `min(Σ|p_j|, M)` and the same
+   ring word (`Reduction.bound_eq`, `Reduction.order_free`), so a read is refused exactly when
+   `Σ|p_j|` reaches `2^127`, whatever its value (`Reduction.refused_iff`), and an admitted read is
+   the integer sum (`Reduction.read_of_bound_lt`). The host's pass is the left comb
+   (`foldl_certify`).
 8. **The solved chart's refinement, with both the residual and the chart rounded.** With the
    residual read at the chart's lattice, `R̃ = R + E`, and the product rounded, `X'' = X + R̃X + Δ`,
    `1 − X''H = R² − E·XH − ΔH` in any ring (`rounded_residual_refinement_left`), so
@@ -880,7 +887,8 @@ end Prox
 
 Three statements of Decision 24's executed charts, each at its Rust consumer:
 `hnn::constitution::SolvedChart` (the warm start), `hnn::constitution::ChartRule::read` (the
-release's read) and `hnn::chart`'s `certified_dot` (the carrier). -/
+release's read) and `hnn::chart`'s `certified_dot` with the card's `hnn_certify` and
+`hnn_block_sum` (`kernels/exact_integer.cuh`; the carrier and its certificate). -/
 
 section WarmStart
 
@@ -1046,6 +1054,141 @@ theorem carrier_ring_read {ι : Type*} (s : Finset ι) (p : ι → ℤ)
   have hb := abs_lt.mp (carrier_partial_sum s p h hT)
   rw [← Int.cast_sum, ZMod.valMinAbs_spec]
   refine ⟨rfl, ?_, ?_⟩ <;> push_cast <;> linarith [hb.1, hb.2]
+
+/-- [definition] **The certificate's addition**: the ℓ1 bounds of two parts, saturated at the
+carrier's ceiling `M` (`kernels/exact_integer.cuh`, `hnn_certify`, at `M = 2^127`). -/
+def certify (M a b : ℕ) : ℕ := min (a + b) M
+
+/-- [proved-standard; formal-checked] **The card's branch form is the saturated sum.**
+`hnn_certify` returns `M` when either part is already at `M` or their sum reaches it, and the sum
+otherwise. -/
+theorem certify_eq_branch (M a b : ℕ) :
+    certify M a b = if M ≤ a ∨ M ≤ b then M else if M ≤ a + b then M else a + b := by
+  unfold certify
+  split_ifs <;> omega
+
+/-- [proved-standard; formal-checked] The certificate's addition is commutative. -/
+theorem certify_comm (M a b : ℕ) : certify M a b = certify M b a := by
+  unfold certify
+  omega
+
+/-- [proved-standard; formal-checked] The certificate's addition is associative: both groupings
+are `min (a + b + c) M`. -/
+theorem certify_assoc (M a b c : ℕ) :
+    certify M (certify M a b) c = certify M a (certify M b c) := by
+  unfold certify
+  omega
+
+/-- [definition] **A reduction tree over integer terms**: a term, or the join of two parts. The
+card's block tree (strides halving over a power of two of threads, `hnn_block_sum`), the host's
+left-to-right pass (`hnn::chart::certified_dot`) and every other order of the same terms are such
+trees. -/
+inductive Reduction
+  | term : ℤ → Reduction
+  | join : Reduction → Reduction → Reduction
+
+namespace Reduction
+
+/-- The terms a tree joins, as a multiset: what stays when the order is forgotten. -/
+def terms : Reduction → Multiset ℤ
+  | term p => {p}
+  | join l r => l.terms + r.terms
+
+/-- The integer sum of the terms. -/
+def sum : Reduction → ℤ
+  | term p => p
+  | join l r => l.sum + r.sum
+
+/-- The ℓ1 norm of the terms. -/
+def l1 : Reduction → ℕ
+  | term p => p.natAbs
+  | join l r => l.l1 + r.l1
+
+/-- The ring word: each join one wrapping addition in `ℤ/2^128`. -/
+def word : Reduction → ZMod (2 ^ 128)
+  | term p => p
+  | join l r => l.word + r.word
+
+/-- The certificate: each term's magnitude saturated at `M` (`hnn_bounded_product` saturates a
+product past the carrier), each join `certify`. -/
+def bound (M : ℕ) : Reduction → ℕ
+  | term p => min p.natAbs M
+  | join l r => certify M (l.bound M) (r.bound M)
+
+theorem sum_eq_terms (t : Reduction) : t.sum = t.terms.sum := by
+  induction t with
+  | term p => simp [sum, terms]
+  | join l r hl hr => simp [sum, terms, hl, hr]
+
+theorem l1_eq_terms (t : Reduction) : t.l1 = (t.terms.map Int.natAbs).sum := by
+  induction t with
+  | term p => simp [l1, terms]
+  | join l r hl hr => simp [l1, terms, hl, hr]
+
+/-- [proved-derived; formal-checked] **Every tree's certificate is the saturated ℓ1 norm of its
+terms**, `min (Σ|p_j|) M`. -/
+theorem bound_eq (M : ℕ) (t : Reduction) : t.bound M = min t.l1 M := by
+  induction t with
+  | term p => rfl
+  | join l r hl hr =>
+    simp only [bound, l1, hl, hr, certify]
+    omega
+
+/-- [proved-standard; formal-checked] Each join adds in the ring, so the word is the integer sum
+read in `ℤ/2^128`. -/
+theorem word_eq (t : Reduction) : t.word = (t.sum : ZMod (2 ^ 128)) := by
+  induction t with
+  | term p => rfl
+  | join l r hl hr => simp [word, sum, hl, hr]
+
+theorem abs_sum_le (t : Reduction) : |t.sum| ≤ t.l1 := by
+  induction t with
+  | term p => exact (Int.abs_eq_natAbs p).le
+  | join l r hl hr =>
+    simp only [sum, l1]
+    push_cast
+    exact (abs_add_le _ _).trans (add_le_add hl hr)
+
+/-- [proved-derived; formal-checked] **The refusal is a property of the terms alone.** Two trees
+over the same terms (any order, any grouping) carry the same certificate and the same word, so the
+card and the host refuse the same reads and admit the same values. -/
+theorem order_free {s t : Reduction} (h : s.terms = t.terms) (M : ℕ) :
+    s.bound M = t.bound M ∧ s.word = t.word := by
+  refine ⟨?_, ?_⟩
+  · rw [bound_eq, bound_eq, l1_eq_terms, l1_eq_terms, h]
+  · rw [word_eq, word_eq, sum_eq_terms, sum_eq_terms, h]
+
+/-- [proved-derived; formal-checked] **A read is refused exactly when the terms' ℓ1 norm reaches
+the ceiling**, whatever its value: the certificate is at `2^127` iff `2^127 ≤ Σ|p_j|`. -/
+theorem refused_iff (t : Reduction) : t.bound (2 ^ 127) = 2 ^ 127 ↔ 2 ^ 127 ≤ t.l1 := by
+  rw [bound_eq]
+  omega
+
+/-- [proved-derived; formal-checked] **An admitted read is the integer sum.** Below the ceiling, the
+tree's ring word read at its signed representative is the integer sum of its terms. -/
+theorem read_of_bound_lt (t : Reduction) (h : t.bound (2 ^ 127) < 2 ^ 127) :
+    t.word.valMinAbs = t.sum := by
+  rw [bound_eq] at h
+  have hl : (t.l1 : ℤ) < 2 ^ 127 := by exact_mod_cast (show t.l1 < 2 ^ 127 by omega)
+  have hb := abs_lt.mp ((abs_sum_le t).trans_lt hl)
+  rw [word_eq, ZMod.valMinAbs_spec]
+  refine ⟨rfl, ?_, ?_⟩ <;> push_cast <;> linarith [hb.1, hb.2]
+
+end Reduction
+
+/-- [proved-derived; formal-checked] **The host's pass is the left comb.** Running the
+certificate's addition over the magnitudes in order, from a start `b`, ends at
+`min (b + Σ m_j) M`; the host's refusal at the first prefix that reaches the ceiling is that end
+reaching `M`, since a saturated bound stays at `M` (`certify M M m = M`). -/
+theorem foldl_certify (M : ℕ) (ms : List ℕ) (b : ℕ) :
+    ms.foldl (certify M) (min b M) = min (b + ms.sum) M := by
+  induction ms generalizing b with
+  | nil => simp
+  | cons m ms ih =>
+    rw [List.foldl_cons, List.sum_cons, show certify M (min b M) m = min (b + m) M by
+      unfold certify; omega, ih]
+    congr 1
+    ring
 
 end Carrier
 
@@ -1386,6 +1529,15 @@ section Audit
 #print axioms carried_chart_release_read
 #print axioms carrier_partial_sum
 #print axioms carrier_ring_read
+#print axioms certify_eq_branch
+#print axioms certify_comm
+#print axioms certify_assoc
+#print axioms Reduction.bound_eq
+#print axioms Reduction.word_eq
+#print axioms Reduction.order_free
+#print axioms Reduction.refused_iff
+#print axioms Reduction.read_of_bound_lt
+#print axioms foldl_certify
 #print axioms rounded_residual_refinement_left
 #print axioms rounded_residual_refinement_certificate_left
 #print axioms solved_refinement_certificate

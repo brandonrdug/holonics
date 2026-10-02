@@ -21,7 +21,8 @@
 //! - The lattice read ([`read_layout`]): every block reads the shared immutable locus and operand
 //!   and writes only its own output entry and status; within a block, the threads' partial sums are
 //!   joined by the ring's addition and the certificate's saturated addition, both associative and
-//!   commutative, so the tree's order changes no value and no refusal.
+//!   commutative, so the tree's order changes no value and no refusal (Lean
+//!   `HNN/LatticeWord.{certify_assoc, certify_comm, Reduction.order_free}`).
 //! - The moment ingest ([`ingest_layout`]): one block, so no two blocks share the moment; within
 //!   it, the counts are atomic integer additions (commutative), and each tile's scans are ordered
 //!   by barriers.

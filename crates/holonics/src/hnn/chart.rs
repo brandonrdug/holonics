@@ -95,6 +95,7 @@
 //! | `feedback_tick`, `feedback_accounting_zero`, `carried_word_accounting` | [`carry`], [`Remainders`] |
 //! | `executed_adjoint_pairing`, `executed_adjoint_unique` | [`ChartWords::apply_transpose`] |
 //! | `carrier_partial_sum`, `carrier_ring_read` | `certified_dot` (the ℓ1 certificate) |
+//! | `foldl_certify`, `Reduction.{bound_eq, order_free, refused_iff, read_of_bound_lt}` | `certified_dot` (the certificate's order-free refusal) |
 //!
 //! [open] Owed in #62 (Lean): the scaled transpose's convergence (`σ_min ≥ 1` by passivity) is an
 //! efficiency claim only, since every certificate is computed exactly and the exact inverse is the
@@ -235,7 +236,10 @@ fn operand(vector: &[Rat]) -> Result<(Vec<i64>, BigInt), HnnError> {
 }
 
 /// `Σ_j q_j x_j` under the ℓ1 certificate: admitted when `Σ_j |q_j x_j| < 2^127`, so every partial
-/// sum is a word of the carrier (`carrier_partial_sum`, `carrier_ring_read`).
+/// sum is a word of the carrier (`carrier_partial_sum`, `carrier_ring_read`). The running bound is
+/// the certificate's left comb (`foldl_certify`): it refuses at the first prefix that reaches
+/// `2^127`, which is exactly when the whole sum of magnitudes does, so its refusals are the card's
+/// block tree's (`Reduction.order_free`, `Reduction.refused_iff`).
 fn certified_dot(pairs: impl Iterator<Item = (i128, i128)>) -> Result<i128, HnnError> {
     let (mut bound, mut sum) = (0u128, 0i128);
     for (q, x) in pairs {
