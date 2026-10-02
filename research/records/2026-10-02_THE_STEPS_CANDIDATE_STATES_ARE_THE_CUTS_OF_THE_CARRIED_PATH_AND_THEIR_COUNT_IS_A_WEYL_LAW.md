@@ -126,7 +126,7 @@ Two kinds of gap are spectral here, and the second is the one that sets the step
    So the flip-free stretch of the direction is set by **the smallest margin over its rate per
    coordinate**: `η_safe ≥ (μ_min/κ − n) u/‖d‖₁`. `m7`'s flip is one request whose lock order
    swaps. Its smallest margin at the incumbent is not a sub-resolution tie: it is about 140 cell
-   widths (§4b). Whether that margin closes within the step is the main line's replay.
+   widths, and the replay finds the pair's gaps cross within the step (§4b).
    The bound charges every entry its rounding (the `n`). A station's readings depend on only some
    entries, and charging only those tightens it.
 3. **The rate per coordinate.** At first order, `κ` is the reading's covector times `u`
@@ -183,6 +183,16 @@ Reading the actual flip's cut index `j_f` against `j*`:
     rate is bounded only while the read multiplier stays a simple root, §4.3);
   - if `μ` stays positive there, the flip is not this pair's reordering: another station or
     another commitment switched.
+
+**The replay** [measured, by the main line, cited; values over `2^24`]. The pair crosses, certain
+at both ends. At the successor at `η = 1/2048` station 5 locks second by `55808` (about 20 cell
+widths), so the margin moved from `+374272` to `−55808`: a change of `430080 = 2^12·3·5·7`, more
+than `μ₀` over the step. Station 2's gap fell `203264` and station 5's rose `231936`. Under linear
+motion the crossing lies at `731/840` of the step. No station is unranked at either state (0 of 64
+refinements in each request). So `m7`'s flip is a crossing by the readings' first-order motion,
+and `j_f ≥ j*` is consistent: a first-order rate large enough to move the margin by `430080` over
+the step consumes `μ₀` before the step's end. The cut index `j_f` and the weighted count `M_w`
+remain the main line's read.
 
 ## 5. The step law that follows
 
