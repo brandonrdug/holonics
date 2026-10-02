@@ -207,5 +207,13 @@ held as `φ M_t`, each reading's code is bounded by the receiving certificate's 
 spread). Summed, the prequential code is at most the face's less `φ a₀` plus `φ² K`, with
 `K = (ln 2/2) 2^ω Σ_t Var_(p_t)(M_t)`. At that bound's Newton point it falls by at least
 `a₀²/(4K)`. What stays a reading rather than a theorem is that the executed map is `1/s` times
-its unit, which holds where the readings' Gram is small against the prior and `η = 1` (§1). #62
-keeps that hypothesis.
+its unit, which holds where the readings' Gram is small against the prior and `η = 1` (§1).
+The exact solve's part of that hypothesis is now bounded (`HNN/ReceivingPrior` item 6). The
+resolvent `(s I + G)⁻¹ = s⁻¹ (I − G (s I + G)⁻¹)` (`prior_resolvent`) reaches a direction where
+the readings' Gram is `g` by `1/(s + g)` (`eigen_reach`), so the `1/s` map loses the fraction
+`g/(s + g)` there (`eigen_departure`), at most `λ/(s + λ)` for `0 ≤ g ≤ λ` (`departure_le`). On
+campaign 1 the Gram's largest eigenvalue is below `8599330/2^24` (§1), so at `2 I` the loss along
+every eigen-direction is below `8599330/42153762`, below a quarter (`campaign_one_departure`; at
+`I` it is below `8599330/25376546`). #62 keeps the rest: the lift from eigen-directions to every
+direction of a symmetric `G` (the spectral theorem), and the certified step `η` and the lattice's
+rounding, which the resolvent does not see.

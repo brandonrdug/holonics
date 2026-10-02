@@ -51,6 +51,13 @@ located     a = Σ_t ⟨g_t, W_t z_t⟩ ,  V = ln 2 Σ_t Var_p(W_t z_t)     ⇒ 
    the face's less `φ a` plus `φ² (ln 2/2) 2^ω Σ_t Var_(p_t)(M_t)`, and at the bound's Newton point
    it falls by at least `a²/(4K)`. The map is held as `φ M_t`: that the executed map is `1/s`
    times its unit is the prior-dominated reading of the record, not a theorem here.
+6. **What the `1/s` reading drops** (`prior_resolvent`, `eigen_reach`, `eigen_departure`,
+   `departure_le`, `campaign_one_departure`). The solved chart's resolvent is
+   `(s I + G)⁻¹ = s⁻¹ (I − G (s I + G)⁻¹)`. Along a direction where the readings' Gram is `g`, the
+   reach is `1/(s + g)`, so the `1/s` map loses the fraction `g/(s + g)` there, at most
+   `λ/(s + λ)` for `0 ≤ g ≤ λ`. On campaign 1 (`λ_max(F) < 8599330/2^24`) at `s = 2` the loss is
+   below `8599330/42153762`, below a quarter. This bounds the exact solve's part of the reading;
+   the certified step `η` and the lattice's rounding are not in it.
 -/
 
 namespace Holonics.HNN.ReceivingPrior
@@ -311,5 +318,72 @@ theorem prequential_newton_decrease (L0 a K φ : ℝ) (hK : 0 < K) (hφ : φ = a
   linarith
 
 end Prequential
+
+section Departure
+
+/-! The map's departure from `1/s` times its unit. §5 holds the map as `φ M_t`, which reads the
+executed map as `1/s` times its unit. The prior's resolvent says exactly what that reading drops:
+along a direction where the readings' Gram is `g`, the reach is `1/(s + g)`, so the fraction of
+the `1/s` map lost there is `g/(s + g)`, at most `λ/(s + λ)` when `0 ≤ g ≤ λ`. -/
+
+/-- [proved-derived; formal-checked] **The prior's resolvent.** With `H = s I + G` invertible and
+`s ≠ 0`, `H⁻¹ = s⁻¹ (I − G H⁻¹)`: the map is `1/s` times its unit less `s⁻¹ G H⁻¹`, the part the
+readings' Gram carries. -/
+theorem prior_resolvent (s : K) (hs : s ≠ 0) (G : Matrix n n K)
+    (hH : IsUnit (s • (1 : Matrix n n K) + G).det) :
+    (s • (1 : Matrix n n K) + G)⁻¹ = s⁻¹ • ((1 : Matrix n n K) - G * (s • (1 : Matrix n n K) + G)⁻¹) := by
+  have h := Matrix.mul_nonsing_inv (s • (1 : Matrix n n K) + G) hH
+  rw [add_mul, smul_mul_assoc, one_mul] at h
+  have h' : s • (s • (1 : Matrix n n K) + G)⁻¹ = 1 - G * (s • (1 : Matrix n n K) + G)⁻¹ :=
+    eq_sub_of_add_eq h
+  rw [← h', smul_smul, inv_mul_cancel₀ hs, one_smul]
+
+/-- [proved-derived; formal-checked] **The reach along a direction of the readings' Gram.** If
+`G v = g v` and `s I + G` is invertible, then `(s I + G)⁻¹ v = (s + g)⁻¹ v`. -/
+theorem eigen_reach (s g : K) (G : Matrix n n K) (v : n → K) (hv : G *ᵥ v = g • v)
+    (hsg : s + g ≠ 0) (hH : IsUnit (s • (1 : Matrix n n K) + G).det) :
+    (s • (1 : Matrix n n K) + G)⁻¹ *ᵥ v = (s + g)⁻¹ • v := by
+  have hHv : (s • (1 : Matrix n n K) + G) *ᵥ v = (s + g) • v := by
+    rw [Matrix.add_mulVec, Matrix.smul_mulVec, Matrix.one_mulVec, hv, add_smul]
+  have h1 : (s • (1 : Matrix n n K) + G)⁻¹ *ᵥ ((s • (1 : Matrix n n K) + G) *ᵥ v) = v := by
+    rw [Matrix.mulVec_mulVec, Matrix.nonsing_inv_mul _ hH, Matrix.one_mulVec]
+  rw [hHv, Matrix.mulVec_smul] at h1
+  calc (s • (1 : Matrix n n K) + G)⁻¹ *ᵥ v
+      = (s + g)⁻¹ • ((s + g) • ((s • (1 : Matrix n n K) + G)⁻¹ *ᵥ v)) := by
+        rw [smul_smul, inv_mul_cancel₀ hsg, one_smul]
+    _ = (s + g)⁻¹ • v := by rw [h1]
+
+omit [Fintype n] [DecidableEq n] in
+/-- [proved-derived; formal-checked] **The fraction of the `1/s` map lost along that direction** is
+`g/(s + g)`: `s⁻¹ v − (s + g)⁻¹ v = (g/(s + g)) s⁻¹ v`. -/
+theorem eigen_departure (s g : K) (hs : s ≠ 0) (hsg : s + g ≠ 0) (v : n → K) :
+    s⁻¹ • v - (s + g)⁻¹ • v = (g / (s + g)) • (s⁻¹ • v) := by
+  rw [smul_smul, ← sub_smul]
+  congr 1
+  field_simp
+  ring
+
+/-- [proved-derived; formal-checked] **The lost fraction is bounded by the Gram's largest
+eigenvalue.** For `0 < s` and `0 ≤ g ≤ λ`, `0 ≤ g/(s + g) ≤ λ/(s + λ)`. -/
+theorem departure_le (s g lam : L) (hs : 0 < s) (hg : 0 ≤ g) (hgl : g ≤ lam) :
+    0 ≤ g / (s + g) ∧ g / (s + g) ≤ lam / (s + lam) := by
+  have h1 : 0 < s + g := by linarith
+  have h2 : 0 < s + lam := by linarith
+  refine ⟨div_nonneg hg h1.le, ?_⟩
+  rw [div_le_div_iff₀ h1 h2]
+  nlinarith
+
+/-- [proved-derived; formal-checked] **Campaign 1 at `2 I`.** The readings' Gram `F` has its largest
+eigenvalue below `8599330/2^24` (§1 of the record), so along every eigen-direction of a Gram
+`0 ⪯ G ⪯ F` the map loses less than `8599330/42153762` of `1/2` times its unit, which is below
+`1/4`. -/
+theorem campaign_one_departure (g : ℚ) (hg : 0 ≤ g) (hgl : g < 8599330 / 2 ^ 24) :
+    g / (2 + g) < 8599330 / 42153762 ∧ (8599330 : ℚ) / 42153762 < 1 / 4 := by
+  refine ⟨?_, by norm_num⟩
+  have h1 : (0 : ℚ) < 2 + g := by linarith
+  rw [div_lt_div_iff₀ h1 (by norm_num)]
+  nlinarith
+
+end Departure
 
 end Holonics.HNN.ReceivingPrior
