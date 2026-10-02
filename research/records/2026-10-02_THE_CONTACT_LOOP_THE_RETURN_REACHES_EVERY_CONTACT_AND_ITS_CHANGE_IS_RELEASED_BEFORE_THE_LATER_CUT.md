@@ -823,3 +823,34 @@ objective it reaches what a linear receiver of its form can take from these anch
 remaining gain over the tree is limited by what the medium's anchors carry beyond the tree. That
 puts the next lever back in the medium's interior (§6, §12–15), whose covectors arrive through `Rᵀ`
 and are larger now that `R` is.
+
+## 22. The larger `R` shrinks the interior's certified steps
+
+Each exposure prints every family's certified steps over its 3,072 deposits. Main against the
+class-metric step, from the two §19 receipts
+([main](2026-10-02_THE_CONTACT_LOOP_receipts/baseline_exposure.txt),
+[class metric](2026-10-02_THE_CONTACT_LOOP_receipts/class_metric_exposure.txt)):
+
+| Family | Main: `2^k`, `k` from … to … | Class metric: `2^k`, `k` from … to … |
+|---|---|---|
+| contact 1, storage / stiffness / dissipation | −13..9 / −10..11 / −11..11 | −15..−2 / −13..1 / −13..0 |
+| contact 2, storage / stiffness / dissipation | −14..10 / −10..10 / −11..10 | −15..−3 / −13..0 / −13..0 |
+| element 0, map / passive / slices | −4..11 / −8..13 / −10..12 | −10..−1 / −12..2 / −15..−1 |
+| element 3, map / passive / slices | −4..12 / −8..11 / −10..9 | −9..1 / −11..−1 / −14..−4 |
+
+Every interior family's largest step falls by `2^8` to `2^11`.
+
+**Why, from the certificate.** An interior family's curvature is `C = s κ² b`, with the gain `κ²`
+carrying the readout's certified bound `‖R‖₂²` and the station score's curvature bounded by its
+worst case `s = ½` (module header, "The certified step"; `Constitution::power_gain`,
+`element_gain`, `source_gain`). The class metric lets `R` grow, so `‖R‖₂²` grows. The interior's
+covectors arrive through `Rᵀ` and grow as `‖R‖`, so its unit step grows as `‖R‖`, while its
+certified step falls as `1/‖R‖²`. Its realized move falls as `1/‖R‖`: the interior learns more
+slowly the better the receiver reads.
+
+[agent-inferred] This is the class-metric defect moved one locus inward. `R`'s own fix read its
+curvature in the readings' Fisher form instead of the worst case. The interior needs the same:
+the station score's curvature along the interior's actual move, `Var_p` of the station logits'
+change, in place of `s ‖R‖₂² b`. That requires the interior step's effect on the station logits,
+a tangent pass through the word, which the machine does not have. That is the next build, and its
+gate is again the held-out code.
