@@ -170,9 +170,16 @@ stationary interval; it is the law's first step, and the at-map read refines it.
 
 The scale is a field's own quantity: §4 locates it per field and carries it with the anchors'
 energy. Campaign 1's located value is therefore declared with its field, not fixed in the
-receiving map's law. Opening the receiving map at `2 I` changes the HNN's behaviour, so that
-change is its own pull request and merges after the main line measures it on campaign 1 and its
-held-out read.
+receiving map's law.
+
+Opening the receiving map at `2 I` changes the HNN's behaviour, and it reaches past the
+constructor. The solved chart takes the Gram as the identity off its support (`SolvedChart`: "the
+Gram is the identity off its support … and so is the chart"). A prior `s I` makes the chart
+`s⁻¹` there. That value enters the chart's dense form, its reach and its carrier count, and the
+card's mirror of the host's chart (`holonics-cuda` `hnn::lattice`). The unit theorem gives no
+shortcut: prior `2 I` on `z` is the unit prior on `z/√2`, which leaves the dyadics. So the change
+carries the off-support value through the chart on host and card. It is its own pull request, and
+it merges after the main line measures it on campaign 1 and its held-out read.
 
 Carrying `a` and `V` natively beside the Gram, and moving `s` by the Newton point as readings
 arrive, is the per-field law's native form. It is not built here. The second-order expansion of
