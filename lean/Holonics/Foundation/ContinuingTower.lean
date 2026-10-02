@@ -1,3 +1,4 @@
+import Mathlib.NumberTheory.Padics.RingHoms
 import Holonics.Foundation.Holon
 import Holonics.Foundation.Receiver
 import Holonics.Foundation.SectionResidual
@@ -125,6 +126,10 @@ joined boundary. It is cited, never rebuilt here; this file deposits no cost law
 
 [definition] What this file does **not** do: it states no milestone and schedules nothing.
 -/
+
+/-! [agent-inferred] The existing p-adic tower actually uses PadicInt.toZModPow
+and ofIntSeq. Declare that source owner directly after SectionResidual stops
+importing all Mathlib; the old tower laws and hypotheses remain unchanged. -/
 
 namespace Holonics.Foundation.ContinuingTower
 

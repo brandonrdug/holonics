@@ -1,4 +1,6 @@
-import Mathlib
+import Mathlib.Algebra.Module.LinearMap.Basic
+import Mathlib.Data.Real.Basic
+import Mathlib.Tactic.Abel
 
 /-!
 # Section residuals
@@ -8,6 +10,10 @@ section coordinates and the receiver-blind remainder reconstruct the source
 exactly.  Changing section changes only the kernel-valued residual; no history
 or archive is introduced.
 -/
+
+/-! [agent-inferred] The section/remainder laws use real modules, linear maps
+and additive cancellation. Import their owners explicitly rather than all
+Mathlib; every existing statement and proof below is unchanged. -/
 
 namespace Holonics.Foundation.SectionResidual
 

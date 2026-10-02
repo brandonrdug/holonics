@@ -2,6 +2,8 @@ import Holonics.Holon.Dirac
 import Holonics.Transport.AffineJointBall
 import Mathlib.Analysis.Calculus.Deriv.Mul
 import Mathlib.Analysis.Calculus.Deriv.Pi
+import Mathlib.LinearAlgebra.Matrix.PosDef
+import Mathlib.LinearAlgebra.Dual.Defs
 
 /-!
 # Holon.Element: element relations, the energy balance and its discrete forms
@@ -311,5 +313,201 @@ theorem ball_image (L : E →L[ℝ] F) {K r : ℝ} (hL : ‖L‖ ≤ K) {x c : E
   simpa using h
 
 end Ball
+
+/-! ## Kinetic restriction through a declared receiver face
+
+[agent-inferred] This extends the existing storage element: a positive kinetic
+form and a surjective face determine the least-energy horizontal rate, while the
+source retains the kinetic energy and momentum of its unread rate. The form's
+physical units belong to the source constitution. This is not a Lorentzian
+restriction or the storage-radical quotient. Faces and placement read pair rates;
+source and receiving clocks remain declared.
+-/
+namespace KineticFace
+section Finite
+variable {n m : Type*} [Fintype n] [Fintype m] [DecidableEq n] [DecidableEq m]
+
+def cometric (M : Matrix n n ℝ) (A : Matrix m n ℝ) : Matrix m m ℝ :=
+  A * M⁻¹ * Aᵀ
+
+def faceMetric (M : Matrix n n ℝ) (A : Matrix m n ℝ) : Matrix m m ℝ :=
+  (cometric M A)⁻¹
+
+def horizontal (M : Matrix n n ℝ) (A : Matrix m n ℝ) (w : m → ℝ) : n → ℝ :=
+  M⁻¹ *ᵥ (Aᵀ *ᵥ (faceMetric M A *ᵥ w))
+
+def hidden (M : Matrix n n ℝ) (A : Matrix m n ℝ) (v : n → ℝ) : n → ℝ :=
+  v - horizontal M A (A *ᵥ v)
+
+theorem transpose_injective (A : Matrix m n ℝ)
+    (hA : Function.Surjective A.mulVec) : Function.Injective Aᵀ.mulVec := by
+  intro x y h
+  apply dotProduct_eq_iff.mp
+  intro z
+  obtain ⟨v, rfl⟩ := hA z
+  calc
+    x ⬝ᵥ (A *ᵥ v) = v ⬝ᵥ (Aᵀ *ᵥ x) :=
+      (dotProduct_transpose_mulVec A v x).symm
+    _ = v ⬝ᵥ (Aᵀ *ᵥ y) := congrArg (fun q => v ⬝ᵥ q) h
+    _ = y ⬝ᵥ (A *ᵥ v) := dotProduct_transpose_mulVec A v y
+
+theorem cometric_posDef (M : Matrix n n ℝ) (A : Matrix m n ℝ)
+    (hM : M.PosDef) (hA : Function.Surjective A.mulVec) : (cometric M A).PosDef := by
+  simpa only [cometric, conjTranspose_eq_transpose_of_trivial, transpose_transpose] using
+    hM.inv.conjTranspose_mul_mul_same (B := Aᵀ) (transpose_injective A hA)
+
+theorem faceMetric_posDef (M : Matrix n n ℝ) (A : Matrix m n ℝ)
+    (hM : M.PosDef) (hA : Function.Surjective A.mulVec) : (faceMetric M A).PosDef :=
+  (cometric_posDef M A hM hA).inv
+
+theorem horizontal_reads (M : Matrix n n ℝ) (A : Matrix m n ℝ)
+    (hM : M.PosDef) (hA : Function.Surjective A.mulVec) (w : m → ℝ) :
+    A *ᵥ horizontal M A w = w := by
+  have hG := cometric_posDef M A hM hA
+  have hi := mul_nonsing_inv (cometric M A)
+    ((Matrix.isUnit_iff_isUnit_det _).mp hG.isUnit)
+  calc
+    A *ᵥ horizontal M A w = (cometric M A * (cometric M A)⁻¹) *ᵥ w := by
+      simp only [horizontal, faceMetric, cometric, mulVec_mulVec, Matrix.mul_assoc]
+    _ = w := by rw [hi, one_mulVec]
+
+theorem metric_horizontal (M : Matrix n n ℝ) (A : Matrix m n ℝ)
+    (hM : M.PosDef) (w : m → ℝ) :
+    M *ᵥ horizontal M A w = Aᵀ *ᵥ (faceMetric M A *ᵥ w) := by
+  have hi := mul_nonsing_inv M ((Matrix.isUnit_iff_isUnit_det _).mp hM.isUnit)
+  rw [horizontal, mulVec_mulVec, hi, one_mulVec]
+
+theorem hidden_null (M : Matrix n n ℝ) (A : Matrix m n ℝ)
+    (hM : M.PosDef) (hA : Function.Surjective A.mulVec) (v : n → ℝ) :
+    A *ᵥ hidden M A v = 0 := by
+  rw [hidden, mulVec_sub, horizontal_reads M A hM hA, sub_self]
+
+theorem momentum_split (M : Matrix n n ℝ) (A : Matrix m n ℝ)
+    (hM : M.PosDef) (v : n → ℝ) :
+    M *ᵥ v = Aᵀ *ᵥ (faceMetric M A *ᵥ (A *ᵥ v)) + M *ᵥ hidden M A v := by
+  rw [hidden, mulVec_sub, metric_horizontal M A hM]
+  abel
+
+theorem horizontal_orthogonal_hidden (M : Matrix n n ℝ) (A : Matrix m n ℝ)
+    (hM : M.PosDef) (hA : Function.Surjective A.mulVec) (v : n → ℝ) :
+    hidden M A v ⬝ᵥ (M *ᵥ horizontal M A (A *ᵥ v)) = 0 := by
+  rw [metric_horizontal M A hM, dotProduct_transpose_mulVec,
+    hidden_null M A hM hA, dotProduct_zero]
+
+theorem energy_split (M : Matrix n n ℝ) (A : Matrix m n ℝ)
+    (hM : M.PosDef) (hA : Function.Surjective A.mulVec) (v : n → ℝ) :
+    Holonics.HolonCore.storageEnergy M v =
+      Holonics.HolonCore.storageEnergy (faceMetric M A) (A *ᵥ v) +
+      Holonics.HolonCore.storageEnergy M (hidden M A v) := by
+  let l := horizontal M A (A *ᵥ v)
+  let h := hidden M A v
+  have hsum : v = l + h := by dsimp [l, h, hidden]; abel
+  have hsymm : Mᵀ = M := by
+    simpa only [conjTranspose_eq_transpose_of_trivial] using hM.1.eq
+  have hhl : h ⬝ᵥ (M *ᵥ l) = 0 := horizontal_orthogonal_hidden M A hM hA v
+  have hlh : l ⬝ᵥ (M *ᵥ h) = 0 := by
+    rw [← hsymm, dotProduct_transpose_mulVec]
+    exact hhl
+  have hll : l ⬝ᵥ (M *ᵥ l) =
+      (A *ᵥ v) ⬝ᵥ (faceMetric M A *ᵥ (A *ᵥ v)) := by
+    change horizontal M A (A *ᵥ v) ⬝ᵥ
+      (M *ᵥ horizontal M A (A *ᵥ v)) = _
+    rw [metric_horizontal M A hM, dotProduct_transpose_mulVec,
+      horizontal_reads M A hM hA, dotProduct_comm]
+  unfold Holonics.HolonCore.storageEnergy
+  conv_lhs => rw [hsum]
+  rw [mulVec_add, dotProduct_add, add_dotProduct, add_dotProduct, hll, hlh, hhl]
+  ring
+
+theorem hidden_energy_nonneg (M : Matrix n n ℝ) (A : Matrix m n ℝ)
+    (hM : M.PosDef) (v : n → ℝ) :
+    0 ≤ Holonics.HolonCore.storageEnergy M (hidden M A v) := by
+  unfold Holonics.HolonCore.storageEnergy
+  apply mul_nonneg (by norm_num)
+  simpa using hM.posSemidef.dotProduct_mulVec_nonneg (hidden M A v)
+
+end Finite
+
+section Momentum
+variable {n m : Type*} [Fintype n] [Fintype m] [DecidableEq n] [DecidableEq m]
+def momentumCovector (M : Matrix n n ℝ) (v : n → ℝ) : Module.Dual ℝ (n → ℝ) where
+  toFun δ := (M *ᵥ v) ⬝ᵥ δ
+  map_add' _ _ := by simp [dotProduct_add]
+  map_smul' _ _ := by simp [dotProduct_smul, smul_eq_mul, mul_comm]
+
+end Momentum
+
+section Clock
+variable {n m : Type*} [Fintype n] [Fintype m] [DecidableEq n] [DecidableEq m]
+theorem clock_rescaled_momentum (M : Matrix n n ℝ) (v : n → ℝ)
+    {r : ℝ} (hr : r ≠ 0) :
+    (r⁻¹ • M) *ᵥ (r • v) = M *ᵥ v := by
+  simp [Matrix.smul_mulVec, Matrix.mulVec_smul, smul_smul, hr]
+
+theorem clock_rescaled_kinetic_energy (M : Matrix n n ℝ) (v : n → ℝ)
+    {r : ℝ} (hr : r ≠ 0) :
+    Holonics.HolonCore.storageEnergy (r⁻¹ • M) (r • v) =
+      r * Holonics.HolonCore.storageEnergy M v := by
+  unfold Holonics.HolonCore.storageEnergy
+  rw [clock_rescaled_momentum M v hr, smul_dotProduct]
+  simp only [smul_eq_mul]
+  ring
+
+end Clock
+section Consequences
+variable {n m : Type*} [Fintype n] [Fintype m] [DecidableEq n] [DecidableEq m]
+theorem unique_minimum_energy (M : Matrix n n ℝ) (A : Matrix m n ℝ)
+    (hM : M.PosDef) (hA : Function.Surjective A.mulVec) (w : m → ℝ) (v : n → ℝ)
+    (hread : A *ᵥ v = w) :
+    Holonics.HolonCore.storageEnergy (faceMetric M A) w ≤
+        Holonics.HolonCore.storageEnergy M v ∧
+      (Holonics.HolonCore.storageEnergy M v =
+          Holonics.HolonCore.storageEnergy (faceMetric M A) w ↔
+        v = horizontal M A w) := by
+  have split := energy_split M A hM hA v
+  rw [hread] at split
+  have nonneg := hidden_energy_nonneg M A hM v
+  constructor
+  · linarith
+  · constructor
+    · intro he
+      have hz : Holonics.HolonCore.storageEnergy M (hidden M A v) = 0 := by linarith
+      have hn : hidden M A v = 0 := by
+        by_contra hn
+        have hp := hM.dotProduct_mulVec_pos hn
+        simp only [star_trivial] at hp
+        unfold Holonics.HolonCore.storageEnergy at hz
+        linarith
+      simpa only [hidden, hread, sub_eq_zero] using hn
+    · intro hv
+      have hn : hidden M A v = 0 := by rw [hidden, hread, hv, sub_self]
+      rw [hn] at split
+      simpa [Holonics.HolonCore.storageEnergy] using split
+
+/-- An invertible change of face coordinates transforms the metric by inverse congruence. -/
+theorem faceMetric_rechart (M : Matrix n n ℝ) (A : Matrix m n ℝ)
+    (hM : M.PosDef) (hA : Function.Surjective A.mulVec)
+    (B : Matrix m m ℝ) (hB : IsUnit B.det) :
+    faceMetric M (B * A) = Bᵀ⁻¹ * faceMetric M A * B⁻¹ := by
+  have hG := cometric_posDef M A hM hA
+  have hBt : IsUnit Bᵀ.det := by simpa using hB
+  unfold faceMetric
+  apply Matrix.inv_eq_left_inv
+  have hcom : cometric M (B * A) = B * cometric M A * Bᵀ := by
+    simp only [cometric, transpose_mul, Matrix.mul_assoc]
+  rw [hcom]
+  calc
+    (Bᵀ⁻¹ * (cometric M A)⁻¹ * B⁻¹) * (B * cometric M A * Bᵀ) =
+        Bᵀ⁻¹ * (cometric M A)⁻¹ * (B⁻¹ * B) * cometric M A * Bᵀ := by
+          simp only [Matrix.mul_assoc]
+    _ = Bᵀ⁻¹ * ((cometric M A)⁻¹ * cometric M A) * Bᵀ := by
+      rw [nonsing_inv_mul B hB, Matrix.mul_one]
+      simp only [Matrix.mul_assoc]
+    _ = 1 := by
+      rw [nonsing_inv_mul (cometric M A) ((Matrix.isUnit_iff_isUnit_det _).mp hG.isUnit),
+        Matrix.mul_one, nonsing_inv_mul Bᵀ hBt]
+
+end Consequences
+end KineticFace
 
 end Holonics.HolonCore

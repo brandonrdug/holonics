@@ -2,6 +2,7 @@ import Holonics.Transport.JunctionLaw
 import Holonics.Foundation.Standing
 import Holonics.Physics.AccumulatedNormalResponse
 import Holonics.Computation.HolonicWorldReturnDeposit
+import Mathlib.LinearAlgebra.Matrix.PosDef
 
 /-!
 # Object 8: deposition, the only law by which a constitution changes

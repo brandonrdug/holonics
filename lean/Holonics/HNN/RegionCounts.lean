@@ -1,6 +1,7 @@
 import Holonics.HNN.LatticeDeposit
 import Holonics.HNN.TargetFace
 import Holonics.HNN.IndexedOpen
+import Mathlib.Analysis.SpecialFunctions.Pow.Deriv
 
 /-!
 # HNN.RegionCounts: the receiving parametron's region class masses, read at the grain
