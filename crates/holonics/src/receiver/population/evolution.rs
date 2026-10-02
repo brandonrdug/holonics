@@ -50,6 +50,23 @@
 //! cell: the excess is `log₂(3/2)`, the test
 //! `the_evolved_aeon_bound_with_a_birth_is_over_the_founded_mass`).
 //!
+//! [proved-derived; formal-checked] **Across aeons** (Lean `Evolution.{selection_telescope,
+//! dirichlet_telescope, dirichlet_telescope_counts, dirichlet_telescope_le, evolved_aeons_code}`).
+//! Along a sequence of aeons whose selections `sel k` update the retained counts, the Dirichlet faces
+//! of the selected families telescope, with the pseudo-counts unchanged, to the
+//! Dirichlet-multinomial face of the counts, and over `K` aeons without births
+//!
+//! ```text
+//! ∏_(k<K) D_k(sel k) = ∏_f (s₀_f + σ_f)⋯(s₀_f + σ_f + c_f − 1) / S(S + 1)⋯(S + K − 1),  S = Σ_g (s₀_g + σ_g)
+//! Σ_(k<K) −log₂ W_k ≤ K(−log₂ λ) − log₂ ∏_(k<K) D_k(sel k) − Σ_(k<K) log₂ L_k(sel k)
+//! ```
+//!
+//! The product depends on the selections only through their counts, which is why the counts are the
+//! retention. With deaths the pseudo-counts move; a floor `ρ ≤ σ_k` and the ceiling `Σ_g σ_k(g) ≤
+//! |F|/2` bound the product below by the telescope at `ρ` over `Σ_g s₀_g + |F|/2`. The comparison of
+//! the telescope's code with the best fixed selection frequency is the Krichevsky–Trofimov parameter
+//! bound, owed in #62 at binary scope.
+//!
 //! With no deaths `σ = ½` and `D` is the Krichevsky–Trofimov (Dirichlet-½) face of the selection
 //! counts; each death thins the pseudo-count (`survivalPseudo_death_lt`), so a family that keeps
 //! winning is founded sooner and one that keeps dying later. [agent-inferred] Survival without

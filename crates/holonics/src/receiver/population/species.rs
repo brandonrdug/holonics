@@ -12,7 +12,7 @@
 //! - a key whose clock winds without the cells emits a word read ahead of the current tick: over `h`
 //!   ticks the word of `h` classes, over the whole future one least period of its declared period
 //!   (two periodic words agree forever exactly when their least periods and one period's words
-//!   agree);
+//!   agree, Lean `Evolution.{agree_forever_iff, signature_eq_iff, leastPeriod_isLeast}`);
 //! - a rotor key's next class depends on the cell before it, so its signature is its whole
 //!   transition table over its rotor's period (the stage a tick reads, the cell it steps from, the
 //!   class it emits), sufficient for every future passage;
