@@ -80,8 +80,9 @@ cell       |ln q̂_0 − ln q_0| ≤ Σ_(levels ≤ L) θ_i + Σ_(levels < L) |l
 `Law`; the card's `holonics_cuda::hnn::tree::CardTree`, `hnn_tree_deposit`, which mirrors the host
 split and carries no certificates). The placement of `K`, the read of the arena as a
 `ConsistentTree`, exact leaf chains and the split's closed forms are proved in
-`Context/StoredInstance` (`instTree`, `instance_read`, `instK_implicit`, `split_closed_form`); the
-Rust's read of its arena as `execFrom` stays agent-inferred there.
+`Context/StoredInstance` (`instTree`, `instance_read`, `instK_implicit`, `split_closed_form`), and
+`Law::read`'s levels as `execFrom`'s (`storedRead`, `read_level`, `read_face`); only the
+transcription of `Law::read` into `storedRead` stays agent-inferred there.
 - **A stored chain** `s_0 … s_(k−1)` over a stored bottom `s_k` is one node at its summed rung
   `S = Σ j_i` (`κ_i = 1 − w_i = 2^(−j_i)`), weight `ladder S · E + 2^(−S) X̂` with `X̂ = (2^S − 1) E/β̂`
   (`Compaction.chain_ratio`, an identity in the bottom split mass). Placing the chain's discrepancy
@@ -123,7 +124,13 @@ Rust's read of its arena as `execFrom` stays agent-inferred there.
   the passage (`cell_units`, with a charge of `1 ≤ U(2(D − b) − 1) + 4V` for the latter). Each
   part inherits the chain's drift: the lower part keeps the chain's bottom, and the upper part's
   earlier charges were bounded at the chain's deeper bottom by a smaller value. An arrival charges
-  a level once, so `n*` bounds the arrivals a level counts. Per cell at most `n* D² + 4 n* D`
+  a level once, so `n*` bounds the arrivals a level counts: `Law::apply` refuses a deposit once
+  the standing has passed the declared population. A window's working overlay reads past it by its
+  own earlier cells, at most `A − 1` for a window of `A` cells (`working_admission`); with
+  `D = P ≥ 4` the mantissa count `(n* + A − 1)(D² + 4D)` stays within the rule's `(2n* + 1) D²`
+  while `(A − 1)(D + 4) ≤ n*(D − 4) + D` (at campaign 1's `D = 63` up to `A = 5,415`, against its
+  `A = 2`), and the carrier count's further `(A − 1) D²` units of `2^(1−R)` stay far inside its
+  share (`R = 126 − W`). Per cell at most `n* D² + 4 n* D`
   mantissa units against the rule's `n* P² + max((n* + 1) P², 4 n* P)` (`mantissa_units`,
   `P ≥ D` the path depth), which is `(2n* + 1) P²` for `P ≥ 4` (the count `(n* + 1) P²` alone is
   short of `4 n* P` at `P ≤ 3`, where the maximum can widen `W`: at `n* = 6,148`, `D = 1`,
