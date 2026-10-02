@@ -1,0 +1,4 @@
+7ffb190184f571bfc64c50dc6d2165db9f241552
+f45fb2da43d2bec4750bbb130edc85c0d77aa830c94fc22d05e139c905650350
+args executed move-once order2 2026093061 8 .local/km/m3 m3=.local/km/m2/m2-kinetic.state lock-dec kinetic
+wall 180689 ms; exit 0; early stop 0
