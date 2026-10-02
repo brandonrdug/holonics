@@ -1272,3 +1272,47 @@ six percent and the depth up to six more at scale. The field's best linear share
 clock removed and a full-rank readout, is a fraction of a percent at a hundred thousand cells,
 while the medium's deposits take about half of each window's time (117 of 223 ms at `D = 4`). What
 the field would have to supply is not a linear image of the recent passage.
+
+## 30. The urn's base measure: the field carries nothing there; the tree's own root does
+
+The tree keeps every context apart, and each node's prior masses split evenly, the `+1` of
+`(2^j n_b + 1)/(2^j n + 2)`. A field could share across contexts through that slot, so it was tested
+there before anything was built ([receipt](2026-10-02_THE_CONTACT_LOOP_receipts/base_measure.txt)).
+
+**Where the code sits.** By the count of the deepest node on the opened path that has counts
+(`leaf_counts.py`, depth 16, `2^(−3)`), the held-out code falls on digits whose leaf has been seen
+once (`12307736/2^25` of it, about 37 percent), two or three times (`15063282/2^26`, 22 percent),
+four to seven (`10662917/2^26`), eight to fifteen (`12863853/2^27`), sixteen to 63 (`14572158/2^27`)
+and more (`12196741/2^28`). The choosing cut splits alike. Most of the remaining code is at sparse
+leaves.
+
+**The wave as the base.** The wave's own prediction at each reading (its exponents `W z`, the map
+published at the aeon's opening close), split down each digit's dyadic cell, as every node's base
+measure (`base_measure.py`, the aeons after the first, 2,260 cells): the even base codes
+`15341375/2^11` bits, the wave's base `15289889/2^11`, and a control giving each reading another
+reading's base `15285139/2^11`. The gain is a non-even base, any one; the wave's reading-specific
+content adds nothing (the control does as well). Refused as a field entry.
+
+**The tree's own root as the base** (`tree_base.py`). The depth-0 node of each digit tree knows the
+unconditional split, and a fresh or sparse context should lean on it, not on an even split.
+
+| Base | standing cut, development | held out | choosing cut, development | held out |
+|---|---|---|---|---|
+| even (the law) | `9191310/2^9` | `14158263/2^12` | `14662032/2^4` | `8637060/2^6` |
+| the root's face | `8911997/2^9` | `13872419/2^12` | `14604178/2^4` | `8629383/2^6` |
+| the parent's, chained | `9824207/2^9` | `15728167/2^12` | | |
+| the root's, mixed with even at ½ | `8933100/2^9` | `13753683/2^12` | `14497403/2^4` | `8551159/2^6` |
+| that, one base for the whole digit tree, at grain `1/16` | `8936120/2^9` | `13750868/2^12` | `14500844/2^4` | `8552417/2^6` |
+
+The last row, every node of a digit tree sharing one base read from its root at the receiver's
+grain and mixed with the even split at ½, codes about 498 development and 100 held-out bits less on
+the standing cut (three percent held out) and 10,074 and 1,322 less on the choosing cut (one
+percent). The parent's face chained down the path doubles what the stop weights already mix, and
+loses. One shared base keeps every node of a chain under one law, so the storage where paths part
+stays exact, and the mixture at ½ keeps each base mass at least a quarter, so the faces' floor moves
+by one bit. The grain is the receiver's own, `1/16`; at `1/64` the code is the same to a bit.
+
+[agent-inferred] The field has no share at the base either; the base slot's value is the tree's
+own unconditional split, which the tree already holds. The next build is that law in the tree
+owner, its oracle and the card's kernel, gated on held-out code, with its Lean counterpart in #62:
+the node law then reads its digit tree's root, a state beyond the arrivals reaching the node.
