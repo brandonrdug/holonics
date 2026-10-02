@@ -524,3 +524,84 @@ fn a_reached_return_steps_every_contact_and_the_later_cut_reads_the_successor() 
     };
     assert_ne!(later(&mut pre), later(&mut post));
 }
+
+/// [measured-diagnostic; agent-inferred, October 2; the contact loop record §3] **The contacts' steps
+/// alone**: the same reached return's channel families deposited without the other loci, together
+/// and then each family alone at its own certificate (no joint halving), with the same later drive
+/// read at the predecessor and at the contacts' successor. The receipts the record cites are
+/// printed: each family's step, alignment and curvature, whether the factors moved, and whether the
+/// later cut differs.
+#[test]
+fn the_contacts_steps_alone_move_the_contacts_and_the_later_cut_reads_them() {
+    use super::learning::generic;
+    use crate::hnn::constitution::Locus;
+    use crate::hnn::field::ConstitutionRead;
+    use crate::hnn::port::Deposit;
+    let field = chain();
+    let reference = Reference::new(4, 1 << 40);
+    let theta = generic(&field, 301);
+    let mut resident = reference.mount_with(&field, &Current::at_rest(&field), theta.clone()).unwrap();
+    let (moment, _) = reference.ingest(&mut resident, None, &one_hot(&[1, 2, 0, 3, 1])).unwrap();
+    let phases = resident.admitted()[0].clone();
+    let (pending, _) = reference.refine(&mut resident, &moment, &phases).unwrap();
+    let (_, compared) = reference.compare(&mut resident, pending, &one_hot(&[1, 0])).unwrap();
+    let deposit = match compared.deposit {
+        Component::Present(deposit) => deposit,
+        other => panic!("{other:?}"),
+    };
+    let contacts: Vec<_> = deposit
+        .factors()
+        .iter()
+        .filter(|s| matches!(s.gradient.locus(), Locus::Channel(_)))
+        .cloned()
+        .collect();
+    let loci: Vec<Locus> = (0..field.contacts().len()).map(Locus::Channel).collect();
+    let mut alone = Deposit::new(deposit.commit(), Vec::new(), contacts, loci);
+    if let Some(reach) = deposit.reach() {
+        alone = alone.with_reach(reach.clone());
+    }
+    let (next, reading) = theta.deposited(&alone).unwrap();
+    for (locus, step) in &reading.steps {
+        eprintln!("{locus:?} {:?}: eta {}", step.family, step.step.step);
+    }
+    for a in 0..field.contacts().len() {
+        eprintln!(
+            "contact {a}: factors moved ({}, {}, {})",
+            theta.contact_storage(a) != next.contact_storage(a),
+            theta.contact_stiffness(a) != next.contact_stiffness(a),
+            theta.contact_dissipation(a) != next.contact_dissipation(a),
+        );
+    }
+    eprintln!(
+        "released {}; storage growth {}",
+        reading.released.len(),
+        reading.storage_growth
+    );
+    let later = |theta: crate::hnn::Constitution| {
+        let mut resident = reference.mount_with(&field, &Current::at_rest(&field), theta).unwrap();
+        let (moment, _) = reference.ingest(&mut resident, None, &one_hot(&[2, 3, 1, 0, 2])).unwrap();
+        let phases = resident.admitted()[0].clone();
+        let (pending, _) = reference.refine(&mut resident, &moment, &phases).unwrap();
+        let (_, compared) = reference.compare(&mut resident, pending, &one_hot(&[2, 3])).unwrap();
+        format!("{:?}", compared.forward)
+    };
+    eprintln!("the later cut differs: {}", later(theta.clone()) != later(next));
+    // Each family alone: its own certificate, no joint halving.
+    for step in alone.factors() {
+        let one = Deposit::new(deposit.commit(), Vec::new(), vec![step.clone()], vec![step.gradient.locus()])
+            .with_reach(deposit.reach().unwrap().clone());
+        let (single, r) = theta.deposited(&one).unwrap();
+        let a = match step.gradient.locus() { Locus::Channel(a) => a, _ => unreachable!() };
+        eprintln!(
+            "alone {:?}: eta {}, a {}, C {}, factors moved ({}, {}, {}), released {}",
+            r.steps[0].1.family,
+            r.steps[0].1.step.step,
+            r.steps[0].1.step.alignment,
+            crate::holon::deposition::significant(&r.steps[0].1.step.curvature, 24, false),
+            theta.contact_storage(a) != single.contact_storage(a),
+            theta.contact_stiffness(a) != single.contact_stiffness(a),
+            theta.contact_dissipation(a) != single.contact_dissipation(a),
+            r.released.len(),
+        );
+    }
+}
