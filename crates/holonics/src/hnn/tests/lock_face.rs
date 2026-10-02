@@ -1289,6 +1289,75 @@ fn the_kinetic_move_deposits_the_solve_and_keeps_every_guard() {
     }
 }
 
+/// **A release run ends at its close, a refusal, or its declared cap, never at a count of its own**
+/// ([`crate::hnn::executed::release_run`]; the run-end record §2, §4). On the kinetic fixture with a
+/// cap of two adopted moves: a negative `σ` is refused before any reading; the first move is the
+/// guarded move with the excursion unchecked; a close reads the adopted trial's own release strictly
+/// below the opening's lower end less `σ`; a run that neither closes nor is refused within the cap is
+/// incomplete with exactly the cap's moves, and is never reported refused.
+#[test]
+fn the_release_run_ends_at_its_close_a_refusal_or_its_declared_cap() {
+    use crate::hnn::executed::{
+        MoveMetric, ReleaseExcursion, RunEnd, executed_move_guarded, release_run,
+    };
+    let field = joint();
+    let theta = generic(&field, 94).with_transport(0, rat(3, 4)).unwrap();
+    let refinement = Refinement::declare(&field, 0, 2, 1, 4, 2).unwrap();
+    let bank = joint_bank();
+    let requests =
+        short_requests(&field, &[(95, [0, 1, 2, 1]), (96, [1, 1, 0, 2]), (97, [2, 0, 1, 1])]);
+    let comparison = Comparison::LOCK_DECISIONS;
+    let metric = MoveMetric::Kinetic;
+    let cap = std::num::NonZeroUsize::new(2);
+    assert_eq!(
+        release_run(
+            &field, &theta, &requests, &refinement, &bank, 12, comparison, metric, &rat(-1, 2),
+            cap, |_, _| true,
+        ),
+        Err(HnnError::WindowDecrease { decrease: rat(-1, 2) })
+    );
+    let unchecked = ReleaseExcursion { checkpoint: None, height: None };
+    let first = executed_move_guarded(
+        &field, &theta, &requests, &refinement, &bank, 12, comparison, metric, &unchecked,
+    )
+    .unwrap();
+    let decrease = rat(1, 16);
+    let mut seen = Vec::new();
+    let ran = release_run(
+        &field, &theta, &requests, &refinement, &bank, 12, comparison, metric, &decrease, cap,
+        |k, moved| {
+            seen.push((k, moved.adopted.is_some()));
+            if k == 0 {
+                let steps = |m: &crate::hnn::executed::ExecutedMove| {
+                    m.trials.iter().map(|t| (t.step.clone(), format!("{:?}", t.refusal))).collect::<Vec<_>>()
+                };
+                assert_eq!(steps(moved), steps(&first));
+                assert_eq!(moved.refusal, first.refusal);
+            }
+            true
+        },
+    )
+    .unwrap();
+    assert_eq!(ran.opening, first.before.value);
+    match &ran.end {
+        RunEnd::Closed { moves, end, .. } => {
+            assert!(*moves >= 1 && *moves <= 2);
+            assert!(end.upper < &ran.opening.lower - &decrease);
+            assert_eq!(seen.len(), *moves);
+        }
+        RunEnd::Refused { moves, refusal } => {
+            assert!(*moves < 2);
+            assert!(refusal.is_some());
+            assert_eq!(seen.len(), moves + 1);
+            assert!(!seen.last().unwrap().1);
+        }
+        RunEnd::Incomplete { moves, .. } => {
+            assert_eq!(*moves, 2);
+            assert_eq!(seen, vec![(0, true), (1, true)]);
+        }
+    }
+}
+
 /// **The joined solve spends the readings' change at least storage energy across `E` and `ρ`**
 /// ([`ModulusCoupling`]): one candidate at `θ = ½` wants its log-reading raised by `2`.
 /// - Where no entry of `E` moves the reading and `ρ` moves it by `2` a unit, `Δρ = 1` and `E` stays.

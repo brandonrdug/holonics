@@ -128,8 +128,11 @@
 //!   that cell while the executed release rose). Within the cell the second condition is the first;
 //!   past it, a step is adopted only while the executed comparison still descends, so over moves on
 //!   fixed requests the executed composition falls strictly at every adopted move;
-//! - otherwise the step is halved and tried again, at most [`LADDER_DEPTH`] trials a move, and the
-//!   move is refused, typed, when no trial is adopted.
+//! - otherwise the step is halved and tried again until the carried move falls below the lattice's
+//!   resolution (`η · 2u < λ`, `λ` the source port's lattice unit), and the move is refused, typed,
+//!   when no trial is adopted. The lattice alone ends the halvings: with `η₀ · 2u ≤ 1` a halving `k`
+//!   is tried only when `2^k ≤ 1/λ` (Lean `HNN/ReleaseRun.attempted_halvings_le_lattice`; the
+//!   [run-end record](../../../../research/records/2026-10-02_A_RUN_CLOSES_ON_A_CONDITION_NOT_A_LENGTH_AND_THE_HALVINGS_END_AT_THE_LATTICE.md) §3).
 //!
 //! **The two readings, kept apart** (the pin §13.1). The descent account is read on one fixed
 //! conditional-context mask, the incumbent's own terms' sections: the proposal, its first order and
@@ -3031,8 +3034,8 @@ pub enum MoveRefusal {
     Unresolved(usize),
     /// The joint unit move's first-order bound of the composition is not certified negative.
     NoDescent(ExactInterval),
-    /// Every trial step failed a condition of adoption, halving down to a move below the lattice or
-    /// to the last of [`LADDER_DEPTH`] trials.
+    /// Every trial step failed a condition of adoption, halving down to a move below the lattice's
+    /// resolution.
     Guards,
     /// The witness's metric ([`MoveMetric::Witness`]): no lock-face term reads the plane (the hinge
     /// has no lock), or some plane direction lies in the witness's kernel (`G` not positive
@@ -3259,18 +3262,21 @@ pub struct Reread {
 ///   (`grain_windows_bounded`): the path releases at the grain.
 /// - `W`: at least two steps, since a jump is read only by the step after it
 ///   (`one_move_closes_iff`), and at least `(F + σ)/d` for jumps `F` against a per-step certified
-///   decrease of at most `d` (`window_length_lower`). Its upper end is the chain's choice: it bounds
-///   the steps an interval that does not close spends.
+///   decrease of at most `d` (`window_length_lower`). No law fixes an upper end: a close is admitted
+///   at any length (`HNN/ReleaseRun.close_at_any_length`), so [`release_run`] ends an interval only
+///   at its close or a refusal, and a declared bound on work ends it incomplete.
 ///
 /// A negative excursion states no condition (the opening state would breach its own) and a
 /// negative decrease lets an opening state rise; both are refused, typed
 /// ([`HnnError::ExcursionHeight`], [`HnnError::WindowDecrease`]).
 ///
 /// **An interval that does not close is discarded whole.** The chain holds the opening state's
-/// `Constitution` (one held state, not a tape) and restarts from it, discarding every successor the
-/// interval admitted; §12's `CheckpointGuard` indexes admitted states only, which is that law. No
-/// process of the rings undoes a deposition: the restart is a selection among paths made by the
-/// receiver and has no physical statement. The unchecked excursion is sound whatever its value: only
+/// `Constitution` (one held state, not a tape) and discards every successor the interval admitted;
+/// §12's `CheckpointGuard` indexes admitted states only, which is that law. No process of the rings
+/// undoes a deposition: the discard is a selection among paths made by the receiver and has no
+/// physical statement. A restart from the opening restores its whole continuing state, deposit
+/// clock and carried Gram included, and repeats the same moves to the same end, so a refused
+/// interval is reported, not restarted ([`RunEnd::Refused`]). The unchecked excursion is sound whatever its value: only
 /// the chain reads an interval's states, and it releases only a closed interval's opening state,
 /// which `NotBelow` on every step and the close certify.
 ///
@@ -3281,8 +3287,8 @@ pub struct Reread {
 /// (`HNN/Floquet.integer_monodromy_floor`; [`crate::hnn::ring`]'s `growth_of`), and a zero target is
 /// refused by [`lock_face`], so it is never admitted. [agent-inferred] The rivals' bound and a floor
 /// uniform over a path (`Δ` varies with `E`) have no Lean statement yet (#62). This type holds only
-/// the opening state's code length, which is all a step's comparison and the close read; no chain
-/// owner runs intervals yet.
+/// the opening state's code length, which is all a step's comparison and the close read; the
+/// interval's owner is [`release_run`].
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct ReleaseExcursion {
     /// The opening state's released code length; `None` is the incumbent's.
@@ -3360,13 +3366,6 @@ impl ReleaseExcursion {
     }
 }
 
-/// [definition; agent-inferred, September 30] **The number of trial steps**: at most 8 a move,
-/// halving from the first down to `2^(−7)` of it. Every trial re-reads every request, so the count
-/// bounds a move's work: a chosen bound on work, not a law. A comparison that does not fall within
-/// `2^(−7)` of the first step along the proposal is refused there (typed), never searched further.
-/// One count for every declared comparison.
-pub const LADDER_DEPTH: usize = 8;
-
 /// The trials' outcome: every trial, the adopted successor with its carried step, or the refusal.
 type LadderOutcome = (Vec<Trial>, Option<(Constitution, SourceStep)>, Option<MoveRefusal>);
 
@@ -3377,7 +3376,7 @@ type FirstOrder<'a> =
 /// [definition; agent-inferred, September 30] **The certified step's halving trials, one law for
 /// every declared comparison** (module header, "The committed move"): from the first step (held so
 /// that no entry of `E` moves by more than the founding's entry scale `½` in one move), halving
-/// until the carried move moves no lattice coordinate or the trials reach [`LADDER_DEPTH`]; each
+/// until the carried move falls below the lattice's resolution or moves no lattice coordinate; each
 /// carried successor adopted only when all of these hold on it: the entry bound, the first-order
 /// certificate on the carried move (`first`, negative), the successor's own certificates and the
 /// fixed mask's value (`reread`) strictly lower by disjoint enclosures, and its own released code
@@ -3407,10 +3406,11 @@ fn ladder(
     let two = Rat::from_integer(BigInt::from(2));
     let mut trials = Vec::new();
     loop {
-        if step.is_zero()
-            || &step * unit_largest * &two < lattice_unit
-            || trials.len() >= LADDER_DEPTH
-        {
+        // The lattice's resolution ends the halvings: below it every entry of the carried move
+        // moves by less than half a lattice unit (`HNN/ReleaseRun.below_floor_one_coordinate`),
+        // and the first step's `η₀ · 2u ≤ 1` bounds the trials by `log₂(1/λ) + 1`
+        // (`attempted_halvings_le_lattice`). No count of trials is declared beside it.
+        if step.is_zero() || &step * unit_largest * &two < lattice_unit {
             return Ok((trials, None, Some(MoveRefusal::Guards)));
         }
         let mut trial = Trial {
@@ -4051,6 +4051,135 @@ pub fn executed_move_guarded(
     receipt.adopted = adopted;
     receipt.refusal = refusal;
     Ok(receipt)
+}
+
+/// [definition; proved-derived, October 2; the
+/// [run-end record](../../../../research/records/2026-10-02_A_RUN_CLOSES_ON_A_CONDITION_NOT_A_LENGTH_AND_THE_HALVINGS_END_AT_THE_LATTICE.md)
+/// §2, §4] **How a release run ended** ([`release_run`]).
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub enum RunEnd {
+    /// The run closed: after `moves` adopted moves the closing state's own released code length
+    /// `end` lies strictly below the opening's lower end less `σ` ([`ReleaseExcursion::closes`]).
+    Closed {
+        moves: usize,
+        state: Box<Constitution>,
+        end: ExactInterval,
+    },
+    /// The move from the state after `moves` adopted moves was refused, typed. The run ends: a
+    /// restart from the opening restores the opening's whole continuing state and repeats the same
+    /// moves to the same refusal (record §1).
+    Refused {
+        moves: usize,
+        refusal: Option<MoveRefusal>,
+    },
+    /// The declared work cap was reached, or the caller stopped the run, after `moves` adopted moves
+    /// with no close and no refusal: the run is incomplete, never refused. `state` is the last
+    /// adopted state, from which the run can be continued with the same opening.
+    Incomplete {
+        moves: usize,
+        state: Box<Constitution>,
+    },
+}
+
+/// A release run's receipt: the opening's released code length, the decrease `σ` and the end.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct ReleaseRun {
+    pub opening: ExactInterval,
+    pub decrease: Rat,
+    pub end: RunEnd,
+}
+
+/// [definition; proved-derived, October 2; the
+/// [run-end record](../../../../research/records/2026-10-02_A_RUN_CLOSES_ON_A_CONDITION_NOT_A_LENGTH_AND_THE_HALVINGS_END_AT_THE_LATTICE.md)
+/// §2, §4] **The release run: from an opening state, committed moves until the run closes or a move
+/// is refused** ([`ReleaseExcursion`]'s chain owner). Each move is [`executed_move_guarded`] under the
+/// declared metric with the excursion unchecked from the opening state
+/// ([`ReleaseExcursion::from_checkpoint`]); after each adopted move the run reads its close on the
+/// adopted trial's own release, `end.upper < opening.lower − σ`.
+///
+/// The repayment law fixes no length: a close is admitted at any length (Lean
+/// `HNN/ReleaseRun.close_at_any_length`), so the run ends only at a close or a refusal. `cap`, at
+/// most that many adopted moves, is a declared bound on work, and `each` (called with the move's index from zero and its receipt) may
+/// stop the run at its own deadline by returning `false`; either ends the run
+/// [`RunEnd::Incomplete`], reported as such and never as a refusal. `σ` is the declared decrease, at
+/// least one receiver grain over the decisions ([`ReleaseExcursion::grain`]); a negative `σ` is
+/// refused before any reading ([`HnnError::WindowDecrease`]).
+#[allow(clippy::too_many_arguments)]
+pub fn release_run(
+    field: &Field,
+    opening: &Constitution,
+    requests: &[Request],
+    declared: &Refinement,
+    bank: &ReceivingBank,
+    grain: u32,
+    comparison: Comparison,
+    metric: MoveMetric,
+    decrease: &Rat,
+    cap: Option<std::num::NonZeroUsize>,
+    mut each: impl FnMut(usize, &ExecutedMove) -> bool,
+) -> Result<ReleaseRun, HnnError> {
+    if decrease.is_negative() {
+        return Err(HnnError::WindowDecrease {
+            decrease: decrease.clone(),
+        });
+    }
+    let mut state = opening.clone();
+    let mut excursion = ReleaseExcursion {
+        checkpoint: None,
+        height: None,
+    };
+    let mut moves = 0;
+    loop {
+        let moved = executed_move_guarded(
+            field, &state, requests, declared, bank, grain, comparison, metric, &excursion,
+        )?;
+        let opening_value = excursion
+            .checkpoint
+            .get_or_insert_with(|| moved.before.value.clone())
+            .clone();
+        let go_on = each(moves, &moved);
+        let Some((successor, _)) = moved.adopted else {
+            return Ok(ReleaseRun {
+                opening: opening_value,
+                decrease: decrease.clone(),
+                end: RunEnd::Refused {
+                    moves,
+                    refusal: moved.refusal,
+                },
+            });
+        };
+        moves += 1;
+        // The adopted trial's own release: the successor's released code length (an adopted trial
+        // always carries it; a trial without it is refused `Unsupported`).
+        let end = moved
+            .trials
+            .last()
+            .and_then(|t| t.after.as_ref())
+            .map(|own| own.value.clone())
+            .expect("an adopted trial carries its own release");
+        if ReleaseExcursion::closes(&opening_value, &end, decrease)? {
+            return Ok(ReleaseRun {
+                opening: opening_value,
+                decrease: decrease.clone(),
+                end: RunEnd::Closed {
+                    moves,
+                    state: Box::new(successor),
+                    end,
+                },
+            });
+        }
+        state = successor;
+        if !go_on || cap.is_some_and(|cap| moves >= cap.get()) {
+            return Ok(ReleaseRun {
+                opening: opening_value,
+                decrease: decrease.clone(),
+                end: RunEnd::Incomplete {
+                    moves,
+                    state: Box::new(state),
+                },
+            });
+        }
+    }
 }
 
 /// **The committed move's unit step, formed and not taken** ([`executed_move`] and
