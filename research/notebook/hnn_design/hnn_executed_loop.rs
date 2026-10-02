@@ -1585,8 +1585,12 @@ pub(super) fn run(
     let decisions = declared.stations * count;
     let decrease = ReleaseExcursion::grain(decisions, &rat(TOLERANCE.0, TOLERANCE.1)).expect("σ");
     println!(
-        "executed run: {count} {terrain} requests at development seed {seed}, the arm {arm}, {metric:?}, from {label} (ρ {}); σ over {decisions} decisions {} nats; cap {cap:?}, deadline {deadline} ms; the bank p = {}, grain 2^(-{BANK_GRAIN})",
+        "executed run: {count} {terrain} requests at development seed {seed}, the arm {arm}, {metric:?}, from {label} (ρ {}; the source port's lattice 2^(-{})); σ over {decisions} decisions {} nats; cap {cap:?}, deadline {deadline} ms; the bank p = {}, grain 2^(-{BANK_GRAIN})",
         theta.transport(ring),
+        theta
+            .lattice(holonics::hnn::constitution::Locus::SourcePort(ring))
+            .expect("the source port's lattice")
+            .exponent(),
         cell(&ExactInterval::point(decrease.clone()), 1 << 12),
         bank_strength()
     );
