@@ -14,8 +14,11 @@ concepts.
 Every term names a quantity or a process of the receiving bank.
 
 - **The released code length** `f` is the comparison: the targets' code length in nats, read
-  through the release's own commitments. `k_B T · f` is a free energy against the receiver's
-  equilibrium; `f` itself is dimensionless.
+  through the release's own commitments. It is a code length, not an energy. Reading it as the
+  Holons' stored energy or work needs a map from cross-entropy to storage and work that is not
+  derived here. The one derived case (Astra's): at a fixed temperature, the change in code length
+  equals the force less its average. So nothing below calls `f`, the jump or the range an energy;
+  the map is owed in #62.
 - **A commitment** is a ring's all-or-nothing lock on its dominant sheet: the zero-temperature limit
   of the lock's shares ([the flip record](2026-10-02_A_FLIP_IS_SET_BY_THE_LOCK_RULES_MARGIN_AND_NO_LAW_IN_THE_CHAIN_CERTIFIES_IT_BEFORE_THE_SUCCESSOR_IS_READ.md) §0).
 - **A step** is one deposition: the constitution `E` moves to a successor.
@@ -106,7 +109,11 @@ less a certified decrease `σ n ≥ 0`.
 - **One step and no excursion is strict descent** (`checkpoint_one_iff`), the rule the chain kept
   before. The comparison on enclosures' ends is sound (`excursion_enclosure`).
 - **An interval closes exactly when its held-commitment decreases exceed its jumps by `σ`**
-  (`window_closes_iff`).
+  (`window_closes_iff`). This repayment condition is necessary for the closing state to lie a
+  grain below the opening. It is not sufficient for anything further:
+  - it does not say the path reaches a lower basin;
+  - it does not bound the states between beyond the range `h`;
+  - it does not say an interval refused at length `W` would fail to close at a longer one.
 - **The opening states descend by the certified decreases** (`checkpoint_descends`):
   `f (t n) ≤ f 0 − Σ_(b<n) σ b`. **Nothing exceeds the first opening by more than `h`**
   (`excursion_le_start`).
@@ -150,8 +157,11 @@ The float path's numbers check these; they do not set them.
      of at most `d` (`window_length_lower`). At `m7`, `F = 34038/4096`. If no step certifies more
      than the `359/4096` that `m7`'s smallest step did, the jump needs at least 95 steps. A step
      that certifies more shortens that in proportion.
-   - **The upper end is the chain's choice.** It bounds the steps an interval that does not close
-     spends before the path restarts from its opening. No law of the chain fixes it.
+   - **The upper end is the chain's choice, a bound on work, not a law.** The chain runs `W = 8`
+     [agent-inferred]. It bounds the steps an interval that does not close spends before the path
+     restarts from its opening, so it bounds the work spent on a path that is then discarded. No
+     law of the chain fixes it. The `m7` jump's lower bound above already exceeds `8` steps
+     unless the steps certify more than `m7`'s smallest did.
 
 ## 5. The readings' floor, and a reading that falls toward zero
 
