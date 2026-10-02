@@ -1,0 +1,2 @@
+executed step-state from m7 at η 1/4096: incumbent L ∈ [337896/4096, 337901/4096); held-sheet [337715/4096, 337720/4096), released [337715/4096, 337720/4096); 1087641 ms
+  written out/q12/m7-4096.state

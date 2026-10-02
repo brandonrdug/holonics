@@ -1,0 +1,16 @@
+executed locks: 8 order2 requests at seed 2026093061, from m7s (ρ 102837/131072); L ∈ [337715/4096, 337720/4096) nats, X ∈ [156263/4096, 156268/4096) nats; solved 1 of 64; whole 0 (released 7, stations right 13)
+  the smallest margins (largest certain gap less another station's reach, /2^24, lower ends):
+    49152: request 7, refinement 6, station 4
+    151552: request 5, refinement 6, station 0
+    157184: request 3, refinement 1, station 5
+    238592: request 1, refinement 5, station 0
+    1851392: request 6, refinement 1, station 7
+    2177792: request 1, refinement 5, station 1
+    2212864: request 4, refinement 4, station 1
+    2435584: request 4, refinement 6, station 4
+    2826240: request 1, refinement 3, station 0
+    3674496: request 1, refinement 3, station 2
+    4270592: request 0, refinement 5, station 1
+    5662976: request 1, refinement 3, station 1
+  margins by octave (-1: not positive; 9: below 2^10; b: in [2^b, 2^(b+1)) of 2^-24): {15: 1, 17: 3, 20: 1, 21: 5, 22: 4, 23: 11, 24: 32, 25: 40, 26: 46, 27: 49, 28: 6, 29: 5, 30: 3, 31: 7, 32: 8, 33: 2}; 223 margins
+  m7s: 64 refinements; 0 with a station not ranked below the largest that did not lock with it (0 stations); 739694 ms
