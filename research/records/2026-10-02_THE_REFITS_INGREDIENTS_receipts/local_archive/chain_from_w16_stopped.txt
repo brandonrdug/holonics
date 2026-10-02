@@ -1,0 +1,5 @@
+checkpoint at w16, exact: 3786253211414307025302647559281/79228162514264337593543950336 1893152355080318255304268367587/39614081257132168796771975168
+move 1: probe exit 0;   v1 kinetic: the incumbent: ρ 102837/131072; L ∈ [195744/4096, 195748/4096) nats, X ∈ [52990/4096, 52993/4096) nats; solved 37 of 64; whole 0 (released 8, stations right 27); 199943 ms
+      trials: η 1/8 ρ unmoved mask [159085/4096, 159088/4096) own [186752/4096, 186756/4096) adopted; γ_ρ [-426589/4096, -426588/4096)
+  window move 1: own   v1 kinetic: the adopted successor's own release: ρ 102837/131072; L ∈ [186752/4096, 186756/4096) nats, X ∈ [47909/4096, 47912/4096) nats; solved 37 of 64; whole 0 (released 8, stations right 29); 19; open
+stopped by priority after move 1 (the ρ reads first)
