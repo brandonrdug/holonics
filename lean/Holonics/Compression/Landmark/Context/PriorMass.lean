@@ -24,7 +24,7 @@ regret     (k/n)^k (m/n)^m ≤ 2^j √n · U_α(k, m)      at most ½ log₂ n +
 one-sided  KT(n, 0) ≤ U_α(n, 0),  U_α(n + 1, 0) ≥ 1/(2(1 + αn))   at most 2 bits while n ≤ 2^j
 choice     j ∈ {1, …, 8} charged log₂ 8 = 3 bits: Σ_w 2^(−(3 + code_ĵ(w))) ≤ 1 for any choice ĵ
 tree       −log₂ ∏_t q_0(x_t) ≤ −log₂ prior_w(S) + Σ_(leaves s) [−log₂ (k_s/n_s)^(k_s) (m_s/n_s)^(m_s) + ½ log₂ n_s + j]
-           every pruned tree S, any stop weights in [0, 1); the whole tree's ĵ charged 3 bits
+           every pruned tree S, any stop weights in [0, 1); one binary tree's ĵ charged 3 bits
 depth      D → k + D: the bound against S of depth ≤ D gains deepLeaves(S) · (−log₂ w_D), nothing else;
            on the ladder −log₂(1 − 2^(−j_D)) = j_D − log₂(2^(j_D) − 1) ≤ 1 bit a deep leaf
 ```
@@ -100,10 +100,14 @@ register (`Capacity::Unbounded`, `hnn::receiving::landmark_declaration_with`) an
 declaration refuses `j = 0`): a register's ceiling is another node law, not the urn. Not stated
 here: the executed lattice code adds the lattice's per-cell drift (#62, "the landmark lattice's
 drift"; checked by the Rust tests through `Landmarks::face_rule`); the enlarged tree's join of the
-cell and bundle branches adds at most one bit against either branch
-(`Tree.sequential_mixture_bounds`), uncomposed; and the concave form `|S| γ(N/|S|)` of the leaves'
-charges. A rung declared on the development cells before the coded cells needs no charge on them;
-the 3 bits cover a choice made on the coded word itself.
+cell and bundle branches adds at most one bit a dyadic cell against either branch (the join is
+per digit tree, at `½`; `Tree.sequential_mixture_bounds`), uncomposed; and the concave form
+`|S| γ(N/|S|)` of the leaves' charges. A rung declared on the development cells before the coded cells needs no charge on them;
+the 3 bits cover a choice made on the coded word itself. `emitted_sum`, `tree_two_part` and
+`priorMass_tree_two_part` are stated for one binary tree whose context is read from its own past
+digits; over a larger alphabet a digit tree's context is the cell history, and the cell code's
+completeness over its digit trees (each cell's digit faces summing to one,
+`Tree.digit_emission_normalized`) is not composed with them here.
 
 [agent-inferred] **The depth is a storage limit.** By item 8 a larger maximum depth never weakens
 the guarantee against a tree source of the old depth by more than one stop code a leaf at the old
@@ -122,7 +126,7 @@ branch's letter depth is that depth, the bundle branch's `(1 + r)` times it, so 
 | regret `½ log₂ n + j`; KT's `½ log₂ n + 1` | `kt_regret`, `priorMass_regret`, `priorMass_regret_bits` | — |
 | the one-sided gain | `priorMass_one_sided_ge_kt`, `priorMass_one_sided_two_bits` | — |
 | the ladder charged 3 bits is a valid code | `two_part_kraft`, `priorMass_two_part` | `hnn::field::ReceiverDeclaration::mass` (campaign 1 declares `j = 3`, coded in `Field::describe`) |
-| the tree's full redundancy, any stop weights; the whole tree's rung charged 3 bits | `emitted_eq_weight`, `own_dominance₀`, `priorMass_tree_redundancy`, `priorMass_tree_redundancy_source`, `emitted_sum`, `tree_two_part`, `priorMass_tree_two_part` | `compression::landmark::context::IdealLandmarks` (one digit tree's exact code), `StopPrior`, `hnn::field::ReceiverDeclaration::mass` |
+| the tree's full redundancy, any stop weights; one binary tree's rung charged 3 bits | `emitted_eq_weight`, `own_dominance₀`, `priorMass_tree_redundancy`, `priorMass_tree_redundancy_source`, `emitted_sum`, `tree_two_part`, `priorMass_tree_two_part` | `compression::landmark::context::IdealLandmarks` (one digit tree's exact code), `StopPrior`, `hnn::field::ReceiverDeclaration::mass` |
 | raising the maximum depth costs one stop code a leaf at the old maximum depth | `PrunedTree.prior_lift`, `ownLik_lift`, `leafSum_lift`, `priorMass_depth_lift`, `ladder_stop_bits`, `priorMass_depth_lift_ladder` | `compression::landmark::context::LandmarkDeclaration::depth`, `StopPrior::weight`, `hnn::field::ReceiverDeclaration` (`depth`) |
 | the floor `1/(2^j n* + 2)` | `priorMass_face_ge` (the node), `priorMass_digit_face_ge` (the opened path, any stop weights) | `compression::landmark::context::face_bits` |
 -/
@@ -1057,7 +1061,7 @@ theorem tree_two_part {B : ℕ} (par : Fin B → ℕ × (ℕ → ℚ)) (hw : ∀
     (fun i => le_of_eq (by exact_mod_cast emitted_sum _ (hw i) ctx D n)) choice
 
 /-- [proved-derived; formal-checked] **`priorMass_tree_two_part`: the tree's rung charged 3 bits.**
-At one stop law and the ladder `j = 1..8`, the lengths `3 + code_ĵ` of the whole tree's emitted code
+At one stop law and the ladder `j = 1..8`, the lengths `3 + code_ĵ` of one binary tree's emitted code
 satisfy Kraft for any choice of rung: `Σ_v 2^(−(3 + code_(ĵ v)(v))) ≤ 1`. With
 `priorMass_tree_redundancy`, the two-part code is at most
 `3 + min_j [−log₂ prior_w(S) + Σ_(leaves) (−log₂ (k_s/n_s)^(k_s) (m_s/n_s)^(m_s) + ½ log₂ n_s + j)]`

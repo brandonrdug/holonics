@@ -1,0 +1,15 @@
+== the source at modulus 63/64 (memory about 64 ticks)
+3400 cells; the last aeon from cell 2192
+cell tree: all 12879530/2^10; last aeon 15782718/2^12
+r = 1: sheets all 12919249/2^10, last aeon 15801341/2^12; coins all 12926740/2^10, last aeon 15801462/2^12
+r = 2: sheets all 12926216/2^10, last aeon 15810298/2^12; coins all 12933334/2^10, last aeon 15805689/2^12
+r = 3: sheets all 12927228/2^10, last aeon 15808775/2^12; coins all 12939966/2^10, last aeon 15832742/2^12
+r = 4: sheets all 12928635/2^10, last aeon 15809769/2^12; coins all 12940214/2^10, last aeon 15819322/2^12
+args: hnn_exposure ablation 1700 samples ... transport-memory 6 (main 2f8b8933); projection 1,690 s (the lossless samples run's 1,320,724 ms times the memory-64 exposure's 876,553/686,915), deadline 1,800 s; wall 1,407,266 ms; then sheet_letters.py over its samples and the pinned cut
+== the lossless open (the samples of section 23)
+3400 cells; the last aeon from cell 2192
+cell tree: all 12879530/2^10; last aeon 15782718/2^12
+r = 1: sheets all 12915088/2^10, last aeon 15807406/2^12; coins all 12926740/2^10, last aeon 15801462/2^12
+r = 2: sheets all 12918423/2^10, last aeon 15810945/2^12; coins all 12933334/2^10, last aeon 15805689/2^12
+r = 3: sheets all 12919182/2^10, last aeon 15798382/2^12; coins all 12939966/2^10, last aeon 15832742/2^12
+r = 4: sheets all 12918800/2^10, last aeon 15795475/2^12; coins all 12940214/2^10, last aeon 15819322/2^12

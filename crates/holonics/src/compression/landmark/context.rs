@@ -102,12 +102,14 @@
 //! development cells from the ladder `j = 1..8` and charged 3 bits, a valid two-part code for any choice
 //! (`priorMass_two_part`). Composed into the tree, a digit tree's exact code ([`IdealLandmarks`]) is
 //! within, for every pruned tree under any stop weights, its prior code plus each leaf's best fixed
-//! digit code and `½ log₂ n_s + j` (`priorMass_tree_redundancy`), and the whole tree's rung charged
-//! 3 bits stays a valid code (`priorMass_tree_two_part`); the executed lattice adds its drift
-//! (owed in #62) and the join at most one bit. Raising the declared depth from `D` to `D'` costs,
-//! against every pruned tree of depth at most `D`, one stop code `−log₂ w_D = j_D − log₂(2^(j_D) − 1)`
-//! (at most one bit) a leaf at depth `D`, and nothing else (`priorMass_depth_lift_ladder`): the depth
-//! is a storage limit. A register's ceiling stays on KT's half-unit masses.
+//! digit code and `½ log₂ n_s + j` (`priorMass_tree_redundancy`), and one binary tree's rung chosen
+//! on its coded word and charged 3 bits stays a valid code (`priorMass_tree_two_part`; the cell
+//! code's completeness over its digit trees is not composed); the executed lattice adds its drift
+//! (owed in #62) and each dyadic cell's join at most one bit. Raising the declared depth from `D` to
+//! `D'` costs, against every pruned tree of depth at most `D`, one stop code
+//! `−log₂ w_D = j_D − log₂(2^(j_D) − 1)` (at most one bit) a leaf at depth `D`, and nothing else
+//! (`priorMass_depth_lift_ladder`): the depth is a storage limit. A register's ceiling stays on KT's
+//! half-unit masses.
 //!
 //! [definition] **Typed address letters** ([`Letter`]): `Boundary` (before the cut's first cell),
 //! `Cell(code)` (a tick of the cell-only family) and `Bundle` (a tick's cell with its declared
