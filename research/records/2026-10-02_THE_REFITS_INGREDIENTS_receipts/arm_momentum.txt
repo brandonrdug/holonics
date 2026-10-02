@@ -1,0 +1,28 @@
+step 0: rho 1.0000; held-out release: released 0, whole 0, stations 0, first lock at 0/1 0, first lock right 0, consistent 0; teacher-forced 234/1024; |E| max 0.500; 2 s
+step 50: rho 0.8278; held-out release: released 128, whole 0, stations 434, first lock at 0/1 91, first lock right 40, consistent 1; teacher-forced 379/1024; |E| max 2.772; 149 s
+step 100: rho 0.8178; held-out release: released 128, whole 21, stations 619, first lock at 0/1 78, first lock right 102, consistent 61; teacher-forced 633/1024; |E| max 3.295; 301 s
+step 150: rho 0.7760; held-out release: released 128, whole 19, stations 653, first lock at 0/1 7, first lock right 123, consistent 54; teacher-forced 795/1024; |E| max 3.457; 455 s
+step 200: rho 0.7571; held-out release: released 128, whole 15, stations 694, first lock at 0/1 0, first lock right 116, consistent 25; teacher-forced 898/1024; |E| max 3.785; 606 s
+step 250: rho 0.7761; held-out release: released 128, whole 13, stations 595, first lock at 0/1 0, first lock right 77, consistent 29; teacher-forced 843/1024; |E| max 4.169; 755 s
+step 300: rho 0.7678; held-out release: released 128, whole 34, stations 686, first lock at 0/1 0, first lock right 114, consistent 67; teacher-forced 941/1024; |E| max 4.592; 903 s
+Traceback (most recent call last):
+  File "/tmp/claude-1000/-home-b-Workspaces-holonics/9ce880bf-defe-435b-ba3b-908d3cda31b7/scratchpad/probe/eO_ablate.py", line 127, in <module>
+    loss, GE = batch_loss(decs, E)
+               ~~~~~~~~~~^^^^^^^^^
+  File "/tmp/claude-1000/-home-b-Workspaces-holonics/9ce880bf-defe-435b-ba3b-908d3cda31b7/scratchpad/probe/eO_ablate.py", line 69, in batch_loss
+    loss, GE, _, _ = executed_loss_grad(Cs, tg, E)
+                     ~~~~~~~~~~~~~~~~~~^^^^^^^^^^^
+  File "/tmp/claude-1000/-home-b-Workspaces-holonics/9ce880bf-defe-435b-ba3b-908d3cda31b7/scratchpad/probe/fit.py", line 11, in executed_loss_grad
+    a, G, members, cert = joint_growth(z, P, want_grad=True)
+                          ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^
+  File "/tmp/claude-1000/-home-b-Workspaces-holonics/9ce880bf-defe-435b-ba3b-908d3cda31b7/scratchpad/probe/model.py", line 230, in joint_growth
+    rho, G, cert = member_growth(zturn, m, ps[mi], want_grad)
+                   ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/tmp/claude-1000/-home-b-Workspaces-holonics/9ce880bf-defe-435b-ba3b-908d3cda31b7/scratchpad/probe/model.py", line 200, in member_growth
+    Linv = np.linalg.inv(Vr)
+  File "/usr/lib/python3.14/site-packages/numpy/linalg/_linalg.py", line 648, in inv
+    ainv = _umath_linalg.inv(a, signature=signature)
+  File "/usr/lib/python3.14/site-packages/numpy/linalg/_linalg.py", line 145, in _raise_linalgerror_singular
+    raise LinAlgError("Singular matrix")
+numpy.linalg.LinAlgError: Singular matrix
+exit 1
