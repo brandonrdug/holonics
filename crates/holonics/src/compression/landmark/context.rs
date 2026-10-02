@@ -203,13 +203,14 @@
 //!   the node's arrivals, `2^(1−W)` a mantissa rebase's `|ln(1 − r)|` (`rebase_log_residual`) and
 //!   `ρ_c` a carrier rebase's (below).
 //! - **A cell** has at most `B` opened digits and `Σ_(d<P) (2(P − d) − 1) = P²`, and each split of
-//!   a stored chain (stored where paths part, below) rounds once more at `W` bits: an arrival splits at most one
-//!   chain in each digit tree it opens and a lineage at most `D ≤ P` times, so the mantissa units
-//!   number at most `(2n* + 1) P²` a digit, and
-//!   `|log₂ q̂ − log₂ q| ≤ (3/2) B [(n* P² + 2P + 1) ε/μ̂ + (2n* + 1) P² 2^(1−W) + n* P² ρ_c]`
+//!   a stored chain (stored where paths part, below) rounds once more at `W` bits: an arrival splits
+//!   at most one chain in each digit tree it opens and charges at most 4 units to each of the at
+//!   most `P` levels (Lean `StoredDrift.split_charge`), so the mantissa units number at most
+//!   `n* P² + 4n* P ≤ U = n* P² + max((n* + 1) P², 4n* P)` a digit (`U = (2n* + 1) P²` for `P ≥ 4`), and
+//!   `|log₂ q̂ − log₂ q| ≤ (3/2) B [(n* P² + 2P + 1) ε/μ̂ + U 2^(1−W) + n* P² ρ_c]`
 //!   (`log₂ e < 3/2`). Each source is held within a quarter grain:
 //!   - `M_p` is the least `M` with `2^M ≥ 3 B L_R K (n* P² + 2P + 1)` ([`face_bits`]);
-//!   - `W` is the least width with `2^W ≥ 12 B L_R (2n* + 1) P²` ([`carrier_width`]);
+//!   - `W` is the least width with `2^W ≥ 12 B L_R U` ([`carrier_width`]);
 //!   - the carrier rebase keeps a denominator of `R = 126 − W ≥ W` bits, so `ρ_c < 2^(1−R)` and its
 //!     share is below a quarter grain too (the rebase is taken only when its product can overflow;
 //!     otherwise `ρ_c = 0` and the rule is campaign 1's);
@@ -296,8 +297,9 @@
 //! is carried as `(2^W − 1) 2^(S − W)` with its unit alike. An arrival splits at most one chain in
 //! each digit tree it opens, which adds at most 4 units to each of the at most `P` levels above it,
 //! so a cell's mantissa units number at most `n* P² + 4n* P`, within the rule's
-//! `(2n* + 1) P² 2^(1−W)` for `P ≥ 4` ([`Landmarks::face_rule`]), which the derived `W` holds
-//! within a quarter grain ([`carrier_width`]); at `P ≤ 3` the rule's split count is short of it. **The labels are the tree's own paths**: a cell that founds leaves
+//! `n* P² + max((n* + 1) P², 4n* P)` units of `2^(1−W)` (`(2n* + 1) P²` for `P ≥ 4`;
+//! [`Landmarks::face_rule`]), which the derived `W` holds within a quarter grain
+//! ([`carrier_width`]). **The labels are the tree's own paths**: a cell that founds leaves
 //! holds, in each branch, one run of its address's letters below the shallowest leaf it founds (the
 //! label pool, `u32` letters), and each of its leaves ends in that run; every letter of a run lies
 //! on a stored node's edge, interned per founding cell, never a record of arrivals or a pointer into
@@ -1242,19 +1244,30 @@ pub fn face_bits(population: u64, digits: u64, grain: u64, depth: u64, mass: u32
     )
 }
 
+/// [proved-derived; agent-inferred] **A digit's mantissa units** on `2^(1−W)` (module header, "The
+/// widths"): `n* P² + max((n* + 1) P², 4n* P)`. The rebases number at most `n* P²`; an arrival splits
+/// at most one chain in each digit tree it opens and charges at most 4 units to each of the at most
+/// `P` levels (Lean `Compression/Landmark/Context/StoredDrift.split_charge`), at most `4n* P`, which
+/// the count `(n* + 1) P²` covers for `P ≥ 4` and the maximum covers at every depth. For `P ≥ 4` it
+/// is `(2n* + 1) P²`.
+fn mantissa_units(population: u64, depth: u64) -> BigUint {
+    let (n, d) = (BigUint::from(population), BigUint::from(depth));
+    let paths = &n * &d * &d;
+    let splits = (&paths + &d * &d).max(&n * &d * 4u32);
+    paths + splits
+}
+
 /// [definition; agent-inferred] **The β carrier width** `W`: the least width (at least 2) with
-/// `2^W ≥ 12 B L_R (2n* + 1) P²`, which holds the rebases' drift, the splits' included (stored where
-/// paths part: `(2n* + 1) P²` units of `2^(1−W)`), within a quarter grain a cell (module header, "The
+/// `2^W ≥ 12 B L_R (n* P² + max((n* + 1) P², 4n* P))`, `12 B L_R (2n* + 1) P²` for `P ≥ 4`, which
+/// holds the rebases' drift, the splits' included (stored where paths part: the digit's mantissa
+/// units of `2^(1−W)`, `mantissa_units`), within a quarter grain a cell (module header, "The
 /// widths").
 pub fn carrier_width(population: u64, digits: u64, grain: u64, depth: u64) -> u64 {
-    let d = BigUint::from(depth);
     ceil_log2(
         &(BigUint::from(12u32)
             * BigUint::from(digits)
             * BigUint::from(grain)
-            * (BigUint::from(population) * 2u32 + 1u32)
-            * &d
-            * &d),
+            * mantissa_units(population, depth)),
     )
     .max(2)
 }
@@ -3621,15 +3634,16 @@ impl Landmarks {
     }
 
     /// **The rule's a-priori bound per cell**, in bits (module header, "The widths"):
-    /// `(1 + 2^(−min(M_p, W))) (3/2) B [(n* P² + 2P + 1) ε/μ̂ + (2n* + 1) P² 2^(1−W) + n* P² ρ_c]`
-    /// with `ε/μ̂ = 1/(2⌊2^(M_p)/K⌋)`, `K = 2n* + 2`, and `ρ_c = 2^(1−R)` when the carrier rebases
-    /// (else `0`). [proved-derived; agent-inferred] Stored where paths part, each
+    /// `(1 + 2^(−min(M_p, W))) (3/2) B [(n* P² + 2P + 1) ε/μ̂ + U 2^(1−W) + n* P² ρ_c]`
+    /// with `ε/μ̂ = 1/(2⌊2^(M_p)/K⌋)`, `K = 2n* + 2`, `U = n* P² + max((n* + 1) P², 4n* P)` the
+    /// digit's mantissa units (`(2n* + 1) P²` for `P ≥ 4`), and `ρ_c = 2^(1−R)` when the carrier
+    /// rebases (else `0`). [proved-derived; agent-inferred] Stored where paths part, each
     /// split rounds its two ratios once at `W` bits (`Law::part`: each `1/m' < 2^(1−W)`): an arrival
     /// splits at most one chain in each digit tree it opens, which charges at most 4 units to each
     /// of the at most `P` levels above it (Lean `StoredDrift.split_charge`), so a cell's mantissa
-    /// units number at most `n* P² + 4n* P`, within the term `(2n* + 1) P² 2^(1−W)` for `P ≥ 4`,
-    /// which the derived `W` holds within a quarter grain ([`carrier_width`]). At `P ≤ 3` the
-    /// term's split count `(n* + 1) P²` is short of `4n* P`. At the derived widths the rule is at most `(1 + 2^(−min(M_p, W))) · 3/4`
+    /// units number at most `n* P² + 4n* P`, within `U` at every depth (the count `(n* + 1) P²`
+    /// alone covers `4n* P` only for `P ≥ 4`), which the derived `W` holds within a quarter grain
+    /// ([`carrier_width`]). At the derived widths the rule is at most `(1 + 2^(−min(M_p, W))) · 3/4`
     /// of a grain, and `· 1/2` without the carrier's rebase.
     pub fn face_rule(&self) -> Rat {
         let Widths {
@@ -3648,8 +3662,8 @@ impl Landmarks {
         let floor = (BigInt::one() << face as usize)
             / BigInt::from(floor_reciprocal(declaration.population, declaration.mass));
         let rounding = Rat::new(&paths + &d * 2 + 1, floor * 2);
-        let splits = &paths + &d * &d;
-        let mut rebases = Rat::from_integer(&paths + splits) * two_power(1 - carrier as i64);
+        let units = BigInt::from(mantissa_units(declaration.population, self.law.path_depth()));
+        let mut rebases = Rat::from_integer(units) * two_power(1 - carrier as i64);
         if rebase > 0 {
             rebases += Rat::from_integer(paths) * two_power(1 - rebase as i64);
         }

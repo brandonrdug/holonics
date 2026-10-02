@@ -508,13 +508,15 @@ fn landmark_code_length_meets_the_series() {
 /// **The derived widths** at the standing real cut's scope (`n* = 6,148`, `L_R = 16`, `B = 8`):
 /// at `D = 4`, `M_p = 39` (`2^38 < 3·8·16·12298·98377 ≤ 2^39`), `W = 29`
 /// (`2^28 < 12·8·16·12297·16 ≤ 2^29`, the splits counted: `2n* + 1 = 12297`) and `C = 68`; the rule's
-/// residual per cell lies below half a grain; the reference oracle's width is `96 + 34`.
+/// residual per cell lies below half a grain; the reference oracle's width is `96 + 34`. At `D = 1`
+/// the splits' `4n* P` passes `(n* + 1) P²`: `W = 26` (`2^25 < 12·8·16·30740 ≤ 2^26`,
+/// `30740 = n* + 4n* = 2²·5·29·53`), where `(2n* + 1) P²` alone gave `25`.
 #[test]
 fn landmark_widths_follow_the_passage_and_the_grain() {
     assert_eq!(face_bits(6_148, 8, 16, 4, 1), 39);
     assert_eq!(carrier_width(6_148, 8, 16, 4), 29);
     assert_eq!(face_bits(6_148, 8, 16, 1, 1), 35);
-    assert_eq!(carrier_width(6_148, 8, 16, 1), 25);
+    assert_eq!(carrier_width(6_148, 8, 16, 1), 26);
     let declared = LandmarkDeclaration {
         population: 6_148,
         ..declaration(256, 4)
@@ -537,7 +539,8 @@ fn landmark_widths_follow_the_passage_and_the_grain() {
 /// **The rule lies below half a grain** (module header, "The widths"; the splits counted in `W`,
 /// the storage where paths part): at `n* ∈ {64, 6148, 2^14, 2^17, 2^20}`, `L_R = 16`, `B = 8` and path depths
 /// `P ∈ {1, …, 6, 8, 12, 24, 48, 73}`, the lattice's rounding term and the mantissa term
-/// `(3/2) B (2n* + 1) P² 2^(1−W)` each lie within a quarter grain, and the rule
+/// `(3/2) B (n* P² + max((n* + 1) P², 4n* P)) 2^(1−W)` (`4n* P`, the splits' count through Lean
+/// `StoredDrift.split_charge`, passes `(n* + 1) P²` only at `P ≤ 3`) each lie within a quarter grain, and the rule
 /// (`Landmarks::face_rule`) below half a grain, exactly, with the carrier's rebase or without it
 /// (both occur on the scan). With `W` from `n*` alone (commit `89460425`) the rule passed half a
 /// grain at `n* = 6148`, `D = 5`, where that rule's `W = 28`.
@@ -556,8 +559,9 @@ fn landmark_rule_lies_below_half_a_grain() {
             let (n, p) = (BigInt::from(population), BigInt::from(depth as u64));
             let floor = (BigInt::one() << widths.face as usize) / (&n * 2 + 2);
             let rounding = Rat::new(&n * &p * &p + &p * 2 + 1, floor * 2);
-            let mantissa =
-                Rat::from_integer((&n * 2 + 1) * &p * &p) * rat_power(1 - widths.carrier as i64);
+            let paths = &n * &p * &p;
+            let splits = (&paths + &p * &p).max(&n * &p * 4);
+            let mantissa = Rat::from_integer(&paths + splits) * rat_power(1 - widths.carrier as i64);
             let quarter = rat(1, 4 * grain);
             let bits = |term: Rat| term * rat(3, 2) * Rat::from_integer(BigInt::from(digits));
             assert!(bits(rounding) <= quarter, "n* = {population}, D = {depth}");
