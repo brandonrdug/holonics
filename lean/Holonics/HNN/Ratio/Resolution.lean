@@ -54,8 +54,11 @@ exponent `v`. No temperature enters: the receiving map's gain, which plays the r
    Over `N` independent readings same-cell media carry less than one bit whenever
    `2L² ≥ N ln 2` (`grain_unconfirmable`, `grain_criterion_iff`). The least such `L` is `47` at
    `N = 6148` and `244` at `N = 171754` (`derived_grains`).
-7. **The odometer covector's pairing** (owed item 3). If the odometer masses obey `r_c ≤ K p_c`,
-   then `‖r − q‖²/K ≤ ⟨p − q, r − q⟩` (`odometer_pairing_ratio`). Inside a grain cell the chord
+7. **The odometer covector's pairing** (owed item 3). For a one-hot target `q` at `t`, if the
+   odometer masses obey `r_c ≤ K p_c`, then `‖r − q‖²/K ≤ ⟨p − q, r − q⟩`
+   (`odometer_pairing_ratio`). The one-hot target is needed: for `q = (1/2, 1/2)`,
+   `p = (3/5, 2/5)`, `r = (2/5, 3/5)` and `K = 3/2` the masses obey the bound while the pairing is
+   negative. Inside a grain cell the chord
    bound `2^y ≥ (e ln 2/2)(1 + y)` (`two_rpow_ge_chord`, `odometer_le_face_weight`) gives
    `K = 2^(1/L) · 2/(e ln 2)` (`odometer_mass_le`). A step `−η(r − q)` then lowers the smooth score
    by `η a/K` to first order, `a = ‖r − q‖²` (`odometer_step_bound`), and the certificate owes the
@@ -76,17 +79,20 @@ exponent `v`. No temperature enters: the receiving map's gain, which plays the r
    (`reading_split`). Under the code's rule `η C ≤ a` the score falls by at least `η (a/2 − e)`
    (`deposit_descends`), so the deposit descends when `(2K − 1) A⁻ < (3 − 2K) A⁺`
    (`deposit_condition_iff`); at `L = 16` it suffices that `9 A⁻ ≤ 5 A⁺`
-   (`deposit_condition_sixteen`). No condition-free guarantee holds: a move whose wrong-way mass
-   matches its right-way mass has `a` near zero while `e` is not. A coarser sufficient condition
+   (`deposit_condition_sixteen`). This certificate gives no condition-free guarantee: a move whose
+   wrong-way mass matches its right-way mass has `a` near zero while `e` is not. A coarser sufficient condition
    uses only the stations' target masses and a bound `B_s` on their moves:
    `e ≤ 2 Σ_s w_s (K_s − 1)(1 − r_s t_s) B_s` (`miss_le_target_mass`).
 9. **The grain of a continuing machine** (owed item 4). The grain read from a reading count,
    `L(N) = ⌈√(N ln 2/2)⌉`, is the least meeting the criterion of item 6 (`refiningGrain_spec`); it
    is monotone, within one of `√(N ln 2/2)`, and at most doubles when the count quadruples
    (`refiningGrain_growth`). A grain refined by an integer factor determines the coarser read
-   (`grainRead_of_refined`, `grainRead_refines`), so a dyadically refining machine keeps every
-   read it made. At every count, same-cell media carry less than one bit over the readings
-   (`refiningGrain_unconfirmable`).
+   (`grainRead_of_refined`, `grainRead_refines`). `L(N)` itself does not refine by integer factors
+   (it passes from `2` to `3`, for example), so a schedule that keeps every read it made must be
+   dyadic, for example `2^⌈log₂ L(N)⌉`, which meets the criterion because it is at least `L(N)`.
+   At every count, same-cell media carry less than one bit over the readings
+   (`refiningGrain_unconfirmable`). Item 4 is therefore only partly closed: the reads are proved,
+   and re-basing a carrier's lattice onto the finer grain stays owed in #62.
 10. **Campaign 1's numbers** (`resolution_aeon_bounds`, `declared_grain_vs_resolution`,
    `measured_change_ratio`, `measured_change_readings`, `measured_aeon_test_bound`,
    `measured_aeon_code_bound`).
@@ -1358,9 +1364,10 @@ theorem refiningGrain_growth (N M : ℕ) (h : N ≤ M) :
 
 /-- [proved-derived; formal-checked] **A finer grain determines the coarser read.** Refining by an
 integer factor `m`, the read at `m L` determines the read at `L`:
-`grainRead L f = (n, ⌊k′/m⌋)` with `(n, k′) = grainRead (m L) f`. So a machine whose grain
-refines by integer factors (dyadically, `L = 2^j`) re-bases each lattice onto the finer one
-without losing a read it already made. -/
+`grainRead L f = (n, ⌊k′/m⌋)` with `(n, k′) = grainRead (m L) f`. So a grain that refines by
+integer factors (dyadically, `L = 2^j`) loses no read it already made. This is a statement about
+the reads only; re-basing a carrier's lattice onto the finer grain is not proved here and stays
+owed in #62. -/
 theorem grainRead_of_refined {m : ℕ} (hm : 0 < m) (L : ℕ) (f : ℝ) :
     grainRead L f = ((grainRead (m * L) f).1, (grainRead (m * L) f).2 / (m : ℤ)) := by
   refine Prod.ext rfl ?_
