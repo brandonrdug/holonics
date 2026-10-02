@@ -272,3 +272,39 @@ fn two_members_tied_in_growth_are_both_active() {
         .iter()
         .all(|member| matches!(member, MemberCovector::Resolved { .. })));
 }
+
+/// The release window (`HNN/ExecutedComparison` §12, `windowGuard_zero_iff`,
+/// `window_enclosures_guard`): the window of one is the strict decrease by disjoint enclosures; a
+/// longer window admits a rise below an earlier adopted comparison's lower end and refuses one at
+/// or above it; the margin takes its share of the certified first-order descent.
+#[test]
+fn the_release_window_of_one_is_the_strict_decrease_and_a_longer_window_admits_a_bounded_rise() {
+    use crate::hnn::executed::ReleaseWindow;
+    use crate::ratio::algebraic::ExactInterval;
+    let interval = |lower: i64, upper: i64| ExactInterval {
+        lower: integer(lower),
+        upper: integer(upper),
+    };
+    let before = interval(10, 11);
+    let slope = interval(-5, -4);
+    let one = ReleaseWindow::one();
+    assert_eq!(one.ceiling(&before), integer(10));
+    for upper in 7..14 {
+        let own = interval(upper - 1, upper);
+        assert_eq!(one.admits(&before, &own, &slope), own.upper < before.lower);
+    }
+    let window = ReleaseWindow {
+        earlier: vec![integer(13), integer(9)],
+        margin: Rat::zero(),
+    };
+    assert_eq!(window.ceiling(&before), integer(13));
+    assert!(window.admits(&before, &interval(11, 12), &slope));
+    assert!(!window.admits(&before, &interval(12, 13), &slope));
+    let margined = ReleaseWindow {
+        margin: rat(1, 2),
+        ..window
+    };
+    // The ceiling less half the certified descent `4`: `13 − 2 = 11`.
+    assert!(margined.admits(&before, &interval(9, 10), &slope));
+    assert!(!margined.admits(&before, &interval(10, 11), &slope));
+}

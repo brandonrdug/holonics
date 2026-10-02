@@ -86,6 +86,17 @@ the laws that covector and its certified step stand on (the diagnosis record,
    change and its certificate are mass-free, and a deposit never lowers the step's kinetic energy
    (`deposit_raises_native_energy`) (§11).
 
+12. **The windowed release guard.** [proved-derived; formal-checked] The release guard adopts a
+   successor whose own comparison lies below the largest of the last `w + 1` adopted comparisons
+   less a certified decrease `σ ≥ 0`. A window of one is the monotone guard
+   (`windowGuard_zero_iff`); the check on enclosures' lower ends is sound
+   (`window_enclosures_guard`). The ceiling never rises (`windowMax_antitone`), so no adopted
+   comparison exceeds the opening's (`le_start`). Over a whole window the ceiling falls by the
+   window's least certified decrease (`windowMax_block`); the windows' decreases sum below
+   `f 0 − m` (`windowMax_blocks`, `blocks_sum_le`), so at most `(f 0 − m)/ε` windows certify `ε` or
+   more (`large_blocks_card`). With decreases `η · q` and a divergent step sum, `q` falls below every
+   `ε` in windows beyond every point (`schedule_frequently_small`) (§12).
+
 [open] (#62) The existence of the differentiable root path (the implicit function theorem at a
 simple root, from `Φ`'s strict differentiability), Jacobi's formula `∂_η det(λ − M − ηΔM) =
 −tr(adj(λ − M) ΔM)` with the adjugate's rank-one form at a simple root, and the certificate's
@@ -1508,6 +1519,177 @@ theorem deposit_raises_native_energy {M K : Matrix n n ℝ} (hM : M.PosDef) (hK 
 
 end PortMass
 
+/-! ## 12. The windowed release guard
+
+The release guard (`OwnNotBelow` in the Rust owner) adopts a successor only when its own release's
+comparison falls strictly below the incumbent's (§4). The windowed guard replaces that rule: the
+successor's comparison `f (k+1)` must lie below the window's ceiling, the largest of the last `w + 1`
+adopted comparisons, less a certified decrease `σ k ≥ 0`:
+
+  `f (k+1) ≤ windowMax f w k − σ k`,  `windowMax f w k = max_(k−w ≤ j ≤ k) f j`.
+
+The window's length `w + 1` and the decreases `σ` are parameters. With `w = 0` the rule is the
+monotone guard (`windowGuard_zero_iff`). The guard only accepts or refuses a metric's step, so the
+points where a step can rest are §9's (`metric_step_zero_iff`). -/
+
+section WindowGuard
+
+/-- The window's ceiling: the largest of `f (k − w), …, f k` (the window truncated at `0`). -/
+def windowMax (f : ℕ → ℝ) (w k : ℕ) : ℝ :=
+  (Finset.Icc (k - w) k).sup' ⟨k, Finset.mem_Icc.mpr ⟨Nat.sub_le k w, le_rfl⟩⟩ f
+
+/-- Every value in the window lies below its ceiling. -/
+theorem le_windowMax (f : ℕ → ℝ) {w k j : ℕ} (hlo : k - w ≤ j) (hhi : j ≤ k) :
+    f j ≤ windowMax f w k :=
+  Finset.le_sup' f (Finset.mem_Icc.mpr ⟨hlo, hhi⟩)
+
+/-- The ceiling is the least bound of the window's values. -/
+theorem windowMax_le (f : ℕ → ℝ) {w k : ℕ} {c : ℝ}
+    (h : ∀ j, k - w ≤ j → j ≤ k → f j ≤ c) : windowMax f w k ≤ c :=
+  Finset.sup'_le _ _ fun j hj => h j (Finset.mem_Icc.mp hj).1 (Finset.mem_Icc.mp hj).2
+
+/-- The window of one is the incumbent alone. -/
+theorem windowMax_zero (f : ℕ → ℝ) (k : ℕ) : windowMax f 0 k = f k :=
+  le_antisymm (windowMax_le f fun j hlo hhi => by
+    rw [Nat.sub_zero] at hlo; rw [le_antisymm hhi hlo]) (le_windowMax f (by omega) le_rfl)
+
+/-- The first ceiling is the opening's value. -/
+theorem windowMax_start (f : ℕ → ℝ) (w : ℕ) : windowMax f w 0 = f 0 :=
+  le_antisymm (windowMax_le f fun j _ hhi => by rw [Nat.le_zero.mp hhi])
+    (le_windowMax f (by omega) le_rfl)
+
+/-- A lower enclosure's ceiling lies below the value's: the guard read on lower ends is sound. -/
+theorem windowMax_mono {lo f : ℕ → ℝ} (h : ∀ j, lo j ≤ f j) (w k : ℕ) :
+    windowMax lo w k ≤ windowMax f w k :=
+  windowMax_le lo fun j hlo hhi => (h j).trans (le_windowMax f hlo hhi)
+
+/-- [proved-derived; formal-checked] **The windowed guard read on enclosures**: with every adopted
+comparison `f j ≥ lo j` and the successor's `f (k+1) ≤ U`, the check `U < windowMax lo w k − σ` on
+lower ends certifies the guard strictly. With `w = 0` and `σ = 0` it is §4's disjoint enclosures. -/
+theorem window_enclosures_guard {lo f : ℕ → ℝ} (h : ∀ j, lo j ≤ f j) {w k : ℕ} {U s : ℝ}
+    (hU : f (k + 1) ≤ U) (hcheck : U < windowMax lo w k - s) :
+    f (k + 1) < windowMax f w k - s := by
+  have := windowMax_mono h w k
+  linarith
+
+/-- [proved-derived; formal-checked] **The window of one is the monotone guard.** -/
+theorem windowGuard_zero_iff (f σ : ℕ → ℝ) :
+    (∀ k, f (k + 1) ≤ windowMax f 0 k - σ k) ↔ ∀ k, f (k + 1) ≤ f k - σ k := by
+  simp only [windowMax_zero]
+
+/-- [proved-derived; formal-checked] **One adopted step never raises the ceiling**: with `σ k ≥ 0`
+and the guard at `k`, `windowMax f w (k+1) ≤ windowMax f w k`. -/
+theorem windowMax_succ_le (f σ : ℕ → ℝ) (w k : ℕ) (hσ : 0 ≤ σ k)
+    (hg : f (k + 1) ≤ windowMax f w k - σ k) : windowMax f w (k + 1) ≤ windowMax f w k := by
+  refine windowMax_le f fun j hlo hhi => ?_
+  rcases Nat.lt_or_ge j (k + 1) with hj | hj
+  · exact le_windowMax f (by omega) (by omega)
+  · rw [le_antisymm hhi hj]; linarith
+
+/-- [proved-derived; formal-checked] **The ceiling never rises along a guarded chain.** -/
+theorem windowMax_antitone (f σ : ℕ → ℝ) (w : ℕ) (hσ : ∀ k, 0 ≤ σ k)
+    (hg : ∀ k, f (k + 1) ≤ windowMax f w k - σ k) : Antitone (windowMax f w) :=
+  antitone_nat_of_succ_le fun k => windowMax_succ_le f σ w k (hσ k) (hg k)
+
+/-- [proved-derived; formal-checked] **No adopted comparison exceeds the opening's**: the guard
+admits rises inside the window, never above its first ceiling `f 0`. -/
+theorem le_start (f σ : ℕ → ℝ) (w : ℕ) (hσ : ∀ k, 0 ≤ σ k)
+    (hg : ∀ k, f (k + 1) ≤ windowMax f w k - σ k) (k : ℕ) : f k ≤ f 0 := by
+  have h1 := le_windowMax f (w := w) (Nat.sub_le k w) (le_refl k)
+  have h2 := windowMax_antitone f σ w hσ hg (Nat.zero_le k)
+  rw [windowMax_start] at h2
+  linarith
+
+/-- [proved-derived; formal-checked] **The whole window's certificate**: over the `w + 1` steps from
+`k`, if every certified decrease is at least `s`, the ceiling falls by at least `s`. -/
+theorem windowMax_block (f σ : ℕ → ℝ) (w : ℕ) (hσ : ∀ k, 0 ≤ σ k)
+    (hg : ∀ k, f (k + 1) ≤ windowMax f w k - σ k) (k : ℕ) {s : ℝ}
+    (hs : ∀ i ≤ w, s ≤ σ (k + i)) : windowMax f w (k + (w + 1)) ≤ windowMax f w k - s := by
+  refine windowMax_le f fun j hlo hhi => ?_
+  obtain ⟨i, rfl⟩ : ∃ i, j = k + i + 1 := ⟨j - k - 1, by omega⟩
+  have hi : i ≤ w := by omega
+  have hstep := hg (k + i)
+  have hanti := windowMax_antitone f σ w hσ hg (Nat.le_add_right k i)
+  have := hs i hi
+  linarith
+
+/-- [proved-derived; formal-checked] **The blocks' certificates sum below the opening**: with
+`s n` a lower bound of the certified decreases in the `n`-th window, the ceiling after `n` whole
+windows is at most `f 0 − Σ_(b<n) s b`. -/
+theorem windowMax_blocks (f σ s : ℕ → ℝ) (w : ℕ) (hσ : ∀ k, 0 ≤ σ k)
+    (hg : ∀ k, f (k + 1) ≤ windowMax f w k - σ k)
+    (hs : ∀ b, ∀ i ≤ w, s b ≤ σ (b * (w + 1) + i)) (n : ℕ) :
+    windowMax f w (n * (w + 1)) ≤ f 0 - ∑ b ∈ Finset.range n, s b := by
+  induction n with
+  | zero => simp [windowMax_start]
+  | succ n ih =>
+    have hblock := windowMax_block f σ w hσ hg (n * (w + 1)) (hs n)
+    rw [show (n + 1) * (w + 1) = n * (w + 1) + (w + 1) by ring, Finset.sum_range_succ]
+    linarith
+
+/-- [proved-derived; formal-checked] **The certified decreases are summable**: below a floor
+`m ≤ f`, the sum of the windows' certified decreases is at most `f 0 − m`. -/
+theorem blocks_sum_le (f σ s : ℕ → ℝ) (w : ℕ) (hσ : ∀ k, 0 ≤ σ k)
+    (hg : ∀ k, f (k + 1) ≤ windowMax f w k - σ k)
+    (hs : ∀ b, ∀ i ≤ w, s b ≤ σ (b * (w + 1) + i)) {m : ℝ} (hm : ∀ k, m ≤ f k) (n : ℕ) :
+    ∑ b ∈ Finset.range n, s b ≤ f 0 - m := by
+  have h1 := windowMax_blocks f σ s w hσ hg hs n
+  have h2 := le_windowMax f (w := w) (Nat.sub_le (n * (w + 1)) w) le_rfl
+  have := hm (n * (w + 1))
+  linarith
+
+/-- [proved-derived; formal-checked] **Few windows certify a large decrease**: with `s ≥ 0`, the
+number of the first `n` windows whose certified decrease is at least `ε > 0` is at most
+`(f 0 − m)/ε`. -/
+theorem large_blocks_card (f σ s : ℕ → ℝ) (w : ℕ) (hσ : ∀ k, 0 ≤ σ k)
+    (hg : ∀ k, f (k + 1) ≤ windowMax f w k - σ k)
+    (hs : ∀ b, ∀ i ≤ w, s b ≤ σ (b * (w + 1) + i)) (hs0 : ∀ b, 0 ≤ s b) {m : ℝ}
+    (hm : ∀ k, m ≤ f k) {ε : ℝ} (n : ℕ) :
+    (((Finset.range n).filter fun b => ε ≤ s b).card : ℝ) * ε ≤ f 0 - m := by
+  have hsum := blocks_sum_le f σ s w hσ hg hs hm n
+  have hfilter : ∑ b ∈ (Finset.range n).filter (fun b => ε ≤ s b), s b ≤
+      ∑ b ∈ Finset.range n, s b :=
+    Finset.sum_le_sum_of_subset_of_nonneg (Finset.filter_subset _ _) fun b _ _ => hs0 b
+  have hcard : (((Finset.range n).filter fun b => ε ≤ s b).card : ℝ) * ε ≤
+      ∑ b ∈ (Finset.range n).filter (fun b => ε ≤ s b), s b := by
+    rw [← nsmul_eq_mul, ← Finset.sum_const]
+    exact Finset.sum_le_sum fun b hb => (Finset.mem_filter.mp hb).2
+  linarith
+
+/-- [proved-derived; formal-checked] **The schedule's condition**: let each window's certified
+decrease be `s b = η b · q b` with steps `η b ≥ 0` whose sum diverges (every bound is passed by some
+partial sum). If the decreases sum below `C`, then `q` falls below every `ε > 0` in windows beyond
+every `N`. With `q b` the window's least certified slope this is the guarded path reaching the
+neighbourhood of `L`'s fixed points; with a summable `η` nothing is certified. -/
+theorem schedule_frequently_small (η q : ℕ → ℝ) (hη : ∀ b, 0 ≤ η b)
+    (hdiv : ∀ C, ∃ n, C < ∑ b ∈ Finset.range n, η b) {C : ℝ}
+    (hsum : ∀ n, ∑ b ∈ Finset.range n, η b * q b ≤ C) (hq : ∀ b, 0 ≤ q b) {ε : ℝ} (hε : 0 < ε)
+    (N : ℕ) : ∃ b, N ≤ b ∧ q b < ε := by
+  by_contra hcon
+  push Not at hcon
+  obtain ⟨n, hn⟩ := hdiv ((C + ε * ∑ b ∈ Finset.range N, η b) / ε)
+  have hNn : N ≤ n ∨ n < N := le_or_gt N n
+  have hhead : ∑ b ∈ Finset.range N, η b * q b ≥ 0 :=
+    Finset.sum_nonneg fun b _ => mul_nonneg (hη b) (hq b)
+  rcases hNn with hNn | hNn
+  · have hsplit := Finset.sum_range_add_sum_Ico (fun b => η b * q b) hNn
+    have hsplitη := Finset.sum_range_add_sum_Ico η hNn
+    have htail : ε * ∑ b ∈ Finset.Ico N n, η b ≤ ∑ b ∈ Finset.Ico N n, η b * q b := by
+      rw [Finset.mul_sum]
+      exact Finset.sum_le_sum fun b hb =>
+        by rw [mul_comm]; exact mul_le_mul_of_nonneg_left (hcon b (Finset.mem_Ico.mp hb).1) (hη b)
+    have hlt : C + ε * ∑ b ∈ Finset.range N, η b < ε * ∑ b ∈ Finset.range n, η b := by
+      rw [div_lt_iff₀ hε] at hn; linarith
+    have := hsum n
+    nlinarith
+  · have hsub : ∑ b ∈ Finset.range n, η b ≤ ∑ b ∈ Finset.range N, η b :=
+      Finset.sum_le_sum_of_subset_of_nonneg (Finset.range_subset_range.mpr hNn.le) fun b _ _ => hη b
+    have hC : 0 ≤ C := (hsum 0).trans' (by simp)
+    rw [div_lt_iff₀ hε] at hn
+    nlinarith
+
+end WindowGuard
+
 section Audit
 
 #print axioms passage_coeff_zero
@@ -1573,6 +1755,18 @@ section Audit
 #print axioms feature_deposit_makes_native
 #print axioms feature_deposit_native_needs
 #print axioms deposit_raises_native_energy
+#print axioms windowMax_zero
+#print axioms windowMax_start
+#print axioms window_enclosures_guard
+#print axioms windowGuard_zero_iff
+#print axioms windowMax_succ_le
+#print axioms windowMax_antitone
+#print axioms le_start
+#print axioms windowMax_block
+#print axioms windowMax_blocks
+#print axioms blocks_sum_le
+#print axioms large_blocks_card
+#print axioms schedule_frequently_small
 
 end Audit
 

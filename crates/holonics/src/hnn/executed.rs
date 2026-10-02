@@ -2919,8 +2919,9 @@ pub enum TrialRefusal {
     /// The fixed mask's composition not strictly lower by disjoint enclosures.
     NotBelow(ExactInterval),
     /// The fixed mask's composition lower, the successor's own release's executed composition not
-    /// strictly lower by disjoint enclosures: the step left the trajectory cell and the executed
-    /// comparison did not descend.
+    /// strictly below the release window's ceiling less its certified decrease ([`ReleaseWindow`];
+    /// with the window of one, not strictly lower by disjoint enclosures): the step left the
+    /// trajectory cell and the executed comparison did not descend.
     OwnNotBelow(ExactInterval),
     /// The constitution's own guard (budget, storage growth).
     Constitution(String),
@@ -3157,6 +3158,53 @@ pub struct Reread {
     pub refusal: Option<TrialRefusal>,
 }
 
+/// [definition; proved-derived, October 2] **The release guard's window**
+/// (`HNN/ExecutedComparison` §12): a successor's own release is adopted when its executed comparison
+/// lies strictly below the window's ceiling, the largest lower end among the incumbent's comparison
+/// and the `earlier` adopted comparisons the chain carries, less `margin` times the carried move's
+/// certified first-order descent. The window's length (`earlier.len() + 1`) and `margin ≥ 0` are the
+/// chain's parameters, set from measurement; [`ReleaseWindow::one`] is the incumbent alone with no
+/// margin, the strict decrease by disjoint enclosures (`windowGuard_zero_iff`).
+///
+/// What the parameters must satisfy (§12): `margin ≥ 0`, so the ceiling never rises
+/// (`windowMax_antitone`) and no adopted comparison exceeds the opening's (`le_start`); `margin > 0`
+/// for the whole-window certificate to bound the windows' first-order descents
+/// (`windowMax_block`, `blocks_sum_le`, `large_blocks_card`). The guard reads lower ends, which is
+/// sound (`window_enclosures_guard`). The chain supplies `earlier`; a move reads only what it is given.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct ReleaseWindow {
+    /// The lower ends of the adopted comparisons before the incumbent, at most the window's length
+    /// less one.
+    pub earlier: Vec<Rat>,
+    /// The share of the carried move's certified first-order descent the successor must clear.
+    pub margin: Rat,
+}
+
+impl ReleaseWindow {
+    /// The window of one: the incumbent's comparison alone, no margin.
+    pub fn one() -> Self {
+        Self {
+            earlier: Vec::new(),
+            margin: Rat::zero(),
+        }
+    }
+
+    /// The ceiling: the largest lower end among the incumbent's and the earlier comparisons.
+    pub fn ceiling(&self, before: &ExactInterval) -> Rat {
+        self.earlier
+            .iter()
+            .fold(before.lower.clone(), |ceiling, x| ceiling.max(x.clone()))
+    }
+
+    /// The guard on a successor's own comparison: `own.upper < ceiling − margin · (−slope.upper)`,
+    /// with `slope` the carried move's certified first-order bound (negative once the first-order
+    /// guard has held).
+    pub fn admits(&self, before: &ExactInterval, own: &ExactInterval, slope: &ExactInterval) -> bool {
+        let descent = (-&slope.upper).max(Rat::zero());
+        own.upper < self.ceiling(before) - &self.margin * descent
+    }
+}
+
 /// [definition; agent-inferred, September 30] **The ladder's depth**: at most 8 trial steps a move,
 /// from its start down to `2^(−7)` of it. Every trial re-reads the whole batch, so the depth bounds a
 /// move's work; a comparison that does not fall within `2^(−7)` of its start along the proposal is
@@ -3175,8 +3223,8 @@ type FirstOrder<'a> =
 /// entry of `E` moves by more than the founding's entry scale `½` in one move), halving until the
 /// carried move moves no lattice coordinate; each carried successor adopted only when every commit
 /// guard holds on it: the entry bound, the first-order certificate on the carried move (`first`,
-/// negative), the successor's guards and the fixed mask's value (`reread`), and a strict decrease by
-/// disjoint enclosures.
+/// negative), the successor's guards and the fixed mask's value (`reread`) strictly lower by disjoint
+/// enclosures, and its own release below the release window's ceiling ([`ReleaseWindow`]).
 #[allow(clippy::too_many_arguments)]
 fn ladder(
     constitution: &Constitution,
@@ -3188,6 +3236,7 @@ fn ladder(
     transport: Option<&Rat>,
     first: &FirstOrder<'_>,
     reread: &(dyn Fn(&Constitution) -> Result<Reread, HnnError> + Sync),
+    window: &ReleaseWindow,
 ) -> Result<LadderOutcome, HnnError> {
     let source = constitution
         .source_port(ring)
@@ -3296,7 +3345,7 @@ fn ladder(
             (None, _) if read.value.upper >= before.lower => {
                 Some(TrialRefusal::NotBelow(read.value.clone()))
             }
-            (None, Some(own)) if own.value.upper < before.lower => None,
+            (None, Some(own)) if window.admits(before, &own.value, &bound) => None,
             (None, Some(own)) => Some(TrialRefusal::OwnNotBelow(own.value.clone())),
             (None, None) => Some(TrialRefusal::Unsupported),
         };
@@ -3596,6 +3645,34 @@ pub fn executed_move_in(
     comparison: Comparison,
     metric: MoveMetric,
 ) -> Result<ExecutedMove, HnnError> {
+    executed_move_windowed(
+        field,
+        constitution,
+        requests,
+        declared,
+        bank,
+        grain,
+        comparison,
+        metric,
+        &ReleaseWindow::one(),
+    )
+}
+
+/// **The committed move under a declared metric and release window** ([`ReleaseWindow`];
+/// [`executed_move_in`] is the window of one's): the same proposal, guards, ladder and receipts, the
+/// own release adopted below the window's ceiling.
+#[allow(clippy::too_many_arguments)]
+pub fn executed_move_windowed(
+    field: &Field,
+    constitution: &Constitution,
+    requests: &[Request],
+    declared: &Refinement,
+    bank: &ReceivingBank,
+    grain: u32,
+    comparison: Comparison,
+    metric: MoveMetric,
+    window: &ReleaseWindow,
+) -> Result<ExecutedMove, HnnError> {
     let ring = declared.ring();
     let composition = comparison.composition;
     let (before, reads) = incumbent(field, constitution, requests, declared, bank, grain, comparison)?;
@@ -3774,6 +3851,7 @@ pub fn executed_move_in(
         Some(&modulus_unit),
         &first,
         &reread,
+        window,
     )?;
     receipt.trials = trials;
     receipt.adopted = adopted;
