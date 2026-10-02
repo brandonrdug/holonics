@@ -94,8 +94,8 @@ receiver's resolution.
   drifts plus the rebases (`JoinDrift.join_ratio_drift`), and the join's code over the passage
   within the branches' passage drifts plus its roundings and twice its rebases
   (`JoinDrift.join_passage`); each dyadic cell's join costs at most one bit against either branch.
-- **Not stated here**: the certified binary logarithm's squaring invariant
-  (`landmark::binary_log`); it stays owed in #62.
+- **The certified binary logarithm** (`landmark::binary_log`, the residual's and the grain
+  exponent's `log₂`): its squaring invariant is `Context/BinaryLog`.
 
 [proved-standard] The telescoping of a context-tree weighting code to its root weight is Willems,
 Shtarkov and Tjalkens (1995); the proofs here are this owner's.
