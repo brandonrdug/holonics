@@ -182,6 +182,13 @@ carries the off-support value through the chart on host and card. It is its own 
 it merges after the main line measures it on campaign 1 and its held-out read.
 
 Carrying `a` and `V` natively beside the Gram, and moving `s` by the Newton point as readings
-arrive, is the per-field law's native form. It is not built here. The second-order expansion of
-the prequential code along a scaled map, the step from which `newton_point` is applied, is owed
-in #62; its algebraic parts are proved here.
+arrive, is the per-field law's native form. It is not built here.
+
+The second order is certified (`prequential_code_le`, `prequential_newton_decrease`). Along a map
+held as `φ M_t`, each reading's code is bounded by the receiving certificate's own quadratic
+(`HNN/Ratio/Certificate.codeLength_add_le`, curvature `(ln 2/2) 2^ω Var_p`, `ω` the move's class
+spread). Summed, the prequential code is at most the face's less `φ a₀` plus
+`φ² (ln 2/2) 2^ω Σ_t Var_(p_t)(M_t)`. At that bound's Newton point it falls by at least
+`a₀²/(4K)`. What stays a reading rather than a theorem is that the executed map is `1/s` times
+its unit, which holds where the readings' Gram is small against the prior and `η = 1` (§1). #62
+keeps that hypothesis.

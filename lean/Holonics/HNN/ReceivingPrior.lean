@@ -1,6 +1,7 @@
 import Mathlib.Data.Matrix.Basic
 import Mathlib.LinearAlgebra.Matrix.NonsingularInverse
 import Mathlib.Algebra.Order.Field.Basic
+import Holonics.HNN.Ratio.Certificate
 
 /-!
 # HNN.ReceivingPrior: the receiving map's prior Gram is the anchors' unit
@@ -44,6 +45,12 @@ located     a = Σ_t ⟨g_t, W_t z_t⟩ ,  V = ln 2 Σ_t Var_p(W_t z_t)     ⇒ 
    their deposit. At the opening the alignment is the covectors' signal less their self-energy
    (the ordered pairs), whose chance level is the class Fisher trace `1 − Σ p²`, and the located
    prior `V₀/a₀` scales with the anchors' energy, as the prior's unit requires.
+5. **The second order, certified** (`prequential_code_le`, `prequential_newton_decrease`). Along
+   a map scaled by `φ`, each reading's code is bounded by the receiving certificate's own
+   quadratic (`HNN/Ratio/Certificate.codeLength_add_le`); summed, the prequential code is at most
+   the face's less `φ a` plus `φ² (ln 2/2) 2^ω Σ_t Var_(p_t)(M_t)`, and at the bound's Newton point
+   it falls by at least `a²/(4K)`. The map is held as `φ M_t`: that the executed map is `1/s`
+   times its unit is the prior-dominated reading of the record, not a theorem here.
 -/
 
 namespace Holonics.HNN.ReceivingPrior
@@ -254,5 +261,55 @@ theorem variance_smul {C : Type*} [Fintype C] (p : C → L) (x : C → L) (k : L
   have h2 : ∑ c, p c * (k * x c) = k * ∑ c, p c * x c := by
     rw [mul_sum]; exact sum_congr rfl fun c _ => by ring
   rw [h1, h2]; ring
+
+section Prequential
+
+open Holonics.HNN.Ratio Holonics.HNN.Ratio.Certificate
+
+variable {ι T : Type*} [Fintype ι] [Nonempty ι] [DecidableEq ι] [Fintype T]
+
+/-- [proved-derived; formal-checked] **The prequential code along a scaled map.** Each reading `t`
+meets the map's move `φ M_t` on its face `f_t` (masses `p_t = 2^(f_t)/Σ 2^(f_t)`), its classes
+differing pairwise by at most `ω`. Summed over the readings, the code is at most the face's code
+less `φ a`, with `a = Σ_t ⟨e_(target t) − p_t, M_t⟩` the prequential alignment, plus
+`φ² (ln 2/2) 2^ω Σ_t Var_(p_t)(M_t)`. This is `HNN/Ratio/Certificate.codeLength_add_le` summed. -/
+theorem prequential_code_le (f M p : T → ι → ℝ)
+    (hp : ∀ t c, p t c = (2 : ℝ) ^ f t c / ∑ d, (2 : ℝ) ^ f t d) (target : T → ι) (φ ω : ℝ)
+    (hosc : ∀ t c d, φ * M t c - φ * M t d ≤ ω) :
+    ∑ t, codeLength (fun c => f t c + φ * M t c) (target t) ≤
+      ∑ t, codeLength (f t) (target t)
+        - φ * ∑ t, ∑ c, ((Pi.single (target t) (1 : ℝ) : ι → ℝ) c - p t c) * M t c
+        + φ ^ 2 * (Real.log 2 / 2 * (2 : ℝ) ^ ω * ∑ t, faceVariance (p t) (M t)) := by
+  have h : ∀ t, codeLength (fun c => f t c + φ * M t c) (target t) ≤ codeLength (f t) (target t)
+      - φ * ∑ c, ((Pi.single (target t) (1 : ℝ) : ι → ℝ) c - p t c) * M t c
+      + φ ^ 2 * (Real.log 2 / 2 * (2 : ℝ) ^ ω * faceVariance (p t) (M t)) := by
+    intro t
+    have := codeLength_add_le (f t) (fun c => φ * M t c) (p t) (hp t) (hosc t) (target t)
+    rw [faceVariance_smul] at this
+    have e : ∑ c, (p t c - (Pi.single (target t) (1 : ℝ) : ι → ℝ) c) * (φ * M t c) =
+        -(φ * ∑ c, ((Pi.single (target t) (1 : ℝ) : ι → ℝ) c - p t c) * M t c) := by
+      rw [Finset.mul_sum, ← Finset.sum_neg_distrib]
+      exact Finset.sum_congr rfl fun c _ => by ring
+    rw [e] at this
+    linarith
+  calc _ ≤ ∑ t, (codeLength (f t) (target t)
+        - φ * ∑ c, ((Pi.single (target t) (1 : ℝ) : ι → ℝ) c - p t c) * M t c
+        + φ ^ 2 * (Real.log 2 / 2 * (2 : ℝ) ^ ω * faceVariance (p t) (M t))) :=
+        Finset.sum_le_sum fun t _ => h t
+    _ = _ := by
+      rw [Finset.sum_add_distrib, Finset.sum_sub_distrib, ← Finset.mul_sum, ← Finset.mul_sum,
+        ← Finset.mul_sum]
+
+/-- [proved-derived; formal-checked] **The certified decrease at the bound's Newton point.** If the
+code along the scaled map is at most `L₀ − φ a + φ² K`, `K > 0`, then at `φ = a/(2K)` it is at
+most `L₀ − a²/(4K)`. -/
+theorem prequential_newton_decrease (L0 a K φ : ℝ) (hK : 0 < K) (hφ : φ = a / (2 * K))
+    {L : ℝ} (hL : L ≤ L0 - φ * a + φ ^ 2 * K) : L ≤ L0 - a ^ 2 / (4 * K) := by
+  subst hφ
+  have e : a / (2 * K) * a - (a / (2 * K)) ^ 2 * K = a ^ 2 / (4 * K) := by
+    field_simp; ring
+  linarith
+
+end Prequential
 
 end Holonics.HNN.ReceivingPrior
