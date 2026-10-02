@@ -1856,9 +1856,10 @@ impl Field {
             None => naturals(&mut code, &[]),
         }
         natural(&mut code, self.capacity.n_star());
-        // The source's open: 2 names "the normalized open that reads no window" (the marginal over
-        // its population and the whole offset moment over its pair population; the encoding pin of
-        // September 29), with its population chart's lattice `L_ν` (`hnn::moment::PopulationChart`).
+        // The source's open: 2 names "the normalized open that reads no held cell" (the marginal
+        // over its population and the whole offset moment over its pair population; the encoding
+        // pin of September 29), with its population chart's lattice `L_ν`
+        // (`hnn::moment::PopulationChart`).
         // Code 1 was ruling B's indexed open, the pair port read at the buffer's address.
         natural(&mut code, 2);
         natural(
