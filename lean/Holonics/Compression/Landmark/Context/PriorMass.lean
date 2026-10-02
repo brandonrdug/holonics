@@ -708,16 +708,30 @@ theorem priorMass_face_ge (j : ℕ) (n : Bool → ℕ) {N : ℕ} (hN : n true + 
 
 /-! ### Audit -/
 
-/-
+section Audit
+
 #print axioms priorMass_face
+#print axioms urnSeq_eq_urnBool
+#print axioms massLaw_read
+#print axioms urnSeq_sum
+#print axioms kt_face_le
+#print axioms kt_diag
 #print axioms priorMass_ge_kt
 #print axioms priorMass_code_le_kt
-#print axioms kt_regret
-#print axioms priorMass_regret_bits
+#print axioms priorMass_one_sided_ge_kt
+#print axioms priorMass_one_sided
 #print axioms priorMass_one_sided_two_bits
+#print axioms sixteen_pow_le_centralBinom_sq
+#print axioms ascPochhammer_eval_half
+#print axioms fixed_le_bestFixed
+#print axioms kt_regret
+#print axioms priorMass_regret
+#print axioms priorMass_regret_bits
+#print axioms priorMass_regret_fixed
+#print axioms two_part_kraft
 #print axioms priorMass_two_part
-#print axioms massLaw_read
 #print axioms priorMass_face_ge
--/
+
+end Audit
 
 end Holonics.Compression.Landmark.Context.PriorMass
