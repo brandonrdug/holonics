@@ -71,8 +71,9 @@ fn rule(lattice: Lattice) -> ChartRule {
 /// successor Gram `H'` is symmetric, on its lattice, and certified, `‖1 − X̂H'‖∞ = δ ≤ δ_ℓ`; the map
 /// moves by exactly `γ Σ w g fᵀX̂` less its released residuals, so `(W + ΔW)H' = WH' + γG − ρ` with the
 /// released prox residual `ρ = γG(1 − X̂H')`, whose norm is within the reading's certificate; the
-/// published successors satisfy the window's one balance `W′H′ − (WH + WF + γG) = −ρ + W c_H + c_W H′`
-/// with each carry term `c = r − r′ − e` (`HNN/LatticeWord.carried_window_balance`); every
+/// published successors satisfy the deposition's one balance
+/// `W′H′ − (WH + WF + γG) = −ρ + W c_H + c_W H′` with each carry term `c = r − r′ − e`
+/// (`HNN/LatticeWord.carried_deposition_balance`); every
 /// entry stays on the lattice, every remainder in its half-open cell on the fine lattice of its clock,
 /// and every residual within half a fine unit.
 #[test]
@@ -174,8 +175,8 @@ fn the_prox_step_releases_its_charts_residual_at_the_carried_operands() {
         );
         assert!(row_norm(&rho) <= reading.released);
         assert_eq!(reading.read, rule.read(&reading.released));
-        // The window's one balance on the published map and Gram (Lean
-        // `HNN/LatticeWord.carried_window_balance`): `W′H′ − (WH + WF + γG) = −ρ + W c_H + c_W H′`,
+        // The deposition's one balance on the published map and Gram (Lean
+        // `HNN/LatticeWord.carried_deposition_balance`): `W′H′ − (WH + WF + γG) = −ρ + W c_H + c_W H′`,
         // each carry term `c = r − r′ − e`.
         let gram_carry = law
             .gram_remainder()
