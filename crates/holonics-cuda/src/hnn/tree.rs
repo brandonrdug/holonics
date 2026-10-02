@@ -141,6 +141,7 @@ struct TreeLaw {
     log_stride: u32,
     sums_stride: u32,
     unit: u32,
+    base: u32,
 }
 
 /// The arena's device pointers (`TreeArena`).
@@ -377,6 +378,9 @@ impl<'c> CardTree<'c> {
             log_stride: log_stride as u32,
             sums_stride: sums_stride as u32,
             unit: 1u32 << declaration.mass,
+            base: u32::from(
+                declaration.base == holonics::compression::landmark::context::BaseMeasure::Root,
+            ),
         };
         let mut sum_words = vec![0u32; depths.len() * sums_stride];
         for (branch, branch_sums) in sums.iter().enumerate() {

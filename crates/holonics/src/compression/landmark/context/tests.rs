@@ -72,6 +72,7 @@ fn declaration(alphabet: usize, depth: usize) -> LandmarkDeclaration {
         prior: StopPrior::half(),
         capacity: Capacity::Unbounded,
         mass: 1,
+        base: crate::compression::landmark::context::BaseMeasure::Even,
     }
 }
 
@@ -2286,4 +2287,62 @@ fn the_prior_mass_reads_its_masses_and_keeps_the_rule() {
         ..declaration(alphabet, 2)
     };
     assert!(Landmarks::new(ceiling).is_err());
+}
+
+/// **The root's base** (module header; [`BaseMeasure::Root`]): at prior masses `2^(−1)` and
+/// `2^(−3)`, every node of a digit tree splits its prior masses by one base read from its root, so
+/// the executed faces stay exactly normalized, within the rule and within their certificates of
+/// the oracle; a fresh digit tree reads the even split; and a context never seen leans on its
+/// root's split.
+#[test]
+fn the_roots_base_keeps_the_rule_and_leans_on_the_unconditional_split() {
+    use crate::compression::landmark::context::BaseMeasure;
+    let alphabet = 5;
+    let stream: Vec<usize> = (0..60u64)
+        .map(|t| if t % 4 == 3 { ((t * 7 + t / 3) % 5) as usize } else { 1 })
+        .collect();
+    for mass in [1u32, 3] {
+        let mut codes = Vec::new();
+        for base in [BaseMeasure::Even, BaseMeasure::Root] {
+            let declared = LandmarkDeclaration { mass, base, ..declaration(alphabet, 3) };
+            let mut tree = Landmarks::new(declared.clone()).unwrap();
+            let mut oracle = IdealLandmarks::new(declared, None).unwrap();
+            assert!(tree.face_rule() < rat(1, 32), "j = {mass}, {base:?}");
+            let mut code = Rat::one();
+            for (position, &cell) in stream.iter().enumerate() {
+                let here = address(&stream, position, 3);
+                let face = tree.face(&here, 16).unwrap();
+                assert_eq!(face.probabilities.iter().cloned().sum::<Rat>(), Rat::one());
+                let ideal: Rat = (0..alphabet)
+                    .map(|class| oracle.probability(&here, class).unwrap())
+                    .sum();
+                assert_eq!(ideal, Rat::one());
+                let reading = tree.receive(&here, cell).unwrap();
+                let exact = oracle.receive(&here, cell).unwrap();
+                assert!(reading.residual <= tree.face_rule());
+                assert!(within(&reading.executed, &exact, &reading.residual));
+                code *= exact;
+            }
+            codes.push(code);
+        }
+        assert_ne!(codes[0], codes[1]);
+    }
+    // After its root has seen class 1 ten times in one context, a context never seen leans on the
+    // root's split at the root's base and on the even split at the even base.
+    let leaning = |base| {
+        let mut tree =
+            Landmarks::new(LandmarkDeclaration { mass: 3, base, ..declaration(alphabet, 3) }).unwrap();
+        let seen = [Letter::Cell(0), Letter::Cell(0), Letter::Cell(0)];
+        for _ in 0..10 {
+            tree.receive(&seen, 1).unwrap();
+        }
+        tree.probability(&[Letter::Cell(3), Letter::Cell(3), Letter::Cell(3)], 1).unwrap()
+    };
+    assert!(leaning(BaseMeasure::Root) > leaning(BaseMeasure::Even));
+    // A fresh digit tree reads the even split at either base.
+    let fresh = |base| {
+        let tree = Landmarks::new(LandmarkDeclaration { base, ..declaration(2, 2) }).unwrap();
+        tree.probability(&[Letter::Boundary, Letter::Boundary], 0).unwrap()
+    };
+    assert_eq!(fresh(BaseMeasure::Root), fresh(BaseMeasure::Even));
 }

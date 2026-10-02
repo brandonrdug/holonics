@@ -93,6 +93,7 @@ fn chain_declaration(population: u64) -> FieldDeclaration {
             depth: 2,
             prior: holonics::compression::landmark::context::StopPrior::half(),
             mass: 1,
+            base: holonics::compression::landmark::context::BaseMeasure::Even,
         }],
         crib: CribDeclaration {
             window: 16,

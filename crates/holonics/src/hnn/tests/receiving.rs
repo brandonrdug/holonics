@@ -54,6 +54,7 @@ fn the_grain_is_derived_from_the_receivers_code_tolerance() {
         depth: 2,
         prior: crate::compression::landmark::context::StopPrior::half(),
         mass: 1,
+        base: crate::compression::landmark::context::BaseMeasure::Even,
     };
     assert_eq!(
         ReceivingPhases::declare(field, &medium, &current, &coarse)
@@ -85,6 +86,7 @@ fn an_aperture_beyond_the_observability_rank_is_refused() {
         depth: 2,
         prior: crate::compression::landmark::context::StopPrior::half(),
         mass: 1,
+        base: crate::compression::landmark::context::BaseMeasure::Even,
     };
     match ReceivingPhases::declare(&field, &medium, &current, &wide) {
         Err(HnnError::Observability { aperture, rank }) => {
@@ -141,9 +143,9 @@ fn the_phase_address_is_the_trees_causal_address() {
 
 /// **The receiver declares its tree, and the field codes it** (guard 13): the tree's declaration
 /// is the field's `|A|` and population, the receiver's depth and grain, the cell emitted as its odometer digits, with
-/// no forced split; campaign 1 declares `D = 63` and the prior mass `2^(−3)`, and at
-/// `n* = 6,148 = 2²·29·53`, `L_R = 16`, `B = 8` the owner derives the path lattice `M_p = 49` (its
-/// floor `1/(2³n* + 2)`, the path depth 63) and the β carrier `W = 37`. A change of prior mass changes the field's code too. A change of depth changes the field's code; the initial
+/// no forced split; campaign 1 declares `D = 63`, the prior mass `2^(−3)` and the root's base, and at
+/// `n* = 6,148 = 2²·29·53`, `L_R = 16`, `B = 8` the owner derives the path lattice `M_p = 50` (its
+/// floor `1/(2(2³n* + 2))` at the root's base, the path depth 63) and the β carrier `W = 37`. A change of prior mass changes the field's code too. A change of depth changes the field's code; the initial
 /// constitution carries a tree on the receiving ring only, empty, and its receiving map `R_0 = 0`
 /// and source port `E_0` the declared sign sequence times ½ (entries `±½`).
 #[test]
@@ -166,7 +168,11 @@ fn the_field_declares_the_tree_and_codes_it() {
     );
     assert_eq!((declared.population, declared.grain, declared.mass), (6_148, 16, 3));
     let widths = Widths::derived(&declared);
-    assert_eq!((widths.digits, widths.face, widths.carrier), (8, 49, 37));
+    assert_eq!((widths.digits, widths.face, widths.carrier), (8, 50, 37));
+    assert_eq!(
+        declared.base,
+        crate::compression::landmark::context::BaseMeasure::Root
+    );
     let mut kt = FieldDeclaration::campaign_one(6_148);
     kt.receivers[0].mass = 1;
     assert_ne!(
@@ -176,6 +182,8 @@ fn the_field_declares_the_tree_and_codes_it() {
     let theta = Constitution::initial(&campaign, CAMPAIGN_ONE_BUDGET).unwrap();
     let tree = theta.landmarks(2).unwrap();
     assert_eq!(tree.declaration(), &declared);
+    // The root base's doubled floor keeps the rule below half a grain at depth 63.
+    assert!(tree.face_rule() < Rat::new(1.into(), 32.into()));
     assert_eq!((tree.nodes(), tree.passed()), (0, 0));
     assert!(theta.landmarks(0).is_none());
     let map = theta.receiving_map(2).unwrap();
@@ -856,6 +864,7 @@ fn the_address_restricts_by_whole_bundles_and_the_sheets_are_a_scale_square() {
             prior: crate::compression::landmark::context::StopPrior::half(),
             capacity: crate::compression::landmark::context::Capacity::Unbounded,
             mass: 1,
+            base: crate::compression::landmark::context::BaseMeasure::Even,
         };
     let tree = Landmarks::new(declared(family.letters().clone())).unwrap();
     let coarsen = |letter: Letter| match letter {
