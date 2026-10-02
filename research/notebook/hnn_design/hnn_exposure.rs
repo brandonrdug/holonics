@@ -227,6 +227,7 @@ fn main() {
     let mut realization = String::from("host");
     let mut loaded = false;
     let mut gate = false;
+    let mut ablation: Option<usize> = None;
     for pair in arguments.chunks(2) {
         match pair {
             [key, value] if key == "cells" => cells = Some(value.clone()),
@@ -244,6 +245,9 @@ fn main() {
                 realization = value.clone();
             }
             [key, value] if key == "gate" && value == "f2" => gate = true,
+            [key, value] if key == "ablation" => {
+                ablation = Some(value.parse().expect("a count of windows"));
+            }
             _ => {
                 println!(
                     "usage: hnn_exposure [cut-file <path>] [cells <N|all>] [held-out <cells>] [windows <deadline>] [realization <host|card>] [resonator <none|source>] [gate f2]"
@@ -354,6 +358,10 @@ fn main() {
             .join(", ")
     );
     println!("setup (cut read, fields declared): {setup} ms wall");
+    if let Some(count) = ablation {
+        contact_ablation_run(&field, &cut, count);
+        return;
+    }
 
     if realization == "card" {
         println!("realization: {}", card_realization());
@@ -955,6 +963,58 @@ fn rounding(exposure: &Exposure) {
     for (family, (certified, moved, least, largest)) in &families {
         println!("  {family}: moved at {moved} of {certified} certified deposits; steps 2^{least}..2^{largest}");
     }
+}
+
+/// [measured-diagnostic; agent-inferred, October 2; the contact loop record §7] **The contact loop
+/// on the cut** (`ablation <windows>`): `holonics::hnn::reference::contact_ablation` over the first
+/// windows; per window the contact families its return moved when deposited alone, the deposition
+/// work of that commit on the window's end change, and the next window's code at the predecessor
+/// and at the contacts-only successor, with their exact order. One line per window with its
+/// elapsed milliseconds.
+fn contact_ablation_run(field: &Field, cut: &Cut, windows: usize) {
+    use holonics::hnn::reference::contact_ablation;
+    let clock = Instant::now();
+    let readings = contact_ablation(&Reference::campaign_one(), field, &cut.cells, windows)
+        .expect("the contact ablation");
+    let (mut lower, mut higher, mut equal, mut overlap, mut moved) = (0, 0, 0, 0, 0);
+    let (mut states, mut faces) = (0, 0);
+    for r in &readings {
+        let order = if r.contacts.upper < r.held.lower {
+            lower += 1;
+            "strictly lower"
+        } else if r.held.upper < r.contacts.lower {
+            higher += 1;
+            "strictly higher"
+        } else if r.contacts == r.held {
+            equal += 1;
+            "equal"
+        } else {
+            overlap += 1;
+            "overlapping"
+        };
+        moved += usize::from(!r.moved.is_empty());
+        states += usize::from(r.states_differ);
+        faces += usize::from(r.faces_differ);
+        println!(
+            "  window at {}: contacts moved {:?}; work {}; next window's contact states differ {}, faces differ {}; code held [{}, {}) contacts [{}, {}): {order}; {} ms",
+            r.position,
+            r.moved,
+            r.work,
+            r.states_differ,
+            r.faces_differ,
+            r.held.lower,
+            r.held.upper,
+            r.contacts.lower,
+            r.contacts.upper,
+            clock.elapsed().as_millis()
+        );
+    }
+    println!(
+        "contact ablation: {} windows read; a contact moved at {moved}; the next window's contact states differ at {states}, its faces at {faces}; its code strictly lower {lower}, strictly higher {higher}, equal {equal}, overlapping {overlap}; {} ms; resident {}",
+        readings.len(),
+        clock.elapsed().as_millis(),
+        exterior::resident_set().map_or_else(|| "unread".to_string(), |(now, peak)| format!("{now} now, {peak} peak"))
+    );
 }
 
 /// One population's bits against the baselines, each comparison with its exact difference, and the

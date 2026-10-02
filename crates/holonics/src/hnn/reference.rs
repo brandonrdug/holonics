@@ -2931,6 +2931,150 @@ impl Reference {
     }
 }
 
+/// [measured-diagnostic; agent-inferred, October 2; the
+/// [contact loop record](../../../../research/records/2026-10-02_THE_CONTACT_LOOP_THE_RETURN_REACHES_EVERY_CONTACT_AND_ITS_CHANGE_IS_RELEASED_BEFORE_THE_LATER_CUT.md)
+/// §7] **One window's contact ablation** ([`contact_ablation`]): the contact families the window's
+/// own return moved when its deposit is restricted to the contacts, the deposition work of that
+/// contacts-only commit on the window's end change (`½⟨x, ΔΘ x⟩`, `PowerForm::deposition_work`),
+/// and the next window's code read at the predecessor and at the contacts-only successor, each
+/// after the window's own ingest.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct ContactAblation {
+    pub position: usize,
+    pub moved: Vec<(Locus, Family)>,
+    pub vanished: Vec<(Locus, Family)>,
+    pub work: Rat,
+    pub held: ExactInterval,
+    pub contacts: ExactInterval,
+    /// Whether the next window's word ends with different contact states, and whether its
+    /// receiving faces differ, at the contacts-only successor.
+    pub states_differ: bool,
+    pub faces_differ: bool,
+}
+
+/// [measured-diagnostic] **The contact loop on a cut** (Astra's check, on the host reference): the
+/// exposure's own order over the first `windows` receiving windows (refine, compare, deposit, then
+/// the window's ingest). At each window whose successor window exists, before the full deposit, the
+/// compare's deposit is restricted to its contact families and deposited alone on the predecessor;
+/// the same later drive (the next window, read against its own cells) is then read at the
+/// predecessor and at that contacts-only successor, each after the window's ingest
+/// ([`ContactAblation`]). The full deposit then proceeds as in the exposure. Stops at an aeon's
+/// carry-out (no aeon is closed), at the deadline, or at a budget refusal.
+pub fn contact_ablation(
+    reference: &Reference,
+    field: &Field,
+    cells: &[usize],
+    windows: usize,
+) -> Result<Vec<ContactAblation>, HnnError> {
+    let mut resident = reference.mount(field, &Current::at_rest(field))?;
+    let phases = resident
+        .admitted()
+        .first()
+        .cloned()
+        .ok_or(HnnError::Shape { what: "a declared receiver", expected: 1, found: 0 })?;
+    let aperture = phases.aperture();
+    let spans: Vec<Range<usize>> = phases.windows(cells.len())?.into_iter().collect();
+    let (moment, _) = reference.ingest(&mut resident, None, &[])?;
+    let feed = |reference: &Reference, resident: &mut Resident, window: &[usize]| -> Result<bool, HnnError> {
+        let mut fed = 0;
+        while fed < window.len() {
+            let (_, ingested) = reference.ingest(resident, Some(&moment), &one_hot(&window[fed..]))?;
+            let ingested = ingested.forward.into_present().expect("ingest returns");
+            fed += ingested.cells;
+            if ingested.carry_out {
+                return Ok(false);
+            }
+        }
+        Ok(true)
+    };
+    type Read = (ExactInterval, Vec<[Vec<Rat>; 2]>, String);
+    let read = |reference: &Reference, resident: &mut Resident, window: &[usize]| -> Result<Read, HnnError> {
+        let (pending, refined) = reference.refine(resident, &moment, &phases)?;
+        let states = match &refined.receipt.detail {
+            ReceiptDetail::Refine { word, .. } => word.change.states.clone(),
+            _ => Vec::new(),
+        };
+        let faces = format!("{:?}", refined.forward);
+        let (_, compared) = reference.compare(resident, pending, &one_hot(window))?;
+        let holon = compared.forward.into_present().expect("a compare returns its ratio");
+        let mut total = ExactInterval::point(Rat::zero());
+        for phase in holon.phases() {
+            total = interval_sum(&total, &phase.code_length)?;
+        }
+        Ok((total, states, faces))
+    };
+    let mut out = Vec::new();
+    for (k, span) in spans.iter().enumerate().take(windows) {
+        let window = &cells[span.clone()];
+        if window.len() != aperture {
+            break;
+        }
+        let next = spans.get(k + 1).map(|s| &cells[s.clone()]).filter(|w| w.len() == aperture);
+        let (pending, refined) = reference.refine(&mut resident, &moment, &phases)?;
+        let word = match &refined.receipt.detail {
+            ReceiptDetail::Refine { word, .. } => word.as_ref().clone(),
+            _ => return Err(HnnError::Shape { what: "a refine's word balance", expected: 1, found: 0 }),
+        };
+        let (staged, compared) = reference.compare(&mut resident, pending, &one_hot(window))?;
+        if let (Some(next), Component::Present(deposit)) = (next, &compared.deposit) {
+            let theta = resident.constitution().clone();
+            let contacts: Vec<FactorStep> = deposit
+                .factors()
+                .iter()
+                .filter(|s| matches!(s.gradient.locus(), Locus::Channel(_)))
+                .cloned()
+                .collect();
+            if !contacts.is_empty() {
+                let loci: Vec<Locus> = contacts.iter().map(|s| s.gradient.locus()).collect();
+                let mut alone = Deposit::new(deposit.commit(), Vec::new(), contacts, loci);
+                if let Some(reach) = deposit.reach() {
+                    alone = alone.with_reach(reach.clone());
+                }
+                let (successor, reading) = theta.deposited(&alone)?;
+                let before = PowerForm::read(field, &theta, resident.current())?;
+                let after = PowerForm::read(field, &successor, resident.current())?;
+                let work = before.deposition_work(&after, &word.change)?;
+                let mut held = resident.clone();
+                let mut moved_res = resident.clone();
+                moved_res.constitution = successor;
+                moved_res.forget_kept_reads();
+                let (open_held, open_moved) = (
+                    feed(reference, &mut held, window)?,
+                    feed(reference, &mut moved_res, window)?,
+                );
+                if open_held && open_moved {
+                    let (held_code, held_states, held_faces) = read(reference, &mut held, next)?;
+                    let (moved_code, moved_states, moved_faces) = read(reference, &mut moved_res, next)?;
+                    out.push(ContactAblation {
+                        position: span.start,
+                        moved: reading
+                            .steps
+                            .iter()
+                            .filter(|(l, s)| !reading.vanished.contains(&(*l, s.family)))
+                            .map(|(l, s)| (*l, s.family))
+                            .collect(),
+                        vanished: reading.vanished.clone(),
+                        work,
+                        held: held_code,
+                        contacts: moved_code,
+                        states_differ: held_states != moved_states,
+                        faces_differ: held_faces != moved_faces,
+                    });
+                }
+            }
+        }
+        match reference.deposit(&mut resident, staged) {
+            Ok(_) => {}
+            Err(HnnError::ConstitutionBudget { .. }) => break,
+            Err(other) => return Err(other),
+        }
+        if !feed(reference, &mut resident, window)? {
+            break;
+        }
+    }
+    Ok(out)
+}
+
 /// [definition] **What an exposure reads of a port's resident** beside the port's own methods: the
 /// admitted family, the published constitution, the budget stop, an open moment, the lift point,
 /// the state's bits with and without the collapse, the executed charts' tally and the wall time by
