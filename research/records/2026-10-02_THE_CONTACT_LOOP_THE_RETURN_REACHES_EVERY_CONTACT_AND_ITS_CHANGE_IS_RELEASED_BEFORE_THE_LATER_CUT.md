@@ -232,3 +232,29 @@ receiver's unresolved fibre, below its grain, where the comparison cannot see it
 cannot reward it. That is the measured cause of "read but not useful". Raising the receiver's
 grain, or a comparison that reads the fibre, is the next lever, and either is an architecture
 choice: the grain is the receiver's declared tolerance.
+
+## 10. The reflected residual: its instantiation, owed
+
+[definition; agent-inferred] Astra's last obligation is to carry `r = z − K_chart x` and the
+changing-chart residual, with the storage cross terms, in the continued word's account. Here is the
+instantiation on one contact, from the executed transit (`hnn::propagation::transit_solve`,
+`transit_update`):
+- **Interior and boundary.** The interior is `z = (u, w)`, the contact's displacement and rate. The
+  boundary is `x = (α_g, α_h)`, the channel's incoming waves at the tick, the rings' outgoing waves
+  on the channel's selection. With `S = m̂⁻¹`, the executed solve read column by column, the transit
+  is linear: `z′ = D z + C x` with
+  `u′ = u + (G/2) S(2C_a w − h K_a u) + (Gh/2) S(α_g − α_h)` and
+  `w′ = −w + (G/h) S(2C_a w − h K_a u) + G S(α_g − α_h)`. The outgoing waves are
+  `α_g − S(α_g − α_h) − (1/h) S(2C_a w − h K_a u)` and the same with the signs reversed.
+- **The chart.** `K = (I − D)⁻¹ C`, the contact's quasi-static elimination: the interior state a
+  steady boundary holds. Then `r = z − K x` is the contact's motion that the boundary does not
+  determine, and Lean's `ReflectedBoundaryMemory.reflectedResidual_step` gives its next value with
+  the next chart. Across a commit `K` changes, and the retained `z` reads `r′ = z − K′x`, the
+  recharting term `−(K′ − K)x` included.
+- **The account.** `E_a(z) = E_a(r) + 2⟨r, Kx⟩_{E_a} + E_a(Kx)`, with `E_a(u, w) = ½(⟨w, C_a w⟩ +
+  ⟨u, K_a u⟩)`. The continued word's opening power carries this split per contact beside
+  `PowerForm::deposition_work`.
+- **Its consumer.** `contact_ablation`, which reads the split for each moved contact at the
+  predecessor's chart and the successor's. That needs the channel's incoming waves `x`, which the
+  word's per-tick record (`Passage`) does not yet keep. Recording them is the first build step.
+  Until that build lands, the residual stays owed (#62).
