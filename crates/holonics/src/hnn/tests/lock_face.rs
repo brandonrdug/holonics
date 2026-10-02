@@ -1491,7 +1491,7 @@ fn the_thrown_move_carries_its_momentum_through_the_accreted_mass() {
 
 /// **The power is read on the whole move, not on the coast alone** (the throw's record §2): the
 /// fixture's released flight reversed, `−d`, carries the reversed coast `−c`. Its bound along the
-/// coast alone, at the incumbent, is not negative: alone it would be released. The whole move
+/// coast alone, at the incumbent, is certified positive: alone it would be released. The whole move
 /// `η₁D − (η₁/η₀)c` falls, so the reversed coast is carried; the power test is the first trial's own
 /// first-order bound, and an adopted trial lowers the comparison with `ρ` held.
 #[test]
@@ -1544,7 +1544,7 @@ fn a_coast_that_climbs_alone_is_carried_when_the_whole_move_falls() {
     let thrown = move_from(&reversed);
     let throw = thrown.throw.as_ref().unwrap();
     let alone = throw.coast_power.as_ref().expect("the coast alone");
-    assert!(!alone.upper.is_negative(), "the reversed coast climbs alone: {alone:?}");
+    assert!(alone.lower.is_positive(), "the reversed coast climbs alone: {alone:?}");
     let power = throw.power.as_ref().expect("the power test");
     assert!(throw.carried && power.upper.is_negative(), "the whole move falls: {power:?}");
     assert_eq!(thrown.trials[0].first_order.as_ref(), Some(power));
