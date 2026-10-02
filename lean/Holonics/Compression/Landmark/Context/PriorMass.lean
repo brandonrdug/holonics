@@ -24,7 +24,9 @@ regret     (k/n)^k (m/n)^m ≤ 2^j √n · U_α(k, m)      at most ½ log₂ n +
 one-sided  KT(n, 0) ≤ U_α(n, 0),  U_α(n + 1, 0) ≥ 1/(2(1 + αn))   at most 2 bits while n ≤ 2^j
 choice     j ∈ {1, …, 8} charged log₂ 8 = 3 bits: Σ_w 2^(−(3 + code_ĵ(w))) ≤ 1 for any choice ĵ
 tree       −log₂ ∏_t q_0(x_t) ≤ −log₂ prior_w(S) + Σ_(leaves s) [−log₂ (k_s/n_s)^(k_s) (m_s/n_s)^(m_s) + ½ log₂ n_s + j]
-           every pruned tree S, any stop weights in [0, 1); the whole tree's ĵ charged 3 bits
+           every pruned tree S, any stop weights in [0, 1); one binary tree's ĵ charged 3 bits
+depth      D → k + D: the bound against S of depth ≤ D gains deepLeaves(S) · (−log₂ w_D), nothing else;
+           on the ladder −log₂(1 − 2^(−j_D)) = j_D − log₂(2^(j_D) − 1) ≤ 1 bit a deep leaf
 ```
 
 [proved-derived; formal-checked] What is proved.
@@ -73,6 +75,14 @@ tree       −log₂ ∏_t q_0(x_t) ≤ −log₂ prior_w(S) + Σ_(leaves s) [�
    source `(S, θ)`. Under a causal context the emitted code sums to one over the words of each
    length, so choosing the rung, or the rung and the stop prior together, on the coded word itself
    costs `log₂` of the family: 3 bits at `j = 1..8`, `3 + log₂ F` with a stop prior among `F`.
+8. **Raising the maximum depth** (`PrunedTree.lift`, `PrunedTree.prior_lift`, `ownLik_lift`,
+   `leafSum_lift`, `priorMass_depth_lift`, `ladder_stop_bits`, `priorMass_depth_lift_ladder`): a
+   pruned tree of depth at most `D` is one of depth at most `k + D` whose leaves at depth `D` are
+   stops. Its prior gains exactly the stop weight `w_D` per such leaf, its leaves' own weights and
+   routed counts are unchanged, so against every such `S` item 7's bound at `k + D` is the bound at
+   `D` plus `deepLeaves(S) · (−log₂ w_D)` and nothing else; the deeper tree is compared with the
+   deeper pruned trees as well. On the declared ladder `w_D = 1 − 2^(−j_D)` the stop costs
+   `j_D − log₂(2^(j_D) − 1)` bits, at most one (`log₂(8/7)` at `j_D = 3`).
 
 [agent-inferred] **The trade.** Items 2 and 3 are worst-case bounds and the worst case is the
 balanced count: there the prior mass pays up to `j − 1` bits a node over KT (`2` at campaign 1's
@@ -90,14 +100,27 @@ register (`Capacity::Unbounded`, `hnn::receiving::landmark_declaration_with`) an
 declaration refuses `j = 0`): a register's ceiling is another node law, not the urn. Not stated
 here: the executed lattice code adds the lattice's per-cell drift (#62, "the landmark lattice's
 drift"; checked by the Rust tests through `Landmarks::face_rule`); the enlarged tree's join of the
-cell and bundle branches adds at most one bit against either branch
-(`Tree.sequential_mixture_bounds`), uncomposed; and the concave form `|S| γ(N/|S|)` of the leaves'
-charges. A rung declared on the development cells before the coded cells needs no charge on them;
+cell and bundle branches adds at most one bit a dyadic cell against either branch (the join is
+per digit tree, at `½`; `Tree.sequential_mixture_bounds`), uncomposed; and the concave form
+`|S| γ(N/|S|)` of the leaves' charges. A rung declared on the development cells before the coded cells needs no charge on them;
 the 3 bits cover a choice made on the coded word itself. `emitted_sum`, `tree_two_part` and
 `priorMass_tree_two_part` are stated for one binary tree whose context is read from its own past
 digits; over a larger alphabet a digit tree's context is the cell history, and the cell code's
 completeness over its digit trees (each cell's digit faces summing to one,
 `Tree.digit_emission_normalized`) is not composed with them here.
+
+[agent-inferred] **The depth is a storage limit.** By item 8 a larger maximum depth never weakens
+the guarantee against a tree source of the old depth by more than one stop code a leaf at the old
+maximum depth, and it extends the guarantee to the deeper sources: depth bounds what the standing
+can hold, it does not trade one statistical risk for another. Item 8 compares bounds against a fixed
+`S`; it does not say the code at `k + D` is below the code at `D`, which is a measurement (the
+contact-loop record's §28). The Rust's depth is `LandmarkDeclaration::depth` in bundles: the cell
+branch's letter depth is that depth, the bundle branch's `(1 + r)` times it, so one more bundle is
+`k = 1` in the cell branch and `k = 1 + r` in the bundle branch. The stop weight at the old
+maximum depth is `StopPrior::weight` at the branch's letter depth (`rung_sums` reads a rung at
+every letter depth of each branch): `weight(D)` in the cell branch, `weight(D(1 + r))` in the
+bundle branch, the last rung past the list. The HNN declares no forced depths, and at its `½` stop
+prior (rung 1) each deep leaf costs exactly one bit. The bound holds for every `D` and `k ≥ 1`.
 
 | Claim | Lean | Rust |
 |---|---|---|
@@ -106,7 +129,8 @@ completeness over its digit trees (each cell's digit faces summing to one,
 | regret `½ log₂ n + j`; KT's `½ log₂ n + 1` | `kt_regret`, `priorMass_regret`, `priorMass_regret_bits` | — |
 | the one-sided gain | `priorMass_one_sided_ge_kt`, `priorMass_one_sided_two_bits` | — |
 | the ladder charged 3 bits is a valid code | `two_part_kraft`, `priorMass_two_part` | `hnn::field::ReceiverDeclaration::mass` (campaign 1 declares `j = 3`, coded in `Field::describe`) |
-| the tree's full redundancy, any stop weights; the whole tree's rung charged 3 bits | `emitted_eq_weight`, `own_dominance₀`, `priorMass_tree_redundancy`, `priorMass_tree_redundancy_source`, `emitted_sum`, `tree_two_part`, `priorMass_tree_two_part` | `compression::landmark::context::IdealLandmarks` (one digit tree's exact code), `StopPrior`, `hnn::field::ReceiverDeclaration::mass` |
+| the tree's full redundancy, any stop weights; one binary tree's rung charged 3 bits | `emitted_eq_weight`, `own_dominance₀`, `priorMass_tree_redundancy`, `priorMass_tree_redundancy_source`, `emitted_sum`, `tree_two_part`, `priorMass_tree_two_part` | `compression::landmark::context::IdealLandmarks` (one digit tree's exact code), `StopPrior`, `hnn::field::ReceiverDeclaration::mass` |
+| raising the maximum depth costs one stop code a leaf at the old maximum depth | `PrunedTree.prior_lift`, `ownLik_lift`, `leafSum_lift`, `priorMass_depth_lift`, `ladder_stop_bits`, `priorMass_depth_lift_ladder` | `compression::landmark::context::LandmarkDeclaration::depth`, `StopPrior::weight`, `hnn::field::ReceiverDeclaration` (`depth`) |
 | the floor `1/(2^j n* + 2)` | `priorMass_face_ge` (the node), `priorMass_digit_face_ge` (the opened path, any stop weights) | `compression::landmark::context::face_bits` |
 -/
 
@@ -1040,7 +1064,7 @@ theorem tree_two_part {B : ℕ} (par : Fin B → ℕ × (ℕ → ℚ)) (hw : ∀
     (fun i => le_of_eq (by exact_mod_cast emitted_sum _ (hw i) ctx D n)) choice
 
 /-- [proved-derived; formal-checked] **`priorMass_tree_two_part`: the tree's rung charged 3 bits.**
-At one stop law and the ladder `j = 1..8`, the lengths `3 + code_ĵ` of the whole tree's emitted code
+At one stop law and the ladder `j = 1..8`, the lengths `3 + code_ĵ` of one binary tree's emitted code
 satisfy Kraft for any choice of rung: `Σ_v 2^(−(3 + code_(ĵ v)(v))) ≤ 1`. With
 `priorMass_tree_redundancy`, the two-part code is at most
 `3 + min_j [−log₂ prior_w(S) + Σ_(leaves) (−log₂ (k_s/n_s)^(k_s) (m_s/n_s)^(m_s) + ½ log₂ n_s + j)]`
@@ -1059,6 +1083,188 @@ theorem priorMass_tree_two_part {w : ℕ → ℚ} (hw : StopLaw₀ w) (ctx : Lis
   ring
 
 end Redundancy
+
+/-! ### Raising the maximum depth -/
+
+section Depth
+
+variable {Ltr : Type*} [Fintype Ltr] [DecidableEq Ltr]
+
+/-- [definition] **The stop at depth `k` below**: a leaf at a node with `k` levels below it (a stop
+when `k ≥ 1`, the maximum depth when `k = 0`). -/
+def PrunedTree.stopLeaf : (k : ℕ) → PrunedTree Ltr k
+  | 0 => PUnit.unit
+  | k + 1 => (none : Option (Ltr → PrunedTree Ltr k))
+
+/-- [definition] **The lift of a pruned tree by `k` levels**: the same splits, each leaf at the old
+maximum depth becoming a stop with `k` levels below it, so a pruned tree of depth at most `m` is one
+of depth at most `k + m`. -/
+def PrunedTree.lift (k : ℕ) : (m : ℕ) → PrunedTree Ltr m → PrunedTree Ltr (k + m)
+  | 0, _ => PrunedTree.stopLeaf k
+  | m + 1, S => Option.map (fun f b => PrunedTree.lift k m (f b))
+      (S : Option (Ltr → PrunedTree Ltr m))
+
+/-- [definition] **The leaves at the maximum depth** of a pruned tree: the leaves whose depth has no
+stop/split decision coded. -/
+def PrunedTree.deepLeaves : (m : ℕ) → PrunedTree Ltr m → ℕ
+  | 0, _ => 1
+  | m + 1, S => Option.elim (S : Option (Ltr → PrunedTree Ltr m)) 0
+      fun f => ∑ b, PrunedTree.deepLeaves m (f b)
+
+omit [DecidableEq Ltr] in
+theorem PrunedTree.prior_stopLeaf (w : ℕ → ℚ) (d : ℕ) :
+    ∀ k, PrunedTree.prior w k d (PrunedTree.stopLeaf k : PrunedTree Ltr k) = if k = 0 then 1 else w d
+  | 0 => rfl
+  | _ + 1 => rfl
+
+omit [DecidableEq Ltr] in
+/-- [proved-derived; formal-checked] **The lifted prior**: lifting a pruned tree by `k ≥ 1` levels
+multiplies its prior by the stop weight at the old maximum depth once for each leaf there,
+`prior_w(lift_k S) = prior_w(S) · w_(d+m)^(deepLeaves S)`; the splits and the stops above keep
+their weights. -/
+theorem PrunedTree.prior_lift (w : ℕ → ℚ) {k : ℕ} (hk : 1 ≤ k) :
+    ∀ m d (S : PrunedTree Ltr m),
+      PrunedTree.prior w (k + m) d (PrunedTree.lift k m S) =
+        PrunedTree.prior w m d S * w (d + m) ^ PrunedTree.deepLeaves m S
+  | 0, d, S => by
+    show PrunedTree.prior w k d (PrunedTree.stopLeaf k) =
+      PrunedTree.prior w 0 d S * w (d + 0) ^ PrunedTree.deepLeaves 0 S
+    rw [PrunedTree.prior_stopLeaf, if_neg (by omega)]
+    simp [PrunedTree.prior, PrunedTree.deepLeaves]
+  | m + 1, d, S => by
+    cases hS : (S : Option (Ltr → PrunedTree Ltr m)) with
+    | none =>
+      show w d = w d * w (d + (m + 1)) ^ 0
+      ring
+    | some f =>
+      show (1 - w d) * ∏ b, PrunedTree.prior w (k + m) (d + 1) (PrunedTree.lift k m (f b)) =
+        ((1 - w d) * ∏ b, PrunedTree.prior w m (d + 1) (f b)) *
+          w (d + (m + 1)) ^ (∑ b, PrunedTree.deepLeaves m (f b))
+      simp only [PrunedTree.prior_lift w hk m (d + 1), Finset.prod_mul_distrib,
+        Finset.prod_pow_eq_pow_sum, show d + 1 + m = d + (m + 1) by omega]
+      ring
+
+omit [DecidableEq Ltr] in
+theorem ownLik_stopLeaf (E : List Ltr → ℚ) (s : List Ltr) :
+    ∀ k, ownLik E k s (PrunedTree.stopLeaf k : PrunedTree Ltr k) = E s
+  | 0 => rfl
+  | _ + 1 => rfl
+
+omit [DecidableEq Ltr] in
+/-- The lift keeps the leaves' own weights: each old maximum-depth leaf becomes a stop at the same
+node. -/
+theorem ownLik_lift (E : List Ltr → ℚ) (k : ℕ) :
+    ∀ m s (S : PrunedTree Ltr m), ownLik E (k + m) s (PrunedTree.lift k m S) = ownLik E m s S
+  | 0, s, _ => ownLik_stopLeaf E s k
+  | m + 1, s, S => by
+    cases hS : (S : Option (Ltr → PrunedTree Ltr m)) with
+    | none => rfl
+    | some f =>
+      show ∏ b, ownLik E (k + m) (s ++ [b]) (PrunedTree.lift k m (f b)) =
+        ∏ b, ownLik E m (s ++ [b]) (f b)
+      simp only [ownLik_lift E k m]
+
+omit [DecidableEq Ltr] in
+theorem leafSum_stopLeaf (f : List Ltr → ℝ) (s : List Ltr) :
+    ∀ k, leafSum f k s (PrunedTree.stopLeaf k : PrunedTree Ltr k) = f s
+  | 0 => rfl
+  | _ + 1 => rfl
+
+omit [DecidableEq Ltr] in
+/-- The lift keeps every sum over the leaves. -/
+theorem leafSum_lift (f : List Ltr → ℝ) (k : ℕ) :
+    ∀ m s (S : PrunedTree Ltr m), leafSum f (k + m) s (PrunedTree.lift k m S) = leafSum f m s S
+  | 0, s, _ => leafSum_stopLeaf f s k
+  | m + 1, s, S => by
+    cases hS : (S : Option (Ltr → PrunedTree Ltr m)) with
+    | none => rfl
+    | some g =>
+      show ∑ b, leafSum f (k + m) (s ++ [b]) (PrunedTree.lift k m (g b)) =
+        ∑ b, leafSum f m (s ++ [b]) (g b)
+      simp only [leafSum_lift f k m]
+
+/-- [proved-derived; formal-checked] **`priorMass_depth_lift`: raising the maximum depth costs one
+stop code a deep leaf.** Raise the tree's maximum depth from `D` to `D' = k + D` (`k ≥ 1`, the
+addresses reaching `D'`). Against every pruned tree `S` of depth at most `D` with positive prior,
+the bound of `priorMass_tree_redundancy` at `D'` is the bound at `D` plus `−log₂ w_D` for each leaf
+of `S` at the old maximum depth `D`, and nothing else: the prior code of `S`'s splits and stops
+above `D`, the leaves' best fixed codes and their charges `½ log₂ n_s + j` are unchanged (each
+leaf's routed counts depend only on its own address prefix). The deeper tree is also compared
+with every pruned tree of depth up to `D'`. -/
+theorem priorMass_depth_lift {j : ℕ} (hj : 1 ≤ j) {w : ℕ → ℚ} (hw : StopLaw₀ w) (hwD : ∀ D, 0 < w D)
+    {k : ℕ} (hk : 1 ≤ k) (D : ℕ) (obs : List (List Ltr × Bool))
+    (hD : ∀ o ∈ obs, k + D ≤ o.1.length) (S : PrunedTree Ltr D)
+    (hS : 0 < PrunedTree.prior w D 0 S) :
+    codeBits (emitted (massLaw j) w (k + D) obs) ≤
+      codeBits (PrunedTree.prior w D 0 S) + PrunedTree.deepLeaves D S * codeBits (w D) +
+        leafSum (fun s => codeBits (bestFixed (routedCount obs s true) (routedCount obs s false)) +
+          leafCharge j (routedCount obs s true) (routedCount obs s false)) D [] S := by
+  have hP := PrunedTree.prior_lift w hk D 0 S
+  rw [zero_add] at hP
+  have hwD' := hwD D
+  have hS' : 0 < PrunedTree.prior w (k + D) 0 (PrunedTree.lift k D S) := by
+    rw [hP]; positivity
+  have h := priorMass_tree_redundancy hj hw (k + D) obs hD _ hS'
+  rw [leafSum_lift, hP] at h
+  refine h.trans (le_of_eq ?_)
+  have hpR : (0 : ℝ) < (PrunedTree.prior w D 0 S : ℝ) := by exact_mod_cast hS
+  have hwR : (0 : ℝ) < (w D : ℝ) := by exact_mod_cast hwD'
+  unfold codeBits
+  push_cast
+  rw [Real.logb_mul hpR.ne' (by positivity), Real.logb_pow]
+  ring
+
+/-- [proved-derived; formal-checked] **The stop code on the dyadic ladder**: at rung `j ≥ 1` the
+stop weight `w = 1 − 2^(−j)` codes in `−log₂ w = j − log₂(2^j − 1)` bits, at most one bit (exactly
+one at `j = 1`, `log₂(8/7)` at `j = 3`). -/
+theorem ladder_stop_bits {j : ℕ} (hj : 1 ≤ j) :
+    codeBits (ladder j) = j - Real.logb 2 (2 ^ j - 1) ∧ codeBits (ladder j) ≤ 1 := by
+  have h2 : (2 : ℝ) ≤ 2 ^ j := by
+    calc (2 : ℝ) = 2 ^ 1 := by norm_num
+      _ ≤ 2 ^ j := pow_le_pow_right₀ (by norm_num) hj
+  have hl : ((ladder j : ℚ) : ℝ) = (2 ^ j - 1) / 2 ^ j := by
+    unfold ladder; push_cast
+    rw [one_div_pow]
+    field_simp
+  have hpos : (0 : ℝ) < 2 ^ j - 1 := by linarith
+  have e : codeBits (ladder j) = j - Real.logb 2 (2 ^ j - 1) := by
+    rw [codeBits, hl, Real.logb_div hpos.ne' (by positivity), Real.logb_pow,
+      Real.logb_self_eq_one (by norm_num)]
+    ring
+  refine ⟨e, ?_⟩
+  rw [e]
+  have : Real.logb 2 (2 ^ (j - 1 : ℕ)) ≤ Real.logb 2 (2 ^ j - 1) := by
+    apply Real.logb_le_logb_of_le (by norm_num) (by positivity)
+    have : (2 : ℝ) ^ j = 2 * 2 ^ (j - 1) := by
+      rw [← pow_succ']; congr 1; omega
+    rw [this]
+    have : (1 : ℝ) ≤ 2 ^ (j - 1) := one_le_pow₀ (by norm_num)
+    linarith
+  rw [Real.logb_pow, Real.logb_self_eq_one (by norm_num), Nat.cast_sub hj] at this
+  push_cast at this
+  linarith
+
+/-- [proved-derived; formal-checked] **The depth's cost on the Rust's stop prior.** With the declared
+stop prior on the dyadic ladder, `w_d = 1 − 2^(−j_d)` (Rust `StopPrior::weight`, rungs `j_d ≥ 1`
+read at each depth, the last rung past the list), raising the declared depth from `D` to `D' = k + D`
+costs, against every pruned tree `S` of depth at most `D`, `deepLeaves(S) · (j_D − log₂(2^(j_D) − 1))`
+bits, at most one bit per leaf of `S` at depth `D` (`log₂(8/7)` each at `j_D = 3`). -/
+theorem priorMass_depth_lift_ladder {j : ℕ} (hj : 1 ≤ j) (rung : ℕ → ℕ) (hr : ∀ d, 1 ≤ rung d)
+    {k : ℕ} (hk : 1 ≤ k) (D : ℕ) (obs : List (List Ltr × Bool))
+    (hD : ∀ o ∈ obs, k + D ≤ o.1.length) (S : PrunedTree Ltr D) :
+    codeBits (emitted (massLaw j) (fun d => ladder (rung d)) (k + D) obs) ≤
+      codeBits (PrunedTree.prior (fun d => ladder (rung d)) D 0 S) +
+        PrunedTree.deepLeaves D S * (rung D - Real.logb 2 (2 ^ rung D - 1)) +
+        leafSum (fun s => codeBits (bestFixed (routedCount obs s true) (routedCount obs s false)) +
+          leafCharge j (routedCount obs s true) (routedCount obs s false)) D [] S := by
+  have hwD : ∀ d, 0 < ladder (rung d) := fun d => (ladder_founding (hr d)).1
+  have hw : StopLaw (fun d => ladder (rung d)) := fun d =>
+    ⟨(ladder_founding (hr d)).1, (ladder_founding (hr d)).2.1⟩
+  have h := priorMass_depth_lift hj hw.toStopLaw₀ hwD hk D obs hD S
+    (PrunedTree.prior_pos hw D 0 S)
+  rwa [(ladder_stop_bits (hr D)).1] at h
+
+end Depth
 
 /-! ### Audit -/
 
@@ -1093,6 +1299,10 @@ section Audit
 #print axioms priorMass_tree_redundancy_source
 #print axioms tree_two_part
 #print axioms priorMass_tree_two_part
+#print axioms PrunedTree.prior_lift
+#print axioms priorMass_depth_lift
+#print axioms ladder_stop_bits
+#print axioms priorMass_depth_lift_ladder
 
 end Audit
 
