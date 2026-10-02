@@ -2659,8 +2659,10 @@ pub struct DepositReading {
     /// [definition; agent-inferred, October 2; the
     /// [contact loop record](../../../../research/records/2026-10-02_THE_CONTACT_LOOP_THE_RETURN_REACHES_EVERY_CONTACT_AND_ITS_CHANGE_IS_RELEASED_BEFORE_THE_LATER_CUT.md)]
     /// **The rounding refusals**: every family certified at a step `η > 0` none of whose entries
-    /// took a nonzero lattice coordinate, so its whole move was released below its locus's fine
-    /// lattice and its constitution did not change. A reached family either moves or is named here.
+    /// took a nonzero lattice coordinate, so its constitution did not change at this deposit. Its
+    /// move is released below the fine lattice or carried as a remainder below the coarse one
+    /// ([`Constitution::carried_remainders`] says which); it is not necessarily lost. A reached
+    /// family either moves or is named here.
     pub vanished: Vec<(Locus, Family)>,
     pub charts: Vec<(Locus, ChartReading)>,
     pub landmarks: u64,
