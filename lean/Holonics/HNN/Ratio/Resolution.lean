@@ -63,17 +63,31 @@ exponent `v`. No temperature enters: the receiving map's gain, which plays the r
    the rule tightened by `1/K` (`odometer_certified_decrease`). At `L = 16`, `K < 8/7`, so the
    code's rule keeps at least `3/8 · η a` (`odometer_ratio_sixteen`). This covers a logit step
    along the covector itself. A deposit's move pulled back through a locus mixes the stations'
-   covectors, and no factor of this kind is proved for it here. The curvature `s` (item 5) is a
+   covectors; item 8 treats it. The curvature `s` (item 5) is a
    separate question: `s = ½` stays sound there; what the factor corrects is the first-order term
    `a`, which reads the odometer covector rather than the smooth score's gradient.
-8. **The grain of a continuing machine** (owed item 4). The grain read from a reading count,
+8. **A deposit's move through its loci.** A deposit moves a locus, and each station `s` receives
+   a logit move `δ_s` that mixes the covectors of every station the locus serves. For any move,
+   `ℓ_t(f + δ) ≤ ℓ_t(f) + Σ_c r_c (δ_c − δ_t) + (K − 1) Σ_c r_c |δ_c − δ_t| + ½ (ln 2/2) Σ δ²`
+   (`odometer_move_bound`, from `odometer_mismatch_le` and the two-sided mass bound
+   `face_mass_le_odometer`), summed over the stations by `deposit_move_bound`. With
+   `x_c = m_c − m_t`, the odometer's reading of a unit move is `a = A⁺ − A⁻` and what it can miss is
+   `e = (K − 1)(A⁺ + A⁻)`, `A^± = Σ r_c max(±x_c, 0)` the right-way and wrong-way mass
+   (`reading_split`). Under the code's rule `η C ≤ a` the score falls by at least `η (a/2 − e)`
+   (`deposit_descends`), so the deposit descends when `(2K − 1) A⁻ < (3 − 2K) A⁺`
+   (`deposit_condition_iff`); at `L = 16` it suffices that `9 A⁻ ≤ 5 A⁺`
+   (`deposit_condition_sixteen`). No condition-free guarantee holds: a move whose wrong-way mass
+   matches its right-way mass has `a` near zero while `e` is not. A coarser sufficient condition
+   uses only the stations' target masses and a bound `B_s` on their moves:
+   `e ≤ 2 Σ_s w_s (K_s − 1)(1 − r_s t_s) B_s` (`miss_le_target_mass`).
+9. **The grain of a continuing machine** (owed item 4). The grain read from a reading count,
    `L(N) = ⌈√(N ln 2/2)⌉`, is the least meeting the criterion of item 6 (`refiningGrain_spec`); it
    is monotone, within one of `√(N ln 2/2)`, and at most doubles when the count quadruples
    (`refiningGrain_growth`). A grain refined by an integer factor determines the coarser read
    (`grainRead_of_refined`, `grainRead_refines`), so a dyadically refining machine keeps every
    read it made. At every count, same-cell media carry less than one bit over the readings
    (`refiningGrain_unconfirmable`).
-9. **Campaign 1's numbers** (`resolution_aeon_bounds`, `declared_grain_vs_resolution`,
+10. **Campaign 1's numbers** (`resolution_aeon_bounds`, `declared_grain_vs_resolution`,
    `measured_change_ratio`, `measured_change_readings`, `measured_aeon_test_bound`,
    `measured_aeon_code_bound`).
 
@@ -1085,7 +1099,209 @@ theorem odometer_ratio_sixteen :
 
 end Pairing
 
-/-! ## 8. The grain of a continuing machine -/
+/-! ## 8. A deposit's move through its loci -/
+
+section Deposit
+
+variable {ι : Type*} [Fintype ι] [DecidableEq ι]
+
+omit [DecidableEq ι] in
+/-- [proved-derived; formal-checked] **The face's masses against the odometer's.** With every
+exponent in its grain cell, `p_c ≤ 2^(1/L) · (2/(e ln 2)) · r_c`: with `odometer_mass_le` the two
+masses lie within the one factor `K = 2^(1/L) · 2/(e ln 2)` of each other, in both directions. -/
+theorem face_mass_le_odometer [Nonempty ι] (n : ι → ℤ) (k : ι → ℕ) {L : ℕ} (hL : 0 < L)
+    (hk : ∀ c, k c ≤ L) (x : ι → ℝ) (hx0 : ∀ c, (n c : ℝ) + (k c : ℝ) / L ≤ x c)
+    (hx1 : ∀ c, x c < (n c : ℝ) + (k c : ℝ) / L + 1 / L) (c : ι) :
+    (2 : ℝ) ^ x c / ∑ d, (2 : ℝ) ^ x d ≤
+      (2 : ℝ) ^ (1 / (L : ℝ)) / (Real.exp 1 * Real.log 2 / 2) *
+        (odometerWeight (n c) (k c) L / ∑ d, odometerWeight (n d) (k d) L) := by
+  have hμ : 0 < Real.exp 1 * Real.log 2 / 2 := by
+    have := Real.log_pos (show (1 : ℝ) < 2 by norm_num); positivity
+  have ha : (0 : ℝ) < (2 : ℝ) ^ (1 / (L : ℝ)) := by positivity
+  have hω : ∀ d, 0 < odometerWeight (n d) (k d) L := fun d => by
+    unfold odometerWeight; have := zpow_pos (show (0 : ℝ) < 2 by norm_num) (n d); positivity
+  have hW : 0 < ∑ d, odometerWeight (n d) (k d) L :=
+    Finset.sum_pos (fun d _ => hω d) Finset.univ_nonempty
+  have hA : 0 < ∑ d, (2 : ℝ) ^ x d := Finset.sum_pos (fun d _ => by positivity) Finset.univ_nonempty
+  -- the face's weight at `c` is at most `2^(1/L)` times the chart's
+  have hxc : (2 : ℝ) ^ x c ≤ (2 : ℝ) ^ (1 / (L : ℝ)) * odometerWeight (n c) (k c) L := by
+    calc (2 : ℝ) ^ x c ≤ (2 : ℝ) ^ (((n c : ℝ) + (k c : ℝ) / L) + 1 / L) :=
+          Real.rpow_le_rpow_of_exponent_le (by norm_num) (hx1 c).le
+      _ = (2 : ℝ) ^ ((n c : ℝ) + (k c : ℝ) / L) * (2 : ℝ) ^ (1 / (L : ℝ)) :=
+          Real.rpow_add (by norm_num) _ _
+      _ ≤ odometerWeight (n c) (k c) L * (2 : ℝ) ^ (1 / (L : ℝ)) :=
+          mul_le_mul_of_nonneg_right (face_weight_le_odometer (n c) hL (hk c)) ha.le
+      _ = _ := by ring
+  -- the chart's partition is at most the face's over `μ`
+  have hWA : Real.exp 1 * Real.log 2 / 2 * ∑ d, odometerWeight (n d) (k d) L ≤
+      ∑ d, (2 : ℝ) ^ x d := by
+    rw [Finset.mul_sum]
+    exact Finset.sum_le_sum fun d _ => (odometer_le_face_weight (n d) (k d) L).trans
+      (Real.rpow_le_rpow_of_exponent_le (by norm_num) (hx0 d))
+  rw [div_le_iff₀ hA]
+  calc (2 : ℝ) ^ x c ≤ (2 : ℝ) ^ (1 / (L : ℝ)) * odometerWeight (n c) (k c) L := hxc
+    _ = (2 : ℝ) ^ (1 / (L : ℝ)) / (Real.exp 1 * Real.log 2 / 2) *
+          (odometerWeight (n c) (k c) L / ∑ d, odometerWeight (n d) (k d) L) *
+          (Real.exp 1 * Real.log 2 / 2 * ∑ d, odometerWeight (n d) (k d) L) := by
+        field_simp
+    _ ≤ _ := mul_le_mul_of_nonneg_left hWA
+        (mul_nonneg (div_nonneg ha.le hμ.le) (div_nonneg (hω c).le hW.le))
+
+/-- [proved-derived; formal-checked] **A covector read against its target.** For normalized
+masses `w` and the one-hot target at `t`, `⟨w − e_t, m⟩ = Σ_c w_c (m_c − m_t)`: only the moves
+relative to the target's are read. -/
+theorem reading_relative (w m : ι → ℝ) (hw1 : ∑ c, w c = 1) (t : ι) :
+    ∑ c, (w c - (Pi.single t (1 : ℝ) : ι → ℝ) c) * m c = ∑ c, w c * (m c - m t) := by
+  have h1 : ∑ c, (Pi.single t (1 : ℝ) : ι → ℝ) c * m c = m t := by
+    simp [Pi.single_apply]
+  have h2 : ∑ c, w c * m t = m t := by rw [← Finset.sum_mul, hw1, one_mul]
+  simp only [sub_mul, mul_sub, Finset.sum_sub_distrib, h1, h2]
+
+omit [DecidableEq ι] in
+/-- [proved-derived; formal-checked] **What the odometer misreads of any move.** With normalized
+masses within `K ≥ 1` of each other in both directions (`r ≤ K p`, `p ≤ K r`), the smooth face
+and the odometer read any move `m` within `(K − 1) Σ_c r_c |m_c − m_t|`, for any class `t`. -/
+theorem odometer_mismatch_le (p r m : ι → ℝ) (hp1 : ∑ c, p c = 1) (hr1 : ∑ c, r c = 1)
+    (hr : ∀ c, 0 ≤ r c) (t : ι) {K : ℝ} (hK : 1 ≤ K) (hpr : ∀ c, r c ≤ K * p c)
+    (hrp : ∀ c, p c ≤ K * r c) :
+    |∑ c, (p c - r c) * m c| ≤ (K - 1) * ∑ c, r c * |m c - m t| := by
+  have e : ∑ c, (p c - r c) * m c = ∑ c, (p c - r c) * (m c - m t) := by
+    have h0 : ∑ c, (p c - r c) * m t = 0 := by
+      rw [← Finset.sum_mul, Finset.sum_sub_distrib, hp1, hr1]; ring
+    rw [← sub_zero (∑ c, (p c - r c) * m c), ← h0, ← Finset.sum_sub_distrib]
+    exact Finset.sum_congr rfl fun c _ => by ring
+  have hdiff : ∀ c, |p c - r c| ≤ (K - 1) * r c := by
+    intro c
+    rw [abs_le]
+    constructor
+    · have h : K * 0 ≤ K * (p c + (K - 2) * r c) := by
+        nlinarith [hpr c, mul_nonneg (sq_nonneg (K - 1)) (hr c)]
+      have := le_of_mul_le_mul_left h (by linarith)
+      linarith
+    · linarith [hrp c]
+  rw [e, Finset.mul_sum]
+  refine (Finset.abs_sum_le_sum_abs _ _).trans (Finset.sum_le_sum fun c _ => ?_)
+  rw [abs_mul, ← mul_assoc]
+  exact mul_le_mul_of_nonneg_right (hdiff c) (abs_nonneg _)
+
+/-- [proved-derived; formal-checked] **One station under any move.** For any move `δ` of a
+station's logits, with the odometer masses `r` and the smooth face within `K ≥ 1` of each other,
+the base-two score obeys
+`ℓ_t(f + δ) ≤ ℓ_t(f) + Σ_c r_c (δ_c − δ_t) + (K − 1) Σ_c r_c |δ_c − δ_t| + ½ (ln 2/2) Σ δ²`.
+The first sum is the odometer covector's reading `⟨r − e_t, δ⟩`; the second is what that reading
+can miss. -/
+theorem odometer_move_bound [Nonempty ι] (f r δ : ι → ℝ) (t : ι) (hr : ∀ c, 0 ≤ r c)
+    (hr1 : ∑ c, r c = 1) {K : ℝ} (hK : 1 ≤ K)
+    (hpr : ∀ c, r c ≤ K * (face fun c => f c * Real.log 2).mass c)
+    (hrp : ∀ c, (face fun c => f c * Real.log 2).mass c ≤ K * r c) :
+    codeLength (fun c => f c + δ c) t ≤ codeLength f t + ∑ c, r c * (δ c - δ t) +
+      (K - 1) * ∑ c, r c * |δ c - δ t| + 1 / 2 * (Real.log 2 / 2) * ∑ c, δ c ^ 2 := by
+  set p := face fun c => f c * Real.log 2 with hp
+  have hq := codeLength_quadratic_upper f δ t
+  have e1 : ∑ c, (p.mass c - if c = t then 1 else 0) * δ c =
+      ∑ c, p.mass c * (δ c - δ t) := by
+    rw [← reading_relative p.mass δ p.normalized t]
+    exact Finset.sum_congr rfl fun c _ => by simp [Pi.single_apply]
+  have e2 : ∑ c, p.mass c * (δ c - δ t) =
+      ∑ c, r c * (δ c - δ t) + ∑ c, (p.mass c - r c) * δ c := by
+    rw [← reading_relative p.mass δ p.normalized t, ← reading_relative r δ hr1 t,
+      ← Finset.sum_add_distrib]
+    exact Finset.sum_congr rfl fun c _ => by ring
+  have hm := odometer_mismatch_le p.mass r δ p.normalized hr1 hr t hK hpr hrp
+  have := le_abs_self (∑ c, (p.mass c - r c) * δ c)
+  rw [e1, e2] at hq
+  linarith
+
+/-- [proved-derived; formal-checked] **The deposit as it happens: every station at once.** A
+deposit moves its loci, and through the reach each station `s` (weight `w_s ≥ 0`, target `t_s`,
+odometer masses `r_s` within `K_s` of its face) receives a logit move `δ_s`, which mixes the
+covectors of every station the locus serves. The weighted score obeys the sum of the stations'
+bounds: the odometer's reading `Σ_s w_s Σ_c r_sc (δ_sc − δ_s t_s)`, what it can miss
+`Σ_s w_s (K_s − 1) Σ_c r_sc |δ_sc − δ_s t_s|`, and the curvature `½ (ln 2/2) Σ_s w_s ‖δ_s‖²`. -/
+theorem deposit_move_bound [Nonempty ι] {σ : Type*} [Fintype σ] (w : σ → ℝ)
+    (hw : ∀ s, 0 ≤ w s) (f r δ : σ → ι → ℝ) (t : σ → ι) (hr : ∀ s c, 0 ≤ r s c)
+    (hr1 : ∀ s, ∑ c, r s c = 1) (K : σ → ℝ) (hK : ∀ s, 1 ≤ K s)
+    (hpr : ∀ s c, r s c ≤ K s * (face fun c => f s c * Real.log 2).mass c)
+    (hrp : ∀ s c, (face fun c => f s c * Real.log 2).mass c ≤ K s * r s c) :
+    ∑ s, w s * codeLength (fun c => f s c + δ s c) (t s) ≤
+      ∑ s, w s * (codeLength (f s) (t s) + ∑ c, r s c * (δ s c - δ s (t s)) +
+        (K s - 1) * ∑ c, r s c * |δ s c - δ s (t s)| +
+          1 / 2 * (Real.log 2 / 2) * ∑ c, δ s c ^ 2) :=
+  Finset.sum_le_sum fun s _ => mul_le_mul_of_nonneg_left
+    (odometer_move_bound (f s) (r s) (δ s) (t s) (hr s) (hr1 s) (hK s) (hpr s) (hrp s)) (hw s)
+
+omit [DecidableEq ι] in
+/-- [proved-derived; formal-checked] **The reading splits into its right-way and wrong-way
+parts.** With `x_c = m_c − m_t` the move of class `c` against the target, `A⁺ = Σ r_c max(x_c, 0)`
+and `A⁻ = Σ r_c max(−x_c, 0)`: the odometer's reading is `A⁺ − A⁻` and what it can miss is
+`(K − 1)(A⁺ + A⁻)`. -/
+theorem reading_split (r x : ι → ℝ) :
+    ∑ c, r c * x c = ∑ c, r c * max (x c) 0 - ∑ c, r c * max (-x c) 0 ∧
+      ∑ c, r c * |x c| = ∑ c, r c * max (x c) 0 + ∑ c, r c * max (-x c) 0 := by
+  have h : ∀ c, x c = max (x c) 0 - max (-x c) 0 ∧ |x c| = max (x c) 0 + max (-x c) 0 := by
+    intro c
+    rcases le_total 0 (x c) with h | h
+    · simp [max_eq_left h, max_eq_right (neg_nonpos.mpr h), abs_of_nonneg h]
+    · simp [max_eq_right h, max_eq_left (neg_nonneg.mpr h), abs_of_nonpos h]
+  constructor
+  · rw [← Finset.sum_sub_distrib]
+    refine Finset.sum_congr rfl fun c _ => ?_
+    conv_lhs => rw [(h c).1]
+    ring
+  · rw [← Finset.sum_add_distrib]
+    refine Finset.sum_congr rfl fun c _ => ?_
+    conv_lhs => rw [(h c).2]
+    ring
+
+/-- [proved-derived; formal-checked] **When the code's step descends.** Let the deposit's
+model be `φ(η) ≤ φ(0) − η a + η e + ½ η² C`, with `a` the odometer's reading of the unit move,
+`e` what it can miss, and `C ≥ (ln 2/2) Σ w ‖δ‖²/η²` the curvature the certificate bounds. The
+code's rule `η C ≤ a` gives `φ(η) ≤ φ(0) − η (a/2 − e)`: the deposit descends, by at least that,
+when `e < a/2`. -/
+theorem deposit_descends {φ φ₀ a e C η : ℝ} (hη : 0 ≤ η)
+    (hmodel : φ ≤ φ₀ - η * a + η * e + 1 / 2 * η ^ 2 * C) (hstep : η * C ≤ a) :
+    φ ≤ φ₀ - η * (a / 2 - e) := by
+  have : 1 / 2 * η ^ 2 * C ≤ 1 / 2 * η * a := by
+    have := mul_le_mul_of_nonneg_left hstep hη
+    nlinarith
+  nlinarith
+
+/-- [proved-derived; formal-checked] **The condition, in the wrong-way mass.** With
+`a = A⁺ − A⁻` and `e = (K − 1)(A⁺ + A⁻)` (`reading_split`, summed over the stations with one
+`K`), `e < a/2` exactly when `(2K − 1) A⁻ < (3 − 2K) A⁺`. -/
+theorem deposit_condition_iff {Ap Am K : ℝ} :
+    (K - 1) * (Ap + Am) < (Ap - Am) / 2 ↔ (2 * K - 1) * Am < (3 - 2 * K) * Ap := by
+  constructor <;> intro h <;> linarith
+
+/-- [proved-derived; formal-checked] **At the declared grain `L = 16`.** `K < 8/7`, so the code's
+step descends whenever the wrong-way mass is below five ninths of the right-way mass,
+`9 A⁻ ≤ 5 A⁺` with `A⁺ > 0`. A covector step at one station has `A⁻ = 0`
+(`odometer_certified_decrease` is the sharper bound there). -/
+theorem deposit_condition_sixteen {Ap Am K : ℝ} (hK1 : 1 ≤ K) (hK : K < 8 / 7)
+    (hAp : 0 < Ap) (h : 9 * Am ≤ 5 * Ap) : (K - 1) * (Ap + Am) < (Ap - Am) / 2 := by
+  rw [deposit_condition_iff]
+  nlinarith
+
+/-- [proved-derived; formal-checked] **A sufficient condition from what the deposit already
+reads.** With every move within `B` of zero, what the reading can miss at a station is at most
+`2 B (1 − r_t)`: so `e ≤ 2 Σ_s w_s (K_s − 1)(1 − r_s t_s) B_s`, from the stations' target masses
+and a bound on their moves, both of which the deposit's certificate already carries. -/
+theorem miss_le_target_mass (r m : ι → ℝ) (hr : ∀ c, 0 ≤ r c) (hr1 : ∑ c, r c = 1) (t : ι)
+    {B : ℝ} (hB : ∀ c, |m c| ≤ B) :
+    ∑ c, r c * |m c - m t| ≤ 2 * B * (1 - r t) := by
+  have hrt : 1 - r t = ∑ c ∈ Finset.univ.erase t, r c := by
+    rw [← hr1, ← Finset.add_sum_erase _ _ (Finset.mem_univ t)]; ring
+  rw [← Finset.add_sum_erase _ _ (Finset.mem_univ t), sub_self, abs_zero, mul_zero, zero_add,
+    hrt, Finset.mul_sum]
+  refine Finset.sum_le_sum fun c _ => ?_
+  have : |m c - m t| ≤ 2 * B := by
+    calc |m c - m t| ≤ |m c| + |m t| := abs_sub _ _
+      _ ≤ 2 * B := by linarith [hB c, hB t]
+  nlinarith [hr c]
+
+end Deposit
+
+/-! ## 9. The grain of a continuing machine -/
 
 section Refining
 
@@ -1180,7 +1396,7 @@ theorem refiningGrain_unconfirmable {ι ρ : Type*} [Fintype ι] [Nonempty ι] [
 
 end Refining
 
-/-! ## 9. Campaign 1's numbers -/
+/-! ## 10. Campaign 1's numbers -/
 
 section Campaign
 
@@ -1293,6 +1509,16 @@ section Audit
 #print axioms odometer_step_bound
 #print axioms odometer_certified_decrease
 #print axioms odometer_ratio_sixteen
+#print axioms face_mass_le_odometer
+#print axioms reading_relative
+#print axioms odometer_mismatch_le
+#print axioms odometer_move_bound
+#print axioms deposit_move_bound
+#print axioms reading_split
+#print axioms deposit_descends
+#print axioms deposit_condition_iff
+#print axioms deposit_condition_sixteen
+#print axioms miss_le_target_mass
 #print axioms refiningGrain_spec
 #print axioms refiningGrain_growth
 #print axioms grainRead_of_refined
