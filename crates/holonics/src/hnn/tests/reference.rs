@@ -538,3 +538,50 @@ fn a_reached_contact_family_moves_or_is_named_a_rounding_refusal() {
     };
     assert_ne!(later(&mut pre), later(&mut post));
 }
+
+#[test]
+fn family_sensitivity_probe() {
+    let field = chain();
+    let reference = Reference::new(4, 1 << 40);
+    let (mut post, _, staged) = reached_contacts(&reference, &field);
+    let reading = match reference.deposit(&mut post, staged).unwrap().deposit {
+        Component::Present(reading) => reading,
+        other => panic!("{other:?}"),
+    };
+    for (locus, step) in &reading.steps {
+        let a = crate::holon::deposition::significant(&step.step.alignment, 24, false);
+        let c = crate::holon::deposition::significant(&step.step.curvature, 24, false);
+        eprintln!("{locus:?} {:?}: a {a} C {c} eta {} vanished {}", step.family, step.step.step, reading.vanished.contains(&(*locus, step.family)));
+    }
+    let mut carried = std::collections::BTreeMap::new();
+    for (l, c, _, _) in post.constitution().carried_remainders() {
+        *carried.entry(format!("{l:?} {c:?}")).or_insert(0usize) += 1;
+    }
+    let mut released = std::collections::BTreeMap::new();
+    for (l, c, _, _) in &reading.released {
+        *released.entry(format!("{l:?} {c:?}")).or_insert(0usize) += 1;
+    }
+    eprintln!("carried after: {carried:?}");
+    eprintln!("released: {released:?}");
+}
+
+#[test]
+fn family_sensitivity_probe_joint() {
+    let field = super::prediction::joint();
+    let reference = Reference::new(4, 1 << 40);
+    let mut resident = reference
+        .mount_with(&field, &Current::at_rest(&field), super::learning::generic(&field, 301))
+        .unwrap();
+    let (moment, _) = reference.ingest(&mut resident, None, &one_hot(&[1, 2, 0, 1, 1, 2, 0, 0])).unwrap();
+    let phases = resident.admitted()[0].clone();
+    let (pending, _) = reference.refine(&mut resident, &moment, &phases).unwrap();
+    let (staged, _) = reference.compare(&mut resident, pending, &one_hot(&[1, 0, 2])).unwrap();
+    let reading = match reference.deposit(&mut resident, staged).unwrap().deposit {
+        Component::Present(reading) => reading,
+        other => panic!("{other:?}"),
+    };
+    for (locus, step) in &reading.steps {
+        let a = crate::holon::deposition::significant(&step.step.alignment, 24, false);
+        eprintln!("joint {locus:?} {:?}: a {a} eta {} vanished {}", step.family, step.step.step, reading.vanished.contains(&(*locus, step.family)));
+    }
+}
