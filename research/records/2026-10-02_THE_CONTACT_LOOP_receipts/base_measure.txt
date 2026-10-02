@@ -1,0 +1,26 @@
+== the wave's base (base_measure.py over samples at main b796304d, three closes; the run 1,307,635 ms against a projection of 1,321 s, inside its 1,800 s deadline)
+3330 cells; the wave read from cell 1070
+  even base: after the first aeon 15341375/2^11 bits
+  the wave's base: after the first aeon 15289889/2^11 bits
+  a shuffled wave's base: after the first aeon 15285139/2^11 bits
+== the tree's own bases (tree_base.py), the standing cut
+even development 9191310/2^9 held out 14158263/2^12
+root development 8911997/2^9 held out 13872419/2^12
+parent development 9824207/2^9 held out 15728167/2^12
+halfroot development 8933100/2^9 held out 13753683/2^12
+halfroot-g4 development 8934303/2^9 held out 13765101/2^12
+shared-g4 development 8936120/2^9 held out 13750868/2^12
+== the choosing cut
+even development 14662032/2^4 held out 8637060/2^6
+root development 14604178/2^4 held out 8629383/2^6
+halfroot development 14497403/2^4 held out 8551159/2^6
+shared-g4 development 14500844/2^4 held out 8552417/2^6
+== the leaf counts (leaf_counts.py)
+development 9191310/2^9 bits, held out 14158263/2^12 bits
+  leaf count 0: development 151 digits, 9895936/2^16 bits (share 9031696/2^30); held out 0 digits, 0 bits (share 0)
+  leaf count 1: development 16001 digits, 12823444/2^11 bits (share 11703538/2^25); held out 4145 digits, 10386477/2^13 bits (share 12307736/2^25)
+  leaf count 2-3: development 9397 digits, 15920517/2^12 bits (share 14530135/2^26); held out 2413 digits, 12711877/2^14 bits (share 15063282/2^26)
+  leaf count 4-7: development 5483 digits, 10804821/2^12 bits (share 9861206/2^26); held out 1290 digits, 8998417/2^14 bits (share 10662917/2^26)
+  leaf count 8-15: development 3535 digits, 14211327/2^13 bits (share 12970213/2^27); held out 646 digits, 10855783/2^15 bits (share 12863853/2^27)
+  leaf count 16-63: development 3591 digits, 8692139/2^12 bits (share 15866062/2^27); held out 772 digits, 12297419/2^15 bits (share 14572158/2^27)
+  leaf count 64+: development 1506 digits, 9483908/2^13 bits (share 8655653/2^27); held out 254 digits, 10292809/2^16 bits (share 12196741/2^28)

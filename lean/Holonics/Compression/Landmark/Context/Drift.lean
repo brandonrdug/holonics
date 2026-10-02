@@ -58,7 +58,9 @@ uniform    θ ≤ 2u above D, θ ≤ u at D, |ln c| ≤ ρ:
    ideal, and one cell within `t₀ D² (u + ρ) + (2D + 1)u`. At `u = ε/μ̂ = 2^(−M_p−1)/μ̂`,
    `ρ = 2^(1−W) + ρ_c`, `t₀ ≤ n*` and `P = D`, the cell bound is the Rust rule's
    `(n* P² + 2P + 1) ε/μ̂ + n* P² (2^(1−W) + ρ_c)` before the digits `B` and `log₂ e < 3/2`
-   (`Landmarks::face_rule`).
+   (`Landmarks::face_rule`). The rule's `P` is `LandmarkDeclaration::path_depth`: `D` on the
+   cell branch alone, and with the bundle branch both branches' depths plus `2`, at least each
+   branch's depth (the bound grows with `D`; the join's own drift is not stated here).
 
 [agent-inferred] **The passage is sharper than the cell.** A cell's read carries its nodes' drift,
 which grows with their arrivals (the `t₀` above); the passage's code does not, because each node's
@@ -72,7 +74,7 @@ receiver's resolution.
 [conditional] **What the theorems cover in the Rust.**
 - **The carried certificates.** The deposit carries each node's `excess` (its routed
   subsequence's executed code against the ideal) and `drift` (`Δ ≥ |ln β̂ − ln β|`): it adds the
-  read's `θ`, twice the rebases' units, the child's increment and a split's units to the excess,
+  read's `θ`, twice the rebases' units, the child's increment and twice a split's units to the excess,
   and the child's increment and the rebases' units to the drift (`Law::apply_branch`). Item 2
   states the excess's law with each factor counted once, so the doubled rebase units are
   conservative; item 5's `cell_drift` is the read's `ρ ≤ Σ drift + Σ θ`.
@@ -598,9 +600,9 @@ theorem leaf_bound (N : ℕ) (s : List Ltr) (hs : s.length = D) :
 /-- [proved-derived] **`passage_drift`: the executed code against the ideal code over the
 passage.** Over the first `N` observations the executed tree's code differs from the ideal tree's
 by at most each observation's costs summed down its path:
-`|Σ_(t<N) (ln q̂_t − ln q_t)| ≤ Σ_(t<N) Σ_(d ≤ D) (θ_d + 2|ln c_d|)` (no `c` at `D`). The drift is the
-rounding and the factors summed over the passage once, never compounded: on average a reading
-pays `D + 1` roundings and `2D` factors, whatever the passage's length. -/
+`|Σ_(t<N) (ln q̂_t − ln q_t)| ≤ Σ_(t<N) Σ_(d ≤ D) (θ_d + |ln c_d|)` (no `c` at `D`). The drift is the
+rounding and the factors summed over the passage once, never compounded: each reading pays its
+path's `D + 1` roundings and `D` factors, whatever the passage's length. -/
 theorem passage_drift (N : ℕ) :
     |∑ t ∈ range N, (Real.log (T.qh [] t) - Real.log (T.q [] t))| ≤
       ∑ t ∈ range N, ∑ d ∈ range (D + 1), T.cost d t := by
@@ -704,7 +706,7 @@ theorem sum_levels_below (D : ℕ) : ∑ d ∈ range D, (2 * ((D : ℝ) - d) - 1
 
 /-- [proved-derived] **`passage_drift_uniform`.** With every internal rounding at most `2u`, every
 leaf rounding at most `u` and every factor within `ρ` in `ln`, the executed code over `N`
-observations is within `N((2D + 1)u + 2Dρ)` of the ideal code: per reading `(2D + 1)u + 2Dρ`,
+observations is within `N((2D + 1)u + Dρ)` of the ideal code: per reading `(2D + 1)u + Dρ`,
 independent of the passage's length. In the Rust's units `u = ε/μ̂ = 2^(−M_p−1)/μ̂` and
 `ρ = 2^(1−W) + ρ_c` a factor's share. -/
 theorem passage_drift_uniform {u ρ : ℝ}
@@ -739,7 +741,7 @@ theorem passage_drift_uniform {u ρ : ℝ}
 `u, ρ ≥ 0`, the cell read at observation `t₀` is within `t₀ D² (u + ρ) + (2D + 1)u` of its ideal
 face in `ln`: the node at depth `d` carries at most `t₀` earlier arrivals, each with
 `2(D − d) − 1` units `u + ρ` below it, and `Σ_(d<D) (2(D − d) − 1) = D²`. At `t₀ ≤ n*` and the
-path depth `P = D` this is the Rust rule's `(n* P² + 2P + 1) ε/μ̂ + n* P² ρ` before the digits `B`
+path depth `P = D` (one branch; `P ≥ D` with the bundle branch) this is the Rust rule's `(n* P² + 2P + 1) ε/μ̂ + n* P² ρ` before the digits `B`
 and `log₂ e < 3/2` (`Landmarks::face_rule`). -/
 theorem cell_drift_uniform {u ρ : ℝ} (hu : 0 ≤ u) (hρ : 0 ≤ ρ)
     (hθ : ∀ s t, s.length < D → s <+: T.a t → T.θ s t ≤ 2 * u)
