@@ -3173,16 +3173,24 @@ pub struct Reread {
 /// [`ReleaseExcursion::monotone`] (the incumbent as checkpoint, no height) is the strict decrease by
 /// disjoint enclosures, the former rule (`checkpoint_one_iff`).
 ///
-/// What the parameters must satisfy (§12): `height ≥ 0`, which bounds every adopted comparison by
-/// the opening's plus `height` (`excursion_le_start`); `σ ≥ 0`, so the checkpoints descend
-/// (`checkpoint_descends`); `σ` at least a positive share of the window's certified first-order
-/// descent, for the windows' slopes to be summable (`floor_large_slopes_card`).
+/// The parameters, from the chain's laws (§12; the record states each step):
+/// - `height`: `None` within a window. The entry bound bounds the comparison, which supplies a
+///   height (`excursion_of_bounded`), so no per-step own check is owed inside a window; `Some(0)`
+///   with the incumbent as checkpoint is the monotone guard.
+/// - `σ`: one receiver grain over the batch's decisions ([`ReleaseExcursion::grain`]). A decrease
+///   below it is not a reading, and with it at most `(f 0 − m)/σ` windows close
+///   (`grain_windows_bounded`): the chain releases at the grain.
+/// - `W`: at least two moves, since a flip is answered only by the move after it
+///   (`one_move_closes_iff`), and at least `(F + σ)/d` for flips `F` against a per-move certified
+///   decrease of at most `d` (`window_length_lower`). Its upper end is the chain's choice: it bounds
+///   the moves a window that does not close spends.
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct ReleaseExcursion {
     /// The checkpoint's own comparison; `None` is the incumbent's.
     pub checkpoint: Option<ExactInterval>,
-    /// How far the own release may rise above the checkpoint within the window.
-    pub height: Rat,
+    /// How far the own release may rise above the checkpoint within the window; `None`, unchecked
+    /// (the entry bound bounds it).
+    pub height: Option<Rat>,
 }
 
 impl ReleaseExcursion {
@@ -3190,15 +3198,37 @@ impl ReleaseExcursion {
     pub fn monotone() -> Self {
         Self {
             checkpoint: None,
-            height: Rat::zero(),
+            height: Some(Rat::zero()),
         }
     }
 
+    /// A window from a held checkpoint, the own release unchecked until the window's close.
+    pub fn from(checkpoint: ExactInterval) -> Self {
+        Self {
+            checkpoint: Some(checkpoint),
+            height: None,
+        }
+    }
+
+    /// **One receiver grain over a batch** (`σ`, in nats): `decisions · tolerance · ln 2`, read at
+    /// the upper end of `ln 2`'s enclosure, so a closing window certifies at least the grain.
+    pub fn grain(
+        decisions: usize,
+        tolerance: &Rat,
+    ) -> Result<Rat, crate::ratio::algebraic::ExactValueError> {
+        let ln_two = ln_enclosure(&Rat::from_integer(BigInt::from(2)))?;
+        Ok(Rat::from_integer(BigInt::from(decisions)) * tolerance * ln_two.upper)
+    }
+
     /// The step's guard on a successor's own comparison: `own.upper < checkpoint.lower + height`,
-    /// the checkpoint the incumbent's (`before`) when none is held.
+    /// the checkpoint the incumbent's (`before`) when none is held; every successor when the height
+    /// is unchecked.
     pub fn admits(&self, before: &ExactInterval, own: &ExactInterval) -> bool {
         let checkpoint = self.checkpoint.as_ref().unwrap_or(before);
-        own.upper < &checkpoint.lower + &self.height
+        match &self.height {
+            Some(height) => own.upper < &checkpoint.lower + height,
+            None => true,
+        }
     }
 
     /// The window's close: the own comparison at its end strictly below the checkpoint's lower end

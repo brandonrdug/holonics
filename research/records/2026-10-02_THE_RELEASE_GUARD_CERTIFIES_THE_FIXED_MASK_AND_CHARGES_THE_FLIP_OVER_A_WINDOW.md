@@ -82,30 +82,53 @@ checkpoint.
   (`floor_large_slopes_card`). (The lattice-floor stall `K u²/32` is on its own parked branch; the
   `m5`–`m7` refusals are all `OwnNotBelow`, so it is not the cause.)
 
-## 4. The parameters, from measurement
+## 4. The parameters, from the chain's laws
 
-`h`, `W` and `σ` are the chain's, read from the plain-gradient path:
-- **Height.** The float path's excursions above its running minimum peak at `1/500` to `481/1000` nats
-  per decision. In the native comparison's units (the batch's total), `h` is the per-decision peak
-  times the batch's decisions.
-- **Length.** The float excursions last 20 to 60 of its steps. The native window `W` counts adopted
-  moves, so it owes the float steps per native move.
-- **Decrease.** `σ` is a positive share of the window's certified first-order descent (`σ ≥ 0` for
-  §3's descent, `σ > 0` for summable slopes).
+The float path's numbers check these; they do not set them.
 
-[agent-inferred] Both conversions, and `m7`'s jump per decision with the decisions that flip there,
-are the main line's next read. Until then the owner runs with the monotone guard, which is the former
-rule, so nothing changes.
+1. **The height `h`: derived, and not a parameter inside a window.** The entry bound holds every
+   adopted `E` within `2^3` an entry, so the comparison is bounded on the adopted states, between a
+   floor `m` and some `B`. A bounded comparison satisfies every window's excursion with
+   `h = B − m` (`excursion_of_bounded`). So no per-step check of the own release is owed inside a
+   window, and the owner's window runs with the height unchecked (`ReleaseExcursion::from`). The
+   largest flip the lock rule allows on one move is bounded by the same range. A finite `h` below
+   `B − m` would only end futile windows sooner; that is the window's length's job (3).
+2. **The decrease `σ`: derived from the receiver's grain.** A decrease below the grain is not a
+   reading: the comparison is read at `tolerance` bits per decision, so a window closes by at least
+   one grain over the batch, `σ = decisions · tolerance · ln 2` nats (`ReleaseExcursion::grain`, at
+   the upper end of `ln 2`'s enclosure). Then at most `(f 0 − m)/σ` windows close
+   (`grain_windows_bounded`): the chain releases at the grain instead of running on. The tolerance is
+   the declared `1/16` bit, the root of every scale (PR #150); under #150's derived grain `1/L(N)`
+   it would refine with the readings.
+3. **The length `W`: bounded below by the laws, its upper end a choice.**
+   - **At least two moves.** A window of one closes only when the move's own fixed-mask decrease
+     covers its flip (`one_move_closes_iff`). That decrease was certified on the incumbent's mask,
+     before the flip was read. The flip is re-read once, at the next move, so only a later move can
+     answer it.
+   - **At least `(F + σ)/d` moves** for flips summing to `F` against a per-move certified decrease
+     of at most `d` (`window_length_lower`). So two is a lower bound, not the length. At `m7`,
+     `F = 34038/4096`. If no move certifies more than the `359/4096` that `m7`'s smallest rung did,
+     the flip needs at least 95 moves. A move that certifies more shortens that in proportion.
+   - **The upper end is the chain's choice.** It bounds the moves a window that does not close
+     spends before returning to its checkpoint. No law of the chain fixes it.
+
+[agent-inferred] The checks owed from the main line:
+- the float path's excursions per decision against the grain;
+- its 20 to 60 steps against `(F + σ)/d`, once steps convert to moves;
+- `m7`'s per-rung certified decreases, which give `d`.
+
+Until then the owner runs the monotone guard, which is the former rule.
 
 ## 5. The owner
 
-`hnn::executed::ReleaseExcursion` (a held checkpoint, `None` for the incumbent, and `height`) replaces
-the `OwnNotBelow` rule in the ladder:
-- `admits`: `own.upper < checkpoint.lower + height`.
+`hnn::executed::ReleaseExcursion` (a held checkpoint, `None` for the incumbent, and an optional
+`height`) replaces the `OwnNotBelow` rule in the ladder:
+- `admits`: `own.upper < checkpoint.lower + height`, every successor when the height is unchecked.
+- `grain`: `σ`, one receiver grain over the batch.
 - `closes`: `end.upper < checkpoint.lower − σ`.
 
 `executed_move_in` passes `ReleaseExcursion::monotone()`, exactly the former rule.
-`executed_move_guarded` takes the chain's excursion. The chain holds the checkpoint, counts the
+`executed_move_guarded` takes the chain's excursion. `ReleaseExcursion::from` opens a window at a held checkpoint. The chain holds the checkpoint, counts the
 window and returns to the checkpoint when a window does not close. The fixed mask's `NotBelow` is
 unchanged.
 

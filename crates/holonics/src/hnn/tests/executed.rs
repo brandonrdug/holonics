@@ -293,11 +293,15 @@ fn the_monotone_excursion_is_the_strict_decrease_and_a_height_admits_a_bounded_r
     }
     let excursion = ReleaseExcursion {
         checkpoint: Some(interval(9, 10)),
-        height: integer(3),
+        height: Some(integer(3)),
     };
     assert!(excursion.admits(&before, &interval(10, 11)));
     assert!(!excursion.admits(&before, &interval(11, 12)));
+    assert!(ReleaseExcursion::from(interval(9, 10)).admits(&before, &interval(99, 100)));
     let checkpoint = interval(9, 10);
     assert!(ReleaseExcursion::closes(&checkpoint, &interval(5, 6), &integer(2)));
     assert!(!ReleaseExcursion::closes(&checkpoint, &interval(6, 7), &integer(2)));
+    // One grain of `1/16` bit over 64 decisions is `4 ln 2` nats, read above `ln 2`.
+    let grain = ReleaseExcursion::grain(64, &rat(1, 16)).unwrap();
+    assert!(grain > rat(2772, 1000) && grain < rat(2773, 1000));
 }

@@ -97,7 +97,11 @@ the laws that covector and its certified step stand on (the diagnosis record,
    opening by more than `h` (`excursion_le_start`), and the decreases are summable
    (`checkpoints_sum_le`, `large_windows_card`). A divergent step sum, which the lattice floor
    supplies (`floor_steps_diverge`), drives the windows' least slope below every `ε`
-   (`schedule_frequently_small`, `floor_large_slopes_card`) (§12).
+   (`schedule_frequently_small`, `floor_large_slopes_card`). The parameters follow from the laws:
+   a bounded comparison supplies the height (`excursion_of_bounded`); a window of one answers no
+   flip (`one_move_closes_iff`) and a closing window is at least its flips over the largest
+   per-move decrease (`window_length_lower`); a grain's decrease per window ends the chain
+   (`grain_windows_bounded`) (§12).
 
 [open] (#62) The existence of the differentiable root path (the implicit function theorem at a
 simple root, from `Φ`'s strict differentiability), Jacobi's formula `∂_η det(λ − M − ηΔM) =
@@ -1710,6 +1714,43 @@ theorem floor_large_slopes_card {f : ℕ → ℝ} {t : ℕ → ℕ} {W : ℕ} {h
       mul_le_mul_of_nonneg_left (Finset.mem_filter.mp hb).2 hc.le
   linarith
 
+/-- [proved-derived; formal-checked] **A window of one move must pay its flip from the same move**:
+`f (a+1) ≤ f a − σ` iff the move's flip is at most its fixed-mask decrease less `σ`. The decrease
+was certified before the flip was read, so this window answers no flip. -/
+theorem one_move_closes_iff (f m : ℕ → ℝ) (a : ℕ) (σ : ℝ) :
+    f (a + 1) ≤ f a - σ ↔ f (a + 1) - m a ≤ (f a - m a) - σ := by
+  constructor <;> intro h <;> linarith
+
+/-- [proved-derived; formal-checked] **A window's length is at least its flips over the largest
+per-move decrease**: if a window from `a` to `b` closes, every move's certified fixed-mask decrease
+is at most `d`, and its flips sum to `F`, then `F + σ ≤ (b − a) d`. -/
+theorem window_length_lower (f m : ℕ → ℝ) {a b : ℕ} (hab : a ≤ b) {σ d : ℝ}
+    (hclose : f b ≤ f a - σ) (hd : ∀ k ∈ Finset.Ico a b, f k - m k ≤ d) :
+    ∑ k ∈ Finset.Ico a b, (f (k + 1) - m k) + σ ≤ ((b - a : ℕ) : ℝ) * d := by
+  have h := (window_closes_iff f m hab σ).mp hclose
+  have hsum : ∑ k ∈ Finset.Ico a b, (f k - m k) ≤ ∑ _k ∈ Finset.Ico a b, d :=
+    Finset.sum_le_sum hd
+  rw [Finset.sum_const, Nat.card_Ico, nsmul_eq_mul] at hsum
+  linarith
+
+/-- [proved-derived; formal-checked] **A bounded comparison supplies the height**: if every adopted
+comparison lies in `[m, B]`, every window's excursion holds with `h = B − m`, so the height is not a
+free parameter once the comparison is bounded (the entry bound bounds it). -/
+theorem excursion_of_bounded (f : ℕ → ℝ) (t : ℕ → ℕ) {m B : ℝ} (hm : ∀ k, m ≤ f k)
+    (hB : ∀ k, f k ≤ B) (n j : ℕ) : f j ≤ f (t n) + (B - m) := by
+  linarith [hm (t n), hB j]
+
+/-- [proved-derived; formal-checked] **A decrease of one grain per window ends the chain**: with
+every `σ n ≥ g > 0`, `n` closed windows need `n g ≤ f 0 − m`, so at most `(f 0 − m)/g` windows
+close: the chain releases at the receiver's grain. -/
+theorem grain_windows_bounded {f : ℕ → ℝ} {t : ℕ → ℕ} {W : ℕ} {h : ℝ} {σ : ℕ → ℝ}
+    (g : CheckpointGuard f t W h σ) {γ : ℝ} (hγ : ∀ n, γ ≤ σ n) {m : ℝ} (hm : ∀ k, m ≤ f k)
+    (n : ℕ) : (n : ℝ) * γ ≤ f 0 - m := by
+  have hsum := checkpoints_sum_le g hm n
+  have : ∑ _b ∈ Finset.range n, γ ≤ ∑ b ∈ Finset.range n, σ b := Finset.sum_le_sum fun b _ => hγ b
+  rw [Finset.sum_const, Finset.card_range, nsmul_eq_mul] at this
+  linarith
+
 end ReleaseGuard
 
 section Audit
@@ -1788,6 +1829,10 @@ section Audit
 #print axioms schedule_frequently_small
 #print axioms floor_steps_diverge
 #print axioms floor_large_slopes_card
+#print axioms one_move_closes_iff
+#print axioms window_length_lower
+#print axioms excursion_of_bounded
+#print axioms grain_windows_bounded
 
 end Audit
 
