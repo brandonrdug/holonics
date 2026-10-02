@@ -1074,7 +1074,9 @@ impl std::fmt::Display for Capacity {
 /// `λ_d = 0`), the declared population `n*` bounding the passage, the receiver's grain `L_R`, the
 /// declared letter family, the declared stop-weight law ([`StopPrior`], read at each node's
 /// depth in its branch's letters; the joins of an enlarged tree keep their own `β = 1`), and the
-/// declared node law's capacity ([`Capacity`], the register's capacity; `Unbounded` is the KT node).
+/// declared node law's capacity ([`Capacity`], the register's capacity; `Unbounded` is the KT node),
+/// and the node's prior mass exponent `j` (module header, "The prior mass"): each digit's two
+/// masses start at `2^(−j)`, so the node's face is `(2^j n_b + 1)/(2^j n + 2)`, KT at `j = 1`.
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct LandmarkDeclaration {
     pub alphabet: usize,
@@ -1085,6 +1087,7 @@ pub struct LandmarkDeclaration {
     pub family: LetterFamily,
     pub prior: StopPrior,
     pub capacity: Capacity,
+    pub mass: u32,
 }
 
 impl LandmarkDeclaration {
@@ -1178,22 +1181,23 @@ pub fn odometer_digits(alphabet: usize) -> u64 {
     ceil_log2(&BigUint::from(alphabet))
 }
 
-/// `K = 2n* + 2`: a binary KT face after at most `n*` arrivals is at least `1/K`.
-fn floor_reciprocal(population: u64) -> BigUint {
-    BigUint::from(population) * 2u32 + 2u32
+/// `K = 2^j n* + 2`: a binary face at prior mass `2^(−j)` after at most `n*` arrivals is at least
+/// `1/K` (`2n* + 2` at KT's `j = 1`).
+fn floor_reciprocal(population: u64, mass: u32) -> BigUint {
+    (BigUint::from(population) << mass as usize) + 2u32
 }
 
 /// [definition; agent-inferred] **The path lattice's width** `M_p`: the least `M` with
-/// `2^M ≥ 3 B L_R (2n* + 2)(n* P² + 2P + 1)`, which holds the lattice's rounding within a quarter
-/// grain a cell (module header, "The widths").
-pub fn face_bits(population: u64, digits: u64, grain: u64, depth: u64) -> u64 {
+/// `2^M ≥ 3 B L_R (2^j n* + 2)(n* P² + 2P + 1)` at prior mass `2^(−j)`, which holds the lattice's
+/// rounding within a quarter grain a cell (module header, "The widths").
+pub fn face_bits(population: u64, digits: u64, grain: u64, depth: u64, mass: u32) -> u64 {
     let (n, d) = (BigUint::from(population), BigUint::from(depth));
     let terms = &n * &d * &d + &d * 2u32 + 1u32;
     ceil_log2(
         &(BigUint::from(3u32)
             * BigUint::from(digits)
             * BigUint::from(grain)
-            * floor_reciprocal(population)
+            * floor_reciprocal(population, mass)
             * terms),
     )
 }
@@ -1226,6 +1230,8 @@ pub struct Widths {
     pub carrier: u64,
     pub certificate: u64,
     pub rebase: u64,
+    /// The prior mass exponent `j` the faces' floor `1/(2^j n* + 2)` reads.
+    pub mass: u32,
 }
 
 impl Widths {
@@ -1245,8 +1251,14 @@ impl Widths {
         let carrier = carrier.unwrap_or_else(|| {
             carrier_width(declaration.population, digits, declaration.grain, depth)
         });
-        let face = face_bits(declaration.population, digits, declaration.grain, depth);
-        let kappa = floor_reciprocal(declaration.population).bits();
+        let face = face_bits(
+            declaration.population,
+            digits,
+            declaration.grain,
+            depth,
+            declaration.mass,
+        );
+        let kappa = floor_reciprocal(declaration.population, declaration.mass).bits();
         let rebase = if 2 * carrier + kappa + face + 1 > u64::from(u128::BITS) {
             126u64.saturating_sub(carrier)
         } else {
@@ -1258,6 +1270,7 @@ impl Widths {
             carrier,
             certificate: face + carrier,
             rebase,
+            mass: declaration.mass,
         }
     }
 
@@ -1265,9 +1278,9 @@ impl Widths {
     /// `max(2M + 2, M + κ + 3)` (its parts divided apart, [`lattice_mix`]; the two faces' blend
     /// `2M + 2`), the stop weight `M + W + 3` (decided before its division past `2^(M+1)`,
     /// [`Beta::stop_weight`]), the β step's carrier `W + κ + M` and, unless the carrier rebases,
-    /// its mantissa division `2W + κ + M + 1`, with `κ` the bits of `2n* + 2`.
+    /// its mantissa division `2W + κ + M + 1`, with `κ` the bits of `2^j n* + 2`.
     pub fn operand_bits(&self, population: u64) -> u64 {
-        let kappa = floor_reciprocal(population).bits();
+        let kappa = floor_reciprocal(population, self.mass).bits();
         let (m, w) = (self.face, self.carrier);
         let division = if self.rebase > 0 {
             self.rebase + w + 1
@@ -1293,14 +1306,14 @@ impl Widths {
     /// widths; the host's split operands ([`lattice_mix`], [`Beta::stop_weight`]) return the same
     /// integers wherever both admit.
     pub fn single_division_admitted(&self, population: u64) -> bool {
-        let kappa = floor_reciprocal(population).bits();
+        let kappa = floor_reciprocal(population, self.mass).bits();
         (2 * self.face + kappa + 3).max(2 * self.carrier + self.face + 3) <= u64::from(u128::BITS)
     }
 
     /// Whether the widths at a population admit every product in `u128`, the carrier rebase
     /// keeping at least `W` bits.
     fn admitted(&self, population: u64) -> bool {
-        let kappa = floor_reciprocal(population).bits();
+        let kappa = floor_reciprocal(population, self.mass).bits();
         let rebase_needed = 2 * self.carrier + kappa + self.face + 1 > u64::from(u128::BITS);
         let rebase_kept = !rebase_needed || 126u64.saturating_sub(self.carrier) >= self.carrier;
         rebase_kept && self.lattice_operands(kappa) <= u64::from(u128::BITS)
@@ -1919,11 +1932,18 @@ impl Arena {
 
     /// One arrival of `symbol` counted at the path's nodes whose bottom is at least `forced`, each
     /// register carried at the ceiling (the register's capacity).
-    fn count(&mut self, nodes: &[u32], forced: usize, symbol: usize, ceiling: Option<u64>) {
+    fn count(
+        &mut self,
+        nodes: &[u32],
+        forced: usize,
+        symbol: usize,
+        ceiling: Option<u64>,
+        unit: u32,
+    ) {
         for &node in nodes {
             if self.bottom(node) >= forced {
                 let halves = &mut self.halves[node as usize];
-                halves[symbol] += 2;
+                halves[symbol] += unit;
                 carry_at(ceiling, halves);
             }
         }
@@ -2312,12 +2332,22 @@ fn check_declaration(declaration: &LandmarkDeclaration) -> Result<(), ContextErr
     if declaration.population == 0 || declaration.grain == 0 {
         return Err(ContextError::NonpositiveDeclaration);
     }
-    if declaration.population >= u64::from(u32::MAX / 2) || declaration.grain > u64::from(u32::MAX)
+    if declaration.mass == 0
+        || declaration.mass >= 32
+        || u64::from(u32::MAX).checked_shr(declaration.mass).is_none_or(|top| declaration.population >= top / 2)
+        || declaration.grain > u64::from(u32::MAX)
     {
         return Err(shape(
-            "a population whose half-unit counts and a grain that fit 32 bits",
+            "a prior mass 2^(−j), j ≥ 1, whose masses 2^j n + 1 and a grain that fit 32 bits",
             (u32::MAX / 2) as usize,
             usize::try_from(declaration.population).unwrap_or(usize::MAX),
+        ));
+    }
+    if declaration.mass != 1 && declaration.capacity != Capacity::Unbounded {
+        return Err(shape(
+            "a register's ceiling on KT's half-unit masses only (prior mass 1/2)",
+            1,
+            declaration.mass as usize,
         ));
     }
     if declaration.forced > declaration.depth {
@@ -2582,6 +2612,8 @@ struct Law {
     founding: Vec<Chart>,
     sums: Vec<Vec<u64>>,
     ceiling: Option<u64>,
+    /// The masses' increment an arrival adds, `2^j` (module header, "The prior mass").
+    unit: u32,
 }
 
 /// [definition] **The landmark tree, executed** (module header): the declaration, its derived
@@ -2678,6 +2710,7 @@ impl Law {
             .collect();
         let sums = declaration.rung_sums();
         let ceiling = declaration.capacity.ceiling_halves();
+        let unit = 1u32 << declaration.mass;
         Self {
             declaration,
             widths,
@@ -2686,6 +2719,7 @@ impl Law {
             founding,
             sums,
             ceiling,
+            unit,
         }
     }
 
@@ -3235,7 +3269,7 @@ impl Law {
         for &node in &path {
             if nodes.bottom(node) >= forced {
                 let halves = nodes.halves_mut(node);
-                halves[symbol] += 2;
+                halves[symbol] += self.unit;
                 carry_at(self.ceiling, halves);
             }
         }
@@ -3462,8 +3496,8 @@ impl Landmarks {
         self.nodes.passed
     }
 
-    /// **The tree's exact stored bits**: every half-unit mass `2C` (odd) as the ratio `(2C)/2`,
-    /// `bits(2C) + 2`, at the nodes whose bottom is at least their branch's `forced`; at each mixing
+    /// **The tree's exact stored bits**: every mass `2^j C + 1` (odd) as the ratio `(2^j C + 1)/2^j`,
+    /// `bits + 1 + j` (KT's half-unit `bits(2C + 1) + 2` at `j = 1`), at the nodes whose bottom is at least their branch's `forced`; at each mixing
     /// node (bottom below its branch's depth) and each join, β's odd numerator and odd denominator,
     /// `max(1, bits) + 1` each, and its exponent, `max(1, bits|e|) + 2` with its sign; each stored
     /// child's letter, `max(1, bits(letter)) + 1`; each node's bottom depth and its label end (an
@@ -3491,7 +3525,9 @@ impl Landmarks {
                 }
                 let masses: u64 = arena.halves[node]
                     .iter()
-                    .map(|&units| u64::from(u32::BITS - units.leading_zeros()) + 2)
+                    .map(|&units| {
+                        u64::from(u32::BITS - units.leading_zeros()) + 1 + u64::from(self.law.unit.trailing_zeros())
+                    })
                     .sum();
                 let beta = if at < branch.depth {
                     beta_bits(&self.nodes.charts[node].beta)
@@ -3562,7 +3598,7 @@ impl Landmarks {
         );
         let paths = &n * &d * &d;
         let floor = (BigInt::one() << face as usize)
-            / BigInt::from(floor_reciprocal(declaration.population));
+            / BigInt::from(floor_reciprocal(declaration.population, declaration.mass));
         let rounding = Rat::new(&paths + &d * 2 + 1, floor * 2);
         let splits = &paths + &d * &d;
         let mut rebases = Rat::from_integer(&paths + splits) * two_power(1 - carrier as i64);
@@ -4486,7 +4522,8 @@ impl IdealLandmarks {
             nodes.push(leaf);
         }
         let ceiling = self.declaration.capacity.ceiling_halves();
-        self.arena.count(&nodes, forced, symbol, ceiling);
+        let unit = 1u32 << self.declaration.mass;
+        self.arena.count(&nodes, forced, symbol, ceiling, unit);
     }
 }
 

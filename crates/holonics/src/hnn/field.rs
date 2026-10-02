@@ -236,8 +236,10 @@ pub struct ContactDeclaration {
 /// code tolerance `ε_bits` per cell, from which its grain `L_R = ⌈1/ε_bits⌉` is derived, the
 /// depth `D` of its landmark tree's address (the landmark tree; `hnn::receiving::landmark_declaration`):
 /// the receiving parametron's storage is the tree over the last `D` cells, and `D = 1` with the
-/// root's split forced is the region table; and the tree's declared stop-weight law
-/// (the declared stop prior; `compression::landmark::context::StopPrior`, the `½` stop prior at `StopPrior::half`).
+/// root's split forced is the region table; the tree's declared stop-weight law
+/// (the declared stop prior; `compression::landmark::context::StopPrior`, the `½` stop prior at `StopPrior::half`);
+/// and its nodes' prior mass exponent `j`, each digit's masses starting at `2^(−j)`
+/// (`compression::landmark::context::LandmarkDeclaration::mass`; KT at `j = 1`).
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct ReceiverDeclaration {
     pub ring: usize,
@@ -245,6 +247,7 @@ pub struct ReceiverDeclaration {
     pub tolerance: Rat,
     pub depth: usize,
     pub prior: StopPrior,
+    pub mass: u32,
 }
 
 /// [definition] **The crib as declared**: the `window` cells that open each aeon, read at `offset`.
@@ -294,7 +297,9 @@ impl FieldDeclaration {
     /// origin, pitch 0, node `k` of ring `g` at the quarter turn `⌊4k/d_g⌋` of the unit circle
     /// ([`FieldDeclaration::quarter_turn`]); `β_a = 2`, `L = 1`; `h = 1`, `Y_g = Y_a = 2`; `L_R = 16`
     /// (tolerance 1/16 bit); the receiver's landmark tree at address depth `D = 4` (the landmark tree, chosen
-    /// on the development cells in the landmark receipt);
+    /// on the development cells in the landmark receipt) and prior mass `2^(−3)` (chosen on the
+    /// development cells over the ladder `2^(−j)`, `j = 1..B`, charged `⌈log₂ B⌉ = 3` bits: the
+    /// contact loop record §25);
     /// `Δ = {1}`; the crib `W_crib = 64` at offset 1. The population is the cut's length. The carrier
     /// lattices follow [`FieldDeclaration::lattice_by_rule`]: `L = 9, 9, 10, 10` for the four rings'
     /// elements and standings, `10` for ring 2's receiving map, `9, 9, 10, 9` for the four channels,
@@ -349,6 +354,7 @@ impl FieldDeclaration {
                 tolerance: rat(1, 16),
                 depth: 4,
                 prior: StopPrior::half(),
+                mass: 3,
             }],
             crib: CribDeclaration {
                 window: 64,
@@ -1808,6 +1814,7 @@ impl Field {
                 .map(|&j| u64::from(j))
                 .collect();
             naturals(&mut code, &rungs);
+            natural(&mut code, u64::from(receiver.mass));
         }
         natural(&mut code, self.crib.window as u64);
         natural(&mut code, self.crib.offset as u64);

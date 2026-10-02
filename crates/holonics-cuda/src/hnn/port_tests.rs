@@ -92,6 +92,7 @@ fn chain_declaration(population: u64) -> FieldDeclaration {
             tolerance: rat(1, 16),
             depth: 2,
             prior: holonics::compression::landmark::context::StopPrior::half(),
+            mass: 1,
         }],
         crib: CribDeclaration {
             window: 16,

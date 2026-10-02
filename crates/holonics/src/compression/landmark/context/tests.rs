@@ -71,6 +71,7 @@ fn declaration(alphabet: usize, depth: usize) -> LandmarkDeclaration {
         family: LetterFamily::cells(),
         prior: StopPrior::half(),
         capacity: Capacity::Unbounded,
+        mass: 1,
     }
 }
 
@@ -510,9 +511,9 @@ fn landmark_code_length_meets_the_series() {
 /// residual per cell lies below half a grain; the reference oracle's width is `96 + 34`.
 #[test]
 fn landmark_widths_follow_the_passage_and_the_grain() {
-    assert_eq!(face_bits(6_148, 8, 16, 4), 39);
+    assert_eq!(face_bits(6_148, 8, 16, 4, 1), 39);
     assert_eq!(carrier_width(6_148, 8, 16, 4), 29);
-    assert_eq!(face_bits(6_148, 8, 16, 1), 35);
+    assert_eq!(face_bits(6_148, 8, 16, 1, 1), 35);
     assert_eq!(carrier_width(6_148, 8, 16, 1), 25);
     let declared = LandmarkDeclaration {
         population: 6_148,
@@ -1001,7 +1002,7 @@ fn landmark_tree_declares_past_the_old_refusal_and_stays_within_the_grain() {
     };
     let mut tree = Landmarks::new(declared.clone()).unwrap();
     let widths = tree.widths();
-    assert_eq!(widths.face, face_bits(population, 8, 16, 4));
+    assert_eq!(widths.face, face_bits(population, 8, 16, 4, 1));
     assert_eq!(widths.carrier, carrier_width(population, 8, 16, 4));
     assert_eq!((widths.face, widths.carrier, widths.rebase), (48, 33, 93));
     let kappa = 64 - (2 * population + 2).leading_zeros() as u64;
@@ -2234,4 +2235,55 @@ fn the_baselines_read_their_exact_code_lengths_by_the_binary_logarithm() {
         ppm.update(cell);
         counts[cell] += 1;
     }
+}
+
+/// **The prior mass** (module header, "The prior mass"): at `2^(−j)`, `j ∈ {1, 2, 3, 8}`, a fresh
+/// node's binary face after `n_b` of `n` arrivals is `(2^j n_b + 1)/(2^j n + 2)` in the oracle; the
+/// executed faces stay exactly normalized, within the rule and within their certificates of the
+/// oracle; and a deterministic run is coded more cheaply the smaller the prior mass. A ceiling
+/// below KT's half-unit masses is refused.
+#[test]
+fn the_prior_mass_reads_its_masses_and_keeps_the_rule() {
+    let alphabet = 5;
+    let stream: Vec<usize> = (0..40u64).map(|t| ((t * 7 + t / 3) % 5) as usize).collect();
+    let mut previous: Option<Rat> = None;
+    for mass in [1u32, 2, 3, 8] {
+        let declared = LandmarkDeclaration { mass, ..declaration(alphabet, 2) };
+        let mut tree = Landmarks::new(declared.clone()).unwrap();
+        let mut oracle = IdealLandmarks::new(declared.clone(), None).unwrap();
+        assert!(tree.face_rule() < rat(1, 32), "j = {mass}");
+        for (position, &cell) in stream.iter().enumerate() {
+            let here = address(&stream, position, 2);
+            let face = tree.face(&here, 16).unwrap();
+            assert_eq!(face.probabilities.iter().cloned().sum::<Rat>(), Rat::one());
+            let ideal: Rat = (0..alphabet)
+                .map(|class| oracle.probability(&here, class).unwrap())
+                .sum();
+            assert_eq!(ideal, Rat::one());
+            let reading = tree.receive(&here, cell).unwrap();
+            let face = oracle.receive(&here, cell).unwrap();
+            assert!(reading.residual <= tree.face_rule());
+            assert!(within(&reading.executed, &face, &reading.residual));
+        }
+        // A binary depth-0 tree after a run of three zeros reads (3·2^j + 1)/(3·2^j + 2).
+        let binary = LandmarkDeclaration { mass, ..declaration(2, 0) };
+        let mut run = IdealLandmarks::new(binary, None).unwrap();
+        let mut weight = Rat::one();
+        for _ in 0..3 {
+            weight *= run.receive(&[], 0).unwrap();
+        }
+        let unit = BigInt::one() << mass as usize;
+        let next = run.probability(&[], 0).unwrap();
+        assert_eq!(next, Rat::new(&unit * 3 + 1, &unit * 3 + 2));
+        if let Some(previous) = &previous {
+            assert!(weight > *previous);
+        }
+        previous = Some(weight);
+    }
+    let ceiling = LandmarkDeclaration {
+        mass: 3,
+        capacity: Capacity::Ceiling(4),
+        ..declaration(alphabet, 2)
+    };
+    assert!(Landmarks::new(ceiling).is_err());
 }

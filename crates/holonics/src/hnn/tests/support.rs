@@ -155,6 +155,7 @@ pub(super) fn small_field(
                 tolerance: rat(1, 16),
                 depth: 2,
                 prior: crate::compression::landmark::context::StopPrior::half(),
+                mass: 1,
             }],
             crib: CribDeclaration {
                 window: 16,

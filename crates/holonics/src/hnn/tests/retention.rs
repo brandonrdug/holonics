@@ -354,6 +354,7 @@ fn the_collapse_keeps_the_retained_remainders_and_clocks() {
             tolerance: crate::ratio::rat(1, 16),
             depth: 2,
             prior: crate::compression::landmark::context::StopPrior::half(),
+            mass: 1,
         },
     )
     .unwrap();
@@ -471,6 +472,7 @@ fn two_receiver_path() -> Field {
         tolerance: crate::ratio::rat(1, 16),
         depth: 2,
         prior: crate::compression::landmark::context::StopPrior::half(),
+        mass: 1,
     });
     Field::declare(declared.by_lattice_rule()).unwrap()
 }
@@ -543,6 +545,7 @@ fn the_boundary_reaches_the_pending_ratios_and_refuses_out_of_turn() {
             tolerance: crate::ratio::rat(1, 16),
             depth: 2,
             prior: crate::compression::landmark::context::StopPrior::half(),
+            mass: 1,
         },
     )
     .unwrap();

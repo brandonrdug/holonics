@@ -951,6 +951,7 @@ pub fn landmark_declaration_with(
         family,
         prior: receiver.prior.clone(),
         capacity: crate::compression::landmark::context::Capacity::Unbounded,
+        mass: receiver.mass,
     })
 }
 

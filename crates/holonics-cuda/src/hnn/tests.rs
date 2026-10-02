@@ -173,6 +173,7 @@ fn chain() -> Field {
                 tolerance: rat(1, 16),
                 depth: 2,
                 prior: holonics::compression::landmark::context::StopPrior::half(),
+                mass: 1,
             }],
             crib: CribDeclaration {
                 window: 16,
@@ -848,6 +849,7 @@ fn tree_declared(
         family: LetterFamily::cells(),
         prior: StopPrior::half(),
         capacity,
+        mass: 1,
     }
 }
 

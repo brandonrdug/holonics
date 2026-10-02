@@ -95,7 +95,10 @@
 //! by two of its ticks, put the newest datum's read more than eight chart units below its weight
 //! (`leaky_read_exceeds_chart_unit`, read on this ingest by the test
 //! `the_leaky_read_is_not_within_one_chart_unit_in_general`); one chart unit is an instance's
-//! reading (the many-turn test's passage), not the law's. A count that decays below half a lattice unit leaves the
+//! reading (the many-turn test's passage), not the law's. On campaign 1's own cut at the founding,
+//! with up to 22 cells between ring 0's ticks and up to 40 counts held, the read stays within `3/2`
+//! chart units of the transported weights, read at every seventh cell (the contact loop record §24).
+//! A count that decays below half a lattice unit leaves the
 //! record, so the record holds only what the transport still carries. It is a quotient of the
 //! passage sufficient for the transported open, never a list of cells. The modulus is the one the
 //! moment was opened at; a moment read at another modulus is refused ([`HnnError::Transport`]).

@@ -954,7 +954,13 @@ ticks every count is multiplied by `ρ`, and the cell then enters at its phase. 
 weighs its transported weight over a passage of any length, because the age is carried by the decay
 and not read from the phase. The counts are carried on `2^(−L_ν−m)`, `m = ⌈log₂(1/(1 − ρ))⌉`, each
 product read at the nearest point. A carried count then stays within `2^(−L_ν−m−1)/(1 − ρ) ≤
-2^(−L_ν−1)` of the exact decayed count, and a count below half a unit leaves the record. The offset
+2^(−L_ν−1)` of the exact decayed count, and a count below half a unit leaves the record. [Edit,
+October 2, from the Lean thread's proofs (#164): that bound holds on the ingest path; a section
+entry adds half a lattice unit; and the normalized read has no general one-chart-unit bound, since a
+burst into one phase rounds every count alike. On campaign 1's cut at `ρ₀`, with up to 22 cells
+between ring 0's ticks and up to 40 counts held, the read stays within `3/2` chart units of the
+exact transported weights, a relative error near `2^(−17)` in anchors of order one, so the
+founded result below is the short memory's, not the read's.] The offset
 counts decay the same way. The test reads a 400-cell passage of many turns on campaign 1's field
 within one population-chart unit of the brute-force transported weights; at modulus one the moment
 reads what it read before (the 267 `hnn` tests pass). The record is a quotient sufficient for the
@@ -1013,3 +1019,61 @@ reading), and recency at the founding duplicates the tree. The next loop reads w
 lags on the aeons whose contexts recur: its estimator at a context seen a few times, against what
 its own counts would support. A classical compressor stays an exterior yardstick, never a machine
 part.
+
+## 25. The tree's prior mass: KT's half per digit was the bottleneck
+
+**The cause.** The landmark tree emits a cell as its eight odometer digits, and every node holds
+binary Krichevsky–Trofimov masses, `(2n_b + 1)/(2n + 2)`: a prior mass of `½` on each digit. A
+context seen a few times, always followed by the same cell, still pays `log₂((2n + 2)/(2n + 1))`
+on each of its digits, and the stop weight keeps mixing the shallower nodes until the deep node's
+evidence outweighs them. That is the lag §24 located in the aeons whose contexts recur. An exterior
+replica of the count face (`tree_estimator.py`), at mass `½`, matches the machine's tree aeon by
+aeon to within two bits
+([replica](2026-10-02_THE_CONTACT_LOOP_receipts/tree_estimator_replica.txt)).
+
+**The law** (`compression::landmark::context`, `LandmarkDeclaration::mass`; the card's kernel
+mirrors it). A node's two masses start at `2^(−j)`, so its face is `(2^j n_b + 1)/(2^j n + 2)`, KT at
+`j = 1`. Its floor is `1/(2^j n* + 2)`, so the path lattice `M_p` widens by `j − 1` bits (`41` for
+campaign 1 at `j = 3`); the rule, the certificates and the exact normalization are unchanged
+(`the_prior_mass_reads_its_masses_and_keeps_the_rule`). A register's ceiling stays on KT's
+half-unit masses and is refused at another mass.
+
+**The choice, by the declared stop prior's method** (the September 26 record, §1: development cells
+only, the family charged). The family is the dyadic ladder `j = 1..B`, `B = 8` the odometer digits:
+at `j = B` a digit's prior mass is `2^(−B) = 1/|A|`, one class's share of the unit cell, where the
+ladder ends. The receiver's tree alone, prequential over the cut
+([ladder](2026-10-02_THE_CONTACT_LOOP_receipts/prior_mass_ladder.txt), `hnn_exposure prior-mass
+ladder`, 1,333 ms):
+
+| `j` | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 |
+|---|---|---|---|---|---|---|---|---|
+| development (bits, `+ ε`) | `18539 + 6/16` | `18100 + 0/16` | **`17959 + 1/16`** | `18057 + 3/16` | `18284 + 11/16` | `18572 + 6/16` | `18881 + 4/16` | `19190 + 5/16` |
+| held out | `3718 + 5/16` | `3548 + 13/16` | `3467 + 8/16` | `3455 + 2/16` | `3487 + 5/16` | `3542 + 7/16` | `3608 + 5/16` | `3680 + 3/16` |
+
+The development cells choose `j = 3`, charged `⌈log₂ 8⌉ = 3` bits. Campaign 1 declares it
+(`FieldDeclaration::campaign_one`, coded in the field's description). In the replica a mixture of the
+eight masses in each digit tree, the stop mixture's own form, codes 18 bits below the chosen mass over
+the cut: a lead, not adopted.
+
+**The gate: campaign 1's exposure at `n*`**
+([exposure](2026-10-02_THE_CONTACT_LOOP_receipts/prior_mass_exposure.txt), 686,915 ms against
+596 s projected, inside the 720 s deadline).
+
+| Reading | KT (§19) | Prior mass `2^(−3)` |
+|---|---|---|
+| held out, model − PPM-2 | `−208 + 0/16 + ε` bits | **`−453 + 13/16 + ε` bits** |
+| held out, the tree alone − PPM-2 | `−196 + 7/16 + ε` | `−447 + 10/16 + ε` |
+| held out, the wave's contribution | `−13 + 9/16 + ε` | `−6 + 3/16 + ε` |
+| training, model − PPM-2 | `−699 + 8/16 + ε` | `−1239 + 10/16 + ε` |
+| training, the wave's contribution | `−115 + 15/16 + ε` | `−74 + 7/16 + ε` |
+
+**The gate passes.** On the 1,190 held-out cells, scored before their deposits, the model's code
+falls by about 246 bits, a fifth of a bit a cell, to `3460 + ε` bits: 127 bits below PPM order 4,
+the best exterior order (§23). The model codes below PPM-4 in every aeon now
+(`4843 + 2/16`, `3859 + 10/16`, `3585 + 15/16`, `4023 + 2/16`, `4376 + 10/16`, `659 + 11/16` bits
+against §24's PPM-4 row). The wave still lowers the code on top of the stronger tree, by less.
+
+[agent-inferred] This is the largest single gain in the line, and it came from the receiving
+tree's own estimator, not from the wave, the contacts or the receiver. The wave's share is now about
+`1/190` bit a held-out cell. The next measurements are the per-digit-tree mixture of prior masses
+(the replica's lead) and what the wave's long-range content adds to the stronger tree.

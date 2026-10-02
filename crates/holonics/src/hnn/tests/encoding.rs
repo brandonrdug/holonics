@@ -170,6 +170,7 @@ fn crib_field() -> Field {
                 tolerance: rat(1, 16),
                 depth: 2,
                 prior: StopPrior::half(),
+                mass: 1,
             }],
             crib: CribDeclaration {
                 window: 16,

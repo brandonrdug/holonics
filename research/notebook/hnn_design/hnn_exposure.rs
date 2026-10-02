@@ -233,6 +233,7 @@ fn main() {
     let mut samples_out: Option<String> = None;
     let mut refining = false;
     let mut founded = false;
+    let mut ladder = false;
     for pair in arguments.chunks(2) {
         match pair {
             [key, value] if key == "cells" => cells = Some(value.clone()),
@@ -260,6 +261,7 @@ fn main() {
             [key, value] if key == "samples" => samples_out = Some(value.clone()),
             [key, value] if key == "grain" && value == "refining" => refining = true,
             [key, value] if key == "transport" && value == "founded" => founded = true,
+            [key, value] if key == "prior-mass" && value == "ladder" => ladder = true,
             _ => {
                 println!(
                     "usage: hnn_exposure [cut-file <path>] [cells <N|all>] [held-out <cells>] [windows <deadline>] [realization <host|card>] [resonator <none|source>] [gate f2]"
@@ -394,6 +396,10 @@ fn main() {
             .join(", ")
     );
     println!("setup (cut read, fields declared): {setup} ms wall");
+    if ladder {
+        prior_mass_ladder(&field, &cut);
+        return;
+    }
     if let Some(count) = ablation {
         contact_ablation_run(&field, &cut, count, information, descent, samples_out.as_deref(), founded);
         return;
@@ -1586,6 +1592,45 @@ fn tree_alone(field: &Field, cut: &Cut, scored: usize) -> TreeAlone {
         nodes: tree.nodes(),
         tree_bits: tree.bits(),
         population_bits: population.bits(),
+    }
+}
+
+/// [measured-diagnostic; agent-inferred, October 2; the contact loop record §25] **The receiver's
+/// tree over the prior-mass ladder** (`prior-mass ladder`): the tree alone, prequential over the cut
+/// at each prior mass `2^(−j)`, `j = 1..B` (`B` the odometer digits), its development (training)
+/// and held-out codes. The development cells choose `j`, charged `⌈log₂ B⌉` bits for the family,
+/// the declared stop prior's method (the September 26 record, §1).
+fn prior_mass_ladder(field: &Field, cut: &Cut) {
+    let base =
+        landmark_declaration(field, &field.receivers()[0]).expect("the receiver's declared tree");
+    let grain = base.grain;
+    let digits = holonics::compression::landmark::context::odometer_digits(base.alphabet) as u32;
+    let letters = cell_letters(&cut.cells);
+    println!("prior-mass ladder over the cut's {} cells (B = {digits})", cut.cells.len());
+    for mass in 1..=digits {
+        let started = Instant::now();
+        let declaration = holonics::compression::landmark::context::LandmarkDeclaration {
+            mass,
+            ..base.clone()
+        };
+        let mut tree = Landmarks::new(declaration).expect("the receiver's tree at the prior mass");
+        let zero = ExactInterval::point(Rat::zero());
+        let (mut training, mut held_out) = (zero.clone(), zero);
+        for (position, &class) in cut.cells.iter().enumerate() {
+            let reading = tree
+                .receive(&letter_address(&letters, position, base.depth), class)
+                .expect("the tree receives the cell");
+            let code = holonics::compression::landmark::context::code_length(&reading.executed)
+                .expect("a positive face has a code");
+            let sum = if cut.held_out(position) { &mut held_out } else { &mut training };
+            *sum = interval_sum(sum, &code).expect("an ordered sum");
+        }
+        println!(
+            "  j = {mass}: development {}; held out {}; {} ms",
+            enclosure(&training, grain),
+            enclosure(&held_out, grain),
+            started.elapsed().as_millis()
+        );
     }
 }
 

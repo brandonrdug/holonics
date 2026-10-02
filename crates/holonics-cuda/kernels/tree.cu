@@ -59,6 +59,8 @@ struct TreeLaw {
     uint32_t stride;
     uint32_t log_stride;
     uint32_t sums_stride;
+    // The masses' increment an arrival adds, `2^j` at the prior mass `2^(−j)` (KT's 2 at j = 1).
+    uint32_t unit;
 };
 
 struct TreeArena {
@@ -853,7 +855,7 @@ extern "C" __global__ void hnn_tree_deposit(TreeLaw law, TreeArena a, const uint
         for (uint32_t k = 0; k < read.count; ++k) {
             if (read.bottoms[k] < forced) continue;
             uint32_t* halves = a.halves + 2 * (uint64_t)read.nodes[k];
-            halves[symbol] += 2;
+            halves[symbol] += law.unit;
             tree_carry(halves, law.ceiling);
         }
     }

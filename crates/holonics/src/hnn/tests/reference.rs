@@ -420,6 +420,7 @@ fn tree_declaration(alphabet: usize, depth: usize) -> LandmarkDeclaration {
         family: LetterFamily::cells(),
         prior: StopPrior::half(),
         capacity: Capacity::Unbounded,
+        mass: 1,
     }
 }
 
