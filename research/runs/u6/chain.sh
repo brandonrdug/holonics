@@ -21,7 +21,16 @@ restore() {
   [ "$now" = "$heldsum" ] && echo "  restored the held state $held (sha256 $heldsum, unchanged)" || echo "  RESTORE FAILED: $held changed ($heldsum -> $now)"
   state=$held
 }
-for k in $(seq 1 $MAX); do
+# Continuing a chain whose shell was lost (a container restart): START_K is the first move not yet
+# on disk, STATE the last accepted state, HELD the held state and CHECKPOINT its own comparison
+# (exact, as the listing prints it), WINDOW the moves of the open run already taken.
+K0=${START_K:-1}
+if [ "$K0" -gt 1 ]; then
+  state=$STATE; held=$HELD; heldsum=$(sha256sum "$held" | cut -d' ' -f1)
+  checkpoint="$CHECKPOINT"; first=0; window=$WINDOW
+  echo "continuing at move $K0 from $state; held $held (sha256 $heldsum); open run of $window moves"
+fi
+for k in $(seq $K0 $MAX); do
   out=$outdir/$label$k; mkdir -p $out
   export EXCURSION_CHECKPOINT="$checkpoint"
   bash research/notebook/hnn_design/read_probe.sh $out $UNIT_MS $DEADLINE_S executed move-once order2 2026093061 8 $out $label$k=$state lock-dec $METRIC
