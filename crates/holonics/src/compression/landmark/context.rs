@@ -657,8 +657,9 @@
 //! tree (and of [`FaceJoins`]) is Lean `Compression/Landmark/Context/JoinDrift`
 //! (`join_read_drift`, `join_ratio_drift`, `join_passage`): its `drift` is both branches' summed
 //! drifts plus the rebases, and its `excess` adds its rounding, twice the rebases and both
-//! branches' increments, term for term what the proof charges. [open] Owed in #62: the certified
-//! binary logarithm's squaring invariant, checked by the tests.
+//! branches' increments, term for term what the proof charges. The certified binary logarithm's
+//! squaring invariant is Lean `Compression/Landmark/Context/BinaryLog` (`bit_one`, `bit_zero`,
+//! `log_encl`, `hi_one_le`, `grain_floor_of_encl`).
 
 use std::collections::HashMap;
 
@@ -4088,8 +4089,9 @@ pub struct BinaryLog {
     pub exact: bool,
 }
 
-/// **The binary logarithm by exact squaring** (agent-inferred; the invariant's Lean statement is
-/// owed in #62): `y = m/2^whole ∈ [1, 2)` is held between two fixed-point integers on `2^(−P)`,
+/// **The binary logarithm by exact squaring** (agent-inferred; the invariant is Lean
+/// `Compression/Landmark/Context/BinaryLog.{bit_one, bit_zero, log_encl}`, the carrier
+/// `hi_one_le`): `y = m/2^whole ∈ [1, 2)` is held between two fixed-point integers on `2^(−P)`,
 /// rounded outward; each step squares both, and a bit is emitted only when both bounds agree on
 /// `y² ≥ 2` (then both halve, outward). It stops at `bits` fraction bits, when `decided` accepts,
 /// or when the bounds straddle `2` (a shorter, still certified enclosure). At most 128 bits.
