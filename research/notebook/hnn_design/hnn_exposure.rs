@@ -980,6 +980,8 @@ fn contact_ablation_run(field: &Field, cut: &Cut, windows: usize) {
     let (mut states, mut logits, mut faces) = (0, 0, 0);
     let (mut c_anchors, mut c_logits, mut c_faces) = (0, 0, 0);
     let (mut cells, mut c_cells) = (0, 0);
+    let mut shifts: Vec<Rat> = Vec::new();
+    let mut c_shifts: Vec<Rat> = Vec::new();
     for r in &readings {
         let order = if r.contacts.upper < r.held.lower {
             lower += 1;
@@ -1003,6 +1005,8 @@ fn contact_ablation_run(field: &Field, cut: &Cut, windows: usize) {
         c_faces += usize::from(r.continued_faces_differ);
         cells += usize::from(r.cells_differ);
         c_cells += usize::from(r.continued_cells_differ);
+        shifts.push(r.exponent_shift.clone());
+        c_shifts.push(r.continued_exponent_shift.clone());
         println!(
             "  window at {}: contacts moved {:?}; work {}; next window's contact states differ {}, logits {}, grain faces {}; continued anchors {}, logits {}, grain faces {}; code held [{}, {}) contacts [{}, {}): {order}; {} ms",
             r.position,
@@ -1019,6 +1023,22 @@ fn contact_ablation_run(field: &Field, cut: &Cut, windows: usize) {
             r.contacts.lower,
             r.contacts.upper,
             clock.elapsed().as_millis()
+        );
+    }
+    // The exponent shifts against two grains: the declared tolerance 1/16 bit and 1/21 bit (below
+    // the derived resolution, the contact loop record §11).
+    for (label, values) in [("fresh", &mut shifts), ("continued", &mut c_shifts)] {
+        values.sort();
+        let at = |q: usize| values.get(values.len().saturating_sub(1).min(q)).cloned().unwrap_or_else(Rat::zero);
+        let n = values.len();
+        let above = |grain: Rat| values.iter().filter(|v| **v >= grain).count();
+        println!(
+            "  {label} exponent shift (bits): median {}, upper quartile {}, largest {}; at least 1/16 at {}, at least 1/21 at {} of {n}",
+            at(n / 2),
+            at(3 * n / 4),
+            at(n.saturating_sub(1)),
+            above(Rat::new(1.into(), 16.into())),
+            above(Rat::new(1.into(), 21.into())),
         );
     }
     println!(

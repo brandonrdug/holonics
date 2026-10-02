@@ -2963,6 +2963,11 @@ pub struct ContactAblation {
     /// class, what the code reads), fresh and continued; a face can differ in its fibres alone.
     pub cells_differ: bool,
     pub continued_cells_differ: bool,
+    /// The largest change of the next window's exponents `v = carry + phase/L + fibre` (bits of
+    /// log-mass, before normalization) over its phases and classes, fresh and continued: the
+    /// contacts' change in the receiver's own units.
+    pub exponent_shift: Rat,
+    pub continued_exponent_shift: Rat,
 }
 
 /// [measured-diagnostic] **The contact loop on a cut** (Astra's check, on the host reference): the
@@ -3024,6 +3029,23 @@ pub fn contact_ablation(
                 .map(|face| face.cells().iter().map(|c| (c.carry.clone(), c.phase)).collect())
                 .collect()
         })
+    };
+    // The largest exponent change between two windows' faces, in bits.
+    let shift = |a: Option<&Faces>, b: Option<&Faces>| -> Rat {
+        let (Some(a), Some(b)) = (a, b) else { return Rat::zero() };
+        let value = |c: &crate::receiver::face::GrainCell, grain: u64| {
+            Rat::from_integer(c.carry.clone()) + Rat::new(BigInt::from(c.phase), BigInt::from(grain)) + &c.fibre
+        };
+        a.faces
+            .iter()
+            .zip(&b.faces)
+            .flat_map(|(x, y)| {
+                x.cells().iter().zip(y.cells()).map(move |(p, q)| {
+                    (value(p, x.grain()) - value(q, y.grain())).abs()
+                })
+            })
+            .max()
+            .unwrap_or_else(Rat::zero)
     };
     let mut out = Vec::new();
     for (k, span) in spans.iter().enumerate().take(windows) {
@@ -3110,6 +3132,8 @@ pub fn contact_ablation(
                         cells_differ: grained(held_faces.as_ref()) != grained(moved_faces.as_ref()),
                         continued_cells_differ: grained(Some(&held_continued))
                             != grained(Some(&moved_continued)),
+                        exponent_shift: shift(held_faces.as_ref(), moved_faces.as_ref()),
+                        continued_exponent_shift: shift(Some(&held_continued), Some(&moved_continued)),
                     });
                 }
             }

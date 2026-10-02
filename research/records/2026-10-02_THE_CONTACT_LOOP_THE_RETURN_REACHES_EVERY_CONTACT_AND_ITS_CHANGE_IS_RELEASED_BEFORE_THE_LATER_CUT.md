@@ -229,9 +229,10 @@ each class's carry and phase class and the normalizer (`Face::code_length`:
 
 So the contacts' change reaches the receiver at nearly every window, but almost always inside the
 receiver's unresolved fibre, below its grain, where the comparison cannot see it and its covector
-cannot reward it. That is the measured cause of "read but not useful". Raising the receiver's
+cannot reward it. That is the measured cause of "read but not useful". ~~Raising the receiver's
 grain, or a comparison that reads the fibre, is the next lever, and either is an architecture
-choice: the grain is the receiver's declared tolerance.
+choice.~~ [Edit, October 2: this is not a choice. §11 derives the receiver's resolution and shows
+that the change lies far below it.]
 
 ## 10. The reflected residual: its instantiation, owed
 
@@ -258,3 +259,57 @@ instantiation on one contact, from the executed transit (`hnn::propagation::tran
   predecessor's chart and the successor's. That needs the channel's incoming waves `x`, which the
   word's per-tick record (`Passage`) does not yet keep. Recording them is the first build step.
   Until that build lands, the residual stays owed (#62).
+
+## 11. The receiver's resolution, derived, and the contacts' change against it
+
+Brandon (October 2): whether the receiver can read the change is a question of physics, settled by
+derivation, not a choice handed to anyone.
+
+**What sets the grain in the code.** `ReceivingPhases::grain` is `L_R = ⌈1/ε_bits⌉`, where
+`ε_bits` is the receiver's declared code tolerance (`ReceiverDeclaration::tolerance`, `1/16` bit on
+campaign 1's field). It is a declared constant. Nothing derives it, and the deposit's lattices are
+derived from it in turn (the lattice rule).
+
+**Temperature.** No temperature appears anywhere in `hnn`, so the code fixes no temperature. The
+quantity a temperature would play is the receiver's exponent scale. A reading of class `c` is
+`a_c = 2^(v_c)` with `v_c = −E_c/(k_B T ln 2)` in the framework's physical reading (cross-entropy
+is free energy, `F(p) − F(q) = k_B T D(p‖q)`), so `1/(k_B T ln 2)` is the gain that turns the
+receiving anchor into exponents. That gain is the receiving map `R`, a learned locus, which moves at
+every deposit on real text (the rounding census, §7: `ReceivingMap(2)` at 7 of 7). So the
+receiver's temperature is a state of the receiver, changed by deposition. It is not fixed. Below,
+everything is in bits of `v`, where it cancels. It enters only in converting a deposition's energy
+into bits.
+
+**The derivation.** These are the receiver's own readings. No exterior readout is added.
+1. A receiving phase reads `p_c = 2^(v_c)/Z` (`Face::mass`). A change of the medium changes the
+   exponents by `δ_c` bits and the reading to `p′`.
+2. The information the receiver gains about the change from one reading is the divergence
+   `D(p′‖p)`. To second order in bits, `D(p′‖p) = (ln 2/2) Var_p(δ) + O(δ³)`, using
+   `ln p′_c − ln p_c = ln 2·(δ_c − Σ_d p_d δ_d) + O(δ²)`.
+3. The receiver can tell the two media apart over `N` readings exactly when the accumulated
+   divergence reaches one bit, `N·D(p′‖p) ≥ 1` (Stein's lemma: the error of telling them apart
+   falls as `2^(−N·D)`). Since `Var_p(δ) ≤ max_c δ_c²`, a change is unreadable over `N` readings
+   whenever `max_c |δ_c| < √(2/(N ln 2))`.
+4. The receiver integrates readings within one retained state, over one aeon: `N = 1,190` cells on
+   campaign 1's field (the exposure's declared aeon). So its resolution is
+   `√(2/(1190 ln 2))` bits, which lies in `(1/21, 1/20)` because `1190 · ln 2 / 2` lies in
+   `(400, 441)`. The declared `1/16` is coarser than this by less than a factor of `4/3`. That
+   discrepancy is real, but it is small next to what follows.
+
+**The contacts' change, measured** ([receipt](2026-10-02_THE_CONTACT_LOOP_receipts/readability_256.txt)).
+Over 256 windows, take the largest change of the next window's exponents `v` over its phases and
+classes:
+- **The fresh consumer:** median `41/2^24`, upper quartile `33/2^23`, largest `695/2^25` bits.
+- **The continuing consumer:** median `53/2^24`, upper quartile `77/2^24`, largest `7/2^18` bits.
+- None reaches `1/21` or `1/16`. The largest, `7/2^18`, lies more than `2^12` times below the derived
+  resolution.
+
+**The finding.** The contacts' change cannot physically be read by this receiver. With
+`max |δ| ≤ 7/2^18`, one reading carries less than `(ln 2/2)(7/2^18)² < 2^(−29)` bits about it, so
+the receiver would need more than `2^29` readings, about `2^19` aeons, to tell the media apart. The
+14 windows whose code moved are cells whose exponent sat within `7/2^18` of a cell edge and crossed
+it. That is a boundary effect, not information. The finding is the weak coupling: the return-driven
+contact change is real, conserved in the energy account and carried to the receiver, but it reaches
+the receiver at a size its own statistics cannot resolve. Moving the grain or scoring the fibre would
+read a difference the receiver itself cannot distinguish, which is an exterior readout, and neither
+is done.
