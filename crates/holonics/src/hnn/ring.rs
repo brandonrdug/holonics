@@ -1829,7 +1829,24 @@ fn strictly_inside(characteristic: &RationalPolynomial, radius: &Rat) -> bool {
 /// cheap to test), bisected there to the grain, then certified on `q` itself by two exact tests:
 /// what the shift attains is trusted nowhere. A bracket the exact tests refuse falls back to the
 /// exact bracket and bisection.
+///
+/// [proved-derived; formal-checked] **The lattice's floor.** `N` is an integer matrix, so a
+/// monodromy with any nonzero multiplier has `ρ(M) ≥ 1/Δ` (Lean
+/// `HNN/Floquet.integer_monodromy_floor` for an invertible `N`; the singular case by the same
+/// argument on the nonzero multipliers, owed in #62). Only a nilpotent `N` (every coefficient below
+/// the leading one zero) has its growth below `1/Δ`, and then every multiplier is zero: its growth
+/// is the floor's cell `[0, 1/Δ)`, read without bisection, which would halve toward zero without
+/// end. A target read there has no finite code length and its lock face is refused
+/// ([`crate::hnn::executed::lock_face`]).
 pub(crate) fn growth_of(characteristic: &[BigInt], scale: &BigInt, grain: u32) -> Growth {
+    if let Some((_, below)) = characteristic.split_last()
+        && below.iter().all(Zero::is_zero)
+    {
+        return Growth {
+            lower: Rat::zero(),
+            upper: Rat::new(BigInt::one(), scale.clone()),
+        };
+    }
     let mut power = BigInt::one();
     let exact: Vec<BigInt> = characteristic
         .iter()
