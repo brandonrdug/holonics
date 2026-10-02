@@ -1,0 +1,1 @@
+executed locks: 8 order2 requests at seed 2026093061, from m7s (ρ 102837/131072); L ∈ [337715/4096, 337720/4096) nats, X ∈ [156263/4096, 156268/4096) nats; solved 1 of 64; whole 0 (released 7, stations right 13)
