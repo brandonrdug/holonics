@@ -597,6 +597,7 @@ pub(super) fn recurrence(
 }
 
 #[derive(Debug)]
+#[allow(dead_code)]
 pub(super) struct StepRead {
     pub before: Read,
     pub next: Read,
