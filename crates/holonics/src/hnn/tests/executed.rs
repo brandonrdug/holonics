@@ -289,10 +289,10 @@ fn two_members_tied_in_growth_are_both_active() {
         .all(|member| matches!(member, MemberCovector::Resolved { .. })));
 }
 
-/// The release guard's excursion (`HNN/ExecutedComparison` §12, `checkpoint_one_iff`,
-/// `excursion_enclosure`): the monotone guard is the strict decrease by disjoint enclosures; a held
-/// checkpoint with a height admits a rise below its lower end plus the height and refuses one at or
-/// above it; a window closes only strictly below its checkpoint less the certified decrease.
+/// The released code length's excursion (`HNN/ExecutedComparison` §12, `checkpoint_one_iff`,
+/// `excursion_enclosure`): strict descent is the decrease by disjoint enclosures; a held opening
+/// state with a height admits a rise below its lower end plus the height and refuses one at or
+/// above it; an interval closes only strictly below its opening state less the certified decrease.
 #[test]
 fn the_monotone_excursion_is_the_strict_decrease_and_a_height_admits_a_bounded_rise() {
     use crate::hnn::executed::ReleaseExcursion;
@@ -319,8 +319,9 @@ fn the_monotone_excursion_is_the_strict_decrease_and_a_height_admits_a_bounded_r
     let checkpoint = interval(9, 10);
     assert_eq!(ReleaseExcursion::closes(&checkpoint, &interval(5, 6), &integer(2)), Ok(true));
     assert_eq!(ReleaseExcursion::closes(&checkpoint, &interval(6, 7), &integer(2)), Ok(false));
-    // A negative decrease would close a window above its checkpoint, and a negative height states
-    // no `CheckpointGuard` (the checkpoint itself would breach its excursion): both are refused.
+    // A negative decrease would close an interval above its opening state, and a negative height
+    // states no `CheckpointGuard` (the opening state itself would breach its excursion): both are
+    // refused.
     assert_eq!(
         ReleaseExcursion::closes(&checkpoint, &interval(9, 10), &integer(-2)),
         Err(HnnError::WindowDecrease {

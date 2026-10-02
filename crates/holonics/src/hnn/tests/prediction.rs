@@ -743,7 +743,7 @@ fn the_proposals_returns_are_its_pullback_to_e() {
 /// (`hnn::executed::executed_move`): on two requests along the machine's own trajectory the move
 /// is adopted, and its successor reads `F` strictly lower by disjoint enclosures, holds every entry
 /// of `E` within the bound, certifies its first order, admits every crossing, certifies every lock
-/// and counts one commit; every trial before the adopted one names the guard that refused it.
+/// and counts one commit; every trial before the adopted one names the condition that refused it.
 #[test]
 fn the_committed_move_descends_or_refuses_by_type() {
     use crate::hnn::executed::{Comparison, Context, entry_bound, executed_move};
@@ -791,7 +791,7 @@ fn the_committed_move_descends_or_refuses_by_type() {
 /// [two counts' pin](../../../../../research/records/2026-09-30_THE_TWO_COUNTS_PINNED_BEFORE_ITS_RUNS.md)
 /// §5): on the committed move's instance, every trial that read its first order carries one bound
 /// per term of the proposal, aligned with the move's sites, and their sum is the certificate
-/// exactly (a straddling term's bound hinged at zero); every site names a request of the batch and
+/// exactly (a straddling term's bound hinged at zero); every site names one of the requests and
 /// a station of the section; the leading branches' pairing on the carried move lies at or below the
 /// certificate's upper end (each leading branch is one of its term's active branches, paired with
 /// the same exact storage moves); the unit move's largest entry is read, and the adopted trial
@@ -851,7 +851,7 @@ fn the_moves_receipts_read_its_certificate() {
 /// requests whose span with the stations fills one turn, the move reads the modulus's slope, and an
 /// adopted successor keeps a passive modulus on the source port's lattice (the trial's), lowers the
 /// comparison by disjoint enclosures with its first order certified negative on the carried move,
-/// and holds every lock's certificate; every earlier trial names its guard.
+/// and holds every lock's certificate; every earlier trial names the condition that refused it.
 #[test]
 fn the_committed_move_carries_the_transport_modulus() {
     use crate::hnn::executed::{Comparison, Context, Request, executed_move};
