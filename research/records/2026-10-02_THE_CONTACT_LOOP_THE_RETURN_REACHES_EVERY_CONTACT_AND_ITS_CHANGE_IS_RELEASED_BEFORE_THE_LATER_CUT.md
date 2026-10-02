@@ -39,13 +39,31 @@ On the chain (two contacts) with a generic constitution, one word, its compare a
   difference comes from the element, source port, standing and receiving-map steps, because no
   contact moved.
 
+**The contacts alone** (test `the_contacts_steps_alone_move_the_contacts_and_the_later_cut_reads_them`).
+The same six channel families deposited without the other loci give the same steps. Deposited one
+family at a time, each at its own certificate with no joint halving, they still give the same
+steps. So the joint certificate is not what shrinks them: each family's own curvature `C = s·κ²·b`
+dwarfs its decrease `a`.
+
+| Contact, family | `a` (decrease) | `C` (curvature, 24 bits) | `η` |
+|---|---|---|---|
+| 0, storage | `4435594093169685299/2^75` | `2244951/16` | `2^(−31)` |
+| 0, stiffness | `3004229502457467857/2^76` | `6223669/1024` | `2^(−28)` |
+| 0, dissipation | `6925366743880731153/2^76` | `13165999/2048` | `2^(−27)` |
+| 1, storage | `9550704405487570785/2^76` | `13316721/16384` | `2^(−23)` |
+| 1, stiffness | `34257067843/2^49` | `193749/4096` | `2^(−20)` |
+| 1, dissipation | `43966108913/2^50` | `4473285/262144` | `2^(−19)` |
+
+No factor moves, 17 entries are released for each family, the storage growth is 0, and the later
+cut is identical to the predecessor's.
+
 ## 4. The missing link
 
 [agent-inferred] The owner chain exists. **The certified step at the channel sizes every contact
-move below the locus's lattice, so the release erases it before any later cut.** The certificate
-reads the contact's move through the whole reach's gain `κ²`, the stacked station logits
-(`C = s·κ²·b` against the alignment `a`). A contact's own power, its slip and material work, never
-enters the size of its step. So the return-driven change Astra asks for is reached and then
+move below the locus's lattice, so the release erases it before any later cut.** This holds for
+each family alone (§3). The certificate reads the contact's move through the whole reach's gain
+`κ²` to the stacked station logits (`C = s·κ²·b` against the alignment `a`). A contact's own power,
+its slip and material work, never enters the size of its step. So the return-driven change Astra asks for is reached and then
 discarded. Separately, the executed release has no contact at all: its receiving bank is declared,
 not a locus.
 
