@@ -436,7 +436,7 @@
 //! |---|---|
 //! | `HNN/Normal.normal_prox_step` at the carried Gram, with `HNN/LatticeDeposit.within_one_unit_since_founding` | [`NormalLaw`]: `W` is the prox iterate at the carried Gram `H'` (`B` is not carried, so `W` is not the minimizer of the accumulated `J(W)`), and `H` stays within one unit of the exact statistic `I + Σ w f fᵀ` |
 //! | `HNN/Normal.normal_prox_step`, `depositLocus_solves`; `HNN/LatticeWord.{prox_chart_residual, prox_chart_certificate}` | [`NormalLaw::deposited`] (the step at the carried Gram through the executed chart, its residual released and reported: [`ChartReading`]) |
-//! | `HNN/LatticeWord.{window_residual_sum, window_chart_balance, window_chart_certificate, carryDefect, carry_value_eq, carryDefect_bounded, carried_window_balance}` | [`NormalLaw::deposited`] (the window's one balance on the published map and Gram, with their carry terms) |
+//! | `HNN/LatticeWord.{deposition_residual_sum, deposition_chart_balance, deposition_chart_certificate, carryDefect, carry_value_eq, carryDefect_bounded, carried_deposition_balance}` | [`NormalLaw::deposited`] (the deposition's one balance on the published map and Gram, with their carry terms) |
 //! | `HNN/LatticeWord.{nsStep, newton_schulz_left, rounded_refinement_residual_left, rounded_refinement_certificate_left, rowNorm, latticeChart}` | [`SolvedChart`] (the certificate and the rounded refinement) |
 //! | `HNN/LatticeWord.{rounded_residual_refinement_left, rounded_residual_refinement_certificate_left, solvedRefine, solved_refinement_certificate, solved_refinement_stays}` | [`SolvedChart`] (the refinement with the residual rounded too, and the mirrored triangle) |
 //! | `HNN/LatticeWord.{warm_start_residual, warm_start_certificate}` | [`SolvedChart`] (why the warm start takes the window's rank-one steps) |
@@ -2023,12 +2023,13 @@ impl NormalLaw {
     /// `γ = η`), which a deposit takes at its certified step and a test at any step. Returns the
     /// successor with its chart's reading, `None` when the window reached nothing.
     ///
-    /// [proved-derived; formal-checked] **The window's one balance** (Lean
-    /// `HNN/LatticeWord.{window_chart_balance, carried_window_balance}`): with `F = Σ w f fᵀ`,
+    /// [proved-derived; formal-checked] **The deposition's one balance** (Lean
+    /// `HNN/LatticeWord.{deposition_chart_balance, carried_deposition_balance}`): with the covectors
+    /// that reached the locus, `F = Σ w f fᵀ`,
     /// `G = Σ w g fᵀ` and the carry terms `c = r − r′ − e` of the Gram's and the map's deposits
     /// (remainder before, remainder after, released residual), the published successors satisfy
-    /// `W′H′ − (WH + WF + ηG) = −ηG(1 − X̂H′) + W c_H + c_W H′`. The first term is the window's prox
-    /// residuals summed (`window_residual_sum`), reported by its certificate
+    /// `W′H′ − (WH + WF + ηG) = −ηG(1 − X̂H′) + W c_H + c_W H′`. The first term is the chart's residual at
+    /// the deposited Gram, summed over the arrivals (`deposition_residual_sum`), reported by its certificate
     /// ([`ChartReading::released`]); each carry entry is below `2^(−L) + 2^(−L−k_m)/2`
     /// (`carryDefect_bounded`).
     pub fn deposited(
