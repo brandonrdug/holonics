@@ -49,7 +49,7 @@
 //! | `Objects/Ratio/CarriedPower.{carriedPower_exact, theta_pow, irreducible_X_pow_sub_two, realChart}` (the owner's) | [`CarriedPower`], [`PhaseField`] |
 //! | `face_constant_on_fibre`, `face_code_length_within_grain`, `codeLength_eq_face` | [`Face`], [`Face::code_length`] |
 //! | `receivingPhase_ratio` (a common rechart leaves `ℓ`) | [`HolonRatio::compare`] |
-//! | `alignCost_turns` (the windowed gap in turns; the cut's winding the branch) | [`target_phases`], [`PhaseRatio`] |
+//! | `alignCost_turns` (the gap past the cut's winding, in turns; the cut's winding the branch) | [`target_phases`], [`PhaseRatio`] |
 //! | `odometer_covector_descends`, `odometer_eq_face_at_integer_cells` (the magnitude part); `receivingPhase_phase_pullback` (the phase part) | [`RatioCovector`], [`Face::odometer_masses`] |
 //! | `Objects/Ratio.logFibre` (the undivided pair with its winding) | [`HolonRatio::log_ratio`] |
 
@@ -233,8 +233,8 @@ impl Face {
     }
 }
 
-/// [definition] **The faces `p̂_j` of one receiving window**, one per receiving phase, with their
-/// fibres: what `refine` publishes (design (c), `Faces`).
+/// [definition] **The faces `p̂_j` the receiver reads over one epoch**, one per receiving phase,
+/// with their fibres: what `refine` publishes (design (c), `Faces`).
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct Faces {
     pub faces: Vec<Face>,
@@ -255,7 +255,7 @@ impl Faces {
 // -------------------------------------------------------------------------------------------
 // the target's phase
 
-/// [definition] **The target phases of one window, read in the cut's frame** (Lean
+/// [definition] **The target phases of one epoch, read in the cut's frame** (Lean
 /// `HNN/Ratio.alignCost_turns`): the receiving ring's winding at the anchor, `w = ⌊λ_R/d_R⌋`, which
 /// is the log's branch, and `φ^T_j = (τ_R(j) − d_R w)/d_R` turns per receiving phase.
 #[derive(Clone, Debug, PartialEq, Eq)]
@@ -264,7 +264,7 @@ pub struct TargetPhases {
     pub phases: Vec<Rat>,
 }
 
-/// **The target phases** of a window: the receiving ring's lift from the anchor `λ`, advanced by
+/// **The target phases** of an epoch: the receiving ring's lift from the anchor `λ`, advanced by
 /// selective stepping over `t_0 … t_j` (with carries, as ingest would, without ingesting), read
 /// relative to the cut's winding `w = ⌊λ_R/d_R⌋`, which is returned as the branch. Each phase lies
 /// in `[0, 1 + 2(j+1)/d_R)`, the anchor's open phase plus at most two ticks a cell (a step and a
@@ -303,10 +303,10 @@ pub fn target_phases(
 // the Holon ratio
 
 /// [definition] **The ratio at one receiving phase** at its target class `t`: the target's phase
-/// `φ^T` in the cut's frame, the produced phase `φ^H_t`, the windowed gap `Δ = φ^T − φ^H_t` read as
-/// its windings and open phase ([`Reading`]), the cut's winding `w` as the branch, never descended
-/// on (Lean `HNN/Ratio.alignCost_turns`), the code length `−log₂ p̂(t)` (the KL part against the
-/// one-hot target, enclosed), and the phase excess `½ Δ²` exactly.
+/// `φ^T` in the cut's frame, the produced phase `φ^H_t`, the gap past the cut's winding
+/// `Δ = φ^T − φ^H_t` read as its windings and open phase ([`Reading`]), the cut's winding `w` as
+/// the branch, never descended on (Lean `HNN/Ratio.alignCost_turns`), the code length `−log₂ p̂(t)`
+/// (the KL part against the one-hot target, enclosed), and the phase excess `½ Δ²` exactly.
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct PhaseRatio {
     pub target: usize,
@@ -319,15 +319,16 @@ pub struct PhaseRatio {
 }
 
 impl PhaseRatio {
-    /// The log's whole winding `n` in `Im ℓ = n + open phase`: the cut's winding plus the windowed
-    /// gap's own windings.
+    /// The log's whole winding `n` in `Im ℓ = n + open phase`: the cut's winding plus the gap's own
+    /// windings past it.
     pub fn winding(&self) -> BigInt {
         &self.branch + self.gap.windings()
     }
 }
 
-/// [definition] **The Holon ratio `R_j = Ĝ_(T←H)` over a receiving window**: the contemporary faces
-/// and, per phase, the ratio at its target class. Only it constructs a [`RatioCovector`].
+/// [definition] **The Holon ratio `R_j = Ĝ_(T←H)` over the epoch the receiver reads**: the
+/// contemporary faces and, per phase, the ratio at its target class. Only it constructs a
+/// [`RatioCovector`].
 ///
 /// [definition; agent-inferred, U6's order repair] **A ratio over a partition of the phases**
 /// ([`HolonRatio::compare_partition`]): a receipt is a field of readings over a partition, so a
@@ -421,7 +422,7 @@ impl HolonRatio {
         &self.phases
     }
 
-    /// The window's code length `Σ_j −log₂ p̂_j(t_j)`, enclosed.
+    /// The epoch's code length `Σ_j −log₂ p̂_j(t_j)`, enclosed.
     pub fn code_length(&self) -> Result<ExactInterval, HnnError> {
         let mut total = ExactInterval::point(Rat::zero());
         for phase in &self.phases {
@@ -430,13 +431,13 @@ impl HolonRatio {
         Ok(total)
     }
 
-    /// The window's phase excess `Σ_j ½ Δ_j²`, exact.
+    /// The epoch's phase excess `Σ_j ½ Δ_j²`, exact.
     pub fn excess(&self) -> Rat {
         self.phases.iter().map(|phase| phase.excess.clone()).sum()
     }
 
     /// **The undivided pair of phase `j`** in the covector's rational chart, `(q_t : p̃_t)`, carried
-    /// with the log's whole winding (the cut's plus the windowed gap's) as the branch of its
+    /// with the log's whole winding (the cut's plus the gap's past it) as the branch of its
     /// logarithm (Lean `Objects/Ratio.logFibre`).
     pub fn log_ratio(&self, phase: usize) -> Result<LogRatio, HnnError> {
         let ratio = self.phases.get(phase).ok_or(HnnError::Shape {
