@@ -480,3 +480,51 @@ bound shows a contact improvement accruing.
 [agent-inferred] On this cut, the contacts' learning, frozen by rounding after the first aeon, does
 not produce a change the receiver gains from. This is the statement the measurement supports, and
 the bounds above are its evidence.
+
+## 15. The real deposits descend, and the rounded contact residuals are coherent but bounded
+
+The first aeon on campaign 1, 534 deposits
+([receipt](2026-10-02_THE_CONTACT_LOOP_receipts/descent_aeon0.txt), 270,995 ms against about
+265 s projected, inside the 400 s deadline).
+
+**The mixed-covector condition** (the Lean thread, PR #151). Each deposit moves loci, not one
+station's logits, so its guaranteed decrease rests on `A⁻ ≤ 5/9 · A⁺` at `L = 16`, where `A⁺` is the
+odometer-weighted part of the move favouring the target and `A⁻` the part lifting other classes. The
+split was read on each deposit's realized move: the window's own exponents re-read at the successor
+against its own targets (`DepositDescent`). This is the secant, not the tangent the certificate
+reads, and it covers the whole deposit, `R` included.
+- **`A⁻/A⁺`:** median `2336289/2^32`, upper quartile `5475503/2^33`, largest `8985321/2^33`. None
+  of the 533 with `A⁺ > 0` passes `5/9`; the largest is below `2^(−9)`. One deposit had `A⁺ = 0`.
+- **The window's own code fell at all 534 deposits**, strictly in enclosure, and rose at none.
+
+So on real text the condition holds with a margin of about `2^9`, and every deposit descends on its
+own window. The gap in the proof is not a failure in the deposits.
+
+**The dropped contact residuals** (`DepositReading::released` at the channel loci, per entry
+across the 534 deposits, then pooled per contact). This is the ratio of the per-entry sums'
+magnitudes to the sums of the magnitudes:
+
+| Contact | Residuals / entries | `Σ_entries |Σ e| / Σ_entries Σ |e|` | A random sign would give about |
+|---|---|---|---|
+| 0 | 161,095 / 303 | `10841473/2^25` | `1/√531` |
+| 1 | 313,530 / 591 | `11298605/2^25` | `1/√530` |
+| 2 | 768,938 / 1,455 | `10315767/2^25` | `1/√528` |
+| 3 | 161,064 / 303 | `667429/2^21` | `1/√531` |
+
+The dropped residuals are coherent: about `1/3` of their magnitude survives summation per entry,
+about seven times what independent signs would leave.
+
+**The derivation of what that is worth.** A released residual is the part of an entry's update below
+the fine lattice, `|e| < ½ · 2^(−L−k_m)`, with `k_m = 2⌊log₂ m⌋ + 1` at the locus's clock `m`. The
+Elias-gamma lengths satisfy Kraft, `Σ_m 2^(−k_m) < 1` (`gamma_kraft_lt_one`), so an entry's releases
+since founding sum, in magnitude, to less than `u/2 = ½ · 2^(−L)`
+(`HNN/LatticeDeposit.release_bounded_since_founding`). Even perfectly coherent, everything rounding
+has dropped from one contact entry over the whole history is less than half a lattice unit:
+`2^(−10)` absolute at `L = 9`, against factor entries of order `½`. A carried remainder would recover
+at most that, about one lattice step per entry over all time.
+
+[agent-inferred] So the coordinator's question, whether the remainders should be carried because
+they add coherently, has a two-part answer. They do add coherently. The lattice law already bounds
+their total by half a unit per entry, so carrying them changes the contacts by at most one step per
+entry. The freeze after the first aeon is correct behaviour. The contacts have learned what they can
+at this grain, and their remaining updates fall below the size the law admits.

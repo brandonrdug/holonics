@@ -975,6 +975,7 @@ fn contact_ablation_run(field: &Field, cut: &Cut, windows: usize) {
     use holonics::hnn::reference::contact_ablation;
     let clock = Instant::now();
     use holonics::hnn::reference::{ContactAblation, CumulativeContacts, ReceiverStep};
+    use num_traits::Signed;
     // One aeon's summary: the receiver's exponent span, one deposit's contact change, the
     // contacts-only commits (families certified and vanished, the return's size `a`) and R's steps.
     let aeon_line = |a: usize, readings: &[ContactAblation], receiver: &[ReceiverStep]| {
@@ -1020,7 +1021,7 @@ fn contact_ablation_run(field: &Field, cut: &Cut, windows: usize) {
             clock.elapsed().as_millis()
         );
     };
-    let (readings, _cumulative, receiver) = contact_ablation(
+    let run = contact_ablation(
         &Reference::campaign_one(),
         field,
         &cut.cells,
@@ -1031,8 +1032,66 @@ fn contact_ablation_run(field: &Field, cut: &Cut, windows: usize) {
         },
     )
     .expect("the contact ablation");
+    let (readings, receiver) = (&run.windows, &run.receiver);
     if let Some(last) = readings.iter().map(|r| r.aeon).max() {
-        aeon_line(last, &readings, &receiver);
+        aeon_line(last, readings, receiver);
+    }
+    // Each deposit's realized descent, split (the contact loop record §15).
+    {
+        let mut ratios: Vec<Rat> = run
+            .descents
+            .iter()
+            .filter(|d| d.a_plus.is_positive())
+            .map(|d| &d.a_minus / &d.a_plus)
+            .collect();
+        ratios.sort();
+        let n = ratios.len();
+        let pick = |q: usize| ratios.get(q.min(n.saturating_sub(1))).cloned().unwrap_or_else(Rat::zero);
+        let bound = Rat::new(5.into(), 9.into());
+        let past = ratios.iter().filter(|r| **r > bound).count();
+        let (mut fell, mut rose, mut undecided) = (0, 0, 0);
+        let (mut fell_past, mut rose_past) = (0, 0);
+        for d in &run.descents {
+            let failing = d.a_plus.is_positive() && &d.a_minus / &d.a_plus > bound || !d.a_plus.is_positive();
+            if d.after.upper < d.before.lower {
+                fell += 1;
+                fell_past += usize::from(failing);
+            } else if d.before.upper < d.after.lower {
+                rose += 1;
+                rose_past += usize::from(failing);
+            } else {
+                undecided += 1;
+            }
+        }
+        let held = |x: &Rat| holonics::holon::deposition::significant(x, 24, false);
+        println!(
+            "  deposits {}: A-/A+ median {}, upper quartile {}, largest {} (24 bits); past 5/9 at {past} of {n} (A+ zero at {}); the window's own code fell at {fell}, rose at {rose}, undecided {undecided}; of those past 5/9 or with A+ zero: fell {fell_past}, rose {rose_past}",
+            run.descents.len(),
+            held(&pick(n / 2)),
+            held(&pick(3 * n / 4)),
+            held(&pick(n.saturating_sub(1))),
+            run.descents.len() - n,
+        );
+    }
+    // The released residuals' coherence per contact: |sum| over the sum of magnitudes, entries pooled.
+    {
+        use std::collections::BTreeMap;
+        let mut pooled: BTreeMap<String, (Rat, Rat, usize, usize)> = BTreeMap::new();
+        for ((locus, _, _), (sum, magnitude, count)) in &run.released {
+            let slot = pooled.entry(format!("{locus:?}")).or_insert((Rat::zero(), Rat::zero(), 0, 0));
+            slot.0 += sum.abs();
+            slot.1 += magnitude;
+            slot.2 += count;
+            slot.3 += 1;
+        }
+        for (locus, (net, magnitude, count, entries)) in &pooled {
+            let ratio = if magnitude.is_positive() { net / magnitude } else { Rat::zero() };
+            println!(
+                "  released at {locus}: {count} residuals over {entries} entries; per entry |sum| summed over magnitudes summed {} (24 bits); a random sign would give about 1/sqrt({}) per entry",
+                holonics::holon::deposition::significant(&ratio, 24, false),
+                count / (*entries).max(1)
+            );
+        }
     }
     let (mut lower, mut higher, mut equal, mut overlap, mut moved) = (0, 0, 0, 0, 0);
     let (mut states, mut logits, mut faces) = (0, 0, 0);
@@ -1043,7 +1102,7 @@ fn contact_ablation_run(field: &Field, cut: &Cut, windows: usize) {
     let mut changes: Vec<Rat> = Vec::new();
     let mut anchors: Vec<Rat> = Vec::new();
     let mut spreads: Vec<Rat> = Vec::new();
-    for r in &readings {
+    for r in readings {
         let order = if r.contacts.upper < r.held.lower {
             lower += 1;
             "strictly lower"
