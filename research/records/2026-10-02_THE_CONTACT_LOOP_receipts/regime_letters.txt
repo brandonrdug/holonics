@@ -1,0 +1,30 @@
+== the standing cut (6,148 cells, held out from 4,958)
+cell tree: development 8936120/2^9, held out 13750868/2^12
+memory 2^6, r = 1: state development 8960168/2^9, held out 13782474/2^12; coins development 8968777/2^9, held out 13796643/2^12
+memory 2^6, r = 2: state development 8963270/2^9, held out 13811413/2^12; coins development 8971630/2^9, held out 13781677/2^12
+memory 2^6, r = 3: state development 8969118/2^9, held out 13798832/2^12; coins development 8972660/2^9, held out 13807933/2^12
+memory 2^8, r = 1: state development 8957696/2^9, held out 13874048/2^12; coins development 8969577/2^9, held out 13770430/2^12
+memory 2^8, r = 2: state development 8968231/2^9, held out 13803139/2^12; coins development 8971588/2^9, held out 13801265/2^12
+memory 2^8, r = 3: state development 8969874/2^9, held out 13807206/2^12; coins development 8974212/2^9, held out 13790806/2^12
+memory 2^10, r = 1: state development 8963172/2^9, held out 13829582/2^12; coins development 8970173/2^9, held out 13801804/2^12
+memory 2^10, r = 2: state development 8970982/2^9, held out 13793261/2^12; coins development 8972254/2^9, held out 13791976/2^12
+memory 2^10, r = 3: state development 8972527/2^9, held out 13788081/2^12; coins development 8972271/2^9, held out 13791951/2^12
+== the standing cut, memories 2^2 and 2^4 (the same script with k in (2, 4))
+memory 2^2, r = 1: state development 8941512/2^9, held out 13780886/2^12; coins development 8968777/2^9, held out 13796643/2^12
+memory 2^2, r = 2: state development 8961467/2^9, held out 13764657/2^12; coins development 8971630/2^9, held out 13781677/2^12
+memory 2^2, r = 3: state development 8969066/2^9, held out 13758773/2^12; coins development 8972660/2^9, held out 13807933/2^12
+memory 2^4, r = 1: state development 8962379/2^9, held out 13745626/2^12; coins development 8969577/2^9, held out 13770430/2^12
+memory 2^4, r = 2: state development 8959805/2^9, held out 13797025/2^12; coins development 8971588/2^9, held out 13801265/2^12
+memory 2^4, r = 3: state development 8962260/2^9, held out 13791363/2^12; coins development 8974212/2^9, held out 13790806/2^12
+== the choosing cut's first 200,000 cells (development to 170,000)
+cell tree: development 11097227/2^5, held out 15474099/2^8
+memory 2^6, r = 1: state development 11100557/2^5, held out 15476284/2^8; coins development 11101480/2^5, held out 15473733/2^8
+memory 2^6, r = 2: state development 11101219/2^5, held out 15475788/2^8; coins development 11101468/2^5, held out 15475366/2^8
+memory 2^6, r = 3: state development 11101415/2^5, held out 15475198/2^8; coins development 11101606/2^5, held out 15474669/2^8
+memory 2^8, r = 1: state development 11101035/2^5, held out 15471832/2^8; coins development 11101407/2^5, held out 15474725/2^8
+memory 2^8, r = 2: state development 11101051/2^5, held out 15471923/2^8; coins development 11101602/2^5, held out 15474655/2^8
+memory 2^8, r = 3: state development 11101471/2^5, held out 15473060/2^8; coins development 11101581/2^5, held out 15474827/2^8
+memory 2^10, r = 1: state development 11100873/2^5, held out 15473329/2^8; coins development 11101271/2^5, held out 15476131/2^8
+memory 2^10, r = 2: state development 11099414/2^5, held out 15469288/2^8; coins development 11101565/2^5, held out 15475088/2^8
+memory 2^10, r = 3: state development 11100844/2^5, held out 15476409/2^8; coins development 11101603/2^5, held out 15474749/2^8
+timeout 3600 python3 regime_letters.py  200000 170000  1703.11s user 391.79s system 98% cpu 35:18.12 total

@@ -1354,3 +1354,54 @@ in about `3353 + ε` bits, about 233 below PPM order 4. Campaign 1 declares the 
 - The depth's limit depends on the population. At 523,215 cells the widths refuse depth 63 (an
   operand of 132 bits), so the deepest the carriers admit sets it there; at campaign 1's 6,148 cells
   the card's kernel path does.
+
+## 33. The field's ceiling on text, derived and measured
+
+**The derivation, from the owners.** Within campaign 1's library a field reading reaches the
+receiver only through the word, and three facts bound what it can be.
+1. *Nothing of a word persists.* A word opens from rest except the source storage, and is released
+   at its end (`hnn::word`'s header; `Current` holds no wave, guard 16). The resonator's two-state
+   motion lives only in its word. So the state retained from one window to the next is the
+   moment's counts `M̂, Ĉ` (whole or decayed), the clock `τ` and the constitution `Θ`.
+2. *Every stage within a word is linear in the change.* The ring element is a Cayley step with fixed
+   `K` and `W`; the transit is a fixed solve; a pump is a periodic modulation of the constitution
+   (linear, time-varying); a boost is an indefinite stiffness `b diag(σ) bᵀ` (linear). So a reading
+   at a receiving epoch is `T_j(τ, Θ) s(0)`, linear in `(M̂, Ĉ)` for fixed `(τ, Θ)`.
+3. *A sheet is the sign of one such projection.* `ring::sheets` reads `Re(z ā) < 0`, the side of a
+   linear reading against an axis. A pumped sheet does not hold a state across windows: it is
+   recomputed from the counts at every word.
+
+So whatever the field supplies is a function of `(M̂, Ĉ, τ, Θ)`: global or decayed frequencies,
+signs of linear projections of them, and the clock, which is itself a count of the selected cells.
+A pumped sheet cannot carry a regime longer than the counts already carry it, and a boost changes
+`T_j`, not the linearity. The field's information about the next cell beyond the tree is at most
+`I(x; M̂, Ĉ, τ | address)`, read through those forms.
+
+**The measurement of that bound, in the field's best case** ([receipt](2026-10-02_THE_CONTACT_LOOP_receipts/regime_letters.txt),
+`regime_letters.py`). The strongest state those forms allow, with the clock removed: the signs of the
+top one to three principal directions of the passage's decayed counts, found on the development
+cells (an exterior search), at memories of 4 to 1,024 cells. The state is the first letter of a
+bundle tree whose digit trees read their base from the state's node (the root switched by state),
+joined with the cell tree in each dyadic cell; coins of the same width are the control. The cell tree
+is campaign 1's law (prior mass `2^(−3)`, the root's base, depth 16).
+- On the standing cut no state codes below the cell tree alone on the development cells: the state
+  letters cost 11 to 71 bits there (coins 64 to 75), and held out they range from one bit below the
+  cell tree to 30 above.
+- On the choosing cut's first 200,000 cells (development to 170,000) the cell tree codes
+  `11097227/2^5` development and `15474099/2^8` held-out bits. The states cost 68 to 133
+  development bits (coins 126 to 137) and save at most `4811/2^8`, about 19 bits of some 60,000,
+  held out (the 1,024-cell memory, two signs).
+
+The states carry a few tens of bits over coins, never their join. Together with §21 (linear readout),
+§26 (memory), §28 (sheets through the clock), §29 (a clock-free full-rank linear field) and §30 (the
+base), this is the field's ceiling on text with campaign 1's library: four to nine held-out bits, at
+about half of each window's compute.
+
+[agent-inferred] **The role question, answered from this.** On text the compression is the tree's,
+and the field cannot add what the tree lacks while its state is the counts, the clock and the
+constitution and its dynamics are linear within a word. To carry a passage-level state it would
+need a state that persists across words (the continuing word exists only within a refinement,
+`Word::continuing`), and to carry similarity across contexts a nonlinear entry of the content
+itself, not of its counts. Both change the retention law's quotient, not a declared value, so
+neither is a branch option to gate on campaign 1: each is a design of the field's law with its
+Lean counterpart first.
