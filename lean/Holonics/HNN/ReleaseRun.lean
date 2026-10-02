@@ -146,10 +146,11 @@ theorem gauss_newton_halvings {d K : ℝ} (hK : 0 < K) (m : ℕ)
   linarith
 
 /-- [proved-derived; formal-checked] **Below the lattice's end a halving resolves no direction**:
-when the step moves an entry by less than half the lattice unit (`2η|d| < u`), its carried
-coordinate moves by at most one, and only where its remainder lies next to a cut
-(`CarriedCuts.coordinate_moves_lt`). So `η · 2u < λ`, the halvings' end in `ladder`, is the
-lattice's resolution of the move: below it every entry's carried change is a single unit or none,
+when the step moves an entry by less than half the lattice unit (`2η|d| < u`, with `u` here the
+lattice unit), its carried coordinate moves by at most one, and only where its remainder lies next
+to a cut (`CarriedCuts.coordinate_moves_lt`). So `η · 2u < λ`, the halvings' end in `ladder` (there
+`u` is the move's largest entry change and `λ` the lattice unit), is the lattice's resolution of
+the move: below it every entry's carried change is a single unit or none,
 set by the remainders, not by the direction. -/
 theorem below_floor_one_coordinate (r d c η : ℝ) {u : ℝ} (hu : 0 < u) (hη : 0 ≤ η)
     (hfloor : η * |d| * 2 < u) :

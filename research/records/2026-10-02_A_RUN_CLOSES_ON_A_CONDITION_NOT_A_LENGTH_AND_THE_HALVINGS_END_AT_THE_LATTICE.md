@@ -131,8 +131,8 @@ is never counted as a new attempt.
    caps `η₀` below one, fewer halvings are needed.
 5. **What no count adopts.** A jump present at every small step refuses every halving (#225,
    `jump_refuses_every_halving`), and no count reaches below it. `m7`'s jump is not of that kind:
-   its commitment crossing lies at `731/840` of the `1/2048` step (§6), so the ninth step size,
-   `1/4096`, lies before it.
+   its certified gaps cross at `731/840` of the `1/2048` step under linear motion of the margins
+   (§6), so the ninth step size, `1/4096`, lies before it if that motion holds.
 
 **What fixes the count.** The chain reads no curvature bound `K` along a move and no crossing
 distance `η_c`. So nothing in its readings derives a depth to replace eight. The lattice's end is
@@ -183,10 +183,12 @@ chain under them and campaign 1's held-out read holds.
 Answered (relayed October 2):
 1. **`m7`'s refused move.** `η₀ = 1/16` (`KineticEntryScale`). Eight trials ran from `1/16` to
    `1/2048`, so `LADDER_DEPTH`, not the lattice, ended them. `1/16 = power_below(½/u)` puts `u` in
-   `(4, 8]`, and the lattice's end lies many halvings lower. The commitment crossing measured at
-   `m7` lies at `731/840` of the `1/2048` step, so a ninth step size, `1/4096`, lands before it.
-   There the order is the incumbent's and #225's adoption law applies, provided the decrease
-   clears the enclosures (§3.3).
+   `(4, 8]`, and the lattice's end lies many halvings lower. At `m7` the certified margins of
+   stations 2 and 5 cross at `731/840` of the `1/2048` step under linear motion between the
+   incumbent and that trial (the flip record's replay). No law bounds the margins' motion over the
+   step, so this is a linear reading, not a certified location of the gap order's change. If it
+   holds, a ninth step size, `1/4096`, lands before it; there the order is the incumbent's and
+   #225's adoption law applies, provided the decrease clears the enclosures (§3.3).
 2. **The diagnostic chain** never restarted and never retraced a state. No move was refused. Every
    move took one trial except moves 5 and 12, which took two. So `W` has not yet refused a run
    there: moves 5 to 12 closed at their eighth move, and moves 14 to 16 were open when the chain's
