@@ -1,0 +1,4 @@
+1ee7fed794319c8ef6c21382dd48f6622388b617
+f45fb2da43d2bec4750bbb130edc85c0d77aa830c94fc22d05e139c905650350
+args executed kinetic order2 2026093061 2 lock-dec research/records/2026-09-30_THE_MODULUS_FOUNDED_OFF_ONE_receipts/refit_on_lattice.txt opening=opening
+wall 27095 ms; exit 0; early stop 0

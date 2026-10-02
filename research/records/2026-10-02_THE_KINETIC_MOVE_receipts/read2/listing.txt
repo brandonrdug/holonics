@@ -1,0 +1,12 @@
+executed kinetic: 2 order2 requests at development seed 2026093061, the arm lock-dec, toward research/records/2026-09-30_THE_MODULUS_FOUNDED_OFF_ONE_receipts/refit_on_lattice.txt; the bank p = 5/8, grain 2^(-16)
+  opening: ρ 102837/131072; L ∈ [130257/4096, 130260/4096) nats; 85 returns; the normal law's unit move against the leg 13803133/8589934592; 26120 ms
+    iterate 1: against the leg 13803157/8589934592, residual energy 14171583/8388608
+    iterate 2: against the leg 12335065/4294967296, residual energy 16676489/33554432
+    iterate 4: against the leg 14773457/137438953472, residual energy 1147405/4194304
+    iterate 8: against the leg -5980919/4294967296, residual energy 2256739/33554432
+    iterate 16: against the leg -16493345/8589934592, residual energy 10333371/8589934592
+    iterate 32: against the leg -4276599/4294967296, residual energy 3213461/68719476736
+    iterate 64: against the leg -3569383/4294967296, residual energy 5477383/562949953421312
+    iterate 72: against the leg -3569043/4294967296, residual energy 8339393/72057594037927936
+    80 readings; stop Converged after 72; the model's change -4262367/65536; v's largest entry 16524933/4194304 (24 bits); 26120 ms
+executed kinetic: 26165 ms; resident 135405568 now, 156516352 peak
