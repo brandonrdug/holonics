@@ -89,6 +89,13 @@ Frobenius norm `frobSq`; a certificate is a declared rational bound, never a flo
    `‖1 − X''H‖∞ ≤ δ² + n·2^(−L)/2·(1 + 2‖X‖∞)·‖H‖∞` (`solved_refinement_certificate`), and a
    certificate at most `c ≤ 1/2` stays there when twice that rounding term is at most `c`
    (`solved_refinement_stays`).
+9. **The window's balance.** A window moves the Gram by `F = Σ_t w f_t f_tᵀ` and the map by the
+   executed step `γ G X̂`, each published with its carry term (`H′ = H + F + c_H`,
+   `W′ = W + γGX̂ + c_W`). Its prox residuals sum to `−γG(1 − X̂H′)` (`window_residual_sum`), and
+   `W′H′ − (WH + Σ_t w(W f_t + γ g_t)f_tᵀ) = −γG(1 − X̂H′) + W c_H + c_W H′` in any field
+   (`window_chart_balance`), with its row-norm certificate (`window_chart_certificate`). On the
+   carriers each carry term is `r − r′ − e` (`carryDefect`, `carry_value_eq`), below
+   `2^(−L) + 2^(−L−k_m)/2` per entry (`carryDefect_bounded`; `carried_window_balance`).
 
 The balance of the full element with its passive part and contrast port at an executed chart is
 `HNN/Word.element_executed_balance` (campaign 2): for any executed output `ŝ′`,
@@ -1214,6 +1221,118 @@ theorem solved_refinement_stays (L : ℕ) {H X : Matrix n n ℚ} (hX : Xᵀ = X)
 
 end SolvedRefinement
 
+/-! ## 9. The window's balance: its prox residuals, the published map and the Gram's carry -/
+
+section WindowBalance
+
+open Holonics.HNN.Normal (Window windowGram windowCovector window_cross_eq)
+open Holonics.HNN.LatticeDeposit (Carried carry release carry_accounting release_bounded
+  gammaLength)
+
+variable {𝕜 : Type*} [Field 𝕜] {σ τ : Type*} [Fintype σ] [DecidableEq σ]
+
+/-- [proved-derived; formal-checked] **The window's prox residuals summed.** The per-return
+residuals of `prox_chart_residual`, read at one successor Gram `H′`, sum to the window's
+`−γ G (1 − X̂H′)`, `G = Σ_t w g_t f_tᵀ` the window covector. -/
+theorem window_residual_sum (γ : 𝕜) (data : Window 𝕜 σ τ) (Xh H' : Matrix σ σ 𝕜) :
+    (data.map fun d => -((d.1 * γ) • vecMulVec d.2.2 d.2.1 * (1 - Xh * H'))).sum =
+      -(γ • windowCovector data * (1 - Xh * H')) := by
+  induction data with
+  | nil => simp [windowCovector]
+  | cons d data ih =>
+      simp only [windowCovector, List.map_cons, List.sum_cons] at ih ⊢
+      rw [ih, smul_add, Matrix.add_mul, neg_add, smul_smul, mul_comm γ d.1]
+
+/-- [proved-derived; formal-checked] **The window's balance with the published map and the Gram's
+carry.** A window of returns `(w, f_t, g_t)` moves the Gram by `F = Σ_t w f_t f_tᵀ` and the map by
+the executed step `γ G X̂` through a chart `X̂` of the successor Gram, each published with a carry
+term: `H′ = H + F + c_H`, `W′ = W + γ G X̂ + c_W`. Then, against the prox statistic's move
+`Σ_t w (W f_t + γ g_t) f_tᵀ` read at the published `W`,
+`W′H′ − (WH + Σ_t w (W f_t + γ g_t) f_tᵀ) = −γ G (1 − X̂H′) + W c_H + c_W H′`: the chart's residual
+at the published Gram (the window's prox residuals summed, `window_residual_sum`) plus the Gram's
+carry through the map and the map's carry through the Gram. With no carry and the exact inverse
+it is `HNN/Normal.depositLocus_solves`'s step. -/
+theorem window_chart_balance (γ : 𝕜) (data : Window 𝕜 σ τ) (W cW : Matrix τ σ 𝕜)
+    (H Xh cH : Matrix σ σ 𝕜) {W' : Matrix τ σ 𝕜} {H' : Matrix σ σ 𝕜}
+    (hW : W' = W + γ • windowCovector data * Xh + cW) (hH : H' = H + windowGram data + cH) :
+    W' * H' - (W * H + (data.map fun d => d.1 • vecMulVec (W *ᵥ d.2.1 + γ • d.2.2) d.2.1).sum) =
+      -(γ • windowCovector data * (1 - Xh * H')) + W * cH + cW * H' := by
+  have hWH : W * H' = W * H + W * windowGram data + W * cH := by
+    rw [hH, Matrix.mul_add, Matrix.mul_add]
+  rw [window_cross_eq, hW, Matrix.add_mul, Matrix.add_mul, hWH, Matrix.mul_sub, Matrix.mul_one,
+    Matrix.mul_assoc (γ • windowCovector data) Xh H']
+  abel
+
+/-- [proved-derived; formal-checked] **The window balance's certificate**: over `ℚ`,
+`‖W′H′ − (WH + Σ_t w (W f_t + γ g_t) f_tᵀ)‖∞ ≤ ‖γG‖∞‖1 − X̂H′‖∞ + ‖W‖∞‖c_H‖∞ + ‖c_W‖∞‖H′‖∞`. -/
+theorem window_chart_certificate [Fintype τ] (γ : ℚ) (data : Window ℚ σ τ) (W cW : Matrix τ σ ℚ)
+    (H Xh cH : Matrix σ σ ℚ) {W' : Matrix τ σ ℚ} {H' : Matrix σ σ ℚ}
+    (hW : W' = W + γ • windowCovector data * Xh + cW) (hH : H' = H + windowGram data + cH) :
+    rowNorm (W' * H' -
+        (W * H + (data.map fun d => d.1 • vecMulVec (W *ᵥ d.2.1 + γ • d.2.2) d.2.1).sum)) ≤
+      rowNorm (γ • windowCovector data) * rowNorm (1 - Xh * H') + rowNorm W * rowNorm cH +
+        rowNorm cW * rowNorm H' := by
+  rw [window_chart_balance γ data W cW H Xh cH hW hH]
+  refine (rowNorm_add_le _ _).trans (add_le_add ((rowNorm_add_le _ _).trans
+    (add_le_add ?_ (rowNorm_mul_le _ _))) (rowNorm_mul_le _ _))
+  rw [rowNorm_neg]
+  exact rowNorm_mul_le _ _
+
+variable {L : ℕ} {E : Type*}
+
+/-- [definition] **One deposit's carry term** at an entry: `r − r′ − e`, the remainder given back
+less the remainder kept and the residual released. -/
+noncomputable def carryDefect (s : Carried L E) (Δ : E → ℚ) (i : E) : ℚ :=
+  s.rem i - (carry s Δ).rem i - release s Δ i
+
+/-- [proved-derived; formal-checked] **A deposit publishes its update plus its carry term**:
+`value′ = value + Δ + (r − r′ − e)` (`carry_accounting`). -/
+theorem carry_value_eq (s : Carried L E) (Δ : E → ℚ) (i : E) :
+    (carry s Δ).value i = s.value i + Δ i + carryDefect s Δ i := by
+  have := carry_accounting s Δ i
+  unfold carryDefect
+  linarith
+
+/-- [proved-derived; formal-checked] **The carry term is below one unit and half a fine unit**:
+`|r − r′ − e| < 2^(−L) + 2^(−L−k_m)/2`, from the two remainders' cells and `release_bounded`. -/
+theorem carryDefect_bounded (s : Carried L E) (Δ : E → ℚ) (i : E) :
+    |carryDefect s Δ i| < unit L + unit (L + gammaLength (s.clock + 1)) / 2 := by
+  have h1 := s.rem_bounded i
+  have h2 := (carry s Δ).rem_bounded i
+  have h3 := abs_le.mp (release_bounded s Δ i)
+  unfold carryDefect
+  rw [abs_lt]
+  constructor <;> linarith [h1.1, h1.2, h2.1, h2.2, h3.1, h3.2]
+
+/-- [definition] A carrier indexed by `τ × σ`, read as a matrix. -/
+def entryMatrix {α β : Type*} (v : α × β → ℚ) : Matrix α β ℚ := Matrix.of fun i j => v (i, j)
+
+/-- [proved-derived; formal-checked] **The window's balance on the carried map and Gram**
+(`hnn::constitution::NormalLaw::deposited`): the map's carrier `s_W` deposits the executed step
+`γ G X̂` and the Gram's carrier `s_H` deposits `F`, each by `carry`; the published successors
+satisfy `window_chart_balance` with the carry terms `c_W = r_W − r_W′ − e_W` and
+`c_H = r_H − r_H′ − e_H` (`carryDefect`), each entry below `2^(−L) + 2^(−L−k_m)/2`
+(`carryDefect_bounded`). -/
+theorem carried_window_balance (γ : ℚ) (data : Window ℚ σ τ) (Xh : Matrix σ σ ℚ)
+    (sW : Carried L (τ × σ)) (sH : Carried L (σ × σ)) :
+    entryMatrix (carry sW fun p => (γ • windowCovector data * Xh) p.1 p.2).value *
+        entryMatrix (carry sH fun p => windowGram data p.1 p.2).value -
+      (entryMatrix sW.value * entryMatrix sH.value +
+        (data.map fun d =>
+          d.1 • vecMulVec (entryMatrix sW.value *ᵥ d.2.1 + γ • d.2.2) d.2.1).sum) =
+      -(γ • windowCovector data *
+          (1 - Xh * entryMatrix (carry sH fun p => windowGram data p.1 p.2).value)) +
+        entryMatrix sW.value * entryMatrix (carryDefect sH fun p => windowGram data p.1 p.2) +
+        entryMatrix (carryDefect sW fun p => (γ • windowCovector data * Xh) p.1 p.2) *
+          entryMatrix (carry sH fun p => windowGram data p.1 p.2).value := by
+  apply window_chart_balance
+  · ext i j
+    simp only [entryMatrix, Matrix.of_apply, Matrix.add_apply, carry_value_eq]
+  · ext i j
+    simp only [entryMatrix, Matrix.of_apply, Matrix.add_apply, carry_value_eq]
+
+end WindowBalance
+
 section Audit
 
 #print axioms newton_schulz_right
@@ -1269,6 +1388,12 @@ section Audit
 #print axioms rounded_residual_refinement_certificate_left
 #print axioms solved_refinement_certificate
 #print axioms solved_refinement_stays
+#print axioms window_residual_sum
+#print axioms window_chart_balance
+#print axioms window_chart_certificate
+#print axioms carry_value_eq
+#print axioms carryDefect_bounded
+#print axioms carried_window_balance
 
 end Audit
 
