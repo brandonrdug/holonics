@@ -1,0 +1,20 @@
+close 1: fitted on 1070, scored on the next aeon's 1122; tree alone 14967487/2^22
+close 1: fitted on 1070, scored on the next aeon's 1122; linear 14950376/2^22 (ridge 8388608/2^27)
+close 1: fitted on 1070, scored on the next aeon's 1122; fourier 14810578/2^22 (ridge 8388608/2^19)
+close 1: fitted on 1070, scored on the next aeon's 1122; quadratic 8885367/2^21 (ridge 8388608/2^19)
+close 1: fitted on 1070, scored on the next aeon's 1122; nearest anchors 15056483/2^22 (lam 8388608/2^27)
+close 2: fitted on 2192, scored on the next aeon's 1138; tree alone 13930200/2^22
+close 2: fitted on 2192, scored on the next aeon's 1138; linear 13907145/2^22 (ridge 8388608/2^27)
+close 2: fitted on 2192, scored on the next aeon's 1138; fourier 13812315/2^22 (ridge 8388608/2^19)
+close 2: fitted on 2192, scored on the next aeon's 1138; nearest anchors 13907145/2^22 (lam 0)
+close 3: fitted on 3330, scored on the next aeon's 70; tree alone 13962286/2^22
+close 3: fitted on 3330, scored on the next aeon's 70; linear 13910298/2^22 (ridge 8388608/2^27)
+close 3: fitted on 3330, scored on the next aeon's 70; fourier 13786855/2^22 (ridge 8388608/2^19)
+close 3: fitted on 3330, scored on the next aeon's 70; nearest anchors 13910298/2^22 (lam 0)
+close 1: fitted on 1070, scored on the next aeon's 1122; linear-replay 14913780/2^22
+close 2: fitted on 2192, scored on the next aeon's 1138; linear-replay 13803654/2^22
+close 3: fitted on 3330, scored on the next aeon's 70; linear-replay 13770373/2^22
+close 1: fitted on 1070, scored on the next aeon's 1122; fourier-replay 14940909/2^22
+close 2: fitted on 2192, scored on the next aeon's 1138; fourier-replay 13904300/2^22
+close 3: fitted on 3330, scored on the next aeon's 70; fourier-replay 13897823/2^22
+args: receiver_nonlinear.py over the samples of a three-aeon run at main 7afbb887 (hnn_exposure ablation 1700 samples; 1,320,724 ms against a projection of 1,256 s and inside its 1,400 s deadline, the run of section 21 repeated, whose sample file the removed worktree had deleted); each (close, receiver) one process with one thread, deadline 900 s; the quadratic fits at closes 2 and 3 were stopped by hand at about 400 s, after close 1's quadratic fit coded above the tree alone (overfit): incomplete; the gradient-descent fits use 150 iterations, so the linear one sits above section 21's converged fit, and the comparison among them is at equal budget

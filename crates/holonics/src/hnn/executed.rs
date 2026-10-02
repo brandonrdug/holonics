@@ -532,7 +532,7 @@ fn positive_part(value: &ExactInterval) -> ExactInterval {
 }
 
 /// `ln 2` enclosed on the declared grid, formed once.
-fn ln_two() -> Result<ExactInterval, HnnError> {
+pub(crate) fn ln_two() -> Result<ExactInterval, HnnError> {
     static LN_TWO: OnceLock<ExactInterval> = OnceLock::new();
     if let Some(value) = LN_TWO.get() {
         return Ok(value.clone());
