@@ -75,12 +75,18 @@ is fixed and is not raised.
 Gate: w16's held-out combined code below m6's by at least `1024·1/16 = 64` bits. Report the held-out and
 training lines whole.
 
-## P5. The joint held-out read of the three move-16 states (waits on all three)
+## P5. The joint held-out read of the four move-16 states (waits on all four)
 
-When Q2's Coordinate chain, Q2's Kinetic control and the throw chain (#240) each store their move-16
-state, the main line names the three paths here, and the PC reads them in one call at 16 threads:
+When these chains each store their move-16 state, the main line names the four paths here, and the PC
+reads them in one call at 16 threads:
+- Q2's Coordinate chain and Q2's Kinetic control, both under #202's interval acceptance;
+- the throw chain (#240), under strict descent (`move-once`, `ReleaseExcursion::monotone()`);
+- the throw's control, the same driver with `coordinate` in place of `throw`, also under strict descent.
+
+The throw is read against its control: both chains run the same acceptance law. It is not read against
+Q2's chains, which run #202's interval and adopt trials that strict descent refuses (η 1/2 at c0).
 ```
-RAYON_NUM_THREADS=16 timeout 5096 $B executed evaluate order2 2026093012 128 out/p5-move16 coord16=<path> kin16=<path> throw16=<path>
+RAYON_NUM_THREADS=16 timeout 6795 $B executed evaluate order2 2026093012 128 out/p5-move16 coord16=<path> kin16=<path> throw16=<path> tctl16=<path>
 ```
-The deadline is three times the measured 566219 ms per state at 16 threads, times three states (`9·566219 = 5095971` ms):
-`timeout 5096`. Report whole sections and stations right by station for each state.
+The deadline is three times the measured 566219 ms per state at 16 threads, for four states
+(`12·566219 = 6794628` ms). Report whole sections and stations right, station by station, for each state.
