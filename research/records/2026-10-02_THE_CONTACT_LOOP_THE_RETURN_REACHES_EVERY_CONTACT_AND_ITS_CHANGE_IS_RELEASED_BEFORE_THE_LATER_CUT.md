@@ -451,11 +451,15 @@ The first aeon took 245,316 ms against the projection's 205 s per aeon
 | 1 | 560 | 6,720 / 6,549 | `4237223/2^36` | 561 of 561 / `9383943/2^32` |
 
 The return reaching the contacts grows by about `2^6` from the first aeon to the second, yet the
-share of families that vanish rises from about half to 97 percent. A unit step is `D = G/h′` with
-the family's statistic `h′` accumulating the feature energy of every passage, while the fine lattice
-refines only as `2⌊log₂ m⌋ + 1` in the locus's clock. So the step shrinks faster than the lattice
-refines, and the contacts freeze by rounding. The cumulative change of §13 is therefore what the
-current lattice permits, not a trend. `R`, whose step is `η = 1` at every deposit, keeps moving.
+share of families that vanish rises from about half to 97 percent. ~~So the step shrinks faster than
+the lattice refines, and the contacts freeze by rounding.~~ [Edit, October 2, from the Lean thread's
+proofs, commit `2c7dcfa`.] "Vanished" counts deposits at which a family took no coarse coordinate
+(`q = 0`), not updates released. At clock `m` the fine cell lies between `u/(2m²)` and `2u/m²`, so a
+step decaying as `1/m` is held in the carried remainder, not released. A unit step is `D = G/h′`,
+with the statistic `h′` accumulating every passage's feature energy. The contacts reach the next
+coarse unit only as `κ · log` of that statistic's growth. The freeze is that logarithmic law, not
+the rounding of individual steps. The cumulative change of §13 is what this schedule permits, not a
+trend. `R`, whose step is `η = 1` at every deposit, keeps moving.
 
 **The information (second order).** The receiver's readings were compared over 128 frozen readings
 (64 windows) after each close, the opening's contacts against the learned:
@@ -511,8 +515,15 @@ magnitudes to the sums of the magnitudes:
 | 2 | 768,938 / 1,455 | `10315767/2^25` | `1/√528` |
 | 3 | 161,064 / 303 | `667429/2^21` | `1/√531` |
 
-The dropped residuals are coherent: about `1/3` of their magnitude survives summation per entry,
-about seven times what independent signs would leave.
+~~The dropped residuals are coherent: about `1/3` of their magnitude survives summation per entry,
+about seven times what independent signs would leave.~~ [Edit, October 2: wrong. The `1/√n` baseline
+assumes residuals of equal magnitude. These are heavy-tailed, so a few large ones dominate both
+sums, and the pooled ratio is not a coherence test. The test is per entry: `Z = S/√Q`, with `S` the
+sum and `Q` the sum of squares, coherent at `α = 1/20` when `Z² > 2 ln 40` (the Lean thread's
+statistic). Over the same first aeon
+([receipt](2026-10-02_THE_CONTACT_LOOP_receipts/coherence_aeon0.txt)), 3 of 2,652 entries pass:
+0 of 303, 0 of 591, 3 of 1,455 and 0 of 303 for contacts 0 to 3. That is fewer than the
+`2,652/20` chance alone would pass. The dropped residuals cancel; they are not coherent.]
 
 **The derivation of what that is worth.** A released residual is the part of an entry's update below
 the fine lattice, `|e| < ½ · 2^(−L−k_m)`, with `k_m = 2⌊log₂ m⌋ + 1` at the locus's clock `m`. The
@@ -528,3 +539,65 @@ they add coherently, has a two-part answer. They do add coherently. The lattice 
 their total by half a unit per entry, so carrying them changes the contacts by at most one step per
 entry. The freeze after the first aeon is correct behaviour. The contacts have learned what they can
 at this grain, and their remaining updates fall below the size the law admits.
+
+[Edit, October 2, from the Lean thread's proofs, commit `2c7dcfa`.] The half-unit cap is tight: `2^J − 1`
+deposits can drop exactly `(u/2)(1 − 2^(−J))`. It holds only because the declared schedule's fine
+cell shrinks as `1/m²`, which is summable. For any schedule the drop is at most `u/2` times that
+schedule's Kraft sum. Under the derived grain `1/L(N)`, `L(N) = ⌈√(N ln 2/2)⌉`, the sum is at least
+`√N/4`, which passes one at `N = 16` and grows without bound. So "the freeze is correct behaviour" is
+a property of the declared `1/m²` schedule. It does not survive the derived grain. ~~under which the
+coherent remainders found above would accumulate without a cap.~~ Under the derived grain the cap
+grows without bound, but the residuals cancel (the corrected test above), so what they would add
+grows as the square root of their count, not linearly. Under either schedule, rounding drops no
+coherent signal from the contacts.
+
+**The conclusion's dependence, stated.** "Learned what they can at this grain" holds for the
+declared schedule. The base lattice `L` of each locus comes from the lattice rule, which reads the
+receiver's grain `L_R`, and `L_R` is the declared `1/16` bit (§11), not derived. The fine lattice's
+precision `k_m = 2⌊log₂ m⌋ + 1` follows the locus's clock. The Kraft cap `u/2 = ½ · 2^(−L)` is a
+property of that schedule. If `L_R` followed the derived grain, which refines as `√N` with the
+receiver's reading count (§11; the constants audit, PR #150), `L` would grow with the readings.
+That shrinks both the cap and the size below which a contact's step vanishes, so more of the
+contacts' late updates would land. This dependence is stated, not measured. Whether those updates
+would then reach the receiver above its resolution is the question of §12, whose bottleneck is the
+receiver's gain, not the contacts' lattice.
+
+## 16. The receiver's separation levels off while `R` keeps growing (incomplete: three closes)
+
+This read takes `R`, the receiving map, at each aeon's close
+([receipt](2026-10-02_THE_CONTACT_LOOP_receipts/receiver_gain_incomplete.txt)). It passed its
+1,250 s deadline after three closes, because the host was under other load (a load average of about
+5), and an identical configuration had run all six aeons in 1,114,572 ms. It is reported incomplete
+and was not relaunched with a larger limit.
+
+**`R`'s update, from the code.** The receiving map is a normal law whose certified step is
+`η = 1` at every deposit (its gain is `κ² = 1`: `Constitution::gain`, `LinearLocus::Receiving`). Its
+unit step is `D = Σ_t w g_t (X̂ f_t)ᵀ`, with `X̂ ≈ H′⁻¹` and `H′` the Gram of the receiving anchors,
+accumulated since the opening. Its covector is the comparison's `p − q`. This is an online
+Gauss–Newton step on the cross-entropy, preconditioned by the accumulated Gram, so the size of
+each step falls roughly as `1/n` in the anchors seen.
+
+| Close | `R`'s largest entry | `R`'s largest change since the last close, over its largest entry | The receiver's exponent span, largest in the aeon before (bits) |
+|---|---|---|---|
+| after aeon 0 | `219/1024` | `1` (`R₀ = 0`) | `2076909/2^25` |
+| after aeon 1 | `97/256` | `4756427/2^23` | `2838929/2^24` |
+| after aeon 2 | `267/512` | `4587029/2^24` | `3918029/2^24` |
+
+`R` moved at every deposit: 534, 561 and 569 of 534, 561 and 569. Its certified decrease `a` holds
+steady, with medians `10550203/2^33`, `9383943/2^32` and `205299/2^27`.
+
+**What this settles.**
+- **Not a rounding freeze.** `R` moves at every deposit, unlike the contacts.
+- **Its step does shrink.** Its relative change per aeon roughly halves from aeon to aeon, while
+  its largest entry still grows by `219/1024`, about `0.166` and about `0.143` per aeon.
+- **The separation saturates faster than `R` grows.** From the second close to the third, `R`'s
+  largest entry grows by `267/512 ÷ 97/256`, about `1.38` times, while the aeon's span grows about
+  `1.38` times too. From the first close to the third, `R` grows `2.4` times and the span `3.8`
+  times. On three points the separation tracks `R`'s growth, and both slow down.
+
+[agent-inferred] On three closes the leveling-off is the online estimator's own slowing (its step
+falls as its Gram accumulates), not a freeze. Whether the level it approaches is the best a
+receiver of this form can reach on these anchors is the fitted-oracle comparison: the
+cross-entropy-optimal `R` of the same form on the same windows, against `R`'s span at each close.
+That comparison has not been run, and it needs the receiving anchors, which the refine does not
+publish. It is the next build.
