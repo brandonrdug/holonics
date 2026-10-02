@@ -27,10 +27,15 @@ used here, deposit `i` moves an entry by at most `κ` times the share of the sta
 
 1. **The logarithm law** (`sum_fraction_le_log`, `move_le_log`, `move_needs_growth`). Under that
    bound the exact sum of the entry's updates from deposit `m` to deposit `n` is at most
-   `κ log(h_n/h_m)` in size, whatever the updates' signs, rounded or not. To move an entry by one
-   lattice unit `u` after deposit `m`, the statistic must grow by the factor `e^(u/κ)`. A
-   statistic that grows linearly in the windows makes that exponentially many windows: the contact
-   freezes because its step decays as `1/h`, not because rounding loses its moves.
+   `κ log(h_n/h_m)` in size, whatever the updates' signs, rounded or not. For the updates alone to
+   sum to one lattice unit `u` after deposit `m`, the statistic must grow by the factor `e^(u/κ)`.
+   That bounds the accumulated updates, not the first move: the carried remainder can sit just
+   inside the cell's edge, so a small update can move the entry once. A sustained displacement is
+   bounded, though: by the accounting (`run_accounting`, with both carried remainders at most
+   `u/2` and the releases below `u/2`), moving `k` units needs `|Σ δ| > (k − 3/2) u`, so the
+   statistic must grow by `e^((k − 3/2)u/κ)`. A statistic that grows linearly in the windows makes
+   that exponentially many windows: the contact freezes because its step decays as `1/h`, not
+   because rounding loses its moves.
 2. **A coherent contact still moves, but only logarithmically** (`sum_log_ratio`,
    `coherent_move_ge`). If every update keeps one sign and at least `κ′` times the share, and no
    deposit grows the statistic by more than the factor `1 + ρ`, the sum is at least
@@ -61,8 +66,9 @@ used here, deposit `i` moves an entry by at most `κ` times the share of the sta
 6. **The step against the fine cell** (`gammaWeight_bounds`, `step_exceeds_fine_cell`). The fine
    cell at clock `m` is between `u/(2m²)` and `2u/m²`. A step decaying as `κ′/m` exceeds the half
    cell once `κ′ m > u`, so it is carried, not released. The contacts are held by the coarse unit
-   `u`, which the logarithm law (item 1) says the steps reach only after the statistic grows by
-   `e^(u/κ)`; the release is not what freezes them.
+   `u`: past the first move the carried remainder can supply, the logarithm law (item 1) says each
+   further unit needs the statistic to grow by about `e^(u/κ)`; the release is not what freezes
+   them.
 7. **The bound under a refining schedule** (`schedule_release_le`, `schedule_release_attained`,
    `refining_schedule_kraft_ge`, `refining_schedule_kraft_ge_one`). For any precision schedule the
    releases at an entry total at most `(u/2) Σ_j 2^(−k_j)`, and that total is reached. If the fine
@@ -71,6 +77,10 @@ used here, deposit `i` moves an entry by at most `κ` times the share of the sta
    deposits sum to at least `√N/4`: one from `N = 16`, and without bound. The drop could then
    reach `(u/2)·√N/4`, a whole unit from `N = 64`. The half-unit conclusion holds because the
    code's cell refines as `1/m²`, which is summable; a cell refining as `1/√m` is not.
+   Here the coarse unit `u` is held fixed, as the carrier fixes `L`. If the coarse unit itself
+   refined with the grain, the half-unit bound would shrink with it, and each drop would have to be
+   read against the unit current at its deposit; re-basing a carrier's lattice is not modelled here
+   and stays owed in #62.
 
 [definition] **The condition, in what the main line measures.** The carried remainder's own sign is
 not the statistic: it lies in `[−u/2, u/2)` and changes sign every time the entry moves. The
@@ -154,8 +164,9 @@ theorem move_le_log (h : ℕ → ℝ) (hpos : ∀ i, 0 < h i) (hmono : ∀ i, h 
     _ ≤ κ * Real.log (h n / h m) :=
         mul_le_mul_of_nonneg_left (sum_fraction_le_log h hpos hmono hmn) hκ
 
-/-- [proved-derived; formal-checked] **Moving one unit needs exponential growth.** Under the
-logarithm law, an accumulated move of at least `u` over the run needs `h_n ≥ h_m e^(u/κ)`. -/
+/-- [proved-derived; formal-checked] **Accumulating one unit needs exponential growth.** Under the
+logarithm law, updates that sum to at least `u` over the run need `h_n ≥ h_m e^(u/κ)`. This bounds
+the accumulated updates; the carried remainder can bring the entry's first move sooner. -/
 theorem move_needs_growth (h : ℕ → ℝ) (hpos : ∀ i, 0 < h i) (hmono : ∀ i, h i ≤ h (i + 1))
     (δ : ℕ → ℝ) {κ u : ℝ} (hκ : 0 < κ)
     (hδ : ∀ i, |δ i| ≤ κ * ((h (i + 1) - h i) / h (i + 1))) {m n : ℕ} (hmn : m ≤ n)
