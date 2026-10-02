@@ -5,6 +5,7 @@ import Holonics.Holon.Element
 import Holonics.Holon.Navigator
 import Holonics.Holon.Restriction
 import Holonics.Holon.Law
+import Holonics.Holon.Law.Fisher
 import Holonics.Holon.Conformance
 import Holonics.Holon.Deposition
 import Holonics.Holon.Reaction
@@ -19,7 +20,8 @@ import Holonics.Holon.MomentStorage
 is its law and ports — complex and connection (`Holon.Complex`), ports and power (`Holon.Port`),
 Dirac interconnection (`Holon.Dirac`), element relations and balances (`Holon.Element`),
 generators and clock jumps (`Holon.Navigator`), restrictions (`Holon.Restriction`), the five laws
-(`Holon.Law`), the existing owners as instances (`Holon.Conformance`) deposition under
+(`Holon.Law`), the lock's Fisher form on its move plane, its kernel, its step and its
+chart invariance (`Holon.Law.Fisher`), the existing owners as instances (`Holon.Conformance`) deposition under
 learning (`Holon.Deposition`) the workless reaction (`Holon.Reaction`), its implicit
 Cayley step (`Holon.Cayley`) and the lossless unit-admittance contact of a current with an affine
 family of the constitutive relation (`Holon.AffineContact`). Namespace
