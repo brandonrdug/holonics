@@ -5837,10 +5837,14 @@ impl Constitution {
                     let samples = metric.as_deref().unwrap_or(&step.samples[..]);
                     let mut step_prepared = law.prepare(samples, &rule, at).map_err(refused)?;
                     if let (Some(_), Some(prepared_step)) = (&metric, step_prepared.as_mut()) {
-                        if let Some((moves, oscillation)) =
+                        if let Some((moves, oscillation, alignment)) =
                             receiving_fisher_face(&step.samples, &prepared_step.unit.to_rows())
                         {
                             prepared_step.moves = moves;
+                            // The certified decrease pairs the original comparison's covector with
+                            // the move: the metric shapes the direction, never the law it descends
+                            // (Astra's review, October 2).
+                            prepared_step.alignment = alignment;
                             // At most the unit step: `η · max(osc, 1) ≤ 1`.
                             prepared_step.covector = oscillation.max(Rat::one());
                         }
@@ -6127,11 +6131,14 @@ pub fn receiving_class_metric(samples: &[Sample]) -> Option<Rat> {
 /// along the unit step `Δ_t = D f_t` is at most `(119/80) Var_p̃(Δ_t^Re) + ¼ |Δ_t^Im|²`. The
 /// certificate's `C = s κ² b` with `s = ½`, `κ² = 1` then takes `b = 2 Σ_t (…)`, and its covector
 /// scale is the largest magnitude oscillation `max_t osc(Δ_t^Re)` (`ηc ≤ 1` is `η · osc ≤ 1`).
+/// Its alignment is the original comparison's, `a = Σ_t w ⟨g_t, Δ_t⟩` with `g_t` the read's own
+/// `q − p̃`: the class metric shapes `D`, and the decrease it certifies is the original code's
+/// (Astra's review, October 2: pairing the scaled covector overstated it by the metric's factor).
 /// `None`, leaving the worst-case readings, when a covector is not a face's `q − p̃`. Lean
 /// `HNN/Ratio/Certificate.{codeLength_add_le_fisher, face_mass_le_odometer_on_grain,
 /// codeLength_add_le_odometer}` (the magnitude part, at half this second-derivative bound).
-fn receiving_fisher_face(samples: &[Sample], unit: &[Vec<Rat>]) -> Option<(Rat, Rat)> {
-    let (mut curvature, mut oscillation) = (Rat::zero(), Rat::zero());
+fn receiving_fisher_face(samples: &[Sample], unit: &[Vec<Rat>]) -> Option<(Rat, Rat, Rat)> {
+    let (mut curvature, mut oscillation, mut alignment) = (Rat::zero(), Rat::zero(), Rat::zero());
     for sample in samples.iter().filter(|s| !s.weight.is_zero()) {
         let delta: Vec<Rat> = unit
             .iter()
@@ -6151,6 +6158,7 @@ fn receiving_fisher_face(samples: &[Sample], unit: &[Vec<Rat>]) -> Option<(Rat, 
         let second: Rat = masses.iter().zip(&real).map(|(p, d)| p * *d * *d).sum();
         let variance = second - &mean * &mean;
         let phase: Rat = imaginary.iter().map(|d| *d * *d).sum();
+        alignment += &sample.weight * sample.covector.iter().zip(&delta).map(|(g, d)| g * d).sum::<Rat>();
         curvature += sample.weight.abs()
             * (Rat::new(BigInt::from(119), BigInt::from(80)) * variance
                 + phase / Rat::from_integer(BigInt::from(4)));
@@ -6158,7 +6166,17 @@ fn receiving_fisher_face(samples: &[Sample], unit: &[Vec<Rat>]) -> Option<(Rat, 
             oscillation = oscillation.max(*high - *low);
         }
     }
-    Some((Rat::from_integer(BigInt::from(2)) * curvature, oscillation))
+    Some((Rat::from_integer(BigInt::from(2)) * curvature, oscillation, alignment))
+}
+
+/// The receiving Fisher face's three readings for a test: its curvature, oscillation and the
+/// original comparison's alignment `Σ_t w ⟨g_t, D f_t⟩`.
+#[cfg(test)]
+pub(crate) fn receiving_fisher_face_probe(
+    samples: &[Sample],
+    unit: &[Vec<Rat>],
+) -> Option<(Rat, Rat, Rat)> {
+    receiving_fisher_face(samples, unit)
 }
 
 /// One locus's deposited carried remainders, budgeted carry and chart readings, or the refusal its
