@@ -215,6 +215,25 @@ reads the host's Gram and chart in their dense forms, so it takes the off-suppor
 stand. Its parity test gains a window at `2 I` that reaches half the coordinates, and that test
 runs on the card.
 
+The change is measured twice before it merges, and both rules are fixed here before either read.
+- (a) A field at the unit prior is unchanged. Q1's `executed metric-steps order2 2026093061 8
+  lock-dec` at C0 (the order-2 field declares `receiving_scale = 0`) reproduces its stored receipt
+  except the three elapsed-ms fields and the resident line
+  ([receipt](2026-10-02_THE_READINGS_LOCATE_THE_RECEIVING_PRIOR_receipts/q1_metric_steps_scaled_receipt.txt)).
+  It was built at `fe9c58e9`, the stored Q1's commit, with this change applied, not at the
+  branch's own commit: `fe9c58e9` differs from the base `3515ed4a` (for example by 228 lines in
+  `executed.rs`), and building at `fe9c58e9` makes the read like for like with the stored receipt.
+- (b) Campaign 1 at `2 I` against `I`. The read is the held-out model `q`'s code enclosure over the
+  held-out cells `[4958, 6148)`, paired cell by cell between the two members. The gate is
+  `1190/16` bits: one declared grain of `1/16` bit per held-out decision. There are three
+  outcomes.
+  - Pass: `2 I`'s held-out code is below `I`'s by at least `1190/16` bits over the whole
+    enclosure. The change merges.
+  - Undecided: neither pass nor fail; the difference's enclosure reaches inside the gate.
+    The change merges, recorded as not resolved at the grain.
+  - Fail: `2 I`'s held-out code is at or above `I`'s over the whole enclosure. The change does
+    not merge.
+
 Carrying `a` and `V` natively beside the Gram, and moving `s` by the Newton point as readings
 arrive, is the per-field law's native form. It is not built here.
 
