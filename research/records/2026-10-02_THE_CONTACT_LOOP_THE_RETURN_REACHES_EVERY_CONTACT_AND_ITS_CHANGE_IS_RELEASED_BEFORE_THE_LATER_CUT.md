@@ -301,12 +301,15 @@ Over 256 windows, take the largest change of the next window's exponents `v` ove
 classes:
 - **The fresh consumer:** median `41/2^24`, upper quartile `33/2^23`, largest `695/2^25` bits.
 - **The continuing consumer:** median `53/2^24`, upper quartile `77/2^24`, largest `7/2^18` bits.
-- None reaches `1/21` or `1/16`. The largest, `7/2^18`, lies more than `2^12` times below the derived
-  resolution.
+- None reaches `1/21` or `1/16`. The largest, `7/2^18`, lies ~~more than `2^12` times~~ more than
+  `2^10` times below the derived resolution. [Edit, October 2: the ratio is `(1/21)/(7/2^18)`, about
+  `2^10.8`, not more than `2^12`.]
 
 **The finding.** The contacts' change cannot physically be read by this receiver. With
-`max |δ| ≤ 7/2^18`, one reading carries less than `(ln 2/2)(7/2^18)² < 2^(−29)` bits about it, so
-the receiver would need more than `2^29` readings, about `2^19` aeons, to tell the media apart. The
+`max |δ| ≤ 7/2^18`, one reading carries less than `(ln 2/2)(7/2^18)² < 2^(−31)` bits about it, so
+the receiver would need more than `2^31` readings, ~~about `2^19` aeons~~ more than `2^21` aeons, to
+tell the media apart. [Edit, October 2: `(ln 2/2)·49/2^36` lies below `2^(−31)`, and `2^31/1190`
+exceeds `2^20`. The earlier margins, `2^(−29)` and about `2^19` aeons, were loose or wrong.] The
 14 windows whose code moved are cells whose exponent sat within `7/2^18` of a cell edge and crossed
 it. That is a boundary effect, not information. The finding is the weak coupling: the return-driven
 contact change is real, conserved in the energy account and carried to the receiver, but it reaches
@@ -360,3 +363,48 @@ measure the second.
 Time: the run stopped at the first aeon's carry-out, by `contact_ablation`'s declared stop (it
 closes no aeon), at 534 of the 3,074 projected windows. Its wall, 175,763 ms over 534 windows, is
 within the per-window projection.
+
+## 13. Over the whole cut: the receiver's span saturates, and the contacts' changes add up
+
+The ablation now closes each aeon (without the exposure's key location) and, at the first window
+after each boundary, reads that window at the published constitution and at the same constitution
+with every contact's factors returned to the opening's
+([receipt](2026-10-02_THE_CONTACT_LOOP_receipts/cumulative_cut.txt): 3,068 windows, six aeons,
+1,114,572 ms against a projected 1,011,346 ms, inside the 1,200 s deadline). All numbers assume the
+current certified step (`s = ½` in `C = s κ² b`). The constants audit (PR #150) derives the tight
+value `ln 2/2`, which would scale every deposit's step by `1/ln 2`.
+
+| Aeon | Receiver's exponent span, largest (bits) | One deposit's contact change, largest (bits) | Contacts' cumulative change at the aeon's close (bits) |
+|---|---|---|---|
+| 0 | `2076909/2^25` | `695/2^25` | |
+| 1 | `2838929/2^24` | `453/2^25` | `5237/2^19` |
+| 2 | `3918029/2^24` | `59/2^21` | `222317/2^24` |
+| 3 | `4480569/2^24` | `135/2^24` | `749861/2^25` |
+| 4 | `9531753/2^25` | `163/2^24` | `1025753/2^25` |
+| 5 | `2447437/2^23` | 0 | `1003399/2^25` |
+
+- **The receiver's span grows, then saturates.** It rises from about `1/16` to about `0.29` bits
+  (`2447437/2^23`) by the sixth aeon, with each step smaller than the last.
+- **Contacts move less after the first aeon.** A contact moved at 679 of the 3,068 windows: at 487
+  of the first aeon's 534, and at about 190 over the five aeons after it.
+- **The contacts' changes add up.** Over the cut their cumulative change in the receiver's
+  exponents grows from `5237/2^19` bits at the first close to `1025753/2^25` bits at the fourth,
+  more than a thousand times one deposit's largest change, then holds.
+
+**Readability of the cumulative change.** By the bound of §11, an exponent change of at most `Δ`
+bits carries at most `(ln 2/2) Δ²` bits per reading. At `Δ = 1025753/2^25` (between `3/100` and
+`1/32`), the bound reaches one bit only after more than `2/(ln 2 · Δ²)` readings. That is more than
+3,000 and fewer than 3,300, about three aeons. The cut's 6,148 readings exceed that, so the upper
+bound no longer rules the cumulative change out: it reaches a size the receiver could resolve within
+the exposure. Whether it actually does needs a lower bound on `Var_p(δ)`, and this measurement
+records only the largest `|δ|`. The single-window codes at the six closes go both ways. At the fifth
+close the learned contacts read `669256998367765604292325457111/2^96` bits against
+`673907947111696475745294623777/2^96` with the opening's, lower by about `1/17` bit. At the third
+close they read higher by about `1/500` bit. One window per close is too few readings to decide.
+
+**How long until a contact's change is readable.** One deposit's contact change never is (§11,
+more than `2^31` readings). The accumulated change reaches the size the bound allows within about
+three aeons of the contacts' learning, and the receiver's span stops growing near `0.3` bits. The
+next measurement is the information itself, over many windows rather than one: the accumulated
+`Σ D(p′‖p)` between the learned and the opening contacts over a whole aeon of readings, which
+decides readability without the `max |δ|` bound.
