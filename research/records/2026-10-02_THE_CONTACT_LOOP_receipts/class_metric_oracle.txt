@@ -1,0 +1,7 @@
+close 1: 1070 readings seen; R: mean code 16308122/2^21 bits, span 11918615/2^22 bits; fitted: mean code 16766918/2^21 bits, span 10538517/2^28 bits; on the next aeon's 1122 readings: R 16219264/2^21 bits, fitted 16763376/2^21 bits
+close 2: 2192 readings seen; R: mean code 16238968/2^21 bits, span 13265460/2^22 bits; fitted: mean code 16747035/2^21 bits, span 14663059/2^27 bits; on the next aeon's 1138 readings: R 16176018/2^21 bits, fitted 16741083/2^21 bits
+close 3: 3330 readings seen; R: mean code 16180123/2^21 bits, span 14612929/2^22 bits; fitted: mean code 16724527/2^21 bits, span 12204691/2^26 bits; on the next aeon's 70 readings: R 16246174/2^21 bits, fitted 16704909/2^21 bits
+--- ridge 1/256, 1000 iterations
+close 1: 1070 readings seen; R: mean code 16308122/2^21 bits, span 11918615/2^22 bits; fitted: mean code 14796444/2^21 bits, span 14706365/2^21 bits; on the next aeon's 1122 readings: R 16219264/2^21 bits, fitted 14269055/2^21 bits
+close 2: 2192 readings seen; R: mean code 16238968/2^21 bits, span 13265460/2^22 bits; fitted: mean code 13572610/2^21 bits, span 10015550/2^20 bits; on the next aeon's 1138 readings: R 16176018/2^21 bits, fitted 13144385/2^21 bits
+close 3: 3330 readings seen; R: mean code 16180123/2^21 bits, span 14612929/2^22 bits; fitted: mean code 13010278/2^21 bits, span 11550770/2^20 bits; on the next aeon's 70 readings: R 16246174/2^21 bits, fitted 12282946/2^21 bits

@@ -6,7 +6,8 @@ each refined phase's receiving input z (the rotated anchor the receiving map R r
 class and its aeon; and R at each aeon close (the opening's first). For each close k it fits, outside
 the machine, the cross-entropy-optimal receiver of R's own form, exponents v = W z in bits with
 p_c = 2^(v_c) / sum_d 2^(v_d), on the same readings R had seen by that close (aeons 0..k-1), with
-the ridge sum(W^2)/2 that R's normal law's unit prior carries. It then reads both W and R_k
+the ridge ridge*sum(W^2)/2 (default 1, R's normal law's unit prior; argument 2 sets it, argument 3
+the iterations). It then reads both W and R_k
 (R's even rows, the classes' exponents) on those readings and on the next aeon's.
 
 The fit runs in floating point: it is a search outside the machine, not a law. Every value it
@@ -60,7 +61,7 @@ def code_and_span(W, Z, T):
     return code, span
 
 
-def fit(Z, T, classes, iterations=400):
+def fit(Z, T, classes, iterations=400, ridge=1.0):
     """Full-batch gradient descent on the mean cross-entropy (bits) plus ridge/(2N), with a
     backtracking step: the search, outside the machine."""
     n = Z.shape[1]
@@ -75,8 +76,8 @@ def fit(Z, T, classes, iterations=400):
         E = np.exp2(V - top)
         P = E / E.sum(axis=1, keepdims=True)
         log_norm = top[:, 0] + np.log2(E.sum(axis=1))
-        loss = (log_norm - V[np.arange(N), T]).mean() + (W * W).sum() / (2 * N)
-        grad = (P - Y).T @ Z / N + W / N
+        loss = (log_norm - V[np.arange(N), T]).mean() + ridge * (W * W).sum() / (2 * N)
+        grad = (P - Y).T @ Z / N + ridge * W / N
         return loss, grad
 
     step = 1.0
@@ -93,7 +94,7 @@ def fit(Z, T, classes, iterations=400):
     return W
 
 
-def main(path):
+def main(path, ridge=1.0, iterations=400):
     samples, maps = read(path)
     aeons = max(a for a, _, _ in samples) + 1
     classes = maps[0].shape[0] // 2
@@ -103,7 +104,7 @@ def main(path):
         Z = np.array([z for _, z in seen])
         T = np.array([t for t, _ in seen])
         R = maps[close][0::2, :]
-        W = fit(Z, T, classes)
+        W = fit(Z, T, classes, iterations, ridge)
         r_code, r_span = code_and_span(R, Z, T)
         w_code, w_span = code_and_span(W, Z, T)
         line = (
@@ -120,4 +121,6 @@ def main(path):
 
 
 if __name__ == "__main__":
-    main(sys.argv[1])
+    ridge = float(Fraction(sys.argv[2])) if len(sys.argv) > 2 else 1.0
+    iterations = int(sys.argv[3]) if len(sys.argv) > 3 else 400
+    main(sys.argv[1], ridge, iterations)
