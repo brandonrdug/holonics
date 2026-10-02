@@ -114,7 +114,7 @@ comparison, and the contact loop needs a contact the comparison reads. I retired
 because it has no consumer that gains from it. The rounding refusal (step 1) and the continued
 word's reading (step 2) remain.
 
-## 6. The medium's interior does not move at all on these fixtures
+## 6. The medium's interior does not move at all on these small fixtures
 
 Every family at one deposit, ranked
 ([receipt](2026-10-02_THE_CONTACT_LOOP_receipts/families.txt); the probe is archived in this
@@ -149,3 +149,13 @@ at the published constitution, compared against its next cells and deposited.
 The scope is these two openings on the chain under this drive. They say nothing of a trained
 constitution, or of the text runs of September 29, where the tightened certificate's record reports
 the factor families moving.
+
+**A correction of scope.** The [tightened certificate's text run](2026-09-29_THE_TIGHTENED_CERTIFICATE_THE_FACTOR_FAMILIES_MOVE_AND_THE_STANDINGS_FOLD_COSTS_THE_COPY.md)
+of September 29 (the prediction field, one pass over 385 choosing pairs, 12,320 stations, 25
+deposits) moved contact 0's `c`, `b` and `F` in 17, 22 and 21 of its 25 deposits. Their steps there
+were `2^(−18)..2^(−12)`, against `2^(−31)..2^(−19)` here. A deposit over many stations sums many
+returns, so the interior is reached above its lattice. My fixtures (two targets on the chain, three
+on the joint field) are too small to move it. So the statement of §6 holds for these fixtures, not
+for the machine. The contact loop belongs on the text configuration, where contacts move. Its
+harness (`hnn_prediction develop`) was retired with the linear readout on September 30, so running
+it means porting a harness, and that choice goes to Astra with its cost.
