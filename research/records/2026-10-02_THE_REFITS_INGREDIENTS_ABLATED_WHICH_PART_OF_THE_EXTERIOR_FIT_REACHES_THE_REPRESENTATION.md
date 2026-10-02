@@ -13,8 +13,8 @@ held-out requests) shows a representation exists
 The refit (`eO_fit.py`, retired with the notebook's probe at `e214ccc8`) differs from the native
 move in its optimizer: float Adam on `E` with a cosine schedule (momentum `9/10` and a per-coordinate
 second moment `999/1000`), 400 steps of 16 requests re-read on the release's own trajectory, and `ρ` by
-Adam on a central difference. The native moves are guarded certified steps in the port's or the
-receiver's metric, a few at a time.
+Adam on a central difference. The native moves are certified steps in the port's or the
+receiver's metric, each refused unless its executed release falls, a few at a time.
 
 The claim this loop can make is narrow: which ingredient of the exterior optimizer carries it to the
 representation. Four arms, every other setting the refit's (`order2 400 256 101 0.03 0.05 1 16`, learning rates `3/100` and `1/20`):
@@ -40,7 +40,7 @@ read natively. No Adam arm's number stands in for it.
 
 ## 2. Measured
 
-Held-out whole sections of 128 at step 400 (the best checkpoint in brackets), three seeds per arm
+Held-out whole sections of 128 at step 400 (the best state read along the way in brackets), three seeds per arm
 ([receipts](2026-10-02_THE_REFITS_INGREDIENTS_receipts/)):
 
 | Arm | seed 101 | seed 202 | seed 303 |
@@ -53,7 +53,7 @@ Held-out whole sections of 128 at step 400 (the best checkpoint in brackets), th
 - **The reproduction.** The float refit reaches 36 to 49 whole sections, not the record's 96. That
   96 was the exported `E` read natively after rounding to the lattice (the station-framed record
   §2); the float release here is the probe's own, and the run-to-run spread is large (the same arm
-  moves by 10 to 20 sections between checkpoints).
+  moves by 10 to 20 sections between the states read along the way).
 - **No ingredient is located.** Plain gradient steps with the matched step size reach 57 on two of
   three seeds, as many as the scaled arms; the per-coordinate scale is not required, and momentum is
   not either (it destabilizes the solve). The acceptance's location test is not met by any arm.
@@ -62,9 +62,9 @@ Held-out whole sections of 128 at step 400 (the best checkpoint in brackets), th
 takes 400 small, decaying, stochastic steps, each accepted whatever it does to the comparison,
 re-read on the release's own trajectory. The Lean thread's baseline (#195) proves every candidate
 move is a gradient step under some metric and stops only where the gradient vanishes; the native
-chain stopped first at its guard (`OwnNotBelow`, the executed release must fall). The step-1
+chain stopped first at its acceptance condition (`OwnNotBelow`, the executed release must fall). The step-1
 records found the chord to the refit rising before it falls (the stiffness record). So the next
-candidate location is the guard together with the step schedule, read first on the float path
+candidate location is the acceptance condition together with the step schedule, read first on the float path
 itself: whether the plain-gradient arm's own comparison rises along its way to the sections.
 
 ## 3. The plain-gradient path's own comparison
@@ -79,11 +79,11 @@ training requests, each re-read on its own trajectory ([receipts](2026-10-02_THE
   `[475/4096, 476/4096)`; seed 303, eight of 20 to 60 steps, peaks `[20/4096, 21/4096)` to `[1970/4096, 1971/4096)` (steps 50 to 100, the largest,
   then `[1241/4096, 1242/4096)` over steps 170 to 200). Each later excursion ends below the earlier minimum.
 
-[agent-inferred] The path that reaches the sections is not monotone in its own comparison at any
-window, and on one seed it rises well above the opening. A guard that admits a rise only below the
-running maximum of a window of adopted comparisons cannot follow it; it needs an excursion above a
-checkpoint, bounded in height and length, with the certified decrease owed over the excursion as a
-whole. The numbers above are the measurement such a law's window and schedule read.
+[agent-inferred] The path that reaches the sections is not monotone in its own comparison over
+any stretch of steps, and on one seed it rises well above the opening. An acceptance that admits a
+rise only below the largest of the last few adopted comparisons cannot follow it; it needs an
+excursion above a held state, bounded in height and length, with the certified decrease owed over the
+excursion as a whole. The numbers above are what such a law's run length and step schedule read.
 
 ## 4. The released comparison's jump at m7, decision by decision, beside the float path's
 
@@ -149,6 +149,11 @@ units of `1/4096` nat, each within `6/4096`.
   - Only the `1/2048` diff was taken; that the same request carries the jump at the other step sizes
     is inferred from its constant size.
   - m6 was accepted at `1/2048` (`d = 361`, no jump), and jumped from `1/1024` up.
+  - m7's halvings ended at their count, not at the lattice: from `η₀ = 1/16` the eighth trial is
+    `1/2048`, and `LADDER_DEPTH = 8` stopped the move there, refused. The lattice floor (`η·2u < λ`,
+    #230) was not reached by then; whether m7 adopts at `1/4096` or below is Q3 of
+    `research/runs/u6/CLOUD_QUEUE.md`. The crossing at `731/840` of the `1/2048` step is located only
+    under linear motion of the two gaps; what is certified is that they cross inside that step.
 - **The float path's rises are not relocking jumps** (`sgd`, seed 303, 32 fixed requests, read every
   10 steps to step 130).
   - Relocking changes the freezing order on 29 to 32 of the 32 requests in every 10-step stretch to
@@ -288,7 +293,7 @@ a lower basin in 13 accepted moves.
   from m6 `4411164`, from w16 `6458652`; a move changes an entry by at most `1/2` at the kinetic entry
   scale, so 5, 5 and 7 moves reach it. Its largest entry is in `[10032/4096, 10033/4096)`, inside the
   entry bound `8`.
-- *The direction is.* `w16 − m6` against `fit − m6`: `−[60, 61)`, covering `−[452, 451]/4096` of the
+- *The direction is.* `w16 − m6` against `fit − m6`: `−[60, 61)`, covering `[−452/4096, −451/4096)` of the
   distance (away from it) while `|w16 − m6|²` is `[3386, 3387)/4096` of `|fit − m6|²`. Each of the 16
   moves, against `fit − E` from its own start, lies in `−[1, 2)` to `−[133, 134)`: every one negative.
 - *The metric turns it, not the comparison.* At the opening (the float probe's `E₀` equals the native
@@ -324,7 +329,7 @@ It runs on Astra's landed continuation (`receiver::reception::continuation`, `98
   `(E, ρ)` move's end (#220) once run.
 - **What each read must show**, per accepted move from m6 to w16:
   - the move's deposition reaches the locus it changes (the source port) as a native deposit, with
-    its certified storage growth (`Constitution::deposited`'s guards, the same ones the move already
+    its certified storage growth (`Constitution::deposited`'s conditions, the same ones the move already
     passes);
   - its work at the reached point closes: `W_dep = E(x; Θ′) − E(x; Θ)`, read at the same state;
   - the next passage reads the changed material: a request's `Word`, opened on the successor, reads
