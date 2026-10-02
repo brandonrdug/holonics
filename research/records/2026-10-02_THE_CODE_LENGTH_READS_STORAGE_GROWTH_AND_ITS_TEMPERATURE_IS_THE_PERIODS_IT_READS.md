@@ -82,15 +82,15 @@ shares become
 θ_x(n) = a_xⁿ / (1 + Σ_y a_yⁿ) = e^(n κ_x) / (1 + Σ_y e^(n κ_y)),
 ```
 
-a Gibbs state at inverse temperature `n` over the levels `−κ_x`. **The temperature is the
-reciprocal of the number of turns the lock is read over.** The release reads one turn
-(`read_turn` multiplies exactly `schedule.period()` crossings), so the lock face's class shares are
-at inverse temperature `1`. This is the class shares' temperature only: the order in which the
-release commits its stations is read at zero temperature (#225, Lean `HNN/OrderTemperature`).
-Nothing declares it as a constant and no bath sets it: it is fixed by the receiver's clock, one
-decision per passage. In storage exponents (`2κ`) the inverse temperature is `½` per turn, the
-same `½` as the amplitude face of a ratio of Holons, `log(ψ_T/ψ_H) = ½ log(q/p)`: the lock reads
-amplitudes, whose squares are the storage.
+a Gibbs state at inverse temperature `n` over the levels `−κ_x`. **The temperature is the reciprocal
+of the number of turns the lock is read over.** The release reads one turn (`read_turn` multiplies
+exactly `schedule.period()` crossings), so the lock face's class shares are at inverse temperature
+`1`. This is the class shares' temperature only: the order in which the release commits its stations
+is read at zero temperature, a step resolved to one turn of the turn clock (#225, Lean
+`HolonicsResearch/HNN/OrderTemperature`). Nothing declares it as a constant and no bath sets it: it
+is fixed by the receiver's clock, one decision per passage. In storage exponents (`2κ`) the inverse
+temperature is `½` per turn, the same `½` as the amplitude face of a ratio of Holons,
+`log(ψ_T/ψ_H) = ½ log(q/p)`: the lock reads amplitudes, whose squares are the storage.
 
 **What would move it.** Only a change of the receiver's clock: reading the lock over more turns of
 the passage lowers the temperature and sharpens the commitment; nothing in the chain does this
@@ -104,10 +104,10 @@ readings (`hingeTerm`: `max(max_(x≠t) log(a_x/a_t), −log a_t)`),
 n (f)_+ ≤ ℓ_n ≤ n (f)_+ + log(2 + |s|),      ℓ_n / n → (f)_+,
 ```
 
-(`lockFace_periods_hinge`, `lockFace_per_period_tendsto`; `|s|` the rivals). Step 1a's hinge is
-step 1b's lock face read over infinitely many turns per period, and at one turn the lock face
-exceeds the hinge's positive part by at most the log of the sheet count: the entropy of the shares
-at unit temperature.
+(`lockFace_periods_hinge`, `lockFace_per_period_tendsto`; `|s|` the rivals). Step 1a's hinge is the
+limit per turn of step 1b's lock face read over many turns, and at one turn the lock face exceeds
+the hinge's positive part by at most the log of the sheet count: the entropy of the shares at unit
+temperature.
 
 ## 4. What the code length is not
 
