@@ -20,6 +20,7 @@
 //! cargo run --release -p holonics --example hnn_prediction -- executed causal <terrain> <seed> <count> <label[=E]>…
 //! cargo run --release -p holonics --example hnn_prediction -- executed joined <terrain> <seed> <count> <arm> <label=source>…
 //! cargo run --release -p holonics --example hnn_prediction -- executed metric-steps <terrain> <seed> <count> <arm> <label=source>…
+//! cargo run --release -p holonics --example hnn_prediction -- executed kinetic-coupling <terrain> <seed> <count> <arm> <label=source>…
 //! ```
 //!
 //! [definition; agent-inferred, the order pin and the bank pin] **The declaration**
@@ -507,6 +508,14 @@ fn main() {
         // The joined move's direction at each source (the record
         // research/records/2026-10-02_THE_TRANSPORT_MODULUS_JOINS_THE_RECEIVERS_MINIMUM_ENERGY_MOVE.md §4c): read-only.
         (Some("executed"), Some("joined")) => executed_loop::joined(
+            &arguments[3],
+            arguments[4].parse().expect("a seed"),
+            arguments[5].parse().expect("a count"),
+            &arguments[6],
+            &arguments[7..],
+        ),
+        // Where the receiver's solve leaves the native gradient: read-only.
+        (Some("executed"), Some("kinetic-coupling")) => executed_loop::kinetic_coupling(
             &arguments[3],
             arguments[4].parse().expect("a seed"),
             arguments[5].parse().expect("a count"),

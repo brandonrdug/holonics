@@ -4396,26 +4396,9 @@ pub fn metric_steps(
         }
     }
     reading.pullback = Some(ExactRatMatrix::new(pullback)?);
-    // The native descent gradient `−Aᵀc`, exactly: each reading coordinate's covector entry
-    // (`θ_x − [x = t]`, as the kinetic solve's opening residual) on its members' reading gradients.
     let members: Vec<&Contribution> = proposal.terms.iter().flat_map(|t| &t.leading).collect();
     let gradients = reading_gradients(field, constitution, declared, requests, &members)?;
-    let mut weights = vec![Rat::zero(); members.len()];
-    for (theta, target, coordinates) in &terms {
-        for (x, (share, row)) in theta.iter().zip(coordinates).enumerate() {
-            let c = if x == *target { share - Rat::one() } else { share.clone() };
-            for (m, k) in row {
-                weights[*m] -= k * &c;
-            }
-        }
-    }
-    let mut gradient = vec![Rat::zero(); rows * columns];
-    for (g, w) in gradients.iter().zip(&weights).filter(|(_, w)| !w.is_zero()) {
-        for (entry, x) in gradient.iter_mut().zip(g) {
-            *entry += x * w;
-        }
-    }
-    reading.gradient = Some(ExactRatMatrix::new(gradient.chunks(columns).map(<[Rat]>::to_vec).collect())?);
+    reading.gradient = Some(native_gradient(&terms, &gradients, rows, columns)?);
     reading.modulus_slope = Some(step.gamma.clone());
     let ceiling = constitution
         .founding_transport(field, ring)?
@@ -4996,6 +4979,8 @@ pub struct KineticSolve {
     /// Each iterate's signed squared cosine with a declared `E` direction, `⟨v,t⟩|⟨v,t⟩|/(|v|²|t|²)`,
     /// when one is declared.
     pub cosines: Vec<Rat>,
+    /// Each iterate `v_k` (`E`'s entries, row-major), kept only when a direction is declared.
+    pub iterates: Vec<Vec<Rat>>,
     pub stop: KineticStop,
     /// `v = M⁻¹Aᵀμ`, rows × columns of `E`.
     pub moved: ExactRatMatrix,
@@ -5102,17 +5087,48 @@ fn kinetic_solve(
     toward: Option<&ExactRatMatrix>,
     join: bool,
 ) -> Result<Option<KineticSolve>, HnnError> {
+    let Some(parts) = kinetic_parts(field, constitution, declared, requests, proposal, samples)? else {
+        return Ok(None);
+    };
+    let toward: Option<Vec<Rat>> = toward.map(|t| t.entries().to_vec());
+    let coupling = if join {
+        modulus_coupling(field, constitution, declared, requests, proposal, &parts.chart)?
+    } else {
+        None
+    };
+    kinetic_lift(&parts.terms, &parts.gradients, &parts.chart, parts.columns, toward.as_deref(), coupling.as_ref())
+        .map(Some)
+}
+
+/// The kinetic solve's operands at a proposal: its reading terms, every leading member's reading
+/// gradient on `E` (row-major), the mass's inverse on a row of `E` (`H′⁻¹`, exactly) and `E`'s
+/// columns. `None` where no reading coordinate stands or `H′` is singular.
+struct KineticParts {
+    terms: Vec<(Vec<Rat>, usize, Vec<ReadingRow>)>,
+    gradients: Vec<Vec<Rat>>,
+    /// `H′`, the mass on a row of `E`.
+    gram: Vec<Vec<Rat>>,
+    chart: Vec<Vec<Rat>>,
+    columns: usize,
+}
+
+fn kinetic_parts(
+    field: &Field,
+    constitution: &Constitution,
+    declared: &Refinement,
+    requests: &[Request],
+    proposal: &Proposal,
+    samples: &[Sample],
+) -> Result<Option<KineticParts>, HnnError> {
     let ring = declared.ring();
     let terms = kinetic_readings(proposal);
-    let rows: Vec<&ReadingRow> = terms.iter().flat_map(|(_, _, r)| r).collect();
-    if rows.is_empty() {
+    if terms.iter().all(|(_, _, r)| r.is_empty()) {
         return Ok(None);
     }
     let law = constitution
         .source_law(ring)
         .ok_or(HnnError::MissingSourcePort { ring })?;
     let columns = law.map().columns();
-    // The mass's inverse on a row of `E`: `H′⁻¹`, exactly.
     let mut gram = law.gram().to_rows();
     for sample in samples.iter().filter(|s| !s.weight.is_zero()) {
         for (i, fi) in sample.feature.iter().enumerate() {
@@ -5121,19 +5137,220 @@ fn kinetic_solve(
             }
         }
     }
-    let Ok(chart) = ExactRatMatrix::new(gram)?.inverse() else {
+    let Ok(chart) = ExactRatMatrix::new(gram.clone())?.inverse() else {
         return Ok(None);
     };
     let members: Vec<&Contribution> = proposal.terms.iter().flat_map(|t| &t.leading).collect();
     let gradients = reading_gradients(field, constitution, declared, requests, &members)?;
-    let toward: Option<Vec<Rat>> = toward.map(|t| t.entries().to_vec());
-    let chart = chart.to_rows();
-    let coupling = if join {
-        modulus_coupling(field, constitution, declared, requests, proposal, &chart)?
-    } else {
-        None
+    Ok(Some(KineticParts { terms, gradients, gram, chart: chart.to_rows(), columns }))
+}
+
+/// The native descent gradient `−Aᵀc` on `E`, exactly: each reading coordinate's covector entry
+/// (`θ_x − [x = t]`, the kinetic solve's opening residual) on its members' reading gradients.
+fn native_gradient(
+    terms: &[(Vec<Rat>, usize, Vec<ReadingRow>)],
+    gradients: &[Vec<Rat>],
+    rows: usize,
+    columns: usize,
+) -> Result<ExactRatMatrix, HnnError> {
+    let mut weights = vec![Rat::zero(); gradients.len()];
+    for (theta, target, coordinates) in terms {
+        for (x, (share, row)) in theta.iter().zip(coordinates).enumerate() {
+            let c = if x == *target { share - Rat::one() } else { share.clone() };
+            for (m, k) in row {
+                weights[*m] -= k * &c;
+            }
+        }
+    }
+    let mut gradient = vec![Rat::zero(); rows * columns];
+    for (g, w) in gradients.iter().zip(&weights).filter(|(_, w)| !w.is_zero()) {
+        for (entry, x) in gradient.iter_mut().zip(g) {
+            *entry += x * w;
+        }
+    }
+    Ok(ExactRatMatrix::new(gradient.chunks(columns).map(<[Rat]>::to_vec).collect())?)
+}
+
+/// [measured-diagnostic; agent-inferred, October 2] **Where the receiver's solve leaves the native
+/// gradient** ([`kinetic_coupling`]). With `K = AM⁻¹Aᵀ` the readings' Gram and `w = −F⁻¹c` the
+/// readings' change (for a lock term `e_t/θ_t`, the target alone), the kinetic step is
+/// `v = M⁻¹AᵀK⁻¹w`. At one constitution (`ρ` held), it reads `v` with `K` replaced by its blocks:
+/// the joint `K` (the kinetic solve, every conjugate-gradient iterate kept), the blocks of each
+/// request's terms, the blocks of each term, and `K`'s diagonal; each block solved by the same
+/// recurrence, its moves summed. Every step is read against the native descent gradient
+/// `d = −Aᵀc = AᵀFw` twice: the Euclidean signed squared cosine on `E`'s row-major entries (as
+/// [`MetricSteps`]), and the signed squared cosine in `M`'s metric against `M⁻¹d`,
+/// `⟨v,d⟩|⟨v,d⟩| / (⟨v,Mv⟩⟨d,M⁻¹d⟩)`. Beside them the kinetic metric's deposited unit step,
+/// Euclidean. Nothing moves.
+#[derive(Clone, Debug)]
+pub struct KineticCoupling {
+    pub before: BatchComparison,
+    pub refusal: Option<MoveRefusal>,
+    /// Each arm: its name, the blocks' stops and iterate counts, and `(Euclidean, M)` cosines.
+    pub arms: Vec<(&'static str, Vec<(KineticStop, usize)>, Rat, Rat)>,
+    /// The joint solve's iterates, `(Euclidean, M)` cosines against `d`.
+    pub iterates: Vec<(Rat, Rat)>,
+    /// The deposited kinetic unit step against `d`, Euclidean.
+    pub deposited: Option<Rat>,
+}
+
+/// [measured-diagnostic] Where the receiver's solve leaves the native gradient ([`KineticCoupling`]).
+pub fn kinetic_coupling(
+    field: &Field,
+    constitution: &Constitution,
+    requests: &[Request],
+    declared: &Refinement,
+    bank: &ReceivingBank,
+    grain: u32,
+    comparison: Comparison,
+) -> Result<KineticCoupling, HnnError> {
+    let ring = declared.ring();
+    let (before, reads) = incumbent(field, constitution, requests, declared, bank, grain, comparison)?;
+    let proposal = propose(comparison.composition, &before, &reads);
+    drop(reads);
+    let mut reading = KineticCoupling {
+        before,
+        refusal: certificate_refusal(&proposal),
+        arms: Vec::new(),
+        iterates: Vec::new(),
+        deposited: None,
     };
-    kinetic_lift(&terms, &gradients, &chart, columns, toward.as_deref(), coupling.as_ref()).map(Some)
+    if reading.refusal.is_some() {
+        return Ok(reading);
+    }
+    let (samples, step) = unit_step(field, constitution, declared, requests, &proposal)?;
+    let Some(step) = step else {
+        reading.refusal = Some(MoveRefusal::Unreached);
+        return Ok(reading);
+    };
+    let Some(parts) = kinetic_parts(field, constitution, declared, requests, &proposal, &samples)? else {
+        reading.refusal = Some(MoveRefusal::Invisible);
+        return Ok(reading);
+    };
+    let (rows, columns) = (step.unit_move.rows(), step.unit_move.columns());
+    let d = native_gradient(&parts.terms, &parts.gradients, rows, columns)?.entries().to_vec();
+    let dot = |a: &[Rat], b: &[Rat]| -> Rat { a.iter().zip(b).map(|(x, y)| x * y).sum() };
+    // `Σ_r a_r Q b_rᵀ` over `E`'s rows for a row form `Q`.
+    let form = |a: &[Rat], q: &[Vec<Rat>], b: &[Rat]| -> Rat {
+        (0..rows)
+            .map(|r| {
+                let (ar, br) = (&a[r * columns..(r + 1) * columns], &b[r * columns..(r + 1) * columns]);
+                (0..columns)
+                    .map(|i| (0..columns).map(|j| &ar[i] * &q[i][j] * &br[j]).sum::<Rat>())
+                    .sum::<Rat>()
+            })
+            .sum()
+    };
+    let (dd, dmd) = (dot(&d, &d), form(&d, &parts.chart, &d));
+    let cosines = |v: &[Rat]| -> (Rat, Rat) {
+        let vd = dot(v, &d);
+        let (vv, vmv) = (dot(v, v), form(v, &parts.gram, v));
+        let signed = &vd * vd.abs();
+        if vv.is_zero() || dd.is_zero() || vmv.is_zero() || dmd.is_zero() {
+            return (Rat::zero(), Rat::zero());
+        }
+        (&signed / (vv * &dd), &signed / (vmv * &dmd))
+    };
+    // One arm: the terms partitioned into blocks, each solved alone, their moves summed.
+    let blocks = |groups: &[Vec<usize>]| -> Result<(Vec<Rat>, Vec<(KineticStop, usize)>), HnnError> {
+        let mut sum = vec![Rat::zero(); rows * columns];
+        let mut stops = Vec::new();
+        for group in groups {
+            let mut local: BTreeMap<usize, usize> = BTreeMap::new();
+            for &t in group {
+                for row in &parts.terms[t].2 {
+                    for (m, _) in row {
+                        let next = local.len();
+                        local.entry(*m).or_insert(next);
+                    }
+                }
+            }
+            let mut own = vec![Vec::new(); local.len()];
+            for (m, i) in &local {
+                own[*i] = parts.gradients[*m].clone();
+            }
+            let alone: Vec<(Vec<Rat>, usize, Vec<ReadingRow>)> = group
+                .iter()
+                .map(|&t| {
+                    let (theta, target, coordinates) = &parts.terms[t];
+                    let renumbered = coordinates
+                        .iter()
+                        .map(|row| row.iter().map(|(m, k)| (local[m], k.clone())).collect())
+                        .collect();
+                    (theta.clone(), *target, renumbered)
+                })
+                .collect();
+            let solve = kinetic_lift(&alone, &own, &parts.chart, parts.columns, None, None)?;
+            for (x, y) in sum.iter_mut().zip(solve.moved.entries()) {
+                *x += y;
+            }
+            stops.push((solve.stop, solve.residuals.len()));
+        }
+        Ok((sum, stops))
+    };
+    // The joint solve, its iterates kept.
+    let joint = kinetic_lift(&parts.terms, &parts.gradients, &parts.chart, parts.columns, Some(d.as_slice()), None)?;
+    reading.iterates = joint.iterates.iter().map(|v| cosines(v)).collect();
+    let (e, m) = cosines(joint.moved.entries());
+    reading.arms.push(("joint", vec![(joint.stop, joint.residuals.len())], e, m));
+    let request_of = |t: usize| proposal.terms[t].leading.first().map_or(usize::MAX, |c| c.request);
+    let mut by_request: BTreeMap<usize, Vec<usize>> = BTreeMap::new();
+    for t in 0..parts.terms.len() {
+        by_request.entry(request_of(t)).or_default().push(t);
+    }
+    let groups: Vec<Vec<usize>> = by_request.into_values().collect();
+    let (v, stops) = blocks(&groups)?;
+    let (e, m) = cosines(&v);
+    reading.arms.push(("by request", stops, e, m));
+    let groups: Vec<Vec<usize>> = (0..parts.terms.len()).map(|t| vec![t]).collect();
+    let (v, stops) = blocks(&groups)?;
+    let (e, m) = cosines(&v);
+    reading.arms.push(("by term", stops, e, m));
+    // `K`'s diagonal: `μ_i = w_i / K_ii`, `w = −F⁻¹c`; for a lock term `w = e_t/θ_t` (a term with a
+    // degenerate share reads no diagonal step).
+    let mut weights = vec![Rat::zero(); parts.gradients.len()];
+    for (theta, target, coordinates) in &parts.terms {
+        let Some(row) = coordinates.get(*target) else { continue };
+        if !theta[*target].is_positive() {
+            continue;
+        }
+        let w = Rat::one() / &theta[*target];
+        // `a_i = Σ_m k g_m`, `K_ii = ⟨a_i, M⁻¹ a_i⟩`.
+        let mut a = vec![Rat::zero(); rows * columns];
+        for (m, k) in row {
+            for (x, g) in a.iter_mut().zip(&parts.gradients[*m]) {
+                *x += k * g;
+            }
+        }
+        let kii = form(&a, &parts.chart, &a);
+        if !kii.is_positive() {
+            continue;
+        }
+        let mu = &w / &kii;
+        for (m, k) in row {
+            weights[*m] += k * &mu;
+        }
+    }
+    let mut pulled = vec![Rat::zero(); rows * columns];
+    for (g, w) in parts.gradients.iter().zip(&weights).filter(|(_, w)| !w.is_zero()) {
+        for (x, y) in pulled.iter_mut().zip(g) {
+            *x += y * w;
+        }
+    }
+    let v: Vec<Rat> = (0..rows * columns)
+        .map(|i| {
+            let (r, j) = (i / columns, i % columns);
+            (0..columns).map(|l| &pulled[r * columns + l] * &parts.chart[l][j]).sum()
+        })
+        .collect();
+    let (e, m) = cosines(&v);
+    reading.arms.push(("diagonal", Vec::new(), e, m));
+    let ceiling = constitution
+        .founding_transport(field, ring)?
+        .max(constitution.transport(ring).clone());
+    let (_, _, formed) = kinetic_unit(field, constitution, declared, requests, &proposal, &samples, false, &ceiling)?;
+    reading.deposited = formed.map(|(_, _, unit_move)| cosines(unit_move.entries()).0);
+    Ok(reading)
 }
 
 /// **Every datum's reach moments over the contributions** ([`ModulusCoupling`], "Its mass"):
@@ -5360,6 +5577,7 @@ fn kinetic_lift(
     let mut ap = az.clone();
     let mut residuals = Vec::new();
     let mut cosines = Vec::new();
+    let mut iterates = Vec::new();
     let floor = &opening / Rat::from_integer(BigInt::one() << 32usize);
     let stop = loop {
         if !opening.is_positive() {
@@ -5386,6 +5604,7 @@ fn kinetic_lift(
         residuals.push(joint_held(&next / &opening));
         if let Some(c) = cosine(&v) {
             cosines.push(c);
+            iterates.push(v[..size].to_vec());
         }
         if next <= floor {
             break KineticStop::Converged;
@@ -5417,6 +5636,7 @@ fn kinetic_lift(
         multipliers: mu,
         residuals,
         cosines,
+        iterates,
         stop,
         moved,
         predicted,

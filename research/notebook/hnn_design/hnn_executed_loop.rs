@@ -20,6 +20,7 @@
 //! cargo run --release -p holonics --example hnn_prediction -- executed agreement <terrain> <seed> <count> <arm,arm,…> <label=source>…
 //! cargo run --release -p holonics --example hnn_prediction -- executed span <terrain> <seed> <count> <arm> <toward> <label=source>…
 //! cargo run --release -p holonics --example hnn_prediction -- executed metric-steps <terrain> <seed> <count> <arm> <label=source>…
+//! cargo run --release -p holonics --example hnn_prediction -- executed kinetic-coupling <terrain> <seed> <count> <arm> <label=source>…
 //! cargo run --release -p holonics --example hnn_prediction -- executed route-plane <terrain> <seed> <count> <arm> <both|route|port> <toward> <label=state>…
 //! ```
 //!
@@ -4285,6 +4286,86 @@ pub(super) fn kinetic(terrain: &str, seed: u64, count: usize, arm: &str, toward:
         );
     }
     println!("executed kinetic: {} ms; resident {}", clock.elapsed().as_millis(), resident());
+}
+
+/// [measured-diagnostic; agent-inferred, October 2] **Where the receiver's solve leaves the native
+/// gradient** (`executed kinetic-coupling <terrain> <seed> <count> <arm> <label=source>…`):
+/// `hnn::executed::kinetic_coupling` at each source. Prints the kinetic step `M⁻¹AᵀK⁻¹w` with `K`
+/// joint, in each request's blocks, in each term's blocks and on its diagonal, and every iterate of
+/// the joint solve, each against the native descent gradient `d` twice: Euclidean on `E`'s entries
+/// and in `M`'s metric against `M⁻¹d`, signed squared cosines enclosed at `/4096`; then the
+/// deposited kinetic unit step, Euclidean. Nothing is moved.
+pub(super) fn kinetic_coupling(terrain: &str, seed: u64, count: usize, arm: &str, sources: &[String]) {
+    use holonics::hnn::executed::kinetic_coupling;
+    let clock = Instant::now();
+    let declared = order_declared();
+    let engine = Engine::new(declared);
+    let bank = bank_of(declared.period, &bank_strength());
+    let ring = engine.refinement.ring();
+    let pairs = terrain_pairs(terrain, &declared, seed, count);
+    let requests = open_requests(&engine, &pairs);
+    let (comparison, partition) = arm_comparison(arm);
+    assert!(!partition, "the solve is read on the open section");
+    println!(
+        "executed kinetic-coupling: {count} {terrain} requests at development seed {seed}, the arm {arm}; the bank p = {}, grain 2^(-{BANK_GRAIN})",
+        bank_strength()
+    );
+    let point = |x: &Rat| cell(&ExactInterval::point(x.clone()), 1 << 12);
+    for source in sources {
+        let started = Instant::now();
+        let (label, spec) = source.split_once('=').expect("<label>=<source>");
+        let theta = segment_source(&engine, ring, spec);
+        let reading = kinetic_coupling(
+            &engine.field,
+            &theta,
+            &requests,
+            &engine.refinement,
+            &bank,
+            BANK_GRAIN,
+            comparison,
+        )
+        .expect("the coupling reading");
+        println!(
+            "  {label}: ρ {}; {} ∈ {} nats; {} ms",
+            theta.transport(ring),
+            symbol(&comparison),
+            cell(&reading.before.value, 1 << 12),
+            started.elapsed().as_millis()
+        );
+        if let Some(refusal) = &reading.refusal {
+            println!("    refused, {refusal:?}");
+            continue;
+        }
+        for (name, stops, euclid, metric) in &reading.arms {
+            let mut tally: BTreeMap<String, (usize, usize, usize)> = BTreeMap::new();
+            for (stop, k) in stops {
+                let e = tally.entry(format!("{stop:?}")).or_insert((0, usize::MAX, 0));
+                e.0 += 1;
+                e.1 = e.1.min(*k);
+                e.2 = e.2.max(*k);
+            }
+            let stops: Vec<String> = tally
+                .iter()
+                .map(|(s, (n, lo, hi))| format!("{n} {s} after {lo}..{hi}"))
+                .collect();
+            println!(
+                "    K {name}: against d, Euclidean {}, M's metric {}; blocks {} ({})",
+                point(euclid),
+                point(metric),
+                stops.len().max(1),
+                if stops.is_empty() { "closed form".to_string() } else { stops.join(", ") }
+            );
+        }
+        for (k, (euclid, metric)) in reading.iterates.iter().enumerate() {
+            println!("    joint iterate {}: Euclidean {}, M's metric {}", k + 1, point(euclid), point(metric));
+        }
+        println!(
+            "    the deposited kinetic unit step against d, Euclidean {}; {} ms",
+            reading.deposited.as_ref().map_or_else(|| "none".to_string(), point),
+            started.elapsed().as_millis()
+        );
+    }
+    println!("executed kinetic-coupling: {} ms; resident {}", clock.elapsed().as_millis(), resident());
 }
 
 /// [measured-diagnostic; agent-inferred, October 2] **Each declared metric's unit step beside the
