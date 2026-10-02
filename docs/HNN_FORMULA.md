@@ -21,13 +21,13 @@ to glue), and the receiving parametron's storage is read from the context tree
 (`compression::landmark::context`), one family of the receiving storage the objects define
 ([the receiving storage](ELEMENTARY_OBJECTS.md#the-receiving-storage), an interpretation whose
 port join is owed). Its passage is an aeon on the Holarchy's parametric
-orientation: a receiving window is an epoch at the receiver's section, a pump period or a clock
-closure is a cycle, the aeon boundary is the collapse, and the first law over the aeon is
+orientation: the receiver reads it by epochs at its section, a pump period or a clock closure is
+a cycle, the aeon boundary is the collapse, and the first law over the aeon is
 `aeon::EnclosedLedger`. `Field` is the Holarchy's declaration, a chart of it, and
 `Reference::expose` is a cut's passage through the resident's aeons. The equations below are that
-Holarchy's element relations and that passage. What the code does not yet join (the tree as a
-Holon at ports, the receiving window as an epoch reading, the pump period as a cycle) is `[open]`
-in THE_MACHINE.
+Holarchy's element relations and that passage. The receiver's epochs and the pump period as a
+cycle are joined in the code since the unified plan's U5; the one join it does not yet make, the
+tree as a Holon at ports, is `[open]` in THE_MACHINE.
 
 Its field is chains of complex parametron rings joined by helical pair contacts. Athena is its
 first intended product; Eros names the collective formative organization and the composition

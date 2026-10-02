@@ -7,7 +7,7 @@
 //! resident moment's ingest, and the word's carried tick, its adjoint and the Newton–Schulz inverse
 //! charts (the lattice word), each with its host-parity test, and, in its header, the device
 //! execution-port plan: what of `holonics::hnn::ExecutionPort` runs resident, what stays on the
-//! host, and what crosses the bus per window, together with the port records for #76.
+//! host, and what crosses the bus per epoch, together with the port records for #76.
 
 pub mod cuda;
 pub mod ffi;

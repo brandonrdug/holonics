@@ -16,7 +16,7 @@
 //! |---|---|
 //! | the all-class read: at each splitting dyadic cell, each branch's walk (each stored chain's label compared to the address letter by letter), a parting chain's upper part at its split ratio, the opened path's faces and the join (`hnn_tree_splits`) | the class faces from the splits (`LandmarkFace::of_splits`: the products down the dyadic heap and the grain exponents, whose certified logarithm reads integers past the card's words) |
 //! | the opened-path update of each deposit (`hnn_tree_deposit`): the label runs, the β steps with the carrier's rebase, a parting chain's split (both ratios formed exactly and carried at `W` bits), the upper parts and leaves founded at the host's numbers, the relinks, the masses and each register's carry at the declared ceiling (`tree_carry`) | the certificates (the host's tree, `Constitution::deposited`); the ceiling in half-units (`Capacity::ceiling_halves`) |
-//! | a window's phases in cell order: the earlier phases' deposits applied with an undo log, the later phase read, the log undone (`hnn_tree_undo`) | the addresses' letters (`LandmarkDeclaration::letters`), the digits each target opens, each branch's summed rungs (`LandmarkDeclaration::rung_sums`) and founding charts (`ArenaView::founding`) |
+//! | an epoch's phases in cell order: the earlier phases' deposits applied with an undo log, the later phase read, the log undone (`hnn_tree_undo`) | the addresses' letters (`LandmarkDeclaration::letters`), the digits each target opens, each branch's summed rungs (`LandmarkDeclaration::rung_sums`) and founding charts (`ArenaView::founding`) |
 //!
 //! [definition; agent-inferred] **The layout** (the compacted arena, `compression::landmark::context`'s "The arena"):
 //! per node its depth word (the bottom depth, the branch in the top bit), its label end, its two
@@ -24,7 +24,8 @@
 //! the nodes' capacity, a power of two, 12 bytes a slot (`(parent << 32) | letter` and the child);
 //! the label pool, 4 bytes a letter; each join's chart; the counts `(nodes, letters)`. The capacity
 //! is the a-priori bound (`compacted_node_bound`): a passage of `n` cells founds at most `2 n B`
-//! nodes a branch and holds at most `n D_b` letters, at the declared population plus a window.
+//! nodes a branch and holds at most `n D_b` letters, at the declared population plus an epoch's
+//! cells.
 //!
 //! [definition; agent-inferred] **The register's capacity** (`context::Capacity`;
 //! Lean `Compression/Landmark/Context/Capacity.{capCarry, cap_carry_half_units, capped_tree_laws}`). The law's words
@@ -32,11 +33,11 @@
 //! `c = ∞` is the KT node), read from the host's declaration; the layout is unchanged. The
 //! carry acts where the host's `Law::apply_branch` places it: in the deposit, at every node of the
 //! opened path past the forced depths, right after the node's mass of the digit grows, `h_0 + h_1
-//! ≥ 2L + 2` carries each `h ← 2⌊(h + 1)/4⌋ + 1`, so the next read (the window's next phase, or
+//! ≥ 2L + 2` carries each `h ← 2⌊(h + 1)/4⌋ + 1`, so the next read (the epoch's next phase, or
 //! the next cell) meets the carried counts. A stored chain is one register; a parting chain's upper
 //! part is founded with the chain's register as carried so far, then counts and carries as any
 //! node; the lower part is not reached and keeps its register. The undo log holds the masses from
-//! before the count, so a window's undo restores the pre-carry register.
+//! before the count, so an epoch's undo restores the pre-carry register.
 //!
 //! [definition; agent-inferred] **The realization** (the hardware law, CLAUDE.md). The read is one
 //! block per phase with one thread per splitting dyadic cell (`threads` the least power of two
@@ -294,7 +295,7 @@ pub struct CardTree<'c> {
 }
 
 /// The per-deposit lockstep's gather buffers, sized for the touched nodes and joins of one deposit
-/// of a window's cells.
+/// of an epoch's cells.
 struct GatherBuffers<'c> {
     nodes: CardBuffer<'c, u32>,
     dyadic: CardBuffer<'c, u32>,
@@ -314,9 +315,9 @@ impl Drop for CardTree<'_> {
 
 impl<'c> CardTree<'c> {
     /// **Mirror a host tree on the card**: its law's words, its branches' summed rungs and its
-    /// founding charts, the arena at its current standing, and room for every node and label
-    /// letter a passage of the declared population founds (`2B` nodes and `D_b` letters a branch a
-    /// cell, the compacted tree's bound), plus `window` cells a window's overlay and a re-read found past
+    /// founding charts, the arena at its current standing, and room for every node and label letter
+    /// a passage of the declared population founds (`2B` nodes and `D_b` letters a branch a cell,
+    /// the compacted tree's bound), plus `window` cells an epoch's overlay and a re-read found past
     /// it; the child table at twice the nodes, a power of two. Refused at a branch deeper than the
     /// kernels' paths, at widths past the kernel's single-division operands
     /// (`Widths::single_division_admitted`), or at a split whose integers pass 512 bits

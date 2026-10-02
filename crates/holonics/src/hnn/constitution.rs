@@ -3764,10 +3764,10 @@ impl Constitution {
     /// the chart of `H′` refined, the unit step `D = Σ w g (X̂f)ᵀ`, its alignment `a = Σ w⟨g, Df⟩`)
     /// and stepped by `ηD` through the locus's budgeted carry ([`PreparedStep::stepped`]), the
     /// locus's clock advanced when an entry moved, the commit counted, and the successor refused
-    /// past the budget or when its committed storage growth is uncertified (the guards of
+    /// past the budget or when its committed storage growth is uncertified (the refusals of
     /// [`Constitution::deposited`]). `None` when the returns reach nothing. It publishes nothing:
-    /// the executed comparison's move adopts the successor only when every commit guard holds on it
-    /// (`hnn::executed::executed_move`), so it is visible to the crate alone.
+    /// the executed comparison's move adopts the successor only when every condition of adoption
+    /// holds on it (`hnn::executed::executed_move`), so it is visible to the crate alone.
     pub(crate) fn stepped_source(
         &self,
         ring: usize,
@@ -3909,7 +3909,7 @@ impl Constitution {
     /// (`hnn::moment`, "One passage, its transported weights"): `0 < ρ ≤ 1` (the transport is
     /// passive: its energy a tick `ρ² ≤ 1`, its dissipation `1 − ρ² ≥ 0`), on the source port's
     /// lattice. Refused off a source ring, outside `(0, 1]`, or off the lattice. The executed
-    /// comparison's move adopts it only when every commit guard holds (`hnn::executed`).
+    /// comparison's move adopts it only when every condition of adoption holds (`hnn::executed`).
     pub fn with_transport(mut self, ring: usize, modulus: Rat) -> Result<Self, HnnError> {
         let material = self
             .rings

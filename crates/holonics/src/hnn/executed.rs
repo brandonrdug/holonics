@@ -96,12 +96,12 @@
 //! **piecewise directional derivative** (the pin §13.5) sums the bounds of the terms above their
 //! level and `max(bound, 0)` over the boundary terms (solved terms add nothing).
 //!
-//! **The committed move** ([`executed_move`], the guards symmetric across every composition and
-//! reading, the pin §13.4). The source port's normal law prepares the unit step on the returns
-//! (`Constitution::stepped_source`); the modulus's unit move is its least-squares step
-//! `Δρ = −γ_ρ/G_ρ` with `γ_ρ = Σ_c c ⟨ĝ_c, ∂z_c/∂ρ⟩` and `G_ρ = Σ_c |∂z_c/∂ρ|²` over the
-//! proposal's contributions (`BankPlacement::modulus_derivative`; Lean `modulus_least_squares`); none
-//! upward from `ρ = 1`. Then:
+//! **The committed move** ([`executed_move`], its conditions of adoption the same for every
+//! composition and reading, the pin §13.4). The source port's normal law prepares the unit step on
+//! the returns (`Constitution::stepped_source`); the modulus's unit move is its least-squares step
+//! `Δρ = −γ_ρ/G_ρ` with `γ_ρ = Σ_c c ⟨ĝ_c, ∂z_c/∂ρ⟩` and `G_ρ = Σ_c |∂z_c/∂ρ|²` over the proposal's
+//! contributions (`BankPlacement::modulus_derivative`; Lean `modulus_least_squares`); none upward
+//! from `ρ = 1`. Then:
 //! - **an unresolved active member refuses the move** ([`MoveRefusal::Unresolved`]): a term the
 //!   certificate reads with any active member unresolved is never bounded by its resolved members
 //!   alone (1a's hinge let it through);
@@ -109,33 +109,35 @@
 //!   `E`-part plus `(∂z/∂ρ)Δρ`, before any refusal (the old early test on `E`'s unit alone could
 //!   refuse before the modulus joined); the move is refused, typed, when the composition's joint
 //!   bound is not negative;
-//! - **the ladder starts** at `η₀ = 2^⌊log₂ min(X⁻/(−s_X⁺), ½/u)⌋`, `s_X` the excess's piecewise
+//! - **the first trial step** is `η₀ = 2^⌊log₂ min(X⁻/(−s_X⁺), ½/u)⌋`, `s_X` the excess's piecewise
 //!   derivative on the joint unit move and `u` its largest entry change ([`ladder_start`]); with
 //!   `X⁻ = 0`, or `s_X⁺ ≥ 0`, the entry scale `½/u` alone: no division by a zero excess or a
 //!   nonnegative slope, and nothing becomes solved by it;
-//! - each carried successor `(E + ηD, ρ + ηΔρ)` (held within `[ρ/2, max(ρ₀, ρ)]` on the port's
-//!   lattice, `ρ₀` the founding's one-turn alias bound) is
-//!   adopted only when every commit guard holds on it: the entry bound `2^ENTRY_BOUND = 8`
-//!   ([`entry_bound`]); the first-order certificate negative on the carried move; every crossing of
-//!   its own release admissible and every lock's Floquet certificate certified; every reading
-//!   supported; the constitution's own guards; **the fixed incumbent mask's composition strictly
-//!   lower by disjoint enclosures**, `C_mask(Θ′)⁺ < C(Θ)⁻`; and **the composition the successor's own
-//!   release executes strictly lower too**, `C_own(Θ′)⁺ < C(Θ)⁻` (October 1, the
+//! - each carried successor `(E + ηD, ρ + ηΔρ)` (`ρ` held on the port's lattice within
+//!   `[ρ/2, max(ρ₀, ρ)]` under every metric, `ρ₀` the founding's one-turn alias bound) is adopted
+//!   only when all of these hold on it: the entry bound `2^ENTRY_BOUND = 8` ([`entry_bound`]); the
+//!   first-order certificate negative on the carried move; every crossing of its own release
+//!   admissible and every lock's Floquet certificate certified; every reading supported; the
+//!   constitution's own conditions on a deposit (its bit budget and certified storage growth);
+//!   **the fixed incumbent mask's composition strictly lower by disjoint enclosures**,
+//!   `C_mask(Θ′)⁺ < C(Θ)⁻`; and **the composition the successor's own release executes strictly
+//!   lower too**, `C_own(Θ′)⁺ < C(Θ)⁻` (October 1, the
 //!   [native direction record](../../../../research/records/2026-10-01_THE_NATIVE_DIRECTION_MEASURED_THE_STEP_DESCENDS_THE_EXECUTED_RELEASE_WITHIN_ITS_CELL_AND_GATE_A_ADOPTED_SIXTEEN_TIMES_BEYOND_IT.md):
-//!   the mask's first order holds only within the trajectory cell where the mask and the own release
-//!   coincide, and gate A's first move certified the mask's decrease sixteen times past that cell
-//!   while the executed release rose). Within the cell the second guard is the first; past it, a
-//!   step is adopted only while the executed comparison still descends, so over moves on a fixed
-//!   batch the executed composition falls strictly at every adopted move;
-//! - otherwise the next step is tried, at most [`LADDER_DEPTH`] a move, and the move is refused,
-//!   typed, when none holds.
+//!   the mask's first order holds only within the trajectory cell where the mask and the own
+//!   release coincide, and gate A's first move certified the mask's decrease sixteen times past
+//!   that cell while the executed release rose). Within the cell the second condition is the first;
+//!   past it, a step is adopted only while the executed comparison still descends, so over moves on
+//!   fixed requests the executed composition falls strictly at every adopted move;
+//! - otherwise the step is halved and tried again, at most [`LADDER_DEPTH`] trials a move, and the
+//!   move is refused, typed, when no trial is adopted.
 //!
 //! **The two readings, kept apart** (the pin §13.1). The descent account is read on one fixed
 //! conditional-context mask, the incumbent's own terms' sections: the proposal, its first order and
 //! the successor's re-read compare like with like. The mask is transient within the move: it is
 //! formed from the incumbent's release, read once at each trial and discarded with the move; no
 //! event, no replay history is retained. The successor's **own release** is read beside it for
-//! behaviour and for its guards, its recomputed composition a commit guard (it must fall) and never
+//! behaviour and for its own certificates (admissible crossings, certified locks, supported
+//! readings); its recomputed composition is a condition of adoption (it must fall) and is never
 //! read as decision progress, with the context change (own less mask) beside it. Every count is kept ([`TermCounts`]): attempted, unresolved, absent, post-error, held,
 //! support, coverage. The persistence reads (the pin §13.7, [`Persistence`]) re-read each decision
 //! solved at its refinement after the later locks of its section.
@@ -153,7 +155,7 @@
 //! | the simple root's eigen-derivative, `D log|μ|[ΔM] = Re(ℓᵀΔMr/(μℓᵀr))` | `HNN/ExecutedComparison.{simple_root_deriv, log_modulus_deriv}` | `hnn::ring::ReceivingBank::read_turn_covector` |
 //! | the monodromy's variation, `ΔM = Σ_t T_(>t) ΔT_t T_(<t)` | `HNN/ExecutedComparison.product_deriv` | `hnn::ring::ReceivingBank::turn_variation` |
 //! | a max comparison descends where every active branch descends, and a sum of maxes where its active slopes sum below zero | `HNN/ExecutedComparison.{max_descends, sum_max_descends}` | [`executed_move`]'s first-order certificate (the hinge) |
-//! | a strict decrease certified by disjoint enclosures | `HNN/ExecutedComparison.disjoint_enclosures_decrease` | [`executed_move`]'s commit guard |
+//! | a strict decrease certified by disjoint enclosures | `HNN/ExecutedComparison.disjoint_enclosures_decrease` | [`executed_move`]'s condition of adoption |
 //! | the release's predicates, class and threshold, sufficient for order and section | `HNN/ExecutedComparison.predicates_release_the_section` | [`BatchComparison`] |
 //! | the hinge's zero set is the closed predicate set | `HNN/ExecutedComparison.{hinge_zero_iff, hinge_zero_at_tie, hinge_right_leaves}` | [`Composition::Hinge`] |
 //! | the lock face, its solved level and the rational test | `HNN/ExecutedComparison.{lockFace_pos, lockFace_lt_log_two_iff, lockFace_enclosure_sublevel, class_top_is_target}` | [`lock_face`] |
@@ -189,8 +191,8 @@ use crate::ratio::linear::inertia::{SymmetricForm, inertia};
 
 /// [definition; agent-inferred, September 30] **The entry bound** `2³`: every entry of `E` at most
 /// three binary orders above the founding's unit scale (the certified step's pins, acceptance 1;
-/// every development read stayed below 2, the divergence it guards against passed 316). A commit
-/// guard here, never a tally.
+/// every development read stayed below 2, the divergence it excludes passed 316). A condition of
+/// adoption here, never a tally.
 pub fn entry_bound() -> Rat {
     Rat::from_integer(BigInt::from(8))
 }
@@ -220,8 +222,9 @@ pub enum Context {
     Partition(Vec<bool>),
 }
 
-/// [definition; agent-inferred, September 30] **One request of a batch**: its ingested current and
-/// moment, its targets (the terrain's truth; only the comparison reads them), and its context.
+/// [definition; agent-inferred, September 30] **One request**: its ingested current and moment, its
+/// targets (the terrain's truth; only the comparison reads them), and its context. A comparison
+/// reads several requests together, as co-present regions of one constitution.
 #[derive(Clone, Debug)]
 pub struct Request {
     pub current: Current,
@@ -407,8 +410,9 @@ pub struct TermCounts {
     pub above: usize,
 }
 
-/// [definition; agent-inferred, September 30] **A batch's comparison**: its declared comparison,
-/// each request's, and the composition and its excess enclosed.
+/// [definition; agent-inferred, September 30] **The comparison of requests read together** at one
+/// constitution: its declared comparison, each request's, and the composition and its excess
+/// enclosed.
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct BatchComparison {
     pub comparison: Comparison,
@@ -1464,7 +1468,7 @@ fn compare_request(
     ))
 }
 
-/// Join requests' comparisons into the batch's.
+/// Join the requests' comparisons into their joint one.
 fn batch_of(comparison: Comparison, requests: Vec<RequestComparison>) -> BatchComparison {
     let (mut value, mut excess, mut readings) = (nought(), nought(), 0);
     for request in &requests {
@@ -1481,11 +1485,11 @@ fn batch_of(comparison: Comparison, requests: Vec<RequestComparison>) -> BatchCo
     }
 }
 
-/// **The declared comparison of a batch, read** (module header): every request's release read by the
-/// bank's joint growth alone, its predicates, orders and releases, its terms under the declared
-/// reading, and the composition and its excess enclosed. The targets are validated; an inadmissible
-/// crossing refuses it (`HnnError::UncertifiedResonator`), and a reading whose lower end is not
-/// positive (`HnnError::NonpositiveDeclaration`).
+/// **The declared comparison of requests read together** (module header): every request's release
+/// read by the bank's joint growth alone, its predicates, orders and releases, its terms under the
+/// declared reading, and the composition and its excess enclosed. The targets are validated; an
+/// inadmissible crossing refuses it (`HnnError::UncertifiedResonator`), and a reading whose lower
+/// end is not positive (`HnnError::NonpositiveDeclaration`).
 pub fn compare(
     field: &Field,
     constitution: &impl ConstitutionRead,
@@ -1668,13 +1672,13 @@ fn points(moved: &[Rat]) -> Vec<ExactInterval> {
 }
 
 /// [definition; agent-inferred, September 30] **The joint direction's modulus part, enclosed**:
-/// each entry of `(∂z/∂ρ)Δρ` is enclosed outward on dyadics of [`JOINT_BITS`] significant bits
-/// (the derivative's entry and the modulus's unit move each enclosed, their product's corners
-/// taken), so the certificate on the joint direction is an enclosure of its exact value with its
-/// rounding charged. The exact product of the transported weights' derivatives (powers of the
-/// founded modulus over the passage's mass) with the least-squares move carries thousands of bits
-/// a coordinate and made the joint certificate cost minutes a batch; the enclosure keeps it at the
-/// port's cost. 128 bits lie far below the readings' grain (`2^(−16)` relative).
+/// each entry of `(∂z/∂ρ)Δρ` is enclosed outward on dyadics of [`JOINT_BITS`] significant bits (the
+/// derivative's entry and the modulus's unit move each enclosed, their product's corners taken), so
+/// the certificate on the joint direction is an enclosure of its exact value with its rounding
+/// charged. The exact product of the transported weights' derivatives (powers of the founded
+/// modulus over the passage's mass) with the least-squares move carries thousands of bits a
+/// coordinate and made the joint certificate cost minutes for each set of requests; the enclosure
+/// keeps it at the port's cost. 128 bits lie far below the readings' grain (`2^(−16)` relative).
 const JOINT_BITS: u32 = 128;
 
 /// A rational's outward dyadic enclosure at `bits` significant bits.
@@ -2145,14 +2149,14 @@ fn propose(
 /// station `j` (`BankPlacement::storage`): each datum, the request's phase counts and the section's
 /// cells, at its transported weight `w_S` from `j` over the span its section `S` closes (the
 /// storage stays linear in `E` at fixed weights, so the form of the returns is unchanged; only the
-/// weights are read from the contribution's station). Every datum returns in one
-/// form, one return a placement aggregated by its feature: one per phase of each request (feature
-/// the phase's counts `M[c]` at the weight `Σ w_S(c)²` over the contributions, covector their
-/// `w_S(c)`-weighted sum carried back through the phase's rotation `P^(c − λ)`, over that weight),
-/// and one per class over the batch for the sections' placements (feature `e_x` at the weight
-/// `Σ w_S(j)²`, covector their `w_S(j)`-weighted sum over it): the same gradient, unit step,
-/// alignment and metric as one return a placement; each the descent covector, every contribution
-/// at its weight in its term's covector.
+/// weights are read from the contribution's station). Every datum returns in one form, one return a
+/// placement aggregated by its feature: one per phase of each request (feature the phase's counts
+/// `M[c]` at the weight `Σ w_S(c)²` over the contributions, covector their `w_S(c)`-weighted sum
+/// carried back through the phase's rotation `P^(c − λ)`, over that weight), and one per class over
+/// all the requests for the sections' placements (feature `e_x` at the weight `Σ w_S(j)²`, covector
+/// their `w_S(j)`-weighted sum over it): the same gradient, unit step, alignment and metric as one
+/// return a placement; each the descent covector, every contribution at its weight in its term's
+/// covector.
 fn returns(
     field: &Field,
     constitution: &Constitution,
@@ -2431,7 +2435,7 @@ fn slope_split(
     })
 }
 
-/// The incumbent read of a batch: its comparison and every term's candidates' covectors.
+/// The incumbent read of the requests: their comparison and every term's candidates' covectors.
 #[allow(clippy::type_complexity)]
 fn incumbent(
     field: &Field,
@@ -2467,7 +2471,7 @@ fn incumbent(
 }
 
 /// [measured-diagnostic; agent-inferred, September 30] **The modulus's slope split by term kind at
-/// a constitution** ([`SlopeSplit`]; the station-framed placement's record §7), with the batch's
+/// a constitution** ([`SlopeSplit`]; the station-framed placement's record §7), with the requests'
 /// comparison: the requests read with every term's candidates' covectors, the proposal formed as
 /// [`executed_move`] forms it, and no move made.
 pub fn modulus_slopes(
@@ -2566,7 +2570,7 @@ fn pullback(
 }
 
 /// [measured-diagnostic; agent-inferred, loop 1c's pin §3] **Every decision term's lock face and
-/// gradient at a constitution** ([`SiteGradient`]), with the batch's comparison (the lock face at
+/// gradient at a constitution** ([`SiteGradient`]), with the requests' comparison (the lock face at
 /// the decisions, [`Comparison::LOCK_DECISIONS`], read as [`executed_move`] reads its incumbent):
 /// the exterior fit's linearization at the release's actual decision contexts. No move is made.
 pub fn site_gradients(
@@ -2777,13 +2781,13 @@ fn section_moves(
         .collect())
 }
 
-/// [definition; agent-inferred, September 30] **A move's first-order reading** (module header,
-/// "The first-order certificate"): the composition's bound `Σ_terms` enclosed (its upper end is the
-/// commit guard), the excess's piecewise bound (the terms above their level and `max(·, 0)` over the
-/// boundary terms; its upper end starts the ladder), the terms reading an unresolved active member;
-/// and, as receipts only, each term's bound in the proposal's order (`None` for a term with no
-/// resolved branch), aligned with [`ExecutedMove::sites`], and the leading contributions' pairing
-/// `Σ c ⟨ĝ, Δz⟩`, the proposal's own gradient on the move.
+/// [definition; agent-inferred, September 30] **A move's first-order reading** (module header, "The
+/// first-order certificate"): the composition's bound `Σ_terms` enclosed (adoption needs its upper
+/// end negative), the excess's piecewise bound (the terms above their level and `max(·, 0)` over
+/// the boundary terms; its upper end sets the first trial step), the terms reading an unresolved
+/// active member; and, as receipts only, each term's bound in the proposal's order (`None` for a
+/// term with no resolved branch), aligned with [`ExecutedMove::sites`], and the leading
+/// contributions' pairing `Σ c ⟨ĝ, Δz⟩`, the proposal's own gradient on the move.
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct FirstOrderReading {
     pub bound: ExactInterval,
@@ -2960,7 +2964,7 @@ fn first_order(
 // the committed move
 
 /// [definition; agent-inferred, September 30] **Why a trial step is not adopted** (module header,
-/// "The committed move"): each a commit guard.
+/// "The committed move"): each a condition of adoption that failed.
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub enum TrialRefusal {
     /// An entry of `E` past [`entry_bound`].
@@ -2980,7 +2984,8 @@ pub enum TrialRefusal {
     /// strictly lower by disjoint enclosures): the step's jump took the released code length past
     /// what the interval admits.
     OwnNotBelow(ExactInterval),
-    /// The constitution's own guard (budget, storage growth).
+    /// The constitution refused the deposit: its bit budget exceeded, or its storage growth not
+    /// certified.
     Constitution(String),
 }
 
@@ -3026,7 +3031,8 @@ pub enum MoveRefusal {
     Unresolved(usize),
     /// The joint unit move's first-order bound of the composition is not certified negative.
     NoDescent(ExactInterval),
-    /// Every trial step failed a guard, down to a move below the lattice.
+    /// Every trial step failed a condition of adoption, halving down to a move below the lattice or
+    /// to the last of [`LADDER_DEPTH`] trials.
     Guards,
     /// The witness's metric ([`MoveMetric::Witness`]): no lock-face term reads the plane (the hinge
     /// has no lock), or some plane direction lies in the witness's kernel (`G` not positive
@@ -3037,8 +3043,8 @@ pub enum MoveRefusal {
     Reversed([Rat; 2]),
 }
 
-/// [definition; agent-inferred, September 30; the pin §2.6, §13.5] **Which bound set the ladder's
-/// start** ([`ladder_start`]).
+/// [definition; agent-inferred, September 30; the pin §2.6, §13.5] **Which bound set the first
+/// trial step** ([`ladder_start`]).
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub enum LadderStart {
     /// The excess's first-order zero `X⁻/(−s_X⁺)`, at most the entry scale.
@@ -3070,19 +3076,20 @@ pub enum LadderStart {
 ///   coordinates, no cross term (the move's law until October 1, kept as the control).
 /// - `Witness`: both by the lock's own normalized reading pulled back onto the plane of the port's
 ///   unit move and `ρ`, its cross term counted ([`WitnessForm`]): the plane step `(α, β) = −G⁻¹g`,
-///   the ladder starting at `α` (at most the entry scale) with `ρ` moving `β/α` per unit of `E`'s
-///   step. Every guard is the same; only the direction and the start differ. A step's size is a
-///   constitutive change, not a velocity or an elapsed time.
+///   the first trial step `α` (at most the entry scale) with `ρ` moving `β/α` per unit of `E`'s
+///   step. The conditions of adoption are the same; only the direction and the first step differ. A
+///   step's size is a constitutive change, not a velocity or an elapsed time.
 /// - `Kinetic`: `E` alone, by the receiver's minimum-energy Gauss–Newton move over all of `E`
 ///   ([`KineticSolve`]), deposited by the normal law from the returns at the solve's reading weights;
-///   `ρ` held. The ladder starts at the Gauss–Newton step (`η = 1`), at most the entry scale.
+///   `ρ` held. The first trial step is the Gauss–Newton step (`η = 1`), at most the entry scale.
 /// - `KineticModulus`: `E` and `ρ` together, by the receiver's minimum-energy Gauss–Newton move over
 ///   both ([`KineticSolve`] with the modulus joined, [`ModulusCoupling`]): the readings' change is
 ///   the same Gauss–Newton change, and the storage-change mass splits it between `E` and `ρ`. `E`'s
 ///   part is deposited by the normal law from the returns at the solve's reading weights, each return
 ///   carrying the coupling's covector; `ρ` moves by the solve's `Δρ` per unit step, held at or below
-///   the founding `ρ₀` (the one-turn alias bound, [`Constitution::founding_transport`]). Where `ρ` is
-///   at that bound and the solve would raise it, the bound holds `ρ` and the move is `Kinetic`'s.
+///   the founding `ρ₀` (the one-turn alias bound, [`Constitution::founding_transport`]), or at the
+///   incumbent's `ρ` where that already stands above it. Where `ρ` is at that bound and the solve
+///   would raise it, the bound holds `ρ` and the move is `Kinetic`'s.
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub enum MoveMetric {
     Coordinate,
@@ -3091,9 +3098,9 @@ pub enum MoveMetric {
     KineticModulus,
 }
 
-/// [definition; agent-inferred, September 30; the pin §2.6, §13.5] **The ladder's start**: from the
-/// excess's lower end `X⁻`, the upper end `s_X⁺` of its piecewise directional derivative on the joint
-/// unit move and the unit move's largest entry change `u`,
+/// [definition; agent-inferred, September 30; the pin §2.6, §13.5] **The first trial step**: from
+/// the excess's lower end `X⁻`, the upper end `s_X⁺` of its piecewise directional derivative on the
+/// joint unit move and the unit move's largest entry change `u`,
 /// `η₀ = 2^⌊log₂ min(X⁻/(−s_X⁺), ½/u)⌋` when `X⁻ > 0` and `s_X⁺ < 0`; the entry scale `½/u` alone
 /// otherwise (`1` when `u = 0`). A zero excess or a nonnegative slope never enters a division.
 pub fn ladder_start(excess: &Rat, slope: &Rat, unit_largest: &Rat) -> (Rat, LadderStart) {
@@ -3116,8 +3123,8 @@ pub fn ladder_start(excess: &Rat, slope: &Rat, unit_largest: &Rat) -> (Rat, Ladd
     }
 }
 
-/// [definition; agent-inferred, September 30; the pin §13.4] **The certificate's guard before any
-/// step**: no term moves the composition ([`MoveRefusal::Nothing`]), or some term of the
+/// [definition; agent-inferred, September 30; the pin §13.4] **The certificate's refusal before
+/// any step**: no term moves the composition ([`MoveRefusal::Nothing`]), or some term of the
 /// certificate's support reads an unresolved active member ([`MoveRefusal::Unresolved`]): its
 /// bound is never formed from its resolved members alone, for every composition and reading.
 fn certificate_refusal(proposal: &Proposal) -> Option<MoveRefusal> {
@@ -3131,7 +3138,7 @@ fn certificate_refusal(proposal: &Proposal) -> Option<MoveRefusal> {
     }
 }
 
-/// [definition; agent-inferred, September 30; the pin §13.4] **The slope's guard**, read on the
+/// [definition; agent-inferred, September 30; the pin §13.4] **The slope's refusal**, read on the
 /// joint unit direction (the port's unit move with the modulus's least-squares move joined): the
 /// move is refused, typed, only when the composition's joint first-order bound is not negative.
 fn slope_refusal(joint: &FirstOrderReading) -> Option<MoveRefusal> {
@@ -3160,7 +3167,7 @@ pub struct Persistence {
 /// comparison; the incumbent's reading (the fixed mask's), the proposal's size (contributions,
 /// returns, terms of the certificate's support, unresolved leading members, terms reading an
 /// unresolved active member); the joint unit move's first-order bound of the composition and of its
-/// excess; the ladder's start; the modulus's reading; every trial; the adopted successor with its
+/// excess; the first trial step; the modulus's reading; every trial; the adopted successor with its
 /// carried step's reading, or the move's refusal; and the receipts: every term's site in the order of
 /// every trial's `terms`, the unit move's largest entry change, the terms' counts and the
 /// persistence reads.
@@ -3179,7 +3186,8 @@ pub struct ExecutedMove {
     pub unresolved: Vec<CovectorRefusal>,
     pub unresolved_branches: usize,
     pub slope: Option<ExactInterval>,
-    /// The port's part of the unit move alone (`Δρ = 0`), a receipt: the guard reads `slope`.
+    /// The port's part of the unit move alone (`Δρ = 0`), a receipt: the slope's refusal reads
+    /// `slope`.
     pub port_slope: Option<ExactInterval>,
     pub excess_slope: Option<ExactInterval>,
     pub start: Option<(Rat, LadderStart)>,
@@ -3214,8 +3222,8 @@ fn largest_entry(matrix: &ExactRatMatrix) -> Rat {
 
 /// [definition; agent-inferred, September 30] **What a declared comparison reads at a carried
 /// successor**: the fixed mask's composition and excess enclosed, the successor's own release
-/// comparison where it was read, and the guard that refused it (admission, Floquet, support), if one
-/// did.
+/// comparison where it was read, and the certificate that refused it (admission, Floquet, support),
+/// if one did.
 pub struct Reread {
     pub value: ExactInterval,
     pub excess: ExactInterval,
@@ -3246,7 +3254,7 @@ pub struct Reread {
 /// - `height`: `None` inside an interval. The code length's range over the admitted states bounds
 ///   every excursion (`excursion_of_bounded`), so no per-step comparison of the released code length
 ///   is owed inside an interval; `Some(0)` with the incumbent as opening state is strict descent.
-/// - `σ`: one receiver grain over the batch's decisions ([`ReleaseExcursion::grain`]). A decrease
+/// - `σ`: one receiver grain over the requests' decisions ([`ReleaseExcursion::grain`]). A decrease
 ///   below it is not a reading, and with it at most `(f 0 − m)/σ` intervals close
 ///   (`grain_windows_bounded`): the path releases at the grain.
 /// - `W`: at least two steps, since a jump is read only by the step after it
@@ -3301,8 +3309,9 @@ impl ReleaseExcursion {
         }
     }
 
-    /// **One receiver grain over a batch** (`σ`, in nats): `decisions · tolerance · ln 2`, read at
-    /// the upper end of `ln 2`'s enclosure, so a closing interval certifies at least the grain.
+    /// **One receiver grain over the requests' decisions** (`σ`, in nats):
+    /// `decisions · tolerance · ln 2`, read at the upper end of `ln 2`'s enclosure, so a closing
+    /// interval certifies at least the grain.
     pub fn grain(
         decisions: usize,
         tolerance: &Rat,
@@ -3351,26 +3360,28 @@ impl ReleaseExcursion {
     }
 }
 
-/// [definition; agent-inferred, September 30] **The ladder's depth**: at most 8 trial steps a move,
-/// from its start down to `2^(−7)` of it. Every trial re-reads the whole batch, so the depth bounds a
-/// move's work; a comparison that does not fall within `2^(−7)` of its start along the proposal is
-/// refused there (typed), never searched further. One depth for every declared comparison.
+/// [definition; agent-inferred, September 30] **The number of trial steps**: at most 8 a move,
+/// halving from the first down to `2^(−7)` of it. Every trial re-reads every request, so the count
+/// bounds a move's work: a chosen bound on work, not a law. A comparison that does not fall within
+/// `2^(−7)` of the first step along the proposal is refused there (typed), never searched further.
+/// One count for every declared comparison.
 pub const LADDER_DEPTH: usize = 8;
 
-/// The ladder's outcome: every trial, the adopted successor with its carried step, or the refusal.
+/// The trials' outcome: every trial, the adopted successor with its carried step, or the refusal.
 type LadderOutcome = (Vec<Trial>, Option<(Constitution, SourceStep)>, Option<MoveRefusal>);
 
 /// A carried move's first-order certificate: from the source port's move and the carried successor.
 type FirstOrder<'a> =
     dyn Fn(&ExactRatMatrix, &Constitution) -> Result<FirstOrderReading, HnnError> + Sync + 'a;
 
-/// [definition; agent-inferred, September 30] **The certified step's ladder, one law for every
-/// declared comparison** (module header, "The committed move"): from its start (held so that no
-/// entry of `E` moves by more than the founding's entry scale `½` in one move), halving until the
-/// carried move moves no lattice coordinate; each carried successor adopted only when every commit
-/// guard holds on it: the entry bound, the first-order certificate on the carried move (`first`,
-/// negative), the successor's guards and the fixed mask's value (`reread`) strictly lower by disjoint
-/// enclosures, and its own release within the release guard's excursion ([`ReleaseExcursion`]).
+/// [definition; agent-inferred, September 30] **The certified step's halving trials, one law for
+/// every declared comparison** (module header, "The committed move"): from the first step (held so
+/// that no entry of `E` moves by more than the founding's entry scale `½` in one move), halving
+/// until the carried move moves no lattice coordinate or the trials reach [`LADDER_DEPTH`]; each
+/// carried successor adopted only when all of these hold on it: the entry bound, the first-order
+/// certificate on the carried move (`first`, negative), the successor's own certificates and the
+/// fixed mask's value (`reread`) strictly lower by disjoint enclosures, and its own released code
+/// length within the excursion ([`ReleaseExcursion`]).
 #[allow(clippy::too_many_arguments)]
 fn ladder(
     constitution: &Constitution,
@@ -3434,7 +3445,8 @@ fn ladder(
         trial.source = Some(reading.clone());
         // The transport modulus's part of the move (module header, "The committed move"): `ρ + ηΔρ`
         // held within `[ρ/2, ceiling]` and read on the source port's lattice, nearest. The ceiling is
-        // the one-turn alias bound `max(ρ₀, ρ)` under every metric.
+        // the one-turn alias bound, or the incumbent's modulus where that stands above it,
+        // `max(ρ₀, ρ)`, under every metric.
         let (successor, modulus_moved) = match transport {
             Some(unit) if !unit.is_zero() => {
                 let modulus = constitution.transport(ring);
@@ -3507,7 +3519,7 @@ fn ladder(
 }
 
 /// [definition; agent-inferred, September 30; the pin §13.1] **The successor's two readings**: its
-/// own release compared under the declared comparison (its guards: an inadmissible crossing, a
+/// own release compared under the declared comparison (its refusals: an inadmissible crossing, a
 /// refused lock certificate, an unsupported reading), and the fixed incumbent mask's terms re-read at
 /// the successor, each site's candidates taken from the own release's refinement at the same section
 /// when it executed one (the same reading exactly), else read there.
@@ -3752,12 +3764,13 @@ fn persistence(
 }
 
 /// **The committed move of `E` and `ρ` on a declared comparison** (module header, "The committed
-/// move"): the batch read at the incumbent with every term's candidates' covectors, the proposal and
-/// its returns, the modulus's least-squares unit move, the joint unit move's first order read before
-/// any refusal, the ladder's start from the excess, then the certified step's ladder ([`ladder`]),
-/// each carried successor re-read on the fixed incumbent mask and on its own release, and adopted
-/// only when every commit guard holds. The targets are validated (one per station, each a class of
-/// the chart); an unsupported reading at the incumbent refuses with its typed error.
+/// move"): the requests read at the incumbent with every term's candidates' covectors, the proposal
+/// and its returns, the modulus's least-squares unit move, the joint unit move's first order read
+/// before any refusal, the first trial step from the excess, then the certified step's halving
+/// trials ([`ladder`]), each carried successor re-read on the fixed incumbent mask and on its own
+/// release, and adopted only when every condition of adoption holds. The targets are validated (one
+/// per station, each a class of the chart); an unsupported reading at the incumbent refuses with
+/// its typed error.
 pub fn executed_move(
     field: &Field,
     constitution: &Constitution,
@@ -3780,8 +3793,8 @@ pub fn executed_move(
 }
 
 /// **The committed move under a declared metric** ([`MoveMetric`]; [`executed_move`] is the
-/// coordinate metric's): the same proposal, guards, ladder and receipts, the joint direction and
-/// the ladder's start sized by the declared metric.
+/// coordinate metric's): the same proposal, conditions of adoption, halving trials and receipts,
+/// the joint direction and the first trial step sized by the declared metric.
 #[allow(clippy::too_many_arguments)]
 pub fn executed_move_in(
     field: &Field,
@@ -3806,10 +3819,10 @@ pub fn executed_move_in(
     )
 }
 
-/// **The committed move under a declared metric and the release guard's excursion**
-/// ([`ReleaseExcursion`]; [`executed_move_in`] is the monotone guard's): the same proposal, guards,
-/// ladder and receipts, the own release adopted within the excursion. A negative height is refused
-/// before any reading ([`HnnError::ExcursionHeight`]).
+/// **The committed move under a declared metric and an excursion of the released code length**
+/// ([`ReleaseExcursion`]; [`executed_move_in`] is strict descent's): the same proposal, conditions
+/// of adoption, halving trials and receipts, the own released code length admitted within the
+/// excursion. A negative height is refused before any reading ([`HnnError::ExcursionHeight`]).
 #[allow(clippy::too_many_arguments)]
 pub fn executed_move_guarded(
     field: &Field,
@@ -3957,11 +3970,11 @@ pub fn executed_move_guarded(
                 receipt.refusal = Some(MoveRefusal::Reversed([alpha, beta]));
                 return Ok(receipt);
             }
-            // The witness's exact step stays in its form (the receipt); the ladder carries it at
-            // the face grain, toward zero (October 1: carried exactly, `α` reached a 1229-digit
-            // denominator). Every trial is a carried successor read whole by every guard, so the
-            // grain moves which step is tried, never what certifies it; the residual is the form's
-            // exact step less the held one.
+            // The witness's exact step stays in its form (the receipt); the trials carry it at the
+            // face grain, toward zero (October 1: carried exactly, `α` reached a 1229-digit
+            // denominator). Every trial is a carried successor read whole under every condition of
+            // adoption, so the grain moves which step is tried, never what certifies it; the
+            // residual is the form's exact step less the held one.
             let held = |x: Rat| {
                 if x.is_negative() {
                     -significant(&-x, FACE_BITS, false)
@@ -3978,8 +3991,8 @@ pub fn executed_move_guarded(
         }
     };
     receipt.modulus_unit = Some(modulus_unit.clone());
-    // The second repaired guard (the pin §13.4): the slope is read on the joint unit direction, the
-    // modulus's storage move joined, before any refusal. The port's part alone is a receipt.
+    // The slope's refusal, repaired (the pin §13.4): the slope is read on the joint unit direction,
+    // the modulus's storage move joined, before any refusal. The port's part alone is a receipt.
     let port = first_order(field, constitution, declared, requests, &proposal, &unit, None)?;
     receipt.port_slope = Some(port.bound);
     let joint = first_order(
@@ -4693,8 +4706,8 @@ pub enum KineticStop {
 ///   is the normal law's own direction, `−M⁻¹Aᵀc`, and the iterates are the receiver's coupling of
 ///   the readings, which the normal law omits.
 /// - **The grain.** Every vector and scalar of the recurrence is held at [`JOINT_BITS`]
-///   significant bits toward zero. The solve proposes the direction, and the move's guards certify
-///   every trial whole.
+///   significant bits toward zero. The solve proposes the direction, and every trial is certified
+///   whole before it is adopted.
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct KineticSolve {
     /// The reading coordinates: lock candidates and order pieces.
@@ -5302,8 +5315,8 @@ pub fn pairing_receipt(
 // -------------------------------------------------------------------------------------------
 // the owner's pure laws, exposed to its tests
 
-/// **The move's guards and certificate on synthetic readings** (the owner's guard tests): the
-/// proposal formed from a batch's terms and their candidates' covectors, its unresolved terms, and
+/// **The move's refusals and certificate on synthetic readings** (the owner's tests of them): the
+/// proposal formed from given terms and their candidates' covectors, its unresolved terms, and
 /// its first-order reading on given section moves (a function of the proposal's sections, read in
 /// its order).
 #[cfg(test)]
@@ -5356,12 +5369,12 @@ impl ProposalProbe {
         witness_form(&terms)
     }
 
-    /// The move's guard before any step ([`certificate_refusal`]).
+    /// The move's refusal before any step ([`certificate_refusal`]).
     pub(crate) fn refusal(&self) -> Option<MoveRefusal> {
         certificate_refusal(&self.proposal)
     }
 
-    /// The slope's guard on a first-order reading ([`slope_refusal`]).
+    /// The slope's refusal on a first-order reading ([`slope_refusal`]).
     pub(crate) fn slope_refusal(reading: &FirstOrderReading) -> Option<MoveRefusal> {
         slope_refusal(reading)
     }
@@ -5443,7 +5456,8 @@ pub(crate) fn reading_gradient_probe(
     Ok((pairs, weighted, pullback))
 }
 
-/// A batch comparison built from terms read at given sections (the owner's guard tests).
+/// The requests' comparison built from terms read at given sections (the owner's tests of its
+/// refusals).
 #[cfg(test)]
 pub(crate) fn synthetic_batch(
     comparison: Comparison,

@@ -1115,7 +1115,7 @@ not:
     carries joules until one is stated), a Dirac structure between the receiving ring's port (the
     wave's `R P_R^(τ_R) v_R` in the field's quadratic chart) and the combined family's flow
     `ln q_C(x)`, which the softmax receiver does not give power-neutrally (a power-preserving
-    receiver map, or its defect bounded), and a common clock (the receiving window as an
+    receiver map, or its defect bounded), and a common clock (the receiver's epochs as an
     `aeon::Epochs` reading, built at U5: `hnn::receiving::ReceivingPhases::windows`).
 
   Until that join is constructed, a statistical receiver obeys its count and posterior update laws
