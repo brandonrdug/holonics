@@ -35,7 +35,7 @@
 //! grain (`receiver::face::grain_exponent`); its letters are addresses over a declared family of
 //! slot alphabets ([`LetterFamily`]), whose readers are the HNN's (`hnn::receiving::Feature`: a
 //! ring's phase class, a contact's reading); its online baselines are codes of fixed context order
-//! ([`baseline`]). The HNN reads the tree: it builds the addresses it passes in, runs a window's
+//! ([`baseline`]). The HNN reads the tree: it builds the addresses it passes in, runs an epoch's
 //! phases together on its cores (`hnn::receiving::window_faces`), and measures the tree
 //! prequentially on the exposure's cut (`hnn::reference::prequential`).
 //!
@@ -116,7 +116,7 @@
 //! [definition] **Typed address letters** ([`Letter`]): `Boundary` (before the cut's first cell),
 //! `Cell(code)` (a tick of the cell-only family) and `Bundle` (a tick's cell with its declared
 //! features' letters, [`Bundle`]). The address of cell `j` is its preceding `D` bundles, newest
-//! first, read per cell: causal, with no window pooling ([`address`], [`letter_address`]). A
+//! first, read per cell: causal, never pooled over an epoch ([`address`], [`letter_address`]). A
 //! bundle's code is `0` for the boundary and `1 + x + |A| · f` for a cell `x` with the features'
 //! mixed-radix code `f` ([`LetterFamily::bundle_code`], injective: Lean
 //! `Compression/Landmark/Context/Address.bundle_code_injective`); in a tree each typed letter is a child's key under
@@ -447,27 +447,27 @@
 //! stored nodes: 96 bytes a node in the flat vectors on x86-64 (the chart 80, the masses 8, the depth
 //! word 4, the label end 4), a 16-byte table entry with its control byte, and 4 bytes a label
 //! letter; `PartialEq` compares the table as a map (std's `HashMap`). The reads and the deposit are
-//! one law (`Law`) acting on any standing (`Standing`): the tree's own, or a window's working
+//! one law (`Law`) acting on any standing (`Standing`): the tree's own, or an epoch's working
 //! overlay (below). The card (`holonics-cuda`, `hnn::tree`) mirrors the same arena without the
 //! certificates: 48 bytes a node (the depth word, the label end, the masses and the chart's `β` and
 //! `λ̂`), a 12-byte table slot at twice the nodes, and 4 bytes a label letter.
 //!
-//! [definition; agent-inferred] **A window in cell order** ([`Landmarks::window`], [`Window`],
-//! prequential scoring within a window; run on the host's cores by `hnn::receiving::window_faces`
-//! and consumed by `hnn::receiving::ReceivingPhases::tree_faces`). A receiving window
-//! compares `A` cells at once, and phase `j` reads the tree at the standing after the window's
-//! earlier phases' deposits: their targets are known at compare, so those deposits are applied, in
-//! cell order, to a working overlay (`Working`). The nodes and joins a deposit writes are copied
-//! from the tree at their first write, the nodes it founds are numbered after the tree's, the links
-//! a compacted split changes and the label runs it holds are the overlay's own, and every other
-//! node reads through to the tree, which is never written. The deposit then applies the same
-//! steps to the published tree in the same order, by the same law, so each overlay's face is the
-//! face the deposited tree reads (the test
+//! [definition; agent-inferred] **An epoch in cell order** ([`Landmarks::window`], [`Window`],
+//! prequential scoring within an epoch; run on the host's cores by `hnn::receiving::window_faces`
+//! and consumed by `hnn::receiving::ReceivingPhases::tree_faces`). The receiver's epoch, the cells
+//! between two crossings of its section, compares `A` cells at once, and phase `j` reads the tree
+//! at the standing after the epoch's earlier phases' deposits: their targets are known at compare,
+//! so those deposits are applied, in cell order, to a working overlay (`Working`). The nodes and
+//! joins a deposit writes are copied from the tree at their first write, the nodes it founds are
+//! numbered after the tree's, the links a compacted split changes and the label runs it holds are
+//! the overlay's own, and every other node reads through to the tree, which is never written. The
+//! deposit then applies the same steps to the published tree in the same order, by the same law, so
+//! each overlay's face is the face the deposited tree reads (the test
 //! `landmark_window_faces_read_each_phase_after_the_earlier_deposits`). [established-bounded;
-//! measured] On the standing cut's cell tree before its last window (63,280 nodes; exterior wall
-//! time on one host, the mean over 50 runs in integer µs): a clone takes 211 µs; the window's two
+//! measured] On the standing cut's cell tree before its last epoch (63,280 nodes; exterior wall
+//! time on one host, the mean over 50 runs in integer µs): a clone takes 211 µs; the epoch's two
 //! faces read in cell order take 122 µs and read with nothing known 73 µs. [agent-inferred] An
-//! overlay admits arrivals past the declared population by the window's own earlier cells while
+//! overlay admits arrivals past the declared population by the epoch's own earlier cells while
 //! the widths' operands at that count fit `u128`; its faces are exact executed faces, normalized
 //! for any stop weight, and its certificates are not read.
 //!
@@ -615,7 +615,7 @@
 //! [definition; agent-inferred] **The host realization** (the hardware law) is the reader's: which
 //! regions run together is recorded where they are run (`hnn::reference`'s header). Within the
 //! prequential measurement the tree and the baselines run together, each reading the shared
-//! immutable cut and writing only its own state and sums; a window's phases read their own
+//! immutable cut and writing only its own state and sums; an epoch's phases read their own
 //! overlays together. Within one tree the cells stay serial: they share mutable counts along their
 //! paths.
 //!
@@ -638,7 +638,7 @@
 //! | the prior mass: the face at `2^(−j)` is the Pólya urn and a node law, at most `j − 1` bits over KT at every count, the regret against the best fixed digit probability at most `½ log₂ n + j` (KT's `½ log₂ n + 1`), the one-sided gain, the floor `1/(2^j n* + 2)`, the tree's full redundancy under any stop weights, and the ladder `j = 1..8` charged 3 bits a valid two-part code | `Compression/Landmark/Context/PriorMass.{priorMass_face, massLaw_read, priorMass_ge_kt, priorMass_code_le_kt, kt_regret, priorMass_regret_bits, priorMass_one_sided_ge_kt, priorMass_one_sided_two_bits, priorMass_face_ge, priorMass_digit_face_ge, two_part_kraft, priorMass_two_part, priorMass_tree_redundancy, priorMass_tree_two_part, priorMass_depth_lift_ladder}` | [`LandmarkDeclaration::mass`], [`Landmarks::deposit`] (`Law`'s unit), `Arena::count`, [`face_bits`]; the card's `holonics_cuda::hnn::tree::CardTree` (`hnn_tree_deposit`) |
 //! | a population's code is its faces' product, enclosed once | (a certified reading: integer bounds and the certified logarithm) | [`PassageCode`], [`ProductBound`] |
 //! | the stop-weight mixture per digit tree: the mixture over (law, pruned tree), its prior complete, within `−log₂ π_k − log₂ prior_(w_k)(S)`; the joins telescope to the Bayesian mixture, the executed chart's drift once | `Compression/Landmark/Context/LocalWeighing.{stop_mixture_per_tree, static_mixture, forward_executed}` | [`StopMixture`], [`JoinTree`], [`FaceJoins`] |
-//! | a window's phases in cell order: each reads the standing after the earlier phases' deposits | `Compression/Landmark/Context/Tree.{landmark_step, treeWeight_arrive_off}` | [`Landmarks::window`], [`Window`] |
+//! | an epoch's phases in cell order: each reads the standing after the earlier phases' deposits | `Compression/Landmark/Context/Tree.{landmark_step, treeWeight_arrive_off}` | [`Landmarks::window`], [`Window`] |
 //! | founding where paths converge (second-arrival founding, measured and retired): the stopped path normalized under any stopping rule decided before the digit (a complete code); the tree with absent children, its Kraft form and dominance; the stopped step (`β` still at the stop); the second arrival opening with the first count; the first-arrival tree its case | `Compression/Landmark/Context/ConvergenceFounding.{stopping_rule_normalized, prequential_code_complete, conv_mixture_over_trees, conv_kraft_and_dominance, conv_weight_step, conv_ratio_step, second_arrival_opens_with_the_first_count, convergence_step, convergence_is_probability, first_arrival_is_the_full_tree}` | retired (its realization is at commit `d137e8a6`; the development cells kept the first arrival) |
 //! | a landmark's storage has a capacity: the tree weighting over any node law whose state is a function of the arrivals reaching the node (its Kraft form, dominance, step and prequential code), the compacted tree for that law, and the capped register as an instance (positive, normalized, the carry lowering the register and keeping each reached symbol, KT below its ceiling, `c = ∞` KT) | `Compression/Landmark/Context/Tree.{NodeLaw, own_mixture_over_trees, own_kraft_and_dominance, own_weight_step₀, law_standing_is_routed, ktLaw_standing}`; `Compression/Landmark/Context/Compaction.{MassRouted, own_weight_prequential, compacted_node_law}`; `Compression/Landmark/Context/Capacity.{capLaw, cap_face_pos, cap_face_sum, cap_carry_laws, cap_carry_half_units, cap_run_total_le, cap_unbounded_is_kt, cap_below_ceiling_is_kt, capped_tree_laws}` | [`Capacity`], [`Capacity::carry`], [`LandmarkDeclaration::capacity`], `Law::apply_branch`, [`IdealLandmarks`] |
 //! | stored where paths part: a chain with its bottom is one node at the summed rung (`1 − ρ_top = 2^(−S)(1 − ρ_bottom)`, founded at `2^S − 1`), a chain to `D` one KT node, the split's two ratios, the landmark tree's face exactly, at most `2n − 1` nodes a tree | `Compression/Landmark/Context/Compaction.{chain_ratio, chain_ratio_dyadic, leaf_chain_is_one_node, chain_split, compacted_is_the_full_tree, compacted_node_bound}` | [`Landmarks`], [`LandmarkDeclaration::rung_sums`], the split ([`Beta::split`], `Law::part`, `Law::chain`), [`Landmarks::face_rule`], [`Landmarks::tree_sizes`], [`IdealLandmarks`] |
@@ -1880,7 +1880,7 @@ struct Walk {
 /// **The stored nodes as a read opens them**: the root of each tree, the child behind a letter,
 /// each node's two half-unit masses, its depth word and its label end, the label pool's letters and
 /// the count of stored nodes. The arena answers them (for the oracle and the
-/// executed tree), and so does a window's working overlay ([`Working`]).
+/// executed tree), and so does an epoch's working overlay ([`Working`]).
 trait Topology {
     fn root(&self, tree: usize) -> Option<u32>;
     fn child(&self, parent: u32, letter: u32) -> Option<u32>;
@@ -2117,7 +2117,7 @@ struct Founded {
 
 /// **The executed tree's standing as a deposit moves it** (module header, "The arena"): the
 /// stored nodes with their charts, the joins, the label pool, the rebases and the cells passed. The
-/// tree's own [`Nodes`] carry it, and so does a window's working overlay ([`Working`]).
+/// tree's own [`Nodes`] carry it, and so does an epoch's working overlay ([`Working`]).
 trait Standing: Topology {
     fn chart(&self, node: u32) -> &Chart;
     fn chart_mut(&mut self, node: u32) -> &mut Chart;
@@ -2246,8 +2246,8 @@ struct Fresh {
     chart: Chart,
 }
 
-/// [definition; agent-inferred] **A working overlay on the tree** (module header, "A window in
-/// cell order"): the nodes and joins a window's earlier phases' deposits wrote, each copied from
+/// [definition; agent-inferred] **A working overlay on the tree** (module header, "An epoch in
+/// cell order"): the nodes and joins an epoch's earlier phases' deposits wrote, each copied from
 /// the tree at its first write, the nodes they founded, numbered after the tree's, the links they
 /// changed (a compacted split relinks a parent to its new upper part) and the label runs they held,
 /// numbered after the tree's pool; every other node reads through to the tree, which is never
@@ -3864,8 +3864,8 @@ impl Landmarks {
         self.law.face(&self.nodes, address, grain)
     }
 
-    /// [definition; agent-inferred] **A window's standings in cell order** (module header, "A
-    /// window in cell order"; prequential scoring within a window): phase `j` reads the tree at
+    /// [definition; agent-inferred] **An epoch's standings in cell order** (module header, "An
+    /// epoch in cell order"; prequential scoring within an epoch): phase `j` reads the tree at
     /// `addresses[j]` at the standing after the deposits of the phases before it whose classes are
     /// known (`known[i]` at `addresses[i]`, `i < j`), each on a working overlay of the nodes those
     /// deposits wrote, built here in cell order; the tree itself is unchanged. With nothing known
@@ -3903,8 +3903,8 @@ impl Landmarks {
     }
 
     /// [agent-inferred] **The arrivals a working overlay admits**: the declared population, and
-    /// past it the window's own earlier cells (a deposit's re-read at its successor reads the
-    /// window's cells again) while the widths' operands at that count still fit `u128`. A working
+    /// past it the epoch's own earlier cells (a deposit's re-read at its successor reads the
+    /// epoch's cells again) while the widths' operands at that count still fit `u128`. A working
     /// read's faces are exact executed faces, normalized for any stop weight; its certificates are
     /// not read.
     fn working_admission(&self, deposits: u64) -> u64 {
@@ -4010,8 +4010,8 @@ impl Landmarks {
     }
 }
 
-/// [definition; agent-inferred] **A window's standings in cell order** ([`Landmarks::window`]):
-/// the window's addresses, and for each phase after the first whose predecessors' classes are
+/// [definition; agent-inferred] **An epoch's standings in cell order** ([`Landmarks::window`]):
+/// the epoch's addresses, and for each phase after the first whose predecessors' classes are
 /// known, the working overlay of their deposits over the published tree, which is never written.
 pub struct Window<'a> {
     law: &'a Law,
@@ -4021,13 +4021,13 @@ pub struct Window<'a> {
 }
 
 impl Window<'_> {
-    /// The window's phases.
+    /// The epoch's phases.
     pub fn phases(&self) -> usize {
         self.addresses.len()
     }
 
     /// **Phase `j`'s splits** (the quantity a card's read returns), at the standing after the
-    /// window's earlier known phases' deposits.
+    /// epoch's earlier known phases' deposits.
     pub fn splits(&self, phase: usize) -> Splits {
         match phase.min(self.standings.len()).checked_sub(1) {
             Some(index) => self

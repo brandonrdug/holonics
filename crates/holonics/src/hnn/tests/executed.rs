@@ -160,6 +160,21 @@ fn the_dominant_multiplier_is_certified_or_refused_by_type() {
     assert_eq!(read(&expand(&[5, 5, 1, -2], None)), Err(CovectorRefusal::Collision));
 }
 
+/// **A reading has the lattice's floor** (Lean `HNN/Floquet.integer_monodromy_floor`): on `M = N/Δ`
+/// with `Δ = 4`, the nilpotent `N = [[0, 1], [0, 0]]` (`det(ν − N) = ν²`) reads the floor's cell
+/// `[0, 1/4)` without bisecting toward zero, and `N = [[1, 0], [0, 0]]` (`ν² − ν`, `ρ(M) = 1/4`)
+/// reads a cell whose lower end is within the grain of `1/4`.
+#[test]
+fn a_reading_is_zero_or_past_the_lattices_floor() {
+    let scale = BigInt::from(4);
+    let nilpotent = growth_of(&[BigInt::zero(), BigInt::zero(), BigInt::one()], &scale, 24);
+    assert_eq!(nilpotent.lower, Rat::zero());
+    assert_eq!(nilpotent.upper, rat(1, 4));
+    let floor = growth_of(&[BigInt::zero(), -BigInt::one(), BigInt::one()], &scale, 24);
+    assert!(floor.lower <= rat(1, 4) && rat(1, 4) < floor.upper);
+    assert!(floor.lower >= rat(1, 4) * (Rat::one() - rat(1, 1 << 24)));
+}
+
 /// **The covector pairs with the exact variation, three ways** (`ReceivingBank::directional_routes`):
 /// on drawn turns below and past the bifurcation (8 crossings, and 60 crossings, the order-2
 /// ring's period, with amplitudes on `2^(−22)`) and drawn moves, every resolved member's covector
@@ -274,10 +289,10 @@ fn two_members_tied_in_growth_are_both_active() {
         .all(|member| matches!(member, MemberCovector::Resolved { .. })));
 }
 
-/// The release guard's excursion (`HNN/ExecutedComparison` §12, `checkpoint_one_iff`,
-/// `excursion_enclosure`): the monotone guard is the strict decrease by disjoint enclosures; a held
-/// checkpoint with a height admits a rise below its lower end plus the height and refuses one at or
-/// above it; a window closes only strictly below its checkpoint less the certified decrease.
+/// The released code length's excursion (`HNN/ExecutedComparison` §12, `checkpoint_one_iff`,
+/// `excursion_enclosure`): strict descent is the decrease by disjoint enclosures; a held opening
+/// state with a height admits a rise below its lower end plus the height and refuses one at or
+/// above it; an interval closes only strictly below its opening state less the certified decrease.
 #[test]
 fn the_monotone_excursion_is_the_strict_decrease_and_a_height_admits_a_bounded_rise() {
     use crate::hnn::executed::ReleaseExcursion;
@@ -304,8 +319,9 @@ fn the_monotone_excursion_is_the_strict_decrease_and_a_height_admits_a_bounded_r
     let checkpoint = interval(9, 10);
     assert_eq!(ReleaseExcursion::closes(&checkpoint, &interval(5, 6), &integer(2)), Ok(true));
     assert_eq!(ReleaseExcursion::closes(&checkpoint, &interval(6, 7), &integer(2)), Ok(false));
-    // A negative decrease would close a window above its checkpoint, and a negative height states
-    // no `CheckpointGuard` (the checkpoint itself would breach its excursion): both are refused.
+    // A negative decrease would close an interval above its opening state, and a negative height
+    // states no `CheckpointGuard` (the opening state itself would breach its excursion): both are
+    // refused.
     assert_eq!(
         ReleaseExcursion::closes(&checkpoint, &interval(9, 10), &integer(-2)),
         Err(HnnError::WindowDecrease {

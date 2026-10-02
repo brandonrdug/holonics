@@ -48,7 +48,7 @@ every period is at least `2`, `carryIn_le_one`). On a closing ring (`P^d = 1`) t
    `P^T m̃` is the `Objects/SourceHolon.ClockedRing` moment of the cells with their increments as
    clocks (`open_eq_clockedRing_moment`, composing `ClockedRing.moment_closed_form`).
 4. **Descent.** The fixed-size stream state (lift point, phase-binned counts on the source rings,
-   offset counts, the window of the last `max Δ` cells) is a
+   offset counts, the last `max Δ` cells) is a
    `Foundation/ReceiverHistoryCompression` for the append action (`selectiveClock_stream_descent`),
    and the source moment of a source ring is read off its counts alone
    (`binsMoment_stream`).
@@ -642,7 +642,8 @@ theorem logConcavity_is_load_bearing :
 /-! ## 3. The stream state and its descent -/
 
 /-- [definition] **A source declaration**: the rings in carry order, the source rings `𝒮` and the
-declared offsets `Δ`. The window holds the last `max Δ` cells. -/
+declared offsets `Δ`. The state holds the last `max Δ` cells, so each new cell meets the cell `δ`
+back for every declared offset. -/
 structure SourceDecl (A : Type*) extends SelectiveDecl A where
   sources : Finset ℕ
   offsets : Finset ℕ
@@ -651,13 +652,13 @@ namespace SourceDecl
 
 variable {A : Type*} (D : SourceDecl A)
 
-/-- [definition] The window length `max Δ`. -/
+/-- [definition] The number of cells the state holds, `max Δ`: the farthest declared offset. -/
 def windowLength : ℕ := D.offsets.sup id
 
 /-- [definition] **The persisting source state**: the lift point, the phase-binned counts on each
 source ring (the multiset of `(phase class, cell)` it met), the offset counts per source ring and
-offset (`(phase class, cell, cell δ back)`), and the window of the last `max Δ` cells, most recent
-first. Its size does not grow with the passage except through the counts' values. -/
+offset (`(phase class, cell, cell δ back)`), and the last `max Δ` cells, most recent first. Its size
+does not grow with the passage except through the counts' values. -/
 structure StreamState where
   lift : ℕ → ℕ
   bins : (g : ℕ) → Multiset (ZMod (D.period g) × A)
@@ -667,8 +668,9 @@ structure StreamState where
 variable {D}
 
 /-- [definition] **Ingest one cell**: advance every ring by selective stepping, bin the cell at
-each source ring's new phase class, bin the offset pairs the window supplies, and overwrite the
-window. The window is a shift register, not an accumulating ring. -/
+each source ring's new phase class, bin the offset pairs the held cells supply, and hold the new
+cell in place of the oldest. The held cells are a delay line tapped at the declared offsets, not an
+accumulating ring. -/
 def ingest (a : A) (s : D.StreamState) : D.StreamState :=
   { lift := D.advance a s.lift
     bins := fun g => if g ∈ D.sources then
@@ -707,7 +709,7 @@ theorem stream_bins_append_one (τ₀ : ℕ → ℕ) {g : ℕ} (hg : g ∈ D.sou
   rw [stream_append_one, ← stream_lift]
   exact if_pos hg
 
-/-- The window is the last `max Δ` cells, most recent first. -/
+/-- The held cells are the last `max Δ` cells, most recent first. -/
 theorem stream_window (τ₀ : ℕ → ℕ) (l : List A) :
     (D.stream τ₀ l).window = l.reverse.take D.windowLength := by
   induction l using List.reverseRecOn with
@@ -829,7 +831,7 @@ variable [Fintype A] [DecidableEq A]
 variable (D)
 
 /-- [definition] The persisting source state read on the first `G` rings: lift point, the counts
-of the source rings, their offset counts and the window. -/
+of the source rings, their offset counts and the held cells. -/
 abbrev Persist (G : ℕ) :=
   (Fin G → ℕ) × ((g : D.sources) → Multiset (ZMod (D.period g.1) × A)) ×
     ((p : D.sources × D.offsets) → Multiset (ZMod (D.period p.1.1) × A × A)) × List A
@@ -842,7 +844,7 @@ variable [hne : ∀ g, NeZero (D.period g)]
 
 /-- [definition] **The box of persisting states after `n` cells**: lift points within `2n` ticks of
 the opening, counts of total `n` on each source ring (`Sym` of its slots), offset counts of total
-`n − δ`, and windows of `min n (max Δ)` cells. -/
+`n − δ`, and the last `min n (max Δ)` cells. -/
 def box (τ₀ : ℕ → ℕ) (G n : ℕ) : Finset (D.Persist G) :=
   Fintype.piFinset (fun g : Fin G => Finset.Icc (τ₀ g) (τ₀ g + 2 * n)) ×ˢ
     Fintype.piFinset (fun g : D.sources => (Finset.univ : Finset (Sym (ZMod (D.period g.1) × A) n)).map
@@ -976,9 +978,9 @@ theorem moment_capacity [Nonempty A] (hd : ∀ g, 2 ≤ D.period g)
   omega
 
 omit [Fintype A] [DecidableEq A] hne in
-/-- [proved-derived; formal-checked] **`N(n)` is log-concave past the window.** Every factor is:
-the window constant, each lift range `2n + d_g`, each stars-and-bars count `C(n + S − 1, S − 1)`,
-and each offset count `C(n − δ + S' − 1, S' − 1)` from `n ≥ δ`. -/
+/-- [proved-derived; formal-checked] **`N(n)` is log-concave from `n = max Δ`.** Every factor is:
+the held cells' constant `|A|^(max Δ)`, each lift range `2n + d_g`, each stars-and-bars count
+`C(n + S − 1, S − 1)`, and each offset count `C(n − δ + S' − 1, S' − 1)` from `n ≥ δ`. -/
 theorem capacityBound_logConcave (hd1 : ∀ g, 1 ≤ D.period g) {alphabet : ℕ}
     (halphabet : 1 ≤ alphabet) (G : ℕ) :
     LogConcaveFrom D.windowLength (D.capacityBound G alphabet) := by
@@ -1009,7 +1011,7 @@ theorem capacityBound_pos (hd1 : ∀ g, 1 ≤ D.period g) {alphabet : ℕ} (halp
 
 omit [DecidableEq A] hne in
 /-- [proved-derived; formal-checked] **The admitted regime is lossy for good (R3 H1).** If the
-count falls below `|A|ⁿ` at a first crossing `n*` past the window (`N(n*) < |A|^(n*)` and
+count falls below `|A|ⁿ` at a first crossing `n* > max Δ` (`N(n*) < |A|^(n*)` and
 `N(n* − 1) ≥ |A|^(n* − 1)`), it stays below at every later `n`, so the moment is lossy by
 construction at every declared population of at least `n*` cells. -/
 theorem capacity_persists [Nonempty A] (hd1 : ∀ g, 1 ≤ D.period g) (G : ℕ) {nstar : ℕ}

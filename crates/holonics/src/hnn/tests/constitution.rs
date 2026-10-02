@@ -2,8 +2,8 @@
 //! chart's certificate, warm start and refinement, the statistic's standing, the budgeted carry (its
 //! accounting, its bound since the founding, remainder bits, the carried Gram's positivity and the
 //! zero update), the squares' positivity with no clamp, the energy growth of reaction deposits,
-//! the budget's refusal, the standing's lock chart, the causal diamond's window, the declared
-//! initial constitution, and the refusal of a complex-bilinear block at declaration.
+//! the budget's refusal, the standing's lock chart, what reaches a locus inside its causal diamond,
+//! the declared initial constitution, and the refusal of a complex-bilinear block at declaration.
 
 use std::collections::BTreeMap;
 use std::sync::OnceLock;
@@ -70,7 +70,10 @@ fn rule(lattice: Lattice) -> ChartRule {
 /// `Σ w f fᵀ` less its released residuals (value plus remainder); the solved chart `X̂` of the carried
 /// successor Gram `H'` is symmetric, on its lattice, and certified, `‖1 − X̂H'‖∞ = δ ≤ δ_ℓ`; the map
 /// moves by exactly `γ Σ w g fᵀX̂` less its released residuals, so `(W + ΔW)H' = WH' + γG − ρ` with the
-/// released prox residual `ρ = γG(1 − X̂H')`, whose norm is within the reading's certificate; every
+/// released prox residual `ρ = γG(1 − X̂H')`, whose norm is within the reading's certificate; the
+/// published successors satisfy the deposition's one balance
+/// `W′H′ − (WH + WF + γG) = −ρ + W c_H + c_W H′` with each carry term `c = r − r′ − e`
+/// (`HNN/LatticeWord.carried_deposition_balance`); every
 /// entry stays on the lattice, every remainder in its half-open cell on the fine lattice of its clock,
 /// and every residual within half a fine unit.
 #[test]
@@ -172,6 +175,43 @@ fn the_prox_step_releases_its_charts_residual_at_the_carried_operands() {
         );
         assert!(row_norm(&rho) <= reading.released);
         assert_eq!(reading.read, rule.read(&reading.released));
+        // The deposition's one balance on the published map and Gram (Lean
+        // `HNN/LatticeWord.carried_deposition_balance`): `W′H′ − (WH + WF + γG) = −ρ + W c_H + c_W H′`,
+        // each carry term `c = r − r′ − e`.
+        let gram_carry = law
+            .gram_remainder()
+            .subtract(&next.gram_remainder())
+            .unwrap()
+            .subtract(&released(Carrier::Gram, 4, 4))
+            .unwrap();
+        let map_carry = law
+            .map_remainder()
+            .subtract(&next.map_remainder())
+            .unwrap()
+            .subtract(&released(Carrier::Map, 3, 4))
+            .unwrap();
+        assert_eq!(
+            next.map()
+                .multiply(&next.gram())
+                .unwrap()
+                .subtract(
+                    &law.map()
+                        .multiply(&law.gram())
+                        .unwrap()
+                        .add(&law.map().multiply(&gram_update).unwrap())
+                        .unwrap()
+                        .add(&gradient.scaled(&proxy))
+                        .unwrap()
+                )
+                .unwrap(),
+            law.map()
+                .multiply(&gram_carry)
+                .unwrap()
+                .add(&map_carry.multiply(&next.gram()).unwrap())
+                .unwrap()
+                .subtract(&rho)
+                .unwrap()
+        );
         let half = lattice.unit() / integer(2);
         let fine = Lattice::new(lattice.exponent() + gamma_length(clock));
         for value in next.map().entries().iter().chain(next.gram().entries()) {
@@ -360,6 +400,33 @@ fn the_carry_splits_its_ties_upward_at_both_lattices() {
         lattice.div_rem_coordinate(&BigInt::from(7), 0),
         (BigInt::from(7), BigInt::zero())
     );
+}
+
+/// Lean `HNN/LatticeDeposit.{quot_fine_eq_floor, step_coordinate_eq_floor}` at the carry's two
+/// splits: [`Lattice::div_rem`] at the fine lattice `2^(−L−k)ℤ`, then
+/// [`Lattice::div_rem_coordinate`] at `2^(−L)ℤ`, give `q = ⌊y·2^L + 1/2 + 2^(−k−1)⌋` for `k ≥ 1`.
+/// The values `y = n/(3·2^(L+k+1))` cross four cells on each side of zero. They include every cell
+/// boundary `(z − 1/2)·2^(−L) − 2^(−L−k−1)` (`n` a multiple of three) and rationals off every
+/// dyadic lattice.
+#[test]
+fn the_two_splits_compose_into_one_floor() {
+    for exponent in [0, 3] {
+        for finer in [1, 3, 5] {
+            let (lattice, fine) = (Lattice::new(exponent), Lattice::new(exponent + finer));
+            let shift = rat(1, 2) + Rat::new(BigInt::one(), BigInt::one() << (finer + 1) as usize);
+            let reach = 3_i64 << (finer + 3);
+            for n in -reach..=reach {
+                let y = Rat::new(
+                    BigInt::from(n),
+                    BigInt::from(3) << (exponent + finer + 1) as usize,
+                );
+                let (point, _) = fine.div_rem(&y);
+                let (quotient, _) = lattice.div_rem_coordinate(&point, finer);
+                let floor = (&y / lattice.unit() + &shift).floor().to_integer();
+                assert_eq!(quotient, floor, "L = {exponent}, k = {finer}, y = {y}");
+            }
+        }
+    }
 }
 
 /// Lean `HNN/LatticeDeposit.{carried_remainder_bounded, run_onLattice}` on the constitution: the
@@ -1612,8 +1679,8 @@ fn the_standing_is_founded_off_its_nodes() {
 
 /// Lean `HNN/Normal.deposit_local`, `windowGram_apply_eq_zero`, `HNN/Retention.deposit_descends`:
 /// on the six-ring path a compare's deposit reaches only the causal diamond; every locus outside it
-/// is unchanged, and each element's statistic (carried value plus remainder) sums only over its
-/// window (one tick each here).
+/// is unchanged, and each element's statistic (carried value plus remainder) sums only over the
+/// ticks inside its causal diamond (one tick each here).
 #[test]
 fn a_deposit_reaches_only_the_diamond_and_sums_only_its_window() {
     let field = six_path(2);
@@ -1643,7 +1710,7 @@ fn a_deposit_reaches_only_the_diamond_and_sums_only_its_window() {
     let (_, deposit) = compose(&field, &theta, &pending, &back, &targets, &[]).unwrap();
     for step in deposit.linear() {
         if let LinearLocus::Contrast(g) = step.locus {
-            assert_eq!(step.samples.len(), 1, "ring {g}'s window is one tick");
+            assert_eq!(step.samples.len(), 1, "ring {g}'s diamond holds one tick");
             let tick = back.elements[g].iter().find(|tick| tick.tick == g).unwrap();
             assert_eq!(step.samples[0].feature, tick.contrast);
         }

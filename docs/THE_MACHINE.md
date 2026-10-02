@@ -34,17 +34,17 @@ results from them.
   families are not yet Holons joined at power ports: their update and code identities are their own
   laws, and their join to the Holon's energy balance is owed (the unified plan, U1 and §4).
 - **The aeon.** Its passage is an aeon on the Holarchy's parametric orientation (the lift of the
-  rings' joint clock torus): a receiving window is an epoch at the receiver's section; a pump
-  period or a clock closure is a cycle; the aeon boundary is the collapse; and the first law over
-  the aeon is `aeon::EnclosedLedger`. `hnn::Reference::expose` is a cut's passage through the
-  resident's aeons, one closed at each joint-clock carry-out.
+  rings' joint clock torus): the receiver reads it by epochs, the cells between two crossings of its
+  section; a pump period or a clock closure is a cycle; the aeon boundary is the collapse; and the
+  first law over the aeon is `aeon::EnclosedLedger`. `hnn::Reference::expose` is a cut's passage
+  through the resident's aeons, one closed at each joint-clock carry-out.
 - **What the code joins** (read from source at this commit): the resident's aeon is an
   `aeon::Aeon` on the parametric orientation from its opening lift point to the joint clock's
   carry-out; each ring's epochs are the flux through its own ring section; the carry-out is an
   `aeon::Cycle` of the last ring's clock when that ring opened on its section; the boundary runs
-  the collapse; and the resident carries the `EnclosedLedger`. Since the unified plan's U5: a
-  receiving window is an `aeon::Epochs` reading, an epoch of the cut's cell clock at the
-  receiver's section (`hnn::receiving::ReceivingPhases::windows`, which the exposure reads); a
+  the collapse; and the resident carries the `EnclosedLedger`. Since the unified plan's U5: the
+  receiver's spans of cells are an `aeon::Epochs` reading, the epochs of the cut's cell clock at
+  the receiver's section (`hnn::receiving::ReceivingPhases::windows`, which the exposure reads); a
   pump's period is an `aeon::Cycle` of its own clock (`hnn::ring::PumpDeclaration::period`); every
   ring clock is its navigator's `navigator::Clock` (`hnn::field::Ring::clock_at`), and the
   selective step's carry is its jumps, the flux of its section (Lean
@@ -490,7 +490,7 @@ them into one readout, `hnn::reference::Exposure`, whose fields are named below.
    - Cold setup, generation, update, ingestion, rest and egress are reported separately.
 6. **Locality.** The loci reached per deposit (the diamond), each ring's tick count, and the cone
    per word. Beside them, the openness of the source-to-receiver path (review C2): `open_windows` of
-   the `windows` read, the receiving windows whose refine receipt's `PathAttenuation` was open at
+   the `windows` read, the receiving epochs whose refine receipt's `PathAttenuation` was open at
    their cut, so a shielded receiver is reported as a located cause.
 7. **Numerical health.** The receivers' fibres, and the device's ball radii and residual
    certificate (step 5). No committed-face residual exists.

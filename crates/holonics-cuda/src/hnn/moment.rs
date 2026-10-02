@@ -6,7 +6,7 @@
 //! with carries, then a histogram reduction into `M_g[phase]`"). Its entries are **integer
 //! counts**, `u64` on the host with a refusal past the word (`HnnError::CountOverflow`): the
 //! phase-binned counts `M_g` (`d_g × |A|`) and the offset counts `C_g(δ)` (`d_g × |A| × |A|`) on
-//! every source ring, and the window, a shift register of the last `max Δ` raw cells. A
+//! every source ring, and the last `max Δ` raw cells, held as a delay line. A
 //! [`ResidentMoment`] keeps all of them on the card, with the rings' phase classes; the host keeps
 //! only the lift's words (`λ_g`, unbounded integers, advanced by the ingest's per-ring advances)
 //! and the cell count.
@@ -131,7 +131,7 @@ fn words(values: &[usize], what: &'static str) -> Result<Vec<u32>, DeviceError> 
 }
 
 impl<'c> ResidentMoment<'c> {
-    /// **Open a moment on the card** at a lift point: every count zero, the window empty, the
+    /// **Open a moment on the card** at a lift point: every count zero, no cell held, the
     /// field's lock chart and the rings' phase classes mounted (transfers).
     pub fn open(card: &'c Card, field: &Field, current: &Current) -> Result<Self, DeviceError> {
         let alphabet = field.alphabet();
@@ -203,7 +203,7 @@ impl<'c> ResidentMoment<'c> {
 
     /// **Ingest cells in order** at the layout derived from the card's census: the lift point's
     /// selective steps, then the phase-binned and offset counts on every source ring, then the
-    /// window. Stops after the cell whose step carries the joint clock out, and reports it.
+    /// held cells. Stops after the cell whose step carries the joint clock out, and reports it.
     pub fn ingest(&mut self, codes: &[usize]) -> Result<Ingested, DeviceError> {
         Ok(self.ingest_in(codes, None)?.0)
     }
@@ -332,7 +332,7 @@ impl<'c> ResidentMoment<'c> {
         })
     }
 
-    /// **The window's cells, most recent first** (`win[1], win[2], …`), `None` before enough
+    /// **The held cells, most recent first** (`win[1], win[2], …`), `None` before enough
     /// cells (a transfer).
     pub fn window(&self) -> Result<Vec<Option<usize>>, DeviceError> {
         let words = self.card.fetch(&self.window)?;
@@ -362,7 +362,7 @@ impl<'c> ResidentMoment<'c> {
     }
 
     /// **Re-key the rings' phase classes** at a lift point (`Current::rekey` moved only phase
-    /// classes; the counts and the window are untouched): the phases written (a transfer of one
+    /// classes; the counts and the held cells are untouched): the phases written (a transfer of one
     /// word per ring) and the lift kept.
     pub fn rekey(&mut self, field: &Field, current: &Current) -> Result<(), DeviceError> {
         let phases = (0..field.rings().len())

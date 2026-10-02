@@ -231,7 +231,7 @@ pub(crate) struct WordPlan {
     pub(crate) grain: u64,
     /// Per pair port entry `(source ring index, offset index, phases, rank, weights offset)` and
     /// its pair population's chart numerator, `0` at an empty population (the open reads no
-    /// window).
+    /// held cell).
     pub(crate) pairs: Vec<(usize, usize, usize, usize, usize, u64)>,
     pub(crate) pair_weights: usize,
     /// Host decoding scales in the embedded resonator table's order.
@@ -273,7 +273,7 @@ fn gather(field: &Field, ring: usize, k: &BigInt) -> Vec<i64> {
 }
 
 impl WordPlan {
-    /// **Form a word's plan** at a lift point on a publication, for a receiving window (module
+    /// **Form a word's plan** at a lift point on a publication, for a receiving epoch (module
     /// header), with the moment's count layout (its phase rows' and offset blocks' bases).
     pub(crate) fn form(
         field: &Field,
@@ -543,7 +543,7 @@ impl WordPlan {
         for (a, offset) in selection_offsets.iter().enumerate() {
             plan[contact_table + a * WC_STRIDE + WC_SELECTION] = (selections_at + offset) as i64;
         }
-        // The receiving window and its gather.
+        // The receiving epoch and its gather.
         let receiver = phases.ring();
         let map = loci.maps[receiver]
             .as_ref()
@@ -804,10 +804,10 @@ fn open_exponent(source: &crate::hnn::publication::SourceLoci, population: u32) 
 }
 
 /// [definition] **One source ring's normalized open, as the plan reads it**
-/// (`holonics::hnn::moment`: the open reads no window): its ring, the marginal's population chart
-/// numerator `⌊2^(L_ν)/n_g + ½⌋`, and per declared offset the pair population's chart numerator
-/// `⌊2^(L_ν)/n_(g,δ) + ½⌋`, `0` at an empty population. The host forms it from its mirror of the
-/// moment.
+/// (`holonics::hnn::moment`: the open reads no held cell): its ring, the marginal's population
+/// chart numerator `⌊2^(L_ν)/n_g + ½⌋`, and per declared offset the pair population's chart
+/// numerator `⌊2^(L_ν)/n_(g,δ) + ½⌋`, `0` at an empty population. The host forms it from its
+/// mirror of the moment.
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub(crate) struct SourceOpen {
     pub(crate) ring: usize,

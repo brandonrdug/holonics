@@ -146,7 +146,7 @@
 //! retired: it moved the standing past the entry bound on text and grew a contact's storage by up to
 //! `2²⁸` in one deposit. A factor family `x` steps by the same certificate as a linear locus, in the
 //! same loop and the same joint certificate. Its metric is its carried statistic `h_x′ = h_x + e`
-//! (`e`, the feature energy its window adds), so its unit step is `D = G_x / h_x′`:
+//! (`e`, the feature energy of what reached it), so its unit step is `D = G_x / h_x′`:
 //!
 //! ```text
 //! a = ⟨G_x, D⟩ = |G_x|² / h_x′          checked ≥ 0 (factor_unit_step_alignment)
@@ -233,7 +233,7 @@
 //! - **At a node: the lock's half-turn.** The crossings the chart's step offered are the lock's
 //!   proposal ([`LockProposal`]): the standings at the chart's certified step, turning each proposed
 //!   sheet by a half-turn. It is a separate move and a commit of its own ([`Constitution::locked`]),
-//!   taken by the machine that holds the comparison's window only where the lock's exact comparison
+//!   taken by the machine that holds the epoch's comparison only where the lock's exact comparison
 //!   of the comparison's code at both sheets says the turned sheets are strictly better
 //!   ([`crate::holon::deposition::strictly_better`]: the turned code's enclosure lies strictly below
 //!   the held one's). It is the two-state lock's own decision, no threshold: with the sheets'
@@ -408,7 +408,7 @@
 //! and refined by rounded Newton–Schulz steps until `δ ≤ δ_ℓ`, both declared by rule
 //! ([`ChartRule`]) so that the prox identity's released residual moves a read by less than the
 //! receiver's grain. The exact solved chart it replaces grew by the Hadamard bound of the carried
-//! Gram (0.40 Mbit over 24 windows of the standing real cut, still growing). [proved-derived;
+//! Gram (0.40 Mbit over 24 epochs of the standing real cut, still growing). [proved-derived;
 //! formal-checked] **The carried Gram stays positive
 //! definite with no clamp** (Lean `carried_gram_posDef`, `carried_gram_posDef_rule`): every entry
 //! of `H` is within one unit of the exact Gram `H_exact = I + Σ w f fᵀ ⪰ I`
@@ -436,13 +436,15 @@
 //! |---|---|
 //! | `HNN/Normal.normal_prox_step` at the carried Gram, with `HNN/LatticeDeposit.within_one_unit_since_founding` | [`NormalLaw`]: `W` is the prox iterate at the carried Gram `H'` (`B` is not carried, so `W` is not the minimizer of the accumulated `J(W)`), and `H` stays within one unit of the exact statistic `I + Σ w f fᵀ` |
 //! | `HNN/Normal.normal_prox_step`, `depositLocus_solves`; `HNN/LatticeWord.{prox_chart_residual, prox_chart_certificate}` | [`NormalLaw::deposited`] (the step at the carried Gram through the executed chart, its residual released and reported: [`ChartReading`]) |
+//! | `HNN/LatticeWord.{deposition_residual_sum, deposition_chart_balance, deposition_chart_certificate, carryDefect, carry_value_eq, carryDefect_bounded, carried_deposition_balance}` | [`NormalLaw::deposited`] (the deposition's one balance on the published map and Gram, with their carry terms) |
 //! | `HNN/LatticeWord.{nsStep, newton_schulz_left, rounded_refinement_residual_left, rounded_refinement_certificate_left, rowNorm, latticeChart}` | [`SolvedChart`] (the certificate and the rounded refinement) |
-//! | `HNN/LatticeWord.{warm_start_residual, warm_start_certificate}` | [`SolvedChart`] (why the warm start takes the window's rank-one steps) |
-//! | `HNN/LatticeWord.{warm_start_window, warm_start_window_exact, warm_start_window_certificate}` | [`SolvedChart`] (the window's rank-one warm start keeps the chart's residual) |
+//! | `HNN/LatticeWord.{rounded_residual_refinement_left, rounded_residual_refinement_certificate_left, solvedRefine, solved_refinement_certificate, solved_refinement_stays}` | [`SolvedChart`] (the refinement with the residual rounded too, and the mirrored triangle) |
+//! | `HNN/LatticeWord.{warm_start_residual, warm_start_certificate}` | [`SolvedChart`] (why the warm start takes the deposition's rank-one steps) |
+//! | `HNN/LatticeWord.{warm_start_window, warm_start_window_exact, warm_start_window_certificate}` | [`SolvedChart`] (the rank-one warm start after a deposition keeps the chart's residual) |
 //! | `HNN/LatticeWord.{chart_release_read, carried_chart_release_read}` | [`ChartRule::read`] (the released prox residual's move of a read) |
 //! | `HNN/LatticeWord.{roundedIter_certificate, newton_schulz_iter_left, inverse_chart_deviation}` | [`ChartRule`] (the lattice `L_s`, the target `δ_ℓ`, the refinement count) |
 //! | `HNN/Normal.normalStatistic_standing`, `objective_eq_statisticObjective`, for its statistic `H` only (carried on the lattice) | [`NormalLaw::gram`] (keeps `H`, never the samples) |
-//! | `HNN/Normal.deposit_local`, `windowGram_apply_eq_zero` | [`Constitution::deposited`] (per locus, only its window) |
+//! | `HNN/Normal.deposit_local`, `windowGram_apply_eq_zero` | [`Constitution::deposited`] (per locus, only what reached it inside its causal diamond) |
 //! | `HNN/Normal.reaction_deposit_storage_unchanged`, `reaction_deposits_keep_committed_energy`; `Holon/Deposition.committed_energy_bound` | [`DepositReading::storage_growth`], [`Constitution::storage_product`] (refused when uncertified: [`HnnError::UncertifiedStorage`]) |
 //! | `Holon/Deposition.{certified_step_descends, quadratic_upper_model, gauss_newton_curvature, joint_cauchy_schwarz}`, `HNN/Normal.certified_normal_step` | [`NormalLaw::prepare`] (the unit step and its readings), [`Constitution::deposited`] (the certified steps: [`StepReading`]) |
 //! | `Holon/Deposition.{active_element_growth, active_energy_growth}` | [`Constitution::amplitude`] (the per-tick growth `1 + ω`) |
@@ -885,6 +887,12 @@ struct CarriedEntry {
 /// `carry_accounting`) at the lattice and precision of its locus's deposit, from the entry, the
 /// residual and coordinate an earlier step of the same deposit staged there, and the remainder the
 /// entry carries.
+///
+/// [proved-derived] The two splits compose into one floor. With `y = Δ + r_prev` and `k = k_m ≥ 1`,
+/// the applied coordinate is `q = ⌊y·2^L + 1/2 + 2^(−k−1)⌋` (Lean
+/// `HNN/LatticeDeposit.{quot_fine_eq_floor, step_coordinate_eq_floor}`). So `q` moves only where
+/// `y` crosses `(z − 1/2)·2^(−L) − 2^(−L−k−1)`, half a fine unit below the boundary of one rounding
+/// at the lattice.
 fn carried_entry(
     lattice: &Lattice,
     precision: u32,
@@ -1056,11 +1064,12 @@ const RESIDUAL_SHIFT: u32 = 125;
 ///
 /// **Why the target.** At an executed chart `X̂` of the carried successor Gram `H'`, the map step
 /// `ΔW = γ Σ w g fᵀX̂` leaves the prox identity `(W + ΔW)H' = WH' + γG` (`G = Σ w g fᵀ`) with the
-/// released residual `ρ = γG(1 − X̂H')` (`prox_chart_residual`, summed over the window's returns),
-/// `‖ρ‖∞ ≤ ‖γG‖∞ δ` (`prox_chart_certificate`). The map differs from the exact prox step's by
-/// `−ρH'⁻¹`, so a read at an operand `x` moves by `|ρ_i H'⁻¹ x| ≤ ‖ρ_i‖₂‖x‖₂/λ_min(H') ≤
-/// ‖ρ‖∞‖x‖₁/c`, with `c = 1 − 1/(2L_R)` the carried Gram's margin (`carried_gram_posDef_rule`;
-/// the bound is `HNN/LatticeWord.{chart_release_read, carried_chart_release_read}`).
+/// released residual `ρ = γG(1 − X̂H')` (`prox_chart_residual`, summed over the returns that
+/// reached the locus), `‖ρ‖∞ ≤ ‖γG‖∞ δ` (`prox_chart_certificate`). The map differs from the exact
+/// prox step's by `−ρH'⁻¹`, so a read at an operand `x` moves by
+/// `|ρ_i H'⁻¹ x| ≤ ‖ρ_i‖₂‖x‖₂/λ_min(H') ≤ ‖ρ‖∞‖x‖₁/c`, with `c = 1 − 1/(2L_R)` the carried Gram's
+/// margin (`carried_gram_posDef_rule`; the bound is
+/// `HNN/LatticeWord.{chart_release_read, carried_chart_release_read}`).
 /// One return of a unit-scale covector (`‖wηg‖∞ ≤ 1`, the lattice rule's assumption, which the
 /// certified step enforces) and a feature
 /// `‖f‖₁ ≤ X_ℓ` read at an operand `‖x‖₁ ≤ X_ℓ` therefore moves by at most `X_ℓ²δ/c`; the lattice
@@ -1070,14 +1079,23 @@ const RESIDUAL_SHIFT: u32 = 125;
 /// returns reach ([`ChartReading::read`]), so the unit-scale assumption is measured, as the lattice
 /// rule's is.
 ///
-/// **Why the lattice.** A rounded refinement adds to the certificate the chart's rounding
-/// `‖ΔH'‖∞ ≤ n·2^(−L_s)/2·‖H'‖∞` (`rounded_refinement_certificate_left`) and the residual's rounding at
-/// the chart's lattice, `‖(R̃ − R)X̂H'‖∞ ≤ n·2^(−L_s)/2·(1 + δ)`; together at most
-/// `2n·2^(−L_s)‖H'‖∞ ≤ δ_ℓ/2`, so from any certificate at most `δ_ℓ` every rounded refinement stays
-/// at most `δ_ℓ` (`roundedIter_certificate` at `c = δ_ℓ ≤ 1/2`), and from above it the certificates
-/// fall to the fixed point near `δ_ℓ/2`. The Gram's own norm is read at each deposit, as the clock's
-/// Elias-gamma length is: the lattice refines as the Gram grows, and never coarsens (a coarser chart
-/// is a finer one's lattice point). Brandon may override the rule.
+/// **Why the lattice.** A rounded refinement that forms the whole product adds to the certificate
+/// the chart's rounding `‖ΔH'‖∞ ≤ n·2^(−L_s)/2·‖H'‖∞` and the residual's rounding at the chart's
+/// lattice, `‖(R̃ − R)X̂H'‖∞ ≤ n·2^(−L_s)/2·(1 + δ)` (`rounded_residual_refinement_certificate_left`);
+/// together at most `2n·2^(−L_s)‖H'‖∞ ≤ δ_ℓ/2`, so from any certificate at most `δ_ℓ` every rounded
+/// refinement stays at most `δ_ℓ` (`roundedIter_certificate` at `c = δ_ℓ ≤ 1/2`), and from above it
+/// the certificates fall to the fixed point near `δ_ℓ/2`. The executed step forms the upper
+/// triangle and mirrors it (`refined`), which carries the residual's rounding transposed through
+/// `X̂`, where `X̂H' ≈ 1` no longer absorbs it: `‖1 − X''H'‖∞ ≤ δ² + n·2^(−L_s)/2·(1 + 2‖X̂‖∞)‖H'‖∞`
+/// (`solved_refinement_certificate`), and the certificate stays at most `δ_ℓ` when twice that
+/// rounding term is (`solved_refinement_stays`). The rule counts `n` and `‖H'‖∞` but not `‖X̂‖∞`.
+/// [open] (#62) the lattice owes `⌈log₂(1 + 2‖X̂‖∞)⌉` more bits, or the step owes the whole product.
+/// Every certificate is computed exactly, so a refinement the lattice does not carry restarts cold
+/// and, short of `δ_ℓ` within the rule's count, is refused
+/// ([`ExactLinearError::InverseCertificateFailure`]); no chart above `δ_ℓ` is released. The Gram's
+/// own norm is read at each deposit, as the clock's Elias-gamma length is: the lattice refines as
+/// the Gram grows, and never coarsens (a coarser chart is a finer one's lattice point). Brandon may
+/// override the rule.
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub struct ChartRule {
     lattice: Lattice,
@@ -1150,7 +1168,7 @@ impl ChartRule {
 /// chart in three stages, each on the successor's lattice:
 ///
 /// ```text
-/// warm start   X₀ = X̂ − X̂F(Ω⁻¹ + FᵀX̂F)⁻¹FᵀX̂      the window's returns F, Ω = diag(w), one rank-one step each, rounded
+/// warm start   X₀ = X̂ − X̂F(Ω⁻¹ + FᵀX̂F)⁻¹FᵀX̂      the returns F that reached the locus, Ω = diag(w), one rank-one step each, rounded
 ///              1 − X₀(H + FΩFᵀ) = (1 − X̂FS⁻¹Fᵀ)(1 − X̂H)                                              (exact identity)
 /// certificate  δ = ‖1 − X₀H'‖∞                      exact, from integer products
 /// refinement   X ← round((2 − XH')X) = round(X + R X) ,  R = 1 − XH'     until δ ≤ δ_ℓ ;  1 − X'H' = R² − (rounding)H'
@@ -1160,11 +1178,12 @@ impl ChartRule {
 /// `(1 − X̂H) − X̂ΔH` (`warm_start_residual`), whose certificate `δ + ‖ΔH‖∞‖X̂‖∞`
 /// (`warm_start_certificate`) passes 1 whenever a return's feature is large (`‖f fᵀ‖∞` up to
 /// `X_ℓ²`), and the exact residual `−H⁻¹ΔH` then has spectral radius above 1, where Newton–Schulz
-/// diverges. The window's rank-one steps (Sherman–Morrison, read at the chart's lattice) carry the
-/// residual instead: with `S = Ω⁻¹ + FᵀX̂F` the identity above holds in any ring (it expands to
-/// `X̂F[Ω − S⁻¹(Ω⁻¹ + FᵀX̂F)Ω]Fᵀ = 0`), so an exact chart stays exact and a certified one keeps its
-/// residual up to `1 − X̂FS⁻¹Fᵀ` (near `H'⁻¹H`): `HNN/LatticeWord.{warm_start_window,
-/// warm_start_window_exact, warm_start_window_certificate}`, with the inverses as left inverses.
+/// diverges. The rank-one steps of the returns that reached the locus (Sherman–Morrison, read at
+/// the chart's lattice) carry the residual instead: with `S = Ω⁻¹ + FᵀX̂F` the identity above holds
+/// in any ring (it expands to `X̂F[Ω − S⁻¹(Ω⁻¹ + FᵀX̂F)Ω]Fᵀ = 0`), so an exact chart stays exact and
+/// a certified one keeps its residual up to `1 − X̂FS⁻¹Fᵀ` (near `H'⁻¹H`):
+/// `HNN/LatticeWord.{warm_start_window, warm_start_window_exact, warm_start_window_certificate}`,
+/// with the inverses as left inverses.
 /// Nothing rests on it, since the certificate is computed exactly afterwards.
 /// When the warm start's certificate is not below 1, or a refinement does not lower it, the chart
 /// restarts from the scaled identity `2^(−a)I`, whose residual is contracting (spectrum in `[0, 1)`).
@@ -1393,10 +1412,11 @@ fn certified(block: &[i128], gram: &[i128], s: usize, shift: u32) -> Option<(Vec
 }
 
 /// **One rounded Newton–Schulz refinement, left form** (Lean `nsStep`, `newton_schulz_left`,
-/// `rounded_refinement_certificate_left`): `X' = round(X + R̃X)` on `2^(−L_s)ℤ`, with `R̃` the certified
-/// residual `P·2^(−L_s−e_H)` read at the chart's lattice. `X + RX = (2 − XH)X` is symmetric for a
-/// symmetric `X` and `H`, so the upper triangle is formed and mirrored. The rows run together. `None`
-/// when an entry leaves the `i128` carrier.
+/// `solvedRefine`, `solved_refinement_certificate`): `X' = round(X + R̃X)` on `2^(−L_s)ℤ`, with `R̃`
+/// the certified residual `P·2^(−L_s−e_H)` read at the chart's lattice. `X + RX = (2 − XH)X` is
+/// symmetric for a symmetric `X` and `H`, so the upper triangle is formed and mirrored; `R̃X` is not,
+/// and the mirror carries the residual's rounding transposed (`ChartRule`, "Why the lattice"). The
+/// rows run together. `None` when an entry leaves the `i128` carrier.
 fn refined(
     block: &[i128],
     residual: &[i128],
@@ -1601,8 +1621,8 @@ impl SolvedChart {
     }
 
     /// **The successor's chart** (the type's header): the Gram `gram` is the carried successor, and
-    /// `features` the window's returns `(w, f)` in the integral chart. Refused past the `i128` carrier
-    /// or when the refinement does not reach `δ_ℓ` within the rule's count.
+    /// `features` the returns `(w, f)` that reached the locus, in the integral chart. Refused past
+    /// the `i128` carrier or when the refinement does not reach `δ_ℓ` within the rule's count.
     fn deposited(
         &self,
         gram: &[Vec<Rat>],
@@ -1877,7 +1897,7 @@ impl NormalLaw {
     /// `W` and `D`. The step `η` is certified by the constitution (it reads every locus's gains) and
     /// applied by [`PreparedStep::stepped`]: `ΔW = η D`, so `(W + ΔW)H' = WH' + ηG − ηG(1 − X̂H')`
     /// exactly, with `G = Σ w g fᵀ`. The Gram's carry is at the budgeted carry `at` of the locus's
-    /// deposit (its residuals staged there). `None` when the window reached nothing (no nonzero
+    /// deposit (its residuals staged there). `None` when nothing reached the locus (no nonzero
     /// weighted feature), which moves nothing.
     ///
     /// [definition; agent-inferred] **The sums are read in the integral chart**: each sample's
@@ -2009,7 +2029,17 @@ impl NormalLaw {
     /// **The carried prox step at a given step `η`** ([`NormalLaw::prepare`] then
     /// [`PreparedStep::stepped`]): the law's own step (Lean `HNN/Normal.normal_prox_step` at
     /// `γ = η`), which a deposit takes at its certified step and a test at any step. Returns the
-    /// successor with its chart's reading, `None` when the window reached nothing.
+    /// successor with its chart's reading, `None` when nothing reached the locus.
+    ///
+    /// [proved-derived; formal-checked] **The deposition's one balance** (Lean
+    /// `HNN/LatticeWord.{deposition_chart_balance, carried_deposition_balance}`): with the covectors
+    /// that reached the locus, `F = Σ w f fᵀ`,
+    /// `G = Σ w g fᵀ` and the carry terms `c = r − r′ − e` of the Gram's and the map's deposits
+    /// (remainder before, remainder after, released residual), the published successors satisfy
+    /// `W′H′ − (WH + WF + ηG) = −ηG(1 − X̂H′) + W c_H + c_W H′`. The first term is the chart's residual at
+    /// the deposited Gram, summed over the arrivals (`deposition_residual_sum`), reported by its certificate
+    /// ([`ChartReading::released`]); each carry entry is below `2^(−L) + 2^(−L−k_m)/2`
+    /// (`carryDefect_bounded`).
     pub fn deposited(
         &self,
         samples: &[Sample],
@@ -2409,7 +2439,7 @@ impl LinearLocus {
     }
 }
 
-/// [definition] **One linear locus's window**: its samples inside the causal diamond.
+/// [definition] **What reaches one linear locus**: its samples inside its causal diamond.
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct LinearStep {
     pub locus: LinearLocus,
@@ -2418,8 +2448,8 @@ pub struct LinearStep {
 
 /// [definition] **One reached comparison's deposit into the receiving parametron's landmark tree**
 /// (the landmark tree): its receiving ring, the causal address its phase read the tree at
-/// (`hnn::receiving::ActiveAddress::phase`) and its target class. The deposit applies a window's
-/// steps in cell order, each on the paths its address opens (Lean
+/// (`hnn::receiving::ActiveAddress::phase`) and its target class. The deposit applies the steps of
+/// what reached the locus in cell order, each on the paths its address opens (Lean
 /// `Compression/Landmark/Context/Tree.landmark_step`), at the receiving locus.
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct LandmarkStep {
@@ -2443,10 +2473,10 @@ pub enum FactorGradient {
         gradient: Vec<(Vec<Rat>, Vec<Rat>)>,
     },
     /// The standing `q_g`, through the declared lock chart (the class covector carried by the
-    /// transpose of the contrast map `q ↦ Δ`), with its chart's **reach**: every ring whose contrast
-    /// a move of `q_g` moves (`g` and the other ends of its contacts), each with its element
-    /// window's energy `Σ_t |x̄_t|²`, which the certified step's curvature reads (module header,
-    /// "The factor families' certified step").
+    /// transpose of the contrast map `q ↦ Δ`), with its chart's **reach**: every ring whose
+    /// contrast a move of `q_g` moves (`g` and the other ends of its contacts), each with the
+    /// energy `Σ_t |x̄_t|²` of what reached its element, which the certified step's curvature reads
+    /// (module header, "The factor families' certified step").
     Standing {
         ring: usize,
         gradient: Vec<Rat>,
@@ -2572,12 +2602,12 @@ impl Family {
 }
 
 /// [definition] **One factor step**: the family's descent direction `G_x`, the feature energy
-/// `e = Σ_t w|f_t|²` its window adds to the family's statistic `h_x`, and the **covector scale**
-/// `c = max_t |g_t|_∞`, the largest entry of the covector one return carries at the family's output
-/// (the element's adjoint `u_t` for the element's families and the standing, the transit's solved
-/// `r̄_t` for a channel's and a resonator's, the turned opening at a phase for a pair port), which
-/// the certified step reads as the linear loci read theirs (module header, "The factor families'
-/// certified step").
+/// `e = Σ_t w|f_t|²` that what reached it adds to the family's statistic `h_x`, and the **covector
+/// scale** `c = max_t |g_t|_∞`, the largest entry of the covector one return carries at the
+/// family's output (the element's adjoint `u_t` for the element's families and the standing, the
+/// transit's solved `r̄_t` for a channel's and a resonator's, the turned opening at a phase for a
+/// pair port), which the certified step reads as the linear loci read theirs (module header, "The
+/// factor families' certified step").
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct FactorStep {
     pub gradient: FactorGradient,
@@ -3734,10 +3764,10 @@ impl Constitution {
     /// the chart of `H′` refined, the unit step `D = Σ w g (X̂f)ᵀ`, its alignment `a = Σ w⟨g, Df⟩`)
     /// and stepped by `ηD` through the locus's budgeted carry ([`PreparedStep::stepped`]), the
     /// locus's clock advanced when an entry moved, the commit counted, and the successor refused
-    /// past the budget or when its committed storage growth is uncertified (the guards of
+    /// past the budget or when its committed storage growth is uncertified (the refusals of
     /// [`Constitution::deposited`]). `None` when the returns reach nothing. It publishes nothing:
-    /// the executed comparison's move adopts the successor only when every commit guard holds on it
-    /// (`hnn::executed::executed_move`), so it is visible to the crate alone.
+    /// the executed comparison's move adopts the successor only when every condition of adoption
+    /// holds on it (`hnn::executed::executed_move`), so it is visible to the crate alone.
     pub(crate) fn stepped_source(
         &self,
         ring: usize,
@@ -3879,7 +3909,7 @@ impl Constitution {
     /// (`hnn::moment`, "One passage, its transported weights"): `0 < ρ ≤ 1` (the transport is
     /// passive: its energy a tick `ρ² ≤ 1`, its dissipation `1 − ρ² ≥ 0`), on the source port's
     /// lattice. Refused off a source ring, outside `(0, 1]`, or off the lattice. The executed
-    /// comparison's move adopts it only when every commit guard holds (`hnn::executed`).
+    /// comparison's move adopts it only when every condition of adoption holds (`hnn::executed`).
     pub fn with_transport(mut self, ring: usize, modulus: Rat) -> Result<Self, HnnError> {
         let material = self
             .rings
@@ -5939,7 +5969,7 @@ impl Constitution {
                         })
                         .map_err(refused)?;
                     let at = self.stroke(locus, &mut stroke).map_err(refused)?;
-                    // The step prepared in pass 1 (none when its window reached nothing), at its
+                    // The step prepared in pass 1 (none when nothing reached the locus), at its
                     // certified step (zero when its alignment was zero: the Gram and chart move,
                     // the map does not).
                     if let Some((_, _, Some(prepared))) = linear.take() {
@@ -6087,7 +6117,8 @@ pub fn receiving_metric_samples(samples: &[Sample]) -> Option<Vec<Sample>> {
 /// the power of two at or below `1/λ̄`: about `|A|` at a uniform reading, so the step's magnitude
 /// part is the normal law's own scaled into the receiver's own curvature. `None` when a covector is
 /// not a face's `q − p̃`, or the readings carry no curvature.
-/// The window mean stands for the accumulated class Fisher. Its certified counterpart is the
+/// The mean over the readings that reached the receiving map at this deposit stands for the
+/// accumulated class Fisher. Its certified counterpart is the
 /// factored certificate (`Holonics.HNN.Ratio.Certificate.factored_accumulated_code_le`), which reads
 /// each reading's largest face mass `μ_i` in place of the mean eigenvalue: the accumulated bound's
 /// curvature is `P₀ ⊗ Σ μ_i x_i x_iᵀ`, and its step solves `cen D · G = M − cen W · G − b/(ln 2·2^ω)`.
@@ -6197,7 +6228,7 @@ type CertifiedSteps = (
 );
 
 /// One locus's pass-1 preparation: its budgeted carry (opened by its first step), its linear step's
-/// place, kind and prepared unit step (none when its window reached nothing), and its factor
+/// place, kind and prepared unit step (none when nothing reached the locus), and its factor
 /// families' prepared unit steps.
 struct Prepared {
     stroke: Option<BudgetedCarry>,
@@ -6238,8 +6269,8 @@ enum Moves {
         u: (Rat, Rat),
         v: (Rat, Rat),
     },
-    /// The standing: `|D|_∞` and its lock chart's reach (each ring with its element window's
-    /// energy); its moves read the reached rings' slices (the certificate).
+    /// The standing: `|D|_∞` and its lock chart's reach (each ring with the energy of what reached
+    /// its element); its moves read the reached rings' slices (the certificate).
     Standing { unit: Rat, reach: Vec<(usize, Rat)> },
     /// A resonator gain: `|D|` and `|g_i| > 0`; `b(η) = |D|² e ((|g_i| + η|D|) / |g_i|)²`.
     Resonator { unit: Rat, gain: Rat },

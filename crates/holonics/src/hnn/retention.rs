@@ -30,10 +30,11 @@
 //! (`hnn::receiving::ActiveAddress`) is resident state beside it, which the collapse does not
 //! touch.
 //!
-//! The time-indexed window of a locus is the ticks at which its output is read within the word:
-//! the element of `g` at tick `t` when `r_g ≤ t` and `t + 1 + o_g ≤ e_last`; a channel likewise with
-//! the ends' minima. A deposit's statistics sum only over these windows, which is why a deposit
-//! gives the same result with or without the collapse (`deposit_descends`).
+//! The ticks inside a locus's causal diamond are those at which its input can be nonzero and its
+//! output is read within the word: the element of `g` at tick `t` when `r_g ≤ t` and
+//! `t + 1 + o_g ≤ e_last`; a channel likewise with the ends' minima. A deposit's statistics sum
+//! only over what reaches a locus at these ticks, which is why a deposit gives the same result with
+//! or without the collapse (`deposit_descends`).
 //!
 //! [definition; agent-inferred, U2] **Its place in the retention contract**
 //! ([objects §8](../../../../docs/ELEMENTARY_OBJECTS.md#the-retention-contract), which owns the
@@ -249,15 +250,15 @@ impl Diamond {
         }
     }
 
-    /// **The element's window**: tick `t` of ring `g`'s element is read within the word when
-    /// `r_g ≤ t` and `t + 1 + o_g ≤ e_last`.
+    /// **The element's causal diamond**: tick `t` of ring `g`'s element is read within the word
+    /// when `r_g ≤ t` and `t + 1 + o_g ≤ e_last`.
     pub fn element_window(&self, ring: usize, tick: usize) -> bool {
         self.reach[ring].is_some_and(|r| r <= tick)
             && le(self.observe[ring].map(|o| tick + 1 + o), self.last_epoch)
     }
 
-    /// **The channel's window**: tick `t` of contact `a`'s transit is read within the word when
-    /// `min(r_g, r_h) ≤ t` and `t + 1 + min(o_g, o_h) ≤ e_last`.
+    /// **The channel's causal diamond**: tick `t` of contact `a`'s transit is read within the word
+    /// when `min(r_g, r_h) ≤ t` and `t + 1 + min(o_g, o_h) ≤ e_last`.
     pub fn channel_window(&self, field: &Field, contact: usize, tick: usize) -> bool {
         let (g, h) = field.contact(contact).ends();
         min(self.reach[g], self.reach[h]).is_some_and(|r| r <= tick)

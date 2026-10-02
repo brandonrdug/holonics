@@ -895,8 +895,8 @@ theorem supportedIn_single [DecidableEq B] (z : B) (φ : Module.Dual K (M z)) :
 
 /-- [proved-derived; formal-checked] **The trajectory agrees wherever it is still observed.** If two
 operator families agree on the diamond's edges, the change at block `z` and tick `k ≤ e_last`
-agrees whenever `z` observes a receiver within `e_last − k` hops: every feature a retained locus
-reads in its window is the same under both. -/
+agrees whenever `z` observes a receiver within `e_last − k` hops: every feature that reaches a
+retained locus inside its causal diamond is the same under both. -/
 theorem trajectory_agrees_where_observed [DecidableEq B] {T T' : BlockOp K M} (hT : Sparse adj T)
     (hT' : Sparse adj T') {x₀ : (b : B) → M b} {S R : Set B} (hx : SupportedIn x₀ S)
     {eLast : ℕ} (hagree : ∀ y z, InDiamond adj S R eLast z y → T' y z = T y z) {k : ℕ}

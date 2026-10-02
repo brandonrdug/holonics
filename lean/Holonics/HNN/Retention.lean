@@ -44,12 +44,12 @@ change at fixed operands, and the `tick` of a `BlockOp` on `Ring ⊕ Contact` th
 2. **Release is indistinguishable** (`release_indistinguishable`): the collapse changes no admitted
    reading at any class configuration, epoch `≤ e_last` or receiver (`Propagation.release_past_diamond`).
 3. **Deposits descend** (`deposit_descends`, R3 R3): a deposit reads, on each block edge, the
-   features and covectors at the ticks of its diamond window; with or without the collapse these
-   agree on retained loci (`Propagation.trajectory_agrees_where_observed`,
-   `sweep_agrees_where_reached`), and a released locus has an empty window, so
+   features and covectors that reach it inside its causal diamond; with or without the collapse
+   these agree on retained loci (`Propagation.trajectory_agrees_where_observed`,
+   `sweep_agrees_where_reached`), and nothing reaches a released locus, so
    `collapse ∘ deposit = deposit ∘ collapse`. The release is structural: no sequence of deposits
-   resurrects a released locus (`release_structural`). A deposit law that moves a locus with an
-   empty window breaks the descent (`deposit_descends_needs_empty_window_law`), and the diamond rule
+   resurrects a released locus (`release_structural`). A deposit law that moves a locus nothing
+   reaches breaks the descent (`deposit_descends_needs_empty_window_law`), and the diamond rule
    is tight on the path witness: releasing a retained edge changes a reading
    (`retained_edge_is_read`).
 4. **Admitted families may only shrink** (`admitted_nonincreasing`): the collapse is sufficient for
@@ -341,15 +341,15 @@ def Admitted (R : Set B) (eLast : ℕ) (rd : List (ℕ × ((b : B) → Module.Du
 
 variable (adj) in
 open Classical in
-/-- [definition] **The diamond window** of the edge `z → y` for a reading at epoch `t`: the ticks
-`k < t` at which the edge's input can be nonzero (`r_z ≤ k`) and its output can still be read
-(`o_y ≤ t − 1 − k`). -/
+/-- [definition] **The ticks inside the causal diamond** of the edge `z → y` for a reading at epoch
+`t`: the ticks `k < t` at which the edge's input can be nonzero (`r_z ≤ k`) and its output can still
+be read (`o_y ≤ t − 1 − k`). -/
 def windowTicks (S R : Set B) (t : ℕ) (z y : B) : List ℕ :=
   (List.range t).filter fun k => z ∈ reachWithin adj S k ∧ Observes adj R y (t - 1 - k)
 
 variable (adj) in
 /-- [definition] **The data a deposit reads on the edge `z → y`**: for every admitted reading and
-every tick of its diamond window, the feature `x_k(z)` of the word's own trajectory and the
+every tick inside its causal diamond, the feature `x_k(z)` of the word's own trajectory and the
 covector `λ(y)` swept back to tick `k + 1`. -/
 def depositData (T : BlockOp K M) (x₀ : (b : B) → M b) (S R : Set B)
     (rd : List (ℕ × ((b : B) → Module.Dual K (M b)))) (z y : B) :
@@ -360,7 +360,7 @@ def depositData (T : BlockOp K M) (x₀ : (b : B) → M b) (S R : Set B)
 variable (adj op) in
 open Classical in
 /-- [definition] **The deposit**: on each declared edge the locus law `Φ` reads its own state and
-its window's data; nothing else changes. -/
+the data that reached it inside its causal diamond; nothing else changes. -/
 def deposit (Φ : (y z : B) → Θ y z → List (M z × Module.Dual K (M y)) → Θ y z) (S R : Set B)
     (c : Cls) (x₀ : (b : B) → M b) (rd : List (ℕ × ((b : B) → Module.Dual K (M b))))
     (θ : (y z : B) → Θ y z) : (y z : B) → Θ y z :=
@@ -385,9 +385,9 @@ theorem depositData_eq_nil (T : BlockOp K M) (x₀ : (b : B) → M b) {S R : Set
   rw [windowTicks_eq_nil (hrd r hr).1 hout, List.map_nil]
 
 /-- [proved-derived; formal-checked] **A deposit gives the same result with or without the
-collapse** (`deposit_descends`, R3 R3). On a retained edge the window's features and covectors are
-the same under both constitutions (`trajectory_agrees_where_observed`,
-`sweep_agrees_where_reached`); a released edge has an empty window, so the collapsed locus stays
+collapse** (`deposit_descends`, R3 R3). On a retained edge the features and covectors that reach
+it are the same under both constitutions (`trajectory_agrees_where_observed`,
+`sweep_agrees_where_reached`); nothing reaches a released edge, so the collapsed locus stays
 released. Hence `collapse ∘ deposit = deposit ∘ collapse` on the admitted family. -/
 theorem deposit_descends [DecidableEq B] (hrel : ∀ c y z, op c y z (rel y z) = 0)
     (Φ : (y z : B) → Θ y z → List (M z × Module.Dual K (M y)) → Θ y z)
@@ -589,10 +589,10 @@ theorem retained_edge_is_read :
   · simp only [pair_single, trajectory, tick, readOp, pathOp, pathAdj, Fin.sum_univ_three]
     simp
 
-/-- [counterexample; formal-checked] **`deposit_descends` needs a deposit law that an empty window
-leaves unchanged.** The law `Φ(θ, data) = θ + I` moves a locus even with no data; on the released
-edge `1 → 2` of the path, collapsing after the deposit gives `0` and depositing after the collapse
-gives `I`. -/
+/-- [counterexample; formal-checked] **`deposit_descends` needs a deposit law that leaves a
+locus nothing reaches unchanged.** The law `Φ(θ, data) = θ + I` moves a locus even with no data; on
+the released edge `1 → 2` of the path, collapsing after the deposit gives `0` and depositing after
+the collapse gives `I`. -/
 theorem deposit_descends_needs_empty_window_law :
     collapse pathAdj (fun _ _ => (0 : ℚ →ₗ[ℚ] ℚ)) {0} {1} 1
         (deposit pathAdj (fun (_ : Unit) _ _ (θ : ℚ →ₗ[ℚ] ℚ) => θ)

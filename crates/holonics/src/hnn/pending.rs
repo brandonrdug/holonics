@@ -6,12 +6,12 @@
 //! the receiving parametron's active suffix address at the cut (`hnn::receiving::ActiveAddress`,
 //! its receiver's `D` letters and the reader of the next ones: the clock's phases, the windings
 //! since the aeon's opening and the contacts' site kinds its contact letters read, so every
-//! bundle of the window's known targets is read from the state at the cut; campaign 2); its
+//! bundle of the epoch's known targets is read from the state at the cut; campaign 2); its
 //! [`ReceivingPhases`]; and the commit it was produced at. Every
 //! word opens at zero change, so the anchor needs no waves. A read ([`PendingRatio::open`])
 //! recomputes `m̃ = ⟨M, E_now⟩` and runs the word at the contemporary constitution, `q` included;
 //! at compare, the contemporary landmark tree is read at each phase's causal address, the copied
-//! suffix after the window's earlier targets (the landmark tree, [`PendingRatio::against`]):
+//! suffix after the epoch's earlier targets (the landmark tree, [`PendingRatio::against`]):
 //!
 //! - `refine` publishes only faces, with no commit flag, so no source is counted twice and `E` is
 //!   never mixed across two cuts;
@@ -68,7 +68,7 @@ pub struct PendingRatio {
     commit: u64,
 }
 
-/// [definition] **A window's faces at compare**: the combined faces (the tree's at each phase's
+/// [definition] **An epoch's faces at compare**: the combined faces (the tree's at each phase's
 /// address plus the wave's) and the tree faces they were formed from.
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct Against {
@@ -112,7 +112,7 @@ impl PendingRatio {
         &self.address
     }
 
-    /// **The window's phase addresses** given its known targets
+    /// **The epoch's phase addresses** given its known targets
     /// (`hnn::receiving::ActiveAddress::phase`).
     pub fn addresses(&self, known: &[usize]) -> Result<Vec<Vec<Letter>>, HnnError> {
         self.phases.addresses(&self.address, known)
@@ -158,9 +158,9 @@ impl PendingRatio {
         )
     }
 
-    /// **The contemporary read**: the word run over its receiving window and the wave's faces read
-    /// at the receiver's grain, every solve seeded afresh. Returns the word (for its return) and the
-    /// faces.
+    /// **The contemporary read**: the word run through its receiving epochs and the wave's faces
+    /// read at the receiver's grain, every solve seeded afresh. Returns the word (for its return)
+    /// and the faces.
     pub fn read<'c>(
         &self,
         field: &'c Field,
@@ -189,7 +189,7 @@ impl PendingRatio {
         Ok((word, Faces::of_reads(&reads, self.phases.grain())?))
     }
 
-    /// The contemporary tree faces at each phase's causal address given the window's known targets:
+    /// The contemporary tree faces at each phase's causal address given the epoch's known targets:
     /// what [`PendingRatio::against`] adds to the wave (read-only).
     pub(crate) fn tree_faces(
         &self,
@@ -199,10 +199,10 @@ impl PendingRatio {
         self.phases.tree_faces(constitution, &self.address, known)
     }
 
-    /// **The window's faces at compare** (module header; the landmark tree): the contemporary tree read at
-    /// each phase's causal address given the window's known targets, added to the wave's faces.
-    /// At a compare every target is known; at a release none is, and every phase reads the
-    /// window's opening address (`hnn::receiving::ActiveAddress::phase`).
+    /// **The epoch's faces at compare** (module header; the landmark tree): the contemporary tree
+    /// read at each phase's causal address given the epoch's known targets, added to the wave's
+    /// faces. At a compare every target is known; at a release none is, and every phase reads the
+    /// address where the epoch opens (`hnn::receiving::ActiveAddress::phase`).
     pub fn against(
         &self,
         constitution: &impl ConstitutionRead,
@@ -216,7 +216,7 @@ impl PendingRatio {
         })
     }
 
-    /// **The window scored by the receiver's population** (ruling A, THE_REBUILD U1,
+    /// **The epoch scored by the receiver's population** (ruling A, THE_REBUILD U1,
     /// `hnn::receiving::score`): the contemporary population weighs the tree's faces against the
     /// combined faces at the targets by the families' likelihoods, each phase's code length under
     /// it, and the steps its deposit applies. Refused when the constitution carries no population on

@@ -1,4 +1,6 @@
 import Holonics.HNN.Ring
+import Mathlib.LinearAlgebra.Matrix.Charpoly.Eigs
+import Mathlib.Analysis.Complex.Polynomial.Basic
 
 /-!
 # HNN.Floquet: the pumped ring's monodromy, its growth certificate and phase-sensitive amplification
@@ -52,6 +54,15 @@ states what the certificate implies, and the pump's own geometry.
    reading is odd, so no linear map followed by a threshold reads it
    (`no_linear_threshold_reads_relative_phase`): the relative phase of two cells enters the lock
    only through the pump.
+
+7. **The lattice's floor on a multiplier.** [proved-derived; formal-checked] The executed monodromy
+   is `M = N/Δ` with `N` an integer matrix (the Rust owner carries each tick on integers). If `N` is
+   invertible, `|det N| ≥ 1` and `det N` is the product of its multipliers, so one has modulus at
+   least one (`integer_monodromy_floor`): `ρ(M) ≥ 1/Δ`. A sheet on an exact constitution that grows
+   at all grows by at least one part in `Δ` per cycle; no reading approaches zero continuously.
+
+[open] (#62) The singular, not nilpotent `N`: the same bound from the nonzero multipliers, whose
+product is the lowest nonzero coefficient of `det(ν − N)`, an integer.
 
 [open] That the principal-resonance monodromy of a rotating pump has a real multiplier below `−1`
 (the subharmonic lock), and the Mathieu tongue boundaries, are not stated here (#62).
@@ -444,6 +455,58 @@ theorem no_linear_threshold_reads_relative_phase (L : ℂ × ℂ →ₗ[ℝ] ℝ
 
 end Parity
 
+section Floor
+
+/-- A product of finitely many values in `[0, 1)`, at least one, is below one. -/
+theorem multiset_prod_lt_one (s : Multiset ℝ) (hs : s ≠ 0) (h0 : ∀ x ∈ s, 0 ≤ x)
+    (h1 : ∀ x ∈ s, x < 1) : s.prod < 1 := by
+  induction s using Multiset.induction_on with
+  | empty => exact absurd rfl hs
+  | cons a s ih =>
+    rw [Multiset.prod_cons]
+    have ha0 := h0 a (Multiset.mem_cons_self a s)
+    have ha1 := h1 a (Multiset.mem_cons_self a s)
+    have hs0 : 0 ≤ s.prod := Multiset.prod_nonneg fun x hx => h0 x (Multiset.mem_cons_of_mem hx)
+    have hs1 : s.prod ≤ 1 := by
+      by_cases he : s = 0
+      · simp [he]
+      · exact (ih he (fun x hx => h0 x (Multiset.mem_cons_of_mem hx))
+          (fun x hx => h1 x (Multiset.mem_cons_of_mem hx))).le
+    nlinarith
+
+/-- [proved-derived; formal-checked] **An invertible integer monodromy has a multiplier of modulus
+at least one**: so `M = N/Δ` has `ρ(M) ≥ 1/Δ`, the lattice's floor on a reading. -/
+theorem integer_monodromy_floor {m : Type*} [Fintype m] [DecidableEq m] [Nonempty m]
+    (N : Matrix m m ℤ) (hN : N.det ≠ 0) :
+    ∃ μ ∈ (N.map (Int.castRingHom ℂ)).charpoly.roots, 1 ≤ ‖μ‖ := by
+  set M := N.map (Int.castRingHom ℂ)
+  have hdet : M.det = M.charpoly.roots.prod :=
+    Matrix.det_eq_prod_roots_charpoly_of_splits (IsAlgClosed.splits _)
+  have hMdet : M.det = ((N.det : ℤ) : ℂ) := by
+    simp only [M]
+    exact ((Int.castRingHom ℂ).map_det N).symm
+  have hcard : M.charpoly.roots.card = Fintype.card m := by
+    rw [← M.charpoly_natDegree_eq_dim]
+    exact (Polynomial.splits_iff_card_roots.mp (IsAlgClosed.splits _))
+  by_contra hcon
+  push Not at hcon
+  have hnorm : ‖M.det‖ = (M.charpoly.roots.map (‖·‖)).prod := by
+    rw [hdet]
+    exact Multiset.prod_hom M.charpoly.roots (normHom (α := ℂ)) |>.symm
+  have hge : (1 : ℝ) ≤ ‖M.det‖ := by
+    rw [hMdet, Complex.norm_intCast]
+    exact_mod_cast Int.one_le_abs hN
+  have hne : M.charpoly.roots.map (‖·‖) ≠ 0 := by
+    intro h
+    have := congrArg Multiset.card h
+    simp [hcard, Fintype.card_ne_zero] at this
+  have hlt := multiset_prod_lt_one _ hne
+    (fun x hx => by obtain ⟨μ, _, rfl⟩ := Multiset.mem_map.mp hx; exact norm_nonneg μ)
+    (fun x hx => by obtain ⟨μ, hμ, rfl⟩ := Multiset.mem_map.mp hx; exact hcon μ hμ)
+  linarith
+
+end Floor
+
 section Audit
 
 #print axioms energy_transport
@@ -471,6 +534,7 @@ section Audit
 #print axioms reflection_pair_trace_carriers
 #print axioms relativePairing_halfTurn
 #print axioms no_linear_threshold_reads_relative_phase
+#print axioms integer_monodromy_floor
 
 end Audit
 

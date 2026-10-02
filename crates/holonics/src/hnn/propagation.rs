@@ -83,6 +83,7 @@
 //! | Lean | Rust |
 //! |---|---|
 //! | `HNN/Propagation.anchor_is_participation`, `junctionScattering_involutive`, `junctionScattering_isometry`; `Geometry/AffineSwing.swing` | [`junction_scattering`], [`participation`], [`scattering_about`] |
+//! | `HNN/Word.{anchor_secant, anchor_hasDerivAt, executed_conductance_return, executed_conductance_return_bound, executed_potential_deviation}` (the return's conductance covector at the executed node potential) | [`conductance_covector`] |
 //! | `HNN/Word.reaction_stage_isometry`, `reaction_stage_balance`, `contrastPort_active`; `Holon/Cayley.drive_balance`; `HNN/LatticeWord.cayley_chart_energy` | [`element_step`] |
 //! | `HNN/Propagation.partialIsometry_transit`, `transit_balance`, `tick_well_defined` | [`transit`], [`transit_solve`], [`transit_update`], [`ContactOperands`] |
 //! | `HNN/Word.word_tick_balance`; `HNN/LatticeWord.{chart_energy_identity, feedback_tick}` | [`global_power`], [`TickBalance`] |
@@ -1176,6 +1177,21 @@ pub fn participation(
         anchor = add(&anchor, &scale(weight, wave));
     }
     Ok(anchor)
+}
+
+/// [proved-derived; formal-checked] **A conductance's covector at the executed node potential**
+/// `⟨ā, a_p − v̂⟩/S`, `S = Y_r + Σ_a G_a` (Lean `HNN/Word.{anchor_hasDerivAt,
+/// executed_conductance_return, executed_conductance_return_bound, executed_potential_deviation}`):
+/// the potential drop `a_p − v̂` across the contact paired with the adjoint node potential `ā/S`.
+/// At the smooth node potential `v*` it is the exact derivative `∂⟨ā, v*⟩/∂G_p`; the word carries
+/// `v̂`, read from rounded weights split on the transients' lattice, which moves with a conductance
+/// only by jumps, so the return reads the smooth derivative at `v̂`. For a finite change `ΔG` the
+/// executed potential's pairing moves by
+/// `⟨ā, v̂′ − v̂⟩ = Σ_p ΔG_p ⟨ā, a_p − v̂⟩/S + ⟨ā, e′ − e⟩ + (Σ ΔG/S)⟨ā, v̂ − v*′⟩`,
+/// `e = v̂ − v*`, each deviation within the bound the forward junction reports
+/// (`‖ŵ − w‖₁ max_k ‖x_k‖∞` plus the split; `hnn::word`'s junction residual).
+pub fn conductance_covector(covector: &[Rat], wave: &[Rat], potential: &[Rat], total: &Rat) -> Rat {
+    dot(covector, &sub(wave, potential)) / total
 }
 
 /// **The junction's scattering about an anchor**: each wave leaves as the owner's half-turn about it

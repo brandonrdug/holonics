@@ -70,15 +70,41 @@ Frobenius norm `frobSq`; a certificate is a declared rational bound, never a flo
 6. **The prox step at an inverse chart** (`prox_chart_residual`, `prox_chart_certificate`): with
    `W' = W + wγ g fᵀ X̂`, `W'H' − B' = −wγ g fᵀ(1 − X̂H')`, the left residual of the chart of
    `H'⁻¹`; with the exact inverse it is `HNN/Normal.normal_prox_step`.
-7. **The window's warm start, the release's read and the carrier.** The window's rank-one steps
-   `X₀ = X̂ − X̂F S⁻¹FᵀX̂`, `S = Ω⁻¹ + FᵀX̂F`, give `1 − X₀(H + FΩFᵀ) = (1 − X̂F S⁻¹Fᵀ)(1 − X̂H)` in
-   any ring (`warm_start_window`), so an exact chart stays exact (`warm_start_window_exact`) and
-   a certified one keeps its residual up to that factor (`warm_start_window_certificate`). A
-   release `ρ` moves a read at `x` by `|(ρH'⁻¹x)_i| ≤ ‖ρ‖∞‖x‖₁/c` under the Gram's margin `c`
-   (`chart_release_read`), `c = 1 − 1/(2L_R)` at the carried Gram
-   (`carried_chart_release_read`). Under the ℓ1 certificate `Σ|p_j| < 2^127`, every partial sum
-   in any order lies in `(−2^127, 2^127)` (`carrier_partial_sum`), so the 128-bit ring read is
-   the integer sum (`carrier_ring_read`).
+7. **The warm start after a deposition, the release's read and the carrier.** The rank-one steps of
+   the returns that reached the locus, `X₀ = X̂ − X̂F S⁻¹FᵀX̂`, `S = Ω⁻¹ + FᵀX̂F`, give
+   `1 − X₀(H + FΩFᵀ) = (1 − X̂F S⁻¹Fᵀ)(1 − X̂H)` in any ring (`warm_start_window`), so an exact
+   chart stays exact (`warm_start_window_exact`) and a certified one keeps its residual up to that
+   factor (`warm_start_window_certificate`). A release `ρ` moves a read at `x` by
+   `|(ρH'⁻¹x)_i| ≤ ‖ρ‖∞‖x‖₁/c` under the Gram's margin `c` (`chart_release_read`),
+   `c = 1 − 1/(2L_R)` at the carried Gram (`carried_chart_release_read`). Under the ℓ1 certificate
+   `Σ|p_j| < 2^127`, every partial sum in any order lies in `(−2^127, 2^127)`
+   (`carrier_partial_sum`), so the 128-bit ring read is the integer sum (`carrier_ring_read`).
+   The certificate is itself order-free. Its saturated addition `min(a + b, M)` is the card's
+   branch form (`certify_eq_branch`), commutative and associative (`certify_comm`,
+   `certify_assoc`). Every reduction tree over the same terms carries `min(Σ|p_j|, M)` and the same
+   ring word (`Reduction.bound_eq`, `Reduction.order_free`), so a read is refused exactly when
+   `Σ|p_j|` reaches `2^127`, whatever its value (`Reduction.refused_iff`), and an admitted read is
+   the integer sum (`Reduction.read_of_bound_lt`). The host's pass is the left comb
+   (`foldl_certify`).
+8. **The solved chart's refinement, with both the residual and the chart rounded.** With the
+   residual read at the chart's lattice, `R̃ = R + E`, and the product rounded, `X'' = X + R̃X + Δ`,
+   `1 − X''H = R² − E·XH − ΔH` in any ring (`rounded_residual_refinement_left`), so
+   `‖1 − X''H‖∞ ≤ δ² + n·2^(−L)/2·(1 + δ) + n·2^(−L)/2·‖H‖∞`
+   (`rounded_residual_refinement_certificate_left`). The constitution's solved chart forms only the
+   upper triangle and mirrors it (`solvedRefine`). For symmetric `X` and `H` the mirror carries the
+   transpose of the residual's rounding, which `XH ≈ 1` no longer absorbs:
+   `‖1 − X''H‖∞ ≤ δ² + n·2^(−L)/2·(1 + 2‖X‖∞)·‖H‖∞` (`solved_refinement_certificate`), and a
+   certificate at most `c ≤ 1/2` stays there when twice that rounding term is at most `c`
+   (`solved_refinement_stays`).
+9. **The deposition's balance.** The covectors that reach a locus inside its causal diamond,
+   `(w, f_t, g_t)` (`HNN/Normal.Window`), move the Gram by `F = Σ_t w f_t f_tᵀ` and the map by
+   `γ G X̂`, read through a chart `X̂` of the deposited Gram; each is published with its carry term
+   (`H′ = H + F + c_H`, `W′ = W + γGX̂ + c_W`). The chart's per-arrival residuals sum to
+   `−γG(1 − X̂H′)` (`deposition_residual_sum`), and
+   `W′H′ − (WH + Σ_t w(W f_t + γ g_t)f_tᵀ) = −γG(1 − X̂H′) + W c_H + c_W H′` in any field
+   (`deposition_chart_balance`), with its row-norm certificate (`deposition_chart_certificate`).
+   On the carriers each carry term is `r − r′ − e` (`carryDefect`, `carry_value_eq`), below
+   `2^(−L) + 2^(−L−k_m)/2` per entry (`carryDefect_bounded`; `carried_deposition_balance`).
 
 The balance of the full element with its passive part and contrast port at an executed chart is
 `HNN/Word.element_executed_balance` (campaign 2): for any executed output `ŝ′`,
@@ -133,8 +159,8 @@ theorem newton_schulz_left (A X : M) : 1 - nsStep A X * A = (1 - X * A) ^ 2 := b
 /-- [definition] `k` exact refinements. -/
 def nsIter (A X : M) (k : ℕ) : M := (nsStep A)^[k] X
 
-/-- [proved-derived; formal-checked] The next refinement refines the last chart (a window's warm
-start). -/
+/-- [proved-derived; formal-checked] The next refinement refines the last chart (the warm start
+after a deposition). -/
 theorem nsIter_succ (A X : M) (k : ℕ) : nsIter A X (k + 1) = nsStep A (nsIter A X k) :=
   Function.iterate_succ_apply' _ _ _
 
@@ -354,8 +380,8 @@ def roundedIter (L : ℕ) (A X : Matrix n n ℚ) : ℕ → Matrix n n ℚ
 /-- [proved-derived; formal-checked] **The certificate does not grow.** If `c ≤ 1/2`, twice the
 rounding term `‖A‖∞·n·2^(−L)/2` is at most `c`, and the starting chart's residual is at most `c`,
 then every rounded refinement's residual is at most `c`: `δ² + ε ≤ c² + c/2 ≤ c`. In HNN terms, a
-precision `L` declared by rule holds each inverse chart's certificate below its declared bound for
-the whole window, with every chart on the lattice. -/
+precision `L` declared by rule holds each inverse chart's certificate below its declared bound at
+every refinement, with every chart on the lattice. -/
 theorem roundedIter_certificate (L : ℕ) (A X : Matrix n n ℚ) {c : ℚ} (hc : c ≤ 1 / 2)
     (hε : 2 * (rowNorm A * (Fintype.card n * (unit L / 2))) ≤ c)
     (h0 : rowNorm (1 - A * X) ≤ c) (k : ℕ) :
@@ -373,7 +399,7 @@ theorem roundedIter_certificate (L : ℕ) (A X : Matrix n n ℚ) {c : ℚ} (hc :
 
 /-- [proved-derived; formal-checked] **A warm start's certificate**: after a deposit moves
 `A → A + D`, the last chart's residual is at most `‖1 − AX‖∞ + ‖D‖∞‖X‖∞`, so one deposit's
-movement bounds what the window's first refinement must square away. -/
+movement bounds what the first refinement after it must square away. -/
 theorem warm_start_certificate (A D X : Matrix n n ℚ) :
     rowNorm (1 - (A + D) * X) ≤ rowNorm (1 - A * X) + rowNorm D * rowNorm X := by
   rw [warm_start_residual]
@@ -857,19 +883,21 @@ theorem prox_chart_certificate {W : Matrix τ σ ℚ} {H : Matrix σ σ ℚ} {B 
 
 end Prox
 
-/-! ## 7. The window's warm start, the release's read and the ℓ1 carrier
+/-! ## 7. The warm start after a deposition, the release's read and the ℓ1 carrier
 
 Three statements of Decision 24's executed charts, each at its Rust consumer:
 `hnn::constitution::SolvedChart` (the warm start), `hnn::constitution::ChartRule::read` (the
-release's read) and `hnn::chart`'s `certified_dot` (the carrier). -/
+release's read) and `hnn::chart`'s `certified_dot` with the card's `hnn_certify` and
+`hnn_block_sum` (`kernels/exact_integer.cuh`; the carrier and its certificate). -/
 
 section WarmStart
 
 variable {R : Type*} [Ring R] {n m : Type*} [Fintype n] [Fintype m] [DecidableEq n]
   [DecidableEq m]
 
-/-- [proved-derived; formal-checked] **The window's warm start keeps the chart's residual.** After
-a window of returns `F` with weights `Ω` moves the Gram to `H + FΩFᵀ`, the rank-one steps give
+/-- [proved-derived; formal-checked] **The warm start after a deposition keeps the chart's
+residual.** After the returns `F` that reached the locus, with weights `Ω`, move the Gram to
+`H + FΩFᵀ`, the rank-one steps give
 `X₀ = X̂ − X̂F S⁻¹ FᵀX̂` with `S = Ω⁻¹ + FᵀX̂F`, and in any ring
 `1 − X₀(H + FΩFᵀ) = (1 − X̂F S⁻¹Fᵀ)(1 − X̂H)`. The inverses enter only as left inverses
 (`Ωi Ω = 1`, `Si S = 1`): the difference of the two sides is `X̂F[Si(FᵀX̂F)Ω + Si − Ω]Fᵀ`, and
@@ -894,8 +922,8 @@ theorem warm_start_window (Xh H : Matrix n n R) (F : Matrix n m R) (Ω Ωi Si : 
     Matrix.mul_one, Matrix.one_mul]
   abel
 
-/-- [proved-derived; formal-checked] **An exact chart stays exact** under the window's warm start:
-`X̂H = 1` gives `X₀(H + FΩFᵀ) = 1`. -/
+/-- [proved-derived; formal-checked] **An exact chart stays exact** under the warm start after a
+deposition: `X̂H = 1` gives `X₀(H + FΩFᵀ) = 1`. -/
 theorem warm_start_window_exact (Xh H : Matrix n n R) (F : Matrix n m R) (Ω Ωi Si : Matrix m m R)
     (hΩ : Ωi * Ω = 1) (hS : Si * (Ωi + Fᵀ * Xh * F) = 1) (hX : Xh * H = 1) :
     (Xh - Xh * F * Si * Fᵀ * Xh) * (H + F * Ω * Fᵀ) = 1 := by
@@ -908,11 +936,10 @@ end WarmStart
 section WarmStartRat
 
 variable {n m : Type*} [Fintype n] [Fintype m] [DecidableEq n] [DecidableEq m]
-
-/-- [proved-derived; formal-checked] **The warm start's certificate**: over `ℚ`, the window's warm
-start has `‖1 − X₀H'‖∞ ≤ ‖1 − X̂F S⁻¹Fᵀ‖∞ ‖1 − X̂H‖∞`, so a certified chart keeps its residual up to
-the factor the window's returns read. Unlike `warm_start_certificate`, the deposit's size does not
-enter additively. -/
+/-- [proved-derived; formal-checked] **The warm start's certificate**: over `ℚ`, the warm start
+after a deposition has `‖1 − X₀H'‖∞ ≤ ‖1 − X̂F S⁻¹Fᵀ‖∞ ‖1 − X̂H‖∞`, so a certified chart keeps its
+residual up to the factor the returns that reached the locus read. Unlike `warm_start_certificate`,
+the deposit's size does not enter additively. -/
 theorem warm_start_window_certificate (Xh H : Matrix n n ℚ) (F : Matrix n m ℚ)
     (Ω Ωi Si : Matrix m m ℚ) (hΩ : Ωi * Ω = 1) (hS : Si * (Ωi + Fᵀ * Xh * F) = 1) :
     rowNorm (1 - (Xh - Xh * F * Si * Fᵀ * Xh) * (H + F * Ω * Fᵀ)) ≤
@@ -1028,7 +1055,428 @@ theorem carrier_ring_read {ι : Type*} (s : Finset ι) (p : ι → ℤ)
   rw [← Int.cast_sum, ZMod.valMinAbs_spec]
   refine ⟨rfl, ?_, ?_⟩ <;> push_cast <;> linarith [hb.1, hb.2]
 
+/-- [definition] **The certificate's addition**: the ℓ1 bounds of two parts, saturated at the
+carrier's ceiling `M` (`kernels/exact_integer.cuh`, `hnn_certify`, at `M = 2^127`). -/
+def certify (M a b : ℕ) : ℕ := min (a + b) M
+
+/-- [proved-standard; formal-checked] **The card's branch form is the saturated sum.**
+`hnn_certify` returns `M` when either part is already at `M` or their sum reaches it, and the sum
+otherwise. -/
+theorem certify_eq_branch (M a b : ℕ) :
+    certify M a b = if M ≤ a ∨ M ≤ b then M else if M ≤ a + b then M else a + b := by
+  unfold certify
+  split_ifs <;> omega
+
+/-- [proved-standard; formal-checked] The certificate's addition is commutative. -/
+theorem certify_comm (M a b : ℕ) : certify M a b = certify M b a := by
+  unfold certify
+  omega
+
+/-- [proved-standard; formal-checked] The certificate's addition is associative: both groupings
+are `min (a + b + c) M`. -/
+theorem certify_assoc (M a b c : ℕ) :
+    certify M (certify M a b) c = certify M a (certify M b c) := by
+  unfold certify
+  omega
+
+/-- [definition] **A reduction tree over integer terms**: a term, or the join of two parts. The
+card's block tree (strides halving over a power of two of threads, `hnn_block_sum`), the host's
+left-to-right pass (`hnn::chart::certified_dot`) and every other order of the same terms are such
+trees. -/
+inductive Reduction
+  | term : ℤ → Reduction
+  | join : Reduction → Reduction → Reduction
+
+namespace Reduction
+
+/-- The terms a tree joins, as a multiset: what stays when the order is forgotten. -/
+def terms : Reduction → Multiset ℤ
+  | term p => {p}
+  | join l r => l.terms + r.terms
+
+/-- The integer sum of the terms. -/
+def sum : Reduction → ℤ
+  | term p => p
+  | join l r => l.sum + r.sum
+
+/-- The ℓ1 norm of the terms. -/
+def l1 : Reduction → ℕ
+  | term p => p.natAbs
+  | join l r => l.l1 + r.l1
+
+/-- The ring word: each join one wrapping addition in `ℤ/2^128`. -/
+def word : Reduction → ZMod (2 ^ 128)
+  | term p => p
+  | join l r => l.word + r.word
+
+/-- The certificate: each term's magnitude saturated at `M` (`hnn_bounded_product` saturates a
+product past the carrier), each join `certify`. -/
+def bound (M : ℕ) : Reduction → ℕ
+  | term p => min p.natAbs M
+  | join l r => certify M (l.bound M) (r.bound M)
+
+theorem sum_eq_terms (t : Reduction) : t.sum = t.terms.sum := by
+  induction t with
+  | term p => simp [sum, terms]
+  | join l r hl hr => simp [sum, terms, hl, hr]
+
+theorem l1_eq_terms (t : Reduction) : t.l1 = (t.terms.map Int.natAbs).sum := by
+  induction t with
+  | term p => simp [l1, terms]
+  | join l r hl hr => simp [l1, terms, hl, hr]
+
+/-- [proved-derived; formal-checked] **Every tree's certificate is the saturated ℓ1 norm of its
+terms**, `min (Σ|p_j|) M`. -/
+theorem bound_eq (M : ℕ) (t : Reduction) : t.bound M = min t.l1 M := by
+  induction t with
+  | term p => rfl
+  | join l r hl hr =>
+    simp only [bound, l1, hl, hr, certify]
+    omega
+
+/-- [proved-standard; formal-checked] Each join adds in the ring, so the word is the integer sum
+read in `ℤ/2^128`. -/
+theorem word_eq (t : Reduction) : t.word = (t.sum : ZMod (2 ^ 128)) := by
+  induction t with
+  | term p => rfl
+  | join l r hl hr => simp [word, sum, hl, hr]
+
+theorem abs_sum_le (t : Reduction) : |t.sum| ≤ t.l1 := by
+  induction t with
+  | term p => exact (Int.abs_eq_natAbs p).le
+  | join l r hl hr =>
+    simp only [sum, l1]
+    push_cast
+    exact (abs_add_le _ _).trans (add_le_add hl hr)
+
+/-- [proved-derived; formal-checked] **The refusal is a property of the terms alone.** Two trees
+over the same terms (any order, any grouping) carry the same certificate and the same word, so the
+card and the host refuse the same reads and admit the same values. -/
+theorem order_free {s t : Reduction} (h : s.terms = t.terms) (M : ℕ) :
+    s.bound M = t.bound M ∧ s.word = t.word := by
+  refine ⟨?_, ?_⟩
+  · rw [bound_eq, bound_eq, l1_eq_terms, l1_eq_terms, h]
+  · rw [word_eq, word_eq, sum_eq_terms, sum_eq_terms, h]
+
+/-- [proved-derived; formal-checked] **A read is refused exactly when the terms' ℓ1 norm reaches
+the ceiling**, whatever its value: the certificate is at `2^127` iff `2^127 ≤ Σ|p_j|`. -/
+theorem refused_iff (t : Reduction) : t.bound (2 ^ 127) = 2 ^ 127 ↔ 2 ^ 127 ≤ t.l1 := by
+  rw [bound_eq]
+  omega
+
+/-- [proved-derived; formal-checked] **An admitted read is the integer sum.** Below the ceiling, the
+tree's ring word read at its signed representative is the integer sum of its terms. -/
+theorem read_of_bound_lt (t : Reduction) (h : t.bound (2 ^ 127) < 2 ^ 127) :
+    t.word.valMinAbs = t.sum := by
+  rw [bound_eq] at h
+  have hl : (t.l1 : ℤ) < 2 ^ 127 := by exact_mod_cast (show t.l1 < 2 ^ 127 by omega)
+  have hb := abs_lt.mp ((abs_sum_le t).trans_lt hl)
+  rw [word_eq, ZMod.valMinAbs_spec]
+  refine ⟨rfl, ?_, ?_⟩ <;> push_cast <;> linarith [hb.1, hb.2]
+
+end Reduction
+
+/-- [proved-derived; formal-checked] **The host's pass is the left comb.** Running the
+certificate's addition over the magnitudes in order, from a start `b`, ends at
+`min (b + Σ m_j) M`; the host's refusal at the first prefix that reaches the ceiling is that end
+reaching `M`, since a saturated bound stays at `M` (`certify M M m = M`). -/
+theorem foldl_certify (M : ℕ) (ms : List ℕ) (b : ℕ) :
+    ms.foldl (certify M) (min b M) = min (b + ms.sum) M := by
+  induction ms generalizing b with
+  | nil => simp
+  | cons m ms ih =>
+    rw [List.foldl_cons, List.sum_cons, show certify M (min b M) m = min (b + m) M by
+      unfold certify; omega, ih]
+    congr 1
+    ring
+
 end Carrier
+
+/-! ## 8. The solved chart's refinement: the residual rounded, the product rounded, the upper
+triangle mirrored
+
+The constitution's solved chart (`hnn/constitution.rs`, `refined`) refines a symmetric chart `X̂`
+of a symmetric Gram `H` in the left form with both the residual and the refined chart rounded: the
+residual `1 − X̂H` read at the chart's lattice, the product `R̃X̂` rounded there, and only the upper
+triangle formed and mirrored. -/
+
+section SolvedRefinement
+
+/-- [proved-derived; formal-checked] **The refinement with a rounded residual** (left form): with
+`R = 1 − XH`, a residual read as `R + E`, and the refined chart `X + (R + E)X + Δ`,
+`1 − (X + (R + E)X + Δ)H = R² − E(XH) − ΔH` exactly, in any ring. The residual's rounding enters
+through `XH = 1 − R`, so a certified chart does not amplify it. -/
+theorem rounded_residual_refinement_left {M : Type*} [Ring M] (H X E Δ : M) :
+    1 - (X + ((1 - X * H) + E) * X + Δ) * H = (1 - X * H) ^ 2 - E * (X * H) - Δ * H := by
+  noncomm_ring
+
+variable {n : Type*} [Fintype n] [DecidableEq n]
+
+/-- [proved-derived; formal-checked] **The rounded refinement with a rounded residual keeps a
+certified residual** (left form, the whole product formed): the residual `R = 1 − XH` read at the
+lattice and the product `R̃X` rounded there give
+`‖1 − X''H‖∞ ≤ ‖R‖∞² + n·2^(−L)/2·(1 + ‖R‖∞) + n·2^(−L)/2·‖H‖∞`. -/
+theorem rounded_residual_refinement_certificate_left (L : ℕ) (H X : Matrix n n ℚ) :
+    rowNorm (1 - (X + latticeChart L (latticeChart L (1 - X * H) * X)) * H) ≤
+      rowNorm (1 - X * H) ^ 2 + Fintype.card n * (unit L / 2) * (1 + rowNorm (1 - X * H)) +
+        Fintype.card n * (unit L / 2) * rowNorm H := by
+  set R := 1 - X * H with hR
+  set E := latticeChart L R - R with hE
+  set Y := latticeChart L R * X with hY
+  set Δ := latticeChart L Y - Y with hΔ
+  have hsplit : X + latticeChart L Y = X + (R + E) * X + Δ := by
+    have hRE : R + E = latticeChart L R := by rw [hE]; abel
+    rw [hRE, hΔ, hY]; abel
+  have hid := rounded_residual_refinement_left H X E Δ
+  rw [← hR] at hid
+  rw [hsplit, hid]
+  have hXH : rowNorm (X * H) ≤ 1 + rowNorm R := by
+    have : X * H = 1 - R := by rw [hR, sub_sub_cancel]
+    rw [this]
+    exact (rowNorm_sub_le _ _).trans (add_le_add rowNorm_one_le le_rfl)
+  have hEb : rowNorm E ≤ Fintype.card n * (unit L / 2) := rowNorm_latticeChart_sub L R
+  have hΔb : rowNorm Δ ≤ Fintype.card n * (unit L / 2) := rowNorm_latticeChart_sub L Y
+  have hu : 0 ≤ Fintype.card n * (unit L / 2) := by have := unit_pos L; positivity
+  calc rowNorm (R ^ 2 - E * (X * H) - Δ * H)
+      ≤ rowNorm (R ^ 2) + rowNorm (E * (X * H)) + rowNorm (Δ * H) :=
+        (rowNorm_sub_le _ _).trans (add_le_add (rowNorm_sub_le _ _) le_rfl)
+    _ ≤ rowNorm R ^ 2 + Fintype.card n * (unit L / 2) * (1 + rowNorm R) +
+          Fintype.card n * (unit L / 2) * rowNorm H := by
+        refine add_le_add (add_le_add (rowNorm_pow_le _ 2) ?_) ?_
+        · exact (rowNorm_mul_le _ _).trans
+            (mul_le_mul hEb hXH (rowNorm_nonneg _) hu)
+        · exact (rowNorm_mul_le _ _).trans
+            (mul_le_mul_of_nonneg_right hΔb (rowNorm_nonneg _))
+
+variable [LinearOrder n]
+
+/-- [definition] **The upper triangle mirrored**: entry `(i, j)` read at `(min i j, max i j)`. -/
+def upperMirror (Y : Matrix n n ℚ) : Matrix n n ℚ :=
+  Matrix.of fun i j => if i ≤ j then Y i j else Y j i
+
+/-- [definition] **The solved chart's executed refinement** (`refined` in `hnn/constitution.rs`):
+the residual `1 − XH` read at the lattice, the product with `X` rounded there and added, the upper
+triangle formed and mirrored. -/
+def solvedRefine (L : ℕ) (H X : Matrix n n ℚ) : Matrix n n ℚ :=
+  upperMirror (X + latticeChart L (latticeChart L (1 - X * H) * X))
+
+/-- [proved-derived; formal-checked] **The solved chart's refinement keeps a certified residual**:
+for symmetric `X` and `H`, `‖1 − X''H‖∞ ≤ ‖R‖∞² + n·2^(−L)/2·(1 + 2‖X‖∞)·‖H‖∞`. The exact
+refinement `X + RX` is symmetric, so `X'' − (X + RX)` is, entry by entry, the product's rounding
+plus the residual's rounding `EX` read at `(min i j, max i j)`; its row sums are at most
+`n·2^(−L)/2 + ‖EX‖∞ + ‖(EX)ᵀ‖∞`. The mirror's term `(EX)ᵀH = XEᵀH` meets no `XH ≈ 1`, which is
+the `2‖X‖∞‖H‖∞` the whole product
+(`rounded_residual_refinement_certificate_left`) does not carry. -/
+theorem solved_refinement_certificate (L : ℕ) {H X : Matrix n n ℚ} (hX : Xᵀ = X)
+    (hH : Hᵀ = H) :
+    rowNorm (1 - solvedRefine L H X * H) ≤
+      rowNorm (1 - X * H) ^ 2 +
+        Fintype.card n * (unit L / 2) * (1 + 2 * rowNorm X) * rowNorm H := by
+  set R := 1 - X * H with hR
+  set E := latticeChart L R - R with hE
+  set Y := latticeChart L R * X with hY
+  set D := latticeChart L Y - Y with hD
+  set Δ := solvedRefine L H X - nsStep H X with hΔ
+  have hns : nsStep H X = X + R * X := by
+    rw [(nsStep_eq H X).2.2, hR]; noncomm_ring
+  have hRX : ∀ i j, (R * X) i j = (R * X) j i := by
+    have hT : (R * X)ᵀ = R * X := by
+      rw [transpose_mul, hX, hR, transpose_sub, transpose_one, transpose_mul, hX, hH]
+      noncomm_ring
+    intro i j
+    conv_lhs => rw [← hT]
+    rfl
+  have hYsplit : Y = R * X + E * X := by
+    have hRE : latticeChart L R = R + E := by rw [hE]; abel
+    rw [hY, hRE, Matrix.add_mul]
+  have hu0 : 0 ≤ unit L / 2 := by have := unit_pos L; positivity
+  have hDb : ∀ i j, |D i j| ≤ unit L / 2 := latticeChart_round L Y
+  have hEb : ∀ i j, |E i j| ≤ unit L / 2 := latticeChart_round L R
+  have hent : ∀ i j, |Δ i j| ≤ unit L / 2 + |(E * X) i j| + |(E * X) j i| := by
+    intro i j
+    have hZ : ∀ a b, latticeChart L Y a b = (R * X) a b + (E * X) a b + D a b := by
+      intro a b
+      simp only [hD, Matrix.sub_apply, hYsplit, Matrix.add_apply]; ring
+    by_cases hij : i ≤ j
+    · have : Δ i j = D i j + (E * X) i j := by
+        simp only [hΔ, solvedRefine, upperMirror, Matrix.sub_apply, Matrix.of_apply, if_pos hij,
+          Matrix.add_apply, hns, ← hR, ← hY, hZ]
+        ring
+      rw [this]
+      calc |D i j + (E * X) i j| ≤ |D i j| + |(E * X) i j| := abs_add_le _ _
+        _ ≤ unit L / 2 + |(E * X) i j| + |(E * X) j i| := by
+          linarith [hDb i j, abs_nonneg ((E * X) j i)]
+    · have hXij : X j i = X i j := by rw [← transpose_apply X i j, hX]
+      have : Δ i j = D j i + (E * X) j i := by
+        simp only [hΔ, solvedRefine, upperMirror, Matrix.sub_apply, Matrix.of_apply, if_neg hij,
+          Matrix.add_apply, hns, ← hR, ← hY, hZ, hXij, hRX i j]
+        ring
+      rw [this]
+      calc |D j i + (E * X) j i| ≤ |D j i| + |(E * X) j i| := abs_add_le _ _
+        _ ≤ unit L / 2 + |(E * X) i j| + |(E * X) j i| := by
+          linarith [hDb j i, abs_nonneg ((E * X) i j)]
+  have hEXT : (E * X)ᵀ = X * Eᵀ := by rw [transpose_mul, hX]
+  have hEn : rowNorm E ≤ Fintype.card n * (unit L / 2) := rowNorm_latticeChart_sub L R
+  have hETn : rowNorm Eᵀ ≤ Fintype.card n * (unit L / 2) :=
+    rowNorm_le_card_mul hu0 fun i j => by rw [transpose_apply]; exact hEb j i
+  have hΔn : rowNorm Δ ≤ Fintype.card n * (unit L / 2) * (1 + 2 * rowNorm X) := by
+    have hX0 := rowNorm_nonneg X
+    have hc : 0 ≤ Fintype.card n * (unit L / 2) * (1 + 2 * rowNorm X) := by positivity
+    refine rowNorm_le hc fun i => ?_
+    calc ∑ j, |Δ i j| ≤ ∑ j, (unit L / 2 + |(E * X) i j| + |(E * X) j i|) :=
+          Finset.sum_le_sum fun j _ => hent i j
+      _ = Fintype.card n * (unit L / 2) + ∑ j, |(E * X) i j| + ∑ j, |(E * X)ᵀ i j| := by
+          simp only [Finset.sum_add_distrib, Finset.sum_const, Finset.card_univ, nsmul_eq_mul,
+            transpose_apply]
+      _ ≤ Fintype.card n * (unit L / 2) + rowNorm (E * X) + rowNorm ((E * X)ᵀ) :=
+          add_le_add (add_le_add le_rfl (row_sum_le_rowNorm _ i)) (row_sum_le_rowNorm _ i)
+      _ ≤ Fintype.card n * (unit L / 2) + Fintype.card n * (unit L / 2) * rowNorm X +
+            rowNorm X * (Fintype.card n * (unit L / 2)) := by
+          rw [hEXT]
+          refine add_le_add (add_le_add le_rfl ?_) ?_
+          · exact (rowNorm_mul_le _ _).trans (mul_le_mul_of_nonneg_right hEn hX0)
+          · exact (rowNorm_mul_le _ _).trans (mul_le_mul_of_nonneg_left hETn hX0)
+      _ = Fintype.card n * (unit L / 2) * (1 + 2 * rowNorm X) := by ring
+  have hsplit : solvedRefine L H X = nsStep H X + Δ := by rw [hΔ]; abel
+  rw [hsplit, rounded_refinement_residual_left, ← hR]
+  calc rowNorm (R ^ 2 - Δ * H) ≤ rowNorm (R ^ 2) + rowNorm (Δ * H) := rowNorm_sub_le _ _
+    _ ≤ rowNorm R ^ 2 + Fintype.card n * (unit L / 2) * (1 + 2 * rowNorm X) * rowNorm H :=
+        add_le_add (rowNorm_pow_le _ 2)
+          ((rowNorm_mul_le _ _).trans (mul_le_mul_of_nonneg_right hΔn (rowNorm_nonneg _)))
+
+/-- [proved-derived; formal-checked] **The solved chart's certificate does not grow** when the
+lattice covers the mirror: if `c ≤ 1/2`, `‖X‖∞ ≤ ρ`, twice the rounding term
+`n·2^(−L)/2·(1 + 2ρ)·‖H‖∞` is at most `c`, and the chart's residual is at most `c`, then the
+refined chart's residual is at most `c`: `δ² + ε ≤ c² + c/2 ≤ c`. -/
+theorem solved_refinement_stays (L : ℕ) {H X : Matrix n n ℚ} (hX : Xᵀ = X) (hH : Hᵀ = H)
+    {c ρ : ℚ} (hc : c ≤ 1 / 2) (hρ : rowNorm X ≤ ρ)
+    (hε : 2 * (Fintype.card n * (unit L / 2) * (1 + 2 * ρ) * rowNorm H) ≤ c)
+    (h0 : rowNorm (1 - X * H) ≤ c) :
+    rowNorm (1 - solvedRefine L H X * H) ≤ c := by
+  have hstep := solved_refinement_certificate L hX hH
+  have hδ0 := rowNorm_nonneg (1 - X * H)
+  have hc0 : 0 ≤ c := hδ0.trans h0
+  have hsq : rowNorm (1 - X * H) ^ 2 ≤ c ^ 2 := pow_le_pow_left₀ hδ0 h0 2
+  have hu : 0 ≤ Fintype.card n * (unit L / 2) := by have := unit_pos L; positivity
+  have hmono : Fintype.card n * (unit L / 2) * (1 + 2 * rowNorm X) * rowNorm H ≤
+      Fintype.card n * (unit L / 2) * (1 + 2 * ρ) * rowNorm H :=
+    mul_le_mul_of_nonneg_right
+      (mul_le_mul_of_nonneg_left (by linarith) hu) (rowNorm_nonneg H)
+  nlinarith
+
+end SolvedRefinement
+
+/-! ## 9. The deposition's balance: the chart's residual at the deposited Gram, and the two carries -/
+
+section DepositionBalance
+
+open Holonics.HNN.Normal (Window windowGram windowCovector window_cross_eq)
+open Holonics.HNN.LatticeDeposit (Carried carry release carry_accounting release_bounded
+  gammaLength)
+
+variable {𝕜 : Type*} [Field 𝕜] {σ τ : Type*} [Fintype σ] [DecidableEq σ]
+
+/-- [proved-derived; formal-checked] **The chart's residuals summed over the arrivals.** The
+per-arrival residuals of `prox_chart_residual`, read at one deposited Gram `H′`, sum to
+`−γ G (1 − X̂H′)`, `G = Σ_t w g_t f_tᵀ` the covectors that reached the locus. -/
+theorem deposition_residual_sum (γ : 𝕜) (data : Window 𝕜 σ τ) (Xh H' : Matrix σ σ 𝕜) :
+    (data.map fun d => -((d.1 * γ) • vecMulVec d.2.2 d.2.1 * (1 - Xh * H'))).sum =
+      -(γ • windowCovector data * (1 - Xh * H')) := by
+  induction data with
+  | nil => simp [windowCovector]
+  | cons d data ih =>
+      simp only [windowCovector, List.map_cons, List.sum_cons] at ih ⊢
+      rw [ih, smul_add, Matrix.add_mul, neg_add, smul_smul, mul_comm γ d.1]
+
+/-- [proved-derived; formal-checked] **The deposition's balance with the published map and the
+Gram's carry.** The covectors `(w, f_t, g_t)` that reach a locus move its Gram by
+`F = Σ_t w f_t f_tᵀ` and its map by `γ G X̂`, read through a chart `X̂` of the deposited Gram, each
+published with a carry term: `H′ = H + F + c_H`, `W′ = W + γ G X̂ + c_W`. Then, against the exact
+deposition's move `Σ_t w (W f_t + γ g_t) f_tᵀ` of the map's product with the Gram,
+`W′H′ − (WH + Σ_t w (W f_t + γ g_t) f_tᵀ) = −γ G (1 − X̂H′) + W c_H + c_W H′`: the chart's residual
+at the published Gram (summed over the arrivals, `deposition_residual_sum`) plus the Gram's carry
+through the map and the map's carry through the Gram. With no carry and the exact inverse it is
+`HNN/Normal.depositLocus_solves`'s deposit. -/
+theorem deposition_chart_balance (γ : 𝕜) (data : Window 𝕜 σ τ) (W cW : Matrix τ σ 𝕜)
+    (H Xh cH : Matrix σ σ 𝕜) {W' : Matrix τ σ 𝕜} {H' : Matrix σ σ 𝕜}
+    (hW : W' = W + γ • windowCovector data * Xh + cW) (hH : H' = H + windowGram data + cH) :
+    W' * H' - (W * H + (data.map fun d => d.1 • vecMulVec (W *ᵥ d.2.1 + γ • d.2.2) d.2.1).sum) =
+      -(γ • windowCovector data * (1 - Xh * H')) + W * cH + cW * H' := by
+  have hWH : W * H' = W * H + W * windowGram data + W * cH := by
+    rw [hH, Matrix.mul_add, Matrix.mul_add]
+  rw [window_cross_eq, hW, Matrix.add_mul, Matrix.add_mul, hWH, Matrix.mul_sub, Matrix.mul_one,
+    Matrix.mul_assoc (γ • windowCovector data) Xh H']
+  abel
+
+/-- [proved-derived; formal-checked] **The deposition balance's certificate**: over `ℚ`,
+`‖W′H′ − (WH + Σ_t w (W f_t + γ g_t) f_tᵀ)‖∞ ≤ ‖γG‖∞‖1 − X̂H′‖∞ + ‖W‖∞‖c_H‖∞ + ‖c_W‖∞‖H′‖∞`. -/
+theorem deposition_chart_certificate [Fintype τ] (γ : ℚ) (data : Window ℚ σ τ) (W cW : Matrix τ σ ℚ)
+    (H Xh cH : Matrix σ σ ℚ) {W' : Matrix τ σ ℚ} {H' : Matrix σ σ ℚ}
+    (hW : W' = W + γ • windowCovector data * Xh + cW) (hH : H' = H + windowGram data + cH) :
+    rowNorm (W' * H' -
+        (W * H + (data.map fun d => d.1 • vecMulVec (W *ᵥ d.2.1 + γ • d.2.2) d.2.1).sum)) ≤
+      rowNorm (γ • windowCovector data) * rowNorm (1 - Xh * H') + rowNorm W * rowNorm cH +
+        rowNorm cW * rowNorm H' := by
+  rw [deposition_chart_balance γ data W cW H Xh cH hW hH]
+  refine (rowNorm_add_le _ _).trans (add_le_add ((rowNorm_add_le _ _).trans
+    (add_le_add ?_ (rowNorm_mul_le _ _))) (rowNorm_mul_le _ _))
+  rw [rowNorm_neg]
+  exact rowNorm_mul_le _ _
+
+variable {L : ℕ} {E : Type*}
+
+/-- [definition] **One deposit's carry term** at an entry: `r − r′ − e`, the remainder given back
+less the remainder kept and the residual released. -/
+noncomputable def carryDefect (s : Carried L E) (Δ : E → ℚ) (i : E) : ℚ :=
+  s.rem i - (carry s Δ).rem i - release s Δ i
+
+/-- [proved-derived; formal-checked] **A deposit publishes its update plus its carry term**:
+`value′ = value + Δ + (r − r′ − e)` (`carry_accounting`). -/
+theorem carry_value_eq (s : Carried L E) (Δ : E → ℚ) (i : E) :
+    (carry s Δ).value i = s.value i + Δ i + carryDefect s Δ i := by
+  have := carry_accounting s Δ i
+  unfold carryDefect
+  linarith
+
+/-- [proved-derived; formal-checked] **The carry term is below one unit and half a fine unit**:
+`|r − r′ − e| < 2^(−L) + 2^(−L−k_m)/2`, from the two remainders' cells and `release_bounded`. -/
+theorem carryDefect_bounded (s : Carried L E) (Δ : E → ℚ) (i : E) :
+    |carryDefect s Δ i| < unit L + unit (L + gammaLength (s.clock + 1)) / 2 := by
+  have h1 := s.rem_bounded i
+  have h2 := (carry s Δ).rem_bounded i
+  have h3 := abs_le.mp (release_bounded s Δ i)
+  unfold carryDefect
+  rw [abs_lt]
+  constructor <;> linarith [h1.1, h1.2, h2.1, h2.2, h3.1, h3.2]
+
+/-- [definition] A carrier indexed by `τ × σ`, read as a matrix. -/
+def entryMatrix {α β : Type*} (v : α × β → ℚ) : Matrix α β ℚ := Matrix.of fun i j => v (i, j)
+
+/-- [proved-derived; formal-checked] **The deposition's balance on the carried map and Gram**
+(`hnn::constitution::NormalLaw::deposited`): the map's carrier `s_W` deposits `γ G X̂` and the
+Gram's carrier `s_H` deposits `F`, each by `carry`; the published successors satisfy
+`deposition_chart_balance` with the carry terms `c_W = r_W − r_W′ − e_W` and
+`c_H = r_H − r_H′ − e_H` (`carryDefect`), each entry below `2^(−L) + 2^(−L−k_m)/2`
+(`carryDefect_bounded`). -/
+theorem carried_deposition_balance (γ : ℚ) (data : Window ℚ σ τ) (Xh : Matrix σ σ ℚ)
+    (sW : Carried L (τ × σ)) (sH : Carried L (σ × σ)) :
+    entryMatrix (carry sW fun p => (γ • windowCovector data * Xh) p.1 p.2).value *
+        entryMatrix (carry sH fun p => windowGram data p.1 p.2).value -
+      (entryMatrix sW.value * entryMatrix sH.value +
+        (data.map fun d =>
+          d.1 • vecMulVec (entryMatrix sW.value *ᵥ d.2.1 + γ • d.2.2) d.2.1).sum) =
+      -(γ • windowCovector data *
+          (1 - Xh * entryMatrix (carry sH fun p => windowGram data p.1 p.2).value)) +
+        entryMatrix sW.value * entryMatrix (carryDefect sH fun p => windowGram data p.1 p.2) +
+        entryMatrix (carryDefect sW fun p => (γ • windowCovector data * Xh) p.1 p.2) *
+          entryMatrix (carry sH fun p => windowGram data p.1 p.2).value := by
+  apply deposition_chart_balance
+  · ext i j
+    simp only [entryMatrix, Matrix.of_apply, Matrix.add_apply, carry_value_eq]
+  · ext i j
+    simp only [entryMatrix, Matrix.of_apply, Matrix.add_apply, carry_value_eq]
+
+end DepositionBalance
 
 section Audit
 
@@ -1081,6 +1529,25 @@ section Audit
 #print axioms carried_chart_release_read
 #print axioms carrier_partial_sum
 #print axioms carrier_ring_read
+#print axioms certify_eq_branch
+#print axioms certify_comm
+#print axioms certify_assoc
+#print axioms Reduction.bound_eq
+#print axioms Reduction.word_eq
+#print axioms Reduction.order_free
+#print axioms Reduction.refused_iff
+#print axioms Reduction.read_of_bound_lt
+#print axioms foldl_certify
+#print axioms rounded_residual_refinement_left
+#print axioms rounded_residual_refinement_certificate_left
+#print axioms solved_refinement_certificate
+#print axioms solved_refinement_stays
+#print axioms deposition_residual_sum
+#print axioms deposition_chart_balance
+#print axioms deposition_chart_certificate
+#print axioms carry_value_eq
+#print axioms carryDefect_bounded
+#print axioms carried_deposition_balance
 
 end Audit
 

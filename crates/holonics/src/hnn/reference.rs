@@ -2031,7 +2031,7 @@ pub fn compose_return(
                 .ok_or(HnnError::MissingSourcePort { ring: g })?;
             let rank = pair.rank();
             // The whole normalized offset moment of each phase `(x, a, C_c[x, a] ν̂)` over its pair
-            // population (`hnn::moment`: the open reads no window), read once; none at an empty
+            // population (`hnn::moment`: the open reads no held cell), read once; none at an empty
             // population.
             let tables = [moment.offset_table(field, g, offset)?];
             let mut nonzero: Vec<Vec<(usize, usize, Rat)>> = Vec::with_capacity(d);

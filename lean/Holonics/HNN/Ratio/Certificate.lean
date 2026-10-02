@@ -8,7 +8,7 @@ import Mathlib.Analysis.Calculus.Deriv.Pow
 /-!
 # HNN.Ratio.Certificate: the receiver's step certified in its own Fisher form
 
-[definition; agent-inferred] The receiving map `R` reads a window's readings `z = W x` as bits,
+[definition; agent-inferred] The receiving map `R` reads its readings `z = W x` as bits,
 `p_c ∝ 2^(z_c)`, and pays the code length `−log₂ p_t` at each target `t` (`HNN/Ratio.codeLength`).
 Its deposit is certified when the code a step moves to is bounded above by a quadratic model and
 the model falls. The worst-case model (`HNN/Ratio/Resolution.codeLength_quadratic_upper`) bounds the
@@ -50,12 +50,12 @@ codeLength(z + Δ) ≤ codeLength(z) + ⟨g, Δ⟩ + (ln 2/2) · 2^(osc Δ) · V
 4. **The step descends** (`codeLength_step_descends`). For the step `Δ = −η v` with first-order
    decrease `a = ⟨p − e_t, v⟩`, Fisher form `b = Var_p(v)` and the spread capped,
    `η (v_c − v_d) ≤ ω`: if `η · ln 2 · 2^ω · b ≤ a` the code falls by at least `η a/2`.
-5. **A window of readings in the linear form** (`window_code_add_le`, `linear_first_order`,
-   `window_step_descends`). Over readings `k` with caps `ω_k`, the window's code is bounded by the
-   sum of the per-reading bounds. For `Δ_k = (ΔW) x_k` the first-order term is `⟨ΔW, G⟩` with
-   `G = Σ_k g_k x_kᵀ`. A step `Δ_k = −η u_k` (for `R`, `u_k = V x_k`) with
+5. **Readings summed under one step, in the linear form** (`window_code_add_le`,
+   `linear_first_order`, `window_step_descends`). Over readings `k` with caps `ω_k`, their summed
+   code is bounded by the sum of the per-reading bounds. For `Δ_k = (ΔW) x_k` the first-order term
+   is `⟨ΔW, G⟩` with `G = Σ_k g_k x_kᵀ`. A step `Δ_k = −η u_k` (for `R`, `u_k = V x_k`) with
    `η (u_k,c − u_k,d) ≤ ω_k` and `η · ln 2 · Σ_k 2^(ω_k) Var_(p_k)(u_k) ≤ Σ_k ⟨g_k, u_k⟩` lowers
-   the window's code by at least half its first-order decrease.
+   their summed code by at least half their first-order decrease.
 6. **The accumulated certificate** (`reading_code_le`, `accumulated_code_le`,
    `bound_statistics`, `statistics_insert`). Each reading `i`, read at its own base point `W_i`,
    bounds its code at any later `W` by the item 3 bound with `Δ_i = (W − W_i) x_i`, provided that
@@ -409,15 +409,15 @@ theorem codeLength_step_descends [DecidableEq ι] (f v p : ι → ℝ)
 
 end Bits
 
-/-! ## 4. A window of readings in the linear form -/
+/-! ## 4. Readings summed under one step, in the linear form -/
 
 section Window
 
 variable {ι : Type*} [Fintype ι] [Nonempty ι] [DecidableEq ι]
 variable {K X : Type*} [Fintype K] [Fintype X]
 
-/-- [proved-derived; formal-checked] **A window's code under a step**: over readings `k` with
-faces `p_k` of exponents `f_k`, targets `t_k` and spreads capped by `ω_k`, the window's code at
+/-- [proved-derived; formal-checked] **The readings' summed code under a step**: over readings `k`
+with faces `p_k` of exponents `f_k`, targets `t_k` and spreads capped by `ω_k`, their summed code at
 `f_k + Δ_k` is at most its code at `f_k` plus the summed first-order term and the summed Fisher
 terms. -/
 theorem window_code_add_le (f Δ p : K → ι → ℝ) (t : K → ι)
@@ -433,7 +433,8 @@ theorem window_code_add_le (f Δ p : K → ι → ℝ) (t : K → ι)
 
 omit [Nonempty ι] [DecidableEq ι] in
 /-- [proved-derived; formal-checked] **The linear form's first-order term**: for
-`Δ_k = (ΔW) x_k`, `Σ_k ⟨g_k, Δ_k⟩ = ⟨ΔW, G⟩` with `G = Σ_k g_k x_kᵀ`, the window's gradient. -/
+`Δ_k = (ΔW) x_k`, `Σ_k ⟨g_k, Δ_k⟩ = ⟨ΔW, G⟩` with `G = Σ_k g_k x_kᵀ`, the readings' summed
+gradient. -/
 theorem linear_first_order (g : K → ι → ℝ) (ΔW : Matrix ι X ℝ) (x : K → X → ℝ) :
     ∑ k, ∑ c, g k c * (ΔW *ᵥ x k) c = ∑ c, ∑ j, ΔW c j * ∑ k, g k c * x k j := by
   simp only [Matrix.mulVec, dotProduct, Finset.mul_sum]
@@ -442,10 +443,11 @@ theorem linear_first_order (g : K → ι → ℝ) (ΔW : Matrix ι X ℝ) (x : K
   rw [Finset.sum_comm]
   exact Finset.sum_congr rfl fun j _ => Finset.sum_congr rfl fun k _ => by ring
 
-/-- [proved-derived; formal-checked] **`R`'s window step descends.** For `Δ_k = −η u_k` (for `R`,
-`u_k = V x_k`) with each reading's spread capped, `η (u_k,d − u_k,c) ≤ ω_k`, and
-`η · ln 2 · Σ_k 2^(ω_k) Var_(p_k)(u_k) ≤ a = Σ_k ⟨p_k − e_(t_k), u_k⟩`, the window's code falls by
-at least `η a/2`. -/
+/-- [proved-derived; formal-checked] **`R`'s step over summed readings descends.** For
+`Δ_k = −η u_k` (for `R`, `u_k = V x_k`) with each reading's spread capped,
+`η (u_k,d − u_k,c) ≤ ω_k`, and
+`η · ln 2 · Σ_k 2^(ω_k) Var_(p_k)(u_k) ≤ a = Σ_k ⟨p_k − e_(t_k), u_k⟩`, their summed code falls
+by at least `η a/2`. -/
 theorem window_step_descends (f u p : K → ι → ℝ) (t : K → ι)
     (hp : ∀ k c, p k c = (2 : ℝ) ^ f k c / ∑ d, (2 : ℝ) ^ f k d) {η : ℝ} (ω : K → ℝ)
     (hη : 0 ≤ η) (hosc : ∀ k c d, η * (u k d - u k c) ≤ ω k)

@@ -909,7 +909,7 @@ extern "C" __global__ void hnn_tree_deposit(TreeLaw law, TreeArena a, const uint
 // its digit's nodes (in reverse), the children it relinked, the roots it set and the join, and frees
 // the slots it inserted; thread 0 restores the arena's counts (the founded nodes and the held
 // letters past them are then unread). The logged deposit's digits are disjoint, so the threads
-// commute; the deposits of a window are undone in reverse, so the table returns slot for slot.
+// commute; the deposits of an epoch are undone in reverse, so the table returns slot for slot.
 extern "C" __global__ void hnn_tree_undo(TreeLaw law, TreeArena a, const uint32_t* digits,
                                          uint32_t count, TreeLog log) {
     uint32_t i = threadIdx.x;

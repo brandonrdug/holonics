@@ -289,8 +289,8 @@ struct Compared {
 }
 
 /// **Run the exposure protocol on both ports in lockstep** (module header) over at most `windows`
-/// receiving windows of `cut`, from `constitution` (the declared initial one when `None`), with a
-/// release at every `release_every`-th window. Every return is asserted equal.
+/// receiving epochs of `cut`, from `constitution` (the declared initial one when `None`), with a
+/// release at every `release_every`-th epoch. Every return is asserted equal.
 fn lockstep(
     field: &Field,
     cut: &Cut,

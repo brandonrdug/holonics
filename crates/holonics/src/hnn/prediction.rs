@@ -24,13 +24,13 @@
 //!   terrain knows `T` (the notebook's `hnn_prediction … executed` terrains, order-2, the alternation
 //!   and the line).
 //! - **Learning** is the release's own comparison (`hnn::executed`): the bank's class, threshold,
-//!   order and section predicates along the machine's own trajectory, pulled back to `E` through the
-//!   executed monodromy's eigen-derivative, and a carried update adopted only under its commit
-//!   guards. The lock iteration has one owner, [`bank_release`], which generation and the comparison
-//!   both read.
-//! - **No window anywhere.** The path reads the request only through its phase-carried moment and
-//!   the section only through its own placement (below); it reads no landmark tree, no suffix
-//!   address, no copy stage and no byte context.
+//!   order and section predicates along the machine's own trajectory, pulled back to `E` through
+//!   the executed monodromy's eigen-derivative, and a carried update adopted only where its re-read
+//!   comparison is certified lower. The lock iteration has one owner, [`bank_release`], which
+//!   generation and the comparison both read.
+//! - **No datum is cut off by its age.** The path reads the request only through its phase-carried
+//!   moment and the section only through its own placement (below); it reads no landmark tree, no
+//!   suffix address, no copy stage and no byte context.
 //!
 //! [historical; September 30, batch H] **The linear readout and the bank's face are retired from
 //! Rust** (source at [`f5fd8f3b`](https://github.com/brandonrdug/holonics/blob/f5fd8f3b/crates/holonics/src/hnn/prediction.rs);
@@ -54,7 +54,7 @@
 //! residues and relative phases.** The located failure: every station read one ring's placement
 //! through one map, so the section saw a residue histogram, the table without its index, and each
 //! station's top class was read alone; its best reading was the marginal. The repair has two parts,
-//! neither a window nor a table of pairs:
+//! neither a cut-off of earlier cells nor a table of pairs:
 //!
 //! - **Remainders: the joint residue class.** Each datum is placed on the receiving ring's spectrum
 //!   at its residue ([`SourceMoment`], `m = Σ_k Ĝ(τ_k)⁻¹ E u_k`, unchanged). A field declares that
@@ -100,7 +100,7 @@
 //! every crossing's term in the bank's phase-carried reading has the same modulus at every lag
 //! (`lossless_term_modulus`), so no reading marks the span's frontier, where a continuation's seed
 //! lies; the transport's dissipation weighs the term at lag `r` by `ρ^r` (`dissipative_term_modulus`)
-//! and marks it. The weights are not a window: every crossing enters and none is dropped by length.
+//! and marks it. The weights cut nothing off: every crossing enters and none is dropped by length.
 //!
 //! [definition; agent-inferred, September 30; the
 //! [re-entry diagnosis](../../../../research/records/2026-09-30_THE_RE_ENTRY_DIAGNOSED_A_LATER_LOCK_TAKES_THE_SPANS_MASS_AND_QUENCHES_THE_EARLIER_STATIONS.md)
@@ -154,11 +154,12 @@
 //!   release executes;
 //! - **a refused certificate refuses the release** [proved-derived, September 30]: a lock whose
 //!   Floquet certificate is refused stops the release, held with the refused station first
-//!   ([`BankGeneration::uncertified`]). A certificate is a commit guard, never a tally (the
-//!   diagnosis record §4): the certificate is read at the reading's upper end strictly outside every
-//!   multiplier (Schur–Cohn), where the exact Stein solve of the exact monodromy always certifies
-//!   (its operator's eigenvalues `μ_iμ_j − ρ²` are nonzero and its solution `Σ_k (M/ρ)^(kᵀ)(M/ρ)^k`
-//!   is positive definite), so a refusal can only mean the reading is wrong.
+//!   ([`BankGeneration::uncertified`]). A certificate decides whether the lock stands, never a
+//!   tally (the diagnosis record §4): the certificate is read at the reading's upper end strictly
+//!   outside every multiplier (Schur–Cohn), where the exact Stein solve of the exact monodromy
+//!   always certifies (its operator's eigenvalues `μ_iμ_j − ρ²` are nonzero and its solution
+//!   `Σ_k (M/ρ)^(kᵀ)(M/ρ)^k` is positive definite), so a refusal can only mean the reading is
+//!   wrong.
 //!
 //! **Every modality reads it the same way**: the bank reads the ring's storage, which holds any
 //! chart's classes through `E` at their residues; an image's pixels at their scan ticks and an
@@ -398,8 +399,8 @@ pub fn mask(draw: &mut Draw, stations: usize) -> Vec<bool> {
 /// readings made, and at every lock the bank's certificate (the members certified at the locked
 /// reading's growth, and the executed turn's ticks whose balance closed, of those run), with each
 /// lock's station, class, growth and runner-up growth; and the lock whose Floquet certificate was
-/// refused, if one was, where the release stopped and held (September 30: a refused certificate is
-/// a commit guard, never a tally).
+/// refused, if one was, where the release stopped and held (September 30: a refused certificate
+/// refuses the lock, never a tally).
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct BankGeneration {
     pub release: SectionRelease,
@@ -708,10 +709,10 @@ fn release_iteration<R: JointGrowth + Send + Sync>(
                     ticks_closed += certificate.closed;
                     ticks += certificate.ticks;
                 }
-                // A refused certificate refuses the lock and the release (a commit guard): with
-                // the reading's upper end strictly outside every multiplier, the exact Stein solve
-                // of the exact monodromy always certifies, so a refusal can only mean the reading
-                // itself is wrong.
+                // A refused certificate refuses the lock and the release: with the reading's upper
+                // end strictly outside every multiplier, the exact Stein solve of the exact
+                // monodromy always certifies, so a refusal can only mean the reading itself is
+                // wrong.
                 Err(HnnError::UncertifiedFloquet { .. }) => {
                     uncertified = Some((station, class));
                     break;
@@ -809,9 +810,8 @@ fn release_iteration<R: JointGrowth + Send + Sync>(
 /// - **a datum `r ≥ 1` ticks from `j` weighs at most `ρ^r`** of `j`'s span, the candidate's own
 ///   datum weighing one before the normalization (`framed_weight_le_pow`), so a far lock no longer
 ///   quenches an earlier station;
-/// - **every datum enters**, none is dropped by its distance or the span's length (no window), and
-///   each station's normalization is its own systolic reduction over the same carried powers
-///   `ρ^r`;
+/// - **every datum enters**, none is dropped by its distance or the span's length, and each
+///   station's normalization is its own systolic reduction over the same carried powers `ρ^r`;
 /// - **every modality reads it the same way**: the law reads only the distance between two ticks
 ///   of the ring's clock; a text cell, an image pixel at its scan tick (its row neighbours at
 ///   distance one on either side, the pixels one row away at the row's width), an acoustic sample
@@ -1050,6 +1050,31 @@ impl BankPlacement {
         storage
     }
 
+    /// The storage's derivative in the modulus rebuilt from each datum's reach slope,
+    /// `Σ_k (ρ^(r_k)/M) s_k read_k` ([`BankPlacement::reach_slopes`] against
+    /// [`BankPlacement::modulus_derivative`], the owner's test).
+    #[cfg(test)]
+    pub(crate) fn reach_derivative(&self, station: usize, cells: &[Option<usize>]) -> Vec<Rat> {
+        let mass = self.mass(station, cells);
+        let (request, section) = self.reach_slopes(station, cells);
+        let mut derivative = vec![Rat::zero(); self.pairs.len()];
+        let mut add = |distance: u64, slope: &Rat, read: &[Rat]| {
+            let factor = &self.powers[distance as usize] / &mass * slope;
+            for (value, x) in derivative.iter_mut().zip(read) {
+                *value += x * &factor;
+            }
+        };
+        for ((lag, _, read), slope) in self.reads.iter().zip(&request) {
+            add(Self::request_distance(station, *lag), slope, read);
+        }
+        for (placed, (cell, slope)) in cells.iter().zip(&section).enumerate() {
+            if let (Some(class), Some(slope)) = (cell, slope) {
+                add(Self::station_distance(station, placed), slope, &self.images[placed][*class]);
+            }
+        }
+        derivative
+    }
+
     /// The storage read from a station at the exact transported weights at a modulus (no chart):
     /// the test's reference for [`BankPlacement::modulus_derivative`].
     #[cfg(test)]
@@ -1118,6 +1143,54 @@ impl BankPlacement {
             }
         }
         derivative
+    }
+
+    /// [definition; agent-inferred, October 2; the
+    /// [joined move's record](../../../../research/records/2026-10-02_THE_TRANSPORT_MODULUS_JOINS_THE_RECEIVERS_MINIMUM_ENERGY_MOVE.md)]
+    /// **Each datum's reach slope** read from a station, aligned with [`BankPlacement::weights`]:
+    /// `s_k = (r_k − r̄)/ρ`, the log-derivative of datum `k`'s transported weight in the modulus,
+    /// `∂w_k/∂ρ = w_k s_k` (the factor [`BankPlacement::modulus_derivative`] applies), with `r̄` the
+    /// span's weighted mean distance at the exact weights. Each slope is held at the derivative's
+    /// grain. The request's phases come first, then the placed stations (`None` where unplaced).
+    #[allow(clippy::type_complexity)]
+    pub fn reach_slopes(
+        &self,
+        station: usize,
+        cells: &[Option<usize>],
+    ) -> (Vec<Rat>, Vec<Option<Rat>>) {
+        let data = self.data(station, cells);
+        let mass: Rat = data
+            .iter()
+            .map(|(distance, count, _)| &self.powers[*distance as usize] * count)
+            .sum();
+        let mean: Rat = data
+            .iter()
+            .map(|(distance, count, _)| {
+                &self.powers[*distance as usize] * count * Rat::from_integer(BigInt::from(*distance))
+            })
+            .sum::<Rat>()
+            / &mass;
+        let slope = |distance: u64| -> Rat {
+            let x = (Rat::from_integer(BigInt::from(distance)) - &mean) / &self.modulus;
+            if x.is_zero() {
+                x
+            } else if x.is_negative() {
+                -crate::holon::deposition::significant(&-x, DERIVATIVE_BITS, false)
+            } else {
+                crate::holon::deposition::significant(&x, DERIVATIVE_BITS, false)
+            }
+        };
+        (
+            self.reads
+                .iter()
+                .map(|(lag, _, _)| slope(Self::request_distance(station, *lag)))
+                .collect(),
+            cells
+                .iter()
+                .enumerate()
+                .map(|(placed, cell)| cell.map(|_| slope(Self::station_distance(station, placed))))
+                .collect(),
+        )
     }
 }
 

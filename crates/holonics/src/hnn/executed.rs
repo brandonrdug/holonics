@@ -96,12 +96,12 @@
 //! **piecewise directional derivative** (the pin §13.5) sums the bounds of the terms above their
 //! level and `max(bound, 0)` over the boundary terms (solved terms add nothing).
 //!
-//! **The committed move** ([`executed_move`], the guards symmetric across every composition and
-//! reading, the pin §13.4). The source port's normal law prepares the unit step on the returns
-//! (`Constitution::stepped_source`); the modulus's unit move is its least-squares step
-//! `Δρ = −γ_ρ/G_ρ` with `γ_ρ = Σ_c c ⟨ĝ_c, ∂z_c/∂ρ⟩` and `G_ρ = Σ_c |∂z_c/∂ρ|²` over the
-//! proposal's contributions (`BankPlacement::modulus_derivative`; Lean `modulus_least_squares`); none
-//! upward from `ρ = 1`. Then:
+//! **The committed move** ([`executed_move`], its conditions of adoption the same for every
+//! composition and reading, the pin §13.4). The source port's normal law prepares the unit step on
+//! the returns (`Constitution::stepped_source`); the modulus's unit move is its least-squares step
+//! `Δρ = −γ_ρ/G_ρ` with `γ_ρ = Σ_c c ⟨ĝ_c, ∂z_c/∂ρ⟩` and `G_ρ = Σ_c |∂z_c/∂ρ|²` over the proposal's
+//! contributions (`BankPlacement::modulus_derivative`; Lean `modulus_least_squares`); none upward
+//! from `ρ = 1`. Then:
 //! - **an unresolved active member refuses the move** ([`MoveRefusal::Unresolved`]): a term the
 //!   certificate reads with any active member unresolved is never bounded by its resolved members
 //!   alone (1a's hinge let it through);
@@ -109,32 +109,35 @@
 //!   `E`-part plus `(∂z/∂ρ)Δρ`, before any refusal (the old early test on `E`'s unit alone could
 //!   refuse before the modulus joined); the move is refused, typed, when the composition's joint
 //!   bound is not negative;
-//! - **the ladder starts** at `η₀ = 2^⌊log₂ min(X⁻/(−s_X⁺), ½/u)⌋`, `s_X` the excess's piecewise
+//! - **the first trial step** is `η₀ = 2^⌊log₂ min(X⁻/(−s_X⁺), ½/u)⌋`, `s_X` the excess's piecewise
 //!   derivative on the joint unit move and `u` its largest entry change ([`ladder_start`]); with
 //!   `X⁻ = 0`, or `s_X⁺ ≥ 0`, the entry scale `½/u` alone: no division by a zero excess or a
 //!   nonnegative slope, and nothing becomes solved by it;
-//! - each carried successor `(E + ηD, ρ + ηΔρ)` (held within `[ρ/2, 1]` on the port's lattice) is
-//!   adopted only when every commit guard holds on it: the entry bound `2^ENTRY_BOUND = 8`
-//!   ([`entry_bound`]); the first-order certificate negative on the carried move; every crossing of
-//!   its own release admissible and every lock's Floquet certificate certified; every reading
-//!   supported; the constitution's own guards; **the fixed incumbent mask's composition strictly
-//!   lower by disjoint enclosures**, `C_mask(Θ′)⁺ < C(Θ)⁻`; and **the composition the successor's own
-//!   release executes strictly lower too**, `C_own(Θ′)⁺ < C(Θ)⁻` (October 1, the
+//! - each carried successor `(E + ηD, ρ + ηΔρ)` (`ρ` held on the port's lattice within `[ρ/2, 1]`,
+//!   or within `[ρ/2, max(ρ₀, ρ)]` under [`MoveMetric::KineticModulus`]) is adopted only when all
+//!   of these hold on it: the entry bound `2^ENTRY_BOUND = 8` ([`entry_bound`]); the first-order
+//!   certificate negative on the carried move; every crossing of its own release admissible and
+//!   every lock's Floquet certificate certified; every reading supported; the constitution's own
+//!   conditions on a deposit (its bit budget and certified storage growth); **the fixed incumbent
+//!   mask's composition strictly lower by disjoint enclosures**, `C_mask(Θ′)⁺ < C(Θ)⁻`; and **the
+//!   composition the successor's own release executes strictly lower too**, `C_own(Θ′)⁺ < C(Θ)⁻`
+//!   (October 1, the
 //!   [native direction record](../../../../research/records/2026-10-01_THE_NATIVE_DIRECTION_MEASURED_THE_STEP_DESCENDS_THE_EXECUTED_RELEASE_WITHIN_ITS_CELL_AND_GATE_A_ADOPTED_SIXTEEN_TIMES_BEYOND_IT.md):
-//!   the mask's first order holds only within the trajectory cell where the mask and the own release
-//!   coincide, and gate A's first move certified the mask's decrease sixteen times past that cell
-//!   while the executed release rose). Within the cell the second guard is the first; past it, a
-//!   step is adopted only while the executed comparison still descends, so over moves on a fixed
-//!   batch the executed composition falls strictly at every adopted move;
-//! - otherwise the next step is tried, at most [`LADDER_DEPTH`] a move, and the move is refused,
-//!   typed, when none holds.
+//!   the mask's first order holds only within the trajectory cell where the mask and the own
+//!   release coincide, and gate A's first move certified the mask's decrease sixteen times past
+//!   that cell while the executed release rose). Within the cell the second condition is the first;
+//!   past it, a step is adopted only while the executed comparison still descends, so over moves on
+//!   fixed requests the executed composition falls strictly at every adopted move;
+//! - otherwise the step is halved and tried again, at most [`LADDER_DEPTH`] trials a move, and the
+//!   move is refused, typed, when no trial is adopted.
 //!
 //! **The two readings, kept apart** (the pin §13.1). The descent account is read on one fixed
 //! conditional-context mask, the incumbent's own terms' sections: the proposal, its first order and
 //! the successor's re-read compare like with like. The mask is transient within the move: it is
 //! formed from the incumbent's release, read once at each trial and discarded with the move; no
 //! event, no replay history is retained. The successor's **own release** is read beside it for
-//! behaviour and for its guards, its recomputed composition a commit guard (it must fall) and never
+//! behaviour and for its own certificates (admissible crossings, certified locks, supported
+//! readings); its recomputed composition is a condition of adoption (it must fall) and is never
 //! read as decision progress, with the context change (own less mask) beside it. Every count is kept ([`TermCounts`]): attempted, unresolved, absent, post-error, held,
 //! support, coverage. The persistence reads (the pin §13.7, [`Persistence`]) re-read each decision
 //! solved at its refinement after the later locks of its section.
@@ -152,7 +155,7 @@
 //! | the simple root's eigen-derivative, `D log|μ|[ΔM] = Re(ℓᵀΔMr/(μℓᵀr))` | `HNN/ExecutedComparison.{simple_root_deriv, log_modulus_deriv}` | `hnn::ring::ReceivingBank::read_turn_covector` |
 //! | the monodromy's variation, `ΔM = Σ_t T_(>t) ΔT_t T_(<t)` | `HNN/ExecutedComparison.product_deriv` | `hnn::ring::ReceivingBank::turn_variation` |
 //! | a max comparison descends where every active branch descends, and a sum of maxes where its active slopes sum below zero | `HNN/ExecutedComparison.{max_descends, sum_max_descends}` | [`executed_move`]'s first-order certificate (the hinge) |
-//! | a strict decrease certified by disjoint enclosures | `HNN/ExecutedComparison.disjoint_enclosures_decrease` | [`executed_move`]'s commit guard |
+//! | a strict decrease certified by disjoint enclosures | `HNN/ExecutedComparison.disjoint_enclosures_decrease` | [`executed_move`]'s condition of adoption |
 //! | the release's predicates, class and threshold, sufficient for order and section | `HNN/ExecutedComparison.predicates_release_the_section` | [`BatchComparison`] |
 //! | the hinge's zero set is the closed predicate set | `HNN/ExecutedComparison.{hinge_zero_iff, hinge_zero_at_tie, hinge_right_leaves}` | [`Composition::Hinge`] |
 //! | the lock face, its solved level and the rational test | `HNN/ExecutedComparison.{lockFace_pos, lockFace_lt_log_two_iff, lockFace_enclosure_sublevel, class_top_is_target}` | [`lock_face`] |
@@ -188,8 +191,8 @@ use crate::ratio::linear::inertia::{SymmetricForm, inertia};
 
 /// [definition; agent-inferred, September 30] **The entry bound** `2³`: every entry of `E` at most
 /// three binary orders above the founding's unit scale (the certified step's pins, acceptance 1;
-/// every development read stayed below 2, the divergence it guards against passed 316). A commit
-/// guard here, never a tally.
+/// every development read stayed below 2, the divergence it excludes passed 316). A condition of
+/// adoption here, never a tally.
 pub fn entry_bound() -> Rat {
     Rat::from_integer(BigInt::from(8))
 }
@@ -219,8 +222,9 @@ pub enum Context {
     Partition(Vec<bool>),
 }
 
-/// [definition; agent-inferred, September 30] **One request of a batch**: its ingested current and
-/// moment, its targets (the terrain's truth; only the comparison reads them), and its context.
+/// [definition; agent-inferred, September 30] **One request**: its ingested current and moment, its
+/// targets (the terrain's truth; only the comparison reads them), and its context. A comparison
+/// reads several requests together, as co-present regions of one constitution.
 #[derive(Clone, Debug)]
 pub struct Request {
     pub current: Current,
@@ -406,8 +410,9 @@ pub struct TermCounts {
     pub above: usize,
 }
 
-/// [definition; agent-inferred, September 30] **A batch's comparison**: its declared comparison,
-/// each request's, and the composition and its excess enclosed.
+/// [definition; agent-inferred, September 30] **The comparison of requests read together** at one
+/// constitution: its declared comparison, each request's, and the composition and its excess
+/// enclosed.
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct BatchComparison {
     pub comparison: Comparison,
@@ -1506,7 +1511,7 @@ fn compare_request(
     ))
 }
 
-/// Join requests' comparisons into the batch's.
+/// Join the requests' comparisons into their joint one.
 fn batch_of(comparison: Comparison, requests: Vec<RequestComparison>) -> BatchComparison {
     let (mut value, mut excess, mut readings) = (nought(), nought(), 0);
     for request in &requests {
@@ -1523,11 +1528,11 @@ fn batch_of(comparison: Comparison, requests: Vec<RequestComparison>) -> BatchCo
     }
 }
 
-/// **The declared comparison of a batch, read** (module header): every request's release read by the
-/// bank's joint growth alone, its predicates, orders and releases, its terms under the declared
-/// reading, and the composition and its excess enclosed. The targets are validated; an inadmissible
-/// crossing refuses it (`HnnError::UncertifiedResonator`), and a reading whose lower end is not
-/// positive (`HnnError::NonpositiveDeclaration`).
+/// **The declared comparison of requests read together** (module header): every request's release
+/// read by the bank's joint growth alone, its predicates, orders and releases, its terms under the
+/// declared reading, and the composition and its excess enclosed. The targets are validated; an
+/// inadmissible crossing refuses it (`HnnError::UncertifiedResonator`), and a reading whose lower
+/// end is not positive (`HnnError::NonpositiveDeclaration`).
 pub fn compare(
     field: &Field,
     constitution: &impl ConstitutionRead,
@@ -1710,13 +1715,13 @@ fn points(moved: &[Rat]) -> Vec<ExactInterval> {
 }
 
 /// [definition; agent-inferred, September 30] **The joint direction's modulus part, enclosed**:
-/// each entry of `(∂z/∂ρ)Δρ` is enclosed outward on dyadics of [`JOINT_BITS`] significant bits
-/// (the derivative's entry and the modulus's unit move each enclosed, their product's corners
-/// taken), so the certificate on the joint direction is an enclosure of its exact value with its
-/// rounding charged. The exact product of the transported weights' derivatives (powers of the
-/// founded modulus over the passage's mass) with the least-squares move carries thousands of bits
-/// a coordinate and made the joint certificate cost minutes a batch; the enclosure keeps it at the
-/// port's cost. 128 bits lie far below the readings' grain (`2^(−16)` relative).
+/// each entry of `(∂z/∂ρ)Δρ` is enclosed outward on dyadics of [`JOINT_BITS`] significant bits (the
+/// derivative's entry and the modulus's unit move each enclosed, their product's corners taken), so
+/// the certificate on the joint direction is an enclosure of its exact value with its rounding
+/// charged. The exact product of the transported weights' derivatives (powers of the founded
+/// modulus over the passage's mass) with the least-squares move carries thousands of bits a
+/// coordinate and made the joint certificate cost minutes for each set of requests; the enclosure
+/// keeps it at the port's cost. 128 bits lie far below the readings' grain (`2^(−16)` relative).
 const JOINT_BITS: u32 = 128;
 
 /// A rational's outward dyadic enclosure at `bits` significant bits.
@@ -2187,14 +2192,14 @@ fn propose(
 /// station `j` (`BankPlacement::storage`): each datum, the request's phase counts and the section's
 /// cells, at its transported weight `w_S` from `j` over the span its section `S` closes (the
 /// storage stays linear in `E` at fixed weights, so the form of the returns is unchanged; only the
-/// weights are read from the contribution's station). Every datum returns in one
-/// form, one return a placement aggregated by its feature: one per phase of each request (feature
-/// the phase's counts `M[c]` at the weight `Σ w_S(c)²` over the contributions, covector their
-/// `w_S(c)`-weighted sum carried back through the phase's rotation `P^(c − λ)`, over that weight),
-/// and one per class over the batch for the sections' placements (feature `e_x` at the weight
-/// `Σ w_S(j)²`, covector their `w_S(j)`-weighted sum over it): the same gradient, unit step,
-/// alignment and metric as one return a placement; each the descent covector, every contribution
-/// at its weight in its term's covector.
+/// weights are read from the contribution's station). Every datum returns in one form, one return a
+/// placement aggregated by its feature: one per phase of each request (feature the phase's counts
+/// `M[c]` at the weight `Σ w_S(c)²` over the contributions, covector their `w_S(c)`-weighted sum
+/// carried back through the phase's rotation `P^(c − λ)`, over that weight), and one per class over
+/// all the requests for the sections' placements (feature `e_x` at the weight `Σ w_S(j)²`, covector
+/// their `w_S(j)`-weighted sum over it): the same gradient, unit step, alignment and metric as one
+/// return a placement; each the descent covector, every contribution at its weight in its term's
+/// covector.
 fn returns(
     field: &Field,
     constitution: &Constitution,
@@ -2202,7 +2207,36 @@ fn returns(
     requests: &[Request],
     contributions: &[Contribution],
 ) -> Result<Vec<Sample>, HnnError> {
+    returns_coupled(field, constitution, declared, requests, contributions, None)
+}
+
+/// [definition; agent-inferred, October 2] **The returns carrying the modulus's coupling**
+/// ([`ModulusCoupling`]): [`returns`], with `x = Δρ` the joined solve's modulus part, each return of
+/// feature `f` and weight `W = Σ w²` carrying beside its covector `−x (S/W) E f`, `S = Σ w² s` over
+/// the same data (`s` each datum's reach slope). The normal law's step with these returns is the
+/// solve's `E` part, `M⁻¹Aᵀμ`'s `YH′⁻¹ − x bH′⁻¹` with `b` read on the data the returns reach: the
+/// storage change of the modulus's move returned to the port through the data that carry it.
+fn returns_coupled(
+    field: &Field,
+    constitution: &Constitution,
+    declared: &Refinement,
+    requests: &[Request],
+    contributions: &[Contribution],
+    coupling: Option<(&Rat, &ExactRatMatrix)>,
+) -> Result<Vec<Sample>, HnnError> {
     let ring = declared.ring();
+    // `−x E f` in `E`'s frame, for a feature `f`.
+    let coupled = |feature: &[Rat]| -> Option<Vec<Rat>> {
+        let (x, port) = coupling?;
+        Some(
+            (0..port.rows())
+                .map(|r| {
+                    let row = port.row(r).expect("a row of the port");
+                    -(x * row.iter().zip(feature).map(|(e, f)| e * f).sum::<Rat>())
+                })
+                .collect(),
+        )
+    };
     let geometry = field.ring(ring);
     let period = geometry.period() as usize;
     let width = geometry.width();
@@ -2210,6 +2244,7 @@ fn returns(
     let mut samples = Vec::new();
     let mut section_sums = vec![vec![Rat::zero(); width]; alphabet];
     let mut section_weights = vec![Rat::zero(); alphabet];
+    let mut section_reach = vec![Rat::zero(); alphabet];
     let placements = placements_of(field, constitution, requests, declared)?;
     for (index, (request, placement)) in requests.iter().zip(&placements).enumerate() {
         let mine: Vec<&Contribution> = contributions.iter().filter(|c| c.request == index).collect();
@@ -2228,10 +2263,27 @@ fn returns(
             .collect();
         let mut phase_sums = vec![vec![Rat::zero(); width]; phases.len()];
         let mut phase_weights = vec![Rat::zero(); phases.len()];
+        let mut phase_reach = vec![Rat::zero(); phases.len()];
         for contribution in mine {
             let covector: Vec<Rat> = contribution.covector.iter().map(face).collect();
             let (request_weights, station_weights) =
                 placement.weights(contribution.station, &contribution.cells);
+            if coupling.is_some() {
+                let (request_slopes, station_slopes) =
+                    placement.reach_slopes(contribution.station, &contribution.cells);
+                for ((reach, weight), slope) in
+                    phase_reach.iter_mut().zip(&request_weights).zip(&request_slopes)
+                {
+                    *reach += weight * weight * slope;
+                }
+                for ((cell, weight), slope) in
+                    contribution.cells.iter().zip(&station_weights).zip(&station_slopes)
+                {
+                    if let (Some(class), Some(weight), Some(slope)) = (cell, weight, slope) {
+                        section_reach[*class] += weight * weight * slope;
+                    }
+                }
+            }
             for ((sum, total), weight) in phase_sums
                 .iter_mut()
                 .zip(phase_weights.iter_mut())
@@ -2256,22 +2308,26 @@ fn returns(
                 section_weights[*class] += weight * weight;
             }
         }
-        for ((c, sum), weight) in phases.iter().zip(phase_sums).zip(phase_weights) {
-            if !weight.is_positive() || sum.iter().all(Zero::is_zero) {
+        for (((c, sum), weight), reach) in phases.iter().zip(phase_sums).zip(phase_weights).zip(phase_reach) {
+            let carried = coupling.is_some() && !reach.is_zero();
+            if !weight.is_positive() || (sum.iter().all(Zero::is_zero) && !carried) {
                 continue;
             }
-            let feature = request
+            let feature: Vec<Rat> = request
                 .moment
                 .phase_counts(ring, *c)?
                 .iter()
                 .map(|&count| Rat::from_integer(BigInt::from(count)))
                 .collect();
             let rotated = geometry.rotate(&sum, &(BigInt::from(*c as u64) - &lift));
-            samples.push(Sample {
-                covector: rotated.into_iter().map(|x| -(x / &weight)).collect(),
-                weight,
-                feature,
-            });
+            let mut covector: Vec<Rat> = rotated.into_iter().map(|x| -(x / &weight)).collect();
+            if carried && let Some(term) = coupled(&feature) {
+                let share = &reach / &weight;
+                for (value, add) in covector.iter_mut().zip(term) {
+                    *value += add * &share;
+                }
+            }
+            samples.push(Sample { covector, weight, feature });
         }
     }
     for class in 0..alphabet {
@@ -2281,11 +2337,16 @@ fn returns(
         let weight = section_weights[class].clone();
         let mut feature = vec![Rat::zero(); alphabet];
         feature[class] = Rat::one();
-        samples.push(Sample {
-            covector: section_sums[class].iter().map(|x| -(x / &weight)).collect(),
-            weight,
-            feature,
-        });
+        let mut covector: Vec<Rat> = section_sums[class].iter().map(|x| -(x / &weight)).collect();
+        if !section_reach[class].is_zero()
+            && let Some(term) = coupled(&feature)
+        {
+            let share = &section_reach[class] / &weight;
+            for (value, add) in covector.iter_mut().zip(term) {
+                *value += add * &share;
+            }
+        }
+        samples.push(Sample { covector, weight, feature });
     }
     Ok(samples)
 }
@@ -2417,7 +2478,7 @@ fn slope_split(
     })
 }
 
-/// The incumbent read of a batch: its comparison and every term's candidates' covectors.
+/// The incumbent read of the requests: their comparison and every term's candidates' covectors.
 #[allow(clippy::type_complexity)]
 fn incumbent(
     field: &Field,
@@ -2453,7 +2514,7 @@ fn incumbent(
 }
 
 /// [measured-diagnostic; agent-inferred, September 30] **The modulus's slope split by term kind at
-/// a constitution** ([`SlopeSplit`]; the station-framed placement's record §7), with the batch's
+/// a constitution** ([`SlopeSplit`]; the station-framed placement's record §7), with the requests'
 /// comparison: the requests read with every term's candidates' covectors, the proposal formed as
 /// [`executed_move`] forms it, and no move made.
 pub fn modulus_slopes(
@@ -2552,7 +2613,7 @@ fn pullback(
 }
 
 /// [measured-diagnostic; agent-inferred, loop 1c's pin §3] **Every decision term's lock face and
-/// gradient at a constitution** ([`SiteGradient`]), with the batch's comparison (the lock face at
+/// gradient at a constitution** ([`SiteGradient`]), with the requests' comparison (the lock face at
 /// the decisions, [`Comparison::LOCK_DECISIONS`], read as [`executed_move`] reads its incumbent):
 /// the exterior fit's linearization at the release's actual decision contexts. No move is made.
 pub fn site_gradients(
@@ -2763,13 +2824,13 @@ fn section_moves(
         .collect())
 }
 
-/// [definition; agent-inferred, September 30] **A move's first-order reading** (module header,
-/// "The first-order certificate"): the composition's bound `Σ_terms` enclosed (its upper end is the
-/// commit guard), the excess's piecewise bound (the terms above their level and `max(·, 0)` over the
-/// boundary terms; its upper end starts the ladder), the terms reading an unresolved active member;
-/// and, as receipts only, each term's bound in the proposal's order (`None` for a term with no
-/// resolved branch), aligned with [`ExecutedMove::sites`], and the leading contributions' pairing
-/// `Σ c ⟨ĝ, Δz⟩`, the proposal's own gradient on the move.
+/// [definition; agent-inferred, September 30] **A move's first-order reading** (module header, "The
+/// first-order certificate"): the composition's bound `Σ_terms` enclosed (adoption needs its upper
+/// end negative), the excess's piecewise bound (the terms above their level and `max(·, 0)` over
+/// the boundary terms; its upper end sets the first trial step), the terms reading an unresolved
+/// active member; and, as receipts only, each term's bound in the proposal's order (`None` for a
+/// term with no resolved branch), aligned with [`ExecutedMove::sites`], and the leading
+/// contributions' pairing `Σ c ⟨ĝ, Δz⟩`, the proposal's own gradient on the move.
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct FirstOrderReading {
     pub bound: ExactInterval,
@@ -2946,7 +3007,7 @@ fn first_order(
 // the committed move
 
 /// [definition; agent-inferred, September 30] **Why a trial step is not adopted** (module header,
-/// "The committed move"): each a commit guard.
+/// "The committed move"): each a condition of adoption that failed.
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub enum TrialRefusal {
     /// An entry of `E` past [`entry_bound`].
@@ -2961,12 +3022,13 @@ pub enum TrialRefusal {
     FirstOrder(ExactInterval),
     /// The fixed mask's composition not strictly lower by disjoint enclosures.
     NotBelow(ExactInterval),
-    /// The fixed mask's composition lower, the successor's own release's executed composition not
-    /// strictly below its checkpoint's plus the excursion's height ([`ReleaseExcursion`]; with the
-    /// monotone guard, not strictly lower by disjoint enclosures): the step's flip took the executed
-    /// comparison past what the window admits.
+    /// The fixed mask's composition lower, the successor's released code length not strictly below
+    /// its opening state's plus the excursion ([`ReleaseExcursion`]; under strict descent, not
+    /// strictly lower by disjoint enclosures): the step's jump took the released code length past
+    /// what the interval admits.
     OwnNotBelow(ExactInterval),
-    /// The constitution's own guard (budget, storage growth).
+    /// The constitution refused the deposit: its bit budget exceeded, or its storage growth not
+    /// certified.
     Constitution(String),
 }
 
@@ -3012,7 +3074,8 @@ pub enum MoveRefusal {
     Unresolved(usize),
     /// The joint unit move's first-order bound of the composition is not certified negative.
     NoDescent(ExactInterval),
-    /// Every trial step failed a guard, down to a move below the lattice.
+    /// Every trial step failed a condition of adoption, halving down to a move below the lattice or
+    /// to the last of [`LADDER_DEPTH`] trials.
     Guards,
     /// The witness's metric ([`MoveMetric::Witness`]): no lock-face term reads the plane (the hinge
     /// has no lock), or some plane direction lies in the witness's kernel (`G` not positive
@@ -3023,8 +3086,8 @@ pub enum MoveRefusal {
     Reversed([Rat; 2]),
 }
 
-/// [definition; agent-inferred, September 30; the pin §2.6, §13.5] **Which bound set the ladder's
-/// start** ([`ladder_start`]).
+/// [definition; agent-inferred, September 30; the pin §2.6, §13.5] **Which bound set the first
+/// trial step** ([`ladder_start`]).
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub enum LadderStart {
     /// The excess's first-order zero `X⁻/(−s_X⁺)`, at most the entry scale.
@@ -3056,22 +3119,31 @@ pub enum LadderStart {
 ///   coordinates, no cross term (the move's law until October 1, kept as the control).
 /// - `Witness`: both by the lock's own normalized reading pulled back onto the plane of the port's
 ///   unit move and `ρ`, its cross term counted ([`WitnessForm`]): the plane step `(α, β) = −G⁻¹g`,
-///   the ladder starting at `α` (at most the entry scale) with `ρ` moving `β/α` per unit of `E`'s
-///   step. Every guard is the same; only the direction and the start differ. A step's size is a
-///   constitutive change, not a velocity or an elapsed time.
+///   the first trial step `α` (at most the entry scale) with `ρ` moving `β/α` per unit of `E`'s
+///   step. The conditions of adoption are the same; only the direction and the first step differ. A
+///   step's size is a constitutive change, not a velocity or an elapsed time.
 /// - `Kinetic`: `E` alone, by the receiver's minimum-energy Gauss–Newton move over all of `E`
 ///   ([`KineticSolve`]), deposited by the normal law from the returns at the solve's reading weights;
-///   `ρ` held. The ladder starts at the Gauss–Newton step (`η = 1`), at most the entry scale.
+///   `ρ` held. The first trial step is the Gauss–Newton step (`η = 1`), at most the entry scale.
+/// - `KineticModulus`: `E` and `ρ` together, by the receiver's minimum-energy Gauss–Newton move over
+///   both ([`KineticSolve`] with the modulus joined, [`ModulusCoupling`]): the readings' change is
+///   the same Gauss–Newton change, and the storage-change mass splits it between `E` and `ρ`. `E`'s
+///   part is deposited by the normal law from the returns at the solve's reading weights, each return
+///   carrying the coupling's covector; `ρ` moves by the solve's `Δρ` per unit step, held at or below
+///   the founding `ρ₀` (the one-turn alias bound, [`Constitution::founding_transport`]), or at the
+///   incumbent's `ρ` where that already stands above it. Where `ρ` is at that bound and the solve
+///   would raise it, the bound holds `ρ` and the move is `Kinetic`'s.
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub enum MoveMetric {
     Coordinate,
     Witness,
     Kinetic,
+    KineticModulus,
 }
 
-/// [definition; agent-inferred, September 30; the pin §2.6, §13.5] **The ladder's start**: from the
-/// excess's lower end `X⁻`, the upper end `s_X⁺` of its piecewise directional derivative on the joint
-/// unit move and the unit move's largest entry change `u`,
+/// [definition; agent-inferred, September 30; the pin §2.6, §13.5] **The first trial step**: from
+/// the excess's lower end `X⁻`, the upper end `s_X⁺` of its piecewise directional derivative on the
+/// joint unit move and the unit move's largest entry change `u`,
 /// `η₀ = 2^⌊log₂ min(X⁻/(−s_X⁺), ½/u)⌋` when `X⁻ > 0` and `s_X⁺ < 0`; the entry scale `½/u` alone
 /// otherwise (`1` when `u = 0`). A zero excess or a nonnegative slope never enters a division.
 pub fn ladder_start(excess: &Rat, slope: &Rat, unit_largest: &Rat) -> (Rat, LadderStart) {
@@ -3094,8 +3166,8 @@ pub fn ladder_start(excess: &Rat, slope: &Rat, unit_largest: &Rat) -> (Rat, Ladd
     }
 }
 
-/// [definition; agent-inferred, September 30; the pin §13.4] **The certificate's guard before any
-/// step**: no term moves the composition ([`MoveRefusal::Nothing`]), or some term of the
+/// [definition; agent-inferred, September 30; the pin §13.4] **The certificate's refusal before
+/// any step**: no term moves the composition ([`MoveRefusal::Nothing`]), or some term of the
 /// certificate's support reads an unresolved active member ([`MoveRefusal::Unresolved`]): its
 /// bound is never formed from its resolved members alone, for every composition and reading.
 fn certificate_refusal(proposal: &Proposal) -> Option<MoveRefusal> {
@@ -3109,7 +3181,7 @@ fn certificate_refusal(proposal: &Proposal) -> Option<MoveRefusal> {
     }
 }
 
-/// [definition; agent-inferred, September 30; the pin §13.4] **The slope's guard**, read on the
+/// [definition; agent-inferred, September 30; the pin §13.4] **The slope's refusal**, read on the
 /// joint unit direction (the port's unit move with the modulus's least-squares move joined): the
 /// move is refused, typed, only when the composition's joint first-order bound is not negative.
 fn slope_refusal(joint: &FirstOrderReading) -> Option<MoveRefusal> {
@@ -3138,7 +3210,7 @@ pub struct Persistence {
 /// comparison; the incumbent's reading (the fixed mask's), the proposal's size (contributions,
 /// returns, terms of the certificate's support, unresolved leading members, terms reading an
 /// unresolved active member); the joint unit move's first-order bound of the composition and of its
-/// excess; the ladder's start; the modulus's reading; every trial; the adopted successor with its
+/// excess; the first trial step; the modulus's reading; every trial; the adopted successor with its
 /// carried step's reading, or the move's refusal; and the receipts: every term's site in the order of
 /// every trial's `terms`, the unit move's largest entry change, the terms' counts and the
 /// persistence reads.
@@ -3157,7 +3229,8 @@ pub struct ExecutedMove {
     pub unresolved: Vec<CovectorRefusal>,
     pub unresolved_branches: usize,
     pub slope: Option<ExactInterval>,
-    /// The port's part of the unit move alone (`Δρ = 0`), a receipt: the guard reads `slope`.
+    /// The port's part of the unit move alone (`Δρ = 0`), a receipt: the slope's refusal reads
+    /// `slope`.
     pub port_slope: Option<ExactInterval>,
     pub excess_slope: Option<ExactInterval>,
     pub start: Option<(Rat, LadderStart)>,
@@ -3166,6 +3239,9 @@ pub struct ExecutedMove {
     /// `−γ_ρ/G_ρ` (zero upward at `ρ = 1`), where the modulus was read.
     pub modulus_curvature: Option<Rat>,
     pub modulus_unit: Option<Rat>,
+    /// `KineticModulus` at its bound: the joined solve whose upward `Δρ` the bound held (the move
+    /// then is `E`'s alone, [`MoveMetric::KineticModulus`]); `None` where nothing was held.
+    pub modulus_held: Option<KineticSolve>,
     /// The modulus's slope split by term kind ([`SlopeSplit`]), where the modulus was read.
     pub split: Option<SlopeSplit>,
     pub trials: Vec<Trial>,
@@ -3189,8 +3265,8 @@ fn largest_entry(matrix: &ExactRatMatrix) -> Rat {
 
 /// [definition; agent-inferred, September 30] **What a declared comparison reads at a carried
 /// successor**: the fixed mask's composition and excess enclosed, the successor's own release
-/// comparison where it was read, and the guard that refused it (admission, Floquet, support), if one
-/// did.
+/// comparison where it was read, and the certificate that refused it (admission, Floquet, support),
+/// if one did.
 pub struct Reread {
     pub value: ExactInterval,
     pub excess: ExactInterval,
@@ -3201,60 +3277,66 @@ pub struct Reread {
     pub refusal: Option<TrialRefusal>,
 }
 
-/// [definition; proved-derived, October 2] **The release guard's excursion**
-/// (`HNN/ExecutedComparison` §12). A move's change in the own release is the fixed mask's change,
-/// continuous and certified at first order, plus the **flip**: the successor's own decisions read
-/// against the incumbent's on the same `E` (`own_telescopes`; a trial's `change`, the own reading
-/// less the mask's, encloses it). Each adopted step certifies the fixed mask's fall (`NotBelow`,
-/// unchanged). The own release is guarded over a window from a checkpoint: each successor's own
-/// comparison strictly below the checkpoint's lower end plus `height`
-/// ([`ReleaseExcursion::admits`], `excursion_enclosure`), and the window, at most `W` adopted
-/// moves, closing strictly below the checkpoint's lower end less a certified decrease `σ ≥ 0`
-/// ([`ReleaseExcursion::closes`]). It closes exactly when its fixed-mask decreases exceed its flips
-/// by `σ` (`window_closes_iff`). A window that does not close returns to its checkpoint; the chain
-/// holds the checkpoint, the window's length and `σ`.
-/// [`ReleaseExcursion::monotone`] (the incumbent as checkpoint, no height) is the strict decrease by
-/// disjoint enclosures, the former rule (`checkpoint_one_iff`).
+/// [definition; proved-derived, October 2] **The released code length compared between two
+/// endpoint states** (`HNN/ExecutedComparison` §12; the record states each step). A step (one
+/// deposition) changes the released code length by its change with the incumbent's commitments
+/// held, continuous and certified at first order, plus the **jump** where a ring's all-or-nothing
+/// commitment switches (`own_telescopes`; a trial's `change`, the released reading less the held
+/// one, encloses it). Every admitted step certifies the held code length's fall (`NotBelow`,
+/// unchanged). The jump is set by placement, not by the step's length, and only a later step can
+/// repay it, so the released code length is compared between the two endpoint states of an
+/// interval of the path: each successor's released code length strictly below the opening state's
+/// lower end plus `height` ([`ReleaseExcursion::admits`], `excursion_enclosure`), and the closing
+/// state, at most `W` admitted steps on, strictly below the opening's lower end less a certified
+/// decrease `σ ≥ 0` ([`ReleaseExcursion::closes`]). An interval closes exactly when its held
+/// decreases exceed its jumps by `σ` (`window_closes_iff`). The chain holds the opening state, the
+/// interval's length and `σ`. [`ReleaseExcursion::monotone`] (the incumbent as opening state, no
+/// excursion) is strict descent by disjoint enclosures, the former rule (`checkpoint_one_iff`).
 ///
-/// The parameters, from the chain's laws (§12; the record states each step):
-/// - `height`: `None` within a window. The entry bound bounds the comparison, which supplies a
-///   height (`excursion_of_bounded`), so no per-step own check is owed inside a window; `Some(0)`
-///   with the incumbent as checkpoint is the monotone guard.
-/// - `σ`: one receiver grain over the batch's decisions ([`ReleaseExcursion::grain`]). A decrease
-///   below it is not a reading, and with it at most `(f 0 − m)/σ` windows close
-///   (`grain_windows_bounded`): the chain releases at the grain.
-/// - `W`: at least two moves, since a flip is answered only by the move after it
-///   (`one_move_closes_iff`), and at least `(F + σ)/d` for flips `F` against a per-move certified
+/// The parameters, from the chain's laws:
+/// - `height`: `None` inside an interval. The code length's range over the admitted states bounds
+///   every excursion (`excursion_of_bounded`), so no per-step comparison of the released code length
+///   is owed inside an interval; `Some(0)` with the incumbent as opening state is strict descent.
+/// - `σ`: one receiver grain over the requests' decisions ([`ReleaseExcursion::grain`]). A decrease
+///   below it is not a reading, and with it at most `(f 0 − m)/σ` intervals close
+///   (`grain_windows_bounded`): the path releases at the grain.
+/// - `W`: at least two steps, since a jump is read only by the step after it
+///   (`one_move_closes_iff`), and at least `(F + σ)/d` for jumps `F` against a per-step certified
 ///   decrease of at most `d` (`window_length_lower`). Its upper end is the chain's choice: it bounds
-///   the moves a window that does not close spends.
+///   the steps an interval that does not close spends.
 ///
-/// A negative height states no guard (at its own checkpoint the excursion would fail) and a
-/// negative decrease lets a checkpoint rise; both are refused, typed ([`HnnError::ExcursionHeight`],
-/// [`HnnError::WindowDecrease`]).
+/// A negative excursion states no condition (the opening state would breach its own) and a
+/// negative decrease lets an opening state rise; both are refused, typed
+/// ([`HnnError::ExcursionHeight`], [`HnnError::WindowDecrease`]).
 ///
-/// **The return restores the whole checkpoint**, not its comparison alone: the chain that runs
-/// windows holds the checkpoint's `Constitution` (one held state, not a tape) and adopts it again
-/// when the window does not close, discarding every successor the window adopted. §12's
-/// `CheckpointGuard` indexes adopted states only, which is that law: a failed window leaves no trace
-/// in the constitution. The unchecked height is sound on the same terms, whatever the height: only
-/// the chain reads a window's states, and what it releases is a closed window's checkpoint, which
-/// the fixed mask's `NotBelow` on every step and the close certify. [agent-inferred] The finite
-/// height `excursion_of_bounded` names, the comparison's range over the states the commit guards
-/// admit (every entry of `E` within [`entry_bound`]), is not computed: its finiteness also needs the
-/// readings bounded away from zero on those states, which no guard states. This type holds only the
-/// checkpoint's comparison, which is all a step's guard and the close read; no chain owner runs
-/// windows yet.
+/// **An interval that does not close is discarded whole.** The chain holds the opening state's
+/// `Constitution` (one held state, not a tape) and restarts from it, discarding every successor the
+/// interval admitted; §12's `CheckpointGuard` indexes admitted states only, which is that law. No
+/// process of the rings undoes a deposition: the restart is a selection among paths made by the
+/// receiver and has no physical statement. The unchecked excursion is sound whatever its value: only
+/// the chain reads an interval's states, and it releases only a closed interval's opening state,
+/// which `NotBelow` on every step and the close certify.
+///
+/// **Why the range is finite.** A target's term `log((1 + a + r)/a)` grows without bound as its
+/// reading `a` falls to zero (`lockFace_unbounded`), so the entry bound alone does not bound the
+/// code length. It is bounded with a floor on every target's reading (`lockFace_le_of_floor`), and
+/// the lattice supplies one: a growth over one period is zero or at least `1/Δ`
+/// (`HNN/Floquet.integer_monodromy_floor`; [`crate::hnn::ring`]'s `growth_of`), and a zero target is
+/// refused by [`lock_face`], so it is never admitted. [agent-inferred] The rivals' bound and a floor
+/// uniform over a path (`Δ` varies with `E`) have no Lean statement yet (#62). This type holds only
+/// the opening state's code length, which is all a step's comparison and the close read; no chain
+/// owner runs intervals yet.
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct ReleaseExcursion {
-    /// The checkpoint's own comparison; `None` is the incumbent's.
+    /// The opening state's released code length; `None` is the incumbent's.
     pub checkpoint: Option<ExactInterval>,
-    /// How far the own release may rise above the checkpoint within the window; `None`, unchecked
-    /// (the entry bound bounds it).
+    /// How far the released code length may rise above the opening state's inside the interval;
+    /// `None`, unchecked (the code length's range bounds it).
     pub height: Option<Rat>,
 }
 
 impl ReleaseExcursion {
-    /// The monotone guard: the incumbent as checkpoint, no height.
+    /// Strict descent: the incumbent as opening state, no excursion.
     pub fn monotone() -> Self {
         Self {
             checkpoint: None,
@@ -3262,7 +3344,7 @@ impl ReleaseExcursion {
         }
     }
 
-    /// A window from a held checkpoint, the own release unchecked until the window's close.
+    /// An interval from a held opening state, the released code length unchecked until its close.
     pub fn from_checkpoint(checkpoint: ExactInterval) -> Self {
         Self {
             checkpoint: Some(checkpoint),
@@ -3270,8 +3352,9 @@ impl ReleaseExcursion {
         }
     }
 
-    /// **One receiver grain over a batch** (`σ`, in nats): `decisions · tolerance · ln 2`, read at
-    /// the upper end of `ln 2`'s enclosure, so a closing window certifies at least the grain.
+    /// **One receiver grain over the requests' decisions** (`σ`, in nats):
+    /// `decisions · tolerance · ln 2`, read at the upper end of `ln 2`'s enclosure, so a closing
+    /// interval certifies at least the grain.
     pub fn grain(
         decisions: usize,
         tolerance: &Rat,
@@ -3291,9 +3374,9 @@ impl ReleaseExcursion {
         }
     }
 
-    /// The step's guard on a successor's own comparison: `own.upper < checkpoint.lower + height`,
-    /// the checkpoint the incumbent's (`before`) when none is held; every successor when the height
-    /// is unchecked.
+    /// The step's comparison of a successor's released code length with the opening state's:
+    /// `own.upper < checkpoint.lower + height`, the opening state the incumbent (`before`) when none
+    /// is held; every successor when the excursion is unchecked.
     pub fn admits(&self, before: &ExactInterval, own: &ExactInterval) -> bool {
         let checkpoint = self.checkpoint.as_ref().unwrap_or(before);
         match &self.height {
@@ -3302,9 +3385,10 @@ impl ReleaseExcursion {
         }
     }
 
-    /// The window's close: the own comparison at its end strictly below the checkpoint's lower end
-    /// less the certified decrease `σ`. A negative `σ` is refused ([`HnnError::WindowDecrease`]):
-    /// it would let a window close above its checkpoint, so the checkpoints could rise.
+    /// The interval's close: the released code length at its closing state strictly below the
+    /// opening state's lower end less the certified decrease `σ`. A negative `σ` is refused
+    /// ([`HnnError::WindowDecrease`]): it would let an interval close above its opening state, so
+    /// the opening states could rise.
     pub fn closes(
         checkpoint: &ExactInterval,
         end: &ExactInterval,
@@ -3319,26 +3403,28 @@ impl ReleaseExcursion {
     }
 }
 
-/// [definition; agent-inferred, September 30] **The ladder's depth**: at most 8 trial steps a move,
-/// from its start down to `2^(−7)` of it. Every trial re-reads the whole batch, so the depth bounds a
-/// move's work; a comparison that does not fall within `2^(−7)` of its start along the proposal is
-/// refused there (typed), never searched further. One depth for every declared comparison.
+/// [definition; agent-inferred, September 30] **The number of trial steps**: at most 8 a move,
+/// halving from the first down to `2^(−7)` of it. Every trial re-reads every request, so the count
+/// bounds a move's work: a chosen bound on work, not a law. A comparison that does not fall within
+/// `2^(−7)` of the first step along the proposal is refused there (typed), never searched further.
+/// One count for every declared comparison.
 pub const LADDER_DEPTH: usize = 8;
 
-/// The ladder's outcome: every trial, the adopted successor with its carried step, or the refusal.
+/// The trials' outcome: every trial, the adopted successor with its carried step, or the refusal.
 type LadderOutcome = (Vec<Trial>, Option<(Constitution, SourceStep)>, Option<MoveRefusal>);
 
 /// A carried move's first-order certificate: from the source port's move and the carried successor.
 type FirstOrder<'a> =
     dyn Fn(&ExactRatMatrix, &Constitution) -> Result<FirstOrderReading, HnnError> + Sync + 'a;
 
-/// [definition; agent-inferred, September 30] **The certified step's ladder, one law for every
-/// declared comparison** (module header, "The committed move"): from its start (held so that no
-/// entry of `E` moves by more than the founding's entry scale `½` in one move), halving until the
-/// carried move moves no lattice coordinate; each carried successor adopted only when every commit
-/// guard holds on it: the entry bound, the first-order certificate on the carried move (`first`,
-/// negative), the successor's guards and the fixed mask's value (`reread`) strictly lower by disjoint
-/// enclosures, and its own release within the release guard's excursion ([`ReleaseExcursion`]).
+/// [definition; agent-inferred, September 30] **The certified step's halving trials, one law for
+/// every declared comparison** (module header, "The committed move"): from the first step (held so
+/// that no entry of `E` moves by more than the founding's entry scale `½` in one move), halving
+/// until the carried move moves no lattice coordinate or the trials reach [`LADDER_DEPTH`]; each
+/// carried successor adopted only when all of these hold on it: the entry bound, the first-order
+/// certificate on the carried move (`first`, negative), the successor's own certificates and the
+/// fixed mask's value (`reread`) strictly lower by disjoint enclosures, and its own released code
+/// length within the excursion ([`ReleaseExcursion`]).
 #[allow(clippy::too_many_arguments)]
 fn ladder(
     constitution: &Constitution,
@@ -3348,6 +3434,7 @@ fn ladder(
     start: Rat,
     unit_largest: &Rat,
     transport: Option<&Rat>,
+    ceiling: &Rat,
     first: &FirstOrder<'_>,
     reread: &(dyn Fn(&Constitution) -> Result<Reread, HnnError> + Sync),
     excursion: &ReleaseExcursion,
@@ -3400,18 +3487,20 @@ fn ladder(
         let (successor, reading) = stepped;
         trial.source = Some(reading.clone());
         // The transport modulus's part of the move (module header, "The committed move"): `ρ + ηΔρ`
-        // held within `[ρ/2, 1]` (passive) and read on the source port's lattice, nearest.
+        // held within `[ρ/2, ceiling]` and read on the source port's lattice, nearest. The ceiling is
+        // the passive bound `1`, or `KineticModulus`'s `max(ρ₀, ρ)`, the one-turn alias bound or
+        // the incumbent's modulus where that stands above it.
         let (successor, modulus_moved) = match transport {
             Some(unit) if !unit.is_zero() => {
                 let modulus = constitution.transport(ring);
                 let target = (&modulus + &step * unit)
                     .max(&modulus / &two)
-                    .min(Rat::one());
+                    .min(ceiling.clone());
                 let carried = ((&target / &lattice_unit)
                     + Rat::new(BigInt::one(), BigInt::from(2)))
                 .floor()
                     * &lattice_unit;
-                let carried = carried.min(Rat::one()).max(lattice_unit.clone());
+                let carried = carried.min(ceiling.clone()).max(lattice_unit.clone());
                 trial.modulus = Some(carried.clone());
                 let moved_modulus = carried != modulus;
                 (successor.with_transport(ring, carried)?, moved_modulus)
@@ -3473,7 +3562,7 @@ fn ladder(
 }
 
 /// [definition; agent-inferred, September 30; the pin §13.1] **The successor's two readings**: its
-/// own release compared under the declared comparison (its guards: an inadmissible crossing, a
+/// own release compared under the declared comparison (its refusals: an inadmissible crossing, a
 /// refused lock certificate, an unsupported reading), and the fixed incumbent mask's terms re-read at
 /// the successor, each site's candidates taken from the own release's refinement at the same section
 /// when it executed one (the same reading exactly), else read there.
@@ -3718,12 +3807,13 @@ fn persistence(
 }
 
 /// **The committed move of `E` and `ρ` on a declared comparison** (module header, "The committed
-/// move"): the batch read at the incumbent with every term's candidates' covectors, the proposal and
-/// its returns, the modulus's least-squares unit move, the joint unit move's first order read before
-/// any refusal, the ladder's start from the excess, then the certified step's ladder ([`ladder`]),
-/// each carried successor re-read on the fixed incumbent mask and on its own release, and adopted
-/// only when every commit guard holds. The targets are validated (one per station, each a class of
-/// the chart); an unsupported reading at the incumbent refuses with its typed error.
+/// move"): the requests read at the incumbent with every term's candidates' covectors, the proposal
+/// and its returns, the modulus's least-squares unit move, the joint unit move's first order read
+/// before any refusal, the first trial step from the excess, then the certified step's halving
+/// trials ([`ladder`]), each carried successor re-read on the fixed incumbent mask and on its own
+/// release, and adopted only when every condition of adoption holds. The targets are validated (one
+/// per station, each a class of the chart); an unsupported reading at the incumbent refuses with
+/// its typed error.
 pub fn executed_move(
     field: &Field,
     constitution: &Constitution,
@@ -3746,8 +3836,8 @@ pub fn executed_move(
 }
 
 /// **The committed move under a declared metric** ([`MoveMetric`]; [`executed_move`] is the
-/// coordinate metric's): the same proposal, guards, ladder and receipts, the joint direction and
-/// the ladder's start sized by the declared metric.
+/// coordinate metric's): the same proposal, conditions of adoption, halving trials and receipts,
+/// the joint direction and the first trial step sized by the declared metric.
 #[allow(clippy::too_many_arguments)]
 pub fn executed_move_in(
     field: &Field,
@@ -3772,10 +3862,10 @@ pub fn executed_move_in(
     )
 }
 
-/// **The committed move under a declared metric and the release guard's excursion**
-/// ([`ReleaseExcursion`]; [`executed_move_in`] is the monotone guard's): the same proposal, guards,
-/// ladder and receipts, the own release adopted within the excursion. A negative height is refused
-/// before any reading ([`HnnError::ExcursionHeight`]).
+/// **The committed move under a declared metric and an excursion of the released code length**
+/// ([`ReleaseExcursion`]; [`executed_move_in`] is strict descent's): the same proposal, conditions
+/// of adoption, halving trials and receipts, the own released code length admitted within the
+/// excursion. A negative height is refused before any reading ([`HnnError::ExcursionHeight`]).
 #[allow(clippy::too_many_arguments)]
 pub fn executed_move_guarded(
     field: &Field,
@@ -3822,6 +3912,7 @@ pub fn executed_move_guarded(
         modulus_slope: None,
         modulus_curvature: None,
         modulus_unit: None,
+        modulus_held: None,
         split: None,
         trials: Vec::new(),
         adopted: None,
@@ -3849,16 +3940,46 @@ pub fn executed_move_guarded(
     };
     // The kinetic metric's deposition: the same normal law, from the returns at the solve's
     // reading weights.
-    let (samples, unit, unit_move) = if metric == MoveMetric::Kinetic {
-        let Some(solve) =
-            kinetic_solve(field, constitution, declared, requests, &proposal, &samples, None)?
-        else {
+    // `KineticModulus`'s bound on `ρ`: the founding's one-turn alias bound `ρ₀`, or the incumbent's
+    // modulus where it already stands above it (the move never lifts `ρ` past `ρ₀`).
+    let joined = metric == MoveMetric::KineticModulus;
+    let ceiling = if joined {
+        let founding = constitution.founding_transport(field, ring)?;
+        founding.max(constitution.transport(ring).clone())
+    } else {
+        Rat::one()
+    };
+    let (samples, unit, unit_move, kinetic_modulus) = if metric == MoveMetric::Kinetic || joined {
+        let mut solve =
+            kinetic_solve(field, constitution, declared, requests, &proposal, &samples, None, joined)?;
+        // At the bound an upward `Δρ` is held, and the least-energy move is `E`'s alone.
+        if solve
+            .as_ref()
+            .and_then(|s| s.modulus.as_ref())
+            .is_some_and(|x| x.is_positive() && constitution.transport(ring) >= ceiling)
+        {
+            receipt.modulus_held = solve;
+            solve = kinetic_solve(field, constitution, declared, requests, &proposal, &samples, None, false)?;
+        }
+        let Some(solve) = solve else {
             receipt.refusal = Some(MoveRefusal::Invisible);
             return Ok(receipt);
         };
         let weighted = kinetic_contributions(&proposal, &solve);
+        let modulus = solve.modulus.clone();
         receipt.kinetic = Some(solve);
-        let samples = returns(field, constitution, declared, requests, &weighted)?;
+        let port = constitution
+            .source_port(ring)
+            .ok_or(HnnError::MissingSourcePort { ring })?
+            .clone();
+        let samples = returns_coupled(
+            field,
+            constitution,
+            declared,
+            requests,
+            &weighted,
+            modulus.as_ref().map(|x| (x, &port)),
+        )?;
         let Some((unit, _)) = constitution.stepped_source(ring, &samples, &Rat::one())? else {
             receipt.refusal = Some(MoveRefusal::Unreached);
             return Ok(receipt);
@@ -3867,9 +3988,9 @@ pub fn executed_move_guarded(
             .source_port(ring)
             .ok_or(HnnError::MissingSourcePort { ring })?
             .subtract(&constitution.source_port(ring).ok_or(HnnError::MissingSourcePort { ring })?.clone())?;
-        (samples, unit, unit_move)
+        (samples, unit, unit_move, modulus)
     } else {
-        (samples, unit, unit_move)
+        (samples, unit, unit_move, None)
     };
     let unit_largest = largest_entry(&unit_move);
     receipt.unit_largest = Some(unit_largest.clone());
@@ -3881,6 +4002,7 @@ pub fn executed_move_guarded(
     let (modulus_unit, witness_start) = match metric {
         MoveMetric::Coordinate => (modulus_unit, None),
         MoveMetric::Kinetic => (Rat::zero(), Some(Rat::one())),
+        MoveMetric::KineticModulus => (kinetic_modulus.unwrap_or_else(Rat::zero), Some(Rat::one())),
         MoveMetric::Witness => {
             let form = plane_form(field, constitution, declared, requests, &proposal, &unit)?;
             let step = form.as_ref().and_then(WitnessForm::step);
@@ -3893,11 +4015,11 @@ pub fn executed_move_guarded(
                 receipt.refusal = Some(MoveRefusal::Reversed([alpha, beta]));
                 return Ok(receipt);
             }
-            // The witness's exact step stays in its form (the receipt); the ladder carries it at
-            // the face grain, toward zero (October 1: carried exactly, `α` reached a 1229-digit
-            // denominator). Every trial is a carried successor read whole by every guard, so the
-            // grain moves which step is tried, never what certifies it; the residual is the form's
-            // exact step less the held one.
+            // The witness's exact step stays in its form (the receipt); the trials carry it at the
+            // face grain, toward zero (October 1: carried exactly, `α` reached a 1229-digit
+            // denominator). Every trial is a carried successor read whole under every condition of
+            // adoption, so the grain moves which step is tried, never what certifies it; the
+            // residual is the form's exact step less the held one.
             let held = |x: Rat| {
                 if x.is_negative() {
                     -significant(&-x, FACE_BITS, false)
@@ -3914,8 +4036,8 @@ pub fn executed_move_guarded(
         }
     };
     receipt.modulus_unit = Some(modulus_unit.clone());
-    // The second repaired guard (the pin §13.4): the slope is read on the joint unit direction, the
-    // modulus's storage move joined, before any refusal. The port's part alone is a receipt.
+    // The slope's refusal, repaired (the pin §13.4): the slope is read on the joint unit direction,
+    // the modulus's storage move joined, before any refusal. The port's part alone is a receipt.
     let port = first_order(field, constitution, declared, requests, &proposal, &unit, None)?;
     receipt.port_slope = Some(port.bound);
     let joint = first_order(
@@ -3941,7 +4063,7 @@ pub fn executed_move_guarded(
             } else {
                 Rat::one()
             };
-            let kinetic = metric == MoveMetric::Kinetic;
+            let kinetic = matches!(metric, MoveMetric::Kinetic | MoveMetric::KineticModulus);
             match (alpha <= scale, kinetic) {
                 (true, false) => (alpha, LadderStart::Witness),
                 (false, false) => (power_below(&scale), LadderStart::WitnessEntryScale),
@@ -3965,6 +4087,7 @@ pub fn executed_move_guarded(
         start,
         &unit_largest,
         Some(&modulus_unit),
+        &ceiling,
         &first,
         &reread,
         excursion,
@@ -4628,8 +4751,8 @@ pub enum KineticStop {
 ///   is the normal law's own direction, `−M⁻¹Aᵀc`, and the iterates are the receiver's coupling of
 ///   the readings, which the normal law omits.
 /// - **The grain.** Every vector and scalar of the recurrence is held at [`JOINT_BITS`]
-///   significant bits toward zero. The solve proposes the direction, and the move's guards certify
-///   every trial whole.
+///   significant bits toward zero. The solve proposes the direction, and every trial is certified
+///   whole before it is adopted.
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct KineticSolve {
     /// The reading coordinates: lock candidates and order pieces.
@@ -4646,6 +4769,41 @@ pub struct KineticSolve {
     pub moved: ExactRatMatrix,
     /// The Gauss–Newton model's change at `v`, `cᵀAv + ½(Av)ᵀF(Av)`.
     pub predicted: Rat,
+    /// `Δρ`, the modulus's part of `v` per unit step, where the modulus is joined
+    /// ([`ModulusCoupling`]); `None` where `ρ` is held.
+    pub modulus: Option<Rat>,
+    /// Where the modulus is joined, the two parts of its move at the solve's multipliers `μ`:
+    /// `(own, supplied)` with `Δρ = (own − supplied)/s`. `own = Σ_m w_m a_m` is the readings' ask
+    /// along `ρ` (its sign is the reach the readings want), and `supplied = ⟨bH′⁻¹, (Aᵀμ)_E⟩` is
+    /// the part of that ask `E`'s own move already carries through the coupling `b`.
+    pub modulus_drive: Option<(Rat, Rat)>,
+}
+
+/// [definition; agent-inferred, October 2; the
+/// [joined move's record](../../../../research/records/2026-10-02_THE_TRANSPORT_MODULUS_JOINS_THE_RECEIVERS_MINIMUM_ENERGY_MOVE.md)]
+/// **The transport modulus joined to the receiver's minimum-energy move** ([`KineticSolve`]): one
+/// coordinate more, `v = (ΔE, Δρ)`.
+/// - **Its column of `A`.** Each leading member's reading moves with `ρ` by `a_m = ⟨ĝ_m, ∂z_m/∂ρ⟩`
+///   (the storage's exact derivative, `BankPlacement::modulus_derivative`): the pairing the
+///   modulus's slope `γ_ρ` sums, without the normal law's weight.
+/// - **Its mass.** The kinetic energy of a move is the squared norm of the storage change it causes on
+///   the passage's data, read in `E`'s own frame as `E`'s mass is: a datum `k` of feature `f_k`
+///   placed at weight `w_k` moves by `w_k ΔE f_k + w_k s_k Δρ E f_k`, `s_k = (r_k − r̄)/ρ` its reach
+///   slope (`BankPlacement::reach_slopes`). Summed over the proposal's data, the mass is
+///   `[[I ⊗ H′, b], [bᵀ, g]]` with `b = E Σ_k w_k² s_k f_k f_kᵀ` and `g = Σ_k w_k² s_k² |E f_k|²`.
+///   The retained Gram `H` stays in `E`'s block only: it is the second moment of moments already
+///   formed at their own passages' transport, so no retained datum's storage moves with today's `ρ`.
+/// - **Its inverse.** One coordinate more is one Schur complement: with `y = (Y, y_ρ)`,
+///   `x_ρ = (y_ρ − ⟨bH′⁻¹, Y⟩)/s` and `X = YH′⁻¹ − x_ρ bH′⁻¹`, `s = g − ⟨b, bH′⁻¹⟩ > 0`. Where
+///   `s` is not positive the modulus moves no storage that `E` cannot, and it is not joined.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct ModulusCoupling {
+    /// `a_m`, one per leading member, in the proposal's order.
+    pub columns: Vec<Rat>,
+    /// `bH′⁻¹`, rows × columns of `E`, row-major.
+    pub coupling: Vec<Rat>,
+    /// `s = g − ⟨b, bH′⁻¹⟩`, the modulus's mass after `E`'s share.
+    pub schur: Rat,
 }
 
 /// One reading coordinate of the kinetic solve: its members and their coefficients.
@@ -4710,6 +4868,7 @@ fn kinetic_solve(
     proposal: &Proposal,
     samples: &[Sample],
     toward: Option<&ExactRatMatrix>,
+    join: bool,
 ) -> Result<Option<KineticSolve>, HnnError> {
     let ring = declared.ring();
     let terms = kinetic_readings(proposal);
@@ -4736,7 +4895,121 @@ fn kinetic_solve(
     let members: Vec<&Contribution> = proposal.terms.iter().flat_map(|t| &t.leading).collect();
     let gradients = reading_gradients(field, constitution, declared, requests, &members)?;
     let toward: Option<Vec<Rat>> = toward.map(|t| t.entries().to_vec());
-    kinetic_lift(&terms, &gradients, &chart.to_rows(), columns, toward.as_deref()).map(Some)
+    let chart = chart.to_rows();
+    let coupling = if join {
+        modulus_coupling(field, constitution, declared, requests, proposal, &chart)?
+    } else {
+        None
+    };
+    kinetic_lift(&terms, &gradients, &chart, columns, toward.as_deref(), coupling.as_ref()).map(Some)
+}
+
+/// **Every datum's reach moments over the contributions** ([`ModulusCoupling`], "Its mass"):
+/// `Σ_k w_k² s_k f_k f_kᵀ` and `Σ_k w_k² s_k² f_k f_kᵀ` over each contribution's data, read as
+/// [`returns`] reads them (each request phase with its counts `M[c]`, each placed station with its
+/// class `e_x`, at its transported weight from the contribution's station).
+#[allow(clippy::type_complexity)]
+fn reach_moments(
+    field: &Field,
+    constitution: &Constitution,
+    declared: &Refinement,
+    requests: &[Request],
+    contributions: &[Contribution],
+) -> Result<(Vec<Vec<Rat>>, Vec<Vec<Rat>>), HnnError> {
+    let ring = declared.ring();
+    let period = field.ring(ring).period() as usize;
+    let alphabet = field.alphabet();
+    let placements = placements_of(field, constitution, requests, declared)?;
+    let mut first = vec![vec![Rat::zero(); alphabet]; alphabet];
+    let mut second = vec![vec![Rat::zero(); alphabet]; alphabet];
+    for (index, (request, placement)) in requests.iter().zip(&placements).enumerate() {
+        let mine: Vec<&Contribution> = contributions.iter().filter(|c| c.request == index).collect();
+        if mine.is_empty() {
+            continue;
+        }
+        let counts: Vec<Vec<Rat>> = (0..period)
+            .filter_map(|c| {
+                let counts = request.moment.phase_counts(ring, c).ok()?;
+                counts.iter().any(|&n| n != 0).then(|| {
+                    counts.iter().map(|&n| Rat::from_integer(BigInt::from(n))).collect()
+                })
+            })
+            .collect();
+        for contribution in mine {
+            let (request_weights, station_weights) =
+                placement.weights(contribution.station, &contribution.cells);
+            let (request_slopes, station_slopes) =
+                placement.reach_slopes(contribution.station, &contribution.cells);
+            for ((f, w), slope) in counts.iter().zip(&request_weights).zip(&request_slopes) {
+                let once = w * w * slope;
+                let twice = &once * slope;
+                for (i, fi) in f.iter().enumerate().filter(|(_, x)| !x.is_zero()) {
+                    for (j, fj) in f.iter().enumerate().filter(|(_, x)| !x.is_zero()) {
+                        first[i][j] += &once * fi * fj;
+                        second[i][j] += &twice * fi * fj;
+                    }
+                }
+            }
+            for ((cell, w), slope) in
+                contribution.cells.iter().zip(&station_weights).zip(&station_slopes)
+            {
+                let (Some(class), Some(w), Some(slope)) = (cell, w, slope) else { continue };
+                let once = w * w * slope;
+                second[*class][*class] += &once * slope;
+                first[*class][*class] += once;
+            }
+        }
+    }
+    Ok((first, second))
+}
+
+/// **The modulus's column and mass** ([`ModulusCoupling`]) at the proposal, with `E`'s mass inverse
+/// `H′⁻¹` on a row (`chart`). `None` where the modulus moves no storage `E` cannot (`s ≤ 0`).
+fn modulus_coupling(
+    field: &Field,
+    constitution: &Constitution,
+    declared: &Refinement,
+    requests: &[Request],
+    proposal: &Proposal,
+    chart: &[Vec<Rat>],
+) -> Result<Option<ModulusCoupling>, HnnError> {
+    let ring = declared.ring();
+    let derivatives = section_derivatives(field, constitution, declared, requests, proposal)?;
+    let columns: Vec<Rat> = proposal
+        .terms
+        .iter()
+        .flat_map(|t| &t.leading)
+        .map(|m| {
+            joint_held(m.covector.iter().map(face).zip(&derivatives[m.section]).map(|(g, d)| g * d).sum())
+        })
+        .collect();
+    let (first, second) = reach_moments(field, constitution, declared, requests, &proposal.contributions)?;
+    let port = constitution
+        .source_port(ring)
+        .ok_or(HnnError::MissingSourcePort { ring })?
+        .to_rows();
+    let width = chart.len();
+    if first.len() != width || port.iter().any(|row| row.len() != width) {
+        return Ok(None);
+    }
+    let product = |row: &[Rat], matrix: &[Vec<Rat>]| -> Vec<Rat> {
+        (0..width)
+            .map(|j| row.iter().zip(matrix).map(|(x, m)| x * &m[j]).sum())
+            .collect()
+    };
+    let mut coupling = Vec::with_capacity(port.len() * width);
+    let mut energy = Rat::zero();
+    let mut shared = Rat::zero();
+    for row in &port {
+        let b = product(row, &first);
+        let b_chart = product(&b, chart);
+        let c_row = product(row, &second);
+        energy += row.iter().zip(&c_row).map(|(x, y)| x * y).sum::<Rat>();
+        shared += b.iter().zip(&b_chart).map(|(x, y)| x * y).sum::<Rat>();
+        coupling.extend(b_chart.into_iter().map(joint_held));
+    }
+    let schur = joint_held(energy - shared);
+    Ok(schur.is_positive().then_some(ModulusCoupling { columns, coupling, schur }))
 }
 
 /// The solve's recurrence ([`KineticSolve`], "The solve") on given readings: each term's
@@ -4748,20 +5021,33 @@ fn kinetic_lift(
     chart: &[Vec<Rat>],
     columns: usize,
     toward: Option<&[Rat]>,
+    modulus: Option<&ModulusCoupling>,
 ) -> Result<KineticSolve, HnnError> {
     use rayon::prelude::*;
     let rows: Vec<&ReadingRow> = terms.iter().flat_map(|(_, _, r)| r).collect();
     let height = gradients.first().map_or(0, Vec::len) / columns.max(1);
+    // `v` is `E`'s entries, then `Δρ` where the modulus is joined.
+    let size = height * columns;
     let dot = |a: &[Rat], b: &[Rat]| -> Rat { a.iter().zip(b).map(|(x, y)| x * y).sum() };
     // `A v`: each reading coordinate's change.
     let forward = |v: &[Rat]| -> Vec<Rat> {
-        let pairings: Vec<Rat> = gradients.par_iter().map(|g| dot(g, v)).collect();
+        let pairings: Vec<Rat> = gradients
+            .par_iter()
+            .enumerate()
+            .map(|(m, g)| {
+                let moved = dot(g, &v[..size]);
+                match modulus {
+                    Some(c) => moved + &c.columns[m] * &v[size],
+                    None => moved,
+                }
+            })
+            .collect();
         rows.iter()
             .map(|row| joint_held(row.iter().map(|(m, k)| k * &pairings[*m]).sum()))
             .collect()
     };
-    // `M⁻¹Aᵀu`: the members' weights, their gradients summed, each row of `E` through `H′⁻¹`.
-    let lift = |u: &[Rat]| -> Vec<Rat> {
+    // `Aᵀu`: the members' weights and their gradients summed.
+    let pull = |u: &[Rat]| -> (Vec<Rat>, Vec<Rat>) {
         let mut weights = vec![Rat::zero(); gradients.len()];
         for (row, value) in rows.iter().zip(u) {
             for (m, k) in row.iter() {
@@ -4779,12 +5065,31 @@ fn kinetic_lift(
                     .sum()
             })
             .collect();
-        (0..height * columns)
+        (weights, pulled)
+    };
+    // The modulus's two drives at `u` ([`KineticSolve::modulus_drive`]).
+    let drive = |c: &ModulusCoupling, weights: &[Rat], pulled: &[Rat]| -> (Rat, Rat) {
+        (weights.iter().zip(&c.columns).map(|(w, a)| w * a).sum(), dot(&c.coupling, pulled))
+    };
+    // `M⁻¹Aᵀu`: each row of `E` through `H′⁻¹`.
+    let lift = |u: &[Rat]| -> Vec<Rat> {
+        let (weights, pulled) = pull(u);
+        let mut lifted: Vec<Rat> = (0..height * columns)
             .map(|e| {
                 let (r, j) = (e / columns, e % columns);
                 joint_held((0..columns).map(|i| &pulled[r * columns + i] * &chart[i][j]).sum())
             })
-            .collect()
+            .collect();
+        // The modulus's row of `M⁻¹` by its Schur complement ([`ModulusCoupling`], "Its inverse").
+        if let Some(c) = modulus {
+            let (own, supplied) = drive(c, &weights, &pulled);
+            let x = joint_held((own - supplied) / &c.schur);
+            for (value, b) in lifted.iter_mut().zip(&c.coupling) {
+                *value = joint_held(&*value - &x * b);
+            }
+            lifted.push(x);
+        }
+        lifted
     };
     // The witness's form and covector on the reading coordinates, term by term.
     let fisher = |delta: &[Rat]| -> Vec<Rat> {
@@ -4807,12 +5112,13 @@ fn kinetic_lift(
     let m = rows.len();
     let cosine = |v: &[Rat]| -> Option<Rat> {
         let t = toward?;
+        let v = &v[..size];
         let (vt, vv, tt) = (dot(v, t), dot(v, v), dot(t, t));
         (vv.is_positive() && tt.is_positive()).then(|| joint_held(&vt * vt.abs() / (vv * tt)))
     };
     let mut s: Vec<Rat> = covector.iter().map(|c| -c).collect();
     let mut mu = vec![Rat::zero(); m];
-    let mut v = vec![Rat::zero(); height * columns];
+    let mut v = vec![Rat::zero(); size + usize::from(modulus.is_some())];
     let mut z = lift(&s);
     let mut az = forward(&z);
     let mut rz = dot(&s, &az);
@@ -4869,7 +5175,11 @@ fn kinetic_lift(
     };
     let av = forward(&v);
     let predicted = dot(&covector, &av) + dot(&av, &fisher(&av)) / Rat::from_integer(BigInt::from(2));
-    let moved = ExactRatMatrix::new(v.chunks(columns).map(<[Rat]>::to_vec).collect())?;
+    let moved = ExactRatMatrix::new(v[..size].chunks(columns).map(<[Rat]>::to_vec).collect())?;
+    let modulus_drive = modulus.map(|c| {
+        let (weights, pulled) = pull(&mu);
+        drive(c, &weights, &pulled)
+    });
     Ok(KineticSolve {
         readings: m,
         multipliers: mu,
@@ -4878,6 +5188,8 @@ fn kinetic_lift(
         stop,
         moved,
         predicted,
+        modulus: modulus.map(|_| v[size].clone()),
+        modulus_drive,
     })
 }
 
@@ -4959,7 +5271,7 @@ pub fn kinetic_reading(
         }
     }
     reading.solve =
-        kinetic_solve(field, constitution, declared, requests, &proposal, &samples, direction.as_ref())?;
+        kinetic_solve(field, constitution, declared, requests, &proposal, &samples, direction.as_ref(), false)?;
     reading.unit_move = Some(step.unit_move);
     Ok(reading)
 }
@@ -5045,8 +5357,8 @@ pub fn pairing_receipt(
 // -------------------------------------------------------------------------------------------
 // the owner's pure laws, exposed to its tests
 
-/// **The move's guards and certificate on synthetic readings** (the owner's guard tests): the
-/// proposal formed from a batch's terms and their candidates' covectors, its unresolved terms, and
+/// **The move's refusals and certificate on synthetic readings** (the owner's tests of them): the
+/// proposal formed from given terms and their candidates' covectors, its unresolved terms, and
 /// its first-order reading on given section moves (a function of the proposal's sections, read in
 /// its order).
 #[cfg(test)]
@@ -5099,12 +5411,12 @@ impl ProposalProbe {
         witness_form(&terms)
     }
 
-    /// The move's guard before any step ([`certificate_refusal`]).
+    /// The move's refusal before any step ([`certificate_refusal`]).
     pub(crate) fn refusal(&self) -> Option<MoveRefusal> {
         certificate_refusal(&self.proposal)
     }
 
-    /// The slope's guard on a first-order reading ([`slope_refusal`]).
+    /// The slope's refusal on a first-order reading ([`slope_refusal`]).
     pub(crate) fn slope_refusal(reading: &FirstOrderReading) -> Option<MoveRefusal> {
         slope_refusal(reading)
     }
@@ -5119,7 +5431,20 @@ pub(crate) fn kinetic_lift_probe(
     chart: &[Vec<Rat>],
     columns: usize,
 ) -> Result<KineticSolve, HnnError> {
-    kinetic_lift(terms, gradients, chart, columns, None)
+    kinetic_lift(terms, gradients, chart, columns, None, None)
+}
+
+/// The kinetic solve's recurrence with the modulus joined ([`ModulusCoupling`]; the owner's solve
+/// tests).
+#[cfg(test)]
+pub(crate) fn kinetic_lift_joined_probe(
+    terms: &[(Vec<Rat>, usize, Vec<Vec<(usize, Rat)>>)],
+    gradients: &[Vec<Rat>],
+    chart: &[Vec<Rat>],
+    columns: usize,
+    coupling: &ModulusCoupling,
+) -> Result<KineticSolve, HnnError> {
+    kinetic_lift(terms, gradients, chart, columns, None, Some(coupling))
 }
 
 /// **Each reading's gradient against its storage move** (the owner's gradient test): at a
@@ -5173,7 +5498,8 @@ pub(crate) fn reading_gradient_probe(
     Ok((pairs, weighted, pullback))
 }
 
-/// A batch comparison built from terms read at given sections (the owner's guard tests).
+/// The requests' comparison built from terms read at given sections (the owner's tests of its
+/// refusals).
 #[cfg(test)]
 pub(crate) fn synthetic_batch(
     comparison: Comparison,

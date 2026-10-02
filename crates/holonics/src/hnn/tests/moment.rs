@@ -1,8 +1,8 @@
 //! The source moment: the capacity by counting, the phase-binned counts against their clocked
 //! closed form, the encoder contract and its tape-free covector, the pair buffer, the carry-out, and
-//! the window tests of the encoding loop (the pin of September 29, acceptance 2): the moment of a
-//! long source equals the moment accumulated across every split, and nothing of the source is
-//! discarded by length.
+//! the encoding loop's tests of the pin of September 29, acceptance 2: the moment of a long source
+//! equals the moment accumulated across every split, and nothing of the source is discarded by
+//! length.
 
 use num_bigint::{BigInt, BigUint};
 use num_traits::{Signed, Zero};
@@ -117,11 +117,11 @@ fn per_cell_ingest_equals_the_clocked_closed_form() {
 }
 
 /// Lean `HNN/Moment.encoderMoment_contract` with `HNN/Encoding.whole_pair_read_offset_moment` (the
-/// normalized open, reading no window): for any rational
+/// normalized open, reading no held cell): for any rational
 /// encoder and pair port, the open storage from the counts equals the streamed sum
 /// `Σ_k P^(τ_cut − τ_k)(ν̂(n) E x_k + [k ≥ 1] ν̂(n − 1) E^(1)(x_k, x_(k−1)))`: the marginal over its
 /// population `n`, and the pair port read on every pair of the passage over the pair population
-/// `n − 1` (the open reads no window).
+/// `n − 1` (the open reads no held cell).
 #[test]
 fn the_moment_contracts_to_the_streamed_encoder_sum() {
     let field = small_field(&[3, 2], vec![contact(0, 1, 1, 0)], 1);
@@ -211,7 +211,7 @@ fn the_encoder_covector_is_the_exact_directional_derivative() {
     assert_eq!(moved - base, pairing);
 }
 
-/// The pair buffer is a shift register of raw cells, overwritten once their pairs are counted; its
+/// The pair buffer is a delay line of raw cells, each overwritten once its pairs are counted; its
 /// bits are counted in the moment's dense code, which is sized once.
 #[test]
 fn the_pair_buffer_overwrites_and_its_bits_are_counted() {
@@ -222,7 +222,7 @@ fn the_pair_buffer_overwrites_and_its_bits_are_counted() {
     let empty = moment.dense_bits();
     moment.ingest(field, &mut current, &[3, 1, 2]).unwrap();
     assert_eq!(moment.window(), vec![Some(2)]);
-    // Slots are fixed: only their widths change. The window's 3 bits are in the empty code too
+    // Slots are fixed: only their widths change. The held cell's 3 bits are in the empty code too
     // (`d = 2`, `|A| = 4`).
     assert!(moment.dense_bits() >= empty);
     assert_eq!(empty, 2 * (2 * 4 + 2 * 4 * 4) + 3);
@@ -244,7 +244,7 @@ fn ingest_stops_at_the_carry_out() {
     assert_eq!(rest.cells, 2);
 }
 
-/// **The population chart and the normalized open that reads no window** (Lean
+/// **The population chart and the normalized open that reads no held cell** (Lean
 /// `HNN/IndexedOpen.{normalized_phase_counts_mass, normalized_zero_population}`,
 /// `HNN/Encoding.whole_pair_read_counts`): `ν̂(n)` is the nearest point of `2^(−L_ν)ℤ` to `1/n`
 /// (`|ν̂ − 1/n| ≤ 2^(−L_ν−1)`), zero at `n = 0`; `L_ν = ⌈log₂(2 L_R n*)⌉` (18 on campaign 1:

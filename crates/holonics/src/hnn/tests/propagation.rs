@@ -10,10 +10,12 @@ use super::support::{
 };
 use crate::hnn::HnnError;
 use crate::hnn::chart::{ChartKey, WordLattice};
+use crate::hnn::constitution::Lattice;
 use crate::hnn::field::{Current, Field, FieldDeclaration};
 use crate::hnn::propagation::{
-    ContactOperands, ExponentReading, Operands, RingOperands, contact_exponent, element_step,
-    junction_scattering, path_attenuation, transit,
+    ContactOperands, ExponentReading, Operands, RingOperands, conductance_covector,
+    contact_exponent, element_step, junction_scattering, junction_weights, participation,
+    path_attenuation, transit,
 };
 use crate::hnn::word::Word;
 use crate::ratio::linear::ExactRatMatrix;
@@ -500,6 +502,78 @@ fn the_element_balance_on_its_chart_closes_with_its_certified_chart_term() {
         let e = scale(&-Rat::one(), &residual.apply(&operand).unwrap());
         assert_eq!(dot(&step.midpoint, &e), step.defect);
     }
+}
+
+/// Lean `HNN/Word.{executed_conductance_return, executed_potential_deviation}` at their consumer,
+/// [`conductance_covector`]: two node potentials, before and after a finite change of the
+/// conductances, are each executed from weights rounded onto `2^(−4)ℤ` and split onto `2^(−6)ℤ`.
+/// The executed potential's pairing with the return's covector `ā` moves by exactly the
+/// conductances' covectors read at the executed potential, the change of the deviation
+/// `e = v̂ − v*` and the second-order term, and that remainder is not zero: the covector is not the
+/// executed potential's difference. The remainder lies within `‖ā‖₁(‖e′‖∞ + ‖e‖∞ + |ΣΔG/S|
+/// ‖v̂ − v*′‖∞)` (Hölder's pairing of the same identity), and each deviation within the split and
+/// the weights' certificate `‖ŵ − w‖₁` against the largest wave.
+#[test]
+fn the_conductance_covector_at_the_executed_potential_misses_by_the_deviations() {
+    let mut draw = Draw::new(7);
+    let admittance = rat(3, 2);
+    let before = [rat(1, 4), integer(2), rat(5, 3)];
+    let after = [rat(2, 7), rat(15, 8), rat(5, 3)];
+    let (weights, transients) = (Lattice::new(4), Lattice::new(6));
+    let storage = draw.vector(6);
+    let waves: Vec<Vec<Rat>> = (0..3).map(|_| draw.vector(6)).collect();
+    let arrivals: Vec<&[Rat]> = waves.iter().map(Vec::as_slice).collect();
+    let covector = draw.vector(6);
+    let sup = |x: &[Rat]| x.iter().map(Rat::abs).max().unwrap();
+    let l1 = |x: &[Rat]| x.iter().map(Rat::abs).sum::<Rat>();
+    // (v̂, the rounded mean x̂, v*, ‖ŵ − w‖₁) at the declared conductances.
+    let potentials = |conductances: &[Rat]| {
+        let conductances: Vec<&Rat> = conductances.iter().collect();
+        let (executed, exact, certificate) =
+            junction_weights(&admittance, &conductances, Some(&weights)).unwrap();
+        let image = participation(&executed, &storage, &arrivals).unwrap();
+        let split: Vec<Rat> = image
+            .iter()
+            .map(|x| Rat::from_integer(transients.div_rem(x).0) * transients.unit())
+            .collect();
+        let exact = participation(&exact, &storage, &arrivals).unwrap();
+        (split, image, exact, certificate)
+    };
+    let (executed, image, exact, certificate) = potentials(&before);
+    let (executed_after, image_after, exact_after, certificate_after) = potentials(&after);
+    let total = before.iter().fold(admittance.clone(), |sum, g| sum + g);
+    let change: Vec<Rat> = after.iter().zip(&before).map(|(a, b)| a - b).collect();
+    let predicted: Rat = change
+        .iter()
+        .zip(&waves)
+        .map(|(dg, wave)| dg * &conductance_covector(&covector, wave, &executed, &total))
+        .sum();
+    let swept = change.iter().sum::<Rat>() / &total;
+    let (deviation, deviation_after) = (sub(&executed, &exact), sub(&executed_after, &exact_after));
+    let remainder = dot(&covector, &sub(&deviation_after, &deviation))
+        + &swept * &dot(&covector, &sub(&executed, &exact_after));
+    assert_eq!(
+        dot(&covector, &sub(&executed_after, &executed)),
+        &predicted + &remainder
+    );
+    assert!(!remainder.is_zero());
+    assert!(
+        remainder.abs()
+            <= l1(&covector)
+                * (sup(&deviation_after)
+                    + sup(&deviation)
+                    + swept.abs() * sup(&sub(&executed, &exact_after)))
+    );
+    let largest = std::iter::once(storage.as_slice())
+        .chain(arrivals.iter().copied())
+        .map(sup)
+        .max()
+        .unwrap();
+    assert!(sup(&deviation) <= sup(&sub(&executed, &image)) + &certificate * &largest);
+    assert!(
+        sup(&deviation_after)
+            <= sup(&sub(&executed_after, &image_after)) + &certificate_after * &largest
+    );
 }
 
 /// Every solve the executed word reads at a cut is a lattice chart whose certificate, read again

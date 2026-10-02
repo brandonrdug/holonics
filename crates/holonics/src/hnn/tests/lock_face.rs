@@ -1,11 +1,12 @@
 //! Step 1b's gate A (the
 //! [pin](../../../../../research/records/2026-09-30_STEP_1B_THE_CANDIDATE_COMPARISON_PINNED_BEFORE_ITS_RUNS.md)
-//! §13; `hnn::executed`): the lock face and its normalization against its resting sheet; the zero and
-//! unsupported targets and the declared input's validation; the ladder's start and its boundary
-//! cases; the two repaired guards on every composition; active-face ties; the readings' sites (the
-//! decisions along the key-consistent prefix on a release, a hold and a refused certificate); the
-//! fixed incumbent mask; the guards on every arm; and the complete continuing state restored and
-//! continued over successive receptions. One test per stated law and per boundary case.
+//! §13; `hnn::executed`): the lock face and its normalization against its resting sheet; the zero
+//! and unsupported targets and the declared input's validation; the first trial step and its
+//! boundary cases; the two repaired refusals on every composition; active-face ties; the readings'
+//! sites (the decisions along the key-consistent prefix on a release, a hold and a refused
+//! certificate); the fixed incumbent mask; the conditions of adoption on every arm; and the
+//! complete continuing state restored and continued over successive receptions. One test per stated
+//! law and per boundary case.
 
 use num_traits::{One, Signed, Zero};
 
@@ -225,9 +226,9 @@ fn a_zero_or_unsupported_target_is_refused_typed() {
 }
 
 // -------------------------------------------------------------------------------------------
-// the ladder's start
+// the first trial step
 
-/// **The ladder starts from the excess's first-order zero, and a zero excess or a nonnegative
+/// **The first trial step is the excess's first-order zero, and a zero excess or a nonnegative
 /// slope never enters a division** (the pin §2.6, §13.5): `η₀ = 2^⌊log₂ min(X⁻/(−s_X⁺), ½/u)⌋`, the
 /// entry scale alone when `X⁻ = 0` (with a station at exactly `ℓ = ln 2` still unsolved) or when
 /// `s_X⁺ ≥ 0` (`X > 0` with a nonnegative derivative), and `1` in place of `½/u` at `u = 0`.
@@ -256,7 +257,7 @@ fn the_ladder_starts_from_the_excess_and_never_divides_by_zero() {
 }
 
 // -------------------------------------------------------------------------------------------
-// the repaired guards
+// the repaired refusals
 
 /// **An unresolved active member refuses the move on every composition** (the pin §13.4): the lock
 /// face reads every candidate's active members, so an unresolved member of the target or of any
@@ -296,11 +297,11 @@ fn an_unresolved_active_member_refuses_every_composition() {
     }
 }
 
-/// **The slope is read on the joint direction** (the pin §13.4): on a lock-face term above its level
-/// (every reading 1, `θ = 1/4` each), a port move that raises only the rivals' storages reads a
-/// first-order bound `1/2 ≥ 0` and would refuse alone; joined by the modulus's storage move, which
-/// raises the target's, the joint bound is `−1 < 0` and the move proceeds, its ladder started at the
-/// excess's first-order zero from the joint derivative.
+/// **The slope is read on the joint direction** (the pin §13.4): on a lock-face term above its
+/// level (every reading 1, `θ = 1/4` each), a port move that raises only the rivals' storages reads
+/// a first-order bound `1/2 ≥ 0` and would refuse alone; joined by the modulus's storage move,
+/// which raises the target's, the joint bound is `−1 < 0` and the move proceeds, its first trial
+/// step at the excess's first-order zero from the joint derivative.
 #[test]
 fn the_slope_is_read_on_the_joint_direction() {
     let candidates = (0..3).map(|_| candidate(at(Rat::one()), vec![resolved(0, 1, 0)])).collect();
@@ -559,15 +560,16 @@ fn a_hold_keeps_every_station_obligation() {
     }
 }
 
-/// **The guards hold symmetrically on every arm** (the pin §13.4): on the joint field's two requests,
-/// every arm's move either refuses by type (an unresolved member with its count and no trial, a
-/// joint slope not negative, every trial refused by a named guard) or adopts a successor whose
-/// fixed-mask composition is strictly lower by disjoint enclosures (its re-read at the successor on
-/// the incumbent's sections), whose first order is certified negative on the carried move, whose own
-/// release certifies every lock, and whose entries stay within the bound; the ladder starts at its
-/// stated start; the port's slope alone is only a receipt (equal to the joint's where the modulus
-/// does not move); every station obligation is covered; the persistence reads are consistent. The
-/// candidate arm (the lock face at the decisions) is adopted on this instance.
+/// **The conditions of adoption hold the same on every arm** (the pin §13.4): on the joint field's
+/// two requests, every arm's move either refuses by type (an unresolved member with its count and
+/// no trial, a joint slope not negative, every trial refused by a named condition) or adopts a
+/// successor whose fixed-mask composition is strictly lower by disjoint enclosures (its re-read at
+/// the successor on the incumbent's sections), whose first order is certified negative on the
+/// carried move, whose own release certifies every lock, and whose entries stay within the bound;
+/// the first trial step is the stated one; the port's slope alone is only a receipt (equal to the
+/// joint's where the modulus does not move); every station obligation is covered; the persistence
+/// reads are consistent. The candidate arm (the lock face at the decisions) is adopted on this
+/// instance.
 #[test]
 fn the_guards_hold_symmetrically_on_every_arm() {
     let field = joint();
@@ -614,8 +616,8 @@ fn the_guards_hold_symmetrically_on_every_arm() {
                     .iter()
                     .all(|r| r.generation.as_ref().unwrap().uncertified.is_none()));
                 // The executed release's composition falls strictly too (the native direction
-                // record's guard), and every earlier trial refused on the mask or the own release
-                // carried its kind.
+                // record's condition), and every earlier trial refused on the mask or the own
+                // release carried its kind.
                 assert!(own.value.upper < moved.before.value.lower);
                 for trial in &moved.trials[..moved.trials.len() - 1] {
                     if let Some(crate::hnn::executed::TrialRefusal::OwnNotBelow(v)) = &trial.refusal {
@@ -944,11 +946,12 @@ fn dropping_the_cross_term_changes_the_step_only_where_the_witness_couples_the_p
 }
 
 /// **The machine's plane reading agrees with its move, and the witness's metric moves under the
-/// same guards** (the witness's metric record): on the candidate arm at a generic constitution, the
-/// plane reading forms the move's own unit step (the same `γ_ρ`, `G_ρ` and `−γ_ρ/G_ρ`) over the
-/// same terms, and its form is positive semidefinite. The move under the witness's metric carries
-/// the witness's form, starts its ladder at the witness's `α` (or the entry scale), moves `ρ` by
-/// `β/α` per unit of `E`'s step, and adopts only under every guard the coordinate move keeps.
+/// same conditions of adoption** (the witness's metric record): on the candidate arm at a generic
+/// constitution, the plane reading forms the move's own unit step (the same `γ_ρ`, `G_ρ` and
+/// `−γ_ρ/G_ρ`) over the same terms, and its form is positive semidefinite. The move under the
+/// witness's metric carries the witness's form, takes the witness's `α` (or the entry scale) as its
+/// first trial step, moves `ρ` by `β/α` per unit of `E`'s step, and adopts only under every
+/// condition the coordinate move keeps.
 #[test]
 fn the_machines_plane_reading_agrees_with_its_move() {
     use crate::hnn::executed::{LadderStart, MoveMetric, executed_move_in};
@@ -988,7 +991,7 @@ fn the_machines_plane_reading_agrees_with_its_move() {
         (Some([a, _]), Some(MoveRefusal::Reversed(_))) => assert!(!a.is_positive()),
         (Some([a, b]), _) => {
             assert!(a.is_positive());
-            // The ladder carries the witness's exact step at the face grain, toward zero.
+            // The trials carry the witness's exact step at the face grain, toward zero.
             let grain = Rat::new(1.into(), num_bigint::BigInt::from(1) << 63usize);
             let near = |held: &Rat, exact: &Rat| {
                 held.abs() <= exact.abs() && (exact - held).abs() <= exact.abs() * &grain
@@ -998,7 +1001,7 @@ fn the_machines_plane_reading_agrees_with_its_move() {
             match kind {
                 LadderStart::Witness => assert!(near(&start, &a)),
                 LadderStart::WitnessEntryScale => assert!(start < a),
-                other => panic!("the witness's ladder starts at its own step: {other:?}"),
+                other => panic!("the witness's first trial step is its own step: {other:?}"),
             }
             if let Some((successor, _)) = &witnessed.adopted {
                 let last = witnessed.trials.last().unwrap();
@@ -1305,11 +1308,11 @@ fn the_solve_lifts_the_witnesss_newton_change_at_least_energy() {
     }
 }
 
-/// **The kinetic move deposits the solve through the normal law and keeps every guard**: on the
-/// machine's opening, the move under the kinetic metric carries its solve, holds `ρ`, starts at the
-/// Gauss–Newton step or the entry scale, its unit move's largest entry is the solve's within
-/// `2^(−16)` of it (the chart's and the recurrence's grains),
-/// and an adopted trial lowers the comparison.
+/// **The kinetic move deposits the solve through the normal law and keeps every condition of
+/// adoption**: on the machine's opening, the move under the kinetic metric carries its solve, holds
+/// `ρ`, starts at the Gauss–Newton step or the entry scale, its unit move's largest entry is the
+/// solve's within `2^(−16)` of it (the chart's and the recurrence's grains), and an adopted trial
+/// lowers the comparison.
 #[test]
 fn the_kinetic_move_deposits_the_solve_and_keeps_every_guard() {
     use crate::hnn::executed::{MoveMetric, executed_move_in};
@@ -1344,4 +1347,176 @@ fn the_kinetic_move_deposits_the_solve_and_keeps_every_guard() {
         assert!(last.value.as_ref().unwrap().upper < moved.before.value.lower);
         assert_eq!(successor.transport(0), theta.transport(0));
     }
+}
+
+/// **The joined solve spends the readings' change at least storage energy across `E` and `ρ`**
+/// ([`ModulusCoupling`]): one candidate at `θ = ½` wants its log-reading raised by `2`.
+/// - Where no entry of `E` moves the reading and `ρ` moves it by `2` a unit, `Δρ = 1` and `E` stays.
+/// - Where one entry of mass `1` and `ρ` of mass `3` each move it by `1`, the change splits in
+///   inverse proportion to the masses: `(ΔE, Δρ) = (3/2, 1/2)`.
+/// - Where `ρ` moves no reading but its storage change couples to `E`'s (`M = [[1, ½], [½, 1]]`),
+///   the least-energy move turns `ρ` against `E`'s storage change: `(ΔE, Δρ) = (2, −1)`.
+#[test]
+fn the_joined_solve_splits_the_readings_change_at_least_storage_energy() {
+    use crate::hnn::executed::{KineticStop, ModulusCoupling, kinetic_lift_joined_probe};
+    let grain = Rat::new(1.into(), num_bigint::BigInt::from(1) << 120usize);
+    let close = |x: &Rat, y: Rat| (x - &y).abs() <= grain;
+    let term = vec![(vec![rat(1, 2)], 0, vec![vec![(0, Rat::one())]])];
+    let alone = kinetic_lift_joined_probe(
+        &term,
+        &[vec![Rat::zero(), Rat::zero()]],
+        &[vec![Rat::one(), Rat::zero()], vec![Rat::zero(), Rat::one()]],
+        2,
+        &ModulusCoupling {
+            columns: vec![integer(2)],
+            coupling: vec![Rat::zero(), Rat::zero()],
+            schur: integer(4),
+        },
+    )
+    .unwrap();
+    assert_eq!(alone.stop, KineticStop::Converged);
+    assert!(close(alone.modulus.as_ref().unwrap(), Rat::one()));
+    assert!(alone.moved.entries().iter().all(Zero::is_zero));
+    assert!(close(&alone.predicted, rat(-1, 2)));
+    let split = kinetic_lift_joined_probe(
+        &term,
+        &[vec![Rat::one()]],
+        &[vec![Rat::one()]],
+        1,
+        &ModulusCoupling { columns: vec![Rat::one()], coupling: vec![Rat::zero()], schur: integer(3) },
+    )
+    .unwrap();
+    assert!(close(&split.moved.entries()[0], rat(3, 2)));
+    assert!(close(split.modulus.as_ref().unwrap(), rat(1, 2)));
+    // The readings' own ask along `ρ` carries it all: `Δρ = (3/2 − 0)/3`.
+    let (own, supplied) = split.modulus_drive.clone().unwrap();
+    assert!(close(&own, rat(3, 2)) && supplied.is_zero());
+    let coupled = kinetic_lift_joined_probe(
+        &term,
+        &[vec![Rat::one()]],
+        &[vec![Rat::one()]],
+        1,
+        &ModulusCoupling {
+            columns: vec![Rat::zero()],
+            coupling: vec![rat(1, 2)],
+            schur: rat(3, 4),
+        },
+    )
+    .unwrap();
+    assert!(close(&coupled.moved.entries()[0], integer(2)));
+    assert!(close(coupled.modulus.as_ref().unwrap(), integer(-1)));
+    // No reading asks along `ρ`; `E`'s move supplies `3/4` through the coupling, and `ρ` turns
+    // against it: `Δρ = (0 − 3/4)/(3/4)`.
+    let (own, supplied) = coupled.modulus_drive.clone().unwrap();
+    assert!(own.is_zero() && close(&supplied, rat(3, 4)));
+}
+
+/// **The joined move carries `ρ` with `E` and keeps every condition of adoption**: on the machine's
+/// opening at `ρ = 3/4`, the move under `KineticModulus` joins the modulus, carries its solve's
+/// `Δρ` (negative here: the comparison asks for a shorter reach) as its modulus unit, starts at the
+/// Gauss–Newton step or the entry scale, never carries `ρ` past `max(ρ₀, 3/4)`, and an adopted
+/// trial lowers the comparison with `ρ` below `3/4`.
+#[test]
+fn the_joined_move_carries_the_modulus_and_keeps_every_guard() {
+    use crate::hnn::executed::{MoveMetric, executed_move_in};
+    let field = joint();
+    let theta = generic(&field, 94).with_transport(0, rat(3, 4)).unwrap();
+    let refinement = Refinement::declare(&field, 0, 2, 1, 4, 2).unwrap();
+    let bank = joint_bank();
+    let requests =
+        short_requests(&field, &[(95, [0, 1, 2, 1]), (96, [1, 1, 0, 2]), (97, [2, 0, 1, 1])]);
+    let moved = executed_move_in(
+        &field,
+        &theta,
+        &requests,
+        &refinement,
+        &bank,
+        12,
+        Comparison::LOCK_DECISIONS,
+        MoveMetric::KineticModulus,
+    )
+    .unwrap();
+    assert_eq!(moved.metric, MoveMetric::KineticModulus);
+    let solve = moved.kinetic.as_ref().expect("the solve");
+    assert!(solve.predicted.is_negative());
+    let ceiling = theta.founding_transport(&field, 0).unwrap().max(rat(3, 4));
+    // On this opening the modulus joins and the comparison asks for a shorter reach.
+    let delta = solve.modulus.as_ref().expect("the modulus joins");
+    assert!(delta.is_negative());
+    assert_eq!(moved.modulus_unit.as_ref(), Some(delta));
+    let (_, kind) = moved.start.clone().unwrap();
+    assert!(matches!(kind, LadderStart::Kinetic | LadderStart::KineticEntryScale));
+    for trial in &moved.trials {
+        if let Some(modulus) = &trial.modulus {
+            assert!(modulus <= &ceiling);
+        }
+    }
+    if let Some((successor, _)) = &moved.adopted {
+        let last = moved.trials.last().unwrap();
+        assert!(last.value.as_ref().unwrap().upper < moved.before.value.lower);
+        assert!(successor.transport(0) <= ceiling);
+        assert!(successor.transport(0) < rat(3, 4), "the adopted move shortens the reach");
+    }
+}
+
+/// The joined move from `generic(seed)` at its founded `ρ₀` on the fixture's three requests.
+fn joined_at_the_founding(seed: u64) -> (Rat, crate::hnn::executed::ExecutedMove) {
+    use crate::hnn::executed::{MoveMetric, executed_move_in};
+    let field = joint();
+    let base = generic(&field, seed);
+    let founding = base.founding_transport(&field, 0).unwrap();
+    let theta = base.with_transport(0, founding.clone()).unwrap();
+    let refinement = Refinement::declare(&field, 0, 2, 1, 4, 2).unwrap();
+    let requests =
+        short_requests(&field, &[(95, [0, 1, 2, 1]), (96, [1, 1, 0, 2]), (97, [2, 0, 1, 1])]);
+    let moved = executed_move_in(
+        &field,
+        &theta,
+        &requests,
+        &refinement,
+        &joint_bank(),
+        12,
+        Comparison::LOCK_DECISIONS,
+        MoveMetric::KineticModulus,
+    )
+    .unwrap();
+    (founding, moved)
+}
+
+/// **At the bound an upward ask is held, and the move is `E`'s alone** (the sign the main line's
+/// `w16` walk reads): from `generic(92)` at its founded `ρ₀` the comparison's slope asks for a longer
+/// memory (`γ_ρ < 0`), the joined solve asks `Δρ > 0` with the readings' ask exceeding what `E`
+/// supplies, the bound holds it (the refused solve on the receipt), and the adopted successor keeps
+/// `ρ₀`.
+#[test]
+fn the_bound_holds_an_upward_ask_and_the_move_is_e_alone() {
+    let (founding, moved) = joined_at_the_founding(92);
+    assert!(moved.modulus_slope.as_ref().unwrap().is_negative());
+    let solve = moved.kinetic.as_ref().expect("the solve over E");
+    assert!(solve.modulus.is_none() && solve.modulus_drive.is_none());
+    let held = moved.modulus_held.as_ref().expect("the held ask");
+    assert!(held.modulus.as_ref().unwrap().is_positive());
+    let (own, supplied) = held.modulus_drive.clone().unwrap();
+    assert!(own > supplied);
+    assert_eq!(moved.modulus_unit.as_ref(), Some(&Rat::zero()));
+    for trial in &moved.trials {
+        assert!(trial.modulus.as_ref().is_none_or(|m| m == &founding));
+    }
+    let (successor, _) = moved.adopted.as_ref().expect("an adopted move");
+    assert_eq!(successor.transport(0), founding);
+}
+
+/// **The joined direction is not the slope's sign** (`KineticSolve::modulus_drive`): from
+/// `generic(99)` at its founded `ρ₀` the slope asks for a longer memory (`γ_ρ < 0`) and so do the
+/// readings at the solve (`own > 0`), but `E`'s move already supplies more of that change through the
+/// coupling (`supplied > own`), so the joined move shortens the memory (`Δρ < 0`).
+#[test]
+fn e_can_supply_more_than_the_readings_ask_and_turn_the_modulus() {
+    let (_, moved) = joined_at_the_founding(99);
+    assert!(moved.modulus_slope.as_ref().unwrap().is_negative());
+    assert!(moved.modulus_held.is_none());
+    let solve = moved.kinetic.as_ref().unwrap();
+    assert!(solve.modulus.as_ref().unwrap().is_negative());
+    let (own, supplied) = solve.modulus_drive.clone().unwrap();
+    assert!(own.is_positive() && supplied > own);
 }

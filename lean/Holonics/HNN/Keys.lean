@@ -38,7 +38,7 @@ consistent keys are the fibre of the loop-closure map (`Compression/Core/Keys`).
 6. **Gauge fixing.** Each rotor-gauge orbit has exactly one member with `S p₀ = 0`
    (`gauge_fix_unique`).
 7. **Re-keying keeps the winding.** Publishing a key at an aeon boundary sets the ring's phase
-   class and keeps its winding, and leaves the open moment's counts, offset counts and window
+   class and keeps its winding, and leaves the open moment's counts, offset counts and held cells
    untouched (`rekey_keeps_winding`).
 
 [open] That the survivors of `propagate` equal the fibre of the component's fundamental-cycle menu
@@ -621,8 +621,8 @@ def rekey (g key : ℕ) (s : D.StreamState) : D.StreamState :=
 
 /-- [proved-derived; formal-checked] **Re-keying moves only the phase class.** With
 `key < d_g`: the ring's winding `⌊λ_g / d_g⌋` is kept and its phase class becomes the key; every
-other ring's clock is unchanged; the open moment's counts, offset counts and window are untouched
-(publication re-configures and never rewrites the past). -/
+other ring's clock is unchanged; the open moment's counts, offset counts and held cells are
+untouched (publication re-configures and never rewrites the past). -/
 theorem rekey_keeps_winding (g key : ℕ) (hkey : key < D.period g) (s : D.StreamState) :
     (rekey g key s).lift g / D.period g = s.lift g / D.period g ∧
       (rekey g key s).lift g % D.period g = key ∧

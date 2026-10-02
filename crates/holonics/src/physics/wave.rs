@@ -63,6 +63,8 @@ use crate::holon::HolonError;
 use crate::ratio::{Rat, integer};
 
 mod chain;
+#[cfg(test)]
+mod continuation;
 mod interference;
 #[cfg(test)]
 mod tests;

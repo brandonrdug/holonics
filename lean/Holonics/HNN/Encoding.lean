@@ -5,7 +5,7 @@ import Mathlib.LinearAlgebra.Basis.VectorSpace
 
 /-!
 # HNN.Encoding: Holonic Encoding's squares, its reduced recurrence, its separator, and the open
-that reads no window
+that reads no held cell
 
 [definition] THE_REBUILD U6, the `hnn::encoding` loop (its pin,
 `research/records/2026-09-29_HOLONIC_ENCODING_FOR_THE_FIELD_PINNED_BEFORE_ITS_RUN.md`; the
@@ -30,8 +30,8 @@ linear form of `Holon/Restriction.descent_total`: a reading factors through the 
 no merged direction separates it (`separator_refutes_factoring`), and the fifth is the linear form of
 `Foundation/JointReceiverDescent.joint_generator_descends_iff`.
 
-[proved-derived; formal-checked] **The open reads no window** (Rust `hnn::moment`). The pair port is
-read over the whole offset moment, normalized by its pair population
+[proved-derived; formal-checked] **The open reads no held cell** (Rust `hnn::moment`). The pair
+port is read over the whole offset moment, normalized by its pair population
 (`HNN/IndexedOpen.{pairPopulation, pairNormalized}`), never at an address a buffer supplies:
 the whole read is the count read over the pair population (`whole_pair_read_counts`), the offset
 moment of the passage on a closing ring over it (`whole_pair_read_offset_moment`, composing
@@ -168,7 +168,7 @@ theorem moment_reduced_recurrence {S Letter : Type*} [AddCommGroup S] [Module K 
 
 end Recurrence
 
-/-! ## 3. The open reads no window -/
+/-! ## 3. The open reads no held cell -/
 
 section Whole
 
