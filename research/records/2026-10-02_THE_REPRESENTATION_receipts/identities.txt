@@ -1,0 +1,4 @@
+84906e7532001914af5a41b7cbcde65b4a2bc06d
+c4e4671d6d0cb2c8f795fb7909c567bf9d997e26f7b1518185844df386ce1c1f
+args executed agreement order2 2026093061 8 lock-dec E0@0=opening@1645392/2097152 E0@1=opening@1509190/2097152 E0@2=opening@1372988/2097152 E0@3=opening@1236786/2097152 E0@4=opening@1100584/2097152 Er@0=research/records/2026-09-30_THE_MODULUS_FOUNDED_OFF_ONE_receipts/refit_on_lattice.txt@1645392/2097152 Er@1=research/records/2026-09-30_THE_MODULUS_FOUNDED_OFF_ONE_receipts/refit_on_lattice.txt@1509190/2097152 Er@2=research/records/2026-09-30_THE_MODULUS_FOUNDED_OFF_ONE_receipts/refit_on_lattice.txt@1372988/2097152 Er@3=research/records/2026-09-30_THE_MODULUS_FOUNDED_OFF_ONE_receipts/refit_on_lattice.txt@1236786/2097152 Er@4=research/records/2026-09-30_THE_MODULUS_FOUNDED_OFF_ONE_receipts/refit_on_lattice.txt@1100584/2097152
+wall 297161 ms; exit 0; early stop 0

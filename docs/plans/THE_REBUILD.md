@@ -727,6 +727,9 @@ that fires becomes the next loop's subject, and nothing downstream starts.
     - *The forced move from the opening, October 1* ([F3](../../research/records/2026-10-01_THE_FORCED_MOVE_FROM_THE_OPENING_MEASURED_F3.md)). Eight adopted
       moves; the forced comparison falls, 3 of 288 terms solved at most, stations right 16 at most.
       The comparison is no longer the limit; the representation is.
+    - *The representation, October 2* ([record](../../research/records/2026-10-02_THE_REPRESENTATION_THE_REFITS_E_MAKES_RHO_A_MONOTONE_PATH_TO_THE_DECISIONS.md)). The refit's `E` turns
+      `ρ` into a monotone path to the decisions; the opening's `E` does not. Next: the receiver's
+      minimum-energy move over all of `E`, from the opening.
   - *1b's subject, as 1a named it*: a comparison whose descent must move decisions, one
     that holds a margin on right decisions, is not minimized on ties, and is read where a reading
     carries information about the key. The governing law "loss is the log of a ratio" is the
