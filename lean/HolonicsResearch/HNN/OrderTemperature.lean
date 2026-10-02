@@ -1,37 +1,36 @@
 import Mathlib
 
 /-!
-# The commitment is read on the turn clock: a crossing read at its grain enters the first order
+# The commitment is read on the turn clock: its order is resolved to one turn
 
 [proved-derived; formal-checked] for the theorems; [definition; derived in the record] for
 `aheadShare`, `copresentShare` and `commitResidual` (the record
-`research/records/2026-10-02_THE_COMMITMENT_IS_READ_ON_THE_TURN_CLOCK_ITS_ORDER_HAS_A_TEMPERATURE_OF_ONE_TURN_AND_A_CROSSING_ENTERS_THE_FIRST_ORDER.md`).
+`research/records/2026-10-02_THE_COMMITMENT_IS_READ_ON_THE_TURN_CLOCK_ITS_ORDER_IS_RESOLVED_TO_ONE_TURN_AND_A_CROSSING_JUMPS_ONLY_AT_A_WHOLE_TURN.md`).
 
 The release commits each station at zero temperature, so its released code length jumps where two
-stations' commitments change order (`HNN/ExecutedComparison` §13). Read the order on the clock the
-lock is read on instead: the incumbent's order `A` holds on a share `p` of the clock's origins and
-the crossed order on the rest. This file states what that reading buys and what it costs.
+stations' commitments change order (`HNN/ExecutedComparison` §13). This file states the order read
+on the clock the lock is read on.
 
-1. **No jump** (`orderMixture_continuous`, `threeOrder_continuous`).
-2. **The jump becomes a first-order term** (`orderMixture_hasDerivAt`): the slope is the two orders'
-   slopes at their shares plus the anticipation `p′ μ′ (C_A − C_B)`.
-3. **The anticipation pays the jump exactly** (`anticipation_integral`).
-4. **A negative slope is adopted by some halving** (`halving_adopts_of_neg_slope`, from the right
-   slope alone); at zero temperature a jump present at every small step refuses every halving
-   (`jump_refuses_every_halving`).
-5. **The anticipation pushes toward the cheaper order** (`anticipation_pos_iff`).
-6. **Sharpening recovers the zero-temperature comparison off the crossing**
-   (`occupation_sharpens_pos`, `occupation_sharpens_neg`, `orderMixture_sharpens`).
-7. **The receiver's resolution bounds what is left unread** (`orderMixture_resolution`).
-8. **The turn clock's partition** (`aheadShare`, `copresentShare`): with the commitment instants'
-   difference `Δ` in turns and the clock's origin uniform on the circle, `A` is read a turn first on
-   `clamp Δ`, both in one turn on `max 0 (1 − |Δ|)` (`copresentShare_eq`), `B` first on
-   `clamp (−Δ)`; the arcs sum to one (`shares_sum`), read the whole order a turn apart
-   (`aheadShare_of_one_le`), and move at rate one (`aheadShare_lipschitz`).
-9. **The commitment instant** (`commitResidual`): a station commits where its top's code length
+1. **The commitment instant** (`commitResidual`): a station commits where its top's code length
    over `n` turns reaches the grain; the residual falls strictly past the threshold
    (`commitResidual_strictAnti`), never reaches the grain below it (`commitResidual_ge_one`), and a
-   pointwise smaller residual commits no later (`commit_instant_le`).
+   pointwise smaller residual commits no later (`commit_instant_le`). Read at whole turns, it commits
+   at the ceiling of its instant (`commit_turn_iff`).
+2. **The turn's reading carries no section** (`turn_reading_section_free`): the bank's growth is
+   read from the monodromy's characteristic polynomial.
+3. **The whole-turn order changes only at a whole turn** (`ceil_eventually_eq`,
+   `wholeTurn_counts_eventually_const`), so where the order holds a negative slope is adopted by
+   some halving (`fixed_order_halving_adopts`, from `halving_adopts_of_neg_slope`); at zero
+   temperature a jump present at every small step refuses every halving
+   (`jump_refuses_every_halving`).
+4. **The two-order slope** (`orderMixture_hasDerivAt`, `anticipation_integral`,
+   `anticipation_pos_iff`) and its sharpening (`occupation_sharpens_pos`, `occupation_sharpens_neg`,
+   `orderMixture_sharpens`, `orderMixture_resolution`): statements about a kernel that weighs two
+   orders.
+5. **The three-arc kernel** (`aheadShare`, `copresentShare`, `shares_sum`, `copresentShare_eq`,
+   `aheadShare_of_one_le`, `aheadShare_lipschitz`, `threeOrder_continuous`, `tick_count_near`,
+   `tick_share_near`): the whole-turn order averaged over a pair's position in the turn. The code's
+   clock has one carried origin, so this average is not the release's comparison (the record §6).
 -/
 
 namespace Holonics.HNN.OrderTemperature
@@ -302,5 +301,85 @@ theorem commitResidual_ge_one {ι : Type*} (s : Finset ι) {aTop : ℝ} {r : ι 
   have h2 : 0 ≤ ∑ y ∈ s, r y ^ n :=
     Finset.sum_nonneg fun y hy => Real.rpow_nonneg (hr0 y hy) n
   linarith
+
+/-! ### What the code's turn reading carries: no section, and the tick grain -/
+
+/-- [proved-derived; formal-checked] **The turn's reading does not depend on where the turn
+starts.** Starting the monodromy one crossing later replaces `B * A` (first crossing `A`, the rest
+`B`) by `A * B`, with the same characteristic polynomial; the bank's growth is read from that
+polynomial (`hnn::ring::ReceivingBank::read_turn`, `growth_of(integer_characteristic(..))`). -/
+theorem turn_reading_section_free {n : Type*} [Fintype n] [DecidableEq n] {R : Type*} [CommRing R]
+    (A B : Matrix n n R) : (B * A).charpoly = (A * B).charpoly :=
+  Matrix.charpoly_mul_comm B A
+
+/-- [proved-derived; formal-checked] **Whole-tick counts.** The number of integers in `[a, b)` is
+`⌈b⌉ − ⌈a⌉`, and it lies within one of the length `b − a`. -/
+theorem tick_count_near (a b : ℝ) : |((⌈b⌉ - ⌈a⌉ : ℤ) : ℝ) - (b - a)| < 1 := by
+  have ha := Int.ceil_lt_add_one a
+  have ha' := Int.le_ceil a
+  have hb := Int.ceil_lt_add_one b
+  have hb' := Int.le_ceil b
+  push_cast
+  rw [abs_lt]
+  constructor <;> linarith
+
+/-- [proved-derived; formal-checked] **The arc read at the tick grain.** With `p` crossings a turn,
+the share of section origins on which a turn boundary falls in `[t_A, t_B)` is a count of ticks over
+`p`, and it lies within `1/p` of the continuous arc length `t_B − t_A`. -/
+theorem tick_share_near {p : ℕ} (hp : 0 < p) (tA tB : ℝ) :
+    |((⌈p * tB⌉ - ⌈p * tA⌉ : ℤ) : ℝ) / p - (tB - tA)| < 1 / p := by
+  have hp' : (0 : ℝ) < p := by exact_mod_cast hp
+  have h := tick_count_near (p * tA) (p * tB)
+  have : ((⌈p * tB⌉ - ⌈p * tA⌉ : ℤ) : ℝ) / p - (tB - tA)
+      = (((⌈p * tB⌉ - ⌈p * tA⌉ : ℤ) : ℝ) - (p * tB - p * tA)) / p := by
+    field_simp
+  rw [this, abs_div, abs_of_pos hp']
+  exact div_lt_div_of_pos_right h hp'
+
+/-! ### The whole-turn order: one origin, and no change off whole turns
+
+The code's clock gives every station the same origin, the start of the read (the record §3). So a
+release that commits at whole turns orders by the whole-turn counts themselves, not by an average
+over origins. -/
+
+/-- [proved-derived; formal-checked] **The commitment turn is the ceiling of the instant.** With the
+residual strictly falling and meeting the grain at `t`, the residual read at a whole turn `n` is
+within the grain exactly when `⌈t⌉ ≤ n`. Read at whole turns only, a station commits at turn
+`⌈t⌉`, a quantity of the growth over whole turns alone (`turn_reading_section_free`). -/
+theorem commit_turn_iff {R : ℝ → ℝ} {c t : ℝ} (hR : StrictAnti R) (ht : R t = c) (n : ℤ) :
+    R n ≤ c ↔ ⌈t⌉ ≤ n := by
+  rw [← ht, StrictAnti.le_iff_ge hR, Int.ceil_le]
+
+/-- [proved-derived; formal-checked] **A whole-turn count does not change off a whole turn.** If the
+instant moves continuously and is not a whole number at the incumbent, its commitment turn is the
+same at every nearby step. -/
+theorem ceil_eventually_eq {t : ℝ → ℝ} {x : ℝ} (ht : ContinuousAt t x) (hnot : ∀ k : ℤ, t x ≠ k) :
+    ∀ᶠ η in 𝓝 x, ⌈t η⌉ = ⌈t x⌉ := by
+  have h1 : ((⌈t x⌉ : ℤ) : ℝ) - 1 < t x := by
+    have := Int.ceil_lt_add_one (t x)
+    linarith
+  have h2 : t x < ((⌈t x⌉ : ℤ) : ℝ) := lt_of_le_of_ne (Int.le_ceil _) (hnot _)
+  filter_upwards [ht.preimage_mem_nhds (Ioo_mem_nhds h1 h2)] with η hη
+  exact Int.ceil_eq_iff.mpr ⟨hη.1, hη.2.le⟩
+
+/-- [proved-derived; formal-checked] **No station's turn changes near an incumbent off whole turns.**
+For a finite family of stations whose instants move continuously and none of which is a whole
+number at the incumbent, every commitment turn, hence the whole-turn order, is unchanged at every
+small enough step. -/
+theorem wholeTurn_counts_eventually_const {ι : Type*} (s : Finset ι) {t : ι → ℝ → ℝ}
+    (ht : ∀ i ∈ s, ContinuousAt (t i) 0) (hnot : ∀ i ∈ s, ∀ k : ℤ, t i 0 ≠ k) :
+    ∀ᶠ η in 𝓝 (0 : ℝ), ∀ i ∈ s, ⌈t i η⌉ = ⌈t i 0⌉ :=
+  (Filter.eventually_all_finset s).2 fun i hi => ceil_eventually_eq (ht i hi) (hnot i hi)
+
+/-- [proved-derived; formal-checked] **Where the order holds, a negative slope is adopted by some
+halving.** If the released comparison equals the comparison on one fixed order at every small step
+(as it does off whole turns, `wholeTurn_counts_eventually_const`) and that comparison's slope from
+the right is negative, some halving of any positive step is adopted. -/
+theorem fixed_order_halving_adopts {f g : ℝ → ℝ} {d η₀ : ℝ} (hfg : ∀ᶠ η in 𝓝 (0 : ℝ), f η = g η)
+    (hg : HasDerivWithinAt g d (Ioi 0) 0) (hd : d < 0) (hη : 0 < η₀) :
+    ∃ k : ℕ, f (η₀ / 2 ^ k) < f 0 := by
+  have hf : HasDerivWithinAt f d (Ioi 0) 0 :=
+    hg.congr_of_eventuallyEq (nhdsWithin_le_nhds hfg) hfg.self_of_nhds
+  exact halving_adopts_of_neg_slope hf hd hη
 
 end Holonics.HNN.OrderTemperature
