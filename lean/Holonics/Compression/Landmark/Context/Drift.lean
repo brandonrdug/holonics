@@ -88,10 +88,14 @@ receiver's resolution.
   passage within their changes and the root's read jumps (`StoredDrift.stored_passage`), and a split
   charges `u + 2ℓ` to the upper part's drift and `2(u + ℓ)` to the increment
   (`StoredDrift.split_charge`; the Rust now carries these).
-- **Not stated here**: the enlarged tree's join (`Context/LocalWeighing`'s executed join tree,
-  whose two sides are both executed, adds its own drift; each dyadic cell's join costs at most one
-  bit against either branch), and the certified binary logarithm's squaring invariant
-  (`landmark::binary_log`); both stay owed in #62.
+- **The join.** The enlarged tree's join, whose two sides are both executed, is
+  `Context/JoinDrift`: one digit's joined face within its rounding, the join's ratio drift and the
+  two branches' face drifts (`JoinDrift.join_read_drift`), the ratio's drift the branches' summed
+  drifts plus the rebases (`JoinDrift.join_ratio_drift`), and the join's code over the passage
+  within the branches' passage drifts plus its roundings and twice its rebases
+  (`JoinDrift.join_passage`); each dyadic cell's join costs at most one bit against either branch.
+- **Not stated here**: the certified binary logarithm's squaring invariant
+  (`landmark::binary_log`); it stays owed in #62.
 
 [proved-standard] The telescoping of a context-tree weighting code to its root weight is Willems,
 Shtarkov and Tjalkens (1995); the proofs here are this owner's.

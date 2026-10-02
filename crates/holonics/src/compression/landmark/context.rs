@@ -653,9 +653,12 @@
 //! ideal, far inside the rule summed over the cells. The compacted storage is that tree's instance
 //! in Lean `Compression/Landmark/Context/StoredDrift` (`ConsistentTree.drift_le_tot`,
 //! `stored_passage`, `split_charge`, `level_read_drift`): each stored level's `drift` dominates its
-//! bottom's subtree discrepancy, the split's charges included. [open] Owed in #62: the executed
-//! join's drift and the certified binary logarithm's squaring invariant; both are checked by the
-//! tests, the drift cell by cell against the oracle.
+//! bottom's subtree discrepancy, the split's charges included. The executed join of an enlarged
+//! tree (and of [`FaceJoins`]) is Lean `Compression/Landmark/Context/JoinDrift`
+//! (`join_read_drift`, `join_ratio_drift`, `join_passage`): its `drift` is both branches' summed
+//! drifts plus the rebases, and its `excess` adds its rounding, twice the rebases and both
+//! branches' increments, term for term what the proof charges. [open] Owed in #62: the certified
+//! binary logarithm's squaring invariant, checked by the tests.
 
 use std::collections::HashMap;
 
@@ -4777,7 +4780,8 @@ pub struct JoinReceipt {
 /// `β' = β q̂_left(b)/q̂_right(b)`, the drift growing by both sides' excess increments and the
 /// rebases, the excess by its rounding `2^(−M)/min(q̂, q̂_left, q̂_right)`, twice the rebases and
 /// both sides' increments (the enlarged tree's join accounting; Lean
-/// `Compression/Landmark/Context/LocalWeighing.forward_executed`). A read's certificate is the faces' plus each join's drift
+/// `Compression/Landmark/Context/LocalWeighing.forward_executed`,
+/// `Compression/Landmark/Context/JoinDrift.{join_read_drift, join_ratio_drift, join_passage}`). A read's certificate is the faces' plus each join's drift
 /// and rounding. Each dyadic cell is its own digit tree, weighed by its own evidence.
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct FaceJoins {
