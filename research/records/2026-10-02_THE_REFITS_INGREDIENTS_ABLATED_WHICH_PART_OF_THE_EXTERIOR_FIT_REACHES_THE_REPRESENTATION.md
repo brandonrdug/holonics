@@ -421,8 +421,10 @@ weights act on the terms, and `d = −Aᵀc` sums the terms' pullbacks, so the b
 where those pullbacks are pairwise orthogonal. Terms that share rows of `E` (below) are not: their
 pullbacks can cancel in `d`, and reweighting them can then turn `d` further. Whether the `1/θ_t`
 weights alone stay at `[1019, 1020)` or above against `d` is read by Q11 (runner 1, `77afd16`;
-`q11_kinetic_coupling.txt`). The step with `μ_t = w_t = e_t/θ_t` and `K` left out lies at `[1942, 1943)`
-(Euclidean) and `[1870, 1871)` (`M`'s metric). It stays above `[1019, 1020)`, but that is measured;
+`q11_kinetic_coupling.txt`; projection `1400` s from Q10's read, timeout `1800` s, wall `1399930` ms,
+peak resident `244817920` bytes). The step with `K` left out, `μ = w = −F⁻¹c` (for a lock term its
+target's unit `e_t` over `θ_t`: the `1/θ_t` weights alone), lies at `[1942, 1943)` (Euclidean) and
+`[1870, 1871)` (`M`'s metric). It stays above `[1019, 1020)`, but that is measured;
 the bound does not give it.
 
 **No single block of the reading Gram carries the turn.** The step is `M⁻¹Aᵀμ`: the chart
@@ -452,8 +454,9 @@ monotonically: `[4068, 4069)` at 1, `[2659, 2660)` at 2, `[653, 654)` at 8, `[25
 not to where the solve stopped. In exact arithmetic the solve reaches `K⁻¹w` within its 320 reading
 coordinates. Holding every iterate at `JOINT_BITS` (`joint_held`) breaks that, and the solve ends
 without its `2⁻³²` energy floor. Q11 reads the residual energy over the opening's: `[10933, 10934)/2^32`
-at iterate 188, `[262, 263)/2^32` at 258 and `[16, 17)/2^32` at 320. So the deposited step stops four
-bits above the floor, and its direction settled at iterate 258 while the residual fell by `2^4` more.
+at iterate 188, `[262, 263)/2^32` at 258 and `[16, 17)/2^32` at 320. So the deposited step stops at `[16, 17)/2^32`,
+four bits above the `2⁻³²` floor (`16 = 2^4`), and its direction settled at iterate 258 while the
+residual fell by a factor in `(262/17, 263/16)`, an interval holding `2^4`.
 [agent-inferred] That is a law of the solve's representation, not a property of the metric.
 
 **The throw runs under strict descent, so its control does too.** The throw chain (#240) calls
