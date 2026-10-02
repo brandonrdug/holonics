@@ -1,0 +1,49 @@
+held state's released comparison, exact: 9675233065125832691889997362453/79228162514264337593543950336 9675321095424183550354644101135/79228162514264337593543950336
+move 1: probe exit 0;   q21 coordinate: the incumbent: ρ 102837/131072; L ∈ [500197/4096, 500203/4096) nats, X ∈ [318493/4096, 318499/4096) nats; solved 0 of 64; whole 0 (released 7, stations right 15); 431738 ms
+      trials: η 1/2 ρ 102837/131072 mask [473652/4096, 473658/4096) own [517650/4096, 517656/4096) adopted; γ_ρ [-332395/4096, -332394/4096)
+  run move 1:  successor's own release: ρ 102837/131072; L ∈ [517650/4096, 517656/4096) nats, X ∈ [345657/4096, 345662/4096) nats; solved 7 of 64; whole 0 (released 8, stations right 16); 431740 ms; open
+move 2: probe exit 0;   q22 coordinate: the incumbent: ρ 102837/131072; L ∈ [517650/4096, 517656/4096) nats, X ∈ [345657/4096, 345662/4096) nats; solved 7 of 64; whole 0 (released 8, stations right 16); 621381 ms
+      trials: η 1/2 ρ 102837/131072 mask [431746/4096, 431751/4096) own [431746/4096, 431751/4096) adopted; γ_ρ [-817762/4096, -817761/4096)
+  run move 2:  successor's own release: ρ 102837/131072; L ∈ [431746/4096, 431751/4096) nats, X ∈ [250309/4096, 250314/4096) nats; solved 1 of 64; whole 0 (released 8, stations right 15); 621397 ms; closes
+  the run closes; held state now out/q2/q22/q22-coordinate.state
+move 3: probe exit 0;   q23 coordinate: the incumbent: ρ 102837/131072; L ∈ [431746/4096, 431751/4096) nats, X ∈ [250309/4096, 250314/4096) nats; solved 1 of 64; whole 0 (released 8, stations right 15); 498029 ms
+      trials: η 4 ρ 102837/131072 mask [404635/4096, 404640/4096) own [429669/4096, 429674/4096) adopted; γ_ρ [-376545/4096, -376544/4096)
+  run move 1:  successor's own release: ρ 102837/131072; L ∈ [429669/4096, 429674/4096) nats, X ∈ [247964/4096, 247970/4096) nats; solved 0 of 64; whole 0 (released 8, stations right 15); 498047 ms; open
+move 4: probe exit 0;   q24 coordinate: the incumbent: ρ 102837/131072; L ∈ [429669/4096, 429674/4096) nats, X ∈ [247964/4096, 247970/4096) nats; solved 0 of 64; whole 0 (released 8, stations right 15); 774778 ms
+      trials: η 4 ρ 408843/524288 mask [443663/4096, 443669/4096) own [465548/4096, 465554/4096) NotBelow; η 2 ρ 820191/1048576 mask [404685/4096, 404690/4096) own [391233/4096, 391238/4096) adopted; γ_ρ [293152/4096, 293153/4096)
+  run move 2:  successor's own release: ρ 820191/1048576; L ∈ [391233/4096, 391238/4096) nats, X ∈ [210297/4096, 210302/4096) nats; solved 3 of 64; whole 0 (released 8, stations right 15); 774793 ms; closes
+  the run closes; held state now out/q2/q24/q24-coordinate.state
+move 5: probe exit 0;   q25 coordinate: the incumbent: ρ 820191/1048576; L ∈ [391233/4096, 391238/4096) nats, X ∈ [210297/4096, 210302/4096) nats; solved 3 of 64; whole 0 (released 8, stations right 15); 886983 ms
+      trials: η 4 ρ 102837/131072 mask [433779/4096, 433784/4096) own [434252/4096, 434257/4096) NotBelow; η 2 ρ 410789/524288 mask [385243/4096, 385249/4096) own [406899/4096, 406904/4096) adopted; γ_ρ [-193282/4096, -193281/4096)
+  run move 1:  successor's own release: ρ 410789/524288; L ∈ [406899/4096, 406904/4096) nats, X ∈ [225200/4096, 225206/4096) nats; solved 1 of 64; whole 0 (released 8, stations right 14); 887001 ms; open
+move 6: probe exit 0;   q26 coordinate: the incumbent: ρ 410789/524288; L ∈ [406899/4096, 406904/4096) nats, X ∈ [225200/4096, 225206/4096) nats; solved 1 of 64; whole 0 (released 8, stations right 14); 518184 ms
+      trials: η 8 ρ 102837/131072 mask [405723/4096, 405728/4096) own [393054/4096, 393059/4096) adopted; γ_ρ [-91267/4096, -91266/4096)
+  run move 2:  successor's own release: ρ 102837/131072; L ∈ [393054/4096, 393059/4096) nats, X ∈ [212969/4096, 212974/4096) nats; solved 5 of 64; whole 0 (released 8, stations right 16); 518200 ms; open
+move 7: probe exit 0;   q27 coordinate: the incumbent: ρ 102837/131072; L ∈ [393054/4096, 393059/4096) nats, X ∈ [212969/4096, 212974/4096) nats; solved 5 of 64; whole 0 (released 8, stations right 16); 694527 ms
+      trials: η 4 ρ 102837/131072 mask [394475/4096, 394480/4096) own [386721/4096, 386726/4096) NotBelow; η 2 ρ 102837/131072 mask [363423/4096, 363428/4096) own [376725/4096, 376730/4096) adopted; γ_ρ [-354224/4096, -354223/4096)
+  run move 3:  successor's own release: ρ 102837/131072; L ∈ [376725/4096, 376730/4096) nats, X ∈ [195021/4096, 195026/4096) nats; solved 0 of 64; whole 0 (released 8, stations right 17); 694542 ms; closes
+  the run closes; held state now out/q2/q27/q27-coordinate.state
+move 8: probe exit 0;   q28 coordinate: the incumbent: ρ 102837/131072; L ∈ [376725/4096, 376730/4096) nats, X ∈ [195021/4096, 195026/4096) nats; solved 0 of 64; whole 0 (released 8, stations right 17); 540473 ms
+      trials: η 16 ρ 802921/1048576 mask [378560/4096, 378565/4096) own [405644/4096, 405649/4096) NotBelow; η 8 ρ 1625617/2097152 mask [357061/4096, 357066/4096) own [375650/4096, 375655/4096) adopted; γ_ρ [296551/4096, 296552/4096)
+  run move 1:  successor's own release: ρ 1625617/2097152; L ∈ [375650/4096, 375655/4096) nats, X ∈ [193945/4096, 193950/4096) nats; solved 0 of 64; whole 0 (released 8, stations right 13); 540488 ms; open
+move 9: probe exit 0;   q29 coordinate: the incumbent: ρ 1625617/2097152; L ∈ [375650/4096, 375655/4096) nats, X ∈ [193945/4096, 193950/4096) nats; solved 0 of 64; whole 0 (released 8, stations right 13); 384643 ms
+      trials: η 4 ρ 1638751/2097152 mask [375372/4096, 375377/4096) own [370285/4096, 370290/4096) adopted; γ_ρ [-444961/4096, -444960/4096)
+  run move 2:  successor's own release: ρ 1638751/2097152; L ∈ [370285/4096, 370290/4096) nats, X ∈ [195208/4096, 195213/4096) nats; solved 6 of 64; whole 0 (released 8, stations right 17); 384645 ms; open
+continuing at move 10 from out/q2/q29/q29-coordinate.state; held out/q2/q27/q27-coordinate.state (sha256 0f441eca16dedd599d1076d114c63f682ec2413e01858f7ee22f003150ea1842); open run of 2 moves
+move 10: probe exit 0;   q210 coordinate: the incumbent: ρ 1638751/2097152; L ∈ [370285/4096, 370290/4096) nats, X ∈ [195208/4096, 195213/4096) nats; solved 6 of 64; whole 0 (released 8, stations right 17); 506505 ms
+      trials: η 8 ρ 1632513/2097152 mask [379486/4096, 379491/4096) own [389800/4096, 389805/4096) NotBelow; η 4 ρ 102227/131072 mask [351881/4096, 351886/4096) own [379730/4096, 379735/4096) adopted; γ_ρ [105070/4096, 105071/4096)
+  run move 3: d successor's own release: ρ 102227/131072; L ∈ [379730/4096, 379735/4096) nats, X ∈ [198025/4096, 198031/4096) nats; solved 0 of 64; whole 0 (released 8, stations right 17); 506506 ms; open
+move 11: probe exit 0;   q211 coordinate: the incumbent: ρ 102227/131072; L ∈ [379730/4096, 379735/4096) nats, X ∈ [198025/4096, 198031/4096) nats; solved 0 of 64; whole 0 (released 8, stations right 17); 465678 ms
+      trials: η 16 ρ 102837/131072 mask [403448/4096, 403453/4096) own [426640/4096, 426645/4096) NotBelow; η 8 ρ 102837/131072 mask [356193/4096, 356198/4096) own [361097/4096, 361102/4096) adopted; γ_ρ [-215286/4096, -215285/4096)
+  run move 4: d successor's own release: ρ 102837/131072; L ∈ [361097/4096, 361102/4096) nats, X ∈ [186134/4096, 186139/4096) nats; solved 5 of 64; whole 0 (released 8, stations right 19); 465679 ms; closes
+  the run closes; held state now out/q2/q211/q211-coordinate.state
+move 12: probe exit 0;   q212 coordinate: the incumbent: ρ 102837/131072; L ∈ [361097/4096, 361102/4096) nats, X ∈ [186134/4096, 186139/4096) nats; solved 5 of 64; whole 0 (released 8, stations right 19); 514436 ms
+      trials: η 16 ρ 1623375/2097152 mask [379991/4096, 379996/4096) own [400082/4096, 400087/4096) NotBelow; η 8 ρ 1634383/2097152 mask [344400/4096, 344405/4096) own [360635/4096, 360640/4096) adopted; γ_ρ [169180/4096, 169181/4096)
+  run move 1: d successor's own release: ρ 1634383/2097152; L ∈ [360635/4096, 360640/4096) nats, X ∈ [179032/4096, 179037/4096) nats; solved 1 of 64; whole 0 (released 8, stations right 16); 514452 ms; open
+move 13: probe ended (chain shell stopped at the switch);   q213 coordinate: the incumbent: ρ 1634383/2097152; L ∈ [360635/4096, 360640/4096) nats, X ∈ [179032/4096, 179037/4096) nats; solved 1 of 64; whole 0 (released 8, stations right 16); 473081 ms
+      trials: η 16 ρ 409581/524288 mask [368257/4096, 368262/4096) own [372393/4096, 372398/4096) NotBelow; η 8 ρ 1636353/2097152 mask [335483/4096, 335488/4096) own [329485/4096, 329490/4096) adopted; γ_ρ [-31488/4096, -31487/4096)
+  run move 2: d successor's own release: ρ 1636353/2097152; L ∈ [329485/4096, 329490/4096) nats, X ∈ [152529/4096, 152534/4096) nats; solved 4 of 64; whole 0 (released 8, stations right 19); 473095 ms; closes
+  the run closes; held state now out/q2/q213/q213-coordinate.state
+continuing at move 14 from out/q2/q213/q213-coordinate.state; held out/q2/q213/q213-coordinate.state (sha256 038f227d32924018c2685c345054e32a91e66afad703b41187b66b9241f944b8); open run of 0 moves
+move 14 attempt on the picks build (a0922b8, per-kind bounds) stopped at the main line's ruling before its incumbent read finished; kept in out/q2/abandoned/q214-picks-build, not a chain move
+continuing at move 14 from out/q2/q213/q213-coordinate.state; held out/q2/q213/q213-coordinate.state (sha256 038f227d32924018c2685c345054e32a91e66afad703b41187b66b9241f944b8); open run of 0 moves

@@ -35,6 +35,7 @@ for k in $(seq $K0 $MAX); do
   export EXCURSION_CHECKPOINT="$checkpoint"
   bash research/notebook/hnn_design/read_probe.sh $out $UNIT_MS $DEADLINE_S executed move-once order2 2026093061 8 $out $label$k=$state lock-dec $METRIC
   rc=$?
+  echo "whole-move deadline $DEADLINE_S s" >> $out/identities.txt
   inc=$(grep -m1 "the incumbent's own comparison, exact" $out/listing.txt | sed 's/.*exact: //')
   [ $first = 1 ] && [ -n "$inc" ] && { checkpoint="$inc"; first=0; echo "held state's released comparison, exact: $checkpoint"; }
   echo "move $k: probe exit $rc; $(grep -E "^  $label$k $METRIC: (the incumbent|refused)" $out/listing.txt | cut -c1-200)"
