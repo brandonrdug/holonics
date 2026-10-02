@@ -54,7 +54,22 @@ exponent `v`. No temperature enters: the receiving map's gain, which plays the r
    Over `N` independent readings same-cell media carry less than one bit whenever
    `2L² ≥ N ln 2` (`grain_unconfirmable`, `grain_criterion_iff`). The least such `L` is `47` at
    `N = 6148` and `244` at `N = 171754` (`derived_grains`).
-7. **Campaign 1's numbers** (`resolution_aeon_bounds`, `declared_grain_vs_resolution`,
+7. **The odometer covector's pairing** (owed item 3). If the odometer masses obey `r_c ≤ K p_c`,
+   then `‖r − q‖²/K ≤ ⟨p − q, r − q⟩` (`odometer_pairing_ratio`). Inside a grain cell the chord
+   bound `2^y ≥ (e ln 2/2)(1 + y)` (`two_rpow_ge_chord`, `odometer_le_face_weight`) gives
+   `K = 2^(1/L) · 2/(e ln 2)` (`odometer_mass_le`). A step `−η(r − q)` then lowers the smooth score
+   by `η a/K` to first order, `a = ‖r − q‖²` (`odometer_step_bound`), and the certificate owes the
+   factor `1/K`: under the code's rule the decrease is at least `η a (1/K − ½)`, and `½ η a/K` with
+   the rule tightened by `1/K` (`odometer_certified_decrease`). At `L = 16`, `K < 8/7`, so the
+   code's rule keeps at least `3/8 · η a` (`odometer_ratio_sixteen`).
+8. **The grain of a continuing machine** (owed item 4). The grain read from a reading count,
+   `L(N) = ⌈√(N ln 2/2)⌉`, is the least meeting the criterion of item 6 (`refiningGrain_spec`); it
+   is monotone, within one of `√(N ln 2/2)`, and at most doubles when the count quadruples
+   (`refiningGrain_growth`). A grain refined by an integer factor determines the coarser read
+   (`grainRead_of_refined`, `grainRead_refines`), so a dyadically refining machine keeps every
+   read it made. At every count, same-cell media carry less than one bit over the readings
+   (`refiningGrain_unconfirmable`).
+9. **Campaign 1's numbers** (`resolution_aeon_bounds`, `declared_grain_vs_resolution`,
    `measured_change_ratio`, `measured_change_readings`, `measured_aeon_test_bound`,
    `measured_aeon_code_bound`).
 
@@ -93,7 +108,8 @@ namespace Holonics.HNN.Ratio.Resolution
 open Holonics.Computation.HolonicInformationTheory
 open Holonics.Computation.HolonicAdjointNormalization
 open Holonics.Computation.HolonicAdjointNormalization.NormalizedExponential
-open Holonics.HNN.Ratio (codeLength two_rpow_eq_exp grainRead face_constant_on_fibre)
+open Holonics.HNN.Ratio (codeLength two_rpow_eq_exp grainRead face_constant_on_fibre
+  odometerWeight face_weight_le_odometer)
 open Holonics.Objects.RatioPhase (alignCost phaseGap)
 
 /-! ## 1. Hoeffding's lemma on a finite section -/
@@ -867,7 +883,299 @@ theorem derived_grains :
 
 end Grain
 
-/-! ## 7. Campaign 1's numbers -/
+/-! ## 7. The odometer covector's pairing with the smooth score -/
+
+section Pairing
+
+variable {ι : Type*} [Fintype ι] [DecidableEq ι]
+
+/-- [proved-derived; formal-checked] **The odometer covector reads at least `1/K` of its own
+decrease.** With positive normalized masses `p` (the smooth face) and `r` (the odometer chart),
+the one-hot target `q` at `t`, and `r_c ≤ K p_c` for every class, the smooth score's first-order
+decrease along the odometer covector is at least `1/K` of the odometer's own:
+`‖r − q‖²/K ≤ ⟨p − q, r − q⟩`. Off the target each `p_c r_c ≥ r_c²/K`; at the target
+`1 − r_t = Σ_(c≠t) r_c ≤ K (1 − p_t)`. -/
+theorem odometer_pairing_ratio (p r : ι → ℝ) (hr : ∀ c, 0 < r c) (hp1 : ∑ c, p c = 1)
+    (hr1 : ∑ c, r c = 1) (t : ι) {K : ℝ} (hK : 0 < K) (hpr : ∀ c, r c ≤ K * p c) :
+    (∑ c, (r c - (Pi.single t (1 : ℝ) : ι → ℝ) c) ^ 2) / K ≤
+      ∑ c, (p c - (Pi.single t (1 : ℝ) : ι → ℝ) c) * (r c - (Pi.single t (1 : ℝ) : ι → ℝ) c) := by
+  have hrt : 1 - r t = ∑ c ∈ Finset.univ.erase t, r c := by
+    rw [← hr1, ← Finset.add_sum_erase _ _ (Finset.mem_univ t)]; ring
+  have hpt : 1 - p t = ∑ c ∈ Finset.univ.erase t, p c := by
+    rw [← hp1, ← Finset.add_sum_erase _ _ (Finset.mem_univ t)]; ring
+  have hrest : ∑ c ∈ Finset.univ.erase t, r c ≤ K * ∑ c ∈ Finset.univ.erase t, p c := by
+    rw [Finset.mul_sum]; exact Finset.sum_le_sum fun c _ => hpr c
+  have hrt0 : 0 ≤ 1 - r t := by
+    rw [hrt]; exact Finset.sum_nonneg fun c _ => (hr c).le
+  have htgt : (r t - 1) ^ 2 ≤ K * ((p t - 1) * (r t - 1)) := by
+    have h1 : 1 - r t ≤ K * (1 - p t) := by rw [hrt, hpt]; exact hrest
+    nlinarith [mul_le_mul_of_nonneg_right h1 hrt0]
+  have hoff : ∑ c ∈ Finset.univ.erase t, (r c - (Pi.single t (1 : ℝ) : ι → ℝ) c) ^ 2 ≤
+      K * ∑ c ∈ Finset.univ.erase t,
+        (p c - (Pi.single t (1 : ℝ) : ι → ℝ) c) * (r c - (Pi.single t (1 : ℝ) : ι → ℝ) c) := by
+    rw [Finset.mul_sum]
+    refine Finset.sum_le_sum fun c hc => ?_
+    have hct : c ≠ t := (Finset.mem_erase.mp hc).1
+    simp only [Pi.single_eq_of_ne hct, sub_zero]
+    nlinarith [mul_le_mul_of_nonneg_right (hpr c) (hr c).le]
+  rw [div_le_iff₀ hK, ← Finset.add_sum_erase _ _ (Finset.mem_univ t),
+    ← Finset.add_sum_erase _ _ (Finset.mem_univ t)]
+  simp only [Pi.single_eq_same]
+  nlinarith [hoff, htgt]
+
+/-- [proved-standard; formal-checked] **The face's weight against the chord.**
+`2^y ≥ (e ln 2/2)(1 + y)` for every `y`: the tangent to `2^y` at `y = 1/ln 2 − 1`, through
+`e^z ≥ 1 + z`. -/
+theorem two_rpow_ge_chord (y : ℝ) : Real.exp 1 * Real.log 2 / 2 * (1 + y) ≤ (2 : ℝ) ^ y := by
+  rw [two_rpow_eq_exp]
+  have h1 := Real.add_one_le_exp (y * Real.log 2 - 1 + Real.log 2)
+  have h2 : Real.exp (y * Real.log 2 - 1 + Real.log 2) =
+      Real.exp (y * Real.log 2) * 2 / Real.exp 1 := by
+    rw [Real.exp_add, Real.exp_sub, Real.exp_log (by norm_num)]
+    ring
+  rw [h2, le_div_iff₀ (Real.exp_pos 1)] at h1
+  nlinarith [h1]
+
+/-- [proved-derived; formal-checked] **The odometer chart lies within `2/(e ln 2)` of the face's
+weight.** `(e ln 2/2) · 2^n (1 + k/L) ≤ 2^(n + k/L)`; with `face_weight_le_odometer` the chart's
+weight is pinned to the face's within the factor `2/(e ln 2) ∈ (1, 17/16)`, whatever `L`. -/
+theorem odometer_le_face_weight (n : ℤ) (k L : ℕ) :
+    Real.exp 1 * Real.log 2 / 2 * odometerWeight n k L ≤ (2 : ℝ) ^ ((n : ℝ) + (k : ℝ) / L) := by
+  rw [Real.rpow_add (by norm_num), Real.rpow_intCast, odometerWeight]
+  have h2 : (0 : ℝ) < (2 : ℝ) ^ n := zpow_pos (by norm_num) n
+  calc Real.exp 1 * Real.log 2 / 2 * ((2 : ℝ) ^ n * (1 + (k : ℝ) / L)) =
+        (2 : ℝ) ^ n * (Real.exp 1 * Real.log 2 / 2 * (1 + (k : ℝ) / L)) := by ring
+    _ ≤ (2 : ℝ) ^ n * (2 : ℝ) ^ ((k : ℝ) / L) :=
+        mul_le_mul_of_nonneg_left (two_rpow_ge_chord _) h2.le
+
+omit [DecidableEq ι] in
+/-- [proved-derived; formal-checked] **The odometer's masses against the face's.** With every
+exponent `x_c` in its grain cell `[n_c + k_c/L, n_c + (k_c + 1)/L)`, `k_c ≤ L`, the odometer mass
+`r_c = ω_c/Σ ω` and the face's mass `p_c = 2^(x_c)/Σ 2^x` obey
+`r_c ≤ 2^(1/L) · (2/(e ln 2)) · p_c`. -/
+theorem odometer_mass_le [Nonempty ι] (n : ι → ℤ) (k : ι → ℕ) {L : ℕ} (hL : 0 < L)
+    (hk : ∀ c, k c ≤ L) (x : ι → ℝ) (hx0 : ∀ c, (n c : ℝ) + (k c : ℝ) / L ≤ x c)
+    (hx1 : ∀ c, x c < (n c : ℝ) + (k c : ℝ) / L + 1 / L) (c : ι) :
+    odometerWeight (n c) (k c) L / ∑ d, odometerWeight (n d) (k d) L ≤
+      (2 : ℝ) ^ (1 / (L : ℝ)) / (Real.exp 1 * Real.log 2 / 2) *
+        ((2 : ℝ) ^ x c / ∑ d, (2 : ℝ) ^ x d) := by
+  have hμ : 0 < Real.exp 1 * Real.log 2 / 2 := by
+    have := Real.log_pos (show (1 : ℝ) < 2 by norm_num); positivity
+  have ha : (0 : ℝ) < (2 : ℝ) ^ (1 / (L : ℝ)) := by positivity
+  have hω : ∀ d, 0 < odometerWeight (n d) (k d) L := fun d => by
+    unfold odometerWeight; have := zpow_pos (show (0 : ℝ) < 2 by norm_num) (n d); positivity
+  have hW : 0 < ∑ d, odometerWeight (n d) (k d) L :=
+    Finset.sum_pos (fun d _ => hω d) Finset.univ_nonempty
+  have hA : 0 < ∑ d, (2 : ℝ) ^ x d := Finset.sum_pos (fun d _ => by positivity) Finset.univ_nonempty
+  -- the chart's weight at `c` is at most the face's weight over `μ`
+  have hωc : odometerWeight (n c) (k c) L ≤ (2 : ℝ) ^ x c / (Real.exp 1 * Real.log 2 / 2) := by
+    rw [le_div_iff₀ hμ, mul_comm]
+    exact (odometer_le_face_weight (n c) (k c) L).trans
+      (Real.rpow_le_rpow_of_exponent_le (by norm_num) (hx0 c))
+  -- the face's partition is at most `2^(1/L)` times the chart's
+  have hAW : ∑ d, (2 : ℝ) ^ x d ≤ (2 : ℝ) ^ (1 / (L : ℝ)) * ∑ d, odometerWeight (n d) (k d) L := by
+    rw [Finset.mul_sum]
+    refine Finset.sum_le_sum fun d _ => ?_
+    calc (2 : ℝ) ^ x d ≤ (2 : ℝ) ^ (((n d : ℝ) + (k d : ℝ) / L) + 1 / L) :=
+          Real.rpow_le_rpow_of_exponent_le (by norm_num) (hx1 d).le
+      _ = (2 : ℝ) ^ ((n d : ℝ) + (k d : ℝ) / L) * (2 : ℝ) ^ (1 / (L : ℝ)) :=
+          Real.rpow_add (by norm_num) _ _
+      _ ≤ odometerWeight (n d) (k d) L * (2 : ℝ) ^ (1 / (L : ℝ)) :=
+          mul_le_mul_of_nonneg_right (face_weight_le_odometer (n d) hL (hk d)) ha.le
+      _ = _ := by ring
+  rw [div_le_iff₀ hW]
+  have h1 : 1 ≤ (2 : ℝ) ^ (1 / (L : ℝ)) * (∑ d, odometerWeight (n d) (k d) L) /
+      ∑ d, (2 : ℝ) ^ x d := by
+    rw [le_div_iff₀ hA]; linarith
+  have hfx : 0 ≤ (2 : ℝ) ^ x c / (Real.exp 1 * Real.log 2 / 2) := by positivity
+  calc odometerWeight (n c) (k c) L ≤ (2 : ℝ) ^ x c / (Real.exp 1 * Real.log 2 / 2) * 1 := by
+        rw [mul_one]; exact hωc
+    _ ≤ (2 : ℝ) ^ x c / (Real.exp 1 * Real.log 2 / 2) *
+        ((2 : ℝ) ^ (1 / (L : ℝ)) * (∑ d, odometerWeight (n d) (k d) L) / ∑ d, (2 : ℝ) ^ x d) :=
+        mul_le_mul_of_nonneg_left h1 hfx
+    _ = _ := by ring
+
+/-- [proved-derived; formal-checked] **The certified step's decrease under the odometer
+covector.** Stepping the station logits along `−η (r − q)`, with the odometer masses `r` within
+`r ≤ K p` of the smooth face `p`, the smooth score obeys
+`ℓ_t(f − η g̃) ≤ ℓ_t(f) − η a/K + ½ (ln 2/2) η² a`, `a = ‖r − q‖²` the deposit's first-order
+decrease read on the odometer covector. -/
+theorem odometer_step_bound [Nonempty ι] (f r : ι → ℝ) (t : ι) (hr : ∀ c, 0 < r c)
+    (hr1 : ∑ c, r c = 1) {K η : ℝ} (hK : 0 < K) (hη : 0 ≤ η)
+    (hpr : ∀ c, r c ≤ K * (face fun c => f c * Real.log 2).mass c) :
+    codeLength (fun c => f c - η * (r c - (Pi.single t (1 : ℝ) : ι → ℝ) c)) t ≤
+      codeLength f t - η * ((∑ c, (r c - (Pi.single t (1 : ℝ) : ι → ℝ) c) ^ 2) / K) +
+        1 / 2 * (Real.log 2 / 2) * η ^ 2 * ∑ c, (r c - (Pi.single t (1 : ℝ) : ι → ℝ) c) ^ 2 := by
+  set p := face fun c => f c * Real.log 2 with hp
+  have hq := codeLength_quadratic_upper f
+    (fun c => -(η * (r c - (Pi.single t (1 : ℝ) : ι → ℝ) c))) t
+  have e1 : (fun c => f c + -(η * (r c - (Pi.single t (1 : ℝ) : ι → ℝ) c))) =
+      fun c => f c - η * (r c - (Pi.single t (1 : ℝ) : ι → ℝ) c) := by
+    funext c; ring
+  rw [e1] at hq
+  have hpair := odometer_pairing_ratio p.mass r hr p.normalized hr1 t hK hpr
+  have e2 : ∑ c, (p.mass c - if c = t then 1 else 0) *
+        -(η * (r c - (Pi.single t (1 : ℝ) : ι → ℝ) c)) =
+      -η * ∑ c, (p.mass c - (Pi.single t (1 : ℝ) : ι → ℝ) c) *
+        (r c - (Pi.single t (1 : ℝ) : ι → ℝ) c) := by
+    rw [Finset.mul_sum]
+    refine Finset.sum_congr rfl fun c _ => ?_
+    simp only [Pi.single_apply]
+    ring
+  have e3 : ∑ c, (-(η * (r c - (Pi.single t (1 : ℝ) : ι → ℝ) c))) ^ 2 =
+      η ^ 2 * ∑ c, (r c - (Pi.single t (1 : ℝ) : ι → ℝ) c) ^ 2 := by
+    rw [Finset.mul_sum]
+    exact Finset.sum_congr rfl fun c _ => by ring
+  rw [e2, e3] at hq
+  have := mul_le_mul_of_nonneg_left hpair hη
+  nlinarith [this, hq]
+
+/-- [proved-derived; formal-checked] **What the certificate guarantees.** Under the code's step
+rule `η · s · a ≤ a` with `s ≥ ln 2/2`, the smooth score falls by at least `η a (1/K − ½)`, not
+the `½ η a` the deposit reads; with the rule tightened to `η (ln 2/2) a ≤ a/K` it falls by at
+least `½ η a/K`. The certified decrease `½ η a` is therefore owed exactly the factor `1/K`. -/
+theorem odometer_certified_decrease {φ φ₀ a η s K : ℝ} (hη : 0 ≤ η) (ha : 0 ≤ a)
+    (hs : Real.log 2 / 2 ≤ s)
+    (hmodel : φ ≤ φ₀ - η * (a / K) + 1 / 2 * (Real.log 2 / 2) * η ^ 2 * a) :
+    (η * s * a ≤ a → φ ≤ φ₀ - η * a * (1 / K - 1 / 2)) ∧
+      (η * (Real.log 2 / 2) * a ≤ a / K → φ ≤ φ₀ - 1 / 2 * η * (a / K)) := by
+  have hl : 0 < Real.log 2 := Real.log_pos (by norm_num)
+  constructor
+  · intro hstep
+    have h1 : η * (Real.log 2 / 2) * a ≤ η * s * a := by
+      have : 0 ≤ η * a := mul_nonneg hη ha
+      nlinarith
+    have h2 : 1 / 2 * (Real.log 2 / 2) * η ^ 2 * a ≤ 1 / 2 * η * a := by
+      have := mul_le_mul_of_nonneg_left (h1.trans hstep) hη
+      nlinarith
+    have e : η * a * (1 / K - 1 / 2) = η * (a / K) - 1 / 2 * η * a := by ring
+    rw [e]; linarith
+  · intro hstep
+    have := mul_le_mul_of_nonneg_left hstep hη
+    nlinarith
+
+/-- [proved-derived; formal-checked] **At the declared grain `L = 16` the odometer pairing keeps
+seven eighths.** `K = 2^(1/16) · 2/(e ln 2) < 8/7`, so under the code's rule the smooth score falls
+by at least `3/8 · η a`. -/
+theorem odometer_ratio_sixteen :
+    (2 : ℝ) ^ (1 / (16 : ℝ)) / (Real.exp 1 * Real.log 2 / 2) < 8 / 7 ∧
+      3 / 8 < 1 / ((2 : ℝ) ^ (1 / (16 : ℝ)) / (Real.exp 1 * Real.log 2 / 2)) - 1 / 2 := by
+  have he := Real.exp_one_gt_d9
+  have hl := Real.log_two_gt_d9
+  have hμ : (119 : ℝ) / 128 < Real.exp 1 * Real.log 2 / 2 := by nlinarith
+  have hμ0 : 0 < Real.exp 1 * Real.log 2 / 2 := by linarith
+  have hb : (2 : ℝ) ^ (1 / (16 : ℝ)) ≤ 17 / 16 := by
+    have := rpow_one_add_le_one_add_mul_self (s := 1) (by norm_num)
+      (show (0 : ℝ) ≤ 1 / 16 by norm_num) (show (1 : ℝ) / 16 ≤ 1 by norm_num)
+    norm_num at this ⊢
+    linarith
+  have hb0 : (0 : ℝ) < (2 : ℝ) ^ (1 / (16 : ℝ)) := by positivity
+  have hK : (2 : ℝ) ^ (1 / (16 : ℝ)) / (Real.exp 1 * Real.log 2 / 2) < 8 / 7 := by
+    rw [div_lt_iff₀ hμ0]; linarith
+  refine ⟨hK, ?_⟩
+  have hK0 : 0 < (2 : ℝ) ^ (1 / (16 : ℝ)) / (Real.exp 1 * Real.log 2 / 2) := by positivity
+  have : (7 : ℝ) / 8 < 1 / ((2 : ℝ) ^ (1 / (16 : ℝ)) / (Real.exp 1 * Real.log 2 / 2)) := by
+    rw [lt_div_iff₀ hK0]; linarith
+  linarith
+
+end Pairing
+
+/-! ## 8. The grain of a continuing machine -/
+
+section Refining
+
+/-- [definition] **The grain read from a reading count**: the least `L` with `2L² ≥ N ln 2`,
+`L(N) = ⌈√(N ln 2/2)⌉`. -/
+noncomputable def refiningGrain (N : ℕ) : ℕ := ⌈Real.sqrt (N * Real.log 2 / 2)⌉₊
+
+/-- [proved-derived; formal-checked] **The read grain meets the criterion, and is the least that
+does.** `N ln 2 ≤ 2 L(N)²`, and every `L < L(N)` has `2L² < N ln 2`. -/
+theorem refiningGrain_spec (N : ℕ) :
+    (N : ℝ) * Real.log 2 ≤ 2 * (refiningGrain N : ℝ) ^ 2 ∧
+      ∀ L : ℕ, L < refiningGrain N → 2 * (L : ℝ) ^ 2 < N * Real.log 2 := by
+  have hl : 0 < Real.log 2 := Real.log_pos (by norm_num)
+  have hx : 0 ≤ (N : ℝ) * Real.log 2 / 2 := by positivity
+  constructor
+  · have h := Nat.le_ceil (Real.sqrt ((N : ℝ) * Real.log 2 / 2))
+    have hsq : Real.sqrt ((N : ℝ) * Real.log 2 / 2) ^ 2 ≤ (refiningGrain N : ℝ) ^ 2 :=
+      pow_le_pow_left₀ (Real.sqrt_nonneg _) h 2
+    rw [Real.sq_sqrt hx] at hsq
+    linarith
+  · intro L hL
+    have h : (L : ℝ) < Real.sqrt ((N : ℝ) * Real.log 2 / 2) := Nat.lt_ceil.mp hL
+    have hsq : (L : ℝ) ^ 2 < Real.sqrt ((N : ℝ) * Real.log 2 / 2) ^ 2 :=
+      pow_lt_pow_left₀ h (Nat.cast_nonneg _) two_ne_zero
+    rw [Real.sq_sqrt hx] at hsq
+    linarith
+
+/-- [proved-derived; formal-checked] **The grain refines as the count grows, as `√N`.** `L(N)` is
+monotone, lies within one of `√(N ln 2/2)`, and quadrupling the count at most doubles it. A
+moment with fewer remaining readings needs a coarser grain, so a grain read from the whole count
+covers every later moment. -/
+theorem refiningGrain_growth (N M : ℕ) (h : N ≤ M) :
+    refiningGrain N ≤ refiningGrain M ∧
+      (refiningGrain N : ℝ) < Real.sqrt (N * Real.log 2 / 2) + 1 ∧
+      refiningGrain (4 * N) ≤ 2 * refiningGrain N := by
+  have hl : 0 < Real.log 2 := Real.log_pos (by norm_num)
+  refine ⟨?_, ?_, ?_⟩
+  · unfold refiningGrain
+    refine Nat.ceil_mono (Real.sqrt_le_sqrt ?_)
+    have : (N : ℝ) ≤ M := by exact_mod_cast h
+    have := mul_le_mul_of_nonneg_right this hl.le
+    linarith
+  · exact Nat.ceil_lt_add_one (Real.sqrt_nonneg _)
+  · unfold refiningGrain
+    rw [Nat.ceil_le]
+    have e : Real.sqrt (((4 * N : ℕ) : ℝ) * Real.log 2 / 2) =
+        2 * Real.sqrt ((N : ℝ) * Real.log 2 / 2) := by
+      rw [show (((4 * N : ℕ) : ℝ) * Real.log 2 / 2) = 2 ^ 2 * ((N : ℝ) * Real.log 2 / 2) by
+        push_cast; ring]
+      rw [Real.sqrt_mul (by norm_num), Real.sqrt_sq (by norm_num)]
+    rw [e]
+    push_cast
+    linarith [Nat.le_ceil (Real.sqrt ((N : ℝ) * Real.log 2 / 2))]
+
+/-- [proved-derived; formal-checked] **A finer grain determines the coarser read.** Refining by an
+integer factor `m`, the read at `m L` determines the read at `L`:
+`grainRead L f = (n, ⌊k′/m⌋)` with `(n, k′) = grainRead (m L) f`. So a machine whose grain
+refines by integer factors (dyadically, `L = 2^j`) re-bases each lattice onto the finer one
+without losing a read it already made. -/
+theorem grainRead_of_refined {m : ℕ} (hm : 0 < m) (L : ℕ) (f : ℝ) :
+    grainRead L f = ((grainRead (m * L) f).1, (grainRead (m * L) f).2 / (m : ℤ)) := by
+  refine Prod.ext rfl ?_
+  show ⌊(L : ℝ) * Int.fract f⌋ = ⌊((m * L : ℕ) : ℝ) * Int.fract f⌋ / (m : ℤ)
+  rw [← Int.floor_div_natCast]
+  congr 1
+  have : (m : ℝ) ≠ 0 := by exact_mod_cast hm.ne'
+  push_cast
+  field_simp
+
+/-- [proved-derived; formal-checked] **Same fine cell, same coarse cell.** -/
+theorem grainRead_refines {m : ℕ} (hm : 0 < m) (L : ℕ) {f f' : ℝ}
+    (h : grainRead (m * L) f = grainRead (m * L) f') : grainRead L f = grainRead L f' := by
+  rw [grainRead_of_refined hm L f, grainRead_of_refined hm L f', h]
+
+/-- [proved-derived; formal-checked] **The continuing machine's grain hides nothing it could
+confirm.** At reading count `N > 0` with grain `L(N)`, any two media in the same cell for every
+class, over the `N` independent readings, carry less than one bit. -/
+theorem refiningGrain_unconfirmable {ι ρ : Type*} [Fintype ι] [Nonempty ι] [Fintype ρ]
+    [DecidableEq ρ] (hρ : 0 < Fintype.card ρ) (v v' : ρ → ι → ℝ)
+    (hcell : ∀ r c, grainRead (refiningGrain (Fintype.card ρ)) (v' r c) =
+      grainRead (refiningGrain (Fintype.card ρ)) (v r c)) :
+    (joint fun r => face fun i => v r i * Real.log 2).klDivergence
+        (joint fun r => face fun i => v' r i * Real.log 2) / Real.log 2 < 1 := by
+  have hl : 0 < Real.log 2 := Real.log_pos (by norm_num)
+  have hL : 0 < refiningGrain (Fintype.card ρ) := by
+    unfold refiningGrain
+    rw [Nat.ceil_pos]
+    apply Real.sqrt_pos.mpr
+    have : (0 : ℝ) < Fintype.card ρ := by exact_mod_cast hρ
+    positivity
+  exact grain_unconfirmable hL hρ (refiningGrain_spec _).1 v v' hcell
+
+end Refining
+
+/-! ## 9. Campaign 1's numbers -/
 
 section Campaign
 
@@ -973,6 +1281,18 @@ section Audit
 #print axioms grain_unconfirmable
 #print axioms grain_criterion_iff
 #print axioms derived_grains
+#print axioms odometer_pairing_ratio
+#print axioms two_rpow_ge_chord
+#print axioms odometer_le_face_weight
+#print axioms odometer_mass_le
+#print axioms odometer_step_bound
+#print axioms odometer_certified_decrease
+#print axioms odometer_ratio_sixteen
+#print axioms refiningGrain_spec
+#print axioms refiningGrain_growth
+#print axioms grainRead_of_refined
+#print axioms grainRead_refines
+#print axioms refiningGrain_unconfirmable
 
 end Audit
 
