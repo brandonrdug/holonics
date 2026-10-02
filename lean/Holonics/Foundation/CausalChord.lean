@@ -1,4 +1,6 @@
 import Mathlib.LinearAlgebra.Matrix.Charpoly.Coeff
+import Mathlib.LinearAlgebra.Charpoly.ToMatrix
+import Mathlib.LinearAlgebra.Dimension.Constructions
 import Mathlib.LinearAlgebra.Matrix.NonsingularInverse
 import Mathlib.LinearAlgebra.Matrix.PosDef
 import Mathlib.LinearAlgebra.Matrix.Notation
@@ -22,7 +24,7 @@ cancellation, poles named by their factors, residues, the resolvent's index and 
 cospectral pair) are in `docs/RECEIVER_HOLARCHY.md`, "The causal chord". It is receiver **R1** of
 `docs/plans/THE_RECEIVER_ATLAS_SEPARATES_WHAT_ONE_FACE_CANNOT.md` and it formalizes the rate-form
 algebra of `research/records/2026-09-15_INTEGRATING_AND_DIFFERENTIATING_ROLES_SHARE_ONE_CURRENT.md`
-§"The critical seam is the `Sigma_G = 0` case". Three things are stated here, in this order.
+§"The critical seam is the `Sigma_G = 0` case". Four things are stated here, in this order.
 
 1. **The transfer function over a field.** A `Linearization` is the triple `(A, B, C)` of the plan's
    `x' = A x + B u`, `y = C x`, carried as `state`/`excitation`/`readout` so that no field name
@@ -46,6 +48,19 @@ algebra of `research/records/2026-09-15_INTEGRATING_AND_DIFFERENTIATING_ROLES_SH
    a pole, because the mode it names is neither excited by `excitation` nor observed by `readout`.
    The inclusion "poles ⊆ eigenvalues" is therefore strict, and the reduced denominator
    `X − C 1` is exhibited with a nonzero value at `2`.
+4. **The chord survives the release.** A chart `V`, any `r × n` matrix, with `V A = Ā V`,
+   `V B = B̄` and `C = C̄ V` leaves the transfer object unchanged,
+   `C(sI − A)⁻¹B = C̄(sI − Ā)⁻¹B̄` (`transfer_descend`). The characteristic matrices intertwine
+   (`charmatrix_intertwine`), so the resolvents do, `(sI − Ā)⁻¹V = V(sI − A)⁻¹`, and
+   `transfer_eq_resolvent` reads the transfer object as `C(sI − A)⁻¹B` in `RatFunc K`. Hence
+   `det(sI − Ā)` already clears every entry of the full chord (`descended_denominator_clears`);
+   when `V` is onto, `det(sI − Ā)` divides `det(sI − A)` (`charpoly_dvd_of_quotient`: in a basis
+   adapted to `ker V`, `Basis.sumQuot`, the matrix is block triangular with `Ā` as its quotient
+   block), so the release removes only factors of `det(sI − A)` that every entry cancels
+   (`release_cancels`). This is the mode quotient's descended chord (`HNN/ModeQuotient` item 3,
+   `docs/HNN_FORMULA.md`, "The chord survives the release"), which the retired Rust test
+   `the_chord_survives_the_release` (`hnn/tests/modes.rs`, history at `1bdacc8f`) checked entry by
+   entry in lowest terms on exact fixtures.
 
 [proved-derived; formal-checked] **The rate form.** `rateForm A G = Aᴴ G + G A` is the constant-`G`
 case of the record's `Sigma_G = A*G + GA + G'`. `rateForm_congruence` is the record's
@@ -166,6 +181,64 @@ theorem charpoly_conj {U V M : Matrix ι ι R} (h₂ : V * U = 1) :
 
 end Chart
 
+/-! ## A quotient's characteristic polynomial divides the whole's -/
+
+section Quotient
+
+variable {K : Type*} [Field K] {n r : ℕ}
+
+/-- [proved-standard; formal-checked] **A quotient's characteristic polynomial divides the
+whole's.** If `V` is onto and `V T = S V`, then `ker V` is carried by `T`; in a basis of `K^n`
+adapted to `ker V` (`Module.Basis.sumQuot`, a basis of the kernel followed by lifts of a basis of
+the quotient, which `V` identifies with `K^r`) the matrix of `T` is block triangular with `S` as its
+quotient block, so `charpoly T = charpoly(T on ker V) · charpoly S`. -/
+theorem charpoly_dvd_of_quotient (V : Matrix (Fin r) (Fin n) K)
+    (hV : Function.Surjective V.mulVec) {T : Matrix (Fin n) (Fin n) K}
+    {S : Matrix (Fin r) (Fin r) K} (h : V * T = S * V) : S.charpoly ∣ T.charpoly := by
+  set Vl : (Fin n → K) →ₗ[K] (Fin r → K) := Matrix.toLin' V
+  set f : (Fin n → K) →ₗ[K] (Fin n → K) := Matrix.toLin' T
+  have hVl : Function.Surjective Vl := hV
+  set W := LinearMap.ker Vl
+  have hinv : ∀ v ∈ W, f v ∈ W := by
+    intro v hv
+    simp only [W, LinearMap.mem_ker, Vl, f, Matrix.toLin'_apply] at hv ⊢
+    rw [mulVec_mulVec, h, ← mulVec_mulVec, hv, mulVec_zero]
+  let e : ((Fin n → K) ⧸ W) ≃ₗ[K] (Fin r → K) := Vl.quotKerEquivOfSurjective hVl
+  let bW := Module.finBasis K W
+  let bQ : Module.Basis (Fin r) K ((Fin n → K) ⧸ W) := (Pi.basisFun K (Fin r)).map e.symm
+  let b := Module.Basis.sumQuot bW bQ
+  set M := LinearMap.toMatrix b b f
+  have hM : M.charpoly = T.charpoly := by
+    rw [LinearMap.charpoly_toMatrix, Matrix.charpoly_toLin']
+  have h21 : M.toBlocks₂₁ = 0 := by
+    ext i j
+    simp only [toBlocks₂₁, of_apply, Matrix.zero_apply, M, LinearMap.toMatrix_apply]
+    rw [Module.Basis.sumQuot_inl]
+    exact Module.Basis.sumQuot_repr_inr_of_mem bW bQ _ (hinv _ (bW j).2) i
+  have hVb : ∀ j, V *ᵥ b (Sum.inr j) = Pi.single j 1 := by
+    intro j
+    have h1 : e (Submodule.Quotient.mk (b (Sum.inr j))) = Vl (b (Sum.inr j)) :=
+      Vl.quotKerEquivOfSurjective_apply_mk hVl _
+    rw [Module.Basis.sumQuot_inr] at h1
+    simp only [bQ, Module.Basis.map_apply, LinearEquiv.apply_symm_apply, Pi.basisFun_apply] at h1
+    rw [← Matrix.toLin'_apply]
+    exact h1.symm
+  have h22 : M.toBlocks₂₂ = S := by
+    ext i j
+    simp only [toBlocks₂₂, of_apply, M, LinearMap.toMatrix_apply]
+    rw [Module.Basis.sumQuot_repr_inr]
+    simp only [bQ, Module.Basis.map_repr, LinearEquiv.trans_apply, LinearEquiv.symm_symm,
+      Pi.basisFun_repr, Submodule.mkQ_apply]
+    rw [show e (Submodule.Quotient.mk (f (b (Sum.inr j)))) = Vl (f (b (Sum.inr j))) from
+      Vl.quotKerEquivOfSurjective_apply_mk hVl _]
+    simp only [Vl, f, Matrix.toLin'_apply]
+    rw [mulVec_mulVec, h, ← mulVec_mulVec, hVb, mulVec_single_one]
+    rfl
+  rw [← hM, ← Matrix.fromBlocks_toBlocks M, h21, h22, Matrix.charpoly_fromBlocks_zero₂₁]
+  exact Dvd.intro_left _ rfl
+
+end Quotient
+
 /-! ## The transfer function over a field -/
 
 /-- [definition] A local linearization `x' = A x + B u`, `y = C x`. The three fields are named
@@ -270,6 +343,103 @@ in which it is written. -/
 theorem rebase_transfer (T : (Matrix (Fin n) (Fin n) K)ˣ) (L : Linearization K n m p) :
     (rebase T L).transfer = L.transfer := by
   rw [transfer, transfer, rebase_denominator, rebase_numerator]
+
+/-! ### The chord survives the release -/
+
+/-- [proved-derived; formal-checked] **The transfer object is the resolvent.** In `RatFunc K`,
+`transfer = C (sI − A)⁻¹ B` with the characteristic matrix inverted: the adjugate over the
+determinant is the inverse once both are read as rational functions. -/
+theorem transfer_eq_resolvent (L : Linearization K n m p) :
+    L.transfer = (L.readout.map Polynomial.C).map (algebraMap K[X] (RatFunc K))
+      * ((Matrix.charmatrix L.state).map (algebraMap K[X] (RatFunc K)))⁻¹
+      * (L.excitation.map Polynomial.C).map (algebraMap K[X] (RatFunc K)) := by
+  set φ := algebraMap K[X] (RatFunc K)
+  rw [Matrix.inv_def, Ring.inverse_eq_inv, transfer, numerator, denominator, Matrix.charpoly,
+    Matrix.map_mul, Matrix.map_mul]
+  have hdet : φ (Matrix.charmatrix L.state).det
+      = ((Matrix.charmatrix L.state).map φ).det := by
+    rw [RingHom.map_det, RingHom.mapMatrix_apply]
+  have hadj : ((Matrix.charmatrix L.state).adjugate).map φ
+      = ((Matrix.charmatrix L.state).map φ).adjugate := by
+    rw [← RingHom.mapMatrix_apply, RingHom.map_adjugate, RingHom.mapMatrix_apply]
+  rw [hdet, hadj, Matrix.mul_smul, Matrix.smul_mul]
+
+/-- [proved-derived; formal-checked] **A chart that closes the square intertwines the
+characteristic matrices**: `V T = S V` gives `V (sI − T) = (sI − S) V` in the polynomial chart,
+for a rectangular `V`. -/
+theorem charmatrix_intertwine {r : ℕ} (V : Matrix (Fin r) (Fin n) K)
+    {T : Matrix (Fin n) (Fin n) K} {S : Matrix (Fin r) (Fin r) K} (h : V * T = S * V) :
+    V.map Polynomial.C * Matrix.charmatrix T = Matrix.charmatrix S * V.map Polynomial.C := by
+  have hscal : ∀ {a b : ℕ} (W : Matrix (Fin a) (Fin b) K[X]),
+      W * Matrix.scalar (Fin b) (X : K[X]) = Matrix.scalar (Fin a) (X : K[X]) * W := by
+    intro a b W
+    rw [Matrix.scalar_apply, Matrix.scalar_apply, ← Matrix.smul_one_eq_diagonal,
+      ← Matrix.smul_one_eq_diagonal, Matrix.mul_smul, Matrix.mul_one, Matrix.smul_mul,
+      Matrix.one_mul]
+  have hmap : V.map Polynomial.C * T.map Polynomial.C = S.map Polynomial.C * V.map Polynomial.C := by
+    rw [← Matrix.map_mul, ← Matrix.map_mul, h]
+  simp only [Matrix.charmatrix, RingHom.mapMatrix_apply, Matrix.mul_sub, Matrix.sub_mul, hscal,
+    hmap]
+
+/-- [proved-derived; formal-checked] **`transfer_descend`: the chord survives the release.** A
+chart `V : K^n → K^r` with `V A = Ā V`, `V B = B̄` and `C = C̄ V` leaves the whole transfer object
+unchanged, `C (sI − A)⁻¹ B = C̄ (sI − Ā)⁻¹ B̄`: the resolvents intertwine,
+`(sI − Ā)⁻¹ V = V (sI − A)⁻¹`, and the chart is absorbed by the excitation on one side and the
+readout on the other. `V` need not be onto; at `r = 0` both sides are zero. -/
+theorem transfer_descend {r : ℕ} (L : Linearization K n m p) (L' : Linearization K r m p)
+    (V : Matrix (Fin r) (Fin n) K) (hT : V * L.state = L'.state * V)
+    (hB : V * L.excitation = L'.excitation) (hρ : L.readout = L'.readout * V) :
+    L.transfer = L'.transfer := by
+  set φ := algebraMap K[X] (RatFunc K)
+  set M := (Matrix.charmatrix L.state).map φ
+  set M' := (Matrix.charmatrix L'.state).map φ
+  set W := (V.map Polynomial.C).map φ
+  have hM : IsUnit M.det := by
+    rw [isUnit_iff_ne_zero, show M.det = φ (Matrix.charmatrix L.state).det by
+      rw [RingHom.map_det, RingHom.mapMatrix_apply]]
+    exact RatFunc.algebraMap_ne_zero L.denominator_ne_zero
+  have hM' : IsUnit M'.det := by
+    rw [isUnit_iff_ne_zero, show M'.det = φ (Matrix.charmatrix L'.state).det by
+      rw [RingHom.map_det, RingHom.mapMatrix_apply]]
+    exact RatFunc.algebraMap_ne_zero L'.denominator_ne_zero
+  have hWM : W * M = M' * W := by
+    simp only [W, M, M', ← Matrix.map_mul, charmatrix_intertwine V hT]
+  have hcomm : W * M⁻¹ = M'⁻¹ * W := by
+    calc W * M⁻¹ = M'⁻¹ * M' * W * M⁻¹ := by rw [Matrix.nonsing_inv_mul _ hM', Matrix.one_mul]
+      _ = M'⁻¹ * (W * M) * M⁻¹ := by rw [hWM]; simp only [Matrix.mul_assoc]
+      _ = M'⁻¹ * W := by rw [Matrix.mul_assoc, Matrix.mul_assoc, Matrix.mul_nonsing_inv _ hM,
+            Matrix.mul_one]
+  rw [transfer_eq_resolvent, transfer_eq_resolvent, hρ, ← hB]
+  simp only [Matrix.map_mul]
+  change _ * W * M⁻¹ * _ = _ * M'⁻¹ * (W * _)
+  rw [Matrix.mul_assoc _ W, hcomm]
+  simp only [Matrix.mul_assoc]
+
+/-- [proved-derived; formal-checked] **The descended denominator clears the full chord.** Under the
+hypotheses of `transfer_descend`, one copy of `det(sI − Ā)` turns every entry of the full ring's
+transfer object into the descended numerator, a polynomial: no pole of the full chord lies outside
+the spectrum of `Ā`. -/
+theorem descended_denominator_clears {r : ℕ} (L : Linearization K n m p)
+    (L' : Linearization K r m p) (V : Matrix (Fin r) (Fin n) K)
+    (hT : V * L.state = L'.state * V) (hB : V * L.excitation = L'.excitation)
+    (hρ : L.readout = L'.readout * V) :
+    (algebraMap K[X] (RatFunc K) L'.denominator) • L.transfer
+      = (L'.numerator).map (algebraMap K[X] (RatFunc K)) := by
+  rw [transfer_descend L L' V hT hB hρ, denominator_smul_transfer_eq_numerator]
+
+/-- [proved-derived; formal-checked] **`release_cancels`: the release removes only factors every
+entry cancels.** When the chart `V` is onto (a release of `ker V`), `det(sI − A)` is
+`det(sI − Ā)` times the released factor `R` (`charpoly_dvd_of_quotient`), and `det(sI − Ā)` alone
+already clears every entry of the full chord (`descended_denominator_clears`): the factor `R` is
+cancelled by every entry. -/
+theorem release_cancels {r : ℕ} (L : Linearization K n m p) (L' : Linearization K r m p)
+    (V : Matrix (Fin r) (Fin n) K) (hV : Function.Surjective V.mulVec)
+    (hT : V * L.state = L'.state * V) (hB : V * L.excitation = L'.excitation)
+    (hρ : L.readout = L'.readout * V) :
+    (∃ R : K[X], L.denominator = L'.denominator * R) ∧
+      (algebraMap K[X] (RatFunc K) L'.denominator) • L.transfer
+        = (L'.numerator).map (algebraMap K[X] (RatFunc K)) :=
+  ⟨charpoly_dvd_of_quotient V hV hT, descended_denominator_clears L L' V hT hB hρ⟩
 
 /-! ### Cancellation is visible, not lost -/
 
@@ -575,6 +745,12 @@ section Axioms
 #print axioms Linearization.rebase_denominator
 #print axioms Linearization.rebase_numerator
 #print axioms Linearization.rebase_transfer
+#print axioms charpoly_dvd_of_quotient
+#print axioms Linearization.transfer_eq_resolvent
+#print axioms Linearization.charmatrix_intertwine
+#print axioms Linearization.transfer_descend
+#print axioms Linearization.descended_denominator_clears
+#print axioms Linearization.release_cancels
 #print axioms Linearization.cancellingWitness_denominator
 #print axioms Linearization.cancellingWitness_numerator
 #print axioms Linearization.cancellation_is_strict
