@@ -398,15 +398,6 @@ __device__ void tree_split(uint64_t n, uint64_t d, int64_t e, uint32_t upper_run
     upper.exponent -= released;
 }
 
-// -------------------------------------------------------------------------------------------------
-// the register's capacity
-// -------------------------------------------------------------------------------------------------
-
-// **The register's carry after a deposit** (`context::Capacity::carry`; Lean
-// `Compression/Landmark/Context/Capacity.{capCarry, cap_carry_half_units}`): on the half-unit masses `h_b = 2n_b + 1`,
-// when `n_0 + n_1 ≥ L = 2^c`, that is `h_0 + h_1 ≥ 2L + 2 = ceiling`, each `n_b ← ⌈n_b/2⌉`, that is
-// `h_b ← 2⌊(h_b + 1)/4⌋ + 1`. The sum is read in 64 bits, so the unbounded ceiling `u64::MAX` is
-// never reached.
 // A node's face of `symbol` at the declared base (the host's `Topology::kt_based`): the masses
 // `(m_b, M)` at the even base, `(16 m_b − 16 + 2·16π_b, 16M)` at the root's, with
 // `16π_0 = ⌊(2(8 m_0 + 4M_root) + M_root)/(2 M_root)⌋` read from the root's masses.
@@ -427,6 +418,15 @@ __device__ __forceinline__ void tree_kt(const TreeLaw& law, const uint32_t* halv
     *v = 16 * total;
 }
 
+// -------------------------------------------------------------------------------------------------
+// the register's capacity
+// -------------------------------------------------------------------------------------------------
+
+// **The register's carry after a deposit** (`context::Capacity::carry`; Lean
+// `Compression/Landmark/Context/Capacity.{capCarry, cap_carry_half_units}`): on the half-unit masses `h_b = 2n_b + 1`,
+// when `n_0 + n_1 ≥ L = 2^c`, that is `h_0 + h_1 ≥ 2L + 2 = ceiling`, each `n_b ← ⌈n_b/2⌉`, that is
+// `h_b ← 2⌊(h_b + 1)/4⌋ + 1`. The sum is read in 64 bits, so the unbounded ceiling `u64::MAX` is
+// never reached.
 __device__ __forceinline__ void tree_carry(uint32_t* halves, uint64_t ceiling) {
     if ((uint64_t)halves[0] + halves[1] >= ceiling) {
         halves[0] = 2u * ((halves[0] + 1u) / 4u) + 1u;

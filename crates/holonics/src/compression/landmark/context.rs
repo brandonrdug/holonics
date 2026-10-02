@@ -1124,7 +1124,13 @@ impl std::fmt::Display for Capacity {
 /// is `(2^(j+4) n_b + 2·16π_b)/(2^(j+4) n + 32)`. A fresh or sparse context then leans on the
 /// unconditional split its digit tree has seen, not on an even one. Every node of a chain shares the
 /// base, so the storage where paths part stays exact; each base mass is at least a quarter, so the
-/// faces' floor is `1/(2(2^j n* + 2))`, one bit below `Even`'s.
+/// faces' floor is `1/(2(2^j n* + 2))`, one bit below `Even`'s. [proved-derived; formal-checked]
+/// Lean `Compression/Landmark/Context/BaseMeasure`: the rounding is `⌊16(½ k_root(0) + ¼) + ½⌋` in
+/// `[4, 12]` sixteenths (`8` at an empty root, so "no root yet" reads the formula's own value), a
+/// level past the last stored one reads `π_0` (a node with no arrival), the code is the root weight
+/// over the based own weights and complete, the floor holds on every path, and the redundancy is
+/// `Even`'s plus at most `c(k) + c(m)` a leaf, `c(K + 1) ≤ 1 + 3/2^(j+2)(1 + ln K)`: under 4 bits a
+/// leaf at campaign 1.
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash)]
 pub enum BaseMeasure {
     Even,
