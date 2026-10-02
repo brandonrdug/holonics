@@ -1642,7 +1642,8 @@ pub(super) fn step_state(terrain: &str, seed: u64, count: usize, out: &str, sour
 }
 
 /// [measured-diagnostic; October 2] **The release's lock order read at its resolution**
-/// (`executed locks <terrain> <seed> <count> <label=state> <arm> [request]`): the batch's released
+/// (`executed locks <terrain> <seed> <count> <label=source> <arm> [request]`, sources as
+/// [`segment_source`]): the batch's released
 /// comparison, then every request's release refinement by refinement through the release's own lock
 /// iteration (`hnn::prediction::bank_release`, each candidate read by its joint growth). In each
 /// refinement each eligible station has a certain gap (its top's lower end less the strongest rival's
@@ -1663,11 +1664,7 @@ pub(super) fn locks(terrain: &str, seed: u64, count: usize, source: &str, arm: &
     let requests = open_requests(&engine, &pairs);
     let (comparison, _) = arm_comparison(arm);
     let (label, spec) = source.split_once('=').expect("<label>=<source>");
-    let theta = if is_continuing(spec) {
-        remounted(&engine.theta, spec)
-    } else {
-        trained(&engine.theta, engine.refinement.ring(), spec)
-    };
+    let theta = segment_source(&engine, engine.refinement.ring(), spec);
     let batch = compare(&engine.field, &theta, &requests, &engine.refinement, &bank, BANK_GRAIN, comparison)
         .expect("the batch's comparison");
     let (solved, all) = solved_terms(&batch);
