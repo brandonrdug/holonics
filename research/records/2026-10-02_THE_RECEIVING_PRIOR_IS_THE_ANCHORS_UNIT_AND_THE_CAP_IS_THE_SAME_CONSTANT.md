@@ -96,6 +96,10 @@ trace reaches `1` at 3,239 readings (`3239 · 10608674/2^35 ≥ 1 > 3238 · 1060
 the campaign's 3,400, so over the whole campaign the accumulated Gram may outweigh the prior along
 its leading direction. The third aeon is not read here.
 
+[The whole campaign is read](2026-10-02_THE_READINGS_LOCATE_THE_RECEIVING_PRIOR_BY_THE_PREQUENTIAL_CERTIFICATE.md)
+§1–§2: the trace reaches `1` at reading 3,109, every eigenvalue stays below it, and the best
+member over the integer scales is `2 I`.
+
 ## 5. The readings' code locates the scale
 
 `receiver_prior_scale.py` replays the receiving map's executed law on the combined face (tree

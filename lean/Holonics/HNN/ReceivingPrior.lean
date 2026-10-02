@@ -15,6 +15,7 @@ reads it on the code and on campaign 1's anchors.
 unit        H = s I + Σ w f fᵀ ,  f = c f′ ,  x = c x′ ,  s = c²   ⇒   ⟨H⁻¹ f, x⟩ = ⟨H′⁻¹ f′, x′⟩ ,  H′ = I + Σ w f′ f′ᵀ
 opening     H′ = s I + z zᵀ                                       ⇒   ⟨H′⁻¹ z, z⟩ = |z|²/(s + |z|²)
 one cap     reads ∝ 1/s ,  η = min(a/C, 1/max(osc, 1))             ⇒   η D = D₁ min(a₁/C₁, 1/max(osc₁, s))
+located     a = Σ_t ⟨g_t, W_t z_t⟩ ,  V = ln 2 Σ_t Var_p(W_t z_t)     ⇒   s ↦ s/(1 + a/V) ;  at the opening s = V₀/a₀
 ```
 
 1. **The prior's scale is the anchors' unit** (`unit_step_read_prior_scale`). The unit step
@@ -34,6 +35,15 @@ one cap     reads ∝ 1/s ,  η = min(a/C, 1/max(osc, 1))             ⇒   η D
    (`a`, `osc` as `1/s`, `C` as `1/s²`). The certified step `η = min(a/C, 1/max(osc, 1))` (the
    curvature's and the unit step's caps, before the dyadic floor) then moves the map by
    `D₁ min(a₁/C₁, 1/max(osc₁, s))`: `s` enters only as the floor of the oscillation cap.
+4. **The readings locate the prior** (`prequential_pairs`, `fisher_trace`, `newton_point`,
+   `variance_smul`; the record
+   `research/records/2026-10-02_THE_READINGS_LOCATE_THE_RECEIVING_PRIOR_BY_THE_PREQUENTIAL_CERTIFICATE.md`).
+   Each reading meets the map built from the readings before it. Where the map is `1/s` times its
+   unit, scaling the prior scales the map inversely, and the prequential code's Newton point in that
+   scale is `φ = 1 + a/V`, read from the certificate's alignment and curvature on readings before
+   their deposit. At the opening the alignment is the covectors' signal less their self-energy
+   (the ordered pairs), whose chance level is the class Fisher trace `1 − Σ p²`, and the located
+   prior `V₀/a₀` scales with the anchors' energy, as the prior's unit requires.
 -/
 
 namespace Holonics.HNN.ReceivingPrior
@@ -158,5 +168,91 @@ theorem cap_and_prior_one_constant (s a C o : L) (hs : 0 < s) (hC : 0 < C) :
   congr 1
   · field_simp
   · rw [div_div, hmax]
+
+open Finset
+
+/-- [proved-derived; formal-checked] **The prequential pairs.** Reading `t` meets the map built from
+the readings before it, so its first-order gain pairs it with every earlier reading once. For a
+symmetric pairing `k`, twice the sum over the ordered pairs `u < t` is the whole pairing less its
+diagonal: `2 Σ_(u<t) k(u, t) = Σ_(u,t) k(u, t) − Σ_t k(t, t)`. With
+`k(u, t) = κ ⟨g_u, g_t⟩⟨z_u, z_t⟩` the whole pairing is `κ‖Σ g zᵀ‖²` and the diagonal each
+reading's own `κ|g_t|²|z_t|²`: the opening's prequential alignment is the covectors' signal less
+their self-energy. -/
+theorem prequential_pairs {N : ℕ} {K : Type*} [CommRing K] (k : Fin N → Fin N → K)
+    (hk : ∀ u t, k u t = k t u) :
+    2 * ∑ t, ∑ u ∈ univ.filter (· < t), k u t = ∑ t, ∑ u, k u t - ∑ t, k t t := by
+  have hsplit : ∀ t, ∑ u, k u t = ∑ u ∈ univ.filter (· < t), k u t + k t t
+      + ∑ u ∈ univ.filter (t < ·), k u t := by
+    intro t
+    rw [← sum_filter_add_sum_filter_not univ (· < t)]
+    rw [← sum_filter_add_sum_filter_not (univ.filter fun u => ¬ u < t) (t < ·)]
+    have h1 : (univ.filter fun u => ¬ u < t).filter (fun u => ¬ t < u) = {t} := by
+      ext u; simp only [mem_filter, mem_univ, true_and, mem_singleton, not_lt]
+      constructor
+      · rintro ⟨h1, h2⟩; exact le_antisymm h2 h1
+      · rintro rfl; exact ⟨le_rfl, le_rfl⟩
+    have h2 : (univ.filter fun u => ¬ u < t).filter (fun u => t < u) = univ.filter (t < ·) := by
+      ext u; simp only [mem_filter, mem_univ, true_and, not_lt]
+      constructor
+      · rintro ⟨_, h⟩; exact h
+      · intro h; exact ⟨h.le, h⟩
+    rw [h1, h2, sum_singleton]; ring
+  have hswap : ∑ t, ∑ u ∈ univ.filter (t < ·), k u t = ∑ t, ∑ u ∈ univ.filter (· < t), k u t := by
+    rw [sum_comm' (t' := univ) (s' := fun u => univ.filter (· < u))]
+    · refine sum_congr rfl fun u _ => sum_congr rfl fun t _ => hk u t
+    · intro t u; simp
+  rw [sum_congr rfl fun t _ => hsplit t, sum_add_distrib, sum_add_distrib, hswap]
+  ring
+
+omit [LinearOrder L] [IsStrictOrderedRing L] in
+/-- [proved-derived; formal-checked] **The self-energy's level is the class Fisher trace.** Under
+the face's own masses `p` (`Σ p = 1`), the expected energy of the covector `q − p`, `q` the target's
+indicator, is `Σ_c p_c |e_c − p|² = 1 − Σ p²`, the trace of `diag p − p pᵀ`. -/
+theorem fisher_trace {C : Type*} [Fintype C] [DecidableEq C] (p : C → L) (hp : ∑ c, p c = 1) :
+    ∑ c, p c * ∑ j, (Pi.single (M := fun _ => L) c 1 j - p j) ^ 2 = 1 - ∑ j, p j ^ 2 := by
+  have h : ∀ c, ∑ j, (Pi.single (M := fun _ => L) c 1 j - p j) ^ 2 = 1 - 2 * p c + ∑ j, p j ^ 2 := by
+    intro c
+    have : ∀ j, (Pi.single (M := fun _ => L) c 1 j - p j) ^ 2
+        = Pi.single (M := fun _ => L) c 1 j - 2 * (Pi.single (M := fun _ => L) c 1 j * p j) + p j ^ 2 := by
+      intro j
+      by_cases hj : j = c
+      · subst hj; simp; ring
+      · simp [hj]
+    simp only [this, sum_add_distrib, sum_sub_distrib, ← mul_sum]
+    simp [Pi.single_apply]
+  simp only [h, mul_add, mul_sub, sum_add_distrib, sum_sub_distrib, ← sum_mul, hp, mul_one]
+  have : ∑ c, p c * (2 * p c) = 2 * ∑ j, p j ^ 2 := by
+    rw [mul_sum]; exact sum_congr rfl fun c _ => by ring
+  rw [this]; ring
+
+/-- [proved-derived; formal-checked] **The Newton point of the scaled map.** Scaling the map by `φ`
+moves the prequential code, to second order, by `−φ a + φ² V/2` (`a` the prequential alignment,
+`V` its curvature); for `V > 0` its least value is at `φ = a/V`. -/
+theorem newton_point (a V φ : L) (hV : 0 < V) :
+    -(a / V) * a + (a / V) ^ 2 * V / 2 ≤ -φ * a + φ ^ 2 * V / 2 := by
+  have h : 0 ≤ (φ * V - a) ^ 2 / V := div_nonneg (sq_nonneg _) hV.le
+  have hV' : V ≠ 0 := hV.ne'
+  have e : -φ * a + φ ^ 2 * V / 2 - (-(a / V) * a + (a / V) ^ 2 * V / 2) = (φ * V - a) ^ 2 / V / 2 := by
+    field_simp; ring
+  linarith [e, h]
+
+omit [LinearOrder L] [IsStrictOrderedRing L] in
+/-- The variance of a move `x` under the masses `p` (`Var_p`, unnormalized when `Σ p ≠ 1`). -/
+def variance {C : Type*} [Fintype C] (p : C → L) (x : C → L) : L :=
+  ∑ c, p c * x c ^ 2 - (∑ c, p c * x c) ^ 2
+
+omit [LinearOrder L] [IsStrictOrderedRing L] in
+/-- [proved-derived; formal-checked] A move scaled by `k` has `k²` times the variance. With
+`z ↦ c z` the opening's map `M ↦ c M`, so `M z ↦ c² M z`: the curvature `Σ Var_p(M z)` scales by
+`c⁴`, the alignment `Σ ⟨g, M z⟩` by `c²`, and the located prior `V/a` by `c²`, as the prior's unit
+(`unit_step_read_prior_scale`) requires. -/
+theorem variance_smul {C : Type*} [Fintype C] (p : C → L) (x : C → L) (k : L) :
+    variance p (fun c => k * x c) = k ^ 2 * variance p x := by
+  unfold variance
+  have h1 : ∑ c, p c * (k * x c) ^ 2 = k ^ 2 * ∑ c, p c * x c ^ 2 := by
+    rw [mul_sum]; exact sum_congr rfl fun c _ => by ring
+  have h2 : ∑ c, p c * (k * x c) = k * ∑ c, p c * x c := by
+    rw [mul_sum]; exact sum_congr rfl fun c _ => by ring
+  rw [h1, h2]; ring
 
 end Holonics.HNN.ReceivingPrior
