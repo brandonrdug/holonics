@@ -1349,6 +1349,8 @@ in about `3353 + ε` bits, about 233 below PPM order 4. Campaign 1 declares the 
   and `133631 + 8/16 + ε` held-out bits, against the even base's `916377 + 0/16` and
   `134954 + 1/16`: about one percent less on each, and `2^(−3)` is the least of the three masses
   read there too.
+- The stop prior's ladder under the root's base (the replica, depth 16, `2^(−3)`): rungs 1, 2 and 3
+  code `8936120/2^9`, `9108226/2^9` and `9360469/2^9` development bits; the half stays.
 - The depth's limit depends on the population. At 523,215 cells the widths refuse depth 63 (an
   operand of 132 bits), so the deepest the carriers admit sets it there; at campaign 1's 6,148 cells
   the card's kernel path does.
