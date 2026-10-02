@@ -10,7 +10,7 @@ from math import comb
 def cells(path):
     out = []
     for line in open(path):
-        m = re.search(r"target \[([0-9, ]*)\] \| released \[([0-9, ]*)\]", line)
+        m = re.search(r"target \[([0-9, ]*)\] \| (?:released|held) \[([0-9, ]*)\]", line)
         if m:
             t = [int(x) for x in m.group(1).split(',')]
             r = [int(x) for x in m.group(2).split(',')]
