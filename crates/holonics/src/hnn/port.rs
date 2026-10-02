@@ -190,18 +190,18 @@ pub enum ReceiptDetail {
         /// the exposure carries across the commit that follows and checks at every word.
         word: Box<crate::hnn::word::WordBalance>,
     },
-    /// `compare`: the window's code length (the KL part, enclosed), phase excess, each phase's
+    /// `compare`: the epoch's code length (the KL part, enclosed), phase excess, each phase's
     /// winding, the residual of the wave's logits against the emitted ones, the loci reached, the
-    /// remainders the return's carried adjoint released at the open (the lattice word); each phase's
-    /// code length under the landmark tree's executed face alone (`tree`: `−log₂ q_T(t_j)`, the
-    /// face the population weighs; `hnn::receiving::Scored::tree`) and under the face of its grain
-    /// logits alone (`tree_grain`: `hnn::receiving::tree_code_length`, the face the combined read
-    /// opens at when the wave reads zero), each at the same standing and address as the combined
-    /// face (the landmark tree, the window read in cell order); and each phase's code length under the
-    /// receiver's scored face, its population over the tree's and the combined face (ruling A;
-    /// `hnn::receiving::receiving_population`), whose sum is the window's code length. The Holon ratio (its
-    /// phases' code lengths, excess and windings) is the combined face's, whose covector the wave
-    /// learns from.
+    /// remainders the return's carried adjoint released at the open (the lattice word); each
+    /// phase's code length under the landmark tree's executed face alone (`tree`: `−log₂ q_T(t_j)`,
+    /// the face the population weighs; `hnn::receiving::Scored::tree`) and under the face of its
+    /// grain logits alone (`tree_grain`: `hnn::receiving::tree_code_length`, the face the combined
+    /// read opens at when the wave reads zero), each at the same standing and address as the
+    /// combined face (the landmark tree, the epoch read in cell order); and each phase's code
+    /// length under the receiver's scored face, its population over the tree's and the combined
+    /// face (ruling A; `hnn::receiving::receiving_population`), whose sum is the epoch's code
+    /// length. The Holon ratio (its phases' code lengths, excess and windings) is the combined
+    /// face's, whose covector the wave learns from.
     Compare {
         code_length: crate::ratio::algebraic::ExactInterval,
         excess: Rat,
@@ -314,7 +314,7 @@ pub enum Transpose {
     Separator(Vec<Locus>),
 }
 
-/// **The release's width, read from its receiving phases** (module header): over the window's
+/// **The release's width, read from its receiving phases** (module header): over the epoch's
 /// faces, the largest fibre `ε_c`, the certified bound on how far any code length moves over the
 /// receiver's fibre (Lean `HNN/Ratio.face_code_length_within_grain`), in the supremum norm and
 /// attained at the widest `(phase, class)` coordinate; zero, attained at a point, when every logit
@@ -453,10 +453,10 @@ pub struct Pullback {
 
 /// [definition] **The staged material return** (design (c), `Deposit`): keyed by locus, inside the
 /// causal diamond of the source rings and the receiver, at the constitution commit it was computed
-/// at: the linear loci's windows, the factor families' steps and the receiving parametron's
-/// landmark steps (the landmark tree), one per reached comparison in cell order; and its reach
-/// (`hnn::constitution::Reach`: the stations, re-entries and phases its covectors summed), which
-/// the certified step reads. Only a compare builds one (`hnn::reference`).
+/// at: what reached each linear locus inside its diamond, the factor families' steps and the
+/// receiving parametron's landmark steps (the landmark tree), one per reached comparison in cell
+/// order; and its reach (`hnn::constitution::Reach`: the stations, re-entries and phases its
+/// covectors summed), which the certified step reads. Only a compare builds one (`hnn::reference`).
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct Deposit {
     commit: u64,
@@ -524,7 +524,7 @@ impl Deposit {
         self.commit
     }
 
-    /// The linear loci's windows.
+    /// What reached each linear locus inside its diamond.
     pub fn linear(&self) -> &[LinearStep] {
         &self.linear
     }
@@ -957,7 +957,7 @@ fn reverse(
     let steps = word.recorded().len();
     if steps != phases.junction_steps() {
         return Err(HnnError::Shape {
-            what: "the word's junction steps against its receiving window",
+            what: "the word's junction steps against its receiving phases",
             expected: phases.junction_steps(),
             found: steps,
         });
