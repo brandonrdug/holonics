@@ -1383,6 +1383,7 @@ fn the_throw_from_rest_is_the_impulse_and_hands_on_its_move() {
         &bank,
         12,
         Comparison::LOCK_DECISIONS,
+        MoveMetric::Throw,
         &ReleaseExcursion::monotone(),
         &Flight::default(),
     )
@@ -1455,6 +1456,7 @@ fn the_thrown_move_carries_its_momentum_through_the_accreted_mass() {
         &bank,
         12,
         Comparison::LOCK_DECISIONS,
+        MoveMetric::Throw,
         &ReleaseExcursion::monotone(),
         &flight,
     )
@@ -1482,6 +1484,95 @@ fn the_thrown_move_carries_its_momentum_through_the_accreted_mass() {
         assert_eq!(throw.next.moves, if throw.carried { 2 } else { 1 });
     } else {
         assert_eq!(throw.next, Flight::default());
+    }
+}
+
+/// **The throw stopped at its floor carries at most the coast's floor fraction** (the throw's record
+/// §7): from the same released successor and flight, `ThrowToFloor` reads the same coast and power
+/// as `Throw`; where the coast is carried it reads the fixed mask at the coast's end, and where the
+/// secant curvature `κ = 2(L(c) − L(0) − s)` is certified positive the fraction carried is in
+/// `(0, 1]` and at most `−s/κ` at the enclosures' ends; an adopted trial lowers the comparison with
+/// `ρ` held and hands on its move. From rest it is the throw's release.
+#[test]
+fn the_throw_to_its_floor_carries_at_most_the_floor_fraction_of_its_coast() {
+    use crate::hnn::executed::{
+        Flight, MoveMetric, ReleaseExcursion, executed_move_in, executed_move_thrown,
+    };
+    let field = joint();
+    let theta = generic(&field, 94).with_transport(0, rat(3, 4)).unwrap();
+    let refinement = Refinement::declare(&field, 0, 2, 1, 4, 2).unwrap();
+    let bank = joint_bank();
+    let requests =
+        short_requests(&field, &[(95, [0, 1, 2, 1]), (96, [1, 1, 0, 2]), (97, [2, 0, 1, 1])]);
+    let move_from = |constitution, metric, flight: &Flight| {
+        executed_move_thrown(
+            &field,
+            constitution,
+            &requests,
+            &refinement,
+            &bank,
+            12,
+            Comparison::LOCK_DECISIONS,
+            metric,
+            &ReleaseExcursion::monotone(),
+            flight,
+        )
+        .unwrap()
+    };
+    let released = move_from(&theta, MoveMetric::ThrowToFloor, &Flight::default());
+    let leap = executed_move_in(
+        &field,
+        &theta,
+        &requests,
+        &refinement,
+        &bank,
+        12,
+        Comparison::LOCK_DECISIONS,
+        MoveMetric::Throw,
+    )
+    .unwrap();
+    assert_eq!(
+        released.adopted.as_ref().map(|(s, _)| s.source_port(0).cloned()),
+        leap.adopted.as_ref().map(|(s, _)| s.source_port(0).cloned())
+    );
+    let Some((first, _)) = &released.adopted else {
+        panic!("the fixture's release is adopted: {:?}", released.refusal);
+    };
+    let flight = released.throw.as_ref().unwrap().next.clone();
+    let thrown = move_from(first, MoveMetric::Throw, &flight);
+    let floored = move_from(first, MoveMetric::ThrowToFloor, &flight);
+    let (throw, floor) = (thrown.throw.as_ref().unwrap(), floored.throw.as_ref().unwrap());
+    assert_eq!(floor.power, throw.power);
+    assert_eq!(floor.carried, throw.carried);
+    let power = floor.power.as_ref().expect("the power test");
+    if floor.carried {
+        let end = floor.coast_end.as_ref().expect("the coast's end is read");
+        let two = Rat::from_integer(2.into());
+        let least = (&end.lower - &floored.before.value.upper - &power.upper) * &two;
+        let most = (&end.upper - &floored.before.value.lower - &power.lower) * &two;
+        match &floor.floor {
+            Some(tau) => {
+                assert!(least.is_positive());
+                assert!(tau.is_positive() && *tau <= Rat::one());
+                assert!(*tau <= -&power.upper / &most);
+            }
+            None => assert!(!least.is_positive()),
+        }
+        // On this fixture `κ` is certified positive and the floor lies at or past the whole coast.
+        assert_eq!(floor.floor, Some(Rat::one()));
+    } else {
+        assert!(floor.coast_end.is_none() && floor.floor.is_none());
+    }
+    if let Some((successor, _)) = &floored.adopted {
+        let last = floored.trials.last().unwrap();
+        assert!(last.value.as_ref().unwrap().upper < floored.before.value.lower);
+        assert_eq!(successor.transport(0), first.transport(0));
+        let moved = successor
+            .source_port(0)
+            .unwrap()
+            .subtract(first.source_port(0).unwrap())
+            .unwrap();
+        assert_eq!(floor.next.velocity.as_ref(), Some(&moved));
     }
 }
 

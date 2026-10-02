@@ -3145,6 +3145,13 @@ pub enum LadderStart {
 ///   the apex: the move is released from rest, `Coordinate`'s `E` part). The halving trials halve
 ///   the whole carried move, impulse and coast together; the conditions of adoption are every
 ///   metric's. Without a flight ([`executed_move_in`]) it is released from rest.
+/// - `ThrowToFloor` ([agent-inferred, October 2; the throw's record §7]): `Throw` with the carried
+///   coast stopped at its floor. Along the coast the fixed-mask comparison is read at its start
+///   (`L(0)`), its first-order bound `s` (the power test) and its end (`L(c)`, one reread of the
+///   coast-only successor); the secant curvature is `κ = 2(L(c) − L(0) − s)` and the floor is at
+///   `τ* = −s/κ`. The coast carried is `min(1, τ*)·c`, `τ*` taken at its least over the enclosures
+///   and held at [`JOINT_BITS`] toward zero; where `κ` is not certified positive the whole coast is
+///   carried, as `Throw` carries it. At the apex it is `Throw`'s release from rest.
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub enum MoveMetric {
     Coordinate,
@@ -3152,6 +3159,14 @@ pub enum MoveMetric {
     Kinetic,
     KineticModulus,
     Throw,
+    ThrowToFloor,
+}
+
+impl MoveMetric {
+    /// Whether the metric carries a flight ([`MoveMetric::Throw`], [`MoveMetric::ThrowToFloor`]).
+    pub fn throws(self) -> bool {
+        matches!(self, MoveMetric::Throw | MoveMetric::ThrowToFloor)
+    }
 }
 
 /// [definition; agent-inferred, October 2; the
@@ -3176,6 +3191,12 @@ pub struct ThrowReading {
     pub flight: Flight,
     pub coast: Option<SourceCoast>,
     pub power: Option<ExactInterval>,
+    /// [`MoveMetric::ThrowToFloor`]: the fixed-mask comparison at the coast's end, `L(c)`, where
+    /// the coast was carried.
+    pub coast_end: Option<ExactInterval>,
+    /// [`MoveMetric::ThrowToFloor`]: the fraction of the coast carried, `min(1, τ*)`, where `κ` was
+    /// certified positive.
+    pub floor: Option<Rat>,
     pub carried: bool,
     pub impulse_step: Option<Rat>,
     pub next: Flight,
@@ -3972,6 +3993,7 @@ pub fn executed_move_guarded(
 /// **The thrown move** ([`MoveMetric::Throw`] in its flight): the same proposal, conditions of
 /// adoption, halving trials and receipts as [`executed_move_guarded`], the carried move the impulse
 /// with the flight's coast. The flight after the move is on the receipt ([`ThrowReading::next`]).
+/// `metric` is a throwing one ([`MoveMetric::throws`]); any other is the leap's, released from rest.
 #[allow(clippy::too_many_arguments)]
 pub fn executed_move_thrown(
     field: &Field,
@@ -3981,6 +4003,7 @@ pub fn executed_move_thrown(
     bank: &ReceivingBank,
     grain: u32,
     comparison: Comparison,
+    metric: MoveMetric,
     excursion: &ReleaseExcursion,
     flight: &Flight,
 ) -> Result<ExecutedMove, HnnError> {
@@ -3992,7 +4015,7 @@ pub fn executed_move_thrown(
         bank,
         grain,
         comparison,
-        MoveMetric::Throw,
+        metric,
         excursion,
         Some(flight),
         None,
@@ -4057,10 +4080,12 @@ fn executed_move_flown(
         metric,
         witness: None,
         kinetic: None,
-        throw: (metric == MoveMetric::Throw).then(|| ThrowReading {
+        throw: metric.throws().then(|| ThrowReading {
             flight: flight.cloned().unwrap_or_default(),
             coast: None,
             power: None,
+            coast_end: None,
+            floor: None,
             carried: false,
             impulse_step: None,
             next: Flight::default(),
@@ -4166,7 +4191,7 @@ fn executed_move_flown(
     // of `E`'s step with its start `α`.
     let (modulus_unit, witness_start) = match metric {
         MoveMetric::Coordinate => (modulus_unit, None),
-        MoveMetric::Throw => (Rat::zero(), None),
+        MoveMetric::Throw | MoveMetric::ThrowToFloor => (Rat::zero(), None),
         MoveMetric::Kinetic => (Rat::zero(), Some(Rat::one())),
         MoveMetric::KineticModulus => (kinetic_modulus.unwrap_or_else(Rat::zero), Some(Rat::one())),
         MoveMetric::Witness => {
@@ -4244,14 +4269,19 @@ fn executed_move_flown(
     // The throw's coast (the record above): the flight's velocity through the accreted mass, kept
     // while the composition falls along it at first order (the power test), scaled per trial with
     // the impulse, the entry scale read on the whole carried move.
+    let reread = |successor: &Constitution| {
+        executed_reread(field, successor, requests, declared, bank, grain, comparison, &mask)
+    };
     let throw_velocity = flight
         .and_then(|f| f.velocity.as_ref())
-        .filter(|v| metric == MoveMetric::Throw && v.entries().iter().any(|x| !x.is_zero()));
+        .filter(|v| metric.throws() && v.entries().iter().any(|x| !x.is_zero()));
     let (start, unit_largest, coast) = match throw_velocity {
         Some(velocity) => {
             let read = constitution.source_coast(ring, &samples, velocity)?;
             let mut carried = None;
             let mut power = None;
+            let mut coast_end = None;
+            let mut floor = None;
             if let Some(read) = &read
                 && let Some((coasted, _)) = constitution.stepped_source_coasting(
                     ring,
@@ -4262,13 +4292,32 @@ fn executed_move_flown(
             {
                 let bound = first(&read.coast, &coasted)?.bound;
                 if bound.upper.is_negative() {
-                    carried = Some(read.coast.clone());
+                    let mut coast = read.coast.clone();
+                    // The floor along the coast (the record §7): the fixed mask read at the coast's
+                    // end, the secant curvature over the enclosures, the least `τ*`.
+                    if metric == MoveMetric::ThrowToFloor {
+                        let end = reread(&coasted)?.value;
+                        let two = Rat::from_integer(BigInt::from(2));
+                        let least = (&end.lower - &before.value.upper - &bound.upper) * &two;
+                        let most = (&end.upper - &before.value.lower - &bound.lower) * &two;
+                        if least.is_positive() {
+                            let tau = joint_held(-&bound.upper / &most).min(Rat::one());
+                            if tau < Rat::one() {
+                                coast = coast.scaled(&tau);
+                            }
+                            floor = Some(tau);
+                        }
+                        coast_end = Some(end);
+                    }
+                    carried = Some(coast);
                 }
                 power = Some(bound);
             }
             if let Some(throw) = receipt.throw.as_mut() {
                 throw.coast = read;
                 throw.power = power;
+                throw.coast_end = coast_end;
+                throw.floor = floor;
                 throw.carried = carried.is_some();
                 throw.impulse_step = Some(start.clone());
             }
@@ -4291,9 +4340,6 @@ fn executed_move_flown(
         }
     };
     receipt.start = Some((start.clone(), kind));
-    let reread = |successor: &Constitution| {
-        executed_reread(field, successor, requests, declared, bank, grain, comparison, &mask)
-    };
     let (trials, adopted, refusal) = ladder(
         constitution,
         ring,

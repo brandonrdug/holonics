@@ -276,13 +276,19 @@ length to `[495714/4096, 495719/4096)`, and that jump is what turned the line (#
   is `min(1, τ*)·c`. #240 carries `τ = 1` and lets the halvings scale it, so a coast with `τ* < 1`
   overshoots its floor and the next move releases.
 - *The curvature without a constant.* The power test already builds the coast-only successor. One
-  reread of its own comparison gives the secant `κ_c = 2(L(c) − L(0) − s)`
-  (`coast_secant_curvature`), with exact enclosures. On the own release the secant includes any
-  crossing's jump along the coast, upward or downward.
+  reread of it gives the secant `κ_c = 2(L(c) − L(0) − s)` (`coast_secant_curvature`), with exact
+  enclosures. The secant is read on the fixed mask, the same comparison the first-order bound `s`
+  reads, so no commitment flips inside it. The own release is then checked by the conditions of
+  adoption, as every trial is.
+- *Built* as `MoveMetric::ThrowToFloor` (`ThrowReading::coast_end`, `ThrowReading::floor`): the
+  least `τ*` over the enclosures, `−s⁺/κ⁺` with `κ⁺ = 2(L(c)⁺ − L(0)⁻ − s⁻)`, held at `JOINT_BITS`
+  toward zero and at most `1`; where `κ⁻ = 2(L(c)⁻ − L(0)⁺ − s⁺)` is not positive, the whole coast is
+  carried as `Throw` carries it. The cost is one reread per carried move. The harness reads it as
+  `throw-floor`.
 
-**What it changes.** The apex moves are unchanged. Carried moves with `τ* < 1` would carry less
-coast. So the law changes only what follows the running chain, whose receipts stay those of
-§2's rule. It is to be built as its own arm after the chain, held for measurement like this one.
+**What it changes.** The apex moves are unchanged. Carried moves with `τ* < 1` carry less coast. So
+the law changes only what follows the running chain, whose receipts stay those of §2's rule. It is
+held for measurement like `Throw`.
 
 ## 8. Verification
 
