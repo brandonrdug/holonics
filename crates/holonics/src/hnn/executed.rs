@@ -5176,7 +5176,8 @@ fn native_gradient(
 /// readings' change (for a lock term `e_t/θ_t`, the target alone), the kinetic step is
 /// `v = M⁻¹AᵀK⁻¹w`. At one constitution (`ρ` held), it reads `v` with `K` replaced by its blocks:
 /// the joint `K` (the kinetic solve, every conjugate-gradient iterate kept), the blocks of each
-/// request's terms, the blocks of each term, and `K`'s diagonal; each block solved by the same
+/// request's terms, the blocks of each term, `K`'s diagonal, and `K` left out (`μ = w`, the
+/// `1/θ_t` weights alone); each block solved by the same
 /// recurrence, its moves summed. Every step is read against the native descent gradient
 /// `d = −Aᵀc = AᵀFw` twice: the Euclidean signed squared cosine on `E`'s row-major entries (as
 /// [`MetricSteps`]), and the signed squared cosine in `M`'s metric against `M⁻¹d`,
@@ -5311,14 +5312,19 @@ pub fn kinetic_coupling(
     let (e, m) = cosines(&v);
     reading.arms.push(("by term", stops, e, m));
     // `K`'s diagonal: `μ_i = w_i / K_ii`, `w = −F⁻¹c`; for a lock term `w = e_t/θ_t` (a term with a
-    // degenerate share reads no diagonal step).
-    let mut weights = vec![Rat::zero(); parts.gradients.len()];
+    // degenerate share reads no diagonal step). Beside it `K` left out, `μ = w`: the `1/θ_t` part
+    // alone.
+    let mut diagonal = vec![Rat::zero(); parts.gradients.len()];
+    let mut shares = vec![Rat::zero(); parts.gradients.len()];
     for (theta, target, coordinates) in &parts.terms {
         let Some(row) = coordinates.get(*target) else { continue };
         if !theta[*target].is_positive() {
             continue;
         }
         let w = Rat::one() / &theta[*target];
+        for (m, k) in row {
+            shares[*m] += k * &w;
+        }
         // `a_i = Σ_m k g_m`, `K_ii = ⟨a_i, M⁻¹ a_i⟩`.
         let mut a = vec![Rat::zero(); rows * columns];
         for (m, k) in row {
@@ -5332,23 +5338,28 @@ pub fn kinetic_coupling(
         }
         let mu = &w / &kii;
         for (m, k) in row {
-            weights[*m] += k * &mu;
+            diagonal[*m] += k * &mu;
         }
     }
-    let mut pulled = vec![Rat::zero(); rows * columns];
-    for (g, w) in parts.gradients.iter().zip(&weights).filter(|(_, w)| !w.is_zero()) {
-        for (x, y) in pulled.iter_mut().zip(g) {
-            *x += y * w;
+    // `M⁻¹Aᵀμ` from the members' weights.
+    let lifted = |weights: &[Rat]| -> Vec<Rat> {
+        let mut pulled = vec![Rat::zero(); rows * columns];
+        for (g, w) in parts.gradients.iter().zip(weights).filter(|(_, w)| !w.is_zero()) {
+            for (x, y) in pulled.iter_mut().zip(g) {
+                *x += y * w;
+            }
         }
-    }
-    let v: Vec<Rat> = (0..rows * columns)
-        .map(|i| {
-            let (r, j) = (i / columns, i % columns);
-            (0..columns).map(|l| &pulled[r * columns + l] * &parts.chart[l][j]).sum()
-        })
-        .collect();
-    let (e, m) = cosines(&v);
+        (0..rows * columns)
+            .map(|i| {
+                let (r, j) = (i / columns, i % columns);
+                (0..columns).map(|l| &pulled[r * columns + l] * &parts.chart[l][j]).sum()
+            })
+            .collect()
+    };
+    let (e, m) = cosines(&lifted(&diagonal));
     reading.arms.push(("diagonal", Vec::new(), e, m));
+    let (e, m) = cosines(&lifted(&shares));
+    reading.arms.push(("left out (μ = w)", Vec::new(), e, m));
     let ceiling = constitution
         .founding_transport(field, ring)?
         .max(constitution.transport(ring).clone());
