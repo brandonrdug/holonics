@@ -2918,10 +2918,10 @@ pub enum TrialRefusal {
     FirstOrder(ExactInterval),
     /// The fixed mask's composition not strictly lower by disjoint enclosures.
     NotBelow(ExactInterval),
-    /// The fixed mask's composition lower, the successor's own release's executed composition not
-    /// strictly below its checkpoint's plus the excursion's height ([`ReleaseExcursion`]; with the
-    /// monotone guard, not strictly lower by disjoint enclosures): the step's flip took the executed
-    /// comparison past what the window admits.
+    /// The fixed mask's composition lower, the successor's released code length not strictly below
+    /// its opening state's plus the excursion ([`ReleaseExcursion`]; under strict descent, not
+    /// strictly lower by disjoint enclosures): the step's jump took the released code length past
+    /// what the interval admits.
     OwnNotBelow(ExactInterval),
     /// The constitution's own guard (budget, storage growth).
     Constitution(String),
@@ -3158,60 +3158,66 @@ pub struct Reread {
     pub refusal: Option<TrialRefusal>,
 }
 
-/// [definition; proved-derived, October 2] **The release guard's excursion**
-/// (`HNN/ExecutedComparison` §12). A move's change in the own release is the fixed mask's change,
-/// continuous and certified at first order, plus the **flip**: the successor's own decisions read
-/// against the incumbent's on the same `E` (`own_telescopes`; a trial's `change`, the own reading
-/// less the mask's, encloses it). Each adopted step certifies the fixed mask's fall (`NotBelow`,
-/// unchanged). The own release is guarded over a window from a checkpoint: each successor's own
-/// comparison strictly below the checkpoint's lower end plus `height`
-/// ([`ReleaseExcursion::admits`], `excursion_enclosure`), and the window, at most `W` adopted
-/// moves, closing strictly below the checkpoint's lower end less a certified decrease `σ ≥ 0`
-/// ([`ReleaseExcursion::closes`]). It closes exactly when its fixed-mask decreases exceed its flips
-/// by `σ` (`window_closes_iff`). A window that does not close returns to its checkpoint; the chain
-/// holds the checkpoint, the window's length and `σ`.
-/// [`ReleaseExcursion::monotone`] (the incumbent as checkpoint, no height) is the strict decrease by
-/// disjoint enclosures, the former rule (`checkpoint_one_iff`).
+/// [definition; proved-derived, October 2] **The released code length compared between two
+/// endpoint states** (`HNN/ExecutedComparison` §12; the record states each step). A step (one
+/// deposition) changes the released code length by its change with the incumbent's commitments
+/// held, continuous and certified at first order, plus the **jump** where a ring's all-or-nothing
+/// commitment switches (`own_telescopes`; a trial's `change`, the released reading less the held
+/// one, encloses it). Every admitted step certifies the held code length's fall (`NotBelow`,
+/// unchanged). The jump is set by placement, not by the step's length, and only a later step can
+/// repay it, so the released code length is compared between the two endpoint states of an
+/// interval of the path: each successor's released code length strictly below the opening state's
+/// lower end plus `height` ([`ReleaseExcursion::admits`], `excursion_enclosure`), and the closing
+/// state, at most `W` admitted steps on, strictly below the opening's lower end less a certified
+/// decrease `σ ≥ 0` ([`ReleaseExcursion::closes`]). An interval closes exactly when its held
+/// decreases exceed its jumps by `σ` (`window_closes_iff`). The chain holds the opening state, the
+/// interval's length and `σ`. [`ReleaseExcursion::monotone`] (the incumbent as opening state, no
+/// excursion) is strict descent by disjoint enclosures, the former rule (`checkpoint_one_iff`).
 ///
-/// The parameters, from the chain's laws (§12; the record states each step):
-/// - `height`: `None` within a window. The entry bound bounds the comparison, which supplies a
-///   height (`excursion_of_bounded`), so no per-step own check is owed inside a window; `Some(0)`
-///   with the incumbent as checkpoint is the monotone guard.
+/// The parameters, from the chain's laws:
+/// - `height`: `None` inside an interval. The code length's range over the admitted states bounds
+///   every excursion (`excursion_of_bounded`), so no per-step comparison of the released code length
+///   is owed inside an interval; `Some(0)` with the incumbent as opening state is strict descent.
 /// - `σ`: one receiver grain over the batch's decisions ([`ReleaseExcursion::grain`]). A decrease
-///   below it is not a reading, and with it at most `(f 0 − m)/σ` windows close
-///   (`grain_windows_bounded`): the chain releases at the grain.
-/// - `W`: at least two moves, since a flip is answered only by the move after it
-///   (`one_move_closes_iff`), and at least `(F + σ)/d` for flips `F` against a per-move certified
+///   below it is not a reading, and with it at most `(f 0 − m)/σ` intervals close
+///   (`grain_windows_bounded`): the path releases at the grain.
+/// - `W`: at least two steps, since a jump is read only by the step after it
+///   (`one_move_closes_iff`), and at least `(F + σ)/d` for jumps `F` against a per-step certified
 ///   decrease of at most `d` (`window_length_lower`). Its upper end is the chain's choice: it bounds
-///   the moves a window that does not close spends.
+///   the steps an interval that does not close spends.
 ///
-/// A negative height states no guard (at its own checkpoint the excursion would fail) and a
-/// negative decrease lets a checkpoint rise; both are refused, typed ([`HnnError::ExcursionHeight`],
-/// [`HnnError::WindowDecrease`]).
+/// A negative excursion states no condition (the opening state would breach its own) and a
+/// negative decrease lets an opening state rise; both are refused, typed
+/// ([`HnnError::ExcursionHeight`], [`HnnError::WindowDecrease`]).
 ///
-/// **The return restores the whole checkpoint**, not its comparison alone: the chain that runs
-/// windows holds the checkpoint's `Constitution` (one held state, not a tape) and adopts it again
-/// when the window does not close, discarding every successor the window adopted. §12's
-/// `CheckpointGuard` indexes adopted states only, which is that law: a failed window leaves no trace
-/// in the constitution. The unchecked height is sound on the same terms, whatever the height: only
-/// the chain reads a window's states, and what it releases is a closed window's checkpoint, which
-/// the fixed mask's `NotBelow` on every step and the close certify. [agent-inferred] The finite
-/// height `excursion_of_bounded` names, the comparison's range over the states the commit guards
-/// admit (every entry of `E` within [`entry_bound`]), is not computed: its finiteness also needs the
-/// readings bounded away from zero on those states, which no guard states. This type holds only the
-/// checkpoint's comparison, which is all a step's guard and the close read; no chain owner runs
-/// windows yet.
+/// **An interval that does not close is discarded whole.** The chain holds the opening state's
+/// `Constitution` (one held state, not a tape) and restarts from it, discarding every successor the
+/// interval admitted; §12's `CheckpointGuard` indexes admitted states only, which is that law. No
+/// process of the rings undoes a deposition: the restart is a selection among paths made by the
+/// receiver and has no physical statement. The unchecked excursion is sound whatever its value: only
+/// the chain reads an interval's states, and it releases only a closed interval's opening state,
+/// which `NotBelow` on every step and the close certify.
+///
+/// **Why the range is finite.** A target's term `log((1 + a + r)/a)` grows without bound as its
+/// reading `a` falls to zero (`lockFace_unbounded`), so the entry bound alone does not bound the
+/// code length. It is bounded with a floor on every target's reading (`lockFace_le_of_floor`), and
+/// the lattice supplies one: a growth over one period is zero or at least `1/Δ`
+/// (`HNN/Floquet.integer_monodromy_floor`; [`crate::hnn::ring`]'s `growth_of`), and a zero target is
+/// refused by [`lock_face`], so it is never admitted. [agent-inferred] The rivals' bound and a floor
+/// uniform over a path (`Δ` varies with `E`) have no Lean statement yet (#62). This type holds only
+/// the opening state's code length, which is all a step's comparison and the close read; no chain
+/// owner runs intervals yet.
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct ReleaseExcursion {
-    /// The checkpoint's own comparison; `None` is the incumbent's.
+    /// The opening state's released code length; `None` is the incumbent's.
     pub checkpoint: Option<ExactInterval>,
-    /// How far the own release may rise above the checkpoint within the window; `None`, unchecked
-    /// (the entry bound bounds it).
+    /// How far the released code length may rise above the opening state's inside the interval;
+    /// `None`, unchecked (the code length's range bounds it).
     pub height: Option<Rat>,
 }
 
 impl ReleaseExcursion {
-    /// The monotone guard: the incumbent as checkpoint, no height.
+    /// Strict descent: the incumbent as opening state, no excursion.
     pub fn monotone() -> Self {
         Self {
             checkpoint: None,
@@ -3219,7 +3225,7 @@ impl ReleaseExcursion {
         }
     }
 
-    /// A window from a held checkpoint, the own release unchecked until the window's close.
+    /// An interval from a held opening state, the released code length unchecked until its close.
     pub fn from_checkpoint(checkpoint: ExactInterval) -> Self {
         Self {
             checkpoint: Some(checkpoint),
@@ -3228,7 +3234,7 @@ impl ReleaseExcursion {
     }
 
     /// **One receiver grain over a batch** (`σ`, in nats): `decisions · tolerance · ln 2`, read at
-    /// the upper end of `ln 2`'s enclosure, so a closing window certifies at least the grain.
+    /// the upper end of `ln 2`'s enclosure, so a closing interval certifies at least the grain.
     pub fn grain(
         decisions: usize,
         tolerance: &Rat,
@@ -3248,9 +3254,9 @@ impl ReleaseExcursion {
         }
     }
 
-    /// The step's guard on a successor's own comparison: `own.upper < checkpoint.lower + height`,
-    /// the checkpoint the incumbent's (`before`) when none is held; every successor when the height
-    /// is unchecked.
+    /// The step's comparison of a successor's released code length with the opening state's:
+    /// `own.upper < checkpoint.lower + height`, the opening state the incumbent (`before`) when none
+    /// is held; every successor when the excursion is unchecked.
     pub fn admits(&self, before: &ExactInterval, own: &ExactInterval) -> bool {
         let checkpoint = self.checkpoint.as_ref().unwrap_or(before);
         match &self.height {
@@ -3259,9 +3265,10 @@ impl ReleaseExcursion {
         }
     }
 
-    /// The window's close: the own comparison at its end strictly below the checkpoint's lower end
-    /// less the certified decrease `σ`. A negative `σ` is refused ([`HnnError::WindowDecrease`]):
-    /// it would let a window close above its checkpoint, so the checkpoints could rise.
+    /// The interval's close: the released code length at its closing state strictly below the
+    /// opening state's lower end less the certified decrease `σ`. A negative `σ` is refused
+    /// ([`HnnError::WindowDecrease`]): it would let an interval close above its opening state, so
+    /// the opening states could rise.
     pub fn closes(
         checkpoint: &ExactInterval,
         end: &ExactInterval,

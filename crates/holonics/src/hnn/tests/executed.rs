@@ -160,6 +160,21 @@ fn the_dominant_multiplier_is_certified_or_refused_by_type() {
     assert_eq!(read(&expand(&[5, 5, 1, -2], None)), Err(CovectorRefusal::Collision));
 }
 
+/// **A reading has the lattice's floor** (Lean `HNN/Floquet.integer_monodromy_floor`): on `M = N/Δ`
+/// with `Δ = 4`, the nilpotent `N = [[0, 1], [0, 0]]` (`det(ν − N) = ν²`) reads the floor's cell
+/// `[0, 1/4)` without bisecting toward zero, and `N = [[1, 0], [0, 0]]` (`ν² − ν`, `ρ(M) = 1/4`)
+/// reads a cell whose lower end is within the grain of `1/4`.
+#[test]
+fn a_reading_is_zero_or_past_the_lattices_floor() {
+    let scale = BigInt::from(4);
+    let nilpotent = growth_of(&[BigInt::zero(), BigInt::zero(), BigInt::one()], &scale, 24);
+    assert_eq!(nilpotent.lower, Rat::zero());
+    assert_eq!(nilpotent.upper, rat(1, 4));
+    let floor = growth_of(&[BigInt::zero(), -BigInt::one(), BigInt::one()], &scale, 24);
+    assert!(floor.lower <= rat(1, 4) && rat(1, 4) < floor.upper);
+    assert!(floor.lower >= rat(1, 4) * (Rat::one() - rat(1, 1 << 24)));
+}
+
 /// **The covector pairs with the exact variation, three ways** (`ReceivingBank::directional_routes`):
 /// on drawn turns below and past the bifurcation (8 crossings, and 60 crossings, the order-2
 /// ring's period, with amplitudes on `2^(−22)`) and drawn moves, every resolved member's covector
