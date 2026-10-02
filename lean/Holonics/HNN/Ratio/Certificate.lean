@@ -85,11 +85,15 @@ codeLength(z + Δ) ≤ codeLength(z) + ⟨g, Δ⟩ + (ln 2/2) · 2^(osc Δ) · V
    `2^(1/L)·2/(e ln 2)`, below `8/7` at `L = 16` (`Resolution.face_mass_le_odometer`,
    `Resolution.odometer_ratio_sixteen`), and the second-derivative constant would be
    `2 ln 2·(8/7) ≤ 8/5`, not `119/80`.
-9. **The factored certificate** (`faceVariance_le_centred`, `factored_reading_code_le`,
-   `factored_accumulated_code_le`, `factoredStatistics_insert`, `factored_bound_statistics`,
-   `FactoredStatistics.bound_add`). If every mass of the face is at most `μ`, then
-   `Var_p(v) ≤ μ Σ_c (v_c − v̄)²` with `v̄` the classes' plain mean. Near a uniform face
-   `μ ≈ 1/|A|`, which is the scale `hnn::constitution::receiving_class_metric` reads. With each
+9. **The factored certificate** (`faceVariance_le_centred`, `faceVariance_uniform`,
+   `centred_le_weighted`, `factored_reading_code_le`, `factored_accumulated_code_le`,
+   `factoredStatistics_insert`, `factored_bound_statistics`, `FactoredStatistics.bound_add`). If
+   every mass of the face is at most `μ`, then `Var_p(v) ≤ μ Σ_c (v_c − v̄)²` with `v̄` the
+   classes' plain mean. At a uniform face `μ = 1/|A|` and the bound is an equality
+   (`faceVariance_uniform`). There `1/|A|` is also the mean zero-sum Fisher eigenvalue `λ̄` of
+   `hnn::constitution::receiving_class_metric`, which steps at `2^⌊log₂(1/λ̄)⌋`. That is
+   `1/μ = |A|` exactly when `|A|` is a power of two (campaign 1's `256 = 2^8`), and the power of
+   two below `|A|` otherwise. With each
    reading's mass bound `μ_i`, item 6's bound holds with `A` replaced by `P₀ ⊗ G`, where `P₀`
    centres over the classes and `G = Σ μ_i x_i x_iᵀ`. Its statistics are `Σ code_i(W_i)`, `b`,
    `Σ⟨vec W_i, b_i⟩`, the feature Gram `G`, the anchor `M = Σ μ_i (cen W_i x_i) x_iᵀ` and the
@@ -100,8 +104,8 @@ codeLength(z + Δ) ≤ codeLength(z) + ⟨g, Δ⟩ + (ln 2/2) · 2^(osc Δ) · V
    the two squared. The bound is a quadratic in `W` with Hessian `ln 2·2^ω·(P₀ ⊗ G)`
    (`FactoredStatistics.bound_add`), so its minimizing step `D` solves
    `cen D · G = M − cen W · G − b/(ln 2·2^ω)` on the centred classes. That is one solve in the
-   features, shared by every class. It is looser than item 6 by the factor `μ_i/p_ic` in each
-   class direction, and exact at a uniform face.
+   features, shared by every class. It is looser than item 6 by at most the factor `μ_i/p_ic` in
+   each class direction (`centred_le_weighted`), and exact at a uniform face.
 
 [definition] The factor `2^ω` is the price of reading the curvature at the current face instead
 of along the whole step: as `ω → 0` the model is the second-order Taylor model
@@ -937,8 +941,8 @@ theorem gPair_comm {G : Matrix X X ℝ} (hG : Gᵀ = G) (U V : Matrix ι X ℝ) 
 omit [DecidableEq ι] in
 /-- [proved-derived; formal-checked] **The face's variance within its largest mass.** If every
 mass of the face is at most `μ`, `Var_p(v) ≤ μ Σ_c (v_c − v̄)²`, `v̄` the classes' plain mean
-(`faceVariance_le_of_mass_le` against the uniform chart, `p_c ≤ (μ|ι|)·(1/|ι|)`). Near a uniform
-face `μ ≈ 1/|ι|`. -/
+(`faceVariance_le_of_mass_le` against the uniform chart, `p_c ≤ (μ|ι|)·(1/|ι|)`). At a uniform
+face `μ = 1/|ι|` and it is an equality (`faceVariance_uniform`). -/
 theorem faceVariance_le_centred (p v : ι → ℝ) (hp1 : ∑ i, p i = 1) {μ : ℝ}
     (hμ : ∀ i, p i ≤ μ) :
     faceVariance p v ≤ μ * ∑ c, (v c - (∑ d, v d) / Fintype.card ι) ^ 2 := by
@@ -955,6 +959,51 @@ theorem faceVariance_le_centred (p v : ι → ℝ) (hp1 : ∑ i, p i = 1) {μ : 
   rw [hr] at h
   calc faceVariance p v ≤ _ := h
     _ = μ * ∑ c, (v c - (∑ d, v d) / Fintype.card ι) ^ 2 := by field_simp
+
+omit [Nonempty ι] [DecidableEq ι] in
+/-- [proved-derived; formal-checked] **At a uniform face the bound is exact**: with every mass
+`1/|ι|`, `Var_p(v) = (1/|ι|) Σ_c (v_c − v̄)²`, so `faceVariance_le_centred` at `μ = 1/|ι|` is an
+equality. `1/|ι|` is also the uniform face's zero-sum Fisher eigenvalue, the `λ̄` of
+`hnn::constitution::receiving_class_metric`. -/
+theorem faceVariance_uniform (v : ι → ℝ) :
+    faceVariance (fun _ => 1 / (Fintype.card ι : ℝ)) v =
+      1 / (Fintype.card ι : ℝ) * ∑ c, (v c - (∑ d, v d) / Fintype.card ι) ^ 2 := by
+  have hmean : ∑ j, 1 / (Fintype.card ι : ℝ) * v j = (∑ d, v d) / Fintype.card ι := by
+    rw [← Finset.mul_sum]; ring
+  unfold faceVariance
+  rw [hmean, Finset.mul_sum]
+
+omit [Nonempty ι] [DecidableEq ι] in
+/-- [proved-derived; formal-checked] **The plain mean minimizes the plain squares**:
+`Σ_c (v_c − v̄)² ≤ Σ_c (v_c − a)²` for every `a`. -/
+theorem centred_sq_le (v : ι → ℝ) (a : ℝ) :
+    ∑ c, (v c - (∑ d, v d) / Fintype.card ι) ^ 2 ≤ ∑ c, (v c - a) ^ 2 := by
+  set m := (∑ d, v d) / Fintype.card ι with hm
+  have hsum : ∑ c, (v c - m) = 0 := by
+    rcases isEmpty_or_nonempty ι with hι | hι
+    · simp
+    have hn : (Fintype.card ι : ℝ) ≠ 0 := by exact_mod_cast Fintype.card_ne_zero
+    rw [Finset.sum_sub_distrib, Finset.sum_const, Finset.card_univ, nsmul_eq_mul, hm,
+      mul_div_cancel₀ _ hn, sub_self]
+  have hexp : ∑ c, (v c - a) ^ 2 =
+      ∑ c, (v c - m) ^ 2 + 2 * (m - a) * ∑ c, (v c - m) + ∑ _c : ι, (m - a) ^ 2 := by
+    rw [Finset.mul_sum, ← Finset.sum_add_distrib, ← Finset.sum_add_distrib]
+    exact Finset.sum_congr rfl fun c _ => by ring
+  have hnn : 0 ≤ ∑ _c : ι, (m - a) ^ 2 := Finset.sum_nonneg fun _ _ => sq_nonneg _
+  rw [hexp, hsum, mul_zero, add_zero]
+  linarith
+
+omit [Nonempty ι] [DecidableEq ι] in
+/-- [proved-derived; formal-checked] **The factored term is looser by at most `μ/p_c` in each
+class direction**: `μ Σ_c (v_c − v̄)² ≤ Σ_c (μ/p_c)·p_c (v_c − E_p v)²`, the right side the face
+variance with class `c`'s share raised by `μ/p_c` (`centred_sq_le` at `a = E_p v`). -/
+theorem centred_le_weighted (p v : ι → ℝ) (hp : ∀ c, 0 < p c) {μ : ℝ} (hμ : 0 ≤ μ) :
+    μ * ∑ c, (v c - (∑ d, v d) / Fintype.card ι) ^ 2 ≤
+      ∑ c, μ / p c * (p c * (v c - ∑ d, p d * v d) ^ 2) := by
+  refine (mul_le_mul_of_nonneg_left (centred_sq_le v (∑ d, p d * v d)) hμ).trans (le_of_eq ?_)
+  rw [Finset.mul_sum]
+  refine Finset.sum_congr rfl fun c _ => ?_
+  rw [← mul_assoc, div_mul_cancel₀ _ (hp c).ne']
 
 /-- [definition] **The factored statistics a running certificate stores**: the summed code at the
 base points, the gradient `b = Σ (p_i − e_(t_i)) x_iᵀ` and `Σ⟨vec W_i, b_i⟩` (as in `Statistics`),
@@ -1153,6 +1202,9 @@ end Factored
 #print axioms codeLength_add_le_chart
 #print axioms codeLength_add_le_odometer
 #print axioms faceVariance_le_centred
+#print axioms faceVariance_uniform
+#print axioms centred_sq_le
+#print axioms centred_le_weighted
 #print axioms gPair_reading
 #print axioms gPair_comm
 #print axioms factoredStatistics_insert
