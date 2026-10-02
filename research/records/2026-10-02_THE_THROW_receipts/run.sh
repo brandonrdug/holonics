@@ -8,7 +8,8 @@
 #
 # <moves> is 16 by default; the development read passes 2 (the release m0 and the first coast m1).
 # START_STATE (default the opening c0.state) and FIRST_MOVE (default 0) start the chain from a stored
-# state at a later move: moves FIRST_MOVE … <moves> − 1 run. With AT_REST=1 no flight is ever passed,
+# state at a later move (with its `.flight` where one rides beside it): moves FIRST_MOVE … <moves> − 1
+# run. With AT_REST=1 no flight is ever passed,
 # so every move is released from rest: the at-rest throw, `ρ` held, the impulse alone.
 # The per-move bound is the projection's upper end: the largest measured move of the development read
 # (m0 at rest, m1 with its first coast), fixed before launch and never raised (the waiting standard).
@@ -20,7 +21,9 @@ moves=${4:-16}
 state=${START_STATE:-research/records/2026-10-01_THE_GUARDED_WITNESS_receipts/c0.state}
 first=${FIRST_MOVE:-0}
 at_rest=${AT_REST:-0}
+# A restart in flight continues the stored state's flight, where one rides beside it.
 flight=""
+if [ "$at_rest" != 1 ] && [ -f "$state.flight" ]; then flight=$state.flight; fi
 for k in $(seq "$first" $((moves - 1))); do
   out=$root/m$k; mkdir -p "$out"
   # The flight rides beside the state as `<state>.flight`; at rest there is none.
