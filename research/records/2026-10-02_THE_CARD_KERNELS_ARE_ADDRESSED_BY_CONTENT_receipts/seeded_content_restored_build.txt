@@ -1,0 +1,5 @@
+   Compiling holonics-cuda v0.1.0 (.local/wt/build-hash/crates/holonics-cuda)
+warning: holonics-cuda@0.1.0: compiled the HNN kernels, sources 6f5b5a75c170ce9e5b8fac7be138a123cf1a8ce3f52055bd0ce7cdb80e594b80
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 4.45s
+  Executable unittests src/lib.rs (.local/target-hash-seeded2/debug/deps/holonics_cuda-162b84abbaed056d)
+  Executable unittests src/bin/mount-smoke.rs (.local/target-hash-seeded2/debug/deps/mount_smoke-569bf16e165ff310)

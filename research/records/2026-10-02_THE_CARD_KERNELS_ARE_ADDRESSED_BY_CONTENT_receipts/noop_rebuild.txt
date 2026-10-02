@@ -1,0 +1,5 @@
+   Compiling holonics-cuda v0.1.0 (.local/wt/build-hash/crates/holonics-cuda)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 1.15s
+  Executable unittests src/lib.rs (.local/target-hash-clean/debug/deps/holonics_cuda-162b84abbaed056d)
+  Executable unittests src/bin/mount-smoke.rs (.local/target-hash-clean/debug/deps/mount_smoke-569bf16e165ff310)
+second build exit 0 wall 1211 ms

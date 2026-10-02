@@ -1,0 +1,24 @@
+   Compiling proc-macro2 v1.0.107
+   Compiling autocfg v1.5.1
+   Compiling crossbeam-utils v0.8.23
+   Compiling unicode-ident v1.0.24
+   Compiling quote v1.0.47
+   Compiling crossbeam-epoch v0.9.21
+   Compiling crossbeam-deque v0.8.8
+   Compiling rayon-core v1.13.0
+   Compiling thiserror v2.0.19
+   Compiling either v1.18.0
+   Compiling holonics-cuda v0.1.0 (.local/wt/build-hash/crates/holonics-cuda)
+   Compiling num-traits v0.2.19
+   Compiling syn v3.0.3
+   Compiling num-integer v0.1.46
+   Compiling num-bigint v0.4.8
+   Compiling rayon v1.12.0
+   Compiling num-rational v0.4.2
+   Compiling thiserror-impl v2.0.19
+   Compiling holonics v0.1.0 (.local/wt/build-hash/crates/holonics)
+warning: holonics-cuda@0.1.0: compiled the HNN kernels, sources 6f5b5a75c170ce9e5b8fac7be138a123cf1a8ce3f52055bd0ce7cdb80e594b80
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 26.14s
+  Executable unittests src/lib.rs (.local/target-hash-clean/debug/deps/holonics_cuda-162b84abbaed056d)
+  Executable unittests src/bin/mount-smoke.rs (.local/target-hash-clean/debug/deps/mount_smoke-569bf16e165ff310)
+build exit 0 wall 26214 ms
