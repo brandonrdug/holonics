@@ -716,3 +716,41 @@ start, not `2^11`, still shrinking as `1/n`. Its certificate is the window theor
 readings so far. Whether that can be read from stored statistics alone, without keeping the
 readings, is the question the build must settle, since retention is never a tape. Its acceptance is
 the held-out code: the wave's held-out contribution must improve on main's `−5 + 9/16 + ε` bits.
+
+## 19. The receiving map's step in its class metric: the held-out code improves
+
+**The law** (`hnn::constitution::receiving_class_metric`, applied where the receiving map's
+normal-law step is prepared). `R`'s normal law keeps its own feature metric `X̂ ≈ H′⁻¹`, so its step
+still shrinks as `1/n`. Its covectors' magnitude parts pass through the inverse of the readings'
+mean class Fisher eigenvalue on the zero-sum classes, `λ̄ = mean_t (1 − Σ_c p̃_(t,c)²)/(|A| − 1)`,
+held at the power of two at or below `1/λ̄`. That is about `|A|` near a uniform reading, the
+near-uniform form of the accumulated Fisher `G ⊗ (1/|A|)(I − 𝟙𝟙ᵀ/|A|)`. The phase parts are left
+as they are. The step is certified in the readings' own Fisher form (§18's bound) and capped at the
+unit step, `η · max(osc, 1) ≤ 1`. That cap is what separates it from §18's window certificate, which
+let `η` run to `2^16`. The accounting test carries the same metric
+(`the_budgeted_carry_accounts_for_every_update`).
+
+**Measured: campaign 1's exposure at `n*`**
+([receipt](2026-10-02_THE_CONTACT_LOOP_receipts/class_metric_exposure.txt), 595,668 ms; main's
+[receipt](2026-10-02_THE_CONTACT_LOOP_receipts/baseline_exposure.txt)).
+
+| Reading | Main | Class-metric step |
+|---|---|---|
+| `R`'s certified steps | `2^0..2^2` | `2^(−1)..2^0` |
+| held out, the wave's contribution (combined − tree) | `−5 + 9/16 + ε` bits | `−13 + 9/16 + ε` bits |
+| held out, model − PPM-2 | `−200 + 1/16 + ε` bits | `−208 + 0/16 + ε` bits |
+| training, the wave's contribution | `−23 + 7/16 + ε` bits | `−115 + 15/16 + ε` bits |
+| training, model − PPM-2 | `−607 + 0/16 + ε` bits | `−699 + 8/16 + ε` bits |
+
+**The gate passes.** On the 1,190 held-out cells, scored before their own deposits, the wave's
+contribution improves by eight bits and the whole model's code by more than seven and a half bits
+against PPM-2. In training the wave's contribution grows about fivefold. This is the first change
+in this line that lowers the held-out code.
+
+**What it leaves open.** The scale is the window's mean Fisher eigenvalue, the near-uniform form of
+the accumulated Fisher, not the accumulated matrix itself. The certificate over all readings from
+stored statistics (the Lean thread's #160: the running sums `A`, `b` and `Σ A_i vec W_i`, with the
+drift check `2X · distance ≤ ω` in the row norm) is the exact form of this step. A dense
+`A = Σ z zᵀ ⊗ F(p)` would be `(22 · 256)²` entries on campaign 1's field, so the build has to
+factor it, by the Kronecker form or by its classes' structure, before it can be kept. The fitted
+receiver of §17 still gains more held-out, so the receiver has room left.
