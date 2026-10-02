@@ -132,8 +132,9 @@ splits it between `E` and `ρ`.
 - **`ρ`'s part.** `ρ + ηΔρ` on the port's lattice, nearest, between `ρ/2` and the bound
   `max(ρ₀, ρ)`. The first trial step is the Gauss–Newton step, at most the entry scale, and each
   trial is certified whole before it is adopted, as before: its comparison's upper end below the
-  incumbent's lower end, its entries within the entry bound, its first order certified negative and
-  its locks certified.
+  incumbent's lower end, its entries within the entry bound, its first order certified negative, its
+  crossings admissible, its locks certified, its readings supported, and the constitution's bit
+  budget and storage growth certified on its deposit.
 
 ## 4. Where the comparison asks for more reach than the alias allows
 
