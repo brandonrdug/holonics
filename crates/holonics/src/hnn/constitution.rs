@@ -1113,10 +1113,10 @@ const RESIDUAL_SHIFT: u32 = 125;
 /// `δ_ℓ/2`. `k_n` replaces the former `2`, which covered the whole product's rounding but not the
 /// mirror's (one more bit at `n = 1`, `⌈log₂(1 + 6√n)⌉ − 2` in general). Every certificate is
 /// still computed exactly, so a refinement that does not reach `δ_ℓ` within the rule's count is
-/// refused ([`ExactLinearError::InverseCertificateFailure`]); no chart above `δ_ℓ` is released. The Gram's
-/// own norm is read at each deposit, as the clock's Elias-gamma length is: the lattice refines as
-/// the Gram grows, and never coarsens (a coarser chart is a finer one's lattice point). Brandon may
-/// override the rule.
+/// refused ([`ExactLinearError::InverseCertificateFailure`]); no chart above `δ_ℓ` is released.
+/// The Gram's own norm is read at each deposit, as the clock's Elias-gamma length is: the lattice
+/// refines as the Gram grows, and never coarsens (a coarser chart is a finer one's lattice point).
+/// Brandon may override the rule.
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub struct ChartRule {
     lattice: Lattice,
