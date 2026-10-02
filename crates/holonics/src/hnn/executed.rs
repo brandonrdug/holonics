@@ -3141,20 +3141,12 @@ pub enum LadderStart {
 ///   `E` alone, `ρ` held, by the source port's normal law (the impulse, `Coordinate`'s `E` part)
 ///   with the carried velocity's coast through the deposit's accreted mass ([`Flight`],
 ///   `Constitution::source_coast`). The flight's velocity is the last adopted move of `E`; its
-///   coast is kept only while the composition's first-order bound along it is negative (otherwise
-///   the apex: the move is released from rest, `Coordinate`'s `E` part). The halving trials halve
-///   the whole carried move, impulse and coast together; the conditions of adoption are every
-///   metric's. Without a flight ([`executed_move_in`]) it is released from rest.
-/// - `ThrowToFloor` ([agent-inferred, October 2; the throw's record §7]): `Throw` with the carried
-///   coast stopped at its floor. Along the coast the fixed-mask comparison is read at its start
-///   (`L(0)`), its first-order bound `s` (the power test) and its end (`L(c)`, one reread of the
-///   coast-only successor); the secant curvature is `κ = 2(L(c) − L(0) − s)` and the floor is at
-///   `τ* = −s/κ`. The coast carried is `min(1, τ*)·c`, `τ*` taken at its least over the enclosures
-///   and held at [`JOINT_BITS`] toward zero; where `κ` is not certified positive the whole coast is
-///   carried, as `Throw` carries it (on the quadratic with `s ≤ 0`, `κ ≤ 0` the end is the floor:
-///   `coast_floor_at_end`). At the apex it is `Throw`'s release from rest, derived where the coast
-///   is convex (`coast_apex_no_floor_ahead`) and chosen elsewhere; `L(c)` is read only on a carried
-///   coast.
+///   coast is kept only while the composition's first-order bound on the first trial's whole move,
+///   impulse and coast together, is negative: the force's power on the motion, not on the coast
+///   alone (otherwise the apex: the move is released from rest, `Coordinate`'s `E` part). The
+///   halving trials halve the whole carried move, impulse and coast together, along one line; the
+///   conditions of adoption are every metric's. Without a flight ([`executed_move_in`]) it is
+///   released from rest.
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub enum MoveMetric {
     Coordinate,
@@ -3162,14 +3154,6 @@ pub enum MoveMetric {
     Kinetic,
     KineticModulus,
     Throw,
-    ThrowToFloor,
-}
-
-impl MoveMetric {
-    /// Whether the metric carries a flight ([`MoveMetric::Throw`], [`MoveMetric::ThrowToFloor`]).
-    pub fn throws(self) -> bool {
-        matches!(self, MoveMetric::Throw | MoveMetric::ThrowToFloor)
-    }
 }
 
 /// [definition; agent-inferred, October 2; the
@@ -3185,24 +3169,16 @@ pub struct Flight {
 
 /// [definition; agent-inferred, October 2] **A throw's reading** ([`MoveMetric::Throw`]): the
 /// flight it met, the coast of its velocity ([`SourceCoast`]) where one was read, the composition's
-/// first-order bound along the coast alone (the power test), whether the coast was carried (the
-/// bound negative) or the move released from rest (the apex, or no velocity), the impulse's first
-/// step `η₀` (every trial carries the coast scaled by its step over `η₀`), and the flight after the
-/// move: the adopted move as its velocity, or rest when no trial was adopted.
+/// first-order bound on the first trial's whole move, impulse and coast together (the power test),
+/// whether the coast was carried (the bound negative) or the move released from rest (the apex, or
+/// no velocity), the impulse's first step `η₀` (every trial carries the coast scaled by its step
+/// over `η₀`), and the flight after the move: the adopted move as its velocity, or rest when no
+/// trial was adopted.
 #[derive(Clone, Debug)]
 pub struct ThrowReading {
     pub flight: Flight,
     pub coast: Option<SourceCoast>,
     pub power: Option<ExactInterval>,
-    /// [`MoveMetric::ThrowToFloor`]: the fixed-mask comparison at the coast's end, `L(c)`, where
-    /// the coast was carried.
-    pub coast_end: Option<ExactInterval>,
-    /// [`MoveMetric::ThrowToFloor`]: the fraction of the coast carried, `min(1, τ*)`, where `κ` was
-    /// certified positive.
-    pub floor: Option<Rat>,
-    /// [`MoveMetric::ThrowToFloor`]: the fixed-mask comparison at the stopped coast, `L(τc)`, read
-    /// where `τ < 1`: the receipt of whether the floor's quadratic reading held off its own end.
-    pub floor_end: Option<ExactInterval>,
     pub carried: bool,
     pub impulse_step: Option<Rat>,
     pub next: Flight,
@@ -4086,13 +4062,10 @@ fn executed_move_flown(
         metric,
         witness: None,
         kinetic: None,
-        throw: metric.throws().then(|| ThrowReading {
+        throw: (metric == MoveMetric::Throw).then(|| ThrowReading {
             flight: flight.cloned().unwrap_or_default(),
             coast: None,
             power: None,
-            coast_end: None,
-            floor: None,
-            floor_end: None,
             carried: false,
             impulse_step: None,
             next: Flight::default(),
@@ -4198,7 +4171,7 @@ fn executed_move_flown(
     // of `E`'s step with its start `α`.
     let (modulus_unit, witness_start) = match metric {
         MoveMetric::Coordinate => (modulus_unit, None),
-        MoveMetric::Throw | MoveMetric::ThrowToFloor => (Rat::zero(), None),
+        MoveMetric::Throw => (Rat::zero(), None),
         MoveMetric::Kinetic => (Rat::zero(), Some(Rat::one())),
         MoveMetric::KineticModulus => (kinetic_modulus.unwrap_or_else(Rat::zero), Some(Rat::one())),
         MoveMetric::Witness => {
@@ -4274,78 +4247,49 @@ fn executed_move_flown(
         first_order(field, constitution, declared, requests, &proposal, successor, None)
     };
     // The throw's coast (the record above): the flight's velocity through the accreted mass, kept
-    // while the composition falls along it at first order (the power test), scaled per trial with
-    // the impulse, the entry scale read on the whole carried move.
+    // while the whole carried move falls at first order (the power test), scaled per trial with the
+    // impulse, the entry scale read on the whole carried move.
     let reread = |successor: &Constitution| {
         executed_reread(field, successor, requests, declared, bank, grain, comparison, &mask)
     };
     let throw_velocity = flight
         .and_then(|f| f.velocity.as_ref())
-        .filter(|v| metric.throws() && v.entries().iter().any(|x| !x.is_zero()));
+        .filter(|v| metric == MoveMetric::Throw && v.entries().iter().any(|x| !x.is_zero()));
     let (start, unit_largest, coast) = match throw_velocity {
         Some(velocity) => {
             let read = constitution.source_coast(ring, &samples, velocity)?;
-            let mut carried = None;
+            // The power on the whole move (the record §2): the first trial carries `η₁D + (η₁/η₀)c`
+            // on the line `D + c/η₀` every halving keeps, and its first-order bound decides whether
+            // the coast is carried. A coast tested alone along the old line would let that line
+            // decide the release.
+            let mut whole = None;
             let mut power = None;
-            let mut coast_end = None;
-            let mut floor = None;
-            let mut floor_end = None;
-            if let Some(read) = &read
-                && let Some((coasted, _)) = constitution.stepped_source_coasting(
-                    ring,
-                    &samples,
-                    &Rat::zero(),
-                    Some(&read.coast),
-                )?
-            {
-                let bound = first(&read.coast, &coasted)?.bound;
-                if bound.upper.is_negative() {
-                    let mut coast = read.coast.clone();
-                    // The floor along the coast (the record §7): the fixed mask read at the coast's
-                    // end, the secant curvature over the enclosures, the least `τ*`.
-                    if metric == MoveMetric::ThrowToFloor {
-                        let end = reread(&coasted)?.value;
-                        let two = Rat::from_integer(BigInt::from(2));
-                        let least = (&end.lower - &before.value.upper - &bound.upper) * &two;
-                        let most = (&end.upper - &before.value.lower - &bound.lower) * &two;
-                        if least.is_positive() {
-                            let tau = joint_held(-&bound.upper / &most).min(Rat::one());
-                            if tau < Rat::one() {
-                                coast = coast.scaled(&tau);
-                                if let Some((stopped, _)) = constitution.stepped_source_coasting(
-                                    ring,
-                                    &samples,
-                                    &Rat::zero(),
-                                    Some(&coast),
-                                )? {
-                                    floor_end = Some(reread(&stopped)?.value);
-                                }
-                            }
-                            floor = Some(tau);
+            if let Some(read) = &read {
+                let per_step = read.coast.scaled(&(Rat::one() / &start));
+                let effective = &unit_largest + largest_entry(&per_step);
+                let scale = Rat::new(BigInt::one(), BigInt::from(2)) / &effective;
+                let first_step = if start <= scale { start.clone() } else { power_below(&scale) };
+                let coasted = per_step.scaled(&first_step);
+                match constitution.stepped_source_coasting(ring, &samples, &first_step, Some(&coasted)) {
+                    Ok(Some((successor, _))) => {
+                        let bound = first(&coasted, &successor)?.bound;
+                        if bound.upper.is_negative() {
+                            whole = Some((first_step, effective, per_step));
                         }
-                        coast_end = Some(end);
+                        power = Some(bound);
                     }
-                    carried = Some(coast);
+                    Ok(None) | Err(HnnError::ConstitutionBudget { .. } | HnnError::UncertifiedStorage) => {}
+                    Err(error) => return Err(error),
                 }
-                power = Some(bound);
             }
             if let Some(throw) = receipt.throw.as_mut() {
                 throw.coast = read;
                 throw.power = power;
-                throw.coast_end = coast_end;
-                throw.floor = floor;
-                throw.floor_end = floor_end;
-                throw.carried = carried.is_some();
+                throw.carried = whole.is_some();
                 throw.impulse_step = Some(start.clone());
             }
-            match carried {
-                Some(coast) => {
-                    let per_step = coast.scaled(&(Rat::one() / &start));
-                    let effective = &unit_largest + largest_entry(&per_step);
-                    let scale = Rat::new(BigInt::one(), BigInt::from(2)) / &effective;
-                    let first_step = if start <= scale { start } else { power_below(&scale) };
-                    (first_step, effective, Some(per_step))
-                }
+            match whole {
+                Some((first_step, effective, per_step)) => (first_step, effective, Some(per_step)),
                 None => (start, unit_largest, None),
             }
         }

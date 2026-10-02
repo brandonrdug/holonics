@@ -1465,11 +1465,10 @@ pub(super) fn move_once(terrain: &str, seed: u64, count: usize, out: &str, sourc
             "kinetic" => MoveMetric::Kinetic,
             "kinetic-modulus" => MoveMetric::KineticModulus,
             "throw" => MoveMetric::Throw,
-            "throw-floor" => MoveMetric::ThrowToFloor,
-            other => panic!("a metric, coordinate, witness, kinetic, kinetic-modulus, throw or throw-floor: {other}"),
+            other => panic!("a metric, coordinate, witness, kinetic, kinetic-modulus or throw: {other}"),
         };
         let started = Instant::now();
-        let moved = if metric.throws() {
+        let moved = if metric == MoveMetric::Throw {
             let flight = read_flight(&format!("{spec}.flight"));
             holonics::hnn::executed::executed_move_thrown(
                 &engine.field,
@@ -1546,7 +1545,7 @@ pub(super) fn move_once(terrain: &str, seed: u64, count: usize, out: &str, sourc
         }
         if let Some(throw) = &moved.throw {
             println!(
-                "    the throw: flight of {} moves, {}; power along the coast {}; coast {}; kinetic reading {}; impulse step {:?}",
+                "    the throw: flight of {} moves, {}; power on the whole move {}; coast {}; kinetic reading {}; impulse step {:?}",
                 throw.flight.moves,
                 if throw.flight.velocity.is_some() { "moving" } else { "at rest" },
                 throw.power.as_ref().map_or_else(|| "none".to_string(), |p| cell(p, 1 << 12)),
@@ -1557,13 +1556,6 @@ pub(super) fn move_once(terrain: &str, seed: u64, count: usize, out: &str, sourc
                     .map_or_else(|| "none".to_string(), |c| cell(&ExactInterval::point(c.kinetic.clone()), 1 << 12)),
                 throw.impulse_step,
             );
-            if let Some(end) = &throw.coast_end {
-                println!(
-                    "    the coast's floor: the mask at the coast's end {}; fraction carried {}",
-                    cell(end, 1 << 12),
-                    throw.floor.as_ref().map_or_else(|| "whole (κ not certified positive)".to_string(), ToString::to_string),
-                );
-            }
         }
         let modulus_line = |what: &str, k: &holonics::hnn::executed::KineticSolve| {
             if let (Some(step), Some((own, supplied))) = (&k.modulus, &k.modulus_drive) {

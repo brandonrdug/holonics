@@ -39,14 +39,16 @@ the pump's reflection block `−2p R_c` to its stiffness, `c` the placed carrier
    keeps its sign.
 9. **The throw through the accreted mass** (`accretion_loss`, `accretion_dissipates`,
    `thrown_move`, `throw_velocity_le_terminal`, `throw_velocity_rises`, `leap_velocity_le`,
-   `throw_velocity_le_unaccreted`, `throw_reach_le_free_fall`, `coast_apex_no_floor_ahead`,
-   `coast_floor`, `coast_secant_curvature`): a
+   `throw_velocity_le_unaccreted`, `throw_reach_le_free_fall`, `convex_slope_le`,
+   `coast_apex_no_floor_ahead`, `coast_floor`, `coast_floor_at_end`, `line_falls_to`,
+   `coast_secant_curvature`): a
    deposit accretes mass onto the port and conserves the carried momentum, so its kinetic reading
    falls by exactly `p² f/(2m(m + f))`; the thrown move is the impulse plus the coast, the leap's
    impulse alone from rest; under a constant impulse the throw's velocity rises toward the impulse
    over the per-deposit mass while the leap's falls like `1/k`; and a throw from rest reaches no
-   further than free fall `(i/m₀)·n(n + 1)/2`; at the apex the floor is not ahead, and a carried
-   coast's floor is `−s/κ`, its curvature read from the coast's own end (the record
+   further than free fall `(i/m₀)·n(n + 1)/2`; at a convex line's apex nothing ahead is lower,
+   a falling line's floor is `−s/κ` with its curvature read from the line's own end, and over
+   enclosures the line falls up to `min(1, −s⁺/κ⁺)` whatever the sign of `κ` (the record
    `research/records/2026-10-02_THE_THROW_CARRIES_ITS_MOMENTUM_THROUGH_THE_DEPOSITS_ACCRETED_MASS_AND_A_HALVING_HALVES_IT.md`).
 -/
 
@@ -501,11 +503,11 @@ theorem convex_slope_le {f : ℝ → ℝ} {s t : ℝ} (hf : ConvexOn ℝ (Set.Ic
     linarith
   rwa [le_div_iff₀ ht0] at hs
 
-/-- **At a convex coast's apex nothing ahead is lower**: if the comparison is convex along the
-whole coast and its slope at the start is not negative (the power test's apex), no fraction
-`τ ∈ [0, 1]` of the coast lowers it, so the coast that stops at its floor is none and the move is
-released from rest. Where the coast is not convex this is not derived: the release from rest there
-is chosen (§7 of the throw's record). -/
+/-- **At a convex line's apex nothing ahead is lower**: if the comparison is convex along the
+whole line and its slope at the start is not negative (the power test's apex), no fraction
+`τ ∈ [0, 1]` of the line lowers it, so no step along it can be adopted and the move is released
+from rest. Where the line is not convex this is not derived (§7 of the throw's record). The
+throw's line is its whole carried move, impulse and coast together. -/
 theorem coast_apex_no_floor_ahead {f : ℝ → ℝ} {s : ℝ} (hf : ConvexOn ℝ (Set.Icc 0 1) f)
     (hd : HasDerivWithinAt f s (Set.Ioi 0) 0) (hs : 0 ≤ s) :
     ∀ τ ∈ Set.Icc (0 : ℝ) 1, f 0 ≤ f τ := by
@@ -526,13 +528,29 @@ theorem coast_floor (a s κ τ : ℝ) (hκ : 0 < κ) :
   nlinarith [mul_nonneg (by linarith : (0 : ℝ) ≤ κ / 2) (sq_nonneg (τ + s / κ))]
 
 /-- **Without certified curvature the end is the floor**: on `a + sτ + κτ²/2` with `s ≤ 0` and
-`κ ≤ 0`, the whole coast `τ = 1` is lowest over `[0, 1]`. ThrowToFloor carries the whole coast
+`κ ≤ 0`, the line's end `τ = 1` is lowest over `[0, 1]`: a floor stop carries the whole line
 where its curvature reading's lower end is not positive. -/
 theorem coast_floor_at_end (a s κ τ : ℝ) (hs : s ≤ 0) (hκ : κ ≤ 0) (hτ0 : 0 ≤ τ) (hτ1 : τ ≤ 1) :
     a + s * 1 + κ * 1 ^ 2 / 2 ≤ a + s * τ + κ * τ ^ 2 / 2 := by
   have h1 : s * 1 ≤ s * τ := by nlinarith
   have h2 : κ * 1 ^ 2 / 2 ≤ κ * τ ^ 2 / 2 := by nlinarith [mul_le_mul hτ1 hτ1 hτ0 zero_le_one]
   linarith
+
+/-- **The line falls up to where its slope turns**: on `a + sτ + κτ²/2`, if `0 ≤ τ₁ ≤ τ₂`,
+`s ≤ 0` and `s + κτ₂ ≤ 0`, then the value at `τ₂` is at most the value at `τ₁`. One condition
+covers both signs of `κ`, so over enclosures `s ≤ s⁺`, `κ ≤ κ⁺` the line falls on `[0, τ]` for
+every `τ` with `s⁺ + κ⁺τ ≤ 0`: the stop `min(1, −s⁺/κ⁺)` (the whole line where `κ⁺ ≤ 0`) is
+derived without certifying the sign of `κ`. -/
+theorem line_falls_to (a s κ τ₁ τ₂ : ℝ) (h₁ : 0 ≤ τ₁) (h₁₂ : τ₁ ≤ τ₂) (hs : s ≤ 0)
+    (hturn : s + κ * τ₂ ≤ 0) :
+    a + s * τ₂ + κ * τ₂ ^ 2 / 2 ≤ a + s * τ₁ + κ * τ₁ ^ 2 / 2 := by
+  have e : a + s * τ₂ + κ * τ₂ ^ 2 / 2 - (a + s * τ₁ + κ * τ₁ ^ 2 / 2)
+      = (τ₂ - τ₁) * (s + κ * (τ₁ + τ₂) / 2) := by ring
+  have hmid : s + κ * (τ₁ + τ₂) / 2 ≤ 0 := by
+    rcases le_total 0 κ with hκ | hκ
+    · nlinarith [mul_le_mul_of_nonneg_left h₁₂ hκ]
+    · nlinarith [mul_nonneg_of_nonpos_of_nonpos hκ (by linarith : -(τ₁ + τ₂) ≤ 0)]
+  nlinarith [mul_nonpos_of_nonneg_of_nonpos (by linarith : 0 ≤ τ₂ - τ₁) hmid]
 
 /-- **The coast's curvature is read from its own end**: on that quadratic, the secant reading
 `2(L(1) − L(0) − s)` is `κ`. -/

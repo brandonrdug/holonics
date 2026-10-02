@@ -44,9 +44,10 @@ comparison's shape, turns the Kinetic step from the gradient.
    - The halving trials halve the whole carried move, `2^(−j)(ηD + c)`. The adopted move is the
      next velocity, so a trial adopted after `j` halvings carries `2^(−j)` of the momentum.
    - A refused move leaves the port at rest.
-   - Before the trials, the composition's first-order bound along the coast alone is read (the
-     power test). The coast is carried only when that bound is negative: the comparison falls along
-     the motion. Otherwise the throw is at its apex and the move is released from rest.
+   - Before the trials, the composition's first-order bound on the first trial's whole move,
+     impulse and coast together, is read (the power test): the force's power on the motion. The
+     coast is carried only when that bound is negative. Otherwise the throw is at its apex and the
+     move is released from rest. (#240 first read the coast alone; §2 says why that was wrong.)
    - **The flight** is the run of moves from a release to its apex or to a refusal. It is measured,
      never chosen.
 5. **#202's acceptance is unchanged, and `H` is a reading, not a condition.**
@@ -134,15 +135,28 @@ continuous form of the throw is `d/dt(H(t)v) = −∇L` with `Ḣ = F`, that is
 it vanishes like `1/t` on the deposit clock. The constant is the deposit's own `F`, not a chosen
 time scale. The leap is the limit that spends the momentum at every deposit.
 
-**The apex.** The power the comparison's force delivers along the motion is `−⟨∇L, c⟩`. The
-composition's first-order bound along the coast alone encloses `⟨∇L, c⟩`, read on the coast's own
-carried successor. A negative upper end certifies that the comparison falls along the coast, and
-only then is the coast carried. The impulse's own slope refusal (`slope_refusal`) is read before
-the coast: a move whose impulse is refused never reads its coast.
+**The apex.** In the continuous form, `d/dt ½⟨v, Hv⟩ = −⟨∇L, v⟩ − ½⟨v, Fv⟩`: the kinetic reading
+changes by the force's power on the actual velocity, less the accretion's loss. Over a move the
+velocity is the whole carried move `ηD + c`, so the power is `−⟨∇L, ηD + c⟩`. Every trial lies on
+one line, `w = D + c/η₀`, because the halvings scale impulse and coast together. The power test is
+therefore the first trial's own first-order bound on its whole move (`first_order` on the
+successor `stepped_source_coasting(η₁, (η₁/η₀)c)`, `η₁` the first step after the entry scale). A
+negative upper end certifies that the motion falls, and only then is the coast carried. The
+impulse's own slope refusal (`slope_refusal`) is read before the coast: a move whose impulse is
+refused never reads its coast.
 
-[agent-inferred] **Why release at the apex.** Past the apex the coast climbs, and #202's held
-certificate refuses a climb. Carrying it would spend the move's trials on halvings that cannot be
-adopted. Releasing from rest keeps the move the normal law's.
+[derived] **Why not the coast alone.** #240 first read the bound along `c` alone, at the incumbent.
+That splits the move into a coast followed by a kick, and lets the old line decide the release. A
+leap lands past its own line's floor whenever it adopts the largest admitted step (m0's slope read,
+§7), so the coast alone climbs and the move is released: the chain run under that rule (§6) is
+then its own at-rest throw, move for move. A leap stopped exactly at its floor leaves
+`⟨∇L, c⟩ = 0`, so the coast alone never descends at first order, while the whole move still does,
+through `⟨∇L, ηD⟩ < 0`. That is the conjugate-direction case, the one where momentum pays.
+
+[derived] **Why release at the apex.** The first-order bound's sign is shared along `w`, so where
+the whole move climbs every halving on that line meets the same refused certificate. Carrying the
+coast would spend the move's trials on steps that cannot be adopted. Releasing from rest keeps the
+move the normal law's, whose impulse descends.
 
 **The halvings.** The trials halve the whole carried move. A trial adopted at `2^(−j)` of the first
 carries `2^(−j)` of the momentum, since its move is the next velocity. The halving is the time step:
@@ -265,7 +279,18 @@ per-move bound is `253092 + 8 · 137075 = 1349692` ms, and the chain's deadline 
 `16 · 1349692 = 21595072` ms, rounded up to `21596` s, launched as `timeout 21596` around
 `run.sh .local/throw 1349692 1350` (each move's own deadline `1350` s is its bound rounded up).
 
-## 7. The floor along the coast (after the development read)
+**What the running chain measures.** It was launched at `7944b772`, under the coast-alone power
+test. Its moves so far have all been released from rest (the power along the coast is
+`[21607, 21609)/4096` at m1, `[16685, 16687)/4096` at m2 and `[59623, 59627)/4096` at m3). While
+every move releases, it is the at-rest throw: `ρ` held, the same impulse. So it is the clean control
+for the corrected chain, and against an at-rest control its difference is zero by construction, a
+consequence of the coast-alone rule and not a reading of momentum. The corrected chain (the
+whole-move power test) runs from the same `c0.state`, requests and strict descent, at 4 threads and
+the same per-move bound. Its acceptance is the claim above, with this chain as the control. Its m1
+state is byte-identical to the Coordinate control's m1; the Coordinate control left this path at m2
+through `ρ` (it lowered `ρ` to `102139/131072`).
+
+## 7. The floor along the line (after the development read)
 
 **The read.** At m0's stored state, the plain pullback `G` (the descent covector on m0's own
 sections) pairs positively with `E_c0 − E_m0`, with `cos²` in `[354, 355)/4096`. So
@@ -274,36 +299,28 @@ sections the same line still fell at m0 (the mask's cells `[430625/4096, 430630/
 and `[473652/4096, 473658/4096)` at `η 1/2`). The step's flipped commitments raised the released code
 length to `[495714/4096, 495719/4096)`, and that jump is what turned the line (#207's crossing law).
 
-**The law** [derived; the profile along the line is the hypothesis]. Along the carried line
-`L(τ) = L(E + τc)`, with slope `s` at `τ = 0` (the power test) and curvature `κ`:
-- *Apex, `s ≥ 0`.* With `L` convex along the coast, the coast does not lower it
-  (`coast_apex_no_floor_ahead`). The floor is not ahead, so the coast that stops at the floor is
-  none, and the move is released from rest: the inelastic limit of the deposit's own sticking. This
-  is #240's rule, derived where the coast is convex. Where `L` is not convex along the coast this
-  derives nothing, and the release from rest there is chosen. `ThrowToFloor` reads `L(c)` only on
-  a carried coast (`s⁺ < 0`), so at the apex it never reads whether the coast is convex.
-- *Carried, `s < 0`.* The floor is at `τ* = −s/κ` (`coast_floor`), and the coast that stops there
-  is `min(1, τ*)·c`. #240 carries `τ = 1` and lets the halvings scale it, so a coast with `τ* < 1`
-  overshoots its floor and the next move releases.
-- *The curvature without a constant.* The power test already builds the coast-only successor. One
-  reread of it gives the secant `κ_c = 2(L(c) − L(0) − s)` (`coast_secant_curvature`), with exact
-  enclosures. The secant is read on the fixed mask, the same comparison the first-order bound `s`
-  reads, so no commitment flips inside it. The own release is then checked by the conditions of
-  adoption, as every trial is.
-- *Built* as `MoveMetric::ThrowToFloor` (`ThrowReading::coast_end`, `ThrowReading::floor`): the
-  least `τ*` over the enclosures, `−s⁺/κ⁺` with `κ⁺ = 2(L(c)⁺ − L(0)⁻ − s⁻)`, held at `JOINT_BITS`
-  toward zero and at most `1`; where `κ⁻ = 2(L(c)⁻ − L(0)⁺ − s⁺)` is not positive, the whole coast is
-  carried as `Throw` carries it: on the quadratic with `s ≤ 0` and `κ ≤ 0` the end is the floor
-  (`coast_floor_at_end`). The cost is one reread per carried move, and one more where `τ < 1`: the
-  stopped coast's own `L(τc)` (`ThrowReading::floor_end`), the receipt of whether the quadratic held
-  off the coast's end. The harness reads it as `throw-floor`.
-- *What the stop dissipates.* The adopted move is the next velocity, so a coast stopped at `τ`
-  hands on `τ` of its momentum: `(1 − τ)` of the coast's momentum is dropped at the floor, a
-  dissipation of the same kind as a halving's.
+**The law** [derived; the profile along the line is the hypothesis]. Along a line
+`L(τ) = L(E + τw)`, with slope `s` at `τ = 0` and curvature `κ`:
+- *Apex, `s ≥ 0`.* With `L` convex along the line, no point of it is lower
+  (`convex_slope_le`, `coast_apex_no_floor_ahead`), so nothing on it can be adopted. Where `L` is
+  not convex along the line this derives nothing.
+- *Falling, `s < 0`.* The floor is at `τ* = −s/κ` (`coast_floor`); where `κ ≤ 0` the end is the floor
+  (`coast_floor_at_end`). The secant `κ = 2(L(1) − L(0) − s)` is read from the line's own end
+  (`coast_secant_curvature`), on the fixed mask, the same comparison the first-order bound reads.
+- *Over enclosures.* The line falls on `[0, τ]` wherever `s + κτ ≤ 0`, for either sign of `κ`
+  (`line_falls_to`). So with `s ≤ s⁺ < 0` and `κ ≤ κ⁺` the stop `min(1, −s⁺/κ⁺)`, the whole line
+  where `κ⁺ ≤ 0`, is derived without certifying the sign of `κ`. #240's first floor stop carried the
+  whole coast where `κ⁻ ≤ 0 < κ⁺`; that straddling case was chosen, and the derived stop replaces
+  it.
+- *What a stop dissipates.* The adopted move is the next velocity, so a move stopped at `τ` hands on
+  `τ` of its momentum: `(1 − τ)` is dropped at the floor, a dissipation of the same kind as a
+  halving's.
 
-**What it changes.** The apex moves are unchanged. Carried moves with `τ* < 1` carry less coast. So
-the law changes only what follows the running chain, whose receipts stay those of §2's rule. It is
-held for measurement like `Throw`.
+**Which line.** #240 first applied this along the coast alone (`MoveMetric::ThrowToFloor`, which
+carried `min(1, τ*)·c`). That answers the coast-alone question §2 rejects, so it is removed. Under
+the whole-move power test the line is the trials' own line `w`, and its floor is the ladder's own
+floor: the main line is building it for the leap, from the secant of the trials the halvings
+already read. It applies to the throw's line unchanged, and these lemmas are its Lean.
 
 ## 8. Where the Kinetic step turns from the normal direction (Q10)
 
@@ -345,7 +362,7 @@ truncated iterate's.
 ## 9. Verification
 
 - `cargo check -p holonics --all-targets`: clean.
-- The three throw tests (the floor test with its `τ < 1` fixture) and
-  `the_kinetic_move_deposits_the_solve_and_keeps_every_guard`: see the PR.
+- The three throw tests (`a_coast_that_climbs_alone_is_carried_when_the_whole_move_falls` among
+  them) and `the_kinetic_move_deposits_the_solve_and_keeps_every_guard`: see the PR.
 - `bash tools/lean_check.sh HolonicsResearch.HNN.MoveDirection`: "Build completed successfully
   (8706 jobs)".

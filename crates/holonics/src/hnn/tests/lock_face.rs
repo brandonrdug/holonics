@@ -1468,9 +1468,11 @@ fn the_thrown_move_carries_its_momentum_through_the_accreted_mass() {
     assert_eq!(coast.momentum, velocity.multiply(&gram).unwrap());
     let power = throw.power.as_ref().expect("the power test");
     assert_eq!(throw.carried, power.upper.is_negative());
-    // On this fixture the comparison falls along the coast, and the first trial carries it.
+    // On this fixture the whole carried move falls, and the first trial carries it: the power test
+    // is that trial's own first-order bound.
     assert!(throw.carried, "the fixture's coast is carried: {power:?}");
     assert!(thrown.adopted.is_some() && thrown.trials.len() == 1);
+    assert_eq!(thrown.trials[0].first_order.as_ref(), Some(power));
     if let Some((successor, _)) = &thrown.adopted {
         let last = thrown.trials.last().unwrap();
         assert!(last.value.as_ref().unwrap().upper < thrown.before.value.lower);
@@ -1487,14 +1489,13 @@ fn the_thrown_move_carries_its_momentum_through_the_accreted_mass() {
     }
 }
 
-/// **The throw stopped at its floor carries at most the coast's floor fraction** (the throw's record
-/// §7): from the same released successor and flight, `ThrowToFloor` reads the same coast and power
-/// as `Throw`; where the coast is carried it reads the fixed mask at the coast's end, and where the
-/// secant curvature `κ = 2(L(c) − L(0) − s)` is certified positive the fraction carried is in
-/// `(0, 1]` and at most `−s/κ` at the enclosures' ends; an adopted trial lowers the comparison with
-/// `ρ` held and hands on its move. From rest it is the throw's release.
+/// **The power is read on the whole move, not on the coast alone** (the throw's record §2): the
+/// fixture's released flight reversed, `−d`, carries the reversed coast `−c`, which climbs at first
+/// order wherever `c` falls. Scaled by the least `2^(−k)` at which the impulse outweighs it, the
+/// whole move `η₁D − (η₁/η₀)c` falls and the reversed coast is carried; the power test is the first
+/// trial's own first-order bound, and an adopted trial lowers the comparison with `ρ` held.
 #[test]
-fn the_throw_to_its_floor_carries_at_most_the_floor_fraction_of_its_coast() {
+fn a_coast_that_climbs_alone_is_carried_when_the_whole_move_falls() {
     use crate::hnn::executed::{
         Flight, MoveMetric, ReleaseExcursion, executed_move_in, executed_move_thrown,
     };
@@ -1504,23 +1505,7 @@ fn the_throw_to_its_floor_carries_at_most_the_floor_fraction_of_its_coast() {
     let bank = joint_bank();
     let requests =
         short_requests(&field, &[(95, [0, 1, 2, 1]), (96, [1, 1, 0, 2]), (97, [2, 0, 1, 1])]);
-    let move_from = |constitution, metric, flight: &Flight| {
-        executed_move_thrown(
-            &field,
-            constitution,
-            &requests,
-            &refinement,
-            &bank,
-            12,
-            Comparison::LOCK_DECISIONS,
-            metric,
-            &ReleaseExcursion::monotone(),
-            flight,
-        )
-        .unwrap()
-    };
-    let released = move_from(&theta, MoveMetric::ThrowToFloor, &Flight::default());
-    let leap = executed_move_in(
+    let released = executed_move_in(
         &field,
         &theta,
         &requests,
@@ -1531,84 +1516,47 @@ fn the_throw_to_its_floor_carries_at_most_the_floor_fraction_of_its_coast() {
         MoveMetric::Throw,
     )
     .unwrap();
-    assert_eq!(
-        released.adopted.as_ref().map(|(s, _)| s.source_port(0).cloned()),
-        leap.adopted.as_ref().map(|(s, _)| s.source_port(0).cloned())
-    );
     let Some((first, _)) = &released.adopted else {
         panic!("the fixture's release is adopted: {:?}", released.refusal);
     };
     let flight = released.throw.as_ref().unwrap().next.clone();
-    let thrown = move_from(first, MoveMetric::Throw, &flight);
-    let floored = move_from(first, MoveMetric::ThrowToFloor, &flight);
-    let (throw, floor) = (thrown.throw.as_ref().unwrap(), floored.throw.as_ref().unwrap());
-    assert_eq!(floor.power, throw.power);
-    assert_eq!(floor.carried, throw.carried);
-    let power = floor.power.as_ref().expect("the power test");
-    if floor.carried {
-        let end = floor.coast_end.as_ref().expect("the coast's end is read");
-        let two = Rat::from_integer(2.into());
-        let least = (&end.lower - &floored.before.value.upper - &power.upper) * &two;
-        let most = (&end.upper - &floored.before.value.lower - &power.lower) * &two;
-        match &floor.floor {
-            Some(tau) => {
-                assert!(least.is_positive());
-                assert!(tau.is_positive() && *tau <= Rat::one());
-                assert!(*tau <= -&power.upper / &most);
-            }
-            None => assert!(!least.is_positive()),
-        }
-        // On this fixture `κ` is certified positive and the floor lies at or past the whole coast.
-        assert_eq!(floor.floor, Some(Rat::one()));
-        assert!(floor.floor_end.is_none());
-    } else {
-        assert!(floor.coast_end.is_none() && floor.floor.is_none());
-    }
-    // A faster flight: the velocity scaled by the least `2^k` whose floor falls short of the whole
-    // coast. Its coast is stopped at `τ < 1`, carried as `τ·c`: the same move as `Throw` from the
-    // velocity scaled by `τ` (the coast is linear in the velocity), and the stopped coast reads no
-    // higher than the coast's end on this fixture.
-    let velocity = flight.velocity.clone().expect("the release hands on its move");
-    let (fast, stopped, tau) = (1..=12)
+    let velocity = flight.velocity.clone().expect("a velocity");
+    let move_from = |flight: &Flight| {
+        executed_move_thrown(
+            &field,
+            first,
+            &requests,
+            &refinement,
+            &bank,
+            12,
+            Comparison::LOCK_DECISIONS,
+            MoveMetric::Throw,
+            &ReleaseExcursion::monotone(),
+            flight,
+        )
+        .unwrap()
+    };
+    let forward = move_from(&flight);
+    let forward_power = forward.throw.as_ref().unwrap().power.clone().expect("the power test");
+    assert!(forward_power.upper.is_negative());
+    let (thrown, k) = (0..=12)
         .find_map(|k| {
-            let fast = Flight {
-                velocity: Some(velocity.scaled(&rat(1 << k, 1))),
+            let reversed = Flight {
+                velocity: Some(velocity.scaled(&rat(-1, 1 << k))),
                 moves: flight.moves,
             };
-            let stopped = move_from(first, MoveMetric::ThrowToFloor, &fast);
-            let tau = stopped.throw.as_ref().unwrap().floor.clone()?;
-            (tau < Rat::one()).then_some((fast, stopped, tau))
+            let thrown = move_from(&reversed);
+            thrown.throw.as_ref().unwrap().carried.then_some((thrown, k))
         })
-        .expect("some faster flight stops short of its whole coast");
-    let reading = stopped.throw.as_ref().unwrap();
-    assert!(reading.carried && tau.is_positive());
-    let end = reading.coast_end.as_ref().unwrap();
-    let at_floor = reading.floor_end.as_ref().expect("the stopped coast is read");
-    assert!(at_floor.upper <= end.upper, "L(τc) {at_floor:?} against L(c) {end:?}");
-    let slowed = Flight {
-        velocity: Some(fast.velocity.as_ref().unwrap().scaled(&tau)),
-        moves: fast.moves,
-    };
-    let carried = move_from(first, MoveMetric::Throw, &slowed);
-    assert!(carried.throw.as_ref().unwrap().carried);
-    assert_eq!(
-        carried.trials.iter().map(|t| t.value.clone()).collect::<Vec<_>>(),
-        stopped.trials.iter().map(|t| t.value.clone()).collect::<Vec<_>>()
-    );
-    assert_eq!(
-        carried.adopted.as_ref().map(|(s, _)| s.source_port(0).cloned()),
-        stopped.adopted.as_ref().map(|(s, _)| s.source_port(0).cloned())
-    );
-    if let Some((successor, _)) = &floored.adopted {
-        let last = floored.trials.last().unwrap();
-        assert!(last.value.as_ref().unwrap().upper < floored.before.value.lower);
+        .expect("some reversed flight is carried with the impulse");
+    let throw = thrown.throw.as_ref().unwrap();
+    let power = throw.power.as_ref().unwrap();
+    assert!(power.upper.is_negative(), "the reversed flight at 2^(-{k})");
+    assert_eq!(thrown.trials[0].first_order.as_ref(), Some(power));
+    if let Some((successor, _)) = &thrown.adopted {
+        let last = thrown.trials.last().unwrap();
+        assert!(last.value.as_ref().unwrap().upper < thrown.before.value.lower);
         assert_eq!(successor.transport(0), first.transport(0));
-        let moved = successor
-            .source_port(0)
-            .unwrap()
-            .subtract(first.source_port(0).unwrap())
-            .unwrap();
-        assert_eq!(floor.next.velocity.as_ref(), Some(&moved));
     }
 }
 
