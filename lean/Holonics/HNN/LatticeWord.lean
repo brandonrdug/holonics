@@ -70,6 +70,15 @@ Frobenius norm `frobSq`; a certificate is a declared rational bound, never a flo
 6. **The prox step at an inverse chart** (`prox_chart_residual`, `prox_chart_certificate`): with
    `W' = W + wγ g fᵀ X̂`, `W'H' − B' = −wγ g fᵀ(1 − X̂H')`, the left residual of the chart of
    `H'⁻¹`; with the exact inverse it is `HNN/Normal.normal_prox_step`.
+7. **The window's warm start, the release's read and the carrier.** The window's rank-one steps
+   `X₀ = X̂ − X̂F S⁻¹FᵀX̂`, `S = Ω⁻¹ + FᵀX̂F`, give `1 − X₀(H + FΩFᵀ) = (1 − X̂F S⁻¹Fᵀ)(1 − X̂H)` in
+   any ring (`warm_start_window`), so an exact chart stays exact (`warm_start_window_exact`) and
+   a certified one keeps its residual up to that factor (`warm_start_window_certificate`). A
+   release `ρ` moves a read at `x` by `|(ρH'⁻¹x)_i| ≤ ‖ρ‖∞‖x‖₁/c` under the Gram's margin `c`
+   (`chart_release_read`), `c = 1 − 1/(2L_R)` at the carried Gram
+   (`carried_chart_release_read`). Under the ℓ1 certificate `Σ|p_j| < 2^127`, every partial sum
+   in any order lies in `(−2^127, 2^127)` (`carrier_partial_sum`), so the 128-bit ring read is
+   the integer sum (`carrier_ring_read`).
 
 The balance of the full element with its passive part and contrast port at an executed chart is
 `HNN/Word.element_executed_balance` (campaign 2): for any executed output `ŝ′`,
@@ -848,6 +857,179 @@ theorem prox_chart_certificate {W : Matrix τ σ ℚ} {H : Matrix σ σ ℚ} {B 
 
 end Prox
 
+/-! ## 7. The window's warm start, the release's read and the ℓ1 carrier
+
+Three statements of Decision 24's executed charts, each at its Rust consumer:
+`hnn::constitution::SolvedChart` (the warm start), `hnn::constitution::ChartRule::read` (the
+release's read) and `hnn::chart`'s `certified_dot` (the carrier). -/
+
+section WarmStart
+
+variable {R : Type*} [Ring R] {n m : Type*} [Fintype n] [Fintype m] [DecidableEq n]
+  [DecidableEq m]
+
+/-- [proved-derived; formal-checked] **The window's warm start keeps the chart's residual.** After
+a window of returns `F` with weights `Ω` moves the Gram to `H + FΩFᵀ`, the rank-one steps give
+`X₀ = X̂ − X̂F S⁻¹ FᵀX̂` with `S = Ω⁻¹ + FᵀX̂F`, and in any ring
+`1 − X₀(H + FΩFᵀ) = (1 − X̂F S⁻¹Fᵀ)(1 − X̂H)`. The inverses enter only as left inverses
+(`Ωi Ω = 1`, `Si S = 1`): the difference of the two sides is `X̂F[Si(FᵀX̂F)Ω + Si − Ω]Fᵀ`, and
+`Si(FᵀX̂F)Ω + Si = Si S Ω = Ω`. -/
+theorem warm_start_window (Xh H : Matrix n n R) (F : Matrix n m R) (Ω Ωi Si : Matrix m m R)
+    (hΩ : Ωi * Ω = 1) (hS : Si * (Ωi + Fᵀ * Xh * F) = 1) :
+    1 - (Xh - Xh * F * Si * Fᵀ * Xh) * (H + F * Ω * Fᵀ) =
+      (1 - Xh * F * Si * Fᵀ) * (1 - Xh * H) := by
+  have key : Si * (Fᵀ * Xh * F) * Ω + Si = Ω := by
+    calc Si * (Fᵀ * Xh * F) * Ω + Si = Si * (Fᵀ * Xh * F) * Ω + Si * (Ωi * Ω) := by
+          rw [hΩ, mul_one]
+      _ = Si * (Ωi + Fᵀ * Xh * F) * Ω := by
+        simp only [Matrix.mul_add, Matrix.add_mul, Matrix.mul_assoc]; abel
+      _ = Ω := by rw [hS, one_mul]
+  have e : Xh * F * Ω * Fᵀ = Xh * F * (Si * (Fᵀ * Xh * F) * Ω + Si) * Fᵀ := by rw [key]
+  have lhs : 1 - (Xh - Xh * F * Si * Fᵀ * Xh) * (H + F * Ω * Fᵀ)
+      = 1 - Xh * H + Xh * F * Si * Fᵀ * Xh * H - Xh * F * Ω * Fᵀ
+          + Xh * F * Si * Fᵀ * Xh * F * Ω * Fᵀ := by
+    simp only [Matrix.sub_mul, Matrix.mul_add, Matrix.mul_assoc]; abel
+  rw [lhs, e]
+  simp only [Matrix.sub_mul, Matrix.mul_sub, Matrix.mul_add, Matrix.add_mul, Matrix.mul_assoc,
+    Matrix.mul_one, Matrix.one_mul]
+  abel
+
+/-- [proved-derived; formal-checked] **An exact chart stays exact** under the window's warm start:
+`X̂H = 1` gives `X₀(H + FΩFᵀ) = 1`. -/
+theorem warm_start_window_exact (Xh H : Matrix n n R) (F : Matrix n m R) (Ω Ωi Si : Matrix m m R)
+    (hΩ : Ωi * Ω = 1) (hS : Si * (Ωi + Fᵀ * Xh * F) = 1) (hX : Xh * H = 1) :
+    (Xh - Xh * F * Si * Fᵀ * Xh) * (H + F * Ω * Fᵀ) = 1 := by
+  have h := warm_start_window Xh H F Ω Ωi Si hΩ hS
+  rw [hX, sub_self, Matrix.mul_zero] at h
+  exact (sub_eq_zero.mp h).symm
+
+end WarmStart
+
+section WarmStartRat
+
+variable {n m : Type*} [Fintype n] [Fintype m] [DecidableEq n] [DecidableEq m]
+
+/-- [proved-derived; formal-checked] **The warm start's certificate**: over `ℚ`, the window's warm
+start has `‖1 − X₀H'‖∞ ≤ ‖1 − X̂F S⁻¹Fᵀ‖∞ ‖1 − X̂H‖∞`, so a certified chart keeps its residual up to
+the factor the window's returns read. Unlike `warm_start_certificate`, the deposit's size does not
+enter additively. -/
+theorem warm_start_window_certificate (Xh H : Matrix n n ℚ) (F : Matrix n m ℚ)
+    (Ω Ωi Si : Matrix m m ℚ) (hΩ : Ωi * Ω = 1) (hS : Si * (Ωi + Fᵀ * Xh * F) = 1) :
+    rowNorm (1 - (Xh - Xh * F * Si * Fᵀ * Xh) * (H + F * Ω * Fᵀ)) ≤
+      rowNorm (1 - Xh * F * Si * Fᵀ) * rowNorm (1 - Xh * H) := by
+  rw [warm_start_window Xh H F Ω Ωi Si hΩ hS]
+  exact rowNorm_mul_le _ _
+
+end WarmStartRat
+
+section Read
+
+variable {σ τ : Type*} [Fintype σ] [Fintype τ]
+
+/-- [proved-standard; formal-checked] `|u|² ≤ ‖u‖₁²` over `ℚ`. -/
+theorem dot_self_le_l1_sq (u : σ → ℚ) : u ⬝ᵥ u ≤ l1 u ^ 2 := by
+  unfold l1 dotProduct
+  have h : ∀ i ∈ Finset.univ, u i * u i ≤ |u i| * ∑ j, |u j| := fun i _ => by
+    rw [← abs_mul_abs_self (u i)]
+    exact mul_le_mul_of_nonneg_left
+      (Finset.single_le_sum (fun j _ => abs_nonneg (u j)) (Finset.mem_univ i)) (abs_nonneg _)
+  calc ∑ i, u i * u i ≤ ∑ i, |u i| * ∑ j, |u j| := Finset.sum_le_sum h
+    _ = (∑ j, |u j|) ^ 2 := by rw [← Finset.sum_mul, sq]
+
+/-- [proved-standard; formal-checked] **A solve under a margin.** If `c|v|² ≤ vᵀHv` for every `v`
+(`c > 0`) and `Hy = x`, then `c²|y|² ≤ |x|²`: from `c|y|² ≤ ⟨y, x⟩` and Cauchy–Schwarz, with no
+square root, no symmetry and no inverse. -/
+theorem solve_energy_le {H : Matrix σ σ ℚ} {c : ℚ} (hc : 0 < c)
+    (hmargin : ∀ v : σ → ℚ, c * ∑ i, v i ^ 2 ≤ ∑ i, ∑ j, v i * H i j * v j)
+    {x y : σ → ℚ} (hy : H *ᵥ y = x) : c ^ 2 * (y ⬝ᵥ y) ≤ x ⬝ᵥ x := by
+  have hq : ∑ i, ∑ j, y i * H i j * y j = y ⬝ᵥ x := by
+    rw [← hy]; simp [dotProduct, mulVec, Finset.mul_sum, mul_assoc]
+  have hyy : ∑ i, y i ^ 2 = y ⬝ᵥ y := by simp [dotProduct, sq]
+  have h1 : c * (y ⬝ᵥ y) ≤ y ⬝ᵥ x := by
+    have := hmargin y; rwa [hq, hyy] at this
+  have h0 : 0 ≤ y ⬝ᵥ y := dot_self_nonneg y
+  have h2 : (c * (y ⬝ᵥ y)) ^ 2 ≤ (y ⬝ᵥ y) * (x ⬝ᵥ x) :=
+    (pow_le_pow_left₀ (mul_nonneg hc.le h0) h1 2).trans (dot_sq_le y x)
+  rcases h0.eq_or_lt with h | h
+  · rw [← h, mul_zero]; exact dot_self_nonneg x
+  · have : (y ⬝ᵥ y) * (c ^ 2 * (y ⬝ᵥ y)) ≤ (y ⬝ᵥ y) * (x ⬝ᵥ x) := by nlinarith [h2]
+    exact le_of_mul_le_mul_left this h
+
+/-- [proved-derived; formal-checked] **The release's read.** The map step through an executed chart
+differs from the exact prox step by `−ρH'⁻¹` (`prox_chart_residual`), so a read at an operand `x`
+moves by `(ρy)_i` with `H'y = x`. Under the Gram's margin `c`, `|(ρy)_i| ≤ ‖ρ‖∞‖x‖₁/c`: by
+Cauchy–Schwarz, `|⟨ρ_i, y⟩| ≤ |ρ_i||y| ≤ ‖ρ_i‖₁ ‖x‖₁/c`, and the row's ℓ1 is at most `‖ρ‖∞`. -/
+theorem chart_release_read {H : Matrix σ σ ℚ} {c : ℚ} (hc : 0 < c)
+    (hmargin : ∀ v : σ → ℚ, c * ∑ i, v i ^ 2 ≤ ∑ i, ∑ j, v i * H i j * v j)
+    (ρ : Matrix τ σ ℚ) {x y : σ → ℚ} (hy : H *ᵥ y = x) (i : τ) :
+    |(ρ *ᵥ y) i| ≤ rowNorm ρ * l1 x / c := by
+  have hcs := dot_sq_le (ρ i) y
+  have hyy := solve_energy_le hc hmargin hy
+  have hu1 := dot_self_le_l1_sq (ρ i)
+  have hx1 := dot_self_le_l1_sq x
+  have hrow : l1 (ρ i) ≤ rowNorm ρ := row_sum_le_rowNorm ρ i
+  have hl1 : 0 ≤ l1 (ρ i) := Finset.sum_nonneg fun j _ => abs_nonneg _
+  have hc2 : 0 ≤ c ^ 2 := sq_nonneg c
+  have huu := dot_self_nonneg (ρ i)
+  have hxx := dot_self_nonneg x
+  have key : c ^ 2 * (ρ i ⬝ᵥ y) ^ 2 ≤ (rowNorm ρ * l1 x) ^ 2 := by
+    calc c ^ 2 * (ρ i ⬝ᵥ y) ^ 2 ≤ c ^ 2 * ((ρ i ⬝ᵥ ρ i) * (y ⬝ᵥ y)) :=
+          mul_le_mul_of_nonneg_left hcs hc2
+      _ = (ρ i ⬝ᵥ ρ i) * (c ^ 2 * (y ⬝ᵥ y)) := by ring
+      _ ≤ (ρ i ⬝ᵥ ρ i) * (x ⬝ᵥ x) := mul_le_mul_of_nonneg_left hyy huu
+      _ ≤ l1 (ρ i) ^ 2 * l1 x ^ 2 := mul_le_mul hu1 hx1 hxx (sq_nonneg _)
+      _ ≤ rowNorm ρ ^ 2 * l1 x ^ 2 :=
+          mul_le_mul_of_nonneg_right (pow_le_pow_left₀ hl1 hrow 2) (sq_nonneg _)
+      _ = (rowNorm ρ * l1 x) ^ 2 := by ring
+  have hb : 0 ≤ rowNorm ρ * l1 x / c :=
+    div_nonneg (mul_nonneg (rowNorm_nonneg ρ) (Finset.sum_nonneg fun j _ => abs_nonneg _)) hc.le
+  apply abs_le_of_sq_le_sq _ hb
+  rw [div_pow, le_div_iff₀ (pow_pos hc 2), mul_comm]
+  exact key
+
+/-- [proved-derived; formal-checked] **The release's read at the carried Gram**: under the lattice
+rule (`LatticeDeposit.carried_gram_posDef_rule`) the margin is `c = 1 − 1/(2L_R)`, so
+`|(ρH'⁻¹x)_i| ≤ ‖ρ‖∞‖x‖₁/(1 − 1/(2L_R))`: the bound `ChartRule::read` reports. -/
+theorem carried_chart_release_read {L : ℕ} (H Hx : Matrix σ σ ℚ)
+    (hclose : ∀ i j, |H i j - Hx i j| ≤ unit L)
+    (hexact : ∀ v : σ → ℚ, ∑ i, v i ^ 2 ≤ ∑ i, ∑ j, v i * Hx i j * v j) {LR : ℕ}
+    (hLR : 0 < LR) (hL : 2 * LR * Fintype.card σ ≤ 2 ^ L)
+    (ρ : Matrix τ σ ℚ) {x y : σ → ℚ} (hy : H *ᵥ y = x) (i : τ) :
+    |(ρ *ᵥ y) i| ≤ rowNorm ρ * l1 x / (1 - 1 / (2 * LR)) := by
+  have hc : (0 : ℚ) < 1 - 1 / (2 * LR) := by
+    have h1 : (1 : ℚ) ≤ LR := by exact_mod_cast hLR
+    have : (1 : ℚ) / (2 * LR) ≤ 1 / 2 := by
+      apply div_le_div_of_nonneg_left (by norm_num) (by norm_num) (by linarith)
+    linarith
+  exact chart_release_read hc
+    (fun v => Holonics.HNN.LatticeDeposit.carried_gram_posDef_rule H Hx hclose hexact hLR hL v)
+    ρ hy i
+
+end Read
+
+section Carrier
+
+/-- [proved-standard; formal-checked] **The ℓ1 carrier bounds every partial sum.** If
+`Σ_(j∈s) |p_j| < 2^127`, the sum over any `T ⊆ s` lies in `(−2^127, 2^127)`. Every partial sum of
+`s` in any order is the sum over such a `T`. -/
+theorem carrier_partial_sum {ι : Type*} (s : Finset ι) (p : ι → ℤ)
+    (h : ∑ j ∈ s, |p j| < 2 ^ 127) {T : Finset ι} (hT : T ⊆ s) :
+    |∑ j ∈ T, p j| < 2 ^ 127 :=
+  ((Finset.abs_sum_le_sum_abs _ _).trans
+    (Finset.sum_le_sum_of_subset_of_nonneg hT fun _ _ _ => abs_nonneg _)).trans_lt h
+
+/-- [proved-derived; formal-checked] **The 128-bit ring read is the integer sum.** Under the ℓ1
+certificate, any partial sum taken in `ℤ/2^128` (the device's wrapping words, in any order), read
+at its signed representative (`valMinAbs`), is the integer sum. -/
+theorem carrier_ring_read {ι : Type*} (s : Finset ι) (p : ι → ℤ)
+    (h : ∑ j ∈ s, |p j| < 2 ^ 127) {T : Finset ι} (hT : T ⊆ s) :
+    (∑ j ∈ T, (p j : ZMod (2 ^ 128))).valMinAbs = ∑ j ∈ T, p j := by
+  have hb := abs_lt.mp (carrier_partial_sum s p h hT)
+  rw [← Int.cast_sum, ZMod.valMinAbs_spec]
+  refine ⟨rfl, ?_, ?_⟩ <;> push_cast <;> linarith [hb.1, hb.2]
+
+end Carrier
+
 section Audit
 
 #print axioms newton_schulz_right
@@ -890,6 +1072,15 @@ section Audit
 #print axioms cayley_chart_energy_rowNorm
 #print axioms prox_chart_residual
 #print axioms prox_chart_certificate
+#print axioms warm_start_window
+#print axioms warm_start_window_exact
+#print axioms warm_start_window_certificate
+#print axioms dot_self_le_l1_sq
+#print axioms solve_energy_le
+#print axioms chart_release_read
+#print axioms carried_chart_release_read
+#print axioms carrier_partial_sum
+#print axioms carrier_ring_read
 
 end Audit
 
