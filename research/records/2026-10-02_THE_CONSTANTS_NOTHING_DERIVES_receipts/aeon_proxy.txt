@@ -1,0 +1,3 @@
+docs/**/*.md: 64 files, 1874871 bytes; lock counts [437641, 204564, 202105]; mean aeon by rate 1099 rem 4713891 over 8534136; 1705 aeons, measured mean 1099 rem 915 over 1705; least 781, median 1085, largest 2037
+research/records/*.md: 1350 files, 15697762 bytes; lock counts [3683801, 1679131, 1695008]; mean aeon by rate 1100 rem 22089210 over 71404736; 14266 aeons, measured mean 1100 rem 4431 over 14266; least 642, median 1082, largest 2826
+crates/holonics/src/**/*.rs: 188 files, 5700276 bytes; lock counts [1149322, 447112, 486171]; mean aeon by rate 1398 rem 9469314 over 20400867; 4076 aeons, measured mean 1398 rem 1885 over 4076; least 645, median 1366, largest 2858
