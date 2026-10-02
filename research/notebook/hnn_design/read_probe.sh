@@ -22,14 +22,15 @@ start=$(date +%s%3N)
 RAYON_NUM_THREADS=${RAYON_NUM_THREADS:-19} setsid timeout "$deadline" "$bin" "$@" > "$out/listing.txt" 2> "$out/stderr.txt" &
 pid=$!
 stopped=0
-# One line per constitution (`  <label>…; <ms> ms`). The run stops when the read in progress has
-# taken longer than the unit since the last such line (or since launch), not only once a slow line
-# has been printed.
+# One line per constitution or unit of work (`  <label>…; <ms> ms`, on stdout or stderr: an executed
+# move prints its incumbent read, its persistence read, its returns and slope, and each trial's
+# reread). The run stops when the read in progress has taken longer than the unit since the last
+# such line (or since launch), not only once a slow line has been printed.
 lines=0
 mark=$(date +%s%3N)
 while kill -0 "$pid" 2>/dev/null; do
   now=$(date +%s%3N)
-  count=$(grep -cE '^  [^ ].*; [0-9]+ ms$' "$out/listing.txt" || true)
+  count=$(cat "$out/listing.txt" "$out/stderr.txt" | grep -cE '^  [^ ].*; [0-9]+ ms$' || true)
   if (( count > lines )); then
     lines=$count
     mark=$now

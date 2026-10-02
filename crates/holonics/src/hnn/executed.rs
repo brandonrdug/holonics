@@ -4040,7 +4040,12 @@ fn executed_move_flown(
     let excursion = excursion.checked()?;
     let ring = declared.ring();
     let composition = comparison.composition;
+    // Progress lines on stderr, one per unit of the move's work with its elapsed milliseconds (the
+    // waiting standard): the incumbent's read, its persistence read, and each trial's reread.
+    let mut mark = std::time::Instant::now();
     let (before, reads) = incumbent(field, constitution, requests, declared, bank, grain, comparison)?;
+    eprintln!("  the move's incumbent read; {} ms", mark.elapsed().as_millis());
+    mark = std::time::Instant::now();
     // The fixed incumbent mask: every term's section, transient within the move.
     let mask: Vec<Vec<TermSite>> = before
         .requests
@@ -4050,6 +4055,8 @@ fn executed_move_flown(
     let proposal = propose(composition, &before, &reads);
     drop(reads);
     let persistence = persistence(field, constitution, requests, declared, bank, grain, &before)?;
+    eprintln!("  the move's proposal and persistence read; {} ms", mark.elapsed().as_millis());
+    mark = std::time::Instant::now();
     let unresolved_terms = proposal.unresolved_terms();
     let refused = certificate_refusal(&proposal);
     let mut receipt = ExecutedMove {
@@ -4291,8 +4298,12 @@ fn executed_move_flown(
         }
     };
     receipt.start = Some((start.clone(), kind));
+    eprintln!("  the move's returns, slope and first step; {} ms", mark.elapsed().as_millis());
     let reread = |successor: &Constitution| {
-        executed_reread(field, successor, requests, declared, bank, grain, comparison, &mask)
+        let started = std::time::Instant::now();
+        let read = executed_reread(field, successor, requests, declared, bank, grain, comparison, &mask);
+        eprintln!("  a trial's reread; {} ms", started.elapsed().as_millis());
+        read
     };
     let (trials, adopted, refusal) = ladder(
         constitution,
