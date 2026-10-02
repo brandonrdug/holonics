@@ -113,3 +113,26 @@ comparison itself does not see. The chain's contacts are effectively invisible t
 comparison, and the contact loop needs a contact the comparison reads. I retired the read step
 because it has no consumer that gains from it. The rounding refusal (step 1) and the continued
 word's reading (step 2) remain.
+
+## 6. The medium's interior does not move at all on these fixtures
+
+Every family at one deposit, ranked
+([receipt](2026-10-02_THE_CONTACT_LOOP_receipts/families.txt); the probe is archived in this
+change's history and retired):
+- **The chain:** 20 of 21 certified families are named vanished: all three elements' maps,
+  passive factors and slices, both contacts' factors, the source port and its pair port, and all
+  three standings. Only the receiving map `R` moves (`η = 1`). Every vanished family's entries are
+  released, and only the Grams and the scales carry a remainder, so nothing accumulates toward a
+  later move.
+- **The joint prediction field:** the source port `E` and the readout `R` move. The element, the
+  contact and both standings vanish.
+
+[agent-inferred] This is the lattice deposit's own law at work, not a defect of one certificate. An
+update below the fine unit `½·2^(−L−k_m)` is released by design, and the law holds that such
+releases sum to less than `u/2` since the locus's founding, below every receiver's grain. Unit 3's
+read step agrees: where contact 1 did move, the window's code did not change. So on these fixtures
+the comparison reaches the interior only below its grain. The interior (elements, contacts and
+standings) takes no part in learning, which happens in `R` and, on the joint field, in `E`. The
+contact loop Astra asked for cannot be shown here. It needs a medium whose interior the comparison
+reads above the receiver's grain, and which medium or coupling that is belongs to the architecture
+question I've put to Astra.
