@@ -2619,6 +2619,9 @@ pub struct CurvePoint {
     pub stepped: u64,
     pub contacts: Vec<SiteReading>,
     pub steps: Vec<(Locus, Family, i64)>,
+    /// The deposit's rounding refusals ([`DepositReading::vanished`]): the certified families that
+    /// moved no lattice coordinate.
+    pub vanished: Vec<(Locus, Family)>,
     pub storage_growth: Rat,
 }
 
@@ -3075,6 +3078,7 @@ where
         stepped: 0,
         contacts,
         steps: Vec::new(),
+        vanished: Vec::new(),
         storage_growth: Rat::zero(),
     }];
     let mut words = WordBalances {
@@ -3202,6 +3206,10 @@ where
                             .deposit
                             .present()
                             .map_or((0, 0), |reading| (reading.released_bits, reading.stepped));
+                        let vanished = returned
+                            .deposit
+                            .present()
+                            .map_or_else(Vec::new, |reading| reading.vanished.clone());
                         let (steps, storage_growth) = returned.deposit.present().map_or_else(
                             || (Vec::new(), Rat::zero()),
                             |reading| {
@@ -3232,6 +3240,7 @@ where
                             stepped,
                             contacts,
                             steps,
+                            vanished,
                             storage_growth,
                         });
                     }

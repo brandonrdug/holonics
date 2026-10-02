@@ -826,6 +826,7 @@ fn report(field: &Field, exposure: &Exposure) {
         exposure.constitution_curve.len()
     );
     census(field, exposure);
+    rounding(exposure);
     // The certified steps (September 29): each family's least and largest exponent `k` over the
     // curve (the step `2^k`), by locus, and the certified storage growth's product and extremes.
     let mut exponents: std::collections::BTreeMap<String, (i64, i64, u64)> =
@@ -926,6 +927,33 @@ fn census(field: &Field, exposure: &Exposure) {
             "  contact {contact} ({from} → {to}): rotation {}, null shear {}, boost {}, reflection {}, degenerate {} commits; modes: rotation {}, null {}, boost {}",
             kinds[0], kinds[1], kinds[2], kinds[3], kinds[4], modes[0], modes[1], modes[2]
         );
+    }
+}
+
+/// [measured-diagnostic; agent-inferred, October 2; the
+/// [contact loop record](../../records/2026-10-02_THE_CONTACT_LOOP_THE_RETURN_REACHES_EVERY_CONTACT_AND_ITS_CHANGE_IS_RELEASED_BEFORE_THE_LATER_CUT.md)]
+/// **The rounding census**: for every family certified at some deposit, the deposits that certified
+/// it and the deposits at which it moved a lattice coordinate (not named in the deposit's
+/// rounding refusals), with its least and largest certified step exponent.
+fn rounding(exposure: &Exposure) {
+    use std::collections::BTreeMap;
+    let mut families: BTreeMap<String, (u64, u64, i64, i64)> = BTreeMap::new();
+    for point in exposure.constitution_curve.iter().skip(1) {
+        for (locus, family, exponent) in &point.steps {
+            let entry = families
+                .entry(format!("{locus:?} {family:?}"))
+                .or_insert((0, 0, *exponent, *exponent));
+            entry.0 += 1;
+            if !point.vanished.contains(&(*locus, *family)) {
+                entry.1 += 1;
+            }
+            entry.2 = entry.2.min(*exponent);
+            entry.3 = entry.3.max(*exponent);
+        }
+    }
+    println!("the rounding census over {} deposits:", exposure.constitution_curve.len() - 1);
+    for (family, (certified, moved, least, largest)) in &families {
+        println!("  {family}: moved at {moved} of {certified} certified deposits; steps 2^{least}..2^{largest}");
     }
 }
 

@@ -1,0 +1,183 @@
+hnn_exposure: campaign 1's declared field over fed5488ce70eb5ffbc90f2f03d23638be9d69189:docs/plans/THE_REBUILD.md
+resonator: none (campaign 1)
+cut: the first 6148 of the pinned cut's 171754 bytes (the declared population; n* = 6148); 3074 receiving windows of A = 2 cells
+held out: cells 4958..6148 (1190 cells, the manifest's range or the declared tail); training: cells 0..4958
+reference: campaign 1 (every locus's certified step, the normal laws' and the factor families', B_Theta = 2^33 bits, pending capacity 64); deadline: 8 windows
+carrier lattices L: Element(0) 9, Element(1) 9, Element(2) 10, Element(3) 10, Channel(0) 9, Channel(1) 9, Channel(2) 10, Channel(3) 9, SourcePort(0) 18, Standing(0) 9, Standing(1) 9, Standing(2) 10, Standing(3) 10, ReceivingMap(2) 10
+setup (cut read, fields declared): 35 ms wall
+realization: the host reference (holonics::hnn::Reference)
+
+== the run ==
+INCOMPLETE: deadline reached at cell 16
+receiving windows read: 8 (compares 8, deposits 8); the source-to-receiver path open at the cut of 8 of the 8 windows; peak bits of the change inside a word: 30
+
+== the executed word (Decision 24) ==
+declared precisions: charts on 2^-38Z, certificate target 2^-19, transients on 2^-15Z
+charts: 128 refinements read (12 cold from the scaled transpose, 0 from one exact inverse, 134 rounded Newton-Schulz steps); the largest certificate ||1 - A X||_inf = 1474164848883/2^60 against the target 1/2^19: at or below it (bound − value = 724858406669/2^60)
+the words' released remainders (forward): 1563 nonzero, the largest 1/2^16, l1 sum 119702026613862716369/2^73, 131265 exact bits
+the returns' released remainders (adjoint): 2448 nonzero, the largest 1/2^16, l1 sum 93195422006704986976210115074783657349079131/(2^61·2145112321528525994865045441), 190382 exact bits
+tick balances: 24 read, every one closed up to its residual within its certified bound: true; the largest residual 7050484390958191524208608407/2^107 against its bound 8467359796172828114935596105/2^104: at or below it (bound − value = 60688393978424433395276160433/2^107)
+word balances (campaign 2, WordBalance::closes: the field and its resonators in one identity with the deposition work at the commit, and the executed residual within its certified bound): 8 formed, 8 carried across a commit, every one closed: true; the largest executed residual (defects, the last junction's, and the resonators' chart and split) 2300704411698925134729273426783090511131/2^147 against its bound 186400292529402250892196168073284226378599/2^147: at or below it (bound − value = 46024897029425831439366723661625283966867/2^145); the deposition work summed over the commits 44192981965/2^50 (the largest in magnitude 253465651873/2^51); the interconnection's defect summed 0 (zero by construction for a loaded port: the field's term is the negative of the resonator's port work)
+
+== bits against the baselines (online, on the same stream; read at the receiver's grain L_R = 16 as n + k/16 + ε: carry n, phase class k, fibre 0 ≤ ε < 1/16) ==
+training: 16 targets
+  model q           exact [8890526315179029441138601429473/2^96, 8890526315179029442105141511897/2^96] bits; at L_R = 16: 112 + 3/16 + ε, ε ∈ [2116833109999067362889501153/2^96, 2116833109999068329429583577/2^96] ⊂ [0, 1/16); per cell at L_R = 16: 7 + 0/16 + ε, ε ∈ [16972113581423630661678991841/2^100, 16972113581423631628219074265/2^100] ⊂ [0, 1/16)
+  tree              exact [4446006885589467588927048114265/2^95, 8892013771178935177854096228545/2^96] bits; at L_R = 16: 112 + 3/16 + ε, ε ∈ [1802144554952402039192150105/2^95, 3604289109904804078384300225/2^96] ⊂ [0, 1/16); per cell at L_R = 16: 7 + 0/16 + ε, ε ∈ [9229784790664683688586895449/2^99, 18459569581329367377173790913/2^100] ⊂ [0, 1/16)
+  tree at the grain exact [8884901800057352604219986894503/2^96, 8884901800057352604281981627203/2^96] bits; at L_R = 16: 112 + 2/16 + ε, ε ∈ [1444078145463751543871463079/2^96, 1444078145463751605866195779/2^96] ⊂ [0, 1/16); per cell at L_R = 16: 7 + 0/16 + ε, ε ∈ [11347598459746793743064456871/2^100, 11347598459746793805059189571/2^100] ⊂ [0, 1/16)
+  combined          exact [4444528983802789494192391103093/2^95, 8889057967605578988447078324053/2^96] bits; at L_R = 16: 112 + 3/16 + ε, ε ∈ [324242768274307304535138933/2^95, 648485536548614671366395733/2^96] ⊂ [0, 1/16); per cell at L_R = 16: 7 + 0/16 + ε, ε ∈ [7751883003986588953929884277/2^99, 15503766007973177970155886421/2^100] ⊂ [0, 1/16)
+  uniform           exact [128, 128] bits; at L_R = 16: 128 + 0/16 + ε, ε ∈ [0, 0] ⊂ [0, 1/16); per cell at L_R = 16: 8 + 0/16 + ε, ε ∈ [0, 0] ⊂ [0, 1/16)
+  order-0 KT        exact [4933780323519128212360973066963/2^95, 9867560647038256424721946133943/2^96] bits; at L_R = 16: 124 + 8/16 + ε, ε ∈ [1827207006173197162862158547/2^95, 3654414012346394325724317111/2^96] ⊂ [0, 1/16); per cell at L_R = 16: 7 + 12/16 + ε, ε ∈ [21634247634739281561248146131/2^99, 43268495269478563122496292279/2^100] ⊂ [0, 1/16)
+  order-1 KT        exact [19812252629448483225064876657/2^87, 10143873346277623411233216848387/2^96] bits; at L_R = 16: 128 + 0/16 + ε, ε ∈ [5212000882398826678889073/2^87, 2668544451788199259591205379/2^96] ⊂ [0, 1/16); per cell at L_R = 16: 8 + 0/16 + ε, ε ∈ [5212000882398826678889073/2^91, 2668544451788199259591205379/2^100] ⊂ [0, 1/16)
+  PPM order 2       exact [10417431352857893868924975627455/2^96, 5208715676428946934462487813737/2^95] bits; at L_R = 16: 131 + 7/16 + ε, ε ∈ [3879742389274996473542655167/2^96, 1939871194637498236771327593/2^95] ⊂ [0, 1/16); per cell at L_R = 16: 8 + 3/16 + ε, ε ∈ [38542063489265644170718133439/2^100, 19271031744632822085359066729/2^99] ⊂ [0, 1/16)
+  the model is below tree; model − tree: exact [-46482999997054272359212471/2^91, -1487455999905735748954716633/2^96] bits; at L_R = 16: -1 + 15/16 + ε, ε ∈ [108259504913618262003178057/2^91, 3464304157235785350641780263/2^96] ⊂ [0, 1/16)
+  the model is above tree at the grain; model − tree at the grain: exact [2812257560838418428309901135/2^95, 2812257560838418942577308697/2^95] bits; at L_R = 16: 0 + 1/16 + ε, ε ∈ [336377482267657878511652687/2^95, 336377482267658392779060249/2^95] ⊂ [0, 1/16)
+  the model is above combined; model − combined: exact [367086893362613172880776355/2^94, 1468347573450453720359305711/2^96] bits; at L_R = 16: 0 + 0/16 + ε, ε ∈ [367086893362613172880776355/2^94, 1468347573450453720359305711/2^96] ⊂ [0, 1/16)
+  the model is below uniform; model − uniform: exact [-1250678486646805770835024213535/2^96, -1250678486646805769868484131111/2^96] bits; at L_R = 16: -16 + 3/16 + ε, ε ∈ [2116833109999067362889501153/2^96, 2116833109999068329429583577/2^96] ⊂ [0, 1/16)
+  the model is below order-0 KT; model − order-0 KT: exact [-488517165929613491791672352235/2^95, -977034331859226982616804622029/2^96] bits; at L_R = 16: -13 + 10/16 + ε, ε ∈ [1707089627397097068380840469/2^95, 3414179254794195103301763379/2^96] ⊂ [0, 1/16)
+  the model is below order-1 KT; model − order-1 KT: exact [-626673515549296985047307709457/2^95, -1253347031098593969128075336487/2^96] bits; at L_R = 16: -16 + 2/16 + ε, ε ∈ [2200024407676194601447396335/2^95, 4400048815352390169434875097/2^96] ⊂ [0, 1/16)
+  the model is below PPM order 2; model − PPM order 2: exact [-1526905037678864427786374198001/2^96, -763452518839432213409917057779/2^95] bits; at L_R = 16: -20 + 11/16 + ε, ε ∈ [3188850877865591988943342863/2^96, 1594425438932796477741712653/2^95] ⊂ [0, 1/16)
+  the tree's executed face alone is below uniform; tree − uniform: exact [-624595515323450017059764707239/2^95, -1249191030646900034119529414463/2^96] bits; at L_R = 16: -16 + 3/16 + ε, ε ∈ [1802144554952402039192150105/2^95, 3604289109904804078384300225/2^96] ⊂ [0, 1/16)
+  the tree's executed face alone is below order-0 KT; tree − order-0 KT: exact [-975546875859321246867849905413/2^96, -975546875859321246867849905381/2^96] bits; at L_R = 16: -13 + 10/16 + ε, ε ∈ [4901635254699930852256479995/2^96, 4901635254699930852256480027/2^96] ⊂ [0, 1/16)
+  the tree's executed face alone is below order-1 KT; tree − order-1 KT: exact [-1251859575098688233379120619857/2^96, -1251859575098688233379120619839/2^96] bits; at L_R = 16: -16 + 3/16 + ε, ε ∈ [935744658116604818793094831/2^96, 935744658116604818793094849/2^96] ⊂ [0, 1/16)
+  the tree's executed face alone is below PPM order 2; tree − PPM order 2: exact [-47669299427467459095964981217/2^91, -762708790839479345535439699455/2^95] bits; at L_R = 16: -20 + 11/16 + ε, ε ∈ [146134589930354022013691935/2^91, 2338153438885664352219070977/2^95] ⊂ [0, 1/16)
+  L_C − L_T, the combined face (tree + wave) against the tree's executed face: below it; exact [-2955803573356189469314022359/2^96, -2955803573356189407017904477/2^96] bits; at L_R = 16: -1 + 15/16 + ε, ε ∈ [1995956583785331630282474537/2^96, 1995956583785331692578592419/2^96] ⊂ [0, 1/16)
+  L_model − L_T, the mixture against the tree's executed face: below it; exact [-46482999997054272359212471/2^91, -1487455999905735748954716633/2^96] bits; at L_R = 16: -1 + 15/16 + ε, ε ∈ [108259504913618262003178057/2^91, 3464304157235785350641780263/2^96] ⊂ [0, 1/16)
+  the grain's rounding, the tree at the grain against the tree: below it; exact [-3555985560791286817054667021/2^95, -7111971121582573572114601327/2^96] bits; at L_R = 16: -1 + 14/16 + ε, ε ∈ [1395774596350234282541829875/2^95, 2791549192700468627078392465/2^96] ⊂ [0, 1/16)
+  L_C − L_T at the grain, the combined face against the tree at the grain: above it; exact [4156167548226384102800578983/2^96, 2078083774113192113545714775/2^95] bits; at L_R = 16: 0 + 0/16 + ε, ε ∈ [4156167548226384102800578983/2^96, 2078083774113192113545714775/2^95] ⊂ [0, 1/16)
+  against online order-0: the model beats it
+  the wave's contribution (the combined face against the tree's executed face): the wave lowers the code length
+  the mixture (ruling A: the model against the tree's executed face): the mixture codes below the tree
+held out: 0 targets
+  no targets read
+
+== the receiving face's course by aeon (ruling A: each aeon's cells under the model, the tree's executed face alone and the combined face alone; the population's log-odds log2(L_T/L_C) at its boundary) ==
+aeon 0: closed at cell 16, 16 cells; model 112 + 3/16 + ε, ε ∈ [2116833109999067362889501153/2^96, 2116833109999068329429583577/2^96] ⊂ [0, 1/16) (a cell 7 + 0/16 + ε, ε ∈ [16972113581423630661678991841/2^100, 16972113581423631628219074265/2^100] ⊂ [0, 1/16)); tree 112 + 3/16 + ε, ε ∈ [1802144554952402039192150105/2^95, 3604289109904804078384300225/2^96] ⊂ [0, 1/16) (a cell 7 + 0/16 + ε, ε ∈ [9229784790664683688586895449/2^99, 18459569581329367377173790913/2^100] ⊂ [0, 1/16)); combined 112 + 3/16 + ε, ε ∈ [324242768274307304535138933/2^95, 648485536548614671366395733/2^96] ⊂ [0, 1/16) (a cell 7 + 0/16 + ε, ε ∈ [7751883003986588953929884277/2^99, 15503766007973177970155886421/2^100] ⊂ [0, 1/16)); L_C − L_T exact [-2955803573356189469314022359/2^96, -2955803573356189407017904477/2^96] bits; at L_R = 16: -1 + 15/16 + ε, ε ∈ [1995956583785331630282474537/2^96, 1995956583785331692578592419/2^96] ⊂ [0, 1/16); L_model − L_T exact [-46482999997054272359212471/2^91, -1487455999905735748954716633/2^96] bits; at L_R = 16: -1 + 15/16 + ε, ε ∈ [108259504913618262003178057/2^91, 3464304157235785350641780263/2^96] ⊂ [0, 1/16); log2(L_T/L_C) -1 + 15/16 + ε, ε ∈ [31186821621645806333312913/2^90, 997978291892665863818341897/2^95] ⊂ [0, 1/16)
+the receiver's population at the end (ruling A, THE_REBUILD U1): code −log2(½ L_T + ½ L_C) exact [555657894698689340099431249063/2^92, 8890526315179029441652842956361/2^96] bits; at L_R = 16: 112 + 3/16 + ε, ε ∈ [132302069374941738449253543/2^92, 2116833109999067877131028041/2^96] ⊂ [0, 1/16) (the telescope); the tree alone exact [8892013771178935177854096228537/2^96, 4446006885589467588927048114269/2^95] bits; at L_R = 16: 112 + 3/16 + ε, ε ∈ [3604289109904804078384300217/2^96, 1802144554952402039192150109/2^95] ⊂ [0, 1/16); the combined face alone exact [4444528983802789494179915879037/2^95, 8889057967605578988482136415435/2^96] bits; at L_R = 16: 112 + 3/16 + ε, ε ∈ [324242768274307292059914877/2^95, 648485536548614706424487115/2^96] ⊂ [0, 1/16); log2(L_T/L_C) exact [-46184430833690460847882351/2^90, -1477901786678094685979906551/2^95] bits; at L_R = 16: -1 + 15/16 + ε, ε ∈ [31186821621645806333312913/2^90, 997978291892665863818341897/2^95] ⊂ [0, 1/16); 16 cells; 819 bits
+
+== cost against the literal ==
+Kt = |field + initial material description| 1432 + located keys 0 + L_target|model + ceil(log2 ExactWork) 15 = exact [123533677473319525938996697565665/2^96, 123533677473319525939963237648089/2^96] bits; at L_R = 16: 1559 + 3/16 + ε, ε ∈ [2116833109999067362889501153/2^96, 2116833109999068329429583577/2^96] ⊂ [0, 1/16)
+literal ceil(log2|A|)·n over the cells read: 128 bits; Kt is above the literal; Kt − literal: exact [113392472671493690727023071922657/2^96, 113392472671493690727989612005081/2^96] bits; at L_R = 16: 1431 + 3/16 + ε, ε ∈ [2116833109999067362889501153/2^96, 2116833109999068329429583577/2^96] ⊂ [0, 1/16)
+
+== key locations (0, on the crib that closed each aeon) ==
+
+== aeons (0 boundaries at the joint clock's carry-out) ==
+
+== state against the source ==
+source: 128 bits (16 cells ingested, n* = 6148)
+lift point: 10 bits
+moment: dense 657931 bits, per source bit 657931/128 (5140 rem 11 over 128); counted state ceil(log2 N(n)) 386 bits, per source bit 193/64 (3 rem 1 over 64)
+constitution: 365477 bits, per source bit 365477/128 (2855 rem 37 over 128)
+resident: 1740646 bits with the collapse, per source bit 870323/64 (13598 rem 51 over 64); 1740646 bits without it, per source bit 870323/64 (13598 rem 51 over 64)
+
+== the constitution's curve (9 points, one per published commit) ==
+the contact-kind census over 9 commits (the kinds at each commit; the modes by kind summed over the commits):
+  contact 0 (0 → 1): rotation 9, null shear 0, boost 0, reflection 0, degenerate 0 commits; modes: rotation 90, null 0, boost 0
+  contact 1 (1 → 2): rotation 9, null shear 0, boost 0, reflection 0, degenerate 0 commits; modes: rotation 126, null 0, boost 0
+  contact 2 (2 → 3): rotation 9, null shear 0, boost 0, reflection 0, degenerate 0 commits; modes: rotation 198, null 0, boost 0
+  contact 3 (3 → 0): rotation 9, null shear 0, boost 0, reflection 0, degenerate 0 commits; modes: rotation 90, null 0, boost 0
+the rounding census over 8 deposits:
+  Channel(0) Factor(0): moved at 0 of 6 certified deposits; steps 2^1..2^3
+  Channel(0) Factor(1): moved at 0 of 6 certified deposits; steps 2^4..2^7
+  Channel(0) Factor(2): moved at 0 of 6 certified deposits; steps 2^4..2^7
+  Channel(1) Factor(0): moved at 5 of 6 certified deposits; steps 2^4..2^9
+  Channel(1) Factor(1): moved at 6 of 6 certified deposits; steps 2^7..2^11
+  Channel(1) Factor(2): moved at 6 of 6 certified deposits; steps 2^7..2^11
+  Channel(2) Factor(0): moved at 6 of 6 certified deposits; steps 2^3..2^6
+  Channel(2) Factor(1): moved at 6 of 6 certified deposits; steps 2^6..2^8
+  Channel(2) Factor(2): moved at 6 of 6 certified deposits; steps 2^5..2^8
+  Channel(3) Factor(0): moved at 0 of 6 certified deposits; steps 2^-1..2^3
+  Channel(3) Factor(1): moved at 0 of 6 certified deposits; steps 2^2..2^7
+  Channel(3) Factor(2): moved at 1 of 6 certified deposits; steps 2^2..2^7
+  Element(0) Map: moved at 6 of 6 certified deposits; steps 2^6..2^10
+  Element(0) Passive: moved at 6 of 6 certified deposits; steps 2^8..2^11
+  Element(0) Slices: moved at 6 of 6 certified deposits; steps 2^6..2^8
+  Element(1) Map: moved at 6 of 6 certified deposits; steps 2^10..2^12
+  Element(1) Passive: moved at 6 of 6 certified deposits; steps 2^7..2^10
+  Element(1) Slices: moved at 6 of 6 certified deposits; steps 2^5..2^7
+  Element(2) Map: moved at 6 of 6 certified deposits; steps 2^8..2^9
+  Element(2) Passive: moved at 6 of 6 certified deposits; steps 2^8..2^9
+  Element(2) Slices: moved at 6 of 6 certified deposits; steps 2^7..2^9
+  Element(3) Map: moved at 6 of 6 certified deposits; steps 2^10..2^12
+  Element(3) Passive: moved at 6 of 6 certified deposits; steps 2^7..2^10
+  Element(3) Slices: moved at 6 of 6 certified deposits; steps 2^5..2^8
+  ReceivingMap(2) Map: moved at 7 of 7 certified deposits; steps 2^0..2^0
+  SourcePort(0) Map: moved at 6 of 6 certified deposits; steps 2^6..2^7
+  SourcePort(0) Pair(1): moved at 0 of 6 certified deposits; steps 2^-16..2^-15
+  Standing(0) Standing: moved at 2 of 6 certified deposits; steps 2^2..2^6
+  Standing(1) Standing: moved at 2 of 6 certified deposits; steps 2^2..2^8
+  Standing(2) Standing: moved at 1 of 6 certified deposits; steps 2^6..2^7
+  Standing(3) Standing: moved at 4 of 6 certified deposits; steps 2^2..2^7
+the certified steps at Channel(0) Factor(0): 2^k for k from 1 to 3, over 6 deposits
+the certified steps at Channel(0) Factor(1): 2^k for k from 4 to 7, over 6 deposits
+the certified steps at Channel(0) Factor(2): 2^k for k from 4 to 7, over 6 deposits
+the certified steps at Channel(1) Factor(0): 2^k for k from 4 to 9, over 6 deposits
+the certified steps at Channel(1) Factor(1): 2^k for k from 7 to 11, over 6 deposits
+the certified steps at Channel(1) Factor(2): 2^k for k from 7 to 11, over 6 deposits
+the certified steps at Channel(2) Factor(0): 2^k for k from 3 to 6, over 6 deposits
+the certified steps at Channel(2) Factor(1): 2^k for k from 6 to 8, over 6 deposits
+the certified steps at Channel(2) Factor(2): 2^k for k from 5 to 8, over 6 deposits
+the certified steps at Channel(3) Factor(0): 2^k for k from -1 to 3, over 6 deposits
+the certified steps at Channel(3) Factor(1): 2^k for k from 2 to 7, over 6 deposits
+the certified steps at Channel(3) Factor(2): 2^k for k from 2 to 7, over 6 deposits
+the certified steps at Element(0) Map: 2^k for k from 6 to 10, over 6 deposits
+the certified steps at Element(0) Passive: 2^k for k from 8 to 11, over 6 deposits
+the certified steps at Element(0) Slices: 2^k for k from 6 to 8, over 6 deposits
+the certified steps at Element(1) Map: 2^k for k from 10 to 12, over 6 deposits
+the certified steps at Element(1) Passive: 2^k for k from 7 to 10, over 6 deposits
+the certified steps at Element(1) Slices: 2^k for k from 5 to 7, over 6 deposits
+the certified steps at Element(2) Map: 2^k for k from 8 to 9, over 6 deposits
+the certified steps at Element(2) Passive: 2^k for k from 8 to 9, over 6 deposits
+the certified steps at Element(2) Slices: 2^k for k from 7 to 9, over 6 deposits
+the certified steps at Element(3) Map: 2^k for k from 10 to 12, over 6 deposits
+the certified steps at Element(3) Passive: 2^k for k from 7 to 10, over 6 deposits
+the certified steps at Element(3) Slices: 2^k for k from 5 to 8, over 6 deposits
+the certified steps at ReceivingMap(2) Map: 2^k for k from 0 to 0, over 7 deposits
+the certified steps at SourcePort(0) Map: 2^k for k from 6 to 7, over 6 deposits
+the certified steps at SourcePort(0) Pair(1): 2^k for k from -16 to -15, over 6 deposits
+the certified steps at Standing(0) Standing: 2^k for k from 2 to 6, over 6 deposits
+the certified steps at Standing(1) Standing: 2^k for k from 2 to 8, over 6 deposits
+the certified steps at Standing(2) Standing: 2^k for k from 6 to 7, over 6 deposits
+the certified steps at Standing(3) Standing: 2^k for k from 2 to 7, over 6 deposits
+the certified storage growth ε_k of one deposit: from 0 to 1/16; the product ∏(1 + ε_k) since the mount 1310442705/1073741824
+commit	bits	entries	remainders	solved	released_bits	stepped
+0	174926	107094	0	67832	0	0
+1	176194	108362	0	67832	0	0
+2	183274	110720	2190	70364	266450	159
+3	247983	123257	50060	74666	733071	1110
+4	280102	132986	67374	79742	1085232	1832
+5	323862	136503	104635	82724	1072967	1189
+6	346924	141065	120258	85601	1096663	1559
+7	355171	144142	125074	85955	1096184	1440
+8	365477	149527	130073	85877	1083583	1540
+
+== work counted (ExactWork, over every refine, compare and deposit) ==
+additions 0; multiplications 0; divisions 0; entries written 16960; cumulative bits 123468; peak bits 44; resident entries 365477; dependency span 40
+unknown (no receiver counted them): energy in joules, device power, bits per joule, occupancy
+
+== wall time by phase (exterior: the host's wall clock, milliseconds; per window as quotient rem remainder over 8 windows) ==
+phase               	  total ms	  per window
+refine read         	        60	     7 rem 4
+release             	         3	     0 rem 3
+resonators          	         0	     0 rem 0
+compare read        	         0	     0 rem 0
+tree transfer       	         0	     0 rem 0
+tree read           	         8	     1 rem 0
+holon and covector  	        60	     7 rem 4
+pull_back           	        26	     3 rem 2
+compose             	        25	     3 rem 1
+deposited           	       259	    32 rem 3
+tree deposit        	         0	     0 rem 0
+normal deposit      	         0	     0 rem 0
+re-read             	        77	     9 rem 5
+ingest              	         0	     0 rem 0
+phases' sum         	       521	    65 rem 1
+word balances       	        14	     1 rem 6
+kind census         	         1	     0 rem 1
+(word balances: the power forms read before and after each deposit and the commit's deposition work; kind census: the contacts' site readings at every commit; both the exposure's own readings)
+rest of exposure    	       171	    21 rem 3
+the tree read per window: 1073 rem 2 over 8 us; the word (refine read) per window: 7527 rem 5 over 8 us; tree read over word: 0 rem 8586 over 60221
+the tree's transfers per window: 0 rem 0 over 8 us; its deposits' updates per window: 0 rem 0 over 8 us; the compare phase (holon and covector) per window: 7585 rem 0 over 8 us; the host's deposit (deposited) per window: 32483 rem 5 over 8 us
+
+wall time (exterior): setup 35 ms; exposure 707 ms over 8 windows (per window 88 rem 3 over 8, in ms)
+resident set (exterior, /proc/self/status): now 89317376 bytes, peak 114688000 bytes
+args: hnn_exposure windows 8 (the development control); commit 2f1f80666fffd1e475f4a77f9fda699879a3eb92 + this change; wall 752 ms
