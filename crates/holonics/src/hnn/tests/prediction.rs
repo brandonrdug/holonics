@@ -91,6 +91,7 @@ fn a_word_at_rest_is_the_continuing_word_on_the_rest_change() {
 /// opens at the first's last energy.
 #[test]
 fn continuing_words_carry_waves_contact_and_resonator_states() {
+    use super::contact_residual::{ContactCut, CutKind, Refusal};
     let field = chain().with_exact_word();
     let theta = resonant(&field, generic(&field, 73));
     let current = Current::at_rest(&field);
@@ -106,8 +107,22 @@ fn continuing_words_carry_waves_contact_and_resonator_states() {
         .iter()
         .map(|wave| vec![Rat::zero(); wave.len()])
         .collect();
-    let mut second = Word::continuing(&field, operands, &carried, &nothing, 2).unwrap();
+    let cut = ContactCut::read(&first, &theta, &current).unwrap();
+    assert!(matches!(cut.continuing(&field,&theta,&current,&nothing,3),Err(Refusal::Clock)));
+    let mut wrong_phase = cut.clone();
+    wrong_phase.change.resonator_phases[0] = Some(1-cut.change.resonator_phases[0].unwrap());
+    assert!(matches!(wrong_phase.continuing(&field,&theta,&current,&nothing,2),Err(Refusal::Phase)));
+    let mut wrong_cut = cut.clone();
+    wrong_cut.kind = CutKind::AfterJunction;
+    assert!(matches!(wrong_cut.continuing(&field,&theta,&current,&nothing,2),Err(Refusal::Cut(CutKind::AfterJunction))));
+    let mut second = cut.continuing(&field, &theta, &current, &nothing, 2).unwrap();
+    let second_open = ContactCut::read(&second,&theta,&current).unwrap();
     second.run(2).unwrap();
+    let receipt = second_open.first_step(&second,&theta,&current,0).unwrap();
+    assert!(receipt.boundary_advanced);
+    if let Some(remainder) = receipt.remainder {
+        assert!(remainder.iter().all(Zero::is_zero));
+    } // A singular stationary chart keeps its fibre; motion and the complete opening were checked.
     assert_eq!(second.change().unwrap(), whole.change().unwrap());
     assert!(
         carried
@@ -907,6 +922,156 @@ fn the_committed_move_carries_the_transport_modulus() {
 /// (`PowerForm::deposition_work`); every tick of both closes; and the moved contact's states, its
 /// outgoing waves and the receiving ring's storage differ at the end.
 #[test]
+fn a_contact_change_has_a_unique_reflected_storage_receipt() {
+    use super::contact_residual::{ContactCut, Read, Refusal};
+    use crate::hnn::word::PowerForm;
+    let field = chain().with_exact_word();
+    // Declare the stationary chart's domain; the singular cases keep their fibres separately.
+    let theta = generic(&field, 73);
+    let theta = theta.clone().with_channel(0, theta.contact_storage(0).clone(),
+        ExactRatMatrix::identity(field.contact(0).width()).unwrap(),
+        theta.contact_dissipation(0).clone()).unwrap();
+    let current = Current::at_rest(&field);
+    let operands = Operands::exact_at_cut(&field, &theta, &current).unwrap();
+    let mut first = Word::on_operands(&field, operands, storage(&field, 74)).unwrap();
+    first.run(2).unwrap();
+    let x = first.change().unwrap();
+    let cut = ContactCut::read(&first, &theta, &current).unwrap();
+    let mut factor = theta.contact_storage(0).to_rows();
+    factor[0][0] += rat(1, 2);
+    let next = theta
+        .clone()
+        .with_channel(
+            0,
+            ExactRatMatrix::new(factor).unwrap(),
+            theta.contact_stiffness(0).clone(),
+            theta.contact_dissipation(0).clone(),
+        )
+        .unwrap();
+    let nothing: Vec<Vec<Rat>> = x.storage.iter().map(|w| vec![Rat::zero(); w.len()]).collect();
+    assert!(matches!(cut.continuing(&field,&theta,&current,&nothing,3),Err(Refusal::Clock)));
+    assert!(matches!(ContactCut::read(&first,&next,&current),Err(Refusal::Producer)));
+    let continued = |constitution: &Constitution| {
+        let mut word = cut.continuing(&field, constitution, &current, &nothing, 2).unwrap();
+        let open = ContactCut::read(&word,constitution,&current).unwrap();
+        word.run(1).unwrap();
+        let receipt = open.first_step(&word,constitution,&current,0).unwrap();
+        assert!(!receipt.boundary_advanced);
+        assert!(receipt.remainder.as_ref().unwrap().iter().all(Zero::is_zero));
+        for read in [&receipt.before,&receipt.next] {
+            let Read::Unique(read) = read else { panic!("declared nonsingular stiffness") };
+            assert!(read.closes());
+        }
+        let mut wrong_open = open.clone();
+        wrong_open.change.storage[0][0] += Rat::one();
+        assert!(matches!(wrong_open.first_step(&word,constitution,&current,0),Err(Refusal::Step)));
+        word.run(1).unwrap();
+        let advanced = open.first_step(&word,constitution,&current,0).unwrap();
+        assert!(advanced.boundary_advanced);
+        assert!(advanced.remainder.as_ref().unwrap().iter().all(Zero::is_zero));
+        let (Read::Unique(a),Read::Unique(b)) = (&advanced.before,&advanced.next) else {panic!("unique chart")};
+        assert_ne!(a.boundary,b.boundary,"the actual next junction moved the boundary");
+        assert!(a.closes() && b.closes());
+        word.run(2).unwrap();
+        word
+    };
+    let (before, after) = (continued(&theta), continued(&next));
+    let (old, new) = (
+        PowerForm::read(&field, &theta, &current).unwrap(),
+        PowerForm::read(&field, &next, &current).unwrap(),
+    );
+    let work = old.deposition_work(&new, &x).unwrap();
+    let declared = field.contact(0);
+    let (from,to) = declared.ends();
+    let boundary = [(from,crate::hnn::field::End::From),(to,crate::hnn::field::End::To)]
+        .map(|(ring,end)| declared.selection(end).into_iter().map(|i|
+            integer(2)*&before.anchor(0,ring).unwrap()[i]-&x.arrivals[0][usize::from(ring!=from)][i]
+        ).collect());
+    let deposition = cut.control_deposit(&next,0,&boundary).unwrap();
+    assert!(deposition.closes());
+    assert_eq!(deposition.work,work);
+    assert!(!work.is_zero());
+    assert_eq!(before.field_balances()[0].before, old.power(&x).unwrap());
+    assert_eq!(after.field_balances()[0].before, new.power(&x).unwrap());
+    assert_eq!(new.power(&x).unwrap() - old.power(&x).unwrap(), work);
+    for tick in before.field_balances().iter().chain(after.field_balances()) {
+        assert!(tick.closes(), "{tick:?}");
+    }
+    let (a, b) = (before.change().unwrap(), after.change().unwrap());
+    assert_ne!(a.states[0], b.states[0]);
+    assert_ne!(a.arrivals[0], b.arrivals[0]);
+    let receiver = field.receivers()[0].ring;
+    assert_ne!(a.storage[receiver], b.storage[receiver]);
+    // Campaign one's unloaded contact fixture has no inherited resonator storage term.
+    for word in [before,after] {
+        let balance = crate::hnn::word::WordBalance::of(&word.release().unwrap());
+        assert!(balance.resonator_end.is_zero());
+        assert!(balance.closes());
+    }
+}
+
+/// A post-junction release is a different cut, never silently resumed as a full-tick cut.
+#[test]
+fn the_private_contact_cut_refuses_a_terminal_junction() {
+    use super::contact_residual::{ContactCut,CutKind,Refusal};
+    let field = chain().with_exact_word();
+    let theta = generic(&field,73);
+    let current = Current::at_rest(&field);
+    let mut word = Word::on_operands(&field,Operands::exact_at_cut(&field,&theta,&current).unwrap(),storage(&field,74)).unwrap();
+    word.run(1).unwrap();
+    word.last_junction().unwrap();
+    assert!(matches!(ContactCut::read(&word,&theta,&current),Err(Refusal::Cut(CutKind::AfterJunction))));
+}
+
+/// Join the existing native deposited return, including its clocks, statistics and carries, to
+/// the same-state reflected chart and work. This is a staged-material control, not a claim that
+/// the hand-built factor covector came from an HNN comparison.
+#[test]
+fn a_native_contact_successor_carries_its_publication_and_reflected_work() {
+    use super::contact_residual::{ContactCut,Read,Refusal};
+    use super::learning::{OPEN_BUDGET,chain_reach};
+    use crate::hnn::constitution::{FactorGradient,FactorStep,Locus};
+    use crate::hnn::port::Deposit;
+    let field = chain().with_exact_word();
+    let theta = Constitution::initial(&field,OPEN_BUDGET).unwrap();
+    let current = Current::at_rest(&field);
+    let mut first = Word::on_operands(&field,Operands::exact_at_cut(&field,&theta,&current).unwrap(),storage(&field,74)).unwrap();
+    first.run(2).unwrap();
+    let cut = ContactCut::read(&first,&theta,&current).unwrap();
+    let deposit = Deposit::new(theta.commit(),Vec::new(),vec![FactorStep {
+        gradient:FactorGradient::Storage {contact:0,
+            gradient:ExactRatMatrix::identity(field.contact(0).width()).unwrap()},
+        energy:Rat::zero(),covector:Rat::one(),
+    }],vec![Locus::Channel(0)]).with_reach(chain_reach());
+    let (next,publication) = theta.deposited(&deposit).unwrap();
+    assert_eq!(next.commit(),theta.commit()+1);
+    assert_eq!(next.clock(Locus::Channel(0)),theta.clock(Locus::Channel(0))+1);
+    assert!(publication.stepped>0);
+    assert_ne!(next.contact_storage(0),theta.contact_storage(0));
+    let nothing:Vec<_> = cut.change.storage.iter().map(|v|vec![Rat::zero();v.len()]).collect();
+    let mut continued = cut.continuing(&field,&next,&current,&nothing,2).unwrap();
+    let opening = ContactCut::read(&continued,&next,&current).unwrap();
+    continued.run(2).unwrap();
+    let movement = opening.first_step(&continued,&next,&current,0).unwrap();
+    assert!(movement.boundary_advanced);
+    assert!(movement.remainder.as_ref().unwrap().iter().all(Zero::is_zero));
+    let Read::Unique(read) = &movement.before else {panic!("initial stiffness is nonsingular")};
+    let width = field.contact(0).width();
+    let x = [read.boundary[..width].to_vec(),read.boundary[width..].to_vec()];
+    let receipt = cut.deposited_return(&deposit,&next,&publication,0,&x).unwrap();
+    assert!(receipt.closes());
+    assert!(!receipt.work.is_zero());
+    assert_eq!(receipt.publication.as_ref(),Some(&publication));
+    let replacement = theta.clone().with_channel(0,next.contact_storage(0).clone(),
+        next.contact_stiffness(0).clone(),next.contact_dissipation(0).clone()).unwrap();
+    assert!(matches!(cut.deposited_return(&deposit,&replacement,&publication,0,&x),Err(Refusal::Producer)));
+    let mut wrong_publication = publication.clone();
+    wrong_publication.commit += 1;
+    assert!(matches!(cut.deposited_return(&deposit,&next,&wrong_publication,0,&x),Err(Refusal::Producer)));
+}
+
+/// Original generic-stiffness continuation control, retained verbatim alongside the unique chart.
+#[test]
 fn a_contact_change_is_read_by_the_continued_word_with_its_work() {
     use crate::hnn::word::PowerForm;
     let field = chain().with_exact_word();
@@ -952,4 +1117,145 @@ fn a_contact_change_is_read_by_the_continued_word_with_its_work() {
     assert_ne!(a.arrivals[0], b.arrivals[0]);
     let receiver = field.receivers()[0].ring;
     assert_ne!(a.storage[receiver], b.storage[receiver]);
+}
+
+/// Native production receipts include the actual inherited storage at both endpoints.
+#[test]
+fn inherited_resonator_opening_closes_native_balances() {
+    use crate::hnn::word::{ResonatorBalance,WordBalance};
+    let field=chain().with_exact_word();
+    let theta=resonant(&field,generic(&field,73));
+    let current=Current::at_rest(&field);
+    let operands=Operands::exact_at_cut(&field,&theta,&current).unwrap();
+    let mut first=Word::on_operands(&field,operands.clone(),storage(&field,74)).unwrap();
+    first.run(2).unwrap();
+    let carried=first.change().unwrap();
+    let nothing:Vec<_>=carried.storage.iter().map(|v|vec![Rat::zero();v.len()]).collect();
+    let mut next=Word::continuing(&field,operands,&carried,&nothing,2).unwrap();
+    next.run(2).unwrap();
+    let mut opening=Rat::zero();
+    for (ring,resonance) in next.resonances().iter().enumerate() {
+        if let Some(resonance)=resonance {
+            let b=ResonatorBalance::of(ring,resonance);
+            assert_eq!(b.open,resonance.steps[0].before);
+            assert!(!b.open.is_zero());
+            assert!(b.closes());
+            opening+=b.open;
+        }
+    }
+    let balance=WordBalance::of(&next.release().unwrap());
+    assert_eq!(balance.resonator_open,opening);
+    assert!(balance.closes());
+    assert!(WordBalance::of(&first.release().unwrap()).closes());
+}
+
+#[test]
+fn a_zero_tick_native_word_keeps_inherited_resonator_storage() {
+    use crate::hnn::word::{PowerForm,WordBalance};
+    let field=chain().with_exact_word();
+    let theta=resonant(&field,generic(&field,73));
+    let current=Current::at_rest(&field);
+    let operands=Operands::exact_at_cut(&field,&theta,&current).unwrap();
+    let mut first=Word::on_operands(&field,operands.clone(),storage(&field,74)).unwrap();
+    first.run(2).unwrap();
+    let carried=first.change().unwrap();
+    let energy=PowerForm::read(&field,&theta,&current).unwrap().resonator_power(&carried).unwrap();
+    assert!(!energy.is_zero());
+    let nothing:Vec<_>=carried.storage.iter().map(|v|vec![Rat::zero();v.len()]).collect();
+    let next=Word::continuing(&field,operands,&carried,&nothing,2).unwrap();
+    let released=next.release().unwrap();
+    for b in &released.resonators {assert_eq!(b.open,b.end);assert!(b.closes());}
+    let balance=WordBalance::of(&released);
+    assert_eq!(balance.resonator_open,energy);
+    assert_eq!(balance.resonator_end,energy);
+    assert!(balance.closes());
+}
+
+/// A native refusal certifies phase compatibility; it does not prove an absolute carried clock.
+#[test]
+fn native_continuing_refuses_an_incompatible_carried_phase() {
+    let field=chain().with_exact_word();
+    let theta=resonant(&field,generic(&field,73));
+    let current=Current::at_rest(&field);
+    let operands=Operands::exact_at_cut(&field,&theta,&current).unwrap();
+    let mut first=Word::on_operands(&field,operands.clone(),storage(&field,74)).unwrap();
+    first.run(2).unwrap();
+    let mut carried=first.change().unwrap();
+    let nothing:Vec<_>=carried.storage.iter().map(|v|vec![Rat::zero();v.len()]).collect();
+    carried.resonator_phases[0]=Some(1-carried.resonator_phases[0].unwrap());
+    assert!(matches!(Word::continuing(&field,operands,&carried,&nothing,2),
+        Err(crate::hnn::HnnError::Resonator{ring:0,..})));
+    let unpumped=Constitution::initial(&field,super::learning::OPEN_BUDGET).unwrap();
+    let bare=Operands::exact_at_cut(&field,&unpumped,&current).unwrap();
+    let mut absent=EndChange::rest(&field,&bare);
+    absent.resonator_phases[0]=Some(0);
+    assert!(matches!(Word::continuing(&field,bare,&absent,&nothing,0),
+        Err(crate::hnn::HnnError::Resonator{ring:0,..})));
+}
+
+#[test]
+fn native_absent_state_and_supplied_phase_follow_the_opening_contract() {
+    let field=chain().with_exact_word();
+    let theta=resonant(&field,generic(&field,73));
+    let current=Current::at_rest(&field);
+    let operands=Operands::exact_at_cut(&field,&theta,&current).unwrap();
+    let mut carried=EndChange::rest(&field,&operands);
+    for (ring,r) in operands.resonators().iter().enumerate() {
+        carried.resonator_phases[ring]=r.as_ref().map(|r|r.phase_at(1));
+    }
+    let expected=carried.resonator_phases[0].unwrap();
+    carried.resonators[0]=None;
+    let nothing:Vec<_>=carried.storage.iter().map(|v|vec![Rat::zero();v.len()]).collect();
+    for phase in [None,Some(expected)] {
+        carried.resonator_phases[0]=phase;
+        let word=Word::continuing(&field,operands.clone(),&carried,&nothing,2).unwrap();
+        let resonator=word.resonances()[0].as_ref().unwrap();
+        assert!(resonator.state.iter().flatten().all(Zero::is_zero));
+        assert!(resonator.open.is_zero());
+        assert_eq!(word.change().unwrap().resonator_phases[0],Some(expected));
+    }
+    carried.resonator_phases[0]=Some(1-expected);
+    assert!(matches!(Word::continuing(&field,operands.clone(),&carried,&nothing,2),
+        Err(crate::hnn::HnnError::Resonator{ring:0,..})));
+    carried.resonators[0]=Some([vec![Rat::zero();field.ring(0).width()],vec![Rat::zero();field.ring(0).width()]]);
+    carried.resonator_phases[0]=None;
+    assert!(matches!(Word::continuing(&field,operands,&carried,&nothing,2),
+        Err(crate::hnn::HnnError::Resonator{ring:0,..})));
+}
+
+/// The opening energy uses the scheduled previous form, not the material's unpumped form or
+/// the first newly executed phase. The native owner keeps the nonzero pump work of that change.
+#[test]
+fn native_opening_uses_the_scheduled_previous_phase() {
+    use crate::hnn::ring::{PumpSchedule,ResonatorOperands};
+    use crate::hnn::word::{ResonatorBalance,WordBalance};
+    let field=chain().with_exact_word();
+    let material=ResonatorMaterial::of_parametron(&cycle(2),&rat(1,8),None).unwrap();
+    let theta=Constitution::initial(&field,super::learning::OPEN_BUDGET).unwrap()
+        .with_ring_resonator(&field,0,material.clone()).unwrap();
+    let current=Current::at_rest(&field);
+    let mut operands=Operands::exact_at_cut(&field,&theta,&current).unwrap();
+    let carrier=|a,b|Carrier::new(integer(a),integer(b)).unwrap();
+    let schedule=PumpSchedule::modulated(
+        &PumpDeclaration::new(rat(1,16),carrier(1,0),PumpStep::Quarter).unwrap(),
+        &[carrier(0,1),carrier(-1,0),carrier(1,0)]).unwrap();
+    let scheduled=ResonatorOperands::scheduled(0,&material,&schedule,field.ring(0).admittance(),field.step(),None).unwrap();
+    *operands.resonators_mut().get_mut(0).unwrap()=Some(scheduled.clone());
+    let mut carried=EndChange::rest(&field,&operands);
+    let input=[vec![rat(1,2),Rat::zero(),Rat::zero(),Rat::zero()],
+               vec![Rat::zero(),Rat::zero(),rat(1,4),Rat::zero()]];
+    carried.resonators[0]=Some(input.clone());
+    carried.resonator_phases[0]=Some(scheduled.phase_at(1));
+    let expected=scheduled.energy_at(scheduled.phase_at(1),&input[0],&input[1]).unwrap();
+    let first_form=scheduled.energy_at(scheduled.phase_at(2),&input[0],&input[1]).unwrap();
+    assert_ne!(expected,first_form);
+    let nothing:Vec<_>=carried.storage.iter().map(|v|vec![Rat::zero();v.len()]).collect();
+    let mut word=Word::continuing(&field,operands,&carried,&nothing,2).unwrap();
+    assert_eq!(word.resonances()[0].as_ref().unwrap().open,expected);
+    word.run(1).unwrap();
+    let resonance=word.resonances()[0].as_ref().unwrap();
+    assert_eq!(resonance.steps[0].before,expected);
+    assert!(!resonance.steps[0].pump.is_zero());
+    assert!(ResonatorBalance::of(0,resonance).closes());
+    assert!(WordBalance::of(&word.release().unwrap()).closes());
 }
