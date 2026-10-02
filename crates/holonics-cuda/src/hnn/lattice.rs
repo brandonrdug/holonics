@@ -18,7 +18,9 @@
 //! anchor, with no arithmetic in the rotation. The integer sum is taken in the ring `ℤ/2^128` and
 //! read under its l1 certificate (`kernels/exact_integer.cuh`): an entry whose bound
 //! `Σ_j |a_ij ξ_j|` reaches `2^127` is refused ([`DeviceError::Carrier`]), whatever its value, so
-//! the refusal depends on the exact terms alone and never on the realization's order.
+//! the refusal depends on the exact terms alone and never on the realization's order. Below the
+//! bound the ring's signed read of any partial sum, in any order, is the integer sum (Lean
+//! `HNN/LatticeWord.{carrier_partial_sum, carrier_ring_read}`).
 //!
 //! [definition] **The word boundary.** A coordinate enters the card as a signed 64-bit word, so a
 //! product of two coordinates is at most `2^126` in magnitude and is always a word of the carrier.
