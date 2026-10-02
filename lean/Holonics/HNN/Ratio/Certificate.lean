@@ -445,6 +445,12 @@ variable {K X : Type*} [Fintype X]
 /-- [definition] **The face in bits**, `p_c = 2^(f_c)/Σ_d 2^(f_d)`, as `R` reads its logits. -/
 def bitFace (f : ι → ℝ) : ι → ℝ := fun c => (2 : ℝ) ^ f c / ∑ d, (2 : ℝ) ^ f d
 
+omit [DecidableEq ι] in
+/-- The face in bits is the face owner's softmax at `f · ln 2`, as
+`HNN/Ratio/Resolution.codeLength_quadratic_upper` reads it. -/
+theorem bitFace_eq_face (f : ι → ℝ) : bitFace f = (face fun c => f c * Real.log 2).mass :=
+  funext fun c => by simp only [bitFace, face, partition, two_rpow_eq_exp]
+
 /-- [definition] **A matrix read as a vector**, `vec W (c, j) = W c j`. -/
 def vecW (W : Matrix ι X ℝ) : ι × X → ℝ := fun a => W a.1 a.2
 
@@ -678,6 +684,7 @@ end Accumulated
 #print axioms window_code_add_le
 #print axioms linear_first_order
 #print axioms window_step_descends
+#print axioms bitFace_eq_face
 #print axioms readingFisher_quadratic
 #print axioms readingFisher_drift
 #print axioms statistics_insert
