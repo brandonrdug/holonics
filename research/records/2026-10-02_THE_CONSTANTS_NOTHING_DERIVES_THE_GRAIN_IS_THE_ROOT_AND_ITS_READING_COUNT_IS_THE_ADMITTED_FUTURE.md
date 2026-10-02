@@ -347,3 +347,20 @@ bits.
 4. For a continuing machine with no declared population, the grain as a reading of the machine's
    own count of readings, refining as `√N`, with the lattices that follow it re-based at each
    refinement (§3.3).
+
+**Status after #151** (`HNN/Ratio/Resolution`):
+- Item 1 is proved: `codeLength_quadratic_upper` and `station_score_quadratic_upper`, with the
+  constant compared in `station_curvature_constant`.
+- Item 2 is proved: `grain_lemma`, `grain_lemma_tight`, `grain_unconfirmable`,
+  `grain_criterion_iff` and `derived_grains`.
+- Item 3 is answered for a one-hot target. Along the covector itself, `a` bounds the smooth
+  score's first-order decrease only up to the factor `1/K`, with `K = 2^(1/L)·2/(e ln 2) < 8/7` at
+  `L = 16`. So the code's rule keeps at least `3/8·ηa` of the `½ηa` the certificate states
+  (`odometer_pairing_ratio`, `odometer_certified_decrease`, `odometer_ratio_sixteen`). A
+  deposit's move through its loci is certified to descend when `(2K − 1)A⁻ < (3 − 2K)A⁺`
+  (`deposit_descends`, `deposit_condition_iff`).
+- Item 4 is proved for the reads. `L(N) = ⌈√(N ln 2/2)⌉` is the least grain meeting the
+  criterion and refines as `√N` (`refiningGrain_spec`, `refiningGrain_growth`). `L(N)` does not
+  refine by integer factors, so a schedule that keeps every read is a dyadic one at or above it,
+  such as `2^⌈log₂ L(N)⌉` (`grainRead_of_refined`). Re-basing the lattices at each refinement is
+  still owed in #62.
