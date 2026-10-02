@@ -176,3 +176,34 @@ So the return-driven contact change Astra asked for is present on real text. A r
 contacts 1 and 2 at nearly every deposit. The old develop-text harness isn't needed. Next, on this
 configuration, the same later drive read at the predecessor and at a successor that differs only in
 the contacts' deposited steps, with the deposition work accounted.
+
+## 8. The contact loop closes on real text, and the comparison does not improve
+
+`hnn::reference::contact_ablation`, through `hnn_exposure ablation <windows>` on the development
+control, follows the exposure's own order. At each window, before the full deposit, the compare's
+deposit is restricted to its contact families and deposited alone on the predecessor. The deposition
+work of that contacts-only commit on the window's end change is read. Then the same later drive, the
+next window read against its own cells, is read at the predecessor and at the contacts-only
+successor, each after the window's ingest.
+
+| Windows | A contact moved | Next word's contact states differ | Next receiving faces differ | Next window's code: lower / higher / equal |
+|---|---|---|---|---|
+| 16 ([receipt](2026-10-02_THE_CONTACT_LOOP_receipts/ablation_16.txt)) | 14 | 14 | 14 | 0 / 2 / 14 |
+| 256 ([receipt](2026-10-02_THE_CONTACT_LOOP_receipts/ablation_256.txt)) | 254 | 251 | 232 | 4 / 10 / 242 |
+
+- **Astra's loop holds.** A return actually reaches a contact and changes its constitution
+  (contacts 1 and 2 at nearly every window, contacts 0 and 3 later). The commit's deposition work
+  `½⟨x, ΔΘ x⟩` on the window's end change is nonzero and signed. The next window's word, under the
+  same drive, ends with different contact states and different receiving faces.
+- **The comparison does not improve from it.** At its grain, the next window's code is unchanged at
+  242 of 256 windows, strictly lower at 4 and strictly higher at 10. The contacts' change reaches
+  the receiver's faces, but it is not, by itself, a change the next comparison rewards.
+
+[agent-inferred] The contact loop is a working mechanism of the reference machine on text. Whether
+it learns is a separate question, and on this measurement the contacts alone do not lower the next
+window's code: they are a consumed change, not yet a useful one. The full deposit also moves the
+elements, the source port and the readout, and this ablation does not split their shares.
+
+Time: projected `256 · 196 = 50,176` ms from the 16-window read (3,131 ms), deadline 100 s; measured
+74,202 ms, peak 308,056,064 bytes. The 16 windows the projection was taken from all fall in the
+cut's opening, which runs cheaper than the windows after it, and that is where the error comes from.
