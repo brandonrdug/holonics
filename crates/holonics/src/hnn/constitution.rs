@@ -887,6 +887,12 @@ struct CarriedEntry {
 /// `carry_accounting`) at the lattice and precision of its locus's deposit, from the entry, the
 /// residual and coordinate an earlier step of the same deposit staged there, and the remainder the
 /// entry carries.
+///
+/// [proved-derived] The two splits compose into one floor. With `y = Δ + r_prev` and `k = k_m ≥ 1`,
+/// the applied coordinate is `q = ⌊y·2^L + 1/2 + 2^(−k−1)⌋` (Lean
+/// `HNN/LatticeDeposit.{quot_fine_eq_floor, step_coordinate_eq_floor}`). So `q` moves only where
+/// `y` crosses `(z − 1/2)·2^(−L) − 2^(−L−k−1)`, half a fine unit below the boundary of one rounding
+/// at the lattice.
 fn carried_entry(
     lattice: &Lattice,
     precision: u32,

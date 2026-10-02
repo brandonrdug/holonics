@@ -312,6 +312,45 @@ def step (s : Carried L E) (Δ : E → ℚ) : Carried L E where
     push_cast
     ring
 
+/-- [proved-derived; formal-checked] **The two roundings compose into one floor.** With
+`u = 2^(−L)` and `1 ≤ k`, rounding `y` to the nearest point of the fine lattice `2^(−L−k)ℤ` and that
+point to the nearest point of the lattice `2^(−L)ℤ`, ties upward at both, gives the coordinate
+`q = ⌊y/u + 1/2 + 2^(−k−1)⌋`. The boundary of `q`'s cell lies at `(q − 1/2)·u − 2^(−L−k−1)`: half a
+fine unit below where one rounding at the lattice puts it, the only trace the fine rounding leaves
+on the coordinate. -/
+theorem quot_fine_eq_floor {k : ℕ} (hk : 1 ≤ k) (y : ℚ) :
+    quot L (fine L k y) = ⌊y / unit L + (1 / 2 + unit (k + 1))⌋ := by
+  obtain ⟨j, rfl⟩ : ∃ j, k = j + 1 := ⟨k - 1, by omega⟩
+  have hu := (unit_pos (L + (j + 1))).ne'
+  have hP : quot (L + (j + 1)) y = ⌊y / unit (L + (j + 1)) + 1 / 2⌋ := round_eq _
+  have hlhs : quot L (fine L (j + 1) y) =
+      ⌊((quot (L + (j + 1)) y + 2 ^ j : ℤ) : ℚ) / ((2 ^ (j + 1) : ℕ) : ℚ)⌋ := by
+    unfold fine
+    rw [quot.eq_1 L, round_eq, unit_eq_pow_mul L (j + 1)]
+    congr 1
+    push_cast
+    field_simp
+    ring
+  have hrhs : y / unit L + (1 / 2 + unit (j + 1 + 1)) =
+      (y / unit (L + (j + 1)) + 1 / 2 + ((2 ^ j : ℤ) : ℚ)) / ((2 ^ (j + 1) : ℕ) : ℚ) := by
+    rw [unit_eq_pow_mul L (j + 1)]
+    unfold unit
+    push_cast
+    field_simp
+    ring
+  rw [hlhs, hrhs, Int.floor_div_natCast, Int.floor_div_natCast, Int.floor_intCast,
+    Int.floor_add_intCast, hP]
+
+/-- [proved-derived; formal-checked] **The step's applied coordinate is one floor of the carried
+sum.** At entry `i`, the budgeted step that advances the clock to `m` moves the value by
+`q·2^(−L)` with `q = ⌊(Δ_i + r_i)/u + 1/2 + 2^(−k_m−1)⌋` (`quot_fine_eq_floor`, `k_m ≥ 1`): along a
+path of updates, `q` changes only where `(Δ_i + r_i)/u` crosses a point of
+`ℤ − 1/2 − 2^(−k_m−1)`. -/
+theorem step_coordinate_eq_floor (s : Carried L E) (Δ : E → ℚ) (i : E) :
+    quot L (fine L (gammaLength (s.clock + 1)) (Δ i + s.rem i)) =
+      ⌊(Δ i + s.rem i) / unit L + (1 / 2 + unit (gammaLength (s.clock + 1) + 1))⌋ :=
+  quot_fine_eq_floor (one_le_gammaLength _) _
+
 open Classical in
 /-- [definition] **One budgeted deposit** of the exact update `Δ`: the step when `Δ ≠ 0`, nothing
 (the clock included) when `Δ = 0`. -/
@@ -867,6 +906,8 @@ section Audit
 #print axioms div_rem_spec
 #print axioms rem_bounds
 #print axioms quot_eq_zero_of_bounds
+#print axioms quot_fine_eq_floor
+#print axioms step_coordinate_eq_floor
 #print axioms gamma_kraft_lt_one
 #print axioms carry_zero
 #print axioms carry_accounting

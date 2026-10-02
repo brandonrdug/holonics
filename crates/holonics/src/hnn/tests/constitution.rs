@@ -402,6 +402,33 @@ fn the_carry_splits_its_ties_upward_at_both_lattices() {
     );
 }
 
+/// Lean `HNN/LatticeDeposit.{quot_fine_eq_floor, step_coordinate_eq_floor}` at the carry's two
+/// splits: [`Lattice::div_rem`] at the fine lattice `2^(−L−k)ℤ`, then
+/// [`Lattice::div_rem_coordinate`] at `2^(−L)ℤ`, give `q = ⌊y·2^L + 1/2 + 2^(−k−1)⌋` for `k ≥ 1`.
+/// The values `y = n/(3·2^(L+k+1))` cross four cells on each side of zero. They include every cell
+/// boundary `(z − 1/2)·2^(−L) − 2^(−L−k−1)` (`n` a multiple of three) and rationals off every
+/// dyadic lattice.
+#[test]
+fn the_two_splits_compose_into_one_floor() {
+    for exponent in [0, 3] {
+        for finer in [1, 3, 5] {
+            let (lattice, fine) = (Lattice::new(exponent), Lattice::new(exponent + finer));
+            let shift = rat(1, 2) + Rat::new(BigInt::one(), BigInt::one() << (finer + 1) as usize);
+            let reach = 3_i64 << (finer + 3);
+            for n in -reach..=reach {
+                let y = Rat::new(
+                    BigInt::from(n),
+                    BigInt::from(3) << (exponent + finer + 1) as usize,
+                );
+                let (point, _) = fine.div_rem(&y);
+                let (quotient, _) = lattice.div_rem_coordinate(&point, finer);
+                let floor = (&y / lattice.unit() + &shift).floor().to_integer();
+                assert_eq!(quotient, floor, "L = {exponent}, k = {finer}, y = {y}");
+            }
+        }
+    }
+}
+
 /// Lean `HNN/LatticeDeposit.{carried_remainder_bounded, run_onLattice}` on the constitution: the
 /// chain control's deposits keep every retained entry on its locus's lattice and every carried
 /// remainder in its half-open cell.
