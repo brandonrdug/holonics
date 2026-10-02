@@ -1,0 +1,20 @@
+   Compiling crossbeam-utils v0.8.23
+   Compiling proc-macro2 v1.0.107
+   Compiling num-traits v0.2.19
+   Compiling crossbeam-epoch v0.9.21
+   Compiling quote v1.0.47
+   Compiling syn v3.0.3
+   Compiling crossbeam-deque v0.8.8
+   Compiling num-integer v0.1.46
+   Compiling rayon-core v1.13.0
+   Compiling num-bigint v0.4.8
+   Compiling rayon v1.12.0
+   Compiling num-rational v0.4.2
+   Compiling thiserror-impl v2.0.19
+   Compiling thiserror v2.0.19
+   Compiling holonics v0.1.0 (.local/wt/build-hash/crates/holonics)
+   Compiling holonics-cuda v0.1.0 (.local/wt/build-hash/crates/holonics-cuda)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 23.23s
+  Executable unittests src/lib.rs (.local/target-hash-seeded/debug/deps/holonics_cuda-162b84abbaed056d)
+  Executable unittests src/bin/mount-smoke.rs (.local/target-hash-seeded/debug/deps/mount_smoke-569bf16e165ff310)
+build exit 0 wall 23287 ms
