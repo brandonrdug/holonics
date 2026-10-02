@@ -103,6 +103,13 @@ the laws that covector and its certified step stand on (the diagnosis record,
    per-move decrease (`window_length_lower`); a grain's decrease per window ends the chain
    (`grain_windows_bounded`) (§12).
 
+13. **The flip.** [proved-derived; formal-checked] A flip present on every small step defeats
+   every first-order bound (`flip_defeats_first_order`); one at `η_c` needs a curvature constant
+   of its cost over `η_c²` (`flip_curvature_lower`); a margin moving at a bounded rate certifies no
+   flip within it (`no_flip_within_margin`); a visible cell end holds until the true reading reaches
+   its cut and moves there (`cell_holds_until_cut`, `cell_moves_at_cut`), at a step set by the
+   reading's place inside its cell (`cut_within_cell`) (§13).
+
 [open] (#62) The existence of the differentiable root path (the implicit function theorem at a
 simple root, from `Φ`'s strict differentiability), Jacobi's formula `∂_η det(λ − M − ηΔM) =
 −tr(adj(λ − M) ΔM)` with the adjugate's rank-one form at a simple root, and the certificate's
@@ -1753,6 +1760,103 @@ theorem grain_windows_bounded {f : ℕ → ℝ} {t : ℕ → ℕ} {W : ℕ} {h :
 
 end ReleaseGuard
 
+/-! ## 13. The flip: where the lock rule changes a decision, and what the move can certify
+
+The release locks, at each refinement, the eligible stations of the strictly largest gap
+`g_j = L_top − U_runner` (ties together), each `L`, `U` the end of the reading's dyadic bisection
+cell at the release's grain. The lock rule's **margin** at a refinement is the largest gap less the
+next (zero at a tie), with each locked station's threshold `L_top − 1` and gap beside it. A move
+**flips** a decision exactly where a margin's visible value changes sign or a tie splits; the
+flip's cost is the comparison re-read on the successor's sections against the incumbent's, the
+second sum of `own_telescopes`.
+
+What a native move can certify about it, each statement on one coordinate `η` of the move:
+- **No first-order bound survives a flip on every small step** (`flip_defeats_first_order`): a
+  positive jump present at every `η ∈ (0, δ)` exceeds `own 0 − η s + K η²` for some `η`, whatever
+  `s` and `K`.
+- **A flip at `η_c` needs a curvature constant of its cost over `η_c²`**
+  (`flip_curvature_lower`): `J − η_c (s₁ − s) ≤ K η_c²`.
+- **A margin moving at most `Λ η` certifies no flip below `μ 0 / Λ`** (`no_flip_within_margin`).
+  The chain has no such `Λ` over a segment (this section's record, §3b).
+- **A visible end stays until the true reading reaches its cell's cut, and moves there**
+  (`cell_holds_until_cut`, `cell_moves_at_cut`); the first such step lies anywhere in
+  `(0, w/v]` (`cut_within_cell`), set by the reading's place inside its cell, which the enclosure
+  does not carry. A tie, or a margin within the summed cell widths, can therefore flip at an
+  arbitrarily small step. -/
+
+section Flip
+
+/-- [proved-derived; formal-checked] **A flip on every small step defeats every first-order bound**:
+if `own η = g η + J` on `(0, δ)` with `J > 0`, `own 0 = g 0` and `g` right-continuous at `0`,
+then for every slope `s` and curvature `K` some `η ∈ (0, δ)` has `own 0 − η s + K η² < own η`. -/
+theorem flip_defeats_first_order {own g : ℝ → ℝ} {J δ : ℝ} (hJ : 0 < J) (hδ : 0 < δ)
+    (hflip : ∀ η ∈ Set.Ioo 0 δ, own η = g η + J) (h0 : own 0 = g 0)
+    (hg : ContinuousWithinAt g (Set.Ioi 0) 0) (s K : ℝ) :
+    ∃ η ∈ Set.Ioo 0 δ, own 0 - η * s + K * η ^ 2 < own η := by
+  have hid : Tendsto (fun η : ℝ => η) (𝓝[>] (0 : ℝ)) (𝓝 0) :=
+    tendsto_nhdsWithin_of_tendsto_nhds tendsto_id
+  have hlim : Tendsto (fun η => g η + J - (g 0 - η * s + K * η ^ 2)) (𝓝[>] (0 : ℝ))
+      (𝓝 (g 0 + J - (g 0 - 0 * s + K * 0 ^ 2))) :=
+    ((hg.tendsto.add_const J).sub ((tendsto_const_nhds.sub (hid.mul_const s)).add
+      ((hid.pow 2).const_mul K)))
+  have hval : g 0 + J - (g 0 - 0 * s + K * 0 ^ 2) = J := by ring
+  rw [hval] at hlim
+  have hev := (hlim.eventually (eventually_gt_nhds hJ)).and (Ioo_mem_nhdsGT hδ)
+  obtain ⟨η, hpos, hmem⟩ := hev.exists
+  refine ⟨η, hmem, ?_⟩
+  rw [hflip η hmem, h0]
+  linarith
+
+/-- [proved-derived; formal-checked] **A smooth bound across a flip carries its cost over the
+step squared**: if the own release jumps by `J` at `η` over a continuous part falling at most at
+slope `s₁`, a bound `own η ≤ own 0 − η s + K η²` forces `J − η (s₁ − s) ≤ K η²`. -/
+theorem flip_curvature_lower {own g : ℝ → ℝ} {η J s s₁ K : ℝ} (hflip : own η = g η + J)
+    (h0 : own 0 = g 0) (hg : g 0 - η * s₁ ≤ g η) (hbound : own η ≤ own 0 - η * s + K * η ^ 2) :
+    J - η * (s₁ - s) ≤ K * η ^ 2 := by
+  linarith
+
+/-- [proved-derived; formal-checked] **A margin with a bounded rate certifies no flip within it**:
+if `|μ η − μ 0| ≤ Λ η` for `η ≥ 0`, then `μ η > 0` wherever `Λ η < μ 0`. -/
+theorem no_flip_within_margin {μ : ℝ → ℝ} {Λ : ℝ} (hlip : ∀ η, 0 ≤ η → |μ η - μ 0| ≤ Λ * η)
+    {η : ℝ} (hη : 0 ≤ η) (hmargin : Λ * η < μ 0) : 0 < μ η := by
+  have := (abs_le.mp (hlip η hη)).1
+  linarith
+
+/-- [proved-derived; formal-checked] **A visible end holds until the true reading reaches its
+cell's cut**: on a lattice of width `w`, a reading `x` moving at rate `v > 0` keeps its cell
+`⌊x/w⌋` for every `η` below `(w(⌊x/w⌋ + 1) − x)/v`. -/
+theorem cell_holds_until_cut {w x v : ℝ} (hw : 0 < w) (hv : 0 < v) {η : ℝ} (hη : 0 ≤ η)
+    (hlt : η < (w * (⌊x / w⌋ + 1) - x) / v) : ⌊(x + η * v) / w⌋ = ⌊x / w⌋ := by
+  rw [Int.floor_eq_iff]
+  have hx := Int.floor_le (x / w)
+  have h1 : (⌊x / w⌋ : ℝ) * w ≤ x := by rwa [le_div_iff₀ hw] at hx
+  have h2 : η * v < w * (⌊x / w⌋ + 1) - x := by rwa [lt_div_iff₀ hv] at hlt
+  constructor
+  · rw [le_div_iff₀ hw]; nlinarith
+  · rw [div_lt_iff₀ hw]; nlinarith
+
+/-- [proved-derived; formal-checked] **…and moves to the next cell there.** -/
+theorem cell_moves_at_cut {w x v : ℝ} (hw : 0 < w) (hv : 0 < v) :
+    ⌊(x + (w * (⌊x / w⌋ + 1) - x) / v * v) / w⌋ = ⌊x / w⌋ + 1 := by
+  rw [div_mul_cancel₀ _ hv.ne']
+  have : (x + (w * (⌊x / w⌋ + 1) - x)) / w = ((⌊x / w⌋ + 1 : ℤ) : ℝ) := by
+    push_cast; field_simp; ring
+  rw [this, Int.floor_intCast]
+
+/-- [proved-derived; formal-checked] **The step to the cut lies anywhere in `(0, w/v]`**: it is set
+by the reading's place inside its cell, which the cell's ends do not carry. -/
+theorem cut_within_cell {w x v : ℝ} (hw : 0 < w) (hv : 0 < v) :
+    0 < (w * (⌊x / w⌋ + 1) - x) / v ∧ (w * (⌊x / w⌋ + 1) - x) / v ≤ w / v := by
+  have hx := Int.floor_le (x / w)
+  have hx' := Int.lt_floor_add_one (x / w)
+  have h1 : (⌊x / w⌋ : ℝ) * w ≤ x := by rwa [le_div_iff₀ hw] at hx
+  have h2 : x < (⌊x / w⌋ + 1) * w := by rwa [div_lt_iff₀ hw] at hx'
+  constructor
+  · apply div_pos _ hv; nlinarith
+  · apply div_le_div_of_nonneg_right _ hv.le; nlinarith
+
+end Flip
+
 section Audit
 
 #print axioms passage_coeff_zero
@@ -1833,6 +1937,12 @@ section Audit
 #print axioms window_length_lower
 #print axioms excursion_of_bounded
 #print axioms grain_windows_bounded
+#print axioms flip_defeats_first_order
+#print axioms flip_curvature_lower
+#print axioms no_flip_within_margin
+#print axioms cell_holds_until_cut
+#print axioms cell_moves_at_cut
+#print axioms cut_within_cell
 
 end Audit
 
