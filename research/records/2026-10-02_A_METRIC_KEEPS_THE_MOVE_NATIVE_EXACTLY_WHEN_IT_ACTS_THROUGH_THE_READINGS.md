@@ -67,7 +67,7 @@ its step `v = −η H (d ⊙ c)` is native:
 The exterior `rms` scales each of `E`'s 600 entries, not each reading. That generally leaves the
 native span. The smallest case: two entries, one reading, `A = [1 1]`, `M = I`. The horizontal
 space is the line through `(1, 1)`, and `∇L = (c, c)`. The step `−diag(p₁, p₂)(c, c)` is horizontal
-exactly when `p₁ = p₂`.
+exactly when `p₁ = p₂` (at `c ≠ 0`).
 
 [agent-inferred] So the per-reading scale reproduces `rms`'s ingredient only if `rms`'s gain comes
 through the horizontal part of its steps. The read that settles it on the main line's own
@@ -83,9 +83,10 @@ chord: the hidden energy `½⟨M h, h⟩` of each step, `h = hidden(v_rms)`, aga
 [agent-inferred] Under the witness's own face `θ`, the second moment of a reading's covector is the
 Fisher form's diagonal: `E_t[(θ_k − [t = k])²] = θ_k(1 − θ_k) = F_kk`. Taken per reading, `rms`
 divides by the square root of a running estimate of that second moment, so it sits between the
-plain step in the readings (`d_k = 1`) and the Jacobi step `d_k = 1/F_kk`, the diagonal of the
-kinetic member `F⁻¹`. Over the data, the running second moment equals `F_kk` only where the face is
-calibrated. An exact native rule would hold `d_k` dyadic, `d_k = 2^(−⌊½ log₂ F̂_kk⌋)` with `F̂` the
+plain step in the readings (`d_k = 1`) and the Jacobi step `d_k = 1/F_kk`, which inverts `F`'s
+diagonal in place of the kinetic member `F⁻¹` (in general `(F⁻¹)_kk ≠ 1/F_kk`). Over the data,
+the running second moment equals `F_kk` only where the face is calibrated. An exact native rule
+would hold `d_k` dyadic, `d_k = 2^(−⌊½ log₂ F̂_kk⌋)` with `F̂` the
 accumulated per-reading second moment, as `hnn::constitution::receiving_class_metric` steps at
 `2^⌊log₂(1/λ̄)⌋`. It is not built: the main line's remaining seeds and the hidden-share read above
 decide whether it is the ingredient's counterpart.
