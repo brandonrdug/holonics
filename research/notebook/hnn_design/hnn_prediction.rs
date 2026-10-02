@@ -18,6 +18,7 @@
 //! cargo run --release -p holonics --example hnn_prediction -- executed represent <terrain> <seed> <count> <iterates> <deadline ms> <out> [<held-out seed>]
 //! cargo run --release -p holonics --example hnn_prediction -- executed resume-coupling <terrain> <seed> <count> <c1 state> <gate A receipt> <move bound ms> <capture dir>
 //! cargo run --release -p holonics --example hnn_prediction -- executed causal <terrain> <seed> <count> <label[=E]>…
+//! cargo run --release -p holonics --example hnn_prediction -- executed joined <terrain> <seed> <count> <arm> <label=source>…
 //! ```
 //!
 //! [definition; agent-inferred, the order pin and the bank pin] **The declaration**
@@ -456,6 +457,15 @@ fn main() {
             &arguments[6],
             &arguments[7],
             &arguments[8..],
+        ),
+        // The joined move's direction at each source (the record
+        // research/records/2026-10-02_THE_TRANSPORT_MODULUS_JOINS_THE_RECEIVERS_MINIMUM_ENERGY_MOVE.md §4c): read-only.
+        (Some("executed"), Some("joined")) => executed_loop::joined(
+            &arguments[3],
+            arguments[4].parse().expect("a seed"),
+            arguments[5].parse().expect("a count"),
+            &arguments[6],
+            &arguments[7..],
         ),
         // Each constitution under several declared comparisons (the record
         // research/records/2026-10-01_THE_COMPARISONS_AGREEMENT_WITH_THE_DECISIONS.md): read-only.
