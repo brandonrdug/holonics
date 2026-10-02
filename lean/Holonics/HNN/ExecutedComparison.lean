@@ -78,6 +78,14 @@ the laws that covector and its certified step stand on (the diagnosis record,
    sign-consistent reading changes (`reading_diagonal_reach`; a full `D`, every descending one,
    `reading_posDef_reach`), and is certified in the Fisher form (`reading_scale_descends`) (§10).
 
+11. **The port's mass and the hidden directions.** [proved-derived; formal-checked] A direction no
+   reading sees is never native under any positive mass (`hidden_never_native`); some mass makes
+   `δ` native exactly when `A δ ≠ 0` (`native_under_some_mass_iff`). The smallest additive change
+   is rank one (`deposit_makes_native`); through the feature Gram it is `k = Zᵀ (Z Δᵀ)⁻¹ Z`, needing
+   `(X − Δ H) Δᵀ ⪰ 0` (`feature_deposit_makes_native`, `feature_deposit_native_needs`). The reading
+   change and its certificate are mass-free, and a deposit raises the step's kinetic energy
+   (`deposit_raises_native_energy`) (§11).
+
 [open] (#62) The existence of the differentiable root path (the implicit function theorem at a
 simple root, from `Φ`'s strict differentiability), Jacobi's formula `∂_η det(λ − M − ηΔM) =
 −tr(adj(λ − M) ΔM)` with the adjugate's rank-one form at a simple root, and the certificate's
@@ -1356,6 +1364,149 @@ theorem reading_scale_descends {ι : Type*} [Fintype ι] [Nonempty ι] [Decidabl
 
 end ReadingScale
 
+/-! ## 11. The port's mass and the hidden directions
+
+[definition; agent-inferred, October 2] Rebuild step U6, step 1: if an exterior step's gain lies in
+the directions no reading sees, what change of the port's mass `M = I ⊗ H′` carries it natively
+(`research/records/2026-10-02_NO_MASS_MAKES_A_HIDDEN_DIRECTION_VISIBLE_THE_DEPOSIT_CAN_ONLY_TILT_A_VISIBLE_STEP.md`).
+A direction no reading sees is never native under any mass (`hidden_never_native`); a mass change
+can only tilt the lift of a visible reading change (`native_under_some_mass_iff`), by a rank-one
+addition (`deposit_makes_native`) or, through the feature Gram, a deposit of rank at most the rows'
+under a row-by-row condition (`feature_deposit_makes_native`, `feature_deposit_native_needs`). The
+change leaves the step's reading change and its Fisher-form certificate unchanged and raises its
+kinetic energy (`deposit_raises_native_energy`). -/
+
+section PortMass
+
+open Matrix Holonics.HolonCore.KineticFace
+
+variable {n m : Type*} [Fintype n] [Fintype m] [DecidableEq n] [DecidableEq m]
+
+omit [DecidableEq n] [DecidableEq m] in
+/-- [proved-derived; formal-checked] **`hidden_never_native`: no mass makes a direction no
+reading sees native.** If `A δ = 0` and `M δ = Aᵀμ` for a positive definite `M`, then `δ = 0`:
+`⟨δ, M δ⟩ = ⟨A δ, μ⟩ = 0`. Visibility, `A δ ≠ 0`, is set by the readings alone, and a native step
+is the least-energy lift of a reading change, so a purely hidden direction is the lift of zero under
+every mass. -/
+theorem hidden_never_native {M : Matrix n n ℝ} (hM : M.PosDef) (A : Matrix m n ℝ) {δ : n → ℝ}
+    (hread : A *ᵥ δ = 0) {μ : m → ℝ} (hmom : M *ᵥ δ = Aᵀ *ᵥ μ) : δ = 0 := by
+  by_contra hδ
+  have hp := hM.dotProduct_mulVec_pos hδ
+  simp only [star_trivial] at hp
+  rw [hmom, dotProduct_transpose_mulVec, hread, dotProduct_zero] at hp
+  exact lt_irrefl _ hp
+
+omit [DecidableEq m] in
+/-- [proved-derived; formal-checked] **`native_under_some_mass_iff`: some positive mass makes
+`δ` native exactly when a reading sees it.** `M δ = Aᵀμ` for some `M ≻ 0` and `μ` iff `δ = 0` or
+`A δ ≠ 0` (`M` from `posDef_reach` with `μ = A δ`). A mass change can only choose which lift of a
+visible reading change the native step deposits; it can tilt that lift into hidden directions. -/
+theorem native_under_some_mass_iff (A : Matrix m n ℝ) (δ : n → ℝ) :
+    (∃ M : Matrix n n ℝ, M.PosDef ∧ ∃ μ : m → ℝ, M *ᵥ δ = Aᵀ *ᵥ μ) ↔
+      (δ = 0 ∨ A *ᵥ δ ≠ 0) := by
+  constructor
+  · rintro ⟨M, hM, μ, hmom⟩
+    by_cases hr : A *ᵥ δ = 0
+    · exact Or.inl (hidden_never_native hM A hr hmom)
+    · exact Or.inr hr
+  · rintro (rfl | hr)
+    · exact ⟨1, PosDef.one, 0, by simp⟩
+    · have hδ : δ ≠ 0 := by rintro rfl; exact hr (mulVec_zero _)
+      have hpos : 0 < (A *ᵥ δ) ⬝ᵥ (A *ᵥ δ) :=
+        lt_of_le_of_ne (Finset.sum_nonneg fun i _ => mul_self_nonneg _)
+          fun h => hr (dotProduct_self_eq_zero.mp h.symm)
+      have hd : (-(Aᵀ *ᵥ (A *ᵥ δ))) ⬝ᵥ δ < 0 := by
+        rw [neg_dotProduct, dotProduct_comm, dotProduct_transpose_mulVec]
+        linarith
+      obtain ⟨P, hP, hPd⟩ := posDef_reach hδ hd
+      exact ⟨P, hP, A *ᵥ δ, neg_injective hPd⟩
+
+omit [DecidableEq n] [DecidableEq m] in
+/-- [proved-derived; formal-checked] **`deposit_makes_native`: the smallest additive change.**
+With `z = Aᵀμ − M δ` and `⟨δ, z⟩ > 0`, the rank-one positive semidefinite addition
+`K = z zᵀ/⟨δ, z⟩` keeps the mass positive definite and makes `δ` native: `(M + K) δ = Aᵀμ`. A
+`μ` with `⟨δ, z⟩ = ⟨A δ, μ⟩ − ⟨δ, M δ⟩ > 0` exists exactly when `A δ ≠ 0`. A deposit only adds,
+so this is the least-rank change the deposit's sign admits. -/
+theorem deposit_makes_native {M : Matrix n n ℝ} (hM : M.PosDef) (A : Matrix m n ℝ)
+    (δ : n → ℝ) (μ : m → ℝ) (hz : 0 < δ ⬝ᵥ (Aᵀ *ᵥ μ - M *ᵥ δ)) :
+    let z := Aᵀ *ᵥ μ - M *ᵥ δ
+    let K := (δ ⬝ᵥ z)⁻¹ • vecMulVec z z
+    K.PosSemidef ∧ (M + K).PosDef ∧ (M + K) *ᵥ δ = Aᵀ *ᵥ μ := by
+  intro z K
+  have hK : K.PosSemidef := by
+    refine PosSemidef.smul ?_ (inv_nonneg.mpr hz.le)
+    simpa using posSemidef_vecMulVec_self_star z
+  refine ⟨hK, hM.add_posSemidef hK, ?_⟩
+  rw [add_mulVec, Matrix.smul_mulVec, vecMulVec_mulVec_eq, smul_smul,
+    dotProduct_comm z δ, inv_mul_cancel₀ hz.ne', one_smul]
+  simp only [z]; abel
+
+omit [Fintype m] [DecidableEq m] [DecidableEq n] in
+/-- [proved-derived; formal-checked] **`feature_deposit_makes_native`: the same change through
+the feature Gram.** The port's mass acts on `E`'s rows through one feature Gram, `V ↦ V H`
+(`M = I ⊗ H′`), and the deposit changes only `H` (`ΔH = Σ w f fᵀ`). For a target `Δ` and a
+momentum `X` (a combination of the readings' covectors in `E`'s shape), with `Z = X − Δ H`: if
+`Z Δᵀ` is positive definite, the feature deposit `k = Zᵀ (Z Δᵀ)⁻¹ Z` is positive semidefinite, of
+rank at most the rows', and `Δ (H + k) = X`. -/
+theorem feature_deposit_makes_native {r : Type*} [Fintype r] [DecidableEq r]
+    (Δ X : Matrix r n ℝ) (H : Matrix n n ℝ) (hY : ((X - Δ * H) * Δᵀ).PosDef) :
+    let Z := X - Δ * H
+    let k := Zᵀ * ((X - Δ * H) * Δᵀ)⁻¹ * Z
+    k.PosSemidef ∧ Δ * (H + k) = X := by
+  intro Z k
+  have hYs : ((X - Δ * H) * Δᵀ)ᵀ = (X - Δ * H) * Δᵀ := by
+    simpa only [conjTranspose_eq_transpose_of_trivial] using hY.1.eq
+  have hi := mul_nonsing_inv ((X - Δ * H) * Δᵀ) ((Matrix.isUnit_iff_isUnit_det _).mp hY.isUnit)
+  refine ⟨?_, ?_⟩
+  · simpa only [conjTranspose_eq_transpose_of_trivial] using
+      hY.inv.posSemidef.conjTranspose_mul_mul_same Z
+  · have hΔk : Δ * k = Z := by
+      have hΔZ : Δ * Zᵀ = ((X - Δ * H) * Δᵀ)ᵀ := by
+        rw [transpose_mul, transpose_transpose]
+      simp only [k, ← Matrix.mul_assoc]
+      rw [hΔZ, hYs, hi, Matrix.one_mul]
+    rw [Matrix.mul_add, hΔk]
+    simp only [Z]; abel
+
+omit [Fintype m] [DecidableEq m] [DecidableEq n] in
+/-- [proved-derived; formal-checked] **`feature_deposit_native_needs`: and it is needed.** If a
+positive semidefinite feature deposit `k` gives `Δ (H + k) = X`, then `(X − Δ H) Δᵀ = Δ k Δᵀ` is
+positive semidefinite. So a feature deposit can make `Δ` native toward `X` only where
+`(X − Δ H) Δᵀ` is symmetric and positive semidefinite: one row-by-row condition on the readings'
+weights, which a target fails whenever its rows disagree on the feature direction they need. -/
+theorem feature_deposit_native_needs {r : Type*} [Fintype r] [DecidableEq r]
+    (Δ X : Matrix r n ℝ) (H k : Matrix n n ℝ) (hk : k.PosSemidef) (hX : Δ * (H + k) = X) :
+    ((X - Δ * H) * Δᵀ).PosSemidef := by
+  have : X - Δ * H = Δ * k := by rw [← hX, Matrix.mul_add]; abel
+  rw [this]
+  simpa only [conjTranspose_eq_transpose_of_trivial, Matrix.mul_assoc] using
+    hk.mul_mul_conjTranspose_same Δ
+
+/-- [proved-derived; formal-checked] **`deposit_raises_native_energy`: the cost.** Every native
+step's reading change is the same under any mass (`KineticFace.horizontal_reads`), so a mass change
+leaves the step's first-order decrease and its Fisher-form certificate on the readings
+(`reading_scale_descends`) unchanged. What it changes is the step's kinetic energy: after a
+deposit `K ⪰ 0`, the least energy of a reading change `w`, `½⟨w, (A M⁻¹ Aᵀ)⁻¹ w⟩`, does not
+fall. -/
+theorem deposit_raises_native_energy {M K : Matrix n n ℝ} (hM : M.PosDef) (hK : K.PosSemidef)
+    (A : Matrix m n ℝ) (hA : Function.Surjective A.mulVec) (w : m → ℝ) :
+    Holonics.HolonCore.storageEnergy (faceMetric M A) w ≤
+      Holonics.HolonCore.storageEnergy (faceMetric (M + K) A) w := by
+  have hMK : (M + K).PosDef := hM.add_posSemidef hK
+  set v := horizontal (M + K) A w
+  have hread : A *ᵥ v = w := horizontal_reads (M + K) A hMK hA w
+  have h1 := (unique_minimum_energy M A hM hA w v hread).1
+  have h3 := ((unique_minimum_energy (M + K) A hMK hA w v hread).2).mpr rfl
+  have h2 : Holonics.HolonCore.storageEnergy M v ≤ Holonics.HolonCore.storageEnergy (M + K) v := by
+    unfold Holonics.HolonCore.storageEnergy
+    have := hK.dotProduct_mulVec_nonneg v
+    simp only [star_trivial] at this
+    rw [add_mulVec, dotProduct_add]
+    nlinarith
+  linarith
+
+end PortMass
+
 section Audit
 
 #print axioms passage_coeff_zero
@@ -1415,6 +1566,12 @@ section Audit
 #print axioms reading_diagonal_reach
 #print axioms reading_posDef_reach
 #print axioms reading_scale_descends
+#print axioms hidden_never_native
+#print axioms native_under_some_mass_iff
+#print axioms deposit_makes_native
+#print axioms feature_deposit_makes_native
+#print axioms feature_deposit_native_needs
+#print axioms deposit_raises_native_energy
 
 end Audit
 
