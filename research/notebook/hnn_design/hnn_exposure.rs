@@ -974,19 +974,26 @@ fn rounding(exposure: &Exposure) {
 }
 
 /// The receiving map's inputs and targets, and `R` at each close, written for the exterior fitted
-/// receiver (`receiver_oracle.py`): one line a sample (aeon, target, the input's exact entries), then
-/// one line a map (its index, rows, columns, entries). Rewritten whole at each close; the file lives
-/// under `.local` (private).
+/// receiver (`receiver_oracle.py`): one line a sample (aeon, target, the input's exact entries, and
+/// after a `|` the tree's exponents when they were read), then one line a map (its index, rows,
+/// columns, entries). Rewritten whole at each close; the file lives under `.local` (private).
 fn write_samples(
     path: &str,
     samples: &[(usize, Vec<Rat>, usize)],
+    trees: &[Option<Vec<Rat>>],
     maps: &[holonics::ratio::linear::ExactRatMatrix],
 ) {
     let mut text = String::new();
-    for (aeon, z, target) in samples {
+    for (index, (aeon, z, target)) in samples.iter().enumerate() {
         text.push_str(&format!("sample {aeon} {target}"));
         for x in z {
             text.push_str(&format!(" {x}"));
+        }
+        if let Some(Some(tree)) = trees.get(index) {
+            text.push_str(" |");
+            for x in tree {
+                text.push_str(&format!(" {x}"));
+            }
         }
         text.push('\n');
     }
@@ -1076,18 +1083,18 @@ fn contact_ablation_run(
         &cut.cells,
         windows,
         holonics::hnn::reference::AblationOptions { information, descent, samples: samples_out.is_some() },
-        &mut |c, readings, receiver, samples, maps| {
+        &mut |c, readings, receiver, samples, trees, maps| {
             aeon_line(c.aeon - 1, readings, receiver);
             cumulative_line(c);
             if let Some(path) = samples_out {
-                write_samples(path, samples, maps);
+                write_samples(path, samples, trees, maps);
             }
         },
     )
     .expect("the contact ablation");
     let (readings, receiver) = (&run.windows, &run.receiver);
     if let Some(path) = samples_out {
-        write_samples(path, &run.samples, &run.receiving_maps);
+        write_samples(path, &run.samples, &run.trees, &run.receiving_maps);
     }
     if let Some(last) = readings.iter().map(|r| r.aeon).max() {
         aeon_line(last, readings, receiver);

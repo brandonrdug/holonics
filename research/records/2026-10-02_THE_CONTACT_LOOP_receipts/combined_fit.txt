@@ -1,0 +1,5 @@
+close 1: next aeon's 1122 readings, combined code in bits a reading: tree alone 14967487/2^22, R in the machine 14899768/2^22, fitted (ridge 8388608/2^31) 14880363/2^22, class-metric replay 14913780/2^22
+close 2: next aeon's 1138 readings, combined code in bits a reading: tree alone 13930200/2^22, R in the machine 13802783/2^22, fitted (ridge 8388608/2^31) 13827681/2^22, class-metric replay 13803654/2^22
+close 3: next aeon's 70 readings, combined code in bits a reading: tree alone 13962286/2^22, R in the machine 13793218/2^22, fitted (ridge 8388608/2^31) 13764233/2^22, class-metric replay 13770373/2^22
+fit exit 0
+args: python3 research/notebook/hnn_design/receiver_combined.py .local/samples.txt (ridge 1/256)

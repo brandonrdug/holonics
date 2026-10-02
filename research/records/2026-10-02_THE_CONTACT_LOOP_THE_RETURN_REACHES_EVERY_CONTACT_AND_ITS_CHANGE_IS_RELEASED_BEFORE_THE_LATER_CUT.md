@@ -791,3 +791,35 @@ replayed outside the machine on the same anchors
 The fitted receiver and the replay must add the tree's logits at each reading and fit or update `W`
 on top of them. That needs the tree's grain logits exported beside each receiving input, which is
 the next build.
+
+## 21. On its own objective `R` is at its form's limit
+
+A read-only accessor, `Resident::receiving_tree_exponents`, reads the landmark tree as the compare
+does: `PendingRatio::tree_faces` at each phase's causal address given the window's known targets,
+returning its grain exponents `k_c/L`. The refine's kept faces are the wave's alone; the tree
+joins only at the compare, which a first attempt missed (it read zero exponents and is discarded).
+Each sample now carries the tree's exponents. `receiver_combined.py` scores the combined face,
+exponents `tree + W z`, on the next aeon's readings, never fitted on
+([run](2026-10-02_THE_CONTACT_LOOP_receipts/combined_samples_run.txt), three aeons with `R`'s
+class-metric step, 1,245,532 ms inside the 1,700 s deadline;
+[analysis](2026-10-02_THE_CONTACT_LOOP_receipts/combined_fit.txt)).
+
+| Next aeon (readings) | Tree alone | `R` in the machine | Fitted receiver (ridge `1/256`) | Class-metric replay |
+|---|---|---|---|---|
+| after close 1 (1,122) | `14967487/2^22` | `14899768/2^22` | `14880363/2^22` | `14913780/2^22` |
+| after close 2 (1,138) | `13930200/2^22` | `13802783/2^22` | `13827681/2^22` | `13803654/2^22` |
+| after close 3 (70) | `13962286/2^22` | `13793218/2^22` | `13764233/2^22` | `13770373/2^22` |
+
+These are bits a reading on the combined face, against about 3.3 to 3.6 bits for the tree alone.
+- **`R` matches a fitted receiver of its form.** On the readings it never saw, the machine's `R`
+  equals the fitted receiver and the one-pass replay to within about `1/50` bit a reading at every
+  close, and after the second close it is the lowest of the three.
+- **The wave adds about `1/33` bit a reading to the tree.** After the second close, `R` saves
+  `127417/2^22` bits a reading against the tree alone, about 35 bits over the 1,138 readings of
+  that aeon.
+
+[agent-inferred] With the class metric, the receiving map is no longer the bottleneck: on its own
+objective it reaches what a linear receiver of its form can take from these anchors. The wave's
+remaining gain over the tree is limited by what the medium's anchors carry beyond the tree. That
+puts the next lever back in the medium's interior (§6, §12–15), whose covectors arrive through `Rᵀ`
+and are larger now that `R` is.

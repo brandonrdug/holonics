@@ -176,7 +176,7 @@ use crate::hnn::propagation::{Operands, contact_exponent, path_attenuation};
 use crate::hnn::ratio::{Faces, HolonRatio, PhaseRatio, RatioCovector, target_phases};
 use crate::hnn::realization::{apply_rows, indexed, outer_rows};
 use crate::hnn::receiving::{
-    ActiveAddress, ReceivingPhases, ReceivingStep, Scored, tree_code_length,
+    ActiveAddress, ReceivingPhases, ReceivingStep, Scored, grain_logits, tree_code_length,
 };
 use crate::hnn::retention::{AeonBoundary, Diamond, aeon_readings, collapse, contained, separator};
 use crate::hnn::word::{KeptWord, PowerForm, Word, WordBalance};
@@ -246,6 +246,26 @@ impl Resident {
                     .map(|anchor| ring.rotate(anchor, &current.lift()[phases.ring()]))
             })
             .collect())
+    }
+
+    /// [measured-diagnostic; agent-inferred, October 2; the contact loop record §21] **The tree's
+    /// exponents at a pending ratio, as its compare reads them** (read-only): the contemporary
+    /// landmark tree at each phase's causal address given the window's known targets
+    /// ([`PendingRatio::against`]'s tree faces), its grain exponents `k_c/L` per phase: what the
+    /// combined face adds to the wave.
+    pub(crate) fn receiving_tree_exponents(
+        &self,
+        pending: &PendingId,
+        known: &[usize],
+    ) -> Result<Option<Vec<Vec<Rat>>>, HnnError> {
+        let Some(slot) = self.pending.get(pending) else { return Ok(None) };
+        let trees = slot.ratio.tree_faces(&self.constitution, known)?;
+        Ok(Some(
+            trees
+                .iter()
+                .map(|tree| grain_logits(tree).into_iter().step_by(2).collect())
+                .collect(),
+        ))
     }
 }
 
@@ -3085,6 +3105,8 @@ pub struct AblationRun {
     /// When collected: each refined phase's receiving input (the rotated anchor `R` reads), its
     /// target class and its aeon; and `R` at each close (the opening's first).
     pub samples: Vec<(usize, Vec<Rat>, usize)>,
+    /// When collected and on the grain: each sample's tree exponents, aligned with `samples`.
+    pub trees: Vec<Option<Vec<Rat>>>,
     pub receiving_maps: Vec<crate::ratio::linear::ExactRatMatrix>,
 }
 
@@ -3130,6 +3152,7 @@ pub fn contact_ablation(
         &[ContactAblation],
         &[ReceiverStep],
         &[(usize, Vec<Rat>, usize)],
+        &[Option<Vec<Rat>>],
         &[crate::ratio::linear::ExactRatMatrix],
     ),
 ) -> Result<AblationRun, HnnError> {
@@ -3147,6 +3170,7 @@ pub fn contact_ablation(
     let mut receiver = Vec::new();
     let mut descents = Vec::new();
     let mut samples = Vec::new();
+    let mut trees: Vec<Option<Vec<Rat>>> = Vec::new();
     let mut receiving_maps: Vec<crate::ratio::linear::ExactRatMatrix> =
         opening.receiving_map(receiving_ring).cloned().into_iter().collect();
     let mut released: BTreeMap<(Locus, Carrier, usize), Released> = BTreeMap::new();
@@ -3387,13 +3411,15 @@ pub fn contact_ablation(
                     change
                 },
             });
-            on_boundary(cumulative.last().expect("pushed"), &out, &receiver, &samples, &receiving_maps);
+            on_boundary(cumulative.last().expect("pushed"), &out, &receiver, &samples, &trees, &receiving_maps);
         }
         let (pending, refined) = reference.refine(&mut resident, &moment, &phases)?;
         if options.samples {
             if let Some(inputs) = resident.receiving_inputs(&pending, &phases)? {
-                for (z, &target) in inputs.into_iter().zip(window) {
+                let tree = resident.receiving_tree_exponents(&pending, window)?;
+                for (j, (z, &target)) in inputs.into_iter().zip(window).enumerate() {
                     samples.push((aeon, z, target));
+                    trees.push(tree.as_ref().map(|t| t[j].clone()));
                 }
             }
         }
@@ -3608,6 +3634,7 @@ pub fn contact_ablation(
         descents,
         released,
         samples,
+        trees,
         receiving_maps,
     })
 }
