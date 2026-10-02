@@ -3550,7 +3550,10 @@ fn ladder(
         let coasted = coast.map(|c| c.scaled(&step));
         let stepped = match constitution.stepped_source_coasting(ring, samples, &step, coasted.as_ref()) {
             Ok(Some(stepped)) => stepped,
-            Ok(None) => return Ok((trials, None, Some(MoveRefusal::Unreached))),
+            Ok(None) => {
+                eprintln!("  a trial's deposit, unreached; {} ms", started.elapsed().as_millis());
+                return Ok((trials, None, Some(MoveRefusal::Unreached)));
+            }
             Err(error @ (HnnError::ConstitutionBudget { .. } | HnnError::UncertifiedStorage)) => {
                 trial.refusal = Some(TrialRefusal::Constitution(error.to_string()));
                 eprintln!("  a trial's deposit, refused by the constitution; {} ms", started.elapsed().as_millis());
@@ -3596,6 +3599,7 @@ fn ladder(
         }
         trial.largest = reading.largest.clone();
         if trial.moved.is_zero() && !modulus_moved && schedule.is_none() {
+            eprintln!("  a trial's deposit, moved nothing; {} ms", started.elapsed().as_millis());
             return Ok((trials, None, Some(MoveRefusal::Guards)));
         }
         if reading.largest > entry_bound() {
