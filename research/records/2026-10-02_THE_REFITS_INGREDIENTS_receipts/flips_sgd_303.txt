@@ -1,0 +1,52 @@
+step 0: rho 1.0000; held-out release: released 0, whole 0, stations 0, first lock at 0/1 0, first lock right 0, consistent 0; teacher-forced 248/1024; |E| max 0.500; 2 s
+step 0: fixed comparison 1.608452; trajectories changed 0, sections changed 0, first locks changed 0 (of 32, since the last read)
+step 10: fixed comparison 1.451300; trajectories changed 32, sections changed 32, first locks changed 32 (of 32, since the last read)
+step 20: fixed comparison 1.393332; trajectories changed 32, sections changed 32, first locks changed 29 (of 32, since the last read)
+step 30: fixed comparison 1.398471; trajectories changed 32, sections changed 32, first locks changed 32 (of 32, since the last read)
+step 40: fixed comparison 1.258222; trajectories changed 32, sections changed 32, first locks changed 20 (of 32, since the last read)
+step 50: rho 0.9335; held-out release: released 121, whole 9, stations 465, first lock at 0/1 58, first lock right 53, consistent 42; teacher-forced 592/1024; |E| max 1.625; 171 s
+step 50: fixed comparison 1.355662; trajectories changed 32, sections changed 31, first locks changed 24 (of 32, since the last read)
+step 60: fixed comparison 1.739551; trajectories changed 32, sections changed 32, first locks changed 32 (of 32, since the last read)
+step 70: fixed comparison 1.307451; trajectories changed 32, sections changed 32, first locks changed 29 (of 32, since the last read)
+step 80: fixed comparison 1.454648; trajectories changed 32, sections changed 32, first locks changed 29 (of 32, since the last read)
+step 90: fixed comparison 1.324886; trajectories changed 32, sections changed 32, first locks changed 30 (of 32, since the last read)
+step 100: rho 0.7940; held-out release: released 128, whole 29, stations 591, first lock at 0/1 4, first lock right 102, consistent 70; teacher-forced 551/1024; |E| max 2.691; 419 s
+step 100: fixed comparison 1.082737; trajectories changed 32, sections changed 31, first locks changed 30 (of 32, since the last read)
+step 110: fixed comparison 1.013889; trajectories changed 32, sections changed 21, first locks changed 18 (of 32, since the last read)
+step 120: fixed comparison 0.961581; trajectories changed 32, sections changed 29, first locks changed 20 (of 32, since the last read)
+step 130: fixed comparison 0.889581; trajectories changed 32, sections changed 27, first locks changed 22 (of 32, since the last read)
+step 140: fixed comparison 0.867945; trajectories changed 32, sections changed 28, first locks changed 22 (of 32, since the last read)
+step 150: rho 0.7835; held-out release: released 128, whole 23, stations 659, first lock at 0/1 0, first lock right 96, consistent 54; teacher-forced 922/1024; |E| max 3.596; 592 s
+step 150: fixed comparison 0.728034; trajectories changed 32, sections changed 28, first locks changed 11 (of 32, since the last read)
+step 160: fixed comparison 0.681480; trajectories changed 32, sections changed 28, first locks changed 20 (of 32, since the last read)
+step 170: fixed comparison 0.984020; trajectories changed 32, sections changed 31, first locks changed 20 (of 32, since the last read)
+step 180: fixed comparison 0.726307; trajectories changed 32, sections changed 31, first locks changed 20 (of 32, since the last read)
+step 190: fixed comparison 0.820451; trajectories changed 32, sections changed 32, first locks changed 18 (of 32, since the last read)
+step 200: rho 0.7545; held-out release: released 128, whole 35, stations 711, first lock at 0/1 0, first lock right 102, consistent 62; teacher-forced 978/1024; |E| max 3.732; 762 s
+step 200: fixed comparison 0.624827; trajectories changed 32, sections changed 29, first locks changed 15 (of 32, since the last read)
+step 210: fixed comparison 0.476062; trajectories changed 30, sections changed 24, first locks changed 8 (of 32, since the last read)
+step 220: fixed comparison 0.605835; trajectories changed 29, sections changed 25, first locks changed 6 (of 32, since the last read)
+step 230: fixed comparison 0.456938; trajectories changed 29, sections changed 21, first locks changed 10 (of 32, since the last read)
+step 240: fixed comparison 0.467650; trajectories changed 29, sections changed 20, first locks changed 4 (of 32, since the last read)
+step 250: rho 0.7256; held-out release: released 128, whole 50, stations 761, first lock at 0/1 0, first lock right 120, consistent 87; teacher-forced 1003/1024; |E| max 3.756; 932 s
+step 250: fixed comparison 0.472880; trajectories changed 31, sections changed 20, first locks changed 3 (of 32, since the last read)
+step 260: fixed comparison 0.467817; trajectories changed 25, sections changed 22, first locks changed 6 (of 32, since the last read)
+step 270: fixed comparison 0.455246; trajectories changed 27, sections changed 23, first locks changed 5 (of 32, since the last read)
+step 280: fixed comparison 0.373413; trajectories changed 25, sections changed 17, first locks changed 6 (of 32, since the last read)
+step 290: fixed comparison 0.438876; trajectories changed 23, sections changed 17, first locks changed 3 (of 32, since the last read)
+step 300: rho 0.7169; held-out release: released 128, whole 71, stations 869, first lock at 0/1 0, first lock right 128, consistent 86; teacher-forced 1001/1024; |E| max 3.808; 1139 s
+step 300: fixed comparison 0.362997; trajectories changed 19, sections changed 12, first locks changed 1 (of 32, since the last read)
+step 310: fixed comparison 0.374090; trajectories changed 18, sections changed 10, first locks changed 0 (of 32, since the last read)
+step 320: fixed comparison 0.366594; trajectories changed 15, sections changed 9, first locks changed 1 (of 32, since the last read)
+step 330: fixed comparison 0.334587; trajectories changed 18, sections changed 10, first locks changed 3 (of 32, since the last read)
+step 340: fixed comparison 0.304126; trajectories changed 10, sections changed 5, first locks changed 1 (of 32, since the last read)
+step 350: rho 0.7111; held-out release: released 128, whole 63, stations 833, first lock at 0/1 0, first lock right 128, consistent 78; teacher-forced 1004/1024; |E| max 3.889; 1339 s
+step 350: fixed comparison 0.325958; trajectories changed 6, sections changed 3, first locks changed 2 (of 32, since the last read)
+step 360: fixed comparison 0.322750; trajectories changed 9, sections changed 5, first locks changed 1 (of 32, since the last read)
+step 370: fixed comparison 0.349585; trajectories changed 10, sections changed 6, first locks changed 1 (of 32, since the last read)
+step 380: fixed comparison 0.331435; trajectories changed 7, sections changed 4, first locks changed 1 (of 32, since the last read)
+step 390: fixed comparison 0.342635; trajectories changed 2, sections changed 1, first locks changed 1 (of 32, since the last read)
+step 400: rho 0.7097; held-out release: released 128, whole 57, stations 817, first lock at 0/1 0, first lock right 128, consistent 72; teacher-forced 1002/1024; |E| max 3.887; 1529 s
+rho final 0.7097488731898256
+eO_fit ['order2', '400', '256', '303', '0.03', '0.05', '1', '16']: 1529 s, peak 316731392 bytes
+exit 0

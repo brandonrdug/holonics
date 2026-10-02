@@ -1485,6 +1485,9 @@ pub(super) fn move_once(terrain: &str, seed: u64, count: usize, out: &str, sourc
         );
         println!("{}", move_line(0, &moved, started.elapsed().as_millis()));
         println!("{}", trial_line(&moved));
+        if std::env::var("DECISION_DIFF").is_ok() {
+            decision_diff(&moved.before, moved.trials.last().and_then(|t| t.after.as_ref()));
+        }
         match &moved.adopted {
             Some((successor, _)) => {
                 let own = moved.trials.last().and_then(|t| t.after.as_ref()).expect("the adopted trial's own release");
@@ -1520,6 +1523,51 @@ pub(super) fn move_once(terrain: &str, seed: u64, count: usize, out: &str, sourc
 /// the top class, the target's and the leading rival's growth enclosures (the ordering margin) and
 /// the first-order bound on the exact storage move; then each request's released section before and
 /// after against its targets. Every term is printed, none selected after the outcome.
+/// [measured-diagnostic; October 2] **The own release decision by decision, the incumbent against
+/// the smallest trial** (`DECISION_DIFF`): per request and per decision term, the section the term is
+/// read at, the top class and the lock face `ℓ` (lower ends, `/4096` nats), and whether the term's
+/// section or its top moved: a flipped decision upstream changes the section, a flip at the term
+/// changes its top.
+fn decision_diff(before: &BatchComparison, after: Option<&BatchComparison>) {
+    let Some(after) = after else {
+        println!("    decision diff: the smallest trial has no own release");
+        return;
+    };
+    let low = |x: &holonics::ratio::algebraic::ExactInterval| (&x.lower * Rat::from_integer(4096.into())).floor();
+    for (r, (b, a)) in before.requests.iter().zip(&after.requests).enumerate() {
+        let sb = b.generation.as_ref().map(|g| format!("{:?}", g.release.emitted));
+        let sa = a.generation.as_ref().map(|g| format!("{:?}", g.release.emitted));
+        println!(
+            "    request {r}: L {} -> {} (/4096); section {} -> {}",
+            low(&b.value),
+            low(&a.value),
+            sb.unwrap_or_default(),
+            sa.unwrap_or_default()
+        );
+        for tb in &b.terms {
+            let ta = a.terms.iter().find(|t| t.site.station == tb.site.station);
+            match ta {
+                Some(ta) => {
+                    let moved_section = ta.site.cells != tb.site.cells;
+                    let moved_top = ta.comparison.top != tb.comparison.top;
+                    println!(
+                        "      station {}: target {}, top {} -> {}, ℓ {} -> {}{}{}",
+                        tb.site.station,
+                        tb.comparison.target,
+                        tb.comparison.top,
+                        ta.comparison.top,
+                        low(&tb.value),
+                        low(&ta.value),
+                        if moved_section { ", section moved" } else { "" },
+                        if moved_top { ", top flipped" } else { "" },
+                    );
+                }
+                None => println!("      station {}: absent after", tb.site.station),
+            }
+        }
+    }
+}
+
 pub(super) fn margins(terrain: &str, seed: u64, count: usize, before: &str, after: &str) {
     use holonics::hnn::executed::move_margins;
     let clock = Instant::now();
