@@ -168,6 +168,71 @@ trial already reads both: the fixed mask at the trial, and the own release at th
 as `η → 0` while the fixed mask's certified decrease falls in proportion to `η`. That is why halving
 cannot pay for it, which is §12's `one_move_closes_iff` read from the other side.
 
+## 2b. A true crossing: located at first order, paid at zeroth order
+
+The main line's replay finds `m7`'s flip a true crossing of two certain gaps (§5). The released
+classes do not change. The jump, `+33987/4096`, comes from later stations being read with
+different data placed before them. This section states what such a crossing costs and what bounds
+it.
+
+**The comparison along a step has walls.** [derived; §1, §2] Inside a region of constitutions where
+the commitment order is fixed, the comparison is read on fixed sections and is continuous in the
+constitution; the first-order law certifies it. Where two certain gaps cross, the order changes and
+the comparison jumps by
+
+```text
+J_c = Σ_(j∈D) [ℓ_j(Θ_c; S′_j) − ℓ_j(Θ_c; S_j)]
+```
+
+with both sums read at the **same** constitution `Θ_c` at the crossing, and `D` the stations read
+with different placed data (those open at the first changed refinement, §2). Only the order of
+commitment differs. So `J_c` is a property of the crossing itself, not of the step that reaches it:
+it stays as the step shrinks onto the crossing. The location is a first-order event (the margin
+moves at a rate the first-order readings give; at `m7` it crosses at `731/840` of the step under
+linear motion), and the cost is a zeroth-order one, a wall in the comparison.
+
+**What bounds the cost.** [proved-derived; formal-checked] A lock face `ℓ = log(1 + a + r) − log a`
+moves by at most twice its readings' largest log change (`lockFace_sub_abs_le`). If station `j`'s
+target reading and rivals' sum change by at most a factor `e^(δ_j)` between its two contexts, then
+
+```text
+|J_c| ≤ 2 Σ_(j∈D) δ_j          (crossing_cost_le)
+```
+
+Physically `δ_j` is the largest change in a class's growth exponent per turn that the different
+placed data cause at station `j`. At `m7`, `J_c = 33987/4096`, so the re-read stations' exponents
+changed by at least `33987/8192` nats in total.
+
+**What the chain owns before the crossing.**
+- [derived, from the lattice floor (`lockFace_le_of_floor`, the release's follow-up)] With every
+  reading at least the floor `ρ₀`, each face is at most `log((1 + A_j)/ρ₀)`, `A_j` the station's readings' sum. So
+  `|J_c| ≤ Σ_(j∈D) log((1 + A_j)/ρ₀)`: finite, a priori, and far from tight.
+- Nothing bounds `δ_j` in advance. A placed datum adds a finite-rank term to the storage, and a
+  reading is the spectral radius of a monodromy that is not self-adjoint. That radius moves
+  Lipschitz in the data only away from a coalescence of multipliers, the segment bound #62 owes.
+- No law signs `J_c` (§2: context values are not monotone in the placed data).
+
+So a crossing's cost is **not** bounded before it is read, except by the floor's coarse bound. Once
+the crossing is located it is read exactly, in two reads: the carried states on either side of the
+crossing's cut, at which `S_j` and `S′_j` are the two orders.
+
+**The treatment that follows.** [agent-inferred; from `own_telescopes`, §12's `one_move_closes_iff`
+and the carried-cuts record's step law (#211)] With the crossing located at its cut:
+1. **Stop before the wall.** The last carried state before the cut has the incumbent's commitments,
+   so its decrease is the fixed mask's, certified at first order. No run is needed.
+2. **Cross when the wall is negative.** If `J_c` plus the continuous change across the cut is
+   negative, the crossing is a decrease read exactly, taken in one move.
+3. **A positive wall needs a run.** If `J_c > 0`, as at `m7`, one move cannot pay it: the move's
+   decrease scales with its step and `J_c` does not (§12). Crossing it is a run of moves that must
+   close one receiver grain below its opening state (the release's rule).
+
+So the run-of-moves acceptance is the right treatment for crossing a positive wall, and only for
+that. It is not the only treatment of a crossing. A located crossing gives a certified alternative:
+descend to the wall and stop, or cross a negative wall in one move. A positive wall is a barrier
+between two commitment orders that a zero-temperature release crosses only by an excursion, the run
+of moves with its height `h`. Whether to cross it is the endpoint comparison between the two states
+the run joins, and nothing in the chain decides that sooner.
+
 ## 3. Whether the move can certify the flip it causes
 
 ### 3a. By a first-order bound on the own release: no
@@ -370,6 +435,8 @@ location along the step is the carried-cuts record's prediction
   `cell_holds_until_cut`, `cell_moves_at_cut`, `cut_within_cell`. Each depends only on `propext`,
   `Classical.choice` and `Quot.sound` (the audit's `#print axioms`). Checked with
   `lake env lean Holonics/HNN/ExecutedComparison.lean`: no errors, no `sorry`.
+- **Lean, §13, the crossing's cost**: `lockFace_sub_abs_le`, `crossing_cost_le`; the same axioms
+  only.
 - **Lean, §14** (`section CertifiedLock`): `certifiedLock`, `certifiedLock_largest`,
   `leader_locks`, `certifiedLock_exact`, `lone_lock_is_largest`,
   `certified_order_needs_crossing`, `order_solved_locks_no_wrong`; the same axioms only.

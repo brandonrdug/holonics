@@ -1798,7 +1798,11 @@ What a native move can certify about it, each statement on one coordinate `η` o
   (`cell_holds_until_cut`, `cell_moves_at_cut`); the first such step lies anywhere in
   `(0, w/v]` (`cut_within_cell`), set by the reading's place inside its cell, which the enclosure
   does not carry. A tie, or a margin within the summed cell widths, can therefore flip at an
-  arbitrarily small step. -/
+  arbitrarily small step.
+- **A crossing costs at most twice the re-read stations' log changes** (`lockFace_sub_abs_le`,
+  `crossing_cost_le`): the jump is read at one constitution on two commitment orders, so it does
+  not shrink with the step, and it is bounded by how much the different placed data change the
+  re-read stations' readings, which no owner bounds in advance. -/
 
 section Flip
 
@@ -1870,6 +1874,47 @@ theorem cut_within_cell {w x v : ℝ} (hw : 0 < w) (hv : 0 < v) :
   constructor
   · apply div_pos _ hv; nlinarith
   · apply div_le_div_of_nonneg_right _ hv.le; nlinarith
+
+/-- [proved-derived; formal-checked] **A lock face moves by at most twice its readings' largest
+log change.** If the target's reading and the rivals' sum each change by at most a factor `e^δ`
+either way, the face `ℓ = log(1 + a + r) − log a` changes by at most `2δ`: `log(1 + a + r)` by at
+most `δ` (the resting weight one only dilutes the change), and `log a` by at most `δ`. -/
+theorem lockFace_sub_abs_le {a r a' r' δ : ℝ} (ha : 0 < a) (hr : 0 ≤ r) (ha' : 0 < a')
+    (hr' : 0 ≤ r') (hδ : 0 ≤ δ) (ha1 : a' ≤ Real.exp δ * a) (ha2 : a ≤ Real.exp δ * a')
+    (hr1 : r' ≤ Real.exp δ * r) (hr2 : r ≤ Real.exp δ * r') :
+    |lockFace a' r' - lockFace a r| ≤ 2 * δ := by
+  have he : 1 ≤ Real.exp δ := Real.one_le_exp hδ
+  have hep : 0 < Real.exp δ := Real.exp_pos δ
+  have hP : 0 < 1 + a + r := by linarith
+  have hP' : 0 < 1 + a' + r' := by linarith
+  have hP1 : 1 + a' + r' ≤ Real.exp δ * (1 + a + r) := by nlinarith
+  have hP2 : 1 + a + r ≤ Real.exp δ * (1 + a' + r') := by nlinarith
+  have hlog : ∀ {x y : ℝ}, 0 < x → 0 < y → x ≤ Real.exp δ * y → Real.log x ≤ δ + Real.log y := by
+    intro x y hx hy hxy
+    have := Real.log_le_log hx hxy
+    rwa [Real.log_mul hep.ne' hy.ne', Real.log_exp] at this
+  have l1 := hlog hP' hP hP1
+  have l2 := hlog hP hP' hP2
+  have l3 := hlog ha' ha ha1
+  have l4 := hlog ha ha' ha2
+  unfold lockFace
+  rw [Real.log_div hP'.ne' ha'.ne', Real.log_div hP.ne' ha.ne', abs_le]
+  constructor <;> linarith
+
+/-- [proved-derived; formal-checked] **A crossing costs at most twice the re-read stations' log
+changes.** A crossing re-reads the stations `D` with different placed data before them. If station
+`j`'s target reading and rivals' sum change by at most a factor `e^(δ j)` between its two contexts,
+the jump in the comparison, `J = Σ_(j∈D) (ℓ′_j − ℓ_j)`, has `|J| ≤ 2 Σ_(j∈D) δ j`. -/
+theorem crossing_cost_le {ι : Type*} (D : Finset ι) (a r a' r' δ : ι → ℝ)
+    (ha : ∀ j ∈ D, 0 < a j) (hr : ∀ j ∈ D, 0 ≤ r j) (ha' : ∀ j ∈ D, 0 < a' j)
+    (hr' : ∀ j ∈ D, 0 ≤ r' j) (hδ : ∀ j ∈ D, 0 ≤ δ j)
+    (ha1 : ∀ j ∈ D, a' j ≤ Real.exp (δ j) * a j) (ha2 : ∀ j ∈ D, a j ≤ Real.exp (δ j) * a' j)
+    (hr1 : ∀ j ∈ D, r' j ≤ Real.exp (δ j) * r j) (hr2 : ∀ j ∈ D, r j ≤ Real.exp (δ j) * r' j) :
+    |∑ j ∈ D, (lockFace (a' j) (r' j) - lockFace (a j) (r j))| ≤ 2 * ∑ j ∈ D, δ j := by
+  rw [Finset.mul_sum]
+  refine (Finset.abs_sum_le_sum_abs _ _).trans (Finset.sum_le_sum fun j hj => ?_)
+  exact lockFace_sub_abs_le (ha j hj) (hr j hj) (ha' j hj) (hr' j hj) (hδ j hj) (ha1 j hj)
+    (ha2 j hj) (hr1 j hj) (hr2 j hj)
 
 end Flip
 
@@ -2049,6 +2094,8 @@ section Audit
 #print axioms certifiedLock_exact
 #print axioms lone_lock_is_largest
 #print axioms certified_order_needs_crossing
+#print axioms lockFace_sub_abs_le
+#print axioms crossing_cost_le
 #print axioms order_solved_locks_no_wrong
 
 end Audit
