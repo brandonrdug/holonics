@@ -79,6 +79,16 @@ Frobenius norm `frobSq`; a certificate is a declared rational bound, never a flo
    (`carried_chart_release_read`). Under the ℓ1 certificate `Σ|p_j| < 2^127`, every partial sum
    in any order lies in `(−2^127, 2^127)` (`carrier_partial_sum`), so the 128-bit ring read is
    the integer sum (`carrier_ring_read`).
+8. **The solved chart's refinement, with both the residual and the chart rounded.** With the
+   residual read at the chart's lattice, `R̃ = R + E`, and the product rounded, `X'' = X + R̃X + Δ`,
+   `1 − X''H = R² − E·XH − ΔH` in any ring (`rounded_residual_refinement_left`), so
+   `‖1 − X''H‖∞ ≤ δ² + n·2^(−L)/2·(1 + δ) + n·2^(−L)/2·‖H‖∞`
+   (`rounded_residual_refinement_certificate_left`). The constitution's solved chart forms only the
+   upper triangle and mirrors it (`solvedRefine`). For symmetric `X` and `H` the mirror carries the
+   transpose of the residual's rounding, which `XH ≈ 1` no longer absorbs:
+   `‖1 − X''H‖∞ ≤ δ² + n·2^(−L)/2·(1 + 2‖X‖∞)·‖H‖∞` (`solved_refinement_certificate`), and a
+   certificate at most `c ≤ 1/2` stays there when twice that rounding term is at most `c`
+   (`solved_refinement_stays`).
 
 The balance of the full element with its passive part and contrast port at an executed chart is
 `HNN/Word.element_executed_balance` (campaign 2): for any executed output `ŝ′`,
@@ -1030,6 +1040,180 @@ theorem carrier_ring_read {ι : Type*} (s : Finset ι) (p : ι → ℤ)
 
 end Carrier
 
+/-! ## 8. The solved chart's refinement: the residual rounded, the product rounded, the upper
+triangle mirrored
+
+The constitution's solved chart (`hnn/constitution.rs`, `refined`) refines a symmetric chart `X̂`
+of a symmetric Gram `H` in the left form with both the residual and the refined chart rounded: the
+residual `1 − X̂H` read at the chart's lattice, the product `R̃X̂` rounded there, and only the upper
+triangle formed and mirrored. -/
+
+section SolvedRefinement
+
+/-- [proved-derived; formal-checked] **The refinement with a rounded residual** (left form): with
+`R = 1 − XH`, a residual read as `R + E`, and the refined chart `X + (R + E)X + Δ`,
+`1 − (X + (R + E)X + Δ)H = R² − E(XH) − ΔH` exactly, in any ring. The residual's rounding enters
+through `XH = 1 − R`, so a certified chart does not amplify it. -/
+theorem rounded_residual_refinement_left {M : Type*} [Ring M] (H X E Δ : M) :
+    1 - (X + ((1 - X * H) + E) * X + Δ) * H = (1 - X * H) ^ 2 - E * (X * H) - Δ * H := by
+  noncomm_ring
+
+variable {n : Type*} [Fintype n] [DecidableEq n]
+
+/-- [proved-derived; formal-checked] **The rounded refinement with a rounded residual keeps a
+certified residual** (left form, the whole product formed): the residual `R = 1 − XH` read at the
+lattice and the product `R̃X` rounded there give
+`‖1 − X''H‖∞ ≤ ‖R‖∞² + n·2^(−L)/2·(1 + ‖R‖∞) + n·2^(−L)/2·‖H‖∞`. -/
+theorem rounded_residual_refinement_certificate_left (L : ℕ) (H X : Matrix n n ℚ) :
+    rowNorm (1 - (X + latticeChart L (latticeChart L (1 - X * H) * X)) * H) ≤
+      rowNorm (1 - X * H) ^ 2 + Fintype.card n * (unit L / 2) * (1 + rowNorm (1 - X * H)) +
+        Fintype.card n * (unit L / 2) * rowNorm H := by
+  set R := 1 - X * H with hR
+  set E := latticeChart L R - R with hE
+  set Y := latticeChart L R * X with hY
+  set Δ := latticeChart L Y - Y with hΔ
+  have hsplit : X + latticeChart L Y = X + (R + E) * X + Δ := by
+    have hRE : R + E = latticeChart L R := by rw [hE]; abel
+    rw [hRE, hΔ, hY]; abel
+  have hid := rounded_residual_refinement_left H X E Δ
+  rw [← hR] at hid
+  rw [hsplit, hid]
+  have hXH : rowNorm (X * H) ≤ 1 + rowNorm R := by
+    have : X * H = 1 - R := by rw [hR, sub_sub_cancel]
+    rw [this]
+    exact (rowNorm_sub_le _ _).trans (add_le_add rowNorm_one_le le_rfl)
+  have hEb : rowNorm E ≤ Fintype.card n * (unit L / 2) := rowNorm_latticeChart_sub L R
+  have hΔb : rowNorm Δ ≤ Fintype.card n * (unit L / 2) := rowNorm_latticeChart_sub L Y
+  have hu : 0 ≤ Fintype.card n * (unit L / 2) := by have := unit_pos L; positivity
+  calc rowNorm (R ^ 2 - E * (X * H) - Δ * H)
+      ≤ rowNorm (R ^ 2) + rowNorm (E * (X * H)) + rowNorm (Δ * H) :=
+        (rowNorm_sub_le _ _).trans (add_le_add (rowNorm_sub_le _ _) le_rfl)
+    _ ≤ rowNorm R ^ 2 + Fintype.card n * (unit L / 2) * (1 + rowNorm R) +
+          Fintype.card n * (unit L / 2) * rowNorm H := by
+        refine add_le_add (add_le_add (rowNorm_pow_le _ 2) ?_) ?_
+        · exact (rowNorm_mul_le _ _).trans
+            (mul_le_mul hEb hXH (rowNorm_nonneg _) hu)
+        · exact (rowNorm_mul_le _ _).trans
+            (mul_le_mul_of_nonneg_right hΔb (rowNorm_nonneg _))
+
+variable [LinearOrder n]
+
+/-- [definition] **The upper triangle mirrored**: entry `(i, j)` read at `(min i j, max i j)`. -/
+def upperMirror (Y : Matrix n n ℚ) : Matrix n n ℚ :=
+  Matrix.of fun i j => if i ≤ j then Y i j else Y j i
+
+/-- [definition] **The solved chart's executed refinement** (`refined` in `hnn/constitution.rs`):
+the residual `1 − XH` read at the lattice, the product with `X` rounded there and added, the upper
+triangle formed and mirrored. -/
+def solvedRefine (L : ℕ) (H X : Matrix n n ℚ) : Matrix n n ℚ :=
+  upperMirror (X + latticeChart L (latticeChart L (1 - X * H) * X))
+
+/-- [proved-derived; formal-checked] **The solved chart's refinement keeps a certified residual**:
+for symmetric `X` and `H`, `‖1 − X''H‖∞ ≤ ‖R‖∞² + n·2^(−L)/2·(1 + 2‖X‖∞)·‖H‖∞`. The exact
+refinement `X + RX` is symmetric, so `X'' − (X + RX)` is, entry by entry, the product's rounding
+plus the residual's rounding `EX` read at `(min i j, max i j)`; its row sums are at most
+`n·2^(−L)/2 + ‖EX‖∞ + ‖(EX)ᵀ‖∞`. The mirror's term `(EX)ᵀH = XEᵀH` meets no `XH ≈ 1`, which is
+the `2‖X‖∞‖H‖∞` the whole product
+(`rounded_residual_refinement_certificate_left`) does not carry. -/
+theorem solved_refinement_certificate (L : ℕ) {H X : Matrix n n ℚ} (hX : Xᵀ = X)
+    (hH : Hᵀ = H) :
+    rowNorm (1 - solvedRefine L H X * H) ≤
+      rowNorm (1 - X * H) ^ 2 +
+        Fintype.card n * (unit L / 2) * (1 + 2 * rowNorm X) * rowNorm H := by
+  set R := 1 - X * H with hR
+  set E := latticeChart L R - R with hE
+  set Y := latticeChart L R * X with hY
+  set D := latticeChart L Y - Y with hD
+  set Δ := solvedRefine L H X - nsStep H X with hΔ
+  have hns : nsStep H X = X + R * X := by
+    rw [(nsStep_eq H X).2.2, hR]; noncomm_ring
+  have hRX : ∀ i j, (R * X) i j = (R * X) j i := by
+    have hT : (R * X)ᵀ = R * X := by
+      rw [transpose_mul, hX, hR, transpose_sub, transpose_one, transpose_mul, hX, hH]
+      noncomm_ring
+    intro i j
+    conv_lhs => rw [← hT]
+    rfl
+  have hYsplit : Y = R * X + E * X := by
+    have hRE : latticeChart L R = R + E := by rw [hE]; abel
+    rw [hY, hRE, Matrix.add_mul]
+  have hu0 : 0 ≤ unit L / 2 := by have := unit_pos L; positivity
+  have hDb : ∀ i j, |D i j| ≤ unit L / 2 := latticeChart_round L Y
+  have hEb : ∀ i j, |E i j| ≤ unit L / 2 := latticeChart_round L R
+  have hent : ∀ i j, |Δ i j| ≤ unit L / 2 + |(E * X) i j| + |(E * X) j i| := by
+    intro i j
+    have hZ : ∀ a b, latticeChart L Y a b = (R * X) a b + (E * X) a b + D a b := by
+      intro a b
+      simp only [hD, Matrix.sub_apply, hYsplit, Matrix.add_apply]; ring
+    by_cases hij : i ≤ j
+    · have : Δ i j = D i j + (E * X) i j := by
+        simp only [hΔ, solvedRefine, upperMirror, Matrix.sub_apply, Matrix.of_apply, if_pos hij,
+          Matrix.add_apply, hns, ← hR, ← hY, hZ]
+        ring
+      rw [this]
+      calc |D i j + (E * X) i j| ≤ |D i j| + |(E * X) i j| := abs_add_le _ _
+        _ ≤ unit L / 2 + |(E * X) i j| + |(E * X) j i| := by
+          linarith [hDb i j, abs_nonneg ((E * X) j i)]
+    · have hXij : X j i = X i j := by rw [← transpose_apply X i j, hX]
+      have : Δ i j = D j i + (E * X) j i := by
+        simp only [hΔ, solvedRefine, upperMirror, Matrix.sub_apply, Matrix.of_apply, if_neg hij,
+          Matrix.add_apply, hns, ← hR, ← hY, hZ, hXij, hRX i j]
+        ring
+      rw [this]
+      calc |D j i + (E * X) j i| ≤ |D j i| + |(E * X) j i| := abs_add_le _ _
+        _ ≤ unit L / 2 + |(E * X) i j| + |(E * X) j i| := by
+          linarith [hDb j i, abs_nonneg ((E * X) i j)]
+  have hEXT : (E * X)ᵀ = X * Eᵀ := by rw [transpose_mul, hX]
+  have hEn : rowNorm E ≤ Fintype.card n * (unit L / 2) := rowNorm_latticeChart_sub L R
+  have hETn : rowNorm Eᵀ ≤ Fintype.card n * (unit L / 2) :=
+    rowNorm_le_card_mul hu0 fun i j => by rw [transpose_apply]; exact hEb j i
+  have hΔn : rowNorm Δ ≤ Fintype.card n * (unit L / 2) * (1 + 2 * rowNorm X) := by
+    have hX0 := rowNorm_nonneg X
+    have hc : 0 ≤ Fintype.card n * (unit L / 2) * (1 + 2 * rowNorm X) := by positivity
+    refine rowNorm_le hc fun i => ?_
+    calc ∑ j, |Δ i j| ≤ ∑ j, (unit L / 2 + |(E * X) i j| + |(E * X) j i|) :=
+          Finset.sum_le_sum fun j _ => hent i j
+      _ = Fintype.card n * (unit L / 2) + ∑ j, |(E * X) i j| + ∑ j, |(E * X)ᵀ i j| := by
+          simp only [Finset.sum_add_distrib, Finset.sum_const, Finset.card_univ, nsmul_eq_mul,
+            transpose_apply]
+      _ ≤ Fintype.card n * (unit L / 2) + rowNorm (E * X) + rowNorm ((E * X)ᵀ) :=
+          add_le_add (add_le_add le_rfl (row_sum_le_rowNorm _ i)) (row_sum_le_rowNorm _ i)
+      _ ≤ Fintype.card n * (unit L / 2) + Fintype.card n * (unit L / 2) * rowNorm X +
+            rowNorm X * (Fintype.card n * (unit L / 2)) := by
+          rw [hEXT]
+          refine add_le_add (add_le_add le_rfl ?_) ?_
+          · exact (rowNorm_mul_le _ _).trans (mul_le_mul_of_nonneg_right hEn hX0)
+          · exact (rowNorm_mul_le _ _).trans (mul_le_mul_of_nonneg_left hETn hX0)
+      _ = Fintype.card n * (unit L / 2) * (1 + 2 * rowNorm X) := by ring
+  have hsplit : solvedRefine L H X = nsStep H X + Δ := by rw [hΔ]; abel
+  rw [hsplit, rounded_refinement_residual_left, ← hR]
+  calc rowNorm (R ^ 2 - Δ * H) ≤ rowNorm (R ^ 2) + rowNorm (Δ * H) := rowNorm_sub_le _ _
+    _ ≤ rowNorm R ^ 2 + Fintype.card n * (unit L / 2) * (1 + 2 * rowNorm X) * rowNorm H :=
+        add_le_add (rowNorm_pow_le _ 2)
+          ((rowNorm_mul_le _ _).trans (mul_le_mul_of_nonneg_right hΔn (rowNorm_nonneg _)))
+
+/-- [proved-derived; formal-checked] **The solved chart's certificate does not grow** when the
+lattice covers the mirror: if `c ≤ 1/2`, `‖X‖∞ ≤ ρ`, twice the rounding term
+`n·2^(−L)/2·(1 + 2ρ)·‖H‖∞` is at most `c`, and the chart's residual is at most `c`, then the
+refined chart's residual is at most `c`: `δ² + ε ≤ c² + c/2 ≤ c`. -/
+theorem solved_refinement_stays (L : ℕ) {H X : Matrix n n ℚ} (hX : Xᵀ = X) (hH : Hᵀ = H)
+    {c ρ : ℚ} (hc : c ≤ 1 / 2) (hρ : rowNorm X ≤ ρ)
+    (hε : 2 * (Fintype.card n * (unit L / 2) * (1 + 2 * ρ) * rowNorm H) ≤ c)
+    (h0 : rowNorm (1 - X * H) ≤ c) :
+    rowNorm (1 - solvedRefine L H X * H) ≤ c := by
+  have hstep := solved_refinement_certificate L hX hH
+  have hδ0 := rowNorm_nonneg (1 - X * H)
+  have hc0 : 0 ≤ c := hδ0.trans h0
+  have hsq : rowNorm (1 - X * H) ^ 2 ≤ c ^ 2 := pow_le_pow_left₀ hδ0 h0 2
+  have hu : 0 ≤ Fintype.card n * (unit L / 2) := by have := unit_pos L; positivity
+  have hmono : Fintype.card n * (unit L / 2) * (1 + 2 * rowNorm X) * rowNorm H ≤
+      Fintype.card n * (unit L / 2) * (1 + 2 * ρ) * rowNorm H :=
+    mul_le_mul_of_nonneg_right
+      (mul_le_mul_of_nonneg_left (by linarith) hu) (rowNorm_nonneg H)
+  nlinarith
+
+end SolvedRefinement
+
 section Audit
 
 #print axioms newton_schulz_right
@@ -1081,6 +1265,10 @@ section Audit
 #print axioms carried_chart_release_read
 #print axioms carrier_partial_sum
 #print axioms carrier_ring_read
+#print axioms rounded_residual_refinement_left
+#print axioms rounded_residual_refinement_certificate_left
+#print axioms solved_refinement_certificate
+#print axioms solved_refinement_stays
 
 end Audit
 

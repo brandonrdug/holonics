@@ -437,6 +437,7 @@
 //! | `HNN/Normal.normal_prox_step` at the carried Gram, with `HNN/LatticeDeposit.within_one_unit_since_founding` | [`NormalLaw`]: `W` is the prox iterate at the carried Gram `H'` (`B` is not carried, so `W` is not the minimizer of the accumulated `J(W)`), and `H` stays within one unit of the exact statistic `I + Σ w f fᵀ` |
 //! | `HNN/Normal.normal_prox_step`, `depositLocus_solves`; `HNN/LatticeWord.{prox_chart_residual, prox_chart_certificate}` | [`NormalLaw::deposited`] (the step at the carried Gram through the executed chart, its residual released and reported: [`ChartReading`]) |
 //! | `HNN/LatticeWord.{nsStep, newton_schulz_left, rounded_refinement_residual_left, rounded_refinement_certificate_left, rowNorm, latticeChart}` | [`SolvedChart`] (the certificate and the rounded refinement) |
+//! | `HNN/LatticeWord.{rounded_residual_refinement_left, rounded_residual_refinement_certificate_left, solvedRefine, solved_refinement_certificate, solved_refinement_stays}` | [`SolvedChart`] (the refinement with the residual rounded too, and the mirrored triangle) |
 //! | `HNN/LatticeWord.{warm_start_residual, warm_start_certificate}` | [`SolvedChart`] (why the warm start takes the window's rank-one steps) |
 //! | `HNN/LatticeWord.{warm_start_window, warm_start_window_exact, warm_start_window_certificate}` | [`SolvedChart`] (the window's rank-one warm start keeps the chart's residual) |
 //! | `HNN/LatticeWord.{chart_release_read, carried_chart_release_read}` | [`ChartRule::read`] (the released prox residual's move of a read) |
@@ -1070,14 +1071,23 @@ const RESIDUAL_SHIFT: u32 = 125;
 /// returns reach ([`ChartReading::read`]), so the unit-scale assumption is measured, as the lattice
 /// rule's is.
 ///
-/// **Why the lattice.** A rounded refinement adds to the certificate the chart's rounding
-/// `‖ΔH'‖∞ ≤ n·2^(−L_s)/2·‖H'‖∞` (`rounded_refinement_certificate_left`) and the residual's rounding at
-/// the chart's lattice, `‖(R̃ − R)X̂H'‖∞ ≤ n·2^(−L_s)/2·(1 + δ)`; together at most
-/// `2n·2^(−L_s)‖H'‖∞ ≤ δ_ℓ/2`, so from any certificate at most `δ_ℓ` every rounded refinement stays
-/// at most `δ_ℓ` (`roundedIter_certificate` at `c = δ_ℓ ≤ 1/2`), and from above it the certificates
-/// fall to the fixed point near `δ_ℓ/2`. The Gram's own norm is read at each deposit, as the clock's
-/// Elias-gamma length is: the lattice refines as the Gram grows, and never coarsens (a coarser chart
-/// is a finer one's lattice point). Brandon may override the rule.
+/// **Why the lattice.** A rounded refinement that forms the whole product adds to the certificate
+/// the chart's rounding `‖ΔH'‖∞ ≤ n·2^(−L_s)/2·‖H'‖∞` and the residual's rounding at the chart's
+/// lattice, `‖(R̃ − R)X̂H'‖∞ ≤ n·2^(−L_s)/2·(1 + δ)` (`rounded_residual_refinement_certificate_left`);
+/// together at most `2n·2^(−L_s)‖H'‖∞ ≤ δ_ℓ/2`, so from any certificate at most `δ_ℓ` every rounded
+/// refinement stays at most `δ_ℓ` (`roundedIter_certificate` at `c = δ_ℓ ≤ 1/2`), and from above it
+/// the certificates fall to the fixed point near `δ_ℓ/2`. The executed step forms the upper
+/// triangle and mirrors it (`refined`), which carries the residual's rounding transposed through
+/// `X̂`, where `X̂H' ≈ 1` no longer absorbs it: `‖1 − X''H'‖∞ ≤ δ² + n·2^(−L_s)/2·(1 + 2‖X̂‖∞)‖H'‖∞`
+/// (`solved_refinement_certificate`), and the certificate stays at most `δ_ℓ` when twice that
+/// rounding term is (`solved_refinement_stays`). The rule counts `n` and `‖H'‖∞` but not `‖X̂‖∞`.
+/// [open] (#62) the lattice owes `⌈log₂(1 + 2‖X̂‖∞)⌉` more bits, or the step owes the whole product.
+/// Every certificate is computed exactly, so a refinement the lattice does not carry restarts cold
+/// and, short of `δ_ℓ` within the rule's count, is refused
+/// ([`ExactLinearError::InverseCertificateFailure`]); no chart above `δ_ℓ` is released. The Gram's
+/// own norm is read at each deposit, as the clock's Elias-gamma length is: the lattice refines as
+/// the Gram grows, and never coarsens (a coarser chart is a finer one's lattice point). Brandon may
+/// override the rule.
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub struct ChartRule {
     lattice: Lattice,
@@ -1393,10 +1403,11 @@ fn certified(block: &[i128], gram: &[i128], s: usize, shift: u32) -> Option<(Vec
 }
 
 /// **One rounded Newton–Schulz refinement, left form** (Lean `nsStep`, `newton_schulz_left`,
-/// `rounded_refinement_certificate_left`): `X' = round(X + R̃X)` on `2^(−L_s)ℤ`, with `R̃` the certified
-/// residual `P·2^(−L_s−e_H)` read at the chart's lattice. `X + RX = (2 − XH)X` is symmetric for a
-/// symmetric `X` and `H`, so the upper triangle is formed and mirrored. The rows run together. `None`
-/// when an entry leaves the `i128` carrier.
+/// `solvedRefine`, `solved_refinement_certificate`): `X' = round(X + R̃X)` on `2^(−L_s)ℤ`, with `R̃`
+/// the certified residual `P·2^(−L_s−e_H)` read at the chart's lattice. `X + RX = (2 − XH)X` is
+/// symmetric for a symmetric `X` and `H`, so the upper triangle is formed and mirrored; `R̃X` is not,
+/// and the mirror carries the residual's rounding transposed (`ChartRule`, "Why the lattice"). The
+/// rows run together. `None` when an entry leaves the `i128` carrier.
 fn refined(
     block: &[i128],
     residual: &[i128],
