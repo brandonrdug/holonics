@@ -1192,3 +1192,39 @@ to the replica tree, and score the held-out cells. If the letters do not lower t
 beyond their charge, the entry is refused before it is built. Otherwise the build is a sheet
 `Feature` read from the word at the receiving epoch, pushed into the address register, with its
 consumer stated at the tree: `face(address ⊕ sheets) ≤ face(address) + charge`.
+
+## 28. The sheet letters fail their information test; at scale the depth is the lever
+
+**The information test of §27** ([receipt](2026-10-02_THE_CONTACT_LOOP_receipts/sheet_letters.txt),
+`sheet_letters.py`). Samples with the source at modulus `63/64`, a memory of about 64 ticks (1,407,266
+ms against a projection of 1,690 s, inside the 1,800 s deadline). Each anchor's ten relative-phase
+sheets, node `k` against node 0's axis, give letters of one to four bits; the bundle tree reads the
+letter before the four cells and joins the cell tree in each dyadic cell by evidence. Over the 3,400
+cells, at prior mass `2^(−3)`:
+
+| Letters | the cell tree alone | `r = 1` | `r = 2` | `r = 3` | `r = 4` |
+|---|---|---|---|---|---|
+| sheets (bits) | `12879530/2^10` | `12919249/2^10` | `12926216/2^10` | `12927228/2^10` | `12928635/2^10` |
+| fair coins | | `12926740/2^10` | `12933334/2^10` | `12939966/2^10` | `12940214/2^10` |
+
+The sheets code seven to twelve bits below coins of the same width, so they carry that much, and
+39 to 48 bits above the cell tree alone, so they do not pay the join. The lossless open's sheets do
+the same. Refused, as §27 required, before any owner changed. Reading the anchors' relative
+phase does not remove what the clock-indexed transfer did to them, and the field carries no more
+than this to read.
+
+**The depth at scale** ([receipt](2026-10-02_THE_CONTACT_LOOP_receipts/depth_at_scale.txt); the
+tree alone on the choosing cut at `2^(−3)`). Development and held-out bits, each `+ ε`:
+
+| `D` | 4 | 5 | 6 | 8 | 10 | 12 | 16 |
+|---|---|---|---|---|---|---|---|
+| development | `968962 + 14/16` | `937396 + 11/16` | `927520 + 8/16` | `919596 + 14/16` | `917099 + 7/16` | `916559 + 8/16` | `916377 + 0/16` |
+| held out | `143620 + 10/16` | `137933 + 14/16` | `136428 + 9/16` | `135327 + 10/16` | `135044 + 0/16` | `134969 + 10/16` | `134954 + 1/16` |
+
+At half a million cells the address's depth is worth about six percent held out, from 4 to 8, and
+the code keeps falling to 16, where the September 26 wide cut found it too (its memory cap stopped
+the sweep at 6). Campaign 1's `D = 4` stays at `n* = 6,148`, where depths past 4 gain at most eight
+development bits (§25). [agent-inferred] With the prior mass making a context seen a few times pay,
+the depth a passage supports grows with the passage; at scale it is the tree's next declared value
+to choose, by the development cells against its storage, and the field's share stays the few bits
+§26 measured until the source enters it otherwise.
