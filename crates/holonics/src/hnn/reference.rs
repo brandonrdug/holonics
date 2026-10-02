@@ -2941,6 +2941,8 @@ impl Reference {
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct ContactAblation {
     pub position: usize,
+    /// The aeon the window lies in (0 the first).
+    pub aeon: usize,
     pub moved: Vec<(Locus, Family)>,
     pub vanished: Vec<(Locus, Family)>,
     pub work: Rat,
@@ -2977,21 +2979,43 @@ pub struct ContactAblation {
     pub exponent_spread: Rat,
 }
 
+/// [measured-diagnostic; agent-inferred, October 2; the contact loop record §13] **The contacts'
+/// cumulative change at an aeon's close**: at the first window after each aeon boundary, that
+/// window read at the published constitution and at the same constitution with every contact's
+/// factors returned to the opening's, from the same resident state: the largest change of its
+/// exponents, the receiver's exponent span there, and both codes.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct CumulativeContacts {
+    pub aeon: usize,
+    pub position: usize,
+    pub exponent_shift: Rat,
+    pub spread: Rat,
+    pub held: ExactInterval,
+    pub reverted: ExactInterval,
+}
+
 /// [measured-diagnostic] **The contact loop on a cut** (Astra's check, on the host reference): the
 /// exposure's own order over the first `windows` receiving windows (refine, compare, deposit, then
 /// the window's ingest). At each window whose successor window exists, before the full deposit, the
 /// compare's deposit is restricted to its contact families and deposited alone on the predecessor;
 /// the same later drive (the next window, read against its own cells) is then read at the
 /// predecessor and at that contacts-only successor, each after the window's ingest
-/// ([`ContactAblation`]). The full deposit then proceeds as in the exposure. Stops at an aeon's
-/// carry-out (no aeon is closed), at the deadline, or at a budget refusal.
+/// ([`ContactAblation`]). The full deposit then proceeds as in the exposure. At an aeon's
+/// carry-out the aeon is closed (no keys are located: the exposure's crib step is omitted), and the
+/// next window reads the contacts' cumulative change ([`CumulativeContacts`]). Stops at the
+/// deadline or at a budget refusal.
 pub fn contact_ablation(
     reference: &Reference,
     field: &Field,
     cells: &[usize],
     windows: usize,
-) -> Result<Vec<ContactAblation>, HnnError> {
+) -> Result<(Vec<ContactAblation>, Vec<CumulativeContacts>), HnnError> {
     let mut resident = reference.mount(field, &Current::at_rest(field))?;
+    let opening = resident.constitution().clone();
+    let family = resident.admitted().to_vec();
+    let mut aeon = 0usize;
+    let mut cumulative = Vec::new();
+    let mut boundary = false;
     let phases = resident
         .admitted()
         .first()
@@ -3087,6 +3111,53 @@ pub fn contact_ablation(
             break;
         }
         let next = spans.get(k + 1).map(|s| &cells[s.clone()]).filter(|w| w.len() == aperture);
+        if std::mem::take(&mut boundary) {
+            let mut reverted = resident.constitution().clone();
+            for c in 0..field.contacts().len() {
+                reverted = reverted.with_channel(
+                    c,
+                    opening.contact_storage(c).clone(),
+                    opening.contact_stiffness(c).clone(),
+                    opening.contact_dissipation(c).clone(),
+                )?;
+            }
+            let mut held = resident.clone();
+            let mut back = resident.clone();
+            back.constitution = reverted;
+            back.forget_kept_reads();
+            let (held_code, _, held_faces) = read(reference, &mut held, window)?;
+            let (back_code, _, back_faces) = read(reference, &mut back, window)?;
+            let spread = held_faces
+                .as_ref()
+                .map(|f| {
+                    f.faces
+                        .iter()
+                        .map(|face| {
+                            let v: Vec<Rat> = face
+                                .cells()
+                                .iter()
+                                .map(|c| {
+                                    Rat::from_integer(c.carry.clone())
+                                        + Rat::new(BigInt::from(c.phase), BigInt::from(face.grain()))
+                                        + &c.fibre
+                                })
+                                .collect();
+                            v.iter().max().cloned().unwrap_or_else(Rat::zero)
+                                - v.iter().min().cloned().unwrap_or_else(Rat::zero)
+                        })
+                        .max()
+                        .unwrap_or_else(Rat::zero)
+                })
+                .unwrap_or_else(Rat::zero);
+            cumulative.push(CumulativeContacts {
+                aeon,
+                position: span.start,
+                exponent_shift: shift(held_faces.as_ref(), back_faces.as_ref()),
+                spread,
+                held: held_code,
+                reverted: back_code,
+            });
+        }
         let (pending, refined) = reference.refine(&mut resident, &moment, &phases)?;
         let word = match &refined.receipt.detail {
             ReceiptDetail::Refine { word, .. } => word.as_ref().clone(),
@@ -3145,6 +3216,7 @@ pub fn contact_ablation(
                     let (moved_code, moved_states, moved_faces) = read(reference, &mut moved_res, next)?;
                     out.push(ContactAblation {
                         position: span.start,
+                        aeon,
                         moved: reading
                             .steps
                             .iter()
@@ -3208,11 +3280,20 @@ pub fn contact_ablation(
             Err(HnnError::ConstitutionBudget { .. }) => break,
             Err(other) => return Err(other),
         }
-        if !feed(reference, &mut resident, window)? {
-            break;
+        let mut fed = 0;
+        while fed < window.len() {
+            let (_, ingested) =
+                reference.ingest(&mut resident, Some(&moment), &one_hot(&window[fed..]))?;
+            let ingested = ingested.forward.into_present().expect("ingest returns");
+            fed += ingested.cells;
+            if ingested.carry_out {
+                reference.close_aeon(&mut resident, &family)?;
+                aeon += 1;
+                boundary = true;
+            }
         }
     }
-    Ok(out)
+    Ok((out, cumulative))
 }
 
 /// [definition] **What an exposure reads of a port's resident** beside the port's own methods: the

@@ -974,8 +974,33 @@ fn rounding(exposure: &Exposure) {
 fn contact_ablation_run(field: &Field, cut: &Cut, windows: usize) {
     use holonics::hnn::reference::contact_ablation;
     let clock = Instant::now();
-    let readings = contact_ablation(&Reference::campaign_one(), field, &cut.cells, windows)
-        .expect("the contact ablation");
+    let (readings, cumulative) =
+        contact_ablation(&Reference::campaign_one(), field, &cut.cells, windows)
+            .expect("the contact ablation");
+    // The receiver's exponent span, largest per aeon, and the contacts' cumulative change at each
+    // aeon's close (the contact loop record §13).
+    let aeons = readings.iter().map(|r| r.aeon).max().map_or(0, |a| a + 1);
+    for a in 0..aeons {
+        let largest = readings
+            .iter()
+            .filter(|r| r.aeon == a)
+            .map(|r| r.exponent_spread.clone())
+            .max()
+            .unwrap_or_else(Rat::zero);
+        let single = readings
+            .iter()
+            .filter(|r| r.aeon == a)
+            .map(|r| r.exponent_shift.clone())
+            .max()
+            .unwrap_or_else(Rat::zero);
+        println!("  aeon {a}: the receiver's exponent span, largest {largest} bits; one deposit's contact change, largest {single} bits");
+    }
+    for c in &cumulative {
+        println!(
+            "  after aeon {} (window at {}): the contacts' cumulative change {} bits at an exponent span of {} bits; code held [{}, {}) with the opening's contacts [{}, {})",
+            c.aeon, c.position, c.exponent_shift, c.spread, c.held.lower, c.held.upper, c.reverted.lower, c.reverted.upper
+        );
+    }
     let (mut lower, mut higher, mut equal, mut overlap, mut moved) = (0, 0, 0, 0, 0);
     let (mut states, mut logits, mut faces) = (0, 0, 0);
     let (mut c_anchors, mut c_logits, mut c_faces) = (0, 0, 0);
