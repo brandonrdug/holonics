@@ -4277,11 +4277,26 @@ impl Constitution {
     /// A channel's lattice is read only by its deposits, so its re-base is this move alone. The ring
     /// loci also read their lattice outside the deposit (the solved charts' rule, the founding
     /// modulus, the standing's fine half unit, the resonator's Floquet grain), and their re-base is
-    /// refused ([`HnnError::RebaseLocus`]).
+    /// refused ([`HnnError::RebaseLocus`]); a released channel is refused
+    /// ([`HnnError::ReleasedLocus`]).
+    ///
+    /// [definition; agent-inferred] A re-base by `j > 0` levels is published as a commit, since an
+    /// entry that takes `q′u′` changes the applied factors and the lattice changes the next deposit's
+    /// split: a boost's solve is certified again, the storage growth `C_a`, `K_a` is certified by
+    /// inertia into [`Constitution::storage_product`] (module header, "The committed energy bound,
+    /// enforced at the commit"), the exact bits stay within `B_Θ`, and the commit counter advances,
+    /// so a deposit staged against the predecessor is refused ([`HnnError::StaleDeposit`]). A re-base
+    /// by zero levels is the identity.
     pub fn rebased(&self, locus: Locus, levels: u32) -> Result<Self, HnnError> {
         let Locus::Channel(contact) = locus else {
             return Err(HnnError::RebaseLocus { locus });
         };
+        if self.released.contains(&locus) {
+            return Err(HnnError::ReleasedLocus { locus });
+        }
+        if levels == 0 {
+            return Ok(self.clone());
+        }
         let mut next = self.clone();
         let mut at = BudgetedCarry::new(next.lattice(locus)?, next.clock(locus) + 1);
         let material = next
@@ -4337,6 +4352,23 @@ impl Constitution {
             }
         }
         next.lattices.insert(locus, at.lattice());
+        if let Some(boost) = &next.contacts[contact].boost {
+            boost.certify(contact, &next.contacts[contact])?;
+        }
+        let storage_growth =
+            certify_storage_growth(&self.storage_forms()?, &next.storage_forms()?)?
+                .ok_or(HnnError::UncertifiedStorage)?;
+        next.storage_product = &self.storage_product * (Rat::one() + &storage_growth);
+        let bits = next.exact_bits();
+        if bits > self.budget {
+            return Err(HnnError::ConstitutionBudget {
+                bits,
+                budget: self.budget,
+                commit: self.commit,
+                loci: vec![locus],
+            });
+        }
+        next.commit += 1;
         Ok(next)
     }
 

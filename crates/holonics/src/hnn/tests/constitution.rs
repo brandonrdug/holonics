@@ -1962,28 +1962,34 @@ fn a_contacts_channel_rebases_with_its_carried_remainders() {
     let field = six_path(2);
     let start = generic(&field, 13);
     let (current, open) = moment(&field, 14, 9);
-    let phases = phases(&field, &start, &current);
-    let pending = PendingRatio::produce(
-        &current,
-        &open,
-        &ActiveAddress::boundary(phases.depth()),
-        &phases,
-        0,
-    )
-    .unwrap();
-    let (word, faces) = pending.read(&field, &start).unwrap();
-    let targets = [1usize, 0];
-    let anchors = target_phases(&field, pending.anchor(), 2, &targets).unwrap();
-    let ratio = HolonRatio::compare(faces, &targets, &anchors).unwrap();
-    let back = word
-        .pull_back(
-            &ratio.covector().unwrap(),
-            start.receiving_map(2).unwrap(),
-            &current.lift()[2],
+    // One compare's deposit, staged by the machine path at a constitution.
+    let stage = |theta: &Constitution| {
+        let phases = phases(&field, theta, &current);
+        let pending = PendingRatio::produce(
+            &current,
+            &open,
+            &ActiveAddress::boundary(phases.depth()),
             &phases,
+            0,
         )
         .unwrap();
-    let (_, deposit) = compose(&field, &start, &pending, &back, &targets, &[]).unwrap();
+        let (word, faces) = pending.read(&field, theta).unwrap();
+        let targets = [1usize, 0];
+        let anchors = target_phases(&field, pending.anchor(), 2, &targets).unwrap();
+        let ratio = HolonRatio::compare(faces, &targets, &anchors).unwrap();
+        let back = word
+            .pull_back(
+                &ratio.covector().unwrap(),
+                theta.receiving_map(2).unwrap(),
+                &current.lift()[2],
+                &phases,
+            )
+            .unwrap();
+        compose(&field, theta, &pending, &back, &targets, &[])
+            .unwrap()
+            .1
+    };
+    let deposit = stage(&start);
     let (deposited, _) = start.deposited(&deposit).unwrap();
     let theta = &deposited;
     assert!(
@@ -2025,6 +2031,8 @@ fn a_contacts_channel_rebases_with_its_carried_remainders() {
                 theta.lattice(locus).unwrap().exponent() + levels
             );
             assert_eq!(next.clock(locus), theta.clock(locus));
+            assert_eq!(next.commit(), theta.commit() + 1);
+            assert!(next.storage_product() >= theta.storage_product());
             let half = finer.unit() / integer(2);
             for carrier in carriers {
                 let (before, carried) = (
@@ -2043,11 +2051,12 @@ fn a_contacts_channel_rebases_with_its_carried_remainders() {
                 }
             }
             assert!(next.on_lattice());
-            let (later, _) = start
-                .rebased(locus, levels)
-                .unwrap()
-                .deposited(&deposit)
-                .unwrap();
+            let rebased = start.rebased(locus, levels).unwrap();
+            assert!(matches!(
+                rebased.deposited(&deposit),
+                Err(HnnError::StaleDeposit { .. })
+            ));
+            let (later, _) = rebased.deposited(&stage(&rebased)).unwrap();
             assert!(later.on_lattice());
             assert_eq!(later.lattice(locus).unwrap(), finer);
             let others = |t: &Constitution| {
@@ -2067,5 +2076,13 @@ fn a_contacts_channel_rebases_with_its_carried_remainders() {
     assert!(matches!(
         theta.rebased(Locus::Element(0), 1),
         Err(HnnError::RebaseLocus { .. })
+    ));
+    let mut released = theta.clone();
+    released
+        .release(&std::collections::BTreeSet::from([Locus::Channel(0)]))
+        .unwrap();
+    assert!(matches!(
+        released.rebased(Locus::Channel(0), 1),
+        Err(HnnError::ReleasedLocus { .. })
     ));
 }
