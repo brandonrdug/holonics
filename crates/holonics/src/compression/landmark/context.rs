@@ -1321,7 +1321,8 @@ pub fn face_bits_at(
 /// at most one chain in each digit tree it opens and charges at most 4 units to each of the at most
 /// `P` levels (Lean `Compression/Landmark/Context/StoredDrift.split_charge`), at most `4n* P`, which
 /// the count `(n* + 1) P²` covers for `P ≥ 4` and the maximum covers at every depth. For `P ≥ 4` it
-/// is `(2n* + 1) P²`.
+/// is `(2n* + 1) P²`. The count, per cell at most `n* D² + 4n* D` for `D ≤ P`, is Lean
+/// `StoredDrift.{arrival_units_le, cell_units, rule_units}`.
 fn mantissa_units(population: u64, depth: u64) -> BigUint {
     let (n, d) = (BigUint::from(population), BigUint::from(depth));
     let paths = &n * &d * &d;
