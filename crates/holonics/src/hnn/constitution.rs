@@ -1048,6 +1048,20 @@ fn ceil_log2(x: u128) -> u32 {
     }
 }
 
+/// [proved-derived; formal-checked] **The bits the mirrored refinement's rounding takes beyond the
+/// width and the Gram's norm**: the least `k` with `36n ≤ (2^k − 1)²`, so that a chart of residual
+/// at most `1/2` under the carried Gram's margin has `1 + 2‖X̂‖∞ ≤ 2^k` (Lean
+/// `HNN/LatticeWord.{chart_rowNorm_le_of_margin, solved_chart_lattice_stays}`; [`ChartRule`]).
+pub(crate) fn mirror_bits(width: usize) -> u32 {
+    let need = 36u128 * width.max(1) as u128;
+    (0u32..)
+        .find(|&k| {
+            let side = (1u128 << k) - 1;
+            side * side >= need
+        })
+        .expect("a power of two past 6√n")
+}
+
 /// The widest shift a residual's coordinates take: `2^(L_s + e_H)` with its sign and one more bit
 /// of headroom stays inside the `i128` carrier.
 const RESIDUAL_SHIFT: u32 = 125;
@@ -1059,7 +1073,8 @@ const RESIDUAL_SHIFT: u32 = 125;
 ///
 /// ```text
 /// target     δ_ℓ = 2^(−D_ℓ) ,   D_ℓ = 2L_ℓ + 1 − ⌊log₂ L_R⌋        (so δ_ℓ ≤ L_R·2^(−2L_ℓ−1))
-/// lattice    L_s = D_ℓ + ⌈log₂ n⌉ + ⌈log₂ ‖H'‖∞⌉ + 2                (n the Gram's width)
+/// lattice    L_s = D_ℓ + ⌈log₂ n⌉ + ⌈log₂ ‖H'‖∞⌉ + k_n ,  k_n least with 36n ≤ (2^(k_n) − 1)²
+///                                                                   (n the Gram's width)
 /// ```
 ///
 /// **Why the target.** At an executed chart `X̂` of the carried successor Gram `H'`, the map step
@@ -1088,11 +1103,17 @@ const RESIDUAL_SHIFT: u32 = 125;
 /// triangle and mirrors it (`refined`), which carries the residual's rounding transposed through
 /// `X̂`, where `X̂H' ≈ 1` no longer absorbs it: `‖1 − X''H'‖∞ ≤ δ² + n·2^(−L_s)/2·(1 + 2‖X̂‖∞)‖H'‖∞`
 /// (`solved_refinement_certificate`), and the certificate stays at most `δ_ℓ` when twice that
-/// rounding term is (`solved_refinement_stays`). The rule counts `n` and `‖H'‖∞` but not `‖X̂‖∞`.
-/// [open] (#62) the lattice owes `⌈log₂(1 + 2‖X̂‖∞)⌉` more bits, or the step owes the whole product.
-/// Every certificate is computed exactly, so a refinement the lattice does not carry restarts cold
-/// and, short of `δ_ℓ` within the rule's count, is refused
-/// ([`ExactLinearError::InverseCertificateFailure`]); no chart above `δ_ℓ` is released. The Gram's
+/// rounding term is (`solved_refinement_stays`). **The chart's norm is bounded by its residual**
+/// under the carried Gram's margin `c₀ = 1 − 1/(2L_R) ≥ 1/2`, with no inverse formed: column `j`
+/// of a symmetric chart solves `H'x = ((1 − X̂H')ᵀ)_j`, so `c₀²‖X̂‖∞² ≤ n(1 + δ)²`
+/// (`chart_rowNorm_le_of_margin`). At `δ ≤ δ_ℓ ≤ 1/2` that is `‖X̂‖∞ ≤ 3√n`, and `k_n`'s
+/// `36n ≤ (2^(k_n) − 1)²` makes `1 + 2‖X̂‖∞ ≤ 2^(k_n)`: twice the rounding term is at most
+/// `n·2^(−L_s)·2^(k_n)·‖H'‖∞ ≤ δ_ℓ`, so every certificate at most `δ_ℓ` stays there
+/// (`solved_chart_lattice_stays`), and from above it the certificates fall to the fixed point near
+/// `δ_ℓ/2`. `k_n` replaces the former `2`, which covered the whole product's rounding but not the
+/// mirror's (one more bit at `n = 1`, `⌈log₂(1 + 6√n)⌉ − 2` in general). Every certificate is
+/// still computed exactly, so a refinement that does not reach `δ_ℓ` within the rule's count is
+/// refused ([`ExactLinearError::InverseCertificateFailure`]); no chart above `δ_ℓ` is released. The Gram's
 /// own norm is read at each deposit, as the clock's Elias-gamma length is: the lattice refines as
 /// the Gram grows, and never coarsens (a coarser chart is a finer one's lattice point). Brandon may
 /// override the rule.
@@ -1133,10 +1154,10 @@ impl ChartRule {
         Lattice::new(self.target_exponent()).unit()
     }
 
-    /// `L_s = D_ℓ + ⌈log₂ n⌉ + ⌈log₂ ‖H'‖∞⌉ + 2` for a Gram of width `n` whose norm has
-    /// `⌈log₂ ‖H'‖∞⌉ = norm`.
+    /// `L_s = D_ℓ + ⌈log₂ n⌉ + ⌈log₂ ‖H'‖∞⌉ + k_n` for a Gram of width `n` whose norm has
+    /// `⌈log₂ ‖H'‖∞⌉ = norm` ([`mirror_bits`]).
     pub fn exponent(&self, width: usize, norm: u32) -> u32 {
-        self.target_exponent() + ceil_log2(width as u128) + norm + 2
+        self.target_exponent() + ceil_log2(width as u128) + norm + mirror_bits(width)
     }
 
     /// **The most a released prox residual of norm `‖ρ‖∞ ≤ released` moves a read** at an operand

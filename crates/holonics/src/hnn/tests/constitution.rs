@@ -59,6 +59,22 @@ fn left_residual(chart: &ExactRatMatrix, gram: &ExactRatMatrix) -> ExactRatMatri
         .unwrap()
 }
 
+/// **The mirrored refinement's bits are the least `k` with `36n ≤ (2^k − 1)²`** (Lean
+/// `HNN/LatticeWord.solved_chart_lattice_stays`): three at width one (`36 ≤ 49`), four at two
+/// (`49 < 72 ≤ 225`), and the least such `k` at every width through 4096.
+#[test]
+fn the_mirror_bits_are_the_least_power_past_six_root_n() {
+    use crate::hnn::constitution::mirror_bits;
+    assert_eq!(mirror_bits(1), 3);
+    assert_eq!(mirror_bits(2), 4);
+    for n in 1..=4096u128 {
+        let k = mirror_bits(n as usize);
+        let side = |k: u32| (1u128 << k) - 1;
+        assert!(side(k) * side(k) >= 36 * n);
+        assert!(side(k - 1) * side(k - 1) < 36 * n);
+    }
+}
+
 /// The chart rule of the fixtures: the lattice `L`, and the grain `L_R = 16` of campaign 1.
 fn rule(lattice: Lattice) -> ChartRule {
     ChartRule::new(lattice, 16)
