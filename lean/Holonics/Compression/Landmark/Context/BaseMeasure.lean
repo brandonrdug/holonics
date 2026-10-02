@@ -70,7 +70,7 @@ tree       −log₂ ∏_t q_0(x_t) ≤ −log₂ prior_w(S)
    `[0, 1]`. This is the doubled floor the Rust's `based_floor` gives `face_bits_at`. It does not
    depend on the depth.
 5. **The widths at depth 63** (`campaign_face_bits`, `campaign_carrier_bits`,
-   `campaign_mass_operand`, `campaign_operands`): campaign 1's `M_p = 50` (one more than the even
+   `campaign_mass_operand`, `campaign_operands`, `campaign_rule_floor`): campaign 1's `M_p = 50` (one more than the even
    base's 49), `W = 37`, `κ = 20` bits of `16(2^3·6148 + 2)`, so the β step's mantissa division
    `2W + κ + M + 1 = 145` passes `u128` and the carrier rebases at `R = 89 ≥ W`; every operand the
    Rust (`Widths::operand_bits`, `admitted`) and the card (`single_division_admitted`) ask for is at
@@ -352,6 +352,19 @@ theorem campaign_operands :
       max (max (max (2 * 50 + 2) (50 + 20 + 3)) (50 + 37 + 3)) (37 + 20 + 50) = 107 ∧
       (126 - 37) + 37 + 1 = 127 ∧ max (2 * 50 + 20 + 3) (2 * 37 + 50 + 3) = 127 := by
   decide
+
+/-- [proved-derived; formal-checked] **`campaign_rule_floor`: the rule's floor is the even base's.**
+At the even base `M_p = 49` (the least `M` with `2^M ≥ 3 B L_R (2^j n* + 2)(n* P² + 2P + 1)`), and
+the rule's floor `⌊2^(M_p)/based_floor⌋` (`Landmarks::face_rule`) is `11445329024` at both bases:
+`⌊2^50/(2(2^3·6148 + 2))⌋ = ⌊2^49/(2^3·6148 + 2)⌋`. The rule's other terms read `W`, `R` and `B`,
+which the base does not change (`W` reads no floor, `R = 126 − W`), so campaign 1's rule at depth 63
+is the even base's. -/
+theorem campaign_rule_floor :
+    (2 ^ 48 < 3 * 8 * 16 * (2 ^ 3 * 6148 + 2) * (6148 * 63 ^ 2 + 2 * 63 + 1) ∧
+      3 * 8 * 16 * (2 ^ 3 * 6148 + 2) * (6148 * 63 ^ 2 + 2 * 63 + 1) ≤ 2 ^ 49) ∧
+      2 ^ 50 / (2 * (2 ^ 3 * 6148 + 2)) = 11445329024 ∧
+      2 ^ 49 / (2 ^ 3 * 6148 + 2) = 11445329024 := by
+  norm_num
 
 /-! ### 5. The code at a base read from the passage -/
 
@@ -803,5 +816,41 @@ theorem rootBase_tree_redundancy {j : ℕ} (hj : 1 ≤ j) {w : ℕ → ℚ} (hw 
   base_tree_redundancy hj (rootBaseOf_quarter j) hw D obs hD S hS
 
 end Redundancy
+
+/-! ### Audit -/
+
+section Audit
+
+#print axioms rootSixteenths_round
+#print axioms rootSixteenths_mem
+#print axioms rootSixteenths_empty
+#print axioms rootBase_quarter
+#print axioms rootBase_sum
+#print axioms rootBase_empty
+#print axioms basedFace_sum
+#print axioms basedFace_half
+#print axioms rootBase_face_sixteenths
+#print axioms prior_read
+#print axioms basedFace_ge
+#print axioms rootBase_face_ge
+#print axioms rootBase_path_face_ge
+#print axioms campaign_face_bits
+#print axioms campaign_carrier_bits
+#print axioms campaign_mass_operand
+#print axioms campaign_operands
+#print axioms campaign_rule_floor
+#print axioms baseEmitted_face_normalized
+#print axioms baseEmitted_eq_weight
+#print axioms baseEmitted_sum
+#print axioms rootBaseOf_quarter
+#print axioms basedOwn_half
+#print axioms basedOwn_ge
+#print axioms baseCost_succ_le
+#print axioms baseCost_campaign
+#print axioms leaf_cost_campaign
+#print axioms base_tree_redundancy
+#print axioms rootBase_tree_redundancy
+
+end Audit
 
 end Holonics.Compression.Landmark.Context.BaseMeasure
