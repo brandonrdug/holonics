@@ -1722,6 +1722,57 @@ theorem floor_large_slopes_card (f σ q : ℕ → ℝ) (w : ℕ) (hσ : ∀ k, 0
 
 end WindowGuard
 
+/-! ## 13. The lattice floor and the finest source lattice the comparison reads
+
+Every adopted move moves at least one lattice coordinate, so its step is at least `c = u/(2U)`
+(`u` the source port's lattice unit, `U` the unit move's largest entry). Along a ray of slope `−q`
+and curvature at most `K` (in the norm `‖d‖² = D`), the certified decrease of a step `η` is
+`η q − ½ K η² D`. At the floor it certifies nothing once `q ≤ ½ K c D`, and the decrease a free step
+would have certified there, `q²/(2 K D)`, is at most `K c² D / 8`, which is `K u²/32` at `D = U²`:
+the unit move's scale cancels. -/
+
+section LatticeFloor
+
+/-- [proved-derived; formal-checked] **Below the floor's slope no step at or above the floor is
+certified**: with `0 ≤ q ≤ ½ K c D` and `c ≤ η`, `η q − ½ K η² D ≤ 0`. -/
+theorem floor_certifies_nothing {K D c q η : ℝ} (hK : 0 < K) (hD : 0 < D) (hc : 0 < c)
+    (hq : q ≤ K * c * D / 2) (hη : c ≤ η) : η * q - K * η ^ 2 * D / 2 ≤ 0 := by
+  have hη0 : 0 < η := hc.trans_le hη
+  have h1 : η * q ≤ η * (K * c * D / 2) := mul_le_mul_of_nonneg_left hq hη0.le
+  have h2 : K * c * D ≤ K * η * D := by
+    have := mul_le_mul_of_nonneg_left hη (mul_nonneg hK.le hD.le)
+    nlinarith
+  nlinarith
+
+/-- [proved-derived; formal-checked] **What the floor leaves uncertified**: a free step's certified
+decrease `q²/(2 K D)` at a slope `0 ≤ q ≤ ½ K c D` is at most `K c² D / 8`. -/
+theorem floor_lost_le {K D c q : ℝ} (hK : 0 < K) (hD : 0 < D) (hq0 : 0 ≤ q)
+    (hq : q ≤ K * c * D / 2) : q ^ 2 / (2 * K * D) ≤ K * c ^ 2 * D / 8 := by
+  have hKD : 0 < 2 * K * D := by positivity
+  rw [div_le_iff₀ hKD]
+  have : q ^ 2 ≤ (K * c * D / 2) ^ 2 := pow_le_pow_left₀ hq0 hq 2
+  nlinarith
+
+/-- [proved-derived; formal-checked] **In the lattice's terms the unit move cancels**: with
+`c = u/(2U)` and `D = U²`, `K c² D / 8 = K u² / 32`. -/
+theorem floor_lost_lattice {K u U : ℝ} (hU : U ≠ 0) :
+    K * (u / (2 * U)) ^ 2 * U ^ 2 / 8 = K * u ^ 2 / 32 := by
+  field_simp
+  ring
+
+/-- [proved-derived; formal-checked] **The finest lattice the comparison reads**: a dyadic unit
+`u = 2^(−L)` leaves at most a grain `g` uncertified exactly when `K ≤ 32 g 4^L`. The least such `L`
+is `⌈½ log₂(K/(32 g))⌉`: refining past it changes nothing the comparison can read at `g`. -/
+theorem lattice_needed_iff {K g : ℝ} (L : ℕ) :
+    K * ((2 : ℝ)⁻¹ ^ L) ^ 2 / 32 ≤ g ↔ K ≤ 32 * g * 4 ^ L := by
+  have h4 : (0 : ℝ) < 4 ^ L := by positivity
+  have hpow : ((2 : ℝ)⁻¹ ^ L) ^ 2 = (4 ^ L)⁻¹ := by
+    rw [← pow_mul, mul_comm, pow_mul, inv_pow, inv_pow]; norm_num
+  rw [hpow, div_le_iff₀ (by norm_num : (0 : ℝ) < 32), ← div_eq_mul_inv, div_le_iff₀ h4]
+  constructor <;> intro h <;> linarith
+
+end LatticeFloor
+
 section Audit
 
 #print axioms passage_coeff_zero
@@ -1801,6 +1852,10 @@ section Audit
 #print axioms schedule_frequently_small
 #print axioms floor_steps_diverge
 #print axioms floor_large_slopes_card
+#print axioms floor_certifies_nothing
+#print axioms floor_lost_le
+#print axioms floor_lost_lattice
+#print axioms lattice_needed_iff
 
 end Audit
 
