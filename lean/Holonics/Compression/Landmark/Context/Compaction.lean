@@ -108,10 +108,11 @@ proofs here are this owner's.
 
 [conditional] The weight, face and code identities and the founding ratio hold for any rungs
 `j_d ≥ 0`, the forced rung `0` included. The executed chart steps `β` on its lattice (`Tree`,
-section 6′); its drift is `Context/Drift`'s, proved for the full executed tree. [agent-inferred]
-The compacted tree reads as its instance: a chain's implicit nodes read exactly (`chain_ratio` is an
-identity in the bottom's split mass), and a split's two carries are factors at the two parts'
-bottoms; that instance is owed in #62 ("the landmark lattice's drift"), not restated here.
+section 6′); its drift is `Context/Drift`'s, proved for the full executed tree, and the compacted
+tree is that tree's instance in `Context/StoredDrift`: a chain's implicit nodes read exactly
+(`chain_ratio` is an identity in the bottom's split mass), each stored chain's discrepancy sits at
+its bottom, and a split's two roundings are discrepancies at the two parts' bottoms
+(`StoredDrift.split_charge`).
 
 The Rust consumer is `crates/holonics/src/compression/landmark/context.rs` (`compression::landmark::context::Landmarks`, the one
 storage; under a declared `Capacity` each stored chain carries one register, item 4′):

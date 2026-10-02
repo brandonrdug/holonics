@@ -225,9 +225,9 @@ passage of `lattice_node_telescope`, `weight_log_lipschitz` and `mix_ratio_bound
 `tree_drift_below`), the passage's code within `Σ_t Σ_(d ≤ D)(θ_d + |ln c_d|)`
 (`ExecutedTree.passage_drift`), and the per-cell rule `(n* D² + 2D + 1) 2^(−M−1)/μ̂ + n* D² ρ`
 before `(3/2) B` (`ExecutedTree.cell_drift_uniform`; Rust `landmark::face_bits`, `carrier_width`,
-`Landmarks::face_rule`), for the full executed tree. [open] Its reading on the compacted storage,
-and **the certified binary logarithm's squaring invariant** (Rust `landmark::binary_log`), are
-owed in #62; both are checked by the Rust tests. The finite-cut orderings (the count-only tree below online order-0, order-1 and PPM-2
+`Landmarks::face_rule`), for the full executed tree. Its reading on the compacted storage is
+`Context/StoredDrift`, the executed join of two trees `Context/JoinDrift`, and the certified binary
+logarithm's squaring invariant (Rust `landmark::binary_log`) `Context/BinaryLog`. The finite-cut orderings (the count-only tree below online order-0, order-1 and PPM-2
 on the standing real cut) are measurement receipts, not theorems. The campaign 5 merge laws are not
 stated here: they have no consumer yet.
 

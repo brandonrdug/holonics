@@ -74,24 +74,28 @@ receiver's resolution.
 [conditional] **What the theorems cover in the Rust.**
 - **The carried certificates.** The deposit carries each node's `excess` (its routed
   subsequence's executed code against the ideal) and `drift` (`Δ ≥ |ln β̂ − ln β|`): it adds the
-  read's `θ`, twice the rebases' units, the child's increment and a split's units to the excess,
+  read's `θ`, twice the rebases' units, the child's increment and twice a split's units to the excess,
   and the child's increment and the rebases' units to the drift (`Law::apply_branch`). Item 2
   states the excess's law with each factor counted once, so the doubled rebase units are
   conservative; item 5's `cell_drift` is the read's `ρ ≤ Σ drift + Σ θ`.
 - **The factors.** A mantissa rebase is `c = x/m'` with `|ln c| < 2^(1−W)`
   (`Tree.rebase_log_residual`); a carrier release lies in `[1, 1 + 1/D̂)` (`Carrier`), of the
   opposite sign, which item 2 allows.
-- **Stored where paths part** (agent-inferred, not formalized). `ExecutedTree` is the full tree.
-  The compacted executed tree (`Compaction`, Decision 37) is read as an instance: a stored chain's
-  implicit nodes read their faces exactly (`θ = 0`, `c = 1`, by `Compaction.chain_ratio`, an
-  identity in the chain's bottom split mass), its rebases are factors at its bottom, its rounding
-  at its top, and a split's two `W`-bit carries are factors at the two parts' bottoms on the
-  arrival before the split. That instance, and the count of splits behind the rule's
-  `(2n* + 1) P² 2^(1−W)`, stay owed in #62.
-- **Not stated here**: the enlarged tree's join (`Context/LocalWeighing`'s executed join tree,
-  whose two sides are both executed, adds its own drift; each dyadic cell's join costs at most one
-  bit against either branch), and the certified binary logarithm's squaring invariant
-  (`landmark::binary_log`); both stay owed in #62.
+- **Stored where paths part.** `ExecutedTree` is the full tree; the compacted executed tree
+  (`Compaction`, Decision 37) is its instance in `Context/StoredDrift`: each stored chain's
+  discrepancy sits at its bottom node and every implicit node reads exactly, so the weight and the
+  split mass are within the subtree's discrepancies (`StoredDrift.ConsistentTree.drift_le_tot`), the
+  passage within their changes and the root's read jumps (`StoredDrift.stored_passage`), and a split
+  charges `u + 2ℓ` to the upper part's drift and `2(u + ℓ)` to the increment
+  (`StoredDrift.split_charge`; the Rust now carries these).
+- **The join.** The enlarged tree's join, whose two sides are both executed, is
+  `Context/JoinDrift`: one digit's joined face within its rounding, the join's ratio drift and the
+  two branches' face drifts (`JoinDrift.join_read_drift`), the ratio's drift the branches' summed
+  drifts plus the rebases (`JoinDrift.join_ratio_drift`), and the join's code over the passage
+  within the branches' passage drifts plus its roundings and twice its rebases
+  (`JoinDrift.join_passage`); each dyadic cell's join costs at most one bit against either branch.
+- **The certified binary logarithm** (`landmark::binary_log`, the residual's and the grain
+  exponent's `log₂`): its squaring invariant is `Context/BinaryLog`.
 
 [proved-standard] The telescoping of a context-tree weighting code to its root weight is Willems,
 Shtarkov and Tjalkens (1995); the proofs here are this owner's.

@@ -203,13 +203,14 @@
 //!   the node's arrivals, `2^(1−W)` a mantissa rebase's `|ln(1 − r)|` (`rebase_log_residual`) and
 //!   `ρ_c` a carrier rebase's (below).
 //! - **A cell** has at most `B` opened digits and `Σ_(d<P) (2(P − d) − 1) = P²`, and each split of
-//!   a stored chain (stored where paths part, below) rounds once more at `W` bits: an arrival splits at most one
-//!   chain in each digit tree it opens and a lineage at most `D ≤ P` times, so the mantissa units
-//!   number at most `(2n* + 1) P²` a digit, and
-//!   `|log₂ q̂ − log₂ q| ≤ (3/2) B [(n* P² + 2P + 1) ε/μ̂ + (2n* + 1) P² 2^(1−W) + n* P² ρ_c]`
+//!   a stored chain (stored where paths part, below) rounds once more at `W` bits: an arrival splits
+//!   at most one chain in each digit tree it opens and charges at most 4 units to each of the at
+//!   most `P` levels (Lean `StoredDrift.split_charge`), so the mantissa units number at most
+//!   `n* P² + 4n* P ≤ U = n* P² + max((n* + 1) P², 4n* P)` a digit (`U = (2n* + 1) P²` for `P ≥ 4`), and
+//!   `|log₂ q̂ − log₂ q| ≤ (3/2) B [(n* P² + 2P + 1) ε/μ̂ + U 2^(1−W) + n* P² ρ_c]`
 //!   (`log₂ e < 3/2`). Each source is held within a quarter grain:
 //!   - `M_p` is the least `M` with `2^M ≥ 3 B L_R K (n* P² + 2P + 1)` ([`face_bits`]);
-//!   - `W` is the least width with `2^W ≥ 12 B L_R (2n* + 1) P²` ([`carrier_width`]);
+//!   - `W` is the least width with `2^W ≥ 12 B L_R U` ([`carrier_width`]);
 //!   - the carrier rebase keeps a denominator of `R = 126 − W ≥ W` bits, so `ρ_c < 2^(1−R)` and its
 //!     share is below a quarter grain too (the rebase is taken only when its product can overflow;
 //!     otherwise `ρ_c = 0` and the rule is campaign 1's);
@@ -287,13 +288,18 @@
 //! rebase at most,
 //! the ratio's carry `m' ∈ [2^(W−1), 2^W)` below the exact one by a relative `[0, 1/m')`; the map
 //! `β ↦ β_u` is 1-Lipschitz in `ln β` and `β ↦ β_ℓ` an exact shift, so
-//! `|ln β̂_u − ln β_u|, |ln β̂_ℓ − ln β_ℓ| ≤ Δ + 1/m' < Δ + 2^(1−W)` with `Δ` the chain's drift: each part
-//! carries its unit `⌈2^C/m'⌉` in its drift, and the split's two units enter the deposit's increment
-//! once, by the rule the rebases use; a founding ratio `2^S − 1` past `W` bits is carried as
-//! `(2^W − 1) 2^(S − W)` with its unit alike. An arrival splits at most one chain in each digit tree
-//! it opens, and a lineage at most `D ≤ P` times, so the rule's rebase term reads
-//! `(2n* + 1) P² 2^(1−W)` ([`Landmarks::face_rule`]), which the derived `W` holds within a quarter
-//! grain ([`carrier_width`]). **The labels are the tree's own paths**: a cell that founds leaves
+//! `|ln β̂_u − ln β_u|, |ln β̂_ℓ − ln β_ℓ| ≤ Δ + 1/m' < Δ + 2^(1−W)` with `Δ` the chain's drift. Read
+//! as the full tree's instance (Lean `Compression/Landmark/Context/StoredDrift`: each stored chain's
+//! discrepancy at its bottom, the implicit nodes exact), the lower part's rounding `ℓ` and the upper
+//! part's `u` are discrepancies at the two parts' bottoms, the upper one read against the lower
+//! part's weight before its rounding: the lower part's drift carries `ℓ`, the upper part's `u + 2ℓ`,
+//! and the deposit's increment `2(u + ℓ)` (`split_charge`); a founding ratio `2^S − 1` past `W` bits
+//! is carried as `(2^W − 1) 2^(S − W)` with its unit alike. An arrival splits at most one chain in
+//! each digit tree it opens, which adds at most 4 units to each of the at most `P` levels above it,
+//! so a cell's mantissa units number at most `n* P² + 4n* P`, within the rule's
+//! `n* P² + max((n* + 1) P², 4n* P)` units of `2^(1−W)` (`(2n* + 1) P²` for `P ≥ 4`;
+//! [`Landmarks::face_rule`]), which the derived `W` holds within a quarter grain
+//! ([`carrier_width`]). **The labels are the tree's own paths**: a cell that founds leaves
 //! holds, in each branch, one run of its address's letters below the shallowest leaf it founds (the
 //! label pool, `u32` letters), and each of its leaves ends in that run; every letter of a run lies
 //! on a stored node's edge, interned per founding cell, never a record of arrivals or a pointer into
@@ -644,9 +650,16 @@
 //! (`ExecutedTree.passage_drift`, `ExecutedTree.cell_drift`, `ExecutedTree.cell_drift_uniform`),
 //! for the full executed tree: each node's `excess` counts its factors once (the doubled rebase
 //! units here are conservative), and the passage's code is within `N((2D + 1)u + Dρ)` of the
-//! ideal, far inside the rule summed over the cells. [open] Owed in #62: the compacted storage read
-//! as that tree's instance, the executed join's drift, and the certified binary logarithm's
-//! squaring invariant; all are checked by the tests, the drift cell by cell against the oracle.
+//! ideal, far inside the rule summed over the cells. The compacted storage is that tree's instance
+//! in Lean `Compression/Landmark/Context/StoredDrift` (`ConsistentTree.drift_le_tot`,
+//! `stored_passage`, `split_charge`, `level_read_drift`): each stored level's `drift` dominates its
+//! bottom's subtree discrepancy, the split's charges included. The executed join of an enlarged
+//! tree (and of [`FaceJoins`]) is Lean `Compression/Landmark/Context/JoinDrift`
+//! (`join_read_drift`, `join_ratio_drift`, `join_passage`): its `drift` is both branches' summed
+//! drifts plus the rebases, and its `excess` adds its rounding, twice the rebases and both
+//! branches' increments, term for term what the proof charges. The certified binary logarithm's
+//! squaring invariant is Lean `Compression/Landmark/Context/BinaryLog` (`bit_one`, `bit_zero`,
+//! `log_encl`, `hi_one_le`, `grain_floor_of_encl`).
 
 use std::collections::HashMap;
 
@@ -1297,19 +1310,30 @@ pub fn face_bits_at(
     )
 }
 
+/// [proved-derived; agent-inferred] **A digit's mantissa units** on `2^(1−W)` (module header, "The
+/// widths"): `n* P² + max((n* + 1) P², 4n* P)`. The rebases number at most `n* P²`; an arrival splits
+/// at most one chain in each digit tree it opens and charges at most 4 units to each of the at most
+/// `P` levels (Lean `Compression/Landmark/Context/StoredDrift.split_charge`), at most `4n* P`, which
+/// the count `(n* + 1) P²` covers for `P ≥ 4` and the maximum covers at every depth. For `P ≥ 4` it
+/// is `(2n* + 1) P²`.
+fn mantissa_units(population: u64, depth: u64) -> BigUint {
+    let (n, d) = (BigUint::from(population), BigUint::from(depth));
+    let paths = &n * &d * &d;
+    let splits = (&paths + &d * &d).max(&n * &d * 4u32);
+    paths + splits
+}
+
 /// [definition; agent-inferred] **The β carrier width** `W`: the least width (at least 2) with
-/// `2^W ≥ 12 B L_R (2n* + 1) P²`, which holds the rebases' drift, the splits' included (stored where
-/// paths part: `(2n* + 1) P²` units of `2^(1−W)`), within a quarter grain a cell (module header, "The
+/// `2^W ≥ 12 B L_R (n* P² + max((n* + 1) P², 4n* P))`, `12 B L_R (2n* + 1) P²` for `P ≥ 4`, which
+/// holds the rebases' drift, the splits' included (stored where paths part: the digit's mantissa
+/// units of `2^(1−W)`, `mantissa_units`), within a quarter grain a cell (module header, "The
 /// widths").
 pub fn carrier_width(population: u64, digits: u64, grain: u64, depth: u64) -> u64 {
-    let d = BigUint::from(depth);
     ceil_log2(
         &(BigUint::from(12u32)
             * BigUint::from(digits)
             * BigUint::from(grain)
-            * (BigUint::from(population) * 2u32 + 1u32)
-            * &d
-            * &d),
+            * mantissa_units(population, depth)),
     )
     .max(2)
 }
@@ -2656,8 +2680,9 @@ struct Chart {
 /// `depth`; its upper part, down to `depth`, is read (and founded at the deposit) with `upper`, and
 /// its lower part keeps its counts with `lower` (none when it keeps its chart: a leaf, or an upper
 /// part above the forced depths). `units` is the split's rounding on `2^(−C)` (each ratio carried at
-/// `W` bits, one mantissa rebase at most), added once to the increment the deposit carries up, and
-/// `rebases` counts its mantissa rebases.
+/// `W` bits, one mantissa rebase at most), added twice to the increment the deposit carries up (once
+/// as the parts' discrepancies, once as the move it reads above; Lean `StoredDrift.split_charge`),
+/// and `rebases` counts its mantissa rebases.
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 struct Parting {
     depth: usize,
@@ -2941,8 +2966,12 @@ impl Law {
     /// `β_u = (2^(S_up) − 1) 2^(S_low) β/(β (2^(S_low) − 1) + 2^S − 1)`, each formed exactly and
     /// carried once at `W` bits: `|ln β̂_ℓ − ln β_ℓ| ≤ Δ + 1/m'_ℓ` and, the map
     /// `β ↦ β_u` being 1-Lipschitz in `ln β`, `|ln β̂_u − ln β_u| ≤ Δ + 1/m'_u`, each `1/m' < 2^(1−W)`
-    /// with `Δ` the chain's drift ([`Beta::split`]). An upper part above the forced depths
-    /// (`S_up = 0`) passes its face through, and the lower part then keeps `β`.
+    /// with `Δ` the chain's drift ([`Beta::split`]). The carried drifts are the stored
+    /// discrepancies' (Lean `Compression/Landmark/Context/StoredDrift.split_charge`): the lower part
+    /// carries `Δ + ℓ`, the upper part `Δ + u + 2ℓ`, since its subtree holds both parts'
+    /// discrepancies, the upper one read against the lower part's weight before its rounding. An
+    /// upper part above the forced depths (`S_up = 0`) passes its face through, and the lower part
+    /// then keeps `β`.
     fn part(
         &self,
         nodes: &impl Standing,
@@ -2990,9 +3019,12 @@ impl Law {
             drift: chart.drift.saturating_add(units),
             excess: chart.excess,
         };
+        // The upper part's drift carries its own unit and twice the lower part's (its weight is
+        // read against the lower part's before that part's rounding; Lean `StoredDrift.split_charge`).
+        let upper_drift = upper_units.saturating_add(lower_units.saturating_mul(2));
         Parting {
             depth,
-            upper: chart_of(upper.0, upper_units, upper.1),
+            upper: chart_of(upper.0, upper_drift, upper.1),
             lower: Some(chart_of(lower.0, lower_units, lower.1)),
             units: upper_units.saturating_add(lower_units),
             rebases: u32::from(upper.1.is_some()) + u32::from(lower.1.is_some()),
@@ -3269,7 +3301,7 @@ impl Law {
 
     /// **Deposit one branch's read** on a standing: each mixing level's β steps by
     /// `k(b)/q̂_(ℓ+1)(b)` bottom-up and its certificates grow (a parting chain's upper part is
-    /// stepped on its split's chart, and its split's rounding added once to the increment). Then
+    /// stepped on its split's chart, and its split's rounding added twice to the increment). Then
     /// the storage acts (stored where paths part): a parting chain is split (its upper part founded with its
     /// stepped chart and the chain's counts, its lower part keeping its counts at `β_ℓ`, the parent
     /// relinked to the upper part), and an arrival stopped at the prior founds its leaf at `D`'s
@@ -3335,7 +3367,7 @@ impl Law {
             let increment = theta
                 .saturating_add(rebase.saturating_mul(2))
                 .saturating_add(carried)
-                .saturating_add(split);
+                .saturating_add(split.saturating_mul(2));
             let chart = match upper.as_mut() {
                 Some(chart) if parts => chart,
                 _ => nodes.chart_mut(node),
@@ -3705,14 +3737,15 @@ impl Landmarks {
     }
 
     /// **The rule's a-priori bound per cell**, in bits (module header, "The widths"):
-    /// `(1 + 2^(−min(M_p, W))) (3/2) B [(n* P² + 2P + 1) ε/μ̂ + (2n* + 1) P² 2^(1−W) + n* P² ρ_c]`
-    /// with `ε/μ̂ = 1/(2⌊2^(M_p)/K⌋)`, `K = 2n* + 2`, and `ρ_c = 2^(1−R)` when the carrier rebases
-    /// (else `0`). [proved-derived; agent-inferred] Stored where paths part, each
+    /// `(1 + 2^(−min(M_p, W))) (3/2) B [(n* P² + 2P + 1) ε/μ̂ + U 2^(1−W) + n* P² ρ_c]`
+    /// with `ε/μ̂ = 1/(2⌊2^(M_p)/K⌋)`, `K = 2n* + 2`, `U = n* P² + max((n* + 1) P², 4n* P)` the
+    /// digit's mantissa units (`(2n* + 1) P²` for `P ≥ 4`), and `ρ_c = 2^(1−R)` when the carrier
+    /// rebases (else `0`). [proved-derived; agent-inferred] Stored where paths part, each
     /// split rounds its two ratios once at `W` bits (`Law::part`: each `1/m' < 2^(1−W)`): an arrival
-    /// splits at most one chain in each digit tree it opens, and adds the split's units once to its
-    /// increment (a further rebase of that arrival at one level), and a stored node's lineage is
-    /// split at most `D ≤ P` times, each time adding one unit to its drift; so the mantissa term
-    /// reads `(2n* + 1) P² 2^(1−W)`, which the derived `W` holds within a quarter grain
+    /// splits at most one chain in each digit tree it opens, which charges at most 4 units to each
+    /// of the at most `P` levels above it (Lean `StoredDrift.split_charge`), so a cell's mantissa
+    /// units number at most `n* P² + 4n* P`, within `U` at every depth (the count `(n* + 1) P²`
+    /// alone covers `4n* P` only for `P ≥ 4`), which the derived `W` holds within a quarter grain
     /// ([`carrier_width`]). At the derived widths the rule is at most `(1 + 2^(−min(M_p, W))) · 3/4`
     /// of a grain, and `· 1/2` without the carrier's rebase.
     pub fn face_rule(&self) -> Rat {
@@ -3732,8 +3765,8 @@ impl Landmarks {
         let floor = (BigInt::one() << face as usize)
             / BigInt::from(based_floor(declaration.population, declaration.mass, declaration.base));
         let rounding = Rat::new(&paths + &d * 2 + 1, floor * 2);
-        let splits = &paths + &d * &d;
-        let mut rebases = Rat::from_integer(&paths + splits) * two_power(1 - carrier as i64);
+        let units = BigInt::from(mantissa_units(declaration.population, self.law.path_depth()));
+        let mut rebases = Rat::from_integer(units) * two_power(1 - carrier as i64);
         if rebase > 0 {
             rebases += Rat::from_integer(paths) * two_power(1 - rebase as i64);
         }
@@ -4160,8 +4193,9 @@ pub struct BinaryLog {
     pub exact: bool,
 }
 
-/// **The binary logarithm by exact squaring** (agent-inferred; the invariant's Lean statement is
-/// owed in #62): `y = m/2^whole ∈ [1, 2)` is held between two fixed-point integers on `2^(−P)`,
+/// **The binary logarithm by exact squaring** (agent-inferred; the invariant is Lean
+/// `Compression/Landmark/Context/BinaryLog.{bit_one, bit_zero, log_encl}`, the carrier
+/// `hi_one_le`): `y = m/2^whole ∈ [1, 2)` is held between two fixed-point integers on `2^(−P)`,
 /// rounded outward; each step squares both, and a bit is emitted only when both bounds agree on
 /// `y² ≥ 2` (then both halve, outward). It stops at `bits` fraction bits, when `decided` accepts,
 /// or when the bounds straddle `2` (a shorter, still certified enclosure). At most 128 bits.
@@ -4857,7 +4891,8 @@ pub struct JoinReceipt {
 /// `β' = β q̂_left(b)/q̂_right(b)`, the drift growing by both sides' excess increments and the
 /// rebases, the excess by its rounding `2^(−M)/min(q̂, q̂_left, q̂_right)`, twice the rebases and
 /// both sides' increments (the enlarged tree's join accounting; Lean
-/// `Compression/Landmark/Context/LocalWeighing.forward_executed`). A read's certificate is the faces' plus each join's drift
+/// `Compression/Landmark/Context/LocalWeighing.forward_executed`,
+/// `Compression/Landmark/Context/JoinDrift.{join_read_drift, join_ratio_drift, join_passage}`). A read's certificate is the faces' plus each join's drift
 /// and rounding. Each dyadic cell is its own digit tree, weighed by its own evidence.
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct FaceJoins {
