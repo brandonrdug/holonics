@@ -20,8 +20,9 @@ step law that follows, and says what the RH work contributes and where its paral
 
 ## 1. The carried path is constant between cuts
 
-The ladder never evaluates `W + ηD` itself. It evaluates the successor the budgeted carry builds
-(`hnn::constitution::carried_entry`). Each entry `i` moves by `q_i u`, `u = 2^(−L)` the locus's
+The step sizes the own release tries are `η₀ 2^(−j)`, each half the last, from `η₀`
+(`ladder_start`) down at most `LADDER_DEPTH` halvings. At none of them is `W + ηD` itself read. Each
+reads the successor the budgeted carry builds (`hnn::constitution::carried_entry`). Each entry `i` moves by `q_i u`, `u = 2^(−L)` the locus's
 lattice unit. The fine point `P` is `η d_i` plus the entry's carried remainder `r_i`, rounded to
 the fine lattice `2^(−L−k)` (nearest, ties upward). The coarse coordinate `q_i` is `P` rounded to
 `uℤ` the same way. The two roundings compose to
@@ -30,23 +31,28 @@ the fine lattice `2^(−L−k)` (nearest, ties upward). The coarse coordinate `q
 q_i(η) = ⌊(r_i + η d_i)/u + c⌋,   c = 1/2 + 2^(−k−1)
 ```
 
-[derived: `⌊(⌊y⌋ + m)/N⌋ = ⌊(y + m)/N⌋` for integers `m` and `N > 0`]. The transport modulus is
+[derived: `⌊(⌊y⌋ + m)/N⌋ = ⌊(y + m)/N⌋` for integers `m` and `N > 0`]. This needs `k ≥ 1`, which
+holds because `k = gamma_length(m) ≥ 1`. At `k = 0`, `div_rem_coordinate` skips the coarse rounding
+and `c` would be `1/2`. The transport modulus is
 carried onto the same lattice, nearest, and contributes one more such coordinate.
 
 So **every coordinate is a step function of `η`**. It changes exactly where `(r_i + η d_i)/u + c`
 passes an integer (`coordinate_changes_iff`): at the **cuts** of entry `i`, an arithmetic
 progression of spacing `u/|d_i|` whose offset is set by the carried remainder. Every reading,
-commitment and code length the ladder compares is a function of the carried state. Between two
+commitment and code length the comparison reads is a function of the carried state. Between two
 consecutive cuts of the union over entries, the successor is the same constitution and
 **nothing changes**. The candidate successors along a direction are indexed by their cuts, not by
 `η`.
 
 Two consequences:
 - "Continuous along the move" holds for the uncarried path `W + ηD` that the first-order
-  certificate speaks to. The comparison the ladder executes is piecewise constant, with jumps only
-  at cuts. The certificate's continuous code length and the carried one differ by the carry's
-  released residual, at most half a fine cell per entry.
-- The ladder's own stopping rule, `η · max|d| · 2 < u`, places the first cut near `u/(2 max|d|)`
+  certificate speaks to. The comparison read at the successor is piecewise constant, with jumps
+  only at cuts. The successor reads the entry `W + q_i u`. It differs from `W + η d_i` by the
+  carried remainder (at most `u/2` per entry, held for the next deposit) and by the carry's released
+  residual (at most half a fine cell). Half a fine cell bounds only the entry plus its remainder
+  against `W + η d_i`. Both are bounds on states: the code lengths differ by that state difference
+  read through the comparison, which nothing here bounds.
+- The halving's own stopping rule, `η · max|d| · 2 < u`, places the first cut near `u/(2 max|d|)`
   when the remainders are zero (just below it, by the fine half-cell in `c`). With nonzero
   remainders the first cut can lie much lower.
 
@@ -79,20 +85,20 @@ holds trivially because every cut set is a lattice progression.
 
 ## 3. Brandon's numbers on the cut set
 
-- **The multiplicative view.** The ladder's rungs `1/16, 1/32, …, 1/2048` lie on the orbit of `2^ℤ`.
-  Eight rungs span the factor `2^(−7)`.
+- **The multiplicative view.** The step sizes `1/16, 1/32, …, 1/2048` lie on the orbit of `2^ℤ`.
+  Eight of them span the factor `2^(−7)`.
 - **The additive view.** The carried states in that span number
   `(1/16 − 1/2048)‖d‖₁/u ± n = (127/2048)‖d‖₁/u ± n`. The difference of
   denominators is `2048 − 16 = 2032 = 2⁴·127`, and `1/16 − 1/2048 = 2032/(16·2048) = 127/2^11`.
 - **Each octave holds half the states of the one above it.** The octave `[η/2, η]` holds
-  `(η/2)‖d‖₁/u ± n` carried states. The ladder reads one of them per octave. The coarsest octave
+  `(η/2)‖d‖₁/u ± n` carried states. Halving reads one of them per octave. The coarsest octave
   `(1/32, 1/16]` holds `2^7 = 128` times the states of the finest, `(1/4096, 1/2048]`.
 - **Between `m6`'s adoption and its flip** lie `(1/2048)‖d‖₁/u ± n` carried states. Halving
   cannot place the wall among them. Their number for `m6`'s direction needs only `‖d‖₁/u` and the
   remainders (§7).
 
-So the multiplicative ladder spends its reads evenly per octave, while the states are spread evenly
-in `η`. Near the step that matters, the ladder resolves the wall to a factor of two, among
+So halving spends its reads evenly per octave, while the states are spread evenly in `η`. Near the
+step that matters, halving resolves the wall to a factor of two, among
 `η‖d‖₁/(2u)` states.
 
 ## 4. The gaps
@@ -111,19 +117,19 @@ Two kinds of gap are spectral here, and the second is the one that sets the step
 2. **The stations' margins.** A decision changes at a cut only where some station's margin
    reaches zero. In #207's lock rule the margin of a ring's commitment is its certified gap
    against the stations the readings must lock with it. If each coordinate moved changes a margin
-   `μ` by at most `c`, then `μ` stays positive at every step size with
+   `μ` by at most `κ`, then `μ` stays positive at every step size with
 
    ```text
-   c (η‖d‖₁/u + n) ≤ μ₀            (margin_survives_moves)
+   κ (η‖d‖₁/u + n) ≤ μ₀            (margin_survives_moves)
    ```
 
    So the flip-free stretch of the direction is set by **the smallest margin over its rate per
-   coordinate**: `η_safe ≥ (μ_min/c − n) u/‖d‖₁`. `m7`'s flip is one request whose lock order
+   coordinate**: `η_safe ≥ (μ_min/κ − n) u/‖d‖₁`. `m7`'s flip is one request whose lock order
    swaps. Its smallest margin at the incumbent is not a sub-resolution tie: it is about 140 cell
    widths (§4b). Whether that margin closes within the step is the main line's replay.
    The bound charges every entry its rounding (the `n`). A station's readings depend on only some
    entries, and charging only those tightens it.
-3. **The rate per coordinate.** At first order, `c` is the reading's covector times `u`
+3. **The rate per coordinate.** At first order, `κ` is the reading's covector times `u`
    (`hnn.executed-growth-covector`). Over a stretch, the rate is bounded only where the read
    multiplier stays a simple root (the flip record's §3b names this missing owner).
    [derived; a simple root's perturbation] Near a pair of multipliers of one monodromy that nearly
@@ -184,10 +190,10 @@ Reading the actual flip's cut index `j_f` against `j*`:
 candidates are the carried states) and `margin_survives_moves`] Replace halving in `η` by stepping
 on the cut index:
 
-1. **Count the candidates.** List the cuts of the carried path up to the ladder's start: the
+1. **Count the candidates.** List the cuts of the carried path up to the starting step size `η₀`: the
    progressions `((j − c)u − r_i)/d_i`. There are `N(η_start)` of them, about `η_start‖d‖₁/u`.
 2. **Predict the wall.** Read the smallest certified margin and its first-order rate per coordinate,
-   and take the cut index where it would be consumed. Read the carried state there, one batch.
+   and take the cut index where it would be consumed. Read the carried state there, in one read.
 3. **Locate the wall exactly.** If the commitments changed there, bisect on the cut index between
    the incumbent and that cut. This takes `log₂ N` reads and ends at two adjacent carried states:
    - the last before the wall, where the released and held code lengths agree (no jump), so strict
@@ -199,8 +205,8 @@ on the cut index:
    release record: the jump is repaid or not by later steps.
 
 Bisecting on the cut index resolves a wall to one coordinate move. Halving resolves it to a factor
-of two in `η`. The reads number `log₂ N(η_start) ≤ log₂(η_start‖d‖₁/u + n)`, so the ladder's fixed
-depth and its `2^(−7)` range are no longer needed. Nothing here is built. The main line's
+of two in `η`. The reads number `log₂ N(η_start) ≤ log₂(η_start‖d‖₁/u + n)`, so the fixed number
+of halvings and its `2^(−7)` range are no longer needed. Nothing here is built. The main line's
 measurement (§7) decides whether the wall lies where the margins predict.
 
 ## 6. What the RH work contributes, and what does not fit
@@ -222,9 +228,10 @@ measurement (§7) decides whether the wall lies where the margins predict.
 
 **What does not fit.**
 - **Level repulsion and GUE spacing.** Repulsion between eigenvalues comes from one self-adjoint
-  operator (or, for zeta, from the heat flow's pair term, `rh.pair-inertia-rate`). A station's
-  sheets are read by *different* members' monodromies, independent matrices, and the monodromy is
-  not self-adjoint. Nothing makes the stations' margins avoid zero. Near-ties occur with positive
+  operator (or, for zeta, from the heat flow's pair term, `rh.pair-inertia-rate`). A station is a
+  tick of the receiving ring's clock, and a candidate is a class placed there. Each candidate's
+  reading is the bank's growth with that class placed, so different candidates are read by
+  *different* monodromies, independent matrices, none of them self-adjoint. Nothing makes the stations' margins avoid zero. Near-ties occur with positive
   density `p₀` at zero, and [derived; independent margins assumed] the smallest margin over `S`
   stations shrinks like `1/(S p₀)`. Repulsion with spacing density `∝ s²` would give `S^(−1/3)`
   instead; nothing here supplies it.
@@ -243,7 +250,7 @@ Along `m6`'s and `m7`'s directions:
   `margin_survives_moves`'s prediction against the wall;
 - for `m7`, request 3's pair (station 2 against station 5): the first-order rates `w_i`, the weighted
   move count `M_w(j)` at each cut, `j*`, and the flip's cut index `j_f` (§4b);
-- the margins' distribution near zero over the batch's stations, which tests §6's prediction that
+- the margins' distribution near zero over the requests' stations, which tests §6's prediction that
   near-ties are not repelled.
 
 ## 8. Owners
@@ -252,7 +259,7 @@ Along `m6`'s and `m7`'s directions:
   `coordinate_moves_gt`, `moves_sum_lt`, `moves_sum_gt`, `margin_survives_moves`,
   `weighted_moves_le`, `margin_survives_weighted`.
 - Rust (unchanged): `hnn::constitution::carried_entry` (the carried coordinate), `hnn::executed`'s
-  ladder (the halving law §5 would replace).
+  `ladder_start` and `LADDER_DEPTH` (the halving law §5 would replace).
 - Owed to #62:
   - the rounding composition as a Lean statement;
   - the three-distance law;

@@ -13,8 +13,9 @@ import Mathlib.Tactic.FieldSimp
 coordinate, nearest with ties upward, of the fine point, itself nearest with ties upward, of its
 update `η d` plus its carried remainder `r`. The two roundings compose to
 `q(η) = ⌊(r + η d)/u + c⌋` with `c = 1/2 + 2^(−k−1)`, `2^(−k)` the fine lattice's ratio to the
-coarse [derived: `⌊(⌊y⌋ + m)/N⌋ = ⌊(y + m)/N⌋` for integers `m` and `N > 0`]. So along the direction each coordinate is constant in `η` except at its **cuts**, the step
-sizes where `(r + η d)/u + c` passes an integer: an arithmetic progression of spacing `u/|d|`. Every
+coarse, `k ≥ 1` [derived: `⌊(⌊y⌋ + m)/N⌋ = ⌊(y + m)/N⌋` for integers `m` and `N > 0`]. So
+along the direction each coordinate is constant in `η` except at its **cuts**, the step sizes
+where `(r + η d)/u + c` passes an integer: an arithmetic progression of spacing `u/|d|`. Every
 reading, commitment and code length of the successor is a function of the carried state, so all of
 them are constant between consecutive cuts of the union over entries and change only at a cut:
 the carried path's candidate states are indexed by its cuts, not by `η`.
@@ -24,8 +25,8 @@ the carried path's candidate states are indexed by its cuts, not by `η`.
   than one (`coordinate_moves_lt`, `coordinate_moves_gt`), and the whole map by
   `|η′ − η|/u · ‖d‖₁` up to less than its number of entries `n` (`moves_sum_lt`, `moves_sum_gt`).
 - **A margin survives every carried state it can pay for**: if each coordinate moved changes a
-  station's margin by at most `c`, the margin stays positive at every step size with
-  `c(η/u · ‖d‖₁ + n) ≤ μ₀` (`margin_survives_moves`); entry by entry, with a rate `w_i` per
+  station's margin by at most `κ`, the margin stays positive at every step size with
+  `κ(η/u · ‖d‖₁ + n) ≤ μ₀` (`margin_survives_moves`); entry by entry, with a rate `w_i` per
   coordinate of entry `i`, at every step size with `η/u · Σ w_i|d_i| + Σ w_i < μ₀`
   (`margin_survives_weighted`).
 
@@ -143,21 +144,21 @@ theorem moves_sum_gt (s : Finset ι) (hs : s.Nonempty) (r d c : ι → ℝ) {u :
   linarith
 
 /-- [proved-derived; formal-checked] **A margin survives every carried state it can pay for**: if a
-station's margin `μ` changes by at most `c ≥ 0` per coordinate moved, `|μ η − μ 0| ≤ c · moves`,
-then `μ η > 0` at every step size with `c(η/u · ‖d‖₁ + n) ≤ μ 0`. So the flip-free stretch of the
+station's margin `μ` changes by at most `κ ≥ 0` per coordinate moved, `|μ η − μ 0| ≤ κ · moves`,
+then `μ η > 0` at every step size with `κ(η/u · ‖d‖₁ + n) ≤ μ 0`. So the flip-free stretch of the
 direction is set by the smallest margin over its rate per coordinate, counted on the cuts. -/
 theorem margin_survives_moves (s : Finset ι) (hs : s.Nonempty) (r d cs : ι → ℝ) {u : ℝ}
-    (hu : 0 < u) {μ : ℝ → ℝ} {c η : ℝ} (hc : 0 ≤ c) (hη : 0 ≤ η)
-    (hμ : |μ η - μ 0| ≤ c * moves s r d cs u 0 η)
-    (hpay : c * (η / u * (∑ i ∈ s, |d i|) + s.card) ≤ μ 0) (hμ0 : 0 < μ 0) : 0 < μ η := by
+    (hu : 0 < u) {μ : ℝ → ℝ} {κ η : ℝ} (hκ : 0 ≤ κ) (hη : 0 ≤ η)
+    (hμ : |μ η - μ 0| ≤ κ * moves s r d cs u 0 η)
+    (hpay : κ * (η / u * (∑ i ∈ s, |d i|) + s.card) ≤ μ 0) (hμ0 : 0 < μ 0) : 0 < μ η := by
   have hlt := moves_sum_lt s hs r d cs hu 0 η
   rw [sub_zero, abs_of_nonneg hη] at hlt
   have := (abs_le.mp hμ).1
-  rcases hc.lt_or_eq with hc' | hc'
-  · have hstrict : c * moves s r d cs u 0 η < c * (η / u * (∑ i ∈ s, |d i|) + s.card) :=
-      mul_lt_mul_of_pos_left hlt hc'
+  rcases hκ.lt_or_eq with hκ' | hκ'
+  · have hstrict : κ * moves s r d cs u 0 η < κ * (η / u * (∑ i ∈ s, |d i|) + s.card) :=
+      mul_lt_mul_of_pos_left hlt hκ'
     linarith
-  · subst hc'
+  · subst hκ'
     simp at hμ
     linarith
 
@@ -166,7 +167,8 @@ own change**: for nonnegative per-entry rates `w i`, the weighted moves
 `Σ w_i |q_i(η′) − q_i(η)|` are at most `|η′ − η|/u · Σ w_i|d_i| + Σ w_i`. -/
 theorem weighted_moves_le (s : Finset ι) (r d c w : ι → ℝ) (hw : ∀ i ∈ s, 0 ≤ w i) {u : ℝ}
     (hu : 0 < u) (η η' : ℝ) :
-    ∑ i ∈ s, w i * |((coordinate (r i) (d i) u (c i) η' - coordinate (r i) (d i) u (c i) η : ℤ) : ℝ)|
+    ∑ i ∈ s, w i *
+        |((coordinate (r i) (d i) u (c i) η' - coordinate (r i) (d i) u (c i) η : ℤ) : ℝ)|
       ≤ |η' - η| / u * (∑ i ∈ s, w i * |d i|) + ∑ i ∈ s, w i := by
   have h : ∀ i ∈ s, w i * |((coordinate (r i) (d i) u (c i) η' -
       coordinate (r i) (d i) u (c i) η : ℤ) : ℝ)| ≤ |η' - η| / u * (w i * |d i|) + w i := by
