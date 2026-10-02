@@ -362,7 +362,7 @@ the largest real logit of `R P_R v_R`. Read at m6 and w16 on held-out requests
   first class and its stations right count only targets equal to it: 0 of 8 at both states on one
   request; 2 of 16 at m6 on two. The bank's open section reads 4 and 2 of 8, its release 4 and 4.
 - **Reading the stations through `R P_R^(1+j) v_R` is the linear readout retired on September 30**
-  (`hnn::prediction`'s header: its descent direction met the executed decision's at `39/512`).
+  (`hnn::prediction`'s header: its descent direction met the executed decision's at cosine `39/512`).
 
 So §6's deciding number is withdrawn: no word read at a U6 state can separate m6 from w16 while the
 receiving map holds nothing, and forming one would revive the retired readout. In the generation
@@ -384,10 +384,22 @@ and the next passage differs from its predecessor only by its injection. Astra's
 have their own transported return. [agent-inferred] The U6 chain's gains are therefore gains of the
 source codec read by a declared bank; no material locus of the constitution learns along it.
 
-**The next loop's subject** (decided here). §6's gate is restated on a formed receiver: from the same
-opening material, the receiver's own comparison deposits into the receiving map `R` and the contact
-storage `C` along a passage of the 8 training requests, once with `E` at m6 and once at w16 (ρ₀ for
-both, every other setting equal); then a word reads the 128 held-out requests' stations through each
-formed receiver. The gate is §6's number: w16 exceeds m6 by at least 28 of 1024 stations. If it
-does not, the U6 move's gains do not reach the machine's receiving material, and the bank chain
-stops as §6 says.
+**The aperture is declared, not derived.** The prediction field's receiver has aperture
+`A = K·w + 1 = 3` from the declared words `K = 2` and span `w = 1` (`hnn_prediction.rs`,
+`order_declared`); its only law is the refusal of an aperture above the receiver's observability rank
+(`ReceivingPhases::declare`). It is a held quantity beside campaign 1's `A = 2` (the
+[constants record](2026-10-02_THE_CONSTANTS_NOTHING_DERIVES_THE_GRAIN_IS_THE_ROOT_AND_ITS_READING_COUNT_IS_THE_ADMITTED_FUTURE.md) §2),
+and it decides how many cells one word reads. No station read through a word is attempted here.
+
+**The next loop's subject** (decided here). No station class is read through `R`: that is the readout
+retired above, whether `R` is zero or formed. §6's question is asked instead of the machine's own
+receiving path, campaign 1's exposure protocol, whose measurement is a code length, not a station
+class: `executed expose` runs `Reference::expose_with` on the prediction field from a stored
+constitution, over one cut of the field's declared population (`2^16` cells: order-2 passages at the
+training seed, then the 128 held-out passages at seed `2026093012` with their 1024 station cells held
+out). The protocol reads each cell's code before it deposits, deposits into every locus it admits
+from the receiver's own comparison, and never deposits on a held-out cell. Run once from m6 and once
+from w16, with everything else equal, it reads whether the U6 move's `E` shortens the machine's own
+held-out code. [agent-inferred] The gate is one grain per held-out station: w16's held-out combined
+code below m6's by at least `1024 · 1/16 = 64` bits. If it is not, the U6 move's gains do not reach the
+machine's receiving path, and the bank chain stops as §6 says.
