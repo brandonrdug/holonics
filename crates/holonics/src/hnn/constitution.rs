@@ -683,6 +683,14 @@ impl BudgetedCarry {
             .filter(|(_, quotient)| !quotient.is_zero())
             .count() as u64
     }
+
+    /// Whether any entry of a family's carriers took a nonzero applied coordinate `q`
+    /// ([`Family::carries`]).
+    fn family_moved(&self, family: Family) -> bool {
+        self.staged
+            .iter()
+            .any(|((carrier, _), (_, quotient))| family.carries(carrier) && !quotient.is_zero())
+    }
 }
 
 /// [definition] **The carried remainders of one lattice-valued array** (Lean `Carried.rem`), by
@@ -2475,6 +2483,23 @@ pub enum Family {
     Factor(usize),
 }
 
+impl Family {
+    /// Whether a carrier holds this family's moved entries (its values, not its scale or Gram).
+    fn carries(self, carrier: &Carrier) -> bool {
+        match (self, carrier) {
+            (Family::Map, Carrier::Map)
+            | (Family::Passive, Carrier::Passive)
+            | (Family::Slices, Carrier::Slices)
+            | (Family::Standing, Carrier::Standing) => true,
+            (Family::Resonator(f), Carrier::Resonator(c)) | (Family::Factor(f), Carrier::Factor(c)) => {
+                f == *c
+            }
+            (Family::Pair(o), Carrier::Pair { offset, .. }) => o == *offset,
+            _ => false,
+        }
+    }
+}
+
 /// [definition] **One factor step**: the family's descent direction `G_x`, the feature energy
 /// `e = Σ_t w|f_t|²` its window adds to the family's statistic `h_x`, and the **covector scale**
 /// `c = max_t |g_t|_∞`, the largest entry of the covector one return carries at the family's output
@@ -2631,6 +2656,12 @@ pub struct DepositReading {
     pub released: Vec<(Locus, Carrier, usize, Rat)>,
     pub released_bits: u64,
     pub stepped: u64,
+    /// [definition; agent-inferred, October 2; the
+    /// [contact loop record](../../../../research/records/2026-10-02_THE_CONTACT_LOOP_THE_RETURN_REACHES_EVERY_CONTACT_AND_ITS_CHANGE_IS_RELEASED_BEFORE_THE_LATER_CUT.md)]
+    /// **The rounding refusals**: every family certified at a step `η > 0` none of whose entries
+    /// took a nonzero lattice coordinate, so its whole move was released below its locus's fine
+    /// lattice and its constitution did not change. A reached family either moves or is named here.
+    pub vanished: Vec<(Locus, Family)>,
     pub charts: Vec<(Locus, ChartReading)>,
     pub landmarks: u64,
     /// Every loaded resonator gain step the deposit backtracked instead of carrying a gain to
@@ -5246,6 +5277,14 @@ impl Constitution {
             );
         }
         let released_bits = released.iter().map(|(.., residual)| bits(residual)).sum();
+        let vanished: Vec<(Locus, Family)> = certified
+            .iter()
+            .filter(|(_, reading)| reading.step.step.is_positive())
+            .filter(|((locus, family), _)| {
+                strokes.get(locus).is_none_or(|at| !at.family_moved(*family))
+            })
+            .map(|(key, _)| *key)
+            .collect();
         let backtracks: Vec<GainBacktrack> = strokes
             .values()
             .flat_map(|at| at.backtracks().iter().cloned())
@@ -5294,6 +5333,7 @@ impl Constitution {
             released,
             released_bits,
             stepped,
+            vanished,
             charts,
             landmarks: deposit.landmarks().len() as u64,
             backtracks,

@@ -464,57 +464,71 @@ fn landmark_prequential_partitions_the_cut() {
     assert!(run.run.largest_residual <= run.run.face_rule);
 }
 
-/// [measured-diagnostic; agent-inferred, October 2; the
+/// The reference fixture of the contact loop: the chain on a generic constitution, mounted, one word
+/// read and compared against its targets; the resident and the compare's deposit.
+fn reached_contacts(
+    reference: &Reference,
+    field: &crate::hnn::Field,
+) -> (crate::hnn::reference::Resident, crate::hnn::port::Deposit, crate::hnn::port::StagedId) {
+    let mut resident = reference
+        .mount_with(field, &Current::at_rest(field), super::learning::generic(field, 301))
+        .unwrap();
+    let (moment, _) = reference.ingest(&mut resident, None, &one_hot(&[1, 2, 0, 3, 1])).unwrap();
+    let phases = resident.admitted()[0].clone();
+    let (pending, _) = reference.refine(&mut resident, &moment, &phases).unwrap();
+    let (staged, compared) = reference.compare(&mut resident, pending, &one_hot(&[1, 0])).unwrap();
+    match compared.deposit {
+        Component::Present(deposit) => (resident, deposit, staged),
+        other => panic!("the compare's deposit: {other:?}"),
+    }
+}
+
+/// [definition; agent-inferred, October 2; the
 /// [contact loop record](../../../../../research/records/2026-10-02_THE_CONTACT_LOOP_THE_RETURN_REACHES_EVERY_CONTACT_AND_ITS_CHANGE_IS_RELEASED_BEFORE_THE_LATER_CUT.md)]
-/// **A reached return's change to each contact, and the later cut that would consume it** (Astra's
-/// owner-to-consumer check, on the reference machine): a word on a generic constitution of the
-/// chain, its compare and deposit, then the same later drive read at the predecessor and at the
-/// successor. The return reaches every contact's channel with a certified step (`η > 0` for each
-/// factor family), and the later cut reads differently. The receipts the record cites are printed:
-/// whether each contact's factors moved, the channel entries the deposit released below their
-/// lattice, and the channel remainders it carried.
+/// **A reached contact family moves or is named as a rounding refusal** (Astra's smallest unit):
+/// the word's return reaches every contact's three factor families with a certified step `η > 0`;
+/// deposited whole, and then each family alone with every other locus frozen, a family's factor
+/// moves exactly when the deposit does not name it in [`DepositReading::vanished`]. Under the same
+/// later drive the predecessor and the whole successor read differently.
 #[test]
-fn a_reached_return_steps_every_contact_and_the_later_cut_reads_the_successor() {
-    use super::learning::generic;
-    use crate::hnn::constitution::Locus;
+fn a_reached_contact_family_moves_or_is_named_a_rounding_refusal() {
+    use crate::hnn::constitution::{Family, Locus};
     use crate::hnn::field::ConstitutionRead;
+    use crate::hnn::port::Deposit;
     let field = chain();
     let reference = Reference::new(4, 1 << 40);
-    let mut post = reference
-        .mount_with(&field, &Current::at_rest(&field), generic(&field, 301))
-        .unwrap();
-    let (moment, _) = reference.ingest(&mut post, None, &one_hot(&[1, 2, 0, 3, 1])).unwrap();
-    let phases = post.admitted()[0].clone();
-    let (pending, _) = reference.refine(&mut post, &moment, &phases).unwrap();
-    let (staged, _) = reference.compare(&mut post, pending, &one_hot(&[1, 0])).unwrap();
+    let (mut post, deposit, staged) = reached_contacts(&reference, &field);
     let mut pre = post.clone();
-    let reading = match reference.deposit(&mut post, staged).unwrap().deposit {
+    let theta = pre.constitution().clone();
+    let moved = |a: usize, family: usize, next: &crate::hnn::Constitution| match family {
+        0 => theta.contact_storage(a) != next.contact_storage(a),
+        1 => theta.contact_stiffness(a) != next.contact_stiffness(a),
+        _ => theta.contact_dissipation(a) != next.contact_dissipation(a),
+    };
+    let whole = match reference.deposit(&mut post, staged).unwrap().deposit {
         Component::Present(reading) => reading,
         other => panic!("the deposit's reading: {other:?}"),
     };
+    let reach = deposit.reach().unwrap().clone();
     for a in 0..field.contacts().len() {
-        let steps: Vec<_> =
-            reading.steps.iter().filter(|(l, _)| *l == Locus::Channel(a)).collect();
-        assert_eq!(steps.len(), 3, "the return reaches contact {a}'s three factor families");
-        assert!(steps.iter().all(|(_, s)| s.step.step > Rat::zero()));
-        let (p, q) = (pre.constitution(), post.constitution());
-        eprintln!(
-            "contact {a}: factors moved (storage, stiffness, dissipation) = ({}, {}, {})",
-            p.contact_storage(a) != q.contact_storage(a),
-            p.contact_stiffness(a) != q.contact_stiffness(a),
-            p.contact_dissipation(a) != q.contact_dissipation(a),
-        );
+        for family in 0..3 {
+            let key = (Locus::Channel(a), Family::Factor(family));
+            let certified: Vec<_> = whole.steps.iter().filter(|(l, s)| *l == key.0 && s.family == key.1).collect();
+            assert_eq!(certified.len(), 1, "the return reaches contact {a}'s family {family}");
+            assert!(certified[0].1.step.step > Rat::zero());
+            assert_eq!(moved(a, family, post.constitution()), !whole.vanished.contains(&key));
+            let step = deposit
+                .factors()
+                .iter()
+                .find(|s| s.gradient.locus() == key.0 && s.gradient.family() == key.1)
+                .unwrap()
+                .clone();
+            let alone = Deposit::new(deposit.commit(), Vec::new(), vec![step], vec![key.0])
+                .with_reach(reach.clone());
+            let (next, reading) = theta.deposited(&alone).unwrap();
+            assert_eq!(moved(a, family, &next), !reading.vanished.contains(&key));
+        }
     }
-    eprintln!(
-        "channel entries released at the deposit: {}; channel remainders carried: {:?}",
-        reading.released.iter().filter(|(l, ..)| matches!(l, Locus::Channel(_))).count(),
-        post.constitution()
-            .carried_remainders()
-            .into_iter()
-            .filter(|(l, ..)| matches!(l, Locus::Channel(_)))
-            .map(|(l, c, i, r)| format!("{l:?} {c:?} {i} {r}"))
-            .collect::<Vec<_>>()
-    );
     let later = |resident: &mut crate::hnn::reference::Resident| {
         let (moment, _) = reference.ingest(resident, None, &one_hot(&[2, 3, 1, 0, 2])).unwrap();
         let phases = resident.admitted()[0].clone();
@@ -523,85 +537,4 @@ fn a_reached_return_steps_every_contact_and_the_later_cut_reads_the_successor() 
         format!("{:?}", compared.forward)
     };
     assert_ne!(later(&mut pre), later(&mut post));
-}
-
-/// [measured-diagnostic; agent-inferred, October 2; the contact loop record §3] **The contacts' steps
-/// alone**: the same reached return's channel families deposited without the other loci, together
-/// and then each family alone at its own certificate (no joint halving), with the same later drive
-/// read at the predecessor and at the contacts' successor. The receipts the record cites are
-/// printed: each family's step, alignment and curvature, whether the factors moved, and whether the
-/// later cut differs.
-#[test]
-fn the_contacts_steps_alone_move_the_contacts_and_the_later_cut_reads_them() {
-    use super::learning::generic;
-    use crate::hnn::constitution::Locus;
-    use crate::hnn::field::ConstitutionRead;
-    use crate::hnn::port::Deposit;
-    let field = chain();
-    let reference = Reference::new(4, 1 << 40);
-    let theta = generic(&field, 301);
-    let mut resident = reference.mount_with(&field, &Current::at_rest(&field), theta.clone()).unwrap();
-    let (moment, _) = reference.ingest(&mut resident, None, &one_hot(&[1, 2, 0, 3, 1])).unwrap();
-    let phases = resident.admitted()[0].clone();
-    let (pending, _) = reference.refine(&mut resident, &moment, &phases).unwrap();
-    let (_, compared) = reference.compare(&mut resident, pending, &one_hot(&[1, 0])).unwrap();
-    let deposit = match compared.deposit {
-        Component::Present(deposit) => deposit,
-        other => panic!("{other:?}"),
-    };
-    let contacts: Vec<_> = deposit
-        .factors()
-        .iter()
-        .filter(|s| matches!(s.gradient.locus(), Locus::Channel(_)))
-        .cloned()
-        .collect();
-    let loci: Vec<Locus> = (0..field.contacts().len()).map(Locus::Channel).collect();
-    let mut alone = Deposit::new(deposit.commit(), Vec::new(), contacts, loci);
-    if let Some(reach) = deposit.reach() {
-        alone = alone.with_reach(reach.clone());
-    }
-    let (next, reading) = theta.deposited(&alone).unwrap();
-    for (locus, step) in &reading.steps {
-        eprintln!("{locus:?} {:?}: eta {}", step.family, step.step.step);
-    }
-    for a in 0..field.contacts().len() {
-        eprintln!(
-            "contact {a}: factors moved ({}, {}, {})",
-            theta.contact_storage(a) != next.contact_storage(a),
-            theta.contact_stiffness(a) != next.contact_stiffness(a),
-            theta.contact_dissipation(a) != next.contact_dissipation(a),
-        );
-    }
-    eprintln!(
-        "released {}; storage growth {}",
-        reading.released.len(),
-        reading.storage_growth
-    );
-    let later = |theta: crate::hnn::Constitution| {
-        let mut resident = reference.mount_with(&field, &Current::at_rest(&field), theta).unwrap();
-        let (moment, _) = reference.ingest(&mut resident, None, &one_hot(&[2, 3, 1, 0, 2])).unwrap();
-        let phases = resident.admitted()[0].clone();
-        let (pending, _) = reference.refine(&mut resident, &moment, &phases).unwrap();
-        let (_, compared) = reference.compare(&mut resident, pending, &one_hot(&[2, 3])).unwrap();
-        format!("{:?}", compared.forward)
-    };
-    eprintln!("the later cut differs: {}", later(theta.clone()) != later(next));
-    // Each family alone: its own certificate, no joint halving.
-    for step in alone.factors() {
-        let one = Deposit::new(deposit.commit(), Vec::new(), vec![step.clone()], vec![step.gradient.locus()])
-            .with_reach(deposit.reach().unwrap().clone());
-        let (single, r) = theta.deposited(&one).unwrap();
-        let a = match step.gradient.locus() { Locus::Channel(a) => a, _ => unreachable!() };
-        eprintln!(
-            "alone {:?}: eta {}, a {}, C {}, factors moved ({}, {}, {}), released {}",
-            r.steps[0].1.family,
-            r.steps[0].1.step.step,
-            r.steps[0].1.step.alignment,
-            crate::holon::deposition::significant(&r.steps[0].1.step.curvature, 24, false),
-            theta.contact_storage(a) != single.contact_storage(a),
-            theta.contact_stiffness(a) != single.contact_stiffness(a),
-            theta.contact_dissipation(a) != single.contact_dissipation(a),
-            r.released.len(),
-        );
-    }
 }
