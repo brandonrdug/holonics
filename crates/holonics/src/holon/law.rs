@@ -201,6 +201,27 @@ pub trait HolonLaw {
     }
 }
 
+/// Raw rational coefficients of one word at explicit material, before solving.
+/// `f = A_f z + c_f`, `e = A_e z + c_e`, `system z = target`.
+/// These coefficients are not an admitted bond or a unique-solve certificate.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct CommitCoefficients {
+    pub counts: crate::holon::PortCounts,
+    pub storage: ExactRatMatrix,
+    pub flow_coefficient: ExactRatMatrix,
+    pub effort_coefficient: ExactRatMatrix,
+    pub flow_constant: Vec<Rat>,
+    pub effort_constant: Vec<Rat>,
+    pub dirac_flow: ExactRatMatrix,
+    pub dirac_effort: ExactRatMatrix,
+    pub system: ExactRatMatrix,
+    pub target: Vec<Rat>,
+    /// The external effort injection `I_P`, with arbitrary external extent.
+    pub external_effort_coefficient: ExactRatMatrix,
+    /// `-E I_P`: the change of target per external effort coordinate.
+    pub external_target: ExactRatMatrix,
+}
+
 /// [definition] **The exact reference law** over ℚ: the Dirac-form step of [`Holon`] at step `h`
 /// under a declared scheme.
 #[derive(Clone, Debug, PartialEq, Eq)]
@@ -230,17 +251,17 @@ impl ReferenceHolon {
         self.scheme
     }
 
-    /// **One word at a declared material** `(Q, L)`, then a deposit `Q → Q'`
-    /// (`Holon/Deposition.commit_balance`): the returned balance is the word's plus the
-    /// deposition work `½⟨x⁺, (Q' − Q) x⁺⟩`, and `stored_change = E(x⁺; Q') − E(x; Q)`.
-    pub fn commit(
+    /// Assemble one word's rational coefficients at explicit `(Q, L, Q')`.
+    /// The same shape checks precede assembly as in [`Self::commit`].
+    /// No inverse or representative of a plural preimage fibre is chosen here.
+    pub fn prepare_commit(
         &self,
         state: &HolonState,
         input: &[Rat],
         storage: &SymmetricForm,
         active: &ExactRatMatrix,
         deposit: &SymmetricForm,
-    ) -> Result<Advance, HolonError> {
+    ) -> Result<CommitCoefficients, HolonError> {
         let port_holon = self.holon.port_holon();
         let c = port_holon.counts();
         if storage.extent() != c.storage || deposit.extent() != c.storage {
@@ -328,6 +349,58 @@ impl ReferenceHolon {
             &f.apply(&flow_constant)?,
             &e.apply(&effort_constant)?,
         ));
+        let external_effort_coefficient = matrix(n, pi, |row, column| {
+            if row == po + column {
+                Rat::one()
+            } else {
+                Rat::zero()
+            }
+        })?;
+        let external_target = matrix(e.rows(), pi, |row, column| -at(&e, row, po + column))?;
+        Ok(CommitCoefficients {
+            counts: c,
+            storage: q,
+            flow_coefficient,
+            effort_coefficient,
+            flow_constant,
+            effort_constant,
+            dirac_flow: f,
+            dirac_effort: e,
+            system,
+            target,
+            external_effort_coefficient,
+            external_target,
+        })
+    }
+
+    /// **One word at a declared material** `(Q, L)`, then a deposit `Q → Q'`
+    /// (`Holon/Deposition.commit_balance`): the returned balance is the word's plus the
+    /// deposition work `½⟨x⁺, (Q' − Q) x⁺⟩`, and `stored_change = E(x⁺; Q') − E(x; Q)`.
+    pub fn commit(
+        &self,
+        state: &HolonState,
+        input: &[Rat],
+        storage: &SymmetricForm,
+        active: &ExactRatMatrix,
+        deposit: &SymmetricForm,
+    ) -> Result<Advance, HolonError> {
+        let CommitCoefficients {
+            counts: c,
+            storage: q,
+            flow_coefficient,
+            effort_coefficient,
+            flow_constant,
+            effort_constant,
+            system,
+            target,
+            ..
+        } = self.prepare_commit(state, input, storage, active, deposit)?;
+        let port_holon = self.holon.port_holon();
+        let (sigma, rho, pi, alpha) = (c.storage, c.resistive, c.external, c.active);
+        let (xo, ro, po, ao) = (0, sigma, sigma + rho, sigma + rho + pi);
+        let r = port_holon.resistance().resistance();
+        let h = &self.step;
+        let x = &state.configuration;
         let z = match system.preimage_fibre(&target)? {
             None => return Err(HolonError::Inconsistent),
             Some((z, kernel)) if kernel.is_empty() => z,

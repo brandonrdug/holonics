@@ -763,6 +763,100 @@ mod tests {
         assert!(bound.commits() == 1 && Rat::one() < *bound.product());
     }
 
+    /// The commit's coefficients assembled apart (`ReferenceHolon::prepare_commit`) are the ones the
+    /// commit solves: `system = F A_f + E A_e`, `target = −(F c_f + E c_e)`, the external target
+    /// `−E I_P`, and the unique preimage's storage block is the committed configuration, under both
+    /// schemes and external extents 0, 1 and 2, with a nonzero active relation and a real deposit.
+    #[test]
+    fn the_commits_coefficients_are_the_ones_it_solves() {
+        let learned = project_passive(&integer_matrix(&[&[1, 2], &[0, -3]]).unwrap())
+            .unwrap()
+            .projected;
+        let before = diagonal(&[1, 1]);
+        let after = form(&[vec![3, 1], vec![1, 2]]);
+        let state = HolonState::new(ints(&[2, -1]));
+        let injections: [(&[&[i64]], &[i64]); 3] = [
+            (&[&[], &[]], &[]),
+            (&[&[1], &[0]], &[3]),
+            (&[&[1, 0], &[1, 1]], &[1, -2]),
+        ];
+        for scheme in [Scheme::Midpoint, Scheme::BackwardEuler] {
+            for (injection, input) in injections {
+                let columns = injection[0].len();
+                let injection = if columns == 0 {
+                    zero(2, 0)
+                } else {
+                    integer_matrix(injection).unwrap()
+                };
+                let port_holon =
+                    PortHolon::medium(&zero(2, 2), &zero(2, 2), diagonal(&[1, 1]), &injection, true)
+                        .unwrap();
+                let holon = Holon::new(port_holon)
+                    .unwrap()
+                    .with_active(ActiveRelation::new(learned.clone()).unwrap())
+                    .unwrap();
+                let law = ReferenceHolon::new(holon.clone(), integer(1), scheme).unwrap();
+                let input = ints(input);
+                let active = holon.active().relation().clone();
+                let coefficients = law
+                    .prepare_commit(&state, &input, &before, &active, &after)
+                    .unwrap();
+                let (f, e) = (&coefficients.dirac_flow, &coefficients.dirac_effort);
+                assert_eq!(
+                    coefficients.system,
+                    f.multiply(&coefficients.flow_coefficient)
+                        .unwrap()
+                        .add(&e.multiply(&coefficients.effort_coefficient).unwrap())
+                        .unwrap()
+                );
+                let assembled: Vec<Rat> = f
+                    .apply(&coefficients.flow_constant)
+                    .unwrap()
+                    .iter()
+                    .zip(e.apply(&coefficients.effort_constant).unwrap())
+                    .map(|(a, b)| -(a + b))
+                    .collect();
+                assert_eq!(coefficients.target, assembled);
+                assert_eq!(
+                    coefficients.external_target,
+                    e.multiply(&coefficients.external_effort_coefficient)
+                        .unwrap()
+                        .scaled(&-Rat::one())
+                );
+                let (z, kernel) = coefficients
+                    .system
+                    .preimage_fibre(&coefficients.target)
+                    .unwrap()
+                    .expect("a consistent step");
+                assert!(kernel.is_empty());
+                let advance = law.commit(&state, &input, &before, &active, &after).unwrap();
+                assert_eq!(&z[..2], &advance.state.configuration[..]);
+                assert!(advance.balance.is_exact());
+            }
+        }
+    }
+
+    /// A singular step assembles its coefficients without choosing an inverse: at `h = 1` the
+    /// midpoint's step matrix `1 − ½ L Q` with `L = diag(2, 0)`, `Q = 1` has nullity one, so the
+    /// commit refuses (plural or inconsistent) while `prepare_commit` returns the raw system.
+    #[test]
+    fn a_singular_step_assembles_and_the_commit_refuses() {
+        let learned = integer_matrix(&[&[2, 0], &[0, 0]]).unwrap();
+        let law = learned_law(&learned);
+        let identity = diagonal(&[1, 1]);
+        for configuration in [ints(&[0, 1]), ints(&[1, 0])] {
+            let state = HolonState::new(configuration);
+            let coefficients = law
+                .prepare_commit(&state, &[], &identity, &learned, &identity)
+                .unwrap();
+            assert!(coefficients.system.rank().unwrap() < coefficients.system.rows());
+            assert!(matches!(
+                law.commit(&state, &[], &identity, &learned, &identity),
+                Err(HolonError::NotUniquelySolvable { nullity: 1 } | HolonError::Inconsistent)
+            ));
+        }
+    }
+
     /// Power neutrality needs a skew `Ω`: the medium's interconnection refuses one that is not.
     #[test]
     fn the_medium_structure_refuses_a_non_skew_omega() {
