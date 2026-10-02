@@ -330,6 +330,18 @@ pub enum HnnError {
     )]
     Lattice { locus: Locus },
     #[error(
+        "a carrier on 2^-{exponent} Z re-bases {levels} levels only before its deposit stages an entry ({staged} staged) and onto an exponent that fits a u32"
+    )]
+    Rebase {
+        exponent: u32,
+        levels: u32,
+        staged: usize,
+    },
+    #[error(
+        "locus {locus:?} reads its lattice outside its deposits, so its re-base is not this move: only a contact's channel re-bases"
+    )]
+    RebaseLocus { locus: Locus },
+    #[error(
         "ring {ring}'s transport modulus {modulus} is not a passive modulus on the source port's lattice (0 < ρ ≤ 1)"
     )]
     Transport { ring: usize, modulus: Rat },

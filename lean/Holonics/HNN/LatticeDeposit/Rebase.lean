@@ -9,8 +9,10 @@ factors, so a schedule that keeps every coarser read is dyadic, `2^⌈log₂ L(N
 (`HNN/Ratio/Resolution.grainRead_of_refined`). A carrier on the lattice `2^(−L)ℤ` then moves to
 `2^(−L−j)ℤ`. This module states that move for the lattice deposit's carrier (`HNN/LatticeDeposit`)
 and proves that it loses nothing the carrier stored, over any number of re-bases. It is the item
-#62 owed after PR #151. The re-base has no Rust owner yet: `hnn::constitution`'s `BudgetedCarry`
-holds one fixed lattice per locus and never re-bases it.
+#62 owed after PR #151. Its Rust owner is `hnn::constitution`'s `BudgetedCarry::rebase`, which
+re-bases every array a locus carries before a deposit stages an entry, and at the machine
+`Constitution::rebased`, which re-bases a contact's channel; the declared schedule keeps one lattice
+per locus and never calls it.
 
 **The re-base.** The carried remainder `r ∈ [−u/2, u/2)` is divided at the finer unit
 `u′ = 2^(−L−j)`, `r = q′u′ + r′` with `r′ ∈ [−u′/2, u′/2)` (the owner's `div_rem_spec`). The value
