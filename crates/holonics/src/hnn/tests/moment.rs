@@ -464,3 +464,58 @@ fn the_leaky_count_reads_the_transported_weights_over_many_turns() {
     assert!(moment.normalized_counts(field, 0, 0, &one).is_err());
 }
 
+/// The leaky read is not within one chart unit in general, on the ingest's own path (Lean
+/// `HNN/IndexedOpen.leaky_read_exceeds_chart_unit`). On campaign 1's field at the founded transport
+/// `ρ₀ = 10809/2^17` (chart `2^(−18)`, lattice `2^(−19)`), ring 0 ticks only at the codes its lock
+/// selects (`x ≡ 0 mod 5`, the residue port chart), and each tick's datum enters at the new phase.
+/// Code 5 and the 204 codes the lock does not select enter 205 slots of phase 1; codes 0 and 10
+/// tick the ring to phases 2 and 3. Each phase-1 slot carries `3566` against its exact
+/// `ρ₀² 2^19 = 116834481/2^15`, phase 2's carries `43236 = ρ₀ 2^19` exactly, and the newest
+/// datum's read `chart(2^19/(2^19 + 43236 + 205 · 3566)) = 105840/2^18` is more than eight chart
+/// units below its transported weight `1/(1 + ρ₀ + 205 ρ₀²)`.
+#[test]
+fn the_leaky_read_is_not_within_one_chart_unit_in_general() {
+    use crate::hnn::constitution::{Constitution, Locus};
+    use crate::hnn::field::FieldDeclaration;
+    use crate::hnn::moment::PopulationChart;
+    let field = &Field::declare(FieldDeclaration::campaign_one(6_148)).unwrap();
+    let founded = Constitution::initial(field, 1 << 33)
+        .unwrap()
+        .founded_transport(field, 0)
+        .unwrap();
+    let modulus = founded.transport(0);
+    let dyadic = |numerator: u64, exponent: u32| {
+        Rat::new(BigInt::from(numerator), BigInt::from(1u64 << exponent))
+    };
+    assert_eq!(modulus, dyadic(10_809, 17));
+    assert_eq!(
+        founded.lattice(Locus::SourcePort(0)).unwrap().exponent(),
+        18
+    );
+    assert_eq!(PopulationChart::of(field).exponent(), 18);
+
+    let mut cells = vec![5usize];
+    cells.extend((0..256).filter(|code| code % 5 != 0));
+    cells.extend([0, 10]);
+    let mut walk = Current::at_rest(field);
+    let phases: Vec<u64> = cells
+        .iter()
+        .map(|&code| {
+            walk.step(field, code).unwrap();
+            walk.phase(field, 0).unwrap()
+        })
+        .collect();
+    assert!(phases[..205].iter().all(|&phase| phase == 1));
+    assert_eq!(phases[205..], [2, 3]);
+
+    let mut current = Current::at_rest(field);
+    let mut moment = SourceMoment::open_with(field, &current, &founded).unwrap();
+    let ingested = moment.ingest(field, &mut current, &cells).unwrap();
+    assert_eq!((ingested.cells, ingested.carry_out), (207, false));
+    let newest = moment.normalized_counts(field, 0, 3, &modulus).unwrap()[10].clone();
+    assert_eq!(newest, dyadic(105_840, 18));
+    let one = Rat::from_integer(1.into());
+    let weight =
+        one.clone() / (one + &modulus + Rat::from_integer(205.into()) * &modulus * &modulus);
+    assert!(weight - &newest > Rat::from_integer(8.into()) * dyadic(1, 18));
+}
