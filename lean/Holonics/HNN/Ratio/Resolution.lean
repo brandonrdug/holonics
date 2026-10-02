@@ -100,9 +100,10 @@ exponent `v`. No temperature enters: the receiving map's gain, which plays the r
    `measured_aeon_code_bound`). These are arithmetic on the record's inputs, and each reading of
    them is conditional: it treats the `1190` readings of an aeon as independent draws from one of
    the two faces (`1190` is the exposure's mean aeon length, and its readings are not independent
-   samples), it takes `7/2^18` bits from the record's variance surrogate, which is not certified,
-   and "readable" means the one-bit convention (Stein's lemma gives the convention, not an exact
-   threshold). None of them is a measured physical fact about the machine.
+   samples), it uses `7/2^18` bits, the largest change the record measured over 256 windows, as a
+   bound at every reading, which is not certified, and "readable" means the one-bit convention
+   (Stein's lemma gives the convention, not an exact threshold). None of them is a measured
+   physical fact about the machine.
 
 [definition] **The record's steps, checked.**
 
@@ -120,9 +121,9 @@ exponent `v`. No temperature enters: the receiving map's gain, which plays the r
   it by less than `4/3`. `N = 1190` is the exposure's mean aeon length; using it as `N` treats the
   aeon's readings as independent, which they are not.
 
-[definition] **The finding's margins, corrected.** With the record's `max|δ| = 7/2^18` bits (read
-through its uncertified variance surrogate), and treating an aeon's `1190` readings as independent
-draws from one face, at the one-bit convention:
+[definition] **The finding's margins, corrected.** With the record's `max|δ| = 7/2^18` bits (the
+largest change measured over 256 windows, used as a bound at every reading, which is not certified),
+and treating an aeon's `1190` readings as independent draws from one face, at the one-bit convention:
 * it lies between `2^10` and `2^11` times below the resolution, not more than `2^12` times
   (`measured_change_ratio`);
 * telling the media apart at one bit needs more than `2^21` aeons (`2^31` readings), not about
@@ -1419,8 +1420,9 @@ end Refining
 
 [definition] Every statement here is arithmetic on the record's inputs. Read as claims about the
 machine, each is conditional: `N = 1190` is the exposure's mean aeon length, and treating its
-readings as independent draws from one face is an assumption they do not meet; `7/2^18` bits comes
-from the record's uncertified variance surrogate; and "readable" is the one-bit convention. -/
+readings as independent draws from one face is an assumption they do not meet; `7/2^18` bits is the
+largest change the record measured over 256 windows, and using it as a bound at every reading is not
+certified; and "readable" is the one-bit convention. -/
 
 section Campaign
 
@@ -1447,8 +1449,9 @@ theorem declared_grain_vs_resolution :
   constructor <;> linarith
 
 /-- [proved-derived; formal-checked] **The record's change against the resolution.** The record's
-largest change `7/2^18` bits (from its uncertified variance surrogate) lies between `2^10` and `2^11`
-times below the independent-readings resolution, so not more than `2^12` times below it. -/
+largest change over 256 windows, `7/2^18` bits (a bound at every reading only by assumption), lies
+between `2^10` and `2^11` times below the independent-readings resolution, so not more than `2^12`
+times below it. -/
 theorem measured_change_ratio :
     2 ^ 10 * (7 / 2 ^ 18 : ℝ) < Real.sqrt (2 / (1190 * Real.log 2)) ∧
       Real.sqrt (2 / (1190 * Real.log 2)) < 2 ^ 11 * (7 / 2 ^ 18 : ℝ) ∧
