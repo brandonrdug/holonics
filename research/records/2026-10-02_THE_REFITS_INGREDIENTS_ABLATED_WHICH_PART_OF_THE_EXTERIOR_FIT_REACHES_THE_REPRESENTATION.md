@@ -66,3 +66,21 @@ chain stopped first at its guard (`OwnNotBelow`, the executed release must fall)
 records found the chord to the refit rising before it falls (the stiffness record). So the next
 candidate location is the guard together with the step schedule, read first on the float path
 itself: whether the plain-gradient arm's own comparison rises along its way to the sections.
+
+## 3. The plain-gradient path's own comparison
+
+The `sgd` arm re-run on seeds 202 and 303 with its comparison read every 10 steps on a fixed set of 32
+training requests, each re-read on its own trajectory ([receipts](2026-10-02_THE_REFITS_INGREDIENTS_receipts/),
+`path_sgd_*.txt`; both again end at 57 whole sections).
+- **It climbs above where it started.** Seed 202's opening comparison `1.612090` is exceeded at step 30
+  (by `0.001471`); seed 303's `1.608452` at step 60 (by `0.131100`).
+- **Its excursions above the running minimum** (the step a rise begins, the step the minimum is
+  undercut again, the peak rise): seed 202, ten excursions of 20 to 50 steps, peaks `0.002` to
+  `0.116`; seed 303, eight of 20 to 60 steps, peaks `0.005` to `0.481` (steps 50 to 100, the largest,
+  then `0.303` over steps 170 to 200). Each later excursion ends below the earlier minimum.
+
+[agent-inferred] The path that reaches the sections is not monotone in its own comparison at any
+window, and on one seed it rises well above the opening. A guard that admits a rise only below the
+running maximum of a window of adopted comparisons cannot follow it; it needs an excursion above a
+checkpoint, bounded in height and length, with the certified decrease owed over the excursion as a
+whole. The numbers above are the measurement such a law's window and schedule read.
