@@ -1,0 +1,45 @@
+The build script's content address, read with a stand-in nvcc (cloud, no CUDA toolkit; October 2).
+Each round is one `NVCC=<stand-in> cargo check -p holonics-cuda` in one target directory; "compiled" counts the
+script's "compiled the HNN kernels" warning, and the last column the stand-in's compile calls so far (two per image).
+
+At #262's head (70b43113), the digest without the script's own text:
+r1 first build (unfixed): exit 0, compiled-warnings 1, nvcc compile calls so far 2
+r2 no-op (unfixed): exit 0, compiled-warnings 0, nvcc compile calls so far 2
+r3 nvcc flag -O3 to -O2 (unfixed): exit 0, compiled-warnings 0, nvcc compile calls so far 2
+
+With the script's text and nvcc's --version output in the digest:
+r4 fixed script, first build: exit 0, compiled-warnings 1, nvcc compile calls so far 4
+r5 no-op (fixed): exit 0, compiled-warnings 0, nvcc compile calls so far 4
+r6 nvcc flag -O3 to -O2 (fixed): exit 0, compiled-warnings 1, nvcc compile calls so far 6
+r7 flag restored (fixed): exit 0, compiled-warnings 1, nvcc compile calls so far 8
+r8 kernel content change, mtime three hours old (fixed): exit 0, compiled-warnings 1, nvcc compile calls so far 10
+r9 kernel restored, old mtime (fixed): exit 0, compiled-warnings 1, nvcc compile calls so far 12
+r10 nvcc upgraded in place (fixed): exit 0, compiled-warnings 1, nvcc compile calls so far 14
+r11 no-op at the new nvcc (fixed): exit 0, compiled-warnings 0, nvcc compile calls so far 14
+
+The stand-in's compile calls, in order:
+--ptx -O3 --std=c++20 --gpu-architecture=compute_75 kernels/hnn.cu -o target/debug/build/holonics-cuda-aa58680e21b548b2/out/hnn.ptx
+--ptx -O3 --std=c++20 --gpu-architecture=compute_75 kernels/tree.cu -o target/debug/build/holonics-cuda-aa58680e21b548b2/out/tree.ptx
+--ptx -O3 --std=c++20 --gpu-architecture=compute_75 kernels/hnn.cu -o target/debug/build/holonics-cuda-aa58680e21b548b2/out/hnn.ptx
+--ptx -O3 --std=c++20 --gpu-architecture=compute_75 kernels/tree.cu -o target/debug/build/holonics-cuda-aa58680e21b548b2/out/tree.ptx
+--ptx -O2 --std=c++20 --gpu-architecture=compute_75 kernels/hnn.cu -o target/debug/build/holonics-cuda-aa58680e21b548b2/out/hnn.ptx
+--ptx -O2 --std=c++20 --gpu-architecture=compute_75 kernels/tree.cu -o target/debug/build/holonics-cuda-aa58680e21b548b2/out/tree.ptx
+--ptx -O3 --std=c++20 --gpu-architecture=compute_75 kernels/hnn.cu -o target/debug/build/holonics-cuda-aa58680e21b548b2/out/hnn.ptx
+--ptx -O3 --std=c++20 --gpu-architecture=compute_75 kernels/tree.cu -o target/debug/build/holonics-cuda-aa58680e21b548b2/out/tree.ptx
+--ptx -O3 --std=c++20 --gpu-architecture=compute_75 kernels/hnn.cu -o target/debug/build/holonics-cuda-aa58680e21b548b2/out/hnn.ptx
+--ptx -O3 --std=c++20 --gpu-architecture=compute_75 kernels/tree.cu -o target/debug/build/holonics-cuda-aa58680e21b548b2/out/tree.ptx
+--ptx -O3 --std=c++20 --gpu-architecture=compute_75 kernels/hnn.cu -o target/debug/build/holonics-cuda-aa58680e21b548b2/out/hnn.ptx
+--ptx -O3 --std=c++20 --gpu-architecture=compute_75 kernels/tree.cu -o target/debug/build/holonics-cuda-aa58680e21b548b2/out/tree.ptx
+--ptx -O3 --std=c++20 --gpu-architecture=compute_75 kernels/hnn.cu -o target/debug/build/holonics-cuda-aa58680e21b548b2/out/hnn.ptx
+--ptx -O3 --std=c++20 --gpu-architecture=compute_75 kernels/tree.cu -o target/debug/build/holonics-cuda-aa58680e21b548b2/out/tree.ptx
+
+The stand-in nvcc:
+#!/bin/bash
+# A stand-in nvcc for testing the build script's content address: it logs each call and writes a
+# nonempty image to the path after -o.
+log="$(dirname "$0")/calls.log"
+if [ "$1" = "--version" ]; then echo "fake nvcc, release ${FAKE_NVCC_RELEASE:-1}"; exit 0; fi
+echo "$*" >> "$log"
+out=""; prev=""
+for a in "$@"; do if [ "$prev" = "-o" ]; then out="$a"; fi; prev="$a"; done
+printf '// fake image for %s\n' "$*" > "$out"
