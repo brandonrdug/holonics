@@ -312,6 +312,10 @@ pub enum HnnError {
     Observability { aperture: usize, rank: usize },
     #[error("the code tolerance must be a positive rational, found {tolerance}")]
     Tolerance { tolerance: Rat },
+    #[error("the release guard's excursion height must be nonnegative, found {height}")]
+    ExcursionHeight { height: Rat },
+    #[error("a release window's certified decrease must be nonnegative, found {decrease}")]
+    WindowDecrease { decrease: Rat },
     #[error("the word has run its {ticks} junction steps")]
     WordEnded { ticks: usize },
     #[error("the crib of {cells} cells has no pair at offset {offset}")]
