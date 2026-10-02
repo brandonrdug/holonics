@@ -52,7 +52,11 @@ choice     j ∈ {1, …, 8} charged log₂ 8 = 3 bits: Σ_w 2^(−(3 + code_ĵ(
    `priorMass_one_sided_two_bits`): a node that has seen only one digit value is never coded worse
    than by KT, and at rung `j` its first `2^j + 1` arrivals cost at most 2 bits together, where KT's
    cost grows as `½ log₂ n`. This is where the prior mass gains: the recurring contexts §24 located.
-5. **The choice is a two-part code** (`two_part_kraft`, `priorMass_two_part`): charging `log₂ B` bits
+5. **The floor** (`priorMass_face_ge`, `priorMass_digit_face_ge`): a node with at most `n*` arrivals
+   reads each digit value at least at `1/(2^j n* + 2)`, and so does the opened path's face at every
+   depth under any stop weights in `[0, 1]`: the floor the lattice width `M_p` reads, KT's
+   `Tree.digit_face_ge` at `j = 1`.
+6. **The choice is a two-part code** (`two_part_kraft`, `priorMass_two_part`): charging `log₂ B` bits
    for a choice among `B` sub-probability laws satisfies Kraft for **any** choice, made on the
    development cells or even on the coded word itself; at the ladder `j = 1..8`, `3 + code_ĵ` is a
    valid code length.
@@ -67,9 +71,7 @@ against the best fixed probability is standard. The proofs here are this owner's
 
 [open] Owed in #62: the composition of the per-node regret into the tree's full redundancy bound
 (each leaf's `½ log₂ n_s + j` added to `Γ(S)` through `Tree.own_kraft_and_dominance`) is not
-stated. The node's floor `1/(2^j n* + 2)` is proved here (`priorMass_face_ge`), but the path-level
-floor the lattice width reads, `Tree.digit_face_ge`, is stated on KT's tree standing at
-`1/(2n + 2)`; its prior-mass case follows through `Tree.path_face_ge_min` and is not restated.
+stated.
 
 | Claim | Lean | Rust |
 |---|---|---|
@@ -78,7 +80,7 @@ floor the lattice width reads, `Tree.digit_face_ge`, is stated on KT's tree stan
 | regret `½ log₂ n + j`; KT's `½ log₂ n + 1` | `kt_regret`, `priorMass_regret`, `priorMass_regret_bits` | — |
 | the one-sided gain | `priorMass_one_sided_ge_kt`, `priorMass_one_sided_two_bits` | — |
 | the ladder charged 3 bits is a valid code | `two_part_kraft`, `priorMass_two_part` | `hnn::field::ReceiverDeclaration::mass` (campaign 1 declares `j = 3`, coded in `Field::describe`) |
-| the floor `1/(2^j n* + 2)` | `priorMass_face_ge` (the node; the path through `Tree.path_face_ge_min`, owed) | `compression::landmark::context::face_bits` |
+| the floor `1/(2^j n* + 2)` | `priorMass_face_ge` (the node), `priorMass_digit_face_ge` (the opened path, any stop weights) | `compression::landmark::context::face_bits` |
 -/
 
 namespace Holonics.Compression.Landmark.Context.PriorMass
@@ -706,6 +708,24 @@ theorem priorMass_face_ge (j : ℕ) (n : Bool → ℕ) {N : ℕ} (hN : n true + 
     mul_nonneg (mul_nonneg h2.le (Nat.cast_nonneg (n b) : (0 : ℚ) ≤ n b))
       (by positivity : (0 : ℚ) ≤ 2 ^ j * N + 2)]
 
+/-- [proved-derived; formal-checked] **`priorMass_digit_face_ge`: the path's floor at prior mass
+`2^-j`.** On a binary landmark tree whose nodes read the prior-mass face, if every node of the
+opened path holds at most `n` arrivals, the path face at every depth is at least `1/(2^j n + 2)`,
+under **any** stop weights `λ_d ∈ [0, 1]` (the exact posterior weights and the executed chart's
+alike), through `Tree.path_face_ge_min` and the node floor `priorMass_face_ge`. At `j = 1` it is
+`Tree.digit_face_ge`'s `1/(2n + 2)`. This is the floor the lattice width `M_p` reads
+(Rust `face_bits`). -/
+theorem priorMass_digit_face_ge {Ltr : Type*} (j : ℕ) (N : TreeStanding Ltr Bool)
+    (lam : ℕ → ℚ) (D : ℕ) (hl : ∀ d < D, 0 ≤ lam d ∧ lam d ≤ 1) (a : List Ltr) (n : ℕ)
+    (hn : ∀ d ≤ D, ∑ b, N (a.take d) b ≤ n) (b : Bool) :
+    ∀ d ≤ D, 1 / (2 ^ j * (n : ℚ) + 2) ≤
+      pathFace (fun d => dirichletPredictive (massWeight j) (N (a.take d))) lam D d b := by
+  intro d hd
+  refine (path_face_ge_min _ lam D b hl).1 _ d hd fun d' _ h2 => ?_
+  have h := hn d' h2
+  rw [Fintype.sum_bool] at h
+  exact priorMass_face_ge j (N (a.take d')) h b
+
 /-! ### Audit -/
 
 /-
@@ -718,6 +738,7 @@ theorem priorMass_face_ge (j : ℕ) (n : Bool → ℕ) {N : ℕ} (hN : n true + 
 #print axioms priorMass_two_part
 #print axioms massLaw_read
 #print axioms priorMass_face_ge
+#print axioms priorMass_digit_face_ge
 -/
 
 end Holonics.Compression.Landmark.Context.PriorMass
