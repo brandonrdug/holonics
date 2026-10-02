@@ -37,11 +37,13 @@ the pump's reflection block `−2p R_c` to its stiffness, `c` the placed carrier
    by `1/θ_t`; a throw's flight caps every mode at the force's free fall `|g|t²/2`, whatever its
    stiffness; a carried velocity accumulates a push that keeps its sign.
 9. **The throw through the accreted mass** (`accretion_loss`, `accretion_dissipates`,
-   `thrown_move`, `throw_velocity_le_terminal`, `throw_velocity_rises`, `leap_velocity_le`): a
+   `thrown_move`, `throw_velocity_le_terminal`, `throw_velocity_rises`, `leap_velocity_le`,
+   `throw_velocity_le_unaccreted`, `throw_reach_le_free_fall`): a
    deposit accretes mass onto the port and conserves the carried momentum, so its kinetic reading
    falls by exactly `p² f/(2m(m + f))`; the thrown move is the impulse plus the coast, the leap's
    impulse alone from rest; under a constant impulse the throw's velocity rises toward the impulse
-   over the per-deposit mass while the leap's falls like `1/k` (the record
+   over the per-deposit mass while the leap's falls like `1/k`; and a throw from rest reaches no
+   further than free fall `(i/m₀)·n(n + 1)/2` (the record
    `research/records/2026-10-02_THE_THROW_CARRIES_ITS_MOMENTUM_THROUGH_THE_DEPOSITS_ACCRETED_MASS_AND_A_HALVING_HALVES_IT.md`).
 -/
 
@@ -375,5 +377,32 @@ theorem leap_velocity_le (i m₀ f : ℝ) (k : ℕ) (hk : 1 ≤ k) (hi : 0 ≤ i
   have hk' : (0 : ℝ) < k := by exact_mod_cast hk
   apply div_le_div_of_nonneg_left hi (by positivity)
   linarith
+
+/-- **Accretion never speeds the throw past its unaccreted mass**: after `k` deposits of mass
+`f ≥ 0` onto `m₀ > 0`, each with impulse `i ≥ 0`, the carried momentum `k i` moves the port by
+`k i/(m₀ + k f) ≤ k i/m₀`, the velocity of free fall under `g = i/m₀`. -/
+theorem throw_velocity_le_unaccreted (i m₀ f : ℝ) (k : ℕ) (hi : 0 ≤ i) (hm : 0 < m₀)
+    (hf : 0 ≤ f) : k * i / (m₀ + k * f) ≤ k * i / m₀ := by
+  have hk : (0 : ℝ) ≤ k := Nat.cast_nonneg k
+  apply div_le_div_of_nonneg_left (mul_nonneg hk hi) hm
+  nlinarith
+
+/-- **A throw from rest reaches no further than free fall**: under a constant impulse `i ≥ 0` on
+`m₀ > 0` with per-deposit mass `f ≥ 0`, the port's displacement over moves `0, …, n` is at most
+`(i/m₀)·n(n + 1)/2`, the discrete `|g| t²/2` with `g = i/m₀`. At `f = 0` it is free fall's own
+reach; a positive `f` only damps it. -/
+theorem throw_reach_le_free_fall (i m₀ f : ℝ) (hi : 0 ≤ i) (hm : 0 < m₀) (hf : 0 ≤ f) (n : ℕ) :
+    ∑ k ∈ Finset.range (n + 1), (k : ℝ) * i / (m₀ + k * f) ≤ i / m₀ * (n * (n + 1) / 2) := by
+  induction n with
+  | zero => simp
+  | succ n ih =>
+    rw [Finset.sum_range_succ]
+    have h := throw_velocity_le_unaccreted i m₀ f (n + 1) hi hm hf
+    push_cast at h ⊢
+    have e : i / m₀ * (((n : ℝ) + 1) * ((n : ℝ) + 1 + 1) / 2)
+        = i / m₀ * ((n : ℝ) * ((n : ℝ) + 1) / 2) + ((n : ℝ) + 1) * i / m₀ := by
+      field_simp
+      ring
+    linarith
 
 end Holonics.HNN.MoveDirection
