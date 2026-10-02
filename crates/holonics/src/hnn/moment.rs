@@ -82,10 +82,16 @@
 //! so a datum `a` ticks old weighs `ρ^a / Σ_k ρ^(a_k)`, the transported weight, whatever the span:
 //! the age is carried by the decay, not read from the phase, and nothing aliases past one turn.
 //! The counts are carried on the lattice `2^(−L_ν−m)`, `m = ⌈log₂(1/(1 − ρ))⌉`, each product read at
-//! the nearest point (ties up); a count's carried value then stays within
-//! `2^(−L_ν−m−1)/(1 − ρ) ≤ 2^(−L_ν−1)` of the exact decayed count, half a population-chart unit.
-//! A count that decays below half a lattice unit leaves the record, so the record holds only what
-//! the transport still carries. It is a quotient of the passage sufficient for the transported
+//! the nearest point (ties up); on the ingest path a count's carried value then stays within
+//! `2^(−L_ν−m−1)/(1 − ρ) ≤ 2^(−L_ν−1)` of the exact decayed count, half a population-chart unit,
+//! and each datum a section enters at its decayed weight adds half a lattice unit more (the Lean
+//! thread's proofs, #164). The normalized read `L/Σ L` is not bounded by one chart unit in
+//! general: a burst of data into one phase between ticks rounds every held count alike, and at a
+//! small modulus the newest datum's read can pass seven chart units (`leaky_read_exceeds_chart_unit`).
+//! On campaign 1's cut at its founding modulus, with up to 22 cells between ring 0's ticks and up to
+//! 40 counts held, the read stays within `3/2` chart units of the exact transported weights (the
+//! contact loop record §24). A count that decays below half a lattice unit leaves the record, so the
+//! record holds only what the transport still carries. It is a quotient of the passage sufficient for the transported
 //! open, never a list of cells. The modulus is the one the moment was opened at; a moment read at
 //! another modulus is refused ([`HnnError::Transport`]).
 //!

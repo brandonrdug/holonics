@@ -390,10 +390,11 @@ fn nothing_of_the_source_is_discarded_by_length() {
 }
 
 /// The leaky count (`hnn::moment`, "The leaky count"): on campaign 1's field at the founded
-/// transport, a passage of many turns reads each phase's normalized decayed counts within one
-/// population-chart unit of the exact transported weights `Σ_k ρ^(a_k) [slot_k] / Σ_k ρ^(a_k)`
-/// (half a unit from the carried decay, half from the chart's read); no age aliases, and at modulus
-/// one the moment opened at the constitution reads what the plain moment reads.
+/// transport, a 400-cell passage of many turns reads each phase's normalized decayed counts within
+/// one population-chart unit of the exact transported weights `Σ_k ρ^(a_k) [slot_k] / Σ_k ρ^(a_k)`
+/// (a measurement on this passage: the read has no general one-unit bound, the module header); no
+/// age aliases, and at modulus one the moment opened at the constitution reads what the plain
+/// moment reads.
 #[test]
 fn the_leaky_count_reads_the_transported_weights_over_many_turns() {
     use crate::hnn::constitution::Constitution;
@@ -462,3 +463,4 @@ fn the_leaky_count_reads_the_transported_weights_over_many_turns() {
     assert!(moment.phase_weights(field, 0, &modulus).is_ok());
     assert!(moment.normalized_counts(field, 0, 0, &one).is_err());
 }
+

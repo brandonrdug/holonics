@@ -49,6 +49,7 @@ pub(super) fn path_with(aperture: usize, junctions: &[Rat], contacts: &[Rat]) ->
                 tolerance: rat(1, 16),
                 depth: 2,
                 prior: crate::compression::landmark::context::StopPrior::half(),
+                mass: 1,
             }],
             crib: CribDeclaration {
                 window: 16,
@@ -109,6 +110,7 @@ pub(super) fn chain_declaration(population: u64) -> FieldDeclaration {
             tolerance: rat(1, 16),
             depth: 2,
             prior: crate::compression::landmark::context::StopPrior::half(),
+            mass: 1,
         }],
         crib: CribDeclaration {
             window: 16,

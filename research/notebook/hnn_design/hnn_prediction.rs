@@ -134,6 +134,7 @@ fn declare(declared: &Declared) -> Field {
                 tolerance: rat(TOLERANCE.0, TOLERANCE.1),
                 depth: 1,
                 prior: StopPrior::half(),
+                mass: 1,
             }],
             crib: CribDeclaration {
                 window: 16,

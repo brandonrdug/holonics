@@ -248,6 +248,7 @@ fn standing_of(cells: &[usize]) -> Landmarks {
         family: LetterFamily::cells(),
         prior: StopPrior::half(),
         capacity: Capacity::Unbounded,
+        mass: 1,
     };
     let mut standing = Landmarks::new(declaration).unwrap();
     for (position, &cell) in cells.iter().enumerate() {

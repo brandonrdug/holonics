@@ -177,6 +177,7 @@ pub(super) fn joint() -> Field {
                 tolerance: rat(1, 16),
                 depth: 1,
                 prior: crate::compression::landmark::context::StopPrior::half(),
+                mass: 1,
             }],
             crib: crate::hnn::field::CribDeclaration {
                 window: 16,
