@@ -5190,6 +5190,8 @@ pub struct KineticCoupling {
     pub arms: Vec<(&'static str, Vec<(KineticStop, usize)>, Rat, Rat)>,
     /// The joint solve's iterates, `(Euclidean, M)` cosines against `d`.
     pub iterates: Vec<(Rat, Rat)>,
+    /// The joint solve's residual energy at each iterate over its opening's ([`KineticSolve::residuals`]).
+    pub residuals: Vec<Rat>,
     /// The deposited kinetic unit step against `d`, Euclidean.
     pub deposited: Option<Rat>,
 }
@@ -5213,6 +5215,7 @@ pub fn kinetic_coupling(
         refusal: certificate_refusal(&proposal),
         arms: Vec::new(),
         iterates: Vec::new(),
+        residuals: Vec::new(),
         deposited: None,
     };
     if reading.refusal.is_some() {
@@ -5291,6 +5294,7 @@ pub fn kinetic_coupling(
     // The joint solve, its iterates kept.
     let joint = kinetic_lift(&parts.terms, &parts.gradients, &parts.chart, parts.columns, Some(d.as_slice()), None)?;
     reading.iterates = joint.iterates.iter().map(|v| cosines(v)).collect();
+    reading.residuals = joint.residuals.clone();
     let (e, m) = cosines(joint.moved.entries());
     reading.arms.push(("joint", vec![(joint.stop, joint.residuals.len())], e, m));
     let request_of = |t: usize| proposal.terms[t].leading.first().map_or(usize::MAX, |c| c.request);

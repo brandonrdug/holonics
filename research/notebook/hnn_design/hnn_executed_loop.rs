@@ -4293,8 +4293,9 @@ pub(super) fn kinetic(terrain: &str, seed: u64, count: usize, arm: &str, toward:
 /// `hnn::executed::kinetic_coupling` at each source. Prints the kinetic step `M⁻¹AᵀK⁻¹w` with `K`
 /// joint, in each request's blocks, in each term's blocks and on its diagonal, and every iterate of
 /// the joint solve, each against the native descent gradient `d` twice: Euclidean on `E`'s entries
-/// and in `M`'s metric against `M⁻¹d`, signed squared cosines enclosed at `/4096`; then the
-/// deposited kinetic unit step, Euclidean. Nothing is moved.
+/// and in `M`'s metric against `M⁻¹d`, signed squared cosines enclosed at `/4096`, each iterate with
+/// its residual energy over the opening's at `2^(−32)`; then the deposited kinetic unit step,
+/// Euclidean. Nothing is moved.
 pub(super) fn kinetic_coupling(terrain: &str, seed: u64, count: usize, arm: &str, sources: &[String]) {
     use holonics::hnn::executed::kinetic_coupling;
     let clock = Instant::now();
@@ -4356,8 +4357,16 @@ pub(super) fn kinetic_coupling(terrain: &str, seed: u64, count: usize, arm: &str
                 if stops.is_empty() { "closed form".to_string() } else { stops.join(", ") }
             );
         }
+        // The residual energy over the opening's at the solve's floor grain `2^(−32)`.
+        let energy = |x: &Rat| cell(&ExactInterval::point(x.clone()), 1 << 32);
         for (k, (euclid, metric)) in reading.iterates.iter().enumerate() {
-            println!("    joint iterate {}: Euclidean {}, M's metric {}", k + 1, point(euclid), point(metric));
+            println!(
+                "    joint iterate {}: Euclidean {}, M's metric {}; residual energy {}",
+                k + 1,
+                point(euclid),
+                point(metric),
+                reading.residuals.get(k).map_or_else(|| "none".to_string(), energy)
+            );
         }
         println!(
             "    the deposited kinetic unit step against d, Euclidean {}; {} ms",
