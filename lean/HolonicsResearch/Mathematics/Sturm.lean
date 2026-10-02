@@ -1,4 +1,11 @@
-import Mathlib.Tactic
+import Holonics.Mathematics.PolynomialReading
+import Mathlib.Tactic.NormNum
+import Mathlib.Tactic.Ring
+import Mathlib.Tactic.Linarith
+import Mathlib.Tactic.LinearCombination
+import Mathlib.Analysis.Real.Sqrt
+import Mathlib.Algebra.CharZero.Infinite
+import Lean.Elab.Tactic.Omega
 import Mathlib.Algebra.Polynomial.Roots
 import Mathlib.Data.Set.Card
 
@@ -100,20 +107,12 @@ open Polynomial
 
 /-! ## 1. The chart, its readings, and the polynomial it names
 
+The rational/real readings and their cast join are imported from the shared
+`Holonics.Mathematics.PolynomialReading` owner, with their public names and bodies unchanged.
+
 A **chart** is a coefficient list, lowest degree first: `[c₀, c₁, …, c_d]` names
 `c₀ + c₁X + ⋯ + c_dX^d`.  Three readings of one chart are declared — at a rational point, at a
 real point, and as an object of `Polynomial ℚ` — and they are proved to agree. -/
-
-/-- The reading of a chart at a rational point, by nested multiplication (*Horner's rule*). -/
-def evalAt (x : ℚ) : List ℚ → ℚ
-  | [] => 0
-  | c :: p => c + x * evalAt x p
-
-/-- The reading of a chart at a **real** point.  The chart stays rational; only the point moves,
-which is the whole reason the instrument can count real roots without leaving `ℚ`. -/
-noncomputable def evalReal (x : ℝ) : List ℚ → ℝ
-  | [] => 0
-  | c :: p => (c : ℝ) + x * evalReal x p
 
 /-- The chart as an object of `Polynomial ℚ`. -/
 noncomputable def toPoly : List ℚ → Polynomial ℚ
@@ -276,14 +275,6 @@ theorem theChartIsTheEvaluationOfItsPolynomial (x : ℚ) :
   induction p with
   | nil => simp [toPoly, evalAt]
   | cons c p ih => simp [toPoly, evalAt, ih]
-
-/-- **The rational reading casts to the real reading**: one chart, two receivers, no drift. -/
-theorem theRationalReadingCastsToTheRealReading (x : ℚ) :
-    ∀ p : List ℚ, ((evalAt x p : ℚ) : ℝ) = evalReal (x : ℝ) p := by
-  intro p
-  induction p with
-  | nil => simp [evalAt, evalReal]
-  | cons c p ih => simp [evalAt, evalReal, ih]
 
 /-- A blind value inside a value list is dropped by the continuing count. -/
 theorem theBlindValueIsDroppedByTheContinuingCount (u : ℚ) :
