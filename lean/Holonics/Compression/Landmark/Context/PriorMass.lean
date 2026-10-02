@@ -93,7 +93,11 @@ drift"; checked by the Rust tests through `Landmarks::face_rule`); the enlarged 
 cell and bundle branches adds at most one bit against either branch
 (`Tree.sequential_mixture_bounds`), uncomposed; and the concave form `|S| γ(N/|S|)` of the leaves'
 charges. A rung declared on the development cells before the coded cells needs no charge on them;
-the 3 bits cover a choice made on the coded word itself.
+the 3 bits cover a choice made on the coded word itself. `emitted_sum`, `tree_two_part` and
+`priorMass_tree_two_part` are stated for one binary tree whose context is read from its own past
+digits; over a larger alphabet a digit tree's context is the cell history, and the cell code's
+completeness over its digit trees (each cell's digit faces summing to one,
+`Tree.digit_emission_normalized`) is not composed with them here.
 
 | Claim | Lean | Rust |
 |---|---|---|
