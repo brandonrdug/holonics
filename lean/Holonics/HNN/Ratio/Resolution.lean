@@ -61,7 +61,11 @@ exponent `v`. No temperature enters: the receiving map's gain, which plays the r
    by `η a/K` to first order, `a = ‖r − q‖²` (`odometer_step_bound`), and the certificate owes the
    factor `1/K`: under the code's rule the decrease is at least `η a (1/K − ½)`, and `½ η a/K` with
    the rule tightened by `1/K` (`odometer_certified_decrease`). At `L = 16`, `K < 8/7`, so the
-   code's rule keeps at least `3/8 · η a` (`odometer_ratio_sixteen`).
+   code's rule keeps at least `3/8 · η a` (`odometer_ratio_sixteen`). This covers a logit step
+   along the covector itself. A deposit's move pulled back through a locus mixes the stations'
+   covectors, and no factor of this kind is proved for it here. The curvature `s` (item 5) is a
+   separate question: `s = ½` stays sound there; what the factor corrects is the first-order term
+   `a`, which reads the odometer covector rather than the smooth score's gradient.
 8. **The grain of a continuing machine** (owed item 4). The grain read from a reading count,
    `L(N) = ⌈√(N ln 2/2)⌉`, is the least meeting the criterion of item 6 (`refiningGrain_spec`); it
    is monotone, within one of `√(N ln 2/2)`, and at most doubles when the count quadruples
@@ -1033,7 +1037,8 @@ theorem odometer_step_bound [Nonempty ι] (f r : ι → ℝ) (t : ι) (hr : ∀ 
 /-- [proved-derived; formal-checked] **What the certificate guarantees.** Under the code's step
 rule `η · s · a ≤ a` with `s ≥ ln 2/2`, the smooth score falls by at least `η a (1/K − ½)`, not
 the `½ η a` the deposit reads; with the rule tightened to `η (ln 2/2) a ≤ a/K` it falls by at
-least `½ η a/K`. The certified decrease `½ η a` is therefore owed exactly the factor `1/K`. -/
+least `½ η a/K`. The certified decrease `½ η a` is therefore owed exactly the factor `1/K`. The
+model `hmodel` is `odometer_step_bound`'s, a logit step along the odometer covector. -/
 theorem odometer_certified_decrease {φ φ₀ a η s K : ℝ} (hη : 0 ≤ η) (ha : 0 ≤ a)
     (hs : Real.log 2 / 2 ≤ s)
     (hmodel : φ ≤ φ₀ - η * (a / K) + 1 / 2 * (Real.log 2 / 2) * η ^ 2 * a) :
