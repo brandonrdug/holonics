@@ -104,15 +104,20 @@ split and carries no certificates).
   `D`); `s_p = u + ℓ` is `Parting::units` at the parting level `p`, carried up twice in the
   increment; `o_p = u + 2ℓ` is `Law::part`'s addition to the upper part's drift (one unit each,
   `u = ℓ = 0` where a part keeps its chart, `s_p = o_p ≤ 1` at a leaf's founding). The lower part,
-  off the arrival's path, takes `ℓ ≤ 1`, and each part inherits the chain's drift, whose earlier
+  off the arrival's path, takes `ℓ ≤ 1` (`Law::part`'s `lower_units`): that unit is the splitting
+  arrival's, which never passes through the lower part, so a level's drift holds the units of its
+  own arrivals and one unit for each arrival that split its chain above it, distinct arrivals of
+  the passage (`cell_units`, with a charge of `1 ≤ 2(D − b) − 1 + 4` for the latter). Each part
+  inherits the chain's drift: the lower part keeps the chain's bottom, and the upper part's earlier
   charges were bounded at the chain's deeper bottom by a smaller value. An arrival charges a level
-  once, so `n*` bounds the arrivals a level holds. Per cell at most `n* D² + 4 n* D` units against
+  once, so `n*` bounds the arrivals a level counts. Per cell at most `n* D² + 4 n* D` units against
   the rule's `n* P² + max((n* + 1) P², 4 n* P)` (`mantissa_units`, `P ≥ D` the path depth), which
   is `(2n* + 1) P²` for `P ≥ 4` (the count `(n* + 1) P²` alone is short of `4 n* P` at `P ≤ 3`,
   where the maximum can widen `W`: at `n* = 6,148`, `D = 1`, `W = 26` against `25`). A carrier
   release (`ρ_c`) is taken at the same steps as a mantissa rebase, with no split, so its count is
   item 6's without the `4`: the rule's `n* P²`. At campaign 1's `D = 63`
-  (`P = 63`, `n* = 6,148 = 2²·29·53`) the widths stay the rule's, `M_p = 49`, `W = 37`, and the
+  (`P = 63`, `n* = 6,148 = 2²·29·53`) the widths stay the rule's, `M_p = 49` at the even base
+  (`50` at the root's, `BaseMeasure.campaign_face_bits`), `W = 37`, and the
   per-cell read stays within a quarter grain per source; the per-cell `D²` term gives a usable
   resolution there.
 
@@ -675,8 +680,9 @@ theorem levels_units {L D : ℕ} {c : ℕ → ℕ} (hmono : ∀ i j, i < j → j
 
 /-- [proved-derived] **`cell_units`: a cell's read carries at most `n* D² + 4n* D` units a
 digit.** Each level `ℓ` of the read (bottom `c ℓ < D`, rising) holds the units of the arrivals
-through it, at most `n*` of them, each at most `2(D − c ℓ) − 1 + 4` (`arrival_units_le`; a split
-part inherits its chain's drift, and the bound only grows as the bottom rises toward the root). -/
+through it, each at most `2(D − c ℓ) − 1 + 4` (`arrival_units_le`; a split part inherits its
+chain's drift, and the bound only grows as the bottom rises toward the root), and one unit for each
+arrival that split its chain above it; `arrivals ℓ` counts both, distinct, at most `n*`. -/
 theorem cell_units {α : Type*} {L D n : ℕ} {c : ℕ → ℕ} (arrivals : ℕ → Finset α)
     (charge : ℕ → α → ℕ) (hmono : ∀ i j, i < j → j < L → c i < c j) (hD : ∀ ℓ < L, c ℓ < D)
     (hcard : ∀ ℓ < L, (arrivals ℓ).card ≤ n)
