@@ -77,7 +77,9 @@ use crate::hnn::constitution::{
 use crate::hnn::field::{Current, Field, Ring};
 use crate::hnn::keys::KeyLocation;
 use crate::hnn::moment::Ingested;
-use crate::hnn::propagation::{PathAttenuation, TickBalance, scattering_about};
+use crate::hnn::propagation::{
+    PathAttenuation, TickBalance, conductance_covector, scattering_about,
+};
 use crate::hnn::ratio::{Faces, HolonRatio, RatioCovector};
 use crate::hnn::realization::{apply_rows, entries, indexed};
 use crate::hnn::receiving::{ReceivingPhases, ReceivingStep};
@@ -737,9 +739,11 @@ pub struct TransitTick {
 }
 
 /// [definition] **What the word's return yields**: the covector on the opening storage of every
-/// ring, the element and transit ticks with their adjoints, the conductance covector `∂ℓ/∂G_a`, per
-/// receiving phase the receiving map's feature `P_R^(τ_R) v_R(e_j)` with the logit gradient, and the
-/// adjoint's carried remainders, released at the open ([`Remainders`]; none under the exact law).
+/// ring, the element and transit ticks with their adjoints, the conductance covector `∂ℓ/∂G_a` (at
+/// each junction read at the executed node potential,
+/// [`crate::hnn::propagation::conductance_covector`]), per receiving phase the receiving map's
+/// feature `P_R^(τ_R) v_R(e_j)` with the logit gradient, and the adjoint's carried remainders,
+/// released at the open ([`Remainders`]; none under the exact law).
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct WordReturn {
     pub opening: Vec<Vec<Rat>>,
@@ -1417,16 +1421,15 @@ fn reverse_core(
                     let slot = operands.end_slot(a, r);
                     let (covector, remainder) =
                         split(lattice.as_ref(), covector, &arrival_carried[a][slot]);
-                    let offset = entries(widths[r], |i| {
-                        &record.arrivals[a][slot][i] - &junction.anchor[i]
-                    });
-                    (
-                        a,
-                        slot,
-                        covector,
-                        remainder,
-                        dot(&anchor_bar, &offset) / &total,
-                    )
+                    // The conductance's covector at the executed node potential (Lean
+                    // `HNN/Word.executed_conductance_return`).
+                    let term = conductance_covector(
+                        &anchor_bar,
+                        &record.arrivals[a][slot],
+                        &junction.anchor,
+                        &total,
+                    );
+                    (a, slot, covector, remainder, term)
                 })
                 .collect();
             Ok::<JunctionReverse, HnnError>((storage, storage_remainder, arriving))

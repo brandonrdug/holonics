@@ -243,7 +243,11 @@ Decision 22 bounded the constitution, not the word. The exact-representation law
   executed (`LatticeWord.executed_adjoint_unique`): a chart-based covector. It is not the
   derivative of the rounded word: rounded participation weights are returned through the
   smooth normalization at the executed anchor, a difference that needs its own residual
-  (owed, #62).
+  (stated October 2: a finite change of conductances moves the executed node potential by the
+  conductances' covector read at it, the change of its deviation from the smooth node potential
+  and a second-order term, each deviation within the weights' rounding and the split;
+  `HNN/Word.{executed_conductance_return, executed_conductance_return_bound,
+  executed_potential_deviation}`, consumed by `hnn::propagation::conductance_covector`).
 - **The balances.** The ring's power balance and the prox identity
   `(W + ΔW)H' = WH' + γΣ w g fᵀ` hold up to the released residuals, reported per word and per
   deposit (the chart's share and the map and Gram carries, to be stated in one balance,

@@ -63,6 +63,16 @@ standing, and `W_c` is the learned contrast port.
    storage moves by both balances plus the interconnection's defect `W − δ`
    (`combined_balance_unloaded_port`). Their consumer is `hnn::word::WordBalance`, which the exposure
    forms and checks at every word.
+9. **The conductance's return at the executed node potential** (Decision 24). The word reads each
+   junction's node potential `v̂` from rounded weights split on its lattice, so `v̂` moves with a
+   conductance only by jumps; the return reads each conductance's covector `⟨ā, a_p − v̂⟩/S`, the
+   smooth node potential's derivative (`anchor_hasDerivAt`) read at `v̂`. For a finite change of
+   conductances the executed potential moves by what that covector predicts, the change of its
+   deviation `e = v̂ − v*` and a term of second order (`anchor_secant`,
+   `executed_conductance_return`); paired with the return's covector at the node, the prediction's
+   error is bounded by the two deviations (`executed_conductance_return_bound`), each within the
+   weights' rounding and the split (`executed_potential_deviation`). Its consumer is
+   `hnn::propagation::conductance_covector`, read by `hnn::port`'s reverse junction.
 
 [open] The diamond and retention laws (`Propagation` §4, `Retention`) are proved for the abstract
 `BlockOp` word, not for `fieldTick`. Writing `fieldTick` as a linear block operator family on
@@ -1001,6 +1011,164 @@ theorem combined_balance_unloaded_port {P P' E E' F R W δ : ℝ} (hfield : P' =
 
 end Executed
 
+/-! ## 4. The conductance's return at the executed node potential
+
+A junction's node potential is where its storage port and its contacts meet: the
+conductance-weighted mean `v* = (Y s + Σ_p G_p a_p)/S`, `S = Y + Σ_p G_p` (`Propagation.anchor`,
+Millman's common potential). The executed word reads its node potential `v̂` from weights rounded
+onto `2^(−L_c)ℤ` and split on the transients' lattice, so `v̂` moves with a conductance only by
+jumps and has no useful derivative in it. The return reads each conductance's covector instead as
+`⟨ā, a_p − v̂⟩/S` (`hnn::port`, `propagation::conductance_covector`): the potential drop `a_p − v̂`
+across the contact paired with the adjoint node potential `ā/S`, which is the smooth node
+potential's derivative (`anchor_hasDerivAt`) read at the executed potential. This section states
+what that covector predicts for a finite change of conductances and what it leaves:
+
+- the smooth node potential moves by `S(v*′ − v*) = Σ_p ΔG_p (a_p − v*′)`, the secant of its
+  derivative (`anchor_secant`);
+- the executed potential moves by the covector's prediction read at `v̂`, plus the change of its
+  own deviation `e = v̂ − v*`, plus a term of second order, `(S⁻¹ Σ ΔG)(v̂ − v*′)`
+  (`executed_conductance_return`); paired with any covector `ā`, the prediction's error is at
+  most `‖ā‖(‖e′‖ + ‖e‖ + |S⁻¹ Σ ΔG| ‖v̂ − v*′‖)` (`executed_conductance_return_bound`);
+- the deviation is the split plus the weights' rounding,
+  `‖v̂ − v*‖ ≤ ‖v̂ − x̂‖ + Σ_k |ŵ_k − w_k| ‖x_k‖` over the storage port and the contacts
+  (`executed_potential_deviation`), the bound the forward word already reports at every junction
+  (`hnn::word`). -/
+
+section ConductanceReturn
+
+variable {ι : Type*} [Fintype ι]
+
+/-- [proved-derived; formal-checked] **The node potential's secant in the conductances.** Changing
+the conductances from `G` to `G′` moves the node potential by
+`S(v*′ − v*) = Σ_p (G′_p − G_p)(a_p − v*′)`, `S = Y + Σ G`: each contact pulls the potential toward
+its arriving wave in proportion to its change of conductance, read against the new potential. -/
+theorem anchor_secant {V : Type*} [AddCommGroup V] [Module ℝ V] (Y : ℝ) (G G' : ι → ℝ)
+    (hsum : admittanceSum Y G ≠ 0) (hsum' : admittanceSum Y G' ≠ 0) (s : V) (a : ι → V) :
+    anchor Y G' s a - anchor Y G s a =
+      (admittanceSum Y G)⁻¹ • ∑ p, (G' p - G p) • (a p - anchor Y G' s a) := by
+  have h := admittanceSum_smul_anchor Y G hsum s a
+  have h' := admittanceSum_smul_anchor Y G' hsum' s a
+  have hdiff : admittanceSum Y G' - admittanceSum Y G = ∑ p, (G' p - G p) := by
+    simp only [admittanceSum, Finset.sum_sub_distrib]; ring
+  have hexp : ∑ p, (G' p - G p) • (a p - anchor Y G' s a) =
+      (∑ p, G' p • a p - ∑ p, G p • a p) -
+        (∑ p, (G' p - G p)) • anchor Y G' s a := by
+    simp only [smul_sub, sub_smul, Finset.sum_sub_distrib, Finset.sum_smul]
+  have key : admittanceSum Y G • (anchor Y G' s a - anchor Y G s a) =
+      ∑ p, (G' p - G p) • (a p - anchor Y G' s a) := by
+    rw [hexp, ← hdiff, smul_sub, h, sub_smul, h']
+    abel
+  rw [← key, smul_smul, inv_mul_cancel₀ hsum, one_smul]
+
+/-- [proved-derived; formal-checked] **The smooth node potential's derivative in a conductance.**
+Along `G + tδ` the node potential moves at `t = 0` with velocity `S⁻¹ Σ_p δ_p (a_p − v*)`: the
+covector `⟨ā, a_p − v*⟩/S` of the conductance `G_p` is the exact derivative of `⟨ā, v*⟩`. -/
+theorem anchor_hasDerivAt {V : Type*} [NormedAddCommGroup V] [NormedSpace ℝ V] (Y : ℝ)
+    (G δ : ι → ℝ) (hsum : admittanceSum Y G ≠ 0) (s : V) (a : ι → V) :
+    HasDerivAt (fun t : ℝ => anchor Y (G + t • δ) s a)
+      ((admittanceSum Y G)⁻¹ • ∑ p, δ p • (a p - anchor Y G s a)) 0 := by
+  set S := admittanceSum Y G
+  set σ := ∑ p, δ p
+  set A : V := Y • s + ∑ p, G p • a p
+  set B : V := ∑ p, δ p • a p
+  have hform : (fun t : ℝ => anchor Y (G + t • δ) s a) = fun t => (S + t * σ)⁻¹ • (A + t • B) := by
+    funext t
+    simp only [anchor, admittanceSum, Pi.add_apply, Pi.smul_apply, smul_eq_mul, add_smul,
+      Finset.sum_add_distrib, mul_smul, ← Finset.mul_sum, ← Finset.smul_sum, S, σ, A, B]
+    congr 1
+    · ring
+    · abel
+  have hc : HasDerivAt (fun t : ℝ => (S + t * σ)⁻¹) (-(1 * σ) / (S + 0 * σ) ^ 2) 0 :=
+    (((hasDerivAt_id (0 : ℝ)).mul_const σ).const_add S).inv (by simpa using hsum)
+  have hf : HasDerivAt (fun t : ℝ => A + t • B) ((1 : ℝ) • B) 0 :=
+    ((hasDerivAt_id (0 : ℝ)).smul_const B).const_add A
+  have hv : anchor Y G s a = S⁻¹ • A := rfl
+  have hB : ∑ p, δ p • (a p - anchor Y G s a) = B - σ • anchor Y G s a := by
+    simp only [smul_sub, Finset.sum_sub_distrib, Finset.sum_smul, B, σ]
+  rw [hform]
+  refine (hc.smul hf).congr_deriv ?_
+  rw [hB, hv]
+  simp only [zero_mul, add_zero, one_mul, zero_smul, one_smul]
+  module
+
+/-- [proved-derived; formal-checked] **The executed potential's change against the covector read
+at it.** For any executed potentials `v̂` at `G` and `v̂′` at `G′` (their weights rounded and split
+however the word executed them), with deviations `e = v̂ − v*` and `e′ = v̂′ − v*′`,
+`v̂′ − v̂ = S⁻¹ Σ_p ΔG_p (a_p − v̂) + (e′ − e) + (S⁻¹ Σ_p ΔG_p)(v̂ − v*′)`: the conductances'
+covector read at the executed potential, the change of the executed deviation, and a term of second
+order in the change and the deviation. -/
+theorem executed_conductance_return {V : Type*} [AddCommGroup V] [Module ℝ V] (Y : ℝ)
+    (G G' : ι → ℝ) (hsum : admittanceSum Y G ≠ 0) (hsum' : admittanceSum Y G' ≠ 0) (s : V)
+    (a : ι → V) (vh vh' : V) :
+    vh' - vh = (admittanceSum Y G)⁻¹ • ∑ p, (G' p - G p) • (a p - vh) +
+      ((vh' - anchor Y G' s a) - (vh - anchor Y G s a)) +
+      ((admittanceSum Y G)⁻¹ * ∑ p, (G' p - G p)) • (vh - anchor Y G' s a) := by
+  have hs := anchor_secant Y G G' hsum hsum' s a
+  have hexp : ∑ p, (G' p - G p) • (a p - vh) =
+      ∑ p, (G' p - G p) • (a p - anchor Y G' s a) -
+        (∑ p, (G' p - G p)) • (vh - anchor Y G' s a) := by
+    rw [Finset.sum_smul, ← Finset.sum_sub_distrib]
+    refine Finset.sum_congr rfl fun p _ => ?_
+    rw [← smul_sub]
+    congr 1
+    abel
+  rw [hexp, smul_sub, ← hs, mul_smul]
+  abel
+
+/-- [proved-derived; formal-checked] **The prediction's error, paired with a covector.** Pairing
+the executed potential's change with the return's covector `ā` (`u`) at the node, the prediction
+`S⁻¹ Σ_p ΔG_p ⟨ā, a_p − v̂⟩` misses it by at most
+`‖ā‖(‖e′‖ + ‖e‖ + |S⁻¹ Σ ΔG| ‖v̂ − v*′‖)` (`executed_conductance_return`). -/
+theorem executed_conductance_return_bound {V : Type*} [NormedAddCommGroup V]
+    [InnerProductSpace ℝ V] (Y : ℝ) (G G' : ι → ℝ) (hsum : admittanceSum Y G ≠ 0)
+    (hsum' : admittanceSum Y G' ≠ 0) (s : V) (a : ι → V) (vh vh' u : V) :
+    |inner ℝ u (vh' - vh) -
+        (admittanceSum Y G)⁻¹ * ∑ p, (G' p - G p) * inner ℝ u (a p - vh)| ≤
+      ‖u‖ * (‖vh' - anchor Y G' s a‖ + ‖vh - anchor Y G s a‖ +
+        |(admittanceSum Y G)⁻¹ * ∑ p, (G' p - G p)| * ‖vh - anchor Y G' s a‖) := by
+  set c := (admittanceSum Y G)⁻¹ * ∑ p, (G' p - G p)
+  have hid := executed_conductance_return Y G G' hsum hsum' s a vh vh'
+  have hpair : inner ℝ u (vh' - vh) -
+      (admittanceSum Y G)⁻¹ * ∑ p, (G' p - G p) * inner ℝ u (a p - vh) =
+      inner ℝ u ((vh' - anchor Y G' s a) - (vh - anchor Y G s a) +
+        c • (vh - anchor Y G' s a)) := by
+    rw [hid]
+    simp only [inner_add_right, inner_smul_right, inner_sum, c]
+    ring
+  rw [hpair]
+  refine (abs_real_inner_le_norm _ _).trans (mul_le_mul_of_nonneg_left ?_ (norm_nonneg _))
+  refine (norm_add_le _ _).trans (add_le_add (norm_sub_le _ _) ?_)
+  rw [norm_smul, Real.norm_eq_abs]
+
+/-- [proved-derived; formal-checked] **The executed potential's deviation.** With weights `ŵ_s` on
+the storage port and `ŵ_p` on the contacts, the executed potential `v̂` lies within its split
+`‖v̂ − x̂‖` of the rounded mean `x̂ = ŵ_s s + Σ_p ŵ_p a_p`, and that mean within
+`|ŵ_s − Y/S| ‖s‖ + Σ_p |ŵ_p − G_p/S| ‖a_p‖` of the node potential: the weights' ℓ1 rounding
+against each port's wave, the bound `‖ŵ − w‖₁ max_k ‖x_k‖ + u` the forward word reports
+(`hnn::word`). -/
+theorem executed_potential_deviation {V : Type*} [NormedAddCommGroup V] [NormedSpace ℝ V]
+    (Y : ℝ) (G : ι → ℝ) (hY : 0 < Y) (hG : ∀ p, 0 ≤ G p) (s : V) (a : ι → V) (ws : ℝ)
+    (w : ι → ℝ) (vh : V) :
+    ‖vh - anchor Y G s a‖ ≤ ‖vh - (ws • s + ∑ p, w p • a p)‖ +
+      (|ws - Y / admittanceSum Y G| * ‖s‖ +
+        ∑ p, |w p - G p / admittanceSum Y G| * ‖a p‖) := by
+  have hmean := (anchor_is_participation Y G hY hG s a).1
+  have hdev : (ws • s + ∑ p, w p • a p) - anchor Y G s a =
+      (ws - Y / admittanceSum Y G) • s + ∑ p, (w p - G p / admittanceSum Y G) • a p := by
+    rw [hmean]
+    simp only [sub_smul, Finset.sum_sub_distrib]
+    abel
+  have hsplit : vh - anchor Y G s a =
+      (vh - (ws • s + ∑ p, w p • a p)) + ((ws • s + ∑ p, w p • a p) - anchor Y G s a) := by
+    abel
+  rw [hsplit, hdev]
+  refine (norm_add_le _ _).trans (add_le_add le_rfl ((norm_add_le _ _).trans (add_le_add ?_ ?_)))
+  · rw [norm_smul, Real.norm_eq_abs]
+  · refine (norm_sum_le _ _).trans (Finset.sum_le_sum fun p _ => ?_)
+    rw [norm_smul, Real.norm_eq_abs]
+
+end ConductanceReturn
+
 section Audit
 
 #print axioms reaction_stage_balance
@@ -1020,6 +1188,11 @@ section Audit
 #print axioms field_executed_balance_with_defects
 #print axioms field_commit_deposition
 #print axioms combined_balance_unloaded_port
+#print axioms anchor_secant
+#print axioms anchor_hasDerivAt
+#print axioms executed_conductance_return
+#print axioms executed_conductance_return_bound
+#print axioms executed_potential_deviation
 
 end Audit
 
