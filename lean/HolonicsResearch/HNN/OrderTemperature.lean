@@ -382,4 +382,51 @@ theorem fixed_order_halving_adopts {f g : ℝ → ℝ} {d η₀ : ℝ} (hfg : �
     hg.congr_of_eventuallyEq (nhdsWithin_le_nhds hfg) hfg.self_of_nhds
   exact halving_adopts_of_neg_slope hf hd hη
 
+/-! ### Walls: a zero-temperature descent walks into them
+
+A wall is a step length `w` along the move's direction at which the order changes and the comparison
+jumps up by more than the continuous part falls. Every trial at or past it is refused, every trial
+short of it that descends is adopted. -/
+
+/-- [proved-derived; formal-checked] **The first halving short of a wall lands within half of it.**
+Halving a step `η₀ ≥ w` until it falls short of the wall at `w`, the first such step is at least
+`w/2`: the trial before it was at or past the wall. -/
+theorem first_halving_short_of_wall {η₀ w : ℝ} (hη : w ≤ η₀) {k : ℕ} (hk : η₀ / 2 ^ k < w)
+    (hmin : ∀ j < k, w ≤ η₀ / 2 ^ j) : w / 2 ≤ η₀ / 2 ^ k := by
+  rcases k with _ | j
+  · simp at hk
+    linarith
+  · have h := hmin j (Nat.lt_succ_self j)
+    rw [pow_succ, ← div_div]
+    linarith
+
+/-- [proved-derived; formal-checked] **So the distance to the wall halves at every adopted move.**
+After the move adopts that step, the wall lies less than half as far as before. -/
+theorem wall_distance_halves {η₀ w : ℝ} (hη : w ≤ η₀) {k : ℕ} (hk : η₀ / 2 ^ k < w)
+    (hmin : ∀ j < k, w ≤ η₀ / 2 ^ j) : w - η₀ / 2 ^ k ≤ w / 2 := by
+  have := first_halving_short_of_wall hη hk hmin
+  linarith
+
+/-- [proved-derived; formal-checked] **A chain whose wall distance halves converges onto the wall**:
+after `n` moves it lies within `d 0 / 2^n` of it. -/
+theorem wall_distance_le {d : ℕ → ℝ} (h : ∀ n, d (n + 1) ≤ d n / 2) (n : ℕ) :
+    d n ≤ d 0 / 2 ^ n := by
+  induction n with
+  | zero => simp
+  | succ n ih =>
+    calc d (n + 1) ≤ d n / 2 := h n
+      _ ≤ d 0 / 2 ^ n / 2 := by linarith
+      _ = d 0 / 2 ^ (n + 1) := by rw [pow_succ, div_div]
+
+/-- [proved-derived; formal-checked] **And what the chain can still gain before the wall vanishes
+with it.** If the comparison falls at most `G` per unit step short of the wall, a move that stays
+short of a wall at distance `d` gains at most `G d`. -/
+theorem gain_short_of_wall {g : ℝ → ℝ} {G d η : ℝ} (hlip : ∀ x y, |g x - g y| ≤ G * |x - y|)
+    (hη0 : 0 ≤ η) (hηd : η ≤ d) (hG : 0 ≤ G) : g 0 - g η ≤ G * d := by
+  have h := hlip 0 η
+  have h1 : g 0 - g η ≤ |g 0 - g η| := le_abs_self _
+  have h2 : |(0:ℝ) - η| = η := by rw [zero_sub, abs_neg, abs_of_nonneg hη0]
+  rw [h2] at h
+  nlinarith
+
 end Holonics.HNN.OrderTemperature
