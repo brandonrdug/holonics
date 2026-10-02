@@ -233,7 +233,10 @@ fn main() {
     let mut samples_out: Option<String> = None;
     let mut refining = false;
     let mut founded = false;
+    let mut memory: Option<u32> = None;
     let mut ladder = false;
+    let mut ladder_masses: Option<u32> = None;
+    let mut ladder_depth: Option<usize> = None;
     for pair in arguments.chunks(2) {
         match pair {
             [key, value] if key == "cells" => cells = Some(value.clone()),
@@ -261,7 +264,17 @@ fn main() {
             [key, value] if key == "samples" => samples_out = Some(value.clone()),
             [key, value] if key == "grain" && value == "refining" => refining = true,
             [key, value] if key == "transport" && value == "founded" => founded = true,
+            [key, value] if key == "transport-memory" => {
+                memory = Some(value.parse().expect("a memory exponent"));
+            }
             [key, value] if key == "prior-mass" && value == "ladder" => ladder = true,
+            [key, value] if key == "prior-mass" => {
+                ladder = true;
+                ladder_masses = Some(value.parse().expect("a prior mass exponent"));
+            }
+            [key, value] if key == "tree-depth" => {
+                ladder_depth = Some(value.parse().expect("a tree depth"));
+            }
             _ => {
                 println!(
                     "usage: hnn_exposure [cut-file <path>] [cells <N|all>] [held-out <cells>] [windows <deadline>] [realization <host|card>] [resonator <none|source>] [gate f2]"
@@ -332,7 +345,20 @@ fn main() {
     } else {
         reference
     };
-    let constitution = if founded {
+    let constitution = if let Some(k) = memory {
+        // [measured-diagnostic] The source transport at the modulus `1 − 2^(−k)`, a memory of about
+        // `2^k` ticks, read by the leaky count (the contact loop record §26): a sweep, not a law.
+        let mut initial =
+            Constitution::initial(&field, CAMPAIGN_ONE_BUDGET).expect("the initial constitution");
+        let modulus = Rat::one() - Rat::new(BigInt::from(1), BigInt::from(1u64 << k));
+        for &ring in field.sources() {
+            initial = initial
+                .with_transport(ring, modulus.clone())
+                .expect("a transport on the source port's lattice");
+            println!("transport: ring {ring} at {modulus} (the leaky count)");
+        }
+        Some(initial)
+    } else if founded {
         // The source rings' transport founded off the lossless boundary, read by the leaky count
         // (the contact loop record §24).
         let mut initial = loaded.then(|| loaded_constitution(&field)).unwrap_or_else(|| {
@@ -397,7 +423,7 @@ fn main() {
     );
     println!("setup (cut read, fields declared): {setup} ms wall");
     if ladder {
-        prior_mass_ladder(&field, &cut);
+        prior_mass_ladder(&field, &cut, ladder_masses, ladder_depth);
         return;
     }
     if let Some(count) = ablation {
@@ -1599,15 +1625,23 @@ fn tree_alone(field: &Field, cut: &Cut, scored: usize) -> TreeAlone {
 /// tree over the prior-mass ladder** (`prior-mass ladder`): the tree alone, prequential over the cut
 /// at each prior mass `2^(−j)`, `j = 1..B` (`B` the odometer digits), its development (training)
 /// and held-out codes. The development cells choose `j`, charged `⌈log₂ B⌉` bits for the family,
-/// the declared stop prior's method (the September 26 record, §1).
-fn prior_mass_ladder(field: &Field, cut: &Cut) {
-    let base =
+/// the declared stop prior's method (the September 26 record, §1). `prior-mass j` reads one rung,
+/// `tree-depth D` another address depth.
+fn prior_mass_ladder(field: &Field, cut: &Cut, only: Option<u32>, depth: Option<usize>) {
+    let mut base =
         landmark_declaration(field, &field.receivers()[0]).expect("the receiver's declared tree");
+    if let Some(depth) = depth {
+        base.depth = depth;
+    }
     let grain = base.grain;
     let digits = holonics::compression::landmark::context::odometer_digits(base.alphabet) as u32;
     let letters = cell_letters(&cut.cells);
-    println!("prior-mass ladder over the cut's {} cells (B = {digits})", cut.cells.len());
-    for mass in 1..=digits {
+    println!(
+        "prior-mass ladder over the cut's {} cells (B = {digits}, depth {})",
+        cut.cells.len(),
+        base.depth
+    );
+    for mass in (1..=digits).filter(|j| only.is_none_or(|o| o == *j)) {
         let started = Instant::now();
         let declaration = holonics::compression::landmark::context::LandmarkDeclaration {
             mass,
