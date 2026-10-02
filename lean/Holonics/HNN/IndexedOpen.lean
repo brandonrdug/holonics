@@ -1,4 +1,5 @@
 import Holonics.HNN.Moment
+import Mathlib.Data.Rat.Floor
 
 /-!
 # HNN.IndexedOpen: the source opens on its indexed, normalized counts
@@ -863,6 +864,257 @@ theorem order_founding : IsFounding 21 60 21 1645392 := by
 
 end Founding
 
+/-! ## 7. The leaky count
+
+[definition; agent-inferred, October 2] (`holonics::hnn::moment`, "The leaky count";
+`SourceMoment::open_with`; the contact loop record §24.) Below modulus one the phase record reads
+a datum's age only within one turn (`founded_modulus_alias`). The leaky count carries the age in
+the counts instead: at each of the ring's ticks every count is multiplied by `ρ`, and a datum then
+enters at its phase. The counts are integer coordinates on the lattice `2^(−u)`, `u = L_ν + m`,
+`m` the least with `2^m (1 − ρ) ≥ 1`, and each product is read at the nearest lattice point, ties
+up (`nearest`). In lattice units:
+
+```text
+tick          v ← ⌊(2 v k + 2^s) / 2^(s+1)⌋ = nearest(ρ v)   (ρ = k 2^(−s); leaky_tick_eq_nearest)
+ingest        v ← v + 2^u                                      (exact: one datum, weight one)
+section       v ← v + nearest(ρ^a 2^u)                         (a datum entered a ticks old)
+read          w = chart(L̂[slot] / Σ L̂)
+```
+
+* **One half unit per rounding** (`nearest_sub_le`); the Rust tick is the nearest point
+  (`leaky_tick_eq_nearest`).
+* **The carried count** (`leaky_count_error_le`, `leaky_count_ingest`): over any sequence of
+  ticks, exact entries and `r` rounded entries, a carried count stays within
+  `1/(2(1 − ρ)) + r/2` lattice units of the exact decayed count. The ingest enters exact units, so
+  its counts stay within `1/(2(1 − ρ))` units over a passage of any length, and with
+  `2^m (1 − ρ) ≥ 1` that is at most `2^(−L_ν−1)`, half a population-chart unit
+  (`leaky_lattice_le_half_chart`). A section's datum is rounded once when it enters
+  (`SourceMoment::continued` reads it `ρ^a` at its age), so a section adds up to half a lattice
+  unit a rounded entry; the half-chart-unit bound is not shown on that path.
+* **The normalized read** (`leaky_read_error`): with every carried count within `δ` of its exact
+  count over `N` slots, the read of slot `k` is within `(δ + w_k N δ)/Σ L̂` of its transported
+  weight `w_k`, before the chart rounds it (half a chart unit more). The slots' errors add in the
+  mass, so the read is not within one chart unit in general:
+  `leaky_read_exceeds_chart_unit` is the law's own instance at campaign 1's founding
+  (`campaign_one_founding`, `ρ₀ = 10809/2^17`, `L_ν = 18`, `m = 1`) on a passage the ingest takes:
+  205 data entering one phase of ring 0 (a code its lock selects, then the 204 it does not), then
+  two of its ticks, where the newest datum's read is more than eight chart units from its
+  transported weight, before and after the chart rounds it. -/
+
+section Leaky
+
+/-- [definition] **The nearest lattice point**, ties up: `⌊y + 1/2⌋`. -/
+def nearest (y : ℚ) : ℤ := ⌊y + 1 / 2⌋
+
+/-- [proved-derived; formal-checked] **One rounding is at most half a lattice unit**. -/
+theorem nearest_sub_le (y : ℚ) : |(nearest y : ℚ) - y| ≤ 1 / 2 := by
+  unfold nearest
+  have h1 := Int.floor_le (y + 1 / 2)
+  have h2 := Int.lt_floor_add_one (y + 1 / 2)
+  rw [abs_le]
+  constructor <;> linarith
+
+/-- [proved-derived; formal-checked] **The Rust tick is the nearest point**: the integer step
+`⌊(2 v k + 2^s)/2^(s+1)⌋` of `Leaky::decay` is `nearest(ρ v)` at `ρ = k 2^(−s)` (Lean's integer
+division is the floor; the Rust's truncation agrees on the counts, which are nonnegative). -/
+theorem leaky_tick_eq_nearest (v k : ℤ) (s : ℕ) :
+    (2 * v * k + 2 ^ s) / 2 ^ (s + 1) = nearest ((k : ℚ) / 2 ^ s * v) := by
+  unfold nearest
+  have h : ((k : ℚ) / 2 ^ s * v + 1 / 2) = ((2 * v * k + 2 ^ s : ℤ) : ℚ) / ((2 ^ (s + 1) : ℕ) : ℚ) := by
+    push_cast
+    field_simp
+    ring
+  rw [h, Rat.floor_intCast_div_natCast]
+  push_cast
+  rfl
+
+/-- [definition] **One step of the leaky count**: a tick of the transport, an exact lattice amount
+entering (the ingest's datum, `2^u`), or a datum entering at the nearest point to `y` (a section's
+datum, `y = ρ^a 2^u`). -/
+inductive LeakyStep
+  | tick
+  | unit (n : ℤ)
+  | entry (y : ℚ)
+
+/-- [definition] **The carried count** after the steps, in lattice units. -/
+def carried (ρ : ℚ) : ℤ → List LeakyStep → ℤ
+  | v, [] => v
+  | v, .tick :: l => carried ρ (nearest (ρ * v)) l
+  | v, .unit n :: l => carried ρ (v + n) l
+  | v, .entry y :: l => carried ρ (v + nearest y) l
+
+/-- [definition] **The exact decayed count** after the steps, in lattice units. -/
+def exactCount (ρ : ℚ) : ℚ → List LeakyStep → ℚ
+  | x, [] => x
+  | x, .tick :: l => exactCount ρ (ρ * x) l
+  | x, .unit n :: l => exactCount ρ (x + n) l
+  | x, .entry y :: l => exactCount ρ (x + y) l
+
+/-- [definition] **The rounded entries** among the steps. -/
+def rounded : List LeakyStep → ℕ
+  | [] => 0
+  | .entry _ :: l => rounded l + 1
+  | _ :: l => rounded l
+
+/-- [proved-derived; formal-checked] **The carried count's error**: over any steps, a carried count
+within `1/(2(1 − ρ)) + c/2` lattice units of the exact one stays within
+`1/(2(1 − ρ)) + (c + r)/2`, `r` the rounded entries. A tick takes the error `e` to at most
+`ρ e + 1/2`, whose fixed point is `1/(2(1 − ρ))`; an exact entry leaves it; a rounded entry adds at
+most `1/2`. -/
+theorem leaky_count_error_le {ρ : ℚ} (h0 : 0 ≤ ρ) (h1 : ρ < 1) (l : List LeakyStep) :
+    ∀ (v : ℤ) (x : ℚ) (c : ℕ), |(v : ℚ) - x| ≤ 1 / (2 * (1 - ρ)) + c / 2 →
+      |(carried ρ v l : ℚ) - exactCount ρ x l| ≤ 1 / (2 * (1 - ρ)) + (c + rounded l) / 2 := by
+  have hgap : 0 < 1 - ρ := by linarith
+  induction l with
+  | nil => intro v x c h; simpa [carried, exactCount, rounded] using h
+  | cons st l ih =>
+    intro v x c h
+    cases st with
+    | tick =>
+      simp only [carried, exactCount, rounded]
+      apply ih
+      have hr := nearest_sub_le (ρ * v)
+      have hfix : 1 / (2 * (1 - ρ)) = 1 / 2 + ρ * (1 / (2 * (1 - ρ))) := by
+        field_simp
+        ring
+      have hc : (0 : ℚ) ≤ c := by positivity
+      calc |(nearest (ρ * v) : ℚ) - ρ * x|
+          = |((nearest (ρ * v) : ℚ) - ρ * v) + ρ * ((v : ℚ) - x)| := by ring_nf
+        _ ≤ |(nearest (ρ * v) : ℚ) - ρ * v| + |ρ * ((v : ℚ) - x)| := abs_add_le _ _
+        _ ≤ 1 / 2 + ρ * (1 / (2 * (1 - ρ)) + c / 2) := by
+          rw [abs_mul, abs_of_nonneg h0]
+          exact add_le_add hr (mul_le_mul_of_nonneg_left h h0)
+        _ ≤ 1 / (2 * (1 - ρ)) + c / 2 := by
+          rw [hfix]
+          nlinarith
+    | unit n =>
+      simp only [carried, exactCount, rounded]
+      apply ih
+      push_cast
+      calc |(v : ℚ) + n - (x + n)| = |(v : ℚ) - x| := by ring_nf
+        _ ≤ _ := h
+    | entry y =>
+      simp only [carried, exactCount, rounded]
+      have := ih (v + nearest y) (x + y) (c + 1) (by
+        push_cast
+        calc |(v : ℚ) + nearest y - (x + y)| = |((v : ℚ) - x) + ((nearest y : ℚ) - y)| := by
+              ring_nf
+          _ ≤ |(v : ℚ) - x| + |(nearest y : ℚ) - y| := abs_add_le _ _
+          _ ≤ 1 / (2 * (1 - ρ)) + c / 2 + 1 / 2 := add_le_add h (nearest_sub_le y)
+          _ = 1 / (2 * (1 - ρ)) + ((c : ℚ) + 1) / 2 := by ring)
+      calc _ ≤ 1 / (2 * (1 - ρ)) + (((c + 1 : ℕ) : ℚ) + rounded l) / 2 := this
+        _ = _ := by push_cast; ring
+
+/-- [proved-derived; formal-checked] **The ingest's count over a passage of any length**: from an
+empty count, ticks and exact entries alone keep the carried count within `1/(2(1 − ρ))` lattice
+units of the exact decayed count. -/
+theorem leaky_count_ingest {ρ : ℚ} (h0 : 0 ≤ ρ) (h1 : ρ < 1) {l : List LeakyStep}
+    (hl : rounded l = 0) : |(carried ρ 0 l : ℚ) - exactCount ρ 0 l| ≤ 1 / (2 * (1 - ρ)) := by
+  have hgap : 0 < 1 - ρ := by linarith
+  have := leaky_count_error_le h0 h1 l 0 0 0 (by
+    simp only [Int.cast_zero, sub_zero, abs_zero, Nat.cast_zero, zero_div, add_zero]
+    positivity)
+  simpa [hl] using this
+
+/-- [proved-derived; formal-checked] **On the lattice `2^(−L_ν−m)` the ingest's bound is half a
+chart unit**: with `2^m (1 − ρ) ≥ 1`, `2^(−L_ν−m)/(2(1 − ρ)) ≤ 2^(−L_ν−1)`. -/
+theorem leaky_lattice_le_half_chart {ρ : ℚ} (h1 : ρ < 1) {L m : ℕ} (hm : 1 ≤ 2 ^ m * (1 - ρ)) :
+    (1 / 2 : ℚ) ^ (L + m) * (1 / (2 * (1 - ρ))) ≤ (1 / 2) ^ (L + 1) := by
+  have hgap : 0 < 1 - ρ := by linarith
+  have h2m : (0 : ℚ) < 2 ^ m := by positivity
+  rw [pow_add, pow_add, pow_one, one_div_pow (n := m), mul_assoc]
+  apply mul_le_mul_of_nonneg_left _ (by positivity)
+  rw [div_mul_div_comm, one_mul, div_le_iff₀ (by positivity)]
+  nlinarith
+
+/-- [proved-derived; formal-checked] **The normalized read's error**: with every carried count
+within `δ` of its exact count over the slots `s` (exact counts nonnegative, both masses positive),
+the read of slot `k` is within `(δ + w_k |s| δ)/Σ L̂` of its transported weight `w_k = L_k/Σ L`:
+the mass carries every slot's error. -/
+theorem leaky_read_error {ι : Type*} (s : Finset ι) (Lh L : ι → ℚ) {δ : ℚ}
+    (hδ : ∀ i ∈ s, |Lh i - L i| ≤ δ) (hL : ∀ i ∈ s, 0 ≤ L i) (hMh : 0 < ∑ i ∈ s, Lh i)
+    (hM : 0 < ∑ i ∈ s, L i) {k : ι} (hk : k ∈ s) :
+    |Lh k / ∑ i ∈ s, Lh i - L k / ∑ i ∈ s, L i|
+      ≤ (δ + L k / (∑ i ∈ s, L i) * (s.card * δ)) / ∑ i ∈ s, Lh i := by
+  set Mh := ∑ i ∈ s, Lh i
+  set M := ∑ i ∈ s, L i
+  have hw : 0 ≤ L k / M := div_nonneg (hL k hk) hM.le
+  have hmass : |Mh - M| ≤ s.card * δ := by
+    calc |Mh - M| = |∑ i ∈ s, (Lh i - L i)| := by rw [Finset.sum_sub_distrib]
+      _ ≤ ∑ i ∈ s, |Lh i - L i| := Finset.abs_sum_le_sum_abs _ _
+      _ ≤ ∑ _i ∈ s, δ := Finset.sum_le_sum hδ
+      _ = s.card * δ := by rw [Finset.sum_const, nsmul_eq_mul]
+  have heq : Lh k / Mh - L k / M = ((Lh k - L k) - L k / M * (Mh - M)) / Mh := by
+    field_simp
+    ring
+  rw [heq, abs_div, abs_of_pos hMh]
+  apply div_le_div_of_nonneg_right _ hMh.le
+  calc |(Lh k - L k) - L k / M * (Mh - M)|
+      ≤ |Lh k - L k| + |L k / M * (Mh - M)| := abs_sub _ _
+    _ ≤ δ + L k / M * (s.card * δ) := by
+      rw [abs_mul, abs_of_nonneg hw]
+      exact add_le_add (hδ k hk) (mul_le_mul_of_nonneg_left hmass hw)
+
+/-- [proved-derived; formal-checked] **Campaign 1's founding**: period `d = 5`, chart `L_ν = 18`
+and the source port's lattice `2^(−18)` (both `⌈log₂(32 n*)⌉` at a declared population
+`4096 < n* ≤ 8192`, as in the leaky-count tests' `campaign_one(6148)`) found ring 0 at `k = 21618`,
+`ρ₀ = 21618/2^18 = 10809/2^17`; there `m = 1` (`2 (1 − ρ₀) ≥ 1`). -/
+theorem campaign_one_founding :
+    IsFounding 18 5 18 21618 ∧ (21618 / 2 ^ 18 : ℚ) = 10809 / 2 ^ 17 ∧
+      (1 : ℚ) ≤ 2 ^ 1 * (1 - 10809 / 2 ^ 17) := by
+  unfold IsFounding
+  refine ⟨⟨by norm_num, by norm_num⟩, by norm_num, by norm_num⟩
+
+/-- [proved-derived; formal-checked] **The read is not within one chart unit in general**: at
+campaign 1's founding (`ρ₀ = 10809/2^17`, lattice `2^(−19)`, chart `2^(−18)`), on a passage the
+ingest takes. Ring 0 ticks only at the codes its lock selects (`x ≡ 0 mod 5` on the residue port
+chart), and each tick's datum enters at the new phase, so code 5 and then the 204 codes the lock
+does not select enter 205 slots of one phase; codes 0 and 10 then tick the ring twice, each entering
+a new slot. Each of the 205 slots carries `3566` against its exact `ρ₀² 2^19 = 116834481/2^15`, a
+rounding of the same sign in every slot, so the mass is off by `205 · 16207/2^15 = 101 +
+12867/2^15` lattice units; the middle datum carries `43236 = ρ₀ 2^19` exactly. The newest datum's
+read `2^19/(2^19 + 43236 + 205·3566)` is more than eight chart units from its transported weight
+`1/(1 + ρ₀ + 205 ρ₀²)`, and so is the chart's read of it, `nearest` at `2^18`, `105840/2^18`
+(`holonics::hnn::tests::moment::the_leaky_read_is_not_within_one_chart_unit_in_general` reads this
+value on the Rust ingest). -/
+theorem leaky_read_exceeds_chart_unit :
+    carried (10809 / 2 ^ 17) 0 [.unit (2 ^ 19), .tick] = 43236 ∧
+    exactCount (10809 / 2 ^ 17) 0 [.unit (2 ^ 19), .tick] = 43236 ∧
+    carried (10809 / 2 ^ 17) 0 [.unit (2 ^ 19), .tick, .tick] = 3566 ∧
+    exactCount (10809 / 2 ^ 17) 0 [.unit (2 ^ 19), .tick, .tick] = 116834481 / 2 ^ 15 ∧
+    8 * (1 / 2 : ℚ) ^ 18 <
+      1 / (1 + 10809 / 2 ^ 17 + 205 * (10809 / 2 ^ 17) ^ 2)
+        - 2 ^ 19 / (2 ^ 19 + 43236 + 205 * 3566) ∧
+    nearest (2 ^ 18 * (2 ^ 19 / (2 ^ 19 + 43236 + 205 * 3566))) = 105840 ∧
+    8 * (1 / 2 : ℚ) ^ 18 <
+      1 / (1 + 10809 / 2 ^ 17 + 205 * (10809 / 2 ^ 17) ^ 2)
+        - (nearest (2 ^ 18 * (2 ^ 19 / (2 ^ 19 + 43236 + 205 * 3566))) : ℚ) / 2 ^ 18 := by
+  have h1 : nearest (10809 / 2 ^ 17 * ((0 + 2 ^ 19 : ℤ) : ℚ)) = 43236 := by
+    unfold nearest
+    rw [Int.floor_eq_iff]
+    norm_num
+  have h2 : nearest (10809 / 2 ^ 17 * ((43236 : ℤ) : ℚ)) = 3566 := by
+    unfold nearest
+    rw [Int.floor_eq_iff]
+    norm_num
+  have hn : nearest (2 ^ 18 * (2 ^ 19 / (2 ^ 19 + 43236 + 205 * 3566))) = 105840 := by
+    unfold nearest
+    rw [Int.floor_eq_iff]
+    norm_num
+  refine ⟨?_, ?_, ?_, ?_, by norm_num, hn, ?_⟩
+  · simp only [carried]
+    rw [h1]
+  · simp only [exactCount]
+    norm_num
+  · simp only [carried]
+    rw [h1, h2]
+  · simp only [exactCount]
+    norm_num
+  · rw [hn]
+    norm_num
+
+end Leaky
+
 section Audit
 
 #print axioms normalized_of_pos
@@ -917,6 +1169,14 @@ section Audit
 #print axioms founded_modulus_lt_one
 #print axioms founded_modulus_pos
 #print axioms order_founding
+#print axioms nearest_sub_le
+#print axioms leaky_tick_eq_nearest
+#print axioms leaky_count_error_le
+#print axioms leaky_count_ingest
+#print axioms leaky_lattice_le_half_chart
+#print axioms leaky_read_error
+#print axioms campaign_one_founding
+#print axioms leaky_read_exceeds_chart_unit
 
 end Audit
 
