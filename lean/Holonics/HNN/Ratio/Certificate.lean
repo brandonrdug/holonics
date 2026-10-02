@@ -85,6 +85,23 @@ codeLength(z + Δ) ≤ codeLength(z) + ⟨g, Δ⟩ + (ln 2/2) · 2^(osc Δ) · V
    `2^(1/L)·2/(e ln 2)`, below `8/7` at `L = 16` (`Resolution.face_mass_le_odometer`,
    `Resolution.odometer_ratio_sixteen`), and the second-derivative constant would be
    `2 ln 2·(8/7) ≤ 8/5`, not `119/80`.
+9. **The factored certificate** (`faceVariance_le_centred`, `factored_reading_code_le`,
+   `factored_accumulated_code_le`, `factoredStatistics_insert`, `factored_bound_statistics`,
+   `FactoredStatistics.bound_add`). If every mass of the face is at most `μ`, then
+   `Var_p(v) ≤ μ Σ_c (v_c − v̄)²` with `v̄` the classes' plain mean. Near a uniform face
+   `μ ≈ 1/|A|`, which is the scale `hnn::constitution::receiving_class_metric` reads. With each
+   reading's mass bound `μ_i`, item 6's bound holds with `A` replaced by `P₀ ⊗ G`, where `P₀`
+   centres over the classes and `G = Σ μ_i x_i x_iᵀ`. Its statistics are `Σ code_i(W_i)`, `b`,
+   `Σ⟨vec W_i, b_i⟩`, the feature Gram `G`, the anchor `M = Σ μ_i (cen W_i x_i) x_iᵀ` and the
+   scalar `Σ μ_i ‖cen W_i x_i‖²`:
+   `Σ_i code_i(W) ≤ Σ code_i(W_i) + ⟨vec W, b⟩ − Σ⟨vec W_i, b_i⟩ +
+   (ln 2/2)·2^ω·(⟨cen W, cen W⟩_G − 2⟨cen W, M⟩ + Σ μ_i ‖cen W_i x_i‖²)`.
+   Their sizes are the features squared and the classes times the features, not the product of
+   the two squared. The bound is a quadratic in `W` with Hessian `ln 2·2^ω·(P₀ ⊗ G)`
+   (`FactoredStatistics.bound_add`), so its minimizing step `D` solves
+   `cen D · G = M − cen W · G − b/(ln 2·2^ω)` on the centred classes. That is one solve in the
+   features, shared by every class. It is looser than item 6 by the factor `μ_i/p_ic` in each
+   class direction, and exact at a uniform face.
 
 [definition] The factor `2^ω` is the price of reading the curvature at the current face instead
 of along the whole step: as `ω → 0` the model is the second-order Taylor model
@@ -94,8 +111,11 @@ of along the whole step: as `ω → 0` the model is the second-order Taylor mode
 so a certificate may read whichever term is smaller. Hoeffding's bound
 (`HNN/Ratio/Resolution.log_mean_exp_sub_mean_le`, `(ln 2/8)·osc²`) reads the spread alone and does
 not shrink with the face's variance. The Rust owner of the one-reading certificate is
-`hnn::constitution::receiving_fisher_face` (item 8); the accumulated certificate's is the main
-line's stored-statistics step once it lands.
+`hnn::constitution::receiving_fisher_face` (item 8). The accumulated certificate has no Rust owner:
+item 6's `A` has the classes times the features squared entries, while item 9's statistics are
+the form a Rust owner can keep. That owner, the stored factored statistics with the step solving
+item 9's equation, is unbuilt. It belongs to the main line's receiving map and is gated on held-out
+code.
 
 No `axiom`, no `sorry`, no `native_decide`.
 -/
@@ -836,6 +856,276 @@ theorem codeLength_add_le_odometer [DecidableEq ι] (n : ι → ℤ) (k : ι →
 
 end Odometer
 
+/-! ## 7. The factored certificate: statistics of the feature and class sizes -/
+
+section Factored
+
+variable {ι : Type*} [Fintype ι] [Nonempty ι] [DecidableEq ι]
+variable {K X : Type*} [Fintype X]
+
+/-- [definition] **A matrix centred over the classes**, column by column:
+`(cen V)_cj = V_cj − (1/|ι|) Σ_d V_dj`, the zero-sum projection `P₀ = I − 𝟙𝟙ᵀ/|ι|` on its
+columns. -/
+def cen (V : Matrix ι X ℝ) : Matrix ι X ℝ :=
+  fun c j => V c j - (∑ d, V d j) / Fintype.card ι
+
+/-- [definition] **The feature-weighted pairing** `⟨U, V⟩_G = Σ_c Σ_(j,l) U_cj G_jl V_cl`. -/
+def gPair (G : Matrix X X ℝ) (U V : Matrix ι X ℝ) : ℝ := ∑ c, ∑ j, ∑ l, U c j * G j l * V c l
+
+/-- [definition] **The entrywise pairing** `⟨U, V⟩ = Σ_(c,j) U_cj V_cj`. -/
+def fPair (U V : Matrix ι X ℝ) : ℝ := ∑ c, ∑ j, U c j * V c j
+
+omit [Nonempty ι] [DecidableEq ι] [Fintype X] in
+theorem cen_sub (W V : Matrix ι X ℝ) : cen (W - V) = cen W - cen V := by
+  ext c j
+  simp only [cen, Matrix.sub_apply, Finset.sum_sub_distrib]
+  ring
+
+omit [Nonempty ι] [DecidableEq ι] in
+/-- Centring commutes with reading: `(V x)_c − (1/|ι|) Σ_d (V x)_d = (cen V · x)_c`. -/
+theorem cen_mulVec (V : Matrix ι X ℝ) (x : X → ℝ) (c : ι) :
+    (V *ᵥ x) c - (∑ d, (V *ᵥ x) d) / Fintype.card ι = (cen V *ᵥ x) c := by
+  simp only [mulVec, dotProduct, cen, sub_mul, Finset.sum_sub_distrib, div_mul_eq_mul_div,
+    ← Finset.sum_div, Finset.sum_mul]
+  rw [Finset.sum_comm (s := Finset.univ) (t := Finset.univ)]
+
+omit [Nonempty ι] [DecidableEq ι] in
+theorem gPair_add (G H : Matrix X X ℝ) (U V : Matrix ι X ℝ) :
+    gPair (G + H) U V = gPair G U V + gPair H U V := by
+  simp only [gPair, Matrix.add_apply, mul_add, add_mul, Finset.sum_add_distrib]
+
+omit [Nonempty ι] [DecidableEq ι] in
+theorem gPair_zero (U V : Matrix ι X ℝ) : gPair (0 : Matrix X X ℝ) U V = 0 := by
+  simp [gPair]
+
+omit [Nonempty ι] [DecidableEq ι] in
+theorem gPair_sum (s : Finset K) (G : K → Matrix X X ℝ) (U V : Matrix ι X ℝ) :
+    gPair (∑ k ∈ s, G k) U V = ∑ k ∈ s, gPair (G k) U V := by
+  classical
+  induction s using Finset.induction_on with
+  | empty => simp [gPair_zero]
+  | insert k s hk ih => rw [Finset.sum_insert hk, Finset.sum_insert hk, gPair_add, ih]
+
+omit [Nonempty ι] [DecidableEq ι] in
+theorem fPair_sum (s : Finset K) (U : Matrix ι X ℝ) (V : K → Matrix ι X ℝ) :
+    fPair U (∑ k ∈ s, V k) = ∑ k ∈ s, fPair U (V k) := by
+  simp only [fPair, Matrix.sum_apply, Finset.mul_sum]
+  calc ∑ c, ∑ j, ∑ k ∈ s, U c j * V k c j = ∑ c, ∑ k ∈ s, ∑ j, U c j * V k c j :=
+        Finset.sum_congr rfl fun c _ => Finset.sum_comm
+    _ = ∑ k ∈ s, ∑ c, ∑ j, U c j * V k c j := Finset.sum_comm
+
+omit [Nonempty ι] [DecidableEq ι] in
+/-- [proved-derived; formal-checked] **One reading's pairing is the feature-weighted pairing at
+`x xᵀ`**: `Σ_c (U x)_c (V x)_c = ⟨U, V⟩_(x xᵀ)`. -/
+theorem gPair_reading (x : X → ℝ) (U V : Matrix ι X ℝ) :
+    gPair (vecMulVec x x) U V = ∑ c, (U *ᵥ x) c * (V *ᵥ x) c := by
+  simp only [gPair, vecMulVec_apply, mulVec, dotProduct, Finset.sum_mul_sum]
+  refine Finset.sum_congr rfl fun c _ => Finset.sum_congr rfl fun j _ =>
+    Finset.sum_congr rfl fun l _ => by ring
+
+omit [Nonempty ι] [DecidableEq ι] in
+/-- [proved-derived; formal-checked] **The pairing is symmetric at a symmetric weight.** -/
+theorem gPair_comm {G : Matrix X X ℝ} (hG : Gᵀ = G) (U V : Matrix ι X ℝ) :
+    gPair G U V = gPair G V U := by
+  unfold gPair
+  refine Finset.sum_congr rfl fun c _ => ?_
+  rw [Finset.sum_comm]
+  refine Finset.sum_congr rfl fun l _ => Finset.sum_congr rfl fun j _ => ?_
+  have : G j l = G l j := by rw [← Matrix.transpose_apply G l j, hG]
+  rw [this]; ring
+
+omit [DecidableEq ι] in
+/-- [proved-derived; formal-checked] **The face's variance within its largest mass.** If every
+mass of the face is at most `μ`, `Var_p(v) ≤ μ Σ_c (v_c − v̄)²`, `v̄` the classes' plain mean
+(`faceVariance_le_of_mass_le` against the uniform chart, `p_c ≤ (μ|ι|)·(1/|ι|)`). Near a uniform
+face `μ ≈ 1/|ι|`. -/
+theorem faceVariance_le_centred (p v : ι → ℝ) (hp1 : ∑ i, p i = 1) {μ : ℝ}
+    (hμ : ∀ i, p i ≤ μ) :
+    faceVariance p v ≤ μ * ∑ c, (v c - (∑ d, v d) / Fintype.card ι) ^ 2 := by
+  have hn : (0 : ℝ) < Fintype.card ι := by exact_mod_cast Fintype.card_pos
+  have h := faceVariance_le_of_mass_le p (fun _ => 1 / (Fintype.card ι : ℝ)) v hp1
+    (κ := μ * Fintype.card ι) fun i => by
+      rw [mul_assoc, mul_one_div_cancel hn.ne', mul_one]; exact hμ i
+  have hmean : ∑ j, 1 / (Fintype.card ι : ℝ) * v j = (∑ d, v d) / Fintype.card ι := by
+    rw [← Finset.mul_sum]; ring
+  have hr : faceVariance (fun _ => 1 / (Fintype.card ι : ℝ)) v =
+      1 / (Fintype.card ι : ℝ) * ∑ c, (v c - (∑ d, v d) / Fintype.card ι) ^ 2 := by
+    unfold faceVariance
+    rw [hmean, Finset.mul_sum]
+  rw [hr] at h
+  calc faceVariance p v ≤ _ := h
+    _ = μ * ∑ c, (v c - (∑ d, v d) / Fintype.card ι) ^ 2 := by field_simp
+
+/-- [definition] **The factored statistics a running certificate stores**: the summed code at the
+base points, the gradient `b = Σ (p_i − e_(t_i)) x_iᵀ` and `Σ⟨vec W_i, b_i⟩` (as in `Statistics`),
+the weighted feature Gram `G = Σ μ_i x_i x_iᵀ`, the anchor `M = Σ μ_i (cen W_i x_i) x_iᵀ` and the
+scalar `Σ μ_i ‖cen W_i x_i‖²`. Their sizes are the feature square and the classes times the
+features, never their product squared. -/
+@[ext] structure FactoredStatistics (ι X : Type*) where
+  code : ℝ
+  grad : ι × X → ℝ
+  gradAnchor : ℝ
+  gram : Matrix X X ℝ
+  anchor : Matrix ι X ℝ
+  anchorEnergy : ℝ
+
+instance : Add (FactoredStatistics ι X) :=
+  ⟨fun S T => ⟨S.code + T.code, S.grad + T.grad, S.gradAnchor + T.gradAnchor, S.gram + T.gram,
+    S.anchor + T.anchor, S.anchorEnergy + T.anchorEnergy⟩⟩
+
+/-- [definition] **One reading's factored statistics**, read at its own base point `W_i` with the
+mass bound `μ`. -/
+def factoredReading (μ : ℝ) (x : X → ℝ) (t : ι) (Wi : Matrix ι X ℝ) : FactoredStatistics ι X :=
+  let p := bitFace (Wi *ᵥ x)
+  let g : ι → ℝ := fun c => p c - if c = t then 1 else 0
+  ⟨codeLength (Wi *ᵥ x) t, readingGrad g x, vecW Wi ⬝ᵥ readingGrad g x, μ • vecMulVec x x,
+    fun c l => μ * (cen Wi *ᵥ x) c * x l, μ * ∑ c, ((cen Wi *ᵥ x) c) ^ 2⟩
+
+/-- [definition] **The factored statistics of the readings in `s`.** -/
+def factoredStatistics (s : Finset K) (μ : K → ℝ) (x : K → X → ℝ) (t : K → ι)
+    (Wb : K → Matrix ι X ℝ) : FactoredStatistics ι X :=
+  ⟨∑ k ∈ s, (factoredReading (μ k) (x k) (t k) (Wb k)).code,
+    ∑ k ∈ s, (factoredReading (μ k) (x k) (t k) (Wb k)).grad,
+    ∑ k ∈ s, (factoredReading (μ k) (x k) (t k) (Wb k)).gradAnchor,
+    ∑ k ∈ s, (factoredReading (μ k) (x k) (t k) (Wb k)).gram,
+    ∑ k ∈ s, (factoredReading (μ k) (x k) (t k) (Wb k)).anchor,
+    ∑ k ∈ s, (factoredReading (μ k) (x k) (t k) (Wb k)).anchorEnergy⟩
+
+omit [Nonempty ι] [DecidableEq ι] [Fintype ι] [Fintype X] in
+/-- [proved-derived; formal-checked] **The factored statistics update by addition.** -/
+theorem factoredStatistics_insert [DecidableEq K] [Fintype ι] [DecidableEq ι] [Fintype X]
+    (s : Finset K) {k : K} (hk : k ∉ s) (μ : K → ℝ) (x : K → X → ℝ) (t : K → ι)
+    (Wb : K → Matrix ι X ℝ) :
+    factoredStatistics (insert k s) μ x t Wb =
+      factoredStatistics s μ x t Wb + factoredReading (μ k) (x k) (t k) (Wb k) := by
+  ext <;> simp only [factoredStatistics, Finset.sum_insert hk] <;> exact add_comm _ _
+
+/-- [definition] **The factored bound read from the statistics alone**, at a later `W`:
+`code + (⟨vec W, b⟩ − Σ⟨vec W_i, b_i⟩) +
+(ln 2/2)·2^ω·(⟨cen W, cen W⟩_G − 2⟨cen W, M⟩ + Σ μ_i ‖cen W_i x_i‖²)`. -/
+def FactoredStatistics.bound (S : FactoredStatistics ι X) (ω : ℝ) (W : Matrix ι X ℝ) : ℝ :=
+  S.code + (vecW W ⬝ᵥ S.grad - S.gradAnchor) +
+    Real.log 2 / 2 * (2 : ℝ) ^ ω *
+      (gPair S.gram (cen W) (cen W) - 2 * fPair (cen W) S.anchor + S.anchorEnergy)
+
+omit [Nonempty ι] in
+/-- [proved-derived; formal-checked] **The factored bound is additive in the statistics.** -/
+theorem factored_bound_statistics (s : Finset K) (μ : K → ℝ) (x : K → X → ℝ) (t : K → ι)
+    (Wb : K → Matrix ι X ℝ) (ω : ℝ) (W : Matrix ι X ℝ) :
+    (factoredStatistics s μ x t Wb).bound ω W =
+      ∑ k ∈ s, (factoredReading (μ k) (x k) (t k) (Wb k)).bound ω W := by
+  simp only [FactoredStatistics.bound, factoredStatistics, gPair_sum, fPair_sum, dotProduct_sum,
+    Finset.sum_add_distrib, Finset.sum_sub_distrib, Finset.mul_sum, mul_add, mul_sub]
+
+omit [Nonempty ι] in
+/-- [proved-derived; formal-checked] **The stored Gram is symmetric.** -/
+theorem factoredStatistics_gram_symm (s : Finset K) (μ : K → ℝ) (x : K → X → ℝ) (t : K → ι)
+    (Wb : K → Matrix ι X ℝ) : (factoredStatistics s μ x t Wb).gramᵀ =
+      (factoredStatistics s μ x t Wb).gram := by
+  ext j l
+  simp only [factoredStatistics, factoredReading, Matrix.transpose_apply, Matrix.sum_apply,
+    Matrix.smul_apply, vecMulVec_apply, smul_eq_mul]
+  exact Finset.sum_congr rfl fun k _ => by ring
+
+/-- [proved-derived; formal-checked] **One reading at a later `W`, factored.** If every mass of the
+reading's face at its base point is at most `μ` and the drift `(W − W_i) x_i` has spread at most
+`ω`, its code at `W` is at most the bound read from its factored statistics: the Fisher term
+`Var_p(Δ)` is at most `μ ‖cen Δ‖²` (`faceVariance_le_centred`), and `cen Δ = cen W x − cen W_i x`
+expands into the stored Gram, anchor and energy. -/
+theorem factored_reading_code_le (μ : ℝ) (x : X → ℝ) (t : ι) (Wi W : Matrix ι X ℝ) {ω : ℝ}
+    (hμ : ∀ c, bitFace (Wi *ᵥ x) c ≤ μ)
+    (hosc : ∀ c d, ((W - Wi) *ᵥ x) c - ((W - Wi) *ᵥ x) d ≤ ω) :
+    codeLength (W *ᵥ x) t ≤ (factoredReading μ x t Wi).bound ω W := by
+  set p := bitFace (Wi *ᵥ x) with hpdef
+  have hp : ∀ c, p c = (2 : ℝ) ^ (Wi *ᵥ x) c / ∑ d, (2 : ℝ) ^ (Wi *ᵥ x) d := fun c => rfl
+  have hp1 : ∑ c, p c = 1 := by
+    have hpos : 0 < ∑ d, (2 : ℝ) ^ (Wi *ᵥ x) d :=
+      Finset.sum_pos (fun d _ => Real.rpow_pos_of_pos (by norm_num) _) Finset.univ_nonempty
+    simp only [hp, ← Finset.sum_div, div_self hpos.ne']
+  have h := codeLength_add_le (Wi *ᵥ x) ((W - Wi) *ᵥ x) p hp hosc t
+  have hW : (fun c => (Wi *ᵥ x) c + ((W - Wi) *ᵥ x) c) = W *ᵥ x := by
+    rw [sub_mulVec]; funext c; simp only [Pi.sub_apply]; ring
+  rw [hW] at h
+  have hvar := faceVariance_le_centred p ((W - Wi) *ᵥ x) hp1 hμ
+  have hcen : ∑ c, (((W - Wi) *ᵥ x) c - (∑ d, ((W - Wi) *ᵥ x) d) / Fintype.card ι) ^ 2 =
+      gPair (vecMulVec x x) (cen W) (cen W) - 2 * ∑ c, (cen Wi *ᵥ x) c * (cen W *ᵥ x) c +
+        ∑ c, ((cen Wi *ᵥ x) c) ^ 2 := by
+    have hc : ∀ c, ((W - Wi) *ᵥ x) c - (∑ d, ((W - Wi) *ᵥ x) d) / Fintype.card ι =
+        (cen W *ᵥ x) c - (cen Wi *ᵥ x) c := by
+      intro c; rw [cen_mulVec, cen_sub, sub_mulVec, Pi.sub_apply]
+    simp only [hc, gPair_reading]
+    rw [Finset.mul_sum, ← Finset.sum_sub_distrib, ← Finset.sum_add_distrib]
+    exact Finset.sum_congr rfl fun c _ => by ring
+  have hanchor : fPair (cen W) (fun c l => μ * (cen Wi *ᵥ x) c * x l) =
+      μ * ∑ c, (cen Wi *ᵥ x) c * (cen W *ᵥ x) c := by
+    simp only [fPair]
+    rw [Finset.mul_sum]
+    refine Finset.sum_congr rfl fun c _ => ?_
+    generalize (cen Wi *ᵥ x) c = a
+    simp only [mulVec, dotProduct, Finset.mul_sum]
+    exact Finset.sum_congr rfl fun j _ => by ring
+  have hgram : gPair (μ • vecMulVec x x) (cen W) (cen W) =
+      μ * gPair (vecMulVec x x) (cen W) (cen W) := by
+    simp only [gPair, Matrix.smul_apply, smul_eq_mul, Finset.mul_sum]
+    exact Finset.sum_congr rfl fun c _ => Finset.sum_congr rfl fun j _ =>
+      Finset.sum_congr rfl fun l _ => by ring
+  have hfirst : ∑ c, (p c - (Pi.single t (1 : ℝ) : ι → ℝ) c) * ((W - Wi) *ᵥ x) c =
+      vecW W ⬝ᵥ readingGrad (fun c => p c - if c = t then 1 else 0) x -
+        vecW Wi ⬝ᵥ readingGrad (fun c => p c - if c = t then 1 else 0) x := by
+    rw [readingGrad_pairing, vecW_sub, sub_dotProduct]
+    simp only [Pi.single_apply]
+  rw [hfirst] at h
+  have hκ : 0 ≤ Real.log 2 / 2 * (2 : ℝ) ^ ω :=
+    mul_nonneg (div_nonneg (Real.log_nonneg (by norm_num)) (by norm_num))
+      (Real.rpow_nonneg (by norm_num) _)
+  have hle := mul_le_mul_of_nonneg_left hvar hκ
+  simp only [FactoredStatistics.bound, factoredReading]
+  rw [hgram, hanchor]
+  rw [hcen] at hle
+  nlinarith
+
+/-- [proved-derived; formal-checked] **The factored accumulated certificate.** Every reading
+`i ∈ s`, read at its own base point `W_i` with every face mass at most `μ_i`, bounds its code at
+any later `W` whose drift has spread at most `ω`; the bounds sum to one read from the factored
+statistics alone: `Σ_i code_i(W) ≤ (factoredStatistics s).bound ω W`. -/
+theorem factored_accumulated_code_le (s : Finset K) (μ : K → ℝ) (x : K → X → ℝ) (t : K → ι)
+    (Wb : K → Matrix ι X ℝ) (W : Matrix ι X ℝ) {ω : ℝ}
+    (hμ : ∀ k ∈ s, ∀ c, bitFace (Wb k *ᵥ x k) c ≤ μ k)
+    (hosc : ∀ k ∈ s, ∀ c d, ((W - Wb k) *ᵥ x k) c - ((W - Wb k) *ᵥ x k) d ≤ ω) :
+    ∑ k ∈ s, codeLength (W *ᵥ x k) (t k) ≤ (factoredStatistics s μ x t Wb).bound ω W := by
+  rw [factored_bound_statistics]
+  exact Finset.sum_le_sum fun k hk =>
+    factored_reading_code_le (μ k) (x k) (t k) (Wb k) W (hμ k hk) (hosc k hk)
+
+omit [Nonempty ι] [DecidableEq ι] in
+/-- [proved-derived; formal-checked] **The factored bound is a quadratic in `W` with Hessian
+`(ln 2)·2^ω (P₀ ⊗ G)`.** At a symmetric stored Gram, moving `W` by `D`:
+`bound(W + D) = bound(W) + ⟨vec D, b⟩ +
+(ln 2/2)·2^ω·(2⟨cen W, cen D⟩_G + ⟨cen D, cen D⟩_G − 2⟨cen D, M⟩)`. So the factored step solves
+`cen D · G = M − cen W · G − b/((ln 2)·2^ω)` on the zero-sum classes: the feature Gram's inverse
+on the right, the classes untouched, a Kronecker-factored natural step. -/
+theorem FactoredStatistics.bound_add (S : FactoredStatistics ι X) (hG : S.gramᵀ = S.gram)
+    (ω : ℝ) (W D : Matrix ι X ℝ) :
+    S.bound ω (W + D) = S.bound ω W + vecW D ⬝ᵥ S.grad +
+      Real.log 2 / 2 * (2 : ℝ) ^ ω *
+        (2 * gPair S.gram (cen W) (cen D) + gPair S.gram (cen D) (cen D) -
+          2 * fPair (cen D) S.anchor) := by
+  have hcen : cen (W + D) = cen W + cen D := by
+    ext c j; simp only [cen, Matrix.add_apply, Finset.sum_add_distrib]; ring
+  have hvec : vecW (W + D) = vecW W + vecW D := rfl
+  have hbil : gPair S.gram (cen W + cen D) (cen W + cen D) =
+      gPair S.gram (cen W) (cen W) + gPair S.gram (cen W) (cen D) +
+        gPair S.gram (cen D) (cen W) + gPair S.gram (cen D) (cen D) := by
+    simp only [gPair, Matrix.add_apply, add_mul, mul_add, Finset.sum_add_distrib]
+    ring
+  have hf : fPair (cen W + cen D) S.anchor = fPair (cen W) S.anchor + fPair (cen D) S.anchor := by
+    simp only [fPair, Matrix.add_apply, add_mul, Finset.sum_add_distrib]
+  simp only [FactoredStatistics.bound]
+  rw [hcen, hvec, add_dotProduct, hbil, hf, gPair_comm hG (cen D) (cen W)]
+  ring
+
+end Factored
+
 /-! ## Audit -/
 
 #print axioms exp_remainder_le
@@ -862,5 +1152,14 @@ end Odometer
 #print axioms face_mass_le_odometer_on_grain
 #print axioms codeLength_add_le_chart
 #print axioms codeLength_add_le_odometer
+#print axioms faceVariance_le_centred
+#print axioms gPair_reading
+#print axioms gPair_comm
+#print axioms factoredStatistics_insert
+#print axioms factored_bound_statistics
+#print axioms factoredStatistics_gram_symm
+#print axioms factored_reading_code_le
+#print axioms factored_accumulated_code_le
+#print axioms FactoredStatistics.bound_add
 
 end Holonics.HNN.Ratio.Certificate

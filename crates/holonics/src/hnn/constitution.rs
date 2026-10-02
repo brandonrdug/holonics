@@ -6079,6 +6079,11 @@ pub fn receiving_metric_samples(samples: &[Sample]) -> Option<Vec<Sample>> {
 /// the power of two at or below `1/λ̄`: about `|A|` at a uniform reading, so the step's magnitude
 /// part is the normal law's own scaled into the receiver's own curvature. `None` when a covector is
 /// not a face's `q − p̃`, or the readings carry no curvature.
+/// The window mean stands for the accumulated class Fisher. Its certified counterpart is the
+/// factored certificate (`Holonics.HNN.Ratio.Certificate.factored_accumulated_code_le`), which reads
+/// each reading's largest face mass `μ_i` in place of the mean eigenvalue: the accumulated bound's
+/// curvature is `P₀ ⊗ Σ μ_i x_i x_iᵀ`, and its step solves `cen D · G = M − cen W · G − b/(ln 2·2^ω)`.
+/// The stored-statistics owner of that law is unbuilt.
 pub fn receiving_class_metric(samples: &[Sample]) -> Option<Rat> {
     let (mut trace, mut count, mut classes) = (Rat::zero(), 0u64, 0usize);
     for sample in samples.iter().filter(|s| !s.weight.is_zero()) {
