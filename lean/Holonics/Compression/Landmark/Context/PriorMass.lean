@@ -116,8 +116,11 @@ can hold, it does not trade one statistical risk for another. Item 8 compares bo
 `S`; it does not say the code at `k + D` is below the code at `D`, which is a measurement (the
 contact-loop record's §28). The Rust's depth is `LandmarkDeclaration::depth` in bundles: the cell
 branch's letter depth is that depth, the bundle branch's `(1 + r)` times it, so one more bundle is
-`k = 1` in the cell branch and `k = 1 + r` in the bundle branch; the stop weight read at `D` is
-`StopPrior::weight(D)`, the last rung past the list, and the HNN declares no forced depths.
+`k = 1` in the cell branch and `k = 1 + r` in the bundle branch. The stop weight at the old
+maximum depth is `StopPrior::weight` at the branch's letter depth (`rung_sums` reads a rung at
+every letter depth of each branch): `weight(D)` in the cell branch, `weight(D(1 + r))` in the
+bundle branch, the last rung past the list. The HNN declares no forced depths, and at its `½` stop
+prior (rung 1) each deep leaf costs exactly one bit. The bound holds for every `D` and `k ≥ 1`.
 
 | Claim | Lean | Rust |
 |---|---|---|
