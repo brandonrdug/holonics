@@ -1,3 +1,5 @@
+import HolonicsResearch.Foundation.IwasawaPolynomial
+import HolonicsResearch.Geometry.CyclicGrover.OwnerJoin
 import Holonics.Foundation.ContinuingTower
 import HolonicsResearch.Mathematics.NormRelation
 import HolonicsResearch.EllipticCurve.SelmerCalculus
@@ -403,13 +405,6 @@ def gammaSectionEquiv : ℤ_[p] ≃ (padicTower p).CompatibleSection :=
 /-- [definition] The Iwasawa algebra in the difference coordinate `T = γ − 1`.  `Λ = ℤ_p[[T]]`. -/
 abbrev Lambda : Type := PowerSeries ℤ_[p]
 
-/-- [definition] `ω_n = (1 + T)^{p^n} − 1` as a **polynomial**, so that its distinguished shape and
-the rank of its quotient are theorems rather than descriptions.
-
-Retired Rust counterpart: `iwasawa_tower.rs::{omega, check_distinguished,
-omega_divides_omega_succ}` ([history](https://github.com/brandonrdug/holonics/blob/13f8c734/crates/holonics-cuda/src/iwasawa_tower.rs)). -/
-def omegaPoly (n : ℕ) : Polynomial ℤ_[p] := (Polynomial.X + 1) ^ (p ^ n) - 1
-
 /-- [definition] The same element inside `Λ`. -/
 def omega (n : ℕ) : Lambda p := (PowerSeries.X + 1) ^ (p ^ n) - 1
 
@@ -512,11 +507,6 @@ theorem omegaQuotient_finrank (p : ℕ) [Fact p.Prime] (n : ℕ) :
   rw [(AdjoinRoot.powerBasis' (omegaPoly_monic p n)).finrank,
     AdjoinRoot.powerBasis'_dim, omegaPoly_natDegree]
 
-/-- [definition] The group ring `ℤ_p[Γ/Γ_n] = ℤ_p[ℤ/p^n]` in its polynomial presentation
-`ℤ_p[γ]/(γ^{p^n} − 1)`. -/
-def groupRingPoly (p : ℕ) [Fact p.Prime] (n : ℕ) : Polynomial ℤ_[p] :=
-  Polynomial.X ^ (p ^ n) - 1
-
 theorem groupRingPoly_monic (p : ℕ) [Fact p.Prime] (n : ℕ) : (groupRingPoly p n).Monic := by
   refine Polynomial.Monic.sub_of_left (Polynomial.monic_X_pow _) ?_
   have h0 : 0 < ((Polynomial.X : Polynomial ℤ_[p]) ^ (p ^ n)).degree := by
@@ -530,17 +520,6 @@ theorem groupRingPoly_natDegree (p : ℕ) [Fact p.Prime] (n : ℕ) :
   rw [Polynomial.natDegree_sub_eq_left_of_natDegree_lt, Polynomial.natDegree_X_pow]
   rw [Polynomial.natDegree_X_pow]
   simpa using pow_pos (Fact.out (p := p.Prime)).pos n
-
-/-- [proved-derived; formal-checked] The substitution `γ = 1 + T` carries `γ^{p^n} − 1` to `ω_n`,
-as polynomials. -/
-theorem omegaPoly_eq_groupRingPoly_comp (p : ℕ) [Fact p.Prime] (n : ℕ) :
-    omegaPoly p n = (groupRingPoly p n).comp (Polynomial.X + 1) := by
-  simp [omegaPoly, groupRingPoly]
-
-/-- [proved-derived; formal-checked] And `T = γ − 1` carries it back. -/
-theorem groupRingPoly_eq_omegaPoly_comp (p : ℕ) [Fact p.Prime] (n : ℕ) :
-    groupRingPoly p n = (omegaPoly p n).comp (Polynomial.X - 1) := by
-  simp [omegaPoly, groupRingPoly, sub_add_cancel]
 
 /-- [proved-derived; formal-checked] **`Λ/ω_n ≅ ℤ_p[ℤ/p^n]`, at the level where it is a theorem.**
 The two quotients are isomorphic as `ℤ_p`-algebras, through the substitution `γ = 1 + T` and its
