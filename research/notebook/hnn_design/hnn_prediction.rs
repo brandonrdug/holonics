@@ -445,6 +445,16 @@ fn main() {
             &arguments[7],
             &arguments[8..],
         ),
+        // The receiver's minimum-energy move against a declared E leg (the record
+        // research/records/2026-10-02_THE_REPRESENTATION_THE_REFITS_E_MAKES_RHO_A_MONOTONE_PATH_TO_THE_DECISIONS.md): read-only.
+        (Some("executed"), Some("kinetic")) => executed_loop::kinetic(
+            &arguments[3],
+            arguments[4].parse().expect("a seed"),
+            arguments[5].parse().expect("a count"),
+            &arguments[6],
+            &arguments[7],
+            &arguments[8..],
+        ),
         // Each constitution under several declared comparisons (the record
         // research/records/2026-10-01_THE_COMPARISONS_AGREEMENT_WITH_THE_DECISIONS.md): read-only.
         (Some("executed"), Some("agreement")) => executed_loop::agreement(

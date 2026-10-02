@@ -2996,6 +2996,10 @@ pub enum LadderStart {
     Witness,
     /// The entry scale `½/u`, below the witness's step.
     WitnessEntryScale,
+    /// The receiver's Gauss–Newton step (`η = 1`, [`MoveMetric::Kinetic`]), at most the entry scale.
+    Kinetic,
+    /// The entry scale `½/u`, below the Gauss–Newton step.
+    KineticEntryScale,
 }
 
 /// [definition; agent-inferred, October 1; the
@@ -3011,10 +3015,14 @@ pub enum LadderStart {
 ///   the ladder starting at `α` (at most the entry scale) with `ρ` moving `β/α` per unit of `E`'s
 ///   step. Every guard is the same; only the direction and the start differ. A step's size is a
 ///   constitutive change, not a velocity or an elapsed time.
+/// - `Kinetic`: `E` alone, by the receiver's minimum-energy Gauss–Newton move over all of `E`
+///   ([`KineticSolve`]), deposited by the normal law from the returns at the solve's reading weights;
+///   `ρ` held. The ladder starts at the Gauss–Newton step (`η = 1`), at most the entry scale.
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub enum MoveMetric {
     Coordinate,
     Witness,
+    Kinetic,
 }
 
 /// [definition; agent-inferred, September 30; the pin §2.6, §13.5] **The ladder's start**: from the
@@ -3096,6 +3104,8 @@ pub struct ExecutedMove {
     /// Whose measurement sized the move ([`MoveMetric`]) and, under the witness, its form.
     pub metric: MoveMetric,
     pub witness: Option<WitnessForm>,
+    /// Under the kinetic metric, the receiver's solve.
+    pub kinetic: Option<KineticSolve>,
     pub before: BatchComparison,
     pub contributions: usize,
     pub returns: usize,
@@ -3604,6 +3614,7 @@ pub fn executed_move_in(
         comparison,
         metric,
         witness: None,
+        kinetic: None,
         counts: before.counts(declared.stations()),
         before: before.clone(),
         contributions: proposal.contributions.len(),
@@ -3643,6 +3654,30 @@ pub fn executed_move_in(
         receipt.refusal = Some(MoveRefusal::Unreached);
         return Ok(receipt);
     };
+    // The kinetic metric's deposition: the same normal law, from the returns at the solve's
+    // reading weights.
+    let (samples, unit, unit_move) = if metric == MoveMetric::Kinetic {
+        let Some(solve) =
+            kinetic_solve(field, constitution, declared, requests, &proposal, &samples, None)?
+        else {
+            receipt.refusal = Some(MoveRefusal::Invisible);
+            return Ok(receipt);
+        };
+        let weighted = kinetic_contributions(&proposal, &solve);
+        receipt.kinetic = Some(solve);
+        let samples = returns(field, constitution, declared, requests, &weighted)?;
+        let Some((unit, _)) = constitution.stepped_source(ring, &samples, &Rat::one())? else {
+            receipt.refusal = Some(MoveRefusal::Unreached);
+            return Ok(receipt);
+        };
+        let unit_move = unit
+            .source_port(ring)
+            .ok_or(HnnError::MissingSourcePort { ring })?
+            .subtract(&constitution.source_port(ring).ok_or(HnnError::MissingSourcePort { ring })?.clone())?;
+        (samples, unit, unit_move)
+    } else {
+        (samples, unit, unit_move)
+    };
     let unit_largest = largest_entry(&unit_move);
     receipt.unit_largest = Some(unit_largest.clone());
     receipt.modulus_slope = Some(gamma);
@@ -3652,6 +3687,7 @@ pub fn executed_move_in(
     // of `E`'s step with its start `α`.
     let (modulus_unit, witness_start) = match metric {
         MoveMetric::Coordinate => (modulus_unit, None),
+        MoveMetric::Kinetic => (Rat::zero(), Some(Rat::one())),
         MoveMetric::Witness => {
             let form = plane_form(field, constitution, declared, requests, &proposal, &unit)?;
             let step = form.as_ref().and_then(WitnessForm::step);
@@ -3712,10 +3748,12 @@ pub fn executed_move_in(
             } else {
                 Rat::one()
             };
-            if alpha <= scale {
-                (alpha, LadderStart::Witness)
-            } else {
-                (power_below(&scale), LadderStart::WitnessEntryScale)
+            let kinetic = metric == MoveMetric::Kinetic;
+            match (alpha <= scale, kinetic) {
+                (true, false) => (alpha, LadderStart::Witness),
+                (false, false) => (power_below(&scale), LadderStart::WitnessEntryScale),
+                (true, true) => (alpha, LadderStart::Kinetic),
+                (false, true) => (power_below(&scale), LadderStart::KineticEntryScale),
             }
         }
     };
@@ -4290,6 +4328,448 @@ pub fn witness_span(
     Ok(reading)
 }
 
+/// [definition; agent-inferred, October 2; the
+/// [representation record](../../../../research/records/2026-10-02_THE_REPRESENTATION_THE_REFITS_E_MAKES_RHO_A_MONOTONE_PATH_TO_THE_DECISIONS.md)]
+/// **Each reading's gradient in all of `E`**: a section's storage is linear in the source port at
+/// fixed weights ([`returns`]), so a member's pairing `⟨ĝ, z_S⟩` has the gradient
+/// `G = Σ_c w_S(c) P^(c−λ)ĝ M[c]ᵀ + Σ_j w_S(j) P^(c_j−λ)ĝ e_(x_j)ᵀ` (rows × columns, row-major) over
+/// the request's occupied phases and the section's placed stations: the per-member form of the
+/// returns, which sum `−Σ_m c_m G_m` as their pullback. `⟨G, ΔE⟩ = ⟨ĝ, Δz_S(ΔE)⟩` exactly (the
+/// owner's test).
+fn reading_gradients(
+    field: &Field,
+    constitution: &Constitution,
+    declared: &Refinement,
+    requests: &[Request],
+    members: &[&Contribution],
+) -> Result<Vec<Vec<Rat>>, HnnError> {
+    use rayon::prelude::*;
+    let ring = declared.ring();
+    let geometry = field.ring(ring);
+    let period = geometry.period() as usize;
+    let columns = field.alphabet();
+    let rows = constitution
+        .source_port(ring)
+        .ok_or(HnnError::MissingSourcePort { ring })?
+        .rows();
+    let placements = placements_of(field, constitution, requests, declared)?;
+    type Phases = Vec<(usize, Vec<Rat>)>;
+    let shapes: Vec<(BigInt, usize, Phases)> = requests
+        .iter()
+        .map(|request| -> Result<_, HnnError> {
+            let lift = request.current.lift()[ring].clone();
+            let phase = request.current.phase(field, ring)? as usize;
+            let mut phases = Vec::new();
+            for c in 0..period {
+                let counts = request.moment.phase_counts(ring, c)?;
+                if counts.iter().any(|&n| n != 0) {
+                    phases.push((c, counts.iter().map(|&n| Rat::from_integer(BigInt::from(n))).collect()));
+                }
+            }
+            Ok((lift, phase, phases))
+        })
+        .collect::<Result<_, _>>()?;
+    Ok(members
+        .par_iter()
+        .map(|member| {
+            let (lift, phase, phases) = &shapes[member.request];
+            let covector: Vec<Rat> = member.covector.iter().map(face).collect();
+            let (request_weights, station_weights) =
+                placements[member.request].weights(member.station, &member.cells);
+            let mut gradient = vec![Rat::zero(); rows * columns];
+            let mut add = |at: usize, weight: &Rat, feature: &mut dyn FnMut(usize) -> Option<Rat>| {
+                let rotated = geometry.rotate(&covector, &(BigInt::from(at as u64) - lift));
+                for column in 0..columns {
+                    let Some(f) = feature(column).filter(|f| !f.is_zero()) else { continue };
+                    let scale = weight * &f;
+                    for (row, g) in rotated.iter().enumerate() {
+                        if !g.is_zero() {
+                            gradient[row * columns + column] += g * &scale;
+                        }
+                    }
+                }
+            };
+            for ((c, counts), weight) in phases.iter().zip(&request_weights) {
+                add(*c, weight, &mut |column| Some(counts[column].clone()));
+            }
+            for (station, (cell, weight)) in member.cells.iter().zip(&station_weights).enumerate() {
+                let (Some(class), Some(weight)) = (cell, weight) else { continue };
+                add((phase + 1 + station) % period, weight, &mut |column| {
+                    (column == *class).then(Rat::one)
+                });
+            }
+            gradient
+        })
+        .collect())
+}
+
+/// [definition; agent-inferred, October 2] **Why the receiver's Gauss–Newton solve stopped**
+/// ([`KineticSolve`]).
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub enum KineticStop {
+    /// The residual's energy fell to `2^(−32)` of its opening (`2^(−16)` in its norm, the bank's grain).
+    Converged,
+    /// A search direction the witness does not read (`pᵀAᵀFAp ≤ 0`): the kernel of the readings.
+    Kernel,
+    /// As many iterations as reading coordinates, the exact solve's bound.
+    Exhausted,
+}
+
+/// [definition; agent-inferred, October 2; the
+/// [representation record](../../../../research/records/2026-10-02_THE_REPRESENTATION_THE_REFITS_E_MAKES_RHO_A_MONOTONE_PATH_TO_THE_DECISIONS.md)]
+/// **The receiver's minimum-energy move over all of `E`**: the Gauss–Newton step of the witness's
+/// readings, the port's retained mass settling every direction no reading fixes.
+/// - **The pieces.** `A` maps a move of `E` to the readings' changes (each lock candidate's
+///   log-reading, each order piece's log-gap; [`reading_gradients`]). The witness's Fisher form
+///   `F = ⊕_j (diag θ_j − θ_jθ_jᵀ)` on the non-resting sheets ([`witness_form`]'s) and its covector
+///   `c = ⊕_j (θ_j − e_t)`. The mass is the port's Gram with this passage deposited,
+///   `M = I ⊗ H′`, `H′ = H + Σ_t w_t f_t f_tᵀ` (the normal law's own chart `X̂ ≈ H′⁻¹`).
+/// - **The law.** Minimize `cᵀAv + ½ vᵀAᵀFAv` with the least kinetic energy `½⟨Mv, v⟩` among the
+///   minimizers. Where `A` reaches every reading, its solution is Astra's kinetic face
+///   (Lean `Holon/Element`): `v = M⁻¹Aᵀ M_F w` with `M_F = (AM⁻¹Aᵀ)⁻¹` and the readings' change
+///   `w = −F⁻¹c`.
+/// - **The solve.** Conjugate gradients on `AᵀFA v = −Aᵀc`, preconditioned by `M⁻¹` from `v = 0`,
+///   so every iterate is `v_k = M⁻¹Aᵀμ_k`. It is a deposition of the returns with the reading
+///   weights `−μ_k`, a normal-law step from the covectors that reached the port. The first iterate
+///   is the normal law's own direction, `−M⁻¹Aᵀc`, and the iterates are the receiver's coupling of
+///   the readings, which the normal law omits.
+/// - **The grain.** Every vector and scalar of the recurrence is held at [`JOINT_BITS`]
+///   significant bits toward zero. The solve proposes the direction, and the move's guards certify
+///   every trial whole.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct KineticSolve {
+    /// The reading coordinates: lock candidates and order pieces.
+    pub readings: usize,
+    /// `μ`, one per reading coordinate. The move's member weights are `−Σ coefficient · μ`.
+    pub multipliers: Vec<Rat>,
+    /// Each iterate's residual energy over the opening's, `rᵀM⁻¹r / r₀ᵀM⁻¹r₀`.
+    pub residuals: Vec<Rat>,
+    /// Each iterate's signed squared cosine with a declared `E` direction, `⟨v,t⟩|⟨v,t⟩|/(|v|²|t|²)`,
+    /// when one is declared.
+    pub cosines: Vec<Rat>,
+    pub stop: KineticStop,
+    /// `v = M⁻¹Aᵀμ`, rows × columns of `E`.
+    pub moved: ExactRatMatrix,
+    /// The Gauss–Newton model's change at `v`, `cᵀAv + ½(Av)ᵀF(Av)`.
+    pub predicted: Rat,
+}
+
+/// One reading coordinate of the kinetic solve: its members and their coefficients.
+type ReadingRow = Vec<(usize, Rat)>;
+
+/// [agent-inferred, October 2] **The readings of a proposal and their witness**: every lock or
+/// order term's non-resting sheets `θ`, its target among them, and its reading coordinates over the
+/// term's leading members, numbered in the order the proposal's contributions list them.
+fn kinetic_readings(proposal: &Proposal) -> Vec<(Vec<Rat>, usize, Vec<ReadingRow>)> {
+    let mut member = 0usize;
+    let mut out = Vec::new();
+    for term in &proposal.terms {
+        let base = member;
+        member += term.leading.len();
+        match &term.certificate {
+            Certificate::Lock { target, sheets, .. } => out.push((
+                sheets[1..].to_vec(),
+                *target,
+                (0..term.leading.len()).map(|x| vec![(base + x, Rat::one())]).collect(),
+            )),
+            // The order's lock over stations: no resting sheet; each piece's log-gap moves by
+            // `(a_top δ_top − a_runner δ_runner)/g` (its members top then runner).
+            Certificate::Order(pieces) => out.push((
+                pieces.iter().map(|p| p.share.clone()).collect(),
+                0,
+                pieces
+                    .iter()
+                    .enumerate()
+                    .map(|(i, p)| {
+                        vec![
+                            (base + 2 * i, face(&p.top.growth) / &p.gap),
+                            (base + 2 * i + 1, -face(&p.runner.growth) / &p.gap),
+                        ]
+                    })
+                    .collect(),
+            )),
+            Certificate::Hinge(_) => {}
+        }
+    }
+    out
+}
+
+/// A value held at [`JOINT_BITS`] significant bits toward zero.
+fn joint_held(x: Rat) -> Rat {
+    if x.is_zero() {
+        x
+    } else if x.is_negative() {
+        -significant(&-x, JOINT_BITS, false)
+    } else {
+        significant(&x, JOINT_BITS, false)
+    }
+}
+
+/// The receiver's Gauss–Newton solve ([`KineticSolve`]) at the proposal's returns `samples`, with
+/// each iterate's squared cosine against `toward` when declared. `None` when the proposal has no
+/// lock or order reading, or the passage's Gram is not invertible.
+fn kinetic_solve(
+    field: &Field,
+    constitution: &Constitution,
+    declared: &Refinement,
+    requests: &[Request],
+    proposal: &Proposal,
+    samples: &[Sample],
+    toward: Option<&ExactRatMatrix>,
+) -> Result<Option<KineticSolve>, HnnError> {
+    let ring = declared.ring();
+    let terms = kinetic_readings(proposal);
+    let rows: Vec<&ReadingRow> = terms.iter().flat_map(|(_, _, r)| r).collect();
+    if rows.is_empty() {
+        return Ok(None);
+    }
+    let law = constitution
+        .source_law(ring)
+        .ok_or(HnnError::MissingSourcePort { ring })?;
+    let columns = law.map().columns();
+    // The mass's inverse on a row of `E`: `H′⁻¹`, exactly.
+    let mut gram = law.gram().to_rows();
+    for sample in samples.iter().filter(|s| !s.weight.is_zero()) {
+        for (i, fi) in sample.feature.iter().enumerate() {
+            for (j, fj) in sample.feature.iter().enumerate() {
+                gram[i][j] += &sample.weight * fi * fj;
+            }
+        }
+    }
+    let Ok(chart) = ExactRatMatrix::new(gram)?.inverse() else {
+        return Ok(None);
+    };
+    let members: Vec<&Contribution> = proposal.terms.iter().flat_map(|t| &t.leading).collect();
+    let gradients = reading_gradients(field, constitution, declared, requests, &members)?;
+    let toward: Option<Vec<Rat>> = toward.map(|t| t.entries().to_vec());
+    kinetic_lift(&terms, &gradients, &chart.to_rows(), columns, toward.as_deref()).map(Some)
+}
+
+/// The solve's recurrence ([`KineticSolve`], "The solve") on given readings: each term's
+/// non-resting sheets, target and reading coordinates over members, each member's gradient in `E`
+/// (row-major, `columns` a row), and the mass's inverse on a row `chart`.
+fn kinetic_lift(
+    terms: &[(Vec<Rat>, usize, Vec<ReadingRow>)],
+    gradients: &[Vec<Rat>],
+    chart: &[Vec<Rat>],
+    columns: usize,
+    toward: Option<&[Rat]>,
+) -> Result<KineticSolve, HnnError> {
+    use rayon::prelude::*;
+    let rows: Vec<&ReadingRow> = terms.iter().flat_map(|(_, _, r)| r).collect();
+    let height = gradients.first().map_or(0, Vec::len) / columns.max(1);
+    let dot = |a: &[Rat], b: &[Rat]| -> Rat { a.iter().zip(b).map(|(x, y)| x * y).sum() };
+    // `A v`: each reading coordinate's change.
+    let forward = |v: &[Rat]| -> Vec<Rat> {
+        let pairings: Vec<Rat> = gradients.par_iter().map(|g| dot(g, v)).collect();
+        rows.iter()
+            .map(|row| joint_held(row.iter().map(|(m, k)| k * &pairings[*m]).sum()))
+            .collect()
+    };
+    // `M⁻¹Aᵀu`: the members' weights, their gradients summed, each row of `E` through `H′⁻¹`.
+    let lift = |u: &[Rat]| -> Vec<Rat> {
+        let mut weights = vec![Rat::zero(); gradients.len()];
+        for (row, value) in rows.iter().zip(u) {
+            for (m, k) in row.iter() {
+                weights[*m] += k * value;
+            }
+        }
+        let pulled: Vec<Rat> = (0..height * columns)
+            .into_par_iter()
+            .map(|e| {
+                gradients
+                    .iter()
+                    .zip(&weights)
+                    .filter(|(_, w)| !w.is_zero())
+                    .map(|(g, w)| &g[e] * w)
+                    .sum()
+            })
+            .collect();
+        (0..height * columns)
+            .map(|e| {
+                let (r, j) = (e / columns, e % columns);
+                joint_held((0..columns).map(|i| &pulled[r * columns + i] * &chart[i][j]).sum())
+            })
+            .collect()
+    };
+    // The witness's form and covector on the reading coordinates, term by term.
+    let fisher = |delta: &[Rat]| -> Vec<Rat> {
+        let mut out = Vec::with_capacity(delta.len());
+        let mut at = 0;
+        for (theta, _, r) in terms {
+            let d = &delta[at..at + r.len()];
+            let mean = dot(theta, d);
+            out.extend(theta.iter().zip(d).map(|(t, x)| joint_held(t * (x - &mean))));
+            at += r.len();
+        }
+        out
+    };
+    let covector: Vec<Rat> = terms
+        .iter()
+        .flat_map(|(theta, target, _)| {
+            theta.iter().enumerate().map(move |(x, t)| if x == *target { t - Rat::one() } else { t.clone() })
+        })
+        .collect();
+    let m = rows.len();
+    let cosine = |v: &[Rat]| -> Option<Rat> {
+        let t = toward?;
+        let (vt, vv, tt) = (dot(v, t), dot(v, v), dot(t, t));
+        (vv.is_positive() && tt.is_positive()).then(|| joint_held(&vt * vt.abs() / (vv * tt)))
+    };
+    let mut s: Vec<Rat> = covector.iter().map(|c| -c).collect();
+    let mut mu = vec![Rat::zero(); m];
+    let mut v = vec![Rat::zero(); height * columns];
+    let mut z = lift(&s);
+    let mut az = forward(&z);
+    let mut rz = dot(&s, &az);
+    let opening = rz.clone();
+    let mut pi = s.clone();
+    let mut p = z.clone();
+    let mut ap = az.clone();
+    let mut residuals = Vec::new();
+    let mut cosines = Vec::new();
+    let floor = &opening / Rat::from_integer(BigInt::one() << 32usize);
+    let stop = loop {
+        if !opening.is_positive() {
+            break KineticStop::Converged;
+        }
+        let q = fisher(&ap);
+        let curvature = dot(&ap, &q);
+        if !curvature.is_positive() {
+            break KineticStop::Kernel;
+        }
+        let alpha = joint_held(&rz / &curvature);
+        for (x, y) in mu.iter_mut().zip(&pi) {
+            *x = joint_held(&*x + &alpha * y);
+        }
+        for (x, y) in v.iter_mut().zip(&p) {
+            *x = joint_held(&*x + &alpha * y);
+        }
+        for (x, y) in s.iter_mut().zip(&q) {
+            *x = joint_held(&*x - &alpha * y);
+        }
+        z = lift(&s);
+        az = forward(&z);
+        let next = dot(&s, &az);
+        residuals.push(joint_held(&next / &opening));
+        if let Some(c) = cosine(&v) {
+            cosines.push(c);
+        }
+        if next <= floor {
+            break KineticStop::Converged;
+        }
+        if residuals.len() >= m {
+            break KineticStop::Exhausted;
+        }
+        let beta = joint_held(&next / &rz);
+        for (x, y) in pi.iter_mut().zip(&s) {
+            *x = joint_held(y + &beta * &*x);
+        }
+        for (x, y) in p.iter_mut().zip(&z) {
+            *x = joint_held(y + &beta * &*x);
+        }
+        for (x, y) in ap.iter_mut().zip(&az) {
+            *x = joint_held(y + &beta * &*x);
+        }
+        rz = next;
+    };
+    let av = forward(&v);
+    let predicted = dot(&covector, &av) + dot(&av, &fisher(&av)) / Rat::from_integer(BigInt::from(2));
+    let moved = ExactRatMatrix::new(v.chunks(columns).map(<[Rat]>::to_vec).collect())?;
+    Ok(KineticSolve {
+        readings: m,
+        multipliers: mu,
+        residuals,
+        cosines,
+        stop,
+        moved,
+        predicted,
+    })
+}
+
+/// [agent-inferred, October 2] **The proposal's contributions carrying the kinetic weights**: each
+/// leading member at `−Σ coefficient · μ` over its reading coordinates, so the normal law's step
+/// with their returns is `M⁻¹Aᵀμ` ([`KineticSolve`]).
+fn kinetic_contributions(proposal: &Proposal, solve: &KineticSolve) -> Vec<Contribution> {
+    let members: Vec<&Contribution> = proposal.terms.iter().flat_map(|t| &t.leading).collect();
+    let mut weights = vec![Rat::zero(); members.len()];
+    let rows: Vec<ReadingRow> = kinetic_readings(proposal).into_iter().flat_map(|(_, _, r)| r).collect();
+    for (row, mu) in rows.iter().zip(&solve.multipliers) {
+        for (m, k) in row {
+            weights[*m] -= k * mu;
+        }
+    }
+    members
+        .into_iter()
+        .zip(weights)
+        .filter(|(_, w)| !w.is_zero())
+        .map(|(c, w)| Contribution { weight: w, ..c.clone() })
+        .collect()
+}
+
+/// [measured-diagnostic; agent-inferred, October 2] **The receiver's minimum-energy move read, not
+/// taken** ([`KineticSolve`]): the incumbent's comparison, the solve with each iterate's signed
+/// squared cosine against `toward − E` when a target constitution is declared, the normal law's unit
+/// move `ΔE` and its signed squared cosine against the same direction. Nothing is retained.
+#[derive(Clone, Debug)]
+pub struct KineticReading {
+    pub before: BatchComparison,
+    pub refusal: Option<MoveRefusal>,
+    pub returns: usize,
+    pub solve: Option<KineticSolve>,
+    pub unit_move: Option<ExactRatMatrix>,
+    pub unit_cosine: Option<Rat>,
+}
+
+/// [measured-diagnostic] The receiver's minimum-energy move read ([`KineticReading`]).
+#[allow(clippy::too_many_arguments)]
+pub fn kinetic_reading(
+    field: &Field,
+    constitution: &Constitution,
+    toward: Option<&Constitution>,
+    requests: &[Request],
+    declared: &Refinement,
+    bank: &ReceivingBank,
+    grain: u32,
+    comparison: Comparison,
+) -> Result<KineticReading, HnnError> {
+    let ring = declared.ring();
+    let (before, reads) = incumbent(field, constitution, requests, declared, bank, grain, comparison)?;
+    let proposal = propose(comparison.composition, &before, &reads);
+    drop(reads);
+    let mut reading = KineticReading {
+        before,
+        refusal: certificate_refusal(&proposal),
+        returns: 0,
+        solve: None,
+        unit_move: None,
+        unit_cosine: None,
+    };
+    if reading.refusal.is_some() {
+        return Ok(reading);
+    }
+    let (samples, step) = unit_step(field, constitution, declared, requests, &proposal)?;
+    reading.returns = samples.len();
+    let Some(step) = step else {
+        reading.refusal = Some(MoveRefusal::Unreached);
+        return Ok(reading);
+    };
+    let port = |c: &Constitution| c.source_port(ring).cloned().ok_or(HnnError::MissingSourcePort { ring });
+    let direction = toward.map(|t| port(t)?.subtract(&port(constitution)?).map_err(HnnError::from)).transpose()?;
+    if let Some(d) = &direction {
+        let (u, t) = (step.unit_move.entries(), d.entries());
+        let dot = |a: &[Rat], b: &[Rat]| -> Rat { a.iter().zip(b).map(|(x, y)| x * y).sum() };
+        let (ut, uu, tt) = (dot(u, t), dot(u, u), dot(t, t));
+        if uu.is_positive() && tt.is_positive() {
+            reading.unit_cosine = Some(joint_held(&ut * ut.abs() / (uu * tt)));
+        }
+    }
+    reading.solve =
+        kinetic_solve(field, constitution, declared, requests, &proposal, &samples, direction.as_ref())?;
+    reading.unit_move = Some(step.unit_move);
+    Ok(reading)
+}
+
 /// The largest power of two at or below `x > 0`; zero at zero.
 fn power_below(x: &Rat) -> Rat {
     if !x.is_positive() {
@@ -4434,6 +4914,69 @@ impl ProposalProbe {
     pub(crate) fn slope_refusal(reading: &FirstOrderReading) -> Option<MoveRefusal> {
         slope_refusal(reading)
     }
+}
+
+/// The kinetic solve's recurrence on given readings (the owner's solve tests, [`kinetic_lift`]):
+/// each term `(θ, target, rows)` with rows over members as `(member, coefficient)`.
+#[cfg(test)]
+pub(crate) fn kinetic_lift_probe(
+    terms: &[(Vec<Rat>, usize, Vec<Vec<(usize, Rat)>>)],
+    gradients: &[Vec<Rat>],
+    chart: &[Vec<Rat>],
+    columns: usize,
+) -> Result<KineticSolve, HnnError> {
+    kinetic_lift(terms, gradients, chart, columns, None)
+}
+
+/// **Each reading's gradient against its storage move** (the owner's gradient test): at a
+/// constitution and a move `ΔE`, every leading member's `(⟨G, ΔE⟩, ⟨ĝ, Δz_S⟩)`, and the members'
+/// weighted gradients `Σ c_m G_m` beside the returns' pullback `Σ_t w_t g_t f_tᵀ`, row-major.
+#[cfg(test)]
+#[allow(clippy::too_many_arguments, clippy::type_complexity)]
+pub(crate) fn reading_gradient_probe(
+    field: &Field,
+    constitution: &Constitution,
+    requests: &[Request],
+    declared: &Refinement,
+    bank: &ReceivingBank,
+    grain: u32,
+    comparison: Comparison,
+    delta: &ExactRatMatrix,
+) -> Result<(Vec<(Rat, Rat)>, Vec<Rat>, Vec<Rat>), HnnError> {
+    let ring = declared.ring();
+    let (before, reads) = incumbent(field, constitution, requests, declared, bank, grain, comparison)?;
+    let proposal = propose(comparison.composition, &before, &reads);
+    let members: Vec<&Contribution> = proposal.terms.iter().flat_map(|t| &t.leading).collect();
+    let gradients = reading_gradients(field, constitution, declared, requests, &members)?;
+    let port = constitution.source_port(ring).ok_or(HnnError::MissingSourcePort { ring })?;
+    let successor = constitution.clone().with_ports(ring, None, Some(port.add(delta)?), None)?;
+    let moves = section_moves(field, constitution, &successor, declared, requests, &proposal.sections, None)?;
+    let dot = |a: &[Rat], b: &[Rat]| -> Rat { a.iter().zip(b).map(|(x, y)| x * y).sum() };
+    let pairs = members
+        .iter()
+        .zip(&gradients)
+        .map(|(m, g)| {
+            let covector: Vec<Rat> = m.covector.iter().map(face).collect();
+            let moved: Vec<Rat> = moves[m.section].iter().map(|x| x.lower.clone()).collect();
+            (dot(g, delta.entries()), dot(&covector, &moved))
+        })
+        .collect();
+    let mut weighted = vec![Rat::zero(); delta.rows() * delta.columns()];
+    for (m, g) in members.iter().zip(&gradients) {
+        for (w, x) in weighted.iter_mut().zip(g) {
+            *w += &m.weight * x;
+        }
+    }
+    let columns = delta.columns();
+    let mut pullback = vec![Rat::zero(); delta.rows() * columns];
+    for sample in returns(field, constitution, declared, requests, &proposal.contributions)? {
+        for (row, g) in sample.covector.iter().enumerate() {
+            for (column, f) in sample.feature.iter().enumerate() {
+                pullback[row * columns + column] += &sample.weight * g * f;
+            }
+        }
+    }
+    Ok((pairs, weighted, pullback))
 }
 
 /// A batch comparison built from terms read at given sections (the owner's guard tests).

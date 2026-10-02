@@ -1435,7 +1435,8 @@ pub(super) fn move_once(terrain: &str, seed: u64, count: usize, out: &str, sourc
         let metric = match name.as_str() {
             "coordinate" => MoveMetric::Coordinate,
             "witness" => MoveMetric::Witness,
-            other => panic!("a metric, coordinate or witness: {other}"),
+            "kinetic" => MoveMetric::Kinetic,
+            other => panic!("a metric, coordinate, witness or kinetic: {other}"),
         };
         let started = Instant::now();
         let moved = executed_move_in(
@@ -1465,6 +1466,16 @@ pub(super) fn move_once(terrain: &str, seed: u64, count: usize, out: &str, sourc
                 at_bits(&w.gradient[0]),
                 at_bits(&w.gradient[1]),
                 w.step().map(|v| (at_bits(&v[0]), at_bits(&v[1]))),
+            );
+        }
+        if let Some(k) = &moved.kinetic {
+            println!(
+                "    the receiver's solve: {} readings, {} iterations, stop {:?}, residual energy {}, model change {} (24 bits)",
+                k.readings,
+                k.residuals.len(),
+                k.stop,
+                k.residuals.last().map_or_else(|| "none".to_string(), |r| at_bits(r).to_string()),
+                at_bits(&k.predicted),
             );
         }
         println!(
@@ -3695,4 +3706,82 @@ pub(super) fn counts(
         clock.elapsed().as_millis(),
         resident()
     );
+}
+
+/// [measured-diagnostic; agent-inferred, October 2; the
+/// [representation record](../../records/2026-10-02_THE_REPRESENTATION_THE_REFITS_E_MAKES_RHO_A_MONOTONE_PATH_TO_THE_DECISIONS.md)]
+/// **The receiver's minimum-energy move read against a declared `E` leg** (`executed kinetic
+/// <terrain> <seed> <count> <arm> <toward> <label=source>…`): `hnn::executed::kinetic_reading` at
+/// each source, toward the `E` of `toward` at the source's own `ρ`. Prints the returns, the reading
+/// coordinates, the normal law's unit move's signed squared cosine with the leg, then the solve's
+/// iterates at `k = 1, 2, 4, …` and the last: the signed squared cosine and the residual energy, the
+/// stop, the model change and `v`'s largest entry. Nothing is moved.
+pub(super) fn kinetic(terrain: &str, seed: u64, count: usize, arm: &str, toward: &str, sources: &[String]) {
+    use holonics::hnn::executed::kinetic_reading;
+    let clock = Instant::now();
+    let declared = order_declared();
+    let engine = Engine::new(declared);
+    let bank = bank_of(declared.period, &bank_strength());
+    let ring = engine.refinement.ring();
+    let pairs = terrain_pairs(terrain, &declared, seed, count);
+    let requests = open_requests(&engine, &pairs);
+    let (comparison, partition) = arm_comparison(arm);
+    assert!(!partition, "the solve is read on the open section");
+    let goal = segment_source(&engine, ring, toward);
+    println!(
+        "executed kinetic: {count} {terrain} requests at development seed {seed}, the arm {arm}, toward {toward}; the bank p = {}, grain 2^(-{BANK_GRAIN})",
+        bank_strength()
+    );
+    for source in sources {
+        let started = Instant::now();
+        let (label, spec) = source.split_once('=').expect("<label>=<source>");
+        let theta = segment_source(&engine, ring, spec);
+        let leg = theta
+            .clone()
+            .with_ports(ring, None, Some(goal.source_port(ring).expect("E").clone()), None)
+            .expect("the leg's end");
+        let reading = kinetic_reading(
+            &engine.field,
+            &theta,
+            Some(&leg),
+            &requests,
+            &engine.refinement,
+            &bank,
+            BANK_GRAIN,
+            comparison,
+        )
+        .expect("the kinetic reading");
+        println!(
+            "  {label}: ρ {}; {} ∈ {} nats; {} returns; the normal law's unit move against the leg {}; {} ms",
+            theta.transport(ring),
+            symbol(&comparison),
+            cell(&reading.before.value, 1 << 12),
+            reading.returns,
+            reading.unit_cosine.as_ref().map_or_else(|| format!("none ({:?})", reading.refusal), |c| at_bits(c).to_string()),
+            started.elapsed().as_millis()
+        );
+        let Some(solve) = &reading.solve else {
+            println!("  {label}: no solve ({:?})", reading.refusal);
+            continue;
+        };
+        let last = solve.residuals.len();
+        let mut k = 1;
+        while k <= last {
+            println!(
+                "    iterate {k}: against the leg {}, residual energy {}",
+                solve.cosines.get(k - 1).map_or_else(|| "none".to_string(), |c| at_bits(c).to_string()),
+                at_bits(&solve.residuals[k - 1]),
+            );
+            k = if k * 2 > last && k < last { last } else { k * 2 };
+        }
+        println!(
+            "    {} readings; stop {:?} after {last}; the model's change {}; v's largest entry {} (24 bits); {} ms",
+            solve.readings,
+            solve.stop,
+            at_bits(&solve.predicted),
+            at_bits(&largest_of(&solve.moved)),
+            started.elapsed().as_millis()
+        );
+    }
+    println!("executed kinetic: {} ms; resident {}", clock.elapsed().as_millis(), resident());
 }

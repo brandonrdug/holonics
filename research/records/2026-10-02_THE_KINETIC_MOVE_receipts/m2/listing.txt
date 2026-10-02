@@ -1,0 +1,9 @@
+executed move-once: 8 order2 requests at development seed 2026093061, the candidate arm, from m2 (ρ 102837/131072); the bank p = 5/8, grain 2^(-16)
+  m2 kinetic: the incumbent: ρ 102837/131072; L ∈ [430767/4096, 430772/4096) nats, X ∈ [249063/4096, 249068/4096) nats; solved 0 of 64; whole 0 (released 8, stations right 15); 181060 ms
+    the receiver's solve: 320 readings, 320 iterations, stop Exhausted, residual energy 8850645/2251799813685248, model change -5066897/32768 (24 bits)
+    γ_ρ Some(Ratio { numer: 9958529, denom: 131072 }), Δρ per unit of E's step Some(Ratio { numer: 0, denom: 1 }) (24 bits)
+    move 0: adopted at step 1/32; the ladder's start Some((Ratio { numer: 1, denom: 32 }, KineticEntryScale)); trials η 1/32 None; persistence Persistence { locks: 64, solved: 2, reread: 2, stay: 0, fall: 2, reversed: 2, uncertified: 0 }; 181060 ms
+      trials: η 1/32 ρ unmoved mask [393781/4096, 393786/4096) own [392653/4096, 392659/4096) adopted; γ_ρ [311204/4096, 311205/4096)
+  m2 kinetic: the adopted successor's own release: ρ 102837/131072; L ∈ [392653/4096, 392659/4096) nats, X ∈ [210949/4096, 210954/4096) nats; solved 0 of 64; whole 0 (released 8, stations right 12); 181060 ms
+  m2: kinetic adopted; the later metrics are not attempted
+executed move-once: 181105 ms; resident 210427904 now, 231727104 peak
