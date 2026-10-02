@@ -1,4 +1,5 @@
 import Holonics.HNN.BankFace
+import Holonics.Holon.Element
 import Holonics.Foundation.Standing
 import Mathlib.Analysis.Calculus.Deriv.Comp
 import Mathlib.Analysis.Calculus.Deriv.Prod
@@ -57,6 +58,14 @@ the laws that covector and its certified step stand on (the diagnosis record,
    the section whole (`decisions_release_the_section`); its covector is `θ − q` and its first-order
    certificate is Danskin's bound over the members (`lockFace_first_order`,
    `sum_upper_dini_descends`). Step 1b's candidate (§7).
+
+9. **The move's fixed points and one step's reach.** [proved-derived; formal-checked] A positive
+   definite metric's step `−P g` rests exactly where `g = 0` (`metric_step_zero_iff`) and descends
+   elsewhere (`metric_step_descends`). A full metric reaches every descent direction
+   (`posDef_reach`), and a per-coordinate one exactly the sign-consistent directions
+   (`diagonal_reach_iff`). A native step `M⁻¹Aᵀμ` is horizontal, with no hidden part
+   (`native_step_horizontal`, with `Holon/Element.KineticFace`): the baseline for U6 step 1's
+   ingredient (§9).
 
 [open] (#62) The existence of the differentiable root path (the implicit function theorem at a
 simple root, from `Φ`'s strict differentiability), Jacobi's formula `∂_η det(λ − M − ηΔM) =
@@ -948,6 +957,155 @@ theorem equal_states_agree {Generator Receiver Source Retained Face : Type*}
 
 end LoopOneC
 
+/-! ## 9. The move's fixed points and one step's reach
+
+[definition; agent-inferred, October 2] Rebuild step U6, step 1: a baseline for the native move at
+`E` alone against an exterior optimizer's ingredient
+(`research/records/2026-10-02_THE_NATIVE_MOVE_AT_E_ALONE_ITS_FIXED_POINTS_AND_ONE_STEPS_REACH.md`).
+Every candidate move is a metric's step `−P ∇L`, so all share `L`'s stationary points
+(`metric_step_zero_iff`); they differ in reach. A full metric reaches every descent direction
+(`posDef_reach`), a per-coordinate one exactly the sign-consistent directions
+(`diagonal_reach_iff`), and the native family, `M⁻¹Aᵀμ`, exactly the readings' horizontal space
+(`native_step_horizontal`). -/
+
+section MoveReach
+
+open Matrix
+
+variable {n m : Type*} [Fintype n] [Fintype m] [DecidableEq n] [DecidableEq m]
+
+omit [DecidableEq n] in
+/-- [proved-standard; formal-checked] **`metric_step_zero_iff`: a metric's step rests only where the
+comparison does.** For a positive definite metric `P`, `P g = 0` exactly when `g = 0`: every move
+`−P ∇L` (the normal law, the witness's span, the kinetic solve's first iterate, and an exterior
+`sgd` or `rms` step, or `adam`'s without momentum, whose `P` is diagonal) has the stationary points
+of `L` as its fixed points, whatever `P`, step size or schedule. -/
+theorem metric_step_zero_iff {P : Matrix n n ℝ} (hP : P.PosDef) (g : n → ℝ) :
+    P *ᵥ g = 0 ↔ g = 0 := by
+  constructor
+  · intro h
+    by_contra hg
+    have := hP.dotProduct_mulVec_pos hg
+    simp [h] at this
+  · rintro rfl; exact mulVec_zero _
+
+omit [DecidableEq n] in
+/-- [proved-standard; formal-checked] **`metric_step_descends`**: at `g ≠ 0` the step `−P g` of a
+positive definite metric is a first-order descent, `⟨g, −P g⟩ < 0`. -/
+theorem metric_step_descends {P : Matrix n n ℝ} (hP : P.PosDef) {g : n → ℝ} (hg : g ≠ 0) :
+    g ⬝ᵥ (-(P *ᵥ g)) < 0 := by
+  have := hP.dotProduct_mulVec_pos hg
+  simp only [star_trivial] at this
+  rw [dotProduct_neg]; linarith
+
+/-- [proved-derived; formal-checked] **`diagonal_reach_iff`: a per-coordinate scale reaches exactly the
+sign-consistent directions.** `d = −diag(p) g` for some `p > 0` iff every entry of `d` is zero where
+`g` is and of the opposite sign where `g` is not. An exterior `rms` step, and an `adam` step without
+momentum, is of this form (`adam`'s first step is `−η g/(|g| + ε)`, which is `−η sign g` at `ε = 0`;
+with momentum it steps along its running average, not along `g`), so its one-step reach from a state
+is fixed by the signs of the comparison's covector there. -/
+theorem diagonal_reach_iff (g d : n → ℝ) :
+    (∃ p : n → ℝ, (∀ i, 0 < p i) ∧ d = -(diagonal p *ᵥ g)) ↔
+      ∀ i, (g i = 0 → d i = 0) ∧ (g i ≠ 0 → d i * g i < 0) := by
+  constructor
+  · rintro ⟨p, hp, rfl⟩ i
+    simp only [Pi.neg_apply, mulVec_diagonal]
+    refine ⟨fun h => by simp [h], fun h => ?_⟩
+    have := mul_pos (hp i) (mul_self_pos.mpr h)
+    nlinarith
+  · intro h
+    refine ⟨fun i => if g i = 0 then 1 else -(d i) / g i, fun i => ?_, ?_⟩
+    · by_cases hi : g i = 0
+      · simp [hi]
+      · simp only [hi, if_false]
+        have h2 := (h i).2 hi
+        rcases lt_or_gt_of_ne hi with hlt | hgt
+        · exact div_pos_of_neg_of_neg (by nlinarith) hlt
+        · exact div_pos (by nlinarith) hgt
+    · funext i
+      simp only [Pi.neg_apply, mulVec_diagonal]
+      by_cases hi : g i = 0
+      · simp [hi, (h i).1 hi]
+      · simp only [hi, if_false]; field_simp
+
+omit [DecidableEq n] in
+/-- `(a bᵀ) x = (b · x) a`. -/
+theorem vecMulVec_mulVec_eq (a b x : n → ℝ) : vecMulVec a b *ᵥ x = (b ⬝ᵥ x) • a := by
+  ext i
+  simp only [mulVec, dotProduct, vecMulVec_apply, Pi.smul_apply, smul_eq_mul, Finset.sum_mul]
+  exact Finset.sum_congr rfl fun j _ => by ring
+
+/-- [proved-derived; formal-checked] **`posDef_reach`: a full metric reaches every descent direction.**
+At `g ≠ 0`, every `d` with `⟨d, g⟩ < 0` is `−P g` for a positive definite `P`
+(`P = I − g gᵀ/|g|² − d dᵀ/⟨d, g⟩`). So a metric alone can point a step anywhere in the open
+descent half-space: whatever separates two moves' reach from one state is the class of metric each
+admits, not descent. -/
+theorem posDef_reach {g d : n → ℝ} (hg : g ≠ 0) (hdg : d ⬝ᵥ g < 0) :
+    ∃ P : Matrix n n ℝ, P.PosDef ∧ -(P *ᵥ g) = d := by
+  set s : ℝ := g ⬝ᵥ g with hs
+  have hs0 : 0 < s := lt_of_le_of_ne (Finset.sum_nonneg fun i _ => mul_self_nonneg (g i))
+    fun h => hg (dotProduct_self_eq_zero.mp h.symm)
+  set c : ℝ := -(d ⬝ᵥ g)⁻¹ with hc
+  have hc0 : 0 < c := by rw [hc]; exact neg_pos.mpr (inv_lt_zero.mpr hdg)
+  have hcd : c * (d ⬝ᵥ g) = -1 := by rw [hc, neg_mul, inv_mul_cancel₀ hdg.ne]
+  let P : Matrix n n ℝ := 1 - s⁻¹ • vecMulVec g g + c • vecMulVec d d
+  have hPx : ∀ x, P *ᵥ x = x - (s⁻¹ * (g ⬝ᵥ x)) • g + (c * (d ⬝ᵥ x)) • d := by
+    intro x
+    simp only [P, add_mulVec, sub_mulVec, one_mulVec, Matrix.smul_mulVec, vecMulVec_mulVec_eq,
+      smul_smul]
+  refine ⟨P, ?_, ?_⟩
+  · refine PosDef.of_dotProduct_mulVec_pos ?_ fun x hx => ?_
+    · simp only [P, IsHermitian, conjTranspose_eq_transpose_of_trivial, transpose_add,
+        transpose_sub, transpose_one, transpose_smul, transpose_vecMulVec]
+    · simp only [star_trivial]
+      set t : ℝ := s⁻¹ * (g ⬝ᵥ x) with ht
+      have hq : x ⬝ᵥ (P *ᵥ x) = (x - t • g) ⬝ᵥ (x - t • g) + c * (d ⬝ᵥ x) ^ 2 := by
+        rw [hPx]
+        simp only [dotProduct_add, dotProduct_sub, sub_dotProduct, dotProduct_smul,
+          smul_dotProduct, smul_eq_mul, dotProduct_comm x g, dotProduct_comm x d]
+        have : t * (t * s) = t * (g ⬝ᵥ x) := by
+          rw [ht, hs]; field_simp
+        rw [← hs]
+        nlinarith [this]
+      rw [hq]
+      by_cases hr : x - t • g = 0
+      · have hx' : x = t • g := sub_eq_zero.mp hr
+        have ht0 : t ≠ 0 := by rintro h0; apply hx; rw [hx', h0, zero_smul]
+        have hdx : d ⬝ᵥ x ≠ 0 := by
+          rw [hx', dotProduct_smul, smul_eq_mul]; exact mul_ne_zero ht0 hdg.ne
+        rw [hr, zero_dotProduct, zero_add]
+        exact mul_pos hc0 (lt_of_le_of_ne (sq_nonneg _) (Ne.symm (pow_ne_zero 2 hdx)))
+      · have h1 : 0 < (x - t • g) ⬝ᵥ (x - t • g) :=
+          lt_of_le_of_ne (Finset.sum_nonneg fun i _ => mul_self_nonneg _)
+            fun h => hr (dotProduct_self_eq_zero.mp h.symm)
+        have h2 : 0 ≤ c * (d ⬝ᵥ x) ^ 2 := mul_nonneg hc0.le (sq_nonneg _)
+        linarith
+  · rw [hPx, ← hs, inv_mul_cancel₀ hs0.ne', one_smul, sub_self, zero_add, hcd, neg_one_smul,
+      neg_neg]
+
+open Holonics.HolonCore.KineticFace in
+/-- [proved-derived; formal-checked] **`native_step_horizontal`: every native step is horizontal.**
+A move `v = M⁻¹Aᵀμ` (the normal law's deposition of the returns at reading weights `μ`, every
+iterate of the kinetic solve) is the least-energy lift of its own reading change and has no hidden
+part: `horizontal(A v) = v`, `hidden v = 0`. With `KineticFace.energy_split`, a target `δ` splits
+into `horizontal(A δ)`, which a native step reaches, and `hidden δ`, which no native step from this
+state moves and no reading sees at first order. -/
+theorem native_step_horizontal (M : Matrix n n ℝ) (A : Matrix m n ℝ) (hM : M.PosDef)
+    (hA : Function.Surjective A.mulVec) (μ : m → ℝ) :
+    horizontal M A (A *ᵥ (M⁻¹ *ᵥ (Aᵀ *ᵥ μ))) = M⁻¹ *ᵥ (Aᵀ *ᵥ μ) ∧
+      hidden M A (M⁻¹ *ᵥ (Aᵀ *ᵥ μ)) = 0 := by
+  have hG := cometric_posDef M A hM hA
+  have hi := nonsing_inv_mul (cometric M A) ((Matrix.isUnit_iff_isUnit_det _).mp hG.isUnit)
+  have hr : A *ᵥ (M⁻¹ *ᵥ (Aᵀ *ᵥ μ)) = cometric M A *ᵥ μ := by
+    simp only [cometric, mulVec_mulVec, Matrix.mul_assoc]
+  have hh : horizontal M A (A *ᵥ (M⁻¹ *ᵥ (Aᵀ *ᵥ μ))) = M⁻¹ *ᵥ (Aᵀ *ᵥ μ) := by
+    have hμ : (cometric M A)⁻¹ *ᵥ (cometric M A *ᵥ μ) = μ := by
+      rw [mulVec_mulVec, hi, one_mulVec]
+    rw [hr, horizontal, faceMetric, hμ]
+  exact ⟨hh, by rw [Holonics.HolonCore.KineticFace.hidden, hh, sub_self]⟩
+
+end MoveReach
+
 section Audit
 
 #print axioms passage_coeff_zero
@@ -987,6 +1145,12 @@ section Audit
 #print axioms sequential_attribution_depends_on_order
 #print axioms restored_continuation_agrees
 #print axioms equal_states_agree
+#print axioms metric_step_zero_iff
+#print axioms metric_step_descends
+#print axioms diagonal_reach_iff
+#print axioms vecMulVec_mulVec_eq
+#print axioms posDef_reach
+#print axioms native_step_horizontal
 
 end Audit
 
