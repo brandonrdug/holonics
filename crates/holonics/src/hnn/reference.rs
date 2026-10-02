@@ -182,7 +182,7 @@ use crate::hnn::retention::{AeonBoundary, Diamond, aeon_readings, collapse, cont
 use crate::hnn::word::{KeptWord, PowerForm, Word, WordBalance};
 use crate::holon::contact::FeatureCovector;
 use crate::navigator::Clock;
-use crate::ratio::algebraic::{ExactInterval, interval_sum};
+use crate::ratio::algebraic::{ExactInterval, interval_difference, interval_sum};
 use crate::ratio::exponentiated::power_of_two;
 use crate::ratio::linear::ExactRatMatrix;
 use crate::ratio::linear::vector::{add, dot, scale, sub};
@@ -2973,6 +2973,12 @@ pub struct ContactAblation {
     /// The contacts-only commit's largest relative factor change: over the contacts and their three
     /// factors, the largest entry change over that factor's largest entry.
     pub factor_change: Rat,
+    /// The contacts-only commit's certified channel families, how many of them vanished below
+    /// the lattice, and the sum of their certified decreases `a` (the size of the return that
+    /// reached the contacts, `a = |G|²/h′`).
+    pub contact_families: usize,
+    pub contact_vanished: usize,
+    pub contact_alignment: Rat,
     /// The continued consumer's largest relative anchor change (largest entry change over the
     /// largest anchor entry), and its exponent spread: the largest `|v_c − v_d|` within a phase.
     pub anchor_change: Rat,
@@ -2992,6 +2998,35 @@ pub struct CumulativeContacts {
     pub spread: Rat,
     pub held: ExactInterval,
     pub reverted: ExactInterval,
+    /// Over the following windows with both constitutions frozen (no deposit), up to the next
+    /// carry-out or `INFORMATION_WINDOWS`: the readings compared, and `Σ Var_p(δ)` over them in
+    /// bits² (`δ_c = v′_c − v_c` between the opening-contacts and the learned readings, `p` the
+    /// learned face's masses at their enclosures' midpoints). The information the receiver gains
+    /// about the contacts is `(ln 2/2) Σ Var_p(δ)` to second order (the record's §11, step 2).
+    pub readings: usize,
+    pub variance: Rat,
+    /// Over the same frozen windows, the code with the opening's contacts less the code with the
+    /// learned contacts, summed (enclosed), and the windows where it is strictly positive, strictly
+    /// negative or undecided: the first-order difference on the actual targets.
+    pub code_difference: ExactInterval,
+    pub better: usize,
+    pub worse: usize,
+    pub undecided: usize,
+}
+
+/// The windows over which [`CumulativeContacts`] accumulates the receiver's information: `2^6`, set
+/// by the read's cost (the October 2 run at `2^8` passed its 1,800 s deadline, the contact loop
+/// record §14), not by the receiver.
+pub const INFORMATION_WINDOWS: usize = 64;
+
+/// [measured-diagnostic] **One deposit's receiving-map step** in [`contact_ablation`]: its aeon, the
+/// certified decrease `a` of `R`'s step, its step `η`, and whether it moved a lattice coordinate.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct ReceiverStep {
+    pub aeon: usize,
+    pub alignment: Rat,
+    pub step: Rat,
+    pub moved: bool,
 }
 
 /// [measured-diagnostic] **The contact loop on a cut** (Astra's check, on the host reference): the
@@ -3009,12 +3044,14 @@ pub fn contact_ablation(
     field: &Field,
     cells: &[usize],
     windows: usize,
-) -> Result<(Vec<ContactAblation>, Vec<CumulativeContacts>), HnnError> {
+    on_boundary: &mut dyn FnMut(&CumulativeContacts, &[ContactAblation], &[ReceiverStep]),
+) -> Result<(Vec<ContactAblation>, Vec<CumulativeContacts>, Vec<ReceiverStep>), HnnError> {
     let mut resident = reference.mount(field, &Current::at_rest(field))?;
     let opening = resident.constitution().clone();
     let family = resident.admitted().to_vec();
     let mut aeon = 0usize;
     let mut cumulative = Vec::new();
+    let mut receiver = Vec::new();
     let mut boundary = false;
     let phases = resident
         .admitted()
@@ -3149,6 +3186,68 @@ pub fn contact_ablation(
                         .unwrap_or_else(Rat::zero)
                 })
                 .unwrap_or_else(Rat::zero);
+            // The information over the following windows, both constitutions frozen.
+            let (mut readings, mut variance) = (0usize, Rat::zero());
+            let mut code_difference = interval_difference(&back_code, &held_code)?;
+            let tally = |d: &ExactInterval, counts: &mut (usize, usize, usize)| {
+                if d.lower.is_positive() {
+                    counts.0 += 1;
+                } else if d.upper.is_negative() {
+                    counts.1 += 1;
+                } else {
+                    counts.2 += 1;
+                }
+            };
+            let mut counts = (0usize, 0usize, 0usize);
+            tally(&code_difference.clone(), &mut counts);
+            let mut faces_pair = (held_faces.clone(), back_faces.clone());
+            let mut j = k;
+            loop {
+                if let (Some(a), Some(b)) = (&faces_pair.0, &faces_pair.1) {
+                    for (fa, fb) in a.faces.iter().zip(&b.faces) {
+                        let value = |c: &crate::receiver::face::GrainCell, grain: u64| {
+                            Rat::from_integer(c.carry.clone())
+                                + Rat::new(BigInt::from(c.phase), BigInt::from(grain))
+                                + &c.fibre
+                        };
+                        let delta: Vec<Rat> = fa
+                            .cells()
+                            .iter()
+                            .zip(fb.cells())
+                            .map(|(p, q)| value(q, fb.grain()) - value(p, fa.grain()))
+                            .collect();
+                        let masses: Vec<Rat> = (0..delta.len())
+                            .map(|c| -> Result<Rat, HnnError> {
+                                let e = fa.mass(c)?.enclosure()?;
+                                Ok((&e.lower + &e.upper) / Rat::from_integer(BigInt::from(2)))
+                            })
+                            .collect::<Result<_, _>>()?;
+                        let total: Rat = masses.iter().sum();
+                        if total.is_positive() {
+                            let mean: Rat = masses.iter().zip(&delta).map(|(p, d)| p * d).sum::<Rat>() / &total;
+                            let second: Rat = masses.iter().zip(&delta).map(|(p, d)| p * d * d).sum::<Rat>() / &total;
+                            variance += second - &mean * &mean;
+                            readings += 1;
+                        }
+                    }
+                }
+                if !feed(reference, &mut held, &cells[spans[j].clone()])?
+                    || !feed(reference, &mut back, &cells[spans[j].clone()])?
+                {
+                    break;
+                }
+                j += 1;
+                if j >= spans.len() || j >= k + INFORMATION_WINDOWS || cells[spans[j].clone()].len() != aperture {
+                    break;
+                }
+                let next_window = &cells[spans[j].clone()];
+                let (ca, _, fa) = read(reference, &mut held, next_window)?;
+                let (cb, _, fb) = read(reference, &mut back, next_window)?;
+                let d = interval_difference(&cb, &ca)?;
+                tally(&d, &mut counts);
+                code_difference = interval_sum(&code_difference, &d)?;
+                faces_pair = (fa, fb);
+            }
             cumulative.push(CumulativeContacts {
                 aeon,
                 position: span.start,
@@ -3156,7 +3255,14 @@ pub fn contact_ablation(
                 spread,
                 held: held_code,
                 reverted: back_code,
+                readings,
+                variance,
+                code_difference,
+                better: counts.0,
+                worse: counts.1,
+                undecided: counts.2,
             });
+            on_boundary(cumulative.last().expect("pushed"), &out, &receiver);
         }
         let (pending, refined) = reference.refine(&mut resident, &moment, &phases)?;
         let word = match &refined.receipt.detail {
@@ -3239,6 +3345,9 @@ pub fn contact_ablation(
                         continued_cells_differ: grained(Some(&held_continued))
                             != grained(Some(&moved_continued)),
                         factor_change: factor_change(&theta, &successor_kept),
+                        contact_families: reading.steps.len(),
+                        contact_vanished: reading.vanished.len(),
+                        contact_alignment: reading.steps.iter().map(|(_, s)| s.step.alignment.clone()).sum(),
                         anchor_change: {
                             let scale = held_anchors.iter().flatten().map(|x| x.abs()).max().unwrap_or_else(Rat::zero);
                             let moved = held_anchors
@@ -3276,7 +3385,20 @@ pub fn contact_ablation(
             }
         }
         match reference.deposit(&mut resident, staged) {
-            Ok(_) => {}
+            Ok(returned) => {
+                if let Component::Present(reading) = &returned.deposit {
+                    for (locus, step) in &reading.steps {
+                        if matches!(locus, Locus::ReceivingMap(_)) {
+                            receiver.push(ReceiverStep {
+                                aeon,
+                                alignment: step.step.alignment.clone(),
+                                step: step.step.step.clone(),
+                                moved: !reading.vanished.contains(&(*locus, step.family)),
+                            });
+                        }
+                    }
+                }
+            }
             Err(HnnError::ConstitutionBudget { .. }) => break,
             Err(other) => return Err(other),
         }
@@ -3293,7 +3415,7 @@ pub fn contact_ablation(
             }
         }
     }
-    Ok((out, cumulative))
+    Ok((out, cumulative, receiver))
 }
 
 /// [definition] **What an exposure reads of a port's resident** beside the port's own methods: the
