@@ -57,11 +57,28 @@ totals.
 | `2^3 I` | `−10745538/2^20` | `10691/1024` |
 | `2^4 I` | `−12111237/2^21` | `15271/1024` |
 
-The best member is `2 I`. `I` codes `3813/1024` bits above it, inside the charge
-(`2^3813 < 18^1024`); `2^2 I` codes `4524/1024` above it, outside (`2^4524 > 18^1024`). Every
-scale below `I` codes worse than the tree alone. At 2,192 readings the best member over the same
-family is also `2 I` (`8704939/2^10` bits, with `I` `3482/1024` above it and `2^2 I` `978/1024`
-above it).
+The best member is `2 I`. Every scale below `I` codes worse than the tree alone. At 2,192 readings
+the best member over the same family is also `2 I` (`8704939/2^10` bits, with `I` `3482/1024`
+above it and `2^2 I` `978/1024` above it).
+
+**The charge belongs to the grid, not to the readings.** Under a uniform code over a replayed
+family, naming its best member costs `log₂` of the family's size. The reading count enters
+nothing. #251's family had eleven members (the even scales from `2^(−14)` to `2^4` and unit
+information), so its charge was `log₂ 11`. This family has eighteen (the odd scales from `2^(−5)`
+to `2^5` and `2^6` added), so its charge is `log₂ 18`. "Inside the charge" therefore judged the
+grid that was replayed: `3813/1024` lies inside `log₂ 18` and outside `log₂ 11`.
+
+The grid-free question is whether a code over the scales `2^k I` can prefer `I` to `2 I` against
+the readings. That needs `ℓ(1) − ℓ(0) > 3813/1024` bits, so `I` must carry more than `2^3` times
+`2 I`'s prior weight (`3813 > 3 · 1024`).
+- Nothing derives such a weight. By the unit theorem every scale is the same law in other anchor
+  units (the receiving-prior record §3), so no scale is favoured beyond how the integers `k` are
+  indexed.
+- An ordinary index of the integers gives far less. Elias's gamma code over `0, 1, −1, 2, …`
+  charges `ℓ(0) = 1` and `ℓ(1) = 3`, a difference of `2` bits.
+
+The readings separate `2 I` from `I` by more than that index charges: by `3813/1024` bits over the
+campaign, and `3482/1024` at 2,192 readings. `2^2 I` is `4524/1024` above `2 I`.
 
 ## 3. The storage form's coefficient is not the scale
 
@@ -72,7 +89,8 @@ declares `h = 1` and `Y_R = 2` (`FieldDeclaration::campaign_one`), so the coeffi
 `(h/4)Y_R = 1/2`.
 
 Read as the prior's scale, `s = 1/2` codes `23837/1024` bits above the best member over the
-whole campaign (`16265/1024` at 2,192 readings), outside the charge. The coefficient is refused.
+whole campaign (`16265/1024` at 2,192 readings), more than the readings' separation of `I` from
+`2 I`. The coefficient is refused.
 The units say why: `s` is an anchor energy, `|z|²`, while `(h/4)Y_R` is power per anchor energy.
 A scale needs a declared power `P₀`, and the anchor energy that carries it is
 `|v_R|² = (4/h)P₀/Y_R` (the bound in `hnn::constitution`'s module header). The medium declares no
@@ -130,7 +148,8 @@ the tree face, and the law gives `s_open = V₀/a₀` with `a₀ = Σ_t ⟨g_t, 
 
 Over the whole campaign the law locates the prior between `I` and `2 I`: `a < 0` at `I` (the map
 overreaches readings it has not met) and `a > 0` at `2 I`, and the Newton points from both sides
-fall inside that interval. The best replayed member is `2 I` at both lengths. Below `I` the law
+fall inside that interval. The Newton point read at `2 I` is `16109515/2^23`, below `2` by
+`667701/2^23` (less than `2^(−3)`). The best replayed member is `2 I` at both lengths. Below `I` the law
 pushes up from every member: from `2^(−14) I` its Newton point is `15392687/2^35`, more than
 `2^2` times the prior it is read at, and the replayed code falls monotonically up to `2 I`. The
 opening's `s_open`, read before the map has moved, lies between `2 I` and `2^2 I`, above the
@@ -138,12 +157,24 @@ stationary interval; it is the law's first step, and the at-map read refines it.
 
 ## 6. Decision
 
-[agent-inferred] `H₀ = I` stays as the opening. The law locates campaign 1's prior in `(I, 2 I)`;
-`I` is that interval's lower end and codes `3813/1024` bits above `2 I` over 3,400 readings,
-inside the family's charge, so a declared change to `2 I` is not supported by the code. The
-per-field law owed in #62 is §4: a medium locates its prior where the prequential alignment of
-the map against readings before their deposit vanishes, read through the certificate's own two
-sums, and scales it with its anchors' energy. Carrying `a` and `V` natively beside the Gram, and
-moving `s` by the Newton point, is a change to the receiving map's behaviour; on campaign 1 it
-would move `H₀` inside the charge. The second-order law's statement in Lean (the code's
-expansion along a scaled map) remains in #62; its algebraic parts are proved here.
+[agent-inferred] `H₀ = I` is released, and campaign 1's receiving prior is `2 I`.
+- The prior is held on the powers of two, so that its founding chart `s⁻¹ I` is exact on the
+  dyadic lattice (`SolvedChart::identity` is founded exact).
+- Among the powers of two, the law and the code select the same member.
+  - The prequential alignment changes sign in `(I, 2 I)`.
+  - The Newton point read at `2 I` lies within `2^(−3)` below `2`.
+  - `2 I` is the best replayed member at 2,192 readings and at 3,400.
+- `I` has no derivation as the lower end of the interval. The law's stationary point lies near
+  `2 I`, and the readings separate the two members by more than an ordinary index of the scales
+  charges (§2).
+
+The scale is a field's own quantity: §4 locates it per field and carries it with the anchors'
+energy. Campaign 1's located value is therefore declared with its field, not fixed in the
+receiving map's law. Opening the receiving map at `2 I` changes the HNN's behaviour, so that
+change is its own pull request and merges after the main line measures it on campaign 1 and its
+held-out read.
+
+Carrying `a` and `V` natively beside the Gram, and moving `s` by the Newton point as readings
+arrive, is the per-field law's native form. It is not built here. The second-order expansion of
+the prequential code along a scaled map, the step from which `newton_point` is applied, is owed
+in #62; its algebraic parts are proved here.
