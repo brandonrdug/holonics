@@ -15,6 +15,7 @@ import Holonics.Compression.Landmark.Context.Capacity
 import Holonics.Compression.Landmark.Context.Epoch
 import Holonics.Compression.Landmark.Context.PriorMass
 import Holonics.Compression.Landmark.Context.Drift
+import Holonics.Compression.Landmark.Context.StoredDrift
 
 /-!
 # The receiving tree: the shift navigator's landmarks
@@ -64,6 +65,7 @@ The joins to the framework ([proved-derived; formal-checked]):
 | `Context/Epoch` | a node's arrivals are the epochs of its section; the register, capped or not, is read on them | `compression::landmark::context::Capacity` (the deposit's count register) |
 | `Context/PriorMass` | the node's prior mass `2^(−j)`: its face the Pólya urn at that weight and a node law, at most `j − 1` bits over KT at every count, the regret against the best fixed digit probability at most `½ log₂ n + j` (KT's `½ log₂ n + 1`), the one-sided gain, the floor `1/(2^j n* + 2)`, and the ladder `j = 1..8` charged 3 bits a valid two-part code | `compression::landmark::context::{LandmarkDeclaration, face_bits}` (the deposit's unit `2^j`), `hnn::field::ReceiverDeclaration`; the card's `holonics_cuda::hnn::tree::CardTree` (`hnn_tree_deposit`) |
 | `Context/Drift` | the executed lattice against the ideal tree: a node's code telescopes to its weight, which is 1-Lipschitz in its split mass, so the drift adds over the tree and the passage, each rounding and factor once; the passage's code within `N((2D + 1)u + Dρ)`, one cell's read within `t₀ D² (u + ρ) + (2D + 1)u` (the per-cell rule) | `compression::landmark::context::{Landmarks::face_rule, face_bits, carrier_width}`, `Law::apply_branch` (`excess`, `drift`) |
+| `Context/StoredDrift` | the compacted executed tree as the full tree's instance: each stored chain's discrepancy at its bottom, the weight and the split mass within the subtree's discrepancies, the passage within their changes and the root's read jumps, a step, a read and a split's charges (`u + 2ℓ` to the upper part's drift, `2(u + ℓ)` to the increment), one cell over the stored levels | `compression::landmark::context::{Law::part, Law::apply_branch, Landmarks::face_rule}`, `CellReading::residual`; the card's `holonics_cuda::hnn::tree::CardTree` (`hnn_tree_deposit`, no certificates) |
 
 `HNN/RegionCounts` (the receiving face's region table, grain read and combined face) stays with
 the HNN; `Context/Tree` reads its KT count laws.
