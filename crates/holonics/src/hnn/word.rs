@@ -1140,6 +1140,13 @@ impl<'c> Word<'c> {
         &self.passage
     }
 
+    /// Each contact's carried transit-solve remainder `r_ζ` (zero under the exact law). Two words
+    /// holding equal representatives differ here by their accumulated image difference.
+    #[cfg(test)]
+    pub(crate) fn solve_remainders(&self) -> &[Vec<Rat>] {
+        &self.carried.solves
+    }
+
     /// The peak exact bits of any entry of the change so far, a reading.
     pub fn peak_bits(&self) -> u64 {
         self.peak_bits

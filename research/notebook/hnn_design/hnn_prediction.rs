@@ -434,6 +434,19 @@ fn main() {
             &arguments[9],
             &arguments[10],
         ),
+        (Some("executed"), Some("expose")) => executed_loop::expose_read(
+            arguments[3].parse().expect("a training seed"),
+            arguments[4].parse().expect("a held-out seed"),
+            arguments[5].parse().expect("a held-out count"),
+            &arguments[6],
+            &arguments[7..],
+        ),
+        (Some("executed"), Some("word-read")) => executed_loop::word_read(
+            &arguments[3],
+            arguments[4].parse().expect("a seed"),
+            arguments[5].parse().expect("a count"),
+            &arguments[6..],
+        ),
         (Some("executed"), Some("locks")) => executed_loop::locks(
             &arguments[3],
             arguments[4].parse().expect("a seed"),

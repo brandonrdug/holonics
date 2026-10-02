@@ -1,0 +1,92 @@
+# U6 heavy runs for the PC (24 cores, 32,746,147,840 bytes, RTX 4080 SUPER)
+
+Owner of what is measured: the main-line thread (in the cloud since October 2). The PC session runs
+these in order and reports each receipt exactly as the harness prints it (rationals, `/4096` cells,
+enclosures; never a decimal), with wall time and peak resident set. Small reads (smoke tests, single
+`direction`, `locks`, `instants` reads) stay in the cloud.
+
+**Setup.** Check out this branch, `cargo build --release -p holonics --example hnn_prediction`
+(`$B` = `target/release/examples/hnn_prediction`); `$S` = `research/runs/u6/states`. Launch every run
+in the background with an outer `timeout` from its projection; never raise a limit. Stored states
+the cloud runners produce arrive on their branches; the main line names them here when they land.
+
+## Where the GPU applies (exact arithmetic only)
+
+The card's realization (`crates/holonics-cuda`) is the exposure protocol's execution port: moment
+ingest, the lattice read, chart refinement, the word's forward and reverse passage with its
+receiving read, deposits and the landmark tree, all in exact integers (`ℤ/2^128` ring words under
+the l1 certificate), each with a host-parity test. So:
+- **Campaign 1 and the GPU suite** run on the card exactly (`hnn_exposure` over `Resident`). Gate 3
+  for any PR that changes HNN behaviour: `flock .local/gpu.lock cargo test -p holonics-cuda --
+  --include-ignored --test-threads=1`, alone on the card.
+- **Today's U6 reads have no card path**: the executed comparison, the bank release, the kinetic
+  and joined moves, `evaluate`, `word-read`, `spectrum` and `run` are host code over `rayon`
+  (`hnn::executed`, `hnn::prediction`). They run on the PC's 24 cores.
+- **What could take the card without leaving exact arithmetic**: a word's forward passage and
+  receiving read (`hnn_word_forward`) and the per-request observability rank (one word per source
+  coordinate, the same kernel). The bank release, the lock order and the move's solve are rational
+  host laws with no card owner; porting them is not exact-integer work yet and is not queued.
+
+## P1. Withdrawn
+
+§6's contact-path read reads a receiving map that is zero at every U6 state (the record's §7). Its
+replacement, the work of each move's deposit and the changed passage, is a single-request read and
+runs in the cloud.
+
+## P2. Held-out reads of the cloud chains' final states (16 threads, one at a time)
+
+As each cloud chain reports its final state (Q2's metric chain, Q2's kinetic control, Q4's joined
+chain from w3, Q5's run from r13), fetch the runner's branch and read it out:
+```
+RAYON_NUM_THREADS=16 timeout 1700 $B executed evaluate order2 2026093012 128 out/p2-<label> <label>=<final state>
+```
+Measured here before: 566219 ms for w16 at 16 threads; deadline three times that. Report whole
+sections and stations right by station.
+
+## P3. Where the decisions change along m6's and m7's directions (#211 §7; moved from cloud Q8)
+
+If the first cloud runner has not started Q8, run it here, the two reads together at 12 threads each:
+```
+RAYON_NUM_THREADS=12 timeout 7200 $B executed spectrum order2 2026093061 8 m6=$S/m6.state lock-dec kinetic 1/2048 1/1024 16 64
+RAYON_NUM_THREADS=12 timeout 7200 $B executed spectrum order2 2026093061 8 m7=$S/m7.state lock-dec kinetic 0 1/2048 16 64
+```
+Report the header (the lattice unit), each read's cut index, and every wall (its two cut indices,
+its jump `J`, the requests it changes).
+
+## P4. The exposure protocol's held-out code at m6 and w16 (record §7's restated gate)
+
+**Running in the cloud since October 2, 21:28 UTC**, both sources together at 2 threads each. The
+cloud's 4 cores are otherwise idle, and the PC's 24 threads are full (P3 at 8 per direction, Q4
+at 8). The PC takes P4 only if the cloud run stops before its deadline. In that case P4 launches
+when P3 exits, both sources together at 2 threads each:
+```
+RAYON_NUM_THREADS=2 timeout 36000 $B executed expose 2026093061 2026093012 128 all m6=$S/m6.state
+RAYON_NUM_THREADS=2 timeout 36000 $B executed expose 2026093061 2026093012 128 all w16=$S/w16.state
+```
+Projection, from the 200-window smoke at m6 in the cloud:
+- 294297 ms for 200 windows, with user time 425 s over a real time of 294 s;
+- peak resident set 665231360 bytes per source;
+- the full cut is 21845 windows (`2^16` cells, three per window), so 32144589 ms per source,
+  and the deadline is 36000 s.
+
+The run prints no per-window progress line, so it cannot stop early on evidence; the deadline
+is fixed and is not raised.
+
+Gate: w16's held-out combined code below m6's by at least `1024·1/16 = 64` bits. Report the held-out and
+training lines whole.
+
+## P5. The joint held-out read of the four move-16 states (waits on all four)
+
+When these chains each store their move-16 state, the main line names the four paths here, and the PC
+reads them in one call at 16 threads:
+- Q2's Coordinate chain and Q2's Kinetic control, both under #202's interval acceptance;
+- the throw chain (#240), under strict descent (`move-once`, `ReleaseExcursion::monotone()`);
+- the throw's control, the same driver with `coordinate` in place of `throw`, also under strict descent.
+
+The throw is read against its control: both chains run the same acceptance law. It is not read against
+Q2's chains, which run #202's interval and adopt trials that strict descent refuses (η 1/2 at c0).
+```
+RAYON_NUM_THREADS=16 timeout 6795 $B executed evaluate order2 2026093012 128 out/p5-move16 coord16=<path> kin16=<path> throw16=<path> tctl16=<path>
+```
+The deadline is three times the measured 566219 ms per state at 16 threads, for four states
+(`12·566219 = 6794628` ms). Report whole sections and stations right, station by station, for each state.

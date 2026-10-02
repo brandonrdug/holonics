@@ -287,7 +287,8 @@ fit's path follows the gradient (`+1693`), so they carry it.
 - **The underdamped throw over a finite flight.** From rest, each mode moves at most the force's
   free fall `|g_i| τ²/2` by time `τ`, whatever its stiffness. `throw_le_free_fall` proves it for the
   undamped mode. Damping keeps the bound, since the velocity `g_i e^(−γt/2) sin(ω_d t)/ω_d` is at
-  most `|g_i| t` in size; that case is owed in Lean (#62). Stiff modes
+  most `|g_i| t` in size; `damped_throw_le_free_fall` proves it for every damping `γ ≥ 0`, through
+  the force felt `a = g_i − γẋ − ω_i²x`, whose energy `a² + ω_i²ẋ²` damping only drains. Stiff modes
   (`ω_i τ ≫ 1`) reach their equilibrium as the leap does. Soft modes stay at free fall instead of
   the leap's `g_i/ω_i²`. The flight time cuts exactly the soft-mode amplification that turns the
   kinetic step.
@@ -332,4 +333,5 @@ reweighting. The main line's read of the Coordinate and Witness steps against `G
   151 of 300 entries agree under one element.
 - **Owed (#62):** the ring's reversal symmetry; orbit invariance of the Floquet certificate's
   refusals; the equivariance of every rounding in the chain, checked call by call; the throw's
-  discrete energy law and its damping read from the modes; the free-fall bound for the damped mode.
+  discrete energy law and its damping read from the modes. The free-fall bound for the damped mode
+  is proved since (`damped_throw_le_free_fall`).

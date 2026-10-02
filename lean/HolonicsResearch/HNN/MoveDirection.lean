@@ -33,9 +33,10 @@ the pump's reflection block `−2p R_c` to its stiffness, `c` the placed carrier
    energy, so a move from rest never crosses a pass above its start; in one quadratic mode the throw
    from rest moves only toward and past its equilibrium, at most twice as far.
 8. **Why the receiver's step turns from the gradient** (`fisher_step_target_only`,
-   `throw_le_free_fall`, `carried_velocity`): one lock's Gauss–Newton change raises only its target,
-   by `1/θ_t`; a throw's flight caps every mode at the force's free fall `|g|t²/2`, whatever its
-   stiffness; a carried velocity accumulates a push that keeps its sign.
+   `throw_le_free_fall`, `damped_throw_le_free_fall`, `carried_velocity`): one lock's Gauss–Newton
+   change raises only its target, by `1/θ_t`; a throw's flight caps every mode at the force's free
+   fall `|g|t²/2`, whatever its stiffness and damping; a carried velocity accumulates a push that
+   keeps its sign.
 9. **The throw through the accreted mass** (`accretion_loss`, `accretion_dissipates`,
    `thrown_move`, `throw_velocity_le_terminal`, `throw_velocity_rises`, `leap_velocity_le`,
    `throw_velocity_le_unaccreted`, `throw_reach_le_free_fall`, `coast_apex_no_floor_ahead`,
@@ -315,6 +316,73 @@ theorem throw_le_free_fall (g ω t : ℝ) (hω : ω ≠ 0) : |throw (g / ω ^ 2)
   calc |g| / ω ^ 2 * (1 - Real.cos (ω * t)) ≤ |g| / ω ^ 2 * ((ω * t) ^ 2 / 2) :=
         mul_le_mul_of_nonneg_left h1 (by positivity)
     _ = |g| * t ^ 2 / 2 := by field_simp
+
+/-- From rest, a quantity whose rate is nonnegative after the start has not fallen. -/
+private lemma le_of_hasDerivAt_nonneg_from_zero {F F' : ℝ → ℝ} (hF : ∀ s, HasDerivAt F (F' s) s)
+    (hF' : ∀ s, 0 < s → 0 ≤ F' s) {t : ℝ} (ht : 0 ≤ t) : F 0 ≤ F t := by
+  have hmono : MonotoneOn F (Set.Ici 0) := by
+    apply monotoneOn_of_hasDerivWithinAt_nonneg (convex_Ici 0)
+    · exact fun s _ => (hF s).continuousAt.continuousWithinAt
+    · intro s _; exact (hF s).hasDerivWithinAt
+    · intro s hs; rw [interior_Ici] at hs; exact hF' s hs
+  exact hmono (Set.mem_Ici.mpr le_rfl) ht ht
+
+/-- **Damping keeps the throw within free fall**: in a mode of stiffness `ω²` and damping `γ ≥ 0`
+pushed by a force `g`, thrown from rest (`ẍ = g − γẋ − ω²x`, `x 0 = ẋ 0 = 0`), the mode has moved
+at most `|g| t²/2` by time `t`, whatever `ω` and `γ`. The force felt, `a = g − γẋ − ω²x`, carries the
+energy `a² + ω²ẋ²`, which damping drains at the rate `2γa²` from its start `g²`; so `|a| ≤ |g|`
+throughout, `|ẋ| ≤ |g| t` and `|x| ≤ |g| t²/2`. Every damping regime (under-, critically and
+over-damped) is covered at once. -/
+theorem damped_throw_le_free_fall {g γ ω : ℝ} (hγ : 0 ≤ γ) {x v : ℝ → ℝ}
+    (hx : ∀ t, HasDerivAt x (v t) t) (hv : ∀ t, HasDerivAt v (g - γ * v t - ω ^ 2 * x t) t)
+    (hx0 : x 0 = 0) (hv0 : v 0 = 0) {t : ℝ} (ht : 0 ≤ t) : |x t| ≤ |g| * t ^ 2 / 2 := by
+  -- the force felt, `a = g − γv − ω²x`, changes at the rate `−γa − ω²v`
+  have hda : ∀ s, HasDerivAt (fun s => g - γ * v s - ω ^ 2 * x s)
+      (-γ * (g - γ * v s - ω ^ 2 * x s) - ω ^ 2 * v s) s := by
+    intro s
+    exact (((hasDerivAt_const s g).sub ((hv s).const_mul γ)).sub
+      ((hx s).const_mul (ω ^ 2))).congr_deriv (by ring)
+  -- its energy `a² + ω²v²` falls at the rate `2γa²`
+  have hW : ∀ s, HasDerivAt
+      (fun s => (g - γ * v s - ω ^ 2 * x s) * (g - γ * v s - ω ^ 2 * x s) + ω ^ 2 * (v s * v s))
+      (-(2 * γ) * ((g - γ * v s - ω ^ 2 * x s) * (g - γ * v s - ω ^ 2 * x s))) s := by
+    intro s
+    exact (((hda s).mul (hda s)).add (((hv s).mul (hv s)).const_mul (ω ^ 2))).congr_deriv
+      (by ring)
+  have hanti := antitone_of_hasDerivAt_nonpos hW fun s => by
+    have := mul_self_nonneg (g - γ * v s - ω ^ 2 * x s)
+    simp only [Pi.zero_apply]; nlinarith
+  -- so the force felt never exceeds the applied one
+  have ha : ∀ s, 0 ≤ s → |g - γ * v s - ω ^ 2 * x s| ≤ |g| := by
+    intro s hs
+    have h := hanti hs
+    simp only [hx0, hv0, mul_zero, sub_zero, add_zero] at h
+    have hv2 : 0 ≤ ω ^ 2 * (v s * v s) := mul_nonneg (sq_nonneg ω) (mul_self_nonneg (v s))
+    exact sq_le_sq.mp (by nlinarith)
+  -- the velocity is at most free fall's
+  have hvel : ∀ s, 0 ≤ s → |v s| ≤ |g| * s := by
+    intro s hs
+    have hup := le_of_hasDerivAt_nonneg_from_zero (F := fun s => |g| * s - v s)
+      (F' := fun s => |g| * 1 - (g - γ * v s - ω ^ 2 * x s))
+      (fun s => ((hasDerivAt_id s).const_mul |g|).sub (hv s))
+      (fun s hs => by have := (abs_le.mp (ha s hs.le)).2; linarith) hs
+    have hdn := le_of_hasDerivAt_nonneg_from_zero (F := fun s => |g| * s + v s)
+      (F' := fun s => |g| * 1 + (g - γ * v s - ω ^ 2 * x s))
+      (fun s => ((hasDerivAt_id s).const_mul |g|).add (hv s))
+      (fun s hs => by have := (abs_le.mp (ha s hs.le)).1; linarith) hs
+    simp only [hv0, mul_zero, sub_zero, add_zero] at hup hdn
+    exact abs_le.mpr ⟨by linarith, by linarith⟩
+  -- and so is the displacement
+  have hup := le_of_hasDerivAt_nonneg_from_zero (F := fun s => |g| / 2 * (s * s) - x s)
+    (F' := fun s => |g| / 2 * (1 * s + s * 1) - v s)
+    (fun s => (((hasDerivAt_id s).mul (hasDerivAt_id s)).const_mul (|g| / 2)).sub (hx s))
+    (fun s hs => by have := (abs_le.mp (hvel s hs.le)).2; linarith) ht
+  have hdn := le_of_hasDerivAt_nonneg_from_zero (F := fun s => |g| / 2 * (s * s) + x s)
+    (F' := fun s => |g| / 2 * (1 * s + s * 1) + v s)
+    (fun s => (((hasDerivAt_id s).mul (hasDerivAt_id s)).const_mul (|g| / 2)).add (hx s))
+    (fun s hs => by have := (abs_le.mp (hvel s hs.le)).1; linarith) ht
+  simp only [hx0, mul_zero, sub_zero, add_zero] at hup hdn
+  exact abs_le.mpr ⟨by nlinarith, by nlinarith⟩
 
 /-- **A carried velocity accumulates a persistent push**: with `v (k+1) = β v k + a` from rest,
 `v k = a (1 − β^k)/(1 − β)`, so a push that keeps its sign builds toward `a/(1 − β)` while one that

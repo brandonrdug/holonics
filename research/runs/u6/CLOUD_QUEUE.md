@@ -107,3 +107,8 @@ timeout 10800 $B executed spectrum order2 2026093061 8 m7=$S/m7.state lock-dec k
 ```
 Report the header (the lattice unit), each read's cut index, and every wall (its two cut indices,
 its jump `J`, and the requests it changes).
+
+## Q9. Withdrawn
+
+`executed word-read` reads the declared receiver's 3 epochs through a receiving map that is zero at
+every U6 state (the record's §7): it cannot decide §6's gate. Do not run it.

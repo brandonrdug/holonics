@@ -13,8 +13,8 @@ held-out requests) shows a representation exists
 The refit (`eO_fit.py`, retired with the notebook's probe at `e214ccc8`) differs from the native
 move in its optimizer: float Adam on `E` with a cosine schedule (momentum `9/10` and a per-coordinate
 second moment `999/1000`), 400 steps of 16 requests re-read on the release's own trajectory, and `ρ` by
-Adam on a central difference. The native moves are guarded certified steps in the port's or the
-receiver's metric, a few at a time.
+Adam on a central difference. The native moves are certified steps in the port's or the
+receiver's metric, each refused unless its executed release falls, a few at a time.
 
 The claim this loop can make is narrow: which ingredient of the exterior optimizer carries it to the
 representation. Four arms, every other setting the refit's (`order2 400 256 101 0.03 0.05 1 16`, learning rates `3/100` and `1/20`):
@@ -40,7 +40,7 @@ read natively. No Adam arm's number stands in for it.
 
 ## 2. Measured
 
-Held-out whole sections of 128 at step 400 (the best checkpoint in brackets), three seeds per arm
+Held-out whole sections of 128 at step 400 (the best state read along the way in brackets), three seeds per arm
 ([receipts](2026-10-02_THE_REFITS_INGREDIENTS_receipts/)):
 
 | Arm | seed 101 | seed 202 | seed 303 |
@@ -53,7 +53,7 @@ Held-out whole sections of 128 at step 400 (the best checkpoint in brackets), th
 - **The reproduction.** The float refit reaches 36 to 49 whole sections, not the record's 96. That
   96 was the exported `E` read natively after rounding to the lattice (the station-framed record
   §2); the float release here is the probe's own, and the run-to-run spread is large (the same arm
-  moves by 10 to 20 sections between checkpoints).
+  moves by 10 to 20 sections between the states read along the way).
 - **No ingredient is located.** Plain gradient steps with the matched step size reach 57 on two of
   three seeds, as many as the scaled arms; the per-coordinate scale is not required, and momentum is
   not either (it destabilizes the solve). The acceptance's location test is not met by any arm.
@@ -62,9 +62,9 @@ Held-out whole sections of 128 at step 400 (the best checkpoint in brackets), th
 takes 400 small, decaying, stochastic steps, each accepted whatever it does to the comparison,
 re-read on the release's own trajectory. The Lean thread's baseline (#195) proves every candidate
 move is a gradient step under some metric and stops only where the gradient vanishes; the native
-chain stopped first at its guard (`OwnNotBelow`, the executed release must fall). The step-1
+chain stopped first at its acceptance condition (`OwnNotBelow`, the executed release must fall). The step-1
 records found the chord to the refit rising before it falls (the stiffness record). So the next
-candidate location is the guard together with the step schedule, read first on the float path
+candidate location is the acceptance condition together with the step schedule, read first on the float path
 itself: whether the plain-gradient arm's own comparison rises along its way to the sections.
 
 ## 3. The plain-gradient path's own comparison
@@ -79,11 +79,11 @@ training requests, each re-read on its own trajectory ([receipts](2026-10-02_THE
   `[475/4096, 476/4096)`; seed 303, eight of 20 to 60 steps, peaks `[20/4096, 21/4096)` to `[1970/4096, 1971/4096)` (steps 50 to 100, the largest,
   then `[1241/4096, 1242/4096)` over steps 170 to 200). Each later excursion ends below the earlier minimum.
 
-[agent-inferred] The path that reaches the sections is not monotone in its own comparison at any
-window, and on one seed it rises well above the opening. A guard that admits a rise only below the
-running maximum of a window of adopted comparisons cannot follow it; it needs an excursion above a
-checkpoint, bounded in height and length, with the certified decrease owed over the excursion as a
-whole. The numbers above are the measurement such a law's window and schedule read.
+[agent-inferred] The path that reaches the sections is not monotone in its own comparison over
+any stretch of steps, and on one seed it rises well above the opening. An acceptance that admits a
+rise only below the largest of the last few adopted comparisons cannot follow it; it needs an
+excursion above a held state, bounded in height and length, with the certified decrease owed over the
+excursion as a whole. The numbers above are what such a law's run length and step schedule read.
 
 ## 4. The released comparison's jump at m7, decision by decision, beside the float path's
 
@@ -149,6 +149,11 @@ units of `1/4096` nat, each within `6/4096`.
   - Only the `1/2048` diff was taken; that the same request carries the jump at the other step sizes
     is inferred from its constant size.
   - m6 was accepted at `1/2048` (`d = 361`, no jump), and jumped from `1/1024` up.
+  - m7's halvings ended at their count, not at the lattice: from `η₀ = 1/16` the eighth trial is
+    `1/2048`, and `LADDER_DEPTH = 8` stopped the move there, refused. The lattice floor (`η·2u < λ`,
+    #230) was not reached by then; whether m7 adopts at `1/4096` or below is Q3 of
+    `research/runs/u6/CLOUD_QUEUE.md`. The crossing at `731/840` of the `1/2048` step is located only
+    under linear motion of the two gaps; what is certified is that they cross inside that step.
 - **The float path's rises are not relocking jumps** (`sgd`, seed 303, 32 fixed requests, read every
   10 steps to step 130).
   - Relocking changes the freezing order on 29 to 32 of the 32 requests in every 10-step stretch to
@@ -288,7 +293,7 @@ a lower basin in 13 accepted moves.
   from m6 `4411164`, from w16 `6458652`; a move changes an entry by at most `1/2` at the kinetic entry
   scale, so 5, 5 and 7 moves reach it. Its largest entry is in `[10032/4096, 10033/4096)`, inside the
   entry bound `8`.
-- *The direction is.* `w16 − m6` against `fit − m6`: `−[60, 61)`, covering `−[452, 451]/4096` of the
+- *The direction is.* `w16 − m6` against `fit − m6`: `−[60, 61)`, covering `[−452/4096, −451/4096)` of the
   distance (away from it) while `|w16 − m6|²` is `[3386, 3387)/4096` of `|fit − m6|²`. Each of the 16
   moves, against `fit − E` from its own start, lies in `−[1, 2)` to `−[133, 134)`: every one negative.
 - *The metric turns it, not the comparison.* At the opening (the float probe's `E₀` equals the native
@@ -324,7 +329,7 @@ It runs on Astra's landed continuation (`receiver::reception::continuation`, `98
   `(E, ρ)` move's end (#220) once run.
 - **What each read must show**, per accepted move from m6 to w16:
   - the move's deposition reaches the locus it changes (the source port) as a native deposit, with
-    its certified storage growth (`Constitution::deposited`'s guards, the same ones the move already
+    its certified storage growth (`Constitution::deposited`'s conditions, the same ones the move already
     passes);
   - its work at the reached point closes: `W_dep = E(x; Θ′) − E(x; Θ)`, read at the same state;
   - the next passage reads the changed material: a request's `Word`, opened on the successor, reads
@@ -340,3 +345,62 @@ It runs on Astra's landed continuation (`receiver::reception::continuation`, `98
   run on it, and the executed comparison is rebuilt to read its stations through the contact path
   before any further move. The step-size scan (#211) and the joined move (#220) are then measured on
   that rebuilt comparison, not on the bank.
+
+## 7. The contact-path read of §6 reads nothing at these states
+
+`executed word-read` (`ce4252e7`, Q9) opens a `Word` on the constitution at each request's own
+current and moment, runs it over the declared receiver's epochs, and reads each station's class as
+the largest real logit of `R P_R v_R`. Read at m6 and w16 on held-out requests
+([receipts](2026-10-02_THE_REFITS_INGREDIENTS_receipts/): `word_read_smoke_m6.txt`,
+`word_read_receiving_map.txt`):
+- **The receiver reads 3 epochs, not 8 stations.** Its aperture is `K·w + 1 = 3`
+  (`hnn_prediction.rs`, the declared receiver), so one word reads the next three cells.
+- **Its receiving map is zero.** `Constitution::initial` declares `R = 0` on the receiving ring with
+  an empty landmark tree, and the U6 chain deposits only into the source port `E` (the move's
+  `stepped_source`, a normal-law step from the bank comparison's returns) and holds ρ. At m6 and at
+  w16 every station read has every logit zero (3 of 3 reads each), so the word's "class" is the tie's
+  first class and its stations right count only targets equal to it: 0 of 8 at both states on one
+  request; 2 of 16 at m6 on two. The bank's open section reads 4 and 2 of 8, its release 4 and 4.
+- **Reading the stations through `R P_R^(1+j) v_R` is the linear readout retired on September 30**
+  (`hnn::prediction`'s header; the [diagnosis](2026-09-30_THE_LEARNING_FAILURE_DIAGNOSED_THE_TRAINED_COMPARISON_IS_NOT_THE_ONE_THE_RELEASE_EXECUTES.md) §3: its descent direction met the executed
+  decision's at cosine `39/512`).
+
+So §6's deciding number is withdrawn: no word read at a U6 state can separate m6 from w16 while the
+receiving map holds nothing, and forming one would revive the retired readout. In the generation
+law the station reader is the receiving bank (`ρ(F^K(I_h)) = T`; `hnn::prediction`), and the U6
+move already deposits into `E` natively. What §6 owes is its other two reads, on the move as
+executed: the work of each move's deposit at the reached point, `W_dep = E(x; Θ′) − E(x; Θ)`, closing
+under Astra's continuation (`receiver::reception::continuation`), and the next passage reading the
+changed material. Times: one request at m6 and w16 together `247050` ms on 4 cores, peak resident
+`144216064` bytes.
+
+**§6's two remaining reads are empty for this move, by construction.** The deposition work of a
+commit is `½⟨x, ΔΘ x⟩` over the power form (`PowerForm::deposition_work`; Lean
+`HNN/Word.field_commit_deposition`), and the power form holds the ring admittances, the contacts'
+conductances, storage `C`, stiffness `K` and the loaded resonators (`PowerForm::read`). The source
+map `E` and the transport ρ are not in it: they enter the passage only through the opening
+injection (`SourceMoment::open_storage`). So every U6 move has `W_dep = 0` at every reached point,
+and the next passage differs from its predecessor only by its injection. Astra's native return
+(`hnn::word::continuation`) admits contact storage `C` and refuses source-map changes until they
+have their own transported return. [agent-inferred] The U6 chain's gains are therefore gains of the
+source codec read by a declared bank; no material locus of the constitution learns along it.
+
+**The aperture is declared, not derived.** The prediction field's receiver has aperture
+`A = K·w + 1 = 3` from the declared words `K = 2` and span `w = 1` (`hnn_prediction.rs`,
+`order_declared`); its only law is the refusal of an aperture above the receiver's observability rank
+(`ReceivingPhases::declare`). It is a held quantity beside campaign 1's `A = 2` (the
+[constants record](2026-10-02_THE_CONSTANTS_NOTHING_DERIVES_THE_GRAIN_IS_THE_ROOT_AND_ITS_READING_COUNT_IS_THE_ADMITTED_FUTURE.md) §2),
+and it decides how many cells one word reads. No station read through a word is attempted here.
+
+**The next loop's subject** (decided here). No station class is read through `R`: that is the readout
+retired above, whether `R` is zero or formed. §6's question is asked instead of the machine's own
+receiving path, campaign 1's exposure protocol, whose measurement is a code length, not a station
+class: `executed expose` runs `Reference::expose_with` on the prediction field from a stored
+constitution, over one cut of the field's declared population (`2^16` cells: order-2 passages at the
+training seed, then the 128 held-out passages at seed `2026093012` with their 1024 station cells held
+out). The protocol reads each cell's code before it deposits, deposits into every locus it admits
+from the receiver's own comparison, and never deposits on a held-out cell. Run once from m6 and once
+from w16, with everything else equal, it reads whether the U6 move's `E` shortens the machine's own
+held-out code. [agent-inferred] The gate is one grain per held-out station: w16's held-out combined
+code below m6's by at least `1024 · 1/16 = 64` bits. If it is not, the U6 move's gains do not reach the
+machine's receiving path, and the bank chain stops as §6 says.
