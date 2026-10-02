@@ -1451,3 +1451,37 @@ of a percent, against a change of the retention law (the receiver's sheet in `Cu
 Lean counterpart. It is not built. Persistence through a latched element is measured out on text
 with this library: the field's ceiling stays the few bits of §33, plus at most this latch's
 hundredths of a percent at scale.
+
+## 35. The parent's base, and the two mixes still chosen
+
+**The parent's base** ([receipt](2026-10-02_THE_CONTACT_LOOP_receipts/parent_base.txt), `tree_base.py`'s
+`halfparent`). Each node's base is its parent's face at the parent's own base, mixed with the even
+split at ½, read before the cell's deposit at every level; the root's base is even. The ½ mix keeps
+every base mass at least ¼, so the floor halves as under the root's base. Against the root's base:
+- the standing cut: development `8981595/2^9` against `8936120/2^9` (89 bits more), held out
+  `13769312/2^12` against `13750868/2^12` (four and a half more);
+- 200,000 choosing cells: development `11054750/2^5` against `11097227/2^5` (1,327 bits less), held
+  out `15377729/2^8` against `15474099/2^8` (376 less, about 0.6 percent).
+
+The parent pays at scale and loses on campaign 1's cut, where a parent seen a few times is a noisier
+base than the root. It also costs the storage where paths part its exactness: the levels of a
+stored chain share their counts but not their bases (each level's base is the one above it), so a
+chain is no longer one node law. Campaign 1 keeps the root's base; the parent's base is the law to
+build for a population large enough that its parents carry data, with the chain's per-level bases
+stated first.
+
+**The two mixes still chosen.**
+- *The stop prior's ½* stays the development cells' choice under the root's base (§32: rungs 1 to 3
+  code `8936120/2^9`, `9108226/2^9`, `9360469/2^9`).
+- *The base's ½* (the root's weight `w` in `w·root + (1 − w)·even`). On the standing cut the
+  development cells code `9039797`, `8936120`, `8861516`, `8849923` and `8878611` (each `/2^9`) at
+  `w = ¼, ½, ¾, 7/8, 15/16`, held out `13948911`, `13750868`, `13752616`, `13773893`, `13793982`
+  (`/2^12`); at 200,000 choosing cells the development cells code `11167175`, `11097227`,
+  `11071232`, `11095318`, `11110583` (`/2^5`) and the held-out cells `15523425`, `15474099`,
+  `15467742`, `15505240`, `15540114` (`/2^8`).
+
+The development cells choose `7/8` on one cut and `¾` on the other, and neither choice moves the
+held-out code by more than six bits on campaign 1 or 25 at 200,000 cells. The data do not settle the
+weight. [agent-inferred] The ½ is the two-face mixture's uniform prior (the even split and the root,
+with no evidence between them), the same form as the stop prior's and the join's, and it keeps the
+floor one bit from the even base; it stays declared, with that reason, rather than chosen.

@@ -6,7 +6,9 @@ J, default 3), each node's prior masses split by a base pi: `even` (1/2, the law
 digit tree's depth-0 node's face), `parent` (the parent's face, chained), `halfroot` (the root's
 face mixed with the even split at 1/2), `halfroot-gG` (that, read at grain 2^-G), and `shared-g4`
 (one base for every node of the digit tree, the root included: the root's even-base face mixed with
-the even split at 1/2, read at grain 1/16). Environment MODES lists them. Arguments: the cut file,
+the even split at 1/2, read at grain 1/16; `shared-wW` the same with the root's weight W in place of 1/2), `halfparent` (each node's base its parent's face at the
+parent's own base, mixed with the even split at 1/2; the root's base even) and `halfparent-g4` (that,
+read at grain 1/16). Environment MODES lists them. Arguments: the cut file,
 its cells, the held-out start. Floating point is a search outside the machine; each total is the
 exact dyadic of its float at 24 significant bits.
 """
@@ -33,6 +35,10 @@ def run(cells, mode):
                 if mode=='parent': pi=kk
                 elif mode=='root' and d==0: pi=kk
                 elif mode=='halfroot' and d==0: pi=[(kk[0]+0.5)/2,(kk[1]+0.5)/2]
+                elif mode=='halfparent':
+                    pi=[(kk[0]+0.5)/2,(kk[1]+0.5)/2]
+                elif mode=='halfparent-g4':
+                    p0=math.floor(((kk[0]+0.5)/2)*16+0.5)/16; pi=[p0,1-p0]
                 elif mode.startswith('halfroot-g') and d==0:
                     g=int(mode[len('halfroot-g'):]); p0=round(((kk[0]+0.5)/2)*2**g)/2**g; pi=[p0,1-p0]
             if mode=='even': bases=[[0.5,0.5]]*len(path)
@@ -40,6 +46,12 @@ def run(cells, mode):
                 n0,n1,_=path[0]
                 k0=(n0+ALPHA)/(n0+n1+2*ALPHA)
                 p0=round(((k0+0.5)/2)*16)/16
+                bases=[[p0,1-p0]]*len(path)
+            if mode.startswith('shared-w'):
+                w=float(mode[len('shared-w'):])
+                n0,n1,_=path[0]
+                k0=(n0+ALPHA)/(n0+n1+2*ALPHA)
+                p0=math.floor((w*k0+(1-w)*0.5)*16+0.5)/16
                 bases=[[p0,1-p0]]*len(path)
             rev=list(reversed(list(zip(path,bases)))); ks=[]; qs=[]
             for level,(node,pi) in enumerate(rev):
