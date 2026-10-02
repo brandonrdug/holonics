@@ -125,8 +125,9 @@ theorem two_point_log_le {θ h : ℝ} (hθ0 : 0 ≤ θ) (hθ1 : θ ≤ 1) (hh : 
     have h1 : HasDerivAt (fun u : ℝ => u / 4) (1 / 4) u := by
       simpa using (hasDerivAt_id u).div_const 4
     have h2 := ((Real.hasDerivAt_exp u).const_mul θ).div (hA u) (hApos u).ne'
-    convert (h1.sub h2).add_const θ using 1
-    simp only [G', A]
+    refine ((h1.sub h2).add_const θ).congr_deriv ?_
+    show 1 / 4 - (θ * Real.exp u * (1 - θ + θ * Real.exp u) - θ * Real.exp u * (θ * Real.exp u)) /
+        (1 - θ + θ * Real.exp u) ^ 2 = 1 / 4 - θ * (1 - θ) * Real.exp u / (1 - θ + θ * Real.exp u) ^ 2
     ring
   have hG'nonneg : 0 ≤ G' := by
     intro u
@@ -143,11 +144,11 @@ theorem two_point_log_le {θ h : ℝ} (hθ0 : 0 ≤ θ) (hθ1 : θ ≤ 1) (hh : 
   have hF : ∀ u, HasDerivAt F (G u) u := by
     intro u
     have h1 : HasDerivAt (fun u : ℝ => u ^ 2 / 8) (u / 4) u := by
-      convert (hasDerivAt_pow 2 u).div_const 8 using 1
-      ring
+      refine ((hasDerivAt_pow 2 u).div_const 8).congr_deriv ?_
+      norm_num; ring
     have h2 := ((hA u).log (hApos u).ne').sub ((hasDerivAt_id u).const_mul θ)
-    convert h1.sub h2 using 1
-    simp only [G, id]
+    refine (h1.sub h2).congr_deriv ?_
+    show _ = u / 4 - θ * Real.exp u / A u + θ
     ring
   have hFmono : MonotoneOn F (Set.Ici 0) := by
     refine monotoneOn_of_hasDerivWithinAt_nonneg (convex_Ici 0)
@@ -158,7 +159,7 @@ theorem two_point_log_le {θ h : ℝ} (hθ0 : 0 ≤ θ) (hθ1 : θ ≤ 1) (hh : 
     have := hGmono (le_of_lt hu)
     linarith
   have hF0 : F 0 = 0 := by simp [F, A]
-  have := hFmono Set.left_mem_Ici (Set.mem_Ici.mpr hh) hh
+  have := hFmono Set.self_mem_Ici (Set.mem_Ici.mpr hh) hh
   rw [hF0] at this
   simp only [F, A] at this
   linarith
@@ -186,7 +187,7 @@ theorem log_mean_exp_sub_mean_le {ι : Type*} [Fintype ι] (p : PositiveProbabil
           Finset.sum_le_sum fun i _ => mul_le_mul_of_nonneg_left (hb i) (p.nonnegative i)
       _ = b := by rw [← Finset.sum_mul, p.normalized, one_mul]
   have hS : 0 < ∑ i, p.mass i * Real.exp (ψ i) :=
-    Finset.sum_pos (fun i _ => mul_pos (p.positive i) (Real.exp_pos _)) Finset.univ_nonempty
+    Finset.sum_pos (fun i _ => mul_pos (p.positive i) (Real.exp_pos _)) ⟨i₀, Finset.mem_univ _⟩
   rcases hab.eq_or_lt with heq | hlt
   · -- a constant shift: the section's mean exponential is `e^a`
     subst heq
@@ -202,10 +203,10 @@ theorem log_mean_exp_sub_mean_le {ι : Type*} [Fintype ι] (p : PositiveProbabil
     have h := convexOn_exp.2 (Set.mem_univ a) (Set.mem_univ b)
       (div_nonneg (sub_nonneg.2 (hb i)) hh.le) (div_nonneg (sub_nonneg.2 (ha i)) hh.le)
       (by field_simp [hh.ne']; ring)
-    convert h using 2
-    simp only [smul_eq_mul]
-    field_simp [hh.ne']
-    ring
+    simp only [smul_eq_mul] at h
+    have harg : (b - ψ i) / (b - a) * a + (ψ i - a) / (b - a) * b = ψ i := by
+      field_simp [hh.ne']; ring
+    rwa [harg] at h
   have hexpb : Real.exp b = Real.exp a * Real.exp (b - a) := by
     rw [← Real.exp_add]; congr 1; ring
   set θ := (m - a) / (b - a) with hθ
@@ -267,7 +268,7 @@ theorem klDivergence_face_shift (φ ψ : ι → ℝ) :
       Real.log (∑ i, (face φ).mass i * Real.exp (ψ i)) := by
     rw [partition_shift, Real.log_mul (partition_ne_zero φ) hS.ne']
     ring
-  rw [klDivergence_eq_logDifference]
+  rw [PositiveProbabilitySection.klDivergence_eq_logDifference]
   simp_rw [log_face_mass]
   calc ∑ i, (face φ).mass i * (φ i - Real.log (partition φ) -
           ((φ + ψ) i - Real.log (partition (φ + ψ))))
@@ -323,7 +324,6 @@ theorem klBits_face_shift_le (v δ : ι → ℝ) {a b : ℝ} (ha : ∀ i, a ≤ 
   have key : (b * Real.log 2 - a * Real.log 2) ^ 2 / 8 / Real.log 2 =
       Real.log 2 / 8 * (b - a) ^ 2 := by
     field_simp
-    ring
   rw [face_bits_shift]
   constructor
   · rw [← key]
@@ -370,7 +370,6 @@ theorem joint_marginal (p : ρ → PositiveProbabilitySection ι) (r : ρ) (f : 
     ∑ x : ρ → ι, (joint p).mass x * f (x r) = ∑ i, (p r).mass i * f i := by
   have key := Fintype.prod_sum (κ := fun _ : ρ => ι)
     (fun s i => (p s).mass i * (if s = r then f i else 1))
-  simp only at key
   have hl : ∏ s, ∑ i, (p s).mass i * (if s = r then f i else 1) = ∑ i, (p r).mass i * f i := by
     rw [Fintype.prod_eq_single r]
     · simp
@@ -391,11 +390,11 @@ theorem klDivergence_joint (p q : ρ → PositiveProbabilitySection ι) :
       Real.log ((joint s).mass x) = ∑ r, Real.log ((s r).mass (x r)) := by
     intro s x
     exact Real.log_prod (fun r _ => ((s r).positive (x r)).ne')
-  rw [klDivergence_eq_logDifference]
+  rw [PositiveProbabilitySection.klDivergence_eq_logDifference]
   simp_rw [hlog, ← Finset.sum_sub_distrib, Finset.mul_sum]
   rw [Finset.sum_comm]
   refine Finset.sum_congr rfl fun r _ => ?_
-  rw [klDivergence_eq_logDifference]
+  rw [PositiveProbabilitySection.klDivergence_eq_logDifference]
   exact joint_marginal p r (fun i => Real.log ((p r).mass i) - Real.log ((q r).mass i))
 
 /-- [proved-derived; formal-checked] `N` readings, each carrying at most `B`, carry at most `N·B`. -/
@@ -422,7 +421,7 @@ theorem exp_neg_half_kl_le (P Q : PositiveProbabilitySection Ω) :
   have hj := convexOn_exp.map_sum_le (t := Finset.univ) (w := P.mass) (p := y)
     (fun i _ => P.nonnegative i) P.normalized (fun i _ => Set.mem_univ _)
   have hl : ∑ i, P.mass i • y i = -P.klDivergence Q / 2 := by
-    rw [klDivergence_eq_logDifference, neg_div, Finset.sum_div, ← Finset.sum_neg_distrib]
+    rw [PositiveProbabilitySection.klDivergence_eq_logDifference, neg_div, Finset.sum_div, ← Finset.sum_neg_distrib]
     refine Finset.sum_congr rfl fun i _ => ?_
     simp only [smul_eq_mul, y]
     ring
@@ -595,11 +594,14 @@ theorem codeLength_shift_sum_le {ρ : Type*} [Fintype ρ] (f δ : ρ → ι → 
         Finset.abs_sum_le_sum_abs _ _
     _ ≤ ∑ _r : ρ, (b - a) :=
         Finset.sum_le_sum fun r _ => codeLength_shift_abs_le (f r) (δ r) (ha r) (hb r) (t r)
-    _ = Fintype.card ρ * (b - a) := by simp
+    _ = Fintype.card ρ * (b - a) := by rw [Finset.sum_const, Finset.card_univ, nsmul_eq_mul]
 
 end Code
 
 /-! ## 6. The station score's curvature and the grain lemma -/
+
+theorem log_two_bounds : (0.6931471803 : ℝ) < Real.log 2 ∧ Real.log 2 < 0.6931471808 :=
+  ⟨Real.log_two_gt_d9, Real.log_two_lt_d9⟩
 
 section Curvature
 
@@ -660,7 +662,7 @@ theorem codeLength_quadratic_upper (f δ : ι → ℝ) (t : ι) :
       have : 0 ≤ ∑ c, δ c ^ 2 := Finset.sum_nonneg fun c _ => sq_nonneg _
       nlinarith
     · have hpair : δ i₁ ^ 2 + δ i₂ ^ 2 ≤ ∑ c, δ c ^ 2 := by
-        rw [← Finset.sum_pair h]
+        rw [← Finset.sum_pair (f := fun c => δ c ^ 2) h]
         exact Finset.sum_le_sum_of_subset_of_nonneg (Finset.subset_univ _)
           (fun _ _ _ => sq_nonneg _)
       nlinarith [sq_nonneg (δ i₁ + δ i₂)]
@@ -677,6 +679,7 @@ theorem codeLength_quadratic_upper (f δ : ι → ℝ) (t : ι) :
   have := hdiff
   linarith [hlogT]
 
+omit [Nonempty ι] [DecidableEq ι] in
 /-- [proved-derived; formal-checked] **The station score's curvature, phase part.** The
 alignment cost `½ Σ_c q_c Δ_c²`, `Δ_c = φ^T_c − y_c/2`, is exactly quadratic in the imaginary
 logits `y`: along `y + h` it moves by its slope `−½ q_c Δ_c` and curvature `q_c/4`. -/
@@ -689,11 +692,11 @@ theorem alignCost_quadratic (q φT y h : ι → ℝ) :
   ring
 
 /-- [proved-derived; formal-checked] **The whole station score's curvature.** With the target
-weights `0 ≤ q_c ≤ 1`, the magnitude score plus the alignment cost obeys the quadratic upper model
+weights `q_c ≤ 1`, the magnitude score plus the alignment cost obeys the quadratic upper model
 in all its realified logits `(f, y)` with the one curvature `ln 2/2`: the phase part's `q_c/4 ≤ ¼`
 lies below it. -/
 theorem station_score_quadratic_upper (f δ : ι → ℝ) (t : ι) (q φT y h : ι → ℝ)
-    (hq0 : ∀ c, 0 ≤ q c) (hq1 : ∀ c, q c ≤ 1) :
+    (hq1 : ∀ c, q c ≤ 1) :
     codeLength (fun c => f c + δ c) t + alignCost q φT (fun c => y c + h c) ≤
       codeLength f t + alignCost q φT y +
         (∑ c, ((face fun c => f c * Real.log 2).mass c - if c = t then 1 else 0) * δ c +
@@ -775,7 +778,7 @@ theorem grain_lemma {L : ℕ} (hL : 0 < L) (v v' : ι → ℝ)
   have hLpos : (0 : ℝ) < L := by exact_mod_cast hL
   have hδ : ∀ c, |v' c - v c| < 1 / L := by
     intro c
-    obtain ⟨-, hk0, hkL, -, -, hiff, -⟩ := face_constant_on_fibre hL (v c)
+    obtain ⟨-, hk0, hkL, -, -, hiff, -⟩ := face_constant_on_fibre.{0, 0} hL (v c)
     have hself := (hiff (grainRead L (v c)).1 (grainRead L (v c)).2 (v c) hk0 hkL).mp rfl
     have hother := (hiff (grainRead L (v c)).1 (grainRead L (v c)).2 (v' c) hk0 hkL).mp
       (hcell c)
@@ -809,7 +812,7 @@ theorem grain_lemma_tight (t : ℝ) :
   have hmass : ∀ b : Bool, (face fun _ : Bool => (0 : ℝ) * Real.log 2).mass b = 1 / 2 := by
     intro b
     norm_num [face, partition, Fintype.sum_bool]
-  simp only [hmass, Fintype.sum_bool, eq_self_iff_true, if_true, Bool.false_eq_true, if_false]
+  simp only [hmass, Fintype.sum_bool, if_true, Bool.false_eq_true, if_false]
   have hc : 1 / 2 * Real.exp (t * Real.log 2) + 1 / 2 * Real.exp (-t * Real.log 2) =
       Real.cosh (t * Real.log 2) := by
     rw [Real.cosh_eq, neg_mul]
@@ -830,7 +833,7 @@ theorem grain_unconfirmable {ρ : Type*} [Fintype ρ] [DecidableEq ρ] {L : ℕ}
         (joint fun r => face fun i => v' r i * Real.log 2) / Real.log 2 < 1 := by
   have hl : 0 < Real.log 2 := Real.log_pos (by norm_num)
   have hLpos : (0 : ℝ) < L := by exact_mod_cast hL
-  haveI : Nonempty ρ := Fintype.card_pos_iff.mp hρ
+  have : Nonempty ρ := Fintype.card_pos_iff.mp hρ
   rw [klDivergence_joint, Finset.sum_div]
   have hlt : ∑ r, (face fun i => v r i * Real.log 2).klDivergence
         (face fun i => v' r i * Real.log 2) / Real.log 2 <
@@ -868,8 +871,6 @@ end Grain
 
 section Campaign
 
-theorem log_two_bounds : (0.6931471803 : ℝ) < Real.log 2 ∧ Real.log 2 < 0.6931471808 :=
-  ⟨Real.log_two_gt_d9, Real.log_two_lt_d9⟩
 
 /-- [proved-derived; formal-checked] **The resolution at one aeon.** With `N = 1190` readings and
 the one-bit criterion, `√(2/(1190 ln 2))` lies in `(1/21, 1/20)`. -/
@@ -909,7 +910,7 @@ theorem measured_change_readings (N : ℝ) (h : 1 ≤ N * (Real.log 2 / 2 * (7 /
   obtain ⟨_, hhi⟩ := log_two_bounds
   have hN : 0 ≤ N := by
     by_contra hneg
-    push_neg at hneg
+    replace hneg := not_le.mp hneg
     have : N * (Real.log 2 / 2 * (7 / 2 ^ 18) ^ 2) < 0 :=
       mul_neg_of_neg_of_pos hneg (by positivity)
     linarith

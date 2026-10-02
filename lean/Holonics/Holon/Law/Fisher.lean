@@ -74,12 +74,12 @@ theorem softmaxJacobian_quadratic (p w : ι → ℝ) :
 theorem softmaxJacobian_quadratic_eq_variance (p w : ι → ℝ) (h1 : ∑ i, p i = 1) :
     w ⬝ᵥ (softmaxJacobian p *ᵥ w) = ∑ i, p i * (w i - ∑ j, p j * w j) ^ 2 := by
   rw [softmaxJacobian_quadratic]
-  set m := ∑ j, p j * w j
-  have : ∑ i, p i * (w i - m) ^ 2 = ∑ i, p i * w i ^ 2 - 2 * m * m + m ^ 2 * ∑ i, p i := by
-    rw [Finset.mul_sum, Finset.mul_sum, ← Finset.sum_sub_distrib, ← Finset.sum_add_distrib]
-    refine Finset.sum_congr rfl fun i _ => ?_
-    ring
-  rw [this, h1]
+  obtain ⟨m, hm⟩ : ∃ m, m = ∑ j, p j * w j := ⟨_, rfl⟩
+  rw [← hm]
+  have e : ∀ i, p i * (w i - m) ^ 2 = p i * w i ^ 2 - 2 * m * (p i * w i) + m ^ 2 * p i :=
+    fun i => by ring
+  rw [Finset.sum_congr rfl fun i _ => e i, Finset.sum_add_distrib, Finset.sum_sub_distrib,
+    ← Finset.mul_sum, ← Finset.mul_sum, ← hm, h1]
   ring
 
 theorem softmaxJacobian_quadratic_nonneg (p w : ι → ℝ) (hp : ∀ i, 0 ≤ p i) (h1 : ∑ i, p i = 1) :
@@ -140,11 +140,13 @@ def lockScore (θ : ∀ j, σ j → ℝ) (t : ∀ j, σ j) (D : ∀ j, Matrix (�
 def lockStep (θ : ∀ j, σ j → ℝ) (t : ∀ j, σ j) (D : ∀ j, Matrix (σ j) τ ℝ) : τ → ℝ :=
   -((lockFisher θ D)⁻¹ *ᵥ lockScore θ t D)
 
+omit [Fintype τ] [DecidableEq τ] in
 theorem lockFisher_transpose (θ : ∀ j, σ j → ℝ) (D : ∀ j, Matrix (σ j) τ ℝ) :
     (lockFisher θ D)ᵀ = lockFisher θ D := by
   simp only [lockFisher, transpose_sum, transpose_mul, transpose_transpose,
     softmaxJacobian_transpose, Matrix.mul_assoc]
 
+omit [DecidableEq τ] in
 /-- [proved-derived; formal-checked] **The variance identity.** `vᵀ G v = Σ_j (D_j v)ᵀ J_θj (D_j v)`,
 the sum over locks of the variance of the log readings `D_j v` (`softmaxJacobian_quadratic_eq_variance`). -/
 theorem lockFisher_quadratic (θ : ∀ j, σ j → ℝ) (D : ∀ j, Matrix (σ j) τ ℝ) (v : τ → ℝ) :
@@ -154,12 +156,14 @@ theorem lockFisher_quadratic (θ : ∀ j, σ j → ℝ) (D : ∀ j, Matrix (σ j
   refine Finset.sum_congr rfl fun j _ => ?_
   rw [← mulVec_mulVec, ← mulVec_mulVec, dotProduct_mulVec, vecMul_transpose]
 
+omit [DecidableEq τ] in
 theorem lockFisher_quadratic_nonneg (θ : ∀ j, σ j → ℝ) (D : ∀ j, Matrix (σ j) τ ℝ)
     (hθ : ∀ j x, 0 ≤ θ j x) (h1 : ∀ j, ∑ x, θ j x = 1) (v : τ → ℝ) :
     0 ≤ v ⬝ᵥ (lockFisher θ D *ᵥ v) := by
   rw [lockFisher_quadratic]
   exact Finset.sum_nonneg fun j _ => softmaxJacobian_quadratic_nonneg _ _ (hθ j) (h1 j)
 
+omit [DecidableEq τ] in
 /-- [proved-derived; formal-checked] **The kernel of the quadratic form.** With positive faces and
 a resting sheet `rest j` whose row is zero, `vᵀGv = 0` exactly when every lock reads nothing of `v`. -/
 theorem lockFisher_quadratic_eq_zero_iff (θ : ∀ j, σ j → ℝ) (D : ∀ j, Matrix (σ j) τ ℝ)
@@ -183,6 +187,7 @@ theorem lockFisher_quadratic_eq_zero_iff (θ : ∀ j, σ j → ℝ) (D : ∀ j, 
     rw [h j]
     simp
 
+omit [DecidableEq τ] in
 /-- [proved-derived; formal-checked] **The kernel**: `G v = 0` exactly when `D_j v = 0` for every
 lock, `ker G = ∩_j ker D_j`. -/
 theorem lockFisher_mulVec_eq_zero_iff (θ : ∀ j, σ j → ℝ) (D : ∀ j, Matrix (σ j) τ ℝ)
@@ -198,6 +203,7 @@ theorem lockFisher_mulVec_eq_zero_iff (θ : ∀ j, σ j → ℝ) (D : ∀ j, Mat
     refine Finset.sum_eq_zero fun j _ => ?_
     rw [← mulVec_mulVec, h j, mulVec_zero]
 
+omit [DecidableEq τ] in
 /-- [proved-derived; formal-checked] **The step's domain.** `G ≻ 0` exactly when no nonzero plane
 direction is unread by every lock. -/
 theorem lockFisher_posDef_iff (θ : ∀ j, σ j → ℝ) (D : ∀ j, Matrix (σ j) τ ℝ)
@@ -234,6 +240,7 @@ theorem lockStep_unique (θ : ∀ j, σ j → ℝ) (t : ∀ j, σ j) (D : ∀ j,
   have hu : IsUnit (lockFisher θ D).det := (hG.det_pos).ne'.isUnit
   rw [lockStep, ← mulVec_neg, ← hx, mulVec_mulVec, nonsing_inv_mul _ hu, one_mulVec]
 
+omit [DecidableEq τ] in
 /-- [proved-derived; formal-checked] **Off the domain the step is undetermined.** If a nonzero
 direction `v` is unread by every lock, any solution of `G x = −g` moved along `v` is another. -/
 theorem lockStep_undetermined (θ : ∀ j, σ j → ℝ) (t : ∀ j, σ j) (D : ∀ j, Matrix (σ j) τ ℝ)
@@ -245,11 +252,13 @@ theorem lockStep_undetermined (θ : ∀ j, σ j → ℝ) (t : ∀ j, σ j) (D : 
 
 /-! ## 3. Chart invariance -/
 
+omit [DecidableEq τ] in
 /-- [proved-derived; formal-checked] A change of plane coordinates `S` moves `G` to `SᵀGS`. -/
 theorem lockFisher_rechart (θ : ∀ j, σ j → ℝ) (D : ∀ j, Matrix (σ j) τ ℝ) (S : Matrix τ τ ℝ) :
     lockFisher θ (fun j => D j * S) = Sᵀ * lockFisher θ D * S := by
   simp only [lockFisher, Finset.mul_sum, Finset.sum_mul, transpose_mul, Matrix.mul_assoc]
 
+omit [DecidableEq τ] in
 /-- [proved-derived; formal-checked] …and `g` to `Sᵀ g`. -/
 theorem lockScore_rechart (θ : ∀ j, σ j → ℝ) (t : ∀ j, σ j) (D : ∀ j, Matrix (σ j) τ ℝ)
     (S : Matrix τ τ ℝ) :
@@ -262,7 +271,8 @@ theorem lockStep_rechart (θ : ∀ j, σ j → ℝ) (t : ∀ j, σ j) (D : ∀ j
     (S : Matrix τ τ ℝ) (hS : IsUnit S.det) :
     lockStep θ t (fun j => D j * S) = S⁻¹ *ᵥ lockStep θ t D := by
   have hST : IsUnit Sᵀ.det := by rwa [det_transpose]
-  rw [lockStep, lockStep, lockFisher_rechart, lockScore_rechart, mul_inv_rev, mul_inv_rev,
+  rw [lockStep, lockStep, lockFisher_rechart, lockScore_rechart, Matrix.mul_inv_rev,
+    Matrix.mul_inv_rev,
     mulVec_neg, mulVec_mulVec, mulVec_mulVec]
   congr 2
   simp only [Matrix.mul_assoc, nonsing_inv_mul _ hST, Matrix.mul_one]
