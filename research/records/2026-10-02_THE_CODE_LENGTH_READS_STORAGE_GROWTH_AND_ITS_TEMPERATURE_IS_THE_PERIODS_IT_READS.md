@@ -84,7 +84,9 @@ shares become
 
 a Gibbs state at inverse temperature `n` over the levels `−κ_x`. **The temperature is the
 reciprocal of the number of turns the lock is read over.** The release reads one turn
-(`read_turn` multiplies exactly `schedule.period()` crossings), so the inverse temperature is `1`.
+(`read_turn` multiplies exactly `schedule.period()` crossings), so the lock face's class shares are
+at inverse temperature `1`. This is the class shares' temperature only: the order in which the
+release commits its stations is read at zero temperature (#225, Lean `HNN/OrderTemperature`).
 Nothing declares it as a constant and no bath sets it: it is fixed by the receiver's clock, one
 decision per passage. In storage exponents (`2κ`) the inverse temperature is `½` per turn, the
 same `½` as the amplitude face of a ratio of Holons, `log(ψ_T/ψ_H) = ½ log(q/p)`: the lock reads
