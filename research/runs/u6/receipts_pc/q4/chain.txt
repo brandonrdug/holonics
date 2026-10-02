@@ -46,3 +46,13 @@ move 13: probe exit 0;   q413 kinetic-modulus: the incumbent: ρ 100025/131072; 
 move 14: probe exit 0;   q414 kinetic-modulus: the incumbent: ρ 794593/1048576; L ∈ [197074/4096, 197078/4096) nats, X ∈ [52391/4096, 52394/4096) nats; solved 38 of 64; whole 1 (released 8, stations right 39); 285693 ms
       trials: η 1/8 ρ 792691/1048576 mask [168895/4096, 168899/4096) own [223884/4096, 223888/4096) adopted; γ_ρ [471781/4096, 471782/4096)
   run move 3: dopted successor's own release: ρ 792691/1048576; L ∈ [223884/4096, 223888/4096) nats, X ∈ [74930/4096, 74933/4096) nats; solved 30 of 64; whole 1 (released 8, stations right 29); 285694 ms; open
+move 15: probe exit 0;   q415 kinetic-modulus: the incumbent: ρ 792691/1048576; L ∈ [223884/4096, 223888/4096) nats, X ∈ [74930/4096, 74933/4096) nats; solved 30 of 64; whole 1 (released 8, stations right 29); 408061 ms
+      trials: η 1/8 ρ 788569/1048576 mask [187250/4096, 187254/4096) own [228935/4096, 228939/4096) adopted; γ_ρ [-932439/4096, -932438/4096)
+  run move 4: dopted successor's own release: ρ 788569/1048576; L ∈ [228935/4096, 228939/4096) nats, X ∈ [87022/4096, 87025/4096) nats; solved 31 of 64; whole 0 (released 8, stations right 26); 408063 ms; open
+move 16: probe exit 0;   q416 kinetic-modulus: the incumbent: ρ 788569/1048576; L ∈ [228935/4096, 228939/4096) nats, X ∈ [87022/4096, 87025/4096) nats; solved 31 of 64; whole 0 (released 8, stations right 26); 424447 ms
+      trials: η 1/16 ρ 197629/262144 mask [204323/4096, 204327/4096) own [206600/4096, 206604/4096) adopted; γ_ρ [-1170463/4096, -1170462/4096)
+  run move 5: dopted successor's own release: ρ 197629/262144; L ∈ [206600/4096, 206604/4096) nats, X ∈ [63155/4096, 63158/4096) nats; solved 31 of 64; whole 1 (released 8, stations right 31); 424448 ms; open
+  the limit was reached inside an open run
+  restored the held state out/q4/q411/q411-kinetic-modulus.state (sha256 7edee37f6b0cac0575c113acdb7d29bc8bcfa972ba18207536d30de33c0210be, unchanged)
+final state out/q4/q411/q411-kinetic-modulus.state
+run done
