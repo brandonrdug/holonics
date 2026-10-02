@@ -81,6 +81,10 @@ codeLength(z + Δ) ≤ codeLength(z) + ⟨g, Δ⟩ + (ln 2/2) · 2^(osc Δ) · V
    second-derivative bound `hnn::constitution::receiving_fisher_face` reads along the unit step;
    the first-order term here is still the face's `⟨p − e_t, Δ⟩`, while the Rust step pairs the
    odometer covector `p̃ − q`, whose shortfall is `HNN/Ratio/Resolution.odometer_pairing_ratio`.
+   The `17/16` holds at the grain representative only. Off the grain the factor is
+   `2^(1/L)·2/(e ln 2)`, below `8/7` at `L = 16` (`Resolution.face_mass_le_odometer`,
+   `Resolution.odometer_ratio_sixteen`), and the second-derivative constant would be
+   `2 ln 2·(8/7) ≤ 8/5`, not `119/80`.
 
 [definition] The factor `2^ω` is the price of reading the curvature at the current face instead
 of along the whole step: as `ω → 0` the model is the second-order Taylor model

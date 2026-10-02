@@ -6109,8 +6109,10 @@ pub(crate) fn receiving_class_metric(samples: &[Sample]) -> Option<Rat> {
 /// `2^(osc Δ)`, `osc Δ = max Δ − min Δ`, so along the whole ray `[0, η]` with `η · osc ≤ 1` the
 /// second derivative is at most `2 ln 2 · Var_p(Δ)` (the bound `f(v + Δ) ≤ f + gᵀΔ +
 /// (e^(osc)/2) Var_p(Δ)` in nats, carried to bits). The covector's masses are the odometer chart
-/// `p̃` (`p̃ − q`, the HNN adjoint's), and on the grain `p_c/p̃_c ≤ 2/(e ln 2) < 17/16`
-/// (`2^x/(1 + x)` lies in `[e ln 2/2, 1]` on `[0, 1]`), so
+/// `p̃` (`p̃ − q`, the HNN adjoint's), and at the grain representative
+/// `p_c/p̃_c ≤ 2/(e ln 2) < 17/16` (`2^x/(1 + x)` lies in `[e ln 2/2, 1]` on `[0, 1]`; off the
+/// grain the factor is `2^(1/L)·2/(e ln 2) < 8/7` at `L = 16`, and the constant below would be
+/// `8/5`), so
 /// `Var_p(Δ) ≤ E_p[(Δ − E_p̃ Δ)²] ≤ (17/16) Var_p̃(Δ)`. The phase part's curvature is at most `¼`
 /// (module header, "The certified step"). With `ln 2 ≤ 7/10`, each read's curvature
 /// along the unit step `Δ_t = D f_t` is at most `(119/80) Var_p̃(Δ_t^Re) + ¼ |Δ_t^Im|²`. The
