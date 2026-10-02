@@ -74,3 +74,13 @@ is fixed and is not raised.
 
 Gate: w16's held-out combined code below m6's by at least `1024·1/16 = 64` bits. Report the held-out and
 training lines whole.
+
+## P5. The joint held-out read of the three move-16 states (waits on all three)
+
+When Q2's Coordinate chain, Q2's Kinetic control and the throw chain (#240) each store their move-16
+state, the main line names the three paths here, and the PC reads them in one call at 16 threads:
+```
+RAYON_NUM_THREADS=16 timeout <3·(3·566219) ms, in s> $B executed evaluate order2 2026093012 128 out/p5-move16 coord16=<path> kin16=<path> throw16=<path>
+```
+The deadline is three times the measured 566219 ms per state at 16 threads, times three states:
+`timeout 5096`. Report whole sections and stations right by station for each state.
