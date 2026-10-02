@@ -67,12 +67,13 @@ tree       −log₂ ∏_t q_0(x_t) ≤ −log₂ prior_w(S)
    normalized sequential code using only past data. The order is necessary
    (`deposit_first_overcounts`): a root base read after the arrival's own deposit gives either
    digit `11/16` on an empty passage at `j = 3`, `11/8` in all.
-4. **The floor** (`basedFace_ge`, `rootBase_face_ge`, `rootBase_path_face_ge`): with each base
-   mass at least `¼`, a node with at most `n*` arrivals reads each digit value at least at
-   `1/(2(2^j n* + 2))`, and so does the opened path's face at every depth under any stop weights in
-   `[0, 1]`. This is the doubled floor the Rust's `based_floor` gives `face_bits_at`. It does not
-   depend on the depth. `basedFace_ge` reads only the node's own base mass, so the floor holds for
-   any base with every mass at least `¼` at every node.
+4. **The floor** (`basedFace_ge`, `rootBase_face_ge`, `rootBase_path_face_ge`,
+   `basedPath_face_ge`): with each base mass at least `¼`, a node with at most `n*` arrivals reads
+   each digit value at least at `1/(2(2^j n* + 2))`, and so does the opened path's face at every
+   depth under any stop weights in `[0, 1]`. This is the doubled floor the Rust's `based_floor`
+   gives `face_bits_at`. It does not depend on the depth. `basedFace_ge` reads only the node's own
+   base mass, so the floor holds for any base with every mass at least `¼` at every node, on the
+   opened path too (`basedPath_face_ge`).
 5. **The widths at depth 63** (`campaign_face_bits`, `campaign_carrier_bits`,
    `campaign_mass_operand`, `campaign_operands`, `campaign_rule_floor`): campaign 1's `M_p = 50` (one more than the even
    base's 49), `W = 37`, `κ = 20` bits of `16(2^3·6148 + 2)`, so the β step's mantissa division
@@ -364,6 +365,26 @@ theorem rootBase_path_face_ge {Ltr : Type*} (j : ℕ) (n0 : Bool → ℕ) (N : T
   intro d hd
   exact (path_face_ge_min _ lam D b hl).1 _ d hd fun d' _ h2 =>
     rootBase_face_ge j n0 (N (a.take d')) (hn d' h2) b
+
+/-- [proved-derived; formal-checked] **`basedPath_face_ge`: the path's floor at any per-node
+base.** If the node at depth `d` of the opened path reads its own base `π d`, every mass at least
+`¼`, and holds at most `n` arrivals, the path face at every depth is at least `1/(2(2^j n + 2))`
+under any stop weights `λ_d ∈ [0, 1]`. `rootBase_path_face_ge` is the case of one base shared by
+the path. -/
+theorem basedPath_face_ge {Ltr : Type*} (j : ℕ) (π : ℕ → Bool → ℚ)
+    (hπ : ∀ d b, 1 / 4 ≤ π d b) (N : TreeStanding Ltr Bool) (lam : ℕ → ℚ) (D : ℕ)
+    (hl : ∀ d < D, 0 ≤ lam d ∧ lam d ≤ 1) (a : List Ltr) (n : ℕ)
+    (hn : ∀ d ≤ D, N (a.take d) true + N (a.take d) false ≤ n) (b : Bool) :
+    ∀ d ≤ D, 1 / (2 * (2 ^ j * (n : ℚ) + 2)) ≤
+      pathFace (fun d => basedFace j (π d) (N (a.take d))) lam D d b := by
+  intro d hd
+  have hd0 : (0 : ℚ) < 2 ^ j * (n : ℚ) + 2 := by positivity
+  have hfloor : 1 / (2 * (2 ^ j * (n : ℚ) + 2)) = 2 * (1 / 4) / (2 ^ j * (n : ℚ) + 2) := by
+    field_simp
+    ring
+  exact (path_face_ge_min _ lam D b hl).1 _ d hd fun d' _ h2 => by
+    rw [hfloor]
+    exact basedFace_ge j (by norm_num) (N (a.take d')) (hn d' h2) b (hπ d' b)
 
 /-! ### 4. The widths at campaign 1's depth 63 -/
 
@@ -895,6 +916,7 @@ section Audit
 #print axioms basedFace_ge
 #print axioms rootBase_face_ge
 #print axioms rootBase_path_face_ge
+#print axioms basedPath_face_ge
 #print axioms campaign_face_bits
 #print axioms campaign_carrier_bits
 #print axioms campaign_mass_operand
