@@ -62,13 +62,18 @@ cell       |ln q̂_0 − ln q_0| ≤ Σ_(levels ≤ L) θ_i + Σ_(levels < L) |l
 5. **One cell** (`level_read_drift`): over the stored levels of a read, the face departs by the
    levels' roundings and their split masses' drifts (`Drift.node_face_drift` down the levels), each
    at most its bottom's `tot` (item 2).
-6. **The per-cell count of mantissa units** (`arrivalUnits`, `rebases_below`, `arrival_units_le`,
-   `levels_units`, `cell_units`, `rule_units`): one arrival charges a stored level with bottom
-   `b < D` at most `2(D − b) − 1 + 4` units (its own rebase, twice each rebase below, which have
-   distinct bottoms in `(b, D)`, and at most `4` from its one split); a read's levels have
-   distinct bottoms below `D`, so with at most `n*` arrivals a level a cell carries at most
-   `n* D² + 4n* D` units a digit, within the rule's `n* P² + max((n* + 1) P², 4n* P)` for `D ≤ P`,
-   which is `(2n* + 1) P²` for `P ≥ 4`; at `P = 1` the count `(n* + 1) P²` alone is short
+6. **The per-cell count of mantissa units** (`carriedAfter`, `arrivalUnits`, `walk_units`,
+   `arrivalUnits_add`, `unit_le`, `rebases_below`, `arrival_units_le`, `levels_units`,
+   `cell_units`, `rule_units`): the Rust's bottom-first walk charges a stored level its own rebase,
+   twice every rebase and split below it, and the face roundings, in closed form (`walk_units`);
+   each rebase or split rounding is at most one unit (`unit_le`), and the walk is linear in its
+   rebases, so mantissa and carrier releases count apart (`arrivalUnits_add`). One arrival
+   charges a level with bottom `b < D` at most `U(2(D − b) − 1) + 4V` (rebases below have
+   distinct bottoms in `(b, D)`; its one split at most `4V`); a read's levels have distinct
+   bottoms below `D`, so with at most `n*` arrivals a level a cell carries at most
+   `n*(U D² + 4V D)`: `n* D² + 4n* D` mantissa units a digit (`U = V = 1`), within the rule's
+   `n* P² + max((n* + 1) P², 4n* P)` for `D ≤ P`, which is `(2n* + 1) P²` for `P ≥ 4`, and
+   `n* D²` carrier units (`V = 0`); at `P = 1` the count `(n* + 1) P²` alone is short
    (`rule_units_shallow`).
 
 [agent-inferred] **The instance** (Rust `compression::landmark::context`, the host `Arena` and its
@@ -101,24 +106,29 @@ Rust's read of its arena as `execFrom` stays agent-inferred there.
   and `2(u + ℓ)` to the increment it carries up (`split_charge`). Before this owner the Rust added
   `u` to the upper part's drift and `u + ℓ` to the increment; it now adds the proved charges, which
   only enlarge the certificates and change no face.
-- **The per-cell rule** (`Landmarks::face_rule`), counted by item 6. The instance of
-  `arrivalUnits`: `r_m` is `Law::apply_branch`'s mantissa rebase at level `m` (`⌈2^C/m'⌉` with
-  `m' ≥ 2^(W−1)`, one unit of `2^(1−W)`, taken only at `level < top`, so never at a leaf's bottom
-  `D`); `s_p = u + ℓ` is `Parting::units` at the parting level `p`, carried up twice in the
-  increment; `o_p = u + 2ℓ` is `Law::part`'s addition to the upper part's drift (one unit each,
-  `u = ℓ = 0` where a part keeps its chart, `s_p = o_p ≤ 1` at a leaf's founding). The lower part,
-  off the arrival's path, takes `ℓ ≤ 1` (`Law::part`'s `lower_units`): that unit is the splitting
+- **The per-cell rule** (`Landmarks::face_rule`), counted by item 6. The instance is the Rust's
+  own loop: `carriedAfter` is `Law::apply_branch`'s `carried` over `for level in (0..levels).rev()`
+  (`increment = theta + 2·rebase + carried + 2·split`), and the drift it adds at a level is
+  `carried + rebase`, plus `Law::part`'s `o_p` at the parting level; `walk_units` is that sum in
+  closed form. `r_k` is the level's `rebase` (taken only at `level < top`, so never at a leaf's
+  bottom `D`), the sum of a mantissa rebase `⌈2^C/m'⌉` (`m'` of exactly `W` bits) and a carrier
+  release `⌈2^C/D̂⌉` (`D̂` of `R` bits) on `2^(−C)`, at most `2^(C+1−W)` and `2^(C+1−R)`
+  (`unit_le`), i.e. one unit of `2^(1−W)` and of `2^(1−R)`; `arrivalUnits_add` splits the two.
+  `s_p = u + ℓ` is `Parting::units` at the parting level `p`, carried up twice; `o_p = u + 2ℓ` is
+  `Law::part`'s addition to the upper part's drift (each rounding at most one unit, `u = ℓ = 0`
+  where a part keeps its chart, `s_p = o_p ≤ 1` at a leaf's founding). The lower part, off the
+  arrival's path, takes `ℓ ≤ 1` (`Law::part`'s `lower_units`): that unit is the splitting
   arrival's, which never passes through the lower part, so a level's drift holds the units of its
   own arrivals and one unit for each arrival that split its chain above it, distinct arrivals of
-  the passage (`cell_units`, with a charge of `1 ≤ 2(D − b) − 1 + 4` for the latter). Each part
-  inherits the chain's drift: the lower part keeps the chain's bottom, and the upper part's earlier
-  charges were bounded at the chain's deeper bottom by a smaller value. An arrival charges a level
-  once, so `n*` bounds the arrivals a level counts. Per cell at most `n* D² + 4 n* D` units against
-  the rule's `n* P² + max((n* + 1) P², 4 n* P)` (`mantissa_units`, `P ≥ D` the path depth), which
-  is `(2n* + 1) P²` for `P ≥ 4` (the count `(n* + 1) P²` alone is short of `4 n* P` at `P ≤ 3`,
-  where the maximum can widen `W`: at `n* = 6,148`, `D = 1`, `W = 26` against `25`). A carrier
-  release (`ρ_c`) is taken at the same steps as a mantissa rebase, with no split, so its count is
-  item 6's without the `4`: the rule's `n* P²`. At campaign 1's `D = 63`
+  the passage (`cell_units`, with a charge of `1 ≤ U(2(D − b) − 1) + 4V` for the latter). Each
+  part inherits the chain's drift: the lower part keeps the chain's bottom, and the upper part's
+  earlier charges were bounded at the chain's deeper bottom by a smaller value. An arrival charges
+  a level once, so `n*` bounds the arrivals a level counts. Per cell at most `n* D² + 4 n* D`
+  mantissa units against the rule's `n* P² + max((n* + 1) P², 4 n* P)` (`mantissa_units`,
+  `P ≥ D` the path depth), which is `(2n* + 1) P²` for `P ≥ 4` (the count `(n* + 1) P²` alone is
+  short of `4 n* P` at `P ≤ 3`, where the maximum can widen `W`: at `n* = 6,148`, `D = 1`,
+  `W = 26` against `25`). The carrier releases take no split, so their count is `cell_units` at
+  `V = 0`: the rule's `n* P²` (`ρ_c`). At campaign 1's `D = 63`
   (`P = 63`, `n* = 6,148 = 2²·29·53`) the widths stay the rule's, `M_p = 49` at the even base
   (`50` at the root's, `BaseMeasure.campaign_face_bits`), `W = 37`, and the
   per-cell read stays within a quarter grain per source; the per-cell `D²` term gives a usable
@@ -134,7 +144,7 @@ tree is Willems's unbounded-depth storage (1998). The proofs here are this owner
 | the passage | `stored_passage` | `Chart::excess` (the root's), `Landmarks::deposit` |
 | a step, a read, a split | `carried_step`, `read_jump`, `off_jump`, `up_path`, `split_effect`, `split_charge` | `Law::apply_branch`, `Law::part`, `Beta::split`, `hnn_tree_deposit` |
 | one cell over the stored levels | `level_read_drift` | `CellReading::residual`, `Landmarks::face_rule` |
-| the per-cell count of mantissa units | `arrivalUnits`, `rebases_below`, `arrival_units_le`, `levels_units`, `cell_units`, `rule_units` | `Law::apply_branch`, `Law::part`, `mantissa_units`, `Landmarks::face_rule` |
+| the per-cell count of mantissa units | `carriedAfter`, `arrivalUnits`, `walk_units`, `arrivalUnits_add`, `unit_le`, `rebases_below`, `arrival_units_le`, `levels_units`, `cell_units`, `rule_units` | `Law::apply_branch`, `Law::part`, `mantissa_units`, `Landmarks::face_rule` |
 
 No `sorry`, no `axiom`, no `native_decide`.
 -/
@@ -567,91 +577,144 @@ theorem level_read_drift (L : ℕ) (E E' P Q q qh θ : ℕ → ℝ) (hE : ∀ i,
 /-! ### The per-cell count of mantissa units
 
 The rule's `U = n* P² + max((n* + 1) P², 4n* P)` (Rust `mantissa_units`) counts, per digit, the
-units of `2^(1−W)` a cell's read can carry in its stored levels' drifts: one per mantissa rebase,
-one per rounding of a split part. One arrival's deposit (`Law::apply_branch`) walks its path's
-stored levels `m = 0, …, L − 1` bottom-up: level `m` adds the carried increment from below and its
-own rebase `r_m` to its drift, and carries up `θ_m + 2r_m + 2s_m` plus the carried increment, with
-`s_m = u + ℓ` the split's two roundings at the parting level (`split_charge`); the parting level's
-upper part also takes `o = u + 2ℓ` into its drift (`Law::part`). The `θ` are the face roundings,
-counted apart (the rule's `ε/μ̂` term), so in units the arrival charges level `ℓ`
+units of `2^(1−W)` a cell's read can carry in its stored levels' drifts. One arrival's deposit
+(`Law::apply_branch`) walks its path's stored levels **bottom first**, as the Rust's
+`for level in (0..levels).rev()` does. Level `k` (the `k`-th from the bottom) adds the carried
+increment `carried_k` and its own rebase `r_k` to its drift, and carries up
+`θ_k + 2r_k + carried_k + 2s_k`, with `s_k = u + ℓ` the split's two roundings at the parting level
+(`split_charge`); the parting level's upper part also takes `o = u + 2ℓ` into its drift before the
+walk (`Law::part`). In closed form (`walk_units`) level `k` takes
 
 ```text
-arrivalUnits ℓ = r_ℓ + o_ℓ + Σ_(ℓ < m < L) 2 (r_m + s_m) .
+carried_k + r_k + o_k  =  arrivalUnits k + Σ_(i<k) θ_i ,   arrivalUnits k = r_k + o_k + Σ_(i<k) 2 (r_i + s_i) ,
 ```
 
-A rebase is taken only at a level read below its stored bottom (`level < top`), so a level whose
-bottom is the declared depth `D` (a leaf) takes none; the bottoms rise strictly down a path. -/
+the `θ` being the face roundings, counted apart (the rule's `ε/μ̂` term). A rebase is taken only at a
+level read below its stored bottom (`level < top`), so a level whose bottom is the declared depth `D`
+(a leaf) takes none; the bottoms fall strictly from the bottom level up. Each Rust rebase is
+`⌈2^C/m⌉` on `2^(−C)` with `m` a `W`-bit mantissa, at most one unit `2^(C+1−W)` (`unit_le`), and
+each split rounding likewise; a carrier release is `⌈2^C/D̂⌉` with `D̂` of `R` bits, at most
+`2^(C+1−R)`, and takes no split. The walk is linear in its rebases (`arrivalUnits_add`), so the two
+kinds count apart: the mantissa rebases with the splits, at most `U` units of `2^(1−W)` a digit, and
+the carrier releases alone, the rule's `n* P² ρ_c`. -/
 
-/-- [definition] **One arrival's units at level `ℓ`** of its path of `L` stored levels: its own
-rebase `r ℓ`, the parting upper part's `o ℓ`, and twice every rebase and split below it. -/
-def arrivalUnits (L : ℕ) (r s o : ℕ → ℕ) (ℓ : ℕ) : ℕ :=
-  r ℓ + o ℓ + ∑ m ∈ Ioo ℓ L, 2 * (r m + s m)
+/-- [definition] **The Rust's carried increment** (`Law::apply_branch`'s `carried`) after the walk's
+first `k` levels from the bottom: `0`, then `θ_k + 2r_k + carried_k + 2s_k`
+(`increment = theta + 2·rebase + carried + 2·split`). -/
+def carriedAfter (θ r s : ℕ → ℕ) : ℕ → ℕ
+  | 0 => 0
+  | k + 1 => θ k + 2 * r k + carriedAfter θ r s k + 2 * s k
 
-/-- [proved-derived] **`rebases_below`: the rebases below a level number at most `D − 1 − b`.**
-With the bottoms strictly rising down the path, at most `D`, and a rebase only below `D`, the
-levels below one with bottom `b` that rebase have distinct bottoms in `(b, D)`. -/
-theorem rebases_below {L D ℓ : ℕ} {bot r : ℕ → ℕ} (hmono : ∀ i j, i < j → j < L → bot i < bot j)
-    (hD : ∀ m < L, bot m ≤ D) (hr : ∀ m, r m ≤ 1) (hrD : ∀ m < L, bot m = D → r m = 0) :
-    ∑ m ∈ Ioo ℓ L, r m ≤ D - 1 - bot ℓ := by
+/-- [definition] **One arrival's units at the `k`-th level from the bottom**: its own rebase `r k`,
+the parting upper part's `o k`, and twice every rebase and split below it. -/
+def arrivalUnits (r s o : ℕ → ℕ) (k : ℕ) : ℕ :=
+  r k + o k + ∑ i ∈ range k, 2 * (r i + s i)
+
+/-- [proved-derived] **`walk_units`: the Rust's walk charges `arrivalUnits` plus the roundings.**
+The `k`-th level's drift addition `carried_k + r_k`, with the parting upper part's `o_k`, is
+`arrivalUnits k + Σ_(i<k) θ_i`. -/
+theorem walk_units (θ r s o : ℕ → ℕ) (k : ℕ) :
+    carriedAfter θ r s k + r k + o k = arrivalUnits r s o k + ∑ i ∈ range k, θ i := by
+  have h : ∀ k, carriedAfter θ r s k = ∑ i ∈ range k, (2 * (r i + s i) + θ i) := by
+    intro k
+    induction k with
+    | zero => rfl
+    | succ k ih => rw [carriedAfter, ih, sum_range_succ]; ring
+  rw [h, sum_add_distrib, arrivalUnits]
+  ring
+
+/-- [proved-derived] **`arrivalUnits_add`: the units count rebases of two kinds apart.** -/
+theorem arrivalUnits_add (r₁ r₂ s o : ℕ → ℕ) (k : ℕ) :
+    arrivalUnits (fun i => r₁ i + r₂ i) s o k =
+      arrivalUnits r₁ s o k + arrivalUnits r₂ (fun _ => 0) (fun _ => 0) k := by
+  unfold arrivalUnits
+  simp only [add_zero]
+  rw [show ∑ i ∈ range k, 2 * (r₁ i + r₂ i + s i) =
+      ∑ i ∈ range k, 2 * (r₁ i + s i) + ∑ i ∈ range k, 2 * r₂ i by
+    rw [← sum_add_distrib]; exact sum_congr rfl fun i _ => by ring]
+  ring
+
+/-- [proved-derived] **`unit_le`: a rebase is at most one unit `2^(C+1−W)`.** For a `W`-bit
+mantissa `m ≥ 2^(W−1)` and `W ≤ C + 1`, `⌈2^C/m⌉ = ⌊(2^C + m − 1)/m⌋ ≤ 2^(C+1−W)` (Rust
+`ceil_div(1 << C, m)`, `u128::div_ceil`; `C = M_p + W`). -/
+theorem unit_le {C W m : ℕ} (hC : W ≤ C + 1) (hm : 2 ^ (W - 1) ≤ m) :
+    (2 ^ C + m - 1) / m ≤ 2 ^ (C + 1 - W) := by
+  have hm0 : 0 < m := lt_of_lt_of_le (by positivity) hm
+  have hq : 2 ^ C ≤ 2 ^ (C + 1 - W) * m := by
+    calc 2 ^ C ≤ 2 ^ (C + 1 - W) * 2 ^ (W - 1) := by
+          rw [← pow_add]; exact Nat.pow_le_pow_right (by norm_num) (by omega)
+      _ ≤ 2 ^ (C + 1 - W) * m := Nat.mul_le_mul_left _ hm
+  rw [← Nat.lt_succ_iff, Nat.div_lt_iff_lt_mul hm0, Nat.succ_mul]
+  generalize 2 ^ (C + 1 - W) * m = a at hq ⊢
+  omega
+
+/-- [proved-derived] **`rebases_below`: the rebases below a level are at most `U(D − 1 − b)`.**
+With the bottoms falling strictly up the path, at most `D`, each rebase at most `U` and none at a
+bottom `D`, the rebasing levels below one with bottom `b` have distinct bottoms in `(b, D)`. -/
+theorem rebases_below {L D k U : ℕ} {bot r : ℕ → ℕ}
+    (hmono : ∀ i j, i < j → j < L → bot j < bot i) (hD : ∀ i < L, bot i ≤ D)
+    (hr : ∀ i, r i ≤ U) (hrD : ∀ i < L, bot i = D → r i = 0) (hk : k < L) :
+    ∑ i ∈ range k, r i ≤ U * (D - 1 - bot k) := by
   classical
-  have h1 : ∑ m ∈ Ioo ℓ L, r m ≤ ((Ioo ℓ L).filter fun m => bot m < D).card := by
-    rw [card_eq_sum_ones, sum_filter]
-    refine sum_le_sum fun m hm => ?_
-    have hmL : m < L := (mem_Ioo.1 hm).2
+  have h1 : ∑ i ∈ range k, r i ≤ ((range k).filter fun i => bot i < D).card * U := by
+    rw [card_eq_sum_ones, sum_mul, sum_filter]
+    refine sum_le_sum fun i hi => ?_
+    have hiL : i < L := by have := mem_range.1 hi; omega
     split_ifs with h
-    · exact hr m
-    · have : bot m = D := le_antisymm (hD m hmL) (not_lt.1 h)
-      rw [hrD m hmL this]
-  have h2 : ((Ioo ℓ L).filter fun m => bot m < D).card ≤ (Ioo (bot ℓ) D).card := by
-    refine card_le_card_of_injOn bot (fun m hm => ?_) (fun i hi j hj hij => ?_)
-    · rw [coe_filter, Set.mem_ofPred_eq, mem_Ioo] at hm
-      exact mem_Ioo.2 ⟨hmono ℓ m hm.1.1 hm.1.2, hm.2⟩
-    · rw [coe_filter, Set.mem_ofPred_eq, mem_Ioo] at hi hj
+    · rw [one_mul]; exact hr i
+    · have : bot i = D := le_antisymm (hD i hiL) (not_lt.1 h)
+      rw [hrD i hiL this]
+  have h2 : ((range k).filter fun i => bot i < D).card ≤ (Ioo (bot k) D).card := by
+    refine card_le_card_of_injOn bot (fun i hi => ?_) (fun i hi i' hi' hii => ?_)
+    · rw [coe_filter, Set.mem_ofPred_eq, mem_range] at hi
+      exact mem_Ioo.2 ⟨hmono i k hi.1 hk, hi.2⟩
+    · rw [coe_filter, Set.mem_ofPred_eq, mem_range] at hi hi'
       by_contra hne
       rcases Nat.lt_or_gt_of_ne hne with h | h
-      · exact absurd hij (hmono i j h hj.1.2).ne
-      · exact absurd hij (hmono j i h hi.1.2).ne'
+      · exact absurd hii (hmono i i' h (by omega)).ne'
+      · exact absurd hii (hmono i' i h (by omega)).ne
   rw [Nat.card_Ioo] at h2
-  omega
+  calc ∑ i ∈ range k, r i ≤ _ := h1
+    _ ≤ (D - bot k - 1) * U := Nat.mul_le_mul_right _ h2
+    _ = U * (D - 1 - bot k) := by rw [mul_comm]; congr 1; omega
 
-/-- [proved-derived] **`arrival_units_le`: one arrival charges a level at most `2(D − b) − 1 + 4`
-units.** At a level with bottom `b < D`: its own rebase and twice each rebase below,
-`1 + 2(D − 1 − b) = 2(D − b) − 1` (`rebases_below`), and the split's at most `4`: twice its two
-roundings to the levels above the parting level, `u + 2ℓ ≤ 3` to the parting level's upper part
-(`split_charge`), nothing below it. There is at most one parting level `p` a path. -/
-theorem arrival_units_le {L D ℓ p : ℕ} {bot r s o : ℕ → ℕ}
-    (hmono : ∀ i j, i < j → j < L → bot i < bot j) (hD : ∀ m < L, bot m ≤ D)
-    (hr : ∀ m, r m ≤ 1) (hrD : ∀ m < L, bot m = D → r m = 0)
-    (hs : ∀ m, m ≠ p → s m = 0) (ho : ∀ m, m ≠ p → o m = 0) (hsp : s p ≤ 2) (hop : o p ≤ 3)
-    (hb : bot ℓ < D) :
-    arrivalUnits L r s o ℓ ≤ 2 * (D - bot ℓ) - 1 + 4 := by
-  classical
-  have hreb := rebases_below (ℓ := ℓ) hmono hD hr hrD
-  have hsplit : o ℓ + ∑ m ∈ Ioo ℓ L, 2 * s m ≤ 4 := by
-    by_cases hp : p ∈ Ioo ℓ L
-    · rw [← mul_sum, sum_eq_single_of_mem p hp (fun m _ hm => hs m hm),
-        ho ℓ (mem_Ioo.1 hp).1.ne]
+/-- [proved-derived] **`arrival_units_le`: one arrival charges a level at most `U(2(D − b) − 1) + 4V`.**
+At the `k`-th level from the bottom, with bottom `b < D`: its own rebase and twice each rebase below,
+`U + 2U(D − 1 − b)` (`rebases_below`), and the split's at most `4V`: twice its two roundings to the
+levels above the parting level `p`, `u + 2ℓ ≤ 3V` to the parting level's upper part
+(`split_charge`), nothing below it. At most one level a path parts. With `U = V` one unit of
+`2^(1−W)` this is the mantissa count; with `V = 0` and `U` a carrier unit, the carrier's. -/
+theorem arrival_units_le {L D k p U V : ℕ} {bot r s o : ℕ → ℕ}
+    (hmono : ∀ i j, i < j → j < L → bot j < bot i) (hD : ∀ i < L, bot i ≤ D)
+    (hr : ∀ i, r i ≤ U) (hrD : ∀ i < L, bot i = D → r i = 0)
+    (hs : ∀ i, i ≠ p → s i = 0) (ho : ∀ i, i ≠ p → o i = 0) (hsp : s p ≤ 2 * V)
+    (hop : o p ≤ 3 * V) (hk : k < L) (hb : bot k < D) :
+    arrivalUnits r s o k ≤ U * (2 * (D - bot k) - 1) + 4 * V := by
+  have hreb := rebases_below hmono hD hr hrD hk
+  have hsplit : o k + ∑ i ∈ range k, 2 * s i ≤ 4 * V := by
+    by_cases hp : p ∈ range k
+    · rw [← mul_sum, sum_eq_single_of_mem p hp (fun i _ hi => hs i hi),
+        ho k (by have := mem_range.1 hp; omega)]
       omega
-    · rw [sum_eq_zero fun m hm => by rw [hs m (fun h => hp (h ▸ hm)), mul_zero]]
-      by_cases hlp : ℓ = p
-      · subst hlp; omega
-      · rw [ho ℓ hlp]; omega
-  have hsum : ∑ m ∈ Ioo ℓ L, 2 * (r m + s m) =
-      2 * ∑ m ∈ Ioo ℓ L, r m + ∑ m ∈ Ioo ℓ L, 2 * s m := by
-    rw [mul_sum, ← sum_add_distrib]; exact sum_congr rfl fun m _ => by ring
+    · rw [sum_eq_zero fun i hi => by rw [hs i (fun h => hp (h ▸ hi)), mul_zero]]
+      by_cases hkp : k = p
+      · subst hkp; omega
+      · rw [ho k hkp]; omega
+  have hsum : ∑ i ∈ range k, 2 * (r i + s i) = 2 * ∑ i ∈ range k, r i + ∑ i ∈ range k, 2 * s i := by
+    rw [mul_sum, ← sum_add_distrib]; exact sum_congr rfl fun i _ => by ring
+  have hd : 2 * (D - bot k) - 1 = 2 * (D - 1 - bot k) + 1 := by omega
   unfold arrivalUnits
-  rw [hsum]
-  have := hr ℓ
-  omega
+  rw [hsum, hd, mul_add, mul_one]
+  have := hr k
+  nlinarith
 
-/-- [proved-derived] **`levels_units`: `Σ (2(D − b) − 1) ≤ D²` over a read's levels.** The levels
-of a read that carry a drift have distinct bottoms below `D`, so the sum is at most the full
-tree's `Σ_(d<D) (2(D − d) − 1) = D²` (`Drift.sum_levels_below`, here in `ℕ`), and there are at
-most `D` of them. -/
+/-- [proved-derived] **`levels_units`: over a read's levels, `Σ (2(D − b) − 1) ≤ D²` and there are
+at most `D` levels.** The levels of a read that carry a drift have distinct bottoms below `D`
+(rising from the root), so the sum is at most the full tree's `Σ_(d<D) (2(D − d) − 1) = D²`
+(`Drift.sum_levels_below`, here in `ℕ`). -/
 theorem levels_units {L D : ℕ} {c : ℕ → ℕ} (hmono : ∀ i j, i < j → j < L → c i < c j)
     (hD : ∀ ℓ < L, c ℓ < D) :
-    ∑ ℓ ∈ range L, (2 * (D - c ℓ) - 1 + 4) ≤ D ^ 2 + 4 * D := by
-  classical
+    ∑ ℓ ∈ range L, (2 * (D - c ℓ) - 1) ≤ D ^ 2 ∧ L ≤ D := by
   have hrise : ∀ ℓ < L, ℓ ≤ c ℓ := by
     intro ℓ
     induction ℓ with
@@ -672,36 +735,40 @@ theorem levels_units {L D : ℕ} {c : ℕ → ℕ} (hmono : ∀ i j, i < j → j
       rw [e, sum_add_distrib, ih, sum_const, card_range, smul_eq_mul]
       have : 2 * (D + 1 - D) - 1 = 1 := by omega
       rw [this]; ring
-  calc ∑ ℓ ∈ range L, (2 * (D - c ℓ) - 1 + 4)
-      ≤ ∑ ℓ ∈ range L, (2 * (D - ℓ) - 1 + 4) :=
+  refine ⟨?_, hLD⟩
+  calc ∑ ℓ ∈ range L, (2 * (D - c ℓ) - 1)
+      ≤ ∑ ℓ ∈ range L, (2 * (D - ℓ) - 1) :=
         sum_le_sum fun ℓ hℓ => by have := hrise ℓ (mem_range.1 hℓ); omega
-    _ = ∑ ℓ ∈ range L, (2 * (D - ℓ) - 1) + 4 * L := by
-        rw [sum_add_distrib, sum_const, card_range, smul_eq_mul, mul_comm]
-    _ ≤ ∑ ℓ ∈ range D, (2 * (D - ℓ) - 1) + 4 * D :=
-        add_le_add (sum_le_sum_of_subset (range_subset_range.2 hLD)) (by omega)
-    _ = D ^ 2 + 4 * D := by rw [hfull]
+    _ ≤ ∑ ℓ ∈ range D, (2 * (D - ℓ) - 1) := sum_le_sum_of_subset (range_subset_range.2 hLD)
+    _ = D ^ 2 := hfull D
 
-/-- [proved-derived] **`cell_units`: a cell's read carries at most `n* D² + 4n* D` units a
-digit.** Each level `ℓ` of the read (bottom `c ℓ < D`, rising) holds the units of the arrivals
-through it, each at most `2(D − c ℓ) − 1 + 4` (`arrival_units_le`; a split part inherits its
-chain's drift, and the bound only grows as the bottom rises toward the root), and one unit for each
-arrival that split its chain above it; `arrivals ℓ` counts both, distinct, at most `n*`. -/
-theorem cell_units {α : Type*} {L D n : ℕ} {c : ℕ → ℕ} (arrivals : ℕ → Finset α)
+/-- [proved-derived] **`cell_units`: a cell's read carries at most `n*(U D² + 4V D)` a digit.**
+Each level `ℓ` of the read (bottom `c ℓ < D`, rising from the root) holds the charges of the
+arrivals through it, each at most `U(2(D − c ℓ) − 1) + 4V` (`arrival_units_le`; a split part
+inherits its chain's drift, and the bound only grows as the bottom rises toward the root), and one
+split unit for each arrival that split its chain above it; `arrivals ℓ` counts both, distinct, at
+most `n*`. In units of `2^(1−W)` (`U = V = 1`) the mantissa count is `n* D² + 4n* D`; the
+carrier's, which takes no split (`V = 0`), is `n* D²`. -/
+theorem cell_units {α : Type*} {L D n U V : ℕ} {c : ℕ → ℕ} (arrivals : ℕ → Finset α)
     (charge : ℕ → α → ℕ) (hmono : ∀ i j, i < j → j < L → c i < c j) (hD : ∀ ℓ < L, c ℓ < D)
     (hcard : ∀ ℓ < L, (arrivals ℓ).card ≤ n)
-    (hcharge : ∀ ℓ < L, ∀ a ∈ arrivals ℓ, charge ℓ a ≤ 2 * (D - c ℓ) - 1 + 4) :
-    ∑ ℓ ∈ range L, ∑ a ∈ arrivals ℓ, charge ℓ a ≤ n * D ^ 2 + 4 * n * D := by
+    (hcharge : ∀ ℓ < L, ∀ a ∈ arrivals ℓ, charge ℓ a ≤ U * (2 * (D - c ℓ) - 1) + 4 * V) :
+    ∑ ℓ ∈ range L, ∑ a ∈ arrivals ℓ, charge ℓ a ≤ n * (U * D ^ 2 + 4 * V * D) := by
+  obtain ⟨hsum, hLD⟩ := levels_units hmono hD
   calc ∑ ℓ ∈ range L, ∑ a ∈ arrivals ℓ, charge ℓ a
-      ≤ ∑ ℓ ∈ range L, n * (2 * (D - c ℓ) - 1 + 4) := by
+      ≤ ∑ ℓ ∈ range L, n * (U * (2 * (D - c ℓ) - 1) + 4 * V) := by
         refine sum_le_sum fun ℓ hℓ => ?_
         have hℓ := mem_range.1 hℓ
-        calc ∑ a ∈ arrivals ℓ, charge ℓ a ≤ (arrivals ℓ).card • (2 * (D - c ℓ) - 1 + 4) :=
+        calc ∑ a ∈ arrivals ℓ, charge ℓ a
+            ≤ (arrivals ℓ).card • (U * (2 * (D - c ℓ) - 1) + 4 * V) :=
               sum_le_card_nsmul _ _ _ (hcharge ℓ hℓ)
-          _ ≤ n * (2 * (D - c ℓ) - 1 + 4) := by
+          _ ≤ n * (U * (2 * (D - c ℓ) - 1) + 4 * V) := by
               rw [smul_eq_mul]; exact Nat.mul_le_mul_right _ (hcard ℓ hℓ)
-    _ = n * ∑ ℓ ∈ range L, (2 * (D - c ℓ) - 1 + 4) := by rw [mul_sum]
-    _ ≤ n * (D ^ 2 + 4 * D) := Nat.mul_le_mul_left _ (levels_units hmono hD)
-    _ = n * D ^ 2 + 4 * n * D := by ring
+    _ = n * (U * ∑ ℓ ∈ range L, (2 * (D - c ℓ) - 1) + 4 * V * L) := by
+        rw [← mul_sum, sum_add_distrib, ← mul_sum, sum_const, card_range, smul_eq_mul]; ring
+    _ ≤ n * (U * D ^ 2 + 4 * V * D) :=
+        Nat.mul_le_mul_left _ (add_le_add (Nat.mul_le_mul_left _ hsum)
+          (Nat.mul_le_mul_left _ hLD))
 
 /-- [proved-derived] **`rule_units`: the rule's `U` covers the count.** For `D ≤ P`,
 `n D² + 4n D ≤ n P² + max((n + 1) P², 4n P)` (`mantissa_units`), and for `P ≥ 4` the rule is
@@ -746,6 +813,11 @@ section Audit
 #print axioms up_path
 #print axioms split_charge
 #print axioms level_read_drift
+#print axioms carriedAfter
+#print axioms arrivalUnits
+#print axioms walk_units
+#print axioms arrivalUnits_add
+#print axioms unit_le
 #print axioms rebases_below
 #print axioms arrival_units_le
 #print axioms levels_units
