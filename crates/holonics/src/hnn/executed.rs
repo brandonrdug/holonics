@@ -3238,6 +3238,9 @@ impl ReleaseExcursion {
     }
 }
 
+/// A diagnostic schedule of step sizes: the next step, chosen from the trials read so far, or none.
+pub type Schedule<'a> = dyn Fn(&[Trial]) -> Option<Rat> + Sync + 'a;
+
 /// [definition; agent-inferred, September 30] **The ladder's depth**: at most 8 trial steps a move,
 /// from its start down to `2^(−7)` of it. Every trial re-reads the whole batch, so the depth bounds a
 /// move's work; a comparison that does not fall within `2^(−7)` of its start along the proposal is
@@ -3270,21 +3273,35 @@ fn ladder(
     first: &FirstOrder<'_>,
     reread: &(dyn Fn(&Constitution) -> Result<Reread, HnnError> + Sync),
     excursion: &ReleaseExcursion,
+    schedule: Option<&Schedule<'_>>,
 ) -> Result<LadderOutcome, HnnError> {
     let source = constitution
         .source_port(ring)
         .ok_or(HnnError::MissingSourcePort { ring })?
         .clone();
-    let mut step = start;
+    let mut trials: Vec<Trial> = Vec::new();
+    let mut step = match schedule {
+        Some(choose) => match choose(&trials) {
+            Some(step) => step,
+            None => return Ok((trials, None, Some(MoveRefusal::Guards))),
+        },
+        None => start,
+    };
     let lattice_unit = constitution
         .lattice(crate::hnn::constitution::Locus::SourcePort(ring))?
         .unit();
     let two = Rat::from_integer(BigInt::from(2));
-    let mut trials = Vec::new();
+    // A declared schedule reads the steps it chooses from the trials read so far and adopts none;
+    // the ladder halves from its start.
+    let next = |trials: &Vec<Trial>, step: &Rat| -> Option<Rat> {
+        match schedule {
+            Some(choose) => choose(trials),
+            None => Some(step / &two),
+        }
+    };
     loop {
-        if step.is_zero()
-            || &step * unit_largest * &two < lattice_unit
-            || trials.len() >= LADDER_DEPTH
+        if schedule.is_none()
+            && (step.is_zero() || &step * unit_largest * &two < lattice_unit || trials.len() >= LADDER_DEPTH)
         {
             return Ok((trials, None, Some(MoveRefusal::Guards)));
         }
@@ -3311,7 +3328,10 @@ fn ladder(
             Err(error @ (HnnError::ConstitutionBudget { .. } | HnnError::UncertifiedStorage)) => {
                 trial.refusal = Some(TrialRefusal::Constitution(error.to_string()));
                 trials.push(trial);
-                step /= &two;
+                match next(&trials, &step) {
+                    Some(n) => step = n,
+                    None => return Ok((trials, None, Some(MoveRefusal::Guards))),
+                }
                 continue;
             }
             Err(error) => return Err(error),
@@ -3343,13 +3363,16 @@ fn ladder(
             .subtract(&source)?;
         trial.moved = largest_entry(&moved);
         trial.largest = reading.largest.clone();
-        if trial.moved.is_zero() && !modulus_moved {
+        if trial.moved.is_zero() && !modulus_moved && schedule.is_none() {
             return Ok((trials, None, Some(MoveRefusal::Guards)));
         }
         if reading.largest > entry_bound() {
             trial.refusal = Some(TrialRefusal::EntryBound(reading.largest.clone()));
             trials.push(trial);
-            step /= &two;
+            match next(&trials, &step) {
+                Some(n) => step = n,
+                None => return Ok((trials, None, Some(MoveRefusal::Guards))),
+            }
             continue;
         }
         let first_reading = first(&moved, &successor)?;
@@ -3358,10 +3381,13 @@ fn ladder(
         trial.leading = first_reading.leading;
         trial.excess_bound = Some(first_reading.excess);
         trial.first_order = Some(bound.clone());
-        if !bound.upper.is_negative() {
+        if !bound.upper.is_negative() && schedule.is_none() {
             trial.refusal = Some(TrialRefusal::FirstOrder(bound));
             trials.push(trial);
-            step /= &two;
+            match next(&trials, &step) {
+                Some(n) => step = n,
+                None => return Ok((trials, None, Some(MoveRefusal::Guards))),
+            }
             continue;
         }
         let read = reread(&successor)?;
@@ -3382,12 +3408,15 @@ fn ladder(
             (None, Some(own)) => Some(TrialRefusal::OwnNotBelow(own.value.clone())),
             (None, None) => Some(TrialRefusal::Unsupported),
         };
-        let adopted = trial.refusal.is_none();
+        let adopted = trial.refusal.is_none() && schedule.is_none();
         trials.push(trial);
         if adopted {
             return Ok((trials, Some((successor, reading)), None));
         }
-        step /= &two;
+        match next(&trials, &step) {
+            Some(n) => step = n,
+            None => return Ok((trials, None, Some(MoveRefusal::Guards))),
+        }
     }
 }
 
@@ -3706,6 +3735,27 @@ pub fn executed_move_guarded(
     metric: MoveMetric,
     excursion: &ReleaseExcursion,
 ) -> Result<ExecutedMove, HnnError> {
+    executed_move_scheduled(field, constitution, requests, declared, bank, grain, comparison, metric, excursion, None)
+}
+
+/// [measured-diagnostic; October 2] **The move's direction read at chosen step sizes**: the same
+/// proposal and readings as [`executed_move_guarded`], each step the schedule chooses from the trials
+/// read so far read (the fixed mask and the own release, the first-order bound recorded and not
+/// refusing) and none adopted, until it chooses none. With `None`, the committed move's ladder. A
+/// diagnostic of where along one direction the release's decisions change.
+#[allow(clippy::too_many_arguments)]
+pub fn executed_move_scheduled(
+    field: &Field,
+    constitution: &Constitution,
+    requests: &[Request],
+    declared: &Refinement,
+    bank: &ReceivingBank,
+    grain: u32,
+    comparison: Comparison,
+    metric: MoveMetric,
+    excursion: &ReleaseExcursion,
+    schedule: Option<&Schedule<'_>>,
+) -> Result<ExecutedMove, HnnError> {
     let ring = declared.ring();
     let composition = comparison.composition;
     let (before, reads) = incumbent(field, constitution, requests, declared, bank, grain, comparison)?;
@@ -3885,6 +3935,7 @@ pub fn executed_move_guarded(
         &first,
         &reread,
         excursion,
+        schedule,
     )?;
     receipt.trials = trials;
     receipt.adopted = adopted;

@@ -85,23 +85,41 @@ running maximum of a window of adopted comparisons cannot follow it; it needs an
 checkpoint, bounded in height and length, with the certified decrease owed over the excursion as a
 whole. The numbers above are the measurement such a law's window and schedule read.
 
-## 4. The native own release's jump, per decision, beside the float path's flips
+## 4. The released comparison's jump at m7, decision by decision, beside the float path's
 
-The Lean thread's revision of #202 splits a move's change of the own release into the fixed mask's
-change (continuous) and the flip. Both paths were read under that split
+**The two parts of a move's change.** The released comparison `ℓ` is the cross-entropy between the
+release and its targets: the surprise crossing the receiver's section, summed over 8 requests × 8
+stations. A move deposits into `E`. Each lock in the release is a parametron settled on one half-turn
+sheet.
+- With every lock held on its sheet, `ℓ` is a smooth function of `E`: the **held-sheet comparison**
+  (the code's "fixed mask"). Each accepted move must lower it, certified at first order: a
+  dissipative descent within one basin of the lock configuration.
+- Relocking after the move can settle the release into another lock configuration, a different
+  metastable state. The released `ℓ` then differs from the held-sheet `ℓ` by the energy difference
+  between the two configurations: the **relocking jump** (the code's "flip").
+
+The Lean thread proved this split for #202. Both paths were read under it
 ([receipts](2026-10-02_THE_REFITS_INGREDIENTS_receipts/): `m7_decision_diff.txt`,
 `kinetic_chain_m0_m7.txt`, `split_sgd_303.txt`, `flips_sgd_303.txt`). Native values are lower ends in
 units of `1/4096` nat, each within `6/4096`.
 
-- **m7's flip is one request's lock order.** At `η = 1/2048`, request 3 goes from `43957` to `77944`
-  (`+33987`). The other seven requests each fall, by `306` in total. Request 3's released section is
-  the same before and after (all eight stations at 3, right at two). Six of its stations are read at
-  different partial sections, and three term tops flip (stations 3, 6, 7). Per station: 1 `+2742`, 2
-  `−105`, 3 `+6100`, 4 `+11986`, 6 `+9452`, 7 `+3815`, 0 `−4`, 5 `−2`. The lock-gap ranking swaps
-  which near-tied station locks first in a degenerate release.
-- **Per rung** (realized fixed-mask decrease `d`, flip `own − mask`):
+- **m7's jump is one request's freezing order.** At `η = 1/2048`, request 3 goes from `43957` to
+  `77944` (`+33987`). The other seven requests each fall, by `306` in total. Request 3's released
+  section is the same before and after: all eight stations at 3, right at two. What changed is the
+  order in which its locks froze. Six of its stations are read in different contexts, and three of
+  their leading classes change (stations 3, 6, 7). Per station: 1 `+2742`, 2 `−105`, 3 `+6100`,
+  4 `+11986`, 6 `+9452`, 7 `+3815`, 0 `−4`, 5 `−2`.
+  - The release locks first the station with the largest certain gap: its leading reading's lower
+    end less the strongest rival's upper end.
+  - Two of request 3's stations have gaps that overlap within the readings' cell widths, so the
+    receiver cannot rank them at its resolution. Which locked first was set by where the cells' cuts
+    fell, detail below resolution, and a deposition too small to move any resolved reading moved it.
+  - Freezing one lock first changes the context the others are read in, so the release settled
+    into another configuration. That is a symmetry broken by sub-resolution detail, and it reads
+    as a discontinuous jump in `ℓ`.
+- **Per step size η** (held-sheet decrease `d`, relocking jump):
 
-  | η | `d` | flip |
+  | η | `d` | jump |
   |---|---|---|
   | 1/16 | 33562 | 74106 |
   | 1/32 | 20269 | 45891 |
@@ -112,37 +130,41 @@ units of `1/4096` nat, each within `6/4096`.
   | 1/1024 | 714 | 34047 |
   | 1/2048 | 359 | 34038 |
 
-  From `1/64` down, the flip moves by `287` while `d` halves with each rung: a fixed cost. With the
-  window bound `(flips + σ)/d`, paying it takes 95 moves at `1/2048`, but about 4 at `1/64` and 3 at
-  `1/32`, if the flip held. Only the `1/2048` diff was taken; that the same request carries the flip
-  at the other rungs is inferred from its constant size. m6 adopted at `1/2048` (`d = 361`, no flip)
-  and flipped from `1/1024` up.
-- **The float path's excursions are not flips of this kind** (`sgd`, seed 303, 32 fixed requests,
-  10-step windows to step 130).
-  - Trajectories change on 29 to 32 of the 32 requests in every window to step 200, falling to 2
-    by step 390. Yet the flip part per window stays between `−0.0714` and `+0.0555` nats per term,
-    takes both signs, and nets `−0.0247` over the 130 steps.
-  - The excursions are in the continuous part: single steps raise the fixed mask itself, by
-    `+0.7996` per term at step 57 (the excursion over steps 50 to 100), and by `+0.256`, `+0.251` and
-    `+0.315` at steps 1, 77 and 78. Later steps repay them. The float path steps on minibatches of
-    other requests, so its read mask can rise. The native move steps on the requests it reads, so its
-    mask falls, and its only rise is the flip.
-  - Per term, m7's flip (`34038/64`, between `531/4096` and `532/4096`) exceeds every float window's
-    flip part (at most `227/4096`), and it sits in 1 of 8 requests.
-- **Steps per move.** Native `η = 1/32` moves (m0 to m3) lower the fixed mask by `573/4096` to
-  `574/4096` per term. A float step lowers it, per term:
+  - From `1/64` down, the jump moves by `287` while `d` halves with each halving of η. The jump is
+    an energy difference between configurations, not a slope, so it does not shrink with the step.
+  - A later run of moves repays it once its held-sheet decreases exceed the jump by one receiver
+    grain `σ`: at least `(jump + σ)/d` moves. That is 95 moves at `1/2048`, and about 4 at `1/64` or 3
+    at `1/32`, if the jump held.
+  - Only the `1/2048` diff was taken; that the same request carries the jump at the other step sizes
+    is inferred from its constant size.
+  - m6 was accepted at `1/2048` (`d = 361`, no jump), and jumped from `1/1024` up.
+- **The float path's rises are not relocking jumps** (`sgd`, seed 303, 32 fixed requests, read every
+  10 steps to step 130).
+  - Relocking changes the freezing order on 29 to 32 of the 32 requests in every 10-step stretch to
+    step 200, falling to 2 by step 390. Yet its share of `ℓ` per stretch stays between `−0.0714` and
+    `+0.0555` nats per term, takes both signs, and nets `−0.0247` over the 130 steps.
+  - The rises are in the held-sheet comparison itself. Single steps raise it, by `+0.7996` per term
+    at step 57 (the rise over steps 50 to 100), and by `+0.256`, `+0.251` and `+0.315` at steps 1, 77
+    and 78. Later steps repay them.
+  - The float path deposits from minibatches of other requests, so the comparison it reads can
+    rise. The native move deposits from the requests it reads, so its held-sheet comparison falls,
+    and its only rise is a relocking jump.
+  - Per term, m7's jump (`34038/64`, between `531/4096` and `532/4096`) exceeds every float
+    stretch's relocking share (at most `227/4096`), and it sits in 1 of 8 requests.
+- **Float steps per native move.** Native `η = 1/32` moves (m0 to m3) lower the held-sheet comparison
+  by `573/4096` to `574/4096` per term. A float step lowers it, per term:
   - `21/4096` to `22/4096` at the net mean over 130 steps;
   - `64/4096` to `65/4096` over the first 10 steps;
   - `101/4096` to `102/4096` at the median descending step.
 
   One `1/32` move is therefore 26 to 27, 8 to 9, or 5 to 6 float steps by those three rates. The
-  float excursions' 20 to 60 steps come to about 1 to 3 native `1/32` moves at the net rate, or 3 to
-  7 at the opening rate. The two per-term means average different families: the float averages every
-  open station at every lock snapshot (about 36 terms per request), the native one term per station.
-  So the ratio is an enclosure of scale, not an identity.
+  float path's rises of 20 to 60 steps come to about 1 to 3 native `1/32` moves at the net rate, or
+  3 to 7 at the opening rate. The two per-term means average different families: the float averages
+  every open station at every lock snapshot (about 36 terms per request), the native one term per
+  station. So the ratio is an enclosure of scale, not an identity.
 
-[agent-inferred] The float path never pays a flip like m7's because it never makes one: its flips
-are many, small and of both signs. A window sized on the float excursions (about 1 to 7 moves) admits
-m7's flip only at rungs of `1/64` or more, where `d` is large enough. The flip itself is a near-tie in
-one request's lock order, a degeneracy of the release rather than of the move's size, so the
-location this read points to is the release's lock ordering among near-tied stations.
+[agent-inferred] The float path never repays a jump like m7's because it never makes one: its
+relocking is frequent, small and of both signs. A run of moves sized on the float rises (about 1 to
+7 moves) repays m7's jump only at step sizes of `1/64` or more, where `d` is large enough. The jump
+itself comes from two locks the receiver cannot rank at its resolution, a degeneracy of the release
+rather than of the move's size.
