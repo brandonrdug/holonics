@@ -1154,3 +1154,134 @@ fn the_forced_release_reads_every_decision_along_the_right_trajectory() {
         assert_eq!(first, (0..r.targets.len()).collect::<Vec<_>>());
     }
 }
+
+// -------------------------------------------------------------------------------------------
+// the receiver's minimum-energy move over all of E
+
+/// **Each reading's gradient in `E` is its storage move's pairing, and the returns sum them**: at
+/// the machine's opening and a move `ΔE` of every entry, each leading member's `⟨G, ΔE⟩` equals its
+/// covector's pairing with its section's exact storage move, and `Σ c_m G_m` is the returns'
+/// pullback with its sign reversed (`−Σ_t w_t g_t f_tᵀ`): one gradient for the solve and the normal
+/// law.
+#[test]
+fn each_readings_gradient_in_e_is_its_storage_moves_pairing() {
+    use crate::hnn::executed::reading_gradient_probe;
+    let field = joint();
+    let theta = generic(&field, 94).with_transport(0, rat(3, 4)).unwrap();
+    let refinement = Refinement::declare(&field, 0, 2, 1, 4, 2).unwrap();
+    let bank = joint_bank();
+    let requests =
+        short_requests(&field, &[(95, [0, 1, 2, 1]), (96, [1, 1, 0, 2]), (97, [2, 0, 1, 1])]);
+    let port = theta.source_port(0).unwrap();
+    let delta = ExactRatMatrix::new(
+        (0..port.rows())
+            .map(|i| {
+                (0..port.columns())
+                    .map(|j| rat(((7 * i + 3 * j) % 11) as i64 - 5, 1024))
+                    .collect()
+            })
+            .collect(),
+    )
+    .unwrap();
+    for comparison in [
+        Comparison::LOCK_DECISIONS,
+        Comparison { composition: Composition::LockOrder, reading: Reading::Decisions },
+    ] {
+        let (pairs, weighted, pullback) = reading_gradient_probe(
+            &field, &theta, &requests, &refinement, &bank, 12, comparison, &delta,
+        )
+        .unwrap();
+        assert!(!pairs.is_empty());
+        for (gradient, storage) in &pairs {
+            assert_eq!(gradient, storage);
+        }
+        assert!(pairs.iter().any(|(g, _)| !g.is_zero()));
+        for (w, p) in weighted.iter().zip(&pullback) {
+            assert_eq!(w, &-p.clone());
+        }
+    }
+}
+
+/// **The solve is the kinetic face's least-energy lift of the witness's Newton change**: one
+/// candidate at `θ = ½` against its resting sheet wants its log-reading raised by `−F⁻¹c = 2`; read
+/// along two entries of `E` with the mass's inverse `diag(1, 3)`, the lift spends it where the mass
+/// is lighter, `v = (½, 3/2)`, not the coordinate split `(1, 1)`. Two candidates at
+/// `θ = (¼, ¼)` over a resting `½` couple through the witness: the target's reading rises by `4`
+/// and the rival's stays, `v = (4, 0, 0)`.
+#[test]
+fn the_solve_lifts_the_witnesss_newton_change_at_least_energy() {
+    use crate::hnn::executed::{KineticStop, kinetic_lift_probe};
+    let lighter = kinetic_lift_probe(
+        &[(vec![rat(1, 2)], 0, vec![vec![(0, Rat::one())]])],
+        &[vec![Rat::one(), Rat::one()]],
+        &[vec![Rat::one(), Rat::zero()], vec![Rat::zero(), integer(3)]],
+        2,
+    )
+    .unwrap();
+    assert_eq!(lighter.stop, KineticStop::Converged);
+    assert_eq!(lighter.moved.entries(), &[rat(1, 2), rat(3, 2)]);
+    assert_eq!(lighter.predicted, rat(-1, 2));
+    let identity: Vec<Vec<Rat>> =
+        (0..3).map(|i| (0..3).map(|j| if i == j { Rat::one() } else { Rat::zero() }).collect()).collect();
+    let coupled = kinetic_lift_probe(
+        &[(
+            vec![rat(1, 4), rat(1, 4)],
+            0,
+            vec![vec![(0, Rat::one())], vec![(1, Rat::one())]],
+        )],
+        &[
+            vec![Rat::one(), Rat::zero(), Rat::zero()],
+            vec![Rat::zero(), Rat::one(), Rat::zero()],
+        ],
+        &identity,
+        3,
+    )
+    .unwrap();
+    assert_eq!(coupled.stop, KineticStop::Converged);
+    // Exact up to the recurrence's grain (every value held at 128 significant bits toward zero).
+    let grain = Rat::new(1.into(), num_bigint::BigInt::from(1) << 120usize);
+    for (v, expected) in coupled.moved.entries().iter().zip([integer(4), Rat::zero(), Rat::zero()]) {
+        assert!((v - &expected).abs() <= grain);
+    }
+}
+
+/// **The kinetic move deposits the solve through the normal law and keeps every guard**: on the
+/// machine's opening, the move under the kinetic metric carries its solve, holds `ρ`, starts at the
+/// Gauss–Newton step or the entry scale, its unit move's largest entry is the solve's within
+/// `2^(−16)` of it (the chart's and the recurrence's grains),
+/// and an adopted trial lowers the comparison.
+#[test]
+fn the_kinetic_move_deposits_the_solve_and_keeps_every_guard() {
+    use crate::hnn::executed::{MoveMetric, executed_move_in};
+    let field = joint();
+    let theta = generic(&field, 94).with_transport(0, rat(3, 4)).unwrap();
+    let refinement = Refinement::declare(&field, 0, 2, 1, 4, 2).unwrap();
+    let bank = joint_bank();
+    let requests =
+        short_requests(&field, &[(95, [0, 1, 2, 1]), (96, [1, 1, 0, 2]), (97, [2, 0, 1, 1])]);
+    let moved = executed_move_in(
+        &field,
+        &theta,
+        &requests,
+        &refinement,
+        &bank,
+        12,
+        Comparison::LOCK_DECISIONS,
+        MoveMetric::Kinetic,
+    )
+    .unwrap();
+    assert_eq!(moved.metric, MoveMetric::Kinetic);
+    let solve = moved.kinetic.as_ref().expect("the solve");
+    assert!(solve.predicted.is_negative());
+    assert_eq!(moved.modulus_unit, Some(Rat::zero()));
+    let (_, kind) = moved.start.clone().unwrap();
+    assert!(matches!(kind, LadderStart::Kinetic | LadderStart::KineticEntryScale));
+    let largest = solve.moved.entries().iter().map(|x| x.abs()).max().unwrap();
+    let unit = moved.unit_largest.clone().unwrap();
+    assert!((&unit - &largest).abs() <= &largest / integer(1 << 16));
+    if let Some((successor, _)) = &moved.adopted {
+        let last = moved.trials.last().unwrap();
+        assert!(last.value.as_ref().unwrap().upper < moved.before.value.lower);
+        assert_eq!(successor.transport(0), theta.transport(0));
+    }
+}
