@@ -1077,3 +1077,15 @@ against §24's PPM-4 row). The wave still lowers the code on top of the stronger
 tree's own estimator, not from the wave, the contacts or the receiver. The wave's share is now about
 `1/190` bit a held-out cell. The next measurements are the per-digit-tree mixture of prior masses
 (the replica's lead) and what the wave's long-range content adds to the stronger tree.
+
+**After the gate.**
+- **The card.** Its normal-law mirror read the receiving map's raw samples, while the host steps in
+  the class metric (§19), so the GPU suite's generic parity test refused at the deposit from
+  `404f6ce8` on. `receiving_metric_samples` now owns the scaling, and the host's step and the card's
+  mirror read the same samples: the GPU suite passes 32 of 32 (56 s, alone under the lock), the tree
+  kernel's prior mass (`TreeLaw::unit`) included.
+- **The stop prior and the depth at the new mass** (the replica, development cells). The stop
+  ladder's rungs 1 to 4 code `9195040/2^9`, `9313303/2^9`, `9528051/2^9` and `9731374/2^9` bits: the
+  half stays. Depths 3, 4, 5, 6 and 8 code `9293089/2^9`, `9195040/2^9`, `9192629/2^9`,
+  `9192086/2^9` and `9191120/2^9`: past depth 4 the gain is at most eight bits over the development
+  cells, below what a depth sweep's charge and a deeper tree's storage cost, so depth 4 stays.
