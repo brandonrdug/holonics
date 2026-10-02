@@ -6,7 +6,7 @@
 //! with carries, then a histogram reduction into `M_g[phase]`"). Its entries are **integer
 //! counts**, `u64` on the host with a refusal past the word (`HnnError::CountOverflow`): the
 //! phase-binned counts `M_g` (`d_g × |A|`) and the offset counts `C_g(δ)` (`d_g × |A| × |A|`) on
-//! every source ring, and the window, a shift register of the last `max Δ` raw cells. A
+//! every source ring, and the last `max Δ` raw cells, held as a delay line. A
 //! [`ResidentMoment`] keeps all of them on the card, with the rings' phase classes; the host keeps
 //! only the lift's words (`λ_g`, unbounded integers, advanced by the ingest's per-ring advances)
 //! and the cell count.

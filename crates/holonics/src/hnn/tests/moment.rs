@@ -211,7 +211,7 @@ fn the_encoder_covector_is_the_exact_directional_derivative() {
     assert_eq!(moved - base, pairing);
 }
 
-/// The pair buffer is a shift register of raw cells, overwritten once their pairs are counted; its
+/// The pair buffer is a delay line of raw cells, each overwritten once its pairs are counted; its
 /// bits are counted in the moment's dense code, which is sized once.
 #[test]
 fn the_pair_buffer_overwrites_and_its_bits_are_counted() {
