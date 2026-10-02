@@ -46,9 +46,14 @@
 // refused operand is refused in turn (`HNN_REFUSED_OPERAND`), so a refusal travels with the
 // current and is reported where the word is released.
 //
-// [open] The ring law's formal statement (the Z/2^w residue read on (−2^(w−1), 2^(w−1)) equals
-// the integer sum under the l1 certificate) is owed in #62; it is elementary and has no Lean
-// counterpart in `lean/` yet.
+// [proved-derived; formal-checked] Lean `HNN/LatticeWord` §7: under the l1 certificate every
+// partial sum lies in W and the ring's signed read is the integer sum (`carrier_partial_sum`,
+// `carrier_ring_read`). The certificate's addition below is `min(a + b, 2^127)`
+// (`certify_eq_branch`), commutative and associative (`certify_comm`, `certify_assoc`), so every
+// tree over the same terms, the block tree here and the host's pass alike, carries
+// `min(Σ|p_j|, 2^127)` and the same word (`Reduction.bound_eq`, `Reduction.order_free`): a read is
+// refused exactly when `Σ|p_j|` reaches 2^127 (`Reduction.refused_iff`), and an admitted read is
+// the integer sum (`Reduction.read_of_bound_lt`).
 
 #pragma once
 #include <stdint.h>
@@ -142,7 +147,8 @@ __device__ __forceinline__ bool hnn_is_word(wide v) {
 
 // The block's tree over its threads' ring words and certificates (blockDim.x a power of two):
 // ring addition and the saturated certificate addition are associative and commutative, so the
-// tree's order changes no value and no refusal. Thread 0 holds the block's word and bound.
+// tree's order changes no value and no refusal (Lean `HNN/LatticeWord.Reduction.order_free`).
+// Thread 0 holds the block's word and bound.
 __device__ __forceinline__ void hnn_block_sum(uwide *ring, uwide *bound, uint32_t t) {
     for (uint32_t stride = blockDim.x >> 1; stride > 0; stride >>= 1) {
         if (t < stride) {
