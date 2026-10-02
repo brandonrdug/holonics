@@ -382,4 +382,64 @@ theorem fixed_order_halving_adopts {f g : ℝ → ℝ} {d η₀ : ℝ} (hfg : �
     hg.congr_of_eventuallyEq (nhdsWithin_le_nhds hfg) hfg.self_of_nhds
   exact halving_adopts_of_neg_slope hf hd hη
 
+/-! ### A jump in the release's order: the halving descent stops short of it
+
+Along one move's direction, the comparison is a continuous part `g` short of a step length `w` and
+jumps up in code length at `w`, where the release's order changes, by more than the move's
+conditions admit (the release excursion). Every trial at or past `w` is refused; a trial short of it
+is adopted when the move's own conditions hold (`hnn::executed`, the halving trials: at most
+`LADDER_DEPTH` trials a move, none below the lattice floor). -/
+
+/-- [proved-derived; formal-checked] **The first halving short of a jump lands within half of it.**
+Halving a step `η₀ ≥ w` until it falls short of the jump at `w`, the first such step is at least
+`w/2`: the trial before it was at or past the jump. -/
+theorem first_halving_short_of_jump {η₀ w : ℝ} (hη : w ≤ η₀) {k : ℕ} (hk : η₀ / 2 ^ k < w)
+    (hmin : ∀ j < k, w ≤ η₀ / 2 ^ j) : w / 2 ≤ η₀ / 2 ^ k := by
+  rcases k with _ | j
+  · simp at hk
+    linarith
+  · have h := hmin j (Nat.lt_succ_self j)
+    rw [pow_succ, ← div_div]
+    linarith
+
+/-- [proved-derived; formal-checked] **So, where that step is adopted, the jump's distance halves.**
+After the move adopts it, the jump lies at most half as far ahead as before. -/
+theorem jump_distance_halves {η₀ w : ℝ} (hη : w ≤ η₀) {k : ℕ} (hk : η₀ / 2 ^ k < w)
+    (hmin : ∀ j < k, w ≤ η₀ / 2 ^ j) : w - η₀ / 2 ^ k ≤ w / 2 := by
+  have := first_halving_short_of_jump hη hk hmin
+  linarith
+
+/-- [proved-derived; formal-checked] **A chain whose jump distance halves approaches the jump**:
+after `n` such moves it lies within `d 0 / 2^n` of it. -/
+theorem jump_distance_le {d : ℕ → ℝ} (h : ∀ n, d (n + 1) ≤ d n / 2) (n : ℕ) :
+    d n ≤ d 0 / 2 ^ n := by
+  induction n with
+  | zero => simp
+  | succ n ih =>
+    calc d (n + 1) ≤ d n / 2 := h n
+      _ ≤ d 0 / 2 ^ n / 2 := by linarith
+      _ = d 0 / 2 ^ (n + 1) := by rw [pow_succ, div_div]
+
+/-- [proved-derived; formal-checked] **Closer than the smallest trial, every trial crosses the jump.**
+With the move's trials `η₀ / 2^k` for `k < D`, a jump nearer than the last of them, `η₀ / 2^(D−1)`,
+lies short of every trial, so every trial reads the jump and the move is refused: the run ends short
+of the jump, not at it (with `jump_refuses_every_halving` for a jump present at every small step). -/
+theorem trials_cross_jump {η₀ w : ℝ} {D k : ℕ} (hη : 0 ≤ η₀) (hk : k < D)
+    (hw : w < η₀ / 2 ^ (D - 1)) : w < η₀ / 2 ^ k := by
+  have hpow : (2 : ℝ) ^ k ≤ 2 ^ (D - 1) := pow_le_pow_right₀ (by norm_num) (by omega)
+  have hpos : (0 : ℝ) < 2 ^ k := by positivity
+  calc w < η₀ / 2 ^ (D - 1) := hw
+    _ ≤ η₀ / 2 ^ k := div_le_div_of_nonneg_left hη hpos hpow
+
+/-- [proved-derived; formal-checked] **What a move can still gain short of the jump shrinks with
+it.** If the continuous part falls at most `G` per unit step, a move that stays short of a jump at
+distance `d` lowers it by at most `G d`. -/
+theorem gain_short_of_jump {g : ℝ → ℝ} {G d η : ℝ} (hlip : ∀ x y, |g x - g y| ≤ G * |x - y|)
+    (hη0 : 0 ≤ η) (hηd : η ≤ d) (hG : 0 ≤ G) : g 0 - g η ≤ G * d := by
+  have h := hlip 0 η
+  have h1 : g 0 - g η ≤ |g 0 - g η| := le_abs_self _
+  have h2 : |(0:ℝ) - η| = η := by rw [zero_sub, abs_neg, abs_of_nonneg hη0]
+  rw [h2] at h
+  nlinarith
+
 end Holonics.HNN.OrderTemperature
