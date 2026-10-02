@@ -1379,11 +1379,19 @@ impl<'c> ExecutionPort for Resident<'c> {
                 // The normal law's certified step at the locus (zero where its alignment certified
                 // none; the locus's factor families step beside it).
                 let certified = reading.linear_step(locus);
+                // The receiving map steps in its class metric (the host's
+                // `receiving_metric_samples`): the mirror reads the same samples.
+                let metric = match step.locus {
+                    holonics::hnn::constitution::LinearLocus::Receiving(_) => {
+                        holonics::hnn::constitution::receiving_metric_samples(&step.samples)
+                    }
+                    _ => None,
+                };
                 tally.count(normal_deposit_on_card(
                     self.card,
                     before,
                     after,
-                    &step.samples,
+                    metric.as_deref().unwrap_or(&step.samples[..]),
                     &certified,
                     resident.constitution.lattice(locus)?,
                     gamma_length(resident.constitution.clock(locus) + 1),

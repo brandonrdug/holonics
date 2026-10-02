@@ -5831,30 +5831,10 @@ impl Constitution {
                     // covectors' magnitudes taken through the inverse of the readings' mean class
                     // Fisher, and certified in the readings' own Fisher form, at most the unit step.
                     let metric = match step.locus {
-                        LinearLocus::Receiving(_) => receiving_class_metric(&step.samples),
+                        LinearLocus::Receiving(_) => receiving_metric_samples(&step.samples),
                         _ => None,
                     };
-                    let scaled: Vec<Sample>;
-                    let samples = match &metric {
-                        Some(scale) => {
-                            scaled = step
-                                .samples
-                                .iter()
-                                .map(|sample| Sample {
-                                    weight: sample.weight.clone(),
-                                    feature: sample.feature.clone(),
-                                    covector: sample
-                                        .covector
-                                        .iter()
-                                        .enumerate()
-                                        .map(|(i, c)| if i % 2 == 0 { c * scale } else { c.clone() })
-                                        .collect(),
-                                })
-                                .collect();
-                            &scaled[..]
-                        }
-                        None => &step.samples[..],
-                    };
+                    let samples = metric.as_deref().unwrap_or(&step.samples[..]);
                     let mut step_prepared = law.prepare(samples, &rule, at).map_err(refused)?;
                     if let (Some(_), Some(prepared_step)) = (&metric, step_prepared.as_mut()) {
                         if let Some((moves, oscillation)) =
@@ -6070,13 +6050,36 @@ impl Constitution {
     }
 }
 
+/// **The receiving map's samples in its class metric** (the contact loop record §19): each
+/// covector's magnitude parts (its even entries) scaled by [`receiving_class_metric`], its phase
+/// parts kept; `None` where the metric is. The host's step reads them, and so does the card's
+/// mirror of the normal law (`holonics-cuda`, `hnn::lattice::normal_deposit_on_card`).
+pub fn receiving_metric_samples(samples: &[Sample]) -> Option<Vec<Sample>> {
+    let scale = receiving_class_metric(samples)?;
+    Some(
+        samples
+            .iter()
+            .map(|sample| Sample {
+                weight: sample.weight.clone(),
+                feature: sample.feature.clone(),
+                covector: sample
+                    .covector
+                    .iter()
+                    .enumerate()
+                    .map(|(i, c)| if i % 2 == 0 { c * &scale } else { c.clone() })
+                    .collect(),
+            })
+            .collect(),
+    )
+}
+
 /// [definition; agent-inferred, October 2; the contact loop record §19] **The receiving readings'
 /// class metric**: the inverse of their mean class Fisher eigenvalue on the zero-sum classes,
 /// `λ̄ = mean_t (1 − Σ_c p̃_(t,c)²)/(|A| − 1)` (the trace of `diag p̃ − p̃ p̃ᵀ` over its rank), held at
 /// the power of two at or below `1/λ̄`: about `|A|` at a uniform reading, so the step's magnitude
 /// part is the normal law's own scaled into the receiver's own curvature. `None` when a covector is
 /// not a face's `q − p̃`, or the readings carry no curvature.
-pub(crate) fn receiving_class_metric(samples: &[Sample]) -> Option<Rat> {
+pub fn receiving_class_metric(samples: &[Sample]) -> Option<Rat> {
     let (mut trace, mut count, mut classes) = (Rat::zero(), 0u64, 0usize);
     for sample in samples.iter().filter(|s| !s.weight.is_zero()) {
         let mut masses: Vec<Rat> = sample.covector.iter().step_by(2).map(|c| -c).collect();
