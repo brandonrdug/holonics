@@ -3,6 +3,7 @@ import Holonics.Computation.HolonicAdjointNormalization
 import Holonics.Geometry.CrossRatio
 import Holonics.Objects.Ratio.ExponentialKernel
 import Holonics.Objects.Ratio.CarriedPower
+import Holonics.Objects.Ratio.SelectedQuadratic.SourceRoot
 import Holonics.Objects.Ratio.GaugeCalculus
 import Holonics.Transport.JetStaircase
 import Mathlib.Analysis.Quaternion
@@ -20,7 +21,10 @@ order is the Maurer–Cartan form `R⁻¹dR`, which is the pure-gauge term of th
 (`Objects/Ratio/GaugeCalculus`); its higher orders are the jet of the log ratio, read
 continuously by `iteratedDeriv` and on the tick lattice by `Transport/JetStaircase`. Its
 exponentiated chart at a grain `L` is the carried power `2^(n + k/L) = 2^n θ^k` in
-`ℚ(θ)`, `θ^L = 2` (`Objects/Ratio/CarriedPower`).
+`ℚ(θ)`, `θ^L = 2` (`Objects/Ratio/CarriedPower`). The generic selected positive quadratic
+root chart (`Objects/Ratio/SelectedQuadratic` and its `PositiveRoot`, `SourceRoot` joins) keeps
+rational coefficient operands, nonsquare/positive-root guards and the original-source decoder;
+it proves formula correctness without asserting Rust execution correspondence.
 
 This module joins those owners; it founds no second softmax, cross-entropy or gauge.
 
