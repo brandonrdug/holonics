@@ -5652,19 +5652,7 @@ impl Constitution {
                         .map_err(refused)?;
                     let at = self.stroke(locus, &mut prepared.stroke).map_err(refused)?;
                     let rule = self.chart_rule(locus).map_err(refused)?;
-                    let mut step_prepared = law.prepare(&step.samples, &rule, at).map_err(refused)?;
-                    // The receiving map's step is read in its own Fisher form (the contact loop
-                    // record §18): its curvature and covector scale replace the worst-case readings.
-                    if let (LinearLocus::Receiving(_), Some(prepared_step)) =
-                        (step.locus, step_prepared.as_mut())
-                    {
-                        if let Some((moves, oscillation)) =
-                            receiving_fisher_face(&step.samples, &prepared_step.unit.to_rows())
-                        {
-                            prepared_step.moves = moves;
-                            prepared_step.covector = oscillation;
-                        }
-                    }
+                    let step_prepared = law.prepare(&step.samples, &rule, at).map_err(refused)?;
                     prepared.linear = Some((*index, step.locus, step_prepared));
                 }
                 LocusStep::Factor(step) => {
@@ -5868,52 +5856,6 @@ impl Constitution {
         self.clocks.retain(|locus, _| kept(locus));
         Ok(())
     }
-}
-
-/// [definition; agent-inferred, October 2; the
-/// [contact loop record](../../../../research/records/2026-10-02_THE_CONTACT_LOOP_THE_RETURN_REACHES_EVERY_CONTACT_AND_ITS_CHANGE_IS_RELEASED_BEFORE_THE_LATER_CUT.md)
-/// §18] **The receiving map's step in its own Fisher form.** A receiving read's code in bits is
-/// `f(v) = −v_t + log₂ Σ_c 2^(v_c)`, whose Hessian in the exponents is `ln 2 (diag p − p pᵀ)`, so
-/// `δᵀ ∇²f δ = ln 2 · Var_p(δ)`. A logit change `Δ` multiplies every class's mass by at most
-/// `2^(osc Δ)`, `osc Δ = max Δ − min Δ`, so along the whole ray `[0, η]` with `η · osc ≤ 1` the
-/// second derivative is at most `2 ln 2 · Var_p(Δ)` (the bound `f(v + Δ) ≤ f + gᵀΔ +
-/// (e^(osc)/2) Var_p(Δ)` in nats, carried to bits). The covector's masses are the odometer chart
-/// `p̃` (`p̃ − q`, the HNN adjoint's), and `p_c/p̃_c ≤ 17/16` (`2^x/(1 + x)` lies in `[0.94, 1]` on
-/// `[0, 1)`), so `Var_p(Δ) ≤ E_p[(Δ − E_p̃ Δ)²] ≤ (17/16) Var_p̃(Δ)`. The phase part's curvature is
-/// at most `¼` (module header, "The certified step"). With `ln 2 ≤ 7/10`, each read's curvature
-/// along the unit step `Δ_t = D f_t` is at most `(119/80) Var_p̃(Δ_t^Re) + ¼ |Δ_t^Im|²`. The
-/// certificate's `C = s κ² b` with `s = ½`, `κ² = 1` then takes `b = 2 Σ_t (…)`, and its covector
-/// scale is the largest magnitude oscillation `max_t osc(Δ_t^Re)` (`ηc ≤ 1` is `η · osc ≤ 1`).
-/// `None`, leaving the worst-case readings, when a covector is not a face's `q − p̃`.
-fn receiving_fisher_face(samples: &[Sample], unit: &[Vec<Rat>]) -> Option<(Rat, Rat)> {
-    let (mut curvature, mut oscillation) = (Rat::zero(), Rat::zero());
-    for sample in samples.iter().filter(|s| !s.weight.is_zero()) {
-        let delta: Vec<Rat> = unit
-            .iter()
-            .map(|row| row.iter().zip(&sample.feature).map(|(d, f)| d * f).sum())
-            .collect();
-        let real: Vec<&Rat> = delta.iter().step_by(2).collect();
-        let imaginary: Vec<&Rat> = delta.iter().skip(1).step_by(2).collect();
-        // The covector is the descent `q − p̃`; the masses are `p̃ = q − covector`.
-        let mut masses: Vec<Rat> = sample.covector.iter().step_by(2).map(|c| -c).collect();
-        if let Some(target) = (0..masses.len()).find(|&c| masses[c].is_negative()) {
-            masses[target] += Rat::one();
-        }
-        if masses.iter().any(Signed::is_negative) || masses.iter().sum::<Rat>() != Rat::one() {
-            return None;
-        }
-        let mean: Rat = masses.iter().zip(&real).map(|(p, d)| p * *d).sum();
-        let second: Rat = masses.iter().zip(&real).map(|(p, d)| p * *d * *d).sum();
-        let variance = second - &mean * &mean;
-        let phase: Rat = imaginary.iter().map(|d| *d * *d).sum();
-        curvature += sample.weight.abs()
-            * (Rat::new(BigInt::from(119), BigInt::from(80)) * variance
-                + phase / Rat::from_integer(BigInt::from(4)));
-        if let (Some(high), Some(low)) = (real.iter().max(), real.iter().min()) {
-            oscillation = oscillation.max(*high - *low);
-        }
-    }
-    Some((Rat::from_integer(BigInt::from(2)) * curvature, oscillation))
 }
 
 /// One locus's deposited carried remainders, budgeted carry and chart readings, or the refusal its
