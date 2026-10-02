@@ -13,14 +13,16 @@ use crate::receiver::receipt::ReceiptLaw;
 use crate::receiver::reception::{JointLaw, ReceiverFace};
 use crate::receiver::reception::continuation::JointProducer;
 
+fn reader() -> crate::ratio::linear::ExactRatMatrix {
+    matrix(1, 5, |_, column| {
+        if column == 0 || column == 3 { Rat::one() } else { Rat::zero() }
+    }).unwrap()
+}
+
 fn admitted(chain: &WaveChain) -> JointLaw {
     let native = ReferenceHolon::new(chain.holon().unwrap(), chain.tick().clone(), Scheme::Midpoint)
         .unwrap();
-    // Read V_0 plus I_0. This fixed receiver map, incidence and leakage transport with Q.
-    let reader = matrix(1, 5, |_, column| {
-        if column == 0 || column == 3 { Rat::one() } else { Rat::zero() }
-    }).unwrap();
-    JointLaw::reading(&native, &reader).unwrap()
+    JointLaw::reading(&native, &reader()).unwrap()
 }
 
 #[test]
@@ -40,7 +42,7 @@ fn wave_material_return_preserves_charge_flux_and_continues_its_native_joint_law
     let mut point = predecessor.configuration(&wave).unwrap();
     point.push(Rat::zero());
     let clock = Arc::new(Clock::unwound(predecessor.tick().clone()).unwrap());
-    let producer = JointProducer::declared(admitted(&predecessor), predecessor.clone(), clock.clone()).unwrap();
+    let producer = WaveChain::bind_receiver(&predecessor, &clock, &reader()).unwrap();
     let origin = producer.open(HolonState::new(point), &predecessor, &clock).unwrap();
     let receipt = ReceiptLaw::new(6, vec![], vec![]).unwrap();
     let face = ReceiverFace::receiver_state(5, 1).unwrap();
@@ -55,9 +57,23 @@ fn wave_material_return_preserves_charge_flux_and_continues_its_native_joint_law
     assert_ne!(old_reading, new_reading);
     assert_ne!(successor.configuration(&old_reading).unwrap(), native_point);
     let next_law = admitted(&successor);
-    let (next_producer, returned) = producer.return_storage(
-        reached, &predecessor, &clock, next_law.clone(), rat(1, 2), &receipt,
+    let (next_producer, returned, native_reading) = predecessor.return_material(
+        &predecessor, &producer, reached, &clock, &successor, &reader(), rat(1, 2), &receipt,
     ).unwrap();
+    assert_eq!(native_reading, new_reading);
+    let wrong_reader = matrix(1, 5, |_, col| if col == 1 { Rat::one() } else { Rat::zero() }).unwrap();
+    assert!(predecessor.return_material(&predecessor, &producer, reached, &clock,
+        &successor, &wrong_reader, rat(1, 2), &receipt).is_err());
+    assert!(successor.return_material(&predecessor, &producer, reached, &clock,
+        &successor, &reader(), rat(1, 2), &receipt).is_err());
+    // A generic declared producer cannot smuggle a different native current material under
+    // the original source handle: this first native return authenticates the whole source.
+    let forged = JointProducer::declared(admitted(&successor), predecessor.clone(), clock.clone()).unwrap();
+    let forged_origin = forged.open(HolonState::new(origin.state().configuration.clone()), &predecessor, &clock).unwrap();
+    let forged_step = forged.interact(&forged_origin, &predecessor, &clock, &input, &face, &receipt).unwrap();
+    assert!(successor.return_material(&predecessor, &forged,
+        forged_step.forward.present().unwrap().reached(), &clock, &successor,
+        &reader(), rat(1, 2), &receipt).is_err());
     let returned_state = returned.forward.present().unwrap();
     assert_eq!(returned_state.state(), reached.state());
     assert_eq!(returned_state.clock(), reached.clock());
@@ -82,7 +98,7 @@ fn wave_material_return_preserves_charge_flux_and_continues_its_native_joint_law
     eprintln!("WAVE_RETURN reached_charge_flux={:?}", native_point);
     eprintln!("WAVE_RETURN old_voltage_current={:?}", old_reading);
     eprintln!("WAVE_RETURN successor_voltage_current={:?}", new_reading);
-    eprintln!("WAVE_RETURN storage_work={} next_charge_flux={:?} next_receiver={}",
+    eprintln!("WAVE_RETURN storage_work={} next_charge_flux={:?} next_cumulative_reading={}",
         work.work, after, continued.reached().state().configuration[5]);
     eprintln!("WAVE_RETURN next_balance_residual={}", continued.step().balance().residual);
     let wrong_source = Arc::new((*predecessor).clone());
