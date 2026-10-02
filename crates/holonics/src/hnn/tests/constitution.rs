@@ -1852,3 +1852,237 @@ fn the_gains_read_the_span_factor_term_by_term() {
     assert_eq!(reach.tick_gain(&growth, None), passive_ticks);
     assert_eq!(reach.entry_gain(&growth, None), passive_entries);
 }
+
+/// Lean `HNN/LatticeDeposit/Rebase.{rebase_value_add_rem, rebase_onLattice, invariant_history,
+/// history_accounting, history_release_lt, history_within_founding_unit}`: over seeded histories
+/// that interleave deposits of non-dyadic updates with re-bases onto finer lattices, a re-base keeps
+/// every entry plus its carried remainder exactly, lands the entry on the finer lattice with the
+/// remainder in the finer half cell, and releases nothing; after every move the entry, remainder
+/// and releases sum to the founding value plus every update, the releases stay within
+/// `u₀/2·Σ_{m ≤ clock} 2^(−k_m)` and so below half the founding unit `u₀`, and the entry stays
+/// within `u₀/2 + u/2` of the exact accumulation, `u` the current unit.
+#[test]
+fn a_rebase_keeps_value_plus_carry_and_the_releases_stay_below_the_founding_half_unit() {
+    use crate::hnn::constitution::Carry;
+    let width = 4;
+    let (mut refined, mut releasing) = (0, 0);
+    for seed in 0..48 {
+        let mut draw = Draw::new(seed);
+        let founding = Lattice::new(2 + (draw.next() % 3) as u32);
+        let half = founding.unit() / integer(2);
+        let start = draw.dyadic_vector(width);
+        let (mut lattice, mut clock) = (founding, 0u64);
+        let mut entries = start.clone();
+        let mut carry = Carry::default();
+        let mut accumulated = vec![Rat::zero(); width];
+        let mut released = vec![Rat::zero(); width];
+        let mut kraft = Rat::zero();
+        let mut rebases = 0;
+        for _ in 0..24 {
+            let mut at = BudgetedCarry::new(lattice, clock + 1);
+            if draw.next().is_multiple_of(4) {
+                let levels = (draw.next() % 3) as u32;
+                let before: Vec<Rat> = (0..width).map(|i| &entries[i] + carry.at(i)).collect();
+                at.rebase(levels, &mut [(&mut carry, &mut entries)])
+                    .unwrap();
+                lattice = at.lattice();
+                assert_eq!(lattice.exponent(), founding.exponent() + rebases + levels);
+                rebases += levels;
+                refined += usize::from(levels > 0);
+                let fine_half = lattice.unit() / integer(2);
+                for i in 0..width {
+                    assert_eq!(&entries[i] + carry.at(i), before[i]);
+                    assert!(lattice.contains(&entries[i]));
+                    assert!(-&fine_half <= carry.at(i) && carry.at(i) < fine_half);
+                }
+                assert!(at.released().is_empty() && !at.moved());
+            } else {
+                let updates = draw.vector(width);
+                carry.deposit_all(&mut at, Carrier::Map, &mut entries, &updates);
+                for i in 0..width {
+                    accumulated[i] += &updates[i];
+                }
+                for (_, i, e) in at.released() {
+                    released[i] += e;
+                    releasing += 1;
+                }
+                if at.moved() {
+                    clock += 1;
+                    kraft += Rat::new(BigInt::one(), BigInt::one() << gamma_length(clock));
+                }
+            }
+            let current_half = lattice.unit() / integer(2);
+            for i in 0..width {
+                let exact = &start[i] + &accumulated[i];
+                assert_eq!(&entries[i] + carry.at(i) + &released[i], exact);
+                assert!(lattice.contains(&entries[i]));
+                assert!(released[i].abs() <= &half * &kraft && released[i].abs() < half);
+                assert!((&entries[i] - &exact).abs() < &half + &current_half);
+            }
+        }
+    }
+    assert!(refined > 0 && releasing > 0);
+}
+
+/// The re-base is refused once the deposit has staged an entry, whose applied coordinate is in the
+/// coarser unit, and for a remainder past its array.
+#[test]
+fn a_rebase_is_refused_mid_deposit_and_past_its_array() {
+    use crate::hnn::constitution::Carry;
+    let lattice = Lattice::new(3);
+    let mut entries = vec![Rat::zero(); 2];
+    let mut carry = Carry::default();
+    let mut at = BudgetedCarry::new(lattice, 1);
+    carry.deposit_all(
+        &mut at,
+        Carrier::Map,
+        &mut entries,
+        &[rat(1, 3), rat(-2, 7)],
+    );
+    assert!(matches!(
+        at.rebase(1, &mut [(&mut carry, &mut entries)]),
+        Err(HnnError::Rebase { staged: 2, .. })
+    ));
+    let mut at = BudgetedCarry::new(lattice, 2);
+    assert!(matches!(
+        at.rebase(1, &mut [(&mut carry, &mut entries[..1])]),
+        Err(HnnError::Shape { .. })
+    ));
+    assert_eq!(at.lattice(), lattice);
+}
+
+/// Lean `HNN/LatticeDeposit/Rebase.{rebase_value_add_rem, rebase_onLattice, rebase_clock}` at the
+/// machine: after a compare's deposit on the six-ring path reaches the channels, re-basing each contact's channel keeps every
+/// factor and scale entry plus its carried remainder, lands the entries on the finer lattice with
+/// the remainders in its half cell, keeps the clock, and leaves every other locus as it was; a
+/// re-base by zero levels is the identity, a ring locus is refused, and the re-based constitution
+/// takes the next deposit's carry on the finer lattice.
+#[test]
+fn a_contacts_channel_rebases_with_its_carried_remainders() {
+    let field = six_path(2);
+    let start = generic(&field, 13);
+    let (current, open) = moment(&field, 14, 9);
+    // One compare's deposit, staged by the machine path at a constitution.
+    let stage = |theta: &Constitution| {
+        let phases = phases(&field, theta, &current);
+        let pending = PendingRatio::produce(
+            &current,
+            &open,
+            &ActiveAddress::boundary(phases.depth()),
+            &phases,
+            0,
+        )
+        .unwrap();
+        let (word, faces) = pending.read(&field, theta).unwrap();
+        let targets = [1usize, 0];
+        let anchors = target_phases(&field, pending.anchor(), 2, &targets).unwrap();
+        let ratio = HolonRatio::compare(faces, &targets, &anchors).unwrap();
+        let back = word
+            .pull_back(
+                &ratio.covector().unwrap(),
+                theta.receiving_map(2).unwrap(),
+                &current.lift()[2],
+                &phases,
+            )
+            .unwrap();
+        compose(&field, theta, &pending, &back, &targets, &[])
+            .unwrap()
+            .1
+    };
+    let deposit = stage(&start);
+    let (deposited, _) = start.deposited(&deposit).unwrap();
+    let theta = &deposited;
+    assert!(
+        theta
+            .carried_remainders()
+            .iter()
+            .any(|(l, ..)| matches!(l, Locus::Channel(_)))
+    );
+    let carriers = [
+        Carrier::Factor(0),
+        Carrier::Factor(1),
+        Carrier::Factor(2),
+        Carrier::FactorScale(0),
+        Carrier::FactorScale(1),
+        Carrier::FactorScale(2),
+    ];
+    let remainders = |theta: &Constitution, locus: Locus, carrier: Carrier| {
+        let mut dense = vec![Rat::zero(); entries(theta, locus, carrier).len()];
+        for (l, c, i, r) in theta.carried_remainders() {
+            if (l, c) == (locus, carrier) {
+                dense[i] = r;
+            }
+        }
+        dense
+    };
+    let mut moved = 0;
+    let contacts = (0..)
+        .take_while(|a| theta.lattice(Locus::Channel(*a)).is_ok())
+        .count();
+    assert!(contacts > 0);
+    for a in 0..contacts {
+        let locus = Locus::Channel(a);
+        assert_eq!(&theta.rebased(locus, 0).unwrap(), theta);
+        for levels in 1..=3 {
+            let next = theta.rebased(locus, levels).unwrap();
+            let finer = next.lattice(locus).unwrap();
+            assert_eq!(
+                finer.exponent(),
+                theta.lattice(locus).unwrap().exponent() + levels
+            );
+            assert_eq!(next.clock(locus), theta.clock(locus));
+            assert_eq!(next.commit(), theta.commit() + 1);
+            assert!(next.storage_product() >= theta.storage_product());
+            let half = finer.unit() / integer(2);
+            for carrier in carriers {
+                let (before, carried) = (
+                    entries(theta, locus, carrier),
+                    remainders(theta, locus, carrier),
+                );
+                let (after, rest) = (
+                    entries(&next, locus, carrier),
+                    remainders(&next, locus, carrier),
+                );
+                for i in 0..before.len() {
+                    assert_eq!(&after[i] + &rest[i], &before[i] + &carried[i]);
+                    assert!(finer.contains(&after[i]));
+                    assert!(-&half <= rest[i] && rest[i] < half);
+                    moved += usize::from(after[i] != before[i]);
+                }
+            }
+            assert!(next.on_lattice());
+            let rebased = start.rebased(locus, levels).unwrap();
+            assert!(matches!(
+                rebased.deposited(&deposit),
+                Err(HnnError::StaleDeposit { .. })
+            ));
+            let (later, _) = rebased.deposited(&stage(&rebased)).unwrap();
+            assert!(later.on_lattice());
+            assert_eq!(later.lattice(locus).unwrap(), finer);
+            let others = |t: &Constitution| {
+                t.carried_remainders()
+                    .into_iter()
+                    .filter(|(l, ..)| *l != locus)
+                    .collect::<Vec<_>>()
+            };
+            assert_eq!(others(&next), others(theta));
+            assert_eq!(
+                next.rebased(locus, 0).unwrap().contact_storage(a),
+                next.contact_storage(a)
+            );
+        }
+    }
+    assert!(moved > 0);
+    assert!(matches!(
+        theta.rebased(Locus::Element(0), 1),
+        Err(HnnError::RebaseLocus { .. })
+    ));
+    let mut released = theta.clone();
+    released
+        .release(&std::collections::BTreeSet::from([Locus::Channel(0)]))
+        .unwrap();
+    assert!(matches!(
+        released.rebased(Locus::Channel(0), 1),
+        Err(HnnError::ReleasedLocus { .. })
+    ));
+}
