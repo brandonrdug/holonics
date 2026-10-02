@@ -58,7 +58,11 @@ the laws that covector and its certified step stand on (the diagnosis record,
    enclosures (`lockFace_enclosure_sublevel`); read at each station's decision refinement it releases
    the section whole (`decisions_release_the_section`); its covector is `θ − q` and its first-order
    certificate is Danskin's bound over the members (`lockFace_first_order`,
-   `sum_upper_dini_descends`). Step 1b's candidate (§7).
+   `sum_upper_dini_descends`). Step 1b's candidate (§7). Read over `n` periods of the same passage
+   every candidate reads `a_x^n`, so the shares are a Gibbs state at inverse temperature `n`, and
+   the lock face lies within `log(2 + |s|)` above `n` times the hinge's positive part
+   (`lockFace_periods_hinge`); per period it tends to the hinge's positive part
+   (`lockFace_per_period_tendsto`): step 1a's hinge is step 1b's lock face at zero temperature.
 
 9. **The move's fixed points and one step's reach.** [proved-derived; formal-checked] A positive
    definite metric's step `−P g` rests exactly where `g = 0` (`metric_step_zero_iff`) and descends
@@ -106,6 +110,24 @@ the laws that covector and its certified step stand on (the diagnosis record,
    jump (`one_move_closes_iff`), a closing interval is at least its jumps over the largest per-step
    decrease (`window_length_lower`), and one grain per interval ends the path
    (`grain_windows_bounded`) (§12).
+
+13. **The flip, a switch of a ring's all-or-nothing commitment.** [proved-derived;
+   formal-checked] A flip present on every small step defeats
+   every first-order bound (`flip_defeats_first_order`); one at `η_c` needs a curvature constant
+   of its cost over `η_c²` (`flip_curvature_lower`); a margin moving at a bounded rate certifies no
+   flip within it (`no_flip_within_margin`); a visible cell end holds until the true reading reaches
+   its cut and moves there (`cell_holds_until_cut`, `cell_moves_at_cut`), at a step set by the
+   reading's place inside its cell (`cut_within_cell`) (§13).
+
+14. **The commitment order the readings resolve.** [proved-derived; formal-checked; the rule
+   itself agent-inferred] A ring commits when no ring's certain gap exceeds its upper end
+   (`certifiedLock`): rings whose gaps the readings cannot order commit together. The largest
+   certain gap commits (`certifiedLock_largest`), the true largest gap commits (`leader_locks`), a
+   lone commitment has the strictly largest true gap (`lone_lock_is_largest`), a resolved order is
+   swapped only by a crossing (`certified_order_needs_crossing`), and exact readings give the
+   largest gap with its ties (`certifiedLock_exact`); the order term, the right ring's certain gap
+   against the wrong rings' upper ends, commits no wrong ring where it is solved
+   (`order_solved_locks_no_wrong`) (§14).
 
 [open] (#62) The existence of the differentiable root path (the implicit function theorem at a
 simple root, from `Φ`'s strict differentiability), Jacobi's formula `∂_η det(λ − M − ηΔM) =
@@ -652,6 +674,132 @@ theorem decisions_release_the_section {σ κ : Type*} (locks : ℕ → Finset σ
   intro r
   induction r using Nat.strong_induction_on with
   | _ r ih => exact hdec r fun r' hr' => ih r' hr'
+
+/-! ### The lock face over `n` periods: its inverse temperature and its zero-temperature face
+
+A member read over `n` repetitions of the same passage has the monodromy `M^n`, whose spectral
+radius is `ρ(M)^n`; so every candidate reads `A_x^n`, while the resting sheet, the lossless ring's
+return, stays `1`. The shares become `A_x^n/(1 + Σ A^n)`, a Gibbs state at inverse temperature `n`
+over the levels `−log A_x`: the lock face's temperature is the reciprocal of the number of periods
+the comparison reads, and the release reads one (the code-length map record, §3). -/
+
+/-- [proved-derived; formal-checked] **The lock face over `n` periods lies within the log of its
+sheet count above `n` times the hinge's positive part**:
+`n (f)_+ ≤ ℓ_n ≤ n (f)_+ + log(2 + |s|)`, `ℓ_n = lockFace (A_t^n) (Σ_(x∈s) A_x^n)`, with `f` the
+hinge term (`hingeTerm`) of the same readings. At one period (`n = 1`) the lock face exceeds the
+hinge's positive part by at most `log(2 + |s|)`. -/
+theorem lockFace_periods_hinge (s : Finset ι) (hs : s.Nonempty) (A : ι → ℝ) (t : ι)
+    (hA : ∀ x ∈ s, 0 < A x) (ht : 0 < A t) (n : ℕ) :
+    (n : ℝ) * max (hingeTerm s hs A t) 0 ≤ lockFace (A t ^ n) (∑ x ∈ s, A x ^ n) ∧
+      lockFace (A t ^ n) (∑ x ∈ s, A x ^ n) ≤
+        (n : ℝ) * max (hingeTerm s hs A t) 0 + Real.log (2 + s.card) := by
+  set M := max (hingeTerm s hs A t) 0 with hM
+  set a := A t ^ n with ha_def
+  set r := ∑ x ∈ s, A x ^ n with hr_def
+  have ha : 0 < a := pow_pos ht n
+  have hr : 0 ≤ r := Finset.sum_nonneg fun x hx => (pow_pos (hA x hx) n).le
+  have htot : 0 < 1 + a + r := by linarith
+  have hL : lockFace a r = Real.log (1 + a + r) - (n : ℝ) * Real.log (A t) := by
+    unfold lockFace
+    rw [Real.log_div htot.ne' ha.ne', ha_def, Real.log_pow]
+  -- the three faces bounded by `M`
+  have hsup : ∀ x ∈ s, Real.log (A x / A t) ≤ M := fun x hx =>
+    le_trans (Finset.le_sup' (fun x => Real.log (A x / A t)) hx)
+      (le_trans (le_max_left _ _) (le_max_left _ _))
+  have hrest : -Real.log (A t) ≤ M := le_trans (le_max_right _ _) (le_max_left _ _)
+  have hzero : (0 : ℝ) ≤ M := le_max_right _ _
+  constructor
+  · -- lower: `n M ≤ ℓ_n`, face by face
+    have hface : ∀ c : ℝ, (∀ k : ℕ, Real.exp ((k : ℝ) * c) * A t ^ k ≤
+        1 + A t ^ k + ∑ x ∈ s, A x ^ k) → (n : ℝ) * c ≤ lockFace a r := by
+      intro c hc
+      rw [hL]
+      have h := hc n
+      have hpos : 0 < Real.exp ((n : ℝ) * c) * A t ^ n := mul_pos (Real.exp_pos _) (pow_pos ht n)
+      have := Real.log_le_log hpos h
+      rw [Real.log_mul (Real.exp_pos _).ne' (pow_pos ht n).ne', Real.log_exp, Real.log_pow] at this
+      linarith
+    have hM' : M = max (hingeTerm s hs A t) 0 := rfl
+    rcases le_total (hingeTerm s hs A t) 0 with hneg | hpos
+    · rw [hM', max_eq_right hneg]
+      apply hface 0
+      intro k
+      simp only [mul_zero, Real.exp_zero, one_mul]
+      have : 0 ≤ ∑ x ∈ s, A x ^ k := Finset.sum_nonneg fun x hx => (pow_pos (hA x hx) k).le
+      linarith
+    · rw [hM', max_eq_left hpos]
+      unfold hingeTerm
+      rcases le_total (s.sup' hs fun x => Real.log (A x / A t)) (-Real.log (A t)) with h1 | h1
+      · rw [max_eq_right h1]
+        apply hface
+        intro k
+        rw [show Real.exp ((k : ℝ) * -Real.log (A t)) * A t ^ k = 1 by
+          rw [mul_neg, ← Real.log_pow, Real.exp_neg, Real.exp_log (pow_pos ht k)]
+          exact inv_mul_cancel₀ (pow_pos ht k).ne']
+        have : 0 ≤ ∑ x ∈ s, A x ^ k := Finset.sum_nonneg fun x hx => (pow_pos (hA x hx) k).le
+        linarith [pow_pos ht k]
+      · rw [max_eq_left h1]
+        obtain ⟨y, hy, hyeq⟩ := Finset.exists_mem_eq_sup' hs fun x => Real.log (A x / A t)
+        rw [hyeq]
+        apply hface
+        intro k
+        rw [show Real.exp ((k : ℝ) * Real.log (A y / A t)) * A t ^ k = A y ^ k by
+          rw [← Real.log_pow, Real.exp_log (pow_pos (div_pos (hA y hy) ht) k), div_pow,
+            div_mul_cancel₀ _ (pow_pos ht k).ne']]
+        have hle : A y ^ k ≤ ∑ x ∈ s, A x ^ k :=
+          Finset.single_le_sum (f := fun x => A x ^ k)
+            (fun x hx => (pow_pos (hA x hx) k).le) hy
+        linarith [pow_pos ht k]
+  · -- upper: every sheet below `B^n`, `B = e^M A_t`
+    set B := Real.exp M * A t with hB
+    have hBpos : 0 < B := mul_pos (Real.exp_pos _) ht
+    have hlogB : Real.log B = M + Real.log (A t) := by
+      rw [hB, Real.log_mul (Real.exp_pos _).ne' ht.ne', Real.log_exp]
+    have hle_of_log : ∀ c : ℝ, 0 < c → Real.log c ≤ Real.log B → c ≤ B := fun c hc h =>
+      (Real.log_le_log_iff hc hBpos).mp h
+    have h1B : 1 ≤ B := by
+      have := hle_of_log 1 one_pos (by rw [Real.log_one, hlogB]; linarith)
+      exact this
+    have htB : A t ≤ B := hle_of_log (A t) ht (by rw [hlogB]; linarith)
+    have hxB : ∀ x ∈ s, A x ≤ B := fun x hx => hle_of_log (A x) (hA x hx) (by
+      rw [hlogB]
+      have := hsup x hx
+      rw [Real.log_div (hA x hx).ne' ht.ne'] at this
+      linarith)
+    have hsum : r ≤ s.card * B ^ n := by
+      rw [hr_def]
+      have := Finset.sum_le_card_nsmul s (fun x => A x ^ n) (B ^ n) fun x hx =>
+        pow_le_pow_left₀ (hA x hx).le (hxB x hx) n
+      simpa [nsmul_eq_mul] using this
+    have htot_le : 1 + a + r ≤ (2 + s.card) * B ^ n := by
+      have h1 : (1 : ℝ) ≤ B ^ n := one_le_pow₀ h1B
+      have h2 : a ≤ B ^ n := pow_le_pow_left₀ ht.le htB n
+      nlinarith
+    have hlog := Real.log_le_log htot htot_le
+    have hcard : (0 : ℝ) < 2 + s.card := by positivity
+    rw [Real.log_mul hcard.ne' (pow_pos hBpos n).ne', Real.log_pow, hlogB] at hlog
+    rw [hL]
+    nlinarith
+
+/-- [proved-derived; formal-checked] **The hinge is the lock face's zero-temperature face**: per
+period, the lock face read over `n` periods tends to the hinge's positive part,
+`ℓ_n / n → (f)_+`. Step 1a's comparison is step 1b's in the limit of many periods. -/
+theorem lockFace_per_period_tendsto (s : Finset ι) (hs : s.Nonempty) (A : ι → ℝ) (t : ι)
+    (hA : ∀ x ∈ s, 0 < A x) (ht : 0 < A t) :
+    Tendsto (fun n : ℕ => lockFace (A t ^ n) (∑ x ∈ s, A x ^ n) / n) atTop
+      (𝓝 (max (hingeTerm s hs A t) 0)) := by
+  set M := max (hingeTerm s hs A t) 0
+  have hgap : Tendsto (fun n : ℕ => M + Real.log (2 + s.card) / n) atTop (𝓝 M) := by
+    simpa using (tendsto_const_div_atTop_nhds_zero_nat (Real.log (2 + s.card))).const_add M
+  refine tendsto_of_tendsto_of_tendsto_of_le_of_le' tendsto_const_nhds hgap ?_ ?_
+  · filter_upwards [eventually_ge_atTop 1] with n hn
+    have hnpos : (0 : ℝ) < n := by exact_mod_cast hn
+    rw [le_div_iff₀ hnpos, mul_comm]
+    exact (lockFace_periods_hinge s hs A t hA ht n).1
+  · filter_upwards [eventually_ge_atTop 1] with n hn
+    have hnpos : (0 : ℝ) < n := by exact_mod_cast hn
+    rw [div_le_iff₀ hnpos, add_mul, div_mul_cancel₀ _ hnpos.ne', mul_comm]
+    exact (lockFace_periods_hinge s hs A t hA ht n).2
 
 end LockFace
 
@@ -1796,6 +1944,241 @@ theorem grain_windows_bounded {f : ℕ → ℝ} {t : ℕ → ℕ} {W : ℕ} {h :
 
 end ReleaseGuard
 
+/-! ## 13. The flip: where a station's commitment switches, and what the move can certify
+
+Each station is a tick of the receiving ring's clock, and each candidate a class placed there. A
+reading is the bank's growth over one turn of the passage with that class placed, known to the
+receiver only as a cell `[L, U]` of its dyadic bisection at the release's grain. Past the threshold
+(`L_top > 1`) the release commits a station to its dominant class outright, the zero-temperature
+limit of the lock, and the stations commit in order of the gap `g_j = L_top − U_runner`, the
+dominant class's excess multiplier over its strongest rival. Each commitment places a datum the
+later stations read. The **margin** at a refinement is the largest gap less the next (zero at a
+tie), with each committed station's threshold margin `L_top − 1` and gap beside it. Because the
+commitment is all or nothing, a move **flips** (switches a commitment) exactly where a margin's
+value at the cell ends changes sign or a tie splits. The code length then jumps by the comparison
+re-read on the successor's sections against the incumbent's, the second sum of `own_telescopes`: a
+jump set by which data are placed beside which, not by the step's length.
+
+What a native move can certify about it, each statement on one coordinate `η` of the move:
+- **No first-order bound survives a flip on every small step** (`flip_defeats_first_order`): a
+  positive jump present at every `η ∈ (0, δ)` exceeds `own 0 − η s + K η²` for some `η`, whatever
+  `s` and `K`.
+- **A flip at `η_c` needs a curvature constant of its cost over `η_c²`**
+  (`flip_curvature_lower`): `J − η_c (s₁ − s) ≤ K η_c²`.
+- **A margin moving at most `Λ η` certifies no flip below `μ 0 / Λ`** (`no_flip_within_margin`).
+  The chain has no such `Λ` over a segment (this section's record, §3b).
+- **A visible end stays until the true reading reaches its cell's cut, and moves there**
+  (`cell_holds_until_cut`, `cell_moves_at_cut`); the first such step lies anywhere in
+  `(0, w/v]` (`cut_within_cell`), set by the reading's place inside its cell, which the enclosure
+  does not carry. A tie, or a margin within the summed cell widths, can therefore flip at an
+  arbitrarily small step.
+- **A crossing's lock faces cost at most twice the re-read stations' log changes**
+  (`lockFace_sub_abs_le`, `crossing_cost_le`): the jump is read at one constitution, the first
+  carried state past the cut, on both commitment orders, so it does not shrink with the step. Its
+  lock faces' part is bounded by how much the different placed data change the re-read stations'
+  readings, which no owner bounds before the crossing is read; under `LockOrder` the order term's
+  change is read beside it. -/
+
+section Flip
+
+/-- [proved-derived; formal-checked] **A flip on every small step defeats every first-order bound**:
+if `own η = g η + J` on `(0, δ)` with `J > 0`, `own 0 = g 0` and `g` right-continuous at `0`,
+then for every slope `s` and curvature `K` some `η ∈ (0, δ)` has `own 0 − η s + K η² < own η`. -/
+theorem flip_defeats_first_order {own g : ℝ → ℝ} {J δ : ℝ} (hJ : 0 < J) (hδ : 0 < δ)
+    (hflip : ∀ η ∈ Set.Ioo 0 δ, own η = g η + J) (h0 : own 0 = g 0)
+    (hg : ContinuousWithinAt g (Set.Ioi 0) 0) (s K : ℝ) :
+    ∃ η ∈ Set.Ioo 0 δ, own 0 - η * s + K * η ^ 2 < own η := by
+  have hid : Tendsto (fun η : ℝ => η) (𝓝[>] (0 : ℝ)) (𝓝 0) :=
+    tendsto_nhdsWithin_of_tendsto_nhds tendsto_id
+  have hlim : Tendsto (fun η => g η + J - (g 0 - η * s + K * η ^ 2)) (𝓝[>] (0 : ℝ))
+      (𝓝 (g 0 + J - (g 0 - 0 * s + K * 0 ^ 2))) :=
+    ((hg.tendsto.add_const J).sub ((tendsto_const_nhds.sub (hid.mul_const s)).add
+      ((hid.pow 2).const_mul K)))
+  have hval : g 0 + J - (g 0 - 0 * s + K * 0 ^ 2) = J := by ring
+  rw [hval] at hlim
+  have hev := (hlim.eventually (eventually_gt_nhds hJ)).and (Ioo_mem_nhdsGT hδ)
+  obtain ⟨η, hpos, hmem⟩ := hev.exists
+  refine ⟨η, hmem, ?_⟩
+  rw [hflip η hmem, h0]
+  linarith
+
+/-- [proved-derived; formal-checked] **A smooth bound across a flip carries its cost over the
+step squared**: if the own release jumps by `J` at `η` over a continuous part falling at most at
+slope `s₁`, a bound `own η ≤ own 0 − η s + K η²` forces `J − η (s₁ − s) ≤ K η²`. -/
+theorem flip_curvature_lower {own g : ℝ → ℝ} {η J s s₁ K : ℝ} (hflip : own η = g η + J)
+    (h0 : own 0 = g 0) (hg : g 0 - η * s₁ ≤ g η) (hbound : own η ≤ own 0 - η * s + K * η ^ 2) :
+    J - η * (s₁ - s) ≤ K * η ^ 2 := by
+  linarith
+
+/-- [proved-derived; formal-checked] **A margin with a bounded rate certifies no flip within it**:
+if `|μ η − μ 0| ≤ Λ η` for `η ≥ 0`, then `μ η > 0` wherever `Λ η < μ 0`. -/
+theorem no_flip_within_margin {μ : ℝ → ℝ} {Λ : ℝ} (hlip : ∀ η, 0 ≤ η → |μ η - μ 0| ≤ Λ * η)
+    {η : ℝ} (hη : 0 ≤ η) (hmargin : Λ * η < μ 0) : 0 < μ η := by
+  have := (abs_le.mp (hlip η hη)).1
+  linarith
+
+/-- [proved-derived; formal-checked] **A visible end holds until the true reading reaches its
+cell's cut**: on a lattice of width `w`, a reading `x` moving at rate `v > 0` keeps its cell
+`⌊x/w⌋` for every `η` below `(w(⌊x/w⌋ + 1) − x)/v`. -/
+theorem cell_holds_until_cut {w x v : ℝ} (hw : 0 < w) (hv : 0 < v) {η : ℝ} (hη : 0 ≤ η)
+    (hlt : η < (w * (⌊x / w⌋ + 1) - x) / v) : ⌊(x + η * v) / w⌋ = ⌊x / w⌋ := by
+  rw [Int.floor_eq_iff]
+  have hx := Int.floor_le (x / w)
+  have h1 : (⌊x / w⌋ : ℝ) * w ≤ x := by rwa [le_div_iff₀ hw] at hx
+  have h2 : η * v < w * (⌊x / w⌋ + 1) - x := by rwa [lt_div_iff₀ hv] at hlt
+  constructor
+  · rw [le_div_iff₀ hw]; nlinarith
+  · rw [div_lt_iff₀ hw]; nlinarith
+
+/-- [proved-derived; formal-checked] **…and moves to the next cell there.** -/
+theorem cell_moves_at_cut {w x v : ℝ} (hw : 0 < w) (hv : 0 < v) :
+    ⌊(x + (w * (⌊x / w⌋ + 1) - x) / v * v) / w⌋ = ⌊x / w⌋ + 1 := by
+  rw [div_mul_cancel₀ _ hv.ne']
+  have : (x + (w * (⌊x / w⌋ + 1) - x)) / w = ((⌊x / w⌋ + 1 : ℤ) : ℝ) := by
+    push_cast; field_simp; ring
+  rw [this, Int.floor_intCast]
+
+/-- [proved-derived; formal-checked] **The step to the cut lies anywhere in `(0, w/v]`**: it is set
+by the reading's place inside its cell, which the cell's ends do not carry. -/
+theorem cut_within_cell {w x v : ℝ} (hw : 0 < w) (hv : 0 < v) :
+    0 < (w * (⌊x / w⌋ + 1) - x) / v ∧ (w * (⌊x / w⌋ + 1) - x) / v ≤ w / v := by
+  have hx := Int.floor_le (x / w)
+  have hx' := Int.lt_floor_add_one (x / w)
+  have h1 : (⌊x / w⌋ : ℝ) * w ≤ x := by rwa [le_div_iff₀ hw] at hx
+  have h2 : x < (⌊x / w⌋ + 1) * w := by rwa [div_lt_iff₀ hw] at hx'
+  constructor
+  · apply div_pos _ hv; nlinarith
+  · apply div_le_div_of_nonneg_right _ hv.le; nlinarith
+
+/-- [proved-derived; formal-checked] **A lock face moves by at most twice its readings' largest
+log change.** If the target's reading and the rivals' sum each change by at most a factor `e^δ`
+either way, the face `ℓ = log(1 + a + r) − log a` changes by at most `2δ`: `log(1 + a + r)` by at
+most `δ` (the resting weight one only dilutes the change), and `log a` by at most `δ`. -/
+theorem lockFace_sub_abs_le {a r a' r' δ : ℝ} (ha : 0 < a) (hr : 0 ≤ r) (ha' : 0 < a')
+    (hr' : 0 ≤ r') (hδ : 0 ≤ δ) (ha1 : a' ≤ Real.exp δ * a) (ha2 : a ≤ Real.exp δ * a')
+    (hr1 : r' ≤ Real.exp δ * r) (hr2 : r ≤ Real.exp δ * r') :
+    |lockFace a' r' - lockFace a r| ≤ 2 * δ := by
+  have he : 1 ≤ Real.exp δ := Real.one_le_exp hδ
+  have hep : 0 < Real.exp δ := Real.exp_pos δ
+  have hP : 0 < 1 + a + r := by linarith
+  have hP' : 0 < 1 + a' + r' := by linarith
+  have hP1 : 1 + a' + r' ≤ Real.exp δ * (1 + a + r) := by nlinarith
+  have hP2 : 1 + a + r ≤ Real.exp δ * (1 + a' + r') := by nlinarith
+  have hlog : ∀ {x y : ℝ}, 0 < x → 0 < y → x ≤ Real.exp δ * y → Real.log x ≤ δ + Real.log y := by
+    intro x y hx hy hxy
+    have := Real.log_le_log hx hxy
+    rwa [Real.log_mul hep.ne' hy.ne', Real.log_exp] at this
+  have l1 := hlog hP' hP hP1
+  have l2 := hlog hP hP' hP2
+  have l3 := hlog ha' ha ha1
+  have l4 := hlog ha ha' ha2
+  unfold lockFace
+  rw [Real.log_div hP'.ne' ha'.ne', Real.log_div hP.ne' ha.ne', abs_le]
+  constructor <;> linarith
+
+/-- [proved-derived; formal-checked] **A crossing costs at most twice the re-read stations' log
+changes.** A crossing re-reads the stations `D` with different placed data before them. If station
+`j`'s target reading and rivals' sum change by at most a factor `e^(δ j)` between its two contexts,
+the lock faces' part of the jump, `J = Σ_(j∈D) (ℓ′_j − ℓ_j)`, has `|J| ≤ 2 Σ_(j∈D) δ j` (an order
+term, where the comparison carries one, is not covered). -/
+theorem crossing_cost_le {ι : Type*} (D : Finset ι) (a r a' r' δ : ι → ℝ)
+    (ha : ∀ j ∈ D, 0 < a j) (hr : ∀ j ∈ D, 0 ≤ r j) (ha' : ∀ j ∈ D, 0 < a' j)
+    (hr' : ∀ j ∈ D, 0 ≤ r' j) (hδ : ∀ j ∈ D, 0 ≤ δ j)
+    (ha1 : ∀ j ∈ D, a' j ≤ Real.exp (δ j) * a j) (ha2 : ∀ j ∈ D, a j ≤ Real.exp (δ j) * a' j)
+    (hr1 : ∀ j ∈ D, r' j ≤ Real.exp (δ j) * r j) (hr2 : ∀ j ∈ D, r j ≤ Real.exp (δ j) * r' j) :
+    |∑ j ∈ D, (lockFace (a' j) (r' j) - lockFace (a j) (r j))| ≤ 2 * ∑ j ∈ D, δ j := by
+  rw [Finset.mul_sum]
+  refine (Finset.abs_sum_le_sum_abs _ _).trans (Finset.sum_le_sum fun j hj => ?_)
+  exact lockFace_sub_abs_le (ha j hj) (hr j hj) (ha' j hj) (hr' j hj) (hδ j hj) (ha1 j hj)
+    (ha2 j hj) (hr1 j hj) (hr2 j hj)
+
+end Flip
+
+/-! ## 14. The commitment order the readings resolve
+
+Each eligible station's gap (its dominant class's excess multiplier) is enclosed by the readings
+between its certain gap `lo j = L_top − max U`, the least they allow, and its upper end
+`hi j = U_top − max L`, the greatest. Committing only the strictly largest certain gap orders two
+stations whose enclosures overlap by where their cells' cuts fall, a quantity no reading carries.
+(`m7`'s swap is not this case: there the two gaps cross, certified one way at the incumbent and the
+other way at the successor, the case `certified_order_needs_crossing` names.) Two gaps whose
+enclosures overlap have no order at the receiver's resolution, so their commitments are simultaneous for it, as two events closer than one tick have no order on
+that clock. The release's other decisions (a top exceeds its rivals, a station passes its
+threshold) are orderings the enclosures resolve; read the same way, a station is below the largest
+only when its upper end is below the largest certain gap. **A station commits when no station's
+certain gap exceeds its upper end** (`certifiedLock`). Then:
+- the station of the largest certain gap locks, so the rule is a nonempty lock set wherever one
+  station is eligible (`certifiedLock_largest`), and §8's decisions law applies unchanged;
+- the true largest gap always locks (`leader_locks`);
+- a station that locks alone has the strictly largest true gap (`lone_lock_is_largest`), so a
+  station certified below another at one state locks alone at a later one only if their true gaps
+  cross (`certified_order_needs_crossing`);
+- on exact readings it is the largest gap with its ties, the rule as it stood
+  (`certifiedLock_exact`);
+- the comparison's order term reads the same two ends, the right station's certain gap against each
+  wrong station's upper end, so where it is solved no wrong station locks
+  (`order_solved_locks_no_wrong`): one law for the release and the term. -/
+
+section CertifiedLock
+
+variable {ι : Type*}
+
+/-- [definition; agent-inferred, October 2] **A station commits when no station's certain gap
+exceeds its upper end.** Inferred: the release reads its other orderings of enclosures only where they
+are certified and an uncertified one plural, and this reads the gap order the same way; no owner
+states that convention for the gap order. -/
+def certifiedLock (lo hi : ι → ℝ) (j : ι) : Prop := ∀ i, lo i ≤ hi j
+
+/-- [proved-derived; formal-checked] **The station of the largest certain gap locks.** -/
+theorem certifiedLock_largest {lo hi : ι → ℝ} (hlohi : ∀ i, lo i ≤ hi i) {k : ι}
+    (hk : ∀ i, lo i ≤ lo k) : certifiedLock lo hi k :=
+  fun i => (hk i).trans (hlohi k)
+
+/-- [proved-derived; formal-checked] **The true largest gap always locks**: with every true gap
+`g i ∈ [lo i, hi i]`, a station whose true gap is the largest locks. -/
+theorem leader_locks {lo hi g : ι → ℝ} (hlo : ∀ i, lo i ≤ g i) (hhi : ∀ i, g i ≤ hi i) {k : ι}
+    (hk : ∀ i, g i ≤ g k) : certifiedLock lo hi k :=
+  fun i => (hlo i).trans ((hk i).trans (hhi k))
+
+/-- [proved-derived; formal-checked] **On exact readings the rule is the largest gap with its
+ties.** -/
+theorem certifiedLock_exact {g : ι → ℝ} {j : ι} : certifiedLock g g j ↔ ∀ i, g i ≤ g j :=
+  Iff.rfl
+
+/-- [proved-derived; formal-checked] **A station that locks alone has the strictly largest true
+gap.** -/
+theorem lone_lock_is_largest [Finite ι] [Nonempty ι] {lo hi g : ι → ℝ} (hlo : ∀ i, lo i ≤ g i)
+    (hhi : ∀ i, g i ≤ hi i) {k : ι} (hlone : ∀ j, j ≠ k → ¬ certifiedLock lo hi j) :
+    ∀ j, j ≠ k → g j < g k := by
+  obtain ⟨m, hm⟩ := Finite.exists_max g
+  have hmk : m = k := by
+    by_contra h
+    exact hlone m h (leader_locks hlo hhi hm)
+  subst hmk
+  intro j hj
+  obtain ⟨i, hi⟩ := not_forall.mp (hlone j hj)
+  linarith [hhi j, hlo i, hm i, lt_of_not_ge hi]
+
+/-- [proved-derived; formal-checked] **A resolved order is swapped only by a crossing**: if `j`'s
+upper end is below `k`'s certain gap at one state and `j` locks alone at another, the true gaps
+cross: `g j < g k` before and `g′ k < g′ j` after. -/
+theorem certified_order_needs_crossing [Finite ι] [Nonempty ι] {lo hi g lo' hi' g' : ι → ℝ}
+    (hlo : ∀ i, lo i ≤ g i) (hhi : ∀ i, g i ≤ hi i) (hlo' : ∀ i, lo' i ≤ g' i)
+    (hhi' : ∀ i, g' i ≤ hi' i) {j k : ι} (hjk : j ≠ k) (hbelow : hi j < lo k)
+    (hlone : ∀ i, i ≠ j → ¬ certifiedLock lo' hi' i) : g j < g k ∧ g' k < g' j :=
+  ⟨by linarith [hhi j, hlo k], lone_lock_is_largest hlo' hhi' hlone k (Ne.symm hjk)⟩
+
+/-- [proved-derived; formal-checked] **The order term solved commits no wrong station**: the right
+station `r`'s certain gap past the wrong stations' upper ends together (each nonnegative) leaves
+every wrong station `j`'s upper end short of `r`'s certain gap, so none commits. This is the order term's solved
+level (`hnn::executed::OrderTerm`) on the rule `certifiedLock`. -/
+theorem order_solved_locks_no_wrong {lo hi : ι → ℝ} (W : Finset ι) (r : ι)
+    (hhi : ∀ j ∈ W, 0 ≤ hi j) (hsolved : ∑ j ∈ W, hi j < lo r) :
+    ∀ j ∈ W, ¬ certifiedLock lo hi j := fun _ hj hlock =>
+  absurd ((hlock r).trans (Finset.single_le_sum hhi hj)) (not_le.mpr hsolved)
+
+end CertifiedLock
+
 section Audit
 
 #print axioms passage_coeff_zero
@@ -1825,6 +2208,8 @@ section Audit
 #print axioms lockFace_covector
 #print axioms lockFace_share_lt_one
 #print axioms decisions_release_the_section
+#print axioms lockFace_periods_hinge
+#print axioms lockFace_per_period_tendsto
 #print axioms lockTerm_eq
 #print axioms lockTerm_mono
 #print axioms lockTerm_line
@@ -1878,6 +2263,20 @@ section Audit
 #print axioms lockFace_unbounded
 #print axioms excursion_of_bounded
 #print axioms grain_windows_bounded
+#print axioms flip_defeats_first_order
+#print axioms flip_curvature_lower
+#print axioms no_flip_within_margin
+#print axioms cell_holds_until_cut
+#print axioms cell_moves_at_cut
+#print axioms cut_within_cell
+#print axioms certifiedLock_largest
+#print axioms leader_locks
+#print axioms certifiedLock_exact
+#print axioms lone_lock_is_largest
+#print axioms certified_order_needs_crossing
+#print axioms lockFace_sub_abs_le
+#print axioms crossing_cost_le
+#print axioms order_solved_locks_no_wrong
 
 end Audit
 

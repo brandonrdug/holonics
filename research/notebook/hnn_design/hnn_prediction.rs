@@ -368,6 +368,14 @@ fn main() {
         // Step 1b's causal reading (I6).
         // The segment probe (the pin
         // research/records/2026-10-01_THE_SEGMENT_PROBE_PINNED_BEFORE_ITS_RUN.md): read-only.
+        // The whole-turn commitment turns beside the gap order (the turn-clock record §4, §9):
+        // read-only.
+        (Some("executed"), Some("instants")) => executed_loop::instants(
+            &arguments[3],
+            arguments[4].parse().expect("a seed"),
+            arguments[5].parse().expect("a count"),
+            &arguments[6..],
+        ),
         (Some("executed"), Some("segment")) => executed_loop::segment(
             &arguments[3],
             arguments[4].parse().expect("a seed"),

@@ -80,6 +80,8 @@
 //! fn borrowed(field: holonics::hnn::Field<'static>) {}
 //! ```
 
+pub mod continuation;
+
 use num_bigint::BigUint;
 use num_traits::{Signed, Zero};
 
@@ -150,6 +152,8 @@ impl Carried {
 /// the carried remainders.
 #[derive(Debug)]
 pub struct Word<'c> {
+    /// The native source/material producer of a source-bound continuing word.
+    native_source: Option<(crate::hnn::constitution::Constitution, Current, std::sync::Arc<SourceMoment>)>,
     field: &'c Field,
     operands: Operands,
     clock: Clock,
@@ -1003,6 +1007,7 @@ impl<'c> Word<'c> {
             clock.advance(&BigUint::from(opened_at));
         }
         let mut word = Self {
+            native_source: None,
             field,
             operands,
             clock,
@@ -1726,6 +1731,7 @@ impl<'c> Word<'c> {
     /// (`KeptWord`).
     pub(crate) fn keep(self) -> KeptWord {
         let Word {
+            native_source: _,
             field: _,
             operands,
             clock,
@@ -1875,6 +1881,7 @@ impl KeptWord {
             opened_at,
         } = self;
         Word {
+            native_source: None,
             field,
             operands,
             clock,
