@@ -1520,3 +1520,39 @@ fn e_can_supply_more_than_the_readings_ask_and_turn_the_modulus() {
     let (own, supplied) = solve.modulus_drive.clone().unwrap();
     assert!(own.is_positive() && supplied > own);
 }
+
+/// **The coordinate and witness metrics keep `ρ` within its founding bound**: from `generic(92)` at
+/// its founded `ρ₀` the comparison's slope asks for a longer memory (`γ_ρ < 0`), so the coordinate
+/// law's `Δρ = −γ_ρ/G_ρ` and the witness's `β/α` would raise `ρ` past the one-turn alias bound; every
+/// carried trial holds it at `max(ρ₀, ρ) = ρ₀`.
+#[test]
+fn the_founding_bound_holds_the_coordinate_and_witness_moduli() {
+    use crate::hnn::executed::{MoveMetric, executed_move_in};
+    let field = joint();
+    let base = generic(&field, 92);
+    let founding = base.founding_transport(&field, 0).unwrap();
+    let theta = base.with_transport(0, founding.clone()).unwrap();
+    let refinement = Refinement::declare(&field, 0, 2, 1, 4, 2).unwrap();
+    let requests =
+        short_requests(&field, &[(95, [0, 1, 2, 1]), (96, [1, 1, 0, 2]), (97, [2, 0, 1, 1])]);
+    for metric in [MoveMetric::Coordinate, MoveMetric::Witness] {
+        let moved = executed_move_in(
+            &field,
+            &theta,
+            &requests,
+            &refinement,
+            &joint_bank(),
+            12,
+            Comparison::LOCK_DECISIONS,
+            metric,
+        )
+        .unwrap();
+        assert!(moved.modulus_slope.as_ref().unwrap().is_negative());
+        for trial in &moved.trials {
+            assert!(trial.modulus.as_ref().is_none_or(|m| m <= &founding), "{metric:?}");
+        }
+        if let Some((successor, _)) = &moved.adopted {
+            assert!(successor.transport(0) <= founding);
+        }
+    }
+}
