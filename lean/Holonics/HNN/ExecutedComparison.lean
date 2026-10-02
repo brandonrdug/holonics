@@ -86,6 +86,23 @@ the laws that covector and its certified step stand on (the diagnosis record,
    change and its certificate are mass-free, and a deposit never lowers the step's kinetic energy
    (`deposit_raises_native_energy`) (§11).
 
+12. **The release guard.** [proved-derived; formal-checked] A move's change in the own release is
+   its fixed mask's change, continuous and certified at first order, plus the flip of the
+   successor's own decisions read against the incumbent's (`own_telescopes`). Each step certifies
+   the fixed mask's fall. The own release is guarded over a window from a checkpoint: below the
+   checkpoint's plus a height `h` throughout, and closing at most `W` steps on below the checkpoint's
+   less `σ ≥ 0`, which holds exactly when the window's fixed-mask decreases exceed its flips by `σ`
+   (`window_closes_iff`). `W = 1`, `h = 0` is the monotone guard (`checkpoint_one_iff`). The
+   checkpoints descend by the certified decreases (`checkpoint_descends`), nothing exceeds the
+   opening by more than `h` (`excursion_le_start`), and the decreases are summable
+   (`checkpoints_sum_le`, `large_windows_card`). A divergent step sum, which the lattice floor
+   supplies (`floor_steps_diverge`), drives the windows' least slope below every `ε`
+   (`schedule_frequently_small`, `floor_large_slopes_card`). The parameters follow from the laws:
+   a bounded comparison supplies the height (`excursion_of_bounded`); a window of one answers no
+   flip (`one_move_closes_iff`) and a closing window is at least its flips over the largest
+   per-move decrease (`window_length_lower`); a grain's decrease per window ends the chain
+   (`grain_windows_bounded`) (§12).
+
 [open] (#62) The existence of the differentiable root path (the implicit function theorem at a
 simple root, from `Φ`'s strict differentiability), Jacobi's formula `∂_η det(λ − M − ηΔM) =
 −tr(adj(λ − M) ΔM)` with the adjugate's rank-one form at a simple root, and the certificate's
@@ -1508,6 +1525,234 @@ theorem deposit_raises_native_energy {M K : Matrix n n ℝ} (hM : M.PosDef) (hK 
 
 end PortMass
 
+/-! ## 12. The release guard: a certified fixed-mask step and an excursion above a checkpoint
+
+The release guard (`OwnNotBelow` in the Rust owner) adopted a successor only when its own release's
+comparison fell strictly below the incumbent's (§4). The plain-gradient path that reaches the
+sections does not: its own comparison rises above its opening before it falls. This section states
+what the guard compares and the law that follows that path.
+
+**What changes along a move.** Let `f k` be the own release's comparison at the `k`-th adopted
+state and `m k` the incumbent's fixed mask read at the successor (the incumbent's decisions kept).
+At the incumbent the two agree, so `f (k+1) − f k = (m k − f k) + (f (k+1) − m k)`. The first term
+is the fixed mask's change, continuous along the move and the object of the first-order certificate
+(§3, §4); the second is the **flip**, the successor's own decisions read against the incumbent's on
+the same `E`, discontinuous where a decision changes (`own_telescopes`). The flip is re-read once,
+at the next move, whose incumbent is the successor's own release.
+
+**The law.** Each adopted step certifies the fixed mask's fall (unchanged). The own release is
+guarded over a window: from a checkpoint `t n`, every comparison until the next checkpoint stays
+below the checkpoint's plus a height `h`, and the next checkpoint, at most `W` steps on, lies below
+the checkpoint's less a certified decrease `σ n ≥ 0`. A window that does not close returns to its
+checkpoint. `W = 1` and `h = 0` is the monotone guard (`checkpoint_one_iff`). The window closes
+exactly when the certified fixed-mask decreases exceed the window's net flips by `σ`
+(`window_closes_iff`). -/
+
+section ReleaseGuard
+
+/-- [proved-derived; formal-checked] **A move's change is its fixed mask's change and its flip**:
+`f n − f 0 = Σ_(k<n) (m k − f k) + Σ_(k<n) (f (k+1) − m k)`. -/
+theorem own_telescopes (f m : ℕ → ℝ) (n : ℕ) :
+    f n - f 0 = ∑ k ∈ Finset.range n, (m k - f k) + ∑ k ∈ Finset.range n, (f (k + 1) - m k) := by
+  rw [← Finset.sum_add_distrib]
+  simp only [sub_add_sub_cancel']
+  exact (Finset.sum_range_sub f n).symm
+
+/-- [proved-derived; formal-checked] **A window closes exactly when its fixed-mask decreases exceed
+its flips**: from `a` to `b ≥ a`, `f b ≤ f a − σ` iff
+`Σ_(a≤k<b) (f (k+1) − m k) ≤ Σ_(a≤k<b) (f k − m k) − σ`. -/
+theorem window_closes_iff (f m : ℕ → ℝ) {a b : ℕ} (hab : a ≤ b) (σ : ℝ) :
+    f b ≤ f a - σ ↔
+      ∑ k ∈ Finset.Ico a b, (f (k + 1) - m k) ≤ ∑ k ∈ Finset.Ico a b, (f k - m k) - σ := by
+  have htel : ∑ k ∈ Finset.Ico a b, (f (k + 1) - f k) = f b - f a :=
+    Finset.sum_Ico_sub f hab
+  have hsplit : ∑ k ∈ Finset.Ico a b, (f (k + 1) - f k) =
+      ∑ k ∈ Finset.Ico a b, (f (k + 1) - m k) - ∑ k ∈ Finset.Ico a b, (f k - m k) := by
+    rw [← Finset.sum_sub_distrib]
+    exact Finset.sum_congr rfl fun k _ => by ring
+  constructor <;> intro h <;> linarith
+
+/-- The checkpoint guard on a chain of comparisons `f` with checkpoints `t` (`t 0 = 0`): every
+comparison of the `n`-th window lies below its checkpoint's plus `h`, and the window closes at most
+`W` steps on, below its checkpoint's less `σ n`. -/
+structure CheckpointGuard (f : ℕ → ℝ) (t : ℕ → ℕ) (W : ℕ) (h : ℝ) (σ : ℕ → ℝ) : Prop where
+  start : t 0 = 0
+  advances : ∀ n, t n < t (n + 1)
+  length : ∀ n, t (n + 1) ≤ t n + W
+  excursion : ∀ n j, t n ≤ j → j ≤ t (n + 1) → f j ≤ f (t n) + h
+  closes : ∀ n, f (t (n + 1)) ≤ f (t n) - σ n
+
+/-- [proved-derived; formal-checked] **The guard of one step and no height is the monotone
+guard**: checkpoints at every step with `h = 0` hold exactly when `f (n+1) ≤ f n − σ n` for every
+`n`, with `σ ≥ 0`. -/
+theorem checkpoint_one_iff (f σ : ℕ → ℝ) (hσ : ∀ n, 0 ≤ σ n) :
+    CheckpointGuard f id 1 0 σ ↔ ∀ n, f (n + 1) ≤ f n - σ n := by
+  constructor
+  · intro g n
+    simpa using g.closes n
+  · intro hf
+    refine ⟨rfl, fun n => Nat.lt_succ_self n, fun n => le_rfl, fun n j hlo hhi => ?_,
+      fun n => by simpa using hf n⟩
+    simp only [id, add_zero] at hlo hhi ⊢
+    rcases Nat.eq_or_lt_of_le hhi with rfl | hlt
+    · linarith [hf n, hσ n]
+    · rw [le_antisymm (Nat.lt_succ_iff.mp hlt) hlo]
+
+/-- [proved-derived; formal-checked] **The checkpoints descend by the certified decreases**:
+`f (t n) ≤ f 0 − Σ_(b<n) σ b`. -/
+theorem checkpoint_descends {f : ℕ → ℝ} {t : ℕ → ℕ} {W : ℕ} {h : ℝ} {σ : ℕ → ℝ}
+    (g : CheckpointGuard f t W h σ) (n : ℕ) :
+    f (t n) ≤ f 0 - ∑ b ∈ Finset.range n, σ b := by
+  induction n with
+  | zero => simp [g.start]
+  | succ n ih =>
+    rw [Finset.sum_range_succ]
+    linarith [g.closes n]
+
+/-- [proved-derived; formal-checked] **No comparison exceeds the opening's by more than the
+height**: in the `n`-th window, `f j ≤ f 0 + h` (with `σ ≥ 0`). -/
+theorem excursion_le_start {f : ℕ → ℝ} {t : ℕ → ℕ} {W : ℕ} {h : ℝ} {σ : ℕ → ℝ}
+    (g : CheckpointGuard f t W h σ) (hσ : ∀ n, 0 ≤ σ n) {n j : ℕ} (hlo : t n ≤ j)
+    (hhi : j ≤ t (n + 1)) : f j ≤ f 0 + h := by
+  have h1 := g.excursion n j hlo hhi
+  have h2 := checkpoint_descends g n
+  have h3 : 0 ≤ ∑ b ∈ Finset.range n, σ b := Finset.sum_nonneg fun b _ => hσ b
+  linarith
+
+/-- [proved-derived; formal-checked] **The excursion check on enclosures is sound**: with the
+checkpoint's comparison at least `L` and the successor's at most `U`, `U ≤ L + h` gives
+`f ≤ f_checkpoint + h`; at `h = 0` with strict `<` it is §4's disjoint enclosures. -/
+theorem excursion_enclosure {F F' L U h : ℝ} (hF : L ≤ F) (hF' : F' ≤ U) (hcheck : U ≤ L + h) :
+    F' ≤ F + h := by
+  linarith
+
+/-- [proved-derived; formal-checked] **The certified decreases are summable**: below a floor
+`m ≤ f`, `Σ_(b<n) σ b ≤ f 0 − m`. -/
+theorem checkpoints_sum_le {f : ℕ → ℝ} {t : ℕ → ℕ} {W : ℕ} {h : ℝ} {σ : ℕ → ℝ}
+    (g : CheckpointGuard f t W h σ) {m : ℝ} (hm : ∀ k, m ≤ f k) (n : ℕ) :
+    ∑ b ∈ Finset.range n, σ b ≤ f 0 - m := by
+  linarith [checkpoint_descends g n, hm (t n)]
+
+/-- [proved-derived; formal-checked] **Few windows certify much**: with `σ ≥ 0`, at most
+`(f 0 − m)/ε` of the first `n` windows certify `ε` or more. -/
+theorem large_windows_card {f : ℕ → ℝ} {t : ℕ → ℕ} {W : ℕ} {h : ℝ} {σ : ℕ → ℝ}
+    (g : CheckpointGuard f t W h σ) (hσ : ∀ n, 0 ≤ σ n) {m : ℝ} (hm : ∀ k, m ≤ f k) {ε : ℝ}
+    (n : ℕ) : (((Finset.range n).filter fun b => ε ≤ σ b).card : ℝ) * ε ≤ f 0 - m := by
+  have hsum := checkpoints_sum_le g hm n
+  have hfilter : ∑ b ∈ (Finset.range n).filter (fun b => ε ≤ σ b), σ b ≤
+      ∑ b ∈ Finset.range n, σ b :=
+    Finset.sum_le_sum_of_subset_of_nonneg (Finset.filter_subset _ _) fun b _ _ => hσ b
+  have hcard : (((Finset.range n).filter fun b => ε ≤ σ b).card : ℝ) * ε ≤
+      ∑ b ∈ (Finset.range n).filter (fun b => ε ≤ σ b), σ b := by
+    rw [← nsmul_eq_mul, ← Finset.sum_const]
+    exact Finset.sum_le_sum fun b hb => (Finset.mem_filter.mp hb).2
+  linarith
+
+/-- [proved-derived; formal-checked] **The schedule's condition**: let each window's certified
+decrease be `s b = η b · q b` with steps `η b ≥ 0` whose sum diverges (every bound is passed by some
+partial sum). If the decreases sum below `C`, then `q` falls below every `ε > 0` in windows beyond
+every `N`. With `q b` the window's least certified slope this is the guarded path reaching the
+neighbourhood of `L`'s fixed points; with a summable `η` nothing is certified. -/
+theorem schedule_frequently_small (η q : ℕ → ℝ) (hη : ∀ b, 0 ≤ η b)
+    (hdiv : ∀ C, ∃ n, C < ∑ b ∈ Finset.range n, η b) {C : ℝ}
+    (hsum : ∀ n, ∑ b ∈ Finset.range n, η b * q b ≤ C) (hq : ∀ b, 0 ≤ q b) {ε : ℝ} (hε : 0 < ε)
+    (N : ℕ) : ∃ b, N ≤ b ∧ q b < ε := by
+  by_contra hcon
+  push Not at hcon
+  obtain ⟨n, hn⟩ := hdiv ((C + ε * ∑ b ∈ Finset.range N, η b) / ε)
+  have hNn : N ≤ n ∨ n < N := le_or_gt N n
+  have hhead : ∑ b ∈ Finset.range N, η b * q b ≥ 0 :=
+    Finset.sum_nonneg fun b _ => mul_nonneg (hη b) (hq b)
+  rcases hNn with hNn | hNn
+  · have hsplit := Finset.sum_range_add_sum_Ico (fun b => η b * q b) hNn
+    have hsplitη := Finset.sum_range_add_sum_Ico η hNn
+    have htail : ε * ∑ b ∈ Finset.Ico N n, η b ≤ ∑ b ∈ Finset.Ico N n, η b * q b := by
+      rw [Finset.mul_sum]
+      exact Finset.sum_le_sum fun b hb =>
+        by rw [mul_comm]; exact mul_le_mul_of_nonneg_left (hcon b (Finset.mem_Ico.mp hb).1) (hη b)
+    have hlt : C + ε * ∑ b ∈ Finset.range N, η b < ε * ∑ b ∈ Finset.range n, η b := by
+      rw [div_lt_iff₀ hε] at hn; linarith
+    have := hsum n
+    nlinarith
+  · have hsub : ∑ b ∈ Finset.range n, η b ≤ ∑ b ∈ Finset.range N, η b :=
+      Finset.sum_le_sum_of_subset_of_nonneg (Finset.range_subset_range.mpr hNn.le) fun b _ _ => hη b
+    have hC : 0 ≤ C := (hsum 0).trans' (by simp)
+    rw [div_lt_iff₀ hε] at hn
+    nlinarith
+
+/-- [proved-derived; formal-checked] **A step floor makes the step sum diverge**: every adopted move
+of the ladder moves at least one lattice coordinate, so its step is at least `c > 0` (with the unit
+move's largest entry bounded); then every bound is passed by some partial sum. -/
+theorem floor_steps_diverge (η : ℕ → ℝ) {c : ℝ} (hc : 0 < c) (hη : ∀ k, c ≤ η k) (C : ℝ) :
+    ∃ n, C < ∑ k ∈ Finset.range n, η k := by
+  obtain ⟨n, hn⟩ := exists_nat_gt (C / c)
+  refine ⟨n, ?_⟩
+  have hsum : (n : ℝ) * c ≤ ∑ k ∈ Finset.range n, η k := by
+    have := Finset.sum_le_sum fun k (_ : k ∈ Finset.range n) => hη k
+    simpa [Finset.sum_const, Finset.card_range, nsmul_eq_mul] using this
+  rw [div_lt_iff₀ hc] at hn
+  linarith
+
+/-- [proved-derived; formal-checked] **Under a step floor the slopes themselves are summable**: if
+each window's certified decrease is at least `c · q n` with `c > 0` (a positive margin times the floor
+step), at most `(f 0 − m)/(c ε)` of the first `n` windows have least slope `q ≥ ε`: the slope falls
+below every `ε` in all but finitely many windows. -/
+theorem floor_large_slopes_card {f : ℕ → ℝ} {t : ℕ → ℕ} {W : ℕ} {h : ℝ} {σ q : ℕ → ℝ}
+    (g : CheckpointGuard f t W h σ) {c : ℝ} (hc : 0 < c) (hs : ∀ n, c * q n ≤ σ n)
+    (hq0 : ∀ n, 0 ≤ q n) {m : ℝ} (hm : ∀ k, m ≤ f k) {ε : ℝ} (n : ℕ) :
+    (((Finset.range n).filter fun b => ε ≤ q b).card : ℝ) * (c * ε) ≤ f 0 - m := by
+  have hσ : ∀ n, 0 ≤ σ n := fun n => (mul_nonneg hc.le (hq0 n)).trans (hs n)
+  have hsum := checkpoints_sum_le g hm n
+  have hfilter : ∑ b ∈ (Finset.range n).filter (fun b => ε ≤ q b), c * q b ≤
+      ∑ b ∈ Finset.range n, σ b :=
+    (Finset.sum_le_sum_of_subset_of_nonneg (Finset.filter_subset _ _) fun b _ _ =>
+      mul_nonneg hc.le (hq0 b)).trans (Finset.sum_le_sum fun b _ => hs b)
+  have hcard : (((Finset.range n).filter fun b => ε ≤ q b).card : ℝ) * (c * ε) ≤
+      ∑ b ∈ (Finset.range n).filter (fun b => ε ≤ q b), c * q b := by
+    rw [← nsmul_eq_mul, ← Finset.sum_const]
+    exact Finset.sum_le_sum fun b hb =>
+      mul_le_mul_of_nonneg_left (Finset.mem_filter.mp hb).2 hc.le
+  linarith
+
+/-- [proved-derived; formal-checked] **A window of one move must pay its flip from the same move**:
+`f (a+1) ≤ f a − σ` iff the move's flip is at most its fixed-mask decrease less `σ`. The decrease
+was certified before the flip was read, so this window answers no flip. -/
+theorem one_move_closes_iff (f m : ℕ → ℝ) (a : ℕ) (σ : ℝ) :
+    f (a + 1) ≤ f a - σ ↔ f (a + 1) - m a ≤ (f a - m a) - σ := by
+  constructor <;> intro h <;> linarith
+
+/-- [proved-derived; formal-checked] **A window's length is at least its flips over the largest
+per-move decrease**: if a window from `a` to `b` closes, every move's certified fixed-mask decrease
+is at most `d`, and its flips sum to `F`, then `F + σ ≤ (b − a) d`. -/
+theorem window_length_lower (f m : ℕ → ℝ) {a b : ℕ} (hab : a ≤ b) {σ d : ℝ}
+    (hclose : f b ≤ f a - σ) (hd : ∀ k ∈ Finset.Ico a b, f k - m k ≤ d) :
+    ∑ k ∈ Finset.Ico a b, (f (k + 1) - m k) + σ ≤ ((b - a : ℕ) : ℝ) * d := by
+  have h := (window_closes_iff f m hab σ).mp hclose
+  have hsum : ∑ k ∈ Finset.Ico a b, (f k - m k) ≤ ∑ _k ∈ Finset.Ico a b, d :=
+    Finset.sum_le_sum hd
+  rw [Finset.sum_const, Nat.card_Ico, nsmul_eq_mul] at hsum
+  linarith
+
+/-- [proved-derived; formal-checked] **A bounded comparison supplies the height**: if every adopted
+comparison lies in `[m, B]`, every window's excursion holds with `h = B − m`, so the height is not a
+free parameter once the comparison is bounded (the entry bound bounds it). -/
+theorem excursion_of_bounded (f : ℕ → ℝ) (t : ℕ → ℕ) {m B : ℝ} (hm : ∀ k, m ≤ f k)
+    (hB : ∀ k, f k ≤ B) (n j : ℕ) : f j ≤ f (t n) + (B - m) := by
+  linarith [hm (t n), hB j]
+
+/-- [proved-derived; formal-checked] **A decrease of one grain per window ends the chain**: with
+every `σ n ≥ g > 0`, `n` closed windows need `n g ≤ f 0 − m`, so at most `(f 0 − m)/g` windows
+close: the chain releases at the receiver's grain. -/
+theorem grain_windows_bounded {f : ℕ → ℝ} {t : ℕ → ℕ} {W : ℕ} {h : ℝ} {σ : ℕ → ℝ}
+    (g : CheckpointGuard f t W h σ) {γ : ℝ} (hγ : ∀ n, γ ≤ σ n) {m : ℝ} (hm : ∀ k, m ≤ f k)
+    (n : ℕ) : (n : ℝ) * γ ≤ f 0 - m := by
+  have hsum := checkpoints_sum_le g hm n
+  have : ∑ _b ∈ Finset.range n, γ ≤ ∑ b ∈ Finset.range n, σ b := Finset.sum_le_sum fun b _ => hγ b
+  rw [Finset.sum_const, Finset.card_range, nsmul_eq_mul] at this
+  linarith
+
+end ReleaseGuard
+
 section Audit
 
 #print axioms passage_coeff_zero
@@ -1573,6 +1818,21 @@ section Audit
 #print axioms feature_deposit_makes_native
 #print axioms feature_deposit_native_needs
 #print axioms deposit_raises_native_energy
+#print axioms own_telescopes
+#print axioms window_closes_iff
+#print axioms checkpoint_one_iff
+#print axioms checkpoint_descends
+#print axioms excursion_le_start
+#print axioms excursion_enclosure
+#print axioms checkpoints_sum_le
+#print axioms large_windows_card
+#print axioms schedule_frequently_small
+#print axioms floor_steps_diverge
+#print axioms floor_large_slopes_card
+#print axioms one_move_closes_iff
+#print axioms window_length_lower
+#print axioms excursion_of_bounded
+#print axioms grain_windows_bounded
 
 end Audit
 

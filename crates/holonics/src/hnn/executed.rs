@@ -2919,8 +2919,9 @@ pub enum TrialRefusal {
     /// The fixed mask's composition not strictly lower by disjoint enclosures.
     NotBelow(ExactInterval),
     /// The fixed mask's composition lower, the successor's own release's executed composition not
-    /// strictly lower by disjoint enclosures: the step left the trajectory cell and the executed
-    /// comparison did not descend.
+    /// strictly below its checkpoint's plus the excursion's height ([`ReleaseExcursion`]; with the
+    /// monotone guard, not strictly lower by disjoint enclosures): the step's flip took the executed
+    /// comparison past what the window admits.
     OwnNotBelow(ExactInterval),
     /// The constitution's own guard (budget, storage growth).
     Constitution(String),
@@ -3157,6 +3158,124 @@ pub struct Reread {
     pub refusal: Option<TrialRefusal>,
 }
 
+/// [definition; proved-derived, October 2] **The release guard's excursion**
+/// (`HNN/ExecutedComparison` §12). A move's change in the own release is the fixed mask's change,
+/// continuous and certified at first order, plus the **flip**: the successor's own decisions read
+/// against the incumbent's on the same `E` (`own_telescopes`; a trial's `change`, the own reading
+/// less the mask's, encloses it). Each adopted step certifies the fixed mask's fall (`NotBelow`,
+/// unchanged). The own release is guarded over a window from a checkpoint: each successor's own
+/// comparison strictly below the checkpoint's lower end plus `height`
+/// ([`ReleaseExcursion::admits`], `excursion_enclosure`), and the window, at most `W` adopted
+/// moves, closing strictly below the checkpoint's lower end less a certified decrease `σ ≥ 0`
+/// ([`ReleaseExcursion::closes`]). It closes exactly when its fixed-mask decreases exceed its flips
+/// by `σ` (`window_closes_iff`). A window that does not close returns to its checkpoint; the chain
+/// holds the checkpoint, the window's length and `σ`.
+/// [`ReleaseExcursion::monotone`] (the incumbent as checkpoint, no height) is the strict decrease by
+/// disjoint enclosures, the former rule (`checkpoint_one_iff`).
+///
+/// The parameters, from the chain's laws (§12; the record states each step):
+/// - `height`: `None` within a window. The entry bound bounds the comparison, which supplies a
+///   height (`excursion_of_bounded`), so no per-step own check is owed inside a window; `Some(0)`
+///   with the incumbent as checkpoint is the monotone guard.
+/// - `σ`: one receiver grain over the batch's decisions ([`ReleaseExcursion::grain`]). A decrease
+///   below it is not a reading, and with it at most `(f 0 − m)/σ` windows close
+///   (`grain_windows_bounded`): the chain releases at the grain.
+/// - `W`: at least two moves, since a flip is answered only by the move after it
+///   (`one_move_closes_iff`), and at least `(F + σ)/d` for flips `F` against a per-move certified
+///   decrease of at most `d` (`window_length_lower`). Its upper end is the chain's choice: it bounds
+///   the moves a window that does not close spends.
+///
+/// A negative height states no guard (at its own checkpoint the excursion would fail) and a
+/// negative decrease lets a checkpoint rise; both are refused, typed ([`HnnError::ExcursionHeight`],
+/// [`HnnError::WindowDecrease`]).
+///
+/// **The return restores the whole checkpoint**, not its comparison alone: the chain that runs
+/// windows holds the checkpoint's `Constitution` (one held state, not a tape) and adopts it again
+/// when the window does not close, discarding every successor the window adopted. §12's
+/// `CheckpointGuard` indexes adopted states only, which is that law: a failed window leaves no trace
+/// in the constitution. The unchecked height is sound on the same terms, whatever the height: only
+/// the chain reads a window's states, and what it releases is a closed window's checkpoint, which
+/// the fixed mask's `NotBelow` on every step and the close certify. [agent-inferred] The finite
+/// height `excursion_of_bounded` names, the comparison's range over the states the commit guards
+/// admit (every entry of `E` within [`entry_bound`]), is not computed: its finiteness also needs the
+/// readings bounded away from zero on those states, which no guard states. This type holds only the
+/// checkpoint's comparison, which is all a step's guard and the close read; no chain owner runs
+/// windows yet.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct ReleaseExcursion {
+    /// The checkpoint's own comparison; `None` is the incumbent's.
+    pub checkpoint: Option<ExactInterval>,
+    /// How far the own release may rise above the checkpoint within the window; `None`, unchecked
+    /// (the entry bound bounds it).
+    pub height: Option<Rat>,
+}
+
+impl ReleaseExcursion {
+    /// The monotone guard: the incumbent as checkpoint, no height.
+    pub fn monotone() -> Self {
+        Self {
+            checkpoint: None,
+            height: Some(Rat::zero()),
+        }
+    }
+
+    /// A window from a held checkpoint, the own release unchecked until the window's close.
+    pub fn from_checkpoint(checkpoint: ExactInterval) -> Self {
+        Self {
+            checkpoint: Some(checkpoint),
+            height: None,
+        }
+    }
+
+    /// **One receiver grain over a batch** (`σ`, in nats): `decisions · tolerance · ln 2`, read at
+    /// the upper end of `ln 2`'s enclosure, so a closing window certifies at least the grain.
+    pub fn grain(
+        decisions: usize,
+        tolerance: &Rat,
+    ) -> Result<Rat, crate::ratio::algebraic::ExactValueError> {
+        let ln_two = ln_enclosure(&Rat::from_integer(BigInt::from(2)))?;
+        Ok(Rat::from_integer(BigInt::from(decisions)) * tolerance * ln_two.upper)
+    }
+
+    /// The excursion's height checked: refused when held and negative
+    /// ([`HnnError::ExcursionHeight`]).
+    pub fn checked(&self) -> Result<&Self, HnnError> {
+        match &self.height {
+            Some(height) if height.is_negative() => Err(HnnError::ExcursionHeight {
+                height: height.clone(),
+            }),
+            _ => Ok(self),
+        }
+    }
+
+    /// The step's guard on a successor's own comparison: `own.upper < checkpoint.lower + height`,
+    /// the checkpoint the incumbent's (`before`) when none is held; every successor when the height
+    /// is unchecked.
+    pub fn admits(&self, before: &ExactInterval, own: &ExactInterval) -> bool {
+        let checkpoint = self.checkpoint.as_ref().unwrap_or(before);
+        match &self.height {
+            Some(height) => own.upper < &checkpoint.lower + height,
+            None => true,
+        }
+    }
+
+    /// The window's close: the own comparison at its end strictly below the checkpoint's lower end
+    /// less the certified decrease `σ`. A negative `σ` is refused ([`HnnError::WindowDecrease`]):
+    /// it would let a window close above its checkpoint, so the checkpoints could rise.
+    pub fn closes(
+        checkpoint: &ExactInterval,
+        end: &ExactInterval,
+        decrease: &Rat,
+    ) -> Result<bool, HnnError> {
+        if decrease.is_negative() {
+            return Err(HnnError::WindowDecrease {
+                decrease: decrease.clone(),
+            });
+        }
+        Ok(end.upper < &checkpoint.lower - decrease)
+    }
+}
+
 /// [definition; agent-inferred, September 30] **The ladder's depth**: at most 8 trial steps a move,
 /// from its start down to `2^(−7)` of it. Every trial re-reads the whole batch, so the depth bounds a
 /// move's work; a comparison that does not fall within `2^(−7)` of its start along the proposal is
@@ -3175,8 +3294,8 @@ type FirstOrder<'a> =
 /// entry of `E` moves by more than the founding's entry scale `½` in one move), halving until the
 /// carried move moves no lattice coordinate; each carried successor adopted only when every commit
 /// guard holds on it: the entry bound, the first-order certificate on the carried move (`first`,
-/// negative), the successor's guards and the fixed mask's value (`reread`), and a strict decrease by
-/// disjoint enclosures.
+/// negative), the successor's guards and the fixed mask's value (`reread`) strictly lower by disjoint
+/// enclosures, and its own release within the release guard's excursion ([`ReleaseExcursion`]).
 #[allow(clippy::too_many_arguments)]
 fn ladder(
     constitution: &Constitution,
@@ -3188,6 +3307,7 @@ fn ladder(
     transport: Option<&Rat>,
     first: &FirstOrder<'_>,
     reread: &(dyn Fn(&Constitution) -> Result<Reread, HnnError> + Sync),
+    excursion: &ReleaseExcursion,
 ) -> Result<LadderOutcome, HnnError> {
     let source = constitution
         .source_port(ring)
@@ -3296,7 +3416,7 @@ fn ladder(
             (None, _) if read.value.upper >= before.lower => {
                 Some(TrialRefusal::NotBelow(read.value.clone()))
             }
-            (None, Some(own)) if own.value.upper < before.lower => None,
+            (None, Some(own)) if excursion.admits(before, &own.value) => None,
             (None, Some(own)) => Some(TrialRefusal::OwnNotBelow(own.value.clone())),
             (None, None) => Some(TrialRefusal::Unsupported),
         };
@@ -3596,6 +3716,36 @@ pub fn executed_move_in(
     comparison: Comparison,
     metric: MoveMetric,
 ) -> Result<ExecutedMove, HnnError> {
+    executed_move_guarded(
+        field,
+        constitution,
+        requests,
+        declared,
+        bank,
+        grain,
+        comparison,
+        metric,
+        &ReleaseExcursion::monotone(),
+    )
+}
+
+/// **The committed move under a declared metric and the release guard's excursion**
+/// ([`ReleaseExcursion`]; [`executed_move_in`] is the monotone guard's): the same proposal, guards,
+/// ladder and receipts, the own release adopted within the excursion. A negative height is refused
+/// before any reading ([`HnnError::ExcursionHeight`]).
+#[allow(clippy::too_many_arguments)]
+pub fn executed_move_guarded(
+    field: &Field,
+    constitution: &Constitution,
+    requests: &[Request],
+    declared: &Refinement,
+    bank: &ReceivingBank,
+    grain: u32,
+    comparison: Comparison,
+    metric: MoveMetric,
+    excursion: &ReleaseExcursion,
+) -> Result<ExecutedMove, HnnError> {
+    let excursion = excursion.checked()?;
     let ring = declared.ring();
     let composition = comparison.composition;
     let (before, reads) = incumbent(field, constitution, requests, declared, bank, grain, comparison)?;
@@ -3774,6 +3924,7 @@ pub fn executed_move_in(
         Some(&modulus_unit),
         &first,
         &reread,
+        excursion,
     )?;
     receipt.trials = trials;
     receipt.adopted = adopted;
