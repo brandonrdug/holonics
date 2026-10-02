@@ -80,6 +80,11 @@ the readings. That needs `ℓ(1) − ℓ(0) > 3813/1024` bits, so `I` must carry
 The readings separate `2 I` from `I` by more than that index charges: by `3813/1024` bits over the
 campaign, and `3482/1024` at 2,192 readings. `2^2 I` is `4524/1024` above `2 I`.
 
+This is a selection among the powers of two, not a separation at the main line's standard. One
+pair's no-hypercompression tail, `2^(−3813/1024)`, is above `2^(−4)` (`3813 < 4 · 1024`), and a
+tail of `1/64` would need `6` bits. The selection's acceptance is the measurement of the change it
+asks for (§6).
+
 ## 3. The storage form's coefficient is not the scale
 
 The receiving-prior record §2 takes the prior's shape from the receiving ring's storage form
@@ -157,16 +162,28 @@ stationary interval; it is the law's first step, and the at-map read refines it.
 
 ## 6. Decision
 
-[agent-inferred] `H₀ = I` is released, and campaign 1's receiving prior is `2 I`.
-- The prior is held on the powers of two, so that its founding chart `s⁻¹ I` is exact on the
-  dyadic lattice (`SolvedChart::identity` is founded exact).
+[agent-inferred] `H₀ = I` is released, and campaign 1's receiving prior is `2 I`. The code still
+opens at `I` (`NormalLaw::with_prior`, `SolvedChart::identity`) until the change below is built and
+measured.
+- The prior is held on the powers of two. They are the only scales at which both the Gram's
+  opening entry `s` and its founding chart `s⁻¹` are dyadic: a dyadic `s⁻¹` alone allows
+  `s = 4/3`. So the Gram stays on the dyadics (each deposit moves an entry by a lattice quotient,
+  `carried_entry`), and `SolvedChart::identity`'s exact founding carries over as `s⁻¹ I`.
 - Among the powers of two, the law and the code select the same member.
-  - The prequential alignment changes sign in `(I, 2 I)`.
-  - The Newton point read at `2 I` lies within `2^(−3)` below `2`.
+  - The prequential alignment changes sign in `(I, 2 I)` over the campaign, and in `(2 I, 2^2 I)`
+    at 2,192 readings.
+  - At both lengths, the Newton points read at the two members that bracket the sign change lie in
+    `(√2, 2√2)`, the scales whose exponent is nearer `1` than any other integer: `12055433/2^23`
+    and `16109515/2^23` over the campaign, `9137823/2^22` and `10741668/2^22` at 2,192 readings
+    (each square lies between `2` and `8`).
   - `2 I` is the best replayed member at 2,192 readings and at 3,400.
-- `I` has no derivation as the lower end of the interval. The law's stationary point lies near
-  `2 I`, and the readings separate the two members by more than an ordinary index of the scales
+- `I` has no derivation as the lower end of the interval. The law's Newton points lie in `2 I`'s
+  cell, and the readings separate the two members by more than an ordinary index of the scales
   charges (§2).
+- The receiving-prior record's other reason for `I` is that the prior's floor and the cap's `1`
+  coincide there (`cap_and_prior_one_constant`). At `2 I` the law carries two constants in the
+  declared anchor unit, the cap's `1` and the floor `2`. They coincide again only in the anchor
+  unit `z/√2`, which leaves the dyadics. The selection gives that economy up.
 
 The scale is a field's own quantity: §4 locates it per field and carries it with the anchors'
 energy. Campaign 1's located value is therefore declared with its field, not fixed in the
@@ -187,8 +204,8 @@ arrive, is the per-field law's native form. It is not built here.
 The second order is certified (`prequential_code_le`, `prequential_newton_decrease`). Along a map
 held as `φ M_t`, each reading's code is bounded by the receiving certificate's own quadratic
 (`HNN/Ratio/Certificate.codeLength_add_le`, curvature `(ln 2/2) 2^ω Var_p`, `ω` the move's class
-spread). Summed, the prequential code is at most the face's less `φ a₀` plus
-`φ² (ln 2/2) 2^ω Σ_t Var_(p_t)(M_t)`. At that bound's Newton point it falls by at least
+spread). Summed, the prequential code is at most the face's less `φ a₀` plus `φ² K`, with
+`K = (ln 2/2) 2^ω Σ_t Var_(p_t)(M_t)`. At that bound's Newton point it falls by at least
 `a₀²/(4K)`. What stays a reading rather than a theorem is that the executed map is `1/s` times
 its unit, which holds where the readings' Gram is small against the prior and `η = 1` (§1). #62
 keeps that hypothesis.

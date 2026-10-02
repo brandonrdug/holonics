@@ -139,6 +139,12 @@ inside either charge (`2^313 < 10^128`). `2^4 I` codes `475/128` bits above it, 
 
 ## 6. Decision
 
+[Superseded on the scale](2026-10-02_THE_READINGS_LOCATE_THE_RECEIVING_PRIOR_BY_THE_PREQUENTIAL_CERTIFICATE.md)
+§2 and §6: the family's charge `log₂ |family|` belongs to the grid replayed, not to the readings;
+over the whole campaign the readings select `2 I` among the powers of two, and `I` is released.
+The code opens at `I` until the change to `2 I` is measured. The shape and the unit theorem below
+stand.
+
 [agent-inferred] `H₀ = I` stays. Its status changes from declared to derived in shape and located
 in scale:
 
