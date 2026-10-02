@@ -31,8 +31,9 @@ used here, deposit `i` moves an entry by at most `κ` times the share of the sta
    sum to one lattice unit `u` after deposit `m`, the statistic must grow by the factor `e^(u/κ)`.
    That bounds the accumulated updates, not the first move: the carried remainder can sit just
    inside the cell's edge, so a small update can move the entry once. A sustained displacement is
-   bounded, though: by the accounting (`run_accounting`, with both carried remainders at most
-   `u/2` and the releases below `u/2`), moving `k` units needs `|Σ δ| > (k − 3/2) u`, so the
+   bounded, though: by the accounting, with both carried remainders at most `u/2` and the releases
+   below `u/2`, moving `k` units needs `|Σ δ| > (k − 3/2) u` (`move_needs_accumulation`; more than
+   `(k − 1) u` from a founding carrier, `move_needs_accumulation_fresh`), so the
    statistic must grow by `e^((k − 3/2)u/κ)`. A statistic that grows linearly in the windows makes
    that exponentially many windows: the contact freezes because its step decays as `1/h`, not
    because rounding loses its moves.
@@ -78,9 +79,10 @@ used here, deposit `i` moves an entry by at most `κ` times the share of the sta
    reach `(u/2)·√N/4`, a whole unit from `N = 64`. The half-unit conclusion holds because the
    code's cell refines as `1/m²`, which is summable; a cell refining as `1/√m` is not.
    Here the coarse unit `u` is held fixed, as the carrier fixes `L`. If the coarse unit itself
-   refined with the grain, the half-unit bound would shrink with it, and each drop would have to be
-   read against the unit current at its deposit; re-basing a carrier's lattice is not modelled here
-   and stays owed in #62.
+   refines with the grain, the carrier is re-based (`HNN/LatticeDeposit/Rebase`): over any number
+   of re-bases value plus carry is kept exactly, and the releases since the founding stay below
+   half the founding unit, just under `2^(j−1)` units of a grain refined `j` levels
+   (`history_release_lt`).
 
 [definition] **The condition, in what the main line measures.** The carried remainder's own sign is
 not the statistic: it lies in `[−u/2, u/2)` and changes sign every time the entry moves. The
@@ -234,6 +236,50 @@ theorem moved_of_accumulation (s : Carried L E) (Δs : List (E → ℚ)) (i : E)
     (h : unit L ≤ |s.rem i + (Δs.map (· i)).sum|) :
     (run s Δs).value i ≠ s.value i := fun hfrozen =>
   absurd (frozen_accumulation_lt_unit s Δs i hfrozen) (not_lt.mpr h)
+
+/-- [proved-derived; formal-checked] **`move_needs_accumulation`: moving `k` units needs the
+updates to sum past `(k − 3/2)` units.** By `run_accounting` the value's move is the exact updates
+plus the starting remainder, less the final remainder and the releases. Both remainders are at most
+`u/2` and the releases since any carrier are below `u/2` (`release_bounded_since_founding`), so a
+move of `k` units needs `|Σ Δ| > (k − 3/2) u`. -/
+theorem move_needs_accumulation (s : Carried L E) (Δs : List (E → ℚ)) (i : E) {k : ℚ}
+    (h : k * unit L ≤ |(run s Δs).value i - s.value i|) :
+    (k - 3 / 2) * unit L < |(Δs.map (· i)).sum| := by
+  have hacc := run_accounting s Δs i
+  have hrel := release_bounded_since_founding s Δs i
+  have h0 := s.rem_bounded i
+  have hn := (run s Δs).rem_bounded i
+  have e : (run s Δs).value i - s.value i =
+      (Δs.map (· i)).sum + s.rem i - (run s Δs).rem i - released s Δs i := by linarith
+  rw [e] at h
+  have hS := le_abs_self (Δs.map (· i)).sum
+  have hS' := neg_abs_le (Δs.map (· i)).sum
+  rw [abs_lt] at hrel
+  rcases abs_cases ((Δs.map (· i)).sum + s.rem i - (run s Δs).rem i - released s Δs i)
+    with ⟨ha, _⟩ | ⟨ha, _⟩ <;> rw [ha] at h <;>
+    linarith [h0.1, h0.2, hn.1, hn.2, hrel.1, hrel.2]
+
+/-- [proved-derived; formal-checked] **From a founding carrier, `k` units need more than `k − 1`.**
+With no starting remainder the bound tightens by half a unit. -/
+theorem move_needs_accumulation_fresh (value : E → ℚ) (Δs : List (E → ℚ)) (i : E) {k : ℚ}
+    (h : k * unit L ≤ |(run (Carried.fresh (L := L) value) Δs).value i - value i|) :
+    (k - 1) * unit L < |(Δs.map (· i)).sum| := by
+  set s := Carried.fresh (L := L) value
+  have hacc := run_accounting s Δs i
+  have hrel := release_bounded_since_founding s Δs i
+  have hn := (run s Δs).rem_bounded i
+  have h0 : s.rem i = 0 := rfl
+  have hv : s.value i = value i := rfl
+  have e : (run s Δs).value i - value i =
+      (Δs.map (· i)).sum - (run s Δs).rem i - released s Δs i := by
+    rw [← hv]; linarith
+  rw [e] at h
+  have hS := le_abs_self (Δs.map (· i)).sum
+  have hS' := neg_abs_le (Δs.map (· i)).sum
+  rw [abs_lt] at hrel
+  rcases abs_cases ((Δs.map (· i)).sum - (run s Δs).rem i - released s Δs i)
+    with ⟨ha, _⟩ | ⟨ha, _⟩ <;> rw [ha] at h <;>
+    linarith [hn.1, hn.2, hrel.1, hrel.2]
 
 end Frozen
 
@@ -632,6 +678,8 @@ section Audit
 #print axioms coherent_move_ge
 #print axioms frozen_accumulation_lt_unit
 #print axioms moved_of_accumulation
+#print axioms move_needs_accumulation
+#print axioms move_needs_accumulation_fresh
 #print axioms sign_mgf_le
 #print axioms sign_tail
 #print axioms sign_tail_abs
