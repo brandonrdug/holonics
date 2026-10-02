@@ -36,13 +36,16 @@ codeLength(z + Δ) ≤ codeLength(z) + ⟨g, Δ⟩ + (ln 2/2) · 2^(osc Δ) · V
    partition as `S·e^μ·Σ p e^(Δ−μ)`, its logarithm is `log S + μ + log T` with
    `log T ≤ T − 1 = Σ p (e^(Δ−μ) − 1 − (Δ − μ))`, and each term is at most
    `p (Δ−μ)²/2 · e^(max Δ − μ)`. The factor is `e^(max Δ − μ) ≤ e^(osc Δ)`, since `μ` lies
-   between `min Δ` and `max Δ`. This route needs no integral: the coordinator's route bounds each
-   ratio `p′_c/p_c` within `e^(±osc Δ)`, the moved variance within `e^(t osc Δ)` of `Var_p`, and
-   integrates twice; it gives the same factor.
-3. **In `R`'s chart** (`codeLength_add_le`, `codeLength_add_le_fisher`): the code length in bits at
-   exponents `f + Δ` is at most the code at `f`, plus `⟨p − e_t, Δ⟩`, plus
-   `(ln 2/2)·2^ω·Var_p(Δ)` whenever every pair of classes differs by at most `ω` under `Δ`
-   (`Δ_c − Δ_d ≤ ω`). The variance is the Fisher form `Δᵀ J_p Δ`.
+   between `min Δ` and `max Δ`. This route needs no integral. Integrating the second derivative
+   twice, with each ratio `p′_c/p_c` within `e^(±osc Δ)` and the moved variance within
+   `e^(t osc Δ)` of `Var_p`, gives the same factor.
+3. **In `R`'s chart** (`codeLength_add_le`, `codeLength_add_le_fisher`, `codeLength_add_le_face`):
+   the code length in bits at exponents `f + Δ` is at most the code at `f`, plus `⟨p − e_t, Δ⟩`,
+   plus `(ln 2/2)·2^ω·Var_p(Δ)` whenever every pair of classes differs by at most `ω` under `Δ`
+   (`Δ_c − Δ_d ≤ ω`). The variance is the Fisher form `Δᵀ J_p Δ`. Read at the face owner
+   (`Computation/HolonicAdjointNormalization.face`), the bound has the same first-order term as
+   the worst case `HNN/Ratio/Resolution.codeLength_quadratic_upper`, so the two differ only in
+   their curvature terms.
 4. **The step descends** (`codeLength_step_descends`). For the step `Δ = −η v` with first-order
    decrease `a = ⟨p − e_t, v⟩`, Fisher form `b = Var_p(v)` and the spread capped,
    `η (v_c − v_d) ≤ ω`: if `η · ln 2 · 2^ω · b ≤ a` the code falls by at least `η a/2`.
@@ -73,6 +76,7 @@ namespace Holonics.HNN.Ratio.Certificate
 open Matrix
 open Holonics.HNN.Ratio (codeLength two_rpow_eq_exp)
 open Holonics.HolonCore (softmaxJacobian softmaxJacobian_quadratic_eq_variance)
+open Holonics.Computation.HolonicAdjointNormalization.NormalizedExponential (face partition)
 
 /-! ## 1. The exponential's second-order remainder -/
 
@@ -160,17 +164,18 @@ theorem faceVariance_smul (p v : ι → ℝ) (η : ℝ) :
 
 variable [Nonempty ι]
 
+/-- A face given by its masses is the face owner's softmax at `z`. -/
+theorem face_eq_mass (z p : ι → ℝ) (hp : ∀ i, p i = Real.exp (z i) / ∑ j, Real.exp (z j)) :
+    p = (face z).mass :=
+  funext fun i => by rw [hp i]; rfl
+
 theorem face_nonneg (z p : ι → ℝ) (hp : ∀ i, p i = Real.exp (z i) / ∑ j, Real.exp (z j))
     (i : ι) : 0 ≤ p i := by
-  rw [hp i]; positivity
+  rw [face_eq_mass z p hp]; exact ((face z).positive i).le
 
 theorem face_sum_one (z p : ι → ℝ) (hp : ∀ i, p i = Real.exp (z i) / ∑ j, Real.exp (z j)) :
     ∑ i, p i = 1 := by
-  have hS : 0 < ∑ j, Real.exp (z j) :=
-    Finset.sum_pos (fun j _ => Real.exp_pos _) Finset.univ_nonempty
-  simp_rw [hp]
-  rw [← Finset.sum_div]
-  exact div_self hS.ne'
+  rw [face_eq_mass z p hp]; exact (face z).normalized
 
 /-- [proved-derived; formal-checked] **The log-partition step at the face's own variance.** With
 `p = softmax(z)`, `μ = ⟨p, Δ⟩` and `Δ ≤ M` everywhere,
@@ -310,6 +315,22 @@ theorem codeLength_add_le_fisher [DecidableEq ι] (f Δ p : ι → ℝ)
   rw [← faceVariance_eq_fisher p Δ (face_sum_one _ p hpz)]
   exact codeLength_add_le f Δ p hp hosc t
 
+/-- [proved-derived; formal-checked] **The same step at the face owner.** With the face read as
+`face (f · ln 2)`, as in `HNN/Ratio/Resolution.codeLength_quadratic_upper`, the Fisher model has
+the worst case's first-order term; only the curvature terms `(ln 2/2)·2^ω·Var_p(Δ)` and
+`½ (ln 2/2) Σ Δ_c²` differ. -/
+theorem codeLength_add_le_face [DecidableEq ι] (f Δ : ι → ℝ) {ω : ℝ}
+    (hosc : ∀ c d, Δ c - Δ d ≤ ω) (t : ι) :
+    codeLength (fun c => f c + Δ c) t ≤ codeLength f t +
+      ∑ c, ((face fun c => f c * Real.log 2).mass c - if c = t then 1 else 0) * Δ c +
+        Real.log 2 / 2 * (2 : ℝ) ^ ω * faceVariance (face fun c => f c * Real.log 2).mass Δ := by
+  have hmass : ∀ c, (face fun c => f c * Real.log 2).mass c =
+      (2 : ℝ) ^ f c / ∑ d, (2 : ℝ) ^ f d := fun c => by
+    simp only [face, partition, two_rpow_eq_exp]
+  have h := codeLength_add_le f Δ _ hmass hosc t
+  simp only [Pi.single_apply] at h
+  exact h
+
 /-- [proved-derived; formal-checked] **`R`'s step descends.** For `Δ = −η v` with first-order
 decrease `a = ⟨p − e_t, v⟩`, Fisher form `b = Var_p(v)` and spread capped,
 `η (v_c − v_d) ≤ ω`: if `η · ln 2 · 2^ω · b ≤ a`, the code falls by at least `η a/2`. -/
@@ -405,6 +426,7 @@ end Window
 #print axioms log_sum_exp_add_le_osc
 #print axioms codeLength_add_le
 #print axioms codeLength_add_le_fisher
+#print axioms codeLength_add_le_face
 #print axioms codeLength_step_descends
 #print axioms window_code_add_le
 #print axioms linear_first_order
