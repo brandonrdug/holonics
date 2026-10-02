@@ -372,3 +372,22 @@ executed: the work of each move's deposit at the reached point, `W_dep = E(x; Θ
 under Astra's continuation (`receiver::reception::continuation`), and the next passage reading the
 changed material. Times: one request at m6 and w16 together `247050` ms on 4 cores, peak resident
 `144216064` bytes.
+
+**§6's two remaining reads are empty for this move, by construction.** The deposition work of a
+commit is `½⟨x, ΔΘ x⟩` over the power form (`PowerForm::deposition_work`; Lean
+`HNN/Word.field_commit_deposition`), and the power form holds the ring admittances, the contacts'
+conductances, storage `C`, stiffness `K` and the loaded resonators (`PowerForm::read`). The source
+map `E` and the transport ρ are not in it: they enter the passage only through the opening
+injection (`SourceMoment::open_storage`). So every U6 move has `W_dep = 0` at every reached point,
+and the next passage differs from its predecessor only by its injection. Astra's native return
+(`hnn::word::continuation`) admits contact storage `C` and refuses source-map changes until they
+have their own transported return. [agent-inferred] The U6 chain's gains are therefore gains of the
+source codec read by a declared bank; no material locus of the constitution learns along it.
+
+**The next loop's subject** (decided here). §6's gate is restated on a formed receiver: from the same
+opening material, the receiver's own comparison deposits into the receiving map `R` and the contact
+storage `C` along a passage of the 8 training requests, once with `E` at m6 and once at w16 (ρ₀ for
+both, every other setting equal); then a word reads the 128 held-out requests' stations through each
+formed receiver. The gate is §6's number: w16 exceeds m6 by at least 28 of 1024 stations. If it
+does not, the U6 move's gains do not reach the machine's receiving material, and the bank chain
+stops as §6 says.
