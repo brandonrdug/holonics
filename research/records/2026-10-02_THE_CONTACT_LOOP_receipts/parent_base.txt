@@ -1,0 +1,16 @@
+== the standing cut (6,148 cells, held out from 4,958), prior mass 2^-3, depth 16
+shared-g4 development 8936120/2^9 held out 13750868/2^12
+halfparent development 8981595/2^9 held out 13769312/2^12
+halfparent-g4 development 8981662/2^9 held out 13775863/2^12
+shared-w0.25 development 9039797/2^9 held out 13948911/2^12
+shared-w0.75 development 8861516/2^9 held out 13752616/2^12
+shared-w0.875 development 8849923/2^9 held out 13773893/2^12
+shared-w0.9375 development 8878611/2^9 held out 13793982/2^12
+== the choosing cut's first 200,000 cells (development to 170,000)
+shared-g4 development 11097227/2^5 held out 15474099/2^8
+halfparent development 11054750/2^5 held out 15377729/2^8
+shared-w0.25 development 11167175/2^5 held out 15523425/2^8
+shared-w0.75 development 11071232/2^5 held out 15467742/2^8
+shared-w0.875 development 11095318/2^5 held out 15505240/2^8
+shared-w0.9375 development 11110583/2^5 held out 15540114/2^8
+args: tree_base.py (J=3), each mode a separate process; each 200,000-cell run under 10 minutes
