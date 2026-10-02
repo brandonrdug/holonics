@@ -10,9 +10,9 @@ records; [agent-inferred] where marked. No run.
   sections on two seeds, as many as the scaled arms
   ([the ablation](2026-10-02_THE_REFITS_INGREDIENTS_ABLATED_WHICH_PART_OF_THE_EXTERIOR_FIT_REACHES_THE_REPRESENTATION.md) §2).
 - **That path's own comparison rises above its opening** (the same record, §3). Seed 202 opens at
-  `1.612090` nats per decision and exceeds it at step 30 by `0.001471`. Seed 303 opens at `1.608452`
-  and exceeds it at step 60 by `0.131100`. Its excursions above the running minimum last 20 to 60
-  steps and peak at up to `0.481` per decision. Each ends below the earlier minimum.
+  `161209/100000` nats per decision and exceeds it at step 30 by `1471/1000000`. Seed 303 opens at `402113/250000`
+  and exceeds it at step 60 by `1311/10000` (the receipts' printed values). Its excursions above the running minimum last 20 to 60
+  steps and peak at up to `481/1000` per decision. Each ends below the earlier minimum.
 - **The native chain stops at the guard** (the kinetic move's receipts, `m5` to `m7`). Every refused
   rung is `OwnNotBelow`. At `m7` all eight rungs, from `η = 1/16` down to `1/2048`, are refused. At
   `1/2048` the fixed mask falls from `337896/4096` to `337537/4096`, while the own release reads
@@ -85,7 +85,7 @@ checkpoint.
 ## 4. The parameters, from measurement
 
 `h`, `W` and `σ` are the chain's, read from the plain-gradient path:
-- **Height.** The float path's excursions above its running minimum peak at `0.002` to `0.481` nats
+- **Height.** The float path's excursions above its running minimum peak at `1/500` to `481/1000` nats
   per decision. In the native comparison's units (the batch's total), `h` is the per-decision peak
   times the batch's decisions.
 - **Length.** The float excursions last 20 to 60 of its steps. The native window `W` counts adopted
