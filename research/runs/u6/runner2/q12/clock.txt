@@ -1,2 +1,3 @@
 step-state exit 0 wall 1088 s
 direction exit 0 wall 804 s
+locks exit 0 wall 739 s
