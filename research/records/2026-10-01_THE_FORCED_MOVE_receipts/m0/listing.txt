@@ -1,0 +1,84 @@
+executed move-once: 8 order2 requests at development seed 2026093061, the candidate arm, from m0 (ρ 102837/131072); the bank p = 5/8, grain 2^(-16)
+  m0 witness: the incumbent: ρ 102837/131072; L ∈ [2437919/4096, 2437940/4096) nats, X ∈ [1534237/4096, 1534257/4096) nats; solved 0 of 285; whole 0 (released 7, stations right 15); 318514 ms
+      the incumbent request 0 order at refinement 0: [6:1 gap 13963/2048, 0:1 gap 38457/32768, 1:3 gap 4831/65536, 2:1 gap 317/32768, 3:0 gap 1953/4096, 4:1 gap 61345/32768, 5:1 gap 85517/16384, 7:1 gap 11317/1024]; ℓ_o ∈ [89452/65536, 89453/65536) nats, Fails
+      the incumbent request 0 order at refinement 2: [5:3 gap 139137/131072, 0:1 gap 46199/65536, 1:0 gap 1017/32768, 2:0 gap 7695/65536, 6:2 gap 1077/4096]; ℓ_o ∈ [47096/65536, 47097/65536) nats, Fails
+      the incumbent request 0 order at refinement 3: [4:0 gap 3251/65536, 0:1 gap 955/4096, 1:3 gap 17905/65536, 6:4 gap 5389/32768]; ℓ_o ∈ [175356/65536, 175357/65536) nats, Fails
+      the incumbent request 0 order at refinement 4: [6:1 gap 7587/32768, 0:0 gap 1163/65536]; ℓ_o ∈ [4839/65536, 4840/65536) nats, Holds
+      the incumbent request 0 order at refinement 5: [2:3 gap 1075/65536, 0:3 gap 2483/131072, 4:3 gap 26709/32768]; ℓ_o ∈ [258754/65536, 258755/65536) nats, Fails
+      the incumbent request 0 order at refinement 6: [2:3 gap 813/32768, 0:3 gap 1553/65536]; ℓ_o ∈ [43938/65536, 43939/65536) nats, Holds
+      the incumbent request 1 order at refinement 0: [5:1 gap 41667/32768, 0:1 gap 46265/65536, 2:1 gap 118149/65536, 3:1 gap 40087/32768, 7:1 gap 303997/8192]; ℓ_o ∈ [229382/65536, 229383/65536) nats, Fails
+      the incumbent request 1 order at refinement 1: [6:1 gap 171127/65536, 0:1 gap 5679/32768, 2:1 gap 30025/16384, 3:1 gap 28127/65536, 5:2 gap 28299/65536]; ℓ_o ∈ [48558/65536, 48559/65536) nats, Fails
+      the incumbent request 1 order at refinement 4: [1:3 gap 20987/65536, 3:2 gap 18285/65536, 5:3 gap 10807/32768]; ℓ_o ∈ [69802/65536, 69803/65536) nats, Fails
+      the incumbent request 1 order at refinement 5: [1:3 gap 84329/131072, 3:3 gap 29413/65536]; ℓ_o ∈ [34681/65536, 34682/65536) nats, Holds
+      the incumbent request 2 order at refinement 0: [0:3 gap 15585/16384, 1:3 gap 5361/65536, 2:3 gap 14157/32768, 3:3 gap 12073/32768, 4:3 gap 167935/65536, 5:2 gap 6877/32768, 6:1 gap 138769/16384, 7:1 gap 491/4096]; ℓ_o ∈ [172351/65536, 172352/65536) nats, Fails
+      the incumbent request 2 order at refinement 1: [0:3 gap 35379/65536, 1:3 gap 12007/65536, 2:3 gap 44263/65536, 3:0 gap 7087/32768, 4:3 gap 26961/32768, 5:2 gap 18573/65536, 7:1 gap 156299/16384]; ℓ_o ∈ [204660/65536, 204661/65536) nats, Fails
+      the incumbent request 2 order at refinement 2: [0:3 gap 37075/65536, 1:3 gap 1233/32768, 2:3 gap 12571/65536, 3:0 gap 70813/65536, 4:3 gap 53303/65536, 5:2 gap 2483/32768]; ℓ_o ∈ [103981/65536, 103982/65536) nats, Fails
+      the incumbent request 2 order at refinement 3: [0:3 gap 58505/65536, 1:3 gap 9251/65536, 2:3 gap 2423/16384, 4:0 gap 15947/32768]; ℓ_o ∈ [40984/65536, 40985/65536) nats, Holds
+      the incumbent request 3 order at refinement 0: [0:3 gap 13345/16384, 1:3 gap 11947/16384, 2:3 gap 96589/65536, 3:3 gap 7857/4096, 4:4 gap 8801/32768, 5:1 gap 38003/16384, 6:1 gap 12295/2048, 7:1 gap 11587/8192]; ℓ_o ∈ [190665/65536, 190666/65536) nats, Fails
+      the incumbent request 3 order at refinement 1: [0:3 gap 18709/32768, 1:3 gap 41615/65536, 2:3 gap 121527/65536, 3:3 gap 14237/16384, 4:3 gap 2547/2048, 5:2 gap 17885/32768, 7:1 gap 311657/32768]; ℓ_o ∈ [215200/65536, 215201/65536) nats, Fails
+      the incumbent request 3 order at refinement 2: [0:3 gap 10657/16384, 1:3 gap 41139/65536, 2:3 gap 70821/65536, 3:3 gap 5495/32768, 4:3 gap 8959/8192, 5:1 gap 4285/65536]; ℓ_o ∈ [113672/65536, 113673/65536) nats, Fails
+      the incumbent request 3 order at refinement 3: [0:3 gap 53395/65536, 1:3 gap 20783/65536, 2:3 gap 2039/2048, 3:3 gap 8273/8192, 5:4 gap 1579/65536]; ℓ_o ∈ [88861/65536, 88862/65536) nats, Fails
+      the incumbent request 3 order at refinement 4: [0:3 gap 65931/65536, 1:3 gap 3103/32768, 2:3 gap 24885/65536]; ℓ_o ∈ [25318/65536, 25319/65536) nats, Holds
+      the incumbent request 4 order at refinement 0: [1:3 gap 71769/32768, 0:3 gap 32743/32768, 3:1 gap 107395/65536, 4:1 gap 77517/32768, 5:3 gap 135039/32768, 6:1 gap 2007/256, 7:1 gap 481373/16384]; ℓ_o ∈ [203049/65536, 203050/65536) nats, Fails
+      the incumbent request 4 order at refinement 1: [1:3 gap 58199/65536, 0:3 gap 14289/16384, 3:3 gap 14427/32768, 4:1 gap 20485/16384, 5:3 gap 4681/16384, 6:2 gap 4395/32768]; ℓ_o ∈ [96478/65536, 96479/65536) nats, Fails
+      the incumbent request 4 order at refinement 2: [1:3 gap 75385/65536, 0:3 gap 64103/65536, 2:3 gap 33021/65536, 3:3 gap 3197/16384]; ℓ_o ∈ [58939/65536, 58940/65536) nats, Fails
+      the incumbent request 4 order at refinement 3: [5:1 gap 24787/32768, 0:3 gap 3853/8192, 3:1 gap 3109/8192, 6:2 gap 903/16384]; ℓ_o ∈ [51563/65536, 51564/65536) nats, Fails
+      the incumbent request 4 order at refinement 4: [2:1 gap 4929/16384, 0:3 gap 24281/32768, 3:1 gap 20271/65536, 6:2 gap 75133/131072]; ℓ_o ∈ [121619/65536, 121620/65536) nats, Fails
+      the incumbent request 5 order at refinement 2: [4:3 gap 34397/65536, 0:3 gap 122755/131072, 1:3 gap 30583/32768, 2:3 gap 33827/65536, 3:3 gap 8331/4096, 5:3 gap 5709/32768]; ℓ_o ∈ [149264/65536, 149265/65536) nats, Fails
+      the incumbent request 5 order at refinement 4: [4:3 gap 27123/131072, 0:3 gap 8843/32768, 1:1 gap 2633/32768, 5:1 gap 5841/32768]; ℓ_o ∈ [83101/65536, 83102/65536) nats, Fails
+      the incumbent request 6 order at refinement 0: [3:1 gap 198125/65536, 1:3 gap 34993/32768, 2:3 gap 194761/131072, 4:2 gap 2205/32768, 5:1 gap 145441/32768, 6:1 gap 253/32, 7:1 gap 216277/16384]; ℓ_o ∈ [152946/65536, 152947/65536) nats, Fails
+      the incumbent request 6 order at refinement 1: [3:1 gap 31631/32768, 1:3 gap 67665/65536, 2:3 gap 52431/65536, 4:4 gap 2753/8192, 5:3 gap 21857/16384, 6:3 gap 95855/4096]; ℓ_o ∈ [220388/65536, 220389/65536) nats, Fails
+      the incumbent request 6 order at refinement 2: [3:1 gap 43967/65536, 1:3 gap 101391/131072, 2:3 gap 40161/65536, 4:3 gap 69863/65536, 5:4 gap 387/16384]; ℓ_o ∈ [101290/65536, 101291/65536) nats, Fails
+      the incumbent request 6 order at refinement 3: [0:3 gap 85311/131072, 1:3 gap 9063/16384, 2:3 gap 5171/4096, 3:3 gap 190413/131072, 5:1 gap 1609/32768]; ℓ_o ∈ [118475/65536, 118476/65536) nats, Fails
+      the incumbent request 6 order at refinement 4: [0:3 gap 11441/32768, 1:3 gap 73729/131072, 2:3 gap 29499/32768, 5:3 gap 1277/65536]; ℓ_o ∈ [108614/65536, 108615/65536) nats, Fails
+      the incumbent request 6 order at refinement 5: [0:3 gap 63529/131072, 1:3 gap 4865/16384, 5:3 gap 9843/65536]; ℓ_o ∈ [42836/65536, 42837/65536) nats, Holds
+      the incumbent request 7 order at refinement 0: [7:1 gap 133189/16384, 0:2 gap 5759/65536, 1:1 gap 34753/32768, 3:1 gap 37243/65536, 4:1 gap 8091/4096, 5:2 gap 23691/8192, 6:1 gap 303379/32768]; ℓ_o ∈ [70871/65536, 70872/65536) nats, Fails
+      the incumbent request 7 order at refinement 1: [7:1 gap 227943/65536, 1:1 gap 3929/16384, 4:1 gap 49951/65536, 5:2 gap 5707/65536]; ℓ_o ∈ [17852/65536, 17853/65536) nats, Holds
+      the incumbent request 7 order at refinement 2: [3:3 gap 5/256, 1:1 gap 22393/32768, 5:1 gap 419905/65536]; ℓ_o ∈ [386483/65536, 386484/65536) nats, Fails
+      the incumbent request 7 order at refinement 4: [3:3 gap 46883/65536, 2:0 gap 25031/65536, 4:1 gap 577/16384]; ℓ_o ∈ [30107/65536, 30108/65536) nats, Holds
+    the witness: G_EE 5002769/128, G_Eρ -4214371/512, G_ρρ 16001849/128; g_E -10189375/4096, g_ρ 4768829/8192; step Some((Ratio { numer: 1066173, denom: 16777216 }, Ratio { numer: -16229499, denom: 34359738368 })) (24 bits)
+    γ_ρ Some(Ratio { numer: 4768829, denom: 8192 }), Δρ per unit of E's step Some(Ratio { numer: -15961633, denom: 2147483648 }) (24 bits)
+    move 0: adopted at step 9378157588072390143/147573952589676412928; the ladder's start Some((Ratio { numer: 9378157588072390143, denom: 147573952589676412928 }, Witness)); trials η 9378157588072390143/147573952589676412928 None; persistence Persistence { locks: 61, solved: 2, reread: 2, stay: 1, fall: 1, reversed: 1, uncertified: 0 }; 318550 ms
+      trials: η 9378157588072390143/147573952589676412928 ρ 1644401/2097152 mask [2418567/4096, 2418588/4096) own [2421157/4096, 2421177/4096) adopted; γ_ρ [2384414/4096, 2384415/4096)
+  m0 witness: the adopted successor's own release: ρ 1644401/2097152; L ∈ [2421157/4096, 2421177/4096) nats, X ∈ [1512205/4096, 1512225/4096) nats; solved 0 of 285; whole 0 (released 8, stations right 11); 318551 ms
+      the successor request 0 order at refinement 0: [6:1 gap 3055/512, 0:0 gap 13299/65536, 1:3 gap 2737/16384, 2:1 gap 82153/65536, 3:0 gap 7737/32768, 4:2 gap 1877/32768, 5:1 gap 250513/32768, 7:1 gap 98863/8192]; ℓ_o ∈ [100368/65536, 100369/65536) nats, Fails
+      the successor request 0 order at refinement 2: [5:3 gap 79723/65536, 0:0 gap 635/8192, 1:0 gap 95/65536, 2:0 gap 8157/65536, 6:2 gap 11567/32768]; ℓ_o ∈ [24684/65536, 24685/65536) nats, Holds
+      the successor request 0 order at refinement 3: [2:3 gap 895/4096, 0:3 gap 1209/16384, 1:3 gap 10023/32768]; ℓ_o ∈ [65999/65536, 66000/65536) nats, Fails
+      the successor request 0 order at refinement 4: [6:1 gap 24831/65536, 0:3 gap 1913/32768, 4:3 gap 2979/65536]; ℓ_o ∈ [15873/65536, 15874/65536) nats, Holds
+      the successor request 0 order at refinement 5: [2:3 gap 12895/65536, 0:3 gap 3367/32768, 4:3 gap 64589/65536]; ℓ_o ∈ [122982/65536, 122983/65536) nats, Fails
+      the successor request 0 order at refinement 6: [2:3 gap 11625/65536, 0:3 gap 1515/16384]; ℓ_o ∈ [27496/65536, 27497/65536) nats, Holds
+      the successor request 1 order at refinement 0: [6:1 gap 63985/16384, 0:1 gap 132035/65536, 2:1 gap 26115/32768, 3:1 gap 50805/32768, 4:1 gap 5275/8192, 7:1 gap 94017/2048]; ℓ_o ∈ [173124/65536, 173125/65536) nats, Fails
+      the successor request 1 order at refinement 1: [1:3 gap 6541/32768, 0:1 gap 85983/65536, 2:1 gap 21519/32768, 3:1 gap 42533/65536, 4:1 gap 2197/4096, 5:2 gap 1947/8192, 6:2 gap 34317/65536]; ℓ_o ∈ [198312/65536, 198313/65536) nats, Fails
+      the successor request 1 order at refinement 2: [4:0 gap 3011/16384, 1:0 gap 38879/65536, 3:1 gap 20199/65536, 5:3 gap 41881/65536, 6:2 gap 9899/65536]; ℓ_o ∈ [152228/65536, 152229/65536) nats, Fails
+      the successor request 2 order at refinement 0: [0:3 gap 41251/32768, 1:3 gap 23857/65536, 2:3 gap 3787/4096, 3:3 gap 17269/32768, 4:3 gap 15875/32768, 5:1 gap 12181/16384, 6:1 gap 276165/16384, 7:1 gap 2179/4096]; ℓ_o ∈ [186557/65536, 186558/65536) nats, Fails
+      the successor request 2 order at refinement 1: [0:3 gap 12299/16384, 1:3 gap 14039/32768, 2:3 gap 1055/1024, 3:0 gap 639/32768, 4:3 gap 70363/65536, 5:1 gap 2147/32768, 7:1 gap 302965/32768]; ℓ_o ∈ [184915/65536, 184916/65536) nats, Fails
+      the successor request 2 order at refinement 2: [0:3 gap 49589/65536, 1:3 gap 15489/65536, 2:3 gap 14987/32768, 3:0 gap 29349/32768, 4:3 gap 36163/32768, 5:2 gap 13937/65536]; ℓ_o ∈ [103345/65536, 103346/65536) nats, Fails
+      the successor request 2 order at refinement 3: [0:3 gap 27763/32768, 1:3 gap 13751/65536, 2:3 gap 103235/131072, 3:3 gap 16791/65536, 5:0 gap 9421/65536]; ℓ_o ∈ [63852/65536, 63853/65536) nats, Fails
+      the successor request 3 order at refinement 0: [0:3 gap 20103/16384, 1:3 gap 31455/32768, 2:3 gap 135085/65536, 3:3 gap 70121/32768, 5:1 gap 61451/16384, 6:1 gap 35161/4096, 7:1 gap 16213/4096]; ℓ_o ∈ [191166/65536, 191167/65536) nats, Fails
+      the successor request 3 order at refinement 1: [0:3 gap 6995/8192, 1:3 gap 53117/65536, 2:3 gap 72427/32768, 3:3 gap 20565/32768, 4:3 gap 96827/65536, 5:1 gap 32227/65536, 7:1 gap 81521/8192]; ℓ_o ∈ [193765/65536, 193766/65536) nats, Fails
+      the successor request 3 order at refinement 2: [0:3 gap 59301/65536, 1:3 gap 3263/4096, 2:3 gap 92441/65536, 3:3 gap 2539/8192, 4:3 gap 46617/32768, 5:2 gap 7349/65536]; ℓ_o ∈ [111458/65536, 111459/65536) nats, Fails
+      the successor request 3 order at refinement 3: [0:3 gap 273/256, 1:3 gap 18857/32768, 2:3 gap 20609/16384, 3:3 gap 81357/65536, 5:4 gap 373/16384]; ℓ_o ∈ [89270/65536, 89271/65536) nats, Fails
+      the successor request 3 order at refinement 4: [0:3 gap 13335/16384, 1:3 gap 14991/65536, 3:3 gap 27569/65536]; ℓ_o ∈ [38444/65536, 38445/65536) nats, Holds
+      the successor request 4 order at refinement 0: [1:3 gap 88131/32768, 0:3 gap 2675/2048, 3:1 gap 20357/8192, 4:1 gap 5949/2048, 5:3 gap 24027/8192, 6:1 gap 159935/16384, 7:1 gap 67473/2048]; ℓ_o ∈ [197815/65536, 197816/65536) nats, Fails
+      the successor request 4 order at refinement 1: [1:3 gap 74051/65536, 0:3 gap 70555/65536, 3:1 gap 4511/65536, 4:1 gap 13567/8192, 5:3 gap 22381/32768, 6:1 gap 12263/65536]; ℓ_o ∈ [94817/65536, 94818/65536) nats, Fails
+      the successor request 4 order at refinement 2: [1:3 gap 44001/32768, 0:3 gap 75071/65536, 2:3 gap 43041/65536, 3:3 gap 1709/16384]; ℓ_o ∈ [57914/65536, 57915/65536) nats, Fails
+      the successor request 4 order at refinement 3: [5:1 gap 19571/16384, 0:3 gap 1805/8192, 3:1 gap 42119/65536, 6:4 gap 533/16384]; ℓ_o ∈ [36664/65536, 36665/65536) nats, Holds
+      the successor request 4 order at refinement 4: [2:1 gap 13373/32768, 0:3 gap 19293/32768, 3:1 gap 9759/32768, 6:2 gap 30887/65536]; ℓ_o ∈ [96006/65536, 96007/65536) nats, Fails
+      the successor request 5 order at refinement 0: [3:1 gap 6573/32768, 0:3 gap 113329/65536, 1:3 gap 19917/8192, 2:3 gap 32395/16384, 4:1 gap 48793/32768, 5:1 gap 49051/4096, 6:1 gap 2575/2048, 7:1 gap 108087/4096]; ℓ_o ∈ [358228/65536, 358229/65536) nats, Fails
+      the successor request 5 order at refinement 2: [4:3 gap 42783/65536, 0:3 gap 155135/131072, 1:3 gap 22455/16384, 2:3 gap 33855/32768, 3:3 gap 173311/65536, 5:3 gap 5383/8192]; ℓ_o ∈ [160360/65536, 160361/65536) nats, Fails
+      the successor request 5 order at refinement 3: [4:3 gap 3685/65536, 0:3 gap 29095/32768, 1:3 gap 78897/65536, 2:3 gap 83069/65536, 5:3 gap 19491/16384]; ℓ_o ∈ [288719/65536, 288720/65536) nats, Fails
+      the successor request 5 order at refinement 4: [4:3 gap 31173/65536, 0:3 gap 1781/4096, 1:3 gap 38685/65536, 5:3 gap 69105/131072]; ℓ_o ∈ [95033/65536, 95034/65536) nats, Fails
+      the successor request 5 order at refinement 5: [4:3 gap 8633/32768, 0:3 gap 16193/65536, 5:3 gap 29255/32768]; ℓ_o ∈ [109622/65536, 109623/65536) nats, Fails
+      the successor request 5 order at refinement 7: [4:3 gap 31639/131072]; ℓ_o ∈ [0/65536, 1/65536) nats, Holds
+      the successor request 6 order at refinement 0: [3:1 gap 58421/16384, 1:3 gap 12101/8192, 2:3 gap 28927/16384, 4:2 gap 4441/16384, 5:1 gap 51093/8192, 6:1 gap 184703/16384, 7:1 gap 68191/4096]; ℓ_o ∈ [160431/65536, 160432/65536) nats, Fails
+      the successor request 6 order at refinement 1: [3:1 gap 21769/16384, 1:3 gap 42235/32768, 2:3 gap 109851/131072, 4:4 gap 9863/16384, 5:3 gap 74319/16384, 6:3 gap 1256257/32768]; ℓ_o ∈ [233603/65536, 233604/65536) nats, Fails
+      the successor request 6 order at refinement 2: [3:1 gap 33319/32768, 1:3 gap 64017/65536, 2:3 gap 48539/65536, 4:3 gap 85239/65536, 5:1 gap 2371/65536]; ℓ_o ∈ [90914/65536, 90915/65536) nats, Fails
+      the successor request 6 order at refinement 3: [0:3 gap 801/1024, 1:3 gap 13135/16384, 2:3 gap 97247/65536, 3:3 gap 109927/65536, 5:3 gap 2823/65536]; ℓ_o ∈ [118736/65536, 118737/65536) nats, Fails
+      the successor request 6 order at refinement 4: [0:3 gap 31481/65536, 1:3 gap 12117/16384, 2:3 gap 72579/65536, 5:3 gap 12273/65536]; ℓ_o ∈ [108485/65536, 108486/65536) nats, Fails
+      the successor request 6 order at refinement 5: [0:3 gap 40807/65536, 1:3 gap 29737/65536, 5:3 gap 21317/65536]; ℓ_o ∈ [53177/65536, 53178/65536) nats, Fails
+      the successor request 7 order at refinement 0: [7:1 gap 197107/16384, 0:3 gap 7891/32768, 1:3 gap 3013/65536, 3:1 gap 59557/16384, 4:1 gap 33945/16384, 5:2 gap 23715/8192, 6:1 gap 424731/32768]; ℓ_o ∈ [67856/65536, 67857/65536) nats, Fails
+      the successor request 7 order at refinement 2: [3:3 gap 21511/65536, 0:3 gap 43647/131072, 1:3 gap 25421/65536, 2:3 gap 60335/65536, 5:1 gap 2945/65536, 7:3 gap 42545/16384]; ℓ_o ∈ [173183/65536, 173184/65536) nats, Fails
+      the successor request 7 order at refinement 3: [3:3 gap 29873/65536, 0:3 gap 18325/65536, 1:3 gap 35729/65536, 2:3 gap 70857/65536, 5:3 gap 33/2048]; ℓ_o ∈ [108257/65536, 108258/65536) nats, Fails
+      the successor request 7 order at refinement 7: [3:3 gap 11765/65536]; ℓ_o ∈ [0/65536, 1/65536) nats, Holds
+  m0: witness adopted; the later metrics are not attempted
+executed move-once: 318593 ms; resident 487600128 now, 1183793152 peak
