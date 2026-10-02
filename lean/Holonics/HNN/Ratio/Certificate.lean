@@ -55,6 +55,22 @@ codeLength(z + Δ) ≤ codeLength(z) + ⟨g, Δ⟩ + (ln 2/2) · 2^(osc Δ) · V
    `G = Σ_k g_k x_kᵀ`. A step `Δ_k = −η u_k` (for `R`, `u_k = V x_k`) with
    `η (u_k,c − u_k,d) ≤ ω_k` and `η · ln 2 · Σ_k 2^(ω_k) Var_(p_k)(u_k) ≤ Σ_k ⟨g_k, u_k⟩` lowers
    the window's code by at least half its first-order decrease.
+6. **The accumulated certificate** (`reading_code_le`, `accumulated_code_le`,
+   `bound_statistics`, `statistics_insert`). Each reading `i`, read at its own base point `W_i`,
+   bounds its code at any later `W` by the item 3 bound with `Δ_i = (W − W_i) x_i`, provided that
+   drift's spread is at most `ω`. Summed over the readings, the bound is read from six running
+   statistics alone (`Statistics`): `Σ code_i(W_i)`, `A = Σ x_i x_iᵀ ⊗ J_(p_i)`,
+   `b = Σ (p_i − e_(t_i)) x_iᵀ`, `Σ A_i vec W_i`, and the two scalars `Σ ⟨vec W_i, b_i⟩` and
+   `Σ vec W_iᵀ A_i vec W_i`:
+   `Σ_i code_i(W) ≤ Σ code_i(W_i) + ⟨vec W, b⟩ − Σ⟨vec W_i, b_i⟩ +
+   (ln 2/2)·2^ω·(vec Wᵀ A vec W − 2⟨vec W, Σ A_i vec W_i⟩ + Σ vec W_iᵀ A_i vec W_i)`.
+   A new reading adds its own statistics (`statistics_insert`), so the certificate keeps no record
+   of the readings. The two scalars do not depend on `W`: they fix the bound's value, not its
+   minimizer, and a step only needs `A`, `b` and `Σ A_i vec W_i`.
+7. **The drift check** (`drift_spread_le`, `accumulated_code_le_of_path`). With every input
+   `|x_ij| ≤ X` and `2X` times the path length of `W` since reading `i` at most `ω`, the length
+   measured in the row norm `max_c Σ_j |V_cj|` (the operator norm from `ℓ∞` inputs to `ℓ∞`
+   logits), the drift's spread is at most `ω`, so the accumulated certificate holds along the path.
 
 [definition] The factor `2^ω` is the price of reading the curvature at the current face instead
 of along the whole step: as `ω → 0` the model is the second-order Taylor model
@@ -419,6 +435,237 @@ theorem window_step_descends (f u p : K → ι → ℝ) (t : K → ι)
 
 end Window
 
+/-! ## 5. The accumulated certificate: every reading at its own base point -/
+
+section Accumulated
+
+variable {ι : Type*} [Fintype ι] [Nonempty ι] [DecidableEq ι]
+variable {K X : Type*} [Fintype X]
+
+/-- [definition] **The face in bits**, `p_c = 2^(f_c)/Σ_d 2^(f_d)`, as `R` reads its logits. -/
+def bitFace (f : ι → ℝ) : ι → ℝ := fun c => (2 : ℝ) ^ f c / ∑ d, (2 : ℝ) ^ f d
+
+/-- [definition] **A matrix read as a vector**, `vec W (c, j) = W c j`. -/
+def vecW (W : Matrix ι X ℝ) : ι × X → ℝ := fun a => W a.1 a.2
+
+/-- [definition] **One reading's Fisher term** `A_i = x_i x_iᵀ ⊗ J_(p_i)` on `vec W`. -/
+def readingFisher (x : X → ℝ) (p : ι → ℝ) : Matrix (ι × X) (ι × X) ℝ :=
+  fun a b => softmaxJacobian p a.1 b.1 * (x a.2 * x b.2)
+
+/-- [definition] **One reading's gradient** `g_i x_iᵀ` on `vec W`. -/
+def readingGrad (g : ι → ℝ) (x : X → ℝ) : ι × X → ℝ := fun a => g a.1 * x a.2
+
+omit [Fintype ι] [Nonempty ι] [DecidableEq ι] [Fintype X] in
+/-- `vec` is linear in the matrix. -/
+theorem vecW_sub (W V : Matrix ι X ℝ) : vecW (W - V) = vecW W - vecW V := rfl
+
+omit [Nonempty ι] in
+/-- [proved-derived; formal-checked] **The reading's Fisher form on `vec W`**:
+`(V x)ᵀ J_p (V x) = vec Vᵀ (x xᵀ ⊗ J_p) vec V`. -/
+theorem readingFisher_quadratic (x : X → ℝ) (p : ι → ℝ) (V : Matrix ι X ℝ) :
+    (V *ᵥ x) ⬝ᵥ (softmaxJacobian p *ᵥ (V *ᵥ x)) =
+      vecW V ⬝ᵥ (readingFisher x p *ᵥ vecW V) := by
+  simp only [dotProduct, mulVec, vecW, readingFisher, Fintype.sum_prod_type, Finset.sum_mul,
+    Finset.mul_sum]
+  refine Finset.sum_congr rfl fun c _ => ?_
+  conv_rhs => rw [Finset.sum_comm]
+  refine Finset.sum_congr rfl fun d _ => ?_
+  conv_rhs => rw [Finset.sum_comm]
+  exact Finset.sum_congr rfl fun l _ => Finset.sum_congr rfl fun j _ => by ring
+
+omit [Nonempty ι] [DecidableEq ι] in
+/-- [proved-derived; formal-checked] **The reading's first-order term on `vec W`**:
+`⟨g, V x⟩ = ⟨vec V, g xᵀ⟩`. -/
+theorem readingGrad_pairing (g : ι → ℝ) (x : X → ℝ) (V : Matrix ι X ℝ) :
+    ∑ c, g c * (V *ᵥ x) c = vecW V ⬝ᵥ readingGrad g x := by
+  simp only [dotProduct, mulVec, vecW, readingGrad, Fintype.sum_prod_type, Finset.mul_sum]
+  exact Finset.sum_congr rfl fun c _ => Finset.sum_congr rfl fun j _ => by ring
+
+omit [Fintype ι] [Nonempty ι] [Fintype X] in
+/-- [proved-derived; formal-checked] `x xᵀ ⊗ J_p` is symmetric. -/
+theorem readingFisher_transpose (x : X → ℝ) (p : ι → ℝ) :
+    (readingFisher x p)ᵀ = readingFisher x p := by
+  ext a b
+  simp only [Matrix.transpose_apply, readingFisher, softmaxJacobian, Matrix.sub_apply,
+    Matrix.diagonal_apply, Matrix.vecMulVec_apply]
+  by_cases h : a.1 = b.1
+  · rw [h]; ring
+  · rw [if_neg h, if_neg (Ne.symm h)]; ring
+
+omit [Nonempty ι] in
+/-- [proved-derived; formal-checked] **The drift's Fisher form expanded about the base point**:
+`vec(W − W_i)ᵀ A_i vec(W − W_i) = vec Wᵀ A_i vec W − 2 vec Wᵀ A_i vec W_i + vec W_iᵀ A_i vec W_i`. -/
+theorem readingFisher_drift (x : X → ℝ) (p : ι → ℝ) (W Wi : Matrix ι X ℝ) :
+    vecW (W - Wi) ⬝ᵥ (readingFisher x p *ᵥ vecW (W - Wi)) =
+      vecW W ⬝ᵥ (readingFisher x p *ᵥ vecW W) - 2 * (vecW W ⬝ᵥ (readingFisher x p *ᵥ vecW Wi)) +
+        vecW Wi ⬝ᵥ (readingFisher x p *ᵥ vecW Wi) := by
+  have hsym : vecW Wi ⬝ᵥ (readingFisher x p *ᵥ vecW W) =
+      vecW W ⬝ᵥ (readingFisher x p *ᵥ vecW Wi) := by
+    rw [dotProduct_mulVec, ← mulVec_transpose, readingFisher_transpose, dotProduct_comm]
+  rw [vecW_sub, mulVec_sub, dotProduct_sub, sub_dotProduct, sub_dotProduct, hsym]
+  ring
+
+/-- [definition] **The statistics a running certificate stores**: the summed code at the base
+points, the Fisher term `A = Σ x_i x_iᵀ ⊗ J_(p_i)`, the gradient `b = Σ (p_i − e_(t_i)) x_iᵀ`, the
+anchor `Σ A_i vec W_i`, and two scalars, `Σ ⟨vec W_i, b_i⟩` and `Σ vec W_iᵀ A_i vec W_i`. Their
+size does not grow with the readings. -/
+@[ext] structure Statistics (ι X : Type*) where
+  code : ℝ
+  gram : Matrix (ι × X) (ι × X) ℝ
+  grad : ι × X → ℝ
+  anchor : ι × X → ℝ
+  gradAnchor : ℝ
+  anchorEnergy : ℝ
+
+instance : Add (Statistics ι X) :=
+  ⟨fun S T => ⟨S.code + T.code, S.gram + T.gram, S.grad + T.grad, S.anchor + T.anchor,
+    S.gradAnchor + T.gradAnchor, S.anchorEnergy + T.anchorEnergy⟩⟩
+
+/-- [definition] **One reading's statistics**, read at its own base point `W_i`. -/
+def readingStatistics (x : X → ℝ) (t : ι) (Wi : Matrix ι X ℝ) : Statistics ι X :=
+  let p := bitFace (Wi *ᵥ x)
+  let g : ι → ℝ := fun c => p c - if c = t then 1 else 0
+  ⟨codeLength (Wi *ᵥ x) t, readingFisher x p, readingGrad g x, readingFisher x p *ᵥ vecW Wi,
+    vecW Wi ⬝ᵥ readingGrad g x, vecW Wi ⬝ᵥ (readingFisher x p *ᵥ vecW Wi)⟩
+
+/-- [definition] **The statistics of the readings in `s`**, each read at its own base point. -/
+def statistics (s : Finset K) (x : K → X → ℝ) (t : K → ι) (Wb : K → Matrix ι X ℝ) :
+    Statistics ι X :=
+  ⟨∑ k ∈ s, (readingStatistics (x k) (t k) (Wb k)).code,
+    ∑ k ∈ s, (readingStatistics (x k) (t k) (Wb k)).gram,
+    ∑ k ∈ s, (readingStatistics (x k) (t k) (Wb k)).grad,
+    ∑ k ∈ s, (readingStatistics (x k) (t k) (Wb k)).anchor,
+    ∑ k ∈ s, (readingStatistics (x k) (t k) (Wb k)).gradAnchor,
+    ∑ k ∈ s, (readingStatistics (x k) (t k) (Wb k)).anchorEnergy⟩
+
+omit [Nonempty ι] [DecidableEq ι] [Fintype ι] [Fintype X] in
+/-- [proved-derived; formal-checked] **The statistics update by addition**: a new reading adds
+its own statistics, so the certificate keeps no record of the readings. -/
+theorem statistics_insert [DecidableEq K] [Fintype ι] [DecidableEq ι] [Fintype X] (s : Finset K)
+    {k : K} (hk : k ∉ s) (x : K → X → ℝ) (t : K → ι) (Wb : K → Matrix ι X ℝ) :
+    statistics (insert k s) x t Wb = statistics s x t Wb + readingStatistics (x k) (t k) (Wb k) := by
+  ext <;> simp only [statistics, Finset.sum_insert hk] <;> exact add_comm _ _
+
+/-- [definition] **The bound read from the statistics alone**, at a later `W`:
+`code + (⟨vec W, b⟩ − Σ⟨vec W_i, b_i⟩) + (ln 2/2)·2^ω·(vec Wᵀ A vec W − 2⟨vec W, Σ A_i vec W_i⟩ +
+Σ vec W_iᵀ A_i vec W_i)`. -/
+def Statistics.bound (S : Statistics ι X) (ω : ℝ) (W : Matrix ι X ℝ) : ℝ :=
+  S.code + (vecW W ⬝ᵥ S.grad - S.gradAnchor) +
+    Real.log 2 / 2 * (2 : ℝ) ^ ω *
+      (vecW W ⬝ᵥ (S.gram *ᵥ vecW W) - 2 * (vecW W ⬝ᵥ S.anchor) + S.anchorEnergy)
+
+omit [Nonempty ι] in
+/-- [proved-derived; formal-checked] **The bound is additive in the statistics.** -/
+theorem bound_statistics (s : Finset K) (x : K → X → ℝ) (t : K → ι) (Wb : K → Matrix ι X ℝ)
+    (ω : ℝ) (W : Matrix ι X ℝ) :
+    (statistics s x t Wb).bound ω W = ∑ k ∈ s, (readingStatistics (x k) (t k) (Wb k)).bound ω W := by
+  simp only [Statistics.bound, statistics, sum_mulVec, dotProduct_sum, Finset.sum_add_distrib,
+    Finset.sum_sub_distrib, Finset.mul_sum, mul_add, mul_sub]
+
+/-- [proved-derived; formal-checked] **One reading at a later `W`**: the per-reading bound
+(`codeLength_add_le`) at the reading's own base point `W_i`, with the drift `Δ = (W − W_i) x_i`
+of spread at most `ω`, is the bound read from that reading's statistics. -/
+theorem reading_code_le (x : X → ℝ) (t : ι) (Wi W : Matrix ι X ℝ) {ω : ℝ}
+    (hosc : ∀ c d, ((W - Wi) *ᵥ x) c - ((W - Wi) *ᵥ x) d ≤ ω) :
+    codeLength (W *ᵥ x) t ≤ (readingStatistics x t Wi).bound ω W := by
+  set p := bitFace (Wi *ᵥ x) with hpdef
+  have hp : ∀ c, p c = (2 : ℝ) ^ (Wi *ᵥ x) c / ∑ d, (2 : ℝ) ^ (Wi *ᵥ x) d := fun c => rfl
+  have h := codeLength_add_le_fisher (Wi *ᵥ x) ((W - Wi) *ᵥ x) p hp hosc t
+  have hW : (fun c => (Wi *ᵥ x) c + ((W - Wi) *ᵥ x) c) = W *ᵥ x := by
+    rw [sub_mulVec]; funext c; simp only [Pi.sub_apply]; ring
+  rw [hW, readingFisher_quadratic, readingFisher_drift] at h
+  have hfirst : ∑ c, (p c - (Pi.single t (1 : ℝ) : ι → ℝ) c) * ((W - Wi) *ᵥ x) c =
+      vecW W ⬝ᵥ readingGrad (fun c => p c - if c = t then 1 else 0) x -
+        vecW Wi ⬝ᵥ readingGrad (fun c => p c - if c = t then 1 else 0) x := by
+    rw [readingGrad_pairing, vecW_sub, sub_dotProduct]
+    simp only [Pi.single_apply]
+  rw [hfirst] at h
+  simp only [Statistics.bound, readingStatistics]
+  linarith
+
+/-- [proved-derived; formal-checked] **The accumulated certificate.** Every reading `i ∈ s`, read
+at its own base point `W_i`, bounds its code at any later `W` whose drift `(W − W_i) x_i` has spread
+at most `ω`; the readings' bounds sum to a bound read from the statistics alone:
+`Σ_i code_i(W) ≤ (statistics s).bound ω W`. -/
+theorem accumulated_code_le (s : Finset K) (x : K → X → ℝ) (t : K → ι)
+    (Wb : K → Matrix ι X ℝ) (W : Matrix ι X ℝ) {ω : ℝ}
+    (hosc : ∀ k ∈ s, ∀ c d, ((W - Wb k) *ᵥ x k) c - ((W - Wb k) *ᵥ x k) d ≤ ω) :
+    ∑ k ∈ s, codeLength (W *ᵥ x k) (t k) ≤ (statistics s x t Wb).bound ω W := by
+  rw [bound_statistics]
+  exact Finset.sum_le_sum fun k hk => reading_code_le (x k) (t k) (Wb k) W (hosc k hk)
+
+/-! ### The drift check from the path length -/
+
+/-- [definition] **The row norm** `max_c Σ_j |V_cj|`, the operator norm from `ℓ∞` inputs to `ℓ∞`
+logits. -/
+def rowNorm (V : Matrix ι X ℝ) : ℝ := Finset.univ.sup' Finset.univ_nonempty fun c => ∑ j, |V c j|
+
+omit [DecidableEq ι] in
+/-- [proved-derived; formal-checked] `|(V x)_c| ≤ ‖V‖ · X` when every `|x_j| ≤ X`. -/
+theorem abs_mulVec_le (V : Matrix ι X ℝ) (x : X → ℝ) {Xb : ℝ} (hXb : 0 ≤ Xb)
+    (hx : ∀ j, |x j| ≤ Xb) (c : ι) : |(V *ᵥ x) c| ≤ rowNorm V * Xb := by
+  calc |(V *ᵥ x) c| = |∑ j, V c j * x j| := rfl
+    _ ≤ ∑ j, |V c j * x j| := Finset.abs_sum_le_sum_abs _ _
+    _ ≤ ∑ j, |V c j| * Xb := Finset.sum_le_sum fun j _ => by
+        rw [abs_mul]; exact mul_le_mul_of_nonneg_left (hx j) (abs_nonneg _)
+    _ = (∑ j, |V c j|) * Xb := by rw [Finset.sum_mul]
+    _ ≤ rowNorm V * Xb := mul_le_mul_of_nonneg_right
+        (Finset.le_sup' (fun c => ∑ j, |V c j|) (Finset.mem_univ c)) hXb
+
+omit [DecidableEq ι] in
+/-- [proved-derived; formal-checked] The row norm is subadditive over a sum of steps. -/
+theorem rowNorm_sum_le {S : Type*} (u : Finset S) (D : S → Matrix ι X ℝ) :
+    rowNorm (∑ s ∈ u, D s) ≤ ∑ s ∈ u, rowNorm (D s) := by
+  refine Finset.sup'_le _ _ fun c _ => ?_
+  calc ∑ j, |(∑ s ∈ u, D s) c j| = ∑ j, |∑ s ∈ u, D s c j| := by simp only [Matrix.sum_apply]
+    _ ≤ ∑ j, ∑ s ∈ u, |D s c j| := Finset.sum_le_sum fun j _ => Finset.abs_sum_le_sum_abs _ _
+    _ = ∑ s ∈ u, ∑ j, |D s c j| := Finset.sum_comm
+    _ ≤ ∑ s ∈ u, rowNorm (D s) := Finset.sum_le_sum fun s _ =>
+        Finset.le_sup' (fun c => ∑ j, |D s c j|) (Finset.mem_univ c)
+
+omit [Nonempty ι] [DecidableEq ι] [Fintype ι] [Fintype X] in
+/-- [proved-derived; formal-checked] A path's displacement is the sum of its steps. -/
+theorem path_displacement (Wpath : ℕ → Matrix ι X ℝ) {a n : ℕ} (han : a ≤ n) :
+    Wpath n - Wpath a = ∑ u ∈ Finset.Ico a n, (Wpath (u + 1) - Wpath u) := by
+  induction n, han using Nat.le_induction with
+  | base => simp
+  | succ n hn ih =>
+    rw [Finset.sum_Ico_succ_top hn, ← ih]; abel
+
+omit [DecidableEq ι] in
+/-- [proved-derived; formal-checked] **The drift check.** With every `|x_j| ≤ X` and the path
+length of `W` since the reading at most `ω/(2X)` in the row norm, `2X · Σ_u ‖W_(u+1) − W_u‖ ≤ ω`,
+the drift `(W_n − W_a) x` has spread at most `ω`. -/
+theorem drift_spread_le (Wpath : ℕ → Matrix ι X ℝ) {a n : ℕ} (han : a ≤ n) (x : X → ℝ)
+    {Xb ω : ℝ} (hXb : 0 ≤ Xb) (hx : ∀ j, |x j| ≤ Xb)
+    (hlen : 2 * Xb * ∑ u ∈ Finset.Ico a n, rowNorm (Wpath (u + 1) - Wpath u) ≤ ω) (c d : ι) :
+    ((Wpath n - Wpath a) *ᵥ x) c - ((Wpath n - Wpath a) *ᵥ x) d ≤ ω := by
+  have hV : rowNorm (Wpath n - Wpath a) ≤
+      ∑ u ∈ Finset.Ico a n, rowNorm (Wpath (u + 1) - Wpath u) := by
+    rw [path_displacement Wpath han]; exact rowNorm_sum_le _ _
+  have hc := abs_mulVec_le (Wpath n - Wpath a) x hXb hx c
+  have hd := abs_mulVec_le (Wpath n - Wpath a) x hXb hx d
+  have hm := mul_le_mul_of_nonneg_right hV hXb
+  have h1 := le_abs_self (((Wpath n - Wpath a) *ᵥ x) c)
+  have h2 := neg_abs_le (((Wpath n - Wpath a) *ᵥ x) d)
+  nlinarith
+
+/-- [proved-derived; formal-checked] **The accumulated certificate along a path.** Readings
+`i ∈ s` taken at times `τ_i ≤ n` with base points `W_(τ_i)` on one path, inputs `|x_ij| ≤ X`, and
+`2X` times the path length since each reading at most `ω`: the code at `W_n` summed over the
+readings is at most the bound read from the statistics. -/
+theorem accumulated_code_le_of_path (s : Finset K) (x : K → X → ℝ) (t : K → ι) (τ : K → ℕ)
+    (Wpath : ℕ → Matrix ι X ℝ) {n : ℕ} (hτ : ∀ k ∈ s, τ k ≤ n) {Xb ω : ℝ} (hXb : 0 ≤ Xb)
+    (hx : ∀ k ∈ s, ∀ j, |x k j| ≤ Xb)
+    (hlen : ∀ k ∈ s,
+      2 * Xb * ∑ u ∈ Finset.Ico (τ k) n, rowNorm (Wpath (u + 1) - Wpath u) ≤ ω) :
+    ∑ k ∈ s, codeLength (Wpath n *ᵥ x k) (t k) ≤
+      (statistics s x t fun k => Wpath (τ k)).bound ω (Wpath n) :=
+  accumulated_code_le s x t _ _ fun k hk =>
+    drift_spread_le Wpath (hτ k hk) (x k) hXb (hx k hk) (hlen k hk)
+
+end Accumulated
+
 /-! ## Audit -/
 
 #print axioms exp_remainder_le
@@ -431,5 +678,13 @@ end Window
 #print axioms window_code_add_le
 #print axioms linear_first_order
 #print axioms window_step_descends
+#print axioms readingFisher_quadratic
+#print axioms readingFisher_drift
+#print axioms statistics_insert
+#print axioms bound_statistics
+#print axioms reading_code_le
+#print axioms accumulated_code_le
+#print axioms drift_spread_le
+#print axioms accumulated_code_le_of_path
 
 end Holonics.HNN.Ratio.Certificate
