@@ -31,9 +31,10 @@ the fine lattice `2^(−L−k)` (nearest, ties upward). The coarse coordinate `q
 q_i(η) = ⌊(r_i + η d_i)/u + c⌋,   c = 1/2 + 2^(−k−1)
 ```
 
-[derived: `⌊(⌊y⌋ + m)/N⌋ = ⌊(y + m)/N⌋` for integers `m` and `N > 0`]. This needs `k ≥ 1`, which
-holds because `k = gamma_length(m) ≥ 1`. At `k = 0`, `div_rem_coordinate` skips the coarse rounding
-and `c` would be `1/2`. The transport modulus is
+[proved-derived; formal-checked: `HNN/LatticeDeposit.quot_fine_eq_floor`, and at the step
+`step_coordinate_eq_floor`, through `⌊(⌊y⌋ + m)/N⌋ = ⌊(y + m)/N⌋` for integers `m` and `N > 0`].
+This needs `k ≥ 1`, which holds because `k = gamma_length(m) ≥ 1`. At `k = 0`,
+`div_rem_coordinate` skips the coarse rounding and `c` would be `1/2`. The transport modulus is
 carried onto the same lattice, nearest, and contributes one more such coordinate.
 
 So **every coordinate is a step function of `η`**. It changes exactly where `(r_i + η d_i)/u + c`
@@ -225,7 +226,8 @@ on the cut index:
    No state lies between them.
 4. **Decide the wall on its exact jump.** The jump `J_c` is the comparison read at one
    constitution on two commitment orders, so it does not shrink with the step (the flip record's
-   §2b, `crossing_cost_le`). Stop at the last state before the wall, which is certified. One move
+   §2b, `crossing_cost_le`). Stop at the last state before the wall, certified where the first-order certificate's
+   condition holds at its step size. One move
    crosses walls and is accepted exactly when its continuous decrease from the start to its end
    exceeds the sum of the jumps of every wall it crosses: a negative wall always, a positive one
    when the move is long enough. The decrease grows with `η` and a wall's jump does not, so a long
@@ -286,9 +288,10 @@ Along `m6`'s and `m7`'s directions:
 - Lean `HNN/CarriedCuts`: `floor_ne_iff`, `coordinate_changes_iff`, `coordinate_moves_lt`,
   `coordinate_moves_gt`, `moves_sum_lt`, `moves_sum_gt`, `margin_survives_moves`,
   `weighted_moves_le`, `margin_survives_weighted`.
+- Lean `HNN/LatticeDeposit`, the rounding composition: `quot_fine_eq_floor`,
+  `step_coordinate_eq_floor`.
 - Rust (unchanged): `hnn::constitution::carried_entry` (the carried coordinate), `hnn::executed`'s
   `ladder_start` and `LADDER_DEPTH` (the halving law §5 would replace).
 - Owed to #62:
-  - the rounding composition as a Lean statement;
   - the three-distance law;
   - a segment bound on a read multiplier's rate away from a coalescence (the flip record's §3b).

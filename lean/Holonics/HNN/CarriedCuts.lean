@@ -13,7 +13,7 @@ import Mathlib.Tactic.FieldSimp
 coordinate, nearest with ties upward, of the fine point, itself nearest with ties upward, of its
 update `η d` plus its carried remainder `r`. The two roundings compose to
 `q(η) = ⌊(r + η d)/u + c⌋` with `c = 1/2 + 2^(−k−1)`, `2^(−k)` the fine lattice's ratio to the
-coarse, `k ≥ 1` [derived: `⌊(⌊y⌋ + m)/N⌋ = ⌊(y + m)/N⌋` for integers `m` and `N > 0`]. So
+coarse, `k ≥ 1` (`HNN/LatticeDeposit.quot_fine_eq_floor`, `step_coordinate_eq_floor`). So
 along the direction each coordinate is constant in `η` except at its **cuts**, the step sizes
 where `(r + η d)/u + c` passes an integer: an arithmetic progression of spacing `u/|d|`. Every
 reading, commitment and code length of the successor is a function of the carried state, so all of
