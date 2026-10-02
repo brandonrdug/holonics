@@ -1,0 +1,11 @@
+executed joined: 8 order2 requests at development seed 2026093061, the arm lock-dec; the bank p = 5/8, grain 2^(-16)
+  w1: ρ 102837/131072, ρ₀ 102837/131072; L ∈ [379492/4096, 379497/4096) nats; 325 returns; 388471 ms
+    Δρ Some(Ratio { numer: 4785439, denom: 134217728 }); own -1083399/1024, supplied -16033055/4096, own − supplied 11699459/4096 (24 bits); stop Exhausted after 320; 388471 ms
+  w2: ρ 102837/131072, ρ₀ 102837/131072; L ∈ [315459/4096, 315464/4096) nats; 325 returns; 393070 ms
+    Δρ Some(Ratio { numer: 6678985, denom: 134217728 }); own -16090135/4096, supplied -4377651/512, own − supplied 147899/32 (24 bits); stop Exhausted after 320; 393075 ms
+  w3: ρ 102837/131072, ρ₀ 102837/131072; L ∈ [320014/4096, 320019/4096) nats; 325 returns; 402101 ms
+    Δρ Some(Ratio { numer: -2746589, denom: 134217728 }); own -3585389/512, supplied -9857711/2048, own − supplied -4483845/2048 (24 bits); stop Exhausted after 320; 402101 ms
+  w5: ρ 102837/131072, ρ₀ 102837/131072; L ∈ [284831/4096, 284836/4096) nats; 325 returns; 396619 ms
+    Δρ Some(Ratio { numer: -9946711, denom: 8589934592 }); own -6115387/1024, supplied -2995375/512, own − supplied -7976769/65536 (24 bits); stop Exhausted after 320; 396619 ms
+executed joined: 1580375 ms; resident 133246976 now, 161697792 peak
+exit 0 wall 1580433 ms

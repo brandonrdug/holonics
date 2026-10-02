@@ -1,0 +1,3 @@
+  m6 (transport modulus 102837/131072): released 128, held 0, refused 0, refused certificates 0; whole sections 0 of 128 (nonconstant 0 of 128, constant 0 of 0); the success rule (every nonconstant section whole): does not hold; incorrect releases 128; reaching the termination 9; stations right 235 by station [25, 26, 28, 22, 21, 29, 38, 46]; first lock at a request-reading station (0 or 1) 16, first lock right 28; 1669860 ms
+executed evaluate: 1669937 ms; resident 33271808 now, 56475648 peak
+exit 0 wall 1669966 ms
