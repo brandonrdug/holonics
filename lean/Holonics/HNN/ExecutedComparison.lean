@@ -110,6 +110,13 @@ the laws that covector and its certified step stand on (the diagnosis record,
    its cut and moves there (`cell_holds_until_cut`, `cell_moves_at_cut`), at a step set by the
    reading's place inside its cell (`cut_within_cell`) (§13).
 
+14. **The certified lock order.** [proved-derived; formal-checked] A station locks when no
+   station's certain gap exceeds its reach (`certifiedLock`): the largest certain gap locks
+   (`certifiedLock_largest`), the true largest gap locks (`leader_locks`), a lone lock has the
+   strictly largest true gap (`lone_lock_is_largest`), a certified order is swapped only by a
+   crossing (`certified_order_needs_crossing`), and exact readings give the largest gap with its
+   ties (`certifiedLock_exact`) (§14).
+
 [open] (#62) The existence of the differentiable root path (the implicit function theorem at a
 simple root, from `Φ`'s strict differentiability), Jacobi's formula `∂_η det(λ − M − ηΔM) =
 −tr(adj(λ − M) ΔM)` with the adjugate's rank-one form at a simple root, and the certificate's
@@ -1857,6 +1864,73 @@ theorem cut_within_cell {w x v : ℝ} (hw : 0 < w) (hv : 0 < v) :
 
 end Flip
 
+/-! ## 14. The lock order the readings certify
+
+Each eligible station's gap is enclosed: its certain gap `lo j = L_top − max U` (the gap the
+release reads) and its reach `hi j = U_top − max L`. The rule that locks only the strictly largest
+certain gap orders two stations whose enclosures overlap by where their cells' cuts fall, which is
+`m7`'s swap. The release's other decisions (a top exceeds its rivals, a lock passes one) are
+certified orderings of enclosures; read the same way, a station is below the largest only when its
+reach is below the largest certain gap. **A station locks when no station's certain gap exceeds its
+reach** (`certifiedLock`). Then:
+- the station of the largest certain gap locks, so the rule is a nonempty lock set wherever one
+  station is eligible (`certifiedLock_largest`), and §8's decisions law applies unchanged;
+- the true largest gap always locks (`leader_locks`);
+- a station that locks alone has the strictly largest true gap (`lone_lock_is_largest`), so a
+  station certified below another at one state locks alone at a later one only if their true gaps
+  cross (`certified_order_needs_crossing`);
+- on exact readings it is the largest gap with its ties, the rule as it stood
+  (`certifiedLock_exact`). -/
+
+section CertifiedLock
+
+variable {ι : Type*}
+
+/-- [definition; agent-inferred, October 2] **A station locks when no station's certain gap
+exceeds its reach.** -/
+def certifiedLock (lo hi : ι → ℝ) (j : ι) : Prop := ∀ i, lo i ≤ hi j
+
+/-- [proved-derived; formal-checked] **The station of the largest certain gap locks.** -/
+theorem certifiedLock_largest {lo hi : ι → ℝ} (hlohi : ∀ i, lo i ≤ hi i) {k : ι}
+    (hk : ∀ i, lo i ≤ lo k) : certifiedLock lo hi k :=
+  fun i => (hk i).trans (hlohi k)
+
+/-- [proved-derived; formal-checked] **The true largest gap always locks**: with every true gap
+`g i ∈ [lo i, hi i]`, a station whose true gap is the largest locks. -/
+theorem leader_locks {lo hi g : ι → ℝ} (hlo : ∀ i, lo i ≤ g i) (hhi : ∀ i, g i ≤ hi i) {k : ι}
+    (hk : ∀ i, g i ≤ g k) : certifiedLock lo hi k :=
+  fun i => (hlo i).trans ((hk i).trans (hhi k))
+
+/-- [proved-derived; formal-checked] **On exact readings the rule is the largest gap with its
+ties.** -/
+theorem certifiedLock_exact {g : ι → ℝ} {j : ι} : certifiedLock g g j ↔ ∀ i, g i ≤ g j :=
+  Iff.rfl
+
+/-- [proved-derived; formal-checked] **A station that locks alone has the strictly largest true
+gap.** -/
+theorem lone_lock_is_largest [Finite ι] [Nonempty ι] {lo hi g : ι → ℝ} (hlo : ∀ i, lo i ≤ g i)
+    (hhi : ∀ i, g i ≤ hi i) {k : ι} (hlone : ∀ j, j ≠ k → ¬ certifiedLock lo hi j) :
+    ∀ j, j ≠ k → g j < g k := by
+  obtain ⟨m, hm⟩ := Finite.exists_max g
+  have hmk : m = k := by
+    by_contra h
+    exact hlone m h (leader_locks hlo hhi hm)
+  subst hmk
+  intro j hj
+  obtain ⟨i, hi⟩ := not_forall.mp (hlone j hj)
+  linarith [hhi j, hlo i, hm i, lt_of_not_ge hi]
+
+/-- [proved-derived; formal-checked] **A certified order is swapped only by a crossing**: if `j`'s
+reach is below `k`'s certain gap at one state and `j` locks alone at another, the true gaps cross:
+`g j < g k` before and `g′ k < g′ j` after. -/
+theorem certified_order_needs_crossing [Finite ι] [Nonempty ι] {lo hi g lo' hi' g' : ι → ℝ}
+    (hlo : ∀ i, lo i ≤ g i) (hhi : ∀ i, g i ≤ hi i) (hlo' : ∀ i, lo' i ≤ g' i)
+    (hhi' : ∀ i, g' i ≤ hi' i) {j k : ι} (hjk : j ≠ k) (hbelow : hi j < lo k)
+    (hlone : ∀ i, i ≠ j → ¬ certifiedLock lo' hi' i) : g j < g k ∧ g' k < g' j :=
+  ⟨by linarith [hhi j, hlo k], lone_lock_is_largest hlo' hhi' hlone k (Ne.symm hjk)⟩
+
+end CertifiedLock
+
 section Audit
 
 #print axioms passage_coeff_zero
@@ -1943,6 +2017,11 @@ section Audit
 #print axioms cell_holds_until_cut
 #print axioms cell_moves_at_cut
 #print axioms cut_within_cell
+#print axioms certifiedLock_largest
+#print axioms leader_locks
+#print axioms certifiedLock_exact
+#print axioms lone_lock_is_largest
+#print axioms certified_order_needs_crossing
 
 end Audit
 

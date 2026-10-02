@@ -1261,3 +1261,25 @@ fn native_opening_uses_the_scheduled_previous_phase() {
     assert!(ResonatorBalance::of(0,resonance).closes());
     assert!(WordBalance::of(&word.release().unwrap()).closes());
 }
+
+/// **The lock rule locks every station the readings do not certify below the largest gap**: a
+/// near tie within the enclosures locks together, a gap certified below stays open, and on exact
+/// readings (reach equal to the certain gap) it is the largest gap with its ties.
+#[test]
+fn a_gap_the_readings_do_not_order_below_the_largest_locks_with_it() {
+    use crate::hnn::prediction::uncertified_largest;
+    // Station 4's certain gap 5/8 is the largest; station 2's reaches 3/4 ≥ 5/8 (a near tie inside
+    // the cells); station 7's reach 1/2 is certified below.
+    let gaps = vec![(2, 0, rat(1, 2)), (4, 1, rat(5, 8)), (7, 0, rat(1, 4))];
+    let reaches = vec![rat(3, 4), rat(7, 8), rat(1, 2)];
+    assert_eq!(uncertified_largest(&gaps, &reaches), vec![2, 4]);
+    // A reach just below the largest certain gap is certified below: the leader locks alone.
+    let reaches = vec![rat(5, 8) - rat(1, 1024), rat(7, 8), rat(1, 2)];
+    assert_eq!(uncertified_largest(&gaps, &reaches), vec![4]);
+    // Exact readings: the reach is the gap, and the rule is the largest gap with its ties.
+    let gaps = vec![(0, 0, rat(1, 2)), (1, 0, rat(1, 3)), (3, 2, rat(1, 2))];
+    let exact: Vec<Rat> = gaps.iter().map(|(_, _, gap)| gap.clone()).collect();
+    assert_eq!(uncertified_largest(&gaps, &exact), vec![0, 3]);
+    // No eligible station: nothing locks.
+    assert!(uncertified_largest(&[], &[]).is_empty());
+}

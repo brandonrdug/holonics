@@ -1,8 +1,9 @@
 # A flip is set by the lock rule's margin, and no law in the chain certifies it before the successor is read
 
 **Date.** October 2. **Issues.** #73, #63 (THE_REBUILD U6, step 1), #62. **Grade.** [proved-derived;
-formal-checked] for the statements cited to `HNN/ExecutedComparison` §13; [derived] from the owners'
-code where marked; [agent-inferred] where marked. No run. Nothing built in Rust.
+formal-checked] for the statements cited to `HNN/ExecutedComparison` §13 and §14; [measured] for the
+main line's numbers in §4a; [derived] from the owners'
+code where marked; [agent-inferred] where marked. No run here. The lock rule changes in Rust (§5).
 Follows [the release guard](2026-10-02_THE_RELEASE_GUARD_CERTIFIES_THE_FIXED_MASK_AND_CHARGES_THE_FLIP_OVER_A_WINDOW.md)
 (its §1 holds `m7`'s measurement: at every rung from `η = 1/16` to `1/2048` the own release reads
 `34038/4096` nats above the fixed mask at the same `E`).
@@ -19,6 +20,11 @@ decides on cell ends whose place inside a cell the enclosure does not carry. The
 on how far a reading moves over a step's segment. **No law in the chain certifies a flip before the
 successor is read.** The trial reads it exactly at each rung, and the window of §12 is where it is
 paid.
+
+The main line's read (§4a) places `m7`'s flip in the lock rule's ranking of near-tied gaps, which
+the rule read on cell ends. §5 gives the rule that locks together every station the readings do not
+certify below the largest gap. No move can swap a certified order without the readings crossing.
+The rule is forced by the release's own reading of its other decisions.
 
 ## 1. Where a decision changes: the lock rule's margin
 
@@ -163,13 +169,107 @@ If it is a kind-A flip within the cell widths, the flip is set by the release's 
 step. No step size, window length or first-order bound reaches it. What remains is to change the
 decision or the grain it is read at, not the guard.
 
-## 5. Owner and verification
+### 4a. The main line's read: a near-tie swap of the lock order (kind C)
+
+[measured, by the main line, cited] At `η = 1/2048`, `m7`'s flip is one decision chain in one
+request, and it is of kind C, not the kind A this record expected:
+- **Request 3 carries it.** Request 3 rises from `43957/4096` to `77944/4096` (`+33987/4096`). The
+  other seven requests fall by `306/4096` in total.
+- **The released section is unchanged.** It reads `[3,3,3,3,3,3,3,3]` before and after, wrong at six
+  of eight stations: a degenerate release.
+- **The lock order changes.** Among near-tied gaps the ranking swaps which station locks first. Six
+  stations are read at different partial sections, and three terms' tops flip (stations 3, 6, 7).
+- **Per station** (each a lower end over `4096`, good to within `6/4096`): `ℓ` moves
+  - station 1 by `+2742`, station 3 by `+6100`, station 4 by `+11986`, station 6 by `+9452`,
+    station 7 by `+3815`;
+  - station 2 by `−105`, station 0 by `−4`, station 5 by `−2`.
+- **Per rung**, as (realized fixed-mask decrease `d`, flip, own less incumbent), each over `4096`:
+
+  | `η` | `d` | flip | own less incumbent |
+  |---|---|---|---|
+  | `1/16` | `33562` | `74106` | `40544` |
+  | `1/32` | `20269` | `45891` | `25622` |
+  | `1/64` | `10853` | `34325` | `23472` |
+  | `1/128` | `5523` | `34174` | `28651` |
+  | `1/256` | `2804` | `34100` | `31296` |
+  | `1/512` | `1419` | `34065` | `32646` |
+  | `1/1024` | `714` | `34047` | `33333` |
+  | `1/2048` | `359` | `34038` | `33679` |
+
+  Below `1/64` the flip is a fixed cost while `d` halves with `η`, as §2 says a flip must. `m6`
+  adopted at `1/2048` (`d = 361`, no flip) and flipped at `1/1024`.
+- **The float path's excursions are not flips of this kind.** Its flip part per ten-step window has
+  both signs and nets negative, and per term is at most `227/4096`, against `m7`'s about
+  `532/4096`. Its rises are continuous: minibatch steps on other requests raise its own read mask.
+
+So the flip sits in the lock rule's ranking of near-tied gaps, which §1 shows is read on cell ends.
+§5 takes the rule itself.
+
+## 5. The lock order the readings certify
+
+**The defect.**
+- Each eligible station's true gap `a_top − max_(x≠top) a_x` is enclosed by its **certain gap**
+  `lo = L_top − max U` (what the release reads) and its **reach** `hi = U_top − max L`.
+- The rule as it stood locked only the strictly largest certain gap.
+- So two stations whose gap enclosures overlap were ordered by where their cells' cuts fell, not by
+  their readings. A move too small to change any reading's order still swapped them, as at `m7`.
+
+**The rule, in the lock rule's owner, with no second rule.** A station locks when no station's
+certain gap exceeds its reach: every station the readings do not certify below the largest locks
+with it. On exact readings (reach = certain gap) this is the largest gap with its ties, the rule as
+it stood. What follows (Lean §14, `section CertifiedLock`):
+- **It always locks something.** The station of the largest certain gap locks
+  (`certifiedLock_largest`), so a refinement with an eligible station locks a nonempty set.
+  `decisions_release_the_section` (§8) holds for any nonempty lock set, so it applies unchanged.
+- **The true largest gap always locks** (`leader_locks`).
+- **A station that locks alone has the strictly largest true gap** (`lone_lock_is_largest`).
+- **No move swaps a certified order without a crossing** (`certified_order_needs_crossing`): if `j`
+  is certified below `k` at one state and locks alone at another, their true gaps crossed between.
+- **What remains possible is a split.** An uncertified pair locked together can come apart when a
+  move certifies one above the other. Its cost is the split's (§2, kind C: the value of the first
+  datum to the second).
+
+**Forced or chosen.** [derived] Forced by the release's own reading of its other decisions:
+- A top exceeds its rivals only when its `L` exceeds every rival's `U`, and a station locks only
+  when its `L` exceeds one. Both are certified orderings of enclosures.
+- An ordering the enclosures do not certify is read plural: "no positive gap is a plural reading",
+  "ties lock together".
+- The gap ranking was the one decision that compared bare cell ends as if they were readings.
+- Reading it the same way leaves nothing to choose. The comparison `≥` (reach meeting the largest)
+  keeps a possible true tie together, as the exact rule does. The cells are the receiver's declared
+  grain.
+
+[agent-inferred] The one alternative, refining the cells until near ties order, changes the
+receiver's grain, which the release does not own. So it is refused.
+
+**What it would have done at `m7`.** [agent-inferred; to be measured by the main line]
+- **At the incumbent.** If the swapped stations' gap enclosures overlap there, as a swap within
+  every rung down to `1/2048` indicates, they lock together. The incumbent's own release then
+  changes too: different sections and a different incumbent comparison.
+- **At `η = 1/2048`.** Their true gaps move by about `η` times their slope. They stay uncertified
+  unless that motion exceeds the overlap, and then both rule outputs keep them together. The swap,
+  and with it request 3's `+33987/4096`, is gone; the rung adopts on the fixed mask's decrease.
+- **At larger rungs.** They split if the move certifies one above the other, and only then pay a
+  split's cost.
+- **To measure.** Re-run `m7`'s incumbent and its first refused move on this rule. Read:
+  - the two stations' certain gaps and reaches at the incumbent;
+  - the own less incumbent per rung;
+  - whether any rung still flips.
+
+## 6. Owner and verification
 
 - **Lean.** `lean/Holonics/HNN/ExecutedComparison.lean` §13 (`section Flip`):
   `flip_defeats_first_order`, `flip_curvature_lower`, `no_flip_within_margin`,
   `cell_holds_until_cut`, `cell_moves_at_cut`, `cut_within_cell`. Each depends only on `propext`,
   `Classical.choice` and `Quot.sound` (the audit's `#print axioms`). Checked with
   `lake env lean Holonics/HNN/ExecutedComparison.lean`: no errors, no `sorry`.
-- **Rust.** Unchanged. The trial's `change` field (own less mask) already reads `J`.
+- **Lean, §14** (`section CertifiedLock`): `certifiedLock`, `certifiedLock_largest`,
+  `leader_locks`, `certifiedLock_exact`, `lone_lock_is_largest`,
+  `certified_order_needs_crossing`; the same axioms only.
+- **Rust.** The lock rule's owner, `hnn::prediction`:
+  - `uncertified_largest` decides `LockOrder::Gap` from each eligible station's certain gap and
+    reach; it is the only change to the release;
+  - test `a_gap_the_readings_do_not_order_below_the_largest_locks_with_it`;
+  - the trial's `change` field (own less mask) already reads `J`.
 - **Owed (#62).** No new obligation from this record. The segment bound `Λ` is a missing owner, not
   an owed proof of an existing statement.
