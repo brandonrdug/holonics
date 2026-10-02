@@ -125,10 +125,16 @@ splits it between `E` and `ρ`.
   weights is `YH′⁻¹`. The coupling's part `−x_ρ bH′⁻¹` enters as one more covector on each return:
   a return of feature `f` and weight `W` carries `−Δρ (S/W) E f`, with `S = Σ w² s` over the same data
   (`returns_coupled`). It is the storage change of `ρ`'s move, returned to the port through the data
-  that carry it, so `E` still changes only by covectors that reached it.
+  that carry it, so `E` still changes only by covectors that reached it. The solve reads `b` and `g`
+  over all the proposal's contributions, while the returns carry the coupling only for the leading
+  members whose kinetic weight is nonzero (`kinetic_contributions`); the two data sets agree when
+  every leading member carries weight.
 - **`ρ`'s part.** `ρ + ηΔρ` on the port's lattice, nearest, between `ρ/2` and the bound
-  `max(ρ₀, ρ)`. The ladder starts at the Gauss–Newton step, at most the entry scale, and every guard
-  certifies each trial whole as before.
+  `max(ρ₀, ρ)`. The first trial step is the Gauss–Newton step, at most the entry scale, and each
+  trial is certified whole before it is adopted, as before: its comparison's upper end below the
+  incumbent's lower end, its entries within the entry bound, its first order certified negative, its
+  crossings admissible, its locks certified, its readings supported, and the constitution's bit
+  budget and storage growth certified on its deposit.
 
 ## 4. Where the comparison asks for more reach than the alias allows
 
@@ -147,8 +153,12 @@ not along the whole path of `E`.
 - **The bound-active rule.** The joined problem minimizes a convex energy over an affine set of moves
   (the readings' Gauss–Newton change) intersected with the half-space `ρ + Δρ ≤ ρ₀`. Where `ρ` stands
   at the bound and the unconstrained least-energy move has `Δρ > 0`, the constrained minimizer lies on
-  the boundary `Δρ = 0`. There the move is `Kinetic`'s, over `E` alone. The move implements exactly
-  this and keeps the refused joined solve on its receipt (`ExecutedMove::modulus_held`). Its Lean
+  the boundary `Δρ = 0`. There the move is `Kinetic`'s, over `E` alone. The move implements this
+  exactly where `ρ` already stands at the bound, and keeps the refused joined solve on its receipt
+  (`ExecutedMove::modulus_held`). Below the bound the joined solve is taken whole, and a trial whose
+  `ρ + ηΔρ` passes the bound is held at it (`Trial::modulus` shows the held value) while `E` keeps
+  the full joined part `−x_ρ bH′⁻¹`. That trial is not the constrained minimizer, but it is sound:
+  every trial is re-read whole and adopted only where its comparison is certified lower. Its Lean
   statement is owed in #62.
 
 ## 4a. Two basins: `E` and `ρ` adapt together
@@ -232,11 +242,11 @@ decide is the first move's direction, the sign of `own − supplied` there.
 
 ## 5. The other metrics' upper bound: a separate finding
 
-`Coordinate` and `Witness` hold `ρ + ηΔρ` within `[ρ/2, 1]`, the passive bound. So they can carry `ρ`
-above `ρ₀`, past the alias bound. The alias law does not depend on the metric, so those paths should
-take `ρ ≤ max(ρ₀, ρ)` too. This change leaves them unchanged so that it alters only the new metric's
-behaviour. The fix is the same ceiling passed to `ladder`, one line for each metric, and their
-measured records were read under the old bound.
+`Coordinate` and `Witness` hold `ρ + ηΔρ` within `[ρ/2, 1]`, the passive bound. So they can carry
+`ρ` above `ρ₀`, past the alias bound. The alias law does not depend on the metric, so those paths
+should take `ρ ≤ max(ρ₀, ρ)` too. This change leaves them unchanged so that it alters only the new
+metric's behaviour. The fix is the same ceiling passed to the halving trials (`ladder`), one line
+for each metric, and their measured records were read under the old bound.
 
 ## 6. Verification
 

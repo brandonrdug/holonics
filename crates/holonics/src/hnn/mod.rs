@@ -83,7 +83,8 @@
 //! - [`executed`] (THE_REBUILD U6, September 30): the release's own comparison (the receiving
 //!   bank's class, threshold, order and section predicates along the machine's own trajectory), its
 //!   exact pullback to `E` through the executed monodromy's certified eigen-derivative (`ring`), and
-//!   a carried update of `E` adopted only when every commit guard holds on the re-read successor.
+//!   a carried update of `E` adopted only where the re-read successor's comparison is certified
+//!   lower and its certificates hold.
 //!
 //! [definition; agent-inferred, U2] A loaded ring's mode quotient (campaign 3's first construction)
 //! is Lean's (`HNN/ModeQuotient`); its Rust realization (`hnn::modes`, at commit `1bdacc8f`) was
@@ -312,9 +313,9 @@ pub enum HnnError {
     Observability { aperture: usize, rank: usize },
     #[error("the code tolerance must be a positive rational, found {tolerance}")]
     Tolerance { tolerance: Rat },
-    #[error("the release guard's excursion height must be nonnegative, found {height}")]
+    #[error("the released code length's excursion height must be nonnegative, found {height}")]
     ExcursionHeight { height: Rat },
-    #[error("a release window's certified decrease must be nonnegative, found {decrease}")]
+    #[error("an excursion's certified decrease must be nonnegative, found {decrease}")]
     WindowDecrease { decrease: Rat },
     #[error("the word has run its {ticks} junction steps")]
     WordEnded { ticks: usize },
