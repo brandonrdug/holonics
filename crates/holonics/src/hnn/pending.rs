@@ -189,6 +189,16 @@ impl PendingRatio {
         Ok((word, Faces::of_reads(&reads, self.phases.grain())?))
     }
 
+    /// The contemporary tree faces at each phase's causal address given the window's known targets:
+    /// what [`PendingRatio::against`] adds to the wave (read-only).
+    pub(crate) fn tree_faces(
+        &self,
+        constitution: &impl ConstitutionRead,
+        known: &[usize],
+    ) -> Result<Vec<crate::compression::landmark::context::LandmarkFace>, HnnError> {
+        self.phases.tree_faces(constitution, &self.address, known)
+    }
+
     /// **The window's faces at compare** (module header; the landmark tree): the contemporary tree read at
     /// each phase's causal address given the window's known targets, added to the wave's faces.
     /// At a compare every target is known; at a release none is, and every phase reads the
