@@ -1037,9 +1037,12 @@ fn contact_ablation_run(
         let mut r_aligns: Vec<Rat> = steps.iter().map(|s| s.alignment.clone()).collect();
         r_aligns.sort();
         let r_median = r_aligns.get(r_aligns.len() / 2).cloned().unwrap_or_else(Rat::zero);
+        let mut r_steps: Vec<Rat> = steps.iter().map(|s| s.step.clone()).collect();
+        r_steps.sort();
+        let r_step = r_steps.get(r_steps.len() / 2).cloned().unwrap_or_else(Rat::zero);
         let held = |x: &Rat| holonics::holon::deposition::significant(x, 24, false);
         println!(
-            "  aeon {a}: the receiver's exponent span, largest {largest} bits; one deposit's contact change, largest {single} bits; contacts-only commits {}: channel families certified {families}, vanished {vanished}; the contacts' return a, median {}, total {} (24 bits); R's steps {}: moved {r_moved}, its a median {} (24 bits); {} ms",
+            "  aeon {a}: the receiver's exponent span, largest {largest} bits; one deposit's contact change, largest {single} bits; contacts-only commits {}: channel families certified {families}, vanished {vanished}; the contacts' return a, median {}, total {} (24 bits); R's steps {}: moved {r_moved}, its a median {} (24 bits), its step median {r_step}; {} ms",
             here.len(),
             held(&median),
             held(&total),
