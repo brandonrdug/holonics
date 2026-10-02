@@ -834,10 +834,10 @@ optimizing performance.
   continuing owner. They are the scoped analogues of frames and ticks. A device launch, a symbol,
   a source observation and a successor are different counts, and a forecast can deliver a face
   without advancing its body.
-- Rates are counts over an interval `dt > 0` of a named clock, `N_face/dt` and `N_update/dt`. Disjoint
-  serial windows aggregate as `ΣN/Σdt`, never as a mean of reciprocal latencies. Under `t'=at+b`,
-  `a>0`, a rate becomes `r/a`; reversing a clock flips an oriented quotient and reverses no
-  dissipation.
+- Rates are counts over an interval `dt > 0` of a named clock, `N_face/dt` and `N_update/dt`. Over
+  disjoint successive intervals they aggregate as `ΣN/Σdt`, never as a mean of reciprocal latencies.
+  Under `t'=at+b`, `a>0`, a rate becomes `r/a`; reversing a clock flips an oriented quotient and
+  reverses no dissipation.
 - Over one occurrence family, `bits/s = occ/s × bits/occ`. A code reading is
   `Σ_k −log₂ q(y_k | conditions_k) / dt`, and, for an expected finite positive-distribution
   reading, its expected form is `r·H(p,q) = r·H(p) + r·D(p‖q)`.
@@ -1081,12 +1081,12 @@ not:
 - **The HNN's receiving face is the population's** (THE_REBUILD U1). Its receiving face reads the
   tree at the receiving locus (`hnn::receiving`), and scores the population at that port
   (`receiver::population::port::PortPopulation`, declared by `hnn::receiving::receiving_population`)
-  over the tree's face and the combined tree-plus-wave face at ½/½, cell by cell, deposits inside a
-  window included. The combined face lives in `ℚ(θ)`, so it enters as its exact enclosure; zero is
-  exact death (Lean `Population.population_mixture_enclosed`). The population carries only the
-  priors and the likelihoods; the tree's one update is the constitution's landmark deposit. It
-  replaced the carried-ratio `hnn::receiving::Mixture` (history at `19f1eb61`), whose codes lay
-  within its chart's drift of the population's on the standing cut
+  over the tree's face and the combined tree-plus-wave face at ½/½, cell by cell, including the
+  deposits made inside a receiving epoch. The combined face lives in `ℚ(θ)`, so it enters as its
+  exact enclosure; zero is exact death (Lean `Population.population_mixture_enclosed`). The
+  population carries only the priors and the likelihoods; the tree's one update is the
+  constitution's landmark deposit. It replaced the carried-ratio `hnn::receiving::Mixture` (history
+  at `19f1eb61`), whose codes lay within its chart's drift of the population's on the standing cut
   (`Population.executed_{face,mixture}_within_population`). Digit-local joins (`JoinTree`,
   `FaceJoins`) and whole-family Bayes are different admitted combinations of the same families: in
   general `∏_h Σ_f π_f L_(f,h) ≠ Σ_f π_f ∏_h L_(f,h)`.
@@ -1095,8 +1095,8 @@ not:
   ([THE_REBUILD F2](plans/THE_REBUILD.md#f2-the-field-as-a-family-step-4-73), September 28) read
   it on fresh validation families against the population over the tree alone. There it codes
   strictly shorter, by `10` to `10 + 1/16` bits on 2,052 cells. Its work fails the budgets:
-  `107 rem 21` ms a window, where the tree's whole passage takes 432 ms. So it is not adopted for
-  text, and it is kept and not run there.
+  `107 rem 21` ms a receiving epoch, where the tree's whole passage takes 432 ms. So it is not
+  adopted for text, and it is kept and not run there.
 - **The missing join, and its maps named** (U1; owed in #62). Neither the tree nor the population
   is yet a Holon joined at power ports. Their counts and posterior weights carry no declared
   flow/effort pair, storage or power balance, and the learned-energy balance

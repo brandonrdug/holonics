@@ -324,7 +324,7 @@ The atlas keeps each expression with its history owner (`receiver.population-*`,
 ## A displayed body is a cut; its plates can be continuing bodies
 
 [definition] A rendered frame is a present spatial/receiving cut of a world-tube and its
-field sections. The chosen window can be bounded without establishing a physically closed
+field sections. The cut's chosen extent can be bounded without establishing a physically closed
 body or a definite value for every unobserved interior. An exposure may integrate a finite
 interval rather than one instantaneous slice. The complete source retains its evolution,
 incoming boundary conditions and relevant unobserved modes.
