@@ -3187,6 +3187,9 @@ pub struct ExecutedMove {
     /// `−γ_ρ/G_ρ` (zero upward at `ρ = 1`), where the modulus was read.
     pub modulus_curvature: Option<Rat>,
     pub modulus_unit: Option<Rat>,
+    /// `KineticModulus` at its bound: the joined solve whose upward `Δρ` the bound held (the move
+    /// then is `E`'s alone, [`MoveMetric::KineticModulus`]); `None` where nothing was held.
+    pub modulus_held: Option<KineticSolve>,
     /// The modulus's slope split by term kind ([`SlopeSplit`]), where the modulus was read.
     pub split: Option<SlopeSplit>,
     pub trials: Vec<Trial>,
@@ -3852,6 +3855,7 @@ pub fn executed_move_guarded(
         modulus_slope: None,
         modulus_curvature: None,
         modulus_unit: None,
+        modulus_held: None,
         split: None,
         trials: Vec::new(),
         adopted: None,
@@ -3897,6 +3901,7 @@ pub fn executed_move_guarded(
             .and_then(|s| s.modulus.as_ref())
             .is_some_and(|x| x.is_positive() && constitution.transport(ring) >= ceiling)
         {
+            receipt.modulus_held = solve;
             solve = kinetic_solve(field, constitution, declared, requests, &proposal, &samples, None, false)?;
         }
         let Some(solve) = solve else {
@@ -4710,6 +4715,11 @@ pub struct KineticSolve {
     /// `Δρ`, the modulus's part of `v` per unit step, where the modulus is joined
     /// ([`ModulusCoupling`]); `None` where `ρ` is held.
     pub modulus: Option<Rat>,
+    /// Where the modulus is joined, the two parts of its move at the solve's multipliers `μ`:
+    /// `(own, supplied)` with `Δρ = (own − supplied)/s`. `own = Σ_m w_m a_m` is the readings' ask
+    /// along `ρ` (its sign is the reach the readings want), and `supplied = ⟨bH′⁻¹, (Aᵀμ)_E⟩` is
+    /// the part of that ask `E`'s own move already carries through the coupling `b`.
+    pub modulus_drive: Option<(Rat, Rat)>,
 }
 
 /// [definition; agent-inferred, October 2; the
@@ -4719,7 +4729,7 @@ pub struct KineticSolve {
 /// - **Its column of `A`.** Each leading member's reading moves with `ρ` by `a_m = ⟨ĝ_m, ∂z_m/∂ρ⟩`
 ///   (the storage's exact derivative, `BankPlacement::modulus_derivative`): the pairing the
 ///   modulus's slope `γ_ρ` sums, without the normal law's weight.
-/// - **Its mass.** The kinetic energy of a move is the energy of the storage change it causes on
+/// - **Its mass.** The kinetic energy of a move is the squared norm of the storage change it causes on
 ///   the passage's data, read in `E`'s own frame as `E`'s mass is: a datum `k` of feature `f_k`
 ///   placed at weight `w_k` moves by `w_k ΔE f_k + w_k s_k Δρ E f_k`, `s_k = (r_k − r̄)/ρ` its reach
 ///   slope (`BankPlacement::reach_slopes`). Summed over the proposal's data, the mass is
@@ -4979,8 +4989,8 @@ fn kinetic_lift(
             .map(|row| joint_held(row.iter().map(|(m, k)| k * &pairings[*m]).sum()))
             .collect()
     };
-    // `M⁻¹Aᵀu`: the members' weights, their gradients summed, each row of `E` through `H′⁻¹`.
-    let lift = |u: &[Rat]| -> Vec<Rat> {
+    // `Aᵀu`: the members' weights and their gradients summed.
+    let pull = |u: &[Rat]| -> (Vec<Rat>, Vec<Rat>) {
         let mut weights = vec![Rat::zero(); gradients.len()];
         for (row, value) in rows.iter().zip(u) {
             for (m, k) in row.iter() {
@@ -4998,6 +5008,15 @@ fn kinetic_lift(
                     .sum()
             })
             .collect();
+        (weights, pulled)
+    };
+    // The modulus's two drives at `u` ([`KineticSolve::modulus_drive`]).
+    let drive = |c: &ModulusCoupling, weights: &[Rat], pulled: &[Rat]| -> (Rat, Rat) {
+        (weights.iter().zip(&c.columns).map(|(w, a)| w * a).sum(), dot(&c.coupling, pulled))
+    };
+    // `M⁻¹Aᵀu`: each row of `E` through `H′⁻¹`.
+    let lift = |u: &[Rat]| -> Vec<Rat> {
+        let (weights, pulled) = pull(u);
         let mut lifted: Vec<Rat> = (0..height * columns)
             .map(|e| {
                 let (r, j) = (e / columns, e % columns);
@@ -5006,8 +5025,8 @@ fn kinetic_lift(
             .collect();
         // The modulus's row of `M⁻¹` by its Schur complement ([`ModulusCoupling`], "Its inverse").
         if let Some(c) = modulus {
-            let pulled_modulus: Rat = weights.iter().zip(&c.columns).map(|(w, a)| w * a).sum();
-            let x = joint_held((pulled_modulus - dot(&c.coupling, &pulled)) / &c.schur);
+            let (own, supplied) = drive(c, &weights, &pulled);
+            let x = joint_held((own - supplied) / &c.schur);
             for (value, b) in lifted.iter_mut().zip(&c.coupling) {
                 *value = joint_held(&*value - &x * b);
             }
@@ -5100,6 +5119,10 @@ fn kinetic_lift(
     let av = forward(&v);
     let predicted = dot(&covector, &av) + dot(&av, &fisher(&av)) / Rat::from_integer(BigInt::from(2));
     let moved = ExactRatMatrix::new(v[..size].chunks(columns).map(<[Rat]>::to_vec).collect())?;
+    let modulus_drive = modulus.map(|c| {
+        let (weights, pulled) = pull(&mu);
+        drive(c, &weights, &pulled)
+    });
     Ok(KineticSolve {
         readings: m,
         multipliers: mu,
@@ -5109,6 +5132,7 @@ fn kinetic_lift(
         moved,
         predicted,
         modulus: modulus.map(|_| v[size].clone()),
+        modulus_drive,
     })
 }
 

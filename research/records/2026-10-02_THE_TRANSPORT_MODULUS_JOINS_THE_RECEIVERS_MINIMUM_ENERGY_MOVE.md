@@ -1,7 +1,8 @@
 # The transport modulus joins the receiver's minimum-energy move
 
 **Date.** October 2. **Issues.** #73, #63 (THE_REBUILD U6, step 1), #62. **Grade.** [derived] for the
-admissible set's upper bound and the bound-active rule (§1, §4); [definition; agent-inferred] for the
+admissible set's upper bound, the bound-active rule, the direction law and the amplitude law
+(§1, §4, §4b, §4c); [measured by the main line] for the two basins (§4a); [definition; agent-inferred] for the
 joined move and its mass (§2, §3); [proved-derived; implemented-exact] for the solve's tests (§6).
 No run: the main line measures it (§7).
 
@@ -75,7 +76,7 @@ coordinates, the joined ones included).
 
 - **`ρ`'s column of `A`.** Leading member `m`'s reading moves with `ρ` by `a_m = ⟨ĝ_m, ∂z_m/∂ρ⟩`.
   This is the pairing `γ_ρ` sums, without the normal law's weight.
-- **The mass is the storage change's energy.** `E`'s mass `I ⊗ H′` is the energy of the storage
+- **The mass is the storage change's squared norm.** `E`'s mass `I ⊗ H′` is the squared norm of the storage
   change a move of `E` causes on every datum, read in `E`'s own frame: `H′ = H + Σ_t w_t f_t f_tᵀ`,
   each return's weight the sum of its data's squared transported weights. A datum `k` of feature `f_k`
   stored at weight `w_k` changes by `w_k ΔE f_k + w_k s_k Δρ E f_k` under the joined move. Summed over
@@ -88,6 +89,13 @@ coordinates, the joined ones included).
   g = Σ_k w_k² s_k² |E f_k|²
   ```
 
+- **Which energy this is.** `½⟨Mv, v⟩` is the squared norm of the storage change in `E`'s frame:
+  the mass of the minimum-energy law (`Holon/Element.KineticFace`). It is the rings' stored energy
+  of that change only where the rings' storage form is the identity in this chart. A ring's mode
+  energy is its own form `UᵀQU`, and that identification is not shown here. So "energy" in this
+  record names the law's quadratic form on storage changes, not a measured energy of the Holons.
+  The comparison it splits is a code length, which is not an energy until its map to storage and
+  work is derived (#62).
 - **The off-diagonal `b`.** Moving `E` along `E` itself, weighted by the data's distance spread,
   changes the storage the way a move of `ρ` does. So the two coordinates share storage, and the least
   energy move uses that: a `ρ` move that the readings do not ask for is turned against `E`'s storage
@@ -124,14 +132,15 @@ splits it between `E` and `ρ`.
 
 ## 4. Where the comparison asks for more reach than the alias allows
 
-[derived; convexity] The main line read `γ_ρ` at each chain state's incumbent (lower ends, `/4096`
-nats per unit of `ρ`). It is positive at `w1`..`w7` (`+540398` to `+805647`), negative at `w8`..`w11`
-(`−274818`, `−699231`, `−990807`, `−155362`), and positive at `w12`..`w16` (`+262014` to `+574707`).
-So the comparison mostly asks for a shorter memory, but not along the whole path of `E`.
+[measured by the main line; derived] The main line read `γ_ρ` at each chain state's incumbent (lower
+ends, `/4096` nats per unit of `ρ`): positive at `m6`, `w1`..`w6` (`+540398` to `+805647`), negative at
+`w7`..`w10` (`−274818`, `−699231`, `−990807`, `−155362`), positive at `w11`..`w15` (`+262014` to
+`+574707`), and negative at `w16` (`−426589`). So the comparison mostly asks for a shorter memory, but
+not along the whole path of `E`.
 
-- **What the negative slope means physically.** At `w8`..`w11`, with `ρ = ρ₀`, the comparison asks
-  for a longer memory than the one-turn alias allows. There the readings would gain by weighing data
-  a turn old more heavily than the chart can separate them from the present phase. In effect the
+- **What the negative slope means physically.** Where `γ_ρ < 0` with `ρ = ρ₀`, the comparison asks for
+  a longer memory than the one-turn alias allows. There the readings would gain by weighing data a
+  turn old more heavily than the chart can separate them from the present phase. In effect the
   comparison is asking to read structure that repeats with the ring's period by folding the previous
   turn into the present one. The phase record cannot carry that: past the bound, a datum's age is
   misread. The bound returns that part of the comparison's ask unmet, as a residual.
@@ -139,7 +148,87 @@ So the comparison mostly asks for a shorter memory, but not along the whole path
   (the readings' Gauss–Newton change) intersected with the half-space `ρ + Δρ ≤ ρ₀`. Where `ρ` stands
   at the bound and the unconstrained least-energy move has `Δρ > 0`, the constrained minimizer lies on
   the boundary `Δρ = 0`. There the move is `Kinetic`'s, over `E` alone. The move implements exactly
-  this. Its Lean statement is owed in #62.
+  this and keeps the refused joined solve on its receipt (`ExecutedMove::modulus_held`). Its Lean
+  statement is owed in #62.
+
+## 4a. Two basins: `E` and `ρ` adapt together
+
+[measured by the main line] On the chain's 8 requests (`L`, `/4096` nats):
+- **`w16`'s `E`, `ρ` lowered from `ρ₀` with `E` held:** `195744` at `ρ₀`, `196331` at `ρ₀ − 2^(−10)`,
+  `218712` at `ρ₀ − 2^(−7)`, `279406` at `3/4`, `384896` at `11/16`, `475236` at `5/8`, `547651` at
+  `9/16`, `574640` at `ρ*`. Every step down raises it.
+- **The refit's `E`:** `310210` at `ρ₀`, `133292` at `ρ*`.
+
+Each `E` is fitted to readings formed at one memory length. `w16`'s `E` reads structure carried by the
+long tail of `ρ₀`'s weights, and cutting the tail removes what it reads. The refit's `E` reads
+near-term structure, and at `ρ₀` the older data enter readings it does not account for. So neither
+coordinate alone carries the difference between the two states. On these requests the short-memory
+basin is the deeper one: `133292 < 195744`.
+
+The `w16` walk holds `E`, so it reads the comparison along one line of the joined space. It shows
+that `w16` sits at the bottom of that line at the bound. It does not by itself show where the joined
+move goes from `w16`, because the joined move also re-adapts `E` (§4c).
+
+## 4b. Where the joined move starts, and what `E`'s amplitude does
+
+[measured by the main line; derived]
+
+**Start before `E` has committed to `ρ₀`.** Along the chain `E` moved with `ρ` held at `ρ₀`, and the
+readings' ask along `ρ` turned with it:
+- At `m6` and `w1`..`w6`, `γ_ρ > 0`: the readings ask for a shorter memory.
+- From `w7`, `E`'s fit at `ρ₀` has begun to read structure carried by the long tail of the weights,
+  and the ask turns.
+- At `w16` the walk of §4a shows `E` fitted to the bound.
+
+A joined move is local, so from `w16` it can reach the short-memory basin only if its direction law
+(§4c) points down there and keeps pointing down while `E` re-adapts. The founded opening and `m6`
+are states where the readings still ask for a shorter memory. So the joined move runs from there, and
+the comparison with `w16` is made at the endpoint.
+
+**What `E`'s amplitude does to `ρ`'s step** [derived; exact under its condition]. `ρ` changes a
+reading only by re-weighing, by age, the storage that `E` reads. So:
+- `ρ`'s column `a_m = ⟨ĝ_m, ∂z_m/∂ρ⟩` carries `∂z_m/∂ρ = Σ_k w_k s_k E f_k`, linear in `E`.
+- The coupling `b` is linear in `E` and `ρ`'s mass `g` quadratic. `E`'s own mass `H′ = H + Σ w f fᵀ`
+  does not depend on `E`.
+
+Suppose a reading depends only on ratios of storage amplitudes, as the bank face's `θ_x = A(x)/Σ A`
+does. Put `E ↦ λE` with `λ > 0`:
+- The readings, their covector `c` and their Fisher form `F` are unchanged.
+- `E`'s columns scale by `1/λ`, and `ρ`'s column `a_m` is unchanged.
+- The energy of `(λΔE, Δρ)` at `λE` is `λ²` times the energy of `(ΔE, Δρ)` at `E`, and the two moves
+  make the same readings' change.
+
+So the least-energy move at `λE` is `(λΔE, Δρ)`. The memory's step and `E`'s relative step do not
+depend on `E`'s amplitude: `ρ`'s mass grows with the amplitude squared exactly as fast as `E`'s
+columns shrink.
+
+The executed reading is not of that kind. A ring's growth over a pump period depends on the pump's
+depth, which is the storage's absolute amplitude. So along the chain the amplitude is physical, and
+the main line reads `s` and `Δρ` per move rather than inferring them from `|E|`. Its Lean statement is
+owed in #62.
+
+## 4c. The direction: what the readings ask, less what `E` already supplies
+
+[derived] By the Schur complement (§2), `Δρ = (own − supplied)/s` with `s > 0`
+(`KineticSolve::modulus_drive`):
+- **`own`** is `Σ_m w_m a_m` at the solve's member weights. It is the readings' ask along `ρ`, and its
+  sign is the memory they want: positive asks for a longer memory.
+- **`supplied`** is `⟨bH′⁻¹, (Aᵀμ)_E⟩`. It is the part of that ask that `E`'s own move already makes
+  through the coupling `b`.
+
+The coupling is nonzero because moving `E` along `E` itself, weighted by the data's age spread,
+re-weighs storage as a memory change does. So `E` can make part of a memory change, and the modulus
+moves only by the part `E` cannot make.
+
+Two things follow:
+- **The sign of `γ_ρ` is not the sign of the joined move.** Where `E`'s re-adaptation supplies more
+  than the readings ask, the joined move lowers `ρ` even with `γ_ρ < 0`, and the reverse.
+- **At `w16` the joined direction is a reading, not an inference.** The main line reads it from the
+  receipt: `kinetic.modulus` if the solve lowered `ρ`, `modulus_held` if the bound held an upward ask.
+
+**No law in the chain decides the basin from the opening alone.** The two basins differ in `E`
+across the whole passage, not near the opening, and the direction law is local. What the opening does
+decide is the first move's direction, the sign of `own − supplied` there.
 
 ## 5. The other metrics' upper bound: a separate finding
 
@@ -162,6 +251,17 @@ measured records were read under the old bound.
   Gauss–Newton step or the entry scale, never carries `ρ` past `max(ρ₀, 3/4)`, and an adopted trial
   lowers the comparison. On that opening the modulus joins with `Δρ < 0`, and the adopted trial (at
   the entry scale `η = 1/128`) carries `ρ` from `3/4` to `1505367/2097152` with `E`.
+- `the_bound_holds_an_upward_ask_and_the_move_is_e_alone`: from `generic(92)` at its founded `ρ₀`,
+  `γ_ρ < 0`, the joined solve asks `Δρ > 0` with `own > supplied`, the bound holds it (the refused
+  solve on `modulus_held`), every trial keeps `ρ₀`, and the adopted successor keeps `ρ₀`. This is the
+  sign the `w16` walk reads.
+- `e_can_supply_more_than_the_readings_ask_and_turn_the_modulus`: from `generic(99)` at its founded
+  `ρ₀`, `γ_ρ < 0` and `own > 0`, but `supplied > own`, so `Δρ < 0`.
+- The two cases were found by reading the joined move from 8 fixture constitutions (seeds `90`..`94`,
+  `98`..`100`) at two moduli each, the fixture field's founded `ρ₀ = 185363/2097152` and `3/4`, on the
+  same three requests. At `ρ₀`, 4 moves shortened the memory and 4 had an upward ask held. Over the
+  16, `γ_ρ`'s sign agreed with the joined direction in 7. This is a small fixture field, not the
+  chain; it shows that the slope's sign does not predict the joined move.
 - The reach slopes rebuild `BankPlacement::modulus_derivative` datum by datum, within `2^(−160)`, on
   every station and section of the placement test.
 
@@ -173,8 +273,19 @@ requests). The refit's `E` pays off only at its own `ρ*`: at the chain's `ρ₀
 `310210/4096` and 15 of 64 solved, and at `ρ*` `133292/4096` and 45 solved. So `ρ` behaves as a key
 located from the passage, not a constant.
 
-**The check this move must pass.** The main line is walking `w16` in `ρ` (`3/4`, `11/16`, `5/8`,
-`9/16`, `ρ*`) with `E` fixed. The joined move from `w16` must reproduce where that walk's comparison
-bottoms out: `Δρ`'s sign agrees with `γ_ρ` at `w16` (positive, so `ρ` falls), and its successors'
-moduli approach the walk's minimum. Then held-out whole sections against `w16` at fixed `ρ`. That is
-the acceptance; until it is read, this record claims the law and its tests only.
+**The check this move must pass.** The `w16` walk (§4a) landed and corrects the earlier expectation
+that `Δρ` follows `γ_ρ`'s sign at `w16`: there `γ_ρ < 0`, and `E` held at `w16` bottoms out at the
+bound. The tests reproduce that sign on a fixture: where the bound holds an upward ask, `ρ` stays at
+the bound, the move is `E`'s alone, and the refused ask stands on the receipt (§6).
+
+**The measurement.** Run `KineticModulus` from the founded opening and from `m6` on the same 8
+requests. Read, per move:
+- `ρ`, `Δρ`, `modulus_drive` (`own`, `supplied`) and `s`;
+- `modulus_held` where the bound holds.
+
+Then read:
+- whether `ρ`'s path approaches `ρ*` (or the float fit's `168127/262144`) or returns to `ρ₀`;
+- the endpoint's `L` against `w16`'s `195744`;
+- the held-out whole sections against `w16` at fixed `ρ`.
+
+That is the acceptance; until it is read, this record claims the laws and their tests only.
