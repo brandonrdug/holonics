@@ -23,6 +23,8 @@ vs KT      2α · KT(k, m) ≤ U_α(k, m)                 at most j − 1 bits o
 regret     (k/n)^k (m/n)^m ≤ 2^j √n · U_α(k, m)      at most ½ log₂ n + j bits; KT: ½ log₂ n + 1
 one-sided  KT(n, 0) ≤ U_α(n, 0),  U_α(n + 1, 0) ≥ 1/(2(1 + αn))   at most 2 bits while n ≤ 2^j
 choice     j ∈ {1, …, 8} charged log₂ 8 = 3 bits: Σ_w 2^(−(3 + code_ĵ(w))) ≤ 1 for any choice ĵ
+tree       −log₂ ∏_t q_0(x_t) ≤ −log₂ prior_w(S) + Σ_(leaves s) [−log₂ (k_s/n_s)^(k_s) (m_s/n_s)^(m_s) + ½ log₂ n_s + j]
+           every pruned tree S, any stop weights in [0, 1); the whole tree's ĵ charged 3 bits
 ```
 
 [proved-derived; formal-checked] What is proved.
@@ -60,6 +62,17 @@ choice     j ∈ {1, …, 8} charged log₂ 8 = 3 bits: Σ_w 2^(−(3 + code_ĵ(
    for a choice among `B` sub-probability laws satisfies Kraft for **any** choice, made on the
    development cells or even on the coded word itself; at the ladder `j = 1..8`, `3 + code_ĵ` is a
    valid code length.
+7. **The tree's full redundancy** (`emitted_eq_weight`, `own_dominance₀`,
+   `priorMass_tree_redundancy`, `priorMass_tree_redundancy_source`, `emitted_sum`, `tree_two_part`,
+   `priorMass_tree_two_part`): over any observation list whose addresses reach depth `D`, the code
+   the tree emits (its root faces multiplied over the passage) is its root weight over the urn own
+   weights. For **every** pruned tree `S` with positive prior under **any** stop weights in `[0, 1)`
+   (the declared stop prior, forced depths at `0`), it is at most `S`'s prior code plus, at each
+   leaf, the best fixed digit probability's code of what reached the leaf and `½ log₂ n_s + j`
+   (nothing at a leaf no arrival reached); so it is within those charges of every binary tree
+   source `(S, θ)`. Under a causal context the emitted code sums to one over the words of each
+   length, so choosing the rung, or the rung and the stop prior together, on the coded word itself
+   costs `log₂` of the family: 3 bits at `j = 1..8`, `3 + log₂ F` with a stop prior among `F`.
 
 [agent-inferred] **The trade.** Items 2 and 3 are worst-case bounds and the worst case is the
 balanced count: there the prior mass pays up to `j − 1` bits a node over KT (`2` at campaign 1's
@@ -69,9 +82,18 @@ theorem: §25's ladder and exposure read it on campaign 1.
 [proved-standard] The KT redundancy `½ log₂ n + 1` is Krichevsky and Trofimov (1981); the bound
 against the best fixed probability is standard. The proofs here are this owner's.
 
-[open] Owed in #62: the composition of the per-node regret into the tree's full redundancy bound
-(each leaf's `½ log₂ n_s + j` added to `Γ(S)` through `Tree.own_kraft_and_dominance`) is not
-stated.
+[conditional] **What item 7 covers in the Rust.** It bounds one digit tree's exact code, the
+ideal tree's (`IdealLandmarks`): each digit tree's arrivals are an observation list whose
+addresses reach `D` (padded with the boundary letter), and a cell's code is the sum of its digits'
+codes, so the bound holds per digit tree and adds. It needs, and the HNN declares, the unbounded
+register (`Capacity::Unbounded`, `hnn::receiving::landmark_declaration_with`) and `j ≥ 1` (the
+declaration refuses `j = 0`): a register's ceiling is another node law, not the urn. Not stated
+here: the executed lattice code adds the lattice's per-cell drift (#62, "the landmark lattice's
+drift"; checked by the Rust tests through `Landmarks::face_rule`); the enlarged tree's join of the
+cell and bundle branches adds at most one bit against either branch
+(`Tree.sequential_mixture_bounds`), uncomposed; and the concave form `|S| γ(N/|S|)` of the leaves'
+charges. A rung declared on the development cells before the coded cells needs no charge on them;
+the 3 bits cover a choice made on the coded word itself.
 
 | Claim | Lean | Rust |
 |---|---|---|
@@ -80,6 +102,7 @@ stated.
 | regret `½ log₂ n + j`; KT's `½ log₂ n + 1` | `kt_regret`, `priorMass_regret`, `priorMass_regret_bits` | — |
 | the one-sided gain | `priorMass_one_sided_ge_kt`, `priorMass_one_sided_two_bits` | — |
 | the ladder charged 3 bits is a valid code | `two_part_kraft`, `priorMass_two_part` | `hnn::field::ReceiverDeclaration::mass` (campaign 1 declares `j = 3`, coded in `Field::describe`) |
+| the tree's full redundancy, any stop weights; the whole tree's rung charged 3 bits | `emitted_eq_weight`, `own_dominance₀`, `priorMass_tree_redundancy`, `priorMass_tree_redundancy_source`, `emitted_sum`, `tree_two_part`, `priorMass_tree_two_part` | `compression::landmark::context::IdealLandmarks` (one digit tree's exact code), `StopPrior`, `hnn::field::ReceiverDeclaration::mass` |
 | the floor `1/(2^j n* + 2)` | `priorMass_face_ge` (the node), `priorMass_digit_face_ge` (the opened path, any stop weights) | `compression::landmark::context::face_bits` |
 -/
 
@@ -726,6 +749,313 @@ theorem priorMass_digit_face_ge {Ltr : Type*} (j : ℕ) (N : TreeStanding Ltr Bo
   rw [Fintype.sum_bool] at h
   exact priorMass_face_ge j (N (a.take d')) h b
 
+/-! ### The tree's redundancy at prior mass `2^-j` -/
+
+section Redundancy
+
+variable {Ltr : Type*} [Fintype Ltr] [DecidableEq Ltr] {A : Type*} [Fintype A]
+
+/-- [definition] **The law standing of an observation list** (oldest first): each observation
+`(a, c)` arrives at its address `a` (`Tree.lawArrive`), from the standing where no node is reached.
+Under a causal context it is `Tree.lawStandingOf` (`observations`); here the addresses are any. -/
+def obsStanding (L : NodeLaw A) (obs : List (List Ltr × A)) : LawStanding L Ltr :=
+  obs.foldl (fun N o => lawArrive L N o.1 o.2) fun _ => none
+
+omit [Fintype Ltr] in
+theorem obsStanding_snoc (L : NodeLaw A) (obs : List (List Ltr × A)) (a : List Ltr) (c : A) :
+    obsStanding L (obs ++ [(a, c)]) = lawArrive L (obsStanding L obs) a c := by
+  rw [obsStanding, List.foldl_append]
+  rfl
+
+omit [Fintype Ltr] in
+/-- Each node of the standing holds the node law's register and own weight of its routed
+subsequence (`Tree.law_state_own_routed` for any observation list). -/
+theorem obs_state_own_routed (L : NodeLaw A) (obs : List (List Ltr × A)) (s : List Ltr) :
+    lawState L (obsStanding L obs) s = L.run (routed obs s) ∧
+      lawOwn L (obsStanding L obs) s = L.mass (routed obs s) := by
+  induction obs using List.reverseRecOn with
+  | nil => exact ⟨rfl, rfl⟩
+  | append_singleton obs o ih =>
+    obtain ⟨a, c⟩ := o
+    rw [obsStanding_snoc, routed_snoc]
+    by_cases hs : a.take s.length = s
+    · rw [if_pos hs, NodeLaw.run_snoc, NodeLaw.mass_snoc, ← ih.1, ← ih.2]
+      simp [lawState, lawOwn, lawArrive, hs]
+    · rw [if_neg hs, List.append_nil]
+      simpa [lawState, lawOwn, lawArrive, hs] using ih
+
+omit [Fintype Ltr] in
+theorem lawOwn_obs_pos (L : NodeLaw A) (obs : List (List Ltr × A)) (s : List Ltr) :
+    0 < lawOwn L (obsStanding L obs) s := by
+  rw [(obs_state_own_routed L obs s).2]
+  exact L.mass_pos _
+
+/-- [definition] **The code the tree emits** over an observation list: the product of the tree's
+faces at the root, each arrival read at the face of the standing before it (newest first in
+`emittedRev`). Its `−log₂` is the passage's code length. -/
+def emittedRev (L : NodeLaw A) (w : ℕ → ℚ) (D : ℕ) : List (List Ltr × A) → ℚ
+  | [] => 1
+  | o :: obs => emittedRev L w D obs * lawFace L w (obsStanding L obs.reverse) D o.1 0 o.2
+
+/-- [definition] The emitted mass of an observation list, oldest first. -/
+def emitted (L : NodeLaw A) (w : ℕ → ℚ) (D : ℕ) (obs : List (List Ltr × A)) : ℚ :=
+  emittedRev L w D obs.reverse
+
+theorem emitted_nil (L : NodeLaw A) (w : ℕ → ℚ) (D : ℕ) :
+    emitted L w D ([] : List (List Ltr × A)) = 1 := rfl
+
+theorem emitted_snoc (L : NodeLaw A) (w : ℕ → ℚ) (D : ℕ) (obs : List (List Ltr × A))
+    (o : List Ltr × A) :
+    emitted L w D (obs ++ [o]) = emitted L w D obs * lawFace L w (obsStanding L obs) D o.1 0 o.2 := by
+  simp [emitted, emittedRev]
+
+theorem emitted_pos (L : NodeLaw A) {w : ℕ → ℚ} (hw : StopLaw₀ w) (D : ℕ)
+    (obs : List (List Ltr × A)) : 0 < emitted L w D obs := by
+  induction obs using List.reverseRecOn with
+  | nil => exact one_pos
+  | append_singleton obs o ih =>
+    rw [emitted_snoc]
+    exact mul_pos ih ((law_face_normalized L hw _ (lawOwn_obs_pos L obs) D o.1 0
+      (Nat.zero_le _)).1 o.2)
+
+/-- [proved-derived; formal-checked] **`emitted_eq_weight`: the emitted code is the root's weight.**
+When every address reaches depth `D`, the product of the tree's faces over the passage is the
+tree's weight at the root over the node law's own weights, `∏_t q_0(x_t) = W_root`
+(`Tree.law_weight_step₀` at depth `0`, from `Tree.ownWeight_one`). -/
+theorem emitted_eq_weight (L : NodeLaw A) {w : ℕ → ℚ} (hw : StopLaw₀ w) (D : ℕ)
+    (obs : List (List Ltr × A)) (hD : ∀ o ∈ obs, D ≤ o.1.length) :
+    emitted L w D obs = ownWeight w (lawOwn L (obsStanding L obs)) D [] := by
+  induction obs using List.reverseRecOn with
+  | nil =>
+    have e : lawOwn L (obsStanding L ([] : List (List Ltr × A))) = fun _ => 1 := rfl
+    rw [e, ownWeight_one]
+    rfl
+  | append_singleton obs o ih =>
+    have hD' : D ≤ o.1.length := hD o (by simp)
+    rw [emitted_snoc, ih fun o' h => hD o' (by simp [h])]
+    obtain ⟨a, c⟩ := o
+    have h := law_weight_step₀ L hw (obsStanding L obs) (lawOwn_obs_pos L obs) hD' c 0
+      (Nat.zero_le _)
+    simp only [Nat.sub_zero, List.take_zero] at h
+    rw [obsStanding_snoc]
+    exact h.symm
+
+/-- [proved-derived; formal-checked] **The sequential code is complete.** Under a causal context
+whose addresses reach depth `D`, the emitted masses of the `|A|^n` words of length `n` sum to one,
+for any node law and any stop weights in `[0, 1)`. -/
+theorem emitted_sum (L : NodeLaw A) {w : ℕ → ℚ} (hw : StopLaw₀ w) (ctx : List A → List Ltr)
+    (D : ℕ) (n : ℕ) :
+    ∑ v : Fin n → A, emitted L w D (observations ctx (List.ofFn v)) = 1 := by
+  have hn : wordSum n (fun h => emitted L w D (observations ctx h)) = 1 := by
+    induction n with
+    | zero => rfl
+    | succ n ih =>
+      rw [wordSum]
+      have e : (fun h => ∑ c, emitted L w D (observations ctx (c :: h))) =
+          fun h => emitted L w D (observations ctx h) := by
+        funext h
+        simp only [observations, emitted_snoc, ← Finset.mul_sum]
+        rw [(law_face_normalized L hw _ (lawOwn_obs_pos L _) D (ctx h) 0 (Nat.zero_le _)).2,
+          mul_one]
+      rw [e, ih]
+  rwa [wordSum_eq_sum] at hn
+
+omit [DecidableEq Ltr] in
+theorem prior_nonneg₀ {w : ℕ → ℚ} (hw : StopLaw₀ w) :
+    ∀ m d (S : PrunedTree Ltr m), 0 ≤ PrunedTree.prior w m d S
+  | 0, _, _ => by simp [PrunedTree.prior]
+  | m + 1, d, S => by
+    cases hS : (S : Option (Ltr → PrunedTree Ltr m)) with
+    | none => simp only [PrunedTree.prior, Option.elim]; exact (hw d).1
+    | some f =>
+      simp only [PrunedTree.prior, Option.elim]
+      exact mul_nonneg (sub_nonneg.mpr (hw d).2.le)
+        (Finset.prod_nonneg fun b _ => prior_nonneg₀ hw m (d + 1) (f b))
+
+/-- **Dominance with forced depths**: under stop weights in `[0, 1)` and positive own weights,
+`prior_w(S) ∏_(leaves) E ≤ W` for every pruned tree (`Tree.own_kraft_and_dominance`'s, which
+needs `w_d > 0`; a tree stopping at a forced depth has prior `0`). -/
+theorem own_dominance₀ {w : ℕ → ℚ} (hw : StopLaw₀ w) {E : List Ltr → ℚ} (hE : ∀ s, 0 < E s)
+    (m : ℕ) (s : List Ltr) (S : PrunedTree Ltr m) :
+    PrunedTree.prior w m s.length S * ownLik E m s S ≤ ownWeight w E m s := by
+  rw [own_mixture_over_trees w E m s]
+  exact Finset.single_le_sum (f := fun S => PrunedTree.prior w m s.length S * ownLik E m s S)
+    (fun S _ => mul_nonneg (prior_nonneg₀ hw m _ S) (ownLik_pos hE m s S).le) (Finset.mem_univ S)
+
+/-- [definition] **A sum over the leaves** of a pruned tree: `f` at each leaf, the leaf addressed
+by its path from `s`. -/
+def leafSum (f : List Ltr → ℝ) : (m : ℕ) → List Ltr → PrunedTree Ltr m → ℝ
+  | 0, s, _ => f s
+  | m + 1, s, S => Option.elim (S : Option (Ltr → PrunedTree Ltr m)) (f s)
+      fun g => ∑ b, leafSum f m (s ++ [b]) (g b)
+
+omit [DecidableEq Ltr] in
+theorem leafSum_mono {f g : List Ltr → ℝ} (h : ∀ s, f s ≤ g s) :
+    ∀ m s (S : PrunedTree Ltr m), leafSum f m s S ≤ leafSum g m s S
+  | 0, s, _ => h s
+  | m + 1, s, S => by
+    cases hS : (S : Option (Ltr → PrunedTree Ltr m)) with
+    | none => simp only [leafSum, Option.elim]; exact h s
+    | some G =>
+      simp only [leafSum, Option.elim]
+      exact Finset.sum_le_sum fun b _ => leafSum_mono h m _ _
+
+omit [DecidableEq Ltr] in
+theorem leafSum_neg (f : List Ltr → ℝ) :
+    ∀ m s (S : PrunedTree Ltr m), leafSum (fun s => -f s) m s S = -leafSum f m s S
+  | 0, s, _ => rfl
+  | m + 1, s, S => by
+    cases hS : (S : Option (Ltr → PrunedTree Ltr m)) with
+    | none => simp only [leafSum, Option.elim]
+    | some G =>
+      simp only [leafSum, Option.elim, leafSum_neg f m, Finset.sum_neg_distrib]
+
+omit [DecidableEq Ltr] in
+/-- The code length of a pruned tree's leaves is the sum of its leaves' code lengths. -/
+theorem logb_ownLik {E : List Ltr → ℚ} (hE : ∀ s, 0 < E s) :
+    ∀ m s (S : PrunedTree Ltr m),
+      Real.logb 2 (ownLik E m s S : ℝ) = leafSum (fun s => Real.logb 2 (E s : ℝ)) m s S
+  | 0, s, _ => rfl
+  | m + 1, s, S => by
+    cases hS : (S : Option (Ltr → PrunedTree Ltr m)) with
+    | none => simp only [ownLik, leafSum, Option.elim]
+    | some G =>
+      simp only [ownLik, leafSum, Option.elim]
+      push_cast
+      rw [Real.logb_prod _ _ fun b _ => by exact_mod_cast (ownLik_pos hE m _ (G b)).ne']
+      exact Finset.sum_congr rfl fun b _ => logb_ownLik hE m _ _
+
+/-- [definition] **A leaf's parameter charge** at rung `j`: `½ log₂ n + j` bits for a leaf that
+`n ≥ 1` arrivals reached, none for a leaf no arrival reached. -/
+noncomputable def leafCharge (j k m : ℕ) : ℝ :=
+  if k + m = 0 then 0 else Real.logb 2 ((k : ℝ) + m) / 2 + j
+
+/-- The node's code is within its charge of the best fixed digit probability at every count,
+the empty node included (`priorMass_regret_bits`). -/
+theorem node_code_le {j : ℕ} (hj : 1 ≤ j) (k m : ℕ) :
+    codeBits (urnBool (massWeight j) k m) ≤ codeBits (bestFixed k m) + leafCharge j k m := by
+  unfold leafCharge
+  split_ifs with h
+  · have hk : k = 0 := by omega
+    have hm : m = 0 := by omega
+    subst hk hm
+    simp [urnBool_zero, bestFixed, codeBits]
+  · rw [← add_assoc]
+    exact priorMass_regret_bits (k := k) (m := m) hj (by omega)
+
+/-- [definition] The arrivals of digit value `b` routed to node `s`. -/
+def routedCount (obs : List (List Ltr × Bool)) (s : List Ltr) (b : Bool) : ℕ :=
+  (routed obs s).count b
+
+/-- [proved-derived; formal-checked] **`priorMass_tree_redundancy`: the tree's full redundancy at
+prior mass `2^-j`.** For a binary landmark tree at rung `j ≥ 1` under **any** stop weights in
+`[0, 1)` (the declared stop prior `w_d = 1 − 2^(−j_d)`, and forced depths at `0`), whose addresses
+reach depth `D`, and **every** pruned tree `S` of depth at most `D` with positive prior: the code
+the tree emits over the passage is at most `S`'s prior code plus, at each leaf `s`, the best fixed
+digit probability's code of what reached `s` plus `½ log₂ n_s + j` (nothing at a leaf no arrival
+reached):
+`−log₂ ∏_t q_0(x_t) ≤ −log₂ prior_w(S) + Σ_(leaves s) [−log₂ (k_s/n_s)^(k_s) (m_s/n_s)^(m_s) + ½ log₂ n_s + j]`.
+It composes `emitted_eq_weight` (the emitted code is the root weight), `own_dominance₀` (the root
+weight dominates every pruned tree; `Tree.own_kraft_and_dominance` with forced depths), the
+routed own weights (`obs_state_own_routed`, `massLaw_read`, `urnSeq_eq_urnBool`) and each leaf's
+regret (`priorMass_regret_bits`). At `w = ½` the prior code is `Γ(S)`
+(`PrunedTree.prior_half_bits`), and at `j = 1` it is CTW's bound with KT's `½ log₂ n + 1`. -/
+theorem priorMass_tree_redundancy {j : ℕ} (hj : 1 ≤ j) {w : ℕ → ℚ} (hw : StopLaw₀ w) (D : ℕ)
+    (obs : List (List Ltr × Bool)) (hD : ∀ o ∈ obs, D ≤ o.1.length) (S : PrunedTree Ltr D)
+    (hS : 0 < PrunedTree.prior w D 0 S) :
+    codeBits (emitted (massLaw j) w D obs) ≤
+      codeBits (PrunedTree.prior w D 0 S) +
+        leafSum (fun s => codeBits (bestFixed (routedCount obs s true) (routedCount obs s false)) +
+          leafCharge j (routedCount obs s true) (routedCount obs s false)) D [] S := by
+  set E := lawOwn (massLaw j) (obsStanding (massLaw j) obs) with hEdef
+  have hE : ∀ s, 0 < E s := lawOwn_obs_pos _ obs
+  have hEs : ∀ s, E s = urnBool (massWeight j) (routedCount obs s true)
+      (routedCount obs s false) := fun s => by
+    rw [hEdef, (obs_state_own_routed _ obs s).2, (massLaw_read j _).2,
+      urnSeq_eq_urnBool (massWeight_pos j)]
+    rfl
+  rw [emitted_eq_weight _ hw D obs hD]
+  have hdom := own_dominance₀ hw hE D [] S
+  simp only [List.length_nil] at hdom
+  have hpR : (0 : ℝ) < (PrunedTree.prior w D 0 S : ℝ) := by exact_mod_cast hS
+  have hLR : (0 : ℝ) < (ownLik E D [] S : ℝ) := by exact_mod_cast ownLik_pos hE D [] S
+  have hdR : ((PrunedTree.prior w D 0 S : ℚ) : ℝ) * (ownLik E D [] S : ℝ) ≤
+      (ownWeight w E D [] : ℝ) := by exact_mod_cast hdom
+  have hlog := Real.logb_le_logb_of_le (b := 2) (by norm_num) (mul_pos hpR hLR) hdR
+  rw [Real.logb_mul hpR.ne' hLR.ne', logb_ownLik hE] at hlog
+  have hleaf := leafSum_mono (f := fun s => -Real.logb 2 (E s : ℝ))
+    (g := fun s => codeBits (bestFixed (routedCount obs s true) (routedCount obs s false)) +
+      leafCharge j (routedCount obs s true) (routedCount obs s false))
+    (fun s => by
+      have := node_code_le hj (routedCount obs s true) (routedCount obs s false)
+      rw [hEs s]
+      exact this) D [] S
+  rw [leafSum_neg] at hleaf
+  unfold codeBits at hleaf ⊢
+  linarith
+
+/-- [proved-derived; formal-checked] **Against every binary tree source.** For every pruned tree
+`S` with positive prior and every leaf parameter `θ_s ∈ (0, 1)`, the emitted code is at most the
+tree source's code `−log₂ prior_w(S) − Σ_(leaves) log₂ θ_s^(k_s) (1 − θ_s)^(m_s)` plus the leaves'
+charges `Σ_(leaves, n_s ≥ 1) (½ log₂ n_s + j)` (`fixed_le_bestFixed`). -/
+theorem priorMass_tree_redundancy_source {j : ℕ} (hj : 1 ≤ j) {w : ℕ → ℚ} (hw : StopLaw₀ w)
+    (D : ℕ) (obs : List (List Ltr × Bool)) (hD : ∀ o ∈ obs, D ≤ o.1.length)
+    (S : PrunedTree Ltr D) (hS : 0 < PrunedTree.prior w D 0 S) (θ : List Ltr → ℝ)
+    (hθ : ∀ s, 0 < θ s ∧ θ s < 1) :
+    codeBits (emitted (massLaw j) w D obs) ≤
+      codeBits (PrunedTree.prior w D 0 S) +
+        leafSum (fun s => codeBits (θ s ^ routedCount obs s true *
+            (1 - θ s) ^ routedCount obs s false) +
+          leafCharge j (routedCount obs s true) (routedCount obs s false)) D [] S := by
+  refine (priorMass_tree_redundancy hj hw D obs hD S hS).trans (add_le_add le_rfl ?_)
+  refine leafSum_mono (fun s => ?_) D [] S
+  obtain ⟨h0, h1⟩ := hθ s
+  have hpos : 0 < θ s ^ routedCount obs s true * (1 - θ s) ^ routedCount obs s false := by
+    have : 0 < 1 - θ s := by linarith
+    positivity
+  have hle := fixed_le_bestFixed h0.le h1.le (routedCount obs s true) (routedCount obs s false)
+  have hl := Real.logb_le_logb_of_le (b := 2) (by norm_num) hpos hle
+  unfold codeBits
+  linarith
+
+/-- [proved-derived; formal-checked] **`tree_two_part`: choosing the tree's declaration is a
+two-part code.** For `B` declarations `(j_i, w_i)` (a rung and stop weights in `[0, 1)`), a causal
+context whose addresses reach depth `D`, and **any** choice `ĵ` of declaration, made on the
+development cells or on the coded word itself, the lengths `log₂ B + code_ĵ` satisfy Kraft over the
+words of every length: `Σ_v 2^(−(log₂ B + code_(ĵ v)(v))) ≤ 1` (`emitted_sum`, `two_part_kraft`).
+The ladder `j = 1..8` at one stop law is `priorMass_tree_two_part`; the rung chosen jointly with a
+stop prior from a family of `F` is `B = 8F`. -/
+theorem tree_two_part {B : ℕ} (par : Fin B → ℕ × (ℕ → ℚ)) (hw : ∀ i, StopLaw₀ (par i).2)
+    (ctx : List Bool → List Ltr) (D n : ℕ) (choice : (Fin n → Bool) → Fin B) :
+    ∑ v : Fin n → Bool,
+      (emitted (massLaw (par (choice v)).1) (par (choice v)).2 D
+        (observations ctx (List.ofFn v)) : ℝ) / B ≤ 1 :=
+  two_part_kraft (fun i (v : Fin n → Bool) =>
+      (emitted (massLaw (par i).1) (par i).2 D (observations ctx (List.ofFn v)) : ℝ))
+    (fun i v => by exact_mod_cast (emitted_pos _ (hw i) D _).le)
+    (fun i => le_of_eq (by exact_mod_cast emitted_sum _ (hw i) ctx D n)) choice
+
+/-- [proved-derived; formal-checked] **`priorMass_tree_two_part`: the tree's rung charged 3 bits.**
+At one stop law and the ladder `j = 1..8`, the lengths `3 + code_ĵ` of the whole tree's emitted code
+satisfy Kraft for any choice of rung: `Σ_v 2^(−(3 + code_(ĵ v)(v))) ≤ 1`. With
+`priorMass_tree_redundancy`, the two-part code is at most
+`3 + min_j [−log₂ prior_w(S) + Σ_(leaves) (−log₂ (k_s/n_s)^(k_s) (m_s/n_s)^(m_s) + ½ log₂ n_s + j)]`
+when the rung is chosen to minimize it. -/
+theorem priorMass_tree_two_part {w : ℕ → ℚ} (hw : StopLaw₀ w) (ctx : List Bool → List Ltr)
+    (D n : ℕ) (choice : (Fin n → Bool) → Fin 8) :
+    ∑ v : Fin n → Bool, (2 : ℝ) ^ (-(3 + codeBits
+      (emitted (massLaw ((choice v : ℕ) + 1)) w D (observations ctx (List.ofFn v))))) ≤ 1 := by
+  have hk := tree_two_part (B := 8) (fun i => ((i : ℕ) + 1, w)) (fun _ => hw) ctx D n choice
+  refine le_of_eq_of_le (Finset.sum_congr rfl fun v _ => ?_) hk
+  have hP : (0 : ℝ) < (emitted (massLaw ((choice v : ℕ) + 1)) w D
+      (observations ctx (List.ofFn v)) : ℝ) := by exact_mod_cast emitted_pos _ hw D _
+  rw [codeBits, neg_add, neg_neg, Real.rpow_add (by norm_num),
+    Real.rpow_logb (by norm_num) (by norm_num) hP, Real.rpow_neg (by norm_num)]
+  norm_num
+  ring
+
+end Redundancy
+
 /-! ### Audit -/
 
 section Audit
@@ -752,6 +1082,13 @@ section Audit
 #print axioms priorMass_two_part
 #print axioms priorMass_face_ge
 #print axioms priorMass_digit_face_ge
+#print axioms emitted_eq_weight
+#print axioms emitted_sum
+#print axioms own_dominance₀
+#print axioms priorMass_tree_redundancy
+#print axioms priorMass_tree_redundancy_source
+#print axioms tree_two_part
+#print axioms priorMass_tree_two_part
 
 end Audit
 
