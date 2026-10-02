@@ -49,8 +49,8 @@ Two consequences:
   certificate speaks to. The comparison read at the successor is piecewise constant, with jumps
   only at cuts. The successor reads the entry `W + q_i u`. It differs from `W + η d_i` by the
   carried remainder (at most `u/2` per entry, held for the next deposit) and by the carry's released
-  residual (at most half a fine cell). Half a fine cell bounds only the entry plus its remainder
-  against `W + η d_i`. Both are bounds on states: the code lengths differ by that state difference
+  residual (at most half a fine cell). Half a fine cell bounds only the entry plus its new remainder
+  against `W + r_i + η d_i`. Both are bounds on states: the code lengths differ by that state difference
   read through the comparison, which nothing here bounds.
 - The halving's own stopping rule, `η · max|d| · 2 < u`, places the first cut near `u/(2 max|d|)`
   when the remainders are zero (just below it, by the fine half-cell in `c`). With nonzero
@@ -115,7 +115,7 @@ Two kinds of gap are spectral here, and the second is the one that sets the step
      remainders shift each progression, so a general direction's cells are shifted Farey cells.
    - These gaps decide where a state can change. They do not decide whether a decision changes.
 2. **The stations' margins.** A decision changes at a cut only where some station's margin
-   reaches zero. In #207's lock rule the margin of a ring's commitment is its certified gap
+   reaches zero. In #207's lock rule the margin of a station's commitment is its certified gap
    against the stations the readings must lock with it. If each coordinate moved changes a margin
    `μ` by at most `κ`, then `μ` stays positive at every step size with
 
@@ -126,7 +126,7 @@ Two kinds of gap are spectral here, and the second is the one that sets the step
    So the flip-free stretch of the direction is set by **the smallest margin over its rate per
    coordinate**: `η_safe ≥ (μ_min/κ − n) u/‖d‖₁`. `m7`'s flip is one request whose lock order
    swaps. Its smallest margin at the incumbent is not a sub-resolution tie: it is about 140 cell
-   widths, and the replay finds the pair's gaps cross within the step (§4b).
+   widths, and the replay finds the pair's true gaps cross within the step (§4b).
    The bound charges every entry its rounding (the `n`). A station's readings depend on only some
    entries, and charging only those tightens it.
 3. **The rate per coordinate.** At first order, `κ` is the reading's covector times `u`
@@ -140,12 +140,12 @@ Two kinds of gap are spectral here, and the second is the one that sets the step
 ## 4b. The prediction for `m7`'s pair
 
 The main line's first read of #207 at `m7` (coordinator's relay, 17:45): in every refinement of all
-8 requests, no other eligible station's reach meets the largest certain gap. The closest pair is in
-request 3, at the second freeze: station 2's certain gap `187540480/2^24` against station 5's reach
-`187166208/2^24`. The pair's margin at the incumbent is
+8 requests, no other eligible station's upper end meets the largest certain gap. The closest pair is
+in request 3, at the second freeze: station 2's certain gap `187540480/2^24` against station 5's
+upper end `187166208/2^24`. The pair's certified margin at the incumbent is
 
 ```text
-μ₀ = g₂ − ρ₅ = 374272/2^24 = 17·43/2^15
+μ₀ = lo₂ − hi₅ = 374272/2^24 = 17·43/2^15
 ```
 
 [proved-derived; formal-checked] Let `w_i ≥ 0` bound how much `μ` changes when entry `i` moves one
@@ -155,24 +155,31 @@ coordinate. Then `μ` stays positive at every carried state with
 η/u · Σ_i w_i|d_i| + Σ_i w_i < μ₀            (margin_survives_weighted)
 ```
 
-An entry the pair's readings do not depend on has `w_i = 0` and charges nothing. At first order
-`w_i = u|∂μ/∂E_i|`, the covector of `g₂ − ρ₅` (`hnn.executed-growth-covector`) times the unit, so
-the condition reads `η Σ_i|∂μ/∂E_i||d_i| + u Σ_i|∂μ/∂E_i| < μ₀`. That is the pair's directional rate
-plus one rounding for each entry it reads.
+An entry the pair's readings do not depend on has `w_i = 0` and charges nothing.
+
+**The rate comes from the readings, not from `μ`.** `μ` is read on cell ends, which are piecewise
+constant, so it has no derivative. It lies within four cell widths of the true difference
+`g₂ − g₅` (`g = a_top − a_runner`): `lo₂ ≥ g₂ − w_top2 − w_run2` and `hi₅ ≤ g₅ + w_top5 + w_run5`,
+so `μ ≥ (g₂ − g₅) − W₄` with `W₄` the four widths of the ends `μ` reads. The true difference has a
+covector, the growth covector of the four readings (`hnn.executed-growth-covector`). So take
+`w_i = u |∂(g₂ − g₅)/∂E_i|`. Where the largest rival of a station can switch (two rivals whose
+enclosures both reach the runner's), take the largest rate among the rivals that can attain it.
+Then `μ` stays positive while `M_w + W₄ < μ₀`.
 
 The cut list gives a sharper prediction than the bound in `η`. At each cut `j` the main line knows
 which entries moved and by how much, so it can sum the weighted moves exactly:
 
 ```text
-M_w(j) = Σ_i w_i |q_i(η_j) − q_i(0)|,     j* = the first cut with M_w(j*) ≥ μ₀
+M_w(j) = Σ_i w_i |q_i(η_j) − q_i(0)|,     j* = the first cut with M_w(j*) + W₄ ≥ μ₀
 ```
 
-The pair keeps its certified order at every cut before `j*` (`margin_survives_weighted`'s
-hypothesis `|μ(η) − μ₀| ≤ M_w` holds whenever the `w_i` bound the rate). The margin covers the whole
-`1/2048` step when `Σ_i w_i|d_i|/(2048u) + Σ_i w_i < μ₀`.
+The pair keeps its certified order at every cut before `j*` whenever the `w_i` bound the true
+difference's rate over the stretch. Taken from the incumbent's covector, `j*` is a **first-order
+prediction, not a certificate**: the `w_i` bound the rate only while that covector holds (§4.3).
+The margin covers the whole `1/2048` step when `Σ_i w_i|d_i|/(2048u) + Σ_i w_i + W₄ < μ₀`.
 
-The margin reaching zero means the pair becomes **unranked** at the successor (the reach meets the
-certain gap). It does not mean the true gaps cross. That needs more.
+The certified margin reaching zero means the pair becomes **unranked** at the successor (the upper
+end meets the certain gap). It does not mean the true gaps cross. That needs more.
 
 Reading the actual flip's cut index `j_f` against `j*`:
 - **`j_f ≥ j*`.** Consistent: the pair's margin can be consumed by then. The replay tells whether
@@ -185,14 +192,19 @@ Reading the actual flip's cut index `j_f` against `j*`:
     another commitment switched.
 
 **The replay** [measured, by the main line, cited; values over `2^24`]. The pair crosses, certain
-at both ends. At the successor at `η = 1/2048` station 5 locks second by `55808` (about 20 cell
-widths), so the margin moved from `+374272` to `−55808`: a change of `430080 = 2^12·3·5·7`, more
-than `μ₀` over the step. Station 2's gap fell `203264` and station 5's rose `231936`. Under linear
-motion the crossing lies at `731/840` of the step. No station is unranked at either state (0 of 64
-refinements in each request). So `m7`'s flip is a crossing by the readings' first-order motion,
-and `j_f ≥ j*` is consistent: a first-order rate large enough to move the margin by `430080` over
-the step consumes `μ₀` before the step's end. The cut index `j_f` and the weighted count `M_w`
-remain the main line's read.
+at both ends. Two certified margins are read, one at each end:
+- at the incumbent, station 2's certain gap exceeds station 5's upper end by `374272`;
+- at the successor (`η = 1/2048`), station 5's certain gap exceeds station 2's upper end by `55808`
+  (about 20 cell widths).
+
+Each certain gap is at most its true gap and each upper end at least, so the true difference
+`g₂ − g₅` moved by at least `374272 + 55808 = 430080 = 2^12·3·5·7` over the step, more than `μ₀`:
+the true gaps crossed. The certain gaps moved by `203264 + 231936 = 435200` (station 2's fell,
+station 5's rose); the difference, `5120`, is the two enclosures' widths. Under linear motion the
+certified margins cross at `731/840` of the step. That is where the certified order changes, not
+where the true gaps cross. No station is unranked at either state (0 of 64 refinements in each
+request). Two end states do not show that the motion is first order; they are consistent with
+`j_f ≥ j*`, and the cut index `j_f` and the weighted count `M_w` remain the main line's read.
 
 ## 5. The step law that follows
 
@@ -213,9 +225,12 @@ on the cut index:
    No state lies between them.
 4. **Decide the wall on its exact jump.** The jump `J_c` is the comparison read at one
    constitution on two commitment orders, so it does not shrink with the step (the flip record's
-   §2b, `crossing_cost_le`). Stop at the last state before the wall, which is certified. Cross a
-   negative wall in one move. A positive wall is crossed only by a run of moves that closes below
-   its opening state (the release record), since no single move's decrease can pay it.
+   §2b, `crossing_cost_le`). Stop at the last state before the wall, which is certified. One move
+   crosses walls and is accepted exactly when its continuous decrease from the start to its end
+   exceeds the sum of the jumps of every wall it crosses: a negative wall always, a positive one
+   when the move is long enough. The decrease grows with `η` and a wall's jump does not, so a long
+   move can pay a positive wall, while a short move onto it cannot. Otherwise a positive wall is
+   crossed only by a run of moves that closes below its opening state (the release record).
 
 Bisecting on the cut index resolves a wall to one coordinate move. Halving resolves it to a factor
 of two in `η`. The reads number `log₂ N(η_start) ≤ log₂(η_start‖d‖₁/u + n)`, so the fixed number
