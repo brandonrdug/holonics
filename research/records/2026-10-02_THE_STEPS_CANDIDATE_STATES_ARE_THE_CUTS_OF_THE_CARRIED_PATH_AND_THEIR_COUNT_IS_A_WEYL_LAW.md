@@ -118,8 +118,9 @@ Two kinds of gap are spectral here, and the second is the one that sets the step
    ```
 
    So the flip-free stretch of the direction is set by **the smallest margin over its rate per
-   coordinate**: `η_safe ≥ (μ_min/c − n) u/‖d‖₁`. Near-tied stations set it. That is `m7`'s flip,
-   which the flip record found to be one request whose lock order swaps among near-tied stations.
+   coordinate**: `η_safe ≥ (μ_min/c − n) u/‖d‖₁`. `m7`'s flip is one request whose lock order
+   swaps. Its smallest margin at the incumbent is not a sub-resolution tie: it is about 140 cell
+   widths (§4b). Whether that margin closes within the step is the main line's replay.
    The bound charges every entry its rounding (the `n`). A station's readings depend on only some
    entries, and charging only those tightens it.
 3. **The rate per coordinate.** At first order, `c` is the reading's covector times `u`
@@ -129,6 +130,53 @@ Two kinds of gap are spectral here, and the second is the one that sets the step
    coalesce (a zero of the discriminant of `det(μ − M(η))` at complex distance `δ` from the real
    `η` axis), the rate grows like `δ^(−1/2)`. That is an exceptional point of a non-self-adjoint
    family: its eigenvalues meet in a square-root branch instead of crossing.
+
+## 4b. The prediction for `m7`'s pair
+
+The main line's first read of #207 at `m7` (coordinator's relay, 17:45): in every refinement of all
+8 requests, no other eligible station's reach meets the largest certain gap. The closest pair is in
+request 3, at the second freeze: station 2's certain gap `187540480/2^24` against station 5's reach
+`187166208/2^24`. The pair's margin at the incumbent is
+
+```text
+μ₀ = g₂ − ρ₅ = 374272/2^24 = 17·43/2^15
+```
+
+[proved-derived; formal-checked] Let `w_i ≥ 0` bound how much `μ` changes when entry `i` moves one
+coordinate. Then `μ` stays positive at every carried state with
+
+```text
+η/u · Σ_i w_i|d_i| + Σ_i w_i < μ₀            (margin_survives_weighted)
+```
+
+An entry the pair's readings do not depend on has `w_i = 0` and charges nothing. At first order
+`w_i = u|∂μ/∂E_i|`, the covector of `g₂ − ρ₅` (`hnn.executed-growth-covector`) times the unit, so
+the condition reads `η Σ_i|∂μ/∂E_i||d_i| + u Σ_i|∂μ/∂E_i| < μ₀`. That is the pair's directional rate
+plus one rounding for each entry it reads.
+
+The cut list gives a sharper prediction than the bound in `η`. At each cut `j` the main line knows
+which entries moved and by how much, so it can sum the weighted moves exactly:
+
+```text
+M_w(j) = Σ_i w_i |q_i(η_j) − q_i(0)|,     j* = the first cut with M_w(j*) ≥ μ₀
+```
+
+The pair keeps its certified order at every cut before `j*` (`margin_survives_weighted`'s
+hypothesis `|μ(η) − μ₀| ≤ M_w` holds whenever the `w_i` bound the rate). The margin covers the whole
+`1/2048` step when `Σ_i w_i|d_i|/(2048u) + Σ_i w_i < μ₀`.
+
+The margin reaching zero means the pair becomes **unranked** at the successor (the reach meets the
+certain gap). It does not mean the true gaps cross. That needs more.
+
+Reading the actual flip's cut index `j_f` against `j*`:
+- **`j_f ≥ j*`.** Consistent: the pair's margin can be consumed by then. The replay tells whether
+  the pair became unranked or its true gaps crossed.
+- **`j_f < j*`.** The flip happens where the margin cannot yet be consumed at the first-order rate.
+  Reading the pair's actual margin at cuts `j_f − 1` and `j_f` separates two findings:
+  - if `μ` reaches zero there, the first-order rates do not bound the margin over the stretch (the
+    rate is bounded only while the read multiplier stays a simple root, §4.3);
+  - if `μ` stays positive there, the flip is not this pair's reordering: another station or
+    another commitment switched.
 
 ## 5. The step law that follows
 
@@ -193,13 +241,16 @@ Along `m6`'s and `m7`'s directions:
 - the commitments at each cut, which locates the wall by cut index;
 - at the incumbent, the smallest station margin and its first-order rate per coordinate, to test
   `margin_survives_moves`'s prediction against the wall;
+- for `m7`, request 3's pair (station 2 against station 5): the first-order rates `w_i`, the weighted
+  move count `M_w(j)` at each cut, `j*`, and the flip's cut index `j_f` (§4b);
 - the margins' distribution near zero over the batch's stations, which tests §6's prediction that
   near-ties are not repelled.
 
 ## 8. Owners
 
 - Lean `HNN/CarriedCuts`: `floor_ne_iff`, `coordinate_changes_iff`, `coordinate_moves_lt`,
-  `coordinate_moves_gt`, `moves_sum_lt`, `moves_sum_gt`, `margin_survives_moves`.
+  `coordinate_moves_gt`, `moves_sum_lt`, `moves_sum_gt`, `margin_survives_moves`,
+  `weighted_moves_le`, `margin_survives_weighted`.
 - Rust (unchanged): `hnn::constitution::carried_entry` (the carried coordinate), `hnn::executed`'s
   ladder (the halving law §5 would replace).
 - Owed to #62:

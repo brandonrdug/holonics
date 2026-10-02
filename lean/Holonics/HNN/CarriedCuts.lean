@@ -25,7 +25,9 @@ the carried path's candidate states are indexed by its cuts, not by `η`.
   `|η′ − η|/u · ‖d‖₁` up to less than its number of entries `n` (`moves_sum_lt`, `moves_sum_gt`).
 - **A margin survives every carried state it can pay for**: if each coordinate moved changes a
   station's margin by at most `c`, the margin stays positive at every step size with
-  `c(η/u · ‖d‖₁ + n) ≤ μ₀` (`margin_survives_moves`).
+  `c(η/u · ‖d‖₁ + n) ≤ μ₀` (`margin_survives_moves`); entry by entry, with a rate `w_i` per
+  coordinate of entry `i`, at every step size with `η/u · Σ w_i|d_i| + Σ w_i < μ₀`
+  (`margin_survives_weighted`).
 
 The record: `research/records/2026-10-02_THE_STEPS_CANDIDATE_STATES_ARE_THE_CUTS_OF_THE_CARRIED_PATH_AND_THEIR_COUNT_IS_A_WEYL_LAW.md`.
 -/
@@ -159,6 +161,40 @@ theorem margin_survives_moves (s : Finset ι) (hs : s.Nonempty) (r d cs : ι →
     simp at hμ
     linarith
 
+/-- [proved-derived; formal-checked] **Each entry moves a weight by at most its rate times its
+own change**: for nonnegative per-entry rates `w i`, the weighted moves
+`Σ w_i |q_i(η′) − q_i(η)|` are at most `|η′ − η|/u · Σ w_i|d_i| + Σ w_i`. -/
+theorem weighted_moves_le (s : Finset ι) (r d c w : ι → ℝ) (hw : ∀ i ∈ s, 0 ≤ w i) {u : ℝ}
+    (hu : 0 < u) (η η' : ℝ) :
+    ∑ i ∈ s, w i * |((coordinate (r i) (d i) u (c i) η' - coordinate (r i) (d i) u (c i) η : ℤ) : ℝ)|
+      ≤ |η' - η| / u * (∑ i ∈ s, w i * |d i|) + ∑ i ∈ s, w i := by
+  have h : ∀ i ∈ s, w i * |((coordinate (r i) (d i) u (c i) η' -
+      coordinate (r i) (d i) u (c i) η : ℤ) : ℝ)| ≤ |η' - η| / u * (w i * |d i|) + w i := by
+    intro i hi
+    have hlt := coordinate_moves_lt (r i) (d i) (c i) η η' hu
+    have e : |η' - η| / u * (w i * |d i|) + w i = w i * (|η' - η| * |d i| / u + 1) := by ring
+    rw [e]
+    exact mul_le_mul_of_nonneg_left hlt.le (hw i hi)
+  calc _ ≤ ∑ i ∈ s, (|η' - η| / u * (w i * |d i|) + w i) := Finset.sum_le_sum h
+    _ = _ := by rw [Finset.sum_add_distrib, Finset.mul_sum]
+
+/-- [proved-derived; formal-checked] **A margin survives every carried state it can pay for, entry
+by entry**: if a pair's margin `μ` changes by at most `w_i` per coordinate entry `i` moves,
+`|μ η − μ 0| ≤ Σ w_i |q_i(η) − q_i(0)|`, then `μ η > 0` at every step size with
+`η/u · Σ w_i|d_i| + Σ w_i < μ 0`. An entry the margin does not read has `w_i = 0` and charges
+nothing; at first order `w_i = u|∂μ/∂E_i|`, so the condition reads
+`η Σ |∂μ/∂E_i||d_i| + u Σ |∂μ/∂E_i| < μ 0`: the margin's directional rate plus one rounding per
+entry it reads. -/
+theorem margin_survives_weighted (s : Finset ι) (r d cs w : ι → ℝ) (hw : ∀ i ∈ s, 0 ≤ w i)
+    {u : ℝ} (hu : 0 < u) {μ : ℝ → ℝ} {η : ℝ} (hη : 0 ≤ η)
+    (hμ : |μ η - μ 0| ≤ ∑ i ∈ s, w i *
+      |((coordinate (r i) (d i) u (cs i) η - coordinate (r i) (d i) u (cs i) 0 : ℤ) : ℝ)|)
+    (hpay : η / u * (∑ i ∈ s, w i * |d i|) + ∑ i ∈ s, w i < μ 0) : 0 < μ η := by
+  have hle := weighted_moves_le s r d cs w hw hu 0 η
+  rw [sub_zero, abs_of_nonneg hη] at hle
+  have := (abs_le.mp hμ).1
+  linarith
+
 end Holonics.HNN.CarriedCuts
 
 section Audit
@@ -170,4 +206,6 @@ open Holonics.HNN.CarriedCuts
 #print axioms moves_sum_lt
 #print axioms moves_sum_gt
 #print axioms margin_survives_moves
+#print axioms weighted_moves_le
+#print axioms margin_survives_weighted
 end Audit
