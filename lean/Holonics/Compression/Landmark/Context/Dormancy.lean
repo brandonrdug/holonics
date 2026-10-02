@@ -30,6 +30,25 @@ the case of one activity.
   for `k` switches; at `α = 2^(−j)`, `j ≥ 1`, a stay costs less than `3·2^(−j)` bits, so the path costs
   at most `k j + 3 (n − k)/2^j`, and at most `k j + 3` bits over `n ≤ 2^j` cells: each switch pays
   the `log₂` of its positions.
+* `exec_total_le`, `exec_path_le`, `forward_executed_nonneg` [proved-derived; formal-checked]:
+  **the executed forward mixture with nonnegative faces.** Weights rounded down after each kernel
+  step by at most `ρ_t`, and faces scored from class sums rounded down by at most `μ_t`, code within
+  `Σ_t −log₂(ρ_t μ_t)` of every state sequence. The rounded totals telescope
+  (`(∏ μ) Σ W_n ≤ (Σ W_0) ∏ q`) and a path keeps its weight up to `∏ ρ`; no face need be positive.
+  This is `LocalWeighing.forward_executed` for nonnegative faces, with the rounding on the weight
+  after the kernel (the share step's rebase) rather than on the face before it.
+* `dormant_survivor_executed`, `dormant_executed_code` [proved-derived; formal-checked]: **the
+  executed filter codes within the certified drift.** With the opening at scale `c`, every rounding
+  a factor in `(1 − 2^(−j), 1]` and `r` of them counted, the executed code is within
+  `dormant_survivor_code`'s bound plus `3 r 2^(−j)` bits; at `j = 62` this is Rust
+  `Dormancy::drift`. [established-bounded; source-inspected, computational-witness] That the Rust's
+  counted roundings bound the factors: each `Weight::sum` and `Weight::of` rounds down once by a
+  factor in `(1 − 2^(−62), 1]`; a state's weight after the kernel passes `L` share roundings and the
+  opening `#active` products, a class sum one rounding per added weight and per chunk join, and the
+  counter `roundings` adds all of them, more than any one face or weight needs. The Rust test
+  `the_roundings_counted_cover_every_factor_the_lean_takes` checks each chain's factor and the
+  count against the exact step from the executed weights (`hopen`, `hup`, `hdown`, `hq` and
+  `hround`'s per-cell factors).
 
 The computational object is the helical pair interaction read as a receiver's population of eggs
 through aeons; of the winding guide's six general objects this module touches the **helix** (the key
@@ -392,6 +411,272 @@ theorem share_path_code_le {j : ℕ} (hj : 1 ≤ j) (σ : ℕ → Bool) (n : ℕ
     nlinarith
   linarith
 
+/-! ## 4. The executed filter: weights rounded after the kernel, faces from rounded sums -/
+
+section Executed
+
+variable {ι : Type*} [Fintype ι]
+
+/-- [proved-derived; formal-checked] **`exec_total_le`: the rounded totals telescope.** Carried
+weights `W_t ≥ 0` rounded down after each kernel step (`W_(t+1)(x) ≤ Σ_y W_t(y) f_y(t) T(y, x)`)
+and scored faces `q_t ≥ 0` read from sums rounded down by at most `μ_t`
+(`μ_t Σ_x W_t(x) f_x(t) ≤ q_t Σ_x W_t(x)`) give `(∏_(t<n) μ_t) Σ W_n ≤ (Σ W_0) ∏_(t<n) q_t`: the
+mass a face loses to rounding is at most what its normalization returns. -/
+theorem exec_total_le {W : ℕ → ι → ℚ} {f : ι → ℕ → ℚ} {T : ι → ι → ℚ} {q μ : ℕ → ℚ}
+    (hT : Stochastic T) (hdown : ∀ t x, W (t + 1) x ≤ ∑ y, W t y * f y t * T y x)
+    (hq : ∀ t, μ t * ∑ x, W t x * f x t ≤ q t * ∑ x, W t x)
+    (hμ : ∀ t, 0 ≤ μ t) (hq0 : ∀ t, 0 ≤ q t) :
+    ∀ n, (∏ t ∈ range n, μ t) * ∑ x, W n x ≤ (∑ x, W 0 x) * ∏ t ∈ range n, q t := by
+  have hZ : ∀ t, ∑ x, W (t + 1) x ≤ ∑ y, W t y * f y t := by
+    intro t
+    calc ∑ x, W (t + 1) x ≤ ∑ x, ∑ y, W t y * f y t * T y x := sum_le_sum fun x _ => hdown t x
+      _ = ∑ y, W t y * f y t := by
+        rw [sum_comm]
+        refine sum_congr rfl fun y _ => ?_
+        rw [← mul_sum, hT.2 y, mul_one]
+  intro n
+  induction n with
+  | zero => simp
+  | succ n ih =>
+    rw [prod_range_succ, prod_range_succ]
+    have hμn : 0 ≤ ∏ t ∈ range n, μ t := prod_nonneg fun t _ => hμ t
+    calc (∏ t ∈ range n, μ t) * μ n * ∑ x, W (n + 1) x
+        ≤ (∏ t ∈ range n, μ t) * μ n * ∑ y, W n y * f y n :=
+          mul_le_mul_of_nonneg_left (hZ n) (mul_nonneg hμn (hμ n))
+      _ ≤ (∏ t ∈ range n, μ t) * (q n * ∑ x, W n x) := by
+          rw [mul_assoc]; exact mul_le_mul_of_nonneg_left (hq n) hμn
+      _ = (∏ t ∈ range n, μ t) * (∑ x, W n x) * q n := by ring
+      _ ≤ (∑ x, W 0 x) * (∏ t ∈ range n, q t) * q n :=
+          mul_le_mul_of_nonneg_right ih (hq0 n)
+      _ = (∑ x, W 0 x) * ((∏ t ∈ range n, q t) * q n) := by ring
+
+/-- [proved-derived; formal-checked] **`exec_path_le`: a path keeps its weight up to the roundings.**
+With weights rounded down after each kernel step by at most `ρ_t`
+(`ρ_t Σ_y W_t(y) f_y(t) T(y, x) ≤ W_(t+1)(x)`), nonnegative faces and kernel, every state sequence
+keeps `(∏_(t<n) ρ_t) W_0(σ_0) ∏_(t<n) f_(σ_t)(t) T(σ_t, σ_(t+1)) ≤ W_n(σ_n)`. -/
+theorem exec_path_le {W : ℕ → ι → ℚ} {f : ι → ℕ → ℚ} {T : ι → ι → ℚ} {ρ : ℕ → ℚ}
+    (hW : ∀ t x, 0 ≤ W t x) (hf : ∀ x t, 0 ≤ f x t) (hT : ∀ y x, 0 ≤ T y x)
+    (hup : ∀ t x, ρ t * ∑ y, W t y * f y t * T y x ≤ W (t + 1) x) (hρ : ∀ t, 0 ≤ ρ t)
+    (σ : ℕ → ι) :
+    ∀ n, (∏ t ∈ range n, ρ t) *
+        (W 0 (σ 0) * ∏ t ∈ range n, (f (σ t) t * T (σ t) (σ (t + 1)))) ≤ W n (σ n) := by
+  intro n
+  induction n with
+  | zero => simp
+  | succ n ih =>
+    have hm : 0 ≤ f (σ n) n * T (σ n) (σ (n + 1)) := mul_nonneg (hf _ _) (hT _ _)
+    calc (∏ t ∈ range (n + 1), ρ t) *
+          (W 0 (σ 0) * ∏ t ∈ range (n + 1), (f (σ t) t * T (σ t) (σ (t + 1))))
+        = ρ n * ((∏ t ∈ range n, ρ t) *
+            (W 0 (σ 0) * ∏ t ∈ range n, (f (σ t) t * T (σ t) (σ (t + 1)))) *
+              (f (σ n) n * T (σ n) (σ (n + 1)))) := by
+          rw [prod_range_succ, prod_range_succ]; ring
+      _ ≤ ρ n * (W n (σ n) * (f (σ n) n * T (σ n) (σ (n + 1)))) :=
+          mul_le_mul_of_nonneg_left (mul_le_mul_of_nonneg_right ih hm) (hρ n)
+      _ ≤ ρ n * ∑ y, W n y * f y n * T y (σ (n + 1)) := by
+          refine mul_le_mul_of_nonneg_left ?_ (hρ n)
+          rw [← mul_assoc]
+          exact single_le_sum (f := fun y => W n y * f y n * T y (σ (n + 1)))
+            (fun y _ => mul_nonneg (mul_nonneg (hW n y) (hf y n)) (hT _ _)) (mem_univ _)
+      _ ≤ W (n + 1) (σ (n + 1)) := hup n _
+
+/-- [proved-derived; formal-checked] **`forward_executed_nonneg`: the executed forward mixture with
+nonnegative faces.** Weights opened at most `1` in total, rounded down after each kernel step by at
+most `ρ_t`, and faces scored from sums rounded down by at most `μ_t` code within the roundings of
+every state sequence: `(∏_(t<n) ρ_t μ_t) W_0(σ_0) ∏_(t<n) f_(σ_t)(t) T(σ_t, σ_(t+1)) ≤ ∏_(t<n) q_t`.
+No face need be positive: a deterministic emitter's zeros pass, and the rounding sits after the
+kernel, on the weight, where `LocalWeighing.forward_executed` charts the face before it. -/
+theorem forward_executed_nonneg {W : ℕ → ι → ℚ} {f : ι → ℕ → ℚ} {T : ι → ι → ℚ}
+    {q ρ μ : ℕ → ℚ} (hW : ∀ t x, 0 ≤ W t x) (hf : ∀ x t, 0 ≤ f x t) (hT : Stochastic T)
+    (hdown : ∀ t x, W (t + 1) x ≤ ∑ y, W t y * f y t * T y x)
+    (hup : ∀ t x, ρ t * ∑ y, W t y * f y t * T y x ≤ W (t + 1) x)
+    (hq : ∀ t, μ t * ∑ x, W t x * f x t ≤ q t * ∑ x, W t x)
+    (hρ : ∀ t, 0 ≤ ρ t) (hμ : ∀ t, 0 ≤ μ t) (hq0 : ∀ t, 0 ≤ q t) (hZ : ∑ x, W 0 x ≤ 1)
+    (σ : ℕ → ι) (n : ℕ) :
+    (∏ t ∈ range n, (ρ t * μ t)) *
+        (W 0 (σ 0) * ∏ t ∈ range n, (f (σ t) t * T (σ t) (σ (t + 1)))) ≤
+      ∏ t ∈ range n, q t := by
+  have htot := exec_total_le hT hdown hq hμ hq0 n
+  have hpath := exec_path_le hW hf hT.1 hup hρ σ n
+  have hμn : 0 ≤ ∏ t ∈ range n, μ t := prod_nonneg fun t _ => hμ t
+  have hqn : 0 ≤ ∏ t ∈ range n, q t := prod_nonneg fun t _ => hq0 t
+  rw [prod_mul_distrib]
+  calc (∏ t ∈ range n, ρ t) * (∏ t ∈ range n, μ t) *
+        (W 0 (σ 0) * ∏ t ∈ range n, (f (σ t) t * T (σ t) (σ (t + 1))))
+      = (∏ t ∈ range n, μ t) * ((∏ t ∈ range n, ρ t) *
+          (W 0 (σ 0) * ∏ t ∈ range n, (f (σ t) t * T (σ t) (σ (t + 1))))) := by ring
+    _ ≤ (∏ t ∈ range n, μ t) * W n (σ n) := mul_le_mul_of_nonneg_left hpath hμn
+    _ ≤ (∏ t ∈ range n, μ t) * ∑ x, W n x :=
+        mul_le_mul_of_nonneg_left (single_le_sum (f := W n) (fun x _ => hW n x) (mem_univ _)) hμn
+    _ ≤ (∑ x, W 0 x) * ∏ t ∈ range n, q t := htot
+    _ ≤ 1 * ∏ t ∈ range n, q t := mul_le_mul_of_nonneg_right hZ hqn
+    _ = ∏ t ∈ range n, q t := one_mul _
+
+end Executed
+
+section ExecutedSurvivors
+
+variable {κ A C : Type*} [Fintype κ] [DecidableEq κ] [Nonempty κ] [Fintype A] [DecidableEq A]
+  [DecidableEq C]
+
+omit [Nonempty κ] [DecidableEq A] in
+/-- [proved-derived; formal-checked] **`dormant_survivor_executed`: the executed filter keeps the
+survivor bound up to its roundings.** The weights over (key, activity) opened at scale `c > 0`
+(`ρ₀ c π(k, a) ≤ W_0(k, a)`, `Σ W_0 ≤ c`), rounded down after each kernel step by at most `ρ_t`,
+and the faces read from class sums rounded down by at most `μ_t`, over `n + 1` cells and `n`
+transitions: `ρ₀ (∏_(t<n) ρ_t)(∏_(t≤n) μ_t) · #S_σ(n + 1)/|K| · π(σ_0) ∏_(t<n) T(σ_t, σ_(t+1)) ≤
+∏_(t≤n) q_t`, `dormant_survivor_code`'s product times the roundings (Rust `Dormancy`: the opening
+`2^(−jL)(2^j − 1)^(#active)` per key, so `c = |K|`). -/
+theorem dormant_survivor_executed {π : A → ℚ} {T : A → A → ℚ} (hT : Stochastic T)
+    (e : κ → A → ℕ → C) (x : ℕ → C) (σ : ℕ → A) (n : ℕ)
+    {W : ℕ → κ × A → ℚ} {q ρ μ : ℕ → ℚ} {ρ₀ c : ℚ} (hW : ∀ t s, 0 ≤ W t s)
+    (hdown : ∀ t s', W (t + 1) s' ≤ ∑ s, W t s * activeEmits e x s t * keyKernel T s s')
+    (hup : ∀ t s', ρ t * ∑ s, W t s * activeEmits e x s t * keyKernel T s s' ≤ W (t + 1) s')
+    (hq : ∀ t, μ t * ∑ s, W t s * activeEmits e x s t ≤ q t * ∑ s, W t s)
+    (hρ : ∀ t, 0 ≤ ρ t) (hμ : ∀ t, 0 ≤ μ t) (hq0 : ∀ t, 0 ≤ q t)
+    (hopen : ∀ s, ρ₀ * (c * keyPrior π s) ≤ W 0 s) (hc : 0 < c)
+    (hZ : ∑ s, W 0 s ≤ c) :
+    ρ₀ * (∏ t ∈ range n, ρ t) * (∏ t ∈ range (n + 1), μ t) *
+        (((pathSurvivors e x σ (n + 1)).card : ℚ) / Fintype.card κ *
+          (π (σ 0) * ∏ t ∈ range n, T (σ t) (σ (t + 1)))) ≤
+      ∏ t ∈ range (n + 1), q t := by
+  have hK := keyKernel_stochastic (κ := κ) hT
+  have hf : ∀ s t, 0 ≤ activeEmits e x s t := fun s t => by
+    unfold activeEmits; split_ifs <;> norm_num
+  have htot := exec_total_le hK hdown hq hμ hq0 n
+  have hρn : 0 ≤ ∏ t ∈ range n, ρ t := prod_nonneg fun t _ => hρ t
+  have hμn : 0 ≤ ∏ t ∈ range n, μ t := prod_nonneg fun t _ => hμ t
+  have hqn : 0 ≤ ∏ t ∈ range n, q t := prod_nonneg fun t _ => hq0 t
+  set P : ℚ := π (σ 0) * ∏ t ∈ range n, T (σ t) (σ (t + 1)) with hP
+  -- each survivor keeps its path's weight, up to the roundings, at the last cell's activity
+  have hkeep : ∀ k ∈ pathSurvivors e x σ (n + 1),
+      ρ₀ * (∏ t ∈ range n, ρ t) * (c * (1 / Fintype.card κ * P)) ≤
+        W n (k, σ n) * activeEmits e x (k, σ n) n := by
+    intro k hk
+    have hk' := (mem_filter.mp hk).2
+    have hpath := exec_path_le hW hf hK.1 hup hρ (fun t => (k, σ t)) n
+    rw [prod_congr rfl fun t ht => show activeEmits e x (k, σ t) t *
+        keyKernel T (k, σ t) (k, σ (t + 1)) = T (σ t) (σ (t + 1)) by
+      simp [activeEmits, keyKernel, hk' t (by have := mem_range.mp ht; omega)]] at hpath
+    have hlast : activeEmits e x (k, σ n) n = 1 := by
+      simp [activeEmits, hk' n (by omega)]
+    have h0 := hopen (k, σ 0)
+    simp only [keyPrior, uniformPrior] at h0
+    rw [hlast, mul_one]
+    calc ρ₀ * (∏ t ∈ range n, ρ t) * (c * (1 / Fintype.card κ * P))
+        = (∏ t ∈ range n, ρ t) * (ρ₀ * (c * (1 / Fintype.card κ * π (σ 0))) *
+            ∏ t ∈ range n, T (σ t) (σ (t + 1))) := by rw [hP]; ring
+      _ ≤ (∏ t ∈ range n, ρ t) * (W 0 (k, σ 0) * ∏ t ∈ range n, T (σ t) (σ (t + 1))) :=
+          mul_le_mul_of_nonneg_left (mul_le_mul_of_nonneg_right h0
+            (prod_nonneg fun t _ => hT.1 _ _)) hρn
+      _ ≤ W n (k, σ n) := hpath
+  -- the survivors' weights are part of the last cell's emitting mass
+  have hsum : ((pathSurvivors e x σ (n + 1)).card : ℚ) *
+      (ρ₀ * (∏ t ∈ range n, ρ t) * (c * (1 / Fintype.card κ * P))) ≤
+      ∑ s, W n s * activeEmits e x s n := by
+    rw [Fintype.sum_prod_type]
+    calc ((pathSurvivors e x σ (n + 1)).card : ℚ) *
+          (ρ₀ * (∏ t ∈ range n, ρ t) * (c * (1 / Fintype.card κ * P)))
+        = ∑ k ∈ pathSurvivors e x σ (n + 1),
+            ρ₀ * (∏ t ∈ range n, ρ t) * (c * (1 / Fintype.card κ * P)) := by
+          rw [sum_const, nsmul_eq_mul]
+      _ ≤ ∑ k ∈ pathSurvivors e x σ (n + 1), W n (k, σ n) * activeEmits e x (k, σ n) n :=
+          sum_le_sum hkeep
+      _ ≤ ∑ k, W n (k, σ n) * activeEmits e x (k, σ n) n :=
+          sum_le_sum_of_subset_of_nonneg (subset_univ _) fun k _ _ =>
+            mul_nonneg (hW n _) (hf _ _)
+      _ ≤ ∑ k, ∑ a, W n (k, a) * activeEmits e x (k, a) n :=
+          sum_le_sum fun k _ => single_le_sum (f := fun a => W n (k, a) * activeEmits e x (k, a) n)
+            (fun a _ => mul_nonneg (hW n _) (hf _ _)) (mem_univ _)
+  have hmain : c * (ρ₀ * (∏ t ∈ range n, ρ t) * (∏ t ∈ range (n + 1), μ t) *
+      (((pathSurvivors e x σ (n + 1)).card : ℚ) / Fintype.card κ * P)) ≤
+      c * ∏ t ∈ range (n + 1), q t := by
+    calc c * (ρ₀ * (∏ t ∈ range n, ρ t) * (∏ t ∈ range (n + 1), μ t) *
+          (((pathSurvivors e x σ (n + 1)).card : ℚ) / Fintype.card κ * P))
+        = (∏ t ∈ range n, μ t) * (μ n * (((pathSurvivors e x σ (n + 1)).card : ℚ) *
+            (ρ₀ * (∏ t ∈ range n, ρ t) * (c * (1 / Fintype.card κ * P))))) := by
+          rw [prod_range_succ]; ring
+      _ ≤ (∏ t ∈ range n, μ t) * (μ n * ∑ s, W n s * activeEmits e x s n) :=
+          mul_le_mul_of_nonneg_left (mul_le_mul_of_nonneg_left hsum (hμ n)) hμn
+      _ ≤ (∏ t ∈ range n, μ t) * (q n * ∑ s, W n s) :=
+          mul_le_mul_of_nonneg_left (hq n) hμn
+      _ = q n * ((∏ t ∈ range n, μ t) * ∑ s, W n s) := by ring
+      _ ≤ q n * ((∑ s, W 0 s) * ∏ t ∈ range n, q t) := mul_le_mul_of_nonneg_left htot (hq0 n)
+      _ ≤ q n * (c * ∏ t ∈ range n, q t) :=
+          mul_le_mul_of_nonneg_left (mul_le_mul_of_nonneg_right hZ hqn) (hq0 n)
+      _ = c * ∏ t ∈ range (n + 1), q t := by rw [prod_range_succ]; ring
+  exact le_of_mul_le_mul_left hmain hc
+
+omit [DecidableEq A] in
+/-- [proved-derived; formal-checked] **`dormant_executed_code`: the executed code is within the
+certified drift of the ideal bound.** When the roundings' factors multiply to at least
+`(1 − 2^(−j))^r` (each rounding a factor in `(1 − 2^(−j), 1]`, `r` of them counted, `j ≥ 1`), the
+executed filter codes within `dormant_survivor_code`'s bound plus `3 r 2^(−j)` bits:
+`−log₂ ∏_(t≤n) q_t ≤ log₂ |K| − log₂ #S_σ(n + 1) − log₂ π(σ_0) − Σ_(t<n) log₂ T(σ_t, σ_(t+1))
++ 3 r 2^(−j)`. At `j = 62` this is Rust `Dormancy::drift`, `3 · r · 2^(−62)`. -/
+theorem dormant_executed_code {π : A → ℚ} {T : A → A → ℚ} (hT : Stochastic T)
+    (e : κ → A → ℕ → C) (x : ℕ → C) (σ : ℕ → A) (n : ℕ)
+    {W : ℕ → κ × A → ℚ} {q ρ μ : ℕ → ℚ} {ρ₀ c : ℚ} (hW : ∀ t s, 0 ≤ W t s)
+    (hdown : ∀ t s', W (t + 1) s' ≤ ∑ s, W t s * activeEmits e x s t * keyKernel T s s')
+    (hup : ∀ t s', ρ t * ∑ s, W t s * activeEmits e x s t * keyKernel T s s' ≤ W (t + 1) s')
+    (hq : ∀ t, μ t * ∑ s, W t s * activeEmits e x s t ≤ q t * ∑ s, W t s)
+    (hρ : ∀ t, 0 ≤ ρ t) (hμ : ∀ t, 0 ≤ μ t) (hq0 : ∀ t, 0 ≤ q t)
+    (hopen : ∀ s, ρ₀ * (c * keyPrior π s) ≤ W 0 s) (hc : 0 < c)
+    (hZ : ∑ s, W 0 s ≤ c) {j r : ℕ} (hj : 1 ≤ j)
+    (hround : (1 - (1 / 2 : ℚ) ^ j) ^ r ≤
+      ρ₀ * (∏ t ∈ range n, ρ t) * ∏ t ∈ range (n + 1), μ t)
+    (hS : (pathSurvivors e x σ (n + 1)).Nonempty)
+    (h0 : 0 < π (σ 0)) (hTσ : ∀ t < n, 0 < T (σ t) (σ (t + 1))) :
+    -Real.logb 2 ((∏ t ∈ range (n + 1), q t : ℚ) : ℝ) ≤
+      Real.logb 2 (Fintype.card κ) - Real.logb 2 ((pathSurvivors e x σ (n + 1)).card) -
+        Real.logb 2 (π (σ 0) : ℝ) - ∑ t ∈ range n, Real.logb 2 (T (σ t) (σ (t + 1)) : ℝ) +
+          r * (3 * (1 / 2 : ℝ) ^ j) := by
+  have hprod := dormant_survivor_executed hT e x σ n hW hdown hup hq hρ hμ hq0 hopen hc hZ
+  set Λ : ℚ := ρ₀ * (∏ t ∈ range n, ρ t) * ∏ t ∈ range (n + 1), μ t with hΛ
+  set X : ℚ := ((pathSurvivors e x σ (n + 1)).card : ℚ) / Fintype.card κ *
+    (π (σ 0) * ∏ t ∈ range n, T (σ t) (σ (t + 1))) with hX
+  have hε : (0 : ℚ) < 1 - (1 / 2 : ℚ) ^ j := by
+    have : ((1 / 2 : ℚ) ^ j) < 1 := pow_lt_one₀ (by norm_num) (by norm_num) (by omega)
+    linarith
+  have hΛpos : 0 < Λ := lt_of_lt_of_le (pow_pos hε r) hround
+  have hcard : (0 : ℚ) < Fintype.card κ := by exact_mod_cast Fintype.card_pos
+  have hSpos : (0 : ℚ) < (pathSurvivors e x σ (n + 1)).card := by
+    exact_mod_cast Finset.card_pos.mpr hS
+  have hTpos : 0 < ∏ t ∈ range n, T (σ t) (σ (t + 1)) :=
+    prod_pos fun t ht => hTσ t (mem_range.mp ht)
+  have hXpos : 0 < X := mul_pos (div_pos hSpos hcard) (mul_pos h0 hTpos)
+  have hR := neg_logb_le_of_le (by exact_mod_cast mul_pos hΛpos hXpos)
+    (show ((Λ * X : ℚ) : ℝ) ≤ ((∏ t ∈ range (n + 1), q t : ℚ) : ℝ) by exact_mod_cast hprod)
+  have hΛr : (0 : ℝ) < (Λ : ℝ) := by exact_mod_cast hΛpos
+  have hXr : (0 : ℝ) < (X : ℝ) := by exact_mod_cast hXpos
+  rw [Rat.cast_mul, Real.logb_mul hΛr.ne' hXr.ne'] at hR
+  -- the roundings: `−log₂ Λ ≤ r (−log₂ (1 − 2^(−j))) ≤ 3 r 2^(−j)`
+  have hεr : (0 : ℝ) < ((1 - (1 / 2 : ℚ) ^ j : ℚ) : ℝ) := by exact_mod_cast hε
+  have hlam : -Real.logb 2 (Λ : ℝ) ≤ r * (3 * (1 / 2 : ℝ) ^ j) := by
+    have h1 := neg_logb_le_of_le (by exact_mod_cast pow_pos hε r)
+      (show (((1 - (1 / 2 : ℚ) ^ j) ^ r : ℚ) : ℝ) ≤ (Λ : ℝ) by exact_mod_cast hround)
+    rw [Rat.cast_pow, Real.logb_pow] at h1
+    have h2 := mul_le_mul_of_nonneg_left (stay_code_le hj) (Nat.cast_nonneg (α := ℝ) r)
+    linarith
+  -- the ideal bound's expansion, as in `dormant_survivor_code`
+  have hSr : (0 : ℝ) < (pathSurvivors e x σ (n + 1)).card := by exact_mod_cast hSpos
+  have hKr : (0 : ℝ) < Fintype.card κ := by exact_mod_cast hcard
+  have h0r : (0 : ℝ) < (π (σ 0) : ℝ) := by exact_mod_cast h0
+  have hTr : ∀ t ∈ range n, ((T (σ t) (σ (t + 1)) : ℚ) : ℝ) ≠ 0 := fun t ht =>
+    (by exact_mod_cast (hTσ t (mem_range.mp ht)).ne' : ((T (σ t) (σ (t + 1)) : ℚ) : ℝ) ≠ 0)
+  have hXe : Real.logb 2 (X : ℝ) = Real.logb 2 ((pathSurvivors e x σ (n + 1)).card) -
+      Real.logb 2 (Fintype.card κ) + (Real.logb 2 (π (σ 0) : ℝ) +
+        ∑ t ∈ range n, Real.logb 2 (T (σ t) (σ (t + 1)) : ℝ)) := by
+    rw [hX]
+    push_cast
+    rw [Real.logb_mul (by positivity) (mul_pos h0r (prod_pos fun t ht => by
+        exact_mod_cast hTσ t (mem_range.mp ht))).ne', Real.logb_div hSr.ne' hKr.ne',
+      Real.logb_mul h0r.ne' (prod_ne_zero_iff.mpr hTr), Real.logb_prod _ _ hTr]
+  rw [hXe] at hR
+  linarith
+
+end ExecutedSurvivors
+
 section Audit
 
 #print axioms fwd_path_le
@@ -406,6 +691,11 @@ section Audit
 #print axioms share_path_code
 #print axioms stay_code_le
 #print axioms share_path_code_le
+#print axioms exec_total_le
+#print axioms exec_path_le
+#print axioms forward_executed_nonneg
+#print axioms dormant_survivor_executed
+#print axioms dormant_executed_code
 
 end Audit
 

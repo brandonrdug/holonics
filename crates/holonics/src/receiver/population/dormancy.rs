@@ -45,16 +45,22 @@
 //! stays zero, so the survivors (the zero pattern, and so death) are exactly the ideal's. The
 //! executed face `q̂(c) = S̃_c/Σ_c′ S̃_c′`, `S̃_c` the rounded sum of the weights emitting `c`, is exact
 //! and normalized, and it is what the family is scored by (its likelihood is the product of its
-//! executed faces, enclosed by `PassageCode`). [established-bounded] Each rounding multiplies a
-//! weight or a sum by a factor in `(1 − 2^(−62), 1]`; a rounding after the kernel is a charted face
-//! `f ρ` of the next cell, as `LocalWeighing.forward_executed` propagates them, and a rounded sum
-//! lowers the scored face by at most its factor, so the executed code exceeds the ideal bound above
-//! by at most the certified drift `3 · r · 2^(−62)` bits, `r` the roundings counted
-//! ([`Dormancy::drift`]; `−log₂(1 − x) < 3x` for `x ≤ ½`, Lean `Dormancy.stay_code_le`'s bound).
-//! [open] `forward_executed` is proved for positive faces; its nonnegative-face form (as
-//! `forward_dominance_nonneg` extends `forward_dominance`) is owed (#62). The test
-//! `the_dormant_filter_executes_the_exact_forward_mixture` checks the executed faces against the
-//! exact mixture stepped in ℚ.
+//! executed faces, enclosed by `PassageCode`). [proved-derived; formal-checked] Each rounding
+//! multiplies a weight or a sum by a factor in `(1 − 2^(−62), 1]`. A rounding after the kernel lowers
+//! the next weights by at most its factor, and a rounded sum lowers the scored face by at most its
+//! factor, so the executed code exceeds the ideal bound above by at most the certified drift
+//! `3 · r · 2^(−62)` bits, `r` the roundings counted ([`Dormancy::drift`]; Lean
+//! `Dormancy.{forward_executed_nonneg, dormant_survivor_executed, dormant_executed_code}`, the
+//! nonnegative-face form of `LocalWeighing.forward_executed` with the rounding on the weight after
+//! the kernel). [established-bounded; source-inspected, computational-witness] That `r` bounds
+//! every factor the Lean takes is read from this code (the counter adds every share, opening,
+//! accumulation and join rounding, more than any one chain needs) and checked on the chart by the
+//! test `the_roundings_counted_cover_every_factor_the_lean_takes`: against the exact step from the
+//! executed weights, the opening is within `1 − L·2^(−62)` of its prior, each weight after the
+//! kernel within `1 − L·2^(−62)` of the exact kernel and never above it, the scored class sum
+//! within `1 − m·2^(−62)` of its exact sum, `m` the weights and chunk pieces it adds, and each cell
+//! counts at least `m + L`. The test `the_dormant_filter_executes_the_exact_forward_mixture` checks
+//! the executed faces against the exact mixture stepped in ℚ.
 //!
 //! [definition] Of the winding guide's six objects this owner touches the **helix** (a ring's clock
 //! keeps winding while its layer is silent, and its key is read at its continued phase), the
@@ -747,3 +753,7 @@ impl Family for DormantFamily {
         work
     }
 }
+
+#[cfg(test)]
+#[path = "dormancy_tests.rs"]
+mod tests;
