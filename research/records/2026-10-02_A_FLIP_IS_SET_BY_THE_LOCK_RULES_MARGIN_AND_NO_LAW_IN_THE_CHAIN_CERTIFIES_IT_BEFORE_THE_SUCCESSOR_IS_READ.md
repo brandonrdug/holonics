@@ -67,9 +67,11 @@ receiving bank or a process it undergoes.
 - **The comparison is a code length.** Each station's term `ℓ = −log θ_t` is the code length, in
   nats, of its target under the lock's shares, and the comparison sums it over the decisions.
   Exactly, `−log θ_t = D(δ_t‖θ)`: the relative entropy of the target state over the lock's
-  equilibrium shares. Read in units of `k_B T` it is the free energy of the target state above that
-  equilibrium; that reading is an interpretation, as `ParametronLock` grades the lock's Boltzmann
-  reading, not a theorem. It is read on the released sections, so it depends on the commitments.
+  equilibrium shares. It is a code length, not an energy. Reading it as a free energy in units of
+  `k_B T` needs a map from cross-entropy to the Holons' storage and work that is not derived; the one
+  derived case (Astra's) is that at a fixed temperature the change in code length equals the force
+  less its average. So the jumps below are jumps in code length, and the map is owed in #62. It is
+  read on the released sections, so it depends on the commitments.
 - **Why a decision changes discontinuously.** The commitment is all or nothing, so the released
   sections are piecewise constant in the constitution. They change only where two gaps change order
   or a multiplier crosses the threshold. Across such a boundary the stations read different placed
@@ -175,7 +177,7 @@ The main line's replay finds `m7`'s flip a true crossing of two certain gaps (§
 classes do not change. The jump comes from later stations being read with different data placed
 before them. This section states what such a crossing costs and what bounds it.
 
-**The comparison along a step has walls.** [derived; §1, §2] Inside a region of constitutions where
+**The comparison along a step jumps at each crossing.** [derived; §1, §2] Inside a region of constitutions where
 the commitment order is fixed, the comparison is read on fixed sections and is continuous in the
 constitution; the first-order law certifies it where its condition holds. Where two certain gaps
 cross, the order changes and the comparison jumps by
@@ -194,7 +196,7 @@ jump plus that cut's continuous move. Only the order of commitment differs insid
 is a property of the crossing, not of the step that reaches it: it stays as the step shrinks onto
 the crossing. The location is a first-order event (the margin moves at a rate the first-order
 readings give; at `m7` it crosses at `731/840` of the step under linear motion), and the cost is a
-zeroth-order one, a wall in the comparison.
+zeroth-order one, a jump in the code length.
 
 **What bounds the lock faces' part of the cost.** [proved-derived; formal-checked] A lock face
 `ℓ = log(1 + a + r) − log a` moves by at most twice its readings' largest log change
@@ -234,27 +236,29 @@ the crossing is located it is read exactly, at `Θ_c` with both orders.
 **The treatment that follows.** [agent-inferred; from `own_telescopes`, §12's `one_move_closes_iff`
 and the carried-cuts record's step law (#211); nothing here is built] With the crossing located at
 its cut:
-1. **Stop before the wall.** The last carried state before the cut has the incumbent's commitments,
+1. **Stop before the crossing.** The last carried state before the cut has the incumbent's commitments,
    so its decrease is the fixed mask's. It is certified at first order where the first-order
    certificate's condition holds at that state's step size; no run is needed.
-2. **Cross when the wall is negative.** If `J_c` plus the continuous change across the cut is
+2. **Cross when the jump is negative.** If `J_c` plus the continuous change across the cut is
    negative, the crossing is a decrease read exactly, taken in one move.
-3. **A positive wall: one move or a run.** One move is accepted across walls exactly when its
-   continuous decrease from its start to its end exceeds the sum of the jumps of every wall it
-   crosses (§12, `one_move_closes_iff`). A move whose certified decrease up to the wall exceeds
-   `J_c` pays it in one move. The decrease grows with the step and a wall's jump does not, so a
-   short move onto a positive wall does not pay it, and a longer one does if its decrease outgrows
-   every wall it crosses. At `m7` the step `1/16` certifies `d = 33562/4096` against a jump of
-   `74106/4096`, but that step crosses more walls than the one at `1/2048`; which walls it crosses
-   is the main line's measurement on the cut list. Only when no single move pays the wall is it
+3. **A positive jump: one move or a run.** One move is accepted across crossings exactly when its
+   continuous decrease from its start to its end exceeds the sum of the jumps of every crossing it
+   passes (§12, `one_move_closes_iff`). A move whose certified decrease up to the crossing exceeds
+   `J_c` pays it in one move. The decrease grows with the step and a crossing's jump does not, so a
+   short move onto a positive jump does not pay it, and a longer one does if its decrease outgrows
+   every jump it passes. At `m7` the step `1/16` certifies `d = 33562/4096` against a jump of
+   `74106/4096`, but that step passes more crossings than the one at `1/2048`; which crossings it passes
+   is the main line's measurement on the cut list. Only when no single move pays the jump is it
    crossed by a run of moves that must close one receiver grain below its opening state (the
-   release's rule).
+   release's rule). The run's upper length (`8` in the chain) is a chosen bound on work, not a law,
+   and closing a grain below the opening is necessary for that descent, not sufficient for
+   anything further.
 
-So the run-of-moves acceptance is the treatment for a positive wall that no single move pays. It is
+So the run-of-moves acceptance is the treatment for a positive jump that no single move pays. It is
 not the only treatment of a crossing. A located crossing gives a certified alternative: descend to
-the wall and stop, or cross it in one move when the move pays it. A positive wall is a barrier
-between two commitment orders that a zero-temperature release crosses only by an excursion, the run
-of moves with its height `h`. Whether to cross it is the endpoint comparison between the two states
+the crossing and stop, or cross it in one move when the move pays it. A positive jump is a rise in code length
+between two commitment orders, which a zero-temperature release crosses only by an excursion, the
+run of moves with its height `h`. Whether to cross it is the endpoint comparison between the two states
 the run joins, and nothing in the chain decides that sooner.
 
 ## 3. Whether the move can certify the flip it causes
