@@ -355,6 +355,7 @@ fn the_collapse_keeps_the_retained_remainders_and_clocks() {
             depth: 2,
             prior: crate::compression::landmark::context::StopPrior::half(),
             mass: 1,
+            base: crate::compression::landmark::context::BaseMeasure::Even,
         },
     )
     .unwrap();
@@ -473,6 +474,7 @@ fn two_receiver_path() -> Field {
         depth: 2,
         prior: crate::compression::landmark::context::StopPrior::half(),
         mass: 1,
+        base: crate::compression::landmark::context::BaseMeasure::Even,
     });
     Field::declare(declared.by_lattice_rule()).unwrap()
 }
@@ -546,6 +548,7 @@ fn the_boundary_reaches_the_pending_ratios_and_refuses_out_of_turn() {
             depth: 2,
             prior: crate::compression::landmark::context::StopPrior::half(),
             mass: 1,
+            base: crate::compression::landmark::context::BaseMeasure::Even,
         },
     )
     .unwrap();

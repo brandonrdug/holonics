@@ -1102,6 +1102,36 @@ impl std::fmt::Display for Capacity {
 // -------------------------------------------------------------------------------------------
 // the declaration and its derived widths
 
+/// [definition; agent-inferred, October 2; the
+/// [contact loop record](../../../../research/records/2026-10-02_THE_CONTACT_LOOP_THE_RETURN_REACHES_EVERY_CONTACT_AND_ITS_CHANGE_IS_RELEASED_BEFORE_THE_LATER_CUT.md)
+/// §30–31] **The base measure of a node's prior masses.** `Even` splits a node's two prior masses
+/// `2^(−j)` evenly, the face `(2^j n_b + 1)/(2^j n + 2)`. `Root` splits them by one base shared by
+/// every node of the digit tree: its root's face at the even base, mixed with the even split at `½`
+/// and read at the receiver's grain `1/16`, `π_0 = ⌊16(½ k_root(0) + ¼) + ½⌋/16`, so each node's face
+/// is `(2^(j+4) n_b + 2·16π_b)/(2^(j+4) n + 32)`. A fresh or sparse context then leans on the
+/// unconditional split its digit tree has seen, not on an even one. Every node of a chain shares the
+/// base, so the storage where paths part stays exact; each base mass is at least a quarter, so the
+/// faces' floor is `1/(2(2^j n* + 2))`, one bit below `Even`'s.
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Hash)]
+pub enum BaseMeasure {
+    Even,
+    Root,
+}
+
+/// The base's split in sixteenths, `[16π_0, 16π_1]`, from the root's masses `[m_0, m_1]` at the
+/// even base (`Even`, or a digit tree with no root yet: `[8, 8]`).
+fn base_sixteenths(base: BaseMeasure, root: Option<[u32; 2]>) -> [u64; 2] {
+    match (base, root) {
+        (BaseMeasure::Root, Some([m0, m1])) => {
+            let (m0, total) = (u64::from(m0), u64::from(m0) + u64::from(m1));
+            // ⌊16(½ m_0/M + ¼) + ½⌋ = ⌊(2(8 m_0 + 4M) + M)/(2M)⌋, within [4, 12].
+            let zero = (2 * (8 * m0 + 4 * total) + total) / (2 * total);
+            [zero, 16 - zero]
+        }
+        _ => [8, 8],
+    }
+}
+
 /// [definition] **A landmark tree's declaration**: the exterior chart's `|A|`, the address depth
 /// `D` in bundles, the forced splits of the cell tree (context depths `d < forced` mix nothing,
 /// `λ_d = 0`), the declared population `n*` bounding the passage, the receiver's grain `L_R`, the
@@ -1109,7 +1139,8 @@ impl std::fmt::Display for Capacity {
 /// depth in its branch's letters; the joins of an enlarged tree keep their own `β = 1`), and the
 /// declared node law's capacity ([`Capacity`], the register's capacity; `Unbounded` is the KT node),
 /// and the node's prior mass exponent `j` (module header, "The prior mass"): each digit's two
-/// masses start at `2^(−j)`, so the node's face is `(2^j n_b + 1)/(2^j n + 2)`, KT at `j = 1`.
+/// masses start at `2^(−j)`, so the node's face is `(2^j n_b + 1)/(2^j n + 2)`, KT at `j = 1`, and the
+/// base measure those masses are split by ([`BaseMeasure`]).
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct LandmarkDeclaration {
     pub alphabet: usize,
@@ -1121,6 +1152,7 @@ pub struct LandmarkDeclaration {
     pub prior: StopPrior,
     pub capacity: Capacity,
     pub mass: u32,
+    pub base: BaseMeasure,
 }
 
 impl LandmarkDeclaration {
@@ -1220,17 +1252,47 @@ fn floor_reciprocal(population: u64, mass: u32) -> BigUint {
     (BigUint::from(population) << mass as usize) + 2u32
 }
 
+/// The faces' floor reciprocal at a base: `2^j n* + 2` at the even base, twice it at the root's
+/// (each base mass at least a quarter).
+fn based_floor(population: u64, mass: u32, base: BaseMeasure) -> BigUint {
+    match base {
+        BaseMeasure::Even => floor_reciprocal(population, mass),
+        BaseMeasure::Root => floor_reciprocal(population, mass) * 2u32,
+    }
+}
+
+/// `κ`'s operand: the largest face denominator, `2^j n* + 2` at the even base and `16(2^j n* + 2)`
+/// at the root's (its masses in sixteenths).
+fn mass_operand(population: u64, mass: u32, base: BaseMeasure) -> BigUint {
+    match base {
+        BaseMeasure::Even => floor_reciprocal(population, mass),
+        BaseMeasure::Root => floor_reciprocal(population, mass) * 16u32,
+    }
+}
+
 /// [definition; agent-inferred] **The path lattice's width** `M_p`: the least `M` with
 /// `2^M ≥ 3 B L_R (2^j n* + 2)(n* P² + 2P + 1)` at prior mass `2^(−j)`, which holds the lattice's
 /// rounding within a quarter grain a cell (module header, "The widths").
 pub fn face_bits(population: u64, digits: u64, grain: u64, depth: u64, mass: u32) -> u64 {
+    face_bits_at(population, digits, grain, depth, mass, BaseMeasure::Even)
+}
+
+/// [`face_bits`] at a base: its floor `1/(2(2^j n* + 2))` at the root's.
+pub fn face_bits_at(
+    population: u64,
+    digits: u64,
+    grain: u64,
+    depth: u64,
+    mass: u32,
+    base: BaseMeasure,
+) -> u64 {
     let (n, d) = (BigUint::from(population), BigUint::from(depth));
     let terms = &n * &d * &d + &d * 2u32 + 1u32;
     ceil_log2(
         &(BigUint::from(3u32)
             * BigUint::from(digits)
             * BigUint::from(grain)
-            * floor_reciprocal(population, mass)
+            * based_floor(population, mass, base)
             * terms),
     )
 }
@@ -1265,6 +1327,8 @@ pub struct Widths {
     pub rebase: u64,
     /// The prior mass exponent `j` the faces' floor `1/(2^j n* + 2)` reads.
     pub mass: u32,
+    /// The base measure the floor and `κ` read ([`BaseMeasure`]).
+    pub base: BaseMeasure,
 }
 
 impl Widths {
@@ -1284,14 +1348,15 @@ impl Widths {
         let carrier = carrier.unwrap_or_else(|| {
             carrier_width(declaration.population, digits, declaration.grain, depth)
         });
-        let face = face_bits(
+        let face = face_bits_at(
             declaration.population,
             digits,
             declaration.grain,
             depth,
             declaration.mass,
+            declaration.base,
         );
-        let kappa = floor_reciprocal(declaration.population, declaration.mass).bits();
+        let kappa = mass_operand(declaration.population, declaration.mass, declaration.base).bits();
         let rebase = if 2 * carrier + kappa + face + 1 > u64::from(u128::BITS) {
             126u64.saturating_sub(carrier)
         } else {
@@ -1304,6 +1369,7 @@ impl Widths {
             certificate: face + carrier,
             rebase,
             mass: declaration.mass,
+            base: declaration.base,
         }
     }
 
@@ -1313,7 +1379,7 @@ impl Widths {
     /// [`Beta::stop_weight`]), the β step's carrier `W + κ + M` and, unless the carrier rebases,
     /// its mantissa division `2W + κ + M + 1`, with `κ` the bits of `2^j n* + 2`.
     pub fn operand_bits(&self, population: u64) -> u64 {
-        let kappa = floor_reciprocal(population, self.mass).bits();
+        let kappa = mass_operand(population, self.mass, self.base).bits();
         let (m, w) = (self.face, self.carrier);
         let division = if self.rebase > 0 {
             self.rebase + w + 1
@@ -1339,14 +1405,14 @@ impl Widths {
     /// widths; the host's split operands ([`lattice_mix`], [`Beta::stop_weight`]) return the same
     /// integers wherever both admit.
     pub fn single_division_admitted(&self, population: u64) -> bool {
-        let kappa = floor_reciprocal(population, self.mass).bits();
+        let kappa = mass_operand(population, self.mass, self.base).bits();
         (2 * self.face + kappa + 3).max(2 * self.carrier + self.face + 3) <= u64::from(u128::BITS)
     }
 
     /// Whether the widths at a population admit every product in `u128`, the carrier rebase
     /// keeping at least `W` bits.
     fn admitted(&self, population: u64) -> bool {
-        let kappa = floor_reciprocal(population, self.mass).bits();
+        let kappa = mass_operand(population, self.mass, self.base).bits();
         let rebase_needed = 2 * self.carrier + kappa + self.face + 1 > u64::from(u128::BITS);
         let rebase_kept = !rebase_needed || 126u64.saturating_sub(self.carrier) >= self.carrier;
         rebase_kept && self.lattice_operands(kappa) <= u64::from(u128::BITS)
@@ -1865,6 +1931,24 @@ trait Topology {
             u64::from([zero, one][symbol]),
             u64::from(zero) + u64::from(one),
         )
+    }
+
+    /// The node's face of `b` at the declared base ([`BaseMeasure`]), its digit tree's root the
+    /// path's first node `root`: `Even` reads the masses `(m_b, M)`, `Root` reads
+    /// `(16 m_b − 16 + 2·16π_b, 16M)`, the masses `2^j n_b + 1` re-split by the base.
+    fn kt_based(&self, node: u32, symbol: usize, root: Option<u32>, base: BaseMeasure) -> (u64, u64) {
+        match base {
+            BaseMeasure::Even => self.kt(node, symbol),
+            BaseMeasure::Root => {
+                let [zero, one] = self.halves(node);
+                let split = base_sixteenths(base, root.map(|r| self.halves(r)));
+                let mass = u64::from([zero, one][symbol]);
+                (
+                    16 * mass - 16 + 2 * split[symbol],
+                    16 * (u64::from(zero) + u64::from(one)),
+                )
+            }
+        }
     }
 
     /// Refused when founding `nodes` more would pass 31-bit node numbers, or holding `letters` more
@@ -2928,9 +3012,9 @@ impl Law {
         }
     }
 
-    /// The leaf's lattice face `⟦k(0)⟧`.
-    fn leaf(&self, nodes: &impl Standing, node: u32) -> u64 {
-        let (u, v) = nodes.kt(node, 0);
+    /// The leaf's lattice face `⟦k(0)⟧`, its digit tree's root `root`.
+    fn leaf(&self, nodes: &impl Standing, node: u32, root: Option<u32>) -> u64 {
+        let (u, v) = nodes.kt_based(node, 0, root, self.declaration.base);
         self.round(u128::from(u) << self.widths.face, u128::from(v))
     }
 
@@ -2974,8 +3058,15 @@ impl Law {
         };
         let mut faces = vec![0u64; top + 1];
         faces[top] = match stop {
-            Stop::Node => self.leaf(nodes, path[top]),
-            Stop::Prior => self.full() / 2,
+            Stop::Node => self.leaf(nodes, path[top], path.first().copied()),
+            // Past the last stored level the prior: the base's split (`½` at the even base).
+            Stop::Prior => {
+                let split = base_sixteenths(
+                    self.declaration.base,
+                    path.first().map(|&root| nodes.halves(root)),
+                );
+                (self.full() >> 4) * split[0]
+            }
         };
         for level in (0..top).rev() {
             let weight = match &parting {
@@ -2985,7 +3076,8 @@ impl Law {
             faces[level] = if bottoms[level] < forced {
                 faces[level + 1]
             } else {
-                let (u, v) = nodes.kt(path[level], 0);
+                let (u, v) =
+                    nodes.kt_based(path[level], 0, path.first().copied(), self.declaration.base);
                 self.mix_stop(weight, u, v, faces[level + 1])
             };
         }
@@ -3059,7 +3151,12 @@ impl Law {
         if read.bottoms[level] < forced {
             return 0;
         }
-        let (u, v) = nodes.kt(read.nodes[level], read.symbol);
+        let (u, v) = nodes.kt_based(
+            read.nodes[level],
+            read.symbol,
+            read.nodes.first().copied(),
+            self.declaration.base,
+        );
         let here = u128::from(self.side(read.faces[level], read.symbol));
         let kt =
             |shift: u64| ceil_div(u128::from(v) << (certificate - face - shift), u128::from(u));
@@ -3191,6 +3288,8 @@ impl Law {
         let forced = self.branches[read.branch].forced;
         let top = read.faces.len() - 1;
         let levels = read.nodes.len();
+        // The digit tree's root, read at its counts before this deposit (the base measure).
+        let root = read.nodes.first().copied();
         // The parting chain's upper part, stepped here and founded below.
         let mut upper = read.parting.map(|parting| parting.upper);
         // Bottom-up over the stored levels: θ and the rebases add to the excess, the child's
@@ -3214,7 +3313,7 @@ impl Law {
                     Some(chart) if parts => chart.beta,
                     _ => nodes.chart(node).beta,
                 };
-                let (u, v) = nodes.kt(node, read.symbol);
+                let (u, v) = nodes.kt_based(node, read.symbol, root, self.declaration.base);
                 let (step, units) = self.beta_step(
                     beta,
                     u128::from(u),
@@ -3631,7 +3730,7 @@ impl Landmarks {
         );
         let paths = &n * &d * &d;
         let floor = (BigInt::one() << face as usize)
-            / BigInt::from(floor_reciprocal(declaration.population, declaration.mass));
+            / BigInt::from(based_floor(declaration.population, declaration.mass, declaration.base));
         let rounding = Rat::new(&paths + &d * 2 + 1, floor * 2);
         let splits = &paths + &d * &d;
         let mut rebases = Rat::from_integer(&paths + splits) * two_power(1 - carrier as i64);
@@ -3687,7 +3786,12 @@ impl Landmarks {
                     .nodes
                     .iter()
                     .map(|&node| {
-                        let (u, v) = self.nodes.kt(node, read.symbol);
+                        let (u, v) = self.nodes.kt_based(
+                            node,
+                            read.symbol,
+                            read.nodes.first().copied(),
+                            law.declaration.base,
+                        );
                         Rat::new(BigInt::from(u), BigInt::from(v))
                     })
                     .collect(),
@@ -4282,8 +4386,8 @@ impl IdealLandmarks {
         self.rebases
     }
 
-    fn kt(&self, node: u32, symbol: usize) -> Rat {
-        let (u, v) = self.arena.kt(node, symbol);
+    fn kt(&self, node: u32, symbol: usize, root: Option<u32>) -> Rat {
+        let (u, v) = self.arena.kt_based(node, symbol, root, self.declaration.base);
         Rat::new(BigInt::from(u), BigInt::from(v))
     }
 
@@ -4342,9 +4446,13 @@ impl IdealLandmarks {
             Stop::Node => nodes.len() - 1,
             Stop::Prior => nodes.len(),
         };
-        let mut faces = vec![Rat::new(BigInt::one(), BigInt::from(2)); top + 1];
+        let split = base_sixteenths(
+            self.declaration.base,
+            nodes.first().map(|&root| self.arena.halves(root)),
+        );
+        let mut faces = vec![Rat::new(BigInt::from(split[symbol]), BigInt::from(16)); top + 1];
         if stop == Stop::Node {
-            faces[top] = self.kt(nodes[top], symbol);
+            faces[top] = self.kt(nodes[top], symbol, nodes.first().copied());
         }
         for level in (0..top).rev() {
             faces[level] = if bottoms[level] < forced {
@@ -4354,7 +4462,8 @@ impl IdealLandmarks {
                     Some((_, upper, _)) if level + 1 == nodes.len() => upper,
                     _ => &self.beta[nodes[level] as usize],
                 };
-                (beta * self.kt(nodes[level], symbol) + &faces[level + 1]) / (Rat::one() + beta)
+                (beta * self.kt(nodes[level], symbol, nodes.first().copied()) + &faces[level + 1])
+                    / (Rat::one() + beta)
             };
         }
         IdealRead {
@@ -4428,7 +4537,7 @@ impl IdealLandmarks {
                     masses: read
                         .nodes
                         .iter()
-                        .map(|&node| self.kt(node, digit.symbol))
+                        .map(|&node| self.kt(node, digit.symbol, read.nodes.first().copied()))
                         .collect(),
                     betas,
                     faces: read.faces,
@@ -4501,7 +4610,7 @@ impl IdealLandmarks {
                 break;
             }
             let node = read.nodes[level] as usize;
-            let kt = self.kt(read.nodes[level], symbol);
+            let kt = self.kt(read.nodes[level], symbol, read.nodes.first().copied());
             let beta = match &upper {
                 Some(upper) if read.parts(level) => upper.clone(),
                 _ => self.beta[node].clone(),

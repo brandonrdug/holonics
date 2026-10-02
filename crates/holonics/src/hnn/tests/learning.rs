@@ -50,6 +50,7 @@ pub(super) fn path_with(aperture: usize, junctions: &[Rat], contacts: &[Rat]) ->
                 depth: 2,
                 prior: crate::compression::landmark::context::StopPrior::half(),
                 mass: 1,
+                base: crate::compression::landmark::context::BaseMeasure::Even,
             }],
             crib: CribDeclaration {
                 window: 16,
@@ -111,6 +112,7 @@ pub(super) fn chain_declaration(population: u64) -> FieldDeclaration {
             depth: 2,
             prior: crate::compression::landmark::context::StopPrior::half(),
             mass: 1,
+            base: crate::compression::landmark::context::BaseMeasure::Even,
         }],
         crib: CribDeclaration {
             window: 16,

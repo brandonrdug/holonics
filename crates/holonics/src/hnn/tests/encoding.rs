@@ -171,6 +171,7 @@ fn crib_field() -> Field {
                 depth: 2,
                 prior: StopPrior::half(),
                 mass: 1,
+                base: crate::compression::landmark::context::BaseMeasure::Even,
             }],
             crib: CribDeclaration {
                 window: 16,

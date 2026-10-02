@@ -156,6 +156,7 @@ pub(super) fn small_field(
                 depth: 2,
                 prior: crate::compression::landmark::context::StopPrior::half(),
                 mass: 1,
+                base: crate::compression::landmark::context::BaseMeasure::Even,
             }],
             crib: CribDeclaration {
                 window: 16,
