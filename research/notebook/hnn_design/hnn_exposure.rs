@@ -982,6 +982,9 @@ fn contact_ablation_run(field: &Field, cut: &Cut, windows: usize) {
     let (mut cells, mut c_cells) = (0, 0);
     let mut shifts: Vec<Rat> = Vec::new();
     let mut c_shifts: Vec<Rat> = Vec::new();
+    let mut changes: Vec<Rat> = Vec::new();
+    let mut anchors: Vec<Rat> = Vec::new();
+    let mut spreads: Vec<Rat> = Vec::new();
     for r in &readings {
         let order = if r.contacts.upper < r.held.lower {
             lower += 1;
@@ -1007,6 +1010,9 @@ fn contact_ablation_run(field: &Field, cut: &Cut, windows: usize) {
         c_cells += usize::from(r.continued_cells_differ);
         shifts.push(r.exponent_shift.clone());
         c_shifts.push(r.continued_exponent_shift.clone());
+        changes.push(r.factor_change.clone());
+        anchors.push(r.anchor_change.clone());
+        spreads.push(r.exponent_spread.clone());
         println!(
             "  window at {}: contacts moved {:?}; work {}; next window's contact states differ {}, logits {}, grain faces {}; continued anchors {}, logits {}, grain faces {}; code held [{}, {}) contacts [{}, {}): {order}; {} ms",
             r.position,
@@ -1025,9 +1031,19 @@ fn contact_ablation_run(field: &Field, cut: &Cut, windows: usize) {
             clock.elapsed().as_millis()
         );
     }
+    // The exponent spread by quarter of the windows, in window order (the receiver's gain over the
+    // exposure): each quarter's largest.
+    {
+        let quarter = spreads.len().div_ceil(4).max(1);
+        let by: Vec<String> = spreads
+            .chunks(quarter)
+            .map(|chunk| chunk.iter().max().cloned().unwrap_or_else(Rat::zero).to_string())
+            .collect();
+        println!("  exponent spread by quarter of the windows (largest each): {}", by.join(", "));
+    }
     // The exponent shifts against two grains: the declared tolerance 1/16 bit and 1/21 bit (below
     // the derived resolution, the contact loop record §11).
-    for (label, values) in [("fresh", &mut shifts), ("continued", &mut c_shifts)] {
+    for (label, values) in [("fresh", &mut shifts), ("continued", &mut c_shifts), ("relative factor change", &mut changes), ("relative anchor change (continued)", &mut anchors), ("exponent spread (continued, held)", &mut spreads)] {
         values.sort();
         let at = |q: usize| values.get(values.len().saturating_sub(1).min(q)).cloned().unwrap_or_else(Rat::zero);
         let n = values.len();

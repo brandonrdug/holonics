@@ -2968,6 +2968,13 @@ pub struct ContactAblation {
     /// contacts' change in the receiver's own units.
     pub exponent_shift: Rat,
     pub continued_exponent_shift: Rat,
+    /// The contacts-only commit's largest relative factor change: over the contacts and their three
+    /// factors, the largest entry change over that factor's largest entry.
+    pub factor_change: Rat,
+    /// The continued consumer's largest relative anchor change (largest entry change over the
+    /// largest anchor entry), and its exponent spread: the largest `|v_c − v_d|` within a phase.
+    pub anchor_change: Rat,
+    pub exponent_spread: Rat,
 }
 
 /// [measured-diagnostic] **The contact loop on a cut** (Astra's check, on the host reference): the
@@ -3047,6 +3054,32 @@ pub fn contact_ablation(
             .max()
             .unwrap_or_else(Rat::zero)
     };
+    let factor_change = |a: &Constitution, b: &Constitution| -> Rat {
+        let largest = |m: &crate::ratio::linear::ExactRatMatrix| {
+            m.entries().iter().map(|x| x.abs()).max().unwrap_or_else(Rat::zero)
+        };
+        let mut most = Rat::zero();
+        for c in 0..field.contacts().len() {
+            for (x, y) in [
+                (a.contact_storage(c), b.contact_storage(c)),
+                (a.contact_stiffness(c), b.contact_stiffness(c)),
+                (a.contact_dissipation(c), b.contact_dissipation(c)),
+            ] {
+                let scale = largest(x);
+                if scale.is_positive() {
+                    let moved = x
+                        .entries()
+                        .iter()
+                        .zip(y.entries())
+                        .map(|(p, q)| (p - q).abs())
+                        .max()
+                        .unwrap_or_else(Rat::zero);
+                    most = most.max(moved / scale);
+                }
+            }
+        }
+        most
+    };
     let mut out = Vec::new();
     for (k, span) in spans.iter().enumerate().take(windows) {
         let window = &cells[span.clone()];
@@ -3075,6 +3108,7 @@ pub fn contact_ablation(
                     alone = alone.with_reach(reach.clone());
                 }
                 let (successor, reading) = theta.deposited(&alone)?;
+                let successor_kept = successor.clone();
                 let continued = |c: &Constitution| -> Result<(Vec<Vec<Rat>>, Faces), HnnError> {
                     let operands = Operands::at_cut(field, c, resident.current())?;
                     let nothing: Vec<Vec<Rat>> =
@@ -3132,6 +3166,37 @@ pub fn contact_ablation(
                         cells_differ: grained(held_faces.as_ref()) != grained(moved_faces.as_ref()),
                         continued_cells_differ: grained(Some(&held_continued))
                             != grained(Some(&moved_continued)),
+                        factor_change: factor_change(&theta, &successor_kept),
+                        anchor_change: {
+                            let scale = held_anchors.iter().flatten().map(|x| x.abs()).max().unwrap_or_else(Rat::zero);
+                            let moved = held_anchors
+                                .iter()
+                                .flatten()
+                                .zip(moved_anchors.iter().flatten())
+                                .map(|(p, q)| (p - q).abs())
+                                .max()
+                                .unwrap_or_else(Rat::zero);
+                            if scale.is_positive() { moved / scale } else { Rat::zero() }
+                        },
+                        exponent_spread: held_continued
+                            .faces
+                            .iter()
+                            .map(|face| {
+                                let v: Vec<Rat> = face
+                                    .cells()
+                                    .iter()
+                                    .map(|c| {
+                                        Rat::from_integer(c.carry.clone())
+                                            + Rat::new(BigInt::from(c.phase), BigInt::from(face.grain()))
+                                            + &c.fibre
+                                    })
+                                    .collect();
+                                let hi = v.iter().max().cloned().unwrap_or_else(Rat::zero);
+                                let lo = v.iter().min().cloned().unwrap_or_else(Rat::zero);
+                                hi - lo
+                            })
+                            .max()
+                            .unwrap_or_else(Rat::zero),
                         exponent_shift: shift(held_faces.as_ref(), moved_faces.as_ref()),
                         continued_exponent_shift: shift(Some(&held_continued), Some(&moved_continued)),
                     });
