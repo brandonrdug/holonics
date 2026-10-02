@@ -1,0 +1,4 @@
+7d64f99f0c2c8e690261c1a1f9a84cc7aec32556
+56ff52c88d46c86d118dbe2fa853ae3a5dc51e2f2f3b9749a909037e5a559e91
+args executed move-once order2 2026093061 8 .local/fr/m7 m7=.local/fr/m6/m6-witness.state order-forced witness
+wall 457381 ms; exit 0; early stop 0
