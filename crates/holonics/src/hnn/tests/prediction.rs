@@ -896,3 +896,60 @@ fn the_committed_move_carries_the_transport_modulus() {
             .all(|r| r.generation.as_ref().unwrap().uncertified.is_none()));
     }
 }
+
+/// [definition; agent-inferred, October 2; the
+/// [contact loop record](../../../../../research/records/2026-10-02_THE_CONTACT_LOOP_THE_RETURN_REACHES_EVERY_CONTACT_AND_ITS_CHANGE_IS_RELEASED_BEFORE_THE_LATER_CUT.md)
+/// §5, Astra's second unit] **A contact's change is read by the continued word, with its work**:
+/// under the exact law, one word's retained change `x` continues at the predecessor and at a
+/// successor whose contact 0 storage factor moved (a control chart until the deposit's own contact
+/// moves land), with the same later drive (nothing injected, four ticks) and clock. The successor's continued
+/// word opens on `x` at exactly the predecessor's power plus the deposition work `½⟨x, ΔΘ x⟩`
+/// (`PowerForm::deposition_work`); every tick of both closes; and the moved contact's states, its
+/// outgoing waves and the receiving ring's storage differ at the end.
+#[test]
+fn a_contact_change_is_read_by_the_continued_word_with_its_work() {
+    use crate::hnn::word::PowerForm;
+    let field = chain().with_exact_word();
+    let theta = generic(&field, 73);
+    let current = Current::at_rest(&field);
+    let operands = Operands::exact_at_cut(&field, &theta, &current).unwrap();
+    let mut first = Word::on_operands(&field, operands, storage(&field, 74)).unwrap();
+    first.run(2).unwrap();
+    let x = first.change().unwrap();
+    let mut factor = theta.contact_storage(0).to_rows();
+    factor[0][0] += rat(1, 2);
+    let next = theta
+        .clone()
+        .with_channel(
+            0,
+            ExactRatMatrix::new(factor).unwrap(),
+            theta.contact_stiffness(0).clone(),
+            theta.contact_dissipation(0).clone(),
+        )
+        .unwrap();
+    let nothing: Vec<Vec<Rat>> = x.storage.iter().map(|w| vec![Rat::zero(); w.len()]).collect();
+    let continued = |constitution: &Constitution| {
+        let operands = Operands::exact_at_cut(&field, constitution, &current).unwrap();
+        let mut word = Word::continuing(&field, operands, &x, &nothing, 2).unwrap();
+        word.run(4).unwrap();
+        word
+    };
+    let (before, after) = (continued(&theta), continued(&next));
+    let (old, new) = (
+        PowerForm::read(&field, &theta, &current).unwrap(),
+        PowerForm::read(&field, &next, &current).unwrap(),
+    );
+    let work = old.deposition_work(&new, &x).unwrap();
+    assert!(!work.is_zero());
+    assert_eq!(before.field_balances()[0].before, old.power(&x).unwrap());
+    assert_eq!(after.field_balances()[0].before, new.power(&x).unwrap());
+    assert_eq!(new.power(&x).unwrap() - old.power(&x).unwrap(), work);
+    for tick in before.field_balances().iter().chain(after.field_balances()) {
+        assert!(tick.closes(), "{tick:?}");
+    }
+    let (a, b) = (before.change().unwrap(), after.change().unwrap());
+    assert_ne!(a.states[0], b.states[0]);
+    assert_ne!(a.arrivals[0], b.arrivals[0]);
+    let receiver = field.receivers()[0].ring;
+    assert_ne!(a.storage[receiver], b.storage[receiver]);
+}
