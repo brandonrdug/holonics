@@ -58,7 +58,11 @@ the laws that covector and its certified step stand on (the diagnosis record,
    enclosures (`lockFace_enclosure_sublevel`); read at each station's decision refinement it releases
    the section whole (`decisions_release_the_section`); its covector is `θ − q` and its first-order
    certificate is Danskin's bound over the members (`lockFace_first_order`,
-   `sum_upper_dini_descends`). Step 1b's candidate (§7).
+   `sum_upper_dini_descends`). Step 1b's candidate (§7). Read over `n` periods of the same passage
+   every candidate reads `a_x^n`, so the shares are a Gibbs state at inverse temperature `n`, and
+   the lock face lies within `log(2 + |s|)` above `n` times the hinge's positive part
+   (`lockFace_periods_hinge`); per period it tends to the hinge's positive part
+   (`lockFace_per_period_tendsto`): step 1a's hinge is step 1b's lock face at zero temperature.
 
 9. **The move's fixed points and one step's reach.** [proved-derived; formal-checked] A positive
    definite metric's step `−P g` rests exactly where `g = 0` (`metric_step_zero_iff`) and descends
@@ -652,6 +656,132 @@ theorem decisions_release_the_section {σ κ : Type*} (locks : ℕ → Finset σ
   intro r
   induction r using Nat.strong_induction_on with
   | _ r ih => exact hdec r fun r' hr' => ih r' hr'
+
+/-! ### The lock face over `n` periods: its inverse temperature and its zero-temperature face
+
+A member read over `n` repetitions of the same passage has the monodromy `M^n`, whose spectral
+radius is `ρ(M)^n`; so every candidate reads `A_x^n`, while the resting sheet, the lossless ring's
+return, stays `1`. The shares become `A_x^n/(1 + Σ A^n)`, a Gibbs state at inverse temperature `n`
+over the levels `−log A_x`: the lock face's temperature is the reciprocal of the number of periods
+the comparison reads, and the release reads one (the code-length map record, §3). -/
+
+/-- [proved-derived; formal-checked] **The lock face over `n` periods lies within the log of its
+sheet count above `n` times the hinge's positive part**:
+`n (f)_+ ≤ ℓ_n ≤ n (f)_+ + log(2 + |s|)`, `ℓ_n = lockFace (A_t^n) (Σ_(x∈s) A_x^n)`, with `f` the
+hinge term (`hingeTerm`) of the same readings. At one period (`n = 1`) the lock face exceeds the
+hinge's positive part by at most `log(2 + |s|)`. -/
+theorem lockFace_periods_hinge (s : Finset ι) (hs : s.Nonempty) (A : ι → ℝ) (t : ι)
+    (hA : ∀ x ∈ s, 0 < A x) (ht : 0 < A t) (n : ℕ) :
+    (n : ℝ) * max (hingeTerm s hs A t) 0 ≤ lockFace (A t ^ n) (∑ x ∈ s, A x ^ n) ∧
+      lockFace (A t ^ n) (∑ x ∈ s, A x ^ n) ≤
+        (n : ℝ) * max (hingeTerm s hs A t) 0 + Real.log (2 + s.card) := by
+  set M := max (hingeTerm s hs A t) 0 with hM
+  set a := A t ^ n with ha_def
+  set r := ∑ x ∈ s, A x ^ n with hr_def
+  have ha : 0 < a := pow_pos ht n
+  have hr : 0 ≤ r := Finset.sum_nonneg fun x hx => (pow_pos (hA x hx) n).le
+  have htot : 0 < 1 + a + r := by linarith
+  have hL : lockFace a r = Real.log (1 + a + r) - (n : ℝ) * Real.log (A t) := by
+    unfold lockFace
+    rw [Real.log_div htot.ne' ha.ne', ha_def, Real.log_pow]
+  -- the three faces bounded by `M`
+  have hsup : ∀ x ∈ s, Real.log (A x / A t) ≤ M := fun x hx =>
+    le_trans (Finset.le_sup' (fun x => Real.log (A x / A t)) hx)
+      (le_trans (le_max_left _ _) (le_max_left _ _))
+  have hrest : -Real.log (A t) ≤ M := le_trans (le_max_right _ _) (le_max_left _ _)
+  have hzero : (0 : ℝ) ≤ M := le_max_right _ _
+  constructor
+  · -- lower: `n M ≤ ℓ_n`, face by face
+    have hface : ∀ c : ℝ, (∀ k : ℕ, Real.exp ((k : ℝ) * c) * A t ^ k ≤
+        1 + A t ^ k + ∑ x ∈ s, A x ^ k) → (n : ℝ) * c ≤ lockFace a r := by
+      intro c hc
+      rw [hL]
+      have h := hc n
+      have hpos : 0 < Real.exp ((n : ℝ) * c) * A t ^ n := mul_pos (Real.exp_pos _) (pow_pos ht n)
+      have := Real.log_le_log hpos h
+      rw [Real.log_mul (Real.exp_pos _).ne' (pow_pos ht n).ne', Real.log_exp, Real.log_pow] at this
+      linarith
+    have hM' : M = max (hingeTerm s hs A t) 0 := rfl
+    rcases le_total (hingeTerm s hs A t) 0 with hneg | hpos
+    · rw [hM', max_eq_right hneg]
+      apply hface 0
+      intro k
+      simp only [mul_zero, Real.exp_zero, one_mul]
+      have : 0 ≤ ∑ x ∈ s, A x ^ k := Finset.sum_nonneg fun x hx => (pow_pos (hA x hx) k).le
+      linarith
+    · rw [hM', max_eq_left hpos]
+      unfold hingeTerm
+      rcases le_total (s.sup' hs fun x => Real.log (A x / A t)) (-Real.log (A t)) with h1 | h1
+      · rw [max_eq_right h1]
+        apply hface
+        intro k
+        rw [show Real.exp ((k : ℝ) * -Real.log (A t)) * A t ^ k = 1 by
+          rw [mul_neg, ← Real.log_pow, Real.exp_neg, Real.exp_log (pow_pos ht k)]
+          exact inv_mul_cancel₀ (pow_pos ht k).ne']
+        have : 0 ≤ ∑ x ∈ s, A x ^ k := Finset.sum_nonneg fun x hx => (pow_pos (hA x hx) k).le
+        linarith [pow_pos ht k]
+      · rw [max_eq_left h1]
+        obtain ⟨y, hy, hyeq⟩ := Finset.exists_mem_eq_sup' hs fun x => Real.log (A x / A t)
+        rw [hyeq]
+        apply hface
+        intro k
+        rw [show Real.exp ((k : ℝ) * Real.log (A y / A t)) * A t ^ k = A y ^ k by
+          rw [← Real.log_pow, Real.exp_log (pow_pos (div_pos (hA y hy) ht) k), div_pow,
+            div_mul_cancel₀ _ (pow_pos ht k).ne']]
+        have hle : A y ^ k ≤ ∑ x ∈ s, A x ^ k :=
+          Finset.single_le_sum (f := fun x => A x ^ k)
+            (fun x hx => (pow_pos (hA x hx) k).le) hy
+        linarith [pow_pos ht k]
+  · -- upper: every sheet below `B^n`, `B = e^M A_t`
+    set B := Real.exp M * A t with hB
+    have hBpos : 0 < B := mul_pos (Real.exp_pos _) ht
+    have hlogB : Real.log B = M + Real.log (A t) := by
+      rw [hB, Real.log_mul (Real.exp_pos _).ne' ht.ne', Real.log_exp]
+    have hle_of_log : ∀ c : ℝ, 0 < c → Real.log c ≤ Real.log B → c ≤ B := fun c hc h =>
+      (Real.log_le_log_iff hc hBpos).mp h
+    have h1B : 1 ≤ B := by
+      have := hle_of_log 1 one_pos (by rw [Real.log_one, hlogB]; linarith)
+      exact this
+    have htB : A t ≤ B := hle_of_log (A t) ht (by rw [hlogB]; linarith)
+    have hxB : ∀ x ∈ s, A x ≤ B := fun x hx => hle_of_log (A x) (hA x hx) (by
+      rw [hlogB]
+      have := hsup x hx
+      rw [Real.log_div (hA x hx).ne' ht.ne'] at this
+      linarith)
+    have hsum : r ≤ s.card * B ^ n := by
+      rw [hr_def]
+      have := Finset.sum_le_card_nsmul s (fun x => A x ^ n) (B ^ n) fun x hx =>
+        pow_le_pow_left₀ (hA x hx).le (hxB x hx) n
+      simpa [nsmul_eq_mul] using this
+    have htot_le : 1 + a + r ≤ (2 + s.card) * B ^ n := by
+      have h1 : (1 : ℝ) ≤ B ^ n := one_le_pow₀ h1B
+      have h2 : a ≤ B ^ n := pow_le_pow_left₀ ht.le htB n
+      nlinarith
+    have hlog := Real.log_le_log htot htot_le
+    have hcard : (0 : ℝ) < 2 + s.card := by positivity
+    rw [Real.log_mul hcard.ne' (pow_pos hBpos n).ne', Real.log_pow, hlogB] at hlog
+    rw [hL]
+    nlinarith
+
+/-- [proved-derived; formal-checked] **The hinge is the lock face's zero-temperature face**: per
+period, the lock face read over `n` periods tends to the hinge's positive part,
+`ℓ_n / n → (f)_+`. Step 1a's comparison is step 1b's in the limit of many periods. -/
+theorem lockFace_per_period_tendsto (s : Finset ι) (hs : s.Nonempty) (A : ι → ℝ) (t : ι)
+    (hA : ∀ x ∈ s, 0 < A x) (ht : 0 < A t) :
+    Tendsto (fun n : ℕ => lockFace (A t ^ n) (∑ x ∈ s, A x ^ n) / n) atTop
+      (𝓝 (max (hingeTerm s hs A t) 0)) := by
+  set M := max (hingeTerm s hs A t) 0
+  have hgap : Tendsto (fun n : ℕ => M + Real.log (2 + s.card) / n) atTop (𝓝 M) := by
+    simpa using (tendsto_const_div_atTop_nhds_zero_nat (Real.log (2 + s.card))).const_add M
+  refine tendsto_of_tendsto_of_tendsto_of_le_of_le' tendsto_const_nhds hgap ?_ ?_
+  · filter_upwards [eventually_ge_atTop 1] with n hn
+    have hnpos : (0 : ℝ) < n := by exact_mod_cast hn
+    rw [le_div_iff₀ hnpos, mul_comm]
+    exact (lockFace_periods_hinge s hs A t hA ht n).1
+  · filter_upwards [eventually_ge_atTop 1] with n hn
+    have hnpos : (0 : ℝ) < n := by exact_mod_cast hn
+    rw [div_le_iff₀ hnpos, add_mul, div_mul_cancel₀ _ hnpos.ne', mul_comm]
+    exact (lockFace_periods_hinge s hs A t hA ht n).2
 
 end LockFace
 
@@ -1825,6 +1955,8 @@ section Audit
 #print axioms lockFace_covector
 #print axioms lockFace_share_lt_one
 #print axioms decisions_release_the_section
+#print axioms lockFace_periods_hinge
+#print axioms lockFace_per_period_tendsto
 #print axioms lockTerm_eq
 #print axioms lockTerm_mono
 #print axioms lockTerm_line
