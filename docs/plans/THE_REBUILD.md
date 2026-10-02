@@ -733,6 +733,17 @@ that fires becomes the next loop's subject, and nothing downstream starts.
     - *The kinetic move, October 2* ([record](../../research/records/2026-10-02_THE_KINETIC_MOVE_FROM_THE_OPENING_MEASURED_THE_COMPARISON_FALLS_FASTEST_AND_THE_DECISIONS_STAY.md)). The full Gauss–Newton
       move descends the comparison furthest and the decisions stay; the comparison-descent line
       ends. Next: the owner-to-consumer read of a return-driven contact change.
+    - *The contact loop, October 2* ([record](../../research/records/2026-10-02_THE_CONTACT_LOOP_THE_RETURN_REACHES_EVERY_CONTACT_AND_ITS_CHANGE_IS_RELEASED_BEFORE_THE_LATER_CUT.md),
+      §1–35). On campaign 1's text the return reaches every contact, its change is released before
+      the later cut and the next word reads it (the METHOD's test), but the change lands in the
+      receiver's fibre. The receiving map's class-metric step, then the receiving tree's own laws
+      (prior mass `2^(−3)`, depth 63 as its storage limit, the root's base) lowered the held-out
+      code from 208 to 561 bits below PPM order 2. The field's share on text is four to nine
+      held-out bits at about half of each window's time: its reading is a clock-indexed linear map
+      of the passage's phase-binned counts and nothing of a word persists (§27, §33); a latched
+      sheet kept across windows adds a seventeenth of a percent at 200,000 cells (§34). Text is
+      measured out for campaign 1. Next: step 1's own terrains, where the blocker stands as the
+      kinetic move left it, the native move's path to a representation the refit shows exists.
   - *1b's subject, as 1a named it*: a comparison whose descent must move decisions, one
     that holds a margin on right decisions, is not minimized on ties, and is read where a reading
     carries information about the key. The governing law "loss is the log of a ratio" is the
