@@ -1,0 +1,29 @@
+== from generic(301)
+deposit 0: 13 certified, 13 vanished; moved []
+deposit 1: 13 certified, 13 vanished; moved []
+deposit 2: 13 certified, 13 vanished; moved []
+deposit 3: 13 certified, 13 vanished; moved []
+deposit 4: 13 certified, 13 vanished; moved []
+deposit 5: 13 certified, 13 vanished; moved []
+deposit 6: 13 certified, 13 vanished; moved []
+deposit 7: 13 certified, 13 vanished; moved []
+ring 0: passive moved false
+ring 1: passive moved false
+ring 2: passive moved false
+contact 0: factors moved (false, false, false)
+contact 1: factors moved (false, false, false)
+== from the declared opening
+deposit 0: 1 certified, 1 vanished; moved []
+deposit 1: 1 certified, 1 vanished; moved []
+deposit 2: 1 certified, 1 vanished; moved []
+deposit 3: 1 certified, 1 vanished; moved []
+deposit 4: 1 certified, 1 vanished; moved []
+deposit 5: 1 certified, 1 vanished; moved []
+deposit 6: 1 certified, 1 vanished; moved []
+deposit 7: 1 certified, 1 vanished; moved []
+ring 0: passive moved false
+ring 1: passive moved false
+ring 2: passive moved false
+contact 0: factors moved (false, false, false)
+contact 1: factors moved (false, false, false)
+commit 69503724bf2c0512cc45d4392fe8e08adb5b754f
