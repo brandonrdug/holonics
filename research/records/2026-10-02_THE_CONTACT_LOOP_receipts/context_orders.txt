@@ -1,0 +1,10 @@
+PPM order 0: training 12886028/2^9 bits over 4958 cells, held out 12894750/2^11 bits over 1190 cells
+PPM order 1: training 10980741/2^9 bits over 4958 cells, held out 9597120/2^11 bits over 1190 cells
+PPM order 2: training 9791935/2^9 bits over 4958 cells, held out 16031226/2^12 bits over 1190 cells
+PPM order 3: training 9506802/2^9 bits over 4958 cells, held out 14871358/2^12 bits over 1190 cells
+PPM order 4: training 9539207/2^9 bits over 4958 cells, held out 14691963/2^12 bits over 1190 cells
+PPM order 5: training 9592309/2^9 bits over 4958 cells, held out 14789372/2^12 bits over 1190 cells
+PPM order 6: training 9631889/2^9 bits over 4958 cells, held out 14855218/2^12 bits over 1190 cells
+PPM order 7: training 9646956/2^9 bits over 4958 cells, held out 14905952/2^12 bits over 1190 cells
+PPM order 8: training 9654132/2^9 bits over 4958 cells, held out 14919225/2^12 bits over 1190 cells
+args: context_orders.py over the pinned cut's first n* = 6148 cells, held out from 4958; PPM order 2 matches the exposure's (held out 3913 + 13/16 + eps bits, training 19124 + 13/16 + eps); wall under 1 s

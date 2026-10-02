@@ -538,3 +538,20 @@ fn a_reached_contact_family_moves_or_is_named_a_rounding_refusal() {
     };
     assert_ne!(later(&mut pre), later(&mut post));
 }
+
+/// The refining grain's dyadic exponent is the least `k` with `2^k ≥ L(N) = ⌈√(N ln 2/2)⌉`:
+/// `L(1) = 1`, `L(3) = 2`, `L(6144) = 47`.
+#[test]
+fn the_refining_grain_exponent_reads_the_least_dyadic_cover_of_the_grain() {
+    use crate::hnn::reference::refining_grain_exponent;
+    assert_eq!(refining_grain_exponent(1).unwrap(), 0);
+    assert_eq!(refining_grain_exponent(3).unwrap(), 1);
+    assert_eq!(refining_grain_exponent(6144).unwrap(), 6);
+    // Monotone over a campaign's counts, growing by at most one level a step of two readings.
+    let mut last = 0;
+    for n in (2..8000u64).step_by(2) {
+        let k = refining_grain_exponent(n).unwrap();
+        assert!(k == last || k == last + 1, "{n}: {last} -> {k}");
+        last = k;
+    }
+}

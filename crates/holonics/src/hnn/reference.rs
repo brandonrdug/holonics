@@ -267,6 +267,59 @@ impl Resident {
                 .collect(),
         ))
     }
+
+    /// [definition; agent-inferred, October 2; the contact loop record §23] **The contacts'
+    /// refining grain**: every retained channel re-based by `levels` onto its finer lattice
+    /// ([`Constitution::rebased`]), published as one commit per channel. Returns the channels
+    /// re-based. The ring loci keep their lattice (their re-base is refused).
+    pub fn refine_contact_grain(&mut self, levels: u32) -> Result<usize, HnnError> {
+        if levels == 0 {
+            return Ok(0);
+        }
+        let mut next = self.constitution.clone();
+        let mut count = 0;
+        for contact in 0.. {
+            let locus = Locus::Channel(contact);
+            if next.lattice(locus).is_err() {
+                break;
+            }
+            if next.released().contains(&locus) {
+                continue;
+            }
+            next = next.rebased(locus, levels)?;
+            count += 1;
+        }
+        self.constitution = next;
+        Ok(count)
+    }
+}
+
+/// [definition; agent-inferred, October 2; the contact loop record §23] **The dyadic exponent of
+/// the refining grain** (Lean `HNN/Ratio/Resolution.refiningGrain`, `grainRead_of_refined`): the
+/// least `k` with `2^k ≥ L(N) = ⌈√(N ln 2/2)⌉`, which is the least `k` with `2^(2k+1) ≥ N ln 2`
+/// (`2^k ≥ L` exactly when `2^k ≥ √(N ln 2/2)`, since `2^k` is an integer). `ln 2` is read through
+/// its enclosure; a count whose comparison falls inside it is refused, never rounded.
+pub fn refining_grain_exponent(readings: u64) -> Result<u32, HnnError> {
+    let ln2 = crate::hnn::executed::ln_two()?;
+    let n = Rat::from_integer(BigInt::from(readings));
+    for k in 0u32..64 {
+        let power = Rat::from_integer(BigInt::from(2u8).pow(2 * k + 1));
+        if power >= &n * &ln2.upper {
+            return Ok(k);
+        }
+        if power >= &n * &ln2.lower {
+            return Err(HnnError::Shape {
+                what: "the refining grain's comparison inside ln 2's enclosure",
+                expected: 0,
+                found: readings as usize,
+            });
+        }
+    }
+    Err(HnnError::Shape {
+        what: "a refining grain exponent below 64",
+        expected: 64,
+        found: readings as usize,
+    })
 }
 
 impl PendingSlot {
@@ -739,6 +792,7 @@ pub struct Reference {
     pending_capacity: usize,
     budget: u64,
     deadline: Option<u64>,
+    refining: bool,
 }
 
 impl Reference {
@@ -753,6 +807,17 @@ impl Reference {
             pending_capacity,
             budget,
             deadline: None,
+            refining: false,
+        }
+    }
+
+    /// [definition; agent-inferred, October 2; the contact loop record §23] **The contacts on the
+    /// refining grain**: after each deposit, every retained channel is re-based by the levels the
+    /// readings' dyadic grain exponent grew ([`refining_grain_exponent`]).
+    pub fn with_refining_grain(self) -> Self {
+        Self {
+            refining: true,
+            ..self
         }
     }
 
@@ -2947,6 +3012,7 @@ impl Reference {
                 budget: self.budget,
                 pending_capacity: self.pending_capacity,
                 deadline: self.deadline,
+                refining: self.refining,
             },
             field,
             cut,
@@ -2968,6 +3034,7 @@ impl Reference {
                 budget: self.budget,
                 pending_capacity: self.pending_capacity,
                 deadline: self.deadline,
+                refining: self.refining,
             },
             field,
             cut,
@@ -3654,11 +3721,23 @@ pub trait ExposedResident {
     fn state_bits_without_collapse(&self) -> u64;
     fn tally(&self) -> &ChartTally;
     fn wall(&self) -> &WallTimes;
+    /// The contacts' refining grain ([`Resident::refine_contact_grain`]); a realization without it
+    /// refuses.
+    fn refine_contact_grain(&mut self, _levels: u32) -> Result<usize, HnnError> {
+        Err(HnnError::Shape {
+            what: "the contacts' refining grain on this realization",
+            expected: 1,
+            found: 0,
+        })
+    }
 }
 
 impl ExposedResident for Resident {
     fn admitted(&self) -> &[ReceivingPhases] {
         Resident::admitted(self)
+    }
+    fn refine_contact_grain(&mut self, levels: u32) -> Result<usize, HnnError> {
+        Resident::refine_contact_grain(self, levels)
     }
     fn constitution(&self) -> &Constitution {
         Resident::constitution(self)
@@ -3694,6 +3773,9 @@ pub struct Declared {
     pub budget: u64,
     pub pending_capacity: usize,
     pub deadline: Option<u64>,
+    /// The contacts' lattices follow the refining grain of the readings deposited
+    /// ([`refining_grain_exponent`]), re-based after each deposit by the levels its exponent grew.
+    pub refining: bool,
 }
 
 /// **Run campaign 1's exposure protocol on a cut through any execution port** (module header, "The
@@ -3951,6 +4033,12 @@ where
                             vanished,
                             storage_growth,
                         });
+                        if declared.refining {
+                            let readings = aperture as u64 * deposits;
+                            let before = refining_grain_exponent(readings - aperture as u64)?;
+                            let after = refining_grain_exponent(readings)?;
+                            resident.refine_contact_grain(after - before)?;
+                        }
                     }
                     Err(refusal @ HnnError::ConstitutionBudget { .. }) => {
                         stop = BudgetStop::of(&refusal).map(|stop| (stop, position as u64));

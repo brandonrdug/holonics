@@ -845,8 +845,13 @@ carrying the readout's certified bound `‖R‖₂²` and the station score's cu
 worst case `s = ½` (module header, "The certified step"; `Constitution::power_gain`,
 `element_gain`, `source_gain`). The class metric lets `R` grow, so `‖R‖₂²` grows. The interior's
 covectors arrive through `Rᵀ` and grow as `‖R‖`, so its unit step grows as `‖R‖`, while its
-certified step falls as `1/‖R‖²`. Its realized move falls as `1/‖R‖`: the interior learns more
-slowly the better the receiver reads.
+certified step falls as `1/‖R‖²`. ~~Its realized move falls as `1/‖R‖`: the interior learns more
+slowly the better the receiver reads.~~ [Edit, October 2: the same receipts count the deposits at
+which each family took a coarse coordinate, and they do not support this. Over the twelve element
+families the count rises from 13,528 to 16,513 of 36,864 (element 2's passive part from 1,039 to
+2,954); over the twelve contact families it falls from 5,460 to 5,021, with contacts 0 and 3 frozen
+at none; the four standings fall from 258 to 59. The steps shrink, but the covector grows with them,
+so the realized moves are not uniformly slower. §23 reads what they do to the code.]
 
 [agent-inferred] This is the class-metric defect moved one locus inward. `R`'s own fix read its
 curvature in the readings' Fisher form instead of the worst case. The interior needs the same:
@@ -854,3 +859,81 @@ the station score's curvature along the interior's actual move, `Var_p` of the s
 change, in place of `s ‖R‖₂² b`. That requires the interior step's effect on the station logits,
 a tangent pass through the word, which the machine does not have. That is the next build, and its
 gate is again the held-out code.
+
+## 23. The anchors carry the clock, not the passage; the past carries more
+
+Three reads on campaign 1 at `7afbb887` (the class-metric step), each against the held-out code.
+
+**The contacts on the refining grain.** §14 traced the contacts' freeze to the declared lattice:
+an entry moves one coarse unit only after its statistic grows by `e^(u/κ)`. The derived schedule
+is the receiver's confirmable grain `L(N) = ⌈√(N ln 2/2)⌉`, read dyadically
+(`HNN/Ratio/Resolution.grainRead_of_refined`). `Reference::with_refining_grain` re-bases every
+retained channel after each deposit by the levels `k(N) = ⌈log₂ L(N)⌉` grew, `k(N)` the least `k`
+with `2^(2k+1) ≥ N ln 2` (`refining_grain_exponent`, `Resident::refine_contact_grain`,
+`Constitution::rebased`). Over the 6,144 readings that is six levels on every contact, `2^(−9)` to
+`2^(−15)` (contact 2 from `2^(−10)`) ([exposure](2026-10-02_THE_CONTACT_LOOP_receipts/refining_grain_exposure.txt):
+703,768 ms against a projection of 596 s, inside the 720 s deadline).
+
+| Reading | Class metric (§19) | And the refining grain |
+|---|---|---|
+| contacts 1 and 2, deposits with a coarse move (of 3,072) | 163 to 1,441 | 2,832 to 3,064 |
+| contacts 0 and 3 | none | 66 to 752 |
+| held out, model − PPM-2 | `−208 + 0/16 + ε` bits | `−209 + 13/16 + ε` bits |
+| held out, the wave's contribution | `−13 + 9/16 + ε` bits | `−13 + 6/16 + ε` bits |
+| training, model − PPM-2 | `−699 + 8/16 + ε` bits | `−699 + 12/16 + ε` bits |
+
+Every contact moves now, at nearly every deposit for contacts 1 and 2. The held-out code falls by
+`3/16` bit over 1,190 cells and the training code rises by `1/4` bit over 4,958: no measurable
+change. The freeze was real, and it was not what kept the contacts from helping. Their change lands
+where §9 found it, in the receiver's fibre. The refining grain stays an option of the exposure
+(`grain refining`), not the declared schedule, because it does not pass the gate.
+
+**What the anchors carry under richer receivers.** The three-aeon samples of §21, regenerated
+(1,320,724 ms against 1,256 s projected, inside the 1,400 s deadline), were fitted on each close's
+earlier readings and scored on the next aeon's
+([receipt](2026-10-02_THE_CONTACT_LOOP_receipts/anchors_richer_receivers.txt),
+`receiver_nonlinear.py`). Bits a reading on the combined face:
+
+| Next aeon | Tree alone | `R` (§21) | 512 random Fourier features of `z` | 16 nearest anchors mixed in |
+|---|---|---|---|---|
+| after close 1 | `14967487/2^22` | `14899768/2^22` | `14810578/2^22` | worse than linear (mixing `1/16` chosen) |
+| after close 2 | `13930200/2^22` | `13802783/2^22` | `13812315/2^22` | mixing `0` chosen |
+| after close 3 (70 readings) | `13962286/2^22` | `13793218/2^22` | `13786855/2^22` | mixing `0` chosen |
+
+A nonlinear receiver gains about `1/50` bit a reading over `R` after the first close, and nothing
+after the second. Quadratic features overfit (above the tree alone after close 1), and those fits
+were stopped: incomplete. The anchors hold about `1/33` bit a reading beyond the tree for every
+receiver tried.
+
+**What the anchors remember** ([receipt](2026-10-02_THE_CONTACT_LOOP_receipts/anchor_memory.txt),
+`anchor_memory.py`; sample `i` is the reading of cell `i`). Readings that share their preceding `j`
+cells were compared with pairs at the same time lags:
+- for `j` from 1 to 4, their anchors are as far apart as any pair at those lags (`8408164/2^23`,
+  `16384342/2^24`, `16623190/2^24`, `16752357/2^24`). Up to `j = 12` no ratio falls below one, and
+  only the 17 and 4 pairs at `j = 16` and `24` come closer;
+- the anchor's distance at lag 2 is `15816546/2^27` of the overall, at lag 1 `11863886/2^24`. It
+  alternates with the window's two phases and drifts slowly. Its linear transport over two readings
+  has eigenvalue moduli between `15620423/2^24` and `16342757/2^24`, a memory of some forty cells;
+- the residual of that transport, the innovation, is about a quarter of the anchor's variance
+  (`15980795/2^26`, `16247760/2^26`), and grouping it by the two cells just entered leaves
+  `14302002/2^24` and `15587670/2^24` of it. The cells entered account for about a seventh of a
+  quarter.
+
+**What the past carries** ([receipt](2026-10-02_THE_CONTACT_LOOP_receipts/context_orders.txt),
+`context_orders.py`, an exterior yardstick, never a machine part). Prediction by partial matching
+over the same cells, its order 2 matching the exposure's to the bit, codes the held-out cells in
+`14691963/2^12` bits at order 4, the best order. The tree alone codes them in about
+`3718 + 5/16 + ε` bits and the machine in `3705 + 14/16 + ε`. Order 4 is `119 + 0/16 + ε` bits below the
+machine, about a tenth of a bit a reading, while in training the tree beats every order. That is a
+lower bound on what the past still holds about the held-out cells beyond the machine; a better
+model of the past holds more.
+
+[agent-inferred] The receiver is not the limit, and neither is the contacts' freeze. The anchor the
+receiver reads is the ring's own transported state, rotated by the clock: it alternates with the
+phase, decays over some forty cells, and its innovation is barely a function of the cells that
+entered. The machine therefore cannot use the tenth of a bit a reading that recent contexts carry.
+The lever is the source passage's entry into the anchor, the moments
+`m_g = Σ_k Ĝ_g(τ_g(k))⁻¹ E_g(u_k)`: the encoded cell `E_g(u_k)` must dominate the innovation
+over the transport's own motion. The next read separates the innovation's parts at their owner:
+the term `E_g(u_k)` against the transport `Ĝ_g(τ_g(k))⁻¹`, with the anchors read before the
+clock's rotation as well as after it.

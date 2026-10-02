@@ -231,6 +231,7 @@ fn main() {
     let mut information = 0usize;
     let mut descent = false;
     let mut samples_out: Option<String> = None;
+    let mut refining = false;
     for pair in arguments.chunks(2) {
         match pair {
             [key, value] if key == "cells" => cells = Some(value.clone()),
@@ -256,6 +257,7 @@ fn main() {
             }
             [key, value] if key == "descent" => descent = value == "on",
             [key, value] if key == "samples" => samples_out = Some(value.clone()),
+            [key, value] if key == "grain" && value == "refining" => refining = true,
             _ => {
                 println!(
                     "usage: hnn_exposure [cut-file <path>] [cells <N|all>] [held-out <cells>] [windows <deadline>] [realization <host|card>] [resonator <none|source>] [gate f2]"
@@ -319,6 +321,12 @@ fn main() {
     let reference = match deadline {
         Some(windows) => Reference::campaign_one().with_deadline(windows),
         None => Reference::campaign_one(),
+    };
+    let reference = if refining {
+        println!("grain: the contacts on the refining grain (re-based by the dyadic exponent of L(N))");
+        reference.with_refining_grain()
+    } else {
+        reference
     };
     let constitution = loaded.then(|| loaded_constitution(&field));
     let setup = setup.elapsed().as_millis();

@@ -1,0 +1,18 @@
+readings 2330 (aeon 1 onward); overall mean squared pair distance 15982161/2^35
+lag profile (mean squared distance at the lag over the overall): 1 11863886/2^24; 2 15816546/2^27; 3 12866914/2^24; 4 14225734/2^26; 8 12295911/2^25; 16 10646294/2^24; 64 14605846/2^24; 256 13069883/2^24; 1024 11683365/2^24
+depth 1: 2314 readings in repeated contexts, 159482 pairs; within over overall 8404652/2^23, within over the same lags 8408164/2^23
+depth 2: 2120 readings in repeated contexts, 17139 pairs; within over overall 16388381/2^24, within over the same lags 16384342/2^24
+depth 3: 1682 readings in repeated contexts, 4830 pairs; within over overall 16660371/2^24, within over the same lags 16623190/2^24
+depth 4: 1199 readings in repeated contexts, 2252 pairs; within over overall 8419522/2^23, within over the same lags 16752357/2^24
+depth 6: 586 readings in repeated contexts, 757 pairs; within over overall 8834997/2^23, within over the same lags 8624457/2^23
+depth 8: 307 readings in repeated contexts, 386 pairs; within over overall 9253102/2^23, within over the same lags 8882070/2^23
+depth 12: 98 readings in repeated contexts, 84 pairs; within over overall 9823525/2^23, within over the same lags 8898239/2^23
+depth 16: 34 readings in repeated contexts, 17 pairs; within over overall 12432982/2^24, within over the same lags 10425154/2^24
+depth 24: 8 readings in repeated contexts, 4 pairs; within over overall 13312698/2^25, within over the same lags 11118064/2^25
+phase 0: 1162 readings; innovation over the anchors' variance 15980795/2^26; the transport's largest eigenvalue moduli 15709649/2^24 15709649/2^24 16141175/2^24 16206715/2^24
+  the innovation grouped by the two cells entered: 4443 pairs; within over overall 14302002/2^24
+  the innovation grouped by the cell before: 38921 pairs; within over overall 14849721/2^24
+phase 1: 1162 readings; innovation over the anchors' variance 16247760/2^26; the transport's largest eigenvalue moduli 15620423/2^24 15846648/2^24 15846648/2^24 16342757/2^24
+  the innovation grouped by the two cells entered: 4150 pairs; within over overall 15587670/2^24
+  the innovation grouped by the cell before: 40795 pairs; within over overall 8953740/2^23
+args: anchor_memory.py over the same samples and the pinned cut; under 60 s
