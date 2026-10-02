@@ -87,11 +87,17 @@ digit tree  W_h = Σ_k π_k W_h^(w_k) = Σ_(k, S) π_k prior_(w_k)(S) ∏_(leave
 [proved-standard] The forward (hidden Markov) recursion and the fixed share are Herbster and
 Warmuth (1998) and Vovk's aggregating algorithm; the proofs here are this owner's.
 
-[open] Owed in #62 ("Step 4 (#73) owed"): the executed lattice's per-cell certificates of the three
-laws composed over the passage (the own face's rounding and the own ratio's drift at each landmark,
-the join tree's rounding over the digit tree's laws, the share step's rebase) into per-cell rules
-like `Landmarks::face_rule`; `forward_executed` and `share_log_lipschitz` are their passage-level
-parts, and the Rust tests check the executed faces against the ideal weighting.
+[proved-derived; formal-checked] The join tree's per-cell certificate over the digit tree's laws
+is `JoinDrift.JoinNode.{tree_read, tree_passage, cell_read}`: a digit's certificate is the laws'
+certificates plus each join's rounding and drift, a cell's its digits' summed, as `FaceJoins` and
+`StopMixture` carry them. The own face's rounding at each landmark has no executed owner since
+`LocalLaw` was retired (`89460425`).
+
+[open] Owed in #62: the share step's rebase in the executed fixed share
+(`receiver::population::Dormancy`) needs `forward_executed` for nonnegative faces, as
+`Dormancy.forward_dominance_nonneg` extends `forward_dominance`; `share_log_lipschitz` is its
+ratio part. No a-priori per-cell rule like `Landmarks::face_rule` is stated for the join tree:
+its certificate is read per cell from the charts.
 
 | Lean | Rust |
 |---|---|

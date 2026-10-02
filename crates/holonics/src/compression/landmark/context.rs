@@ -4909,7 +4909,8 @@ pub struct JoinReceipt {
 /// rebases, the excess by its rounding `2^(−M)/min(q̂, q̂_left, q̂_right)`, twice the rebases and
 /// both sides' increments (the enlarged tree's join accounting; Lean
 /// `Compression/Landmark/Context/LocalWeighing.forward_executed`,
-/// `Compression/Landmark/Context/JoinDrift.{join_read_drift, join_ratio_drift, join_passage}`). A read's certificate is the faces' plus each join's drift
+/// `Compression/Landmark/Context/JoinDrift.{join_read_drift, join_ratio_drift, join_passage}`, composed up the
+/// tree by `JoinDrift.JoinNode.{tree_read, tree_passage}`). A read's certificate is the faces' plus each join's drift
 /// and rounding. Each dyadic cell is its own digit tree, weighed by its own evidence.
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct FaceJoins {
@@ -5160,7 +5161,7 @@ impl StopMixture {
     /// **Receive one cell**: every tree's digits read at the current standing and deposited, then
     /// in each opened dyadic cell the joins read the trees' pre-deposit splits and step by the
     /// digit. The cell's executed face is the product of the mixed digits' sides; its residual the
-    /// digits' certificates in bits.
+    /// digits' certificates in bits (Lean `Compression/Landmark/Context/JoinDrift.JoinNode.cell_read`).
     pub fn receive(
         &mut self,
         address: &[Letter],
