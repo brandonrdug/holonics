@@ -3,6 +3,7 @@ import HolonicsResearch.Mathematics.NormRelation
 import HolonicsResearch.EllipticCurve.SelmerCalculus
 import Mathlib.NumberTheory.Cyclotomic.Gal
 import Mathlib.RingTheory.PowerSeries.Basic
+import Mathlib.RingTheory.PowerSeries.NoZeroDivisors
 import Mathlib.RingTheory.AdjoinRoot
 import Mathlib.NumberTheory.Padics.PadicIntegers
 
