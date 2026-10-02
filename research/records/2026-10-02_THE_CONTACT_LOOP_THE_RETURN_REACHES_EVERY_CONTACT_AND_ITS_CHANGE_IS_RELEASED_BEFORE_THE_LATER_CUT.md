@@ -136,3 +136,16 @@ standings) takes no part in learning, which happens in `R` and, on the joint fie
 contact loop Astra asked for cannot be shown here. It needs a medium whose interior the comparison
 reads above the receiver's grain, and which medium or coupling that is belongs to the architecture
 question I've put to Astra.
+
+**Over successive deposits** ([receipt](2026-10-02_THE_CONTACT_LOOP_receipts/successive.txt); the
+probe is archived in this change's history and retired). I ran eight windows of drawn cells on the
+chain (`source(64, 81)`, six cells read and the next two compared). Each window was read from rest
+at the published constitution, compared against its next cells and deposited.
+- **From `generic(301)`:** every deposit certifies 13 families and names all 13 vanished, the
+  readout included. After the eight deposits no ring's passive factor and no contact's factor
+  differs from the opening.
+- **From the field's declared opening:** each deposit certifies one family and names it vanished.
+
+The scope is these two openings on the chain under this drive. They say nothing of a trained
+constitution, or of the text runs of September 29, where the tightened certificate's record reports
+the factor families moving.
