@@ -1036,8 +1036,9 @@ mirrors it). A node's two masses start at `2^(−j)`, so its face is `(2^j n_b +
 `j = 1`. Its floor is `1/(2^j n* + 2)`, so the path lattice `M_p` widens by `j − 1` bits (`41` for
 campaign 1 at `j = 3`); the exact normalization holds and the test reads the executed faces within
 the rule and their certificates (`the_prior_mass_reads_its_masses_and_keeps_the_rule`). [Edit,
-October 2: the rule's derivation rests on the path-level floor, which Lean states for KT only
-(`digit_face_ge`); its statement at mass `2^(−j)` is owed in #62.] A register's ceiling stays on
+October 2: the rule's derivation rests on the path-level floor, now proved at every prior mass
+for any stop weights in `[0, 1]`: `priorMass_digit_face_ge`, the floor `1/(2^j n + 2)` on the path
+face that `face_bits` reads (#168).] A register's ceiling stays on
 KT's half-unit masses and is refused at another mass.
 
 **Where the gain and the cost sit** (the Lean thread's per-node bounds, #166). At rung `j` a node
