@@ -1799,10 +1799,12 @@ What a native move can certify about it, each statement on one coordinate `η` o
   `(0, w/v]` (`cut_within_cell`), set by the reading's place inside its cell, which the enclosure
   does not carry. A tie, or a margin within the summed cell widths, can therefore flip at an
   arbitrarily small step.
-- **A crossing costs at most twice the re-read stations' log changes** (`lockFace_sub_abs_le`,
-  `crossing_cost_le`): the jump is read at one constitution on two commitment orders, so it does
-  not shrink with the step, and it is bounded by how much the different placed data change the
-  re-read stations' readings, which no owner bounds in advance. -/
+- **A crossing's lock faces cost at most twice the re-read stations' log changes**
+  (`lockFace_sub_abs_le`, `crossing_cost_le`): the jump is read at one constitution, the first
+  carried state past the cut, on both commitment orders, so it does not shrink with the step. Its
+  lock faces' part is bounded by how much the different placed data change the re-read stations'
+  readings, which no owner bounds before the crossing is read; under `LockOrder` the order term's
+  change is read beside it. -/
 
 section Flip
 
@@ -1904,7 +1906,8 @@ theorem lockFace_sub_abs_le {a r a' r' δ : ℝ} (ha : 0 < a) (hr : 0 ≤ r) (ha
 /-- [proved-derived; formal-checked] **A crossing costs at most twice the re-read stations' log
 changes.** A crossing re-reads the stations `D` with different placed data before them. If station
 `j`'s target reading and rivals' sum change by at most a factor `e^(δ j)` between its two contexts,
-the jump in the comparison, `J = Σ_(j∈D) (ℓ′_j − ℓ_j)`, has `|J| ≤ 2 Σ_(j∈D) δ j`. -/
+the lock faces' part of the jump, `J = Σ_(j∈D) (ℓ′_j − ℓ_j)`, has `|J| ≤ 2 Σ_(j∈D) δ j` (an order
+term, where the comparison carries one, is not covered). -/
 theorem crossing_cost_le {ι : Type*} (D : Finset ι) (a r a' r' δ : ι → ℝ)
     (ha : ∀ j ∈ D, 0 < a j) (hr : ∀ j ∈ D, 0 ≤ r j) (ha' : ∀ j ∈ D, 0 < a' j)
     (hr' : ∀ j ∈ D, 0 ≤ r' j) (hδ : ∀ j ∈ D, 0 ≤ δ j)
