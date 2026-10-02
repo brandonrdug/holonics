@@ -2148,7 +2148,7 @@ mod tests {
 
     fn face(solved: Predicate) -> Face {
         let zero = ExactInterval::point(Rat::zero());
-        Face::Read(LockFace { value: zero.clone(), solved, above: false, shares: Vec::new(), excess: zero })
+        Face::Read(LockFace { value: zero.clone(), solved, above: false, shares: Vec::new(), excess: zero, sheets: vec![Rat::from_integer(1.into())] })
     }
 
     /// A locked station solved at its lock; an event when the release's re-read does not hold.
@@ -2308,6 +2308,7 @@ mod tests {
             above: false,
             shares: Vec::new(),
             excess: zero,
+            sheets: vec![Rat::from_integer(1.into())],
         })
     }
 

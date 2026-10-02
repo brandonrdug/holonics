@@ -3793,7 +3793,7 @@ impl Constitution {
     }
 
     /// [definition; agent-inferred, October 2; the
-    /// [throw's record](../../../../research/records/2026-10-02_THE_THROW_CARRIES_ITS_MOMENTUM_THROUGH_THE_DEPOSITS_ACCRETED_MASS_AND_A_GRIP_HALVES_IT.md)]
+    /// [throw's record](../../../../research/records/2026-10-02_THE_THROW_CARRIES_ITS_MOMENTUM_THROUGH_THE_DEPOSITS_ACCRETED_MASS_AND_A_HALVING_HALVES_IT.md)]
     /// **The coast of a carried velocity through the deposit's accreted mass** (`hnn::executed`'s
     /// `MoveMetric::Throw`). The source port's mass is its normal law's Gram `H` (the storage's
     /// inertia), and a deposit accretes the returns' `F = Σ w f fᵀ` onto it, `H′ = H + F`. A velocity
@@ -3874,7 +3874,7 @@ impl Constitution {
     }
 
     /// [definition; agent-inferred, October 2; the
-    /// [throw's record](../../../../research/records/2026-10-02_THE_THROW_CARRIES_ITS_MOMENTUM_THROUGH_THE_DEPOSITS_ACCRETED_MASS_AND_A_GRIP_HALVES_IT.md)]
+    /// [throw's record](../../../../research/records/2026-10-02_THE_THROW_CARRIES_ITS_MOMENTUM_THROUGH_THE_DEPOSITS_ACCRETED_MASS_AND_A_HALVING_HALVES_IT.md)]
     /// **The source port carried at a step `η` with a coast** (`hnn::executed`'s
     /// `MoveMetric::Throw`): [`Constitution::stepped_source`] with the exact coast `c` added to the
     /// update, `ΔE = ηD + c`, through the same budgeted carry, clock, budget and storage-growth

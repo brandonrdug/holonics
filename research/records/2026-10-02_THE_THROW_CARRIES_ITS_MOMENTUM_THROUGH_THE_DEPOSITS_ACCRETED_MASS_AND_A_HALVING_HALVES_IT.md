@@ -1,4 +1,4 @@
-# The throw carries its momentum through the deposit's accreted mass, and a grip halves it
+# The throw carries its momentum through the deposit's accreted mass, and a halving halves it
 
 **Date.** October 2. **Issues.** #73, #63 (THE_REBUILD U6, step 1), #62. **Grade.** [proved-derived;
 formal-checked] for the accretion laws (`HolonicsResearch/HNN/MoveDirection` §9);
@@ -37,10 +37,9 @@ comparison's shape, turns the Kinetic step from the gradient.
      toward `i/f` (`throw_velocity_rises`, `throw_velocity_le_terminal`). The leap's `i/(m₀ + kf)`
      falls like `1/k` (`leap_velocity_le`). This is "too short per fit", derived: the leap spends at
      each deposit what the throw carries.
-4. **A grip halves the momentum, and the apex releases from rest.**
+4. **A halving halves the momentum, and the apex releases from rest.**
    - The halving trials halve the whole carried move, `2^(−j)(ηD + c)`. The adopted move is the
-     next velocity, so a trial adopted after `j` halvings carries `2^(−j)` of the momentum. The
-     conditions of adoption act as grips that absorb it.
+     next velocity, so a trial adopted after `j` halvings carries `2^(−j)` of the momentum.
    - A refused move leaves the port at rest.
    - Before the trials, the composition's first-order bound along the coast alone is read (the
      power test). The coast is carried only when that bound is negative: the comparison falls along
@@ -138,7 +137,7 @@ only then is the coast carried.
 certificate refuses a climb. Carrying it would spend the move's trials on halvings that cannot be
 adopted. Releasing from rest keeps the move the normal law's.
 
-**The grips.** The trials halve the whole carried move. A trial adopted at `2^(−j)` of the first
+**The halvings.** The trials halve the whole carried move. A trial adopted at `2^(−j)` of the first
 carries `2^(−j)` of the momentum, since its move is the next velocity. The halving is the time step:
 the coast and the impulse shrink together. [agent-inferred] The impulse's own scaling within the
 time step (an impulse is `η` and a coast is `h`, with `η = h²`) is not followed. One halving law
@@ -213,10 +212,10 @@ stations right, the halvings at adoption, the flight's length and whether its co
 ```sh
 cargo build --release -p holonics --example hnn_prediction
 # The development read: the release (m0, at rest) and the first coast (m1), each under a loose
-# per-move bound that only guards the read.
-PROBE_THREADS=<threads> bash research/records/2026-10-02_THE_THROW_receipts/run.sh .local/throw-dev <guard ms> <guard s> 2
+# per-move deadline that only bounds the read.
+RAYON_NUM_THREADS=<threads> bash research/records/2026-10-02_THE_THROW_receipts/run.sh .local/throw-dev <loose ms> <loose s> 2
 # The chain: the per-move bound is the larger of the development read's two moves.
-PROBE_THREADS=<threads> bash research/records/2026-10-02_THE_THROW_receipts/run.sh .local/throw <unit ms> <deadline s>
+RAYON_NUM_THREADS=<threads> bash research/records/2026-10-02_THE_THROW_receipts/run.sh .local/throw <per-move ms> <per-move deadline s>
 # Held-out: the chain's last adopted state beside the other chains' states at move 16.
 cargo run --release -p holonics --example hnn_prediction -- executed evaluate order2 <held-out seed> 128 <out> \
   throw16=<the chain's last adopted state> …
@@ -232,7 +231,7 @@ trials. The chain's deadline is 16 times that bound.
 **Early stop.** A move past its per-move bound stops the chain (`read_probe.sh`'s per-unit
 watch), which is then reported incomplete. No bound is raised after launch.
 
-**Threads.** `PROBE_THREADS` declares the probe's thread budget (19 by default, the PC's). On the
+**Threads.** `RAYON_NUM_THREADS` declares the probe's thread budget (19 by default, the PC's). On the
 cloud host with 4 cores it is 4, and the per-move bound comes from the same host's development read.
 
 ## 7. Verification

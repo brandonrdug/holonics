@@ -4,7 +4,7 @@
 # A refused move with a carried coast ends the flight: the next move starts from the same state at rest.
 # A refused move at rest ends the chain.
 #
-#   [PROBE_THREADS=<n>] bash research/records/2026-10-02_THE_THROW_receipts/run.sh <out root> <per-move ms> <per-move s> [<moves>]
+#   [RAYON_NUM_THREADS=<n>] bash research/records/2026-10-02_THE_THROW_receipts/run.sh <out root> <per-move ms> <per-move s> [<moves>]
 #
 # <moves> is 16 by default; the development read passes 2 (the release m0 and the first coast m1).
 # The per-move bound is the projection's upper end: the largest measured move of the development read

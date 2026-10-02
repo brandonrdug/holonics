@@ -42,7 +42,7 @@ the pump's reflection block `−2p R_c` to its stiffness, `c` the placed carrier
    falls by exactly `p² f/(2m(m + f))`; the thrown move is the impulse plus the coast, the leap's
    impulse alone from rest; under a constant impulse the throw's velocity rises toward the impulse
    over the per-deposit mass while the leap's falls like `1/k` (the record
-   `research/records/2026-10-02_THE_THROW_CARRIES_ITS_MOMENTUM_THROUGH_THE_DEPOSITS_ACCRETED_MASS_AND_A_GRIP_HALVES_IT.md`).
+   `research/records/2026-10-02_THE_THROW_CARRIES_ITS_MOMENTUM_THROUGH_THE_DEPOSITS_ACCRETED_MASS_AND_A_HALVING_HALVES_IT.md`).
 -/
 
 namespace Holonics.HNN.MoveDirection

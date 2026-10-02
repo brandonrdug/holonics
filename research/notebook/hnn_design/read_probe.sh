@@ -5,9 +5,7 @@
 # slope (research/records/2026-10-01_THE_SEGMENT_PROBE_PINNED_BEFORE_ITS_RUN.md,
 # research/records/2026-10-01_THE_MODULUS_SLOPE_PINNED_BEFORE_ITS_RUN.md).
 #
-#   [PROBE_THREADS=<n>] bash research/notebook/hnn_design/read_probe.sh <out dir> <unit ms> <deadline s> <harness args>…
-#
-# The thread budget is 19 (the PC beside its other workers) unless PROBE_THREADS declares another.
+#   bash research/notebook/hnn_design/read_probe.sh <out dir> <unit ms> <deadline s> <harness args>…
 #
 # Exit 0 complete; 3 stopped early by the per-unit bound; 124 the deadline; otherwise the harness's.
 set -euo pipefail
@@ -21,7 +19,7 @@ mkdir -p "$out"
 bin=${CARGO_TARGET_DIR:-target}/release/examples/hnn_prediction
 { git rev-parse HEAD; sha256sum "$bin" | cut -d' ' -f1; echo "args $*"; } > "$out/identities.txt"
 start=$(date +%s%3N)
-RAYON_NUM_THREADS=${PROBE_THREADS:-19} setsid timeout "$deadline" "$bin" "$@" > "$out/listing.txt" 2> "$out/stderr.txt" &
+RAYON_NUM_THREADS=${RAYON_NUM_THREADS:-19} setsid timeout "$deadline" "$bin" "$@" > "$out/listing.txt" 2> "$out/stderr.txt" &
 pid=$!
 stopped=0
 # One line per constitution (`  <label>…; <ms> ms`). The run stops when the read in progress has

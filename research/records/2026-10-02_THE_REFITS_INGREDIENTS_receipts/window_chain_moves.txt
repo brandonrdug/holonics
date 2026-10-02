@@ -1,0 +1,64 @@
+executed move-once: 8 order2 requests at development seed 2026093061, the candidate arm, from w12 (ρ 102837/131072); the bank p = 5/8, grain 2^(-16)
+  w12 kinetic: the incumbent: ρ 102837/131072; L ∈ [237729/4096, 237733/4096) nats, X ∈ [74273/4096, 74276/4096) nats; solved 26 of 64; whole 1 (released 8, stations right 33); 188598 ms
+      trials: η 1/8 ρ unmoved mask [210400/4096, 210404/4096) own [224965/4096, 224969/4096) adopted; γ_ρ [574707/4096, 574708/4096)
+executed move-once: 188647 ms; resident 147214336 now, 180178944 peak
+executed move-once: 8 order2 requests at development seed 2026093061, the candidate arm, from w11 (ρ 102837/131072); the bank p = 5/8, grain 2^(-16)
+  w11 kinetic: the incumbent: ρ 102837/131072; L ∈ [221392/4096, 221396/4096) nats, X ∈ [56227/4096, 56230/4096) nats; solved 27 of 64; whole 0 (released 8, stations right 29); 191339 ms
+      trials: η 1/8 ρ unmoved mask [186020/4096, 186024/4096) own [237729/4096, 237733/4096) adopted; γ_ρ [-155362/4096, -155361/4096)
+executed move-once: 191398 ms; resident 208707584 now, 229920768 peak
+executed move-once: 8 order2 requests at development seed 2026093061, the candidate arm, from w13 (ρ 102837/131072); the bank p = 5/8, grain 2^(-16)
+  w13 kinetic: the incumbent: ρ 102837/131072; L ∈ [224965/4096, 224969/4096) nats, X ∈ [69338/4096, 69341/4096) nats; solved 28 of 64; whole 0 (released 8, stations right 26); 198563 ms
+      trials: η 1/8 ρ unmoved mask [191016/4096, 191020/4096) own [233599/4096, 233603/4096) adopted; γ_ρ [564027/4096, 564028/4096)
+executed move-once: 198610 ms; resident 182648832 now, 194981888 peak
+executed move-once: 8 order2 requests at development seed 2026093061, the candidate arm, from w10 (ρ 102837/131072); the bank p = 5/8, grain 2^(-16)
+  w10 kinetic: the incumbent: ρ 102837/131072; L ∈ [226300/4096, 226304/4096) nats, X ∈ [58711/4096, 58714/4096) nats; solved 25 of 64; whole 0 (released 8, stations right 20); 199369 ms
+      trials: η 1/8 ρ unmoved mask [199626/4096, 199630/4096) own [221392/4096, 221396/4096) adopted; γ_ρ [-990807/4096, -990806/4096)
+executed move-once: 199415 ms; resident 182431744 now, 195162112 peak
+executed move-once: 8 order2 requests at development seed 2026093061, the candidate arm, from w9 (ρ 102837/131072); the bank p = 5/8, grain 2^(-16)
+  w9 kinetic: the incumbent: ρ 102837/131072; L ∈ [249661/4096, 249665/4096) nats, X ∈ [79647/4096, 79651/4096) nats; solved 20 of 64; whole 0 (released 8, stations right 30); 200191 ms
+      trials: η 1/8 ρ unmoved mask [216244/4096, 216248/4096) own [226300/4096, 226304/4096) adopted; γ_ρ [-699231/4096, -699230/4096)
+executed move-once: 200238 ms; resident 183435264 now, 196038656 peak
+executed move-once: 8 order2 requests at development seed 2026093061, the candidate arm, from w14 (ρ 102837/131072); the bank p = 5/8, grain 2^(-16)
+  w14 kinetic: the incumbent: ρ 102837/131072; L ∈ [233599/4096, 233603/4096) nats, X ∈ [80502/4096, 80506/4096) nats; solved 30 of 64; whole 0 (released 8, stations right 24); 189484 ms
+      trials: η 1/8 ρ unmoved mask [190704/4096, 190708/4096) own [222169/4096, 222173/4096) adopted; γ_ρ [262014/4096, 262015/4096)
+executed move-once: 189531 ms; resident 209551360 now, 230838272 peak
+executed move-once: 8 order2 requests at development seed 2026093061, the candidate arm, from w8 (ρ 102837/131072); the bank p = 5/8, grain 2^(-16)
+  w8 kinetic: the incumbent: ρ 102837/131072; L ∈ [265678/4096, 265682/4096) nats, X ∈ [93200/4096, 93204/4096) nats; solved 20 of 64; whole 0 (released 8, stations right 18); 202907 ms
+      trials: η 1/8 ρ unmoved mask [219031/4096, 219035/4096) own [249661/4096, 249665/4096) adopted; γ_ρ [-274818/4096, -274817/4096)
+executed move-once: 202954 ms; resident 181944320 now, 198397952 peak
+executed move-once: 8 order2 requests at development seed 2026093061, the candidate arm, from w7 (ρ 102837/131072); the bank p = 5/8, grain 2^(-16)
+  w7 kinetic: the incumbent: ρ 102837/131072; L ∈ [264885/4096, 264889/4096) nats, X ∈ [87364/4096, 87368/4096) nats; solved 12 of 64; whole 1 (released 8, stations right 28); 199006 ms
+      trials: η 1/8 ρ unmoved mask [229248/4096, 229253/4096) own [265678/4096, 265682/4096) adopted; γ_ρ [805647/4096, 805648/4096)
+executed move-once: 199058 ms; resident 180211712 now, 194461696 peak
+executed move-once: 8 order2 requests at development seed 2026093061, the candidate arm, from w6 (ρ 102837/131072); the bank p = 5/8, grain 2^(-16)
+  w6 kinetic: the incumbent: ρ 102837/131072; L ∈ [284831/4096, 284836/4096) nats, X ∈ [106744/4096, 106748/4096) nats; solved 11 of 64; whole 0 (released 8, stations right 28); 199228 ms
+      trials: η 1/16 ρ unmoved mask [257910/4096, 257914/4096) own [264885/4096, 264889/4096) adopted; γ_ρ [565935/4096, 565936/4096)
+executed move-once: 199277 ms; resident 171872256 now, 195444736 peak
+executed move-once: 8 order2 requests at development seed 2026093061, the candidate arm, from w15 (ρ 102837/131072); the bank p = 5/8, grain 2^(-16)
+  w15 kinetic: the incumbent: ρ 102837/131072; L ∈ [222169/4096, 222173/4096) nats, X ∈ [67858/4096, 67861/4096) nats; solved 28 of 64; whole 0 (released 8, stations right 31); 197135 ms
+      trials: η 1/8 ρ unmoved mask [192106/4096, 192109/4096) own [210489/4096, 210493/4096) adopted; γ_ρ [343306/4096, 343307/4096)
+executed move-once: 197183 ms; resident 208261120 now, 229990400 peak
+executed move-once: 8 order2 requests at development seed 2026093061, the candidate arm, from w2 (ρ 102837/131072); the bank p = 5/8, grain 2^(-16)
+  w2 kinetic: the incumbent: ρ 102837/131072; L ∈ [379492/4096, 379497/4096) nats, X ∈ [198136/4096, 198141/4096) nats; solved 1 of 64; whole 0 (released 8, stations right 20); 180069 ms
+      trials: η 1/32 ρ unmoved mask [347635/4096, 347640/4096) own [315459/4096, 315464/4096) adopted; γ_ρ [557251/4096, 557252/4096)
+executed move-once: 180112 ms; resident 209534976 now, 230551552 peak
+executed move-once: 8 order2 requests at development seed 2026093061, the candidate arm, from w1 (ρ 102837/131072); the bank p = 5/8, grain 2^(-16)
+  w1 kinetic: the incumbent: ρ 102837/131072; L ∈ [338257/4096, 338262/4096) nats, X ∈ [156803/4096, 156808/4096) nats; solved 1 of 64; whole 0 (released 7, stations right 13); 178261 ms
+      trials: η 1/16 ρ unmoved mask [304103/4096, 304108/4096) own [379492/4096, 379497/4096) adopted; γ_ρ [599573/4096, 599574/4096)
+executed move-once: 178306 ms; resident 184758272 now, 197640192 peak
+executed move-once: 8 order2 requests at development seed 2026093061, the candidate arm, from w3 (ρ 102837/131072); the bank p = 5/8, grain 2^(-16)
+  w3 kinetic: the incumbent: ρ 102837/131072; L ∈ [315459/4096, 315464/4096) nats, X ∈ [133966/4096, 133971/4096) nats; solved 1 of 64; whole 0 (released 8, stations right 18); 194240 ms
+      trials: η 1/16 ρ unmoved mask [284048/4096, 284052/4096) own [320014/4096, 320019/4096) adopted; γ_ρ [550483/4096, 550484/4096)
+executed move-once: 194286 ms; resident 195588096 now, 207065088 peak
+executed move-once: 8 order2 requests at development seed 2026093061, the candidate arm, from w16 (ρ 102837/131072); the bank p = 5/8, grain 2^(-16)
+  w16 kinetic: the incumbent: ρ 102837/131072; L ∈ [210489/4096, 210493/4096) nats, X ∈ [59737/4096, 59739/4096) nats; solved 32 of 64; whole 0 (released 8, stations right 39); 206417 ms
+      trials: η 1/8 ρ unmoved mask [186359/4096, 186363/4096) own [195744/4096, 195748/4096) adopted; γ_ρ [446745/4096, 446746/4096)
+executed move-once: 206479 ms; resident 145719296 now, 179793920 peak
+executed move-once: 8 order2 requests at development seed 2026093061, the candidate arm, from w4 (ρ 102837/131072); the bank p = 5/8, grain 2^(-16)
+  w4 kinetic: the incumbent: ρ 102837/131072; L ∈ [320014/4096, 320019/4096) nats, X ∈ [138592/4096, 138597/4096) nats; solved 1 of 64; whole 0 (released 8, stations right 18); 197089 ms
+      trials: η 1/16 ρ unmoved mask [287697/4096, 287702/4096) own [306955/4096, 306959/4096) adopted; γ_ρ [540398/4096, 540399/4096)
+executed move-once: 197137 ms; resident 179769344 now, 193204224 peak
+executed move-once: 8 order2 requests at development seed 2026093061, the candidate arm, from w5 (ρ 102837/131072); the bank p = 5/8, grain 2^(-16)
+  w5 kinetic: the incumbent: ρ 102837/131072; L ∈ [306955/4096, 306959/4096) nats, X ∈ [126832/4096, 126836/4096) nats; solved 2 of 64; whole 0 (released 8, stations right 22); 198635 ms
+      trials: η 1/8 ρ unmoved mask [252488/4096, 252493/4096) own [284831/4096, 284836/4096) adopted; γ_ρ [577097/4096, 577098/4096)
+executed move-once: 198683 ms; resident 183119872 now, 196419584 peak
