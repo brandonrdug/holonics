@@ -673,3 +673,46 @@ magnitude too stiff for a near-uniform receiver, so it moves a small fraction of
 fitted receiver shows is available. The next build is `R`'s step in its own Fisher metric: the
 witness form already owned in `hnn::executed`, with the certificate read on that form (the Lean
 thread's `ln 2/2` and the deposit-condition proofs). It is tested by this same fitted comparison.
+
+## 18. The window Fisher certificate: each window descends, the held-out code worsens
+
+**The law tried** (probe archived at
+[`3abbfd0e`](https://github.com/brandonrdug/holonics/commit/3abbfd0e2f01ac64a98d4a4dc9177e570fd09e22),
+retired in this change). `R`'s certificate read its own Fisher form on the deposit's window instead
+of the worst case. A read's code in bits, `f(v) = −v_t + log₂ Σ 2^(v_c)`, has Hessian
+`ln 2 (diag p − p pᵀ)`. A logit change `Δ` scales every mass by at most `2^(osc Δ)`. So with
+`η · osc ≤ 1`, the curvature along the ray is at most `2 ln 2 · Var_p(Δ)`, which is at most
+`(119/80) Var_p̃(Δ) + ¼|Δ^Im|²` with the odometer masses (`p/p̃ ≤ 17/16`). This replaced the receiving
+face's moves and covector scale. The Lean thread proves the window theorem (#158).
+
+**Measured.**
+- **First aeon** ([receipt](2026-10-02_THE_CONTACT_LOOP_receipts/fisher_window_aeon0.txt)):
+  - `R`'s certified step had median `2048` (`2^0` before) and the receiver's exponent span reached
+    `38983915/2^23` bits (`2076909/2^25` before).
+  - Every deposit's own window code still fell (534 of 534), with `A⁻/A⁺` at most `2245639/2^23`.
+  - The contacts stopped moving: 6,381 of 6,384 channel families vanished.
+- **Campaign 1's exposure at `n*`**: with the window certificate
+  ([receipt](2026-10-02_THE_CONTACT_LOOP_receipts/fisher_window_exposure.txt)) against main built
+  apart ([receipt](2026-10-02_THE_CONTACT_LOOP_receipts/baseline_exposure.txt)).
+
+| Reading | Main (`R` steps `2^0..2^2`) | Window Fisher certificate (`R` steps `2^7..2^16`) |
+|---|---|---|
+| held out, combined face − tree | `−5 + 9/16 + ε` bits (the wave helps) | `+123 + 13/16 + ε` bits (the wave hurts) |
+| held out, model − PPM-2 | `−200 + 1/16 + ε` bits | `−196 + 7/16 + ε` bits |
+| training, combined face − tree | `−23 + 7/16 + ε` bits | `+290 + 10/16 + ε` bits |
+
+The held-out code worsens by more than three and a half bits. The wave turns from a gain into a
+loss, and the mixture falls back to the tree.
+
+**The cause.** The window certificate guarantees descent on the window's own readings only. With
+steps two thousand times larger, each deposit fits its own window and damages the others: per-window
+descent and held-out worsening at once. The held-out code is the gate, and it fails.
+
+**The next law, derived** (the coordinator's reading, checked here). The metric that does not
+overfit is the accumulated Fisher, `Σ_i z_i z_iᵀ ⊗ F(p_i)` over every reading so far. Near uniform
+it is about `G ⊗ (1/256)(I − 𝟙𝟙ᵀ/256)`, with `G` the Gram `R` already accumulates. The step becomes
+`R`'s own `1/n` normal-law step with its class metric corrected: about `2^7` times larger at the
+start, not `2^11`, still shrinking as `1/n`. Its certificate is the window theorem applied to all
+readings so far. Whether that can be read from stored statistics alone, without keeping the
+readings, is the question the build must settle, since retention is never a tape. Its acceptance is
+the held-out code: the wave's held-out contribution must improve on main's `−5 + 9/16 + ε` bits.
