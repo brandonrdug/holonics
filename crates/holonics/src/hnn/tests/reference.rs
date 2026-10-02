@@ -463,3 +463,64 @@ fn landmark_prequential_partitions_the_cut() {
     assert_eq!(run.run.bits, tree.bits());
     assert!(run.run.largest_residual <= run.run.face_rule);
 }
+
+/// [measured-diagnostic; agent-inferred, October 2; the
+/// [contact loop record](../../../../../research/records/2026-10-02_THE_CONTACT_LOOP_THE_RETURN_REACHES_EVERY_CONTACT_AND_ITS_CHANGE_IS_RELEASED_BEFORE_THE_LATER_CUT.md)]
+/// **A reached return's change to each contact, and the later cut that would consume it** (Astra's
+/// owner-to-consumer check, on the reference machine): a word on a generic constitution of the
+/// chain, its compare and deposit, then the same later drive read at the predecessor and at the
+/// successor. The return reaches every contact's channel with a certified step (`η > 0` for each
+/// factor family), and the later cut reads differently. The receipts the record cites are printed:
+/// whether each contact's factors moved, the channel entries the deposit released below their
+/// lattice, and the channel remainders it carried.
+#[test]
+fn a_reached_return_steps_every_contact_and_the_later_cut_reads_the_successor() {
+    use super::learning::generic;
+    use crate::hnn::constitution::Locus;
+    use crate::hnn::field::ConstitutionRead;
+    let field = chain();
+    let reference = Reference::new(4, 1 << 40);
+    let mut post = reference
+        .mount_with(&field, &Current::at_rest(&field), generic(&field, 301))
+        .unwrap();
+    let (moment, _) = reference.ingest(&mut post, None, &one_hot(&[1, 2, 0, 3, 1])).unwrap();
+    let phases = post.admitted()[0].clone();
+    let (pending, _) = reference.refine(&mut post, &moment, &phases).unwrap();
+    let (staged, _) = reference.compare(&mut post, pending, &one_hot(&[1, 0])).unwrap();
+    let mut pre = post.clone();
+    let reading = match reference.deposit(&mut post, staged).unwrap().deposit {
+        Component::Present(reading) => reading,
+        other => panic!("the deposit's reading: {other:?}"),
+    };
+    for a in 0..field.contacts().len() {
+        let steps: Vec<_> =
+            reading.steps.iter().filter(|(l, _)| *l == Locus::Channel(a)).collect();
+        assert_eq!(steps.len(), 3, "the return reaches contact {a}'s three factor families");
+        assert!(steps.iter().all(|(_, s)| s.step.step > Rat::zero()));
+        let (p, q) = (pre.constitution(), post.constitution());
+        eprintln!(
+            "contact {a}: factors moved (storage, stiffness, dissipation) = ({}, {}, {})",
+            p.contact_storage(a) != q.contact_storage(a),
+            p.contact_stiffness(a) != q.contact_stiffness(a),
+            p.contact_dissipation(a) != q.contact_dissipation(a),
+        );
+    }
+    eprintln!(
+        "channel entries released at the deposit: {}; channel remainders carried: {:?}",
+        reading.released.iter().filter(|(l, ..)| matches!(l, Locus::Channel(_))).count(),
+        post.constitution()
+            .carried_remainders()
+            .into_iter()
+            .filter(|(l, ..)| matches!(l, Locus::Channel(_)))
+            .map(|(l, c, i, r)| format!("{l:?} {c:?} {i} {r}"))
+            .collect::<Vec<_>>()
+    );
+    let later = |resident: &mut crate::hnn::reference::Resident| {
+        let (moment, _) = reference.ingest(resident, None, &one_hot(&[2, 3, 1, 0, 2])).unwrap();
+        let phases = resident.admitted()[0].clone();
+        let (pending, _) = reference.refine(resident, &moment, &phases).unwrap();
+        let (_, compared) = reference.compare(resident, pending, &one_hot(&[2, 3])).unwrap();
+        format!("{:?}", compared.forward)
+    };
+    assert_ne!(later(&mut pre), later(&mut post));
+}

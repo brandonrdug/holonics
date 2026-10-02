@@ -1,0 +1,55 @@
+# The contact loop: the return reaches every contact, and its change is released before the later cut
+
+**Date.** October 2. **Issues.** #73, #63. **Grade.** [measured-diagnostic], an owner-to-consumer
+read with one reproducing test, no run.
+Test: `hnn::tests::reference::a_reached_return_steps_every_contact_and_the_later_cut_reads_the_successor`.
+
+## 1. The check
+
+Astra's check (October 2 mail) asks four things before any further run:
+1. one emitting contact and one participating receiver that retain their motion;
+2. a return that actually reaches that contact and changes its constitution;
+3. that successor consumed on a later cut, compared against the predecessor under the same later
+   drive;
+4. joint power and work accounting.
+
+[The kinetic move](2026-10-02_THE_KINETIC_MOVE_FROM_THE_OPENING_MEASURED_THE_COMPARISON_FALLS_FASTEST_AND_THE_DECISIONS_STAY.md)
+showed that a lower comparison loss is not evidence of this loop.
+
+## 2. The owners, traced
+
+| Link | Owner | State |
+|---|---|---|
+| Emitting contact, retaining receiver | `hnn::word`: contact states `(u_a, w_a)`, resonator states and their power per tick (`TickBalance`, `WordBalance`); `Word::continuing` carries them across words within a refinement | built |
+| Return reaching the contact | `hnn::reference::compose` (the contact's factor gradients `C̄ = Σ 2r̄(w − ω)ᵀ`, `K̄ = −hΣ r̄(u + ½hω)ᵀ`, `D̄ = −hΣ r̄ωᵀ`, from the word's reverse return) into `Constitution::deposited` at `Locus::Channel(a)` | built and reached |
+| Change consumed on a later cut | the resident's successor, read by the next word (`Operands::at_cut`) | built, and receives nothing (§3) |
+| The executed release (gate A, every comparison since September 30) | `prediction::generate_by_bank`: `BankPlacement` and a declared `ReceivingBank` | **no word, no contact, no return**; only `E` and `ρ` are deposited, by an exterior comparison optimizer (`executed_move`) |
+
+## 3. Measured
+
+On the chain (two contacts) with a generic constitution, one word, its compare and its deposit:
+- **The return reaches every contact.** Each contact receives a certified step on all three factor
+  families: `η = 2^(−31)`, `2^(−28)`, `2^(−27)` on contact 0 and `2^(−23)`, `2^(−20)`, `2^(−19)` on
+  contact 1.
+- **No contact's constitution changes.** The storage, stiffness and dissipation factors of both
+  contacts are equal before and after. All 102 channel entries' moves are released as residuals
+  below the locus's fine lattice (`BudgetedCarry::released`, each at most `½·2^(−L−k_m)`). The only
+  channel remainders carried are three scale remainders of `−1/256`.
+- **The later cut reads the successor.** Under the same later drive the compare differs, but the
+  difference comes from the element, source port, standing and receiving-map steps, because no
+  contact moved.
+
+## 4. The missing link
+
+[agent-inferred] The owner chain exists. **The certified step at the channel sizes every contact
+move below the locus's lattice, so the release erases it before any later cut.** The certificate
+reads the contact's move through the whole reach's gain `κ²`, the stacked station logits
+(`C = s·κ²·b` against the alignment `a`). A contact's own power, its slip and material work, never
+enters the size of its step. So the return-driven change Astra asks for is reached and then
+discarded. Separately, the executed release has no contact at all: its receiving bank is declared,
+not a locus.
+
+The next loop works on this measurement: a contact's step certified by the contact's own power
+balance (the word's `TickBalance` dissipation and the pair contact's slip law in
+`holon::contact`), so that a reached return changes the contact and the same later drive reads the
+change. It is checked on the word before it joins the bank.
