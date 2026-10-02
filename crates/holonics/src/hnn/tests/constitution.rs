@@ -70,7 +70,9 @@ fn rule(lattice: Lattice) -> ChartRule {
 /// `Σ w f fᵀ` less its released residuals (value plus remainder); the solved chart `X̂` of the carried
 /// successor Gram `H'` is symmetric, on its lattice, and certified, `‖1 − X̂H'‖∞ = δ ≤ δ_ℓ`; the map
 /// moves by exactly `γ Σ w g fᵀX̂` less its released residuals, so `(W + ΔW)H' = WH' + γG − ρ` with the
-/// released prox residual `ρ = γG(1 − X̂H')`, whose norm is within the reading's certificate; every
+/// released prox residual `ρ = γG(1 − X̂H')`, whose norm is within the reading's certificate; the
+/// published successors satisfy the window's one balance `W′H′ − (WH + WF + γG) = −ρ + W c_H + c_W H′`
+/// with each carry term `c = r − r′ − e` (`HNN/LatticeWord.carried_window_balance`); every
 /// entry stays on the lattice, every remainder in its half-open cell on the fine lattice of its clock,
 /// and every residual within half a fine unit.
 #[test]
@@ -172,6 +174,43 @@ fn the_prox_step_releases_its_charts_residual_at_the_carried_operands() {
         );
         assert!(row_norm(&rho) <= reading.released);
         assert_eq!(reading.read, rule.read(&reading.released));
+        // The window's one balance on the published map and Gram (Lean
+        // `HNN/LatticeWord.carried_window_balance`): `W′H′ − (WH + WF + γG) = −ρ + W c_H + c_W H′`,
+        // each carry term `c = r − r′ − e`.
+        let gram_carry = law
+            .gram_remainder()
+            .subtract(&next.gram_remainder())
+            .unwrap()
+            .subtract(&released(Carrier::Gram, 4, 4))
+            .unwrap();
+        let map_carry = law
+            .map_remainder()
+            .subtract(&next.map_remainder())
+            .unwrap()
+            .subtract(&released(Carrier::Map, 3, 4))
+            .unwrap();
+        assert_eq!(
+            next.map()
+                .multiply(&next.gram())
+                .unwrap()
+                .subtract(
+                    &law.map()
+                        .multiply(&law.gram())
+                        .unwrap()
+                        .add(&law.map().multiply(&gram_update).unwrap())
+                        .unwrap()
+                        .add(&gradient.scaled(&proxy))
+                        .unwrap()
+                )
+                .unwrap(),
+            law.map()
+                .multiply(&gram_carry)
+                .unwrap()
+                .add(&map_carry.multiply(&next.gram()).unwrap())
+                .unwrap()
+                .subtract(&rho)
+                .unwrap()
+        );
         let half = lattice.unit() / integer(2);
         let fine = Lattice::new(lattice.exponent() + gamma_length(clock));
         for value in next.map().entries().iter().chain(next.gram().entries()) {
