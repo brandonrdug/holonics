@@ -160,9 +160,10 @@ resolution is the floor above:
 - the rate excursion `J_N`, which the contact cut's rate enclosure bounds.
 
 [agent-inferred] Rebasing the channel past the unit at which one unit's `|ΔC J_N|` reaches `c·u`
-over the admitted run gains nothing at the next contact. Finer deposits are carried in the
-remainder and released at the word's end. At the control that unit is coarser than `1/8192`:
-through tick 19, one channel unit gives `|ΔC J|` short of `c·u` by a factor above 4.
+over the admitted run gains no forced change at the next contact. Finer deposits are carried in the
+remainder and released at the word's end. They can still part a representative by a crossing, as
+at tick 19 here, but nothing certifies that they will. At the control that unit is coarser than
+`1/8192`: through tick 19, one channel unit gives `|ΔC J|` short of `c·u` by a factor above 4.
 
 ## 7. What this asks of the control
 
