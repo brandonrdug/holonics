@@ -457,10 +457,11 @@ theorem throw_velocity_le_unaccreted (i m₀ f : ℝ) (k : ℕ) (hi : 0 ≤ i) (
   apply div_le_div_of_nonneg_left (mul_nonneg hk hi) hm
   nlinarith
 
-/-- **A throw from rest reaches no further than free fall**: under a constant impulse `i ≥ 0` on
-`m₀ > 0` with per-deposit mass `f ≥ 0`, the port's displacement over moves `0, …, n` is at most
-`(i/m₀)·n(n + 1)/2`, the discrete `|g| t²/2` with `g = i/m₀`. At `f = 0` it is free fall's own
-reach; a positive `f` only damps it. -/
+/-- **A throw from rest reaches no further than free fall**: under a constant impulse `i ≥ 0`
+on `m₀ > 0` with per-deposit mass `f ≥ 0`, the port's displacement over its first `n` moves
+(`m0` to `m(n − 1)`; the move after `k` deposits carries `k i/(m₀ + k f)`, and the `k = 0` term
+is the rest before `m0`) is at most `(i/m₀)·n(n + 1)/2`, the discrete `|g| t²/2` with
+`g = i/m₀`. At `f = 0` it is free fall's own reach; a positive `f` only damps it. -/
 theorem throw_reach_le_free_fall (i m₀ f : ℝ) (hi : 0 ≤ i) (hm : 0 < m₀) (hf : 0 ≤ f) (n : ℕ) :
     ∑ k ∈ Finset.range (n + 1), (k : ℝ) * i / (m₀ + k * f) ≤ i / m₀ * (n * (n + 1) / 2) := by
   induction n with
@@ -475,13 +476,44 @@ theorem throw_reach_le_free_fall (i m₀ f : ℝ) (hi : 0 ≤ i) (hm : 0 < m₀)
       ring
     linarith
 
-/-- **At the apex the floor is not ahead**: if the comparison is convex along the whole coast and
-its slope at the start is not negative (the power test's apex), the coast does not lower it, so the
-coast that stops at the floor is none and the move is released from rest. -/
+/-- **A convex coast rises at least at its starting slope**: if `f` is convex on `[0, 1]` with
+right derivative `s` at `0`, then `s t ≤ f t − f 0` for every `t ∈ (0, 1]`. At `t = 1` it is
+`convex_chord_slope_le`. -/
+theorem convex_slope_le {f : ℝ → ℝ} {s t : ℝ} (hf : ConvexOn ℝ (Set.Icc 0 1) f)
+    (hd : HasDerivWithinAt f s (Set.Ioi 0) 0) (ht0 : 0 < t) (ht1 : t ≤ 1) :
+    s * t ≤ f t - f 0 := by
+  have hlim := hasDerivWithinAt_iff_tendsto_slope.mp hd
+  rw [Set.sdiff_singleton_eq_self (by simp)] at hlim
+  have hs : s ≤ (f t - f 0) / t := by
+    apply le_of_tendsto hlim
+    filter_upwards [Ioo_mem_nhdsGT ht0] with h hh
+    obtain ⟨hh0, hht⟩ := hh
+    have hconv := hf.2 (Set.left_mem_Icc.mpr zero_le_one) ⟨ht0.le, ht1⟩
+      (by rw [sub_nonneg, div_le_one ht0]; exact hht.le : (0 : ℝ) ≤ 1 - h / t)
+      (div_nonneg hh0.le ht0.le) (by ring)
+    simp only [smul_eq_mul, mul_zero, zero_add] at hconv
+    rw [div_mul_cancel₀ h ht0.ne'] at hconv
+    rw [slope_def_field, sub_zero, div_le_div_iff₀ hh0 ht0]
+    have e : (1 - h / t) * f 0 + h / t * f t = f 0 + h / t * (f t - f 0) := by ring
+    rw [e] at hconv
+    have : (f h - f 0) * t ≤ h / t * (f t - f 0) * t := by nlinarith
+    rw [div_mul_eq_mul_div, div_mul_cancel₀ _ ht0.ne'] at this
+    linarith
+  rwa [le_div_iff₀ ht0] at hs
+
+/-- **At a convex coast's apex nothing ahead is lower**: if the comparison is convex along the
+whole coast and its slope at the start is not negative (the power test's apex), no fraction
+`τ ∈ [0, 1]` of the coast lowers it, so the coast that stops at its floor is none and the move is
+released from rest. Where the coast is not convex this is not derived: the release from rest there
+is chosen (§7 of the throw's record). -/
 theorem coast_apex_no_floor_ahead {f : ℝ → ℝ} {s : ℝ} (hf : ConvexOn ℝ (Set.Icc 0 1) f)
-    (hd : HasDerivWithinAt f s (Set.Ioi 0) 0) (hs : 0 ≤ s) : f 0 ≤ f 1 := by
-  have := convex_chord_slope_le hf hd
-  linarith
+    (hd : HasDerivWithinAt f s (Set.Ioi 0) 0) (hs : 0 ≤ s) :
+    ∀ τ ∈ Set.Icc (0 : ℝ) 1, f 0 ≤ f τ := by
+  intro τ ⟨hτ0, hτ1⟩
+  rcases hτ0.lt_or_eq with hτ | hτ
+  · have := convex_slope_le hf hd hτ hτ1
+    nlinarith
+  · rw [← hτ]
 
 /-- **The floor along a carried coast**: on the quadratic `a + sτ + κτ²/2` with `κ > 0`, the
 fraction `τ* = −s/κ` is lowest. -/
@@ -492,6 +524,15 @@ theorem coast_floor (a s κ τ : ℝ) (hκ : 0 < κ) :
     field_simp
     ring
   nlinarith [mul_nonneg (by linarith : (0 : ℝ) ≤ κ / 2) (sq_nonneg (τ + s / κ))]
+
+/-- **Without certified curvature the end is the floor**: on `a + sτ + κτ²/2` with `s ≤ 0` and
+`κ ≤ 0`, the whole coast `τ = 1` is lowest over `[0, 1]`. ThrowToFloor carries the whole coast
+where its curvature reading's lower end is not positive. -/
+theorem coast_floor_at_end (a s κ τ : ℝ) (hs : s ≤ 0) (hκ : κ ≤ 0) (hτ0 : 0 ≤ τ) (hτ1 : τ ≤ 1) :
+    a + s * 1 + κ * 1 ^ 2 / 2 ≤ a + s * τ + κ * τ ^ 2 / 2 := by
+  have h1 : s * 1 ≤ s * τ := by nlinarith
+  have h2 : κ * 1 ^ 2 / 2 ≤ κ * τ ^ 2 / 2 := by nlinarith [mul_le_mul hτ1 hτ1 hτ0 zero_le_one]
+  linarith
 
 /-- **The coast's curvature is read from its own end**: on that quadratic, the secant reading
 `2(L(1) − L(0) − s)` is `κ`. -/

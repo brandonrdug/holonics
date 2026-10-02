@@ -304,7 +304,10 @@ fit's path follows the gradient (`+1693`), so they carry it.
 - the velocity, carried as a rational moment of the returns (`v ← βv − hM⁻¹g`);
 - the position, deposited as every deposit is, rounded toward zero on the `2⁻²¹` lattice.
 
-**Superseded the same day** by [the throw's record](2026-10-02_THE_THROW_CARRIES_ITS_MOMENTUM_THROUGH_THE_DEPOSITS_ACCRETED_MASS_AND_A_HALVING_HALVES_IT.md): the deposit's mass accretion is the damping and the flight runs from a release to its apex, so neither the excursion's interval nor `ω_min` is needed. The paragraph is kept as it was.
+**Superseded the same day** by
+[the throw's record](2026-10-02_THE_THROW_CARRIES_ITS_MOMENTUM_THROUGH_THE_DEPOSITS_ACCRETED_MASS_AND_A_HALVING_HALVES_IT.md):
+the deposit's mass accretion is the damping and the flight runs from a release to its apex, so
+neither the excursion's interval nor `ω_min` is needed. The paragraph is kept as it was.
 
 [agent-inferred] **The flight and the damping.** The flight is the excursion's interval: `W` moves
 between its opening and its close, admitted while the energy `H = ½⟨Mv, v⟩ + L_held` falls

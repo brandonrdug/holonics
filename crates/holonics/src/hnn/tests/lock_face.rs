@@ -1560,9 +1560,45 @@ fn the_throw_to_its_floor_carries_at_most_the_floor_fraction_of_its_coast() {
         }
         // On this fixture `κ` is certified positive and the floor lies at or past the whole coast.
         assert_eq!(floor.floor, Some(Rat::one()));
+        assert!(floor.floor_end.is_none());
     } else {
         assert!(floor.coast_end.is_none() && floor.floor.is_none());
     }
+    // A faster flight: the velocity scaled by the least `2^k` whose floor falls short of the whole
+    // coast. Its coast is stopped at `τ < 1`, carried as `τ·c`: the same move as `Throw` from the
+    // velocity scaled by `τ` (the coast is linear in the velocity), and the stopped coast reads no
+    // higher than the coast's end on this fixture.
+    let velocity = flight.velocity.clone().expect("the release hands on its move");
+    let (fast, stopped, tau) = (1..=12)
+        .find_map(|k| {
+            let fast = Flight {
+                velocity: Some(velocity.scaled(&rat(1 << k, 1))),
+                moves: flight.moves,
+            };
+            let stopped = move_from(first, MoveMetric::ThrowToFloor, &fast);
+            let tau = stopped.throw.as_ref().unwrap().floor.clone()?;
+            (tau < Rat::one()).then_some((fast, stopped, tau))
+        })
+        .expect("some faster flight stops short of its whole coast");
+    let reading = stopped.throw.as_ref().unwrap();
+    assert!(reading.carried && tau.is_positive());
+    let end = reading.coast_end.as_ref().unwrap();
+    let at_floor = reading.floor_end.as_ref().expect("the stopped coast is read");
+    assert!(at_floor.upper <= end.upper, "L(τc) {at_floor:?} against L(c) {end:?}");
+    let slowed = Flight {
+        velocity: Some(fast.velocity.as_ref().unwrap().scaled(&tau)),
+        moves: fast.moves,
+    };
+    let carried = move_from(first, MoveMetric::Throw, &slowed);
+    assert!(carried.throw.as_ref().unwrap().carried);
+    assert_eq!(
+        carried.trials.iter().map(|t| t.value.clone()).collect::<Vec<_>>(),
+        stopped.trials.iter().map(|t| t.value.clone()).collect::<Vec<_>>()
+    );
+    assert_eq!(
+        carried.adopted.as_ref().map(|(s, _)| s.source_port(0).cloned()),
+        stopped.adopted.as_ref().map(|(s, _)| s.source_port(0).cloned())
+    );
     if let Some((successor, _)) = &floored.adopted {
         let last = floored.trials.last().unwrap();
         assert!(last.value.as_ref().unwrap().upper < floored.before.value.lower);

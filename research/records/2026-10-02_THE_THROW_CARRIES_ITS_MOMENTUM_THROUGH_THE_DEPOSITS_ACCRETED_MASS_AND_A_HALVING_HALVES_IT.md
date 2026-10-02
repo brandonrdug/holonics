@@ -31,8 +31,11 @@ comparison's shape, turns the Kinetic step from the gradient.
 3. **The damping is the accretion; no constant is chosen.**
    - A carried momentum's kinetic reading falls across every deposit by exactly the sticking loss
      `p²f/(2m(m + f))` (`accretion_loss`, `accretion_dissipates`).
-   - Under a repeated batch, `H_k = H₀ + kF`. The friction coefficient is then the accretion rate
-     `F/H_k`, which vanishes like `1/k` on the deposit clock: a friction with no time constant.
+   - Along the chain `H_k = H₀ + Σ_(j<k) F_j`, each `F_j` read on its own move's sections, so the
+     mass a deposit adds is not constant. With the same requests at every move and `F_j` modelled
+     as one `F` (the Lean's constant `f`), `H_k = H₀ + kF`, and the friction coefficient is the
+     accretion rate `F/H_k`, which vanishes like `1/k` on the deposit clock: a friction with no time
+     constant.
    - Under a constant impulse `i`, the throw's velocity `k i/(m₀ + kf)` rises with every deposit
      toward `i/f` (`throw_velocity_rises`, `throw_velocity_le_terminal`). The leap's `i/(m₀ + kf)`
      falls like `1/k` (`leap_velocity_le`). This is "too short per fit", derived: the leap spends at
@@ -69,6 +72,8 @@ From [the failures that repeated](2026-09-29_LESSONS_THE_FAILURES_THAT_REPEATED_
   yardstick.
 - **A refusal answered with a larger limit (lesson 9).** The throw keeps `LADDER_DEPTH`, the
   lattice floor and the entry scale, read on the whole carried move. No bound is raised.
+  `LADDER_DEPTH`'s 8 is a chosen work bound (#230); whether the receiver's resolution derives it
+  waits on #236, and this sentence holds whichever way that settles.
 - **An uncertified deposition step.** Every trial is certified by the same conditions of adoption,
   and the coast is deposited through the same budgeted carry, clock, budget and storage-growth
   certificate as the impulse (`Constitution::stepped_source_coasting`).
@@ -122,7 +127,8 @@ the flight. The remainder the lattice holds back is not lost: the carry deposits
 of the inverse on positive forms. It is owed in Lean (#62). The chart `X̂′` reads `(H + F)⁻¹` within
 its certificate `δ`.
 
-**The rate.** Gate A's chain deposits the same batch at every move, so `H_k = H₀ + kF`. The
+**The rate.** Gate A's chain deposits the same requests at every move. Their `F_j` is read on each
+move's own sections, so it varies along the chain; modelled as one `F`, `H_k = H₀ + kF`. The
 continuous form of the throw is `d/dt(H(t)v) = −∇L` with `Ḣ = F`, that is
 `H v̇ + F v = −∇L`. The accretion acts as a friction `F` against the mass `H₀ + tF`: per unit mass
 it vanishes like `1/t` on the deposit clock. The constant is the deposit's own `F`, not a chosen
@@ -131,7 +137,8 @@ time scale. The leap is the limit that spends the momentum at every deposit.
 **The apex.** The power the comparison's force delivers along the motion is `−⟨∇L, c⟩`. The
 composition's first-order bound along the coast alone encloses `⟨∇L, c⟩`, read on the coast's own
 carried successor. A negative upper end certifies that the comparison falls along the coast, and
-only then is the coast carried.
+only then is the coast carried. The impulse's own slope refusal (`slope_refusal`) is read before
+the coast: a move whose impulse is refused never reads its coast.
 
 [agent-inferred] **Why release at the apex.** Past the apex the coast climbs, and #202's held
 certificate refuses a climb. Carrying it would spend the move's trials on halvings that cannot be
@@ -141,7 +148,7 @@ adopted. Releasing from rest keeps the move the normal law's.
 carries `2^(−j)` of the momentum, since its move is the next velocity. The halving is the time step:
 the coast and the impulse shrink together. [agent-inferred] The impulse's own scaling within the
 time step (an impulse is `η` and a coast is `h`, with `η = h²`) is not followed. One halving law
-for the whole move keeps one ladder and its work bound.
+for the whole move keeps one sequence of trials and its per-move work bound, `LADDER_DEPTH` trials.
 
 **The entry scale.** The first trial is held so that no entry of `E` moves by more than the
 founding's `½`, now read on the whole carried move. The largest per-unit-step entry is bounded by
@@ -198,13 +205,13 @@ lengthens, and move farther along the persistent part of the gradient per deposi
 
 ## 6. The run, pinned before it
 
-**The claim fixed first.** From the opening `c0.state` on gate A's batch (`order2`, seed
+**The claim fixed first.** From the opening `c0.state` on gate A's requests (`order2`, seed
 `2026093061`, 8 requests) under `lock-dec`:
 - the 16-move throw chain ends with `L` below its control's at the same move count;
 - and its held-out whole sections are at least the control's.
 
 The control is the same `run.sh` with `coordinate` in place of `throw`, from the same `c0.state` and
-batch. Both run under strict descent (`ReleaseExcursion::monotone`: `run.sh` sets no
+requests. Both run under strict descent (`ReleaseExcursion::monotone`: `run.sh` sets no
 `EXCURSION_CHECKPOINT`). So the comparison is like with like: the main line's Coordinate chain
 adopts under #202's open run, which is a different rule. At the opening the Coordinate and Witness
 moves both lie close to `G` and to `ΔE` (each step's `cos²` with `ΔE` in `[4095, 4096)/4096`, with
@@ -254,8 +261,9 @@ read overlapped a 12 s Lean build.
 
 **The projection, fixed at launch.** The unit is a trial. The two moves give a base of
 `253092` ms and `137075` ms a trial (m1 at one trial, m0 at two). With `LADDER_DEPTH`'s 8 trials the
-per-move bound is `253092 + 8 · 137075 = 1349692` ms, and the chain's deadline is 16 times
-`1350` s, `21600` s, launched as `timeout 21596` around `run.sh .local/throw 1349692 1350`.
+per-move bound is `253092 + 8 · 137075 = 1349692` ms, and the chain's deadline is
+`16 · 1349692 = 21595072` ms, rounded up to `21596` s, launched as `timeout 21596` around
+`run.sh .local/throw 1349692 1350` (each move's own deadline `1350` s is its bound rounded up).
 
 ## 7. The floor along the coast (after the development read)
 
@@ -271,7 +279,9 @@ length to `[495714/4096, 495719/4096)`, and that jump is what turned the line (#
 - *Apex, `s ≥ 0`.* With `L` convex along the coast, the coast does not lower it
   (`coast_apex_no_floor_ahead`). The floor is not ahead, so the coast that stops at the floor is
   none, and the move is released from rest: the inelastic limit of the deposit's own sticking. This
-  is #240's rule, now derived. Where `L` is concave along the line, no forward floor exists either.
+  is #240's rule, derived where the coast is convex. Where `L` is not convex along the coast this
+  derives nothing, and the release from rest there is chosen. `ThrowToFloor` reads `L(c)` only on
+  a carried coast (`s⁺ < 0`), so at the apex it never reads whether the coast is convex.
 - *Carried, `s < 0`.* The floor is at `τ* = −s/κ` (`coast_floor`), and the coast that stops there
   is `min(1, τ*)·c`. #240 carries `τ = 1` and lets the halvings scale it, so a coast with `τ* < 1`
   overshoots its floor and the next move releases.
@@ -283,17 +293,59 @@ length to `[495714/4096, 495719/4096)`, and that jump is what turned the line (#
 - *Built* as `MoveMetric::ThrowToFloor` (`ThrowReading::coast_end`, `ThrowReading::floor`): the
   least `τ*` over the enclosures, `−s⁺/κ⁺` with `κ⁺ = 2(L(c)⁺ − L(0)⁻ − s⁻)`, held at `JOINT_BITS`
   toward zero and at most `1`; where `κ⁻ = 2(L(c)⁻ − L(0)⁺ − s⁺)` is not positive, the whole coast is
-  carried as `Throw` carries it. The cost is one reread per carried move. The harness reads it as
-  `throw-floor`.
+  carried as `Throw` carries it: on the quadratic with `s ≤ 0` and `κ ≤ 0` the end is the floor
+  (`coast_floor_at_end`). The cost is one reread per carried move, and one more where `τ < 1`: the
+  stopped coast's own `L(τc)` (`ThrowReading::floor_end`), the receipt of whether the quadratic held
+  off the coast's end. The harness reads it as `throw-floor`.
+- *What the stop dissipates.* The adopted move is the next velocity, so a coast stopped at `τ`
+  hands on `τ` of its momentum: `(1 − τ)` of the coast's momentum is dropped at the floor, a
+  dissipation of the same kind as a halving's.
 
 **What it changes.** The apex moves are unchanged. Carried moves with `τ* < 1` carry less coast. So
 the law changes only what follows the running chain, whose receipts stay those of §2's rule. It is
 held for measurement like `Throw`.
 
-## 8. Verification
+## 8. Where the Kinetic step turns from the normal direction (Q10)
+
+The throw's impulse is the normal law's step `d`; `Kinetic`'s step is `M⁻¹AᵀK⁻¹w` with
+`K = AM⁻¹Aᵀ` and `w = −F⁻¹c` (Q1: at `c0` its Euclidean `cos²` with `d` is `[37, 38)/4096`).
+
+**The prediction** [agent-inferred, before the read]: the per-target weights turn little, since
+Q1 reads the spread of `θ_t` in `[13, 14)`; the terms of one request share data features, their
+covectors are rotations of one class covector, so the within-term blocks act near-diagonally and
+the cross-term coupling carries the turn. The first step leaned on a Kantorovich bound,
+`cos² ≥ 4κ/(κ + 1)²`, which holds for reweighting a vector's own coordinates. The weights here act
+on terms whose pullbacks share rows of `E` and can cancel in `d = −Aᵀc`, so the bound does not
+apply and a `θ_t` spread does not by itself bound their turn. The step with `μ_t = 1/θ_t` alone,
+without `K`, is unread.
+
+**The read** (runner 1, `research/runs/u6/cloud/q10/kinetic-coupling.txt` on
+`claude/cloud-runs-pfo084` at `eeafdf7a`; at `c0`, Euclidean `cos²` against `d` over `4096`, the
+M-metric readings within a few cells of each):
+
+| `K` kept | `cos²` with `d` | Its solve |
+|---|---|---|
+| diagonal | `[662, 663)` | closed form |
+| term blocks | `[852, 853)` | 64 blocks, converged after 5 iterates |
+| request blocks | `[355, 356)` | 8 blocks: 4 converged after 38 to 40, 4 exhausted at 40 |
+| joint | `[37, 38)` | exhausted at 320 iterates |
+
+**What fails.** The diagonal alone does most of the turn, from `d` to `[662, 663)`. The within-term
+coupling turns back toward `d` (`[852, 853)`), so the term blocks are not near-diagonal in effect.
+The coupling within and then across requests finishes the turn. So the cross-term coupling does
+carry the last part of the turn, but the reason given (near-diagonal term blocks, a weight that
+turns little) is wrong at both steps.
+
+**What the solve is.** The joint solve stops at 320 iterates without reaching its energy floor, so
+the native `Kinetic` step is a truncated iterate. Its first iterate lies along `d`
+(`[4068, 4069)`), and the `cos²` falls with every iterate until it settles: the last 63 iterates
+all read `[37, 38)`. The step's direction is settled to the cell, but its length is the
+truncated iterate's.
+
+## 9. Verification
 
 - `cargo check -p holonics --all-targets`: clean.
-- The two tests above and `the_kinetic_move_deposits_the_solve_and_keeps_every_guard`, in release:
-  see the PR.
+- The three throw tests (the floor test with its `τ < 1` fixture) and
+  `the_kinetic_move_deposits_the_solve_and_keeps_every_guard`: see the PR.
 - `bash tools/lean_check.sh HolonicsResearch.HNN.MoveDirection`: "Build completed successfully
   (8706 jobs)".

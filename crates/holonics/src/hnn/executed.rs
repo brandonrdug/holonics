@@ -3151,7 +3151,10 @@ pub enum LadderStart {
 ///   coast-only successor); the secant curvature is `κ = 2(L(c) − L(0) − s)` and the floor is at
 ///   `τ* = −s/κ`. The coast carried is `min(1, τ*)·c`, `τ*` taken at its least over the enclosures
 ///   and held at [`JOINT_BITS`] toward zero; where `κ` is not certified positive the whole coast is
-///   carried, as `Throw` carries it. At the apex it is `Throw`'s release from rest.
+///   carried, as `Throw` carries it (on the quadratic with `s ≤ 0`, `κ ≤ 0` the end is the floor:
+///   `coast_floor_at_end`). At the apex it is `Throw`'s release from rest, derived where the coast
+///   is convex (`coast_apex_no_floor_ahead`) and chosen elsewhere; `L(c)` is read only on a carried
+///   coast.
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub enum MoveMetric {
     Coordinate,
@@ -3197,6 +3200,9 @@ pub struct ThrowReading {
     /// [`MoveMetric::ThrowToFloor`]: the fraction of the coast carried, `min(1, τ*)`, where `κ` was
     /// certified positive.
     pub floor: Option<Rat>,
+    /// [`MoveMetric::ThrowToFloor`]: the fixed-mask comparison at the stopped coast, `L(τc)`, read
+    /// where `τ < 1`: the receipt of whether the floor's quadratic reading held off its own end.
+    pub floor_end: Option<ExactInterval>,
     pub carried: bool,
     pub impulse_step: Option<Rat>,
     pub next: Flight,
@@ -4086,6 +4092,7 @@ fn executed_move_flown(
             power: None,
             coast_end: None,
             floor: None,
+            floor_end: None,
             carried: false,
             impulse_step: None,
             next: Flight::default(),
@@ -4282,6 +4289,7 @@ fn executed_move_flown(
             let mut power = None;
             let mut coast_end = None;
             let mut floor = None;
+            let mut floor_end = None;
             if let Some(read) = &read
                 && let Some((coasted, _)) = constitution.stepped_source_coasting(
                     ring,
@@ -4304,6 +4312,14 @@ fn executed_move_flown(
                             let tau = joint_held(-&bound.upper / &most).min(Rat::one());
                             if tau < Rat::one() {
                                 coast = coast.scaled(&tau);
+                                if let Some((stopped, _)) = constitution.stepped_source_coasting(
+                                    ring,
+                                    &samples,
+                                    &Rat::zero(),
+                                    Some(&coast),
+                                )? {
+                                    floor_end = Some(reread(&stopped)?.value);
+                                }
                             }
                             floor = Some(tau);
                         }
@@ -4318,6 +4334,7 @@ fn executed_move_flown(
                 throw.power = power;
                 throw.coast_end = coast_end;
                 throw.floor = floor;
+                throw.floor_end = floor_end;
                 throw.carried = carried.is_some();
                 throw.impulse_step = Some(start.clone());
             }
