@@ -4162,7 +4162,8 @@ fn dyadic(numerator: BigUint, exponent: u64) -> Rat {
 /// fraction bits for `y ∈ [1, 2]`, the widest with `y² ≤ 4` held in `P + 3 ≤ 128` bits.
 const FIXED: u32 = u128::BITS - 3;
 
-/// `(hi, lo)` with `a b = hi 2^128 + lo`.
+/// `(hi, lo)` with `a b = hi 2^128 + lo`, every operation within `u128` (Lean
+/// `Compression/Landmark/Context/BinaryLog.wideMul_eq`).
 fn wide_mul(a: u128, b: u128) -> (u128, u128) {
     let mask = u128::from(u64::MAX);
     let (a1, a0, b1, b0) = (a >> 64, a & mask, b >> 64, b & mask);
@@ -4174,7 +4175,7 @@ fn wide_mul(a: u128, b: u128) -> (u128, u128) {
     )
 }
 
-/// `⌊x²/2^P⌋` and `⌈x²/2^P⌉` for `x ≤ 2^(P+1) + 1`.
+/// `⌊x²/2^P⌋` and `⌈x²/2^P⌉` for `x ≤ 2^(P+1) + 1` (Lean `BinaryLog.squareWord_eq`).
 fn square(x: u128) -> (u128, u128) {
     let (hi, lo) = wide_mul(x, x);
     let floor = (hi << (u128::BITS - FIXED)) | (lo >> FIXED);
@@ -4249,7 +4250,8 @@ pub fn binary_log(
 }
 
 /// `⌊L log₂ m⌋`, decided by the certified binary logarithm within 64 fraction bits (every operand
-/// within `u128` for `L < 2^32` and `m` of fewer than `2^31` bits), or `None`.
+/// within `u128` for `L < 2^32` and `m` of at most `2^31` bits, Lean `BinaryLog.grain_operands`), or
+/// `None`.
 fn grain_floor(m: &BigUint, grain: u64) -> Option<BigInt> {
     if grain == 0 {
         return Some(BigInt::zero());

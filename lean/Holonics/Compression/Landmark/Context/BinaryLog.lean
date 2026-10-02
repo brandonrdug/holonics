@@ -45,16 +45,26 @@ grain       ⌊L(w 2^k + f)/2^k⌋ = ⌊(L(w 2^k + f + 1) − 1)/2^k⌋  ⟹  �
   square itself, at most `2^252`, in `wide_mul`'s 256-bit pair.
 - `grain_floor_decided`, `grain_floor_of_encl`: when the two floors agree, `⌊L log₂ m⌋` is their
   value (`grain_floor`).
+- `wideMul_eq`: `wide_mul`, written with the Rust's own bit operations, returns `(hi, lo)` with
+  `a b = hi 2^128 + lo` for `a, b < 2^128`; the four half products are below `2^128`, the middle
+  column below `3 · 2^64`, and `hi`, `lo` below `2^128`, so no operation leaves `u128`.
+- `squareWord_eq`: `square` at `P = 125` is `(sqLo 125 x, sqHi 125 x)` for `x ≤ 2^126 + 1`: the
+  high half is below `2^125`, so `hi << 3` drops nothing and `(hi << 3) | (lo >> 125)` is the
+  floor; `sqHi` is in `u128`.
+- `fraction_step`: `(f << 1) | bit` is `2f + bit` and stays below `2^(k+1)`.
+- `grain_operands`: under `grain_floor`'s guards (`L < 2^32`, the top bit `w < 2^31`, at most 64
+  fraction bits) `(w << k) | f = w 2^k + f ≤ 2^95 − 1` and `L (w 2^k + f + 1) < 2^127`.
 
 [conditional] **What the theorems cover in the Rust.** `square` computes `⌊x²/2^P⌋` from the
-128-bit halves of `x²` and adds one unless the low `P` bits vanish, which is `sqLo` and `sqHi`;
-`wide_mul`'s 256-bit product is checked by the tests, not stated here. `binary_log`'s loop is
+128-bit halves of `x²` and adds one unless the low `P` bits vanish, which is `sqLo` and `sqHi`
+(`squareWord_eq`, over `wide_mul`'s 256-bit product, `wideMul_eq`). `binary_log`'s loop is
 `bit_one` (`low >= two`, `(low >> 1, (high + 1) >> 1)`) and `bit_zero` (`high < two`, `(low,
 high)`), founded by `found_exact` (`whole <= fixed`) or `found_floor`. A power of two returns
 `whole` exactly, `log₂ m = w`. `ProductBound::log2` reads `[w + f/2^k, w + (f + 1)/2^k]`, which
 `log_encl` certifies (strictly inside the upper end). `grain_floor`'s operand widths (`L < 2^32`,
-`w < 2^31`, at most 64 fraction bits, so `L (w 2^k + f + 1) < 2^127`) are the Rust's guard, not
-stated here.
+`w < 2^31`, at most 64 fraction bits, so `L (w 2^k + f + 1) < 2^127`) are `grain_operands`. The
+model reads Rust's `u128` addition and product as exact (each is shown below `2^128`, where the
+Rust neither wraps nor panics) and its left shift as dropping the bits past 128 (`shl`).
 
 | Claim | Lean | Rust |
 |---|---|---|
@@ -63,6 +73,7 @@ stated here.
 | the certified enclosure | `log_encl` | `BinaryLog`, `ProductBound::log2` |
 | the carrier | `sqHi_le`, `found_exact_le`, `found_floor_le`, `hi_one_le` | `FIXED`, `square` |
 | the grain floor | `grain_floor_decided`, `grain_floor_of_encl` | `grain_floor`, `dyadic_grain_exponent` |
+| the machine words | `wideMul_eq`, `squareWord_eq`, `fraction_step`, `grain_operands` | `wide_mul`, `square`, `binary_log`, `grain_floor` |
 -/
 
 namespace Holonics.Compression.Landmark.Context.BinaryLog
@@ -357,6 +368,192 @@ theorem grain_floor_of_encl {P lo hi k f m w g : ℕ} (hm : 0 < m) (hg : 0 < g)
       (lt_div_iff₀ hk).1 (by linarith)
     nlinarith
 
+/-! ### The machine words
+
+`u128` carries every operand of `wide_mul`, `square` and `grain_floor`. Each operation below is
+written with the Rust's own bit operations (`>>>`, `&&&`, `|||`, and a left shift that drops the
+bits past 128), and each theorem states that the result is the arithmetic it stands for and that
+no addition, product or shift leaves `u128`. -/
+
+/-- `2^128`, the `u128` carrier. -/
+abbrev word : ℕ := 2 ^ 128
+
+/-- `u128`'s left shift: the bits past 128 are dropped. -/
+def shl (x s : ℕ) : ℕ := (x <<< s) % word
+
+/-- [definition] **`wide_mul`**, as the Rust writes it: the 64-bit halves, their four products,
+the middle column, and the pair `(hi, lo)`. -/
+def wideMul (a b : ℕ) : ℕ × ℕ :=
+  let mask := 2 ^ 64 - 1
+  let a1 := a >>> 64
+  let a0 := a &&& mask
+  let b1 := b >>> 64
+  let b0 := b &&& mask
+  let p00 := a0 * b0
+  let p01 := a0 * b1
+  let p10 := a1 * b0
+  let p11 := a1 * b1
+  let middle := (p00 >>> 64) + (p01 &&& mask) + (p10 &&& mask)
+  (p11 + (p01 >>> 64) + (p10 >>> 64) + (middle >>> 64), (p00 &&& mask) ||| shl middle 64)
+
+theorem half_mul_lt {x y : ℕ} (hx : x < 2 ^ 64) (hy : y < 2 ^ 64) : x * y < word := by
+  calc x * y < 2 ^ 64 * 2 ^ 64 := Nat.mul_lt_mul_of_lt_of_lt hx hy
+    _ = word := by rw [← pow_add]
+
+/-- [proved-derived] **`wideMul_eq`: `wide_mul`'s 256-bit product.** For `a, b < 2^128` the pair is
+`a b = hi 2^128 + lo` with both halves in `u128`; the four half products are below `2^128` and the
+middle column below `3 · 2^64`, so no addition overflows (every partial sum of `hi` is at most
+`hi`). -/
+theorem wideMul_eq {a b : ℕ} (ha : a < word) (hb : b < word) :
+    (wideMul a b).1 * word + (wideMul a b).2 = a * b ∧ (wideMul a b).1 < word ∧
+      (wideMul a b).2 < word ∧
+      (a % 2 ^ 64) * (b % 2 ^ 64) < word ∧ (a % 2 ^ 64) * (b / 2 ^ 64) < word ∧
+      (a / 2 ^ 64) * (b % 2 ^ 64) < word ∧ (a / 2 ^ 64) * (b / 2 ^ 64) < word ∧
+      (a % 2 ^ 64) * (b % 2 ^ 64) / 2 ^ 64 + (a % 2 ^ 64) * (b / 2 ^ 64) % 2 ^ 64 +
+        (a / 2 ^ 64) * (b % 2 ^ 64) % 2 ^ 64 < 3 * 2 ^ 64 := by
+  have hH : (0 : ℕ) < 2 ^ 64 := by positivity
+  have hW : word = 2 ^ 64 * 2 ^ 64 := by rw [← pow_add]
+  have hmask : ∀ x : ℕ, x &&& 2 ^ 64 - 1 = x % 2 ^ 64 := fun x => Nat.and_two_pow_sub_one_eq_mod x 64
+  have ha1 : a / 2 ^ 64 < 2 ^ 64 := by rw [Nat.div_lt_iff_lt_mul hH, ← hW]; exact ha
+  have hb1 : b / 2 ^ 64 < 2 ^ 64 := by rw [Nat.div_lt_iff_lt_mul hH, ← hW]; exact hb
+  have ha0 := Nat.mod_lt a hH
+  have hb0 := Nat.mod_lt b hH
+  set a1 := a / 2 ^ 64 with ha1d
+  set a0 := a % 2 ^ 64 with ha0d
+  set b1 := b / 2 ^ 64 with hb1d
+  set b0 := b % 2 ^ 64 with hb0d
+  set p00 := a0 * b0
+  set p01 := a0 * b1
+  set p10 := a1 * b0
+  set p11 := a1 * b1
+  set middle := p00 / 2 ^ 64 + p01 % 2 ^ 64 + p10 % 2 ^ 64 with hmid
+  have hp00 : p00 < word := half_mul_lt ha0 hb0
+  have hmid3 : middle < 3 * 2 ^ 64 := by
+    have h1 : p00 / 2 ^ 64 < 2 ^ 64 := by rw [Nat.div_lt_iff_lt_mul hH, ← hW]; exact hp00
+    have := Nat.mod_lt p01 hH
+    have := Nat.mod_lt p10 hH
+    omega
+  have hshl : shl middle 64 = (middle % 2 ^ 64) * 2 ^ 64 := by
+    unfold shl; rw [Nat.shiftLeft_eq, hW, Nat.mul_mod_mul_right]
+  have hlo : (p00 % 2 ^ 64) ||| shl middle 64 = (middle % 2 ^ 64) * 2 ^ 64 + p00 % 2 ^ 64 := by
+    rw [hshl, Nat.or_comm, Nat.mul_comm, Nat.two_pow_add_eq_or_of_lt (Nat.mod_lt _ hH)]
+  have hrun : wideMul a b = (p11 + p01 / 2 ^ 64 + p10 / 2 ^ 64 + middle / 2 ^ 64,
+      (middle % 2 ^ 64) * 2 ^ 64 + p00 % 2 ^ 64) := by
+    simp only [wideMul, Nat.shiftRight_eq_div_pow, hmask]
+    rw [← hlo]
+  rw [hrun]
+  -- the product
+  have hab : (p11 + p01 / 2 ^ 64 + p10 / 2 ^ 64 + middle / 2 ^ 64) * word +
+      ((middle % 2 ^ 64) * 2 ^ 64 + p00 % 2 ^ 64) = a * b := by
+    have ea := Nat.div_add_mod a (2 ^ 64)
+    have eb := Nat.div_add_mod b (2 ^ 64)
+    have e00 := Nat.div_add_mod p00 (2 ^ 64)
+    have e01 := Nat.div_add_mod p01 (2 ^ 64)
+    have e10 := Nat.div_add_mod p10 (2 ^ 64)
+    have em := Nat.div_add_mod middle (2 ^ 64)
+    have hab' : a * b = 2 ^ 64 * 2 ^ 64 * p11 + 2 ^ 64 * (p01 + p10) + p00 := by
+      rw [← ea, ← eb]; ring
+    rw [hab', hW]
+    generalize p00 / 2 ^ 64 = q00 at e00 hmid
+    generalize p00 % 2 ^ 64 = r00 at e00 hmid ⊢
+    generalize p01 / 2 ^ 64 = q01 at e01 ⊢
+    generalize p01 % 2 ^ 64 = r01 at e01 hmid
+    generalize p10 / 2 ^ 64 = q10 at e10 ⊢
+    generalize p10 % 2 ^ 64 = r10 at e10 hmid
+    generalize middle / 2 ^ 64 = mq at em ⊢
+    generalize middle % 2 ^ 64 = mr at em ⊢
+    rw [← e00, ← e01, ← e10]
+    rw [hmid] at em
+    linarith
+  have hprod : a * b < word * word := Nat.mul_lt_mul_of_lt_of_lt ha hb
+  have hlo_lt : (middle % 2 ^ 64) * 2 ^ 64 + p00 % 2 ^ 64 < word := by
+    have := Nat.mod_lt middle hH
+    have := Nat.mod_lt p00 hH
+    rw [hW]; nlinarith
+  refine ⟨hab, ?_, hlo_lt, hp00, half_mul_lt ha0 hb1, half_mul_lt ha1 hb0, half_mul_lt ha1 hb1,
+    hmid3⟩
+  by_contra h
+  push Not at h
+  have : word * word ≤ (p11 + p01 / 2 ^ 64 + p10 / 2 ^ 64 + middle / 2 ^ 64) * word :=
+    Nat.mul_le_mul_right _ h
+  omega
+
+/-- [definition] **`square`**, as the Rust writes it at `P = 125` (`FIXED`): the floor from the
+two halves, `(hi << 3) | (lo >> 125)`, and one more unless the low `125` bits vanish. -/
+def squareWord (x : ℕ) : ℕ × ℕ :=
+  let hi := (wideMul x x).1
+  let lo := (wideMul x x).2
+  let floor := shl hi 3 ||| (lo >>> 125)
+  (floor, floor + if lo &&& 2 ^ 125 - 1 = 0 then 0 else 1)
+
+/-- [proved-derived] **`squareWord_eq`: `square` is `(sqLo, sqHi)` in `u128`.** For
+`x ≤ 2^126 + 1` (the carrier `hi_one_le` holds both bounds at most `2^(P+1) = 2^126`) the high half
+of `x²` is below `2^125`, so `hi << 3` drops nothing, the two parts occupy disjoint bits, and both
+results, at most `2^127 + 5`, are in `u128`. -/
+theorem squareWord_eq {x : ℕ} (hx : x ≤ 2 ^ 126 + 1) :
+    squareWord x = (sqLo 125 x, sqHi 125 x) ∧ sqHi 125 x < word := by
+  have hxw : x < word := by unfold word; omega
+  obtain ⟨heq, hhi, hlo, -⟩ := wideMul_eq hxw hxw
+  set hi := (wideMul x x).1
+  set lo := (wideMul x x).2
+  have hsq : x * x ≤ (2 ^ 126 + 1) * (2 ^ 126 + 1) := Nat.mul_le_mul hx hx
+  have h125 : (0 : ℕ) < 2 ^ 125 := by positivity
+  have hW : word = 2 ^ 3 * 2 ^ 125 := by rw [← pow_add]
+  have hhi' : hi < 2 ^ 125 := by
+    by_contra h; push Not at h
+    have : 2 ^ 125 * word ≤ hi * word := Nat.mul_le_mul_right _ h
+    have : (2 ^ 126 + 1) * (2 ^ 126 + 1) < 2 ^ 125 * word := by norm_num
+    omega
+  have hshl : shl hi 3 = 2 ^ 3 * hi := by
+    unfold shl; rw [Nat.shiftLeft_eq, Nat.mod_eq_of_lt (by rw [hW]; omega), Nat.mul_comm]
+  have hlo8 : lo / 2 ^ 125 < 2 ^ 3 := by rw [Nat.div_lt_iff_lt_mul h125, ← hW]; exact hlo
+  have hfloor : shl hi 3 ||| (lo >>> 125) = x * x / 2 ^ 125 := by
+    rw [hshl, Nat.shiftRight_eq_div_pow, ← Nat.two_pow_add_eq_or_of_lt hlo8, ← heq, hW,
+      show hi * (2 ^ 3 * 2 ^ 125) + lo = lo + 2 ^ 125 * (2 ^ 3 * hi) by ring,
+      Nat.add_mul_div_left _ _ h125]
+    ring
+  have hmod : lo % 2 ^ 125 = x * x % 2 ^ 125 := by
+    rw [← heq, hW, show hi * (2 ^ 3 * 2 ^ 125) + lo = lo + 2 ^ 125 * (2 ^ 3 * hi) by ring,
+      Nat.add_mul_mod_self_left]
+  have hpair : squareWord x = (sqLo 125 x, sqHi 125 x) := by
+    simp only [squareWord, Nat.and_two_pow_sub_one_eq_mod, sqLo, sqHi]
+    rw [hfloor, hmod]
+  refine ⟨hpair, ?_⟩
+  have : x * x / 2 ^ 125 ≤ (2 ^ 126 + 1) * (2 ^ 126 + 1) / 2 ^ 125 := Nat.div_le_div_right hsq
+  have h2 : (2 ^ 126 + 1) * (2 ^ 126 + 1) / 2 ^ 125 + 1 < word := by norm_num
+  unfold sqHi
+  split_ifs <;> omega
+
+/-- [proved-derived] **`fraction_step`: the emitted fraction is the bits read so far.** After `k`
+bits the fraction is below `2^k`; `(f << 1) | bit` is `2f + bit`, below `2^(k+1)`. -/
+theorem fraction_step {f k b : ℕ} (hf : f < 2 ^ k) (hb : b < 2) :
+    (f <<< 1 ||| b) = 2 * f + b ∧ 2 * f + b < 2 ^ (k + 1) := by
+  refine ⟨?_, by rw [pow_succ]; omega⟩
+  rw [← Nat.shiftLeft_add_eq_or_of_lt (i := 1) (by simpa using hb), Nat.shiftLeft_eq]
+  ring
+
+/-- [proved-derived] **`grain_operands`: `grain_floor`'s operands are in `u128`.** Under the
+Rust's guards, `L ≤ u32::MAX` and `m` of at most `2^31` bits (so its top bit `w < 2^31`), with at
+most `64` fraction bits (`binary_log(m, u64::BITS, …)`) and the fraction below `2^k`
+(`fraction_step`): `(w << k) | f` is `w 2^k + f`, at most `2^95 − 1`, and both `L (w 2^k + f)` and
+`L (w 2^k + f + 1) − 1` are below `2^127`. The two floors `grain_floor_of_encl` compares are those
+products shifted right by `k`. -/
+theorem grain_operands {L w k f : ℕ} (hL : L < 2 ^ 32) (hw : w + 1 ≤ 2 ^ 31) (hk : k ≤ 64)
+    (hf : f < 2 ^ k) :
+    (w <<< k ||| f) = w * 2 ^ k + f ∧ w * 2 ^ k + f + 1 ≤ 2 ^ 95 ∧
+      L * (w * 2 ^ k + f + 1) < 2 ^ 127 := by
+  have hbase : w * 2 ^ k + f + 1 ≤ 2 ^ 95 := by
+    have h1 : w * 2 ^ k + f + 1 ≤ (w + 1) * 2 ^ k := by rw [add_mul, one_mul]; omega
+    have h2 : (w + 1) * 2 ^ k ≤ 2 ^ 31 * 2 ^ 64 :=
+      Nat.mul_le_mul hw (Nat.pow_le_pow_right (by norm_num) hk)
+    have h3 : (2 : ℕ) ^ 31 * 2 ^ 64 = 2 ^ 95 := by rw [← pow_add]
+    omega
+  refine ⟨?_, hbase, ?_⟩
+  · rw [← Nat.shiftLeft_add_eq_or_of_lt hf, Nat.shiftLeft_eq]
+  · calc L * (w * 2 ^ k + f + 1) < 2 ^ 32 * 2 ^ 95 := by
+          apply Nat.mul_lt_mul_of_lt_of_le hL hbase (by omega)
+      _ = 2 ^ 127 := by rw [← pow_add]
+
 /-! ### Audit -/
 
 #print axioms sqHi_le
@@ -374,5 +571,10 @@ theorem grain_floor_of_encl {P lo hi k f m w g : ℕ} (hm : 0 < m) (hg : 0 < g)
 #print axioms hi_one_le
 #print axioms grain_floor_decided
 #print axioms grain_floor_of_encl
+#print axioms half_mul_lt
+#print axioms wideMul_eq
+#print axioms squareWord_eq
+#print axioms fraction_step
+#print axioms grain_operands
 
 end Holonics.Compression.Landmark.Context.BinaryLog
