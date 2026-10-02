@@ -455,6 +455,7 @@
 //! | `HNN/LatticeDeposit.{quot, rem, div_rem_spec, rem_bounds, quot_eq_zero_of_bounds, fine}` | [`Lattice::div_rem`] (the carry's fine split), [`Lattice::div_rem_coordinate`] (its coarse split) |
 //! | `HNN/LatticeDeposit.{gammaLength, gamma_kraft_lt_one}` | [`gamma_length`] |
 //! | `HNN/LatticeDeposit.{carry, release, carry_accounting, lattice_deposit_accounting, carry_zero, carry_entry_zero, carry_entry_below_grain}` | [`BudgetedCarry`], the carried deposit of every entry |
+//! | `HNN/LatticeDeposit/Rebase.{Carried.rebase, rebase_value_add_rem, rebase_onLattice, history_accounting, history_release_lt, history_within_founding_unit}` | `BudgetedCarry::rebase` (crate-internal), the re-base onto a finer lattice; [`Constitution::rebased`] at a contact's channel, which the declared schedule never calls |
 //! | `HNN/LatticeDeposit.{carried_remainder_bounded, remainder_numerator_bounded, remainder_rat_bits_bounded}` | [`Constitution::carried_remainders`], [`CarrierBits::remainders`] |
 //! | `HNN/LatticeDeposit.{release_bounded, release_bounded_since_founding, within_one_unit_since_founding, remainder_below_grain}` | [`DepositReading::released`] |
 //! | `HNN/LatticeDeposit.{carried_gram_posDef, carried_gram_posDef_rule}` | [`NormalLaw::gram`] (the carried Gram) |
@@ -691,12 +692,78 @@ impl BudgetedCarry {
             .iter()
             .any(|((carrier, _), (_, quotient))| family.carries(carrier) && !quotient.is_zero())
     }
+
+    /// The locus's lattice `2^(−L)ℤ`, the one this deposit carries on.
+    pub fn lattice(&self) -> Lattice {
+        self.lattice
+    }
+
+    /// [definition; agent-inferred] **The re-base onto the finer lattice** `2^(−L−j)ℤ` (Lean
+    /// `HNN/LatticeDeposit/Rebase.Carried.rebase`), of every array the locus carries, before the
+    /// deposit stages anything. Each carried remainder `r` is divided at the finer unit
+    /// `u′ = 2^(−L−j)`, `r = q′u′ + r′` with `r′ ∈ [−u′/2, u′/2)` ([`Lattice::div_rem`]); the entry
+    /// takes `q′u′` and `r′` is carried. The clock is kept, so the precision schedule `k_m`
+    /// continues, and nothing is released.
+    ///
+    /// [proved-derived; formal-checked] Per entry, `entry′ + r′ = entry + r`
+    /// (`rebase_value_add_rem`), a lattice entry lands on the finer lattice (`rebase_onLattice`),
+    /// and over any history of deposits and re-bases the releases since the founding stay below
+    /// half the founding unit (`history_release_lt`), the entry within `u₀/2 + u/2` of the exact
+    /// accumulation (`history_within_founding_unit`). The bound is in the founding unit `u₀`, not
+    /// the current `u`.
+    ///
+    /// [definition; agent-inferred] The declared schedule keeps one lattice per locus and never
+    /// calls this; a refining grain (`HNN/Ratio/Resolution.grainRead_of_refined`, dyadic
+    /// `2^⌈log₂ L(N)⌉`) re-bases by the levels its exponent grew. Refused once the deposit has
+    /// staged an entry (its applied coordinates are in the coarser unit), past a `u32` exponent,
+    /// and for a remainder whose entry the array does not have.
+    pub(crate) fn rebase(
+        &mut self,
+        levels: u32,
+        arrays: &mut [(&mut Carry, &mut [Rat])],
+    ) -> Result<(), HnnError> {
+        let refused = HnnError::Rebase {
+            exponent: self.lattice.exponent,
+            levels,
+            staged: self.staged.len(),
+        };
+        let exponent = self.lattice.exponent.checked_add(levels);
+        let (Some(exponent), true) = (exponent, self.staged.is_empty()) else {
+            return Err(refused);
+        };
+        for (carry, entries) in arrays.iter() {
+            if let Some(&index) = carry.0.keys().next_back()
+                && index >= entries.len()
+            {
+                return Err(HnnError::Shape {
+                    what: "re-based carrier",
+                    expected: entries.len(),
+                    found: index + 1,
+                });
+            }
+        }
+        let finer = Lattice::new(exponent);
+        for (carry, entries) in arrays.iter_mut() {
+            let remainders = std::mem::take(&mut carry.0);
+            for (index, remainder) in remainders {
+                let (quotient, rest) = finer.div_rem(&remainder);
+                if !quotient.is_zero() {
+                    entries[index] = &entries[index] + Rat::new(quotient, finer.scale());
+                }
+                if !rest.is_zero() {
+                    carry.0.insert(index, rest);
+                }
+            }
+        }
+        self.lattice = finer;
+        Ok(())
+    }
 }
 
 /// [definition] **The carried remainders of one lattice-valued array** (Lean `Carried.rem`), by
 /// flat entry index; a zero remainder is not stored, so two carriers with one content compare equal.
 #[derive(Clone, Debug, Default, PartialEq, Eq)]
-struct Carry(BTreeMap<usize, Rat>);
+pub(crate) struct Carry(BTreeMap<usize, Rat>);
 
 impl Carry {
     /// **One entry's budgeted deposit** (Lean `carry`, `carry_accounting`): `y = Δ + r_prev` split at
@@ -728,7 +795,7 @@ impl Carry {
     /// and carried remainder, and writes only its own: the entries run together
     /// (`hnn::realization`), and their results are taken into the carry and the budgeted
     /// carry afterwards, in entry order.
-    fn deposit_all(
+    pub(crate) fn deposit_all(
         &mut self,
         at: &mut BudgetedCarry,
         carrier: Carrier,
@@ -792,7 +859,7 @@ impl Carry {
     }
 
     /// The remainder at an entry.
-    fn at(&self, index: usize) -> Rat {
+    pub(crate) fn at(&self, index: usize) -> Rat {
         self.0.get(&index).cloned().unwrap_or_else(Rat::zero)
     }
 
@@ -4197,6 +4264,80 @@ impl Constitution {
             .get(&locus)
             .copied()
             .ok_or(HnnError::Lattice { locus })
+    }
+
+    /// [definition; agent-inferred] **A contact's channel re-based onto the finer lattice**
+    /// `2^(−L−j)ℤ` (Lean `HNN/LatticeDeposit/Rebase.Carried.rebase`; [`BudgetedCarry::rebase`] is
+    /// the law): the storage, stiffness and dissipation factors and their three scales move with
+    /// their carried remainders, the locus's lattice becomes the finer one and its clock is kept.
+    /// Every entry plus its remainder is unchanged and nothing is released; the releases since the
+    /// founding stay below half the founding unit over any history (`history_release_lt`). The
+    /// declared schedule never calls it; a refining grain re-bases by the levels its exponent grew.
+    ///
+    /// A channel's lattice is read only by its deposits, so its re-base is this move alone. The ring
+    /// loci also read their lattice outside the deposit (the solved charts' rule, the founding
+    /// modulus, the standing's fine half unit, the resonator's Floquet grain), and their re-base is
+    /// refused ([`HnnError::RebaseLocus`]).
+    pub fn rebased(&self, locus: Locus, levels: u32) -> Result<Self, HnnError> {
+        let Locus::Channel(contact) = locus else {
+            return Err(HnnError::RebaseLocus { locus });
+        };
+        let mut next = self.clone();
+        let mut at = BudgetedCarry::new(next.lattice(locus)?, next.clock(locus) + 1);
+        let material = next
+            .contacts
+            .get_mut(contact)
+            .ok_or(HnnError::Lattice { locus })?;
+        let mut carries: [Carry; 6] = std::array::from_fn(|k| {
+            let carrier = if k < 3 {
+                Carrier::Factor(k)
+            } else {
+                Carrier::FactorScale(k - 3)
+            };
+            next.carries.remove(&(locus, carrier)).unwrap_or_default()
+        });
+        let mut factors = [
+            material.storage.entries().to_vec(),
+            material.stiffness.entries().to_vec(),
+            material.dissipation.entries().to_vec(),
+        ];
+        {
+            let [c0, c1, c2, s0, s1, s2] = &mut carries;
+            let [f0, f1, f2] = &mut factors;
+            let [x0, x1, x2] = &mut material.scales;
+            at.rebase(
+                levels,
+                &mut [
+                    (c0, f0.as_mut_slice()),
+                    (c1, f1.as_mut_slice()),
+                    (c2, f2.as_mut_slice()),
+                    (s0, std::slice::from_mut(x0)),
+                    (s1, std::slice::from_mut(x1)),
+                    (s2, std::slice::from_mut(x2)),
+                ],
+            )?;
+        }
+        let [f0, f1, f2] = factors;
+        material.storage = flat_matrix(material.storage.rows(), material.storage.columns(), f0)?;
+        material.stiffness =
+            flat_matrix(material.stiffness.rows(), material.stiffness.columns(), f1)?;
+        material.dissipation = flat_matrix(
+            material.dissipation.rows(),
+            material.dissipation.columns(),
+            f2,
+        )?;
+        for (k, carry) in carries.into_iter().enumerate() {
+            let carrier = if k < 3 {
+                Carrier::Factor(k)
+            } else {
+                Carrier::FactorScale(k - 3)
+            };
+            if !carry.0.is_empty() {
+                next.carries.insert((locus, carrier), carry);
+            }
+        }
+        next.lattices.insert(locus, at.lattice());
+        Ok(next)
     }
 
     /// **Whether every retained entry lies on its locus's lattice** (Lean `run_onLattice`): the
