@@ -223,16 +223,13 @@ The change is measured twice before it merges, and both rules are fixed here bef
   It was built at `fe9c58e9`, the stored Q1's commit, with this change applied, not at the
   branch's own commit: `fe9c58e9` differs from the base `3515ed4a` (for example by 228 lines in
   `executed.rs`), and building at `fe9c58e9` makes the read like for like with the stored receipt.
-- (b) Campaign 1 at `2 I` against `I`. The read is the held-out model `q`'s code enclosure over the
-  held-out cells `[4958, 6148)`, paired cell by cell between the two members. The gate is
-  `1190/16` bits: one declared grain of `1/16` bit per held-out decision. There are three
-  outcomes.
-  - Pass: `2 I`'s held-out code is below `I`'s by at least `1190/16` bits over the whole
-    enclosure. The change merges.
-  - Undecided: neither pass nor fail; the difference's enclosure reaches inside the gate.
-    The change merges, recorded as not resolved at the grain.
-  - Fail: `2 I`'s held-out code is at or above `I`'s over the whole enclosure. The change does
-    not merge.
+- (b) Campaign 1 at `2 I` against `I`. The read is each member's summed held-out model `q` code
+  enclosure over the cells `[4958, 6148)`. The gate is `1190/16` bits, one declared grain of
+  `1/16` bit per held-out decision, and it stands in for a per-cell pairing the exposure does not
+  print. With `U` and `L` the upper and lower ends of each enclosure, there are three outcomes.
+  - Pass: `U(2 I) ≤ L(I) − 1190/16`. The change merges.
+  - Fail: `L(2 I) ≥ U(I) + 1190/16`. The change does not merge.
+  - Undecided: neither. The change merges, recorded as not resolved at the grain.
 
 Carrying `a` and `V` natively beside the Gram, and moving `s` by the Newton point as readings
 arrive, is the per-field law's native form. It is not built here.
