@@ -2108,9 +2108,33 @@ impl PreparedStep {
         step: &Rat,
         at: &mut BudgetedCarry,
     ) -> Result<(NormalLaw, ChartReading), HnnError> {
+        self.stepped_coasting(step, None, at)
+    }
+
+    /// **The step taken at `η` with a carried coast** ([`Constitution::stepped_source_coasting`]):
+    /// `ΔW = η D + c` carried onto `W` at the locus's budgeted carry, the coast `c` exact (it reads no
+    /// chart residual of its own: the chart's residual is the impulse's, `ηG(1 − X̂H′)`).
+    pub(crate) fn stepped_coasting(
+        self,
+        step: &Rat,
+        coast: Option<&ExactRatMatrix>,
+        at: &mut BudgetedCarry,
+    ) -> Result<(NormalLaw, ChartReading), HnnError> {
         let (m, n) = (self.law.map.rows(), self.law.map.columns());
         let mut next = self.law;
-        let update: Vec<Rat> = self.unit.scaled_rows(step).into_iter().flatten().collect();
+        let mut update: Vec<Rat> = self.unit.scaled_rows(step).into_iter().flatten().collect();
+        if let Some(coast) = coast {
+            if coast.rows() != m || coast.columns() != n {
+                return Err(HnnError::Shape {
+                    what: "a coast against the source port",
+                    expected: m * n,
+                    found: coast.rows() * coast.columns(),
+                });
+            }
+            for (entry, c) in update.iter_mut().zip(coast.entries()) {
+                *entry += c;
+            }
+        }
         let mut map = next.map.entries().to_vec();
         next.map_carry
             .deposit_all(at, Carrier::Map, &mut map, &update);
@@ -2707,6 +2731,16 @@ pub struct StepReading {
     pub bound: Rat,
     pub readout: Rat,
     pub amplitude: Rat,
+}
+
+/// [definition; agent-inferred, October 2] **A carried velocity's coast**
+/// ([`Constitution::source_coast`]): the momentum `P = dH` at the incumbent's mass, the coast
+/// `c = P X̂′` through the accreted mass's chart, and the kinetic reading `½⟨P, c⟩`.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct SourceCoast {
+    pub momentum: ExactRatMatrix,
+    pub coast: ExactRatMatrix,
+    pub kinetic: Rat,
 }
 
 /// [definition; agent-inferred, September 30] **A carried source step's reading**
@@ -3758,6 +3792,68 @@ impl Constitution {
         self.rings[ring].resonator.as_ref()
     }
 
+    /// [definition; agent-inferred, October 2; the
+    /// [throw's record](../../../../research/records/2026-10-02_THE_THROW_CARRIES_ITS_MOMENTUM_THROUGH_THE_DEPOSITS_ACCRETED_MASS_AND_A_GRIP_HALVES_IT.md)]
+    /// **The coast of a carried velocity through the deposit's accreted mass** (`hnn::executed`'s
+    /// `MoveMetric::Throw`). The source port's mass is its normal law's Gram `H` (the storage's
+    /// inertia), and a deposit accretes the returns' `F = Σ w f fᵀ` onto it, `H′ = H + F`. A velocity
+    /// `d` (the last adopted move of `E`, on the port's lattice) carries the momentum `P = dH`, each
+    /// row `P_r = H d_r` (`H` symmetric). The returns stick to the port, so the momentum is conserved
+    /// across the accretion and the coast is `c = P X̂′`, each row `X̂′(H d_r)`, with `X̂′` the chart
+    /// the deposit refines for `H′` (the same chart the impulse `D = G X̂′` reads): the velocity
+    /// diluted by the mass the deposit added. Its kinetic reading is `½⟨P, c⟩` (the Frobenius
+    /// pairing), in the same unit as the comparison the normal law descends. `None` when the returns
+    /// reach nothing. Nothing is deposited.
+    pub(crate) fn source_coast(
+        &self,
+        ring: usize,
+        samples: &[Sample],
+        velocity: &ExactRatMatrix,
+    ) -> Result<Option<SourceCoast>, HnnError> {
+        let locus = Locus::SourcePort(ring);
+        let law = self.rings[ring]
+            .source
+            .as_ref()
+            .ok_or(HnnError::MissingSourcePort { ring })?;
+        let (m, n) = (law.map.rows(), law.map.columns());
+        if velocity.rows() != m || velocity.columns() != n {
+            return Err(HnnError::Shape {
+                what: "a velocity against the source port",
+                expected: m * n,
+                found: velocity.rows() * velocity.columns(),
+            });
+        }
+        let rule = self.chart_rule(locus)?;
+        let mut at = BudgetedCarry::new(self.lattice(locus)?, self.clock(locus) + 1);
+        let Some(prepared) = law.prepare(samples, &rule, &mut at)? else {
+            return Ok(None);
+        };
+        let chart = &prepared.law.chart;
+        let mut momentum = Vec::with_capacity(m);
+        let mut coast = Vec::with_capacity(m);
+        let mut kinetic = Rat::zero();
+        for row in velocity.to_rows() {
+            let p: Vec<Rat> = law
+                .gram
+                .iter()
+                .map(|h| h.iter().zip(&row).map(|(a, b)| a * b).sum::<Rat>())
+                .collect();
+            let (reach, denominator) = chart.reach(&integral(&p));
+            let c: Vec<Rat> = reach
+                .into_iter()
+                .map(|x| Rat::new(x, denominator.clone()))
+                .collect();
+            kinetic += p.iter().zip(&c).map(|(a, b)| a * b).sum::<Rat>();
+            momentum.push(p);
+            coast.push(c);
+        }
+        Ok(Some(SourceCoast {
+            momentum: ExactRatMatrix::new(momentum)?,
+            coast: ExactRatMatrix::new(coast)?,
+            kinetic: kinetic / Rat::from_integer(BigInt::from(2)),
+        }))
+    }
+
     /// [definition; agent-inferred, September 30] **The source port carried by a declared
     /// comparison's returns at a step `η`** (`hnn::executed`, "The committed move"): the source
     /// port's normal law prepared on the returns ([`NormalLaw::prepare`]: `ΔH = Σ w f fᵀ` carried,
@@ -3774,6 +3870,22 @@ impl Constitution {
         samples: &[Sample],
         step: &Rat,
     ) -> Result<Option<(Self, SourceStep)>, HnnError> {
+        self.stepped_source_coasting(ring, samples, step, None)
+    }
+
+    /// [definition; agent-inferred, October 2; the
+    /// [throw's record](../../../../research/records/2026-10-02_THE_THROW_CARRIES_ITS_MOMENTUM_THROUGH_THE_DEPOSITS_ACCRETED_MASS_AND_A_GRIP_HALVES_IT.md)]
+    /// **The source port carried at a step `η` with a coast** (`hnn::executed`'s
+    /// `MoveMetric::Throw`): [`Constitution::stepped_source`] with the exact coast `c` added to the
+    /// update, `ΔE = ηD + c`, through the same budgeted carry, clock, budget and storage-growth
+    /// certificate. `None` coast is [`Constitution::stepped_source`].
+    pub(crate) fn stepped_source_coasting(
+        &self,
+        ring: usize,
+        samples: &[Sample],
+        step: &Rat,
+        coast: Option<&ExactRatMatrix>,
+    ) -> Result<Option<(Self, SourceStep)>, HnnError> {
         let locus = Locus::SourcePort(ring);
         if self.released.contains(&locus) {
             return Err(HnnError::ReleasedLocus { locus });
@@ -3789,7 +3901,7 @@ impl Constitution {
         };
         let alignment = prepared.alignment.clone();
         let (unit, _) = prepared.unit_norms.clone();
-        let (stepped, chart) = prepared.stepped(step, &mut at)?;
+        let (stepped, chart) = prepared.stepped_coasting(step, coast, &mut at)?;
         let mut next = self.clone();
         next.rings[ring].source = Some(stepped);
         next.commit += 1;

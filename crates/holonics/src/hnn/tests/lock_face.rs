@@ -1349,6 +1349,142 @@ fn the_kinetic_move_deposits_the_solve_and_keeps_every_guard() {
     }
 }
 
+/// **The throw from rest is the normal law's impulse with `ρ` held, and its flight is the adopted
+/// move** ([`MoveMetric::Throw`]; the throw's record): without a flight, and from an empty flight,
+/// the thrown move carries no coast, holds `ρ`, adopts the same successor, and hands on the adopted
+/// move of `E` as the next flight's velocity (one move since the release).
+#[test]
+fn the_throw_from_rest_is_the_impulse_and_hands_on_its_move() {
+    use crate::hnn::executed::{
+        Flight, MoveMetric, ReleaseExcursion, executed_move_in, executed_move_thrown,
+    };
+    let field = joint();
+    let theta = generic(&field, 94).with_transport(0, rat(3, 4)).unwrap();
+    let refinement = Refinement::declare(&field, 0, 2, 1, 4, 2).unwrap();
+    let bank = joint_bank();
+    let requests =
+        short_requests(&field, &[(95, [0, 1, 2, 1]), (96, [1, 1, 0, 2]), (97, [2, 0, 1, 1])]);
+    let released = executed_move_in(
+        &field,
+        &theta,
+        &requests,
+        &refinement,
+        &bank,
+        12,
+        Comparison::LOCK_DECISIONS,
+        MoveMetric::Throw,
+    )
+    .unwrap();
+    let rest = executed_move_thrown(
+        &field,
+        &theta,
+        &requests,
+        &refinement,
+        &bank,
+        12,
+        Comparison::LOCK_DECISIONS,
+        &ReleaseExcursion::monotone(),
+        &Flight::default(),
+    )
+    .unwrap();
+    assert_eq!(released.modulus_unit, Some(Rat::zero()));
+    for moved in [&released, &rest] {
+        let throw = moved.throw.as_ref().expect("the throw's reading");
+        assert!(!throw.carried && throw.coast.is_none() && throw.power.is_none());
+        assert_eq!(throw.impulse_step, moved.start.as_ref().map(|(s, _)| s.clone()));
+    }
+    assert_eq!(
+        released.adopted.as_ref().map(|(s, _)| s.source_port(0).cloned()),
+        rest.adopted.as_ref().map(|(s, _)| s.source_port(0).cloned())
+    );
+    let next = &released.throw.as_ref().unwrap().next;
+    match &released.adopted {
+        Some((successor, _)) => {
+            assert_eq!(successor.transport(0), theta.transport(0));
+            let moved = successor
+                .source_port(0)
+                .unwrap()
+                .subtract(theta.source_port(0).unwrap())
+                .unwrap();
+            assert_eq!(next.velocity.as_ref(), Some(&moved));
+            assert_eq!(next.moves, 1);
+        }
+        None => assert_eq!(next, &Flight::default()),
+    }
+}
+
+/// **The thrown move carries its momentum through the accreted mass, and keeps the coast only while
+/// the composition falls along it** (the throw's record): from the successor of a released throw,
+/// with that move as the flight's velocity `d`, the coast's momentum is `dH` at the incumbent's
+/// carried Gram exactly; the coast is carried exactly when the composition's first-order bound along
+/// it is negative (on this fixture it is, and the first trial is adopted); an adopted trial lowers
+/// the comparison with `ρ` held, and the next flight's velocity is the adopted move, a flight one
+/// move longer when the coast was carried.
+#[test]
+fn the_thrown_move_carries_its_momentum_through_the_accreted_mass() {
+    use crate::hnn::executed::{
+        Flight, MoveMetric, ReleaseExcursion, executed_move_in, executed_move_thrown,
+    };
+    let field = joint();
+    let theta = generic(&field, 94).with_transport(0, rat(3, 4)).unwrap();
+    let refinement = Refinement::declare(&field, 0, 2, 1, 4, 2).unwrap();
+    let bank = joint_bank();
+    let requests =
+        short_requests(&field, &[(95, [0, 1, 2, 1]), (96, [1, 1, 0, 2]), (97, [2, 0, 1, 1])]);
+    let released = executed_move_in(
+        &field,
+        &theta,
+        &requests,
+        &refinement,
+        &bank,
+        12,
+        Comparison::LOCK_DECISIONS,
+        MoveMetric::Throw,
+    )
+    .unwrap();
+    let Some((first, _)) = &released.adopted else {
+        panic!("the fixture's release is adopted: {:?}", released.refusal);
+    };
+    let flight = released.throw.as_ref().unwrap().next.clone();
+    let velocity = flight.velocity.clone().expect("a velocity");
+    let thrown = executed_move_thrown(
+        &field,
+        first,
+        &requests,
+        &refinement,
+        &bank,
+        12,
+        Comparison::LOCK_DECISIONS,
+        &ReleaseExcursion::monotone(),
+        &flight,
+    )
+    .unwrap();
+    let throw = thrown.throw.as_ref().expect("the throw's reading");
+    assert_eq!(throw.flight, flight);
+    let coast = throw.coast.as_ref().expect("the coast is read");
+    let gram = first.source_law(0).unwrap().gram();
+    assert_eq!(coast.momentum, velocity.multiply(&gram).unwrap());
+    let power = throw.power.as_ref().expect("the power test");
+    assert_eq!(throw.carried, power.upper.is_negative());
+    // On this fixture the comparison falls along the coast, and the first trial carries it.
+    assert!(throw.carried, "the fixture's coast is carried: {power:?}");
+    assert!(thrown.adopted.is_some() && thrown.trials.len() == 1);
+    if let Some((successor, _)) = &thrown.adopted {
+        let last = thrown.trials.last().unwrap();
+        assert!(last.value.as_ref().unwrap().upper < thrown.before.value.lower);
+        assert_eq!(successor.transport(0), first.transport(0));
+        let moved = successor
+            .source_port(0)
+            .unwrap()
+            .subtract(first.source_port(0).unwrap())
+            .unwrap();
+        assert_eq!(throw.next.velocity.as_ref(), Some(&moved));
+        assert_eq!(throw.next.moves, if throw.carried { 2 } else { 1 });
+    } else {
+        assert_eq!(throw.next, Flight::default());
+    }
+}
+
 /// **The joined solve spends the readings' change at least storage energy across `E` and `ρ`**
 /// ([`ModulusCoupling`]): one candidate at `θ = ½` wants its log-reading raised by `2`.
 /// - Where no entry of `E` moves the reading and `ρ` moves it by `2` a unit, `Δρ = 1` and `E` stays.

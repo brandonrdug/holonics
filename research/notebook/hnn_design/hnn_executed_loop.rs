@@ -1396,7 +1396,7 @@ pub(super) fn direction(
 /// [one-move pin](../../records/2026-10-01_ONE_GUARDED_MOVE_FROM_THE_STUCK_STATE_PINNED_BEFORE_ITS_RUN.md)]
 /// **One committed move from a state under each declared metric** (`executed move-once <terrain>
 /// <seed> <count> <out> <label=state> <arm> <metric>…`, the arm as [`arm_comparison`], `metric`
-/// `coordinate`, `witness`, `kinetic` or `kinetic-modulus`, the state
+/// `coordinate`, `witness`, `kinetic`, `kinetic-modulus` or `throw`, the state
 /// a complete continuing state, restored with no `E`/`ρ` fallback ([`remounted`])): the candidate
 /// arm's real proposal, guards, ladder and state carry (`hnn::executed::executed_move_in`), every
 /// metric from the same restored state. The metrics are attempted in order and the first adopted
@@ -1404,6 +1404,12 @@ pub(super) fn direction(
 /// prints the incumbent's reading, the move's line with every trial, the witness's form where read,
 /// and the adopted successor's own release (its trial's reading), written to
 /// `<out>/<label>-<metric>.state`.
+///
+/// [agent-inferred, October 2; the
+/// [throw's record](../../records/2026-10-02_THE_THROW_CARRIES_ITS_MOMENTUM_THROUGH_THE_DEPOSITS_ACCRETED_MASS_AND_A_GRIP_HALVES_IT.md)]
+/// `throw` reads its flight from `<state>.flight` when that file exists (at rest otherwise) and writes
+/// the flight after an adopted move to `<out>/<label>-throw.state.flight` ([`write_flight`]): the
+/// adopted move of `E` as its velocity, exactly.
 pub(super) fn move_once(terrain: &str, seed: u64, count: usize, out: &str, source: &str, arm: &str, metrics: &[String]) {
     use holonics::hnn::executed::{MoveMetric, executed_move_in};
     let clock = Instant::now();
@@ -1438,19 +1444,35 @@ pub(super) fn move_once(terrain: &str, seed: u64, count: usize, out: &str, sourc
             "witness" => MoveMetric::Witness,
             "kinetic" => MoveMetric::Kinetic,
             "kinetic-modulus" => MoveMetric::KineticModulus,
-            other => panic!("a metric, coordinate, witness, kinetic or kinetic-modulus: {other}"),
+            "throw" => MoveMetric::Throw,
+            other => panic!("a metric, coordinate, witness, kinetic, kinetic-modulus or throw: {other}"),
         };
         let started = Instant::now();
-        let moved = executed_move_in(
-            &engine.field,
-            &theta,
-            &requests,
-            &engine.refinement,
-            &bank,
-            BANK_GRAIN,
-            comparison,
-            metric,
-        )
+        let moved = if metric == MoveMetric::Throw {
+            let flight = read_flight(&format!("{spec}.flight"));
+            holonics::hnn::executed::executed_move_thrown(
+                &engine.field,
+                &theta,
+                &requests,
+                &engine.refinement,
+                &bank,
+                BANK_GRAIN,
+                comparison,
+                &holonics::hnn::executed::ReleaseExcursion::monotone(),
+                &flight,
+            )
+        } else {
+            executed_move_in(
+                &engine.field,
+                &theta,
+                &requests,
+                &engine.refinement,
+                &bank,
+                BANK_GRAIN,
+                comparison,
+                metric,
+            )
+        }
         .expect("the move");
         report(
             &format!("{label} {name}: the incumbent"),
@@ -1498,6 +1520,20 @@ pub(super) fn move_once(terrain: &str, seed: u64, count: usize, out: &str, sourc
                 );
             }
         }
+        if let Some(throw) = &moved.throw {
+            println!(
+                "    the throw: flight of {} moves, {}; power along the coast {}; coast {}; kinetic reading {}; impulse step {:?}",
+                throw.flight.moves,
+                if throw.flight.velocity.is_some() { "moving" } else { "at rest" },
+                throw.power.as_ref().map_or_else(|| "none".to_string(), |p| cell(p, 1 << 12)),
+                if throw.carried { "carried" } else { "released from rest" },
+                throw
+                    .coast
+                    .as_ref()
+                    .map_or_else(|| "none".to_string(), |c| cell(&ExactInterval::point(c.kinetic.clone()), 1 << 12)),
+                throw.impulse_step,
+            );
+        }
         println!(
             "    γ_ρ {:?}, Δρ per unit of E's step {:?} (24 bits)",
             moved.modulus_slope.as_ref().map(at_bits),
@@ -1521,6 +1557,11 @@ pub(super) fn move_once(terrain: &str, seed: u64, count: usize, out: &str, sourc
                 #[allow(clippy::disallowed_methods)]
                 std::fs::write(format!("{out}/{label}-{name}.state"), write_state(successor, ring))
                     .expect("write the successor's state");
+                if let Some(throw) = &moved.throw {
+                    #[allow(clippy::disallowed_methods)]
+                    std::fs::write(format!("{out}/{label}-{name}.state.flight"), write_flight(&throw.next))
+                        .expect("write the flight");
+                }
                 println!("  {label}: {name} adopted; the later metrics are not attempted");
                 break;
             }
@@ -1532,6 +1573,55 @@ pub(super) fn move_once(terrain: &str, seed: u64, count: usize, out: &str, sourc
         }
     }
     println!("executed move-once: {} ms; resident {}", clock.elapsed().as_millis(), resident());
+}
+
+/// **A throw's flight as text** (`hnn::executed::Flight`): `moves <k>`, then `velocity <rows>
+/// <columns>` and its rows of exact rationals, or `rest`.
+pub(super) fn write_flight(flight: &holonics::hnn::executed::Flight) -> String {
+    let mut text = format!("moves {}\n", flight.moves);
+    match &flight.velocity {
+        Some(v) => {
+            text.push_str(&format!("velocity {} {}\n", v.rows(), v.columns()));
+            for row in v.to_rows() {
+                let row: Vec<String> = row.iter().map(ToString::to_string).collect();
+                text.push_str(&row.join(" "));
+                text.push('\n');
+            }
+        }
+        None => text.push_str("rest\n"),
+    }
+    text
+}
+
+/// A flight read back from [`write_flight`]'s text; at rest when the file does not exist.
+pub(super) fn read_flight(path: &str) -> holonics::hnn::executed::Flight {
+    use holonics::hnn::executed::Flight;
+    #[allow(clippy::disallowed_methods)]
+    let Ok(text) = std::fs::read_to_string(path) else {
+        return Flight::default();
+    };
+    let mut lines = text.lines();
+    let moves = lines
+        .next()
+        .and_then(|l| l.strip_prefix("moves "))
+        .map(|k| k.trim().parse().expect("a move count"))
+        .expect("moves <k>");
+    let head = lines.next().expect("velocity or rest");
+    let velocity = head.strip_prefix("velocity ").map(|shape| {
+        let rows: usize = shape.split_whitespace().next().expect("rows").parse().expect("rows");
+        let entries: Vec<Vec<Rat>> = (0..rows)
+            .map(|_| {
+                lines
+                    .next()
+                    .expect("a row")
+                    .split_whitespace()
+                    .map(|x| x.parse::<Rat>().expect("a rational"))
+                    .collect()
+            })
+            .collect();
+        ExactRatMatrix::new(entries).expect("the velocity")
+    });
+    Flight { velocity, moves }
 }
 
 /// [measured-diagnostic; agent-inferred, October 1; the

@@ -173,7 +173,7 @@ use num_bigint::BigInt;
 use num_traits::{One, Signed, Zero};
 
 use crate::hnn::HnnError;
-use crate::hnn::constitution::{Constitution, Sample, SourceStep};
+use crate::hnn::constitution::{Constitution, Sample, SourceCoast, SourceStep};
 use crate::hnn::field::{ConstitutionRead, Current, Field};
 use crate::hnn::moment::SourceMoment;
 use crate::hnn::prediction::{
@@ -3133,12 +3133,49 @@ pub enum LadderStart {
 ///   the founding `ρ₀` (the one-turn alias bound, [`Constitution::founding_transport`]), or at the
 ///   incumbent's `ρ` where that already stands above it. Where `ρ` is at that bound and the solve
 ///   would raise it, the bound holds `ρ` and the move is `Kinetic`'s.
+/// - `Throw` ([agent-inferred, October 2; the
+///   [throw's record](../../../../research/records/2026-10-02_THE_THROW_CARRIES_ITS_MOMENTUM_THROUGH_THE_DEPOSITS_ACCRETED_MASS_AND_A_GRIP_HALVES_IT.md)]):
+///   `E` alone, `ρ` held, by the source port's normal law (the impulse, `Coordinate`'s `E` part)
+///   with the carried velocity's coast through the deposit's accreted mass ([`Flight`],
+///   `Constitution::source_coast`). The flight's velocity is the last adopted move of `E`; its
+///   coast is kept only while the composition's first-order bound along it is negative (otherwise
+///   the apex: the move is released from rest, `Coordinate`'s `E` part). The halving trials halve
+///   the whole carried move, impulse and coast together; the conditions of adoption are every
+///   metric's. Without a flight ([`executed_move_in`]) it is released from rest.
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub enum MoveMetric {
     Coordinate,
     Witness,
     Kinetic,
     KineticModulus,
+    Throw,
+}
+
+/// [definition; agent-inferred, October 2; the
+/// [throw's record](../../../../research/records/2026-10-02_THE_THROW_CARRIES_ITS_MOMENTUM_THROUGH_THE_DEPOSITS_ACCRETED_MASS_AND_A_GRIP_HALVES_IT.md)]
+/// **A throw's flight**: the velocity `d`, the last adopted move of the source port `E` (on its
+/// lattice; `None` at rest), and the moves adopted since the release (a receipt). It is the motion's
+/// state, not a record of fluxes: one matrix the size of `E`.
+#[derive(Clone, Debug, Default, PartialEq, Eq)]
+pub struct Flight {
+    pub velocity: Option<ExactRatMatrix>,
+    pub moves: u64,
+}
+
+/// [definition; agent-inferred, October 2] **A throw's reading** ([`MoveMetric::Throw`]): the
+/// flight it met, the coast of its velocity ([`SourceCoast`]) where one was read, the composition's
+/// first-order bound along the coast alone (the power test), whether the coast was carried (the
+/// bound negative) or the move released from rest (the apex, or no velocity), the impulse's first
+/// step `η₀` (every trial carries the coast scaled by its step over `η₀`), and the flight after the
+/// move: the adopted move as its velocity, or rest when no trial was adopted.
+#[derive(Clone, Debug)]
+pub struct ThrowReading {
+    pub flight: Flight,
+    pub coast: Option<SourceCoast>,
+    pub power: Option<ExactInterval>,
+    pub carried: bool,
+    pub impulse_step: Option<Rat>,
+    pub next: Flight,
 }
 
 /// [definition; agent-inferred, September 30; the pin §2.6, §13.5] **The first trial step**: from
@@ -3222,6 +3259,8 @@ pub struct ExecutedMove {
     pub witness: Option<WitnessForm>,
     /// Under the kinetic metric, the receiver's solve.
     pub kinetic: Option<KineticSolve>,
+    /// Under the throw, its flight, coast and the flight after the move.
+    pub throw: Option<ThrowReading>,
     pub before: BatchComparison,
     pub contributions: usize,
     pub returns: usize,
@@ -3438,6 +3477,7 @@ fn ladder(
     first: &FirstOrder<'_>,
     reread: &(dyn Fn(&Constitution) -> Result<Reread, HnnError> + Sync),
     excursion: &ReleaseExcursion,
+    coast: Option<&ExactRatMatrix>,
 ) -> Result<LadderOutcome, HnnError> {
     let source = constitution
         .source_port(ring)
@@ -3473,7 +3513,10 @@ fn ladder(
             leading: None,
             source: None,
         };
-        let stepped = match constitution.stepped_source(ring, samples, &step) {
+        // The throw's coast per unit of the impulse's step, scaled with it: the whole carried move
+        // halves.
+        let coasted = coast.map(|c| c.scaled(&step));
+        let stepped = match constitution.stepped_source_coasting(ring, samples, &step, coasted.as_ref()) {
             Ok(Some(stepped)) => stepped,
             Ok(None) => return Ok((trials, None, Some(MoveRefusal::Unreached))),
             Err(error @ (HnnError::ConstitutionBudget { .. } | HnnError::UncertifiedStorage)) => {
@@ -3878,6 +3921,55 @@ pub fn executed_move_guarded(
     metric: MoveMetric,
     excursion: &ReleaseExcursion,
 ) -> Result<ExecutedMove, HnnError> {
+    executed_move_flown(
+        field, constitution, requests, declared, bank, grain, comparison, metric, excursion, None,
+    )
+}
+
+/// [definition; agent-inferred, October 2; the
+/// [throw's record](../../../../research/records/2026-10-02_THE_THROW_CARRIES_ITS_MOMENTUM_THROUGH_THE_DEPOSITS_ACCRETED_MASS_AND_A_GRIP_HALVES_IT.md)]
+/// **The thrown move** ([`MoveMetric::Throw`] in its flight): the same proposal, conditions of
+/// adoption, halving trials and receipts as [`executed_move_guarded`], the carried move the impulse
+/// with the flight's coast. The flight after the move is on the receipt ([`ThrowReading::next`]).
+#[allow(clippy::too_many_arguments)]
+pub fn executed_move_thrown(
+    field: &Field,
+    constitution: &Constitution,
+    requests: &[Request],
+    declared: &Refinement,
+    bank: &ReceivingBank,
+    grain: u32,
+    comparison: Comparison,
+    excursion: &ReleaseExcursion,
+    flight: &Flight,
+) -> Result<ExecutedMove, HnnError> {
+    executed_move_flown(
+        field,
+        constitution,
+        requests,
+        declared,
+        bank,
+        grain,
+        comparison,
+        MoveMetric::Throw,
+        excursion,
+        Some(flight),
+    )
+}
+
+#[allow(clippy::too_many_arguments)]
+fn executed_move_flown(
+    field: &Field,
+    constitution: &Constitution,
+    requests: &[Request],
+    declared: &Refinement,
+    bank: &ReceivingBank,
+    grain: u32,
+    comparison: Comparison,
+    metric: MoveMetric,
+    excursion: &ReleaseExcursion,
+    flight: Option<&Flight>,
+) -> Result<ExecutedMove, HnnError> {
     let excursion = excursion.checked()?;
     let ring = declared.ring();
     let composition = comparison.composition;
@@ -3898,6 +3990,14 @@ pub fn executed_move_guarded(
         metric,
         witness: None,
         kinetic: None,
+        throw: (metric == MoveMetric::Throw).then(|| ThrowReading {
+            flight: flight.cloned().unwrap_or_default(),
+            coast: None,
+            power: None,
+            carried: false,
+            impulse_step: None,
+            next: Flight::default(),
+        }),
         counts: before.counts(declared.stations()),
         before: before.clone(),
         contributions: proposal.contributions.len(),
@@ -3999,6 +4099,7 @@ pub fn executed_move_guarded(
     // of `E`'s step with its start `α`.
     let (modulus_unit, witness_start) = match metric {
         MoveMetric::Coordinate => (modulus_unit, None),
+        MoveMetric::Throw => (Rat::zero(), None),
         MoveMetric::Kinetic => (Rat::zero(), Some(Rat::one())),
         MoveMetric::KineticModulus => (kinetic_modulus.unwrap_or_else(Rat::zero), Some(Rat::one())),
         MoveMetric::Witness => {
@@ -4070,10 +4171,59 @@ pub fn executed_move_guarded(
             }
         }
     };
-    receipt.start = Some((start.clone(), kind));
     let first = |_: &ExactRatMatrix, successor: &Constitution| {
         first_order(field, constitution, declared, requests, &proposal, successor, None)
     };
+    // The throw's coast (the record above): the flight's velocity through the accreted mass, kept
+    // while the composition falls along it at first order (the power test), scaled per trial with
+    // the impulse, the entry scale read on the whole carried move.
+    let throw_velocity = flight
+        .and_then(|f| f.velocity.as_ref())
+        .filter(|v| metric == MoveMetric::Throw && v.entries().iter().any(|x| !x.is_zero()));
+    let (start, unit_largest, coast) = match throw_velocity {
+        Some(velocity) => {
+            let read = constitution.source_coast(ring, &samples, velocity)?;
+            let mut carried = None;
+            let mut power = None;
+            if let Some(read) = &read
+                && let Some((coasted, _)) = constitution.stepped_source_coasting(
+                    ring,
+                    &samples,
+                    &Rat::zero(),
+                    Some(&read.coast),
+                )?
+            {
+                let bound = first(&read.coast, &coasted)?.bound;
+                if bound.upper.is_negative() {
+                    carried = Some(read.coast.clone());
+                }
+                power = Some(bound);
+            }
+            if let Some(throw) = receipt.throw.as_mut() {
+                throw.coast = read;
+                throw.power = power;
+                throw.carried = carried.is_some();
+                throw.impulse_step = Some(start.clone());
+            }
+            match carried {
+                Some(coast) => {
+                    let per_step = coast.scaled(&(Rat::one() / &start));
+                    let effective = &unit_largest + largest_entry(&per_step);
+                    let scale = Rat::new(BigInt::one(), BigInt::from(2)) / &effective;
+                    let first_step = if start <= scale { start } else { power_below(&scale) };
+                    (first_step, effective, Some(per_step))
+                }
+                None => (start, unit_largest, None),
+            }
+        }
+        None => {
+            if let Some(throw) = receipt.throw.as_mut() {
+                throw.impulse_step = Some(start.clone());
+            }
+            (start, unit_largest, None)
+        }
+    };
+    receipt.start = Some((start.clone(), kind));
     let reread = |successor: &Constitution| {
         executed_reread(field, successor, requests, declared, bank, grain, comparison, &mask)
     };
@@ -4089,7 +4239,26 @@ pub fn executed_move_guarded(
         &first,
         &reread,
         excursion,
+        coast.as_ref(),
     )?;
+    if let Some(throw) = receipt.throw.as_mut() {
+        throw.next = match &adopted {
+            Some((successor, _)) => Flight {
+                velocity: Some(
+                    successor
+                        .source_port(ring)
+                        .ok_or(HnnError::MissingSourcePort { ring })?
+                        .subtract(
+                            constitution
+                                .source_port(ring)
+                                .ok_or(HnnError::MissingSourcePort { ring })?,
+                        )?,
+                ),
+                moves: if throw.carried { throw.flight.moves + 1 } else { 1 },
+            },
+            None => Flight::default(),
+        };
+    }
     receipt.trials = trials;
     receipt.adopted = adopted;
     receipt.refusal = refusal;

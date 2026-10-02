@@ -36,6 +36,13 @@ the pump's reflection block `−2p R_c` to its stiffness, `c` the placed carrier
    `throw_le_free_fall`, `carried_velocity`): one lock's Gauss–Newton change raises only its target,
    by `1/θ_t`; a throw's flight caps every mode at the force's free fall `|g|t²/2`, whatever its
    stiffness; a carried velocity accumulates a push that keeps its sign.
+9. **The throw through the accreted mass** (`accretion_loss`, `accretion_dissipates`,
+   `thrown_move`, `throw_velocity_le_terminal`, `throw_velocity_rises`, `leap_velocity_le`): a
+   deposit accretes mass onto the port and conserves the carried momentum, so its kinetic reading
+   falls by exactly `p² f/(2m(m + f))`; the thrown move is the impulse plus the coast, the leap's
+   impulse alone from rest; under a constant impulse the throw's velocity rises toward the impulse
+   over the per-deposit mass while the leap's falls like `1/k` (the record
+   `research/records/2026-10-02_THE_THROW_CARRIES_ITS_MOMENTUM_THROUGH_THE_DEPOSITS_ACCRETED_MASS_AND_A_GRIP_HALVES_IT.md`).
 -/
 
 namespace Holonics.HNN.MoveDirection
@@ -314,5 +321,59 @@ theorem carried_velocity {β a : ℝ} (hβ : β ≠ 1) (v : ℕ → ℝ) (h0 : v
   induction k with
   | zero => simp [h0]
   | succ k ih => rw [hv, ih, pow_succ]; field_simp; ring
+
+/-! ## 9. The throw through the accreted mass -/
+
+/-- **Accretion dissipates a carried momentum, by exactly its sticking loss**: a momentum `p`
+carried across a deposit that accretes `f ≥ 0` onto the mass `m > 0` is kept, and its kinetic
+reading `p²/(2m)` falls to `p²/(2(m + f))`, by `p² f/(2m(m + f))`. -/
+theorem accretion_loss (p m f : ℝ) (hm : 0 < m) (hf : 0 ≤ f) :
+    p ^ 2 / (2 * m) - p ^ 2 / (2 * (m + f)) = p ^ 2 * f / (2 * m * (m + f)) := by
+  have h : 0 < m + f := by linarith
+  field_simp
+  ring
+
+/-- **The accreted mass is the throw's damping**: the kinetic reading never rises across a
+deposit's accretion. -/
+theorem accretion_dissipates (p m f : ℝ) (hm : 0 < m) (hf : 0 ≤ f) :
+    p ^ 2 / (2 * (m + f)) ≤ p ^ 2 / (2 * m) := by
+  have h := accretion_loss p m f hm hf
+  have h' : 0 ≤ p ^ 2 * f / (2 * m * (m + f)) := by
+    have : 0 < m + f := by linarith
+    positivity
+  linarith
+
+/-- **The thrown move is the impulse plus the coast**: the carried momentum `p` and the deposit's
+impulse `i` move the port by `(p + i)/(m + f)`, the impulse's move `i/(m + f)` (the leap's) plus
+the coast `p/(m + f)`; from rest (`p = 0`) it is the leap. -/
+theorem thrown_move (p i m f : ℝ) :
+    (p + i) / (m + f) = i / (m + f) + p / (m + f) ∧ (0 + i) / (m + f) = i / (m + f) := by
+  constructor
+  · ring
+  · rw [zero_add]
+
+/-- **Under a constant impulse the throw's velocity stays below the impulse over the per-deposit
+mass**: after `k` deposits of mass `f > 0` onto `m₀ > 0`, each with impulse `i ≥ 0`, the carried
+momentum `k i` moves the port by `k i/(m₀ + k f) ≤ i/f`. -/
+theorem throw_velocity_le_terminal (i m₀ f : ℝ) (k : ℕ) (hi : 0 ≤ i) (hm : 0 < m₀) (hf : 0 < f) :
+    k * i / (m₀ + k * f) ≤ i / f := by
+  have hk : (0 : ℝ) ≤ k := Nat.cast_nonneg k
+  rw [div_le_div_iff₀ (by positivity) hf]
+  nlinarith [mul_nonneg hi hm.le]
+
+/-- **The throw's velocity rises with every deposit under a constant impulse**. -/
+theorem throw_velocity_rises (i m₀ f : ℝ) (k : ℕ) (hi : 0 ≤ i) (hm : 0 < m₀) (hf : 0 < f) :
+    k * i / (m₀ + k * f) ≤ (k + 1) * i / (m₀ + (k + 1) * f) := by
+  have hk : (0 : ℝ) ≤ k := Nat.cast_nonneg k
+  rw [div_le_div_iff₀ (by positivity) (by positivity)]
+  nlinarith [mul_nonneg hi hm.le]
+
+/-- **The leap's velocity falls like `1/k`**: the leap spends its momentum at every deposit, so
+after `k ≥ 1` deposits its move is `i/(m₀ + k f) ≤ i/(k f)`. -/
+theorem leap_velocity_le (i m₀ f : ℝ) (k : ℕ) (hk : 1 ≤ k) (hi : 0 ≤ i) (hm : 0 < m₀)
+    (hf : 0 < f) : i / (m₀ + k * f) ≤ i / (k * f) := by
+  have hk' : (0 : ℝ) < k := by exact_mod_cast hk
+  apply div_le_div_of_nonneg_left hi (by positivity)
+  linarith
 
 end Holonics.HNN.MoveDirection
