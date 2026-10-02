@@ -2608,6 +2608,21 @@ pub struct StepReading {
     pub amplitude: Rat,
 }
 
+/// [definition; agent-inferred, October 2; [`Constitution::read_stepped`]] **One read step tried**:
+/// the vanished family, the least step `η = 2^k ≤ 1` at which it moved a lattice coordinate (`None`
+/// when none up to the unit step did, or the successor was refused), the window's code held at the
+/// certified successor and read at the read step's, and whether it was published (the read code
+/// strictly below the held one).
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct ReadStep {
+    pub locus: Locus,
+    pub family: Family,
+    pub step: Option<Rat>,
+    pub held: crate::ratio::algebraic::ExactInterval,
+    pub read: Option<crate::ratio::algebraic::ExactInterval>,
+    pub published: bool,
+}
+
 /// [definition; agent-inferred, September 30] **A carried source step's reading**
 /// ([`Constitution::stepped_source`]): the step `η`, the unit step's alignment `a` with its returns
 /// and its largest absolute column sum, the entries whose lattice coordinate moved, the residuals
@@ -2662,6 +2677,9 @@ pub struct DepositReading {
     /// took a nonzero lattice coordinate, so its whole move was released below its locus's fine
     /// lattice and its constitution did not change. A reached family either moves or is named here.
     pub vanished: Vec<(Locus, Family)>,
+    /// The read steps the machine holding the window tried after this deposit ([`ReadStep`]);
+    /// empty from [`Constitution::deposited`] itself.
+    pub read_steps: Vec<ReadStep>,
     pub charts: Vec<(Locus, ChartReading)>,
     pub landmarks: u64,
     /// Every loaded resonator gain step the deposit backtracked instead of carrying a gain to
@@ -5042,6 +5060,45 @@ impl Constitution {
     /// midpoint of the admissible side and is named in the reading ([`GainBacktrack`]): deposition
     /// never releases a family.
     pub fn deposited(&self, deposit: &Deposit) -> Result<(Self, DepositReading), HnnError> {
+        self.deposited_at(deposit, None)
+    }
+
+    /// [definition; agent-inferred, October 2; the
+    /// [contact loop record](../../../../research/records/2026-10-02_THE_CONTACT_LOOP_THE_RETURN_REACHES_EVERY_CONTACT_AND_ITS_CHANGE_IS_RELEASED_BEFORE_THE_LATER_CUT.md)
+    /// §5, Astra's third unit] **A read step**: a deposit of one factor family carried at a declared
+    /// step `η = 2^k` in place of its certified one, every other check of [`Constitution::deposited`]
+    /// kept (the carry, the commit, the certified storage growth, the budget). Its descent is not
+    /// certified here: only a machine that holds the comparison's window publishes it, where the
+    /// exact re-read of the window's code at the successor is strictly below the held one's
+    /// ([`crate::holon::deposition::strictly_better`]), the pattern of the lock's half-turn
+    /// ([`Constitution::locked`]). Refused unless the deposit steps exactly that one family.
+    pub fn read_stepped(
+        &self,
+        deposit: &Deposit,
+        family: (Locus, Family),
+        step: Rat,
+    ) -> Result<(Self, DepositReading), HnnError> {
+        let only = deposit.linear().is_empty()
+            && deposit.landmarks().is_empty()
+            && deposit.receiving().is_empty()
+            && deposit.factors().len() == 1
+            && deposit.factors()[0].gradient.locus() == family.0
+            && deposit.factors()[0].gradient.family() == family.1;
+        if !only || !step.is_positive() {
+            return Err(HnnError::Shape {
+                what: "a read step's deposit of its one family",
+                expected: 1,
+                found: deposit.factors().len(),
+            });
+        }
+        self.deposited_at(deposit, Some((family, step)))
+    }
+
+    fn deposited_at(
+        &self,
+        deposit: &Deposit,
+        read: Option<((Locus, Family), Rat)>,
+    ) -> Result<(Self, DepositReading), HnnError> {
         if deposit.commit() != self.commit {
             return Err(HnnError::StaleDeposit {
                 staged: deposit.commit(),
@@ -5176,6 +5233,15 @@ impl Constitution {
             self.certify_steps(deposit.reach(), &linear, &factors)?
         };
         let mut certified = certified;
+        if let Some((key, step)) = read {
+            let reading = certified.get_mut(&key).ok_or(HnnError::Shape {
+                what: "a read step's family among the certified",
+                expected: 1,
+                found: 0,
+            })?;
+            reading.step.exponent = crate::ratio::disk::floor_log2(&step);
+            reading.step.step = step;
+        }
         // The standing's fold (module header, "Within a lobe", "At a node"): each standing
         // family's step held inside its lobes, and the crossings its lock chart offered proposed
         // to the lock.
@@ -5334,6 +5400,7 @@ impl Constitution {
             released_bits,
             stepped,
             vanished,
+            read_steps: Vec::new(),
             charts,
             landmarks: deposit.landmarks().len() as u64,
             backtracks,

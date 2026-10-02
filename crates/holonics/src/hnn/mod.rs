@@ -163,7 +163,7 @@ pub mod word;
 
 pub use chart::{ChartKey, ChartReading, ChartStart, ChartWords, Charts, Remainders, WordLattice};
 pub use constitution::{
-    Carrier, CarrierBits, Constitution, Family, Lattice, Locus, NormalLaw, Reach, StepReading,
+    Carrier, CarrierBits, Constitution, Family, Lattice, Locus, NormalLaw, Reach, ReadStep, StepReading,
 };
 pub use contact::{
     BreakReceipt, ContactLock, ContactReading, KindCensus, LockDeclaration, SiteReading,

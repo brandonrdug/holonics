@@ -538,3 +538,29 @@ fn a_reached_contact_family_moves_or_is_named_a_rounding_refusal() {
     };
     assert_ne!(later(&mut pre), later(&mut post));
 }
+
+/// [measured-diagnostic; October 2; the contact loop record §5, unit 3] **The read steps on the
+/// chain**: each vanished contact family tried at the least step `2^k ≤ 1` that moves a lattice
+/// coordinate, published only where the window's exact re-read is strictly lower. Prints each try.
+#[test]
+fn read_step_probe() {
+    let field = chain();
+    let reference = Reference::new(4, 1 << 40).with_read_steps();
+    let (mut post, _, staged) = reached_contacts(&reference, &field);
+    let reading = match reference.deposit(&mut post, staged).unwrap().deposit {
+        Component::Present(reading) => reading,
+        other => panic!("{other:?}"),
+    };
+    for tried in &reading.read_steps {
+        eprintln!(
+            "{:?} {:?}: step {:?} published {} held [{}, {}) read {:?}",
+            tried.locus,
+            tried.family,
+            tried.step,
+            tried.published,
+            tried.held.lower,
+            tried.held.upper,
+            tried.read.as_ref().map(|r| (r.lower.clone(), r.upper.clone()))
+        );
+    }
+}
