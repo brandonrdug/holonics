@@ -91,8 +91,9 @@ exponent `v`. No temperature enters: the receiving map's gain, which plays the r
    (it passes from `2` to `3`, for example), so a schedule that keeps every read it made must be
    dyadic, for example `2^⌈log₂ L(N)⌉`, which meets the criterion because it is at least `L(N)`.
    At every count, same-cell media carry less than one bit over the readings
-   (`refiningGrain_unconfirmable`). Item 4 is therefore only partly closed: the reads are proved,
-   and re-basing a carrier's lattice onto the finer grain stays owed in #62.
+   (`refiningGrain_unconfirmable`). Re-basing a carrier's lattice onto the finer grain is proved
+   in `HNN/LatticeDeposit/Rebase`: it keeps value plus carry exactly, and the releases since the
+   founding stay below half the founding unit.
 10. **Campaign 1's numbers** (`resolution_aeon_bounds`, `declared_grain_vs_resolution`,
    `measured_change_ratio`, `measured_change_readings`, `measured_aeon_test_bound`,
    `measured_aeon_code_bound`).
@@ -1366,8 +1367,8 @@ theorem refiningGrain_growth (N M : ℕ) (h : N ≤ M) :
 integer factor `m`, the read at `m L` determines the read at `L`:
 `grainRead L f = (n, ⌊k′/m⌋)` with `(n, k′) = grainRead (m L) f`. So a grain that refines by
 integer factors (dyadically, `L = 2^j`) loses no read it already made. This is a statement about
-the reads only; re-basing a carrier's lattice onto the finer grain is not proved here and stays
-owed in #62. -/
+the reads only; re-basing a carrier's lattice onto the finer grain is
+`HNN/LatticeDeposit/Rebase.Carried.rebase`. -/
 theorem grainRead_of_refined {m : ℕ} (hm : 0 < m) (L : ℕ) (f : ℝ) :
     grainRead L f = ((grainRead (m * L) f).1, (grainRead (m * L) f).2 / (m : ℤ)) := by
   refine Prod.ext rfl ?_
