@@ -71,6 +71,8 @@ use crate::ratio::linear::vector::{
 };
 use crate::receiver::receipt::{Receipt, ReceiptLaw};
 
+pub mod continuation;
+
 /// [definition] **The joint law of a source and a receiver**: a Holon law whose storage splits as
 /// the first `source` coordinates and the rest, with no cross block at any commit.
 #[derive(Clone, Debug, PartialEq, Eq)]
