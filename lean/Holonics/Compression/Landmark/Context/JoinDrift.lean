@@ -40,6 +40,14 @@ passage    |Σ_(t<N) (ln q̂_t − ln q_t)| ≤ |Σ (ln x̂_c − ln x_c)| + |Σ
   weight `Â = Ŵ_c (1 + 1/β̂)`: a rebase `c` makes the face depart from `Â`'s step by at most
   `|ln c|` (the weight's own read jump), and the final `Â` departs from the ideal `W_c + W_b` by
   the two branches' drifts and the summed `|ln c|` once more.
+- `JoinNode.{tree_passage, tree_read, cell_read}`: the composition up a join tree. A side that is
+  itself a join stands where a branch root stood: its executed face is the join's `q̂`, its ideal
+  face the step of its sides' summed ideal weights, so `join_passage` and `join_read_drift` apply
+  join by join. Over its passage each node's code is within its excess (a face's own, a join's both
+  sides' plus `Σ (θ + 2|ln c|)`); at each read its face is within its certificate (a face's own, a
+  join's both sides' plus its rounding and its drift, the drift its sides' excesses plus
+  `Σ |ln c|`). Unrolled, a digit's certificate is the faces' certificates plus each join's rounding
+  and drift, and a cell's is its digits' summed.
 
 [conditional] **What the theorems cover in the Rust.** In an enlarged tree (`Law::joined`) the
 deposit (`Law::apply`) steps each join by `carried_step(β̂, side_c, 1, side_b, 0)`: `β̂' = β̂
@@ -56,8 +64,13 @@ ideal root weights at prior one half each, so `β_0 = 1`, which every join of an
 founded at exactly (`Standing::join`). The join's rounding `θ_h = 2^(−M)/min(q̂_h, q̂_c, q̂_b)`
 (`Law::join_rounding`) is the lattice blend's, as at a node. The digit trees' joins
 (`FaceJoins::receive`) keep the same accounting at every join of a `JoinTree`, founded at its
-`β₀`; a side that is itself a join reads its face and its excess increment in place of a branch
-root's, so the theorems apply join by join up the tree.
+`β₀`: a join's `drift` grows by its sides' increments and its rebase units, its `excess` (the
+increment it hands up) by `θ + 2·units` and its sides' increments, and a read's certificate is the
+faces' certificates plus each join's `drift` and `θ`. That is `JoinNode.excess` and `JoinNode.cert`
+term for term, so `tree_read` is the read certificate and `tree_passage` the excess at every join
+of the tree; `cell_read` is `StopMixture::receive`'s residual, the digits' certificates summed. The
+faces' certificates and increments are each digit tree's own (`Drift`, `StoredDrift`), and a
+join's founding `β₀ = π_left/π_right` is the ratio of its sides' prior weights (`JoinTree::prior`).
 
 [proved-standard] Mixing two sequential codes by their running weights is the two-expert Bayesian
 mixture (`LocalWeighing.static_mixture`); the bounds here are this owner's.
@@ -67,6 +80,7 @@ mixture (`LocalWeighing.static_mixture`); the bounds here are this owner's.
 | one digit's joined face | `mix_log_le`, `join_face_drift`, `join_read_drift` | `Law::join_face`, `Law::join_rounding`, `Law::digit_certificate` |
 | the carried ratio's drift | `log_step_sum`, `join_ratio`, `join_ratio_drift` | `Law::apply` (the join's `drift`) |
 | the join's code over its passage | `join_passage` | `Law::apply` (the join's `excess`), `FaceJoins::receive` |
+| a join tree's read and passage, and a cell's | `JoinNode.{tree_read, tree_passage, cell_read}` | `FaceJoins::receive` (`certificate`, each chart's `drift` and `excess`), `StopMixture::receive` (`residual`) |
 -/
 
 namespace Holonics.Compression.Landmark.Context.JoinDrift
@@ -312,6 +326,160 @@ theorem join_passage (Wc Wb Wch xc xb xch xbh βh c θ qh : ℕ → ℝ) (hWc : 
       (Real.log (A (t + 1)) - Real.log (A t))))
   linarith
 
+/-! ### The join tree -/
+
+/-- [definition] **A join tree's executed and ideal data** (Rust `JoinTree` with `FaceJoins`'
+charts at one dyadic cell). A face carries its ideal prior weight `W₀`, its ideal faces `x`, its
+executed faces `x̂`, its read certificate `L` and its passage excess `E` (the face's own
+`certificate` and summed `increment`, from its digit tree's lattice). A join carries its two sides,
+its carried ratio `β̂`, its rebase factors `c`, its rounding `θ` and its executed faces `q̂`. -/
+inductive JoinNode
+  | face (W₀ : ℝ) (x xh L E : ℕ → ℝ)
+  | join (l r : JoinNode) (βh c θ qh : ℕ → ℝ)
+
+namespace JoinNode
+
+/-- [definition] **The ideal weight**: a face's prior times its ideal faces so far, a join's the sum
+of its sides' (the Bayesian mixture of the faces below it, `LocalWeighing.static_mixture`). -/
+noncomputable def weight : JoinNode → ℕ → ℝ
+  | face W₀ x _ _ _, t => W₀ * ∏ s ∈ range t, x s
+  | join l r _ _ _ _, t => weight l t + weight r t
+
+/-- [definition] **The ideal face**: the weight's step. -/
+noncomputable def ideal (n : JoinNode) (t : ℕ) : ℝ := n.weight (t + 1) / n.weight t
+
+/-- [definition] **The executed face**: a face's own, a join's `q̂`. -/
+noncomputable def exec : JoinNode → ℕ → ℝ
+  | face _ _ xh _ _ => xh
+  | join _ _ _ _ _ qh => qh
+
+/-- [definition] **The passage excess** (Rust: the chart's `excess`, the sum of its increments
+`θ + 2·units + both sides' increments`): a face's own `E`, a join's both sides' plus its roundings
+and twice its rebases. -/
+noncomputable def excess : JoinNode → ℕ → ℝ
+  | face _ _ _ _ E, N => E N
+  | join l r _ c θ _, N => excess l N + excess r N + ∑ t ∈ range N, (θ t + 2 * |Real.log (c t)|)
+
+/-- [definition] **The read certificate** (Rust `FaceJoins::receive`'s `certificate`): a face's own
+`L`, a join's both sides' plus its rounding and its drift, the drift being both sides' excesses and
+its rebases once (the chart's `drift`). -/
+noncomputable def cert : JoinNode → ℕ → ℝ
+  | face _ _ _ L _, t => L t
+  | join l r _ c θ _, t => cert l t + cert r t + θ t +
+      (excess l t + excess r t + ∑ s ∈ range t, |Real.log (c s)|)
+
+/-- [definition] **What the lattice supplies**: positive faces and weights; each face within its
+certificate at every read and within its excess over every passage; each join's ratio founded at
+its sides' prior ratio and stepped by their executed faces' ratio and a positive rebase; each
+join's executed face positive and within its rounding of the carried mixture. -/
+def Valid : JoinNode → Prop
+  | face W₀ x xh L E => 0 < W₀ ∧ (∀ t, 0 < x t) ∧ (∀ t, 0 < xh t) ∧
+      (∀ t, |Real.log (xh t) - Real.log (x t)| ≤ L t) ∧
+      ∀ N, |∑ t ∈ range N, (Real.log (xh t) - Real.log (x t))| ≤ E N
+  | join l r βh c θ qh => Valid l ∧ Valid r ∧ (∀ t, 0 < βh t) ∧ (∀ t, 0 < c t) ∧
+      (∀ t, 0 < qh t) ∧ (∀ t, βh (t + 1) = βh t * (exec l t / exec r t * c t)) ∧
+      βh 0 = weight l 0 / weight r 0 ∧
+      ∀ t, |Real.log (qh t) - Real.log ((βh t * exec l t + exec r t) / (1 + βh t))| ≤ θ t
+
+theorem weight_pos : ∀ {n : JoinNode}, n.Valid → ∀ t, 0 < n.weight t
+  | face W₀ x xh L E, h, t => by
+    obtain ⟨hW, hx, -⟩ := h
+    exact mul_pos hW (prod_pos fun s _ => hx s)
+  | join l r βh c θ qh, h, t => add_pos (weight_pos h.1 t) (weight_pos h.2.1 t)
+
+theorem exec_pos : ∀ {n : JoinNode}, n.Valid → ∀ t, 0 < n.exec t
+  | face _ _ _ _ _, h, t => h.2.2.1 t
+  | join _ _ _ _ _ _, h, t => h.2.2.2.2.1 t
+
+theorem ideal_pos {n : JoinNode} (h : n.Valid) (t : ℕ) : 0 < n.ideal t :=
+  div_pos (weight_pos h _) (weight_pos h _)
+
+theorem weight_succ {n : JoinNode} (h : n.Valid) (t : ℕ) :
+    n.weight (t + 1) = n.weight t * n.ideal t := by
+  rw [ideal, mul_div_cancel₀ _ (weight_pos h t).ne']
+
+/-- A face's ideal face is its own. -/
+theorem face_ideal {W₀ : ℝ} {x xh L E : ℕ → ℝ} (h : (face W₀ x xh L E).Valid) (t : ℕ) :
+    (face W₀ x xh L E).ideal t = x t := by
+  have := weight_pos h t
+  simp only [ideal, weight, prod_range_succ] at this ⊢
+  rw [← mul_assoc, mul_div_cancel_left₀ _ this.ne']
+
+/-- A join's ideal face is the two-face mixture of its sides' at their weights' ratio. -/
+theorem join_ideal {l r : JoinNode} {βh c θ qh : ℕ → ℝ} (h : (join l r βh c θ qh).Valid) (t : ℕ) :
+    (join l r βh c θ qh).ideal t =
+      (l.weight t / r.weight t * l.ideal t + r.ideal t) / (1 + l.weight t / r.weight t) := by
+  have hl := weight_pos h.1 t
+  have hr := weight_pos h.2.1 t
+  simp only [ideal, weight]
+  field_simp
+  ring
+
+/-- [proved-derived; formal-checked] **`tree_passage`: a join tree's executed code over its
+passage.** At every node, `|Σ_(t<N) (ln q̂_t − ln q_t)|` is at most the node's excess: a face's own,
+a join's both sides' plus `Σ (θ + 2|ln c|)` (`join_passage` at each join, its sides' passage
+drifts bounded by their excesses). -/
+theorem tree_passage : ∀ {n : JoinNode}, n.Valid → ∀ N,
+    |∑ t ∈ range N, (Real.log (n.exec t) - Real.log (n.ideal t))| ≤ n.excess N
+  | face W₀ x xh L E, h, N => by
+    simp only [exec, excess]
+    rw [sum_congr rfl fun t _ => by rw [face_ideal h t]]
+    exact h.2.2.2.2 N
+  | join l r βh c θ qh, h, N => by
+    obtain ⟨hl, hr, hβ, hc, hq, hstep, h0, hθ⟩ := h
+    have il := tree_passage hl N
+    have ir := tree_passage hr N
+    have hJ := join_passage l.weight r.weight (fun t => l.weight 0 * ∏ s ∈ range t, l.exec s)
+      l.ideal r.ideal l.exec r.exec βh c θ qh (weight_pos hl) (weight_pos hr)
+      (fun t => mul_pos (weight_pos hl 0) (prod_pos fun s _ => exec_pos hl s))
+      (ideal_pos hl) (ideal_pos hr) (exec_pos hl) (exec_pos hr) hβ hc (weight_succ hl)
+      (weight_succ hr) (fun t => by rw [prod_range_succ]; ring) hstep h0 (by simp) hθ N
+    simp only [exec, excess]
+    rw [sum_congr rfl fun t _ => by rw [join_ideal ⟨hl, hr, hβ, hc, hq, hstep, h0, hθ⟩ t]]
+    linarith
+termination_by n => n
+decreasing_by all_goals simp_wf <;> omega
+
+/-- [proved-derived; formal-checked] **`tree_read`: one digit's executed face through a join tree.**
+At every node and every read, `|ln q̂_t − ln q_t|` is at most the node's certificate: a face's own,
+a join's both sides' plus its rounding and its drift, the drift its sides' excesses and its rebases
+once (`join_read_drift` at the join, `join_ratio_drift` with its sides' passage drifts bounded by
+`tree_passage`). Unrolled, a read's certificate is the faces' certificates plus each join's rounding
+and drift, as `FaceJoins::receive` sums it. -/
+theorem tree_read : ∀ {n : JoinNode}, n.Valid → ∀ t,
+    |Real.log (n.exec t) - Real.log (n.ideal t)| ≤ n.cert t
+  | face W₀ x xh L E, h, t => by
+    simp only [exec, cert]
+    rw [face_ideal h t]
+    exact h.2.2.2.1 t
+  | join l r βh c θ qh, h, t => by
+    have hv := h
+    obtain ⟨hl, hr, hβ, hc, -, hstep, h0, hθ⟩ := h
+    have rl := tree_read hl t
+    have rr := tree_read hr t
+    have pl := tree_passage hl t
+    have pr := tree_passage hr t
+    have hR := join_ratio_drift l.weight r.weight l.ideal r.ideal l.exec r.exec βh c
+      (weight_pos hl) (weight_pos hr) (ideal_pos hl) (ideal_pos hr) (exec_pos hl) (exec_pos hr) hβ
+      hc (weight_succ hl) (weight_succ hr) hstep h0 t
+    have hD := join_read_drift (div_pos (weight_pos hl t) (weight_pos hr t)) (hβ t)
+      (ideal_pos hl t) (exec_pos hl t) (ideal_pos hr t) (exec_pos hr t) (hθ t)
+    simp only [exec, cert]
+    rw [join_ideal hv t]
+    linarith
+
+/-- [proved-derived; formal-checked] **`cell_read`: a cell's executed face.** The cell's face is
+the product of its digits' sides and its ideal face the product of their ideal sides, so it departs
+in `ln` by at most the digits' certificates summed (`StopMixture::receive`'s `residual`). -/
+theorem cell_read {ι : Type*} (s : Finset ι) (q qh r : ι → ℝ) (hq : ∀ i ∈ s, 0 < q i)
+    (hqh : ∀ i ∈ s, 0 < qh i) (hr : ∀ i ∈ s, |Real.log (qh i) - Real.log (q i)| ≤ r i) :
+    |Real.log (∏ i ∈ s, qh i) - Real.log (∏ i ∈ s, q i)| ≤ ∑ i ∈ s, r i := by
+  rw [Real.log_prod (fun i hi => (hqh i hi).ne'), Real.log_prod (fun i hi => (hq i hi).ne'),
+    ← sum_sub_distrib]
+  exact (abs_sum_le_sum_abs _ _).trans (sum_le_sum hr)
+
+end JoinNode
+
 /-! ### Audit -/
 
 #print axioms mix_log_le
@@ -321,5 +489,8 @@ theorem join_passage (Wc Wb Wch xc xb xch xbh βh c θ qh : ℕ → ℝ) (hWc : 
 #print axioms join_ratio
 #print axioms join_ratio_drift
 #print axioms join_passage
+#print axioms JoinNode.tree_passage
+#print axioms JoinNode.tree_read
+#print axioms JoinNode.cell_read
 
 end Holonics.Compression.Landmark.Context.JoinDrift
