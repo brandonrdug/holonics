@@ -159,7 +159,7 @@ use crate::geometry::RatVec3;
 use crate::hnn::HnnError;
 use crate::hnn::chart::{ChartReading, ChartStart, Charts, Remainders};
 use crate::hnn::constitution::{
-    CAMPAIGN_ONE_BUDGET, CarrierBits, Constitution, DepositReading, FactorGradient, FactorStep,
+    CAMPAIGN_ONE_BUDGET, Carrier, CarrierBits, Constitution, DepositReading, FactorGradient, FactorStep,
     Family, LandmarkStep, LinearLocus, LinearStep, Locus, Reach, Sample,
 };
 use crate::hnn::contact::{SiteReading, site_readings};
@@ -3019,6 +3019,35 @@ pub struct CumulativeContacts {
 /// record §14), not by the receiver.
 pub const INFORMATION_WINDOWS: usize = 64;
 
+/// [measured-diagnostic; agent-inferred, October 2; the contact loop record §15] **One deposit's
+/// realized descent, split** (the Lean thread's condition, PR #151): the window read against its own
+/// targets at the predecessor and at the successor. At each phase, with `δ_c` the change of class
+/// `c`'s exponent and `Δ_c = δ_c − δ_t` its change relative to the target `t`, and `p̃` the
+/// predecessor face's odometer masses: `A⁺ = Σ_(c≠t) p̃_c max(−Δ_c, 0)` (the part favouring the
+/// target), `A⁻ = Σ_(c≠t) p̃_c max(Δ_c, 0)` (the part lifting other classes above it), summed over
+/// the phases; and both codes. The realized secant, not the tangent the certificate reads.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct DepositDescent {
+    pub aeon: usize,
+    pub a_plus: Rat,
+    pub a_minus: Rat,
+    pub before: ExactInterval,
+    pub after: ExactInterval,
+}
+
+/// [measured-diagnostic; the contact loop record §15] **The run of [`contact_ablation`]**: its
+/// windows, its aeon closes, `R`'s steps, each deposit's realized descent, and for every contact
+/// factor entry the residuals its deposits released below the lattice: their sum, the sum of their
+/// magnitudes, and their count (coherent when the sum's magnitude approaches the magnitudes' sum).
+#[derive(Clone, Debug, Default)]
+pub struct AblationRun {
+    pub windows: Vec<ContactAblation>,
+    pub cumulative: Vec<CumulativeContacts>,
+    pub receiver: Vec<ReceiverStep>,
+    pub descents: Vec<DepositDescent>,
+    pub released: BTreeMap<(Locus, Carrier, usize), (Rat, Rat, usize)>,
+}
+
 /// [measured-diagnostic] **One deposit's receiving-map step** in [`contact_ablation`]: its aeon, the
 /// certified decrease `a` of `R`'s step, its step `η`, and whether it moved a lattice coordinate.
 #[derive(Clone, Debug, PartialEq, Eq)]
@@ -3045,13 +3074,15 @@ pub fn contact_ablation(
     cells: &[usize],
     windows: usize,
     on_boundary: &mut dyn FnMut(&CumulativeContacts, &[ContactAblation], &[ReceiverStep]),
-) -> Result<(Vec<ContactAblation>, Vec<CumulativeContacts>, Vec<ReceiverStep>), HnnError> {
+) -> Result<AblationRun, HnnError> {
     let mut resident = reference.mount(field, &Current::at_rest(field))?;
     let opening = resident.constitution().clone();
     let family = resident.admitted().to_vec();
     let mut aeon = 0usize;
     let mut cumulative = Vec::new();
     let mut receiver = Vec::new();
+    let mut descents = Vec::new();
+    let mut released: BTreeMap<(Locus, Carrier, usize), (Rat, Rat, usize)> = BTreeMap::new();
     let mut boundary = false;
     let phases = resident
         .admitted()
@@ -3384,9 +3415,58 @@ pub fn contact_ablation(
                 }
             }
         }
+        let mut pre = resident.clone();
+        let (before_code, _, before_faces) = read(reference, &mut pre, window)?;
         match reference.deposit(&mut resident, staged) {
             Ok(returned) => {
+                let mut post = resident.clone();
+                let (after_code, _, after_faces) = read(reference, &mut post, window)?;
+                let (mut a_plus, mut a_minus) = (Rat::zero(), Rat::zero());
+                if let (Some(fa), Some(fb)) = (&before_faces, &after_faces) {
+                    let value = |c: &crate::receiver::face::GrainCell, grain: u64| {
+                        Rat::from_integer(c.carry.clone())
+                            + Rat::new(BigInt::from(c.phase), BigInt::from(grain))
+                            + &c.fibre
+                    };
+                    for ((x, y), &target) in fa.faces.iter().zip(&fb.faces).zip(window) {
+                        let masses = x.odometer_masses()?;
+                        let delta: Vec<Rat> = x
+                            .cells()
+                            .iter()
+                            .zip(y.cells())
+                            .map(|(p, q)| value(q, y.grain()) - value(p, x.grain()))
+                            .collect();
+                        for (c, (d, p)) in delta.iter().zip(&masses).enumerate() {
+                            if c == target {
+                                continue;
+                            }
+                            let relative = d - &delta[target];
+                            if relative.is_negative() {
+                                a_plus -= p * &relative;
+                            } else {
+                                a_minus += p * &relative;
+                            }
+                        }
+                    }
+                }
+                descents.push(DepositDescent {
+                    aeon,
+                    a_plus,
+                    a_minus,
+                    before: before_code,
+                    after: after_code,
+                });
                 if let Component::Present(reading) = &returned.deposit {
+                    for (locus, carrier, entry, residual) in &reading.released {
+                        if matches!(locus, Locus::Channel(_)) {
+                            let slot = released
+                                .entry((*locus, *carrier, *entry))
+                                .or_insert((Rat::zero(), Rat::zero(), 0));
+                            slot.0 += residual;
+                            slot.1 += residual.abs();
+                            slot.2 += 1;
+                        }
+                    }
                     for (locus, step) in &reading.steps {
                         if matches!(locus, Locus::ReceivingMap(_)) {
                             receiver.push(ReceiverStep {
@@ -3415,7 +3495,13 @@ pub fn contact_ablation(
             }
         }
     }
-    Ok((out, cumulative, receiver))
+    Ok(AblationRun {
+        windows: out,
+        cumulative,
+        receiver,
+        descents,
+        released,
+    })
 }
 
 /// [definition] **What an exposure reads of a port's resident** beside the port's own methods: the
