@@ -224,6 +224,31 @@ impl Clone for PendingSlot {
     }
 }
 
+impl Resident {
+    /// [measured-diagnostic; agent-inferred, October 2; the contact loop record §17] **What the
+    /// receiving map reads at a refined pending ratio** (read-only): the kept word's anchor on the
+    /// receiving ring at each of the phases' epochs, rotated by the ratio's lift exactly as
+    /// [`ReceivingPhases::read`] applies `R` to it. `None` when the pending ratio holds no kept read.
+    pub(crate) fn receiving_inputs(
+        &self,
+        pending: &PendingId,
+        phases: &ReceivingPhases,
+    ) -> Result<Option<Vec<Vec<Rat>>>, HnnError> {
+        let Some(slot) = self.pending.get(pending) else { return Ok(None) };
+        let Some(kept) = &slot.kept else { return Ok(None) };
+        let current = slot.ratio.current(&self.field)?;
+        let ring = self.field.ring(phases.ring());
+        Ok(phases
+            .epochs()
+            .map(|epoch| {
+                kept.word
+                    .anchor(epoch, phases.ring())
+                    .map(|anchor| ring.rotate(anchor, &current.lift()[phases.ring()]))
+            })
+            .collect())
+    }
+}
+
 impl PendingSlot {
     /// Its exact bits: the pending ratio's and the emitted logits' (the face a delayed compare
     /// returns its residual against), each value by its numerator's and denominator's bits. The
@@ -3025,6 +3050,8 @@ pub struct CumulativeContacts {
 pub struct AblationOptions {
     pub information: usize,
     pub descent: bool,
+    /// Whether to collect the receiving map's inputs and targets ([`AblationRun::samples`]).
+    pub samples: bool,
 }
 
 
@@ -3055,6 +3082,10 @@ pub struct AblationRun {
     pub receiver: Vec<ReceiverStep>,
     pub descents: Vec<DepositDescent>,
     pub released: BTreeMap<(Locus, Carrier, usize), Released>,
+    /// When collected: each refined phase's receiving input (the rotated anchor `R` reads), its
+    /// target class and its aeon; and `R` at each close (the opening's first).
+    pub samples: Vec<(usize, Vec<Rat>, usize)>,
+    pub receiving_maps: Vec<crate::ratio::linear::ExactRatMatrix>,
 }
 
 /// One contact factor entry's released residuals over a run: their sum `S`, the sum of their
@@ -3094,7 +3125,13 @@ pub fn contact_ablation(
     cells: &[usize],
     windows: usize,
     options: AblationOptions,
-    on_boundary: &mut dyn FnMut(&CumulativeContacts, &[ContactAblation], &[ReceiverStep]),
+    on_boundary: &mut dyn FnMut(
+        &CumulativeContacts,
+        &[ContactAblation],
+        &[ReceiverStep],
+        &[(usize, Vec<Rat>, usize)],
+        &[crate::ratio::linear::ExactRatMatrix],
+    ),
 ) -> Result<AblationRun, HnnError> {
     let mut resident = reference.mount(field, &Current::at_rest(field))?;
     let opening = resident.constitution().clone();
@@ -3109,6 +3146,9 @@ pub fn contact_ablation(
     let mut cumulative = Vec::new();
     let mut receiver = Vec::new();
     let mut descents = Vec::new();
+    let mut samples = Vec::new();
+    let mut receiving_maps: Vec<crate::ratio::linear::ExactRatMatrix> =
+        opening.receiving_map(receiving_ring).cloned().into_iter().collect();
     let mut released: BTreeMap<(Locus, Carrier, usize), Released> = BTreeMap::new();
     let mut boundary = false;
     let phases = resident
@@ -3340,13 +3380,23 @@ pub fn contact_ablation(
                         }
                         _ => Rat::zero(),
                     };
+                    if let Some(map) = &now {
+                        receiving_maps.push(map.clone());
+                    }
                     last_receiving = now;
                     change
                 },
             });
-            on_boundary(cumulative.last().expect("pushed"), &out, &receiver);
+            on_boundary(cumulative.last().expect("pushed"), &out, &receiver, &samples, &receiving_maps);
         }
         let (pending, refined) = reference.refine(&mut resident, &moment, &phases)?;
+        if options.samples {
+            if let Some(inputs) = resident.receiving_inputs(&pending, &phases)? {
+                for (z, &target) in inputs.into_iter().zip(window) {
+                    samples.push((aeon, z, target));
+                }
+            }
+        }
         let word = match &refined.receipt.detail {
             ReceiptDetail::Refine { word, .. } => word.as_ref().clone(),
             _ => return Err(HnnError::Shape { what: "a refine's word balance", expected: 1, found: 0 }),
@@ -3557,6 +3607,8 @@ pub fn contact_ablation(
         receiver,
         descents,
         released,
+        samples,
+        receiving_maps,
     })
 }
 

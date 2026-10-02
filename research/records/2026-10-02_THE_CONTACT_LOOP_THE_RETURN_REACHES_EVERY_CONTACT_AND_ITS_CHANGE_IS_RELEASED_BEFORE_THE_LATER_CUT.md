@@ -295,9 +295,12 @@ into bits.
 2. The information the receiver gains about the change from one reading is the divergence
    `D(p′‖p)`. To second order in bits, `D(p′‖p) = (ln 2/2) Var_p(δ) + O(δ³)`, using
    `ln p′_c − ln p_c = ln 2·(δ_c − Σ_d p_d δ_d) + O(δ²)`.
-3. The receiver can tell the two media apart over `N` readings exactly when the accumulated
+3. ~~The receiver can tell the two media apart over `N` readings exactly when the accumulated
    divergence reaches one bit, `N·D(p′‖p) ≥ 1` (Stein's lemma: the error of telling them apart
-   falls as `2^(−N·D)`). Since `Var_p(δ) ≤ max_c δ_c²`, a change is unreadable over `N` readings
+   falls as `2^(−N·D)`).~~ [Edit, October 2, after Astra's source review: Stein's lemma gives only
+   the asymptotic exponent of the type-II error at a fixed type-I level. It gives no exact finite-`N`
+   threshold.] Take `N·D(p′‖p) ≥ 1` bit as the convention for distinguishability over `N`
+   readings: a chosen scaling, not an exact threshold. Since `Var_p(δ) ≤ max_c δ_c²`, a change is unreadable over `N` readings
    whenever `max_c |δ_c| < √(2/(N ln 2))`.
 4. The receiver integrates readings within one retained state, over one aeon: `N = 1,190` cells on
    campaign 1's field (the exposure's declared aeon). So its resolution is
@@ -310,6 +313,12 @@ case of the receiver's tolerance, not its law. It assumes:
 - **(a) the decision:** a two-hypothesis test between the two media;
 - **(b) the error criterion:** Stein's exponent at one bit, `N·D ≥ 1`;
 - **(c) the accumulation:** independent readings within one retained state, `N = 1,190` for one aeon.
+  [Edit, October 2, after Astra's source review: 1,190 is the mean aeon length of campaign 1's
+  joint clock under uniform bytes, not a proved effective count of independent samples. Readings
+  under a frozen constitution are dependent, since moments, clocks and addresses keep evolving. The
+  coherent measure is the chain rule of the conditional divergence along the declared path law,
+  `Σ_t E[D(p′_t ‖ p_t | past)]`, of which a sum over the supplied text is one sample path, not the
+  expectation.]
 
 Each of the three is a modelling choice and changes the number. The general criterion recovered
 from the foveation work (the laboratory's July 25 joint-receiver grain; the
@@ -328,7 +337,8 @@ classes:
   `2^10` times below the derived resolution. [Edit, October 2: the ratio is `(1/21)/(7/2^18)`, about
   `2^10.8`, not more than `2^12`.]
 
-**The finding.** The contacts' change cannot physically be read by this receiver. With
+**The finding**, under the convention of step 3 and assumptions (a) to (c) (not a statement of
+physical impossibility): the contacts' change cannot be read by this receiver. With
 `max |δ| ≤ 7/2^18`, one reading carries less than `(ln 2/2)(7/2^18)² < 2^(−31)` bits about it, so
 the receiver would need more than `2^31` readings, ~~about `2^19` aeons~~ more than `2^21` aeons, to
 tell the media apart. [Edit, October 2: `(ln 2/2)·49/2^36` lies below `2^(−31)`, and `2^31/1190`
@@ -456,13 +466,19 @@ the lattice refines, and the contacts freeze by rounding.~~ [Edit, October 2, fr
 proofs, commit `2c7dcfa`.] "Vanished" counts deposits at which a family took no coarse coordinate
 (`q = 0`), not updates released. At clock `m` the fine cell lies between `u/(2m²)` and `2u/m²`, so a
 step decaying as `1/m` is held in the carried remainder, not released. A unit step is `D = G/h′`,
-with the statistic `h′` accumulating every passage's feature energy. The contacts reach the next
-coarse unit only as `κ · log` of that statistic's growth. The freeze is that logarithmic law, not
+with the statistic `h′` accumulating every passage's feature energy. The contacts' accumulated
+updates reach the next coarse unit only as `κ · log` of that statistic's growth (an entry needs
+growth `e^(u/κ)` to move one unit); the carried remainder can bring a contact's first move much
+sooner (the freeze proofs' review, PR #152). The freeze is that logarithmic law, not
 the rounding of individual steps. The cumulative change of §13 is what this schedule permits, not a
 trend. `R`, whose step is `η = 1` at every deposit, keeps moving.
 
-**The information (second order).** The receiver's readings were compared over 128 frozen readings
-(64 windows) after each close, the opening's contacts against the learned:
+**The information (second order, an ungrained surrogate).** The receiver's readings were compared
+over 128 frozen readings (64 windows) after each close, the opening's contacts against the learned.
+The computation takes raw exponent deltas, fibres included, and weights them by the grained masses'
+interval midpoints, so the changed mass is not the exponential tilt of those deltas. It is an
+ungrained surrogate, not a certified divergence, and its remainder is not bounded (Astra's source
+review, October 2):
 - after aeon 1, `Σ Var_p(δ) = 16713691/2^38` bits²;
 - after aeon 2, `797049/2^31` bits².
 
@@ -477,9 +493,13 @@ code with the learned contacts, summed over the same 64 windows:
 - after aeon 2, about `−1/74` bit: 20 better, 27 worse, 17 undecided.
 
 The difference changes sign and the windows split nearly evenly, so the learned contacts are not
-consistently better on the actual targets. Two points cannot separate linear growth from
+consistently better on the actual targets. ~~Two points cannot separate linear growth from
 square-root growth. The sign change and the even split point to incoherent accumulation, so neither
-bound shows a contact improvement accruing.
+bound shows a contact improvement accruing.~~ [Edit, October 2, after Astra's source review: growth
+in `N` does not separate first from second order in the perturbation, since both mean effects can
+grow linearly, and two frozen prefixes identify no exponent.] The supported claim is narrower:
+small contact perturbations, under a declared local surrogate, with no consistent signed
+improvement on the measured prefixes.
 
 [agent-inferred] On this cut, the contacts' learning, frozen by rounding after the first aeon, does
 not produce a change the receiver gains from. This is the statement the measurement supports, and
@@ -601,3 +621,55 @@ receiver of this form can reach on these anchors is the fitted-oracle comparison
 cross-entropy-optimal `R` of the same form on the same windows, against `R`'s span at each close.
 That comparison has not been run, and it needs the receiving anchors, which the refine does not
 publish. It is the next build.
+
+## 17. `R` is far from what a receiver of its own form reaches on the same anchors
+
+**The fitted comparison.** A read-only accessor, `Resident::receiving_inputs`, returns what `R`
+reads at a refined window: the kept word's receiving anchors at the phases' epochs, rotated by the
+lift as `ReceivingPhases::read` applies `R`. `contact_ablation` collects them with their targets
+and `R` at each close. Outside the machine, `receiver_oracle.py` fits the cross-entropy-optimal
+receiver of `R`'s form, `v = W z` in bits with `p_c ∝ 2^(v_c)`. It fits on the same readings `R` had
+seen by each close, with the ridge `|W|²/2` that `R`'s unit prior carries, then reads both on those
+readings and on the next aeon's. The fit runs in floating point as a search outside the machine;
+each reported value is the exact dyadic of its float. These are the wave's codes alone, before the
+landmark tree is mixed in. Uniform is 8 bits a reading
+([run](2026-10-02_THE_CONTACT_LOOP_receipts/receiver_samples_run.txt), three aeons, 1,533,561 ms
+inside the 1,550 s deadline; [fit](2026-10-02_THE_CONTACT_LOOP_receipts/receiver_oracle.txt)).
+
+| Close | Readings seen | `R`: mean code / span (bits) | Fitted: mean code / span (bits) | Next aeon: `R` / fitted (bits) |
+|---|---|---|---|---|
+| 1 | 1,070 | `16769246/2^21` / `11011564/2^27` | `16737089/2^21` / `8820633/2^25` | `16759842/2^21` / `16683173/2^21` (1,122 readings) |
+| 2 | 2,192 | `16757695/2^21` / `11600898/2^26` | `16541577/2^21` / `11545267/2^23` | `16746804/2^21` / `16399855/2^21` (1,138) |
+| 3 | 3,330 | `16751147/2^21` / `15628272/2^26` | `16266735/2^21` / `10852723/2^22` | `16737913/2^21` / `15911273/2^21` (70) |
+
+- **`R` gains almost nothing.** Its wave code stays within about `1/50` bit of uniform at every
+  close.
+- **A receiver of the same form does far better on the same anchors.** It reaches about `1/4` bit
+  below uniform in-sample at the third close. On the next aeon, which it never saw, it reaches
+  `16399855/2^21` against `R`'s `16746804/2^21` after the second close, a gain of about `1/6` bit a
+  reading. Its span grows to about `2.6` bits against `R`'s `0.23`.
+- **The anchors carry learnable information that `R` does not extract.** The plateau of §12–16 is
+  `R`'s learning rule, not the form's limit and not the anchors.
+
+**`R`'s per-aeon law** (the coordinator's check). Over the three closes, `R`'s largest-entry change
+in absolute terms is about `219/1024`, `0.215` and `0.142`, with aeons of 534, 561 and 569 windows.
+That gives successive ratios of about `1.0` and `0.66`. A recursive least-squares step of size `1/n`
+predicts `ln(3/2)/ln 2`, about `0.585`, for the second ratio, and geometric halving predicts `0.5`.
+Three points favour the `1/n` law over halving, so the estimator is still climbing slowly, not
+stopping. The earlier "halves each aeon" read the change relative to a growing `R` and was
+misleading.
+
+**Why `R` is slow: a derivation from its update.** `R`'s normal law steps `D = Σ_t w g_t (X̂ f_t)ᵀ`,
+with `X̂ ≈ H′⁻¹` the inverse of its feature Gram (unit prior included) and `g = p − q`. The step's
+metric over the classes is the identity. The cross-entropy's own curvature in the classes, the
+receiver's Fisher form `diag p − p pᵀ` (the witness's form of
+[October 1](2026-10-01_THE_MOVES_METRIC_IS_ITS_WITNESSS_THE_LOCKS_FISHER_FORM_ON_THE_MOVES_PLANE.md)),
+is far smaller near a uniform reading: about `1/256` per class direction over 256 classes. A
+Gauss–Newton step in the receiver's own metric would therefore be larger by up to the inverse of
+that curvature in each class direction. The certificate also caps `η` at `1` (`ηc ≤ 1`, with
+`c` the covector's largest entry), and it bounds the curvature by the worst case `½`, not the
+reading's own `diag p − p pᵀ`. [agent-inferred] `R` steps with a class metric about two orders of
+magnitude too stiff for a near-uniform receiver, so it moves a small fraction of the way the
+fitted receiver shows is available. The next build is `R`'s step in its own Fisher metric: the
+witness form already owned in `hnn::executed`, with the certificate read on that form (the Lean
+thread's `ln 2/2` and the deposit-condition proofs). It is tested by this same fitted comparison.
