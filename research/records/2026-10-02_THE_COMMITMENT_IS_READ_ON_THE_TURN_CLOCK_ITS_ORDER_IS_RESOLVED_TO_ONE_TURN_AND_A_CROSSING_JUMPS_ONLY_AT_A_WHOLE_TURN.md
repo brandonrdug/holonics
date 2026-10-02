@@ -257,7 +257,7 @@ comparison: each station commits at turn `⌈t⌉` of its instant, counted from 
 and stations that commit in one turn commit together. The current rule, largest gap first, is not a
 proxy of that law: it orders by the difference of growths instead of their ratio, and at the founded
 opening it locks a station of strictly later turn in 17 of the 56 refinements the enclosures decide
-([the walls record](2026-10-02_A_ZERO_TEMPERATURE_DESCENT_WALKS_INTO_THE_RELEASES_WALLS_AND_THE_GAP_ORDER_IS_NOT_THE_COMMITMENT_ORDER.md)
+([the order-jumps record](2026-10-02_THE_HALVING_DESCENT_STOPS_SHORT_OF_A_JUMP_IN_THE_RELEASES_ORDER_AND_THE_GAP_ORDER_IS_NOT_THE_COMMITMENT_ORDER.md)
 §3). Changing it changes HNN behaviour and needs campaign 1's held-out
 read before it merges.
 
