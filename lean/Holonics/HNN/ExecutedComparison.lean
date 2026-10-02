@@ -1,5 +1,6 @@
 import Holonics.HNN.BankFace
 import Holonics.Holon.Element
+import Holonics.HNN.Ratio.Certificate
 import Holonics.Foundation.Standing
 import Mathlib.Analysis.Calculus.Deriv.Comp
 import Mathlib.Analysis.Calculus.Deriv.Prod
@@ -66,6 +67,16 @@ the laws that covector and its certified step stand on (the diagnosis record,
    (`diagonal_reach_iff`). A native step `M⁻¹Aᵀμ` is horizontal, with no hidden part
    (`native_step_horizontal`, with `Holon/Element.KineticFace`): the baseline for U6 step 1's
    ingredient (§9).
+
+10. **A scale in the readings' own coordinates.** [proved-derived; formal-checked] A metric keeps
+   every step in the native span exactly when it acts through a form `D` on the readings
+   (`keeps_span_iff`, `hidden_eq_zero_iff`); every positive definite `D` gives a positive definite
+   metric `P_D` stepping to the least-energy lift of `−D c` (`readingMetric_posDef`,
+   `readingMetric_step`, `readingMetric_reads`). The normal law is `D = AM⁻¹Aᵀ`
+   (`readingStep_normal`). A per-reading scale `D = diag(p)` rests only where `∇L = 0`
+   (`readingStep_zero_iff`), descends by `⟨c, D c⟩` (`readingStep_slope`), reaches the
+   sign-consistent reading changes (`reading_diagonal_reach`; a full `D`, every descending one,
+   `reading_posDef_reach`), and is certified in the Fisher form (`reading_scale_descends`) (§10).
 
 [open] (#62) The existence of the differentiable root path (the implicit function theorem at a
 simple root, from `Φ`'s strict differentiability), Jacobi's formula `∂_η det(λ − M − ηΔM) =
@@ -1105,6 +1116,245 @@ theorem native_step_horizontal (M : Matrix n n ℝ) (A : Matrix m n ℝ) (hM : M
 
 end MoveReach
 
+/-! ## 10. A scale in the readings' own coordinates
+
+[definition; agent-inferred, October 2] Rebuild step U6, step 1: which metrics keep the move in the
+native span, and the per-reading scale as the candidate native counterpart of an exterior `rms`
+step (`research/records/2026-10-02_A_METRIC_KEEPS_THE_MOVE_NATIVE_EXACTLY_WHEN_IT_ACTS_THROUGH_THE_READINGS.md`).
+A metric keeps every step horizontal exactly when it acts through a form `D` on the readings
+(`keeps_span_iff`); every positive definite `D` is such a metric (`readingMetric_posDef`,
+`readingMetric_step`); the normal law is `D = AM⁻¹Aᵀ` (`readingStep_normal`); a per-reading scale
+`D = diag(p)` is a member, with `L`'s fixed points (`readingStep_zero_iff`), the sign-consistent
+reach in the readings (`reading_diagonal_reach`) and its Fisher-form certificate
+(`reading_scale_descends`). -/
+
+section ReadingScale
+
+open Matrix Holonics.HolonCore.KineticFace
+
+variable {n m : Type*} [Fintype n] [Fintype m] [DecidableEq n] [DecidableEq m]
+
+/-- [definition] **The least-energy lift as a matrix**, `H = M⁻¹Aᵀ(AM⁻¹Aᵀ)⁻¹`: `H w` is
+`KineticFace.horizontal M A w`, the least-energy move of `E` whose readings change by `w`. -/
+def liftMatrix (M : Matrix n n ℝ) (A : Matrix m n ℝ) : Matrix n m ℝ :=
+  M⁻¹ * Aᵀ * faceMetric M A
+
+/-- `H w` is the horizontal lift of `w`. -/
+theorem liftMatrix_mulVec (M : Matrix n n ℝ) (A : Matrix m n ℝ) (w : m → ℝ) :
+    liftMatrix M A *ᵥ w = horizontal M A w := by
+  simp only [liftMatrix, horizontal, mulVec_mulVec, Matrix.mul_assoc]
+
+/-- `A H = 1`: the lift reads back its own reading change. -/
+theorem reads_liftMatrix (M : Matrix n n ℝ) (A : Matrix m n ℝ) (hM : M.PosDef)
+    (hA : Function.Surjective A.mulVec) : A * liftMatrix M A = 1 := by
+  have hG := cometric_posDef M A hM hA
+  have hi := mul_nonsing_inv (cometric M A) ((Matrix.isUnit_iff_isUnit_det _).mp hG.isUnit)
+  rw [liftMatrix, faceMetric, ← Matrix.mul_assoc, ← Matrix.mul_assoc]
+  exact hi
+
+/-- A horizontal lift has no hidden part. -/
+theorem hidden_horizontal (M : Matrix n n ℝ) (A : Matrix m n ℝ) (hM : M.PosDef)
+    (hA : Function.Surjective A.mulVec) (w : m → ℝ) : hidden M A (horizontal M A w) = 0 := by
+  rw [Holonics.HolonCore.KineticFace.hidden, horizontal_reads M A hM hA, sub_self]
+
+/-- [proved-derived; formal-checked] **`hidden_eq_zero_iff`: the horizontal space is the
+native span.** A move `v` has no hidden part exactly when its momentum `M v` is a combination of
+the readings' covectors, `Aᵀμ`: the moves the normal law and the kinetic solve can deposit. -/
+theorem hidden_eq_zero_iff (M : Matrix n n ℝ) (A : Matrix m n ℝ) (hM : M.PosDef)
+    (hA : Function.Surjective A.mulVec) (v : n → ℝ) :
+    hidden M A v = 0 ↔ ∃ μ : m → ℝ, M *ᵥ v = Aᵀ *ᵥ μ := by
+  constructor
+  · intro h
+    have hv : v = horizontal M A (A *ᵥ v) := sub_eq_zero.mp h
+    exact ⟨faceMetric M A *ᵥ (A *ᵥ v), by rw [hv, metric_horizontal M A hM, ← hv]⟩
+  · rintro ⟨μ, hμ⟩
+    have hi := nonsing_inv_mul M ((Matrix.isUnit_iff_isUnit_det _).mp hM.isUnit)
+    have hv : v = M⁻¹ *ᵥ (Aᵀ *ᵥ μ) := by rw [← hμ, mulVec_mulVec, hi, one_mulVec]
+    rw [hv]
+    exact (native_step_horizontal M A hM hA μ).2
+
+/-- [proved-derived; formal-checked] **`keeps_span_iff`: a metric keeps the move native exactly
+when it acts through the readings.** For any `P`, every step `P ∇L` with `∇L = Aᵀc` is horizontal
+iff every such step is the least-energy lift of the reading change `(A P Aᵀ) c`. So a span-keeping
+metric acts on the comparison only through `D = A P Aᵀ`, its form on the readings' covectors; the
+rest of `P` never moves `E`. -/
+theorem keeps_span_iff (M : Matrix n n ℝ) (A : Matrix m n ℝ) (hM : M.PosDef)
+    (hA : Function.Surjective A.mulVec) (P : Matrix n n ℝ) :
+    (∀ c, hidden M A (P *ᵥ (Aᵀ *ᵥ c)) = 0) ↔
+      ∀ c, P *ᵥ (Aᵀ *ᵥ c) = horizontal M A ((A * P * Aᵀ) *ᵥ c) := by
+  constructor
+  · intro h c
+    have hv := sub_eq_zero.mp (h c)
+    rw [hv, mulVec_mulVec, mulVec_mulVec]
+  · intro h c
+    rw [h c]
+    exact hidden_horizontal M A hM hA _
+
+/-- [definition; agent-inferred] **The metric of a reading form `D`** on `E`:
+`P_D = H D Hᵀ + (1 − HA) M⁻¹ (1 − HA)ᵀ`. The first term acts on the readings' covectors; the
+second is the port's own cometric on the hidden directions, where no comparison covector lies. -/
+def readingMetric (M : Matrix n n ℝ) (A : Matrix m n ℝ) (D : Matrix m m ℝ) : Matrix n n ℝ :=
+  liftMatrix M A * D * (liftMatrix M A)ᵀ +
+    (1 - liftMatrix M A * A) * M⁻¹ * (1 - liftMatrix M A * A)ᵀ
+
+/-- `P_D Aᵀ = H D`. -/
+theorem readingMetric_mul_transpose (M : Matrix n n ℝ) (A : Matrix m n ℝ) (hM : M.PosDef)
+    (hA : Function.Surjective A.mulVec) (D : Matrix m m ℝ) :
+    readingMetric M A D * Aᵀ = liftMatrix M A * D := by
+  have h1 := reads_liftMatrix M A hM hA
+  have hT : (liftMatrix M A)ᵀ * Aᵀ = 1 := by rw [← transpose_mul, h1, transpose_one]
+  have hZ : (1 - liftMatrix M A * A)ᵀ * Aᵀ = 0 := by
+    rw [← transpose_mul, Matrix.mul_sub, Matrix.mul_one, ← Matrix.mul_assoc, h1, Matrix.one_mul,
+      sub_self, transpose_zero]
+  rw [readingMetric, Matrix.add_mul, Matrix.mul_assoc (liftMatrix M A * D), hT, Matrix.mul_one,
+    Matrix.mul_assoc ((1 - liftMatrix M A * A) * M⁻¹), hZ, Matrix.mul_zero, add_zero]
+
+/-- [proved-derived; formal-checked] **`readingMetric_step`**: `P_D` steps from `∇L = Aᵀc` to
+the least-energy lift of the reading change `D c`. -/
+theorem readingMetric_step (M : Matrix n n ℝ) (A : Matrix m n ℝ) (hM : M.PosDef)
+    (hA : Function.Surjective A.mulVec) (D : Matrix m m ℝ) (c : m → ℝ) :
+    readingMetric M A D *ᵥ (Aᵀ *ᵥ c) = horizontal M A (D *ᵥ c) := by
+  rw [mulVec_mulVec, readingMetric_mul_transpose M A hM hA, ← mulVec_mulVec, liftMatrix_mulVec]
+
+/-- `A P_D Aᵀ = D`: `P_D` is the metric whose form on the readings is `D`. -/
+theorem readingMetric_reads (M : Matrix n n ℝ) (A : Matrix m n ℝ) (hM : M.PosDef)
+    (hA : Function.Surjective A.mulVec) (D : Matrix m m ℝ) :
+    A * readingMetric M A D * Aᵀ = D := by
+  rw [Matrix.mul_assoc, readingMetric_mul_transpose M A hM hA, ← Matrix.mul_assoc,
+    reads_liftMatrix M A hM hA, Matrix.one_mul]
+
+/-- [proved-derived; formal-checked] **`readingMetric_posDef`**: for every positive definite
+reading form `D`, `P_D` is a positive definite metric on `E`. With `readingMetric_step` and
+`keeps_span_iff`, the span-keeping positive definite metrics act on the comparison exactly as the
+family `P_D`, `D ≻ 0`. -/
+theorem readingMetric_posDef (M : Matrix n n ℝ) (A : Matrix m n ℝ) (hM : M.PosDef)
+    {D : Matrix m m ℝ} (hD : D.PosDef) :
+    (readingMetric M A D).PosDef := by
+  set H := liftMatrix M A with hH
+  set Z : Matrix n n ℝ := 1 - H * A with hZdef
+  have hDs : Dᵀ = D := by simpa only [conjTranspose_eq_transpose_of_trivial] using hD.1.eq
+  have hMs : (M⁻¹)ᵀ = M⁻¹ := by
+    simpa only [conjTranspose_eq_transpose_of_trivial] using hM.inv.1.eq
+  refine PosDef.of_dotProduct_mulVec_pos ?_ fun x hx => ?_
+  · simp only [readingMetric, ← hH, ← hZdef, IsHermitian, conjTranspose_eq_transpose_of_trivial,
+      transpose_add, transpose_mul, transpose_transpose, hDs, hMs, Matrix.mul_assoc]
+  · simp only [star_trivial]
+    set u := Hᵀ *ᵥ x with hu
+    set z := Zᵀ *ᵥ x with hz
+    have hq : x ⬝ᵥ (readingMetric M A D *ᵥ x) = u ⬝ᵥ (D *ᵥ u) + z ⬝ᵥ (M⁻¹ *ᵥ z) := by
+      simp only [readingMetric, ← hH, ← hZdef, add_mulVec, dotProduct_add, ← mulVec_mulVec]
+      rw [← dotProduct_transpose_mulVec H, ← dotProduct_transpose_mulVec Z]
+      simp only [hu, hz, dotProduct_comm]
+    have hzx : z = x - Aᵀ *ᵥ u := by
+      rw [hz, hu, hZdef, transpose_sub, transpose_one, transpose_mul, sub_mulVec, one_mulVec,
+        mulVec_mulVec]
+    rw [hq]
+    by_cases hz0 : z = 0
+    · have hx' : x = Aᵀ *ᵥ u := by rw [hz0] at hzx; exact (sub_eq_zero.mp hzx.symm)
+      have hu0 : u ≠ 0 := by rintro h0; apply hx; rw [hx', h0, mulVec_zero]
+      have h1 := hD.dotProduct_mulVec_pos hu0
+      simp only [star_trivial, hz0, zero_dotProduct, add_zero] at h1 ⊢
+      exact h1
+    · have h2 := hM.inv.dotProduct_mulVec_pos hz0
+      have h1 := hD.posSemidef.dotProduct_mulVec_nonneg u
+      simp only [star_trivial] at h1 h2
+      linarith
+
+/-- [proved-derived; formal-checked] **`readingStep_normal`: the normal law is the member
+`D = AM⁻¹Aᵀ`**, the readings' Gram in the port's cometric: its lift of `−D c` is `−M⁻¹Aᵀc`.
+[agent-inferred] By its Rust owner's statement (`hnn::executed::KineticSolve`), the kinetic solve
+is the member `D = F⁻¹` where the witness's Fisher form `F` is invertible on the readings. -/
+theorem readingStep_normal (M : Matrix n n ℝ) (A : Matrix m n ℝ) (hM : M.PosDef)
+    (hA : Function.Surjective A.mulVec) (c : m → ℝ) :
+    horizontal M A (cometric M A *ᵥ c) = M⁻¹ *ᵥ (Aᵀ *ᵥ c) := by
+  have hG := cometric_posDef M A hM hA
+  have hi := nonsing_inv_mul (cometric M A) ((Matrix.isUnit_iff_isUnit_det _).mp hG.isUnit)
+  have hc : (cometric M A)⁻¹ *ᵥ (cometric M A *ᵥ c) = c := by rw [mulVec_mulVec, hi, one_mulVec]
+  rw [horizontal, faceMetric, hc]
+
+/-- [proved-derived; formal-checked] **`readingStep_zero_iff`: the fixed points.** For `D ≻ 0`
+the step from `Aᵀc` rests exactly where `∇L = Aᵀc = 0`: no reading form changes where the move
+can rest. -/
+theorem readingStep_zero_iff (M : Matrix n n ℝ) (A : Matrix m n ℝ) (hM : M.PosDef)
+    (hA : Function.Surjective A.mulVec) {D : Matrix m m ℝ} (hD : D.PosDef) (c : m → ℝ) :
+    horizontal M A (-(D *ᵥ c)) = 0 ↔ Aᵀ *ᵥ c = 0 := by
+  constructor
+  · intro h
+    have hr : D *ᵥ c = 0 := by
+      have := horizontal_reads M A hM hA (-(D *ᵥ c))
+      rw [h, mulVec_zero] at this
+      exact neg_eq_zero.mp this.symm
+    rw [(metric_step_zero_iff hD c).mp hr, mulVec_zero]
+  · intro h
+    have hc : c = 0 := transpose_injective A hA (by rw [h, mulVec_zero])
+    simp [hc, horizontal]
+
+/-- [proved-derived; formal-checked] **`readingStep_slope`**: the step's first-order change of
+`L` is `−⟨c, D c⟩`, read in the readings alone. -/
+theorem readingStep_slope (M : Matrix n n ℝ) (A : Matrix m n ℝ) (hM : M.PosDef)
+    (hA : Function.Surjective A.mulVec) (D : Matrix m m ℝ) (c : m → ℝ) :
+    (Aᵀ *ᵥ c) ⬝ᵥ horizontal M A (-(D *ᵥ c)) = -(c ⬝ᵥ (D *ᵥ c)) := by
+  rw [dotProduct_comm, dotProduct_transpose_mulVec, horizontal_reads M A hM hA, dotProduct_neg]
+
+/-- [proved-derived; formal-checked] **`reading_diagonal_reach`: a per-reading scale's reach.**
+The steps `−H diag(p) c`, `p > 0`, are exactly the horizontal moves whose reading change is zero
+where `c` is and of the opposite sign where it is not: §9's sign-consistent reach, taken in the
+readings' coordinates and lifted. -/
+theorem reading_diagonal_reach (M : Matrix n n ℝ) (A : Matrix m n ℝ) (hM : M.PosDef)
+    (hA : Function.Surjective A.mulVec) (c : m → ℝ) (v : n → ℝ) :
+    (∃ p : m → ℝ, (∀ k, 0 < p k) ∧ v = horizontal M A (-(diagonal p *ᵥ c))) ↔
+      hidden M A v = 0 ∧
+        ∀ k, (c k = 0 → (A *ᵥ v) k = 0) ∧ (c k ≠ 0 → (A *ᵥ v) k * c k < 0) := by
+  constructor
+  · rintro ⟨p, hp, rfl⟩
+    refine ⟨hidden_horizontal M A hM hA _, (diagonal_reach_iff c _).mp ⟨p, hp, ?_⟩⟩
+    rw [horizontal_reads M A hM hA]
+  · rintro ⟨hv, hs⟩
+    obtain ⟨p, hp, hr⟩ := (diagonal_reach_iff c (A *ᵥ v)).mpr hs
+    exact ⟨p, hp, by rw [← hr]; exact sub_eq_zero.mp hv⟩
+
+/-- [proved-derived; formal-checked] **`reading_posDef_reach`: a full reading form's reach.** At
+`c ≠ 0`, every horizontal move whose reading change descends, `⟨A v, c⟩ < 0`, is `−H D c` for a
+positive definite `D`. -/
+theorem reading_posDef_reach (M : Matrix n n ℝ) (A : Matrix m n ℝ) {c : m → ℝ} (hc : c ≠ 0) {v : n → ℝ}
+    (hv : hidden M A v = 0) (hd : (A *ᵥ v) ⬝ᵥ c < 0) :
+    ∃ D : Matrix m m ℝ, D.PosDef ∧ v = horizontal M A (-(D *ᵥ c)) := by
+  obtain ⟨D, hD, hr⟩ := posDef_reach hc hd
+  exact ⟨D, hD, by rw [hr]; exact sub_eq_zero.mp hv⟩
+
+omit [Fintype n] [Fintype m] [DecidableEq n] [DecidableEq m] in
+open Holonics.HNN.Ratio.Certificate in
+/-- [proved-derived; formal-checked] **`reading_scale_descends`: the per-reading step's
+certificate in the Fisher form.** On one sheet of readings with face `p` and target `t`
+(covector `c = p − e_t`), the reading change `−η (d ⊙ c)` of a per-reading scale `d` lowers the
+code by at least `η Σ d_k c_k²/2` when `η · ln 2 · 2^ω · Var_p(d ⊙ c) ≤ Σ d_k c_k²` and the
+change's spread is at most `ω`. `Var_p(d ⊙ c)` is the Fisher form `(d ⊙ c)ᵀ J_p (d ⊙ c)`
+(`HNN/Ratio/Certificate.codeLength_step_descends`). It certifies the readings' first-order
+change `A v`; where the readings are not linear in `E`, the move's guards certify the trial
+whole. -/
+theorem reading_scale_descends {ι : Type*} [Fintype ι] [Nonempty ι] [DecidableEq ι]
+    (f p d : ι → ℝ) (hp : ∀ k, p k = (2 : ℝ) ^ f k / ∑ l, (2 : ℝ) ^ f l) (t : ι) {η ω : ℝ}
+    (hη : 0 ≤ η)
+    (hosc : ∀ a b, η * (d b * (p b - (Pi.single t (1 : ℝ) : ι → ℝ) b) -
+      d a * (p a - (Pi.single t (1 : ℝ) : ι → ℝ) a)) ≤ ω)
+    (hstep : η * (Real.log 2 * (2 : ℝ) ^ ω *
+        faceVariance p (fun k => d k * (p k - (Pi.single t (1 : ℝ) : ι → ℝ) k))) ≤
+      ∑ k, d k * (p k - (Pi.single t (1 : ℝ) : ι → ℝ) k) ^ 2) :
+    Holonics.HNN.Ratio.codeLength
+        (fun k => f k - η * (d k * (p k - (Pi.single t (1 : ℝ) : ι → ℝ) k))) t ≤
+      Holonics.HNN.Ratio.codeLength f t -
+        η * (∑ k, d k * (p k - (Pi.single t (1 : ℝ) : ι → ℝ) k) ^ 2) / 2 := by
+  have hsum : ∑ k, (p k - (Pi.single t (1 : ℝ) : ι → ℝ) k) *
+      (d k * (p k - (Pi.single t (1 : ℝ) : ι → ℝ) k)) =
+      ∑ k, d k * (p k - (Pi.single t (1 : ℝ) : ι → ℝ) k) ^ 2 :=
+    Finset.sum_congr rfl fun k _ => by ring
+  have h := codeLength_step_descends f
+    (fun k => d k * (p k - (Pi.single t (1 : ℝ) : ι → ℝ) k)) p hp hη hosc t (by rw [hsum]; exact hstep)
+  rw [hsum] at h
+  exact h
+
+end ReadingScale
+
 section Audit
 
 #print axioms passage_coeff_zero
@@ -1150,6 +1400,20 @@ section Audit
 #print axioms vecMulVec_mulVec_eq
 #print axioms posDef_reach
 #print axioms native_step_horizontal
+#print axioms reads_liftMatrix
+#print axioms hidden_horizontal
+#print axioms hidden_eq_zero_iff
+#print axioms keeps_span_iff
+#print axioms readingMetric_mul_transpose
+#print axioms readingMetric_step
+#print axioms readingMetric_reads
+#print axioms readingMetric_posDef
+#print axioms readingStep_normal
+#print axioms readingStep_zero_iff
+#print axioms readingStep_slope
+#print axioms reading_diagonal_reach
+#print axioms reading_posDef_reach
+#print axioms reading_scale_descends
 
 end Audit
 
