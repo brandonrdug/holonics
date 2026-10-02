@@ -160,7 +160,7 @@ use crate::hnn::HnnError;
 use crate::hnn::chart::{ChartReading, ChartStart, Charts, Remainders};
 use crate::hnn::constitution::{
     CAMPAIGN_ONE_BUDGET, CarrierBits, Constitution, DepositReading, FactorGradient, FactorStep,
-    Family, LandmarkStep, LinearLocus, LinearStep, Locus, Reach, ReadStep, Sample,
+    Family, LandmarkStep, LinearLocus, LinearStep, Locus, Reach, Sample,
 };
 use crate::hnn::contact::{SiteReading, site_readings};
 use crate::hnn::field::{ConstitutionRead, Current, Field};
@@ -694,7 +694,6 @@ pub struct Reference {
     pending_capacity: usize,
     budget: u64,
     deadline: Option<u64>,
-    read_steps: bool,
 }
 
 impl Reference {
@@ -709,23 +708,6 @@ impl Reference {
             pending_capacity,
             budget,
             deadline: None,
-            read_steps: false,
-        }
-    }
-
-    /// [definition; agent-inferred, October 2; the
-    /// [contact loop record](../../../../research/records/2026-10-02_THE_CONTACT_LOOP_THE_RETURN_REACHES_EVERY_CONTACT_AND_ITS_CHANGE_IS_RELEASED_BEFORE_THE_LATER_CUT.md)
-    /// §5, Astra's third unit] **The read steps** after each deposit: every contact family the deposit
-    /// names as vanished ([`DepositReading::vanished`]) is tried at the least step `2^k ≤ 1` that moves
-    /// one of its lattice coordinates ([`Constitution::read_stepped`]), and its successor is
-    /// published, a commit of its own, only where the exact re-read of the window's code there is
-    /// strictly below the code at the certified successor
-    /// ([`crate::holon::deposition::strictly_better`]). Every try is named in
-    /// [`DepositReading::read_steps`].
-    pub fn with_read_steps(self) -> Self {
-        Self {
-            read_steps: true,
-            ..self
         }
     }
 
@@ -1346,71 +1328,9 @@ impl ExecutionPort for Reference {
         // chart). Keep its chart and tally writes private until the receipt and first-law ledger
         // also accept the same reread.
         let mut next_charts = resident.charts.clone();
-        let (mut reread, readings) = arrived.code_length(&field, &next, &mut next_charts)?;
+        let (reread, readings) = arrived.code_length(&field, &next, &mut next_charts)?;
         let mut next_tally = resident.tally.clone();
         next_tally.read(&readings);
-        let (mut next, mut reading) = (next, reading);
-        if self.read_steps {
-            let vanished: Vec<(Locus, Family)> = reading
-                .vanished
-                .iter()
-                .filter(|(locus, _)| matches!(locus, Locus::Channel(_)))
-                .copied()
-                .collect();
-            for (locus, family) in vanished {
-                let Some(step) = slot
-                    .deposit
-                    .factors()
-                    .iter()
-                    .find(|s| s.gradient.locus() == locus && s.gradient.family() == family)
-                else {
-                    continue;
-                };
-                let alone = Deposit::new(next.commit(), Vec::new(), vec![step.clone()], vec![locus]);
-                let alone = match slot.deposit.reach() {
-                    Some(reach) => alone.with_reach(reach.clone()),
-                    None => alone,
-                };
-                let certified = reading
-                    .steps
-                    .iter()
-                    .find(|(l, s)| *l == locus && s.family == family)
-                    .map_or_else(Rat::zero, |(_, s)| s.step.step.clone());
-                let mut tried = ReadStep {
-                    locus,
-                    family,
-                    step: None,
-                    held: reread.clone(),
-                    read: None,
-                    published: false,
-                };
-                let mut eta = certified * integer(2);
-                while eta.is_positive() && eta <= Rat::one() {
-                    match next.read_stepped(&alone, (locus, family), eta.clone()) {
-                        Ok((candidate, candidate_reading))
-                            if !candidate_reading.vanished.contains(&(locus, family)) =>
-                        {
-                            let mut charts = next_charts.clone();
-                            let (code, readings) =
-                                arrived.code_length(&field, &candidate, &mut charts)?;
-                            tried.step = Some(eta.clone());
-                            tried.read = Some(code.clone());
-                            if crate::holon::deposition::strictly_better(&reread, &code) {
-                                tried.published = true;
-                                next = candidate;
-                                next_charts = charts;
-                                next_tally.read(&readings);
-                                reread = code;
-                            }
-                            break;
-                        }
-                        Ok(_) => eta *= integer(2),
-                        Err(_) => break,
-                    }
-                }
-                reading.read_steps.push(tried);
-            }
-        }
         let reread_time = start.elapsed();
         let mut work = ExactWork::nothing();
         work.stepped();

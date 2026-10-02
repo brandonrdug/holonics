@@ -94,5 +94,22 @@ receiving ring's storage differ after four ticks. The consumer reads a contact c
 work accounted. What remains is that the deposit's own contact move reaches it. The reflected
 interior residual `r = z − Kx` is not yet a term of this word, and it is owed with step 3.
 
-**Step 3, next.** The contact-to-receiver certificate, tightened from the actual finite transit
-sensitivity plus its certified remainder. Its bounded cost and acceptance go to Astra before any run.
+**Step 3, measured: the step was never the limit.** I built a read-certified contact step,
+committed as a probe at [`f0bdc4a2`](https://github.com/brandonrdug/holonics/commit/f0bdc4a256c309c402076827728f52d504f8199c)
+and retired in this change ([receipt](2026-10-02_THE_CONTACT_LOOP_receipts/read_steps.txt)). After
+the certified deposit, each vanished contact family is tried at the least step `2^k ≤ 1` that moves
+a lattice coordinate, and the successor is published only where the window's exact re-read is
+strictly lower ([`strictly_better`]). On the chain:
+- **Contact 0**: none of its three families moves a coordinate even at the full unit step
+  `η = 1` (`D = G/h′` itself lies below the fine lattice).
+- **Contact 1**: storage and stiffness first move at `η = 1`, and the window's code is unchanged
+  there, with the same enclosure exactly (`[81718273742707340252184139321/2^95, …)` at both). Its
+  dissipation never moves.
+- Nothing is published, and the acceptance fails.
+
+[agent-inferred] On this fixture, the return that reaches the contacts is too weak to change the
+window's code at its grain, even at the unit step. A sharper certificate cannot move what the
+comparison itself does not see. The chain's contacts are effectively invisible to the receiver's
+comparison, and the contact loop needs a contact the comparison reads. I retired the read step
+because it has no consumer that gains from it. The rounding refusal (step 1) and the continued
+word's reading (step 2) remain.
