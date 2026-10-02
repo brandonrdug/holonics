@@ -19,7 +19,7 @@ mkdir -p "$out"
 bin=${CARGO_TARGET_DIR:-target}/release/examples/hnn_prediction
 { git rev-parse HEAD; sha256sum "$bin" | cut -d' ' -f1; echo "args $*"; } > "$out/identities.txt"
 start=$(date +%s%3N)
-RAYON_NUM_THREADS=19 setsid timeout "$deadline" "$bin" "$@" > "$out/listing.txt" 2> "$out/stderr.txt" &
+RAYON_NUM_THREADS=${RAYON_NUM_THREADS:-19} setsid timeout "$deadline" "$bin" "$@" > "$out/listing.txt" 2> "$out/stderr.txt" &
 pid=$!
 stopped=0
 # One line per constitution (`  <label>…; <ms> ms`). The run stops when the read in progress has

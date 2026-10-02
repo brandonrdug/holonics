@@ -1,0 +1,59 @@
+checkpoint at c0 (ρ 168127/262144), exact: 8759869545536614365110726249807/79228162514264337593543950336 547497029775566362653890602295/4951760157141521099596496896
+move 1: probe exit 0;   r1 kinetic: the incumbent: ρ 168127/262144; L ∈ [452874/4096, 452879/4096) nats, X ∈ [275062/4096, 275067/4096) nats; solved 10 of 64; whole 0 (released 8, stations right 14); 182374 ms
+      trials: η 1/64 ρ unmoved mask [429409/4096, 429414/4096) own [440023/4096, 440029/4096) adopted; γ_ρ [-140082/4096, -140081/4096)
+  window move 1: own   r1 kinetic: the adopted successor's own release: ρ 168127/262144; L ∈ [440023/4096, 440029/4096) nats, X ∈ [262906/4096, 262911/4096) nats; solved 11 of 64; whole 0 (released 8, stations right 13); ; closes
+  the window closes: checkpoint now 4255649814157420538630168081813/39614081257132168796771975168 8511380645119985777471415963719/79228162514264337593543950336
+move 2: probe exit 0;   r2 kinetic: the incumbent: ρ 168127/262144; L ∈ [440023/4096, 440029/4096) nats, X ∈ [262906/4096, 262911/4096) nats; solved 11 of 64; whole 0 (released 8, stations right 13); 213580 ms
+      trials: η 1/32 ρ unmoved mask [397107/4096, 397112/4096) own [390991/4096, 390997/4096) adopted; γ_ρ [-123260/4096, -123259/4096)
+  window move 1: own   r2 kinetic: the adopted successor's own release: ρ 168127/262144; L ∈ [390991/4096, 390997/4096) nats, X ∈ [213741/4096, 213746/4096) nats; solved 7 of 64; whole 0 (released 8, stations right 14); 2; closes
+  the window closes: checkpoint now 1890721071486905049496908891287/19807040628566084398385987584 7562962659423335849786389609425/79228162514264337593543950336
+move 3: probe exit 0;   r3 kinetic: the incumbent: ρ 168127/262144; L ∈ [390991/4096, 390997/4096) nats, X ∈ [213741/4096, 213746/4096) nats; solved 7 of 64; whole 0 (released 8, stations right 14); 205804 ms
+      trials: η 1/16 ρ unmoved mask [347597/4096, 347602/4096) own [362867/4096, 362872/4096) adopted; γ_ρ [-328180/4096, -328179/4096)
+  window move 1: own   r3 kinetic: the adopted successor's own release: ρ 168127/262144; L ∈ [362867/4096, 362872/4096) nats, X ∈ [188638/4096, 188643/4096) nats; solved 12 of 64; whole 0 (released 8, stations right 19); ; closes
+  the window closes: checkpoint now 7018877534263951753951186294877/79228162514264337593543950336 7018955302798429624774392927617/79228162514264337593543950336
+move 4: probe exit 0;   r4 kinetic: the incumbent: ρ 168127/262144; L ∈ [362867/4096, 362872/4096) nats, X ∈ [188638/4096, 188643/4096) nats; solved 12 of 64; whole 0 (released 8, stations right 19); 210270 ms
+      trials: η 1/16 ρ unmoved mask [311067/4096, 311072/4096) own [320631/4096, 320636/4096) adopted; γ_ρ [-361019/4096, -361018/4096)
+  window move 1: own   r4 kinetic: the adopted successor's own release: ρ 168127/262144; L ∈ [320631/4096, 320636/4096) nats, X ∈ [142606/4096, 142610/4096) nats; solved 10 of 64; whole 0 (released 8, stations right 17); ; closes
+  the window closes: checkpoint now 3100961221785303116927816755187/39614081257132168796771975168 3100999406136429585055914174147/39614081257132168796771975168
+move 5: probe exit 0;   r5 kinetic: the incumbent: ρ 168127/262144; L ∈ [320631/4096, 320636/4096) nats, X ∈ [142606/4096, 142610/4096) nats; solved 10 of 64; whole 0 (released 8, stations right 17); 247251 ms
+      trials: η 1/8 ρ unmoved mask [325144/4096, 325149/4096) own [338953/4096, 338957/4096) NotBelow; η 1/16 ρ unmoved mask [287155/4096, 287160/4096) own [323782/4096, 323787/4096) adopted; γ_ρ [-769752/4096, -769751/4096)
+  window move 1: own   r5 kinetic: the adopted successor's own release: ρ 168127/262144; L ∈ [323782/4096, 323787/4096) nats, X ∈ [145973/4096, 145978/4096) nats; solved 9 of 64; whole 0 (released 8, stations right 19); 2; open
+move 6: probe exit 0;   r6 kinetic: the incumbent: ρ 168127/262144; L ∈ [323782/4096, 323787/4096) nats, X ∈ [145973/4096, 145978/4096) nats; solved 9 of 64; whole 0 (released 8, stations right 19); 216442 ms
+      trials: η 1/16 ρ unmoved mask [301431/4096, 301435/4096) own [338585/4096, 338589/4096) adopted; γ_ρ [-461885/4096, -461884/4096)
+  window move 2: own   r6 kinetic: the adopted successor's own release: ρ 168127/262144; L ∈ [338585/4096, 338589/4096) nats, X ∈ [159878/4096, 159883/4096) nats; solved 8 of 64; whole 0 (released 8, stations right 22); 2; open
+move 7: probe exit 0;   r7 kinetic: the incumbent: ρ 168127/262144; L ∈ [338585/4096, 338589/4096) nats, X ∈ [159878/4096, 159883/4096) nats; solved 8 of 64; whole 0 (released 8, stations right 22); 218272 ms
+      trials: η 1/16 ρ unmoved mask [321871/4096, 321876/4096) own [381497/4096, 381502/4096) adopted; γ_ρ [2416/4096, 2417/4096)
+  window move 3: own   r7 kinetic: the adopted successor's own release: ρ 168127/262144; L ∈ [381497/4096, 381502/4096) nats, X ∈ [206744/4096, 206748/4096) nats; solved 6 of 64; whole 0 (released 8, stations right 17); 2; open
+move 8: probe exit 0;   r8 kinetic: the incumbent: ρ 168127/262144; L ∈ [381497/4096, 381502/4096) nats, X ∈ [206744/4096, 206748/4096) nats; solved 6 of 64; whole 0 (released 8, stations right 17); 215101 ms
+      trials: η 1/64 ρ unmoved mask [362547/4096, 362552/4096) own [362547/4096, 362552/4096) adopted; γ_ρ [-711751/4096, -711750/4096)
+  window move 4: own   r8 kinetic: the adopted successor's own release: ρ 168127/262144; L ∈ [362547/4096, 362552/4096) nats, X ∈ [189412/4096, 189417/4096) nats; solved 9 of 64; whole 0 (released 8, stations right 16); 2; open
+move 9: probe exit 0;   r9 kinetic: the incumbent: ρ 168127/262144; L ∈ [362547/4096, 362552/4096) nats, X ∈ [189412/4096, 189417/4096) nats; solved 9 of 64; whole 0 (released 8, stations right 16); 301941 ms
+      trials: η 1/32 ρ unmoved mask [338674/4096, 338678/4096) own [336230/4096, 336235/4096) adopted; γ_ρ [-619497/4096, -619496/4096)
+  window move 5: own   r9 kinetic: the adopted successor's own release: ρ 168127/262144; L ∈ [336230/4096, 336235/4096) nats, X ∈ [161839/4096, 161844/4096) nats; solved 7 of 64; whole 0 (released 8, stations right 18); 3; open
+move 10: probe exit 0;   r10 kinetic: the incumbent: ρ 168127/262144; L ∈ [336230/4096, 336235/4096) nats, X ∈ [161839/4096, 161844/4096) nats; solved 7 of 64; whole 0 (released 8, stations right 18); 235308 ms
+      trials: η 1/8 ρ unmoved mask [313503/4096, 313508/4096) own [339841/4096, 339846/4096) adopted; γ_ρ [-285699/4096, -285698/4096)
+  window move 6: own   r10 kinetic: the adopted successor's own release: ρ 168127/262144; L ∈ [339841/4096, 339846/4096) nats, X ∈ [162413/4096, 162418/4096) nats; solved 7 of 64; whole 0 (released 8, stations right 16); ; open
+move 11: probe exit 0;   r11 kinetic: the incumbent: ρ 168127/262144; L ∈ [339841/4096, 339846/4096) nats, X ∈ [162413/4096, 162418/4096) nats; solved 7 of 64; whole 0 (released 8, stations right 16); 267726 ms
+      trials: η 1/32 ρ unmoved mask [318739/4096, 318744/4096) own [318739/4096, 318744/4096) adopted; γ_ρ [-1098273/4096, -1098272/4096)
+  window move 7: own   r11 kinetic: the adopted successor's own release: ρ 168127/262144; L ∈ [318739/4096, 318744/4096) nats, X ∈ [142066/4096, 142071/4096) nats; solved 9 of 64; whole 0 (released 8, stations right 16); ; open
+move 12: probe exit 0;   r12 kinetic: the incumbent: ρ 168127/262144; L ∈ [318739/4096, 318744/4096) nats, X ∈ [142066/4096, 142071/4096) nats; solved 9 of 64; whole 0 (released 8, stations right 16); 325681 ms
+      trials: η 1/8 ρ unmoved mask [321364/4096, 321368/4096) own [326195/4096, 326200/4096) NotBelow; η 1/16 ρ unmoved mask [286736/4096, 286741/4096) own [293633/4096, 293638/4096) adopted; γ_ρ [-1098342/4096, -1098341/4096)
+  window move 8: own   r12 kinetic: the adopted successor's own release: ρ 168127/262144; L ∈ [293633/4096, 293638/4096) nats, X ∈ [119196/4096, 119200/4096) nats; solved 14 of 64; whole 0 (released 8, stations right 15);; closes
+  the window closes: checkpoint now 2839853698102123350301131776051/39614081257132168796771975168 5679778513676342254592937350843/79228162514264337593543950336
+move 13: probe exit 0;   r13 kinetic: the incumbent: ρ 168127/262144; L ∈ [293633/4096, 293638/4096) nats, X ∈ [119196/4096, 119200/4096) nats; solved 14 of 64; whole 0 (released 8, stations right 15); 273541 ms
+      trials: η 1/16 ρ unmoved mask [269593/4096, 269597/4096) own [269593/4096, 269597/4096) adopted; γ_ρ [-424670/4096, -424669/4096)
+  window move 1: own   r13 kinetic: the adopted successor's own release: ρ 168127/262144; L ∈ [269593/4096, 269597/4096) nats, X ∈ [94032/4096, 94036/4096) nats; solved 15 of 64; whole 0 (released 8, stations right 17); 2; closes
+  the window closes: checkpoint now 2607345183418188112246422225083/39614081257132168796771975168 2607379070998317852304138161201/39614081257132168796771975168
+move 14: probe exit 0;   r14 kinetic: the incumbent: ρ 168127/262144; L ∈ [269593/4096, 269597/4096) nats, X ∈ [94032/4096, 94036/4096) nats; solved 15 of 64; whole 0 (released 8, stations right 17); 253740 ms
+      trials: η 1/8 ρ unmoved mask [255170/4096, 255174/4096) own [295903/4096, 295908/4096) adopted; γ_ρ [-545954/4096, -545953/4096)
+  window move 1: own   r14 kinetic: the adopted successor's own release: ρ 168127/262144; L ∈ [295903/4096, 295908/4096) nats, X ∈ [123613/4096, 123617/4096) nats; solved 15 of 64; whole 0 (released 8, stations right 15);; open
+move 15: probe exit 0;   r15 kinetic: the incumbent: ρ 168127/262144; L ∈ [295903/4096, 295908/4096) nats, X ∈ [123613/4096, 123617/4096) nats; solved 15 of 64; whole 0 (released 8, stations right 15); 242964 ms
+      trials: η 1/8 ρ unmoved mask [266158/4096, 266162/4096) own [269925/4096, 269930/4096) adopted; γ_ρ [-856305/4096, -856304/4096)
+  window move 2: own   r15 kinetic: the adopted successor's own release: ρ 168127/262144; L ∈ [269925/4096, 269930/4096) nats, X ∈ [101026/4096, 101030/4096) nats; solved 20 of 64; whole 0 (released 8, stations right 15);; open
+move 16: probe exit 0;   r16 kinetic: the incumbent: ρ 168127/262144; L ∈ [269925/4096, 269930/4096) nats, X ∈ [101026/4096, 101030/4096) nats; solved 20 of 64; whole 0 (released 8, stations right 15); 224862 ms
+      trials: η 1/4 ρ unmoved mask [248525/4096, 248529/4096) own [259601/4096, 259605/4096) adopted; γ_ρ [-952575/4096, -952574/4096)
+  window move 3: own   r16 kinetic: the adopted successor's own release: ρ 168127/262144; L ∈ [259601/4096, 259605/4096) nats, X ∈ [100103/4096, 100106/4096) nats; solved 29 of 64; whole 0 (released 8, stations right 23);; open
+final state .local/wk3/r16/r16-kinetic.state
+run done
+Terminated                 RAYON_NUM_THREADS=19 timeout 1200 $B executed evaluate order2 2026093012 128 .local/ev/end3 end3=$state > .local/ev/end3.txt 2> .local/ev/end3.err
+held-out done

@@ -287,6 +287,13 @@ pub(super) fn remounted(opening: &Constitution, path: &str) -> Constitution {
     opening.clone().continued(&state).expect("the checkpoint continues the declared opening")
 }
 
+/// Whether a file holds a complete continuing state (else a written port).
+fn is_continuing(path: &str) -> bool {
+    #[allow(clippy::disallowed_methods)]
+    let text = std::fs::read_to_string(path).expect("read the checkpoint");
+    ContinuingState::from_text(&text).is_ok()
+}
+
 /// The transport modulus line `rho <ρ>` of a written port, if any.
 fn read_modulus(path: &str) -> Option<Rat> {
     #[allow(clippy::disallowed_methods)]
@@ -638,6 +645,8 @@ pub(super) fn evaluate(terrain: &str, seed: u64, count: usize, out: &str, arms: 
         let theta = match (label, path.is_empty()) {
             ("lossless", true) => engine.theta.clone(),
             (_, true) => founded_opening(&engine),
+            // A complete continuing state remounts whole; a written port, E and ρ alone.
+            (_, false) if is_continuing(path) => remounted(&engine.theta, path),
             (_, false) => trained(&engine.theta, ring, path),
         };
         // The constitution's own clock: its requests' generation (run in parallel on the host's
@@ -1405,8 +1414,19 @@ pub(super) fn direction(
 /// and the adopted successor's own release (its trial's reading), written to
 /// `<out>/<label>-<metric>.state`.
 pub(super) fn move_once(terrain: &str, seed: u64, count: usize, out: &str, source: &str, arm: &str, metrics: &[String]) {
-    use holonics::hnn::executed::{MoveMetric, executed_move_in};
+    use holonics::hnn::executed::{MoveMetric, ReleaseExcursion, executed_move_guarded};
     let clock = Instant::now();
+    // The release guard: a window from a held checkpoint (`EXCURSION_CHECKPOINT="<lower> <upper>"`,
+    // its own comparison's exact enclosure as the chain driver holds it), else the monotone guard.
+    let excursion = match std::env::var("EXCURSION_CHECKPOINT") {
+        Ok(text) => {
+            let ends: Vec<Rat> = text.split_whitespace().map(|x| x.parse::<Rat>().expect("a rational end")).collect();
+            assert_eq!(ends.len(), 2, "the checkpoint's lower and upper ends");
+            ReleaseExcursion::from_checkpoint(ExactInterval { lower: ends[0].clone(), upper: ends[1].clone() })
+        }
+        Err(_) => ReleaseExcursion::monotone(),
+    };
+    println!("  the release guard: {excursion:?}");
     let declared = order_declared();
     let engine = Engine::new(declared);
     let bank = bank_of(declared.period, &bank_strength());
@@ -1441,7 +1461,7 @@ pub(super) fn move_once(terrain: &str, seed: u64, count: usize, out: &str, sourc
             other => panic!("a metric, coordinate, witness, kinetic or kinetic-modulus: {other}"),
         };
         let started = Instant::now();
-        let moved = executed_move_in(
+        let moved = executed_move_guarded(
             &engine.field,
             &theta,
             &requests,
@@ -1450,8 +1470,10 @@ pub(super) fn move_once(terrain: &str, seed: u64, count: usize, out: &str, sourc
             BANK_GRAIN,
             comparison,
             metric,
+            &excursion,
         )
         .expect("the move");
+        println!("    the incumbent's own comparison, exact: {} {}", moved.before.value.lower, moved.before.value.upper);
         report(
             &format!("{label} {name}: the incumbent"),
             &moved.before,
@@ -1498,6 +1520,24 @@ pub(super) fn move_once(terrain: &str, seed: u64, count: usize, out: &str, sourc
                 );
             }
         }
+        let modulus_line = |what: &str, k: &holonics::hnn::executed::KineticSolve| {
+            if let (Some(step), Some((own, supplied))) = (&k.modulus, &k.modulus_drive) {
+                let schur = if step.is_zero() { None } else { Some((own - supplied) / step) };
+                println!(
+                    "    {what}: Δρ per unit step {} (24 bits); drive own {}, supplied {}; s {:?} (24 bits)",
+                    at_bits(step),
+                    at_bits(own),
+                    at_bits(supplied),
+                    schur.as_ref().map(at_bits)
+                );
+            }
+        };
+        if let Some(k) = &moved.kinetic {
+            modulus_line("the joined modulus", k);
+        }
+        if let Some(k) = &moved.modulus_held {
+            modulus_line("the modulus held at its bound (the joined solve)", k);
+        }
         println!(
             "    γ_ρ {:?}, Δρ per unit of E's step {:?} (24 bits)",
             moved.modulus_slope.as_ref().map(at_bits),
@@ -1518,6 +1558,7 @@ pub(super) fn move_once(terrain: &str, seed: u64, count: usize, out: &str, sourc
                     started.elapsed().as_millis(),
                 );
                 print_orders("the successor", own);
+                println!("    the successor's own comparison, exact: {} {}", own.value.lower, own.value.upper);
                 #[allow(clippy::disallowed_methods)]
                 std::fs::write(format!("{out}/{label}-{name}.state"), write_state(successor, ring))
                     .expect("write the successor's state");
@@ -1534,15 +1575,396 @@ pub(super) fn move_once(terrain: &str, seed: u64, count: usize, out: &str, sourc
     println!("executed move-once: {} ms; resident {}", clock.elapsed().as_millis(), resident());
 }
 
-/// [measured-diagnostic; agent-inferred, October 1; the
-/// [margins record](../../records/2026-10-01_THE_DECISION_MARGINS_THROUGH_THE_ACCEPTED_MOVE.md)]
-/// **An accepted move read decision by decision** (`executed margins <terrain> <seed> <count>
-/// <before state> <after state>`, complete continuing states restored with no fallback):
-/// `hnn::executed::move_margins` on the candidate arm. Per incumbent decision term: its site, target,
-/// and at `before` and at `after` on the same fixed section, the lock face `ℓ`, its solved predicate,
-/// the top class, the target's and the leading rival's growth enclosures (the ordering margin) and
-/// the first-order bound on the exact storage move; then each request's released section before and
-/// after against its targets. Every term is printed, none selected after the outcome.
+/// [measured-diagnostic; October 2] **A batch's requests and targets, printed** (`executed pairs
+/// <terrain> <seed> <count>`): one line a pair, `<request cells> ; <target cells>`, so an exterior
+/// float fit trains on the very requests the native chain reads.
+pub(super) fn print_pairs(terrain: &str, seed: u64, count: usize) {
+    let declared = order_declared();
+    for (request, target) in terrain_pairs(terrain, &declared, seed, count) {
+        let cells = |v: &[usize]| v.iter().map(ToString::to_string).collect::<Vec<_>>().join(" ");
+        println!("{} ; {}", cells(&request), cells(&target));
+    }
+}
+
+/// [measured-diagnostic; October 2] **One step along a move's direction, written**
+/// (`executed step-state <terrain> <seed> <count> <out> <label=state> <arm> <metric> <η>`): the
+/// move's proposal read at the one step `η` (`executed_move_scheduled`), passed by no guard; prints
+/// the held-sheet and released comparisons and writes the successor to `<out>/<label>-<η's
+/// denominator>.state`, so its release can be read (`executed locks`).
+#[allow(clippy::too_many_arguments)]
+pub(super) fn step_state(terrain: &str, seed: u64, count: usize, out: &str, source: &str, arm: &str, metric: &str, step: &str) {
+    use holonics::hnn::executed::{MoveMetric, ReleaseExcursion, Trial, executed_move_scheduled};
+    let clock = Instant::now();
+    let declared = order_declared();
+    let engine = Engine::new(declared);
+    let bank = bank_of(declared.period, &bank_strength());
+    let ring = engine.refinement.ring();
+    let pairs = terrain_pairs(terrain, &declared, seed, count);
+    let requests = open_requests(&engine, &pairs);
+    let (comparison, _) = arm_comparison(arm);
+    let (label, spec) = source.split_once('=').expect("<label>=<source>");
+    let theta = remounted(&engine.theta, spec);
+    let metric = match metric {
+        "coordinate" => MoveMetric::Coordinate,
+        "witness" => MoveMetric::Witness,
+        "kinetic" => MoveMetric::Kinetic,
+        "kinetic-modulus" => MoveMetric::KineticModulus,
+        other => panic!("a metric, coordinate, witness or kinetic: {other}"),
+    };
+    let eta: Rat = step.parse().expect("a rational step");
+    let choose = |trials: &[Trial]| -> Option<Rat> { trials.is_empty().then(|| eta.clone()) };
+    let moved = executed_move_scheduled(
+        &engine.field,
+        &theta,
+        &requests,
+        &engine.refinement,
+        &bank,
+        BANK_GRAIN,
+        comparison,
+        metric,
+        &ReleaseExcursion::monotone(),
+        Some(&choose),
+    )
+    .expect("the step");
+    let trial = moved.trials.last().expect("the step's trial");
+    println!(
+        "executed step-state from {label} at η {eta}: incumbent L ∈ {}; held-sheet {}, released {}; {} ms",
+        cell(&moved.before.value, 1 << 12),
+        trial.value.as_ref().map_or_else(|| "not read".to_string(), |v| cell(v, 1 << 12)),
+        trial.after.as_ref().map_or_else(|| "not read".to_string(), |a| cell(&a.value, 1 << 12)),
+        clock.elapsed().as_millis()
+    );
+    let (successor, _) = moved.adopted.as_ref().expect("the step's successor");
+    let path = format!("{out}/{label}-{}.state", eta.denom());
+    #[allow(clippy::disallowed_methods)]
+    std::fs::write(&path, write_state(successor, ring)).expect("write the successor");
+    println!("  written {path}");
+}
+
+/// [measured-diagnostic; October 2] **The release's lock order read at its resolution**
+/// (`executed locks <terrain> <seed> <count> <label=source> <arm> [request]`, sources as
+/// [`segment_source`]): the batch's released
+/// comparison, then every request's release refinement by refinement through the release's own lock
+/// iteration (`hnn::prediction::bank_release`, each candidate read by its joint growth). In each
+/// refinement each eligible station has a certain gap (its top's lower end less the strongest rival's
+/// upper end) and a reach (its top's upper end less the strongest rival's lower end). A station the
+/// readings do not rank below the largest certain gap is one whose reach meets it; counted are the
+/// refinements where such a station did not lock with the largest (an order the cells do not
+/// certify), and the stations involved. With `request`, that request's every refinement is printed:
+/// each eligible station's top, certain gap and reach (`/2^24`, lower ends floored) and whether it
+/// locked.
+pub(super) fn locks(terrain: &str, seed: u64, count: usize, source: &str, arm: &str, detail: Option<usize>) {
+    use holonics::hnn::executed::compare;
+    use holonics::hnn::prediction::{BankPlacement, JointGrowth, bank_release};
+    let clock = Instant::now();
+    let declared = order_declared();
+    let engine = Engine::new(declared);
+    let bank = bank_of(declared.period, &bank_strength());
+    let pairs = terrain_pairs(terrain, &declared, seed, count);
+    let requests = open_requests(&engine, &pairs);
+    let (comparison, _) = arm_comparison(arm);
+    let (label, spec) = source.split_once('=').expect("<label>=<source>");
+    let theta = segment_source(&engine, engine.refinement.ring(), spec);
+    let batch = compare(&engine.field, &theta, &requests, &engine.refinement, &bank, BANK_GRAIN, comparison)
+        .expect("the batch's comparison");
+    let (solved, all) = solved_terms(&batch);
+    let targets: Vec<Vec<usize>> = pairs.iter().map(|(_, t)| t.clone()).collect();
+    let (whole, right, released) = batch.sections(&targets);
+    println!(
+        "executed locks: {count} {terrain} requests at seed {seed}, from {label} (ρ {}); L ∈ {} nats, X ∈ {} nats; solved {solved} of {all}; whole {whole} (released {released}, stations right {right})",
+        theta.transport(engine.refinement.ring()),
+        cell(&batch.value, 1 << 12),
+        cell(&batch.excess, 1 << 12)
+    );
+    let alphabet = engine.field.alphabet();
+    let at = |x: &Rat| (x * Rat::from_integer(BigInt::from(1u64 << 24))).floor();
+    let (mut refinements, mut uncertified, mut stations) = (0usize, 0usize, 0usize);
+    // Every refinement's margins: the largest certain gap less each other eligible station's reach.
+    let mut margins: Vec<(Rat, usize, usize, usize)> = Vec::new();
+    for (index, request) in requests.iter().enumerate() {
+        let placement = BankPlacement::of(&engine.field, &theta, &request.current, &request.moment, &engine.refinement)
+            .expect("the request's placement");
+        let (generation, kept) = bank_release(
+            &placement,
+            &engine.refinement,
+            alphabet,
+            &bank,
+            BANK_GRAIN,
+            |amplitudes| bank.read_turn(amplitudes, BANK_GRAIN),
+            true,
+        )
+        .expect("the release");
+        if detail == Some(index) {
+            println!("  request {index}: locks {:?}, released {:?}", generation.locks, generation.release.emitted);
+        }
+        for (step, refinement) in kept.iter().enumerate() {
+            refinements += 1;
+            let reach = |station: usize, top: usize| -> Rat {
+                let first = refinement.open.iter().position(|&(s, _)| s == station).expect("an open station");
+                let chunk = &refinement.read[first..first + alphabet];
+                let floor = (0..alphabet)
+                    .filter(|&class| class != top)
+                    .map(|class| chunk[class].joint().lower.clone())
+                    .max()
+                    .unwrap_or_else(Rat::zero);
+                &chunk[top].joint().upper - &floor
+            };
+            let largest = refinement.eligible.iter().map(|(_, _, gap)| gap.clone()).max();
+            if let Some(largest) = &largest {
+                for (station, top, _) in &refinement.eligible {
+                    if !refinement.locked.contains(station) {
+                        margins.push((largest - reach(*station, *top), index, step, *station));
+                    }
+                }
+            }
+            let mut unranked = Vec::new();
+            for (station, top, gap) in &refinement.eligible {
+                let r = reach(*station, *top);
+                let locked = refinement.locked.contains(station);
+                if let Some(largest) = &largest
+                    && !locked
+                    && &r >= largest
+                {
+                    unranked.push(*station);
+                }
+                if detail == Some(index) && std::env::var("LOCK_READINGS").is_ok() {
+                    let first = refinement.open.iter().position(|&(s, _)| s == *station).expect("an open station");
+                    let joints: Vec<String> = (0..alphabet)
+                        .map(|class| {
+                            let joint = refinement.read[first + class].joint();
+                            format!("{class}: [{}, {}]", joint.lower, joint.upper)
+                        })
+                        .collect();
+                    println!("    refinement {step}: station {station} readings {}", joints.join("; "));
+                }
+                if detail == Some(index) {
+                    println!(
+                        "    refinement {step}: station {station}, top {top}, certain gap {}, reach {}{}",
+                        at(gap),
+                        at(&r),
+                        if locked { ", locked" } else { "" }
+                    );
+                }
+            }
+            if !unranked.is_empty() {
+                uncertified += 1;
+                stations += unranked.len();
+                println!(
+                    "  request {index}, refinement {step}: locked {:?}, not ranked below it {:?}",
+                    refinement.locked, unranked
+                );
+            }
+        }
+    }
+    margins.sort_by(|a, b| a.0.cmp(&b.0));
+    println!("  the smallest margins (largest certain gap less another station's reach, /2^24, lower ends):");
+    for (m, r, step, station) in margins.iter().take(12) {
+        println!("    {}: request {r}, refinement {step}, station {station}", at(m));
+    }
+    // The margins by octave, in units of 2^-24: (0], (0, 2^10], (2^10, 2^11], ...
+    let mut octaves: std::collections::BTreeMap<i64, usize> = std::collections::BTreeMap::new();
+    for (m, ..) in &margins {
+        let v = at(m);
+        let v = v.to_integer();
+        let key = if v <= BigInt::zero() { -1 } else { (v.bits() as i64 - 1).max(9) };
+        *octaves.entry(key).or_insert(0) += 1;
+    }
+    println!(
+        "  margins by octave (-1: not positive; 9: below 2^10; b: in [2^b, 2^(b+1)) of 2^-24): {:?}; {} margins",
+        octaves,
+        margins.len()
+    );
+    println!(
+        "  {label}: {refinements} refinements; {uncertified} with a station not ranked below the largest that did not lock with it ({stations} stations); {} ms",
+        clock.elapsed().as_millis()
+    );
+}
+
+/// [measured-diagnostic; October 2; the
+/// [cut record](../../records/2026-10-02_THE_STEPS_CANDIDATE_STATES_ARE_THE_CUTS_OF_THE_CARRIED_PATH_AND_THEIR_COUNT_IS_A_WEYL_LAW.md)
+/// §7] **Where along one move's direction the release's decisions change, by cut index**
+/// (`executed spectrum <terrain> <seed> <count> <label=state> <arm> <metric> <lo> <hi> <grid>
+/// <budget>`): the move's proposal from the restored state read at `grid` evenly spaced step sizes in
+/// `[lo, hi]`, then halving every interval whose two ends release different decisions until its two
+/// carried states are adjacent (their cut indices differ by one), at most `budget` reads. A carried
+/// state's cut index is `Σ_i |q_i|`, the lattice coordinates its entries moved (`‖ΔE‖₁/u`), so
+/// adjacent indices are two consecutive candidate states and nothing lies between them. A request's
+/// decisions are its locks in their freezing order and its released classes. Each read prints its
+/// step, cut index, the held-sheet and released comparisons; each located wall prints its two cut
+/// indices and steps, the jump `J = (own − held)_hi − (own − held)_lo` in the released comparison
+/// beyond the held sheet's change, and what changed per request. A wall that reverts inside one
+/// interval of the first grid is not seen.
+#[allow(clippy::too_many_arguments)]
+pub(super) fn spectrum(
+    terrain: &str,
+    seed: u64,
+    count: usize,
+    source: &str,
+    arm: &str,
+    metric: &str,
+    lo: &str,
+    hi: &str,
+    grid: usize,
+    budget: usize,
+) {
+    use holonics::hnn::constitution::Locus;
+    use holonics::hnn::executed::{MoveMetric, ReleaseExcursion, Trial, executed_move_scheduled};
+    let clock = Instant::now();
+    let declared = order_declared();
+    let engine = Engine::new(declared);
+    let bank = bank_of(declared.period, &bank_strength());
+    let ring = engine.refinement.ring();
+    let pairs = terrain_pairs(terrain, &declared, seed, count);
+    let requests = open_requests(&engine, &pairs);
+    let (comparison, partition) = arm_comparison(arm);
+    assert!(!partition, "one move reads the open section");
+    let (label, spec) = source.split_once('=').expect("<label>=<source>");
+    let theta = remounted(&engine.theta, spec);
+    let metric = match metric {
+        "coordinate" => MoveMetric::Coordinate,
+        "witness" => MoveMetric::Witness,
+        "kinetic" => MoveMetric::Kinetic,
+        "kinetic-modulus" => MoveMetric::KineticModulus,
+        other => panic!("a metric, coordinate, witness, kinetic or kinetic-modulus: {other}"),
+    };
+    let unit = theta.lattice(Locus::SourcePort(ring)).expect("the source port's lattice").unit();
+    let (lo, hi): (Rat, Rat) = (lo.parse().expect("a rational lo"), hi.parse().expect("a rational hi"));
+    let grid: Vec<Rat> = (0..=grid)
+        .map(|j| &lo + (&hi - &lo) * Rat::new(BigInt::from(j), BigInt::from(grid)))
+        .filter(|eta| eta.is_positive())
+        .collect();
+    type Decisions = Vec<(Vec<Vec<usize>>, String)>;
+    let decisions = |trial: &Trial| -> Option<Decisions> {
+        trial.after.as_ref().map(|after| {
+            after
+                .requests
+                .iter()
+                .map(|r| match &r.generation {
+                    Some(g) => (g.locks.clone(), format!("{:?}", g.release.emitted)),
+                    None => (Vec::new(), "none".to_string()),
+                })
+                .collect()
+        })
+    };
+    let index = |trial: &Trial| -> Option<BigInt> {
+        trial.carried.as_ref().map(|m| {
+            let sum = m.entries().iter().fold(Rat::zero(), |acc, x| acc + x.abs());
+            (sum / &unit).to_integer()
+        })
+    };
+    let started = Instant::now();
+    let last = std::sync::Mutex::new(Instant::now());
+    let choose = |trials: &[Trial]| -> Option<Rat> {
+        if let Some(t) = trials.last() {
+            let mut last = last.lock().expect("the clock");
+            println!(
+                "  read η {}: cut index {:?}, ρ {:?}, held-sheet {}, released {}; {} ms",
+                t.step,
+                index(t),
+                t.modulus,
+                t.value.as_ref().map_or_else(|| "not read".to_string(), |v| cell(v, 1 << 12)),
+                t.after.as_ref().map_or_else(|| "not read".to_string(), |a| cell(&a.value, 1 << 12)),
+                last.elapsed().as_millis()
+            );
+            *last = Instant::now();
+        }
+        if trials.len() >= budget {
+            return None;
+        }
+        if let Some(step) = grid.iter().find(|g| !trials.iter().any(|t| &t.step == *g)) {
+            return Some(step.clone());
+        }
+        let mut read: Vec<&Trial> = trials.iter().collect();
+        read.sort_by(|a, b| a.step.cmp(&b.step));
+        read.windows(2)
+            .find(|w| {
+                let apart = match (index(w[0]), index(w[1])) {
+                    (Some(a), Some(b)) => (b - a).abs() > BigInt::one(),
+                    _ => false,
+                };
+                decisions(w[0]) != decisions(w[1]) && apart
+            })
+            .map(|w| (&w[0].step + &w[1].step) / Rat::from_integer(BigInt::from(2)))
+    };
+    println!(
+        "executed spectrum: {count} {terrain} requests at seed {seed}, from {label}; steps [{lo}, {hi}], the lattice unit {unit}, at most {budget} reads"
+    );
+    let moved = executed_move_scheduled(
+        &engine.field,
+        &theta,
+        &requests,
+        &engine.refinement,
+        &bank,
+        BANK_GRAIN,
+        comparison,
+        metric,
+        &ReleaseExcursion::monotone(),
+        Some(&choose),
+    )
+    .expect("the scheduled reads");
+    println!(
+        "  {label}: the incumbent: L ∈ {} nats; {} reads; {} ms",
+        cell(&moved.before.value, 1 << 12),
+        moved.trials.len(),
+        started.elapsed().as_millis()
+    );
+    let entries = moved.trials.first().and_then(|t| t.carried.as_ref()).map(|m| m.entries().len());
+    if let Some(t) = moved.trials.iter().max_by(|a, b| a.step.cmp(&b.step)) {
+        println!("  entries n = {entries:?}; at η {} the cut index is {:?}", t.step, index(t));
+    }
+    let mut read: Vec<&Trial> = moved.trials.iter().collect();
+    read.sort_by(|a, b| a.step.cmp(&b.step));
+    let describe = |a: &Decisions, b: &Decisions| -> Vec<String> {
+        a.iter()
+            .zip(b)
+            .enumerate()
+            .filter(|(_, (x, y))| x != y)
+            .map(|(r, (x, y))| {
+                let frozen = |locks: &Vec<Vec<usize>>| locks.iter().map(Vec::len).sum::<usize>();
+                let mut what = Vec::new();
+                if frozen(&x.0) != frozen(&y.0) {
+                    what.push(format!("frozen {} -> {}", frozen(&x.0), frozen(&y.0)));
+                }
+                if x.0 != y.0 {
+                    what.push(format!("order {:?} -> {:?}", x.0, y.0));
+                }
+                if x.1 != y.1 {
+                    what.push(format!("classes {} -> {}", x.1, y.1));
+                }
+                format!("request {r}: {}", what.join("; "))
+            })
+            .collect()
+    };
+    let beyond = |t: &Trial| -> Option<Rat> {
+        match (&t.after, &t.value) {
+            (Some(a), Some(v)) => Some(&a.value.lower - &v.lower),
+            _ => None,
+        }
+    };
+    println!("  the walls, smallest step first (J in /4096 nats, lower ends):");
+    for w in read.windows(2) {
+        if let (Some(a), Some(b)) = (decisions(w[0]), decisions(w[1]))
+            && a != b
+        {
+            let jump = match (beyond(w[0]), beyond(w[1])) {
+                (Some(x), Some(y)) => format!("{}", ((y - x) * Rat::from_integer(BigInt::from(4096))).floor()),
+                _ => "not read".to_string(),
+            };
+            println!(
+                "    cut {:?} -> {:?} (η {} -> {}): J {jump}",
+                index(w[0]),
+                index(w[1]),
+                w[0].step,
+                w[1].step
+            );
+            for line in describe(&a, &b) {
+                println!("      {line}");
+            }
+        }
+    }
+    println!("executed spectrum: {} ms; resident {}", clock.elapsed().as_millis(), resident());
+}
+
 /// [measured-diagnostic; October 2] **The own release decision by decision, the incumbent against
 /// the smallest trial** (`DECISION_DIFF`): per request and per decision term, the section the term is
 /// read at, the top class and the lock face `ℓ` (lower ends, `/4096` nats), and whether the term's
@@ -1588,6 +2010,15 @@ fn decision_diff(before: &BatchComparison, after: Option<&BatchComparison>) {
     }
 }
 
+/// [measured-diagnostic; agent-inferred, October 1; the
+/// [margins record](../../records/2026-10-01_THE_DECISION_MARGINS_THROUGH_THE_ACCEPTED_MOVE.md)]
+/// **An accepted move read decision by decision** (`executed margins <terrain> <seed> <count>
+/// <before state> <after state>`, complete continuing states restored with no fallback):
+/// `hnn::executed::move_margins` on the candidate arm. Per incumbent decision term: its site, target,
+/// and at `before` and at `after` on the same fixed section, the lock face `ℓ`, its solved predicate,
+/// the top class, the target's and the leading rival's growth enclosures (the ordering margin) and
+/// the first-order bound on the exact storage move; then each request's released section before and
+/// after against its targets. Every term is printed, none selected after the outcome.
 pub(super) fn margins(terrain: &str, seed: u64, count: usize, before: &str, after: &str) {
     use holonics::hnn::executed::move_margins;
     let clock = Instant::now();

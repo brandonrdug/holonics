@@ -11,13 +11,13 @@ held-out requests) shows a representation exists
 ([the station-framed placement](2026-09-30_THE_STATION_FRAMED_PLACEMENT_MEASURED_THE_REFIT_READS_BOTH_CHAINS_AND_THE_CERTIFIED_MOVE_KEEPS_THE_MODULUS_AT_ONE.md) §2;
 [the representation](2026-10-02_THE_REPRESENTATION_THE_REFITS_E_MAKES_RHO_A_MONOTONE_PATH_TO_THE_DECISIONS.md)).
 The refit (`eO_fit.py`, retired with the notebook's probe at `e214ccc8`) differs from the native
-move in its optimizer: float Adam on `E` with a cosine schedule (momentum `0.9` and a per-coordinate
-second moment `0.999`), 400 steps of 16 requests re-read on the release's own trajectory, and `ρ` by
+move in its optimizer: float Adam on `E` with a cosine schedule (momentum `9/10` and a per-coordinate
+second moment `999/1000`), 400 steps of 16 requests re-read on the release's own trajectory, and `ρ` by
 Adam on a central difference. The native moves are guarded certified steps in the port's or the
 receiver's metric, a few at a time.
 
 The claim this loop can make is narrow: which ingredient of the exterior optimizer carries it to the
-representation. Four arms, every other setting the refit's (`order2 400 256 101 0.03 0.05 1 16`):
+representation. Four arms, every other setting the refit's (`order2 400 256 101 0.03 0.05 1 16`, learning rates `3/100` and `1/20`):
 - `adam`, the refit (the reproduction: 96 whole expected);
 - `rms`, the per-coordinate second moment without momentum;
 - `momentum`, momentum without the per-coordinate scaling;
@@ -72,12 +72,12 @@ itself: whether the plain-gradient arm's own comparison rises along its way to t
 The `sgd` arm re-run on seeds 202 and 303 with its comparison read every 10 steps on a fixed set of 32
 training requests, each re-read on its own trajectory ([receipts](2026-10-02_THE_REFITS_INGREDIENTS_receipts/),
 `path_sgd_*.txt`; both again end at 57 whole sections).
-- **It climbs above where it started.** Seed 202's opening comparison `1.612090` is exceeded at step 30
-  (by `0.001471`); seed 303's `1.608452` at step 60 (by `0.131100`).
+- **It climbs above where it started.** Seed 202's opening comparison `[6603/4096, 6604/4096)` is exceeded at step 30
+  (by `[6/4096, 7/4096)`); seed 303's `[6588/4096, 6589/4096)` at step 60 (by `[536/4096, 537/4096)`).
 - **Its excursions above the running minimum** (the step a rise begins, the step the minimum is
-  undercut again, the peak rise): seed 202, ten excursions of 20 to 50 steps, peaks `0.002` to
-  `0.116`; seed 303, eight of 20 to 60 steps, peaks `0.005` to `0.481` (steps 50 to 100, the largest,
-  then `0.303` over steps 170 to 200). Each later excursion ends below the earlier minimum.
+  undercut again, the peak rise): seed 202, ten excursions of 20 to 50 steps, peaks `[8/4096, 9/4096)` to
+  `[475/4096, 476/4096)`; seed 303, eight of 20 to 60 steps, peaks `[20/4096, 21/4096)` to `[1970/4096, 1971/4096)` (steps 50 to 100, the largest,
+  then `[1241/4096, 1242/4096)` over steps 170 to 200). Each later excursion ends below the earlier minimum.
 
 [agent-inferred] The path that reaches the sections is not monotone in its own comparison at any
 window, and on one seed it rises well above the opening. A guard that admits a rise only below the
@@ -85,23 +85,51 @@ running maximum of a window of adopted comparisons cannot follow it; it needs an
 checkpoint, bounded in height and length, with the certified decrease owed over the excursion as a
 whole. The numbers above are the measurement such a law's window and schedule read.
 
-## 4. The native own release's jump, per decision, beside the float path's flips
+## 4. The released comparison's jump at m7, decision by decision, beside the float path's
 
-The Lean thread's revision of #202 splits a move's change of the own release into the fixed mask's
-change (continuous) and the flip. Both paths were read under that split
+**The two parts of a move's change.** The released comparison `ℓ` is the cross-entropy between the
+release and its targets: the surprise crossing the receiver's section, summed over 8 requests × 8
+stations. A move deposits into `E`. Each lock in the release is a parametron settled on one half-turn
+sheet.
+- With every lock held on its sheet, `ℓ` is a smooth function of `E`: the **held-sheet comparison**
+  (the code's "fixed mask"). Each accepted move must lower it, certified at first order: a descent
+  of the comparison within one lock configuration.
+- Relocking after the move can settle the release into another lock configuration. The released `ℓ`
+  then differs from the held-sheet `ℓ` by the difference of the comparison's code length between
+  the two configurations at the same `E`: the **relocking jump** (the code's "flip"). It is a
+  difference of code length, in nats. No map from this comparison to the Holons' stored energy and
+  work is derived here, so it is not called an energy (Astra's review, October 2).
+
+The Lean thread proved this split for #202. Both paths were read under it
 ([receipts](2026-10-02_THE_REFITS_INGREDIENTS_receipts/): `m7_decision_diff.txt`,
 `kinetic_chain_m0_m7.txt`, `split_sgd_303.txt`, `flips_sgd_303.txt`). Native values are lower ends in
 units of `1/4096` nat, each within `6/4096`.
 
-- **m7's flip is one request's lock order.** At `η = 1/2048`, request 3 goes from `43957` to `77944`
-  (`+33987`). The other seven requests each fall, by `306` in total. Request 3's released section is
-  the same before and after (all eight stations at 3, right at two). Six of its stations are read at
-  different partial sections, and three term tops flip (stations 3, 6, 7). Per station: 1 `+2742`, 2
-  `−105`, 3 `+6100`, 4 `+11986`, 6 `+9452`, 7 `+3815`, 0 `−4`, 5 `−2`. The lock-gap ranking swaps
-  which near-tied station locks first in a degenerate release.
-- **Per rung** (realized fixed-mask decrease `d`, flip `own − mask`):
+- **m7's jump is one request's freezing order.** At `η = 1/2048`, request 3 goes from `43957` to
+  `77944` (`+33987`). The other seven requests each fall, by `306` in total. Request 3's released
+  section is the same before and after: all eight stations at 3, right at two. What changed is the
+  order in which its locks froze. Six of its stations are read in different contexts, and three of
+  their leading classes change (stations 3, 6, 7). Per station: 1 `+2742`, 2 `−105`, 3 `+6100`,
+  4 `+11986`, 6 `+9452`, 7 `+3815`, 0 `−4`, 5 `−2`.
+  - The release locks first the station with the largest certain gap: its leading reading's lower
+    end less the strongest rival's upper end. Its reach is the leading reading's upper end less the
+    strongest rival's lower end.
+  - The swap is at request 3's second freeze, between stations 2 and 5 (units `1/2^24`). At m7,
+    station 2's certain gap `187540480` exceeds station 5's reach `187166208` by `374272`, about 140
+    cell widths. At the step `η = 1/2048`, station 5's certain gap `187395584` exceeds station 2's
+    reach `187339776` by `55808`. Both orders are certified at the receiver's resolution, opposite
+    ways. Along the step, station 2's gap fell by `203264` and station 5's rose by `231936`. The two
+    lock gaps truly cross, at `731/840` of the `1/2048` step if their motion is linear, just inside the smallest
+    step the move tries.
+  - The freezing order goes from `[0],[2],[4],[5],[6],[7],[3],[1]` to `[0],[5],[7],[6],[4],[3],[2],[1]`.
+    Freezing station 5 before station 2 changes the context every later station is read in, so the
+    release settles into another configuration with the same released classes. The jump in `ℓ` is a
+    level crossing of two locks' drives along the direction of deposition, not a tie below
+    resolution. No refinement of any request has an unranked station at either state (0 of 64 at
+    each). Locking unranked stations together (#207) leaves this release unchanged.
+- **Per step size η** (held-sheet decrease `d`, relocking jump):
 
-  | η | `d` | flip |
+  | η | `d` | jump |
   |---|---|---|
   | 1/16 | 33562 | 74106 |
   | 1/32 | 20269 | 45891 |
@@ -112,37 +140,203 @@ units of `1/4096` nat, each within `6/4096`.
   | 1/1024 | 714 | 34047 |
   | 1/2048 | 359 | 34038 |
 
-  From `1/64` down, the flip moves by `287` while `d` halves with each rung: a fixed cost. With the
-  window bound `(flips + σ)/d`, paying it takes 95 moves at `1/2048`, but about 4 at `1/64` and 3 at
-  `1/32`, if the flip held. Only the `1/2048` diff was taken; that the same request carries the flip
-  at the other rungs is inferred from its constant size. m6 adopted at `1/2048` (`d = 361`, no flip)
-  and flipped from `1/1024` up.
-- **The float path's excursions are not flips of this kind** (`sgd`, seed 303, 32 fixed requests,
-  10-step windows to step 130).
-  - Trajectories change on 29 to 32 of the 32 requests in every window to step 200, falling to 2
-    by step 390. Yet the flip part per window stays between `−0.0714` and `+0.0555` nats per term,
-    takes both signs, and nets `−0.0247` over the 130 steps.
-  - The excursions are in the continuous part: single steps raise the fixed mask itself, by
-    `+0.7996` per term at step 57 (the excursion over steps 50 to 100), and by `+0.256`, `+0.251` and
-    `+0.315` at steps 1, 77 and 78. Later steps repay them. The float path steps on minibatches of
-    other requests, so its read mask can rise. The native move steps on the requests it reads, so its
-    mask falls, and its only rise is the flip.
-  - Per term, m7's flip (`34038/64`, between `531/4096` and `532/4096`) exceeds every float window's
-    flip part (at most `227/4096`), and it sits in 1 of 8 requests.
-- **Steps per move.** Native `η = 1/32` moves (m0 to m3) lower the fixed mask by `573/4096` to
-  `574/4096` per term. A float step lowers it, per term:
+  - From `1/64` down, the jump moves by `287` while `d` halves with each halving of η. The jump is
+    a difference between two configurations' code lengths, not a slope, so it does not shrink with
+    the step.
+  - A later run of moves repays it once its held-sheet decreases exceed the jump by one receiver
+    grain `σ`: at least `(jump + σ)/d` moves. That is 95 moves at `1/2048`, and about 4 at `1/64` or 3
+    at `1/32`, if the jump held.
+  - Only the `1/2048` diff was taken; that the same request carries the jump at the other step sizes
+    is inferred from its constant size.
+  - m6 was accepted at `1/2048` (`d = 361`, no jump), and jumped from `1/1024` up.
+- **The float path's rises are not relocking jumps** (`sgd`, seed 303, 32 fixed requests, read every
+  10 steps to step 130).
+  - Relocking changes the freezing order on 29 to 32 of the 32 requests in every 10-step stretch to
+    step 200, falling to 2 by step 390. Yet its share of `ℓ` per stretch stays between `[-293/4096, -292/4096)` and
+    `[227/4096, 228/4096)` nats per term, takes both signs, and nets `[-102/4096, -101/4096)` over the 130 steps.
+  - The rises are in the held-sheet comparison itself. Single steps raise it, by `[3275/4096, 3276/4096)` per term
+    at step 57 (the rise over steps 50 to 100), and by `[1048/4096, 1049/4096)`, `[1028/4096, 1029/4096)` and `[1290/4096, 1291/4096)` at steps 1, 77
+    and 78. Later steps repay them.
+  - The float path deposits from minibatches of other requests, so the comparison it reads can
+    rise. The native move deposits from the requests it reads, so its held-sheet comparison falls,
+    and its only rise is a relocking jump.
+  - Per term, m7's jump (`34038/64`, between `531/4096` and `532/4096`) exceeds every float
+    stretch's relocking share (at most `227/4096`), and it sits in 1 of 8 requests.
+- **Float steps per native move.** Native `η = 1/32` moves (m0 to m3) lower the held-sheet comparison
+  by `573/4096` to `574/4096` per term. A float step lowers it, per term:
   - `21/4096` to `22/4096` at the net mean over 130 steps;
   - `64/4096` to `65/4096` over the first 10 steps;
   - `101/4096` to `102/4096` at the median descending step.
 
   One `1/32` move is therefore 26 to 27, 8 to 9, or 5 to 6 float steps by those three rates. The
-  float excursions' 20 to 60 steps come to about 1 to 3 native `1/32` moves at the net rate, or 3 to
-  7 at the opening rate. The two per-term means average different families: the float averages every
-  open station at every lock snapshot (about 36 terms per request), the native one term per station.
-  So the ratio is an enclosure of scale, not an identity.
+  float path's rises of 20 to 60 steps come to about 1 to 3 native `1/32` moves at the net rate, or
+  3 to 7 at the opening rate. The two per-term means average different families: the float averages
+  every open station at every lock snapshot (about 36 terms per request), the native one term per
+  station. So the ratio is an enclosure of scale, not an identity.
 
-[agent-inferred] The float path never pays a flip like m7's because it never makes one: its flips
-are many, small and of both signs. A window sized on the float excursions (about 1 to 7 moves) admits
-m7's flip only at rungs of `1/64` or more, where `d` is large enough. The flip itself is a near-tie in
-one request's lock order, a degeneracy of the release rather than of the move's size, so the
-location this read points to is the release's lock ordering among near-tied stations.
+[agent-inferred] The float path never repays a jump like m7's because it never makes one: its
+relocking is frequent, small and of both signs. A run of moves sized on the float rises (about 1 to
+7 moves) repays m7's jump only at step sizes of `1/64` or more, where `d` is large enough. The jump
+itself is two locks' drives crossing along the deposition's direction, a real reordering the
+readings certify on both sides. A smaller step that stops short of the crossing (at `731/840` of the `1/2048` step)
+avoids it only by not crossing; the configuration on the far side is reached by any move that passes
+it.
+
+## 5. A run of moves crosses m7, and what the chain still lacks against the refit
+
+**The acceptance.** Each move must lower the held-sheet comparison, certified at first order: the
+move's own law, unchanged. The released comparison `ℓ` is compared only at the two endpoints of a
+run of moves. A run closes when its end lies below its starting state by `σ`, one receiver grain
+over the batch: `64 · 1/16 · ln 2` nats at the upper end of `ln 2`'s enclosure (between `11356/4096`
+and `11357/4096`). The released `ℓ` of the states inside a run is not constrained. A run that does
+not close within `W` moves returns the chain to its starting state, whole (#202).
+- `W = 8` is a work bound, chosen (agent-inferred): it covers the measured scale of 1 to 7 moves (§4).
+  The laws fix only its least value, 2 and `(jump + σ)/d`, and that bound is necessary, not
+  sufficient (Astra's review).
+- The comparison is a code length. Each closed run lowers it by at least one grain, so at most
+  (opening − floor)/`σ` runs close: a decrease over runs of bounded length rather than at every move.
+
+**From m6, 16 moves** ([receipts](2026-10-02_THE_REFITS_INGREDIENTS_receipts/), `window_chain.txt`;
+values `/4096` nats, lower ends):
+- Every move was accepted at its largest step whose held-sheet comparison falls: `1/16` at first,
+  `1/8` from move 7 on.
+- Runs closed at moves 2, 5, 6, 8, 9, 15 and 16. None reached 8 moves, and none returned.
+- The released `ℓ` fell from `338257` at m6 to `195744` at w16. The single-move chain had stopped
+  at m7's `337896`. The held-sheet excess `X` fell from `156803` to `52990`, and solved terms rose
+  from 1 to 37 of 64. Whole sections on the 8 training requests stayed at 0 or 1.
+- Held out (order-2, seed `2026093012`, 128 requests, read natively):
+
+  | state | whole | stations right of 1024 | by station |
+  |---|---|---|---|
+  | m6 | 0 | 235 | 25, 26, 28, 22, 21, 29, 38, 46 |
+  | w16 | 0 | 329 | 51, 54, 37, 45, 32, 41, 32, 37 |
+
+  One class in four gives 256 by chance: m6 sits below it and w16 above. Whole sections need about
+  `(3/4)^(1/8)` per station for 96 of 128, if stations were independent (inferred). So per-station
+  accuracy is the progress reading here, and 0 whole is expected at w16's level.
+- Moves took `178306` to `206479` ms each, `3115316` ms in all, against the projection `16 · 460` s;
+  the held-out reads took `1669966` ms (m6, 4 threads) and `566219` ms (w16, 16 threads).
+
+**The refit on the same scales**, read natively on the same 8 requests:
+
+| constitution | ρ | `L` | `X` | solved of 64 |
+|---|---|---|---|---|
+| w16 | `102837/131072` | 195744 | 52990 | 37 |
+| the refit's `E` | `137573/262144` (its own) | 133292 | 34021 | 45 |
+| the refit's `E` | `102837/131072` (the chain's) | 310210 | 147888 | 15 |
+| w16's `E` | `137573/262144` (the refit's) | 574640 | 429220 | 20 |
+
+The refit sits below w16 only at its own memory constant. At the chain's ρ it lies above w16, and
+w16's `E` at the refit's ρ lies far above both.
+
+**ρ, the memory transport's modulus.** The chain holds ρ by declaration, not by law: the kinetic
+metric moves `E` alone and sets ρ's unit move to zero (`MoveMetric::Kinetic`). The founding law
+derives only the bound `ρ ≤ ρ₀` (the one-turn alias, `ρ₀⁶⁰ ≤ 2^(−21)`); sitting at its top is a
+choice.
+- Along the chain the comparison's slope in ρ, read at each move's starting state (m6, w1..w15), is
+  positive at 12 of 16 states, asking for a shorter memory. It is negative over the starts of moves
+  8 to 11, and at w16 itself it is `−426589/4096`.
+- **The ρ-only walk at w16 climbs** (w16's `E`, ρ lowered; `L`, `X`; solved; training stations
+  right of 64):
+
+  | ρ | `L` | `X` | solved | stations |
+  |---|---|---|---|---|
+  | `102837/131072` (ρ₀) | 195744 | 52990 | 37 | 27 |
+  | `102709/131072` (ρ₀ − 2^(−10)) | 196331 | 53808 | 37 | 25 |
+  | `101813/131072` (ρ₀ − 2^(−7)) | 218712 | 78119 | 35 | 29 |
+  | `3/4` | 279406 | 137900 | 35 | 19 |
+  | `11/16` | 384896 | 240950 | 26 | 20 |
+  | `5/8` | 475236 | 328710 | 24 | 18 |
+  | `9/16` | 547651 | 403415 | 24 | 16 |
+  | `137573/262144` | 574640 | 429220 | 20 | 20 |
+
+  With `E` fixed, w16's comparison is least at ρ₀, the top of the admitted set. That walk holds `E`
+  fixed, so it does not show where a joined move of `E` and ρ goes from w16: the joined step in ρ
+  is the readings' ask less what `E`'s own re-adaptation already supplies through their coupling,
+  and that is measured by the joined move (#220), not by this walk.
+- [agent-inferred] `E` and ρ co-adapt. The refit's advantage is a joint basin: neither its `E` at
+  the chain's ρ nor w16's `E` at its ρ keeps it. The slope's sign along the chain (positive through
+  w6, turning as `E` fits ρ₀'s long tail) is the reason to start a joined move from the opening or
+  from m6, not from w16.
+
+**Like-for-like on data.** The refit was fit on 256 training requests (`eO_fit.py order2 400 256
+101`, minibatches of 16); the chain descends on 8. Fit the same way on the chain's own 8 requests
+(`eO_fit.py order2 400 8 101 … 8`, the requests printed by `hnn_prediction -- executed pairs`), the
+float fit reaches 39 whole of 128 and 735 stations right on the float probe's held set, against 57
+for the 256-request fit, with ρ ending at `168127/262144` on the lattice, a third value. Read
+natively (its `E` rounded to the source port's lattice) on the same 128 held-out requests as the
+chain, it releases **37 whole of 128 and 717 stations right of 1024** (by station 68, 109, 65, 118,
+61, 121, 58, 117; `2088912` ms at 10 threads; two earlier attempts at 4 and 8 threads under load
+passed their `2400` s deadline and are incomplete). On the 8 training requests it reads `L =
+93355/4096`, `X = 8014/4096`, solved 57 of 64, whole 7 of 8. So data size costs some of the exterior
+fit's whole sections, but not most: the same 8 requests and the same native release reach 37 whole
+where the native chain reaches 0. ρ's value depends on the data, which argues for learning it rather
+than declaring it.
+
+**The memory constant held at the fit's value** (diagnostic: ρ is an exterior constant here). The
+chain from the opening with ρ held at `168127/262144`, 16 moves under the same acceptance: runs closed
+at moves 1, 2, 3, 4, 12 and 13 (moves 5 to 12 one run of 8, closing at its last move); moves 14 to 16
+were an open run at the limit, so the held state is r13: `L = 269593/4096`, `X = 94032/4096`, solved
+15 of 64. Held out it releases 0 whole and 272 stations right (26, 29, 43, 23, 23, 13, 46, 69;
+`898572` ms at 10 threads). Against the chain at ρ₀ after the same 13 moves from the opening (w7:
+`L = 265678/4096`, solved 20) it is no better: held at the fit's ρ from the start, `E` does not find
+a lower basin in 13 accepted moves.
+
+**Where the native move goes** (the stored `E` arrays: 600 entries on the lattice `2^(−21)`; the fit's
+`E` rounded to it; signed squared cosines as cells of `1/4096`).
+- *Reach is not the limit.* The fit's largest entry change from the opening is `4266283` lattice units,
+  from m6 `4411164`, from w16 `6458652`; a move changes an entry by at most `1/2` at the kinetic entry
+  scale, so 5, 5 and 7 moves reach it. Its largest entry is in `[10032/4096, 10033/4096)`, inside the
+  entry bound `8`.
+- *The direction is.* `w16 − m6` against `fit − m6`: `−[60, 61)`, covering `−[452, 451]/4096` of the
+  distance (away from it) while `|w16 − m6|²` is `[3386, 3387)/4096` of `|fit − m6|²`. Each of the 16
+  moves, against `fit − E` from its own start, lies in `−[1, 2)` to `−[133, 134)`: every one negative.
+- *The metric turns it, not the comparison.* At the opening (the float probe's `E₀` equals the native
+  opening's `E` entry for entry; ρ₀ for both): the native gradient `G` (the plain pullback) against
+  the float objective's descent `+[1693, 1694)`; the normal-law step `ΔE` against it `+[1702, 1703)`;
+  `G` against the kinetic step (the first accepted kinetic move) `+[37, 38)`; `ΔE` against it
+  `+[35, 36)`. The native comparison's gradient agrees with the float one's; the kinetic metric's
+  receiver Gauss–Newton step is nearly orthogonal to both. The fit itself lies along a path, not along
+  any starting direction (`G` against `fit − opening` `+[2, 3)`), so a metric is judged by the chain it
+  produces; that chain is queued (`research/runs/u6/CLOUD_QUEUE.md`, Q2).
+- *The joined move's ask on ρ* (`own − supplied` at each stored state, read without moving): positive
+  at w1, w2, w7 and w9; negative at w3 to w6, w8, w10, w11 and w13 to w16. The first state asking for
+  a shorter memory is w3 (`−4483845/2048`); the joined chain starts there (Q4).
+
+**#207's lock rule along this chain.** At m7, at its `1/2048` successor and at the refit, no refinement
+of any request has an eligible station whose reach meets the largest certain gap while it did not
+lock with it. Along the chain (w1 to w16) one does, at w9: request 1's first freeze, where station
+6's reach `701603840/2^24` meets station 5's certain gap `701591552/2^24`; #207 locks the two together
+and the released comparison is unchanged at the grain (`226300/4096` under both rules). #207 releases
+the same sections elsewhere on this chain, and its m7 replay and campaign 1's held-out code (`−560 + 15/16 + ε` bits below
+PPM-2, the same exact enclosure) are unchanged.
+
+## 6. The plan: read the U6 move through the deposition path
+
+The chain's gains in §5 are read on the bank comparison: a declared receiving bank reads each
+station's candidates at the chain's constitution, and the release locks on those readings. Astra's
+review (October 2) states the defect: that comparison does not execute the continuing contact and
+material-deposition path, so a gain on it is not yet a gain of the machine. This plan decides it.
+It runs on Astra's landed continuation (`receiver::reception::continuation`, `98cc6e86`;
+`physics::wave::continuation`, `3ef3c6b1`) and on the native `Word` continuation once it lands.
+
+- **The states read.** m6, w16, the diagnostic chain's end at ρ = `168127/262144`, and the joined
+  `(E, ρ)` move's end (#220) once run.
+- **What each read must show**, per accepted move from m6 to w16:
+  - the move's deposition reaches the locus it changes (the source port) as a native deposit, with
+    its certified storage growth (`Constitution::deposited`'s guards, the same ones the move already
+    passes);
+  - its work at the reached point closes: `W_dep = E(x; Θ′) − E(x; Θ)`, read at the same state;
+  - the next passage reads the changed material: a request's `Word`, opened on the successor, reads
+    its stations differently from the predecessor's at the same request (Astra's changed-passage
+    control, on this constitution).
+- **The deciding number.** Held-out per-station accuracy of the release whose station readings
+  come from the continuing contact path (a `Word` on the constitution) instead of the declared bank,
+  at m6 and at w16, on the same 128 requests (order-2, seed `2026093012`). The bank comparison reads
+  235 and 329 of 1024. The gain is real in the deposition path when w16 exceeds m6 there by at least
+  28 stations, two binomial spreads at chance (`2·√(1024·3/16)`, below 28; agent-inferred).
+- **If it fails** (the path reads w16 within 28 stations of m6, or a move's work does not close, or
+  the successor's passage does not change), the bank-comparison chain stops: no further moves are
+  run on it, and the executed comparison is rebuilt to read its stations through the contact path
+  before any further move. The step-size scan (#211) and the joined move (#220) are then measured on
+  that rebuilt comparison, not on the bank.
