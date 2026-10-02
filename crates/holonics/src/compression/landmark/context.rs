@@ -106,10 +106,12 @@
 //! on its coded word and charged 3 bits stays a valid code (`priorMass_tree_two_part`; the cell
 //! code's completeness over its digit trees is not composed); the executed lattice adds its drift
 //! (owed in #62) and each dyadic cell's join at most one bit. Raising the declared depth from `D` to
-//! `D'` costs, against every pruned tree of depth at most `D`, one stop code
-//! `−log₂ w_D = j_D − log₂(2^(j_D) − 1)` (at most one bit) a leaf at depth `D`, and nothing else
-//! (`priorMass_depth_lift_ladder`): the depth is a storage limit. A register's ceiling stays on KT's
-//! half-unit masses.
+//! `D'` raises that bound against every pruned tree of depth at most `D` by one stop code
+//! `−log₂ w_D = j_D − log₂(2^(j_D) − 1)` (at most one bit, exactly one at the `½` stop prior) a leaf
+//! at depth `D`, and changes nothing else in it (`priorMass_depth_lift_ladder`); `w_D` is
+//! [`StopPrior::weight`] at the branch's old letter depth, `D` in the cell branch and `D(1 + r)` in
+//! the bundle branch. [agent-inferred] The depth is then a storage limit; whether the code falls is
+//! a measurement, not this bound. A register's ceiling stays on KT's half-unit masses.
 //!
 //! [definition] **Typed address letters** ([`Letter`]): `Boundary` (before the cut's first cell),
 //! `Cell(code)` (a tick of the cell-only family) and `Bundle` (a tick's cell with its declared
