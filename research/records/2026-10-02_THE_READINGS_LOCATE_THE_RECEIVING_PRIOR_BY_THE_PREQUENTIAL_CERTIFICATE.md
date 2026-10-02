@@ -23,16 +23,19 @@ lines dropped). Projection `1800` s from the first run's aeon closes, deadline `
 |---|---|
 | largest anchor energy `\|z\|²` | `68693/2^24` (below `2^(−7)`) |
 | mean anchor energy | `11179037/2^35` |
-| accumulated `tr F = Σ \|z\|²` | `9279474/2^23` (above `1`) |
+| accumulated `tr F = Σ \|z\|²` | `1187772767/2^30` exactly (above `1`) |
 | first reading at which `tr F ≥ 1` | `3109` |
-| largest eigenvalue of `F` | `8599329/2^24` (below `1`) |
+| largest eigenvalue of `F` | in `[8599329/2^24, 8599330/2^24)` (below `1`) |
 
 The receiving-prior record §4 projected the trace to reach `1` at 3,239 readings from the first
 two aeons' mean; the third aeon's anchors are larger, and it reaches `1` at reading 3,109. So
 "the readings' Gram never outweighs the prior" fails for the trace over the whole campaign. It
 holds along every direction: the largest eigenvalue stays below `1 = s`, so the prior keeps more
-than `2^24/(2^24 + 8599329)` of the step along each direction (`opening_outweighs_iff` read on
-each eigenvalue), more than half. The eigenvalue is a float read at 24 bits.
+than `2^24/(2^24 + 8599330)` of the step along each direction (`opening_outweighs_iff` read on
+each eigenvalue), more than half. The eigenvalue's cell is exact: `F` is summed from the readings'
+exact anchors, and the `LDLᵀ` pivots of `cI − F` are all positive at `c = 8599330/2^24` and not at
+`c = 8599329/2^24` (Sylvester; [receipt](2026-10-02_THE_READINGS_LOCATE_THE_RECEIVING_PRIOR_receipts/fisher_exact.txt),
+`research/notebook/hnn_design/receiver_fisher_exact.py`).
 
 ## 2. The whole campaign's code
 
@@ -197,6 +200,20 @@ card's mirror of the host's chart (`holonics-cuda` `hnn::lattice`). The unit the
 shortcut: prior `2 I` on `z` is the unit prior on `z/√2`, which leaves the dyadics. So the change
 carries the off-support value through the chart on host and card. It is its own pull request, and
 it merges after the main line measures it on campaign 1 and its held-out read.
+
+The change as built is scoped to the receiving map's law. `ReceiverDeclaration::receiving_scale`
+declares `k` with `H₀ = 2^k I` (campaign 1 declares `1`; every other declared field keeps `0`).
+`NormalLaw::with_scaled_prior` founds the receiving map there, with the chart
+`SolvedChart::founded(k) = 2^(−k) I` on `2^(−k)ℤ`. The chart carries `k`, and every place that read
+the identity off the support reads the prior: the support test (`GramBlock::of`), the dense form,
+the carrier count, the reach (`2^(−k) f`), and the warm start's entry for a newly reached index.
+`with_ports` keeps the replaced map's `k`. `k` is held at `k ≥ 0`, so the carried Gram's positivity
+margin is at least the unit prior's, which the lattice rule's certificate cites; a smaller prior
+would need a finer lattice. `SolvedChart::identity`, `NormalLaw::with_prior` and the source and
+contrast laws are unchanged. The card's mirror (`holonics-cuda` `hnn::lattice::normal_deposit_on_card`)
+reads the host's Gram and chart in their dense forms, so it takes the off-support values as they
+stand. Its parity test gains a window at `2 I` that reaches half the coordinates, and that test
+runs on the card.
 
 Carrying `a` and `V` natively beside the Gram, and moving `s` by the Newton point as readings
 arrive, is the per-field law's native form. It is not built here.
