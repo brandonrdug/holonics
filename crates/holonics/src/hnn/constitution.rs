@@ -438,6 +438,8 @@
 //! | `HNN/Normal.normal_prox_step`, `depositLocus_solves`; `HNN/LatticeWord.{prox_chart_residual, prox_chart_certificate}` | [`NormalLaw::deposited`] (the step at the carried Gram through the executed chart, its residual released and reported: [`ChartReading`]) |
 //! | `HNN/LatticeWord.{nsStep, newton_schulz_left, rounded_refinement_residual_left, rounded_refinement_certificate_left, rowNorm, latticeChart}` | [`SolvedChart`] (the certificate and the rounded refinement) |
 //! | `HNN/LatticeWord.{warm_start_residual, warm_start_certificate}` | [`SolvedChart`] (why the warm start takes the window's rank-one steps) |
+//! | `HNN/LatticeWord.{warm_start_window, warm_start_window_exact, warm_start_window_certificate}` | [`SolvedChart`] (the window's rank-one warm start keeps the chart's residual) |
+//! | `HNN/LatticeWord.{chart_release_read, carried_chart_release_read}` | [`ChartRule::read`] (the released prox residual's move of a read) |
 //! | `HNN/LatticeWord.{roundedIter_certificate, newton_schulz_iter_left, inverse_chart_deviation}` | [`ChartRule`] (the lattice `L_s`, the target `δ_ℓ`, the refinement count) |
 //! | `HNN/Normal.normalStatistic_standing`, `objective_eq_statisticObjective`, for its statistic `H` only (carried on the lattice) | [`NormalLaw::gram`] (keeps `H`, never the samples) |
 //! | `HNN/Normal.deposit_local`, `windowGram_apply_eq_zero` | [`Constitution::deposited`] (per locus, only its window) |
@@ -1057,7 +1059,8 @@ const RESIDUAL_SHIFT: u32 = 125;
 /// released residual `ρ = γG(1 − X̂H')` (`prox_chart_residual`, summed over the window's returns),
 /// `‖ρ‖∞ ≤ ‖γG‖∞ δ` (`prox_chart_certificate`). The map differs from the exact prox step's by
 /// `−ρH'⁻¹`, so a read at an operand `x` moves by `|ρ_i H'⁻¹ x| ≤ ‖ρ_i‖₂‖x‖₂/λ_min(H') ≤
-/// ‖ρ‖∞‖x‖₁/c`, with `c = 1 − 1/(2L_R)` the carried Gram's margin (`carried_gram_posDef_rule`).
+/// ‖ρ‖∞‖x‖₁/c`, with `c = 1 − 1/(2L_R)` the carried Gram's margin (`carried_gram_posDef_rule`;
+/// the bound is `HNN/LatticeWord.{chart_release_read, carried_chart_release_read}`).
 /// One return of a unit-scale covector (`‖wηg‖∞ ≤ 1`, the lattice rule's assumption, which the
 /// certified step enforces) and a feature
 /// `‖f‖₁ ≤ X_ℓ` read at an operand `‖x‖₁ ≤ X_ℓ` therefore moves by at most `X_ℓ²δ/c`; the lattice
@@ -1160,8 +1163,9 @@ impl ChartRule {
 /// diverges. The window's rank-one steps (Sherman–Morrison, read at the chart's lattice) carry the
 /// residual instead: with `S = Ω⁻¹ + FᵀX̂F` the identity above holds in any ring (it expands to
 /// `X̂F[Ω − S⁻¹(Ω⁻¹ + FᵀX̂F)Ω]Fᵀ = 0`), so an exact chart stays exact and a certified one keeps its
-/// residual up to `1 − X̂FS⁻¹Fᵀ` (near `H'⁻¹H`). The Lean statement of that identity is owed in #62
-/// ("Step 4 (#73) owed"); nothing rests on it, since the certificate is computed exactly afterwards.
+/// residual up to `1 − X̂FS⁻¹Fᵀ` (near `H'⁻¹H`): `HNN/LatticeWord.{warm_start_window,
+/// warm_start_window_exact, warm_start_window_certificate}`, with the inverses as left inverses.
+/// Nothing rests on it, since the certificate is computed exactly afterwards.
 /// When the warm start's certificate is not below 1, or a refinement does not lower it, the chart
 /// restarts from the scaled identity `2^(−a)I`, whose residual is contracting (spectrum in `[0, 1)`).
 /// A refinement that does not reach `δ_ℓ` within the rule's count is refused. Sherman–Morrison and the
