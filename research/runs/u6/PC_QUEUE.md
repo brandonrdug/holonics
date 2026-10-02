@@ -80,7 +80,7 @@ training lines whole.
 When Q2's Coordinate chain, Q2's Kinetic control and the throw chain (#240) each store their move-16
 state, the main line names the three paths here, and the PC reads them in one call at 16 threads:
 ```
-RAYON_NUM_THREADS=16 timeout <3·(3·566219) ms, in s> $B executed evaluate order2 2026093012 128 out/p5-move16 coord16=<path> kin16=<path> throw16=<path>
+RAYON_NUM_THREADS=16 timeout 5096 $B executed evaluate order2 2026093012 128 out/p5-move16 coord16=<path> kin16=<path> throw16=<path>
 ```
-The deadline is three times the measured 566219 ms per state at 16 threads, times three states:
+The deadline is three times the measured 566219 ms per state at 16 threads, times three states (`9·566219 = 5095971` ms):
 `timeout 5096`. Report whole sections and stations right by station for each state.
