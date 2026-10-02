@@ -52,8 +52,9 @@ receiving bank or a process it undergoes.
   shares `θ_t = a_t/(1 + Σ_y a_y)`, the resting state at weight one. Raising each weight to `1/T`
   gives `θ_x = a_x^(1/T)/(1 + Σ_y a_y^(1/T))`. As `T → 0` the shares go to the top class when
   `a_top > 1`, to rest when every `a_x < 1`, and split evenly among tied tops. That gives both the
-  threshold `a > 1` and tied stations committing together (`ParametronLock`: "the threshold is
-  this face at zero temperature"). The release keeps only that limit.
+  threshold `a > 1` and, at one station, tied classes sharing the commitment (`ParametronLock`:
+  "the threshold is this face at zero temperature"). The release keeps only that limit. Stations
+  committing together is a different statement, the rule across stations that §5 infers.
 - **The gap is the dominant class's excess multiplier**, `g = a_top − a_runner`: how much more per
   turn the dominant class grows than its strongest rival. The readings enclose it between its
   **certain gap** `lo = L_top − max U` (the least value the readings allow) and its **upper end**
@@ -222,12 +223,17 @@ and the carried-cuts record's step law (#211)] With the crossing located at its 
    so its decrease is the fixed mask's, certified at first order. No run is needed.
 2. **Cross when the wall is negative.** If `J_c` plus the continuous change across the cut is
    negative, the crossing is a decrease read exactly, taken in one move.
-3. **A positive wall needs a run.** If `J_c > 0`, as at `m7`, one move cannot pay it: the move's
-   decrease scales with its step and `J_c` does not (§12). Crossing it is a run of moves that must
-   close one receiver grain below its opening state (the release's rule).
+3. **A positive wall: one move or a run.** One move is accepted across walls exactly when its
+   continuous decrease from its start to its end exceeds the sum of the jumps of every wall it
+   crosses (§12, `one_move_closes_iff`). The decrease grows with the step and a wall's jump does
+   not, so a short move onto a positive wall cannot pay it, and a long one can if its decrease
+   outgrows every wall it crosses. At `m7` the step `1/16` certifies `d = 33562/4096` against a
+   jump of `74106/4096`, but that step crosses more walls than the one at `1/2048`; which walls
+   it crosses is the main line's measurement on the cut list. Otherwise a positive wall is crossed
+   only by a run of moves that must close one receiver grain below its opening state (the
+   release's rule).
 
-So the run-of-moves acceptance is the right treatment for crossing a positive wall, and only for
-that. It is not the only treatment of a crossing. A located crossing gives a certified alternative:
+So the run-of-moves acceptance is the treatment for a positive wall that no single move pays. It is not the only treatment of a crossing. A located crossing gives a certified alternative:
 descend to the wall and stop, or cross a negative wall in one move. A positive wall is a barrier
 between two commitment orders that a zero-temperature release crosses only by an excursion, the run
 of moves with its height `h`. Whether to cross it is the endpoint comparison between the two states
@@ -411,22 +417,26 @@ rule does not remove it.
 
 **The replay: a true crossing, certain at both ends** [measured, by the main line, cited]. Request
 3, second freeze, values over `2^24`:
-- At `m7` station 2 locks second, by `374272`. At the successor at `η = 1/2048` station 5 locks
-  second, by `55808` (about 20 cell widths). The margin moved from `+374272` to `−55808`, a change of
-  `430080 = 2^12·3·5·7`, more than the margin it started with. Along the step station 2's gap fell
-  `203264` and station 5's rose `231936`. Under linear motion the pair crosses at `731/840` of the
-  step (`374272/430080` reduced).
+- At `m7` station 2 locks second: its certain gap exceeds station 5's upper end by `374272`. At the
+  successor at `η = 1/2048` station 5 locks second: its certain gap exceeds station 2's upper end
+  by `55808` (about 20 cell widths). These are two different certified margins. Each certain gap
+  is at most its true gap and each upper end at least, so the true difference `g₂ − g₅` moved by at
+  least `374272 + 55808 = 430080 = 2^12·3·5·7`: the true gaps crossed. The certain gaps moved by
+  `203264 + 231936 = 435200` (station 2's fell, station 5's rose); the difference, `5120`, is the
+  two enclosures' widths. Under linear motion the certified margins cross at `731/840` of the step
+  (`374272/430080` reduced); that is where the certified order changes, not where the true gaps
+  cross.
 - No station is unranked at either state (0 of 64 refinements in each of the 8 requests), so the
   rule above changes nothing at `m7`.
 - The freezing order goes from `[0],[2],[4],[5],[6],[7],[3],[1]` to `[0],[5],[7],[6],[4],[3],[2],[1]`.
   The released classes are unchanged (all `3`). The later stations are read with different data
   placed before them, and that is request 3's `+33987/4096`.
 
-So the rule of this section removes only swaps the readings cannot rank; `m7`'s is a crossing of
-true gaps by the readings' first-order motion, which `certified_order_needs_crossing` allows. Its
-location along the step is the carried-cuts record's prediction
-([§4b](2026-10-02_THE_STEPS_CANDIDATE_STATES_ARE_THE_CUTS_OF_THE_CARRIED_PATH_AND_THEIR_COUNT_IS_A_WEYL_LAW.md), #211): a margin change larger than `μ₀` over the step makes
-`j_f ≥ j*` consistent.
+So the rule of this section removes only swaps the readings cannot rank. `m7`'s is a crossing of
+true gaps, the case `certified_order_needs_crossing` names. Two end states do not show that the
+motion is first order. Its location along the step is the carried-cuts record's prediction
+([§4b](2026-10-02_THE_STEPS_CANDIDATE_STATES_ARE_THE_CUTS_OF_THE_CARRIED_PATH_AND_THEIR_COUNT_IS_A_WEYL_LAW.md), #211): the replay is consistent with `j_f ≥ j*`. The main
+line also finds the rule inert at `m7`: its replay matches the old rule digit for digit.
 
 ## 6. Owner and verification
 

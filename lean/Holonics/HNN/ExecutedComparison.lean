@@ -1925,8 +1925,8 @@ between its certain gap `lo j = L_top − max U`, the least they allow, and its 
 `hi j = U_top − max L`, the greatest. Committing only the strictly largest certain gap orders two
 stations whose enclosures overlap by where their cells' cuts fall, a quantity no reading carries.
 (`m7`'s swap is not this case: there the two gaps cross, certified one way at the incumbent and the
-other way at the successor, which `certified_order_needs_crossing` allows.) Two gaps whose enclosures overlap have no order at the receiver's resolution,
-so their commitments are simultaneous for it, as two events closer than one tick have no order on
+other way at the successor, the case `certified_order_needs_crossing` names.) Two gaps whose
+enclosures overlap have no order at the receiver's resolution, so their commitments are simultaneous for it, as two events closer than one tick have no order on
 that clock. The release's other decisions (a top exceeds its rivals, a station passes its
 threshold) are orderings the enclosures resolve; read the same way, a station is below the largest
 only when its upper end is below the largest certain gap. **A station commits when no station's
