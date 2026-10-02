@@ -1,0 +1,15 @@
+executed run: 8 order2 requests at development seed 2026093061, the arm lock-dec, Kinetic, from m7 (ρ 102837/131072; the source port's lattice 2^(-21)); σ over 64 decisions [11356/4096, 11357/4096) nats; cap Some(32), deadline 38400000 ms; the bank p = 5/8, grain 2^(-16)
+  the opening: L ∈ [337896/4096, 337901/4096) nats; solved 1 of 64; whole 0 (released 7, stations right 13)
+    move 0: adopted at step 1/16; the ladder's start Some((Ratio { numer: 1, denom: 16 }, KineticEntryScale)); trials η 1/16 None; persistence Persistence { locks: 63, solved: 4, reread: 3, stay: 2, fall: 1, reversed: 1, uncertified: 0 }; 493539 ms
+      trials: η 1/16 ρ unmoved mask [304334/4096, 304339/4096) own [378440/4096, 378445/4096) adopted; γ_ρ [584710/4096, 584711/4096)
+  move 0: adopted; ρ 102837/131072; L ∈ [378440/4096, 378445/4096) nats; solved 2 of 64; whole 0 (released 8, stations right 18); 493539 ms
+    move 1: adopted at step 1/32; the ladder's start Some((Ratio { numer: 1, denom: 32 }, KineticEntryScale)); trials η 1/32 None; persistence Persistence { locks: 64, solved: 3, reread: 3, stay: 2, fall: 1, reversed: 1, uncertified: 0 }; 857217 ms
+      trials: η 1/32 ρ unmoved mask [345239/4096, 345244/4096) own [332893/4096, 332898/4096) adopted; γ_ρ [651568/4096, 651569/4096)
+  move 1: adopted; ρ 102837/131072; L ∈ [332893/4096, 332898/4096) nats; solved 0 of 64; whole 0 (released 8, stations right 19); 857217 ms
+    move 2: adopted at step 1/16; the ladder's start Some((Ratio { numer: 1, denom: 16 }, KineticEntryScale)); trials η 1/16 None; persistence Persistence { locks: 64, solved: 3, reread: 3, stay: 2, fall: 1, reversed: 1, uncertified: 0 }; 1433622 ms
+      trials: η 1/16 ρ unmoved mask [292972/4096, 292977/4096) own [324907/4096, 324912/4096) adopted; γ_ρ [528445/4096, 528446/4096)
+  move 2: adopted; ρ 102837/131072; L ∈ [324907/4096, 324912/4096) nats; solved 0 of 64; whole 0 (released 7, stations right 22); 1433622 ms
+  the opening L ∈ [337896/4096, 337901/4096) nats, σ [11356/4096, 11357/4096) nats
+executed run: closed at move 3: L ∈ [324907/4096, 324912/4096) nats below the opening's lower end less σ; the closing state is out/q3/m7-3.state
+executed run: 1433624 ms; resident 233488384 now, 239120384 peak
+exit 0 wall 1433644 ms
