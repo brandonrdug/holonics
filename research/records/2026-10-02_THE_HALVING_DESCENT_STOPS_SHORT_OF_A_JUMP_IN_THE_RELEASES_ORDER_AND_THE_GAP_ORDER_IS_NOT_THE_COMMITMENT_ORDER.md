@@ -35,8 +35,9 @@ the Holons' storage and work is derived (#62); this record keeps that wording.
    face marks no change there.
 4. **The jumps do not stop the chain's runs** (§5, the main line's read). Every move of the
    diagnostic chain adopted its first or second trial, so no step size fell geometrically toward a
-   jump. Only `m7` closed on a jump, and in §2's last case: the jump lay at `731/840` of the smallest
-   of the eight trials, so every trial crossed it and the move's depth (`LADDER_DEPTH`), not the
+   jump. Only `m7` closed on a jump, and in §2's last case: the jump lay at `731/840` of the
+   smallest of the eight trials (where the certified margins cross under linear motion, the flip
+   record's replay), so every trial crossed it and the move's depth (`LADDER_DEPTH`), not the
    lattice floor, ended the halvings. The native chain's shortfall against the float fit is
    therefore not a run of closures at jumps; it lies in the native move's direction or reach, which
    the next derivation takes.
@@ -177,10 +178,13 @@ closure (a geometric fall toward the closing state is §2's signature), the clos
 the coordinator):
 - **The approach.** Every move adopted its first trial except `r5` and `r12`, which adopted their
   second. No step size falls geometrically anywhere, so no run of this chain closes by §2's approach.
-- **`m7`.** Its eight trials ran from `1/16` to `1/2048` and all were refused. The jump along its
-  direction lies at `731/840` of the smallest trial, so every trial crosses it (`trials_cross_jump`,
-  `jump_refuses_every_halving`), and a ninth halving, at `420/840` of the smallest, would land short
-  of it. The move's depth ended the halvings; the lattice floor did not.
+- **`m7`.** Its eight trials ran from `1/16` to `1/2048` and all were refused. Under linear motion
+  of the certified margins between the incumbent and the smallest trial (the flip record's replay),
+  the release's order changes at `731/840` of that trial, so every trial crosses it
+  (`trials_cross_jump`, `jump_refuses_every_halving`), and a ninth halving, at `420/840` of it,
+  would land short of it. No law bounds the margins' motion over the step (the flip record's missing
+  `Λ`), so that location is a linear reading, not a certified one. The move's depth ended the
+  halvings; the lattice floor did not.
 - **Against the float fit.** The float fit on the same 8 requests, read natively, decides `37/128`
   held-out requests whole and `717/1024` stations right; the native chain at the fit's `ρ` decides
   `0/128` whole and `272/1024`. The gap is the native move's, in its direction or its reach.
