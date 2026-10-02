@@ -271,8 +271,9 @@ coordinates, where the readings' Jacobian has singular values `σ_i`, the gradie
 gradient by the well-read ones. [proved-standard; Kantorovich] For a positive form `P` with
 condition number `κ` on the gradient's span, `cos(g, Pg) ≥ 2√κ/(1 + κ)`. The measured
 `cos² = 37/4096` therefore needs `κ > 440`: at `κ = 441`, `4κ/(1 + κ)² = 1764/195364`, which lies
-below `37/4096`. The suppressed directions are the well-read ones. The fit's path follows the
-gradient (`+1693`), so they carry it.
+below `37/4096`. Read at its grain, any `cos²` below `38/4096` still needs `κ > 429`: at `κ = 430`,
+`4κ/(1 + κ)² = 1720/185761`, below `38/4096`. The suppressed directions are the well-read ones. The
+fit's path follows the gradient (`+1693`), so they carry it.
 
 **(b) The leap, the overdamped flow and the throw.** The mass is the storage's inertia
 `M = I ⊗ H′`, and the stiffness is the Fisher pullback `K = AᵀFA` (§5). For the motion
@@ -284,7 +285,9 @@ gradient (`+1693`), so they carry it.
   is `Ė = −M⁻¹g/γ`, the direction of `ΔE`. The main line's `+1702` says this native direction
   already follows the fit's descent.
 - **The underdamped throw over a finite flight.** From rest, each mode moves at most the force's
-  free fall `|g_i| τ²/2` by time `τ`, whatever its stiffness (`throw_le_free_fall`). Stiff modes
+  free fall `|g_i| τ²/2` by time `τ`, whatever its stiffness. `throw_le_free_fall` proves it for the
+  undamped mode. Damping keeps the bound, since the velocity `g_i e^(−γt/2) sin(ω_d t)/ω_d` is at
+  most `|g_i| t` in size; that case is owed in Lean (#62). Stiff modes
   (`ω_i τ ≫ 1`) reach their equilibrium as the leap does. Soft modes stay at free fall instead of
   the leap's `g_i/ω_i²`. The flight time cuts exactly the soft-mode amplification that turns the
   kinetic step.
@@ -303,9 +306,9 @@ gradient (`+1693`), so they carry it.
 [agent-inferred] **The flight and the damping.** The flight is the excursion's interval: `W` moves
 between its opening and its close, admitted while the energy `H = ½⟨Mv, v⟩ + L_held` falls
 (§5). The damping is read from the modes. Critical damping of the softest admitted mode,
-`β = 1 − 2hω_min`, is rational once `ω²_min` is enclosed at a rational grain. The kinetic solve's
-iterates enclose it. Owed (#62): the discrete energy law at the lattice and the enclosure of
-`ω_min`.
+`β = 1 − 2hω_min`, is rational once `ω_min` is enclosed at a rational grain: the kinetic solve's
+iterates enclose `ω²_min`, and rational bounds on its square root follow. Owed (#62): the discrete
+energy law at the lattice and the enclosure of `ω_min`.
 
 **Outside yardstick only.** The float fit (Adam: momentum and a near-sign diagonal scale) shows what
 a carried, nearly diagonal motion reaches. It is not the mechanism. The native counterpart is
@@ -327,4 +330,4 @@ reweighting. The main line's read of the Coordinate and Witness steps against `G
   151 of 300 entries agree under one element.
 - **Owed (#62):** the ring's reversal symmetry; orbit invariance of the Floquet certificate's
   refusals; the equivariance of every rounding in the chain, checked call by call; the throw's
-  discrete energy law and its damping read from the modes.
+  discrete energy law and its damping read from the modes; the free-fall bound for the damped mode.

@@ -18,9 +18,13 @@ def sign(locus,i,j):
     return 1 if z&1 else -1
 N,A=60,5
 E=[[sign(0,i,j) for j in range(A)] for i in range(2*N)]  # times 1/2
-# complex node t, column j
-Z=[[complex(E[2*t][j],E[2*t+1][j]) for j in range(A)] for t in range(N)]
-d4=[lambda z:z, lambda z:1j*z, lambda z:-z, lambda z:-1j*z, lambda z:z.conjugate(), lambda z:1j*z.conjugate(), lambda z:-z.conjugate(), lambda z:-1j*z.conjugate()]
+# node t, column j, as the integer pair (Re, Im)
+Z=[[(E[2*t][j],E[2*t+1][j]) for j in range(A)] for t in range(N)]
+# the quarter turns i^r and their composites with conjugation, on integer pairs
+def turn(z,r):
+    for _ in range(r): z=(-z[1],z[0])
+    return z
+d4=[(lambda z,r=r:turn(z,r)) for r in range(4)]+[(lambda z,r=r:turn((z[0],-z[1]),r)) for r in range(4)]
 fixed=[]
 for m in range(N):
     for k,d in enumerate(d4):
