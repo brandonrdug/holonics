@@ -1,3 +1,4 @@
+import Holonics.Objects.RatioPhase
 import Holonics.Physics.InformationDifference
 
 /-!
@@ -400,5 +401,59 @@ section Audit
 #print axioms equal_face_different_effort
 
 end Audit
+
+/-! The same energy levels supply the canonical code covector; kinetic inertia
+is separate source data. Fixed positive thermal scale and differentiable levels. -/
+section CanonicalCode
+open Holonics.Computation.HolonicAdjointNormalization
+variable [Nonempty ι]
+/-- For the existing canonical constitution, theta*L_i = E_i - F,
+with F = -theta log Z. Theta carries energy units; L_i is dimensionless. -/
+theorem canonical_code_energy {theta logZ : ℝ} {E : ι → ℝ}
+    {p : PositiveProbabilitySection ι} (h : Canonical theta E logZ p) (i : ι) :
+    theta * (-Real.log (p.mass i)) = E i - (-theta * logZ) := by
+  have hi := h i
+  linarith
+
+theorem canonicalState_eq_face (theta : ℝ) (E : ι → ℝ) :
+    canonicalState theta E = NormalizedExponential.face (fun i => -E i / theta) := rfl
+
+/-- The actual computed canonical state, with no supplied Canonical hypothesis. -/
+theorem canonicalState_code_energy {theta : ℝ} (htheta : theta ≠ 0)
+    (E : ι → ℝ) (i : ι) :
+    theta * (-Real.log ((canonicalState theta E).mass i)) =
+      E i - (-theta * Real.log (Holonics.Physics.Information.PortWork.partition theta E)) :=
+  canonical_code_energy (canonicalState_canonical htheta E) i
+
+/-- Along any declared configuration direction with fixed positive thermal scale,
+dL_i = (dE_i - mean dE)/theta. For f_i = -dE_i this is
+-(f_i - mean f)/theta. No inertial metric is inferred from this identity. -/
+theorem canonical_code_rate {theta t : ℝ} (htheta : 0 < theta)
+    {E : ℝ → ι → ℝ} {dE : ι → ℝ}
+    (hE : ∀ i, HasDerivAt (fun s => E s i) (dE i) t) (i : ι) :
+    HasDerivAt (fun s => -Real.log ((canonicalState theta (E s)).mass i))
+      ((dE i - NormalizedExponential.expectation (canonicalState theta (E t)) dE) / theta) t := by
+  have hs : ∀ i, HasDerivAt (fun s => -E s i / theta) (-dE i / theta) t :=
+    fun i => (hE i).neg.div_const theta
+  have h := (Holonics.Objects.RatioPhase.hasDerivAt_log_mass hs i).neg
+  simp_rw [canonicalState_eq_face]
+  have he : NormalizedExponential.expectation
+      (NormalizedExponential.face (fun i => -E t i / theta)) (fun i => -dE i / theta) =
+      -NormalizedExponential.expectation
+        (NormalizedExponential.face (fun i => -E t i / theta)) dE / theta := by
+    unfold NormalizedExponential.expectation
+    calc
+      _ = (∑ j, -((NormalizedExponential.face (fun i => -E t i / theta)).mass j * dE j)) /
+          theta := by
+        rw [Finset.sum_div]
+        apply Finset.sum_congr rfl
+        intro j _
+        ring
+      _ = _ := by rw [Finset.sum_neg_distrib]
+  apply h.congr_deriv
+  rw [he]
+  ring
+
+end CanonicalCode
 
 end Holonics.Physics.Information.PortWork

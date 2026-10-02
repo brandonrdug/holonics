@@ -1,4 +1,7 @@
-import Holonics.Aeon.Production.FirstLaw
+import Holonics.Transport.ChangingReceiver
+import Holonics.Aeon.Production.FirstLaw.Continuous
+import Holonics.Foundation.InformationReceiver
+import Holonics.Foundation.FiniteCrossEntropyReceiver
 import Mathlib.Analysis.SpecialFunctions.Log.Deriv
 
 /-!
@@ -146,5 +149,147 @@ section Audit
 #print axioms moving_reference_rate
 
 end Audit
+
+/-! Conditional cell/density code rates. The supplied continuity rate is not a
+Reynolds theorem; a continuum transport consumer must derive it. -/
+/-- p is the dimensionless probability of an actually declared cell. Source and
+relative boundary outflow have units probability per declared clock time. -/
+theorem cell_code_rate {p : ℝ → ℝ} {source outflow t : ℝ}
+    (hp : HasDerivAt p (source - outflow) t) (hpos : 0 < p t) :
+    HasDerivAt (fun s => -Real.log (p s)) ((outflow - source) / p t) t := by
+  apply (hp.log hpos.ne').neg.congr_deriv
+  ring
+
+/-- Along a material trajectory, delta is div_mu(v) + partial_t log(m)
+for the declared reference dmu_t = m(t,x) dx. Flux divergence and source are
+densities per the same reference. This is conditional on the actual continuity law. -/
+theorem density_code_rate {rho : ℝ → ℝ} {rate delta divJ source t : ℝ}
+    (hrho : HasDerivAt rho rate t) (hpos : 0 < rho t)
+    (balance : rate + rho t * delta + divJ = source) :
+    HasDerivAt (fun s => -Real.log (rho s))
+      (delta + (divJ - source) / rho t) t := by
+  apply (hrho.log hpos.ne').neg.congr_deriv
+  field_simp [hpos.ne']
+  linarith [balance]
+
+/-! The moving-cell balance supplies a log-content ratio rate.
+Probability is separately derived from a nonnegative integrable whole,
+its actual total integral Z, and the moving cell inclusion. source(u,y)
+already denotes s(u,X(u,y)). A moving Z contributes its own log-rate. -/
+section MaterialCellCode
+open MeasureTheory Filter Set ContinuousLinearMap
+open scoped Topology Interval
+theorem affine_cell_log_content_rate
+    (rho : ℝ × ℝ → ℝ) (j source : ℝ → ℝ → ℝ)
+    (a b da db : ℝ → ℝ) (rt rx dj : ℝ → ℝ → ℝ)
+    {t l r : ℝ} {S : Set ℝ} {bound : ℝ → ℝ}
+    (hS : S ∈ 𝓝 t) (hlr : l < r) (haPositive : ∀ u ∈ S, 0 < a u)
+    (ha : ∀ u ∈ S, HasDerivAt a (da u) u)
+    (hb : ∀ u ∈ S, HasDerivAt b (db u) u)
+    (hrho : ∀ u ∈ S, ∀ y ∈ uIcc l r, HasFDerivAt rho
+      ((fst ℝ ℝ ℝ).smulRight (rt u y) + (snd ℝ ℝ ℝ).smulRight (rx u y))
+      (u, a u * y + b u))
+    (hj : ∀ u ∈ S, ∀ y ∈ uIcc l r, HasDerivAt (j u) (dj u y) (a u * y + b u))
+    (continuity : ∀ u ∈ S, ∀ y ∈ uIcc l r, rt u y + dj u y = source u y)
+    (hFmeas : ∀ᶠ u in 𝓝 t, AEStronglyMeasurable
+      (fun y => rho (u, a u * y + b u) * a u) (volume.restrict (Ι l r)))
+    (hFint : IntervalIntegrable (fun y => rho (t, a t * y + b t) * a t) volume l r)
+    (hdFmeas : AEStronglyMeasurable (fun y =>
+      (rt t y + rx t y * (da t * y + db t)) * a t + rho (t, a t * y + b t) * da t)
+      (volume.restrict (Ι l r)))
+    (hbound : ∀ᵐ y ∂volume, y ∈ Ι l r → ∀ u ∈ S,
+      ‖(rt u y + rx u y * (da u * y + db u)) * a u + rho (u, a u * y + b u) * da u‖ ≤ bound y)
+    (hboundint : IntervalIntegrable bound volume l r)
+    (hfluxint : IntervalIntegrable (fun y =>
+      dj t y * a t - rx t y * a t * (da t * y + db t) - rho (t, a t * y + b t) * da t)
+      volume l r)
+    (Z : ℝ) (hZ : 0 < Z)
+    (hmass : 0 < ∫ x in a t * l + b t..a t * r + b t, rho (t, x)) :
+    HasDerivAt (fun u => -Real.log
+      ((∫ x in a u * l + b u..a u * r + b u, rho (u, x)) / Z))
+      ((((j t (a t * r + b t) - rho (t, a t * r + b t) * (da t * r + db t)) -
+          (j t (a t * l + b t) - rho (t, a t * l + b t) * (da t * l + db t))) -
+        (∫ y in l..r, a t * source t y)) /
+        (∫ x in a t * l + b t..a t * r + b t, rho (t, x))) t := by
+  have ht := Holonics.Transport.ChangingReceiver.affine_cell_transport rho j source a b da db rt rx dj hS hlr haPositive
+    ha hb hrho hj continuity hFmeas hFint hdFmeas hbound hboundint hfluxint
+  have hd := ((ht.2.div_const Z).log (div_pos hmass hZ).ne').neg
+  apply hd.congr_deriv
+  field_simp [hmass.ne', hZ.ne']
+  ring
+
+/-- Inclusion in an actual nonnegative integrable whole gives both content bounds. -/
+theorem interval_content_bounds_of_total
+    (f : ℝ → ℝ) (Omega : Set ℝ) (hOmega : MeasurableSet Omega)
+    (hfi : IntegrableOn f Omega volume) (hf : ∀ x ∈ Omega, 0 ≤ f x)
+    {left right Z : ℝ} (hlr : left ≤ right) (hin : Ioc left right ⊆ Omega)
+    (htotal : (∫ x in Omega, f x) = Z) :
+    0 ≤ (∫ x in left..right, f x) ∧ (∫ x in left..right, f x) ≤ Z := by
+  rw [intervalIntegral.integral_of_le hlr]
+  constructor
+  · exact setIntegral_nonneg measurableSet_Ioc (fun x hx => hf x (hin hx))
+  · rw [← htotal]
+    apply setIntegral_mono_set hfi
+    · exact (ae_restrict_iff' hOmega).mpr (Filter.Eventually.of_forall hf)
+    · exact Filter.Eventually.of_forall hin
+
+/-- The actual source total and material-cell inclusion discharge probability
+normalization throughout the declared neighborhood. No p≤1 hypothesis is supplied. -/
+theorem affine_cell_probability_code
+    (rho : ℝ × ℝ → ℝ) (j source : ℝ → ℝ → ℝ)
+    (a b da db : ℝ → ℝ) (rt rx dj : ℝ → ℝ → ℝ)
+    {t l r : ℝ} {S : Set ℝ} {bound : ℝ → ℝ}
+    (hS : S ∈ 𝓝 t) (hlr : l < r) (haPositive : ∀ u ∈ S, 0 < a u)
+    (ha : ∀ u ∈ S, HasDerivAt a (da u) u)
+    (hb : ∀ u ∈ S, HasDerivAt b (db u) u)
+    (hrho : ∀ u ∈ S, ∀ y ∈ uIcc l r, HasFDerivAt rho
+      ((fst ℝ ℝ ℝ).smulRight (rt u y) + (snd ℝ ℝ ℝ).smulRight (rx u y))
+      (u, a u * y + b u))
+    (hj : ∀ u ∈ S, ∀ y ∈ uIcc l r, HasDerivAt (j u) (dj u y) (a u * y + b u))
+    (continuity : ∀ u ∈ S, ∀ y ∈ uIcc l r, rt u y + dj u y = source u y)
+    (hFmeas : ∀ᶠ u in 𝓝 t, AEStronglyMeasurable
+      (fun y => rho (u, a u * y + b u) * a u) (volume.restrict (Ι l r)))
+    (hFint : IntervalIntegrable (fun y => rho (t, a t * y + b t) * a t) volume l r)
+    (hdFmeas : AEStronglyMeasurable (fun y =>
+      (rt t y + rx t y * (da t * y + db t)) * a t + rho (t, a t * y + b t) * da t)
+      (volume.restrict (Ι l r)))
+    (hbound : ∀ᵐ y ∂volume, y ∈ Ι l r → ∀ u ∈ S,
+      ‖(rt u y + rx u y * (da u * y + db u)) * a u + rho (u, a u * y + b u) * da u‖ ≤ bound y)
+    (hboundint : IntervalIntegrable bound volume l r)
+    (hfluxint : IntervalIntegrable (fun y =>
+      dj t y * a t - rx t y * a t * (da t * y + db t) - rho (t, a t * y + b t) * da t)
+      volume l r)
+    (Z : ℝ) (hZ : 0 < Z)
+    (hmass : 0 < ∫ x in a t * l + b t..a t * r + b t, rho (t, x))
+    (Omega : Set ℝ) (hOmega : MeasurableSet Omega)
+    (hwholeInt : ∀ u ∈ S, IntegrableOn (fun x => rho (u, x)) Omega volume)
+    (hnonneg : ∀ u ∈ S, ∀ x ∈ Omega, 0 ≤ rho (u, x))
+    (htotal : ∀ u ∈ S, (∫ x in Omega, rho (u, x)) = Z)
+    (hcellIn : ∀ u ∈ S, Ioc (a u * l + b u) (a u * r + b u) ⊆ Omega) :
+    (∀ u ∈ S,
+      0 ≤ (∫ x in a u * l + b u..a u * r + b u, rho (u, x)) / Z ∧
+        (∫ x in a u * l + b u..a u * r + b u, rho (u, x)) / Z ≤ 1) ∧
+    0 < (∫ x in a t * l + b t..a t * r + b t, rho (t, x)) / Z ∧
+    HasDerivAt (fun u => -Real.log
+      ((∫ x in a u * l + b u..a u * r + b u, rho (u, x)) / Z))
+      ((((j t (a t * r + b t) - rho (t, a t * r + b t) * (da t * r + db t)) -
+          (j t (a t * l + b t) - rho (t, a t * l + b t) * (da t * l + db t))) -
+        (∫ y in l..r, a t * source t y)) /
+        (∫ x in a t * l + b t..a t * r + b t, rho (t, x))) t := by
+  have hbounds : ∀ u ∈ S,
+      0 ≤ (∫ x in a u * l + b u..a u * r + b u, rho (u, x)) / Z ∧
+        (∫ x in a u * l + b u..a u * r + b u, rho (u, x)) / Z ≤ 1 := by
+    intro u hu
+    have horder : a u * l + b u ≤ a u * r + b u := by
+      have hp := haPositive u hu
+      nlinarith
+    have bounds := interval_content_bounds_of_total (fun x => rho (u, x)) Omega hOmega
+      (hwholeInt u hu) (hnonneg u hu) horder (hcellIn u hu) (htotal u hu)
+    exact ⟨div_nonneg bounds.1 hZ.le, (div_le_one hZ).mpr bounds.2⟩
+  refine ⟨hbounds, div_pos hmass hZ, ?_⟩
+  exact affine_cell_log_content_rate rho j source a b da db rt rx dj hS hlr haPositive
+    ha hb hrho hj continuity hFmeas hFint hdFmeas hbound hboundint hfluxint Z hZ hmass
+
+end MaterialCellCode
 
 end Holonics.Physics.Information.CrossEntropyRate

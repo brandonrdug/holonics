@@ -4,6 +4,7 @@ import Holonics.Foundation.FractalPacking
 import Holonics.Compression.Core.Cost
 import Holonics.Foundation.Standing
 import Mathlib.Analysis.SpecialFunctions.OrdinaryHypergeometric
+import Mathlib.Analysis.Complex.ExponentialBounds
 
 /-!
 # Compression.Landmark.Context.Tree: the receiving parametron's storage as a tree of landmarks

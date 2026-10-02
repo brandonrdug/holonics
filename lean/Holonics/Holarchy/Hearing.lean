@@ -1,5 +1,5 @@
 import Holonics.Foundation.CausalRelevance
-import Holonics.Foundation.Standing
+import Holonics.Foundation.Standing.Law
 import Holonics.Holarchy.Reception
 import Mathlib.LinearAlgebra.Dual.Lemmas
 
@@ -269,6 +269,38 @@ theorem mem_pulledBack_iff (F : U →ₗ[K] W) (φ : Module.Dual K U) :
   exact forall_congr' fun δ => by rw [LinearMap.mem_ker]; rfl
 
 end Dual
+
+/-! The source momentum descends precisely when its hidden kinetic rate vanishes. -/
+section KineticMomentum
+open Matrix Holonics.HolonCore.KineticFace
+variable {n m : Type*} [Fintype n] [Fintype m] [DecidableEq n] [DecidableEq m]
+theorem source_momentum_descends_iff (M : Matrix n n ℝ) (A : Matrix m n ℝ)
+    (hM : M.PosDef) (hA : Function.Surjective A.mulVec) (v : n → ℝ) :
+    momentumCovector M v ∈ LinearMap.range A.mulVecLin.dualMap ↔ hidden M A v = 0 := by
+  rw [Holonics.Receiver.Hearing.mem_pulledBack_iff]
+  constructor
+  · intro annihilates
+    have hnull : Holonics.Receiver.Hearing.Null A.mulVecLin (hidden M A v) :=
+      hidden_null M A hM hA v
+    have hp := annihilates _ hnull
+    change (M *ᵥ v) ⬝ᵥ hidden M A v = 0 at hp
+    rw [momentum_split M A hM v, add_dotProduct] at hp
+    have hface : (Aᵀ *ᵥ (faceMetric M A *ᵥ (A *ᵥ v))) ⬝ᵥ hidden M A v = 0 := by
+      rw [dotProduct_comm, dotProduct_transpose_mulVec,
+        hidden_null M A hM hA v, dotProduct_zero]
+    rw [hface, zero_add, dotProduct_comm] at hp
+    by_contra hne
+    have positive := hM.dotProduct_mulVec_pos hne
+    simp only [star_trivial] at positive
+    linarith
+  · intro hh δ hδ
+    change A *ᵥ δ = 0 at hδ
+    change (M *ᵥ v) ⬝ᵥ δ = 0
+    rw [momentum_split M A hM v, hh, mulVec_zero, add_zero, dotProduct_comm,
+      dotProduct_transpose_mulVec, hδ, dotProduct_zero]
+
+end KineticMomentum
+
 
 /-! ## 4. The zero-storage receiver hears without storing -/
 

@@ -860,4 +860,71 @@ section Audit
 
 end Audit
 
+/-! The kinetic restriction consumes this ring's existing modeForm. -/
+section KineticReceiver
+open Holonics.HolonCore Holonics.HolonCore.KineticFace
+theorem ring_face_energy_balance {n m : Type*} [Fintype n] [Fintype m]
+    [DecidableEq n] [DecidableEq m] (K M : Matrix n n ℝ) (A : Matrix m n ℝ)
+    (hM : M.PosDef) (hA : Function.Surjective A.mulVec) (u w : n → ℝ) :
+    storageEnergy (modeForm K M) (Sum.elim u w) =
+      storageEnergy K u + storageEnergy (faceMetric M A) (A *ᵥ w) +
+        storageEnergy M (hidden M A w) := by
+  have block : storageEnergy (modeForm K M) (Sum.elim u w) =
+      storageEnergy K u + storageEnergy M w := by
+    simp [storageEnergy, modeForm, Matrix.fromBlocks_mulVec,
+      sumElim_dotProduct_sumElim]
+    ring
+  rw [block, energy_split M A hM hA w]
+  ring
+
+def firstModeMatrix : Matrix (Fin 1) (Fin 2) ℝ := !![1, 0]
+
+theorem firstModeMatrix_surjective : Function.Surjective firstModeMatrix.mulVec := by
+  intro w
+  refine ⟨![w 0, 0], ?_⟩
+  ext i
+  fin_cases i
+  simp [firstModeMatrix, Matrix.mulVec, dotProduct, Fin.sum_univ_two]
+
+/-- The concrete one-mode read consumes the general finite theorem and the ring's
+existing storage form. M may couple the two rates; the remainder is retained. -/
+theorem ring_first_mode_balance (K M : Matrix (Fin 2) (Fin 2) ℝ)
+    (hM : M.PosDef) (u w : Fin 2 → ℝ) :
+    storageEnergy (modeForm K M) (Sum.elim u w) =
+      storageEnergy K u + storageEnergy (faceMetric M firstModeMatrix)
+        (firstModeMatrix *ᵥ w) + storageEnergy M (hidden M firstModeMatrix w) :=
+  ring_face_energy_balance K M firstModeMatrix hM firstModeMatrix_surjective u w
+
+theorem ring_kinetic_two_mode_reading (K : Matrix (Fin 2) (Fin 2) ℝ)
+    (m₀ m₁ : ℝ) (u w : Fin 2 → ℝ) :
+    storageEnergy (modeForm K (Matrix.diagonal ![m₀, m₁])) (Sum.elim u w) =
+      storageEnergy K u + (1 / 2 : ℝ) * m₀ * (w 0)^2 +
+        (1 / 2 : ℝ) * m₁ * (w 1)^2 := by
+  simp [storageEnergy, modeForm, Matrix.fromBlocks_mulVec,
+    Matrix.mulVec_diagonal, dotProduct, Fin.sum_univ_two]
+  ring
+
+variable {n m : Type*} [Fintype n] [Fintype m] [DecidableEq n] [DecidableEq m]
+theorem projected_ring_generator_with_hidden_return
+    (K M : Matrix n n ℝ) (A : Matrix m n ℝ) (u w : n → ℝ) :
+    (fromBlocks A 0 0 A) *ᵥ ((ringGenerator K M) *ᵥ Sum.elim u w) =
+      Sum.elim (A *ᵥ w)
+        (-(A *ᵥ (M⁻¹ *ᵥ (K *ᵥ horizontal M A (A *ᵥ u)))) -
+          A *ᵥ (M⁻¹ *ᵥ (K *ᵥ hidden M A u))) := by
+  have hu : u = horizontal M A (A *ᵥ u) + hidden M A u := by
+    unfold Holonics.HolonCore.KineticFace.hidden
+    abel
+  have hacc : A *ᵥ (M⁻¹ *ᵥ (K *ᵥ u)) =
+      A *ᵥ (M⁻¹ *ᵥ (K *ᵥ horizontal M A (A *ᵥ u))) +
+        A *ᵥ (M⁻¹ *ᵥ (K *ᵥ hidden M A u)) := by
+    conv_lhs => rw [hu]
+    simp only [mulVec_add]
+  simp only [ringGenerator, fromBlocks_mulVec, zero_mulVec, one_mulVec, zero_add,
+    add_zero]
+  change Sum.elim (A *ᵥ w) (A *ᵥ (-(M⁻¹ * K) *ᵥ u)) = _
+  rw [neg_mulVec, mulVec_neg, ← mulVec_mulVec, hacc, neg_add_rev]
+  simp only [sub_eq_add_neg, add_comm]
+
+end KineticReceiver
+
 end Holonics.HNN.Ring

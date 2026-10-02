@@ -1,5 +1,5 @@
 import Holonics.Holon.Element
-import Holonics.Holon.Restriction
+import Holonics.Holon.Restriction.Morphism
 
 /-!
 # Holon.Law: interact, receive, advance, restrict and pullback

@@ -4,6 +4,7 @@ import Holonics.Foundation.CausalChord
 import Holonics.Foundation.FractalPacking
 import Mathlib.LinearAlgebra.Dual.Lemmas
 import Mathlib.LinearAlgebra.Matrix.Charpoly.Basic
+import Mathlib.Data.List.GetD
 
 /-!
 # The source Holon: phase-carried moments with ring clocks, offsets, standing, chord and address

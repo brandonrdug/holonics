@@ -1,6 +1,7 @@
 import Holonics.Holarchy.Join
 import Holonics.Foundation.HodgeReceiver
 import Holonics.Aeon.Clock.Epoch
+import Holonics.Holon.Restriction
 
 /-!
 # Holarchy.View: a Holarchy's quantities belong to the receiver

@@ -1,6 +1,7 @@
 import Holonics.Physics.Fluid.Cells
 import Holonics.Objects.Pairing
 import Mathlib.LinearAlgebra.CrossProduct
+import Mathlib.Algebra.Order.Chebyshev
 
 /-!
 # Fluid.ControlVolume: per-face returns, the joined balance, viscous heat and the coholon reading
