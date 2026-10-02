@@ -404,3 +404,65 @@ from w16, with everything else equal, it reads whether the U6 move's `E` shorten
 held-out code. [agent-inferred] The gate is one grain per held-out station: w16's held-out combined
 code below m6's by at least `1024 · 1/16 = 64` bits. If it is not, the U6 move's gains do not reach the
 machine's receiving path, and the bank chain stops as §6 says.
+
+## 8. What turns the Kinetic step away from `G`, and the throw's acceptance law
+
+Read at the founded opening C0 on the arm lock-dec, 8 requests at seed `2026093061`. The receipts are
+in this record's receipts directory: `q1_metric_steps.txt` (runner 1, `fe9c58e9`) and
+`q10_kinetic_coupling.txt` (runner 1, `eeafdf7`). Every cosine is a signed squared cosine against the
+native gradient `d = −Aᵀc`, in `/4096` cells.
+
+**The target shares cannot carry the turn.** The Coordinate and Witness unit steps lie along `d` at
+`[4068, 4069)`. The Kinetic and KineticModulus steps lie at `[37, 38)`, which needs a condition number
+near 440 (#235). The 64 lock terms' target shares run from `153439/4769705` to `269508/620323`, so
+`max(1/θ_t)/min(1/θ_t) = 34742531220/2572479481 ∈ [13, 14)`. A diagonal reweighting with spread
+`κ < 14` keeps `cos² ≥ 4κ/(κ+1)² > 56/225 = (1019 + 101/225)/4096`, so the `1/θ_t` weights alone stay
+in `[1019, 1020)` or above.
+
+**No single block of the reading Gram carries it either.** The step is `M⁻¹Aᵀμ`: the chart
+`M⁻¹ = H′⁻¹` applied to the readings' pullback, with `μ` from the conjugate-gradient solve of the
+witness's form `F = diag(θ) − θθᵀ` against `K = A M⁻¹ Aᵀ` (`kinetic_lift`). `F` acts term by term, so
+any coupling across terms comes only through `K`, from terms that share rows of `E`. The chart alone
+turns nothing: its first iterate `M⁻¹d` lies at `[4068, 4069)`. With `K` cut to blocks:
+
+| `K` read as | Euclidean | `M`'s metric | Solve |
+|---|---|---|---|
+| its diagonal, `μ_t = (1/θ_t)/K_tt` | `[662, 663)` | `[621, 622)` | closed form |
+| 64 term blocks | `[852, 853)` | `[800, 801)` | all converged at 5 iterates |
+| 8 request blocks (8 terms each) | `[355, 356)` | `[339, 340)` | 4 converged at 38–40, 4 exhausted at 40 |
+| whole | `[37, 38)` | `[37, 38)` | exhausted at 320 |
+
+The per-target weight `1/(θ_t K_tt)` makes most of the turn. Coupling inside a term partly undoes it,
+coupling inside a request takes it to `[355, 356)`, and the coupling across requests through shared
+`E` completes it. The derivations thread's prediction, term blocks in the Coordinate band and request
+blocks reaching `[37, 38)`, fails on both counts.
+
+**The deposited step is the solve's 320th iterate, not a converged `K⁻¹w`.** The joint iterates fall
+monotonically: `[4068, 4069)` at 1, `[2659, 2660)` at 2, `[653, 654)` at 8, `[258, 259)` at 16,
+`[110, 111)` at 32, `[54, 55)` at 64, `[42, 43)` at 128, `[38, 39)` from 250 to 257, and `[37, 38)` from
+258 to 320. So the direction holds to one cell over its last 63 iterates, and the turn belongs to `K`,
+not to where the solve stopped. In exact arithmetic the solve reaches `K⁻¹w` within its 320 reading
+coordinates. Holding every iterate at `JOINT_BITS` (`joint_held`) breaks that, and the solve ends
+without its `2⁻³²` energy floor. [agent-inferred] That is a law of the solve's representation, owed
+with its residual read, not a property of the metric.
+
+**The throw runs under strict descent, so its control does too.** The throw chain (#240) calls
+`move-once`, which holds `ReleaseExcursion::monotone()`. Q2's chains run #202's interval, in which a
+successor's released code length is unchecked until the interval closes. At C0 the same trial,
+η 1/2 along the Coordinate direction, therefore separates them. Its own release `[517650, 517656)`
+lies above the opening's `[500197, 500203)`, so strict descent refuses it and the throw adopts η 1/4
+at `[495714, 495719)`. The Coordinate chain adopts η 1/2 with its run open. The throw is read against
+a control run on the same driver with `coordinate` in place of `throw`. That control's first move is
+byte-identical to the throw's first move, `m0`. [PC_QUEUE](../runs/u6/PC_QUEUE.md) P5 reads all four
+move-16 states.
+
+At `m0`, the slope along `m0`'s own move is positive: `G` at `m0` pairs positively with
+`E_c0 − E_m0`, at squared cosine `[354, 355)`. So `m0` already lies past the floor of its line. That is
+the crossing jump, not a misoriented momentum. The derivations thread's floor law, which coasts
+`min(1, τ*)` with `τ* = −s/κ_c` from the secant curvature, is on #240.
+
+**The exposure gate is read after the opening deposit.** By #244, `R = 0` at every U6 state is the
+opening value, the first deposit moves `R` alone, and `C` and `E` learn from the second deposit on.
+`executed expose` deposits once per window. Its held-out cells come after every training cell, so they
+are read after about 21500 deposits from each state, and the gate is not decided by the features'
+Gram at the first deposit.
