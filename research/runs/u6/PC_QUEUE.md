@@ -75,22 +75,26 @@ is fixed and is not raised.
 Gate: w16's held-out combined code below m6's by at least `1024·1/16 = 64` bits. Report the held-out and
 training lines whole.
 
-## P5. The joint held-out read of the five move-16 states (waits on all five)
+## P5. The joint held-out read of the six move-16 states (waits on all six)
 
-When these chains each store their move-16 state, the main line names the five paths here, and the PC
+When these chains each store their move-16 state, the main line names the six paths here, and the PC
 reads them in one call at 16 threads:
 - Q2's Coordinate chain and Q2's Kinetic control, both under #202's interval acceptance;
-- the corrected throw (#240's whole-move power test, `−⟨∇L, ηD + c⟩` along `w = D + c/η₀`), under
-  strict descent;
-- the coast-alone throw chain, which released its coast at every move, so it is the throw held at rest
-  (ρ held), under strict descent;
+- the at-rest throw: the throw chain through m5 (every move released from rest), then its own chain
+  from `m5-throw.state` to m16, releasing from rest at every move (ρ held);
+- the coast-alone throw: the original throw chain, which first carried its coast at m6 (#240's rule
+  before `5f254c2d`);
+- the whole-move throw (#240's whole-move power test, `−⟨∇L, ηD + c⟩` along `w = D + c/η₀`);
 - the strict-descent Coordinate control, the same driver with `coordinate`, as the baseline. It
   matches the throw through m1 and leaves it at m2, where Coordinate moves ρ.
 
-The corrected throw is read against the coast-alone chain: same driver, same acceptance, ρ held in
-both, and only the carried momentum differs.
+The last four use strict descent. Each throw is read against the at-rest throw, which has the same
+driver, the same acceptance and ρ held; only the carried momentum differs. Pairs follow the paired
+rule: per held-out station, `b` (right in A only), `c` (right in B only), and the exact one-sided sign
+tail on `b` of `b + c` at `1/2`, released only at a tail of at most `1/64`.
 ```
-RAYON_NUM_THREADS=16 timeout 8494 $B executed evaluate order2 2026093012 128 out/p5-move16 coord16=<path> kin16=<path> throw16=<path> rest16=<path> tctl16=<path>
+RAYON_NUM_THREADS=16 timeout 10192 $B executed evaluate order2 2026093012 128 out/p5-move16.sections coord16=<path> kin16=<path> rest16=<path> coast16=<path> whole16=<path> tctl16=<path>
 ```
-The deadline is three times the measured 566219 ms per state at 16 threads, for five states
-(`15·566219 = 8493285` ms). Report whole sections and stations right, station by station, for each state.
+Pass a file path for the sections, not a directory. The deadline is three times the measured
+566219 ms per state at 16 threads, for six states (`18·566219 = 10191942` ms). Report whole sections and
+stations right, station by station, for each state.
