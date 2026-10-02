@@ -39,3 +39,13 @@ move 10: probe exit 0;   q2k10 kinetic: the incumbent: ρ 102837/131072; L ∈ [
 move 11: probe exit 0;   q2k11 kinetic: the incumbent: ρ 102837/131072; L ∈ [261153/4096, 261157/4096) nats, X ∈ [81189/4096, 81193/4096) nats; solved 10 of 64; whole 0 (released 8, stations right 21); 966116 ms
       trials: η 1/8 ρ unmoved mask [224679/4096, 224683/4096) own [280011/4096, 280016/4096) adopted; γ_ρ [651621/4096, 651622/4096)
   run move 1: successor's own release: ρ 102837/131072; L ∈ [280011/4096, 280016/4096) nats, X ∈ [102740/4096, 102744/4096) nats; solved 14 of 64; whole 0 (released 8, stations right 19); 966118 ms; open
+move 12: probe exit 0;   q2k12 kinetic: the incumbent: ρ 102837/131072; L ∈ [280011/4096, 280016/4096) nats, X ∈ [102740/4096, 102744/4096) nats; solved 14 of 64; whole 0 (released 8, stations right 19); 678846 ms
+      trials: η 1/8 ρ unmoved mask [227855/4096, 227859/4096) own [279813/4096, 279817/4096) adopted; γ_ρ [69575/4096, 69576/4096)
+  run move 2: successor's own release: ρ 102837/131072; L ∈ [279813/4096, 279817/4096) nats, X ∈ [103533/4096, 103537/4096) nats; solved 14 of 64; whole 0 (released 8, stations right 26); 678847 ms; open
+move 13: probe exit 0;   q2k13 kinetic: the incumbent: ρ 102837/131072; L ∈ [279813/4096, 279817/4096) nats, X ∈ [103533/4096, 103537/4096) nats; solved 14 of 64; whole 0 (released 8, stations right 26); 710201 ms
+      trials: η 1/8 ρ unmoved mask [230767/4096, 230771/4096) own [267400/4096, 267404/4096) adopted; γ_ρ [297612/4096, 297613/4096)
+  run move 3: successor's own release: ρ 102837/131072; L ∈ [267400/4096, 267404/4096) nats, X ∈ [95203/4096, 95207/4096) nats; solved 18 of 64; whole 0 (released 8, stations right 28); 710203 ms; open
+move 14: probe exit 0;   q2k14 kinetic: the incumbent: ρ 102837/131072; L ∈ [267400/4096, 267404/4096) nats, X ∈ [95203/4096, 95207/4096) nats; solved 18 of 64; whole 0 (released 8, stations right 28); 648910 ms
+      trials: η 1/8 ρ unmoved mask [242929/4096, 242934/4096) own [248321/4096, 248325/4096) adopted; γ_ρ [459956/4096, 459957/4096)
+  run move 4: successor's own release: ρ 102837/131072; L ∈ [248321/4096, 248325/4096) nats, X ∈ [85225/4096, 85228/4096) nats; solved 24 of 64; whole 0 (released 8, stations right 21); 648912 ms; closes
+  the run closes; held state now out/q2k/q2k14/q2k14-kinetic.state
