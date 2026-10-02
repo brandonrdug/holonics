@@ -93,8 +93,16 @@ driver, the same acceptance and ρ held; only the carried momentum differs. Pair
 rule: per held-out station, `b` (right in A only), `c` (right in B only), and the exact one-sided sign
 tail on `b` of `b + c` at `1/2`, released only at a tail of at most `1/64`.
 ```
-RAYON_NUM_THREADS=16 timeout 10192 $B executed evaluate order2 2026093012 128 out/p5-move16.sections coord16=<path> kin16=<path> rest16=<path> coast16=<path> whole16=<path> tctl16=<path>
+RAYON_NUM_THREADS=16 timeout 19493 $B executed evaluate order2 2026093012 128 out/p5-move16.sections coord16=<path> kin16=<path> rest16=<path> coast16=<path> whole16=<path> tctl16=<path>
 ```
-Pass a file path for the sections, not a directory. The deadline is three times the measured
-566219 ms per state at 16 threads, for six states (`18·566219 = 10191942` ms). Report whole sections and
-stations right, station by station, for each state.
+Pass a file path for the sections, not a directory. `evaluate` writes it with `std::fs::write`, which
+creates no parent directory, so `out/` must exist before launch.
+
+The deadline is three times the largest held-out read per state measured before launch, for six
+states. The reads at 16 threads, each on a machine shared with other runs, are:
+- w16, `566219` ms (`heldout_end.txt` in the refits record's receipts);
+- q411, `712634` ms (`claude/pc-receipts` `141895d6`, `paired/q411_eval.txt`);
+- m13-4 (r13close), `1082906` ms (the same commit, `paired/m13-4_eval.txt`).
+
+The largest is `1082906` ms, so the deadline is `18·1082906 = 19492308` ms. It is fixed here before
+launch and never raised. Report whole sections and stations right, station by station, for each state.
