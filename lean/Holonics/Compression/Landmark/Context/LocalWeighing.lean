@@ -93,11 +93,13 @@ certificates plus each join's rounding and drift, a cell's its digits' summed, a
 `StopMixture` carry them. The own face's rounding at each landmark has no executed owner since
 `LocalLaw` was retired (`89460425`).
 
-[open] Owed in #62: the share step's rebase in the executed fixed share
-(`receiver::population::Dormancy`) needs `forward_executed` for nonnegative faces, as
-`Dormancy.forward_dominance_nonneg` extends `forward_dominance`; `share_log_lipschitz` is its
-ratio part. No a-priori per-cell rule like `Landmarks::face_rule` is stated for the join tree:
-its certificate is read per cell from the charts.
+[proved-derived; formal-checked] The share step's rebase in the executed fixed share
+(`receiver::population::Dormancy`) is `Dormancy.{forward_executed_nonneg,
+dormant_survivor_executed, dormant_executed_code}`: `forward_executed` for nonnegative faces, with
+the rounding on the weight after the kernel, and the executed filter within `3 r 2^(−62)` bits of
+the ideal bound; `share_log_lipschitz` is its two-face ratio part. No a-priori per-cell rule like
+`Landmarks::face_rule` is stated for the join tree: its certificate is read per cell from the
+charts.
 
 | Lean | Rust |
 |---|---|
