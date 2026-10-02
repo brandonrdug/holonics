@@ -211,8 +211,11 @@ on the cut index:
    - the first after the wall, where the jump is read exactly.
 
    No state lies between them.
-4. **Cross the wall as its own step.** Whether to cross is then the endpoint comparison of the
-   release record: the jump is repaid or not by later steps.
+4. **Decide the wall on its exact jump.** The jump `J_c` is the comparison read at one
+   constitution on two commitment orders, so it does not shrink with the step (the flip record's
+   §2b, `crossing_cost_le`). Stop at the last state before the wall, which is certified. Cross a
+   negative wall in one move. A positive wall is crossed only by a run of moves that closes below
+   its opening state (the release record), since no single move's decrease can pay it.
 
 Bisecting on the cut index resolves a wall to one coordinate move. Halving resolves it to a factor
 of two in `η`. The reads number `log₂ N(η_start) ≤ log₂(η_start‖d‖₁/u + n)`, so the fixed number
