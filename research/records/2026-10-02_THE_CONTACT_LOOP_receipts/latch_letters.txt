@@ -1,0 +1,15 @@
+== the standing cut (6,148 cells, held out from 4,958)
+cell tree: development 8936120/2^9, held out 13750868/2^12; coins: development 8968739/2^9, held out 13794089/2^12
+pca latch, hold 0.5: development 8941129/2^9, held out 13707740/2^12
+pca latch, hold 1.0: development 8962670/2^9, held out 13789046/2^12
+pca latch, hold 2.0: development 8950203/2^9, held out 13760711/2^12
+pca latch, hold 4.0: development 8965528/2^9, held out 13763114/2^12
+set/reset latch (set 46, reset 32; development conditional entropy 12230401/2^9): development 8873843/2^9, held out 13741390/2^12
+== the choosing cut's first 200,000 cells (development to 170,000)
+cell tree: development 11097227/2^5, held out 15474099/2^8; coins: development 11101457/2^5, held out 15475106/2^8
+pca latch, hold 0.5: development 11101295/2^5, held out 15475218/2^8
+pca latch, hold 1.0: development 11101169/2^5, held out 15474937/2^8
+pca latch, hold 2.0: development 11099782/2^5, held out 15474670/2^8
+pca latch, hold 4.0: development 11095951/2^5, held out 15465098/2^8
+set/reset latch (set 116, reset 32; development conditional entropy 12605678/2^4): development 11100122/2^5, held out 15472984/2^8
+args: latch_letters.py; the standing cut under 2 minutes, the choosing cut's 200,000 cells 651 s

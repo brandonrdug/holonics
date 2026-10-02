@@ -1405,3 +1405,49 @@ need a state that persists across words (the continuing word exists only within 
 itself, not of its counts. Both change the retention law's quotient, not a declared value, so
 neither is a branch option to gate on campaign 1: each is a design of the field's law with its
 Lean counterpart first.
+
+## 34. A latched sheet kept across windows: state beyond the counts, and what it is worth on text
+
+**The law, derived from the library.** The receiving parametron reads its seed "linear, then
+threshold" (`ring::lock`): past the bifurcation the in-phase coordinate grows by the Floquet
+multiplier and the sheet is its sign. Kept across the window boundary instead of released, the
+sheet's amplitude seeds the next window beside the new readout `L_t`, so
+`x_(t+1) = μ_w x_t + L_t`, `s = sign x`, with `μ_w` the in-phase multiplier over a window at the
+declared pump (`p = 5/8`, the bank's). The library's executed pump has no saturation, so a kept
+amplitude grows without bound and the latch becomes absorbing; read at its locked sheet instead
+(`x_t` replaced by `s_t`, the lock's unit), the law is `s_(t+1) = sign(a s_t + L_t)`, a recurrent
+threshold state. Its hold `a` is the locked unit over the readout's scale, which the library does
+not declare, so it is a declared value chosen on the development cells (the ladder `1/2` to `4` in
+the readout's spread, charged two bits), as the stop prior and the prior mass were.
+- *What it can represent.* A flip-flop: inputs above the hold set or reset it, smaller ones leave
+  it. So it can hold a bit for any length, past the depth-63 address and past the counts' memory
+  (a span opened by one cell and closed by another). One sheet cannot toggle on a single cell
+  (parity is not a threshold of one input and one state) and cannot count.
+- *Its ceiling.* At most one bit a sheet a window, and its information about the next cell is at
+  most the state's entropy given the address.
+- *Its charge.* Supplied as a letter, the bundle tree's join, at most one bit a dyadic cell plus the
+  letter's description (`cell_only_dominance_with_feature_charge`); a searched input adds its search.
+
+**Measured** ([receipt](2026-10-02_THE_CONTACT_LOOP_receipts/latch_letters.txt), `latch_letters.py`;
+the state the first letter of a bundle tree joined with the cell tree, as in §28 and §33). Two inputs,
+each the field's best case: the top principal readout of the last few cells' counts, and a set/reset
+pair of cells searched on the development cells among the 30 most frequent (870 pairs).
+
+| | standing cut, development | held out | 200k choosing cells, development | held out |
+|---|---|---|---|---|
+| the cell tree alone | `8936120/2^9` | `13750868/2^12` | `11097227/2^5` | `15474099/2^8` |
+| fair coins | `8968739/2^9` | `13794089/2^12` | `11101457/2^5` | `15475106/2^8` |
+| the readout latch, hold chosen on development | `8941129/2^9` (½) | `13707740/2^12` | `11095951/2^5` (4) | `15465098/2^8` |
+| the set/reset latch | `8873843/2^9` | `13741390/2^12` | `11100122/2^5` | `15472984/2^8` |
+
+On campaign 1's cut no latch codes below the cell tree on the development cells except the searched
+set/reset pair (`.` sets, space resets), whose 122 development bits shrink to 2 held out, below its
+search's ten bits. At 200,000 cells the readout latch at the ladder's top hold saves about 40
+development and 35 held-out bits of some 60,000 (a seventeenth of a percent), net of its join.
+
+[agent-inferred] A kept sheet does carry state the counts cannot, and at scale a little of it pays.
+On campaign 1 it does not pass the gate, and at half a million cells its share is a few hundredths
+of a percent, against a change of the retention law (the receiver's sheet in `Current`) with its
+Lean counterpart. It is not built. Persistence through a latched element is measured out on text
+with this library: the field's ceiling stays the few bits of §33, plus at most this latch's
+hundredths of a percent at scale.
