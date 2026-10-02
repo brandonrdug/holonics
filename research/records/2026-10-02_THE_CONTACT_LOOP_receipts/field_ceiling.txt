@@ -1,0 +1,13 @@
+== the standing cut (6,148 cells, held out from 4,958)
+tree alone: development 9195040/2^9, held out 14202984/2^12
+memory 2^2 cells: development 10485225/2^9, held out 8819885/2^11
+memory 2^4 cells: development 9775359/2^9, held out 15045748/2^12
+memory 2^6 cells: development 9384066/2^9, held out 14513965/2^12
+memory 2^8 cells: development 9243745/2^9, held out 14328402/2^12
+== the choosing cut's first 120,000 cells (development 0..100,000, the rest scored as held out)
+tree alone: development 12568203/2^6, held out 12869625/2^8
+memory 2^2 cells: development 14045253/2^6, held out 14491005/2^8
+memory 2^4 cells: development 13116233/2^6, held out 13845467/2^8
+memory 2^6 cells: development 12763538/2^6, held out 12976211/2^8
+memory 2^8 cells: development 12680852/2^6, held out 12836809/2^8
+args: field_ceiling.py; the standing cut under 60 s, the choosing cut's 120,000 cells 163 s
