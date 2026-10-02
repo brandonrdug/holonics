@@ -207,3 +207,28 @@ elements, the source port and the readout, and this ablation does not split thei
 Time: projected `256 · 196 = 50,176` ms from the 16-window read (3,131 ms), deadline 100 s; measured
 74,202 ms, peak 308,056,064 bytes. The 16 windows the projection was taken from all fall in the
 cut's opening, which runs cheaper than the windows after it, and that is where the error comes from.
+
+## 9. Why the change is read and not useful: it lands in the receiver's fibre
+
+Astra's reviews (October 2) asked for the continuing consumer as well: the window's own retained
+end change continued with `Word::continuing` at the predecessor's and at the actual successor's
+operands, with nothing injected, on the clock after the window's junction steps. Its anchors go
+through `ReceivingPhases::read` and the faces at the grain. They also asked that anchors, logits and
+grain cells be compared before the score
+([receipt](2026-10-02_THE_CONTACT_LOOP_receipts/ablation_256_continued.txt), 256 windows, 80,478 ms):
+
+| Consumer | Anchors or contact states differ | Exact logits differ | Faces differ | Grain cells above the fibre differ |
+|---|---|---|---|---|
+| the exposure's (a fresh word at the next cut) | 251 | 232 | 232 | **14** |
+| the continuing word (the window's own change) | 250 | 250 | 250 | **36** |
+
+The next window's code changes at exactly 14 windows (strictly lower 4, strictly higher 10), the
+windows where the fresh consumer's grain cells differ above the fibre. A face's code length reads
+each class's carry and phase class and the normalizer (`Face::code_length`:
+`log₂ Z − (n_c − n_top) − k_c/L`). It never reads the fibre `ε_c`.
+
+So the contacts' change reaches the receiver at nearly every window, but almost always inside the
+receiver's unresolved fibre, below its grain, where the comparison cannot see it and its covector
+cannot reward it. That is the measured cause of "read but not useful". Raising the receiver's
+grain, or a comparison that reads the fibre, is the next lever, and either is an architecture
+choice: the grain is the receiver's declared tolerance.

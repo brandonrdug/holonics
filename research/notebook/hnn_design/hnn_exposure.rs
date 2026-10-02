@@ -977,7 +977,9 @@ fn contact_ablation_run(field: &Field, cut: &Cut, windows: usize) {
     let readings = contact_ablation(&Reference::campaign_one(), field, &cut.cells, windows)
         .expect("the contact ablation");
     let (mut lower, mut higher, mut equal, mut overlap, mut moved) = (0, 0, 0, 0, 0);
-    let (mut states, mut faces) = (0, 0);
+    let (mut states, mut logits, mut faces) = (0, 0, 0);
+    let (mut c_anchors, mut c_logits, mut c_faces) = (0, 0, 0);
+    let (mut cells, mut c_cells) = (0, 0);
     for r in &readings {
         let order = if r.contacts.upper < r.held.lower {
             lower += 1;
@@ -994,14 +996,24 @@ fn contact_ablation_run(field: &Field, cut: &Cut, windows: usize) {
         };
         moved += usize::from(!r.moved.is_empty());
         states += usize::from(r.states_differ);
+        logits += usize::from(r.logits_differ);
         faces += usize::from(r.faces_differ);
+        c_anchors += usize::from(r.continued_anchors_differ);
+        c_logits += usize::from(r.continued_logits_differ);
+        c_faces += usize::from(r.continued_faces_differ);
+        cells += usize::from(r.cells_differ);
+        c_cells += usize::from(r.continued_cells_differ);
         println!(
-            "  window at {}: contacts moved {:?}; work {}; next window's contact states differ {}, faces differ {}; code held [{}, {}) contacts [{}, {}): {order}; {} ms",
+            "  window at {}: contacts moved {:?}; work {}; next window's contact states differ {}, logits {}, grain faces {}; continued anchors {}, logits {}, grain faces {}; code held [{}, {}) contacts [{}, {}): {order}; {} ms",
             r.position,
             r.moved,
             r.work,
             r.states_differ,
+            r.logits_differ,
             r.faces_differ,
+            r.continued_anchors_differ,
+            r.continued_logits_differ,
+            r.continued_faces_differ,
             r.held.lower,
             r.held.upper,
             r.contacts.lower,
@@ -1010,7 +1022,7 @@ fn contact_ablation_run(field: &Field, cut: &Cut, windows: usize) {
         );
     }
     println!(
-        "contact ablation: {} windows read; a contact moved at {moved}; the next window's contact states differ at {states}, its faces at {faces}; its code strictly lower {lower}, strictly higher {higher}, equal {equal}, overlapping {overlap}; {} ms; resident {}",
+        "contact ablation: {} windows read; a contact moved at {moved}; the next window's contact states differ at {states}, its logits at {logits}, its grain faces at {faces} (above the fibre at {cells}); continued from the window's own change: anchors at {c_anchors}, logits at {c_logits}, grain faces at {c_faces} (above the fibre at {c_cells}); the next window's code strictly lower {lower}, strictly higher {higher}, equal {equal}, overlapping {overlap}; {} ms; resident {}",
         readings.len(),
         clock.elapsed().as_millis(),
         exterior::resident_set().map_or_else(|| "unread".to_string(), |(now, peak)| format!("{now} now, {peak} peak"))

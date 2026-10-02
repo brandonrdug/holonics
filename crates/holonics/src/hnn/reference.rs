@@ -172,14 +172,14 @@ use crate::hnn::port::{
     Pullback, ReceiptDetail, ResonatorPullback, RingPullback, StagedId, Transpose, WordReturn,
     port_receipt, release_width, resonance_reading, source_order, wrote_all,
 };
-use crate::hnn::propagation::{contact_exponent, path_attenuation};
+use crate::hnn::propagation::{Operands, contact_exponent, path_attenuation};
 use crate::hnn::ratio::{Faces, HolonRatio, PhaseRatio, RatioCovector, target_phases};
 use crate::hnn::realization::{apply_rows, indexed, outer_rows};
 use crate::hnn::receiving::{
     ActiveAddress, ReceivingPhases, ReceivingStep, Scored, tree_code_length,
 };
 use crate::hnn::retention::{AeonBoundary, Diamond, aeon_readings, collapse, contained, separator};
-use crate::hnn::word::{KeptWord, PowerForm, WordBalance};
+use crate::hnn::word::{KeptWord, PowerForm, Word, WordBalance};
 use crate::holon::contact::FeatureCovector;
 use crate::navigator::Clock;
 use crate::ratio::algebraic::{ExactInterval, interval_sum};
@@ -2946,10 +2946,23 @@ pub struct ContactAblation {
     pub work: Rat,
     pub held: ExactInterval,
     pub contacts: ExactInterval,
-    /// Whether the next window's word ends with different contact states, and whether its
-    /// receiving faces differ, at the contacts-only successor.
+    /// Whether the next window's word (the exposure's consumer, a fresh word at the next cut) ends
+    /// with different contact states, reads different exact logits, and different grain faces, at
+    /// the contacts-only successor.
     pub states_differ: bool,
+    pub logits_differ: bool,
     pub faces_differ: bool,
+    /// The continuing consumer (Astra's check): the window's own retained end change continued at
+    /// the predecessor's and at the successor's operands with nothing injected, on the clock after
+    /// the window's junction steps, read through the receiving phases: whether its anchors, its
+    /// exact logits and its grain faces differ.
+    pub continued_anchors_differ: bool,
+    pub continued_logits_differ: bool,
+    pub continued_faces_differ: bool,
+    /// Whether the next window's grain cells differ above the fibre (some class's carry or phase
+    /// class, what the code reads), fresh and continued; a face can differ in its fibres alone.
+    pub cells_differ: bool,
+    pub continued_cells_differ: bool,
 }
 
 /// [measured-diagnostic] **The contact loop on a cut** (Astra's check, on the host reference): the
@@ -2987,14 +3000,14 @@ pub fn contact_ablation(
         }
         Ok(true)
     };
-    type Read = (ExactInterval, Vec<[Vec<Rat>; 2]>, String);
+    type Read = (ExactInterval, Vec<[Vec<Rat>; 2]>, Option<Faces>);
     let read = |reference: &Reference, resident: &mut Resident, window: &[usize]| -> Result<Read, HnnError> {
         let (pending, refined) = reference.refine(resident, &moment, &phases)?;
         let states = match &refined.receipt.detail {
             ReceiptDetail::Refine { word, .. } => word.change.states.clone(),
             _ => Vec::new(),
         };
-        let faces = format!("{:?}", refined.forward);
+        let faces = refined.forward.into_present();
         let (_, compared) = reference.compare(resident, pending, &one_hot(window))?;
         let holon = compared.forward.into_present().expect("a compare returns its ratio");
         let mut total = ExactInterval::point(Rat::zero());
@@ -3002,6 +3015,15 @@ pub fn contact_ablation(
             total = interval_sum(&total, &phase.code_length)?;
         }
         Ok((total, states, faces))
+    };
+    // Each face's grain cells above the fibre: (carry, phase class) per class.
+    let grained = |faces: Option<&Faces>| -> Option<Vec<Vec<(BigInt, u64)>>> {
+        faces.map(|f| {
+            f.faces
+                .iter()
+                .map(|face| face.cells().iter().map(|c| (c.carry.clone(), c.phase)).collect())
+                .collect()
+        })
     };
     let mut out = Vec::new();
     for (k, span) in spans.iter().enumerate().take(windows) {
@@ -3031,6 +3053,26 @@ pub fn contact_ablation(
                     alone = alone.with_reach(reach.clone());
                 }
                 let (successor, reading) = theta.deposited(&alone)?;
+                let continued = |c: &Constitution| -> Result<(Vec<Vec<Rat>>, Faces), HnnError> {
+                    let operands = Operands::at_cut(field, c, resident.current())?;
+                    let nothing: Vec<Vec<Rat>> =
+                        word.change.storage.iter().map(|w| vec![Rat::zero(); w.len()]).collect();
+                    let mut carried = Word::continuing(
+                        field,
+                        operands,
+                        &word.change,
+                        &nothing,
+                        phases.junction_steps(),
+                    )?;
+                    let anchors = carried.forward(&phases)?;
+                    let reads = anchors
+                        .iter()
+                        .map(|anchor| phases.read(field, c, resident.current(), anchor))
+                        .collect::<Result<Vec<_>, _>>()?;
+                    Ok((anchors, Faces::of_reads(&reads, phases.grain())?))
+                };
+                let (held_anchors, held_continued) = continued(&theta)?;
+                let (moved_anchors, moved_continued) = continued(&successor)?;
                 let before = PowerForm::read(field, &theta, resident.current())?;
                 let after = PowerForm::read(field, &successor, resident.current())?;
                 let work = before.deposition_work(&after, &word.change)?;
@@ -3058,7 +3100,16 @@ pub fn contact_ablation(
                         held: held_code,
                         contacts: moved_code,
                         states_differ: held_states != moved_states,
-                        faces_differ: held_faces != moved_faces,
+                        logits_differ: held_faces.as_ref().map(|f| &f.logits)
+                            != moved_faces.as_ref().map(|f| &f.logits),
+                        faces_differ: held_faces.as_ref().map(|f| &f.faces)
+                            != moved_faces.as_ref().map(|f| &f.faces),
+                        continued_anchors_differ: held_anchors != moved_anchors,
+                        continued_logits_differ: held_continued.logits != moved_continued.logits,
+                        continued_faces_differ: held_continued.faces != moved_continued.faces,
+                        cells_differ: grained(held_faces.as_ref()) != grained(moved_faces.as_ref()),
+                        continued_cells_differ: grained(Some(&held_continued))
+                            != grained(Some(&moved_continued)),
                     });
                 }
             }
