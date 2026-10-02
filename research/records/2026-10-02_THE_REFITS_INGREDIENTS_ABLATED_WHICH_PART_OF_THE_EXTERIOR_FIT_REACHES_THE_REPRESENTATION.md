@@ -92,11 +92,13 @@ release and its targets: the surprise crossing the receiver's section, summed ov
 stations. A move deposits into `E`. Each lock in the release is a parametron settled on one half-turn
 sheet.
 - With every lock held on its sheet, `ℓ` is a smooth function of `E`: the **held-sheet comparison**
-  (the code's "fixed mask"). Each accepted move must lower it, certified at first order: a
-  dissipative descent within one basin of the lock configuration.
-- Relocking after the move can settle the release into another lock configuration, a different
-  metastable state. The released `ℓ` then differs from the held-sheet `ℓ` by the energy difference
-  between the two configurations: the **relocking jump** (the code's "flip").
+  (the code's "fixed mask"). Each accepted move must lower it, certified at first order: a descent
+  of the comparison within one lock configuration.
+- Relocking after the move can settle the release into another lock configuration. The released `ℓ`
+  then differs from the held-sheet `ℓ` by the difference of the comparison's code length between
+  the two configurations at the same `E`: the **relocking jump** (the code's "flip"). It is a
+  difference of code length, in nats. No map from this comparison to the Holons' stored energy and
+  work is derived here, so it is not called an energy (Astra's review, October 2).
 
 The Lean thread proved this split for #202. Both paths were read under it
 ([receipts](2026-10-02_THE_REFITS_INGREDIENTS_receipts/): `m7_decision_diff.txt`,
@@ -110,13 +112,21 @@ units of `1/4096` nat, each within `6/4096`.
   their leading classes change (stations 3, 6, 7). Per station: 1 `+2742`, 2 `−105`, 3 `+6100`,
   4 `+11986`, 6 `+9452`, 7 `+3815`, 0 `−4`, 5 `−2`.
   - The release locks first the station with the largest certain gap: its leading reading's lower
-    end less the strongest rival's upper end.
-  - Two of request 3's stations have gaps that overlap within the readings' cell widths, so the
-    receiver cannot rank them at its resolution. Which locked first was set by where the cells' cuts
-    fell, detail below resolution, and a deposition too small to move any resolved reading moved it.
-  - Freezing one lock first changes the context the others are read in, so the release settled
-    into another configuration. That is a symmetry broken by sub-resolution detail, and it reads
-    as a discontinuous jump in `ℓ`.
+    end less the strongest rival's upper end. Its reach is the leading reading's upper end less the
+    strongest rival's lower end.
+  - The swap is at request 3's second freeze, between stations 2 and 5 (units `1/2^24`). At m7,
+    station 2's certain gap `187540480` exceeds station 5's reach `187166208` by `374272`, about 140
+    cell widths. At the step `η = 1/2048`, station 5's certain gap `187395584` exceeds station 2's
+    reach `187339776` by `55808`. Both orders are certified at the receiver's resolution, opposite
+    ways. Along the step, station 2's gap fell by `203264` and station 5's rose by `231936`. The two
+    lock gaps truly cross, near `η ≈ 0.87/2048` if their motion is linear, just inside the smallest
+    step the move tries.
+  - The freezing order goes from `[0],[2],[4],[5],[6],[7],[3],[1]` to `[0],[5],[7],[6],[4],[3],[2],[1]`.
+    Freezing station 5 before station 2 changes the context every later station is read in, so the
+    release settles into another configuration with the same released classes. The jump in `ℓ` is a
+    level crossing of two locks' drives along the direction of deposition, not a tie below
+    resolution. No refinement of any request has an unranked station at either state (0 of 64 at
+    each). Locking unranked stations together (#207) leaves this release unchanged.
 - **Per step size η** (held-sheet decrease `d`, relocking jump):
 
   | η | `d` | jump |
@@ -131,7 +141,8 @@ units of `1/4096` nat, each within `6/4096`.
   | 1/2048 | 359 | 34038 |
 
   - From `1/64` down, the jump moves by `287` while `d` halves with each halving of η. The jump is
-    an energy difference between configurations, not a slope, so it does not shrink with the step.
+    a difference between two configurations' code lengths, not a slope, so it does not shrink with
+    the step.
   - A later run of moves repays it once its held-sheet decreases exceed the jump by one receiver
     grain `σ`: at least `(jump + σ)/d` moves. That is 95 moves at `1/2048`, and about 4 at `1/64` or 3
     at `1/32`, if the jump held.
@@ -166,5 +177,7 @@ units of `1/4096` nat, each within `6/4096`.
 [agent-inferred] The float path never repays a jump like m7's because it never makes one: its
 relocking is frequent, small and of both signs. A run of moves sized on the float rises (about 1 to
 7 moves) repays m7's jump only at step sizes of `1/64` or more, where `d` is large enough. The jump
-itself comes from two locks the receiver cannot rank at its resolution, a degeneracy of the release
-rather than of the move's size.
+itself is two locks' drives crossing along the deposition's direction, a real reordering the
+readings certify on both sides. A smaller step that stops short of the crossing (near `0.87/2048`)
+avoids it only by not crossing; the configuration on the far side is reached by any move that passes
+it.

@@ -410,6 +410,21 @@ fn main() {
         // research/records/2026-10-01_ONE_GUARDED_MOVE_FROM_THE_STUCK_STATE_PINNED_BEFORE_ITS_RUN.md).
         // Where along one move's direction the release's decisions change (record §5 of
         // research/records/2026-10-02_THE_REFITS_INGREDIENTS_ABLATED_WHICH_PART_OF_THE_EXTERIOR_FIT_REACHES_THE_REPRESENTATION.md).
+        (Some("executed"), Some("pairs")) => executed_loop::print_pairs(
+            &arguments[3],
+            arguments[4].parse().expect("a seed"),
+            arguments[5].parse().expect("a count"),
+        ),
+        (Some("executed"), Some("step-state")) => executed_loop::step_state(
+            &arguments[3],
+            arguments[4].parse().expect("a seed"),
+            arguments[5].parse().expect("a count"),
+            &arguments[6],
+            &arguments[7],
+            &arguments[8],
+            &arguments[9],
+            &arguments[10],
+        ),
         (Some("executed"), Some("locks")) => executed_loop::locks(
             &arguments[3],
             arguments[4].parse().expect("a seed"),

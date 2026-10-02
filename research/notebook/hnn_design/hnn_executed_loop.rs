@@ -1537,6 +1537,71 @@ pub(super) fn move_once(terrain: &str, seed: u64, count: usize, out: &str, sourc
     println!("executed move-once: {} ms; resident {}", clock.elapsed().as_millis(), resident());
 }
 
+/// [measured-diagnostic; October 2] **A batch's requests and targets, printed** (`executed pairs
+/// <terrain> <seed> <count>`): one line a pair, `<request cells> ; <target cells>`, so an exterior
+/// float fit trains on the very requests the native chain reads.
+pub(super) fn print_pairs(terrain: &str, seed: u64, count: usize) {
+    let declared = order_declared();
+    for (request, target) in terrain_pairs(terrain, &declared, seed, count) {
+        let cells = |v: &[usize]| v.iter().map(ToString::to_string).collect::<Vec<_>>().join(" ");
+        println!("{} ; {}", cells(&request), cells(&target));
+    }
+}
+
+/// [measured-diagnostic; October 2] **One step along a move's direction, written**
+/// (`executed step-state <terrain> <seed> <count> <out> <label=state> <arm> <metric> <η>`): the
+/// move's proposal read at the one step `η` (`executed_move_scheduled`), passed by no guard; prints
+/// the held-sheet and released comparisons and writes the successor to `<out>/<label>-<η's
+/// denominator>.state`, so its release can be read (`executed locks`).
+#[allow(clippy::too_many_arguments)]
+pub(super) fn step_state(terrain: &str, seed: u64, count: usize, out: &str, source: &str, arm: &str, metric: &str, step: &str) {
+    use holonics::hnn::executed::{MoveMetric, ReleaseExcursion, Trial, executed_move_scheduled};
+    let clock = Instant::now();
+    let declared = order_declared();
+    let engine = Engine::new(declared);
+    let bank = bank_of(declared.period, &bank_strength());
+    let ring = engine.refinement.ring();
+    let pairs = terrain_pairs(terrain, &declared, seed, count);
+    let requests = open_requests(&engine, &pairs);
+    let (comparison, _) = arm_comparison(arm);
+    let (label, spec) = source.split_once('=').expect("<label>=<source>");
+    let theta = remounted(&engine.theta, spec);
+    let metric = match metric {
+        "coordinate" => MoveMetric::Coordinate,
+        "witness" => MoveMetric::Witness,
+        "kinetic" => MoveMetric::Kinetic,
+        other => panic!("a metric, coordinate, witness or kinetic: {other}"),
+    };
+    let eta: Rat = step.parse().expect("a rational step");
+    let choose = |trials: &[Trial]| -> Option<Rat> { trials.is_empty().then(|| eta.clone()) };
+    let moved = executed_move_scheduled(
+        &engine.field,
+        &theta,
+        &requests,
+        &engine.refinement,
+        &bank,
+        BANK_GRAIN,
+        comparison,
+        metric,
+        &ReleaseExcursion::monotone(),
+        Some(&choose),
+    )
+    .expect("the step");
+    let trial = moved.trials.last().expect("the step's trial");
+    println!(
+        "executed step-state from {label} at η {eta}: incumbent L ∈ {}; held-sheet {}, released {}; {} ms",
+        cell(&moved.before.value, 1 << 12),
+        trial.value.as_ref().map_or_else(|| "not read".to_string(), |v| cell(v, 1 << 12)),
+        trial.after.as_ref().map_or_else(|| "not read".to_string(), |a| cell(&a.value, 1 << 12)),
+        clock.elapsed().as_millis()
+    );
+    let (successor, _) = moved.adopted.as_ref().expect("the step's successor");
+    let path = format!("{out}/{label}-{}.state", eta.denom());
+    #[allow(clippy::disallowed_methods)]
+    std::fs::write(&path, write_state(successor, ring)).expect("write the successor");
+    println!("  written {path}");
+}
+
 /// [measured-diagnostic; October 2] **The release's lock order read at its resolution**
 /// (`executed locks <terrain> <seed> <count> <label=state> <arm> [request]`): the batch's released
 /// comparison, then every request's release refinement by refinement through the release's own lock
@@ -1559,10 +1624,22 @@ pub(super) fn locks(terrain: &str, seed: u64, count: usize, source: &str, arm: &
     let requests = open_requests(&engine, &pairs);
     let (comparison, _) = arm_comparison(arm);
     let (label, spec) = source.split_once('=').expect("<label>=<source>");
-    let theta = remounted(&engine.theta, spec);
+    let theta = if is_continuing(spec) {
+        remounted(&engine.theta, spec)
+    } else {
+        trained(&engine.theta, engine.refinement.ring(), spec)
+    };
     let batch = compare(&engine.field, &theta, &requests, &engine.refinement, &bank, BANK_GRAIN, comparison)
         .expect("the batch's comparison");
-    println!("executed locks: {count} {terrain} requests at seed {seed}, from {label}; L ∈ {} nats", cell(&batch.value, 1 << 12));
+    let (solved, all) = solved_terms(&batch);
+    let targets: Vec<Vec<usize>> = pairs.iter().map(|(_, t)| t.clone()).collect();
+    let (whole, right, released) = batch.sections(&targets);
+    println!(
+        "executed locks: {count} {terrain} requests at seed {seed}, from {label} (ρ {}); L ∈ {} nats, X ∈ {} nats; solved {solved} of {all}; whole {whole} (released {released}, stations right {right})",
+        theta.transport(engine.refinement.ring()),
+        cell(&batch.value, 1 << 12),
+        cell(&batch.excess, 1 << 12)
+    );
     let alphabet = engine.field.alphabet();
     let at = |x: &Rat| (x * Rat::from_integer(BigInt::from(1u64 << 24))).floor();
     let (mut refinements, mut uncertified, mut stations) = (0usize, 0usize, 0usize);

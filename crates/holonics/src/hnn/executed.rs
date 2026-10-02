@@ -3280,10 +3280,12 @@ fn ladder(
         .ok_or(HnnError::MissingSourcePort { ring })?
         .clone();
     let mut trials: Vec<Trial> = Vec::new();
+    // Under a schedule, the last step's successor, read and committed by no guard.
+    let mut last: Option<(Constitution, SourceStep)> = None;
     let mut step = match schedule {
         Some(choose) => match choose(&trials) {
             Some(step) => step,
-            None => return Ok((trials, None, Some(MoveRefusal::Guards))),
+            None => return Ok((trials, last.take(), Some(MoveRefusal::Guards))),
         },
         None => start,
     };
@@ -3330,7 +3332,7 @@ fn ladder(
                 trials.push(trial);
                 match next(&trials, &step) {
                     Some(n) => step = n,
-                    None => return Ok((trials, None, Some(MoveRefusal::Guards))),
+                    None => return Ok((trials, last.take(), Some(MoveRefusal::Guards))),
                 }
                 continue;
             }
@@ -3371,7 +3373,7 @@ fn ladder(
             trials.push(trial);
             match next(&trials, &step) {
                 Some(n) => step = n,
-                None => return Ok((trials, None, Some(MoveRefusal::Guards))),
+                None => return Ok((trials, last.take(), Some(MoveRefusal::Guards))),
             }
             continue;
         }
@@ -3386,7 +3388,7 @@ fn ladder(
             trials.push(trial);
             match next(&trials, &step) {
                 Some(n) => step = n,
-                None => return Ok((trials, None, Some(MoveRefusal::Guards))),
+                None => return Ok((trials, last.take(), Some(MoveRefusal::Guards))),
             }
             continue;
         }
@@ -3413,9 +3415,12 @@ fn ladder(
         if adopted {
             return Ok((trials, Some((successor, reading)), None));
         }
+        if schedule.is_some() {
+            last = Some((successor, reading));
+        }
         match next(&trials, &step) {
             Some(n) => step = n,
-            None => return Ok((trials, None, Some(MoveRefusal::Guards))),
+            None => return Ok((trials, last.take(), Some(MoveRefusal::Guards))),
         }
     }
 }
@@ -3741,8 +3746,9 @@ pub fn executed_move_guarded(
 /// [measured-diagnostic; October 2] **The move's direction read at chosen step sizes**: the same
 /// proposal and readings as [`executed_move_guarded`], each step the schedule chooses from the trials
 /// read so far read (the fixed mask and the own release, the first-order bound recorded and not
-/// refusing) and none adopted, until it chooses none. With `None`, the committed move's ladder. A
-/// diagnostic of where along one direction the release's decisions change.
+/// refusing) and none committed, until it chooses none; `adopted` then carries the last step's
+/// successor, read and passed by no guard. With `None`, the committed move's ladder. A diagnostic
+/// of where along one direction the release's decisions change.
 #[allow(clippy::too_many_arguments)]
 pub fn executed_move_scheduled(
     field: &Field,
