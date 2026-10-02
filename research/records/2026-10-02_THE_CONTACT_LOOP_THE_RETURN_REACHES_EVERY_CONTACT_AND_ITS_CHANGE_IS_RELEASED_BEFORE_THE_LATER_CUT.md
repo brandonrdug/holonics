@@ -754,3 +754,40 @@ drift check `2X · distance ≤ ω` in the row norm) is the exact form of this s
 `A = Σ z zᵀ ⊗ F(p)` would be `(22 · 256)²` entries on campaign 1's field, so the build has to
 factor it, by the Kronecker form or by its classes' structure, before it can be kept. The fitted
 receiver of §17 still gains more held-out, so the receiver has room left.
+
+## 20. With the class metric: what is left, and what the comparison must read
+
+The same three-aeon samples run, with `R`'s class-metric step at `404f6ce8`
+([run](2026-10-02_THE_CONTACT_LOOP_receipts/class_metric_samples_run.txt), 1,255,992 ms inside the
+1,700 s deadline). The fitted receiver of `R`'s form is read at two ridges
+([fit](2026-10-02_THE_CONTACT_LOOP_receipts/class_metric_oracle.txt)), and the online law is
+replayed outside the machine on the same anchors
+([replay](2026-10-02_THE_CONTACT_LOOP_receipts/class_metric_online_sim.txt),
+`receiver_online_sim.py`). All codes are the wave's alone; uniform is 8 bits.
+
+| Next aeon after close 2 (1,138 readings) | Code (bits) |
+|---|---|
+| `R` in the machine (class-metric step) | `16176018/2^21` |
+| fitted receiver, ridge `1` (`R`'s unit prior in identity units) | `16741083/2^21` |
+| fitted receiver, ridge `1/256` (that prior in the class metric's units) | `13144385/2^21` |
+| online replay, prior `1`, identity class metric (`R` before §19) | `16746299/2^21` |
+| online replay, prior `1`, class metric | `12985815/2^21` |
+
+- **The ridge-1 fit of §17 was the wrong yardstick.** With anchors of size about `1/60`, a unit
+  ridge in identity units dominates the data, and the fit barely leaves uniform. The class metric
+  puts `R`'s prior at about `1/|A|` in its own units, and at that ridge the fitted receiver reaches
+  `13144385/2^21` bits.
+- **The law can reach that in one pass.** Replayed online on the same anchors, the class-metric
+  update with the unit prior reaches `12985815/2^21` bits on the third aeon, as low as the batch
+  fit. With the identity metric it stays at `16746299/2^21`. A smaller prior under the class metric
+  diverges (`15309238/2^14` and `15094019/2^14` bits), so the unit prior is what keeps the
+  class-metric step stable.
+- **`R` in the machine stays near `7.7` bits on the wave alone.** It is not trained on the wave
+  alone. Its covector is the comparison's at the combined face (the tree's logits plus the wave's),
+  so it learns the wave as a correction to the tree, and the wave alone is not its objective. Its
+  objective, the combined face's code on held-out cells, improved by eight bits (§19).
+
+[agent-inferred] The remaining headroom can only be read on `R`'s own objective, the combined face.
+The fitted receiver and the replay must add the tree's logits at each reading and fit or update `W`
+on top of them. That needs the tree's grain logits exported beside each receiving input, which is
+the next build.

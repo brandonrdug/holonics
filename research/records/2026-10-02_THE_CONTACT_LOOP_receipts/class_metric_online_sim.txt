@@ -1,0 +1,6 @@
+prior 8388608/2^23, identity metric: third aeon's mean code 16746299/2^21 bits over 1138 readings
+prior 8388608/2^23, class metric: third aeon's mean code 12985815/2^21 bits over 1138 readings
+prior 8388608/2^27, identity metric: third aeon's mean code 16581698/2^21 bits over 1138 readings
+prior 8388608/2^27, class metric: third aeon's mean code 15309238/2^14 bits over 1138 readings
+prior 8388608/2^31, identity metric: third aeon's mean code 16259182/2^21 bits over 1138 readings
+prior 8388608/2^31, class metric: third aeon's mean code 15094019/2^14 bits over 1138 readings
