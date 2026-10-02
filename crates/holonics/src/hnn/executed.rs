@@ -113,7 +113,8 @@
 //!   derivative on the joint unit move and `u` its largest entry change ([`ladder_start`]); with
 //!   `X⁻ = 0`, or `s_X⁺ ≥ 0`, the entry scale `½/u` alone: no division by a zero excess or a
 //!   nonnegative slope, and nothing becomes solved by it;
-//! - each carried successor `(E + ηD, ρ + ηΔρ)` (held within `[ρ/2, 1]` on the port's lattice) is
+//! - each carried successor `(E + ηD, ρ + ηΔρ)` (held within `[ρ/2, max(ρ₀, ρ)]` on the port's
+//!   lattice, `ρ₀` the founding's one-turn alias bound) is
 //!   adopted only when every commit guard holds on it: the entry bound `2^ENTRY_BOUND = 8`
 //!   ([`entry_bound`]); the first-order certificate negative on the carried move; every crossing of
 //!   its own release admissible and every lock's Floquet certificate certified; every reading
@@ -3433,7 +3434,7 @@ fn ladder(
         trial.source = Some(reading.clone());
         // The transport modulus's part of the move (module header, "The committed move"): `ρ + ηΔρ`
         // held within `[ρ/2, ceiling]` and read on the source port's lattice, nearest. The ceiling is
-        // the passive bound `1`, or `KineticModulus`'s one-turn alias bound `ρ₀`.
+        // the one-turn alias bound `max(ρ₀, ρ)` under every metric.
         let (successor, modulus_moved) = match transport {
             Some(unit) if !unit.is_zero() => {
                 let modulus = constitution.transport(ring);
@@ -3883,15 +3884,13 @@ pub fn executed_move_guarded(
     };
     // The kinetic metric's deposition: the same normal law, from the returns at the solve's
     // reading weights.
-    // `KineticModulus`'s bound on `ρ`: the founding's one-turn alias bound `ρ₀`, or the incumbent's
-    // modulus where it already stands above it (the move never lifts `ρ` past `ρ₀`).
+    // The bound on `ρ` under every metric that moves it: the founding's one-turn alias bound `ρ₀`,
+    // or the incumbent's modulus where it already stands above it (no move lifts `ρ` past `ρ₀`;
+    // October 2: the coordinate and witness moves were held only by the passive `1`).
     let joined = metric == MoveMetric::KineticModulus;
-    let ceiling = if joined {
-        let founding = constitution.founding_transport(field, ring)?;
-        founding.max(constitution.transport(ring).clone())
-    } else {
-        Rat::one()
-    };
+    let ceiling = constitution
+        .founding_transport(field, ring)?
+        .max(constitution.transport(ring).clone());
     let (samples, unit, unit_move, kinetic_modulus) = if metric == MoveMetric::Kinetic || joined {
         let mut solve =
             kinetic_solve(field, constitution, declared, requests, &proposal, &samples, None, joined)?;
@@ -5159,7 +5158,9 @@ fn kinetic_contributions(proposal: &Proposal, solve: &KineticSolve) -> Vec<Contr
 /// [measured-diagnostic; agent-inferred, October 2] **The receiver's minimum-energy move read, not
 /// taken** ([`KineticSolve`]): the incumbent's comparison, the solve with each iterate's signed
 /// squared cosine against `toward − E` when a target constitution is declared, the normal law's unit
-/// move `ΔE` and its signed squared cosine against the same direction. Nothing is retained.
+/// move `ΔE` and its signed squared cosine against the same direction. With `join`, the solve is the
+/// joined `(E, ρ)` move's ([`MoveMetric::KineticModulus`]), its `Δρ` and its two drives read before
+/// any bound holds them. Nothing is retained.
 #[derive(Clone, Debug)]
 pub struct KineticReading {
     pub before: BatchComparison,
@@ -5181,6 +5182,7 @@ pub fn kinetic_reading(
     bank: &ReceivingBank,
     grain: u32,
     comparison: Comparison,
+    join: bool,
 ) -> Result<KineticReading, HnnError> {
     let ring = declared.ring();
     let (before, reads) = incumbent(field, constitution, requests, declared, bank, grain, comparison)?;
@@ -5214,7 +5216,7 @@ pub fn kinetic_reading(
         }
     }
     reading.solve =
-        kinetic_solve(field, constitution, declared, requests, &proposal, &samples, direction.as_ref(), false)?;
+        kinetic_solve(field, constitution, declared, requests, &proposal, &samples, direction.as_ref(), join)?;
     reading.unit_move = Some(step.unit_move);
     Ok(reading)
 }

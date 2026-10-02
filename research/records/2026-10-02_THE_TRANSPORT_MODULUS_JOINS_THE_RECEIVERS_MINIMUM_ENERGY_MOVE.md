@@ -230,13 +230,49 @@ Two things follow:
 across the whole passage, not near the opening, and the direction law is local. What the opening does
 decide is the first move's direction, the sign of `own − supplied` there.
 
-## 5. The other metrics' upper bound: a separate finding
+## 4d. When a descent's basin is decided
 
-`Coordinate` and `Witness` hold `ρ + ηΔρ` within `[ρ/2, 1]`, the passive bound. So they can carry `ρ`
-above `ρ₀`, past the alias bound. The alias law does not depend on the metric, so those paths should
-take `ρ ≤ max(ρ₀, ρ)` too. This change leaves them unchanged so that it alters only the new metric's
-behaviour. The fix is the same ceiling passed to `ladder`, one line for each metric, and their
-measured records were read under the old bound.
+[derived] A descent with certified strict decrease (every adopted move lowers the comparison by
+disjoint enclosures) cannot leave the connected part of the sublevel set `{L ≤ L(start)}` that holds
+its start. So:
+
+- The basin is decided at the first state whose `L` lies below the lowest pass between the two basins
+  (the least, over paths joining them, of the largest `L` along the path). Below that level the two
+  basins lie in different parts of the sublevel set, and no certified descent crosses.
+- Above it, only the path decides, and the local direction (§4c) is the only law that acts.
+
+**Numbers from the chain.** The founded opening reads `L = 500197/4096`, `m6` reads `338257/4096`,
+`w16` `195744/4096` at `ρ₀`, and the refit's `E` `133292/4096` at `ρ*` and `310210/4096` at `ρ₀`. A
+path joining the two endpoints is `E` moved straight from `w16`'s to the refit's at `ρ₀`, then `ρ`
+walked from `ρ₀` to `ρ*` at the refit's `E`. Its largest `L` bounds the pass from above and is at
+least `310210/4096`. The `E` segment's interior is unmeasured. If its largest `L` lies below `m6`'s
+`338257/4096`, then neither the opening nor `m6` decides the basin, and the joined chain's first state
+below that level does. The main line reads the segment in `L` at a few points (`executed direction`
+reads a declared `E` leg).
+
+**The direction at the opening.** `executed joined <terrain> <seed> <count> <arm> <label=source>…`
+reads the joined solve's `Δρ` and its two drives at each source, before any bound and without moving.
+See §6 for the founded opening's reading.
+
+## 5. The other metrics' upper bound: now the founding bound
+
+`Coordinate` and `Witness` held `ρ + ηΔρ` within `[ρ/2, 1]`, the passive bound, so they could carry
+`ρ` above `ρ₀`, past the alias bound. The alias law does not depend on the metric. Since October 2
+(the follow-up to #220) every metric is held within `[ρ/2, max(ρ₀, ρ)]`: the move computes one
+ceiling, `founding_transport(field, ring).max(transport(ring))`, and the ladder reads it.
+
+- **The defect, reproduced before the fix.** From `generic(92)` at its founded `ρ₀` the slope asks
+  for a longer memory (`γ_ρ < 0`), and the coordinate move carried a trial with `ρ > ρ₀`
+  (`the_founding_bound_holds_the_coordinate_and_witness_moduli` failed on main at `4c5c311d`). After
+  the fix, every coordinate and witness trial holds `ρ ≤ ρ₀`.
+- **Campaign 1 does not read these metrics.** Outside the tests, `executed_move` and its metrics are
+  called only by the order-2 chain's harness (`research/notebook/hnn_design/hnn_executed_loop.rs`,
+  `hnn_loop_1c.rs`). The text campaign's contact loop and its normal-law deposition
+  (`Constitution::receiving_class_metric`) do not go through the executed move, so the fix needs no
+  campaign 1 read.
+- **The chain's earlier states.** Coordinate or witness states read before the fix were reached
+  under the old bound; any whose `ρ` stands above `ρ₀` stays there (the ceiling is `max(ρ₀, ρ)`), and
+  from such a state no move raises it further.
 
 ## 6. Verification
 
