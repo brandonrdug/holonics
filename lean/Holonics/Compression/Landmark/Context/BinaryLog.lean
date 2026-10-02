@@ -41,7 +41,8 @@ grain       ⌊L(w 2^k + f)/2^k⌋ = ⌊(L(w 2^k + f + 1) − 1)/2^k⌋  ⟹  �
   enclosure read so far is certified.
 - `sqHi_le`, `found_exact_le`, `found_floor_le`, `hi_one_le`: the upper bound stays at most
   `2^(P+1)`, so every square is at most `2^(2P+2)` and `sqHi ≤ 2^(P+2)`: with `P = 125`
-  (`FIXED = 128 − 3`) every operand is held in `u128`.
+  (`FIXED = 128 − 3`) the bounds, the outward squares and `sqHi + 1` are held in `u128`, and each
+  square itself, at most `2^252`, in `wide_mul`'s 256-bit pair.
 - `grain_floor_decided`, `grain_floor_of_encl`: when the two floors agree, `⌊L log₂ m⌋` is their
   value (`grain_floor`).
 

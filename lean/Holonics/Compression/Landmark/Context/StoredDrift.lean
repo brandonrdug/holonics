@@ -93,8 +93,10 @@ split and carries no certificates).
 - **The per-cell rule** (`Landmarks::face_rule`). Counted through this owner, an arrival through a
   level's subtree adds at most `2(D − d)` rebase units and one split (one per digit tree it opens)
   to the levels above it, the split at most `4` units to each of the at most `P` levels: per cell
-  at most `n* P² + 4 n* P` units against the rule's `(2n* + 1) P²`, which covers them for `P ≥ 4`
-  (at `P ≤ 3` the rule's split count is short: `4n* P > (n* + 1) P²`). At campaign 1's `D = 63`
+  at most `n* P² + 4 n* P` units against the rule's `n* P² + max((n* + 1) P², 4 n* P)`
+  (`mantissa_units`), which covers them at every depth and is `(2n* + 1) P²` for `P ≥ 4` (the count
+  `(n* + 1) P²` alone is short of `4 n* P` at `P ≤ 3`, where the maximum can widen `W`: at
+  `n* = 6,148`, `D = 1`, `W = 26` against `25`). At campaign 1's `D = 63`
   (`P = 63`, `n* = 6,148 = 2²·29·53`) the widths stay the rule's, `M_p = 49`, `W = 37`, and the
   per-cell read stays within a quarter grain per source; the per-cell `D²` term gives a usable
   resolution there.
