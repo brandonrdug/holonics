@@ -27,6 +27,9 @@ K           K_s = ln X̂_s − ln ∏_b Ŵ(s b) at a reached kept node above D, 
 node law    Ŵ_s = (1 − 2^(−j)) E_s + 2^(−j) e^(K_s) ∏_b Ŵ(s b)                       (inst_node)
 read = Ŵ    C(S, s) = (1 − 2^(−S)) E_s + 2^(−S) Ŵ_s ,  C(0, s) = Ŵ_s                  (exec_eq)
 split       X̂_ℓ kept at β_ℓ ;  (2^(S_up) − 1) E/β_u = (1 − 2^(−S_low)) E + 2^(−S_low) X̂  (split_closed_form)
+the read    β̂ = (2^(S′) − 1) E/X = E_c/Q ,  E_c = (1 − 2^(−S′)) E ,  Q = 2^(−S′) X ,  C(S, s) = E_c + Q
+            λ = β̂/(1 + β̂) = E_c/C(S, s) ;  λ k + (1 − λ) q = (E_c k + Q q)/C(S, s)        (read_level, read_face)
+            X = X̂ at a kept node, C(0, s b) at a cut ;  C(S + T, s) = (1 − 2^(−S)) E + 2^(−S) C(T, s)  (exec_shift)
 ```
 
 [proved-derived; formal-checked] What is proved.
@@ -45,11 +48,26 @@ split       X̂_ℓ kept at β_ℓ ;  (2^(S_up) − 1) E/β_u = (1 − 2^(−S_l
   child weighs one), so the parting node's `K` is `0` before the two roundings; the roundings are
   the discrepancies `StoredDrift.split_charge` reads.
 
-[agent-inferred] **The Rust side.** `execFrom` is `Law::reading`'s weight over the arena (each stored
-chain one node at its summed rung `rung_sums`, read at its carried `β̂`); `X̂` is the carried
-`β̂`'s split mass at the chain's KT mass (`kt_based`, under the declared base the same at every node
-of a unary chain, its counts being its bottom's). A forced depth has rung `0`: a kept node there
-reads `X̂` itself, and the Rust passes the face through. The faces and the steps are
+[proved-derived; formal-checked] **The arena's read** (`storedRead`, `Law::read`'s loop exact
+before its roundings). The read walks only the stored levels: an implicit node the address follows
+adds its rung and continues (`storedRead_levels`). At a stored level (a kept node, or a node the
+address parts from, where `Law::part` cuts the chain) it mixes the node's KT face with the face below
+at the stop weight of the chain's carried `β̂ = betaOf S′ E X`; `X` is the carried `X̂`, or at a cut
+the lower part's executed weight (`rustX`). That stop weight is `execFrom`'s own share,
+`E_c/C(S, s)` (`read_level`; at a cut through `exec_shift`), so the level's face is
+`(E_c k + Q q)/C(S, s)` (`read_face`, `storedRead_stored`): `StoredDrift.level_read_drift`'s centre
+with `E = E_c`, `E' = E_c k`, `Q = 2^(−S′) X`. A summed rung `0` passes its face through
+(`stop_pass`), as the Rust skips a level whose bottom lies above the forced depths. The Rust's two
+stop-weight numerators are `β/(1 + β)` before rounding (`stop_numerators`), and its β step
+`β' = β u/(v x)` keeps `β̂ = betaOf S′ E X̂` through a deposit (`beta_step`). The roundings (the stop
+weight's and the face's) are `Drift`'s `θ`.
+
+[agent-inferred] **The Rust side.** `storedRead` is `Law::read` over the arena: its levels are the
+walk's stored nodes (`Standing::walk`), each at its summed rung (`rung_sum`) and carried `β̂`; a
+parting chain's level reads its upper part's chart (`parting.upper`); `bottoms[level] < forced` is
+`S′ = 0`; `Stop::Node` is the leaf's face at `D`, `Stop::Prior` the base's split `k₀`. `X̂` is the
+carried `β̂`'s split mass at the chain's KT mass (`kt_based`, under the declared base the same at
+every node of a unary chain, its counts being its bottom's). The faces and the steps are
 `StoredDrift`'s (`level_read_drift`, `carried_step`, `split_effect`).
 
 | Claim | Lean | Rust |
@@ -58,6 +76,8 @@ reads `X̂` itself, and the Rust passes the face through. The faces and the step
 | the arena's read is the instance's weight | `exec_eq`, `instance_read` | `Law::reading`, `rung_sums` |
 | the discrepancy at a chain's bottom, leaf chains exact | `instK_implicit` | `Law::leaf`, `Law::chain` |
 | the split's closed forms | `split_closed_form`, `instK_exact` | `Law::part`, `Beta::split` |
+| the read's levels and stop weights | `storedRead`, `storedRead_levels`, `storedRead_stored`, `read_level`, `read_face`, `exec_shift`, `stop_beta`, `stop_pass` | `Law::read`, `Law::mix_stop`, `rung_sum` |
+| the stop weight and the β step | `stop_numerators`, `beta_step` | `Beta::stop_weight`, `carried_step` |
 
 No `sorry`, no `axiom`, no `native_decide`.
 -/
@@ -331,6 +351,207 @@ theorem split_closed_form {E β : ℝ} (hE : 0 < E) (hβ : 0 < β) {Su Sl : ℕ}
   · field_simp
   · field_simp
 
+/-! ### The arena's read: `Law::read` over the stored levels -/
+
+/-- [definition] **A chain's carried `β`** at the summed rung `S`, KT mass `E` and carried split
+mass `X̂`: `β̂ = (2^S − 1) E/X̂` (`Beta`; founded at `2^S − 1` over a leaf, `Law::chain`). -/
+def betaOf (S : ℕ) (E X : ℝ) : ℝ := (2 ^ S - 1) * E / X
+
+/-- [definition] **The stop weight** `λ = β/(1 + β)` (`Beta::stop_weight` before its rounding). -/
+def stopOf (β : ℝ) : ℝ := β / (1 + β)
+
+/-- [definition] **The split mass the Rust reads at a stored level**: a kept node's carried `X̂`;
+at a node the address parts from (a cut chain, `Law::part`), the lower part's executed weight. -/
+def rustX (j : ℕ → ℕ) (R : List Ltr → Bool) (E Xh : List Ltr → ℝ) (m : ℕ) (s : List Ltr) : ℝ :=
+  if (kidsOf R s).card = 1 then ∑ b ∈ kidsOf R s, execFrom j R E Xh m 0 (s ++ [b]) else Xh s
+
+/-- [definition] **The Rust's read** (`Law::read`, exact before its roundings) along the address
+`a`, entered at depth `d` with `m` levels below and the rung `S` summed above: an implicit node the
+address follows is no stored level (the chain continues, its rung joining the sum); at a stored
+level the face mixes the node's KT face `k` with the face below at the stop weight of the chain's
+carried `β̂`; the face below is the next stored chain's read, entered afresh, or the base's split
+`k₀` past the last stored level (`Stop::Prior`); at `D` the leaf's face (`Stop::Node`). -/
+def storedRead (j : ℕ → ℕ) (R : List Ltr → Bool) (E Xh k : List Ltr → ℝ) (k₀ : ℝ)
+    (a : List Ltr) : ℕ → ℕ → ℕ → ℝ
+  | 0, _, d => k (a.take d)
+  | m + 1, S, d =>
+    if (kidsOf R (a.take d)).card = 1 ∧ R (a.take (d + 1)) = true then
+      storedRead j R E Xh k k₀ a m (S + j (a.take d).length) (d + 1)
+    else
+      stopOf (betaOf (S + j (a.take d).length) (E (a.take d)) (rustX j R E Xh m (a.take d))) *
+          k (a.take d) +
+        (1 - stopOf (betaOf (S + j (a.take d).length) (E (a.take d))
+          (rustX j R E Xh m (a.take d)))) *
+          if R (a.take (d + 1)) = true then storedRead j R E Xh k k₀ a m 0 (d + 1) else k₀
+
+/-- [proved-derived] **`stop_numerators`: the Rust's two stop-weight forms are `β/(1 + β)`.** For
+`β = a 2^e/b`, `e ≥ 0`: `1 − b/(a 2^e + b)`; for `β = a/(b 2^e)`: `a/(a + b 2^e)`
+(`Beta::stop_weight`'s `2^M − 2^M b/g` and `2^M a/h`, before rounding). -/
+theorem stop_numerators {a b t : ℝ} (ha : 0 ≤ a) (hb : 0 < b) (ht : 0 < t) :
+    1 - b / (a * t + b) = stopOf (a * t / b) ∧ a / (a + b * t) = stopOf (a / (b * t)) := by
+  have h1 : 0 < a * t + b := by positivity
+  have h2 : 0 < a + b * t := by positivity
+  unfold stopOf
+  constructor <;> field_simp <;> ring
+
+/-- [proved-derived] **`stop_beta`: the stop weight of a chain's carried `β̂` is its own share.**
+`β̂/(1 + β̂) = (1 − 2^(−S)) E/((1 − 2^(−S)) E + 2^(−S) X̂)`; `β̂ = E_c/Q` with the chain's own weight
+`E_c = (1 − 2^(−S)) E` and split mass `Q = 2^(−S) X̂` (`Drift.face_weight_form`'s `β̂ = E/Q`). -/
+theorem stop_beta {E X : ℝ} (hE : 0 < E) (hX : 0 < X) (S : ℕ) :
+    betaOf S E X = (1 - (1 / 2 : ℝ) ^ S) * E / ((1 / 2 : ℝ) ^ S * X) ∧
+      stopOf (betaOf S E X) =
+        (1 - (1 / 2 : ℝ) ^ S) * E / ((1 - (1 / 2 : ℝ) ^ S) * E + (1 / 2 : ℝ) ^ S * X) := by
+  have ht := half_pow_pos S
+  have ht1 := half_pow_le S
+  have h2 : (2 : ℝ) ^ S = 1 / (1 / 2) ^ S := by rw [one_div_pow, one_div_one_div]
+  have hb : betaOf S E X = (1 - (1 / 2 : ℝ) ^ S) * E / ((1 / 2 : ℝ) ^ S * X) := by
+    unfold betaOf; rw [h2]; field_simp
+  refine ⟨hb, ?_⟩
+  have hden : 0 < (1 - (1 / 2 : ℝ) ^ S) * E + (1 / 2 : ℝ) ^ S * X := by
+    have : 0 ≤ (1 - (1 / 2 : ℝ) ^ S) * E := mul_nonneg (by linarith) hE.le
+    have : 0 < (1 / 2 : ℝ) ^ S * X := mul_pos ht hX
+    linarith
+  have hQ : 0 < (1 / 2 : ℝ) ^ S * X := mul_pos ht hX
+  rw [stopOf, hb]
+  generalize (1 - (1 / 2 : ℝ) ^ S) * E = Ec at hden ⊢
+  generalize (1 / 2 : ℝ) ^ S * X = Q at hden hQ ⊢
+  have h1 : 1 + Ec / Q = (Ec + Q) / Q := by field_simp; ring
+  rw [h1, div_div_div_cancel_right₀ hQ.ne']
+
+/-- [proved-derived] **`stop_mix`: a stored level's face is the executed mixture.** At the stop
+weight `λ = E_c/(E_c + Q)`, `λ k + (1 − λ) q = (E_c k + Q q)/(E_c + Q)`: the centre of
+`StoredDrift.level_read_drift`'s `hround`, with `E' = E_c k`. -/
+theorem stop_mix {Ec Q k q : ℝ} (h : 0 < Ec + Q) :
+    Ec / (Ec + Q) * k + (1 - Ec / (Ec + Q)) * q = (Ec * k + Q * q) / (Ec + Q) := by
+  field_simp
+  ring
+
+/-- [proved-derived] **`stop_pass`: at a summed rung `0` the level passes its face through.**
+`β̂ = 0`, `λ = 0` (`Law::read` skips a level whose bottom lies above the forced depths). -/
+theorem stop_pass (E X k q : ℝ) :
+    stopOf (betaOf 0 E X) * k + (1 - stopOf (betaOf 0 E X)) * q = q := by
+  simp [stopOf, betaOf]
+
+/-- [proved-derived] **`beta_step`: the Rust's β step keeps the chain's correspondence.** With the
+KT mass stepped by its face `k` and the split mass by the child's face `x`,
+`β̂' = β̂ k/x` (`carried_step`'s `β' = β u/(v x)`, before its rebase). -/
+theorem beta_step {E X k x : ℝ} (hX : X ≠ 0) (hx : x ≠ 0) (S : ℕ) :
+    betaOf S (E * k) (X * x) = betaOf S E X * k / x := by
+  unfold betaOf
+  field_simp
+
+theorem execFrom_pos (hR : Routing D R E) (hX : ∀ s, 0 < Xh s) :
+    ∀ m S (s : List Ltr), 0 < execFrom j R E Xh m S s
+  | 0, _, s => by simp only [execFrom]; exact hR.pos s
+  | m + 1, S, s => by
+    rw [execFrom]
+    split_ifs with hc
+    · obtain ⟨b0, hb0⟩ := Finset.card_eq_one.mp hc
+      rw [hb0, sum_singleton]
+      exact execFrom_pos hR hX m _ _
+    · have := half_pow_le (S + j s.length); have := half_pow_pos (S + j s.length)
+      have := hR.pos s; have := hX s
+      nlinarith
+
+/-- [proved-derived] **`exec_shift`: a rung summed above a chain is one node over it.**
+`C(S + T, s) = (1 − 2^(−S)) E_s + 2^(−S) C(T, s)` (a unary chain's nodes hold its bottom's counts):
+a chain cut anywhere is its upper part at its own rung over the lower part's weight. -/
+theorem exec_shift (hR : Routing D R E) :
+    ∀ m S T (s : List Ltr), s.length + m = D →
+      execFrom j R E Xh m (S + T) s =
+        (1 - (1 / 2 : ℝ) ^ S) * E s + (1 / 2 : ℝ) ^ S * execFrom j R E Xh m T s
+  | 0, S, T, s, _ => by simp only [execFrom]; ring
+  | m + 1, S, T, s, hsm => by
+    have hs : s.length < D := by omega
+    simp only [execFrom]
+    split_ifs with hc
+    · obtain ⟨b0, hb0⟩ := Finset.card_eq_one.mp hc
+      have hU : ∀ b, R (s ++ [b]) = true → b = b0 := fun b hb => by
+        have hmem : b ∈ kidsOf R s := mem_kidsOf.mpr hb
+        rw [hb0] at hmem
+        exact Finset.mem_singleton.mp hmem
+      rw [hb0, sum_singleton, sum_singleton, add_assoc,
+        exec_shift hR m S (T + j s.length) (s ++ [b0]) (by simp; omega), hR.unary s hs b0 hU]
+    · rw [add_assoc, pow_add]; ring
+
+/-- [proved-derived] **`read_level`: `Law::read`'s stop weight at a stored level is `execFrom`'s
+own share.** At a stored level `s` (a kept node, or a node the address parts from) entered with the
+rung `S`, `S′ = S + j_|s|`: the chain's executed weight is `E_c + 2^(−S′) X` with `E_c =
+(1 − 2^(−S′)) E_s` and `X` the split mass the Rust reads (`rustX`: the carried `X̂`, or at a cut the
+lower part's weight, `exec_shift`), and the stop weight of the carried `β̂ = betaOf S′ E_s X` is
+`E_c/C(S, s)`. -/
+theorem read_level (hR : Routing D R E) (hX : ∀ s, 0 < Xh s) (m S : ℕ) (s : List Ltr)
+    (hsm : s.length + m + 1 = D) :
+    execFrom j R E Xh (m + 1) S s =
+        (1 - (1 / 2 : ℝ) ^ (S + j s.length)) * E s +
+          (1 / 2 : ℝ) ^ (S + j s.length) * rustX j R E Xh m s ∧
+      stopOf (betaOf (S + j s.length) (E s) (rustX j R E Xh m s)) =
+        (1 - (1 / 2 : ℝ) ^ (S + j s.length)) * E s / execFrom j R E Xh (m + 1) S s := by
+  have hs : s.length < D := by omega
+  have hXpos : 0 < rustX j R E Xh m s := by
+    unfold rustX
+    split_ifs with hc
+    · obtain ⟨b0, hb0⟩ := Finset.card_eq_one.mp hc
+      rw [hb0, sum_singleton]; exact execFrom_pos j hR hX m 0 _
+    · exact hX s
+  have hC : execFrom j R E Xh (m + 1) S s =
+      (1 - (1 / 2 : ℝ) ^ (S + j s.length)) * E s +
+        (1 / 2 : ℝ) ^ (S + j s.length) * rustX j R E Xh m s := by
+    unfold rustX
+    simp only [execFrom]
+    split_ifs with hc
+    · obtain ⟨b0, hb0⟩ := Finset.card_eq_one.mp hc
+      have hU : ∀ b, R (s ++ [b]) = true → b = b0 := fun b hb => by
+        have hmem : b ∈ kidsOf R s := mem_kidsOf.mpr hb
+        rw [hb0] at hmem
+        exact Finset.mem_singleton.mp hmem
+      rw [hb0, sum_singleton, sum_singleton,
+        show S + j s.length = S + j s.length + 0 by rfl,
+        exec_shift j hR m (S + j s.length) 0 (s ++ [b0]) (by simp; omega), hR.unary s hs b0 hU]
+      simp only [add_zero]
+    · rfl
+  refine ⟨hC, ?_⟩
+  rw [(stop_beta (hR.pos s) hXpos _).2, hC]
+
+/-- [proved-derived] **`read_face`: a stored level of `Law::read` is the executed mixture over
+`execFrom`.** Its face is `(E_c k + Q q)/(E_c + Q)` with `E_c + Q = C(S, s)` the chain's executed
+weight (`read_level`), so `StoredDrift.level_read_drift` reads the Rust's levels with
+`E = E_c`, `E' = E_c k`, `Q = 2^(−S′) X`; at `S′ = 0` the level passes its face through
+(`stop_pass`). -/
+theorem read_face (hR : Routing D R E) (hX : ∀ s, 0 < Xh s) (m S : ℕ) (s : List Ltr)
+    (hsm : s.length + m + 1 = D) (k q : ℝ) :
+    stopOf (betaOf (S + j s.length) (E s) (rustX j R E Xh m s)) * k +
+        (1 - stopOf (betaOf (S + j s.length) (E s) (rustX j R E Xh m s))) * q =
+      ((1 - (1 / 2 : ℝ) ^ (S + j s.length)) * E s * k +
+          (1 / 2 : ℝ) ^ (S + j s.length) * rustX j R E Xh m s * q) /
+        execFrom j R E Xh (m + 1) S s := by
+  obtain ⟨hC, hlam⟩ := read_level j hR hX m S s hsm
+  have hpos := execFrom_pos j hR hX (m + 1) S s
+  rw [hlam, hC] at *
+  rw [stop_mix hpos]
+
+/-- [proved-derived] **`storedRead_levels`: the read walks only the stored levels.** An implicit
+node the address follows contributes no level: the read continues into its child with the rung
+summed, as `execFrom` does; every other node is a stored level (`read_face`). -/
+theorem storedRead_levels (k : List Ltr → ℝ) (k₀ : ℝ) (a : List Ltr) (m S d : ℕ)
+    (hc : (kidsOf R (a.take d)).card = 1) (hr : R (a.take (d + 1)) = true) :
+    storedRead j R E Xh k k₀ a (m + 1) S d =
+      storedRead j R E Xh k k₀ a m (S + j (a.take d).length) (d + 1) := by
+  rw [storedRead, if_pos ⟨hc, hr⟩]
+
+/-- [proved-derived] **`storedRead_stored`: at a stored level the read is the executed mixture over
+`execFrom`.** Its face below is the next stored chain's read, or `k₀` past the last stored level. -/
+theorem storedRead_stored (hR : Routing D R E) (hX : ∀ s, 0 < Xh s) (k : List Ltr → ℝ) (k₀ : ℝ)
+    (a : List Ltr) (m S d : ℕ) (hsm : (a.take d).length + m + 1 = D)
+    (hst : ¬((kidsOf R (a.take d)).card = 1 ∧ R (a.take (d + 1)) = true)) :
+    storedRead j R E Xh k k₀ a (m + 1) S d =
+      ((1 - (1 / 2 : ℝ) ^ (S + j (a.take d).length)) * E (a.take d) * k (a.take d) +
+          (1 / 2 : ℝ) ^ (S + j (a.take d).length) * rustX j R E Xh m (a.take d) *
+            (if R (a.take (d + 1)) = true then storedRead j R E Xh k k₀ a m 0 (d + 1) else k₀)) /
+        execFrom j R E Xh (m + 1) S (a.take d) := by
+  rw [storedRead, if_neg hst]
+  exact read_face j hR hX m S (a.take d) hsm _ _
+
 /-! ### Audit -/
 
 #print axioms inst_node
@@ -340,5 +561,16 @@ theorem split_closed_form {E β : ℝ} (hE : 0 < E) (hβ : 0 < β) {Su Sl : ℕ}
 #print axioms instK_exact
 #print axioms instance_read
 #print axioms split_closed_form
+#print axioms stop_numerators
+#print axioms stop_beta
+#print axioms stop_mix
+#print axioms stop_pass
+#print axioms beta_step
+#print axioms execFrom_pos
+#print axioms exec_shift
+#print axioms read_level
+#print axioms read_face
+#print axioms storedRead_levels
+#print axioms storedRead_stored
 
 end Holonics.Compression.Landmark.Context.StoredInstance

@@ -3070,7 +3070,9 @@ impl Law {
     }
 
     /// **One branch's executed read** at its letters in tree `t`: its walk, and a parting chain's
-    /// split (stored where paths part).
+    /// split (stored where paths part). Its levels are the stored ones, each mixed at the stop weight
+    /// of its chain's carried `β̂`, the own share of the chain's executed weight (Lean
+    /// `Compression/Landmark/Context/StoredInstance.{storedRead, read_level, read_face}`).
     fn read(
         &self,
         nodes: &impl Standing,
