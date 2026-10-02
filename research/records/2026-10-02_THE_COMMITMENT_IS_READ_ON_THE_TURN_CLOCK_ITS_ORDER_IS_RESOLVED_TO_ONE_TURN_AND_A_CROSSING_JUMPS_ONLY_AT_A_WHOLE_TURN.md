@@ -202,8 +202,11 @@ implements this (§3, last paragraph); it is the release law of §7.
 
 **What it does not do.** It does not bound how far a step moves an instant before the successor is
 read: the segment bound on the readings' motion (the flip record's missing `Λ`) is still absent, so
-how small "small enough" is cannot yet be certified in advance. It does not say the move reaches the
-refit's basin or any held-out decision.
+how small "small enough" is cannot yet be certified in advance. The halving that
+`fixed_order_halving_adopts` names may lie past the move's eight trials (`LADDER_DEPTH`) or below
+the lattice grain, where the move refuses, and adoption still needs the move's conditions, among
+them a decrease resolved by disjoint enclosures of the two comparisons. It does not say the move
+reaches the refit's basin or any held-out decision.
 
 ## 5. What it costs to read
 
