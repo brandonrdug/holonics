@@ -252,7 +252,17 @@ reads a declared `E` leg).
 
 **The direction at the opening.** `executed joined <terrain> <seed> <count> <arm> <label=source>…`
 reads the joined solve's `Δρ` and its two drives at each source, before any bound and without moving.
-See §6 for the founded opening's reading.
+At the founded opening (order 2, development seed `2026093061`, 8 requests, the arm `order-dec`,
+`ρ = ρ₀ = 102837/131072`, `L+O ∈ [569492/4096, 569498/4096)` nats, 325 returns) the solve reads
+`own = 11159663/2048`, `supplied = 14383585/4096`, `own − supplied = 15871483/8192` (24 bits) and
+`Δρ = 16767753/268435456`, with the recurrence stopped at as many iterations as readings (370).
+
+The joined direction at the opening asks for a **longer** memory: the readings' own ask outweighs
+what `E`'s move supplies. At `ρ₀` the bound holds that ask, so the joined chain's first move from the
+opening is `E`'s alone, the same as the kinetic chain's. The joined chain parts from the kinetic one
+only where `own − supplied` turns negative, and the main line's per-move reads locate that state.
+Receipt: one read, projection `2200000` ms, measured `879473` ms (`879473/2200000`), peak resident
+`180666368` bytes, 4 cores.
 
 ## 5. The other metrics' upper bound: now the founding bound
 
