@@ -3138,6 +3138,9 @@ pub struct AblationOptions {
     /// Whether the source rings' transport is founded off the lossless boundary
     /// ([`Constitution::founded_transport`]), read by the leaky count (the contact loop record §24).
     pub founded: bool,
+    /// [measured-diagnostic] A source transport at the modulus `1 − 2^(−k)` instead, a memory of
+    /// about `2^k` ticks (the contact loop record §26–27).
+    pub memory: Option<u32>,
 }
 
 
@@ -3222,7 +3225,14 @@ pub fn contact_ablation(
         &[crate::ratio::linear::ExactRatMatrix],
     ),
 ) -> Result<AblationRun, HnnError> {
-    let mut resident = if options.founded {
+    let mut resident = if let Some(k) = options.memory {
+        let mut initial = Constitution::initial(field, reference.budget)?;
+        let modulus = Rat::one() - Rat::new(BigInt::one(), BigInt::one() << k as usize);
+        for &ring in field.sources() {
+            initial = initial.with_transport(ring, modulus.clone())?;
+        }
+        reference.mount_with(field, &Current::at_rest(field), initial)?
+    } else if options.founded {
         let mut initial = Constitution::initial(field, reference.budget)?;
         for &ring in field.sources() {
             initial = initial.founded_transport(field, ring)?;
