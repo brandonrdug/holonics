@@ -1016,6 +1016,31 @@ impl BankPlacement {
         storage
     }
 
+    /// The storage's derivative in the modulus rebuilt from each datum's reach slope,
+    /// `Σ_k (ρ^(r_k)/M) s_k read_k` ([`BankPlacement::reach_slopes`] against
+    /// [`BankPlacement::modulus_derivative`], the owner's test).
+    #[cfg(test)]
+    pub(crate) fn reach_derivative(&self, station: usize, cells: &[Option<usize>]) -> Vec<Rat> {
+        let mass = self.mass(station, cells);
+        let (request, section) = self.reach_slopes(station, cells);
+        let mut derivative = vec![Rat::zero(); self.pairs.len()];
+        let mut add = |distance: u64, slope: &Rat, read: &[Rat]| {
+            let factor = &self.powers[distance as usize] / &mass * slope;
+            for (value, x) in derivative.iter_mut().zip(read) {
+                *value += x * &factor;
+            }
+        };
+        for ((lag, _, read), slope) in self.reads.iter().zip(&request) {
+            add(Self::request_distance(station, *lag), slope, read);
+        }
+        for (placed, (cell, slope)) in cells.iter().zip(&section).enumerate() {
+            if let (Some(class), Some(slope)) = (cell, slope) {
+                add(Self::station_distance(station, placed), slope, &self.images[placed][*class]);
+            }
+        }
+        derivative
+    }
+
     /// The storage read from a station at the exact transported weights at a modulus (no chart):
     /// the test's reference for [`BankPlacement::modulus_derivative`].
     #[cfg(test)]
@@ -1084,6 +1109,54 @@ impl BankPlacement {
             }
         }
         derivative
+    }
+
+    /// [definition; agent-inferred, October 2; the
+    /// [joined move's record](../../../../research/records/2026-10-02_THE_TRANSPORT_MODULUS_JOINS_THE_RECEIVERS_MINIMUM_ENERGY_MOVE.md)]
+    /// **Each datum's reach slope** read from a station, aligned with [`BankPlacement::weights`]:
+    /// `s_k = (r_k − r̄)/ρ`, the log-derivative of datum `k`'s transported weight in the modulus,
+    /// `∂w_k/∂ρ = w_k s_k` (the factor [`BankPlacement::modulus_derivative`] applies), with `r̄` the
+    /// span's weighted mean distance at the exact weights. Each slope is held at the derivative's
+    /// grain. The request's phases come first, then the placed stations (`None` where unplaced).
+    #[allow(clippy::type_complexity)]
+    pub fn reach_slopes(
+        &self,
+        station: usize,
+        cells: &[Option<usize>],
+    ) -> (Vec<Rat>, Vec<Option<Rat>>) {
+        let data = self.data(station, cells);
+        let mass: Rat = data
+            .iter()
+            .map(|(distance, count, _)| &self.powers[*distance as usize] * count)
+            .sum();
+        let mean: Rat = data
+            .iter()
+            .map(|(distance, count, _)| {
+                &self.powers[*distance as usize] * count * Rat::from_integer(BigInt::from(*distance))
+            })
+            .sum::<Rat>()
+            / &mass;
+        let slope = |distance: u64| -> Rat {
+            let x = (Rat::from_integer(BigInt::from(distance)) - &mean) / &self.modulus;
+            if x.is_zero() {
+                x
+            } else if x.is_negative() {
+                -crate::holon::deposition::significant(&-x, DERIVATIVE_BITS, false)
+            } else {
+                crate::holon::deposition::significant(&x, DERIVATIVE_BITS, false)
+            }
+        };
+        (
+            self.reads
+                .iter()
+                .map(|(lag, _, _)| slope(Self::request_distance(station, *lag)))
+                .collect(),
+            cells
+                .iter()
+                .enumerate()
+                .map(|(placed, cell)| cell.map(|_| slope(Self::station_distance(station, placed))))
+                .collect(),
+        )
     }
 }
 
