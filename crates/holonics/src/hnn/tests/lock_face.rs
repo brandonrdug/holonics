@@ -1285,3 +1285,175 @@ fn the_kinetic_move_deposits_the_solve_and_keeps_every_guard() {
         assert_eq!(successor.transport(0), theta.transport(0));
     }
 }
+
+/// **The joined solve spends the readings' change at least storage energy across `E` and `ρ`**
+/// ([`ModulusCoupling`]): one candidate at `θ = ½` wants its log-reading raised by `2`.
+/// - Where no entry of `E` moves the reading and `ρ` moves it by `2` a unit, `Δρ = 1` and `E` stays.
+/// - Where one entry of mass `1` and `ρ` of mass `3` each move it by `1`, the change splits in
+///   inverse proportion to the masses: `(ΔE, Δρ) = (3/2, 1/2)`.
+/// - Where `ρ` moves no reading but its storage change couples to `E`'s (`M = [[1, ½], [½, 1]]`),
+///   the least-energy move turns `ρ` against `E`'s storage change: `(ΔE, Δρ) = (2, −1)`.
+#[test]
+fn the_joined_solve_splits_the_readings_change_at_least_storage_energy() {
+    use crate::hnn::executed::{KineticStop, ModulusCoupling, kinetic_lift_joined_probe};
+    let grain = Rat::new(1.into(), num_bigint::BigInt::from(1) << 120usize);
+    let close = |x: &Rat, y: Rat| (x - &y).abs() <= grain;
+    let term = vec![(vec![rat(1, 2)], 0, vec![vec![(0, Rat::one())]])];
+    let alone = kinetic_lift_joined_probe(
+        &term,
+        &[vec![Rat::zero(), Rat::zero()]],
+        &[vec![Rat::one(), Rat::zero()], vec![Rat::zero(), Rat::one()]],
+        2,
+        &ModulusCoupling {
+            columns: vec![integer(2)],
+            coupling: vec![Rat::zero(), Rat::zero()],
+            schur: integer(4),
+        },
+    )
+    .unwrap();
+    assert_eq!(alone.stop, KineticStop::Converged);
+    assert!(close(alone.modulus.as_ref().unwrap(), Rat::one()));
+    assert!(alone.moved.entries().iter().all(Zero::is_zero));
+    assert!(close(&alone.predicted, rat(-1, 2)));
+    let split = kinetic_lift_joined_probe(
+        &term,
+        &[vec![Rat::one()]],
+        &[vec![Rat::one()]],
+        1,
+        &ModulusCoupling { columns: vec![Rat::one()], coupling: vec![Rat::zero()], schur: integer(3) },
+    )
+    .unwrap();
+    assert!(close(&split.moved.entries()[0], rat(3, 2)));
+    assert!(close(split.modulus.as_ref().unwrap(), rat(1, 2)));
+    // The readings' own ask along `ρ` carries it all: `Δρ = (3/2 − 0)/3`.
+    let (own, supplied) = split.modulus_drive.clone().unwrap();
+    assert!(close(&own, rat(3, 2)) && supplied.is_zero());
+    let coupled = kinetic_lift_joined_probe(
+        &term,
+        &[vec![Rat::one()]],
+        &[vec![Rat::one()]],
+        1,
+        &ModulusCoupling {
+            columns: vec![Rat::zero()],
+            coupling: vec![rat(1, 2)],
+            schur: rat(3, 4),
+        },
+    )
+    .unwrap();
+    assert!(close(&coupled.moved.entries()[0], integer(2)));
+    assert!(close(coupled.modulus.as_ref().unwrap(), integer(-1)));
+    // No reading asks along `ρ`; `E`'s move supplies `3/4` through the coupling, and `ρ` turns
+    // against it: `Δρ = (0 − 3/4)/(3/4)`.
+    let (own, supplied) = coupled.modulus_drive.clone().unwrap();
+    assert!(own.is_zero() && close(&supplied, rat(3, 4)));
+}
+
+/// **The joined move carries `ρ` with `E` and keeps every guard**: on the machine's opening at
+/// `ρ = 3/4`, the move under `KineticModulus` joins the modulus, carries its solve's `Δρ` (negative
+/// here: the comparison asks for a shorter reach) as its modulus unit, starts at the Gauss–Newton step
+/// or the entry scale, never carries `ρ` past `max(ρ₀, 3/4)`, and an adopted trial lowers the
+/// comparison with `ρ` below `3/4`.
+#[test]
+fn the_joined_move_carries_the_modulus_and_keeps_every_guard() {
+    use crate::hnn::executed::{MoveMetric, executed_move_in};
+    let field = joint();
+    let theta = generic(&field, 94).with_transport(0, rat(3, 4)).unwrap();
+    let refinement = Refinement::declare(&field, 0, 2, 1, 4, 2).unwrap();
+    let bank = joint_bank();
+    let requests =
+        short_requests(&field, &[(95, [0, 1, 2, 1]), (96, [1, 1, 0, 2]), (97, [2, 0, 1, 1])]);
+    let moved = executed_move_in(
+        &field,
+        &theta,
+        &requests,
+        &refinement,
+        &bank,
+        12,
+        Comparison::LOCK_DECISIONS,
+        MoveMetric::KineticModulus,
+    )
+    .unwrap();
+    assert_eq!(moved.metric, MoveMetric::KineticModulus);
+    let solve = moved.kinetic.as_ref().expect("the solve");
+    assert!(solve.predicted.is_negative());
+    let ceiling = theta.founding_transport(&field, 0).unwrap().max(rat(3, 4));
+    // On this opening the modulus joins and the comparison asks for a shorter reach.
+    let delta = solve.modulus.as_ref().expect("the modulus joins");
+    assert!(delta.is_negative());
+    assert_eq!(moved.modulus_unit.as_ref(), Some(delta));
+    let (_, kind) = moved.start.clone().unwrap();
+    assert!(matches!(kind, LadderStart::Kinetic | LadderStart::KineticEntryScale));
+    for trial in &moved.trials {
+        if let Some(modulus) = &trial.modulus {
+            assert!(modulus <= &ceiling);
+        }
+    }
+    if let Some((successor, _)) = &moved.adopted {
+        let last = moved.trials.last().unwrap();
+        assert!(last.value.as_ref().unwrap().upper < moved.before.value.lower);
+        assert!(successor.transport(0) <= ceiling);
+        assert!(successor.transport(0) < rat(3, 4), "the adopted move shortens the reach");
+    }
+}
+
+/// The joined move from `generic(seed)` at its founded `ρ₀` on the fixture's three requests.
+fn joined_at_the_founding(seed: u64) -> (Rat, crate::hnn::executed::ExecutedMove) {
+    use crate::hnn::executed::{MoveMetric, executed_move_in};
+    let field = joint();
+    let base = generic(&field, seed);
+    let founding = base.founding_transport(&field, 0).unwrap();
+    let theta = base.with_transport(0, founding.clone()).unwrap();
+    let refinement = Refinement::declare(&field, 0, 2, 1, 4, 2).unwrap();
+    let requests =
+        short_requests(&field, &[(95, [0, 1, 2, 1]), (96, [1, 1, 0, 2]), (97, [2, 0, 1, 1])]);
+    let moved = executed_move_in(
+        &field,
+        &theta,
+        &requests,
+        &refinement,
+        &joint_bank(),
+        12,
+        Comparison::LOCK_DECISIONS,
+        MoveMetric::KineticModulus,
+    )
+    .unwrap();
+    (founding, moved)
+}
+
+/// **At the bound an upward ask is held, and the move is `E`'s alone** (the sign the main line's
+/// `w16` walk reads): from `generic(92)` at its founded `ρ₀` the comparison's slope asks for a longer
+/// memory (`γ_ρ < 0`), the joined solve asks `Δρ > 0` with the readings' ask exceeding what `E`
+/// supplies, the bound holds it (the refused solve on the receipt), and the adopted successor keeps
+/// `ρ₀`.
+#[test]
+fn the_bound_holds_an_upward_ask_and_the_move_is_e_alone() {
+    let (founding, moved) = joined_at_the_founding(92);
+    assert!(moved.modulus_slope.as_ref().unwrap().is_negative());
+    let solve = moved.kinetic.as_ref().expect("the solve over E");
+    assert!(solve.modulus.is_none() && solve.modulus_drive.is_none());
+    let held = moved.modulus_held.as_ref().expect("the held ask");
+    assert!(held.modulus.as_ref().unwrap().is_positive());
+    let (own, supplied) = held.modulus_drive.clone().unwrap();
+    assert!(own > supplied);
+    assert_eq!(moved.modulus_unit.as_ref(), Some(&Rat::zero()));
+    for trial in &moved.trials {
+        assert!(trial.modulus.as_ref().is_none_or(|m| m == &founding));
+    }
+    let (successor, _) = moved.adopted.as_ref().expect("an adopted move");
+    assert_eq!(successor.transport(0), founding);
+}
+
+/// **The joined direction is not the slope's sign** (`KineticSolve::modulus_drive`): from
+/// `generic(99)` at its founded `ρ₀` the slope asks for a longer memory (`γ_ρ < 0`) and so do the
+/// readings at the solve (`own > 0`), but `E`'s move already supplies more of that change through the
+/// coupling (`supplied > own`), so the joined move shortens the memory (`Δρ < 0`).
+#[test]
+fn e_can_supply_more_than_the_readings_ask_and_turn_the_modulus() {
+    let (_, moved) = joined_at_the_founding(99);
+    assert!(moved.modulus_slope.as_ref().unwrap().is_negative());
+    assert!(moved.modulus_held.is_none());
+    let solve = moved.kinetic.as_ref().unwrap();
+    assert!(solve.modulus.as_ref().unwrap().is_negative());
+    let (own, supplied) = solve.modulus_drive.clone().unwrap();
+    assert!(own.is_positive() && supplied > own);
+}

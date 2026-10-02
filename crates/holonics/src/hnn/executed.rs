@@ -2159,7 +2159,36 @@ fn returns(
     requests: &[Request],
     contributions: &[Contribution],
 ) -> Result<Vec<Sample>, HnnError> {
+    returns_coupled(field, constitution, declared, requests, contributions, None)
+}
+
+/// [definition; agent-inferred, October 2] **The returns carrying the modulus's coupling**
+/// ([`ModulusCoupling`]): [`returns`], with `x = Δρ` the joined solve's modulus part, each return of
+/// feature `f` and weight `W = Σ w²` carrying beside its covector `−x (S/W) E f`, `S = Σ w² s` over
+/// the same data (`s` each datum's reach slope). The normal law's step with these returns is the
+/// solve's `E` part, `M⁻¹Aᵀμ`'s `YH′⁻¹ − x bH′⁻¹` with `b` read on the data the returns reach: the
+/// storage change of the modulus's move returned to the port through the data that carry it.
+fn returns_coupled(
+    field: &Field,
+    constitution: &Constitution,
+    declared: &Refinement,
+    requests: &[Request],
+    contributions: &[Contribution],
+    coupling: Option<(&Rat, &ExactRatMatrix)>,
+) -> Result<Vec<Sample>, HnnError> {
     let ring = declared.ring();
+    // `−x E f` in `E`'s frame, for a feature `f`.
+    let coupled = |feature: &[Rat]| -> Option<Vec<Rat>> {
+        let (x, port) = coupling?;
+        Some(
+            (0..port.rows())
+                .map(|r| {
+                    let row = port.row(r).expect("a row of the port");
+                    -(x * row.iter().zip(feature).map(|(e, f)| e * f).sum::<Rat>())
+                })
+                .collect(),
+        )
+    };
     let geometry = field.ring(ring);
     let period = geometry.period() as usize;
     let width = geometry.width();
@@ -2167,6 +2196,7 @@ fn returns(
     let mut samples = Vec::new();
     let mut section_sums = vec![vec![Rat::zero(); width]; alphabet];
     let mut section_weights = vec![Rat::zero(); alphabet];
+    let mut section_reach = vec![Rat::zero(); alphabet];
     let placements = placements_of(field, constitution, requests, declared)?;
     for (index, (request, placement)) in requests.iter().zip(&placements).enumerate() {
         let mine: Vec<&Contribution> = contributions.iter().filter(|c| c.request == index).collect();
@@ -2185,10 +2215,27 @@ fn returns(
             .collect();
         let mut phase_sums = vec![vec![Rat::zero(); width]; phases.len()];
         let mut phase_weights = vec![Rat::zero(); phases.len()];
+        let mut phase_reach = vec![Rat::zero(); phases.len()];
         for contribution in mine {
             let covector: Vec<Rat> = contribution.covector.iter().map(face).collect();
             let (request_weights, station_weights) =
                 placement.weights(contribution.station, &contribution.cells);
+            if coupling.is_some() {
+                let (request_slopes, station_slopes) =
+                    placement.reach_slopes(contribution.station, &contribution.cells);
+                for ((reach, weight), slope) in
+                    phase_reach.iter_mut().zip(&request_weights).zip(&request_slopes)
+                {
+                    *reach += weight * weight * slope;
+                }
+                for ((cell, weight), slope) in
+                    contribution.cells.iter().zip(&station_weights).zip(&station_slopes)
+                {
+                    if let (Some(class), Some(weight), Some(slope)) = (cell, weight, slope) {
+                        section_reach[*class] += weight * weight * slope;
+                    }
+                }
+            }
             for ((sum, total), weight) in phase_sums
                 .iter_mut()
                 .zip(phase_weights.iter_mut())
@@ -2213,22 +2260,26 @@ fn returns(
                 section_weights[*class] += weight * weight;
             }
         }
-        for ((c, sum), weight) in phases.iter().zip(phase_sums).zip(phase_weights) {
-            if !weight.is_positive() || sum.iter().all(Zero::is_zero) {
+        for (((c, sum), weight), reach) in phases.iter().zip(phase_sums).zip(phase_weights).zip(phase_reach) {
+            let carried = coupling.is_some() && !reach.is_zero();
+            if !weight.is_positive() || (sum.iter().all(Zero::is_zero) && !carried) {
                 continue;
             }
-            let feature = request
+            let feature: Vec<Rat> = request
                 .moment
                 .phase_counts(ring, *c)?
                 .iter()
                 .map(|&count| Rat::from_integer(BigInt::from(count)))
                 .collect();
             let rotated = geometry.rotate(&sum, &(BigInt::from(*c as u64) - &lift));
-            samples.push(Sample {
-                covector: rotated.into_iter().map(|x| -(x / &weight)).collect(),
-                weight,
-                feature,
-            });
+            let mut covector: Vec<Rat> = rotated.into_iter().map(|x| -(x / &weight)).collect();
+            if carried && let Some(term) = coupled(&feature) {
+                let share = &reach / &weight;
+                for (value, add) in covector.iter_mut().zip(term) {
+                    *value += add * &share;
+                }
+            }
+            samples.push(Sample { covector, weight, feature });
         }
     }
     for class in 0..alphabet {
@@ -2238,11 +2289,16 @@ fn returns(
         let weight = section_weights[class].clone();
         let mut feature = vec![Rat::zero(); alphabet];
         feature[class] = Rat::one();
-        samples.push(Sample {
-            covector: section_sums[class].iter().map(|x| -(x / &weight)).collect(),
-            weight,
-            feature,
-        });
+        let mut covector: Vec<Rat> = section_sums[class].iter().map(|x| -(x / &weight)).collect();
+        if !section_reach[class].is_zero()
+            && let Some(term) = coupled(&feature)
+        {
+            let share = &section_reach[class] / &weight;
+            for (value, add) in covector.iter_mut().zip(term) {
+                *value += add * &share;
+            }
+        }
+        samples.push(Sample { covector, weight, feature });
     }
     Ok(samples)
 }
@@ -3019,11 +3075,19 @@ pub enum LadderStart {
 /// - `Kinetic`: `E` alone, by the receiver's minimum-energy Gauss–Newton move over all of `E`
 ///   ([`KineticSolve`]), deposited by the normal law from the returns at the solve's reading weights;
 ///   `ρ` held. The ladder starts at the Gauss–Newton step (`η = 1`), at most the entry scale.
+/// - `KineticModulus`: `E` and `ρ` together, by the receiver's minimum-energy Gauss–Newton move over
+///   both ([`KineticSolve`] with the modulus joined, [`ModulusCoupling`]): the readings' change is
+///   the same Gauss–Newton change, and the storage-change mass splits it between `E` and `ρ`. `E`'s
+///   part is deposited by the normal law from the returns at the solve's reading weights, each return
+///   carrying the coupling's covector; `ρ` moves by the solve's `Δρ` per unit step, held at or below
+///   the founding `ρ₀` (the one-turn alias bound, [`Constitution::founding_transport`]). Where `ρ` is
+///   at that bound and the solve would raise it, the bound holds `ρ` and the move is `Kinetic`'s.
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub enum MoveMetric {
     Coordinate,
     Witness,
     Kinetic,
+    KineticModulus,
 }
 
 /// [definition; agent-inferred, September 30; the pin §2.6, §13.5] **The ladder's start**: from the
@@ -3123,6 +3187,9 @@ pub struct ExecutedMove {
     /// `−γ_ρ/G_ρ` (zero upward at `ρ = 1`), where the modulus was read.
     pub modulus_curvature: Option<Rat>,
     pub modulus_unit: Option<Rat>,
+    /// `KineticModulus` at its bound: the joined solve whose upward `Δρ` the bound held (the move
+    /// then is `E`'s alone, [`MoveMetric::KineticModulus`]); `None` where nothing was held.
+    pub modulus_held: Option<KineticSolve>,
     /// The modulus's slope split by term kind ([`SlopeSplit`]), where the modulus was read.
     pub split: Option<SlopeSplit>,
     pub trials: Vec<Trial>,
@@ -3312,6 +3379,7 @@ fn ladder(
     start: Rat,
     unit_largest: &Rat,
     transport: Option<&Rat>,
+    ceiling: &Rat,
     first: &FirstOrder<'_>,
     reread: &(dyn Fn(&Constitution) -> Result<Reread, HnnError> + Sync),
     excursion: &ReleaseExcursion,
@@ -3364,18 +3432,19 @@ fn ladder(
         let (successor, reading) = stepped;
         trial.source = Some(reading.clone());
         // The transport modulus's part of the move (module header, "The committed move"): `ρ + ηΔρ`
-        // held within `[ρ/2, 1]` (passive) and read on the source port's lattice, nearest.
+        // held within `[ρ/2, ceiling]` and read on the source port's lattice, nearest. The ceiling is
+        // the passive bound `1`, or `KineticModulus`'s one-turn alias bound `ρ₀`.
         let (successor, modulus_moved) = match transport {
             Some(unit) if !unit.is_zero() => {
                 let modulus = constitution.transport(ring);
                 let target = (&modulus + &step * unit)
                     .max(&modulus / &two)
-                    .min(Rat::one());
+                    .min(ceiling.clone());
                 let carried = ((&target / &lattice_unit)
                     + Rat::new(BigInt::one(), BigInt::from(2)))
                 .floor()
                     * &lattice_unit;
-                let carried = carried.min(Rat::one()).max(lattice_unit.clone());
+                let carried = carried.min(ceiling.clone()).max(lattice_unit.clone());
                 trial.modulus = Some(carried.clone());
                 let moved_modulus = carried != modulus;
                 (successor.with_transport(ring, carried)?, moved_modulus)
@@ -3786,6 +3855,7 @@ pub fn executed_move_guarded(
         modulus_slope: None,
         modulus_curvature: None,
         modulus_unit: None,
+        modulus_held: None,
         split: None,
         trials: Vec::new(),
         adopted: None,
@@ -3813,16 +3883,46 @@ pub fn executed_move_guarded(
     };
     // The kinetic metric's deposition: the same normal law, from the returns at the solve's
     // reading weights.
-    let (samples, unit, unit_move) = if metric == MoveMetric::Kinetic {
-        let Some(solve) =
-            kinetic_solve(field, constitution, declared, requests, &proposal, &samples, None)?
-        else {
+    // `KineticModulus`'s bound on `ρ`: the founding's one-turn alias bound `ρ₀`, or the incumbent's
+    // modulus where it already stands above it (the move never lifts `ρ` past `ρ₀`).
+    let joined = metric == MoveMetric::KineticModulus;
+    let ceiling = if joined {
+        let founding = constitution.founding_transport(field, ring)?;
+        founding.max(constitution.transport(ring).clone())
+    } else {
+        Rat::one()
+    };
+    let (samples, unit, unit_move, kinetic_modulus) = if metric == MoveMetric::Kinetic || joined {
+        let mut solve =
+            kinetic_solve(field, constitution, declared, requests, &proposal, &samples, None, joined)?;
+        // At the bound an upward `Δρ` is held, and the least-energy move is `E`'s alone.
+        if solve
+            .as_ref()
+            .and_then(|s| s.modulus.as_ref())
+            .is_some_and(|x| x.is_positive() && constitution.transport(ring) >= ceiling)
+        {
+            receipt.modulus_held = solve;
+            solve = kinetic_solve(field, constitution, declared, requests, &proposal, &samples, None, false)?;
+        }
+        let Some(solve) = solve else {
             receipt.refusal = Some(MoveRefusal::Invisible);
             return Ok(receipt);
         };
         let weighted = kinetic_contributions(&proposal, &solve);
+        let modulus = solve.modulus.clone();
         receipt.kinetic = Some(solve);
-        let samples = returns(field, constitution, declared, requests, &weighted)?;
+        let port = constitution
+            .source_port(ring)
+            .ok_or(HnnError::MissingSourcePort { ring })?
+            .clone();
+        let samples = returns_coupled(
+            field,
+            constitution,
+            declared,
+            requests,
+            &weighted,
+            modulus.as_ref().map(|x| (x, &port)),
+        )?;
         let Some((unit, _)) = constitution.stepped_source(ring, &samples, &Rat::one())? else {
             receipt.refusal = Some(MoveRefusal::Unreached);
             return Ok(receipt);
@@ -3831,9 +3931,9 @@ pub fn executed_move_guarded(
             .source_port(ring)
             .ok_or(HnnError::MissingSourcePort { ring })?
             .subtract(&constitution.source_port(ring).ok_or(HnnError::MissingSourcePort { ring })?.clone())?;
-        (samples, unit, unit_move)
+        (samples, unit, unit_move, modulus)
     } else {
-        (samples, unit, unit_move)
+        (samples, unit, unit_move, None)
     };
     let unit_largest = largest_entry(&unit_move);
     receipt.unit_largest = Some(unit_largest.clone());
@@ -3845,6 +3945,7 @@ pub fn executed_move_guarded(
     let (modulus_unit, witness_start) = match metric {
         MoveMetric::Coordinate => (modulus_unit, None),
         MoveMetric::Kinetic => (Rat::zero(), Some(Rat::one())),
+        MoveMetric::KineticModulus => (kinetic_modulus.unwrap_or_else(Rat::zero), Some(Rat::one())),
         MoveMetric::Witness => {
             let form = plane_form(field, constitution, declared, requests, &proposal, &unit)?;
             let step = form.as_ref().and_then(WitnessForm::step);
@@ -3905,7 +4006,7 @@ pub fn executed_move_guarded(
             } else {
                 Rat::one()
             };
-            let kinetic = metric == MoveMetric::Kinetic;
+            let kinetic = matches!(metric, MoveMetric::Kinetic | MoveMetric::KineticModulus);
             match (alpha <= scale, kinetic) {
                 (true, false) => (alpha, LadderStart::Witness),
                 (false, false) => (power_below(&scale), LadderStart::WitnessEntryScale),
@@ -3929,6 +4030,7 @@ pub fn executed_move_guarded(
         start,
         &unit_largest,
         Some(&modulus_unit),
+        &ceiling,
         &first,
         &reread,
         excursion,
@@ -4610,6 +4712,41 @@ pub struct KineticSolve {
     pub moved: ExactRatMatrix,
     /// The Gauss–Newton model's change at `v`, `cᵀAv + ½(Av)ᵀF(Av)`.
     pub predicted: Rat,
+    /// `Δρ`, the modulus's part of `v` per unit step, where the modulus is joined
+    /// ([`ModulusCoupling`]); `None` where `ρ` is held.
+    pub modulus: Option<Rat>,
+    /// Where the modulus is joined, the two parts of its move at the solve's multipliers `μ`:
+    /// `(own, supplied)` with `Δρ = (own − supplied)/s`. `own = Σ_m w_m a_m` is the readings' ask
+    /// along `ρ` (its sign is the reach the readings want), and `supplied = ⟨bH′⁻¹, (Aᵀμ)_E⟩` is
+    /// the part of that ask `E`'s own move already carries through the coupling `b`.
+    pub modulus_drive: Option<(Rat, Rat)>,
+}
+
+/// [definition; agent-inferred, October 2; the
+/// [joined move's record](../../../../research/records/2026-10-02_THE_TRANSPORT_MODULUS_JOINS_THE_RECEIVERS_MINIMUM_ENERGY_MOVE.md)]
+/// **The transport modulus joined to the receiver's minimum-energy move** ([`KineticSolve`]): one
+/// coordinate more, `v = (ΔE, Δρ)`.
+/// - **Its column of `A`.** Each leading member's reading moves with `ρ` by `a_m = ⟨ĝ_m, ∂z_m/∂ρ⟩`
+///   (the storage's exact derivative, `BankPlacement::modulus_derivative`): the pairing the
+///   modulus's slope `γ_ρ` sums, without the normal law's weight.
+/// - **Its mass.** The kinetic energy of a move is the squared norm of the storage change it causes on
+///   the passage's data, read in `E`'s own frame as `E`'s mass is: a datum `k` of feature `f_k`
+///   placed at weight `w_k` moves by `w_k ΔE f_k + w_k s_k Δρ E f_k`, `s_k = (r_k − r̄)/ρ` its reach
+///   slope (`BankPlacement::reach_slopes`). Summed over the proposal's data, the mass is
+///   `[[I ⊗ H′, b], [bᵀ, g]]` with `b = E Σ_k w_k² s_k f_k f_kᵀ` and `g = Σ_k w_k² s_k² |E f_k|²`.
+///   The retained Gram `H` stays in `E`'s block only: it is the second moment of moments already
+///   formed at their own passages' transport, so no retained datum's storage moves with today's `ρ`.
+/// - **Its inverse.** One coordinate more is one Schur complement: with `y = (Y, y_ρ)`,
+///   `x_ρ = (y_ρ − ⟨bH′⁻¹, Y⟩)/s` and `X = YH′⁻¹ − x_ρ bH′⁻¹`, `s = g − ⟨b, bH′⁻¹⟩ > 0`. Where
+///   `s` is not positive the modulus moves no storage that `E` cannot, and it is not joined.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct ModulusCoupling {
+    /// `a_m`, one per leading member, in the proposal's order.
+    pub columns: Vec<Rat>,
+    /// `bH′⁻¹`, rows × columns of `E`, row-major.
+    pub coupling: Vec<Rat>,
+    /// `s = g − ⟨b, bH′⁻¹⟩`, the modulus's mass after `E`'s share.
+    pub schur: Rat,
 }
 
 /// One reading coordinate of the kinetic solve: its members and their coefficients.
@@ -4674,6 +4811,7 @@ fn kinetic_solve(
     proposal: &Proposal,
     samples: &[Sample],
     toward: Option<&ExactRatMatrix>,
+    join: bool,
 ) -> Result<Option<KineticSolve>, HnnError> {
     let ring = declared.ring();
     let terms = kinetic_readings(proposal);
@@ -4700,7 +4838,121 @@ fn kinetic_solve(
     let members: Vec<&Contribution> = proposal.terms.iter().flat_map(|t| &t.leading).collect();
     let gradients = reading_gradients(field, constitution, declared, requests, &members)?;
     let toward: Option<Vec<Rat>> = toward.map(|t| t.entries().to_vec());
-    kinetic_lift(&terms, &gradients, &chart.to_rows(), columns, toward.as_deref()).map(Some)
+    let chart = chart.to_rows();
+    let coupling = if join {
+        modulus_coupling(field, constitution, declared, requests, proposal, &chart)?
+    } else {
+        None
+    };
+    kinetic_lift(&terms, &gradients, &chart, columns, toward.as_deref(), coupling.as_ref()).map(Some)
+}
+
+/// **Every datum's reach moments over the contributions** ([`ModulusCoupling`], "Its mass"):
+/// `Σ_k w_k² s_k f_k f_kᵀ` and `Σ_k w_k² s_k² f_k f_kᵀ` over each contribution's data, read as
+/// [`returns`] reads them (each request phase with its counts `M[c]`, each placed station with its
+/// class `e_x`, at its transported weight from the contribution's station).
+#[allow(clippy::type_complexity)]
+fn reach_moments(
+    field: &Field,
+    constitution: &Constitution,
+    declared: &Refinement,
+    requests: &[Request],
+    contributions: &[Contribution],
+) -> Result<(Vec<Vec<Rat>>, Vec<Vec<Rat>>), HnnError> {
+    let ring = declared.ring();
+    let period = field.ring(ring).period() as usize;
+    let alphabet = field.alphabet();
+    let placements = placements_of(field, constitution, requests, declared)?;
+    let mut first = vec![vec![Rat::zero(); alphabet]; alphabet];
+    let mut second = vec![vec![Rat::zero(); alphabet]; alphabet];
+    for (index, (request, placement)) in requests.iter().zip(&placements).enumerate() {
+        let mine: Vec<&Contribution> = contributions.iter().filter(|c| c.request == index).collect();
+        if mine.is_empty() {
+            continue;
+        }
+        let counts: Vec<Vec<Rat>> = (0..period)
+            .filter_map(|c| {
+                let counts = request.moment.phase_counts(ring, c).ok()?;
+                counts.iter().any(|&n| n != 0).then(|| {
+                    counts.iter().map(|&n| Rat::from_integer(BigInt::from(n))).collect()
+                })
+            })
+            .collect();
+        for contribution in mine {
+            let (request_weights, station_weights) =
+                placement.weights(contribution.station, &contribution.cells);
+            let (request_slopes, station_slopes) =
+                placement.reach_slopes(contribution.station, &contribution.cells);
+            for ((f, w), slope) in counts.iter().zip(&request_weights).zip(&request_slopes) {
+                let once = w * w * slope;
+                let twice = &once * slope;
+                for (i, fi) in f.iter().enumerate().filter(|(_, x)| !x.is_zero()) {
+                    for (j, fj) in f.iter().enumerate().filter(|(_, x)| !x.is_zero()) {
+                        first[i][j] += &once * fi * fj;
+                        second[i][j] += &twice * fi * fj;
+                    }
+                }
+            }
+            for ((cell, w), slope) in
+                contribution.cells.iter().zip(&station_weights).zip(&station_slopes)
+            {
+                let (Some(class), Some(w), Some(slope)) = (cell, w, slope) else { continue };
+                let once = w * w * slope;
+                second[*class][*class] += &once * slope;
+                first[*class][*class] += once;
+            }
+        }
+    }
+    Ok((first, second))
+}
+
+/// **The modulus's column and mass** ([`ModulusCoupling`]) at the proposal, with `E`'s mass inverse
+/// `H′⁻¹` on a row (`chart`). `None` where the modulus moves no storage `E` cannot (`s ≤ 0`).
+fn modulus_coupling(
+    field: &Field,
+    constitution: &Constitution,
+    declared: &Refinement,
+    requests: &[Request],
+    proposal: &Proposal,
+    chart: &[Vec<Rat>],
+) -> Result<Option<ModulusCoupling>, HnnError> {
+    let ring = declared.ring();
+    let derivatives = section_derivatives(field, constitution, declared, requests, proposal)?;
+    let columns: Vec<Rat> = proposal
+        .terms
+        .iter()
+        .flat_map(|t| &t.leading)
+        .map(|m| {
+            joint_held(m.covector.iter().map(face).zip(&derivatives[m.section]).map(|(g, d)| g * d).sum())
+        })
+        .collect();
+    let (first, second) = reach_moments(field, constitution, declared, requests, &proposal.contributions)?;
+    let port = constitution
+        .source_port(ring)
+        .ok_or(HnnError::MissingSourcePort { ring })?
+        .to_rows();
+    let width = chart.len();
+    if first.len() != width || port.iter().any(|row| row.len() != width) {
+        return Ok(None);
+    }
+    let product = |row: &[Rat], matrix: &[Vec<Rat>]| -> Vec<Rat> {
+        (0..width)
+            .map(|j| row.iter().zip(matrix).map(|(x, m)| x * &m[j]).sum())
+            .collect()
+    };
+    let mut coupling = Vec::with_capacity(port.len() * width);
+    let mut energy = Rat::zero();
+    let mut shared = Rat::zero();
+    for row in &port {
+        let b = product(row, &first);
+        let b_chart = product(&b, chart);
+        let c_row = product(row, &second);
+        energy += row.iter().zip(&c_row).map(|(x, y)| x * y).sum::<Rat>();
+        shared += b.iter().zip(&b_chart).map(|(x, y)| x * y).sum::<Rat>();
+        coupling.extend(b_chart.into_iter().map(joint_held));
+    }
+    let schur = joint_held(energy - shared);
+    Ok(schur.is_positive().then_some(ModulusCoupling { columns, coupling, schur }))
 }
 
 /// The solve's recurrence ([`KineticSolve`], "The solve") on given readings: each term's
@@ -4712,20 +4964,33 @@ fn kinetic_lift(
     chart: &[Vec<Rat>],
     columns: usize,
     toward: Option<&[Rat]>,
+    modulus: Option<&ModulusCoupling>,
 ) -> Result<KineticSolve, HnnError> {
     use rayon::prelude::*;
     let rows: Vec<&ReadingRow> = terms.iter().flat_map(|(_, _, r)| r).collect();
     let height = gradients.first().map_or(0, Vec::len) / columns.max(1);
+    // `v` is `E`'s entries, then `Δρ` where the modulus is joined.
+    let size = height * columns;
     let dot = |a: &[Rat], b: &[Rat]| -> Rat { a.iter().zip(b).map(|(x, y)| x * y).sum() };
     // `A v`: each reading coordinate's change.
     let forward = |v: &[Rat]| -> Vec<Rat> {
-        let pairings: Vec<Rat> = gradients.par_iter().map(|g| dot(g, v)).collect();
+        let pairings: Vec<Rat> = gradients
+            .par_iter()
+            .enumerate()
+            .map(|(m, g)| {
+                let moved = dot(g, &v[..size]);
+                match modulus {
+                    Some(c) => moved + &c.columns[m] * &v[size],
+                    None => moved,
+                }
+            })
+            .collect();
         rows.iter()
             .map(|row| joint_held(row.iter().map(|(m, k)| k * &pairings[*m]).sum()))
             .collect()
     };
-    // `M⁻¹Aᵀu`: the members' weights, their gradients summed, each row of `E` through `H′⁻¹`.
-    let lift = |u: &[Rat]| -> Vec<Rat> {
+    // `Aᵀu`: the members' weights and their gradients summed.
+    let pull = |u: &[Rat]| -> (Vec<Rat>, Vec<Rat>) {
         let mut weights = vec![Rat::zero(); gradients.len()];
         for (row, value) in rows.iter().zip(u) {
             for (m, k) in row.iter() {
@@ -4743,12 +5008,31 @@ fn kinetic_lift(
                     .sum()
             })
             .collect();
-        (0..height * columns)
+        (weights, pulled)
+    };
+    // The modulus's two drives at `u` ([`KineticSolve::modulus_drive`]).
+    let drive = |c: &ModulusCoupling, weights: &[Rat], pulled: &[Rat]| -> (Rat, Rat) {
+        (weights.iter().zip(&c.columns).map(|(w, a)| w * a).sum(), dot(&c.coupling, pulled))
+    };
+    // `M⁻¹Aᵀu`: each row of `E` through `H′⁻¹`.
+    let lift = |u: &[Rat]| -> Vec<Rat> {
+        let (weights, pulled) = pull(u);
+        let mut lifted: Vec<Rat> = (0..height * columns)
             .map(|e| {
                 let (r, j) = (e / columns, e % columns);
                 joint_held((0..columns).map(|i| &pulled[r * columns + i] * &chart[i][j]).sum())
             })
-            .collect()
+            .collect();
+        // The modulus's row of `M⁻¹` by its Schur complement ([`ModulusCoupling`], "Its inverse").
+        if let Some(c) = modulus {
+            let (own, supplied) = drive(c, &weights, &pulled);
+            let x = joint_held((own - supplied) / &c.schur);
+            for (value, b) in lifted.iter_mut().zip(&c.coupling) {
+                *value = joint_held(&*value - &x * b);
+            }
+            lifted.push(x);
+        }
+        lifted
     };
     // The witness's form and covector on the reading coordinates, term by term.
     let fisher = |delta: &[Rat]| -> Vec<Rat> {
@@ -4771,12 +5055,13 @@ fn kinetic_lift(
     let m = rows.len();
     let cosine = |v: &[Rat]| -> Option<Rat> {
         let t = toward?;
+        let v = &v[..size];
         let (vt, vv, tt) = (dot(v, t), dot(v, v), dot(t, t));
         (vv.is_positive() && tt.is_positive()).then(|| joint_held(&vt * vt.abs() / (vv * tt)))
     };
     let mut s: Vec<Rat> = covector.iter().map(|c| -c).collect();
     let mut mu = vec![Rat::zero(); m];
-    let mut v = vec![Rat::zero(); height * columns];
+    let mut v = vec![Rat::zero(); size + usize::from(modulus.is_some())];
     let mut z = lift(&s);
     let mut az = forward(&z);
     let mut rz = dot(&s, &az);
@@ -4833,7 +5118,11 @@ fn kinetic_lift(
     };
     let av = forward(&v);
     let predicted = dot(&covector, &av) + dot(&av, &fisher(&av)) / Rat::from_integer(BigInt::from(2));
-    let moved = ExactRatMatrix::new(v.chunks(columns).map(<[Rat]>::to_vec).collect())?;
+    let moved = ExactRatMatrix::new(v[..size].chunks(columns).map(<[Rat]>::to_vec).collect())?;
+    let modulus_drive = modulus.map(|c| {
+        let (weights, pulled) = pull(&mu);
+        drive(c, &weights, &pulled)
+    });
     Ok(KineticSolve {
         readings: m,
         multipliers: mu,
@@ -4842,6 +5131,8 @@ fn kinetic_lift(
         stop,
         moved,
         predicted,
+        modulus: modulus.map(|_| v[size].clone()),
+        modulus_drive,
     })
 }
 
@@ -4923,7 +5214,7 @@ pub fn kinetic_reading(
         }
     }
     reading.solve =
-        kinetic_solve(field, constitution, declared, requests, &proposal, &samples, direction.as_ref())?;
+        kinetic_solve(field, constitution, declared, requests, &proposal, &samples, direction.as_ref(), false)?;
     reading.unit_move = Some(step.unit_move);
     Ok(reading)
 }
@@ -5083,7 +5374,20 @@ pub(crate) fn kinetic_lift_probe(
     chart: &[Vec<Rat>],
     columns: usize,
 ) -> Result<KineticSolve, HnnError> {
-    kinetic_lift(terms, gradients, chart, columns, None)
+    kinetic_lift(terms, gradients, chart, columns, None, None)
+}
+
+/// The kinetic solve's recurrence with the modulus joined ([`ModulusCoupling`]; the owner's solve
+/// tests).
+#[cfg(test)]
+pub(crate) fn kinetic_lift_joined_probe(
+    terms: &[(Vec<Rat>, usize, Vec<Vec<(usize, Rat)>>)],
+    gradients: &[Vec<Rat>],
+    chart: &[Vec<Rat>],
+    columns: usize,
+    coupling: &ModulusCoupling,
+) -> Result<KineticSolve, HnnError> {
+    kinetic_lift(terms, gradients, chart, columns, None, Some(coupling))
 }
 
 /// **Each reading's gradient against its storage move** (the owner's gradient test): at a

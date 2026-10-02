@@ -433,6 +433,11 @@ fn the_bank_placement_under_a_dissipative_transport() {
             // The modulus's derivative against the exact weights' central difference: second order.
             if cells.iter().any(Option::is_some) {
                 let derivative = placement.modulus_derivative(station, cells);
+                // Each datum's reach slope rebuilds it, datum by datum, within the held grain.
+                let grain = Rat::new(1.into(), BigInt::from(1) << 160usize);
+                for (rebuilt, d) in placement.reach_derivative(station, cells).iter().zip(&derivative) {
+                    assert!((rebuilt - d).abs() <= grain, "the reach slopes rebuild ∂z/∂ρ");
+                }
                 let residual = |h: &Rat| -> Rat {
                     let up = placement.exact_storage(station, cells, &(&modulus + h));
                     let down = placement.exact_storage(station, cells, &(&modulus - h));
