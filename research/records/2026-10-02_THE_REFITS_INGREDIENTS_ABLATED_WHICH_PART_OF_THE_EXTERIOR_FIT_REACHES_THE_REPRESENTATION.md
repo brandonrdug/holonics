@@ -362,7 +362,8 @@ the largest real logit of `R P_R v_R`. Read at m6 and w16 on held-out requests
   first class and its stations right count only targets equal to it: 0 of 8 at both states on one
   request; 2 of 16 at m6 on two. The bank's open section reads 4 and 2 of 8, its release 4 and 4.
 - **Reading the stations through `R P_R^(1+j) v_R` is the linear readout retired on September 30**
-  (`hnn::prediction`'s header: its descent direction met the executed decision's at cosine `39/512`).
+  (`hnn::prediction`'s header; the [diagnosis](2026-09-30_THE_LEARNING_FAILURE_DIAGNOSED_THE_TRAINED_COMPARISON_IS_NOT_THE_ONE_THE_RELEASE_EXECUTES.md) §3: its descent direction met the executed
+  decision's at cosine `39/512`).
 
 So §6's deciding number is withdrawn: no word read at a U6 state can separate m6 from w16 while the
 receiving map holds nothing, and forming one would revive the retired readout. In the generation
