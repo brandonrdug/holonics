@@ -216,8 +216,10 @@ gradient only once a metric is supplied.
 
 [proved-derived; formal-checked] The KT parameter redundancy
 `−log₂ KT(x) ≤ −log₂ P_θ(x) + ½ log₂ n + 1` (binary) is `Context/PriorMass.kt_regret` (with its
-prior-mass case `½ log₂ n + j`, `priorMass_regret_bits`). [open] Owed in #62 ("Step 4 (#73) owed"):
-its composition with `kraft_and_dominance` into CTW's full bound. **The lattice chart's passage-level drift** (#62, "the landmark lattice's drift"): the
+prior-mass case `½ log₂ n + j`, `priorMass_regret_bits`), and its composition with the dominance
+into the tree's full bound, at any rung and any stop weights, is
+`Context/PriorMass.priorMass_tree_redundancy` (the leaves' charges summed, not in the concave form
+`|S| γ(N/|S|)`). [open] **The lattice chart's passage-level drift** (#62, "the landmark lattice's drift"): the
 composition over the tree and the passage of `lattice_node_telescope`, `weight_log_lipschitz` and
 `mix_ratio_bound` into `|ln β̂_s − ln β_s| ≤ Σ_(subtree)(θ + 2|ln(1 − r)|) + Σ_s |ln(1 − r)|` and the
 per-cell rule `(3/2) B [(n* D² + 2D + 1) 2^(−M−1)/μ̂ + n* D² 2^(1−W)]` (Rust `landmark::face_bits`,
