@@ -42,7 +42,9 @@
 //! `holonics-cuda::hnn::lattice`): a chart's coordinates are signed 64-bit words; each product
 //! entry is a sum of 128-bit products, admitted only when its bound `Σ_j |q_ij x_j|` stays below
 //! `2^127`, whatever its value, so the refusal depends on the exact terms alone
-//! ([`HnnError::Carrier`]). An operand enters a product as its integral chart (integers over one
+//! ([`HnnError::Carrier`]). Under that bound every partial sum, in any order, lies in
+//! `(−2^127, 2^127)`, so the 128-bit ring read is the integer sum (Lean
+//! `HNN/LatticeWord.{carrier_partial_sum, carrier_ring_read}`). An operand enters a product as its integral chart (integers over one
 //! denominator, `crate::ratio::linear::vector::integral`): a carried transient on `2^(−L_w)ℤ` is
 //! its coordinates over `2^(L_w)`.
 //!
@@ -89,13 +91,14 @@
 //! | Lean (`HNN/LatticeWord`) | Rust |
 //! |---|---|
 //! | `nsStep`, `rounded_refinement_certificate`, `roundedIter_certificate`, `latticeChart` | [`refine`], [`newton_schulz_step`], [`ChartWords`] |
+//! | `rowNorm` (the certificate), `warm_start_certificate`, `inverse_chart_deviation` | [`certificate`], [`Charts`] (the warm start), [`WordLattice::by_rule`] |
+//! | `feedback_tick`, `feedback_accounting_zero`, `carried_word_accounting` | [`carry`], [`Remainders`] |
+//! | `executed_adjoint_pairing`, `executed_adjoint_unique` | [`ChartWords::apply_transpose`] |
+//! | `carrier_partial_sum`, `carrier_ring_read` | `certified_dot` (the ℓ1 certificate) |
 //!
 //! [open] Owed in #62 (Lean): the scaled transpose's convergence (`σ_min ≥ 1` by passivity) is an
 //! efficiency claim only, since every certificate is computed exactly and the exact inverse is the
 //! fallback.
-//! | `rowNorm` (the certificate), `warm_start_certificate`, `inverse_chart_deviation` | [`certificate`], [`Charts`] (the warm start), [`WordLattice::by_rule`] |
-//! | `feedback_tick`, `feedback_accounting_zero`, `carried_word_accounting` | [`carry`], [`Remainders`] |
-//! | `executed_adjoint_pairing`, `executed_adjoint_unique` | [`ChartWords::apply_transpose`] |
 
 use std::collections::BTreeMap;
 
@@ -231,7 +234,8 @@ fn operand(vector: &[Rat]) -> Result<(Vec<i64>, BigInt), HnnError> {
     Ok((words, denominator))
 }
 
-/// `Σ_j q_j x_j` under the ℓ1 certificate: admitted when `Σ_j |q_j x_j| < 2^127`.
+/// `Σ_j q_j x_j` under the ℓ1 certificate: admitted when `Σ_j |q_j x_j| < 2^127`, so every partial
+/// sum is a word of the carrier (`carrier_partial_sum`, `carrier_ring_read`).
 fn certified_dot(pairs: impl Iterator<Item = (i128, i128)>) -> Result<i128, HnnError> {
     let (mut bound, mut sum) = (0u128, 0i128);
     for (q, x) in pairs {

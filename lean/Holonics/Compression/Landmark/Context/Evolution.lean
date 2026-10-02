@@ -40,6 +40,18 @@ only deaths thin it.
   births. A birth draws `m_g` from the reserve and renormalizes the priors over the founded mass
   `M_n = M + Σ_g m_g`, so with births the bound is `−log₂(m_f/M_n) − log₂ L_f` (Rust
   `receiver::population::evolution`; `evolved_code_with_births` below).
+* `selection_telescope`, `dirichlet_telescope`, `dirichlet_telescope_counts`
+  [proved-derived; formal-checked]: **the Dirichlet face telescoped along a sequence of
+  selections.** With the pseudo-counts unchanged, the faces of the selected families multiply to the
+  Dirichlet-multinomial face of the counts, `∏_(k<K) D_k(sel k) = ∏_f (s₀_f + σ_f)⋯(s₀_f + σ_f +
+  c_f − 1)/S(S + 1)⋯(S + K − 1)`, `S = Σ_g (s₀_g + σ_g)`, so the order of the aeons does not matter
+  and the counts are its retention. `dirichlet_telescope_le` [proved-derived; formal-checked]: with
+  deaths the pseudo-counts move, and a floor `ρ ≤ σ_k` with a ceiling `Σ_g σ_k(g) ≤ T` (`T = |F|/2`
+  by `survivalPseudo_le_half`) bounds the product below by the telescope at `ρ` over `S₀ + T`.
+* `evolved_aeons_code` [proved-derived; formal-checked]: **the multi-aeon code.** Over `K` aeons
+  without births, the population's summed code is at most the selected families' own codes plus
+  `K(−log₂ λ)` plus the Dirichlet face's code of the selection sequence, `−log₂ ∏_(k<K) D_k(sel k)`:
+  the regret the evolved prior carries across aeons is the telescope's code.
 
 **The newborn** (Rust `receiver::population`, "Birth from reserved mass"). Every family stands in
 one static mixture at its declared mass `m_x`, born or not. A family born at cell `t_x` abstains
@@ -86,6 +98,18 @@ admitted receiver). The collapsed mixture carries one member a species at the su
   by the collapsed family (`speciesStep`, `speciesRead`), through
   `Standing.statistical_sufficiency_gives_standing`. Every cell word includes every word a release
   commits, so the future is action-sufficient. Its recoverability is `species_split`.
+
+**The whole-future signature** (Rust `Emitters::signature` under `AdmittedFuture::Whole`). A key
+whose clock winds without the cells emits a periodic word, and its signature over the whole future
+is its word over one least period (`leastPeriod`, Mathlib's minimal period of the shift `wordShift`).
+
+* `leastPeriod_dvd` [proved-standard; formal-checked]: the least period divides every period.
+* `agree_forever_iff`, `signature_eq_iff` [proved-derived; formal-checked]: **two periodic words
+  agree forever exactly when their least periods agree and they agree over one period**, so two keys
+  are one species over the whole future exactly when their signatures are equal.
+* `shiftHolds_iff`, `leastPeriod_isLeast` [proved-derived; formal-checked]: on a declared period `P`,
+  a divisor `d` with `u(t + d) = u(t)` wherever `t + d < P` is a period of the whole word, so the
+  Rust search for the least such divisor returns the least period.
 
 The computational object is the helical pair interaction read as a receiver's population of eggs
 across aeons. Of the winding guide's six general objects this module touches the **tube** (the
@@ -623,6 +647,182 @@ theorem evolved_code_with_births {m : ι → ℚ} (hm : ∀ x, 0 ≤ m x) (hM : 
 
 end Newborn
 
+/-! ### The evolved prior across aeons -/
+
+section Aeons
+
+variable {ι : Type*} [Fintype ι] [DecidableEq ι]
+
+/-- [definition] **The selections of a family in the first `k` aeons** of the sequence `sel`. -/
+def selCount (sel : ℕ → ι) (k : ℕ) (x : ι) : ℕ := ((range k).filter (fun j => sel j = x)).card
+
+/-- [definition] **The retained selection counts at aeon `k`**: the counts `s₀` retained before the
+sequence plus its first `k` selections. -/
+def aeonCounts (s₀ : ι → ℕ) (sel : ℕ → ι) (k : ℕ) : ι → ℕ := fun x => s₀ x + selCount sel k x
+
+/-- [definition] **The rising product** `a(a + 1)⋯(a + n − 1)`. -/
+def rising (a : ℚ) (n : ℕ) : ℚ := ∏ j ∈ range n, (a + j)
+
+theorem rising_succ (a : ℚ) (n : ℕ) : rising a (n + 1) = rising a n * (a + n) := by
+  unfold rising
+  rw [prod_range_succ]
+
+theorem rising_pos {a : ℚ} (ha : 0 < a) (n : ℕ) : 0 < rising a n :=
+  prod_pos (fun j _ => by positivity)
+
+omit [Fintype ι] in
+theorem selCount_succ (sel : ℕ → ι) (k : ℕ) (x : ι) :
+    selCount sel (k + 1) x = selCount sel k x + if sel k = x then 1 else 0 := by
+  unfold selCount
+  rw [range_add_one, filter_insert]
+  split_ifs with h
+  · rw [card_insert_of_notMem (by simp)]
+  · rfl
+
+theorem sum_selCount (sel : ℕ → ι) (k : ℕ) : ∑ x, selCount sel k x = k := by
+  induction k with
+  | zero => simp [selCount]
+  | succ k ih =>
+    simp only [selCount_succ, sum_add_distrib, ih, sum_ite_eq, mem_univ, if_true]
+
+/-- The Dirichlet face's total at aeon `k` is the retained total plus `k`. -/
+theorem aeonCounts_total (s₀ : ι → ℕ) (σ : ι → ℚ) (sel : ℕ → ι) (k : ℕ) :
+    ∑ g, ((aeonCounts s₀ sel k g : ℚ) + σ g) = (∑ g, ((s₀ g : ℚ) + σ g)) + k := by
+  have h := congrArg (fun n : ℕ => (n : ℚ)) (sum_selCount sel k)
+  simp only [Nat.cast_sum] at h
+  simp only [aeonCounts, Nat.cast_add, sum_add_distrib, h]
+  ring
+
+/-- [proved-derived; formal-checked] **The general telescope.** For base weights `a` and a positive
+base total `B`, the per-aeon ratios `(a_(sel k) + c_k(sel k))/(B + k)` multiply to
+`∏_x a_x(a_x + 1)⋯(a_x + c_x − 1) / B(B + 1)⋯(B + K − 1)`, with `c_x` the selections of `x` in the
+`K` aeons: the product depends on the sequence only through its counts. -/
+theorem selection_telescope (a : ι → ℚ) {B : ℚ} (hB : 0 < B) (sel : ℕ → ι) (K : ℕ) :
+    ∏ k ∈ range K, (a (sel k) + selCount sel k (sel k)) / (B + k) =
+      (∏ x, rising (a x) (selCount sel K x)) / rising B K := by
+  induction K with
+  | zero => simp [selCount, rising]
+  | succ K ih =>
+    rw [prod_range_succ, ih, rising_succ]
+    have hnum : ∏ x, rising (a x) (selCount sel (K + 1) x) =
+        (∏ x, rising (a x) (selCount sel K x)) * (a (sel K) + selCount sel K (sel K)) := by
+      have hx : ∀ x, rising (a x) (selCount sel (K + 1) x) =
+          rising (a x) (selCount sel K x) *
+            (if sel K = x then a x + selCount sel K x else 1) := by
+        intro x
+        rw [selCount_succ]
+        split_ifs with h
+        · rw [rising_succ]
+        · rw [add_zero, mul_one]
+      rw [prod_congr rfl (fun x _ => hx x), prod_mul_distrib, prod_ite_eq univ (sel K)]
+      simp
+    rw [hnum]
+    have hR := rising_pos hB K
+    have hBK : (0 : ℚ) < B + K := by positivity
+    field_simp
+
+/-- [proved-derived; formal-checked] **The Dirichlet face telescoped along a sequence of
+selections.** With the pseudo-counts `σ` unchanged across the aeons, the product of the Dirichlet
+faces of the selected families is the Dirichlet-multinomial face of the counts,
+`∏_(k<K) D_k(sel k) = ∏_f (s₀_f + σ_f)⋯(s₀_f + σ_f + c_f − 1) / S(S + 1)⋯(S + K − 1)`,
+`S = Σ_g (s₀_g + σ_g)`: it depends on the sequence only through its counts. -/
+theorem dirichlet_telescope [Nonempty ι] (s₀ : ι → ℕ) {σ : ι → ℚ} (hσ : ∀ f, 0 < σ f)
+    (sel : ℕ → ι) (K : ℕ) :
+    ∏ k ∈ range K, dirichletFace (aeonCounts s₀ sel k) σ (sel k) =
+      (∏ x, rising ((s₀ x : ℚ) + σ x) (selCount sel K x)) /
+        rising (∑ g, ((s₀ g : ℚ) + σ g)) K := by
+  rw [← selection_telescope (fun x => (s₀ x : ℚ) + σ x) (dirichlet_total_pos s₀ hσ) sel K]
+  refine prod_congr rfl (fun k _ => ?_)
+  unfold dirichletFace
+  rw [aeonCounts_total]
+  simp only [aeonCounts, Nat.cast_add]
+  ring
+
+/-- [proved-derived; formal-checked] **The counts are the retention of the Dirichlet code**: two
+sequences of selections with the same counts have the same telescoped face, in any order. -/
+theorem dirichlet_telescope_counts [Nonempty ι] (s₀ : ι → ℕ) {σ : ι → ℚ} (hσ : ∀ f, 0 < σ f)
+    {sel sel' : ℕ → ι} {K : ℕ} (hc : ∀ x, selCount sel K x = selCount sel' K x) :
+    ∏ k ∈ range K, dirichletFace (aeonCounts s₀ sel k) σ (sel k) =
+      ∏ k ∈ range K, dirichletFace (aeonCounts s₀ sel' k) σ (sel' k) := by
+  rw [dirichlet_telescope s₀ hσ, dirichlet_telescope s₀ hσ]
+  simp only [hc]
+
+/-- [proved-derived; formal-checked] **Deaths along the sequence.** When the pseudo-counts move from
+aeon to aeon (each death thins one), a floor `ρ ≤ σ_k` and a ceiling `Σ_g σ_k(g) ≤ T` bound the
+product from below by the telescope at the floor over the ceiling's total:
+`∏_(k<K) D_k(sel k) ≥ ∏_f (s₀_f + ρ_f)⋯(s₀_f + ρ_f + c_f − 1) / (S₀ + T)⋯(S₀ + T + K − 1)`,
+`S₀ = Σ_g s₀_g`. -/
+theorem dirichlet_telescope_le (s₀ : ι → ℕ) {σ : ℕ → ι → ℚ} {ρ : ι → ℚ} {T : ℚ}
+    (hρ : ∀ x, 0 < ρ x) (hρσ : ∀ k x, ρ x ≤ σ k x) (hT : ∀ k, ∑ g, σ k g ≤ T)
+    (sel : ℕ → ι) (K : ℕ) :
+    (∏ x, rising ((s₀ x : ℚ) + ρ x) (selCount sel K x)) /
+        rising ((∑ g, (s₀ g : ℚ)) + T) K ≤
+      ∏ k ∈ range K, dirichletFace (aeonCounts s₀ sel k) (σ k) (sel k) := by
+  have hσ : ∀ k x, 0 < σ k x := fun k x => lt_of_lt_of_le (hρ x) (hρσ k x)
+  have hT0 : 0 < T := lt_of_lt_of_le (lt_of_lt_of_le (hσ 0 (sel 0))
+    (single_le_sum (fun g _ => (hσ 0 g).le) (mem_univ (sel 0)))) (hT 0)
+  have hB : 0 < (∑ g, (s₀ g : ℚ)) + T := by
+    have : 0 ≤ ∑ g, (s₀ g : ℚ) := sum_nonneg (fun g _ => Nat.cast_nonneg _)
+    linarith [hT0]
+  rw [← selection_telescope (fun x => (s₀ x : ℚ) + ρ x) hB sel K]
+  refine prod_le_prod (fun k _ => ?_) (fun k _ => ?_)
+  · have : 0 ≤ (s₀ (sel k) : ℚ) + ρ (sel k) + selCount sel k (sel k) := by
+      have := hρ (sel k); positivity
+    exact div_nonneg this (by positivity)
+  · have hNe : Nonempty ι := ⟨sel 0⟩
+    unfold dirichletFace
+    rw [aeonCounts_total]
+    refine div_le_div₀ ?_ ?_ ?_ ?_
+    · have := hσ k (sel k); positivity
+    · simp only [aeonCounts, Nat.cast_add]
+      linarith [hρσ k (sel k)]
+    · have := dirichlet_total_pos s₀ (hσ k); linarith [Nat.cast_nonneg (α := ℚ) k]
+    · have h1 := hT k
+      simp only [sum_add_distrib]
+      linarith
+
+/-- [proved-derived; formal-checked] **The evolved prior across aeons: the multi-aeon code
+telescoped along the selections.** In aeon `k` the population codes its passage `F k` under the
+evolved prior `π_k = λ D_k + (1 − λ) P`, `D_k` the Dirichlet face of the counts retained from the
+earlier aeons' selections; over `K` aeons its code is at most the selected families' own codes plus
+`K` times `−log₂ λ` plus the Dirichlet face's code of the selection sequence:
+`Σ_(k<K) −log₂ W_k ≤ K(−log₂ λ) − log₂ ∏_(k<K) D_k(sel k) − Σ_(k<K) log₂ L_k(sel k)`. With the
+pseudo-counts unchanged the product is `dirichlet_telescope`'s face of the counts; with deaths
+`dirichlet_telescope_le` bounds it. Aeons without births (a birth adds `log₂(M_n/M)` to its aeon,
+`evolved_code_with_births`). -/
+theorem evolved_aeons_code {w : ℚ} (hw0 : 0 < w) (hw1 : w ≤ 1) (s₀ : ι → ℕ) {σ : ℕ → ι → ℚ}
+    (hσ : ∀ k x, 0 < σ k x) {P : ι → ℚ} (hP : IsPrior P) (sel : ℕ → ι) {F : ℕ → ι → ℕ → ℚ}
+    (hF : ∀ k x t, 0 ≤ F k x t) (n : ℕ → ℕ) (hL : ∀ k, 0 < seqLik (F k (sel k)) (n k)) (K : ℕ) :
+    ∑ k ∈ range K, -Real.logb 2 ((∏ t ∈ range (n k), fwdMix
+        (evolved w (dirichletFace (aeonCounts s₀ sel k) (σ k)) P) (F k) idKernel t : ℚ) : ℝ) ≤
+      K * -Real.logb 2 (w : ℝ) -
+        Real.logb 2 ((∏ k ∈ range K, dirichletFace (aeonCounts s₀ sel k) (σ k) (sel k) : ℚ) : ℝ) -
+        ∑ k ∈ range K, Real.logb 2 (seqLik (F k (sel k)) (n k) : ℝ) := by
+  have : Nonempty ι := ⟨sel 0⟩
+  have hD : ∀ k, 0 < dirichletFace (aeonCounts s₀ sel k) (σ k) (sel k) :=
+    fun k => dirichletFace_pos _ (hσ k) _
+  have hstep : ∀ k ∈ range K, -Real.logb 2 ((∏ t ∈ range (n k),
+      fwdMix (evolved w (dirichletFace (aeonCounts s₀ sel k) (σ k)) P) (F k) idKernel t : ℚ) : ℝ) ≤
+        -Real.logb 2 (w : ℝ) -
+          Real.logb 2 (dirichletFace (aeonCounts s₀ sel k) (σ k) (sel k) : ℝ) -
+          Real.logb 2 (seqLik (F k (sel k)) (n k) : ℝ) := by
+    intro k _
+    have hDp := dirichletFace_isPrior (aeonCounts s₀ sel k) (hσ k)
+    have hx : 0 < evolved w (dirichletFace (aeonCounts s₀ sel k) (σ k)) P (sel k) := by
+      unfold evolved
+      have := mul_nonneg (sub_nonneg.2 hw1) (hP.1 (sel k))
+      have := mul_pos hw0 (hD k)
+      linarith
+    have h1 := evolved_aeon_code hw0.le hw1 hDp hP (hF k) (n k) hx (hL k)
+    have h2 := evolved_code_le_face hw0 hw1 (D := dirichletFace (aeonCounts s₀ sel k) (σ k))
+      hP.1 (hD k)
+    linarith
+  refine (sum_le_sum hstep).trans (le_of_eq ?_)
+  rw [Rat.cast_prod, Real.logb_prod _ _ (fun k _ => by exact_mod_cast (hD k).ne'),
+    sum_sub_distrib, sum_sub_distrib, sum_const, card_range, nsmul_eq_mul]
+
+end Aeons
+
 section Species
 
 variable {κ S : Type*} [Fintype κ] [Fintype S] [DecidableEq κ] [DecidableEq S]
@@ -759,6 +959,144 @@ theorem species_collapse_standing (σ : κ → S) (rep : S → κ) (f : κ → �
 
 end Species
 
+/-! ### The whole-future signature -/
+
+section Signature
+
+variable {α : Type*}
+
+/-- [definition] **The shift of a word** `u : ℕ → α`, one tick later. -/
+def wordShift (u : ℕ → α) : ℕ → α := fun t => u (t + 1)
+
+theorem wordShift_iterate (n : ℕ) (u : ℕ → α) : wordShift^[n] u = fun t => u (t + n) := by
+  induction n with
+  | zero => rfl
+  | succ n ih =>
+    rw [Function.iterate_succ_apply', ih]
+    funext t
+    simp only [wordShift, add_assoc, add_comm 1 n]
+
+/-- A word is a periodic point of the shift exactly when it is periodic. -/
+theorem isPeriodicPt_wordShift_iff {n : ℕ} {u : ℕ → α} :
+    Function.IsPeriodicPt wordShift n u ↔ Function.Periodic u n := by
+  unfold Function.IsPeriodicPt Function.IsFixedPt
+  rw [wordShift_iterate]
+  exact ⟨fun h t => congrFun h t, fun h => funext h⟩
+
+/-- [definition] **The least period of a word**: the least `d > 0` with `u(t + d) = u(t)` at every
+tick, Mathlib's minimal period of the shift (zero for an aperiodic word). -/
+def leastPeriod (u : ℕ → α) : ℕ := Function.minimalPeriod wordShift u
+
+theorem leastPeriod_periodic (u : ℕ → α) : Function.Periodic u (leastPeriod u) :=
+  isPeriodicPt_wordShift_iff.1 (Function.isPeriodicPt_minimalPeriod _ _)
+
+theorem leastPeriod_pos {u : ℕ → α} {P : ℕ} (hP : 0 < P) (hu : Function.Periodic u P) :
+    0 < leastPeriod u :=
+  Function.minimalPeriod_pos_of_mem_periodicPts
+    (Function.mk_mem_periodicPts hP (isPeriodicPt_wordShift_iff.2 hu))
+
+/-- [proved-standard; formal-checked] **The least period of a periodic word divides each of its
+periods.** -/
+theorem leastPeriod_dvd {u : ℕ → α} {P : ℕ} (hu : Function.Periodic u P) : leastPeriod u ∣ P :=
+  (isPeriodicPt_wordShift_iff.2 hu).minimalPeriod_dvd
+
+theorem leastPeriod_le {u : ℕ → α} {P : ℕ} (hP : 0 < P) (hu : Function.Periodic u P) :
+    leastPeriod u ≤ P :=
+  (isPeriodicPt_wordShift_iff.2 hu).minimalPeriod_le hP
+
+/-- [proved-derived; formal-checked] **Two periodic words agree forever exactly when their least
+periods agree and they agree over one period.** Only one of the two need be declared periodic: a
+word whose least period equals a positive one is periodic with it. -/
+theorem agree_forever_iff {u v : ℕ → α} {P : ℕ} (hP : 0 < P) (hu : Function.Periodic u P) :
+    (∀ t, u t = v t) ↔ leastPeriod u = leastPeriod v ∧ ∀ t < leastPeriod u, u t = v t := by
+  constructor
+  · intro h
+    have : u = v := funext h
+    subst this
+    exact ⟨rfl, fun t _ => rfl⟩
+  · rintro ⟨hd, hag⟩ t
+    rw [← (leastPeriod_periodic u).map_mod_nat t, ← (leastPeriod_periodic v).map_mod_nat t, ← hd]
+    exact hag _ (Nat.mod_lt _ (leastPeriod_pos hP hu))
+
+/-- [definition] **The finite shift test** on one declared period `P` (Rust
+`Emitters::signature`): `d` divides `P` and `u(t + d) = u(t)` wherever `t + d < P`. -/
+def ShiftHolds (u : ℕ → α) (P d : ℕ) : Prop := d ∣ P ∧ ∀ t, t + d < P → u (t + d) = u t
+
+/-- [proved-derived; formal-checked] **The finite test reads a period of the whole word**: on a
+declared period `P`, a divisor `d` passes the test over the one period exactly when it is a period
+of the whole future. -/
+theorem shiftHolds_iff {u : ℕ → α} {P d : ℕ} (hP : 0 < P) (hu : Function.Periodic u P) :
+    ShiftHolds u P d ↔ d ∣ P ∧ Function.Periodic u d := by
+  constructor
+  · rintro ⟨⟨m, hm⟩, h⟩
+    refine ⟨⟨m, hm⟩, fun t => ?_⟩
+    have hit : ∀ j x, x + d * j < P → u (x + d * j) = u x := by
+      intro j
+      induction j with
+      | zero => intro x _; simp
+      | succ j ih =>
+        intro x hx
+        have he : x + d * (j + 1) = x + d * j + d := by ring
+        rw [he] at hx ⊢
+        rw [h _ hx, ih x (lt_of_le_of_lt (Nat.le_add_right _ _) hx)]
+    have hm1 : 1 ≤ m := by
+      rcases Nat.eq_zero_or_pos m with h0 | h0
+      · rw [h0, mul_zero] at hm; omega
+      · exact h0
+    have hD : d * (m - 1) + d = P := by
+      rw [hm, ← Nat.mul_succ]; congr 1; omega
+    have hred : ∀ x, u (x + P * (t / P)) = u x := fun x => by
+      rw [mul_comm]; exact (hu.nat_mul (t / P)) x
+    have ht : t = t % P + P * (t / P) := (Nat.mod_add_div t P).symm
+    have hr : t % P < P := Nat.mod_lt _ hP
+    rw [ht, show t % P + P * (t / P) + d = (t % P + d) + P * (t / P) by ring, hred, hred]
+    by_cases hlt : t % P + d < P
+    · exact h _ hlt
+    · have hx : t % P + d = (t % P + d - P) + P := by omega
+      rw [hx, hu]
+      have hr' : t % P = (t % P + d - P) + d * (m - 1) := by omega
+      rw [hr'] at hr ⊢
+      rw [hit (m - 1) _ hr]
+      congr 1
+      omega
+  · rintro ⟨hdvd, hper⟩
+    exact ⟨hdvd, fun t _ => hper t⟩
+
+/-- [proved-derived; formal-checked] **The least period is the least divisor passing the finite
+test**: Rust `Emitters::signature`'s search `(1..=P).find(d ∣ P ∧ shift holds)` returns the least
+period of the whole word. -/
+theorem leastPeriod_isLeast {u : ℕ → α} {P : ℕ} (hP : 0 < P) (hu : Function.Periodic u P) :
+    IsLeast {d | 0 < d ∧ ShiftHolds u P d} (leastPeriod u) := by
+  refine ⟨⟨leastPeriod_pos hP hu, (shiftHolds_iff hP hu).2
+    ⟨leastPeriod_dvd hu, leastPeriod_periodic u⟩⟩, ?_⟩
+  rintro d ⟨hd, hs⟩
+  exact leastPeriod_le hd ((shiftHolds_iff hP hu).1 hs).2
+
+/-- [definition] **A word's whole-future signature**: its letters over one least period. -/
+def signature (u : ℕ → α) : List α := (List.range (leastPeriod u)).map u
+
+/-- [proved-derived; formal-checked] **The whole-future species check.** Two keys whose emitted
+words are periodic have equal signatures exactly when they emit one class at every future tick
+(Rust `Emitters::signature` under `AdmittedFuture::Whole`, compared as words). -/
+theorem signature_eq_iff {u v : ℕ → α} {P : ℕ} (hP : 0 < P) (hu : Function.Periodic u P) :
+    signature u = signature v ↔ ∀ t, u t = v t := by
+  rw [agree_forever_iff hP hu]
+  unfold signature
+  constructor
+  · intro h
+    have hl := congrArg List.length h
+    simp only [List.length_map, List.length_range] at hl
+    refine ⟨hl, fun t ht => ?_⟩
+    have := congrArg (fun l => l[t]?) h
+    simp only [List.getElem?_map, List.getElem?_range ht, List.getElem?_range (hl ▸ ht),
+      Option.map_some] at this
+    exact Option.some.inj this
+  · rintro ⟨hd, h⟩
+    rw [← hd]
+    exact List.map_congr_left (fun t ht => h t (List.mem_range.1 ht))
+
+end Signature
+
 section Audit
 
 #print axioms survivalPseudo_pos
@@ -785,6 +1123,11 @@ section Audit
 #print axioms founded_share
 #print axioms founded_code
 #print axioms evolved_code_with_births
+#print axioms selection_telescope
+#print axioms dirichlet_telescope
+#print axioms dirichlet_telescope_counts
+#print axioms dirichlet_telescope_le
+#print axioms evolved_aeons_code
 #print axioms speciesWeight_isPrior
 #print axioms species_mixture
 #print axioms species_face
@@ -792,6 +1135,11 @@ section Audit
 #print axioms species_split
 #print axioms speciesWeight_mul
 #print axioms species_collapse_standing
+#print axioms leastPeriod_dvd
+#print axioms agree_forever_iff
+#print axioms shiftHolds_iff
+#print axioms leastPeriod_isLeast
+#print axioms signature_eq_iff
 
 end Audit
 

@@ -87,10 +87,11 @@ checkpoint.
 The float path's numbers check these; they do not set them.
 
 1. **The height `h`: derived, and not a parameter inside a window.** The entry bound holds every
-   adopted `E` within `2^3` an entry, so the comparison is bounded on the adopted states, between a
-   floor `m` and some `B`. A bounded comparison satisfies every window's excursion with
-   `h = B − m` (`excursion_of_bounded`). So no per-step check of the own release is owed inside a
-   window, and the owner's window runs with the height unchecked (`ReleaseExcursion::from`). The
+   adopted `E` within `2^3` an entry. With the readings bounded away from zero there
+   ([agent-inferred]; §5's review), the comparison is bounded on the adopted states, between a floor
+   `m` and some `B`. A bounded comparison satisfies every window's excursion with `h = B − m`
+   (`excursion_of_bounded`). So no per-step check of the own release is owed inside a window, and
+   the owner's window runs with the height unchecked (`ReleaseExcursion::from_checkpoint`). The
    largest flip the lock rule allows on one move is bounded by the same range. A finite `h` below
    `B − m` would only end futile windows sooner; that is the window's length's job (3).
 2. **The decrease `σ`: derived from the receiver's grain.** A decrease below the grain is not a
@@ -128,9 +129,25 @@ Until then the owner runs the monotone guard, which is the former rule.
 - `closes`: `end.upper < checkpoint.lower − σ`.
 
 `executed_move_in` passes `ReleaseExcursion::monotone()`, exactly the former rule.
-`executed_move_guarded` takes the chain's excursion. `ReleaseExcursion::from` opens a window at a held checkpoint. The chain holds the checkpoint, counts the
-window and returns to the checkpoint when a window does not close. The fixed mask's `NotBelow` is
-unchanged.
+`executed_move_guarded` takes the chain's excursion. `ReleaseExcursion::from_checkpoint` opens a
+window at a held checkpoint. The chain holds the checkpoint, counts the window and returns to the
+checkpoint when a window does not close. The fixed mask's `NotBelow` is unchanged.
+
+Review (#202): the fixed mask's `NotBelow` is tested before the excursion on every rung, so no
+window skips it. The return restores the checkpoint's whole `Constitution`, held by the chain as one
+state (not a tape), and every successor the failed window adopted is discarded: §12's
+`CheckpointGuard` indexes adopted states only, which presumes exactly that. `ReleaseExcursion`
+holds only the checkpoint's comparison, which is all the step's guard and the close read; no chain
+owner runs windows yet. The unchecked height is sound whatever its value, because only the chain
+reads a window's states and it releases only a closed window's checkpoint. Its finiteness, §4's
+`B − m`, is [agent-inferred]: the entry bound bounds `E`, but a bounded comparison also needs the
+readings bounded away from zero on the admitted states, which no guard states, so
+`excursion_of_bounded`'s hypothesis is not discharged. A held negative height states no guard (the
+checkpoint itself would breach its excursion) and a negative `σ` lets a checkpoint rise, so both
+are refused, typed: `executed_move_guarded` refuses `HnnError::ExcursionHeight` before any reading,
+and `closes` returns `HnnError::WindowDecrease`. `σ` is in the comparison's units: the comparison
+is the batch's total in nats (its logarithms are `ln` enclosures), and one grain of `tolerance`
+bits per decision is `decisions · tolerance · ln 2` nats.
 
 ## 6. Verification
 
