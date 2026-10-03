@@ -1,0 +1,12 @@
+  the release guard: ReleaseExcursion { checkpoint: None, height: Some(Ratio { numer: 0, denom: 1 }) }
+executed move-once: 8 order2 requests at development seed 2026093061, the candidate arm, from m2 (ρ 102837/131072); the bank p = 5/8, grain 2^(-16)
+    the incumbent's own comparison, exact: 1081166074354256287118507449543/9903520314283042199192993792 2162352995797441047060173079461/19807040628566084398385987584
+  m2 throw: the incumbent: ρ 102837/131072; L ∈ [447159/4096, 447165/4096) nats, X ∈ [265895/4096, 265900/4096) nats; solved 2 of 64; whole 0 (released 8, stations right 16); 520612 ms
+    the throw: flight of 1 moves, moving; power along the coast [16685/4096, 16687/4096); coast released from rest; kinetic reading [29187/4096, 29188/4096); impulse step Some(Ratio { numer: 2, denom: 1 })
+    γ_ρ Some(Ratio { numer: 10790723, denom: 65536 }), Δρ per unit of E's step Some(Ratio { numer: 0, denom: 1 }) (24 bits)
+    move 0: adopted at step 2; the ladder's start Some((Ratio { numer: 2, denom: 1 }, FirstOrderZero)); trials η 2 None; persistence Persistence { locks: 64, solved: 6, reread: 6, stay: 2, fall: 4, reversed: 4, uncertified: 0 }; 520613 ms
+      trials: η 2 ρ unmoved mask [415196/4096, 415202/4096) own [427102/4096, 427107/4096) adopted; γ_ρ [674420/4096, 674421/4096)
+  m2 throw: the adopted successor's own release: ρ 102837/131072; L ∈ [427102/4096, 427107/4096) nats, X ∈ [248035/4096, 248040/4096) nats; solved 3 of 64; whole 0 (released 8, stations right 15); 520613 ms
+    the successor's own comparison, exact: 4130682637871916127302498591389/39614081257132168796771975168 8261448996702543651035936359119/79228162514264337593543950336
+  m2: throw adopted; the later metrics are not attempted
+executed move-once: 520700 ms; resident 169799680 now, 175296512 peak

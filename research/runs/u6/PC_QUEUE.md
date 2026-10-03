@@ -131,13 +131,18 @@ driver, the same acceptance and ρ held; only the carried momentum differs.
 
 **The end states named so far** (the main line, October 3):
 - `coord`: Q2's Coordinate chain ended at its held state q213, `q213-coordinate.state` on
-  `claude/cloud-runs-pfo084` at `5f54e54` (sha256 `038f227d32924018c2685c345054e32a91e66afad703b41187b66b9241f944b8`);
+  `claude/cloud-runs-pfo084` at `5f54e54`, archived at
+  `research/runs/branch-archive/claude/cloud-runs-pfo084/research/runs/u6/cloud/q2/q213-coordinate.state` (sha256 `038f227d32924018c2685c345054e32a91e66afad703b41187b66b9241f944b8`);
 - `kin`: Q2's Kinetic control ended at q2k14, `research/runs/u6/runner2/q2k/q2k14/q2k14-kinetic.state`
-  on `claude/cloud-runs-2-5aw27d` at `1733578` (sha256 `963d122685ee16449ac1cc4fb3f0623c91b9a6ba2ab5770919c79de7d20790d9`);
-- `rest`: `research/runs/throw-rest/m8/m8-throw.state` on `claude/pc-receipts`;
+  on `claude/cloud-runs-2-5aw27d` at `1733578`, archived at
+  `research/runs/branch-archive/claude/cloud-runs-2-5aw27d/research/runs/u6/runner2/q2k/q2k14/q2k14-kinetic.state` (sha256 `963d122685ee16449ac1cc4fb3f0623c91b9a6ba2ab5770919c79de7d20790d9`);
+- `rest`: `research/runs/throw-rest/m8/m8-throw.state` on `claude/pc-receipts`, archived at
+  `research/runs/branch-archive/claude/pc-receipts/research/runs/throw-rest/m8/m8-throw.state`;
 - `tctl`: the strict-descent Coordinate control is not relaunched. It is read at m6,
   `research/runs/throw-control/m6/m6-coordinate.state` on `claude/throw-control-chain-847j2f` at
-  `774079e`, beside `rest6` = `research/runs/throw-rest/m6/m6-throw.state` on `claude/pc-receipts`;
+  `774079e` (archived at
+  `research/runs/branch-archive/claude/throw-control-chain-847j2f/research/runs/throw-control/m6/m6-coordinate.state`), beside `rest6` = `research/runs/throw-rest/m6/m6-throw.state` on `claude/pc-receipts` (archived at
+  `research/runs/branch-archive/claude/pc-receipts/research/runs/throw-rest/m6/m6-throw.state`);
 - `coast` and `whole`: still running. Coast-alone m8 against at-rest m8 is already read (record §10).
 
 **Like for like by move count.** A pair compares two states at the same move count:

@@ -1,0 +1,6 @@
+e0901dfae5c550f40657b3148fea92ecd76ee7b6
+0fde2bdf2e7b8140e83d1e985f067ff9841c2a9f81c2df41651bf833b7d3d005
+args executed move-once order2 2026093061 8 /home/user/holonics/.local/throw/m10 m10=/home/user/holonics/.local/throw/m10/in.state lock-dec throw
+unit bounds ms: incumbent 1349692 persistence 1349692 slope 1349692 reread 1349692
+per-kind bounds from move 10: incumbent 201042 persistence 992 slope 31009 reread 189029 ms
+note: incomplete; the outer timeout 1350 s ended this move during its eighth trial (see stamps.txt); no result

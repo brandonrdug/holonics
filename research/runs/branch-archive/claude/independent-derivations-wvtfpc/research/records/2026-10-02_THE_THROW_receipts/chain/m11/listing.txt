@@ -1,0 +1,12 @@
+  the release guard: ReleaseExcursion { checkpoint: None, height: Some(Ratio { numer: 0, denom: 1 }) }
+executed move-once: 8 order2 requests at development seed 2026093061, the candidate arm, from m11 (ρ 102837/131072); the bank p = 5/8, grain 2^(-16)
+    the incumbent's own comparison, exact: 3372592809338839393057638413303/39614081257132168796771975168 6745263483482550543306238265417/79228162514264337593543950336
+  m11 throw: the incumbent: ρ 102837/131072; L ∈ [348717/4096, 348722/4096) nats, X ∈ [167601/4096, 167606/4096) nats; solved 1 of 64; whole 0 (released 8, stations right 16); 1377865 ms
+    the throw: flight of 0 moves, at rest; power along the coast none; coast released from rest; kinetic reading none; impulse step Some(Ratio { numer: 16, denom: 1 })
+    γ_ρ Some(Ratio { numer: 7894497, denom: 262144 }), Δρ per unit of E's step Some(Ratio { numer: 0, denom: 1 }) (24 bits)
+    move 0: adopted at step 1/4; the ladder's start Some((Ratio { numer: 16, denom: 1 }, FirstOrderZero)); trials η 16 Some("refused"), η 8 Some("refused"), η 4 Some("refused"), η 2 Some("refused"), η 1 Some("refused"), η 1/2 Some("refused"), η 1/4 None; persistence Persistence { locks: 64, solved: 5, reread: 5, stay: 0, fall: 5, reversed: 5, uncertified: 0 }; 1377865 ms
+      trials: η 16 ρ unmoved mask [358596/4096, 358602/4096) own [376594/4096, 376599/4096) NotBelow; η 8 ρ unmoved mask [343733/4096, 343738/4096) own [373208/4096, 373213/4096) OwnNotBelow; η 4 ρ unmoved mask [333649/4096, 333654/4096) own [360300/4096, 360305/4096) OwnNotBelow; η 2 ρ unmoved mask [336173/4096, 336178/4096) own [362591/4096, 362596/4096) OwnNotBelow; η 1 ρ unmoved mask [341514/4096, 341519/4096) own [359987/4096, 359993/4096) OwnNotBelow; η 1/2 ρ unmoved mask [344736/4096, 344741/4096) own [364129/4096, 364134/4096) OwnNotBelow; η 1/4 ρ unmoved mask [346662/4096, 346667/4096) own [346662/4096, 346667/4096) adopted; γ_ρ [123351/4096, 123352/4096)
+  m11 throw: the adopted successor's own release: ρ 102837/131072; L ∈ [346662/4096, 346667/4096) nats, X ∈ [165453/4096, 165458/4096) nats; solved 2 of 64; whole 0 (released 8, stations right 16); 1377866 ms
+    the successor's own comparison, exact: 6705418597418044497930516371479/79228162514264337593543950336 6705496344697860969207939093507/79228162514264337593543950336
+  m11: throw adopted; the later metrics are not attempted
+executed move-once: 1377929 ms; resident 168230912 now, 178429952 peak

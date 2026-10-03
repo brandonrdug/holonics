@@ -1,0 +1,63 @@
+move 0: probe exit 0; wall 477281 ms; exit 0; early stop 0
+  m0 throw: the incumbent: ρ 102837/131072; L ∈ [500197/4096, 500203/4096) nats, X ∈ [318493/4096, 318499/4096) nats; solved 0 of 64; whole 0 (released 7, stations right 15); 476576 ms
+    the throw: flight of 0 moves, at rest; power along the coast none; coast released from rest; kinetic reading none; impulse step Some(Ratio { numer: 1, denom: 2 })
+  m0 throw: the adopted successor's own release: ρ 102837/131072; L ∈ [495714/4096, 495719/4096) nats, X ∈ [316225/4096, 316230/4096) nats; solved 4 of 64; whole 0 (released 8, stations right 15); 476577 ms
+move 1: probe exit 0; wall 402362 ms; exit 0; early stop 0
+  m1 throw: the incumbent: ρ 102837/131072; L ∈ [495714/4096, 495719/4096) nats, X ∈ [316225/4096, 316230/4096) nats; solved 4 of 64; whole 0 (released 8, stations right 15); 401486 ms
+    the throw: flight of 1 moves, moving; power along the coast [21607/4096, 21609/4096); coast released from rest; kinetic reading [9547/4096, 9548/4096); impulse step Some(Ratio { numer: 1, denom: 2 })
+  m1 throw: the adopted successor's own release: ρ 102837/131072; L ∈ [447159/4096, 447165/4096) nats, X ∈ [265895/4096, 265900/4096) nats; solved 2 of 64; whole 0 (released 8, stations right 16); 401487 ms
+move 2: probe exit 0; wall 521484 ms; exit 0; early stop 0
+  m2 throw: the incumbent: ρ 102837/131072; L ∈ [447159/4096, 447165/4096) nats, X ∈ [265895/4096, 265900/4096) nats; solved 2 of 64; whole 0 (released 8, stations right 16); 520612 ms
+    the throw: flight of 1 moves, moving; power along the coast [16685/4096, 16687/4096); coast released from rest; kinetic reading [29187/4096, 29188/4096); impulse step Some(Ratio { numer: 2, denom: 1 })
+  m2 throw: the adopted successor's own release: ρ 102837/131072; L ∈ [427102/4096, 427107/4096) nats, X ∈ [248035/4096, 248040/4096) nats; solved 3 of 64; whole 0 (released 8, stations right 15); 520613 ms
+move 3: probe exit 0; wall 391459 ms; exit 0; early stop 0
+  m3 throw: the incumbent: ρ 102837/131072; L ∈ [427102/4096, 427107/4096) nats, X ∈ [248035/4096, 248040/4096) nats; solved 3 of 64; whole 0 (released 8, stations right 15); 391013 ms
+    the throw: flight of 1 moves, moving; power along the coast [59623/4096, 59627/4096); coast released from rest; kinetic reading [108092/4096, 108093/4096); impulse step Some(Ratio { numer: 1, denom: 1 })
+  m3 throw: the adopted successor's own release: ρ 102837/131072; L ∈ [394355/4096, 394360/4096) nats, X ∈ [212650/4096, 212656/4096) nats; solved 0 of 64; whole 0 (released 8, stations right 14); 391014 ms
+move 4: probe exit 0; wall 698809 ms; exit 0; early stop 0
+  m4 throw: the incumbent: ρ 102837/131072; L ∈ [394355/4096, 394360/4096) nats, X ∈ [212650/4096, 212656/4096) nats; solved 0 of 64; whole 0 (released 8, stations right 14); 698562 ms
+    the throw: flight of 1 moves, moving; power along the coast [4688/4096, 4689/4096); coast released from rest; kinetic reading [58250/4096, 58251/4096); impulse step Some(Ratio { numer: 8, denom: 1 })
+  m4 throw: the adopted successor's own release: ρ 102837/131072; L ∈ [386130/4096, 386135/4096) nats, X ∈ [207701/4096, 207706/4096) nats; solved 4 of 64; whole 0 (released 8, stations right 16); 698564 ms
+move 5: probe exit 0; wall 585842 ms; exit 0; early stop 0
+  m5 throw: the incumbent: ρ 102837/131072; L ∈ [386130/4096, 386135/4096) nats, X ∈ [207701/4096, 207706/4096) nats; solved 4 of 64; whole 0 (released 8, stations right 16); 585056 ms
+    the throw: flight of 1 moves, moving; power along the coast [31755/4096, 31758/4096); coast released from rest; kinetic reading [119045/4096, 119046/4096); impulse step Some(Ratio { numer: 2, denom: 1 })
+  m5 throw: the adopted successor's own release: ρ 102837/131072; L ∈ [385082/4096, 385087/4096) nats, X ∈ [203746/4096, 203751/4096) nats; solved 2 of 64; whole 0 (released 8, stations right 17); 585057 ms
+move 6: probe exit 0; wall 973667 ms; exit 0; early stop 0
+  m6 throw: the incumbent: ρ 102837/131072; L ∈ [385082/4096, 385087/4096) nats, X ∈ [203746/4096, 203751/4096) nats; solved 2 of 64; whole 0 (released 8, stations right 17); 973500 ms
+    the throw: flight of 1 moves, moving; power along the coast [-290/4096, -289/4096); coast carried; kinetic reading [28978/4096, 28979/4096); impulse step Some(Ratio { numer: 16, denom: 1 })
+  m6 throw: the adopted successor's own release: ρ 102837/131072; L ∈ [375993/4096, 375998/4096) nats, X ∈ [194853/4096, 194858/4096) nats; solved 2 of 64; whole 0 (released 8, stations right 17); 973501 ms
+move 7: probe exit 0; wall 857745 ms; exit 0; early stop 0
+  m7 throw: the incumbent: ρ 102837/131072; L ∈ [375993/4096, 375998/4096) nats, X ∈ [194853/4096, 194858/4096) nats; solved 2 of 64; whole 0 (released 8, stations right 17); 856671 ms
+    the throw: flight of 2 moves, moving; power along the coast [-6505/4096, -6503/4096); coast carried; kinetic reading [4590/4096, 4591/4096); impulse step Some(Ratio { numer: 16, denom: 1 })
+  m7 throw: the adopted successor's own release: ρ 102837/131072; L ∈ [369823/4096, 369828/4096) nats, X ∈ [189547/4096, 189552/4096) nats; solved 3 of 64; whole 0 (released 8, stations right 16); 856674 ms
+move 8: probe exit 0; wall 370911 ms; exit 0; early stop 0
+  m8 throw: the incumbent: ρ 102837/131072; L ∈ [369823/4096, 369828/4096) nats, X ∈ [189547/4096, 189552/4096) nats; solved 3 of 64; whole 0 (released 8, stations right 16); 370447 ms
+    the throw: flight of 3 moves, moving; power along the coast [-3719/4096, -3718/4096); coast carried; kinetic reading [14097/4096, 14098/4096); impulse step Some(Ratio { numer: 16, denom: 1 })
+  m8 throw: the adopted successor's own release: ρ 102837/131072; L ∈ [351324/4096, 351329/4096) nats, X ∈ [170328/4096, 170333/4096) nats; solved 1 of 64; whole 0 (released 8, stations right 16); 370465 ms
+container restart at 23:2x UTC killed move 9 (no output); resumed from m8's state and flight, moves 9..15, same binary and per-move bound
+move 9: probe exit (old loop stopped at its boundary); wall 1171255 ms; exit 0; early stop 0
+  m9 throw: the incumbent: ρ 102837/131072; L ∈ [351324/4096, 351329/4096) nats, X ∈ [170328/4096, 170333/4096) nats; solved 1 of 64; whole 0 (released 8, stations right 16); 1170524 ms
+    the throw: flight of 4 moves, moving; power along the coast [60806/4096, 60812/4096); coast released from rest; kinetic reading [1409949/4096, 1409950/4096); impulse step Some(Ratio { numer: 8, denom: 1 })
+  m9 throw: the adopted successor's own release: ρ 102837/131072; L ∈ [348717/4096, 348722/4096) nats, X ∈ [167601/4096, 167606/4096) nats; solved 1 of 64; whole 0 (released 8, stations right 16); 1170525 ms
+switch at the boundary after move 9: ported build e0901dfa; move 10 under the old per-move bound 1349692 ms, no per-kind stop, its unit lines stamped on arrival
+move 10 stamped gaps (ms, incumbent from launch): incumbent 201042 persistence 992 slope 31009 reread 189029
+move 10 refused in flight: the next move starts from rest
+move 10 done; holding move 11 for the main line's ruling on the bounds' factor
+ruling: factor 3 on each kind's maximum from move 10
+from move 11: per-kind bounds incumbent 603126 persistence 2976 slope 93027 reread 567087 ms, per move 5235825 ms, outer 26180 s
+move 11: probe exit 0; wall 1378267 ms; exit 0; early stop 0
+  m11 throw: the incumbent: ρ 102837/131072; L ∈ [348717/4096, 348722/4096) nats, X ∈ [167601/4096, 167606/4096) nats; solved 1 of 64; whole 0 (released 8, stations right 16); 1377865 ms
+    the throw: flight of 0 moves, at rest; power along the coast none; coast released from rest; kinetic reading none; impulse step Some(Ratio { numer: 16, denom: 1 })
+  m11 throw: the adopted successor's own release: ρ 102837/131072; L ∈ [346662/4096, 346667/4096) nats, X ∈ [165453/4096, 165458/4096) nats; solved 2 of 64; whole 0 (released 8, stations right 16); 1377866 ms
+move 12: probe exit 0; wall 1415310 ms; exit 0; early stop 0
+  m12 throw: the incumbent: ρ 102837/131072; L ∈ [346662/4096, 346667/4096) nats, X ∈ [165453/4096, 165458/4096) nats; solved 2 of 64; whole 0 (released 8, stations right 16); 1414334 ms
+    the throw: flight of 1 moves, moving; power along the coast [-1836/4096, -1835/4096); coast carried; kinetic reading [237/4096, 238/4096); impulse step Some(Ratio { numer: 16, denom: 1 })
+  m12 throw: refused, Some(Guards); 1414346 ms
+move 12 refused in flight: the next move starts from rest
+move 13: probe exit 0; wall 1341066 ms; exit 0; early stop 0
+  m13 throw: the incumbent: ρ 102837/131072; L ∈ [346662/4096, 346667/4096) nats, X ∈ [165453/4096, 165458/4096) nats; solved 2 of 64; whole 0 (released 8, stations right 16); 1340263 ms
+    the throw: flight of 0 moves, at rest; power along the coast none; coast released from rest; kinetic reading none; impulse step Some(Ratio { numer: 16, denom: 1 })
+  m13 throw: refused, Some(Guards); 1340264 ms
+move 13 refused at rest: stop
+run done
+correction (01:57 UTC): move 10 did not refuse. The outer timeout 1350 s ended it during its eighth trial (its stamps end 1350007 ms after launch, with no result line); port_chain was killed before it could print 'incomplete', and the switch read the missing state as a refusal in flight. Under the chain's rule the chain stops at move 10, incomplete; moves 11-13 ran after that misread, from m9's state at rest, and are kept as measurements outside the chain's rule.
