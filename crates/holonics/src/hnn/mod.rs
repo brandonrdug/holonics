@@ -187,7 +187,9 @@ pub use receiving::{ActiveAddress, LetterReader, ReceivingPhases, ReceivingRead}
 pub use reference::{Cut, Exposure, Reference, Resident};
 pub use retention::AeonBoundary;
 pub use ring::{Floquet, FloquetReading, PumpDeclaration, PumpSchedule, ResonatorMaterial};
-pub use word::{Absorption, ReceptionCarry, Released, ResonatorBalance, Word, WordOpening};
+pub use word::{
+    Absorption, ChainedBalance, ReceptionCarry, Released, ResonatorBalance, Word, WordOpening,
+};
 
 #[cfg(test)]
 pub(crate) mod tests;

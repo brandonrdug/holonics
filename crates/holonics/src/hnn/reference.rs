@@ -180,7 +180,8 @@ use crate::hnn::receiving::{
 };
 use crate::hnn::retention::{AeonBoundary, Diamond, aeon_readings, collapse, contained, separator};
 use crate::hnn::word::{
-    Absorption, EndChange, KeptWord, PowerForm, ReceptionCarry, Word, WordBalance, WordOpening,
+    Absorption, ChainedBalance, EndChange, KeptWord, PowerForm, ReceptionCarry, Word, WordBalance,
+    WordOpening,
 };
 use crate::holon::contact::FeatureCovector;
 use crate::navigator::Clock;
@@ -978,6 +979,30 @@ impl Reference {
             wall: WallTimes::default(),
             carried: None,
         })
+    }
+
+    /// [definition; agent-inferred, October 3; the reception carry §2.4] **Mount on a declared
+    /// constitution with a reception's carried end restored** ([`Reference::mount_with`]): the next
+    /// reception's word opens on the restored carry's interior exactly as it would have opened in
+    /// the uninterrupted chain (the saved carry is the carried state whole: its end change and its
+    /// elapsed ticks, read back from [`crate::hnn::constitution::ContinuingState`]). Refused where
+    /// the carry has another field's shape ([`ReceptionCarry::fits`]) or this reference receives at
+    /// rest.
+    pub fn mount_carried(
+        &self,
+        field: &Field,
+        current: &Current,
+        constitution: Constitution,
+        carry: ReceptionCarry,
+    ) -> Result<Resident, HnnError> {
+        if !matches!(self.reception, Reception::Carry(_)) || !carry.fits(field) {
+            return Err(HnnError::ContinuingState {
+                what: "a carried end mounted at rest or of another field's shape",
+            });
+        }
+        let mut resident = self.mount_with(field, current, constitution)?;
+        resident.carried = Some(carry);
+        Ok(resident)
     }
 }
 
@@ -3073,6 +3098,41 @@ pub struct WordReport {
     pub largest_residual: Rat,
     pub residual_bound: Rat,
     pub words: WordBalances,
+    pub chained: ChainedBalances,
+}
+
+/// [definition; agent-inferred, October 3; the reception carry §2.3] **Every reception's chained
+/// balance over an exposure** ([`ChainedBalance`]): one per reception opened on a carried change,
+/// how many were read, whether every one closed exactly, how many were dissipative with respect to
+/// the declared supply (the law), how many held the stronger reading that the work between the
+/// words is within the next word's loss (not a law), and the work, the loss and the excess summed,
+/// with the largest excess.
+#[derive(Clone, Debug, Default, PartialEq, Eq)]
+pub struct ChainedBalances {
+    pub read: u64,
+    pub closed: bool,
+    pub dissipative: u64,
+    pub within_loss: u64,
+    pub work: Rat,
+    pub loss: Rat,
+    pub excess: Rat,
+    pub largest_excess: Rat,
+}
+
+impl ChainedBalances {
+    fn record(&mut self, balance: &ChainedBalance) {
+        self.read += 1;
+        self.closed &= balance.closes();
+        self.dissipative += u64::from(balance.dissipative());
+        self.within_loss += u64::from(balance.within_loss());
+        self.work += balance.work();
+        self.loss += &balance.loss;
+        let excess = balance.excess();
+        if excess > self.largest_excess {
+            self.largest_excess = excess.clone();
+        }
+        self.excess += excess;
+    }
 }
 
 /// [definition] **Every word's balance over an exposure** (campaign 2, `hnn::word::WordBalance`,
@@ -3157,34 +3217,6 @@ impl Reference {
         )
     }
 
-    /// [definition; agent-inferred, October 3; the reception carry §4] **The prequential protocol
-    /// from a declared constitution, the constitution it leaves returned** ([`expose_kept`]): the
-    /// stored state the held-out passages are then read from ([`Reference::read_passage`]).
-    pub fn expose_forming(
-        &self,
-        field: &Field,
-        cut: &Cut,
-        constitution: Constitution,
-        progress: &mut dyn FnMut(u64),
-    ) -> Result<(Exposure, Constitution), HnnError> {
-        let current = Current::at_rest(field);
-        let resident = self.mount_with(field, &current, constitution)?;
-        let (exposure, resident) = expose_kept(
-            self,
-            &Declared {
-                budget: self.budget,
-                pending_capacity: self.pending_capacity,
-                deadline: self.deadline,
-                refining: self.refining,
-            },
-            field,
-            cut,
-            resident,
-            progress,
-        )?;
-        Ok((exposure, resident.constitution))
-    }
-
     /// Run the same prequential protocol from a caller-declared initial constitution.
     pub fn expose_with(
         &self,
@@ -3207,118 +3239,6 @@ impl Reference {
             resident,
         )
     }
-}
-
-/// [definition; agent-inferred, October 3; the
-/// [reception carry](../../../../research/records/2026-10-03_THE_RECEPTION_CARRIES_THE_INTERIOR_CHANGE_THE_SOURCE_PORT_IMPOSES_THE_MOMENT_AND_REST_IS_COMPLETE_ABSORPTION.md)
-/// §4] **One held-out passage read from a stored state** ([`Reference::read_passage`]): its station
-/// cells compared, those whose compared face reads the target with the strictly least code (the
-/// target's grain offset `n_c + k_c/L` above every other class's, exactly), the stations' combined
-/// code (the Holon ratio's, enclosed), the windows compared and the aeon boundaries closed.
-#[derive(Clone, Debug, PartialEq, Eq)]
-pub struct PassageReading {
-    pub stations: u64,
-    pub right: u64,
-    pub code: ExactInterval,
-    pub compares: u64,
-    /// The aeon boundaries the passage's cells carried the joint clock through, each closed by the
-    /// field's own law (no crib is read on a held-out passage, so no key is located).
-    pub boundaries: u64,
-}
-
-impl Reference {
-    /// [definition; agent-inferred, October 3; the reception carry §4] **Read one passage from a
-    /// stored state, depositing nothing**: the constitution mounted at rest, the passage's cells
-    /// ingested from an opened moment, every complete receiving window refined and compared on its
-    /// cells under this reference's reception, and each staged deposit discarded. Under
-    /// [`Reception::Carry`] the motion carries across the passage's receptions and starts again from
-    /// the stored state at the next passage, so passages couple only through the fixed state and the
-    /// read does not alter what it measures. The cells in `stations` are scored
-    /// ([`PassageReading`]). An aeon boundary inside the passage is closed by the field's own law;
-    /// no key is located there. Refused when no receiver is declared.
-    pub fn read_passage(
-        &self,
-        field: &Field,
-        constitution: &Constitution,
-        cells: &[usize],
-        stations: Range<usize>,
-    ) -> Result<PassageReading, HnnError> {
-        let mut resident = self.mount_with(field, &Current::at_rest(field), constitution.clone())?;
-        let phases = resident.admitted.first().cloned().ok_or(HnnError::Shape {
-            what: "a declared receiver for the passage's read",
-            expected: 1,
-            found: 0,
-        })?;
-        let aperture = phases.aperture();
-        let (moment, _) = self.ingest(&mut resident, None, &[])?;
-        let mut reading = PassageReading {
-            stations: 0,
-            right: 0,
-            code: ExactInterval::point(Rat::zero()),
-            compares: 0,
-            boundaries: 0,
-        };
-        for span in phases.windows(cells.len())? {
-            let window = &cells[span.clone()];
-            if window.len() == aperture {
-                let (pending, _) = self.refine(&mut resident, &moment, &phases)?;
-                let (staged, compared) = self.compare(&mut resident, pending, &one_hot(window))?;
-                reading.compares += 1;
-                let holon = compared
-                    .forward
-                    .into_present()
-                    .expect("a compare returns its ratio");
-                for (offset, ((face, phase), &target)) in holon
-                    .faces()
-                    .faces
-                    .iter()
-                    .zip(holon.phases())
-                    .zip(window)
-                    .enumerate()
-                {
-                    if !stations.contains(&(span.start + offset)) {
-                        continue;
-                    }
-                    reading.stations += 1;
-                    reading.code = interval_sum(&reading.code, &phase.code_length)?;
-                    reading.right += u64::from(least_code(face, target)?);
-                }
-                self.discard(&mut resident, Handle::Staged(staged))?;
-            }
-            let mut fed = 0;
-            while fed < window.len() {
-                let (_, ingested) =
-                    self.ingest(&mut resident, Some(&moment), &one_hot(&window[fed..]))?;
-                let ingested = ingested.forward.into_present().expect("ingest returns");
-                fed += ingested.cells;
-                if ingested.carry_out {
-                    // The field's own boundary law, as the exposure closes it; no crib is read on a
-                    // held-out passage, so no key is located there.
-                    let family = resident.admitted.clone();
-                    self.close_aeon(&mut resident, &family)?;
-                    reading.boundaries += 1;
-                }
-            }
-        }
-        Ok(reading)
-    }
-}
-
-/// Whether a face reads `target` with the strictly least code: its grain offset `n_c + k_c/L`
-/// exceeds every other class's (the code length is `log₂ Z` less that offset, `Z` shared).
-fn least_code(face: &crate::hnn::ratio::Face, target: usize) -> Result<bool, HnnError> {
-    let offset = |cell: &crate::receiver::face::GrainCell| {
-        Rat::from_integer(cell.carry.clone()) + Rat::new(BigInt::from(cell.phase), BigInt::from(face.grain()))
-    };
-    let cells = face.cells();
-    let mine = offset(cells.get(target).ok_or(HnnError::CellOutside {
-        code: target,
-        alphabet: cells.len(),
-    })?);
-    Ok(cells
-        .iter()
-        .enumerate()
-        .all(|(class, cell)| class == target || offset(cell) < mine))
 }
 
 /// [measured-diagnostic; agent-inferred, October 2; the
@@ -4020,6 +3940,11 @@ pub trait ExposedResident {
     fn state_bits_without_collapse(&self) -> u64;
     fn tally(&self) -> &ChartTally;
     fn wall(&self) -> &WallTimes;
+    /// The carried change the next reception opens on (the reception carry); a realization that
+    /// opens every reception at rest carries none.
+    fn carried(&self) -> Option<&ReceptionCarry> {
+        None
+    }
     /// The contacts' refining grain ([`Resident::refine_contact_grain`]); a realization without it
     /// refuses.
     fn refine_contact_grain(&mut self, _levels: u32) -> Result<usize, HnnError> {
@@ -4034,6 +3959,9 @@ pub trait ExposedResident {
 impl ExposedResident for Resident {
     fn admitted(&self) -> &[ReceivingPhases] {
         Resident::admitted(self)
+    }
+    fn carried(&self) -> Option<&ReceptionCarry> {
+        Resident::carried(self)
     }
     fn refine_contact_grain(&mut self, levels: u32) -> Result<usize, HnnError> {
         Resident::refine_contact_grain(self, levels)
@@ -4107,28 +4035,8 @@ pub fn expose_from<P>(
     declared: &Declared,
     field: &Field,
     cut: &Cut,
-    resident: P::Resident,
-) -> Result<Exposure, HnnError>
-where
-    P: ExecutionPort,
-    P::Resident: ExposedResident,
-{
-    Ok(expose_kept(port, declared, field, cut, resident, &mut |_| {})?.0)
-}
-
-/// [definition; agent-inferred, October 3; the reception carry §4] **The exposure protocol from a
-/// mounted resident, the resident returned**: [`expose_from`]'s run, with the resident as the
-/// protocol left it, so that a state formed by the protocol can be read further in the same process.
-/// `progress` is told the count of windows compared after each compare (an exterior line; it enters
-/// no law and no reading).
-pub fn expose_kept<P>(
-    port: &P,
-    declared: &Declared,
-    field: &Field,
-    cut: &Cut,
     mut resident: P::Resident,
-    progress: &mut dyn FnMut(u64),
-) -> Result<(Exposure, P::Resident), HnnError>
+) -> Result<Exposure, HnnError>
 where
     P: ExecutionPort,
     P::Resident: ExposedResident,
@@ -4194,6 +4102,12 @@ where
         closed: true,
         ..WordBalances::default()
     };
+    let mut chained = ChainedBalances {
+        closed: true,
+        ..ChainedBalances::default()
+    };
+    // The previous word's balance, carried across its commit: the chained balance's first term.
+    let mut previous: Option<WordBalance> = None;
     let (mut windows, mut open_windows, mut peak_word_bits) = (0u64, 0u64, 0u64);
     let (mut forward, mut adjoint) = (Remainders::default(), Remainders::default());
     let (mut balances, mut closed) = (0u64, true);
@@ -4215,6 +4129,29 @@ where
             break;
         }
         if window.len() == aperture {
+            // Under the reception carry: the power form and the opening change at this opening,
+            // read before the refine (the chained balance, §2.3).
+            // Read only where the carried change is the previous word's end (`A = 0`): at
+            // `A = I` the end is absorbed and nothing is carried.
+            let opening = match (resident.carried(), &previous) {
+                (Some(carry), Some(previous)) if carry.change == previous.change => {
+                    let started = Instant::now();
+                    let current = resident.current();
+                    let constitution = resident.constitution();
+                    let form = PowerForm::read(field, constitution, current)?;
+                    let source = resident
+                        .moment(&moment)
+                        .expect("the exposure's moment")
+                        .open_storage(field, constitution, current)?;
+                    let mut opened = carry.interior(field);
+                    for (wave, added) in opened.storage.iter_mut().zip(&source) {
+                        *wave = crate::ratio::linear::vector::add(wave, added);
+                    }
+                    readout.balance += started.elapsed();
+                    Some((form, carry.change.clone(), opened))
+                }
+                _ => None,
+            };
             let (pending, refined) = port.refine(&mut resident, &moment, &phases)?;
             work = work.then(&refined.receipt.work);
             if let ReceiptDetail::Refine {
@@ -4248,13 +4185,17 @@ where
                     });
                 }
             };
+            if let (Some((form, carried, opened)), Some(previous)) = (&opening, &previous) {
+                chained.record(&ChainedBalance::read(
+                    field, previous, form, carried, opened, &word,
+                )?);
+            }
             let (staged, compared) = port.compare(&mut resident, pending, &one_hot(window))?;
             work = work.then(&compared.receipt.work);
             if let ReceiptDetail::Compare { released, .. } = &compared.receipt.detail {
                 adjoint = adjoint.join(released);
             }
             compares += 1;
-            progress(compares);
             let holon = compared
                 .forward
                 .into_present()
@@ -4367,6 +4308,7 @@ where
                 }
             }
             words.record(&word);
+            previous = Some(word);
         } else {
             for &code in window {
                 baselines.update(code);
@@ -4427,7 +4369,7 @@ where
         source_bits: n * symbol,
         n_star: field.capacity().n_star(),
     };
-    let exposure = Exposure {
+    Ok(Exposure {
         training,
         held_out,
         keys,
@@ -4462,6 +4404,7 @@ where
             largest_residual,
             residual_bound,
             words,
+            chained,
         },
         wall: *resident.wall(),
         readout,
@@ -4470,8 +4413,7 @@ where
             .population(phases.ring())
             .map(PopulationReport::of)
             .transpose()?,
-    };
-    Ok((exposure, resident))
+    })
 }
 
 // -------------------------------------------------------------------------------------------

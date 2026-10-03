@@ -569,38 +569,6 @@ fn without_wall(mut exposure: Exposure) -> Exposure {
     exposure
 }
 
-/// A stored state that reads the receiving ring: the opening constitution after the deposits of the
-/// first `windows` receiving windows of `cells`, at rest.
-fn deposited(field: &crate::hnn::Field, cells: &[usize], windows: usize) -> crate::hnn::Constitution {
-    let reference = Reference::new(64, OPEN_BUDGET);
-    let mut resident = reference.mount(field, &Current::at_rest(field)).unwrap();
-    let phases = resident.admitted()[0].clone();
-    let (moment, _) = reference.ingest(&mut resident, None, &[]).unwrap();
-    for span in phases.windows(cells.len()).unwrap().into_iter().take(windows) {
-        let window = &cells[span];
-        if window.len() == phases.aperture() {
-            let (pending, _) = reference.refine(&mut resident, &moment, &phases).unwrap();
-            let (staged, _) = reference
-                .compare(&mut resident, pending, &one_hot(window))
-                .unwrap();
-            reference.deposit(&mut resident, staged).unwrap();
-        }
-        let mut fed = 0;
-        while fed < window.len() {
-            let (_, ingested) = reference
-                .ingest(&mut resident, Some(&moment), &one_hot(&window[fed..]))
-                .unwrap();
-            let ingested = ingested.forward.into_present().unwrap();
-            fed += ingested.cells;
-            if ingested.carry_out {
-                let family = resident.admitted().to_vec();
-                reference.close_aeon(&mut resident, &family).unwrap();
-            }
-        }
-    }
-    resident.constitution().clone()
-}
-
 /// The reception carry §2.2 and §4: at complete absorption (`A = I`) the carry path is today's
 /// reception exactly on a field with no declared resonator. The prequential exposure under
 /// `Carry(Complete)` returns every reading, deposit, balance and curve point of the exposure at rest,
@@ -625,10 +593,51 @@ fn the_carry_at_complete_absorption_is_todays_reception_exactly() {
     assert_eq!(rest.compares, 6);
     assert!(carried.state.resident_bits > rest.state.resident_bits);
     carried.state = rest.state.clone();
+    // At `A = I` the carried change is the rest; a chained balance is read only where a word ended
+    // exactly at rest, and then nothing was carried, so no work was done on it.
+    let chained = &carried.word.chained;
+    assert!(chained.closed && chained.dissipative == chained.read);
+    assert!(chained.work.is_zero() && chained.excess.is_zero());
+    carried.word.chained = rest.word.chained.clone();
     for (a, b) in carried.aeons.iter_mut().zip(&rest.aeons) {
         a.state_bits = b.state_bits;
     }
     assert_eq!(carried, rest);
+}
+
+/// The reception carry §2.3: under `Carry(Nothing)` the chained balance closes exactly at every
+/// reception of a prequential exposure on one baseline (the source rings' end storage subtracted
+/// once), and the chain is dissipative with respect to its declared supply at every reception. The
+/// stronger reading, that the work between the words lies within the next word's certified loss,
+/// fails at exactly one reception of this fixture, the seventh, by `3580154876230715732256339/2⁸²`:
+/// the ingest's re-reading of the contacts' conductances does more work on the carried waves than
+/// the next word dissipates. It is pinned here as the measured failure of that reading, not a law.
+#[test]
+fn the_chained_balance_closes_and_the_chain_is_dissipative() {
+    let length = cut_length();
+    let field = chain_of(length as u64);
+    let cut = Cut {
+        cells: source(length, 81),
+        held_out: vec![2..4, length - 4..length],
+    };
+    let exposure = Reference::new(64, OPEN_BUDGET)
+        .with_deadline(24)
+        .with_reception(Reception::Carry(Absorption::Nothing))
+        .expose(&field, &cut)
+        .unwrap();
+    let chained = &exposure.word.chained;
+    assert!(exposure.word.words.closed && exposure.word.closed);
+    assert_eq!(chained.read, exposure.compares - 1);
+    assert_eq!(chained.read, 8);
+    assert!(chained.closed);
+    assert_eq!(chained.dissipative, chained.read);
+    assert!(!chained.work.is_zero(), "the ingest does work on the carry");
+    assert_eq!(chained.within_loss, chained.read - 1);
+    assert_eq!(chained.excess, chained.largest_excess);
+    assert_eq!(
+        chained.excess.to_string(),
+        "3580154876230715732256339/4835703278458516698824704"
+    );
 }
 
 /// The reception carry §2.1 and §2.6: under `Carry(Nothing)` every compare writes its consumed
@@ -655,11 +664,25 @@ fn the_carry_passes_each_receptions_end_to_the_next() {
         let window = &cells[span.clone()];
         if window.len() == phases.aperture() {
             let before = resident.carried().cloned();
+            // The opening is read from the carry as saved and read back (§2.4): the saved carry is
+            // the carried state whole, so the word it opens is the uninterrupted chain's exactly.
             let opening = match &before {
-                Some(carry) => WordOpening::Received {
-                    carry: carry.clone(),
-                    absorption: Absorption::Nothing,
-                },
+                Some(carry) => {
+                    let mut text = String::new();
+                    carry.write(&mut text);
+                    let mut lines = text.lines();
+                    let head = lines.next().unwrap();
+                    let restored = crate::hnn::ReceptionCarry::read(head, &mut |what| {
+                        lines.next().ok_or(HnnError::ContinuingState { what })
+                    })
+                    .unwrap();
+                    assert_eq!(&restored, carry);
+                    assert!(lines.next().is_none());
+                    WordOpening::Received {
+                        carry: restored,
+                        absorption: Absorption::Nothing,
+                    }
+                }
                 None => WordOpening::Rest,
             };
             let ratio = PendingRatio::produce(
@@ -721,46 +744,20 @@ fn the_carry_passes_each_receptions_end_to_the_next() {
     }
     // The carried interior moves the read once the constitution reads the receiving ring.
     assert!(moved >= 1 && position > 0);
+    // The carry mounts beside a declared constitution (§2.4), and only under a carrying reception.
+    let carry = resident.carried().cloned().expect("the chain carries");
+    let mounted = reference
+        .mount_carried(&field, resident.current(), resident.constitution().clone(), carry.clone())
+        .unwrap();
+    assert_eq!(mounted.carried(), Some(&carry));
+    assert!(matches!(
+        Reference::new(64, OPEN_BUDGET).mount_carried(
+            &field,
+            resident.current(),
+            resident.constitution().clone(),
+            carry
+        ),
+        Err(HnnError::ContinuingState { .. })
+    ));
 }
 
-/// The reception carry §4: a held-out passage is read from the stored state with nothing
-/// deposited, so the same passage reads the same whether or not others were read before it, and the
-/// stored state is unchanged; under `Carry(Complete)` the read is the read at rest exactly, and under
-/// `Carry(Nothing)` the motion carries across the passage's receptions and moves its stations'
-/// code.
-#[test]
-fn each_held_out_passage_is_read_from_the_stored_state() {
-    let length = cut_length();
-    let field = chain_of(length as u64);
-    let theta = deposited(&field, &source(length, 81), 24);
-    // Inside one aeon of the chain's joint clock (it carries out at its eleventh cell from rest).
-    let cells = source(10, 7);
-    let stations = 6..10;
-    let read = |reception: Reception, passage: &[usize]| {
-        Reference::new(64, OPEN_BUDGET)
-            .with_reception(reception)
-            .read_passage(&field, &theta, passage, stations.clone())
-            .unwrap()
-    };
-    let rest = read(Reception::Rest, &cells);
-    assert_eq!(rest.stations, 4);
-    assert!(rest.compares >= 2);
-    assert_eq!(read(Reception::Carry(Absorption::Complete), &cells), rest);
-    let carried = read(Reception::Carry(Absorption::Nothing), &cells);
-    assert_eq!(carried.stations, rest.stations);
-    assert_ne!(carried.code, rest.code, "the carry moves the stations' code");
-    // Another passage read first changes nothing: every passage mounts the stored state.
-    let other = source(10, 11);
-    let reference =
-        Reference::new(64, OPEN_BUDGET).with_reception(Reception::Carry(Absorption::Nothing));
-    reference
-        .read_passage(&field, &theta, &other, stations.clone())
-        .unwrap();
-    assert_eq!(
-        reference
-            .read_passage(&field, &theta, &cells, stations.clone())
-            .unwrap(),
-        carried
-    );
-    assert_eq!(theta, deposited(&field, &source(length, 81), 24));
-}

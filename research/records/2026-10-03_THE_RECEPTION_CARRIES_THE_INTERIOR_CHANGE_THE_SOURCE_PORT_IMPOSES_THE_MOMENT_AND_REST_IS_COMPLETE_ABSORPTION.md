@@ -3,8 +3,8 @@
 **Date.** October 3. **Issues.** #73, #63 (THE_REBUILD U6), #62 (the owed Lean). **Grade.**
 [definition; agent-inferred] for the carry law and its choices (§2, §3); [proved-derived;
 implemented-exact] for the owners it reuses, held by their tests (§1); the build of October 3 and
-its tests are §6 [implemented-exact]; the decisive read is not yet made. Code follows this record, and every build or read under it passes the
-[pre-launch checks](../runs/u6/PC_QUEUE.md) (a) to (f) first.
+its tests are §6 [implemented-exact]; the chained balance and the law it satisfies are §2.3
+[proved-derived; implemented-exact]. Code follows this record. The production default stays rest.
 
 **Occasion.** The review of October 3 located that every production reception opens at rest. The
 path is `Reference::refine` (`reference.rs:1147`) → `PendingRatio::read_charted` → `open_charted`
@@ -39,11 +39,13 @@ From the [lessons record](2026-09-29_LESSONS_THE_FAILURES_THAT_REPEATED_AFTER_TH
 - **3, text as the exception.** Nothing here reads a codec; the carry is the same for any boundary
   chart.
 - **5, an uncertified deposition.** A deposit between two receptions does work on the carried
-  change. That work is read exactly by the owner that already reads it (§2.3), and the chain's
-  passivity is stated as a certificate per reception, not assumed.
+  change. That work is read exactly by the owner that already reads it (§2.3). The chain's balance
+  is read exactly at every reception, and the law it satisfies is derived and stated (§2.3), with
+  the stronger reading that fails it, never assumed.
 - **6 and 7, seen as unseen; bits as progress.** Exposure stays prequential (the corrected §7 of
   [the refit record](2026-10-02_THE_REFITS_INGREDIENTS_ABLATED_WHICH_PART_OF_THE_EXTERIOR_FIT_REACHES_THE_REPRESENTATION.md)).
-  Whether the carry is kept is decided by a paired held-out read (§4), never by development bits.
+  No score decides the carry: it is a declared opening whose laws are derived and checked exactly
+  (§2.3, §4), and the production default stays rest.
 - **The retention law (no tape).** The adjoint stops at the opening (§2.5). No word outlives its
   compare, and nothing of a consumed word is kept except the end change it leaves.
 
@@ -126,22 +128,70 @@ the same physical coordinates of the carried change, by one owner, `PowerForm` (
    `P_(Θ',λ')(x) − P_(Θ',λ)(x)`. The step is the exterior source acting, so this work is the source
    port's, entered in the balance beside the source's imposition.
 
-[definition] **The chained balance.** For the interior change `y = Π_int x_k(end)` the next word's
-open power is
+[definition; proved-derived] **The chained balance, on one baseline.** Let `x = x_k(end)` be the
+carried change, `y = Π_int x` its interior, `s = s_(k+1)(0)` the moment the source port imposes, and
+`E_S(z) = (h/4) Σ_(g∈𝒮) Y_g |z_g|²` the source rings' storage. The power form is additive by ring
+and the ring admittances are field constants, so `P_(Θ,λ)(x) = P_(Θ,λ)(y) + E_S(x)` under every
+form, and the deposit and the ingest act only on the contacts, so they read `x` and `y` alike. The
+source rings' end storage `E_S(x)` is absorbed through the source port at the reception and is
+subtracted once:
 
 ```text
-P_open(k+1) = P_(Θ,λ)(y) + deposition_k(y) + ingest_k(y) + source exchange_(k+1)
+P_open(k+1) = P_(Θ,λ)(y) + deposition_k + ingest_k + E_S(s)
+E_end(k+1)  = P_open(k+1) − L_(k+1) + Π_c + pump + interconnection + residual,   |residual| ≤ bound
 ```
 
-The source exchange is `(h/4) Σ_(g∈𝒮) Y_g (|s_(k+1),g(0)|² − |x_k(end)_g|²)`: the moment's imposed
-storage in, and the source ring's end storage absorbed. At `A = I` the first three terms vanish and
-the source exchange is today's opening power, so today's balance is the limit of this one.
+with `L = dissipation − resist + resonator dissipation ≥ 0` the next word's certified loss (each term
+signed by its own owner). The first line is exact by the two decompositions above; the second is the
+word's own balance (`WordBalance::closes`). Written on the whole end power instead, the same identity
+is `P_open(k+1) = P_(Θ,λ)(x) + deposition_k + ingest_k + E_S(s) − E_S(x)`: the two forms are one
+baseline, and an earlier draft of this section, which wrote `P(y)` and also subtracted `E_S(x)`,
+subtracted it twice. At `A = I` the carried change is the rest, so the interior and the work on it
+vanish, the whole end power is absorbed, and the opening is `E_S(s)` alone: today's opening power,
+so today's balance is the limit of this one.
 
-[definition; owed] **Passivity over the chain is certified, never assumed.** Sufficient: at every
-reception, `deposition_k(y) + ingest_k(y)` does not exceed the word's certified dissipation. When a
-reception fails that bound, it reports the excess as work entering from outside the field; it is not
-refused by a cap. The Lean statement of the chained balance, and of the rest case as its limit, is
-owed in #62.
+[proved-derived] **The law the carry satisfies: dissipativity with respect to its declared supply.**
+The ingest is the source port's work (2. above), and the deposition, the imposition, the contrast,
+the pump and the interconnection are each a declared port's. From the two lines and `L ≥ 0`, at
+every reception
+
+```text
+E_end(k+1) ≤ P_(Θ,λ)(y) + deposition_k + ingest_k + E_S(s) + Π_c + pump + interconnection + bound
+```
+
+and summed over a chain, the end storage never exceeds the first interior plus everything the ports
+supplied plus the residuals' bounds. Nothing enters except through a declared port.
+
+[measured-exact; the failing law] **The stronger reading is not a law.** It was stated here before
+the read as the sufficient condition: at every reception, `deposition_k + ingest_k ≤ L_(k+1)`, the
+work done on the carried change between the words within the next word's loss. On the chain fixture
+(`chain_of(cut_length())`, source `source(length, 81)`, a 24-window deadline, `Carry(Nothing)`;
+nine compares, so eight chained readings) the deposition is zero at every reception, and:
+
+| Reception | `deposition + ingest` | `L` | Holds |
+|---|---|---|---|
+| 1 | `0` | `0` | yes |
+| 2 | `0` | `18142115297891599265251270759039205961/2¹²⁸` | yes |
+| 3 | `10531030011859400337/2⁷⁵` | `57557220820183899053671/2⁸¹` | yes |
+| 4 | `0` | `255451355697484121789559/2⁸²` | yes |
+| 5 | `−2448376125/2⁴²` | `81862029179669344589161/2⁸¹` | yes |
+| 6 | `1144389765/2⁴²` | `234498858861794171536969/2⁸²` | yes |
+| 7 | `5048657427/2³²` | `2104128050508906045512109/2⁸²` | **no**, by `3580154876230715732256339/2⁸²` |
+| 8 | `−15407359260789375224895/2⁷⁶` | `357753753096119191965200943566167177049/2¹³⁰` | yes |
+
+Summed, the work is `73408221214458413523171/2⁷⁶` against the loss's
+`1238976393826823334276250846524291252349/2¹³⁰`, so the summed reading also fails from reception 7
+on. The cause is the ingest: each cell's selective step moves the lift and re-reads every contact's
+conductance at the lift, and at reception 7 that re-reading does more work on the carried arriving
+waves than the next word dissipates. The work is the source port's, so the reading that fails is the
+one that counted it as interior. An earlier pass of this read compared the work with the dissipation
+alone, omitting the element's passive term `−resist`; it failed at receptions 3, 6 and 7. That was
+a slip in the loss, not a property of the carry. Both checks are now receipts
+(`ChainedBalance::{dissipative, within_loss}`), and the fixture's test pins the failure of the
+stronger one, exactly, rather than tuning anything to make it pass.
+
+[owed in #62] The Lean statement of the chained balance and its dissipativity, and of the rest case
+as its limit (`HNN/Retention`).
 
 ### 2.4 The clock
 
@@ -181,9 +231,9 @@ governs every word's motion, including the motion the next word carries.
 - **One chain.** A refinement opened while another refinement is pending would have no defined
   predecessor, so under the carry the refine refuses that opening. Exposure holds one pending at a
   time.
-- **The saved state.** The carried change and its tick are part of the continuing state. Under the
-  carry, `ContinuingState` owes both, inside its material identity's check. Until then every saved
-  state is exactly a rest-carried state, which is today's law.
+- **The saved state.** The carried change and its tick are part of the continuing state, written
+  inside its check (built, §6). A state at rest writes none, so every state written before the carry
+  reads back at rest, which is today's law.
 - **The card.** The device word owes the same opening: the carried change resident on the card,
   read by the next word, with host-card parity. Receptions were already sequential (a deposit
   separates each pair), so carrying them costs no co-presence.
@@ -201,33 +251,17 @@ governs every word's motion, including the motion the next word carries.
 - **Not a context.** Nothing about which windows preceded is carried, only the field's present
   motion. Two passages that leave the same end change open the next reception identically.
 
-## 4. The claim fixed before the code, and the read that decides it
+## 4. The claim fixed before the code
 
-- **The build's acceptance.**
-  - At `A = I`, the carry path reproduces today's exposure receipt on the gate state byte for byte:
-    every reading, deposit and balance.
-  - At `A = 0`, the chained balance (§2.3) closes at every reception within its certified bound.
-  - Under the carry, a saved state restores the chain exactly, and a foreign or damaged one is
-    refused.
-- **The decisive read** (only after the build's acceptance passes, and only through checks (a) to
-  (f)). The decision is whether production receptions carry. Carry and rest are read on one stored
-  state, the same state and lineage at an equal move count.
-  - **The unit is the held-out passage, not the station.** A passage's eight station targets follow
-    from its last two request cells, and they are read in one release, so its stations are not
-    independent trials.
-  - **One stored state.** Every held-out passage is read from that stored state, and nothing is
-    deposited on a held-out passage's cells. Under carry, the motion carries across the receptions
-    inside a passage and starts again from the stored state at each passage. Passages therefore
-    couple only through a fixed state, and the read does not alter what it measures.
-  - **The test.** For each of the 128 passages, `d_k` is carry's stations right minus rest's.
-    Passages with `d_k = 0` are dropped; `b` counts `d_k > 0` and `c` counts `d_k < 0`. Carry is
-    released at `P[X ≥ b | X ~ Bin(b + c, 1/2)] ≤ 1/64`, exact. Station counts are description and
-    enter no tail. Development bits do not decide it.
-- **Its held-out seed** is `2026100301` (order-2, 128 requests), which no run has read: it appears
-  in no record, queue or receipt on `main` or on the run branches as of this record. The seed
-  `2026093012` is spent (P5 in §11 and every held-out pair of §9 of the
-  [refit record](2026-10-02_THE_REFITS_INGREDIENTS_ABLATED_WHICH_PART_OF_THE_EXTERIOR_FIT_REACHES_THE_REPRESENTATION.md))
-  and is excluded.
+- At `A = I`, the carry path reproduces today's exposure receipt on the gate state byte for byte:
+  every reading, deposit and balance.
+- At `A = 0`, the chained balance (§2.3) closes exactly at every reception, and the chain is
+  dissipative with respect to its declared supply within the residuals' certified bounds.
+- Under the carry, a saved carry restores the chain's next opening exactly, and a damaged one is
+  refused.
+
+No score, seed or held-out read decides the carry. The production default stays rest; a change of
+the default is a derivation and its exact checks, together with the device word's parity (§6).
 
 ## 5. Owners touched when built
 
@@ -260,31 +294,32 @@ a test path. Today's reception is unchanged unless a carry is declared.
   advances the hop clock without a pump step, so the carried resonator state, measured at its last
   pump tick's phase, does not fit the next opening's clock (`Word::continuing`'s check). The pump's
   carry across receptions is owed; under `A = I` a resonator opens at rest in the carried clock.
-- **The held-out read.** `Reference::read_passage` mounts the stored state at rest for each passage,
-  compares every complete receiving window under the declared reception, discards every staged
-  deposit, closes an aeon boundary by the field's own law (no crib, so no key is located), and scores
-  the station cells: right when the compared face reads the target with the strictly least code,
-  and the stations' combined code.
-
-**The acceptance read so far** (`crates/holonics/src/hnn/tests/reference.rs`, "the reception carry"):
+**The acceptance read** (`crates/holonics/src/hnn/tests/reference.rs`, "the reception carry";
+`tests/lock_face.rs`):
 - at `A = I` the prequential exposure on the chain field returns every reading, deposit, balance
   and curve point of the exposure at rest, bit for bit; only the resident's state bits read more, by
   the carried tick;
-- under `A = 0` every compare writes its consumed word's end at the summed junction steps, the next
-  refine's faces are exactly the read on that opening, and the carried interior moves the read;
-- each held-out passage reads the same whether or not another passage was read first, and the
-  stored state is unchanged; at `A = I` the passage read is the read at rest exactly.
+- under `A = 0` every compare writes its consumed word's end at the summed junction steps, and the
+  next refine's faces are exactly the read on that opening, opened from the carry as written and
+  read back (`ReceptionCarry::{write, read}`); the carried interior moves the read;
+- under `A = 0` the chained balance (`ChainedBalance`, read in `expose_from` at every reception
+  opened on the previous word's end) closes exactly at all eight readings, the chain is dissipative
+  at all eight, and the stronger reading fails at reception 7 only, by
+  `3580154876230715732256339/2⁸²` (§2.3);
+- `ContinuingState` carries the reception's end (`with_carry`, `carry`) inside its check, before its
+  clock line, so the stamp still replaces only what follows the storage product; a state at rest
+  writes no carry and reads back at rest; one byte changed inside the carry is refused as damage;
+  `Constitution::continued` does not read the carry, which is resident motion, and
+  `Reference::mount_carried` mounts it beside the declared constitution, refused at rest or on
+  another field's shape.
 
-Still owed from §4's acceptance: the chained balance's closure at `A = 0` within its certified bound
-at every reception (the receipts carry each word's balance; the per-reception certificate is not
-yet read), the carried change in `ContinuingState` (every saved state stays rest-carried), the
-device word with host-card parity, and the Lean statement (#62).
+[agent-inferred] The carry's restore is exact at the word it opens, which is what the carry
+determines. The rest of the reference resident (its open moments and the aeon in progress) is not a
+saved object of this path; it is restored only where the executed path's continuing state already
+restores it.
 
-**What the decisive read needs first.** Every U6 state holds the receiving map at zero (the
-[PC queue](../runs/u6/PC_QUEUE.md), P1). A compare's wave face is then zero, so a passage reads the
-same at rest and under the carry by construction: the chain test showed exactly this until deposits
-formed the map. The read therefore forms its stored state first, in the same process, by the
-exposure protocol at rest from the U6 source over training passages
-(`Reference::expose_forming`, `executed held-read`), and reads every held-out passage from that one
-formed constitution under both openings. `ContinuingState` refuses a constitution whose other loci
-moved, so the formed state is not saved between processes. The launch plan is the PC queue's P6.
+Still owed: the device word with host-card parity (the card's port tests read the reference at its
+default, rest, so they are unchanged), and the Lean statement (#62). Guard 16 of
+[THE_MACHINE](../../docs/THE_MACHINE.md) reads that no change outlives its word or its refinement;
+under `A = 0` the end change outlives its refinement into the next reception's opening, as this
+record derives. The guard's wording owes that join in its owner.

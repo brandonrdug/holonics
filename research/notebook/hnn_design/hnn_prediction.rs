@@ -443,14 +443,6 @@ fn main() {
             &arguments[6],
             &arguments[7..],
         ),
-        (Some("executed"), Some("held-read")) => executed_loop::held_read(
-            arguments[3].parse().expect("a training seed"),
-            arguments[4].parse().expect("a window count"),
-            arguments[5].parse().expect("a held-out seed"),
-            arguments[6].parse().expect("a passage count"),
-            &arguments[7],
-            &arguments[8],
-        ),
         (Some("executed"), Some("word-read")) => executed_loop::word_read(
             &arguments[3],
             arguments[4].parse().expect("a seed"),

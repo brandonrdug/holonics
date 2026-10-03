@@ -80,7 +80,7 @@ its jump `J`, the requests it changes).
 **Incomplete** (October 3, `claude/pc-receipts` `697a89ed`; the refits record §12). Both sources exited
 124 at `36000053` ms with only the header written, so the gate is not read. It is not relaunched, and
 the record states the decisive form (a progress line, and the held-out passages first under a 2048-window deadline). The
-queue then held nothing else; P6 below is planned, not launched. The text below is the plan as launched.
+queue is empty. The text below is the plan as launched.
 
 **Running in two places.** The cloud launched it on October 2 at 21:28 UTC, at 2 threads per
 source. A container restart at about 23:00 lost that run: only the header line had been written, since
@@ -172,57 +172,3 @@ states. The reads at 16 threads, each on a machine shared with other runs, are:
 
 The largest is `1082906` ms, so the deadline is `18·1082906 = 19492308` ms. It is fixed here before
 launch and never raised. Report whole sections and stations right, station by station, for each state.
-
-## P6. The reception carry against rest, on the fresh seed 2026100301
-
-**Planned, not launched** (October 3; record B §6,
-`research/records/2026-10-03_THE_RECEPTION_CARRIES_THE_INTERIOR_CHANGE_THE_SOURCE_PORT_IMPOSES_THE_MOMENT_AND_REST_IS_COMPLETE_ABSORPTION.md`).
-The production path now carries a reception's end into the next reception
-(`Reference::with_reception(Reception::Carry(Absorption::Nothing))`, `Word::open_received`). This
-run reads whether the carry predicts held-out stations better than today's rest. The six checks:
-
-1. **The decision.** If the carry is ahead (paired by passage, tail at most `1/64`), production
-   receptions carry, and the owed work follows: the carried change in `ContinuingState`, the device
-   word, and the chained-balance certificate with its Lean (#62). If it is not ahead, receptions
-   stay at rest and the carry stays a declared, unadopted opening. Nothing that depends on the answer
-   starts first: no exposure or U6 chain is launched under either opening before this reads. If one
-   is launched anyway, this run is stopped.
-2. **The projection, on the PC.** Before launch, a development read on the PC on the spent seed
-   (never on 2026100301), at the declared windows and two passages:
-   ```
-   RAYON_NUM_THREADS=16 timeout 7200 $B executed held-read 2026093061 2048 2026093012 2 out/p6-dev.listing m7-3=<m7-3 state>
-   ```
-   Take the largest formation time `F` (the last formation line) and the largest passage time `P`
-   (the passage lines). The deadline is `3·(F + ⌈128/16⌉·P)` ms when passages run sixteen at a
-   time, written here before launch and never raised.
-3. **Progress lines.** Formation prints one line per compared window with its elapsed ms; the read
-   prints one line per passage, written to the listing as each passage ends. Formation is the
-   longest part and is measured whole by the development read; if the first passages of the
-   decisive read run slower than `P`, the run stops and is reported incomplete.
-4. **What a null means.** At complete absorption the carry equals rest exactly (tested:
-   `the_carry_at_complete_absorption_is_todays_reception_exactly`,
-   `each_held_out_passage_is_read_from_the_stored_state`). A state whose receiving map is zero ties
-   every passage by construction, which is why the stored state is formed in the same process by
-   the exposure protocol at rest (`Reference::expose_forming`): the formed map cannot be saved,
-   because `ContinuingState` holds only the source port. **Launch only if the development read shows
-   at least one passage whose rest and carry codes differ.** If every development passage ties, the
-   instrument cannot separate, and the run is not launched. Every held-out passage reads from the one
-   formed state, with nothing deposited (`Reference::read_passage` discards each staged deposit), and
-   the carry restarts from that state at every passage.
-5. **No existing receipt.** Seed 2026100301 has never been read (record B §4), and no `held-read`
-   receipt exists on main or on `claude/pc-receipts`. Check both again before launch
-   (`git grep -n 2026100301 origin/main origin/claude/pc-receipts`).
-6. **Receipts on every exit.** Launch through a wrapper whose `trap … EXIT` copies the listing,
-   stdout, `/usr/bin/time -v` output (wall time, peak resident set), exit code, launch UTC, build
-   commit, host and threads into `research/runs/p6/` on `claude/pc-receipts`, and commits and pushes
-   them, whether the run completes, times out or fails.
-
-The decisive command, after the development read sets the deadline `T`:
-```
-RAYON_NUM_THREADS=16 timeout T $B executed held-read 2026093061 2048 2026100301 128 out/p6-carry.listing m7-3=<m7-3 state>
-```
-The opening state is m7-3, the state #236 released:
-`research/runs/branch-archive/claude/pc-receipts/research/runs/u6/receipts_pc/q3/m7-3.state` on main.
-Formation runs 2048 windows (6144 cells) of training seed 2026093061 at rest. Report the formation
-line, every passage line, and the final paired line (ahead, behind, tied, the exact tail and its
-`/2^20` cell, released or not) whole. Stations right are description only.
