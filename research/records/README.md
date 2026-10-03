@@ -450,6 +450,10 @@ for the changed source.
 - [The operating guides carry the machine and research into the consumer](2026-09-20_THE_OPERATING_GUIDES_CARRY_THE_MACHINE_AND_RESEARCH_INTO_THE_CONSUMER.md): the September 20 audit and consolidation of the repository's documentation, with Brandon's direct requests recovered and the guides joined to their consumers.
 - [Lessons from the workbench and Athena prototypes](2026-09-24_LESSONS_FROM_THE_WORKBENCH_AND_ATHENA_PROTOTYPES.md): what the retired `holonics` CLI and Athena examples achieved and failed at, with evidence, and ten requirements for any rebuilt application.
 
+## Protein receiving certificates
+
+- [Protein receiving certificates and the unresolved internal gate](2026-10-03_PROTEIN_RECEIVING_CERTIFICATES_AND_THE_UNRESOLVED_INTERNAL_GATE.md) (#148, #62): experimental paused evidence with 1UBQ geometry ancestry, a conditional CCD NML secondary-amide source, the withdrawn 205-comparison cell, the corrected 236-comparison checkpoint and its unresolved regional pairs. [The package](../protein/README.md) supplies exact exterior certificate readers; native construction and experimental uncertainty remain outside its reproduction boundary. No validated fold, binder or pH result is claimed.
+
 ## Maintaining a route
 
 A new record keeps its dated filename. Add it to the relevant route when it changes a reusable

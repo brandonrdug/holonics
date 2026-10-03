@@ -1,0 +1,149 @@
+{
+  "schema": "holonics.protein.publication-verification.v1",
+  "sealed_manifest": {
+    "sha256": "f8ffbc16dc39a513350ed409cb71293c04ca9de34a3693f120c692c6b82223ed",
+    "bytes": 1592
+  },
+  "evidence_parts_passed": true,
+  "workspace_cargo_check_completed": false,
+  "merge_gate": "cargo check --workspace --all-targets remains incomplete after the required two-second cached-compilation cap. No Rust source changed.",
+  "new_scientific_design_or_experiment": false,
+  "receipts": [
+    {
+      "exit": 0,
+      "wall_ns": 45895912,
+      "CPU_count": 1,
+      "CPU_user_us": 35565,
+      "CPU_system_us": 5778,
+      "cap_ns": 8000000000,
+      "projection_kill_triggered": false,
+      "system_floor_breached": false,
+      "group_memory_max_bytes": 268435456,
+      "group_memory_peak_bytes": 23285760,
+      "all_outputs_present": true,
+      "inputs_unchanged": true,
+      "within_projection": true,
+      "part": "amide",
+      "lease_released_after_publication": true,
+      "child_reaped": true,
+      "group_swap_bytes": 0,
+      "output_seal_json_identity": {
+        "sha256": "67053f50028d754899e1be733094bb24e986f22fb6f3f03afed4f9a39ccc388a",
+        "bytes": 1497
+      },
+      "result_json_identity": {
+        "sha256": "c5375b8598be3116eb5c0b87bac12d949cd86464a4866b0c707816c044bda6ab",
+        "bytes": 149
+      },
+      "result": {
+        "passed": true,
+        "part": "amide",
+        "source": "NML",
+        "source_charts_checked": 2,
+        "experimental_or_transfer_uncertainty_quantified": false
+      }
+    },
+    {
+      "exit": 0,
+      "wall_ns": 2009549307,
+      "CPU_count": 1,
+      "CPU_user_us": 1965457,
+      "CPU_system_us": 18828,
+      "cap_ns": 8000000000,
+      "projection_kill_triggered": false,
+      "system_floor_breached": false,
+      "group_memory_max_bytes": 268435456,
+      "group_memory_peak_bytes": 35786752,
+      "all_outputs_present": true,
+      "inputs_unchanged": true,
+      "within_projection": true,
+      "part": "certificates",
+      "lease_released_after_publication": true,
+      "child_reaped": true,
+      "group_swap_bytes": 0,
+      "output_seal_json_identity": {
+        "sha256": "122637e749bde7ee45a42900a13e0aa7c68692d07da0661943f07c0e93781665",
+        "bytes": 1509
+      },
+      "result_json_identity": {
+        "sha256": "019bed5ce3988105de86355018c64292c9de80d7a7e75e89153d8f8c901402bd",
+        "bytes": 267
+      },
+      "result": {
+        "passed": true,
+        "part": "certificates",
+        "old205_obstruction_leaves": 315,
+        "joint236_checkpoint": {
+          "refused": 134,
+          "necessary_pass": 1,
+          "unresolved": 155
+        },
+        "full_internal_fixture_admission": false,
+        "common_pose_or_binding_claim": false
+      }
+    },
+    {
+      "exit": 0,
+      "wall_ns": 1221812930,
+      "CPU_count": 1,
+      "CPU_user_us": 1198859,
+      "CPU_system_us": 8898,
+      "cap_ns": 8000000000,
+      "projection_kill_triggered": false,
+      "system_floor_breached": false,
+      "group_memory_max_bytes": 268435456,
+      "group_memory_peak_bytes": 30879744,
+      "all_outputs_present": true,
+      "inputs_unchanged": true,
+      "within_projection": true,
+      "part": "broadphase",
+      "lease_released_after_publication": true,
+      "child_reaped": true,
+      "group_swap_bytes": 0,
+      "output_seal_json_identity": {
+        "sha256": "e304e6ed34a0555016f0f84aca3cb4c1286d6d3e5fdd8ccf76e66fe9caaf31f0",
+        "bytes": 1506
+      },
+      "result_json_identity": {
+        "sha256": "f70d599b4cabe588b55ac02bb86ce67a9f7002f86b20e1f1f43ded1902efb2c3",
+        "bytes": 229
+      },
+      "result": {
+        "passed": true,
+        "part": "broadphase",
+        "nonlocal_reference": 610154,
+        "unresolved_nondirectional": 967,
+        "possible_directional": 110,
+        "full_internal_fixture_admission": false,
+        "common_pose_or_binding_claim": false
+      }
+    },
+    {
+      "exit": -9,
+      "wall_ns": 2005017004,
+      "CPU_count": 1,
+      "CPU_user_us": 17095,
+      "CPU_system_us": 11060,
+      "cap_ns": 2000000000,
+      "projection_kill_triggered": true,
+      "system_floor_breached": false,
+      "group_memory_max_bytes": 1073741824,
+      "group_memory_peak_bytes": 848977920,
+      "all_outputs_present": false,
+      "inputs_unchanged": true,
+      "within_projection": false,
+      "part": "cargo",
+      "lease_released_after_publication": true,
+      "child_reaped": true,
+      "group_swap_bytes": 0,
+      "output_seal_json_identity": {
+        "sha256": "8df6ca70f26bda981898b5d587e2609dd4c622a8605967dc8719155e6ae78e84",
+        "bytes": 1257
+      },
+      "failure_json_identity": {
+        "sha256": "72f851f04854ee23f283e784c743c553edb1a216b1752be7326aa697caf4a5da",
+        "bytes": 154
+      }
+    }
+  ]
+}

@@ -11,6 +11,7 @@ retired is in history at [`13f8c734`](https://github.com/brandonrdug/holonics/tr
 |---|---|
 | A derivation, design decision, source comparison or substantial result | [Dated records](records/README.md), with its source, hypotheses, receiver and evidence |
 | A reproducible calculation or native/application run | Its dated record, retaining inputs, source revision, command, cost and conclusions. The experiment tree before the reset is in history at [`research/experiments`](https://github.com/brandonrdug/holonics/tree/13f8c734/research/experiments) |
+| Paused protein geometric evidence | [Protein receiving certificates](protein/README.md): sequence, source contracts, exact exterior readers and incomplete admission; no validated fold or binder |
 | A paper, expository diagram or composed mathematical argument | [Papers](papers/README.md), with editable Typst sources and rendered artifacts |
 | Symbolic exploration, exercises and handwritten development | [Notebook](notebook/README.md), including its local Lean checks |
 | Current definitions and implementation contracts | [Elementary objects](../docs/ELEMENTARY_OBJECTS.md), [formal framework](../docs/FORMAL_FRAMEWORK.md), [model formula](../docs/HNN_FORMULA.md), [subject guides](../docs/canon/README.md#where-the-current-laws-live), [`lean/`](../lean/README.md) and `crates/` |

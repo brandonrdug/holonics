@@ -1,0 +1,49 @@
+{
+  "schema": "holonics.protein.publication-manifest.v1",
+  "files": {
+    "README.md": {
+      "sha256": "aa7739a8b355870c7295e3e441b4579a9addcf877253393b7e1ba75c90f1c563",
+      "bytes": 11513
+    },
+    "SOURCES.md": {
+      "sha256": "3bbb34ad8312616326804c65ff313b7c23acedc855102ecba56b416ec985b81e",
+      "bytes": 2645
+    },
+    "sequence.fasta": {
+      "sha256": "5740a1bd019b6cfa0e195320c5d5991c0edeb53d65c98344393f90bf47b5c0da",
+      "bytes": 162
+    },
+    "exact.py": {
+      "sha256": "af05f06633ced5a5437f0af0c7e7ae8843420fa46570d6fd6c6467af10c21531",
+      "bytes": 1976
+    },
+    "verify.py": {
+      "sha256": "445912307472dce3158fa60ebbc30031489150d3453c69791ccf67f82bac17ea",
+      "bytes": 24548
+    },
+    "sources/NML.cif": {
+      "sha256": "3508913f3a128d8182545424e2342c3319390b910fdba85171cf41ad86e28c27",
+      "bytes": 5091
+    },
+    "data/amide_source_contract.json": {
+      "sha256": "26d11a4e07c19736a7c4ec3c9071d97619f725c42362da92dc10fe49a4221b40",
+      "bytes": 9515
+    },
+    "data/checkpoints.json": {
+      "sha256": "e58d5f0f3279317219beabd0c27e59727b2d913b9bf904cf5aae10c65e6519ba",
+      "bytes": 142123
+    },
+    "data/comparisons.json": {
+      "sha256": "265216c0da81428947bd4234780282fca1951a494fa3290cb35c1030e5804210",
+      "bytes": 28595
+    },
+    "data/results.json": {
+      "sha256": "c052a7caed075a88c4e4e7d5d0053970bf60a344833ab8ae872b3cac7a361347",
+      "bytes": 184488
+    },
+    "data/source_faces.json": {
+      "sha256": "2fea549ee2a546f3d358ca488cfe36c664abe67221656c46cfd2522d9eba9177",
+      "bytes": 826125
+    }
+  }
+}
