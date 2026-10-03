@@ -1840,6 +1840,13 @@ impl<'c> Word<'c> {
         &self.carried.solves
     }
 
+    /// Each contact's carried state remainders `[σ, ρ]` (displacement, rate; zero under the exact
+    /// law). At an opening they hold what the split of a held rate left off the lattice.
+    #[cfg(test)]
+    pub(crate) fn state_remainders(&self) -> &[[Vec<Rat>; 2]] {
+        &self.carried.states
+    }
+
     /// The peak exact bits of any entry of the change so far, a reading.
     pub fn peak_bits(&self) -> u64 {
         self.peak_bits

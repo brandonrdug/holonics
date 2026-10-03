@@ -117,7 +117,26 @@ fn native_storage_continuation(exact: bool) {
             receipt.opening_difference
         );
         let mut next = returned.forward.into_present().unwrap();
-        assert_eq!(next.change().unwrap(), change);
+        // The deposit holds each contact's canonical state `(u, π = C w)`: the opened rate, with
+        // what its split left in the opening remainder, solves `C′ w′ = C w`; the displacement,
+        // the waves and the storage open as the cut left them.
+        let opened = next.change().unwrap();
+        assert_eq!(opened.storage, change.storage);
+        assert_eq!(opened.arrivals, change.arrivals);
+        for (a, (state, held)) in change.states.iter().zip(&opened.states).enumerate() {
+            let (storage, moved) = (
+                predecessor.operands().contacts()[a].forms().0,
+                next.operands().contacts()[a].forms().0,
+            );
+            let [displacement, rate] = &next.state_remainders()[a];
+            assert!(displacement.iter().all(Rat::is_zero));
+            assert_eq!(held[0], state[0]);
+            let rate = crate::ratio::linear::vector::add(&held[1], rate);
+            assert_eq!(moved.apply(&rate).unwrap(), storage.apply(&state[1]).unwrap());
+            if exact {
+                assert_ne!(held[1], state[1], "the deposit moved the contact's mass");
+            }
+        }
         assert_eq!(next.opened_at(), next_tick);
         assert_eq!(next.clock().ticks(), BigUint::from(next_tick));
         for (ring, state) in change.resonators.iter().enumerate() {
@@ -132,7 +151,7 @@ fn native_storage_continuation(exact: bool) {
         next.run(1).unwrap();
         predecessor.run(1).unwrap();
         eprintln!("native storage next tick elapsed_ms={}", started.elapsed().as_millis());
-        assert_eq!(next.recorded()[0].states, change.states);
+        assert_eq!(next.recorded()[0].states, opened.states);
         assert_eq!(next.recorded()[0].arrivals, change.arrivals);
         assert!(next.field_balances()[0].closes());
         assert!(
@@ -195,18 +214,20 @@ fn native_contact_return_refuses_another_source_and_stale_deposit_without_cache_
     assert_eq!(charts, before);
 }
 
-// [derivation] **A storage deposit reaches the next contact passage only through the rate's jump.**
-// With both words at the same representatives, the transit's right side differs by `2ΔC w` and its
-// operator by `(G/h)ΔC`, so under the exact solve `m′(ζ′ − ζ) = 2ΔC(w − ω) = ΔC(w − w⁺)`, `w⁺ = 2ω − w`
-// the predecessor's next rate before its split. Summed over the ticks the representatives agree,
-// the rate jumps telescope: `Σ(w_t − w⁺_t) = (w_0 − w_N) + (ρ_0 − ρ_N) + (G/h)(r_0 − r_N)` (rate and
-// solve remainders). While the representatives agree, the two words' solve remainders differ by the
-// accumulated image difference, so a deposit is forced into the next passage only once that sum
-// reaches one word unit. Record
-// `research/records/2026-10-02_A_STORAGE_DEPOSIT_IS_FELT_ONLY_THROUGH_THE_RATE_S_JUMP_AND_THE_WORD_HOLDS_IT_BELOW_ONE_UNIT.md`;
-// Lean `HNN/StorageResolution`.
+// [derivation] **At held momentum a storage deposit is felt through the motion itself, and the
+// lattice word opens the held momentum in the rate's remainder.** The deposit holds the contact's
+// canonical state `(u, π = C w)`, so the successor opens at `C′ w′ = C w` and the transit's right
+// side `h(α_g − α_h) + 2C w − hKu` is unchanged: under the exact solve `m′(ζ′ − ζ) = −(G/h)ΔC ζ =
+// −ΔC(w + w⁺)`, `w⁺ = (G/h)ζ − w` the predecessor's next rate. Summed, the midpoint rates are the
+// displacement's travel. On the lattice the successor's opening rate is the split of `w + δ`,
+// `C′δ = −ΔC w`: while the representatives agree the solve reads them alone, so the per-tick
+// response is the 2026-10-02 identity `ΔC(ŵ − ŵ⁺)`, the solve remainders differ by the accumulated
+// image difference, and the rate remainders by the opening's `δ` plus the accumulated rate-image
+// difference. Record
+// `research/records/2026-10-02_A_STORAGE_DEPOSIT_IS_FELT_ONLY_THROUGH_THE_RATE_S_JUMP_AND_THE_WORD_HOLDS_IT_BELOW_ONE_UNIT.md`
+// §9; Lean `HNN/StorageResolution` (§1–§4 at one rate), the held-momentum statements in #62.
 #[test]
-fn storage_deposit_reaches_the_next_contact_only_through_the_rate_jump() {
+fn storage_deposit_at_held_momentum_is_felt_through_the_motion() {
     storage_response(true, 1);
     storage_response(false, 4096);
 }
@@ -214,6 +235,7 @@ fn storage_deposit_reaches_the_next_contact_only_through_the_rate_jump() {
 fn storage_response(exact: bool, ticks: usize) {
     use crate::ratio::linear::vector::{add, sub};
     let started = std::time::Instant::now();
+    let two = Rat::from_integer(2.into());
     let scale = |c: &Rat, v: &[Rat]| v.iter().map(|x| c * x).collect::<Vec<_>>();
     let field = if exact { boundary().with_exact_word() } else { boundary() };
     let theta = resolved(&field);
@@ -242,44 +264,75 @@ fn storage_response(exact: bool, ticks: usize) {
     assert_eq!(&g, after.conductance());
     assert_eq!(before.forms().1, after.forms().1);
     assert_eq!(before.forms().2, after.forms().2);
-    let delta = after.forms().0.subtract(before.forms().0).unwrap();
+    let storage = before.forms().0.clone();
+    let delta = after.forms().0.subtract(&storage).unwrap();
     let operator = after.operator().clone();
     let inverse = operator.inverse().unwrap();
     let unit = if exact { Rat::zero() } else { field.word_lattice().unwrap().transient().unit() };
     eprintln!("storage response exact={exact} h={h} G={g} G/h={} unit={unit} dC={:?} m'={:?}",
         &g / &h, delta.to_rows(), operator.to_rows());
     assert_eq!(predecessor.solve_remainders(), successor.solve_remainders());
+    // The opening holds the momentum: `C′(ŵ′ + ρ′) = C w`, and the jump `δ = ŵ′ + ρ′ − w`.
     let rate0 = predecessor.change().unwrap().states[0][1].clone();
-    let (mut accumulated, mut material, mut parted) =
-        (vec![Rat::zero(); rate0.len()], vec![Rat::zero(); rate0.len()], None);
+    let opened = successor.change().unwrap().states[0][1].clone();
+    let opening_remainder = successor.state_remainders()[0][1].clone();
+    assert!(predecessor.state_remainders()[0][1].iter().all(Rat::is_zero));
+    let held = add(&opened, &opening_remainder);
+    assert_eq!(after.forms().0.apply(&held).unwrap(), storage.apply(&rate0).unwrap());
+    let jump = sub(&held, &rate0);
+    assert!(jump.iter().any(|x| !x.is_zero()), "the deposit moved the contact's mass");
+    eprintln!("storage opening exact={exact} w={rate0:?} jump={jump:?} representative_moved={} remainder={opening_remainder:?}",
+        opened != rate0);
+    let (mut accumulated, mut material, mut rate_images, mut parted) = (
+        vec![Rat::zero(); rate0.len()], vec![Rat::zero(); rate0.len()],
+        vec![Rat::zero(); rate0.len()], None,
+    );
     for tick in 0..ticks {
+        let (pc, sc) = (predecessor.change().unwrap(), successor.change().unwrap());
+        if !exact && pc != sc {
+            parted = Some(tick);
+            break;
+        }
+        assert_eq!(pc.states[0][0], sc.states[0][0], "one displacement");
         let r_before = predecessor.solve_remainders()[0].clone();
         let r_after = successor.solve_remainders()[0].clone();
         predecessor.run(1).unwrap();
         successor.run(1).unwrap();
         let (p, s) = (predecessor.recorded().last().unwrap(), successor.recorded().last().unwrap());
-        assert_eq!(p.states, s.states, "the two words entered this tick at one representative");
         let rate = &p.states[0][1];
         // ζ = ζ̂ + r_(t+1) − r_t, ζ̂ = (2h/G) ω.
         let image = |omega: &[Rat], r0: &[Rat], r1: &[Rat]| {
-            add(&scale(&(&(&h * Rat::from_integer(2.into())) / &g), omega), &sub(r1, r0))
+            add(&scale(&(&(&h * &two) / &g), omega), &sub(r1, r0))
         };
         let zeta = image(&p.rates[0], &r_before, &predecessor.solve_remainders()[0]);
         let zeta_after = image(&s.rates[0], &r_after, &successor.solve_remainders()[0]);
         let difference = sub(&zeta_after, &zeta);
-        let jump = sub(&scale(&Rat::from_integer(2.into()), rate), &scale(&(&g / &h), &zeta));
-        let response = inverse.apply(&delta.apply(&jump).unwrap()).unwrap();
-        if exact {
-            assert_eq!(operator.apply(&difference).unwrap(), delta.apply(&jump).unwrap(),
-                "m'(ζ' − ζ) = ΔC(w − w⁺) under the exact solve");
-        }
         accumulated = add(&accumulated, &difference);
-        material = add(&material, &response);
-        let remainders = sub(&successor.solve_remainders()[0], &predecessor.solve_remainders()[0]);
+        if exact {
+            // The right side is unchanged at held momentum; the deposit acts on the motion.
+            let motion = scale(&(&g / &h), &zeta);
+            assert_eq!(
+                operator.apply(&difference).unwrap(),
+                scale(&-Rat::one(), &delta.apply(&motion).unwrap()),
+                "m'(ζ' − ζ) = −ΔC(w + w⁺) under the exact solve at held momentum"
+            );
+            eprintln!("storage tick={} w={rate:?} w'={:?} difference={difference:?} motion={motion:?}",
+                tick + 1, s.states[0][1]);
+            continue;
+        }
+        // On the lattice the solve reads the representatives alone: the 2026-10-02 response.
+        let jump = sub(&scale(&two, rate), &scale(&(&g / &h), &zeta));
+        material = add(&material, &inverse.apply(&delta.apply(&jump).unwrap()).unwrap());
+        rate_images = add(&rate_images, &scale(&two, &sub(&s.rates[0], &p.rates[0])));
         let (pc, sc) = (predecessor.change().unwrap(), successor.change().unwrap());
         let equal = pc == sc;
-        if !exact && equal {
+        if equal {
+            let remainders =
+                sub(&successor.solve_remainders()[0], &predecessor.solve_remainders()[0]);
             assert_eq!(remainders, accumulated, "equal representatives carry the image difference");
+            let rates = sub(&successor.state_remainders()[0][1], &predecessor.state_remainders()[0][1]);
+            assert_eq!(rates, add(&opening_remainder, &rate_images),
+                "the rate remainders carry the opening's held momentum and the rate images");
         }
         if tick < 4 || (tick + 1).is_power_of_two() || !equal {
             eprintln!("storage tick={} w={:?} accumulated={:?} material={:?} chart={:?} equal={} elapsed_ms={}",
@@ -291,8 +344,9 @@ fn storage_response(exact: bool, ticks: usize) {
             break;
         }
     }
-    eprintln!("storage response exact={exact} parted={parted:?} rate_excursion={:?}",
-        sub(&rate0, &predecessor.change().unwrap().states[0][1]));
+    eprintln!("storage response exact={exact} parted={parted:?} rate_excursion={:?} travel={:?}",
+        sub(&rate0, &predecessor.change().unwrap().states[0][1]),
+        sub(&predecessor.change().unwrap().states[0][0], &change.states[0][0]));
 }
 
 // [proved-derived] At an opening receiving map `R = 0` (`Constitution::initial`) the face is the
