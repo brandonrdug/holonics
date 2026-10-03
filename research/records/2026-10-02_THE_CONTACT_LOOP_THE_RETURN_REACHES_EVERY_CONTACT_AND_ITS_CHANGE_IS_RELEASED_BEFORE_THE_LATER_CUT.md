@@ -1355,7 +1355,7 @@ in about `3353 + ε` bits, about 233 below PPM order 4. Campaign 1 declares the 
   operand of 132 bits), so the deepest the carriers admit sets it there; at campaign 1's 6,148 cells
   the card's kernel path does.
 
-## 33. The field's ceiling on text, derived and measured
+## 33. The fixed field's share on text, derived and measured
 
 **The derivation, from the owners.** Within campaign 1's library a field reading reaches the
 receiver only through the word, and three facts bound what it can be.
@@ -1371,13 +1371,19 @@ receiver only through the word, and three facts bound what it can be.
    linear reading against an axis. A pumped sheet does not hold a state across windows: it is
    recomputed from the counts at every word.
 
-So whatever the field supplies is a function of `(M̂, Ĉ, τ, Θ)`: global or decayed frequencies,
-signs of linear projections of them, and the clock, which is itself a count of the selected cells.
-A pumped sheet cannot carry a regime longer than the counts already carry it, and a boost changes
-`T_j`, not the linearity. The field's information about the next cell beyond the tree is at most
-`I(x; M̂, Ĉ, τ | address)`, read through those forms.
+So at a fixed constitution whatever the field supplies is a function of `(M̂, Ĉ, τ)`: global or
+decayed frequencies, signs of linear projections of them, and the clock, which is itself a count of
+the selected cells. A pumped sheet cannot carry a regime longer than the counts already carry it,
+and a boost changes `T_j`, not the linearity. At a fixed `Θ` the field's information about the next
+cell beyond the tree is at most `I(x; M̂, Ĉ, τ | address, Θ)`. `Θ` is not fixed in campaign 1's
+protocol: every compared window deposits (`reference.rs:3999-4008`, through `Constitution::deposited`
+at `reference.rs:1424` to `resident.constitution` at `:1463`), and §7–§8 measure the constitution
+moving at nearly every one. Its deposits are formed from each window's own cells, so `Θ` depends on
+the passage read so far, not only on its counts, and the adapting field's information is bounded
+only by `I(x; M̂, Ĉ, τ, Θ | address)`. This record does not bound the `Θ` term. [Corrected
+October 3, after Astra's review: this first stated the bound without `Θ`.]
 
-**The measurement of that bound, in the field's best case** ([receipt](2026-10-02_THE_CONTACT_LOOP_receipts/regime_letters.txt),
+**The measurement of those fixed forms, in the field's best case** ([receipt](2026-10-02_THE_CONTACT_LOOP_receipts/regime_letters.txt),
 `regime_letters.py`). The strongest state those forms allow, with the clock removed: the signs of the
 top one to three principal directions of the passage's decayed counts, found on the development
 cells (an exterior search), at memories of 4 to 1,024 cells. The state is the first letter of a
@@ -1394,12 +1400,14 @@ is campaign 1's law (prior mass `2^(−3)`, the root's base, depth 16).
 
 The states carry a few tens of bits over coins, never their join. Together with §21 (linear readout),
 §26 (memory), §28 (sheets through the clock), §29 (a clock-free full-rank linear field) and §30 (the
-base), this is the field's ceiling on text with campaign 1's library: four to nine held-out bits, at
-about half of each window's compute.
+base), this measures the share of the fixed forms of the counts and the clock on text with campaign
+1's library: four to nine held-out bits, at about half of each window's compute. It is not a ceiling
+on the adapting field: what the deposits carry through `Θ` is not separated by these reads.
 
-[agent-inferred] **The role question, answered from this.** On text the compression is the tree's,
-and the field cannot add what the tree lacks while its state is the counts, the clock and the
-constitution and its dynamics are linear within a word. To carry a passage-level state it would
+[agent-inferred] **The role question, answered from this.** On text the compression is the tree's.
+At a fixed constitution, with a state of counts and clock and dynamics linear within a word, the
+field cannot add what the tree lacks; whether the deposits' change of `Θ` adds it is not measured
+here. To carry a passage-level state it would
 need a state that persists across words (the continuing word exists only within a refinement,
 `Word::continuing`), and to carry similarity across contexts a nonlinear entry of the content
 itself, not of its counts. Both change the retention law's quotient, not a declared value, so
@@ -1449,8 +1457,9 @@ development and 35 held-out bits of some 60,000 (a seventeenth of a percent), ne
 On campaign 1 it does not pass the gate, and at half a million cells its share is a few hundredths
 of a percent, against a change of the retention law (the receiver's sheet in `Current`) with its
 Lean counterpart. It is not built. Persistence through a latched element is measured out on text
-with this library: the field's ceiling stays the few bits of §33, plus at most this latch's
-hundredths of a percent at scale.
+with this library: at a fixed constitution the field's share stays the few bits of §33, plus at
+most this latch's hundredths of a percent at scale; what the deposits carry through `Θ` is not
+measured (§33).
 
 ## 35. The parent's base, and the two mixes still chosen
 
