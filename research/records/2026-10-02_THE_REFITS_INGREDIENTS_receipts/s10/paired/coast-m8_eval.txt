@@ -1,0 +1,3 @@
+  coast (transport modulus 102837/131072): released 128, held 0, refused 0, refused certificates 0; whole sections 0 of 128 (nonconstant 0 of 128, constant 0 of 0); the success rule (every nonconstant section whole): does not hold; incorrect releases 128; reaching the termination 0; stations right 258 by station [25, 26, 31, 31, 39, 34, 30, 42]; first lock at a request-reading station (0 or 1) 29, first lock right 32; 603603 ms
+executed evaluate: 603646 ms; resident 80916480 now, 80916480 peak
+exit 0 wall 603654 ms
