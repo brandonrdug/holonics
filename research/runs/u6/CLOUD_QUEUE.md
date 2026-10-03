@@ -20,6 +20,28 @@ deadline at three times these: a chain move `DEADLINE_S=1900` (`UNIT_MS=1900000`
 `timeout 5400`, a single read `timeout 1800`. A run past its deadline is reported incomplete with how
 far it got; it is not relaunched with a larger limit.
 
+## Before any launch
+
+A run launches only when its entry here states each of these, and the main line has checked them
+(October 3, after the audit of P4; the refits record §12):
+1. **The decision it can change**, written as "result A leads to X, result B leads to Y", with the
+   latest time at which X or Y still matters. Nothing that the result would decide starts before it
+   reads. When that time passes, or the decision is taken anyway, the run is stopped.
+2. **A projection on the launch host**: a development read there of early and late units, the
+   largest time per unit, and a deadline of three times the declared count times that largest time.
+   A projection is never carried to another host, and a deadline never exceeds the host's own
+   lifetime (a cloud session's background runs end at 2 h).
+3. **A progress line and an early measured part.** The run prints one line per unit with its
+   elapsed ms, and the part it measures is reached early (reorder or declare the cut so that it is),
+   so that it can stop early on evidence.
+4. **What a null means.** A check that the instrument does not change the quantity under test, and
+   which outcomes can be read.
+5. **No existing receipt.** A search of every branch's receipts for the same input-state sha256 and
+   command, and of existing sections that already answer the question.
+6. **Receipts on every exit.** The run commits and pushes its own receipts on completion, timeout or
+   error (launch UTC, build, host, threads, projection, deadline, wall time, peak resident set), so
+   no result waits on a session.
+
 ## Q1. The native metrics' first steps at the founded opening
 
 Each metric's step from `$C0`, written one small step out, then paired with the native gradient `G`

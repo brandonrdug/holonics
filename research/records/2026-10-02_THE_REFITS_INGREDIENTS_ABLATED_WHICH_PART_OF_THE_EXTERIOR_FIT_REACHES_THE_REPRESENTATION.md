@@ -527,7 +527,9 @@ trial:
 | 1 | 1/32 | `[332893, 332898)` | 0 | 19 | 857217 |
 | 2 | 1/16 | `[324907, 324912)` | 0 | 22 | 1433622 |
 
-Move 0 releases above the opening, past the wall, and strict descent would refuse it. The run closes
+The cloud ran the same move 0 under cap 1 (`cdc9725`, `1068191` ms) with the same readings: a
+duplicate measurement (noted October 3). Move 0 releases above the opening, past the wall, and
+strict descent would refuse it. The run closes
 at move 3, since `324907 < 337896 − 11357 = 326539`. The closing state is m7-3.
 
 **From r13 (Q5; `q5_run.txt`).** The Kinetic driver at `ρ 168127/262144` under the same run, opening
@@ -541,8 +543,10 @@ chain restores the held state q411:
 - `ρ 802987/1048576`, released `[192495, 192499)`, held sheet `[187575, 187579)`;
 - solved 37, whole 1, stations right 26.
 
-Kinetic w16 at the same count releases `195744` at `ρ0`, solved 37, so the joined chain ends `3249`
-lower. Its `γ_ρ` changes sign from move to move.
+The Kinetic window chain at the same count is w14 (w3 + 11 moves = m6 + 14): it releases
+`[222169, 222173)` at `ρ0`, solved 28 (`lock_reads.txt`), so the joined chain ends `29674` lower.
+[Corrected October 3: this first compared w16, two moves further, at `195744`, `3249` above q411.]
+Its `γ_ρ` changes sign from move to move.
 
 **Held out.** Each state is read with `executed evaluate`, and each pair with `paired/paired.py` on
 the two states' sections. b counts stations right only in the first state, c those right only in the
@@ -629,8 +633,9 @@ largest measured time. A sample maximum is not an upper time: if a kind's times 
 exchangeable, the next sample passes the largest of `n` with chance `1/(n+1)`, so a chain held to it
 stops on the host's variance, and the stop says nothing about the move. Each kind is therefore bounded
 by `3` times its largest time measured on the same host before launch. [agent-inferred] The factor is
-the queue's own: every deadline in [PC_QUEUE](../runs/u6/PC_QUEUE.md) (P2, P5, the Q2 chains' `1900` s)
-is three times a measured time. A unit past it is a change of regime, not variance. It ends the chain
+the queues' own for P2 and P5 in [PC_QUEUE](../runs/u6/PC_QUEUE.md) and the Q2 chains' `1900` s in
+[CLOUD_QUEUE](../runs/u6/CLOUD_QUEUE.md). [Corrected October 3: not every deadline was; P3's `7200` s
+had no projection, and P4's `36000` s was `4000000/3571621` of one (§12).] A unit past it is a change of regime, not variance. It ends the chain
 incomplete, the factor is never raised, and its cost becomes the next subject. Bounds are fixed at
 launch, from that host's own measurements; one host's maxima are never applied to another.
 
@@ -654,7 +659,9 @@ was reread-bound, at seven reread gaps of `155229` to `209825` ms. The relaunch 
   different points, so the at-rest driver was run with no flight from coast-alone's m8
   (`rest-from-coast-m8/`). It refuses `η 8` (NotBelow) and `η 4, 2, 1, 1/2` (OwnNotBelow), and adopts
   `η 1/4`. The result is `L 348717`, `X 167601`, solved 1, stations right 16 at `ρ0`, which is
-  coast-alone's own m9, released there from rest.
+  coast-alone's own m9, released there from rest. [Noted October 3: coast-alone's m9 listing
+(`78d922d6`, 23:44:33 UTC) had already shown this release from rest, 21 min before this run, so the
+run duplicates it; §11 confirms the two states are byte-identical.]
 
 So from coast-alone's m8 the move needs no momentum, and from at-rest's m8 no step descends. The
 difference between the arms at m9 is in their m8 states, not in a carried coast.
@@ -679,7 +686,7 @@ held-out cells are `4958..6148`, 1190 targets.
 | held out, model q | `3354 + 13/16 + ε` | `3351 + 0/16 + ε` |
 | training, model q | `17437 + 13/16 + ε` | `17430 + 4/16 + ε` |
 | PPM order 2, held out | `3913 + 13/16 + ε` | the same |
-| wall | `750904` ms (shared load) | `673146` ms (alone) |
+| wall | `750904` ms (shared load) | `673146` ms (beside P4's two sources) |
 | peak resident | `292622336` bytes | `295591936` bytes |
 
 `L(I) − U(2I) = 149301954884965437216731043645/2^95` bits, in `[3 + 12/16, 3 + 13/16)`. The gate fixed
@@ -688,8 +695,9 @@ By the rule fixed with the gate, `2I` stays the scale that the prequential certi
 #259 merges with this read beside it. The measurement does not contradict it: `2I` codes lower on held
 out and on training. The card's parity is gate 3, 32 of 32 on a clean build. The first `2I` attempt ran
 beside four other runs and stopped incomplete at its `800` s deadline. It was not relaunched under that
-deadline; the solo read is a new launch, projected from its own 200-window read (`33807` ms) at three
-times. The two failures in gate 3 that came before it were stale kernels from a copied target
+deadline; the second read is a new launch, without the other #259 arm but beside P4's two sources
+(corrected October 3: it was first labelled "alone"), projected from its own 200-window read
+(`33807` ms) at three times. The two failures in gate 3 that came before it were stale kernels from a copied target
 directory, not a fault on main (#262 makes the build script rebuild on a change of the kernel sources'
 content).
 
@@ -752,39 +760,93 @@ after 32 cells), 128 held-out passages from seed `2026093012`, 1024 station cell
 all. The error files are empty. No code was printed, so w16's held-out code against m6's (the gate,
 64 bits) is not read, and §7's question is open. It is not relaunched with a larger deadline.
 
-**Why the projection failed.** The deadline came from a 200-window read at m6 in the cloud (`294297`
-ms, user time 425 s over a real time of 294 s), extrapolated linearly to the cut's 21845 windows:
-`32144589` ms per source. Three things in it did not hold.
-- *The host.* The rate was measured in the cloud and applied to the PC, which §10's rule forbids: a
-  bound comes from the same host's own measurement before launch. The PC copy was started as a
-  fallback for the cloud copy, which a container restart had stopped, and it inherited the cloud's
-  projection.
-- *The parallelism.* A read-only look at the PC at 05:14 UTC found each source running at `6106/6000`
-  of one core with 2 rayon workers. The only parallel work in `expose_with` is two `rayon::join`
-  points (`reference.rs:609`, `:4325`). By that look, more workers would have saved under `1/23` of the
-  wall time, so the thread count was not the cause.
-- *The read.* `expose_read` prints nothing between its header and its result, and it keeps no state
-  mid-run, so the run could not be stopped early on evidence, and how far it got is unknown. Whether
-  the time per window grows along the cut (the standing deepens with every deposit, and keys are
-  located at each aeon boundary) or the PC's rate was simply lower is not separated.
+**Why it failed** (corrected October 3 from an audit of the U6 runs; each item below was checked
+against the code and the receipts named). P4 could not have changed a decision, and its deadline
+could not have held.
+- *No decision waited on it.* Its only consequence was that on failure the bank chain stops (§6, §7).
+  P5 was queued 17 s after P4 (`f195474` after `d0af941`) to read the end states of those same chains,
+  and Q2, Q4 and the throw arms kept running moves throughout. The last chain ended at 01:55 UTC
+  (`4743e836`) and §11 closed at 02:26:59 UTC (`6bd97eb`), while P4's projected finish was about
+  08:05 UTC. It was not stopped when its purpose lapsed. It ran `24163` s past §11, to 09:09:42 UTC.
+- *The deadline had no headroom.* `36000000/32144589 = 4000000/3571621` over a point projection. The
+  queues' rule at launch was three times a measured time (CLOUD_QUEUE's common setup; P2 and P5 in
+  PC_QUEUE), so the deadline should have been at least `96433767` ms.
+- *The projection was a linear extrapolation from another host's sample.* It took a 200-window read
+  at m6 in the cloud (`294297` ms; user time 425 s over a real time of 294 s; peak `665231360` bytes,
+  none of which has a receipt on any branch) and multiplied by `21845/200 = 4369/40`. The rule
+  CLAUDE.md states asks for a development read on the launch host and the largest time per unit,
+  and a 200-window total has no per-unit maximum. The PC copy was a fallback for the cloud copy,
+  which a container restart had stopped, and it inherited the cloud's projection.
+- *The same host showed the time per window growing, an hour into the run.* Campaign 1's exposure on
+  the PC took `33756` ms for its first 200 windows and `672249` ms for its whole 3074-window cut
+  (`claude/pc-receipts` `6f2e4b5d`, `c1_259/c1-host-2I-window200.txt` and `c1-host-2I-solo.txt`).
+  Per window that is a factor of `193175/149089`. Applied to P4's projection it gives
+  `49676249115555/1192712` ms, already past `36000000`, and P4's cut is `4369/40` times its sample
+  against campaign 1's `1537/100`. It was not acted on.
+- *The measured part was reachable only by finishing, with no progress line.* The held-out cells are
+  the cut's last 6144 (from cell 59392, window 19797 of 21845; `expose_read`,
+  `hnn_executed_loop.rs`). `expose_read` prints nothing between its header and its result and keeps
+  no state, so the run could not stop early on evidence. Progress lines were added to executed moves
+  at 23:14 UTC (`7a650e6b`), five minutes after P4's PC launch, and not to `expose`.
+- *A null result could not be read.* `expose_from` deposits every compared window, held-out windows
+  included (`reference.rs:3999-4000`), and the deposits reach the source port `E`. So about 19797
+  windows of the protocol's own learning into `E` stand between m6's or w16's `E` and the first
+  held-out cell. A pass would have shown that w16's `E` survives them. A null could equally mean the
+  protocol overwrote it, so it would not have shown that the U6 gains miss the receiving path, and
+  the gate's failure branch did not follow from its failure.
+- *The cloud copy.* It was relaunched at 23:07 UTC under the same deadline in a session whose
+  background runs end at 2 h, below the `29/32` of the projection needed to reach the first held-out
+  cell. It left no end receipt.
 
-**What a decisive read would need** (stated, not launched). `with_deadline(n)` alone cannot decide
-the gate. The cut's 6144 held-out cells (128 passages of 48 cells) are its last 2048 windows, so a
-read that stops after `n` windows never reaches them unless it reads the whole cut. The cheapest
-decisive form has two parts.
-1. A progress line from `expose_with` every fixed number of windows, with elapsed ms. Then a
-   same-host development read of the first windows gives the rate, the deadline is three times its
-   projection, and the run stops early when the measured rate passes it.
-2. A cut whose training prefix is a declared count shorter than 59392 cells, with the held-out
-   passages unchanged and still last, so the held-out cells are reached within that projection.
-   The present code does not admit such a cut. The exposure refuses a cut whose length is not the
-   field's declared population (`expose_from`, which `expose_with` calls, `reference.rs:3834`), and
-   the field refuses a population below `n*` (`Field::declare`, `field.rs:1135`). So this part needs
-   campaign 1's field declared with the shorter population, no shorter than `n*`. That is a new
-   declaration, not a launch argument, and whether m6's and w16's states mount on it is not checked.
-   The prefix must still span the aeon boundaries at which keys are located. [agent-inferred]
-   §7 counted on about 21500 deposits before the held-out cells, so a shorter prefix changes what
-   the read measures: the gate then asks whether E shortens held-out code after that many deposits.
+**What was claimed beyond the receipts** (this section as first merged).
+- The look at the PC at 05:14 UTC (each source at `6106/6000` of one core with 2 rayon workers) was
+  reported to the main line, not receipted: `s12/` holds only the header and exit lines and two empty
+  error files.
+- "The only parallel work in `expose_with` is two `rayon::join` points" is false. Each window's
+  deposit (`resident.constitution.deposited`, `reference.rs:1424`) runs `Constitution::deposited`,
+  whose loci run under `par_iter_mut` and `into_par_iter` (`constitution.rs:5431`, `:5512`), and the
+  solved chart's rows run under `into_par_iter` (`constitution.rs:1394`, `:1438`, `:1464`, `:1487`).
+  The conclusion that the thread count was not the cause rests only on the unreceipted look.
 
-Nothing waits on this gate now. The U6 chains have ended (§10), and the arms' end states do not
-separate held out (§11). The read stays owed and is not queued.
+**The direction P4 asked about is already read held out, through `evaluate`** (undeclared; it counts
+toward no release). Pairing the existing sections of P4's own m6 (sha256 `9da99d84…`, 235 stations
+right, §9's table) and w16 (sha256 `35ca209c…`, 329) with §9's `paired.py`
+(`claude/pc-receipts` `paired/m6.sections` and `paired/w16.sections`, copied into `s12/`) gives
+`b = 215`, `c = 121`, and a tail for w16 ahead in `[177/2^30, 178/2^30)`. This is the station read,
+not the exposure's code, so §7's gate as stated stays unread. It shows that the 16 window moves from
+m6 raise held-out stations right on the same batch, which P4's direction question needed. The "m6" of
+§11's control pair is a different state.
+
+**What a decisive exposure read would need** (stated, not launched). The cheapest form reorders the
+cut instead of shortening it.
+- *Held-out passages first.* `Cut` takes held-out ranges at any position, and `closing_crib` already
+  keeps every crib off them (`reference.rs:2613-2635`). With the 128 held-out passages first and the
+  training passages after, the cut is still exactly the declared population of `2^16` cells, so no
+  new field declaration is needed. The change is to `expose_read` only.
+- *A window deadline.* The receiving windows are `[3k, 3k + 3)` from cell 0 (`receiving_windows`),
+  and a passage is 48 cells, so the held-out passages are exactly the first 2048 windows.
+  `with_deadline(2048)` stops after 2048 compared windows (`reference.rs:3910`), and the held-out
+  code is summed window by window (`reference.rs:3987-3996`), so the stopped run prints the code of
+  all 1024 held-out station cells. That is `2048/21845` of the cut, from its cheapest part.
+- *What it measures.* Held-out passage `k` opens after `16(k − 1)` deposits. Only its 8 stations are
+  held out (`expose_read`): its 40-cell request is coded and deposited like training, so its first
+  station cell, in window `16(k − 1) + 13`, is coded after `16(k − 1) + 13` deposits. That is 13 for
+  the first, against 19810 in P4 (its first station cell is 59432). The protocol still deposits every
+  complete window, the held-out windows included, so the read is not free of the instrument's own
+  learning. It is far closer to the stored `E` than P4's layout.
+- *Before any launch.* It needs a progress line from `expose_with`, a development read of its first
+  windows on the launch host, and a decision it can change. None exists now: the U6 chains have
+  ended (§10), and the arms' end states do not separate held out (§11). It stays owed and is not
+  queued.
+
+**Other duplicates and an out-of-rule launch in the same period** (noted October 3).
+- The whole-move throw's m0 is byte-identical to coast-alone's m0 (sha256 `4c514ff0…` on both
+  branches), and its m2 ran twice, once as the diagnostic and once as the relaunch (state `8d3f54c5…`
+  in both; the second was declared as a reproduction).
+- Coast-alone's m10 was launched at 23:45:24 UTC (`4743e836`, `m10/stamps.txt`) under the fitted
+  per-move bound `1349692` ms that §9 had recorded as a projection error at 23:36:36 UTC (`6fc18d6`).
+  It timed out in its eighth trial, and its driver read the timeout as a refusal and ran m11 to m13
+  outside the chain's rule. Those three are measurements outside the rule, not chain moves.
+
+The pre-launch conditions these failures call for are at the top of
+[PC_QUEUE](../runs/u6/PC_QUEUE.md) and [CLOUD_QUEUE](../runs/u6/CLOUD_QUEUE.md).

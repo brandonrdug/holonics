@@ -1859,8 +1859,9 @@ pub(super) fn word_read(terrain: &str, seed: u64, count: usize, sources: &[Strin
 /// <windows|all> <label=source>…`, sources as [`segment_source`]): campaign 1's exposure protocol
 /// (`Reference::expose_with`) on the prediction field, from each source's constitution, over one cut
 /// of the field's declared population: order-2 passages at the training seed, then `held count`
-/// passages at the held seed whose stations are held out (each passage's request is read and
-/// deposited on, its 8 stations coded and never deposited on). The receiver's own comparison
+/// passages at the held seed whose stations are held out (every complete window is coded and then
+/// deposited on, held-out windows included, as `expose_from` scores prequentially; held out means
+/// no crib reads those cells and no design choice was made on them). The receiver's own comparison
 /// deposits into every locus the protocol admits (the receiving map, the tree, the contacts, the
 /// source port) from the same opening material; only the source differs between runs. Prints, per
 /// source, the held-out stations' code (model, tree, combined, and the baselines), the training
