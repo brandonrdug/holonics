@@ -2,8 +2,8 @@
 
 **Date.** October 3. **Issues.** #73, #63 (THE_REBUILD U6), #62 (the owed Lean). **Grade.**
 [definition; agent-inferred] for the carry law and its choices (§2, §3); [proved-derived;
-implemented-exact] for the owners it reuses, held by their tests (§1); nothing here is built or
-measured. Code follows this record, and every build or read under it passes the
+implemented-exact] for the owners it reuses, held by their tests (§1); the build of October 3 and
+its tests are §6 [implemented-exact]; the decisive read is not yet made. Code follows this record, and every build or read under it passes the
 [pre-launch checks](../runs/u6/PC_QUEUE.md) (a) to (f) first.
 
 **Occasion.** The review of October 3 located that every production reception opens at rest. The
@@ -237,3 +237,54 @@ rest limit"); `pending.rs` and `reference.rs`'s refine (open on the resident's c
 `constitution.rs`'s `ContinuingState`; the device word; `tests/word.rs:33` (it states today's law and
 becomes the `A = I` case); Lean `HNN/Retention.word_opens_at_zero` (the rest case) with the chained
 balance owed in #62. The atlas rows for these owners update in the same commit as the code.
+
+## 6. Built (October 3), and what the read needs first
+
+[implemented-exact; agent-inferred where marked] The carry is built through the production path, not
+a test path. Today's reception is unchanged unless a carry is declared.
+- **The switch.** `Reference::with_reception(Reception::Carry(absorption))`; the default is
+  `Reception::Rest`, which keeps `Word::open_charted` exactly. `Absorption::{Complete, Nothing}` are
+  `A = I` and `A = 0` (§2.2); nothing in between is built.
+- **The opening.** `Reference::refine` → `PendingRatio::read_on` → `Word::open_received`, which
+  zeroes each source ring's storage in the carried change (`Π_int`) and calls the unchanged
+  `Word::continuing` with the moment's open storage at the carried tick (§2.1, §2.4). The compare's
+  re-read at a later commit, the deposit's re-read at the successor (`Arrived`) and `release` open on
+  the same opening, which the pending slot holds beside the ratio, never inside it (guard 3).
+- **The carry.** The compare writes the resident's one carried change (`Resident::carried`) from the
+  word its return consumes (`Word::reception_end`: the end change and `opened_at` plus the word's
+  junction steps), after the boundary's absorption (`ReceptionCarry::absorbed`). A discarded pending
+  ratio carries its refine's word's end (§2.6). A refinement opened while another is pending is
+  refused (one chain). The resident's state bits count the carried change's nonzero values and its
+  tick.
+- [agent-inferred] **A declared resonator under `A = 0` is refused.** The last junction step
+  advances the hop clock without a pump step, so the carried resonator state, measured at its last
+  pump tick's phase, does not fit the next opening's clock (`Word::continuing`'s check). The pump's
+  carry across receptions is owed; under `A = I` a resonator opens at rest in the carried clock.
+- **The held-out read.** `Reference::read_passage` mounts the stored state at rest for each passage,
+  compares every complete receiving window under the declared reception, discards every staged
+  deposit, closes an aeon boundary by the field's own law (no crib, so no key is located), and scores
+  the station cells: right when the compared face reads the target with the strictly least code,
+  and the stations' combined code.
+
+**The acceptance read so far** (`crates/holonics/src/hnn/tests/reference.rs`, "the reception carry"):
+- at `A = I` the prequential exposure on the chain field returns every reading, deposit, balance
+  and curve point of the exposure at rest, bit for bit; only the resident's state bits read more, by
+  the carried tick;
+- under `A = 0` every compare writes its consumed word's end at the summed junction steps, the next
+  refine's faces are exactly the read on that opening, and the carried interior moves the read;
+- each held-out passage reads the same whether or not another passage was read first, and the
+  stored state is unchanged; at `A = I` the passage read is the read at rest exactly.
+
+Still owed from §4's acceptance: the chained balance's closure at `A = 0` within its certified bound
+at every reception (the receipts carry each word's balance; the per-reception certificate is not
+yet read), the carried change in `ContinuingState` (every saved state stays rest-carried), the
+device word with host-card parity, and the Lean statement (#62).
+
+**What the decisive read needs first.** Every U6 state holds the receiving map at zero (the
+[PC queue](../runs/u6/PC_QUEUE.md), P1). A compare's wave face is then zero, so a passage reads the
+same at rest and under the carry by construction: the chain test showed exactly this until deposits
+formed the map. The read therefore forms its stored state first, in the same process, by the
+exposure protocol at rest from the U6 source over training passages
+(`Reference::expose_forming`, `executed held-read`), and reads every held-out passage from that one
+formed constitution under both openings. `ContinuingState` refuses a constitution whose other loci
+moved, so the formed state is not saved between processes. The launch plan is the PC queue's P6.

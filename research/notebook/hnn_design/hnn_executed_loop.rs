@@ -4894,3 +4894,126 @@ pub(super) fn instants(terrain: &str, seed: u64, count: usize, sources: &[String
         println!("  {label}: wall time {} ms", started.elapsed().as_millis());
     }
 }
+
+/// [definition; agent-inferred, October 3; the
+/// [reception carry](../../records/2026-10-03_THE_RECEPTION_CARRIES_THE_INTERIOR_CHANGE_THE_SOURCE_PORT_IMPOSES_THE_MOMENT_AND_REST_IS_COMPLETE_ABSORPTION.md)
+/// §4] **The carry against rest on held-out passages** (`executed held-read <train seed> <windows>
+/// <held seed> <count> <out> <label=source>`, the source as [`segment_source`]). First the stored
+/// state is formed: the exposure protocol at rest (today's reception, `Reference::expose_forming`)
+/// from the source over a cut of order-2 training passages at the training seed, stopped after
+/// `windows` receiving windows; it deposits on the receiving map, which every U6 state holds at zero
+/// (a read of a zero map is the same at rest and under the carry by construction). Then every order-2
+/// passage at the held seed is read from that one stored state with nothing deposited
+/// (`Reference::read_passage`), once at rest and once under the carry (`A = 0`), its request ingested
+/// and every complete receiving window compared. The unit is the passage: `d_k` is the carry's stations right less rest's (a station is
+/// right when its compared face reads the target with the strictly least code), ties dropped, `b`
+/// passages ahead and `c` behind, and the carry is released at
+/// `P[X ≥ b | X ~ Bin(b + c, 1/2)] ≤ 1/64`, exact. The station counts and the stations' code are
+/// description. One line per passage as it completes (its progress line, with its milliseconds), the
+/// listing written to `out` after every passage, the paired test printed at the end.
+pub(super) fn held_read(
+    train_seed: u64,
+    windows: u64,
+    held_seed: u64,
+    count: usize,
+    out: &str,
+    source: &str,
+) {
+    use holonics::hnn::reference::{Cut, PassageReading, Reception};
+    use holonics::hnn::{Absorption, Reference};
+    use rayon::prelude::*;
+    use std::sync::Mutex;
+    let clock = Instant::now();
+    let declared = order_declared();
+    let engine = Engine::new(declared);
+    let field = &engine.field;
+    let ring = engine.refinement.ring();
+    let (label, spec) = source.split_once('=').expect("<label>=<source>");
+    let opening = segment_source(&engine, ring, spec);
+    let population = usize::try_from(field.population()).expect("a population in memory");
+    let passage = declared.request + declared.stations;
+    let training = terrain_pairs("order2", &declared, train_seed, population.div_ceil(passage));
+    let mut cells: Vec<usize> =
+        training.iter().flat_map(|(r, t)| r.iter().chain(t).copied()).collect();
+    cells.truncate(population);
+    let started = Instant::now();
+    let (formed, theta) = Reference::campaign_one()
+        .with_deadline(windows)
+        .expose_forming(field, &Cut { cells, held_out: Vec::new() }, opening, &mut |compared| {
+            println!("  formation window {compared}: {} ms", started.elapsed().as_millis());
+        })
+        .expect("the formation");
+    println!(
+        "  formed from {label} over {} windows of the training seed {train_seed} at rest: deposits {}, commit {}, stopped at cell {:?}; training combined code {}; {} ms",
+        formed.windows,
+        formed.deposits,
+        theta.commit(),
+        formed.deadline,
+        exterior::enclosure(&formed.training.combined, 16),
+        started.elapsed().as_millis()
+    );
+    let pairs = terrain_pairs("order2", &declared, held_seed, count);
+    let stations = declared.request..declared.request + declared.stations;
+    println!(
+        "executed held-read: {count} order-2 passages at the held seed {held_seed}, read from {label} ({spec}) at rest and under the carry (A = 0), nothing deposited; stations {stations:?} of each passage"
+    );
+    let listing = Mutex::new(Vec::<(usize, String)>::new());
+    let read = |reception: Reception, cells: &[usize]| -> PassageReading {
+        Reference::campaign_one()
+            .with_reception(reception)
+            .read_passage(field, &theta, cells, stations.clone())
+            .expect("the passage's read")
+    };
+    let readings: Vec<(PassageReading, PassageReading)> = pairs
+        .par_iter()
+        .enumerate()
+        .map(|(k, (request, target))| {
+            let started = Instant::now();
+            let cells: Vec<usize> = request.iter().chain(target).copied().collect();
+            let rest = read(Reception::Rest, &cells);
+            let carry = read(Reception::Carry(Absorption::Nothing), &cells);
+            let line = format!(
+                "passage {k} | target {target:?} | rest right {} code {} | carry right {} code {} | compares {} boundaries {} | {} ms",
+                rest.right,
+                exterior::enclosure(&rest.code, 16),
+                carry.right,
+                exterior::enclosure(&carry.code, 16),
+                rest.compares,
+                rest.boundaries,
+                started.elapsed().as_millis()
+            );
+            println!("{line}");
+            let mut written = listing.lock().expect("the listing");
+            written.push((k, line));
+            written.sort_by_key(|(k, _)| *k);
+            let text: String = written.iter().map(|(_, l)| format!("{l}\n")).collect();
+            #[allow(clippy::disallowed_methods)]
+            std::fs::write(out, text).expect("write the listing");
+            (rest, carry)
+        })
+        .collect();
+    let (mut ahead, mut behind, mut tied) = (0u64, 0u64, 0u64);
+    let (mut rest_right, mut carry_right) = (0u64, 0u64);
+    for (rest, carry) in &readings {
+        rest_right += rest.right;
+        carry_right += carry.right;
+        match carry.right.cmp(&rest.right) {
+            std::cmp::Ordering::Greater => ahead += 1,
+            std::cmp::Ordering::Less => behind += 1,
+            std::cmp::Ordering::Equal => tied += 1,
+        }
+    }
+    let n = ahead + behind;
+    let binomial = |n: u64, k: u64| -> BigUint {
+        (0..k).fold(BigUint::one(), |acc, i| acc * BigUint::from(n - i) / BigUint::from(i + 1))
+    };
+    let upper: BigUint = (ahead..=n).map(|k| binomial(n, k)).sum();
+    let whole = BigUint::one() << n;
+    let cell = (&upper << 20u32) / &whole;
+    let released = &upper * BigUint::from(64u32) <= whole;
+    println!(
+        "  per passage: carry ahead {ahead}, behind {behind}, tied {tied}; P[X >= {ahead} | X ~ Bin({n}, 1/2)] = {upper}/2^{n}, in [{cell}/2^20, {}/2^20); at most 1/64: {released}; stations right (described) rest {rest_right}, carry {carry_right}",
+        &cell + BigUint::one()
+    );
+    println!("executed held-read: {} ms; resident {}", clock.elapsed().as_millis(), resident());
+}

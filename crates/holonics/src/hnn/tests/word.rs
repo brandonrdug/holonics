@@ -28,7 +28,9 @@ fn cut(field: &Field) -> (Medium, Current, SourceMoment) {
 
 /// Lean `HNN/Retention.word_opens_at_zero`: a word opens with every wave and contact state zero
 /// and storage only on the source rings, and a word opened after another word's full epoch reads
-/// exactly what the first read: nothing of the earlier change persists.
+/// exactly what the first read: nothing of the earlier change persists. This is today's reception,
+/// the rest limit (complete absorption, `A = I`) of the reception carry; under a declared carry the
+/// interior change persists (`tests/reference.rs`, "the reception carry").
 #[test]
 fn a_word_opens_at_zero_change_whatever_preceded_it() {
     let field = &chain();

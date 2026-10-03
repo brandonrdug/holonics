@@ -14,7 +14,8 @@
 //!   evaluates `e_max = e_0 + A` junction steps, and the last stops after its junction;
 //! - **release**: at the word's end every wave and contact state is released as the word's emitted
 //!   exchange, with its power, and every carried remainder is released and reported with it;
-//!   nothing is carried to the next word ([`Word::release`] consumes it).
+//!   nothing is carried to the next word ([`Word::release`] consumes it) unless a declared reception
+//!   carry reads its end change ("Continuing motion across receptions" below).
 //!
 //! [definition] **The carried transients** (the lattice word; Lean `HNN/LatticeWord.{feedback_tick,
 //! carried_word_accounting}`). On the field's declared lattices ([`crate::hnn::chart`]) the word
@@ -53,11 +54,22 @@
 //! declared injection added at the storage ports (the request's moment re-entering). The word then
 //! ticks on the refinement's clock: its hop clock and every resonator's pump phase read the ticks
 //! since the refinement opened ([`Word::opened_at`]), so a pump's cycle and the balance's resonator
-//! energies chain across the boundary. Only a refinement opens a continuing word; the refinement
+//! energies chain across the boundary. Only a refinement, or a reception under a declared carry
+//! (below), opens a continuing word; the refinement
 //! owns its words until its return consumes them, so the change still lives only inside the
 //! refinement (bounded by its words' ticks, never by a source length), and [`Current`] still holds
 //! no wave (guard 16). A word opened at rest ([`Word::open`]) is the continuing word opened on the
 //! zero change at tick zero (Lean `HNN/Retention.word_opens_at_zero` is that case).
+//!
+//! [definition; agent-inferred, October 3; the
+//! [reception carry](../../../../research/records/2026-10-03_THE_RECEPTION_CARRIES_THE_INTERIOR_CHANGE_THE_SOURCE_PORT_IMPOSES_THE_MOMENT_AND_REST_IS_COMPLETE_ABSORPTION.md)]
+//! **Continuing motion across receptions.** Under a declared carry, a reception's word opens on the
+//! interior of the end change the previous reception's consumed word left, with the source rings'
+//! storage imposed by the moment ([`Word::open_received`], [`ReceptionCarry`]), at the field's
+//! elapsed ticks. The resident, not [`Current`], holds the one carried change and its tick (guard
+//! 16 stands). Complete absorption ([`Absorption::Complete`]) is the rest limit: the word at rest,
+//! exactly, on a field with no declared resonator. The return stops at the opening: the covector
+//! reaching the carried change is a reading, deposited nowhere, and no tape of words is kept.
 //!
 //! [definition; agent-inferred] **Within a step the rings, then the contacts, run together** (the
 //! hardware law; `hnn::realization`): every junction reads only its own storage and arrivals and
@@ -341,6 +353,81 @@ pub struct EndChange {
     /// ([`crate::hnn::ring::ResonatorOperands::step`] reads `before` at tick `0` on phase `0`).
     /// `None` where no resonator is declared.
     pub resonator_phases: Vec<Option<usize>>,
+}
+
+/// [definition; agent-inferred, October 3; the
+/// [reception carry](../../../../research/records/2026-10-03_THE_RECEPTION_CARRIES_THE_INTERIOR_CHANGE_THE_SOURCE_PORT_IMPOSES_THE_MOMENT_AND_REST_IS_COMPLETE_ABSORPTION.md)
+/// §2.1, §2.4] **A reception's carried end**: the end change `x_k(end)` the consumed word left, and
+/// the field's elapsed ticks at its end, `t_(k+1)`, the sum of the junction steps every word of the
+/// chain executed. It is the field's present motion, of the field's fixed shape, overwritten at every
+/// reception: not a record of which windows preceded.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct ReceptionCarry {
+    pub change: EndChange,
+    pub ticks: usize,
+}
+
+impl ReceptionCarry {
+    /// [definition; agent-inferred, October 3; the reception carry §2.2] **The carry after the
+    /// boundary's absorption at the word's end**: under [`Absorption::Nothing`] the end change as it
+    /// stands; under [`Absorption::Complete`] every coordinate emitted, so only the field's elapsed
+    /// ticks remain (the rest change, every declared resonator at rest in the carried clock).
+    pub fn absorbed(self, absorption: Absorption) -> Self {
+        match absorption {
+            Absorption::Nothing => self,
+            Absorption::Complete => {
+                let rest = |waves: &[Vec<Rat>]| waves.iter().map(|w| zeros(w.len())).collect();
+                let pairs = |pairs: &[[Vec<Rat>; 2]]| {
+                    pairs
+                        .iter()
+                        .map(|[a, b]| [zeros(a.len()), zeros(b.len())])
+                        .collect()
+                };
+                let EndChange {
+                    storage,
+                    arrivals,
+                    states,
+                    resonators,
+                    ..
+                } = &self.change;
+                Self {
+                    change: EndChange {
+                        storage: rest(storage),
+                        arrivals: pairs(arrivals),
+                        states: pairs(states),
+                        resonators: vec![None; resonators.len()],
+                        resonator_phases: vec![None; resonators.len()],
+                    },
+                    ticks: self.ticks,
+                }
+            }
+        }
+    }
+}
+
+/// [definition; agent-inferred, October 3; the reception carry §2.2] **The boundary's absorption
+/// at a word's end**, `A`. [`Absorption::Complete`] (`A = I`) emits every interior coordinate at the
+/// end, so the next word opens on the rest change: today's word exactly on a field with no declared
+/// resonator. [`Absorption::Nothing`] (`A = 0`) absorbs nothing beyond the field's own conductances
+/// within the ticks, so the interior change carries. An intermediate absorption would need a
+/// declared exterior admittance at the receiver's section, a locus that does not exist; none is
+/// built.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub enum Absorption {
+    Complete,
+    Nothing,
+}
+
+/// [definition; agent-inferred, October 3; the reception carry §2.1] **What a reception's word
+/// opens on**: at rest at tick zero (today's reception, [`Word::open_charted`]), or on the previous
+/// reception's carried end under a declared absorption ([`Word::open_received`]).
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub enum WordOpening {
+    Rest,
+    Received {
+        carry: ReceptionCarry,
+        absorption: Absorption,
+    },
 }
 
 /// [definition] **The field's power form at a cut**, `P(x) = (h/4)[Σ_r Y_r|s_r|² + Σ_a G_a(|a_g|² +
@@ -782,6 +869,58 @@ impl<'c> Word<'c> {
         )
     }
 
+    /// [definition; agent-inferred, October 3; the reception carry §2.1–§2.4] **Open a reception's
+    /// word on its opening**: at [`WordOpening::Rest`], exactly [`Word::open_charted`]. On a
+    /// received carry, `x_(k+1)(0) = Π_int x_k(end) + s_(k+1)(0)` through [`Word::continuing`] at the
+    /// carried tick: `Π_int` keeps every interior coordinate and zeroes each source ring's storage,
+    /// so the moment's open storage, nonzero only on the source rings, is imposed there and adds to
+    /// nothing elsewhere (the source port is an imposed port; adding would count the passage once
+    /// per reception). Under [`Absorption::Complete`] the carried change is the rest change, with
+    /// every declared resonator opening at rest at the carried tick. Under [`Absorption::Nothing`] a
+    /// declared resonator is refused: the last junction step advances the hop clock without a pump
+    /// step, so the carried resonator state's phase does not fit the next opening's clock, and the
+    /// pump's carry across receptions is owed.
+    pub fn open_received(
+        field: &'c Field,
+        constitution: &impl ConstitutionRead,
+        current: &Current,
+        moment: &SourceMoment,
+        charts: &mut Charts,
+        opening: &WordOpening,
+    ) -> Result<Self, HnnError> {
+        let WordOpening::Received { carry, absorption } = opening else {
+            return Self::open_charted(field, constitution, current, moment, charts);
+        };
+        let storage = moment.open_storage(field, constitution, current)?;
+        let operands = Operands::at_cut_charted(field, constitution, current, charts)?;
+        let change = match absorption {
+            Absorption::Complete => {
+                let rings = field.rings().len();
+                EndChange {
+                    resonators: vec![None; rings],
+                    resonator_phases: vec![None; rings],
+                    ..EndChange::rest(field, &operands)
+                }
+            }
+            Absorption::Nothing => {
+                if let Some(ring) = operands.resonators().iter().position(Option::is_some) {
+                    return Err(HnnError::Resonator {
+                        ring,
+                        what: "the reception carry of a declared resonator's pump phase is owed",
+                    });
+                }
+                let mut change = carry.change.clone();
+                for (ring, wave) in change.storage.iter_mut().enumerate() {
+                    if field.is_source(ring) {
+                        *wave = zeros(wave.len());
+                    }
+                }
+                change
+            }
+        };
+        Self::continuing(field, operands, &change, &storage, carry.ticks)
+    }
+
     /// Open a word on a declared storage injection (every wave and contact state still zero), every
     /// solve seeded afresh: the impulse of the law's own tests.
     #[cfg(test)]
@@ -1116,6 +1255,16 @@ impl<'c> Word<'c> {
                     })
                 })
                 .collect(),
+        }
+    }
+
+    /// [definition; agent-inferred, October 3; the reception carry §2.1] **The reception's carried
+    /// end**: the change the word holds and the field's elapsed ticks at its end (its opening tick
+    /// plus its junction steps), read when its return consumes it.
+    pub(crate) fn reception_end(&self) -> ReceptionCarry {
+        ReceptionCarry {
+            change: self.end_change(),
+            ticks: self.opened_at + self.passage.len(),
         }
     }
 

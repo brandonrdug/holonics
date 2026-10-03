@@ -118,7 +118,7 @@
 //! | Holonic Encoding (U6) | `HNN/Encoding.{injection_square, encoding_reduced_recurrence, moment_reduced_recurrence, encoding_separator, encoding_descends_iff}`, `Compression/Landmark/Context/Birth.founding_intertwines` | [`encoding`] |
 //! | the receiving face: the landmark tree's face at each phase's causal address, read at the grain, plus the wave (the region table and the landmark tree; the region table is the depth-one forced case of the whole-cell emission, kept in Lean, not of the digit tree) | `HNN/RegionCounts.{grain_log_iff_pow_bounds, grain_code_residual, combined_face_pullback}`, `Compression/Landmark/Context/Tree.{depth_one_is_the_whole_cell_table, release_rule}` | [`receiving`], [`ReceivingRead::combined`], [`ActiveAddress`]; the grain read is [`crate::receiver::face::grain_exponent`]'s |
 //! | the receiving face compresses landmarks: the tree's path face, its opened-path deposit and telescope, the executed dyadic face (the landmark tree) | `Compression/Landmark/Context/Tree.{path_face_normalized, weight_step, landmark_step, path_telescope_exact, depth_one_is_the_whole_cell_table, executed_split_laws, cell_faces_partition, digit_log_residual}` (the owner's header has the rest) | [`crate::compression::landmark::context`] |
-//! | the word opens at zero | structural: [`Current`] has no wave field (`HNN/Retention.word_opens_at_zero` is the abstract trajectory's linearity) | [`Word::open`] |
+//! | the word opens at zero, the rest limit of the reception carry | structural: [`Current`] has no wave field (`HNN/Retention.word_opens_at_zero` is the abstract trajectory's linearity; the chained balance across receptions is owed in #62) | [`Word::open`], [`Word::open_received`] |
 //! | keys | `HNN/Keys.{field_loop_fibre, selective_step_dormant, propagation_eq_edge_fibre, gauge_fix_unique}` | [`keys`], [`crate::compression::Menu::propagate`] |
 //! | the ring's mode tick, its pump and sheets, its clock, the junction's reference change (campaign 2) | `HNN/Ring.{ring_tick_conserves_mode_energy, ring_descriptor_tick_conserves, ring_cayley_denominator_nonsingular, ring_tick_executed_energy_balance, two_port_reference_balance, ring_crossings_are_epoch_ticks, pump_period_is_cycle, pump_half_turn_invariant, pump_blind_to_sheets, locked_sheet_receiver_face}` | [`ring`] |
 //! | the contact's transfer and site kind, its boost, its lock address, its break (campaign 2) | `HNN/Contact.{contact_transfer_kind_by_storage_sign, contact_mode_transfer, contact_boost_solve_or_singular_direction, contact_signed_storage_balance, contact_lock_address, lockAddress_unique, least_denominator_unique, lockAddress_closes}`, `HNN/ContactBreak.{break_release_balance, break_iff_release_covers_gluing, griffith_closed_port_case, parting_returns_gluing_defect}` | [`contact`], [`contact_readings`] (`Field::parted_holarchy` the tests') |
@@ -187,7 +187,7 @@ pub use receiving::{ActiveAddress, LetterReader, ReceivingPhases, ReceivingRead}
 pub use reference::{Cut, Exposure, Reference, Resident};
 pub use retention::AeonBoundary;
 pub use ring::{Floquet, FloquetReading, PumpDeclaration, PumpSchedule, ResonatorMaterial};
-pub use word::{Released, ResonatorBalance, Word};
+pub use word::{Absorption, ReceptionCarry, Released, ResonatorBalance, Word, WordOpening};
 
 #[cfg(test)]
 pub(crate) mod tests;
