@@ -49,3 +49,15 @@ move 14: probe exit 0;   q2k14 kinetic: the incumbent: ρ 102837/131072; L ∈ [
       trials: η 1/8 ρ unmoved mask [242929/4096, 242934/4096) own [248321/4096, 248325/4096) adopted; γ_ρ [459956/4096, 459957/4096)
   run move 4: successor's own release: ρ 102837/131072; L ∈ [248321/4096, 248325/4096) nats, X ∈ [85225/4096, 85228/4096) nats; solved 24 of 64; whole 0 (released 8, stations right 21); 648912 ms; closes
   the run closes; held state now out/q2k/q2k14/q2k14-kinetic.state
+move 15: probe exit 0;   q2k15 kinetic: the incumbent: ρ 102837/131072; L ∈ [248321/4096, 248325/4096) nats, X ∈ [85225/4096, 85228/4096) nats; solved 24 of 64; whole 0 (released 8, stations right 21); 638157 ms
+      trials: η 1/8 ρ unmoved mask [202744/4096, 202748/4096) own [238118/4096, 238123/4096) adopted; γ_ρ [70908/4096, 70909/4096)
+  run move 1: successor's own release: ρ 102837/131072; L ∈ [238118/4096, 238123/4096) nats, X ∈ [78685/4096, 78688/4096) nats; solved 26 of 64; whole 0 (released 8, stations right 31); 638159 ms; open
+resume at move 16 after a container restart at 23:55 lost move 16 in flight
+continuing at move 16 from out/q2k/q2k15/q2k15-kinetic.state; held out/q2k/q2k14/q2k14-kinetic.state (sha256 963d122685ee16449ac1cc4fb3f0623c91b9a6ba2ab5770919c79de7d20790d9); open run of 1 moves
+move 16: probe exit 0;   q2k16 kinetic: the incumbent: ρ 102837/131072; L ∈ [238118/4096, 238123/4096) nats, X ∈ [78685/4096, 78688/4096) nats; solved 26 of 64; whole 0 (released 8, stations right 31); 708984 ms
+      trials: η 1/8 ρ unmoved mask [211223/4096, 211227/4096) own [243009/4096, 243014/4096) adopted; γ_ρ [452171/4096, 452172/4096)
+  run move 2: successor's own release: ρ 102837/131072; L ∈ [243009/4096, 243014/4096) nats, X ∈ [82142/4096, 82145/4096) nats; solved 26 of 64; whole 0 (released 8, stations right 27); 708986 ms; open
+  the limit was reached inside an open run
+  restored the held state out/q2k/q2k14/q2k14-kinetic.state (sha256 963d122685ee16449ac1cc4fb3f0623c91b9a6ba2ab5770919c79de7d20790d9, unchanged)
+final state out/q2k/q2k14/q2k14-kinetic.state
+run done

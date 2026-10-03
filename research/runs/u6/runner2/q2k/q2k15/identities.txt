@@ -1,3 +1,4 @@
 b30625e35f84cb847f75a936bbc1598b184e9785
 b747e0366e2fdf7b4f776408f9525bf16a55c372529c0b0945a33c8139f9969c
 args executed move-once order2 2026093061 8 out/q2k/q2k15 q2k15=out/q2k/q2k14/q2k14-kinetic.state lock-dec kinetic
+wall 638605 ms; exit 0; early stop 0
