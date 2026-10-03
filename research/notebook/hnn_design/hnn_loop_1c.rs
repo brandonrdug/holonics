@@ -2143,13 +2143,21 @@ mod tests {
     use super::*;
 
     /// Gate A's saved complete continuing state (constitution 1 of its native continuation).
+    /// Gate A's saved state, written before a state carried its material identity and check: its
+    /// lines through `storage-product`, with the declared opening's identity and the check added as
+    /// [`ContinuingState::to_text`] writes them.
     fn gate_a_state() -> String {
         let path = concat!(
             env!("CARGO_MANIFEST_DIR"),
             "/../../research/records/2026-09-30_STEP_1B_GATE_A_receipts/witness_best.state"
         );
         #[allow(clippy::disallowed_methods)]
-        std::fs::read_to_string(path).expect("gate A's saved state")
+        let saved = std::fs::read_to_string(path).expect("gate A's saved state");
+        let engine = Engine::new(order_declared());
+        let mut text = saved.strip_suffix("end\n").expect("the saved state's end").to_string();
+        text += &format!("material {}\n", engine.theta.material_identity(engine.refinement.ring()));
+        text += &format!("check {} {}\n", text.len(), holonics::hnn::constitution::text_residue(&text));
+        text + "end\n"
     }
 
     fn face(solved: Predicate) -> Face {
@@ -2221,13 +2229,13 @@ mod tests {
         assert_eq!(arm("w=partial:best.txt"), Ok(("w".to_string(), Source::Partial("best.txt".to_string()))));
         // A complete state is never read as a partial: `partial:` refuses lines after `rho`.
         assert!(remount_partial(&engine, ring, &text).is_err());
-        // A value off its written form after `rho` (the clock `01`): parses to the same state, but
-        // does not write back to its own text.
+        // A value off its written form after `rho` (the clock `01`): the same value, but the bytes
+        // differ, so the check refuses it before it parses to a state.
         let edited = text.replace("\nclock ", "\nclock 0");
         assert_ne!(edited, text);
-        assert!(ContinuingState::from_text(&edited).is_ok());
+        assert!(ContinuingState::from_text(&edited).is_err());
         let refused = restore_whole(&engine, ring, &edited).expect_err("a state off its written form is refused");
-        assert!(refused.contains("written back differs"), "{refused}");
+        assert!(refused.contains("not a complete continuing state"), "{refused}");
         // A broken line after `rho` (the Gram's head): the state does not parse.
         let broken = text.replace("\ngram 5\n", "\ngram five\n");
         assert_ne!(broken, text);

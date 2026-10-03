@@ -264,7 +264,7 @@ pub(super) fn write_state(theta: &Constitution, ring: usize) -> String {
 /// chart, remainders and clock lost). Exact for every reading of the release (which reads `E` and
 /// `ρ` alone), partial for a continuing deposit: labelled so on stderr wherever one is read (stdout
 /// is left to the readings, so the baseline's replay listing is unchanged).
-pub(super) fn trained(opening: &Constitution, ring: usize, path: &str) -> Constitution {
+fn trained(opening: &Constitution, ring: usize, path: &str) -> Constitution {
     eprintln!(
         "remount {path}: partial (E and rho alone; the normal law's Gram, chart, remainders and clock are the prior's)"
     );
@@ -287,11 +287,24 @@ pub(super) fn remounted(opening: &Constitution, path: &str) -> Constitution {
     opening.clone().continued(&state).expect("the checkpoint continues the declared opening")
 }
 
-/// Whether a file holds a complete continuing state (else a written port).
-fn is_continuing(path: &str) -> bool {
-    #[allow(clippy::disallowed_methods)]
-    let text = std::fs::read_to_string(path).expect("read the checkpoint");
-    ContinuingState::from_text(&text).is_ok()
+/// **A source mounted from a file** onto the declared opening: `partial:<path>` remounts a written
+/// port, `E` and `ρ` alone ([`trained`], labelled on stderr), and refuses a file that holds more than
+/// those lines; any other path is a complete continuing state restored whole ([`remounted`]), which
+/// refuses a damaged state or one of another opening's material. A complete state is never read as
+/// a partial one.
+pub(super) fn mount(opening: &Constitution, ring: usize, spec: &str) -> Constitution {
+    match spec.strip_prefix("partial:") {
+        Some(path) => {
+            #[allow(clippy::disallowed_methods)]
+            let text = std::fs::read_to_string(path).expect("read the written port");
+            assert!(
+                !text.lines().any(|line| line.starts_with("state ")),
+                "{path} holds a complete state: mount it whole, without `partial:`"
+            );
+            trained(opening, ring, path)
+        }
+        None => remounted(opening, spec),
+    }
 }
 
 /// The transport modulus line `rho <ρ>` of a written port, if any.
@@ -384,7 +397,7 @@ pub(super) fn slopes(terrain: &str, seed: u64, count: usize, arms: &[String]) {
         let mut theta = match (path.is_empty(), &modulus) {
             (true, None) => founded_opening(&engine),
             (true, Some(_)) => engine.theta.clone(),
-            (false, _) => trained(&engine.theta, ring, path),
+            (false, _) => mount(&engine.theta, ring, path),
         };
         if let Some(modulus) = modulus {
             theta = theta.with_transport(ring, modulus).expect("a passive modulus on the lattice");
@@ -646,8 +659,7 @@ pub(super) fn evaluate(terrain: &str, seed: u64, count: usize, out: &str, arms: 
             ("lossless", true) => engine.theta.clone(),
             (_, true) => founded_opening(&engine),
             // A complete continuing state remounts whole; a written port, E and ρ alone.
-            (_, false) if is_continuing(path) => remounted(&engine.theta, path),
-            (_, false) => trained(&engine.theta, ring, path),
+            (_, false) => mount(&engine.theta, ring, path),
         };
         // The constitution's own clock: its requests' generation (run in parallel on the host's
         // cores) and their tally, read before the listing is written.
@@ -759,7 +771,7 @@ pub(super) fn spread(terrain: &str, seed: u64, count: usize, arms: &[String]) {
         let theta = if path.is_empty() {
             engine.theta.clone()
         } else {
-            trained(&engine.theta, ring, path)
+            mount(&engine.theta, ring, path)
         };
         let read: Vec<(Vec<usize>, Rat, Rat)> = pairs
             .par_iter()
@@ -827,20 +839,6 @@ pub(super) fn spread(terrain: &str, seed: u64, count: usize, arms: &[String]) {
             point(&terms),
             point(&spreads)
         );
-    }
-}
-
-/// A written constitution remounted onto the declared opening: whole where the file holds a complete
-/// continuing state, else partial (`E` and `ρ` alone, labelled on stderr by [`trained`]).
-pub(super) fn remount(opening: &Constitution, ring: usize, path: &str) -> Constitution {
-    #[allow(clippy::disallowed_methods)]
-    let text = std::fs::read_to_string(path).expect("read the constitution");
-    match ContinuingState::from_text(&text) {
-        Ok(state) => opening
-            .clone()
-            .continued(&state)
-            .expect("the checkpoint continues the declared opening"),
-        Err(_) => trained(opening, ring, path),
     }
 }
 
@@ -1153,7 +1151,7 @@ pub(super) fn causal(terrain: &str, seed: u64, count: usize, arms: &[String]) {
         let theta = match (label, path.is_empty()) {
             ("lossless", true) => engine.theta.clone(),
             (_, true) => founded_opening(&engine),
-            (_, false) => remount(&engine.theta, ring, path),
+            (_, false) => mount(&engine.theta, ring, path),
         };
         let batch = compare(
             &engine.field,
@@ -1234,7 +1232,7 @@ fn segment_source(engine: &Engine, ring: usize, spec: &str) -> Constitution {
     match spec {
         "opening" => founded_opening(engine),
         "lossless" => engine.theta.clone(),
-        path => remount(&engine.theta, ring, path),
+        path => mount(&engine.theta, ring, path),
     }
 }
 
