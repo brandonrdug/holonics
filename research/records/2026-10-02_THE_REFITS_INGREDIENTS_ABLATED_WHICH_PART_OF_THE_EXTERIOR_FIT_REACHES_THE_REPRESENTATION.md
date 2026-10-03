@@ -692,3 +692,49 @@ deadline; the solo read is a new launch, projected from its own 200-window read 
 times. The two failures in gate 3 that came before it were stale kernels from a copied target
 directory, not a fault on main (#262 makes the build script rebuild on a change of the kernel sources'
 content).
+
+## 11. The arms' end states held out: no declared pair separates
+
+The receipts are under `s11/`, copied from `claude/pc-receipts` (`5fb7e96b`). The run is P5 of
+[PC_QUEUE](../runs/u6/PC_QUEUE.md): held out, order 2, seed `2026093012`, 128 requests, one
+`evaluate` call at 16 threads, with coast-alone m9 read in a second call. `p5.sections` is split into
+one file per state; the six files concatenate back to it byte for byte. Stations are counted of 1024
+(8 per request); "first lock right" counts requests whose first lock is right.
+
+| state | ρ | stations right | by station | first lock right |
+|---|---|---|---|---|
+| whole-move m2 | `102837/131072` | 238 | `[18, 15, 37, 29, 32, 33, 30, 44]` | 25 |
+| at-rest m2 | `102837/131072` | 257 | `[25, 28, 32, 32, 38, 34, 32, 36]` | 35 |
+| strict-descent Coordinate control m6 | `204001/262144` | 268 | `[26, 24, 41, 40, 30, 14, 46, 47]` | 48 |
+| at-rest m6 | `102837/131072` | 268 | `[21, 29, 41, 46, 22, 19, 44, 46]` | 49 |
+| Q2 Coordinate, q213 | `1636353/2097152` | 278 | `[25, 32, 38, 34, 29, 25, 54, 41]` | 57 |
+| Q2 Kinetic control, q2k14 | `102837/131072` | 311 | `[43, 52, 36, 45, 32, 24, 37, 42]` | 40 |
+| coast-alone m9 | `102837/131072` | 261 | `[25, 26, 31, 33, 40, 33, 33, 40]` | 33 |
+
+No state makes a section whole: 0 of 128 each, every release incorrect. q2k14 reaches the termination
+on one request; no other state does.
+
+**The declared pairs** (paired rule of §9, released at a tail of at most `1/64`):
+- *Whole-move m2 against at-rest m2.* `b = 172`, `c = 191`. Whole-move ahead has tail
+  `[3494, 3495)/4096` and at-rest ahead has tail `[706, 707)/4096`, so neither is released.
+- *The strict-descent Coordinate control against at-rest m6.* `b = 92`, `c = 92`, tail
+  `[2168, 2169)/4096`: an exact tie in stations right, with 184 discordant stations.
+
+With §10's m8 pair, the throw's carried momentum is now read held out at m2 and m8, and neither
+separates from the at-rest throw. Moving ρ under strict descent (the control) does not separate from
+holding it at m6.
+
+**Coast-alone m9 is the at-rest point.** Its state (sha256 `8712ae47…6dab0a5c`) is byte-identical to
+the at-rest move from coast-alone's m8 (§10, `rest-from-coast-m8`), so its held-out read (261) belongs
+to that state, not to a carried coast. It is read unpaired; the throw's pair stays at m8.
+
+**The #202 chains.** q2k14 has the most stations right of the states in this call (311). It is the same
+batch as §9's reads, where w16 has 329; w16 is not an end state of these arms and is not paired here. Against q213, the other Q2 end, it is
+an undeclared pair: `b = 230`, `c = 197`, Kinetic-control ahead has tail `[248, 249)/4096` and
+Coordinate ahead `[3891, 3892)/4096`. It is not released, and as an undeclared read it does not count
+toward any release.
+
+**Time.** The six-state call took `3095851` ms against its fixed deadline of `19492308` ms
+(measured to projected `281441/1772028`, below `3/16`), with a peak resident set of `103690240`
+bytes. The per-state reads ran from `501719` to `533346` ms, below the `1082906` ms that set the
+projection. Coast-alone m9's call took `519226` ms, peak `85889024` bytes.
