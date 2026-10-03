@@ -275,9 +275,9 @@ one deposition: the held work of an accreting contact mass, `C ⪰ 0`, `F ⪰ 0`
 other coordinate of the constitution moved (`HNN/HeldDeposition.{held_deposition_work,
 held_deposition_nonpos, reception_within_loss_of_accretion}`). The commit's deposition also carries
 the same-state work `½⟨x, ΔΘ x⟩` of every other coordinate (`PowerForm::held`), so a deposit that
-lowers a mass, or whose stiffness, admittance or conductance move does positive same-state work, is
-not covered: there the chained balance holds only in its dissipative form, with respect to the
-declared supply, at every reception. At `G' = G` the wave crosses unchanged.
+lowers a mass (which a production deposit can, §2.3b), or whose stiffness, admittance or
+conductance move does positive same-state work, is not covered: there the chained balance holds
+only in its dissipative form, with respect to the declared supply, at every reception. At `G' = G` the wave crosses unchanged.
 [proved-derived; formal-checked] Each coordinate's identity `G'|a'|² = G|a|² − G|Γ a|²` is the
 fifth conjunct of `two_port_reference_balance` (`HNN/Ring.reference_carry_change`). Summed over
 coordinates and contacts, the lift's work is `−(h/4) Σ_a Γ_a² G_a |a_a|²`, at most zero for `h ≥ 0`,
@@ -354,6 +354,69 @@ limit are `HNN/ChainedBalance` (#293; §2.3 above). The opening's split is
 `½⟨r, Q(2z − r)⟩` for any symmetric block form `Q`, within
 `½ Σ_i c_i (2|(Qz)_i| + Σ_j |Q_ij| c_j)` when every remainder lies in its half cell `c_i`, and zero
 on the lattice (`opening_split_eq`, `opening_split_le`, `splitBound`, `opening_split_on_lattice`).
+
+### 2.3b A deposit can lower a contact's mass; the momentum holds either way, and the rise is the deposit's work
+
+[proved-derived; measured-exact where marked] The question (October 3, after #293): #293 proves the
+stronger reading, deposition plus ingest at most the next word's loss, only for deposits that add
+mass (`ΔC ⪰ 0`) and move no other coordinate of the constitution (§2.3a). Can a production deposit
+lower a contact's mass? If it can, does the remaining mass keep its momentum, or does the leaving
+mass carry its own momentum away?
+
+1. **A production deposit can lower the mass.** The contact's storage is a Gram, `C_a = c cᵀ`
+   (`hnn/constitution.rs`, module header, "Loci"). The factor step moves the factor,
+   `Δc = η G / h′` ("Deposition", `h′` the carried successor statistic), so
+   `ΔC = c Δcᵀ + Δc cᵀ + Δc Δcᵀ`. Neither the step's sign nor its certificate confines this to
+   `⪰ 0`: `C′ = c′c′ᵀ` stays passive, but `ΔC` need not. A shrink of the factor, `Δc = −εc`, gives
+   `ΔC = −(2ε − ε²) C ⪯ 0` for `0 < ε < 2`, and a turn of the factor gives an indefinite `ΔC`.
+   [measured-exact] Astra's control deposit is
+   `ΔC = [[0, −2^(−13)], [−2^(−13), 24577/2^26]]`, from the
+   [storage-resolution record](2026-10-02_A_STORAGE_DEPOSIT_IS_FELT_ONLY_THROUGH_THE_RATE_S_JUMP_AND_THE_WORD_HOLDS_IT_BELOW_ONE_UNIT.md)
+   §5, the native comparison's own return. Its determinant is `−2^(−26)`, so it lowers the mass
+   along one direction and raises it along another.
+2. **The momentum hold does not rest on mass arriving at rest.** The
+   [deposit record](2026-10-03_THE_DEPOSIT_HOLDS_THE_CARRIED_MOMENTUM_AND_THE_ACCRETED_MASS_IS_THE_THROWS_DAMPING.md)
+   item 3 derives the hold from the transit's canonical state. `u̇ = ∂P/∂π` and `π̇ = −∂P/∂u` stay
+   bounded across a jump of `C`, so `(u, π)` is continuous for either sign of `ΔC`. The sticking
+   mass (`accretion_loss`) is the scalar case that record illustrates, not its premise.
+3. **No mass leaves at the carrier's speed, because no mass is carried.** The ejection law, in which
+   the rest keeps its velocity and the leaving part takes `½|Δm| v²` away, needs a departing body
+   with its own momentum and a port it leaves through. The junction's reflection (§2.3a) has both:
+   the reflected wave is a wave of the tube, and it leaves on the `G` side. A deposit has neither.
+   It is the one law that changes a constitution (the
+   [elementary objects](../../docs/ELEMENTARY_OBJECTS.md) §8). It changes the factor `c` through
+   which the contact's coordinates store, and the field's state stays the contact's `(u, π)`. The
+   constitution is the material law, not a substance moving with the motion, and no port carries a
+   part of it away. A storage law that changes under a motion held at its momentum is the parametric
+   case. The constitution's change does work on the motion, as a pump does: in the elementary
+   objects, a pump is a modulation of the constitution, and it boosts through the storage's own
+   motion. Shrinking a pendulum's length at held angular momentum is the same law.
+4. **So the carried energy can rise, and the rise is the deposit's work.** With `C′ = C + ΔC` and
+   the held rate `C′w′ = Cw`, the change is
+   `½⟨w′, C′w′⟩ − ½⟨w, Cw⟩ = −½⟨w′, ΔC w′⟩ − ½⟨w − w′, C(w − w′)⟩` (`held_momentum_loss`). It is
+   positive exactly when `⟨w′, ΔC w′⟩ < −⟨w − w′, C(w − w′)⟩`. That work is supply from the deposit,
+   entered in the chained balance as `deposition_k`, which the commit reads exactly
+   (`PowerForm::held`).
+   - The chain stays dissipative with respect to its declared supply at every reception (#293).
+   - The stronger reading is a law for deposits with `ΔC ⪰ 0` that move no other coordinate of the
+     constitution (#293, §2.3a), not for every production reception.
+   - Under a shrink the bound is the mass certified from below:
+     `C′ ⪰ C/(1 + ε)` gives `½⟨w′, C′w′⟩ ≤ (1 + ε) ½⟨w, Cw⟩` (`held_momentum_bound`).
+5. [measured-exact] **The sign is the motion's.** On the control, the work at held momentum was
+   `−7³·13·34403/(2^23·5²·31²·37²)` (storage-resolution record §9.4), so it fell even though `ΔC`
+   is indefinite: along `w′` the deposit added mass. The work's sign does not fix that by itself,
+   since the jump's energy also enters; the reading does. With §9.4's opening rate
+   `w = (−1/16, 39/1024)` and jump `δ`, `½⟨w, ΔC w⟩ = 3·13·2007079/2^47` is the work at the held
+   rate, and `⟨w′, ΔC w′⟩ = 3·7²·13·41·109·8599·429259/(2^20·5^6·31^4·37^4) > 0` at `w′ = w + δ`.
+   On the chain fixture no deposit moves a contact's storage, which is why the stronger reading's
+   8 of 8 there is the lift's alone.
+6. **Code.** Unchanged. The carry (`ReceptionCarry::crossed`), the commit (`PowerForm::held`) and
+   the continuation (`ContactCut::continue_deposited`) already hold momentum for either sign, and
+   they read the deposit's work exactly. No new law enters: the derivation uses
+   `held_momentum_loss`, `held_momentum_bound` and #293. [agent-inferred] The deposit record's §5
+   item 4, a per-reception reading of `ε′` with `C_(k+1) ⪰ C_k/(1 + ε′_k)`, stays a proposed reading,
+   not a refusal. A refusal of shrinking deposits would author a sign the constitution does not
+   carry.
 
 ### 2.4 The clock
 
