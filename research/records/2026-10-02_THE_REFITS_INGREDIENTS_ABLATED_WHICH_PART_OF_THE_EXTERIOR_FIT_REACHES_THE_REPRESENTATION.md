@@ -550,9 +550,20 @@ The Kinetic window chain at the same count is w14 (w3 + 11 moves = m6 + 14): it 
 [Corrected October 3: this first compared w16, two moves further, at `195744`, `3249` above q411.]
 Its `γ_ρ` changes sign from move to move.
 
-**Held out.** Each state is read with `executed evaluate`, and each pair with `paired/paired.py` on
-the two states' sections. b counts stations right only in the first state, c those right only in the
-second, and the tail is `P[X ≥ b | X ~ Bin(b + c, 1/2)]`, exact.
+**Held out.** Each state is read with `executed evaluate`, which deposits nothing, and each pair is
+compared request by request (`paired/paired.py`, which now prints both units). The eight stations of a
+request are not independent: their targets follow from the request's last two cells
+(`x_t = x_(t−2) + 1 (mod 4)`, `hnn_prediction.rs:263-279`), and their classes come from one joint
+release. The 128 requests are independent draws read from the same stored states, so they are the
+units. For each request, `d` is the first state's stations right minus the second's; `b` counts
+requests with `d > 0`, `c` those with `d < 0`, ties are dropped, and the tail is
+`P[X ≥ b | X ~ Bin(b + c, 1/2)]`, exact. Station counts are kept as description and enter no tail.
+[Corrected October 3, after Astra's review: this first paired the 1024 stations as independent
+trials.]
+
+The held-out seed `2026093012` is not a fresh blind read. It is the development validation batch,
+consulted for many states and pairs (§9 to §12) before and after these rules were fixed; a grade on
+it is a validation grade.
 
 | state | stations right | by station | whole |
 |---|---|---|---|
@@ -563,27 +574,32 @@ second, and the tail is `P[X ≥ b | X ~ Bin(b + c, 1/2)]`, exact.
 | m13-4 | 291 | `[34, 39, 47, 52, 23, 10, 28, 58]` | 0 |
 | q411 | 345 | | 1 |
 
-| pair (first vs second) | b | c | tail |
+| pair (first vs second) | station b / c (described) | request + / − / ties | request tail |
 |---|---|---|---|
-| m7-3 vs m7 | 128 | 80 | `[560, 561)/2^20`, inside `[2, 3)/4096` |
-| w16 vs r13 | 226 | 169 | `[9, 10)/4096` |
-| m13-4 vs r13 | 165 | 146 | `[629, 630)/4096` |
-| q411 vs w16 | 199 | 183 | `[906, 907)/4096` |
-| m13-4 vs w16 | 184 | 222 | `[3987, 3988)/4096` |
-| m7-3 vs w16 | 154 | 204 | `[4081, 4082)/4096` |
+| m7-3 vs m7 | 128 / 80 | 50 / 22 / 56 | `[678, 679)/2^20` |
+| w16 vs r13 | 226 / 169 | 58 / 39 / 31 | `[137, 138)/4096` |
+| m13-4 vs r13 | 165 / 146 | 36 / 32 / 60 | `[1466, 1467)/4096` |
+| q411 vs w16 | 199 / 183 | 53 / 49 / 26 | `[1570, 1571)/4096` |
+| m13-4 vs w16 | 184 / 222 | 47 / 56 / 25 | `[3431, 3432)/4096` |
+| m7-3 vs w16 | 154 / 204 | 43 / 56 / 29 | `[3770, 3771)/4096` |
 
-Each `b − c` equals the difference in stations right. The pairs against w16 are not like for like.
+Each station `b − c` equals the difference in stations right. Per station, w16 against r13 read
+`[9, 10)/4096`; per request it is above `1/64` and does not separate. It was never declared, and no
+release rests on it. The pairs against w16 are not like for like.
 w16 is 16 Kinetic moves under #202's interval, while m7-3 is 7 Coordinate moves and 3 Kinetic moves,
 and q411 is a joined chain.
 
 **#236 is released.** The rule was fixed before the reads: #236's acceptance is released at a paired
-tail of at most `1/64` on a closed run against its opening state. Two reads were made:
-- m13-4 against r13 did not separate;
-- m7-3 against m7 did, at `[560, 561)/2^20`.
+tail of at most `1/64` on a closed run against its opening state, `1/128` for the two reads made.
+As first stated it paired stations; read per request, as above:
+- m13-4 against r13: 36 ahead, 32 behind, 60 tied, tail `[1466, 1467)/4096`; it does not separate;
+- m7-3 against m7: 50 ahead, 22 behind, 56 tied, tail `[678, 679)/2^20`, below `1/128 = 8192/2^20`.
 
-That is also below `1/128 = 8192/2^20`, the bound for two reads, so the release holds for both reads
-together. What it shows is that crossing m7's wall with a run of moves carries 48 held-out stations
-that strict descent left behind. It does not show that Coordinate beats Kinetic: m7-3 is below w16.
+The release holds for both reads together, at request level as it did per station
+(`[560, 561)/2^20`). m7-3 has 48 more stations right than m7 (279 against 231) on the same batch;
+that is a description, not a second test. It shows that crossing m7's wall with a run of moves
+carries held-out stations that strict descent left behind. It does not show that Coordinate beats
+Kinetic: m7-3 is below w16.
 The same question on a second wall, the at-rest throw's at m9 (below), is queued as Q13 against the
 bound `1/128`.
 
@@ -654,8 +670,10 @@ was reread-bound, at seven reread gaps of `155229` to `209825` ms. The relaunch 
 - *Like for like at m8.* Coast-alone m8 reads `[351324, 351329)`, solved 1, stations right 16. At-rest
   m8 reads `352438`, solved 4, stations right 17. Held out, coast-alone m8 has 258 stations right
   (`[25, 26, 31, 31, 39, 34, 30, 42]`) and at-rest m8 has 282 (`[19, 27, 38, 30, 35, 29, 51, 53]`).
-  Paired, `b = 94`, `c = 118`. Coast-alone ahead has tail `[3920, 3921)/4096`, and at-rest ahead has
-  tail `[233, 234)/4096`, so neither is released. The development batch's lower coast-alone read does
+  Paired per station, `b = 94`, `c = 118`; per request (§9's corrected unit), coast-alone is ahead on
+  32, behind on 47, tied on 49. Coast-alone ahead has request tail `[3950, 3951)/4096`, and at-rest
+  ahead has `[234, 235)/4096` (per station `[3920, 3921)` and `[233, 234)/4096`), so neither is
+  released. The development batch's lower coast-alone read does
   not carry to held out.
 - *The direct read.* Coast-alone's m9 moved, while at-rest's m9 refused every step (`rest-m9/`). These are two
   different points, so the at-rest driver was run with no flight from coast-alone's m8
@@ -724,11 +742,13 @@ one file per state; the six files concatenate back to it byte for byte. Stations
 No state makes a section whole: 0 of 128 each, every release incorrect. q2k14 reaches the termination
 on one request; no other state does.
 
-**The declared pairs** (paired rule of §9, released at a tail of at most `1/64`):
-- *Whole-move m2 against at-rest m2.* `b = 172`, `c = 191`. Whole-move ahead has tail
-  `[3494, 3495)/4096` and at-rest ahead has tail `[706, 707)/4096`, so neither is released.
-- *The strict-descent Coordinate control against at-rest m6.* `b = 92`, `c = 92`, tail
-  `[2168, 2169)/4096`: an exact tie in stations right, with 184 discordant stations.
+**The declared pairs** (paired rule of §9, per request, released at a tail of at most `1/64`):
+- *Whole-move m2 against at-rest m2.* Per station `b = 172`, `c = 191`; per request 32 ahead, 46
+  behind, 50 tied. Whole-move ahead has request tail `[3914, 3915)/4096` and at-rest ahead
+  `[287, 288)/4096` (per station `[3494, 3495)` and `[706, 707)/4096`), so neither is released.
+- *The strict-descent Coordinate control against at-rest m6.* Per station `b = 92`, `c = 92`, an exact
+  tie in stations right with 184 discordant stations; per request 34 ahead, 33 behind, 61 tied,
+  tail exactly `1/2` (per station `[2168, 2169)/4096`).
 
 With §10's m8 pair, the throw's carried momentum is now read held out at m2 and m8, and neither
 separates from the at-rest throw. Moving ρ under strict descent (the control) does not separate from
@@ -740,8 +760,9 @@ to that state, not to a carried coast. It is read unpaired; the throw's pair sta
 
 **The #202 chains.** q2k14 has the most stations right of the states in this call (311). It is the same
 batch as §9's reads, where w16 has 329; w16 is not an end state of these arms and is not paired here. Against q213, the other Q2 end, it is
-an undeclared pair: `b = 230`, `c = 197`, Kinetic-control ahead has tail `[248, 249)/4096` and
-Coordinate ahead `[3891, 3892)/4096`. It is not released, and as an undeclared read it does not count
+an undeclared pair: per station `b = 230`, `c = 197`; per request 55 ahead, 44 behind, 29 tied,
+Kinetic-control ahead with request tail `[644, 645)/4096` (per station `[248, 249)/4096`, and
+Coordinate ahead `[3891, 3892)/4096`). It is not released, and as an undeclared read it does not count
 toward any release.
 
 **Time.** The six-state call took `3095851` ms against its fixed deadline of `19492308` ms
@@ -815,7 +836,8 @@ could not have held.
 toward no release). Pairing the existing sections of P4's own m6 (sha256 `9da99d84…`, 235 stations
 right, §9's table) and w16 (sha256 `35ca209c…`, 329) with §9's `paired.py`
 (`claude/pc-receipts` `paired/m6.sections` and `paired/w16.sections`, copied into `s12/`) gives
-`b = 215`, `c = 121`, and a tail for w16 ahead in `[177/2^30, 178/2^30)`. This is the station read,
+per station `b = 215`, `c = 121`, a tail for w16 ahead in `[177/2^30, 178/2^30)`; per request (§9's
+corrected unit) 65 ahead, 33 behind, 30 tied, tail `[839, 840)/2^20`. This is the `evaluate` read,
 not the exposure's code, so §7's gate as stated stays unread. It shows that the 16 window moves from
 m6 raise held-out stations right on the same batch, which P4's direction question needed. The "m6" of
 §11's control pair is a different state.

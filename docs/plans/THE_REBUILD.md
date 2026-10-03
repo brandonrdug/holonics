@@ -56,7 +56,7 @@ Its corrections are folded in.
 | Landmark tree | earns: standing cut `3 + 1/16 + ε` a cell held out; unseen agent text about `1 + 12/16` bits a byte |
 | Population | codes known-truth terrain at its truth among declared families; the egg alone is F0's byte predictor; no library owner calls it (the harnesses do) |
 | Field (rings, contacts, word, deposition, wave) | lawful on host and card; `5 − 13/16 − ε` held-out bits on the standing cut through `q_C`; campaign 2 and the loaded resonator added none; its wave and resonator states live inside one word |
-| Chase (F6) | reception at truth on 16 arenas; action captures in 164 ticks against 3,704 and 366; the at-once acceptance failed; each tick is released through the one law (the certified capture, the probe) or the declared cornering arm, and F6's action law is amended to that rule (U3's second loop) |
+| Chase (F6) | reception at truth on 16 arenas; an authored exact planner's motion over the located fibre captures in 164 ticks against 3,704 and 366 (not learned motion; audited October 3); the at-once acceptance failed; each tick is released through the one law (the certified capture, the probe) or the declared cornering arm, and F6's action law is amended to that rule (U3's second loop) |
 | Retention | one contract (objects §8): each collapse is the standing law through its own carrier, with its Lean standing and its recoverability (U2's first loop); the test-only linear chain is retired |
 | Release | one law, `receiver::release`: the HNN's threshold commit and the population's certified draws, stop law and refusals (U3's first loop); the chaser's certified capture and probe (U3's second loop), its cornering commit a declared separate arm priced by the tick |
 | Mixtures | four constructions, sharing the ideal telescope but differing in conditioning, transitions and carriers: digit-local joins (`JoinTree`, `FaceJoins`), the population's telescope with death (over families carrying their faces, `Population`, or read at a port, `PortPopulation`, which is the HNN's receiving face since U1 retired the whole-cell `receiving::Mixture`), dormancy's fixed share over switching paths, and the retired `LocalMixture` |
@@ -840,8 +840,11 @@ that fires becomes the next loop's subject, and nothing downstream starts.
     - Rebase the test fixtures on key families. Keep `SectionChart`, which `exterior.rs` reads.
     - Keep the population core (`Population`, `Family`, `Survivors`, `KeyFamily`: the unicity
       loop's ideal listener), `PortPopulation`, `species`, the key families (gratings, rotor keys)
-      and the chaser (F6, #27). The chaser's plan reads the terrain's `pursuit` routines, to be
-      audited under "No catered machinery" at F6's next loop.
+      and the chaser (F6, #27). The chaser's plan reads the terrain's `pursuit` routines. Audited
+      under "No catered machinery" on October 3 (after Astra's review): the capture basin, the
+      viable tube, the expected capture and the ranking over them are authored control; only the
+      fibre (which declared candidates the received cells leave) and the faulty channel are updated
+      from what the chaser receives, so the capture counts measure that planner, not learned motion.
   - **Batch H, `hnn`** (`hnn/**`; after N, in parallel with P).
     - Retire the face path (`BankImages`, `stage_bank`, `bank_reach`, `deposit_with_bank`,
       `face_read`, `face_move`, `BankChart`, `BankReach`, `HnnError::FaceTransport`; Lean
@@ -2108,7 +2111,9 @@ and pin a fresh untouched development split before F5's acceptance pass or evalu
 ### F6. Motion: the chase terrain, then the motor chart (campaign 4; #27, #148)
 
 [definition; agent-inferred; Brandon's derivation, September 27, [record](../../research/records/2026-09-27_THE_LEARNER_MUST_MOVE_A_CHASE_TERRAIN_DATA_AS_PARTICLES_WITH_FLUX_AND_RELEASE_AS_A_THRESHOLD_COMMIT.md#13-the-chase-terrain)]
-The machine has only read recordings; here it first moves, against another's constitution.
+The machine has only read recordings; here it first emits motions, against another's constitution,
+chosen by an authored exact planner over the fibre its population locates. Learned motor navigation
+is not shown by F6 and stays owed (audited October 3, the batch item above).
 
 - **Builds on.** `holarchy::terrain` (terrain with known truth, the `Switching` pattern of declared
   families), `receiver::population` (families, mixture, dormancy's fixed share, composition),

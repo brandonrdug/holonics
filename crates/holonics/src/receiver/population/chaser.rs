@@ -5,6 +5,12 @@
 //! §14.3–§14.5 and §14.10; campaign 4, #27, #148). It replaces the reception's scripted pursuer with
 //! the machine, a [`Chaser`] of `holarchy::terrain::pursuit`.
 //!
+//! [scope; audited October 3 under "No catered machinery"] Each motion is computed by the terrain's
+//! `pursuit` routines, authored and exact: the capture basin, the viable tube, the expected capture
+//! and the ranking over them are authored control. Only the fibre (which declared candidates the
+//! received cells leave) and the faulty channel are updated from what the chaser receives. The
+//! capture receipts measure this planner on that fibre, not a learned navigator.
+//!
 //! [definition; agent-inferred] **The reading.** The machine holds the reception's population
 //! (`ChaseFamily`, one family per declared candidate, escape mass `2^(−j)`), joined to the passage's
 //! ports as the chaser writes them, and receives the channels' readings of the runner's cell as they
