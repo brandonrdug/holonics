@@ -397,6 +397,10 @@ pub enum HnnError {
     )]
     UncertifiedConductance { contact: usize },
     #[error(
+        "contact {contact}'s carried momentum lies outside the range of its storage after the deposit: the law of a momentum a singular storage cannot hold is owed (#62)"
+    )]
+    HeldMomentum { contact: usize },
+    #[error(
         "the deposit's storage growth is not certified: no dyadic ε in the declared search makes Q_(k+1) ⪯ (1 + ε) Q_k on the contacts' and resonators' storage forms"
     )]
     UncertifiedStorage,

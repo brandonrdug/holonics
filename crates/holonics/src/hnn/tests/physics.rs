@@ -1000,6 +1000,53 @@ fn the_word_balance_closes_across_its_commit() {
     }
 }
 
+/// The deposit record (October 3) §3 and record B §2.3a (`hnn::word::{PowerForm::held,
+/// WordBalance::commit_held}`; Lean `HolonicsResearch/HNN/MoveDirection.{held_momentum_loss,
+/// velocity_held_injects}`): carried across a deposit that moves only the contacts' storage,
+/// `C′ = (9/4) C` (each storage factor scaled by `3/2`), the held change's committed power is the
+/// end plus the held deposition work, and the balance closes with it. The rate held at momentum is
+/// `w′ = (4/9) w`, so the held work is `−(5/9) K` where the commit at the same state reads
+/// `(5/4) K`, `K = ½ Σ_a ⟨w_a, C_a w_a⟩`: `9 · held + 4 · same = 0`. A commit that leaves `Θ`
+/// holds the change and does no work.
+#[test]
+fn the_word_balance_closes_across_its_commit_at_held_momentum() {
+    for field in [chain(), chain().with_exact_word()] {
+        let field = &field;
+        let medium = Medium::encoding(field, 41);
+        let (current, moment) = cut(field);
+        let phases =
+            ReceivingPhases::declare(field, &medium, &current, &field.receivers()[0]).unwrap();
+        let mut word = Word::open(field, &medium, &current, &moment).unwrap();
+        word.forward(&phases).unwrap();
+        let released = word.released().unwrap();
+        let mut deposited = medium.clone();
+        for contact in 0..field.contacts().len() {
+            deposited.storage[contact] = deposited.storage[contact].scaled(&rat(3, 2));
+        }
+        let before = PowerForm::read(field, &medium, &current).unwrap();
+        let after = PowerForm::read(field, &deposited, &current).unwrap();
+        let mut same = WordBalance::of(&released);
+        same.commit(&before, &after).unwrap();
+        let mut held = WordBalance::of(&released);
+        held.commit_held(&before, &after).unwrap();
+        let (same_work, commit) = (
+            same.commit.unwrap().deposition,
+            held.commit.clone().unwrap(),
+        );
+        assert!(same_work > Rat::zero(), "holding the rate injects ½⟨w, ΔC w⟩");
+        assert!(commit.deposition < Rat::zero(), "holding the momentum loses");
+        assert_eq!(integer(9) * &commit.deposition + integer(4) * &same_work, Rat::zero());
+        assert_eq!(commit.committed, &held.end + &commit.deposition);
+        assert!(held.closes(), "{held:?}");
+        let mut unmoved = WordBalance::of(&released);
+        unmoved.commit_held(&before, &before).unwrap();
+        let commit = unmoved.commit.clone().unwrap();
+        assert!(commit.deposition.is_zero());
+        assert_eq!(commit.committed, unmoved.end);
+        assert!(unmoved.closes());
+    }
+}
+
 /// Lean `HNN/Contact.{contact_boost_solve_or_singular_direction, contact_signed_storage_balance,
 /// boost_grows_at_conserved_signed_storage}`: a negative stiffness column is admitted only with a
 /// certified solve, a singular one refused with a direction the operator sends to zero; the

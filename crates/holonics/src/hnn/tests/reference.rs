@@ -605,13 +605,16 @@ fn the_carry_at_complete_absorption_is_todays_reception_exactly() {
     assert_eq!(carried, rest);
 }
 
-/// The reception carry §2.3: under `Carry(Nothing)` the chained balance closes exactly at every
-/// reception of a prequential exposure on one baseline (the source rings' end storage subtracted
-/// once), and the chain is dissipative with respect to its declared supply at every reception. The
-/// stronger reading, that the work between the words lies within the next word's certified loss,
-/// fails at exactly one reception of this fixture, the seventh, by `3580154876230715732256339/2⁸²`:
-/// the ingest's re-reading of the contacts' conductances does more work on the carried waves than
-/// the next word dissipates. It is pinned here as the measured failure of that reading, not a law.
+/// The reception carry §2.3 and §2.3a: under `Carry(Nothing)` the chained balance closes exactly
+/// at every reception of a prequential exposure on one baseline (the source rings' end storage
+/// subtracted once, the opening's lattice split read exactly), and the chain is dissipative with
+/// respect to its declared supply at every reception. Each carried wave crosses the lift's move of
+/// its conductance at the junction's reference change, `a′ = (1 + Γ) a`, so the lift only emits:
+/// its work on the carry is exactly minus the reflected power at every reception. On this fixture
+/// no deposit moves a contact's storage (the deposition is zero at every reception), so the work
+/// between the words is the lift's alone and the stronger reading, that it lies within the next
+/// word's certified loss, holds at all eight. Before §2.3a the built carry kept the waves `a` and
+/// that reading failed at the seventh (record B §2.3).
 #[test]
 fn the_chained_balance_closes_and_the_chain_is_dissipative() {
     let length = cut_length();
@@ -631,13 +634,12 @@ fn the_chained_balance_closes_and_the_chain_is_dissipative() {
     assert_eq!(chained.read, 8);
     assert!(chained.closed);
     assert_eq!(chained.dissipative, chained.read);
-    assert!(!chained.work.is_zero(), "the ingest does work on the carry");
-    assert_eq!(chained.within_loss, chained.read - 1);
-    assert_eq!(chained.excess, chained.largest_excess);
-    assert_eq!(
-        chained.excess.to_string(),
-        "3580154876230715732256339/4835703278458516698824704"
-    );
+    assert_eq!(chained.lift_emits, chained.read);
+    assert!(chained.reflected > Rat::zero(), "the lift moves a carried wave's reference");
+    assert_eq!(chained.work, -chained.reflected.clone());
+    assert!(!chained.split.is_zero(), "a transmitted wave is split at the word's lattice");
+    assert_eq!(chained.within_loss, chained.read);
+    assert!(chained.excess.is_zero() && chained.largest_excess.is_zero());
 }
 
 /// The reception carry §2.1 and §2.6: under `Carry(Nothing)` every compare writes its consumed

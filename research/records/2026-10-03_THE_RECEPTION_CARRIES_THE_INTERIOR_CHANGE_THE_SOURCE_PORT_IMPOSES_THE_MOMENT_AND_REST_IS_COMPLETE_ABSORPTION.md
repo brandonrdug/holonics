@@ -4,7 +4,9 @@
 [definition; agent-inferred] for the carry law and its choices (§2, §3); [proved-derived;
 implemented-exact] for the owners it reuses, held by their tests (§1); the build of October 3 and
 its tests are §6 [implemented-exact]; the chained balance and the law it satisfies are §2.3
-[proved-derived; implemented-exact]. Code follows this record. The production default stays rest.
+[proved-derived; implemented-exact]; the contact's crossing of the reception (§2.3a) is
+[proved-derived from its owners; implemented-exact], with the reflection's release agent-inferred.
+Code follows this record. The production default stays rest.
 
 **Occasion.** The review of October 3 located that every production reception opens at rest. The
 path is `Reference::refine` (`reference.rs:1147`) → `PendingRatio::read_charted` → `open_charted`
@@ -119,13 +121,16 @@ measurement under `A = 0` locates the need for it.
 Between the end of word `k` and the opening of word `k+1` the medium changes twice. Both are read on
 the same physical coordinates of the carried change, by one owner, `PowerForm` (`word.rs:352`):
 1. **The deposit**: `Θ → Θ'` at the lift `λ`. Its work on the carried change is
-   `CommitWork::deposition = P_(Θ',λ)(x) − P_(Θ,λ)(x)`, already read today (§1).
+   `P_(Θ',λ)(x′) − P_(Θ,λ)(x)`, with `x′` the change held at each contact's momentum (§2.3a,
+   [the deposit record](2026-10-03_THE_DEPOSIT_HOLDS_THE_CARRIED_MOMENTUM_AND_THE_ACCRETED_MASS_IS_THE_THROWS_DAMPING.md)
+   §3); at rest the commit still reads `CommitWork::deposition = P_(Θ',λ)(x) − P_(Θ,λ)(x)` (§1).
    - Deposits on `E`, on the transport modulus `ρ`, on the receiving tree and on landmarks change
      only the injection or the reading. Their work on the carried change is zero.
    - Deposits on a contact's storage, stiffness or dissipation, and on a resonator's gains, do work.
 2. **The ingest**: `λ → λ'` at `Θ'`. Each cell's selective step moves the lift point, which moves
    every contact's conductance at the lift. Its work on the carried change is
-   `P_(Θ',λ')(x) − P_(Θ',λ)(x)`. The step is the exterior source acting, so this work is the source
+   `P_(Θ',λ')(x″) − P_(Θ',λ)(x′)`, with `x″` the held change's arriving waves crossed at the
+   reference change (§2.3a). The step is the exterior source acting, so this work is the source
    port's, entered in the balance beside the source's imposition.
 
 [definition; proved-derived] **The chained balance, on one baseline.** Let `x = x_k(end)` be the
@@ -162,8 +167,9 @@ E_end(k+1) ≤ P_(Θ,λ)(y) + deposition_k + ingest_k + E_S(s) + Π_c + pump + i
 and summed over a chain, the end storage never exceeds the first interior plus everything the ports
 supplied plus the residuals' bounds. Nothing enters except through a declared port.
 
-[measured-exact; the failing law] **The stronger reading is not a law.** It was stated here before
-the read as the sufficient condition: at every reception, `deposition_k + ingest_k ≤ L_(k+1)`, the
+[measured-exact on the carry as first built (#280), which kept the waves `a`; superseded by
+§2.3a] **The stronger reading failed on that carry.** It was stated here before the read as the
+sufficient condition: at every reception, `deposition_k + ingest_k ≤ L_(k+1)`, the
 work done on the carried change between the words within the next word's loss. On the chain fixture
 (`chain_of(cut_length())`, source `source(length, 81)`, a 24-window deadline, `Carry(Nothing)`;
 nine compares, so eight chained readings) the deposition is zero at every reception, and:
@@ -211,13 +217,112 @@ reception 7. Carrying the momentum `G a` instead, the jump does `(h/4)(G²/G' �
 (Receptions 1, 2 and 4 carry no arriving wave on a moved contact, so both forms give zero.) Keeping
 the momentum moves the failure to the receptions where the conductance falls. At reception 8 a
 contact shielded by `2⁻⁵¹` would carry the current it held unshielded, amplifying its wave by
-`2⁵²`. Both carries are dissipative with respect to the declared supply. The built carry keeps the
-waves the junction executes on (the word's state, `propagation.rs`'s header), and it is kept.
+`2⁵²`. Both carries are dissipative with respect to the declared supply. Neither law was derived;
+§2.3a derives the crossing from the junction's owner and replaces the kept waves.
 
-[owed; agent-inferred] Which coordinate of a contact's wave crosses a change of its conductance is
-the contact's own temporal-boundary law: the waves `a`, the momentum `G a`, or the power-normalised
-`√G a` (under which the ingest does no work). It is not derived here, and none of the three is chosen
-because it passes.
+### 2.3a The contact's wave crosses the reception through the junction's reference change
+
+[proved-derived from the owners; agent-inferred where marked] **What the lift's move is.** A
+contact's conductance is `G_a = 2^(s_a) Y_a` with `s_a = −β_a Q_a / 2`, where `Q_a` is the pair
+quadrance of the two rings' screws situated at their lifts (`propagation::contact_exponent`,
+`field::Contact::pair`). The lift is the rings' clock state, which the ingest's selective step
+advances. So a move of `G_a` is a change of the pair's slip, the rings' relative configuration.
+
+It is not a change of chart. A change of chart would leave every later reading unchanged. A move of
+`G_a` moves the junction's participation anchor: `∂v*/∂G_p = (a_p − v*)/S` (atlas
+`hnn.conductance-covector-executed-potential`, `hnn.junction-participation-anchor`). It also moves
+the transit's resistance `2/G_a`, and with them every later tick. The carried energy therefore has no
+reason to be invariant across it, and the power-normalised carry `√G a`, which would make it
+invariant, is excluded on this ground, not on its outcome.
+
+**What the move is in the word's own geometry.** One tick is one contact hop
+(`propagation.rs`, "One tick is one contact hop"), and a word's operands are fixed at its cut. A
+reception therefore joins two segments of one clocked span (the tube) along the hop coordinate: the
+consumed word's medium, with channel conductance `G`, and the next word's, with `G'`. A wave in
+flight on the channel meets that step on its next hop. The field already owns the law of a wave
+meeting a change of reference admittance: the junction's two-port at a zero held wave (Lean
+`HNN/Ring.two_port_reference_balance` over `HolonicConstitutiveCirculation.{emitted, successorHeld,
+weighted_square_energy}`; the propagation owner is `HNN/Propagation.junctionScattering_twoPort`).
+For `G, G' > 0`:
+
+```text
+a' = (1 + Γ) a  carried in G',      r = Γ a  emitted in G,      Γ = (G − G')/(G + G')
+G'|a'|² = T·G|a|²,   G|r|² = Γ²·G|a|²,   T = 4GG'/(G + G')²,   Γ² + T = 1
+```
+
+Each moved contact's two arriving waves cross this way. The ring storage waves (admittances are
+field constants) and the contact states `[u, w]` (constitution, not lift) are unchanged by the lift.
+
+[agent-inferred] **The reflection is emitted.** The reflected wave travels back into the consumed
+word's medium, which no longer exists after the compare. It therefore leaves with that word's
+emitted exchange, as the word's unread change does (`Released::power`), and is never carried.
+
+**Consequence for the chained balance.** The lift's inter-word work on the carried change becomes
+`−(h/4) Σ_a Γ_a² G_a (|a_(g←a)|² + |a_(h←a)|²) ≤ 0`, exactly the emitted power. The ingest can no
+longer raise the carried energy, in either direction of the move, so the stronger reading's
+remaining term is the deposition alone. At `G' = G` the wave crosses unchanged.
+[proved-derived; formal-checked per coordinate] Each coordinate's identity
+`G'|a'|² = G|a|² − G|Γ a|²` is the fifth conjunct of `two_port_reference_balance`; the sum over
+coordinates and contacts, and its identification with the chained balance's ingest, are owed in Lean
+(#62).
+
+This is neither of the two exchange laws proposed beside #281. Mass arriving at rest keeps the
+momentum `G a`, and mass leaving at the carrier's speed keeps the velocity `a`; neither is one of the
+three coordinates first listed here. Both describe a passive exchange with a reservoir. The
+reference change instead transmits `2G/(G + G')·a`. That lies strictly between `a` and `(G/G')a`
+when `G' > G`, and between `a` and `2a` when `G' < G`. The difference is emitted rather than
+absorbed.
+
+**The deposition's half is the deposit record's law** (#281, merged as #284). The transit advances
+on `(u, p = C_a w)` (`propagation.rs`, the transit as the reference Holon's midpoint advance), so a
+deposit that changes `C_a` holds the contact's momentum: the rate after it solves `C′_a w′ = π_a`,
+`π_a = C_a w_a` with word `k`'s storage. [agent-inferred] The solve fixes `w′` modulo `ker C′_a`,
+which no later tick reads; the built rate is `w + δ` with `δ` the reduced solve's particular point
+of `C′_a δ = π_a − C′_a w`, so the rate is unchanged exactly where no mass moved. A momentum outside
+`range C′_a` is refused, naming the contact (its law is owed, #62).
+
+**Built (October 3).**
+- `ReceptionCarry` carries, beside the end change, each contact's conductance `G_a` and momentum
+  `π_a` at word `k`'s cut (`Word::reception_end`), written in the saved carry as its `reference`
+  line and one momentum line per contact.
+- `ReceptionCarry::crossed` transmits each contact's arriving waves at the next cut's conductances
+  and holds its rate at momentum against the next cut's storage; `ReceptionCarry::reflected` is the
+  emitted power. `Word::open_received` and the exposure's chained read both open through
+  `ReceptionCarry::opening`, one owner.
+- The commit under the carry reads its work at held momentum (`PowerForm::held`,
+  `WordBalance::commit_held`), from the deposit record's identity
+  `½⟨w′, C′w′⟩ − ½⟨w, Cw⟩ = −½⟨w′, ΔC w′⟩ − ½⟨w − w′, C(w − w′)⟩`; the commit at rest is unchanged.
+- [agent-inferred] A transmitted wave or a held rate need not lie on the word's transient lattice.
+  The opening splits every arriving wave and contact state at that lattice, as it already split the
+  storage, and the remainders open the word's error feedback (`Word::on_change`). A change on the
+  lattice splits to itself, so every earlier opening is unchanged. The chained balance reads the
+  opening's split exactly, `split = P(opening) − P(its representative)`, as an executed residual.
+- `ChainedBalance` reads `reflected` and `split` beside its terms; `lift_emits` checks
+  `ingest + reflected = 0`.
+
+[measured-exact; this carry's own run] **The chain fixture read again, nothing tuned** (the same
+fixture and deadline as §2.3; eight chained readings). Every reception closes, is dissipative with
+respect to its declared supply, and the lift only emits. The deposition is zero at every reception:
+no deposit on this fixture moves a contact's storage, so the momentum hold is exercised here only by
+its unit test (`tests/word.rs`, `a_carried_change_crosses_the_next_openings_references`), and the
+work between the words is the lift's alone. The stronger reading holds at all eight; the excess is
+zero.
+
+| Reception | reflected `= −ingest` | opening split | `L` |
+|---|---|---|---|
+| 1 | `0` | `0` | `0` |
+| 2 | `0` | `0` | `18142115297891599265251270759039205961/2¹²⁸` |
+| 3 | `46315959801979220365916592441711/(2⁷⁵·(2⁴²+1)²)` | `2394479/(2³¹·(2⁴²+1)²)` | `57098551254434724028511/2⁸¹` |
+| 4 | `0` | `0` | `257159359338988997670991/2⁸²` |
+| 5 | `10548810675/(2³¹·(2⁸+1)²)` | `−215431293/(2⁴³·(2⁸+1)²)` | `163725364095216116449671/2⁸²` |
+| 6 | `615659626125/(2⁴³·(2⁸+1)²)` | `950789/(2³⁵·(2⁸+1)²)` | `117873298028166605879837/2⁸¹` |
+| 7 | `3441151657053/(2³⁵·5³·41²)` | `−494093/(2²³·5³·41²)` | `83163959690503562684611/2⁸²` |
+| 8 | `1484327582024039537461868631154564575/(2²⁴·(2⁵²+1)²)` | `−659173863059710090719/(2⁷⁴·(2⁵²+1)²)` | `62587632561350452267109439670114075243/2¹³⁰` |
+
+The denominators are the reference changes' own: `(G + G')²` for the moves `2⁴²`, `2⁸`, `2⁸`, `2¹⁰`
+and `2⁵²` of contact 0's conductance listed in §2.3 (at reception 7, `(2¹⁰ + 1)² = 5⁴·41²` with one
+`5` cancelled). The test pins the closure, the dissipativity, `lift_emits` and the zero excess at all
+eight (`the_chained_balance_closes_and_the_chain_is_dissipative`).
 
 [owed in #62] The Lean statement of the chained balance and its dissipativity, and of the rest case
 as its limit (`HNN/Retention`).
@@ -333,8 +438,8 @@ a test path. Today's reception is unchanged unless a carry is declared.
   read back (`ReceptionCarry::{write, read}`); the carried interior moves the read;
 - under `A = 0` the chained balance (`ChainedBalance`, read in `expose_from` at every reception
   opened on the previous word's end) closes exactly at all eight readings, the chain is dissipative
-  at all eight, and the stronger reading fails at reception 7 only, by
-  `3580154876230715732256339/2⁸²` (§2.3);
+  at all eight, the lift only emits at all eight, and the stronger reading holds at all eight
+  (§2.3a; on the carry first built, which kept the waves, it failed at reception 7, §2.3);
 - `ContinuingState` carries the reception's end (`with_carry`, `carry`) inside its check, before its
   clock line, so the stamp still replaces only what follows the storage product; a state at rest
   writes no carry and reads back at rest; one byte changed inside the carry is refused as damage;
@@ -348,7 +453,11 @@ saved object of this path; it is restored only where the executed path's continu
 restores it.
 
 Still owed: the device word with host-card parity (the card's port tests read the reference at its
-default, rest, so they are unchanged), and the Lean statement (#62). Guard 16 of
+default, rest, so they are unchanged), and the Lean statement (#62). The within-refinement
+continuation (`ContactCut::continue_deposited`) still holds the rate across its contact deposit;
+moving it to the held momentum (the deposit record §5 item 2) changes the law its own record and
+Lean derive (`HNN/StorageResolution`: the two words compared at one rate), so it needs that
+derivation redone at held momentum, not a swap of its state. Guard 16 of
 [THE_MACHINE](../../docs/THE_MACHINE.md) reads that no change outlives its word or its refinement;
 under `A = 0` the end change outlives its refinement into the next reception's opening, as this
 record derives. The guard is amended to say so, with rest as the default that keeps it as stated.
