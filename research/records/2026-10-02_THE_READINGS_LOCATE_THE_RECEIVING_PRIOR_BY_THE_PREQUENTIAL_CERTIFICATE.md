@@ -23,16 +23,19 @@ lines dropped). Projection `1800` s from the first run's aeon closes, deadline `
 |---|---|
 | largest anchor energy `\|z\|²` | `68693/2^24` (below `2^(−7)`) |
 | mean anchor energy | `11179037/2^35` |
-| accumulated `tr F = Σ \|z\|²` | `9279474/2^23` (above `1`) |
+| accumulated `tr F = Σ \|z\|²` | `1187772767/2^30` exactly (above `1`) |
 | first reading at which `tr F ≥ 1` | `3109` |
-| largest eigenvalue of `F` | `8599329/2^24` (below `1`) |
+| largest eigenvalue of `F` | in `[8599329/2^24, 8599330/2^24)` (below `1`) |
 
 The receiving-prior record §4 projected the trace to reach `1` at 3,239 readings from the first
 two aeons' mean; the third aeon's anchors are larger, and it reaches `1` at reading 3,109. So
 "the readings' Gram never outweighs the prior" fails for the trace over the whole campaign. It
 holds along every direction: the largest eigenvalue stays below `1 = s`, so the prior keeps more
-than `2^24/(2^24 + 8599329)` of the step along each direction (`opening_outweighs_iff` read on
-each eigenvalue), more than half. The eigenvalue is a float read at 24 bits.
+than `2^24/(2^24 + 8599330)` of the step along each direction (`opening_outweighs_iff` read on
+each eigenvalue), more than half. The eigenvalue's cell is exact: `F` is summed from the readings'
+exact anchors, and the `LDLᵀ` pivots of `cI − F` are all positive at `c = 8599330/2^24` and not at
+`c = 8599329/2^24` (Sylvester; [receipt](2026-10-02_THE_READINGS_LOCATE_THE_RECEIVING_PRIOR_receipts/fisher_exact.txt),
+`research/notebook/hnn_design/receiver_fisher_exact.py`).
 
 ## 2. The whole campaign's code
 
@@ -197,6 +200,44 @@ card's mirror of the host's chart (`holonics-cuda` `hnn::lattice`). The unit the
 shortcut: prior `2 I` on `z` is the unit prior on `z/√2`, which leaves the dyadics. So the change
 carries the off-support value through the chart on host and card. It is its own pull request, and
 it merges after the main line measures it on campaign 1 and its held-out read.
+
+The change as built is scoped to the receiving map's law. `ReceiverDeclaration::receiving_scale`
+declares `k` with `H₀ = 2^k I` (campaign 1 declares `1`; every other declared field keeps `0`).
+`NormalLaw::with_scaled_prior` founds the receiving map there, with the chart
+`SolvedChart::founded(k) = 2^(−k) I` on `2^(−k)ℤ`. The chart carries `k`, and every place that read
+the identity off the support reads the prior: the support test (`GramBlock::of`), the dense form,
+the carrier count, the reach (`2^(−k) f`), and the warm start's entry for a newly reached index.
+`with_ports` keeps the replaced map's `k`. `k` is held at `k ≥ 0`, so the carried Gram's positivity
+margin is at least the unit prior's, which the lattice rule's certificate cites; a smaller prior
+would need a finer lattice. `SolvedChart::identity`, `NormalLaw::with_prior` and the source and
+contrast laws are unchanged. The card's mirror (`holonics-cuda` `hnn::lattice::normal_deposit_on_card`)
+reads the host's Gram and chart in their dense forms, so it takes the off-support values as they
+stand. Its parity test gains a window at `2 I` that reaches half the coordinates, and that test
+runs on the card.
+
+The change is measured twice before it merges, and both rules are fixed here before either read.
+- (a) A field at the unit prior is unchanged. Q1's `executed metric-steps order2 2026093061 8
+  lock-dec` at C0 (the order-2 field declares `receiving_scale = 0`) reproduces its stored receipt
+  except the three elapsed-ms fields and the resident line
+  ([receipt](2026-10-02_THE_READINGS_LOCATE_THE_RECEIVING_PRIOR_receipts/q1_metric_steps_scaled_receipt.txt)).
+  It was built at `fe9c58e9`, the stored Q1's commit, with this change applied, not at the
+  branch's own commit: `fe9c58e9` differs from the base `3515ed4a` (for example by 228 lines in
+  `executed.rs`), and building at `fe9c58e9` makes the read like for like with the stored receipt.
+- (b) Campaign 1 at `2 I` against `I`. The read is each member's summed held-out model `q` code
+  enclosure over the cells `[4958, 6148)`. The gate is `1190/16` bits, one declared grain of
+  `1/16` bit per held-out decision, and it stands in for a per-cell pairing the exposure does not
+  print. With `U` and `L` the upper and lower ends of each enclosure, there are three outcomes.
+  - Pass: `U(2 I) ≤ L(I) − 1190/16`. The change merges.
+  - Fail: `L(2 I) ≥ U(I) + 1190/16`. The change does not merge.
+  - Undecided: neither. The change merges, recorded as not resolved at the grain.
+
+**(b) read, October 3: undecided, so the change merges, recorded as not resolved at the grain.**
+`L(I) − U(2 I) = 149301954884965437216731043645/2^95` bits, which lies in `[3 + 12/16, 3 + 13/16)`,
+below the gate's `74 + 6/16`. `2 I` codes lower on the held-out cells and on training (training
+`17430 + 4/16` at `2 I` against `17437 + 13/16` at `I`), so by the rule fixed above `2 I` stays
+campaign 1's derived scale. The first `2 I` read stopped incomplete at its 800 s deadline under
+shared load; the solo read took 673146 ms. Card parity is gate 3: 32 of 32 on a clean card build.
+The receipts are on `claude/pc-receipts` at `6f2e4b5d`.
 
 Carrying `a` and `V` natively beside the Gram, and moving `s` by the Newton point as readings
 arrive, is the per-field law's native form. It is not built here.

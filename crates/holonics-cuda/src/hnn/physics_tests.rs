@@ -40,7 +40,7 @@ use holonics::hnn::Lattice;
 use holonics::hnn::constitution::{BudgetedCarry, ChartRule, NormalLaw, Sample, gamma_length};
 use holonics::ratio::linear::ExactRatMatrix;
 use num_bigint::BigInt;
-use num_traits::One;
+use num_traits::{One, Zero};
 
 use super::lattice::{LatticeCoordinates, OuterSamples, ResidentLattice, SplitRecord};
 
@@ -97,12 +97,20 @@ fn split_values(split: &SplitRecord, lattice: u32, fine: u32) -> (Vec<Rat>, Vec<
 /// the chart of `H'`, `ΔW = γ Σ w g (X̂f)ᵀ` carried onto `W`, each by the budgeted carry at the deposit
 /// clock's precision) and on the card (`hnn_outer_update` for both sums, `hnn_budgeted_split` for both
 /// carries; the chart is the host's successor chart, and the reaches `X̂f` its exact products): the
-/// successor's `H'`, `W'` and both carried remainders are equal, and the times are reported.
+/// successor's `H'`, `W'` and both carried remainders are equal, and the times are reported. The
+/// third window deposits on a receiving map's scaled prior `H_0 = 2I`
+/// (`NormalLaw::with_scaled_prior`) with features that reach only the first half of the
+/// coordinates, so the Gram is `2` and the host's chart `½` on the diagonal off the support, read
+/// on the card as they stand.
 #[test]
 #[ignore = "needs the CUDA card; run alone with --include-ignored --test-threads=1"]
 fn the_prox_deposit_on_the_card_equals_the_host_and_is_measured() {
     let card = card();
-    for (m, n, samples) in [(10usize, 64usize, 32usize), (10, 256, 64)] {
+    for (m, n, samples, scale, reached) in [
+        (10usize, 64usize, 32usize, 0u32, 64usize),
+        (10, 256, 64, 0, 256),
+        (10, 64, 8, 1, 32),
+    ] {
         let mut draw = Draw(9 + n as u64);
         let exponent = 9;
         let lattice = Lattice::new(exponent);
@@ -114,11 +122,19 @@ fn the_prox_deposit_on_the_card_equals_the_host_and_is_measured() {
                 .collect(),
         )
         .unwrap();
-        let law = NormalLaw::with_prior(prior);
+        let law = NormalLaw::with_scaled_prior(prior, scale);
         let window: Vec<Sample> = (0..samples)
             .map(|_| Sample {
                 weight: Rat::one(),
-                feature: (0..n).map(|_| dyadic(&mut draw, 3, 6)).collect(),
+                feature: (0..n)
+                    .map(|j| {
+                        if j < reached {
+                            dyadic(&mut draw, 3, 6)
+                        } else {
+                            Rat::zero()
+                        }
+                    })
+                    .collect(),
                 covector: (0..m).map(|_| dyadic(&mut draw, 5, 8)).collect(),
             })
             .collect();
@@ -161,6 +177,10 @@ fn the_prox_deposit_on_the_card_equals_the_host_and_is_measured() {
         // The reaches X̂f at the host's successor chart, read on the card (`hnn_lattice_read`: the
         // chart as the locus on `2^(−L_s)ℤ`, the features as its operand), and ΔW with its carry.
         let chart = next.solved();
+        let off = Rat::new(BigInt::one(), BigInt::one() << scale as usize);
+        for i in reached..n {
+            assert_eq!(chart.get(i, i).unwrap(), &off, "the chart off the support at {i}");
+        }
         let chart_lattice = Lattice::new(next.chart().exponent());
         let feature_lattice = Lattice::new(6);
         let started = Instant::now();

@@ -1,0 +1,14 @@
+projection 783 s (runner 1, 4 cores); deadline 2400 s
+exit 0 wall_ms 781312 peak_rss_kib 223272
+command: hnn_prediction executed metric-steps order2 2026093061 8 lock-dec c0=research/records/2026-10-01_THE_GUARDED_WITNESS_receipts/c0.state, built at fe9c58e9 with this branch's change applied (cloud, 4 cores)
+against research/records/2026-10-02_THE_REFITS_INGREDIENTS_receipts/q1_metric_steps.txt: identical except the three elapsed-ms fields and the resident line:
+2c2
+<   c0: ρ 102837/131072; L ∈ [500197/4096, 500203/4096) nats; solved 0 of 64; whole 0 (released 7, stations right 15); 776602 ms
+---
+>   c0: ρ 102837/131072; L ∈ [500197/4096, 500203/4096) nats; solved 0 of 64; whole 0 (released 7, stations right 15); 774832 ms
+16,17c16,17
+<     c0: 782825 ms
+< executed metric-steps: 782872 ms; resident 205000704 now, 229666816 peak
+---
+>     c0: 781242 ms
+> executed metric-steps: 781286 ms; resident 204750848 now, 228630528 peak

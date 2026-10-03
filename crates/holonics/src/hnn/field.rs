@@ -239,8 +239,11 @@ pub struct ContactDeclaration {
 /// root's split forced is the region table; the tree's declared stop-weight law
 /// (the declared stop prior; `compression::landmark::context::StopPrior`, the `½` stop prior at `StopPrior::half`);
 /// and its nodes' prior mass exponent `j`, each digit's masses starting at `2^(−j)`
-/// (`compression::landmark::context::LandmarkDeclaration::mass`; KT at `j = 1`), and the base
-/// measure those masses are split by (`compression::landmark::context::BaseMeasure`).
+/// (`compression::landmark::context::LandmarkDeclaration::mass`; KT at `j = 1`), the base
+/// measure those masses are split by (`compression::landmark::context::BaseMeasure`), and the
+/// receiving map's prior scale `k`: its normal law founds at `H_0 = 2^k I`
+/// (`hnn::constitution::NormalLaw::with_scaled_prior`; `k = 0` is the unit prior every other law
+/// keeps).
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct ReceiverDeclaration {
     pub ring: usize,
@@ -250,6 +253,7 @@ pub struct ReceiverDeclaration {
     pub prior: StopPrior,
     pub mass: u32,
     pub base: BaseMeasure,
+    pub receiving_scale: u32,
 }
 
 /// [definition] **The crib as declared**: the `window` cells that open each aeon, read at `offset`.
@@ -305,7 +309,9 @@ impl FieldDeclaration {
     /// (inferred; the contact loop record §28–29 measures it; it was `4`,
     /// chosen on the development cells in the landmark receipt), and prior mass `2^(−3)` (chosen on the
     /// development cells over the ladder `2^(−j)`, `j = 1..B`, charged `⌈log₂ B⌉ = 3` bits: the
-    /// contact loop record §25), split by its digit tree's root (`BaseMeasure::Root`, §30–31);
+    /// contact loop record §25), split by its digit tree's root (`BaseMeasure::Root`, §30–31); the
+    /// receiving map's prior `2I` (`receiving_scale = 1`, located by the readings' prequential
+    /// certificate on campaign 1's 3,400 readings: the receiving prior's October 2 record);
     /// `Δ = {1}`; the crib `W_crib = 64` at offset 1. The population is the cut's length. The carrier
     /// lattices follow [`FieldDeclaration::lattice_by_rule`]: `L = 9, 9, 10, 10` for the four rings'
     /// elements and standings, `10` for ring 2's receiving map, `9, 9, 10, 9` for the four channels,
@@ -362,6 +368,7 @@ impl FieldDeclaration {
                 prior: StopPrior::half(),
                 mass: 3,
                 base: BaseMeasure::Root,
+                receiving_scale: 1,
             }],
             crib: CribDeclaration {
                 window: 64,

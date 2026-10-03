@@ -1,0 +1,8 @@
+readings 3400, width 22
+tr F = 1187772767/1073741824, in [18558949/2^24, 18558950/2^24)
+accumulated energy first reaches 1 at reading 3109
+largest eigenvalue of F in [8599329/2^24, 8599330/2^24): 8599330/2^24 I - F positive definite, 8599329/2^24 I - F not
+
+real	0m3.590s
+user	0m3.540s
+sys	0m0.012s

@@ -576,6 +576,93 @@ fn the_warm_start_carries_the_residual_through_the_rank_one_steps() {
     );
 }
 
+/// `cI`, the scaled identity of width `n`.
+fn scaled_identity(n: usize, c: Rat) -> ExactRatMatrix {
+    ExactRatMatrix::shaped(
+        n,
+        n,
+        (0..n)
+            .map(|i| {
+                (0..n)
+                    .map(|j| if i == j { c.clone() } else { Rat::zero() })
+                    .collect()
+            })
+            .collect(),
+    )
+    .unwrap()
+}
+
+/// The receiving map's scaled prior (`NormalLaw::with_scaled_prior`, `SolvedChart::founded`): at
+/// `H_0 = 2I` the founding chart is `½I` exactly on `2^(−1)ℤ` (`δ = 0`), and `k = 0` is the unit
+/// prior. Over two deposits, the second reaching coordinates the first did not and one coordinate
+/// never reached, the carried Gram is `2I + Σ f fᵀ` exactly; the chart is `½` on the diagonal off
+/// its support; the warm start carries the newly reached coordinates in at the prior's chart, so it
+/// needs no restart (entering them at `1` would leave the residual `1 − 2 = −1` there, outside the
+/// contraction); and each executed certificate is the exact `‖1 − X̂H'‖∞` of the dense chart.
+#[test]
+fn a_scaled_prior_carries_its_chart_off_the_support() {
+    let lattice = Lattice::new(4);
+    let rule = rule(lattice);
+    let n = 5;
+    assert_eq!(
+        NormalLaw::with_scaled_prior(ExactRatMatrix::zero(2, n).unwrap(), 0),
+        NormalLaw::with_prior(ExactRatMatrix::zero(2, n).unwrap())
+    );
+    let mut law = NormalLaw::with_scaled_prior(ExactRatMatrix::zero(2, n).unwrap(), 1);
+    assert_eq!(law.gram(), scaled_identity(n, integer(2)));
+    assert_eq!(law.solved(), scaled_identity(n, rat(1, 2)));
+    assert_eq!(
+        (law.chart().scale(), law.chart().exponent()),
+        (1, 1)
+    );
+    assert!(law.chart().certificate().is_zero());
+    let ints = |values: [i64; 5]| values.iter().map(|x| integer(*x)).collect::<Vec<Rat>>();
+    let covector = || vec![rat(1, 3), rat(-1, 2)];
+    let mut exact = scaled_identity(n, integer(2));
+    for (clock, features) in [
+        (1, vec![ints([1, 2, 0, 0, 0]), ints([0, 1, 0, 0, 0])]),
+        (2, vec![ints([3, 0, 2, 1, 0])]),
+    ] {
+        let samples: Vec<Sample> = features
+            .iter()
+            .map(|f| sample(Rat::one(), f.clone(), covector()))
+            .collect();
+        let (next, reading) = law
+            .deposited(
+                &samples,
+                &Rat::one(),
+                &rule,
+                &mut BudgetedCarry::new(lattice, clock),
+            )
+            .unwrap();
+        let reading = reading.unwrap();
+        for f in &features {
+            let f = ExactRatMatrix::shaped(n, 1, f.iter().map(|x| vec![x.clone()]).collect())
+                .unwrap();
+            exact = exact
+                .add(&f.multiply(&f.transpose().unwrap()).unwrap())
+                .unwrap();
+        }
+        assert_eq!(next.gram(), exact);
+        assert_eq!(next.chart().scale(), 1);
+        let chart = next.solved();
+        let support = next.chart().support().to_vec();
+        for i in (0..n).filter(|i| !support.contains(i)) {
+            for j in 0..n {
+                let expected = if i == j { rat(1, 2) } else { Rat::zero() };
+                assert_eq!(chart.get(i, j).unwrap(), &expected, "({i}, {j})");
+            }
+        }
+        assert!(!support.contains(&4));
+        assert!(!reading.cold, "deposit {clock} restarted");
+        assert!(reading.warm.as_ref().is_some_and(|warm| *warm < rat(1, 4)));
+        assert!(reading.certificate <= rule.target());
+        assert_eq!(row_norm(&left_residual(&chart, &exact)), reading.certificate);
+        law = next;
+    }
+    assert_eq!(law.chart().support(), &[0, 1, 2, 3]);
+}
+
 /// Lean `HNN/LatticeWord.{newton_schulz_left, rounded_refinement_certificate_left}`: one
 /// refinement `X' = (2 − XH)X` squares the left residual exactly, `1 − X'H = (1 − XH)²`; on a lattice
 /// fine enough to hold it the executed refinement is that `X'` with certificate `‖R²‖∞ ≤ δ²`, and on a
@@ -1666,6 +1753,16 @@ fn the_standing_is_founded_off_its_nodes() {
     )
     .unwrap();
     let theta = Constitution::initial(&campaign, OPEN_BUDGET).unwrap();
+    // Ring 2's receiving map founds at its declared prior 2I (chart ½I), and a replaced map keeps it.
+    let receiving = theta.receiving_law(2).unwrap();
+    let n = receiving.gram().rows();
+    assert_eq!(receiving.gram(), scaled_identity(n, integer(2)));
+    assert_eq!(receiving.solved(), scaled_identity(n, rat(1, 2)));
+    let replaced = theta
+        .clone()
+        .with_ports(2, None, None, Some(receiving.map().clone()))
+        .unwrap();
+    assert_eq!(replaced.receiving_law(2), Some(receiving));
     let fixed = theta.fixed_nodes();
     assert_eq!(fixed.len(), 16);
     assert!(fixed.iter().all(|&(g, rho)| (g == 2 || g == 3) && (14..22).contains(&rho)));
