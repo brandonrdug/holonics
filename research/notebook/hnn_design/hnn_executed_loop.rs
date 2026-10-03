@@ -278,12 +278,47 @@ fn trained(opening: &Constitution, ring: usize, path: &str) -> Constitution {
     }
 }
 
+/// The states written before a state carried its material identity and check, each named by the
+/// sha256 of its bytes (`research/runs/u6/LEGACY_STATES.txt`, compiled in).
+const LEGACY_STATES: &str = include_str!("../../runs/u6/LEGACY_STATES.txt");
+
+/// The sha256 of a text's bytes, in hex.
+fn sha256(text: &str) -> String {
+    use sha2::{Digest, Sha256};
+    Sha256::digest(text.as_bytes()).iter().map(|byte| format!("{byte:02x}")).collect()
+}
+
+/// [definition; agent-inferred, October 3] **A complete state's text, authenticated**: a text whose
+/// sha256 the manifest of earlier states lists ([`LEGACY_STATES`]) is stamped with the declared
+/// opening's identity and its check (`ContinuingState::stamped`) and labelled on stderr; any other
+/// text is returned as it is, for `ContinuingState::from_text` to check and
+/// `Constitution::continued` to match against the opening. A listed state is the bytes a receipt
+/// cites, so it is stamped whatever it carries after its storage product: a state written before
+/// the identity, or one stamped under an earlier layout of the constitution, whose identity a change
+/// of layout has moved. An unlisted text without a check is refused by `from_text`.
+pub(super) fn authenticated(opening: &Constitution, text: &str) -> Result<String, String> {
+    let sha = sha256(text);
+    let listed = LEGACY_STATES
+        .lines()
+        .filter(|line| !line.starts_with('#'))
+        .any(|line| line.split_whitespace().next() == Some(sha.as_str()));
+    if !listed {
+        return Ok(text.to_string());
+    }
+    eprintln!("state {sha}: a listed earlier state, stamped with the declared opening's identity");
+    ContinuingState::stamped(text, opening).map_err(|error| format!("the listed state {sha} ({error})"))
+}
+
 /// **A full remount**: a checkpoint's complete continuing state restored onto the declared opening
-/// (`Constitution::continued`); refused where the file holds `E` and `ρ` alone.
+/// (`Constitution::continued`), authenticated first ([`authenticated`]); refused where the file
+/// holds `E` and `ρ` alone, where it is damaged, where it continues another opening's material, and
+/// where it carries no check and the manifest of earlier states does not list it.
 pub(super) fn remounted(opening: &Constitution, path: &str) -> Constitution {
     #[allow(clippy::disallowed_methods)]
     let text = std::fs::read_to_string(path).expect("read the checkpoint");
-    let state = ContinuingState::from_text(&text).expect("a complete continuing state");
+    let text = authenticated(opening, &text).unwrap_or_else(|why| panic!("{path}: {why}"));
+    let state = ContinuingState::from_text(&text)
+        .unwrap_or_else(|error| panic!("{path}: not a complete continuing state, nor a listed earlier one ({error})"));
     opening.clone().continued(&state).expect("the checkpoint continues the declared opening")
 }
 

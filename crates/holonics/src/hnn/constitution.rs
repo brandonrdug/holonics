@@ -7364,6 +7364,43 @@ impl ContinuingState {
         s
     }
 
+    /// [definition; agent-inferred, October 3] **A state's text stamped with a declared opening's
+    /// identity**: its lines through `storage-product`, then `material` (the opening's
+    /// [`Constitution::material_identity`] at the state's ring), `check` and `end`, as
+    /// [`ContinuingState::to_text`] writes them. Only what follows `storage-product` may be replaced:
+    /// `end` alone (a state written before the identity) or an earlier stamp (a state written under
+    /// an earlier layout); anything else is refused. The stamp authenticates nothing by itself: its
+    /// caller has authenticated the text's bytes (the notebook's manifest of earlier states), and
+    /// [`ContinuingState::from_text`] then reads the stamped text whole.
+    pub fn stamped(text: &str, opening: &Constitution) -> Result<String, HnnError> {
+        let refuse = |what: &'static str| HnnError::ContinuingState { what };
+        let at = text
+            .find("\nstorage-product ")
+            .ok_or(refuse("the storage-product line"))?
+            + 1;
+        let through = text[at..]
+            .find('\n')
+            .map(|end| at + end + 1)
+            .ok_or(refuse("the storage-product line"))?;
+        let (body, rest) = text.split_at(through);
+        let stamp = |line: &str| {
+            line == "end" || line.starts_with("material ") || line.starts_with("check ")
+        };
+        if !rest.lines().all(stamp) || rest.lines().last() != Some("end") {
+            return Err(refuse("the stamp (only `end` or an earlier stamp follows the storage product)"));
+        }
+        let ring = body
+            .lines()
+            .find_map(|line| line.strip_prefix("state "))
+            .and_then(|ring| ring.parse::<usize>().ok())
+            .ok_or(refuse("the state line"))?;
+        let mut s = body.to_string();
+        s += &format!("material {}\n", opening.material_identity(ring));
+        s += &format!("check {} {}\n", s.len(), text_residue(&s));
+        s += "end\n";
+        Ok(s)
+    }
+
     /// **The state read back from its text** ([`ContinuingState::to_text`]); refused, typed, on any
     /// line out of its form (a remount of `E` and `ρ` alone has no `state` line and is refused here:
     /// it is partial).

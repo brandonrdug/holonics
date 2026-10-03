@@ -104,7 +104,8 @@ Let `A` be the absorption of the boundary at a word's end:
 - `A = 0`: nothing is absorbed beyond what the field's own conductances dissipate within the ticks.
 
 The opening is `(I − A) Π_int x_k(end) + s_(k+1)(0)`. At `A = I` it is `EndChange::rest` plus the
-injection, at tick zero, which is today's word exactly by `tests/prediction.rs:66`.
+injection, at tick zero, which is today's word exactly by `tests/prediction.rs:66` on a field
+with no declared resonator (§2.4).
 
 [agent-inferred] The law built is `A = 0`. An intermediate absorption would need a declared exterior
 admittance at the receiver's section, a new locus of the constitution with its own deposition. None
@@ -150,10 +151,18 @@ earlier word of the chain executed, so a declared resonator's pump phase continu
 receptions.
 
 Today every reception re-phases the pump to zero, a reset of the pump clock that the carry removes.
-The exact limit therefore holds on the change for every field. It holds on the pump phase when no
-resonator is declared (U6's default, `resonator none` in `hnn_exposure.rs`), or when every pump
-period divides the ticks a word executes (`e_max = e_0 + A` junction steps, `receiving.rs:1269`).
-Otherwise the carried phase is the second carried quantity, and the measurement compares it as such.
+The rest case of `tests/prediction.rs:66` opens at tick zero, while the carry opens at the
+cumulative tick. On a field with a declared resonator the two differ in the pump's phase even when
+the carried change is at rest, unless the cumulative tick at the opening is a multiple of every
+pump period.
+
+[definition; agent-inferred] **The exact limit is claimed for fields with no declared resonator.**
+That is U6's default (`resonator none` in `hnn_exposure.rs`) and every field the exposure and the
+U6 reads run today. There `A = I` is today's word exactly, whatever the cumulative tick. On a field
+with a declared resonator the carry keeps the cumulative clock, and no exact limit is claimed: the
+pump phase is a second carried quantity, and a read under such a field compares it as such. A
+clock reset at every opening is not taken: it would restore the hidden restart of the pump that
+the carry exists to remove.
 
 ### 2.5 The adjoint stops at the opening
 
@@ -205,6 +214,11 @@ governs every word's motion, including the motion the next word carries.
   `with_deadline`, carry against rest on the same state and lineage at an equal move count. It is
   the paired sign test on discordant held-out cells, released at a tail at most `1/64`.
   Development bits do not decide it.
+- **Its held-out seed** is `2026100301` (order-2, 128 requests), which no run has read: it appears
+  in no record, queue or receipt on `main` or on the run branches as of this record. The seed
+  `2026093012` is spent (P5 in §11 and every held-out pair of §9 of the
+  [refit record](2026-10-02_THE_REFITS_INGREDIENTS_ABLATED_WHICH_PART_OF_THE_EXTERIOR_FIT_REACHES_THE_REPRESENTATION.md))
+  and is excluded.
 
 ## 5. Owners touched when built
 

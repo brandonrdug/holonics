@@ -479,7 +479,7 @@ the crossing jump, not a misoriented momentum. The derivations thread's floor la
 **The exposure gate is read after the opening deposit.** By #244, `R = 0` at every U6 state is the
 opening value, the first deposit moves `R` alone, and `C` and `E` learn from the second deposit on.
 `executed expose` deposits once per window. Its held-out passages come after every training passage,
-so their 1024 held-out station cells are read after 19810 to 21845 deposits from each state (§12), and the gate is not decided by the features'
+so their 1024 held-out station cells are read after 19810 to 21844 deposits from each state (§12), and the gate is not decided by the features'
 Gram at the first deposit.
 
 ## 9. The wall at m7, the run that crosses it, and the paired held-out reads
