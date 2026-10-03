@@ -1,0 +1,2 @@
+executed expose: a cut of 65536 cells, 1238 training passages from seed 2026093061 (the first entered after 32 cells), 128 held-out passages from seed 2026093012 with 1024 station cells held out; windows all
+exit 124 wall 36000053 ms
