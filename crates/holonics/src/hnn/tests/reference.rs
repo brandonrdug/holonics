@@ -27,8 +27,9 @@ use crate::compression::landmark::context::{
 use crate::hnn::HnnError;
 use crate::hnn::field::Current;
 use crate::hnn::port::{ExecutionPort, ReceiptDetail};
+use crate::hnn::Absorption;
 use crate::hnn::reference::{
-    Cut, Exposure, ReadoutWall, Reference, WallTimes, one_hot, prequential,
+    Cut, Exposure, ReadoutWall, Reception, Reference, WallTimes, one_hot, prequential,
 };
 use crate::ratio::Rat;
 use crate::ratio::algebraic::ExactInterval;
@@ -557,3 +558,206 @@ fn the_refining_grain_exponent_reads_the_least_dyadic_cover_of_the_grain() {
         last = k;
     }
 }
+
+// -------------------------------------------------------------------------------------------
+// the reception carry (the record of October 3, "The reception carries the interior change")
+
+/// An exposure with its wall times cleared: the one field two runs of one cut do not share.
+fn without_wall(mut exposure: Exposure) -> Exposure {
+    exposure.wall = WallTimes::default();
+    exposure.readout = ReadoutWall::default();
+    exposure
+}
+
+/// The reception carry §2.2 and §4: at complete absorption (`A = I`) the carry path is today's
+/// reception exactly on a field with no declared resonator. The prequential exposure under
+/// `Carry(Complete)` returns every reading, deposit, balance and curve point of the exposure at rest,
+/// bit for bit; the carried state at `A = I` is the field's elapsed tick alone, so only the
+/// resident's state bits read more.
+#[test]
+fn the_carry_at_complete_absorption_is_todays_reception_exactly() {
+    let length = cut_length();
+    let field = chain_of(length as u64);
+    let cut = Cut {
+        cells: source(length, 81),
+        held_out: vec![2..4, length - 4..length],
+    };
+    let reference = Reference::new(64, OPEN_BUDGET).with_deadline(6);
+    let rest = without_wall(reference.clone().expose(&field, &cut).unwrap());
+    let mut carried = without_wall(
+        reference
+            .with_reception(Reception::Carry(Absorption::Complete))
+            .expose(&field, &cut)
+            .unwrap(),
+    );
+    assert_eq!(rest.compares, 6);
+    assert!(carried.state.resident_bits > rest.state.resident_bits);
+    carried.state = rest.state.clone();
+    // At `A = I` the carried change is the rest; a chained balance is read only where a word ended
+    // exactly at rest, and then nothing was carried, so no work was done on it.
+    let chained = &carried.word.chained;
+    assert!(chained.closed && chained.dissipative == chained.read);
+    assert!(chained.work.is_zero() && chained.excess.is_zero());
+    carried.word.chained = rest.word.chained.clone();
+    for (a, b) in carried.aeons.iter_mut().zip(&rest.aeons) {
+        a.state_bits = b.state_bits;
+    }
+    assert_eq!(carried, rest);
+}
+
+/// The reception carry §2.3: under `Carry(Nothing)` the chained balance closes exactly at every
+/// reception of a prequential exposure on one baseline (the source rings' end storage subtracted
+/// once), and the chain is dissipative with respect to its declared supply at every reception. The
+/// stronger reading, that the work between the words lies within the next word's certified loss,
+/// fails at exactly one reception of this fixture, the seventh, by `3580154876230715732256339/2⁸²`:
+/// the ingest's re-reading of the contacts' conductances does more work on the carried waves than
+/// the next word dissipates. It is pinned here as the measured failure of that reading, not a law.
+#[test]
+fn the_chained_balance_closes_and_the_chain_is_dissipative() {
+    let length = cut_length();
+    let field = chain_of(length as u64);
+    let cut = Cut {
+        cells: source(length, 81),
+        held_out: vec![2..4, length - 4..length],
+    };
+    let exposure = Reference::new(64, OPEN_BUDGET)
+        .with_deadline(24)
+        .with_reception(Reception::Carry(Absorption::Nothing))
+        .expose(&field, &cut)
+        .unwrap();
+    let chained = &exposure.word.chained;
+    assert!(exposure.word.words.closed && exposure.word.closed);
+    assert_eq!(chained.read, exposure.compares - 1);
+    assert_eq!(chained.read, 8);
+    assert!(chained.closed);
+    assert_eq!(chained.dissipative, chained.read);
+    assert!(!chained.work.is_zero(), "the ingest does work on the carry");
+    assert_eq!(chained.within_loss, chained.read - 1);
+    assert_eq!(chained.excess, chained.largest_excess);
+    assert_eq!(
+        chained.excess.to_string(),
+        "3580154876230715732256339/4835703278458516698824704"
+    );
+}
+
+/// The reception carry §2.1 and §2.6: under `Carry(Nothing)` every compare writes its consumed
+/// word's end as the resident's one carried change, at the field's elapsed ticks (the sum of the
+/// junction steps of every earlier word), and the next reception's word opens on its interior with
+/// the source rings imposed by the moment: the refine's faces are the read on that opening, and they
+/// differ from the read at rest. A second refinement while one is pending is refused (one chain).
+#[test]
+fn the_carry_passes_each_receptions_end_to_the_next() {
+    use crate::hnn::{Absorption, PendingRatio, WordOpening};
+    let length = cut_length();
+    let field = chain_of(length as u64);
+    let cells = source(length, 81);
+    let reference =
+        Reference::new(64, OPEN_BUDGET).with_reception(Reception::Carry(Absorption::Nothing));
+    let mut resident = reference.mount(&field, &Current::at_rest(&field)).unwrap();
+    let phases = resident.admitted()[0].clone();
+    let steps = phases.junction_steps();
+    let (moment, _) = reference.ingest(&mut resident, None, &[]).unwrap();
+    assert!(resident.carried().is_none());
+    let mut position = 0;
+    let (mut receptions, mut moved) = (0, 0);
+    for span in phases.windows(cells.len()).unwrap().into_iter().take(24) {
+        let window = &cells[span.clone()];
+        if window.len() == phases.aperture() {
+            let before = resident.carried().cloned();
+            // The opening is read from the carry as saved and read back (§2.4): the saved carry is
+            // the carried state whole, so the word it opens is the uninterrupted chain's exactly.
+            let opening = match &before {
+                Some(carry) => {
+                    let mut text = String::new();
+                    carry.write(&mut text);
+                    let mut lines = text.lines();
+                    let head = lines.next().unwrap();
+                    let restored = crate::hnn::ReceptionCarry::read(head, &mut |what| {
+                        lines.next().ok_or(HnnError::ContinuingState { what })
+                    })
+                    .unwrap();
+                    assert_eq!(&restored, carry);
+                    assert!(lines.next().is_none());
+                    WordOpening::Received {
+                        carry: restored,
+                        absorption: Absorption::Nothing,
+                    }
+                }
+                None => WordOpening::Rest,
+            };
+            let ratio = PendingRatio::produce(
+                resident.current(),
+                resident.moment(&moment).unwrap(),
+                resident.address(),
+                &phases,
+                resident.constitution().commit(),
+            )
+            .unwrap();
+            let (pending, refined) = reference.refine(&mut resident, &moment, &phases).unwrap();
+            let faces = refined.forward.into_present().unwrap();
+            let theta = resident.constitution().clone();
+            let (_, on) = ratio
+                .read_on(&field, &theta, &mut crate::hnn::Charts::new(), &opening)
+                .unwrap();
+            assert_eq!(faces, on);
+            let moving = |carry: &crate::hnn::ReceptionCarry| {
+                let change = &carry.change;
+                change
+                    .storage
+                    .iter()
+                    .chain(change.arrivals.iter().flatten())
+                    .chain(change.states.iter().flatten())
+                    .flatten()
+                    .any(|x| !x.is_zero())
+            };
+            if before.as_ref().is_some_and(moving) {
+                let (_, at_rest) = ratio.read(&field, &theta).unwrap();
+                moved += usize::from(faces != at_rest);
+            }
+            if before.is_some() {
+                assert!(matches!(
+                    reference.refine(&mut resident, &moment, &phases),
+                    Err(HnnError::Shape { .. })
+                ));
+            }
+            let (staged, _) = reference
+                .compare(&mut resident, pending, &one_hot(window))
+                .unwrap();
+            receptions += 1;
+            let carry = resident.carried().expect("the compare writes the carry");
+            assert_eq!(carry.ticks, receptions * steps);
+            reference.deposit(&mut resident, staged).unwrap();
+        }
+        let mut fed = 0;
+        while fed < window.len() {
+            let (_, ingested) = reference
+                .ingest(&mut resident, Some(&moment), &one_hot(&window[fed..]))
+                .unwrap();
+            let ingested = ingested.forward.into_present().unwrap();
+            fed += ingested.cells;
+            if ingested.carry_out {
+                let family = resident.admitted().to_vec();
+                reference.close_aeon(&mut resident, &family).unwrap();
+            }
+        }
+        position = span.end;
+    }
+    // The carried interior moves the read once the constitution reads the receiving ring.
+    assert!(moved >= 1 && position > 0);
+    // The carry mounts beside a declared constitution (§2.4), and only under a carrying reception.
+    let carry = resident.carried().cloned().expect("the chain carries");
+    let mounted = reference
+        .mount_carried(&field, resident.current(), resident.constitution().clone(), carry.clone())
+        .unwrap();
+    assert_eq!(mounted.carried(), Some(&carry));
+    assert!(matches!(
+        Reference::new(64, OPEN_BUDGET).mount_carried(
+            &field,
+            resident.current(),
+            resident.constitution().clone(),
+            carry
+        ),
+        Err(HnnError::ContinuingState { .. })
+    ));
+}
+

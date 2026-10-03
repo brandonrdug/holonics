@@ -8,7 +8,8 @@
 //! since the aeon's opening and the contacts' site kinds its contact letters read, so every
 //! bundle of the epoch's known targets is read from the state at the cut; campaign 2); its
 //! [`ReceivingPhases`]; and the commit it was produced at. Every
-//! word opens at zero change, so the anchor needs no waves. A read ([`PendingRatio::open`])
+//! word opens at zero change or, under a declared reception carry, on the resident's carried change
+//! held beside the ratio ([`PendingRatio::open_on`]), so the anchor needs no waves. A read ([`PendingRatio::open`])
 //! recomputes `m̃ = ⟨M, E_now⟩` and runs the word at the contemporary constitution, `q` included;
 //! at compare, the contemporary landmark tree is read at each phase's causal address, the copied
 //! suffix after the epoch's earlier targets (the landmark tree, [`PendingRatio::against`]):
@@ -55,7 +56,7 @@ use crate::hnn::moment::SourceMoment;
 use crate::hnn::ratio::Faces;
 use crate::hnn::realization::indexed;
 use crate::hnn::receiving::{ActiveAddress, ReceivingPhases, Scored};
-use crate::hnn::word::Word;
+use crate::hnn::word::{Word, WordOpening};
 
 /// [definition] **A pending ratio**: the producing anchor `λ`, the encoder moment `M`, the active
 /// suffix address, the receiving phases and the producing commit. See the module header.
@@ -149,12 +150,26 @@ impl PendingRatio {
         constitution: &impl ConstitutionRead,
         charts: &mut Charts,
     ) -> Result<Word<'c>, HnnError> {
-        Word::open_charted(
+        self.open_on(field, constitution, charts, &WordOpening::Rest)
+    }
+
+    /// **Open the word on a reception's opening** ([`Word::open_received`]; the reception carry):
+    /// at [`WordOpening::Rest`] exactly [`PendingRatio::open_charted`]. The opening is the resident's
+    /// carried change, read beside the pending ratio, never a field of it (guard 3).
+    pub fn open_on<'c>(
+        &self,
+        field: &'c Field,
+        constitution: &impl ConstitutionRead,
+        charts: &mut Charts,
+        opening: &WordOpening,
+    ) -> Result<Word<'c>, HnnError> {
+        Word::open_received(
             field,
             constitution,
             &self.current(field)?,
             &self.moment,
             charts,
+            opening,
         )
     }
 
@@ -180,8 +195,20 @@ impl PendingRatio {
         constitution: &impl ConstitutionRead,
         charts: &mut Charts,
     ) -> Result<(Word<'c>, Faces), HnnError> {
+        self.read_on(field, constitution, charts, &WordOpening::Rest)
+    }
+
+    /// **The contemporary read on a reception's opening** ([`PendingRatio::open_on`]): what
+    /// [`PendingRatio::read_charted`] returns, the word opened on `opening`.
+    pub fn read_on<'c>(
+        &self,
+        field: &'c Field,
+        constitution: &impl ConstitutionRead,
+        charts: &mut Charts,
+        opening: &WordOpening,
+    ) -> Result<(Word<'c>, Faces), HnnError> {
         let current = self.current(field)?;
-        let mut word = self.open_charted(field, constitution, charts)?;
+        let mut word = self.open_on(field, constitution, charts, opening)?;
         let anchors = word.forward(&self.phases)?;
         let reads = indexed(anchors.len(), |j| {
             self.phases.read(field, constitution, &current, &anchors[j])
@@ -243,7 +270,19 @@ impl PendingRatio {
         charts: &mut Charts,
         targets: &[usize],
     ) -> Result<(Word<'c>, Against), HnnError> {
-        let (word, wave) = self.read_charted(field, constitution, charts)?;
+        self.read_against_on(field, constitution, charts, targets, &WordOpening::Rest)
+    }
+
+    /// The contemporary read against targets on a reception's opening ([`PendingRatio::read_on`]).
+    pub fn read_against_on<'c>(
+        &self,
+        field: &'c Field,
+        constitution: &impl ConstitutionRead,
+        charts: &mut Charts,
+        targets: &[usize],
+        opening: &WordOpening,
+    ) -> Result<(Word<'c>, Against), HnnError> {
+        let (word, wave) = self.read_on(field, constitution, charts, opening)?;
         let against = self.against(constitution, &wave, targets)?;
         Ok((word, against))
     }

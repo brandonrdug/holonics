@@ -484,6 +484,7 @@ use crate::hnn::port::Deposit;
 use crate::hnn::propagation::gram;
 use crate::hnn::realization::{indexed, outer_integral};
 use crate::hnn::receiving::{ReceivingStep, landmark_declaration, receiving_population};
+use crate::hnn::word::ReceptionCarry;
 use crate::hnn::ring::{
     Floquet, FloquetBound, FloquetReading, ResonatorMaterial, ResonatorOperands, attain_metric,
 };
@@ -7165,6 +7166,13 @@ pub struct ContinuingState {
     storage_product: Rat,
     /// The identity of the material the state continues ([`Constitution::material_identity`]).
     material: u128,
+    /// [definition; agent-inferred, October 3; the reception carry §2.4] The reception's carried
+    /// end ([`ReceptionCarry`]: the end change and the field's elapsed ticks), where the state was
+    /// written under the carry; `None` at rest (`A = I`, and every state written before the carry).
+    /// It is resident motion, not constitution: [`Constitution::continued`] does not read it, and
+    /// its consumer mounts it beside the restored constitution
+    /// ([`crate::hnn::reference::Reference::mount_carried`]).
+    carry: Option<ReceptionCarry>,
 }
 
 /// [definition; agent-inferred, October 3] **A text's residue**: its bytes read as one base-256
@@ -7225,6 +7233,7 @@ impl Constitution {
             commit: self.commit,
             storage_product: self.storage_product.clone(),
             material: self.material_identity(ring),
+            carry: None,
         })
     }
 
@@ -7320,10 +7329,23 @@ impl ContinuingState {
         self.clock
     }
 
+    /// [definition; agent-inferred, October 3; the reception carry §2.4] The reception's carried
+    /// end, `None` at rest.
+    pub fn carry(&self) -> Option<&ReceptionCarry> {
+        self.carry.as_ref()
+    }
+
+    /// The state with the reception's carried end beside it (`None` at rest), written inside the
+    /// state's check.
+    pub fn with_carry(self, carry: Option<ReceptionCarry>) -> Self {
+        Self { carry, ..self }
+    }
+
     /// **The state as text**, every value exact (the type's header): `E rows cols`, the rows,
     /// `rho ρ`, then `state g`, `gram n` with its rows, `chart L_s δ`, `support k` with the support,
     /// `block` with the chart's integer coordinates, `map-carry k` and `gram-carry k` each with
-    /// `index value` lines, `clock m`, `commit c`, `storage-product p`, `material m` (the identity of
+    /// `index value` lines, the reception's carried end where one is carried
+    /// ([`ReceptionCarry::write`], absent at rest), `clock m`, `commit c`, `storage-product p`, `material m` (the identity of
     /// the material it continues), `check n r` (the byte length and residue of every line before it,
     /// [`text_residue`]), `end`.
     pub fn to_text(&self) -> String {
@@ -7354,6 +7376,9 @@ impl ContinuingState {
             for (index, value) in &carry.0 {
                 s += &format!("{index} {value}\n");
             }
+        }
+        if let Some(carry) = &self.carry {
+            carry.write(&mut s);
         }
         s += &format!("clock {}\n", self.clock);
         s += &format!("commit {}\n", self.commit);
@@ -7508,15 +7533,25 @@ impl ContinuingState {
             }
             carries.push(Carry(carry));
         }
+        // The reception's carried end, where one is carried; a state at rest goes on to its clock.
+        let mut line = next("the clock")?;
+        let carry = if line.starts_with("carry ") {
+            let carry = ReceptionCarry::read(line, &mut next)?;
+            line = next("the clock")?;
+            Some(carry)
+        } else {
+            None
+        };
+        let clock: u64 = head(line, "clock", "the clock")?
+            .first()
+            .and_then(|m| m.parse().ok())
+            .ok_or(HnnError::ContinuingState { what: "the clock" })?;
         let mut scalar = |key: &str, what: &'static str| -> Result<String, HnnError> {
             head(next(what)?, key, what)?
                 .into_iter()
                 .next()
                 .ok_or(HnnError::ContinuingState { what })
         };
-        let clock: u64 = scalar("clock", "the clock")?
-            .parse()
-            .map_err(|_| HnnError::ContinuingState { what: "the clock" })?;
         let commit: u64 = scalar("commit", "the commit")?
             .parse()
             .map_err(|_| HnnError::ContinuingState { what: "the commit" })?;
@@ -7559,6 +7594,7 @@ impl ContinuingState {
             commit,
             storage_product,
             material,
+            carry,
         })
     }
 }

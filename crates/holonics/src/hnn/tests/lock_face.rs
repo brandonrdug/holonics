@@ -829,6 +829,81 @@ fn a_checkpoint_is_refused_onto_foreign_material_and_when_damaged() {
     assert!(ContinuingState::from_text(&relabelled).is_err());
 }
 
+/// [the reception carry §2.4] **A continuing state carries the reception's end inside its check**:
+/// a state written with a carried end reads back whole (every storage wave, arriving pair and
+/// contact state, and the elapsed ticks), a state at rest writes no carry and reads back at rest
+/// (every state written before the carry), the carry is resident motion that
+/// [`Constitution::continued`] does not read, the stamp still replaces only what follows the storage
+/// product, and one byte changed inside the carry is refused as damage.
+#[test]
+fn a_continuing_state_carries_the_receptions_end_inside_its_check() {
+    use crate::hnn::word::{EndChange, ReceptionCarry};
+    let field = joint();
+    let opening = generic(&field, 94).with_transport(0, rat(3, 4)).unwrap();
+    let refinement = Refinement::declare(&field, 0, 2, 1, 4, 2).unwrap();
+    let requests = short_requests(&field, &[(95, [0, 1, 2, 1]), (96, [1, 1, 0, 2]), (97, [2, 0, 1, 1])]);
+    let first = executed_move(&field, &opening, &requests, &refinement, &joint_bank(), 12, Comparison::LOCK_DECISIONS)
+        .unwrap();
+    let (continued, _) = first.adopted.expect("the reception adopts a move");
+    let at_rest = state_of(&continued);
+    assert!(at_rest.carry().is_none());
+    assert!(!at_rest.to_text().contains("\ncarry "));
+    // A carried end of the field's shape, every value a distinct exact rational.
+    let mut k = 0i64;
+    let mut wave = |n: usize| -> Vec<Rat> {
+        (0..n)
+            .map(|_| {
+                k += 1;
+                rat(if k % 2 == 0 { -k } else { k }, 2 * k + 1)
+            })
+            .collect()
+    };
+    let widths: Vec<usize> = field.rings().iter().map(|ring| ring.width()).collect();
+    let storage = widths.iter().map(|n| wave(*n)).collect();
+    let arrivals = field
+        .contacts()
+        .iter()
+        .map(|contact| {
+            let (a, b) = contact.ends();
+            [wave(widths[a]), wave(widths[b])]
+        })
+        .collect();
+    let states = field
+        .contacts()
+        .iter()
+        .map(|contact| [wave(contact.width()), wave(contact.width())])
+        .collect();
+    let carry = ReceptionCarry {
+        change: EndChange {
+            storage,
+            arrivals,
+            states,
+            resonators: vec![None, Some([wave(2), wave(2)])],
+            resonator_phases: vec![None, Some(3)],
+        },
+        ticks: 27,
+    };
+    assert!(carry.fits(&field));
+    let carried = at_rest.clone().with_carry(Some(carry.clone()));
+    let text = carried.to_text();
+    let read = ContinuingState::from_text(&text).unwrap();
+    assert_eq!(read, carried);
+    assert_eq!(read.carry(), Some(&carry));
+    assert_eq!(opening.clone().continued(&read).unwrap(), continued);
+    // The stamp replaces only what follows the storage product, so the carry stays inside it.
+    let stamped = ContinuingState::stamped(&text, &opening).unwrap();
+    assert_eq!(stamped, text);
+    // One byte inside the carry changed: refused by the check.
+    let at = text.find("\ncarry ").unwrap() + "\ncarry ".len();
+    let mut damaged = text.clone().into_bytes();
+    damaged[at] = if damaged[at] == b'7' { b'8' } else { b'7' };
+    let damaged = String::from_utf8(damaged).unwrap();
+    assert!(matches!(
+        ContinuingState::from_text(&damaged),
+        Err(HnnError::ContinuingState { what }) if what.contains("damaged")
+    ));
+}
+
 fn state_of(theta: &Constitution) -> ContinuingState {
     theta.continuing_state(0).unwrap()
 }

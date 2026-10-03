@@ -602,6 +602,14 @@ tests can comb through anything valuable").
     pending ratio or the constitution except through a deposit's covectors. The reason: generation
     refines one joint field through the model's constituted dynamics (HNN_FORMULA, "Generation as
     field refinement"), which the word-local release would cut at every word.
+    [agent-inferred, amended October 3 for the reception carry] Under a declared reception carry
+    (`Reception::Carry`; the default is `Reception::Rest`, which keeps the guard as stated above) a
+    reception's word opens on the interior of the end change the previous reception's consumed word
+    left (`Word::open_received`, `ReceptionCarry`), so that change outlives its refinement into the
+    next reception's opening and no further. The resident, not `Current`, holds the one carried
+    change and its tick, overwritten at every reception, and the return stops at the opening: the
+    covector reaching the carried change is a reading, deposited nowhere
+    ([record](../research/records/2026-10-03_THE_RECEPTION_CARRIES_THE_INTERIOR_CHANGE_THE_SOURCE_PORT_IMPOSES_THE_MOMENT_AND_REST_IS_COMPLETE_ABSORPTION.md)).
 17. **No catered machinery** ([antipattern record](../research/records/2026-09-29_ANTIPATTERN_CATERED_MACHINERY_A_TASKS_SOLUTION_ROUTINE_NEVER_STANDS_IN_FOR_LEARNING.md)). No receiver, family, stage or
     port computes a task's answer by an authored routine or recognizes its inputs by a grammar
     fitted to a test's layouts. A terrain generates its truth; the machine locates it. The
