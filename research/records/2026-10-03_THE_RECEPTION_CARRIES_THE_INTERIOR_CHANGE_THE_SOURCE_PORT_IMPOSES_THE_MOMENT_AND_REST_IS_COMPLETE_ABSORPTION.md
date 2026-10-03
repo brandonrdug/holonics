@@ -455,12 +455,49 @@ determines. The rest of the reference resident (its open moments and the aeon in
 saved object of this path; it is restored only where the executed path's continuing state already
 restores it.
 
-Still owed: the device word with host-card parity (the card's port tests read the reference at its
-default, rest, so they are unchanged), and the chained balance's Lean statement (#62). The
-within-refinement continuation (`ContactCut::continue_deposited`) now holds the momentum across its
-contact deposit as well (the deposit record §5 item 2). Its law is redone at held momentum in the
+Still owed: the chained balance's Lean statement (#62). The device word is built with host-card
+parity (§7). The within-refinement continuation (`ContactCut::continue_deposited`) now holds the
+momentum across its contact deposit as well (the deposit record §5 item 2). Its law is redone at
+held momentum in the
 [storage-resolution record](2026-10-02_A_STORAGE_DEPOSIT_IS_FELT_ONLY_THROUGH_THE_RATE_S_JUMP_AND_THE_WORD_HOLDS_IT_BELOW_ONE_UNIT.md)
 §9; its Lean is `HNN/StorageResolution` §5 (#290). Guard 16 of
 [THE_MACHINE](../../docs/THE_MACHINE.md) reads that no change outlives its word or its refinement;
 under `A = 0` the end change outlives its refinement into the next reception's opening, as this
 record derives. The guard is amended to say so, with rest as the default that keeps it as stated.
+
+## 7. The device word (October 3)
+
+[implemented-exact; agent-inferred where marked] The card's word opens on the carry exactly as the
+host word does (`holonics-cuda`: `hnn::carry`, `hnn::port`, `hnn::execute`, `kernels/hnn_word.cuh`).
+- **The carried change stays on the card.** The consumed word's storage, arrivals and states are
+  copied into a buffer of their own on the card (`ResidentWord::end_words`); the next word copies them
+  into its own change before its open. The host keeps the reference's carry as a mirror read from the
+  consumed word's record (`CardCarry::ended`: the end change, the elapsed ticks, the cut's
+  conductances and the momenta `C_a w_a`), which the chained balance, the state's bits and a saved
+  continuing state read. `Resident::mount_carried` uploads a restored carry.
+- **The crossing runs in the card's open** (§2.3a, the deposit record §3). Each carried wave is
+  transmitted, `a′ = 2G/(G + G′)·a`, from the plan's reduced gain; each rate is held,
+  `w′ = w + δ`, where `δ` is read from the host owner `ReceptionCarry::crossed` against the
+  publication's storage forms (agent-inferred: the card's words carry no exact preimage solve).
+  Both leave the dyadics, so the card splits them onto `L_w` over their denominators
+  (`hnn_split_over`: `s = q·D·2^k + r`, ties upward, the host's `Lattice::div_rem` at `s/(D·2^k)`)
+  and carries each remainder over its denominator through every later split of the word. At rest
+  every denominator is one and the word's path is unchanged.
+- [agent-inferred] **The card refuses a declared resonator on a received opening**: under `A = 0`
+  as the host does; under `A = I` because the card's pump phase reads the word's own ticks from
+  zero, not the field's elapsed ticks. That phase offset on the card is owed (#76).
+
+**The parity read** (`crates/holonics-cuda/src/hnn/port_tests.rs`, alone on the card): on the
+chain with no pair offset (the host's carry fixture, 18 cells, 9 windows, the campaign-one
+declarations), every return of the lockstep is the reference's and the carried end is
+byte-identical as saved text after every compare:
+- under `A = 0`, all 8 receptions open on a carry; on this cut the lift moves a carried wave's
+  conductance at 4 of them and a deposit moves a carried rate off its momentum at 2, so both
+  crossings and their denominators run; the card's whole exposure equals the reference's, its
+  chained balance closing at all 8 with a nonzero opening split; a carry saved as text and restored
+  on both ports opens the next word alike;
+- under `A = I`, all 8 receptions, every return the reference's;
+- under `A = 0` from the generic constitutions 5 and 11 on the chain with `Δ = {1}`, 11 receptions
+  each, every return the reference's;
+- at rest, the existing locksteps unchanged. Zeroing either opening remainder on the card fails the
+  first test at its first refine on a crossed carry.
