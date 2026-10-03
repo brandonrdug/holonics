@@ -376,7 +376,8 @@ mass carry its own momentum away?
    along one direction and raises it along another.
 2. **The momentum hold does not rest on mass arriving at rest.** The
    [deposit record](2026-10-03_THE_DEPOSIT_HOLDS_THE_CARRIED_MOMENTUM_AND_THE_ACCRETED_MASS_IS_THE_THROWS_DAMPING.md)
-   item 3 derives the hold from the transit's canonical state. `u̇ = ∂P/∂π` and `π̇ = −∂P/∂u` stay
+   Answer 3 derives the hold from the transit's canonical state (its Lean is
+   `HNN/DepositHold`, the record's §6 item 1, #297). `u̇ = ∂P/∂π` and `π̇ = −∂P/∂u` stay
    bounded across a jump of `C`, so `(u, π)` is continuous for either sign of `ΔC`. The sticking
    mass (`accretion_loss`) is the scalar case that record illustrates, not its premise.
 3. **No mass leaves at the carrier's speed, because no mass is carried.** The ejection law, in which

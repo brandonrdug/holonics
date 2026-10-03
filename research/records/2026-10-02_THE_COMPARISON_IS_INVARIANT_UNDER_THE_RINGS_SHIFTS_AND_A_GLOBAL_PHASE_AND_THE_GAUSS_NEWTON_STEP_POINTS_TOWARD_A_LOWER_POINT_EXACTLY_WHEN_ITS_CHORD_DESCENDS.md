@@ -191,13 +191,16 @@ checked at its endpoint against its start: a leap with a tolerance, as Brandon r
 
 **(2) Its second-order motion.** The kinetic solve already holds a mass. A move's kinetic energy is
 `½⟨Mv, v⟩`, with `M = I ⊗ H′` the squared storage change the move causes on the passage's data:
-inertia of storage. The Fisher pullback `K = AᵀFA` is the comparison's curvature, a stiffness and
-not a mass, which agrees with Astra's point. The modes of `E`'s motion are the constitution's
-`Kv = ω²Mv`. The leap is the static limit: it jumps to the quadratic model's equilibrium. A throw
-is `M Ë + D Ė + ∇L = 0`. Its velocity is a carried moment of the returns,
-`v_(k+1) = β v_k − η M⁻¹Aᵀμ_k`, of the same kind as the source's phase-carried moments, so it needs
-no tape. [agent-inferred] On a quadratic model the damping that converges fastest is
-`β = ((√κ − 1)/(√κ + 1))²` with `κ = ω²_max/ω²_min`. The kinetic solve's own iterates read these
+inertia of storage. [Corrected October 3, #297: exactly, `H′ − H₀` is that inertia. The prior's
+reading `½⟨ΔE H₀, ΔE⟩` is no storage the move imposes on the data
+(`HNN/DepositHold.{kinetic_gram, kinetic_ne_imposed}`; the deposit record, Answer 7).] The Fisher
+pullback `K = AᵀFA` is the comparison's curvature, a stiffness and not a mass, which agrees with
+Astra's point. The modes of `E`'s motion are the constitution's `Kv = ω²Mv`. The leap is the static
+limit: it jumps to the quadratic model's equilibrium. A throw is `M Ë + D Ė + ∇L = 0`. Its velocity
+is a carried moment of the returns, `v_(k+1) = β v_k − η M⁻¹Aᵀμ_k`, of the same kind as the
+source's phase-carried moments, so it needs no tape. [agent-inferred] On a quadratic model the
+damping that converges fastest is `β = ((√κ − 1)/(√κ + 1))²` with `κ = ω²_max/ω²_min`. The kinetic
+solve's own iterates read these
 frequencies, so the damping is a reading, not a chosen constant (owed, #62). This agrees with #199.
 The force is always `Aᵀμ` read through `M⁻¹`, so a throw makes no hidden direction native. It
 changes where along the visible directions the state travels in time, not the span at a state.
@@ -276,8 +279,8 @@ below `37/4096`. Read at its grain, any `cos²` below `38/4096` still needs `κ 
 fit's path follows the gradient (`+1693`), so they carry it.
 
 **(b) The leap, the overdamped flow and the throw.** The mass is the storage's inertia
-`M = I ⊗ H′`, and the stiffness is the Fisher pullback `K = AᵀFA` (§5). For the motion
-`M Ë + D Ė + ∇L = 0`:
+`M = I ⊗ H′` (the prior's part aside, §5(2)), and the stiffness is the Fisher pullback
+`K = AᵀFA` (§5). For the motion `M Ë + D Ė + ∇L = 0`:
 - **The kinetic step is the static leap.** It jumps to the quadratic model's equilibrium `Kx = −g`,
   where `M` only settles the directions `K` does not read. It is independent of the damping, and
   each mode `i` moves `g_i/ω_i²`, without bound as the mode softens.
