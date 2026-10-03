@@ -147,8 +147,10 @@ driver, the same acceptance and ρ held; only the carried momentum differs.
 When an arm ends short of another, the call adds the other arm's state at that move as an extra
 label. Each arm's own end state is read as well, but it is paired only at equal move counts.
 
-Pairs follow the paired rule: per held-out station, `b` (right in A only), `c` (right in B only), and
-the exact one-sided sign tail on `b` of `b + c` at `1/2`, released only at a tail of at most `1/64`.
+Pairs follow the paired rule: per held-out request, `d` = stations right in A minus in B; `b` counts
+`d > 0`, `c` counts `d < 0`, ties dropped; the exact one-sided sign tail on `b` of `b + c` at `1/2`,
+released only at a tail of at most `1/64` (`paired.py`'s default; a request's eight stations are not
+independent; corrected October 3).
 The labels below are the six end states. Pairing labels added for equal move counts extend the call
 and its deadline (three times the largest per-state read, per state).
 ```
