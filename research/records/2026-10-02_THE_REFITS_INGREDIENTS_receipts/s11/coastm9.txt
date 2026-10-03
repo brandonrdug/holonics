@@ -1,0 +1,3 @@
+  coastm9 (transport modulus 102837/131072): released 128, held 0, refused 0, refused certificates 0; whole sections 0 of 128 (nonconstant 0 of 128, constant 0 of 0); the success rule (every nonconstant section whole): does not hold; incorrect releases 128; reaching the termination 0; stations right 261 by station [25, 26, 31, 33, 40, 33, 33, 40]; first lock at a request-reading station (0 or 1) 27, first lock right 33; 519150 ms
+executed evaluate: 519205 ms; resident 85889024 now, 85889024 peak
+exit 0 wall 519226 ms

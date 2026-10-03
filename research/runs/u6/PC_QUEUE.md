@@ -79,6 +79,10 @@ training lines whole.
 
 ## P5. The joint held-out read of the arms' end states, paired by move count
 
+**Done** (October 3, `claude/pc-receipts` `5fb7e96b`; the refits record §11). No declared pair is
+released: whole-move m2 against at-rest m2 has `b = 172`, `c = 191`; the strict-descent control
+against at-rest m6 ties at `b = c = 92`. The text below is the plan as launched.
+
 Each chain stores every move's state. When a chain ends, at m16 or earlier, the main line names its
 end state here. A chain ends in one of three ways: at m16; under its own law, where every trial is
 refused; or incomplete, past a per-kind bound. The PC reads the end states in one call at 16 threads.
