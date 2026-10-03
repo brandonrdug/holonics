@@ -1301,15 +1301,19 @@ pub struct ChainedBalance {
     pub open: Rat,
     /// The next word's balance at its opening ([`WordBalance::open`]), after its opening split.
     pub next_open: Rat,
-    /// The opening's split at the transients' lattice, `open − next_open`: the crossed change's
-    /// power less its representative's, an executed residual read exactly (zero on the exact word).
+    /// The opening's split at the transients' lattice, the field's and the carried resonators',
+    /// `(open + resonator_open) − (next_open + next_resonator_open)`: the crossed change's power
+    /// less its representative's, an executed residual read exactly (zero on the exact word).
     pub split: Rat,
     /// The next word's certified loss `L`.
     pub loss: Rat,
     /// The next word's port terms: contrast, pump and interconnection.
     pub ported: Rat,
-    /// The next word's resonator storage at its opening and its end.
+    /// The carried resonators' storage at the opening under the next opening's form, before its
+    /// split (record B §2.4: a rate held at momentum is split at the opening as a contact's is).
     pub resonator_open: Rat,
+    /// The next word's resonator storage at its opening, after its split, and at its end.
+    pub next_resonator_open: Rat,
     pub resonator_end: Rat,
     /// The next word's end power, its executed residual and that residual's certified bound.
     pub end: Rat,
@@ -1353,12 +1357,15 @@ impl ChainedBalance {
             ingest: form.power(&crossed)? - committed,
             reflected: carry.reflected(&form.step, &form.conductances),
             imposed,
-            split: form.power(opening)? - &next.open,
+            split: form.power(opening)? + form.resonator_power(&crossed)?
+                - &next.open
+                - &next.resonator_open,
             open: form.power(opening)?,
             next_open: next.open.clone(),
             loss: &next.dissipation - &next.resist + &next.resonator_dissipation,
             ported: &next.contrast + &next.pump + &next.interconnection,
-            resonator_open: next.resonator_open.clone(),
+            resonator_open: form.resonator_power(&crossed)?,
+            next_resonator_open: next.resonator_open.clone(),
             resonator_end: next.resonator_end.clone(),
             end: next.end.clone(),
             residual: next.residual(),
@@ -1377,13 +1384,15 @@ impl ChainedBalance {
         self.work() + &self.imposed + &self.ported
     }
 
-    /// **It closes**: the opening, the next word's resonator storage included, is
+    /// **It closes**: the opening, the carried resonators' storage included, is
     /// `interior + resonator_interior + deposition + ingest + imposed` exactly, and it is the
-    /// opening the next word's balance starts from, but for the opening's split.
+    /// opening the next word's balance starts from, its resonators' included, but for the opening's
+    /// split.
     pub fn closes(&self) -> bool {
         &self.open + &self.resonator_open
             == &self.interior + &self.resonator_interior + self.work() + &self.imposed
-            && &self.open - &self.split == self.next_open
+            && &self.open + &self.resonator_open - &self.split
+                == &self.next_open + &self.next_resonator_open
     }
 
     /// **The lift only emits** (record B §2.3a): the ingest is exactly minus the reflected power,
@@ -1812,6 +1821,10 @@ impl<'c> Word<'c> {
                 opened
             })
             .collect();
+        // [definition; agent-inferred, record B §2.4] A carried resonator state is split once at
+        // the transients' lattice, as the contacts' states are: a rate held at momentum across a
+        // moved capacity need not lie on it, and its remainder opens the state's error feedback
+        // (`ResonatorRemainders::state`). A state on the lattice splits to itself.
         let resonators = operands
             .resonators()
             .iter()
@@ -1819,14 +1832,26 @@ impl<'c> Word<'c> {
             .map(|(resonator, state)| -> Result<Option<Resonance>, HnnError> {
                 let Some(resonator) = resonator else { return Ok(None) };
                 let n = resonator.width();
-                let state = state.unwrap_or_else(|| [zeros(n), zeros(n)]);
+                let (state, remainders) = match state {
+                    Some(state) => {
+                        let ([u, w], [u_rest, w_rest]) = split_pair(state);
+                        (
+                            [u, w],
+                            ResonatorRemainders {
+                                rate: zeros(n),
+                                state: [u_rest, w_rest],
+                            },
+                        )
+                    }
+                    None => ([zeros(n), zeros(n)], ResonatorRemainders::default()),
+                };
                 let open = resonator.energy_at(
                     resonator.phase_at(opened_at.saturating_sub(1)), &state[0], &state[1],
                 )?;
                 Ok(Some(Resonance {
                     open,
                     state,
-                    remainders: ResonatorRemainders::default(),
+                    remainders,
                     steps: Vec::new(),
                 }))
             })

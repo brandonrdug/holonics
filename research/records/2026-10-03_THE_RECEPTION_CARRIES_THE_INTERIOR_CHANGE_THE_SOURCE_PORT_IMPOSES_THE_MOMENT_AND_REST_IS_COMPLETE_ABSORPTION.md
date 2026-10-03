@@ -646,46 +646,42 @@ host word does (`holonics-cuda`: `hnn::carry`, `hnn::port`, `hnn::execute`, `ker
   (`hnn_split_over`: `s = q·D·2^k + r`, ties upward, the host's `Lattice::div_rem` at `s/(D·2^k)`)
   and carries each remainder over its denominator through every later split of the word. At rest
   every denominator is one and the word's path is unchanged.
-- [agent-inferred] **The card refuses a declared resonator on a received opening**: under `A = 0`
-  as the host first did; under `A = I` because the card's pump phase reads the word's own ticks from
-  zero, not the field's elapsed ticks. That phase offset on the card is owed (#76).
+- **The carry is the last crossing, and the pump continues** (§2.4). `CardCarry::ended` reads the
+  change at the start of the word's last junction step from its record (`readout::crossing`) with
+  every resonator state as hop `T − 1` left it, at tick `opened_at + steps − 1`, and
+  `ResidentWord::end_words` copies the same words on the card (the record's storage, arrivals and
+  states at that step, and the resonator states). The plan uploads the opening's tick
+  (`WP_OPENED`), and the kernels' pump phase, the forward's and the return's, is
+  `(opened_at + step) mod order`, the host's `phase_at`; the readout measures each resonator's
+  open, pump and end at the same phases. Both refusals of a received resonator are gone.
+- **A carried resonator's rate is held and split** (§2.4). Its jump `δ_r` (`C′_r w′_r = C_r w_r`)
+  is read from `ReceptionCarry::crossed` against the publication's capacities, added in the card's
+  open and split onto `L_w` over its denominator; the velocity's split carries that remainder over
+  the same denominator through the word. [agent-inferred] The host opening split a carried
+  resonator state not at all, so a held rate off the dyadics would have entered its step unsplit;
+  `Word::on_change` now splits it once at the transients' lattice as it splits a contact's state,
+  its remainder opening `ResonatorRemainders::state`, and `ChainedBalance` reads the carried
+  resonators' storage before that split (`resonator_open`) and after it (`next_resonator_open`),
+  the difference joining the opening's split. On the lattice nothing changes.
+- **The receipt reads the crossing.** Under `A = 0` the card's refine receipt is
+  `WordBalance::carried`, as the reference's.
 
-The parity read below was made on the carry first built, which carried the change after the last
-junction at `opened_at + e`. The host law is now §2.4, and the card's word must change with it
-before the read is repeated; until then the card's received openings differ from the host's in the
-carried change and its tick, under both absorptions.
-
-[owed, #76] **What the card's word must change** (each against the host owner named):
-1. **The carry is the last crossing.** `CardCarry::ended` reads the change the word's record holds
-   before its last junction (the host's last `Passage`: storage, arrivals and resonator states), not
-   `readout::end`'s change after it, at tick `opened_at + plan.steps − 1`; `ResidentWord::end_words`
-   copies the same words (`Word::reception_end`). Where the record does not already hold the last
-   crossing's arriving words, the kernel keeps them before it scatters that junction.
-2. **The pump phase reads the field's tick.** In `kernels/hnn_word.cuh` (the four
-   `step % res[RZ_PHASES]` reads) the phase is `(opened_at + step) mod order`, the host's
-   `phase_at(t)`, with `opened_at` uploaded beside the plan; at rest `opened_at = 0` and the path is
-   unchanged.
-3. **The resonators carry.** Both refusals in `CardCarry`'s opening go. The carried resonator states
-   ride in the change; each rate is held at momentum, `π_r = C_r w_r` read from
-   `ReceptionCarry::crossed` (`held_resonator_rate`), and split onto `L_w` with its remainder, as the
-   contacts' held rates already are; the mirror keeps `resonator_momenta`.
-4. **The receipt reads the crossing.** Under `A = 0` the card's refine receipt reads
-   `WordBalance::carried`, as `Reference` does, so the exposure's chained read is the host's.
-
-The read to repeat is the parity read below with a pumped constitution added
-(`tests/reference.rs`, `the_chained_balance_closes_on_a_pumped_field`, is the host's).
-
-**The parity read** (`crates/holonics-cuda/src/hnn/port_tests.rs`, alone on the card): on the
+**The parity read** (`crates/holonics-cuda/src/hnn/port_tests.rs`, alone on the card), on the
 chain with no pair offset (the host's carry fixture, 18 cells, 9 windows, the campaign-one
-declarations), every return of the lockstep is the reference's and the carried end is
-byte-identical as saved text after every compare:
-- under `A = 0`, all 8 receptions open on a carry; on this cut the lift moves a carried wave's
-  conductance at 4 of them and a deposit moves a carried rate off its momentum at 2, so both
-  crossings and their denominators run; the card's whole exposure equals the reference's, its
-  chained balance closing at all 8 with a nonzero opening split; a carry saved as text and restored
-  on both ports opens the next word alike;
-- under `A = I`, all 8 receptions, every return the reference's;
-- under `A = 0` from the generic constitutions 5 and 11 on the chain with `Δ = {1}`, 11 receptions
-  each, every return the reference's;
-- at rest, the existing locksteps unchanged. Zeroing either opening remainder on the card fails the
-  first test at its first refine on a crossed carry.
+declarations): every return of the lockstep is the reference's and the carried end is
+byte-identical as saved text after every compare.
+- `A = 0`: all 8 receptions; a carried wave crosses a moved conductance at 4 and a deposit moves a
+  carried rate off its momentum at 3. The card's whole exposure equals the reference's, its chained
+  balance closing at all 8 with a nonzero opening split, and a carry saved as text and restored on
+  both ports opens the next word alike.
+- `A = 0` with a pumped resonator on every ring (the dyadic carrier `(1, 0)`, half step, the
+  card's words carrying only dyadic material): all 8 receptions carry the resonator states, and the
+  card's exposure from the pumped constitution equals the reference's, its chained balance closing
+  and dissipative at all 8. No deposit on this cut moves a resonator's gains, so the resonator's
+  held jump is zero at every reception: that path is exercised by the host's law, not yet by a card
+  read.
+- `A = I`: all 8 receptions, without and with the pumped resonators.
+- `A = 0` from the generic constitutions 5 and 11 on the chain with `Δ = {1}`: 11 receptions each.
+- At rest the existing locksteps, the loaded resonators' included, are unchanged.
+- Reading the pump phase from the word's own ticks (`opened_at` dropped in the kernel) fails the
+  pumped test at its first refine on a carry; zeroing either opening remainder fails the first test.
