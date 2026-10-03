@@ -58,6 +58,18 @@ located     a = Σ_t ⟨g_t, W_t z_t⟩ ,  V = ln 2 Σ_t Var_p(W_t z_t)     ⇒ 
    `λ/(s + λ)` for `0 ≤ g ≤ λ`. On campaign 1 (`λ_max(F) < 8599330/2^24`) at `s = 2` the loss is
    below `8599330/42153762`, below a quarter. This bounds the exact solve's part of the reading;
    the certified step `η` and the lattice's rounding are not in it.
+7. **The lift to every direction** (`rayleigh_eigen_le`, `rayleigh_eigen_lt`, `eigen_nonneg`,
+   `image_sq_le`, `departure_sq_le`, `departure_form_le`, `departure_pair_sq_le`,
+   `campaign_one_lift`). A Gram below `F ⪯ λ I` has its eigenvalues at most `λ` (the Rayleigh
+   step). With no eigenbasis: for symmetric `0 ⪯ G ⪯ λ I` and `y = (s I + G)⁻¹ x`, the departure
+   `d = s⁻¹ x − y = s⁻¹ G y` has `|d|² ≤ (λ/(s + λ))² |s⁻¹ x|²` and
+   `0 ≤ ⟨x, d⟩ ≤ (λ/(s + λ)) ⟨x, s⁻¹ x⟩`, from `|G y|² ≤ λ ⟨y, G y⟩ ≤ λ² |y|²`. A pair read
+   `⟨(s I + G)⁻¹ u, z⟩` departs from `⟨s⁻¹ u, z⟩` by at most `(λ/(s + λ)) |s⁻¹ u| |z|`.
+8. **The second order along the executed map** (`departure_class_le`, `faceVariance_sub_le`,
+   `prequential_code_departure_le`). The executed move is `φ M_t − E_t`, its departure a sum of
+   pair departures; with `|E_t c| ≤ r_t` the prequential code is at most the face's less `φ a`,
+   plus `φ² (ln 2) 2^ω Σ_t Var_(p_t)(M_t)`, plus `(ln 2) 2^ω Σ_t r_t² + 2 Σ_t r_t`. It holds at
+   the exact solve and `η = 1`; the certified step and the chart's lattice residual stay in #62.
 -/
 
 namespace Holonics.HNN.ReceivingPrior
@@ -385,5 +397,330 @@ theorem campaign_one_departure (g : ℚ) (hg : 0 ≤ g) (hgl : g < 8599330 / 2 ^
   nlinarith
 
 end Departure
+
+section Lift
+
+/-! The lift from eigen-directions to every direction, without an eigenbasis. Item 6 bounds the
+departure along a direction where the readings' Gram is `g`. Here `G` is any symmetric Gram with
+`0 ⪯ G ⪯ λ I` as quadratic forms. Writing `y = (s I + G)⁻¹ x`, the read is `x = s y + G y`, so the
+departure of the `1/s` reading is `d = s⁻¹ x − y = s⁻¹ G y`. With `a = ⟨y, G y⟩`, `b = |G y|²`,
+`c = |y|²`, the Gram gives `a ≤ λ c` and `b ≤ λ a` (`image_sq_le`), which is all the lift needs. -/
+
+omit [DecidableEq n] in
+theorem dot_self_nonneg (v : n → L) : 0 ≤ v ⬝ᵥ v :=
+  sum_nonneg fun i _ => mul_self_nonneg (v i)
+
+omit [DecidableEq n] in
+theorem dot_self_pos (v : n → L) (hv : v ≠ 0) : 0 < v ⬝ᵥ v :=
+  lt_of_le_of_ne (dot_self_nonneg v) (fun h => hv (dotProduct_self_eq_zero.mp h.symm))
+
+omit [DecidableEq n] in
+/-- [proved-standard; formal-checked] **Cauchy–Schwarz for the pairing**: `⟨u, v⟩² ≤ |u|² |v|²`. -/
+theorem dot_sq_le (u v : n → L) : (u ⬝ᵥ v) ^ 2 ≤ (u ⬝ᵥ u) * (v ⬝ᵥ v) := by
+  have := Finset.sum_mul_sq_le_sq_mul_sq Finset.univ u v
+  simpa only [dotProduct, pow_two] using this
+
+omit [DecidableEq n] [LinearOrder L] [IsStrictOrderedRing L] in
+/-- A symmetric Gram moves across the pairing: `⟨u, G w⟩ = ⟨G u, w⟩`. -/
+theorem sym_dot (G : Matrix n n L) (hGt : Gᵀ = G) (u w : n → L) :
+    u ⬝ᵥ (G *ᵥ w) = (G *ᵥ u) ⬝ᵥ w := by
+  rw [dotProduct_mulVec, ← vecMul_transpose, hGt]
+
+omit [DecidableEq n] in
+/-- [proved-derived; formal-checked] **The Rayleigh step.** If the Gram `G` is below `F` and `F`
+below `λ I` as quadratic forms, every eigenvalue of `G` is at most `λ`. This is what item 6's
+eigenvalue bound stands on. -/
+theorem rayleigh_eigen_le (G F : Matrix n n L) (lam g : L) (v : n → L) (hv0 : v ≠ 0)
+    (hGF : ∀ x, x ⬝ᵥ (G *ᵥ x) ≤ x ⬝ᵥ (F *ᵥ x))
+    (hF : ∀ x, x ⬝ᵥ (F *ᵥ x) ≤ lam * (x ⬝ᵥ x)) (hv : G *ᵥ v = g • v) : g ≤ lam := by
+  have hp := dot_self_pos v hv0
+  have h := (hGF v).trans (hF v)
+  rw [hv, dotProduct_smul, smul_eq_mul] at h
+  exact le_of_mul_le_mul_right h hp
+
+omit [DecidableEq n] in
+/-- [proved-derived; formal-checked] **The strict Rayleigh step.** If `⟨x, F x⟩ < c |x|²` for every
+`x ≠ 0` (what an exact `LDLᵀ` certificate of `c I − F` gives), every eigenvalue of a Gram
+`G ⪯ F` is below `c`: on campaign 1 this is `campaign_one_departure`'s hypothesis `g < 8599330/2^24`. -/
+theorem rayleigh_eigen_lt (G F : Matrix n n L) (c g : L) (v : n → L) (hv0 : v ≠ 0)
+    (hGF : ∀ x, x ⬝ᵥ (G *ᵥ x) ≤ x ⬝ᵥ (F *ᵥ x))
+    (hF : ∀ x, x ≠ 0 → x ⬝ᵥ (F *ᵥ x) < c * (x ⬝ᵥ x)) (hv : G *ᵥ v = g • v) : g < c := by
+  have hp := dot_self_pos v hv0
+  have h := (hGF v).trans_lt (hF v hv0)
+  rw [hv, dotProduct_smul, smul_eq_mul] at h
+  exact lt_of_mul_lt_mul_right h hp.le
+
+omit [DecidableEq n] in
+/-- [proved-derived; formal-checked] A nonnegative Gram's eigenvalues are nonnegative. -/
+theorem eigen_nonneg (G : Matrix n n L) (g : L) (v : n → L) (hv0 : v ≠ 0)
+    (h0 : ∀ x, 0 ≤ x ⬝ᵥ (G *ᵥ x)) (hv : G *ᵥ v = g • v) : 0 ≤ g := by
+  have hp := dot_self_pos v hv0
+  have h := h0 v
+  rw [hv, dotProduct_smul, smul_eq_mul] at h
+  exact nonneg_of_mul_nonneg_left h hp
+
+omit [DecidableEq n] in
+/-- [proved-derived; formal-checked] **The image of a bounded Gram.** For symmetric `G` with
+`0 ⪯ G ⪯ λ I`, `λ > 0`: `|G y|² ≤ λ ⟨y, G y⟩`. The form at `y − λ⁻¹ G y` is nonnegative, and the
+bound at `G y` closes it. -/
+theorem image_sq_le (G : Matrix n n L) (hGt : Gᵀ = G) (lam : L) (hlam : 0 < lam)
+    (h0 : ∀ x, 0 ≤ x ⬝ᵥ (G *ᵥ x)) (h1 : ∀ x, x ⬝ᵥ (G *ᵥ x) ≤ lam * (x ⬝ᵥ x)) (y : n → L) :
+    (G *ᵥ y) ⬝ᵥ (G *ᵥ y) ≤ lam * (y ⬝ᵥ (G *ᵥ y)) := by
+  set z := G *ᵥ y with hz
+  have hx := h0 (y - lam⁻¹ • z)
+  have he := h1 z
+  have hyz : y ⬝ᵥ (G *ᵥ z) = z ⬝ᵥ z := by rw [sym_dot G hGt]
+  have hzy : z ⬝ᵥ (G *ᵥ y) = z ⬝ᵥ z := rfl
+  simp only [mulVec_sub, mulVec_smul, dotProduct_sub, sub_dotProduct, dotProduct_smul,
+    smul_dotProduct, smul_eq_mul, hyz, hzy] at hx
+  have hl : lam⁻¹ * lam = 1 := inv_mul_cancel₀ hlam.ne'
+  have hli : 0 < lam⁻¹ := inv_pos.mpr hlam
+  have key : lam⁻¹ * (lam⁻¹ * (z ⬝ᵥ (G *ᵥ z))) ≤ lam⁻¹ * (z ⬝ᵥ z) := by
+    have := mul_le_mul_of_nonneg_left he (mul_nonneg hli.le hli.le)
+    calc lam⁻¹ * (lam⁻¹ * (z ⬝ᵥ (G *ᵥ z))) = lam⁻¹ * lam⁻¹ * (z ⬝ᵥ (G *ᵥ z)) := by ring
+      _ ≤ lam⁻¹ * lam⁻¹ * (lam * (z ⬝ᵥ z)) := this
+      _ = lam⁻¹ * (z ⬝ᵥ z) := by rw [← mul_assoc, mul_assoc lam⁻¹ lam⁻¹ lam, hl, mul_one]
+  have hb : lam⁻¹ * (z ⬝ᵥ z) ≤ y ⬝ᵥ (G *ᵥ y) := by linarith
+  have := mul_le_mul_of_nonneg_left hb hlam.le
+  rwa [← mul_assoc, mul_inv_cancel₀ hlam.ne', one_mul] at this
+
+omit [DecidableEq n] [LinearOrder L] [IsStrictOrderedRing L] in
+/-- The read's energy: `|s y + G y|² = s² |y|² + 2 s ⟨y, G y⟩ + |G y|²`. -/
+theorem read_energy (G : Matrix n n L) (s : L) (y : n → L) :
+    (s • y + G *ᵥ y) ⬝ᵥ (s • y + G *ᵥ y) =
+      s ^ 2 * (y ⬝ᵥ y) + 2 * s * (y ⬝ᵥ (G *ᵥ y)) + (G *ᵥ y) ⬝ᵥ (G *ᵥ y) := by
+  have hc : (G *ᵥ y) ⬝ᵥ y = y ⬝ᵥ (G *ᵥ y) := dotProduct_comm _ _
+  simp only [add_dotProduct, dotProduct_add, smul_dotProduct, dotProduct_smul, smul_eq_mul, hc]
+  ring
+
+omit [LinearOrder L] [IsStrictOrderedRing L] in
+/-- The read through the resolvent: with `y = (s I + G)⁻¹ x`, `x = s y + G y`. -/
+theorem resolvent_read (s : L) (G : Matrix n n L) (hH : IsUnit (s • (1 : Matrix n n L) + G).det)
+    (x : n → L) :
+    x = s • ((s • (1 : Matrix n n L) + G)⁻¹ *ᵥ x) + G *ᵥ ((s • (1 : Matrix n n L) + G)⁻¹ *ᵥ x) := by
+  have h : (s • (1 : Matrix n n L) + G) *ᵥ ((s • (1 : Matrix n n L) + G)⁻¹ *ᵥ x) = x := by
+    rw [Matrix.mulVec_mulVec, Matrix.mul_nonsing_inv _ hH, Matrix.one_mulVec]
+  rw [Matrix.add_mulVec, Matrix.smul_mulVec, Matrix.one_mulVec] at h
+  exact h.symm
+
+/-- [proved-derived; formal-checked] **The departure in every direction.** For symmetric `G` with
+`0 ⪯ G ⪯ λ I`, `0 < s`, `0 < λ` and `s I + G` invertible, the `1/s` reading's departure
+`d = s⁻¹ x − (s I + G)⁻¹ x` satisfies `|d|² ≤ (λ/(s + λ))² |s⁻¹ x|²` for every `x`. This is
+`departure_le` lifted from eigen-directions to the whole space, with no eigenbasis. -/
+theorem departure_sq_le (s lam : L) (hs : 0 < s) (hlam : 0 < lam) (G : Matrix n n L)
+    (hGt : Gᵀ = G) (h0 : ∀ x, 0 ≤ x ⬝ᵥ (G *ᵥ x)) (h1 : ∀ x, x ⬝ᵥ (G *ᵥ x) ≤ lam * (x ⬝ᵥ x))
+    (hH : IsUnit (s • (1 : Matrix n n L) + G).det) (x : n → L) :
+    (s⁻¹ • x - (s • (1 : Matrix n n L) + G)⁻¹ *ᵥ x) ⬝ᵥ (s⁻¹ • x - (s • (1 : Matrix n n L) + G)⁻¹ *ᵥ x)
+      ≤ (lam / (s + lam)) ^ 2 * ((s⁻¹ • x) ⬝ᵥ (s⁻¹ • x)) := by
+  have hx := resolvent_read s G hH x
+  obtain ⟨y, hy⟩ : ∃ y, y = (s • (1 : Matrix n n L) + G)⁻¹ *ᵥ x := ⟨_, rfl⟩
+  rw [← hy] at hx ⊢
+  have hd : s⁻¹ • x - y = s⁻¹ • (G *ᵥ y) := by
+    rw [hx, smul_add, smul_smul, inv_mul_cancel₀ hs.ne', one_smul]; abel
+  rw [hd, hx]
+  simp only [smul_dotProduct, dotProduct_smul, smul_eq_mul]
+  rw [read_energy G s y]
+  have ha0 := h0 y
+  have hac := h1 y
+  have hba := image_sq_le G hGt lam hlam h0 h1 y
+  set a := y ⬝ᵥ (G *ᵥ y)
+  set b := (G *ᵥ y) ⬝ᵥ (G *ᵥ y)
+  set c := y ⬝ᵥ y
+  have hspl : 0 < s + lam := by linarith
+  have core : (s + lam) ^ 2 * b ≤ lam ^ 2 * (s ^ 2 * c + 2 * s * a + b) := by
+    nlinarith [mul_nonneg (sq_nonneg s) (sub_nonneg.mpr hba),
+      mul_nonneg (mul_nonneg (sq_nonneg s) hlam.le) (sub_nonneg.mpr hac),
+      mul_nonneg (mul_nonneg hs.le hlam.le) (sub_nonneg.mpr hba)]
+  rw [div_pow, div_mul_eq_mul_div, le_div_iff₀ (by positivity)]
+  have hsi := sq_nonneg s⁻¹
+  have := mul_le_mul_of_nonneg_left core hsi
+  calc s⁻¹ * (s⁻¹ * b) * (s + lam) ^ 2 = s⁻¹ ^ 2 * ((s + lam) ^ 2 * b) := by ring
+    _ ≤ s⁻¹ ^ 2 * (lam ^ 2 * (s ^ 2 * c + 2 * s * a + b)) := this
+    _ = lam ^ 2 * (s⁻¹ * (s⁻¹ * (s ^ 2 * c + 2 * s * a + b))) := by ring
+
+/-- [proved-derived; formal-checked] **The departure along the read itself.** Under the hypotheses
+of `departure_sq_le`, `0 ≤ ⟨x, d⟩ ≤ (λ/(s + λ)) ⟨x, s⁻¹ x⟩`: the `1/s` reading overstates the
+map's form at every read, by at most the fraction `λ/(s + λ)`. -/
+theorem departure_form_le (s lam : L) (hs : 0 < s) (hlam : 0 < lam) (G : Matrix n n L)
+    (hGt : Gᵀ = G) (h0 : ∀ x, 0 ≤ x ⬝ᵥ (G *ᵥ x)) (h1 : ∀ x, x ⬝ᵥ (G *ᵥ x) ≤ lam * (x ⬝ᵥ x))
+    (hH : IsUnit (s • (1 : Matrix n n L) + G).det) (x : n → L) :
+    0 ≤ x ⬝ᵥ (s⁻¹ • x - (s • (1 : Matrix n n L) + G)⁻¹ *ᵥ x) ∧
+      x ⬝ᵥ (s⁻¹ • x - (s • (1 : Matrix n n L) + G)⁻¹ *ᵥ x) ≤ lam / (s + lam) * (x ⬝ᵥ (s⁻¹ • x)) := by
+  have hx := resolvent_read s G hH x
+  obtain ⟨y, hy⟩ : ∃ y, y = (s • (1 : Matrix n n L) + G)⁻¹ *ᵥ x := ⟨_, rfl⟩
+  rw [← hy] at hx ⊢
+  have hd : s⁻¹ • x - y = s⁻¹ • (G *ᵥ y) := by
+    rw [hx, smul_add, smul_smul, inv_mul_cancel₀ hs.ne', one_smul]; abel
+  rw [hd]
+  have hxx : x ⬝ᵥ (s⁻¹ • x) = s⁻¹ * (s ^ 2 * (y ⬝ᵥ y) + 2 * s * (y ⬝ᵥ (G *ᵥ y)) +
+      (G *ᵥ y) ⬝ᵥ (G *ᵥ y)) := by
+    rw [dotProduct_smul, smul_eq_mul, ← read_energy G s y, ← hx]
+  have hxd : x ⬝ᵥ (s⁻¹ • (G *ᵥ y)) = s⁻¹ * (s * (y ⬝ᵥ (G *ᵥ y)) + (G *ᵥ y) ⬝ᵥ (G *ᵥ y)) := by
+    rw [dotProduct_smul, smul_eq_mul, hx, add_dotProduct, smul_dotProduct, smul_eq_mul]
+  rw [hxx, hxd]
+  have ha0 := h0 y
+  have hac := h1 y
+  have hba := image_sq_le G hGt lam hlam h0 h1 y
+  have hb0 := dot_self_nonneg (G *ᵥ y)
+  set a := y ⬝ᵥ (G *ᵥ y)
+  set b := (G *ᵥ y) ⬝ᵥ (G *ᵥ y)
+  set c := y ⬝ᵥ y
+  have hsi : 0 < s⁻¹ := inv_pos.mpr hs
+  have hspl : 0 < s + lam := by linarith
+  refine ⟨mul_nonneg hsi.le (by nlinarith), ?_⟩
+  have core : (s + lam) * (s * a + b) ≤ lam * (s ^ 2 * c + 2 * s * a + b) := by
+    nlinarith [mul_nonneg (sq_nonneg s) (sub_nonneg.mpr hac),
+      mul_nonneg hs.le (sub_nonneg.mpr hba)]
+  rw [div_mul_eq_mul_div, le_div_iff₀ hspl]
+  have := mul_le_mul_of_nonneg_left core hsi.le
+  calc s⁻¹ * (s * a + b) * (s + lam) = s⁻¹ * ((s + lam) * (s * a + b)) := by ring
+    _ ≤ s⁻¹ * (lam * (s ^ 2 * c + 2 * s * a + b)) := this
+    _ = lam * (s⁻¹ * (s ^ 2 * c + 2 * s * a + b)) := by ring
+
+/-- [proved-derived; formal-checked] **The departure of one pair read.** The executed map reads a
+pair of readings `u`, `z` as `⟨(s I + G)⁻¹ u, z⟩` where the `1/s` reading takes `⟨s⁻¹ u, z⟩`. Their
+difference `q = ⟨s⁻¹ u − (s I + G)⁻¹ u, z⟩` satisfies `q² ≤ (λ/(s + λ))² |s⁻¹ u|² |z|²`. -/
+theorem departure_pair_sq_le (s lam : L) (hs : 0 < s) (hlam : 0 < lam) (G : Matrix n n L)
+    (hGt : Gᵀ = G) (h0 : ∀ x, 0 ≤ x ⬝ᵥ (G *ᵥ x)) (h1 : ∀ x, x ⬝ᵥ (G *ᵥ x) ≤ lam * (x ⬝ᵥ x))
+    (hH : IsUnit (s • (1 : Matrix n n L) + G).det) (u z : n → L) :
+    ((s⁻¹ • u - (s • (1 : Matrix n n L) + G)⁻¹ *ᵥ u) ⬝ᵥ z) ^ 2 ≤
+      (lam / (s + lam)) ^ 2 * ((s⁻¹ • u) ⬝ᵥ (s⁻¹ • u)) * (z ⬝ᵥ z) :=
+  (dot_sq_le _ z).trans
+    (mul_le_mul_of_nonneg_right (departure_sq_le s lam hs hlam G hGt h0 h1 hH u)
+      (dot_self_nonneg z))
+
+/-- [proved-derived; formal-checked] **Campaign 1 at `2 I`, in every direction.** With the readings'
+Gram below `λ = 8599330/2^24` (§1 of the record), the `1/2` reading's departure satisfies
+`|d|² ≤ (8599330/42153762)² |x/2|²`. -/
+theorem campaign_one_lift (G : Matrix n n L) (hGt : Gᵀ = G) (h0 : ∀ x, 0 ≤ x ⬝ᵥ (G *ᵥ x))
+    (h1 : ∀ x, x ⬝ᵥ (G *ᵥ x) ≤ 8599330 / 2 ^ 24 * (x ⬝ᵥ x))
+    (hH : IsUnit ((2 : L) • (1 : Matrix n n L) + G).det) (x : n → L) :
+    ((2 : L)⁻¹ • x - ((2 : L) • (1 : Matrix n n L) + G)⁻¹ *ᵥ x) ⬝ᵥ
+        ((2 : L)⁻¹ • x - ((2 : L) • (1 : Matrix n n L) + G)⁻¹ *ᵥ x)
+      ≤ (8599330 / 42153762) ^ 2 * (((2 : L)⁻¹ • x) ⬝ᵥ ((2 : L)⁻¹ • x)) := by
+  have h := departure_sq_le (2 : L) (8599330 / 2 ^ 24) (by norm_num) (by norm_num) G hGt h0 h1 hH x
+  have e : (8599330 / 2 ^ 24 : L) / (2 + 8599330 / 2 ^ 24) = 8599330 / 42153762 := by norm_num
+  rwa [e] at h
+
+end Lift
+
+section SecondOrder
+
+/-! The second order along the executed map. §5 holds the map as `φ M_t`, the `1/s` reading. The
+executed move is `φ M_t − E_t`, where `E_t` collects the pair departures
+(`departure_pair_sq_le`): at reading `t`, class `c`, `E_t c = Σ_u κ g_u c q_(u,t)` with
+`q_(u,t) = ⟨s⁻¹ z_u − X̂ z_u, z_t⟩`. A class bound `|E_t c| ≤ r_t` (`departure_class_le`) enters the
+prequential code as an explicit remainder. -/
+
+open Holonics.HNN.Ratio Holonics.HNN.Ratio.Certificate
+
+/-- [proved-derived; formal-checked] **A class's departure from its pair departures.** If
+`E = Σ_u w_u q_u` with `q_u² ≤ ρ_u²`, `ρ_u ≥ 0`, then `|E| ≤ Σ_u |w_u| ρ_u`. -/
+theorem departure_class_le {U : Type*} (S : Finset U) (w q ρ : U → L)
+    (hq : ∀ u, q u ^ 2 ≤ ρ u ^ 2) (hρ : ∀ u, 0 ≤ ρ u) :
+    |∑ u ∈ S, w u * q u| ≤ ∑ u ∈ S, |w u| * ρ u :=
+  (abs_sum_le_sum_abs _ _).trans (sum_le_sum fun u _ => by
+    rw [abs_mul]
+    exact mul_le_mul_of_nonneg_left (abs_le_of_sq_le_sq (hq u) (hρ u)) (abs_nonneg _))
+
+variable {ι : Type*} [Fintype ι] [Nonempty ι] [DecidableEq ι]
+
+omit [DecidableEq ι] in
+/-- The face `p_c = 2^(f_c)/Σ 2^f` is a simplex point. -/
+theorem bit_face_simplex (f p : ι → ℝ) (hp : ∀ c, p c = (2 : ℝ) ^ f c / ∑ d, (2 : ℝ) ^ f d) :
+    (∀ c, 0 ≤ p c) ∧ ∑ c, p c = 1 := by
+  have hS : 0 < ∑ d, (2 : ℝ) ^ f d :=
+    sum_pos (fun d _ => Real.rpow_pos_of_pos (by norm_num) _) univ_nonempty
+  refine ⟨fun c => ?_, ?_⟩
+  · rw [hp c]; exact div_nonneg (Real.rpow_nonneg (by norm_num) _) hS.le
+  · simp_rw [hp]; rw [← sum_div, div_self hS.ne']
+
+omit [Nonempty ι] [DecidableEq ι] in
+/-- [proved-derived; formal-checked] **The variance of a departed move.** On a simplex point,
+`Var_p(v − e) ≤ 2 Var_p(v) + 2 Σ p e²`. -/
+theorem faceVariance_sub_le (p v e : ι → ℝ) (hp0 : ∀ c, 0 ≤ p c) (hp1 : ∑ c, p c = 1) :
+    faceVariance p (fun c => v c - e c) ≤ 2 * faceVariance p v + 2 * ∑ c, p c * e c ^ 2 := by
+  set μ := ∑ j, p j * v j with hμ
+  have h := faceVariance_add_sq p (fun c => v c - e c) hp1 μ
+  beta_reduce at h
+  have hle : ∑ c, p c * (v c - e c - μ) ^ 2 ≤
+      ∑ c, (2 * (p c * (v c - μ) ^ 2) + 2 * (p c * e c ^ 2)) :=
+    sum_le_sum fun c _ => by nlinarith [mul_nonneg (hp0 c) (sq_nonneg (v c - μ + e c))]
+  rw [sum_add_distrib, ← mul_sum, ← mul_sum] at hle
+  have hv : faceVariance p v = ∑ c, p c * (v c - μ) ^ 2 := rfl
+  nlinarith [sq_nonneg (∑ i, p i * (v i - e i) - μ)]
+
+/-- [proved-derived; formal-checked] **The prequential code along the executed map.** Each reading
+`t` meets the executed move `φ M_t − E_t` on its face `f_t`, its classes differing pairwise by at
+most `ω`, with the departure bounded classwise by `|E_t c| ≤ r_t`. Summed, the code is at most the
+face's code less `φ a` plus `φ² (ln 2) 2^ω Σ_t Var_(p_t)(M_t)`, plus the departure's remainder
+`(ln 2) 2^ω Σ_t r_t² + 2 Σ_t r_t`. At `E = 0` the quadratic is twice `prequential_code_le`'s: the
+cross term between the `1/s` move and its departure is bounded, not dropped. -/
+theorem prequential_code_departure_le {T : Type*} [Fintype T] (f M E p : T → ι → ℝ)
+    (hp : ∀ t c, p t c = (2 : ℝ) ^ f t c / ∑ d, (2 : ℝ) ^ f t d) (target : T → ι) (φ ω : ℝ)
+    (r : T → ℝ) (hosc : ∀ t c d, (φ * M t c - E t c) - (φ * M t d - E t d) ≤ ω)
+    (hE : ∀ t c, |E t c| ≤ r t) :
+    ∑ t, codeLength (fun c => f t c + (φ * M t c - E t c)) (target t) ≤
+      ∑ t, codeLength (f t) (target t)
+        - φ * ∑ t, ∑ c, ((Pi.single (target t) (1 : ℝ) : ι → ℝ) c - p t c) * M t c
+        + φ ^ 2 * (Real.log 2 * (2 : ℝ) ^ ω * ∑ t, faceVariance (p t) (M t))
+        + (Real.log 2 * (2 : ℝ) ^ ω * ∑ t, r t ^ 2 + 2 * ∑ t, r t) := by
+  have hC : 0 ≤ Real.log 2 / 2 * (2 : ℝ) ^ ω := by
+    have := Real.log_pos (by norm_num : (1 : ℝ) < 2)
+    positivity
+  have h : ∀ t, codeLength (fun c => f t c + (φ * M t c - E t c)) (target t) ≤
+      codeLength (f t) (target t)
+        - φ * ∑ c, ((Pi.single (target t) (1 : ℝ) : ι → ℝ) c - p t c) * M t c
+        + φ ^ 2 * (Real.log 2 * (2 : ℝ) ^ ω * faceVariance (p t) (M t))
+        + (Real.log 2 * (2 : ℝ) ^ ω * r t ^ 2 + 2 * r t) := by
+    intro t
+    obtain ⟨hp0, hp1⟩ := bit_face_simplex (f t) (p t) (hp t)
+    have hcode := codeLength_add_le (f t) (fun c => φ * M t c - E t c) (p t) (hp t) (hosc t)
+      (target t)
+    have hlin : ∑ c, (p t c - (Pi.single (target t) (1 : ℝ) : ι → ℝ) c) * (φ * M t c - E t c) =
+        -(φ * ∑ c, ((Pi.single (target t) (1 : ℝ) : ι → ℝ) c - p t c) * M t c)
+          + (∑ c, (Pi.single (target t) (1 : ℝ) : ι → ℝ) c * E t c - ∑ c, p t c * E t c) := by
+      rw [mul_sum, ← sum_neg_distrib, ← sum_sub_distrib, ← sum_add_distrib]
+      exact sum_congr rfl fun c _ => by ring
+    have hδ : ∑ c, (Pi.single (target t) (1 : ℝ) : ι → ℝ) c * E t c = E t (target t) := by
+      simp [Pi.single_apply]
+    have hpE : -(∑ c, p t c * E t c) ≤ r t := by
+      have hs : ∑ c, -(p t c * E t c) ≤ ∑ c, p t c * r t := sum_le_sum fun c _ => by
+        have := mul_le_mul_of_nonneg_left
+          ((neg_le_abs (E t c)).trans (hE t c)) (hp0 c)
+        linarith
+      rwa [sum_neg_distrib, ← sum_mul, hp1, one_mul] at hs
+    have hEt : E t (target t) ≤ r t := (le_abs_self _).trans (hE t _)
+    have hsq : ∀ c, E t c ^ 2 ≤ r t ^ 2 := fun c => by
+      have := pow_le_pow_left₀ (abs_nonneg (E t c)) (hE t c) 2
+      rwa [sq_abs] at this
+    have h2 : ∑ c, p t c * E t c ^ 2 ≤ r t ^ 2 := by
+      calc ∑ c, p t c * E t c ^ 2 ≤ ∑ c, p t c * r t ^ 2 :=
+            sum_le_sum fun c _ => mul_le_mul_of_nonneg_left (hsq c) (hp0 c)
+        _ = r t ^ 2 := by rw [← sum_mul, hp1, one_mul]
+    have h1 : faceVariance (p t) (fun c => φ * M t c - E t c) ≤
+        2 * faceVariance (p t) (fun c => φ * M t c) + 2 * ∑ c, p t c * E t c ^ 2 :=
+      faceVariance_sub_le (p t) (fun c => φ * M t c) (E t) hp0 hp1
+    rw [faceVariance_smul] at h1
+    have hvar : faceVariance (p t) (fun c => φ * M t c - E t c) ≤
+        2 * (φ ^ 2 * faceVariance (p t) (M t)) + 2 * r t ^ 2 := by linarith
+    have hCV := mul_le_mul_of_nonneg_left hvar hC
+    rw [hlin, hδ] at hcode
+    nlinarith
+  calc _ ≤ ∑ t, (codeLength (f t) (target t)
+        - φ * ∑ c, ((Pi.single (target t) (1 : ℝ) : ι → ℝ) c - p t c) * M t c
+        + φ ^ 2 * (Real.log 2 * (2 : ℝ) ^ ω * faceVariance (p t) (M t))
+        + (Real.log 2 * (2 : ℝ) ^ ω * r t ^ 2 + 2 * r t)) := sum_le_sum fun t _ => h t
+    _ = _ := by
+      simp only [sum_add_distrib, sum_sub_distrib, ← mul_sum]
+
+end SecondOrder
+
+#print axioms departure_sq_le
+#print axioms departure_form_le
+#print axioms departure_pair_sq_le
+#print axioms campaign_one_lift
+#print axioms rayleigh_eigen_lt
+#print axioms prequential_code_departure_le
 
 end Holonics.HNN.ReceivingPrior
