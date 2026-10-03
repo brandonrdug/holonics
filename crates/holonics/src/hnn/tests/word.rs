@@ -156,6 +156,8 @@ fn the_initial_constitution_opens_an_empty_word() {
 /// at momentum, `C′ w′ = π`: at an unchanged storage `w′ = w` exactly, under an accretion
 /// `C′ = C + F`, `F ⪰ 0`, the kinetic reading falls by `½⟨w′, F w′⟩ + ½⟨w − w′, C(w − w′)⟩`
 /// (`held_momentum_loss`, `held_momentum_dissipates`), and a momentum outside `range C′` is refused.
+/// A carried resonator's rate is held at its momentum the same way (record B §2.4), and a carried
+/// resonator state crosses only onto a declared resonator.
 #[test]
 fn a_carried_change_crosses_the_next_openings_references() {
     use crate::hnn::word::{EndChange, ReceptionCarry};
@@ -177,24 +179,37 @@ fn a_carried_change_crosses_the_next_openings_references() {
             storage: vec![vec![r(1, 1), r(2, 1)], vec![r(0, 1); 3]],
             arrivals: arrivals.clone(),
             states,
-            resonators: vec![None, None],
-            resonator_phases: vec![None, None],
+            resonators: vec![Some([vec![r(1, 5), r(-1, 4)], rate.clone()]), None],
+            resonator_phases: vec![Some(1), None],
         },
         ticks: 5,
         conductances: vec![r(2, 1), r(1, 4)],
         momenta: vec![momentum.clone(), momentum.clone()],
+        resonator_momenta: vec![Some(momentum.clone()), None],
     };
     // Contact 0 keeps its storage; contact 1 accretes F ⪰ 0.
     let accreted = matrix(vec![vec![r(1, 1), r(1, 3)], vec![r(1, 3), r(1, 9)]]);
     let grown = storage.add(&accreted).unwrap();
     let after = [r(1, 8), r(1, 4)];
     let step = r(1, 2);
-    let crossed = carry.crossed(&after, &[&storage, &grown]).unwrap();
-    // Storage, displacements and resonators carry unchanged.
+    let crossed = carry.crossed(&after, &[&storage, &grown], &[Some(&grown), None]).unwrap();
+    // Storage and displacements carry unchanged; the resonator's rate is held at its momentum.
     assert_eq!(crossed.storage, carry.change.storage);
     for (a, b) in crossed.states.iter().zip(&carry.change.states) {
         assert_eq!(a[0], b[0]);
     }
+    let [u, w] = crossed.resonators[0].clone().unwrap();
+    assert_eq!(u, vec![r(1, 5), r(-1, 4)]);
+    assert_eq!(grown.apply(&w).unwrap(), momentum);
+    assert_eq!(
+        carry.crossed(&after, &[&storage, &grown], &[Some(&storage), None]).unwrap().resonators,
+        carry.change.resonators,
+        "an unchanged capacity holds the resonator's rate exactly"
+    );
+    assert!(matches!(
+        carry.crossed(&after, &[&storage, &grown], &[None, None]),
+        Err(HnnError::Resonator { ring: 0, .. })
+    ));
     // The waves: transmitted, the reflection's power the only difference.
     let mut reflected = Rat::zero();
     for (a, ((before, now), (from, to))) in arrivals
@@ -227,7 +242,7 @@ fn a_carried_change_crosses_the_next_openings_references() {
     // A singular storage cannot hold a momentum outside its range.
     let singular = matrix(vec![vec![r(1, 1), r(0, 1)], vec![r(0, 1), r(0, 1)]]);
     assert!(matches!(
-        carry.crossed(&after, &[&storage, &singular]),
+        carry.crossed(&after, &[&storage, &singular], &[Some(&storage), None]),
         Err(HnnError::HeldMomentum { contact: 1 })
     ));
 }

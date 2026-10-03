@@ -642,9 +642,38 @@ fn the_chained_balance_closes_and_the_chain_is_dissipative() {
     assert!(chained.excess.is_zero() && chained.largest_excess.is_zero());
 }
 
+/// The reception carry §2.4 on a pumped field: with a resonator declared on every ring the carry
+/// is accepted, each resonator crosses the deposit at held momentum, and the chained balance still
+/// closes and is dissipative at every reception, with the carried resonator storage on its right.
+#[test]
+fn the_chained_balance_closes_on_a_pumped_field() {
+    use crate::hnn::constitution::Constitution;
+    let length = cut_length();
+    let field = chain_of(length as u64);
+    let cut = Cut {
+        cells: source(length, 81),
+        held_out: vec![2..4, length - 4..length],
+    };
+    let reference = Reference::new(64, OPEN_BUDGET)
+        .with_deadline(24)
+        .with_reception(Reception::Carry(Absorption::Nothing));
+    let theta = super::prediction::resonant(
+        &field,
+        Constitution::initial(&field, OPEN_BUDGET).unwrap(),
+    );
+    let exposure = reference.expose_with(&field, &cut, theta).unwrap();
+    let chained = &exposure.word.chained;
+    assert!(exposure.word.words.closed && exposure.word.closed);
+    assert_eq!(chained.read, exposure.compares - 1);
+    assert!(chained.read > 0);
+    assert!(chained.closed);
+    assert_eq!(chained.dissipative, chained.read);
+    assert!(chained.excess.is_zero() && chained.largest_excess.is_zero());
+}
+
 /// The reception carry §2.1 and §2.6: under `Carry(Nothing)` every compare writes its consumed
-/// word's end as the resident's one carried change, at the field's elapsed ticks (the sum of the
-/// junction steps of every earlier word), and the next reception's word opens on its interior with
+/// word's end as the resident's one carried change, at the field's elapsed ticks (the hops every
+/// earlier word ran, §2.4), and the next reception's word opens on its interior with
 /// the source rings imposed by the moment: the refine's faces are the read on that opening, and they
 /// differ from the read at rest. A second refinement while one is pending is refused (one chain).
 #[test]
@@ -727,7 +756,8 @@ fn the_carry_passes_each_receptions_end_to_the_next() {
                 .unwrap();
             receptions += 1;
             let carry = resident.carried().expect("the compare writes the carry");
-            assert_eq!(carry.ticks, receptions * steps);
+            // Each word's motion stands at its last crossing, whose hop has not run (§2.4).
+            assert_eq!(carry.ticks, receptions * (steps - 1));
             reference.deposit(&mut resident, staged).unwrap();
         }
         let mut fed = 0;

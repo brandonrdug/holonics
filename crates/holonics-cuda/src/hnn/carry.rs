@@ -24,10 +24,11 @@
 //! ([`crate::hnn::execute::CarryPlan`]).
 //!
 //! [definition; agent-inferred] **What the card refuses.** A declared resonator on a received
-//! opening: under `Absorption::Nothing` exactly as the host refuses it (the pump's carry across
-//! receptions is owed), and under `Absorption::Complete` because the card's pump phase reads the
-//! word's own ticks from zero (`step % phases`), not the field's elapsed ticks; that phase offset
-//! on the card is owed (#76). A carried change off the transients' lattice, or past the signed
+//! opening: under `Absorption::Nothing` because the card still carries the change after the last
+//! junction, which the host law no longer does (the reception carry §2.4: the carry is the last
+//! crossing and the pump continues from it), and under `Absorption::Complete` because the card's
+//! pump phase reads the word's own ticks from zero (`step % phases`), not the field's elapsed
+//! ticks. The card's change is owed (#76; the record's §7 names it). A carried change off the transients' lattice, or past the signed
 //! 64-bit word, is refused at its restore.
 
 use std::rc::Rc;
@@ -85,7 +86,8 @@ fn moving(carry: &ReceptionCarry) -> bool {
 impl<'c> CardCarry<'c> {
     /// [definition; the reception carry §2.1] **The carried end a consumed word leaves**: its end
     /// change read from its record, the field's elapsed ticks (the opening's plus its junction
-    /// steps), each contact's conductance at its cut and momentum `C_a w_a` under its
+    /// steps; the host now carries the last crossing at one tick fewer, §2.4, and this read follows
+    /// it under #76), each contact's conductance at its cut and momentum `C_a w_a` under its
     /// publication's storage, after the boundary's absorption; under `Absorption::Nothing` its
     /// change's words copied on the card.
     pub(crate) fn ended(
@@ -111,6 +113,9 @@ impl<'c> CardCarry<'c> {
                 .map(|c| c.conductance.clone())
                 .collect(),
             momenta,
+            // The card refuses a declared resonator on a received opening (module header), so it
+            // carries no resonator momentum.
+            resonator_momenta: vec![None; change.resonators.len()],
             change,
         }
         .absorbed(absorption);
@@ -202,7 +207,7 @@ impl<'c> CardOpening<'c> {
                 ring,
                 what: match absorption {
                     Absorption::Nothing => {
-                        "the reception carry of a declared resonator's pump phase is owed"
+                        "the card's carry of the last crossing and its pump phase is owed (#76)"
                     }
                     Absorption::Complete => {
                         "the card's pump phase at a carried tick is owed (it reads the word's own ticks)"
@@ -221,7 +226,8 @@ impl<'c> CardOpening<'c> {
             .map(|c| c.conductance.clone())
             .collect();
         let storage: Vec<&ExactRatMatrix> = loci.contacts.iter().map(|c| &c.forms[0]).collect();
-        let crossed = host.crossed(&conductances, &storage)?;
+        let crossed =
+            host.crossed(&conductances, &storage, &vec![None; host.change.resonators.len()])?;
         let reduced = |value: &Rat, what: &'static str| -> Result<(i64, i64), HnnError> {
             match (value.numer().to_i64(), value.denom().to_i64()) {
                 (Some(n), Some(d)) => Ok((n, d)),

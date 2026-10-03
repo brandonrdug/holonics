@@ -6,7 +6,9 @@ implemented-exact] for the owners it reuses, held by their tests (§1); the buil
 its tests are §6 [implemented-exact]; the chained balance and the law it satisfies are §2.3
 [proved-derived; implemented-exact; formal-checked, `HNN/ChainedBalance` (#293)]; the contact's
 crossing of the reception (§2.3a) is [proved-derived from its owners; implemented-exact], with the
-reflection's release agent-inferred.
+reflection's release agent-inferred; the clock (§2.4: the carry stands at the last crossing and the
+pump continues from it) is [proved-derived from the owners; implemented-exact on the host], and the
+card's change is §7.
 Code follows this record. The production default stays rest.
 
 **Occasion.** The review of October 3 located that every production reception opens at rest. The
@@ -325,29 +327,48 @@ singular_hold_unbounded}`, #293).
 - `ChainedBalance` reads `reflected` and `split` beside its terms; `lift_emits` checks
   `ingest + reflected = 0`.
 
-[measured-exact; this carry's own run] **The chain fixture read again, nothing tuned** (the same
-fixture and deadline as §2.3; eight chained readings). Every reception closes, is dissipative with
-respect to its declared supply, and the lift only emits. The deposition is zero at every reception:
-no deposit on this fixture moves a contact's storage, so the momentum hold is exercised here only by
-its unit test (`tests/word.rs`, `a_carried_change_crosses_the_next_openings_references`), and the
-work between the words is the lift's alone. The stronger reading holds at all eight; the excess is
-zero.
+[measured-exact; this carry's own run, at the last crossing of §2.4] **The chain fixture read
+again, nothing tuned** (the same fixture and deadline as §2.3; eight chained readings). Every
+reception closes, is dissipative with respect to its declared supply, and the lift only emits. The
+deposition is zero at every reception: no deposit on this fixture moves a contact's storage, so the
+momentum hold is exercised here only by its unit test (`tests/word.rs`,
+`a_carried_change_crosses_the_next_openings_references`), and the work between the words is the
+lift's alone. The stronger reading holds at all eight; the excess is zero. The read made on the
+carry first built, which carried the change after the last junction, is superseded by §2.4 and
+stays in git history (the record at `4f2c6815`).
 
 | Reception | reflected `= −ingest` | opening split | `L` |
 |---|---|---|---|
 | 1 | `0` | `0` | `0` |
 | 2 | `0` | `0` | `18142115297891599265251270759039205961/2¹²⁸` |
-| 3 | `46315959801979220365916592441711/(2⁷⁵·(2⁴²+1)²)` | `2394479/(2³¹·(2⁴²+1)²)` | `57098551254434724028511/2⁸¹` |
-| 4 | `0` | `0` | `257159359338988997670991/2⁸²` |
-| 5 | `10548810675/(2³¹·(2⁸+1)²)` | `−215431293/(2⁴³·(2⁸+1)²)` | `163725364095216116449671/2⁸²` |
-| 6 | `615659626125/(2⁴³·(2⁸+1)²)` | `950789/(2³⁵·(2⁸+1)²)` | `117873298028166605879837/2⁸¹` |
-| 7 | `3441151657053/(2³⁵·5³·41²)` | `−494093/(2²³·5³·41²)` | `83163959690503562684611/2⁸²` |
-| 8 | `1484327582024039537461868631154564575/(2²⁴·(2⁵²+1)²)` | `−659173863059710090719/(2⁷⁴·(2⁵²+1)²)` | `62587632561350452267109439670114075243/2¹³⁰` |
+| 3 | `9281629529855942321216728552041/(2⁷²·(2⁴²+1)²)` | `479849/(2²⁸·(2⁴²+1)²)` | `57098551254434724028511/2⁸¹` |
+| 4 | `0` | `0` | `3989086496414903808497/2⁷⁶` |
+| 5 | `469749248325/(2³³·(2⁸+1)²)` | `96202485/(2⁴²·(2⁸+1)²)` | `163727188683152523083415/2⁸²` |
+| 6 | `5637951724275/(2⁴²·(2⁸+1)²)` | `390479/(2³⁴·(2⁸+1)²)` | `58937913782770529064747/2⁸⁰` |
+| 7 | `5³·38069585433/(2³³·(2¹⁰+1)²)` | `−5³·14187/(2²³·(2¹⁰+1)²)` | `41512338409708060494309/2⁸¹` |
+| 8 | `3729995973340351489524206808619732575/(2²⁴·(2⁵²+1)²)` | `−1656450964544632835679/(2⁷⁴·(2⁵²+1)²)` | `30437673169329122503929622069075041611/2¹²⁹` |
+
+[measured-exact] **The same chain with a pumped resonator on every ring** (`resonant` of
+`tests/prediction.rs`: a cycle parametron of the ring's period, mass `1/8`, pump strength `1/16`
+at carrier `1/2`, half steps), which the carry first built refused. Every reception closes with the
+carried resonator storage on its right, is dissipative, and the excess is zero
+(`the_chained_balance_closes_on_a_pumped_field`).
+
+| Reception | reflected `= −ingest` | opening split | `L` |
+|---|---|---|---|
+| 1 | `0` | `0` | `0` |
+| 2 | `0` | `0` | `19034657419062798326319658257813355283/2¹²⁸` |
+| 3 | `5²·596358271112346921021890132079/(2⁷³·(2⁴²+1)²)` | `5²·30831/(2²⁹·(2⁴²+1)²)` | `124526922898319106936181/2⁸²` |
+| 4 | `0` | `0` | `10414205361007093961739/2⁷⁷` |
+| 5 | `404701749675/(2³⁴·(2⁸+1)²)` | `−173487007/(2⁴²·(2⁸+1)²)` | `142699167559277937839639/2⁸¹` |
+| 6 | `2138466705975/(2⁴²·(2⁸+1)²)` | `2135113/(2³⁵·(2⁸+1)²)` | `149484482951422031877479/2⁸⁰` |
+| 7 | `25574036498703/(2³⁵·(2¹⁰+1)²)` | `−4707861/(2²⁴·(2¹⁰+1)²)` | `244433579427890778827861/2⁸²` |
+| 8 | `14719330015152480071700939304658997975/(2²⁴·(2⁵²+1)²)` | `−6536695635951378698967/(2⁷⁴·(2⁵²+1)²)` | `312513087017383140432674528302191590473/2¹³⁰` |
 
 The denominators are the reference changes' own: `(G + G')²` for the moves `2⁴²`, `2⁸`, `2⁸`, `2¹⁰`
-and `2⁵²` of contact 0's conductance listed in §2.3 (at reception 7, `(2¹⁰ + 1)² = 5⁴·41²` with one
-`5` cancelled). The test pins the closure, the dissipativity, `lift_emits` and the zero excess at all
-eight (`the_chained_balance_closes_and_the_chain_is_dissipative`).
+and `2⁵²` of contact 0's conductance listed in §2.3; a power of `5` written in a numerator is one
+the reduced fraction cancels against `(2¹⁰ + 1)² = 5⁴·41²` or `(2⁴² + 1)² = 5²·13²·29²·113²·1429²·14449²`. The tests pin the closure, the dissipativity and the zero excess at all eight, and
+`lift_emits` on the unpumped chain.
 
 [proved-derived; formal-checked] The chained balance, its dissipativity and the rest case as its
 limit are `HNN/ChainedBalance` (#293; §2.3 above). The opening's split is
@@ -418,26 +439,79 @@ mass carry its own momentum away?
    not a refusal. A refusal of shrinking deposits would author a sign the constitution does not
    carry.
 
-### 2.4 The clock
+### 2.4 The clock: the carry stands at the last crossing, and the pump continues from it
 
-[definition; agent-inferred] The carried state is read on the field's own elapsed ticks.
-`Word::continuing` takes `opened_at`. Under the carry, `t_(k+1)` is the sum of the ticks every
-earlier word of the chain executed, so a declared resonator's pump phase continues across
-receptions.
+[proved-derived from the owners; implemented-exact; agent-inferred where marked] The carried state
+is read on the field's own clock, and the derivation starts from what that clock's tick is.
+- **A junction is a crossing.** `Word::junctions` advances the word's hop clock by one, and the
+  ring's anchors at its junction steps are its epoch readings (`Word::anchor`, read by
+  `Word::forward`). A section crossing is a clock tick (`ELEMENTARY_OBJECTS` §5).
+- **The hop follows the crossing.** After crossing `t` the hop runs the ring elements, each
+  declared resonator at pump phase `phase_at(t)`, and the contact transits (`Word::tick`).
+  `ResonatorOperands::step` at tick `t` switches the stiffness from phase `t − 1` to phase `t` with
+  `u` held, the pump's work `½⟨u, (K_t − K_(t−1)) u⟩`, and then integrates. The pump is a periodic
+  modulation of the constitution, so its phase is a function of the crossing count alone; the
+  resonator's state after hop `t` is measured at phase `t`.
+- **A reception's word ends between a crossing and its hop.** `Word::forward` runs `e − 1` full
+  ticks and then `last_junction`: crossing `T = opened_at + e − 1` is scattered and its anchors are
+  read, but hop `T` does not run (no element, no resonator, no transit). The motion therefore
+  stands at crossing `T`, arriving: each ring's storage is the element's output of hop `T − 1`,
+  each arriving wave is the transit's output of hop `T − 1`, and each resonator state and phase are
+  as hop `T − 1` left them. That is the change the word's `Passage` records before its last
+  junction.
 
-Today every reception re-phases the pump to zero, a reset of the pump clock that the carry removes.
-The rest case of `tests/prediction.rs:66` opens at tick zero, while the carry opens at the
-cumulative tick. On a field with a declared resonator the two differ in the pump's phase even when
-the carried change is at rest, unless the cumulative tick at the opening is a multiple of every
-pump period.
+**The law.** The carry holds the change arriving at the last crossing, at tick `T`
+(`Word::reception_end`). The next word opens there: its first junction scatters crossing `T` in
+the medium the reception leaves, and its first hop is `T`, at pump phase `T`. With
+`t_(k+1) = T`, the chain's tick is the sum of the hops every earlier word ran. This is the cut a
+refinement already continues from: `Word::change` and `ContactCut` cut after a full tick at
+`opened_at + ticks`, and a cut after a junction is refused (`CutKind::AfterJunction`) because its
+arriving waves are outgoing.
 
-[definition; agent-inferred] **The exact limit is claimed for fields with no declared resonator.**
-That is U6's default (`resonator none` in `hnn_exposure.rs`) and every field the exposure and the
-U6 reads run today. There `A = I` is today's word exactly, whatever the cumulative tick. On a field
-with a declared resonator the carry keeps the cumulative clock, and no exact limit is claimed: the
-pump phase is a second carried quantity, and a read under such a field compares it as such. A
-clock reset at every opening is not taken: it would restore the hidden restart of the pump that
-the carry exists to remove.
+**The pump continues.** The carried resonator state is at phase `T − 1`, and the next word reads
+its opening state at `phase_at(T − 1)`. Its first step at tick `T` switches to phase `T` with the
+pump's work and integrates, exactly as the uninterrupted word's step at `T`. The phase is neither
+reset nor skipped, so the refusal under `A = 0` is lifted. It was not a missing law of the pump: the
+carried tick counted a hop that never ran.
+
+**What the carry first built did.** It carried the change after the last junction at tick
+`T + 1` (#285, #292). Besides the pump's refusal, the next word's first junction scattered crossing
+`T` a second time. The junction is the reflection `2P_D − I` about its participation anchor, an
+involution (Lean `HNN/Propagation.junctionScattering_involutive`). On every node whose weights and
+storage the reception left unchanged, it therefore restored the waves from before crossing `T`.
+Hop `T` then ran on unscattered waves: each element received its own previous output, and each
+transit sent the arrived waves straight back into their channels. That is one hop of total
+reflection at every node, at every reception. The scattering is power-neutral, a `W`-isometry, so
+every balance still closed and the chain fixture's checks could not see it.
+
+**The resonator crosses the deposit at held momentum.** Its step advances on `(u, 2C_r w)`: the
+right side of `ResonatorOperands::step` is `2C w + hβ − hK u`, the canonical state the contact's
+transit advances on. So the deposit holds `C′_r w′_r = C_r w_r`, as it holds a contact's momentum
+([the deposit record](2026-10-03_THE_DEPOSIT_HOLDS_THE_CARRIED_MOMENTUM_AND_THE_ACCRETED_MASS_IS_THE_THROWS_DAMPING.md)
+§3; `held_resonator_rate`). The carry keeps `π_r` beside the contacts' momenta. A deposit on the
+stiffness or the pump strength does same-state work `½⟨u, ΔK_t u⟩` at the carried phase.
+`PowerForm::held` reads both, and the opening's crossing applies the same hold
+(`ReceptionCarry::crossed`).
+
+**The chained balance at the crossing.** Word `k`'s balance is read to the crossing it carries
+(`WordBalance::carried`): its end is `P(crossing) = P(end) − last`, the power before the last
+junction. That junction is the receiver's reading, and its outputs are not carried, so its residual
+and bound leave the balance. The carried resonators' storage before the commit enters as
+`resonator_interior`, and the opening line reads
+
+```text
+P_open(k+1) + R_open(k+1) = interior + resonator_interior + deposition_k + ingest_k + E_S(s)
+```
+
+`ChainedBalance::dissipative` keeps the resonators' end storage on its left and the carried storage
+on its right.
+
+**The exact limit.** At `A = I` the word opens at rest at tick `T`. On a field with no declared
+resonator that is today's word exactly, whatever the tick (`tests/reference.rs`,
+`the_carry_at_complete_absorption_is_todays_reception_exactly`, unchanged). On a field with a
+declared resonator the carry keeps the cumulative clock, and no exact limit is claimed: the pump
+phase is a second carried quantity. A clock reset at every opening is not taken; it would restore
+the hidden restart of the pump that the carry exists to remove.
 
 ### 2.5 The adjoint stops at the opening
 
@@ -511,21 +585,21 @@ a test path. Today's reception is unchanged unless a carry is declared.
   re-read at a later commit, the deposit's re-read at the successor (`Arrived`) and `release` open on
   the same opening, which the pending slot holds beside the ratio, never inside it (guard 3).
 - **The carry.** The compare writes the resident's one carried change (`Resident::carried`) from the
-  word its return consumes (`Word::reception_end`: the end change and `opened_at` plus the word's
-  junction steps), after the boundary's absorption (`ReceptionCarry::absorbed`). A discarded pending
+  word its return consumes (`Word::reception_end`: the change arriving at its last crossing and
+  `opened_at` plus the hops it ran, §2.4), after the boundary's absorption (`ReceptionCarry::absorbed`). A discarded pending
   ratio carries its refine's word's end (§2.6). A refinement opened while another is pending is
   refused (one chain). The resident's state bits count the carried change's nonzero values and its
   tick.
-- [agent-inferred] **A declared resonator under `A = 0` is refused.** The last junction step
-  advances the hop clock without a pump step, so the carried resonator state, measured at its last
-  pump tick's phase, does not fit the next opening's clock (`Word::continuing`'s check). The pump's
-  carry across receptions is owed; under `A = I` a resonator opens at rest in the carried clock.
+- **A declared resonator carries.** The carry stands at the word's last crossing (§2.4), so the
+  carried resonator state and its phase are hop `T − 1`'s and the next word's first pump step is
+  `T`'s; the refusal under `A = 0` that the carry first built had is lifted. The resonator's rate is
+  held at momentum across the deposit beside the contacts' (`ReceptionCarry::resonator_momenta`).
 **The acceptance read** (`crates/holonics/src/hnn/tests/reference.rs`, "the reception carry";
 `tests/lock_face.rs`):
 - at `A = I` the prequential exposure on the chain field returns every reading, deposit, balance
   and curve point of the exposure at rest, bit for bit; only the resident's state bits read more, by
   the carried tick;
-- under `A = 0` every compare writes its consumed word's end at the summed junction steps, and the
+- under `A = 0` every compare writes its consumed word's last crossing at the summed hops, and the
   next refine's faces are exactly the read on that opening, opened from the carry as written and
   read back (`ReceptionCarry::{write, read}`); the carried interior moves the read;
 - under `A = 0` the chained balance (`ChainedBalance`, read in `expose_from` at every reception
@@ -573,8 +647,33 @@ host word does (`holonics-cuda`: `hnn::carry`, `hnn::port`, `hnn::execute`, `ker
   and carries each remainder over its denominator through every later split of the word. At rest
   every denominator is one and the word's path is unchanged.
 - [agent-inferred] **The card refuses a declared resonator on a received opening**: under `A = 0`
-  as the host does; under `A = I` because the card's pump phase reads the word's own ticks from
+  as the host first did; under `A = I` because the card's pump phase reads the word's own ticks from
   zero, not the field's elapsed ticks. That phase offset on the card is owed (#76).
+
+The parity read below was made on the carry first built, which carried the change after the last
+junction at `opened_at + e`. The host law is now §2.4, and the card's word must change with it
+before the read is repeated; until then the card's received openings differ from the host's in the
+carried change and its tick, under both absorptions.
+
+[owed, #76] **What the card's word must change** (each against the host owner named):
+1. **The carry is the last crossing.** `CardCarry::ended` reads the change the word's record holds
+   before its last junction (the host's last `Passage`: storage, arrivals and resonator states), not
+   `readout::end`'s change after it, at tick `opened_at + plan.steps − 1`; `ResidentWord::end_words`
+   copies the same words (`Word::reception_end`). Where the record does not already hold the last
+   crossing's arriving words, the kernel keeps them before it scatters that junction.
+2. **The pump phase reads the field's tick.** In `kernels/hnn_word.cuh` (the four
+   `step % res[RZ_PHASES]` reads) the phase is `(opened_at + step) mod order`, the host's
+   `phase_at(t)`, with `opened_at` uploaded beside the plan; at rest `opened_at = 0` and the path is
+   unchanged.
+3. **The resonators carry.** Both refusals in `CardCarry`'s opening go. The carried resonator states
+   ride in the change; each rate is held at momentum, `π_r = C_r w_r` read from
+   `ReceptionCarry::crossed` (`held_resonator_rate`), and split onto `L_w` with its remainder, as the
+   contacts' held rates already are; the mirror keeps `resonator_momenta`.
+4. **The receipt reads the crossing.** Under `A = 0` the card's refine receipt reads
+   `WordBalance::carried`, as `Reference` does, so the exposure's chained read is the host's.
+
+The read to repeat is the parity read below with a pumped constitution added
+(`tests/reference.rs`, `the_chained_balance_closes_on_a_pumped_field`, is the host's).
 
 **The parity read** (`crates/holonics-cuda/src/hnn/port_tests.rs`, alone on the card): on the
 chain with no pair offset (the host's carry fixture, 18 cells, 9 windows, the campaign-one

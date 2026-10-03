@@ -888,6 +888,7 @@ fn a_continuing_state_carries_the_receptions_end_inside_its_check() {
         ticks: 27,
         conductances,
         momenta,
+        resonator_momenta: vec![None, Some(wave(2))],
     };
     assert!(carry.fits(&field));
     let carried = at_rest.clone().with_carry(Some(carry.clone()));
