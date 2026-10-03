@@ -117,7 +117,8 @@ The arms are:
 - Q2's Coordinate chain and Q2's Kinetic control, both under #202's interval acceptance;
 - the at-rest throw: the throw chain through m5 (every move released from rest), then its own chain
   from `m5-throw.state`, releasing from rest at every move (ρ held). **It ended under its law at m8**
-  (`claude/pc-receipts`, `research/runs/throw-rest/m8/m8-throw.state`): at m9, strict descent refused
+  (`claude/pc-receipts`, `research/runs/throw-rest/m8/m8-throw.state`, archived at
+  `research/runs/branch-archive/claude/pc-receipts/research/runs/throw-rest/m8/m8-throw.state`): at m9, strict descent refused
   every trial from η 8 down to 1/16;
 - the coast-alone throw: the original throw chain, which first carried its coast at m6 (#240's rule
   before `5f254c2d`);
