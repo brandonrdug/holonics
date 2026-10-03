@@ -190,6 +190,35 @@ a slip in the loss, not a property of the carry. Both checks are now receipts
 (`ChainedBalance::{dissipative, within_loss}`), and the fixture's test pins the failure of the
 stronger one, exactly, rather than tuning anything to make it pass.
 
+[measured-exact; agent-inferred] **Keeping the momentum instead does not make the stronger reading
+a law.** On this fixture the ingest changes only the one contact's conductance, `G_0 = 2^(n_0) Y_0`
+at the lift. So the ingest is exactly `(h/4)(G' − G)|a|²`, the energy of the conductance jump at the
+kept arriving waves `a`: the term `½ vᵀ F v` of the throw's join (#281), in this form's
+normalisation. It is the work, not the excess; the excess is the work minus the loss. #281 bounds
+the momentum-kept energy by `(M + F)⁻¹ ⪯ M⁻¹`, which needs `F ⪰ 0`. The lift moves the conductance
+by powers of two in both directions here: `2 → 2⁻⁵¹` at receptions 2 and 8, `2⁻⁵¹ → 2⁻⁹` at
+reception 3, `2⁻⁹ → 2⁻¹⁷` at reception 5, `2⁻¹⁷ → 2⁻⁹` at reception 6, and `2⁻⁹ → 2` at
+reception 7. Carrying the momentum `G a` instead, the jump does `(h/4)(G²/G' − G)|a|²`:
+
+| Reception | Kept waves `a` (built) | Kept momentum `G a` | Momentum `≤ L` |
+|---|---|---|---|
+| 3 | `10531030011859400337/2⁷⁵` | `−10531030011859400337/2¹¹⁷` | yes |
+| 5 | `−2448376125/2⁴²` | `2448376125/2³⁴` | **no**, by `262716277201981247154839/2⁸¹` |
+| 6 | `1144389765/2⁴²` | `−1144389765/2⁵⁰` | yes |
+| 7 | `5048657427/2³²` | `−5048657427/2⁴²` | yes |
+| 8 | `−15407359260789375224895/2⁷⁶` | `15407359260789375224895/2²⁴` | **no**, by `1249993485751783345298914315909973265141760265707096231/2¹³⁰` |
+
+(Receptions 1, 2 and 4 carry no arriving wave on a moved contact, so both forms give zero.) Keeping
+the momentum moves the failure to the receptions where the conductance falls. At reception 8 a
+contact shielded by `2⁻⁵¹` would carry the current it held unshielded, amplifying its wave by
+`2⁵²`. Both carries are dissipative with respect to the declared supply. The built carry keeps the
+waves the junction executes on (the word's state, `propagation.rs`'s header), and it is kept.
+
+[owed; agent-inferred] Which coordinate of a contact's wave crosses a change of its conductance is
+the contact's own temporal-boundary law: the waves `a`, the momentum `G a`, or the power-normalised
+`√G a` (under which the ingest does no work). It is not derived here, and none of the three is chosen
+because it passes.
+
 [owed in #62] The Lean statement of the chained balance and its dissipativity, and of the rest case
 as its limit (`HNN/Retention`).
 
