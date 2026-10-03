@@ -13,6 +13,7 @@
 //! cargo run --release -p holonics --example hnn_prediction -- executed slopes <terrain> <seed> <count> <label[=E]>…
 //! cargo run --release -p holonics --example hnn_prediction -- executed counts <terrain> <training seed> <count> <validation seed> <count> <out>
 //! cargo run --release -p holonics --example hnn_prediction -- executed witness <terrain> <seed> <count> <moves> <deadline ms> <out> [<states dir>]
+//! cargo run --release -p holonics --example hnn_prediction -- executed run <terrain> <seed> <count> <out> <label=state> <arm> <metric> <cap|none> <deadline ms>
 //! cargo run --release -p holonics --example hnn_prediction -- executed replay <terrain> <seed> <count> <label=state>…
 //! cargo run --release -p holonics --example hnn_prediction -- executed coupling <terrain> <seed> <count> <deadline ms> <label=state|label=opening>…
 //! cargo run --release -p holonics --example hnn_prediction -- executed represent <terrain> <seed> <count> <iterates> <deadline ms> <out> [<held-out seed>]
@@ -475,6 +476,19 @@ fn main() {
             &arguments[7],
             &arguments[8],
             &arguments[9..],
+        ),
+        // A release run from an opening state to its close or a refusal (the record
+        // research/records/2026-10-02_A_RUN_CLOSES_ON_A_CONDITION_NOT_A_LENGTH_AND_THE_HALVINGS_END_AT_THE_LATTICE.md).
+        (Some("executed"), Some("run")) => executed_loop::run(
+            &arguments[3],
+            arguments[4].parse().expect("a seed"),
+            arguments[5].parse().expect("a count"),
+            &arguments[6],
+            &arguments[7],
+            &arguments[8],
+            &arguments[9],
+            &arguments[10],
+            arguments[11].parse().expect("a deadline in ms"),
         ),
         // An accepted move read decision by decision (the record
         // research/records/2026-10-01_THE_DECISION_MARGINS_THROUGH_THE_ACCEPTED_MOVE.md): read-only.

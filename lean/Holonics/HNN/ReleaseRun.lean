@@ -9,10 +9,10 @@ import Mathlib.Tactic.Positivity
 /-!
 # HNN.ReleaseRun: a run closes on a condition, and how many halvings a move needs
 
-[proved-derived; formal-checked] Two counts of the native chain are chosen constants: the run
+[proved-derived; formal-checked] Two counts of the native chain were chosen constants: the run
 length `W = 8` (the most moves from an opening state to its close, `HNN/ExecutedComparison`
-§12) and the halving count `LADDER_DEPTH = 8` (`hnn::executed`). This module states what the
-chain's own laws fix in their place.
+§12) and the halving count `LADDER_DEPTH = 8` (`hnn::executed`, retired: the halvings now end at
+the lattice). This module states what the chain's own laws fix in their place.
 
 **1. The run closes on a condition, not a length** (`close_at_any_length`). The close test
 (`ReleaseExcursion::closes`) reads the opening's code length, the current one and the grain `σ`.

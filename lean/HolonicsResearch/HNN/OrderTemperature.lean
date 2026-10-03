@@ -387,8 +387,8 @@ theorem fixed_order_halving_adopts {f g : ℝ → ℝ} {d η₀ : ℝ} (hfg : �
 Along one move's direction, the comparison is a continuous part `g` short of a step length `w` and
 jumps up in code length at `w`, where the release's order changes, by more than the move's
 conditions admit (the release excursion). Every trial at or past `w` is refused; a trial short of it
-is adopted when the move's own conditions hold (`hnn::executed`, the halving trials: at most
-`LADDER_DEPTH` trials a move, none below the lattice floor). -/
+is adopted when the move's own conditions hold (`hnn::executed`, the halving trials, none below
+the lattice floor). -/
 
 /-- [proved-derived; formal-checked] **The first halving short of a jump lands within half of it.**
 Halving a step `η₀ ≥ w` until it falls short of the jump at `w`, the first such step is at least
