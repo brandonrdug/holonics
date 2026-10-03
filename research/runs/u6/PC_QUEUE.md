@@ -10,6 +10,28 @@ enclosures; never a decimal), with wall time and peak resident set. Small reads 
 in the background with an outer `timeout` from its projection; never raise a limit. Stored states
 the cloud runners produce arrive on their branches; the main line names them here when they land.
 
+## Before any launch
+
+A run launches only when its entry here states each of these, and the main line has checked them
+(October 3, after the audit of P4; the refits record §12):
+1. **The decision it can change**, written as "result A leads to X, result B leads to Y", with the
+   latest time at which X or Y still matters. Nothing that the result would decide starts before it
+   reads. When that time passes, or the decision is taken anyway, the run is stopped.
+2. **A projection on the launch host**: a development read there of early and late units, the
+   largest time per unit, and a deadline of three times the declared count times that largest time.
+   A projection is never carried to another host, and a deadline never exceeds the host's own
+   lifetime (a cloud session's background runs end at 2 h).
+3. **A progress line and an early measured part.** The run prints one line per unit with its
+   elapsed ms, and the part it measures is reached early (reorder or declare the cut so that it is),
+   so that it can stop early on evidence.
+4. **What a null means.** A check that the instrument does not change the quantity under test, and
+   which outcomes can be read.
+5. **No existing receipt.** A search of every branch's receipts for the same input-state sha256 and
+   command, and of existing sections that already answer the question.
+6. **Receipts on every exit.** The run commits and pushes its own receipts on completion, timeout or
+   error (launch UTC, build, host, threads, projection, deadline, wall time, peak resident set), so
+   no result waits on a session.
+
 ## Where the GPU applies (exact arithmetic only)
 
 The card's realization (`crates/holonics-cuda`) is the exposure protocol's execution port: moment
@@ -57,7 +79,7 @@ its jump `J`, the requests it changes).
 
 **Incomplete** (October 3, `claude/pc-receipts` `697a89ed`; the refits record §12). Both sources exited
 124 at `36000053` ms with only the header written, so the gate is not read. It is not relaunched, and
-the record states the decisive form (a progress line and a shorter declared training prefix). The
+the record states the decisive form (a progress line, and the held-out passages first under a 2048-window deadline). The
 queue is empty. The text below is the plan as launched.
 
 **Running in two places.** The cloud launched it on October 2 at 21:28 UTC, at 2 threads per
