@@ -37,6 +37,30 @@ the pump's reflection block `−2p R_c` to its stiffness, `c` the placed carrier
    change raises only its target, by `1/θ_t`; a throw's flight caps every mode at the force's free
    fall `|g|t²/2`, whatever its stiffness and damping; a carried velocity accumulates a push that
    keeps its sign.
+9. **The throw through the accreted mass** (`accretion_loss`, `accretion_dissipates`,
+   `thrown_move`, `throw_velocity_le_terminal`, `throw_velocity_rises`, `leap_velocity_le`,
+   `throw_velocity_le_unaccreted`, `throw_reach_le_free_fall`, `convex_slope_le`,
+   `coast_apex_no_floor_ahead`, `coast_floor`, `coast_floor_at_end`, `line_falls_to`,
+   `coast_secant_curvature`): a
+   deposit accretes mass onto the port and conserves the carried momentum, so its kinetic reading
+   falls by exactly `p² f/(2m(m + f))`; the thrown move is the impulse plus the coast, the leap's
+   impulse alone from rest; under a constant impulse the throw's velocity rises toward the impulse
+   over the per-deposit mass while the leap's falls like `1/k`; and a throw from rest reaches no
+   further than free fall `(i/m₀)·n(n + 1)/2`; at a convex line's apex nothing ahead is lower,
+   a falling line's floor is `−s/κ` with its curvature read from the line's own end, and over
+   enclosures the line falls up to `min(1, −s⁺/κ⁺)` whatever the sign of `κ` (#240's record,
+   [`4743e836`](https://github.com/brandonrdug/holonics/blob/4743e836/research/records/2026-10-02_THE_THROW_CARRIES_ITS_MOMENTUM_THROUGH_THE_DEPOSITS_ACCRETED_MASS_AND_A_HALVING_HALVES_IT.md)).
+10. **The deposit holds the carried momentum** (`held_momentum_loss`, `held_momentum_dissipates`,
+   `accretion_inverse_antitone`, `velocity_held_injects`, `held_momentum_bound`): §9 in matrix
+   form. A deposit is a sudden change of the mass `C → C + F`; the canonical state `(u, π = C w)`
+   is held, so `(C + F) w' = C w`, and the kinetic reading falls by exactly
+   `½⟨w', F w'⟩ + ½⟨w − w', C (w − w')⟩`: the accreted mass's energy at the new velocity plus the
+   velocity jump's energy in the old mass. For `C, F ⪰ 0` it never rises, which is
+   `(H + F)⁻¹ ⪯ H⁻¹` in the Loewner order. Holding the velocity instead adds `½⟨w, F w⟩`: the
+   held momentum plus an impulse `F w` no source supplies. Where the mass may also shrink, a mass
+   certified from below, `C' ⪰ C/(1 + ε)`, bounds the held momentum's reading by `(1 + ε)` (the
+   record
+   `research/records/2026-10-03_THE_DEPOSIT_HOLDS_THE_CARRIED_MOMENTUM_AND_THE_ACCRETED_MASS_IS_THE_THROWS_DAMPING.md`).
 -/
 
 namespace Holonics.HNN.MoveDirection
@@ -382,5 +406,253 @@ theorem carried_velocity {β a : ℝ} (hβ : β ≠ 1) (v : ℕ → ℝ) (h0 : v
   induction k with
   | zero => simp [h0]
   | succ k ih => rw [hv, ih, pow_succ]; field_simp; ring
+
+/-! ## 9. The throw through the accreted mass -/
+
+/-- **Accretion dissipates a carried momentum, by exactly its sticking loss**: a momentum `p`
+carried across a deposit that accretes `f ≥ 0` onto the mass `m > 0` is kept, and its kinetic
+reading `p²/(2m)` falls to `p²/(2(m + f))`, by `p² f/(2m(m + f))`. -/
+theorem accretion_loss (p m f : ℝ) (hm : 0 < m) (hf : 0 ≤ f) :
+    p ^ 2 / (2 * m) - p ^ 2 / (2 * (m + f)) = p ^ 2 * f / (2 * m * (m + f)) := by
+  have h : 0 < m + f := by linarith
+  field_simp
+  ring
+
+/-- **The accreted mass is the throw's damping**: the kinetic reading never rises across a
+deposit's accretion. -/
+theorem accretion_dissipates (p m f : ℝ) (hm : 0 < m) (hf : 0 ≤ f) :
+    p ^ 2 / (2 * (m + f)) ≤ p ^ 2 / (2 * m) := by
+  have h := accretion_loss p m f hm hf
+  have h' : 0 ≤ p ^ 2 * f / (2 * m * (m + f)) := by
+    have : 0 < m + f := by linarith
+    positivity
+  linarith
+
+/-- **The thrown move is the impulse plus the coast**: the carried momentum `p` and the deposit's
+impulse `i` move the port by `(p + i)/(m + f)`, the impulse's move `i/(m + f)` (the leap's) plus
+the coast `p/(m + f)`; from rest (`p = 0`) it is the leap. -/
+theorem thrown_move (p i m f : ℝ) :
+    (p + i) / (m + f) = i / (m + f) + p / (m + f) ∧ (0 + i) / (m + f) = i / (m + f) := by
+  constructor
+  · ring
+  · rw [zero_add]
+
+/-- **Under a constant impulse the throw's velocity stays below the impulse over the per-deposit
+mass**: after `k` deposits of mass `f > 0` onto `m₀ > 0`, each with impulse `i ≥ 0`, the carried
+momentum `k i` moves the port by `k i/(m₀ + k f) ≤ i/f`. -/
+theorem throw_velocity_le_terminal (i m₀ f : ℝ) (k : ℕ) (hi : 0 ≤ i) (hm : 0 < m₀) (hf : 0 < f) :
+    k * i / (m₀ + k * f) ≤ i / f := by
+  have hk : (0 : ℝ) ≤ k := Nat.cast_nonneg k
+  rw [div_le_div_iff₀ (by positivity) hf]
+  nlinarith [mul_nonneg hi hm.le]
+
+/-- **The throw's velocity rises with every deposit under a constant impulse**. -/
+theorem throw_velocity_rises (i m₀ f : ℝ) (k : ℕ) (hi : 0 ≤ i) (hm : 0 < m₀) (hf : 0 < f) :
+    k * i / (m₀ + k * f) ≤ (k + 1) * i / (m₀ + (k + 1) * f) := by
+  have hk : (0 : ℝ) ≤ k := Nat.cast_nonneg k
+  rw [div_le_div_iff₀ (by positivity) (by positivity)]
+  nlinarith [mul_nonneg hi hm.le]
+
+/-- **The leap's velocity falls like `1/k`**: the leap spends its momentum at every deposit, so
+after `k ≥ 1` deposits its move is `i/(m₀ + k f) ≤ i/(k f)`. -/
+theorem leap_velocity_le (i m₀ f : ℝ) (k : ℕ) (hk : 1 ≤ k) (hi : 0 ≤ i) (hm : 0 < m₀)
+    (hf : 0 < f) : i / (m₀ + k * f) ≤ i / (k * f) := by
+  have hk' : (0 : ℝ) < k := by exact_mod_cast hk
+  apply div_le_div_of_nonneg_left hi (by positivity)
+  linarith
+
+/-- **Accretion never speeds the throw past its unaccreted mass**: after `k` deposits of mass
+`f ≥ 0` onto `m₀ > 0`, each with impulse `i ≥ 0`, the carried momentum `k i` moves the port by
+`k i/(m₀ + k f) ≤ k i/m₀`, the velocity of free fall under `g = i/m₀`. -/
+theorem throw_velocity_le_unaccreted (i m₀ f : ℝ) (k : ℕ) (hi : 0 ≤ i) (hm : 0 < m₀)
+    (hf : 0 ≤ f) : k * i / (m₀ + k * f) ≤ k * i / m₀ := by
+  have hk : (0 : ℝ) ≤ k := Nat.cast_nonneg k
+  apply div_le_div_of_nonneg_left (mul_nonneg hk hi) hm
+  nlinarith
+
+/-- **A throw from rest reaches no further than free fall**: under a constant impulse `i ≥ 0`
+on `m₀ > 0` with per-deposit mass `f ≥ 0`, the port's displacement over its first `n` moves
+(`m0` to `m(n − 1)`; the move after `k` deposits carries `k i/(m₀ + k f)`, and the `k = 0` term
+is the rest before `m0`) is at most `(i/m₀)·n(n + 1)/2`, the discrete `|g| t²/2` with
+`g = i/m₀`. At `f = 0` it is free fall's own reach; a positive `f` only damps it. -/
+theorem throw_reach_le_free_fall (i m₀ f : ℝ) (hi : 0 ≤ i) (hm : 0 < m₀) (hf : 0 ≤ f) (n : ℕ) :
+    ∑ k ∈ Finset.range (n + 1), (k : ℝ) * i / (m₀ + k * f) ≤ i / m₀ * (n * (n + 1) / 2) := by
+  induction n with
+  | zero => simp
+  | succ n ih =>
+    rw [Finset.sum_range_succ]
+    have h := throw_velocity_le_unaccreted i m₀ f (n + 1) hi hm hf
+    push_cast at h ⊢
+    have e : i / m₀ * (((n : ℝ) + 1) * ((n : ℝ) + 1 + 1) / 2)
+        = i / m₀ * ((n : ℝ) * ((n : ℝ) + 1) / 2) + ((n : ℝ) + 1) * i / m₀ := by
+      field_simp
+      ring
+    linarith
+
+/-- **A convex coast rises at least at its starting slope**: if `f` is convex on `[0, 1]` with
+right derivative `s` at `0`, then `s t ≤ f t − f 0` for every `t ∈ (0, 1]`. At `t = 1` it is
+`convex_chord_slope_le`. -/
+theorem convex_slope_le {f : ℝ → ℝ} {s t : ℝ} (hf : ConvexOn ℝ (Set.Icc 0 1) f)
+    (hd : HasDerivWithinAt f s (Set.Ioi 0) 0) (ht0 : 0 < t) (ht1 : t ≤ 1) :
+    s * t ≤ f t - f 0 := by
+  have hlim := hasDerivWithinAt_iff_tendsto_slope.mp hd
+  rw [Set.sdiff_singleton_eq_self (by simp)] at hlim
+  have hs : s ≤ (f t - f 0) / t := by
+    apply le_of_tendsto hlim
+    filter_upwards [Ioo_mem_nhdsGT ht0] with h hh
+    obtain ⟨hh0, hht⟩ := hh
+    have hconv := hf.2 (Set.left_mem_Icc.mpr zero_le_one) ⟨ht0.le, ht1⟩
+      (by rw [sub_nonneg, div_le_one ht0]; exact hht.le : (0 : ℝ) ≤ 1 - h / t)
+      (div_nonneg hh0.le ht0.le) (by ring)
+    simp only [smul_eq_mul, mul_zero, zero_add] at hconv
+    rw [div_mul_cancel₀ h ht0.ne'] at hconv
+    rw [slope_def_field, sub_zero, div_le_div_iff₀ hh0 ht0]
+    have e : (1 - h / t) * f 0 + h / t * f t = f 0 + h / t * (f t - f 0) := by ring
+    rw [e] at hconv
+    have : (f h - f 0) * t ≤ h / t * (f t - f 0) * t := by nlinarith
+    rw [div_mul_eq_mul_div, div_mul_cancel₀ _ ht0.ne'] at this
+    linarith
+  rwa [le_div_iff₀ ht0] at hs
+
+/-- **At a convex line's apex nothing ahead is lower**: if the comparison is convex along the
+whole line and its slope at the start is not negative (the power test's apex), no fraction
+`τ ∈ [0, 1]` of the line lowers it, so no step along it can be adopted and the move is released
+from rest. Where the line is not convex this is not derived (§7 of the throw's record). The
+throw's line is its whole carried move, impulse and coast together. -/
+theorem coast_apex_no_floor_ahead {f : ℝ → ℝ} {s : ℝ} (hf : ConvexOn ℝ (Set.Icc 0 1) f)
+    (hd : HasDerivWithinAt f s (Set.Ioi 0) 0) (hs : 0 ≤ s) :
+    ∀ τ ∈ Set.Icc (0 : ℝ) 1, f 0 ≤ f τ := by
+  intro τ ⟨hτ0, hτ1⟩
+  rcases hτ0.lt_or_eq with hτ | hτ
+  · have := convex_slope_le hf hd hτ hτ1
+    nlinarith
+  · rw [← hτ]
+
+/-- **The floor along a carried coast**: on the quadratic `a + sτ + κτ²/2` with `κ > 0`, the
+fraction `τ* = −s/κ` is lowest. -/
+theorem coast_floor (a s κ τ : ℝ) (hκ : 0 < κ) :
+    a + s * (-s / κ) + κ * (-s / κ) ^ 2 / 2 ≤ a + s * τ + κ * τ ^ 2 / 2 := by
+  have e : a + s * τ + κ * τ ^ 2 / 2 - (a + s * (-s / κ) + κ * (-s / κ) ^ 2 / 2)
+      = κ / 2 * (τ + s / κ) ^ 2 := by
+    field_simp
+    ring
+  nlinarith [mul_nonneg (by linarith : (0 : ℝ) ≤ κ / 2) (sq_nonneg (τ + s / κ))]
+
+/-- **Without certified curvature the end is the floor**: on `a + sτ + κτ²/2` with `s ≤ 0` and
+`κ ≤ 0`, the line's end `τ = 1` is lowest over `[0, 1]`: a floor stop carries the whole line
+where its curvature reading's upper end `κ⁺` is not positive (`line_falls_to` gives the stop for
+every `κ⁺`). -/
+theorem coast_floor_at_end (a s κ τ : ℝ) (hs : s ≤ 0) (hκ : κ ≤ 0) (hτ0 : 0 ≤ τ) (hτ1 : τ ≤ 1) :
+    a + s * 1 + κ * 1 ^ 2 / 2 ≤ a + s * τ + κ * τ ^ 2 / 2 := by
+  have h1 : s * 1 ≤ s * τ := by nlinarith
+  have h2 : κ * 1 ^ 2 / 2 ≤ κ * τ ^ 2 / 2 := by nlinarith [mul_le_mul hτ1 hτ1 hτ0 zero_le_one]
+  linarith
+
+/-- **The line falls up to where its slope turns**: on `a + sτ + κτ²/2`, if `0 ≤ τ₁ ≤ τ₂`,
+`s ≤ 0` and `s + κτ₂ ≤ 0`, then the value at `τ₂` is at most the value at `τ₁`. One condition
+covers both signs of `κ`, so over enclosures `s ≤ s⁺`, `κ ≤ κ⁺` the line falls on `[0, τ]` for
+every `τ` with `s⁺ + κ⁺τ ≤ 0`: the stop `min(1, −s⁺/κ⁺)` (the whole line where `κ⁺ ≤ 0`) is
+derived without certifying the sign of `κ`. -/
+theorem line_falls_to (a s κ τ₁ τ₂ : ℝ) (h₁ : 0 ≤ τ₁) (h₁₂ : τ₁ ≤ τ₂) (hs : s ≤ 0)
+    (hturn : s + κ * τ₂ ≤ 0) :
+    a + s * τ₂ + κ * τ₂ ^ 2 / 2 ≤ a + s * τ₁ + κ * τ₁ ^ 2 / 2 := by
+  have e : a + s * τ₂ + κ * τ₂ ^ 2 / 2 - (a + s * τ₁ + κ * τ₁ ^ 2 / 2)
+      = (τ₂ - τ₁) * (s + κ * (τ₁ + τ₂) / 2) := by ring
+  have hmid : s + κ * (τ₁ + τ₂) / 2 ≤ 0 := by
+    rcases le_total 0 κ with hκ | hκ
+    · nlinarith [mul_le_mul_of_nonneg_left h₁₂ hκ]
+    · nlinarith [mul_nonneg_of_nonpos_of_nonpos hκ (by linarith : -(τ₁ + τ₂) ≤ 0)]
+  nlinarith [mul_nonpos_of_nonneg_of_nonpos (by linarith : 0 ≤ τ₂ - τ₁) hmid]
+
+/-- **The coast's curvature is read from its own end**: on that quadratic, the secant reading
+`2(L(1) − L(0) − s)` is `κ`. -/
+theorem coast_secant_curvature (a s κ : ℝ) :
+    2 * ((a + s * 1 + κ * 1 ^ 2 / 2) - a - s) = κ := by
+  ring
+
+/-! ## 10. The deposit holds the carried momentum -/
+
+omit [DecidableEq n] in
+/-- **The held momentum's sticking loss.** A deposit changes the mass `C` to `C + F` and holds the
+momentum: `(C + F) w' = C w`. With `C` symmetric, the kinetic reading `⟨w, C w⟩` (twice the
+energy) falls by exactly the accreted mass's reading at the new velocity plus the velocity jump's
+reading in the old mass. No sign is assumed: the identity holds for any symmetric `F`. -/
+theorem held_momentum_loss (C F : Matrix n n ℝ) (hC : Cᵀ = C) (w w' : n → ℝ)
+    (hheld : C *ᵥ w = (C + F) *ᵥ w') :
+    w ⬝ᵥ (C *ᵥ w) - w' ⬝ᵥ ((C + F) *ᵥ w') =
+      w' ⬝ᵥ (F *ᵥ w') + (w - w') ⬝ᵥ (C *ᵥ (w - w')) := by
+  have hs : w ⬝ᵥ (C *ᵥ w') = w' ⬝ᵥ (C *ᵥ w) := by
+    rw [dotProduct_mulVec, ← mulVec_transpose, hC, dotProduct_comm]
+  have e : w' ⬝ᵥ (C *ᵥ w) = w' ⬝ᵥ (C *ᵥ w') + w' ⬝ᵥ (F *ᵥ w') := by
+    rw [hheld, add_mulVec, dotProduct_add]
+  simp only [mulVec_sub, sub_dotProduct, dotProduct_sub, add_mulVec, dotProduct_add]
+  linarith
+
+omit [DecidableEq n] in
+/-- **Accretion at a held momentum dissipates**: for `C ⪰ 0` and an accreted `F ⪰ 0`, the kinetic
+reading never rises across the deposit. The scalar case is `accretion_dissipates`. -/
+theorem held_momentum_dissipates {C F : Matrix n n ℝ} (hC : C.PosSemidef) (hF : F.PosSemidef)
+    (w w' : n → ℝ) (hheld : C *ᵥ w = (C + F) *ᵥ w') :
+    w' ⬝ᵥ ((C + F) *ᵥ w') ≤ w ⬝ᵥ (C *ᵥ w) := by
+  have hCs : Cᵀ = C := by simpa only [conjTranspose_eq_transpose_of_trivial] using hC.1.eq
+  have h := held_momentum_loss C F hCs w w' hheld
+  have hF' : 0 ≤ w' ⬝ᵥ (F *ᵥ w') := by
+    simpa only [star_trivial] using hF.dotProduct_mulVec_nonneg w'
+  have hC' : 0 ≤ (w - w') ⬝ᵥ (C *ᵥ (w - w')) := by
+    simpa only [star_trivial] using hC.dotProduct_mulVec_nonneg (w - w')
+  linarith
+
+/-- **Accretion lowers the inverse mass in the Loewner order**: `(H + F)⁻¹ ⪯ H⁻¹` for `H ≻ 0` and
+`F ⪰ 0`. Read at a momentum `π`, `½⟨π, (H + F)⁻¹ π⟩ ≤ ½⟨π, H⁻¹ π⟩`: the throw's kinetic reading
+never rises across a deposit (#240's record §5, the matrix form it owed). -/
+theorem accretion_inverse_antitone {H F : Matrix n n ℝ} (hH : H.PosDef) (hF : F.PosSemidef) :
+    (H⁻¹ - (H + F)⁻¹).PosSemidef := by
+  have hHF : (H + F).PosDef := hH.add_posSemidef hF
+  refine PosSemidef.of_dotProduct_mulVec_nonneg (hH.inv.1.sub hHF.inv.1) fun x => ?_
+  simp only [star_trivial]
+  set w := H⁻¹ *ᵥ x
+  set w' := (H + F)⁻¹ *ᵥ x
+  have hw : H *ᵥ w = x := by
+    simp only [w, mulVec_mulVec, mul_nonsing_inv H ((isUnit_iff_isUnit_det H).mp hH.isUnit),
+      one_mulVec]
+  have hw' : (H + F) *ᵥ w' = x := by
+    simp only [w', mulVec_mulVec,
+      mul_nonsing_inv (H + F) ((isUnit_iff_isUnit_det _).mp hHF.isUnit), one_mulVec]
+  have hle := held_momentum_dissipates hH.posSemidef hF w w' (hw.trans hw'.symm)
+  have e1 : x ⬝ᵥ w = w ⬝ᵥ (H *ᵥ w) := by rw [hw, dotProduct_comm]
+  have e2 : x ⬝ᵥ w' = w' ⬝ᵥ ((H + F) *ᵥ w') := by rw [hw', dotProduct_comm]
+  rw [sub_mulVec, dotProduct_sub]
+  change 0 ≤ x ⬝ᵥ w - x ⬝ᵥ w'
+  linarith
+
+omit [DecidableEq n] in
+/-- **Holding the velocity injects the accreted mass's reading**: across `C → C + F` at a held
+velocity `w`, the reading rises by `⟨w, F w⟩`. It is the held momentum `C w` plus an impulse
+`F w` that no source supplies. -/
+theorem velocity_held_injects (C F : Matrix n n ℝ) (w : n → ℝ) :
+    w ⬝ᵥ ((C + F) *ᵥ w) = w ⬝ᵥ (C *ᵥ w) + w ⬝ᵥ (F *ᵥ w) := by
+  rw [add_mulVec, dotProduct_add]
+
+omit [DecidableEq n] in
+/-- **A mass certified from below bounds the held momentum**: if the deposit's mass satisfies
+`C' ⪰ C/(1 + ε)` with `1 + ε > 0`, the held momentum's reading after it is at most `(1 + ε)` times
+the reading before. The storage certificate `Q' ⪯ (1 + ε) Q` bounds a held velocity; a held
+momentum needs the mass bounded from the other side. -/
+theorem held_momentum_bound {C C' : Matrix n n ℝ} {ε : ℝ} (hC : C.PosSemidef) (hε : 0 < 1 + ε)
+    (hlow : (C' - (1 + ε)⁻¹ • C).PosSemidef) (w w' : n → ℝ) (hheld : C *ᵥ w = C' *ᵥ w') :
+    w' ⬝ᵥ (C' *ᵥ w') ≤ (1 + ε) * (w ⬝ᵥ (C *ᵥ w)) := by
+  have hCs : ((1 + ε)⁻¹ • C).PosSemidef := hC.smul (inv_nonneg.mpr hε.le)
+  have hsplit : (1 + ε)⁻¹ • C + (C' - (1 + ε)⁻¹ • C) = C' := by abel
+  have hheld' : ((1 + ε)⁻¹ • C) *ᵥ ((1 + ε) • w) =
+      ((1 + ε)⁻¹ • C + (C' - (1 + ε)⁻¹ • C)) *ᵥ w' := by
+    rw [hsplit, ← hheld, smul_mulVec, mulVec_smul, smul_smul,
+      inv_mul_cancel₀ hε.ne', one_smul]
+  have h := held_momentum_dissipates hCs hlow _ _ hheld'
+  rw [hsplit] at h
+  have e : ((1 + ε) • w) ⬝ᵥ (((1 + ε)⁻¹ • C) *ᵥ ((1 + ε) • w)) =
+      (1 + ε) * (w ⬝ᵥ (C *ᵥ w)) := by
+    rw [smul_mulVec, mulVec_smul, smul_smul, inv_mul_cancel₀ hε.ne', one_smul,
+      smul_dotProduct, smul_eq_mul]
+  linarith
 
 end Holonics.HNN.MoveDirection
