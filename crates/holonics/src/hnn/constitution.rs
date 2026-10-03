@@ -7163,6 +7163,32 @@ pub struct ContinuingState {
     clock: u64,
     commit: u64,
     storage_product: Rat,
+    /// The identity of the material the state continues ([`Constitution::material_identity`]).
+    material: u128,
+}
+
+/// [definition; agent-inferred, October 3] **A text's residue**: its bytes read as one base-256
+/// integer, reduced modulo the Mersenne prime `p = 2^127 − 1`. Two texts of the same length that
+/// differ in one byte by `δ` at place `k` differ by `δ·256^k`, and `p` is prime and larger than
+/// `|δ| < 256` and coprime to 256, so their residues differ: every single-byte change is caught
+/// exactly. A length change is caught by carrying the length beside it. The modulus is the largest
+/// prime below the ring words' `2^128` (`ℤ/2^128`), so the residue fits one word.
+pub fn text_residue(text: &str) -> u128 {
+    let p: u128 = (1 << 127) - 1;
+    let mut residue: u128 = 0;
+    for &byte in text.as_bytes() {
+        for _ in 0..8 {
+            residue <<= 1;
+            if residue >= p {
+                residue -= p;
+            }
+        }
+        residue += u128::from(byte);
+        if residue >= p {
+            residue -= p;
+        }
+    }
+    residue
 }
 
 impl Constitution {
@@ -7198,7 +7224,30 @@ impl Constitution {
             clock: self.clock(locus),
             commit: self.commit,
             storage_product: self.storage_product.clone(),
+            material: self.material_identity(ring),
         })
+    }
+
+    /// [definition; agent-inferred, October 3] **The identity of the material a continuing state of
+    /// ring `g` continues**: the residue ([`text_residue`]) of this constitution's exact written
+    /// form (its derived `Debug`, every value exact) with what a continuing state carries set to
+    /// the founding's values: ring `g`'s source law absent and its modulus one, no clock, commit
+    /// zero and storage product one. A move that changes only the source port (all
+    /// [`Constitution::continuing_state`] admits) leaves it unchanged, so a state and the declared
+    /// opening it continues share it, and a state written against another opening's material
+    /// (another field, declaration or founding) is refused at [`Constitution::continued`]. The
+    /// written form follows the constitution's layout, so a change of that layout changes every
+    /// identity: an earlier save is then refused, never mounted.
+    pub fn material_identity(&self, ring: usize) -> u128 {
+        let mut material = self.clone();
+        if let Some(founding) = material.rings.get_mut(ring) {
+            founding.source = None;
+            founding.transport = Rat::one();
+        }
+        material.clocks.clear();
+        material.commit = 0;
+        material.storage_product = Rat::one();
+        text_residue(&format!("{material:?}"))
     }
 
     /// **The constitution continued from a checkpoint** ([`ContinuingState`]): the state's source
@@ -7226,6 +7275,11 @@ impl Constitution {
         {
             return Err(HnnError::ContinuingState {
                 what: "the constitution it is restored onto is not the declared opening",
+            });
+        }
+        if self.material_identity(ring) != state.material {
+            return Err(HnnError::ContinuingState {
+                what: "the state continues another opening's material",
             });
         }
         let lattice = self.lattice(Locus::SourcePort(ring))?;
@@ -7269,7 +7323,9 @@ impl ContinuingState {
     /// **The state as text**, every value exact (the type's header): `E rows cols`, the rows,
     /// `rho ρ`, then `state g`, `gram n` with its rows, `chart L_s δ`, `support k` with the support,
     /// `block` with the chart's integer coordinates, `map-carry k` and `gram-carry k` each with
-    /// `index value` lines, `clock m`, `commit c`, `storage-product p`, `end`.
+    /// `index value` lines, `clock m`, `commit c`, `storage-product p`, `material m` (the identity of
+    /// the material it continues), `check n r` (the byte length and residue of every line before it,
+    /// [`text_residue`]), `end`.
     pub fn to_text(&self) -> String {
         let join = |values: &mut dyn Iterator<Item = String>| values.collect::<Vec<_>>().join(" ");
         let map = &self.law.map;
@@ -7302,8 +7358,47 @@ impl ContinuingState {
         s += &format!("clock {}\n", self.clock);
         s += &format!("commit {}\n", self.commit);
         s += &format!("storage-product {}\n", self.storage_product);
+        s += &format!("material {}\n", self.material);
+        s += &format!("check {} {}\n", s.len(), text_residue(&s));
         s += "end\n";
         s
+    }
+
+    /// [definition; agent-inferred, October 3] **A state's text stamped with a declared opening's
+    /// identity**: its lines through `storage-product`, then `material` (the opening's
+    /// [`Constitution::material_identity`] at the state's ring), `check` and `end`, as
+    /// [`ContinuingState::to_text`] writes them. Only what follows `storage-product` may be replaced:
+    /// `end` alone (a state written before the identity) or an earlier stamp (a state written under
+    /// an earlier layout); anything else is refused. The stamp authenticates nothing by itself: its
+    /// caller has authenticated the text's bytes (the notebook's manifest of earlier states), and
+    /// [`ContinuingState::from_text`] then reads the stamped text whole.
+    pub fn stamped(text: &str, opening: &Constitution) -> Result<String, HnnError> {
+        let refuse = |what: &'static str| HnnError::ContinuingState { what };
+        let at = text
+            .find("\nstorage-product ")
+            .ok_or(refuse("the storage-product line"))?
+            + 1;
+        let through = text[at..]
+            .find('\n')
+            .map(|end| at + end + 1)
+            .ok_or(refuse("the storage-product line"))?;
+        let (body, rest) = text.split_at(through);
+        let stamp = |line: &str| {
+            line == "end" || line.starts_with("material ") || line.starts_with("check ")
+        };
+        if !rest.lines().all(stamp) || rest.lines().last() != Some("end") {
+            return Err(refuse("the stamp (only `end` or an earlier stamp follows the storage product)"));
+        }
+        let ring = body
+            .lines()
+            .find_map(|line| line.strip_prefix("state "))
+            .and_then(|ring| ring.parse::<usize>().ok())
+            .ok_or(refuse("the state line"))?;
+        let mut s = body.to_string();
+        s += &format!("material {}\n", opening.material_identity(ring));
+        s += &format!("check {} {}\n", s.len(), text_residue(&s));
+        s += "end\n";
+        Ok(s)
     }
 
     /// **The state read back from its text** ([`ContinuingState::to_text`]); refused, typed, on any
@@ -7313,6 +7408,11 @@ impl ContinuingState {
         fn refuse<T>(what: &'static str) -> Result<T, HnnError> {
             Err(HnnError::ContinuingState { what })
         }
+        // The check covers every byte before its own line: a damaged state is refused whole.
+        let body = text
+            .rfind("\ncheck ")
+            .map(|at| &text[..at + 1])
+            .ok_or(HnnError::ContinuingState { what: "the check line" })?;
         let mut lines = text.lines();
         let mut next = |what: &'static str| lines.next().ok_or(HnnError::ContinuingState { what });
         let rats = |line: &str, what: &'static str| -> Result<Vec<Rat>, HnnError> {
@@ -7423,6 +7523,16 @@ impl ContinuingState {
         let storage_product: Rat = scalar("storage-product", "the storage product")?
             .parse()
             .map_err(|_| HnnError::ContinuingState { what: "the storage product" })?;
+        let material: u128 = scalar("material", "the material identity")?
+            .parse()
+            .map_err(|_| HnnError::ContinuingState { what: "the material identity" })?;
+        let check = head(next("the check line")?, "check", "the check line")?;
+        if check.len() != 2
+            || check[0].parse::<usize>().ok() != Some(body.len())
+            || check[1].parse::<u128>().ok() != Some(text_residue(body))
+        {
+            return refuse("the check (the state is damaged)");
+        }
         if next("the end")?.trim() != "end" {
             return refuse("the end");
         }
@@ -7448,6 +7558,7 @@ impl ContinuingState {
             clock,
             commit,
             storage_product,
+            material,
         })
     }
 }

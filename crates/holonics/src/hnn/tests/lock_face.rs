@@ -783,6 +783,52 @@ fn a_restored_checkpoint_continues_exactly_over_successive_receptions() {
     ));
 }
 
+/// **A restored checkpoint authenticates the material it continues and refuses damage**: a state
+/// carries the identity of its opening's material ([`Constitution::material_identity`]) and a check
+/// over its text, so a state of the same shape and lattice is refused onto another opening (here
+/// one founded from another seed), and a text damaged in one byte is refused before it mounts.
+#[test]
+fn a_checkpoint_is_refused_onto_foreign_material_and_when_damaged() {
+    let field = joint();
+    let opening = generic(&field, 94).with_transport(0, rat(3, 4)).unwrap();
+    let foreign = generic(&field, 95).with_transport(0, rat(3, 4)).unwrap();
+    assert_eq!(
+        opening.source_port(0).map(|e| (e.rows(), e.columns())),
+        foreign.source_port(0).map(|e| (e.rows(), e.columns()))
+    );
+    assert_ne!(opening.material_identity(0), foreign.material_identity(0));
+    let refinement = Refinement::declare(&field, 0, 2, 1, 4, 2).unwrap();
+    let requests = short_requests(&field, &[(95, [0, 1, 2, 1]), (96, [1, 1, 0, 2]), (97, [2, 0, 1, 1])]);
+    let first = executed_move(&field, &opening, &requests, &refinement, &joint_bank(), 12, Comparison::LOCK_DECISIONS)
+        .unwrap();
+    let (continued, _) = first.adopted.expect("the reception adopts a move");
+    // The move changes only the source port, so the identity is the opening's.
+    assert_eq!(continued.material_identity(0), opening.material_identity(0));
+    let text = state_of(&continued).to_text();
+    let state = ContinuingState::from_text(&text).unwrap();
+    assert_eq!(opening.clone().continued(&state).unwrap(), continued);
+    assert!(matches!(
+        foreign.clone().continued(&state),
+        Err(HnnError::ContinuingState { what }) if what.contains("another opening")
+    ));
+    // One byte of the port's first row changed, still a well-formed rational: refused by the check.
+    let row = text.lines().nth(1).expect("the port's first row");
+    let at = text.find(row).expect("the row") + row.find(|c: char| c.is_ascii_digit()).expect("a digit");
+    let mut damaged = text.clone().into_bytes();
+    damaged[at] = if damaged[at] == b'7' { b'8' } else { b'7' };
+    let damaged = String::from_utf8(damaged).unwrap();
+    assert_ne!(damaged, text);
+    assert!(matches!(
+        ContinuingState::from_text(&damaged),
+        Err(HnnError::ContinuingState { what }) if what.contains("damaged")
+    ));
+    // A changed material line is caught by the check as well.
+    let material = format!("material {}", opening.material_identity(0));
+    let relabelled = text.replace(&material, &format!("material {}", foreign.material_identity(0)));
+    assert_ne!(relabelled, text);
+    assert!(ContinuingState::from_text(&relabelled).is_err());
+}
+
 fn state_of(theta: &Constitution) -> ContinuingState {
     theta.continuing_state(0).unwrap()
 }
