@@ -738,3 +738,48 @@ toward any release.
 (measured to projected `281441/1772028`, below `3/16`), with a peak resident set of `103690240`
 bytes. The per-state reads ran from `501719` to `533346` ms, below the `1082906` ms that set the
 projection. Coast-alone m9's call took `519226` ms, peak `85889024` bytes.
+
+## 12. The exposure gate at m6 and w16 is not read: both runs passed their deadline
+
+The receipts are under `s12/`, copied from `claude/pc-receipts` (`697a89ed`). This is P4 of
+[PC_QUEUE](../runs/u6/PC_QUEUE.md), the gate §7 restates: from m6 and from w16, everything else equal,
+`executed expose 2026093061 2026093012 128 all`, at 2 threads per source, both sources at once on the
+PC, under `timeout 36000`.
+
+**Both stopped incomplete.** Each exited 124 at `36000053` ms. Each output is the header line and the
+exit line: a cut of 65536 cells, 1238 training passages from seed `2026093061` (the first entered
+after 32 cells), 128 held-out passages from seed `2026093012`, 1024 station cells held out, windows
+all. The error files are empty. No code was printed, so w16's held-out code against m6's (the gate,
+64 bits) is not read, and §7's question is open. It is not relaunched with a larger deadline.
+
+**Why the projection failed.** The deadline came from a 200-window read at m6 in the cloud (`294297`
+ms, user time 425 s over a real time of 294 s), extrapolated linearly to the cut's 21845 windows:
+`32144589` ms per source. Three things in it did not hold.
+- *The host.* The rate was measured in the cloud and applied to the PC, which §10's rule forbids: a
+  bound comes from the same host's own measurement before launch. The PC copy was started as a
+  fallback for the cloud copy, which a container restart had stopped, and it inherited the cloud's
+  projection.
+- *The parallelism.* A read-only look at the PC at 05:14 UTC found each source running at `6106/6000`
+  of one core with 2 rayon workers. The only parallel work in `expose_with` is two `rayon::join`
+  points (`reference.rs:609`, `:4325`). By that look, more workers would have saved under `1/23` of the
+  wall time, so the thread count was not the cause.
+- *The read.* `expose_read` prints nothing between its header and its result, and it keeps no state
+  mid-run, so the run could not be stopped early on evidence, and how far it got is unknown. Whether
+  the time per window grows along the cut (the standing deepens with every deposit, and keys are
+  located at each aeon boundary) or the PC's rate was simply lower is not separated.
+
+**What a decisive read would need** (stated, not launched). `with_deadline(n)` alone cannot decide
+the gate. The cut's 6144 held-out cells (128 passages of 48 cells) are its last 2048 windows, so a
+read that stops after `n` windows never reaches them unless it reads the whole cut. The cheapest
+decisive form has two parts.
+1. A progress line from `expose_with` every fixed number of windows, with elapsed ms. Then a
+   same-host development read of the first windows gives the rate, the deadline is three times its
+   projection, and the run stops early when the measured rate passes it.
+2. A cut whose training prefix is a declared count shorter than 59392 cells, with the held-out
+   passages unchanged and still last, so the held-out cells are reached within that projection.
+   The prefix must still span the aeon boundaries at which keys are located. [agent-inferred]
+   §7 counted on about 21500 deposits before the held-out cells, so a shorter prefix changes what
+   the read measures: the gate then asks whether E shortens held-out code after that many deposits.
+
+Nothing waits on this gate now. The U6 chains have ended (§10), and the arms' end states do not
+separate held out (§11). The read stays owed and is not queued.

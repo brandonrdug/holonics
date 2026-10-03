@@ -55,6 +55,11 @@ its jump `J`, the requests it changes).
 
 ## P4. The exposure protocol's held-out code at m6 and w16 (record §7's restated gate)
 
+**Incomplete** (October 3, `claude/pc-receipts` `697a89ed`; the refits record §12). Both sources exited
+124 at `36000053` ms with only the header written, so the gate is not read. It is not relaunched, and
+the record states the decisive form (a progress line and a shorter declared training prefix). The
+queue is empty. The text below is the plan as launched.
+
 **Running in two places.** The cloud launched it on October 2 at 21:28 UTC, at 2 threads per
 source. A container restart at about 23:00 lost that run: only the header line had been written, since
 the run prints no per-window progress. The cloud relaunched it at 23:07 under the same deadline. The
