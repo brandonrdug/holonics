@@ -1,0 +1,4 @@
+held state's released comparison, exact: 6542858644553322250612611210219/79228162514264337593543950336 1635733628642321419922258578365/19807040628566084398385987584
+move 1: probe exit 0;   jm1 kinetic-modulus: the incumbent: ρ 102837/131072; L ∈ [338257/4096, 338262/4096) nats, X ∈ [156803/4096, 156808/4096) nats; solved 1 of 64; whole 0 (released 7, stations right 13); 519373 ms
+      trials: η 1/16 ρ unmoved mask [304103/4096, 304108/4096) own [379492/4096, 379497/4096) adopted; γ_ρ [599573/4096, 599574/4096)
+  run move 1: opted successor's own release: ρ 102837/131072; L ∈ [379492/4096, 379497/4096) nats, X ∈ [198136/4096, 198141/4096) nats; solved 1 of 64; whole 0 (released 8, stations right 20); 519374 ms; open

@@ -1,0 +1,12 @@
+  the release guard: ReleaseExcursion { checkpoint: None, height: Some(Ratio { numer: 0, denom: 1 }) }
+executed move-once: 8 order2 requests at development seed 2026093061, the candidate arm, from m9 (ρ 102837/131072); the bank p = 5/8, grain 2^(-16)
+    the incumbent's own comparison, exact: 3397800539814146637432322707237/39614081257132168796771975168 6795679662398244967466518684551/79228162514264337593543950336
+  m9 throw: the incumbent: ρ 102837/131072; L ∈ [351324/4096, 351329/4096) nats, X ∈ [170328/4096, 170333/4096) nats; solved 1 of 64; whole 0 (released 8, stations right 16); 1170524 ms
+    the throw: flight of 4 moves, moving; power along the coast [60806/4096, 60812/4096); coast released from rest; kinetic reading [1409949/4096, 1409950/4096); impulse step Some(Ratio { numer: 8, denom: 1 })
+    γ_ρ Some(Ratio { numer: 9891383, denom: 2097152 }), Δρ per unit of E's step Some(Ratio { numer: 0, denom: 1 }) (24 bits)
+    move 0: adopted at step 1/4; the ladder's start Some((Ratio { numer: 8, denom: 1 }, FirstOrderZero)); trials η 8 Some("refused"), η 4 Some("refused"), η 2 Some("refused"), η 1 Some("refused"), η 1/2 Some("refused"), η 1/4 None; persistence Persistence { locks: 64, solved: 5, reread: 5, stay: 0, fall: 5, reversed: 5, uncertified: 0 }; 1170525 ms
+      trials: η 8 ρ unmoved mask [359802/4096, 359807/4096) own [367169/4096, 367174/4096) NotBelow; η 4 ρ unmoved mask [338332/4096, 338337/4096) own [364927/4096, 364932/4096) OwnNotBelow; η 2 ρ unmoved mask [336981/4096, 336986/4096) own [352193/4096, 352198/4096) OwnNotBelow; η 1 ρ unmoved mask [342484/4096, 342489/4096) own [360561/4096, 360566/4096) OwnNotBelow; η 1/2 ρ unmoved mask [346262/4096, 346267/4096) own [365818/4096, 365823/4096) OwnNotBelow; η 1/4 ρ unmoved mask [348717/4096, 348722/4096) own [348717/4096, 348722/4096) adopted; γ_ρ [19319/4096, 19320/4096)
+  m9 throw: the adopted successor's own release: ρ 102837/131072; L ∈ [348717/4096, 348722/4096) nats, X ∈ [167601/4096, 167606/4096) nats; solved 1 of 64; whole 0 (released 8, stations right 16); 1170525 ms
+    the successor's own comparison, exact: 3372592809338839393057638413303/39614081257132168796771975168 6745263483482550543306238265417/79228162514264337593543950336
+  m9: throw adopted; the later metrics are not attempted
+executed move-once: 1170693 ms; resident 165343232 now, 177455104 peak
