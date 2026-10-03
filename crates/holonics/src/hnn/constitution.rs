@@ -1158,11 +1158,13 @@ impl ChartRule {
 
 /// [definition; agent-inferred] **The solved chart** `X̂ ≈ H⁻¹` of a normal law's carried Gram
 /// (the lattice word; Lean `HNN/LatticeWord`): a symmetric lattice matrix on `2^(−L_s)ℤ` with its certified
-/// left residual `δ = ‖1 − X̂H‖∞`, computed exactly. The Gram is the identity off its **support**
-/// (the rows where a deposit moved it: `H = I + Σ w f fᵀ` moves only rows some feature reached), and
-/// so is the chart; the chart is carried on the support as integer coordinates (`i128`, with the
-/// carrier refused past it), and every product it takes is an integer product. The founding chart is
-/// exact: `H_0 = I`, `X̂ = I`, `δ = 0`.
+/// left residual `δ = ‖1 − X̂H‖∞`, computed exactly. The Gram is its prior `2^k I` off its
+/// **support** (the rows where a deposit moved it: `H = 2^k I + Σ w f fᵀ` moves only rows some
+/// feature reached), and the chart is `2^(−k) I` there, exact on its lattice (`L_s ≥ k`); the chart
+/// is carried on the support as integer coordinates (`i128`, with the carrier refused past it), and
+/// every product it takes is an integer product. The founding chart is exact: `H_0 = 2^k I`,
+/// `X̂ = 2^(−k) I`, `δ = 0` ([`SolvedChart::founded`]; `k = 0` is [`SolvedChart::identity`], every
+/// law's but a receiving map's declared otherwise, `ReceiverDeclaration::receiving_scale`).
 ///
 /// A deposit ([`SolvedChart::deposited`]) moves the Gram to `H' = H + Σ w f fᵀ` (carried) and the
 /// chart in three stages, each on the successor's lattice:
@@ -1191,9 +1193,11 @@ impl ChartRule {
 /// exact inversion are retired as solves: the rank-one steps are only the warm start.
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct SolvedChart {
-    /// `L_s`: every entry lies on `2^(−L_s)ℤ`.
+    /// `L_s`: every entry lies on `2^(−L_s)ℤ`, and `L_s ≥ k`.
     exponent: u32,
-    /// The Gram's support `S`, ascending; off it the chart is the identity.
+    /// `k`: the Gram is `2^k I` off its support and the chart `2^(−k) I` there.
+    scale: u32,
+    /// The Gram's support `S`, ascending; off it the chart is `2^(−k) I`.
     support: Vec<usize>,
     /// The chart on `S × S` as integer coordinates at `2^(−L_s)`, row-major and symmetric.
     block: Vec<i128>,
@@ -1212,8 +1216,9 @@ struct Refinement {
     residual_bits: u64,
 }
 
-/// A carried Gram read on its support: the support, the finest dyadic exponent `e_H` of its entries
-/// there, their integer coordinates at `2^(−e_H)` (row-major), and `⌈log₂ ‖H‖∞⌉` (0 at most 1).
+/// A carried Gram read on its support (the rows that leave its prior `2^k I`): the support, the
+/// finest dyadic exponent `e_H` of its entries there, their integer coordinates at `2^(−e_H)`
+/// (row-major), and `⌈log₂ ‖H‖∞⌉` over the support's rows (0 at most 1).
 struct GramBlock {
     support: Vec<usize>,
     exponent: u32,
@@ -1222,14 +1227,15 @@ struct GramBlock {
 }
 
 impl GramBlock {
-    /// Read a carried Gram (every entry on a dyadic lattice), refusing a coordinate past `i128` and an
-    /// entry off every dyadic lattice (a Gram that is not carried has no chart).
-    fn of(gram: &[Vec<Rat>]) -> Result<Self, HnnError> {
+    /// Read a carried Gram (every entry on a dyadic lattice) against its prior's diagonal `prior`,
+    /// refusing a coordinate past `i128` and an entry off every dyadic lattice (a Gram that is not
+    /// carried has no chart).
+    fn of(gram: &[Vec<Rat>], prior: &Rat) -> Result<Self, HnnError> {
         let support: Vec<usize> = (0..gram.len())
             .filter(|&i| {
                 gram[i].iter().enumerate().any(
                     |(j, x)| {
-                        if i == j { !x.is_one() } else { !x.is_zero() }
+                        if i == j { x != prior } else { !x.is_zero() }
                     },
                 )
             })
@@ -1520,10 +1526,36 @@ impl SolvedChart {
     pub fn identity() -> Self {
         Self {
             exponent: 0,
+            scale: 0,
             support: Vec::new(),
             block: Vec::new(),
             certificate: Rat::zero(),
         }
+    }
+
+    /// **The founding chart at a scaled prior**: `H_0 = 2^k I`, so `X̂ = 2^(−k) I` exactly on
+    /// `2^(−k)ℤ` (`L_s = k`), `δ = 0`. At `k = 0` it is [`SolvedChart::identity`].
+    pub fn founded(scale: u32) -> Self {
+        Self {
+            exponent: scale,
+            scale,
+            ..Self::identity()
+        }
+    }
+
+    /// `k`: the Gram's prior `2^k I`, which holds off the support.
+    pub fn scale(&self) -> u32 {
+        self.scale
+    }
+
+    /// The Gram's diagonal off the support, `2^k`.
+    fn prior(&self) -> Rat {
+        Rat::from_integer(BigInt::one() << self.scale as usize)
+    }
+
+    /// The chart's diagonal off the support, `2^(−k)`.
+    fn off_support(&self) -> Rat {
+        Rat::new(BigInt::one(), BigInt::one() << self.scale as usize)
     }
 
     /// `L_s`.
@@ -1543,7 +1575,14 @@ impl SolvedChart {
 
     /// The chart as rows of width `n`.
     pub fn dense(&self, n: usize) -> Vec<Vec<Rat>> {
-        let mut rows: Vec<Vec<Rat>> = (0..n).map(|i| unit(n, i)).collect();
+        let diagonal = self.off_support();
+        let mut rows: Vec<Vec<Rat>> = (0..n)
+            .map(|i| {
+                let mut row = vec![Rat::zero(); n];
+                row[i] = diagonal.clone();
+                row
+            })
+            .collect();
         let (s, scale) = (self.support.len(), BigInt::one() << self.exponent as usize);
         for (a, &i) in self.support.iter().enumerate() {
             for (b, &j) in self.support.iter().enumerate() {
@@ -1554,11 +1593,11 @@ impl SolvedChart {
     }
 
     /// Its bits at its lattice as a matrix of width `n`, each entry a reduced ratio as [`bits`]
-    /// counts the other carriers (off the support: `1` on the diagonal, `0` elsewhere), with the
-    /// certificate's.
+    /// counts the other carriers (off the support: `2^(−k)` on the diagonal, `0` elsewhere), with
+    /// the certificate's.
     fn bits(&self, n: usize) -> u64 {
         let s = self.support.len();
-        let outside = (n * n - s * s) as u64 + (n - s) as u64;
+        let outside = (n * n - s * s - (n - s)) as u64 + (n - s) as u64 * bits(&self.off_support());
         let block: u64 = self
             .block
             .iter()
@@ -1568,10 +1607,11 @@ impl SolvedChart {
     }
 
     /// **The reach `X̂f`** of a feature in the integral chart (`F / d`), in the integral chart
-    /// (`over d·2^(L_s)`): the identity off the support.
+    /// (`over d·2^(L_s)`): `2^(−k) f` off the support.
     fn reach(&self, (values, denominator): &Chart) -> Chart {
         let shift = self.exponent as usize;
-        let mut reach: Vec<BigInt> = values.iter().map(|value| value << shift).collect();
+        let off = (self.exponent - self.scale) as usize;
+        let mut reach: Vec<BigInt> = values.iter().map(|value| value << off).collect();
         let s = self.support.len();
         for (a, &i) in self.support.iter().enumerate() {
             let mut sum = BigInt::zero();
@@ -1588,7 +1628,7 @@ impl SolvedChart {
 
     /// The chart carried onto another support at a lattice at least as fine: an entry both
     /// supports hold moves by `2^(L − L_s)` exactly, and an index the chart did not hold enters as the
-    /// identity's.
+    /// prior's chart `2^(−k)` on the diagonal.
     fn carried_to(&self, support: &[usize], exponent: u32) -> Result<Vec<i128>, HnnError> {
         let s = support.len();
         // Every chart and the rule's lattice lie within the residual's shift, so the move fits.
@@ -1609,7 +1649,7 @@ impl SolvedChart {
             for (b, j) in support.iter().enumerate() {
                 let value = match (held.get(i), held.get(j)) {
                     (Some(&p), Some(&q)) => self.block[p * width + q],
-                    _ if a == b => 1i128 << self.exponent,
+                    _ if a == b => 1i128 << (self.exponent - self.scale),
                     _ => 0,
                 };
                 block[a * s + b] = value
@@ -1630,7 +1670,7 @@ impl SolvedChart {
         rule: &ChartRule,
     ) -> Result<(Self, Refinement), HnnError> {
         let n = gram.len();
-        let carried = GramBlock::of(gram)?;
+        let carried = GramBlock::of(gram, &self.prior())?;
         let s = carried.support.len();
         let exponent = rule.exponent(n, carried.norm).max(self.exponent);
         let shift = exponent + carried.exponent;
@@ -1640,7 +1680,7 @@ impl SolvedChart {
         if s == 0 {
             let chart = Self {
                 exponent,
-                ..Self::identity()
+                ..Self::founded(self.scale)
             };
             let refinement = Refinement {
                 warm: Some(Rat::zero()),
@@ -1726,6 +1766,7 @@ impl SolvedChart {
         let (p, delta) = residual.expect("certified above");
         let chart = Self {
             exponent,
+            scale: self.scale,
             support: carried.support,
             block,
             certificate: delta,
@@ -1750,7 +1791,7 @@ pub(crate) fn refined_once(
     exponent: u32,
     gram: &[Vec<Rat>],
 ) -> Option<(Vec<Vec<Rat>>, Rat, Rat)> {
-    let carried = GramBlock::of(gram).ok()?;
+    let carried = GramBlock::of(gram, &Rat::one()).ok()?;
     let s = carried.support.len();
     let scale = Rat::from_integer(BigInt::one() << exponent as usize);
     let mut block = Vec::with_capacity(s * s);
@@ -1769,6 +1810,7 @@ pub(crate) fn refined_once(
     let (_, after) = certified(&next, &carried.coordinates, s, shift)?;
     let chart = SolvedChart {
         exponent,
+        scale: 0,
         support: carried.support,
         block: next,
         certificate: after.clone(),
@@ -1836,16 +1878,44 @@ impl NormalLaw {
     /// [receiving prior's record](../../../../research/records/2026-10-02_THE_RECEIVING_PRIOR_IS_THE_ANCHORS_UNIT_AND_THE_CAP_IS_THE_SAME_CONSTANT.md)]
     /// Its shape is the ring's storage form; its scale is the features' amplitude unit (a prior
     /// `c² I` on features `c f` reads as `I` on `f`, Lean `HNN/ReceivingPrior`), and on the receiving
-    /// map it enters the certified move only as the floor of the unit-step cap. On campaign 1 the
-    /// readings' prequential code is worse at every scale below `I`, and the readings select `2 I`
-    /// among the powers of two ([the locating record](../../../../research/records/2026-10-02_THE_READINGS_LOCATE_THE_RECEIVING_PRIOR_BY_THE_PREQUENTIAL_CERTIFICATE.md)):
-    /// `I` is released, and the opening stays here until the change to `2 I` is measured.
+    /// map it enters the certified move only as the floor of the unit-step cap. Every law but a
+    /// receiving map founds here; a receiving map founds at its field's declared scale
+    /// ([`NormalLaw::with_scaled_prior`]).
     pub fn with_prior(map: ExactRatMatrix) -> Self {
         let n = map.columns();
         let identity: Vec<Vec<Rat>> = (0..n).map(|i| unit(n, i)).collect();
         Self {
             gram: identity,
             chart: SolvedChart::identity(),
+            map,
+            map_carry: Carry::default(),
+            gram_carry: Carry::default(),
+        }
+    }
+
+    /// **The scaled prior at a map**: `H_0 = 2^k I` (so `B_0 = 2^k W_0`), no remainder, and the
+    /// founding chart `X̂ = 2^(−k) I` exact (`δ = 0`, [`SolvedChart::founded`]); `k = 0` is
+    /// [`NormalLaw::with_prior`]. [agent-inferred, October 2; the
+    /// [record that locates it](../../../../research/records/2026-10-02_THE_READINGS_LOCATE_THE_RECEIVING_PRIOR_BY_THE_PREQUENTIAL_CERTIFICATE.md)]
+    /// The receiving map's prior is a per-field declared scale (`ReceiverDeclaration::receiving_scale`),
+    /// located by the readings' prequential certificate (Lean `HNN/ReceivingPrior.prequential_code_le`):
+    /// on campaign 1's 3,400 readings its alignment changes sign between `I` and `2I`, and `2I` codes
+    /// least of the replayed family. It is held to powers of two so the founding chart is exact on
+    /// the lattice, and to `k ≥ 0` so the carried Gram's positivity margin is at least the unit
+    /// prior's, which the lattice rule's certificate cites.
+    pub fn with_scaled_prior(map: ExactRatMatrix, scale: u32) -> Self {
+        let n = map.columns();
+        let prior = Rat::from_integer(BigInt::one() << scale as usize);
+        let gram: Vec<Vec<Rat>> = (0..n)
+            .map(|i| {
+                let mut row = vec![Rat::zero(); n];
+                row[i] = prior.clone();
+                row
+            })
+            .collect();
+        Self {
+            gram,
+            chart: SolvedChart::founded(scale),
             map,
             map_carry: Carry::default(),
             gram_carry: Carry::default(),
@@ -3203,7 +3273,7 @@ impl Constitution {
     /// |---|---|---|
     /// | `E_g` on a source ring | the sign sequence times ½ | normal law, `H_0 = I`, `B_0 = E_0` |
     /// | `E_g^(δ)`, rank `2d_g` | `e_ρ = 0`; `a_ρ`, `b_ρ` from the sign sequence | factor steps |
-    /// | `R` on a receiving ring | 0 | normal law, `H_0 = I`, `B_0 = 0` |
+    /// | `R` on a receiving ring | 0 | normal law, `H_0 = 2^k I` at the receiver's declared `k`, `B_0 = 0` |
     /// | the landmark tree on a receiving ring, declared from its first receiver | empty: every node unfounded, every face uniform (`α = ½` at first arrival) | the landmark deposit (the landmark tree) |
     /// | `W_c,g` | 0 | normal law, `H_0 = I`, `B_0 = 0` |
     /// | `W_s,g = −f fᵀ` | `f = ½I` | factor step |
@@ -3248,7 +3318,13 @@ impl Constitution {
             .max()
             .unwrap_or(1);
         let a = field.alphabet();
-        let receivers: BTreeSet<usize> = field.receivers().iter().map(|r| r.ring).collect();
+        // Each receiving ring's prior scale, from its first declared receiver (as its tree).
+        let receivers: BTreeMap<usize, u32> = field
+            .receivers()
+            .iter()
+            .rev()
+            .map(|r| (r.ring, r.receiving_scale))
+            .collect();
         // Each receiving ring's tree, declared from its first declared receiver.
         let tree = |g: usize| -> Result<Option<Landmarks>, HnnError> {
             field
@@ -3337,8 +3413,11 @@ impl Constitution {
                     Vec::new()
                 };
                 let receiving = receivers
-                    .contains(&g)
-                    .then(|| ExactRatMatrix::zero(2 * a, n).map(NormalLaw::with_prior))
+                    .get(&g)
+                    .map(|&scale| {
+                        ExactRatMatrix::zero(2 * a, n)
+                            .map(|map| NormalLaw::with_scaled_prior(map, scale))
+                    })
                     .transpose()?;
                 Ok(RingMaterial {
                     standing: std::mem::take(&mut founded[g]),
@@ -3354,7 +3433,7 @@ impl Constitution {
                     pairs,
                     pair_scale: Rat::one(),
                     receiving,
-                    population: receivers.contains(&g).then(receiving_population),
+                    population: receivers.contains_key(&g).then(receiving_population),
                     tree: tree(g)?,
                     resonator: None,
                     resonator_scales: std::array::from_fn(|_| Rat::one()),
@@ -3867,7 +3946,12 @@ impl Constitution {
             material.source = Some(NormalLaw::with_prior(source));
         }
         if let Some(receiving) = receiving {
-            material.receiving = Some(NormalLaw::with_prior(receiving));
+            // The replaced map keeps the receiving law's declared prior scale.
+            let scale = material
+                .receiving
+                .as_ref()
+                .map_or(0, |law| law.chart().scale());
+            material.receiving = Some(NormalLaw::with_scaled_prior(receiving, scale));
         }
         Ok(self)
     }
@@ -7349,8 +7433,10 @@ impl ContinuingState {
             law: NormalLaw {
                 map,
                 gram,
+                // The continuing state is the source port's, founded at `H_0 = I`.
                 chart: SolvedChart {
                     exponent,
+                    scale: 0,
                     support,
                     block,
                     certificate,

@@ -55,6 +55,7 @@ fn the_grain_is_derived_from_the_receivers_code_tolerance() {
         prior: crate::compression::landmark::context::StopPrior::half(),
         mass: 1,
         base: crate::compression::landmark::context::BaseMeasure::Even,
+        receiving_scale: 0,
     };
     assert_eq!(
         ReceivingPhases::declare(field, &medium, &current, &coarse)
@@ -87,6 +88,7 @@ fn an_aperture_beyond_the_observability_rank_is_refused() {
         prior: crate::compression::landmark::context::StopPrior::half(),
         mass: 1,
         base: crate::compression::landmark::context::BaseMeasure::Even,
+        receiving_scale: 0,
     };
     match ReceivingPhases::declare(&field, &medium, &current, &wide) {
         Err(HnnError::Observability { aperture, rank }) => {
