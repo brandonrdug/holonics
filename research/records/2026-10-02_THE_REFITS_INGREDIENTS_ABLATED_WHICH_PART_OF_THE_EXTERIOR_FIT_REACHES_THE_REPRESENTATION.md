@@ -777,6 +777,11 @@ decisive form has two parts.
    projection, and the run stops early when the measured rate passes it.
 2. A cut whose training prefix is a declared count shorter than 59392 cells, with the held-out
    passages unchanged and still last, so the held-out cells are reached within that projection.
+   The present code does not admit such a cut. The exposure refuses a cut whose length is not the
+   field's declared population (`expose_from`, which `expose_with` calls, `reference.rs:3834`), and
+   the field refuses a population below `n*` (`Field::declare`, `field.rs:1135`). So this part needs
+   campaign 1's field declared with the shorter population, no shorter than `n*`. That is a new
+   declaration, not a launch argument, and whether m6's and w16's states mount on it is not checked.
    The prefix must still span the aeon boundaries at which keys are located. [agent-inferred]
    §7 counted on about 21500 deposits before the held-out cells, so a shorter prefix changes what
    the read measures: the gate then asks whether E shortens held-out code after that many deposits.
