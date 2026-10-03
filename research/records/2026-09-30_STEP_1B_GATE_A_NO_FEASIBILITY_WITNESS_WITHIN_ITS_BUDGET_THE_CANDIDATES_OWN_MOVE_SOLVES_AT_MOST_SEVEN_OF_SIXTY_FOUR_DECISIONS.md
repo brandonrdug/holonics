@@ -290,12 +290,12 @@ owner's tests named here until it is stated.
    executed move's admitted future), with the move's determinism as its hypothesis. Held by
    `a_restored_checkpoint_continues_exactly_over_successive_receptions`.
    [Noted October 3.] A restore does not recompute the solved chart's residual: `continued`
-   (`constitution.rs:7208-7245`) checks shape, opening and lattice and loads the chart with its saved
-   certificate. Acceptance is protected where a chart is adopted: a deposit's chart is published
-   only when its exact integer residual `δ` is at most its target (`SolvedChart::deposited`,
-   `constitution.rs:1724-1729`; every other path refuses). From #273 a restored state's bytes are
-   bound by its material identity and whole-text check, so a saved certificate is the one its
-   deposit certified, read back unchanged.
+   (`constitution.rs:7257-7299`) checks shape, opening, material and lattice and loads the chart
+   with its saved certificate. Acceptance is protected where a chart is adopted: a deposit's chart
+   is published only when its exact integer residual `δ` is at most its target
+   (`SolvedChart::deposited`, `constitution.rs:1724-1729`; every other path refuses). From #273 a
+   restored state's bytes are bound by its material identity and whole-text check, so a saved
+   certificate is the one its deposit certified, read back unchanged.
 4. **The decisions' coverage** (§13.4, §13.7): for any lock trajectory whose refinements' placed
    sections grow by the locks, `r*` exists (refinement `0` places nothing) and every station `j` is
    open at `d(j)`, so a request has exactly `m` decision terms on a release, a hold and a refused
