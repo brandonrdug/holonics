@@ -351,4 +351,4 @@ Still owed: the device word with host-card parity (the card's port tests read th
 default, rest, so they are unchanged), and the Lean statement (#62). Guard 16 of
 [THE_MACHINE](../../docs/THE_MACHINE.md) reads that no change outlives its word or its refinement;
 under `A = 0` the end change outlives its refinement into the next reception's opening, as this
-record derives. The guard's wording owes that join in its owner.
+record derives. The guard is amended to say so, with rest as the default that keeps it as stated.

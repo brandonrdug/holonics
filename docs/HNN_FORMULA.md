@@ -820,7 +820,9 @@ receive   f_j = R[P_R^(τ_R) v_R(e_j)] at the receiving epochs, read at the rece
   The standing `q` moves only by deposition. Within one refinement a continuing word opens on the
   change the previous word left (`Word::continuing`; its consumer, the linear readout of
   `hnn::prediction`, was retired September 30, batch H); the refinement owns its words until its
-  return (THE_MACHINE guard 16).
+  return (THE_MACHINE guard 16). Under a declared reception carry (October 3; the default is rest)
+  the next reception's word opens on the interior of the end change the consumed word left
+  (`Word::open_received`; guard 16 as amended).
 - **What the word lacks.** It has no global `D/b`, no softmax drive, no boundary hold `H̄` and no
   relaxation `μ`. Those belonged to the prototype's word, which is kept in history at
   [`13f8c734`](https://github.com/brandonrdug/holonics/blob/13f8c734/docs/HNN_FORMULA.md#the-incident-word).
