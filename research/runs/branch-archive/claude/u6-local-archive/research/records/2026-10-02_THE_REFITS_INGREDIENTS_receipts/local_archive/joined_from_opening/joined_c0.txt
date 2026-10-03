@@ -1,0 +1,9 @@
+held state's released comparison, exact: 9675233065125832691889997362453/79228162514264337593543950336 9675321095424183550354644101135/79228162514264337593543950336
+move 1: probe exit 0;   jo1 kinetic-modulus: the incumbent: ρ 102837/131072; L ∈ [500197/4096, 500203/4096) nats, X ∈ [318493/4096, 318499/4096) nats; solved 0 of 64; whole 0 (released 7, stations right 15); 502229 ms
+      trials: η 1/32 ρ unmoved mask [453778/4096, 453783/4096) own [453778/4096, 453783/4096) adopted; γ_ρ [-332395/4096, -332394/4096)
+  run move 1: opted successor's own release: ρ 102837/131072; L ∈ [453778/4096, 453783/4096) nats, X ∈ [272074/4096, 272079/4096) nats; solved 0 of 64; whole 0 (released 7, stations right 16); 502231 ms; closes
+  the run closes; held state now .local/jk/jo1/jo1-kinetic-modulus.state
+move 2: probe exit 0;   jo2 kinetic-modulus: the incumbent: ρ 102837/131072; L ∈ [453778/4096, 453783/4096) nats, X ∈ [272074/4096, 272079/4096) nats; solved 0 of 64; whole 0 (released 7, stations right 16); 279931 ms
+      trials: η 1/32 ρ 410859/524288 mask [416494/4096, 416499/4096) own [430770/4096, 430775/4096) adopted; γ_ρ [577176/4096, 577177/4096)
+  run move 1: opted successor's own release: ρ 410859/524288; L ∈ [430770/4096, 430775/4096) nats, X ∈ [249065/4096, 249071/4096) nats; solved 0 of 64; whole 0 (released 8, stations right 13); 279935 ms; closes
+  the run closes; held state now .local/jk/jo2/jo2-kinetic-modulus.state

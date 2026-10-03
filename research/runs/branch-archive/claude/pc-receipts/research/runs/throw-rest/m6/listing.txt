@@ -1,0 +1,12 @@
+  the release guard: ReleaseExcursion { checkpoint: None, height: Some(Ratio { numer: 0, denom: 1 }) }
+executed move-once: 8 order2 requests at development seed 2026093061, the candidate arm, from m6 (ρ 102837/131072); the bank p = 5/8, grain 2^(-16)
+    the incumbent's own comparison, exact: 232767934744161526080879104925/2475880078570760549798248448 1862163710408867877139334325095/19807040628566084398385987584
+  m6 throw: the incumbent: ρ 102837/131072; L ∈ [385082/4096, 385087/4096) nats, X ∈ [203746/4096, 203751/4096) nats; solved 2 of 64; whole 0 (released 8, stations right 17); 473317 ms
+    the throw: flight of 0 moves, at rest; power along the coast none; coast released from rest; kinetic reading none; impulse step Some(Ratio { numer: 16, denom: 1 })
+    γ_ρ Some(Ratio { numer: 11984441, denom: 262144 }), Δρ per unit of E's step Some(Ratio { numer: 0, denom: 1 }) (24 bits)
+    move 0: adopted at step 1; the ladder's start Some((Ratio { numer: 16, denom: 1 }, EntryScale)); trials η 16 Some("refused"), η 8 Some("refused"), η 4 Some("refused"), η 2 Some("refused"), η 1 None; persistence Persistence { locks: 64, solved: 3, reread: 3, stay: 0, fall: 3, reversed: 3, uncertified: 0 }; 473317 ms
+      trials: η 16 ρ unmoved mask [445118/4096, 445123/4096) own [447040/4096, 447045/4096) NotBelow; η 8 ρ unmoved mask [385756/4096, 385761/4096) own [396362/4096, 396368/4096) NotBelow; η 4 ρ unmoved mask [369811/4096, 369816/4096) own [385161/4096, 385166/4096) OwnNotBelow; η 2 ρ unmoved mask [371692/4096, 371698/4096) own [386870/4096, 386875/4096) OwnNotBelow; η 1 ρ unmoved mask [376965/4096, 376970/4096) own [375945/4096, 375950/4096) adopted; γ_ρ [187256/4096, 187257/4096)
+  m6 throw: the adopted successor's own release: ρ 102837/131072; L ∈ [375945/4096, 375950/4096) nats, X ∈ [194773/4096, 194778/4096) nats; solved 2 of 64; whole 0 (released 8, stations right 18); 473317 ms
+    the successor's own comparison, exact: 7271844498755134405950472534405/79228162514264337593543950336 1817981066908963241607610905885/19807040628566084398385987584
+  m6: throw adopted; the later metrics are not attempted
+executed move-once: 473380 ms; resident 178585600 now, 183595008 peak

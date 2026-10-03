@@ -1,0 +1,84 @@
+  the release guard: ReleaseExcursion { checkpoint: Some(ExactInterval { lower: Ratio { numer: 6598668058627723129880795484607, denom: 79228162514264337593543950336 }, upper: Ratio { numer: 824843045133923254320203367351, denom: 9903520314283042199192993792 } }), height: None }
+executed move-once: 8 order2 requests at development seed 2026093061, the candidate arm, from q2k7 (ρ 102837/131072); the bank p = 5/8, grain 2^(-16)
+    the incumbent's own comparison, exact: 6811450864880604026080970717865/79228162514264337593543950336 6811526254946730774313000888721/79228162514264337593543950336
+  q2k7 kinetic: the incumbent: ρ 102837/131072; L ∈ [352143/4096, 352148/4096) nats, X ∈ [170698/4096, 170703/4096) nats; solved 1 of 64; whole 0 (released 8, stations right 15); 567361 ms
+    the receiver's solve: 320 readings, 320 iterations, stop Exhausted, residual energy 4544565/562949953421312, model change -8456987/65536 (24 bits)
+    γ_ρ Some(Ratio { numer: 10687085, denom: 65536 }), Δρ per unit of E's step Some(Ratio { numer: 0, denom: 1 }) (24 bits)
+    move 0: adopted at step 1/32; the ladder's start Some((Ratio { numer: 1, denom: 32 }, KineticEntryScale)); trials η 1/32 None; persistence Persistence { locks: 64, solved: 3, reread: 3, stay: 2, fall: 1, reversed: 1, uncertified: 0 }; 567361 ms
+      trials: η 1/32 ρ unmoved mask [328944/4096, 328949/4096) own [315245/4096, 315250/4096) adopted; γ_ρ [667942/4096, 667943/4096)
+    request 0: L 42136 -> 39916 (/4096); section [3, 3, 3, 3, 1, 0, 1, 3] -> [1]
+      station 0: target 2, top 1 -> 2, ℓ 5333 -> 5053, top flipped
+      station 1: target 1, top 1 -> 1, ℓ 5570 -> 5323
+      station 2: target 3, top 3 -> 3, ℓ 5094 -> 4777
+      station 3: target 2, top 2 -> 2, ℓ 3645 -> 3564
+      station 4: target 0, top 1 -> 1, ℓ 6751 -> 6444
+      station 5: target 3, top 2 -> 2, ℓ 6062 -> 5622
+      station 6: target 1, top 1 -> 1, ℓ 3245 -> 3202
+      station 7: target 0, top 4 -> 0, ℓ 6433 -> 5928, top flipped
+    request 1: L 36753 -> 35339 (/4096); section [3, 3, 3] -> [0, 3, 3]
+      station 0: target 2, top 2 -> 2, ℓ 5379 -> 4980
+      station 1: target 3, top 3 -> 3, ℓ 4029 -> 3899
+      station 2: target 3, top 1 -> 1, ℓ 5142 -> 5043
+      station 3: target 0, top 0 -> 0, ℓ 5223 -> 4984
+      station 4: target 0, top 0 -> 0, ℓ 3604 -> 3375
+      station 5: target 1, top 1 -> 1, ℓ 3967 -> 3318
+      station 6: target 1, top 1 -> 1, ℓ 4542 -> 4367
+      station 7: target 2, top 1 -> 1, ℓ 4864 -> 5371
+    request 2: L 37395 -> 34940 (/4096); section [3, 3, 1, 0, 1, 1, 1, 2] -> [3, 3, 1, 0, 1, 1, 1, 2]
+      station 0: target 3, top 3 -> 3, ℓ 3673 -> 3490
+      station 1: target 1, top 1 -> 1, ℓ 3687 -> 3521
+      station 2: target 0, top 0 -> 0, ℓ 4243 -> 3892
+      station 3: target 2, top 2 -> 2, ℓ 4544 -> 4439
+      station 4: target 1, top 1 -> 1, ℓ 4855 -> 4464
+      station 5: target 3, top 3 -> 3, ℓ 5060 -> 4685
+      station 6: target 2, top 2 -> 2, ℓ 4269 -> 4015
+      station 7: target 0, top 2 -> 2, ℓ 7059 -> 6429
+    request 3: L 72173 -> 52792 (/4096); section [3, 3, 3, 3, 3, 3, 3, 3] -> [3, 1, 3, 1, 3, 1, 3, 1]
+      station 0: target 3, top 3 -> 3, ℓ 3532 -> 3478, section moved
+      station 1: target 1, top 3 -> 1, ℓ 8102 -> 2966, section moved, top flipped
+      station 2: target 0, top 3 -> 3, ℓ 7061 -> 9159, section moved
+      station 3: target 2, top 3 -> 2, ℓ 11239 -> 5490, section moved, top flipped
+      station 4: target 1, top 3 -> 3, ℓ 16154 -> 6035, section moved
+      station 5: target 3, top 3 -> 1, ℓ 2579 -> 9866, section moved, top flipped
+      station 6: target 2, top 3 -> 1, ℓ 11726 -> 9154, section moved, top flipped
+      station 7: target 0, top 3 -> 1, ℓ 11776 -> 6640, section moved, top flipped
+    request 4: L 37598 -> 35970 (/4096); section [3, 3, 3, 3, 3, 3, 1, 3] -> [3, 3, 3, 3, 3, 3, 1, 3]
+      station 0: target 0, top 0 -> 0, ℓ 3958 -> 3692
+      station 1: target 3, top 3 -> 3, ℓ 3246 -> 3302
+      station 2: target 1, top 1 -> 1, ℓ 3649 -> 3633
+      station 3: target 0, top 0 -> 0, ℓ 4989 -> 4703
+      station 4: target 2, top 2 -> 2, ℓ 4184 -> 3961
+      station 5: target 1, top 3 -> 1, ℓ 5405 -> 5166, top flipped
+      station 6: target 3, top 1 -> 1, ℓ 7700 -> 7258
+      station 7: target 2, top 1 -> 1, ℓ 4464 -> 4252
+    request 5: L 38234 -> 37892 (/4096); section [3, 1, 3, 1, 0, 1, 0, 1] -> [3, 1, 3, 1, 0, 1, 0, 1]
+      station 0: target 1, top 1 -> 1, ℓ 4337 -> 4102
+      station 1: target 0, top 0 -> 0, ℓ 4584 -> 4357
+      station 2: target 2, top 2 -> 2, ℓ 5062 -> 4664
+      station 3: target 1, top 1 -> 1, ℓ 4738 -> 4291
+      station 4: target 3, top 3 -> 3, ℓ 4982 -> 4960
+      station 5: target 2, top 1 -> 2, ℓ 4322 -> 4228, top flipped
+      station 6: target 0, top 0 -> 0, ℓ 4904 -> 4719
+      station 7: target 3, top 1 -> 1, ℓ 5303 -> 6567
+    request 6: L 46935 -> 37150 (/4096); section [3, 3, 3, 1, 3, 1, 0, 1] -> [3, 3, 3, 3, 3, 1, 3, 1]
+      station 0: target 3, top 3 -> 3, ℓ 4672 -> 3915, section moved
+      station 1: target 0, top 0 -> 0, ℓ 4067 -> 4300, section moved
+      station 2: target 0, top 3 -> 3, ℓ 9917 -> 6558, section moved
+      station 3: target 1, top 1 -> 1, ℓ 3012 -> 2935
+      station 4: target 1, top 1 -> 1, ℓ 4214 -> 4765, section moved
+      station 5: target 2, top 1 -> 2, ℓ 7754 -> 4697, section moved, top flipped
+      station 6: target 2, top 1 -> 1, ℓ 4526 -> 4270, section moved
+      station 7: target 3, top 1 -> 1, ℓ 8769 -> 5704, section moved
+    request 7: L 40916 -> 41241 (/4096); section [0, 1, 0, 1, 3, 1, 2, 1] -> [3, 1, 0, 1, 2, 1, 2, 1]
+      station 0: target 1, top 1 -> 1, ℓ 4319 -> 4725, section moved
+      station 1: target 2, top 2 -> 1, ℓ 4935 -> 4879, section moved, top flipped
+      station 2: target 2, top 2 -> 2, ℓ 3615 -> 4125, section moved
+      station 3: target 3, top 1 -> 1, ℓ 5929 -> 6379, section moved
+      station 4: target 3, top 0 -> 3, ℓ 7328 -> 5792, section moved, top flipped
+      station 5: target 0, top 0 -> 1, ℓ 3997 -> 6070, section moved, top flipped
+      station 6: target 0, top 2 -> 0, ℓ 6201 -> 4786, section moved, top flipped
+      station 7: target 1, top 1 -> 1, ℓ 4589 -> 4481
+  q2k7 kinetic: the adopted successor's own release: ρ 102837/131072; L ∈ [315245/4096, 315250/4096) nats, X ∈ [133541/4096, 133545/4096) nats; solved 0 of 64; whole 0 (released 8, stations right 13); 567363 ms
+    the successor's own comparison, exact: 6097732434724708273503748902879/79228162514264337593543950336 3048902013603751855056694548743/39614081257132168796771975168
+  q2k7: kinetic adopted; the later metrics are not attempted
+executed move-once: 567430 ms; resident 167268352 now, 204263424 peak

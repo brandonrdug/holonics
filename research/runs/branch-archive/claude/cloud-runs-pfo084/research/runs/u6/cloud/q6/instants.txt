@@ -1,0 +1,150 @@
+inc (research/runs/u6/states/m7.state):
+    request 0 refinement 0: least turn 4..4; 0:gap [1856/4096, 1857/4096) turn 22, 1:gap [2004/4096, 2005/4096) turn 15, 2:gap [10553/4096, 10554/4096) turn 5, 3:gap [10381/4096, 10382/4096) turn 7, 4:gap [14494/4096, 14495/4096) turn 6, 5:gap [4281/4096, 4282/4096) turn 22, 6*:gap [50531/4096, 50532/4096) turn 4, 7:gap [23706/4096, 23707/4096) turn 9
+    request 0 refinement 1: least turn 3..3; 0:gap [258/4096, 259/4096) turn 132, 1:gap [622/4096, 623/4096) turn 37, 2:gap [2049/4096, 2050/4096) turn 19, 3:gap [8008/4096, 8009/4096) turn 5, 4*:gap [51771/4096, 51772/4096) turn 3, 5:gap [19963/4096, 19964/4096) turn 5, 7:gap [2575/4096, 2576/4096) turn 35
+    request 0 refinement 2: least turn 6..6; 0:gap [8264/4096, 8265/4096) turn 6, 1:gap [1140/4096, 1141/4096) turn 22, 2:gap [7006/4096, 7007/4096) turn 8, 3:gap [6468/4096, 6469/4096) turn 12, 5*:gap [11933/4096, 11934/4096) turn 9, 7:gap [2516/4096, 2517/4096) turn 72
+    request 0 refinement 3: least turn 8..8; 0:gap [3230/4096, 3231/4096) turn 11, 1:gap [1632/4096, 1633/4096) turn 14, 2:gap [4/4096, 5/4096) turn [11343,12052], 3*:gap [6568/4096, 6569/4096) turn 8, 7:gap [3617/4096, 3618/4096) turn 21
+    request 0 refinement 4: least turn 5..5; 0:gap [2149/4096, 2150/4096) turn 15, 1:gap [6038/4096, 6039/4096) turn 6, 2*:gap [12363/4096, 12364/4096) turn 5, 7:gap [1361/4096, 1362/4096) turn 60
+    request 0 refinement 5: least turn 7..7; 0:gap [837/4096, 838/4096) turn 44, 1:gap [8435/4096, 8436/4096) turn 7, 7*:gap [9483/4096, 9484/4096) turn 12
+    request 0 refinement 6: least turn 7..7; 0:gap [1634/4096, 1635/4096) turn 23, 1*:gap [9603/4096, 9604/4096) turn 7
+    request 0 refinement 7: least turn 18..18; 0*:gap [3057/4096, 3058/4096) turn 18
+    request 0: 8 refinements read, 66910 ms
+    request 1 refinement 0: least turn 5..5; 0:gap [259/4096, 260/4096) turn [106,107], 1:gap [5295/4096, 5296/4096) turn 7, 2:gap [5191/4096, 5192/4096) turn 9, 3:gap [398/4096, 399/4096) turn 96, 4:gap [14738/4096, 14739/4096) turn 5, 5:gap [6522/4096, 6523/4096) turn 10, 6:gap [14271/4096, 14272/4096) turn 7, 7*:gap [52442/4096, 52443/4096) turn 7
+    request 1 refinement 1: least turn 5..5; 0:gap [1212/4096, 1213/4096) turn 19, 1:gap [5745/4096, 5746/4096) turn 6, 2:gap [2730/4096, 2731/4096) turn 11, 3:gap [886/4096, 887/4096) turn [42,43], 4:gap [1772/4096, 1773/4096) turn 18, 5*:gap [19278/4096, 19279/4096) turn 5, 6:gap [10350/4096, 10351/4096) turn 12
+    request 1 refinement 2: least turn 6..6; 0:gap [824/4096, 825/4096) turn 25, 1:gap [3083/4096, 3084/4096) turn 8, 2:gap [4780/4096, 4781/4096) turn 6, 3:gap [1810/4096, 1811/4096) turn 19, 4:gap [987/4096, 988/4096) turn 26, 6*:gap [6400/4096, 6401/4096) turn 11
+    request 1 refinement 3: least turn 17..17; 0:gap [1285/4096, 1286/4096) turn 17, 1:gap [598/4096, 599/4096) turn 37, 2:gap [1087/4096, 1088/4096) turn 30, 3*:gap [1982/4096, 1983/4096) turn 20, 4:gap [33/4096, 34/4096) turn [810,816]
+    request 1 refinement 4: least turn 5..5; 0:gap [1363/4096, 1364/4096) turn 17, 1:gap [136/4096, 137/4096) turn 109, 2:gap [1369/4096, 1370/4096) turn 15, 4*:gap [8512/4096, 8513/4096) turn 5
+    request 1 refinement 5: least turn 12..12; 0:gap [1609/4096, 1610/4096) turn 15, 1:gap [1146/4096, 1147/4096) turn 18, 2*:gap [1678/4096, 1679/4096) turn 12
+    request 1 refinement 6: least turn 65..65; 1*:gap [269/4096, 270/4096) turn 65
+    request 1: 7 refinements read, 58860 ms
+    request 2 refinement 0: least turn 5..5; 0:gap [10358/4096, 10359/4096) turn 5, 1:gap [7963/4096, 7964/4096) turn 5, 2:gap [4319/4096, 4320/4096) turn 8, 3:gap [3852/4096, 3853/4096) turn 11, 4:gap [1312/4096, 1313/4096) turn 30, 5:gap [880/4096, 881/4096) turn 64, 6:gap [1789/4096, 1790/4096) turn 78, 7*:gap [31811/4096, 31812/4096) turn 7
+    request 2 refinement 1: least turn 5..5; 0:gap [8457/4096, 8458/4096) turn 5, 1:gap [5604/4096, 5605/4096) turn 5, 2:gap [787/4096, 788/4096) turn 28, 3:gap [4678/4096, 4679/4096) turn 8, 4:gap [662/4096, 663/4096) turn 67, 5*:gap [10678/4096, 10679/4096) turn 6, 6:gap [7849/4096, 7850/4096) turn 15
+    request 2 refinement 2: least turn 5..5; 0:gap [7460/4096, 7461/4096) turn 5, 1:gap [1772/4096, 1773/4096) turn 12, 2:gap [1687/4096, 1688/4096) turn 17, 3:gap [3786/4096, 3787/4096) turn 10, 4:gap [14538/4096, 14539/4096) turn 6, 6*:gap [34800/4096, 34801/4096) turn 6
+    request 2 refinement 3: least turn 4..4; 0:gap [3830/4096, 3831/4096) turn 7, 1:gap [1123/4096, 1124/4096) turn 16, 2:gap [409/4096, 410/4096) turn 42, 3:gap [6993/4096, 6994/4096) turn 6, 4*:gap [26943/4096, 26944/4096) turn 4
+    request 2 refinement 4: least turn 6..6; 0:gap [3325/4096, 3326/4096) turn 8, 1:gap [520/4096, 521/4096) turn 33, 2:gap [3214/4096, 3215/4096) turn 10, 3*:gap [12815/4096, 12816/4096) turn 6
+    request 2 refinement 5: least turn 7..7; 0:gap [3418/4096, 3419/4096) turn 8, 1:gap [2182/4096, 2183/4096) turn 11, 2*:gap [8681/4096, 8682/4096) turn 7
+    request 2 refinement 6: least turn 7..7; 0:gap [1833/4096, 1834/4096) turn 12, 1*:gap [6153/4096, 6154/4096) turn 7
+    request 2 refinement 7: least turn 13..13; 0*:gap [1822/4096, 1823/4096) turn 13
+    request 2: 8 refinements read, 64142 ms
+    request 3 refinement 0: least turn 5..5; 0*:gap [12144/4096, 12145/4096) turn 5, 1:gap [7975/4096, 7976/4096) turn 6, 2:gap [5374/4096, 5375/4096) turn 8, 3:gap [1158/4096, 1159/4096) turn 46, 4:gap [3220/4096, 3221/4096) turn 15, 5:gap [2295/4096, 2296/4096) turn 28, 6:gap [7121/4096, 7122/4096) turn 19, 7:gap [5407/4096, 5408/4096) turn 30
+    request 3 refinement 1: least turn 3..3; 1:gap [34122/4096, 34123/4096) turn 4, 2*:gap [45786/4096, 45787/4096) turn 3, 3:gap [2586/4096, 2587/4096) turn 24, 4:gap [1971/4096, 1972/4096) turn 30, 5:gap [45694/4096, 45695/4096) turn 3, 6:gap [14555/4096, 14556/4096) turn 7, 7:gap [6608/4096, 6609/4096) turn 17
+    request 3 refinement 2: least turn 2..2; 1:gap [166522/4096, 166523/4096) turn 2, 3:gap [231433/4096, 231434/4096) turn 2, 4*:gap [287777/4096, 287778/4096) turn 2, 5:gap [68113/4096, 68114/4096) turn 3, 6:gap [7807/4096, 7808/4096) turn 9, 7:gap [64014/4096, 64015/4096) turn 3
+    request 3 refinement 3: least turn 2..2; 1:gap [178716/4096, 178717/4096) turn 2, 3:gap [598353/4096, 598354/4096) turn 2, 5*:gap [763177/4096, 763178/4096) turn 2, 6:gap [557547/4096, 557548/4096) turn 2, 7:gap [31099/4096, 31100/4096) turn 5
+    request 3 refinement 4: least turn 2..2; 1:gap [204288/4096, 204289/4096) turn 2, 3:gap [838896/4096, 838897/4096) turn 2, 6*:gap [1625647/4096, 1625648/4096) turn 2, 7:gap [800345/4096, 800346/4096) turn 2
+    request 3 refinement 5: least turn 2..2; 1:gap [223895/4096, 223896/4096) turn 2, 3:gap [821461/4096, 821462/4096) turn 2, 7*:gap [2922216/4096, 2922217/4096) turn 2
+    request 3 refinement 6: least turn 2..2; 1:gap [209682/4096, 209683/4096) turn 2, 3*:gap [809468/4096, 809469/4096) turn 2
+    request 3 refinement 7: least turn 3..3; 1*:gap [321311/4096, 321312/4096) turn 3
+    request 3: 8 refinements read, 64882 ms
+    request 4 refinement 0: least turn 5..5; 0:gap [5365/4096, 5366/4096) turn 9, 1:gap [12289/4096, 12290/4096) turn 5, 2:gap [8746/4096, 8747/4096) turn 6, 3:gap [2974/4096, 2975/4096) turn 15, 4:gap [2762/4096, 2763/4096) turn 22, 5:gap [3043/4096, 3044/4096) turn 17, 6:gap [10322/4096, 10323/4096) turn 11, 7*:gap [34952/4096, 34953/4096) turn 9
+    request 4 refinement 1: least turn 4..4; 0:gap [3438/4096, 3439/4096) turn 12, 1:gap [9337/4096, 9338/4096) turn 5, 2:gap [859/4096, 860/4096) turn 33, 3:gap [1720/4096, 1721/4096) turn 19, 4:gap [1045/4096, 1046/4096) turn 42, 5*:gap [19402/4096, 19403/4096) turn 4, 6:gap [3904/4096, 3905/4096) turn 31
+    request 4 refinement 2: least turn 5..5; 0:gap [543/4096, 544/4096) turn 78, 1:gap [11020/4096, 11021/4096) turn 5, 2:gap [2145/4096, 2146/4096) turn 19, 3*:gap [15593/4096, 15594/4096) turn 6, 4:gap [12265/4096, 12266/4096) turn 8, 6:gap [8233/4096, 8234/4096) turn 22
+    request 4 refinement 3: least turn 6..6; 0:gap [2889/4096, 2890/4096) turn 15, 1:gap [4015/4096, 4016/4096) turn 15, 2:gap [11394/4096, 11395/4096) turn 6, 4:gap [1183/4096, 1184/4096) turn 135, 6*:gap [45569/4096, 45570/4096) turn 6
+    request 4 refinement 4: least turn 7..7; 0:gap [2768/4096, 2769/4096) turn 14, 1:gap [7274/4096, 7275/4096) turn 7, 2*:gap [7810/4096, 7811/4096) turn 7, 4:gap [4292/4096, 4293/4096) turn 22
+    request 4 refinement 5: least turn 8..8; 0:gap [3182/4096, 3183/4096) turn 14, 1*:gap [8433/4096, 8434/4096) turn 8, 4:gap [2754/4096, 2755/4096) turn 32
+    request 4 refinement 6: least turn 18..18; 0*:gap [3803/4096, 3804/4096) turn 18, 4:gap [3208/4096, 3209/4096) turn 38
+    request 4 refinement 7: least turn 99..99; 4*:gap [1290/4096, 1291/4096) turn 99
+    request 4: 8 refinements read, 66427 ms
+    request 5 refinement 0: least turn 12..12; 0:gap [3019/4096, 3020/4096) turn 12, 1:gap [903/4096, 904/4096) turn 36, 2:gap [488/4096, 489/4096) turn 63, 3:gap [2636/4096, 2637/4096) turn 15, 4:gap [942/4096, 943/4096) turn 49, 5:gap [6619/4096, 6620/4096) turn 15, 6:gap [3880/4096, 3881/4096) turn 28, 7*:gap [14875/4096, 14876/4096) turn 18
+    request 5 refinement 1: least turn 3..3; 0:gap [2162/4096, 2163/4096) turn 15, 1:gap [3134/4096, 3135/4096) turn 13, 2:gap [3979/4096, 3980/4096) turn 8, 3:gap [3014/4096, 3015/4096) turn 15, 4:gap [8116/4096, 8117/4096) turn 9, 5*:gap [38442/4096, 38443/4096) turn 3, 6:gap [2432/4096, 2433/4096) turn 47
+    request 5 refinement 2: least turn 4..4; 0:gap [162/4096, 163/4096) turn 192, 1:gap [4466/4096, 4467/4096) turn 9, 2:gap [2129/4096, 2130/4096) turn 15, 3*:gap [32648/4096, 32649/4096) turn 4, 4:gap [3433/4096, 3434/4096) turn 19, 6:gap [15803/4096, 15804/4096) turn 12
+    request 5 refinement 3: least turn 5..5; 0:gap [2812/4096, 2813/4096) turn 14, 1:gap [18485/4096, 18486/4096) turn 5, 2:gap [2470/4096, 2471/4096) turn 24, 4:gap [3805/4096, 3806/4096) turn 43, 6*:gap [54960/4096, 54961/4096) turn 5
+    request 5 refinement 4: least turn 6..6; 0:gap [3345/4096, 3346/4096) turn 10, 1*:gap [10835/4096, 10836/4096) turn 6, 2:gap [3010/4096, 3011/4096) turn 16, 4:gap [5340/4096, 5341/4096) turn 18
+    request 5 refinement 5: least turn 8..8; 0:gap [2919/4096, 2920/4096) turn 16, 2:gap [126/4096, 127/4096) turn [541,544], 4*:gap [18586/4096, 18587/4096) turn 8
+    request 5 refinement 6: least turn 13..13; 0:gap [3235/4096, 3236/4096) turn 13, 2*:gap [3273/4096, 3274/4096) turn 18
+    request 5 refinement 7: least turn 9..9; 0*:gap [4670/4096, 4671/4096) turn 9
+    request 5: 8 refinements read, 66833 ms
+    request 6 refinement 0: least turn 4..4; 0:gap [6799/4096, 6800/4096) turn 6, 1:gap [2499/4096, 2500/4096) turn 12, 2*:gap [17673/4096, 17674/4096) turn 4, 3:gap [14554/4096, 14555/4096) turn 5, 4:gap [1459/4096, 1460/4096) turn 44, 5:gap [4847/4096, 4848/4096) turn 16, 6:gap [2452/4096, 2453/4096) turn 47, 7:gap [7214/4096, 7215/4096) turn 26
+    request 6 refinement 1: least turn 3..3; 0:gap [1715/4096, 1716/4096) turn 29, 1:gap [820/4096, 821/4096) turn 54, 3:gap [50872/4096, 50873/4096) turn 3, 4*:gap [107596/4096, 107597/4096) turn 3, 5:gap [58013/4096, 58014/4096) turn 3, 6:gap [9282/4096, 9283/4096) turn 16, 7:gap [106999/4096, 107000/4096) turn 4
+    request 6 refinement 2: least turn 2..2; 0:gap [2552/4096, 2553/4096) turn 21, 1:gap [529/4096, 530/4096) turn 95, 3:gap [404138/4096, 404139/4096) turn 2, 5:gap [345234/4096, 345235/4096) turn 2, 6*:gap [434357/4096, 434358/4096) turn 2, 7:gap [197650/4096, 197651/4096) turn 3
+    request 6 refinement 3: least turn 2..2; 0:gap [1794/4096, 1795/4096) turn 27, 1:gap [18718/4096, 18719/4096) turn 5, 3:gap [371804/4096, 371805/4096) turn 2, 5:gap [887843/4096, 887844/4096) turn 2, 7*:gap [1958857/4096, 1958858/4096) turn 2
+    request 6 refinement 4: least turn 2..2; 0:gap [3504/4096, 3505/4096) turn 12, 1:gap [38741/4096, 38742/4096) turn 3, 3:gap [491030/4096, 491031/4096) turn 2, 5*:gap [1764620/4096, 1764621/4096) turn 2
+    request 6 refinement 5: least turn 2..2; 0:gap [10193/4096, 10194/4096) turn 6, 1:gap [51203/4096, 51204/4096) turn 3, 3*:gap [719891/4096, 719892/4096) turn 2
+    request 6 refinement 6: least turn 2..2; 0:gap [29090/4096, 29091/4096) turn 4, 1*:gap [144800/4096, 144801/4096) turn 2
+    request 6 refinement 7: least turn 3..3; 0*:gap [104106/4096, 104107/4096) turn 3
+    request 6: 8 refinements read, 63260 ms
+    request 7 refinement 0: least turn 6..6; 0:gap [6157/4096, 6158/4096) turn 6, 1:gap [2283/4096, 2284/4096) turn 19, 2:gap [9552/4096, 9553/4096) turn 6, 3:gap [4886/4096, 4887/4096) turn 8, 4:gap [4898/4096, 4899/4096) turn 12, 5:gap [6142/4096, 6143/4096) turn 21, 6*:gap [11819/4096, 11820/4096) turn 10, 7:gap [188/4096, 189/4096) turn [1079,1084]
+    request 7 refinement 1: least turn 4..4; 0:gap [3019/4096, 3020/4096) turn 9, 1:gap [10164/4096, 10165/4096) turn 5, 2:gap [8564/4096, 8565/4096) turn 6, 3:gap [2539/4096, 2540/4096) turn 11, 4:gap [4438/4096, 4439/4096) turn 8, 5:gap [26815/4096, 26816/4096) turn 4, 7*:gap [30003/4096, 30004/4096) turn 6
+    request 7 refinement 2: least turn 3..3; 0:gap [2188/4096, 2189/4096) turn 11, 1:gap [9092/4096, 9093/4096) turn 5, 2:gap [4802/4096, 4803/4096) turn 6, 3:gap [5679/4096, 5680/4096) turn 6, 4:gap [7077/4096, 7078/4096) turn 6, 5*:gap [52991/4096, 52992/4096) turn 3
+    request 7 refinement 3: least turn 3..3; 0:gap [3109/4096, 3110/4096) turn 8, 1:gap [14418/4096, 14419/4096) turn 4, 2:gap [258/4096, 259/4096) turn [114,115], 3*:gap [36879/4096, 36880/4096) turn 3, 4:gap [1687/4096, 1688/4096) turn 36
+    request 7 refinement 4: least turn 3..3; 0:gap [476/4096, 477/4096) turn 40, 1*:gap [35942/4096, 35943/4096) turn 3, 2:gap [6965/4096, 6966/4096) turn 9, 4:gap [3040/4096, 3041/4096) turn 47
+    request 7 refinement 5: least turn 14..14; 0:gap [2292/4096, 2293/4096) turn 20, 2*:gap [10823/4096, 10824/4096) turn 14, 4:gap [35/4096, 36/4096) turn [5208,5357]
+    request 7 refinement 6: least turn 91..91; 0*:gap [417/4096, 418/4096) turn 91, 4:gap [398/4096, 399/4096) turn [301,302]
+    request 7 refinement 7: least turn 67..67; 4*:gap [1477/4096, 1478/4096) turn 67
+    request 7: 8 refinements read, 64336 ms
+  inc: 63 refinements with an eligible station; the gap order's locks are the whole-turn law's first set at 30, a strict part of it at 13, a later turn at 14; enclosures left a turn open at 9; single-station gap locks 63
+  inc: commitment turns (n_hi) of the gap order's locks: {2: 10, 3: 9, 4: 5, 5: 5, 6: 7, 7: 6, 8: 3, 9: 3, 10: 1, 11: 1, 12: 2, 13: 1, 14: 1, 18: 4, 20: 1, 65: 1, 67: 1, 91: 1, 99: 1}
+  inc: wall time 260863 ms
+succ (research/runs/u6/states/m7-2048.state):
+    request 0 refinement 0: least turn 4..4; 0:gap [1826/4096, 1827/4096) turn 23, 1:gap [2004/4096, 2005/4096) turn 15, 2:gap [10520/4096, 10521/4096) turn 5, 3:gap [10372/4096, 10373/4096) turn 7, 4:gap [14494/4096, 14495/4096) turn 6, 5:gap [4487/4096, 4488/4096) turn 21, 6*:gap [50613/4096, 50614/4096) turn 4, 7:gap [23725/4096, 23726/4096) turn 9
+    request 0 refinement 1: least turn 3..3; 0:gap [237/4096, 238/4096) turn 143, 1:gap [605/4096, 606/4096) turn 39, 2:gap [2070/4096, 2071/4096) turn 19, 3:gap [8026/4096, 8027/4096) turn 5, 4*:gap [51719/4096, 51720/4096) turn 3, 5:gap [19918/4096, 19919/4096) turn 5, 7:gap [2575/4096, 2576/4096) turn 35
+    request 0 refinement 2: least turn 6..6; 0:gap [8236/4096, 8237/4096) turn 6, 1:gap [1144/4096, 1145/4096) turn 22, 2:gap [6999/4096, 7000/4096) turn 8, 3:gap [6464/4096, 6465/4096) turn 12, 5*:gap [11942/4096, 11943/4096) turn 9, 7:gap [2544/4096, 2545/4096) turn 71
+    request 0 refinement 3: least turn 8..8; 0:gap [3207/4096, 3208/4096) turn 11, 1:gap [1637/4096, 1638/4096) turn 14, 2:gap [18/4096, 19/4096) turn [2539,2573], 3*:gap [6592/4096, 6593/4096) turn 8, 7:gap [3678/4096, 3679/4096) turn 21
+    request 0 refinement 4: least turn 5..5; 0:gap [2132/4096, 2133/4096) turn 16, 1:gap [6044/4096, 6045/4096) turn 6, 2*:gap [12395/4096, 12396/4096) turn 5, 7:gap [1352/4096, 1353/4096) turn 61
+    request 0 refinement 5: least turn 7..7; 0:gap [834/4096, 835/4096) turn 44, 1:gap [8449/4096, 8450/4096) turn 7, 7*:gap [9488/4096, 9489/4096) turn 12
+    request 0 refinement 6: least turn 7..7; 0:gap [1631/4096, 1632/4096) turn 24, 1*:gap [9616/4096, 9617/4096) turn 7
+    request 0 refinement 7: least turn 18..18; 0*:gap [3068/4096, 3069/4096) turn 18
+    request 0: 8 refinements read, 74255 ms
+    request 1 refinement 0: least turn 5..5; 0:gap [242/4096, 243/4096) turn 114, 1:gap [5312/4096, 5313/4096) turn [6,7], 2:gap [5167/4096, 5168/4096) turn 9, 3:gap [373/4096, 374/4096) turn 102, 4:gap [14770/4096, 14771/4096) turn 5, 5:gap [6558/4096, 6559/4096) turn 10, 6:gap [14317/4096, 14318/4096) turn 7, 7*:gap [52301/4096, 52302/4096) turn 7
+    request 1 refinement 1: least turn 5..5; 0:gap [1224/4096, 1225/4096) turn 19, 1:gap [5768/4096, 5769/4096) turn 6, 2:gap [2729/4096, 2730/4096) turn 11, 3:gap [883/4096, 884/4096) turn 43, 4:gap [1781/4096, 1782/4096) turn 18, 5*:gap [19331/4096, 19332/4096) turn 5, 6:gap [10163/4096, 10164/4096) turn 13
+    request 1 refinement 2: least turn 6..6; 0:gap [836/4096, 837/4096) turn 25, 1:gap [3093/4096, 3094/4096) turn 8, 2:gap [4784/4096, 4785/4096) turn 6, 3:gap [1814/4096, 1815/4096) turn 19, 4:gap [993/4096, 994/4096) turn 26, 6*:gap [6413/4096, 6414/4096) turn 11
+    request 1 refinement 3: least turn 17..17; 0:gap [1297/4096, 1298/4096) turn 17, 1:gap [599/4096, 600/4096) turn 37, 2:gap [1082/4096, 1083/4096) turn 30, 3*:gap [1981/4096, 1982/4096) turn 20, 4:gap [55/4096, 56/4096) turn [493,495]
+    request 1 refinement 4: least turn 5..5; 0:gap [1376/4096, 1377/4096) turn 17, 1:gap [120/4096, 121/4096) turn 123, 2:gap [1372/4096, 1373/4096) turn 15, 4*:gap [8527/4096, 8528/4096) turn 5
+    request 1 refinement 5: least turn 12..12; 0:gap [1631/4096, 1632/4096) turn 14, 1:gap [1147/4096, 1148/4096) turn 18, 2*:gap [1679/4096, 1680/4096) turn 12
+    request 1 refinement 6: least turn 65..65; 1*:gap [270/4096, 271/4096) turn 65
+    request 1: 7 refinements read, 76111 ms
+    request 2 refinement 0: least turn 5..5; 0:gap [10379/4096, 10380/4096) turn 5, 1:gap [7981/4096, 7982/4096) turn 5, 2:gap [4337/4096, 4338/4096) turn 8, 3:gap [3875/4096, 3876/4096) turn 11, 4:gap [1338/4096, 1339/4096) turn 30, 5:gap [843/4096, 844/4096) turn 67, 6:gap [1855/4096, 1856/4096) turn 75, 7*:gap [31720/4096, 31721/4096) turn 7
+    request 2 refinement 1: least turn 5..5; 0:gap [8473/4096, 8474/4096) turn 5, 1:gap [5618/4096, 5619/4096) turn 5, 2:gap [800/4096, 801/4096) turn 27, 3:gap [4701/4096, 4702/4096) turn 8, 4:gap [674/4096, 675/4096) turn 66, 5*:gap [10615/4096, 10616/4096) turn 6, 6:gap [7996/4096, 7997/4096) turn 15
+    request 2 refinement 2: least turn 5..5; 0:gap [7477/4096, 7478/4096) turn 5, 1:gap [1777/4096, 1778/4096) turn 12, 2:gap [1692/4096, 1693/4096) turn 17, 3:gap [3764/4096, 3765/4096) turn 10, 4:gap [14538/4096, 14539/4096) turn 6, 6*:gap [34793/4096, 34794/4096) turn 6
+    request 2 refinement 3: least turn 4..4; 0:gap [3842/4096, 3843/4096) turn 7, 1:gap [1126/4096, 1127/4096) turn 16, 2:gap [396/4096, 397/4096) turn 44, 3:gap [6972/4096, 6973/4096) turn 6, 4*:gap [26943/4096, 26944/4096) turn 4
+    request 2 refinement 4: least turn 6..6; 0:gap [3335/4096, 3336/4096) turn 8, 1:gap [523/4096, 524/4096) turn 32, 2:gap [3220/4096, 3221/4096) turn 10, 3*:gap [12811/4096, 12812/4096) turn 6
+    request 2 refinement 5: least turn 7..7; 0:gap [3425/4096, 3426/4096) turn 8, 1:gap [2176/4096, 2177/4096) turn 11, 2*:gap [8692/4096, 8693/4096) turn 7
+    request 2 refinement 6: least turn 7..7; 0:gap [1837/4096, 1838/4096) turn 12, 1*:gap [6164/4096, 6165/4096) turn 7
+    request 2 refinement 7: least turn 13..13; 0*:gap [1827/4096, 1828/4096) turn 13
+    request 2: 8 refinements read, 80562 ms
+    request 3 refinement 0: least turn 5..5; 0*:gap [12171/4096, 12172/4096) turn 5, 1:gap [7999/4096, 8000/4096) turn 6, 2:gap [5395/4096, 5396/4096) turn 8, 3:gap [1104/4096, 1105/4096) turn 48, 4:gap [3208/4096, 3209/4096) turn 15, 5:gap [2279/4096, 2280/4096) turn 29, 6:gap [7061/4096, 7062/4096) turn 19, 7:gap [5416/4096, 5417/4096) turn 30
+    request 3 refinement 1: least turn 3..3; 1:gap [34064/4096, 34065/4096) turn 4, 2:gap [45736/4096, 45737/4096) turn 3, 3:gap [2619/4096, 2620/4096) turn 24, 4:gap [1937/4096, 1938/4096) turn 30, 5*:gap [45750/4096, 45751/4096) turn 3, 6:gap [14603/4096, 14604/4096) turn 7, 7:gap [6607/4096, 6608/4096) turn 17
+    request 3 refinement 2: least turn 2..2; 1:gap [59281/4096, 59282/4096) turn 3, 2:gap [43920/4096, 43921/4096) turn 3, 3:gap [95686/4096, 95687/4096) turn 2, 4:gap [312311/4096, 312312/4096) turn 2, 6:gap [229556/4096, 229557/4096) turn 2, 7*:gap [357490/4096, 357491/4096) turn 2
+    request 3 refinement 3: least turn 2..2; 1:gap [53626/4096, 53627/4096) turn 3, 2:gap [62949/4096, 62950/4096) turn 3, 3:gap [97864/4096, 97865/4096) turn 2, 4:gap [217071/4096, 217072/4096) turn 2, 6*:gap [1005301/4096, 1005302/4096) turn 2
+    request 3 refinement 4: least turn 2..2; 1:gap [73263/4096, 73264/4096) turn 3, 2:gap [90938/4096, 90939/4096) turn 2, 3:gap [128666/4096, 128667/4096) turn 2, 4*:gap [513964/4096, 513965/4096) turn 2
+    request 3 refinement 5: least turn 2..2; 1:gap [86801/4096, 86802/4096) turn 2, 2:gap [203014/4096, 203015/4096) turn 2, 3*:gap [393259/4096, 393260/4096) turn 2
+    request 3 refinement 6: least turn 2..2; 1:gap [148371/4096, 148372/4096) turn 2, 2*:gap [399579/4096, 399580/4096) turn 2
+    request 3 refinement 7: least turn 3..3; 1*:gap [321567/4096, 321568/4096) turn 3
+    request 3: 8 refinements read, 103835 ms
+    request 4 refinement 0: least turn 5..5; 0:gap [5388/4096, 5389/4096) turn 9, 1:gap [12315/4096, 12316/4096) turn 5, 2:gap [8770/4096, 8771/4096) turn 6, 3:gap [2999/4096, 3000/4096) turn 14, 4:gap [2792/4096, 2793/4096) turn 22, 5:gap [3074/4096, 3075/4096) turn 17, 6:gap [10268/4096, 10269/4096) turn 11, 7*:gap [34819/4096, 34820/4096) turn 9
+    request 4 refinement 1: least turn 4..4; 0:gap [3455/4096, 3456/4096) turn 12, 1:gap [9350/4096, 9351/4096) turn 5, 2:gap [853/4096, 854/4096) turn 33, 3:gap [1723/4096, 1724/4096) turn 19, 4:gap [1000/4096, 1001/4096) turn 44, 5*:gap [19462/4096, 19463/4096) turn 4, 6:gap [3734/4096, 3735/4096) turn 32
+    request 4 refinement 2: least turn 5..5; 0:gap [521/4096, 522/4096) turn 81, 1:gap [11028/4096, 11029/4096) turn 5, 2:gap [2141/4096, 2142/4096) turn 19, 3*:gap [15641/4096, 15642/4096) turn 6, 4:gap [12305/4096, 12306/4096) turn 8, 6:gap [8122/4096, 8123/4096) turn 22
+    request 4 refinement 3: least turn 6..6; 0:gap [2879/4096, 2880/4096) turn 15, 1:gap [4024/4096, 4025/4096) turn 15, 2:gap [11410/4096, 11411/4096) turn 6, 4:gap [1204/4096, 1205/4096) turn 133, 6*:gap [45738/4096, 45739/4096) turn 6
+    request 4 refinement 4: least turn 7..7; 0:gap [2759/4096, 2760/4096) turn 14, 1:gap [7266/4096, 7267/4096) turn 7, 2*:gap [7811/4096, 7812/4096) turn 7, 4:gap [4299/4096, 4300/4096) turn 22
+    request 4 refinement 5: least turn 8..8; 0:gap [3178/4096, 3179/4096) turn 14, 1*:gap [8427/4096, 8428/4096) turn 8, 4:gap [2781/4096, 2782/4096) turn 32
+    request 4 refinement 6: least turn 18..18; 0*:gap [3799/4096, 3800/4096) turn 18, 4:gap [3203/4096, 3204/4096) turn 38
+    request 4 refinement 7: least turn 99..99; 4*:gap [1295/4096, 1296/4096) turn 99
+    request 4: 8 refinements read, 73148 ms
+    request 5 refinement 0: least turn 12..12; 0:gap [3039/4096, 3040/4096) turn 12, 1:gap [922/4096, 923/4096) turn 35, 2:gap [468/4096, 469/4096) turn 66, 3:gap [2636/4096, 2637/4096) turn 15, 4:gap [972/4096, 973/4096) turn 48, 5:gap [6576/4096, 6577/4096) turn 15, 6:gap [3941/4096, 3942/4096) turn 28, 7*:gap [14874/4096, 14875/4096) turn 18
+    request 5 refinement 1: least turn 3..3; 0:gap [2180/4096, 2181/4096) turn 14, 1:gap [3114/4096, 3115/4096) turn 13, 2:gap [3977/4096, 3978/4096) turn 8, 3:gap [3088/4096, 3089/4096) turn 15, 4:gap [8036/4096, 8037/4096) turn 9, 5*:gap [38643/4096, 38644/4096) turn 3, 6:gap [2487/4096, 2488/4096) turn 47
+    request 5 refinement 2: least turn 4..4; 0:gap [147/4096, 148/4096) turn 211, 1:gap [4468/4096, 4469/4096) turn 9, 2:gap [2124/4096, 2125/4096) turn 15, 3*:gap [32711/4096, 32712/4096) turn 4, 4:gap [3437/4096, 3438/4096) turn 19, 6:gap [15692/4096, 15693/4096) turn 12
+    request 5 refinement 3: least turn 5..5; 0:gap [2804/4096, 2805/4096) turn 14, 1:gap [18453/4096, 18454/4096) turn 5, 2:gap [2481/4096, 2482/4096) turn 24, 4:gap [3918/4096, 3919/4096) turn 42, 6*:gap [55134/4096, 55135/4096) turn 5
+    request 5 refinement 4: least turn 6..6; 0:gap [3341/4096, 3342/4096) turn 10, 1*:gap [10824/4096, 10825/4096) turn 6, 2:gap [3012/4096, 3013/4096) turn 16, 4:gap [5334/4096, 5335/4096) turn 18
+    request 5 refinement 5: least turn 8..8; 0:gap [2912/4096, 2913/4096) turn 16, 2:gap [108/4096, 109/4096) turn [634,637], 4*:gap [18646/4096, 18647/4096) turn 8
+    request 5 refinement 6: least turn 13..13; 0:gap [3232/4096, 3233/4096) turn 13, 2*:gap [3269/4096, 3270/4096) turn 18
+    request 5 refinement 7: least turn 9..9; 0*:gap [4675/4096, 4676/4096) turn 9
+    request 5: 8 refinements read, 85263 ms
+    request 6 refinement 0: least turn 4..4; 0:gap [6819/4096, 6820/4096) turn 6, 1:gap [2516/4096, 2517/4096) turn 12, 2*:gap [17646/4096, 17647/4096) turn 4, 3:gap [14582/4096, 14583/4096) turn 5, 4:gap [1422/4096, 1423/4096) turn 45, 5:gap [4886/4096, 4887/4096) turn 16, 6:gap [2503/4096, 2504/4096) turn 47, 7:gap [7121/4096, 7122/4096) turn 26
+    request 6 refinement 1: least turn 3..3; 0:gap [1744/4096, 1745/4096) turn 28, 1:gap [786/4096, 787/4096) turn 56, 3:gap [50914/4096, 50915/4096) turn 3, 4*:gap [107590/4096, 107591/4096) turn 3, 5:gap [58030/4096, 58031/4096) turn 3, 6:gap [9341/4096, 9342/4096) turn 16, 7:gap [107276/4096, 107277/4096) turn 4
+    request 6 refinement 2: least turn 2..2; 0:gap [2602/4096, 2603/4096) turn 21, 1:gap [539/4096, 540/4096) turn 94, 3:gap [404547/4096, 404548/4096) turn 2, 5:gap [345345/4096, 345346/4096) turn 2, 6*:gap [435049/4096, 435050/4096) turn 2, 7:gap [198176/4096, 198177/4096) turn 2
+    request 6 refinement 3: least turn 2..2; 0:gap [1842/4096, 1843/4096) turn 26, 1:gap [18723/4096, 18724/4096) turn 5, 3:gap [372381/4096, 372382/4096) turn 2, 5:gap [889462/4096, 889463/4096) turn 2, 7*:gap [1965163/4096, 1965164/4096) turn 2
+    request 6 refinement 4: least turn 2..2; 0:gap [3513/4096, 3514/4096) turn 12, 1:gap [38756/4096, 38757/4096) turn 3, 3:gap [491764/4096, 491765/4096) turn 2, 5*:gap [1769128/4096, 1769129/4096) turn 2
+    request 6 refinement 5: least turn 2..2; 0:gap [10202/4096, 10203/4096) turn 6, 1:gap [51248/4096, 51249/4096) turn 3, 3*:gap [721258/4096, 721259/4096) turn 2
+    request 6 refinement 6: least turn 2..2; 0:gap [29125/4096, 29126/4096) turn 4, 1*:gap [145013/4096, 145014/4096) turn 2
+    request 6 refinement 7: least turn 3..3; 0*:gap [104262/4096, 104263/4096) turn 3
+    request 6: 8 refinements read, 84465 ms
+    request 7 refinement 0: least turn 6..6; 0:gap [6176/4096, 6177/4096) turn 6, 1:gap [2259/4096, 2260/4096) turn 19, 2:gap [9578/4096, 9579/4096) turn 6, 3:gap [4866/4096, 4867/4096) turn 8, 4:gap [4898/4096, 4899/4096) turn 12, 5:gap [6202/4096, 6203/4096) turn 21, 6*:gap [11819/4096, 11820/4096) turn 10, 7:gap [75/4096, 76/4096) turn [2684,2719]
+    request 7 refinement 1: least turn 4..4; 0:gap [3033/4096, 3034/4096) turn 9, 1:gap [10164/4096, 10165/4096) turn 5, 2:gap [8565/4096, 8566/4096) turn 6, 3:gap [2581/4096, 2582/4096) turn 11, 4:gap [4465/4096, 4466/4096) turn 8, 5:gap [26841/4096, 26842/4096) turn 4, 7*:gap [29918/4096, 29919/4096) turn 6
+    request 7 refinement 2: least turn 3..3; 0:gap [2196/4096, 2197/4096) turn 10, 1:gap [9083/4096, 9084/4096) turn 5, 2:gap [4808/4096, 4809/4096) turn 6, 3:gap [5721/4096, 5722/4096) turn 6, 4:gap [7084/4096, 7085/4096) turn 6, 5*:gap [52965/4096, 52966/4096) turn 3
+    request 7 refinement 3: least turn 3..3; 0:gap [3112/4096, 3113/4096) turn 8, 1:gap [14402/4096, 14403/4096) turn 4, 2:gap [274/4096, 275/4096) turn 108, 3*:gap [36947/4096, 36948/4096) turn 3, 4:gap [1688/4096, 1689/4096) turn 36
+    request 7 refinement 4: least turn 3..3; 0:gap [475/4096, 476/4096) turn 40, 1*:gap [35925/4096, 35926/4096) turn 3, 2:gap [6950/4096, 6951/4096) turn 9, 4:gap [3018/4096, 3019/4096) turn 47
+    request 7 refinement 5: least turn 14..14; 0:gap [2289/4096, 2290/4096) turn 20, 2*:gap [10808/4096, 10809/4096) turn 14, 4:gap [26/4096, 27/4096) turn [6818,7075]
+    request 7 refinement 6: least turn 91..91; 0*:gap [414/4096, 415/4096) turn 91, 4:gap [407/4096, 408/4096) turn [294,295]
+    request 7 refinement 7: least turn 68..68; 4*:gap [1466/4096, 1467/4096) turn 68
+    request 7: 8 refinements read, 100326 ms
+  succ: 63 refinements with an eligible station; the gap order's locks are the whole-turn law's first set at 32, a strict part of it at 13, a later turn at 14; enclosures left a turn open at 7; single-station gap locks 63
+  succ: commitment turns (n_hi) of the gap order's locks: {2: 10, 3: 9, 4: 5, 5: 5, 6: 7, 7: 6, 8: 3, 9: 3, 10: 1, 11: 1, 12: 2, 13: 1, 14: 1, 18: 4, 20: 1, 65: 1, 68: 1, 91: 1, 99: 1}
+  succ: wall time 343205 ms
