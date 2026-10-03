@@ -255,6 +255,26 @@ the readings' Gram is `g` by `1/(s + g)` (`eigen_reach`), so the `1/s` map loses
 `g/(s + g)` there (`eigen_departure`), at most `λ/(s + λ)` for `0 ≤ g ≤ λ` (`departure_le`). On
 campaign 1 the Gram's largest eigenvalue is below `8599330/2^24` (§1), so at `2 I` the loss along
 every eigen-direction is below `8599330/42153762`, below a quarter (`campaign_one_departure`; at
-`I` it is below `8599330/25376546`). #62 keeps the rest: the lift from eigen-directions to every
-direction of a symmetric `G` (the spectral theorem), and the certified step `η` and the lattice's
-rounding, which the resolvent does not see.
+`I` it is below `8599330/25376546`).
+
+October 3: the lift and the second order (`HNN/ReceivingPrior` items 7 and 8). The eigenvalue
+bound stands on the Rayleigh step: a Gram `G ⪯ F` has every eigenvalue at most `λ` when
+`F ⪯ λ I` (`rayleigh_eigen_le`), and below `c` when the exact `LDLᵀ` certificate of `c I − F`
+gives `⟨x, F x⟩ < c |x|²` for `x ≠ 0` (`rayleigh_eigen_lt`). The lift needs no eigenbasis. With
+`y = (s I + G)⁻¹ x` the read is `x = s y + G y`, so the departure is `d = s⁻¹ G y`; for symmetric
+`0 ⪯ G ⪯ λ I`, `|G y|² ≤ λ ⟨y, G y⟩` (`image_sq_le`) and `⟨y, G y⟩ ≤ λ |y|²` give
+`|d|² ≤ (λ/(s + λ))² |s⁻¹ x|²` for every `x` (`departure_sq_le`) and
+`0 ≤ ⟨x, d⟩ ≤ (λ/(s + λ)) ⟨x, s⁻¹ x⟩` (`departure_form_le`). On campaign 1 at `2 I` the departure
+is below `8599330/42153762` of `|x/2|` in every direction (`campaign_one_lift`). The executed map
+reads a pair of readings as `⟨X̂ z_u, z_t⟩` where the `1/s` reading takes `⟨s⁻¹ z_u, z_t⟩`, so each
+pair departs by `q` with `q² ≤ (λ/(s + λ))² |s⁻¹ z_u|² |z_t|²` (`departure_pair_sq_le`, Cauchy–Schwarz
+`dot_sq_le`); each window's Gram is a partial sum of the campaign's, so the one `λ` serves every
+window. A class's departure `E_t c = Σ_u κ g_u c q_(u,t)` is then at most `Σ_u κ |g_u c| ρ_u`
+(`departure_class_le`). Along the executed move `φ M_t − E_t` with `|E_t c| ≤ r_t`, the prequential
+code is at most the face's less `φ a₀`, plus `φ² (ln 2) 2^ω Σ_t Var_(p_t)(M_t)`, plus the remainder
+`(ln 2) 2^ω Σ_t r_t² + 2 Σ_t r_t` (`prequential_code_departure_le`, through
+`faceVariance_sub_le`). The quadratic is twice the held map's: the cross term between the `1/s`
+move and its departure is bounded, not dropped. The hypothesis that the executed map is `1/s`
+times its unit is therefore no longer needed for the exact solve. #62 keeps what the resolvent
+does not see: the certified step `η` (the bound is at `η = 1`) and the chart's lattice residual
+(`SolvedChart` is a certified inverse on `2^(−L_s)ℤ`, not `H⁻¹`).
