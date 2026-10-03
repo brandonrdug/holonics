@@ -165,9 +165,9 @@ stationary interval; it is the law's first step, and the at-map read refines it.
 
 ## 6. Decision
 
-[agent-inferred] `H₀ = I` is released, and campaign 1's receiving prior is `2 I`. The code still
-opens at `I` (`NormalLaw::with_prior`, `SolvedChart::identity`) until the change below is built and
-measured.
+[agent-inferred] `H₀ = I` is released, and campaign 1's receiving prior is `2 I`. The code opens
+campaign 1's receiving map at `2 I` (#259, `ReceiverDeclaration::receiving_scale = 1`); its
+held-out read (b) below is not resolved at the grain.
 - The prior is held on the powers of two. They are the only scales at which both the Gram's
   opening entry `s` and its founding chart `s⁻¹` are dyadic: a dyadic `s⁻¹` alone allows
   `s = 4/3`. So the Gram stays on the dyadics (each deposit moves an entry by a lattice quotient,
