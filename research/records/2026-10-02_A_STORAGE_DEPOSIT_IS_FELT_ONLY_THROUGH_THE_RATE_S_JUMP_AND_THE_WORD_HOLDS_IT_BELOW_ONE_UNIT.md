@@ -8,7 +8,11 @@ where marked.
 **October 3.** §9 redoes the law at held momentum. The continuation now holds the contact's
 momentum across its deposit, not its rate, so §1's response and §2's telescoping describe the held
 rate the continuation no longer executes. §3 and §4 stand unchanged. §5's table is unchanged on the
-lattice, for the reason §9.3 gives.
+lattice, for the reason §9.3 gives. The test §1, §5 and §8 name,
+`storage_deposit_reaches_the_next_contact_only_through_the_rate_jump`, is now
+`storage_deposit_at_held_momentum_is_felt_through_the_motion`: its exact arm asserts §9.2's identity
+in place of §1's, which its Lean (`storage_transit_response`) still holds, and its lattice arm
+asserts §3's remainder equality and §9.3's rate remainders at every equal tick.
 
 ## 0. The question
 
