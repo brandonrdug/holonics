@@ -35,6 +35,15 @@
 // the opening's own scale `σ_open` included, so the opening split and every element split carry
 // one remainder.
 //
+// [definition; record B §2.3–§2.3a] **The carried open** (`holonics::hnn::Word::open_received`).
+// Under a reception carry the word opens on the previous reception's end change, which stays on
+// the card (`src/hnn/carry.rs`): the source rings' storage is imposed by the moment as at rest,
+// every other ring keeps its carried storage, each carried wave crosses its contact's reference
+// change, `a′ = 2G/(G + G′)·a`, and each rate is held at momentum, `w′ = w + δ` (the host's jump);
+// both are split onto `L_w` over their denominators (`hnn_split_over`), and those remainders keep
+// the denominator through every later split of the word. The plan's carry table (`WP_CARRY`) holds
+// per contact the gain `(2G, G + G′)` reduced, then per contact row `δ·2^(L_w)` as `(n, d)`.
+//
 // [definition] **Realization** (the hardware law): one block carries a whole word, its threads
 // dividing the rows of each stage (`row ≡ t mod blockDim.x`): the junctions over every ring's rows
 // together, then the elements' operands with the transits' right sides, then the elements' images
@@ -78,6 +87,7 @@
 #define WP_INCIDENCES 27
 #define WP_MAP 28
 #define WP_RESONATORS 29
+#define WP_CARRY 30
 
 #define WR_STRIDE 12
 #define WR_WIDTH 0
@@ -317,6 +327,48 @@ __device__ __forceinline__ int64_t hnn_split(wide s, long long shift, wide *rema
     return (int64_t)q;
 }
 
+// [definition; record B §2.3a, the reception carry on the card] **The nearest-point split over a
+// denominator**: `s/D` at `2^shift`, ties upward, `s = q·D·2^shift + r`,
+// `−D·2^(shift−1) ≤ r < D·2^(shift−1)` (Lean `HNN/LatticeDeposit.quot`/`rem` at the rational
+// point `s/(D·2^shift)`, the host's `Lattice::div_rem`). A carried wave transmitted across a
+// reference change, `(1 + Γ)a = 2G/(G + G′)·a`, and a rate held at momentum leave the dyadics; their
+// remainders carry the denominator `D` through every later split of the word. At `D = 1` it is
+// `hnn_split`. Refused (carrier) when `D·2^shift` reaches 2^125.
+__device__ __forceinline__ int64_t hnn_split_over(wide s, long long shift, int64_t D,
+                                                  wide *remainder, uint32_t *status) {
+    if (D == 1) {
+        return hnn_split(s, shift, remainder, status);
+    }
+    if (D < 1 || shift < 0 || shift > 124) {
+        *status |= HNN_REFUSED_MALFORMED;
+        *remainder = 0;
+        return 0;
+    }
+    if ((uwide)D >= (((uwide)1) << (125 - shift))) {
+        *status |= HNN_REFUSED_CARRIER;
+        *remainder = 0;
+        return 0;
+    }
+    const wide unit = (wide)((uwide)D << shift);
+    wide q = s / unit;
+    wide r = s % unit;  // truncated toward zero: floor below
+    if (r < 0) {
+        r += unit;
+        q -= 1;
+    }
+    if (2 * r >= unit) {
+        r -= unit;
+        q += 1;
+    }
+    if (!hnn_is_word(q)) {
+        *status |= HNN_REFUSED_WORD;
+        *remainder = 0;
+        return 0;
+    }
+    *remainder = r;
+    return (int64_t)q;
+}
+
 // A difference of two words on the carrier (exact: its magnitude is below 2^65).
 __device__ __forceinline__ wide hnn_minus(int64_t a, int64_t b) {
     return (wide)a - (wide)b;
@@ -515,9 +567,16 @@ extern "C" __global__ void hnn_word_forward(
     int64_t *rec_res_rate = HNN_AT(int64_t, WL_REC_RES_RATE);
     wide *res_rho = HNN_AT(wide, WL_RES_Z_BAR);
 
-    // ---- the open: zero change everywhere, then the source rings' storage.
+    // ---- the open: zero change everywhere, then the source rings' storage. Under a reception
+    // carry (`WP_CARRY` ≥ 0) the host has copied the carried change into the word's storage,
+    // arrivals and states on the card, and the open crosses it into this cut's references instead
+    // of zeroing it (below); every remainder still opens at zero.
+    const long long carry_at = plan[WP_CARRY];
+    const long long *carry = carry_at >= 0 ? plan + carry_at : (const long long *)0;
     for (long long e = t; e < N; e += T) {
-        storage[e] = 0;
+        if (!carry) {
+            storage[e] = 0;
+        }
         rem_anchor[e] = 0;
         rem_storage[e] = 0;
         res_u[e] = 0;
@@ -530,15 +589,51 @@ extern "C" __global__ void hnn_word_forward(
         res_operand_status[e] = HNN_EXACT;
     }
     for (long long p = t; p < NA; p += T) {
-        arrivals[p] = 0;
         rem_arrival[p] = 0;
+        if (!carry) {
+            arrivals[p] = 0;
+            continue;
+        }
+        // [definition; record B §2.3a] The carried wave crosses the lift's move of its contact's
+        // conductance from `G` to `G′`: `a′ = (1 + Γ)a = 2G/(G + G′)·a`, the gain `p/q` from the
+        // plan, split onto `L_w` over `q` with its remainder carried at the arrivals' scale.
+        const long long a = arrival_table[p * WA_STRIDE + WA_CONTACT];
+        const long long gain = carry[2 * a], over = carry[2 * a + 1];
+        if (gain != over) {
+            uint32_t st = 0;
+            wide remainder = 0;
+            const int64_t crossed =
+                hnn_split_over(hnn_word_product((int64_t)gain, arrivals[p]), 0, over, &remainder,
+                               &st);
+            arrivals[p] = crossed;
+            rem_arrival[p] = hnn_shifted(remainder, x_shift, &st);
+            hnn_note(st, STAGE_OPEN, (uint32_t)p, &bits, &first);
+        }
     }
     for (long long q = t; q < K; q += T) {
-        u[q] = 0;
-        w[q] = 0;
         rem_solve[q] = 0;
         rem_disp[q] = 0;
         rem_rate[q] = 0;
+        if (!carry) {
+            u[q] = 0;
+            w[q] = 0;
+            continue;
+        }
+        // [definition; the deposit record §3] The rate held at momentum, `C′w′ = Cw`: the host's
+        // jump `δ·2^(L_w) = n/d` (the commit's solve) added and split onto `L_w` over `d`, its
+        // remainder carried at the rate's scale `L_w + e_g`. The displacement carries as it is.
+        const long long *jump = carry + 2 * C + 2 * q;
+        if (jump[0] != 0) {
+            uint32_t st = 0;
+            const long long *contact = contacts + row_contact[q] * WC_STRIDE;
+            HnnSum held = hnn_sum();
+            hnn_add_words(held, w[q], (int64_t)jump[1]);
+            hnn_add(held, (wide)jump[0]);
+            wide remainder = 0;
+            w[q] = hnn_split_over(hnn_read(held, &st), 0, (int64_t)jump[1], &remainder, &st);
+            rem_rate[q] = hnn_shifted(remainder, contact[WC_GAIN_EXP], &st);
+            hnn_note(st, STAGE_OPEN, (uint32_t)q, &bits, &first);
+        }
     }
     __syncthreads();
     {
@@ -755,9 +850,22 @@ extern "C" __global__ void hnn_word_forward(
                 HnnSum rate = hnn_sum();
                 hnn_add(rate, hnn_shifted(omega, 1, &st));
                 hnn_add(rate, -hnn_shifted((wide)w[q], eg, &st));
-                hnn_add(rate, rem_rate[q]);
+                // A rate held at momentum at the open carries its remainder over the jump's
+                // denominator.
+                const long long over = carry ? carry[2 * C + 2 * q + 1] : 1;
                 wide rate_remainder = 0;
-                const int64_t next_w = hnn_split(hnn_read(rate, &st), eg, &rate_remainder, &st);
+                int64_t next_w;
+                if (over == 1) {
+                    hnn_add(rate, rem_rate[q]);
+                    next_w = hnn_split(hnn_read(rate, &st), eg, &rate_remainder, &st);
+                } else {
+                    const wide image = hnn_read(rate, &st);
+                    HnnSum carried = hnn_sum();
+                    hnn_add_scaled(carried, (int64_t)over, image);
+                    hnn_add(carried, rem_rate[q]);
+                    next_w = hnn_split_over(hnn_read(carried, &st), eg, (int64_t)over,
+                                            &rate_remainder, &st);
+                }
                 HnnSum disp = hnn_sum();
                 hnn_add(disp, hnn_shifted((wide)u[q], eg + h_shift, &st));
                 hnn_add_scaled(disp, (int64_t)h_mul, omega);
@@ -787,9 +895,21 @@ extern "C" __global__ void hnn_word_forward(
                     const wide exchange = hnn_word_product((int64_t)x_mul, z);
                     hnn_add(value, entry[WA_END] == 0 ? -exchange : exchange);
                 }
-                hnn_add(value, rem_arrival[p]);
+                // A wave crossed at the open carries its remainder over the gain's denominator.
+                const long long over = carry ? carry[2 * entry[WA_CONTACT] + 1] : 1;
                 wide remainder = 0;
-                const int64_t next = hnn_split(hnn_read(value, &st), x_shift, &remainder, &st);
+                int64_t next;
+                if (over == 1) {
+                    hnn_add(value, rem_arrival[p]);
+                    next = hnn_split(hnn_read(value, &st), x_shift, &remainder, &st);
+                } else {
+                    const wide image = hnn_read(value, &st);
+                    HnnSum carried = hnn_sum();
+                    hnn_add_scaled(carried, (int64_t)over, image);
+                    hnn_add(carried, rem_arrival[p]);
+                    next = hnn_split_over(hnn_read(carried, &st), x_shift, (int64_t)over,
+                                          &remainder, &st);
+                }
                 arrivals[p] = next;
                 rem_arrival[p] = remainder;
                 hnn_note(st, STAGE_ARRIVAL, (uint32_t)p, &bits, &first);

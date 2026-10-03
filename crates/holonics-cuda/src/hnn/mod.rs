@@ -32,7 +32,10 @@
 //!   `Charts`, refined step for step as `holonics::hnn::chart::refine` refines them, every
 //!   Newton–Schulz step and certificate on the card), `execute` (one word's plan, buffers, launches
 //!   and record: `kernels/hnn_word.cuh`) and `readout` (the host's exact readings of the card's
-//!   record: the faces in `ℚ(θ)`, the tick balances, the release and the word's return).
+//!   record: the faces in `ℚ(θ)`, the tick balances, the release and the word's return), and
+//!   `carry` (the reception carry on the card: under a declared carry each reception's word opens
+//!   on the previous one's end change kept on the card, its waves crossed and its rates held in the
+//!   word's open, with the reference's carry mirrored on the host).
 //!
 //! # The realizations (hardware law)
 //!
@@ -129,6 +132,7 @@
 #![deny(clippy::float_arithmetic)]
 
 pub mod card;
+mod carry;
 mod dyadic;
 mod execute;
 pub mod lattice;

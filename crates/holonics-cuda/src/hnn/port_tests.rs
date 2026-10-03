@@ -23,11 +23,11 @@ use holonics::hnn::constitution::CAMPAIGN_ONE_BUDGET;
 use holonics::hnn::field::{ContactDeclaration, CribDeclaration, ReceiverDeclaration};
 use holonics::hnn::port::{ExecutionPort, Handle, ReceiptDetail};
 use holonics::hnn::reference::ExposedResident;
-use holonics::hnn::reference::{Cut, Reference, one_hot};
+use holonics::hnn::reference::{Cut, Reception, Reference, one_hot};
 use holonics::hnn::ring::{PumpDeclaration, PumpStep, ResonatorMaterial};
 use holonics::hnn::{
-    Constitution, ConstitutionRead, Current, Field, FieldDeclaration, HnnError, PairPort,
-    ReceivingPhases, RingDeclaration, SourceMoment, Word,
+    Absorption, Constitution, ConstitutionRead, Current, Field, FieldDeclaration, HnnError,
+    PairPort, ReceivingPhases, ReceptionCarry, RingDeclaration, SourceMoment, Word,
 };
 use holonics::holon::parametron::Carrier;
 use holonics::ratio::Rat;
@@ -287,6 +287,22 @@ struct Compared {
     traffic: Traffic,
     /// The normal-law mirror's tally: every prox step carried, declined by reason or skipped.
     mirror: NormalMirror,
+    /// The refines that opened on a received carry (the reception carry).
+    received: u64,
+    /// Received openings whose carried rate the deposit's storage moved off its momentum, so the
+    /// open holds it at `w′ = w + δ`, `δ ≠ 0` (the deposit record §3).
+    held: u64,
+    /// Received openings whose carried wave crossed a moved conductance (record B §2.3a).
+    crossed: u64,
+}
+
+/// A carry as its saved text (`ReceptionCarry::write`): the bytes a continuing state holds.
+fn carry_text(carry: Option<&ReceptionCarry>) -> Option<String> {
+    carry.map(|carry| {
+        let mut text = String::new();
+        carry.write(&mut text);
+        text
+    })
 }
 
 /// **Run the exposure protocol on both ports in lockstep** (module header) over at most `windows`
@@ -299,11 +315,34 @@ fn lockstep(
     constitution: Option<Constitution>,
     release_every: u64,
 ) -> Compared {
+    lockstep_receiving(
+        field,
+        cut,
+        windows,
+        constitution,
+        release_every,
+        Reception::Rest,
+    )
+}
+
+/// **The lockstep under a declared reception** ([`lockstep`]; the reception carry): every return
+/// asserted equal, and after every method that writes the carry (compare, deposit, discard) the
+/// carried end on both ports byte-identical as saved text.
+fn lockstep_receiving(
+    field: &Field,
+    cut: &Cut,
+    windows: u64,
+    constitution: Option<Constitution>,
+    release_every: u64,
+    reception: Reception,
+) -> Compared {
     let card = card();
-    let host = Reference::campaign_one();
+    let host = Reference::campaign_one().with_reception(reception);
     // The lockstep runs the normal-law mirror (the parity test it moved into, off the exposure's
     // path), and reports its tally.
-    let device = Resident::campaign_one(&card).with_normal_mirror();
+    let device = Resident::campaign_one(&card)
+        .with_normal_mirror()
+        .with_reception(reception);
     let current = Current::at_rest(field);
     let (mut h, mut d) = match constitution {
         Some(theta) => (
@@ -336,6 +375,28 @@ fn lockstep(
         let span = &cells[position..end];
         if span.len() == aperture {
             window += 1;
+            if let Some(carry) = h.carried() {
+                compared.received += 1;
+                // What the opening does to the carry at this cut, read from the host owner.
+                let form =
+                    holonics::hnn::word::PowerForm::read(field, h.constitution(), h.current())
+                        .unwrap();
+                let opened = form.opening(field, carry).unwrap();
+                compared.held += u64::from(
+                    opened
+                        .states
+                        .iter()
+                        .zip(&carry.change.states)
+                        .any(|(after, before)| after[1] != before[1]),
+                );
+                compared.crossed += u64::from(
+                    opened
+                        .arrivals
+                        .iter()
+                        .zip(&carry.change.arrivals)
+                        .any(|(after, before)| after != before),
+                );
+            }
             let refined = same(
                 "refine",
                 host.refine(&mut h, &hm, &phases),
@@ -360,6 +421,11 @@ fn lockstep(
             let Some((staged, _)) = compared_return else {
                 break;
             };
+            assert_eq!(
+                carry_text(h.carried()),
+                carry_text(ExposedResident::carried(&d)),
+                "the carried ends after the compare"
+            );
             // Prequential scoring: every compared window is deposited, the held-out tail
             // included; only the budget stop discards.
             if h.stopped().is_some() {
@@ -373,6 +439,7 @@ fn lockstep(
                 let resonators_before: Vec<_> = (0..field.rings().len())
                     .map(|ring| h.constitution().ring_resonator(ring).cloned())
                     .collect();
+
                 let deposited = same(
                     "deposit",
                     host.deposit(&mut h, staged),
@@ -452,6 +519,11 @@ fn lockstep(
     assert_eq!(
         h.tally(),
         holonics::hnn::reference::ExposedResident::tally(&d)
+    );
+    assert_eq!(
+        carry_text(h.carried()),
+        carry_text(ExposedResident::carried(&d)),
+        "the carried ends at the run's end"
     );
     compared.traffic = d.traffic();
     compared.mirror = device
@@ -561,6 +633,180 @@ fn the_card_port_returns_the_reference_on_the_chain() {
     assert!(compared.boundaries > 0 && compared.keys > 0 && compared.deposits > 0);
     // Every deposited window added its two targets to the tree (the landmark tree).
     assert_eq!(compared.landmarks, 2 * compared.deposits);
+}
+
+/// **The reception carry's chain** (the host's fixture, `holonics::hnn::tests::learning::chain_of`):
+/// the chain with no pair offset (`Δ = ∅`), at its capacity rounded up to a whole receiving window,
+/// and its cut: the periodic source with its held-out windows at both ends.
+fn carry_chain() -> (Field, Cut) {
+    let declared = |population: u64| {
+        let mut declaration = chain_declaration(population);
+        declaration.offsets = Vec::new();
+        Field::declare(declaration.by_lattice_rule()).unwrap()
+    };
+    let n_star = declared(1 << 20).capacity().n_star() as usize;
+    let length = n_star + n_star % 2;
+    let field = declared(length as u64);
+    let cut = Cut {
+        cells: source(length, field.alphabet(), 81),
+        held_out: vec![2..4, length - 4..length],
+    };
+    (field, cut)
+}
+
+/// An exposure with its wall times cleared: the one field two runs of one cut do not share.
+fn without_wall(
+    mut exposure: holonics::hnn::reference::Exposure,
+) -> holonics::hnn::reference::Exposure {
+    exposure.wall = Default::default();
+    exposure.readout = Default::default();
+    exposure
+}
+
+/// **The card carries each reception as the reference does** (record B §2.3, §2.3a; the deposit
+/// record §3): under `Carry(Nothing)` on the chain every reception after the first opens on the
+/// previous one's end change, kept on the card, its waves crossed at the lift's reference change
+/// and its rates held at momentum in the card's open (both happen on this cut: a lift moves a
+/// conductance and a deposit moves a contact's storage). Every return of the lockstep is the
+/// reference's, and the carried end is byte-identical as saved text after every compare; the
+/// card's exposure under the carry is the reference's exposure whole (wall times aside), its
+/// chained balance closing at every reception with a nonzero opening split (a crossed wave off the
+/// dyadics, carried over its denominator). A carry restored on both ports (`mount_carried`, from
+/// its saved text) opens the next reception's word alike.
+#[test]
+#[ignore = "needs the CUDA card; run alone with --include-ignored --test-threads=1"]
+fn the_card_carries_each_reception_as_the_reference() {
+    let (field, cut) = carry_chain();
+    let carry = Reception::Carry(Absorption::Nothing);
+    let windows = (cut.cells.len() / 2) as u64;
+    let compared = lockstep_receiving(&field, &cut, windows, None, 3, carry);
+    println!("chain, Carry(Nothing): {compared:?}");
+    assert_eq!(compared.compares, windows);
+    assert_eq!(
+        compared.received, 8,
+        "every reception after the first opens on a carry"
+    );
+    assert!(
+        compared.crossed > 0,
+        "a carried wave crosses a moved conductance"
+    );
+    assert!(
+        compared.held > 0,
+        "a deposit moves a carried rate off its momentum"
+    );
+    // The exposure on both ports.
+    let card = card();
+    let host = Reference::campaign_one().with_reception(carry);
+    let device = Resident::campaign_one(&card).with_reception(carry);
+    let reference = without_wall(host.expose(&field, &cut).unwrap());
+    let carried = without_wall(device.expose(&field, &cut).unwrap());
+    let chained = &reference.word.chained;
+    assert_eq!(chained.read, 8);
+    assert!(chained.closed && chained.dissipative == chained.read);
+    assert!(
+        !chained.split.is_zero(),
+        "a crossed wave is split off the dyadics"
+    );
+    assert_eq!(carried, reference, "the card's exposure under the carry");
+    // A saved carry restored on both ports opens the next word alike.
+    let current = Current::at_rest(&field);
+    let mut h = host.mount(&field, &current).unwrap();
+    let mut d = device.mount(&field, &current).unwrap();
+    let phases = h.admitted()[0].clone();
+    let (hm, _) = same(
+        "the open",
+        host.ingest(&mut h, None, &[]),
+        device.ingest(&mut d, None, &[]),
+    )
+    .unwrap();
+    let (pending, _) = same(
+        "refine",
+        host.refine(&mut h, &hm, &phases),
+        device.refine(&mut d, &hm, &phases),
+    )
+    .unwrap();
+    same(
+        "compare",
+        host.compare(&mut h, pending, &one_hot(&cut.cells[..2])),
+        device.compare(&mut d, pending, &one_hot(&cut.cells[..2])),
+    );
+    let saved = carry_text(h.carried()).expect("the compare writes the carry");
+    assert_eq!(
+        Some(&saved),
+        carry_text(ExposedResident::carried(&d)).as_ref()
+    );
+    let mut lines = saved.lines();
+    let head = lines.next().unwrap();
+    let restored = ReceptionCarry::read(head, &mut |what| {
+        lines.next().ok_or(HnnError::ContinuingState { what })
+    })
+    .unwrap();
+    let theta = h.constitution().clone();
+    let mut h = host
+        .mount_carried(&field, &current, theta.clone(), restored.clone())
+        .unwrap();
+    let mut d = device
+        .mount_carried(&field, &current, theta, restored)
+        .unwrap();
+    let (hm, _) = same(
+        "the open",
+        host.ingest(&mut h, None, &[]),
+        device.ingest(&mut d, None, &[]),
+    )
+    .unwrap();
+    same(
+        "refine on the restored carry",
+        host.refine(&mut h, &hm, &phases),
+        device.refine(&mut d, &hm, &phases),
+    );
+}
+
+/// The carry from a generic constitution on half-integers (every locus live: the contrast port,
+/// the pair port's outputs, the channels' forms) under `Carry(Nothing)`: every return the
+/// reference's and the carried end byte-identical after every compare.
+#[test]
+#[ignore = "needs the CUDA card; run alone with --include-ignored --test-threads=1"]
+fn the_card_carries_the_reference_on_a_generic_constitution() {
+    let field = chain();
+    let population = field.population() as usize;
+    for seed in [5u64, 11] {
+        let cells = source(population, field.alphabet(), seed);
+        let compared = lockstep_receiving(
+            &field,
+            &cut_of(cells, population - 6..population),
+            12,
+            Some(generic(&field, seed)),
+            2,
+            Reception::Carry(Absorption::Nothing),
+        );
+        println!("chain, generic constitution {seed}, Carry(Nothing): {compared:?}");
+        assert_eq!(compared.received, compared.compares - 1);
+        assert!(
+            compared.crossed > 0,
+            "a carried wave crosses a moved conductance"
+        );
+    }
+}
+
+/// At complete absorption (`Carry(Complete)`) the carry is the rest change at the field's elapsed
+/// ticks: on the chain every return is the reference's, the carried end byte-identical after
+/// every compare.
+#[test]
+#[ignore = "needs the CUDA card; run alone with --include-ignored --test-threads=1"]
+fn the_card_absorbs_each_reception_as_the_reference() {
+    let (field, cut) = carry_chain();
+    let windows = (cut.cells.len() / 2) as u64;
+    let compared = lockstep_receiving(
+        &field,
+        &cut,
+        windows,
+        None,
+        3,
+        Reception::Carry(Absorption::Complete),
+    );
+    println!("chain, Carry(Complete): {compared:?}");
+    assert_eq!(compared.compares, windows);
+    assert_eq!(compared.received, 8);
 }
 
 /// The chain from a generic constitution on half-integers (every locus live: the contrast port,

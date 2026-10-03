@@ -351,8 +351,10 @@ impl PendingSlot {
 }
 
 /// The exact bits of a carried change: every nonzero value by its numerator's and denominator's
-/// bits (a zero coordinate is the rest, which holds nothing), and the carried tick's.
-fn carry_bits(carry: &ReceptionCarry) -> u64 {
+/// bits (a zero coordinate is the rest, which holds nothing), and the carried tick's. Public so a
+/// device realization's resident counts its carried change as the reference does
+/// (`holonics-cuda`'s `hnn::carry`).
+pub fn carry_bits(carry: &ReceptionCarry) -> u64 {
     let EndChange {
         storage,
         arrivals,

@@ -51,6 +51,16 @@ fn integer(value: i64) -> Rat {
     Rat::from_integer(BigInt::from(value))
 }
 
+/// A remainder carried over a denominator (a crossed wave's or a held rate's, the reception carry;
+/// `1` at rest): its coordinate's value divided by it.
+fn over(value: Rat, denominator: i64) -> Rat {
+    if denominator == 1 {
+        value
+    } else {
+        value / Rat::from_integer(BigInt::from(denominator))
+    }
+}
+
 /// A word's slice of `len` entries at `at`.
 fn slice<T: Clone>(values: &[T], at: usize, len: usize) -> &[T] {
     &values[at..at + len]
@@ -834,7 +844,10 @@ pub(crate) fn released(
             let q = contact.rows + i;
             remainders.push(rat(BigInt::from(record.rem_solve[q]), solve));
             remainders.push(rat(BigInt::from(record.rem_disp[q]), disp));
-            remainders.push(rat(BigInt::from(record.rem_rate[q]), rate));
+            remainders.push(over(
+                rat(BigInt::from(record.rem_rate[q]), rate),
+                plan.rate_over(q),
+            ));
         }
         let widths = [
             plan.rings[contact.ends.0].width,
@@ -842,7 +855,10 @@ pub(crate) fn released(
         ];
         for (base, width) in contact.arrival.iter().zip(widths) {
             for i in 0..width {
-                remainders.push(rat(BigInt::from(record.rem_arrival[base + i]), arrival));
+                remainders.push(over(
+                    rat(BigInt::from(record.rem_arrival[base + i]), arrival),
+                    plan.arrival_over(a),
+                ));
             }
         }
     }
@@ -872,6 +888,12 @@ pub(crate) fn released(
         charts: executed.readings.to_vec(),
         resonators: resonator_balances,
     }
+}
+
+/// **The word's end change** (`holonics::hnn::word::EndChange`), read from its record: the
+/// reception carry's change (`crate::hnn::carry`).
+pub(crate) fn end(plan: &WordPlan, record: &ForwardRecord) -> EndChange {
+    Change::after(plan, record).end(plan)
 }
 
 /// [definition] **The return's source on the host** (module header): per receiving epoch the
