@@ -3,9 +3,11 @@
 //! [agent-inferred] Source admission happens at open through SourceMoment::open_storage on the
 //! producing constitution and Current. The full-tick contact return retains one reached change,
 //! not the word's recorded passages. Its comparison return uses the producing executed solves.
-//! Contact factors change C, K and D in the same (u,w) coordinates; the reflected stationary chart
-//! is a receiver analysis, not the executed state. Ring/pump/source-map changes need their own
-//! transported return and are not silently treated as contact-coordinate changes here.
+//! Contact factors change C, K and D at the contact's held canonical state `(u, π = C w)`: the
+//! rate after the deposit solves `C′ w′ = C w` (the storage-resolution record §9); the reflected
+//! stationary chart is a receiver analysis, not the executed state. Ring/pump/source-map changes
+//! need their own transported return and are not silently treated as contact-coordinate changes
+//! here.
 
 use std::sync::Arc;
 
@@ -224,7 +226,9 @@ impl ContactCut {
         self.next_tick
     }
 
-    /// Apply a native contact-factor deposit, read its same-state work, and open the next Word.
+    /// Apply a native contact-factor deposit, read its work at the held momentum, and open the
+    /// next Word on the held change (`C′ w′ = C w` per contact; `HnnError::HeldMomentum` where
+    /// `C′` cannot hold it).
     /// The source and Current stay bound. The native deposit checks commit/reach/certificate and
     /// returns the actual whole successor/publication; no caller-supplied successor is accepted.
     /// The native coordinates and complete last pump phase carry; successor inverse charts are
@@ -333,14 +337,19 @@ impl ContactCut {
                 });
             }
         }
+        // [definition; the storage-resolution record §9, the deposit record §2–§3] The deposit is
+        // a sudden change of the constitution between two ticks of one continuing motion, so the
+        // contact's canonical state `(u, π = C w)` holds across it and the rate solves
+        // `C′ w′ = C w` ([`PowerForm::held`]); a momentum `C′` cannot hold is refused.
         let old = PowerForm::read(field, &self.producing, current)?;
         let new = PowerForm::read(field, &successor, current)?;
+        let held = old.held(&new, &self.change)?;
         let before = old.power(&self.change)? + old.resonator_power(&self.change)?;
-        let committed = new.power(&self.change)? + new.resonator_power(&self.change)?;
-        let deposition_work = old.deposition_work(&new, &self.change)?;
+        let committed = new.power(&held.change)? + new.resonator_power(&held.change)?;
+        let deposition_work = held.deposition;
         if &committed - &before != deposition_work {
             return Err(HnnError::Shape {
-                what: "the native contact return's same-state work closes",
+                what: "the native contact return's work at the held momentum closes",
                 expected: 0,
                 found: 1,
             });
@@ -351,7 +360,7 @@ impl ContactCut {
             .iter()
             .map(|wave| zeros(wave.len()))
             .collect();
-        let mut word = Word::continuing(field, operands, &self.change, &nothing, self.next_tick)?;
+        let mut word = Word::continuing(field, operands, &held.change, &nothing, self.next_tick)?;
         word.native_source = Some((successor.clone(), current.clone(), source.clone()));
         #[cfg(test)] eprintln!("unit next-word-open elapsed_ms={}", started.elapsed().as_millis());
         let opened = word.change()?;

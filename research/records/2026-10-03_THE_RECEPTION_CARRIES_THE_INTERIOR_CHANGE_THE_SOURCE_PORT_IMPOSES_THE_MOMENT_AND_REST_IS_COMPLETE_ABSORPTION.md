@@ -454,10 +454,10 @@ restores it.
 
 Still owed: the device word with host-card parity (the card's port tests read the reference at its
 default, rest, so they are unchanged), and the Lean statement (#62). The within-refinement
-continuation (`ContactCut::continue_deposited`) still holds the rate across its contact deposit;
-moving it to the held momentum (the deposit record §5 item 2) changes the law its own record and
-Lean derive (`HNN/StorageResolution`: the two words compared at one rate), so it needs that
-derivation redone at held momentum, not a swap of its state. Guard 16 of
+continuation (`ContactCut::continue_deposited`) now holds the momentum across its contact deposit
+as well (the deposit record §5 item 2). Its law is redone at held momentum in the
+[storage-resolution record](2026-10-02_A_STORAGE_DEPOSIT_IS_FELT_ONLY_THROUGH_THE_RATE_S_JUMP_AND_THE_WORD_HOLDS_IT_BELOW_ONE_UNIT.md)
+§9; its Lean is owed in #62. Guard 16 of
 [THE_MACHINE](../../docs/THE_MACHINE.md) reads that no change outlives its word or its refinement;
 under `A = 0` the end change outlives its refinement into the next reception's opening, as this
 record derives. The guard is amended to say so, with rest as the default that keeps it as stated.

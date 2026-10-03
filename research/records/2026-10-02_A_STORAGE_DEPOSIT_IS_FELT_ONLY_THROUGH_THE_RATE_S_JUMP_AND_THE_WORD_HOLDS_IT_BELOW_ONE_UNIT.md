@@ -5,6 +5,15 @@
 §5, on Astra's control (`hnn::reference::continuation`, merged as `046d8d2e`); [agent-inferred]
 where marked.
 
+**October 3.** §9 redoes the law at held momentum. The continuation now holds the contact's
+momentum across its deposit, not its rate, so §1's response and §2's telescoping describe the held
+rate the continuation no longer executes. §3 and §4 stand unchanged. §5's table is unchanged on the
+lattice, for the reason §9.3 gives. The test §1, §5 and §8 name,
+`storage_deposit_reaches_the_next_contact_only_through_the_rate_jump`, is now
+`storage_deposit_at_held_momentum_is_felt_through_the_motion`: its exact arm asserts §9.2's identity
+in place of §1's, which its Lean (`storage_transit_response`) still holds, and its lattice arm
+asserts §3's remainder equality and §9.3's rate remainders at every equal tick.
+
 ## 0. The question
 
 Astra's joint continuation deposits on contact 0's storage factor and opens the next contact
@@ -182,3 +191,116 @@ it.
   The new test asserts the exact identity of §1 and the remainder equality of §3 at every equal
   tick.
 - `cargo check --workspace --all-targets` is clean.
+
+## 9. At held momentum (October 3)
+
+**Grade.** [proved-derived] for 9.1–9.3; the Lean statements are owed in #62 (the cloud has no Lean
+toolchain). [measured-exact] for 9.4, from `storage_deposit_at_held_momentum_is_felt_through_the_motion`.
+
+### 9.1 The continuation holds momentum
+
+The continuation's deposit lands at the full-tick cut (`ContactCut::next_tick`), and the next word
+opens at that tick on the same clock. So the deposit is a sudden change of the constitution between
+two ticks of one continuing motion. That is exactly the event of the
+[deposit record](2026-10-03_THE_DEPOSIT_HOLDS_THE_CARRIED_MOMENTUM_AND_THE_ACCRETED_MASS_IS_THE_THROWS_DAMPING.md)
+item 3. The contact's canonical state `(u, π = C w)` holds across it, and the rate does not.
+Nothing distinguishes a deposit within a refinement from one across receptions. The refinement only
+changes which deposit is certified (the native unit certificate, contact loci only), not what the
+motion keeps.
+
+The successor therefore opens at `w′ = w + δ`, with `C′δ = −ΔC w` (`held_rate`, the particular point
+of the reduced solve). `continue_deposited` now commits through `PowerForm::held` and refuses a
+momentum `C′` cannot hold (`HnnError::HeldMomentum`). Its work is the deposit record's identity,
+`½⟨w′, C′w′⟩ − ½⟨w, Cw⟩ = −½⟨w′, ΔC w′⟩ − ½⟨δ, Cδ⟩`, in place of the same-state `½⟨w, ΔC w⟩`.
+
+The held rate had the opposite sign of work on this control (9.4). Holding the rate gives the motion
+an impulse `ΔC w` that no source supplies (the deposit record item 5).
+
+### 9.2 The response: storage is felt through the motion itself
+
+At held momentum the transit's right side `h(α_g − α_h) + 2Cw − hKu` is unchanged, since
+`2C′w′ = 2π = 2Cw`. Its operator moves by `(G/h)ΔC`. So, at one canonical state `(u, π, α)`,
+
+```text
+m′(ζ′ − ζ) = −(G/h) ΔC ζ = −2ΔC ω = −ΔC(w + w⁺),        ω = (G/2h)ζ,  w⁺ = 2ω − w
+```
+
+exactly. Compare §1's held rate, `ΔC(w − w⁺)`. The two differ by `2ΔC w`, the impulse the held rate
+injected, which is what cancelled the steady part of the motion there. At held momentum a heavier
+mass with the same momentum moves more slowly, and it does so at once. Only rest (`ω = 0`) leaves
+the deposit unfelt. A steady rate does not.
+
+Summed, the midpoints are the travel. The displacement is carried as
+`û_(t+1) + σ_(t+1) = û_t + (G/2)ζ̂_t + σ_t`, and the solve as `ζ̂_t + r_(t+1) = ζ_t + r_t`. Therefore
+
+```text
+(G/2) Σ_(t<N) ζ_t = (û_N − û_0) + (σ_N − σ_0) + (G/2)(r_N − r_0)
+```
+
+Read along the predecessor's path, the exact response accumulates as
+`m′V_N = −(2/h)ΔC[(û_N − û_0) + (σ_N − σ_0) + (G/2)(r_N − r_0)]`. It grows with the displacement's
+travel, not with the rate's excursion. That is the held mass lagging in position. §4's floor applies
+unchanged, with `J` replaced by this sum.
+
+[agent-inferred] This reading is first order in `ΔC`. After one tick the two exact motions no longer
+share a canonical state, as §2's accumulation was first order along the shared representatives.
+
+### 9.3 On the word lattice the momentum opens in the rate's remainder
+
+The cut's end change lies on the transient lattice. `Word::on_change` splits the held rate with
+error feedback, as it splits a carried rate at reception (record B §2.3a). The opening then has two
+cases, decided exactly at the opening:
+- **Forced at the opening.** If some `δ_i` lies outside the remainder's half-open cell
+  `[−u/2, u/2)`, the successor's rate representative parts at the opening. The material response is
+  felt at tick 0, by no crossing.
+- **Held in the remainder.** Otherwise the representative is unchanged, and the opening rate
+  remainder is `ρ′_0 = δ`.
+
+In the second case the solve reads only the carried representatives. While they agree, the per-tick
+response is §1's identity `ΔC(ŵ − ŵ⁺)` at the representative. The solve remainders differ by the
+accumulated image difference (§3). The rate streams carry the momentum hold beside it:
+
+```text
+ρ′_N − ρ_N = δ + Σ_(t<N) (y′_t − y_t),        y_t = 2ω̂_t − ŵ_t
+```
+
+This is §3's feedback difference from two different openings. Since `|δ_i| < u/2`, the hold never by
+itself forces the rate apart. It parts the rate only by a crossing, or once the rate images
+accumulate. So on the lattice the held momentum is carried exactly as representative plus remainder,
+and the solve feels its remainder part only when the error feedback releases it. That is the
+lattice's law for every carried value, not a new one.
+
+### 9.4 The measurement on Astra's control
+
+The fixture, deposit and operands are those of §5: `u = 2^(−11)`, `G/h = 2`, and
+`ΔC = [[0, −2^(−13)], [−2^(−13), 24577/2^26]]`.
+- **Exact arm, one tick.** The successor's rate moved, `C′w′ = Cw` holds exactly, and
+  `m′(ζ′ − ζ) = −ΔC(w + w⁺)` holds as an equality of rationals.
+- **Lattice arm, the opening.** `w_0 = (−1/16, 39/1024)`. The jump is
+  `δ = (−2030099, −13·252319)/(2^10·5³·31²·37²)`, which is `(−4060198, −6560294)/(5³·31²·37²)` in
+  units of `u`, inside `(−1/40, −1/41)` and `(−1/25, −1/26)` of a unit. The representative is
+  unchanged, and `ρ′_0 = δ`.
+- **Lattice arm, the passage.** Every tick of §5's table is unchanged. The representatives agree
+  for 18 ticks and part at tick 19. At every agreeing tick both remainder identities of 9.3 held
+  exactly (asserted).
+- **The work.** At the held rate the deposit's work was `+3·13·2007079/2^47`, raising the reading. At
+  held momentum it is `−7³·13·34403/(2^23·5²·31²·37²)`, lowering it. The opening split is
+  `5148192796380257/(2^47·5²·31²·37²)`, exactly the difference of the two. The lattice representative
+  reads the held rate's power, and the split carries the rest.
+
+The run's wall time was within one second for the test's two arms, so no projection was needed.
+
+### 9.5 Remaining sites
+
+[agent-inferred] `reference::contact_ablation`, a measured diagnostic with no consumer, still
+continues its contacts-only successor on the predecessor's end change and reads its work at the held
+rate (`PowerForm::deposition_work`). It is left as it stands: it is a diagnostic reading, not an
+executed continuation.
+
+Owed in #62:
+- the response at held momentum;
+- the travel telescoping;
+- the remainder difference from two openings.
+
+The exact statements are in the #62 comment.
+

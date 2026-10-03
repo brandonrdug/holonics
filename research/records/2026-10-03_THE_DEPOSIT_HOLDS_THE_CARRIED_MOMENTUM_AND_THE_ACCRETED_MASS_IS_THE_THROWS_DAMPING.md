@@ -195,7 +195,10 @@ Sent to the coordinator for the main line, which owns `word.rs`, `word/continuat
    refused with a typed error naming the contact; its law is owed (#62 item 2). `w′` is fixed only
    modulo `ker C′_a`, which no later tick reads; the solve's own chart fixes it.
 2. `ContactCut::continue_deposited` holds the contacts' momentum across its deposit in the same
-   way, superseding its agent-inferred "same (u,w) coordinates".
+   way, superseding its agent-inferred "same (u,w) coordinates". [Built, #288: its law at held
+   momentum is the
+   [storage-resolution record](2026-10-02_A_STORAGE_DEPOSIT_IS_FELT_ONLY_THROUGH_THE_RATE_S_JUMP_AND_THE_WORD_HOLDS_IT_BELOW_ONE_UNIT.md)
+   §9.]
 3. Record B §2.3 item 1 names the held momentum for the contacts' storage, with `deposition_k` read
    as in §3. The chained balance's form is unchanged.
 4. Under the carry the commit reads, beside `Q_(k+1) ⪯ (1 + ε_k) Q_k`, the mass from below,
