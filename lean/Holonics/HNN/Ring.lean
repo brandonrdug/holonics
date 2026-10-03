@@ -50,7 +50,11 @@ generator form:    ż = A z ,  A = [[0, 1], [−C⁻¹K, 0]] ,  U = (1 − A_h)�
    (`HolonicConstitutiveCirculation.emitted`, `successorHeld`, the owner of
    `HNN/Propagation.junctionScattering_twoPort`) returns the reflected wave `Γ i` in the old reference and
    the transmitted wave `(1 + Γ) i` in the new one, whose power there, `G₁|(1 + Γ) i|²`, is
-   `T · G₀|i|²`: both powers are read in one frame, and `T` is not an amplitude.
+   `T · G₀|i|²`: both powers are read in one frame, and `T` is not an amplitude. Summed over the
+   carried waves of a reception's contacts (`reference_carry_change`, `reference_lift_work`,
+   `reference_lift_work_nonpos`, `reference_lift_work_eq_zero_iff`), the lift's work on the carry is
+   `(h/4) Σ_a Σ_i (G′_a|x′|² − G_a|x|²) = −(h/4) Σ_a Σ_i Γ_a² G_a |x|² ≤ 0`, zero exactly when no
+   nonzero carried wave meets a moved conductance.
 5. **Crossings are epoch ticks** (`ring_crossings_are_epoch_ticks`): along the ring's rational
    clock passage, the arrivals on its section over `N` micro-steps from residue `r < d` are
    `(r + N)/d` (`Epoch.ring_arrivals_eq_ringCrossings`, `Parametron.ringCrossings_eq`); for `d ≥ 2`
@@ -590,6 +594,63 @@ theorem two_port_reference_balance {G₀ G₁ : ℚ} (h₀ : 0 < G₀) (h₁ : 0
   · have := weighted_square_energy (incoming := i) (held := 0) h₀ h₁
     simpa using this
 
+/-- [proved-derived; formal-checked] **One carried wave across a reference change.** The power the
+carried wave keeps in the new reference less what it had in the old one is minus the reflected
+power: `G₁|(1 + Γ) i|² − G₀|i|² = −Γ² G₀ |i|²` (`two_port_reference_balance`'s fifth conjunct). -/
+theorem reference_carry_change {G₀ G₁ : ℚ} (h₀ : 0 < G₀) (h₁ : 0 < G₁) (i : ℚ) :
+    G₁ * successorHeld G₀ G₁ i 0 ^ 2 - G₀ * i ^ 2 = -(reflection G₀ G₁ ^ 2 * G₀ * i ^ 2) := by
+  obtain ⟨-, he, -, -, hb⟩ := two_port_reference_balance h₀ h₁ i
+  rw [he] at hb
+  linear_combination hb
+
+/-- [proved-derived; formal-checked] **The lift's work on the carried waves.** Contacts `a` move
+from conductance `G a` to `G' a` (both positive) and carry the waves `x a i` (every coordinate and
+end of the contact). Each crosses as `(1 + Γ_a) x` and emits `Γ_a x`,
+`Γ_a = (G_a − G'_a)/(G_a + G'_a)`. The lift's work on the carry,
+`(h/4) Σ_a Σ_i (G'_a |x′_(a,i)|² − G_a |x_(a,i)|²)`, is `−(h/4) Σ_a Σ_i Γ_a² G_a |x_(a,i)|²`. -/
+theorem reference_lift_work {A W : Type*} [Fintype A] [Fintype W] (G G' : A → ℚ)
+    (hG : ∀ a, 0 < G a) (hG' : ∀ a, 0 < G' a) (x : A → W → ℚ) (h : ℚ) :
+    h / 4 * ∑ a, ∑ i, (G' a * successorHeld (G a) (G' a) (x a i) 0 ^ 2 - G a * x a i ^ 2) =
+      -(h / 4 * ∑ a, ∑ i, reflection (G a) (G' a) ^ 2 * G a * x a i ^ 2) := by
+  simp_rw [fun a i => reference_carry_change (hG a) (hG' a) (x a i), Finset.sum_neg_distrib]
+  ring
+
+/-- [proved-derived; formal-checked] **The lift never raises the carried energy**: for `h ≥ 0` its
+work on the carried waves is at most zero. -/
+theorem reference_lift_work_nonpos {A W : Type*} [Fintype A] [Fintype W] (G G' : A → ℚ)
+    (hG : ∀ a, 0 < G a) (hG' : ∀ a, 0 < G' a) (x : A → W → ℚ) {h : ℚ} (hh : 0 ≤ h) :
+    h / 4 * ∑ a, ∑ i, (G' a * successorHeld (G a) (G' a) (x a i) 0 ^ 2 - G a * x a i ^ 2) ≤ 0 := by
+  rw [reference_lift_work G G' hG hG' x h, neg_nonpos]
+  exact mul_nonneg (by positivity) (Finset.sum_nonneg fun a _ => Finset.sum_nonneg fun i _ =>
+    mul_nonneg (mul_nonneg (sq_nonneg _) (hG a).le) (sq_nonneg _))
+
+/-- One wave's reflected power vanishes exactly when the wave is zero or its contact's conductance
+does not move. -/
+theorem reflected_power_eq_zero_iff {G₀ G₁ : ℚ} (h₀ : 0 < G₀) (h₁ : 0 < G₁) (i : ℚ) :
+    reflection G₀ G₁ ^ 2 * G₀ * i ^ 2 = 0 ↔ (i ≠ 0 → G₁ = G₀) := by
+  have hs : G₀ + G₁ ≠ 0 := (add_pos h₀ h₁).ne'
+  have hΓ : reflection G₀ G₁ = 0 ↔ G₁ = G₀ := by
+    unfold reflection
+    rw [div_eq_zero_iff, or_iff_left hs, sub_eq_zero, eq_comm]
+  simp only [mul_eq_zero, pow_eq_zero_iff two_ne_zero, h₀.ne', or_false, hΓ]
+  tauto
+
+/-- [proved-derived; formal-checked] **The lift does no work exactly when no carried wave meets a
+moved conductance**: for `h > 0`, the work is zero iff `G'_a = G_a` on every contact `a` carrying a
+nonzero wave. -/
+theorem reference_lift_work_eq_zero_iff {A W : Type*} [Fintype A] [Fintype W] (G G' : A → ℚ)
+    (hG : ∀ a, 0 < G a) (hG' : ∀ a, 0 < G' a) (x : A → W → ℚ) {h : ℚ} (hh : 0 < h) :
+    h / 4 * ∑ a, ∑ i, (G' a * successorHeld (G a) (G' a) (x a i) 0 ^ 2 - G a * x a i ^ 2) = 0 ↔
+      ∀ a i, x a i ≠ 0 → G' a = G a := by
+  have hterm : ∀ a i, 0 ≤ reflection (G a) (G' a) ^ 2 * G a * x a i ^ 2 := fun a i =>
+    mul_nonneg (mul_nonneg (sq_nonneg _) (hG a).le) (sq_nonneg _)
+  rw [reference_lift_work G G' hG hG' x h, neg_eq_zero,
+    mul_eq_zero, or_iff_right (by positivity : h / 4 ≠ 0),
+    Finset.sum_eq_zero_iff_of_nonneg fun a _ => Finset.sum_nonneg fun i _ => hterm a i]
+  simp only [Finset.mem_univ, true_implies,
+    Finset.sum_eq_zero_iff_of_nonneg fun i _ => hterm _ i,
+    fun a i => reflected_power_eq_zero_iff (hG a) (hG' a) (x a i)]
+
 end Reference
 
 /-! ## 4. The ring's crossings are its epoch ticks -/
@@ -846,6 +907,9 @@ section Audit
 #print axioms ring_cayley_denominator_nonsingular
 #print axioms ring_harmonic_mode_singular
 #print axioms two_port_reference_balance
+#print axioms reference_lift_work
+#print axioms reference_lift_work_nonpos
+#print axioms reference_lift_work_eq_zero_iff
 #print axioms ring_crossings_are_epoch_ticks
 #print axioms pump_half_turn_invariant
 #print axioms pump_blind_to_sheets

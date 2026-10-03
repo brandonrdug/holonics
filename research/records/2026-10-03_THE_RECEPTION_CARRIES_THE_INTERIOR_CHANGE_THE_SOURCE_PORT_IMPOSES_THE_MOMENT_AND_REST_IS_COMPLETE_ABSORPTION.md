@@ -261,10 +261,13 @@ emitted exchange, as the word's unread change does (`Released::power`), and is n
 `−(h/4) Σ_a Γ_a² G_a (|a_(g←a)|² + |a_(h←a)|²) ≤ 0`, exactly the emitted power. The ingest can no
 longer raise the carried energy, in either direction of the move, so the stronger reading's
 remaining term is the deposition alone. At `G' = G` the wave crosses unchanged.
-[proved-derived; formal-checked per coordinate] Each coordinate's identity
-`G'|a'|² = G|a|² − G|Γ a|²` is the fifth conjunct of `two_port_reference_balance`; the sum over
-coordinates and contacts, and its identification with the chained balance's ingest, are owed in Lean
-(#62).
+[proved-derived; formal-checked] Each coordinate's identity `G'|a'|² = G|a|² − G|Γ a|²` is the
+fifth conjunct of `two_port_reference_balance` (`HNN/Ring.reference_carry_change`). Summed over
+coordinates and contacts, the lift's work is `−(h/4) Σ_a Γ_a² G_a |a_a|²`, at most zero for `h ≥ 0`,
+and zero for `h > 0` exactly when no nonzero carried wave meets a moved conductance
+(`HNN/Ring.{reference_lift_work, reference_lift_work_nonpos, reference_lift_work_eq_zero_iff}`,
+#290). Its identification with the chained balance's ingest is the Rust owner's join, checked at
+every reception by `ChainedBalance::lift_emits` (#286); it is not a Lean statement.
 
 This is neither of the two exchange laws proposed beside #281. Mass arriving at rest keeps the
 momentum `G a`, and mass leaving at the carrier's speed keeps the velocity `a`; neither is one of the
@@ -453,11 +456,11 @@ saved object of this path; it is restored only where the executed path's continu
 restores it.
 
 Still owed: the device word with host-card parity (the card's port tests read the reference at its
-default, rest, so they are unchanged), and the Lean statement (#62). The within-refinement
-continuation (`ContactCut::continue_deposited`) now holds the momentum across its contact deposit
-as well (the deposit record §5 item 2). Its law is redone at held momentum in the
+default, rest, so they are unchanged), and the chained balance's Lean statement (#62). The
+within-refinement continuation (`ContactCut::continue_deposited`) now holds the momentum across its
+contact deposit as well (the deposit record §5 item 2). Its law is redone at held momentum in the
 [storage-resolution record](2026-10-02_A_STORAGE_DEPOSIT_IS_FELT_ONLY_THROUGH_THE_RATE_S_JUMP_AND_THE_WORD_HOLDS_IT_BELOW_ONE_UNIT.md)
-§9; its Lean is owed in #62. Guard 16 of
+§9; its Lean is `HNN/StorageResolution` §5 (#290). Guard 16 of
 [THE_MACHINE](../../docs/THE_MACHINE.md) reads that no change outlives its word or its refinement;
 under `A = 0` the end change outlives its refinement into the next reception's opening, as this
 record derives. The guard is amended to say so, with rest as the default that keeps it as stated.
