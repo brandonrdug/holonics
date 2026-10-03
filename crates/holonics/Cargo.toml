@@ -35,3 +35,8 @@ path = "../../research/notebook/hnn_design/hnn_chase.rs"
 [[example]]
 name = "hnn_prediction"
 path = "../../research/notebook/hnn_design/hnn_prediction.rs"
+
+[dev-dependencies]
+# The notebook names a state written before the material identity by the sha256 its receipts cite
+# (research/runs/u6/LEGACY_STATES.txt); never inside a law.
+sha2 = "0.11.0"
