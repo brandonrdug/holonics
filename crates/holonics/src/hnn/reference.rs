@@ -1317,7 +1317,7 @@ impl ExecutionPort for Reference {
         let read = start.elapsed();
         let ended = match self.reception {
             Reception::Rest => None,
-            Reception::Carry(absorption) => Some(word.reception_end().absorbed(absorption)),
+            Reception::Carry(absorption) => Some(word.reception_end()?.absorbed(absorption)),
         };
         let start = Instant::now();
         let released = word.released()?;
@@ -1477,7 +1477,7 @@ impl ExecutionPort for Reference {
         // The consumed word's end, read before its return consumes it (the reception carry §2.1).
         let ended = match self.reception {
             Reception::Rest => None,
-            Reception::Carry(absorption) => Some(word.reception_end().absorbed(absorption)),
+            Reception::Carry(absorption) => Some(word.reception_end()?.absorbed(absorption)),
         };
         let start = Instant::now();
         let back = word.pull_back(&covector, &map, &ratio.anchor()[phases.ring()], &phases)?;
@@ -3105,15 +3105,18 @@ pub struct WordReport {
 /// balance over an exposure** ([`ChainedBalance`]): one per reception opened on a carried change,
 /// how many were read, whether every one closed exactly, how many were dissipative with respect to
 /// the declared supply (the law), how many held the stronger reading that the work between the
-/// words is within the next word's loss (not a law), and the work, the loss and the excess summed,
-/// with the largest excess.
+/// words is within the next word's loss (read, not asserted), how many lifts only emitted (§2.3a),
+/// and the work, the reflected power, the opening splits, the loss and the excess summed, with the largest excess.
 #[derive(Clone, Debug, Default, PartialEq, Eq)]
 pub struct ChainedBalances {
     pub read: u64,
     pub closed: bool,
     pub dissipative: u64,
     pub within_loss: u64,
+    pub lift_emits: u64,
     pub work: Rat,
+    pub reflected: Rat,
+    pub split: Rat,
     pub loss: Rat,
     pub excess: Rat,
     pub largest_excess: Rat,
@@ -3125,7 +3128,10 @@ impl ChainedBalances {
         self.closed &= balance.closes();
         self.dissipative += u64::from(balance.dissipative());
         self.within_loss += u64::from(balance.within_loss());
+        self.lift_emits += u64::from(balance.lift_emits());
         self.work += balance.work();
+        self.reflected += &balance.reflected;
+        self.split += &balance.split;
         self.loss += &balance.loss;
         let excess = balance.excess();
         if excess > self.largest_excess {
@@ -4143,12 +4149,12 @@ where
                         .moment(&moment)
                         .expect("the exposure's moment")
                         .open_storage(field, constitution, current)?;
-                    let mut opened = carry.interior(field);
+                    let mut opened = form.opening(field, carry)?;
                     for (wave, added) in opened.storage.iter_mut().zip(&source) {
                         *wave = crate::ratio::linear::vector::add(wave, added);
                     }
                     readout.balance += started.elapsed();
-                    Some((form, carry.change.clone(), opened))
+                    Some((form, carry.clone(), opened))
                 }
                 _ => None,
             };
@@ -4279,7 +4285,13 @@ where
                         let started = Instant::now();
                         let after =
                             PowerForm::read(field, resident.constitution(), resident.current())?;
-                        word.commit(&before, &after)?;
+                        // Under the carry the motion crosses the deposit at held momentum (the
+                        // deposit record §3); at rest the end is emitted and read at its state.
+                        if resident.carried().is_some_and(|carry| carry.change == word.change) {
+                            word.commit_held(&before, &after)?;
+                        } else {
+                            word.commit(&before, &after)?;
+                        }
                         readout.balance += started.elapsed();
                         let started = Instant::now();
                         let contacts = site_readings(field, resident.constitution())?;
