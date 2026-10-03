@@ -1,9 +1,11 @@
 # The deposit holds the carried momentum, and the accreted mass is the throw's damping
 
 **Date.** October 3. **Issues.** #73, #63, #62, #240. **Grade.** [proved-derived; formal-checked]
-for the accretion laws (`HolonicsResearch/HNN/MoveDirection` §9, ported from #240, and §10, new);
-[agent-inferred] where marked; [definition; proposed] for the changes to owners this record does not
-edit (§5). No run, no control arm, no held-out read.
+for the accretion laws (`HolonicsResearch/HNN/MoveDirection` §9, ported from #240, and §10, new),
+and for the hold, the source mass (corrected in Answer 7) and the throw's energy law and floor
+(`HNN/DepositHold`, `HolonicsResearch/HNN/ThrowEnergy`, #297); [agent-inferred] where marked;
+[definition; proposed] for the changes to owners this record does not edit (§5). No run, no control
+arm, no held-out read.
 
 **Occasion.** Brandon's throw lens (October 2: "Predictive release, it's a throw like of
 momentum"), joined to the machine by derivation as the reception carry's interior motion at the
@@ -29,9 +31,14 @@ the next. This record states the one law both obey at a deposit.
 3. **A deposit holds `(u, π)`.** A deposit is a sudden change of the constitution between two
    ticks. Along the motion `π̇ = −∂P/∂u` and `u̇ = ∂P/∂π` stay bounded across a jump of `C` or
    `K`, so both are continuous: the deposit holds position and momentum and changes the mass.
-   The carried rate after it solves `C′_a w′ = C_a w` [proved-derived for the energy below;
-   the continuity is the standard sudden-change law of a Hamiltonian, agent-inferred as the
-   discrete scheme's law until its Lean statement lands, #62 item 1].
+   The carried rate after it solves `C′_a w′ = C_a w`. [proved-derived; formal-checked, #297, on
+   the scheme the tick executes: the midpoint tick reads the rate only through `π`
+   (`HNN/DepositHold.tick_reads_momentum`); a deposit at held `(u, π)` moves the energy by exactly
+   its deposit term (`hold_energy`, `reception_hold_balance`); and a ramp of the parameters over
+   `m` sub-ticks of step `s` moves `(u, π)` by at most `msκU` and `msγP`, so the hold is the limit
+   of every ramp while the rate jumps (`ramp_moves_by_at_most`, `ramp_rate_near_held`). The ramp
+   bound assumes a left inverse `X_j C_j = 1` at each sub-tick and a priori bounds `U`, `P` on the
+   state.]
 4. **What the deposit does to the carried motion.** With `C′ = C + F` the kinetic reading falls by
    exactly
    ```text
@@ -77,9 +84,19 @@ the next. This record states the one law both obey at a deposit.
      so the constitution's throw enters reception only through the moment's imposed storage
      `s_(k+1)(0)`, opened with the thrown `E`. Record B already enters that as the source exchange,
      on the source rings, and its `Π_int` holds the interior coordinates. The two throws act on
-     complementary coordinates and nothing is counted twice. [agent-inferred] `H` is the storage's
-     inertia read through the received moments (the direction record §5); the exact identity of
-     `½⟨ΔE H, ΔE⟩` with the imposed storage power is owed (#62 item 3).
+     complementary coordinates and nothing is counted twice.
+   - The source mass is the imposed storage's inertia less the prior. [proved-derived;
+     formal-checked, #297; corrects this item's first reading, that `½⟨ΔE H, ΔE⟩` is the imposed
+     storage power, which is false] With the carried Gram `H = H₀ + Σ_t w_t f_t f_tᵀ` and the
+     storage `S(E) = Σ_t (w_t/2)|E f_t|²` that `E` imposes on the returns' features,
+     `½⟨ΔE H, ΔE⟩ = ½⟨ΔE H₀, ΔE⟩ + S(ΔE)`, and `S(ΔE)` is exactly the second-order part of the
+     imposed storage's change (`HNN/DepositHold.{kinetic_gram, kinetic_is_imposed_curvature}`).
+     So `½⟨ΔE (H − H₀), ΔE⟩ = S(ΔE)`. The prior `H₀ = 2^k I` (`NormalLaw`) is no storage imposed
+     on any return, and under it `½⟨ΔE H, ΔE⟩` exceeds `S(ΔE)` for every nonzero move
+     (`kinetic_ne_imposed`). Two readings are declared, not proved [agent-inferred]: that the
+     source port imposes `s_t = E f_t` on the returns' features, and that the returns' weights
+     `w_t` are the source rings' storage weights (`(h/4) Y_g` in `E_S`). The identity is exact
+     once both are declared. No code reads `½⟨ΔE H, ΔE⟩` as imposed storage.
 8. **#240 can close without its executed Throw arm.** Its laws are kept: §9's accretion Lean is on
    main with this record, together with §10's matrix form, which closes #240 §5's owed matrix
    statement. Its supersession of the [direction record](2026-10-02_THE_COMPARISON_IS_INVARIANT_UNDER_THE_RINGS_SHIFTS_AND_A_GLOBAL_PHASE_AND_THE_GAUSS_NEWTON_STEP_POINTS_TOWARD_A_LOWER_POINT_EXACTLY_WHEN_ITS_CHORD_DESCENDS.md)'s
@@ -89,8 +106,10 @@ the next. This record states the one law both obey at a deposit.
    `Flight`, `source_coast`, `Constitution::stepped_source_coasting`, `PreparedStep::stepped_coasting`)
    stays in history at [`4743e836`](https://github.com/brandonrdug/holonics/tree/4743e836), to be
    ported when U6's moves resume, under §5's consumer. Its §6 chain (a seed and a control arm) and
-   its §8 Kinetic coupling read served only the synthetic step 1 and are dropped. What it still
-   owes goes to #62 (items 4 and 5).
+   its §8 Kinetic coupling read served only the synthetic step 1 and are dropped. Its owed
+   per-move energy law and nonconvex floor are proved (§6 items 4 and 5,
+   `HolonicsResearch/HNN/ThrowEnergy`, #297). The law is stated at the exact chart `H′X = 1`, and
+   the chart's certified residual `δ` stays owed in #62.
 
 ## 0. The failures this could repeat
 
@@ -156,6 +175,11 @@ The last row is the reason: the next tick's solve reads `2C′_a w′`. Under th
 `coast_apex_no_floor_ahead`, `coast_floor`, `coast_floor_at_end`, `line_falls_to`,
 `coast_secant_curvature`.
 
+#297 adds `Holonics/HNN/DepositHold` (the tick on `(u, π)`, the hold's energy and the ramp limit;
+the source mass as the imposed storage's inertia less the prior) and
+`HolonicsResearch/HNN/ThrowEnergy` (the throw's per-move energy law at the exact chart and the
+floor along a nonconvex line). §6 lists the theorems item by item.
+
 ## 3. The consumer and its equation
 
 [definition; proposed] The consumer is `Word::open_received` (#280, `word.rs:883`), at
@@ -209,9 +233,36 @@ Sent to the coordinator for the main line, which owns `word.rs`, `word/continuat
 
 1. The discrete scheme's hold: across a jump of the constitution between two midpoint ticks, the
    canonical state `(u, π)` is continuous, and the reception's balance with §10's deposit term.
+   [Proved, #297: `HNN/DepositHold.{tick_canonical_position, tick_canonical_momentum,
+   tick_reads_momentum, hold_energy, reception_hold_balance, closed_reception_hold_balance,
+   ramp_moves_by_at_most, ramp_rate_near_held}`. The continuity is the ramp limit, over ℚ with
+   `‖·‖∞`, a left inverse at each sub-tick and a priori state bounds (Answer 3).]
 2. The law of a momentum a singular `C′_a` cannot hold. [Proved, #293: no hold exists, and the
    holds at `C′_a + εI` read above every bound, so the refusal is the law;
    `HNN/ChainedBalance.{hold_iff_kernel_free, singular_hold_unbounded}`.]
-3. `½⟨ΔE H, ΔE⟩` as the imposed storage power of the received moments.
-4. From #240 §5: the throw's per-move energy law with the certified step's adoption.
-5. From #240 §7: the floor along a nonconvex line.
+3. `½⟨ΔE (H − H₀), ΔE⟩` as the second-order part `S(ΔE)` of the imposed storage's change of the
+   received moments. [Corrected and proved, #297. First stated with `H`, which is false: the
+   prior's `½⟨ΔE H₀, ΔE⟩` is positive for every nonzero move and is no imposed storage.
+   `HNN/DepositHold.{kinetic_gram, imposed_storage_expand, kinetic_is_imposed_curvature,
+   imposed_storage_along_line, kinetic_ne_imposed}`. The readings `s_t = E f_t` and `w_t` as the
+   source rings' storage weights are declared, not proved (Answer 7).]
+4. From #240 §5: the throw's per-move energy law with the certified step's adoption. [Proved at
+   the exact chart, #297: across one adopted move the throw's energy `½⟨P, c⟩ + L_held` changes by
+   an exact identity (`HolonicsResearch/HNN/ThrowEnergy.throw_energy_law`), and it does not rise
+   exactly when the lattice's rounding plus the comparison's second-order remainder, `ρ + R`, is
+   within the halving, the sticking loss, the coast's power and the impulse's descent
+   (`throw_energy_falls`). For `H′, F′ ⪰ 0`, `0 ≤ τ ≤ 1` and `0 ≤ τη ≤ 1` the halving, the sticking
+   loss and the impulse's term are nonnegative, and the coast's `τ(1 − τη)⟨G, c⟩` is nonnegative
+   where the coast falls, `⟨G, c⟩ ≥ 0` (`throw_dissipation_nonneg`). Where the coast climbs,
+   `⟨G, c⟩ < 0`, the coast adds `τ(1 − τη)|⟨G, c⟩|` to the energy unless `τη = 1`. Whether an
+   adopted move falls is the exact check of `ρ + R` at that move; no bound of `R` by the certified
+   step's curvature is stated. Still owed: the chart's certified residual `δ`, a further term the
+   law at `H′X = 1` omits.]
+5. From #240 §7: the floor along a nonconvex line. [Proved, #297,
+   `HolonicsResearch/HNN/ThrowEnergy.{line_slope_le, nonconvex_line_falls_to,
+   nonconvex_line_le_quadratic, nonconvex_stop_value, nonconvex_apex_rises}`: with only an upper
+   curvature bound `f″ ≤ κ⁺` on `[0, T]`, of either sign, the line falls while `s ≤ 0` and
+   `s + κ⁺τ ≤ 0`, and for `κ⁺ > 0` the stop `−s/κ⁺` lowers it by at least `s²/(2κ⁺)`. With a lower
+   bound `f″ ≥ κ⁻ < 0`, nothing lies below `f(0)` at least as far as `min(T, −2s/κ⁻)` from an apex
+   (`s ≥ 0`); that bounds the reach from below only. No code reads `κ` or stops a move at its
+   floor.]
