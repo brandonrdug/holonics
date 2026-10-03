@@ -265,7 +265,7 @@ gives `⟨x, F x⟩ < c |x|²` for `x ≠ 0` (`rayleigh_eigen_lt`). The lift nee
 `0 ⪯ G ⪯ λ I`, `|G y|² ≤ λ ⟨y, G y⟩` (`image_sq_le`) and `⟨y, G y⟩ ≤ λ |y|²` give
 `|d|² ≤ (λ/(s + λ))² |s⁻¹ x|²` for every `x` (`departure_sq_le`) and
 `0 ≤ ⟨x, d⟩ ≤ (λ/(s + λ)) ⟨x, s⁻¹ x⟩` (`departure_form_le`). On campaign 1 at `2 I` the departure
-is below `8599330/42153762` of `|x/2|` in every direction (`campaign_one_lift`). The executed map
+is at most `8599330/42153762` of `|x/2|` in every direction (`campaign_one_lift`). The executed map
 reads a pair of readings as `⟨X̂ z_u, z_t⟩` where the `1/s` reading takes `⟨s⁻¹ z_u, z_t⟩`, so each
 pair departs by `q` with `q² ≤ (λ/(s + λ))² |s⁻¹ z_u|² |z_t|²` (`departure_pair_sq_le`, Cauchy–Schwarz
 `dot_sq_le`); each window's Gram is a partial sum of the campaign's, so the one `λ` serves every
