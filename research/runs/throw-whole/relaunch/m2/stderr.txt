@@ -1,0 +1,17 @@
+  the move's incumbent read; 164232 ms
+  the move's proposal and persistence read; 1679 ms
+  the move's returns, slope and first step; 31988 ms
+  a trial's deposit and first-order bound; 3224 ms
+  a trial's reread; 148957 ms
+  a trial's deposit and first-order bound; 3163 ms
+  a trial's reread; 150362 ms
+  a trial's deposit and first-order bound; 3192 ms
+  a trial's reread; 201285 ms
+  a trial's deposit and first-order bound; 3169 ms
+  a trial's reread; 200799 ms
+  a trial's deposit and first-order bound; 3165 ms
+  a trial's reread; 147925 ms
+  a trial's deposit and first-order bound; 3077 ms
+  a trial's reread; 200598 ms
+  a trial's deposit and first-order bound; 3126 ms
+  a trial's reread; 148905 ms
