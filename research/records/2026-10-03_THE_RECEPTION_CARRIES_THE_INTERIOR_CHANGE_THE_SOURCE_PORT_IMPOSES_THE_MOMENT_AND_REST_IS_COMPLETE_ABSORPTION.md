@@ -677,9 +677,15 @@ byte-identical as saved text after every compare.
 - `A = 0` with a pumped resonator on every ring (the dyadic carrier `(1, 0)`, half step, the
   card's words carrying only dyadic material): all 8 receptions carry the resonator states, and the
   card's exposure from the pumped constitution equals the reference's, its chained balance closing
-  and dissipative at all 8. No deposit on this cut moves a resonator's gains, so the resonator's
-  held jump is zero at every reception: that path is exercised by the host's law, not yet by a card
-  read.
+  and dissipative at all 8.
+- A held resonator rate off the dyadics: three pumped receptions in lockstep, their carry saved as
+  text, every ring's capacity gain moved `1 → 3/4` (`C′_r = (9/16) C_r`, so the held rate is
+  `(16/9) w_r`), and the carry restored beside it on both ports for three more receptions: every
+  return the reference's and the carried end byte-identical. [agent-inferred] The move is declared
+  between the save and the restore, because on these cuts no port deposit moves a capacity gain
+  (probed on the carry chain and the `Δ = {1}` chain, unpumped and pumped: only the dissipation
+  gain moves), and the hold reads only `C_r` and `C′_r`. Skipping the jump in the card's open fails
+  it at the first refine on the restored carry.
 - `A = I`: all 8 receptions, without and with the pumped resonators.
 - `A = 0` from the generic constitutions 5 and 11 on the chain with `Δ = {1}`: 11 receptions each.
 - At rest the existing locksteps, the loaded resonators' included, are unchanged.
