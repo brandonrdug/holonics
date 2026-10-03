@@ -7,6 +7,11 @@
 ff362446b3aba34997f36999b97e3ee618684741936c6da5255c1d9c32f4fb28  claude/cloud-runs-2-5aw27d:research/runs/u6/runner2/q12/m7-4096.state
 8cbc424176006a02cacb5ddb964998b7edc1b706d50a01f2753c84c14d358854  claude/cloud-runs-2-5aw27d:research/runs/u6/runner2/q2k/q2k10/q2k10-kinetic.state
 66adaf2d0e48b6a1b0c5be177de6e893213f389d1aa2da4d242ac12d020b9de9  claude/cloud-runs-2-5aw27d:research/runs/u6/runner2/q2k/q2k11/q2k11-kinetic.state
+00269559c41518de6a6079096147cd53d92c1bd810585ccdb885a5357c9bd25f  claude/cloud-runs-2-5aw27d:research/runs/u6/runner2/q2k/q2k12/q2k12-kinetic.state
+b9b8d0c20d53365b8b4bc0eef6728c1b9301c8157b9c8e7cd25873599344ddd4  claude/cloud-runs-2-5aw27d:research/runs/u6/runner2/q2k/q2k13/q2k13-kinetic.state
+963d122685ee16449ac1cc4fb3f0623c91b9a6ba2ab5770919c79de7d20790d9  claude/cloud-runs-2-5aw27d:research/runs/u6/runner2/q2k/q2k14/q2k14-kinetic.state
+19c4dd4b942405de2c9383087a44622bafaf7a72650f5a44c8f5141d9da13879  claude/cloud-runs-2-5aw27d:research/runs/u6/runner2/q2k/q2k15/q2k15-kinetic.state
+13026b727e40d472d12f6de30839c2e445baab96e28f410ad87ca45bf1fc940b  claude/cloud-runs-2-5aw27d:research/runs/u6/runner2/q2k/q2k16/q2k16-kinetic.state
 592f98610d116aa3eafe378424d71d46662faf6a6897f61e04c0c869b6ff2b72  claude/cloud-runs-2-5aw27d:research/runs/u6/runner2/q2k/q2k2/q2k2-kinetic.state
 9018c5c76f543b2a0b8ba76f0b36c35cc6eed96843dd6106456782fa80ba9df0  claude/cloud-runs-2-5aw27d:research/runs/u6/runner2/q2k/q2k3/q2k3-kinetic.state
 03407c33149297590e40b23e48516480516473efcdb5ffb6a2aabf0b17c93c3f  claude/cloud-runs-2-5aw27d:research/runs/u6/runner2/q2k/q2k4/q2k4-kinetic.state
