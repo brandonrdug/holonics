@@ -192,8 +192,8 @@ Sent to the coordinator for the main line, which owns `word.rs`, `word/continuat
 
 1. `ReceptionCarry` carries `[u, π]` per contact (`π = C_a w` with word `k`'s operands), and
    `Word::open_received` solves `C′_a w′ = π` at the new cut. A `π` outside `range C′_a` is
-   refused with a typed error naming the contact; its law is owed (#62 item 2). `w′` is fixed only
-   modulo `ker C′_a`, which no later tick reads; the solve's own chart fixes it.
+   refused with a typed error naming the contact; the refusal is the law (§6 item 2). `w′` is
+   fixed only modulo `ker C′_a`, which no later tick reads; the solve's own chart fixes it.
 2. `ContactCut::continue_deposited` holds the contacts' momentum across its deposit in the same
    way, superseding its agent-inferred "same (u,w) coordinates". [Built, #288: its law at held
    momentum is the
@@ -209,7 +209,9 @@ Sent to the coordinator for the main line, which owns `word.rs`, `word/continuat
 
 1. The discrete scheme's hold: across a jump of the constitution between two midpoint ticks, the
    canonical state `(u, π)` is continuous, and the reception's balance with §10's deposit term.
-2. The law of a momentum a singular `C′_a` cannot hold.
+2. The law of a momentum a singular `C′_a` cannot hold. [Proved, #293: no hold exists, and the
+   holds at `C′_a + εI` read above every bound, so the refusal is the law;
+   `HNN/ChainedBalance.{hold_iff_kernel_free, singular_hold_unbounded}`.]
 3. `½⟨ΔE H, ΔE⟩` as the imposed storage power of the received moments.
 4. From #240 §5: the throw's per-move energy law with the certified step's adoption.
 5. From #240 §7: the floor along a nonconvex line.

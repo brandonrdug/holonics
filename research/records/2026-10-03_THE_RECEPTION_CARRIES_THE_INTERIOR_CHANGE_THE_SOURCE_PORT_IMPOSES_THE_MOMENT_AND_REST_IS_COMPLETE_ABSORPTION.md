@@ -4,8 +4,9 @@
 [definition; agent-inferred] for the carry law and its choices (§2, §3); [proved-derived;
 implemented-exact] for the owners it reuses, held by their tests (§1); the build of October 3 and
 its tests are §6 [implemented-exact]; the chained balance and the law it satisfies are §2.3
-[proved-derived; implemented-exact]; the contact's crossing of the reception (§2.3a) is
-[proved-derived from its owners; implemented-exact], with the reflection's release agent-inferred.
+[proved-derived; implemented-exact; formal-checked, `HNN/ChainedBalance` (#293)]; the contact's
+crossing of the reception (§2.3a) is [proved-derived from its owners; implemented-exact], with the
+reflection's release agent-inferred.
 Code follows this record. The production default stays rest.
 
 **Occasion.** The review of October 3 located that every production reception opens at rest. The
@@ -166,6 +167,13 @@ E_end(k+1) ≤ P_(Θ,λ)(y) + deposition_k + ingest_k + E_S(s) + Π_c + pump + i
 
 and summed over a chain, the end storage never exceeds the first interior plus everything the ports
 supplied plus the residuals' bounds. Nothing enters except through a declared port.
+[formal-checked] `HNN/ChainedBalance` (#293) states this section: the split at the source port and
+the one baseline (`power_split`, `opening_one_baseline`, `draft_subtracts_twice`), the rest limit
+(`rest_opens_at_imposed`, and `carry_enters_additively` on `HNN/Retention.word_opens_at_zero`), each
+reception's dissipativity (`reception_dissipative`), and the chain's telescoping and dissipativity
+(`chain_telescopes`, `chain_dissipative`, and `chain_dissipative_certified` with the opening split
+within its certified bound). `L ≥ 0`, the residual's bound and the absorbed storages `≥ 0` are
+hypotheses read from their owners.
 
 [measured-exact on the carry as first built (#280), which kept the waves `a`; superseded by
 §2.3a] **The stronger reading failed on that carry.** It was stated here before the read as the
@@ -260,7 +268,16 @@ emitted exchange, as the word's unread change does (`Released::power`), and is n
 **Consequence for the chained balance.** The lift's inter-word work on the carried change becomes
 `−(h/4) Σ_a Γ_a² G_a (|a_(g←a)|² + |a_(h←a)|²) ≤ 0`, exactly the emitted power. The ingest can no
 longer raise the carried energy, in either direction of the move, so the stronger reading's
-remaining term is the deposition alone. At `G' = G` the wave crosses unchanged.
+remaining term is the deposition alone. [proved-derived; formal-checked] The stronger reading holds
+at a reception wherever the deposition does no positive work and the ingest only emits
+(`HNN/ChainedBalance.{ingest_emits, ingest_nonpos, reception_within_loss}`, #293). It is proved for
+one deposition: the held work of an accreting contact mass, `C ⪰ 0`, `F ⪰ 0`, `C′ = C + F`, with no
+other coordinate of the constitution moved (`HNN/HeldDeposition.{held_deposition_work,
+held_deposition_nonpos, reception_within_loss_of_accretion}`). The commit's deposition also carries
+the same-state work `½⟨x, ΔΘ x⟩` of every other coordinate (`PowerForm::held`), so a deposit that
+lowers a mass, or whose stiffness, admittance or conductance move does positive same-state work, is
+not covered: there the chained balance holds only in its dissipative form, with respect to the
+declared supply, at every reception. At `G' = G` the wave crosses unchanged.
 [proved-derived; formal-checked] Each coordinate's identity `G'|a'|² = G|a|² − G|Γ a|²` is the
 fifth conjunct of `two_port_reference_balance` (`HNN/Ring.reference_carry_change`). Summed over
 coordinates and contacts, the lift's work is `−(h/4) Σ_a Γ_a² G_a |a_a|²`, at most zero for `h ≥ 0`,
@@ -282,7 +299,12 @@ deposit that changes `C_a` holds the contact's momentum: the rate after it solve
 `π_a = C_a w_a` with word `k`'s storage. [agent-inferred] The solve fixes `w′` modulo `ker C′_a`,
 which no later tick reads; the built rate is `w + δ` with `δ` the reduced solve's particular point
 of `C′_a δ = π_a − C′_a w`, so the rate is unchanged exactly where no mass moved. A momentum outside
-`range C′_a` is refused, naming the contact (its law is owed, #62).
+`range C′_a` is refused, naming the contact. [proved-derived; formal-checked] The refusal is the
+law at held momentum: a symmetric `C′_a` holds `π` exactly when `π` pairs to zero with its kernel,
+every hold reads one energy, and a momentum with a kernel component has no hold while its holds at
+`C′_a + εI` read above every bound as `ε` falls
+(`HNN/ChainedBalance.{hold_iff_kernel_free, held_energy_unique, singular_hold_energy,
+singular_hold_unbounded}`, #293).
 
 **Built (October 3).**
 - `ReceptionCarry` carries, beside the end change, each contact's conductance `G_a` and momentum
@@ -327,8 +349,11 @@ and `2⁵²` of contact 0's conductance listed in §2.3 (at reception 7, `(2¹�
 `5` cancelled). The test pins the closure, the dissipativity, `lift_emits` and the zero excess at all
 eight (`the_chained_balance_closes_and_the_chain_is_dissipative`).
 
-[owed in #62] The Lean statement of the chained balance and its dissipativity, and of the rest case
-as its limit (`HNN/Retention`).
+[proved-derived; formal-checked] The chained balance, its dissipativity and the rest case as its
+limit are `HNN/ChainedBalance` (#293; §2.3 above). The opening's split is
+`½⟨r, Q(2z − r)⟩` for any symmetric block form `Q`, within
+`½ Σ_i c_i (2|(Qz)_i| + Σ_j |Q_ij| c_j)` when every remainder lies in its half cell `c_i`, and zero
+on the lattice (`opening_split_eq`, `opening_split_le`, `splitBound`, `opening_split_on_lattice`).
 
 ### 2.4 The clock
 
@@ -407,7 +432,8 @@ receptions") and its law table row "the word opens at zero" (`mod.rs:121`, which
 rest limit"); `pending.rs` and `reference.rs`'s refine (open on the resident's carried change);
 `constitution.rs`'s `ContinuingState`; the device word; `tests/word.rs:33` (it states today's law and
 becomes the `A = I` case); Lean `HNN/Retention.word_opens_at_zero` (the rest case) with the chained
-balance owed in #62. The atlas rows for these owners update in the same commit as the code.
+balance in `HNN/ChainedBalance` (#293). The atlas rows for these owners update in the same commit as
+the code.
 
 ## 6. Built (October 3), and what the read needs first
 
@@ -455,10 +481,10 @@ determines. The rest of the reference resident (its open moments and the aeon in
 saved object of this path; it is restored only where the executed path's continuing state already
 restores it.
 
-Still owed: the chained balance's Lean statement (#62). The device word is built with host-card
-parity (§7). The within-refinement continuation (`ContactCut::continue_deposited`) now holds the
-momentum across its contact deposit as well (the deposit record §5 item 2). Its law is redone at
-held momentum in the
+The chained balance's Lean statement is `HNN/ChainedBalance` (#293). The device word is built with
+host-card parity (§7). The within-refinement continuation (`ContactCut::continue_deposited`) now
+holds the momentum across its contact deposit as well (the deposit record §5 item 2). Its law is
+redone at held momentum in the
 [storage-resolution record](2026-10-02_A_STORAGE_DEPOSIT_IS_FELT_ONLY_THROUGH_THE_RATE_S_JUMP_AND_THE_WORD_HOLDS_IT_BELOW_ONE_UNIT.md)
 §9; its Lean is `HNN/StorageResolution` §5 (#290). Guard 16 of
 [THE_MACHINE](../../docs/THE_MACHINE.md) reads that no change outlives its word or its refinement;
