@@ -210,10 +210,19 @@ governs every word's motion, including the motion the next word carries.
   - Under the carry, a saved state restores the chain exactly, and a foreign or damaged one is
     refused.
 - **The decisive read** (only after the build's acceptance passes, and only through checks (a) to
-  (f)). The decision is whether production receptions carry. The read is held-out first, by
-  `with_deadline`, carry against rest on the same state and lineage at an equal move count. It is
-  the paired sign test on discordant held-out cells, released at a tail at most `1/64`.
-  Development bits do not decide it.
+  (f)). The decision is whether production receptions carry. Carry and rest are read on one stored
+  state, the same state and lineage at an equal move count.
+  - **The unit is the held-out passage, not the station.** A passage's eight station targets follow
+    from its last two request cells, and they are read in one release, so its stations are not
+    independent trials.
+  - **One stored state.** Every held-out passage is read from that stored state, and nothing is
+    deposited on a held-out passage's cells. Under carry, the motion carries across the receptions
+    inside a passage and starts again from the stored state at each passage. Passages therefore
+    couple only through a fixed state, and the read does not alter what it measures.
+  - **The test.** For each of the 128 passages, `d_k` is carry's stations right minus rest's.
+    Passages with `d_k = 0` are dropped; `b` counts `d_k > 0` and `c` counts `d_k < 0`. Carry is
+    released at `P[X ≥ b | X ~ Bin(b + c, 1/2)] ≤ 1/64`, exact. Station counts are description and
+    enter no tail. Development bits do not decide it.
 - **Its held-out seed** is `2026100301` (order-2, 128 requests), which no run has read: it appears
   in no record, queue or receipt on `main` or on the run branches as of this record. The seed
   `2026093012` is spent (P5 in §11 and every held-out pair of §9 of the

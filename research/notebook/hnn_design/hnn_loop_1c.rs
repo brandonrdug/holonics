@@ -2466,8 +2466,12 @@ mod tests {
         let refused = resume_inputs(&engine, ring, &truncated, &receipt).expect_err("a truncated state");
         assert!(refused.contains("not a complete continuing state"), "{refused}");
         assert!(refused.contains("never read as a partial remount"), "{refused}");
-        // Off its written form: parses, does not write back to its own text.
+        // Edited after its stamp: refused by the check.
         let edited = state.replace("\nclock ", "\nclock 0");
+        let refused = resume_inputs(&engine, ring, &edited, &receipt).expect_err("a state edited after its stamp");
+        assert!(refused.contains("the state is damaged"), "{refused}");
+        // Off its written form, restamped: passes the check, does not write back to its own text.
+        let edited = ContinuingState::stamped(&edited, &engine.theta).expect("the edited state restamped");
         let refused = resume_inputs(&engine, ring, &edited, &receipt).expect_err("a state off its written form");
         assert!(refused.contains("written back differs"), "{refused}");
         // A receipt without move 2's line (constitution 2's persistence reads) is refused too.
