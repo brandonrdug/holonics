@@ -821,8 +821,10 @@ receive   f_j = R[P_R^(τ_R) v_R(e_j)] at the receiving epochs, read at the rece
   change the previous word left (`Word::continuing`; its consumer, the linear readout of
   `hnn::prediction`, was retired September 30, batch H); the refinement owns its words until its
   return (THE_MACHINE guard 16). Under a declared reception carry (October 3; the default is rest)
-  the next reception's word opens on the interior of the end change the consumed word left
-  (`Word::open_received`; guard 16 as amended).
+  the next reception's word opens on the interior of the end change the consumed word left,
+  crossed into the next cut's references: each contact's arriving waves transmitted at the
+  junction's reference change, the reflection emitted, and its rate held at momentum
+  (`Word::open_received`, `ReceptionCarry::crossed`; guard 16 as amended).
 - **What the word lacks.** It has no global `D/b`, no softmax drive, no boundary hold `H̄` and no
   relaxation `μ`. Those belonged to the prototype's word, which is kept in history at
   [`13f8c734`](https://github.com/brandonrdug/holonics/blob/13f8c734/docs/HNN_FORMULA.md#the-incident-word).
