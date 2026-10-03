@@ -828,10 +828,12 @@ cut instead of shortening it.
   `with_deadline(2048)` stops after 2048 compared windows (`reference.rs:3910`), and the held-out
   code is summed window by window (`reference.rs:3987-3996`), so the stopped run prints the code of
   all 1024 held-out station cells. That is `2048/21845` of the cut, from its cheapest part.
-- *What it measures.* The first held-out cell is coded from the stored state before any deposit, and
-  held-out passage `k` after `16(k − 1)` deposits, against about 19797 in P4. The protocol still
-  deposits every window, the held-out windows included, so the read is not free of the instrument's
-  own learning. It is far closer to the stored `E` than P4's layout.
+- *What it measures.* Held-out passage `k` opens after `16(k − 1)` deposits. Only its 8 stations are
+  held out (`expose_read`): its 40-cell request is coded and deposited like training, so its first
+  station cell, in window `16(k − 1) + 13`, is coded after `16(k − 1) + 13` deposits. That is 13 for
+  the first, against 19810 in P4 (its first station cell is 59432). The protocol still deposits every
+  complete window, the held-out windows included, so the read is not free of the instrument's own
+  learning. It is far closer to the stored `E` than P4's layout.
 - *Before any launch.* It needs a progress line from `expose_with`, a development read of its first
   windows on the launch host, and a decision it can change. None exists now: the U6 chains have
   ended (§10), and the arms' end states do not separate held out (§11). It stays owed and is not
