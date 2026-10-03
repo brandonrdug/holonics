@@ -48,7 +48,12 @@ the next. This record states the one law both obey at a deposit.
    `½⟨w, F w⟩` (`velocity_held_injects`): the held momentum plus an impulse `F w` with no source.
    [agent-inferred, not read] This is a candidate for the receptions where the main line's fixture
    is not passive (5 of 8 passive); the per-reception terms decide it, and they are the main
-   line's read.
+   line's read. [measured-exact; the main line's read, record B §2.3 at
+   [`58e4707e`](https://github.com/brandonrdug/holonics/blob/58e4707e/research/records/2026-10-03_THE_RECEPTION_CARRIES_THE_INTERIOR_CHANGE_THE_SOURCE_PORT_IMPOSES_THE_MOMENT_AND_REST_IS_COMPLETE_ABSORPTION.md),
+   #280] The 5 of 8 was a slip in the loss, which omitted the element's passive term. With the
+   whole loss the chain is dissipative at all eight receptions, and only the stronger reading
+   (the work between words within the next word's loss) fails, at reception 7 alone. Keeping the
+   momentum on that fixture moves the failure to receptions 5 and 8, so it does not explain it.
 6. **Where the mass shrinks, the deposit does work, and the certificate is the other side.** At a
    held momentum a shrinking mass raises the reading, as a skater pulling in the arms: the work is
    the deposit's, entered in record B's chained balance as `deposition_k`. A mass certified from
