@@ -194,8 +194,10 @@ it.
 
 ## 9. At held momentum (October 3)
 
-**Grade.** [proved-derived] for 9.1–9.3; the Lean statements are owed in #62 (the cloud has no Lean
-toolchain). [measured-exact] for 9.4, from `storage_deposit_at_held_momentum_is_felt_through_the_motion`.
+**Grade.** [proved-derived] for 9.1, whose work identity is
+`HolonicsResearch/HNN/MoveDirection.held_momentum_loss`; [proved-derived; formal-checked] for 9.2
+and 9.3 (`HNN/StorageResolution` §5, #290); [measured-exact] for 9.4, from
+`storage_deposit_at_held_momentum_is_felt_through_the_motion`.
 
 ### 9.1 The continuation holds momentum
 
@@ -225,10 +227,10 @@ At held momentum the transit's right side `h(α_g − α_h) + 2Cw − hKu` is un
 m′(ζ′ − ζ) = −(G/h) ΔC ζ = −2ΔC ω = −ΔC(w + w⁺),        ω = (G/2h)ζ,  w⁺ = 2ω − w
 ```
 
-exactly. Compare §1's held rate, `ΔC(w − w⁺)`. The two differ by `2ΔC w`, the impulse the held rate
-injected, which is what cancelled the steady part of the motion there. At held momentum a heavier
-mass with the same momentum moves more slowly, and it does so at once. Only rest (`ω = 0`) leaves
-the deposit unfelt. A steady rate does not.
+exactly (`held_storage_transit_response`, `c = G/h`). Compare §1's held rate, `ΔC(w − w⁺)`. The
+two differ by `2ΔC w`, the impulse the held rate injected, which is what cancelled the steady part
+of the motion there. At held momentum a heavier mass with the same momentum moves more slowly, and
+it does so at once. Only rest (`ω = 0`) leaves the deposit unfelt. A steady rate does not.
 
 Summed, the midpoints are the travel. The displacement is carried as
 `û_(t+1) + σ_(t+1) = û_t + (G/2)ζ̂_t + σ_t`, and the solve as `ζ̂_t + r_(t+1) = ζ_t + r_t`. Therefore
@@ -237,10 +239,10 @@ Summed, the midpoints are the travel. The displacement is carried as
 (G/2) Σ_(t<N) ζ_t = (û_N − û_0) + (σ_N − σ_0) + (G/2)(r_N − r_0)
 ```
 
-Read along the predecessor's path, the exact response accumulates as
-`m′V_N = −(2/h)ΔC[(û_N − û_0) + (σ_N − σ_0) + (G/2)(r_N − r_0)]`. It grows with the displacement's
-travel, not with the rate's excursion. That is the held mass lagging in position. §4's floor applies
-unchanged, with `J` replaced by this sum.
+That is `midpoint_sum_is_travel` with `k = G/2`. Read along the predecessor's path, the exact
+response accumulates as `m′V_N = −(2/h)ΔC[(û_N − û_0) + (σ_N − σ_0) + (G/2)(r_N − r_0)]`. It
+grows with the displacement's travel, not with the rate's excursion. That is the held mass lagging
+in position. §4's floor applies unchanged, with `J` replaced by this sum.
 
 [agent-inferred] This reading is first order in `ΔC`. After one tick the two exact motions no longer
 share a canonical state, as §2's accumulation was first order along the shared representatives.
@@ -264,7 +266,8 @@ accumulated image difference (§3). The rate streams carry the momentum hold bes
 ρ′_N − ρ_N = δ + Σ_(t<N) (y′_t − y_t),        y_t = 2ω̂_t − ŵ_t
 ```
 
-This is §3's feedback difference from two different openings. Since `|δ_i| < u/2`, the hold never by
+This is §3's feedback difference from two different openings
+(`feedback_remainder_difference_of_openings`). Since `|δ_i| < u/2`, the hold never by
 itself forces the rate apart. It parts the rate only by a crossing, or once the rate images
 accumulate. So on the lattice the held momentum is carried exactly as representative plus remainder,
 and the solve feels its remainder part only when the error feedback releases it. That is the
@@ -297,10 +300,10 @@ continues its contacts-only successor on the predecessor's end change and reads 
 rate (`PowerForm::deposition_work`). It is left as it stands: it is a diagnostic reading, not an
 executed continuation.
 
-Owed in #62:
-- the response at held momentum;
-- the travel telescoping;
-- the remainder difference from two openings.
+Proved in `HNN/StorageResolution` §5 (#290), as entered in #62 (comment 5973969084):
+- the response at held momentum, `held_storage_transit_response`;
+- the travel telescoping, `midpoint_sum_is_travel`;
+- the remainder difference from two openings, `feedback_remainder_difference_of_openings`.
 
-The exact statements are in the #62 comment.
+9.2's first-order reading of the accumulated response is agent-inferred and is not among them.
 

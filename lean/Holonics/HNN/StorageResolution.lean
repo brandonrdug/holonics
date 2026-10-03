@@ -14,6 +14,7 @@ response      m′(ζ′ − ζ) = ΔC (w − w⁺) ,   w⁺ = (G/h)ζ − w    
 telescoping   Σ_(t<N) (w_t − w⁺_t) = (w_0 − w_N) + (ρ_0 − ρ_N) + (G/h)(r_0 − r_N)
 two words     equal representatives ⇒ r′_N − r_N = Σ_(t<N) (y′_t − y_t)
 floor         m′ = c + S , S ⪰ 0 , m′V = ΔC J ⇒ c²|V|² ≤ |ΔC J|²
+held          C′w′ = Cw ⇒ m′ζ′ = b ,  m′(ζ′ − ζ) = −ΔC (w + w⁺) ;  k Σ_(t<N) ζ_t = Δu + Δσ + kΔr
 ```
 
 1. **The response** (`storage_transit_response`). At one representative `(u, w, α)` the transit's
@@ -36,6 +37,13 @@ floor         m′ = c + S , S ⪰ 0 , m′V = ΔC J ⇒ c²|V|² ≤ |ΔC J|²
    `m′V = ΔC J` gives `c²|V|² ≤ |ΔC J|²`. With `V` the accumulated exact response and `J` the
    telescoped jumps, a deposit with `|ΔC J| < c·u` never forces the next passage's representative
    apart at any tick.
+5. **At held momentum** (`held_storage_transit_response`, `midpoint_sum_is_travel`,
+   `feedback_remainder_difference_of_openings`). When the continuation holds the momentum,
+   `C′w′ = Cw`, the right side does not move, so `m′(ζ′ − ζ) = −ΔC(cζ) = −ΔC(w + w⁺)`: the deposit
+   is felt through the motion, not the rate's jump. Summed over the ticks, `k = G/2` times the
+   midpoints is the travel plus the displacement and solve remainders' changes. The rate's jump
+   opens in the rate remainder, so two streams start from different openings and differ by that
+   opening difference plus the accumulated image difference. The floor (item 4) applies unchanged.
 
 The executed solve is a certified chart, not `m′⁻¹`; its residual adds a per-tick difference that
 does not telescope (`LatticeWord.inverse_chart_deviation` bounds it). The record
@@ -179,5 +187,75 @@ theorem storage_floor (S ΔC : Matrix n n ℚ) (hS : ∀ x, 0 ≤ x ⬝ᵥ (S *�
   exact abs_lt_of_sq_lt_sq hsq hu
 
 end Floor
+
+/-! ## 5. At held momentum
+
+The within-refinement continuation holds the contact's momentum across its deposit, `C′w′ = Cw`
+(the deposit record's law; `HolonicsResearch/HNN/MoveDirection.held_momentum_loss` reads its work).
+The transit's right side then does not move, the deposit is felt through the motion `2ω = w + w⁺`,
+the midpoints sum to the travel, and the rate's jump opens in the rate remainder. -/
+
+section Held
+
+variable {n : Type*} [Fintype n]
+
+/-- [proved-derived; formal-checked] **The storage response at held momentum.** If `m ζ = b` and the
+deposited operator `m + cΔC` solves the same right side (`2C′w′ = 2Cw`), then
+`(m + cΔC)(ζ′ − ζ) = −ΔC(cζ)`: with `c = G/h`, `cζ = w + w⁺`, so the deposit acts on the motion
+`2ω`, not on the rate's jump. -/
+theorem held_storage_transit_response (m ΔC : Matrix n n ℚ) (c : ℚ) (b ζ ζ' : n → ℚ)
+    (hζ : m *ᵥ ζ = b) (hζ' : (m + c • ΔC) *ᵥ ζ' = b) :
+    (m + c • ΔC) *ᵥ (ζ' - ζ) = -(ΔC *ᵥ (c • ζ)) := by
+  rw [mulVec_sub, hζ', add_mulVec, hζ, smul_mulVec, mulVec_smul]
+  ext i
+  simp only [Pi.sub_apply, Pi.add_apply, Pi.neg_apply, Pi.smul_apply, smul_eq_mul]
+  ring
+
+end Held
+
+section Travel
+
+variable {E : Type*}
+
+/-- [proved-derived; formal-checked] **The midpoints sum to the travel.** The displacement is
+carried by error feedback from `u_t + kζ̂_t` (`k = G/2`, so `kζ̂ = hω̂`) and the solve from its
+image. Then `k Σ_(t<N) ζ_t = (u_N − u_0) + (σ_N − σ_0) + k(r_N − r_0)`. -/
+theorem midpoint_sum_is_travel (k : ℚ) (u σ ζ ζhat r : ℕ → E → ℚ)
+    (hu : ∀ t i, u (t + 1) i + σ (t + 1) i = u t i + k * ζhat t i + σ t i)
+    (hζ : ∀ t i, ζhat t i + r (t + 1) i = ζ t i + r t i) (N : ℕ) (i : E) :
+    k * ∑ t ∈ Finset.range N, ζ t i =
+      (u N i - u 0 i) + (σ N i - σ 0 i) + k * (r N i - r 0 i) := by
+  induction N with
+  | zero => simp
+  | succ N ih =>
+    rw [Finset.sum_range_succ, mul_add, ih]
+    linear_combination -(hu N i) - k * hζ N i
+
+end Travel
+
+section Openings
+
+variable {E : Type*}
+
+/-- [proved-derived; formal-checked] **Two streams from different openings.** Two error-feedback
+streams whose carried values agree at `i` before `N` differ there by their openings' difference plus
+the accumulated image difference: `r′_N − r_N = (r′_0 − r_0) + Σ_(t<N)(y′_t − y_t)`. -/
+theorem feedback_remainder_difference_of_openings (L : ℕ) (y y' : ℕ → E → ℚ) (r₀ r₀' : E → ℚ)
+    (N : ℕ) (i : E) (hagree : ∀ t < N, fbOut L y' r₀' t i = fbOut L y r₀ t i) :
+    fbRem L y' r₀' N i - fbRem L y r₀ N i =
+      (r₀' i - r₀ i) + ∑ t ∈ Finset.range N, (y' t i - y t i) := by
+  have h' := feedback_accounting L y' r₀' N i
+  have h := feedback_accounting L y r₀ N i
+  have hsum : ∑ t ∈ Finset.range N, fbOut L y' r₀' t i =
+      ∑ t ∈ Finset.range N, fbOut L y r₀ t i :=
+    Finset.sum_congr rfl fun t ht => hagree t (Finset.mem_range.mp ht)
+  rw [Finset.sum_sub_distrib]
+  linarith
+
+end Openings
+
+#print axioms held_storage_transit_response
+#print axioms midpoint_sum_is_travel
+#print axioms feedback_remainder_difference_of_openings
 
 end Holonics.HNN.StorageResolution
