@@ -148,3 +148,86 @@ fn the_initial_constitution_opens_an_empty_word() {
         );
     }
 }
+
+/// Record B §2.3a and the deposit record (October 3) §4: a carried change crosses the next
+/// opening's references exactly. Each contact's arriving waves are transmitted, `a′ = (1 + Γ) a`,
+/// with `G′|a′|² + Γ²G|a|² = G|a|²` (Lean `HNN/Ring.two_port_reference_balance`), so the lift
+/// emits `Σ (h/4)Γ²G|a|²` and never raises the carried waves' power. Each contact's rate is held
+/// at momentum, `C′ w′ = π`: at an unchanged storage `w′ = w` exactly, under an accretion
+/// `C′ = C + F`, `F ⪰ 0`, the kinetic reading falls by `½⟨w′, F w′⟩ + ½⟨w − w′, C(w − w′)⟩`
+/// (`held_momentum_loss`, `held_momentum_dissipates`), and a momentum outside `range C′` is refused.
+#[test]
+fn a_carried_change_crosses_the_next_openings_references() {
+    use crate::hnn::word::{EndChange, ReceptionCarry};
+    use crate::ratio::linear::ExactRatMatrix;
+    use crate::ratio::linear::vector::{dot, sub};
+    let r = |n: i64, d: i64| Rat::new(BigInt::from(n), BigInt::from(d));
+    let matrix = |rows: Vec<Vec<Rat>>| ExactRatMatrix::new(rows).unwrap();
+    // Two contacts of width 2 between rings of widths 2 and 3.
+    let storage = matrix(vec![vec![r(2, 1), r(1, 2)], vec![r(1, 2), r(1, 1)]]);
+    let rate = vec![r(3, 5), r(-7, 4)];
+    let momentum = storage.apply(&rate).unwrap();
+    let arrivals = vec![
+        [vec![r(1, 3), r(-2, 7)], vec![r(5, 6), r(0, 1), r(-1, 9)]],
+        [vec![r(-4, 5), r(3, 8)], vec![r(1, 2), r(2, 3), r(-3, 4)]],
+    ];
+    let states = vec![[vec![r(1, 7), r(-1, 3)], rate.clone()], [vec![r(2, 5), r(1, 11)], rate.clone()]];
+    let carry = ReceptionCarry {
+        change: EndChange {
+            storage: vec![vec![r(1, 1), r(2, 1)], vec![r(0, 1); 3]],
+            arrivals: arrivals.clone(),
+            states,
+            resonators: vec![None, None],
+            resonator_phases: vec![None, None],
+        },
+        ticks: 5,
+        conductances: vec![r(2, 1), r(1, 4)],
+        momenta: vec![momentum.clone(), momentum.clone()],
+    };
+    // Contact 0 keeps its storage; contact 1 accretes F ⪰ 0.
+    let accreted = matrix(vec![vec![r(1, 1), r(1, 3)], vec![r(1, 3), r(1, 9)]]);
+    let grown = storage.add(&accreted).unwrap();
+    let after = [r(1, 8), r(1, 4)];
+    let step = r(1, 2);
+    let crossed = carry.crossed(&after, &[&storage, &grown]).unwrap();
+    // Storage, displacements and resonators carry unchanged.
+    assert_eq!(crossed.storage, carry.change.storage);
+    for (a, b) in crossed.states.iter().zip(&carry.change.states) {
+        assert_eq!(a[0], b[0]);
+    }
+    // The waves: transmitted, the reflection's power the only difference.
+    let mut reflected = Rat::zero();
+    for (a, ((before, now), (from, to))) in arrivals
+        .iter()
+        .zip(&crossed.arrivals)
+        .zip(carry.conductances.iter().zip(&after))
+        .enumerate()
+    {
+        let gamma = (from - to) / (from + to);
+        for (wave, crossed) in before.iter().zip(now) {
+            let power = dot(wave, wave);
+            assert_eq!(to * dot(crossed, crossed) + &gamma * &gamma * from * &power, from * &power);
+            reflected += &step / integer(4) * &gamma * &gamma * from * power;
+        }
+        if from == to {
+            assert_eq!(before, now, "contact {a}: no reference change, no crossing");
+        }
+    }
+    assert!(reflected > Rat::zero());
+    assert_eq!(carry.reflected(&step, &after), reflected);
+    // The rates: held at momentum.
+    assert_eq!(crossed.states[0][1], rate, "an unchanged storage holds the rate exactly");
+    let held = &crossed.states[1][1];
+    assert_eq!(grown.apply(held).unwrap(), momentum);
+    let jump = sub(&rate, held);
+    let kinetic = |c: &ExactRatMatrix, w: &[Rat]| dot(w, &c.apply(w).unwrap()) / integer(2);
+    let fall = kinetic(&storage, &rate) - kinetic(&grown, held);
+    assert_eq!(fall, kinetic(&accreted, held) + kinetic(&storage, &jump));
+    assert!(fall > Rat::zero());
+    // A singular storage cannot hold a momentum outside its range.
+    let singular = matrix(vec![vec![r(1, 1), r(0, 1)], vec![r(0, 1), r(0, 1)]]);
+    assert!(matches!(
+        carry.crossed(&after, &[&storage, &singular]),
+        Err(HnnError::HeldMomentum { contact: 1 })
+    ));
+}

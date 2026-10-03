@@ -873,6 +873,10 @@ fn a_continuing_state_carries_the_receptions_end_inside_its_check() {
         .iter()
         .map(|contact| [wave(contact.width()), wave(contact.width())])
         .collect();
+    let momenta = field.contacts().iter().map(|contact| wave(contact.width())).collect();
+    let conductances = (0..field.contacts().len())
+        .map(|a| rat(2 * a as i64 + 3, 4))
+        .collect();
     let carry = ReceptionCarry {
         change: EndChange {
             storage,
@@ -882,6 +886,8 @@ fn a_continuing_state_carries_the_receptions_end_inside_its_check() {
             resonator_phases: vec![None, Some(3)],
         },
         ticks: 27,
+        conductances,
+        momenta,
     };
     assert!(carry.fits(&field));
     let carried = at_rest.clone().with_carry(Some(carry.clone()));

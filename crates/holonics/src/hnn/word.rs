@@ -361,10 +361,63 @@ pub struct EndChange {
 /// the field's elapsed ticks at its end, `t_(k+1)`, the sum of the junction steps every word of the
 /// chain executed. It is the field's present motion, of the field's fixed shape, overwritten at every
 /// reception: not a record of which windows preceded.
+///
+/// [definition; record B §2.3a, the deposit record §3] Beside the change it carries the references
+/// the motion was measured in at word `k`'s cut: each contact's conductance `G_a`, the reference of
+/// its arriving waves, and each contact's momentum `π_a = C_a w_a`, the canonical state the deposit
+/// holds. The next opening crosses the change into its own references ([`ReceptionCarry::crossed`]).
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct ReceptionCarry {
     pub change: EndChange,
     pub ticks: usize,
+    /// `G_a` at word `k`'s cut, per contact.
+    pub conductances: Vec<Rat>,
+    /// `π_a = C_a w_a` with word `k`'s storage, per contact.
+    pub momenta: Vec<Vec<Rat>>,
+}
+
+/// [definition; the deposit record (October 3) §2–§3, Lean
+/// `HolonicsResearch/HNN/MoveDirection.held_momentum_loss`] **The rate a contact carries across a
+/// change of its storage at held momentum**: `w′ = w + δ` with `C′ δ = π − C′ w`, so `C′ w′ = π`.
+/// The solve fixes `w′` only modulo `ker C′`, which no later tick reads (the transit reads `w` only
+/// through `C w`); [agent-inferred] the jump `δ` is the particular point of the reduced solve, so
+/// `w′ = w` exactly where `C′ w = π` (no mass moved). A momentum outside `range C′` is refused,
+/// naming the contact.
+fn held_rate(
+    contact: usize,
+    rate: &[Rat],
+    momentum: &[Rat],
+    storage: &ExactRatMatrix,
+) -> Result<Vec<Rat>, HnnError> {
+    let target = sub(momentum, &storage.apply(rate)?);
+    if target.iter().all(Zero::is_zero) {
+        return Ok(rate.to_vec());
+    }
+    match storage.preimage_fibre(&target)? {
+        Some((jump, _)) => Ok(add(rate, &jump)),
+        None => Err(HnnError::HeldMomentum { contact }),
+    }
+}
+
+/// [definition; record B §2.3a, Lean `HNN/Ring.two_port_reference_balance`] **A wave crossing a
+/// reference change** from `G` to `G′`: the transmitted wave `(1 + Γ) a = 2G/(G + G′) · a` in `G′`.
+/// The reflection `Γ a`, `Γ = (G − G′)/(G + G′)`, leaves in `G`.
+fn transmitted(wave: &[Rat], from: &Rat, to: &Rat) -> Vec<Rat> {
+    if from == to {
+        return wave.to_vec();
+    }
+    let gain = integer(2) * from / (from + to);
+    wave.iter().map(|x| x * &gain).collect()
+}
+
+/// [definition; record B §2.3a] **The power a reference change reflects**:
+/// `(h/4) Γ² G |a|²`, the wave's power `(h/4) G |a|²` less the transmitted wave's `(h/4) G′ |(1 + Γ) a|²`.
+fn reflected_power(step: &Rat, wave: &[Rat], from: &Rat, to: &Rat) -> Rat {
+    if from == to {
+        return Rat::zero();
+    }
+    let reflection = (from - to) / (from + to);
+    step / integer(4) * &reflection * &reflection * from * dot(wave, wave)
 }
 
 impl ReceptionCarry {
@@ -372,13 +425,70 @@ impl ReceptionCarry {
     /// change with every source ring's storage at zero, which the moment's imposed storage then
     /// replaces at the source port. Arrivals, contact states and resonator states are interior.
     pub fn interior(&self, field: &Field) -> EndChange {
-        let mut change = self.change.clone();
-        for (ring, wave) in change.storage.iter_mut().enumerate() {
-            if field.is_source(ring) {
-                *wave = zeros(wave.len());
-            }
+        interior_of(field, self.change.clone())
+    }
+
+    /// [definition; record B §2.3a, the deposit record §3] **The carried change crossed into the
+    /// next opening's references**, given its contacts' conductances `G′_a` and storage `C′_a`: each
+    /// contact's arriving waves transmitted, `a′ = (1 + Γ_a) a`, and its rate held at momentum,
+    /// `C′_a w′_a = π_a`; the storage waves, the displacements `u` and the resonator states as
+    /// carried. Refused on a momentum `C′_a` cannot hold.
+    pub fn crossed(
+        &self,
+        conductances: &[Rat],
+        storage: &[&ExactRatMatrix],
+    ) -> Result<EndChange, HnnError> {
+        let shaped = conductances.len() == self.conductances.len()
+            && storage.len() == self.momenta.len()
+            && self.change.arrivals.len() == self.conductances.len();
+        if !shaped {
+            return Err(HnnError::Shape {
+                what: "the next opening's contacts against the carry's",
+                expected: self.conductances.len(),
+                found: conductances.len(),
+            });
         }
-        change
+        let mut change = self.change.clone();
+        for (a, ((pair, state), (to, after))) in change
+            .arrivals
+            .iter_mut()
+            .zip(change.states.iter_mut())
+            .zip(conductances.iter().zip(storage))
+            .enumerate()
+        {
+            let from = &self.conductances[a];
+            for wave in pair.iter_mut() {
+                *wave = transmitted(wave, from, to);
+            }
+            state[1] = held_rate(a, &state[1], &self.momenta[a], after)?;
+        }
+        Ok(change)
+    }
+
+    /// [definition; record B §2.3a] **What the lift's reference change emits**:
+    /// `Σ_a (h/4) Γ_a² G_a (|a_g|² + |a_h|²)` at the next opening's conductances `G′_a`. It is the
+    /// lift's work on the carried waves with the sign reversed, so the lift never raises them.
+    pub fn reflected(&self, step: &Rat, conductances: &[Rat]) -> Rat {
+        self.change
+            .arrivals
+            .iter()
+            .zip(self.conductances.iter().zip(conductances))
+            .map(|([g, h], (from, to))| {
+                reflected_power(step, g, from, to) + reflected_power(step, h, from, to)
+            })
+            .sum()
+    }
+
+    /// [definition; record B §2.1, §2.3a] **The next opening's interior change**: the carried change
+    /// crossed into the opening's references ([`ReceptionCarry::crossed`]) with every source ring's
+    /// storage at zero, which the moment's imposed storage then replaces.
+    pub fn opening(
+        &self,
+        field: &Field,
+        conductances: &[Rat],
+        storage: &[&ExactRatMatrix],
+    ) -> Result<EndChange, HnnError> {
+        Ok(interior_of(field, self.crossed(conductances, storage)?))
     }
 
     /// [definition; agent-inferred, October 3; the reception carry §2.2] **The carry after the
@@ -412,6 +522,8 @@ impl ReceptionCarry {
                         resonator_phases: vec![None; resonators.len()],
                     },
                     ticks: self.ticks,
+                    momenta: rest(&self.momenta),
+                    conductances: self.conductances,
                 }
             }
         }
@@ -420,9 +532,11 @@ impl ReceptionCarry {
     /// [definition; agent-inferred, October 3; the reception carry §2.4] **The carry as text**,
     /// every value exact, appended to `s`: `carry t r c n` (the elapsed ticks, the rings, the
     /// contacts and the resonator slots), one line per ring's storage wave, two per contact's
-    /// arriving waves (`at from`, `at to`), two per contact's state (`u`, `w`), and per resonator
-    /// slot `resonator s p` (`s` is `1` with the slot's two state lines following, `0` without;
-    /// `p` the measuring phase or `-`). A wave is its values on one line, empty when it has none.
+    /// arriving waves (`at from`, `at to`), two per contact's state (`u`, `w`), the line
+    /// `reference` with each contact's conductance, one line per contact's momentum, and per
+    /// resonator slot `resonator s p` (`s` is `1` with the slot's two state lines following, `0`
+    /// without; `p` the measuring phase or `-`). A wave is its values on one line, empty when it has
+    /// none.
     /// [`crate::hnn::constitution::ContinuingState`] carries it inside its check.
     pub fn write(&self, s: &mut String) {
         let line = |s: &mut String, wave: &[Rat]| {
@@ -443,6 +557,14 @@ impl ReceptionCarry {
         for pair in change.arrivals.iter().chain(&change.states) {
             line(s, &pair[0]);
             line(s, &pair[1]);
+        }
+        *s += "reference";
+        for conductance in &self.conductances {
+            *s += &format!(" {conductance}");
+        }
+        s.push('\n');
+        for momentum in &self.momenta {
+            line(s, momentum);
         }
         for (state, phase) in change.resonators.iter().zip(&change.resonator_phases) {
             let phase = phase.map_or("-".to_string(), |p| p.to_string());
@@ -492,6 +614,20 @@ impl ReceptionCarry {
             .collect::<Result<Vec<_>, _>>()?;
         let arrivals = pairs(next, contacts, "a carried arriving wave")?;
         let states = pairs(next, contacts, "a carried contact state")?;
+        let reference = next("the carry's reference")?;
+        let mut words = reference.split_whitespace();
+        if words.next() != Some("reference") {
+            return Err(refuse("the carry's reference"));
+        }
+        let conductances = words
+            .map(|g| g.parse::<Rat>().map_err(|_| refuse("the carry's reference")))
+            .collect::<Result<Vec<_>, _>>()?;
+        if conductances.len() != contacts {
+            return Err(refuse("the carry's reference"));
+        }
+        let momenta = (0..contacts)
+            .map(|_| wave(next, "a carried momentum"))
+            .collect::<Result<Vec<_>, _>>()?;
         let (mut resonators, mut resonator_phases) = (Vec::new(), Vec::new());
         for _ in 0..slots {
             let line = next("a carried resonator slot")?;
@@ -521,12 +657,15 @@ impl ReceptionCarry {
                 resonator_phases,
             },
             ticks,
+            conductances,
+            momenta,
         })
     }
 
     /// [definition; agent-inferred, October 3; the reception carry §2.4] Whether the carry has the
     /// field's shape: each ring's storage wave, each contact's arriving pair at its two rings'
-    /// widths and its state pair at the contact's width, and a measuring phase per resonator slot.
+    /// widths and its state pair at the contact's width, a positive conductance and a momentum at
+    /// the contact's width per contact, and a measuring phase per resonator slot.
     /// A restored carry of another shape is refused at its mount.
     pub fn fits(&self, field: &Field) -> bool {
         let change = &self.change;
@@ -545,6 +684,13 @@ impl ReceptionCarry {
                         && w.len() == contact.width()
                 },
             )
+            && self.conductances.len() == contacts.len()
+            && self.conductances.iter().all(Signed::is_positive)
+            && self.momenta.len() == contacts.len()
+            && contacts
+                .iter()
+                .zip(&self.momenta)
+                .all(|(contact, momentum)| momentum.len() == contact.width())
             && change.resonators.len() == change.resonator_phases.len()
     }
 }
@@ -637,6 +783,13 @@ impl PowerForm {
         })
     }
 
+    /// [definition; record B §2.1, §2.3a] **The opening a carry crosses into at this form's cut**:
+    /// [`ReceptionCarry::opening`] at this form's conductances and storage.
+    pub fn opening(&self, field: &Field, carry: &ReceptionCarry) -> Result<EndChange, HnnError> {
+        let storage: Vec<&ExactRatMatrix> = self.storage.iter().collect();
+        carry.opening(field, &self.conductances, &storage)
+    }
+
     /// **One ring's storage power** under this form, `(h/4)·Y_g·|s|²`: the storage term
     /// [`PowerForm::power`] sums over the rings.
     pub fn ring_power(&self, ring: usize, wave: &[Rat]) -> Rat {
@@ -674,6 +827,41 @@ impl PowerForm {
             total += material.energy(phase, &state[0], &state[1])?;
         }
         Ok(total)
+    }
+
+    /// [definition; the deposit record (October 3) §3–§4, Lean
+    /// `HolonicsResearch/HNN/MoveDirection.held_momentum_loss`] **The commit from this form to
+    /// `after` at held momentum**: the change `x′` with each contact's rate held at its momentum,
+    /// `C′_a w′_a = C_a w_a` ([`held_rate`]), and the deposition work read from the identity
+    /// `½⟨w′, C′ w′⟩ − ½⟨w, C w⟩ = −½⟨w′, ΔC w′⟩ − ½⟨w − w′, C (w − w′)⟩` for the storage, the
+    /// same-state work `½⟨x, ΔΘ x⟩` ([`PowerForm::deposition_work`]) for every other coordinate.
+    /// Where no contact's storage moves, `x′ = x` and the work is the same-state work.
+    pub fn held(&self, after: &PowerForm, change: &EndChange) -> Result<Held, HnnError> {
+        let mut held = change.clone();
+        let mut storage_work = Rat::zero();
+        for (a, state) in held.states.iter_mut().enumerate() {
+            let (before, moved) = (&self.storage[a], &after.storage[a]);
+            if before == moved {
+                continue;
+            }
+            let rate = state[1].clone();
+            let next = held_rate(a, &rate, &before.apply(&rate)?, moved)?;
+            let jump = sub(&rate, &next);
+            storage_work -= (dot(&next, &moved.subtract(before)?.apply(&next)?)
+                + dot(&jump, &before.apply(&jump)?))
+                / integer(2);
+            state[1] = next;
+        }
+        // The same-state work of every coordinate but the contacts' storage.
+        let same = Self {
+            storage: self.storage.clone(),
+            ..after.clone()
+        };
+        let deposition = self.deposition_work(&same, change)? + storage_work;
+        Ok(Held {
+            change: held,
+            deposition,
+        })
     }
 
     /// **The deposition work of the commit from this form to `after`** on the change `x` (Lean
@@ -742,6 +930,14 @@ impl PowerForm {
         }
         Ok(&self.step / integer(4) * waves + stored)
     }
+}
+
+/// [definition; the deposit record (October 3) §3] **A change carried across a commit at held
+/// momentum** ([`PowerForm::held`]): the held change and the deposition work on it.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct Held {
+    pub change: EndChange,
+    pub deposition: Rat,
 }
 
 /// [definition] **The commit a word's balance is carried across** (Lean
@@ -859,6 +1055,22 @@ impl WordBalance {
         Ok(())
     }
 
+    /// [definition; the deposit record (October 3) §3; record B §2.3] **Carry the balance across
+    /// the commit at held momentum**, the reception carry's commit: the deposition work read on the
+    /// held change ([`PowerForm::held`]) and the held change's power under the committed form. The
+    /// word's identity is unchanged: the held change's committed power is the end plus that work.
+    pub fn commit_held(&mut self, before: &PowerForm, after: &PowerForm) -> Result<(), HnnError> {
+        let held = before.held(after, &self.change)?;
+        let committed = after.power(&held.change)?;
+        let resonator_end = after.resonator_power(&held.change)?;
+        self.resonator_end = resonator_end;
+        self.commit = Some(CommitWork {
+            deposition: held.deposition,
+            committed,
+        });
+        Ok(())
+    }
+
     /// The executed residual: the ticks' defects and loaded splits, the last junction's, and the
     /// resonators' chart and split terms.
     pub fn residual(&self) -> Rat {
@@ -908,9 +1120,13 @@ impl WordBalance {
 ///
 /// - `interior = P_(Θ,λ)(y) = end_k − E_S(x)`; `absorbed = E_S(x)`, which leaves through the
 ///   source port at the reception and is subtracted once, here;
-/// - `deposition = ½⟨x, ΔΘ x⟩`, its commit's work ([`CommitWork`], zero where no commit followed);
-/// - `ingest = P_(Θ',λ')(x) − P_(Θ',λ)(x)`: the window's ingest moves the lift and with it every
-///   contact's conductance, the source port's work on the carried contacts (§2.2);
+/// - `deposition`, its commit's work at held momentum ([`WordBalance::commit_held`]: `x′` with
+///   `C′_a w′_a = C_a w_a`, zero where no commit followed);
+/// - `ingest = P_(Θ',λ')(x″) − P_(Θ',λ)(x′)`: the window's ingest moves the lift and with it every
+///   contact's conductance, and each carried wave crosses that reference change,
+///   `x″ = x′` with `a″ = (1 + Γ_a) a`, `Γ_a = (G_a − G′_a)/(G_a + G′_a)` (§2.3a);
+/// - `reflected = Σ_a (h/4) Γ_a² G_a |a|²`, what the reference change emits, so that
+///   `ingest = −reflected ≤ 0` (Lean `HNN/Ring.two_port_reference_balance`);
 /// - `imposed = E_S(s)`, the moment's storage the source port imposes;
 /// - `L = dissipation − resist + resonator dissipation ≥ 0`, the next word's certified loss.
 ///
@@ -921,20 +1137,24 @@ impl WordBalance {
 /// imposition, contrast, pump, interconnection) within the residual's certified bound
 /// ([`ChainedBalance::dissipative`]). It follows from the opening identity, the word's balance and
 /// `L ≥ 0`. **The stronger reading, that the work done on the carried change between the words is
-/// within the next word's loss** ([`ChainedBalance::within_loss`]), is not a law: the ingest's
-/// re-reading of the contacts' conductances can do more work on the carried waves than the next
-/// word dissipates (record §2.3 states the measured failure).
+/// within the next word's loss** ([`ChainedBalance::within_loss`]), is read, not asserted: the lift
+/// emits and never works on the carried waves, so the work between the words is the deposit's.
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct ChainedBalance {
     pub interior: Rat,
     pub absorbed: Rat,
     pub deposition: Rat,
     pub ingest: Rat,
+    /// What the lift's reference change emits from the carried waves.
+    pub reflected: Rat,
     pub imposed: Rat,
-    /// `P_(Θ',λ')(Π_int x + s)`, the opening change's power under the next opening's form.
+    /// `P_(Θ',λ')(Π_int x″ + s)`, the opening change's power under the next opening's form.
     pub open: Rat,
-    /// The next word's balance at its opening ([`WordBalance::open`]).
+    /// The next word's balance at its opening ([`WordBalance::open`]), after its opening split.
     pub next_open: Rat,
+    /// The opening's split at the transients' lattice, `open − next_open`: the crossed change's
+    /// power less its representative's, an executed residual read exactly (zero on the exact word).
+    pub split: Rat,
     /// The next word's certified loss `L`.
     pub loss: Rat,
     /// The next word's port terms: contrast, pump and interconnection.
@@ -949,14 +1169,14 @@ pub struct ChainedBalance {
 }
 
 impl ChainedBalance {
-    /// **Read the chained balance** from the previous word's balance (carried across its commit
-    /// when one followed), the power form at the next opening, the carried change, the next word's
-    /// opening change (before its split) and the next word's balance.
+    /// **Read the chained balance** from the previous word's balance (carried across its commit at
+    /// held momentum when one followed), the power form at the next opening, the carry, the next
+    /// word's opening change (before its split) and the next word's balance.
     pub fn read(
         field: &Field,
         previous: &WordBalance,
         form: &PowerForm,
-        carried: &EndChange,
+        carry: &ReceptionCarry,
         opening: &EndChange,
         next: &WordBalance,
     ) -> Result<Self, HnnError> {
@@ -964,17 +1184,21 @@ impl ChainedBalance {
             Some(commit) => (commit.deposition.clone(), commit.committed.clone()),
             None => (Rat::zero(), previous.end.clone()),
         };
+        let storage: Vec<&ExactRatMatrix> = form.storage.iter().collect();
+        let crossed = carry.crossed(&form.conductances, &storage)?;
         let (mut absorbed, mut imposed) = (Rat::zero(), Rat::zero());
         for ring in (0..field.rings().len()).filter(|ring| field.is_source(*ring)) {
-            absorbed += form.ring_power(ring, &carried.storage[ring]);
+            absorbed += form.ring_power(ring, &carry.change.storage[ring]);
             imposed += form.ring_power(ring, &opening.storage[ring]);
         }
         Ok(Self {
             interior: &previous.end - &absorbed,
             absorbed,
             deposition,
-            ingest: form.power(carried)? - committed,
+            ingest: form.power(&crossed)? - committed,
+            reflected: carry.reflected(&form.step, &form.conductances),
             imposed,
+            split: form.power(opening)? - &next.open,
             open: form.power(opening)?,
             next_open: next.open.clone(),
             loss: &next.dissipation - &next.resist + &next.resonator_dissipation,
@@ -999,16 +1223,23 @@ impl ChainedBalance {
     }
 
     /// **It closes**: the opening is `interior + deposition + ingest + imposed` exactly, and it is
-    /// the opening the next word's balance starts from.
+    /// the opening the next word's balance starts from, but for the opening's split.
     pub fn closes(&self) -> bool {
-        self.open == &self.interior + self.work() + &self.imposed && self.open == self.next_open
+        self.open == &self.interior + self.work() + &self.imposed
+            && &self.open - &self.split == self.next_open
+    }
+
+    /// **The lift only emits** (record B §2.3a): the ingest is exactly minus the reflected power,
+    /// so the lift's reference change does no work on the carried waves.
+    pub fn lift_emits(&self) -> bool {
+        &self.ingest + &self.reflected == Rat::zero() && !self.reflected.is_negative()
     }
 
     /// **Dissipative with respect to the declared supply**: `E_end ≤ interior + resonator storage
-    /// at the opening + supplied + bound`.
+    /// at the opening + supplied − opening split + bound`.
     pub fn dissipative(&self) -> bool {
         &self.end + &self.resonator_end
-            <= &self.interior + &self.resonator_open + self.supplied() + &self.bound
+            <= &self.interior + &self.resonator_open + self.supplied() - &self.split + &self.bound
     }
 
     /// The stronger reading, not a law: `deposition + ingest ≤ L`.
@@ -1087,6 +1318,16 @@ struct Passed {
     parting: Option<BreakReceipt>,
 }
 
+/// The change with every source ring's storage at zero (`Π_int`, record B §2.1).
+fn interior_of(field: &Field, mut change: EndChange) -> EndChange {
+    for (ring, wave) in change.storage.iter_mut().enumerate() {
+        if field.is_source(ring) {
+            *wave = zeros(wave.len());
+        }
+    }
+    change
+}
+
 fn zeros(n: usize) -> Vec<Rat> {
     vec![Rat::zero(); n]
 }
@@ -1150,10 +1391,12 @@ impl<'c> Word<'c> {
         )
     }
 
-    /// [definition; agent-inferred, October 3; the reception carry §2.1–§2.4] **Open a reception's
-    /// word on its opening**: at [`WordOpening::Rest`], exactly [`Word::open_charted`]. On a
-    /// received carry, `x_(k+1)(0) = Π_int x_k(end) + s_(k+1)(0)` through [`Word::continuing`] at the
-    /// carried tick: `Π_int` keeps every interior coordinate and zeroes each source ring's storage,
+    /// [definition; agent-inferred, October 3; the reception carry §2.1–§2.4, §2.3a] **Open a
+    /// reception's word on its opening**: at [`WordOpening::Rest`], exactly [`Word::open_charted`].
+    /// On a received carry, `x_(k+1)(0) = Π_int x_k(end) + s_(k+1)(0)` through [`Word::continuing`]
+    /// at the carried tick, the carried change first crossed into this cut's references
+    /// ([`ReceptionCarry::crossed`]: each contact's waves transmitted at its conductance, its rate
+    /// held at momentum against its storage): `Π_int` keeps every interior coordinate and zeroes each source ring's storage,
     /// so the moment's open storage, nonzero only on the source rings, is imposed there and adds to
     /// nothing elsewhere (the source port is an imposed port; adding would count the passage once
     /// per reception). Under [`Absorption::Complete`] the carried change is the rest change, with
@@ -1190,7 +1433,12 @@ impl<'c> Word<'c> {
                         what: "the reception carry of a declared resonator's pump phase is owed",
                     });
                 }
-                carry.interior(field)
+                let contacts = operands.contacts();
+                let conductances: Vec<Rat> =
+                    contacts.iter().map(|c| c.conductance().clone()).collect();
+                let storage: Vec<&ExactRatMatrix> =
+                    contacts.iter().map(|c| c.forms().0).collect();
+                carry.opening(field, &conductances, &storage)?
             }
         };
         Self::continuing(field, operands, &change, &storage, carry.ticks)
@@ -1358,6 +1606,23 @@ impl<'c> Word<'c> {
             }
         }
         let lattice = operands.lattice().map(|word| word.transient());
+        // [definition; agent-inferred, record B §2.3a] The opening's waves and states are split
+        // once at the transients' lattice, as the storage is: a carried change crossed into this
+        // cut's references (a transmitted wave, a rate held at momentum) need not lie on it, and
+        // its remainder opens the error feedback. A change already on the lattice splits to itself
+        // with a zero remainder.
+        let mut split_pair = |pair: [Vec<Rat>; 2]| -> ([Vec<Rat>; 2], [Vec<Rat>; 2]) {
+            let [first, second] = pair;
+            let (first, first_remainder) =
+                split(lattice.as_ref(), first.clone(), &zeros(first.len()));
+            let (second, second_remainder) =
+                split(lattice.as_ref(), second.clone(), &zeros(second.len()));
+            ([first, second], [first_remainder, second_remainder])
+        };
+        let (arrivals, arrival_remainders): (Vec<_>, Vec<_>) =
+            arrivals.into_iter().map(&mut split_pair).unzip();
+        let (states, state_remainders): (Vec<_>, Vec<_>) =
+            states.into_iter().map(&mut split_pair).unzip();
         let mut carried = Carried {
             anchors: widths.iter().map(|n| zeros(*n)).collect(),
             storage: Vec::with_capacity(widths.len()),
@@ -1367,14 +1632,8 @@ impl<'c> Word<'c> {
                 .iter()
                 .map(|contact| zeros(contact.width()))
                 .collect(),
-            arrivals: arrivals
-                .iter()
-                .map(|pair| [zeros(pair[0].len()), zeros(pair[1].len())])
-                .collect(),
-            states: states
-                .iter()
-                .map(|state| [zeros(state[0].len()), zeros(state[1].len())])
-                .collect(),
+            arrivals: arrival_remainders,
+            states: state_remainders,
         };
         // The source-open split belongs to the ordinary ring element's incoming storage chart.
         // Once a resonator is inserted after that element, the returned wave starts a distinct
@@ -1535,12 +1794,22 @@ impl<'c> Word<'c> {
 
     /// [definition; agent-inferred, October 3; the reception carry §2.1] **The reception's carried
     /// end**: the change the word holds and the field's elapsed ticks at its end (its opening tick
-    /// plus its junction steps), read when its return consumes it.
-    pub(crate) fn reception_end(&self) -> ReceptionCarry {
-        ReceptionCarry {
-            change: self.end_change(),
+    /// plus its junction steps), with each contact's conductance and momentum at the word's cut,
+    /// read when its return consumes it.
+    pub(crate) fn reception_end(&self) -> Result<ReceptionCarry, HnnError> {
+        let change = self.end_change();
+        let contacts = self.operands.contacts();
+        let momenta = contacts
+            .iter()
+            .zip(&change.states)
+            .map(|(contact, [_, rate])| Ok(contact.forms().0.apply(rate)?))
+            .collect::<Result<Vec<_>, HnnError>>()?;
+        Ok(ReceptionCarry {
             ticks: self.opened_at + self.passage.len(),
-        }
+            conductances: contacts.iter().map(|c| c.conductance().clone()).collect(),
+            momenta,
+            change,
+        })
     }
 
     /// Every full tick's balance, in order.
