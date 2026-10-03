@@ -98,6 +98,17 @@ The arms are:
 The last four use strict descent. Each throw is read against the at-rest throw, which has the same
 driver, the same acceptance and ρ held; only the carried momentum differs.
 
+**The end states named so far** (the main line, October 3):
+- `coord`: Q2's Coordinate chain ended at its held state q213, `q213-coordinate.state` on
+  `claude/cloud-runs-pfo084` at `5f54e54` (sha256 `038f227d32924018c2685c345054e32a91e66afad703b41187b66b9241f944b8`);
+- `kin`: Q2's Kinetic control ended at q2k14, `research/runs/u6/runner2/q2k/q2k14/q2k14-kinetic.state`
+  on `claude/cloud-runs-2-5aw27d` at `1733578` (sha256 `963d122685ee16449ac1cc4fb3f0623c91b9a6ba2ab5770919c79de7d20790d9`);
+- `rest`: `research/runs/throw-rest/m8/m8-throw.state` on `claude/pc-receipts`;
+- `tctl`: the strict-descent Coordinate control is not relaunched. It is read at m6,
+  `research/runs/throw-control/m6/m6-coordinate.state` on `claude/throw-control-chain-847j2f` at
+  `774079e`, beside `rest6` = `research/runs/throw-rest/m6/m6-throw.state` on `claude/pc-receipts`;
+- `coast` and `whole`: still running. Coast-alone m8 against at-rest m8 is already read (record §10).
+
 **Like for like by move count.** A pair compares two states at the same move count:
 - the coast-alone and whole-move throws at m8, against the at-rest m8;
 - the strict-descent Coordinate control at its end, against the throw arms at the same move.
@@ -110,7 +121,7 @@ the exact one-sided sign tail on `b` of `b + c` at `1/2`, released only at a tai
 The labels below are the six end states. Pairing labels added for equal move counts extend the call
 and its deadline (three times the largest per-state read, per state).
 ```
-RAYON_NUM_THREADS=16 timeout 19493 $B executed evaluate order2 2026093012 128 out/p5-ends.sections coord=<end> kin=<end> rest=<m8> coast=<end> whole=<end> tctl=<end> [coast8=<m8> whole8=<m8> ...]
+RAYON_NUM_THREADS=16 timeout 19493 $B executed evaluate order2 2026093012 128 out/p5-ends.sections coord=<q213> kin=<q2k14> rest=<m8> coast=<end> whole=<end> tctl=<m6> rest6=<m6> [whole8=<m8> ...]
 ```
 Pass a file path for the sections, not a directory. `evaluate` writes it with `std::fs::write`, which
 creates no parent directory, so `out/` must exist before launch.

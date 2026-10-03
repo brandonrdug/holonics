@@ -611,7 +611,84 @@ per unit:
 - each kind is bounded by the largest time measured for it before launch;
 - the run stops early when a unit passes its kind's bound.
 
-The guard is the sum over one move at the law's depth: the non-reread units once each, plus 8
-rereads. The ladder's depth bounds the trial count, so this bound is an upper time, which the fitted
-one was not. A unit past its bound after launch ends the chain incomplete, and its cost becomes the
-next subject.
+The move's bound is the sum over one move at the law's depth: the non-reread units once each, plus
+one reread per trial the ladder can attempt. On the chains' build (`5f254c2d` with the print picks),
+`LADDER_DEPTH = 8` bounds the trials. #236, merged as #264, retires that depth: its halvings end at the
+lattice, so a launch from main bounds a move at `log₂(1/λ) + 1` trials (`attempted_halvings_le_lattice`),
+with `λ` the source port's lattice unit. Either way the bound is an upper time, which the fitted one
+was not. A unit past its bound after launch ends the chain incomplete, and its cost becomes the next
+subject. §10 sets the per-kind factor.
+
+## 10. Where the throw's crossing comes from, the chains' end states, and the receiving prior's scale
+
+The receipts are under `s10/`, copied from `claude/pc-receipts` (`92f1fea1`, `6f2e4b5d` and the
+`throw-rest` runs). Units and batches are as in §9.
+
+**The per-kind bound is three times the measured maximum.** §9 bounded each kind of unit by its
+largest measured time. A sample maximum is not an upper time: if a kind's times on one host are
+exchangeable, the next sample passes the largest of `n` with chance `1/(n+1)`, so a chain held to it
+stops on the host's variance, and the stop says nothing about the move. Each kind is therefore bounded
+by `3` times its largest time measured on the same host before launch. [agent-inferred] The factor is
+the queue's own: every deadline in [PC_QUEUE](../runs/u6/PC_QUEUE.md) (P2, P5, the Q2 chains' `1900` s)
+is three times a measured time. A unit past it is a change of regime, not variance. It ends the chain
+incomplete, the factor is never raised, and its cost becomes the next subject. Bounds are fixed at
+launch, from that host's own measurements; one host's maxima are never applied to another.
+
+**The whole-move throw's m2 completes in seven trials** (runner 4's diagnostic on `5f254c2d` with
+`7a650e6b`). `η 4, 2, 1, 1/2, 1/4, 1/8` are each refused at the reread (OwnNotBelow), none at first
+order, with own releases `428005, 407581, 427086, 425188, 422867, 419588`, all above the incumbent's
+`[404256, 404261)`. `η 1/16` is adopted, and the coast is carried again: power on the whole move
+`[−169069, −169064)`, impulse step 4. The adopted m2 reads `[401729, 401735)`, `X [220459, 220464)`,
+solved 1, stations right 15, at `ρ0`. The move took about `1551030` ms against the fitted `1349692`. It
+was reread-bound, at seven reread gaps of `155229` to `209825` ms. The relaunch from m1 runs under
+`3·(166264 + 1814 + 32691) + 3·8·209825 = 5638107` ms a move.
+
+**The crossing at m9 comes from the point, not the momentum.**
+- *Like for like at m8.* Coast-alone m8 reads `[351324, 351329)`, solved 1, stations right 16. At-rest
+  m8 reads `352438`, solved 4, stations right 17. Held out, coast-alone m8 has 258 stations right
+  (`[25, 26, 31, 31, 39, 34, 30, 42]`) and at-rest m8 has 282 (`[19, 27, 38, 30, 35, 29, 51, 53]`).
+  Paired, `b = 94`, `c = 118`. Coast-alone ahead has tail `[3920, 3921)/4096`, and at-rest ahead has
+  tail `[233, 234)/4096`, so neither is released. The development batch's lower coast-alone read does
+  not carry to held out.
+- *The direct read.* Coast-alone's m9 moved, while at-rest's m9 refused every step (`rest-m9/`). These are two
+  different points, so the at-rest driver was run with no flight from coast-alone's m8
+  (`rest-from-coast-m8/`). It refuses `η 8` (NotBelow) and `η 4, 2, 1, 1/2` (OwnNotBelow), and adopts
+  `η 1/4`. The result is `L 348717`, `X 167601`, solved 1, stations right 16 at `ρ0`, which is
+  coast-alone's own m9, released there from rest.
+
+So from coast-alone's m8 the move needs no momentum, and from at-rest's m8 no step descends. The
+difference between the arms at m9 is in their m8 states, not in a carried coast.
+
+**The #202 chains' end states.**
+- *Q2's Coordinate chain (runner 1).* The run opened at move 14 was still open at 16, so the chain
+  restored its held state q213: `[329485, 329490)`, `X [152529, 152534)`, solved 4, stations right 19,
+  `ρ 1636353/2097152`. The open run's move 16 reached `[321272, 321277)` with 23 stations, `8213` below
+  the held state, which is less than σ.
+- *Q2's Kinetic control (runner 2).* Move 14 closed a four-move run, and the run opened at 15 was still
+  open at 16, so the chain restored q2k14: `[248321, 248325)`, `X [85225, 85228)`, solved 24, stations
+  right 21, `ρ` unmoved at `102837/131072`. Move 16 (`[243009, 243014)`) is not below `248321 − 11356`.
+- *The strict-descent Coordinate control.* It is not relaunched (usage, October 3). P5 reads it at m6
+  and pairs it with at-rest m6.
+
+**The receiving prior at `2I` (#259's measurement (b)).** Campaign 1's development control at
+`n* = 6148` cells, host reference, compares #259 at `c3e6d21` against its merge base `3515ed4a`. The
+held-out cells are `4958..6148`, 1190 targets.
+
+| | `H₀ = I` | `H₀ = 2I` |
+|---|---|---|
+| held out, model q | `3354 + 13/16 + ε` | `3351 + 0/16 + ε` |
+| training, model q | `17437 + 13/16 + ε` | `17430 + 4/16 + ε` |
+| PPM order 2, held out | `3913 + 13/16 + ε` | the same |
+| wall | `750904` ms (shared load) | `673146` ms (alone) |
+| peak resident | `292622336` bytes | `295591936` bytes |
+
+`L(I) − U(2I) = 149301954884965437216731043645/2^95` bits, in `[3 + 12/16, 3 + 13/16)`. The gate fixed
+before the run asked for `1190/16 = 74 + 6/16` bits either way, so the read is undecided at the grain.
+By the rule fixed with the gate, `2I` stays the scale that the prequential certificate derives, and
+#259 merges with this read beside it. The measurement does not contradict it: `2I` codes lower on held
+out and on training. The card's parity is gate 3, 32 of 32 on a clean build. The first `2I` attempt ran
+beside four other runs and stopped incomplete at its `800` s deadline. It was not relaunched under that
+deadline; the solo read is a new launch, projected from its own 200-window read (`33807` ms) at three
+times. The two failures in gate 3 that came before it were stale kernels from a copied target
+directory, not a fault on main (#262 makes the build script rebuild on a change of the kernel sources'
+content).

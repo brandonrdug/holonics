@@ -1,0 +1,9 @@
+hnn_exposure: campaign 1's declared field over fed5488ce70eb5ffbc90f2f03d23638be9d69189:docs/plans/THE_REBUILD.md
+resonator: none (campaign 1)
+cut: the first 6148 of the pinned cut's 171754 bytes (the declared population; n* = 6148); 3074 receiving windows of A = 2 cells
+held out: cells 4958..6148 (1190 cells, the manifest's range or the declared tail); training: cells 0..4958
+reference: campaign 1 (every locus's certified step, the normal laws' and the factor families', B_Theta = 2^33 bits, pending capacity 64); deadline: none
+carrier lattices L: Element(0) 9, Element(1) 9, Element(2) 10, Element(3) 10, Channel(0) 9, Channel(1) 9, Channel(2) 10, Channel(3) 9, SourcePort(0) 18, Standing(0) 9, Standing(1) 9, Standing(2) 10, Standing(3) 10, ReceivingMap(2) 10
+setup (cut read, fields declared): 66 ms wall
+realization: the host reference (holonics::hnn::Reference)
+exit 124 wall 800027 ms
