@@ -398,10 +398,12 @@ receiving path, campaign 1's exposure protocol, whose measurement is a code leng
 class: `executed expose` runs `Reference::expose_with` on the prediction field from a stored
 constitution, over one cut of the field's declared population (`2^16` cells: order-2 passages at the
 training seed, then the 128 held-out passages at seed `2026093012` with their 1024 station cells held
-out). The protocol reads each cell's code before it deposits, deposits into every locus it admits
-from the receiver's own comparison, and never deposits on a held-out cell. Run once from m6 and once
-from w16, with everything else equal, it reads whether the U6 move's `E` shortens the machine's own
-held-out code. [agent-inferred] The gate is one grain per held-out station: w16's held-out combined
+out). The protocol reads each cell's code before it deposits, and deposits into every locus it admits
+from the receiver's own comparison at every complete window, held-out windows included: prequential,
+not an untouched holdout (`expose_from`, `reference.rs:3999-4008`; corrected October 3, this first
+said it never deposits on a held-out cell). `executed evaluate` deposits nothing. Run once from
+m6 and once from w16, with everything else equal, it reads whether the U6 move's `E` shortens the
+machine's own held-out code. [agent-inferred] The gate is one grain per held-out station: w16's held-out combined
 code below m6's by at least `1024 · 1/16 = 64` bits. If it is not, the U6 move's gains do not reach the
 machine's receiving path, and the bank chain stops as §6 says.
 
@@ -476,8 +478,8 @@ the crossing jump, not a misoriented momentum. The derivations thread's floor la
 
 **The exposure gate is read after the opening deposit.** By #244, `R = 0` at every U6 state is the
 opening value, the first deposit moves `R` alone, and `C` and `E` learn from the second deposit on.
-`executed expose` deposits once per window. Its held-out cells come after every training cell, so they
-are read after about 21500 deposits from each state, and the gate is not decided by the features'
+`executed expose` deposits once per window. Its held-out passages come after every training passage,
+so their 1024 held-out station cells are read after 19810 to 21844 deposits from each state (§12), and the gate is not decided by the features'
 Gram at the first deposit.
 
 ## 9. The wall at m7, the run that crosses it, and the paired held-out reads
@@ -783,20 +785,21 @@ could not have held.
   Per window that is a factor of `193175/149089`. Applied to P4's projection it gives
   `49676249115555/1192712` ms, already past `36000000`, and P4's cut is `4369/40` times its sample
   against campaign 1's `1537/100`. It was not acted on.
-- *The measured part was reachable only by finishing, with no progress line.* The held-out cells are
-  the cut's last 6144 (from cell 59392, window 19797 of 21845; `expose_read`,
-  `hnn_executed_loop.rs`). `expose_read` prints nothing between its header and its result and keeps
+- *The measured part was reachable only by finishing, with no progress line.* The held-out passages
+  are the cut's last 6144 cells (from cell 59392, window 19797 of 21845; `expose_read`,
+  `hnn_executed_loop.rs`), and the mask holds only their 1024 station cells, the first at cell 59432
+  (window 19810). `expose_read` prints nothing between its header and its result and keeps
   no state, so the run could not stop early on evidence. Progress lines were added to executed moves
   at 23:14 UTC (`7a650e6b`), five minutes after P4's PC launch, and not to `expose`.
 - *A null result could not be read.* `expose_from` deposits every compared window, held-out windows
-  included (`reference.rs:3999-4000`), and the deposits reach the source port `E`. So about 19797
+  included (`reference.rs:3999-4000`), and the deposits reach the source port `E`. So 19810
   windows of the protocol's own learning into `E` stand between m6's or w16's `E` and the first
-  held-out cell. A pass would have shown that w16's `E` survives them. A null could equally mean the
+  held-out station cell. A pass would have shown that w16's `E` survives them. A null could equally mean the
   protocol overwrote it, so it would not have shown that the U6 gains miss the receiving path, and
   the gate's failure branch did not follow from its failure.
 - *The cloud copy.* It was relaunched at 23:07 UTC under the same deadline in a session whose
-  background runs end at 2 h, below the `29/32` of the projection needed to reach the first held-out
-  cell. It left no end receipt.
+  background runs end at 2 h, below the about `29/32` of the projection needed to reach the first
+  held-out station cell. It left no end receipt.
 
 **What was claimed beyond the receipts** (this section as first merged).
 - The look at the PC at 05:14 UTC (each source at `6106/6000` of one core with 2 rayon workers) was

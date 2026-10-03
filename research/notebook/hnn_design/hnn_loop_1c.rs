@@ -188,10 +188,13 @@ fn arm(text: &str) -> Result<(String, Source), String> {
 }
 
 /// **A complete continuing state restored whole** onto the declared opening
-/// (`Constitution::continued`) and written back: refused where the text is not a complete state,
+/// (`Constitution::continued`) and written back, authenticated first
+/// ([`super::executed_loop::authenticated`]: a state the manifest of earlier states lists is stamped
+/// with the declared opening's identity): refused where the text is not a complete state,
 /// where the state does not continue the declared opening, and where its write-back differs from
 /// the text by a byte (the replay's item 3: a mismatch fails, it does not warn).
 fn restore_whole(engine: &Engine, ring: usize, text: &str) -> Result<Constitution, String> {
+    let text = &super::executed_loop::authenticated(&engine.theta, text)?;
     let state = ContinuingState::from_text(text)
         .map_err(|error| format!("not a complete continuing state ({error})"))?;
     let theta = engine
@@ -199,7 +202,7 @@ fn restore_whole(engine: &Engine, ring: usize, text: &str) -> Result<Constitutio
         .clone()
         .continued(&state)
         .map_err(|error| format!("it does not continue the declared opening ({error})"))?;
-    if write_state(&theta, ring) != text {
+    if write_state(&theta, ring) != *text {
         return Err("the restored state written back differs from its file".to_string());
     }
     Ok(theta)
@@ -2143,13 +2146,18 @@ mod tests {
     use super::*;
 
     /// Gate A's saved complete continuing state (constitution 1 of its native continuation).
+    /// Gate A's saved state, written before a state carried its material identity and check: its
+    /// lines through `storage-product`, with the declared opening's identity and the check added as
+    /// [`ContinuingState::to_text`] writes them.
     fn gate_a_state() -> String {
         let path = concat!(
             env!("CARGO_MANIFEST_DIR"),
             "/../../research/records/2026-09-30_STEP_1B_GATE_A_receipts/witness_best.state"
         );
         #[allow(clippy::disallowed_methods)]
-        std::fs::read_to_string(path).expect("gate A's saved state")
+        let saved = std::fs::read_to_string(path).expect("gate A's saved state");
+        let engine = Engine::new(order_declared());
+        ContinuingState::stamped(&saved, &engine.theta).expect("gate A's saved state stamped")
     }
 
     fn face(solved: Predicate) -> Face {
@@ -2221,13 +2229,13 @@ mod tests {
         assert_eq!(arm("w=partial:best.txt"), Ok(("w".to_string(), Source::Partial("best.txt".to_string()))));
         // A complete state is never read as a partial: `partial:` refuses lines after `rho`.
         assert!(remount_partial(&engine, ring, &text).is_err());
-        // A value off its written form after `rho` (the clock `01`): parses to the same state, but
-        // does not write back to its own text.
+        // A value off its written form after `rho` (the clock `01`): the same value, but the bytes
+        // differ, so the check refuses it before it parses to a state.
         let edited = text.replace("\nclock ", "\nclock 0");
         assert_ne!(edited, text);
-        assert!(ContinuingState::from_text(&edited).is_ok());
+        assert!(ContinuingState::from_text(&edited).is_err());
         let refused = restore_whole(&engine, ring, &edited).expect_err("a state off its written form is refused");
-        assert!(refused.contains("written back differs"), "{refused}");
+        assert!(refused.contains("not a complete continuing state"), "{refused}");
         // A broken line after `rho` (the Gram's head): the state does not parse.
         let broken = text.replace("\ngram 5\n", "\ngram five\n");
         assert_ne!(broken, text);
@@ -2236,6 +2244,31 @@ mod tests {
         let trailing = format!("{text}extra\n");
         let refused = restore_whole(&engine, ring, &trailing).expect_err("a trailing line is refused");
         assert!(refused.contains("written back differs"), "{refused}");
+    }
+
+    /// A state written before the identity, its bytes listed in the manifest of earlier states,
+    /// mounts whole (stamped with the declared opening's identity, by the file path and by its
+    /// text alike); the same state with one byte changed is unlisted, carries no check, and is
+    /// refused.
+    #[test]
+    fn a_listed_earlier_state_mounts_whole_and_an_unlisted_one_is_refused() {
+        let engine = Engine::new(order_declared());
+        let ring = engine.refinement.ring();
+        let path = concat!(
+            env!("CARGO_MANIFEST_DIR"),
+            "/../../research/records/2026-09-30_STEP_1B_GATE_A_receipts/witness_best.state"
+        );
+        #[allow(clippy::disallowed_methods)]
+        let saved = std::fs::read_to_string(path).expect("gate A's saved state");
+        assert!(!saved.contains("\ncheck "), "the saved state predates the check");
+        let stamped = restore_whole(&engine, ring, &gate_a_state()).expect("the stamped state");
+        let listed = restore_whole(&engine, ring, &saved).expect("a listed earlier state mounts whole");
+        assert_eq!(listed, stamped);
+        assert_eq!(super::super::executed_loop::mount(&engine.theta, ring, path), stamped);
+        let unlisted = saved.replace("\nclock ", "\nclock 0");
+        assert_ne!(unlisted, saved);
+        let refused = restore_whole(&engine, ring, &unlisted).expect_err("an unlisted state without a check is refused");
+        assert!(refused.contains("not a complete continuing state"), "{refused}");
     }
 
     #[test]
@@ -2433,8 +2466,12 @@ mod tests {
         let refused = resume_inputs(&engine, ring, &truncated, &receipt).expect_err("a truncated state");
         assert!(refused.contains("not a complete continuing state"), "{refused}");
         assert!(refused.contains("never read as a partial remount"), "{refused}");
-        // Off its written form: parses, does not write back to its own text.
+        // Edited after its stamp: refused by the check.
         let edited = state.replace("\nclock ", "\nclock 0");
+        let refused = resume_inputs(&engine, ring, &edited, &receipt).expect_err("a state edited after its stamp");
+        assert!(refused.contains("the state is damaged"), "{refused}");
+        // Off its written form, restamped: passes the check, does not write back to its own text.
+        let edited = ContinuingState::stamped(&edited, &engine.theta).expect("the edited state restamped");
         let refused = resume_inputs(&engine, ring, &edited, &receipt).expect_err("a state off its written form");
         assert!(refused.contains("written back differs"), "{refused}");
         // A receipt without move 2's line (constitution 2's persistence reads) is refused too.
