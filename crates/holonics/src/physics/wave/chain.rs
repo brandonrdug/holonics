@@ -3,13 +3,13 @@
 use num_traits::{One, Signed, Zero};
 use std::sync::Arc;
 
-use crate::holon::{Holon, HolonError, PortHolon};
+use crate::holon::{Holon, HolonError, HolonState, PortHolon};
 use crate::holon::law::{ReferenceHolon, Scheme};
 use crate::navigator::Clock;
 use crate::ratio::linear::ExactRatMatrix;
 use crate::receiver::receipt::ReceiptLaw;
-use crate::receiver::reception::{InteractionReturn, JointLaw};
-use crate::receiver::reception::continuation::{BoundJointState, JointProducer, StorageReturn};
+use crate::receiver::reception::{InteractionReturn, JointLaw, ReceiverFace};
+use crate::receiver::reception::continuation::{BoundJointState, BoundJointStep, JointProducer, StorageReturn};
 use crate::ratio::linear::inertia::SymmetricForm;
 use crate::ratio::linear::vector::matrix;
 use crate::ratio::{Rat, integer};
@@ -269,6 +269,43 @@ pub struct WaveChain {
     incidence: Incidence,
     material: WaveMaterial,
     tick: Rat,
+}
+
+/// The native wave's participating receiver, with its current material and admitted reading.
+/// [agent-inferred] The original source and clock remain the generic producer's boundary;
+/// the current material changes only through the native return. Private construction joins
+/// `producer.law() = current.joint_receiver(reader)` at bind and at every material return.
+/// A caller-declared generic producer cannot supply this native derivation.
+#[derive(Clone, Debug)]
+pub struct WaveReceiver {
+    current: WaveChain,
+    reader: ExactRatMatrix,
+    producer: JointProducer<WaveChain>,
+}
+
+impl WaveReceiver {
+    pub fn current(&self) -> &WaveChain {
+        &self.current
+    }
+
+    pub fn law(&self) -> &JointLaw {
+        self.producer.law()
+    }
+
+    /// Open under the bound native law; source and clock identity are checked by its producer.
+    pub fn open(
+        &self, state: HolonState, source: &Arc<WaveChain>, clock: &Arc<Clock>,
+    ) -> Result<BoundJointState<WaveChain>, WaveError> {
+        Ok(self.producer.open(state, source, clock)?)
+    }
+
+    /// Continue the existing solved joint law from its actual reached state and clock.
+    pub fn interact(
+        &self, reached: &BoundJointState<WaveChain>, source: &Arc<WaveChain>,
+        clock: &Arc<Clock>, input: &[Rat], face: &ReceiverFace, receipt: &ReceiptLaw,
+    ) -> Result<InteractionReturn<BoundJointStep<WaveChain>>, WaveError> {
+        Ok(self.producer.interact(reached, source, clock, input, face, receipt)?)
+    }
 }
 
 impl WaveChain {
@@ -579,32 +616,53 @@ impl WaveChain {
     /// Bind a native source and clock to the law derived here, without a caller-supplied law.
     pub fn bind_receiver(
         source: &Arc<Self>, clock: &Arc<Clock>, reader: &ExactRatMatrix,
-    ) -> Result<JointProducer<Self>, WaveError> {
-        Ok(JointProducer::declared(source.joint_receiver(reader)?, source.clone(), clock.clone())?)
+    ) -> Result<WaveReceiver, WaveError> {
+        Ok(WaveReceiver {
+            current: source.as_ref().clone(),
+            reader: reader.clone(),
+            producer: JointProducer::declared(source.joint_receiver(reader)?, source.clone(), clock.clone())?,
+        })
     }
 
     /// Authenticate the current native law/reader, derive the successor from its material, and
     /// decode the same returned charges/fluxes. The caller supplies no successor law or decoder.
-    /// [agent-inferred] This first native return authenticates its full producing source material.
-    /// The returned joint law continues its reached point; no caller-supplied decoder is used.
+    /// [agent-inferred] Authenticate the current material carried by the native receiver, rather
+    /// than equating every later material with the original source. The source and clock keep
+    /// their identities. The derived successor and reader are carried into the next return.
+    /// A caller-declared generic law cannot be used as the native producing receiver:
+    /// ```compile_fail,E0308
+    /// use std::sync::Arc;
+    /// use holonics::physics::wave::WaveChain;
+    /// use holonics::navigator::Clock;
+    /// use holonics::ratio::{Rat, linear::ExactRatMatrix};
+    /// use holonics::receiver::receipt::ReceiptLaw;
+    /// use holonics::receiver::reception::continuation::{BoundJointState, JointProducer};
+    /// fn forged_return(current: &WaveChain, source: &Arc<WaveChain>,
+    ///     forged: &JointProducer<WaveChain>, reached: &BoundJointState<WaveChain>,
+    ///     clock: &Arc<Clock>, successor: &WaveChain, reader: &ExactRatMatrix,
+    ///     epsilon: Rat, receipt: &ReceiptLaw) {
+    ///     let _ = current.return_material(source, forged, reached, clock,
+    ///         successor, reader, epsilon, receipt);
+    /// }
+    /// ```
     pub fn return_material(
-        &self, source: &Arc<Self>, producer: &JointProducer<Self>,
+        &self, source: &Arc<Self>, receiver: &WaveReceiver,
         reached: &BoundJointState<Self>, clock: &Arc<Clock>, successor: &Self,
         reader: &ExactRatMatrix, epsilon: Rat, receipt: &ReceiptLaw,
     ) -> Result<
-        (JointProducer<Self>, InteractionReturn<BoundJointState<Self>, (), StorageReturn>, WaveState),
+        (WaveReceiver, InteractionReturn<BoundJointState<Self>, (), StorageReturn>, WaveState),
         WaveError,
     > {
         let same_ports = |a: &Self, b: &Self| a.incidence == b.incidence
             && a.material.leakage == b.material.leakage && a.tick == b.tick;
-        if self != source.as_ref() || !same_ports(self, successor)
-            || producer.law() != &self.joint_receiver(reader)? {
+        if self != receiver.current() || reader != &receiver.reader || !same_ports(self, successor)
+            || receiver.law() != &self.joint_receiver(reader)? {
             return Err(HolonError::ConformanceFailed {
                 what: "the wave material return uses its derived producing law, reader, incidence and clock",
             }.into());
         }
         let next_law = successor.joint_receiver(reader)?;
-        let (next_producer, returned) = producer.return_storage(
+        let (next_producer, returned) = receiver.producer.return_storage(
             reached, source, clock, next_law, epsilon, receipt,
         )?;
         let point = &returned.forward.present().ok_or(HolonError::ConformanceFailed {
@@ -616,7 +674,11 @@ impl WaveChain {
                 what: "the native wave successor decoder re-encodes the returned point",
             }.into());
         }
-        Ok((next_producer, returned, reading))
+        Ok((WaveReceiver {
+            current: successor.clone(),
+            reader: receiver.reader.clone(),
+            producer: next_producer,
+        }, returned, reading))
     }
 
     /// Decode the Holon's storage coordinates `(q, phi) = (C V, L I)` in this material.
