@@ -949,7 +949,8 @@ impl Reference {
     /// windows, not in wall time. It limits one run from outside: it enters no law of the port and
     /// no description (`Field::describe`). [agent-inferred: a smoke run on campaign 1's field needs
     /// a limit below `n*`, which a shorter cut cannot give, since the field refuses any population
-    /// shorter than `n*`.]
+    /// shorter than `n*`.] A continued passage ([`expose_continuing`]) counts its windows from
+    /// the epoch it resumes at.
     pub fn with_deadline(self, windows: u64) -> Self {
         Self {
             deadline: Some(windows),
@@ -1040,7 +1041,9 @@ impl Reference {
     /// a moved opening; a damaged text is refused when it is read), with its carried end beside it
     /// ([`Reference::mount_carried`]). A state written at rest carries none and mounts with none, so
     /// its next reception opens with zero carry at tick zero, the `A = I` opening from which the
-    /// chain carries.
+    /// chain carries. A state that carries the resident's passage ([`Resident::continuing_state`])
+    /// mounts with its lift point, moment, aeon, balance, charts, register and ranks, and `current`
+    /// gives way to its lift point.
     pub fn mount_continued(
         &self,
         field: &Field,
@@ -1049,9 +1052,16 @@ impl Reference {
         state: &crate::hnn::constitution::ContinuingState,
     ) -> Result<Resident, HnnError> {
         let constitution = opening.continued(state)?;
-        match state.carry() {
+        let resident = match state.carry() {
             Some(carry) => self.mount_carried(field, current, constitution, carry.clone()),
             None => self.mount_with(field, current, constitution),
+        }?;
+        // The resident's passage, where the state carries one (§10): the mount's lift point and
+        // moment give way to the saved ones, so the next exposure continues the cut where it
+        // stopped.
+        match state.passage() {
+            Some(passage) => resident.with_passage(passage),
+            None => Ok(resident),
         }
     }
 }
@@ -3305,15 +3315,32 @@ impl Reference {
     pub fn expose(&self, field: &Field, cut: &Cut) -> Result<Exposure, HnnError> {
         expose(
             self,
-            &Declared {
-                budget: self.budget,
-                pending_capacity: self.pending_capacity,
-                deadline: self.deadline,
-                refining: self.refining,
-            },
+            &self.declared(),
             field,
             cut,
         )
+    }
+
+    /// The declarations an exposure reads off this reference.
+    pub fn declared(&self) -> Declared {
+        Declared {
+            budget: self.budget,
+            pending_capacity: self.pending_capacity,
+            deadline: self.deadline,
+            refining: self.refining,
+        }
+    }
+
+    /// [definition; agent-inferred, October 4; the reception carry §10] **Continue a resident's
+    /// passage on a cut** ([`expose_continuing`]): the exposure from the epoch its moment's cells
+    /// reach, with the resident it leaves.
+    pub fn expose_continuing(
+        &self,
+        field: &Field,
+        cut: &Cut,
+        resident: Resident,
+    ) -> Result<(Exposure, Resident), HnnError> {
+        expose_continuing(self, &self.declared(), field, cut, resident)
     }
 
     /// Run the same prequential protocol from a caller-declared initial constitution.
@@ -3327,12 +3354,7 @@ impl Reference {
         let resident = self.mount_with(field, &current, constitution)?;
         expose_from(
             self,
-            &Declared {
-                budget: self.budget,
-                pending_capacity: self.pending_capacity,
-                deadline: self.deadline,
-                refining: self.refining,
-            },
+            &self.declared(),
             field,
             cut,
             resident,
@@ -4044,6 +4066,14 @@ pub trait ExposedResident {
     fn carried(&self) -> Option<&ReceptionCarry> {
         None
     }
+    /// [definition; agent-inferred, October 4; the reception carry §10] **The passage this resident
+    /// continues**: its open source moment and the cells its aeon in progress has ingested. An
+    /// exposure continues that moment at the epoch its cells reach, so a restored resident resumes
+    /// the cut where it stopped; a realization that opens a fresh moment for every exposure holds
+    /// none.
+    fn continuing(&self) -> Option<(MomentId, u64)> {
+        None
+    }
     /// The contacts' refining grain ([`Resident::refine_contact_grain`]); a realization without it
     /// refuses.
     fn refine_contact_grain(&mut self, _levels: u32) -> Result<usize, HnnError> {
@@ -4058,6 +4088,13 @@ pub trait ExposedResident {
 impl ExposedResident for Resident {
     fn admitted(&self) -> &[ReceivingPhases] {
         Resident::admitted(self)
+    }
+    fn continuing(&self) -> Option<(MomentId, u64)> {
+        let mut open = self.moments.keys();
+        match (open.next(), open.next()) {
+            (Some(id), None) => Some((*id, self.aeon.cells)),
+            _ => None,
+        }
     }
     fn carried(&self) -> Option<&ReceptionCarry> {
         Resident::carried(self)
@@ -4134,8 +4171,28 @@ pub fn expose_from<P>(
     declared: &Declared,
     field: &Field,
     cut: &Cut,
-    mut resident: P::Resident,
+    resident: P::Resident,
 ) -> Result<Exposure, HnnError>
+where
+    P: ExecutionPort,
+    P::Resident: ExposedResident,
+{
+    expose_continuing(port, declared, field, cut, resident).map(|(exposure, _)| exposure)
+}
+
+/// [definition; agent-inferred, October 4; the reception carry §10] **The exposure with the
+/// resident it leaves**: [`expose_from`], returning the resident beside its readings, so the
+/// passage can be saved where the run stopped and continued from there. A resident that continues
+/// an open moment ([`ExposedResident::continuing`]) resumes at the epoch of the cut's cell clock its
+/// moment's cells reach, `[kA, min((k + 1)A, n))` with `kA` the cells received; a resident with no
+/// moment opens one at cell zero. Refused where the moment's cells are not an epoch's opening.
+pub fn expose_continuing<P>(
+    port: &P,
+    declared: &Declared,
+    field: &Field,
+    cut: &Cut,
+    mut resident: P::Resident,
+) -> Result<(Exposure, P::Resident), HnnError>
 where
     P: ExecutionPort,
     P::Resident: ExposedResident,
@@ -4175,8 +4232,30 @@ where
         }
         Ok(())
     };
-    let (moment, _) = port.ingest(&mut resident, None, &[])?;
-    let mut aeon_start = 0usize;
+    // The passage continues: the moment the resident holds and the cells it has received, or a
+    // moment opened at cell zero.
+    let (moment, aeon_cells) = match resident.continuing() {
+        Some(continuing) => continuing,
+        None => (port.ingest(&mut resident, None, &[])?.0, 0),
+    };
+    let start = resident
+        .moment(&moment)
+        .expect("the continued moment")
+        .cells();
+    let start = usize::try_from(start).unwrap_or(usize::MAX);
+    let epochs = phases.windows(cells.len())?;
+    if start > 0 && !epochs.iter().any(|span| span.start == start) {
+        return Err(HnnError::Shape {
+            what: "a continued moment's cells against an epoch's opening of the cut",
+            expected: epochs
+                .iter()
+                .map(|span| span.start)
+                .find(|&opening| opening > start)
+                .unwrap_or(cells.len()),
+            found: start,
+        });
+    }
+    let mut aeon_start = start - usize::try_from(aeon_cells).unwrap_or(start).min(start);
     let mut training = Bits::empty();
     let mut held_out = Bits::empty();
     let mut baselines = Baselines::new(alphabet)?;
@@ -4217,8 +4296,8 @@ where
     let mut deadline = None;
     // The receiving windows are the epochs of the cut's cell clock at the receiver's section
     // (`ReceivingPhases::windows`): the loop reads them, and its position is the epoch's opening.
-    let mut position = 0usize;
-    for span in phases.windows(cells.len())? {
+    let mut position = start;
+    for span in epochs.into_iter().filter(|span| span.start >= start) {
         let unit = Instant::now();
         position = span.start;
         let end = span.end;
@@ -4480,7 +4559,7 @@ where
         source_bits: n * symbol,
         n_star: field.capacity().n_star(),
     };
-    Ok(Exposure {
+    let exposure = Exposure {
         training,
         held_out,
         keys,
@@ -4501,7 +4580,7 @@ where
         resonator_remainders: resident.constitution().resonator_gain_remainders(),
         key_bits,
         kt,
-        literal_bits: symbol * position as u64,
+        literal_bits: symbol * (position - start) as u64,
         work,
         state,
         compares,
@@ -4526,7 +4605,8 @@ where
             .transpose()?,
         retained: resident.constitution().clone(),
         carried: resident.carried().cloned(),
-    })
+    };
+    Ok((exposure, resident))
 }
 
 // -------------------------------------------------------------------------------------------
@@ -4705,3 +4785,4 @@ pub fn prequential(
 
 #[cfg(test)]
 mod continuation;
+mod passage;

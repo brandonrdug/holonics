@@ -771,6 +771,56 @@ impl Charts {
     pub fn bits(&self) -> u64 {
         self.charts.values().map(ChartWords::bits).sum()
     }
+
+    /// [definition; agent-inferred, October 4; the reception carry §10] **The charts' text**, a part
+    /// of a continuing state (the next epoch's refinements start from them): `charts n`, then per
+    /// chart its key (`ring g` or `contact a n_a`) with `rows columns exponent`, and its words on
+    /// one line.
+    pub fn write(&self, s: &mut String) {
+        *s += &format!("charts {}\n", self.charts.len());
+        for (key, chart) in &self.charts {
+            match key {
+                ChartKey::Ring(ring) => *s += &format!("ring {ring}"),
+                ChartKey::Contact { contact, carry } => *s += &format!("contact {contact} {carry}"),
+            }
+            *s += &format!(" {} {} {}\n", chart.rows, chart.columns, chart.exponent);
+            crate::hnn::state_text::line(s, "words", &chart.words);
+        }
+    }
+
+    /// **The charts read back from their text** ([`Charts::write`]); refused, typed, on any line out
+    /// of its form or a chart whose words are not `rows × columns`.
+    pub fn read<'a>(head: &str, next: crate::hnn::state_text::Next<'_, 'a>) -> Result<Self, HnnError> {
+        use crate::hnn::state_text::{keyed, refused, value, values};
+        let what = "the charts";
+        let count: usize = value(keyed(head, "charts", what)?.first(), what)?;
+        let mut charts = BTreeMap::new();
+        for _ in 0..count {
+            let words: Vec<&str> = next("a chart's key")?.split_whitespace().collect();
+            let (key, shape) = match words.first().copied() {
+                Some("ring") if words.len() == 5 => (ChartKey::Ring(value(words.get(1), what)?), &words[2..]),
+                Some("contact") if words.len() == 6 => (
+                    ChartKey::Contact {
+                        contact: value(words.get(1), what)?,
+                        carry: value(words.get(2), what)?,
+                    },
+                    &words[3..],
+                ),
+                _ => return refused("a chart's key"),
+            };
+            let (rows, columns, exponent): (usize, usize, u32) = (
+                value(shape.first(), what)?,
+                value(shape.get(1), what)?,
+                value(shape.get(2), what)?,
+            );
+            let words: Vec<i64> = values(&keyed(next("a chart's words")?, "words", what)?, what)?;
+            if Some(words.len()) != rows.checked_mul(columns) {
+                return refused("a chart's words against its shape");
+            }
+            charts.insert(key, ChartWords { rows, columns, exponent, words });
+        }
+        Ok(Self { charts })
+    }
 }
 
 // -------------------------------------------------------------------------------------------
