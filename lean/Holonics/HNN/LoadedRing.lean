@@ -64,13 +64,14 @@ that edge with the tick.
    `X × (E × E)` the edge `g → g` sends `(x, (u, w))` to `(rest x + store s′, (u′, w′))` with drive
    `e = elem x`, where `rest + store ∘ elem` is the unloaded edge; its resonator part closes by 2.
 
-[open] `Word.Medium` still carries no resonator: `HNN/TickBlocks` writes the unloaded ring block
-`V r × (Port r → V r)`, so the concrete loaded block family on the whole medium is owed (#62),
-with the resonator's held momentum across a deposit (5975646405 item 2). The executed split and
-chart terms of the lattice word are `HNN/Ring`'s and `HNN/LatticeWord`'s, not restated here.
+`Word.Medium` carries no resonator: `HNN/TickBlocks` writes the unloaded ring block
+`V r × (Port r → V r)`. The loaded block family on the whole medium is `HNN/LoadedMedium`, which
+adds the resonator's state to each ring block and loads its element edge by `loadedEdge`. [open]
+The resonator's held momentum across a deposit (5975646405 item 2) is a parameter there (`cross`).
+The executed split and chart terms of the lattice word are `HNN/Ring`'s and `HNN/LatticeWord`'s,
+not restated here.
 
-`HNN/Ring`, `HNN/TickFamily` and `HNN/CarriedMotion` are unchanged. No `sorry`, no `axiom`, no
-`native_decide`.
+No `sorry`, no `axiom`, no `native_decide`.
 -/
 
 noncomputable section
