@@ -241,9 +241,18 @@ pub struct ContactDeclaration {
 /// and its nodes' prior mass exponent `j`, each digit's masses starting at `2^(−j)`
 /// (`compression::landmark::context::LandmarkDeclaration::mass`; KT at `j = 1`), the base
 /// measure those masses are split by (`compression::landmark::context::BaseMeasure`), and the
-/// receiving map's prior ([`ReceivingPrior`]): its normal law founds at `H_0 = 2^k I`
-/// (`hnn::constitution::NormalLaw::with_scaled_prior`; `k = 0` is the unit prior every other law
-/// keeps), held there or located by the readings.
+/// receiving map's prior's founding member `k` (`receiving_prior`): its normal law founds at
+/// `H_0 = 2^k I` (`hnn::constitution::NormalLaw::with_receiving_prior`; `k = 0` is the unit prior
+/// every other law keeps), and the readings move it from there.
+///
+/// [definition; agent-inferred, October 4; the
+/// [prior carry's design](../../../../research/records/2026-10-04_THE_RECEIVING_PRIOR_IS_CARRIED_BESIDE_ITS_GRAM_AND_MOVES_TO_THE_CODES_CELL.md)
+/// §8] `k` is the prior's initial configuration, not a held choice: the founding map `W_0 = 0`
+/// reads no terms, so the pair founds at zero and the mount moves nothing, as a rest-saved state
+/// mounts with zero carry; every later deposit that reaches the map reads its terms and moves `k`
+/// to the code's cell (Lean `HNN/PriorCarry`, `hnn::constitution::LocatedPrior`). No receiver
+/// holds its prior by law: where no reading reaches the map, or none reads as the face's
+/// `q − p̃`, or the curvature is zero, the located law itself holds `k` and says why.
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct ReceiverDeclaration {
     pub ring: usize,
@@ -253,36 +262,7 @@ pub struct ReceiverDeclaration {
     pub prior: StopPrior,
     pub mass: u32,
     pub base: BaseMeasure,
-    pub receiving_prior: ReceivingPrior,
-}
-
-/// [definition; agent-inferred, October 4; the
-/// [prior carry's design](../../../../research/records/2026-10-04_THE_RECEIVING_PRIOR_IS_CARRIED_BESIDE_ITS_GRAM_AND_MOVES_TO_THE_CODES_CELL.md)
-/// §5] **The receiving map's prior as declared**: founded at `2^k I` and either held there, or
-/// located by the readings' prequential pair from there (Lean `HNN/PriorCarry`): the law carries
-/// the pair beside its Gram and moves `k` to the code's cell on the dyadic grid
-/// (`hnn::constitution::LocatedPrior`). The moving law is opt-in, as the reception carry was,
-/// because it changes the HNN's behaviour: every field declared before it holds its prior.
-#[derive(Clone, Copy, Debug, PartialEq, Eq)]
-pub enum ReceivingPrior {
-    /// The prior `2^k I`, held.
-    Held(u32),
-    /// The prior founded at `2^from I` and moved by the readings.
-    Located { from: u32 },
-}
-
-impl ReceivingPrior {
-    /// `k` at the founding.
-    pub fn scale(&self) -> u32 {
-        match *self {
-            ReceivingPrior::Held(k) | ReceivingPrior::Located { from: k } => k,
-        }
-    }
-
-    /// Whether the readings move it.
-    pub fn located(&self) -> bool {
-        matches!(self, ReceivingPrior::Located { .. })
-    }
+    pub receiving_prior: u32,
 }
 
 /// [definition] **The crib as declared**: the `window` cells that open each aeon, read at `offset`.
@@ -339,8 +319,9 @@ impl FieldDeclaration {
     /// chosen on the development cells in the landmark receipt), and prior mass `2^(−3)` (chosen on the
     /// development cells over the ladder `2^(−j)`, `j = 1..B`, charged `⌈log₂ B⌉ = 3` bits: the
     /// contact loop record §25), split by its digit tree's root (`BaseMeasure::Root`, §30–31); the
-    /// receiving map's prior `2I` (`ReceivingPrior::Held(1)`, located by the readings' prequential
-    /// certificate on campaign 1's 3,400 readings: the receiving prior's October 2 record);
+    /// receiving map's prior founded at `2I` (`receiving_prior: 1`, the member the readings'
+    /// prequential certificate located on campaign 1's 3,400 readings: the receiving prior's October
+    /// 2 record), moved from there by the readings;
     /// `Δ = {1}`; the crib `W_crib = 64` at offset 1. The population is the cut's length. The carrier
     /// lattices follow [`FieldDeclaration::lattice_by_rule`]: `L = 9, 9, 10, 10` for the four rings'
     /// elements and standings, `10` for ring 2's receiving map, `9, 9, 10, 9` for the four channels,
@@ -397,7 +378,7 @@ impl FieldDeclaration {
                 prior: StopPrior::half(),
                 mass: 3,
                 base: BaseMeasure::Root,
-                receiving_prior: ReceivingPrior::Held(1),
+                receiving_prior: 1,
             }],
             crib: CribDeclaration {
                 window: 64,

@@ -94,7 +94,7 @@ fn chain_declaration(population: u64) -> FieldDeclaration {
             prior: holonics::compression::landmark::context::StopPrior::half(),
             mass: 1,
             base: holonics::compression::landmark::context::BaseMeasure::Even,
-            receiving_prior: holonics::hnn::field::ReceivingPrior::Held(0),
+            receiving_prior: 0,
         }],
         crib: CribDeclaration {
             window: 16,
@@ -315,7 +315,9 @@ fn carry_text(carry: Option<&ReceptionCarry>) -> Option<String> {
 
 /// **Run the exposure protocol on both ports in lockstep** (module header) over at most `windows`
 /// receiving epochs of `cut`, from `constitution` (the declared initial one when `None`), with a
-/// release at every `release_every`-th epoch. Every return is asserted equal.
+/// release at every `release_every`-th epoch, at the production reception
+/// (`Reference::campaign_one().reception()`, the carry). Every return is asserted equal. A test
+/// about rest names `Reception::Rest` through [`lockstep_receiving`].
 fn lockstep(
     field: &Field,
     cut: &Cut,
@@ -329,7 +331,7 @@ fn lockstep(
         windows,
         constitution,
         release_every,
-        Reception::Rest,
+        Reference::campaign_one().reception(),
     )
 }
 
@@ -478,7 +480,11 @@ fn lockstep_receiving(
                 {
                     compared.landmarks += reading.landmarks;
                     compared.stepped_loci += reading.steps.len() as u64;
-                    for prior in reading.charts.iter().filter_map(|(_, chart)| chart.prior.as_ref()) {
+                    for prior in reading
+                        .charts
+                        .iter()
+                        .filter_map(|(_, chart)| chart.prior.as_ref())
+                    {
                         compared.prior_reads += 1;
                         compared.prior_moves += u64::from(prior.to != prior.from);
                     }
@@ -673,8 +679,7 @@ fn the_card_port_returns_the_reference_on_the_chain() {
 fn the_card_port_returns_the_reference_across_a_moved_receiving_prior() {
     let declared = |population: u64| {
         let mut declaration = chain_declaration(population);
-        declaration.receivers[0].receiving_prior =
-            holonics::hnn::field::ReceivingPrior::Located { from: 6 };
+        declaration.receivers[0].receiving_prior = 6;
         Field::declare(declaration.by_lattice_rule()).unwrap()
     };
     let field = declared(declared(1 << 20).capacity().n_star() as u64);
@@ -1017,6 +1022,87 @@ fn receive<'c>(
             device.ingest(d, Some(&moment), &one_hot(span)),
         );
     }
+}
+
+/// **The card holds a contact's rate past a word's width as the reference does** (the deposit
+/// record §3; `ReceptionCarry::crossed`, `held_rate`, the card's `HeldRow`): on the carry chain
+/// under `Carry(Nothing)`, three receptions run in lockstep and their carry is saved as text; every
+/// contact's storage factor is then moved to the banded `c′ = (255 I + B)/128` (`B` the unit band
+/// beside the diagonal, on the channel's lattice), so the held rate `C′⁻¹ C w` carries
+/// denominators from `det(C′)` and its jump `δ·2^(L_w) = n/d` passes a signed 64-bit word; both
+/// ports mount the saved carry beside it (`mount_carried`) and receive three more windows. Every
+/// return is the reference's and the carried end byte-identical: the card carries the host's split
+/// of the held rate (the coordinate's jump and the remainder's integer part, the fraction read back
+/// by the host), so no width of `n` or `d` enters.
+#[test]
+#[ignore = "needs the CUDA card; run alone with --include-ignored --test-threads=1"]
+fn the_card_holds_a_rate_past_a_words_width_as_the_reference() {
+    let (field, cut) = carry_chain();
+    let carry = Reception::Carry(Absorption::Nothing);
+    let card = card();
+    let host = Reference::campaign_one().with_reception(carry);
+    let device = Resident::campaign_one(&card).with_reception(carry);
+    let current = Current::at_rest(&field);
+    let mut h = host.mount(&field, &current).unwrap();
+    let mut d = device.mount(&field, &current).unwrap();
+    receive(&host, &device, &mut h, &mut d, &cut.cells, 0, 3);
+    let saved = carry_text(h.carried()).expect("the compare writes the carry");
+    let mut lines = saved.lines();
+    let head = lines.next().unwrap();
+    let restored = ReceptionCarry::read(head, &mut |what| {
+        lines.next().ok_or(HnnError::ContinuingState { what })
+    })
+    .unwrap();
+    let mut moved = h.constitution().clone();
+    for contact in 0..field.contacts().len() {
+        let n = field.contact(contact).width();
+        let factor = ExactRatMatrix::shaped(
+            n,
+            n,
+            (0..n)
+                .map(|i| {
+                    (0..n)
+                        .map(|j| match i.abs_diff(j) {
+                            0 => rat(255, 128),
+                            1 => rat(1, 128),
+                            _ => Rat::zero(),
+                        })
+                        .collect()
+                })
+                .collect(),
+        )
+        .unwrap();
+        let theta = moved.clone();
+        moved = moved
+            .with_channel(
+                contact,
+                factor,
+                theta.contact_stiffness(contact).clone(),
+                theta.contact_dissipation(contact).clone(),
+            )
+            .unwrap();
+    }
+    // The first opening's held rate: its jump at `L_w` passes a signed 64-bit word.
+    let lw = field.word_lattice().unwrap().transient_exponent();
+    let form = holonics::hnn::word::PowerForm::read(&field, &moved, &current).unwrap();
+    let opened = form.opening(&field, &restored).unwrap();
+    let widest = opened
+        .states
+        .iter()
+        .zip(&restored.change.states)
+        .flat_map(|(after, before)| after[1].iter().zip(&before[1]))
+        .map(|(after, before)| (after - before) * Rat::from_integer(BigInt::one() << lw as usize))
+        .map(|jump| jump.numer().bits().max(jump.denom().bits()))
+        .max()
+        .unwrap();
+    assert!(widest > 63, "a held rate's jump past a word: {widest} bits");
+    let mut h = host
+        .mount_carried(&field, &current, moved.clone(), restored.clone())
+        .unwrap();
+    let mut d = device
+        .mount_carried(&field, &current, moved, restored)
+        .unwrap();
+    receive(&host, &device, &mut h, &mut d, &cut.cells, 6, 3);
 }
 
 /// At complete absorption (`Carry(Complete)`) the carry is the rest change at the field's elapsed

@@ -51,13 +51,25 @@ fn integer(value: i64) -> Rat {
     Rat::from_integer(BigInt::from(value))
 }
 
-/// A remainder carried over a denominator (a crossed wave's or a held rate's, the reception carry;
+/// A remainder carried over a denominator (a crossed wave's, the reception carry;
 /// `1` at rest): its coordinate's value divided by it.
 fn over(value: Rat, denominator: i64) -> Rat {
     if denominator == 1 {
         value
     } else {
         value / Rat::from_integer(BigInt::from(denominator))
+    }
+}
+
+/// A held rate's remainder (the reception carry, `crate::hnn::execute::HeldRow`): the integer part
+/// the card carried at `2^(−σ)` and the fixed fraction the host split off at the open, at the same
+/// scale.
+fn fractional(value: Rat, fraction: Option<&Rat>, exponent: u32) -> Rat {
+    match fraction {
+        Some(fraction) if !fraction.is_zero() => {
+            value + fraction / Rat::from_integer(BigInt::from(1) << exponent as usize)
+        }
+        _ => value,
     }
 }
 
@@ -447,9 +459,10 @@ fn resonator_balance(
             BigInt::from(record.resonator_remainders[1][row]),
             plan.lw,
         ));
-        released.push(over(
+        released.push(fractional(
             rat(BigInt::from(record.resonator_remainders[2][row]), plan.lw),
-            plan.velocity_over(row),
+            plan.velocity_fraction(row),
+            plan.lw,
         ));
     }
     // The state the word opened on, measured at the phase before its first hop.
@@ -890,9 +903,10 @@ pub(crate) fn released(
             let q = contact.rows + i;
             remainders.push(rat(BigInt::from(record.rem_solve[q]), solve));
             remainders.push(rat(BigInt::from(record.rem_disp[q]), disp));
-            remainders.push(over(
+            remainders.push(fractional(
                 rat(BigInt::from(record.rem_rate[q]), rate),
-                plan.rate_over(q),
+                plan.rate_fraction(q),
+                rate,
             ));
         }
         let widths = [
