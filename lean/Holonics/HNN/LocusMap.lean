@@ -74,7 +74,8 @@ is supported on them.
   runs at the pump's phase: `HNN/CarriedStanding`'s second model limit), `SourcePort(g)` (it enters
   the moment, not the tick), `Standing(g)` (it enters only through the sheet classes `σ`, and the
   Rust keeps it when the element of `g` or of a neighbour is kept) and `ReceivingMap(g)` (never
-  released). Their retention rules are stated in the Rust only.
+  released). `HNN/LoadedRing` states the resonator's operand and rule, and `HNN/RingLoci` the
+  other three as loci with their rules.
 * The standing law over the concrete resident is not here. The concrete loci are shared by
   several edges (a junction by every edge out of its ring, a channel by every edge among its
   blocks); `HNN/TickStanding` states the standing law on shared loci, and `HNN/MediumStanding` is
