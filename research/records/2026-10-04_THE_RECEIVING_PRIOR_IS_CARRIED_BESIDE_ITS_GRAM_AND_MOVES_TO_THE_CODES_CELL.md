@@ -358,3 +358,74 @@ The moves under the carry, in order:
 The runs of one member per read are the climb of §7: those readings keep `V + a ≤ 0`, so no member
 codes least. A climb stops when new readings lift `V + a` above zero, or at the carrier hold.
 
+
+## 9. The U6 states and the receiving map, with the carry and the located prior both the default
+
+[measured-diagnostic; October 4, on `24d1fd3e`; bounded host reads on the cloud host] The standing
+finding is that U6 states have a zero receiving map (the refit-ingredients record §7; the record
+[The receiving map opens at zero](2026-10-02_THE_RECEIVING_MAP_OPENS_AT_ZERO_AND_THE_SOURCE_MAP_REACHES_THE_CONTACT_ONLY_AS_MOTION.md)
+§1). It still holds, and neither default changes it. The link that holds `R` at zero is the
+comparison. The saved-state link no longer zeroes `R`: since `aaf2bd43` it refuses every U6 state.
+
+**The comparison holds `R` at `R₀ = 0`, by the deposition law.** Step 1's chain runs
+`hnn::executed` over the bank's release and `ReceivingBank`, and its move is
+`Constitution::stepped_source`, which writes `rings[ring].source` and the source port's clock and
+nothing else. The bank reads the receiving ring's storage through its members' turn
+`ρ(M_m(z))`; `R` is not on that forward path, so no covector of the chain reaches it, and
+deposition changes only a locus a covector reached. The carry and the located prior are laws of
+the reference port's reception and of a deposit at `LinearLocus::Receiving`. The chain runs
+neither: it never runs `Word`, the reception or a receiving deposit (THE_REBUILD, the
+consolidation inventory). Even a prior move would leave `R` at zero: the move deposits
+`(x − 1)(W + r)`, and `W + r = 0` there, so `x(W + r) = 0`.
+
+**The saved state no longer mounts.** Before `aaf2bd43`, `continuing_state` refused any clock
+other than the source port's, so a U6 state certified every other locus unmoved, and `continued`
+left `R` at the opening's founding: zero by construction. Since `aaf2bd43` the state's text
+carries `chart exponent certificate scale`, a `located` line and a `receiving` section. All 21
+files under `research/runs/u6/states/` are listed in the manifest of earlier states and carry
+none of these, so the stamp passes them and `ContinuingState::from_text` refuses them. Read with
+the notebook's own mount, `m6` and `w16` are refused with "the continuing state refused: the
+chart's scale". No U6 state can be read at `24d1fd3e`, nor on main since #319.
+
+An exact conversion exists, because the earlier writer certified what it left out:
+- the source law's chart at scale `0`, with `located none` (`from_text` requires both of the
+  source law);
+- `receiving 1` with the declared receiver's law at its founding, clock `0`.
+
+Whether the states are rewritten once in the current layout or retired belongs to the U6
+consolidation. Extending the stamp into a layout decoder would be a legacy decoder.
+
+**Where `R` first moves: the receiver's own comparison, from the U6 opening.** The exposure
+protocol (`Reference::campaign_one()`, the carry, founded at `k = 0`) was mounted on the U6
+opening (`founded_opening`, where every U6 state's `R` stands) and read deposit by deposit:
+- **Window 1.** Nothing steps. No source has entered yet, so no reading reaches `R`.
+- **Window 2.** `R` alone steps, at `2^(−2)`, and 872 of its `10·120 = 2^4·3·5^2` entries become
+  nonzero. The prior is read once and held as `NoCurvature`: the pair reads `δ = W z` at the map
+  before the deposit, which is zero, so both terms are zero.
+- **Window 3.** This is the first reading of `R₁`. Fifteen loci step: both elements, both
+  channels, the source port and the standing, beside `R`. This is §5 of the opening-at-zero
+  record: every covector into the passage is `Rᵀg`. The pair now has terms and the prior moves
+  `0 → 1`.
+- **Windows 4 and 5.** The prior moves `1 → 2 → 3`, one member per read. After each move
+  `V + a < 0` (`ln 2 < 7/10` bounds it), so this is §7's climb: no member codes least.
+
+So the first nonzero `R` is window 2's deposit, and the first reading that sees it is window 3's
+compare. The six-window exposure's curve gives the same: no step at commit 1, `R` alone at
+commit 2, and from commit 3 on the elements, channels, source port and standing beside `R`.
+
+**What it changes for step 1's chain.** The chain itself is unchanged: `R` is outside its path,
+so the zero map is not step 1's blocker. Step 1's blocker remains the native move's path to a
+representation. What `R = 0` bars is a read of a bank-chain state through `R`: `word-read`, and
+§6's contact-path read. The carry's repair reaches step 1 only if its chain deposits through the
+receiver's own comparison. Then `R` forms at the second window, and the native contact return
+deposits on `C`, `E` and the standing from the third. That route is the exposure protocol, the
+gate the refit-ingredients record §7 restated. On the existing U6 states this cannot be read
+until they mount again.
+
+Receipts (a scratch notebook command, not committed; debug build):
+- the one-window read with the two mounts: measured 43,473 ms;
+- the six-window exposure: projected at most six windows at the one-window read's 41 s each,
+  deadline 400 s, measured 57,023 ms;
+- the five-window deposit read: deadline 300 s, measured 50,582 ms.
+
+Peak resident sets were not read.
