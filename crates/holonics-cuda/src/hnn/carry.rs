@@ -19,9 +19,13 @@
 //! held at momentum, `w′ = w + δ`. The jump `δ` is the commit's solve `C′δ = π − C′w` (the particular
 //! point of the reduced solve), read from the host owner `ReceptionCarry::crossed` against the
 //! publication's storage forms, since the card's words carry no exact preimage solve
-//! (agent-inferred). Both leave the dyadics in general, so the card splits them onto `L_w` over
-//! their denominators and carries those remainders through every later split of the word
-//! ([`crate::hnn::execute::CarryPlan`]).
+//! (agent-inferred). Both leave the dyadics in general. The card splits a crossed wave onto `L_w`
+//! over the gain's denominator and carries that remainder through every later split of the word.
+//! A held rate it receives as the host splits it at the open (`held_row`): the coordinate's jump,
+//! the remainder's integer part at the stage's scale, and that remainder's fixed fraction, which
+//! no later split changes (`kernels/hnn_word.cuh`, `hnn_split_held`); so no width of `δ`'s
+//! numerator or denominator enters, and the card refuses only a coordinate or integer part past
+//! its state word ([`crate::hnn::execute::HeldRow`]).
 //!
 //! [definition; record B §2.4] **The carry is the last crossing, and the pump continues.** A
 //! word ends between its last crossing `T = opened_at + steps − 1` and hop `T`, so the carry is the
@@ -29,14 +33,14 @@
 //! resonator state as hop `T − 1` left it, at tick `T`. The next word's hops read `T + step`, and
 //! each loaded ring's pump phase is that tick's (`WordPlan::opened_at`). A carried resonator's rate
 //! is held at its momentum `C_r w_r` across the deposit and split onto `L_w` at the open, its
-//! remainder carried in the velocity's split over its denominator, as a contact's rate is. A carried
+//! remainder carried in the velocity's split as a contact's rate's is (`held_row` at `L_w`). A carried
 //! change off the transients' lattice, or past the signed 64-bit word, is refused at its restore.
 
 use std::collections::BTreeSet;
 use std::rc::Rc;
 
 use holonics::hnn::reference::carry_bits;
-use holonics::hnn::{Absorption, Field, HnnError, Locus, ReceptionCarry, WordOpening};
+use holonics::hnn::{Absorption, Field, HnnError, Lattice, Locus, ReceptionCarry, WordOpening};
 use holonics::ratio::Rat;
 use holonics::ratio::linear::ExactRatMatrix;
 use num_bigint::BigInt;
@@ -45,7 +49,7 @@ use num_traits::{ToPrimitive, Zero};
 use crate::hnn::DeviceError;
 use crate::hnn::card::{Card, CardBuffer};
 use crate::hnn::dyadic::{coordinate, refused};
-use crate::hnn::execute::{CarryPlan, ResidentWord, WordPlan};
+use crate::hnn::execute::{CarryPlan, HeldRow, ResidentWord, WordPlan};
 use crate::hnn::publication::Loci;
 use crate::hnn::readout;
 
@@ -302,40 +306,69 @@ impl<'c> CardOpening<'c> {
                 )
             })
             .collect::<Result<Vec<_>, HnnError>>()?;
-        let unit = Rat::from_integer(BigInt::from(1) << plan.lw as usize);
-        let mut jumps = Vec::with_capacity(plan.k);
-        for ([_, carried], [_, held]) in host.change.states.iter().zip(&crossed.states) {
-            for (w, held) in carried.iter().zip(held) {
-                jumps.push(reduced(
-                    &((held - w) * &unit),
-                    "a held rate's jump past the word",
-                )?);
+        let mut held = Vec::with_capacity(plan.k);
+        for ((contact, [_, carried]), [_, rate]) in plan
+            .contacts
+            .iter()
+            .zip(&host.change.states)
+            .zip(&crossed.states)
+        {
+            for (w, rate) in carried.iter().zip(rate) {
+                held.push(held_row(w, rate, plan.lw, contact.gain_exp)?);
             }
         }
-        let mut resonator_jumps = vec![(0, 1); plan.n];
-        for ((ring, carried), held) in plan
+        let mut resonator_held = vec![HeldRow::still(); plan.n];
+        for ((ring, carried), crossed) in plan
             .rings
             .iter()
             .zip(&host.change.resonators)
             .zip(&crossed.resonators)
         {
-            let (Some([_, carried]), Some([_, held])) = (carried, held) else {
+            let (Some([_, carried]), Some([_, rate])) = (carried, crossed) else {
                 continue;
             };
-            for (i, (w, held)) in carried.iter().zip(held).enumerate() {
-                resonator_jumps[ring.rows + i] = reduced(
-                    &((held - w) * &unit),
-                    "a held resonator rate's jump past the word",
-                )?;
+            for (i, (w, rate)) in carried.iter().zip(rate).enumerate() {
+                resonator_held[ring.rows + i] = held_row(w, rate, plan.lw, 0)?;
             }
         }
         Ok((
             plan.with_carry(CarryPlan {
                 gains,
-                jumps,
-                resonator_jumps,
+                held,
+                resonator_held,
             })?,
             Some(words),
         ))
     }
+}
+
+/// [definition; the deposit record §3, record B §2.4] **A rate held at momentum, as the card
+/// carries it** ([`HeldRow`]): the carried coordinate `w` (on `2^(−L_w)ℤ`) and the held rate `w′`
+/// from the host owner, split as the host's open splits it (`Lattice::div_rem`, ties upward):
+/// `w′ = W′·2^(−L_w) + r₀`. The card takes the coordinate's jump `W′ − W` and, at the stage's scale
+/// `2^(L_w + k)`, the remainder's integer part `⌊r₀·2^(L_w + k)⌋` with its fixed fraction. Refused
+/// only where the coordinate or that integer part passes the signed 64-bit word, the card's bound on
+/// every state it carries.
+fn held_row(carried: &Rat, held: &Rat, lw: u32, shift: u32) -> Result<HeldRow, HnnError> {
+    let past = || refused("a held rate's lattice coordinate past the word");
+    let before = coordinate(carried, lw).ok_or_else(past)?;
+    let (after, rest) = Lattice::new(lw).div_rem(held);
+    let jump = (after - before).to_i64().ok_or_else(past)?;
+    let scaled = rest * Rat::from_integer(BigInt::from(1) << (lw + shift) as usize);
+    let whole = scaled.floor();
+    let fraction = &scaled - &whole;
+    let half = Rat::new(BigInt::from(1), BigInt::from(2));
+    let class = if fraction.is_zero() {
+        0
+    } else if fraction < half {
+        1
+    } else {
+        2
+    };
+    Ok(HeldRow {
+        jump,
+        remainder: whole.to_integer().to_i64().ok_or_else(past)?,
+        class,
+        fraction,
+    })
 }

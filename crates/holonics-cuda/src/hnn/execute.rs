@@ -248,16 +248,44 @@ pub(crate) struct WordPlan {
 
 /// [definition; record B §2.3a, §2.4, the deposit record §3] **A carried opening's plan** (the
 /// kernels' `WP_CARRY` table): per contact the transmitted gain `2G/(G + G′)` as a reduced
-/// `(numerator, denominator)`, `(1, 1)` where the lift left the conductance; per contact row the
-/// held rate's jump `δ·2^(L_w)` as a reduced `(n, d)`; and per ring row a carried resonator's held
-/// rate's jump the same way, `(0, 1)` where nothing moved. The denominators are the arrivals', the
-/// rates' and the resonator velocities' remainders' for the whole word ([`WordPlan::arrival_over`],
-/// [`WordPlan::rate_over`], [`WordPlan::velocity_over`]).
+/// `(numerator, denominator)`, `(1, 1)` where the lift left the conductance, whose denominator the
+/// arrivals' remainders carry for the whole word ([`WordPlan::arrival_over`]); per contact row and
+/// per ring row (a carried resonator's velocity) the rate held at momentum as the host splits it
+/// at the open ([`HeldRow`]).
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub(crate) struct CarryPlan {
     pub(crate) gains: Vec<(i64, i64)>,
-    pub(crate) jumps: Vec<(i64, i64)>,
-    pub(crate) resonator_jumps: Vec<(i64, i64)>,
+    pub(crate) held: Vec<HeldRow>,
+    pub(crate) resonator_held: Vec<HeldRow>,
+}
+
+/// [definition; the deposit record §3, record B §2.4] **A rate held at momentum, as the card
+/// carries it**: the host splits `w′ = w + δ` at the open (`Lattice::div_rem`), so the card needs
+/// only the lattice coordinate's jump `W′ − W`, and the remainder at the stage's scale `2^(L_w + k)`
+/// as an integer part `remainder` and a fixed fraction `0 ≤ fraction < 1` (`class`: `0` none, `1`
+/// below a half, `2` at least a half). Every later split adds an integer image and takes an integer
+/// multiple of `2^k`, so the fraction is the same at every split of the word and the card carries
+/// only the integer part (`kernels/hnn_word.cuh`, `hnn_split_held`); the host adds the fraction back
+/// when it reads the remainder. The widths of `δ`'s numerator and denominator never enter: the
+/// card's bound is its state word's, the coordinate and the integer part each a signed 64-bit word.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub(crate) struct HeldRow {
+    pub(crate) jump: i64,
+    pub(crate) remainder: i64,
+    pub(crate) class: i64,
+    pub(crate) fraction: Rat,
+}
+
+impl HeldRow {
+    /// A rate the deposit left where it was.
+    pub(crate) fn still() -> Self {
+        Self {
+            jump: 0,
+            remainder: 0,
+            class: 0,
+            fraction: Rat::from_integer(BigInt::from(0)),
+        }
+    }
 }
 
 /// The executed junction weights, their certificate and the admittance sum of one ring at the
@@ -1532,27 +1560,20 @@ impl WordPlan {
     /// row, every denominator positive.
     pub(crate) fn with_carry(mut self, carry: CarryPlan) -> Result<Self, HnnError> {
         let shaped = carry.gains.len() == self.contacts.len()
-            && carry.jumps.len() == self.k
-            && carry.resonator_jumps.len() == self.n
-            && carry
-                .gains
-                .iter()
-                .chain(&carry.jumps)
-                .chain(&carry.resonator_jumps)
-                .all(|&(_, d)| d > 0);
+            && carry.held.len() == self.k
+            && carry.resonator_held.len() == self.n
+            && carry.gains.iter().all(|&(_, d)| d > 0);
         if !shaped {
             return Err(refused(
-                "a carry table of one gain per contact and one jump per row",
+                "a carry table of one gain per contact and one held rate per row",
             ));
         }
         self.plan[WP_CARRY] = self.plan.len() as i64;
-        for &(numerator, denominator) in carry
-            .gains
-            .iter()
-            .chain(&carry.jumps)
-            .chain(&carry.resonator_jumps)
-        {
+        for &(numerator, denominator) in &carry.gains {
             self.plan.extend([numerator, denominator]);
+        }
+        for row in carry.held.iter().chain(&carry.resonator_held) {
+            self.plan.extend([row.jump, row.remainder, row.class]);
         }
         self.carry = Some(carry);
         Ok(self)
@@ -1566,12 +1587,12 @@ impl WordPlan {
         self
     }
 
-    /// The denominator ring row `e`'s resonator velocity remainder carries over (its held rate's
-    /// jump's), `1` at rest.
-    pub(crate) fn velocity_over(&self, e: usize) -> i64 {
+    /// The fixed fraction of ring row `e`'s resonator velocity remainder at `L_w` ([`HeldRow`]),
+    /// zero at rest.
+    pub(crate) fn velocity_fraction(&self, e: usize) -> Option<&Rat> {
         self.carry
             .as_ref()
-            .map_or(1, |carry| carry.resonator_jumps[e].1)
+            .map(|carry| &carry.resonator_held[e].fraction)
     }
 
     /// The denominator contact `a`'s arrival remainders carry over (its crossed wave's gain's),
@@ -1580,10 +1601,10 @@ impl WordPlan {
         self.carry.as_ref().map_or(1, |carry| carry.gains[a].1)
     }
 
-    /// The denominator contact row `q`'s rate remainder carries over (its held rate's jump's),
-    /// `1` at rest.
-    pub(crate) fn rate_over(&self, q: usize) -> i64 {
-        self.carry.as_ref().map_or(1, |carry| carry.jumps[q].1)
+    /// The fixed fraction of contact row `q`'s rate remainder at its scale ([`HeldRow`]), zero at
+    /// rest.
+    pub(crate) fn rate_fraction(&self, q: usize) -> Option<&Rat> {
+        self.carry.as_ref().map(|carry| &carry.held[q].fraction)
     }
 
     /// The contact's remainder scales `(solve, arrival, displacement, rate)` and its `ω` scale.
