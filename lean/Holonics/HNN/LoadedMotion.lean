@@ -36,8 +36,8 @@ operands applied to its state, so releasing its operands (`resRelease`) and zero
    continuing rule keeps whenever the ring's self-edge is on a walk
    (`LocusMap.retained_of_reads`).
 
-[open] The resonator's momentum held across a deposit is `HNN/HeldCommits` and the reception
-carry's `cross` in `HNN/LoadedMedium`, a parameter; joining it here is owed in #62.
+The resonator's momentum held across a deposit is `HNN/LoadedMedium`'s held crossing
+(`heldCross_momentum`).
 
 No `sorry`, no `axiom`, no `native_decide`.
 -/
