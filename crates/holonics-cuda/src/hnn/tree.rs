@@ -319,19 +319,14 @@ impl<'c> CardTree<'c> {
     /// a passage of the declared population founds (`2B` nodes and `D_b` letters a branch a cell,
     /// the compacted tree's bound), plus `window` cells an epoch's overlay and a re-read found past
     /// it; the child table at twice the nodes, a power of two. Refused at a branch deeper than the
-    /// kernels' paths, at widths past the kernel's single-division operands
-    /// (`Widths::single_division_admitted`), or at a split whose integers pass 512 bits
+    /// kernels' paths, or at a split whose integers pass 512 bits
     /// (`5W + 3S + 5`, `S` a branch's summed rung to its depth).
     pub fn mirror(card: &'c Card, tree: &Landmarks, window: usize) -> Result<Self, DeviceError> {
         let declaration = tree.declaration().clone();
+        // The kernel mixes with the host's split operands (`tree_mix`, `context::lattice_mix`) and
+        // decides the stop weight before any division, so every width the host's tree admits
+        // (`Landmarks::new`, its products within `u128`) runs on the card: the wide cut included.
         let widths: Widths = tree.widths();
-        // The kernel mixes and weighs by single divisions: widths past their `u128` operands
-        // (the host's split operands declare wider trees, the wide cut) are refused here.
-        if !widths.single_division_admitted(declaration.population) {
-            return Err(launch_error(
-                "widths whose single-division operands fit u128 (2M + κ + 3 and 2W + M + 3 bits)",
-            ));
-        }
         let depths = declaration.branch_depths();
         if depths.iter().any(|&depth| depth + 1 > MAX_DEPTH) || depths.len() > 2 {
             return Err(launch_error(
