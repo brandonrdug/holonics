@@ -905,9 +905,21 @@ is at the diamond, not at the step:
   six-ring path the rest collapse releases 72 of 156 entries and the carried one releases none
   (`tests/retention.rs`,
   `under_the_carry_the_diamond_opens_on_the_motion_and_the_collapse_keeps_every_connected_locus`).
-- Owed in #62: the seeded reach recursion and `deposit_descends` over a word opened on a nonzero
-  change (`HNN/Retention` proves both for a change zero off the sources), and the walk-closed
-  collapse's `release_indistinguishable` over the chain.
+- Lean (`HNN/Retention` §4a–4b, #309). The opened word reads and deposits the same through the
+  collapse seeded at `𝒮 ∪ S′` (`opened_release_indistinguishable`, `opened_deposit_descends`), with
+  its windows read from the recursions seeded there (`windowTicks_recursion`). The rest diamond
+  drops the carried motion on every edge it releases (`rest_diamond_drops_opened`). Over a chain at
+  `A = 0`, releasing the off-walk loci changes no admitted reading of any later word
+  (`continuing_release_indistinguishable`), and releasing a walk edge changes one at the 0/1
+  constitution (`continuing_walk_edge_is_read`). So the continuing collapse releases exactly the
+  off-walk loci: retention's bound under the default is the field's walk diamond. That diamond is
+  the diamond at `e_last = 2|B|`, decided in `|B|` rounds (`inDiamond_continuing_iff`,
+  `continuing_recursion`), and a connected field releases nothing (`continuing_collapse_connected`).
+  These are proved at a fixed constitution over the chain, on the abstract `BlockOp`. The standing
+  law over a resident that holds the carried change, with deposits between the words, and the locus
+  map from the medium's operands to the block edges of the concrete tick stay owed (#62);
+  `HNN/TickBlocks` proves `HNN/Word.fieldTick` a sparse `BlockOp`. Material that falls below the
+  lattice grain is a value-level release, not this collapse.
 
 **What the card's default must change.** `holonics_cuda::hnn::port::Resident::new` opens at
 `Reception::Carry(Absorption::Nothing)`, as `Reference::new` does. The card already realizes the

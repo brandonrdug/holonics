@@ -78,6 +78,8 @@
 //! | `release_indistinguishable`, `Propagation.release_past_diamond` | [`collapse`] |
 //! | `deposit_descends`, `windowTicks_eq_nil`, `depositData_eq_nil` | [`Diamond::element_window`], [`Diamond::channel_window`] |
 //! | `release_structural` | [`collapse`] (on sparsity) |
+//! | `windowTicks_recursion`, `opened_release_indistinguishable`, `opened_deposit_descends`, `rest_diamond_drops_opened` | [`Diamond::opened`] |
+//! | `inDiamond_continuing_iff`, `continuing_recursion`, `reachWithin_card`, `continuing_release_indistinguishable`, `continuing_walk_edge_is_read`, `continuing_collapse_connected` | [`Diamond::continuing`], [`Opens::OnMotion`] |
 //! | `admitted_nonincreasing`, `admitted_growth_reads_released` | [`contained`] |
 //! | `local_retention_blocks`, `constitution_descends` | [`Constitution::release`](crate::hnn::Constitution) |
 //! | `HNN/LatticeDeposit.lattice_deposit_descends` (the budgeted carry, `carry_zero`) | [`collapse`] |
@@ -86,12 +88,13 @@
 //!
 //! [definition] **What the Lean covers.** `release_indistinguishable`, `release_past_diamond`,
 //! `deposit_descends`, `release_structural` and `admitted_nonincreasing` are proved for an abstract
-//! time-invariant sparse linear block operator (`HNN/Propagation`'s `BlockOp`), not yet for the
-//! concrete tick `HNN/Word.fieldTick`, which has its balance, locality and cone
-//! (`fieldTick_balance`, `fieldTick_local`, `word_tick_cone`). The bridge (`fieldTick` linear in
-//! the change at fixed operands, as a `BlockOp` on rings and contacts with `blockAdj` sparsity) is
-//! owed in #62, "Step 4 (#73) owed: the diamond on the concrete tick". The Rust tests check these
-//! laws on the concrete word (`tests/retention.rs`).
+//! time-invariant sparse linear block operator (`HNN/Propagation`'s `BlockOp`). `HNN/TickBlocks`
+//! proves the concrete tick `HNN/Word.fieldTick` linear in the change at fixed operands and the
+//! tick of a `BlockOp` on rings and contacts that is sparse on `blockAdj` (`fieldTick_comb`,
+//! `blockOp_sparse`, `fieldTick_iterate_blocks`). The locus map from the medium's operands to the
+//! block edges, which the laws stated on an operand family need on the concrete medium, is owed in
+//! #62, "Step 4 (#73) owed: the diamond on the concrete tick". The Rust tests check these laws on
+//! the concrete word (`tests/retention.rs`).
 
 use std::collections::BTreeSet;
 
