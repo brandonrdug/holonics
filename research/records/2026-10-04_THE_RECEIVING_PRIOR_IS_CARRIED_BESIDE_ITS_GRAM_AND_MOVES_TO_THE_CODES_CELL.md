@@ -243,7 +243,16 @@ The Rust follows §§2–6, with these additions, each decided from the law:
   chart and pair are the reference's, and the lockstep compares the published constitutions after
   every deposit. The normal-law mirror re-steps a fixed `2^k` on its kernel, so it skips a deposit
   whose prior moved and counts it (`NormalMirror::moved`). The card test is
-  `the_card_port_returns_the_reference_across_a_moved_receiving_prior`.
+  `the_card_port_returns_the_reference_across_a_moved_receiving_prior`, at the production
+  reception (the carry).
+- **At rest a map that never leaves zero locates nothing.** On the card's chain and cut at rest,
+  every deposit's move of the receiving map stays below the map's lattice grain at the prior `2^6`
+  and is carried as the map's remainder. The map in force reads zero at every window, so the code
+  along `φ W` is the same at every member, `S = 0`, and all 33 reads hold `k` for want of curvature.
+  No member is distinguishable by those readings, so holding is the law. Under the carry the
+  carried motion reaches the map, it leaves zero, and the same cut moves the prior 22 times in 33
+  reads (`at_rest_the_cards_chain_holds_its_prior_and_under_the_carry_it_moves`). The card test's
+  first run, at rest, read 33 times and moved none, as the law says.
 
 The owed Lean (§2's at-map `carried_eq_sum`, and §3's `q(y/2) < q(y)` at `V + a ≤ 0` and
 `q(2y) ≤ q(y)` at `2y ≤ x`) is filed on #62.

@@ -334,35 +334,24 @@ fn a_saved_state_restores_across_a_move() {
     ));
 }
 
-/// **The located prior on the port** (§6, the exposure): the chain at its capacity with its
-/// receiver's prior located from `2^6`, exposed window by window through the reference port. Every
-/// deposit whose covector reached the receiving map reads the pair once there (a deposit that
-/// stepped only the source port, or nothing, reads none: its terms never reached the map), and the
-/// exposure moves `k` off its founding; the last receiving law still says where its prior was
-/// founded. The card's lockstep (`holonics_cuda::hnn::port_tests`) runs the same chain against this
-/// reference.
-#[test]
-fn an_exposed_located_chain_reads_its_pair_where_the_map_is_stepped_and_moves_its_prior() {
-    use super::support::Draw;
+/// **A located chain exposed window by window through the reference port** at `reception`, from
+/// its declared opening over `cells`: the published deposits, every read of the prior (each at the
+/// receiving map), and the resident's last receiving law.
+fn exposed(
+    field: &Field,
+    cells: &[usize],
+    reception: crate::hnn::reference::Reception,
+) -> (u64, Vec<crate::hnn::constitution::PriorMove>, NormalLaw) {
     use crate::hnn::field::Current;
     use crate::hnn::port::{ExecutionPort, Handle};
     use crate::hnn::reference::{Reference, one_hot};
 
-    let located = ReceivingPrior::Located { from: 6 };
-    let declared = |population: u64| {
-        let mut declaration = chain_declaration(population);
-        declaration.receivers[0].receiving_prior = located;
-        Field::declare(declaration.by_lattice_rule()).unwrap()
-    };
-    let field = declared(declared(1 << 20).capacity().n_star() as u64);
-    let reference = Reference::campaign_one();
-    let mut resident = reference.mount(&field, &Current::at_rest(&field)).unwrap();
-    let mut draw = Draw::new(7);
-    let cells: Vec<usize> = (0..field.population()).map(|_| draw.below(4)).collect();
+    let reference = Reference::campaign_one().with_reception(reception);
+    let mut resident = reference.mount(field, &Current::at_rest(field)).unwrap();
     let phases = resident.admitted()[0].clone();
     let family = resident.admitted().to_vec();
     let (moment, _) = reference.ingest(&mut resident, None, &[]).unwrap();
-    let (mut deposits, mut reads, mut moves) = (0u64, 0u64, Vec::new());
+    let (mut deposits, mut reads) = (0u64, Vec::new());
     for span in cells.chunks(phases.aperture()) {
         if span.len() == phases.aperture() {
             let (pending, _) = reference.refine(&mut resident, &moment, &phases).unwrap();
@@ -383,10 +372,7 @@ fn an_exposed_located_chain_reads_its_pair_where_the_map_is_stepped_and_moves_it
                         continue;
                     };
                     assert_eq!(*locus, Locus::ReceivingMap(2));
-                    reads += 1;
-                    if prior.to != prior.from {
-                        moves.push(prior.clone());
-                    }
+                    reads.push(prior.clone());
                 }
             }
         }
@@ -402,10 +388,86 @@ fn an_exposed_located_chain_reads_its_pair_where_the_map_is_stepped_and_moves_it
             }
         }
     }
-    println!("{deposits} deposits, {reads} pair reads, moves {moves:?}");
-    assert!(reads > 0 && reads <= deposits);
+    let law = resident.constitution().receiving_law(2).unwrap().clone();
+    (deposits, reads, law)
+}
+
+/// The chain located from `2^6`, at its capacity, its rings placed as `place` declares.
+fn located_chain(place: impl Fn(&mut crate::hnn::field::RingDeclaration)) -> Field {
+    let declared = |population: u64| {
+        let mut declaration = chain_declaration(population);
+        declaration.receivers[0].receiving_prior = ReceivingPrior::Located { from: 6 };
+        declaration.rings.iter_mut().for_each(&place);
+        Field::declare(declaration.by_lattice_rule()).unwrap()
+    };
+    declared(declared(1 << 20).capacity().n_star() as u64)
+}
+
+/// **The located prior on the port** (§6, the exposure): the chain at its capacity with its
+/// receiver's prior located from `2^6`, exposed window by window through the reference port at the
+/// production reception (the carry). Every deposit whose covector reached the receiving map reads
+/// the pair once there (a deposit that stepped only the source port, or nothing, reads none: its
+/// terms never reached the map), and the exposure moves `k` off its founding; the last receiving
+/// law still says where its prior was founded.
+#[test]
+fn an_exposed_located_chain_reads_its_pair_where_the_map_is_stepped_and_moves_its_prior() {
+    use super::support::Draw;
+
+    let field = located_chain(|_| {});
+    let mut draw = Draw::new(7);
+    let cells: Vec<usize> = (0..field.population()).map(|_| draw.below(4)).collect();
+    let reception = crate::hnn::reference::Reference::campaign_one().reception();
+    let (deposits, reads, last) = exposed(&field, &cells, reception);
+    let moves: Vec<_> = reads.iter().filter(|read| read.to != read.from).collect();
+    println!("{deposits} deposits, {} pair reads, moves {moves:?}", reads.len());
+    assert!(!reads.is_empty() && reads.len() as u64 <= deposits);
     assert!(!moves.is_empty(), "the exposure moves the located prior");
-    let last = resident.constitution().receiving_law(2).unwrap();
-    assert_eq!(last.receiving_prior(), located);
+    assert_eq!(last.receiving_prior(), ReceivingPrior::Located { from: 6 });
     assert_eq!(last.chart().scale(), moves.last().unwrap().to);
+}
+
+/// **At rest a map that never leaves zero locates nothing** (§3, step 1), on the card's own chain
+/// (its rings placed on the quarter turns) and cut (the periodic source with one draw in eight, seed
+/// 3): the fixture of `holonics_cuda::hnn::port_tests::the_card_port_returns_the_reference_across_a_moved_receiving_prior`.
+/// At rest the deposits' moves of the receiving map stay below its lattice's grain at the prior
+/// `2^6` (each is carried as the map's remainder), so the map in force reads zero at every window:
+/// the code along `φ W` is the same at every member, `S = 0`, and every read holds `k` for want of
+/// curvature. That is the law, not a stall: no member is distinguishable by the readings. Under the
+/// production reception the carried motion reaches the map, which leaves zero, and the same cut
+/// moves the prior; so the card's test runs there.
+#[test]
+fn at_rest_the_cards_chain_holds_its_prior_and_under_the_carry_it_moves() {
+    use super::support::Draw;
+    use crate::hnn::Absorption;
+    use crate::hnn::field::FieldDeclaration;
+    use crate::hnn::reference::Reception;
+
+    let field = located_chain(|ring| {
+        let period = ring.period;
+        ring.placements = (0..period)
+            .map(|node| FieldDeclaration::quarter_turn(node, period))
+            .collect();
+    });
+    let mut draw = Draw::new(3);
+    let cells: Vec<usize> = (0..field.population() as usize)
+        .map(|k| {
+            if draw.below(8) == 0 {
+                draw.below(4)
+            } else {
+                [0, 1, 2, 1][k % 4]
+            }
+        })
+        .collect();
+    let (_, at_rest, rest_law) = exposed(&field, &cells, Reception::Rest);
+    assert!(!at_rest.is_empty());
+    assert!(
+        at_rest
+            .iter()
+            .all(|read| (read.from, read.to, read.held) == (6, 6, Some(PriorHeld::NoCurvature)))
+    );
+    assert!(rest_law.map().entries().iter().all(Zero::is_zero));
+    let (_, carried, _) = exposed(&field, &cells, Reception::Carry(Absorption::Nothing));
+    let moves = carried.iter().filter(|read| read.to != read.from).count();
+    println!("at rest {} reads, none moved; under the carry {} reads, {moves} moved", at_rest.len(), carried.len());
+    assert!(moves > 0);
 }

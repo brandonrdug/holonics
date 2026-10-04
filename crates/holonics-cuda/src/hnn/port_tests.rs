@@ -656,12 +656,18 @@ fn the_card_port_returns_the_reference_on_the_chain() {
     assert_eq!(compared.landmarks, 2 * compared.deposits);
 }
 
-/// **The located receiving prior on the card** (the receiving prior's carry; the host's
-/// `holonics::hnn::tests::prior_carry::an_exposed_located_chain_reads_its_pair_where_the_map_is_stepped_and_moves_its_prior`):
-/// the chain with its receiver's prior located from `2^6`. The card deposits through the host
+/// **The located receiving prior on the card** (the receiving prior's carry, record §7): the chain
+/// with its receiver's prior located from `2^6`, in lockstep at the production reception (the
+/// carry, `Reference::campaign_one().reception()`). The card deposits through the host
 /// constitution, so the moved Gram, map, chart and pair are the reference's (the published
 /// constitutions are compared after every deposit); the normal-law mirror skips a deposit whose
 /// prior moved, since its kernel steps a fixed `2^k`, and counts it.
+///
+/// At rest this cut cannot move the prior, by the law: the receiving map's moves stay below its
+/// lattice's grain at `2^6`, so the map in force reads zero at every window, the code along `φ W`
+/// is the same at every member and every read holds for want of curvature (the host's
+/// `holonics::hnn::tests::prior_carry::at_rest_the_cards_chain_holds_its_prior_and_under_the_carry_it_moves`,
+/// on this fixture: 33 reads at rest, none moved; 33 under the carry, 22 moved).
 #[test]
 #[ignore = "needs the CUDA card; run alone with --include-ignored --test-threads=1"]
 fn the_card_port_returns_the_reference_across_a_moved_receiving_prior() {
@@ -675,8 +681,15 @@ fn the_card_port_returns_the_reference_across_a_moved_receiving_prior() {
     let population = field.population() as usize;
     let cells = source(population, field.alphabet(), 3);
     let held = population - 8;
-    let compared = lockstep(&field, &cut_of(cells, held..population), u64::MAX, None, 3);
-    println!("chain, located prior: {compared:?}");
+    let compared = lockstep_receiving(
+        &field,
+        &cut_of(cells, held..population),
+        u64::MAX,
+        None,
+        3,
+        Reference::campaign_one().reception(),
+    );
+    println!("chain, located prior, the production reception: {compared:?}");
     assert!(compared.prior_reads > 0 && compared.prior_moves > 0);
     // A moved locus stepped twice in one deposit is counted among the repeated steps instead.
     assert!(compared.mirror.moved > 0 && compared.mirror.moved <= compared.prior_moves);
