@@ -342,11 +342,12 @@ fn the_exposure_reads_its_declared_population_and_a_past_crib() {
 /// the commit it read them at, and that compare returns exactly what a compare that reads again
 /// returns (a clone of the resident drops the kept reads). A deposit publishes a successor and
 /// drops every kept read, so a pending ratio refined before it is read again at the contemporary
-/// constitution, and returns what a fresh read returns.
+/// constitution, and returns what a fresh read returns. Two ratios pending at once exist only at
+/// the rest limit (`A = I`): under the carry one chain holds one pending ratio (record B §8).
 #[test]
 fn a_compare_returns_the_same_with_and_without_the_refines_kept_read() {
     let field = chain();
-    let reference = Reference::new(4, 1 << 40);
+    let reference = Reference::new(4, 1 << 40).with_reception(Reception::Rest);
     let mut resident = reference.mount(&field, &Current::at_rest(&field)).unwrap();
     let (moment, _) = reference
         .ingest(&mut resident, None, &one_hot(&[1, 2, 0, 3, 1]))
@@ -582,7 +583,9 @@ fn the_carry_at_complete_absorption_is_todays_reception_exactly() {
         cells: source(length, 81),
         held_out: vec![2..4, length - 4..length],
     };
-    let reference = Reference::new(64, OPEN_BUDGET).with_deadline(6);
+    let reference = Reference::new(64, OPEN_BUDGET)
+        .with_deadline(6)
+        .with_reception(Reception::Rest);
     let rest = without_wall(reference.clone().expose(&field, &cut).unwrap());
     let mut carried = without_wall(
         reference
@@ -605,7 +608,8 @@ fn the_carry_at_complete_absorption_is_todays_reception_exactly() {
     assert_eq!(carried, rest);
 }
 
-/// The reception carry §2.3 and §2.3a: under `Carry(Nothing)` the chained balance closes exactly
+/// The reception carry §2.3, §2.3a and §8: under the default reception, the carry at `A = 0`
+/// (`Carry(Nothing)`, declared nowhere in the test), the chained balance closes exactly
 /// at every reception of a prequential exposure on one baseline (the source rings' end storage
 /// subtracted once, the opening's lattice split read exactly), and the chain is dissipative with
 /// respect to its declared supply at every reception. Each carried wave crosses the lift's move of
@@ -623,11 +627,9 @@ fn the_chained_balance_closes_and_the_chain_is_dissipative() {
         cells: source(length, 81),
         held_out: vec![2..4, length - 4..length],
     };
-    let exposure = Reference::new(64, OPEN_BUDGET)
-        .with_deadline(24)
-        .with_reception(Reception::Carry(Absorption::Nothing))
-        .expose(&field, &cut)
-        .unwrap();
+    let reference = Reference::new(64, OPEN_BUDGET).with_deadline(24);
+    assert_eq!(reference.reception(), Reception::Carry(Absorption::Nothing));
+    let exposure = reference.expose(&field, &cut).unwrap();
     let chained = &exposure.word.chained;
     assert!(exposure.word.words.closed && exposure.word.closed);
     assert_eq!(chained.read, exposure.compares - 1);
@@ -776,19 +778,22 @@ fn the_carry_passes_each_receptions_end_to_the_next() {
     }
     // The carried interior moves the read once the constitution reads the receiving ring.
     assert!(moved >= 1 && position > 0);
-    // The carry mounts beside a declared constitution (§2.4), and only under a carrying reception.
+    // The carry mounts beside a declared constitution (§2.4), and only under a carrying reception:
+    // the rest limit refuses it.
     let carry = resident.carried().cloned().expect("the chain carries");
     let mounted = reference
         .mount_carried(&field, resident.current(), resident.constitution().clone(), carry.clone())
         .unwrap();
     assert_eq!(mounted.carried(), Some(&carry));
     assert!(matches!(
-        Reference::new(64, OPEN_BUDGET).mount_carried(
-            &field,
-            resident.current(),
-            resident.constitution().clone(),
-            carry
-        ),
+        Reference::new(64, OPEN_BUDGET)
+            .with_reception(Reception::Rest)
+            .mount_carried(
+                &field,
+                resident.current(),
+                resident.constitution().clone(),
+                carry
+            ),
         Err(HnnError::ContinuingState { .. })
     ));
 }

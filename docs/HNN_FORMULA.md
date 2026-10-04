@@ -795,8 +795,8 @@ flowchart LR
 
 [definition] **The step 4 word** ([the step 4 design](../research/records/2026-09-28_THE_REBUILDS_CONSTRUCTION_RECORD_STEPS_ZERO_TO_FIVE_THE_CAMPAIGNS_AND_THE_FORWARD_PLAN.md#step-4-design-the-hnn-law)).
 - **The medium.** It is `(Θ, λ)`, fixed at the cut. `Θ` holds each ring's standing `q`.
-- **The open.** The word opens at zero change and receives the source moment on the source rings'
-  storage ports.
+- **The open.** The word opens on the carried interior (zero at the first reception and at the
+  `A = I` limit) and receives the source moment on the source rings' storage ports.
 - **The tick.** The word then runs one contact hop per tick:
 
 ```text
@@ -816,15 +816,20 @@ receive   f_j = R[P_R^(τ_R) v_R(e_j)] at the receiving epochs, read at the rece
   quadrance up to the two self-energies (`HelicalPairInteraction.bilinear_score_eq_polarized_quadrance`,
   finite remainder `pairScore_add_sub`).
 - **The sheet classes** `σ` are read from the standing's contrast `Δ_r = Σ_a U_(r←a) q_a − q_r`.
-- **At the word's end** the unread change is released, and nothing is carried to the next word.
-  The standing `q` moves only by deposition. Within one refinement a continuing word opens on the
+- **At the word's end** the unread change is released within its refinement. Across receptions the
+  interior's motion carries (below). The standing `q` moves only by deposition. Within one refinement a continuing word opens on the
   change the previous word left (`Word::continuing`; its consumer, the linear readout of
   `hnn::prediction`, was retired September 30, batch H); the refinement owns its words until its
-  return (THE_MACHINE guard 16). Under a declared reception carry (October 3; the default is rest)
-  the next reception's word opens on the interior of the end change the consumed word left,
+  return (THE_MACHINE guard 16). Under the reception carry, the default since October 4 (`A = 0`;
+  rest is its `A = I` limit, the [record](../research/records/2026-10-03_THE_RECEPTION_CARRIES_THE_INTERIOR_CHANGE_THE_SOURCE_PORT_IMPOSES_THE_MOMENT_AND_REST_IS_COMPLETE_ABSORPTION.md) §8),
+  the next reception's word opens on the interior of the change arriving at the consumed word's
+  last crossing, at that crossing's tick so a declared pump continues,
   crossed into the next cut's references: each contact's arriving waves transmitted at the
-  junction's reference change, the reflection emitted, and its rate held at momentum
-  (`Word::open_received`, `ReceptionCarry::crossed`; guard 16 as amended).
+  junction's reference change, the reflection emitted, and each contact's and resonator's rate held at momentum
+  (`Word::open_received`, `ReceptionCarry::crossed`; guard 16 as amended). Such a word moves from
+  tick 0 wherever its carried interior is, so its diamond is seeded there as well as at the sources
+  (`Diamond::opened`), and the aeon's collapse keeps every locus a walk from a source to the
+  receiver passes (`Diamond::continuing`); the rest limit keeps the rest diamond.
 - **What the word lacks.** It has no global `D/b`, no softmax drive, no boundary hold `H̄` and no
   relaxation `μ`. Those belonged to the prototype's word, which is kept in history at
   [`13f8c734`](https://github.com/brandonrdug/holonics/blob/13f8c734/docs/HNN_FORMULA.md#the-incident-word).

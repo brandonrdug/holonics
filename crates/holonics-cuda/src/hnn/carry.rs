@@ -35,7 +35,7 @@
 use std::rc::Rc;
 
 use holonics::hnn::reference::carry_bits;
-use holonics::hnn::{Absorption, Field, HnnError, ReceptionCarry};
+use holonics::hnn::{Absorption, Field, HnnError, ReceptionCarry, WordOpening};
 use holonics::ratio::Rat;
 use holonics::ratio::linear::ExactRatMatrix;
 use num_bigint::BigInt;
@@ -198,6 +198,18 @@ impl<'c> CardOpening<'c> {
         match self {
             Self::Rest => 0,
             Self::Received { carry, .. } => carry_bits(&carry.host),
+        }
+    }
+
+    /// **The host opening it mirrors** (`holonics::hnn::WordOpening`), which the host's
+    /// composition reads its diamond from (the reception carry §8).
+    pub(crate) fn host(&self) -> WordOpening {
+        match self {
+            Self::Rest => WordOpening::Rest,
+            Self::Received { carry, absorption } => WordOpening::Received {
+                carry: carry.host.clone(),
+                absorption: *absorption,
+            },
         }
     }
 

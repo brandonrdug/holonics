@@ -317,7 +317,16 @@ fn the_compare_deposits_its_targets_on_their_own_addresses() {
             &phases,
         )
         .unwrap();
-    let (_, deposit) = compose(&field, &theta, &pending, &back, &targets, &scored.steps).unwrap();
+    let (_, deposit) = compose(
+        &field,
+        &theta,
+        &pending,
+        &crate::hnn::WordOpening::Rest,
+        &back,
+        &targets,
+        &scored.steps,
+    )
+    .unwrap();
     assert_eq!(deposit.receiving(), &scored.steps[..]);
     let steps = deposit.landmarks();
     assert_eq!(steps.len(), 2);

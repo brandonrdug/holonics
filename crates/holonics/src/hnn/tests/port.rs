@@ -23,7 +23,7 @@ use crate::hnn::propagation::{
 };
 use crate::hnn::ratio::{Faces, HolonRatio, RatioCovector, TargetPhases, target_phases};
 use crate::hnn::receiving::ActiveAddress;
-use crate::hnn::reference::{Reference, compose, one_hot};
+use crate::hnn::reference::{Reception, Reference, compose, one_hot};
 use crate::hnn::ring::ResonatorMaterial;
 use crate::hnn::word::Word;
 use crate::ratio::exponentiated::power_of_two;
@@ -216,7 +216,16 @@ pub(super) fn cut_at(field: Field, theta: Constitution) -> Cut {
             &phases,
         )
         .unwrap();
-    let (pullback, deposit) = compose(&field, &theta, &pending, &back, &targets, &[]).unwrap();
+    let (pullback, deposit) = compose(
+        &field,
+        &theta,
+        &pending,
+        &crate::hnn::WordOpening::Rest,
+        &back,
+        &targets,
+        &[],
+    )
+    .unwrap();
     let base = pairing(covector.logits(), &faces_logits);
     Cut {
         field,
@@ -1294,8 +1303,11 @@ fn per_ring_receipts_are_read_in_their_own_clocks() {
     assert!(refined.receipt.balances.iter().all(|b| b.closes()));
 }
 
-/// Guard 3's capacity: `refine` refuses beyond the pending capacity; `discard` frees a handle, and
-/// an unknown handle is refused.
+/// Guard 3's capacity: under the default reception (the carry, the reception carry §8) the field's
+/// one motion is in one word at a time, so a second refinement while one is pending is refused (one
+/// chain, §2.6); `discard` frees the handle, and an unknown handle is refused. The pending capacity
+/// bounds concurrent ratios at the `A = I` limit, where each word opens at rest: there `refine`
+/// refuses beyond it.
 #[test]
 fn refine_refuses_beyond_the_pending_capacity() {
     let field = chain();
@@ -1305,6 +1317,25 @@ fn refine_refuses_beyond_the_pending_capacity() {
         .ingest(&mut resident, None, &one_hot(&[1, 2]))
         .unwrap();
     let phases = resident.admitted()[0].clone();
+    let (first, _) = reference.refine(&mut resident, &moment, &phases).unwrap();
+    assert!(matches!(
+        reference.refine(&mut resident, &moment, &phases),
+        Err(HnnError::Shape { .. })
+    ));
+    reference
+        .discard(&mut resident, Handle::Pending(first))
+        .unwrap();
+    reference.refine(&mut resident, &moment, &phases).unwrap();
+    assert!(matches!(
+        reference.discard(&mut resident, Handle::Pending(first)),
+        Err(HnnError::UnknownHandle { .. })
+    ));
+    // The rest limit.
+    let reference = reference.with_reception(Reception::Rest);
+    let mut resident = reference.mount(&field, &Current::at_rest(&field)).unwrap();
+    let (moment, _) = reference
+        .ingest(&mut resident, None, &one_hot(&[1, 2]))
+        .unwrap();
     let (first, _) = reference.refine(&mut resident, &moment, &phases).unwrap();
     reference.refine(&mut resident, &moment, &phases).unwrap();
     assert_eq!(
@@ -1317,10 +1348,6 @@ fn refine_refuses_beyond_the_pending_capacity() {
         .discard(&mut resident, Handle::Pending(first))
         .unwrap();
     reference.refine(&mut resident, &moment, &phases).unwrap();
-    assert!(matches!(
-        reference.discard(&mut resident, Handle::Pending(first)),
-        Err(HnnError::UnknownHandle { .. })
-    ));
 }
 
 /// Design (c)'s handles under refusal (review S11, S12, S14): a compare refused for its target (the

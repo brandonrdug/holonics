@@ -9,7 +9,8 @@ crossing of the reception (§2.3a) is [proved-derived from its owners; implement
 reflection's release agent-inferred; the clock (§2.4: the carry stands at the last crossing and the
 pump continues from it) is [proved-derived from the owners; implemented-exact on the host], and the
 card's change is §7.
-Code follows this record. The production default stays rest.
+Code follows this record. Since October 4 the carry at `A = 0` is the production default, with
+rest as its `A = I` limit (§8, [proved-derived from the owners]).
 
 **Occasion.** The review of October 3 located that every production reception opens at rest. The
 path is `Reference::refine` (`reference.rs:1147`) → `PendingRatio::read_charted` → `open_charted`
@@ -50,7 +51,7 @@ From the [lessons record](2026-09-29_LESSONS_THE_FAILURES_THAT_REPEATED_AFTER_TH
 - **6 and 7, seen as unseen; bits as progress.** Exposure stays prequential (the corrected §7 of
   [the refit record](2026-10-02_THE_REFITS_INGREDIENTS_ABLATED_WHICH_PART_OF_THE_EXTERIOR_FIT_REACHES_THE_REPRESENTATION.md)).
   No score decides the carry: it is a declared opening whose laws are derived and checked exactly
-  (§2.3, §4), and the production default stays rest.
+  (§2.3, §4). The default changed to it by derivation (§8), not by a score.
 - **The retention law (no tape).** The adjoint stops at the opening (§2.5). No word outlives its
   compare, and nothing of a consumed word is kept except the end change it leaves.
 
@@ -596,8 +597,8 @@ governs every word's motion, including the motion the next word carries.
 - Under the carry, a saved carry restores the chain's next opening exactly, and a damaged one is
   refused.
 
-No score, seed or held-out read decides the carry. The production default stays rest; a change of
-the default is a derivation and its exact checks, together with the device word's parity (§6).
+No score, seed or held-out read decides the carry. A change of the default is a derivation and its
+exact checks, together with the device word's parity (§6). That change is §8.
 
 ## 5. Owners touched when built
 
@@ -612,9 +613,10 @@ the code.
 ## 6. Built (October 3), and what the read needs first
 
 [implemented-exact; agent-inferred where marked] The carry is built through the production path, not
-a test path. Today's reception is unchanged unless a carry is declared.
-- **The switch.** `Reference::with_reception(Reception::Carry(absorption))`; the default is
-  `Reception::Rest`, which keeps `Word::open_charted` exactly. `Absorption::{Complete, Nothing}` are
+a test path. As built on October 3, today's reception was unchanged unless a carry was declared;
+§8 makes the carry the default.
+- **The switch.** `Reference::with_reception(Reception::Carry(absorption))`; the default was
+  `Reception::Rest`, which keeps `Word::open_charted` exactly, and is `Carry(Nothing)` since §8. `Absorption::{Complete, Nothing}` are
   `A = I` and `A = 0` (§2.2); nothing in between is built.
 - **The opening.** `Reference::refine` → `PendingRatio::read_on` → `Word::open_received`, which
   zeroes each source ring's storage in the carried change (`Π_int`) and calls the unchanged
@@ -735,3 +737,93 @@ byte-identical as saved text after every compare.
 - At rest the existing locksteps, the loaded resonators' included, are unchanged.
 - Reading the pump phase from the word's own ticks (`opened_at` dropped in the kernel) fails the
   pumped test at its first refine on a carry; zeroing either opening remainder fails the first test.
+
+## 8. The carry is how reception works; rest is its limit (October 4)
+
+[proved-derived from the owners; agent-inferred where marked] The production reception is
+`Reception::Carry(Absorption::Nothing)`, `A = 0`. `Reception::Rest` stays declared, and it is the
+`A = I` limit of the same opening (§2.2). The default was rest while the carry was unbuilt and
+unproved. That is no longer the case: the carry is derived (§2), its chained balance and
+dissipativity are Lean (`HNN/ChainedBalance`, #293), its clock is the field's own (§2.4), and host
+and card agree on it, pumped included (§7). What decides the default is which absorption the
+declared constitution states, not the order in which the two were built.
+
+- **The absorption belongs to a port, and only the source port is declared at a reception.** `A`
+  is the boundary's absorption at a word's end (§2.2). A coordinate is absorbed only where a port
+  with its own admittance takes its power. At a reception, the declared ports are the source rings'
+  ports, which the moment imposes (`Π_int`, §2.1: their outgoing storage is absorbed by the source,
+  once), and the receiver's reading at the last junction, which is power-neutral and whose outputs
+  are not carried (§2.4). No port touches an interior coordinate. So within the declared
+  constitution the interior's absorption is zero, apart from what the field's own conductances
+  dissipate within the ticks. That is `A = 0`.
+- **Rest asks for a locus the constitution does not have.** `A = I` emits every interior coordinate
+  at every word's end. That would need an exterior admittance matched to every interior wave,
+  contact state and resonator state, a load at every node with its own deposition. No such locus is
+  declared, and §2.2 already refuses an intermediate `A` because it would need one. Complete
+  absorption is the same undeclared locus, taken at its extreme.
+- **The Holon is a continuing motion.** It is "already present as potential, never produced by a
+  computation" (CLAUDE.md, the Holon facet table; `ELEMENTARY_OBJECTS`). A reception that reopens at
+  zero restarts the motion at every window, and with a declared pump it restarts the pump's clock
+  too (§2.4). Under `A = 0` the motion of the receptions is one clocked span, the tube of the
+  [winding guide](../../docs/WINDING_CARRY_AND_PLACEMENT.md), and the pump continues.
+- **Passivity is proved, not assumed.** The chain is dissipative with respect to its declared supply
+  at every reception (`HNN/ChainedBalance.{reception_dissipative, chain_dissipative}`), with the
+  carried resonators' storage on its right (`HNN/PumpCarry.{resonator_reception_dissipative,
+  resonator_chain_dissipative}`), so carrying the interior admits no energy the supply did not
+  bring. A pump is declared supply: a pumped ring is never certified passive, and the deposit holds
+  all four of its gains (`PumpedReading::held`).
+- **Retention stays a quotient.** The carried change is resident motion: one change, overwritten
+  at every reception (§2.6). It is not a tape or a context (§3), and the return stops at the
+  opening (§2.5). What the carry changes is which loci the admitted future reads, below.
+
+[agent-inferred] **One chain.** Under the carry a refinement opened while another is pending is
+refused (§2.6), because the field's one motion cannot be in two words at once. The pending
+capacity therefore bounds pending ratios only at rest. Under the default, exposures and readers
+hold one pending at a time. A test that opens several refinements concurrently is a test of the
+rest limit, and declares `Reception::Rest`.
+
+**Saved states.** A state written at rest writes no carry and reads back with none (§2.6). It now
+restores through one owner, `Reference::mount_continued`. That owner continues the declared opening
+from the state (`Constitution::continued`, which refuses a foreign material or a moved opening;
+`ContinuingState::from_text` refuses a damaged one), then mounts its carried end beside it. A state
+without a carry mounts with none, so its next reception opens with zero carry at tick zero: the
+`A = I` opening, from which the chain then carries. A carried state restored into a reference
+declared at rest is refused, as `mount_carried` refuses it.
+
+**The diamond opens on the motion.** The retention diamond's reach counted hops from the source
+rings, because a word at rest opens with its change zero everywhere else. That premise is the rest
+opening. Under the carry a word's change is nonzero at tick 0 wherever the carried interior is, so
+the change reaches ring `b` by tick `t` exactly when `b` is within `t` hops of the sources or of
+that support. The default exposed this as a refusal, not a drift: the receiving exposure
+(`tests/receiving.rs`, `the_receiving_face_codes_within_one_bit_of_the_better_face`) refused its
+second deposit with "a positive alignment with neither a curvature nor a covector scale". Ring
+`g`'s element gradient `Σ_t u_t x̄_tᵀ` sums every tick, but its covector scale `max |u_t|` and
+energy `Σ |x̄_t|²` summed only the rest diamond's window. On a ring the carried motion reached
+before the source's change did, the gradient was nonzero while the scale read no tick. The repair
+is at the diamond, not at the step:
+
+- One word's diamond is seeded at the sources and at the support of its opening's interior change
+  (`Diamond::opened`, `EndChange::support`: a ring whose storage or resonator state is nonzero,
+  the end a nonzero arriving wave arrives at, both ends of a contact whose state is nonzero). The
+  compare's composition, the refine's receipt, a pending ratio's separator and the arrived
+  re-read each use the diamond of the word they read. At rest the support is empty and this is the
+  rest diamond exactly.
+- The admitted future keeps opening on the continuing motion. Across the chain's clock a change
+  reaches every ring connected to a source, and any ring connected to the receiver is heard. So
+  under `A = 0` the aeon's collapse keeps every locus some walk from a source to the receiver
+  passes (`Diamond::continuing`, `Opens::OnMotion`), which in a connected field is every locus.
+  Releasing a locus the motion passes would let its zeroed material reshape a motion a later word
+  reads. The rest limit (`Opens::AtRest`) keeps the diamond and the releases it had. On the
+  six-ring path the rest collapse releases 72 of 156 entries and the carried one releases none
+  (`tests/retention.rs`,
+  `under_the_carry_the_diamond_opens_on_the_motion_and_the_collapse_keeps_every_connected_locus`).
+- Owed in #62: the seeded reach recursion and `deposit_descends` over a word opened on a nonzero
+  change (`HNN/Retention` proves both for a change zero off the sources), and the walk-closed
+  collapse's `release_indistinguishable` over the chain.
+
+**What the card's default must change.** `holonics_cuda::hnn::port::Resident::new` opens at
+`Reception::Carry(Absorption::Nothing)`, as `Reference::new` does. The card already realizes the
+carry, pumped included, at parity (§7). Its port composes through the host's `compose`, now given
+the slot's opening (`CardOpening::host`), and its refine receipt, separator, arrived re-read and
+collapse read the same opened and continuing diamonds as the reference. The GPU suite then reruns
+every lockstep that does not declare its reception, under the carry on both ports.

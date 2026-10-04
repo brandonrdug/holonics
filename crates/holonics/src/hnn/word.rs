@@ -95,6 +95,8 @@
 
 pub mod continuation;
 
+use std::collections::BTreeSet;
+
 use num_bigint::BigUint;
 use num_traits::{Signed, Zero};
 
@@ -796,6 +798,21 @@ pub enum WordOpening {
         carry: ReceptionCarry,
         absorption: Absorption,
     },
+}
+
+impl WordOpening {
+    /// [definition; October 4, the reception carry §8] **The rings the opening's interior change
+    /// occupies** ([`EndChange::support`]): none at rest or under complete absorption, the carried
+    /// interior's otherwise (the crossing into the next references keeps a zero coordinate zero).
+    pub fn support(&self, field: &Field) -> Vec<usize> {
+        match self {
+            WordOpening::Received {
+                carry,
+                absorption: Absorption::Nothing,
+            } => carry.interior(field).support(field),
+            _ => Vec::new(),
+        }
+    }
 }
 
 /// [definition] **The field's power form at a cut**, `P(x) = (h/4)[Σ_r Y_r|s_r|² + Σ_a G_a(|a_g|² +
@@ -2694,6 +2711,41 @@ impl<'c> Word<'c> {
 }
 
 impl EndChange {
+    /// [definition; October 4, the reception carry §8] **The rings this change occupies**: a ring
+    /// whose storage wave or resonator state is nonzero, the end a nonzero arriving wave arrives at,
+    /// and both ends of a contact whose state is nonzero. A word opened on this change can move at
+    /// tick 0 exactly there and at the sources, which seeds its diamond
+    /// ([`crate::hnn::retention::Diamond::opened`]); the rest change occupies none.
+    pub fn support(&self, field: &Field) -> Vec<usize> {
+        let nonzero = |wave: &[Rat]| wave.iter().any(|x| !x.is_zero());
+        let mut rings = BTreeSet::new();
+        for (ring, wave) in self.storage.iter().enumerate() {
+            if nonzero(wave) {
+                rings.insert(ring);
+            }
+        }
+        for (ring, state) in self.resonators.iter().enumerate() {
+            if state
+                .as_ref()
+                .is_some_and(|[u, w]| nonzero(u) || nonzero(w))
+            {
+                rings.insert(ring);
+            }
+        }
+        for (a, contact) in field.contacts().iter().enumerate() {
+            let (from, to) = contact.ends();
+            let [at_from, at_to] = &self.arrivals[a];
+            let [u, w] = &self.states[a];
+            if nonzero(at_from) || nonzero(u) || nonzero(w) {
+                rings.insert(from);
+            }
+            if nonzero(at_to) || nonzero(u) || nonzero(w) {
+                rings.insert(to);
+            }
+        }
+        rings.into_iter().collect()
+    }
+
     /// **The rest change** of a field at its operands: every storage wave, arriving wave and
     /// contact state zero, and each declared resonator at rest at phase 0; the change a word opened
     /// at rest carries (Lean `HNN/Retention.word_opens_at_zero`).

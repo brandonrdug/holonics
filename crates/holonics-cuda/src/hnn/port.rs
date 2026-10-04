@@ -478,7 +478,8 @@ pub struct Resident<'c> {
     pending_capacity: usize,
     budget: u64,
     deadline: Option<u64>,
-    /// How a reception's word opens (the reference's [`Reception`]): rest unless declared.
+    /// How a reception's word opens (the reference's [`Reception`]): the carry at `A = 0` unless
+    /// declared.
     reception: Reception,
     /// The normal-law mirror's tally when the mirror runs (the GPU suite's parity tests,
     /// [`Resident::with_normal_mirror`]); `None` on the exposure's path, which does not run it.
@@ -522,7 +523,7 @@ impl<'c> Resident<'c> {
             pending_capacity,
             budget,
             deadline: None,
-            reception: Reception::Rest,
+            reception: Reception::Carry(Absorption::Nothing),
             normal_mirror: None,
             traffic: Rc::new(Cell::new(Traffic::default())),
             layouts: Rc::new(Cell::new(None)),
@@ -566,9 +567,10 @@ impl<'c> Resident<'c> {
     }
 
     /// [definition; agent-inferred, October 3] **The reception's opening**
-    /// (`Reference::with_reception`): rest unless declared. Under [`Reception::Carry`] each
-    /// reception's word opens on the end change the previous reception's consumed word left, kept
-    /// on the card (`crate::hnn::carry`).
+    /// (`Reference::with_reception`): the carry at `A = 0` unless declared, as the host's (the
+    /// reception carry §8). Each reception's word opens on the change at the last crossing of the
+    /// previous reception's consumed word, kept on the card (`crate::hnn::carry`);
+    /// [`Reception::Rest`] declares the `A = I` limit.
     pub fn with_reception(self, reception: Reception) -> Self {
         Self { reception, ..self }
     }
@@ -900,6 +902,7 @@ impl<'c> Resident<'c> {
             field,
             &resident.constitution,
             ratio,
+            &slot.opening.host(),
             &back,
             targets,
             &scored.steps,
@@ -1289,7 +1292,7 @@ impl<'c> ExecutionPort for Resident<'c> {
             phases.last_epoch(),
             phases.grain(),
         )?;
-        let reached: Vec<Locus> = Diamond::of(field, phases)
+        let reached: Vec<Locus> = Diamond::opened(field, phases, &opening.host().support(field))
             .retained(field)
             .into_iter()
             .filter(|locus| !resident.constitution.released().contains(locus))
@@ -1789,7 +1792,12 @@ impl<'c> ExecutionPort for Resident<'c> {
         let before = resident.bits();
         let field = resident.field.clone();
         resident.forget_kept_reads();
-        let collapsed = collapse(&field, &mut resident.constitution, admitted)?;
+        let collapsed = collapse(
+            &field,
+            &mut resident.constitution,
+            admitted,
+            self.reception.opens(),
+        )?;
         // The collapse keeps the tree whole (`hnn::retention`); the mirror is uploaded again should
         // it ever move.
         if let Some((ring, tree)) = resident.tree.as_mut()
@@ -1812,10 +1820,15 @@ impl<'c> ExecutionPort for Resident<'c> {
         let mut transposes = Vec::new();
         let ids: Vec<PendingId> = resident.pending.keys().copied().collect();
         for id in ids {
-            let phases = resident.pending[&id].ratio.phases();
-            let separating = separator(&field, phases, &collapsed.retained);
+            let slot = &resident.pending[&id];
+            let diamond = Diamond::opened(
+                &field,
+                slot.ratio.phases(),
+                &slot.opening.host().support(&field),
+            );
+            let separating = separator(&field, &diamond, &collapsed.retained);
             if separating.is_empty() {
-                let reads: Vec<Locus> = Diamond::of(&field, phases)
+                let reads: Vec<Locus> = diamond
                     .retained(&field)
                     .into_iter()
                     .filter(|locus| collapsed.retained.contains(locus))
@@ -1844,7 +1857,12 @@ impl<'c> ExecutionPort for Resident<'c> {
         });
         resident.released_bits += collapsed.bits[0].saturating_sub(collapsed.bits[1]);
         if let Some(arrived) = &resident.arrived {
-            let reads = Diamond::of(&field, arrived.ratio.phases()).retained(&field);
+            let reads = Diamond::opened(
+                &field,
+                arrived.ratio.phases(),
+                &arrived.opening.host().support(&field),
+            )
+            .retained(&field);
             if collapsed.released.iter().any(|locus| reads.contains(locus)) {
                 let (reread, readings) =
                     resident.arrived_code_length(&descended, None, self.card)?;

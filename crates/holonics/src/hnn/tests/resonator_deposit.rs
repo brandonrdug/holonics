@@ -12,7 +12,7 @@ use crate::hnn::constitution::{
 use crate::hnn::field::{Current, Field};
 use crate::hnn::port::{Deposit, ExecutionPort, Handle};
 use crate::hnn::reference::{Reference, one_hot};
-use crate::hnn::retention::{collapse, loci, retained};
+use crate::hnn::retention::{Opens, collapse, loci, retained};
 use crate::hnn::ring::{
     PumpDeclaration, PumpStep, ResonatorMaterial, ResonatorOperands, ResonatorRemainders,
 };
@@ -378,14 +378,14 @@ fn resonator_release_follows_the_ring_diamond_and_ignores_empty_slots() {
         }
         let current = Current::at_rest(&field);
         let admitted = [phases(&field, &theta, &current)];
-        let kept = retained(&field, &admitted);
+        let kept = retained(&field, &admitted, Opens::AtRest);
         for ring in 0..field.rings().len() {
             assert_eq!(
                 kept.contains(&Locus::Resonator(ring)),
                 kept.contains(&Locus::Element(ring))
             );
         }
-        let reading = collapse(&field, &mut theta, &admitted).unwrap();
+        let reading = collapse(&field, &mut theta, &admitted, Opens::AtRest).unwrap();
         for ring in 0..field.rings().len() {
             assert_eq!(
                 theta.resonator(ring).is_some(),
@@ -407,7 +407,7 @@ fn resonator_release_follows_the_ring_diamond_and_ignores_empty_slots() {
 
     let field = field_for_empty.unwrap();
     let mut empty = generic(&field, 306);
-    let reading = collapse(&field, &mut empty, &admitted_for_empty).unwrap();
+    let reading = collapse(&field, &mut empty, &admitted_for_empty, Opens::AtRest).unwrap();
     assert!(
         !reading
             .released

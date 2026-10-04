@@ -178,7 +178,9 @@ use crate::hnn::realization::{apply_rows, indexed, outer_rows};
 use crate::hnn::receiving::{
     ActiveAddress, ReceivingPhases, ReceivingStep, Scored, grain_logits, tree_code_length,
 };
-use crate::hnn::retention::{AeonBoundary, Diamond, aeon_readings, collapse, contained, separator};
+use crate::hnn::retention::{
+    AeonBoundary, Diamond, Opens, aeon_readings, collapse, contained, separator,
+};
 use crate::hnn::word::{
     Absorption, ChainedBalance, EndChange, KeptWord, PowerForm, ReceptionCarry, Word, WordBalance,
     WordOpening,
@@ -486,9 +488,9 @@ pub struct Resident {
     wall: WallTimes,
     /// [definition; agent-inferred, October 3; the reception carry §2.6] **The one carried change**
     /// and its tick: the end of the last reception's consumed word, written by the return that
-    /// consumed it, under a declared reception carry ([`Reference::with_reception`]). `None` at the
-    /// mount: a mounted state opens its first reception at rest, so every saved state is a
-    /// rest-carried state (the carried change's place in the continuing state is owed).
+    /// consumed it, under the reception carry ([`Reference::with_reception`]). `None` at a plain
+    /// mount, whose first reception opens with zero carry; a saved state brings its carried end
+    /// back through [`Reference::mount_continued`].
     carried: Option<ReceptionCarry>,
 }
 
@@ -864,15 +866,29 @@ pub struct Reference {
 
 /// [definition; agent-inferred, October 3; the
 /// [reception carry](../../../../research/records/2026-10-03_THE_RECEPTION_CARRIES_THE_INTERIOR_CHANGE_THE_SOURCE_PORT_IMPOSES_THE_MOMENT_AND_REST_IS_COMPLETE_ABSORPTION.md)]
-/// **How a reception's word opens.** [`Reception::Rest`] is today's reception, unchanged: every word
-/// opens at rest at tick zero. Under [`Reception::Carry`] each reception opens on the end change the
-/// previous reception's consumed word left, at the declared absorption ([`Word::open_received`]);
+/// **How a reception's word opens.** The law is [`Reception::Carry`] at
+/// [`Absorption::Nothing`] (`A = 0`, the record's §8): the declared constitution has no port that
+/// absorbs an interior coordinate, so each reception opens on the change arriving at the last
+/// crossing of the previous reception's consumed word ([`Word::open_received`]), and it is the
+/// default. [`Reception::Rest`] is the `A = I` limit: every word opens at rest at tick zero;
 /// the resident holds the one carried change, and a refinement opened while another is pending is
 /// refused (one chain: it would have no defined predecessor). The return stops at the opening.
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub enum Reception {
     Rest,
     Carry(Absorption),
+}
+
+impl Reception {
+    /// [definition; October 4, the reception carry §8] **What the admitted future's words open
+    /// on**: on the continuing motion under the carry at `A = 0`, at rest otherwise (rest, and the
+    /// carry at its `A = I` limit). The aeon's collapse keeps that future's diamond.
+    pub fn opens(&self) -> Opens {
+        match self {
+            Reception::Carry(Absorption::Nothing) => Opens::OnMotion,
+            Reception::Rest | Reception::Carry(Absorption::Complete) => Opens::AtRest,
+        }
+    }
 }
 
 impl Reference {
@@ -888,12 +904,12 @@ impl Reference {
             budget,
             deadline: None,
             refining: false,
-            reception: Reception::Rest,
+            reception: Reception::Carry(Absorption::Nothing),
         }
     }
 
-    /// [definition; agent-inferred, October 3] **The reception's opening** ([`Reception`]): rest
-    /// unless declared.
+    /// [definition; October 4, the reception carry §8] **The reception's opening** ([`Reception`]):
+    /// the carry at `A = 0` unless declared; [`Reception::Rest`] declares its `A = I` limit.
     pub fn with_reception(self, reception: Reception) -> Self {
         Self { reception, ..self }
     }
@@ -1005,6 +1021,26 @@ impl Reference {
         let mut resident = self.mount_with(field, current, constitution)?;
         resident.carried = Some(carry);
         Ok(resident)
+    }
+
+    /// [definition; October 4, the reception carry §8] **Mount a saved state**: the declared opening
+    /// continued from it ([`Constitution::continued`], which refuses another opening's material or
+    /// a moved opening; a damaged text is refused when it is read), with its carried end beside it
+    /// ([`Reference::mount_carried`]). A state written at rest carries none and mounts with none, so
+    /// its next reception opens with zero carry at tick zero, the `A = I` opening from which the
+    /// chain carries.
+    pub fn mount_continued(
+        &self,
+        field: &Field,
+        current: &Current,
+        opening: Constitution,
+        state: &crate::hnn::constitution::ContinuingState,
+    ) -> Result<Resident, HnnError> {
+        let constitution = opening.continued(state)?;
+        match state.carry() {
+            Some(carry) => self.mount_carried(field, current, constitution, carry.clone()),
+            None => self.mount_with(field, current, constitution),
+        }
     }
 }
 
@@ -1331,7 +1367,7 @@ impl ExecutionPort for Reference {
             phases.last_epoch(),
             phases.grain(),
         )?;
-        let reached: Vec<Locus> = Diamond::of(field, phases)
+        let reached: Vec<Locus> = Diamond::opened(field, phases, &opening.support(field))
             .retained(field)
             .into_iter()
             .filter(|locus| !resident.constitution.released().contains(locus))
@@ -1496,6 +1532,7 @@ impl ExecutionPort for Reference {
             &field,
             &resident.constitution,
             ratio,
+            &slot.opening,
             &back,
             &targets,
             &scored.steps,
@@ -1753,17 +1790,24 @@ impl ExecutionPort for Reference {
         let field = resident.field.clone();
         // The collapse publishes the descended constitution at the same commit.
         resident.forget_kept_reads();
-        let collapsed = collapse(&field, &mut resident.constitution, admitted)?;
+        let collapsed = collapse(
+            &field,
+            &mut resident.constitution,
+            admitted,
+            self.reception.opens(),
+        )?;
         let mut carried = Vec::new();
         let mut refused = Vec::new();
         let mut transposes = Vec::new();
         let ids: Vec<PendingId> = resident.pending.keys().copied().collect();
         for id in ids {
-            let phases = resident.pending[&id].ratio.phases();
-            let separating = separator(&field, phases, &collapsed.retained);
+            let slot = &resident.pending[&id];
+            let diamond =
+                Diamond::opened(&field, slot.ratio.phases(), &slot.opening.support(&field));
+            let separating = separator(&field, &diamond, &collapsed.retained);
             if separating.is_empty() {
                 // `Vᵀ` on the carried ratio: the retained loci its diamond reads.
-                let reads: Vec<Locus> = Diamond::of(&field, phases)
+                let reads: Vec<Locus> = diamond
                     .retained(&field)
                     .into_iter()
                     .filter(|locus| collapsed.retained.contains(locus))
@@ -1799,7 +1843,12 @@ impl ExecutionPort for Reference {
         // targets read alike unless their own diamond reads a locus it newly released; then the
         // released part is an exchange step.
         if let Some(arrived) = &resident.arrived {
-            let reads = Diamond::of(&field, arrived.ratio.phases()).retained(&field);
+            let reads = Diamond::opened(
+                &field,
+                arrived.ratio.phases(),
+                &arrived.opening.support(&field),
+            )
+            .retained(&field);
             if collapsed.released.iter().any(|locus| reads.contains(locus)) {
                 let (reread, readings) =
                     arrived.code_length(&field, &resident.constitution, &mut resident.charts)?;
@@ -1958,12 +2007,15 @@ pub fn compose(
     field: &Field,
     constitution: &Constitution,
     ratio: &PendingRatio,
+    opening: &WordOpening,
     back: &WordReturn,
     targets: &[usize],
     steps: &[ReceivingStep],
 ) -> Result<(Pullback, Deposit), HnnError> {
     let phases = ratio.phases();
-    let diamond = Diamond::of(field, phases);
+    // The word's diamond opened on what it opened on (the reception carry §8): under the carry the
+    // carried interior moves from tick 0, so its ticks enter each locus's window.
+    let diamond = Diamond::opened(field, phases, &opening.support(field));
     let released = constitution.released();
     let retained = |locus: Locus| diamond.retains(field, locus) && !released.contains(&locus);
     let receiving = phases.ring();
