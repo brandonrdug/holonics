@@ -36,20 +36,20 @@ pub(super) fn cycle(d: usize) -> Parametron {
 
 /// The constitution with a pumped resonator declared on every ring.
 pub(super) fn resonant(field: &Field, theta: Constitution) -> Constitution {
-    let mut resonant = theta;
-    for ring in 0..field.rings().len() {
-        let period = field.ring(ring).period() as usize;
-        let pump =
-            PumpDeclaration::new(rat(1, 16), Carrier::at(&rat(1, 2)), PumpStep::Half).unwrap();
-        resonant = resonant
-            .with_ring_resonator(
-                field,
-                ring,
-                ResonatorMaterial::of_parametron(&cycle(period), &rat(1, 8), Some(pump)).unwrap(),
-            )
-            .unwrap();
-    }
-    resonant
+    (0..field.rings().len()).fold(theta, |theta, ring| pumped_at(field, theta, ring))
+}
+
+/// The constitution with ring `ring`'s pumped cycle resonator, as [`resonant`] declares it.
+pub(super) fn pumped_at(field: &Field, theta: Constitution, ring: usize) -> Constitution {
+    let period = field.ring(ring).period() as usize;
+    let pump = PumpDeclaration::new(rat(1, 16), Carrier::at(&rat(1, 2)), PumpStep::Half).unwrap();
+    theta
+        .with_ring_resonator(
+            field,
+            ring,
+            ResonatorMaterial::of_parametron(&cycle(period), &rat(1, 8), Some(pump)).unwrap(),
+        )
+        .unwrap()
 }
 
 fn storage(field: &Field, seed: u64) -> Vec<Vec<Rat>> {

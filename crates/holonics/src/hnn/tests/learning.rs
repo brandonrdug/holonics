@@ -131,14 +131,15 @@ pub(super) fn chain() -> Field {
 }
 
 /// **A hand-built deposit's reach** on the chain (its receiver ring 2 read at ticks 1 and 2, the
-/// moment entering once at the open, one phase): the certified step's reading of an epoch a compare
-/// did not compose.
+/// moment entering once at the open, one phase, every locus of the chain in its diamond): the
+/// certified step's reading of an epoch a compare did not compose.
 pub(super) fn chain_reach() -> Reach {
     Reach {
         receiver: 2,
         stations: vec![1, 2],
         entries: vec![0],
         phases: 1,
+        loci: crate::hnn::retention::loci(&chain()).into_iter().collect(),
     }
 }
 
@@ -147,9 +148,14 @@ pub(super) fn chain_reach() -> Reach {
 /// the contrast port, generic slices, a mixed standing, the source and receiving maps, nonzero
 /// pair-port outputs, and generic channel factors.
 pub(crate) fn generic(field: &Field, seed: u64) -> Constitution {
+    generic_within(field, seed, OPEN_BUDGET)
+}
+
+/// [`generic`] under the constitution budget `budget`.
+pub(crate) fn generic_within(field: &Field, seed: u64, budget: u64) -> Constitution {
     let mut draw = Draw::new(seed);
     let a = field.alphabet();
-    let mut theta = Constitution::initial(field, OPEN_BUDGET).unwrap();
+    let mut theta = Constitution::initial(field, budget).unwrap();
     for g in 0..field.rings().len() {
         let n = field.ring(g).width();
         theta = theta

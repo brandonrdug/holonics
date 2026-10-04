@@ -128,6 +128,7 @@ impl<'c> Word<'c> {
             .with_reach(Reach {
                 receiver: phases.ring(), stations: phases.epochs().map(|e| e as u64).collect(),
                 entries: vec![0], phases: occupied,
+                loci: diamond.retained(field),
             });
         cut.deposit = Some(deposit.clone());
         Ok((ratio, InteractionReturn {

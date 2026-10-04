@@ -2064,6 +2064,7 @@ pub fn compose(
         stations: phases.epochs().map(|epoch| epoch as u64).collect(),
         entries: vec![0],
         phases: composed.phases,
+        loci: diamond.retained(field),
     };
     Ok((
         composed.pullback,

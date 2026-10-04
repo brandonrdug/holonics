@@ -891,6 +891,67 @@ open state indistinguishable along the continuing chain, on any sparse block ope
 (`continuing_motion_release_indistinguishable`), and the first law's re-read on the pre-release
 diamond (`first_law_held_diamond`). The resonator's concrete operand is owed (#62).
 
+**Every read a deposit makes past its locus reads the word's diamond.** [agent-inferred, derived
+from the walk diamond, October 4; the reviewer's gap, #62 receipt 5976296910] The walk-diamond
+theorems release the off-walk loci at a fixed `θ`. The Rust's deposit also read past each locus,
+over the whole constitution, by four routes, so a collapse that released off-walk material could
+change a later step or refusal at a retained locus:
+
+- the joint certified step's medium growth: the contrast ports' `1 + ω` and the span factor `F(s)`
+  of every ring whose resonator is not certified passive, with that ring's Floquet decision (a
+  refused decision refused every step) and the held gain families of the rings it reads;
+- the standing's lobe hold: a standing's step leaves the joint certificate
+  (`lobe_move_is_null`) and is held in its lobes, halved with every family whose move reaches a
+  crossed slice, and a crossing is a sign test on `Δ = M q`, whose rows read the standings one
+  contact further out;
+- the declared boost: any contact's boost refused every step (`ActiveContact`), and the channel
+  release keeps the boost;
+- the budget `B_Θ`, counted over every unreleased locus, which the collapse lowers.
+
+The law: a difference stepped at a locus reaches the receiver's stations only along walks from an
+entry to a station, and every ring such a walk passes within the word is an element of the word's
+diamond (`Diamond::element`). A ring outside it carries none of the stepped difference, so its
+growth bounds nothing the certificate certifies; an element outside it is read by no admitted
+reading, so a crossing there changes no reading; a channel whose transit the word does not read
+passes none of the difference, and a released channel's stiffness is zero, so its signature signs
+nothing (the boost stays declared and inert; the release does not drop it). The budget bounds what
+the deposit moves and the word reads: material outside the word's diamond is not moved by the
+deposit, and if the budget read it, the collapse would merge two constitutions that a deposit's
+admission separates, which the retention law forbids (§8 of the objects: the quotient may not
+merge what an admitted action separates). So `Reach` carries the loci of the word's opened
+diamond (`Reach::loci`, `Diamond::retained`), and every read past the locus reads them alone:
+`certify_steps` forms `ω` and calls `ring_reaches` (its Floquet decisions, span factors and held
+families) only on rings whose element the word holds; `lobe` reads crossings, the halving and the
+lock's proposal only on those rings' slices; the boost gate reads only the channels the word holds;
+and the budget at the deposit and at the lock's half-turn reads `Constitution::bits_within` the
+word's loci (`LockProposal` carries them). Each such slice's contrast reads only standings the
+collapse retains, since a standing is retained beside every retained element. The word's opened
+diamond lies within every admitted receiver's collapse diamond (at rest the two are the same; under
+the carry the continuing diamond keeps every locus a walk passes), so the collapse changes no step
+and no refusal. `DepositReading::bits` still reports the successor's whole exact bits, which the
+resident's receipt reads.
+
+Fixtures (`tests/retention.rs`), each failing without its restriction and passing with it:
+- `a_collapse_releasing_a_pumped_ring_changes_no_step`: ring 4 pumped, on the split path under the
+  carry and on the six-ring path at rest. Reading every ring, the uncollapsed deposit read ring 4's
+  span factor (`10777821/2^19` on the split path) and its steps differed from the collapsed one's
+  (the source port's map step `2^−21` against `2^−17`, ring 2's element map `2^−3` against `2^1`).
+  Now neither reads ring 4 (no Floquet decision is formed there, so none can refuse) and every
+  step, the joint reading, the lobe and the lock's proposal are equal.
+- `a_collapse_releasing_a_standings_neighbours_changes_no_lobe_hold`: the six-ring path at rest,
+  standings set so that `Δ_3` and `Δ_4` sit on their nodes on the contacts' coordinates, and a
+  hand-built deposit stepping `q_3` across both. Reading every slice, the uncollapsed lobe offered
+  `(3,0)` and `(4,1)` and dropped standing 3, while the collapsed one stepped it; now both step it.
+- `a_boost_refuses_only_the_steps_whose_word_reads_its_channel`: a boost on contact 4 refuses
+  nothing; a boost on contact 1 refuses on both sides.
+- `the_budget_reads_the_words_loci`: `B_Θ` set to the successor's bits on the word's loci, below
+  its whole bits; the deposit passes on both sides and commutes with the collapse.
+
+The other moves that check `B_Θ`, a channel's re-base (`Constitution::rebased`, the contacts'
+refining grain) and the executed comparison's source move (`Constitution::stepped_source`), are
+not a word's deposit and carry no `Reach`; they still count every unreleased locus. The joint step
+on retained loci as a per-locus factor law is owed in Lean (#62).
+
 **Saved states.** A state written at rest writes no carry and reads back with none (§2.6). It now
 restores through one owner, `Reference::mount_continued`. That owner continues the declared opening
 from the state (`Constitution::continued`, which refuses a foreign material or a moved opening;
