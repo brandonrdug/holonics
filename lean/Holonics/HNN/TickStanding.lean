@@ -54,11 +54,12 @@ agreement on a locus is an equivalence, and a deposit keeps a locus that no datu
 concrete locus laws do (`LocusMap.deposit_descends`'s `hΦe`, `hΦc`).
 
 [definition; agent-inferred] **What this leaves to the instance.** The laws of `TickLaw.Lawful` are
-hypotheses here. On the concrete medium `HNN/LocusMap` proves the first and the last; the deposit's
-locality is the form of `LocusMap.deposited`; global sparsity needs the medium to stay admissible
-under the deposit. The concrete medium has no resonator operand (#62), so on it `cls` reads only
-the sheet classes; the resonator's operand joins the medium as its own file. The commits composed
-at held momentum (`ChainedBalance`'s `dep k`) are not stated here (#62 5975646405 item 2).
+hypotheses here. `HNN/MediumStanding` is the instance on the concrete medium: it proves them there,
+with the deposit keeping the medium admissible when each locus law keeps its locus admissible, and
+shows that the Rust's per-locus rule keeps the loci retained here. The concrete medium has no
+resonator operand, so on it `cls` reads only the sheet classes; the resonator's operand is
+`HNN/LoadedRing`. The commits composed at held momentum (`ChainedBalance`'s `dep k`) are
+`HNN/HeldCommits`.
 
 The proofs of `HNN/CarriedStanding` and `HNN/TickFamily` are unchanged; their headers cite this file. No `sorry`, no `axiom`, no
 `native_decide`.

@@ -75,12 +75,10 @@ is supported on them.
   the moment, not the tick), `Standing(g)` (it enters only through the sheet classes `σ`, and the
   Rust keeps it when the element of `g` or of a neighbour is kept) and `ReceivingMap(g)` (never
   released). Their retention rules are stated in the Rust only.
-* The standing law over the concrete resident. `HNN/CarriedStanding.carriedStanding` keeps per-edge
-  loci and proves its agreement on the loci themselves. The concrete loci are shared by several
-  edges (a junction by every edge out of its ring, a channel by every edge among its blocks), so the
-  Rust's per-locus release agrees with the medium on walk edges at the operators
-  (`mediumOp_release_on_walk`), not at the loci. Its instance on the concrete medium needs that
-  agreement stated on the operators, with the per-locus deposit of item 5.
+* The standing law over the concrete resident is not here. The concrete loci are shared by
+  several edges (a junction by every edge out of its ring, a channel by every edge among its
+  blocks); `HNN/TickStanding` states the standing law on shared loci, and `HNN/MediumStanding` is
+  its instance on this medium, with the per-locus deposit of item 5.
 
 No `sorry`, no `axiom`, no `native_decide`.
 -/
