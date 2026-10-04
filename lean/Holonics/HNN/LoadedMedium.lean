@@ -69,12 +69,13 @@ resonator not certified passive, `Constitution::ring_reaches`), unless the recei
 is zero along the whole joint ray and the resonator is unpumped (`hnn::constitution`, the held
 parts of `Locus::Resonator`). Otherwise they share that step, whose gains read `1 + ω` over every
 ring's contrast port and the span factor `F(s)` over every resonator not certified passive
-(`HNN/FactoredMedium`, module header [open]). The joint step on retained loci, with the carried
-statistics in the locus's state, is owed in #62. The executed split and chart of the lattice word
-are `HNN/Ring`'s and `HNN/LatticeWord`'s. The medium part's crossing (each contact's held rate) is
-a parameter here, and the hold is any linear solve; the Rust's `held_rate` solves exactly and
-refuses a momentum no rate holds (`HnnError::HeldMomentum`). The release of a
-resonator's motion on these blocks (its state, phase and momentum) is `HNN/LoadedMotion`.
+(`HNN/FactoredMedium`, module header [open]). The joint step on retained loci is
+`HNN/JointStep`; the carried statistics in the locus's state are owed in #62. The executed split
+and chart of the lattice word are `HNN/Ring`'s and `HNN/LatticeWord`'s. The medium part's
+crossing (each contact's held rate) is a parameter here, and the hold is any linear solve; the
+Rust's `held_rate` solves exactly and refuses a momentum no rate holds (`HnnError::HeldMomentum`).
+The release of a resonator's motion on these blocks (its state, phase and momentum) is
+`HNN/LoadedMotion`.
 
 No `sorry`, no `axiom`, no `native_decide`.
 -/
