@@ -476,7 +476,7 @@ use num_bigint::BigInt;
 use num_traits::{One, Signed, ToPrimitive, Zero};
 use rayon::prelude::*;
 
-use crate::compression::landmark::context::{Landmarks, Letter};
+use crate::compression::landmark::context::{Landmarks, Letter, TreeStanding};
 use crate::hnn::HnnError;
 use crate::hnn::contact::{
     certify_boost, contact_conductances, signed_form_certifies, signed_stiffness,
@@ -502,6 +502,7 @@ use crate::ratio::linear::vector::{
 use crate::ratio::linear::{ExactLinearError, ExactRatMatrix};
 use crate::ratio::{Rat, rat};
 use crate::receiver::population::PortPopulation;
+use crate::receiver::population::port::PortReading;
 
 /// The declared constitution budget of campaign 1: `B_Θ = 2^33` exact bits.
 pub const CAMPAIGN_ONE_BUDGET: u64 = 1 << 33;
@@ -7681,43 +7682,55 @@ fn certify_storage_growth(
 // -------------------------------------------------------------------------------------------
 // the continuing state
 
-/// [definition; agent-inferred, September 30; step 1b's pin §13.6] **The complete continuing state
-/// of a source ring's port**: what the executed comparison's move changes and the next epoch reads,
-/// the source port's normal law whole (the map `E`, the carried Gram `H`, the solved chart `X̂` with
-/// its lattice, support and certificate, and the carried remainders of `W` and `H`), the source
-/// navigator's transport modulus `ρ`, the locus's deposit clock `m` (its budgeted carry's precision
-/// reads it), every receiving map's normal law whole with its located prior's pair and its clock
-/// (the receiving prior's carry: a moved `k` re-founds the Gram's diagonal and the chart, so a
-/// remount from the declaration would found the wrong prior), the commit counter and the committed
-/// storage growth's product. Nothing else of the constitution moves under that move, and the state is refused, typed, where anything else has
-/// moved (another locus's clock, a released locus, a factor family's remainder), so a restored
-/// state is never partial silently.
+/// [definition; agent-inferred, September 30, completed October 4; step 1b's pin §13.6 and the
+/// reception carry §9] **The complete continuing state**: the constitution's learned material whole,
+/// which every later move reads, and nothing it does not. Retention is the future-sufficient quotient
+/// of the constitution, never a record of what moved it, so the state is the moved material itself:
 ///
-/// Its consumer: [`Constitution::continued`] restores it onto the declared opening, and one move
-/// from the restored constitution equals the same move continued without a checkpoint, exactly
-/// (the owner's test over successive receptions). A remount of `E` and `ρ` alone
+/// - every ring's learned material ([`LearnedRing`]): its standing, its element (the passive map,
+///   the contrast's normal law, the slices) with their statistics, its source port's normal law
+///   whole (the map `E`, the carried Gram `H`, the solved chart `X̂` with its lattice, support and
+///   certificate, and the carried remainders) with its pair ports and the navigator's transport
+///   modulus `ρ`, its receiving map's normal law whole with its located prior's pair, its landmark
+///   tree's executed standing, its population's reading, and its resonator's four gains with their
+///   statistics;
+/// - every contact's channel factors `c`, `b`, `F` and their statistics;
+/// - every locus's lattice (a rebase moves it), the factor families' carried remainders, every
+///   locus's deposit clock, the released loci, the commit counter and the committed storage
+///   growth's product.
+///
+/// What it does not carry is the declared material (the field's lattices aside): the junctions and
+/// conductances, the admittances and the hop, the grain, the lock chart, the fixed nodes, each
+/// receiving map's founding member, the tree's law, the population's priors, the resonator's base
+/// forms and pump, the boosts and the surfaces. Its identity ([`Constitution::material_identity`])
+/// is exactly that part, so a state restores onto any opening of the same declared material
+/// whatever its learned founding, and is refused onto another.
+///
+/// Its consumer: [`Constitution::continued`] restores it onto the declared opening, and the restored
+/// constitution is the saved one, so one move from it equals the same move continued without a
+/// checkpoint, exactly (the owner's tests over successive receptions). A remount of `E` and `ρ` alone
 /// ([`Constitution::with_ports`] and [`Constitution::with_transport`]) rebuilds the normal law from
-/// its prior, losing the Gram, the chart, the remainders and the clock: it is partial, and every
-/// reader of one says so.
+/// its prior, losing the Gram, the chart, the remainders, the clock and everything else that moved:
+/// it is partial, and every reader of one says so.
 ///
-/// The text ([`ContinuingState::to_text`]) opens with the port's rows and its modulus in the form
-/// the harness's partial remount reads (`E rows cols`, the rows, `rho ρ`), so a checkpoint is also a
-/// partial remount's input; the rest follows it line by line, every value exact.
+/// The text ([`ContinuingState::to_text`]) opens with the source ring's port rows and its modulus in
+/// the form the harness's partial remount reads (`E rows cols`, the rows, `rho ρ`), so a checkpoint
+/// is also a partial remount's input; the rest follows it line by line, every value exact.
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct ContinuingState {
+    /// The source ring whose port heads the text.
     ring: usize,
-    law: NormalLaw,
-    transport: Rat,
-    clock: u64,
+    rings: Vec<LearnedRing>,
+    contacts: Vec<LearnedContact>,
+    lattices: BTreeMap<Locus, Lattice>,
+    carries: Carries,
+    clocks: BTreeMap<Locus, u64>,
+    released: BTreeSet<Locus>,
     commit: u64,
     storage_product: Rat,
-    /// The identity of the material the state continues ([`Constitution::material_identity`]).
+    /// The identity of the declared material the state continues
+    /// ([`Constitution::material_identity`]).
     material: u128,
-    /// [definition; agent-inferred, October 4; the prior carry's design §4] Every receiving map's
-    /// normal law whole, with its locus's deposit clock: the map, the Gram with its moved
-    /// diagonal, the chart at its scale, the carried remainders and the located pair, which the
-    /// next deposit and the next move read.
-    receiving: Vec<(usize, NormalLaw, u64)>,
     /// [definition; agent-inferred, October 3; the reception carry §2.4] The reception's carried
     /// end ([`ReceptionCarry`]: the change at its last crossing and the field's elapsed ticks), where the state was
     /// written under the carry; `None` at rest (`A = I`, and every state written before the carry).
@@ -7725,6 +7738,247 @@ pub struct ContinuingState {
     /// its consumer mounts it beside the restored constitution
     /// ([`crate::hnn::reference::Reference::mount_carried`]).
     carry: Option<ReceptionCarry>,
+}
+
+/// [definition; agent-inferred, October 4; the reception carry §9] **A ring's learned material**:
+/// every field of its material a deposit, a lock, a move, a rebase or the collapse writes, and none
+/// it declares.
+#[derive(Clone, Debug, PartialEq, Eq)]
+struct LearnedRing {
+    standing: Vec<Rat>,
+    standing_scale: Rat,
+    passive: ExactRatMatrix,
+    passive_scale: Rat,
+    contrast: NormalLaw,
+    slices: Vec<(Vec<Rat>, Vec<Rat>)>,
+    slice_scale: Rat,
+    source: Option<NormalLaw>,
+    transport: Rat,
+    pairs: Vec<PairPort>,
+    pair_scale: Rat,
+    receiving: Option<NormalLaw>,
+    tree: Option<TreeStanding>,
+    population: Option<PortReading>,
+    /// The resonator's four gains (`None` once released).
+    resonator: Option<[Rat; 4]>,
+    resonator_scales: [Rat; 4],
+}
+
+/// [definition; agent-inferred, October 4; the reception carry §9] **A contact's learned material**:
+/// its channel factors and their statistics (its boost and surface are declared).
+#[derive(Clone, Debug, PartialEq, Eq)]
+struct LearnedContact {
+    storage: ExactRatMatrix,
+    stiffness: ExactRatMatrix,
+    dissipation: ExactRatMatrix,
+    scales: [Rat; 3],
+}
+
+fn same_shape(a: &ExactRatMatrix, b: &ExactRatMatrix) -> bool {
+    (a.rows(), a.columns()) == (b.rows(), b.columns())
+}
+
+fn same_law_shape(a: &NormalLaw, b: &NormalLaw) -> bool {
+    same_shape(&a.map, &b.map) && a.gram.len() == b.gram.len()
+}
+
+fn widths(family: &[Vec<Rat>]) -> Vec<usize> {
+    family.iter().map(Vec::len).collect()
+}
+
+fn same_pair_shape(a: &PairPort, b: &PairPort) -> bool {
+    widths(a.outputs()) == widths(b.outputs())
+        && widths(a.current_reads()) == widths(b.current_reads())
+        && widths(a.earlier_reads()) == widths(b.earlier_reads())
+}
+
+fn zero_family(family: &[Vec<Rat>]) -> Vec<Vec<Rat>> {
+    family.iter().map(|x| vec![Rat::zero(); x.len()]).collect()
+}
+
+impl LearnedRing {
+    fn of(material: &RingMaterial) -> Self {
+        Self {
+            standing: material.standing.clone(),
+            standing_scale: material.standing_scale.clone(),
+            passive: material.passive.clone(),
+            passive_scale: material.passive_scale.clone(),
+            contrast: material.contrast.clone(),
+            slices: material.slices.clone(),
+            slice_scale: material.slice_scale.clone(),
+            source: material.source.clone(),
+            transport: material.transport.clone(),
+            pairs: material.pairs.iter().map(|(_, pair)| pair.clone()).collect(),
+            pair_scale: material.pair_scale.clone(),
+            receiving: material.receiving.clone(),
+            tree: material.tree.as_ref().map(Landmarks::standing),
+            population: material.population.as_ref().map(PortPopulation::reading),
+            resonator: material.resonator.as_ref().map(|resonator| resonator.gains().clone()),
+            resonator_scales: material.resonator_scales.clone(),
+        }
+    }
+
+    /// **Place the learned material on a declared ring's material** (the transport aside, which
+    /// [`Constitution::continued`] places on the restored lattice): refused where any part has
+    /// another shape than the declared one, the receiving map another founding member, or the tree,
+    /// the population or the resonator is present on one side only.
+    fn place(&self, material: &mut RingMaterial) -> Result<(), HnnError> {
+        let refuse = |what: &'static str| HnnError::ContinuingState { what };
+        let mismatched = self.standing.len() != material.standing.len()
+            || !same_shape(&self.passive, &material.passive)
+            || !same_law_shape(&self.contrast, &material.contrast)
+            || self.slices.len() != material.slices.len()
+            || self
+                .slices
+                .iter()
+                .zip(&material.slices)
+                .any(|((u, v), (du, dv))| u.len() != du.len() || v.len() != dv.len())
+            || self.pairs.len() != material.pairs.len()
+            || self
+                .pairs
+                .iter()
+                .zip(&material.pairs)
+                .any(|(pair, (_, declared))| !same_pair_shape(pair, declared))
+            || match (&self.source, &material.source) {
+                (None, None) => false,
+                (Some(saved), Some(declared)) => !same_law_shape(saved, declared),
+                _ => true,
+            }
+            || match (&self.receiving, &material.receiving) {
+                (None, None) => false,
+                (Some(saved), Some(declared)) => {
+                    !same_law_shape(saved, declared)
+                        || saved.receiving_prior() != declared.receiving_prior()
+                }
+                _ => true,
+            }
+            || self.tree.is_some() != material.tree.is_some()
+            || self.population.is_some() != material.population.is_some()
+            || self.resonator.is_some() != material.resonator.is_some();
+        if mismatched {
+            return Err(refuse("a ring's saved material off its declared shape or founding"));
+        }
+        let tree = match (&self.tree, &material.tree) {
+            (Some(standing), Some(tree)) => Some(
+                tree.with_standing(standing)
+                    .map_err(|_| refuse("a saved landmark tree off its declared law"))?,
+            ),
+            _ => None,
+        };
+        let population = match (&self.population, &material.population) {
+            (Some(reading), Some(population)) => Some(
+                population
+                    .with_reading(reading)
+                    .map_err(|_| refuse("a saved population off its declaration"))?,
+            ),
+            _ => None,
+        };
+        let resonator = match (&self.resonator, &material.resonator) {
+            (Some(gains), Some(resonator)) => Some(resonator.with_gains(gains.clone())?),
+            _ => None,
+        };
+        material.standing = self.standing.clone();
+        material.standing_scale = self.standing_scale.clone();
+        material.passive = self.passive.clone();
+        material.passive_scale = self.passive_scale.clone();
+        material.contrast = self.contrast.clone();
+        material.slices = self.slices.clone();
+        material.slice_scale = self.slice_scale.clone();
+        material.source = self.source.clone();
+        for ((_, pair), saved) in material.pairs.iter_mut().zip(&self.pairs) {
+            *pair = saved.clone();
+        }
+        material.pair_scale = self.pair_scale.clone();
+        material.receiving = self.receiving.clone();
+        material.tree = tree;
+        material.population = population;
+        material.resonator = resonator;
+        material.resonator_scales = self.resonator_scales.clone();
+        Ok(())
+    }
+}
+
+impl LearnedContact {
+    fn of(material: &ContactMaterial) -> Self {
+        Self {
+            storage: material.storage.clone(),
+            stiffness: material.stiffness.clone(),
+            dissipation: material.dissipation.clone(),
+            scales: material.scales.clone(),
+        }
+    }
+
+    fn place(&self, material: &mut ContactMaterial) -> Result<(), HnnError> {
+        if !same_shape(&self.storage, &material.storage)
+            || !same_shape(&self.stiffness, &material.stiffness)
+            || !same_shape(&self.dissipation, &material.dissipation)
+        {
+            return Err(HnnError::ContinuingState {
+                what: "a contact's saved channel off its declared shape",
+            });
+        }
+        material.storage = self.storage.clone();
+        material.stiffness = self.stiffness.clone();
+        material.dissipation = self.dissipation.clone();
+        material.scales = self.scales.clone();
+        Ok(())
+    }
+}
+
+impl RingMaterial {
+    /// **The ring's learned material at its canonical founding** (the identity's blank): every
+    /// learned value zero, no source law and the unit modulus, the receiving law founded under its
+    /// declared member, the tree and the population at their founding, the resonator at unit gains.
+    /// The declared material is left as it is.
+    fn blank(&mut self) {
+        let zero = Rat::zero();
+        self.standing = vec![zero.clone(); self.standing.len()];
+        self.standing_scale = zero.clone();
+        self.passive = self.passive.scaled(&zero);
+        self.passive_scale = zero.clone();
+        self.contrast = NormalLaw::with_prior(self.contrast.map.scaled(&zero));
+        self.slices = self
+            .slices
+            .iter()
+            .map(|(u, v)| (vec![zero.clone(); u.len()], vec![zero.clone(); v.len()]))
+            .collect();
+        self.slice_scale = zero.clone();
+        self.source = None;
+        self.transport = Rat::one();
+        for (_, pair) in &mut self.pairs {
+            if let Ok(blank) = PairPort::new(
+                zero_family(pair.outputs()),
+                zero_family(pair.current_reads()),
+                zero_family(pair.earlier_reads()),
+            ) {
+                *pair = blank;
+            }
+        }
+        self.pair_scale = zero.clone();
+        // A moved prior or a grown pair leaves the identity, the founding member stays in it.
+        if let Some(law) = &self.receiving {
+            let prior = law.receiving_prior().unwrap_or(0);
+            self.receiving = Some(NormalLaw::with_receiving_prior(law.map.scaled(&zero), prior));
+        }
+        self.tree = self.tree.as_ref().map(Landmarks::founding);
+        self.population = self.population.as_ref().map(PortPopulation::founding);
+        self.resonator = self
+            .resonator
+            .as_ref()
+            .and_then(|resonator| resonator.with_gains(std::array::from_fn(|_| Rat::one())).ok());
+        self.resonator_scales = std::array::from_fn(|_| zero.clone());
+    }
+}
+
+impl ContactMaterial {
+    /// The contact's learned material at its canonical founding: its factors and statistics zero.
+    fn blank(&mut self) {
+        let zero = Rat::zero();
+        self.storage = self.storage.scaled(&zero);
+        self.stiffness = self.stiffness.scaled(&zero);
+        self.dissipation = self.dissipation.scaled(&zero);
+        self.scales = std::array::from_fn(|_| zero.clone());
+    }
 }
 
 /// [definition; agent-inferred, October 3] **A text's residue**: its bytes read as one base-256
@@ -7752,187 +8006,457 @@ pub fn text_residue(text: &str) -> u128 {
 }
 
 impl Constitution {
-    /// **The complete continuing state of ring `g`'s source port** ([`ContinuingState`]): refused off
-    /// a source ring, and where a locus other than the source port has a clock, a locus is released,
-    /// or a factor family carries a remainder (the state would not be complete).
+    /// **The complete continuing state** ([`ContinuingState`]) headed by ring `g`'s source port:
+    /// refused off a source ring, and complete wherever the constitution has moved.
     pub fn continuing_state(&self, ring: usize) -> Result<ContinuingState, HnnError> {
-        let law = self
+        if self
             .rings
             .get(ring)
-            .and_then(|material| material.source.clone())
-            .ok_or(HnnError::MissingSourcePort { ring })?;
-        let locus = Locus::SourcePort(ring);
-        if self
-            .clocks
-            .keys()
-            .any(|other| *other != locus && !matches!(other, Locus::ReceivingMap(_)))
+            .and_then(|material| material.source.as_ref())
+            .is_none()
         {
-            return Err(HnnError::ContinuingState {
-                what: "a locus other than the source port and the receiving maps has moved",
-            });
-        }
-        if !self.released.is_empty() {
-            return Err(HnnError::ContinuingState {
-                what: "a locus is released",
-            });
-        }
-        if self.carries.values().any(|carry| !carry.0.is_empty()) {
-            return Err(HnnError::ContinuingState {
-                what: "a factor family carries a remainder",
-            });
+            return Err(HnnError::MissingSourcePort { ring });
         }
         Ok(ContinuingState {
             ring,
-            law,
-            transport: self.rings[ring].transport.clone(),
-            clock: self.clock(locus),
+            rings: self.rings.iter().map(LearnedRing::of).collect(),
+            contacts: self.contacts.iter().map(LearnedContact::of).collect(),
+            lattices: self.lattices.clone(),
+            carries: self.carries.clone(),
+            clocks: self.clocks.clone(),
+            released: self.released.clone(),
             commit: self.commit,
             storage_product: self.storage_product.clone(),
-            material: self.material_identity(ring),
-            receiving: self
-                .rings
-                .iter()
-                .enumerate()
-                .filter_map(|(g, material)| {
-                    let law = material.receiving.clone()?;
-                    Some((g, law, self.clock(Locus::ReceivingMap(g))))
-                })
-                .collect(),
+            material: self.material_identity(),
             carry: None,
         })
     }
 
-    /// [definition; agent-inferred, October 3] **The identity of the material a continuing state of
-    /// ring `g` continues**: the residue ([`text_residue`]) of this constitution's exact written
-    /// form (its derived `Debug`, every value exact) with what a continuing state carries set to
-    /// the founding's values: ring `g`'s source law absent and its modulus one, every receiving law
-    /// at its founding under its declared prior, no clock, commit zero and storage product one. A move that changes only the source port (all
-    /// [`Constitution::continuing_state`] admits) leaves it unchanged, so a state and the declared
-    /// opening it continues share it, and a state written against another opening's material
-    /// (another field, declaration or founding) is refused at [`Constitution::continued`]. The
-    /// written form follows the constitution's layout, so a change of that layout changes every
-    /// identity: an earlier save is then refused, never mounted.
-    pub fn material_identity(&self, ring: usize) -> u128 {
+    /// [definition; agent-inferred, October 3, completed October 4] **The identity of the declared
+    /// material a continuing state continues**: the residue ([`text_residue`]) of this
+    /// constitution's exact written form (its derived `Debug`, every value exact) with everything a
+    /// continuing state carries set to its canonical founding ([`RingMaterial::blank`]): every
+    /// learned value zero, no source law and the unit modulus, each receiving law founded under its
+    /// declared member, the trees and populations at their founding, the resonators at unit gains,
+    /// no lattice, remainder or clock, commit zero and storage product one. The released loci stay
+    /// in it: [`Constitution::continued`] releases the opening's before it reads the identity. Any
+    /// move leaves it unchanged, so a state and the declared opening it continues share it, and a
+    /// state written against another declared material (another field, declaration or founding
+    /// member) is refused. The written form follows the constitution's layout, so a change of that
+    /// layout changes every identity: an earlier save is then refused, never mounted.
+    pub fn material_identity(&self) -> u128 {
         let mut material = self.clone();
-        if let Some(founding) = material.rings.get_mut(ring) {
-            founding.source = None;
-            founding.transport = Rat::one();
+        for ring in &mut material.rings {
+            ring.blank();
         }
-        // Each receiving law at its founding: a moved prior or a grown pair leaves the identity, the
-        // founding member stays in it.
-        for founding in &mut material.rings {
-            if let Some(law) = &founding.receiving {
-                let (m, n) = (law.map.rows(), law.map.columns());
-                let prior = law.receiving_prior().unwrap_or(0);
-                founding.receiving = ExactRatMatrix::zero(m, n)
-                    .ok()
-                    .map(|map| NormalLaw::with_receiving_prior(map, prior));
-            }
+        for contact in &mut material.contacts {
+            contact.blank();
         }
+        material.lattices.clear();
+        material.carries.clear();
         material.clocks.clear();
         material.commit = 0;
         material.storage_product = Rat::one();
         text_residue(&format!("{material:?}"))
     }
 
-    /// **The constitution continued from a checkpoint** ([`ContinuingState`]): the state's source
-    /// port, modulus, clock, receiving laws with their clocks, commit and storage product placed on
-    /// this constitution, which must be
-    /// the declared opening the state continued from (no locus moved, none released, no factor
-    /// remainder: refused, typed, otherwise), with the state's port of the declared shape.
+    /// Whether this constitution declares a locus (its ring or contact exists).
+    fn declares(&self, locus: &Locus) -> bool {
+        match *locus {
+            Locus::Element(g)
+            | Locus::Junction(g)
+            | Locus::SourcePort(g)
+            | Locus::Standing(g)
+            | Locus::Resonator(g)
+            | Locus::ReceivingMap(g) => g < self.rings.len(),
+            Locus::Channel(a) | Locus::Conductance(a) => a < self.contacts.len(),
+        }
+    }
+
+    /// **The constitution continued from a checkpoint** ([`ContinuingState`]): this constitution,
+    /// which must be a declared opening (no locus moved, none released, no factor remainder:
+    /// refused, typed, otherwise), with the state's released loci released, its identity checked
+    /// against the state's, and the state's learned material, lattices, remainders, clocks, commit
+    /// and storage product placed on it, every part of its declared shape and every entry on its
+    /// locus's lattice.
     pub fn continued(mut self, state: &ContinuingState) -> Result<Self, HnnError> {
-        let ring = state.ring;
-        let shape = self
+        let refuse = |what: &'static str| HnnError::ContinuingState { what };
+        if self
             .rings
-            .get(ring)
+            .get(state.ring)
             .and_then(|material| material.source.as_ref())
-            .map(|law| (law.map.rows(), law.map.columns()))
-            .ok_or(HnnError::MissingSourcePort { ring })?;
-        if shape != (state.law.map.rows(), state.law.map.columns()) {
-            return Err(HnnError::Shape {
-                what: "a continuing state's source port against the declared port",
-                expected: shape.0 * shape.1,
-                found: state.law.map.rows() * state.law.map.columns(),
-            });
+            .is_none()
+        {
+            return Err(HnnError::MissingSourcePort { ring: state.ring });
         }
         if !self.clocks.is_empty()
             || !self.released.is_empty()
             || self.carries.values().any(|carry| !carry.0.is_empty())
         {
-            return Err(HnnError::ContinuingState {
-                what: "the constitution it is restored onto is not the declared opening",
-            });
+            return Err(refuse("the constitution it is restored onto is not the declared opening"));
         }
-        if self.material_identity(ring) != state.material {
-            return Err(HnnError::ContinuingState {
-                what: "the state continues another opening's material",
-            });
+        if self.rings.len() != state.rings.len() || self.contacts.len() != state.contacts.len() {
+            return Err(refuse("the state continues another opening's material (its rings or contacts)"));
         }
-        let lattice = self.lattice(Locus::SourcePort(ring))?;
-        if !state.law.on_lattice(&lattice) {
-            return Err(HnnError::ContinuingState {
-                what: "the state's port or Gram lies off the source port's lattice",
-            });
-        }
-        for (g, law, _) in &state.receiving {
-            let declared = self
-                .rings
-                .get(*g)
-                .and_then(|material| material.receiving.as_ref())
-                .ok_or(HnnError::MissingReceivingMap { ring: *g })?;
-            if (declared.map.rows(), declared.map.columns()) != (law.map.rows(), law.map.columns())
-                || declared.gram.len() != law.gram.len()
-                || law.receiving_prior() != declared.receiving_prior()
-                || !law.on_lattice(&self.lattice(Locus::ReceivingMap(*g))?)
-            {
-                return Err(HnnError::ContinuingState {
-                    what: "a receiving law off its declared shape, founding or lattice",
-                });
-            }
-        }
-        if self.rings.iter().filter(|material| material.receiving.is_some()).count()
-            != state.receiving.len()
+        if !state
+            .released
+            .iter()
+            .chain(state.clocks.keys())
+            .chain(state.carries.keys().map(|(locus, _)| locus))
+            .all(|locus| self.declares(locus))
+            || !state.lattices.keys().eq(self.lattices.keys())
         {
-            return Err(HnnError::ContinuingState {
-                what: "the state's receiving laws against the declared receiving maps",
-            });
+            return Err(refuse("the state continues another opening's material (its loci)"));
         }
-        self.rings[ring].source = Some(state.law.clone());
-        self = self.with_transport(ring, state.transport.clone())?;
-        if state.clock > 0 {
-            self.clocks.insert(Locus::SourcePort(ring), state.clock);
+        self.release(&state.released)?;
+        if self.material_identity() != state.material {
+            return Err(refuse("the state continues another opening's material"));
         }
-        for (g, law, clock) in &state.receiving {
-            self.rings[*g].receiving = Some(law.clone());
-            if *clock > 0 {
-                self.clocks.insert(Locus::ReceivingMap(*g), *clock);
+        for (material, saved) in self.rings.iter_mut().zip(&state.rings) {
+            saved.place(material)?;
+        }
+        for (material, saved) in self.contacts.iter_mut().zip(&state.contacts) {
+            saved.place(material)?;
+        }
+        self.lattices = state.lattices.clone();
+        for (g, saved) in state.rings.iter().enumerate() {
+            if self.rings[g].source.is_some() {
+                self = self.with_transport(g, saved.transport.clone())?;
+            } else if !saved.transport.is_one() {
+                return Err(refuse("a transport modulus off a source ring"));
             }
         }
+        self.carries = state.carries.clone();
+        self.clocks = state.clocks.clone();
         self.commit = state.commit;
         self.storage_product = state.storage_product.clone();
+        if !self.on_lattice() {
+            return Err(refuse("the state's material off its loci's lattices"));
+        }
         Ok(self)
     }
 }
 
+/// A locus as text: its kind and index.
+fn write_locus(locus: &Locus) -> String {
+    let (kind, index) = match *locus {
+        Locus::Element(g) => ("element", g),
+        Locus::Junction(g) => ("junction", g),
+        Locus::Channel(a) => ("channel", a),
+        Locus::Conductance(a) => ("conductance", a),
+        Locus::SourcePort(g) => ("source", g),
+        Locus::Standing(g) => ("standing", g),
+        Locus::Resonator(g) => ("resonator", g),
+        Locus::ReceivingMap(g) => ("receiving", g),
+    };
+    format!("{kind} {index}")
+}
+
+/// A locus read from its kind and index ([`write_locus`]).
+fn read_locus(kind: &str, index: &str) -> Result<Locus, HnnError> {
+    let index: usize = index
+        .parse()
+        .map_err(|_| HnnError::ContinuingState { what: "a locus's index" })?;
+    Ok(match kind {
+        "element" => Locus::Element(index),
+        "junction" => Locus::Junction(index),
+        "channel" => Locus::Channel(index),
+        "conductance" => Locus::Conductance(index),
+        "source" => Locus::SourcePort(index),
+        "standing" => Locus::Standing(index),
+        "resonator" => Locus::Resonator(index),
+        "receiving" => Locus::ReceivingMap(index),
+        _ => return refuse("a locus's kind"),
+    })
+}
+
+/// A carrier as its words.
+fn write_carrier(carrier: &Carrier) -> String {
+    match *carrier {
+        Carrier::Map => "map".into(),
+        Carrier::Gram => "gram".into(),
+        Carrier::Passive => "passive".into(),
+        Carrier::PassiveScale => "passive-scale".into(),
+        Carrier::Slices => "slices".into(),
+        Carrier::SliceScale => "slice-scale".into(),
+        Carrier::Standing => "standing".into(),
+        Carrier::StandingScale => "standing-scale".into(),
+        Carrier::Resonator(i) => format!("resonator {i}"),
+        Carrier::ResonatorScale(i) => format!("resonator-scale {i}"),
+        Carrier::Pair { offset, family } => format!("pair {offset} {family}"),
+        Carrier::PairScale => "pair-scale".into(),
+        Carrier::Factor(i) => format!("factor {i}"),
+        Carrier::FactorScale(i) => format!("factor-scale {i}"),
+    }
+}
+
+/// A carrier read from its words ([`write_carrier`]).
+fn read_carrier(words: &[&str]) -> Result<Carrier, HnnError> {
+    let index = |word: &str| -> Result<usize, HnnError> {
+        word.parse()
+            .map_err(|_| HnnError::ContinuingState { what: "a carrier's index" })
+    };
+    Ok(match words {
+        ["map"] => Carrier::Map,
+        ["gram"] => Carrier::Gram,
+        ["passive"] => Carrier::Passive,
+        ["passive-scale"] => Carrier::PassiveScale,
+        ["slices"] => Carrier::Slices,
+        ["slice-scale"] => Carrier::SliceScale,
+        ["standing"] => Carrier::Standing,
+        ["standing-scale"] => Carrier::StandingScale,
+        ["resonator", i] => Carrier::Resonator(index(i)?),
+        ["resonator-scale", i] => Carrier::ResonatorScale(index(i)?),
+        ["pair", offset, family] => Carrier::Pair {
+            offset: index(offset)?,
+            family: index(family)?,
+        },
+        ["pair-scale"] => Carrier::PairScale,
+        ["factor", i] => Carrier::Factor(index(i)?),
+        ["factor-scale", i] => Carrier::FactorScale(index(i)?),
+        _ => return refuse("a carrier"),
+    })
+}
+
+/// Exact values on one line.
+fn write_values<'v>(s: &mut String, values: impl Iterator<Item = &'v Rat>) {
+    *s += &values.map(ToString::to_string).collect::<Vec<_>>().join(" ");
+    s.push('\n');
+}
+
+/// One keyed line of exact values: `key v₀ v₁ …`.
+fn write_keyed<'v>(s: &mut String, key: &str, values: impl Iterator<Item = &'v Rat>) {
+    *s += key;
+    for value in values {
+        *s += &format!(" {value}");
+    }
+    s.push('\n');
+}
+
+/// A matrix with its head `key rows cols` and its rows.
+fn write_matrix(s: &mut String, key: &str, map: &ExactRatMatrix) {
+    *s += &format!("{key} {} {}\n", map.rows(), map.columns());
+    write_rows(s, map);
+}
+
+/// A matrix read from its head `key rows cols` and its rows ([`write_matrix`]).
+fn read_matrix(
+    lines: &mut std::str::Lines<'_>,
+    key: &str,
+    what: &'static str,
+) -> Result<ExactRatMatrix, HnnError> {
+    let shape = head(next(lines, what)?, key, what)?;
+    read_rows(lines, &shape, what)
+}
+
+/// A normal law with its map head `key rows cols`, or `key none`.
+fn write_optional_law(s: &mut String, key: &str, law: Option<&NormalLaw>) {
+    match law {
+        Some(law) => {
+            write_matrix(s, key, &law.map);
+            write_law(s, law);
+        }
+        None => *s += &format!("{key} none\n"),
+    }
+}
+
+/// A normal law read from its map head, or none ([`write_optional_law`]).
+fn read_optional_law(
+    lines: &mut std::str::Lines<'_>,
+    key: &str,
+    what: &'static str,
+) -> Result<Option<NormalLaw>, HnnError> {
+    let shape = head(next(lines, what)?, key, what)?;
+    if shape.first().map(String::as_str) == Some("none") {
+        return Ok(None);
+    }
+    let map = read_rows(lines, &shape, what)?;
+    Ok(Some(read_law(lines, map)?))
+}
+
+/// Exact values of a keyed line, `count` of them ([`write_keyed`]).
+fn read_keyed(line: &str, key: &str, count: usize, what: &'static str) -> Result<Vec<Rat>, HnnError> {
+    let values = rats(line.strip_prefix(key).ok_or(HnnError::ContinuingState { what })?, what)?;
+    if values.len() != count {
+        return refuse(what);
+    }
+    Ok(values)
+}
+
+impl LearnedRing {
+    /// The ring's learned material as text ([`ContinuingState::to_text`]); its source law is
+    /// written `source state` on the state's own ring (the text's head carries it).
+    fn write(&self, s: &mut String, head: bool) {
+        *s += &format!("standing {}\n", self.standing.len());
+        write_values(s, self.standing.iter());
+        write_keyed(s, "standing-scale", [&self.standing_scale].into_iter());
+        write_matrix(s, "passive", &self.passive);
+        write_keyed(s, "passive-scale", [&self.passive_scale].into_iter());
+        write_matrix(s, "contrast", &self.contrast.map);
+        write_law(s, &self.contrast);
+        *s += &format!("slices {}\n", self.slices.len());
+        for (u, v) in &self.slices {
+            write_values(s, u.iter());
+            write_values(s, v.iter());
+        }
+        write_keyed(s, "slice-scale", [&self.slice_scale].into_iter());
+        if head {
+            *s += "source state\n";
+        } else {
+            write_optional_law(s, "source", self.source.as_ref());
+        }
+        write_keyed(s, "transport", [&self.transport].into_iter());
+        *s += &format!("pairs {}\n", self.pairs.len());
+        for pair in &self.pairs {
+            for family in [pair.outputs(), pair.current_reads(), pair.earlier_reads()] {
+                *s += &format!("family {}\n", family.len());
+                for x in family {
+                    write_values(s, x.iter());
+                }
+            }
+        }
+        write_keyed(s, "pair-scale", [&self.pair_scale].into_iter());
+        write_optional_law(s, "receiving", self.receiving.as_ref());
+        match &self.tree {
+            Some(tree) => tree.write(s),
+            None => *s += "tree none\n",
+        }
+        match &self.population {
+            Some(population) => population.write(s),
+            None => *s += "population none\n",
+        }
+        match &self.resonator {
+            Some(gains) => write_keyed(s, "resonator", gains.iter()),
+            None => *s += "resonator none\n",
+        }
+        write_keyed(s, "resonator-scales", self.resonator_scales.iter());
+    }
+
+    /// The ring's learned material read from its text ([`LearnedRing::write`]), the head's source
+    /// law placed where the text writes `source state`.
+    fn read(lines: &mut std::str::Lines<'_>, head_law: &NormalLaw, is_head: bool) -> Result<Self, HnnError> {
+        let n = number(head(next(lines, "a ring's standing")?, "standing", "a ring's standing")?.first(), "a ring's standing")?;
+        let standing = rats(next(lines, "a ring's standing")?, "a ring's standing")?;
+        if standing.len() != n {
+            return refuse("a ring's standing");
+        }
+        let scalar = |lines: &mut std::str::Lines<'_>, key: &str, what: &'static str| -> Result<Rat, HnnError> {
+            Ok(read_keyed(next(lines, what)?, key, 1, what)?.remove(0))
+        };
+        let standing_scale = scalar(lines, "standing-scale", "a ring's standing scale")?;
+        let passive = read_matrix(lines, "passive", "a ring's passive map")?;
+        let passive_scale = scalar(lines, "passive-scale", "a ring's passive scale")?;
+        let contrast_map = read_matrix(lines, "contrast", "a ring's contrast")?;
+        let contrast = read_law(lines, contrast_map)?;
+        let count = number(head(next(lines, "a ring's slices")?, "slices", "a ring's slices")?.first(), "a ring's slices")?;
+        let mut slices = Vec::with_capacity(count);
+        for _ in 0..count {
+            let u = rats(next(lines, "a slice")?, "a slice")?;
+            let v = rats(next(lines, "a slice")?, "a slice")?;
+            slices.push((u, v));
+        }
+        let slice_scale = scalar(lines, "slice-scale", "a ring's slice scale")?;
+        let source = if is_head {
+            if next(lines, "the head's source")? != "source state" {
+                return refuse("the head's source (written `source state`)");
+            }
+            Some(head_law.clone())
+        } else {
+            read_optional_law(lines, "source", "a ring's source law")?
+        };
+        if let Some(law) = &source {
+            if law.located.is_some() || law.chart.scale != 0 {
+                return refuse("a source law (founded at the unit prior, with no located pair)");
+            }
+        }
+        let transport = scalar(lines, "transport", "a ring's transport modulus")?;
+        let count = number(head(next(lines, "a ring's pairs")?, "pairs", "a ring's pairs")?.first(), "a ring's pairs")?;
+        let mut pairs = Vec::with_capacity(count);
+        for _ in 0..count {
+            let mut families = Vec::with_capacity(3);
+            for _ in 0..3 {
+                let m = number(head(next(lines, "a pair's family")?, "family", "a pair's family")?.first(), "a pair's family")?;
+                families.push(
+                    (0..m)
+                        .map(|_| rats(next(lines, "a pair's member")?, "a pair's member"))
+                        .collect::<Result<Vec<_>, _>>()?,
+                );
+            }
+            let earlier = families.pop().expect("three families");
+            let current = families.pop().expect("three families");
+            let outputs = families.pop().expect("three families");
+            pairs.push(PairPort::new(outputs, current, earlier)?);
+        }
+        let pair_scale = scalar(lines, "pair-scale", "a ring's pair scale")?;
+        let receiving = read_optional_law(lines, "receiving", "a ring's receiving law")?;
+        let tree = if lines.clone().next() == Some("tree none") {
+            lines.next();
+            None
+        } else {
+            Some(TreeStanding::read(lines).map_err(|what| HnnError::ContinuingState { what })?)
+        };
+        let population = if lines.clone().next() == Some("population none") {
+            lines.next();
+            None
+        } else {
+            Some(PortReading::read(lines).map_err(|what| HnnError::ContinuingState { what })?)
+        };
+        let line = next(lines, "a ring's resonator")?;
+        let resonator = if line == "resonator none" {
+            None
+        } else {
+            let gains = read_keyed(line, "resonator", 4, "a ring's resonator gains")?;
+            Some(std::array::from_fn(|i| gains[i].clone()))
+        };
+        let scales = read_keyed(next(lines, "a ring's resonator scales")?, "resonator-scales", 4, "a ring's resonator scales")?;
+        Ok(Self {
+            standing,
+            standing_scale,
+            passive,
+            passive_scale,
+            contrast,
+            slices,
+            slice_scale,
+            source,
+            transport,
+            pairs,
+            pair_scale,
+            receiving,
+            tree,
+            population,
+            resonator,
+            resonator_scales: std::array::from_fn(|i| scales[i].clone()),
+        })
+    }
+}
+
 impl ContinuingState {
-    /// The source ring.
+    /// The source ring whose port heads the state.
     pub fn ring(&self) -> usize {
         self.ring
     }
 
+    /// The head's source law (the constructors admit a state only on a source ring).
+    fn head_law(&self) -> &NormalLaw {
+        self.rings[self.ring]
+            .source
+            .as_ref()
+            .expect("a continuing state is headed by a source ring")
+    }
+
     /// `E`.
     pub fn port(&self) -> &ExactRatMatrix {
-        &self.law.map
+        &self.head_law().map
     }
 
     /// `ρ`.
     pub fn transport(&self) -> &Rat {
-        &self.transport
+        &self.rings[self.ring].transport
     }
 
     /// The source port's deposit clock.
     pub fn clock(&self) -> u64 {
-        self.clock
+        self.clocks.get(&Locus::SourcePort(self.ring)).copied().unwrap_or(0)
     }
 
     /// [definition; agent-inferred, October 3; the reception carry §2.4] The reception's carried
@@ -7948,30 +8472,55 @@ impl ContinuingState {
     }
 
     /// **The state as text**, every value exact (the type's header): `E rows cols`, the rows,
-    /// `rho ρ`, then `state g`, the source law's parts ([`write_law`]), `receiving r` with each
-    /// receiving map as `receiving-map g m` (its ring and deposit clock), `map rows cols` with its
-    /// rows and its law's parts, the reception's carried end where one is carried
-    /// ([`ReceptionCarry::write`], absent at rest), `clock m`, `commit c`, `storage-product p`,
-    /// `material m` (the identity of the material it continues), `check n r` (the byte length and
-    /// residue of every line before it, [`text_residue`]), `end`.
+    /// `rho ρ`, then `state g` and the head's source law's parts ([`write_law`]); `rings n contacts
+    /// k`, each ring as `ring h` with its learned material ([`LearnedRing::write`]), each contact as
+    /// `contact a` with its factors and `scales`; `lattices n` with `locus exponent` lines; `carries
+    /// n` with `locus carrier count` heads and their `index value` lines; `clocks n` with `locus
+    /// clock` lines; `released n` with a locus a line; the reception's carried end where one is
+    /// carried ([`ReceptionCarry::write`], absent at rest); `commit c`, `storage-product p`,
+    /// `material m` (the identity of the declared material it continues), `check n r` (the byte
+    /// length and residue of every line before it, [`text_residue`]), `end`.
     pub fn to_text(&self) -> String {
-        let map = &self.law.map;
-        let mut s = format!("E {} {}\n", map.rows(), map.columns());
-        write_rows(&mut s, map);
-        s += &format!("rho {}\n", self.transport);
+        let law = self.head_law();
+        let mut s = String::new();
+        write_matrix(&mut s, "E", &law.map);
+        s += &format!("rho {}\n", self.transport());
         s += &format!("state {}\n", self.ring);
-        write_law(&mut s, &self.law);
-        s += &format!("receiving {}\n", self.receiving.len());
-        for (g, law, clock) in &self.receiving {
-            s += &format!("receiving-map {g} {clock}\n");
-            s += &format!("map {} {}\n", law.map.rows(), law.map.columns());
-            write_rows(&mut s, &law.map);
-            write_law(&mut s, law);
+        write_law(&mut s, law);
+        s += &format!("rings {} contacts {}\n", self.rings.len(), self.contacts.len());
+        for (h, ring) in self.rings.iter().enumerate() {
+            s += &format!("ring {h}\n");
+            ring.write(&mut s, h == self.ring);
+        }
+        for (a, contact) in self.contacts.iter().enumerate() {
+            s += &format!("contact {a}\n");
+            write_matrix(&mut s, "storage", &contact.storage);
+            write_matrix(&mut s, "stiffness", &contact.stiffness);
+            write_matrix(&mut s, "dissipation", &contact.dissipation);
+            write_keyed(&mut s, "scales", contact.scales.iter());
+        }
+        s += &format!("lattices {}\n", self.lattices.len());
+        for (locus, lattice) in &self.lattices {
+            s += &format!("{} {}\n", write_locus(locus), lattice.exponent);
+        }
+        s += &format!("carries {}\n", self.carries.len());
+        for ((locus, carrier), carry) in &self.carries {
+            s += &format!("{} {} {}\n", write_locus(locus), write_carrier(carrier), carry.0.len());
+            for (index, value) in &carry.0 {
+                s += &format!("{index} {value}\n");
+            }
+        }
+        s += &format!("clocks {}\n", self.clocks.len());
+        for (locus, clock) in &self.clocks {
+            s += &format!("{} {clock}\n", write_locus(locus));
+        }
+        s += &format!("released {}\n", self.released.len());
+        for locus in &self.released {
+            s += &format!("{}\n", write_locus(locus));
         }
         if let Some(carry) = &self.carry {
             carry.write(&mut s);
         }
-        s += &format!("clock {}\n", self.clock);
         s += &format!("commit {}\n", self.commit);
         s += &format!("storage-product {}\n", self.storage_product);
         s += &format!("material {}\n", self.material);
@@ -7982,11 +8531,11 @@ impl ContinuingState {
 
     /// [definition; agent-inferred, October 3] **A state's text stamped with a declared opening's
     /// identity**: its lines through `storage-product`, then `material` (the opening's
-    /// [`Constitution::material_identity`] at the state's ring), `check` and `end`, as
-    /// [`ContinuingState::to_text`] writes them. Only what follows `storage-product` may be replaced:
-    /// `end` alone (a state written before the identity) or an earlier stamp (a state written under
-    /// an earlier layout); anything else is refused. The stamp authenticates nothing by itself: its
-    /// caller has authenticated the text's bytes (the notebook's manifest of earlier states), and
+    /// [`Constitution::material_identity`]), `check` and `end`, as [`ContinuingState::to_text`]
+    /// writes them. Only what follows `storage-product` may be replaced: `end` alone (a state
+    /// written before the identity) or an earlier stamp (a state written under an earlier layout);
+    /// anything else is refused. The stamp authenticates nothing by itself: its caller has
+    /// authenticated the text's bytes (the notebook's manifest of earlier states), and
     /// [`ContinuingState::from_text`] then reads the stamped text whole.
     pub fn stamped(text: &str, opening: &Constitution) -> Result<String, HnnError> {
         let refuse = |what: &'static str| HnnError::ContinuingState { what };
@@ -8005,13 +8554,8 @@ impl ContinuingState {
         if !rest.lines().all(stamp) || rest.lines().last() != Some("end") {
             return Err(refuse("the stamp (only `end` or an earlier stamp follows the storage product)"));
         }
-        let ring = body
-            .lines()
-            .find_map(|line| line.strip_prefix("state "))
-            .and_then(|ring| ring.parse::<usize>().ok())
-            .ok_or(refuse("the state line"))?;
         let mut s = body.to_string();
-        s += &format!("material {}\n", opening.material_identity(ring));
+        s += &format!("material {}\n", opening.material_identity());
         s += &format!("check {} {}\n", s.len(), text_residue(&s));
         s += "end\n";
         Ok(s)
@@ -8040,8 +8584,7 @@ impl ContinuingState {
             return refuse("the check (the state is damaged)");
         }
         let mut lines = text.lines();
-        let shape = head(next(&mut lines, "the port's head")?, "E", "the port's head")?;
-        let map = read_rows(&mut lines, &shape, "the port's shape")?;
+        let map = read_matrix(&mut lines, "E", "the port's head")?;
         let rho = head(next(&mut lines, "the modulus")?, "rho", "the modulus")?;
         let transport = rho
             .first()
@@ -8057,44 +8600,121 @@ impl ContinuingState {
             "the state's ring",
         )?;
         let law = read_law(&mut lines, map)?;
-        let count = number(
-            head(next(&mut lines, "the receiving head")?, "receiving", "the receiving head")?.first(),
-            "the receiving count",
-        )?;
-        let mut receiving = Vec::with_capacity(count);
-        for _ in 0..count {
-            let words = head(next(&mut lines, "a receiving map")?, "receiving-map", "a receiving map")?;
-            let g = number(words.first(), "a receiving map's ring")?;
-            let clock: u64 = words
-                .get(1)
-                .and_then(|m| m.parse().ok())
-                .ok_or(HnnError::ContinuingState { what: "a receiving map's clock" })?;
-            let shape = head(next(&mut lines, "a receiving map's head")?, "map", "a receiving map's head")?;
-            let map = read_rows(&mut lines, &shape, "a receiving map's shape")?;
-            receiving.push((g, read_law(&mut lines, map)?, clock));
+        let counts = head(next(&mut lines, "the rings' head")?, "rings", "the rings' head")?;
+        if counts.get(1).map(String::as_str) != Some("contacts") || counts.len() != 3 {
+            return refuse("the rings' head");
         }
-        // The reception's carried end, where one is carried; a state at rest goes on to its clock.
-        let mut line = next(&mut lines, "the clock")?;
+        let (count, contacts) = (number(counts.first(), "the rings' count")?, number(counts.get(2), "the contacts' count")?);
+        if ring >= count {
+            return refuse("the state's ring among the rings");
+        }
+        let mut rings = Vec::with_capacity(count);
+        for h in 0..count {
+            if number(head(next(&mut lines, "a ring's head")?, "ring", "a ring's head")?.first(), "a ring's head")? != h {
+                return refuse("a ring's head (in order)");
+            }
+            rings.push(LearnedRing::read(&mut lines, &law, h == ring)?);
+        }
+        if rings[ring].transport != transport {
+            return refuse("the head's modulus against its ring's");
+        }
+        let mut learned = Vec::with_capacity(contacts);
+        for a in 0..contacts {
+            if number(head(next(&mut lines, "a contact's head")?, "contact", "a contact's head")?.first(), "a contact's head")? != a {
+                return refuse("a contact's head (in order)");
+            }
+            let storage = read_matrix(&mut lines, "storage", "a contact's storage")?;
+            let stiffness = read_matrix(&mut lines, "stiffness", "a contact's stiffness")?;
+            let dissipation = read_matrix(&mut lines, "dissipation", "a contact's dissipation")?;
+            let scales = read_keyed(next(&mut lines, "a contact's scales")?, "scales", 3, "a contact's scales")?;
+            learned.push(LearnedContact {
+                storage,
+                stiffness,
+                dissipation,
+                scales: std::array::from_fn(|i| scales[i].clone()),
+            });
+        }
+        let count = number(head(next(&mut lines, "the lattices")?, "lattices", "the lattices")?.first(), "the lattices")?;
+        let mut lattices = BTreeMap::new();
+        for _ in 0..count {
+            let words: Vec<&str> = next(&mut lines, "a lattice")?.split_whitespace().collect();
+            let [kind, index, exponent] = words[..] else {
+                return refuse("a lattice");
+            };
+            let exponent: u32 = exponent
+                .parse()
+                .map_err(|_| HnnError::ContinuingState { what: "a lattice's exponent" })?;
+            lattices.insert(read_locus(kind, index)?, Lattice::new(exponent));
+        }
+        let count = number(head(next(&mut lines, "the carries")?, "carries", "the carries")?.first(), "the carries")?;
+        let mut carries = Carries::new();
+        for _ in 0..count {
+            let words: Vec<&str> = next(&mut lines, "a carry's head")?.split_whitespace().collect();
+            if words.len() < 4 {
+                return refuse("a carry's head");
+            }
+            let locus = read_locus(words[0], words[1])?;
+            let carrier = read_carrier(&words[2..words.len() - 1])?;
+            let entries = number(Some(&words[words.len() - 1].to_string()), "a carry's count")?;
+            let mut carry = BTreeMap::new();
+            for _ in 0..entries {
+                let pair: Vec<&str> = next(&mut lines, "a carried remainder")?.split_whitespace().collect();
+                let [index, value] = pair[..] else {
+                    return refuse("a carried remainder");
+                };
+                let index: usize = index
+                    .parse()
+                    .map_err(|_| HnnError::ContinuingState { what: "a remainder's index" })?;
+                let value: Rat = value
+                    .parse()
+                    .map_err(|_| HnnError::ContinuingState { what: "a remainder's value" })?;
+                if value.is_zero() {
+                    return refuse("a zero remainder (never stored)");
+                }
+                carry.insert(index, value);
+            }
+            carries.insert((locus, carrier), Carry(carry));
+        }
+        let count = number(head(next(&mut lines, "the clocks")?, "clocks", "the clocks")?.first(), "the clocks")?;
+        let mut clocks = BTreeMap::new();
+        for _ in 0..count {
+            let words: Vec<&str> = next(&mut lines, "a clock")?.split_whitespace().collect();
+            let [kind, index, clock] = words[..] else {
+                return refuse("a clock");
+            };
+            let clock: u64 = clock
+                .parse()
+                .map_err(|_| HnnError::ContinuingState { what: "a clock" })?;
+            clocks.insert(read_locus(kind, index)?, clock);
+        }
+        let count = number(head(next(&mut lines, "the released loci")?, "released", "the released loci")?.first(), "the released loci")?;
+        let mut released = BTreeSet::new();
+        for _ in 0..count {
+            let words: Vec<&str> = next(&mut lines, "a released locus")?.split_whitespace().collect();
+            let [kind, index] = words[..] else {
+                return refuse("a released locus");
+            };
+            released.insert(read_locus(kind, index)?);
+        }
+        // The reception's carried end, where one is carried; a state at rest goes on to its commit.
+        let mut line = next(&mut lines, "the commit")?;
         let carry = if line.starts_with("carry ") {
             let carry = ReceptionCarry::read(line, &mut |what| next(&mut lines, what))?;
-            line = next(&mut lines, "the clock")?;
+            line = next(&mut lines, "the commit")?;
             Some(carry)
         } else {
             None
         };
-        let clock: u64 = head(line, "clock", "the clock")?
+        let commit: u64 = head(line, "commit", "the commit")?
             .first()
-            .and_then(|m| m.parse().ok())
-            .ok_or(HnnError::ContinuingState { what: "the clock" })?;
+            .and_then(|c| c.parse().ok())
+            .ok_or(HnnError::ContinuingState { what: "the commit" })?;
         let mut scalar = |key: &str, what: &'static str| -> Result<String, HnnError> {
             head(next(&mut lines, what)?, key, what)?
                 .into_iter()
                 .next()
                 .ok_or(HnnError::ContinuingState { what })
         };
-        let commit: u64 = scalar("commit", "the commit")?
-            .parse()
-            .map_err(|_| HnnError::ContinuingState { what: "the commit" })?;
         let storage_product: Rat = scalar("storage-product", "the storage product")?
             .parse()
             .map_err(|_| HnnError::ContinuingState { what: "the storage product" })?;
@@ -8105,18 +8725,17 @@ impl ContinuingState {
         if next(&mut lines, "the end")?.trim() != "end" {
             return refuse("the end");
         }
-        if law.located.is_some() || law.chart.scale != 0 {
-            return refuse("the source law (founded at the unit prior, with no located pair)");
-        }
         Ok(Self {
             ring,
-            law,
-            transport,
-            clock,
+            rings,
+            contacts: learned,
+            lattices,
+            carries,
+            clocks,
+            released,
             commit,
             storage_product,
             material,
-            receiving,
             carry,
         })
     }
