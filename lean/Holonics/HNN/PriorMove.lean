@@ -35,7 +35,12 @@ exit up     0 ≤ V, 0 ≤ y, 2 y V ≤ V + a  ⇒  q(2y) ≤ q(y) ;   so the fl
    Newton point `1 + a/V` is at most `0`, and the code rises strictly along the members from the
    zero map: `q(x) < q(y)` for `0 ≤ x < y`. So the member half the map in force codes strictly less
    than it, which is the one member, `j = −1`, the Rust moves to (the least move the evidence asks;
-   a later window reads again).
+   a later window reads again). The rebase scales `V + a` by the move, `V′ + a′ = x (V + a)`
+   (`rebaseAt_add`), so the branch persists under its own move (`exit_down_rebased`,
+   `exit_down_iterate`): with no new readings every later read halves the map again. No member is
+   code-least there; the code falls toward the zero map without end, and only the carrier's limit
+   stops the prior (`PriorHeld::Carrier`). This is the law of the code-least rule on the quadratic,
+   not a defect of the move.
 4. **The exit up** (`double_le`, `descend_to_floor`, `floor_member_best`). Where `2 y V ≤ V + a`
    (`2y` at most the Newton point), doubling the map from `y` codes at most `y`. So from a member
    `y` at most the Newton point the code descends along every doubling up to `y`: `y` codes at most
@@ -199,6 +204,36 @@ theorem halving_exit (a V y : L) (hV : 0 < V) (ha : V + a ≤ 0) (hy : 0 < y) :
     model a V (y / 2) < model a V y :=
   model_lt_of_add_nonpos a V _ _ hV ha (by positivity) (by linarith)
 
+omit [LinearOrder L] [IsStrictOrderedRing L] in
+/-- [proved-derived; formal-checked] **The rebase scales `V + a`**: `V′ + a′ = x (V + a)`. -/
+theorem rebaseAt_add (a V x : L) :
+    (rebaseAt x (a, V)).2 + (rebaseAt x (a, V)).1 = x * (V + a) := by
+  simp only [rebaseAt]
+  ring
+
+/-- [proved-derived; formal-checked] **The exit down persists under its own move.** Where `V > 0`
+and `V + a ≤ 0`, the pair rebased to any member `x > 0` has `V′ > 0` and `V′ + a′ ≤ 0`: with no new
+readings the next read takes the same exit. -/
+theorem exit_down_rebased (a V x : L) (hV : 0 < V) (ha : V + a ≤ 0) (hx : 0 < x) :
+    0 < (rebaseAt x (a, V)).2 ∧ (rebaseAt x (a, V)).2 + (rebaseAt x (a, V)).1 ≤ 0 := by
+  refine ⟨by simp only [rebaseAt]; positivity, ?_⟩
+  rw [rebaseAt_add]
+  exact mul_nonpos_of_nonneg_of_nonpos hx.le ha
+
+/-- [proved-derived; formal-checked] **No member is code-least in the exit down.** Where `V > 0`
+and `V + a ≤ 0`, the pair halved `n` times still takes the exit down, and at each of those pairs
+half the map codes strictly less: on the members the code falls toward the zero map without end,
+so the move halves the map at every read until the carrier stops it. -/
+theorem exit_down_iterate (a V : L) (hV : 0 < V) (ha : V + a ≤ 0) (n : ℕ) :
+    0 < (rebaseAt ((1 / 2) ^ n) (a, V)).2 ∧
+      (rebaseAt ((1 / 2) ^ n) (a, V)).2 + (rebaseAt ((1 / 2) ^ n) (a, V)).1 ≤ 0 ∧
+      model (rebaseAt ((1 / 2) ^ n) (a, V)).1 (rebaseAt ((1 / 2) ^ n) (a, V)).2 (1 / 2) <
+        model (rebaseAt ((1 / 2) ^ n) (a, V)).1 (rebaseAt ((1 / 2) ^ n) (a, V)).2 1 := by
+  obtain ⟨h1, h2⟩ := exit_down_rebased a V ((1 / 2) ^ n) hV ha (by positivity)
+  refine ⟨h1, h2, ?_⟩
+  have := halving_exit _ _ 1 h1 h2 one_pos
+  simpa using this
+
 /-- [proved-derived; formal-checked] **The doubling exit.** Where `2y` is at most the Newton point,
 `2 y V ≤ V + a`, doubling the map from `y` codes at most `y`. -/
 theorem double_le (a V y : L) (hV : 0 ≤ V) (hy : 0 ≤ y) (h : 2 * y * V ≤ V + a) :
@@ -272,5 +307,6 @@ end Holonics.HNN.PriorMove
 #print axioms Holonics.HNN.PriorMove.carried_eq_sum
 #print axioms Holonics.HNN.PriorMove.value_rebased
 #print axioms Holonics.HNN.PriorMove.halving_exit
+#print axioms Holonics.HNN.PriorMove.exit_down_iterate
 #print axioms Holonics.HNN.PriorMove.floor_member_best
 #print axioms Holonics.HNN.PriorMove.moved_map_accounting
