@@ -915,10 +915,12 @@ is at the diamond, not at the step:
   off-walk loci: retention's bound under the default is the field's walk diamond. That diamond is
   the diamond at `e_last = 2|B|`, decided in `|B|` rounds (`inDiamond_continuing_iff`,
   `continuing_recursion`), and a connected field releases nothing (`continuing_collapse_connected`).
-  These are proved at a fixed constitution over the chain, on the abstract `BlockOp`. The standing
-  law over a resident that holds the carried change, with deposits between the words, and the locus
-  map from the medium's operands to the block edges of the concrete tick stay owed (#62);
-  `HNN/TickBlocks` proves `HNN/Word.fieldTick` a sparse `BlockOp`. Material that falls below the
+  These are proved at a fixed constitution over the chain, on the abstract `BlockOp`;
+  `HNN/TickBlocks` proves `HNN/Word.fieldTick` a sparse `BlockOp`, and the locus map from the
+  medium's operands to its block edges is `HNN/LocusMap` (`continuing_release_indistinguishable`
+  on the concrete medium). The standing law over a resident that holds the carried change, with
+  deposits between the words, is `HNN/CarriedStanding` (`carriedStanding`) on the abstract
+  `BlockOp`; the commits composed at held momentum stay owed (#62). Material that falls below the
   lattice grain is a value-level release, not this collapse.
 
 **What the card's default must change.** `holonics_cuda::hnn::port::Resident::new` opens at

@@ -32,9 +32,9 @@ lifts and applies to the concrete lift point as it stands. `HNN/TickBlocks` prov
 tick `HNN/Word.fieldTick` linear in the change at fixed operands and the `tick` of a `BlockOp` on
 `Ring ⊕ Contact` that is `Sparse blockAdj` (`fieldTick_comb`, `tick_blockOp`, `blockOp_sparse`,
 `fieldTick_iterate_blocks`), so a law stated here for one `BlockOp` reads on the concrete word. A
-law stated on an operand family reads on the concrete medium once the locus map from the medium's
-operands to the block edges is proved; that map is owed in #62, "Step 4 (#73) owed: the diamond on
-the concrete tick".
+law stated on an operand family reads on the concrete medium through the locus map from the medium's
+operands to the block edges, `HNN/LocusMap` (`blockOp_agree`, `retained_of_reads`,
+`release_indistinguishable`, `continuing_release_indistinguishable`, `deposit_descends`).
 
 [proved-derived; formal-checked] What is proved.
 
@@ -113,7 +113,8 @@ lattice entries' by their magnitudes (`lattice_bits_bounded`).
 [open] Owed in #62 ("Step 4 (#73) owed"): the solved charts `H⁻¹` of the carried Grams, whose bits
 follow the Hadamard bound as the Grams fill in; the word-level certificate of the lattice rule,
 `Σ_ℓ K_ℓ 2^(−L_ℓ) < 1/(2L_R)`; the value-level kernel of a frozen aeon (a collapse below the loci,
-campaign 3's); and the locus map from the medium's operands to the block edges named above.
+campaign 3's). The locus map named above is `HNN/LocusMap`; its own open items (the tick-indexed
+family and the loci with no medium operand) are listed there.
 
 No `sorry`, no `axiom`, no `native_decide`.
 -/

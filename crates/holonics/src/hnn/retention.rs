@@ -92,9 +92,9 @@
 //! proves the concrete tick `HNN/Word.fieldTick` linear in the change at fixed operands and the
 //! tick of a `BlockOp` on rings and contacts that is sparse on `blockAdj` (`fieldTick_comb`,
 //! `blockOp_sparse`, `fieldTick_iterate_blocks`). The locus map from the medium's operands to the
-//! block edges, which the laws stated on an operand family need on the concrete medium, is owed in
-//! #62, "Step 4 (#73) owed: the diamond on the concrete tick". The Rust tests check these laws on
-//! the concrete word (`tests/retention.rs`).
+//! block edges, which the laws stated on an operand family need on the concrete medium, is
+//! `HNN/LocusMap` (`blockOp_agree`, `retained_of_reads`, `release_indistinguishable`,
+//! `deposit_descends`). The Rust tests check these laws on the concrete word (`tests/retention.rs`).
 
 use std::collections::BTreeSet;
 
