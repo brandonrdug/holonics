@@ -141,25 +141,31 @@ __device__ __forceinline__ uint64_t tree_round(u128 numerator, u128 denominator,
     return r;
 }
 
-// **The stop weight** `λ̂ = ⟦β/(1 + β)⟧` on `2^(−M)` (`context::Beta::stop_weight`), decided
-// before any division once `|e| > M + W` (the single division's realization, whose operands the
-// mirror admits: `2W + M + 3 ≤ 128`).
+// **The stop weight** `λ̂ = ⟦β/(1 + β)⟧` on `2^(−M)` (`context::Beta::stop_weight`), its
+// numerator in `[0, 2^M]` (nearest, ties up). With `β = a 2^e / b`, one side of `1 + β` passing the
+// other by at least `2^(M+1)` decides the rounding (the other side's share is below half a lattice
+// step): `λ̂ = 2^M` when `e + bits a ≥ M + 2 + bits b`, `0` when `|e| + bits b ≥ M + 2 + bits a`.
+// It is read from the sides' bits before any division, as the host reads it, so an undecided
+// weight's operands stay within `M + b + 3` bits (`b ≤ W` on the carrier; a founding chart's rung
+// to 63) at every width the host admits.
 __device__ uint64_t tree_stop_weight(uint64_t numerator, uint64_t denominator, int64_t exponent,
                                      uint32_t face, uint32_t width) {
-    uint64_t full = 1ull << face;
-    uint64_t reach = (uint64_t)face + width + 1;
-    u128 a = numerator, b = denominator;
-    u128 twice = ((u128)1) << (face + 1);
+    (void)width;
+    const uint64_t full = 1ull << face;
+    const u128 a = numerator, b = denominator;
+    const int64_t bits_a = (int64_t)tree_bits(a), bits_b = (int64_t)tree_bits(b);
+    const int64_t decided = (int64_t)face + 2;
+    const u128 twice = ((u128)1) << (face + 1);
     if (exponent >= 0) {
-        if ((uint64_t)exponent >= reach) return full;
-        u128 g = (a << exponent) + b;
-        u128 t = twice * b;
-        u128 up = t <= g ? 0 : (t - g + 2 * g - 1) / (2 * g);
+        if (exponent + bits_a >= decided + bits_b) return full;
+        const u128 g = (a << exponent) + b;
+        const u128 t = twice * b;
+        const u128 up = t <= g ? 0 : (t - g + 2 * g - 1) / (2 * g);
         return full - (uint64_t)up;
     } else {
-        uint64_t shift = (uint64_t)(-exponent);
-        if (shift >= reach) return 0;
-        u128 h = a + (b << shift);
+        const int64_t shift = -exponent;
+        if (shift + bits_b >= decided + bits_a) return 0;
+        const u128 h = a + (b << shift);
         return (uint64_t)((twice * a + h) / (2 * h));
     }
 }

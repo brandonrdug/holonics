@@ -1236,8 +1236,12 @@ fn the_card_split_is_the_hosts() {
     use holonics::compression::landmark::context::Beta;
     let card = card();
     let mut draw = Draw(37);
+    let mut edge = Draw(41);
     let (mut rebased_all, mut kept_all) = (0usize, 0usize);
-    for (width, face) in [(6u64, 20u64), (29, 39), (43, 39)] {
+    // `(40, 62)`: the host's widest admitted tree (`D = 4` at 19,372,659 cells), where an
+    // undecided stop weight's operands reach `2W + M = 142` bits unless it is decided from the
+    // sides' bits first (`Beta::stop_weight`, the kernel's `tree_stop_weight`).
+    for (width, face) in [(6u64, 20u64), (29, 39), (43, 39), (40, 62)] {
         let mut charts = Vec::new();
         for trial in 0..3_000u64 {
             let odd = |draw: &mut Draw| u128::from(draw.next() >> (64 - width)) | 1;
@@ -1252,6 +1256,17 @@ fn the_card_split_is_the_hosts() {
                 _ => draw.signed(7) - (width as i64),
             };
             let (beta, _) = Beta::carry(odd(&mut draw), odd(&mut draw), exponent, width);
+            let (n, d, e) = beta.parts();
+            charts.push((n, d, e, upper, lower));
+        }
+        // Within `M + W` of balance on either side, from a draw of their own: where the stop
+        // weight is decided from the sides' bits or read by its division.
+        for _ in 0..600 {
+            let odd = |draw: &mut Draw| u128::from(draw.next() >> (64 - width)) | 1;
+            let (upper, lower) = (1 + edge.next() % 40, 1 + edge.next() % 40);
+            let near = (face + width) as i64 - edge.signed(6).abs();
+            let exponent = if edge.next() % 2 == 0 { near } else { -near };
+            let (beta, _) = Beta::carry(odd(&mut edge), odd(&mut edge), exponent, width);
             let (n, d, e) = beta.parts();
             charts.push((n, d, e, upper, lower));
         }
@@ -1285,7 +1300,10 @@ fn the_card_split_is_the_hosts() {
             );
         }
     }
-    assert!(rebased_all > 0 && kept_all > 0, "both branches exercised");
+    assert!(
+        rebased_all > 0 && kept_all > 0,
+        "both branches exercised: {rebased_all} rebased, {kept_all} kept"
+    );
     assert!(super::tree::split_ratios(&card, &[(1, 1, 0, 60, 60)], 63, 39).is_err());
 }
 
