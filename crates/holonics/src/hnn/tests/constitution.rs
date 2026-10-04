@@ -2216,6 +2216,7 @@ fn a_rebase_is_refused_mid_deposit_and_past_its_array() {
 #[test]
 fn a_contacts_channel_rebases_with_its_carried_remainders() {
     let field = six_path(2);
+    let every = crate::hnn::retention::loci(&field).into_iter().collect();
     let start = generic(&field, 13);
     let (current, open) = moment(&field, 14, 9);
     // One compare's deposit, staged by the machine path at a constitution.
@@ -2286,9 +2287,9 @@ fn a_contacts_channel_rebases_with_its_carried_remainders() {
     assert!(contacts > 0);
     for a in 0..contacts {
         let locus = Locus::Channel(a);
-        assert_eq!(&theta.rebased(locus, 0).unwrap(), theta);
+        assert_eq!(&theta.rebased(locus, 0, &every).unwrap(), theta);
         for levels in 1..=3 {
-            let next = theta.rebased(locus, levels).unwrap();
+            let next = theta.rebased(locus, levels, &every).unwrap();
             let finer = next.lattice(locus).unwrap();
             assert_eq!(
                 finer.exponent(),
@@ -2315,7 +2316,7 @@ fn a_contacts_channel_rebases_with_its_carried_remainders() {
                 }
             }
             assert!(next.on_lattice());
-            let rebased = start.rebased(locus, levels).unwrap();
+            let rebased = start.rebased(locus, levels, &every).unwrap();
             assert!(matches!(
                 rebased.deposited(&deposit),
                 Err(HnnError::StaleDeposit { .. })
@@ -2331,14 +2332,14 @@ fn a_contacts_channel_rebases_with_its_carried_remainders() {
             };
             assert_eq!(others(&next), others(theta));
             assert_eq!(
-                next.rebased(locus, 0).unwrap().contact_storage(a),
+                next.rebased(locus, 0, &every).unwrap().contact_storage(a),
                 next.contact_storage(a)
             );
         }
     }
     assert!(moved > 0);
     assert!(matches!(
-        theta.rebased(Locus::Element(0), 1),
+        theta.rebased(Locus::Element(0), 1, &every),
         Err(HnnError::RebaseLocus { .. })
     ));
     let mut released = theta.clone();
@@ -2346,7 +2347,7 @@ fn a_contacts_channel_rebases_with_its_carried_remainders() {
         .release(&std::collections::BTreeSet::from([Locus::Channel(0)]))
         .unwrap();
     assert!(matches!(
-        released.rebased(Locus::Channel(0), 1),
+        released.rebased(Locus::Channel(0), 1, &every),
         Err(HnnError::ReleasedLocus { .. })
     ));
 }

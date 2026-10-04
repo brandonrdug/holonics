@@ -67,7 +67,9 @@ use holonics::hnn::reference::{
     BudgetStop, ChartTally, ComparePhase, Cut, Declared, ExposedResident, Exposure, Reception,
     WallTimes, carry_bits, compare_phase, compose, expose, expose_from, window_code_length,
 };
-use holonics::hnn::retention::{Diamond, aeon_readings, collapse, contained, separator};
+use holonics::hnn::retention::{
+    Diamond, aeon_readings, collapse, contained, retained, separator,
+};
 use holonics::hnn::{
     Absorption, ActiveAddress, AeonBoundary, ChartKey, ChartReading, Constitution,
     ConstitutionRead, Current, Faces, Field, HnnError, Locus, PendingRatio, ReceivingPhases,
@@ -1446,7 +1448,9 @@ impl<'c> ExecutionPort for Resident<'c> {
             });
         }
         let start = Instant::now();
-        let (next, reading) = match resident.constitution.deposited(slot) {
+        // The budget reads the resident's retention, as the host's (record B §8).
+        let retention = retained(&field, &resident.admitted, self.reception.opens());
+        let (next, reading) = match resident.constitution.deposited_within(slot, &retention) {
             Ok(published) => published,
             Err(refusal @ HnnError::ConstitutionBudget { .. }) => {
                 resident.staged.remove(&staged);

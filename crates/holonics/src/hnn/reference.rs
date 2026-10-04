@@ -141,7 +141,7 @@
 //! `ExactWork` threaded through each of those owners' loops (most outside `hnn`), so they are left
 //! uncounted rather than estimated from shapes.
 
-use std::collections::BTreeMap;
+use std::collections::{BTreeMap, BTreeSet};
 use std::ops::Range;
 use std::time::{Duration, Instant};
 
@@ -280,11 +280,13 @@ impl Resident {
     /// [definition; agent-inferred, October 2; the contact loop record §23] **The contacts'
     /// refining grain**: every retained channel re-based by `levels` onto its finer lattice
     /// ([`Constitution::rebased`]), published as one commit per channel. Returns the channels
-    /// re-based. The ring loci keep their lattice (their re-base is refused).
+    /// re-based. The ring loci keep their lattice (their re-base is refused). Each re-base is
+    /// admitted against the resident's retention ([`Resident::retention`], record B §8).
     pub fn refine_contact_grain(&mut self, levels: u32) -> Result<usize, HnnError> {
         if levels == 0 {
             return Ok(0);
         }
+        let reads = self.retention();
         let mut next = self.constitution.clone();
         let mut count = 0;
         for contact in 0.. {
@@ -295,7 +297,7 @@ impl Resident {
             if next.released().contains(&locus) {
                 continue;
             }
-            next = next.rebased(locus, levels)?;
+            next = next.rebased(locus, levels, &reads)?;
             count += 1;
         }
         self.constitution = next;
@@ -488,6 +490,10 @@ pub struct Resident {
     /// mount, whose first reception opens with zero carry; a saved state brings its carried end
     /// back through [`Reference::mount_continued`].
     carried: Option<ReceptionCarry>,
+    /// [definition; agent-inferred, October 4; record B §8] **What the admitted future's words open
+    /// on** (the port's declared reception, [`Reception::opens`]): the retention a re-base of the
+    /// contacts' grain is admitted against ([`Resident::refine_contact_grain`]).
+    opens: Opens,
 }
 
 /// [definition] **The executed charts' tally** over a resident's words (the lattice word): the chart
@@ -738,6 +744,14 @@ impl Resident {
     /// The admitted family of the last boundary (the declared receivers before the first).
     pub fn admitted(&self) -> &[ReceivingPhases] {
         &self.admitted
+    }
+
+    /// [definition; agent-inferred, October 4; record B §8] **The resident's retention**: the loci
+    /// its admitted family's collapse keeps at its reception's opening
+    /// ([`crate::hnn::retention::retained`]), what it holds after that collapse. `B_Θ` bounds their
+    /// bits at every deposit, lock and re-base ([`Constitution::deposited_within`]).
+    pub fn retention(&self) -> BTreeSet<Locus> {
+        crate::hnn::retention::retained(&self.field, &self.admitted, self.opens)
     }
 
     /// The budget refusal that stopped deposition, once it came.
@@ -993,6 +1007,7 @@ impl Reference {
             tally: ChartTally::new(field),
             wall: WallTimes::default(),
             carried: None,
+            opens: self.reception.opens(),
         })
     }
 
@@ -1611,7 +1626,8 @@ impl ExecutionPort for Reference {
             found: 0,
         })?;
         let start = Instant::now();
-        let (next, reading) = match resident.constitution.deposited(&slot.deposit) {
+        let retention = resident.retention();
+        let (next, reading) = match resident.constitution.deposited_within(&slot.deposit, &retention) {
             Ok(published) => published,
             Err(refusal @ HnnError::ConstitutionBudget { .. }) => {
                 resident.staged.remove(&staged);
@@ -3801,7 +3817,7 @@ pub fn contact_ablation(
                 if let Some(reach) = deposit.reach() {
                     alone = alone.with_reach(reach.clone());
                 }
-                let (successor, reading) = theta.deposited(&alone)?;
+                let (successor, reading) = theta.deposited_within(&alone, &resident.retention())?;
                 let successor_kept = successor.clone();
                 let continued = |c: &Constitution| -> Result<(Vec<Vec<Rat>>, Faces), HnnError> {
                     let operands = Operands::at_cut(field, c, resident.current())?;

@@ -370,14 +370,30 @@ impl Diamond {
 
 /// **The union of the admitted receivers' retentions.** The receiving maps are always retained.
 pub fn retained(field: &Field, admitted: &[ReceivingPhases], opens: Opens) -> BTreeSet<Locus> {
-    let mut kept: BTreeSet<Locus> = loci(field)
-        .into_iter()
-        .filter(|locus| matches!(locus, Locus::ReceivingMap(_)))
-        .collect();
+    let mut kept = receiving_maps(field);
     for phases in admitted {
         kept.extend(Diamond::admitted(field, phases, opens).retained(field));
     }
     kept
+}
+
+/// [definition; agent-inferred, October 4; record B §8] **The retention under the carry** of the
+/// receivers on `rings`: [`retained`] at [`Opens::OnMotion`], which reads only the receiving rings
+/// (the continuing diamond closes every distance). The executed comparison's move is admitted
+/// against it for its declared ring.
+pub fn retained_on_motion(field: &Field, rings: &[usize]) -> BTreeSet<Locus> {
+    let mut kept = receiving_maps(field);
+    for &ring in rings {
+        kept.extend(Diamond::continuing(field, ring).retained(field));
+    }
+    kept
+}
+
+fn receiving_maps(field: &Field) -> BTreeSet<Locus> {
+    loci(field)
+        .into_iter()
+        .filter(|locus| matches!(locus, Locus::ReceivingMap(_)))
+        .collect()
 }
 
 /// **An admitted family is contained in the previous boundary's** exactly when each of its

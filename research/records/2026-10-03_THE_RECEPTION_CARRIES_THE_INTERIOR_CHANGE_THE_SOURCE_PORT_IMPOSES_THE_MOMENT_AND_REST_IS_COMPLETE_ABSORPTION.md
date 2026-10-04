@@ -914,22 +914,32 @@ diamond (`Diamond::element`). A ring outside it carries none of the stepped diff
 growth bounds nothing the certificate certifies; an element outside it is read by no admitted
 reading, so a crossing there changes no reading; a channel whose transit the word does not read
 passes none of the difference, and a released channel's stiffness is zero, so its signature signs
-nothing (the boost stays declared and inert; the release does not drop it). The budget bounds what
-the deposit moves and the word reads: material outside the word's diamond is not moved by the
-deposit, and if the budget read it, the collapse would merge two constitutions that a deposit's
-admission separates, which the retention law forbids (§8 of the objects: the quotient may not
-merge what an admitted action separates). So `Reach` carries the loci of the word's opened
-diamond (`Reach::loci`, `Diamond::retained`), and every read past the locus reads them alone:
-`certify_steps` forms `ω` and calls `ring_reaches` (its Floquet decisions, span factors and held
-families) only on rings whose element the word holds; `lobe` reads crossings, the halving and the
-lock's proposal only on those rings' slices; the boost gate reads only the channels the word holds;
-and the budget at the deposit and at the lock's half-turn reads `Constitution::bits_within` the
-word's loci (`LockProposal` carries them). Each such slice's contrast reads only standings the
-collapse retains, since a standing is retained beside every retained element. The word's opened
-diamond lies within every admitted receiver's collapse diamond (at rest the two are the same; under
-the carry the continuing diamond keeps every locus a walk passes), so the collapse changes no step
-and no refusal. `DepositReading::bits` still reports the successor's whole exact bits, which the
-resident's receipt reads.
+nothing (the boost stays declared and inert; the release does not drop it). So `Reach` carries the
+loci of the word's opened diamond (`Reach::loci`, `Diamond::retained`), and every read the step
+makes past its locus reads them alone: `certify_steps` forms `ω` and calls `ring_reaches` (its
+Floquet decisions, span factors and held families) only on rings whose element the word holds;
+`lobe` reads crossings, the halving and the lock's proposal only on those rings' slices; and the
+boost gate reads only the channels the word holds. Each such slice's contrast reads only standings
+the collapse retains, since a standing is retained beside every retained element. The word's
+opened diamond lies within every admitted receiver's collapse diamond (at rest the two are the
+same; under the carry the continuing diamond keeps every locus a walk passes), so the collapse
+changes no step.
+
+The budget is a different read. `B_Θ` bounds what the resident holds (the stop rule of
+`hnn::constitution`'s header), and after its admitted family's collapse the resident holds that
+collapse's retention, `retention::retained(field, admitted, opens)`. So the budget reads
+`Constitution::bits_within` that retention (`Constitution::deposited_within`; `Resident::retention`
+on the host, the same set on the card's port), at the deposit and at the lock's half-turn
+(`LockProposal` carries it). Counting every unreleased locus would let the collapse turn a refused
+deposit into a passing one, merging two constitutions that a deposit's admission separates, which
+the retention law forbids (§8 of the objects: the quotient may not merge what an admitted action
+separates). Counting the word's diamond alone would omit material the collapse keeps and later
+words read: under the carry the continuing collapse keeps every locus a walk passes, so on the
+connected six-ring path a word opened at rest reads rings 0–2 while the resident holds all six, and
+at rest two admitted receivers hold the union of their diamonds. The retention is invariant under
+the collapse, so the collapse changes no refusal. `Constitution::deposited` alone, with no admitted
+family, reads every unreleased locus. `DepositReading::bits` still reports the successor's whole
+exact bits, which the resident's receipt reads.
 
 Fixtures (`tests/retention.rs`), each failing without its restriction and passing with it:
 - `a_collapse_releasing_a_pumped_ring_changes_no_step`: ring 4 pumped, on the split path under the
@@ -944,13 +954,32 @@ Fixtures (`tests/retention.rs`), each failing without its restriction and passin
   `(3,0)` and `(4,1)` and dropped standing 3, while the collapsed one stepped it; now both step it.
 - `a_boost_refuses_only_the_steps_whose_word_reads_its_channel`: a boost on contact 4 refuses
   nothing; a boost on contact 1 refuses on both sides.
-- `the_budget_reads_the_words_loci`: `B_Θ` set to the successor's bits on the word's loci, below
-  its whole bits; the deposit passes on both sides and commutes with the collapse.
+- `the_budget_reads_the_residents_retention`: on the six-ring path, a word opened at rest, and
+  `B_Θ` set to the successor's bits on the rest retention, below its bits on the carry's retention
+  (all six rings). The deposit passes against the rest retention on both sides and commutes with
+  the collapse. Against the carry's retention, and with no family, it is refused, although its bits
+  on the word's diamond lie within `B_Θ`.
 
-The other moves that check `B_Θ`, a channel's re-base (`Constitution::rebased`, the contacts'
-refining grain) and the executed comparison's source move (`Constitution::stepped_source`), are
-not a word's deposit and carry no `Reach`; they still count every unreleased locus. The joint step
-on retained loci as a per-locus factor law is owed in Lean (#62).
+The two other moves that check `B_Θ` counted every unreleased locus too, so a collapse could turn a
+refused move into a passing one. The same rule settles them, since the retention needs no word:
+
+- A channel's re-base (`Constitution::rebased`, the contacts' refining grain) is admitted against
+  the resident's retention and its channel. The resident carries its reception's `Opens` for this.
+- The executed comparison's source move (`Constitution::stepped_source`) is admitted against the
+  retention and the source port. The executed refinement's words continue under the carry, so its
+  retention is the continuing collapse's for the declared ring (`retention::retained_on_motion`,
+  which reads only the receiving rings). `SourceStep::bits` still reports the whole exact bits.
+
+Fixtures, each failing without its restriction and passing with it:
+- `a_rebase_reads_the_residents_retention`: on the six-ring path at rest, `B_Θ` is set to the
+  re-based successor's bits on the rest retention, below its whole bits. Contact 0's three-level
+  re-base passes on both sides and commutes with the collapse, and one bit less refuses it on both.
+- `the_source_step_reads_the_retention_under_the_carry`: on the split path, where the continuing
+  collapse releases rings 3–5, `B_Θ` is set to the stepped successor's bits on that retention. The
+  unit step passes on both sides with the same reading and commutes with the collapse, and one bit
+  less refuses it on both.
+
+The joint step on retained loci, as a per-locus factor law, is owed in Lean (#62).
 
 **Saved states.** A state written at rest writes no carry and reads back with none (§2.6). It now
 restores through one owner, `Reference::mount_continued`. That owner continues the declared opening

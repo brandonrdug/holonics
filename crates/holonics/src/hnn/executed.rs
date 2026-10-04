@@ -169,14 +169,15 @@
 //! | loop 1c's representation readings: each decision term's lock face pulled back to `E` and `ρ`, and the comparison re-read on frozen sites (a search's readings, never a move) | `HNN/ExecutedComparison.lockFace_covector`; the pullback's joined statement owed (#62) | [`site_gradients`], [`frozen_reread`] |
 //! | the restore law as a standing law (the continuing state's consumer) | `HNN/ExecutedComparison.{restoreStanding, restored_continuation_agrees, equal_states_agree}` | `hnn::constitution::{ContinuingState, Constitution::continued}` |
 
-use std::collections::BTreeMap;
+use std::collections::{BTreeMap, BTreeSet};
 use std::sync::OnceLock;
 
 use num_bigint::BigInt;
 use num_traits::{One, Signed, Zero};
 
 use crate::hnn::HnnError;
-use crate::hnn::constitution::{Constitution, Sample, SourceStep};
+use crate::hnn::constitution::{Constitution, Locus, Sample, SourceStep};
+use crate::hnn::retention::retained_on_motion;
 use crate::hnn::field::{ConstitutionRead, Current, Field};
 use crate::hnn::moment::SourceMoment;
 use crate::hnn::prediction::{
@@ -3435,6 +3436,7 @@ fn ladder(
     constitution: &Constitution,
     ring: usize,
     samples: &[Sample],
+    retained: &BTreeSet<Locus>,
     before: &ExactInterval,
     start: Rat,
     unit_largest: &Rat,
@@ -3498,7 +3500,7 @@ fn ladder(
             source: None,
             carried: None,
         };
-        let stepped = match constitution.stepped_source(ring, samples, &step) {
+        let stepped = match constitution.stepped_source(ring, samples, &step, retained) {
             Ok(Some(stepped)) => stepped,
             Ok(None) => return Ok((trials, None, Some(MoveRefusal::Unreached))),
             Err(error @ (HnnError::ConstitutionBudget { .. } | HnnError::UncertifiedStorage)) => {
@@ -4043,7 +4045,9 @@ pub fn executed_move_scheduled(
             &weighted,
             modulus.as_ref().map(|x| (x, &port)),
         )?;
-        let Some((unit, _)) = constitution.stepped_source(ring, &samples, &Rat::one())? else {
+        let Some((unit, _)) =
+            constitution.stepped_source(ring, &samples, &Rat::one(), &retained_on_motion(field, &[ring]))?
+        else {
             receipt.refusal = Some(MoveRefusal::Unreached);
             return Ok(receipt);
         };
@@ -4146,6 +4150,7 @@ pub fn executed_move_scheduled(
         constitution,
         ring,
         &samples,
+        &retained_on_motion(field, &[ring]),
         &before.value,
         start,
         &unit_largest,
@@ -4318,7 +4323,8 @@ fn unit_step(
         .source_port(ring)
         .ok_or(HnnError::MissingSourcePort { ring })?
         .clone();
-    let Some((unit, _)) = constitution.stepped_source(ring, &samples, &Rat::one())? else {
+    let retained = retained_on_motion(field, &[ring]);
+    let Some((unit, _)) = constitution.stepped_source(ring, &samples, &Rat::one(), &retained)? else {
         return Ok((samples, None));
     };
     let unit_move = unit
