@@ -45,13 +45,12 @@ contact block of every channel the collapse does not keep and leaves every ring 
    `EndChange::support` drops a contact's rings once its state is zero, and the motion the release
    removed may be all that put a ring in the seed.
 
-[open] **The resonator's motion** (owed in #62). `Word.Medium` carries no resonator operand
-(`LocusMap`'s first owed item), so the concrete statement here covers the channels. A resonator
-sits on its ring's element edge `g → g` and its state on its ring; `motion_release_agrees` and
-`carried_motion_release_indistinguishable'` hold for any block layout and any sparse operator
-family, so they cover the resonator's state once the loaded ring's block carries it. The pumped
-resonator's operator moves with the tick: the tick-indexed family's laws are `HNN/TickFamily`, and
-the standing with it is `HNN/TickStanding` (`HNN/CarriedStanding`'s second model limit).
+**The resonator's motion.** `Word.Medium` carries no resonator operand (`LocusMap`'s first owed
+item), so the concrete statement here covers the channels. A resonator sits on its ring's element
+edge `g → g` and its state on its ring. Its release, material and motion together, under its
+pumped tick-indexed word is `HNN/LoadedRing` (`resonator_release_indistinguishable`), on
+`HNN/TickFamily` and `HNN/TickStanding` (`HNN/CarriedStanding`'s second model limit). [open] The
+loaded ring block on the concrete medium is owed (#62).
 
 This closes `HNN/CarriedStanding`'s third model limit (its `retain` keeps the carry whole): the
 carry `carriedStanding` keeps whole and the carry released here give the same admitted readings.
