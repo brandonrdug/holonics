@@ -869,8 +869,11 @@ it stood. Fixture: `retention::a_releasing_collapse_releases_the_carried_motion_
 on the host, and the card's `the_card_port_returns_the_reference_through_a_releasing_collapse`,
 which runs the same sequence on the default. The walk-diamond theorems are stated for the
 constitution at a fixed `θ`. `HNN/CarriedStanding` proves the standing law over the resident that
-holds the carry with the carry kept whole; the release of the carried open state is owed in Lean
-(#62).
+holds the carry with the carry kept whole. `HNN/CarriedMotion` proves the release of the carried
+open state indistinguishable along the continuing chain, on any sparse block operator family
+(`carried_motion_release_indistinguishable'`) and on the concrete medium for channels
+(`continuing_motion_release_indistinguishable`), and the first law's re-read on the pre-release
+diamond (`first_law_held_diamond`). The resonator's concrete operand is owed (#62).
 
 **Saved states.** A state written at rest writes no carry and reads back with none (§2.6). It now
 restores through one owner, `Reference::mount_continued`. That owner continues the declared opening
