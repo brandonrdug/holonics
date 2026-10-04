@@ -39,17 +39,33 @@ terms.
    (`resonator_reception_dissipative`), and over a chain read at every crossing the field's and the
    resonators' storage together never exceeds the first interior plus the supply plus the bounds
    (`resonator_chain_dissipative`), the resonators absorbed nowhere.
+3. **The passage between the words leaves the carried resonators' storage unchanged** (§3,
+   discharging `hlift`). Between word `k`'s commit and word `k + 1`'s opening the constitution is
+   acted on only by the window's ingest and a carry-out's re-keying (the lift alone), the refining
+   grain (the contacts alone) and the aeon's collapse (which can release a resonator to `None`), so
+   each ring's resonator material is the committed one or released (`passRes_keeps_or_releases`).
+   A slot the carry crosses has a declared resonator, so it is the committed one; the crossing
+   holds the rate at the carried momentum `π_r = C_r w` exactly as the held commit does, and where
+   the commit kept the rate (material or capacity unmoved) the held rate is the rate itself. So the
+   next opening's carried storage on the crossed state is the committed storage on the held state
+   (`slot_crossed_reads_held`, `passage_holds_resonator_storage`), and the opening closes with no
+   assumed hypothesis (`resonator_opening_closes_of_passage`).
 
 [definition; agent-inferred] The hypotheses read from the owners: the deposit and the ingest keep
 the source coordinates (as in `HNN/ChainedBalance`); the ingest moves the lift, hence the contacts'
-conductances, and reads every carried resonator's storage unchanged (`R_(m″) = R_(m′)` on the held
-resonator); the certified bound is the sum of the ticks' and the last junction's, each bounding its
-own residual. `L ≥ 0` and `|residual| ≤ bound` are the next word's certificates. The ingest's
-hypothesis (`hlift` of `resonator_opening_closes`) is not proved here. Two Rust tests pin it:
-`tests/reference.rs` `the_chained_balance_closes_on_a_pumped_field`, whose `ChainedBalance::closes`
-is exact and reads the carried resonators' storage under the next opening's form, nonzero from the
-third reception on; and `tests/word.rs` `a_carried_change_crosses_the_next_openings_references`,
-where `ReceptionCarry::crossed` keeps `u` exactly and, at an unchanged capacity, the whole state.
+conductances; the certified bound is the sum of the ticks' and the last junction's, each bounding its
+own residual. `L ≥ 0` and `|residual| ≤ bound` are the next word's certificates. §3 proves the
+ingest's hypothesis (`hlift`) from the owners' definitions, which it models: `Passage` from the
+exposure loop (`hnn::reference`, `SourceMoment::ingest`, `locate_keys`,
+`Resident::refine_contact_grain`, `Constitution::{rebased, release}`); `crossSlot` from
+`ReceptionCarry::crossed`; `heldSlot` from `PowerForm::held`; `slotPower` from
+`PowerForm::resonator_power`; the carried momentum from `Word::reception_end`, read with the word's
+own resonator material, the material the commit's `before` form reads (the compare between the
+refine and the deposit reads the constitution and writes nothing). The held rate is any map that
+returns the rate where the capacity already holds the momentum (`held_rate` returns `rate` when
+`C′ w − π = 0`); elsewhere the crossing and the commit call it on the same arguments. The Rust
+tests `tests/reference.rs` `the_chained_balance_closes_on_a_pumped_field` and `tests/word.rs`
+`a_carried_change_crosses_the_next_openings_references` exercise the same identity.
 
 No `sorry`, no `axiom`, no `native_decide`.
 -/
@@ -166,6 +182,193 @@ theorem resonator_chain_dissipative (P R A dep ing imp spl L Pt res b : ℕ → 
 
 end Chain
 
+/-! ## 3. The passage between the words leaves the carried resonators' storage unchanged -/
+
+section Passage
+
+/-- [definition] **What acts on the constitution between word `k`'s commit and word `k+1`'s
+opening** (`hnn::reference` exposure loop, record B §2.4). The window's ingest
+(`SourceMoment::ingest`, which takes the field and `&mut Current` only) and the keys located at a
+carry-out (`locate_keys`: "Re-keying moves only `λ`'s phase classes") move the lift alone; the
+refining grain (`Resident::refine_contact_grain`, `Constitution::rebased`, refused on every locus
+but `Locus::Channel`) re-bases the contacts alone; the aeon's collapse (`retention::collapse`,
+`Constitution::release`) releases a set of loci, a released resonator locus setting the ring's
+resonator to `None`. -/
+inductive Passage (ι : Type*) where
+  /-- The ingest or a re-keying: the lift moves, the constitution does not. -/
+  | lift
+  /-- The refining grain: a channel's contact material is re-based. -/
+  | rebaseChannel
+  /-- The collapse: the resonators of the rings in `S` are released. -/
+  | release (S : Finset ι)
+
+variable {ι Mat : Type*} [DecidableEq ι]
+
+/-- [definition] **The rings' resonator materials after a passage step** (`ring_resonator`): only a
+release moves them, to `None`. -/
+def Passage.apply : Passage ι → (ι → Option Mat) → (ι → Option Mat)
+  | .lift, res => res
+  | .rebaseChannel, res => res
+  | .release S, res => fun i => if i ∈ S then none else res i
+
+/-- [definition] The resonator materials after a whole passage, its steps in order. -/
+def passRes (steps : List (Passage ι)) (res : ι → Option Mat) : ι → Option Mat :=
+  steps.foldl (fun r st => st.apply r) res
+
+/-- [proved-derived; formal-checked] **A passage keeps every resonator or releases it**: after any
+sequence of ingests, re-keyings, re-bases and collapses, each ring's resonator material is the
+committed one or `None`. -/
+theorem passRes_keeps_or_releases (steps : List (Passage ι)) (res : ι → Option Mat) (i : ι) :
+    passRes steps res i = res i ∨ passRes steps res i = none := by
+  induction steps generalizing res with
+  | nil => exact Or.inl rfl
+  | cons st rest ih =>
+    simp only [passRes, List.foldl_cons]
+    rcases ih (st.apply res) with h | h
+    · cases st with
+      | lift => exact Or.inl h
+      | rebaseChannel => exact Or.inl h
+      | release S =>
+        by_cases hS : i ∈ S
+        · right; exact h.trans (by simp [Passage.apply, hS])
+        · left; exact h.trans (by simp [Passage.apply, hS])
+    · exact Or.inr h
+
+variable {V Cap Φ K : Type*} [DecidableEq Mat] [DecidableEq Cap] [AddCommMonoid K]
+
+/-- [definition] **One ring's resonator storage under a form** (`PowerForm::resonator_power`, one
+term): the material's energy at the slot's form phase where the material, the state `(u, w)` and the
+phase are all present, nothing otherwise. -/
+def slotPower (energy : Mat → Φ → V → V → K) : Option Mat → Option (V × V) → Option Φ → K
+  | some m, some (u, w), some φ => energy m φ u w
+  | _, _, _ => 0
+
+/-- [definition] **The carried resonators' storage under a form**: the sum over the rings. -/
+def resonatorPower [Fintype ι] (energy : Mat → Φ → V → V → K) (res : ι → Option Mat)
+    (st : ι → Option (V × V)) (ph : ι → Option Φ) : K :=
+  ∑ i, slotPower energy (res i) (st i) (ph i)
+
+/-- [definition] **A carried resonator slot crossed into the next opening**
+(`ReceptionCarry::crossed`): with no state and no momentum it stays empty; a state with its momentum
+`π_r` onto a declared resonator holds its rate, `w′ = held(w, π_r, C′_r)` (`held_resonator_rate`),
+`u` as carried; anything else is refused (`none`). -/
+def crossSlot (cap : Mat → Cap) (held : V → V → Cap → V) :
+    Option Mat → Option (V × V) → Option V → Option (Option (V × V))
+  | _, none, none => some none
+  | some n, some (u, w), some π => some (some (u, held w π (cap n)))
+  | _, _, _ => none
+
+/-- [definition] **A resonator slot carried across the commit at held momentum**
+(`PowerForm::held`): where the materials before and after, the state and the phase are all present
+and the material moved, the rate is held at its momentum `C_r w` if the capacity moved; otherwise
+the state is kept. -/
+def heldSlot (cap : Mat → Cap) (act : Cap → V → V) (held : V → V → Cap → V) :
+    Option Mat → Option Mat → Option (V × V) → Option Φ → Option (V × V)
+  | some o, some n, some (u, w), some _ =>
+      if o = n then some (u, w)
+      else if cap o = cap n then some (u, w)
+      else some (u, held w (act (cap o) w) (cap n))
+  | _, _, s, _ => s
+
+/-- [proved-derived; formal-checked] **One slot: the crossing reads the held commit's storage.**
+With the carried momentum `π_r = C_r w` read with the word's own material (`Word::reception_end`),
+the held rate fixed where the capacity already holds the momentum (`held_rate` returns the rate when
+`C′ w = π`), and the next opening's material the committed one or released, a slot the crossing
+accepts has the same storage under the next opening's form as the held commit's under the
+committed form. -/
+theorem slot_crossed_reads_held (cap : Mat → Cap) (act : Cap → V → V) (held : V → V → Cap → V)
+    (hfix : ∀ w π c, act c w = π → held w π c = w) (energy : Mat → Φ → V → V → K)
+    (old new next : Option Mat) (st : Option (V × V)) (mom : Option V) (ph : Option Φ)
+    (hmom : mom = match st, old with
+      | some (_, w), some o => some (act (cap o) w)
+      | _, _ => none)
+    (hnext : next = new ∨ next = none) {cr : Option (V × V)}
+    (hcross : crossSlot cap held next st mom = some cr) :
+    slotPower energy next cr ph = slotPower energy new (heldSlot cap act held old new st ph) ph := by
+  rcases st with _ | ⟨u, w⟩
+  · -- no state: nothing is carried, nothing is read
+    rcases old with _ | o <;> simp only at hmom <;> subst hmom <;>
+      rcases next with _ | n <;> simp [crossSlot] at hcross <;> subst hcross <;>
+      rcases new with _ | m <;> rcases ph with _ | φ <;> simp [slotPower, heldSlot]
+  · rcases old with _ | o
+    · simp only at hmom; subst hmom
+      rcases next with _ | n <;> simp [crossSlot] at hcross
+    · simp only at hmom; subst hmom
+      rcases next with _ | n
+      · simp [crossSlot] at hcross
+      · simp only [crossSlot, Option.some.injEq] at hcross
+        subst hcross
+        rcases hnext with h | h
+        · subst h
+          rcases ph with _ | φ
+          · simp [slotPower, heldSlot]
+          · simp only [slotPower, heldSlot]
+            by_cases hon : o = n
+            · subst hon; simp [hfix w _ _ rfl]
+            · by_cases hc : cap o = cap n
+              · simp [hon, hc, hfix w _ _ rfl]
+              · simp [hon, hc]
+        · exact absurd h (by simp)
+
+/-- [proved-derived; formal-checked] **The passage between the words leaves the carried resonators'
+storage unchanged** (record B §2.4; `ChainedBalance::closes`, the hypothesis `hlift` of
+`resonator_opening_closes`). Let the commit move the rings' resonator materials `old → new` with
+each carried slot held at momentum (`heldSlot`), the passage `steps` (ingests, re-keyings, re-bases,
+collapses) take `new` to the next opening's materials, and the carry cross every slot into the next
+opening (`crossSlot` accepting, as `ChainedBalance::read` requires). Then the carried resonators'
+storage at the opening under the next opening's form, read on the crossed state
+(`resonator_open`), is their storage under the committed form, read on the held state
+(`CommitWork`'s committed resonator storage): `R_(m″)(crossed) = R_(m′)(held)`. -/
+theorem passage_holds_resonator_storage [Fintype ι] (cap : Mat → Cap) (act : Cap → V → V)
+    (held : V → V → Cap → V) (hfix : ∀ w π c, act c w = π → held w π c = w)
+    (energy : Mat → Φ → V → V → K) (old new : ι → Option Mat) (steps : List (Passage ι))
+    (st : ι → Option (V × V)) (mom : ι → Option V) (ph : ι → Option Φ)
+    (hmom : ∀ i, mom i = match st i, old i with
+      | some (_, w), some o => some (act (cap o) w)
+      | _, _ => none)
+    (cr : ι → Option (V × V))
+    (hcross : ∀ i, crossSlot cap held (passRes steps new i) (st i) (mom i) = some (cr i)) :
+    resonatorPower energy (passRes steps new) cr ph =
+      resonatorPower energy new (fun i => heldSlot cap act held (old i) (new i) (st i) (ph i)) ph :=
+  Finset.sum_congr rfl fun i _ =>
+    slot_crossed_reads_held cap act held hfix energy (old i) (new i) (passRes steps new i) (st i)
+      (mom i) (ph i) (hmom i) (passRes_keeps_or_releases steps new i) (hcross i)
+
+/-- [proved-derived; formal-checked] **The opening closes with the resonators, with no assumed
+hypothesis** (#62 item 3 with `hlift` discharged). `resonator_opening_closes` with its resonator
+storages read from the model: word `k`'s carried storage `R_int` (`resonator_interior`), the
+committed storage on the held state, `R_(m′)(held)`, and the next opening's on the crossed state,
+`R_open = R_(m″)(crossed)`; the passage and the crossing as `passage_holds_resonator_storage`
+states. Then
+`P_open + R_open = (P(crossing) − E_S(x)) + R_int + deposition + ingest + E_S(s)`, the deposition
+`(P_(m′)(x′) + R_(m′)(held)) − (P_m(x) + R_int)`. -/
+theorem resonator_opening_closes_of_passage [Fintype ι] {L : Type*} [Field L] {S I Med : Type*}
+    (ES : S → L) (R : Med → I → L) {m m' m'' : Med} {x x' x'' : S × I}
+    (s : S) (h₁ : x'.1 = x.1) (h₂ : x''.1 = x'.1) {Pend last Rint : L}
+    (hcrossing : power ES R m x = Pend - last)
+    (cap : Mat → Cap) (act : Cap → V → V) (held : V → V → Cap → V)
+    (hfix : ∀ w π c, act c w = π → held w π c = w) (energy : Mat → Φ → V → V → L)
+    (old new : ι → Option Mat) (steps : List (Passage ι))
+    (st : ι → Option (V × V)) (mom : ι → Option V) (ph : ι → Option Φ)
+    (hmom : ∀ i, mom i = match st i, old i with
+      | some (_, w), some o => some (act (cap o) w)
+      | _, _ => none)
+    (cr : ι → Option (V × V))
+    (hcross : ∀ i, crossSlot cap held (passRes steps new i) (st i) (mom i) = some (cr i)) :
+    power ES R m'' (s, x''.2) + resonatorPower energy (passRes steps new) cr ph =
+      ((Pend - last) - ES x.1) + Rint +
+        ((power ES R m' x' +
+            resonatorPower energy new
+              (fun i => heldSlot cap act held (old i) (new i) (st i) (ph i)) ph) -
+          (power ES R m x + Rint)) +
+        (power ES R m'' x'' - power ES R m' x') + ES s := by
+  rw [passage_holds_resonator_storage cap act held hfix energy old new steps st mom ph hmom cr
+    hcross, ← hcrossing]
+  simp only [power, h₂, h₁]
+  ring
+
+end Passage
+
 section Audit
 
 #print axioms resonator_held_momentum
@@ -174,6 +377,10 @@ section Audit
 #print axioms resonator_opening_closes
 #print axioms resonator_reception_dissipative
 #print axioms resonator_chain_dissipative
+#print axioms passRes_keeps_or_releases
+#print axioms slot_crossed_reads_held
+#print axioms passage_holds_resonator_storage
+#print axioms resonator_opening_closes_of_passage
 
 end Audit
 
