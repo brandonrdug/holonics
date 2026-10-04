@@ -94,7 +94,7 @@ fn chain_declaration(population: u64) -> FieldDeclaration {
             prior: holonics::compression::landmark::context::StopPrior::half(),
             mass: 1,
             base: holonics::compression::landmark::context::BaseMeasure::Even,
-            receiving_scale: 0,
+            receiving_prior: holonics::hnn::field::ReceivingPrior::Held(0),
         }],
         crib: CribDeclaration {
             window: 16,
@@ -298,6 +298,10 @@ struct Compared {
     pumped: u64,
     /// Received openings whose carried resonator rate a deposit moved off its momentum.
     resonator_held: u64,
+    /// The located receiving prior's reads at the stepped receiving maps, and the reads whose `k`
+    /// moved (the receiving prior's carry; the published constitutions are compared after each).
+    prior_reads: u64,
+    prior_moves: u64,
 }
 
 /// A carry as its saved text (`ReceptionCarry::write`): the bytes a continuing state holds.
@@ -474,6 +478,10 @@ fn lockstep_receiving(
                 {
                     compared.landmarks += reading.landmarks;
                     compared.stepped_loci += reading.steps.len() as u64;
+                    for prior in reading.charts.iter().filter_map(|(_, chart)| chart.prior.as_ref()) {
+                        compared.prior_reads += 1;
+                        compared.prior_moves += u64::from(prior.to != prior.from);
+                    }
                 }
                 compared.resonator_material_changes += (0..field.rings().len())
                     .filter(|&ring| {
@@ -542,7 +550,7 @@ fn lockstep_receiving(
         .normal_mirror()
         .expect("the lockstep runs the mirror");
     println!(
-        "the normal-law mirror: {} carried; {} declined (empty {}, off the dyadics {}, past a word {}, the kernel {}, the read {}); {} skipped (a locus stepped again {}, no normal law {})",
+        "the normal-law mirror: {} carried; {} declined (empty {}, off the dyadics {}, past a word {}, the kernel {}, the read {}); {} skipped (a locus stepped again {}, no normal law {}, a moved prior {})",
         compared.mirror.carried,
         compared.mirror.declined(),
         compared.mirror.empty,
@@ -553,6 +561,7 @@ fn lockstep_receiving(
         compared.mirror.skipped(),
         compared.mirror.repeated,
         compared.mirror.lawless,
+        compared.mirror.moved,
     );
     compared
 }
@@ -645,6 +654,45 @@ fn the_card_port_returns_the_reference_on_the_chain() {
     assert!(compared.boundaries > 0 && compared.keys > 0 && compared.deposits > 0);
     // Every deposited window added its two targets to the tree (the landmark tree).
     assert_eq!(compared.landmarks, 2 * compared.deposits);
+}
+
+/// **The located receiving prior on the card** (the receiving prior's carry, record §7): the chain
+/// with its receiver's prior located from `2^6`, in lockstep at the production reception (the
+/// carry, `Reference::campaign_one().reception()`). The card deposits through the host
+/// constitution, so the moved Gram, map, chart and pair are the reference's (the published
+/// constitutions are compared after every deposit); the normal-law mirror skips a deposit whose
+/// prior moved, since its kernel steps a fixed `2^k`, and counts it.
+///
+/// At rest this cut cannot move the prior, by the law: the receiving map's moves stay below its
+/// lattice's grain at `2^6`, so the map in force reads zero at every window, the code along `φ W`
+/// is the same at every member and every read holds for want of curvature (the host's
+/// `holonics::hnn::tests::prior_carry::at_rest_the_cards_chain_holds_its_prior_and_under_the_carry_it_moves`,
+/// on this fixture: 33 reads at rest, none moved; 33 under the carry, 22 moved).
+#[test]
+#[ignore = "needs the CUDA card; run alone with --include-ignored --test-threads=1"]
+fn the_card_port_returns_the_reference_across_a_moved_receiving_prior() {
+    let declared = |population: u64| {
+        let mut declaration = chain_declaration(population);
+        declaration.receivers[0].receiving_prior =
+            holonics::hnn::field::ReceivingPrior::Located { from: 6 };
+        Field::declare(declaration.by_lattice_rule()).unwrap()
+    };
+    let field = declared(declared(1 << 20).capacity().n_star() as u64);
+    let population = field.population() as usize;
+    let cells = source(population, field.alphabet(), 3);
+    let held = population - 8;
+    let compared = lockstep_receiving(
+        &field,
+        &cut_of(cells, held..population),
+        u64::MAX,
+        None,
+        3,
+        Reference::campaign_one().reception(),
+    );
+    println!("chain, located prior, the production reception: {compared:?}");
+    assert!(compared.prior_reads > 0 && compared.prior_moves > 0);
+    // A moved locus stepped twice in one deposit is counted among the repeated steps instead.
+    assert!(compared.mirror.moved > 0 && compared.mirror.moved <= compared.prior_moves);
 }
 
 /// **The reception carry's chain** (the host's fixture, `holonics::hnn::tests::learning::chain_of`):

@@ -16,6 +16,7 @@ mod loaded_scalar;
 mod lock_face;
 mod moment;
 mod pending;
+mod prior_carry;
 mod physics;
 mod port;
 mod prediction;

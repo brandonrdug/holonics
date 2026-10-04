@@ -138,7 +138,7 @@ fn declare(declared: &Declared) -> Field {
                 prior: StopPrior::half(),
                 mass: 1,
                 base: holonics::compression::landmark::context::BaseMeasure::Even,
-                receiving_scale: 0,
+                receiving_prior: holonics::hnn::field::ReceivingPrior::Held(0),
             }],
             crib: CribDeclaration {
                 window: 16,

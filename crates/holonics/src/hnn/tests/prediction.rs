@@ -233,7 +233,7 @@ pub(super) fn joint() -> Field {
                 prior: crate::compression::landmark::context::StopPrior::half(),
                 mass: 1,
                 base: crate::compression::landmark::context::BaseMeasure::Even,
-                receiving_scale: 0,
+                receiving_prior: crate::hnn::field::ReceivingPrior::Held(0),
             }],
             crib: crate::hnn::field::CribDeclaration {
                 window: 16,

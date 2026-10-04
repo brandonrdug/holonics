@@ -51,7 +51,7 @@ pub(super) fn path_with(aperture: usize, junctions: &[Rat], contacts: &[Rat]) ->
                 prior: crate::compression::landmark::context::StopPrior::half(),
                 mass: 1,
                 base: crate::compression::landmark::context::BaseMeasure::Even,
-                receiving_scale: 0,
+                receiving_prior: crate::hnn::field::ReceivingPrior::Held(0),
             }],
             crib: CribDeclaration {
                 window: 16,
@@ -114,7 +114,7 @@ pub(super) fn chain_declaration(population: u64) -> FieldDeclaration {
             prior: crate::compression::landmark::context::StopPrior::half(),
             mass: 1,
             base: crate::compression::landmark::context::BaseMeasure::Even,
-            receiving_scale: 0,
+            receiving_prior: crate::hnn::field::ReceivingPrior::Held(0),
         }],
         crib: CribDeclaration {
             window: 16,

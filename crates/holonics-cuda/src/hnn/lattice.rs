@@ -722,8 +722,10 @@ pub enum Decline {
 /// [definition] **The normal-law mirror's tally** (the GPU suite's parity test; the exposure's path
 /// does not run the mirror): the prox steps the card carried and read equal to the host's
 /// successor, those it declined by reason, and those it skipped, a locus the deposit stepped more
-/// than once (its later steps read a residual staged by the earlier) or a locus without a normal
-/// law on either side.
+/// than once (its later steps read a residual staged by the earlier), a locus without a normal
+/// law on either side, or a receiving law whose located prior moved at the deposit (its successor
+/// is the prox step and then the host's move, `holonics::hnn::constitution::PriorMove`, which the
+/// card does not form; the next deposit's mirror reads the moved Gram and chart).
 #[derive(Clone, Copy, Debug, Default, PartialEq, Eq)]
 pub struct NormalMirror {
     pub carried: u64,
@@ -734,6 +736,7 @@ pub struct NormalMirror {
     pub read: u64,
     pub repeated: u64,
     pub lawless: u64,
+    pub moved: u64,
 }
 
 impl NormalMirror {
@@ -756,7 +759,7 @@ impl NormalMirror {
 
     /// The steps skipped.
     pub fn skipped(&self) -> u64 {
-        self.repeated + self.lawless
+        self.repeated + self.lawless + self.moved
     }
 }
 
