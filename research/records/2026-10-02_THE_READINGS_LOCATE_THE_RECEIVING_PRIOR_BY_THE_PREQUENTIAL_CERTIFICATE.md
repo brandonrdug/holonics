@@ -176,9 +176,19 @@ held-out read (b) below is not resolved at the grain.
   - The prequential alignment changes sign in `(I, 2 I)` over the campaign, and in `(2 I, 2^2 I)`
     at 2,192 readings.
   - At both lengths, the Newton points read at the two members that bracket the sign change lie in
-    `(√2, 2√2)`, the scales whose exponent is nearer `1` than any other integer: `12055433/2^23`
-    and `16109515/2^23` over the campaign, `9137823/2^22` and `10741668/2^22` at 2,192 readings
-    (each square lies between `2` and `8`).
+    `[4/3, 8/3]`, the cell of `2 I`: `12055433/2^23` and `16109515/2^23` over the campaign,
+    `9137823/2^22` and `10741668/2^22` at 2,192 readings, and `14350156/2^23` read at `I` there
+    (`HNN/PriorCarry.campaign_one_cell`).
+  - The cell is the code's. The law the prior serves is the prequential code, so among the powers
+    of two the prior is the member that codes least. On §4's quadratic two members `x` and `2x` of
+    the map's scale compare at the arithmetic midpoint, `q(x) ≤ q(2x)` iff the Newton point is at
+    most `3x/2` (`HNN/PriorCarry.neighbour_le_iff`), and the member whose cell `[3x/4, 3x/2]` holds
+    the Newton point codes least on the whole grid (`grid_member_best_zpow`). In the prior's scale
+    `σ = s/φ` that cell is `[2σ_m/3, 4σ_m/3]`, bounded by the harmonic midpoints of the neighbours
+    (`cell_prior_iff`). (October 4: this replaces the cell `(√2, 2√2)` first read here, the scales
+    whose exponent is nearer `1` than any other integer. That cell compares members in the exponent,
+    as a quadratic in `log φ` would; the code is quadratic in `φ`, so it was an approximation of the
+    code's cell. Every Newton point above lies in both cells, so the selection is unchanged.)
   - `2 I` is the best replayed member at 2,192 readings and at 3,400.
 - `I` has no derivation as the lower end of the interval. The law's Newton points lie in `2 I`'s
   cell, and the readings separate the two members by more than an ordinary index of the scales
@@ -240,7 +250,11 @@ shared load; the solo read took 673146 ms. Card parity is gate 3: 32 of 32 on a 
 The receipts are on `claude/pc-receipts` at `6f2e4b5d`.
 
 Carrying `a` and `V` natively beside the Gram, and moving `s` by the Newton point as readings
-arrive, is the per-field law's native form. It is not built here.
+arrive, is the per-field law's native form. It is not built here. Its mathematics is `HNN/PriorCarry` (#307,
+October 4): the carried pair is the certificate's own per-reading sum with no tape, a prior move
+rebases it (exactly on a held face, at second order at the map, an action of the scales that
+locates one prior from every member), and the move lands on the code-least member's cell above.
+The Rust owners it needs are written in #62.
 
 The second order is certified (`prequential_code_le`, `prequential_newton_decrease`). Along a map
 held as `φ M_t`, each reading's code is bounded by the receiving certificate's own quadratic
