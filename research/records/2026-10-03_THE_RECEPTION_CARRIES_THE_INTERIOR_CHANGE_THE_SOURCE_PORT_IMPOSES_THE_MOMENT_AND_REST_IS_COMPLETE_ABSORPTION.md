@@ -1103,6 +1103,26 @@ lock, a move, a re-base or a collapse writes.
   constitution: the state overwrites every learned value, so the founding is not part of what it
   continues. An opening of another declared material (another field, budget or receiving founding
   member) is refused, as before.
+- **What a seed determines, and why the change keeps both rules.** No production opening has a
+  seed: `Reference::mount` founds `Constitution::initial(field, budget)` (`reference.rs:1110`,
+  `constitution.rs:3730`), a function of the field and the budget alone. The seed exists only in
+  the test helper `generic_within` (`tests/learning.rs:155-203`), and it draws only learned
+  material: each ring's passive map, contrast and slices (`with_element`), standing, source map and
+  receiving map (`with_ports`), each source ring's pair ports (`with_pair`), and each contact's
+  three channel factors (`with_channel`), every one of them a test chart, never a law
+  (`constitution.rs:3985`, `:4036`, `:4369`, `:4494`). Each of those is a field of `LearnedRing` or
+  `LearnedContact` (`constitution.rs:7747-7775`), and `place` writes every one of them whole
+  (`constitution.rs:7825-7898`, `:7911-7926`), so nothing the seed drew survives a restore. The seed
+  selects no data. The exposure's cells and its held-out positions are the cut's own
+  (`Cut { cells, held_out }`, `reference.rs:2859-2871`), passed to `expose_from` beside the resident
+  (`reference.rs:4132`), and the passage order is the cut's order. A moment's codes come from a
+  separate seed of their own (`tests/learning.rs:207`). So a state restored onto a reseeded opening
+  carries exactly what it carried onto the original, which the fixture asserts as equality of the
+  two restored constitutions, and what it read is fixed by the cuts it was exposed to, not by the
+  opening. "Unseen means unread by any run" is unaffected: whether a passage was read is a fact of
+  the state's exposures, whichever opening receives it. #273's refusal of foreign material keeps
+  its force on the material that is declared, which is all an opening contributes to a restored
+  constitution.
 
 Fixtures: `tests/reference.rs`, `the_exposures_retained_state_saves_and_restores_whole` (a
 six-deposit exposure under the default moves the receiving tree and population; the state with the
