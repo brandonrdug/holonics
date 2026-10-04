@@ -70,9 +70,10 @@ receiver (`windowTicks_agree`). Every face respects it (`observe_agree`).
    the pump's phase at each tick (`operands.resonators()[ring]`, `Resonance`), on the refinement's
    clock, which continues across a continuing word's boundary. The phase moves only the element
    edge `g → g` (`Locus::Resonator(g)` is retained by the element's rule), so every tick's
-   operators agree on the same walk edges; the time-indexed family's laws
-   (`trajectory_agrees_on_walk` for a tick-indexed operator family, and the word read from its
-   opening phase) are owed in #62. Unpumped rings are time-invariant. The executed tick's carried
+   operators agree on the same walk edges. The tick-indexed family's laws are `HNN/TickFamily`
+   (`trajectoryAt_agrees_on_walk`, `depositDataAt_agree`), and the standing with a carry that holds
+   its tick, its word running its lift's class at each absolute tick, on loci shared across edges,
+   is `HNN/TickStanding` (`tickStanding`). Unpumped rings are time-invariant. The executed tick's carried
    remainders are a separate matter: the exact law is linear, the lattice outputs are not
    (`HNN/Word` item 7).
 3. *The motion release.* `retain` keeps the carry whole. The Rust's `close_aeon` also zeroes the

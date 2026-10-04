@@ -50,8 +50,8 @@ contact block of every channel the collapse does not keep and leaves every ring 
 sits on its ring's element edge `g → g` and its state on its ring; `motion_release_agrees` and
 `carried_motion_release_indistinguishable'` hold for any block layout and any sparse operator
 family, so they cover the resonator's state once the loaded ring's block carries it. The pumped
-resonator's operator moves with the tick: the tick-indexed family, owed in #62
-(`HNN/CarriedStanding`'s second model limit).
+resonator's operator moves with the tick: the tick-indexed family's laws are `HNN/TickFamily`, and
+the standing with it is `HNN/TickStanding` (`HNN/CarriedStanding`'s second model limit).
 
 This closes `HNN/CarriedStanding`'s third model limit (its `retain` keeps the carry whole): the
 carry `carriedStanding` keeps whole and the carry released here give the same admitted readings.
