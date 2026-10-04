@@ -12,7 +12,7 @@ use super::learning::{chain_declaration, chain_reach};
 use crate::hnn::HnnError;
 use crate::hnn::constitution::{
     BudgetedCarry, ChartRule, Constitution, ContinuingState, Lattice, LinearLocus, LinearStep,
-    LocatedPrior, Locus, NormalLaw, PriorHeld, Sample, prequential_terms,
+    LocatedPrior, Locus, NormalLaw, PriorHeld, RESIDUAL_SHIFT, Sample, prequential_terms,
 };
 use crate::hnn::field::{Field, ReceivingPrior};
 use crate::hnn::port::Deposit;
@@ -172,7 +172,7 @@ fn a_held_prior_carries_no_pair_and_agrees_with_the_located_run_until_it_moves()
 /// A receiving law founded at `2^from I` on a 4 × 2 map, after one deposit (so its Gram has a
 /// support), with the given pair, its chart rule and a budgeted carry for the move.
 fn moving_law(from: u32, pair: (Rat, Rat, Rat)) -> (NormalLaw, ChartRule, BudgetedCarry) {
-    let lattice = Lattice::new(12);
+    let lattice = Lattice::new(4);
     let rule = ChartRule::new(lattice, 16);
     let map = ExactRatMatrix::shaped(
         4,
@@ -195,7 +195,8 @@ fn moving_law(from: u32, pair: (Rat, Rat, Rat)) -> (NormalLaw, ChartRule, Budget
 }
 
 /// The move's successor read against its law: the Gram's diagonal moved by exactly
-/// `2^(k′) − 2^k` and nothing else, `W′ = x W` up to the map's carry (`W′ + r′ = x W + r`), the
+/// `2^(k′) − 2^k` and nothing else, the map's value scaled with its carried remainder
+/// (`W′ + r′ = x (W + r)`), the
 /// chart at scale `k′` certified to its rule's target, and the pair rebased by `x`.
 fn assert_moved(law: &NormalLaw, moved: &NormalLaw, to: u32, rule: &ChartRule) {
     let k = law.chart().scale();
@@ -213,12 +214,16 @@ fn assert_moved(law: &NormalLaw, moved: &NormalLaw, to: u32, rule: &ChartRule) {
         }
     }
     let (map, remainder) = (law.map(), law.map_remainder());
+    assert!(
+        remainder.entries().iter().any(|r| !r.is_zero()),
+        "the fixture carries a remainder, so the move must scale it"
+    );
     let (moved_map, moved_remainder) = (moved.map(), moved.map_remainder());
     for i in 0..map.rows() {
         for j in 0..map.columns() {
             assert_eq!(
                 moved_map.get(i, j).unwrap() + moved_remainder.get(i, j).unwrap(),
-                &x * map.get(i, j).unwrap() + remainder.get(i, j).unwrap()
+                &x * (map.get(i, j).unwrap() + remainder.get(i, j).unwrap())
             );
         }
     }
@@ -248,6 +253,45 @@ fn the_prior_moves_to_the_newton_points_cell_with_its_gram_map_chart_and_pair() 
     let (moved, read) = law.moved_prior(&rule, &mut at).unwrap().unwrap();
     assert_eq!((read.from, read.to, read.held), (2, 3, None));
     assert_moved(&law, &moved, 3, &rule);
+}
+
+/// **Where no member codes least, the prior rises until the carrier holds it** (record §7; Lean
+/// `HNN/PriorMove.{rebaseAt_add, exit_down_iterate}`, #318): a pair with `V + a ≤ 0` moves one
+/// member up, its rebase by `x = 1/2` keeps `V + a ≤ 0` (`V′ + a′ = x (V + a)`), so the next read
+/// moves again;
+/// at the carrier's residual shift the law holds `k` and the reading says so, with the law unmoved.
+#[test]
+fn where_no_member_codes_least_the_prior_rises_until_the_carrier_holds_it() {
+    let pair = LocatedPrior::from_parts(5, integer(-10), Rat::zero(), Rat::one());
+    assert_eq!(pair.member(5).unwrap(), (-1, None));
+    let half = rat(1, 2);
+    let mut climbed = pair.clone();
+    for k in 5..12 {
+        assert_eq!(climbed.member(k).unwrap(), (-1, None));
+        climbed = climbed.rebased(&half);
+    }
+    assert_eq!(pair.member(RESIDUAL_SHIFT - 1).unwrap(), (-1, None));
+    assert_eq!(pair.member(RESIDUAL_SHIFT).unwrap(), (0, Some(PriorHeld::Carrier)));
+    let lattice = Lattice::new(4);
+    let law = NormalLaw::with_receiving_prior(
+        ExactRatMatrix::zero(4, 2).unwrap(),
+        ReceivingPrior::Located { from: RESIDUAL_SHIFT },
+    )
+    .with_located(Some(LocatedPrior::from_parts(
+        RESIDUAL_SHIFT,
+        integer(-10),
+        Rat::zero(),
+        Rat::one(),
+    )));
+    let (held, read) = law
+        .moved_prior(&ChartRule::new(lattice, 16), &mut BudgetedCarry::new(lattice, 1))
+        .unwrap()
+        .unwrap();
+    assert_eq!(held, law);
+    assert_eq!(
+        (read.from, read.to, read.held, read.certificate),
+        (RESIDUAL_SHIFT, RESIDUAL_SHIFT, Some(PriorHeld::Carrier), None)
+    );
 }
 
 /// **A sign inside the enclosure holds `k`; no curvature holds `k`** (§6, test 5): with

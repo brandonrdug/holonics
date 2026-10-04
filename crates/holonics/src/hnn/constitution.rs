@@ -1051,7 +1051,7 @@ fn ceil_log2(x: u128) -> u32 {
 
 /// The widest shift a residual's coordinates take: `2^(L_s + e_H)` with its sign and one more bit
 /// of headroom stays inside the `i128` carrier.
-const RESIDUAL_SHIFT: u32 = 125;
+pub(crate) const RESIDUAL_SHIFT: u32 = 125;
 
 /// [definition; agent-inferred] **The chart rule of a normal law's locus** (the lattice word; Lean
 /// `HNN/LatticeWord.{prox_chart_certificate, rounded_refinement_certificate_left,
@@ -2323,8 +2323,9 @@ impl LocatedPrior {
     /// prior at `k` (member `x` is the prior `2^(k − j)`), or the reason it holds. Every comparison
     /// is the sign of an `r + t ln 2`, read through `ln 2`'s enclosure: a sign inside it holds `k`.
     /// - `S = 0`: no curvature locates nothing.
-    /// - `V + a ≤ 0`: the code falls toward the zero map at every member; one member,
-    ///   `j = −1`, the least move the evidence asks.
+    /// - `V + a ≤ 0`: the code falls toward the zero map at every member, so no member codes least;
+    ///   one member, `j = −1`, the least move the evidence asks, held at the carrier's residual
+    ///   shift (`PriorHeld::Carrier`).
     /// - Otherwise the `j` whose cell `3x/4 ≤ 1 + a/V ≤ 3x/2` holds the Newton point, the code-least
     ///   member (Lean `HNN/PriorCarry.grid_member_best_zpow`), with `k − j` floored at `0`: on the
     ///   members the code descends up to the cell, so `2^0` codes least among the admitted ones.
@@ -2350,6 +2351,12 @@ impl LocatedPrior {
         match at_most_zero(a0.clone(), s + a1) {
             None => return Ok((0, Some(PriorHeld::Undecided))),
             Some(true) => {
+                // No member codes least here (Lean `HNN/PriorMove.exit_down_iterate`: half the map
+                // still codes strictly less, and `rebaseAt_add` keeps `V + a ≤ 0` through every
+                // halving), so the prior rises one member per deposit until the carrier holds it.
+                if k >= RESIDUAL_SHIFT {
+                    return Ok((0, Some(PriorHeld::Carrier)));
+                }
                 return Ok((-1, None));
             }
             Some(false) => {}
@@ -2431,8 +2438,9 @@ impl NormalLaw {
     /// **The located prior read and moved** (the prior carry's design §3), after a deposit added its
     /// window's terms: the member the pair locates ([`LocatedPrior::member`]) and, when it differs
     /// from the prior in force, one atomic successor. With `x = 2^(k − k′)`:
-    /// - the map `W′ = x W`, the map the law located (`L(φ)` is the code along `φ W`), moved through
-    ///   the map's carry by its budgeted deposit `(x − 1) W` so a remainder is carried, not dropped;
+    /// - the map's value `W′ + r′ = x (W + r)`, the map the law located (`L(φ)` is the code along
+    ///   `φ W`), moved through the map's carry by its budgeted deposit `(x − 1)(W + r)` so a
+    ///   remainder is carried, not dropped;
     /// - the Gram `H′ = H + (2^(k′) − 2^k) I`, the readings' statistic unchanged;
     /// - the chart at scale `k′` ([`SolvedChart::moved`]);
     /// - the pair rebased by `x` ([`LocatedPrior::rebased`]), so its Newton point lands in the unit's
@@ -2478,7 +2486,14 @@ impl NormalLaw {
         let (m, n) = (self.map.rows(), self.map.columns());
         let mut map_carry = self.map_carry.clone();
         let mut map = self.map.entries().to_vec();
-        let update: Vec<Rat> = map.iter().map(|w| (&x - Rat::one()) * w).collect();
+        // The map's value is its lattice entry with its carried remainder, so the move deposits
+        // `(x − 1)(W + r)` and `W′ + r′ = x (W + r)` (the deposit's staged release is emitted, not
+        // retained, and is not scaled).
+        let update: Vec<Rat> = map
+            .iter()
+            .enumerate()
+            .map(|(i, w)| (&x - Rat::one()) * (w + map_carry.at(i)))
+            .collect();
         map_carry.deposit_all(at, Carrier::Map, &mut map, &update);
         let certificate = chart.certificate().clone();
         let moved = Self {
@@ -7884,10 +7899,23 @@ impl ContinuingState {
     /// it is partial).
     pub fn from_text(text: &str) -> Result<Self, HnnError> {
         // The check covers every byte before its own line: a damaged state is refused whole.
-        let body = text
+        let at = text
             .rfind("\ncheck ")
-            .map(|at| &text[..at + 1])
             .ok_or(HnnError::ContinuingState { what: "the check line" })?;
+        let body = &text[..at + 1];
+        // The check is verified before any line is read, so no value (a scale's `2^k` among them)
+        // is formed from damaged text.
+        let check: Vec<&str> = text[at + 1..]
+            .lines()
+            .next()
+            .map(|line| line.split_whitespace().skip(1).collect())
+            .unwrap_or_default();
+        if check.len() != 2
+            || check[0].parse::<usize>().ok() != Some(body.len())
+            || check[1].parse::<u128>().ok() != Some(text_residue(body))
+        {
+            return refuse("the check (the state is damaged)");
+        }
         let mut lines = text.lines();
         let shape = head(next(&mut lines, "the port's head")?, "E", "the port's head")?;
         let map = read_rows(&mut lines, &shape, "the port's shape")?;
@@ -7950,13 +7978,7 @@ impl ContinuingState {
         let material: u128 = scalar("material", "the material identity")?
             .parse()
             .map_err(|_| HnnError::ContinuingState { what: "the material identity" })?;
-        let check = head(next(&mut lines, "the check line")?, "check", "the check line")?;
-        if check.len() != 2
-            || check[0].parse::<usize>().ok() != Some(body.len())
-            || check[1].parse::<u128>().ok() != Some(text_residue(body))
-        {
-            return refuse("the check (the state is damaged)");
-        }
+        head(next(&mut lines, "the check line")?, "check", "the check line")?;
         if next(&mut lines, "the end")?.trim() != "end" {
             return refuse("the end");
         }
@@ -8146,6 +8168,11 @@ fn read_law(lines: &mut std::str::Lines<'_>, map: ExactRatMatrix) -> Result<Norm
     };
     // The scale founds the Gram off its support, the support is exactly the rows that leave
     // `2^k I` (as `GramBlock::of` reads it), and the scale bounds the chart's lattice from below.
+    // A lawful prior never passes the carrier's residual shift (a move there holds), so no larger
+    // `2^k` is formed.
+    if scale > RESIDUAL_SHIFT || exponent < scale {
+        return refuse("the chart's scale against its Gram and lattice");
+    }
     let prior = Rat::from_integer(BigInt::one() << scale as usize);
     let left: Vec<usize> = (0..n)
         .filter(|&i| {
@@ -8155,7 +8182,7 @@ fn read_law(lines: &mut std::str::Lines<'_>, map: ExactRatMatrix) -> Result<Norm
                 .any(|(j, x)| if i == j { *x != prior } else { !x.is_zero() })
         })
         .collect();
-    if left != support || exponent < scale {
+    if left != support {
         return refuse("the chart's scale against its Gram and lattice");
     }
     let gram_carry = carries.pop().expect("two carries");
