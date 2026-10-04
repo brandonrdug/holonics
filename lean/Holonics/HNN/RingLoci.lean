@@ -75,7 +75,8 @@ lock-chart certificate, but it is held in its lobes against the contrasts of eve
 halved together with every family whose move reaches a crossed slice (`hnn::constitution`, module
 header "Within a lobe"; `LobeReading`), and its carried remainder is kept beside the locus (the
 constitution's carries at `(Locus::Standing(g), Carrier::Standing)`). The joint step on retained
-loci, with the carried statistics and remainders in the locus's state, is owed in #62.
+loci is `HNN/JointStep`; the carried statistics and remainders in the locus's state are owed in
+#62.
 
 The loaded ring block joined to the medium, so that the class reads the pump's phase, is
 `HNN/LoadedMedium` (`loaded_ring_rust_collapse_sufficient`).
