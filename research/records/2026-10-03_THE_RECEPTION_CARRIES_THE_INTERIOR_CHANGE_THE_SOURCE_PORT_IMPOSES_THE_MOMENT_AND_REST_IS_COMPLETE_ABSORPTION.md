@@ -1133,3 +1133,46 @@ budget one less is refused, damage is refused) and the restore over successive r
 `tests/prior_carry.rs`, `a_saved_state_restores_across_a_move`. The Lean restore law
 (`HNN/ExecutedComparison.restoreStanding`) takes `R ∘ S = id` as its hypothesis, which these test;
 its statement on the constitution stays owed (#62).
+
+## 10. The saved resident continues the passage where it stopped (October 4)
+
+[agent-inferred, from the retention law and the receiving window's law] §9's state is the
+constitution's learned material and the carried end, which is all a later passage on a *new*
+moment reads. A resident stopped inside a cut reads more: its next window is epoch `k` of the cut's
+cell clock, `[kA, min((k + 1)A, n))` (THE_REBUILD, U5's table; `ReceivingPhases::windows`), and its
+word, its counts and its next aeon boundary read the motion the resident holds between windows.
+Before this section, a restored resident opened a new moment at cell zero, and the landmark tree,
+which had already received those cells, refused the first deposit (`PopulationReached`). Retention
+is the future-sufficient quotient of the whole resident, so the saved state carries that motion
+too.
+
+- **The passage** (`hnn::reference`'s `passage` module, `Resident::continuing_state`), written
+  inside the state's check after the carried end:
+  - the lift point;
+  - the open source moment: the phase-carried counts `M_g` and `C_g(δ)` with their leaky
+    counterparts, the held cells its declared offsets read, its opening and its cells;
+  - the aeon in progress: its opening lift point, its cells, the last closed aeon's cells, and
+    whether its carry-out awaits the boundary;
+  - the first law's balance of that aeon (`EnclosedLedger::resumed`);
+  - the charts the next refinements start from;
+  - the address register: its last `D` letters and its reader's clock ticks since the aeon's
+    opening (the site kinds are read again from the restored constitution, as every ingest
+    reads them);
+  - each admitted receiver's rank as its declaration read it.
+- **What it leaves out, and why.** The state is taken between windows: an open pending ratio or
+  staged deposit is refused, as is a resident whose deposits have stopped or one holding more than
+  one moment. The arrived targets are not carried: every deposit and every aeon boundary reads the
+  targets of its own window's compare, which replaces them first. The tally, the wall times and the
+  released bits are readings.
+- **The continuation.** `expose_continuing` (and `expose_from` through it) continues a resident's
+  open moment at the epoch its cells reach, refusing cells that are not an epoch's opening, and
+  returns the resident it leaves. A deadline counts the continued run's own windows. The exterior
+  baselines restart with the continued run; they are controls, not the machine.
+
+Fixture (`tests/reference.rs`, `a_saved_passage_continues_at_its_epoch_as_the_whole_run`): the
+chain's 18-cell cut stops after four windows at cell 8. Its state reads back equal from its text
+and mounts on the declared opening with the same constitution, lift point, carry, register and
+admitted family. The continued run crosses the cut's one aeon boundary at cell 11 and ends with the
+whole run's retained constitution and carried end. Its curve continues the stopped run's point for
+point, its aeon and first law are the whole run's, and the two runs' model, tree, grained-tree and
+combined code lengths sum exactly to the whole run's on both the training and held-out cells.
