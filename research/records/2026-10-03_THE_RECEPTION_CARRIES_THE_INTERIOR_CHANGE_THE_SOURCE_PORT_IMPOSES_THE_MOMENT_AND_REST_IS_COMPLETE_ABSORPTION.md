@@ -934,3 +934,21 @@ carry, pumped included, at parity (§7). Its port composes through the host's `c
 the slot's opening (`CardOpening::host`), and its refine receipt, separator, arrived re-read and
 collapse read the same opened and continuing diamonds as the reference. The GPU suite then reruns
 every lockstep that does not declare its reception, under the carry on both ports.
+
+[Correction, October 4] It did not, at first. `port_tests::lockstep` passed `Reception::Rest`
+explicitly (from `639310e2`, when the carry was opt-in), so six card tests stayed at rest after
+the default moved: the chain, the generic constitution, campaign 1, the resonators, the loaded
+source with `y4` and hop two, and the standing cut. Campaign 1, the resonators, `y4` and the
+standing cut had no parity check at the production reception. `lockstep` now runs at
+`Reference::campaign_one().reception()`, and a test about rest names `Reception::Rest` through
+`lockstep_receiving`. None of the six is about rest. On the host side of the protocol (the
+lockstep's host calls alone, read in the cloud without a card), every count the five public tests
+assert is the same at rest and under the carry:
+- the chain: 35 compares and deposits, 70 landmarks, 6 aeons closed and 6 key locations;
+- each generic constitution: 12 deposits and 24 landmarks;
+- campaign 1 and its resonators: 8 compares and 16 landmarks;
+- the loaded source with `y4` and hop two: 8 compares, 7 deposits refused and no locus stepped.
+
+Under the carry every window after the first opens on a carried end. The chain then steps 667
+loci where it stepped 657 at rest; the other counts of stepped loci are equal. The resonators' mirror
+count (`mirror.carried > 0`) is the card's alone and is read by the GPU run.

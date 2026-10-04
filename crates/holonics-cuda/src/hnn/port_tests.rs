@@ -315,7 +315,9 @@ fn carry_text(carry: Option<&ReceptionCarry>) -> Option<String> {
 
 /// **Run the exposure protocol on both ports in lockstep** (module header) over at most `windows`
 /// receiving epochs of `cut`, from `constitution` (the declared initial one when `None`), with a
-/// release at every `release_every`-th epoch. Every return is asserted equal.
+/// release at every `release_every`-th epoch, at the production reception
+/// (`Reference::campaign_one().reception()`, the carry). Every return is asserted equal. A test
+/// about rest names `Reception::Rest` through [`lockstep_receiving`].
 fn lockstep(
     field: &Field,
     cut: &Cut,
@@ -329,7 +331,7 @@ fn lockstep(
         windows,
         constitution,
         release_every,
-        Reception::Rest,
+        Reference::campaign_one().reception(),
     )
 }
 
