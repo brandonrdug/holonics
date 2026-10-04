@@ -54,8 +54,8 @@ the factors as its state and proves the standing law there with no hypothesis on
    (`certified_released_stays_released`), and `MediumStanding`'s `hΦe0`, `hΦc0` are gone too.
 
 [open] What it does not cover: the step's certified descent (`Holon/Deposition`, outside the
-standing law); the loci with no `Word.Medium` operand (`SourcePort(g)`, `Standing(g)`,
-`ReceivingMap(g)`) and the loaded ring block joined to the medium, owed in #62.
+standing law); the loaded ring block joined to the medium, owed in #62. The loci with no
+`Word.Medium` operand (`SourcePort(g)`, `Standing(g)`, `ReceivingMap(g)`) are `HNN/RingLoci`.
 
 [open; source-inspected at `37e24ef3`] **The Rust's step is not yet a per-locus factor law.** Its
 moves are sums over the data that reached the locus, so they are zero on empty data, which is all

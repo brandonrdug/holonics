@@ -26,7 +26,8 @@ on the concrete medium of `HNN/Word` and `HNN/LocusMap`, and it proves those law
   data on the edges that read it (`locusOf`, the form of `LocusMap.locusData`).
 * **The release** is `LocusMap.release`.
 * **The opening and the reading read no locus**: the open state is the instance's `openState` at
-  every constitution, and the receiving map is the identity (`openReads`, `recvReads` empty).
+  every constitution, and the receiving map is the identity (`openReads`, `recvReads` empty). The
+  source ports and the receiving maps as loci are `HNN/RingLoci`.
 
 [proved-derived; formal-checked] What is proved.
 
@@ -58,9 +59,9 @@ on the concrete medium of `HNN/Word` and `HNN/LocusMap`, and it proves those law
    `LocusMap.retained_of_reads`. So the collapse the Rust runs changes no admitted face of the
    current word or of any pending word after any word of generators.
 
-[open] What it does not cover, owed in #62: the loci with no `Word.Medium` operand
-(`SourcePort(g)`, `Standing(g)`, `ReceivingMap(g)`), and the loaded ring block joined to the medium
-(the resonator's edge is `HNN/LoadedRing` on its own).
+[open] What it does not cover, owed in #62: the loaded ring block joined to the medium (the
+resonator's edge is `HNN/LoadedRing` on its own). The loci with no `Word.Medium` operand
+(`SourcePort(g)`, `Standing(g)`, `ReceivingMap(g)`) are `HNN/RingLoci`.
 
 `HNN/TickStanding` and `HNN/LocusMap` are unchanged. No `sorry`, no `axiom`, no `native_decide`.
 -/
