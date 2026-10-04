@@ -528,11 +528,20 @@ P_open(k+1) + R_open(k+1) = interior + resonator_interior + deposition_k + inges
 `ChainedBalance::dissipative` keeps the resonators' end storage on its left and the carried storage
 on its right. [formal-checked, #300] `HNN/PumpCarry.{carried_reads_to_crossing,
 resonator_opening_closes, resonator_reception_dissipative, resonator_chain_dissipative}` state the
-read to the crossing, the opening line, each reception's dissipativity and the chain's. One
-hypothesis is read from the owners, not proved: the ingest leaves the held resonators' storage
-unchanged, since the lift moves only the contacts' conductances. The pumped chain's exact closure
+read to the crossing, the opening line, each reception's dissipativity and the chain's. Their one
+hypothesis, that the passage between the words leaves the held resonators' storage unchanged, is
+proved from the owners' definitions [formal-checked, #305]. Between a commit and the next opening
+the constitution is moved only by the window's ingest and a carry-out's re-keying (the lift), the
+refining grain (`Constitution::rebased`, the channels alone) and the aeon's collapse
+(`Constitution::release`, a resonator released to `None`), so each ring's resonator is the committed
+one or released (`HNN/PumpCarry.passRes_keeps_or_releases`). A slot the carry crosses has a declared
+resonator, so it is the committed one, and `ReceptionCarry::crossed` holds its rate at the carried
+momentum exactly as `PowerForm::held` does; where the commit kept the rate, `held_rate` returns it.
+So the next opening reads the committed resonator storage (`slot_crossed_reads_held`,
+`passage_holds_resonator_storage`), and the opening closes with no assumed hypothesis
+(`resonator_opening_closes_of_passage`). The pumped chain's exact closure
 (`the_chained_balance_closes_on_a_pumped_field`) and the crossing's unit test
-(`a_carried_change_crosses_the_next_openings_references`) pin it.
+(`a_carried_change_crosses_the_next_openings_references`) exercise the same identity.
 
 **The exact limit.** At `A = I` the word opens at rest at tick `T`. On a field with no declared
 resonator that is today's word exactly, whatever the tick (`tests/reference.rs`,
