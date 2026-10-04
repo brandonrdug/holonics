@@ -82,6 +82,7 @@ fn native_rebase_moves_material_at_the_same_carried_boundary_with_work() {
     }
     mark!("field:begin");
     let field = chain().with_exact_word();
+    let every = crate::hnn::retention::loci(&field).into_iter().collect();
     mark!("field:done");
     let current = Current::at_rest(&field);
     let pump =
@@ -126,9 +127,9 @@ fn native_rebase_moves_material_at_the_same_carried_boundary_with_work() {
     );
     let stale = stage(&theta, field.contact(0).width());
     mark!("native-rebase:begin");
-    let successor = theta.rebased(locus, 3).unwrap();
+    let successor = theta.rebased(locus, 3, &every).unwrap();
     mark!("native-rebase:done");
-    assert_eq!(theta.rebased(locus, 0).unwrap(), theta);
+    assert_eq!(theta.rebased(locus, 0, &every).unwrap(), theta);
     assert_eq!(successor.commit(), theta.commit() + 1);
     assert_eq!(successor.clock(locus), theta.clock(locus));
     let finer = successor.lattice(locus).unwrap();

@@ -424,8 +424,11 @@
 //!
 //! [definition] **The budget and stop rule** (design (d), R3 §5): the successor is computed exactly
 //! and its exact bits (every numerator and denominator: the lattice entries, the carried remainders,
-//! the statistics and the solved charts at their lattices) are counted before publication. Past
-//! `B_Θ` the deposit is refused with [`HnnError::ConstitutionBudget`], naming the loci that grew most; the predecessor
+//! the statistics and the solved charts at their lattices) are counted before publication, over the
+//! resident's retention: the loci its admitted family's collapse keeps, which are what it holds
+//! after the collapse, or every unreleased locus when no family is declared (record B §8;
+//! [`Constitution::deposited_within`], the lock's half-turn, the re-base and the executed source
+//! move alike). Past `B_Θ` the deposit is refused with [`HnnError::ConstitutionBudget`], naming the loci that grew most; the predecessor
 //! stays published. The lattice bounds the entries' bits (`lattice_bits_bounded`) and the clock the
 //! remainders' (`remainder_rat_bits_bounded`); [`Constitution::carrier_bits`] reads the three parts
 //! separately, and [`DepositReading`] the released residuals and their bits, with each chart's
@@ -3107,9 +3110,24 @@ pub struct Reach {
     pub stations: Vec<u64>,
     pub entries: Vec<u64>,
     pub phases: u64,
+    /// [definition; agent-inferred, October 4; record B §8] **The loci the word's diamond holds**
+    /// (`hnn::retention::Diamond::retained` of the word's opened diamond): its rings are those a
+    /// walk from an entry to a station passes within the word, and its channels those whose transit
+    /// the word reads. A difference stepped at a locus reaches the stations only along such walks, so
+    /// every read a deposit makes past its own locus reads these loci alone: the certified step's
+    /// medium growth (the contrast ports' `1 + ω`, the reach-read rings' span factor and their
+    /// Floquet decisions, a declared boost) and the standing's lobes. Every admitted receiver's
+    /// collapse retains them, so a collapse changes no step. The budget `B_Θ` reads the resident's
+    /// retention instead ([`Constitution::deposited_within`]).
+    pub loci: BTreeSet<Locus>,
 }
 
 impl Reach {
+    /// Whether the word's diamond holds ring `ring`'s element.
+    pub fn reads_ring(&self, ring: usize) -> bool {
+        self.loci.contains(&Locus::Element(ring))
+    }
+
     /// `Σ_j (Σ_(n: T_n ≤ T_j) g^(T_j − T_n))² · F(T_j − min_n T_n)`: the re-entries' amplitude gains
     /// summed at every station, for a per-tick amplitude growth `g`, each station's multiplied by
     /// the pumped medium's span factor at its longest span (module header, "The pumped medium's
@@ -3191,7 +3209,8 @@ pub struct StepReading {
 /// ([`Constitution::stepped_source`]): the step `η`, the unit step's alignment `a` with its returns
 /// and its largest absolute column sum, the entries whose lattice coordinate moved, the residuals
 /// the carry released (exact), the chart's reading, the certified storage growth, the successor's
-/// largest absolute entry of the source port, and its exact bits.
+/// largest absolute entry of the source port, and its exact bits (over every unreleased locus; the
+/// budget reads the resident's retention, record B §8).
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct SourceStep {
     pub step: Rat,
@@ -3211,9 +3230,10 @@ pub struct SourceStep {
 /// `∏(1 + ε_k)` since the founding; each family's certified step, by locus ([`StepReading`], its
 /// family named in it); the
 /// successor's per-tick amplitude growth `1 + ω` (the contrast ports' certified bound; `None` when a
-/// pumped resonator leaves it uncertified); the commit reached, the successor's exact bits against
-/// the budget, the loci reached, and the budgeted carry's report: every residual the deposit
-/// released (exact and sparse, with its locus, carrier and entry; Lean
+/// pumped resonator leaves it uncertified); the commit reached, the successor's exact bits and the
+/// budget (which reads the bits of the resident's retention, [`Constitution::deposited_within`]),
+/// the loci reached, and the budgeted carry's report: every residual the deposit released (exact
+/// and sparse, with its locus, carrier and entry; Lean
 /// `HNN/LatticeDeposit.release`), their bits, and the number of entries whose lattice coordinate
 /// moved (`q ≠ 0`, review R5); and each normal law's solved chart with the prox residual its chart
 /// released ([`ChartReading`], the lattice word); and the cells its reached comparisons deposited
@@ -3643,6 +3663,9 @@ pub struct LockProposal {
     commit: u64,
     standings: Vec<ProposedStanding>,
     crossings: Vec<(usize, usize)>,
+    /// The resident's retention at the deposit, the loci its budget reads
+    /// ([`Constitution::deposited_within`]).
+    retained: BTreeSet<Locus>,
 }
 
 impl LockProposal {
@@ -4268,12 +4291,15 @@ impl Constitution {
     /// past the budget or when its committed storage growth is uncertified (the refusals of
     /// [`Constitution::deposited`]). `None` when the returns reach nothing. It publishes nothing:
     /// the executed comparison's move adopts the successor only when every condition of adoption
-    /// holds on it (`hnn::executed::executed_move`), so it is visible to the crate alone.
+    /// holds on it (`hnn::executed::executed_move`), so it is visible to the crate alone. The budget
+    /// reads the resident's retention `retained` and the source port, as at a deposit
+    /// ([`Constitution::deposited_within`], record B §8).
     pub(crate) fn stepped_source(
         &self,
         ring: usize,
         samples: &[Sample],
         step: &Rat,
+        retained: &BTreeSet<Locus>,
     ) -> Result<Option<(Self, SourceStep)>, HnnError> {
         let locus = Locus::SourcePort(ring);
         if self.released.contains(&locus) {
@@ -4301,7 +4327,10 @@ impl Constitution {
             certify_storage_growth(&self.storage_forms()?, &next.storage_forms()?)?
                 .ok_or(HnnError::UncertifiedStorage)?;
         next.storage_product = &self.storage_product * (Rat::one() + &storage_growth);
-        let bits = next.exact_bits();
+        // The budget reads the resident's retention (record B §8).
+        let mut counted = retained.clone();
+        counted.insert(locus);
+        let bits = next.bits_within(&counted);
         if bits > self.budget {
             return Err(HnnError::ConstitutionBudget {
                 bits,
@@ -4331,7 +4360,7 @@ impl Constitution {
             chart,
             storage_growth,
             largest,
-            bits,
+            bits: next.exact_bits(),
         };
         Ok(Some((next, reading)))
     }
@@ -4607,6 +4636,17 @@ impl Constitution {
         self.carrier_bits().total()
     }
 
+    /// [definition; agent-inferred, October 4; record B §8] **The exact bits of a set of loci**: the
+    /// sum over the unreleased loci among `loci`. Over the resident's retention it is what `B_Θ`
+    /// bounds ([`Constitution::deposited_within`]).
+    pub fn bits_within(&self, loci: &BTreeSet<Locus>) -> u64 {
+        self.bits_by_locus()
+            .into_iter()
+            .filter(|(locus, _)| loci.contains(locus))
+            .map(|(_, bits)| bits)
+            .sum()
+    }
+
     /// **Every carried remainder**, exact, with its locus, its array and its entry (a reading of
     /// the lattice law: each lies in `[−2^(−L_ℓ−1), 2^(−L_ℓ−1))`, Lean `carried_remainder_bounded`).
     pub fn carried_remainders(&self) -> Vec<(Locus, Carrier, usize, Rat)> {
@@ -4830,7 +4870,18 @@ impl Constitution {
     /// enforced at the commit"), the exact bits stay within `B_Θ`, and the commit counter advances,
     /// so a deposit staged against the predecessor is refused ([`HnnError::StaleDeposit`]). A re-base
     /// by zero levels is the identity.
-    pub fn rebased(&self, locus: Locus, levels: u32) -> Result<Self, HnnError> {
+    ///
+    /// [definition; agent-inferred, October 4; record B §8] **The budget reads the resident's
+    /// retention and the re-based channel**: `retained` is the loci the admitted family's collapse
+    /// keeps ([`crate::hnn::retention::retained`]), which are what the resident holds after it, as
+    /// at a deposit ([`Constitution::deposited_within`]). The collapse releases only loci outside
+    /// it, so it changes no re-base's refusal.
+    pub fn rebased(
+        &self,
+        locus: Locus,
+        levels: u32,
+        retained: &BTreeSet<Locus>,
+    ) -> Result<Self, HnnError> {
         let Locus::Channel(contact) = locus else {
             return Err(HnnError::RebaseLocus { locus });
         };
@@ -4902,7 +4953,9 @@ impl Constitution {
             certify_storage_growth(&self.storage_forms()?, &next.storage_forms()?)?
                 .ok_or(HnnError::UncertifiedStorage)?;
         next.storage_product = &self.storage_product * (Rat::one() + &storage_growth);
-        let bits = next.exact_bits();
+        let mut counted = retained.clone();
+        counted.insert(locus);
+        let bits = next.bits_within(&counted);
         if bits > self.budget {
             return Err(HnnError::ConstitutionBudget {
                 bits,
@@ -5072,12 +5125,19 @@ impl Constitution {
     /// so their least is). When no rung certifies, the decided certificate's bound is read. A
     /// refused decision is the refusal [`HnnError::UncertifiedGain`], with its reason: no step is
     /// certified through that ring.
-    fn ring_reaches(&self, span: u64) -> Result<Vec<RingReach>, HnnError> {
+    fn ring_reaches(
+        &self,
+        span: u64,
+        among: impl Fn(usize) -> bool,
+    ) -> Result<Vec<RingReach>, HnnError> {
         let mut rings = Vec::new();
         for (ring, material) in self.rings.iter().enumerate() {
             let Some(resonator) = &material.resonator else {
                 continue;
             };
+            if !among(ring) {
+                continue;
+            }
             if certified_passive(resonator)? {
                 continue;
             }
@@ -5190,7 +5250,7 @@ impl Constitution {
     /// refinement of `T` ticks reads `F(T)` beside `1 + ω` (Lean `Holon/Deposition.pumped_span_factor`:
     /// every span within `T` is carried by `F(T)` at most). Refused where a ring's certificate is.
     pub fn medium_reach(&self, span: u64) -> Result<MediumReach, HnnError> {
-        let rings = self.ring_reaches(span)?;
+        let rings = self.ring_reaches(span, |_| true)?;
         let factors = Self::factors_of(&rings, span);
         Ok(MediumReach {
             amplitude: self.contrast_amplitude()?,
@@ -5337,11 +5397,11 @@ impl Constitution {
             return Ok((BTreeMap::new(), None, None));
         }
         let reach = reach.ok_or(HnnError::MissingReach)?;
-        if let Some(contact) = self
-            .contacts
-            .iter()
-            .position(|material| material.boost.is_some())
-        {
+        // A declared boost is refused where the word reads its channel's transit (`Reach::loci`,
+        // record B §8): a released channel's stiffness is zero, so its signature signs nothing.
+        if let Some(contact) = (0..self.contacts.len()).find(|&contact| {
+            self.contacts[contact].boost.is_some() && reach.loci.contains(&Locus::Channel(contact))
+        }) {
             return Err(HnnError::ActiveContact { contact });
         }
         for (locus, ..) in &parts {
@@ -5371,7 +5431,9 @@ impl Constitution {
         // the readout is zero along the whole joint ray (then every gain is zero, whatever the
         // reach).
         let span = reach.stations.iter().max().copied().unwrap_or(0);
-        let rings = self.ring_reaches(span)?;
+        // Only the rings the word's diamond holds carry the stepped difference to a station
+        // (`Reach::reads_ring`, record B §8).
+        let rings = self.ring_reaches(span, |ring| reach.reads_ring(ring))?;
         let factors = (!rings.is_empty()).then(|| Self::factors_of(&rings, span));
         let mut held = Vec::new();
         if !rings.is_empty() {
@@ -5490,6 +5552,7 @@ impl Constitution {
                 .map_or_else(|| readout_base.clone(), |moved| &readout_base + moved);
             let readout = &reached * &reached;
             let omega = (0..self.rings.len())
+                .filter(|&r| reach.reads_ring(r))
                 .map(|r| {
                     sqrt_ceiling(
                         &ray(&contrast_base[r], moved((Locus::Element(r), Family::Map))),
@@ -5758,8 +5821,29 @@ impl Constitution {
     /// [`HnnError::RepeatedFactorStep`] when it steps one family twice, and with the certified step's
     /// refusals. A loaded resonator's gain step whose carried gain would be `≤ 0` backtracks to the
     /// midpoint of the admissible side and is named in the reading ([`GainBacktrack`]): deposition
-    /// never releases a family.
+    /// never releases a family. The budget reads every unreleased locus: with no admitted family
+    /// declared, the resident holds them all ([`Constitution::deposited_within`]).
     pub fn deposited(&self, deposit: &Deposit) -> Result<(Self, DepositReading), HnnError> {
+        self.deposited_within(deposit, &self.held())
+    }
+
+    /// [definition; agent-inferred, October 4; record B §8] **Every unreleased locus**, the
+    /// retention of a resident that admits no collapse family.
+    pub fn held(&self) -> BTreeSet<Locus> {
+        self.bits_by_locus().into_iter().map(|(locus, _)| locus).collect()
+    }
+
+    /// [definition; agent-inferred, October 4; record B §8] **The successor of a staged deposit
+    /// against the resident's retention** ([`Constitution::deposited`]): `B_Θ` bounds the bits of
+    /// `retained`, the loci the admitted family's collapse keeps
+    /// ([`crate::hnn::retention::retained`]), since after the collapse those are what the resident
+    /// holds. The collapse releases only loci outside `retained`, so it changes no refusal; the
+    /// lock's half-turn reads the same set ([`LockProposal`]).
+    pub fn deposited_within(
+        &self,
+        deposit: &Deposit,
+        retained: &BTreeSet<Locus>,
+    ) -> Result<(Self, DepositReading), HnnError> {
         if deposit.commit() != self.commit {
             return Err(HnnError::StaleDeposit {
                 staged: deposit.commit(),
@@ -5921,7 +6005,7 @@ impl Constitution {
                     Some((g, gradient, scale))
                 })
                 .collect();
-            self.lobe(&stepping, &mut certified)?
+            self.lobe(deposit.reach(), retained, &stepping, &mut certified)?
         };
         // Pass 2: every locus's steps in the deposit's order, each family at its certified step,
         // the loci together.
@@ -6013,12 +6097,17 @@ impl Constitution {
             certify_storage_growth(&self.storage_forms()?, &next.storage_forms()?)?
                 .ok_or(HnnError::UncertifiedStorage)?;
         next.storage_product = &self.storage_product * (Rat::one() + &storage_growth);
-        let bits = next.exact_bits();
+        // The budget reads the bits of the resident's retention (record B §8): the loci the
+        // admitted family's collapse keeps, which are what the resident holds after it. The collapse
+        // releases only loci outside it, so it changes no refusal.
+        let read = |locus: &Locus| retained.contains(locus);
+        let bits = next.bits_within(retained);
         if bits > self.budget {
             let predecessor = self.bits_by_locus();
             let mut grown: Vec<(Locus, i128)> = next
                 .bits_by_locus()
                 .into_iter()
+                .filter(|(locus, _)| read(locus))
                 .map(|(locus, after)| {
                     let before = predecessor
                         .iter()
@@ -6045,7 +6134,7 @@ impl Constitution {
             joint,
             amplitude: next.amplitude()?,
             commit: next.commit,
-            bits,
+            bits: next.exact_bits(),
             budget: self.budget,
             loci: deposit.loci(),
             released,
@@ -6073,8 +6162,17 @@ impl Constitution {
     /// below half its fine lattice's unit on its widest entry moves nothing there and is dropped
     /// (its statistic moved in pass 1, its entries do not). The halving ends: a dropped family moves
     /// no coordinate, so a crossing that remains is read by a family still stepping.
+    ///
+    /// [definition; agent-inferred, October 4; record B §8] The lobes read are the slices of the
+    /// rings the word's diamond holds ([`Reach::reads_ring`]): the lobe holds a move so that no element
+    /// the word reads changes its class, and an element outside the diamond is read by no admitted
+    /// reading. Every term of such a slice's contrast is a standing the collapse retains (a standing
+    /// is retained beside every retained element), so the hold, like the joint step, is a function
+    /// of retained material.
     fn lobe(
         &self,
+        reach: Option<&Reach>,
+        retained: &BTreeSet<Locus>,
         stepping: &[(usize, &[Rat], Rat)],
         certified: &mut BTreeMap<(Locus, Family), StepReading>,
     ) -> Result<(Option<LobeReading>, Option<LockProposal>), HnnError> {
@@ -6099,6 +6197,13 @@ impl Constitution {
         if families.is_empty() {
             return Ok((None, None));
         }
+        let reach = reach.ok_or(HnnError::MissingReach)?;
+        let crossings = |before: &[Vec<Rat>], after: &[Vec<Rat>]| -> Vec<(usize, usize)> {
+            crossings(before, after)
+                .into_iter()
+                .filter(|&(r, _)| reach.reads_ring(r))
+                .collect()
+        };
         let trial = |g: usize, gradient: &[Rat], scale: &Rat, step: &Rat| -> Result<Trial, HnnError> {
             let locus = Locus::Standing(g);
             let mut carry = self
@@ -6198,6 +6303,7 @@ impl Constitution {
             .iter()
             .zip(&proposed_after)
             .enumerate()
+            .filter(|&(r, _)| reach.reads_ring(r))
             .flat_map(|(r, (held, proposed))| {
                 held.iter()
                     .zip(proposed)
@@ -6240,6 +6346,7 @@ impl Constitution {
             commit: self.commit + 1,
             standings,
             crossings: proposal_crossings,
+            retained: retained.clone(),
         });
         Ok((
             Some(LobeReading {
@@ -6289,7 +6396,7 @@ impl Constitution {
             );
         }
         next.commit += 1;
-        let bits = next.exact_bits();
+        let bits = next.bits_within(&proposal.retained);
         if bits > self.budget {
             return Err(HnnError::ConstitutionBudget {
                 bits,
