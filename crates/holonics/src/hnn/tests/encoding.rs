@@ -172,7 +172,7 @@ fn crib_field() -> Field {
                 prior: StopPrior::half(),
                 mass: 1,
                 base: crate::compression::landmark::context::BaseMeasure::Even,
-                receiving_prior: crate::hnn::field::ReceivingPrior::Held(0),
+                receiving_prior: 0,
             }],
             crib: CribDeclaration {
                 window: 16,

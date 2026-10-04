@@ -39,10 +39,14 @@
 // Under a reception carry the word opens on the previous reception's end change, which stays on
 // the card (`src/hnn/carry.rs`): the source rings' storage is imposed by the moment as at rest,
 // every other ring keeps its carried storage, each carried wave crosses its contact's reference
-// change, `a′ = 2G/(G + G′)·a`, and each rate is held at momentum, `w′ = w + δ` (the host's jump);
-// both are split onto `L_w` over their denominators (`hnn_split_over`), and those remainders keep
-// the denominator through every later split of the word. The plan's carry table (`WP_CARRY`) holds
-// per contact the gain `(2G, G + G′)` reduced, then per contact row `δ·2^(L_w)` as `(n, d)`.
+// change, `a′ = 2G/(G + G′)·a`, split onto `L_w` over the gain's denominator (`hnn_split_over`),
+// that remainder keeping the denominator through every later split of the word; and each rate is
+// held at momentum, `w′ = w + δ`, as the host splits it at the open: its coordinate's jump and its
+// remainder's integer part, the remainder's fixed fraction read through `hnn_split_held`. The
+// plan's carry table (`WP_CARRY`) holds per contact the gain `(2G, G + G′)` reduced, then per
+// contact row and per ring row (a resonator's velocity) the held rate as `(jump, R, class)`: the
+// coordinate's jump, the remainder's integer part at the stage's scale, and its fraction's class
+// (`0` none, `1` below a half, `2` at least a half).
 //
 // [definition] **Realization** (the hardware law): one block carries a whole word, its threads
 // dividing the rows of each stage (`row ≡ t mod blockDim.x`): the junctions over every ring's rows
@@ -370,6 +374,31 @@ __device__ __forceinline__ int64_t hnn_split_over(wide s, long long shift, int64
     return (int64_t)q;
 }
 
+// [definition; the deposit record §3, record B §2.4; the reception carry on the card] **The
+// nearest-point split of a held rate's stream**: the host splits a rate held at momentum,
+// `w′ = w + δ`, at the open (`Lattice::div_rem`), and its remainder `r₀` is a fixed rational. At a
+// stage's scale `2^(L_w + k)` that remainder is `R + g`, `R` an integer the card carries and
+// `0 ≤ g < 1` the same fraction at every later split of the word, since each split adds an
+// integer image and takes an integer multiple of `2^k`. For `k ≥ 1`, `⌊(I + g)/2^k + ½⌋ =
+// ⌊(I + 2^(k−1))/2^k⌋` (`g < 1` cannot cross a multiple of `2^k` from the integer `I + 2^(k−1)`),
+// so the split is `hnn_split`'s on the integer part; at `k = 0` it rounds up exactly when
+// `g ≥ ½` (`high`), leaving the integer part `−1`. The fraction `g` itself is the host's, which
+// adds it back when it reads the remainder. No width of `δ`'s numerator or denominator enters.
+__device__ __forceinline__ int64_t hnn_split_held(wide s, long long shift, long long high,
+                                                  wide *remainder, uint32_t *status) {
+    if (shift != 0 || !high) {
+        return hnn_split(s, shift, remainder, status);
+    }
+    const wide q = s + 1;
+    if (!hnn_is_word(q)) {
+        *status |= HNN_REFUSED_WORD;
+        *remainder = 0;
+        return 0;
+    }
+    *remainder = -1;
+    return (int64_t)q;
+}
+
 // A difference of two words on the carrier (exact: its magnitude is below 2^65).
 __device__ __forceinline__ wide hnn_minus(int64_t a, int64_t b) {
     return (wide)a - (wide)b;
@@ -591,18 +620,14 @@ extern "C" __global__ void hnn_word_forward(
             res_w[e] = 0;
             continue;
         }
-        // [definition; record B §2.4] A carried resonator's rate held at momentum, `C′_r w′ = C_r w`:
-        // the host's jump `δ·2^(L_w) = n/d` added and split onto `L_w` over `d`, its remainder
-        // carried in the velocity's split. The displacement carries as it is.
-        const long long *jump = carry + 2 * C + 2 * K + 2 * e;
-        if (jump[0] != 0) {
+        // [definition; record B §2.4] A carried resonator's rate held at momentum, `C′_r w′ = C_r w`,
+        // as the host splits it at the open: its lattice coordinate's jump and its remainder's
+        // integer part at `L_w` (`hnn_split_held`). The displacement carries as it is.
+        const long long *held = carry + 2 * C + 3 * K + 3 * e;
+        if (held[0] != 0 || held[1] != 0) {
             uint32_t st = 0;
-            HnnSum held = hnn_sum();
-            hnn_add_words(held, res_w[e], (int64_t)jump[1]);
-            hnn_add(held, (wide)jump[0]);
-            wide remainder = 0;
-            res_w[e] = hnn_split_over(hnn_read(held, &st), 0, (int64_t)jump[1], &remainder, &st);
-            res_rem_w[e] = remainder;
+            res_w[e] = hnn_word_of((wide)res_w[e] + (wide)held[0], &st);
+            res_rem_w[e] = (wide)held[1];
             hnn_note(st, STAGE_OPEN, (uint32_t)e, &bits, &first);
         }
     }
@@ -637,19 +662,15 @@ extern "C" __global__ void hnn_word_forward(
             w[q] = 0;
             continue;
         }
-        // [definition; the deposit record §3] The rate held at momentum, `C′w′ = Cw`: the host's
-        // jump `δ·2^(L_w) = n/d` (the commit's solve) added and split onto `L_w` over `d`, its
-        // remainder carried at the rate's scale `L_w + e_g`. The displacement carries as it is.
-        const long long *jump = carry + 2 * C + 2 * q;
-        if (jump[0] != 0) {
+        // [definition; the deposit record §3] The rate held at momentum, `C′w′ = Cw`, as the host
+        // splits it at the open (the commit's solve, `Lattice::div_rem`): its lattice coordinate's
+        // jump and its remainder's integer part at the rate's scale `L_w + e_g`
+        // (`hnn_split_held`). The displacement carries as it is.
+        const long long *held = carry + 2 * C + 3 * q;
+        if (held[0] != 0 || held[1] != 0) {
             uint32_t st = 0;
-            const long long *contact = contacts + row_contact[q] * WC_STRIDE;
-            HnnSum held = hnn_sum();
-            hnn_add_words(held, w[q], (int64_t)jump[1]);
-            hnn_add(held, (wide)jump[0]);
-            wide remainder = 0;
-            w[q] = hnn_split_over(hnn_read(held, &st), 0, (int64_t)jump[1], &remainder, &st);
-            rem_rate[q] = hnn_shifted(remainder, contact[WC_GAIN_EXP], &st);
+            w[q] = hnn_word_of((wide)w[q] + (wide)held[0], &st);
+            rem_rate[q] = (wide)held[1];
             hnn_note(st, STAGE_OPEN, (uint32_t)q, &bits, &first);
         }
     }
@@ -868,22 +889,13 @@ extern "C" __global__ void hnn_word_forward(
                 HnnSum rate = hnn_sum();
                 hnn_add(rate, hnn_shifted(omega, 1, &st));
                 hnn_add(rate, -hnn_shifted((wide)w[q], eg, &st));
-                // A rate held at momentum at the open carries its remainder over the jump's
-                // denominator.
-                const long long over = carry ? carry[2 * C + 2 * q + 1] : 1;
+                // A rate held at momentum at the open carries its remainder's fixed fraction: it
+                // rounds the split up at `e_g = 0` when that fraction is at least a half.
+                const long long high = carry ? carry[2 * C + 3 * q + 2] == 2 : 0;
+                hnn_add(rate, rem_rate[q]);
                 wide rate_remainder = 0;
-                int64_t next_w;
-                if (over == 1) {
-                    hnn_add(rate, rem_rate[q]);
-                    next_w = hnn_split(hnn_read(rate, &st), eg, &rate_remainder, &st);
-                } else {
-                    const wide image = hnn_read(rate, &st);
-                    HnnSum carried = hnn_sum();
-                    hnn_add_scaled(carried, (int64_t)over, image);
-                    hnn_add(carried, rem_rate[q]);
-                    next_w = hnn_split_over(hnn_read(carried, &st), eg, (int64_t)over,
-                                            &rate_remainder, &st);
-                }
+                const int64_t next_w =
+                    hnn_split_held(hnn_read(rate, &st), eg, high, &rate_remainder, &st);
                 HnnSum disp = hnn_sum();
                 hnn_add(disp, hnn_shifted((wide)u[q], eg + h_shift, &st));
                 hnn_add_scaled(disp, (int64_t)h_mul, omega);
@@ -1021,18 +1033,16 @@ extern "C" __global__ void hnn_word_forward(
                 const int64_t old_u = res_u[e], old_w = res_w[e];
                 const int64_t rate = rate_record[step * N + e];
                 const wide next_u = (wide)old_u + hnn_shifted((wide)rate, eh, &st);
-                // A velocity held at momentum at the open carries its remainder over the jump's
-                // denominator; on the dyadics `2ω − w` lies on the lattice and splits to itself.
-                const long long over = carry ? carry[2 * C + 2 * K + 2 * e + 1] : 1;
-                wide next_w = 2 * (wide)rate - (wide)old_w;
+                // A velocity held at momentum at the open carries its remainder's fixed fraction
+                // (`hnn_split_held` at `L_w`); on the dyadics `2ω − w` lies on the lattice and
+                // splits to itself.
+                const long long high = carry ? carry[2 * C + 3 * K + 3 * e + 2] == 2 : 0;
+                HnnSum velocity = hnn_sum();
+                hnn_add(velocity, 2 * (wide)rate - (wide)old_w);
+                hnn_add(velocity, res_rem_w[e]);
                 wide velocity_remainder = 0;
-                if (over != 1) {
-                    HnnSum carried = hnn_sum();
-                    hnn_add_scaled(carried, (int64_t)over, next_w);
-                    hnn_add(carried, res_rem_w[e]);
-                    next_w = hnn_split_over(hnn_read(carried, &st), 0, (int64_t)over,
-                                            &velocity_remainder, &st);
-                }
+                const wide next_w =
+                    hnn_split_held(hnn_read(velocity, &st), 0, high, &velocity_remainder, &st);
                 if (st == HNN_EXACT && (!hnn_is_word(next_u) || !hnn_is_word(next_w))) {
                     st |= HNN_REFUSED_WORD;
                 }

@@ -183,6 +183,8 @@ even after `stamped` re-stamps it. Old saves are superseded prototypes.
   CLAUDE.md's: `cargo check`, the changed laws' tests, and the GPU suite, since it changes the
   HNN's behaviour. The main line's read of it on campaign 1 is its receipt, as `2 I`'s read was
   (#259), not a gate.
+- [Superseded, October 4, by §8] No receiver holds its prior: the declaration names only the
+  founding member, `receiving_prior: u32`, and every receiving law carries its pair.
 
 ## 6. The tests that change, and the new ones
 
@@ -281,3 +283,154 @@ The Rust follows §§2–6, with these additions, each decided from the law:
 
 The owed Lean (§2's at-map `carried_eq_sum`, and §3's `q(y/2) < q(y)` at `V + a ≤ 0` and
 `q(2y) ≤ q(y)` at `2y ≤ x`) is filed on #62.
+
+## 8. The located prior is the production default
+
+[agent-inferred, October 4] Which receivers, if any, keep a fixed prior? None, by the law, so
+`ReceivingPrior` is gone and the declaration names only the founding member `k`
+(`ReceiverDeclaration::receiving_prior: u32`). This is derived as #310 derived the carry's default
+(the carry record §8, `A = 0`): a held prior would be one more exterior constant at the reception,
+and the reception has none to spare.
+- **Deposition is the only law that changes a constitution, from the covectors that reached that
+  locus** ([objects §8](../../docs/ELEMENTARY_OBJECTS.md#8-deposition)). The prior `2^k I` is part of
+  the receiving law's constitution: it is the Gram's founding diagonal. The covectors that reach
+  the receiving map are exactly the readings whose terms locate it (§2). Holding `k` while those
+  readings arrive keeps a part of the constitution that the reaching covectors cannot move. That is
+  an authored constant, not a law.
+- **Every lawful reason not to move is already the located law's own reading.** No reading reached
+  the map: no term is added. A reading is not a face's `q − p̃`: `Unread`. Zero curvature:
+  `NoCurvature`. A sign inside `ln 2`'s enclosure: `Undecided`. The floor, a chart that does not
+  certify, the carrier limit: `Floor`, `Chart`, `Carrier`. Each holds `k` and says why, in the
+  deposit's `PriorMove`. A declared hold adds no case these do not cover.
+- **`k` is the prior's initial configuration, a key's and not a choice held.** The founding map is
+  `W₀ = 0`, so the founding pair is zero (§2), and the mount reads no terms and moves nothing. A
+  rest-declared receiver therefore mounts without movement, as a rest-saved state mounts with zero
+  carry. `the_founding_carries_a_zero_pair_and_the_mount_moves_nothing` reads it at `k = 0, 1, 6`:
+  the founding Gram is `2^k I`, its chart exact, its pair zero, and its first window holds with
+  `NoCurvature`. The at-rest bullet of §7 is the same law over a whole exposure.
+- **Campaign 1 founds at `2 I`** (`receiving_prior: 1`, the member its readings located on 3,400
+  readings: the October 2 record), and every other field at `I` (`receiving_prior: 0`). No
+  readings have located another member for those fields, and `I` adds no constant: it is the
+  unit prior every normal law founds at (`NormalLaw::with_prior`, the source and contrast laws),
+  and the floor of the admitted members (`k ≥ 0`, the carried Gram's positivity margin that the
+  lattice rule's certificate cites). A founding above it would be a constant the readings have
+  not located. Both move from there.
+- **A continuing state keeps the founding.** The founding member stays in `material_identity`
+  (§4.4), and `continued` refuses a receiving law founded at another member. So a state saved from
+  one founding is not mounted on another.
+
+**The tests this changes, and why.**
+- Every `ReceiverDeclaration` literal names `k` instead of `Held(k)` or `Located { from: k }`. The
+  prior-carry tests read the founding as above (`chain_at(from)`), and the restore test opens
+  another founding at `k = 5` to read the refusal.
+- **The budgeted carry's ledger** (`tests/constitution.rs`:
+  `the_budgeted_carry_accounts_for_every_update`,
+  `the_release_since_the_founding_stays_below_half_a_unit`,
+  `the_carried_gram_stays_positive_definite`). The chain's receiving prior now moves on that run.
+  Its Gram's first diagonal entry ended at `4 + 105/2^24`, where the step-only ledger expected
+  `1 + 105/2^24`: the moves shifted it by `2² − 2⁰ = 3`. A move is one more update of the carried
+  arrays: `(2^(k′) − 2^k) I` on the Gram, `(x − 1)(W_s + r_s)` on the map. Its step is taken at the
+  stepped successor's chart, which the move then replaces. The ledger now reads both. It reads the
+  step at its own chart from the same deposit on the predecessor without its prior pairs
+  (`Constitution::without_prior_pairs`, test-only), then adds the move. Every identity is
+  unchanged: value plus remainder plus releases equals the exact sum of the updates. The exact Gram
+  is the prior in force plus the statistics, and that is still `⪰ I`. The run's move is asserted,
+  so the ledger reads one.
+
+**The card tests it moves.** The lockstep's host side, read in the cloud, gives the prior reads and
+moves on each card fixture at the production reception (at rest in brackets). Every count those
+tests assert is unchanged.
+- `the_card_port_returns_the_reference_on_the_chain`: 33 reads, 31 moved (rest: 23).
+- `the_card_port_returns_the_reference_on_a_generic_constitution`: seed 5, 11 reads, 2 moved
+  (rest: 0); seed 11, 11 reads, 11 moved (rest: 11).
+- `the_card_port_returns_the_reference_on_campaign_one`: 7 reads, 1 moved (rest: 6).
+- `the_card_port_returns_the_reference_with_resonators`: 7 reads, 4 moved (rest: 2).
+- `the_loaded_source_matches_with_y4_and_hop_two`: no read. Its 7 refused deposits and stepped
+  nothing.
+- `the_card_port_returns_the_reference_on_the_standing_cut`: private, read by the card run.
+- Every other card test whose deposits step the receiving map reads the prior through the host's
+  `Constitution::deposited`, as the card does. The published constitutions are compared after
+  every deposit, and the normal-law mirror skips each moved deposit and counts it
+  (`NormalMirror::moved`). The GPU suite is the receipt.
+
+The moves under the carry, in order:
+- the chain: `0 → 1 → 0 → 1`, then `1 → 2 → … → 29`, one member per read;
+- seed 11: `0 → 1 → … → 11`, one member per read;
+- seed 5: `0 → 1 → 0`;
+- campaign 1: `1 → 0`;
+- the resonators: `1 → 0 → 1 → 2 → 4`, the last a cell move of two members.
+
+The runs of one member per read are the climb of §7: those readings keep `V + a ≤ 0`, so no member
+codes least. A climb stops when new readings lift `V + a` above zero, or at the carrier hold.
+
+
+## 9. The U6 states and the receiving map, with the carry and the located prior both the default
+
+[measured-diagnostic; October 4, on `24d1fd3e`; bounded host reads on the cloud host] The standing
+finding is that U6 states have a zero receiving map (the refit-ingredients record §7; the record
+[The receiving map opens at zero](2026-10-02_THE_RECEIVING_MAP_OPENS_AT_ZERO_AND_THE_SOURCE_MAP_REACHES_THE_CONTACT_ONLY_AS_MOTION.md)
+§1). It still holds, and neither default changes it. The link that holds `R` at zero is the
+comparison. The saved-state link no longer zeroes `R`: since `aaf2bd43` it refuses every U6 state.
+
+**The comparison holds `R` at `R₀ = 0`, by the deposition law.** Step 1's chain runs
+`hnn::executed` over the bank's release and `ReceivingBank`, and its move is
+`Constitution::stepped_source`, which writes `rings[ring].source` and the source port's clock and
+nothing else. The bank reads the receiving ring's storage through its members' turn
+`ρ(M_m(z))`; `R` is not on that forward path, so no covector of the chain reaches it, and
+deposition changes only a locus a covector reached. The carry and the located prior are laws of
+the reference port's reception and of a deposit at `LinearLocus::Receiving`. The chain runs
+neither: it never runs `Word`, the reception or a receiving deposit (THE_REBUILD, the
+consolidation inventory). Even a prior move would leave `R` at zero: the move deposits
+`(x − 1)(W + r)`, and `W + r = 0` there, so `x(W + r) = 0`.
+
+**The saved state no longer mounts.** Before `aaf2bd43`, `continuing_state` refused any clock
+other than the source port's, so a U6 state certified every other locus unmoved, and `continued`
+left `R` at the opening's founding: zero by construction. Since `aaf2bd43` the state's text
+carries `chart exponent certificate scale`, a `located` line and a `receiving` section. All 21
+files under `research/runs/u6/states/` are listed in the manifest of earlier states and carry
+none of these, so the stamp passes them and `ContinuingState::from_text` refuses them. Read with
+the notebook's own mount, `m6` and `w16` are refused with "the continuing state refused: the
+chart's scale". No U6 state can be read at `24d1fd3e`, nor on main since #319.
+
+An exact conversion exists, because the earlier writer certified what it left out:
+- the source law's chart at scale `0`, with `located none` (`from_text` requires both of the
+  source law);
+- `receiving 1` with the declared receiver's law at its founding, clock `0`.
+
+Whether the states are rewritten once in the current layout or retired belongs to the U6
+consolidation. Extending the stamp into a layout decoder would be a legacy decoder.
+
+**Where `R` first moves: the receiver's own comparison, from the U6 opening.** The exposure
+protocol (`Reference::campaign_one()`, the carry, founded at `k = 0`) was mounted on the U6
+opening (`founded_opening`, where every U6 state's `R` stands) and read deposit by deposit:
+- **Window 1.** Nothing steps. No source has entered yet, so no reading reaches `R`.
+- **Window 2.** `R` alone steps, at `2^(−2)`, and 872 of its `10·120 = 2^4·3·5^2` entries become
+  nonzero. The prior is read once and held as `NoCurvature`: the pair reads `δ = W z` at the map
+  before the deposit, which is zero, so both terms are zero.
+- **Window 3.** This is the first reading of `R₁`. Fifteen loci step: both elements, both
+  channels, the source port and the standing, beside `R`. This is §5 of the opening-at-zero
+  record: every covector into the passage is `Rᵀg`. The pair now has terms and the prior moves
+  `0 → 1`.
+- **Windows 4 and 5.** The prior moves `1 → 2 → 3`, one member per read. After each move
+  `V + a < 0` (`ln 2 < 7/10` bounds it), so this is §7's climb: no member codes least.
+
+So the first nonzero `R` is window 2's deposit, and the first reading that sees it is window 3's
+compare. The six-window exposure's curve gives the same: no step at commit 1, `R` alone at
+commit 2, and from commit 3 on the elements, channels, source port and standing beside `R`.
+
+**What it changes for step 1's chain.** The chain itself is unchanged: `R` is outside its path,
+so the zero map is not step 1's blocker. Step 1's blocker remains the native move's path to a
+representation. What `R = 0` bars is a read of a bank-chain state through `R`: `word-read`, and
+§6's contact-path read. The carry's repair reaches step 1 only if its chain deposits through the
+receiver's own comparison. Then `R` forms at the second window, and the native contact return
+deposits on `C`, `E` and the standing from the third. That route is the exposure protocol, the
+gate the refit-ingredients record §7 restated. On the existing U6 states this cannot be read
+until they mount again.
+
+Receipts (a scratch notebook command, not committed; debug build):
+- the one-window read with the two mounts: measured 43,473 ms;
+- the six-window exposure: projected at most six windows at the one-window read's 41 s each,
+  deadline 400 s, measured 57,023 ms;
+- the five-window deposit read: deadline 300 s, measured 50,582 ms.
+
+Peak resident sets were not read.
