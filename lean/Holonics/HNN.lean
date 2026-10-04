@@ -1,5 +1,6 @@
 import Holonics.HNN.Propagation
 import Holonics.HNN.Word
+import Holonics.HNN.TickBlocks
 import Holonics.HNN.Moment
 import Holonics.HNN.Normal
 import Holonics.HNN.LatticeDeposit
@@ -46,6 +47,7 @@ design: the HNN law", table (b) rows 1–8, stated before their Rust owners in `
 | Module | Design item | Rust consumer |
 |---|---|---|
 | `HNN/Word` | 1. the ring's element and the tick's global power | `hnn::propagation` |
+| `HNN/TickBlocks` | the concrete tick is the tick of a block operator (#62 5839507068 item 3): `fieldTick` is linear in the change at fixed operands (`fieldTick_comb`), its block operator is sparse on `blockAdj` (`blockOp_sparse`), and its iterates are that operator's trajectory (`fieldTick_iterate_blocks`), so the cone, pairing, exact variation and release past the diamond read on the concrete word | `hnn::word::Word::tick` |
 | `HNN/Propagation` | 2. the junction scattering, the transit, the causal cone and diamond | `hnn::{propagation, word}` |
 | `HNN/Moment` | 3. selective stepping, the phase-binned moment, its adjoint and capacity | `hnn::moment` |
 | `HNN/Normal` | 4. the normal constitution and deposition, per locus | `hnn::constitution` |
