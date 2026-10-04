@@ -32,9 +32,11 @@ on the concrete medium of `HNN/Word` and `HNN/LocusMap`, and it proves those law
    (`deposited_admissible`). The admissibility of `Word.Medium.Admissible` splits per locus: an
    element's passive `W_s` and skew slices (`ElementAdmissible`), a channel's positive and symmetric
    `C`, `K` and positive `D` (`ChannelAdmissible`); the junctions, conductances, embeddings and tick
-   length are declared and `deposited` keeps them. [agent-inferred] The Rust keeps each learned
-   operand in factor form (`W_s = −f fᵀ`, `C = c cᵀ`, `K = b bᵀ`, `D = F Fᵀ`, the table of
-   `HNN/LocusMap`), which satisfies these per-locus laws.
+   length are declared and `deposited` keeps them. The Rust keeps each learned operand in factor
+   form (`W_s = −f fᵀ`, `A_ρ = u_ρ v_ρᵀ − v_ρ u_ρᵀ`, `C = c cᵀ`, `K = b bᵀ`, `D = F Fᵀ`), which
+   satisfies these per-locus laws for every factor step: `HNN/FactoredMedium` states the medium
+   with the factors as its state and proves this file's results there for every per-locus factor
+   law.
 2. **The locus map's laws hold on the medium** (`mediumLaw_lawful`): every tick's operator is
    sparse (`TickBlocks.blockOp_sparse`), every reading edge is declared (`LocusMap.reads_adj`), an
    edge's operator moves only with the loci it reads (`LocusMap.blockOp_agree`), a contact's
