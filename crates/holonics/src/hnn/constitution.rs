@@ -6675,8 +6675,12 @@ impl Constitution {
     }
 
     /// **Release loci** (the collapse's only mutator, `hnn::retention`): each released locus's
-    /// learned material becomes the zero map and its statistics are dropped; it counts no bits and
-    /// no reading reads it.
+    /// learned material becomes the zero map (an element's contrast law and a source port's normal
+    /// law return to their prior), and its carried remainders and clock leave with it; it counts no
+    /// bits and no reading reads it. The scale statistics stay where they are (the standing's,
+    /// the passive map's, the slices', the pair ports' and a channel's three), except a released
+    /// resonator's, which return to zero as the resonator leaves (Lean `HNN/LocusStatistics`: the
+    /// released state is any `rel`).
     pub(crate) fn release(&mut self, loci: &BTreeSet<Locus>) -> Result<(), HnnError> {
         for locus in loci {
             match *locus {
