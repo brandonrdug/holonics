@@ -254,7 +254,7 @@ def mediumLaw (h₀ : ℝ) (cls : Λ → ℕ → Ring → ρ → ℝ)
   absorb := absorb
   ingestStep := ingestStep
   rekey := rekey
-  apply θ d := ⟨deposited Φe Φc (locusOf d) θ.1, deposited_admissible hΦe hΦc θ.2.1 _, θ.2.2⟩
+  apply θ d := ⟨deposited Φe Φc (locusOf d.edges) θ.1, deposited_admissible hΦe hΦc θ.2.1 _, θ.2.2⟩
   release keep θ := ⟨release keep θ.1, release_admissible θ.2.1 keep, θ.2.2⟩
 
 variable {h₀ : ℝ} {cls : Λ → ℕ → Ring → ρ → ℝ}
@@ -358,7 +358,7 @@ theorem mediumLaw_lawful :
       rw [hG, hC]
   open_reads _ _ _ _ _ _ := rfl
   recv_reads _ _ _ _ := rfl
-  apply_local θ θ' d d' ℓ hθ hd := deposited_local hθ hd
+  apply_local θ θ' d d' ℓ hθ hd _ := deposited_local hθ hd
   release_keeps keep θ ℓ hk := agreeOn_symm (agreeOn_release hk)
 
 omit [Fintype Ring] in
@@ -370,7 +370,7 @@ theorem mediumLaw_quiet
       hΦe hΦc).Quiet where
   refl ℓ θ := agreeOn_refl θ.1 ℓ
   trans _ _ _ _ h₁ h₂ := agreeOn_trans h₁ h₂
-  apply_quiet θ _ _ h := deposited_quiet hΦe0 hΦc0 θ.1 h
+  apply_quiet θ _ _ h _ := deposited_quiet hΦe0 hΦc0 θ.1 h
 
 end Law
 
@@ -393,7 +393,8 @@ theorem agree_release_of_keeps (hL : L.Lawful adj) {S R : Set B} {keep : Loc →
     ?_⟩
   · exact forall₂_self (s := TickStanding.PendAgree adj S R)
       (fun _ => ⟨rfl, rfl, carryAgree_refl _⟩) _
-  · exact forall₂_self (s := TickStanding.StagedAgree adj) (fun _ _ _ _ => rfl) res.staged
+  · exact forall₂_self (s := TickStanding.StagedAgree adj)
+      (fun _ => ⟨fun _ _ _ => rfl, fun _ => rfl⟩) res.staged
 
 /-- [proved-derived; formal-checked] **Any release that keeps the retained loci is sufficient**:
 after any word of the generators, every admitted face of the current word and of every pending word

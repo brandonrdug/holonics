@@ -30,6 +30,15 @@ in two ways, and this file states the standing law with both:
   covector is read through a linear map of the constitution at its block (`recv`, `readThrough`),
   moving only with the loci it reads (`recvReads`, `recv_reads`), in the faces and in the
   comparison covectors a compare stages alike.
+* **The deposit stages the opening's data.** A source port's deposit reads the source input
+  through the moment and the anchor the word opened on, and the covector swept back to the opening
+  (`hnn::reference::compose_return`: `back.opening[g]`, the anchor and the moment's counts, read by
+  `SourceMoment::encoder_covector`). The staged deposit (`TickStage`) holds, beside the data on
+  every edge, at every source that observes a receiver the triple `(l, m, λ_t)` for every admitted
+  reading (`openDataAt`): `λ_t` pairs with the opening as the reading pairs with its tick
+  (`reading_opening_variation`), so it is the reading's gradient in the opening. A deposit moves a
+  locus from its own state, the data on the edges that read it and the opening's data at the blocks
+  whose opening reads it (`TickLaw.Lawful.apply_local`).
 
 The retained loci are those read by an edge, or by the reference of a block, that a walk from a
 source to a receiver passes, by the opening of a source that observes a receiver, or by a
@@ -50,16 +59,19 @@ the generators keep (`Agree`, `step_agree`, `observe_agree`), here on loci rathe
   two words run the same family and stay so at every tick (`TickFamily.trajectoryAt_agrees_on_walk`);
 * every staged deposit is equal on every declared edge: on a walk edge by
   `TickFamily.depositDataAt_agree`, and off every walk both are empty, since every seed is reached
-  from a source (`depositDataAt_off_walk`). So the deposit moves each retained locus alike.
+  from a source (`depositDataAt_off_walk`); and its opening's data are equal at every block, since
+  the swept covectors agree on every reached block (`TickFamily.sweepAt_agrees_on_walk`). So the
+  deposit moves each retained locus alike.
 
 [proved-derived; formal-checked] **A deposit between words never reopens a released locus**
 (`released_stays_released`, `step_released`, `step_stagedOff`). After the collapse, along any word
 of the generators, every locus it released stays in agreement with its released state. Only a
 deposit moves loci; an edge that reads a released locus passes no walk, else the locus would be
 retained, and every staged deposit is empty off every walk (a compare keeps this, since its seeds
-are reached), so no datum reaches the locus. This needs the quiet laws (`TickLaw.Quiet`): the
-agreement on a locus is an equivalence, and a deposit keeps a locus that no datum reaches, as the
-concrete locus laws do (`LocusMap.deposit_descends`'s `hΦe`, `hΦc`).
+are reached); a block whose opening reads a released locus is no source observing a receiver, and a
+compare stages opening data only there, so no datum reaches the locus. This needs the quiet laws
+(`TickLaw.Quiet`): the agreement on a locus is an equivalence, and a deposit keeps a locus that no
+datum reaches, as the concrete locus laws do (`LocusMap.deposit_descends`'s `hΦe`, `hΦc`).
 
 [definition] **The deposit as a hypothesis** (`TickLaw.Local`, `TickLaw.ApplyRetained`,
 `tickStandingOf`). The standing needs of the deposit only that it moves every retained locus alike
@@ -109,6 +121,16 @@ structure TickPend (M : B → Type*) (Ref : B → Type*) (Λ Mo : Type*) where
   moment : Mo
   opening : TickCarry M Ref Λ
 
+/-- [definition] **A staged deposit**: on every edge `z → y` the data the deposit reads there (the
+state at `z` and the swept covector at `y`), and at every block the opening's data (the anchor and
+the moment the word opened on, with the covector swept back to the opening at that block), which a
+source port's deposit reads (`hnn::reference::compose_return`'s source rings,
+`SourceMoment::encoder_covector`). -/
+structure TickStage (K : Type*) [Field K] (M : B → Type*) [∀ b, AddCommGroup (M b)]
+    [∀ b, Module K (M b)] (Λ Mo : Type*) where
+  edges : (y z : B) → List (M z × Module.Dual K (M y))
+  opens : (b : B) → List (Λ × Mo × Module.Dual K (M b))
+
 /-- [definition] **The resident**: the constitution, the lift point, the open moment, the carried
 change, the pending ratios of the chain in refine order, and the staged deposits. -/
 structure TickResident (K : Type*) [Field K] (M : B → Type*) [∀ b, AddCommGroup (M b)]
@@ -118,7 +140,7 @@ structure TickResident (K : Type*) [Field K] (M : B → Type*) [∀ b, AddCommGr
   moment : Mo
   carried : TickCarry M Ref Λ
   pending : List (TickPend M Ref Λ Mo)
-  staged : List ((y z : B) → List (M z × Module.Dual K (M y)))
+  staged : List (TickStage K M Λ Mo)
 
 /-- [definition] **The law**: the block operators at a class, the loci each edge, each block's
 reference, each block's opening and each receiver's reading read, and the agreement on a locus,
@@ -144,7 +166,7 @@ structure TickLaw (K : Type*) [Field K] (M : B → Type*) [∀ b, AddCommGroup (
   absorb : (b : B) → M b →ₗ[K] M b
   ingestStep : Cell → Λ × Mo → Λ × Mo
   rekey : Crib → Λ → Λ
-  apply : Con → ((y z : B) → List (M z × Module.Dual K (M y))) → Con
+  apply : Con → TickStage K M Λ Mo → Con
   release : (Loc → Prop) → Con → Con
 
 variable {K : Type*} [Field K] {M : B → Type*} [∀ b, AddCommGroup (M b)] [∀ b, Module K (M b)]
@@ -166,13 +188,14 @@ structure TickLaw.Local (adj : B → B → Prop) [Fintype B]
   release_keeps : ∀ (keep : Loc → Prop) θ ℓ, keep ℓ → L.agreeOn ℓ θ (L.release keep θ)
 
 /-- [definition] **The laws of the locus map**, assumed of the instance: the local laws, and a
-deposit moves each locus from its own state and the data on the edges that read it (a per-locus
-deposit; the joint step, which also reads a joint certificate over the word's loci, is
-`HNN/JointStep`). -/
+deposit moves each locus from its own state, the data on the edges that read it and the opening's
+data at the blocks whose opening reads it (a per-locus deposit; the joint step, which also reads a
+joint certificate over the word's loci, is `HNN/JointStep`). -/
 structure TickLaw.Lawful (adj : B → B → Prop) [Fintype B]
     (L : TickLaw K M Con Loc Ref Cls Λ Mo Cell Crib) : Prop extends L.Local adj where
-  apply_local : ∀ θ θ' d d' ℓ, L.agreeOn ℓ θ θ' → (∀ y z, L.reads ℓ z y → d y z = d' y z) →
-    L.agreeOn ℓ (L.apply θ d) (L.apply θ' d')
+  apply_local : ∀ θ θ' d d' ℓ, L.agreeOn ℓ θ θ' →
+    (∀ y z, L.reads ℓ z y → d.edges y z = d'.edges y z) →
+    (∀ b, L.openReads ℓ b → d.opens b = d'.opens b) → L.agreeOn ℓ (L.apply θ d) (L.apply θ' d')
 
 end Objects
 
@@ -218,15 +241,43 @@ def endCarry (θ : Con) (l : Λ) (m : Mo) (c : TickCarry M Ref Λ) : TickCarry M
   tick := c.tick + L.ticks l m
 
 variable (adj) in
+open Classical in
+/-- [definition] **The opening's data at a block**: at a source that observes a receiver, for every
+admitted reading, the anchor and the moment the word opened on and the reading's covector swept
+back through every tick the word ran to its opening (`TickFamily.sweepAt` at `n = t`, which pairs
+with the opening: `sweepAt_pairing`); nothing elsewhere. This is the datum the source port's
+gradient reads: `back.opening[g]` with the anchor and the moment's counts
+(`hnn::reference::compose_return`). -/
+def openDataAt (T : ℕ → BlockOp K M) (S R : Set B) (l : Λ) (m : Mo)
+    (rd : List (ℕ × ((b : B) → Module.Dual K (M b)))) (b : B) :
+    List (Λ × Mo × Module.Dual K (M b)) :=
+  if b ∈ S ∧ ObservesAll adj R b then rd.map fun r => (l, m, sweepAt T r.2 r.1 r.1 b) else []
+
+/-- [proved-derived; formal-checked] **The opening's datum is the reading's gradient in the
+opening**: a reading at tick `t` of the word opened on `x` differs from the same word opened on `x′`
+by the covector swept back to the opening paired with `x − x′`, `⟨λ_t, x − x′⟩`, at every block and
+with nothing inverted (`sweepAt_pairing` at `n = t`). This is the covector `openDataAt` stages. -/
+theorem reading_opening_variation (T : ℕ → BlockOp K M) (g : (b : B) → Module.Dual K (M b))
+    (x x' : (b : B) → M b) (t : ℕ) :
+    pair g (trajectoryAt T x t) - pair g (trajectoryAt T x' t) =
+      pair (sweepAt T g t t) (x - x') := by
+  have h := sweepAt_pairing T (x - x') g t t le_rfl
+  rw [Nat.sub_self] at h
+  rw [pair_sub', trajectoryAt_sub, ← h]
+  rfl
+
+variable (adj) in
 /-- [definition] **The data a compare stages**: on every edge, what the pending word opened on its
 stored carry at the constitution `θ` reads there, in the windows seeded at the sources and the
-opening's interior, with each comparison covector read through `θ`'s receiving map. -/
+opening's interior, and at every source the opening's data, with each comparison covector read
+through `θ`'s receiving map. -/
 def stagedOf (S R : Set B) (θ : Con) (p : TickPend M Ref Λ Mo)
-    (rd : List (ℕ × ((b : B) → Module.Dual K (M b)))) :
-    (y z : B) → List (M z × Module.Dual K (M y)) :=
-  fun y z => depositDataAt adj (wordOp L θ p.lift p.opening.tick)
+    (rd : List (ℕ × ((b : B) → Module.Dual K (M b)))) : TickStage K M Λ Mo where
+  edges y z := depositDataAt adj (wordOp L θ p.lift p.opening.tick)
     (opening L θ p.lift p.moment p.opening) (seeds L S θ p.lift p.opening) R
     (rd.map fun r => (r.1, readThrough L θ r.2)) z y
+  opens := openDataAt adj (wordOp L θ p.lift p.opening.tick) S R p.lift p.moment
+    (rd.map fun r => (r.1, readThrough L θ r.2))
 
 variable (adj) in
 /-- [definition] **The generators acting on the resident** (one chain in refine order), as in
@@ -312,26 +363,28 @@ def PendAgree (S R : Set B) (p p' : TickPend M Ref Λ Mo) : Prop :=
   p.lift = p'.lift ∧ p.moment = p'.moment ∧ CarryAgree adj S R p.opening p'.opening
 
 variable (adj) in
-/-- [definition] Two staged deposits are equal on every declared edge. -/
-def StagedAgree (d d' : (y z : B) → List (M z × Module.Dual K (M y))) : Prop :=
-  ∀ y z, adj z y → d y z = d' y z
+/-- [definition] Two staged deposits are equal on every declared edge and at every block. -/
+def StagedAgree (d d' : TickStage K M Λ Mo) : Prop :=
+  (∀ y z, adj z y → d.edges y z = d'.edges y z) ∧ ∀ b, d.opens b = d'.opens b
 
 variable (adj) in
 /-- [definition] **The agreement**: every retained locus agrees, equal lift and moment, agreeing
-carries, agreeing pending ratios and staged deposits equal on every declared edge. -/
+carries, agreeing pending ratios and staged deposits equal on every declared edge and at every
+block. -/
 def Agree (S R : Set B) (res res' : TickResident K M Con Ref Λ Mo) : Prop :=
   (∀ ℓ, Retained adj L S R ℓ → L.agreeOn ℓ res.loci res'.loci) ∧ res.lift = res'.lift ∧
     res.moment = res'.moment ∧ CarryAgree adj S R res.carried res'.carried ∧
     List.Forall₂ (PendAgree adj S R) res.pending res'.pending ∧
-    List.Forall₂ (StagedAgree adj (K := K)) res.staged res'.staged
+    List.Forall₂ (StagedAgree adj (K := K) (Λ := Λ) (Mo := Mo)) res.staged res'.staged
 
 variable (adj) in
 /-- [definition] **The deposit keeps the retained loci**: from two constitutions agreeing on every
-retained locus, a staged deposit equal on every declared edge moves every retained locus alike. A
+retained locus, a staged deposit equal on every declared edge and at every block moves every
+retained locus alike. A
 per-locus deposit has it (`TickLaw.Lawful.applyRetained`); so does a joint step whose joint
 reading reads only retained loci (`HNN/JointStep`). -/
 def TickLaw.ApplyRetained (S R : Set B) : Prop :=
-  ∀ θ θ' d d', (∀ ℓ, Retained adj L S R ℓ → L.agreeOn ℓ θ θ') → StagedAgree adj (K := K) d d' →
+  ∀ θ θ' d d', (∀ ℓ, Retained adj L S R ℓ → L.agreeOn ℓ θ θ') → StagedAgree adj d d' →
     ∀ ℓ, Retained adj L S R ℓ → L.agreeOn ℓ (L.apply θ d) (L.apply θ' d')
 
 variable {L} in
@@ -339,7 +392,8 @@ variable {L} in
 theorem TickLaw.Lawful.applyRetained (hL : L.Lawful adj) (S R : Set B) :
     L.ApplyRetained adj S R :=
   fun θ θ' _ _ hθ hdd ℓ hℓ =>
-    hL.apply_local θ θ' _ _ ℓ (hθ ℓ hℓ) fun y z hr => hdd y z (hL.reads_adj ℓ z y hr)
+    hL.apply_local θ θ' _ _ ℓ (hθ ℓ hℓ) (fun y z hr => hdd.1 y z (hL.reads_adj ℓ z y hr))
+      fun b _ => hdd.2 b
 
 omit [Fintype B] [∀ b, AddCommGroup (M b)] [∀ b, Module K (M b)] in
 theorem carryAgree_refl {S R : Set B} (c : TickCarry M Ref Λ) : CarryAgree adj S R c c :=
@@ -527,7 +581,9 @@ theorem step_valid (hL : L.Local adj) {S R : Set B}
     | some d => exact ⟨hc, hP⟩
   | discardStaged i => exact ⟨hc, hP⟩
 
-/-- [proved-derived; formal-checked] **A compare stages equal data on every declared edge.** -/
+/-- [proved-derived; formal-checked] **A compare stages equal data on every declared edge and
+equal opening data at every block**: at a source the swept covectors agree on every reached block
+(`TickFamily.sweepAt_agrees_on_walk`), and elsewhere both are empty. -/
 theorem stagedOf_agree (hL : L.Local adj) {S R : Set B}
     (hopen : ∀ θ l m, SupportedIn (L.openState θ l m) S) {θ θ' : Con}
     (hθ : ∀ ℓ, Retained adj L S R ℓ → L.agreeOn ℓ θ θ') {p p' : TickPend M Ref Λ Mo}
@@ -536,13 +592,25 @@ theorem stagedOf_agree (hL : L.Local adj) {S R : Set B}
     (rd : ReceiverFamily K M R) :
     StagedAgree adj (stagedOf adj L S R θ p rd.1) (stagedOf adj L S R θ' p' rd.1) := by
   obtain ⟨hpl, hpm, hpo⟩ := hpp
-  intro y z hadj
+  have hrd : (rd.1.map fun r => (r.1, readThrough L θ r.2)) =
+      rd.1.map fun r => (r.1, readThrough L θ' r.2) :=
+    List.map_congr_left fun r hr => by rw [readThrough_agree hL hθ (rd.2 r hr)]
+  refine ⟨fun y z hadj => ?_, fun b => ?_⟩
+  swap
+  · simp only [stagedOf, openDataAt]
+    split_ifs with hb
+    · rw [← hpl, ← hpm, ← hpo.2.1, hrd]
+      refine List.map_congr_left fun r hr => ?_
+      obtain ⟨r₀, hr₀, rfl⟩ := List.mem_map.mp hr
+      dsimp only
+      rw [sweepAt_agrees_on_walk (T := wordOp L θ p.lift p.opening.tick)
+        (T' := wordOp L θ' p.lift p.opening.tick) (fun k => hL.sparse _ θ)
+        (fun k => hL.sparse _ θ') (fun k y z hw => wordOp_agree hL hθ p.lift p.opening.tick k hw)
+        (readThrough_supported (L := L) (θ := θ') (rd.2 r₀ hr₀)) _ _ (subset_reachAll S hb.1)]
+    · rfl
   simp only [stagedOf]
   by_cases hw : OnWalk adj S R z y
-  · have hrd : (rd.1.map fun r => (r.1, readThrough L θ r.2)) =
-        rd.1.map fun r => (r.1, readThrough L θ' r.2) :=
-      List.map_congr_left fun r hr => by rw [readThrough_agree hL hθ (rd.2 r hr)]
-    rw [← hpl, ← hpm, ← hpo.2.1, hrd]
+  · rw [← hpl, ← hpm, ← hpo.2.1, hrd]
     exact depositDataAt_agree (fun k => hL.sparse _ θ) (fun k => hL.sparse _ θ')
       (fun k y z hw => wordOp_agree hL hθ p.lift p.opening.tick k hw)
       (seeds_agree hL hθ p.lift hp hp' hpo)
@@ -618,7 +686,8 @@ theorem agree_retain (hL : L.Local adj) {S R : Set B} (res : TickResident K M Co
     Agree adj L S R res (retain adj L S R res) := by
   refine ⟨fun ℓ hℓ => hL.release_keeps _ res.loci ℓ hℓ, rfl, rfl, carryAgree_refl _, ?_, ?_⟩
   · exact forall₂_self (s := PendAgree adj S R) (fun _ => ⟨rfl, rfl, carryAgree_refl _⟩) _
-  · exact forall₂_self (s := StagedAgree adj) (fun _ _ _ _ => rfl) res.staged
+  · exact forall₂_self (s := StagedAgree adj) (fun _ => ⟨fun _ _ _ => rfl, fun _ => rfl⟩)
+      res.staged
 
 theorem wordRead_agree (hL : L.Local adj) {S R : Set B}
     (hopen : ∀ θ l m, SupportedIn (L.openState θ l m) S) {θ θ' : Con}
@@ -755,27 +824,34 @@ def tickStanding (hL : L.Lawful adj) {S R : Set B}
 
 /-- [definition] **The quiet laws**, assumed of the instance for the release's persistence: the
 agreement on a locus is reflexive and transitive, and a deposit leaves a locus alone when no datum
-reaches it, that is when every edge that reads it carries no data. On the concrete medium the
+reaches it, that is when every edge that reads it and every block whose opening reads it carry no
+data. On the concrete medium the
 agreement is equality of the locus's operands and the deposit's locus laws keep a locus on empty
 data (`LocusMap.deposit_descends`'s `hΦe`, `hΦc`; `Constitution::deposited`). -/
 structure TickLaw.Quiet (L : TickLaw K M Con Loc Ref Cls Λ Mo Cell Crib) : Prop where
   refl : ∀ ℓ θ, L.agreeOn ℓ θ θ
   trans : ∀ ℓ θ₁ θ₂ θ₃, L.agreeOn ℓ θ₁ θ₂ → L.agreeOn ℓ θ₂ θ₃ → L.agreeOn ℓ θ₁ θ₃
-  apply_quiet : ∀ θ d ℓ, (∀ y z, L.reads ℓ z y → d y z = []) → L.agreeOn ℓ θ (L.apply θ d)
+  apply_quiet : ∀ θ d ℓ, (∀ y z, L.reads ℓ z y → d.edges y z = []) →
+    (∀ b, L.openReads ℓ b → d.opens b = []) → L.agreeOn ℓ θ (L.apply θ d)
 
 variable (adj) in
-/-- [definition] Every staged deposit carries no data off every walk. -/
+/-- [definition] Every staged deposit carries no data off every walk, and no opening data but at a
+source that observes a receiver. -/
 def StagedOff (S R : Set B) (res : TickResident K M Con Ref Λ Mo) : Prop :=
-  ∀ d ∈ res.staged, ∀ y z, ¬ OnWalk adj S R z y → d y z = []
+  ∀ d ∈ res.staged, (∀ y z, ¬ OnWalk adj S R z y → d.edges y z = []) ∧
+    ∀ b, ¬ (b ∈ S ∧ ObservesAll adj R b) → d.opens b = []
 
 omit [Fintype B] in
-theorem stagedOff_eraseIdx {S R : Set B} {D : List ((y z : B) → List (M z × Module.Dual K (M y)))}
-    (h : ∀ d ∈ D, ∀ y z, ¬ OnWalk adj S R z y → d y z = []) (i : ℕ) :
-    ∀ d ∈ D.eraseIdx i, ∀ y z, ¬ OnWalk adj S R z y → d y z = [] :=
+theorem stagedOff_eraseIdx {S R : Set B} {D : List (TickStage K M Λ Mo)}
+    (h : ∀ d ∈ D, (∀ y z, ¬ OnWalk adj S R z y → d.edges y z = []) ∧
+      ∀ b, ¬ (b ∈ S ∧ ObservesAll adj R b) → d.opens b = []) (i : ℕ) :
+    ∀ d ∈ D.eraseIdx i, (∀ y z, ¬ OnWalk adj S R z y → d.edges y z = []) ∧
+      ∀ b, ¬ (b ∈ S ∧ ObservesAll adj R b) → d.opens b = [] :=
   fun d hd => h d (List.mem_of_mem_eraseIdx hd)
 
 /-- [proved-derived; formal-checked] Every generator keeps the staged deposits quiet off every walk:
-a compare stages data read in windows seeded on reached blocks (`depositDataAt_off_walk`). -/
+a compare stages data read in windows seeded on reached blocks (`depositDataAt_off_walk`), and
+opening data only at the sources that observe a receiver (`openDataAt`). -/
 theorem step_stagedOff {S R : Set B} (g : CarryGen Cell Crib (ReceiverFamily K M R))
     {res : TickResident K M Con Ref Λ Mo} (hv : Valid adj S res) (h : StagedOff adj S R res) :
     StagedOff adj S R (step adj L S R g res) := by
@@ -790,12 +866,15 @@ theorem step_stagedOff {S R : Set B} (g : CarryGen Cell Crib (ReceiverFamily K M
     cases hpi : P[i]? with
     | none => exact h
     | some p =>
-      intro d hd y z hw
+      intro d hd
       rcases List.mem_append.mp hd with hd | hd
-      · exact h d hd y z hw
+      · exact h d hd
       · rw [List.mem_singleton.mp hd]
-        exact depositDataAt_off_walk
-          (fun s hs => seeds_reached (hP p (List.mem_of_getElem? hpi)) hs) _ _ _ hw
+        refine ⟨fun y z hw => depositDataAt_off_walk
+          (fun s hs => seeds_reached (hP p (List.mem_of_getElem? hpi)) hs) _ _ _ hw,
+          fun b hb => ?_⟩
+        simp only [stagedOf, openDataAt]
+        exact if_neg hb
   | discard i => exact h
   | deposit i =>
     simp only [step]
@@ -807,8 +886,8 @@ theorem step_stagedOff {S R : Set B} (g : CarryGen Cell Crib (ReceiverFamily K M
 /-- [proved-derived; formal-checked] **No generator moves a released locus.** On a valid resident
 whose staged deposits are quiet off every walk, every generator leaves each locus the collapse
 releases in agreement with its state before: only a deposit moves loci, an edge that reads a
-released locus passes no walk (else the locus would be retained), so no datum reaches it, and the
-quiet law keeps it. -/
+released locus passes no walk and a block whose opening reads it is no source that observes a
+receiver (else the locus would be retained), so no datum reaches it, and the quiet law keeps it. -/
 theorem step_released (hQ : L.Quiet) {S R : Set B}
     (g : CarryGen Cell Crib (ReceiverFamily K M R)) {res : TickResident K M Con Ref Λ Mo}
     (h : StagedOff adj S R res) {ℓ : Loc} (hℓ : ¬ Retained adj L S R ℓ) :
@@ -829,8 +908,10 @@ theorem step_released (hQ : L.Quiet) {S R : Set B}
     cases hdi : D[i]? with
     | none => exact hQ.refl ℓ θ
     | some d =>
-      exact hQ.apply_quiet θ d ℓ fun y z hr =>
-        h d (List.mem_of_getElem? hdi) y z fun hw => hℓ (Or.inl ⟨z, y, hr, hw⟩)
+      exact hQ.apply_quiet θ d ℓ
+        (fun y z hr => (h d (List.mem_of_getElem? hdi)).1 y z fun hw => hℓ (Or.inl ⟨z, y, hr, hw⟩))
+        fun b hr => (h d (List.mem_of_getElem? hdi)).2 b fun hb =>
+          hℓ (Or.inr (Or.inr (Or.inl ⟨b, hr, hb.1, hb.2⟩)))
   | discardStaged i => exact hQ.refl ℓ θ
 
 /-- [proved-derived; formal-checked] **A deposit between words never reopens a released locus**
@@ -872,6 +953,7 @@ end Resident
 end Holonics.HNN.TickStanding
 
 #print axioms Holonics.HNN.TickStanding.depositDataAt_off_walk
+#print axioms Holonics.HNN.TickStanding.reading_opening_variation
 #print axioms Holonics.HNN.TickStanding.stagedOf_agree
 #print axioms Holonics.HNN.TickStanding.step_agree
 #print axioms Holonics.HNN.TickStanding.observe_agree

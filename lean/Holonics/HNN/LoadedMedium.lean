@@ -312,6 +312,13 @@ block and its covector on the block. -/
 def projData (d : LData endRing V Ch) : EdgeData endRing V Ch :=
   fun y z => (d y z).map fun t => (t.1.1, t.2.comp (LinearMap.inl ℝ _ _))
 
+/-- [definition] **The staged deposit the medium's loci read**: the edges' data through `projData`,
+and the opening's data with each covector on the block. -/
+def projStage {Λ Mo : Type*} (d : TickStage ℝ (LoadedM endRing V Ch) Λ Mo) :
+    TickStage ℝ (BlockM endRing V Ch) Λ Mo where
+  edges := projData d.edges
+  opens b := (d.opens b).map fun t => (t.1, t.2.1, t.2.2.comp (LinearMap.inl ℝ _ _))
+
 open Classical in
 /-- [definition] **The data a resonator reads**: the data on its ring's element edge. -/
 def resData (d : LData endRing V Ch) (g : Ring) : LData endRing V Ch :=
@@ -371,7 +378,7 @@ def loadedLaw (L : TickLaw ℝ (BlockM endRing V Ch) Con Loc Ref Cls Λ Mo Cell 
   absorb := absorb
   ingestStep := L.ingestStep
   rekey := L.rekey
-  apply θ d := ⟨L.apply θ.inner (projData d), fun g => Ψo g (θ.res g) (resData d g)⟩
+  apply θ d := ⟨L.apply θ.inner (projStage d), fun g => Ψo g (θ.res g) (resData d.edges g)⟩
   release keep θ :=
     ⟨L.release (fun ℓ => keep (.inner ℓ)) θ.inner,
       fun g => if keep (.resonator g) then θ.res g else ResOp.zero (V g)⟩
@@ -426,14 +433,14 @@ theorem loadedLaw_lawful (hL : L.Lawful (blockAdj endRing)) : (LL).Lawful (block
   recv_reads θ θ' b h := by
     show liftRecv (L.recv θ.inner b) = liftRecv (L.recv θ'.inner b)
     rw [hL.recv_reads θ.inner θ'.inner b fun ℓ hr => h (.inner ℓ) hr]
-  apply_local θ θ' d d' ℓ hθ hd := by
+  apply_local θ θ' d d' ℓ hθ hd ho := by
     cases ℓ with
     | inner ℓ =>
-      exact hL.apply_local θ.inner θ'.inner (projData d) (projData d') ℓ hθ
-        fun y z hr => projData_congr (hd y z hr)
+      exact hL.apply_local θ.inner θ'.inner (projStage d) (projStage d') ℓ hθ
+        (fun y z hr => projData_congr (hd y z hr)) fun b hr => by simp only [projStage, ho b hr]
     | resonator g =>
-      show Ψo g (θ.res g) (resData d g) = Ψo g (θ'.res g) (resData d' g)
-      have hrd : resData d g = resData d' g := by
+      show Ψo g (θ.res g) (resData d.edges g) = Ψo g (θ'.res g) (resData d'.edges g)
+      have hrd : resData d.edges g = resData d'.edges g := by
         funext y z
         simp only [resData]
         split_ifs with hr
@@ -460,14 +467,15 @@ theorem loadedLaw_quiet (hQ : L.Quiet) (hΨo : ∀ g p, Ψo g p (fun _ _ => []) 
     cases ℓ with
     | inner ℓ => exact hQ.trans ℓ _ _ _ h₁ h₂
     | resonator g => exact Eq.trans h₁ h₂
-  apply_quiet θ d ℓ h := by
+  apply_quiet θ d ℓ h ho := by
     cases ℓ with
     | inner ℓ =>
-      refine hQ.apply_quiet θ.inner (projData d) ℓ fun y z hr => ?_
-      simp only [projData, h y z hr, List.map_nil]
+      refine hQ.apply_quiet θ.inner (projStage d) ℓ (fun y z hr => ?_) fun b hr => ?_
+      · simp only [projStage, projData, h y z hr, List.map_nil]
+      · simp only [projStage, ho b hr, List.map_nil]
     | resonator g =>
-      show θ.res g = Ψo g (θ.res g) (resData d g)
-      have hrd : resData d g = fun _ _ => [] := by
+      show θ.res g = Ψo g (θ.res g) (resData d.edges g)
+      have hrd : resData d.edges g = fun _ _ => [] := by
         funext y z
         simp only [resData]
         split_ifs with hr
@@ -585,10 +593,11 @@ variable {FE : Ring → Type u} [∀ r, NormedAddCommGroup (FE r)] [∀ r, Inner
 variable {FC : Contact → Type u} [∀ a, NormedAddCommGroup (FC a)]
   [∀ a, InnerProductSpace ℝ (FC a)] [∀ a, FiniteDimensional ℝ (FC a)]
 variable {Q : Ring → Type u} [∀ g, AddCommGroup (Q g)] [∀ g, Module ℝ (Q g)]
-variable {U : Ring → Type u} [∀ g, AddCommGroup (U g)] [∀ g, Module ℝ (U g)]
+variable {P : Ring → Type u} [∀ g, AddCommGroup (P g)] [∀ g, Module ℝ (P g)]
 variable {endRing : Contact × Bool → Ring} {Src : Set Ring}
 variable {Λ Mo Cell Crib : Type*}
-variable {h₀ : ℝ} {χ : LockChart ρ Q endRing} {src : Λ → Mo → (g : Ring) → U g}
+variable {h₀ : ℝ} {χ : LockChart ρ Q endRing}
+  {src : Λ → Mo → (g : Ring) → P g →ₗ[ℝ] BlockM endRing V Ch (.inl g)}
   {ticks : Λ → Mo → ℕ}
   {cross₀ : Λ → Λ → (b : Ring ⊕ Contact) → MediumRef Ring Ch b → MediumRef Ring Ch b →
     (BlockM endRing V Ch b →ₗ[ℝ] BlockM endRing V Ch b)}
@@ -599,8 +608,7 @@ variable {h₀ : ℝ} {χ : LockChart ρ Q endRing} {src : Λ → Mo → (g : Ri
   {Ψc : (a : Contact) → ChannelFactors (Ch := Ch) (FC := FC) a → EdgeData endRing V Ch →
     ChannelFactors (Ch := Ch) (FC := FC) a}
   {Ψq : (g : Ring) → Q g → EdgeData endRing V Ch → Q g}
-  {Ψs : (g : Ring) → (U g →ₗ[ℝ] BlockM endRing V Ch (.inl g)) → EdgeData endRing V Ch →
-    (U g →ₗ[ℝ] BlockM endRing V Ch (.inl g))}
+  {Ψs : (g : Ring) → P g → List (Λ × Mo × Module.Dual ℝ (BlockM endRing V Ch (.inl g))) → P g}
   {Ψr : (g : Ring) →
     (Module.Dual ℝ (BlockM endRing V Ch (.inl g)) →ₗ[ℝ]
       Module.Dual ℝ (BlockM endRing V Ch (.inl g))) →

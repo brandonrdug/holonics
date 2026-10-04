@@ -385,7 +385,7 @@ def factoredLaw (h₀ : ℝ) (cls : Λ → ℕ → Ring → ρ → ℝ)
   absorb := absorb
   ingestStep := ingestStep
   rekey := rekey
-  apply φ d := ⟨fdeposited Ψe Ψc (locusOf d) φ.1, declared_fdeposited φ.2.1, φ.2.2⟩
+  apply φ d := ⟨fdeposited Ψe Ψc (locusOf d.edges) φ.1, declared_fdeposited φ.2.1, φ.2.2⟩
   release keep φ := ⟨frelease keep φ.1, declared_frelease φ.2.1, φ.2.2⟩
 
 variable {h₀ : ℝ} {cls : Λ → ℕ → Ring → ρ → ℝ}
@@ -485,7 +485,7 @@ theorem factoredLaw_lawful : (FL).Lawful (blockAdj endRing) where
       rw [hG, hc]
   open_reads _ _ _ _ _ _ := rfl
   recv_reads _ _ _ _ := rfl
-  apply_local φ φ' d d' ℓ hφ hd := fdeposited_local hφ hd
+  apply_local φ φ' d d' ℓ hφ hd _ := fdeposited_local hφ hd
   release_keeps keep φ ℓ hk := fagreeOn_frelease φ.1 hk
 
 omit [Fintype Ring] in
@@ -496,7 +496,7 @@ theorem factoredLaw_quiet
     (FL).Quiet where
   refl ℓ φ := fagreeOn_refl φ.1 ℓ
   trans _ _ _ _ h₁ h₂ := fagreeOn_trans h₁ h₂
-  apply_quiet φ _ _ h := fdeposited_quiet hΨe0 hΨc0 φ.1 h
+  apply_quiet φ _ _ h _ := fdeposited_quiet hΨe0 hΨc0 φ.1 h
 
 omit [Fintype Ring] in
 /-- [proved-derived; formal-checked] The law's release is `LocusMap.release` on the carriers. -/
