@@ -1,4 +1,5 @@
 import Holonics.HNN.FactoredMedium
+import Holonics.HNN.WordDiamond
 
 /-!
 # HNN.JointStep: the deposit's joint step read on the word's retained loci
@@ -59,14 +60,17 @@ Here the joint step is any such deposit:
    (`certified_joint_rust_collapse_sufficient`, `certified_joint_rust_reading_unchanged`), with no
    hypothesis on the moves. With the budget over that retained set and the other reads over a
    diamond inside it, the collapse changes no step and no refusal
-   (`certified_budgeted_readsOnly`, `certified_budgeted_rust_unchanged`).
+   (`certified_budgeted_readsOnly`, `certified_budgeted_rust_unchanged`), and with the reads over
+   the word's opened diamonds no hypothesis on the diamond (`certified_word_rust_unchanged`).
 
 [agent-inferred] **What it leaves open.** That the Rust's `Reach::loci` lies within the loci its
-collapse retains (record B §8: at rest the word's opened diamond and the collapse diamond are the
-same, and under the carry the continuing diamond keeps every locus a walk passes), and that its
-budget counts that retained set, are the Rust's fixtures (`tests/retention.rs`), not Lean statements
-here; this file takes the reads on the diamond and the budget on the retained set as hypotheses. The
-carried statistics and remainders in the locus's state (a factor family's `h_x′`, a linear locus's
+collapse retains is `HNN/WordDiamond` (`word_diamond_retained`: every opened diamond, seeded at the
+sources and a support they reach and observed from admitted receivers, lies in the continuing
+collapse's retained set), so `certified_word_rust_unchanged` takes the reads on the opened diamonds
+with no inclusion hypothesis. That the joint reading's non-budget reads stay on the opened diamond
+and its budget on the retained set (`Constitution::deposited_within`) are the Rust's construction,
+checked by its fixtures (`tests/retention.rs`), and remain hypotheses here. The carried
+statistics and remainders in the locus's state (a factor family's `h_x′`, a linear locus's
 successor Gram and chart, the standing's carried remainder) are owed in #62. The step's certified
 descent is `Holon/Deposition`. The source port's deposit reads the opening's data the staged deposit
 carries (`TickStanding.TickStage`, `RingLoci.port_gradient`).
@@ -625,6 +629,50 @@ theorem certified_budgeted_rust_unchanged
   ⟨certified_joint_rust_collapse_sufficient hS hR hopen hJ q w s hoff,
     certified_joint_rust_reading_unchanged hS hR hopen hJ w s hoff i⟩
 
+/-- [proved-derived; formal-checked] **The release law with no hypothesis on the diamond** (#62;
+record B §8; `HNN/WordDiamond`): with the joint reading's non-budget reads over the word's opened
+diamonds (`Reach::loci`: seeded at the sources and a carried support they reach, observed from
+receivers among the admitted ones, at any epoch bound) and the budget over the retained set,
+releasing every locus the Rust's rule does not retain changes, after any word of the generators,
+no admitted face and no staged deposit's joint reading, a refusal included. -/
+theorem certified_word_rust_unchanged
+    {Jd : FactoredAt ρ V Ch FE FC endRing h₀ → TickStage ℝ (BlockM endRing V Ch) Λ Mo →
+      Option ((Ring → ℝ) × (Contact → ℝ))} {within : FactoredAt ρ V Ch FE FC endRing h₀ → Bool}
+    {S R : Set (Ring ⊕ Contact)}
+    (hS : ∀ a, (.inr a : Ring ⊕ Contact) ∈ S → ∀ s, (.inl (endRing (a, s)) : Ring ⊕ Contact) ∈ S)
+    (hR : ∀ a, (.inr a : Ring ⊕ Contact) ∉ R) (hopen : ∀ l m, SupportedIn (openState l m) S)
+    (hd : ReadsOnly (blockAdj endRing) (CL1) (WordDiamond.OpenedDiamond endRing S R) Jd)
+    (hb : BudgetReads (CL1) (RUST S R) within)
+    (q : Option ℕ × ReceiverReading ℝ (BlockM endRing V Ch) R)
+    (w : List (CarryGen Cell Crib (ReceiverFamily ℝ (BlockM endRing V Ch) R)))
+    (s : ValidResident (blockAdj endRing)
+      (CJ (budgeted Jd within fun η => (CLη η).apply)) S)
+    (hoff : StagedOff (blockAdj endRing) S R s.1) (i : ℕ) :
+    observe (CJ (budgeted Jd within fun η => (CLη η).apply)) q
+        (Holonics.Foundation.Chronology.transportWord
+          (transportOf (blockAdj endRing)
+            (CJ (budgeted Jd within fun η => (CLη η).apply))
+            (jointLaw_local factoredLaw_lawful.toLocal) (fun _ => hopen)) w
+          ⟨{ s.1 with loci := (CL1).release (RUST S R) s.1.loci }, s.2⟩).1 =
+      observe (CJ (budgeted Jd within fun η => (CLη η).apply))
+        q (Holonics.Foundation.Chronology.transportWord
+          (transportOf (blockAdj endRing)
+            (CJ (budgeted Jd within fun η => (CLη η).apply))
+            (jointLaw_local factoredLaw_lawful.toLocal) (fun _ => hopen)) w s).1 ∧
+    depositReading (budgeted Jd within fun η => (CLη η).apply)
+        (Holonics.Foundation.Chronology.transportWord
+          (transportOf (blockAdj endRing)
+            (CJ (budgeted Jd within fun η => (CLη η).apply))
+            (jointLaw_local factoredLaw_lawful.toLocal) (fun _ => hopen)) w
+          ⟨{ s.1 with loci := (CL1).release (RUST S R) s.1.loci }, s.2⟩).1 i =
+      depositReading (budgeted Jd within fun η => (CLη η).apply)
+        (Holonics.Foundation.Chronology.transportWord
+          (transportOf (blockAdj endRing)
+            (CJ (budgeted Jd within fun η => (CLη η).apply))
+            (jointLaw_local factoredLaw_lawful.toLocal) (fun _ => hopen)) w s).1 i :=
+  certified_budgeted_rust_unchanged (ge := ge) (gc := gc) hS hR hopen
+    (fun ℓ h => (WordDiamond.word_diamond_retained S R ℓ).mp h) hd hb q w s hoff i
+
 end Certified
 
 end Holonics.HNN.JointStep
@@ -642,3 +690,4 @@ end Holonics.HNN.JointStep
 #print axioms Holonics.HNN.JointStep.budgeted_readsOnly
 #print axioms Holonics.HNN.JointStep.certified_budgeted_readsOnly
 #print axioms Holonics.HNN.JointStep.certified_budgeted_rust_unchanged
+#print axioms Holonics.HNN.JointStep.certified_word_rust_unchanged
