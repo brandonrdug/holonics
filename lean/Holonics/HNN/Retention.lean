@@ -24,9 +24,10 @@ family of time-invariant linear block operators `readOp c θ : BlockOp K M` (`op
 `Sparse` on an abstract block graph `adj` (`LociSparse`), iterated by `Propagation.trajectory`.
 That covers `release_indistinguishable`, `deposit_descends`, `release_structural`,
 `admitted_nonincreasing`, `local_retention_blocks`, `constitution_descends`,
-`blind_outside_observe`, `fieldStanding`, `contemporary_read` and `word_opens_at_zero`.
-`diamond_recursion` is a statement about the recursions on any finite graph `adj`, so it applies to
-the concrete ring/contact graph `HNN/Word.blockAdj` as it stands; `lift_reading` reads integer
+`blind_outside_observe`, `fieldStanding`, `contemporary_read`, `word_opens_at_zero` and the
+diamond under the carry (§4a–4b).
+`diamond_recursion`, `continuing_recursion` and `reachWithin_card` are statements about the
+recursions on any finite graph `adj`, so they apply to the concrete ring/contact graph `HNN/Word.blockAdj` as it stands; `lift_reading` reads integer
 lifts and applies to the concrete lift point as it stands. None of them is proved for
 `HNN/Word.fieldTick`; the concrete tick has `fieldTick_balance`, `fieldTick_local`,
 `word_tick_cone`, `elementSolve_spec` and `transitSolve_spec`. The bridge (`fieldTick` linear in the
@@ -79,6 +80,23 @@ change at fixed operands, and the `tick` of a `BlockOp` on `Ring ⊕ Contact` th
    junction is an involution (`Propagation.junctionScattering_involutive`), so the next word's first
    junction undoes it and the hop at `T` runs on the unscattered change, one hop reflected
    (`cut_after_junction_reflects`, `junction_cut_reflects`, `cut_after_junction_differs`).
+8. **The diamond under the carry** (§4a–4b; #62, owed by the carry as the production default,
+   record B §8). A word opened on the source moment plus a carried change supported on `S′` reads,
+   and deposits, the same through the collapse seeded at `𝒮 ∪ S′`
+   (`opened_release_indistinguishable`, `opened_deposit_descends`), with its windows read from the
+   recursions seeded there (`windowTicks_recursion`); the rest diamond seeded at `𝒮` is not enough,
+   since its collapse changes the opened word's reading on every edge it drops
+   (`rest_diamond_drops_opened`). Over a chain of words each opened on the last one's end plus a
+   source moment (`chainEnd`, the carry at `A = 0`), releasing every edge no walk from a source to
+   a receiver passes changes no admitted reading of any later word at any epoch
+   (`continuing_release_indistinguishable`), and releasing any edge such a walk passes changes one
+   (`continuing_walk_edge_is_read`): a carried change stays on the blocks reached from the sources
+   and agrees wherever a receiver is observed (`chain_agrees_on_walk`), and at the 0/1
+   constitution no cancellation hides a released walk edge (`walk_edge_is_read`). The walk diamond
+   is the diamond at `e_last = 2|B|` (`inDiamond_continuing_iff`), decided by the recursions in
+   `|B|` rounds (`continuing_recursion`, `reachWithin_card`), which is `Diamond::continuing`'s
+   `|rings|` rounds and `2|rings|`; where every block is reached from a source and observes a
+   receiver, the continuing collapse releases nothing (`continuing_collapse_connected`).
 
 [definition; agent-inferred] **The collapse and the carried remainders** (Decision 22 of the step 4
 design). The collapse releases only exact complements, and a carried remainder is not one
@@ -622,6 +640,547 @@ theorem deposit_descends_needs_empty_window_law :
 
 end GrowthWitness
 
+/-! ## 4a. The diamond under the carry: the opened word and the continuing chain -/
+
+section Carry
+
+variable {B : Type*} [Fintype B] {adj : B → B → Prop}
+
+omit [Fintype B] in
+theorem supportedIn_union {M : B → Type*} [∀ b, AddCommGroup (M b)] {x x' : (b : B) → M b}
+    {S S' : Set B} (hx : SupportedIn x S) (hx' : SupportedIn x' S') :
+    SupportedIn (x + x') (S ∪ S') := by
+  intro b hb
+  simp only [Set.mem_union, not_or] at hb
+  simp [hx b hb.1, hx' b hb.2]
+
+open Classical in
+/-- [proved-derived; formal-checked] **The windows are read from the recursions.** For a reading
+at epoch `t ≤ e_last`, a tick `k` lies in the window `D(z → y, t)` of the seeds `S` exactly when
+`k < t`, `r_z ≤ k` and `o_y ≤ t − 1 − k` for the reach and observe recursions run `e_last` rounds.
+Seeded at `𝒮 ∪ S′` this is the opened word's window (`Diamond::opened`,
+`Diamond::element_window`, `Diamond::channel_window`). -/
+theorem windowTicks_recursion (S R : Set B) {eLast t : ℕ} (ht : t ≤ eLast) (z y : B) (k : ℕ) :
+    k ∈ windowTicks adj S R t z y ↔
+      k < t ∧ reachRound adj S eLast z ≤ k ∧
+        observeRound adj R eLast y ≤ ((t - 1 - k : ℕ) : ℕ∞) := by
+  simp only [windowTicks, List.mem_filter, List.mem_range, decide_eq_true_eq]
+  constructor
+  · rintro ⟨hk, hz, hy⟩
+    exact ⟨hk, (reachRound_le_iff S (by omega) z).mpr hz,
+      (reachRound_le_iff (adj := flip adj) R (by omega) y).mpr
+        (observes_iff_reachWithin_flip.mp hy)⟩
+  · rintro ⟨hk, hz, hy⟩
+    exact ⟨hk, reachRound_sound S eLast z k hz,
+      observes_iff_reachWithin_flip.mpr (reachRound_sound (adj := flip adj) R eLast y _ hy)⟩
+
+section Opened
+
+variable {K : Type*} [Field K] {M : B → Type*} [∀ b, AddCommGroup (M b)] [∀ b, Module K (M b)]
+variable {Cls : Type*} {Θ : B → B → Type*}
+variable {op : Cls → (y z : B) → Θ y z → (M z →ₗ[K] M y)} {rel : (y z : B) → Θ y z}
+
+/-- [proved-derived; formal-checked] **The opened word's collapse is indistinguishable**
+(#62, the diamond under the carry, item 1). A word opened on the source moment `u` (supported on
+the sources `𝒮`) plus a carried change `x` (supported on `S′`) reads the same through the collapse
+seeded at `𝒮 ∪ S′` as through the constitution, at every class configuration, epoch `t ≤ e_last`
+and receiver. -/
+theorem opened_release_indistinguishable (hrel : ∀ c y z, op c y z (rel y z) = 0)
+    {θ : (y z : B) → Θ y z} (hθ : LociSparse adj op θ) {S S' R : Set B} {eLast t : ℕ}
+    (ht : t ≤ eLast) (c : Cls) {u x : (b : B) → M b} (hu : SupportedIn u S)
+    (hx : SupportedIn x S') {g : (b : B) → Module.Dual K (M b)} (hg : SupportedIn g R) :
+    pair g (trajectory (readOp op c (collapse adj rel (S ∪ S') R eLast θ)) (u + x) t) =
+      pair g (trajectory (readOp op c θ) (u + x) t) :=
+  release_indistinguishable hrel hθ ht c (supportedIn_union hu hx) hg
+
+/-- [proved-derived; formal-checked] **The opened word's deposit descends** (#62, the diamond
+under the carry, item 1). With the windows `D(z → y, t) = {k < t | r_z ≤ k, o_y ≤ t − 1 − k}` read
+from the reach seeded at `𝒮 ∪ S′` (`windowTicks_recursion`), a deposit of the word opened on
+`u + x` gives the same result with or without the collapse seeded there. -/
+theorem opened_deposit_descends [DecidableEq B] (hrel : ∀ c y z, op c y z (rel y z) = 0)
+    (Φ : (y z : B) → Θ y z → List (M z × Module.Dual K (M y)) → Θ y z)
+    (hΦ : ∀ y z θ, Φ y z θ [] = θ) {θ : (y z : B) → Θ y z} (hθ : LociSparse adj op θ)
+    {S S' R : Set B} {eLast : ℕ} (c : Cls) {u x : (b : B) → M b} (hu : SupportedIn u S)
+    (hx : SupportedIn x S') {rd : List (ℕ × ((b : B) → Module.Dual K (M b)))}
+    (hrd : Admitted R eLast rd) :
+    collapse adj rel (S ∪ S') R eLast (deposit adj op Φ (S ∪ S') R c (u + x) rd θ) =
+      deposit adj op Φ (S ∪ S') R c (u + x) rd (collapse adj rel (S ∪ S') R eLast θ) :=
+  deposit_descends hrel Φ hΦ hθ c (supportedIn_union hu hx) hrd
+
+end Opened
+
+/-! ### The walk diamond and its recursion -/
+
+variable (adj) in
+/-- [definition] **Every block a walk from `S` reaches**, at any distance. -/
+def reachAll (S : Set B) : Set B := {b | ∃ t, b ∈ reachWithin adj S t}
+
+variable (adj) in
+/-- [definition] **The block observes a receiver** at some distance. -/
+def ObservesAll (R : Set B) (y : B) : Prop := ∃ m, Observes adj R y m
+
+variable (adj) in
+/-- [definition] **The edge `z → y` lies on a walk from a source to a receiver.** -/
+def OnWalk (S R : Set B) (z y : B) : Prop := z ∈ reachAll adj S ∧ ObservesAll adj R y
+
+omit [Fintype B] in
+theorem reachWithin_succ (S : Set B) (t : ℕ) :
+    reachWithin adj S (t + 1) = reachWithin adj S t ∪ {b | ∃ a ∈ reachWithin adj S t, adj a b} := by
+  ext b
+  constructor
+  · rintro ⟨x, hx, n, hn, hr⟩
+    rcases Nat.lt_or_ge n (t + 1) with h | h
+    · exact Or.inl ⟨x, hx, n, by omega, hr⟩
+    · obtain rfl : n = t + 1 := by omega
+      cases hr with
+      | tail hr' hstep => exact Or.inr ⟨_, ⟨x, hx, t, le_rfl, hr'⟩, hstep⟩
+  · rintro (h | ⟨a, ha, hab⟩)
+    · exact reachWithin_mono (by omega) h
+    · exact reachWithin_step ha hab
+
+omit [Fintype B] in
+theorem reachWithin_stable {S : Set B} {t : ℕ}
+    (h : reachWithin adj S (t + 1) = reachWithin adj S t) (k : ℕ) :
+    reachWithin adj S (t + k) = reachWithin adj S t := by
+  induction k with
+  | zero => rfl
+  | succ k ih => rw [← add_assoc, reachWithin_succ, ih, ← reachWithin_succ, h]
+
+/-- [proved-derived; formal-checked] **A walk is never needed longer than `|B| − 1` hops.** The
+reach sets grow until one round adds nothing and are constant from then on; each growing round adds
+a block, so they stop growing by round `|B| − 1`. -/
+theorem reachWithin_card (S : Set B) (t : ℕ) :
+    reachWithin adj S t ⊆ reachWithin adj S (Fintype.card B - 1) := by
+  intro b hb
+  rcases le_or_gt t (Fintype.card B - 1) with ht | ht
+  · exact reachWithin_mono ht hb
+  have hS : (reachWithin adj S 0).Nonempty := by
+    obtain ⟨x, hx, -⟩ := hb
+    exact ⟨x, x, hx, 0, le_rfl, ReachIn.refl x⟩
+  have hcount : ∀ k, (∀ i < k, reachWithin adj S (i + 1) ≠ reachWithin adj S i) →
+      (reachWithin adj S 0).ncard + k ≤ (reachWithin adj S k).ncard := by
+    intro k
+    induction k with
+    | zero => intro _; simp
+    | succ k ih =>
+      intro hne
+      have h1 := ih fun i hi => hne i (by omega)
+      have hsub : reachWithin adj S k ⊂ reachWithin adj S (k + 1) :=
+        Set.ssubset_iff_subset_ne.mpr ⟨reachWithin_mono (by omega), (hne k (by omega)).symm⟩
+      have h2 := Set.ncard_lt_ncard hsub (Set.toFinite _)
+      omega
+  obtain ⟨i, hi, heq⟩ :
+      ∃ i < Fintype.card B, reachWithin adj S (i + 1) = reachWithin adj S i := by
+    by_contra hno
+    push Not at hno
+    have h := hcount (Fintype.card B) hno
+    have hle : (reachWithin adj S (Fintype.card B)).ncard ≤ Fintype.card B := by
+      calc (reachWithin adj S (Fintype.card B)).ncard ≤ (Set.univ : Set B).ncard :=
+            Set.ncard_le_ncard (Set.subset_univ _)
+        _ = Fintype.card B := by rw [Set.ncard_univ, Nat.card_eq_fintype_card]
+    have hpos := (Set.ncard_pos (Set.toFinite _)).mpr hS
+    omega
+  have hti : t = i + (t - i) := by omega
+  rw [hti, reachWithin_stable heq] at hb
+  exact reachWithin_mono (by omega) hb
+
+theorem observes_card {R : Set B} {y : B} {m : ℕ} (h : Observes adj R y m) :
+    Observes adj R y (Fintype.card B - 1) :=
+  observes_iff_reachWithin_flip.mpr
+    (reachWithin_card (adj := flip adj) R m (observes_iff_reachWithin_flip.mp h))
+
+/-- [proved-derived; formal-checked] **The continuing diamond is the walk diamond**
+(`Diamond::continuing`). At `e_last = 2 |B|` an edge lies in the causal diamond exactly when a walk
+from a source passes through it to a receiver. -/
+theorem inDiamond_continuing_iff (S R : Set B) (z y : B) :
+    InDiamond adj S R (2 * Fintype.card B) z y ↔ OnWalk adj S R z y := by
+  have hpos : 0 < Fintype.card B := Fintype.card_pos_iff.mpr ⟨z⟩
+  constructor
+  · rintro ⟨j, m, hz, hy, -⟩
+    exact ⟨⟨j, hz⟩, ⟨m, hy⟩⟩
+  · rintro ⟨⟨j, hz⟩, ⟨m, hy⟩⟩
+    exact ⟨_, _, reachWithin_card S j hz, observes_card hy, by omega⟩
+
+/-- [proved-derived; formal-checked] **The recursions decide the walk diamond in `|B|` rounds**
+(`Diamond::continuing`: both recursions run `|rings|` rounds, `e_last = 2 |rings|`). An edge
+`z → y` lies on a walk from a source to a receiver exactly when
+`r_z + 1 + o_y ≤ 2 |B|` for the reach and observe recursions run `|B|` rounds. -/
+theorem continuing_recursion (S R : Set B) (z y : B) :
+    OnWalk adj S R z y ↔
+      reachRound adj S (Fintype.card B) z + 1 + observeRound adj R (Fintype.card B) y ≤
+        ((2 * Fintype.card B : ℕ) : ℕ∞) := by
+  have hpos : 0 < Fintype.card B := Fintype.card_pos_iff.mpr ⟨z⟩
+  constructor
+  · rintro ⟨⟨j, hz⟩, ⟨m, hy⟩⟩
+    obtain ⟨n, hn⟩ : ∃ n, n + 1 = Fintype.card B := ⟨Fintype.card B - 1, by omega⟩
+    have hr : reachRound adj S (Fintype.card B) z ≤ n :=
+      (reachRound_le_iff S (by omega) z).mpr (by
+        have := reachWithin_card S j hz
+        rwa [← hn, Nat.add_sub_cancel] at this)
+    have ho : observeRound adj R (Fintype.card B) y ≤ n :=
+      (reachRound_le_iff (adj := flip adj) R (by omega) y).mpr
+        (observes_iff_reachWithin_flip.mp (by
+          have := observes_card hy
+          rwa [← hn, Nat.add_sub_cancel] at this))
+    calc reachRound adj S (Fintype.card B) z + 1 + observeRound adj R (Fintype.card B) y
+        ≤ (n : ℕ∞) + 1 + n := by gcongr
+      _ = ((n + 1 + n : ℕ) : ℕ∞) := by push_cast; ring
+      _ ≤ ((2 * Fintype.card B : ℕ) : ℕ∞) := by exact_mod_cast (by omega)
+  · intro h
+    have hr_ne : reachRound adj S (Fintype.card B) z ≠ ⊤ := by
+      intro htop
+      rw [htop, top_add, top_add, top_le_iff] at h
+      exact ENat.natCast_ne_top _ h
+    have ho_ne : observeRound adj R (Fintype.card B) y ≠ ⊤ := by
+      intro htop
+      rw [htop, add_top, top_le_iff] at h
+      exact ENat.natCast_ne_top _ h
+    obtain ⟨j, hj⟩ := ENat.ne_top_iff_exists.mp hr_ne
+    obtain ⟨m, hm⟩ := ENat.ne_top_iff_exists.mp ho_ne
+    exact ⟨⟨j, reachRound_sound S _ z j (by rw [← hj])⟩,
+      ⟨m, observes_iff_reachWithin_flip.mpr
+        (reachRound_sound (adj := flip adj) R _ y m (by rw [hm]; rfl))⟩⟩
+
+/-! ### The continuing chain -/
+
+section Chain
+
+variable {K : Type*} [Field K] {M : B → Type*} [∀ b, AddCommGroup (M b)] [∀ b, Module K (M b)]
+
+omit [Fintype B] in
+theorem reachAll_step {S : Set B} {z y : B} (hz : z ∈ reachAll adj S) (h : adj z y) :
+    y ∈ reachAll adj S := by
+  obtain ⟨t, ht⟩ := hz
+  exact ⟨t + 1, reachWithin_step ht h⟩
+
+omit [Fintype B] in
+theorem observesAll_step {R : Set B} {z y : B} (h : adj z y) (hy : ObservesAll adj R y) :
+    ObservesAll adj R z := by
+  obtain ⟨m, hm⟩ := hy
+  exact ⟨m + 1, observes_step h hm⟩
+
+omit [Fintype B] in
+theorem subset_reachAll (S : Set B) : S ⊆ reachAll adj S :=
+  fun b hb => ⟨0, b, hb, 0, le_rfl, ReachIn.refl b⟩
+
+/-- [proved-derived; formal-checked] **One tick keeps the change on the reached blocks and agrees
+on the observing blocks.** If two sparse ticks agree on every edge a walk from `S` to `R` passes,
+and two changes are supported on the blocks reached from `S` and agree on every block that
+observes `R`, the ticked changes are again so. -/
+theorem tick_agrees_on_walk {T T' : BlockOp K M} (hT : Sparse adj T) (hT' : Sparse adj T')
+    {S R : Set B} (hagree : ∀ y z, OnWalk adj S R z y → T y z = T' y z)
+    {x x' : (b : B) → M b} (hx : SupportedIn x (reachAll adj S))
+    (hx' : SupportedIn x' (reachAll adj S)) (hxx : ∀ b, ObservesAll adj R b → x b = x' b) :
+    SupportedIn (tick T x) (reachAll adj S) ∧ SupportedIn (tick T' x') (reachAll adj S) ∧
+      ∀ b, ObservesAll adj R b → tick T x b = tick T' x' b := by
+  have hsupp : ∀ U : BlockOp K M, Sparse adj U → ∀ v : (b : B) → M b,
+      SupportedIn v (reachAll adj S) → SupportedIn (tick U v) (reachAll adj S) := by
+    intro U hU v hv y hy
+    refine Finset.sum_eq_zero fun z _ => ?_
+    by_cases h : adj z y
+    · have hz : z ∉ reachAll adj S := fun hz => hy (reachAll_step hz h)
+      rw [hv z hz, map_zero]
+    · simp [hU y z h]
+  refine ⟨hsupp T hT x hx, hsupp T' hT' x' hx', fun y hy => ?_⟩
+  refine Finset.sum_congr rfl fun z _ => ?_
+  by_cases h : adj z y
+  · by_cases hz : z ∈ reachAll adj S
+    · rw [hagree y z ⟨hz, hy⟩, hxx z (observesAll_step h hy)]
+    · rw [hx z hz, hx' z hz, map_zero, map_zero]
+  · simp [hT y z h, hT' y z h]
+
+theorem trajectory_agrees_on_walk {T T' : BlockOp K M} (hT : Sparse adj T) (hT' : Sparse adj T')
+    {S R : Set B} (hagree : ∀ y z, OnWalk adj S R z y → T y z = T' y z)
+    {x x' : (b : B) → M b} (hx : SupportedIn x (reachAll adj S))
+    (hx' : SupportedIn x' (reachAll adj S)) (hxx : ∀ b, ObservesAll adj R b → x b = x' b)
+    (t : ℕ) :
+    SupportedIn (trajectory T x t) (reachAll adj S) ∧
+      SupportedIn (trajectory T' x' t) (reachAll adj S) ∧
+      ∀ b, ObservesAll adj R b → trajectory T x t b = trajectory T' x' t b := by
+  induction t with
+  | zero => exact ⟨hx, hx', hxx⟩
+  | succ t ih => exact tick_agrees_on_walk hT hT' hagree ih.1 ih.2.1 ih.2.2
+
+omit [Fintype B] in
+theorem pair_agrees_on_observers {R : Set B} {g : (b : B) → Module.Dual K (M b)}
+    [Fintype B] (hg : SupportedIn g R) {x x' : (b : B) → M b}
+    (h : ∀ b, ObservesAll adj R b → x b = x' b) : pair g x = pair g x' := by
+  refine Finset.sum_congr rfl fun b _ => ?_
+  by_cases hb : b ∈ R
+  · rw [h b ⟨0, b, hb, 0, le_rfl, ReachIn.refl b⟩]
+  · rw [hg b hb]
+    simp
+
+variable {Cls : Type*} {Θ : B → B → Type*}
+
+variable (op : Cls → (y z : B) → Θ y z → (M z →ₗ[K] M y)) in
+/-- [definition] **A chain of words under the carry at `A = 0`** (record B §8;
+`Opens::OnMotion`). From the carried change `x`, each word `(c, T, u)` opens on the change the
+last one reached plus its source moment `u`, and runs `T` ticks at its class configuration `c`;
+`chainEnd` is the change the last word reached. The rest chain (`A = I`) is the case where every
+word opens on its moment alone. -/
+def chainEnd (θ : (y z : B) → Θ y z) :
+    ((b : B) → M b) → List (Cls × ℕ × ((b : B) → M b)) → (b : B) → M b
+  | x, [] => x
+  | x, w :: ws => chainEnd θ (trajectory (readOp op w.1 θ) (x + w.2.2) w.2.1) ws
+
+variable {op : Cls → (y z : B) → Θ y z → (M z →ₗ[K] M y)} {rel : (y z : B) → Θ y z}
+
+theorem chain_agrees_on_walk {θ θ' : (y z : B) → Θ y z} (hθ : LociSparse adj op θ)
+    (hθ' : LociSparse adj op θ') {S R : Set B}
+    (hagree : ∀ c y z, OnWalk adj S R z y → op c y z (θ y z) = op c y z (θ' y z))
+    (ws : List (Cls × ℕ × ((b : B) → M b))) (hws : ∀ w ∈ ws, SupportedIn w.2.2 S)
+    {x x' : (b : B) → M b} (hx : SupportedIn x (reachAll adj S))
+    (hx' : SupportedIn x' (reachAll adj S)) (hxx : ∀ b, ObservesAll adj R b → x b = x' b) :
+    SupportedIn (chainEnd op θ x ws) (reachAll adj S) ∧
+      SupportedIn (chainEnd op θ' x' ws) (reachAll adj S) ∧
+      ∀ b, ObservesAll adj R b → chainEnd op θ x ws b = chainEnd op θ' x' ws b := by
+  induction ws generalizing x x' with
+  | nil => exact ⟨hx, hx', hxx⟩
+  | cons w ws ih =>
+    have hu : SupportedIn w.2.2 (reachAll adj S) := fun b hb =>
+      hws w List.mem_cons_self b fun hbS => hb (subset_reachAll S hbS)
+    have hadd : ∀ v : (b : B) → M b, SupportedIn v (reachAll adj S) →
+        SupportedIn (v + w.2.2) (reachAll adj S) := fun v hv b hb => by
+      simp [hv b hb, hu b hb]
+    have h := trajectory_agrees_on_walk (sparse_readOp hθ w.1) (sparse_readOp hθ' w.1)
+      (fun y z hw => hagree w.1 y z hw) (hadd x hx) (hadd x' hx')
+      (fun b hb => by simp [hxx b hb]) w.2.1
+    exact ih (fun v hv => hws v (List.mem_cons_of_mem _ hv)) h.1 h.2.1 h.2.2
+
+/-- [proved-derived; formal-checked] **The continuing collapse is indistinguishable over the
+chain** (#62, the diamond under the carry, item 2; `Diamond::continuing`, `Opens::OnMotion`,
+`collapse`). Releasing every locus no walk from a source to a receiver passes (the collapse at
+`e_last = 2 |B|`, `inDiamond_continuing_iff`) changes no admitted reading of any word of any chain
+of words each opened on the last one's end plus a source moment, at any epoch of that word. No
+epoch bound enters: a change carried across words stays on the blocks reached from the sources, and
+agrees on every block that observes a receiver (`chain_agrees_on_walk`). -/
+theorem continuing_release_indistinguishable (hrel : ∀ c y z, op c y z (rel y z) = 0)
+    {θ : (y z : B) → Θ y z} (hθ : LociSparse adj op θ) {S R : Set B}
+    (ws : List (Cls × ℕ × ((b : B) → M b))) (hws : ∀ w ∈ ws, SupportedIn w.2.2 S) (c : Cls)
+    {u : (b : B) → M b} (hu : SupportedIn u S) (t : ℕ) {g : (b : B) → Module.Dual K (M b)}
+    (hg : SupportedIn g R) :
+    pair g (trajectory (readOp op c (collapse adj rel S R (2 * Fintype.card B) θ))
+        (chainEnd op (collapse adj rel S R (2 * Fintype.card B) θ) 0 ws + u) t) =
+      pair g (trajectory (readOp op c θ) (chainEnd op θ 0 ws + u) t) := by
+  have hθc := lociSparse_collapse hrel hθ S R (2 * Fintype.card B)
+  have hagree : ∀ c y z, OnWalk adj S R z y →
+      op c y z (collapse adj rel S R (2 * Fintype.card B) θ y z) = op c y z (θ y z) :=
+    fun c y z hw => by rw [collapse_of_mem ((inDiamond_continuing_iff S R z y).mpr hw)]
+  have h0 : SupportedIn (0 : (b : B) → M b) (reachAll adj S) := fun _ _ => rfl
+  have hch := chain_agrees_on_walk hθc hθ hagree ws hws h0 h0 fun _ _ => rfl
+  have hu' : SupportedIn u (reachAll adj S) := fun b hb => hu b fun hbS => hb (subset_reachAll S hbS)
+  have hadd : ∀ v : (b : B) → M b, SupportedIn v (reachAll adj S) →
+      SupportedIn (v + u) (reachAll adj S) := fun v hv b hb => by simp [hv b hb, hu' b hb]
+  have h := trajectory_agrees_on_walk (sparse_readOp hθc c) (sparse_readOp hθ c)
+    (fun y z hw => hagree c y z hw) (hadd _ hch.1) (hadd _ hch.2.1)
+    (fun b hb => by simp [hch.2.2 b hb]) t
+  exact pair_agrees_on_observers hg h.2.2
+
+/-- [proved-derived; formal-checked] **In a field where every block is reached from a source and
+observes a receiver, the continuing collapse releases nothing.** -/
+theorem continuing_collapse_connected {Θ' : B → B → Type*} (rel' : (y z : B) → Θ' y z)
+    {S R : Set B} (hconn : ∀ b, b ∈ reachAll adj S ∧ ObservesAll adj R b)
+    (θ : (y z : B) → Θ' y z) : collapse adj rel' S R (2 * Fintype.card B) θ = θ := by
+  funext y z
+  exact collapse_of_mem ((inDiamond_continuing_iff S R z y).mpr ⟨(hconn z).1, (hconn y).2⟩)
+
+end Chain
+
+end Carry
+
+/-! ## 4b. The diamonds under the carry are tight -/
+
+section CarryTight
+
+open Classical
+
+variable {B : Type*} [Fintype B] {adj : B → B → Prop}
+
+/-- [definition] **The 0/1 constitution keeping the edges `P`**: the identity on every kept edge
+`z → y`, zero elsewhere, on one rational line per block. -/
+def keepOp (P : B → B → Prop) : BlockOp ℚ (fun _ : B => ℚ) :=
+  fun y z => if P z y then LinearMap.id else 0
+
+theorem tick_keepOp (P : B → B → Prop) (x : B → ℚ) (y : B) :
+    tick (keepOp P) x y = ∑ z, if P z y then x z else 0 := by
+  simp only [tick, keepOp]
+  refine Finset.sum_congr rfl fun z _ => ?_
+  split_ifs <;> simp
+
+theorem trajectory_keep_nonneg (P : B → B → Prop) {x : B → ℚ} (hx : 0 ≤ x) (t : ℕ) :
+    0 ≤ trajectory (keepOp P) x t := by
+  induction t with
+  | zero => exact hx
+  | succ t ih =>
+    intro y
+    show 0 ≤ tick (keepOp P) (trajectory (keepOp P) x t) y
+    rw [tick_keepOp]
+    exact Finset.sum_nonneg fun z _ => by split_ifs; exacts [ih z, le_rfl]
+
+/-- One kept edge carries its tail's value into its head at the next tick. -/
+theorem keep_step_le (P : B → B → Prop) {x : B → ℚ} (hx : 0 ≤ x) {t : ℕ} {z y : B}
+    (h : P z y) : trajectory (keepOp P) x t z ≤ trajectory (keepOp P) x (t + 1) y := by
+  show _ ≤ tick (keepOp P) (trajectory (keepOp P) x t) y
+  rw [tick_keepOp]
+  have hn := trajectory_keep_nonneg P hx t
+  refine le_trans (le_of_eq (if_pos h).symm)
+    (Finset.single_le_sum (f := fun w => if P w y then trajectory (keepOp P) x t w else 0)
+      (fun w _ => by split_ifs; exacts [hn w, le_rfl]) (Finset.mem_univ z))
+
+theorem keep_le {P P' : B → B → Prop} (hPP : ∀ z y, P' z y → P z y) {x : B → ℚ} (hx : 0 ≤ x)
+    (t : ℕ) (b : B) : trajectory (keepOp P') x t b ≤ trajectory (keepOp P) x t b := by
+  induction t generalizing b with
+  | zero => exact le_rfl
+  | succ t ih =>
+    show tick (keepOp P') (trajectory (keepOp P') x t) b ≤
+      tick (keepOp P) (trajectory (keepOp P) x t) b
+    rw [tick_keepOp, tick_keepOp]
+    refine Finset.sum_le_sum fun z _ => ?_
+    by_cases h' : P' z b
+    · rw [if_pos h', if_pos (hPP z b h')]; exact ih z
+    · rw [if_neg h']
+      split_ifs
+      · exact trajectory_keep_nonneg P hx t z
+      · exact le_rfl
+
+/-- [proved-derived; formal-checked] **The released constitution's difference.** For `P′ ⊆ P` and
+a nonnegative open state, write `D_t = x_t(P) − x_t(P′)`. Along an edge `z → y` that `P` keeps,
+`D_t(z) ≤ D_(t+1)(y)`; along an edge `P` keeps and `P′` releases, also `x_t(P′)(z) ≤ D_(t+1)(y)`. -/
+theorem keep_diff_step {P P' : B → B → Prop} (hPP : ∀ z y, P' z y → P z y) {x : B → ℚ}
+    (hx : 0 ≤ x) (t : ℕ) {z y : B} (h : P z y) :
+    (trajectory (keepOp P) x t z - trajectory (keepOp P') x t z ≤
+        trajectory (keepOp P) x (t + 1) y - trajectory (keepOp P') x (t + 1) y) ∧
+      (¬ P' z y → trajectory (keepOp P') x t z ≤
+        trajectory (keepOp P) x (t + 1) y - trajectory (keepOp P') x (t + 1) y) := by
+  set X := trajectory (keepOp P) x t
+  set X' := trajectory (keepOp P') x t
+  have hX' := trajectory_keep_nonneg P' hx t
+  have hle := keep_le hPP hx t
+  have hsum : trajectory (keepOp P) x (t + 1) y - trajectory (keepOp P') x (t + 1) y =
+      ∑ w, ((if P w y then X w else 0) - (if P' w y then X' w else 0)) := by
+    show tick (keepOp P) X y - tick (keepOp P') X' y = _
+    rw [tick_keepOp, tick_keepOp, Finset.sum_sub_distrib]
+  have hnn : ∀ w, 0 ≤ (if P w y then X w else 0) - (if P' w y then X' w else 0) := by
+    intro w
+    by_cases h' : P' w y
+    · rw [if_pos (hPP w y h'), if_pos h']; exact sub_nonneg.mpr (hle w)
+    · rw [if_neg h', sub_zero]
+      split_ifs
+      · exact (hX' w).trans (hle w)
+      · exact le_rfl
+  have hz : ∀ v, v ≤ (if P z y then X z else 0) - (if P' z y then X' z else 0) →
+      v ≤ trajectory (keepOp P) x (t + 1) y - trajectory (keepOp P') x (t + 1) y := by
+    intro v hv
+    rw [hsum]
+    exact hv.trans (Finset.single_le_sum (fun w _ => hnn w) (Finset.mem_univ z))
+  constructor
+  · refine hz _ ?_
+    by_cases h' : P' z y
+    · rw [if_pos h, if_pos h']
+    · rw [if_pos h, if_neg h', sub_zero]
+      exact sub_le_self _ (hX' z)
+  · intro h'
+    refine hz _ ?_
+    rw [if_pos h, if_neg h', sub_zero]
+    exact hle z
+
+/-- Along a walk of `P` from the open block, the value of `P′` or the difference stays positive. -/
+theorem keep_walk_pos {P P' : B → B → Prop} (hPP : ∀ z y, P' z y → P z y) (s : B) {b : B}
+    {n : ℕ} (hr : ReachIn P s b n) :
+    0 < trajectory (keepOp P') (Pi.single s (1 : ℚ)) n b ∨
+      0 < trajectory (keepOp P) (Pi.single s (1 : ℚ)) n b -
+        trajectory (keepOp P') (Pi.single s (1 : ℚ)) n b := by
+  have hx : (0 : B → ℚ) ≤ Pi.single s 1 := Pi.single_nonneg.mpr zero_le_one
+  induction hr with
+  | refl => left; simp [trajectory]
+  | @tail a c n _ hstep ih =>
+    have hd := keep_diff_step hPP hx n hstep
+    rcases ih with ih | ih
+    · by_cases h' : P' a c
+      · exact Or.inl (lt_of_lt_of_le ih (keep_step_le P' hx h'))
+      · exact Or.inr (lt_of_lt_of_le ih (hd.2 h'))
+    · exact Or.inr (lt_of_lt_of_le ih hd.1)
+
+/-- Along a walk of `P`, a positive difference stays positive. -/
+theorem keep_diff_walk {P P' : B → B → Prop} (hPP : ∀ z y, P' z y → P z y) (s : B) {a b : B}
+    {m : ℕ} (hr : ReachIn P a b m) {t : ℕ}
+    (ha : 0 < trajectory (keepOp P) (Pi.single s (1 : ℚ)) t a -
+      trajectory (keepOp P') (Pi.single s (1 : ℚ)) t a) :
+    0 < trajectory (keepOp P) (Pi.single s (1 : ℚ)) (t + m) b -
+      trajectory (keepOp P') (Pi.single s (1 : ℚ)) (t + m) b := by
+  have hx : (0 : B → ℚ) ≤ Pi.single s 1 := Pi.single_nonneg.mpr zero_le_one
+  induction hr with
+  | refl => exact ha
+  | @tail c d m _ hstep ih => exact lt_of_lt_of_le ih (keep_diff_step hPP hx (t + m) hstep).1
+
+/-- [proved-derived; formal-checked] **A released edge on a walk is read.** At the 0/1
+constitution keeping `P`, release any edges (`P′ ⊆ P`) including one edge `z₀ → y₀` that a walk of
+`P` from `s` through it to `ρ` passes. The word opened on the unit change at `s` reads strictly less
+at `ρ` at the walk's length: no cancellation can hide a released edge a walk passes. -/
+theorem walk_edge_is_read {P P' : B → B → Prop} (hPP : ∀ z y, P' z y → P z y)
+    {s z₀ y₀ ρ : B} {j m : ℕ} (hs : ReachIn P s z₀ j) (he : P z₀ y₀) (hne : ¬ P' z₀ y₀)
+    (hρ : ReachIn P y₀ ρ m) :
+    trajectory (keepOp P') (Pi.single s (1 : ℚ)) (j + 1 + m) ρ <
+      trajectory (keepOp P) (Pi.single s (1 : ℚ)) (j + 1 + m) ρ := by
+  have hx : (0 : B → ℚ) ≤ Pi.single s 1 := Pi.single_nonneg.mpr zero_le_one
+  have hd := keep_diff_step hPP hx j he
+  have hy : 0 < trajectory (keepOp P) (Pi.single s (1 : ℚ)) (j + 1) y₀ -
+      trajectory (keepOp P') (Pi.single s (1 : ℚ)) (j + 1) y₀ := by
+    rcases keep_walk_pos hPP s hs with h | h
+    · exact lt_of_lt_of_le h (hd.2 hne)
+    · exact lt_of_lt_of_le h hd.1
+  exact sub_pos.mp (keep_diff_walk hPP s hρ hy)
+
+/-- [proved-derived; formal-checked] **The continuing collapse is tight** (#62, the diamond under
+the carry, item 2). Releasing any edge that a walk from a source to a receiver passes changes an
+admitted reading: at the 0/1 constitution keeping every edge, the word opened on a unit moment at a
+source reads strictly less at a receiver. With `continuing_release_indistinguishable`, the loci the
+continuing collapse keeps are exactly those it may keep at every constitution. -/
+theorem continuing_walk_edge_is_read {S R : Set B} {z₀ y₀ : B} (he : adj z₀ y₀)
+    (hw : OnWalk adj S R z₀ y₀) :
+    ∃ s ∈ S, ∃ ρ ∈ R, ∃ t,
+      trajectory (keepOp fun z y => adj z y ∧ ¬ (z = z₀ ∧ y = y₀)) (Pi.single s (1 : ℚ)) t ρ <
+        trajectory (keepOp adj) (Pi.single s (1 : ℚ)) t ρ := by
+  obtain ⟨⟨-, s, hs, n, -, hr⟩, ⟨-, ρ, hρ, n', -, hr'⟩⟩ := hw
+  exact ⟨s, hs, ρ, hρ, n + 1 + n', walk_edge_is_read (fun _ _ h => h.1) hr he
+    (fun h => h.2 ⟨rfl, rfl⟩) hr'⟩
+
+omit [Fintype B] in
+/-- [proved-derived; formal-checked] **The collapse of the 0/1 constitution keeps the diamond's
+edges.** -/
+theorem collapse_keepOp (S R : Set B) (eLast : ℕ) :
+    collapse adj (fun _ _ => (0 : ℚ →ₗ[ℚ] ℚ)) S R eLast (keepOp adj) =
+      keepOp fun z y => adj z y ∧ InDiamond adj S R eLast z y := by
+  funext y z
+  by_cases hd : InDiamond adj S R eLast z y
+  · rw [collapse_of_mem hd]
+    simp only [keepOp, hd, and_true]
+  · rw [collapse_of_not_mem hd]
+    simp only [keepOp, hd, and_false, if_false]
+
+/-- [proved-derived; formal-checked] **The rest diamond drops the opened word's carried motion**
+(#62, the diamond under the carry, item 1; `Diamond::opened`). An edge in the diamond seeded at
+`𝒮 ∪ S′` but not in the rest diamond seeded at `𝒮` is read by a word opened on a carried change in
+`S′`: the rest collapse of the 0/1 constitution changes that word's reading at a receiver, at an
+epoch `≤ e_last`. -/
+theorem rest_diamond_drops_opened {S S' R : Set B} {eLast : ℕ} {z₀ y₀ : B} (he : adj z₀ y₀)
+    (hopen : InDiamond adj (S ∪ S') R eLast z₀ y₀) (hrest : ¬ InDiamond adj S R eLast z₀ y₀) :
+    ∃ s ∈ S', ∃ ρ ∈ R, ∃ t ≤ eLast,
+      trajectory (collapse adj (fun _ _ => (0 : ℚ →ₗ[ℚ] ℚ)) S R eLast (keepOp adj))
+          (Pi.single s (1 : ℚ)) t ρ <
+        trajectory (keepOp adj) (Pi.single s (1 : ℚ)) t ρ := by
+  obtain ⟨j, m, ⟨s, hs, n, hn, hr⟩, ⟨ρ, hρ, n', hn', hr'⟩, hjm⟩ := hopen
+  have hs' : s ∈ S' := by
+    rcases hs with hs | hs
+    · exact absurd ⟨j, m, ⟨s, hs, n, hn, hr⟩, ⟨ρ, hρ, n', hn', hr'⟩, hjm⟩ hrest
+    · exact hs
+  refine ⟨s, hs', ρ, hρ, n + 1 + n', by omega, ?_⟩
+  rw [collapse_keepOp]
+  exact walk_edge_is_read (fun _ _ h => h.1) hr he (fun h => hrest h.2) hr'
+
+end CarryTight
+
 /-! ## 5. The word opens at zero change; the field's standing; the contemporary read -/
 
 section Standing
@@ -1016,6 +1575,18 @@ section Audit
 #print axioms cut_after_junction_reflects
 #print axioms cut_after_junction_differs
 #print axioms junction_cut_reflects
+#print axioms windowTicks_recursion
+#print axioms opened_release_indistinguishable
+#print axioms opened_deposit_descends
+#print axioms reachWithin_card
+#print axioms inDiamond_continuing_iff
+#print axioms continuing_recursion
+#print axioms chain_agrees_on_walk
+#print axioms continuing_release_indistinguishable
+#print axioms continuing_collapse_connected
+#print axioms walk_edge_is_read
+#print axioms continuing_walk_edge_is_read
+#print axioms rest_diamond_drops_opened
 
 end Audit
 
