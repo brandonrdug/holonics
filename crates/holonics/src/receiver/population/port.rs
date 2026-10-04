@@ -84,6 +84,67 @@ pub struct PortPopulation {
     cells: u64,
 }
 
+/// [definition; agent-inferred, October 4; the reception carry §9] **A population's retained
+/// reading** ([`PortPopulation::reading`]): each family's likelihood bounds `m·2^e` and the cell it
+/// died at, and the cells received.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct PortReading {
+    members: Vec<((Bound, Bound), Option<u64>)>,
+    cells: u64,
+}
+
+impl PortReading {
+    /// **The reading as text**, every value exact: `population F cells`, then one line a family,
+    /// `lower-mantissa lower-exponent upper-mantissa upper-exponent died` (`-` for a living family).
+    pub fn write(&self, s: &mut String) {
+        *s += &format!("population {} {}\n", self.members.len(), self.cells);
+        for ((lo, hi), died) in &self.members {
+            let died = died.map_or_else(|| "-".to_string(), |cell| cell.to_string());
+            *s += &format!(
+                "{} {} {} {} {died}\n",
+                lo.mantissa, lo.exponent, hi.mantissa, hi.exponent
+            );
+        }
+    }
+
+    /// **The reading read from its text** ([`PortReading::write`]), refused with what was out of
+    /// its form; its fit to a declaration is checked where it is placed
+    /// ([`PortPopulation::with_reading`]).
+    pub fn read<'t>(lines: &mut impl Iterator<Item = &'t str>) -> Result<Self, &'static str> {
+        let what = "a saved population";
+        let head: Vec<u64> = lines
+            .next()
+            .and_then(|line| line.strip_prefix("population "))
+            .ok_or(what)?
+            .split_whitespace()
+            .map(|word| word.parse().map_err(|_| what))
+            .collect::<Result<_, _>>()?;
+        let [families, cells] = head[..] else {
+            return Err(what);
+        };
+        let families = usize::try_from(families).map_err(|_| what)?;
+        let mut members = Vec::with_capacity(families);
+        for _ in 0..families {
+            let words: Vec<&str> = lines.next().ok_or(what)?.split_whitespace().collect();
+            let [lo_m, lo_e, hi_m, hi_e, died] = words[..] else {
+                return Err(what);
+            };
+            let bound = |m: &str, e: &str| -> Result<Bound, &'static str> {
+                Ok(Bound {
+                    mantissa: m.parse().map_err(|_| what)?,
+                    exponent: e.parse().map_err(|_| what)?,
+                })
+            };
+            let died = match died {
+                "-" => None,
+                cell => Some(cell.parse().map_err(|_| what)?),
+            };
+            members.push(((bound(lo_m, lo_e)?, bound(hi_m, hi_e)?), died));
+        }
+        Ok(Self { members, cells })
+    }
+}
+
 impl PortPopulation {
     /// **Declare the population** over families of the given descriptions: their Kraft sum
     /// `M = Σ_f 2^(−ℓ_f)` is at most one, the prior is `2^(−ℓ_f)/M` and `1 − M` is reserved.
@@ -131,6 +192,75 @@ impl PortPopulation {
     /// The cells received.
     pub fn cells(&self) -> u64 {
         self.cells
+    }
+
+    /// [definition; agent-inferred, October 4; the reception carry §9] **The population at its
+    /// founding**: its declared families' priors, every likelihood `1`, none dead, no cell received.
+    pub fn founding(&self) -> Self {
+        Self {
+            members: self
+                .members
+                .iter()
+                .map(|member| PortMember {
+                    likelihood: (Bound::one(), Bound::one()),
+                    died: None,
+                    ..member.clone()
+                })
+                .collect(),
+            mass: self.mass.clone(),
+            cells: 0,
+        }
+    }
+
+    /// [definition; agent-inferred, October 4; the reception carry §9] **What the population
+    /// retains past its declaration** ([`PortReading`]): each family's likelihood bounds and the cell
+    /// it died at, and the cells received. A saved state carries it whole; the declared priors stay
+    /// with the declared opening.
+    pub fn reading(&self) -> PortReading {
+        PortReading {
+            members: self
+                .members
+                .iter()
+                .map(|member| (member.likelihood.clone(), member.died))
+                .collect(),
+            cells: self.cells,
+        }
+    }
+
+    /// **The population with a saved reading placed on its declaration**: refused where the
+    /// reading has another family count, a bound past the kept precision, or a death after the
+    /// cells received.
+    pub fn with_reading(&self, reading: &PortReading) -> Result<Self, PopulationError> {
+        if reading.members.len() != self.members.len() {
+            return Err(refuse(
+                "a saved population's reading",
+                "it reads one likelihood for every declared family",
+            ));
+        }
+        if reading.members.iter().any(|((lo, hi), died)| {
+            lo.mantissa.bits() > super::PRECISION
+                || hi.mantissa.bits() > super::PRECISION
+                || died.is_some_and(|cell| cell >= reading.cells)
+        }) {
+            return Err(refuse(
+                "a saved population's reading",
+                "its bounds are kept at the precision and its deaths precede the cells received",
+            ));
+        }
+        Ok(Self {
+            members: self
+                .members
+                .iter()
+                .zip(&reading.members)
+                .map(|(member, (likelihood, died))| PortMember {
+                    likelihood: likelihood.clone(),
+                    died: *died,
+                    ..member.clone()
+                })
+                .collect(),
+            mass: self.mass.clone(),
+            cells: reading.cells,
+        })
     }
 
     /// **The declared total mass** `M = Σ_f 2^(−ℓ_f)`.

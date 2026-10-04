@@ -10,7 +10,7 @@
 
 use num_traits::{One, Signed, Zero};
 
-use super::learning::{generic, moment};
+use super::learning::{OPEN_BUDGET, generic, generic_within, moment};
 use super::prediction::{executed_requests, joint, joint_bank};
 use crate::hnn::HnnError;
 use crate::hnn::constitution::{Constitution, ContinuingState, Locus};
@@ -783,30 +783,35 @@ fn a_restored_checkpoint_continues_exactly_over_successive_receptions() {
     ));
 }
 
-/// **A restored checkpoint authenticates the material it continues and refuses damage**: a state
-/// carries the identity of its opening's material ([`Constitution::material_identity`]) and a check
-/// over its text, so a state of the same shape and lattice is refused onto another opening (here
-/// one founded from another seed), and a text damaged in one byte is refused before it mounts.
+/// **A restored checkpoint authenticates the declared material it continues and refuses damage**:
+/// a state carries the identity of its opening's declared material
+/// ([`Constitution::material_identity`]) and a check over its text. The state carries every learned
+/// value whole, so an opening founded from another seed (the same declared material, other learned
+/// founding values) restores it to the same constitution, while an opening of another declared
+/// material (here another budget) is refused, and a text damaged in one byte is refused before it
+/// mounts.
 #[test]
 fn a_checkpoint_is_refused_onto_foreign_material_and_when_damaged() {
     let field = joint();
     let opening = generic(&field, 94).with_transport(0, rat(3, 4)).unwrap();
-    let foreign = generic(&field, 95).with_transport(0, rat(3, 4)).unwrap();
-    assert_eq!(
-        opening.source_port(0).map(|e| (e.rows(), e.columns())),
-        foreign.source_port(0).map(|e| (e.rows(), e.columns()))
-    );
-    assert_ne!(opening.material_identity(0), foreign.material_identity(0));
+    let reseeded = generic(&field, 95).with_transport(0, rat(3, 4)).unwrap();
+    let foreign = generic_within(&field, 94, OPEN_BUDGET - 1)
+        .with_transport(0, rat(3, 4))
+        .unwrap();
+    assert_ne!(opening, reseeded);
+    assert_eq!(opening.material_identity(), reseeded.material_identity());
+    assert_ne!(opening.material_identity(), foreign.material_identity());
     let refinement = Refinement::declare(&field, 0, 2, 1, 4, 2).unwrap();
     let requests = short_requests(&field, &[(95, [0, 1, 2, 1]), (96, [1, 1, 0, 2]), (97, [2, 0, 1, 1])]);
     let first = executed_move(&field, &opening, &requests, &refinement, &joint_bank(), 12, Comparison::LOCK_DECISIONS)
         .unwrap();
     let (continued, _) = first.adopted.expect("the reception adopts a move");
-    // The move changes only the source port, so the identity is the opening's.
-    assert_eq!(continued.material_identity(0), opening.material_identity(0));
+    // No move changes the declared material.
+    assert_eq!(continued.material_identity(), opening.material_identity());
     let text = state_of(&continued).to_text();
     let state = ContinuingState::from_text(&text).unwrap();
     assert_eq!(opening.clone().continued(&state).unwrap(), continued);
+    assert_eq!(reseeded.clone().continued(&state).unwrap(), continued);
     assert!(matches!(
         foreign.clone().continued(&state),
         Err(HnnError::ContinuingState { what }) if what.contains("another opening")
@@ -823,8 +828,8 @@ fn a_checkpoint_is_refused_onto_foreign_material_and_when_damaged() {
         Err(HnnError::ContinuingState { what }) if what.contains("damaged")
     ));
     // A changed material line is caught by the check as well.
-    let material = format!("material {}", opening.material_identity(0));
-    let relabelled = text.replace(&material, &format!("material {}", foreign.material_identity(0)));
+    let material = format!("material {}", opening.material_identity());
+    let relabelled = text.replace(&material, &format!("material {}", foreign.material_identity()));
     assert_ne!(relabelled, text);
     assert!(ContinuingState::from_text(&relabelled).is_err());
 }
@@ -911,7 +916,7 @@ fn a_continuing_state_carries_the_receptions_end_inside_its_check() {
     ));
     // The reception carry §8: under the default reception a saved state mounts through one owner.
     // A state at rest mounts with no carry, so its next reception opens with zero carry; a carried
-    // state mounts its end beside the continued constitution; another opening's material is
+    // state mounts its end beside the continued constitution; another declared material is
     // refused; a carried state is refused by a reference declared at rest.
     use crate::hnn::field::Current;
     use crate::hnn::reference::{Reception, Reference};
@@ -929,7 +934,7 @@ fn a_continuing_state_carries_the_receptions_end_inside_its_check() {
     assert_eq!(resumed.carried(), Some(&carry));
     assert_eq!(resumed.constitution(), &continued);
     assert!(matches!(
-        reference.mount_continued(&field, &current, generic(&field, 95), &at_rest),
+        reference.mount_continued(&field, &current, generic_within(&field, 94, OPEN_BUDGET - 1), &at_rest),
         Err(HnnError::ContinuingState { .. })
     ));
     assert!(matches!(
