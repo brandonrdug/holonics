@@ -36,8 +36,8 @@ velocity is that move on the lattice, `d′ = v + r`. The next deposit accretes 
    and the impulse's term are each nonnegative (`½⟨P, c⟩ = ½⟨c, H′c⟩`, `⟨G, D⟩ = ⟨D, H′D⟩`), and the
    coast's term is nonnegative exactly when the coast falls at first order, `⟨G, c⟩ ≥ 0`. Where the
    coast climbs (`⟨G, c⟩ < 0`) it injects `τ(1 − τη)|⟨G, c⟩|` unless `τη = 1`, which is #240's apex
-   release read as energy. The law is stated at the exact chart `H′X = 1`; the chart's certified
-   residual `δ` enters as a further term this file does not state.
+   release read as energy. These two items are stated at the exact chart `H′X = 1`; item 5 carries
+   the chart's certified residual.
 4. **The floor along a nonconvex line** (§7, `line_slope_le`, `nonconvex_line_falls_to`,
    `nonconvex_line_le_quadratic`, `nonconvex_stop_value`, `nonconvex_apex_rises`). Along
    `f(τ) = L(E + τw)` with slope `s = f′(0)` and only an upper curvature bound `f″ ≤ κ⁺` on
@@ -50,6 +50,20 @@ velocity is that move on the lattice, `d′ = v + r`. The next deposit accretes 
    (`MoveDirection.coast_apex_no_floor_ahead`'s convex case). This bounds the reach from below
    only: a lower point beyond `−2s/κ⁻` is neither shown nor excluded. The quadratic lemmas of
    `MoveDirection` §9 are the case `f″ ≡ κ`.
+5. **The law through the executed charts** (§1a, #62 receipt 5974606207: the chart's certified
+   residual `δ`). `SolvedChart` executes `X̂` with `δ = ‖1 − X̂H‖∞`, not `H′⁻¹`. With `X` and `X′`
+   symmetric and inexact, the law of item 2 holds with two further terms
+   (`throw_energy_law_chart`, through `held_loss_chart`):
+   ```text
+       − ⟨½v + r, (1 − H′X) τ(ηG + P)⟩               (the move's momentum read through X)
+       − ½⟨c′, (1 − (H′ + F′)X′) P′⟩                  (the next hold read through X′)
+   ```
+   Each is within its certificate: `|⟨a, (1 − MX) b⟩| ≤ δ α Σ_i |b_i|` when every row of `1 − XM`
+   sums in absolute value to at most `δ` and `|a_j| ≤ α` (`chart_residual_pairing_le`). The
+   halving's and the impulse's readings are nonnegative up to the same term,
+   `⟨y, X y⟩ ≥ −δ α Σ_i |y_i|` (`chart_reading_ge`). The energy still does not rise whenever
+   `ρ + R` plus the two residual bounds is within the four dissipations
+   (`throw_energy_falls_chart`).
 
 No `sorry`, no `axiom`, no `native_decide`.
 -/
@@ -179,6 +193,154 @@ theorem throw_dissipation_nonneg [DecidableEq n] {M F' X : Matrix n n ℝ}
 
 end Energy
 
+/-! ## 1a. The law through the executed charts -/
+
+section Chart
+
+variable {n : Type*} [Fintype n] [DecidableEq n]
+
+/-- [proved-derived; formal-checked] The chart returns its argument through the mass up to its residual:
+`H′ (X y) = y − (1 − H′X) y`. -/
+theorem mass_chart_residual (M X : Matrix n n ℝ) (y : n → ℝ) :
+    M *ᵥ (X *ᵥ y) = y - (1 - M * X) *ᵥ y := by
+  rw [sub_mulVec, one_mulVec, mulVec_mulVec, sub_sub_cancel]
+
+omit [DecidableEq n] in
+/-- [proved-derived; formal-checked] **The next deposit's hold through its chart.** With `H′`
+symmetric and the next coast `c′` read through a chart with `(H′ + F′) c′ = H′ d′ − e′`, the next
+kinetic reading is the carried velocity's less the sticking loss less half the chart's defect:
+`½⟨H′d′, c′⟩ = ½⟨d′, H′d′⟩ − loss′ − ½⟨c′, e′⟩`. At the exact chart `e′ = 0`, and this is
+`MoveDirection.held_momentum_loss`. -/
+theorem held_loss_chart {M F' : Matrix n n ℝ} (hM : Mᵀ = M) (d' c' e' : n → ℝ)
+    (hheld : (M + F') *ᵥ c' = M *ᵥ d' - e') :
+    (1 / 2) * ((M *ᵥ d') ⬝ᵥ c') =
+      (1 / 2) * (d' ⬝ᵥ (M *ᵥ d'))
+        - ((1 / 2) * (c' ⬝ᵥ (F' *ᵥ c')) + (1 / 2) * ((d' - c') ⬝ᵥ (M *ᵥ (d' - c'))))
+        - (1 / 2) * (c' ⬝ᵥ e') := by
+  have hs : d' ⬝ᵥ (M *ᵥ c') = c' ⬝ᵥ (M *ᵥ d') := by
+    rw [dotProduct_comm, ← dot_mulVec_symm hM, dotProduct_comm]
+  have hc : c' ⬝ᵥ (M *ᵥ c') + c' ⬝ᵥ (F' *ᵥ c') = c' ⬝ᵥ (M *ᵥ d') - c' ⬝ᵥ e' := by
+    rw [← dotProduct_add, ← add_mulVec, hheld, dotProduct_sub]
+  have hcomm : (M *ᵥ d') ⬝ᵥ c' = c' ⬝ᵥ (M *ᵥ d') := dotProduct_comm _ _
+  simp only [mulVec_sub, sub_dotProduct, dotProduct_sub]
+  rw [hcomm]
+  linear_combination (-(1 / 2) : ℝ) * hs + (1 / 2 : ℝ) * hc
+
+/-- [proved-derived; formal-checked] **The throw's per-move energy law through the executed
+charts.** As `throw_energy_law`, with the deposit's chart `X` (symmetric) and the next deposit's
+`X′` no longer exact: their residuals `1 − H′X` and `1 − (H′ + F′)X′` enter as two further terms,
+`− ⟨½v + r, (1 − H′X) τ(ηG + P)⟩` (the move's momentum read through `X`, `v = τ(ηD + c)`) and
+`− ½⟨c′, (1 − (H′ + F′)X′) P′⟩` (the next hold read through `X′`); every other term is the exact
+law's. At `H′X = 1` and `(H′ + F′)X′ = 1` both vanish and this is `throw_energy_law`. -/
+theorem throw_energy_law_chart {M F' X X' : Matrix n n ℝ} (hM : Mᵀ = M) (hXs : Xᵀ = X)
+    (P G r x : n → ℝ) (η τ : ℝ) (L : (n → ℝ) → ℝ) :
+    let c := X *ᵥ P
+    let D := X *ᵥ G
+    let v := τ • (η • D + c)
+    let d' := v + r
+    let c' := X' *ᵥ (M *ᵥ d')
+    (1 / 2) * ((M *ᵥ d') ⬝ᵥ c') + L (x + d') =
+      (1 / 2) * (P ⬝ᵥ c) + L x
+        - (1 - τ ^ 2) * ((1 / 2) * (P ⬝ᵥ c))
+        - ((1 / 2) * (c' ⬝ᵥ (F' *ᵥ c')) + (1 / 2) * ((d' - c') ⬝ᵥ (M *ᵥ (d' - c'))))
+        - τ * (1 - τ * η) * (G ⬝ᵥ c)
+        - τ * η * (1 - τ * η / 2) * (G ⬝ᵥ D)
+        + (τ * (r ⬝ᵥ (η • G + P)) + (1 / 2) * (r ⬝ᵥ (M *ᵥ r)) - G ⬝ᵥ r)
+        + (L (x + d') - L x + G ⬝ᵥ d')
+        - ((1 / 2 : ℝ) • v + r) ⬝ᵥ ((1 - M * X) *ᵥ (τ • (η • G + P)))
+        - (1 / 2) * (c' ⬝ᵥ ((1 - (M + F') * X') *ᵥ (M *ᵥ d'))) := by
+  intro c D v d' c'
+  set w := τ • (η • G + P) with hw
+  set e := (1 - M * X) *ᵥ w with he
+  have hv : v = X *ᵥ w := by
+    simp only [v, D, c, hw, mulVec_smul, mulVec_add]
+  have hMv : M *ᵥ v = w - e := by rw [hv, mass_chart_residual]
+  have hXw : (X *ᵥ w) ⬝ᵥ w = τ ^ 2 * (P ⬝ᵥ c + 2 * η * (G ⬝ᵥ c) + η ^ 2 * (G ⬝ᵥ D)) := by
+    have hs : (X *ᵥ G) ⬝ᵥ P = G ⬝ᵥ (X *ᵥ P) := by rw [dot_mulVec_symm hXs, dotProduct_comm]
+    simp only [hw, c, D, mulVec_smul, mulVec_add, smul_dotProduct, dotProduct_smul,
+      add_dotProduct, dotProduct_add, smul_eq_mul, hs]
+    rw [dotProduct_comm (X *ᵥ P) G, dotProduct_comm (X *ᵥ G) G, dotProduct_comm (X *ᵥ P) P]
+    ring
+  have k2 : v ⬝ᵥ (M *ᵥ v) =
+      τ ^ 2 * (P ⬝ᵥ c + 2 * η * (G ⬝ᵥ c) + η ^ 2 * (G ⬝ᵥ D)) - v ⬝ᵥ e := by
+    rw [hMv, dotProduct_sub, ← hXw, hv]
+  have k3 : r ⬝ᵥ (M *ᵥ v) = τ * (r ⬝ᵥ (η • G + P)) - r ⬝ᵥ e := by
+    rw [hMv, dotProduct_sub, hw, dotProduct_smul, smul_eq_mul]
+  have hsymM : v ⬝ᵥ (M *ᵥ r) = r ⬝ᵥ (M *ᵥ v) := by
+    rw [dotProduct_comm, ← dot_mulVec_symm hM, dotProduct_comm]
+  have k1 : d' ⬝ᵥ (M *ᵥ d') = v ⬝ᵥ (M *ᵥ v) + 2 * (r ⬝ᵥ (M *ᵥ v)) + r ⬝ᵥ (M *ᵥ r) := by
+    change (v + r) ⬝ᵥ (M *ᵥ (v + r)) = _
+    rw [mulVec_add, add_dotProduct, dotProduct_add, dotProduct_add, hsymM]
+    ring
+  have k4 := held_loss_chart (F' := F') hM d' c' ((1 - (M + F') * X') *ᵥ (M *ᵥ d'))
+    (mass_chart_residual (M + F') X' (M *ᵥ d'))
+  have k6 : G ⬝ᵥ d' = τ * η * (G ⬝ᵥ D) + τ * (G ⬝ᵥ c) + G ⬝ᵥ r := by
+    change G ⬝ᵥ (τ • (η • D + c) + r) = _
+    simp only [dotProduct_add, dotProduct_smul, smul_eq_mul]
+    ring
+  have k7 : ((1 / 2 : ℝ) • v + r) ⬝ᵥ e = (1 / 2) * (v ⬝ᵥ e) + r ⬝ᵥ e := by
+    rw [add_dotProduct, smul_dotProduct, smul_eq_mul]
+  rw [k4, k7]
+  linear_combination (1 / 2) * k1 + (1 / 2) * k2 + k3 - k6
+
+/-- [proved-derived; formal-checked] **A residual's pairing is within the certificate.** With
+`M`, `X` symmetric, `⟨a, (1 − MX) b⟩ = ⟨(1 − XM) a, b⟩`, so if every row of `1 − XM` sums in
+absolute value to at most `δ` (`δ = ‖1 − X̂H‖∞`, the certificate `SolvedChart` carries) and
+`|a_j| ≤ α`, the pairing is at most `δ α Σ_i |b_i|`. -/
+theorem chart_residual_pairing_le {M X : Matrix n n ℝ} (hM : Mᵀ = M) (hXs : Xᵀ = X)
+    (a b : n → ℝ) {δ α : ℝ} (hR : ∀ i, ∑ j, |(1 - X * M) i j| ≤ δ) (ha : ∀ j, |a j| ≤ α) :
+    |a ⬝ᵥ ((1 - M * X) *ᵥ b)| ≤ δ * α * ∑ i, |b i| := by
+  have ht : (1 - M * X) = (1 - X * M)ᵀ := by
+    rw [transpose_sub, transpose_one, transpose_mul, hM, hXs]
+  have hpair : a ⬝ᵥ ((1 - M * X) *ᵥ b) = ((1 - X * M) *ᵥ a) ⬝ᵥ b := by
+    rw [ht, dotProduct_mulVec, vecMul_transpose]
+  rw [hpair]
+  have hrow : ∀ i, |((1 - X * M) *ᵥ a) i| ≤ δ * α := fun i => by
+    calc |((1 - X * M) *ᵥ a) i| = |∑ j, (1 - X * M) i j * a j| := rfl
+      _ ≤ ∑ j, |(1 - X * M) i j| * |a j| := (Finset.abs_sum_le_sum_abs _ _).trans
+          (le_of_eq (by simp only [abs_mul]))
+      _ ≤ ∑ j, |(1 - X * M) i j| * α :=
+          Finset.sum_le_sum fun j _ => mul_le_mul_of_nonneg_left (ha j) (abs_nonneg _)
+      _ = (∑ j, |(1 - X * M) i j|) * α := by rw [Finset.sum_mul]
+      _ ≤ δ * α := mul_le_mul_of_nonneg_right (hR i) ((abs_nonneg _).trans (ha i))
+  calc |((1 - X * M) *ᵥ a) ⬝ᵥ b| = |∑ i, ((1 - X * M) *ᵥ a) i * b i| := rfl
+    _ ≤ ∑ i, |((1 - X * M) *ᵥ a) i| * |b i| := (Finset.abs_sum_le_sum_abs _ _).trans
+        (le_of_eq (by simp only [abs_mul]))
+    _ ≤ ∑ i, δ * α * |b i| :=
+        Finset.sum_le_sum fun i _ => mul_le_mul_of_nonneg_right (hrow i) (abs_nonneg _)
+    _ = δ * α * ∑ i, |b i| := by rw [Finset.mul_sum]
+
+/-- [proved-derived; formal-checked] **A reading through the executed chart.** With `M`, `X`
+symmetric, `⟨y, X y⟩ = ⟨X y, M X y⟩ + ⟨X y, (1 − MX) y⟩`: the chart's reading of a momentum is
+the mass's reading of its rate up to the residual. So with `M ⪰ 0`, `|(X y)_j| ≤ α` and the
+certificate `δ`, `⟨y, X y⟩ ≥ −δ α Σ_i |y_i|`: the halving's and the impulse's readings
+(`½⟨P, c⟩`, `⟨G, D⟩`) are nonnegative up to that term. -/
+theorem chart_reading_ge {M X : Matrix n n ℝ} (hM : Mᵀ = M) (hXs : Xᵀ = X)
+    (hpsd : ∀ y : n → ℝ, 0 ≤ y ⬝ᵥ (M *ᵥ y)) (y : n → ℝ) {δ α : ℝ}
+    (hR : ∀ i, ∑ j, |(1 - X * M) i j| ≤ δ) (ha : ∀ j, |(X *ᵥ y) j| ≤ α) :
+    y ⬝ᵥ (X *ᵥ y) = (X *ᵥ y) ⬝ᵥ (M *ᵥ (X *ᵥ y)) + (X *ᵥ y) ⬝ᵥ ((1 - M * X) *ᵥ y) ∧
+      -(δ * α * ∑ i, |y i|) ≤ y ⬝ᵥ (X *ᵥ y) := by
+  have hid : y ⬝ᵥ (X *ᵥ y) =
+      (X *ᵥ y) ⬝ᵥ (M *ᵥ (X *ᵥ y)) + (X *ᵥ y) ⬝ᵥ ((1 - M * X) *ᵥ y) := by
+    rw [mass_chart_residual, dotProduct_sub, sub_add_cancel, dotProduct_comm]
+  refine ⟨hid, ?_⟩
+  have h1 := chart_residual_pairing_le hM hXs (X *ᵥ y) y hR ha
+  have h2 := hpsd (X *ᵥ y)
+  rw [hid]
+  linarith [neg_abs_le ((X *ᵥ y) ⬝ᵥ ((1 - M * X) *ᵥ y))]
+
+/-- [proved-derived; formal-checked] **When the energy still falls through the executed charts.**
+In the chart law's terms, with the two residual terms `χ`, `χ′` within their certified bounds
+`b`, `b′` (`chart_residual_pairing_le`), the energy does not rise across the move whenever
+`ρ + R + b + b′` is within the four dissipations. -/
+theorem throw_energy_falls_chart {E₀ E₁ halving loss coast impulse ρ R χ χ' b b' : ℝ}
+    (hlaw : E₁ = E₀ - halving - loss - coast - impulse + ρ + R - χ - χ')
+    (hχ : |χ| ≤ b) (hχ' : |χ'| ≤ b')
+    (hfall : ρ + R + b + b' ≤ halving + loss + coast + impulse) : E₁ ≤ E₀ := by
+  linarith [neg_abs_le χ, neg_abs_le χ']
+
+end Chart
+
 /-! ## 2. The floor along a nonconvex line -/
 
 section Floor
@@ -281,6 +443,12 @@ section Audit
 #print axioms nonconvex_line_le_quadratic
 #print axioms nonconvex_stop_value
 #print axioms nonconvex_apex_rises
+#print axioms mass_chart_residual
+#print axioms held_loss_chart
+#print axioms throw_energy_law_chart
+#print axioms chart_residual_pairing_le
+#print axioms chart_reading_ge
+#print axioms throw_energy_falls_chart
 
 end Audit
 
