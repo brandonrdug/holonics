@@ -804,9 +804,10 @@ pending.
   several commits compose into one, `C‴ w‴ = C w`, and their works telescope into the work of that
   one, `P_after(x‴) − P_before(x)`. That is the opening line of `ChainedBalance` with `dep k` the
   composite's work, which `HNN/ChainedBalance.{chain_telescopes, chain_dissipative}` already state for
-  any `dep k`. The chained balance owes nothing new in Lean. The resident that holds the carry,
-  with each refine writing it and the commits between two refines composed at held momentum, is
-  owed with the standing law over that resident (#62).
+  any `dep k`. The chained balance owes nothing new in Lean. The standing law over the resident that
+  holds the carry, with each refine writing it and the pending ratios one chain in refine order, is
+  `HNN/CarriedStanding` (`carriedStanding`, on the abstract `BlockOp`). The commits between two
+  refines composed at held momentum stay owed (#62).
 - **The fixture** (`tests/reference.rs`,
   `several_pending_ratios_are_one_chain_in_refine_order_and_the_chained_balance_closes`): on the
   chain field under the default, three refines in a row carry ticks `1, 2, 3` times
@@ -867,8 +868,9 @@ holds moves, on the host and the card alike, so a refusal leaves the aeon awaiti
 it stood. Fixture: `retention::a_releasing_collapse_releases_the_carried_motion_its_material_held`
 on the host, and the card's `the_card_port_returns_the_reference_through_a_releasing_collapse`,
 which runs the same sequence on the default. The walk-diamond theorems are stated for the
-constitution at a fixed `θ`; the release of the carried open state is owed in Lean with the standing
-law over the resident that holds the carry (#62).
+constitution at a fixed `θ`. `HNN/CarriedStanding` proves the standing law over the resident that
+holds the carry with the carry kept whole; the release of the carried open state is owed in Lean
+(#62).
 
 **Saved states.** A state written at rest writes no carry and reads back with none (§2.6). It now
 restores through one owner, `Reference::mount_continued`. That owner continues the declared opening
@@ -915,10 +917,12 @@ is at the diamond, not at the step:
   off-walk loci: retention's bound under the default is the field's walk diamond. That diamond is
   the diamond at `e_last = 2|B|`, decided in `|B|` rounds (`inDiamond_continuing_iff`,
   `continuing_recursion`), and a connected field releases nothing (`continuing_collapse_connected`).
-  These are proved at a fixed constitution over the chain, on the abstract `BlockOp`. The standing
-  law over a resident that holds the carried change, with deposits between the words, and the locus
-  map from the medium's operands to the block edges of the concrete tick stay owed (#62);
-  `HNN/TickBlocks` proves `HNN/Word.fieldTick` a sparse `BlockOp`. Material that falls below the
+  These are proved at a fixed constitution over the chain, on the abstract `BlockOp`;
+  `HNN/TickBlocks` proves `HNN/Word.fieldTick` a sparse `BlockOp`, and the locus map from the
+  medium's operands to its block edges is `HNN/LocusMap` (`continuing_release_indistinguishable`
+  on the concrete medium). The standing law over a resident that holds the carried change, with
+  deposits between the words, is `HNN/CarriedStanding` (`carriedStanding`) on the abstract
+  `BlockOp`; the commits composed at held momentum stay owed (#62). Material that falls below the
   lattice grain is a value-level release, not this collapse.
 
 **What the card's default must change.** `holonics_cuda::hnn::port::Resident::new` opens at
