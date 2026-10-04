@@ -59,9 +59,9 @@ on the concrete medium of `HNN/Word` and `HNN/LocusMap`, and it proves those law
    `LocusMap.retained_of_reads`. So the collapse the Rust runs changes no admitted face of the
    current word or of any pending word after any word of generators.
 
-[open] What it does not cover, owed in #62: the loaded ring block joined to the medium (the
-resonator's edge is `HNN/LoadedRing` on its own). The loci with no `Word.Medium` operand
-(`SourcePort(g)`, `Standing(g)`, `ReceivingMap(g)`) are `HNN/RingLoci`.
+What it does not cover is elsewhere: the loci with no `Word.Medium` operand (`SourcePort(g)`,
+`Standing(g)`, `ReceivingMap(g)`) are `HNN/RingLoci`, and the loaded ring block joined to the
+medium (the resonator's edge alone is `HNN/LoadedRing`) is `HNN/LoadedMedium`.
 
 No `sorry`, no `axiom`, no `native_decide`.
 -/
