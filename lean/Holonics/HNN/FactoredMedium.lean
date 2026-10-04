@@ -54,8 +54,9 @@ the factors as its state and proves the standing law there with no hypothesis on
    (`certified_released_stays_released`), and `MediumStanding`'s `hΦe0`, `hΦc0` are gone too.
 
 [open] What it does not cover: the step's certified descent (`Holon/Deposition`, outside the
-standing law); the loaded ring block joined to the medium, owed in #62. The loci with no
-`Word.Medium` operand (`SourcePort(g)`, `Standing(g)`, `ReceivingMap(g)`) are `HNN/RingLoci`.
+standing law). The loci with no `Word.Medium` operand (`SourcePort(g)`, `Standing(g)`,
+`ReceivingMap(g)`) are `HNN/RingLoci`, and the loaded ring block joined to the medium is
+`HNN/LoadedMedium`.
 
 [open; source-inspected at `37e24ef3`] **The Rust's step is not yet a per-locus factor law.** Its
 moves are sums over the data that reached the locus, so they are zero on empty data, which is all
@@ -67,9 +68,12 @@ contrast port and the span factor `F(s)` over every resonator not certified pass
 off-walk contrast port is never reached, so it stays at its zero founding and `ω` is unchanged by
 the collapse. An off-walk resonator is declared material, and the collapse releases it
 (`Constitution::release`, `Locus::Resonator`). Where it is pumped, `F(s)` drops after the collapse,
-and a later deposit's step at a retained locus can differ from the uncollapsed run's. Owed (#62):
-the Rust's reach read over the retained rings only, and here a joint step whose scalar reads only
-retained loci, with the carried statistics in the locus's state.
+and a later deposit's step at a retained locus could differ from the uncollapsed run's. Record B
+§8 has the Rust read the reach over the word's diamond only (`Reach::loci`; the release-law fix,
+not yet on main at this writing), and the joint step whose reads are the diamond's and whose budget
+is the retained set's is `HNN/JointStep` (`certified_budgeted_rust_unchanged`): the collapse
+changes no step and no refusal.
+Owed (#62): the carried statistics in the locus's state.
 
 No `sorry`, no `axiom`, no `native_decide`.
 -/

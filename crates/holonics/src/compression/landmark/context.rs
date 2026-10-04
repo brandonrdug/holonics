@@ -1435,17 +1435,6 @@ impl Widths {
             .max(w + kappa + m)
     }
 
-    /// [agent-inferred] **Whether the single divisions fit `u128`** at a population: the lattice
-    /// mixture read as one division `(2^M λ̂ u + (2^M − λ̂) x v)/(2^M v)` (`2M + κ + 3` bits) and the
-    /// stop weight decided only past `|exponent| > M + W` (`2W + M + 3` bits). The card's kernel
-    /// (`holonics-cuda`, `kernels/tree.cu`) executes that realization, so its mirror refuses wider
-    /// widths; the host's split operands ([`lattice_mix`], [`Beta::stop_weight`]) return the same
-    /// integers wherever both admit.
-    pub fn single_division_admitted(&self, population: u64) -> bool {
-        let kappa = mass_operand(population, self.mass, self.base).bits();
-        (2 * self.face + kappa + 3).max(2 * self.carrier + self.face + 3) <= u64::from(u128::BITS)
-    }
-
     /// Whether the widths at a population admit every product in `u128`, the carrier rebase
     /// keeping at least `W` bits.
     fn admitted(&self, population: u64) -> bool {

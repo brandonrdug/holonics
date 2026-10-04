@@ -59,9 +59,9 @@ on the concrete medium of `HNN/Word` and `HNN/LocusMap`, and it proves those law
    `LocusMap.retained_of_reads`. So the collapse the Rust runs changes no admitted face of the
    current word or of any pending word after any word of generators.
 
-[open] What it does not cover, owed in #62: the loaded ring block joined to the medium (the
-resonator's edge is `HNN/LoadedRing` on its own). The loci with no `Word.Medium` operand
-(`SourcePort(g)`, `Standing(g)`, `ReceivingMap(g)`) are `HNN/RingLoci`.
+What it does not cover is elsewhere: the loci with no `Word.Medium` operand (`SourcePort(g)`,
+`Standing(g)`, `ReceivingMap(g)`) are `HNN/RingLoci`, and the loaded ring block joined to the
+medium (the resonator's edge alone is `HNN/LoadedRing`) is `HNN/LoadedMedium`.
 
 No `sorry`, no `axiom`, no `native_decide`.
 -/
@@ -406,7 +406,7 @@ theorem keeps_sufficient (hL : L.Lawful adj) {S R : Set B}
     observe L q (Holonics.Foundation.Chronology.transportWord (transport adj L hL hopen) w
         ⟨{ s.1 with loci := L.release keep s.1.loci }, s.2⟩).1 =
       observe L q (Holonics.Foundation.Chronology.transportWord (transport adj L hL hopen) w s).1 :=
-  (observe_agree hL hopen q (Subtype.property _) (Subtype.property _)
+  (observe_agree hL.toLocal hopen q (Subtype.property _) (Subtype.property _)
     (transportWord_agree (s := s) (s' := ⟨{ s.1 with loci := L.release keep s.1.loci }, s.2⟩)
       hL hopen w (agree_release_of_keeps hL hk s.1))).symm
 
