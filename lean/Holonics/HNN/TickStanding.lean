@@ -23,9 +23,17 @@ in two ways, and this file states the standing law with both:
   the data on the edges that read it (`LocusMap.deposited`, `locusData`), and the release keeps
   every locus it is told to keep (`LocusMap.agreeOn_release`). Every tick's operator is sparse on
   the declared graph, and a locus is read only along declared edges.
+* **The opening and the reading read the constitution.** The Rust's source ports enter the word's
+  opening and its receiving map enters the receiver's reading (`Locus::{SourcePort, ReceivingMap}`).
+  Here the open state is a function of the constitution, supported on the sources, moving at a
+  block only with the loci its opening reads (`openReads`, `open_reads`); each receiver's reading
+  covector is read through a linear map of the constitution at its block (`recv`, `readThrough`),
+  moving only with the loci it reads (`recvReads`, `recv_reads`), in the faces and in the
+  comparison covectors a compare stages alike.
 
 The retained loci are those read by an edge, or by the reference of a block, that a walk from a
-source to a receiver passes (`Retained`); the collapse releases the others (`retain`). This is the
+source to a receiver passes, by the opening of a source that observes a receiver, or by a
+receiver's reading (`Retained`); the collapse releases the others (`retain`). This is the
 continuing collapse (`Diamond::continuing`) read on loci: an edge on a walk is in the diamond at
 `e_last = 2 |B|` (`Retention.inDiamond_continuing_iff`).
 
@@ -105,20 +113,25 @@ structure TickResident (K : Type*) [Field K] (M : B → Type*) [∀ b, AddCommGr
   pending : List (TickPend M Ref Λ Mo)
   staged : List ((y z : B) → List (M z × Module.Dual K (M y)))
 
-/-- [definition] **The law**: the block operators at a class, the loci each edge and each block's
-reference reads and the agreement on a locus, the references, the class at a lift and an absolute
-tick, the moment's open state, the word's ticks, the crossing (local to each block, linear in the
-change), the absorption at a word's end, the ingest and re-keying, the deposit of staged data and
-the release of the loci a keep-predicate does not keep. -/
+/-- [definition] **The law**: the block operators at a class, the loci each edge, each block's
+reference, each block's opening and each receiver's reading read, and the agreement on a locus,
+the references, the receiving map (each receiver's reading covector read through the
+constitution, linear per block), the class at a lift and an absolute tick, the moment's open state
+at the constitution (its source ports), the word's ticks, the crossing (local to each block, linear
+in the change), the absorption at a word's end, the ingest and re-keying, the deposit of staged data
+and the release of the loci a keep-predicate does not keep. -/
 structure TickLaw (K : Type*) [Field K] (M : B → Type*) [∀ b, AddCommGroup (M b)]
     [∀ b, Module K (M b)] (Con Loc : Type*) (Ref : B → Type*) (Cls Λ Mo Cell Crib : Type*) where
   op : Cls → Con → BlockOp K M
   reads : Loc → B → B → Prop
   refReads : Loc → B → Prop
+  openReads : Loc → B → Prop
+  recvReads : Loc → B → Prop
   agreeOn : Loc → Con → Con → Prop
   ref : Con → (b : B) → Ref b
+  recv : Con → (b : B) → Module.Dual K (M b) →ₗ[K] Module.Dual K (M b)
   cls : Λ → ℕ → Cls
-  openState : Λ → Mo → (b : B) → M b
+  openState : Con → Λ → Mo → (b : B) → M b
   ticks : Λ → Mo → ℕ
   cross : Λ → Λ → (b : B) → Ref b → Ref b → (M b →ₗ[K] M b)
   absorb : (b : B) → M b →ₗ[K] M b
@@ -132,14 +145,18 @@ variable {Con Loc : Type*} {Ref : B → Type*} {Cls Λ Mo Cell Crib : Type*}
 
 /-- [definition] **The laws of the locus map**, assumed of the instance: every operator is sparse on
 the declared graph; a locus is read only along declared edges; an edge's operator moves only with
-the loci it reads, a block's reference only with the loci it reads; a deposit moves each locus from
-its own state and the data on the edges that read it; and the release keeps every locus it keeps. -/
+the loci it reads, a block's reference, opening and receiving map only with the loci they read; a
+deposit moves each locus from its own state and the data on the edges that read it; and the release
+keeps every locus it keeps. -/
 structure TickLaw.Lawful (adj : B → B → Prop) [Fintype B]
     (L : TickLaw K M Con Loc Ref Cls Λ Mo Cell Crib) : Prop where
   sparse : ∀ c θ, Sparse adj (L.op c θ)
   reads_adj : ∀ ℓ z y, L.reads ℓ z y → adj z y
   op_reads : ∀ c θ θ' y z, (∀ ℓ, L.reads ℓ z y → L.agreeOn ℓ θ θ') → L.op c θ y z = L.op c θ' y z
   ref_reads : ∀ θ θ' b, (∀ ℓ, L.refReads ℓ b → L.agreeOn ℓ θ θ') → L.ref θ b = L.ref θ' b
+  open_reads : ∀ θ θ' l m b, (∀ ℓ, L.openReads ℓ b → L.agreeOn ℓ θ θ') →
+    L.openState θ l m b = L.openState θ' l m b
+  recv_reads : ∀ θ θ' b, (∀ ℓ, L.recvReads ℓ b → L.agreeOn ℓ θ θ') → L.recv θ b = L.recv θ' b
   apply_local : ∀ θ θ' d d' ℓ, L.agreeOn ℓ θ θ' → (∀ y z, L.reads ℓ z y → d y z = d' y z) →
     L.agreeOn ℓ (L.apply θ d) (L.apply θ' d')
   release_keeps : ∀ (keep : Loc → Prop) θ ℓ, keep ℓ → L.agreeOn ℓ θ (L.release keep θ)
@@ -165,9 +182,15 @@ constitution `θ` at the lift `l`. -/
 def interior (θ : Con) (l : Λ) (c : TickCarry M Ref Λ) : (b : B) → M b :=
   fun b => L.cross c.lift l b (c.ref b) (L.ref θ b) (c.change b)
 
-/-- [definition] **The word's opening**: the moment's open state plus the opening's interior. -/
+/-- [definition] **The word's opening**: the moment's open state at the constitution `θ` plus the
+opening's interior. -/
 def opening (θ : Con) (l : Λ) (m : Mo) (c : TickCarry M Ref Λ) : (b : B) → M b :=
-  L.openState l m + interior L θ l c
+  L.openState θ l m + interior L θ l c
+
+/-- [definition] **A reading through the receiving map**: each receiver's covector read through the
+constitution `θ`'s receiving map at its block. -/
+def readThrough (θ : Con) (g : (b : B) → Module.Dual K (M b)) : (b : B) → Module.Dual K (M b) :=
+  fun b => L.recv θ b (g b)
 
 /-- [definition] **The deposit's seeds**: the sources and the support of the opening's interior. -/
 def seeds (S : Set B) (θ : Con) (l : Λ) (c : TickCarry M Ref Λ) : Set B :=
@@ -184,12 +207,13 @@ def endCarry (θ : Con) (l : Λ) (m : Mo) (c : TickCarry M Ref Λ) : TickCarry M
 variable (adj) in
 /-- [definition] **The data a compare stages**: on every edge, what the pending word opened on its
 stored carry at the constitution `θ` reads there, in the windows seeded at the sources and the
-opening's interior. -/
+opening's interior, with each comparison covector read through `θ`'s receiving map. -/
 def stagedOf (S R : Set B) (θ : Con) (p : TickPend M Ref Λ Mo)
     (rd : List (ℕ × ((b : B) → Module.Dual K (M b)))) :
     (y z : B) → List (M z × Module.Dual K (M y)) :=
   fun y z => depositDataAt adj (wordOp L θ p.lift p.opening.tick)
-    (opening L θ p.lift p.moment p.opening) (seeds L S θ p.lift p.opening) R rd z y
+    (opening L θ p.lift p.moment p.opening) (seeds L S θ p.lift p.opening) R
+    (rd.map fun r => (r.1, readThrough L θ r.2)) z y
 
 variable (adj) in
 /-- [definition] **The generators acting on the resident** (one chain in refine order), as in
@@ -220,10 +244,11 @@ def step (S R : Set B) :
     | some d => { res with loci := L.apply res.loci d, staged := res.staged.eraseIdx i }
   | .discardStaged i, res => { res with staged := res.staged.eraseIdx i }
 
-/-- [definition] A word's admitted reading opened on a carry, at the constitution `θ`. -/
+/-- [definition] A word's admitted reading opened on a carry, at the constitution `θ`, through its
+receiving map. -/
 def wordRead {R : Set B} (θ : Con) (l : Λ) (m : Mo) (c : TickCarry M Ref Λ)
     (r : ReceiverReading K M R) : K :=
-  pair r.1.2 (trajectoryAt (wordOp L θ l c.tick) (opening L θ l m c) r.1.1)
+  pair (readThrough L θ r.1.2) (trajectoryAt (wordOp L θ l c.tick) (opening L θ l m c) r.1.1)
 
 /-- [definition] **The faces**: the current word opened on the carried change (`none`) and the
 `i`-th pending word on its stored carry (`some i`), at the contemporary constitution. -/
@@ -236,10 +261,14 @@ def observe {R : Set B} : Option ℕ × ReceiverReading K M R → TickResident K
 
 variable (adj) in
 /-- [definition] **A retained locus**: one read by an edge, or by the reference of a block, that a
-walk from a source to a receiver passes. -/
+walk from a source to a receiver passes; or by the opening of a source that observes a receiver
+(`Diamond::source_port`: `is_source(g) ∧ o_g ≤ e`); or by a receiver's reading
+(`Diamond::retains`: `ReceivingMap(g)` when `g` is the receiver). -/
 def Retained (S R : Set B) (ℓ : Loc) : Prop :=
   (∃ z y, L.reads ℓ z y ∧ OnWalk adj S R z y) ∨
-    ∃ b, L.refReads ℓ b ∧ b ∈ reachAll adj S ∧ ObservesAll adj R b
+    (∃ b, L.refReads ℓ b ∧ b ∈ reachAll adj S ∧ ObservesAll adj R b) ∨
+    (∃ b, L.openReads ℓ b ∧ b ∈ S ∧ ObservesAll adj R b) ∨
+    ∃ b, L.recvReads ℓ b ∧ b ∈ R
 
 variable (adj) in
 /-- [definition] **The retention**: the continuing collapse releases every locus not retained; the
@@ -307,7 +336,38 @@ theorem wordOp_agree (hL : L.Lawful adj) {S R : Set B} {θ θ' : Con}
 theorem ref_agree (hL : L.Lawful adj) {S R : Set B} {θ θ' : Con}
     (hθ : ∀ ℓ, Retained adj L S R ℓ → L.agreeOn ℓ θ θ') {b : B} (hr : b ∈ reachAll adj S)
     (hb : ObservesAll adj R b) : L.ref θ b = L.ref θ' b :=
-  hL.ref_reads θ θ' b fun ℓ h => hθ ℓ (Or.inr ⟨b, h, hr, hb⟩)
+  hL.ref_reads θ θ' b fun ℓ h => hθ ℓ (Or.inr (Or.inl ⟨b, h, hr, hb⟩))
+
+/-- [proved-derived; formal-checked] Every open state agrees on every block that observes a
+receiver: on a source its loci are retained, off the sources it is zero. -/
+theorem openState_agree (hL : L.Lawful adj) {S R : Set B}
+    (hopen : ∀ θ l m, SupportedIn (L.openState θ l m) S) {θ θ' : Con}
+    (hθ : ∀ ℓ, Retained adj L S R ℓ → L.agreeOn ℓ θ θ') (l : Λ) (m : Mo) {b : B}
+    (hb : ObservesAll adj R b) : L.openState θ l m b = L.openState θ' l m b := by
+  by_cases hS : b ∈ S
+  · exact hL.open_reads θ θ' l m b fun ℓ h => hθ ℓ (Or.inr (Or.inr (Or.inl ⟨b, h, hS, hb⟩)))
+  · rw [hopen θ l m b hS, hopen θ' l m b hS]
+
+/-- [proved-derived; formal-checked] Every receiver's receiving map agrees. -/
+theorem recv_agree (hL : L.Lawful adj) {S R : Set B} {θ θ' : Con}
+    (hθ : ∀ ℓ, Retained adj L S R ℓ → L.agreeOn ℓ θ θ') {b : B} (hb : b ∈ R) :
+    L.recv θ b = L.recv θ' b :=
+  hL.recv_reads θ θ' b fun ℓ h => hθ ℓ (Or.inr (Or.inr (Or.inr ⟨b, h, hb⟩)))
+
+omit [Fintype B] in
+theorem readThrough_supported {R : Set B} {θ : Con} {g : (b : B) → Module.Dual K (M b)}
+    (hg : SupportedIn g R) : SupportedIn (readThrough L θ g) R := fun b hb => by
+  simp [readThrough, hg b hb]
+
+/-- [proved-derived; formal-checked] A reading supported on the receivers reads the same through
+two constitutions whose retained loci agree. -/
+theorem readThrough_agree (hL : L.Lawful adj) {S R : Set B} {θ θ' : Con}
+    (hθ : ∀ ℓ, Retained adj L S R ℓ → L.agreeOn ℓ θ θ') {g : (b : B) → Module.Dual K (M b)}
+    (hg : SupportedIn g R) : readThrough L θ g = readThrough L θ' g := by
+  funext b
+  by_cases hb : b ∈ R
+  · simp only [readThrough, recv_agree hL hθ hb]
+  · simp [readThrough, hg b hb]
 
 omit [Fintype B] in
 theorem interior_supported {S : Set B} {θ : Con} {l : Λ} {c : TickCarry M Ref Λ}
@@ -316,11 +376,11 @@ theorem interior_supported {S : Set B} {θ : Con} {l : Λ} {c : TickCarry M Ref 
   simp [interior, hc b hb]
 
 omit [Fintype B] in
-theorem opening_supported {S : Set B} (hopen : ∀ l m, SupportedIn (L.openState l m) S)
+theorem opening_supported {S : Set B} (hopen : ∀ θ l m, SupportedIn (L.openState θ l m) S)
     {θ : Con} {l : Λ} {m : Mo} {c : TickCarry M Ref Λ}
     (hc : SupportedIn c.change (reachAll adj S)) :
     SupportedIn (opening L θ l m c) (reachAll adj S) := fun b hb => by
-  simp [opening, hopen l m b fun hbS => hb (subset_reachAll S hbS),
+  simp [opening, hopen θ l m b fun hbS => hb (subset_reachAll S hbS),
     interior_supported (L := L) (θ := θ) (l := l) hc b hb]
 
 theorem interior_agree (hL : L.Lawful adj) {S R : Set B} {θ θ' : Con}
@@ -333,16 +393,18 @@ theorem interior_agree (hL : L.Lawful adj) {S R : Set B} {θ θ' : Con}
     rw [hcc.1, hcc.2.2.1 b hr hb, ref_agree hL hθ hr hb, hcc.2.2.2 b hb]
   · simp [interior, hc b hr, hc' b hr]
 
-theorem opening_agree (hL : L.Lawful adj) {S R : Set B} {θ θ' : Con}
+theorem opening_agree (hL : L.Lawful adj) {S R : Set B}
+    (hopen : ∀ θ l m, SupportedIn (L.openState θ l m) S) {θ θ' : Con}
     (hθ : ∀ ℓ, Retained adj L S R ℓ → L.agreeOn ℓ θ θ') (l : Λ) (m : Mo)
     {c c' : TickCarry M Ref Λ}
     (hc : SupportedIn c.change (reachAll adj S)) (hc' : SupportedIn c'.change (reachAll adj S))
     (hcc : CarryAgree adj S R c c') {b : B} (hb : ObservesAll adj R b) :
     opening L θ l m c b = opening L θ' l m c' b := by
-  simp only [opening, Pi.add_apply, interior_agree hL hθ l hc hc' hcc hb]
+  simp only [opening, Pi.add_apply, interior_agree hL hθ l hc hc' hcc hb,
+    openState_agree hL hopen hθ l m hb]
 
 theorem endCarry_supported (hL : L.Lawful adj) {S : Set B}
-    (hopen : ∀ l m, SupportedIn (L.openState l m) S) (θ : Con) (l : Λ) (m : Mo)
+    (hopen : ∀ θ l m, SupportedIn (L.openState θ l m) S) (θ : Con) (l : Λ) (m : Mo)
     {c : TickCarry M Ref Λ} (hc : SupportedIn c.change (reachAll adj S)) :
     SupportedIn (endCarry L θ l m c).change (reachAll adj S) := fun b hb => by
   have hx := opening_supported (L := L) (θ := θ) (l := l) (m := m) hopen hc
@@ -352,7 +414,7 @@ theorem endCarry_supported (hL : L.Lawful adj) {S : Set B}
   simp only [endCarry, h b hb, map_zero]
 
 theorem endCarry_agree (hL : L.Lawful adj) {S R : Set B}
-    (hopen : ∀ l m, SupportedIn (L.openState l m) S) {θ θ' : Con}
+    (hopen : ∀ θ l m, SupportedIn (L.openState θ l m) S) {θ θ' : Con}
     (hθ : ∀ ℓ, Retained adj L S R ℓ → L.agreeOn ℓ θ θ') (l : Λ) (m : Mo)
     {c c' : TickCarry M Ref Λ}
     (hc : SupportedIn c.change (reachAll adj S)) (hc' : SupportedIn c'.change (reachAll adj S))
@@ -365,7 +427,7 @@ theorem endCarry_agree (hL : L.Lawful adj) {S R : Set B}
     (fun k y z hw => by rw [← hcc.2.1]; exact wordOp_agree hL hθ l c.tick k hw)
     (opening_supported (L := L) (θ := θ) (l := l) (m := m) hopen hc)
     (opening_supported (L := L) (θ := θ') (l := l) (m := m) hopen hc')
-    (fun b hb => opening_agree hL hθ l m hc hc' hcc hb) (L.ticks l m)
+    (fun b hb => opening_agree hL hopen hθ l m hc hc' hcc hb) (L.ticks l m)
   simp only [endCarry, h.2.2 b hb]
 
 theorem seeds_agree (hL : L.Lawful adj) {S R : Set B} {θ θ' : Con}
@@ -409,7 +471,7 @@ theorem depositDataAt_off_walk {S R sd : Set B} (hsd : ∀ s ∈ sd, s ∈ reach
 /-! ### Validity, agreement with the collapse, and the generators -/
 
 theorem step_valid (hL : L.Lawful adj) {S R : Set B}
-    (hopen : ∀ l m, SupportedIn (L.openState l m) S)
+    (hopen : ∀ θ l m, SupportedIn (L.openState θ l m) S)
     (g : CarryGen Cell Crib (ReceiverFamily K M R)) {res : TickResident K M Con Ref Λ Mo}
     (hv : Valid adj S res) : Valid adj S (step adj L S R g res) := by
   obtain ⟨θ, l, m, c, P, D⟩ := res
@@ -438,7 +500,7 @@ theorem step_valid (hL : L.Lawful adj) {S R : Set B}
 
 /-- [proved-derived; formal-checked] **A compare stages equal data on every declared edge.** -/
 theorem stagedOf_agree (hL : L.Lawful adj) {S R : Set B}
-    (hopen : ∀ l m, SupportedIn (L.openState l m) S) {θ θ' : Con}
+    (hopen : ∀ θ l m, SupportedIn (L.openState θ l m) S) {θ θ' : Con}
     (hθ : ∀ ℓ, Retained adj L S R ℓ → L.agreeOn ℓ θ θ') {p p' : TickPend M Ref Λ Mo}
     (hp : SupportedIn p.opening.change (reachAll adj S))
     (hp' : SupportedIn p'.opening.change (reachAll adj S)) (hpp : PendAgree adj S R p p')
@@ -448,18 +510,24 @@ theorem stagedOf_agree (hL : L.Lawful adj) {S R : Set B}
   intro y z hadj
   simp only [stagedOf]
   by_cases hw : OnWalk adj S R z y
-  · rw [← hpl, ← hpm, ← hpo.2.1]
+  · have hrd : (rd.1.map fun r => (r.1, readThrough L θ r.2)) =
+        rd.1.map fun r => (r.1, readThrough L θ' r.2) :=
+      List.map_congr_left fun r hr => by rw [readThrough_agree hL hθ (rd.2 r hr)]
+    rw [← hpl, ← hpm, ← hpo.2.1, hrd]
     exact depositDataAt_agree (fun k => hL.sparse _ θ) (fun k => hL.sparse _ θ')
       (fun k y z hw => wordOp_agree hL hθ p.lift p.opening.tick k hw)
       (seeds_agree hL hθ p.lift hp hp' hpo)
       (opening_supported (L := L) (θ := θ) (l := p.lift) (m := p.moment) hopen hp)
       (opening_supported (L := L) (θ := θ') (l := p.lift) (m := p.moment) hopen hp')
-      (fun b hb => opening_agree hL hθ p.lift p.moment hp hp' hpo hb) rd.2 hw hadj
+      (fun b hb => opening_agree hL hopen hθ p.lift p.moment hp hp' hpo hb)
+      (fun r hr => by
+        obtain ⟨r₀, hr₀, rfl⟩ := List.mem_map.mp hr
+        exact readThrough_supported (rd.2 r₀ hr₀)) hw hadj
   · rw [depositDataAt_off_walk (fun s hs => seeds_reached hp hs) _ _ _ hw,
       depositDataAt_off_walk (fun s hs => seeds_reached hp' hs) _ _ _ hw]
 
 theorem step_agree (hL : L.Lawful adj) {S R : Set B}
-    (hopen : ∀ l m, SupportedIn (L.openState l m) S)
+    (hopen : ∀ θ l m, SupportedIn (L.openState θ l m) S)
     (g : CarryGen Cell Crib (ReceiverFamily K M R)) {res res' : TickResident K M Con Ref Λ Mo}
     (hv : Valid adj S res) (hv' : Valid adj S res') (h : Agree adj L S R res res') :
     Agree adj L S R (step adj L S R g res) (step adj L S R g res') := by
@@ -524,21 +592,23 @@ theorem agree_retain (hL : L.Lawful adj) {S R : Set B} (res : TickResident K M C
   · exact forall₂_self (s := StagedAgree adj) (fun _ _ _ _ => rfl) res.staged
 
 theorem wordRead_agree (hL : L.Lawful adj) {S R : Set B}
-    (hopen : ∀ l m, SupportedIn (L.openState l m) S) {θ θ' : Con}
+    (hopen : ∀ θ l m, SupportedIn (L.openState θ l m) S) {θ θ' : Con}
     (hθ : ∀ ℓ, Retained adj L S R ℓ → L.agreeOn ℓ θ θ') (l : Λ) (m : Mo)
     {c c' : TickCarry M Ref Λ}
     (hc : SupportedIn c.change (reachAll adj S)) (hc' : SupportedIn c'.change (reachAll adj S))
     (hcc : CarryAgree adj S R c c') (r : ReceiverReading K M R) :
     wordRead L θ l m c r = wordRead L θ' l m c' r := by
   simp only [wordRead]
-  rw [← hcc.2.1]
+  rw [← hcc.2.1, readThrough_agree hL hθ r.2]
   exact readings_agree_on_walk (fun k => hL.sparse _ θ) (fun k => hL.sparse _ θ')
     (fun k y z hw => wordOp_agree hL hθ l c.tick k hw)
     (opening_supported (L := L) (θ := θ) (l := l) (m := m) hopen hc)
-    (opening_supported (L := L) (θ := θ') (l := l) (m := m) hopen hc') (fun b hb => opening_agree hL hθ l m hc hc' hcc hb) r.2 r.1.1
+    (opening_supported (L := L) (θ := θ') (l := l) (m := m) hopen hc')
+    (fun b hb => opening_agree hL hopen hθ l m hc hc' hcc hb)
+    (readThrough_supported r.2) r.1.1
 
 theorem observe_agree (hL : L.Lawful adj) {S R : Set B}
-    (hopen : ∀ l m, SupportedIn (L.openState l m) S)
+    (hopen : ∀ θ l m, SupportedIn (L.openState θ l m) S)
     (q : Option ℕ × ReceiverReading K M R) {res res' : TickResident K M Con Ref Λ Mo}
     (hv : Valid adj S res) (hv' : Valid adj S res') (h : Agree adj L S R res res') :
     observe L q res = observe L q res' := by
@@ -587,13 +657,14 @@ def ValidResident (_L : TickLaw K M Con Loc Ref Cls Λ Mo Cell Crib) (S : Set B)
 
 variable (adj L) in
 /-- [definition] The generators on the valid residents. -/
-def transport (hL : L.Lawful adj) {S R : Set B} (hopen : ∀ l m, SupportedIn (L.openState l m) S)
+def transport (hL : L.Lawful adj) {S R : Set B}
+    (hopen : ∀ θ l m, SupportedIn (L.openState θ l m) S)
     (g : CarryGen Cell Crib (ReceiverFamily K M R)) (s : ValidResident adj L S) :
     ValidResident adj L S :=
   ⟨step adj L S R g s.1, step_valid hL hopen g s.2⟩
 
 theorem transportWord_agree (hL : L.Lawful adj) {S R : Set B}
-    (hopen : ∀ l m, SupportedIn (L.openState l m) S)
+    (hopen : ∀ θ l m, SupportedIn (L.openState θ l m) S)
     (w : List (CarryGen Cell Crib (ReceiverFamily K M R))) {s s' : ValidResident adj L S}
     (h : Agree adj L S R s.1 s'.1) :
     Agree adj L S R (Holonics.Foundation.Chronology.transportWord (transport adj L hL hopen) w s).1
@@ -610,7 +681,7 @@ word and of every pending word, each running the operator of its absolute tick's
 contemporary constitution, at any epoch, is a `Foundation/Standing.StandingLaw` whose retention is
 the continuing collapse on loci, keeping the carry whole. -/
 def tickStanding (hL : L.Lawful adj) {S R : Set B}
-    (hopen : ∀ l m, SupportedIn (L.openState l m) S) :
+    (hopen : ∀ θ l m, SupportedIn (L.openState θ l m) S) :
     Holonics.Foundation.Standing.StandingLaw (CarryGen Cell Crib (ReceiverFamily K M R))
       (Option ℕ × ReceiverReading K M R) (ValidResident adj L S) (ValidResident adj L S) K where
   transport := transport adj L hL hopen
@@ -711,7 +782,7 @@ re-keyings, refines, compares, discards, and commits and discards of staged depo
 the collapse released stays in agreement with its released state. The staged deposits must be quiet
 off every walk at the collapse; every compare keeps that (`step_stagedOff`). -/
 theorem released_stays_released (hL : L.Lawful adj) (hQ : L.Quiet) {S R : Set B}
-    (hopen : ∀ l m, SupportedIn (L.openState l m) S)
+    (hopen : ∀ θ l m, SupportedIn (L.openState θ l m) S)
     (w : List (CarryGen Cell Crib (ReceiverFamily K M R))) (s : ValidResident adj L S)
     (h : StagedOff adj S R s.1) {ℓ : Loc} (hℓ : ¬ Retained adj L S R ℓ) :
     L.agreeOn ℓ (L.release (Retained adj L S R) s.1.loci)

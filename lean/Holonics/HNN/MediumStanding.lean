@@ -25,6 +25,8 @@ on the concrete medium of `HNN/Word` and `HNN/LocusMap`, and it proves those law
 * **The deposit** is `LocusMap.deposited`, each locus moved by its own law `Φe`, `Φc` from the
   data on the edges that read it (`locusOf`, the form of `LocusMap.locusData`).
 * **The release** is `LocusMap.release`.
+* **The opening and the reading read no locus**: the open state is the instance's `openState` at
+  every constitution, and the receiving map is the identity (`openReads`, `recvReads` empty).
 
 [proved-derived; formal-checked] What is proved.
 
@@ -239,10 +241,13 @@ def mediumLaw (h₀ : ℝ) (cls : Λ → ℕ → Ring → ρ → ℝ)
   op c θ := blockOp (withSheets_admissible θ.2.1 c)
   reads := Reads endRing
   refReads := RefReads
+  openReads _ _ := False
+  recvReads _ _ := False
   agreeOn ℓ θ θ' := AgreeOn θ.1 θ'.1 ℓ
   ref θ := mediumRef θ.1
+  recv _ _ := LinearMap.id
   cls := cls
-  openState := openState
+  openState _ := openState
   ticks := ticks
   cross := cross
   absorb := absorb
@@ -350,6 +355,8 @@ theorem mediumLaw_lawful :
       have hC : θ.1.C a = θ'.1.C a := (h (.channel a) rfl).1
       show (ULift.up (θ.1.G a), θ.1.C a) = (ULift.up (θ'.1.G a), θ'.1.C a)
       rw [hG, hC]
+  open_reads _ _ _ _ _ _ := rfl
+  recv_reads _ _ _ _ := rfl
   apply_local θ θ' d d' ℓ hθ hd := deposited_local hθ hd
   release_keeps keep θ ℓ hk := agreeOn_symm (agreeOn_release hk)
 
@@ -391,7 +398,7 @@ theorem agree_release_of_keeps (hL : L.Lawful adj) {S R : Set B} {keep : Loc →
 after any word of the generators, every admitted face of the current word and of every pending word
 reads the same on the released resident as on the resident. -/
 theorem keeps_sufficient (hL : L.Lawful adj) {S R : Set B}
-    (hopen : ∀ l m, SupportedIn (L.openState l m) S) {keep : Loc → Prop}
+    (hopen : ∀ θ l m, SupportedIn (L.openState θ l m) S) {keep : Loc → Prop}
     (hk : ∀ ℓ, TickStanding.Retained adj L S R ℓ → keep ℓ)
     (q : Option ℕ × ReceiverReading K M R) (w : List (CarryGen Cell Crib (ReceiverFamily K M R)))
     (s : ValidResident adj L S) :
@@ -441,7 +448,7 @@ def mediumStanding {S R : Set (Ring ⊕ Contact)} (hopen : ∀ l m, SupportedIn 
       (Option ℕ × ReceiverReading ℝ (BlockM endRing V Ch) R) (ValidResident (blockAdj endRing) ML S)
       (ValidResident (blockAdj endRing) ML S) ℝ :=
   tickStanding (L := ML) (adj := blockAdj endRing) (S := S) (R := R) (mediumLaw_lawful hΦe hΦc)
-    hopen
+    (fun _ => hopen)
 
 omit [Fintype Ring] in
 /-- [proved-derived; formal-checked] The law's release is `LocusMap.release`. -/
@@ -459,10 +466,10 @@ theorem medium_released_stays_released
     (hℓ : ¬ TickStanding.Retained (blockAdj endRing) ML S R ℓ) :
     AgreeOn (release (TickStanding.Retained (blockAdj endRing) ML S R) s.1.loci.1)
       (Holonics.Foundation.Chronology.transportWord
-        (transport (blockAdj endRing) ML (mediumLaw_lawful hΦe hΦc) hopen) w
+        (transport (blockAdj endRing) ML (mediumLaw_lawful hΦe hΦc) (fun _ => hopen)) w
         ⟨retain (blockAdj endRing) ML S R s.1, retain_valid s.2⟩).1.loci.1 ℓ :=
-  released_stays_released (mediumLaw_lawful hΦe hΦc) (mediumLaw_quiet hΦe hΦc hΦe0 hΦc0) hopen w s
-    h hℓ
+  released_stays_released (mediumLaw_lawful hΦe hΦc) (mediumLaw_quiet hΦe hΦc hΦe0 hΦc0)
+    (fun _ => hopen) w s h hℓ
 
 /-- [proved-derived; formal-checked] **The Rust's rule keeps the retained loci.** Under
 `Diamond::continuing` (`e_last = 2 |B|`), when the seeded contact blocks come with their end rings
@@ -474,7 +481,7 @@ theorem retained_rust {S R : Set (Ring ⊕ Contact)}
     (hR : ∀ a, (.inr a : Ring ⊕ Contact) ∉ R) {ℓ : Locus Ring Contact}
     (h : TickStanding.Retained (blockAdj endRing) ML S R ℓ) :
     LocusMap.Retained endRing S R (2 * Fintype.card (Ring ⊕ Contact)) ℓ := by
-  rcases h with ⟨z, y, hr, hw⟩ | ⟨b, hrb, hreach, hobs⟩
+  rcases h with ⟨z, y, hr, hw⟩ | ⟨b, hrb, hreach, hobs⟩ | ⟨b, hrb, -⟩ | ⟨b, hrb, -⟩
   · exact retained_of_reads hS hR hr ((inDiamond_continuing_iff S R z y).mpr hw)
   · have hd := (inDiamond_continuing_iff (adj := blockAdj endRing) S R b b).mpr ⟨hreach, hobs⟩
     cases ℓ with
@@ -486,6 +493,8 @@ theorem retained_rust {S R : Set (Ring ⊕ Contact)}
     | conductance a =>
       obtain rfl : b = .inr a := hrb
       exact Or.inl (channel_of_edge hS hR (Or.inl rfl) (Or.inl rfl) hd)
+  · exact absurd hrb id
+  · exact absurd hrb id
 
 /-- [proved-derived; formal-checked] **The collapse the Rust runs is sufficient on the medium**
 (`hnn::retention::collapse` under `Diamond::continuing`). Releasing every locus the Rust's
@@ -499,12 +508,13 @@ theorem rust_collapse_sufficient {S R : Set (Ring ⊕ Contact)}
     (w : List (CarryGen Cell Crib (ReceiverFamily ℝ (BlockM endRing V Ch) R)))
     (s : ValidResident (blockAdj endRing) ML S) :
     observe ML q (Holonics.Foundation.Chronology.transportWord
-        (transport (blockAdj endRing) ML (mediumLaw_lawful hΦe hΦc) hopen) w
+        (transport (blockAdj endRing) ML (mediumLaw_lawful hΦe hΦc) (fun _ => hopen)) w
         ⟨{ s.1 with loci := (ML).release (LocusMap.Retained endRing S R
             (2 * Fintype.card (Ring ⊕ Contact))) s.1.loci }, s.2⟩).1 =
       observe ML q (Holonics.Foundation.Chronology.transportWord
-        (transport (blockAdj endRing) ML (mediumLaw_lawful hΦe hΦc) hopen) w s).1 :=
-  keeps_sufficient (mediumLaw_lawful hΦe hΦc) hopen (fun _ hℓ => retained_rust hS hR hℓ) q w s
+        (transport (blockAdj endRing) ML (mediumLaw_lawful hΦe hΦc) (fun _ => hopen)) w s).1 :=
+  keeps_sufficient (mediumLaw_lawful hΦe hΦc) (fun _ => hopen)
+    (fun _ hℓ => retained_rust hS hR hℓ) q w s
 
 end Standing
 

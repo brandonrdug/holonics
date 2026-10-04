@@ -369,10 +369,13 @@ def factoredLaw (h₀ : ℝ) (cls : Λ → ℕ → Ring → ρ → ℝ)
   op c φ := blockOp (withSheets_admissible (toMedium_admissible φ.2.1) c)
   reads := Reads endRing
   refReads := RefReads
+  openReads _ _ := False
+  recvReads _ _ := False
   agreeOn ℓ φ φ' := FAgreeOn φ.1 φ'.1 ℓ
   ref φ := mediumRef (toMedium φ.1)
+  recv _ _ := LinearMap.id
   cls := cls
-  openState := openState
+  openState _ := openState
   ticks := ticks
   cross := cross
   absorb := absorb
@@ -476,6 +479,8 @@ theorem factoredLaw_lawful : (FL).Lawful (blockAdj endRing) where
       have hc : φ.1.c a = φ'.1.c a := (h (.channel a) rfl).1
       show (ULift.up (φ.1.G a), sq (φ.1.c a)) = (ULift.up (φ'.1.G a), sq (φ'.1.c a))
       rw [hG, hc]
+  open_reads _ _ _ _ _ _ := rfl
+  recv_reads _ _ _ _ := rfl
   apply_local φ φ' d d' ℓ hφ hd := fdeposited_local hφ hd
   release_keeps keep φ ℓ hk := fagreeOn_frelease φ.1 hk
 
@@ -505,7 +510,8 @@ def factoredStanding {S R : Set (Ring ⊕ Contact)} (hopen : ∀ l m, SupportedI
       (CarryGen Cell Crib (ReceiverFamily ℝ (BlockM endRing V Ch) R))
       (Option ℕ × ReceiverReading ℝ (BlockM endRing V Ch) R) (ValidResident (blockAdj endRing) FL S)
       (ValidResident (blockAdj endRing) FL S) ℝ :=
-  tickStanding (L := FL) (adj := blockAdj endRing) (S := S) (R := R) factoredLaw_lawful hopen
+  tickStanding (L := FL) (adj := blockAdj endRing) (S := S) (R := R) factoredLaw_lawful
+    (fun _ => hopen)
 
 /-- [proved-derived; formal-checked] **On the factored medium a deposit between words never
 reopens a released locus**, for factor laws that keep a locus on empty data. -/
@@ -518,9 +524,9 @@ theorem factored_released_stays_released
     (hℓ : ¬ TickStanding.Retained (blockAdj endRing) FL S R ℓ) :
     FAgreeOn (frelease (TickStanding.Retained (blockAdj endRing) FL S R) s.1.loci.1)
       (Holonics.Foundation.Chronology.transportWord
-        (transport (blockAdj endRing) FL factoredLaw_lawful hopen) w
+        (transport (blockAdj endRing) FL factoredLaw_lawful (fun _ => hopen)) w
         ⟨retain (blockAdj endRing) FL S R s.1, retain_valid s.2⟩).1.loci.1 ℓ :=
-  released_stays_released factoredLaw_lawful (factoredLaw_quiet hΨe0 hΨc0) hopen w s h hℓ
+  released_stays_released factoredLaw_lawful (factoredLaw_quiet hΨe0 hΨc0) (fun _ => hopen) w s h hℓ
 
 /-- [proved-derived; formal-checked] **The Rust's rule keeps the retained loci** on the factored
 medium, as on the medium (`MediumStanding.retained_rust`): the two laws read the same loci. -/
@@ -529,7 +535,7 @@ theorem retained_rust_factored {S R : Set (Ring ⊕ Contact)}
     (hR : ∀ a, (.inr a : Ring ⊕ Contact) ∉ R) {ℓ : Locus Ring Contact}
     (h : TickStanding.Retained (blockAdj endRing) FL S R ℓ) :
     LocusMap.Retained endRing S R (2 * Fintype.card (Ring ⊕ Contact)) ℓ := by
-  rcases h with ⟨z, y, hr, hw⟩ | ⟨b, hrb, hreach, hobs⟩
+  rcases h with ⟨z, y, hr, hw⟩ | ⟨b, hrb, hreach, hobs⟩ | ⟨b, hrb, -⟩ | ⟨b, hrb, -⟩
   · exact retained_of_reads hS hR hr ((inDiamond_continuing_iff S R z y).mpr hw)
   · have hd := (inDiamond_continuing_iff (adj := blockAdj endRing) S R b b).mpr ⟨hreach, hobs⟩
     cases ℓ with
@@ -541,6 +547,8 @@ theorem retained_rust_factored {S R : Set (Ring ⊕ Contact)}
     | conductance a =>
       obtain rfl : b = .inr a := hrb
       exact Or.inl (channel_of_edge hS hR (Or.inl rfl) (Or.inl rfl) hd)
+  · exact absurd hrb id
+  · exact absurd hrb id
 
 /-- [proved-derived; formal-checked] **The collapse the Rust runs is sufficient, for every
 per-locus factor law** (`hnn::retention::collapse` under `Diamond::continuing`; the Rust's own
@@ -556,12 +564,13 @@ theorem factored_rust_collapse_sufficient {S R : Set (Ring ⊕ Contact)}
     (w : List (CarryGen Cell Crib (ReceiverFamily ℝ (BlockM endRing V Ch) R)))
     (s : ValidResident (blockAdj endRing) FL S) :
     observe FL q (Holonics.Foundation.Chronology.transportWord
-        (transport (blockAdj endRing) FL factoredLaw_lawful hopen) w
+        (transport (blockAdj endRing) FL factoredLaw_lawful (fun _ => hopen)) w
         ⟨{ s.1 with loci := (FL).release (LocusMap.Retained endRing S R
             (2 * Fintype.card (Ring ⊕ Contact))) s.1.loci }, s.2⟩).1 =
       observe FL q (Holonics.Foundation.Chronology.transportWord
-        (transport (blockAdj endRing) FL factoredLaw_lawful hopen) w s).1 :=
-  keeps_sufficient factoredLaw_lawful hopen (fun _ hℓ => retained_rust_factored hS hR hℓ) q w s
+        (transport (blockAdj endRing) FL factoredLaw_lawful (fun _ => hopen)) w s).1 :=
+  keeps_sufficient factoredLaw_lawful (fun _ => hopen)
+    (fun _ hℓ => retained_rust_factored hS hR hℓ) q w s
 
 /-! ## 5. The Rust's step is quiet on empty data -/
 
@@ -615,7 +624,7 @@ theorem certified_released_stays_released
     (hℓ : ¬ TickStanding.Retained (blockAdj endRing) CL S R ℓ) :
     FAgreeOn (frelease (TickStanding.Retained (blockAdj endRing) CL S R) s.1.loci.1)
       (Holonics.Foundation.Chronology.transportWord
-        (transport (blockAdj endRing) CL factoredLaw_lawful hopen) w
+        (transport (blockAdj endRing) CL factoredLaw_lawful (fun _ => hopen)) w
         ⟨retain (blockAdj endRing) CL S R s.1, retain_valid s.2⟩).1.loci.1 ℓ :=
   factored_released_stays_released (fun r p => certifiedStep_quiet (ηe r) (ge r) p)
     (fun a p => certifiedStep_quiet (ηc a) (gc a) p) hopen w s h hℓ
