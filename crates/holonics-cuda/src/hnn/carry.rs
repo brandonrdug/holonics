@@ -32,10 +32,11 @@
 //! remainder carried in the velocity's split over its denominator, as a contact's rate is. A carried
 //! change off the transients' lattice, or past the signed 64-bit word, is refused at its restore.
 
+use std::collections::BTreeSet;
 use std::rc::Rc;
 
 use holonics::hnn::reference::carry_bits;
-use holonics::hnn::{Absorption, Field, HnnError, ReceptionCarry, WordOpening};
+use holonics::hnn::{Absorption, Field, HnnError, Locus, ReceptionCarry, WordOpening};
 use holonics::ratio::Rat;
 use holonics::ratio::linear::ExactRatMatrix;
 use num_bigint::BigInt;
@@ -210,6 +211,32 @@ impl<'c> CardOpening<'c> {
                 carry: carry.host.clone(),
                 absorption: *absorption,
             },
+        }
+    }
+
+    /// [definition; the reception carry §8] **The opening across a releasing collapse**
+    /// (`ReceptionCarry::released`): the motion each released locus's material held leaves with
+    /// it. The card's words are uploaded again only where the release moved a coordinate.
+    pub(crate) fn released(
+        &self,
+        card: &'c Card,
+        field: &Field,
+        released: &BTreeSet<Locus>,
+    ) -> Result<Self, HnnError> {
+        match self {
+            Self::Rest => Ok(Self::Rest),
+            Self::Received { carry, absorption } => {
+                let (host, moved) = carry.host.released(released);
+                let carry = if moved.is_empty() {
+                    Rc::clone(carry)
+                } else {
+                    Rc::new(CardCarry::restored(card, field, host)?)
+                };
+                Ok(Self::Received {
+                    carry,
+                    absorption: *absorption,
+                })
+            }
         }
     }
 

@@ -7,7 +7,7 @@
 
 use std::collections::BTreeSet;
 
-use num_traits::Signed;
+use num_traits::{Signed, Zero};
 
 use super::learning::{generic, moment, path_with, phases, six_path};
 use super::support::Draw;
@@ -697,4 +697,74 @@ fn contained_after(
 ) -> HnnError {
     to_the_carry_out(reference, resident);
     reference.close_aeon(resident, admitted).unwrap_err()
+}
+
+/// [definition; record B §8] **A releasing collapse under the carry releases the motion its
+/// material held.** Closing an aeon onto no receiver releases every materialized locus (no walk
+/// reaches an admitted receiver). The carried end held momentum `π_a = C_a w_a` at the contacts;
+/// a released contact's storage is zero, so no rate holds that momentum on the next opening, and
+/// the motion leaves with the material (`ReceptionCarry::released`): the resident's carry is the
+/// held one with every released contact's state and momentum zero, and the collapsed medium reads
+/// on. Two pending ratios open across the boundary, as the card's
+/// `the_card_port_returns_the_reference_through_a_releasing_collapse` runs it.
+#[test]
+fn a_releasing_collapse_releases_the_carried_motion_its_material_held() {
+    let field = super::learning::chain();
+    let reference = Reference::campaign_one();
+    let mut resident = reference
+        .mount_with(&field, &Current::at_rest(&field), generic(&field, 23))
+        .unwrap();
+    let (moment, _) = reference.ingest(&mut resident, None, &[]).unwrap();
+    let phases = resident.admitted()[0].clone();
+    let mut draw = Draw::new(23);
+    let cells: Vec<usize> = (0..64)
+        .map(|k| if draw.below(8) == 0 { draw.below(4) } else { [0, 1, 2, 1][k % 4] })
+        .collect();
+    let mut position = 0;
+    loop {
+        let (id, _) = reference.refine(&mut resident, &moment, &phases).unwrap();
+        let targets = one_hot(&cells[position..position + 2]);
+        let (staged, _) = reference.compare(&mut resident, id, &targets).unwrap();
+        reference.deposit(&mut resident, staged).unwrap();
+        let (_, ingested) = reference
+            .ingest(&mut resident, Some(&moment), &targets)
+            .unwrap();
+        let ingested = ingested.forward.into_present().unwrap();
+        position += ingested.cells;
+        if ingested.carry_out {
+            break;
+        }
+        assert!(position + 2 <= cells.len(), "the joint clock carries out within the cut");
+    }
+    let (id, _) = reference.refine(&mut resident, &moment, &phases).unwrap();
+    let (other, _) = reference.refine(&mut resident, &moment, &phases).unwrap();
+    reference
+        .compare(&mut resident, other, &one_hot(&[1, 2]))
+        .unwrap();
+    let held = resident.carried().cloned().expect("the refine writes the carry");
+    assert!(
+        held.momenta.iter().flatten().any(|x| !x.is_zero()),
+        "the carried end holds momentum at a contact"
+    );
+    let boundary = reference.close_aeon(&mut resident, &[]).unwrap();
+    let collapse = &boundary.forward.present().unwrap().collapse;
+    assert!(collapse.released.contains(&Locus::Channel(0)), "the collapse releases the contacts");
+    let (expected, moved) = held.released(&collapse.released);
+    assert!(!moved.is_empty(), "the released material held carried motion");
+    let carry = resident.carried().expect("the carry stays, released where its material was");
+    assert_eq!(carry, &expected);
+    for locus in &collapse.released {
+        if let Locus::Channel(a) = *locus {
+            assert!(carry.change.states[a].iter().flatten().all(|x| x.is_zero()));
+            assert!(carry.momenta[a].iter().all(|x| x.is_zero()));
+            assert_eq!(carry.change.arrivals[a], held.change.arrivals[a], "the waves stay");
+        }
+    }
+    // The collapsed medium reads on: a word opens on the released carry, and is compared.
+    let _ = reference.compare(&mut resident, id, &one_hot(&[0, 1]));
+    let (fresh, _) = reference.refine(&mut resident, &moment, &phases).unwrap();
+    reference
+        .compare(&mut resident, fresh, &one_hot(&[2, 3]))
+        .unwrap();
+    reference.read(&resident).unwrap();
 }

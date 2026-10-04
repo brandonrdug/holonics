@@ -102,7 +102,7 @@ use num_traits::{Signed, Zero};
 
 use crate::hnn::HnnError;
 use crate::hnn::chart::{ChartReading, Charts, Remainders, carry};
-use crate::hnn::constitution::Lattice;
+use crate::hnn::constitution::{Lattice, Locus};
 use crate::hnn::contact::{BreakReceipt, signed_stiffness};
 use crate::hnn::field::{ConstitutionRead, Current, Field};
 use crate::hnn::moment::SourceMoment;
@@ -587,6 +587,53 @@ impl ReceptionCarry {
         }
     }
 
+    /// [definition; agent-inferred, October 4; the reception carry §8] **The carry across a
+    /// releasing collapse**: the motion each released locus's material held is released with
+    /// it. A released channel `a` takes its storage, stiffness and dissipation to zero, so its
+    /// state `[u, w]` and momentum `π_a = C_a w_a` (the energy `½(⟨w, C_a w⟩ + ⟨u, K_a u⟩)` its
+    /// material held) leave with the material. Its arriving waves are held by the contact's
+    /// conductance at the lift, which the field declares and the collapse does not release, and
+    /// stay. A released resonator leaves with its state and momentum. Ring storage waves are held
+    /// by the rings' declared admittances and stay.
+    ///
+    /// [proved-derived, on formal-checked theorems] Under the carry the collapse releases exactly
+    /// the loci no walk from a source to an admitted receiver passes (Lean `HNN/Retention`,
+    /// `continuing_release_indistinguishable`, `continuing_collapse_connected`). Motion at such a
+    /// locus reaches no admitted receiver along any walk, so releasing it changes no admitted
+    /// reading, as releasing its material does not. Without it the next opening would have to
+    /// hold a nonzero momentum on a zero storage, which no rate does (`HnnError::HeldMomentum`).
+    ///
+    /// Returns the carry and the released loci whose carried motion was off zero.
+    pub fn released(&self, released: &BTreeSet<Locus>) -> (Self, Vec<Locus>) {
+        let mut carry = self.clone();
+        let mut moved = Vec::new();
+        let off = |values: &[Rat]| values.iter().any(|x| !x.is_zero());
+        for locus in released {
+            match *locus {
+                Locus::Channel(a) if a < carry.momenta.len() => {
+                    let [u, w] = &mut carry.change.states[a];
+                    if off(u) || off(w) || off(&carry.momenta[a]) {
+                        moved.push(*locus);
+                    }
+                    *u = zeros(u.len());
+                    *w = zeros(w.len());
+                    carry.momenta[a] = zeros(carry.momenta[a].len());
+                }
+                Locus::Resonator(g) if g < carry.change.resonators.len() => {
+                    let held = carry.change.resonators[g].is_some();
+                    if held || carry.resonator_momenta[g].is_some() {
+                        moved.push(*locus);
+                    }
+                    carry.change.resonators[g] = None;
+                    carry.change.resonator_phases[g] = None;
+                    carry.resonator_momenta[g] = None;
+                }
+                _ => {}
+            }
+        }
+        (carry, moved)
+    }
+
     /// [definition; agent-inferred, October 3; the reception carry §2.4] **The carry as text**,
     /// every value exact, appended to `s`: `carry t r c n` (the elapsed ticks, the rings, the
     /// contacts and the resonator slots), one line per ring's storage wave, two per contact's
@@ -801,6 +848,18 @@ pub enum WordOpening {
 }
 
 impl WordOpening {
+    /// [definition; agent-inferred, October 4; the reception carry §8] **The opening across a
+    /// releasing collapse** ([`ReceptionCarry::released`]): at rest unchanged.
+    pub fn released(&self, released: &BTreeSet<Locus>) -> Self {
+        match self {
+            WordOpening::Rest => WordOpening::Rest,
+            WordOpening::Received { carry, absorption } => WordOpening::Received {
+                carry: carry.released(released).0,
+                absorption: *absorption,
+            },
+        }
+    }
+
     /// [definition; October 4, the reception carry §8] **The rings the opening's interior change
     /// occupies** ([`EndChange::support`]): none at rest or under complete absorption, the carried
     /// interior's otherwise (the crossing into the next references keeps a zero coordinate zero).

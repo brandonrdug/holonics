@@ -844,6 +844,29 @@ under no supply, so reaching it would have repeated, and no change repeated. Fro
 word on, the largest value on each ring, read every 50 words, lay between 2 and 13 units of
 `2^-12`, the transients' lattice (`L_w = 12`). The probe was a scratch run and is not kept.
 
+**A releasing collapse releases the motion its material held.** [agent-inferred, derived from the
+walk diamond; the PC's GPU suite on `d666b7d7` found it] An aeon closed onto a family whose walks no
+longer pass a locus releases that locus's material, and under the carry the field's motion may be
+held there: a contact's state `[u, w]` with its momentum `π_a = C_a w_a` (the energy
+`½(⟨w, C_a w⟩ + ⟨u, K_a u⟩)` its storage and stiffness held), or a resonator's state. A released
+contact's storage is zero, so the next opening could hold no nonzero `π_a` (`C′δ = π − C′w` has no
+solution), and `close_aeon` onto no receiver refused, typed `HeldMomentum`, after its collapse had
+already moved the resident. The law follows from the theorems above: a released locus is one no walk
+from a source to an admitted receiver passes, so motion there reaches no admitted receiver along any
+walk, and releasing it changes no admitted reading, exactly as releasing its material does not. So
+the collapse releases the carried motion with the material that held it
+(`ReceptionCarry::released`): a released contact's state and momentum, and a released resonator's
+state and momentum. A contact's arriving waves are held by its conductance at the lift, which the
+field declares and the collapse does not release, and ring storage waves by the rings' declared
+admittances: they stay. The release reaches every carried end the resident holds: the next opening,
+each carried pending ratio's opening (its compare may read again on the collapsed constitution) and
+the arrived targets' opening, which the first law's exchange step reads again. `close_aeon` now
+forms the collapse, the release, the separators and that re-read before anything the resident holds
+moves, on the host and the card alike, so a refusal leaves the aeon awaiting its boundary as it
+stood. Fixture: `retention::a_releasing_collapse_releases_the_carried_motion_its_material_held` on
+the host, and the card's `the_card_port_returns_the_reference_through_a_releasing_collapse`, which
+runs the same sequence on the default.
+
 **Saved states.** A state written at rest writes no carry and reads back with none (§2.6). It now
 restores through one owner, `Reference::mount_continued`. That owner continues the declared opening
 from the state (`Constitution::continued`, which refuses a foreign material or a moved opening;

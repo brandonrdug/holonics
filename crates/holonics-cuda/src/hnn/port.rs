@@ -1769,36 +1769,35 @@ impl<'c> ExecutionPort for Resident<'c> {
         contained(admitted, &resident.admitted)?;
         let before = resident.bits();
         let field = resident.field.clone();
-        resident.forget_kept_reads();
-        let collapsed = collapse(
-            &field,
-            &mut resident.constitution,
-            admitted,
-            self.reception.opens(),
-        )?;
-        // The collapse keeps the tree whole (`hnn::retention`); the mirror is uploaded again should
-        // it ever move.
-        if let Some((ring, tree)) = resident.tree.as_mut()
-            && resident.constitution.landmarks(*ring).map(Landmarks::nodes) != Some(tree.nodes())
-            && let Some(host) = resident.constitution.landmarks(*ring)
-        {
-            tree.upload(&host.arena()).map_err(device)?;
-        }
+        // As the reference's: the collapse, the carried motion's release with its material, the
+        // handles' separators and the first law's re-read are formed before the resident's state
+        // moves, so a refusal leaves the aeon awaiting its boundary as it stood.
+        let mut constitution = resident.constitution.clone();
+        let collapsed = collapse(&field, &mut constitution, admitted, self.reception.opens())?;
         // The descended constitution published on the card at the same commit.
         let descended = Rc::new(Publication::publish(
             self.card,
-            Loci::of(&field, &resident.constitution)?,
+            Loci::of(&field, &constitution)?,
             Some(&resident.publication),
         )?);
-        let octets = descended.octets as u64;
-        resident.count(|traffic| traffic.publications += octets);
-        resident.publication = Rc::clone(&descended);
+        // The carried motion the released material held leaves with it (the reference's
+        // `ReceptionCarry::released`, record B §8).
+        let release =
+            |opening: &CardOpening<'c>| opening.released(self.card, &field, &collapsed.released);
+        let carry = match &resident.carried {
+            Some(carry) => match release(&CardOpening::Received {
+                carry: Rc::clone(carry),
+                absorption: holonics::hnn::Absorption::Nothing,
+            })? {
+                CardOpening::Received { carry, .. } => Some(carry),
+                CardOpening::Rest => None,
+            },
+            None => None,
+        };
         let mut carried = Vec::new();
         let mut refused = Vec::new();
         let mut transposes = Vec::new();
-        let ids: Vec<PendingId> = resident.pending.keys().copied().collect();
-        for id in ids {
-            let slot = &resident.pending[&id];
+        for (id, slot) in &resident.pending {
             let diamond = Diamond::opened(
                 &field,
                 slot.ratio.phases(),
@@ -1811,44 +1810,69 @@ impl<'c> ExecutionPort for Resident<'c> {
                     .into_iter()
                     .filter(|locus| collapsed.retained.contains(locus))
                     .collect();
-                transposes.push((id, Transpose::Retained(reads)));
-                carried.push(id);
+                transposes.push((*id, Transpose::Retained(reads)));
+                carried.push(*id);
             } else {
-                resident.pending.remove(&id);
-                transposes.push((id, Transpose::Separator(separating.clone())));
-                refused.push((id, separating));
+                transposes.push((*id, Transpose::Separator(separating.clone())));
+                refused.push((*id, separating));
             }
         }
-        let mut refused_staged = Vec::new();
-        resident.staged.retain(|id, deposit| {
-            let separating: Vec<Locus> = deposit
-                .loci()
-                .into_iter()
-                .filter(|locus| !collapsed.retained.contains(locus))
-                .collect();
-            if separating.is_empty() {
-                true
-            } else {
-                refused_staged.push((*id, separating));
-                false
-            }
-        });
-        resident.released_bits += collapsed.bits[0].saturating_sub(collapsed.bits[1]);
+        let refused_staged: Vec<(StagedId, Vec<Locus>)> = resident
+            .staged
+            .iter()
+            .filter_map(|(id, deposit)| {
+                let separating: Vec<Locus> = deposit
+                    .loci()
+                    .into_iter()
+                    .filter(|locus| !collapsed.retained.contains(locus))
+                    .collect();
+                (!separating.is_empty()).then_some((*id, separating))
+            })
+            .collect();
+        let openings: Vec<(PendingId, CardOpening<'c>)> = resident
+            .pending
+            .iter()
+            .filter(|(id, _)| carried.contains(id))
+            .map(|(id, slot)| Ok((*id, release(&slot.opening)?)))
+            .collect::<Result<_, HnnError>>()?;
+        let (mut ledger, mut tally) = (resident.ledger.clone(), resident.tally.clone());
+        let arrived_opening = resident
+            .arrived
+            .as_ref()
+            .map(|arrived| release(&arrived.opening))
+            .transpose()?;
         if let Some(arrived) = &resident.arrived {
             let reads = Diamond::opened(
                 &field,
                 arrived.ratio.phases(),
-                &arrived.opening.host().support(&field),
+                &arrived.opening.host().released(&collapsed.released).support(&field),
             )
             .retained(&field);
             if collapsed.released.iter().any(|locus| reads.contains(locus)) {
-                let (reread, readings) =
-                    resident.arrived_code_length(&descended, None, self.card)?;
-                resident.tally.read(&readings);
-                resident.ledger.release(reread)?;
+                // The re-read opens on the released opening; the arrived targets are restored
+                // as they stood should it be refused.
+                let held = resident.arrived.as_mut().map(|arrived| {
+                    std::mem::replace(
+                        &mut arrived.opening,
+                        arrived_opening.clone().expect("formed above"),
+                    )
+                });
+                let read =
+                    resident.arrived_code_length(&descended, Some(&constitution), self.card);
+                let (reread, readings) = match read {
+                    Ok(read) => read,
+                    Err(refusal) => {
+                        if let (Some(arrived), Some(held)) = (resident.arrived.as_mut(), held) {
+                            arrived.opening = held;
+                        }
+                        return Err(refusal);
+                    }
+                };
+                tally.read(&readings);
+                ledger.release(reread)?;
             }
         }
-        let first_law = resident.ledger.close();
+        let first_law = ledger.close();
         // The literal `log₂|A|` a cell, read as the host reads it (the certified binary logarithm of
         // `1/|A|`), so the boundary's parity holds at any `|A|`, a power of two or not.
         let literal = first_law.against_literal(&code_length(&Rat::new(
@@ -1859,6 +1883,38 @@ impl<'c> ExecutionPort for Resident<'c> {
         let carry_out = resident.current.lift().to_vec();
         let (readings, epochs, closing) =
             aeon_readings(&resident.parametric, &opening, &carry_out)?;
+        // Published together.
+        resident.constitution = constitution;
+        // The collapse keeps the tree whole (`hnn::retention`); the mirror is uploaded again should
+        // it ever move.
+        if let Some((ring, tree)) = resident.tree.as_mut()
+            && resident.constitution.landmarks(*ring).map(Landmarks::nodes) != Some(tree.nodes())
+            && let Some(host) = resident.constitution.landmarks(*ring)
+        {
+            tree.upload(&host.arena()).map_err(device)?;
+        }
+        let octets = descended.octets as u64;
+        resident.count(|traffic| traffic.publications += octets);
+        resident.publication = Rc::clone(&descended);
+        resident.carried = carry;
+        resident.forget_kept_reads();
+        for (id, _) in &refused {
+            resident.pending.remove(id);
+        }
+        for (id, opening) in openings {
+            if let Some(slot) = resident.pending.get_mut(&id) {
+                slot.opening = opening;
+            }
+        }
+        for (id, _) in &refused_staged {
+            resident.staged.remove(id);
+        }
+        resident.released_bits += collapsed.bits[0].saturating_sub(collapsed.bits[1]);
+        resident.ledger = ledger;
+        resident.tally = tally;
+        if let (Some(arrived), Some(opening)) = (resident.arrived.as_mut(), arrived_opening) {
+            arrived.opening = opening;
+        }
         let cells = resident.aeon.cells;
         resident.aeon = AeonState {
             awaiting: false,

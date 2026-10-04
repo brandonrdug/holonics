@@ -1774,20 +1774,23 @@ impl ExecutionPort for Reference {
         contained(admitted, &resident.admitted)?;
         let before = resident.state_bits();
         let field = resident.field.clone();
-        // The collapse publishes the descended constitution at the same commit.
-        resident.forget_kept_reads();
-        let collapsed = collapse(
-            &field,
-            &mut resident.constitution,
-            admitted,
-            self.reception.opens(),
-        )?;
+        // Nothing the resident holds moves until every step below has succeeded: the collapse, the
+        // carried motion's release with its material, the handles' separators and the first law's
+        // re-read are formed on copies and published together, so a refusal leaves the aeon
+        // awaiting its boundary as it stood.
+        let mut constitution = resident.constitution.clone();
+        let collapsed = collapse(&field, &mut constitution, admitted, self.reception.opens())?;
+        // The carried motion the released material held leaves with it (record B §8): the next
+        // opening, each kept pending ratio's re-read and the first law's re-read cross the carry
+        // onto the collapsed constitution.
+        let carry = resident
+            .carried
+            .as_ref()
+            .map(|carry| carry.released(&collapsed.released).0);
         let mut carried = Vec::new();
         let mut refused = Vec::new();
         let mut transposes = Vec::new();
-        let ids: Vec<PendingId> = resident.pending.keys().copied().collect();
-        for id in ids {
-            let slot = &resident.pending[&id];
+        for (id, slot) in &resident.pending {
             let diamond =
                 Diamond::opened(&field, slot.ratio.phases(), &slot.opening.support(&field));
             let separating = separator(&field, &diamond, &collapsed.retained);
@@ -1798,37 +1801,42 @@ impl ExecutionPort for Reference {
                     .into_iter()
                     .filter(|locus| collapsed.retained.contains(locus))
                     .collect();
-                transposes.push((id, Transpose::Retained(reads)));
-                carried.push(id);
+                transposes.push((*id, Transpose::Retained(reads)));
+                carried.push(*id);
             } else {
-                resident.pending.remove(&id);
-                transposes.push((id, Transpose::Separator(separating.clone())));
-                refused.push((id, separating));
+                transposes.push((*id, Transpose::Separator(separating.clone())));
+                refused.push((*id, separating));
             }
         }
         // A staged deposit that reaches a released locus is refused with the loci it would reach,
         // and discarded; the others are carried (design (c): `close_aeon` carries every open handle
         // or refuses it).
-        let mut refused_staged = Vec::new();
-        resident.staged.retain(|id, slot| {
-            let separating: Vec<Locus> = slot
-                .deposit
-                .loci()
-                .into_iter()
-                .filter(|locus| !collapsed.retained.contains(locus))
-                .collect();
-            if separating.is_empty() {
-                true
-            } else {
-                refused_staged.push((*id, separating));
-                false
-            }
-        });
-        resident.released_bits += collapsed.bits[0].saturating_sub(collapsed.bits[1]);
+        let refused_staged: Vec<(StagedId, Vec<Locus>)> = resident
+            .staged
+            .iter()
+            .filter_map(|(id, slot)| {
+                let separating: Vec<Locus> = slot
+                    .deposit
+                    .loci()
+                    .into_iter()
+                    .filter(|locus| !collapsed.retained.contains(locus))
+                    .collect();
+                (!separating.is_empty()).then_some((*id, separating))
+            })
+            .collect();
         // The first law across the collapse: it changes no admitted reading, so the arrived
         // targets read alike unless their own diamond reads a locus it newly released; then the
         // released part is an exchange step.
-        if let Some(arrived) = &resident.arrived {
+        let (mut ledger, mut tally, mut charts) = (
+            resident.ledger.clone(),
+            resident.tally.clone(),
+            resident.charts.clone(),
+        );
+        let arrived = resident.arrived.clone().map(|arrived| Arrived {
+            opening: arrived.opening.released(&collapsed.released),
+            ..arrived
+        });
+        if let Some(arrived) = &arrived {
             let reads = Diamond::opened(
                 &field,
                 arrived.ratio.phases(),
@@ -1836,13 +1844,12 @@ impl ExecutionPort for Reference {
             )
             .retained(&field);
             if collapsed.released.iter().any(|locus| reads.contains(locus)) {
-                let (reread, readings) =
-                    arrived.code_length(&field, &resident.constitution, &mut resident.charts)?;
-                resident.tally.read(&readings);
-                resident.ledger.release(reread)?;
+                let (reread, readings) = arrived.code_length(&field, &constitution, &mut charts)?;
+                tally.read(&readings);
+                ledger.release(reread)?;
             }
         }
-        let first_law = resident.ledger.close();
+        let first_law = ledger.close();
         let literal = first_law.against_literal(&code_length(&Rat::new(
             BigInt::one(),
             BigInt::from(field.alphabet()),
@@ -1851,6 +1858,24 @@ impl ExecutionPort for Reference {
         let carry_out = resident.current.lift().to_vec();
         let (readings, epochs, closing) =
             aeon_readings(&resident.parametric, &opening, &carry_out)?;
+        // Published together.
+        resident.constitution = constitution;
+        resident.carried = carry;
+        resident.forget_kept_reads();
+        for (id, _) in &refused {
+            resident.pending.remove(id);
+        }
+        for slot in resident.pending.values_mut() {
+            slot.opening = slot.opening.released(&collapsed.released);
+        }
+        for (id, _) in &refused_staged {
+            resident.staged.remove(id);
+        }
+        resident.released_bits += collapsed.bits[0].saturating_sub(collapsed.bits[1]);
+        resident.ledger = ledger;
+        resident.tally = tally;
+        resident.charts = charts;
+        resident.arrived = arrived;
         let cells = resident.aeon.cells;
         resident.aeon = AeonState {
             awaiting: false,
