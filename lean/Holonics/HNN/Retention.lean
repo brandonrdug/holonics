@@ -67,6 +67,18 @@ change at fixed operands, and the `tick` of a `BlockOp` on `Ring ⊕ Contact` th
    (`contemporary_read`, `Propagation.word_variation_exact`). Each ring's clock reads its lift
    displacement, and an aeon closes on the clock torus exactly when every ring reads whole periods
    (`lift_reading`, `Aeon/Clock/Winding`).
+7. **The reception cut composes on the cumulative clock** (§5a; #62, owed by the reception
+   carry's clock, item 1; record B §2.4). On the word stepped tick by tick, the junction at crossing
+   `t` and then the hop at the pump's phases `phase_at(t − 1)`, `phase_at(t)` (`pumpedStep`,
+   `clockedRun`), a word run to its last crossing `T` and continued from the change arriving there
+   at tick `T` is the uninterrupted word from `T` on: its states, the hop it runs at every later
+   tick with its phases, and every per-hop balance (`reception_cut_composes`, from
+   `clockedRun_add`). The rest word is the case `T = 0`: the unpumped word is the constant step's
+   run (`rest_word_is_cut_at_zero`), and the pumped word opens at zero and is linear in its open
+   state (`pumped_word_opens_at_zero`). The cut after the last junction does not compose: the
+   junction is an involution (`Propagation.junctionScattering_involutive`), so the next word's first
+   junction undoes it and the hop at `T` runs on the unscattered change, one hop reflected
+   (`cut_after_junction_reflects`, `junction_cut_reflects`, `cut_after_junction_differs`).
 
 [definition; agent-inferred] **The collapse and the carried remainders** (Decision 22 of the step 4
 design). The collapse releases only exact complements, and a carried remainder is not one
@@ -823,6 +835,141 @@ theorem contemporary_read (res : SparseResident adj op Λ Mo) (i : ℕ)
 
 end Standing
 
+/-! ## 5a. The reception cut composes on the pumped clock -/
+
+section Cut
+
+/-- [definition] **The word on the cumulative clock**: from the state `x` arriving at crossing
+`t₀`, the step `S t` at each later tick `t` (the junction at crossing `t`, then hop `t`). The tick
+index is the word's cumulative clock (record B §2.4): it is never reset at a reception. -/
+def clockedRun {X : Type*} (S : ℕ → X → X) (t₀ : ℕ) (x : X) : ℕ → X
+  | 0 => x
+  | n + 1 => S (t₀ + n) (clockedRun S t₀ x n)
+
+/-- [definition] **The pumped step at tick `t`** (record B §2.4, `ResonatorOperands::step`): the
+junction scatters crossing `t`, then the hop runs with every resonator's pump switching from
+`phase_at(t − 1)` to `phase_at(t)` (`t − 1` truncated at `0`, as the Rust's
+`opened_at.saturating_sub(1)`). -/
+def pumpedStep {X Φ : Type*} (J : ℕ → X → X) (hop : Φ → Φ → X → X) (phase : ℕ → Φ) (t : ℕ)
+    (x : X) : X :=
+  hop (phase (t - 1)) (phase t) (J t x)
+
+/-- [proved-derived; formal-checked] **The cut composes on the clock**: running `a` steps from
+crossing `t₀` and then `b` steps from crossing `t₀ + a`, from the state arriving there, is the
+uninterrupted run of `a + b` steps. -/
+theorem clockedRun_add {X : Type*} (S : ℕ → X → X) (t₀ : ℕ) (x : X) (a b : ℕ) :
+    clockedRun S (t₀ + a) (clockedRun S t₀ x a) b = clockedRun S t₀ x (a + b) := by
+  induction b with
+  | zero => rfl
+  | succ b ih =>
+    show S (t₀ + a + b) (clockedRun S (t₀ + a) (clockedRun S t₀ x a) b) =
+      S (t₀ + (a + b)) (clockedRun S t₀ x (a + b))
+    rw [ih, Nat.add_assoc]
+
+/-- [proved-derived; formal-checked] **The reception cut composes** (#62, owed by the reception
+carry's clock, item 1; record B §2.4). A word opened at crossing `t₀` runs `n` full ticks and
+reaches its last crossing `T = t₀ + n` (`e = n + 1` crossings); its receiver reads that crossing,
+and the carry holds the change `y` arriving there, before the last junction. The next word opens on
+`y` at tick `T`: its first junction scatters crossing `T` and its first hop runs at phase `T`.
+Then for every later `m` it is the uninterrupted word from `T` on: its states; the hop it runs at
+its step `m`, at phases `phase_at(T + m − 1)` and `phase_at(T + m)` on the scattered crossing
+`T + m`; and every per-hop balance `β t (before) (after)`, whatever its reading. The proof assumes
+nothing of the junction, the hop or the phase: the composition is the cumulative clock's. -/
+theorem reception_cut_composes {X Φ R : Type*} (J : ℕ → X → X) (hop : Φ → Φ → X → X)
+    (phase : ℕ → Φ) (β : ℕ → X → X → R) (t₀ n : ℕ) (x : X) (m : ℕ) :
+    let S := pumpedStep J hop phase
+    let y := clockedRun S t₀ x n
+    clockedRun S (t₀ + n) y m = clockedRun S t₀ x (n + m) ∧
+      clockedRun S (t₀ + n) y (m + 1) =
+        hop (phase (t₀ + n + m - 1)) (phase (t₀ + n + m))
+          (J (t₀ + n + m) (clockedRun S t₀ x (n + m))) ∧
+      β (t₀ + n + m) (clockedRun S (t₀ + n) y m) (clockedRun S (t₀ + n) y (m + 1)) =
+        β (t₀ + (n + m)) (clockedRun S t₀ x (n + m)) (clockedRun S t₀ x (n + m + 1)) := by
+  intro S y
+  have h := clockedRun_add S t₀ x n m
+  have h' := clockedRun_add S t₀ x n (m + 1)
+  refine ⟨h, ?_, ?_⟩
+  · show S (t₀ + n + m) (clockedRun S (t₀ + n) y m) = _
+    rw [h]
+    rfl
+  · rw [h, h']
+    simp only [Nat.add_assoc]
+
+/-- [proved-derived; formal-checked] **The rest word is the cut at `T = 0`** (beside
+`word_opens_at_zero`). The unpumped word, one block operator at every tick, is the clocked run of
+its constant step from tick `0`, whatever tick it opens at; and a cut after `0` full ticks is the
+word itself. -/
+theorem rest_word_is_cut_at_zero {B : Type*} [Fintype B] {K : Type*} [Field K] {M : B → Type*}
+    [∀ b, AddCommGroup (M b)] [∀ b, Module K (M b)] (T : BlockOp K M) (t₀ : ℕ)
+    (x : (b : B) → M b) (n : ℕ) :
+    clockedRun (fun _ => tick T) t₀ x n = trajectory T x n ∧
+      clockedRun (fun _ => tick T) (t₀ + 0) (clockedRun (fun _ => tick T) t₀ x 0) n =
+        trajectory T x n := by
+  have h : ∀ t₀ n, clockedRun (fun _ => tick T) t₀ x n = trajectory T x n := by
+    intro t₀ n
+    induction n with
+    | zero => rfl
+    | succ n ih => simp only [clockedRun, trajectory, ih]
+  exact ⟨h t₀ n, by rw [Nat.add_zero]; exact h t₀ n⟩
+
+/-- [proved-derived; formal-checked] **The pumped word opens at zero and is linear in its open
+state** (`word_opens_at_zero` on the cumulative clock): with a block operator `T t` at each tick
+(the pump's phase read from the tick), the clocked run from the zero state is zero at every step
+and is linear in its open state. So at rest (`A = I`, no carried interior) the word opened at any
+tick `T` is the run from the imposed moment alone. -/
+theorem pumped_word_opens_at_zero {B : Type*} [Fintype B] {K : Type*} [Field K] {M : B → Type*}
+    [∀ b, AddCommGroup (M b)] [∀ b, Module K (M b)] (T : ℕ → BlockOp K M) (t₀ : ℕ) :
+    (∀ n, clockedRun (fun t => tick (T t)) t₀ 0 n = 0) ∧
+      ∀ (a : K) (x x' : (b : B) → M b) (n : ℕ),
+        clockedRun (fun t => tick (T t)) t₀ (a • x + x') n =
+          a • clockedRun (fun t => tick (T t)) t₀ x n +
+            clockedRun (fun t => tick (T t)) t₀ x' n := by
+  constructor
+  · intro n
+    induction n with
+    | zero => rfl
+    | succ n ih => funext y; simp [clockedRun, tick, ih]
+  · intro a x x' n
+    induction n with
+    | zero => rfl
+    | succ n ih =>
+      funext y
+      simp only [clockedRun, tick, ih, Pi.add_apply, Pi.smul_apply, map_add, map_smul,
+        Finset.sum_add_distrib, Finset.smul_sum]
+
+/-- [proved-derived; formal-checked] **The cut after the junction reflects one hop.** If the carry
+held the change after the last junction, `J T y`, the next word's first junction scatters it again;
+the junction is an involution, so the hop at `T` runs on the unscattered `y`
+(`HNN/Propagation.junctionScattering_involutive`), where the uninterrupted word runs it on `J T y`:
+the crossing's scattering is undone, one hop of total reflection. -/
+theorem cut_after_junction_reflects {X Φ : Type*} (J : ℕ → X → X) (hop : Φ → Φ → X → X)
+    (phase : ℕ → Φ) (T : ℕ) (hJ : ∀ z, J T (J T z) = z) (y : X) :
+    pumpedStep J hop phase T (J T y) = hop (phase (T - 1)) (phase T) y ∧
+      pumpedStep J hop phase T y = hop (phase (T - 1)) (phase T) (J T y) := by
+  simp [pumpedStep, hJ]
+
+/-- [proved-derived; formal-checked] **The after-junction cut does not compose**: with the identity
+hop and the reflecting junction `x ↦ −x` (an involution) over `ℚ`, the after-junction carry reads
+`1` where the uninterrupted word reads `−1`. -/
+theorem cut_after_junction_differs :
+    pumpedStep (fun _ (x : ℚ) => -x) (fun (_ _ : Unit) (x : ℚ) => x) (fun _ => ()) 0
+        ((fun _ (x : ℚ) => -x) 0 1) ≠
+      pumpedStep (fun _ (x : ℚ) => -x) (fun (_ _ : Unit) (x : ℚ) => x) (fun _ => ()) 0 1 := by
+  norm_num [pumpedStep]
+
+/-- [proved-derived; formal-checked] **On the concrete junction**: the junction scattering of
+`HNN/Propagation` is an involution (`junctionScattering_involutive`), so a carry held after it
+reflects the first hop exactly as `cut_after_junction_reflects` states. -/
+theorem junction_cut_reflects {V : Type*} [AddCommGroup V] [Module ℝ V] {ι : Type*} [Fintype ι]
+    {Φ : Type*} (Y : ℝ) (G : ι → ℝ) (hY : Y ≠ 0) (hsum : admittanceSum Y G ≠ 0)
+    (hop : Φ → Φ → V × (ι → V) → V × (ι → V)) (phase : ℕ → Φ) (T : ℕ) (y : V × (ι → V)) :
+    pumpedStep (fun _ => junction Y G) hop phase T (junction Y G y) =
+      hop (phase (T - 1)) (phase T) y :=
+  (cut_after_junction_reflects (fun _ => junction Y G) hop phase T
+    (junctionScattering_involutive Y G hY hsum) y).1
+
+end Cut
+
 /-! ## 6. The lift point and its readings -/
 
 section Lift
@@ -862,6 +1009,13 @@ section Audit
 #print axioms fieldStanding
 #print axioms contemporary_read
 #print axioms lift_reading
+#print axioms clockedRun_add
+#print axioms reception_cut_composes
+#print axioms rest_word_is_cut_at_zero
+#print axioms pumped_word_opens_at_zero
+#print axioms cut_after_junction_reflects
+#print axioms cut_after_junction_differs
+#print axioms junction_cut_reflects
 
 end Audit
 

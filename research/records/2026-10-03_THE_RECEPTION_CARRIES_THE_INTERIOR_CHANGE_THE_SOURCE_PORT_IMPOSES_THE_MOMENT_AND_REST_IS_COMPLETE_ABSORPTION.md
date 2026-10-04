@@ -475,6 +475,14 @@ pump's work and integrates, exactly as the uninterrupted word's step at `T`. The
 reset nor skipped, so the refusal under `A = 0` is lifted. It was not a missing law of the pump: the
 carried tick counted a hop that never ran.
 
+[formal-checked, #300] The cut composes on the cumulative clock: a word run to its last crossing
+and continued from the change arriving there is the uninterrupted word, in its states, its hop and
+pump phases at every later tick and every per-hop balance (Lean
+`HNN/Retention.reception_cut_composes`, from `clockedRun_add`). The rest word is its case `T = 0`
+(`rest_word_is_cut_at_zero`, `pumped_word_opens_at_zero`). The theorem is the clock's composition
+at fixed operands. On the executed word the deposit and the ingest between the words are the chained
+balance's terms, and the opening's split at the lattice is its separate residual.
+
 **What the carry first built did.** It carried the change after the last junction at tick
 `T + 1` (#285, #292). Besides the pump's refusal, the next word's first junction scattered crossing
 `T` a second time. The junction is the reflection `2P_D − I` about its participation anchor, an
@@ -483,7 +491,9 @@ storage the reception left unchanged, it therefore restored the waves from befor
 Hop `T` then ran on unscattered waves: each element received its own previous output, and each
 transit sent the arrived waves straight back into their channels. That is one hop of total
 reflection at every node, at every reception. The scattering is power-neutral, a `W`-isometry, so
-every balance still closed and the chain fixture's checks could not see it.
+every balance still closed and the chain fixture's checks could not see it. [formal-checked, #300]
+`HNN/Retention.{cut_after_junction_reflects, junction_cut_reflects}` state the reflected hop, and
+`cut_after_junction_differs` shows the after-junction cut is not the uninterrupted word.
 
 **The receipts read on that carry.** Their closures and dissipativity stand, since the double
 crossing is a `W`-isometry, but each per-reception value they report includes the reflected hop.
@@ -501,7 +511,9 @@ transit advances on. So the deposit holds `C′_r w′_r = C_r w_r`, as it holds
 §3; `held_resonator_rate`). The carry keeps `π_r` beside the contacts' momenta. A deposit on the
 stiffness or the pump strength does same-state work `½⟨u, ΔK_t u⟩` at the carried phase.
 `PowerForm::held` reads both, and the opening's crossing applies the same hold
-(`ReceptionCarry::crossed`).
+(`ReceptionCarry::crossed`). [formal-checked, #300] `HNN/PumpCarry.resonator_held_momentum` is
+`HNN/DepositHold.hold_energy` at the stiffness pair `(K_φ, K′_φ)` of the carried phase, and
+`resonator_stiffness_deposit` its case `C′_r = C_r`.
 
 **The chained balance at the crossing.** Word `k`'s balance is read to the crossing it carries
 (`WordBalance::carried`): its end is `P(crossing) = P(end) − last`, the power before the last
@@ -514,7 +526,13 @@ P_open(k+1) + R_open(k+1) = interior + resonator_interior + deposition_k + inges
 ```
 
 `ChainedBalance::dissipative` keeps the resonators' end storage on its left and the carried storage
-on its right.
+on its right. [formal-checked, #300] `HNN/PumpCarry.{carried_reads_to_crossing,
+resonator_opening_closes, resonator_reception_dissipative, resonator_chain_dissipative}` state the
+read to the crossing, the opening line, each reception's dissipativity and the chain's. One
+hypothesis is read from the owners, not proved: the ingest leaves the held resonators' storage
+unchanged, since the lift moves only the contacts' conductances. The pumped chain's exact closure
+(`the_chained_balance_closes_on_a_pumped_field`) and the crossing's unit test
+(`a_carried_change_crosses_the_next_openings_references`) pin it.
 
 **The exact limit.** At `A = I` the word opens at rest at tick `T`. On a field with no declared
 resonator that is today's word exactly, whatever the tick (`tests/reference.rs`,
