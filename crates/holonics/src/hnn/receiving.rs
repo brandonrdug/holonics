@@ -781,6 +781,64 @@ impl ActiveAddress {
         self.reader.synchronize(field, current)
     }
 
+    /// [definition; agent-inferred, October 4; the reception carry §10] **The register's text**, a
+    /// part of a continuing state: `address` with its letters newest first (`b` the boundary, `c` a
+    /// cell's code, `f` a bundle's cell and features), and `clocks` with each read ring's ticks
+    /// since the aeon's opening. The reader's family, rings and ends are the field's, and its site
+    /// kinds are the constitution's, read again at the restore.
+    pub fn write(&self, s: &mut String) {
+        use crate::hnn::state_text::line;
+        line(
+            s,
+            "address",
+            self.letters.iter().map(|letter| match letter {
+                Letter::Boundary => "b".to_string(),
+                Letter::Cell(code) => format!("c{code}"),
+                Letter::Bundle(bundle) => format!("f{}.{}", bundle.cell, bundle.features),
+            }),
+        );
+        line(s, "clocks", self.reader.clocks.iter().map(Clock::ticks));
+    }
+
+    /// **The register continued from its text** ([`ActiveAddress::write`]) on a register of the
+    /// same field: refused, typed, where the depth or the clocks' count differs or a letter is out
+    /// of its form.
+    pub fn continued<'a>(
+        mut self,
+        head: &str,
+        next: crate::hnn::state_text::Next<'_, 'a>,
+    ) -> Result<Self, HnnError> {
+        use crate::hnn::state_text::{keyed, refused, value, values};
+        let what = "the address register";
+        let letters = keyed(head, "address", what)?
+            .into_iter()
+            .map(|word| {
+                Ok(match (word.get(..1), word.get(1..)) {
+                    (Some("b"), Some("")) => Letter::Boundary,
+                    (Some("c"), Some(code)) => Letter::Cell(value(Some(&code), what)?),
+                    (Some("f"), Some(rest)) => {
+                        let (cell, features) = rest.split_once('.').ok_or(HnnError::ContinuingState { what })?;
+                        Letter::Bundle(Bundle {
+                            cell: value(Some(&cell), what)?,
+                            features: value(Some(&features), what)?,
+                        })
+                    }
+                    _ => return refused(what),
+                })
+            })
+            .collect::<Result<Vec<_>, HnnError>>()?;
+        let ticks: Vec<BigUint> = values(&keyed(next("the register's clocks")?, "clocks", what)?, what)?;
+        if letters.len() != self.letters.len() || ticks.len() != self.reader.clocks.len() {
+            return refused("the address register against the field's declaration");
+        }
+        self.letters = letters;
+        for ((clock, ring), ticks) in self.reader.clocks.iter_mut().zip(&self.reader.rings).zip(&ticks) {
+            *clock = ring.rest.clone();
+            clock.advance(ticks);
+        }
+        Ok(self)
+    }
+
     /// **Read the contacts' site kinds from the published constitution** (the resident's, after
     /// each ingest: [`LetterReader::refresh`]).
     pub fn refresh(
@@ -1290,6 +1348,13 @@ impl ReceivingPhases {
     /// epoch that holds no cell (`A | n`, the last micro-state alone) is not read.
     pub fn windows(&self, cells: usize) -> Result<Vec<Range<usize>>, HnnError> {
         receiving_windows(cells, self.aperture)
+    }
+
+    /// [definition; agent-inferred, October 4; the reception carry §10] **The phases with the rank
+    /// read at their declaring medium**: a restored resident's admitted family keeps the rank its
+    /// declaration read, not one read at the restored medium.
+    pub(crate) fn with_rank(self, rank: usize) -> Self {
+        Self { rank, ..self }
     }
 
     /// `L_R = ⌈1/ε_bits⌉`.

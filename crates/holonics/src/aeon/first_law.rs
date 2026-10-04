@@ -325,6 +325,12 @@ impl EnclosedLedger {
         &self.aeon
     }
 
+    /// [definition; agent-inferred, October 4; the reception carry §10] **The ledger continued at
+    /// an aeon in progress**: its balance as a saved state carried it.
+    pub fn resumed(aeon: EnclosedBalance) -> Self {
+        Self { aeon }
+    }
+
     /// One step from the occurrence reached to `next`, into exchange or deposition.
     fn step(&mut self, next: ExactInterval, deposition: bool) -> Result<(), AeonError> {
         let at = self.aeon.closing.take().ok_or(AeonError::NoOccurrence)?;

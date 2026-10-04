@@ -159,6 +159,7 @@ pub(crate) mod realization;
 pub mod receiving;
 pub mod reference;
 pub mod retention;
+pub(crate) mod state_text;
 pub mod ring;
 pub mod word;
 

@@ -7738,6 +7738,14 @@ pub struct ContinuingState {
     /// its consumer mounts it beside the restored constitution
     /// ([`crate::hnn::reference::Reference::mount_carried`]).
     carry: Option<ReceptionCarry>,
+    /// [definition; agent-inferred, October 4; the reception carry §10] The resident's passage
+    /// between two windows, as its owner writes it (`crate::hnn::reference`'s `passage` module):
+    /// the lift point, the open moment, the aeon in progress, the first law's balance, the charts,
+    /// the address register and the admitted ranks. `None` where the state was taken from a
+    /// constitution alone. It is resident motion, read on the field by its consumer
+    /// ([`crate::hnn::reference::Reference::mount_continued`]); here its lines are carried inside
+    /// the check.
+    passage: Option<String>,
 }
 
 /// [definition; agent-inferred, October 4; the reception carry §9] **A ring's learned material**:
@@ -8029,6 +8037,7 @@ impl Constitution {
             storage_product: self.storage_product.clone(),
             material: self.material_identity(),
             carry: None,
+            passage: None,
         })
     }
 
@@ -8471,13 +8480,25 @@ impl ContinuingState {
         Self { carry, ..self }
     }
 
+    /// The resident's passage, as its owner wrote it; `None` for a constitution's state alone.
+    pub fn passage(&self) -> Option<&str> {
+        self.passage.as_deref()
+    }
+
+    /// The state with the resident's passage beside it, written inside the state's check.
+    pub fn with_passage(self, passage: Option<String>) -> Self {
+        Self { passage, ..self }
+    }
+
     /// **The state as text**, every value exact (the type's header): `E rows cols`, the rows,
     /// `rho ρ`, then `state g` and the head's source law's parts ([`write_law`]); `rings n contacts
     /// k`, each ring as `ring h` with its learned material ([`LearnedRing::write`]), each contact as
     /// `contact a` with its factors and `scales`; `lattices n` with `locus exponent` lines; `carries
     /// n` with `locus carrier count` heads and their `index value` lines; `clocks n` with `locus
     /// clock` lines; `released n` with a locus a line; the reception's carried end where one is
-    /// carried ([`ReceptionCarry::write`], absent at rest); `commit c`, `storage-product p`,
+    /// carried ([`ReceptionCarry::write`], absent at rest); `passage n` with the resident's
+    /// passage in its `n` lines, where one is carried
+    /// ([`crate::hnn::reference::Resident::continuing_state`]); `commit c`, `storage-product p`,
     /// `material m` (the identity of the declared material it continues), `check n r` (the byte
     /// length and residue of every line before it, [`text_residue`]), `end`.
     pub fn to_text(&self) -> String {
@@ -8520,6 +8541,10 @@ impl ContinuingState {
         }
         if let Some(carry) = &self.carry {
             carry.write(&mut s);
+        }
+        if let Some(passage) = &self.passage {
+            s += &format!("passage {}\n", passage.lines().count());
+            s += passage;
         }
         s += &format!("commit {}\n", self.commit);
         s += &format!("storage-product {}\n", self.storage_product);
@@ -8705,6 +8730,20 @@ impl ContinuingState {
         } else {
             None
         };
+        // The resident's passage, where one was written: its lines whole, read on the field by
+        // its consumer.
+        let passage = if line.starts_with("passage ") {
+            let count = number(head(line, "passage", "the passage")?.first(), "the passage")?;
+            let mut passage = String::new();
+            for _ in 0..count {
+                passage += next(&mut lines, "a passage line")?;
+                passage.push('\n');
+            }
+            line = next(&mut lines, "the commit")?;
+            Some(passage)
+        } else {
+            None
+        };
         let commit: u64 = head(line, "commit", "the commit")?
             .first()
             .and_then(|c| c.parse().ok())
@@ -8737,6 +8776,7 @@ impl ContinuingState {
             storage_product,
             material,
             carry,
+            passage,
         })
     }
 }

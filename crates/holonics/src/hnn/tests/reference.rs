@@ -685,7 +685,8 @@ fn the_exposures_retained_state_saves_and_restores_whole() {
         .unwrap();
     assert_eq!(resumed.constitution(), retained);
     assert_eq!(resumed.carried(), exposure.carried.as_ref());
-    // The restored resident continues the passage where it stopped, as the retained one does.
+    // A constitution's state alone opens a new moment at cell zero, past the tree's population; the
+    // passage continues only with the resident's passage (§10).
     assert!(matches!(
         reference.expose_with(&field, &cut, resumed.constitution().clone()),
         Err(HnnError::Context(ContextError::PopulationReached { .. }))
@@ -1003,3 +1004,74 @@ fn several_pending_ratios_are_one_chain_in_refine_order_and_the_chained_balance_
     assert!(chained.closes() && chained.dissipative());
 }
 
+
+/// The reception carry §10: a passage stopped at a window's opening is saved with the resident's
+/// passage (its lift point, open moment, aeon in progress, first-law balance, charts, address
+/// register and admitted ranks), read back from its text, mounted on the declared opening, and
+/// continued at the epoch its moment's cells reach. The two runs together are the whole run: the
+/// same retained constitution and carried end, the curve's points in order, the aeons with their
+/// first laws, and the machine's code lengths summed exactly. The cut stops after four windows
+/// (cell 8) and its one aeon closes at cell 11, inside the continued run.
+#[test]
+fn a_saved_passage_continues_at_its_epoch_as_the_whole_run() {
+    use crate::hnn::constitution::{Constitution, ContinuingState};
+    let length = cut_length();
+    let field = chain_of(length as u64);
+    let cut = Cut {
+        cells: source(length, 81),
+        held_out: vec![2..4, length - 4..length],
+    };
+    let reference = Reference::new(64, OPEN_BUDGET);
+    let whole = reference.expose(&field, &cut).unwrap();
+    assert!(whole.complete);
+    assert_eq!(whole.aeons.len(), 1);
+    let mounted = reference.mount(&field, &Current::at_rest(&field)).unwrap();
+    let (prefix, resident) = reference
+        .clone()
+        .with_deadline(4)
+        .expose_continuing(&field, &cut, mounted)
+        .unwrap();
+    assert_eq!(prefix.deadline, Some(8));
+    assert!(prefix.aeons.is_empty());
+    let ring = (0..field.rings().len()).find(|&g| field.is_source(g)).unwrap();
+    let state = resident.continuing_state(ring).unwrap();
+    assert!(state.passage().is_some());
+    let read = ContinuingState::from_text(&state.to_text()).unwrap();
+    assert_eq!(read, state);
+    let opening = Constitution::initial(&field, OPEN_BUDGET).unwrap();
+    let restored = reference
+        .mount_continued(&field, &Current::at_rest(&field), opening, &read)
+        .unwrap();
+    assert_eq!(restored.constitution(), resident.constitution());
+    assert_eq!(restored.current(), resident.current());
+    assert_eq!(restored.carried(), resident.carried());
+    assert_eq!(restored.address(), resident.address());
+    assert_eq!(restored.admitted(), resident.admitted());
+    let (rest, _) = reference.expose_continuing(&field, &cut, restored).unwrap();
+    assert!(rest.complete);
+    assert_eq!(rest.retained, whole.retained);
+    assert_eq!(rest.carried, whole.carried);
+    let mut curve = prefix.constitution_curve.clone();
+    curve.extend(rest.constitution_curve[1..].iter().cloned());
+    assert_eq!(curve, whole.constitution_curve);
+    assert_eq!(rest.aeons, whole.aeons);
+    assert_eq!(rest.keys.len(), whole.keys.len());
+    let sum = |a: &ExactInterval, b: &ExactInterval| ExactInterval {
+        lower: &a.lower + &b.lower,
+        upper: &a.upper + &b.upper,
+    };
+    for (p, r, w) in [
+        (&prefix.training, &rest.training, &whole.training),
+        (&prefix.held_out, &rest.held_out, &whole.held_out),
+    ] {
+        assert_eq!(p.cells + r.cells, w.cells);
+        assert_eq!(sum(&p.model, &r.model), w.model);
+        assert_eq!(sum(&p.tree, &r.tree), w.tree);
+        assert_eq!(sum(&p.tree_grain, &r.tree_grain), w.tree_grain);
+        assert_eq!(sum(&p.combined, &r.combined), w.combined);
+    }
+    // A damaged passage is refused by the state's check before any line is read.
+    let mut damaged = state.to_text();
+    damaged = damaged.replacen("\nmoment ", "\nmoment 1", 1);
+    assert!(ContinuingState::from_text(&damaged).is_err());
+}

@@ -861,6 +861,172 @@ impl SourceMoment {
         Ok(passage)
     }
 
+    /// [definition; agent-inferred, October 4; the reception carry §10] **The moment's text**, a
+    /// part of a continuing state: `moment n cursor rings` (the cells ingested, the held cells'
+    /// cursor, the source rings counted), `window` (each held cell's code or `-`), `opening` (the
+    /// lift point at the open), then per source ring `counts g d start end ticks extent leaky`, its
+    /// phase counts `first`, one `offset` line per declared offset, and, where it counts leakily,
+    /// `leaky ρ k s unit` with its maps (`map` lines of `slot value` pairs, the phase map first).
+    /// The alphabet and offsets are the field's and are not written.
+    pub fn write(&self, s: &mut String) {
+        use crate::hnn::state_text::line;
+        *s += &format!("moment {} {} {}\n", self.cells, self.cursor, self.rings.len());
+        line(
+            s,
+            "window",
+            self.window
+                .iter()
+                .map(|code| code.map_or("-".to_string(), |code| code.to_string())),
+        );
+        line(s, "opening", &self.opening);
+        let map = |s: &mut String, map: &BTreeMap<usize, BigInt>| {
+            line(
+                s,
+                "map",
+                map.iter().flat_map(|(slot, value)| [slot.to_string(), value.to_string()]),
+            );
+        };
+        for counts in &self.rings {
+            *s += &format!(
+                "counts {} {} {} {} {} {} {}\n",
+                counts.ring,
+                counts.period,
+                counts.start,
+                counts.end,
+                counts.ticks,
+                counts.extent,
+                u8::from(counts.leaky.is_some())
+            );
+            line(s, "first", &counts.first);
+            for offset in &counts.offset {
+                line(s, "offset", offset);
+            }
+            if let Some(leaky) = &counts.leaky {
+                *s += &format!(
+                    "leaky {} {} {} {}\n",
+                    leaky.modulus, leaky.numerator, leaky.shift, leaky.unit
+                );
+                map(s, &leaky.first);
+                for offset in &leaky.offset {
+                    map(s, offset);
+                }
+            }
+        }
+    }
+
+    /// **The moment read back from its text** ([`SourceMoment::write`]) on a field: refused, typed,
+    /// where a line is out of its form or a count has another shape than the field declares (its
+    /// source rings, their periods, the alphabet and the offsets).
+    pub fn read<'a>(
+        field: &Field,
+        head: &str,
+        next: crate::hnn::state_text::Next<'_, 'a>,
+    ) -> Result<Self, HnnError> {
+        use crate::hnn::state_text::{counted, keyed, refused, value, values};
+        let what = "the moment";
+        let words = keyed(head, "moment", what)?;
+        let [cells, cursor, count] = words[..] else {
+            return refused(what);
+        };
+        let (cells, cursor, count): (u64, usize, usize) = (
+            value(Some(&cells), what)?,
+            value(Some(&cursor), what)?,
+            value(Some(&count), what)?,
+        );
+        let alphabet = field.alphabet();
+        let offsets = field.offsets().to_vec();
+        let reach = offsets.iter().copied().max().unwrap_or(0);
+        let window = keyed(next("the moment's window")?, "window", "the moment's window")?
+            .into_iter()
+            .map(|word| match word {
+                "-" => Ok(None),
+                code => value::<usize>(Some(&code), "the moment's window")
+                    .and_then(|code| if code < alphabet { Ok(Some(code)) } else { refused("the moment's window") }),
+            })
+            .collect::<Result<Vec<_>, _>>()?;
+        let opening: Vec<BigInt> = values(
+            &keyed(next("the moment's opening")?, "opening", "the moment's opening")?,
+            "the moment's opening",
+        )?;
+        if window.len() != reach
+            || cursor > reach
+            || opening.len() != field.rings().len()
+            || count != field.sources().len()
+        {
+            return refused("the moment against the field's declaration");
+        }
+        let read_map = |next: &mut dyn FnMut(&'static str) -> Result<&'a str, HnnError>| -> Result<BTreeMap<usize, BigInt>, HnnError> {
+            let words = keyed(next("a leaky map")?, "map", "a leaky map")?;
+            if words.len() % 2 != 0 {
+                return refused("a leaky map");
+            }
+            words
+                .chunks(2)
+                .map(|pair| Ok((value(pair.first(), "a leaky map")?, value(pair.get(1), "a leaky map")?)))
+                .collect()
+        };
+        let mut rings = Vec::with_capacity(count);
+        for &ring in field.sources() {
+            let head: Vec<u64> = counted(next("a ring's counts")?, "counts", 7, "a ring's counts")?;
+            let period = field.ring(ring).placements().len();
+            if head[0] != ring as u64 || head[1] != period as u64 || head[6] > 1 {
+                return refused("a ring's counts against its declared ring and period");
+            }
+            let first: Vec<u64> =
+                counted(next("a ring's phase counts")?, "first", period * alphabet, "a ring's phase counts")?;
+            let offset = (0..offsets.len())
+                .map(|_| {
+                    counted(
+                        next("a ring's offset counts")?,
+                        "offset",
+                        period * alphabet * alphabet,
+                        "a ring's offset counts",
+                    )
+                })
+                .collect::<Result<Vec<Vec<u64>>, _>>()?;
+            let leaky = if head[6] == 1 {
+                let words = keyed(next("a leaky count")?, "leaky", "a leaky count")?;
+                let [modulus, numerator, shift, unit] = words[..] else {
+                    return refused("a leaky count");
+                };
+                let mut leaky = Leaky {
+                    modulus: value(Some(&modulus), "a leaky count")?,
+                    numerator: value(Some(&numerator), "a leaky count")?,
+                    shift: value(Some(&shift), "a leaky count")?,
+                    unit: value(Some(&unit), "a leaky count")?,
+                    first: read_map(next)?,
+                    offset: Vec::with_capacity(offsets.len()),
+                };
+                for _ in 0..offsets.len() {
+                    leaky.offset.push(read_map(next)?);
+                }
+                Some(leaky)
+            } else {
+                None
+            };
+            rings.push(RingCounts {
+                ring,
+                period,
+                first,
+                offset,
+                start: head[2],
+                end: head[3],
+                ticks: head[4],
+                extent: head[5],
+                leaky,
+            });
+        }
+        Ok(Self {
+            alphabet,
+            offsets,
+            rings,
+            window,
+            cursor,
+            cells,
+            opening,
+        })
+    }
+
     /// `|A|`, the exterior chart the moment counts on.
     pub fn alphabet(&self) -> usize {
         self.alphabet
