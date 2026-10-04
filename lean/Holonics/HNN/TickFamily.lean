@@ -42,8 +42,8 @@ Every law here holds for any tick dependence. The pumped ring's moves only its e
 the edge is read by its ring's element (`LocusMap.Reads`), so its pump phase enters the laws only
 through which tick the word is at.
 
-The resident's standing law with a tick-indexed word and shared loci is `HNN/TickStanding`. [open]
-The resonator's operand on the loaded ring is not stated here (#62).
+The resident's standing law with a tick-indexed word and shared loci is `HNN/TickStanding`; the
+resonator's operand on the loaded ring, its pump phase family and its release are `HNN/LoadedRing`.
 
 `HNN/Propagation`, `HNN/Retention` and `HNN/CarriedStanding` are unchanged. No `sorry`, no `axiom`,
 no `native_decide`.
