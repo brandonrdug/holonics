@@ -32,8 +32,9 @@ fn resonant(field: &Field, theta: Constitution) -> Constitution {
 // half-unit is below those responses: unit 2^-13. No caller step, covector, target or pump changes.
 // Rebase publishes a new native commit before the actual comparison is recomputed.
 fn resolved(field: &Field) -> Constitution {
+    let every = crate::hnn::retention::loci(field).into_iter().collect();
     resonant(field, learning::generic(field, 81))
-        .rebased(Locus::Channel(0), 7).unwrap()
+        .rebased(Locus::Channel(0), 7, &every).unwrap()
 }
 
 fn contact_comparison(

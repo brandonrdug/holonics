@@ -12,17 +12,19 @@ use num_traits::{Signed, Zero};
 use super::learning::{generic, moment, path_with, phases, six_path};
 use super::support::Draw;
 use crate::hnn::HnnError;
-use crate::hnn::constitution::{Constitution, Locus};
+use crate::hnn::constitution::{
+    Constitution, DepositReading, FactorGradient, FactorStep, Family, Locus, Reach,
+};
 use crate::hnn::field::{ConstitutionRead, Current, Field, ReceiverDeclaration};
 use crate::hnn::pending::PendingRatio;
-use crate::hnn::port::{ExecutionPort, Handle};
+use crate::hnn::port::{Deposit, ExecutionPort, Handle};
 use crate::hnn::propagation::Operands;
 use crate::hnn::ratio::{HolonRatio, target_phases};
 use crate::hnn::receiving::{ActiveAddress, ReceivingPhases};
 use crate::hnn::reference::{Reception, Reference, compose, one_hot};
-use crate::hnn::retention::{Diamond, Opens, collapse, loci, retained};
+use crate::hnn::retention::{Diamond, Opens, collapse, loci, retained, retained_on_motion};
 use crate::hnn::word::Word;
-use crate::ratio::{Rat, integer};
+use crate::ratio::{Rat, integer, rat};
 
 /// The anchors `v_R(e_j)` a word reads from an injection on ring 0's storage, at the admitted
 /// receiver's phases: one chart of the operands at rest serves every injection, and the injections
@@ -265,6 +267,29 @@ fn replacing_any_one_retained_item_changes_some_reading() {
 
 /// A compare's deposit on a constitution, computed exactly as the reference composes it.
 fn deposited(field: &Field, theta: &Constitution, pending: &PendingRatio) -> Constitution {
+    deposit_read(field, theta, pending).0
+}
+
+/// [`deposited`] with the deposit's reading.
+fn deposit_read(
+    field: &Field,
+    theta: &Constitution,
+    pending: &PendingRatio,
+) -> (Constitution, DepositReading) {
+    deposit_try(field, theta, pending).unwrap()
+}
+
+/// [`deposit_read`], refusals returned.
+fn deposit_try(
+    field: &Field,
+    theta: &Constitution,
+    pending: &PendingRatio,
+) -> Result<(Constitution, DepositReading), HnnError> {
+    theta.deposited(&compose_deposit(field, theta, pending))
+}
+
+/// A compare's deposit, composed exactly as the reference composes it.
+fn compose_deposit(field: &Field, theta: &Constitution, pending: &PendingRatio) -> Deposit {
     let (word, faces) = pending.read(field, theta).unwrap();
     let targets = [1usize, 0];
     let anchors = target_phases(field, pending.anchor(), 2, &targets).unwrap();
@@ -287,7 +312,7 @@ fn deposited(field: &Field, theta: &Constitution, pending: &PendingRatio) -> Con
         &[],
     )
     .unwrap();
-    theta.deposited(&deposit).unwrap().0
+    deposit
 }
 
 /// Lean `HNN/LatticeDeposit.lattice_deposit_descends` (`HNN/Retention.deposit_descends` at the
@@ -767,4 +792,355 @@ fn a_releasing_collapse_releases_the_carried_motion_its_material_held() {
         .compare(&mut resident, fresh, &one_hot(&[2, 3]))
         .unwrap();
     reference.read(&resident).unwrap();
+}
+
+/// The six rings of the six-ring path split in two: `0–1–2` (source ring 0, receiver ring 2) and
+/// `3–4–5` (source ring 3, every ring reached from a source), which no walk from a source to the
+/// receiver passes.
+fn split_path() -> Field {
+    let base = six_path(2);
+    let declared = crate::hnn::field::FieldDeclaration {
+        rings: (0..6).map(|_| super::support::ring(2, vec![0])).collect(),
+        contacts: [0, 1, 3, 4]
+            .into_iter()
+            .map(|g| super::support::contact(g, g + 1, 1, 0))
+            .collect(),
+        loops: Vec::new(),
+        sources: vec![0, 3],
+        offsets: vec![1],
+        alphabet: 2,
+        step: integer(1),
+        exponent_grain: 1,
+        receivers: base.receivers().to_vec(),
+        crib: base.crib(),
+        population: 1 << 16,
+        lattice: Default::default(),
+    };
+    Field::declare(declared.by_lattice_rule()).unwrap()
+}
+
+/// A collapse onto the receiver's own family changes no step a compare's deposit takes on
+/// `theta` (each family's certified step, gain and moves, the joint reading, the lobe's hold, the
+/// lock's proposal and the medium's pumped rings), and a deposit then the collapse equals the
+/// collapse then the deposit. Returns the deposit's reading.
+fn collapse_changes_no_step(
+    field: &Field,
+    theta: &Constitution,
+    opens: Opens,
+    released: &[Locus],
+) -> DepositReading {
+    let (current, open) = moment(field, 52, 11);
+    let phases = phases(field, theta, &current);
+    let admitted = [phases.clone()];
+    let pending = PendingRatio::produce(
+        &current,
+        &open,
+        &ActiveAddress::boundary(phases.depth()),
+        &phases,
+        0,
+    )
+    .unwrap();
+    let mut collapsed = theta.clone();
+    let reading = collapse(field, &mut collapsed, &admitted, opens).unwrap();
+    for locus in released {
+        assert!(reading.released.contains(locus), "{opens:?}: {locus:?} is released");
+    }
+    let (mut first, whole) = deposit_read(field, theta, &pending);
+    let (second, kept) = deposit_read(field, &collapsed, &pending);
+    assert!(!whole.steps.is_empty(), "{opens:?}: the deposit steps");
+    assert_eq!(whole.steps, kept.steps, "{opens:?}");
+    assert_eq!(whole.joint, kept.joint, "{opens:?}");
+    assert_eq!(whole.lobe, kept.lobe, "{opens:?}");
+    assert_eq!(whole.lock, kept.lock, "{opens:?}");
+    assert_eq!(whole.pumped, kept.pumped, "{opens:?}");
+    collapse(field, &mut first, &admitted, opens).unwrap();
+    assert_ne!(second, collapsed, "the deposit moves the retained loci");
+    assert_eq!(first, second, "{opens:?}");
+    whole
+}
+
+/// [definition; record B §8, the reviewer's gap of October 4] **A collapse that releases a pumped
+/// ring changes no step a deposit takes.** The joint certified step reads the medium's growth (the
+/// contrast ports' `1 + ω`, the span factor `F(s)` of the rings not certified passive) only on the
+/// rings the word's diamond holds, which a stepped difference passes on its way to the receiver's
+/// stations; the collapse releases every other ring. Under the carry, on the split path, the
+/// continuing collapse releases rings 3–5; at rest, on the six-ring path, the rest collapse releases
+/// rings 3–5 too. With ring 4 pumped the deposit reads no pumped ring, and it takes the same steps
+/// on the uncollapsed and the collapsed constitution.
+#[test]
+fn a_collapse_releasing_a_pumped_ring_changes_no_step() {
+    for (field, opens) in [(split_path(), Opens::OnMotion), (six_path(2), Opens::AtRest)] {
+        let theta = super::prediction::pumped_at(&field, generic(&field, 51), 4);
+        let released = [Locus::Resonator(4), Locus::Element(4)];
+        let whole = collapse_changes_no_step(&field, &theta, opens, &released);
+        assert!(whole.pumped.is_none(), "{opens:?}: ring 4 is outside the word's diamond");
+    }
+}
+
+/// [definition; record B §8, the reviewer's gap of October 4] **A collapse that releases a
+/// standing's neighbours changes no lobe hold.** The standing's step leaves the joint certificate
+/// and is held in its lobes, halved with every family whose move reaches a crossed slice. The lobes
+/// held are the slices of the rings the word's diamond holds: an element outside it is read by no
+/// admitted reading. On the six-ring path at rest the standing of ring 3 is retained beside the
+/// element of ring 2, and the elements of rings 3–5 and the standings of rings 4 and 5 are released.
+/// Each contact block is the identity on the node's two coordinates, so on them
+/// `Δ_3 = −q_3 + q_2 + q_4` and `Δ_4 = −q_4 + q_3 + q_5`. The standings are set so that both are
+/// zero there, their nodes, and a hand-built deposit steps `q_3` up on the first coordinate and down
+/// on the second, which turns a slice of ring 3 and one of ring 4 negative: it crosses both. The
+/// collapse zeroes `q_4` and `q_5`, so there `Δ_3 = q_2 − q_3` and `Δ_4 = q_3`, and the same move
+/// crosses neither. The deposit, read on the diamond of the word (rings 0–2), takes the same step
+/// on both, the lobe holds nothing, and a deposit then the collapse equals the collapse then the
+/// deposit.
+#[test]
+fn a_collapse_releasing_a_standings_neighbours_changes_no_lobe_hold() {
+    let field = six_path(2);
+    let standings = [
+        (2, [rat(1, 1), rat(-1, 2), rat(1, 2), rat(1, 1)]),
+        (3, [rat(1, 2), rat(1, 1), rat(-1, 1), rat(1, 2)]),
+        (4, [rat(-1, 2), rat(3, 2), rat(1, 1), rat(-1, 2)]),
+        (5, [rat(-1, 1), rat(1, 2), rat(1, 2), rat(1, 1)]),
+    ];
+    let theta = standings
+        .into_iter()
+        .fold(generic(&field, 51), |theta, (ring, standing)| {
+            theta.with_ports(ring, Some(standing.to_vec()), None, None).unwrap()
+        });
+    let contrasts = theta.standing_contrasts();
+    assert!(contrasts[3][..2].iter().chain(&contrasts[4][..2]).all(Zero::is_zero));
+    let (current, _) = moment(&field, 52, 11);
+    let admitted = [phases(&field, &theta, &current)];
+    let mut collapsed = theta.clone();
+    let reading = collapse(&field, &mut collapsed, &admitted, Opens::AtRest).unwrap();
+    for locus in [Locus::Element(3), Locus::Element(4), Locus::Standing(4), Locus::Standing(5)] {
+        assert!(reading.released.contains(&locus), "{locus:?} is released");
+    }
+    assert!(reading.retained.contains(&Locus::Standing(3)));
+    let deposit = |commit: u64| {
+        Deposit::new(
+            commit,
+            Vec::new(),
+            vec![FactorStep {
+                gradient: FactorGradient::Standing {
+                    ring: 3,
+                    gradient: vec![integer(1 << 12), integer(-(1 << 12)), Rat::zero(), Rat::zero()],
+                    reach: vec![(3, Rat::zero()), (2, integer(1)), (4, Rat::zero())],
+                },
+                energy: Rat::zero(),
+                covector: integer(1),
+            }],
+            Vec::new(),
+        )
+        .with_reach(Reach {
+            receiver: 2,
+            stations: vec![1, 2],
+            entries: vec![0],
+            phases: 1,
+            loci: Diamond::of(&field, &admitted[0]).retained(&field),
+        })
+    };
+    let (mut first, whole) = theta.deposited(&deposit(theta.commit())).unwrap();
+    let (second, kept) = collapsed.deposited(&deposit(collapsed.commit())).unwrap();
+    assert!(
+        whole
+            .steps
+            .iter()
+            .any(|(locus, step)| *locus == Locus::Standing(3) && step.family == Family::Standing),
+        "the standing of ring 3 steps"
+    );
+    assert!(whole.lobe.is_none());
+    assert_eq!(whole.steps, kept.steps);
+    assert_eq!(whole.lobe, kept.lobe);
+    assert_eq!(whole.lock, kept.lock);
+    collapse(&field, &mut first, &admitted, Opens::AtRest).unwrap();
+    assert_ne!(second, collapsed, "the deposit moves the retained standing");
+    assert_eq!(first, second);
+}
+
+/// The six-ring path at rest, its compare's pending ratio and admitted family (the fixtures of the
+/// gates below).
+fn six_path_at_rest(theta: &Constitution) -> (Field, PendingRatio, [ReceivingPhases; 1]) {
+    let field = six_path(2);
+    let (current, open) = moment(&field, 52, 11);
+    let phases = phases(&field, theta, &current);
+    let pending = PendingRatio::produce(
+        &current,
+        &open,
+        &ActiveAddress::boundary(phases.depth()),
+        &phases,
+        0,
+    )
+    .unwrap();
+    (field, pending, [phases])
+}
+
+/// [definition; record B §8, the reviewer's third routes of October 4] **A declared boost refuses
+/// the steps whose word reads its channel, and no others.** A boost's signed stiffness stores
+/// indefinite energy, so no gain is certified through a channel that carries one, and a deposit
+/// whose word reads the channel's transit is refused (`ActiveContact`). A difference stepped at a
+/// locus passes only the channels its word's diamond holds; a released channel's stiffness is zero,
+/// so its signature signs nothing. On the six-ring path at rest, a boost on contact 4 (rings 4–5,
+/// released by the rest collapse) refuses nothing and changes no step, collapsed or not; a boost on
+/// contact 1 (rings 1–2, in the word) refuses the deposit on both.
+#[test]
+fn a_boost_refuses_only_the_steps_whose_word_reads_its_channel() {
+    let field = six_path(2);
+    let signed = |contact: usize| {
+        let k = field.contact(contact).width();
+        generic(&field, 51)
+            .with_contact_signature(&field, contact, (0..k).map(|j| j != 0).collect())
+            .unwrap()
+    };
+    let off = signed(4);
+    collapse_changes_no_step(&field, &off, Opens::AtRest, &[Locus::Channel(4)]);
+    let on = signed(1);
+    let (field, pending, admitted) = six_path_at_rest(&on);
+    let mut collapsed = on.clone();
+    collapse(&field, &mut collapsed, &admitted, Opens::AtRest).unwrap();
+    for theta in [&on, &collapsed] {
+        assert_eq!(
+            deposit_try(&field, theta, &pending).unwrap_err(),
+            HnnError::ActiveContact { contact: 1 }
+        );
+    }
+}
+
+/// [definition; record B §8, the reviewer's third routes and law point of October 4] **The budget
+/// reads the resident's retention.** `B_Θ` refuses a deposit whose successor's exact bits pass it,
+/// and it bounds what the resident holds. After the admitted family's collapse the resident holds
+/// its retention: counted over every unreleased locus, the bits include material the collapse
+/// releases, so a deposit refused before the collapse would pass after it; counted over the word's
+/// diamond alone, they omit material the collapse keeps and later words read, so a deposit would
+/// pass while the retained resident is past `B_Θ`. On the six-ring path, a word opened at rest
+/// reads rings 0–2. With `B_Θ` at the successor's bits on the rest retention (which holds the
+/// word's diamond), the deposit passes against the rest retention on the uncollapsed and the
+/// collapsed constitution alike and commutes with the collapse, while under the carry, whose
+/// collapse keeps all six rings, the same deposit is refused although the word's diamond count
+/// passes.
+#[test]
+fn the_budget_reads_the_residents_retention() {
+    let open = generic(&six_path(2), 51);
+    let (field, pending, admitted) = six_path_at_rest(&open);
+    let (successor, _) = deposit_read(&field, &open, &pending);
+    let word = Diamond::of(&field, &admitted[0]).retained(&field);
+    let rest = retained(&field, &admitted, Opens::AtRest);
+    let carry = retained(&field, &admitted, Opens::OnMotion);
+    let read = successor.bits_within(&rest);
+    assert!(successor.bits_within(&word) <= read);
+    assert!(
+        read < successor.bits_within(&carry),
+        "the carry keeps rings 3–5: {read} against {}",
+        successor.bits_within(&carry)
+    );
+    let theta = super::learning::generic_within(&field, 51, read);
+    let mut collapsed = theta.clone();
+    collapse(&field, &mut collapsed, &admitted, Opens::AtRest).unwrap();
+    let deposit = compose_deposit(&field, &theta, &pending);
+    let (mut first, reading) = theta.deposited_within(&deposit, &rest).unwrap();
+    assert_eq!(reading.bits, successor.exact_bits());
+    let (second, _) = collapsed
+        .deposited_within(&compose_deposit(&field, &collapsed, &pending), &rest)
+        .unwrap();
+    collapse(&field, &mut first, &admitted, Opens::AtRest).unwrap();
+    assert_eq!(first, second);
+    for refused in [theta.deposited_within(&deposit, &carry), theta.deposited(&deposit)] {
+        assert!(matches!(refused, Err(HnnError::ConstitutionBudget { .. })));
+    }
+}
+
+/// [definition; record B §8, the coordinator's two moves of October 4] **A re-base reads the
+/// resident's retention.** The contacts' refining grain re-bases each retained channel, a move of
+/// that channel alone, admitted against `B_Θ`. Counted over every unreleased locus, its bits include
+/// material the collapse releases: a re-base refused before the collapse would pass after it. Its
+/// budget reads the resident's retention and its channel, as a deposit's does. On the six-ring path
+/// at rest, with `B_Θ` at the re-based successor's bits on the rest retention (below its bits on
+/// every locus), contact 0's re-base passes on the uncollapsed and the collapsed constitution
+/// alike, one bit less refuses it on both, and the re-base commutes with the collapse.
+#[test]
+fn a_rebase_reads_the_residents_retention() {
+    let field = six_path(2);
+    let (_, _, admitted) = six_path_at_rest(&generic(&field, 51));
+    let reads = retained(&field, &admitted, Opens::AtRest);
+    let locus = Locus::Channel(0);
+    assert!(reads.contains(&locus));
+    let every: BTreeSet<Locus> = loci(&field).into_iter().collect();
+    let measured = generic(&field, 51).rebased(locus, 3, &every).unwrap();
+    let (read, whole) = (measured.bits_within(&reads), measured.exact_bits());
+    assert!(read < whole, "the released rings hold bits: {read} against {whole}");
+    let theta = super::learning::generic_within(&field, 51, read);
+    let mut collapsed = theta.clone();
+    let reading = collapse(&field, &mut collapsed, &admitted, Opens::AtRest).unwrap();
+    assert!(reading.released.contains(&Locus::Element(4)));
+    let mut first = theta.rebased(locus, 3, &reads).unwrap();
+    let second = collapsed.rebased(locus, 3, &reads).unwrap();
+    assert_eq!(first.contact_storage(0), second.contact_storage(0));
+    collapse(&field, &mut first, &admitted, Opens::AtRest).unwrap();
+    assert_eq!(first, second);
+    let tight = super::learning::generic_within(&field, 51, read - 1);
+    for theta in [tight.clone(), {
+        let mut c = tight;
+        collapse(&field, &mut c, &admitted, Opens::AtRest).unwrap();
+        c
+    }] {
+        assert!(matches!(
+            theta.rebased(locus, 3, &reads),
+            Err(HnnError::ConstitutionBudget { .. })
+        ));
+    }
+}
+
+/// [definition; record B §8, the coordinator's two moves of October 4] **The executed source step
+/// reads the retention under the carry.** The executed comparison's step moves the receiving ring's
+/// source port alone, admitted against `B_Θ`, and its refinement's words continue under the carry,
+/// so the resident it bounds is the retention that collapse keeps for the declared ring
+/// ([`retained_on_motion`]). On the split path the continuing collapse releases rings 3–5. With
+/// `B_Θ` at the stepped successor's bits on that retention (below its bits on every locus), the
+/// step passes on the uncollapsed and the collapsed constitution alike with the same reading, one
+/// bit less refuses it on both, and the step commutes with the collapse.
+#[test]
+fn the_source_step_reads_the_retention_under_the_carry() {
+    let field = split_path();
+    let open = generic(&field, 51);
+    let (current, _) = moment(&field, 52, 11);
+    let admitted = [phases(&field, &open, &current)];
+    let reads = retained_on_motion(&field, &[admitted[0].ring()]);
+    assert_eq!(reads, retained(&field, &admitted, Opens::OnMotion));
+    let ring = field.sources()[0];
+    let port = open.source_port(ring).unwrap().clone();
+    let unit = |n: usize| (0..n).map(|j| integer(i64::from(j == 0))).collect::<Vec<_>>();
+    let samples = [crate::hnn::constitution::Sample {
+        weight: integer(1),
+        feature: unit(port.columns()),
+        covector: unit(port.rows()),
+    }];
+    let step = integer(1);
+    let every: BTreeSet<Locus> = loci(&field).into_iter().collect();
+    let (measured, _) = open.stepped_source(ring, &samples, &step, &every).unwrap().unwrap();
+    let (read, whole) = (measured.bits_within(&reads), measured.exact_bits());
+    assert!(read < whole, "the released rings hold bits: {read} against {whole}");
+    let collapsed_at = |theta: &Constitution| {
+        let mut collapsed = theta.clone();
+        let reading = collapse(&field, &mut collapsed, &admitted, Opens::OnMotion).unwrap();
+        assert!(reading.retained.contains(&Locus::SourcePort(ring)));
+        assert!(reading.released.contains(&Locus::Element(4)));
+        collapsed
+    };
+    let theta = super::learning::generic_within(&field, 51, read);
+    let collapsed = collapsed_at(&theta);
+    let (mut first, before) = theta.stepped_source(ring, &samples, &step, &reads).unwrap().unwrap();
+    let (second, after) =
+        collapsed.stepped_source(ring, &samples, &step, &reads).unwrap().unwrap();
+    let unbilled = |step: crate::hnn::constitution::SourceStep| {
+        crate::hnn::constitution::SourceStep { bits: 0, ..step }
+    };
+    assert_eq!(unbilled(before), unbilled(after));
+    assert_ne!(first.source_port(ring), theta.source_port(ring), "the step moves the port");
+    collapse(&field, &mut first, &admitted, Opens::OnMotion).unwrap();
+    assert_eq!(first, second);
+    let tight = super::learning::generic_within(&field, 51, read - 1);
+    for theta in [collapsed_at(&tight), tight] {
+        assert!(matches!(
+            theta.stepped_source(ring, &samples, &step, &reads),
+            Err(HnnError::ConstitutionBudget { .. })
+        ));
+    }
 }

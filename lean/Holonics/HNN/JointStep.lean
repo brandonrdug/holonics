@@ -15,8 +15,8 @@ refuses the step (`ActiveContact`); and the budget `B_Θ` bounds the successor's
 of the word's opened diamond (`Reach::loci`, `Diamond::retained`; its rings the rings whose element
 the word holds, `reads_ring`), and that the budget counts the collapse's retained set: the stop rule
 makes `B_Θ` a bound on the resident (`hnn::constitution`, module header "The budget and stop
-rule"), and the retained set is invariant under the collapse. The Rust's release-law fix carries
-that rule; it is not yet on main at this writing (the main line's branch, head `052d72c2`).
+rule"), and the retained set is invariant under the collapse. The Rust carries that rule
+(`Constitution::deposited_within`, the budget over `retention::retained`).
 
 Here the joint step is any such deposit:
 
@@ -63,8 +63,8 @@ Here the joint step is any such deposit:
 [agent-inferred] **What it leaves open.** That the Rust's `Reach::loci` lies within the loci its
 collapse retains (record B §8: at rest the word's opened diamond and the collapse diamond are the
 same, and under the carry the continuing diamond keeps every locus a walk passes), and that its
-budget counts that retained set, are the Rust release-law fix's to show in its fixtures
-(`tests/retention.rs`), not Lean statements here; this file takes the reads on the diamond and the
+budget counts that retained set, are the Rust's fixtures (`tests/retention.rs`), not Lean
+statements here; this file takes the reads on the diamond and the
 budget on the retained set as hypotheses. The carried statistics and remainders in the locus's state (a factor family's `h_x′`,
 a linear locus's successor Gram and chart, the standing's carried remainder) are owed in #62.
 The step's certified descent is `Holon/Deposition`. The moment in the staged deposit (the
