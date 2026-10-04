@@ -51,9 +51,9 @@ edge `g → g` and its state on its ring. Its release, material and motion toget
 pumped tick-indexed word is `HNN/LoadedRing` (`resonator_release_indistinguishable`), on
 `HNN/TickFamily` and `HNN/TickStanding` (`HNN/CarriedStanding`'s second model limit). The loaded
 ring block on the concrete medium is `HNN/LoadedMedium`, whose block family is sparse
-(`loadedOp_sparse`), so the generic `carried_motion_release_indistinguishable'` reads on it. [open]
-The concrete release of a resonator's motion on those blocks, stated as `releaseMotion` is for
-channels, is owed (#62).
+(`loadedOp_sparse`), so the generic `carried_motion_release_indistinguishable'` reads on it. The
+concrete release of a resonator's motion on those blocks, stated as `releaseMotion` is for
+channels, is `HNN/LoadedMotion` (`loaded_motion_release_indistinguishable`).
 
 This closes `HNN/CarriedStanding`'s third model limit (its `retain` keeps the carry whole): the
 carry `carriedStanding` keeps whole and the carry released here give the same admitted readings.

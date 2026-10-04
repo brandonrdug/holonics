@@ -61,7 +61,8 @@ ring's contrast port and the span factor `F(s)` over every resonator not certifi
 (`HNN/FactoredMedium`, module header [open]). The joint step on retained loci, with the carried
 statistics in the locus's state, is owed in #62. The executed split and chart of the lattice word
 are `HNN/Ring`'s and `HNN/LatticeWord`'s; the resonator's held momentum across a deposit is
-`HNN/HeldCommits` and the reception carry's `cross`, a parameter here.
+`HNN/HeldCommits` and the reception carry's `cross`, a parameter here. The release of a
+resonator's motion on these blocks (its state, phase and momentum) is `HNN/LoadedMotion`.
 
 No `sorry`, no `axiom`, no `native_decide`.
 -/
