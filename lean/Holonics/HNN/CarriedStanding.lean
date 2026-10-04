@@ -42,7 +42,8 @@ The model is the Rust as #310 landed (`90cae05a`; `hnn/reference.rs`, `hnn/word.
   (`Diamond::opened`).
 * The collapse keeps the carry whole (`ContinuingState` saves it whole). The Rust's `close_aeon`
   also releases the carried motion on the loci it releases (`ReceptionCarry::released`,
-  `WordOpening::released`; atlas `hnn.carried-motion-released`); the third model limit below.
+  `WordOpening::released`; atlas `hnn.carried-motion-released`); the third model limit below, which
+  `HNN/CarriedMotion` closes.
 
 [proved-derived; formal-checked] **The standing** (`carriedStanding`). The continuing collapse is a
 `Foundation/Standing.StandingLaw` for this resident: every admitted future face, of the current word
@@ -77,7 +78,12 @@ receiver (`windowTicks_agree`). Every face respects it (`observe_agree`).
 3. *The motion release.* `retain` keeps the carry whole. The Rust's `close_aeon` also zeroes the
    carried motion on every channel and resonator it releases: the state and momentum, and a
    resonator's phase (record B §8). The released loci lie off every walk from a source to a
-   receiver. The release of the carried open state is owed in #62.
+   receiver. `HNN/CarriedMotion` proves that release indistinguishable along the continuing chain:
+   on any sparse family (`motion_release_agrees`, `carried_motion_release_indistinguishable'`), so
+   for every carry `carriedStanding` keeps, and on the concrete medium for channels
+   (`releaseMotion_agrees`, `continuing_motion_release_indistinguishable`), with the first law's
+   re-read on the pre-release diamond (`first_law_held_diamond`). The resonator's concrete operand
+   is owed in #62.
 
 The readings carry no epoch bound, since the continuing collapse reads every epoch. That the
 crossing at a block reads only that block's loci is the type of `cross`; which of the medium's
