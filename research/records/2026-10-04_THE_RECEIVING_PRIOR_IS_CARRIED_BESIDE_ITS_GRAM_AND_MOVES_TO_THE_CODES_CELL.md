@@ -110,9 +110,12 @@ is the prior `2^(k−j)`.
 
 The move by `x = 2^j` (prior `s ↦ s/x`) is one atomic successor of the receiving law. If any part
 refuses, the unmoved law stands, the deposit stands, and the refusal is reported.
-- **Map:** `W′ = x W`. This is the map the law located: `L(φ)` is the code along `φ W`. Doubling
-  is exact on the lattice. Halving moves each entry through `map_carry` by its budgeted deposit
-  `(x − 1)W` (`Carry::deposit`, Lean `carry_accounting`), so a remainder is carried, not dropped.
+- **Map:** the map's value moves to `W′ + r′ = x (W + r)`, with `r` the remainder `map_carry`
+  holds. This is the map the law located: `L(φ)` is the code along `φ W`. Each entry moves through
+  `map_carry` by its budgeted deposit `(x − 1)(W + r)` (`Carry::deposit`, Lean
+  `carry_accounting`), so the remainder is scaled with the value and carried, not dropped.
+  Depositing `(x − 1)W` alone would leave `r` unscaled, and the value would not be `x` times
+  itself.
   [agent-inferred] Re-solving `W′ = (W H) X̂′` instead would move the map by a different law, the
   normal equations' minimizer, which the prox iterate `W` is not.
 - **Gram:** `H′ = H + (2^(k′) − 2^k) I` on every diagonal entry. The readings' statistic `G` is
@@ -208,7 +211,7 @@ New tests, at host gate 2. The last runs on the card at gate 3.
 3. **The move.** A field whose pair puts the Newton point in a neighbour's cell checks five things:
    - `k` moves to that neighbour;
    - the Gram's diagonal moves by exactly `2^(k′) − 2^k`;
-   - `W′ = x W` holds up to `map_carry`'s accounting;
+   - `W′ + r′ = x (W + r)` holds exactly, on a fixture whose remainder is nonzero;
    - the chart certifies at `scale = k′`;
    - the pair is rebased by `rebaseAt` exactly, and an immediate re-read holds.
 4. **Held is unchanged.** A `Held(k)` run's receipts are byte-identical to today's.
@@ -222,3 +225,59 @@ New tests, at host gate 2. The last runs on the card at gate 3.
 At the code's landing, the atlas row `hnn.receiving-prior-carry` gains its `R:` owners. The row
 `hnn.receiving-prior-scaled-chart` changes `k declared` to `k founded by the declaration, moved
 where located`. The two owed Lean lemmas (§3, steps 2 and 4) land with it, or go to #62.
+
+## 7. What landed with the code
+
+The Rust follows §§2–6, with these additions, each decided from the law:
+- **Two more held reasons.** `PriorHeld::Carrier` holds `k` where `k′` would pass the carrier's
+  residual shift (`RESIDUAL_SHIFT`), since `2^(k′)` and `2^(−k′)` must stay on the carriers the
+  chart and its remainders use. `PriorHeld::Unread` holds `k` where a stepped receiving map's
+  samples are not a face's `q − p̃` (`prequential_terms` returns `None`), so no term is added and
+  nothing is guessed.
+- **The certificate.** `PriorMove` carries the moved chart's certificate `‖1 − X̂′H′‖∞`, so the
+  reading states the bound `HNN/ChartResidual` reads.
+- **Where the pair is read.** It is read only at a deposit whose covector reached the receiving map
+  (a linear step at `LinearLocus::Receiving`). A deposit that stepped only the source port, or
+  nothing, adds no term: its readings never reached the map. On the chain at its capacity located
+  from `2^6`, the reference port's exposure published 35 deposits and read the pair at 33 of them.
+  It moved six times: `6 → 0`, held at the floor, with certificate `65275/2^28`
+  (`65275 = 5²·7·373`), then one member per move, `0 → 1 → 2 → 3 → 4 → 5`, with certificates
+  `3967/2^26` (3967 prime), `1/2^16`, `1/2^18`, `1/2^20` and `1/2^22`. The climb is the law below.
+- **The climb where no member codes least.** At `V + a ≤ 0` the move exits down (`j = −1`,
+  `k′ = k + 1`), and the rebase keeps that branch: `rebaseAt_add` gives `V′ + a′ = x (V + a)`, and
+  `exit_down_iterate` gives that `V + a ≤ 0` survives every halving with half the map still coding
+  strictly less, and `model_lt_of_add_nonpos` gives that `q` is strictly increasing on `[0, ∞)`
+  there (Lean `HNN/PriorMove`, #318). So while the readings keep `V + a ≤ 0`, no member codes least,
+  and the prior rises one member per read until new readings lift `V + a` above zero or the carrier
+  stops it. That is the law, not a runaway; `j = −1` sets only the pace. `moved_map_accounting`
+  there states the map's move as `W′ + r′ + e = x (W + r)`, with `e` the deposit's staged release.
+- **The carrier limit.** The port's outcome there is a declared reading:
+  `PriorHeld::Carrier`, reported in that deposit's `PriorMove` with `from = to = k`, the deposit
+  standing and the law unmoved. `RESIDUAL_SHIFT = 125` is the `i128` carrier's width (the
+  representation's `2^(L_s + e_H)` with its sign and one bit of headroom), not a chosen constant.
+  The first build checked it only on the cell branch, so the `V + a ≤ 0` branch would have moved
+  past it; `member` now holds there too. The host test
+  `where_no_member_codes_least_the_prior_rises_until_the_carrier_holds_it` reads `j = −1` through
+  the halvings from `k = 5`, `j = −1` at `RESIDUAL_SHIFT − 1`, the hold at `RESIDUAL_SHIFT`, and a
+  law at `k = 125` whose deposit returns it unmoved with the reading `(125, 125, Carrier)`. A chart
+  that refuses to certify before that limit is the declared hold `PriorHeld::Chart`.
+- **The saved law is verified before it is read.** `ContinuingState::from_text` checks the length
+  and residue line before reading any line, and `read_law` refuses a prior past `RESIDUAL_SHIFT`
+  before it forms `2^k`, so a damaged save is refused, never allocated.
+- **The card.** It deposits through the host's `Constitution::deposited`, so a moved Gram, map,
+  chart and pair are the reference's, and the lockstep compares the published constitutions after
+  every deposit. The normal-law mirror re-steps a fixed `2^k` on its kernel, so it skips a deposit
+  whose prior moved and counts it (`NormalMirror::moved`). The card test is
+  `the_card_port_returns_the_reference_across_a_moved_receiving_prior`, at the production
+  reception (the carry).
+- **At rest a map that never leaves zero locates nothing.** On the card's chain and cut at rest,
+  every deposit's move of the receiving map stays below the map's lattice grain at the prior `2^6`
+  and is carried as the map's remainder. The map in force reads zero at every window, so the code
+  along `φ W` is the same at every member, `S = 0`, and all 33 reads hold `k` for want of curvature.
+  No member is distinguishable by those readings, so holding is the law. Under the carry the
+  carried motion reaches the map, it leaves zero, and the same cut moves the prior 22 times in 33
+  reads (`at_rest_the_cards_chain_holds_its_prior_and_under_the_carry_it_moves`). The card test's
+  first run, at rest, read 33 times and moved none, as the law says.
+
+The owed Lean (§2's at-map `carried_eq_sum`, and §3's `q(y/2) < q(y)` at `V + a ≤ 0` and
+`q(2y) ≤ q(y)` at `2y ≤ x`) is filed on #62.
