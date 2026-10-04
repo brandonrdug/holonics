@@ -562,12 +562,13 @@ governs every word's motion, including the motion the next word carries.
 ### 2.6 Where the carried change lives
 
 - **The resident, not the current.** Guard 16 ("`Current` holds the lift point and nothing else";
-  `mod.rs:104`) stays. Under the carry, the resident holds one `EndChange` and its tick. The
-  refinement's return writes them when it consumes its word (a compare, or a discard at the budget
-  stop: the motion happened either way, and a discard carries no deposition work).
-- **One chain.** A refinement opened while another refinement is pending would have no defined
-  predecessor, so under the carry the refine refuses that opening. Exposure holds one pending at a
-  time.
+  `mod.rs:104`) stays. Under the carry, the resident holds one `EndChange` and its tick. The refine
+  that runs a word writes them (amended October 4, §8: this section first had the compare or the
+  discard that consumes the word write them).
+- **One chain, in refine order.** Each refine opens on the end of the last word read, whether that
+  word's comparison is still pending or not, so several pending ratios are consecutive words of one
+  chain (§8). This section first refused a refinement while another was pending, on the reading
+  that it had no defined predecessor; it has one, the word read before it.
 - **The saved state.** The carried change and its tick are part of the continuing state, written
   inside its check (built, §6). A state at rest writes none, so every state written before the carry
   reads back at rest, which is today's law.
@@ -627,7 +628,7 @@ a test path. As built on October 3, today's reception was unchanged unless a car
   word its return consumes (`Word::reception_end`: the change arriving at its last crossing and
   `opened_at` plus the hops it ran, §2.4), after the boundary's absorption (`ReceptionCarry::absorbed`). A discarded pending
   ratio carries its refine's word's end (§2.6). A refinement opened while another is pending is
-  refused (one chain). The resident's state bits count the carried change's nonzero values and its
+  refused (one chain; §8 moves the write to the refine and lifts this refusal). The resident's state bits count the carried change's nonzero values and its
   tick.
 - **A declared resonator carries.** The carry stands at the word's last crossing (§2.4), so the
   carried resonator state and its phase are hop `T − 1`'s and the next word's first pump step is
@@ -638,7 +639,8 @@ a test path. As built on October 3, today's reception was unchanged unless a car
 - at `A = I` the prequential exposure on the chain field returns every reading, deposit, balance
   and curve point of the exposure at rest, bit for bit; only the resident's state bits read more, by
   the carried tick;
-- under `A = 0` every compare writes its consumed word's last crossing at the summed hops, and the
+- under `A = 0` every compare writes its consumed word's last crossing at the summed hops (the refine
+  writes it since §8), and the
   next refine's faces are exactly the read on that opening, opened from the carry as written and
   read back (`ReceptionCarry::{write, read}`); the carried interior moves the read;
 - under `A = 0` the chained balance (`ChainedBalance`, read in `expose_from` at every reception
@@ -776,11 +778,71 @@ declared constitution states, not the order in which the two were built.
   at every reception (§2.6). It is not a tape or a context (§3), and the return stops at the
   opening (§2.5). What the carry changes is which loci the admitted future reads, below.
 
-[agent-inferred] **One chain.** Under the carry a refinement opened while another is pending is
-refused (§2.6), because the field's one motion cannot be in two words at once. The pending
-capacity therefore bounds pending ratios only at rest. Under the default, exposures and readers
-hold one pending at a time. A test that opens several refinements concurrently is a test of the
-rest limit, and declares `Reception::Rest`.
+**One chain, in refine order; several pending ratios are lawful.** [proved-derived from the owners;
+agent-inferred where marked] §2.6 first refused a refinement while another was pending, reading
+that the field's one motion could not be in two words at once. It is not: two refines are two
+consecutive words of that motion, the second after the first. What has to be settled is which end
+the second opens on, and which motion a commit acts on when a deposit lands while later words are
+pending.
+
+- **A word runs at its refine.** The refine reads the word through the constitution standing at its
+  cut and emits its faces; that is the motion. The compare reads the same word against its targets
+  (from the kept read, or read again at the contemporary constitution on the same opening, the
+  module's "kept read" rule) and stages the deposit: it is a reading, not a second run. So the refine
+  writes the resident's carried end (`Reference::refine`, `holonics_cuda::hnn::port`'s refine), and
+  the next refine opens on it whether the compare has come or not. A compare and a discard leave the
+  carry where it stands. In production the two orders agree: every exposure refines, compares and
+  deposits one window at a time (`expose_from`, `contact_ablation`, the receiving read), so no
+  commit falls between a refine and its compare and the kept read is the word that ran.
+- **A commit acts on the motion where it stands.** A deposit published while later words are pending
+  works on the end of the last word read, not on the compared word's. Read in the order the words
+  ran, each reception `k` of the chain is the word opened on word `k − 1`'s end, preceded by every
+  commit published between their refines: none (its deposition work is zero and the form is
+  unchanged), one, or several. Momentum is held across each commit (the deposit record §3), so
+  several commits compose into one, `C‴ w‴ = C w`, and their works telescope into the work of that
+  one, `P_after(x‴) − P_before(x)`. That is the opening line of `ChainedBalance` with `dep k` the
+  composite's work, which `HNN/ChainedBalance.{chain_telescopes, chain_dissipative}` already state for
+  any `dep k`. Nothing new is owed in Lean.
+- **The fixture** (`tests/reference.rs`,
+  `several_pending_ratios_are_one_chain_in_refine_order_and_the_chained_balance_closes`): on the
+  chain field under the default, three refines in a row carry ticks `1, 2, 3` times
+  `steps − 1`, and the chained balance closes and is dissipative at both openings between them with
+  zero deposition work. They return exactly the faces of three refine-compare receptions with no
+  deposit between. Compared in reverse order every compare succeeds and the carry stays at the
+  third word's end; compared in refine order with a deposit after each (the later kept reads stale,
+  so those words are read again), the carry stays there too, and the next word's chained balance,
+  read across those commits as one commit at held momentum from the third word's cut, closes and
+  is dissipative.
+- **What the pending capacity bounds** is the number of words read whose comparisons have not come,
+  under either reception. The tests that held several pending ratios run under the default again:
+  `tests/pending.rs` (the delayed compare against the same ratio taken at once, on the resident as
+  it stood at the refine; after a deposit, against its own word read again on its own opening),
+  `a_compare_returns_the_same_with_and_without_the_refines_kept_read`,
+  `refine_refuses_beyond_the_pending_capacity` and guard eleven, and the card's
+  `the_card_port_returns_the_reference_on_deferred_compares` and
+  `the_card_port_returns_the_reference_through_a_releasing_collapse`.
+  `the_boundary_reaches_the_pending_ratios_and_refuses_out_of_turn` (`tests/retention.rs`) keeps the
+  rest limit for another reason, below: its subject is a collapse onto a narrower family that
+  releases loci, which a connected field has only at rest.
+
+**Retention's bound under the default is the field's walk diamond.** [proved-derived; formal-checked
+in #309, `lean/Holonics/HNN/Retention.lean`] Under `A = 0` the continuing collapse releases exactly
+the loci no walk from a source to an admitted receiver passes
+(`continuing_release_indistinguishable`), and releasing any locus such a walk passes changes a later
+reading (`continuing_walk_edge_is_read`). `Diamond::continuing` decides that walk diamond exactly:
+its recursions run `|rings|` rounds at `e_last = 2·|rings|` (`continuing_recursion`,
+`reachWithin_card`). A connected field releases nothing (`continuing_collapse_connected`), which is
+the six-ring path's none of 156 entries. So under the default retention is bounded by the walk
+diamond of the declared field and admitted receivers: by the field's declaration, never by the
+passage's length. Retention forgets a walk locus only through deposition (a deposit that descends a
+gain), or by an aeon closing onto a family whose walks no longer pass it; no release rule for
+material that falls to the lattice is added, because it would contradict those theorems and would
+need a constitution of its own. [measured, agent-inferred reading] Nor does the carried motion fall
+to zero on its own here: on paths of 6 and 12 rings, after 8 supplied words, 3000 words with no
+supply (an empty moment, the constitution held fixed) never reached the zero change, which is fixed
+under no supply, so reaching it would have repeated, and no change repeated. From the 200th free
+word on, the largest value on each ring, read every 50 words, lay between 2 and 13 units of
+`2^-12`, the transients' lattice (`L_w = 12`). The probe was a scratch run and is not kept.
 
 **Saved states.** A state written at rest writes no carry and reads back with none (§2.6). It now
 restores through one owner, `Reference::mount_continued`. That owner continues the declared opening

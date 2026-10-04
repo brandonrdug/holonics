@@ -4,11 +4,11 @@
 //!
 //! [definition; agent-inferred, October 3] Under a declared carry
 //! (`holonics::hnn::reference::Reception::Carry`) a reception's word opens on the end change the
-//! previous reception's consumed word left. On the card that change **stays on the card**: the
-//! consumed word's storage, arrivals and states are copied into a buffer of their own
+//! previous word read left (its refine writes it, record B §8). On the card that change **stays on
+//! the card**: the word's storage, arrivals and states are copied into a buffer of their own
 //! ([`crate::hnn::execute::ResidentWord::end_words`], nothing crosses the bus), and the next word
 //! copies them into its own change before its open. Beside them the host keeps the carry's exact
-//! mirror, read from the consumed word's record ([`CardCarry::ended`]): the change, the field's
+//! mirror, read from the word's record ([`CardCarry::ended`]): the change, the field's
 //! elapsed ticks, each contact's conductance at the word's cut and its momentum `π_a = C_a w_a`,
 //! the carry the reference holds, so the chained balance, the state's bits and a saved continuing
 //! state read the same carry on either port.
@@ -87,7 +87,7 @@ fn moving(carry: &ReceptionCarry) -> bool {
 }
 
 impl<'c> CardCarry<'c> {
-    /// [definition; the reception carry §2.1, §2.4] **The carried end a consumed word leaves**
+    /// [definition; the reception carry §2.1, §2.4] **The carried end a word leaves**
     /// (`Word::reception_end`): the change arriving at its last crossing, read from its record,
     /// with every resonator state as its last hop left it; that crossing's tick
     /// `opened_at + steps − 1`; each contact's conductance at its cut and momentum `C_a w_a`, and

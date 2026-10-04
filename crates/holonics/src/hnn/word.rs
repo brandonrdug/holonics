@@ -64,7 +64,7 @@
 //! [definition; agent-inferred, October 3; the
 //! [reception carry](../../../../research/records/2026-10-03_THE_RECEPTION_CARRIES_THE_INTERIOR_CHANGE_THE_SOURCE_PORT_IMPOSES_THE_MOMENT_AND_REST_IS_COMPLETE_ABSORPTION.md)]
 //! **Continuing motion across receptions.** Under a declared carry, a reception's word opens on the
-//! interior of the change arriving at the last crossing of the previous reception's consumed word,
+//! interior of the change arriving at the last crossing of the previous word read,
 //! with the source rings' storage imposed by the moment ([`Word::open_received`],
 //! [`ReceptionCarry`]), at that crossing's tick: the field's elapsed ticks are the hops every
 //! earlier word ran, so a declared resonator's pump continues across receptions. The resident, not [`Current`], holds the one carried change and its tick (guard
@@ -362,7 +362,7 @@ pub struct EndChange {
 
 /// [definition; agent-inferred, October 3; the
 /// [reception carry](../../../../research/records/2026-10-03_THE_RECEPTION_CARRIES_THE_INTERIOR_CHANGE_THE_SOURCE_PORT_IMPOSES_THE_MOMENT_AND_REST_IS_COMPLETE_ABSORPTION.md)
-/// §2.1, §2.4] **A reception's carried end**: the change `x_k(end)` the consumed word's motion
+/// §2.1, §2.4] **A reception's carried end**: the change `x_k(end)` the word's motion
 /// reached, arriving at its last crossing, and that crossing's tick `t_(k+1)`, the sum of the hops
 /// every word of the chain executed (record B §2.4: the last junction is a crossing whose hop has
 /// not run, so the next word opens on it and scatters it). It is the field's present motion, of

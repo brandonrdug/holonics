@@ -1,13 +1,8 @@
 //! One cut: a pending ratio is read from its anchor through its producing operands at the
-//! contemporary constitution. With intervening refines and no deposit a delayed compare equals the
-//! immediate one exactly, and so it does across an ingest that extends the moment and steps the lift
+//! contemporary constitution, on the opening its refine opened on. With intervening refines and no
+//! deposit a delayed compare equals the immediate one exactly, and so it does across an ingest that extends the moment and steps the lift
 //! point (the pending ratio holds its own copy of the moment and its anchor); after a deposit it
 //! returns the residual against the emitted face.
-//!
-//! Several pending ratios at one cut exist only at the `A = I` limit, where each word opens at rest:
-//! under the default reception (the carry, the reception carry §8) the field's one motion is in one
-//! word at a time (one chain, §2.6). The tests of concurrent pending ratios declare that limit; the
-//! compare across an ingest needs only one, and runs under the default.
 
 use num_traits::Zero;
 
@@ -15,24 +10,19 @@ use super::learning::{chain, generic};
 use super::support::Draw;
 use crate::hnn::field::Current;
 use crate::hnn::port::{ExecutionPort, ReceiptDetail};
-use crate::hnn::reference::{Reception, Reference, one_hot};
+use crate::hnn::reference::{Reference, one_hot};
 
 /// A cut on the chain: a generic constitution, or the declared initial one (whose first deposit
-/// keeps the constitution small), under the default reception or at its rest limit.
+/// keeps the constitution small).
 fn cut(
     declared: bool,
-    rest: bool,
 ) -> (
     Reference,
     crate::hnn::reference::Resident,
     crate::hnn::port::MomentId,
 ) {
     let field = chain();
-    let reference = if rest {
-        Reference::campaign_one().with_reception(Reception::Rest)
-    } else {
-        Reference::campaign_one()
-    };
+    let reference = Reference::campaign_one();
     let mut resident = if declared {
         reference.mount(&field, &Current::at_rest(&field)).unwrap()
     } else {
@@ -48,18 +38,21 @@ fn cut(
     (reference, resident, moment)
 }
 
-/// Lean `HNN/Retention.contemporary_read`: two pending ratios produced at one cut, with an
-/// intervening refine and no deposit, compare identically, and neither has a residual.
+/// Lean `HNN/Retention.contemporary_read`: a pending ratio compared after intervening refines and
+/// no deposit compares exactly as it did when taken at once (on the resident as it stood at its
+/// refine), and has no residual. Under the carry the intervening refines run the chain's later
+/// words (the reception carry §8); they move no constitution.
 #[test]
 fn a_delayed_compare_with_no_deposit_equals_the_immediate_one() {
-    let (reference, mut resident, moment) = cut(false, true);
+    let (reference, mut resident, moment) = cut(false);
     let phases = resident.admitted()[0].clone();
     let (first, _) = reference.refine(&mut resident, &moment, &phases).unwrap();
-    let (second, _) = reference.refine(&mut resident, &moment, &phases).unwrap();
+    let mut at_once = resident.clone();
     let (_, immediate) = reference
-        .compare(&mut resident, second, &one_hot(&[3, 1]))
+        .compare(&mut at_once, first, &one_hot(&[3, 1]))
         .unwrap();
-    let (_, _) = reference.refine(&mut resident, &moment, &phases).unwrap();
+    reference.refine(&mut resident, &moment, &phases).unwrap();
+    reference.refine(&mut resident, &moment, &phases).unwrap();
     let (_, delayed) = reference
         .compare(&mut resident, first, &one_hot(&[3, 1]))
         .unwrap();
@@ -77,7 +70,7 @@ fn a_delayed_compare_with_no_deposit_equals_the_immediate_one() {
 /// the ingest (on the resident as it stood at the refine), exactly, with no residual.
 #[test]
 fn a_compare_across_an_ingest_equals_one_taken_before_it() {
-    let (reference, mut resident, moment) = cut(false, false);
+    let (reference, mut resident, moment) = cut(false);
     // Close the aeon at the joint clock's next carry-out, so the last ring opens on its section and
     // five cells that step ring 0 at most once cannot carry it out again.
     while !resident.awaiting_boundary() {
@@ -114,13 +107,25 @@ fn a_compare_across_an_ingest_equals_one_taken_before_it() {
     assert!(residual.iter().flatten().all(Zero::is_zero));
 }
 
-/// After a deposit the delayed compare reads the contemporary constitution: its faces are a fresh
-/// refine's wave at the successor with the successor's tree at the targets' addresses (the
-/// landmark tree), and it returns the wave's residual against the face it emitted.
+/// After a deposit the delayed compare reads the contemporary constitution: its faces are its own
+/// word read again at the successor, on the opening it opened on, with the successor's tree at the
+/// targets' addresses (the landmark tree), and it returns the wave's residual against the face it
+/// emitted.
 #[test]
 fn after_a_deposit_the_compare_returns_the_residual_against_the_emitted_face() {
-    let (reference, mut resident, moment) = cut(true, true);
+    let (reference, mut resident, moment) = cut(true);
+    let field = chain();
     let phases = resident.admitted()[0].clone();
+    // The first word of the mount opens at rest; its ratio is produced at its refine's cut.
+    assert!(resident.carried().is_none());
+    let ratio = crate::hnn::PendingRatio::produce(
+        resident.current(),
+        resident.moment(&moment).unwrap(),
+        resident.address(),
+        &phases,
+        resident.constitution().commit(),
+    )
+    .unwrap();
     let (first, emitted) = reference.refine(&mut resident, &moment, &phases).unwrap();
     let emitted = emitted.forward.into_present().unwrap();
     let (second, _) = reference.refine(&mut resident, &moment, &phases).unwrap();
@@ -128,8 +133,14 @@ fn after_a_deposit_the_compare_returns_the_residual_against_the_emitted_face() {
         .compare(&mut resident, second, &one_hot(&[2, 0]))
         .unwrap();
     reference.deposit(&mut resident, staged).unwrap();
-    let (fresh, contemporary) = reference.refine(&mut resident, &moment, &phases).unwrap();
-    let contemporary = contemporary.forward.into_present().unwrap();
+    let (_, contemporary) = ratio
+        .read_on(
+            &field,
+            resident.constitution(),
+            &mut crate::hnn::Charts::new(),
+            &crate::hnn::WordOpening::Rest,
+        )
+        .unwrap();
     let (_, delayed) = reference
         .compare(&mut resident, first, &one_hot(&[2, 0]))
         .unwrap();
@@ -153,7 +164,4 @@ fn after_a_deposit_the_compare_returns_the_residual_against_the_emitted_face() {
         .collect();
     assert_eq!(residual, &expected);
     assert!(residual.iter().flatten().any(|x| !x.is_zero()));
-    reference
-        .discard(&mut resident, crate::hnn::port::Handle::Pending(fresh))
-        .unwrap();
 }

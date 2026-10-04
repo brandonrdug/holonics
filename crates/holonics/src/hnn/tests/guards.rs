@@ -240,7 +240,7 @@ fn guard_eleven_refine_and_compare_leave_the_constitution() {
         .ingest(&mut resident, None, &one_hot(&[2, 2, 1]))
         .unwrap();
     let phases = resident.admitted()[0].clone();
-    // One refinement pending at a time: the carry is the default (the reception carry §2.6, §8).
+    reference.refine(&mut resident, &moment, &phases).unwrap();
     let (pending, _) = reference.refine(&mut resident, &moment, &phases).unwrap();
     assert_eq!(resident.constitution(), &published);
     reference

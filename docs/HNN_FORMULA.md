@@ -822,8 +822,9 @@ receive   f_j = R[P_R^(τ_R) v_R(e_j)] at the receiving epochs, read at the rece
   `hnn::prediction`, was retired September 30, batch H); the refinement owns its words until its
   return (THE_MACHINE guard 16). Under the reception carry, the default since October 4 (`A = 0`;
   rest is its `A = I` limit, the [record](../research/records/2026-10-03_THE_RECEPTION_CARRIES_THE_INTERIOR_CHANGE_THE_SOURCE_PORT_IMPOSES_THE_MOMENT_AND_REST_IS_COMPLETE_ABSORPTION.md) §8),
-  the next reception's word opens on the interior of the change arriving at the consumed word's
-  last crossing, at that crossing's tick so a declared pump continues,
+  the next reception's word opens on the interior of the change arriving at the previous word's
+  last crossing (written by the refine that ran it, so several pending ratios are one chain in
+  refine order), at that crossing's tick so a declared pump continues,
   crossed into the next cut's references: each contact's arriving waves transmitted at the
   junction's reference change, the reflection emitted, and each contact's and resonator's rate held at momentum
   (`Word::open_received`, `ReceptionCarry::crossed`; guard 16 as amended). Such a word moves from

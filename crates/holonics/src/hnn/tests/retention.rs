@@ -535,8 +535,11 @@ fn two_receiver_path() -> Field {
 /// whose reading does not factor through the collapse is refused, naming its separator, and a
 /// pending ratio that factors is carried; a staged deposit that reaches a released locus is refused
 /// with the released loci it would reach and discarded (design (c): `close_aeon` carries every open
-/// handle or refuses it). Several ratios pending at once exist only at the rest limit (`A = I`);
-/// under the carry one chain holds one (record B §8).
+/// handle or refuses it). Narrowing the admitted family releases loci only at the rest limit
+/// (`A = I`): under the carry the collapse keeps every locus a source-to-receiver walk passes, and
+/// on this connected path that is every locus (record B §8, Lean
+/// `HNN/Retention.continuing_collapse_connected`), so the refusals this test reads are the rest
+/// regime's and it declares it. Several pending ratios are lawful under either reception.
 #[test]
 fn the_boundary_reaches_the_pending_ratios_and_refuses_out_of_turn() {
     let field = two_receiver_path();

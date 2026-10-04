@@ -150,8 +150,6 @@ struct PendingSlot<'c> {
     /// The opening the refine's word opened on (the reference's), so a compare that reads again
     /// opens on the same change.
     opening: CardOpening<'c>,
-    /// The refine's word's end under a declared reception carry: what a discard carries.
-    ended: Option<Rc<CardCarry<'c>>>,
 }
 
 impl PendingSlot<'_> {
@@ -569,7 +567,7 @@ impl<'c> Resident<'c> {
     /// [definition; agent-inferred, October 3] **The reception's opening**
     /// (`Reference::with_reception`): the carry at `A = 0` unless declared, as the host's (the
     /// reception carry §8). Each reception's word opens on the change at the last crossing of the
-    /// previous reception's consumed word, kept on the card (`crate::hnn::carry`);
+    /// previous word read, written by its refine and kept on the card (`crate::hnn::carry`);
     /// [`Reception::Rest`] declares the `A = I` limit.
     pub fn with_reception(self, reception: Reception) -> Self {
         Self { reception, ..self }
@@ -785,7 +783,6 @@ type Compared<'c> = (
     ReceivingPhases,
     WallTimes,
     ExactInterval,
-    Option<Rc<CardCarry<'c>>>,
 );
 
 impl<'c> Resident<'c> {
@@ -803,9 +800,8 @@ impl<'c> Resident<'c> {
         let ratio = &slot.ratio;
         let phases = ratio.phases().clone();
         let mut wall = WallTimes::default();
-        let (mut word, faces, ended) = match kept.filter(|kept| kept.commit == commit) {
-            // The kept word is the refine's: its end is the slot's.
-            Some(KeptRead { word, faces, .. }) => (word, faces, slot.ended.clone()),
+        let (mut word, faces) = match kept.filter(|kept| kept.commit == commit) {
+            Some(KeptRead { word, faces, .. }) => (word, faces),
             None => {
                 let start = Instant::now();
                 let publication = Rc::clone(&resident.publication);
@@ -818,16 +814,7 @@ impl<'c> Resident<'c> {
                 )?;
                 resident.tally.read(&word.readings);
                 wall.compare_read = start.elapsed();
-                // The consumed word's end, read before its return (the reception carry §2.1).
-                let ended = match self.reception {
-                    Reception::Rest => None,
-                    Reception::Carry(absorption) => Some(Rc::new(CardCarry::ended(
-                        &word.word,
-                        slot.opening.ticks(),
-                        absorption,
-                    )?)),
-                };
-                (word, faces, ended)
+                (word, faces)
             }
         };
         // The tree part of the combined face at each phase's causal address (the landmark tree): the
@@ -942,7 +929,6 @@ impl<'c> Resident<'c> {
             phases,
             wall,
             code_length,
-            ended,
         ))
     }
 }
@@ -1218,18 +1204,10 @@ impl<'c> ExecutionPort for Resident<'c> {
                 capacity: self.pending_capacity,
             });
         }
-        // One chain under the carry: a refinement opened while another is pending has no defined
-        // predecessor (the reception carry §2.6).
+        // One chain in refine order under the carry, as the reference's (the reception carry §8).
         let opening = match self.reception {
             Reception::Rest => CardOpening::Rest,
             Reception::Carry(absorption) => {
-                if !resident.pending.is_empty() {
-                    return Err(HnnError::Shape {
-                        what: "a refinement under the reception carry while another is pending (one chain)",
-                        expected: 0,
-                        found: resident.pending.len(),
-                    });
-                }
                 match &resident.carried {
                     Some(carry) => CardOpening::Received {
                         carry: Rc::clone(carry),
@@ -1346,9 +1324,12 @@ impl<'c> ExecutionPort for Resident<'c> {
                 moment: snapshot,
                 kept: Some(kept),
                 opening,
-                ended,
             },
         );
+        // The word ran: its end is the motion the next refine opens on (the reference's).
+        if ended.is_some() {
+            resident.carried = ended;
+        }
         Ok((
             id,
             InteractionReturn {
@@ -1401,16 +1382,13 @@ impl<'c> ExecutionPort for Resident<'c> {
             .expect("the slot was read");
         let kept = slot.kept.take();
         match self.compared(resident, &slot, kept, &targets, &field) {
-            Ok((holon, pullback, deposit, receipt, order, phases, wall, code_length, ended)) => {
+            Ok((holon, pullback, deposit, receipt, order, phases, wall, code_length)) => {
                 let PendingSlot {
                     ratio,
                     moment,
                     opening,
                     ..
                 } = slot;
-                if ended.is_some() {
-                    resident.carried = ended;
-                }
                 resident.ledger.arrive(code_length, targets.len() as u64);
                 resident.wall = add(resident.wall, wall);
                 let id = StagedId(resident.fresh());
@@ -1939,13 +1917,8 @@ impl<'c> ExecutionPort for Resident<'c> {
     ) -> Result<InteractionReturn<(), (), (), Vec<ReceivingPhases>, PortReceipt>, HnnError> {
         let bits = match handle {
             Handle::Moment(id) => resident.moments.remove(&id).map(|m| m.host.dense_bits()),
-            Handle::Pending(id) => resident.pending.remove(&id).map(|slot| {
-                // The discarded refinement's word ran: its end carries (the reception carry §2.6).
-                if slot.ended.is_some() {
-                    resident.carried = slot.ended.clone();
-                }
-                slot.bits()
-            }),
+            // The discarded refinement's word ran, and its refine already carried its end.
+            Handle::Pending(id) => resident.pending.remove(&id).map(|slot| slot.bits()),
             Handle::Staged(id) => resident.staged.remove(&id).map(|d| d.bits()),
         }
         .ok_or(HnnError::UnknownHandle { handle })?;
