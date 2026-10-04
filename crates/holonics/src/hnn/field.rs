@@ -241,9 +241,9 @@ pub struct ContactDeclaration {
 /// and its nodes' prior mass exponent `j`, each digit's masses starting at `2^(−j)`
 /// (`compression::landmark::context::LandmarkDeclaration::mass`; KT at `j = 1`), the base
 /// measure those masses are split by (`compression::landmark::context::BaseMeasure`), and the
-/// receiving map's prior scale `k`: its normal law founds at `H_0 = 2^k I`
+/// receiving map's prior ([`ReceivingPrior`]): its normal law founds at `H_0 = 2^k I`
 /// (`hnn::constitution::NormalLaw::with_scaled_prior`; `k = 0` is the unit prior every other law
-/// keeps).
+/// keeps), held there or located by the readings.
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct ReceiverDeclaration {
     pub ring: usize,
@@ -253,7 +253,36 @@ pub struct ReceiverDeclaration {
     pub prior: StopPrior,
     pub mass: u32,
     pub base: BaseMeasure,
-    pub receiving_scale: u32,
+    pub receiving_prior: ReceivingPrior,
+}
+
+/// [definition; agent-inferred, October 4; the
+/// [prior carry's design](../../../../research/records/2026-10-04_THE_RECEIVING_PRIOR_IS_CARRIED_BESIDE_ITS_GRAM_AND_MOVES_TO_THE_CODES_CELL.md)
+/// §5] **The receiving map's prior as declared**: founded at `2^k I` and either held there, or
+/// located by the readings' prequential pair from there (Lean `HNN/PriorCarry`): the law carries
+/// the pair beside its Gram and moves `k` to the code's cell on the dyadic grid
+/// (`hnn::constitution::LocatedPrior`). The moving law is opt-in, as the reception carry was,
+/// because it changes the HNN's behaviour: every field declared before it holds its prior.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub enum ReceivingPrior {
+    /// The prior `2^k I`, held.
+    Held(u32),
+    /// The prior founded at `2^from I` and moved by the readings.
+    Located { from: u32 },
+}
+
+impl ReceivingPrior {
+    /// `k` at the founding.
+    pub fn scale(&self) -> u32 {
+        match *self {
+            ReceivingPrior::Held(k) | ReceivingPrior::Located { from: k } => k,
+        }
+    }
+
+    /// Whether the readings move it.
+    pub fn located(&self) -> bool {
+        matches!(self, ReceivingPrior::Located { .. })
+    }
 }
 
 /// [definition] **The crib as declared**: the `window` cells that open each aeon, read at `offset`.
@@ -310,7 +339,7 @@ impl FieldDeclaration {
     /// chosen on the development cells in the landmark receipt), and prior mass `2^(−3)` (chosen on the
     /// development cells over the ladder `2^(−j)`, `j = 1..B`, charged `⌈log₂ B⌉ = 3` bits: the
     /// contact loop record §25), split by its digit tree's root (`BaseMeasure::Root`, §30–31); the
-    /// receiving map's prior `2I` (`receiving_scale = 1`, located by the readings' prequential
+    /// receiving map's prior `2I` (`ReceivingPrior::Held(1)`, located by the readings' prequential
     /// certificate on campaign 1's 3,400 readings: the receiving prior's October 2 record);
     /// `Δ = {1}`; the crib `W_crib = 64` at offset 1. The population is the cut's length. The carrier
     /// lattices follow [`FieldDeclaration::lattice_by_rule`]: `L = 9, 9, 10, 10` for the four rings'
@@ -368,7 +397,7 @@ impl FieldDeclaration {
                 prior: StopPrior::half(),
                 mass: 3,
                 base: BaseMeasure::Root,
-                receiving_scale: 1,
+                receiving_prior: ReceivingPrior::Held(1),
             }],
             crib: CribDeclaration {
                 window: 64,

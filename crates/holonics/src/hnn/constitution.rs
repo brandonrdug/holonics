@@ -478,7 +478,7 @@ use crate::hnn::HnnError;
 use crate::hnn::contact::{
     certify_boost, contact_conductances, signed_form_certifies, signed_stiffness,
 };
-use crate::hnn::field::{ConstitutionRead, Field, lattice_exponent};
+use crate::hnn::field::{ConstitutionRead, Field, ReceivingPrior, lattice_exponent};
 use crate::hnn::moment::PairPort;
 use crate::hnn::port::Deposit;
 use crate::hnn::propagation::gram;
@@ -1165,7 +1165,8 @@ impl ChartRule {
 /// is carried on the support as integer coordinates (`i128`, with the carrier refused past it), and
 /// every product it takes is an integer product. The founding chart is exact: `H_0 = 2^k I`,
 /// `X̂ = 2^(−k) I`, `δ = 0` ([`SolvedChart::founded`]; `k = 0` is [`SolvedChart::identity`], every
-/// law's but a receiving map's declared otherwise, `ReceiverDeclaration::receiving_scale`).
+/// law's but a receiving map's declared otherwise, `ReceiverDeclaration::receiving_prior`, and a
+/// located prior's chart re-founded at each moved `k`, [`SolvedChart::moved`]).
 ///
 /// A deposit ([`SolvedChart::deposited`]) moves the Gram to `H' = H + Σ w f fᵀ` (carried) and the
 /// chart in three stages, each on the successor's lattice:
@@ -1710,76 +1711,141 @@ impl SolvedChart {
                 (*weight, feature)
             })
             .collect();
-        let target = rule.target();
         let warm = corrected(
             self.carried_to(&carried.support, exponent)?,
             s,
             exponent,
             &features,
         )?;
-        let mut residual = certified(&warm, &carried.coordinates, s, shift);
-        let certificate = residual.as_ref().map(|(_, delta)| delta.clone());
-        let mut block = warm;
-        let limit = rule.refinements(n, carried.norm);
-        let (mut refinements, mut phase, mut cold, mut stalled) = (0u32, 0u32, false, false);
-        loop {
-            if let Some((_, delta)) = &residual
-                && *delta <= target
-            {
-                break;
+        settled(warm, carried, exponent, self.scale, n, rule)
+    }
+
+    /// [definition; agent-inferred, October 4; the
+    /// [prior carry's design](../../../../research/records/2026-10-04_THE_RECEIVING_PRIOR_IS_CARRIED_BESIDE_ITS_GRAM_AND_MOVES_TO_THE_CODES_CELL.md)
+    /// §3] **The chart at a moved prior**: the Gram `gram` is the law's own with its diagonal moved
+    /// to the prior `2^(k′)` (`H′ = H + (2^(k′) − 2^k) I`, the readings' statistic unchanged), and
+    /// the chart follows at scale `k′` (off its support `2^(−k′) I`). The support block is warm-started
+    /// at `x X̂` with `x = 2^(k − k′)`, exact on a lattice `|log₂ x|` finer where `x < 1`: the
+    /// previous chart itself would leave the residual `1 − x⁻¹` on the support, outside the
+    /// contraction at `x = ½`. It is then refined and certified against `H′` as a deposit's chart is
+    /// ([`SolvedChart`]), and refused when `δ_ℓ` is not reached.
+    fn moved(&self, gram: &[Vec<Rat>], scale: u32, rule: &ChartRule) -> Result<(Self, Refinement), HnnError> {
+        let n = gram.len();
+        let moved = Self::founded(scale);
+        let carried = GramBlock::of(gram, &moved.prior())?;
+        let s = carried.support.len();
+        // x = 2^(k − k′): a halving needs the lattice one level finer per halving.
+        let finer = scale.saturating_sub(self.scale);
+        let exponent = rule
+            .exponent(n, carried.norm)
+            .max(self.exponent + finer)
+            .max(scale);
+        if exponent + carried.exponent > RESIDUAL_SHIFT {
+            return Err(ExactLinearError::ExtentOverflow.into());
+        }
+        if s == 0 {
+            let chart = Self { exponent, ..moved };
+            let refinement = Refinement {
+                warm: Some(Rat::zero()),
+                refinements: 0,
+                cold: false,
+                residual_bits: 0,
+            };
+            return Ok((chart, refinement));
+        }
+        let mut warm = self.carried_to(&carried.support, exponent)?;
+        let overflow = || HnnError::from(ExactLinearError::ExtentOverflow);
+        for value in &mut warm {
+            *value = if scale >= self.scale {
+                *value >> (scale - self.scale)
+            } else {
+                value
+                    .checked_mul(1i128 << (self.scale - scale))
+                    .ok_or_else(overflow)?
+            };
+        }
+        settled(warm, carried, exponent, scale, n, rule)
+    }
+}
+
+/// **A chart refined to its rule's target from a warm start** (the type's header, [`SolvedChart`]):
+/// the warm block's exact certificate against the carried Gram, then the rounded refinements to
+/// `δ ≤ δ_ℓ`, restarting once from the scaled identity `2^(−a)I` when the warm start does not
+/// contract or a refinement does not lower its certificate; refused when the refinement does not
+/// reach `δ_ℓ` within the rule's count. The chart is at lattice `exponent` and prior scale `scale`.
+fn settled(
+    warm: Vec<i128>,
+    carried: GramBlock,
+    exponent: u32,
+    scale: u32,
+    n: usize,
+    rule: &ChartRule,
+) -> Result<(SolvedChart, Refinement), HnnError> {
+    let s = carried.support.len();
+    let shift = exponent + carried.exponent;
+    let target = rule.target();
+    let mut residual = certified(&warm, &carried.coordinates, s, shift);
+    let certificate = residual.as_ref().map(|(_, delta)| delta.clone());
+    let mut block = warm;
+    let limit = rule.refinements(n, carried.norm);
+    let (mut refinements, mut phase, mut cold, mut stalled) = (0u32, 0u32, false, false);
+    loop {
+        if let Some((_, delta)) = &residual
+            && *delta <= target
+        {
+            break;
+        }
+        let contracting = residual
+            .as_ref()
+            .is_some_and(|(_, delta)| *delta < Rat::one());
+        if !cold && (!contracting || stalled || phase >= limit) {
+            // The scaled identity 2^(−a)I: its residual 1 − 2^(−a)H' is contracting.
+            cold = true;
+            phase = 0;
+            block = vec![0i128; s * s];
+            for a in 0..s {
+                block[a * s + a] = 1i128 << (exponent - carried.norm);
             }
-            let contracting = residual
-                .as_ref()
-                .is_some_and(|(_, delta)| *delta < Rat::one());
-            if !cold && (!contracting || stalled || phase >= limit) {
-                // The scaled identity 2^(−a)I: its residual 1 − 2^(−a)H' is contracting.
-                cold = true;
-                phase = 0;
-                block = vec![0i128; s * s];
-                for a in 0..s {
-                    block[a * s + a] = 1i128 << (exponent - carried.norm);
-                }
-                residual = certified(&block, &carried.coordinates, s, shift);
-                continue;
-            }
-            let failure = || HnnError::from(ExactLinearError::InverseCertificateFailure);
-            if phase >= limit {
+            residual = certified(&block, &carried.coordinates, s, shift);
+            continue;
+        }
+        let failure = || HnnError::from(ExactLinearError::InverseCertificateFailure);
+        if phase >= limit {
+            return Err(failure());
+        }
+        let (p, delta) = residual.as_ref().ok_or_else(failure)?;
+        let Some(next) = refined(&block, p, s, carried.exponent, exponent) else {
+            // A warm refinement that leaves the carrier restarts; a cold one is refused.
+            if cold {
                 return Err(failure());
             }
-            let (p, delta) = residual.as_ref().ok_or_else(failure)?;
-            let Some(next) = refined(&block, p, s, carried.exponent, exponent) else {
-                // A warm refinement that leaves the carrier restarts; a cold one is refused.
-                if cold {
-                    return Err(failure());
-                }
-                stalled = true;
-                continue;
-            };
-            let next_residual = certified(&next, &carried.coordinates, s, shift);
-            stalled = next_residual
-                .as_ref()
-                .is_none_or(|(_, next_delta)| next_delta >= delta);
-            block = next;
-            residual = next_residual;
-            refinements += 1;
-            phase += 1;
-        }
-        let (p, delta) = residual.expect("certified above");
-        let chart = Self {
-            exponent,
-            scale: self.scale,
-            support: carried.support,
-            block,
-            certificate: delta,
+            stalled = true;
+            continue;
         };
-        let refinement = Refinement {
-            warm: certificate,
-            refinements,
-            cold,
-            residual_bits: residual_bits(&p, shift),
-        };
-        Ok((chart, refinement))
+        let next_residual = certified(&next, &carried.coordinates, s, shift);
+        stalled = next_residual
+            .as_ref()
+            .is_none_or(|(_, next_delta)| next_delta >= delta);
+        block = next;
+        residual = next_residual;
+        refinements += 1;
+        phase += 1;
     }
+    let (p, delta) = residual.expect("certified above");
+    let chart = SolvedChart {
+        exponent,
+        scale,
+        support: carried.support,
+        block,
+        certificate: delta,
+    };
+    let refinement = Refinement {
+        warm: certificate,
+        refinements,
+        cold,
+        residual_bits: residual_bits(&p, shift),
+    };
+    Ok((chart, refinement))
 }
 
 /// **One rounded refinement of a dense chart** (a test fixture's reading of the certified residual
@@ -1839,6 +1905,8 @@ pub struct ChartReading {
     pub released: Rat,
     pub read: Rat,
     pub residual_bits: u64,
+    /// A located receiving prior's read at this deposit ([`PriorMove`]); `None` on every other law.
+    pub prior: Option<PriorMove>,
 }
 
 // -------------------------------------------------------------------------------------------
@@ -1871,6 +1939,9 @@ pub struct NormalLaw {
     chart: SolvedChart,
     map_carry: Carry,
     gram_carry: Carry,
+    /// The receiving prior's carried pair where its field declares the prior located
+    /// ([`LocatedPrior`]); `None` on every other law, and on a receiving law whose prior is held.
+    located: Option<LocatedPrior>,
 }
 
 impl NormalLaw {
@@ -1891,6 +1962,7 @@ impl NormalLaw {
             map,
             map_carry: Carry::default(),
             gram_carry: Carry::default(),
+            located: None,
         }
     }
 
@@ -1898,8 +1970,8 @@ impl NormalLaw {
     /// founding chart `X̂ = 2^(−k) I` exact (`δ = 0`, [`SolvedChart::founded`]); `k = 0` is
     /// [`NormalLaw::with_prior`]. [agent-inferred, October 2; the
     /// [record that locates it](../../../../research/records/2026-10-02_THE_READINGS_LOCATE_THE_RECEIVING_PRIOR_BY_THE_PREQUENTIAL_CERTIFICATE.md)]
-    /// The receiving map's prior is a per-field declared scale (`ReceiverDeclaration::receiving_scale`),
-    /// located by the readings' prequential certificate (Lean `HNN/ReceivingPrior.prequential_code_le`):
+    /// The receiving map's prior is a per-field declared scale (`ReceiverDeclaration::receiving_prior`,
+    /// held, or founded and moved where located: [`NormalLaw::with_receiving_prior`]), located by the readings' prequential certificate (Lean `HNN/ReceivingPrior.prequential_code_le`):
     /// on campaign 1's 3,400 readings its alignment changes sign between `I` and `2I`, and `2I` codes
     /// least of the replayed family. It is held to powers of two so the founding chart is exact on
     /// the lattice, and to `k ≥ 0` so the carried Gram's positivity margin is at least the unit
@@ -1920,7 +1992,38 @@ impl NormalLaw {
             map,
             map_carry: Carry::default(),
             gram_carry: Carry::default(),
+            located: None,
         }
+    }
+
+    /// **The receiving map's law as its field declares its prior** ([`ReceivingPrior`]): founded
+    /// at `2^k I` ([`NormalLaw::with_scaled_prior`]), and where the prior is located, carrying the
+    /// prequential pair from zero ([`LocatedPrior`]) so the readings move `k`.
+    pub fn with_receiving_prior(map: ExactRatMatrix, prior: ReceivingPrior) -> Self {
+        Self {
+            located: prior.located().then(|| LocatedPrior::founded(prior.scale())),
+            ..Self::with_scaled_prior(map, prior.scale())
+        }
+    }
+
+    /// The receiving prior this law was founded by: located from its declared `k`, or held at its
+    /// chart's scale (a held prior never moves).
+    pub fn receiving_prior(&self) -> ReceivingPrior {
+        match &self.located {
+            Some(pair) => ReceivingPrior::Located { from: pair.from },
+            None => ReceivingPrior::Held(self.chart.scale),
+        }
+    }
+
+    /// The receiving prior's carried pair, `None` where the prior is held.
+    pub fn located(&self) -> Option<&LocatedPrior> {
+        self.located.as_ref()
+    }
+
+    /// The law with its carried pair replaced (a test's pair at a chosen Newton point).
+    #[cfg(test)]
+    pub(crate) fn with_located(self, located: Option<LocatedPrior>) -> Self {
+        Self { located, ..self }
     }
 
     /// `W`.
@@ -2159,6 +2262,288 @@ impl NormalLaw {
     }
 }
 
+/// [definition; agent-inferred, October 4; the
+/// [prior carry's design](../../../../research/records/2026-10-04_THE_RECEIVING_PRIOR_IS_CARRIED_BESIDE_ITS_GRAM_AND_MOVES_TO_THE_CODES_CELL.md)
+/// §2] **The receiving prior's carried pair**: the prequential code's alignment `a = A₀ + A₁ ln 2`
+/// and curvature `V = S ln 2` at the map in force, with `A₀`, `A₁` and `S` exact (`ln 2` is
+/// irrational, so the representation is unique and nothing is rounded), and the `k` the
+/// declaration founded the prior at. A window's readings add their terms
+/// ([`prequential_terms`]) to `A₀` and `S`; only a move of the prior changes `A₁`
+/// ([`LocatedPrior::rebased`]). The pair after two windows is read from the pair after the first,
+/// so no reading is kept (Lean `HNN/PriorCarry.{carried_append, carried_eq_sum}`).
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct LocatedPrior {
+    from: u32,
+    a0: Rat,
+    a1: Rat,
+    s: Rat,
+}
+
+impl LocatedPrior {
+    /// The pair at its founding: no reading yet, at the declared `2^from I`.
+    fn founded(from: u32) -> Self {
+        Self {
+            from,
+            a0: Rat::zero(),
+            a1: Rat::zero(),
+            s: Rat::zero(),
+        }
+    }
+
+    /// The pair as text's parts and back: `(from, A₀, A₁, S)`.
+    pub fn parts(&self) -> (u32, &Rat, &Rat, &Rat) {
+        (self.from, &self.a0, &self.a1, &self.s)
+    }
+
+    /// The pair from its parts (a continuing state's reading).
+    pub fn from_parts(from: u32, a0: Rat, a1: Rat, s: Rat) -> Self {
+        Self { from, a0, a1, s }
+    }
+
+    /// A window's terms `(Σα_t, Σσ_t)` read at the map in force, added.
+    pub(crate) fn read(&mut self, (alignment, curvature): &(Rat, Rat)) {
+        self.a0 += alignment;
+        self.s += curvature;
+    }
+
+    /// **The pair rebased to the member `x`** (Lean `HNN/PriorCarry.rebaseAt`, `model_rebase`):
+    /// `(a, V) ↦ (x (a − (x − 1) V), x² V)`, which in the exact representation is
+    /// `(A₀, A₁, S) ↦ (x A₀, x (A₁ − (x − 1) S), x² S)`.
+    pub(crate) fn rebased(&self, x: &Rat) -> Self {
+        let one = Rat::one();
+        Self {
+            from: self.from,
+            a0: x * &self.a0,
+            a1: x * (&self.a1 - (x - &one) * &self.s),
+            s: x * x * &self.s,
+        }
+    }
+
+    /// **The member the pair locates** (the design §3), as the exponent `j` of `x = 2^j` with the
+    /// prior at `k` (member `x` is the prior `2^(k − j)`), or the reason it holds. Every comparison
+    /// is the sign of an `r + t ln 2`, read through `ln 2`'s enclosure: a sign inside it holds `k`.
+    /// - `S = 0`: no curvature locates nothing.
+    /// - `V + a ≤ 0`: the code falls toward the zero map at every member; one member,
+    ///   `j = −1`, the least move the evidence asks.
+    /// - Otherwise the `j` whose cell `3x/4 ≤ 1 + a/V ≤ 3x/2` holds the Newton point, the code-least
+    ///   member (Lean `HNN/PriorCarry.grid_member_best_zpow`), with `k − j` floored at `0`: on the
+    ///   members the code descends up to the cell, so `2^0` codes least among the admitted ones.
+    pub(crate) fn member(&self, k: u32) -> Result<(i64, Option<PriorHeld>), HnnError> {
+        if self.s.is_zero() {
+            return Ok((0, Some(PriorHeld::NoCurvature)));
+        }
+        let ln2 = crate::hnn::executed::ln_two()?;
+        // Whether `r + t ln 2 ≤ 0`, `None` inside the enclosure.
+        let at_most_zero = |r: Rat, t: Rat| -> Option<bool> {
+            let low = &r + &t * &ln2.lower;
+            let high = &r + &t * &ln2.upper;
+            match (low.is_positive(), high.is_positive()) {
+                (false, false) => Some(true),
+                (true, true) => Some(false),
+                _ => None,
+            }
+        };
+        let (a0, a1, s) = (&self.a0, &self.a1, &self.s);
+        let two = Rat::from_integer(BigInt::from(2));
+        let (three, four) = (Rat::from_integer(BigInt::from(3)), Rat::from_integer(BigInt::from(4)));
+        // V + a ≤ 0 is A₀ + (S + A₁) ln 2 ≤ 0.
+        match at_most_zero(a0.clone(), s + a1) {
+            None => return Ok((0, Some(PriorHeld::Undecided))),
+            Some(true) => {
+                return Ok((-1, None));
+            }
+            Some(false) => {}
+        }
+        // 2(V + a) ≤ 3xV: the Newton point is at most 3x/2.
+        let below_high = |x: &Rat| at_most_zero(&two * a0, &two * s + &two * a1 - &three * x * s);
+        // 3xV ≤ 4(V + a): the Newton point is at least 3x/4.
+        let above_low = |x: &Rat| at_most_zero(-(&four * a0), &three * x * s - &four * s - &four * a1);
+        let power = |j: i64| -> Rat {
+            let p = BigInt::one() << j.unsigned_abs() as usize;
+            if j >= 0 { Rat::from_integer(p) } else { Rat::new(BigInt::one(), p) }
+        };
+        match below_high(&Rat::one()) {
+            None => return Ok((0, Some(PriorHeld::Undecided))),
+            Some(false) => {
+                // The Newton point lies above the unit's cell: the prior falls, at most to 2^0.
+                let mut j = 1i64;
+                loop {
+                    if j > i64::from(k) {
+                        return Ok((i64::from(k), Some(PriorHeld::Floor)));
+                    }
+                    match below_high(&power(j)) {
+                        None => return Ok((0, Some(PriorHeld::Undecided))),
+                        Some(true) => return Ok((j, None)),
+                        Some(false) => j += 1,
+                    }
+                }
+            }
+            Some(true) => {}
+        }
+        match above_low(&Rat::one()) {
+            None => Ok((0, Some(PriorHeld::Undecided))),
+            Some(true) => Ok((0, None)),
+            Some(false) => {
+                // The Newton point lies below the unit's cell: the prior rises, as far as the chart's
+                // lattice can carry its scale.
+                let mut j = -1i64;
+                loop {
+                    if i64::from(k) - j > i64::from(RESIDUAL_SHIFT) {
+                        return Ok((0, Some(PriorHeld::Carrier)));
+                    }
+                    match above_low(&power(j)) {
+                        None => return Ok((0, Some(PriorHeld::Undecided))),
+                        Some(true) => return Ok((j, None)),
+                        Some(false) => j -= 1,
+                    }
+                }
+            }
+        }
+    }
+}
+
+/// [definition; agent-inferred, October 4; the prior carry's design §3] **Why a located prior's
+/// `k` did not move to its member**: a sign inside `ln 2`'s enclosure, a member below `2^0`
+/// (moved to `0`), a moved chart that did not certify, a scale the chart's lattice cannot carry,
+/// no curvature, or a window whose readings are not a face's `q − p̃` (its terms are not read).
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub enum PriorHeld {
+    Undecided,
+    Floor,
+    Chart,
+    Carrier,
+    NoCurvature,
+    Unread,
+}
+
+/// [definition; agent-inferred, October 4; the prior carry's design §3] **One deposit's read of a
+/// located prior**: `k` before and after, why it stopped short of its member (`None` when it
+/// reached it), and the moved chart's certificate `‖1 − X̂′H′‖∞` where it moved.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct PriorMove {
+    pub from: u32,
+    pub to: u32,
+    pub held: Option<PriorHeld>,
+    pub certificate: Option<Rat>,
+}
+
+impl NormalLaw {
+    /// **The located prior read and moved** (the prior carry's design §3), after a deposit added its
+    /// window's terms: the member the pair locates ([`LocatedPrior::member`]) and, when it differs
+    /// from the prior in force, one atomic successor. With `x = 2^(k − k′)`:
+    /// - the map `W′ = x W`, the map the law located (`L(φ)` is the code along `φ W`), moved through
+    ///   the map's carry by its budgeted deposit `(x − 1) W` so a remainder is carried, not dropped;
+    /// - the Gram `H′ = H + (2^(k′) − 2^k) I`, the readings' statistic unchanged;
+    /// - the chart at scale `k′` ([`SolvedChart::moved`]);
+    /// - the pair rebased by `x` ([`LocatedPrior::rebased`]), so its Newton point lands in the unit's
+    ///   cell and the law does not move again until new readings move it (Lean
+    ///   `HNN/PriorCarry.{newton_rebaseAt, rebase_into_cell}`).
+    ///
+    /// When the chart does not certify, the unmoved law stands and the read says so. `None` on a law
+    /// whose prior is held.
+    pub(crate) fn moved_prior(
+        &self,
+        rule: &ChartRule,
+        at: &mut BudgetedCarry,
+    ) -> Result<Option<(Self, PriorMove)>, HnnError> {
+        let Some(pair) = &self.located else {
+            return Ok(None);
+        };
+        let k = self.chart.scale;
+        let (j, held) = pair.member(k)?;
+        let unmoved = |held| PriorMove {
+            from: k,
+            to: k,
+            held,
+            certificate: None,
+        };
+        if j == 0 {
+            return Ok(Some((self.clone(), unmoved(held))));
+        }
+        let to = u32::try_from(i64::from(k) - j).map_err(|_| ExactLinearError::ExtentOverflow)?;
+        let power = |e: u32| Rat::from_integer(BigInt::one() << e as usize);
+        let mut gram = self.gram.clone();
+        let shift = power(to) - power(k);
+        for (i, row) in gram.iter_mut().enumerate() {
+            row[i] += &shift;
+        }
+        let Ok((chart, _)) = self.chart.moved(&gram, to, rule) else {
+            return Ok(Some((self.clone(), unmoved(Some(PriorHeld::Chart)))));
+        };
+        let x = if j > 0 {
+            power(j as u32)
+        } else {
+            Rat::new(BigInt::one(), BigInt::one() << j.unsigned_abs() as usize)
+        };
+        let (m, n) = (self.map.rows(), self.map.columns());
+        let mut map_carry = self.map_carry.clone();
+        let mut map = self.map.entries().to_vec();
+        let update: Vec<Rat> = map.iter().map(|w| (&x - Rat::one()) * w).collect();
+        map_carry.deposit_all(at, Carrier::Map, &mut map, &update);
+        let certificate = chart.certificate().clone();
+        let moved = Self {
+            map: flat_matrix(m, n, map)?,
+            gram,
+            chart,
+            map_carry,
+            gram_carry: self.gram_carry.clone(),
+            located: Some(pair.rebased(&x)),
+        };
+        Ok(Some((
+            moved,
+            PriorMove {
+                from: k,
+                to,
+                held,
+                certificate: Some(certificate),
+            },
+        )))
+    }
+}
+
+/// [definition; agent-inferred, October 4; the prior carry's design §2] **A window's prequential
+/// terms at the receiving map in force**: with `δ_t = W z_t` the read of reading `z_t` through the
+/// map before the window's deposit (every read of one word's return is read through that map), its
+/// covector `g_t = q − p̃` and masses `p̃` as [`receiving_fisher_face`] derives them,
+/// `(Σ_t w_t ⟨g_t,Re, δ_t,Re⟩, Σ_t |w_t| Var_p̃_t(δ_t,Re))`: the code's alignment and its curvature
+/// in units of `ln 2`. The pair takes the class part only: its law is the code in bits, whose
+/// Hessian in the class exponents is `ln 2 (diag p − p pᵀ)`; the phase pairing belongs to the
+/// phase comparison. `None` where a covector is not a face's `q − p̃`.
+pub fn prequential_terms(samples: &[Sample], map: &ExactRatMatrix) -> Option<(Rat, Rat)> {
+    let (mut alignment, mut curvature) = (Rat::zero(), Rat::zero());
+    for sample in samples.iter().filter(|s| !s.weight.is_zero()) {
+        let masses = face_masses(&sample.covector)?;
+        let read: Vec<Rat> = (0..map.rows())
+            .step_by(2)
+            .map(|i| {
+                (0..map.columns())
+                    .map(|j| map.get(i, j).expect("in range") * &sample.feature[j])
+                    .sum()
+            })
+            .collect();
+        let mean: Rat = masses.iter().zip(&read).map(|(p, d)| p * d).sum();
+        let second: Rat = masses.iter().zip(&read).map(|(p, d)| p * d * d).sum();
+        alignment += &sample.weight
+            * sample.covector.iter().step_by(2).zip(&read).map(|(g, d)| g * d).sum::<Rat>();
+        curvature += sample.weight.abs() * (second - &mean * &mean);
+    }
+    Some((alignment, curvature))
+}
+
+/// **A receiving covector's face masses**: the descent covector is `q − p̃` on its class (even)
+/// entries, so the masses are `p̃ = q − covector`, with `q` the one-hot target at the class whose
+/// entry is positive. `None` where that is not a distribution (a covector that is not a face's).
+fn face_masses(covector: &[Rat]) -> Option<Vec<Rat>> {
+    let mut masses: Vec<Rat> = covector.iter().step_by(2).map(|c| -c).collect();
+    if let Some(target) = (0..masses.len()).find(|&c| masses[c].is_negative()) {
+        masses[target] += Rat::one();
+    }
+    if masses.iter().any(Signed::is_negative) || masses.iter().sum::<Rat>() != Rat::one() {
+        return None;
+    }
+    Some(masses)
+}
+
 /// [definition; agent-inferred] **A normal law's step prepared at its unit step**
 /// ([`NormalLaw::prepare`]): the law with its Gram and chart carried (its map not yet moved), the
 /// unit step `D` in the integral chart, its alignment `a`, its feature moves `b`, the lattice's
@@ -2204,6 +2589,7 @@ impl PreparedStep {
             read: self.rule.read(&released),
             released,
             residual_bits: self.refinement.residual_bits,
+            prior: None,
         };
         Ok((next, reading))
     }
@@ -3319,12 +3705,12 @@ impl Constitution {
             .max()
             .unwrap_or(1);
         let a = field.alphabet();
-        // Each receiving ring's prior scale, from its first declared receiver (as its tree).
-        let receivers: BTreeMap<usize, u32> = field
+        // Each receiving ring's prior, from its first declared receiver (as its tree).
+        let receivers: BTreeMap<usize, ReceivingPrior> = field
             .receivers()
             .iter()
             .rev()
-            .map(|r| (r.ring, r.receiving_scale))
+            .map(|r| (r.ring, r.receiving_prior))
             .collect();
         // Each receiving ring's tree, declared from its first declared receiver.
         let tree = |g: usize| -> Result<Option<Landmarks>, HnnError> {
@@ -3415,9 +3801,9 @@ impl Constitution {
                 };
                 let receiving = receivers
                     .get(&g)
-                    .map(|&scale| {
+                    .map(|&prior| {
                         ExactRatMatrix::zero(2 * a, n)
-                            .map(|map| NormalLaw::with_scaled_prior(map, scale))
+                            .map(|map| NormalLaw::with_receiving_prior(map, prior))
                     })
                     .transpose()?;
                 Ok(RingMaterial {
@@ -3947,12 +4333,12 @@ impl Constitution {
             material.source = Some(NormalLaw::with_prior(source));
         }
         if let Some(receiving) = receiving {
-            // The replaced map keeps the receiving law's declared prior scale.
-            let scale = material
+            // The replaced map keeps the receiving law's declared prior.
+            let prior = material
                 .receiving
                 .as_ref()
-                .map_or(0, |law| law.chart().scale());
-            material.receiving = Some(NormalLaw::with_scaled_prior(receiving, scale));
+                .map_or(ReceivingPrior::Held(0), NormalLaw::receiving_prior);
+            material.receiving = Some(NormalLaw::with_receiving_prior(receiving, prior));
         }
         Ok(self)
     }
@@ -5931,6 +6317,7 @@ impl Constitution {
             stroke: None,
             linear: None,
             factors: Vec::new(),
+            terms: None,
         };
         for (index, step) in steps {
             let refused = |refusal: HnnError| (*index, refusal);
@@ -5960,6 +6347,11 @@ impl Constitution {
                         LinearLocus::Receiving(_) => receiving_metric_samples(&step.samples),
                         _ => None,
                     };
+                    // A located prior's terms read through the map before this window's deposit
+                    // (the prior carry's design §2): no reading meets its own window's deposit.
+                    if law.located.is_some() {
+                        prepared.terms = Some(prequential_terms(&step.samples, law.map()));
+                    }
                     let samples = metric.as_deref().unwrap_or(&step.samples[..]);
                     let mut step_prepared = law.prepare(samples, &rule, at).map_err(refused)?;
                     if let (Some(_), Some(prepared_step)) = (&metric, step_prepared.as_mut()) {
@@ -6035,6 +6427,7 @@ impl Constitution {
             mut stroke,
             mut linear,
             factors,
+            terms,
         } = prepared;
         let mut charts = Vec::new();
         let step_of = |family: Family| {
@@ -6065,9 +6458,33 @@ impl Constitution {
                     // certified step (zero when its alignment was zero: the Gram and chart move,
                     // the map does not).
                     if let Some((_, _, Some(prepared))) = linear.take() {
-                        let (next, reading) = prepared
+                        let (mut next, mut reading) = prepared
                             .stepped(&step_of(Family::Map), at)
                             .map_err(refused)?;
+                        // A located prior reads its window's terms and moves (the prior carry's
+                        // design §3), one atomic successor of the stepped law.
+                        match (&mut next.located, &terms) {
+                            (Some(pair), Some(Some(window))) => {
+                                pair.read(window);
+                                let rule = self.chart_rule(locus).map_err(refused)?;
+                                if let Some((moved, read)) =
+                                    next.moved_prior(&rule, at).map_err(refused)?
+                                {
+                                    next = moved;
+                                    reading.prior = Some(read);
+                                }
+                            }
+                            (Some(_), _) => {
+                                let k = next.chart.scale;
+                                reading.prior = Some(PriorMove {
+                                    from: k,
+                                    to: k,
+                                    held: Some(PriorHeld::Unread),
+                                    certificate: None,
+                                });
+                            }
+                            (None, _) => {}
+                        }
                         *law = next;
                         charts.push(reading);
                     }
@@ -6218,13 +6635,7 @@ pub fn receiving_metric_samples(samples: &[Sample]) -> Option<Vec<Sample>> {
 pub fn receiving_class_metric(samples: &[Sample]) -> Option<Rat> {
     let (mut trace, mut count, mut classes) = (Rat::zero(), 0u64, 0usize);
     for sample in samples.iter().filter(|s| !s.weight.is_zero()) {
-        let mut masses: Vec<Rat> = sample.covector.iter().step_by(2).map(|c| -c).collect();
-        if let Some(target) = (0..masses.len()).find(|&c| masses[c].is_negative()) {
-            masses[target] += Rat::one();
-        }
-        if masses.iter().any(Signed::is_negative) || masses.iter().sum::<Rat>() != Rat::one() {
-            return None;
-        }
+        let masses = face_masses(&sample.covector)?;
         classes = masses.len();
         trace += Rat::one() - masses.iter().map(|p| p * p).sum::<Rat>();
         count += 1;
@@ -6274,13 +6685,7 @@ fn receiving_fisher_face(samples: &[Sample], unit: &[Vec<Rat>]) -> Option<(Rat, 
         let real: Vec<&Rat> = delta.iter().step_by(2).collect();
         let imaginary: Vec<&Rat> = delta.iter().skip(1).step_by(2).collect();
         // The covector is the descent `q − p̃`; the masses are `p̃ = q − covector`.
-        let mut masses: Vec<Rat> = sample.covector.iter().step_by(2).map(|c| -c).collect();
-        if let Some(target) = (0..masses.len()).find(|&c| masses[c].is_negative()) {
-            masses[target] += Rat::one();
-        }
-        if masses.iter().any(Signed::is_negative) || masses.iter().sum::<Rat>() != Rat::one() {
-            return None;
-        }
+        let masses = face_masses(&sample.covector)?;
         let mean: Rat = masses.iter().zip(&real).map(|(p, d)| p * *d).sum();
         let second: Rat = masses.iter().zip(&real).map(|(p, d)| p * *d * *d).sum();
         let variance = second - &mean * &mean;
@@ -6326,6 +6731,9 @@ struct Prepared {
     stroke: Option<BudgetedCarry>,
     linear: Option<(usize, LinearLocus, Option<PreparedStep>)>,
     factors: Vec<FactorPrepared>,
+    /// A located receiving prior's window terms at the map in force ([`prequential_terms`]):
+    /// `None` where the law's prior is held, `Some(None)` where the readings are not a face's.
+    terms: Option<Option<(Rat, Rat)>>,
 }
 
 /// [definition; agent-inferred] **A factor family's step prepared at its unit step** (module
@@ -7141,8 +7549,10 @@ fn certify_storage_growth(
 /// the source port's normal law whole (the map `E`, the carried Gram `H`, the solved chart `X̂` with
 /// its lattice, support and certificate, and the carried remainders of `W` and `H`), the source
 /// navigator's transport modulus `ρ`, the locus's deposit clock `m` (its budgeted carry's precision
-/// reads it), the commit counter and the committed storage growth's product. Nothing else of the
-/// constitution moves under that move, and the state is refused, typed, where anything else has
+/// reads it), every receiving map's normal law whole with its located prior's pair and its clock
+/// (the receiving prior's carry: a moved `k` re-founds the Gram's diagonal and the chart, so a
+/// remount from the declaration would found the wrong prior), the commit counter and the committed
+/// storage growth's product. Nothing else of the constitution moves under that move, and the state is refused, typed, where anything else has
 /// moved (another locus's clock, a released locus, a factor family's remainder), so a restored
 /// state is never partial silently.
 ///
@@ -7166,6 +7576,11 @@ pub struct ContinuingState {
     storage_product: Rat,
     /// The identity of the material the state continues ([`Constitution::material_identity`]).
     material: u128,
+    /// [definition; agent-inferred, October 4; the prior carry's design §4] Every receiving map's
+    /// normal law whole, with its locus's deposit clock: the map, the Gram with its moved
+    /// diagonal, the chart at its scale, the carried remainders and the located pair, which the
+    /// next deposit and the next move read.
+    receiving: Vec<(usize, NormalLaw, u64)>,
     /// [definition; agent-inferred, October 3; the reception carry §2.4] The reception's carried
     /// end ([`ReceptionCarry`]: the change at its last crossing and the field's elapsed ticks), where the state was
     /// written under the carry; `None` at rest (`A = I`, and every state written before the carry).
@@ -7210,9 +7625,13 @@ impl Constitution {
             .and_then(|material| material.source.clone())
             .ok_or(HnnError::MissingSourcePort { ring })?;
         let locus = Locus::SourcePort(ring);
-        if self.clocks.keys().any(|other| *other != locus) {
+        if self
+            .clocks
+            .keys()
+            .any(|other| *other != locus && !matches!(other, Locus::ReceivingMap(_)))
+        {
             return Err(HnnError::ContinuingState {
-                what: "a locus other than the source port has moved",
+                what: "a locus other than the source port and the receiving maps has moved",
             });
         }
         if !self.released.is_empty() {
@@ -7233,6 +7652,15 @@ impl Constitution {
             commit: self.commit,
             storage_product: self.storage_product.clone(),
             material: self.material_identity(ring),
+            receiving: self
+                .rings
+                .iter()
+                .enumerate()
+                .filter_map(|(g, material)| {
+                    let law = material.receiving.clone()?;
+                    Some((g, law, self.clock(Locus::ReceivingMap(g))))
+                })
+                .collect(),
             carry: None,
         })
     }
@@ -7240,8 +7668,8 @@ impl Constitution {
     /// [definition; agent-inferred, October 3] **The identity of the material a continuing state of
     /// ring `g` continues**: the residue ([`text_residue`]) of this constitution's exact written
     /// form (its derived `Debug`, every value exact) with what a continuing state carries set to
-    /// the founding's values: ring `g`'s source law absent and its modulus one, no clock, commit
-    /// zero and storage product one. A move that changes only the source port (all
+    /// the founding's values: ring `g`'s source law absent and its modulus one, every receiving law
+    /// at its founding under its declared prior, no clock, commit zero and storage product one. A move that changes only the source port (all
     /// [`Constitution::continuing_state`] admits) leaves it unchanged, so a state and the declared
     /// opening it continues share it, and a state written against another opening's material
     /// (another field, declaration or founding) is refused at [`Constitution::continued`]. The
@@ -7253,6 +7681,17 @@ impl Constitution {
             founding.source = None;
             founding.transport = Rat::one();
         }
+        // Each receiving law at its founding: a moved prior or a grown pair leaves the identity, the
+        // declared prior (held, or located from its `k`) stays in it.
+        for founding in &mut material.rings {
+            if let Some(law) = &founding.receiving {
+                let (m, n) = (law.map.rows(), law.map.columns());
+                let prior = law.receiving_prior();
+                founding.receiving = ExactRatMatrix::zero(m, n)
+                    .ok()
+                    .map(|map| NormalLaw::with_receiving_prior(map, prior));
+            }
+        }
         material.clocks.clear();
         material.commit = 0;
         material.storage_product = Rat::one();
@@ -7260,7 +7699,8 @@ impl Constitution {
     }
 
     /// **The constitution continued from a checkpoint** ([`ContinuingState`]): the state's source
-    /// port, modulus, clock, commit and storage product placed on this constitution, which must be
+    /// port, modulus, clock, receiving laws with their clocks, commit and storage product placed on
+    /// this constitution, which must be
     /// the declared opening the state continued from (no locus moved, none released, no factor
     /// remainder: refused, typed, otherwise), with the state's port of the declared shape.
     pub fn continued(mut self, state: &ContinuingState) -> Result<Self, HnnError> {
@@ -7297,10 +7737,38 @@ impl Constitution {
                 what: "the state's port or Gram lies off the source port's lattice",
             });
         }
+        for (g, law, _) in &state.receiving {
+            let declared = self
+                .rings
+                .get(*g)
+                .and_then(|material| material.receiving.as_ref())
+                .ok_or(HnnError::MissingReceivingMap { ring: *g })?;
+            if (declared.map.rows(), declared.map.columns()) != (law.map.rows(), law.map.columns())
+                || declared.gram.len() != law.gram.len()
+                || !law.on_lattice(&self.lattice(Locus::ReceivingMap(*g))?)
+            {
+                return Err(HnnError::ContinuingState {
+                    what: "a receiving law off its declared shape or lattice",
+                });
+            }
+        }
+        if self.rings.iter().filter(|material| material.receiving.is_some()).count()
+            != state.receiving.len()
+        {
+            return Err(HnnError::ContinuingState {
+                what: "the state's receiving laws against the declared receiving maps",
+            });
+        }
         self.rings[ring].source = Some(state.law.clone());
         self = self.with_transport(ring, state.transport.clone())?;
         if state.clock > 0 {
             self.clocks.insert(Locus::SourcePort(ring), state.clock);
+        }
+        for (g, law, clock) in &state.receiving {
+            self.rings[*g].receiving = Some(law.clone());
+            if *clock > 0 {
+                self.clocks.insert(Locus::ReceivingMap(*g), *clock);
+            }
         }
         self.commit = state.commit;
         self.storage_product = state.storage_product.clone();
@@ -7342,40 +7810,25 @@ impl ContinuingState {
     }
 
     /// **The state as text**, every value exact (the type's header): `E rows cols`, the rows,
-    /// `rho ρ`, then `state g`, `gram n` with its rows, `chart L_s δ`, `support k` with the support,
-    /// `block` with the chart's integer coordinates, `map-carry k` and `gram-carry k` each with
-    /// `index value` lines, the reception's carried end where one is carried
-    /// ([`ReceptionCarry::write`], absent at rest), `clock m`, `commit c`, `storage-product p`, `material m` (the identity of
-    /// the material it continues), `check n r` (the byte length and residue of every line before it,
-    /// [`text_residue`]), `end`.
+    /// `rho ρ`, then `state g`, the source law's parts ([`write_law`]), `receiving r` with each
+    /// receiving map as `receiving-map g m` (its ring and deposit clock), `map rows cols` with its
+    /// rows and its law's parts, the reception's carried end where one is carried
+    /// ([`ReceptionCarry::write`], absent at rest), `clock m`, `commit c`, `storage-product p`,
+    /// `material m` (the identity of the material it continues), `check n r` (the byte length and
+    /// residue of every line before it, [`text_residue`]), `end`.
     pub fn to_text(&self) -> String {
-        let join = |values: &mut dyn Iterator<Item = String>| values.collect::<Vec<_>>().join(" ");
         let map = &self.law.map;
         let mut s = format!("E {} {}\n", map.rows(), map.columns());
-        for i in 0..map.rows() {
-            s += &join(&mut (0..map.columns()).map(|j| map.get(i, j).expect("in range").to_string()));
-            s.push('\n');
-        }
+        write_rows(&mut s, map);
         s += &format!("rho {}\n", self.transport);
         s += &format!("state {}\n", self.ring);
-        s += &format!("gram {}\n", self.law.gram.len());
-        for row in &self.law.gram {
-            s += &join(&mut row.iter().map(ToString::to_string));
-            s.push('\n');
-        }
-        let chart = &self.law.chart;
-        s += &format!("chart {} {}\n", chart.exponent, chart.certificate);
-        s += &format!("support {}\n", chart.support.len());
-        s += &join(&mut chart.support.iter().map(ToString::to_string));
-        s.push('\n');
-        s += "block\n";
-        s += &join(&mut chart.block.iter().map(ToString::to_string));
-        s.push('\n');
-        for (name, carry) in [("map-carry", &self.law.map_carry), ("gram-carry", &self.law.gram_carry)] {
-            s += &format!("{name} {}\n", carry.0.len());
-            for (index, value) in &carry.0 {
-                s += &format!("{index} {value}\n");
-            }
+        write_law(&mut s, &self.law);
+        s += &format!("receiving {}\n", self.receiving.len());
+        for (g, law, clock) in &self.receiving {
+            s += &format!("receiving-map {g} {clock}\n");
+            s += &format!("map {} {}\n", law.map.rows(), law.map.columns());
+            write_rows(&mut s, &law.map);
+            write_law(&mut s, law);
         }
         if let Some(carry) = &self.carry {
             carry.write(&mut s);
@@ -7430,114 +7883,50 @@ impl ContinuingState {
     /// line out of its form (a remount of `E` and `ρ` alone has no `state` line and is refused here:
     /// it is partial).
     pub fn from_text(text: &str) -> Result<Self, HnnError> {
-        fn refuse<T>(what: &'static str) -> Result<T, HnnError> {
-            Err(HnnError::ContinuingState { what })
-        }
         // The check covers every byte before its own line: a damaged state is refused whole.
         let body = text
             .rfind("\ncheck ")
             .map(|at| &text[..at + 1])
             .ok_or(HnnError::ContinuingState { what: "the check line" })?;
         let mut lines = text.lines();
-        let mut next = |what: &'static str| lines.next().ok_or(HnnError::ContinuingState { what });
-        let rats = |line: &str, what: &'static str| -> Result<Vec<Rat>, HnnError> {
-            line.split_whitespace()
-                .map(|x| x.parse::<Rat>().map_err(|_| HnnError::ContinuingState { what }))
-                .collect()
-        };
-        let head = |line: &str, key: &str, what: &'static str| -> Result<Vec<String>, HnnError> {
-            let mut words = line.split_whitespace();
-            if words.next() != Some(key) {
-                return refuse(what);
-            }
-            Ok(words.map(str::to_string).collect())
-        };
-        let number = |word: Option<&String>, what: &'static str| -> Result<usize, HnnError> {
-            word.and_then(|w| w.parse().ok())
-                .ok_or(HnnError::ContinuingState { what })
-        };
-        let shape = head(next("the port's head")?, "E", "the port's head")?;
-        let (rows, columns) = (
-            number(shape.first(), "the port's rows")?,
-            number(shape.get(1), "the port's columns")?,
-        );
-        let mut map_rows = Vec::with_capacity(rows);
-        for _ in 0..rows {
-            let row = rats(next("a port row")?, "a port row")?;
-            if row.len() != columns {
-                return refuse("a port row's width");
-            }
-            map_rows.push(row);
-        }
-        let map = ExactRatMatrix::shaped(rows, columns, map_rows)?;
-        let rho = head(next("the modulus")?, "rho", "the modulus")?;
+        let shape = head(next(&mut lines, "the port's head")?, "E", "the port's head")?;
+        let map = read_rows(&mut lines, &shape, "the port's shape")?;
+        let rho = head(next(&mut lines, "the modulus")?, "rho", "the modulus")?;
         let transport = rho
             .first()
             .and_then(|x| x.parse::<Rat>().ok())
             .ok_or(HnnError::ContinuingState { what: "the modulus" })?;
         let ring = number(
-            head(next("the state line (a partial remount has none)")?, "state", "the state line")?
-                .first(),
+            head(
+                next(&mut lines, "the state line (a partial remount has none)")?,
+                "state",
+                "the state line",
+            )?
+            .first(),
             "the state's ring",
         )?;
-        let n = number(head(next("the Gram's head")?, "gram", "the Gram's head")?.first(), "the Gram's width")?;
-        let mut gram = Vec::with_capacity(n);
-        for _ in 0..n {
-            let row = rats(next("a Gram row")?, "a Gram row")?;
-            if row.len() != n {
-                return refuse("a Gram row's width");
-            }
-            gram.push(row);
-        }
-        let chart_head = head(next("the chart's head")?, "chart", "the chart's head")?;
-        let exponent = number(chart_head.first(), "the chart's exponent")? as u32;
-        let certificate = chart_head
-            .get(1)
-            .and_then(|x| x.parse::<Rat>().ok())
-            .ok_or(HnnError::ContinuingState { what: "the chart's certificate" })?;
-        let k = number(head(next("the support's head")?, "support", "the support's head")?.first(), "the support's size")?;
-        let support: Vec<usize> = next("the support")?
-            .split_whitespace()
-            .map(|x| x.parse().map_err(|_| HnnError::ContinuingState { what: "the support" }))
-            .collect::<Result<_, _>>()?;
-        if support.len() != k {
-            return refuse("the support's size");
-        }
-        head(next("the block's head")?, "block", "the block's head")?;
-        let block: Vec<i128> = next("the block")?
-            .split_whitespace()
-            .map(|x| x.parse().map_err(|_| HnnError::ContinuingState { what: "the block" }))
-            .collect::<Result<_, _>>()?;
-        if block.len() != k * k {
-            return refuse("the block's size");
-        }
-        let mut carries = Vec::with_capacity(2);
-        for key in ["map-carry", "gram-carry"] {
-            let count = number(head(next("a carry's head")?, key, "a carry's head")?.first(), "a carry's count")?;
-            let mut carry = BTreeMap::new();
-            for _ in 0..count {
-                let line = next("a carried remainder")?;
-                let mut words = line.split_whitespace();
-                let index: usize = words
-                    .next()
-                    .and_then(|w| w.parse().ok())
-                    .ok_or(HnnError::ContinuingState { what: "a remainder's index" })?;
-                let value: Rat = words
-                    .next()
-                    .and_then(|w| w.parse().ok())
-                    .ok_or(HnnError::ContinuingState { what: "a remainder's value" })?;
-                if value.is_zero() {
-                    return refuse("a zero remainder (never stored)");
-                }
-                carry.insert(index, value);
-            }
-            carries.push(Carry(carry));
+        let law = read_law(&mut lines, map)?;
+        let count = number(
+            head(next(&mut lines, "the receiving head")?, "receiving", "the receiving head")?.first(),
+            "the receiving count",
+        )?;
+        let mut receiving = Vec::with_capacity(count);
+        for _ in 0..count {
+            let words = head(next(&mut lines, "a receiving map")?, "receiving-map", "a receiving map")?;
+            let g = number(words.first(), "a receiving map's ring")?;
+            let clock: u64 = words
+                .get(1)
+                .and_then(|m| m.parse().ok())
+                .ok_or(HnnError::ContinuingState { what: "a receiving map's clock" })?;
+            let shape = head(next(&mut lines, "a receiving map's head")?, "map", "a receiving map's head")?;
+            let map = read_rows(&mut lines, &shape, "a receiving map's shape")?;
+            receiving.push((g, read_law(&mut lines, map)?, clock));
         }
         // The reception's carried end, where one is carried; a state at rest goes on to its clock.
-        let mut line = next("the clock")?;
+        let mut line = next(&mut lines, "the clock")?;
         let carry = if line.starts_with("carry ") {
-            let carry = ReceptionCarry::read(line, &mut next)?;
-            line = next("the clock")?;
+            let carry = ReceptionCarry::read(line, &mut |what| next(&mut lines, what))?;
+            line = next(&mut lines, "the clock")?;
             Some(carry)
         } else {
             None
@@ -7547,7 +7936,7 @@ impl ContinuingState {
             .and_then(|m| m.parse().ok())
             .ok_or(HnnError::ContinuingState { what: "the clock" })?;
         let mut scalar = |key: &str, what: &'static str| -> Result<String, HnnError> {
-            head(next(what)?, key, what)?
+            head(next(&mut lines, what)?, key, what)?
                 .into_iter()
                 .next()
                 .ok_or(HnnError::ContinuingState { what })
@@ -7561,42 +7950,230 @@ impl ContinuingState {
         let material: u128 = scalar("material", "the material identity")?
             .parse()
             .map_err(|_| HnnError::ContinuingState { what: "the material identity" })?;
-        let check = head(next("the check line")?, "check", "the check line")?;
+        let check = head(next(&mut lines, "the check line")?, "check", "the check line")?;
         if check.len() != 2
             || check[0].parse::<usize>().ok() != Some(body.len())
             || check[1].parse::<u128>().ok() != Some(text_residue(body))
         {
             return refuse("the check (the state is damaged)");
         }
-        if next("the end")?.trim() != "end" {
+        if next(&mut lines, "the end")?.trim() != "end" {
             return refuse("the end");
         }
-        let gram_carry = carries.pop().expect("two carries");
-        let map_carry = carries.pop().expect("two carries");
+        if law.located.is_some() || law.chart.scale != 0 {
+            return refuse("the source law (founded at the unit prior, with no located pair)");
+        }
         Ok(Self {
             ring,
-            law: NormalLaw {
-                map,
-                gram,
-                // The continuing state is the source port's, founded at `H_0 = I`.
-                chart: SolvedChart {
-                    exponent,
-                    scale: 0,
-                    support,
-                    block,
-                    certificate,
-                },
-                map_carry,
-                gram_carry,
-            },
+            law,
             transport,
             clock,
             commit,
             storage_product,
             material,
+            receiving,
             carry,
         })
     }
+}
+
+/// A continuing state's text refused with its reason.
+fn refuse<T>(what: &'static str) -> Result<T, HnnError> {
+    Err(HnnError::ContinuingState { what })
+}
+
+/// The text's next line, refused at its end.
+fn next<'t>(lines: &mut std::str::Lines<'t>, what: &'static str) -> Result<&'t str, HnnError> {
+    lines.next().ok_or(HnnError::ContinuingState { what })
+}
+
+/// A line's words after its key, refused when the key differs.
+fn head(line: &str, key: &str, what: &'static str) -> Result<Vec<String>, HnnError> {
+    let mut words = line.split_whitespace();
+    if words.next() != Some(key) {
+        return refuse(what);
+    }
+    Ok(words.map(str::to_string).collect())
+}
+
+/// A word read as a count.
+fn number(word: Option<&String>, what: &'static str) -> Result<usize, HnnError> {
+    word.and_then(|w| w.parse().ok())
+        .ok_or(HnnError::ContinuingState { what })
+}
+
+/// A line read as exact values.
+fn rats(line: &str, what: &'static str) -> Result<Vec<Rat>, HnnError> {
+    line.split_whitespace()
+        .map(|x| x.parse::<Rat>().map_err(|_| HnnError::ContinuingState { what }))
+        .collect()
+}
+
+/// A matrix's rows, one line each.
+fn write_rows(s: &mut String, map: &ExactRatMatrix) {
+    for i in 0..map.rows() {
+        let row: Vec<String> = (0..map.columns())
+            .map(|j| map.get(i, j).expect("in range").to_string())
+            .collect();
+        *s += &row.join(" ");
+        s.push('\n');
+    }
+}
+
+/// A matrix of the head's shape read from its rows.
+fn read_rows(
+    lines: &mut std::str::Lines<'_>,
+    shape: &[String],
+    what: &'static str,
+) -> Result<ExactRatMatrix, HnnError> {
+    let (rows, columns) = (number(shape.first(), what)?, number(shape.get(1), what)?);
+    let mut values = Vec::with_capacity(rows);
+    for _ in 0..rows {
+        let row = rats(next(lines, "a map row")?, "a map row")?;
+        if row.len() != columns {
+            return refuse("a map row's width");
+        }
+        values.push(row);
+    }
+    Ok(ExactRatMatrix::shaped(rows, columns, values)?)
+}
+
+/// **A normal law's parts as text** ([`ContinuingState::to_text`]), its map written by its caller:
+/// `gram n` with its rows, `chart L_s δ k`, `support s` with the support, `block` with the chart's
+/// integer coordinates, `map-carry c` and `gram-carry c` each with `index value` lines, and
+/// `located from A₀ A₁ S` or `located none`.
+fn write_law(s: &mut String, law: &NormalLaw) {
+    let join = |values: &mut dyn Iterator<Item = String>| values.collect::<Vec<_>>().join(" ");
+    *s += &format!("gram {}\n", law.gram.len());
+    for row in &law.gram {
+        *s += &join(&mut row.iter().map(ToString::to_string));
+        s.push('\n');
+    }
+    let chart = &law.chart;
+    *s += &format!("chart {} {} {}\n", chart.exponent, chart.certificate, chart.scale);
+    *s += &format!("support {}\n", chart.support.len());
+    *s += &join(&mut chart.support.iter().map(ToString::to_string));
+    s.push('\n');
+    *s += "block\n";
+    *s += &join(&mut chart.block.iter().map(ToString::to_string));
+    s.push('\n');
+    for (name, carry) in [("map-carry", &law.map_carry), ("gram-carry", &law.gram_carry)] {
+        *s += &format!("{name} {}\n", carry.0.len());
+        for (index, value) in &carry.0 {
+            *s += &format!("{index} {value}\n");
+        }
+    }
+    match &law.located {
+        Some(pair) => *s += &format!("located {} {} {} {}\n", pair.from, pair.a0, pair.a1, pair.s),
+        None => *s += "located none\n",
+    }
+}
+
+/// **A normal law read from its parts** ([`write_law`]) beside its map. Refused where the chart's
+/// support is not exactly the Gram's rows that leave the scale's prior `2^k I`, or its lattice is
+/// coarser than its scale.
+fn read_law(lines: &mut std::str::Lines<'_>, map: ExactRatMatrix) -> Result<NormalLaw, HnnError> {
+    let n = number(head(next(lines, "the Gram's head")?, "gram", "the Gram's head")?.first(), "the Gram's width")?;
+    let mut gram = Vec::with_capacity(n);
+    for _ in 0..n {
+        let row = rats(next(lines, "a Gram row")?, "a Gram row")?;
+        if row.len() != n {
+            return refuse("a Gram row's width");
+        }
+        gram.push(row);
+    }
+    let chart_head = head(next(lines, "the chart's head")?, "chart", "the chart's head")?;
+    let exponent = u32::try_from(number(chart_head.first(), "the chart's exponent")?)
+        .map_err(|_| HnnError::ContinuingState { what: "the chart's exponent" })?;
+    let certificate = chart_head
+        .get(1)
+        .and_then(|x| x.parse::<Rat>().ok())
+        .ok_or(HnnError::ContinuingState { what: "the chart's certificate" })?;
+    let scale = u32::try_from(number(chart_head.get(2), "the chart's scale")?)
+        .map_err(|_| HnnError::ContinuingState { what: "the chart's scale" })?;
+    let k = number(head(next(lines, "the support's head")?, "support", "the support's head")?.first(), "the support's size")?;
+    let support: Vec<usize> = next(lines, "the support")?
+        .split_whitespace()
+        .map(|x| x.parse().map_err(|_| HnnError::ContinuingState { what: "the support" }))
+        .collect::<Result<_, _>>()?;
+    if support.len() != k {
+        return refuse("the support's size");
+    }
+    head(next(lines, "the block's head")?, "block", "the block's head")?;
+    let block: Vec<i128> = next(lines, "the block")?
+        .split_whitespace()
+        .map(|x| x.parse().map_err(|_| HnnError::ContinuingState { what: "the block" }))
+        .collect::<Result<_, _>>()?;
+    if block.len() != k * k {
+        return refuse("the block's size");
+    }
+    let mut carries = Vec::with_capacity(2);
+    for key in ["map-carry", "gram-carry"] {
+        let count = number(head(next(lines, "a carry's head")?, key, "a carry's head")?.first(), "a carry's count")?;
+        let mut carry = BTreeMap::new();
+        for _ in 0..count {
+            let line = next(lines, "a carried remainder")?;
+            let mut words = line.split_whitespace();
+            let index: usize = words
+                .next()
+                .and_then(|w| w.parse().ok())
+                .ok_or(HnnError::ContinuingState { what: "a remainder's index" })?;
+            let value: Rat = words
+                .next()
+                .and_then(|w| w.parse().ok())
+                .ok_or(HnnError::ContinuingState { what: "a remainder's value" })?;
+            if value.is_zero() {
+                return refuse("a zero remainder (never stored)");
+            }
+            carry.insert(index, value);
+        }
+        carries.push(Carry(carry));
+    }
+    let located = match head(next(lines, "the located pair")?, "located", "the located pair")?.as_slice() {
+        [none] if none == "none" => None,
+        [from, a0, a1, s] => {
+            let exact = |x: &String| x.parse::<Rat>().map_err(|_| HnnError::ContinuingState { what: "the located pair" });
+            Some(LocatedPrior {
+                from: from
+                    .parse()
+                    .map_err(|_| HnnError::ContinuingState { what: "the located pair's founding" })?,
+                a0: exact(a0)?,
+                a1: exact(a1)?,
+                s: exact(s)?,
+            })
+        }
+        _ => return refuse("the located pair"),
+    };
+    // The scale founds the Gram off its support, the support is exactly the rows that leave
+    // `2^k I` (as `GramBlock::of` reads it), and the scale bounds the chart's lattice from below.
+    let prior = Rat::from_integer(BigInt::one() << scale as usize);
+    let left: Vec<usize> = (0..n)
+        .filter(|&i| {
+            gram[i]
+                .iter()
+                .enumerate()
+                .any(|(j, x)| if i == j { *x != prior } else { !x.is_zero() })
+        })
+        .collect();
+    if left != support || exponent < scale {
+        return refuse("the chart's scale against its Gram and lattice");
+    }
+    let gram_carry = carries.pop().expect("two carries");
+    let map_carry = carries.pop().expect("two carries");
+    Ok(NormalLaw {
+        map,
+        gram,
+        chart: SolvedChart {
+            exponent,
+            scale,
+            support,
+            block,
+            certificate,
+        },
+        map_carry,
+        gram_carry,
+        located,
+    })
 }
 
 impl ConstitutionRead for Constitution {

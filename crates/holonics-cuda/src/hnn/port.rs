@@ -1486,6 +1486,13 @@ impl<'c> ExecutionPort for Resident<'c> {
                     continue;
                 }
                 let locus = step.locus.locus();
+                let moved = reading.charts.iter().any(|(at, chart)| {
+                    *at == locus && chart.prior.as_ref().is_some_and(|read| read.to != read.from)
+                });
+                if moved {
+                    tally.moved += 1;
+                    continue;
+                }
                 let (Some(before), Some(after)) = (
                     normal_law(&resident.constitution, step.locus),
                     normal_law(&next, step.locus),

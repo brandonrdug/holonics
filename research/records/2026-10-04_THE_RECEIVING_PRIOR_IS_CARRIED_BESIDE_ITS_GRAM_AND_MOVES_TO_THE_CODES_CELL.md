@@ -222,3 +222,28 @@ New tests, at host gate 2. The last runs on the card at gate 3.
 At the code's landing, the atlas row `hnn.receiving-prior-carry` gains its `R:` owners. The row
 `hnn.receiving-prior-scaled-chart` changes `k declared` to `k founded by the declaration, moved
 where located`. The two owed Lean lemmas (§3, steps 2 and 4) land with it, or go to #62.
+
+## 7. What landed with the code
+
+The Rust follows §§2–6, with these additions, each decided from the law:
+- **Two more held reasons.** `PriorHeld::Carrier` holds `k` where `k′` would pass the carrier's
+  residual shift (`RESIDUAL_SHIFT`), since `2^(k′)` and `2^(−k′)` must stay on the carriers the
+  chart and its remainders use. `PriorHeld::Unread` holds `k` where a stepped receiving map's
+  samples are not a face's `q − p̃` (`prequential_terms` returns `None`), so no term is added and
+  nothing is guessed.
+- **The certificate.** `PriorMove` carries the moved chart's certificate `‖1 − X̂′H′‖∞`, so the
+  reading states the bound `HNN/ChartResidual` reads.
+- **Where the pair is read.** It is read only at a deposit whose covector reached the receiving map
+  (a linear step at `LinearLocus::Receiving`). A deposit that stepped only the source port, or
+  nothing, adds no term: its readings never reached the map. On the chain at its capacity located
+  from `2^6`, the reference port's exposure published 35 deposits and read the pair at 33 of them.
+  It moved once, `6 → 0`, held at the floor, with certificate `65275/2^28`
+  (`65275 = 5²·7·373`).
+- **The card.** It deposits through the host's `Constitution::deposited`, so a moved Gram, map,
+  chart and pair are the reference's, and the lockstep compares the published constitutions after
+  every deposit. The normal-law mirror re-steps a fixed `2^k` on its kernel, so it skips a deposit
+  whose prior moved and counts it (`NormalMirror::moved`). The card test is
+  `the_card_port_returns_the_reference_across_a_moved_receiving_prior`.
+
+The owed Lean (§2's at-map `carried_eq_sum`, and §3's `q(y/2) < q(y)` at `V + a ≤ 0` and
+`q(2y) ≤ q(y)` at `2y ≤ x`) is filed on #62.
