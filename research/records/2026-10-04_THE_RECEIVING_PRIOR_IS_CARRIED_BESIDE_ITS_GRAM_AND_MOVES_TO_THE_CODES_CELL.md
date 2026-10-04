@@ -183,6 +183,8 @@ even after `stamped` re-stamps it. Old saves are superseded prototypes.
   CLAUDE.md's: `cargo check`, the changed laws' tests, and the GPU suite, since it changes the
   HNN's behaviour. The main line's read of it on campaign 1 is its receipt, as `2 I`'s read was
   (#259), not a gate.
+- [Superseded, October 4, by §8] No receiver holds its prior: the declaration names only the
+  founding member, `receiving_prior: u32`, and every receiving law carries its pair.
 
 ## 6. The tests that change, and the new ones
 
@@ -281,3 +283,78 @@ The Rust follows §§2–6, with these additions, each decided from the law:
 
 The owed Lean (§2's at-map `carried_eq_sum`, and §3's `q(y/2) < q(y)` at `V + a ≤ 0` and
 `q(2y) ≤ q(y)` at `2y ≤ x`) is filed on #62.
+
+## 8. The located prior is the production default
+
+[agent-inferred, October 4] Which receivers, if any, keep a fixed prior? None, by the law, so
+`ReceivingPrior` is gone and the declaration names only the founding member `k`
+(`ReceiverDeclaration::receiving_prior: u32`). This is derived as #310 derived the carry's default
+(the carry record §8, `A = 0`): a held prior would be one more exterior constant at the reception,
+and the reception has none to spare.
+- **Deposition is the only law that changes a constitution, from the covectors that reached that
+  locus** ([objects §8](../../docs/ELEMENTARY_OBJECTS.md#8-deposition)). The prior `2^k I` is part of
+  the receiving law's constitution: it is the Gram's founding diagonal. The covectors that reach
+  the receiving map are exactly the readings whose terms locate it (§2). Holding `k` while those
+  readings arrive keeps a part of the constitution that the reaching covectors cannot move. That is
+  an authored constant, not a law.
+- **Every lawful reason not to move is already the located law's own reading.** No reading reached
+  the map: no term is added. A reading is not a face's `q − p̃`: `Unread`. Zero curvature:
+  `NoCurvature`. A sign inside `ln 2`'s enclosure: `Undecided`. The floor, a chart that does not
+  certify, the carrier limit: `Floor`, `Chart`, `Carrier`. Each holds `k` and says why, in the
+  deposit's `PriorMove`. A declared hold adds no case these do not cover.
+- **`k` is the prior's initial configuration, a key's and not a choice held.** The founding map is
+  `W₀ = 0`, so the founding pair is zero (§2), and the mount reads no terms and moves nothing. A
+  rest-declared receiver therefore mounts without movement, as a rest-saved state mounts with zero
+  carry. `the_founding_carries_a_zero_pair_and_the_mount_moves_nothing` reads it at `k = 0, 1, 6`:
+  the founding Gram is `2^k I`, its chart exact, its pair zero, and its first window holds with
+  `NoCurvature`. The at-rest bullet of §7 is the same law over a whole exposure.
+- **Campaign 1 founds at `2 I`** (`receiving_prior: 1`, the member its readings located on 3,400
+  readings: the October 2 record), and every other field at `I`. Both move from there.
+- **A continuing state keeps the founding.** The founding member stays in `material_identity`
+  (§4.4), and `continued` refuses a receiving law founded at another member. So a state saved from
+  one founding is not mounted on another.
+
+**The tests this changes, and why.**
+- Every `ReceiverDeclaration` literal names `k` instead of `Held(k)` or `Located { from: k }`. The
+  prior-carry tests read the founding as above (`chain_at(from)`), and the restore test opens
+  another founding at `k = 5` to read the refusal.
+- **The budgeted carry's ledger** (`tests/constitution.rs`:
+  `the_budgeted_carry_accounts_for_every_update`,
+  `the_release_since_the_founding_stays_below_half_a_unit`,
+  `the_carried_gram_stays_positive_definite`). The chain's receiving prior now moves on that run.
+  Its Gram's first diagonal entry ended at `4 + 105/2^24`, where the step-only ledger expected
+  `1 + 105/2^24`: the moves shifted it by `2² − 2⁰ = 3`. A move is one more update of the carried
+  arrays: `(2^(k′) − 2^k) I` on the Gram, `(x − 1)(W_s + r_s)` on the map. Its step is taken at the
+  stepped successor's chart, which the move then replaces. The ledger now reads both. It reads the
+  step at its own chart from the same deposit on the predecessor without its prior pairs
+  (`Constitution::without_prior_pairs`, test-only), then adds the move. Every identity is
+  unchanged: value plus remainder plus releases equals the exact sum of the updates. The exact Gram
+  is the prior in force plus the statistics, and that is still `⪰ I`. The run's move is asserted,
+  so the ledger reads one.
+
+**The card tests it moves.** The lockstep's host side, read in the cloud, gives the prior reads and
+moves on each card fixture at the production reception (at rest in brackets). Every count those
+tests assert is unchanged.
+- `the_card_port_returns_the_reference_on_the_chain`: 33 reads, 31 moved (rest: 23).
+- `the_card_port_returns_the_reference_on_a_generic_constitution`: seed 5, 11 reads, 2 moved
+  (rest: 0); seed 11, 11 reads, 11 moved (rest: 11).
+- `the_card_port_returns_the_reference_on_campaign_one`: 7 reads, 1 moved (rest: 6).
+- `the_card_port_returns_the_reference_with_resonators`: 7 reads, 4 moved (rest: 2).
+- `the_loaded_source_matches_with_y4_and_hop_two`: no read. Its 7 refused deposits and stepped
+  nothing.
+- `the_card_port_returns_the_reference_on_the_standing_cut`: private, read by the card run.
+- Every other card test whose deposits step the receiving map reads the prior through the host's
+  `Constitution::deposited`, as the card does. The published constitutions are compared after
+  every deposit, and the normal-law mirror skips each moved deposit and counts it
+  (`NormalMirror::moved`). The GPU suite is the receipt.
+
+The moves under the carry, in order:
+- the chain: `0 → 1 → 0 → 1`, then `1 → 2 → … → 29`, one member per read;
+- seed 11: `0 → 1 → … → 11`, one member per read;
+- seed 5: `0 → 1 → 0`;
+- campaign 1: `1 → 0`;
+- the resonators: `1 → 0 → 1 → 2 → 4`, the last a cell move of two members.
+
+The runs of one member per read are the climb of §7: those readings keep `V + a ≤ 0`, so no member
+codes least. A climb stops when new readings lift `V + a` above zero, or at the carrier hold.
+

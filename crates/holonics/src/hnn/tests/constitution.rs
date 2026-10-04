@@ -822,7 +822,69 @@ fn entries(theta: &Constitution, locus: Locus, carrier: Carrier) -> Vec<Rat> {
 /// the factor steps, recomputed): `ΔH = Σ w f fᵀ`, `ΔW = η Σ w g (X̂f)ᵀ` at the successor's solved
 /// chart `X̂` and the locus's certified step `η` (zero where none was certified), `Δh_x = Σ w|f|²`
 /// and `Δx = (η_x / h_x') G_x` at the successor's statistic and the family's certified step `η_x`.
+///
+/// Where the deposit moved a receiving prior from `2^k` to `2^(k′)` (`ChartReading::prior`), that
+/// move is one more update of the receiving law, after its step: `(2^(k′) − 2^k) I` on the Gram, and
+/// `(x − 1)(W_s + r_s)` on the map, `x = 2^(k − k′)`, with `W_s + r_s` the stepped map's value
+/// (the prior carry's design §3). The step itself is read at the stepped successor's chart, the
+/// one it was taken at, from the same deposit on the predecessor without its prior pairs
+/// (`Constitution::without_prior_pairs`).
 fn updates(
+    before: &Constitution,
+    deposit: &Deposit,
+    next: &Constitution,
+    reading: &DepositReading,
+) -> Vec<((Locus, Carrier), Vec<Rat>)> {
+    let moves: Vec<(Locus, u32, u32)> = reading
+        .charts
+        .iter()
+        .filter_map(|(locus, chart)| chart.prior.as_ref().map(|prior| (*locus, prior)))
+        .filter(|(_, prior)| prior.to != prior.from)
+        .map(|(locus, prior)| (locus, prior.from, prior.to))
+        .collect();
+    let stepped = (!moves.is_empty()).then(|| {
+        before
+            .without_prior_pairs()
+            .deposited(deposit)
+            .expect("the step deposits without its prior pairs")
+            .0
+    });
+    let next = stepped.as_ref().unwrap_or(next);
+    let mut out = updates_at(deposit, next, reading);
+    for (locus, from, to) in moves {
+        let Locus::ReceivingMap(g) = locus else {
+            panic!("a prior moved off a receiving map: {locus:?}")
+        };
+        let law = next.receiving_law(g).unwrap();
+        let power = |e: u32| Rat::from_integer(BigInt::one() << e as usize);
+        let n = law.gram().rows();
+        let shift = power(to) - power(from);
+        let gram: Vec<Rat> = (0..n * n)
+            .map(|i| if i % (n + 1) == 0 { shift.clone() } else { Rat::zero() })
+            .collect();
+        let x = power(from) / power(to);
+        let carried = remainders(next);
+        let map: Vec<Rat> = law
+            .map()
+            .entries()
+            .iter()
+            .enumerate()
+            .map(|(i, w)| {
+                let r = carried
+                    .get(&(locus, Carrier::Map, i))
+                    .cloned()
+                    .unwrap_or_else(Rat::zero);
+                (&x - Rat::one()) * (w + r)
+            })
+            .collect();
+        out.push(((locus, Carrier::Gram), gram));
+        out.push(((locus, Carrier::Map), map));
+    }
+    out
+}
+
+/// [`updates`] at one successor, every step read at its chart.
+fn updates_at(
     deposit: &Deposit,
     next: &Constitution,
     reading: &DepositReading,
@@ -980,8 +1042,8 @@ fn ledger(run: &[Deposited]) -> Ledger {
         released: BTreeMap::new(),
         arrays: Vec::new(),
     };
-    for (_, deposit, next, reading) in run {
-        for (array, values) in updates(deposit, next, reading) {
+    for (before, deposit, next, reading) in run {
+        for (array, values) in updates(before, deposit, next, reading) {
             if !ledger.arrays.contains(&array) {
                 ledger.arrays.push(array);
             }
@@ -1039,6 +1101,14 @@ fn the_budgeted_carry_accounts_for_every_update() {
                 .sum::<u64>()
     }));
     assert!(run.iter().any(|(.., reading)| reading.stepped > 0));
+    // The chain's receiving prior is located (from `2^0`) and moves on this run, so the ledger
+    // reads a move's updates as well as the steps'.
+    assert!(run.iter().any(|(.., reading)| {
+        reading
+            .charts
+            .iter()
+            .any(|(_, chart)| chart.prior.as_ref().is_some_and(|prior| prior.to != prior.from))
+    }));
 }
 
 /// Lean `HNN/LatticeDeposit.{gamma_kraft_lt_one, release_bounded_since_founding,
@@ -1125,8 +1195,9 @@ fn the_release_since_the_founding_stays_below_half_a_unit() {
 }
 
 /// Lean `HNN/LatticeDeposit.{carried_gram_posDef, carried_gram_posDef_rule}`: after every chain
-/// deposit each carried Gram `H` of width `n` is within one unit of the exact Gram (the unit prior
-/// plus every statistic that reached it), which is `⪰ I`; `H − (1 − n·u) I` has no negative
+/// deposit each carried Gram `H` of width `n` is within one unit of the exact Gram (its prior in
+/// force, `2^k I` with `k ≥ 0` and every move's shift, plus every statistic that reached it), which
+/// is `⪰ I`; `H − (1 − n·u) I` has no negative
 /// inertia, and `n·u ≤ 1/(2L_R)`, so `H ⪰ (1 − 1/(2L_R)) I` with no clamp.
 #[test]
 fn the_carried_gram_stays_positive_definite() {
@@ -1134,8 +1205,8 @@ fn the_carried_gram_stays_positive_definite() {
     let grain = integer(16);
     let mut exact: BTreeMap<Locus, Vec<Rat>> = BTreeMap::new();
     let mut checked = 0;
-    for (_, deposit, next, reading) in run {
-        for ((locus, carrier), values) in updates(deposit, next, reading) {
+    for (before, deposit, next, reading) in run {
+        for ((locus, carrier), values) in updates(before, deposit, next, reading) {
             if carrier != Carrier::Gram {
                 continue;
             }

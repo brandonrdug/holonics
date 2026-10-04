@@ -478,7 +478,7 @@ use crate::hnn::HnnError;
 use crate::hnn::contact::{
     certify_boost, contact_conductances, signed_form_certifies, signed_stiffness,
 };
-use crate::hnn::field::{ConstitutionRead, Field, ReceivingPrior, lattice_exponent};
+use crate::hnn::field::{ConstitutionRead, Field, lattice_exponent};
 use crate::hnn::moment::PairPort;
 use crate::hnn::port::Deposit;
 use crate::hnn::propagation::gram;
@@ -1939,8 +1939,8 @@ pub struct NormalLaw {
     chart: SolvedChart,
     map_carry: Carry,
     gram_carry: Carry,
-    /// The receiving prior's carried pair where its field declares the prior located
-    /// ([`LocatedPrior`]); `None` on every other law, and on a receiving law whose prior is held.
+    /// The receiving prior's carried pair on a receiving law ([`LocatedPrior`]); `None` on a source
+    /// or contrast law.
     located: Option<LocatedPrior>,
 }
 
@@ -1970,8 +1970,10 @@ impl NormalLaw {
     /// founding chart `X̂ = 2^(−k) I` exact (`δ = 0`, [`SolvedChart::founded`]); `k = 0` is
     /// [`NormalLaw::with_prior`]. [agent-inferred, October 2; the
     /// [record that locates it](../../../../research/records/2026-10-02_THE_READINGS_LOCATE_THE_RECEIVING_PRIOR_BY_THE_PREQUENTIAL_CERTIFICATE.md)]
-    /// The receiving map's prior is a per-field declared scale (`ReceiverDeclaration::receiving_prior`,
-    /// held, or founded and moved where located: [`NormalLaw::with_receiving_prior`]), located by the readings' prequential certificate (Lean `HNN/ReceivingPrior.prequential_code_le`):
+    /// The receiving map's prior is founded at a per-field declared member
+    /// (`ReceiverDeclaration::receiving_prior`) and moved from there by the readings
+    /// ([`NormalLaw::with_receiving_prior`]); the member was located by the readings' prequential
+    /// certificate (Lean `HNN/ReceivingPrior.prequential_code_le`):
     /// on campaign 1's 3,400 readings its alignment changes sign between `I` and `2I`, and `2I` codes
     /// least of the replayed family. It is held to powers of two so the founding chart is exact on
     /// the lattice, and to `k ≥ 0` so the carried Gram's positivity margin is at least the unit
@@ -1996,26 +1998,23 @@ impl NormalLaw {
         }
     }
 
-    /// **The receiving map's law as its field declares its prior** ([`ReceivingPrior`]): founded
-    /// at `2^k I` ([`NormalLaw::with_scaled_prior`]), and where the prior is located, carrying the
-    /// prequential pair from zero ([`LocatedPrior`]) so the readings move `k`.
-    pub fn with_receiving_prior(map: ExactRatMatrix, prior: ReceivingPrior) -> Self {
+    /// **The receiving map's law as its field declares its prior**: founded at `2^k I`
+    /// ([`NormalLaw::with_scaled_prior`]) with the prequential pair carried from zero
+    /// ([`LocatedPrior`]), so the readings move `k` (`ReceiverDeclaration::receiving_prior`).
+    pub fn with_receiving_prior(map: ExactRatMatrix, from: u32) -> Self {
         Self {
-            located: prior.located().then(|| LocatedPrior::founded(prior.scale())),
-            ..Self::with_scaled_prior(map, prior.scale())
+            located: Some(LocatedPrior::founded(from)),
+            ..Self::with_scaled_prior(map, from)
         }
     }
 
-    /// The receiving prior this law was founded by: located from its declared `k`, or held at its
-    /// chart's scale (a held prior never moves).
-    pub fn receiving_prior(&self) -> ReceivingPrior {
-        match &self.located {
-            Some(pair) => ReceivingPrior::Located { from: pair.from },
-            None => ReceivingPrior::Held(self.chart.scale),
-        }
+    /// The member a receiving law's prior was founded at, `None` on a source or contrast law, which
+    /// keeps the unit prior and carries no pair.
+    pub fn receiving_prior(&self) -> Option<u32> {
+        self.located.as_ref().map(|pair| pair.from)
     }
 
-    /// The receiving prior's carried pair, `None` where the prior is held.
+    /// The receiving prior's carried pair, `None` on a source or contrast law.
     pub fn located(&self) -> Option<&LocatedPrior> {
         self.located.as_ref()
     }
@@ -2447,8 +2446,8 @@ impl NormalLaw {
     ///   cell and the law does not move again until new readings move it (Lean
     ///   `HNN/PriorCarry.{newton_rebaseAt, rebase_into_cell}`).
     ///
-    /// When the chart does not certify, the unmoved law stands and the read says so. `None` on a law
-    /// whose prior is held.
+    /// When the chart does not certify, the unmoved law stands and the read says so. `None` on a
+    /// source or contrast law, which carries no pair.
     pub(crate) fn moved_prior(
         &self,
         rule: &ChartRule,
@@ -3721,7 +3720,7 @@ impl Constitution {
             .unwrap_or(1);
         let a = field.alphabet();
         // Each receiving ring's prior, from its first declared receiver (as its tree).
-        let receivers: BTreeMap<usize, ReceivingPrior> = field
+        let receivers: BTreeMap<usize, u32> = field
             .receivers()
             .iter()
             .rev()
@@ -3926,6 +3925,20 @@ impl Constitution {
     /// Ring `g`'s receiving-map normal law `R`.
     pub fn receiving_law(&self, ring: usize) -> Option<&NormalLaw> {
         self.rings[ring].receiving.as_ref()
+    }
+
+    /// The constitution with every receiving law's prior pair dropped, so a deposit on it steps
+    /// each receiving law and does not read or move its prior: a deposit's stepped successor before
+    /// its move, which the carry's ledger reads (the step's own updates, then the move's).
+    #[cfg(test)]
+    pub(crate) fn without_prior_pairs(&self) -> Self {
+        let mut theta = self.clone();
+        for material in &mut theta.rings {
+            if let Some(law) = material.receiving.take() {
+                material.receiving = Some(law.with_located(None));
+            }
+        }
+        theta
     }
 
     /// The factor families' statistics `h_x` of ring `g`: standing, passive, slices, pair port.
@@ -4348,11 +4361,13 @@ impl Constitution {
             material.source = Some(NormalLaw::with_prior(source));
         }
         if let Some(receiving) = receiving {
-            // The replaced map keeps the receiving law's declared prior.
+            // The replaced map keeps the receiving law's founding member (the unit prior where the
+            // ring had no receiving law).
             let prior = material
                 .receiving
                 .as_ref()
-                .map_or(ReceivingPrior::Held(0), NormalLaw::receiving_prior);
+                .and_then(NormalLaw::receiving_prior)
+                .unwrap_or(0);
             material.receiving = Some(NormalLaw::with_receiving_prior(receiving, prior));
         }
         Ok(self)
@@ -6747,7 +6762,7 @@ struct Prepared {
     linear: Option<(usize, LinearLocus, Option<PreparedStep>)>,
     factors: Vec<FactorPrepared>,
     /// A located receiving prior's window terms at the map in force ([`prequential_terms`]):
-    /// `None` where the law's prior is held, `Some(None)` where the readings are not a face's.
+    /// `None` on a law with no pair, `Some(None)` where the readings are not a face's.
     terms: Option<Option<(Rat, Rat)>>,
 }
 
@@ -7697,11 +7712,11 @@ impl Constitution {
             founding.transport = Rat::one();
         }
         // Each receiving law at its founding: a moved prior or a grown pair leaves the identity, the
-        // declared prior (held, or located from its `k`) stays in it.
+        // founding member stays in it.
         for founding in &mut material.rings {
             if let Some(law) = &founding.receiving {
                 let (m, n) = (law.map.rows(), law.map.columns());
-                let prior = law.receiving_prior();
+                let prior = law.receiving_prior().unwrap_or(0);
                 founding.receiving = ExactRatMatrix::zero(m, n)
                     .ok()
                     .map(|map| NormalLaw::with_receiving_prior(map, prior));
@@ -7760,10 +7775,11 @@ impl Constitution {
                 .ok_or(HnnError::MissingReceivingMap { ring: *g })?;
             if (declared.map.rows(), declared.map.columns()) != (law.map.rows(), law.map.columns())
                 || declared.gram.len() != law.gram.len()
+                || law.receiving_prior() != declared.receiving_prior()
                 || !law.on_lattice(&self.lattice(Locus::ReceivingMap(*g))?)
             {
                 return Err(HnnError::ContinuingState {
-                    what: "a receiving law off its declared shape or lattice",
+                    what: "a receiving law off its declared shape, founding or lattice",
                 });
             }
         }

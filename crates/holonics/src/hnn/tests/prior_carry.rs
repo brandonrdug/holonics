@@ -14,15 +14,15 @@ use crate::hnn::constitution::{
     BudgetedCarry, ChartRule, Constitution, ContinuingState, Lattice, LinearLocus, LinearStep,
     LocatedPrior, Locus, NormalLaw, PriorHeld, RESIDUAL_SHIFT, Sample, prequential_terms,
 };
-use crate::hnn::field::{Field, ReceivingPrior};
+use crate::hnn::field::Field;
 use crate::hnn::port::Deposit;
 use crate::ratio::linear::ExactRatMatrix;
 use crate::ratio::{Rat, integer, rat};
 
 /// The chain control with its receiver's prior declared `prior`.
-fn chain_at(prior: ReceivingPrior) -> Field {
+fn chain_at(from: u32) -> Field {
     let mut declared = chain_declaration(1 << 16);
-    declared.receivers[0].receiving_prior = prior;
+    declared.receivers[0].receiving_prior = from;
     Field::declare(declared.by_lattice_rule()).unwrap()
 }
 
@@ -86,7 +86,7 @@ fn power(e: i64) -> Rat {
 /// A located run of `windows` hand-built receiving deposits on the chain from `2^from I`, with
 /// each window's law before, its terms read independently at that law's map, and its prior read.
 fn located_run(from: u32, windows: usize) -> Vec<(NormalLaw, (Rat, Rat), NormalLaw, crate::hnn::constitution::PriorMove)> {
-    let field = chain_at(ReceivingPrior::Located { from });
+    let field = chain_at(from);
     let mut theta = Constitution::initial(&field, 1 << 40).unwrap();
     (0..windows)
         .map(|t| {
@@ -147,26 +147,31 @@ fn the_pair_reads_each_window_through_the_map_before_its_deposit_and_keeps_no_ta
     );
 }
 
-/// **A held prior is unchanged** (§6, test 4): its law carries no pair and its deposits read no
-/// prior. While the located run has located nothing (its first window, on the zero map), the two
-/// runs' laws and readings agree but for the pair and its read.
+/// **The founding member is an initial configuration, and the mount moves nothing** (§8): the
+/// declared opening's receiving law is `2^k I` with its exact chart and a zero pair at `k`, and its
+/// first window, read on the founding map `W₀ = 0`, adds no terms and holds `k` for want of
+/// curvature, whatever `k` was declared.
 #[test]
-fn a_held_prior_carries_no_pair_and_agrees_with_the_located_run_until_it_moves() {
-    let run = |prior: ReceivingPrior| {
-        let field = chain_at(prior);
-        let theta = Constitution::initial(&field, 1 << 40).unwrap();
-        let (next, reading) = theta.deposited(&receiving_deposit(&theta, 2, 0)).unwrap();
-        (next.receiving_law(2).unwrap().clone(), reading)
-    };
-    let (held, held_reading) = run(ReceivingPrior::Held(1));
-    let (located, mut located_reading) = run(ReceivingPrior::Located { from: 1 });
-    assert!(held.located().is_none());
-    assert!(held_reading.charts.iter().all(|(_, chart)| chart.prior.is_none()));
-    assert_eq!(held, located.clone().with_located(None));
-    for (_, chart) in &mut located_reading.charts {
-        chart.prior = None;
+fn the_founding_carries_a_zero_pair_and_the_mount_moves_nothing() {
+    for from in [0, 1, 6] {
+        let theta = Constitution::initial(&chain_at(from), 1 << 40).unwrap();
+        let law = theta.receiving_law(2).unwrap();
+        assert_eq!(law.receiving_prior(), Some(from));
+        let zero = Rat::zero();
+        assert_eq!(law.located().unwrap().parts(), (from, &zero, &zero, &zero));
+        assert_eq!(law.chart().scale(), from);
+        assert_eq!(law.chart().certificate(), &Rat::zero());
+        let unit = Rat::from_integer(BigInt::one() << from as usize);
+        let gram = law.gram();
+        let n = gram.rows();
+        assert_eq!(gram, ExactRatMatrix::identity(n).unwrap().scaled(&unit));
+        let (_, reading) = theta.deposited(&receiving_deposit(&theta, 2, 0)).unwrap();
+        let [(_, chart)] = reading.charts.as_slice() else {
+            panic!("one chart reading, at the receiving map");
+        };
+        let read = chart.prior.clone().unwrap();
+        assert_eq!((read.from, read.to, read.held), (from, from, Some(PriorHeld::NoCurvature)));
     }
-    assert_eq!(held_reading, located_reading);
 }
 
 /// A receiving law founded at `2^from I` on a 4 × 2 map, after one deposit (so its Gram has a
@@ -185,7 +190,7 @@ fn moving_law(from: u32, pair: (Rat, Rat, Rat)) -> (NormalLaw, ChartRule, Budget
         ],
     )
     .unwrap();
-    let law = NormalLaw::with_receiving_prior(map, ReceivingPrior::Located { from });
+    let law = NormalLaw::with_receiving_prior(map, from);
     let samples = window(1, 2, 2);
     let mut at = BudgetedCarry::new(lattice, 1);
     let (law, _) = law.deposited(&samples, &rat(1, 4), &rule, &mut at).unwrap();
@@ -275,7 +280,7 @@ fn where_no_member_codes_least_the_prior_rises_until_the_carrier_holds_it() {
     let lattice = Lattice::new(4);
     let law = NormalLaw::with_receiving_prior(
         ExactRatMatrix::zero(4, 2).unwrap(),
-        ReceivingPrior::Located { from: RESIDUAL_SHIFT },
+        RESIDUAL_SHIFT,
     )
     .with_located(Some(LocatedPrior::from_parts(
         RESIDUAL_SHIFT,
@@ -330,11 +335,11 @@ fn a_cell_below_the_unit_prior_moves_to_it() {
 /// **A saved state restores across a move** (§6, test 7; §4): the continuing state carries the
 /// receiving law whole (its moved Gram, its chart at its scale, its remainders and its pair) and its
 /// clock inside the check, its text reads back equal, the declared opening continued from it is the
-/// moved constitution, and the next deposit from either is the same. A state of the located field
-/// is refused on the held field's opening, whose material differs only in the declared prior.
+/// moved constitution, and the next deposit from either is the same. The state is refused on an
+/// opening founded at another member, whose material differs only in the declared founding.
 #[test]
 fn a_saved_state_restores_across_a_move() {
-    let field = chain_at(ReceivingPrior::Located { from: 6 });
+    let field = chain_at(6);
     let opening = Constitution::initial(&field, 1 << 40).unwrap();
     let mut theta = opening.clone();
     let mut moved = false;
@@ -358,9 +363,9 @@ fn a_saved_state_restores_across_a_move() {
     let (a, ra) = theta.deposited(&receiving_deposit(&theta, 2, 2)).unwrap();
     let (b, rb) = restored.deposited(&receiving_deposit(&restored, 2, 2)).unwrap();
     assert_eq!((a, ra), (b, rb));
-    let held = Constitution::initial(&chain_at(ReceivingPrior::Held(6)), 1 << 40).unwrap();
+    let other = Constitution::initial(&chain_at(5), 1 << 40).unwrap();
     assert!(matches!(
-        held.continued(&read),
+        other.continued(&read),
         Err(HnnError::ContinuingState { what }) if what.contains("another opening")
     ));
     // A chart's scale whose prior is not the Gram off its support is refused, even with its check
@@ -440,7 +445,7 @@ fn exposed(
 fn located_chain(place: impl Fn(&mut crate::hnn::field::RingDeclaration)) -> Field {
     let declared = |population: u64| {
         let mut declaration = chain_declaration(population);
-        declaration.receivers[0].receiving_prior = ReceivingPrior::Located { from: 6 };
+        declaration.receivers[0].receiving_prior = 6;
         declaration.rings.iter_mut().for_each(&place);
         Field::declare(declaration.by_lattice_rule()).unwrap()
     };
@@ -466,7 +471,7 @@ fn an_exposed_located_chain_reads_its_pair_where_the_map_is_stepped_and_moves_it
     println!("{deposits} deposits, {} pair reads, moves {moves:?}", reads.len());
     assert!(!reads.is_empty() && reads.len() as u64 <= deposits);
     assert!(!moves.is_empty(), "the exposure moves the located prior");
-    assert_eq!(last.receiving_prior(), ReceivingPrior::Located { from: 6 });
+    assert_eq!(last.receiving_prior(), Some(6));
     assert_eq!(last.chart().scale(), moves.last().unwrap().to);
 }
 

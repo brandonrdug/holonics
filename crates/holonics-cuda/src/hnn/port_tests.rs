@@ -94,7 +94,7 @@ fn chain_declaration(population: u64) -> FieldDeclaration {
             prior: holonics::compression::landmark::context::StopPrior::half(),
             mass: 1,
             base: holonics::compression::landmark::context::BaseMeasure::Even,
-            receiving_prior: holonics::hnn::field::ReceivingPrior::Held(0),
+            receiving_prior: 0,
         }],
         crib: CribDeclaration {
             window: 16,
@@ -675,8 +675,7 @@ fn the_card_port_returns_the_reference_on_the_chain() {
 fn the_card_port_returns_the_reference_across_a_moved_receiving_prior() {
     let declared = |population: u64| {
         let mut declaration = chain_declaration(population);
-        declaration.receivers[0].receiving_prior =
-            holonics::hnn::field::ReceivingPrior::Located { from: 6 };
+        declaration.receivers[0].receiving_prior = 6;
         Field::declare(declaration.by_lattice_rule()).unwrap()
     };
     let field = declared(declared(1 << 20).capacity().n_star() as u64);
