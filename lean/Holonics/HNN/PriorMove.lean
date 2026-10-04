@@ -1,4 +1,5 @@
 import Holonics.HNN.PriorCarry
+import Holonics.HNN.LatticeDeposit
 
 /-!
 # HNN.PriorMove: the at-map pair as the Rust carries it, and the move's two exits
@@ -42,9 +43,14 @@ exit up     0 ≤ V, 0 ≤ y, 2 y V ≤ V + a  ⇒  q(2y) ≤ q(y) ;   so the fl
    when the Newton point is at least `2^k` (every `below_high` up to `j = k` false), the floor codes
    at most every admitted member, the members whose prior is at least `2^0`.
 
+5. **The move scales the map's value** (`moved_map_accounting`, `moved_map_scaled`). The move
+   deposits `(x − 1)(W + r)` through the map's carry, so the applied value, the carried remainder
+   and the released residual together are `x (W + r)` (`LatticeDeposit.carry_accounting`), and
+   `W′ + r′ = x (W + r)` where the deposit releases nothing.
+
 The signs the Rust decides through `ln 2`'s enclosure (`at_most_zero`, an undecided sign holding
 `k`) are the hypotheses here, read at the exact `ℓ`. The chart's re-founding at the moved scale
-(`SolvedChart::moved`) and the map's move through its carry are not stated here.
+(`SolvedChart::moved`) is not stated here.
 
 No `sorry`, no `axiom`, no `native_decide`.
 -/
@@ -228,9 +234,43 @@ theorem floor_member_best (a V : L) (k n : ℕ) (hV : 0 ≤ V) (h : (2 : L) ^ k 
     model a V ((2 : L) ^ k) ≤ model a V ((2 : L) ^ k / 2 ^ n) :=
   descend_to_floor a V _ hV (by positivity) h n
 
+/-! ## The map moved through its carry -/
+
+section MapMove
+
+open Holonics.HNN.LatticeDeposit (Carried carry release carry_accounting)
+
+variable {E : Type*}
+
+/-- [proved-derived; formal-checked] **The move scales the map's value** (`NormalLaw::moved_prior`):
+depositing `(x − 1)(W + r)` through the map's carry, the applied value, the carried remainder and
+the released residual together are `x (W + r)`, entry by entry (`LatticeDeposit.carry_accounting`).
+Where the deposit releases nothing, `W′ + r′ = x (W + r)` exactly. -/
+theorem moved_map_accounting {n : ℕ} (s : Carried n E) (x : ℚ) (i : E) :
+    (carry s fun j => (x - 1) * (s.value j + s.rem j)).value i +
+        (carry s fun j => (x - 1) * (s.value j + s.rem j)).rem i +
+        release s (fun j => (x - 1) * (s.value j + s.rem j)) i =
+      x * (s.value i + s.rem i) := by
+  rw [carry_accounting]
+  ring
+
+/-- [proved-derived; formal-checked] **`W′ + r′ = x (W + r)`** where the move's deposit releases
+nothing at the entry. -/
+theorem moved_map_scaled {n : ℕ} (s : Carried n E) (x : ℚ) (i : E)
+    (h : release s (fun j => (x - 1) * (s.value j + s.rem j)) i = 0) :
+    (carry s fun j => (x - 1) * (s.value j + s.rem j)).value i +
+        (carry s fun j => (x - 1) * (s.value j + s.rem j)).rem i =
+      x * (s.value i + s.rem i) := by
+  have := moved_map_accounting s x i
+  rw [h, add_zero] at this
+  exact this
+
+end MapMove
+
 end Holonics.HNN.PriorMove
 
 #print axioms Holonics.HNN.PriorMove.carried_eq_sum
 #print axioms Holonics.HNN.PriorMove.value_rebased
 #print axioms Holonics.HNN.PriorMove.halving_exit
 #print axioms Holonics.HNN.PriorMove.floor_member_best
+#print axioms Holonics.HNN.PriorMove.moved_map_accounting
