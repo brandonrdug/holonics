@@ -11,7 +11,7 @@ word at its own place (`hnn::constitution::Locus`, `hnn::retention::Diamond::ret
 Standing(g)      q_g      the element's sheet classes, through the lock chart
                           Δ_r = −q_r + Σ_(a at r) T_a q_(other end of a),  σ_(r,ρ) = sign Δ_(r,ρ)
                           kept when element(g) or element(neighbour) is      (Diamond::standing)
-SourcePort(g)    E_g      the opening at a source ring: x_0(g) = E_g u_g
+SourcePort(g)    E_g      the opening at a source ring: x_0(g) = src_(l,m)(E_g), linear in E_g
                           kept when is_source(g) and o_g ≤ e                  (Diamond::source_port)
 ReceivingMap(g)  R_g      the receiver's reading: ⟨p, R_g x⟩ = ⟨R_gᵀ p, x⟩
                           kept when g is the receiver, never released          (retention::retained)
@@ -23,20 +23,23 @@ ReceivingMap(g)  R_g      the receiver's reading: ⟨p, R_g x⟩ = ⟨R_gᵀ p, 
   (`HNN/Normal.sheetClass`'s rule). Ring `g` is **near** ring `r` (`Near`) when `g = r` or a
   contact joins them.
 * **The constitution** (`RingsAt`) is a factored medium (`HNN/FactoredMedium.FactoredAt`) with,
-  per ring, a standing `q_g ∈ Q g`, a source port `E_g : U g → M(g)` and a receiving map read on
-  covectors `R_gᵀ : M(g)* → M(g)*`. Its operator is the tick's block operator at the classes the
-  standings give (`sheets χ q`), not at a clock-read class: the medium has no operand that the
-  clock reads apart from the pump, which is the loaded ring's (`HNN/LoadedRing`), so the class
-  here is `Unit`.
-* **The opening** at a ring `g` of the declared sources `Src` is `E_g` applied to the moment's
-  source input `u_g` (`src`), and zero elsewhere (`ringOpen`). **The reading** at ring `g` is the
+  per ring, a standing `q_g ∈ Q g`, a source port `E_g ∈ P g` (the Rust's `E_g`, `E_g^(δ)` and
+  `I_g`) and a receiving map read on covectors `R_gᵀ : M(g)* → M(g)*`. Its operator is the tick's
+  block operator at the classes the standings give (`sheets χ q`), not at a clock-read class: the
+  medium has no operand that the clock reads apart from the pump, which is the loaded ring's
+  (`HNN/LoadedRing`), so the class here is `Unit`.
+* **The opening** at a ring `g` of the declared sources `Src` is the moment's passage read through
+  the source port, `src l m g E_g`, linear in the port (`SourceMoment::encode`), and zero elsewhere
+  (`ringOpen`). **The reading** at ring `g` is the
   covector read through `R_gᵀ`, and the identity at a contact block (`ringRecv`).
 * **The loci** (`RLocus`) are `LocusMap.Locus` and the three ring loci. A standing is read on the
   element edge `r → r` of every ring `r` near `g`; a source port by the opening at its ring when it
-  is a source, and its deposit reads that ring's element edge; a receiving map by the reading at its
-  ring, and its deposit reads that ring's element edge (`RReads`, `ROpenReads`, `RRecvReads`).
-* **The deposit** moves the factors as in `FactoredMedium` and each ring locus by its own law
-  from the data on the edges that read it (`ringData`). **The release** zeroes a released ring
+  is a source, and its deposit reads the opening's data staged at that ring (`portData`); a
+  receiving map by the reading at its ring, and its deposit reads that ring's element edge
+  (`RReads`, `ROpenReads`, `RRecvReads`).
+* **The deposit** moves the factors as in `FactoredMedium`, the standing and the receiving map by
+  their own laws from the data on the edges that read them (`ringData`), and the source port by its
+  own law from the opening's data at its ring (`portData`). **The release** zeroes a released ring
   locus and releases the factors as in `FactoredMedium`.
 
 [proved-derived; formal-checked] What is proved.
@@ -56,14 +59,17 @@ ReceivingMap(g)  R_g      the receiver's reading: ⟨p, R_g x⟩ = ⟨R_gᵀ p, 
      standing law's own rule retains the receiver's (`retained_receiver`, `Diamond::retains`).
    Hence **the Rust's collapse is sufficient for every per-locus law**
    (`ring_rust_collapse_sufficient`).
-5. **Under the certified step released loci stay released with no hypothesis**
+5. **The opening's datum is the source port's gradient** (`port_gradient`): two constitutions
+   that differ only in their source ports change a reading of the word by
+   `Σ_(g ∈ Src) (λ_t(g) ∘ src l m g)(E_g − E'_g)`, `λ_t` the reading's covector swept back to the
+   opening. The triple `(l, m, λ_t(g))` is what a compare stages at a source that observes a
+   receiver (`TickStanding.openDataAt`), so the source port's deposit reads the source input
+   through the moment and the anchor, as the Rust's `SourceMoment::encoder_covector` does
+   (`hnn::reference::compose_return`'s source rings).
+6. **Under the certified step released loci stay released with no hypothesis**
    (`certified_ring_released_stays_released`): every ring locus's step has the certified step's
-   form (`FactoredMedium.certifiedStep`), which is quiet on empty data.
-
-[agent-inferred] The Rust's source-port step reads the source input `u`, and the staged data on an
-edge carry the state and the swept covector, not `u`; here a source port's deposit is any function
-of its own state and the data on its ring's element edge. A deposit that also reads the moment
-needs the moment in the staged deposit, which `HNN/TickStanding` does not stage; owed in #62.
+   form (`FactoredMedium.certifiedStep`, and `portStep` at the source port), which is quiet on empty
+   data.
 
 [open; source-inspected at `37e24ef3`] Each ring-locus law here is a function of the locus's own
 state and its data. The Rust's steps at these loci read beyond it, so they are not yet per-locus
@@ -164,12 +170,13 @@ inductive RLocus
 variable (endRing : Contact × Bool → Ring) (Src : Set Ring)
 
 /-- [definition] **The block edges that read a locus**: a base locus as in `LocusMap.Reads`; ring
-`g`'s standing on the element edge `r → r` of every ring `r` near `g`; a source ring's source port
-and every ring's receiving map on its ring's element edge, where their deposits read. -/
+`g`'s standing on the element edge `r → r` of every ring `r` near `g`; every ring's receiving map on
+its ring's element edge, where its deposit reads. No edge reads a source port: its deposit reads the
+opening's data at its ring (`ROpenReads`, `portData`). -/
 def RReads : RLocus Ring Contact → (Ring ⊕ Contact) → (Ring ⊕ Contact) → Prop
   | .base ℓ, z, y => Reads endRing ℓ z y
   | .standing g, z, y => ∃ r, Near endRing g r ∧ z = .inl r ∧ y = .inl r
-  | .sourcePort g, z, y => g ∈ Src ∧ z = .inl g ∧ y = .inl g
+  | .sourcePort _, _, _ => False
   | .receivingMap g, z, y => z = .inl g ∧ y = .inl g
 
 /-- [definition] **The loci a block's references read**: those of `MediumStanding.RefReads`. -/
@@ -177,7 +184,8 @@ def RRefReads : RLocus Ring Contact → Ring ⊕ Contact → Prop
   | .base ℓ, b => RefReads ℓ b
   | _, _ => False
 
-/-- [definition] **The loci a block's opening reads**: a source ring's source port. -/
+/-- [definition] **The loci a block's opening reads**: a source ring's source port, which its
+deposit reads there too. -/
 def ROpenReads : RLocus Ring Contact → Ring ⊕ Contact → Prop
   | .sourcePort g, b => b = .inl g ∧ g ∈ Src
   | _, _ => False
@@ -191,15 +199,13 @@ variable {endRing Src}
 
 /-- [proved-derived; formal-checked] Every edge that reads a locus is an edge of the block graph. -/
 theorem rreads_adj {ℓ : RLocus Ring Contact} {z y : Ring ⊕ Contact}
-    (h : RReads endRing Src ℓ z y) : blockAdj endRing z y := by
+    (h : RReads endRing ℓ z y) : blockAdj endRing z y := by
   cases ℓ with
   | base ℓ => exact LocusMap.reads_adj h
   | standing g =>
     obtain ⟨r, -, rfl, rfl⟩ := h
     exact Or.inl rfl
-  | sourcePort g =>
-    obtain ⟨-, rfl, rfl⟩ := h
-    exact Or.inl rfl
+  | sourcePort g => exact h.elim
   | receivingMap g =>
     obtain ⟨rfl, rfl⟩ := h
     exact Or.inl rfl
@@ -221,25 +227,25 @@ variable {FE : Ring → Type u} [∀ r, NormedAddCommGroup (FE r)] [∀ r, Inner
 variable {FC : Contact → Type u} [∀ a, NormedAddCommGroup (FC a)]
   [∀ a, InnerProductSpace ℝ (FC a)] [∀ a, FiniteDimensional ℝ (FC a)]
 variable {Q : Ring → Type u} [∀ g, AddCommGroup (Q g)] [∀ g, Module ℝ (Q g)]
-variable {U : Ring → Type u} [∀ g, AddCommGroup (U g)] [∀ g, Module ℝ (U g)]
+variable {P : Ring → Type u} [∀ g, AddCommGroup (P g)] [∀ g, Module ℝ (P g)]
 variable {endRing : Contact × Bool → Ring} {Src : Set Ring}
 
 /-- A ring block's state. -/
 local notation "MR" g => BlockM endRing V Ch (Sum.inl g)
 
-variable (endRing V Ch ρ FE FC Q U) in
+variable (endRing V Ch ρ FE FC Q P) in
 /-- [definition] **The constitution with the ring loci**: a factored medium at the declared tick
-length `h₀`, and per ring a standing `q_g`, a source port `E_g` from the source input's space
-`U g` to the ring's block, and the receiving map read on the ring block's covectors. -/
+length `h₀`, and per ring a standing `q_g`, a source port `E_g ∈ P g` (the Rust's `E_g`, `E_g^(δ)`
+and `I_g`, `Locus::SourcePort`), and the receiving map read on the ring block's covectors. -/
 structure RingsAt (h₀ : ℝ) : Type u where
   φ : FactoredAt ρ V Ch FE FC endRing h₀
   q : (g : Ring) → Q g
-  E : (g : Ring) → U g →ₗ[ℝ] MR g
+  E : (g : Ring) → P g
   Rd : (g : Ring) → Module.Dual ℝ (MR g) →ₗ[ℝ] Module.Dual ℝ (MR g)
 
 /-- [definition] **Two constitutions agree on a locus**: on a base locus their factors and declared
 operands (`FactoredMedium.FAgreeOn`), on a ring locus its value. -/
-def RAgreeOn {h₀ : ℝ} (θ θ' : RingsAt ρ V Ch FE FC Q U endRing h₀) :
+def RAgreeOn {h₀ : ℝ} (θ θ' : RingsAt ρ V Ch FE FC Q P endRing h₀) :
     RLocus Ring Contact → Prop
   | .base ℓ => FAgreeOn θ.φ.1 θ'.φ.1 ℓ
   | .standing g => θ.q g = θ'.q g
@@ -249,13 +255,13 @@ def RAgreeOn {h₀ : ℝ} (θ θ' : RingsAt ρ V Ch FE FC Q U endRing h₀) :
 open Classical in
 /-- [definition] **The data a ring locus reads**: the data on the edges that read it. -/
 def ringData (d : EdgeData endRing V Ch) (ℓ : RLocus Ring Contact) : EdgeData endRing V Ch :=
-  fun y z => if RReads endRing Src ℓ z y then d y z else []
+  fun y z => if RReads endRing ℓ z y then d y z else []
 
 omit [Fintype Ring] [DecidableEq Ring] [Fintype Contact] [DecidableEq Contact]
   [∀ r, FiniteDimensional ℝ (V r)] [∀ a, FiniteDimensional ℝ (Ch a)] in
 theorem ringData_congr {d d' : EdgeData endRing V Ch} {ℓ : RLocus Ring Contact}
-    (h : ∀ y z, RReads endRing Src ℓ z y → d y z = d' y z) :
-    ringData (Src := Src) d ℓ = ringData (Src := Src) d' ℓ := by
+    (h : ∀ y z, RReads endRing ℓ z y → d y z = d' y z) :
+    ringData d ℓ = ringData d' ℓ := by
   classical
   funext y z
   simp only [ringData]
@@ -266,8 +272,8 @@ theorem ringData_congr {d d' : EdgeData endRing V Ch} {ℓ : RLocus Ring Contact
 omit [Fintype Ring] [DecidableEq Ring] [Fintype Contact] [DecidableEq Contact]
   [∀ r, FiniteDimensional ℝ (V r)] [∀ a, FiniteDimensional ℝ (Ch a)] in
 theorem ringData_quiet {d : EdgeData endRing V Ch} {ℓ : RLocus Ring Contact}
-    (h : ∀ y z, RReads endRing Src ℓ z y → d y z = []) :
-    ringData (Src := Src) d ℓ = fun _ _ => [] := by
+    (h : ∀ y z, RReads endRing ℓ z y → d y z = []) :
+    ringData d ℓ = fun _ _ => [] := by
   classical
   funext y z
   simp only [ringData]
@@ -277,18 +283,55 @@ theorem ringData_quiet {d : EdgeData endRing V Ch} {ℓ : RLocus Ring Contact}
 
 variable {Λ Mo Cell Crib : Type*}
 
+omit [Fintype Ring] [DecidableEq Ring] [Fintype Contact] [DecidableEq Contact]
+  [∀ r, FiniteDimensional ℝ (V r)] [∀ a, FiniteDimensional ℝ (Ch a)] in
 open Classical in
-/-- [definition] **The opening** (`Word::opened_at` with the source ports): at a declared source
-ring `g`, its source port applied to the moment's source input `u_g`; zero elsewhere. -/
-def ringOpen {h₀ : ℝ} (Src : Set Ring) (src : Λ → Mo → (g : Ring) → U g)
-    (θ : RingsAt ρ V Ch FE FC Q U endRing h₀) (l : Λ) (m : Mo) :
+/-- [definition] **The data a source port reads**: the opening's data at its ring when it is a
+declared source, nothing elsewhere. -/
+def portData (Src : Set Ring) (d : TickStage ℝ (BlockM endRing V Ch) Λ Mo) (g : Ring) :
+    List (Λ × Mo × Module.Dual ℝ (MR g)) :=
+  if g ∈ Src then d.opens (.inl g) else []
+
+omit [Fintype Ring] [DecidableEq Ring] [Fintype Contact] [DecidableEq Contact]
+  [∀ r, FiniteDimensional ℝ (V r)] [∀ a, FiniteDimensional ℝ (Ch a)] in
+theorem portData_congr {d d' : TickStage ℝ (BlockM endRing V Ch) Λ Mo} {g : Ring}
+    (h : ∀ b, ROpenReads Src (.sourcePort g : RLocus Ring Contact) b → d.opens b = d'.opens b) :
+    portData Src d g = portData Src d' g := by
+  classical
+  simp only [portData]
+  split_ifs with hg
+  · exact h _ ⟨rfl, hg⟩
+  · rfl
+
+omit [Fintype Ring] [DecidableEq Ring] [Fintype Contact] [DecidableEq Contact]
+  [∀ r, FiniteDimensional ℝ (V r)] [∀ a, FiniteDimensional ℝ (Ch a)] in
+theorem portData_quiet {d : TickStage ℝ (BlockM endRing V Ch) Λ Mo} {g : Ring}
+    (h : ∀ b, ROpenReads Src (.sourcePort g : RLocus Ring Contact) b → d.opens b = []) :
+    portData Src d g = [] := by
+  classical
+  simp only [portData]
+  split_ifs with hg
+  · exact h _ ⟨rfl, hg⟩
+  · rfl
+
+open Classical in
+/-- [definition] **The opening** (`Word::opened_at` with the source ports,
+`SourceMoment::encode`): at a declared source ring `g`, the moment's passage read through its source
+port, `src l m g E_g`, linear in the port; zero elsewhere. The Rust's passage is
+`P_g^(τ_g) Σ_c P_g^(−c)(E_g M_g[c] w(c) + Σ_δ … E_g^(δ)(e_x ⊗ e_a))`, linear in `E_g` and `E_g^(δ)`,
+with the counts `M_g`, the weights `w` and the anchor `τ_g` read from the moment and the lift.
+The weights also read the ring's transport modulus `ρ` (`Constitution::transport`,
+`SourceMoment::phase_weights`), which no deposit moves (the executed move sets it,
+`Constitution::with_transport`): `src` holds it as declared. -/
+def ringOpen {h₀ : ℝ} (Src : Set Ring) (src : Λ → Mo → (g : Ring) → P g →ₗ[ℝ] MR g)
+    (θ : RingsAt ρ V Ch FE FC Q P endRing h₀) (l : Λ) (m : Mo) :
     (b : Ring ⊕ Contact) → BlockM endRing V Ch b
-  | .inl g => if g ∈ Src then θ.E g (src l m g) else 0
+  | .inl g => if g ∈ Src then src l m g (θ.E g) else 0
   | .inr _ => 0
 
 /-- [definition] **The reading through the receiving map**: at ring `g` its receiving map on
 covectors, at a contact block the identity. -/
-def ringRecv {h₀ : ℝ} (θ : RingsAt ρ V Ch FE FC Q U endRing h₀) :
+def ringRecv {h₀ : ℝ} (θ : RingsAt ρ V Ch FE FC Q P endRing h₀) :
     (b : Ring ⊕ Contact) →
       Module.Dual ℝ (BlockM endRing V Ch b) →ₗ[ℝ] Module.Dual ℝ (BlockM endRing V Ch b)
   | .inl g => θ.Rd g
@@ -301,7 +344,7 @@ of the reception carry, the opening through the source ports, the reading throug
 maps, the factors' and the ring loci's deposits and releases. The class is `Unit`: no operand of
 this medium is read at the clock. -/
 def ringLaw (h₀ : ℝ) (χ : LockChart ρ Q endRing) (Src : Set Ring)
-    (src : Λ → Mo → (g : Ring) → U g) (ticks : Λ → Mo → ℕ)
+    (src : Λ → Mo → (g : Ring) → P g →ₗ[ℝ] MR g) (ticks : Λ → Mo → ℕ)
     (cross : Λ → Λ → (b : Ring ⊕ Contact) → MediumRef Ring Ch b → MediumRef Ring Ch b →
       (BlockM endRing V Ch b →ₗ[ℝ] BlockM endRing V Ch b))
     (absorb : (b : Ring ⊕ Contact) → BlockM endRing V Ch b →ₗ[ℝ] BlockM endRing V Ch b)
@@ -311,13 +354,13 @@ def ringLaw (h₀ : ℝ) (χ : LockChart ρ Q endRing) (Src : Set Ring)
     (Ψc : (a : Contact) → ChannelFactors (Ch := Ch) (FC := FC) a → EdgeData endRing V Ch →
       ChannelFactors (Ch := Ch) (FC := FC) a)
     (Ψq : (g : Ring) → Q g → EdgeData endRing V Ch → Q g)
-    (Ψs : (g : Ring) → (U g →ₗ[ℝ] MR g) → EdgeData endRing V Ch → (U g →ₗ[ℝ] MR g))
+    (Ψs : (g : Ring) → P g → List (Λ × Mo × Module.Dual ℝ (MR g)) → P g)
     (Ψr : (g : Ring) → (Module.Dual ℝ (MR g) →ₗ[ℝ] Module.Dual ℝ (MR g)) →
       EdgeData endRing V Ch → (Module.Dual ℝ (MR g) →ₗ[ℝ] Module.Dual ℝ (MR g))) :
-    TickLaw ℝ (BlockM endRing V Ch) (RingsAt ρ V Ch FE FC Q U endRing h₀) (RLocus Ring Contact)
+    TickLaw ℝ (BlockM endRing V Ch) (RingsAt ρ V Ch FE FC Q P endRing h₀) (RLocus Ring Contact)
       (MediumRef Ring Ch) Unit Λ Mo Cell Crib where
   op _ θ := blockOp (withSheets_admissible (toMedium_admissible θ.φ.2.1) (sheets χ θ.q))
-  reads := RReads endRing Src
+  reads := RReads endRing
   refReads := RRefReads
   openReads := ROpenReads Src
   recvReads := RRecvReads
@@ -332,17 +375,18 @@ def ringLaw (h₀ : ℝ) (χ : LockChart ρ Q endRing) (Src : Set Ring)
   ingestStep := ingestStep
   rekey := rekey
   apply θ d :=
-    { φ := ⟨fdeposited Ψe Ψc (locusOf d) θ.φ.1, declared_fdeposited θ.φ.2.1, θ.φ.2.2⟩
-      q := fun g => Ψq g (θ.q g) (ringData (Src := Src) d (.standing g))
-      E := fun g => Ψs g (θ.E g) (ringData (Src := Src) d (.sourcePort g))
-      Rd := fun g => Ψr g (θ.Rd g) (ringData (Src := Src) d (.receivingMap g)) }
+    { φ := ⟨fdeposited Ψe Ψc (locusOf d.edges) θ.φ.1, declared_fdeposited θ.φ.2.1, θ.φ.2.2⟩
+      q := fun g => Ψq g (θ.q g) (ringData d.edges (.standing g))
+      E := fun g => Ψs g (θ.E g) (portData Src d g)
+      Rd := fun g => Ψr g (θ.Rd g) (ringData d.edges (.receivingMap g)) }
   release keep θ :=
     { φ := ⟨frelease (fun ℓ => keep (.base ℓ)) θ.φ.1, declared_frelease θ.φ.2.1, θ.φ.2.2⟩
       q := fun g => if keep (.standing g) then θ.q g else 0
       E := fun g => if keep (.sourcePort g) then θ.E g else 0
       Rd := fun g => if keep (.receivingMap g) then θ.Rd g else 0 }
 
-variable {h₀ : ℝ} {χ : LockChart ρ Q endRing} {src : Λ → Mo → (g : Ring) → U g}
+variable {h₀ : ℝ} {χ : LockChart ρ Q endRing}
+  {src : Λ → Mo → (g : Ring) → P g →ₗ[ℝ] BlockM endRing V Ch (.inl g)}
   {ticks : Λ → Mo → ℕ}
   {cross : Λ → Λ → (b : Ring ⊕ Contact) → MediumRef Ring Ch b → MediumRef Ring Ch b →
     (BlockM endRing V Ch b →ₗ[ℝ] BlockM endRing V Ch b)}
@@ -353,8 +397,7 @@ variable {h₀ : ℝ} {χ : LockChart ρ Q endRing} {src : Λ → Mo → (g : Ri
   {Ψc : (a : Contact) → ChannelFactors (Ch := Ch) (FC := FC) a → EdgeData endRing V Ch →
     ChannelFactors (Ch := Ch) (FC := FC) a}
   {Ψq : (g : Ring) → Q g → EdgeData endRing V Ch → Q g}
-  {Ψs : (g : Ring) → (U g →ₗ[ℝ] BlockM endRing V Ch (.inl g)) → EdgeData endRing V Ch →
-    (U g →ₗ[ℝ] BlockM endRing V Ch (.inl g))}
+  {Ψs : (g : Ring) → P g → List (Λ × Mo × Module.Dual ℝ (BlockM endRing V Ch (.inl g))) → P g}
   {Ψr : (g : Ring) →
     (Module.Dual ℝ (BlockM endRing V Ch (.inl g)) →ₗ[ℝ]
       Module.Dual ℝ (BlockM endRing V Ch (.inl g))) →
@@ -396,7 +439,7 @@ theorem ringLaw_lawful : (RL).Lawful (blockAdj endRing) where
   open_reads θ θ' l m b h := by
     cases b with
     | inl g =>
-      show (if g ∈ Src then θ.E g (src l m g) else 0) = if g ∈ Src then θ'.E g (src l m g) else 0
+      show (if g ∈ Src then src l m g (θ.E g) else 0) = if g ∈ Src then src l m g (θ'.E g) else 0
       split_ifs with hg
       · rw [show θ.E g = θ'.E g from h (.sourcePort g) ⟨rfl, hg⟩]
       · rfl
@@ -405,7 +448,7 @@ theorem ringLaw_lawful : (RL).Lawful (blockAdj endRing) where
     cases b with
     | inl g => exact h (.receivingMap g) rfl
     | inr a => rfl
-  apply_local θ θ' d d' ℓ hθ hd := by
+  apply_local θ θ' d d' ℓ hθ hd ho := by
     cases ℓ with
     | base ℓ => exact fdeposited_local hθ hd
     | standing g =>
@@ -413,7 +456,7 @@ theorem ringLaw_lawful : (RL).Lawful (blockAdj endRing) where
       rw [show θ.q g = θ'.q g from hθ, ringData_congr hd]
     | sourcePort g =>
       show Ψs g (θ.E g) _ = Ψs g (θ'.E g) _
-      rw [show θ.E g = θ'.E g from hθ, ringData_congr hd]
+      rw [show θ.E g = θ'.E g from hθ, portData_congr ho]
     | receivingMap g =>
       show Ψr g (θ.Rd g) _ = Ψr g (θ'.Rd g) _
       rw [show θ.Rd g = θ'.Rd g from hθ, ringData_congr hd]
@@ -429,7 +472,7 @@ omit [Fintype Ring] in
 laws that keep a locus on empty data. -/
 theorem ringLaw_quiet
     (hΨe0 : ∀ r p, Ψe r p (fun _ _ => []) = p) (hΨc0 : ∀ a p, Ψc a p (fun _ _ => []) = p)
-    (hΨq0 : ∀ g p, Ψq g p (fun _ _ => []) = p) (hΨs0 : ∀ g p, Ψs g p (fun _ _ => []) = p)
+    (hΨq0 : ∀ g p, Ψq g p (fun _ _ => []) = p) (hΨs0 : ∀ g p, Ψs g p [] = p)
     (hΨr0 : ∀ g p, Ψr g p (fun _ _ => []) = p) : (RL).Quiet where
   refl ℓ θ := by
     cases ℓ with
@@ -443,7 +486,7 @@ theorem ringLaw_quiet
     | standing g => exact Eq.trans h₁ h₂
     | sourcePort g => exact Eq.trans h₁ h₂
     | receivingMap g => exact Eq.trans h₁ h₂
-  apply_quiet θ d ℓ h := by
+  apply_quiet θ d ℓ h ho := by
     cases ℓ with
     | base ℓ => exact fdeposited_quiet hΨe0 hΨc0 θ.φ.1 h
     | standing g =>
@@ -451,7 +494,7 @@ theorem ringLaw_quiet
       rw [ringData_quiet h, hΨq0]
     | sourcePort g =>
       show θ.E g = Ψs g (θ.E g) _
-      rw [ringData_quiet h, hΨs0]
+      rw [portData_quiet ho, hΨs0]
     | receivingMap g =>
       show θ.Rd g = Ψr g (θ.Rd g) _
       rw [ringData_quiet h, hΨr0]
@@ -466,9 +509,56 @@ theorem ringOpen_supported {S : Set (Ring ⊕ Contact)}
   intro θ l m b hb
   cases b with
   | inl g =>
-    show (if g ∈ Src then θ.E g (src l m g) else 0) = 0
+    show (if g ∈ Src then src l m g (θ.E g) else 0) = 0
     rw [if_neg fun hg => hb (hSrc g hg)]
   | inr a => rfl
+
+/-- [definition] **The source port's gradient** read off one opening datum `(l, m, h)`: the covector
+`δ ↦ h(src l m g δ)` on the port. At the Rust's passage it is
+`Σ_c (P_g^(c−τ_g) h) ⊗ M_g[c] w(c)` (`SourceMoment::encoder_covector`), read from the counts, the
+weights, the anchor and `h` alone. -/
+def portGradient (src : Λ → Mo → (g : Ring) → P g →ₗ[ℝ] MR g) (g : Ring)
+    (x : Λ × Mo × Module.Dual ℝ (MR g)) : Module.Dual ℝ (P g) :=
+  x.2.2 ∘ₗ src x.1 x.2.1 g
+
+open Classical in
+/-- [proved-derived; formal-checked] **The opening's datum is the source port's gradient.** Two
+constitutions that differ only in their source ports run the same word and read through the same
+receiving maps, and a reading of the word opened on any carry differs between them by the sum over
+the declared sources of the source port's gradient at `(l, m, λ_t(g))`, `λ_t` the reading's
+covector swept back to the opening, applied to the ports' difference. That triple is what a compare
+stages at a source observing a receiver (`TickStanding.openDataAt`), so the source port's deposit
+reads the source input through the moment and the anchor (`portData`). -/
+theorem port_gradient (θ θ' : RingsAt ρ V Ch FE FC Q P endRing h₀) (hφ : θ.φ = θ'.φ)
+    (hq : θ.q = θ'.q) (hRd : θ.Rd = θ'.Rd) (l : Λ) (m : Mo)
+    (c : TickCarry (BlockM endRing V Ch) (MediumRef Ring Ch) Λ) {R : Set (Ring ⊕ Contact)}
+    (r : ReceiverReading ℝ (BlockM endRing V Ch) R) :
+    TickStanding.wordRead RL θ l m c r - TickStanding.wordRead RL θ' l m c r =
+      ∑ g, if g ∈ Src then portGradient src g (l, m, sweepAt (wordOp RL θ l c.tick)
+        (readThrough RL θ r.1.2) r.1.1 r.1.1 (.inl g)) (θ.E g - θ'.E g) else 0 := by
+  obtain ⟨φ, q, E, Rd⟩ := θ
+  obtain ⟨φ', q', E', Rd'⟩ := θ'
+  simp only at hφ hq hRd
+  subst hφ hq hRd
+  simp only [TickStanding.wordRead]
+  have hx : TickStanding.opening RL ⟨φ, q, E, Rd⟩ l m c -
+      TickStanding.opening RL ⟨φ, q, E', Rd⟩ l m c =
+      ringOpen Src src ⟨φ, q, E, Rd⟩ l m - ringOpen Src src ⟨φ, q, E', Rd⟩ l m := by
+    funext b
+    simp only [TickStanding.opening, Pi.sub_apply, Pi.add_apply]
+    exact add_sub_add_right_eq_sub _ _ _
+  rw [show readThrough RL ⟨φ, q, E', Rd⟩ r.1.2 = readThrough RL ⟨φ, q, E, Rd⟩ r.1.2 from rfl,
+    show wordOp RL ⟨φ, q, E', Rd⟩ l c.tick = wordOp RL ⟨φ, q, E, Rd⟩ l c.tick from rfl,
+    reading_opening_variation, hx]
+  have h0 : ∀ a : Contact, ringOpen Src src ⟨φ, q, E, Rd⟩ l m (.inr a) -
+      ringOpen Src src ⟨φ, q, E', Rd⟩ l m (.inr a) = 0 := fun a => sub_self _
+  simp only [pair, Fintype.sum_sum_type, Pi.sub_apply, h0, map_zero, Finset.sum_const_zero,
+    add_zero]
+  refine Finset.sum_congr rfl fun g _ => ?_
+  simp only [ringOpen]
+  split_ifs
+  · simp only [portGradient, LinearMap.comp_apply, map_sub]
+  · rw [sub_zero, map_zero]
 
 /-! ## 4. The standing law, and the Rust's rule -/
 
@@ -486,7 +576,7 @@ def ringStanding {S R : Set (Ring ⊕ Contact)} (hSrc : ∀ g ∈ Src, (.inl g :
 never reopens a released locus**, for laws that keep a locus on empty data. -/
 theorem ring_released_stays_released
     (hΨe0 : ∀ r p, Ψe r p (fun _ _ => []) = p) (hΨc0 : ∀ a p, Ψc a p (fun _ _ => []) = p)
-    (hΨq0 : ∀ g p, Ψq g p (fun _ _ => []) = p) (hΨs0 : ∀ g p, Ψs g p (fun _ _ => []) = p)
+    (hΨq0 : ∀ g p, Ψq g p (fun _ _ => []) = p) (hΨs0 : ∀ g p, Ψs g p [] = p)
     (hΨr0 : ∀ g p, Ψr g p (fun _ _ => []) = p)
     {S R : Set (Ring ⊕ Contact)} (hSrc : ∀ g ∈ Src, (.inl g : Ring ⊕ Contact) ∈ S)
     (w : List (CarryGen Cell Crib (ReceiverFamily ℝ (BlockM endRing V Ch) R)))
@@ -554,9 +644,7 @@ theorem retained_rust_ring {S R : Set (Ring ⊕ Contact)}
       · refine Or.inr ⟨a, !s, hg, ?_⟩
         rw [Bool.not_not, hs]
         exact hel
-    | sourcePort g =>
-      obtain ⟨hg, rfl, rfl⟩ := hr
-      exact ⟨hg, observes_of_walk hw⟩
+    | sourcePort g => exact hr.elim
     | receivingMap g => trivial
   · cases ℓ with
     | base ℓ =>
@@ -608,6 +696,19 @@ theorem ring_rust_collapse_sufficient {S R : Set (Ring ⊕ Contact)}
 
 /-! ## 5. The certified step -/
 
+/-- [definition] **The source port's step** (`Constitution::deposited` at `Locus::SourcePort`): the
+port moves by `η` times a sum over the opening's data that reached it, each read by `go`; the Rust
+reads the anchor, the moment's counts and the covector swept to the opening there
+(`compose_return`; its gradient is `portGradient`). -/
+def portStep {Pg X : Type*} [AddCommGroup Pg] [Module ℝ Pg] (η : Pg → List X → ℝ)
+    (go : Pg → X → Pg) (p : Pg) (o : List X) : Pg :=
+  p + η p o • (o.map (go p)).sum
+
+/-- [proved-derived; formal-checked] **The source port's step keeps a port no datum reaches.** -/
+theorem portStep_quiet {Pg X : Type*} [AddCommGroup Pg] [Module ℝ Pg] (η : Pg → List X → ℝ)
+    (go : Pg → X → Pg) (p : Pg) : portStep η go p [] = p := by
+  simp [portStep]
+
 variable
     {ηe : (r : Ring) → ElementFactors (V := V) (FE := FE) (ρ := ρ) r → EdgeData endRing V Ch → ℝ}
     {ge : (r : Ring) → ElementFactors (V := V) (FE := FE) (ρ := ρ) r → (y z : Ring ⊕ Contact) →
@@ -620,10 +721,8 @@ variable
     {ηq : (g : Ring) → Q g → EdgeData endRing V Ch → ℝ}
     {gq : (g : Ring) → Q g → (y z : Ring ⊕ Contact) →
       BlockM endRing V Ch z × Module.Dual ℝ (BlockM endRing V Ch y) → Q g}
-    {ηs : (g : Ring) → (U g →ₗ[ℝ] BlockM endRing V Ch (.inl g)) → EdgeData endRing V Ch → ℝ}
-    {gs : (g : Ring) → (U g →ₗ[ℝ] BlockM endRing V Ch (.inl g)) → (y z : Ring ⊕ Contact) →
-      BlockM endRing V Ch z × Module.Dual ℝ (BlockM endRing V Ch y) →
-      (U g →ₗ[ℝ] BlockM endRing V Ch (.inl g))}
+    {ηs : (g : Ring) → P g → List (Λ × Mo × Module.Dual ℝ (BlockM endRing V Ch (.inl g))) → ℝ}
+    {gs : (g : Ring) → P g → Λ × Mo × Module.Dual ℝ (BlockM endRing V Ch (.inl g)) → P g}
     {ηr : (g : Ring) →
       (Module.Dual ℝ (BlockM endRing V Ch (.inl g)) →ₗ[ℝ]
         Module.Dual ℝ (BlockM endRing V Ch (.inl g))) →
@@ -638,7 +737,7 @@ variable
 /-- The law on the medium with the ring loci under the certified step. -/
 local notation "CRL" => ringLaw (Cell := Cell) (Crib := Crib) h₀ χ Src src ticks cross absorb
   ingestStep rekey (fun r => certifiedStep (ηe r) (ge r)) (fun a => certifiedStep (ηc a) (gc a))
-  (fun g => certifiedStep (ηq g) (gq g)) (fun g => certifiedStep (ηs g) (gs g))
+  (fun g => certifiedStep (ηq g) (gq g)) (fun g => portStep (ηs g) (gs g))
   (fun g => certifiedStep (ηr g) (gr g))
 
 /-- [proved-derived; formal-checked] **Under the certified step, a deposit between words never
@@ -659,7 +758,7 @@ theorem certified_ring_released_stays_released
   ring_released_stays_released (fun r p => certifiedStep_quiet (ηe r) (ge r) p)
     (fun a p => certifiedStep_quiet (ηc a) (gc a) p)
     (fun g p => certifiedStep_quiet (ηq g) (gq g) p)
-    (fun g p => certifiedStep_quiet (ηs g) (gs g) p)
+    (fun g p => portStep_quiet (ηs g) (gs g) p)
     (fun g p => certifiedStep_quiet (ηr g) (gr g) p) hSrc w s h hℓ
 
 end Law
@@ -671,6 +770,8 @@ end Holonics.HNN.RingLoci
 #print axioms Holonics.HNN.RingLoci.ringLaw_lawful
 #print axioms Holonics.HNN.RingLoci.ringLaw_quiet
 #print axioms Holonics.HNN.RingLoci.ringOpen_supported
+#print axioms Holonics.HNN.RingLoci.port_gradient
+#print axioms Holonics.HNN.RingLoci.portStep_quiet
 #print axioms Holonics.HNN.RingLoci.ringStanding
 #print axioms Holonics.HNN.RingLoci.ring_released_stays_released
 #print axioms Holonics.HNN.RingLoci.retained_receiver

@@ -25,10 +25,11 @@ Here the joint step is any such deposit:
   deposit leaves the constitution as it was (`jointApply`). `some γ` carries everything the step
   decides jointly: the step `η`, the lobe's holds and halvings, the lock's proposal.
 * **A per-locus step at each joint value** `stepAt γ`: given `γ`, each locus moves from its own
-  state and the data on the edges that read it (`StepLocal`), and keeps a locus no datum reaches
-  (`StepQuiet`).
+  state, the data on the edges that read it and the opening's data at the blocks whose opening
+  reads it (`StepLocal`), and keeps a locus no datum reaches (`StepQuiet`).
 * **The joint reading reads the kept loci alone** (`ReadsOnly keep`): two constitutions agreeing on
-  every locus of `keep`, with staged data equal on every declared edge, give the same reading. For
+  every locus of `keep`, with staged data equal on every declared edge and at every block, give the
+  same reading. For
   the Rust, `keep` is the collapse's retained set.
 * **The budget over the retained set, the other reads over the diamond** (`budgeted`): the
   diamond's reading `Jd` refuses or decides `γ`, and the budget `within` then admits the successor
@@ -63,12 +64,12 @@ Here the joint step is any such deposit:
 [agent-inferred] **What it leaves open.** That the Rust's `Reach::loci` lies within the loci its
 collapse retains (record B §8: at rest the word's opened diamond and the collapse diamond are the
 same, and under the carry the continuing diamond keeps every locus a walk passes), and that its
-budget counts that retained set, are the Rust's fixtures (`tests/retention.rs`), not Lean
-statements here; this file takes the reads on the diamond and the
-budget on the retained set as hypotheses. The carried statistics and remainders in the locus's state (a factor family's `h_x′`,
-a linear locus's successor Gram and chart, the standing's carried remainder) are owed in #62.
-The step's certified descent is `Holon/Deposition`. The moment in the staged deposit (the
-source-port deposit reading the source input) is a separate item of #62.
+budget counts that retained set, are the Rust's fixtures (`tests/retention.rs`), not Lean statements
+here; this file takes the reads on the diamond and the budget on the retained set as hypotheses. The
+carried statistics and remainders in the locus's state (a factor family's `h_x′`, a linear locus's
+successor Gram and chart, the standing's carried remainder) are owed in #62. The step's certified
+descent is `Holon/Deposition`. The source port's deposit reads the opening's data the staged deposit
+carries (`TickStanding.TickStage`, `RingLoci.port_gradient`).
 
 No `sorry`, no `axiom`, no `native_decide`.
 -/
@@ -90,7 +91,7 @@ variable {Con Loc : Type*} {Ref : B → Type*} {Cls Λ Mo Cell Crib Γ : Type*}
 
 set_option hygiene false in
 /-- The staged data of one deposit. -/
-local notation "Data" => (y z : B) → List (M z × Module.Dual K (M y))
+local notation "Data" => TickStage K M Λ Mo
 
 /-- [definition] **The joint deposit**: the joint reading decides; a refusal leaves the
 constitution, and a joint value `γ` moves every locus by the step at `γ`. -/
@@ -109,18 +110,21 @@ def jointLaw (L : TickLaw K M Con Loc Ref Cls Λ Mo Cell Crib) (J : Con → Data
 variable (L : TickLaw K M Con Loc Ref Cls Λ Mo Cell Crib)
 
 /-- [definition] **The step at each joint value is per-locus**: given the joint value, a locus
-moves from its own state and the data on the edges that read it. -/
+moves from its own state, the data on the edges that read it and the opening's data at the blocks
+whose opening reads it. -/
 def StepLocal (stepAt : Γ → Con → Data → Con) : Prop :=
-  ∀ γ θ θ' d d' ℓ, L.agreeOn ℓ θ θ' → (∀ y z, L.reads ℓ z y → d y z = d' y z) →
-    L.agreeOn ℓ (stepAt γ θ d) (stepAt γ θ' d')
+  ∀ γ θ θ' d d' ℓ, L.agreeOn ℓ θ θ' → (∀ y z, L.reads ℓ z y → d.edges y z = d'.edges y z) →
+    (∀ b, L.openReads ℓ b → d.opens b = d'.opens b) → L.agreeOn ℓ (stepAt γ θ d) (stepAt γ θ' d')
 
 /-- [definition] **The step at each joint value keeps a locus no datum reaches.** -/
 def StepQuiet (stepAt : Γ → Con → Data → Con) : Prop :=
-  ∀ γ θ d ℓ, (∀ y z, L.reads ℓ z y → d y z = []) → L.agreeOn ℓ θ (stepAt γ θ d)
+  ∀ γ θ d ℓ, (∀ y z, L.reads ℓ z y → d.edges y z = []) → (∀ b, L.openReads ℓ b → d.opens b = []) →
+    L.agreeOn ℓ θ (stepAt γ θ d)
 
 variable (adj) in
 /-- [definition] **The joint reading reads the loci `keep` alone**: constitutions agreeing on every
-locus of `keep`, with staged data equal on every declared edge, read the same. -/
+locus of `keep`, with staged data equal on every declared edge and at every block, read the
+same. -/
 def ReadsOnly (keep : Loc → Prop) (J : Con → Data → Option Γ) : Prop :=
   ∀ θ θ' d d', (∀ ℓ, keep ℓ → L.agreeOn ℓ θ θ') → StagedAgree adj (K := K) d d' → J θ d = J θ' d'
 
@@ -158,7 +162,8 @@ theorem jointLaw_applyRetained (hL : L.Local adj) {S R : Set B}
     (jointLaw L J stepAt).ApplyRetained adj S R :=
   fun θ θ' d d' hθ hdd ℓ hℓ =>
     jointApply_agree (hJ θ θ' d d' hθ hdd) (hθ ℓ hℓ) fun γ =>
-      hstep γ θ θ' d d' ℓ (hθ ℓ hℓ) fun y z hr => hdd y z (hL.reads_adj ℓ z y hr)
+      hstep γ θ θ' d d' ℓ (hθ ℓ hℓ) (fun y z hr => hdd.1 y z (hL.reads_adj ℓ z y hr))
+        fun b _ => hdd.2 b
 
 /-- [proved-derived; formal-checked] **The standing with the joint step** (#62): the continuing
 collapse on loci is a `Foundation/Standing.StandingLaw` for the resident whose deposit is the joint
@@ -206,26 +211,34 @@ theorem step_keepAgree (hL : L.Local adj) (hE : Equiv L) {keep : Loc → Prop} {
       (step adj (jointLaw L J stepAt) S R g res') := by
   obtain ⟨hA, hkeep, hoff, hoff'⟩ := h
   -- the deposit at the pair: the joint readings agree, and each kept locus moves alike
-  have hdep : ∀ d d', StagedAgree adj (K := K) d d' →
-      (∀ y z, ¬ OnWalk adj S R z y → d y z = []) → (∀ y z, ¬ OnWalk adj S R z y → d' y z = []) →
+  have hdep : ∀ d d', StagedAgree adj d d' →
+      ((∀ y z, ¬ OnWalk adj S R z y → d.edges y z = []) ∧
+        ∀ b, ¬ (b ∈ S ∧ ObservesAll adj R b) → d.opens b = []) →
+      ((∀ y z, ¬ OnWalk adj S R z y → d'.edges y z = []) ∧
+        ∀ b, ¬ (b ∈ S ∧ ObservesAll adj R b) → d'.opens b = []) →
       ∀ ℓ, keep ℓ → L.agreeOn ℓ (jointApply J stepAt res.loci d)
         (jointApply J stepAt res'.loci d') := by
     intro d d' hdd hd hd' ℓ hℓ
     refine jointApply_agree (hJ _ _ _ _ hkeep hdd) (hkeep ℓ hℓ) fun γ => ?_
     by_cases hr : Retained adj L S R ℓ
-    · exact hstep γ _ _ _ _ ℓ (hkeep ℓ hℓ) fun y z hrd => hdd y z (hL.reads_adj ℓ z y hrd)
-    · have hoffℓ : ∀ (e : Data), (∀ y z, ¬ OnWalk adj S R z y → e y z = []) →
-          ∀ y z, L.reads ℓ z y → e y z = [] :=
+    · exact hstep γ _ _ _ _ ℓ (hkeep ℓ hℓ) (fun y z hrd => hdd.1 y z (hL.reads_adj ℓ z y hrd))
+        fun b _ => hdd.2 b
+    · have hoffℓ : ∀ (e : Data), (∀ y z, ¬ OnWalk adj S R z y → e.edges y z = []) →
+          ∀ y z, L.reads ℓ z y → e.edges y z = [] :=
         fun e he y z hrd => he y z fun hw => hr (Or.inl ⟨z, y, hrd, hw⟩)
-      exact hE.trans ℓ _ _ _ (hE.symm ℓ _ _ (hq γ _ d ℓ (hoffℓ d hd)))
-        (hE.trans ℓ _ _ _ (hkeep ℓ hℓ) (hq γ _ d' ℓ (hoffℓ d' hd')))
+      have hoffo : ∀ (e : Data), (∀ b, ¬ (b ∈ S ∧ ObservesAll adj R b) → e.opens b = []) →
+          ∀ b, L.openReads ℓ b → e.opens b = [] :=
+        fun e he b hrb => he b fun hb => hr (Or.inr (Or.inr (Or.inl ⟨b, hrb, hb.1, hb.2⟩)))
+      exact hE.trans ℓ _ _ _ (hE.symm ℓ _ _ (hq γ _ d ℓ (hoffℓ d hd.1) (hoffo d hd.2)))
+        (hE.trans ℓ _ _ _ (hkeep ℓ hℓ) (hq γ _ d' ℓ (hoffℓ d' hd'.1) (hoffo d' hd'.2)))
   refine ⟨step_agree (jointLaw_local hL) hopen g ?ret hv hv' hA, ?kept,
     step_stagedOff g hv hoff, step_stagedOff g hv' hoff'⟩
   case ret =>
     -- the retained loci: the readings agree, and the step at each joint value is per-locus
     intro d d' hdd ℓ hℓ
     refine jointApply_agree (hJ _ _ _ _ hkeep hdd) (hkeep ℓ (hk ℓ hℓ)) fun γ => ?_
-    exact hstep γ _ _ _ _ ℓ (hkeep ℓ (hk ℓ hℓ)) fun y z hrd => hdd y z (hL.reads_adj ℓ z y hrd)
+    exact hstep γ _ _ _ _ ℓ (hkeep ℓ (hk ℓ hℓ)) (fun y z hrd => hdd.1 y z (hL.reads_adj ℓ z y hrd))
+      fun b _ => hdd.2 b
   case kept =>
     -- the kept loci
     obtain ⟨θ, l, m, c, P, D⟩ := res
@@ -288,7 +301,8 @@ theorem keepAgree_release (hL : L.Local adj) {keep : Loc → Prop} {S R : Set B}
       TickStanding.carryAgree_refl _,
       forall₂_self (s := TickStanding.PendAgree adj S R)
         (fun _ => ⟨rfl, rfl, TickStanding.carryAgree_refl _⟩) _,
-      forall₂_self (s := TickStanding.StagedAgree adj) (fun _ _ _ _ => rfl) res.staged⟩,
+      forall₂_self (s := TickStanding.StagedAgree adj) (fun _ => ⟨fun _ _ _ => rfl, fun _ => rfl⟩)
+        res.staged⟩,
     fun ℓ hℓ => hL.release_keeps keep res.loci ℓ hℓ, hoff, hoff⟩
 
 /-- [proved-derived; formal-checked] **A collapse keeping the read loci is sufficient under the
@@ -359,12 +373,12 @@ theorem joint_released_stays_released (hL : L.Local adj) (hE : Equiv L) {S R : S
         (transportOf adj (jointLaw L J stepAt) (jointLaw_local hL) hopen) w
         ⟨retain adj (jointLaw L J stepAt) S R s.1, retain_valid s.2⟩).1.loci :=
   released_stays_releasedOf (L := jointLaw L J stepAt) (jointLaw_local hL)
-    ⟨hE.refl, hE.trans, fun θ d ℓ hd => by
+    ⟨hE.refl, hE.trans, fun θ d ℓ hd ho => by
       show L.agreeOn ℓ θ (jointApply J stepAt θ d)
       unfold jointApply
       cases J θ d with
       | none => exact hE.refl ℓ θ
-      | some γ => exact hq γ θ d ℓ hd⟩ hopen w s h hℓ
+      | some γ => exact hq γ θ d ℓ hd ho⟩ hopen w s h hℓ
 
 /-! ### The budget over the retained set, the other reads over the diamond -/
 
@@ -397,7 +411,8 @@ theorem budgeted_readsOnly (hL : L.Local adj) {Jd : Con → Data → Option Γ} 
   | some γ =>
     simp only [Option.bind_some]
     rw [hb _ _ fun ℓ hℓ =>
-      hstep γ θ θ' d d' ℓ (hθ ℓ hℓ) fun y z hr => hdd y z (hL.reads_adj ℓ z y hr)]
+      hstep γ θ θ' d d' ℓ (hθ ℓ hℓ) (fun y z hr => hdd.1 y z (hL.reads_adj ℓ z y hr))
+        fun b _ => hdd.2 b]
 
 end Joint
 
@@ -450,7 +465,8 @@ local notation "CL1" => CLη ((fun _ => 1, fun _ => 1) : (Ring → ℝ) × (Cont
 with `certify_steps`): the joint reading `J` refuses (`none`) or decides a step per element and per
 channel (`some η`: the certified `2^k`, halved where the lobe holds a family); each locus's factors
 then move by its step times its own data's moves (`certifiedStep`). -/
-def certifiedJointLaw (J : FactoredAt ρ V Ch FE FC endRing h₀ → EdgeData endRing V Ch →
+def certifiedJointLaw
+    (J : FactoredAt ρ V Ch FE FC endRing h₀ → TickStage ℝ (BlockM endRing V Ch) Λ Mo →
       Option ((Ring → ℝ) × (Contact → ℝ))) :
     TickLaw ℝ (BlockM endRing V Ch) (FactoredAt ρ V Ch FE FC endRing h₀) (Locus Ring Contact)
       (MediumRef Ring Ch) (Ring → ρ → ℝ) Λ Mo Cell Crib :=
@@ -475,24 +491,24 @@ theorem factored_equiv : Equiv (CL1) where
 
 /-- [proved-derived; formal-checked] The certified step at each joint value is per-locus. -/
 theorem certified_stepLocal : StepLocal (CL1) fun η => (CLη η).apply :=
-  fun η θ θ' d d' ℓ hθ hd =>
+  fun η θ θ' d d' ℓ hθ hd ho =>
     (factoredLaw_lawful (Cell := Cell) (Crib := Crib) (h₀ := h₀) (cls := cls)
       (openState := openState) (ticks := ticks) (cross := cross) (absorb := absorb)
       (ingestStep := ingestStep) (rekey := rekey)
       (Ψe := fun r => certifiedStep (fun _ _ => η.1 r) (ge r))
-      (Ψc := fun a => certifiedStep (fun _ _ => η.2 a) (gc a))).apply_local θ θ' d d' ℓ hθ hd
+      (Ψc := fun a => certifiedStep (fun _ _ => η.2 a) (gc a))).apply_local θ θ' d d' ℓ hθ hd ho
 
 /-- [proved-derived; formal-checked] The certified step at each joint value keeps a locus no datum
 reaches. -/
 theorem certified_stepQuiet : StepQuiet (CL1) fun η => (CLη η).apply :=
-  fun η θ d ℓ hd =>
+  fun η θ d ℓ hd ho =>
     (factoredLaw_quiet (Cell := Cell) (Crib := Crib) (h₀ := h₀) (cls := cls)
       (openState := openState) (ticks := ticks) (cross := cross) (absorb := absorb)
       (ingestStep := ingestStep) (rekey := rekey)
       (Ψe := fun r => certifiedStep (fun _ _ => η.1 r) (ge r))
       (Ψc := fun a => certifiedStep (fun _ _ => η.2 a) (gc a))
       (fun r p => certifiedStep_quiet _ (ge r) p)
-      (fun a p => certifiedStep_quiet _ (gc a) p)).apply_quiet θ d ℓ hd
+      (fun a p => certifiedStep_quiet _ (gc a) p)).apply_quiet θ d ℓ hd ho
 
 set_option quotPrecheck false in
 -- The loci the Rust's per-locus rule retains under the continuing diamond.
@@ -504,7 +520,7 @@ step** (#62; record B §8): with the joint reading any function of the loci the 
 retains and of the staged data, releasing every other locus changes no admitted face of the current
 word or of any pending word, after any word of the generators. -/
 theorem certified_joint_rust_collapse_sufficient
-    {J : FactoredAt ρ V Ch FE FC endRing h₀ → EdgeData endRing V Ch →
+    {J : FactoredAt ρ V Ch FE FC endRing h₀ → TickStage ℝ (BlockM endRing V Ch) Λ Mo →
       Option ((Ring → ℝ) × (Contact → ℝ))} {S R : Set (Ring ⊕ Contact)}
     (hS : ∀ a, (.inr a : Ring ⊕ Contact) ∈ S → ∀ s, (.inl (endRing (a, s)) : Ring ⊕ Contact) ∈ S)
     (hR : ∀ a, (.inr a : Ring ⊕ Contact) ∉ R) (hopen : ∀ l m, SupportedIn (openState l m) S)
@@ -530,7 +546,7 @@ theorem certified_joint_rust_collapse_sufficient
 under the certified joint step: after any word of the generators, every staged deposit's joint
 reading on the collapsed resident is the uncollapsed one's. -/
 theorem certified_joint_rust_reading_unchanged
-    {J : FactoredAt ρ V Ch FE FC endRing h₀ → EdgeData endRing V Ch →
+    {J : FactoredAt ρ V Ch FE FC endRing h₀ → TickStage ℝ (BlockM endRing V Ch) Λ Mo →
       Option ((Ring → ℝ) × (Contact → ℝ))} {S R : Set (Ring ⊕ Contact)}
     (hS : ∀ a, (.inr a : Ring ⊕ Contact) ∈ S → ∀ s, (.inl (endRing (a, s)) : Ring ⊕ Contact) ∈ S)
     (hR : ∀ a, (.inr a : Ring ⊕ Contact) ∉ R) (hopen : ∀ l m, SupportedIn (openState l m) S)
@@ -555,7 +571,7 @@ under the collapse): with the budget reading the loci the Rust's rule retains an
 (the gains, the Floquet decisions, the held families, the boost gate, the lobe and the lock) reading
 the word's diamond `diam` inside them, the budgeted reading reads the retained loci alone. -/
 theorem certified_budgeted_readsOnly
-    {Jd : FactoredAt ρ V Ch FE FC endRing h₀ → EdgeData endRing V Ch →
+    {Jd : FactoredAt ρ V Ch FE FC endRing h₀ → TickStage ℝ (BlockM endRing V Ch) Λ Mo →
       Option ((Ring → ℝ) × (Contact → ℝ))} {within : FactoredAt ρ V Ch FE FC endRing h₀ → Bool}
     {diam : Locus Ring Contact → Prop} {S R : Set (Ring ⊕ Contact)}
     (hdk : ∀ ℓ, diam ℓ → (RUST S R) ℓ) (hd : ReadsOnly (blockAdj endRing) (CL1) diam Jd)
@@ -571,7 +587,7 @@ over the diamond inside it, releasing every locus the Rust's rule does not retai
 any word of the generators, no admitted face and no staged deposit's joint reading, a refusal by
 the budget or by any other read included. -/
 theorem certified_budgeted_rust_unchanged
-    {Jd : FactoredAt ρ V Ch FE FC endRing h₀ → EdgeData endRing V Ch →
+    {Jd : FactoredAt ρ V Ch FE FC endRing h₀ → TickStage ℝ (BlockM endRing V Ch) Λ Mo →
       Option ((Ring → ℝ) × (Contact → ℝ))} {within : FactoredAt ρ V Ch FE FC endRing h₀ → Bool}
     {diam : Locus Ring Contact → Prop} {S R : Set (Ring ⊕ Contact)}
     (hS : ∀ a, (.inr a : Ring ⊕ Contact) ∈ S → ∀ s, (.inl (endRing (a, s)) : Ring ⊕ Contact) ∈ S)
