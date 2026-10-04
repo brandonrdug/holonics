@@ -69,7 +69,8 @@ located     a = Σ_t ⟨g_t, W_t z_t⟩ ,  V = ln 2 Σ_t Var_p(W_t z_t)     ⇒ 
    `prequential_code_departure_le`). The executed move is `φ M_t − E_t`, its departure a sum of
    pair departures; with `|E_t c| ≤ r_t` the prequential code is at most the face's less `φ a`,
    plus `φ² (ln 2) 2^ω Σ_t Var_(p_t)(M_t)`, plus `(ln 2) 2^ω Σ_t r_t² + 2 Σ_t r_t`. It holds at
-   the exact solve and `η = 1`; the certified step and the chart's lattice residual stay in #62.
+   the exact solve and `η = 1`; the certified step and the chart's lattice residual are
+   `HNN/ChartResidual`.
 -/
 
 namespace Holonics.HNN.ReceivingPrior
