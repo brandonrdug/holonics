@@ -53,10 +53,11 @@ dyadic      q(x) ≤ q(2x)  ⇔  2 (V + a) ≤ 3 x V ;  x best on the grid  ⇐ 
    `2 (V + a) ≤ 3 x V`: the Newton point at most the arithmetic midpoint `3x/2` in the map's scale.
    A member whose cell `[3x/4, 3x/2]` holds the Newton point codes least on the whole grid. In the
    prior's own scale (`σ = s/φ`) the cell of `σ_m` is `[2σ_m/3, 4σ_m/3]`, the harmonic midpoints
-   of its neighbours. [agent-inferred] The move is by this comparison, because it is the code the
-   law minimizes; record §6 read the Newton points against `(σ_m/√2, σ_m √2)`, the members' cells
-   in the exponent. The two readings differ in general. On campaign 1 they agree: every at-map
-   Newton point the record reports lies in `[4/3, 8/3]`, the cell of `2 I` (`campaign_one_cell`),
+   of its neighbours. The move is by this comparison, because the prequential code is what the
+   prior's law minimizes. Record §6 first read the Newton points against `(σ_m/√2, σ_m √2)`, the
+   members' cells in the exponent, which approximates the code's cell by a quadratic in `log φ`;
+   §6 now states the code's cell. On campaign 1 the two agree: every at-map Newton point the
+   record reports lies in `[4/3, 8/3]`, the cell of `2 I` (`campaign_one_cell`),
    and the opening's located priors lie in `[8/3, 16/3]`, the cell of `2² I`
    (`campaign_one_open_cell`), which the at-map read refines (record §5).
 
