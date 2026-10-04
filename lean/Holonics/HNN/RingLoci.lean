@@ -77,8 +77,8 @@ header "Within a lobe"; `LobeReading`), and its carried remainder is kept beside
 constitution's carries at `(Locus::Standing(g), Carrier::Standing)`). The joint step on retained
 loci, with the carried statistics and remainders in the locus's state, is owed in #62.
 
-[open] The loaded ring block joined to the medium, so that the class reads the pump's phase, is
-owed in #62.
+The loaded ring block joined to the medium, so that the class reads the pump's phase, is
+`HNN/LoadedMedium` (`loaded_ring_rust_collapse_sufficient`).
 
 `HNN/FactoredMedium`, `HNN/MediumStanding` and `HNN/LocusMap` are unchanged in their laws. No
 `sorry`, no `axiom`, no `native_decide`.
