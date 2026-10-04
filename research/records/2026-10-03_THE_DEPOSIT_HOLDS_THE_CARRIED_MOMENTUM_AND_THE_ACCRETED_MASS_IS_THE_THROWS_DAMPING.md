@@ -111,8 +111,9 @@ the next. This record states the one law both obey at a deposit.
    ported when U6's moves resume, under §5's consumer. Its §6 chain (a seed and a control arm) and
    its §8 Kinetic coupling read served only the synthetic step 1 and are dropped. Its owed
    per-move energy law and nonconvex floor are proved (§6 items 4 and 5,
-   `HolonicsResearch/HNN/ThrowEnergy`, #297). The law is stated at the exact chart `H′X = 1`, and
-   the chart's certified residual `δ` stays owed in #62.
+   `HolonicsResearch/HNN/ThrowEnergy`, #297). The law is stated at the exact chart `H′X = 1`; its
+   form through the executed charts, with the chart's certified residual `δ`, is §1a of the same
+   file (#303).
 
 ## 0. The failures this could repeat
 
@@ -259,8 +260,12 @@ Sent to the coordinator for the main line, which owns `word.rs`, `word/continuat
    where the coast falls, `⟨G, c⟩ ≥ 0` (`throw_dissipation_nonneg`). Where the coast climbs,
    `⟨G, c⟩ < 0`, the coast adds `τ(1 − τη)|⟨G, c⟩|` to the energy unless `τη = 1`. Whether an
    adopted move falls is the exact check of `ρ + R` at that move; no bound of `R` by the certified
-   step's curvature is stated. Still owed: the chart's certified residual `δ`, a further term the
-   law at `H′X = 1` omits.]
+   step's curvature is stated. The chart's certified residual `δ` is proved in #303
+   (`throw_energy_law_chart`, through `held_loss_chart`): with `X` and `X′` symmetric and inexact,
+   the law gains `− ⟨½v + r, (1 − H′X) τ(ηG + P)⟩` and `− ½⟨c′, (1 − (H′ + F′)X′) P′⟩`, each within
+   `δ α Σ_i |b_i|` (`chart_residual_pairing_le`); the halving's and the impulse's readings are
+   nonnegative up to the same term (`chart_reading_ge`), and the energy still does not rise when
+   `ρ + R` plus both residual bounds is within the four dissipations (`throw_energy_falls_chart`).]
 5. From #240 §7: the floor along a nonconvex line. [Proved, #297,
    `HolonicsResearch/HNN/ThrowEnergy.{line_slope_le, nonconvex_line_falls_to,
    nonconvex_line_le_quadratic, nonconvex_stop_value, nonconvex_apex_rises}`: with only an upper

@@ -278,3 +278,20 @@ move and its departure is bounded, not dropped. The hypothesis that the executed
 times its unit is therefore no longer needed for the exact solve. #62 keeps what the resolvent
 does not see: the certified step `η` (the bound is at `η = 1`) and the chart's lattice residual
 (`SolvedChart` is a certified inverse on `2^(−L_s)ℤ`, not `H⁻¹`).
+
+October 4: both are proved (`HNN/ChartResidual`, #303).
+- **The chart's lattice residual** (§1). `SolvedChart` certifies the left residual
+  `δ = ‖1 − X̂H‖∞`, so if `AY = 1` the exact inverse is within `‖X̂‖∞ δ/(1 − δ)` of the chart
+  (`inverse_chart_deviation_left`; `δ ≤ δ_ℓ < 1`, since a refinement that misses `δ_ℓ` is
+  refused). The executed pair read then departs from the `1/s` reading by at most
+  `ρ + ‖X̂‖∞ δ/(1 − δ) μ ‖z‖₁`, with `ρ` the exact solve's bound and `|u_j| ≤ μ`
+  (`chart_pair_departure_le`, through `matrix_pair_le`). A class's departure carries both terms
+  (`chart_class_departure_le`) into the remainder of `prequential_code_departure_le`
+  (`prequential_code_chart_le`).
+- **The certified step** (§2). Under the prior `s/φ` the step's cap is
+  `min(a/(φ C), 1/max(φ osc, 1)) ≤ 1` (`certified_move_scaled`), and the executed step is the
+  largest power of two at most the cap, halved with the joint certificate, so each deposit moves by
+  `ψ = φη ≤ φ` times its unit-prior move. Along the executed move the code is the `η = 1` bound
+  with the remainder taken at `r′_t = r_t + Σ_u (φ − ψ_u) μ_u t`
+  (`prequential_code_certified_step_le`): the step's shortfall from `φ` is one more departure, and
+  it is zero where every step is `1`.
