@@ -55,7 +55,7 @@ exit up     0 ≤ V, 0 ≤ y, 2 y V ≤ V + a  ⇒  q(2y) ≤ q(y) ;   so the fl
 
 The signs the Rust decides through `ln 2`'s enclosure (`at_most_zero`, an undecided sign holding
 `k`) are the hypotheses here, read at the exact `ℓ`. The chart's re-founding at the moved scale
-(`SolvedChart::moved`) is not stated here.
+(`SolvedChart::moved`) is `HNN/MovedChart`, at the same `x`.
 
 No `sorry`, no `axiom`, no `native_decide`.
 -/
