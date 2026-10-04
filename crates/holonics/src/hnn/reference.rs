@@ -1356,7 +1356,14 @@ impl ExecutionPort for Reference {
                 remainders: released.remainders.clone(),
                 last: released.last.clone(),
                 resonators: released.resonators.clone(),
-                word: Box::new(WordBalance::of(&released)),
+                // Under `A = 0` the word's motion carries from its last crossing (record B §2.4):
+                // its balance is read to that crossing, whose change the carry holds.
+                word: Box::new(match (&ended, &self.reception) {
+                    (Some(carry), Reception::Carry(Absorption::Nothing)) => {
+                        WordBalance::carried(&released, carry.change.clone())
+                    }
+                    _ => WordBalance::of(&released),
+                }),
             },
         )?;
         receipt.balances = released.balances;

@@ -20,7 +20,7 @@ use crate::ratio::{Rat, integer, rat};
 
 
 /// A cycle parametron of `d` nodes (unit branches), the ring's resonator base.
-fn cycle(d: usize) -> Parametron {
+pub(super) fn cycle(d: usize) -> Parametron {
     let incidence = crate::ratio::linear::vector::matrix(d, d, |branch, node| {
         if node == branch {
             -Rat::one()
@@ -35,7 +35,7 @@ fn cycle(d: usize) -> Parametron {
 }
 
 /// The constitution with a pumped resonator declared on every ring.
-fn resonant(field: &Field, theta: Constitution) -> Constitution {
+pub(super) fn resonant(field: &Field, theta: Constitution) -> Constitution {
     let mut resonant = theta;
     for ring in 0..field.rings().len() {
         let period = field.ring(ring).period() as usize;
@@ -144,6 +144,60 @@ fn continuing_words_carry_waves_contact_and_resonator_states() {
         assert!(tick.closes(), "{tick:?}");
     }
     assert_eq!(second.field_balances(), &whole.field_balances()[2..]);
+}
+
+/// **A reception carries the motion from its last crossing** (record B §2.4): a junction is a
+/// crossing, the clock's tick, and the hop after it runs the elements, the pumped resonators at that
+/// tick's phase and the transits. A word that ends at a last junction has scattered crossing `T`
+/// for its reading and has not run hop `T`, so its carry is the change arriving at `T`, every
+/// resonator state and phase as hop `T − 1` left them, at tick `T`. Under the exact law the word
+/// opened there with nothing injected continues the uninterrupted word exactly, pumped resonators
+/// included: the same change and the same balances tick for tick. The change after the last
+/// junction, opened one tick later, does not: on a pumped field its phase misses the clock (the
+/// refusal the carry first had), and on an unpumped field crossing `T` is scattered twice, which
+/// the junction's involution undoes (Lean `HNN/Propagation.junctionScattering_involutive`), so hop
+/// `T` would run on the unscattered waves.
+#[test]
+fn the_reception_carry_continues_from_the_last_crossing() {
+    let field = chain().with_exact_word();
+    let nothing = |field: &Field| -> Vec<Vec<Rat>> {
+        field.rings().iter().map(|ring| vec![Rat::zero(); ring.width()]).collect()
+    };
+    for (theta, pumped) in [
+        (resonant(&field, generic(&field, 75)), true),
+        (generic(&field, 75), false),
+    ] {
+        let current = Current::at_rest(&field);
+        let operands = Operands::exact_at_cut(&field, &theta, &current).unwrap();
+        let injected = storage(&field, 76);
+        let mut whole = Word::on_operands(&field, operands.clone(), injected.clone()).unwrap();
+        whole.run(5).unwrap();
+        let mut first = Word::on_operands(&field, operands.clone(), injected).unwrap();
+        first.run(3).unwrap();
+        first.last_junction().unwrap();
+        let carry = first.reception_end().unwrap();
+        assert_eq!(carry.ticks, 3, "the last crossing's tick, its hop not run");
+        for (ring, resonator) in operands.resonators().iter().enumerate() {
+            let phase = resonator.as_ref().map(|resonator| resonator.phase_at(2));
+            assert_eq!(carry.change.resonator_phases[ring], phase);
+            assert_eq!(carry.change.resonators[ring].is_some(), pumped);
+        }
+        let mut second =
+            Word::continuing(&field, operands.clone(), &carry.change, &nothing(&field), carry.ticks)
+                .unwrap();
+        second.run(2).unwrap();
+        assert_eq!(second.change().unwrap(), whole.change().unwrap());
+        assert_eq!(second.field_balances(), &whole.field_balances()[3..]);
+        let after = first.released().unwrap().end;
+        let late = Word::continuing(&field, operands.clone(), &after, &nothing(&field), 4);
+        if pumped {
+            assert!(matches!(late, Err(crate::hnn::HnnError::Resonator { .. })));
+        } else {
+            let mut late = late.unwrap();
+            late.run(2).unwrap();
+            assert_ne!(late.change().unwrap(), whole.change().unwrap());
+        }
+    }
 }
 
 // -------------------------------------------------------------------------------------------

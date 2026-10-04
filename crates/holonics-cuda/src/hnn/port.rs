@@ -69,8 +69,9 @@ use holonics::hnn::reference::{
 };
 use holonics::hnn::retention::{Diamond, aeon_readings, collapse, contained, separator};
 use holonics::hnn::{
-    ActiveAddress, AeonBoundary, ChartKey, ChartReading, Constitution, ConstitutionRead, Current,
-    Faces, Field, HnnError, Locus, PendingRatio, ReceivingPhases, ReceptionCarry, SourceMoment,
+    Absorption, ActiveAddress, AeonBoundary, ChartKey, ChartReading, Constitution,
+    ConstitutionRead, Current, Faces, Field, HnnError, Locus, PendingRatio, ReceivingPhases,
+    ReceptionCarry, SourceMoment,
 };
 use holonics::navigator::Clock;
 use holonics::ratio::Rat;
@@ -334,7 +335,7 @@ impl<'c> Mounted<'c> {
             &resonators,
         )?;
         // A received opening's carry table and its words on the card (the reception carry).
-        let (plan, carried) = opening.plan(plan, &publication.loci, &resonators)?;
+        let (plan, carried) = opening.plan(plan, &publication.loci)?;
         let loci = &publication.loci;
         let mut operators = Vec::with_capacity(plan.contacts.len());
         for (a, contact) in plan.contacts.iter().enumerate() {
@@ -1310,7 +1311,17 @@ impl<'c> ExecutionPort for Resident<'c> {
                 remainders: released.remainders.clone(),
                 last: released.last.clone(),
                 resonators: released.resonators.clone(),
-                word: Box::new(holonics::hnn::word::WordBalance::of(&released)),
+                // Under `A = 0` the word's motion carries from its last crossing (record B §2.4):
+                // its balance is read to that crossing, whose change the carry holds.
+                word: Box::new(match (&ended, &self.reception) {
+                    (Some(carry), Reception::Carry(Absorption::Nothing)) => {
+                        holonics::hnn::word::WordBalance::carried(
+                            &released,
+                            carry.host.change.clone(),
+                        )
+                    }
+                    _ => holonics::hnn::word::WordBalance::of(&released),
+                }),
             },
         )?;
         receipt.balances = released.balances;

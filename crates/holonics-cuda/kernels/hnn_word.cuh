@@ -88,6 +88,7 @@
 #define WP_MAP 28
 #define WP_RESONATORS 29
 #define WP_CARRY 30
+#define WP_OPENED 31
 
 #define WR_STRIDE 12
 #define WR_WIDTH 0
@@ -579,14 +580,31 @@ extern "C" __global__ void hnn_word_forward(
         }
         rem_anchor[e] = 0;
         rem_storage[e] = 0;
-        res_u[e] = 0;
-        res_w[e] = 0;
         res_rem_rate[e] = 0;
         res_rem_u[e] = 0;
         res_rem_w[e] = 0;
         res_rem_output[e] = 0;
         res_status[e] = HNN_EXACT;
         res_operand_status[e] = HNN_EXACT;
+        if (!carry) {
+            res_u[e] = 0;
+            res_w[e] = 0;
+            continue;
+        }
+        // [definition; record B §2.4] A carried resonator's rate held at momentum, `C′_r w′ = C_r w`:
+        // the host's jump `δ·2^(L_w) = n/d` added and split onto `L_w` over `d`, its remainder
+        // carried in the velocity's split. The displacement carries as it is.
+        const long long *jump = carry + 2 * C + 2 * K + 2 * e;
+        if (jump[0] != 0) {
+            uint32_t st = 0;
+            HnnSum held = hnn_sum();
+            hnn_add_words(held, res_w[e], (int64_t)jump[1]);
+            hnn_add(held, (wide)jump[0]);
+            wide remainder = 0;
+            res_w[e] = hnn_split_over(hnn_read(held, &st), 0, (int64_t)jump[1], &remainder, &st);
+            res_rem_w[e] = remainder;
+            hnn_note(st, STAGE_OPEN, (uint32_t)e, &bits, &first);
+        }
     }
     for (long long p = t; p < NA; p += T) {
         rem_arrival[p] = 0;
@@ -934,7 +952,7 @@ extern "C" __global__ void hnn_word_forward(
                 uint32_t st = HNN_EXACT;
                 const long long *res = resonators + rix * RZ_STRIDE;
                 const long long n = res[RZ_WIDTH], base = res[RZ_ROWS];
-                const long long phase = step % res[RZ_PHASES];
+                const long long phase = (plan[WP_OPENED] + step) % res[RZ_PHASES];
                 const long long lm = res[RZ_LM], eh = res[RZ_EH];
                 const int64_t *capacity = operands + res[RZ_CAPACITY];
                 const int64_t *stiffness =
@@ -969,7 +987,7 @@ extern "C" __global__ void hnn_word_forward(
                 uint32_t st = res_status[e];
                 const long long *res = resonators + rix * RZ_STRIDE;
                 const long long n = res[RZ_WIDTH], base = res[RZ_ROWS];
-                const long long phase = step % res[RZ_PHASES];
+                const long long phase = (plan[WP_OPENED] + step) % res[RZ_PHASES];
                 const long long shift = res[RZ_LC] + res[RZ_LM];
                 const int64_t *chart = operands + res[RZ_CHARTS] + phase * n * n;
                 for (long long j = 0; j < n; ++j) {
@@ -1003,7 +1021,18 @@ extern "C" __global__ void hnn_word_forward(
                 const int64_t old_u = res_u[e], old_w = res_w[e];
                 const int64_t rate = rate_record[step * N + e];
                 const wide next_u = (wide)old_u + hnn_shifted((wide)rate, eh, &st);
-                const wide next_w = 2 * (wide)rate - (wide)old_w;
+                // A velocity held at momentum at the open carries its remainder over the jump's
+                // denominator; on the dyadics `2ω − w` lies on the lattice and splits to itself.
+                const long long over = carry ? carry[2 * C + 2 * K + 2 * e + 1] : 1;
+                wide next_w = 2 * (wide)rate - (wide)old_w;
+                wide velocity_remainder = 0;
+                if (over != 1) {
+                    HnnSum carried = hnn_sum();
+                    hnn_add_scaled(carried, (int64_t)over, next_w);
+                    hnn_add(carried, res_rem_w[e]);
+                    next_w = hnn_split_over(hnn_read(carried, &st), 0, (int64_t)over,
+                                            &velocity_remainder, &st);
+                }
                 if (st == HNN_EXACT && (!hnn_is_word(next_u) || !hnn_is_word(next_w))) {
                     st |= HNN_REFUSED_WORD;
                 }
@@ -1026,7 +1055,7 @@ extern "C" __global__ void hnn_word_forward(
                 res_u[e] = st == HNN_EXACT ? next_state_u : 0;
                 res_w[e] = st == HNN_EXACT ? next_state_w : 0;
                 res_rem_u[e] = 0;
-                res_rem_w[e] = 0;
+                res_rem_w[e] = velocity_remainder;
                 res_rem_output[e] = return_remainder;
                 storage[e] = output;
                 res_status[e] = st;
@@ -1267,7 +1296,7 @@ extern "C" __global__ void hnn_word_reverse(
                 uint32_t st = res_status[e];
                 const long long *res = resonators + rix * RZ_STRIDE;
                 const long long n = res[RZ_WIDTH], base = res[RZ_ROWS];
-                const long long phase = step % res[RZ_PHASES];
+                const long long phase = (plan[WP_OPENED] + step) % res[RZ_PHASES];
                 const int64_t *chart = operands + res[RZ_CHARTS] + phase * n * n;
                 for (long long j = 0; j < n; ++j) {
                     if (res_operand_status[base + j] != HNN_EXACT) st |= HNN_REFUSED_OPERAND;
@@ -1299,7 +1328,7 @@ extern "C" __global__ void hnn_word_reverse(
                 uint32_t st = res_status[e];
                 const long long *res = resonators + rix * RZ_STRIDE;
                 const long long n = res[RZ_WIDTH], base = res[RZ_ROWS];
-                const long long phase = step % res[RZ_PHASES];
+                const long long phase = (plan[WP_OPENED] + step) % res[RZ_PHASES];
                 const long long lm = res[RZ_LM], eh = res[RZ_EH];
                 const int64_t *capacity = operands + res[RZ_CAPACITY];
                 const int64_t *stiffness = operands + res[RZ_STIFFNESS] + phase * n * n;

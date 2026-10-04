@@ -61,6 +61,9 @@ the next. This record states the one law both obey at a deposit.
    whole loss the chain is dissipative at all eight receptions, and only the stronger reading
    (the work between words within the next word's loss) fails, at reception 7 alone. Keeping the
    momentum on that fixture moves the failure to receptions 5 and 8, so it does not explain it.
+   [Read on the carry that kept the waves and stood after the last junction, both superseded
+   (record B §2.3a, §2.4); on the carry at the last crossing the stronger reading holds at all
+   eight receptions.]
 6. **Where the mass shrinks, the deposit does work, and the certificate is the other side.** At a
    held momentum a shrinking mass raises the reading, as a skater pulling in the arms: the work is
    the deposit's, entered in record B's chained balance as `deposition_k`. A mass certified from

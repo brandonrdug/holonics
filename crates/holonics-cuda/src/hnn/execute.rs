@@ -51,7 +51,7 @@ fn device(error: DeviceError) -> HnnError {
 // -------------------------------------------------------------------------------------------
 // the plan's layout (the kernels' `WP_*` … words)
 
-const WP_HEADER: usize = 31;
+const WP_HEADER: usize = 32;
 const WP_RINGS: usize = 0;
 const WP_CONTACTS: usize = 1;
 const WP_STEPS: usize = 2;
@@ -83,6 +83,7 @@ const WP_INCIDENCES: usize = 27;
 const WP_MAP: usize = 28;
 const WP_RESONATORS: usize = 29;
 const WP_CARRY: usize = 30;
+const WP_OPENED: usize = 31;
 
 const WR_STRIDE: usize = 12;
 const WR_WIDTH: usize = 0;
@@ -240,18 +241,23 @@ pub(crate) struct WordPlan {
     /// The carried opening's table when the word opens on a reception's carry
     /// (`crate::hnn::carry`), `None` at rest.
     pub(crate) carry: Option<CarryPlan>,
+    /// The field's elapsed ticks the word opens at (record B §2.4; `WP_OPENED`): its hops are
+    /// `opened_at + step`, and a loaded ring's pump phase is that tick's. Zero at rest.
+    pub(crate) opened_at: usize,
 }
 
-/// [definition; record B §2.3a, the deposit record §3] **A carried opening's plan** (the kernels'
-/// `WP_CARRY` table): per contact the transmitted gain `2G/(G + G′)` as a reduced `(numerator,
-/// denominator)`, `(1, 1)` where the lift left the conductance, and per contact row the held rate's
-/// jump `δ·2^(L_w)` as a reduced `(n, d)`, `(0, 1)` where nothing moved. The denominators are the
-/// arrivals' and the rates' remainders' for the whole word ([`WordPlan::arrival_over`],
-/// [`WordPlan::rate_over`]).
+/// [definition; record B §2.3a, §2.4, the deposit record §3] **A carried opening's plan** (the
+/// kernels' `WP_CARRY` table): per contact the transmitted gain `2G/(G + G′)` as a reduced
+/// `(numerator, denominator)`, `(1, 1)` where the lift left the conductance; per contact row the
+/// held rate's jump `δ·2^(L_w)` as a reduced `(n, d)`; and per ring row a carried resonator's held
+/// rate's jump the same way, `(0, 1)` where nothing moved. The denominators are the arrivals', the
+/// rates' and the resonator velocities' remainders' for the whole word ([`WordPlan::arrival_over`],
+/// [`WordPlan::rate_over`], [`WordPlan::velocity_over`]).
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub(crate) struct CarryPlan {
     pub(crate) gains: Vec<(i64, i64)>,
     pub(crate) jumps: Vec<(i64, i64)>,
+    pub(crate) resonator_jumps: Vec<(i64, i64)>,
 }
 
 /// The executed junction weights, their certificate and the admittance sum of one ring at the
@@ -764,6 +770,7 @@ impl WordPlan {
             (WP_MAP, map.offset as i64),
             (WP_RESONATORS, resonator_table as i64),
             (WP_CARRY, -1),
+            (WP_OPENED, 0),
         ];
         for (at, value) in header {
             plan[at] = value;
@@ -796,6 +803,7 @@ impl WordPlan {
             pair_weights,
             resonators: loaded_resonators,
             carry: None,
+            opened_at: 0,
         })
     }
 
@@ -1341,16 +1349,30 @@ impl<'c> ResidentWord<'c> {
         ))
     }
 
-    /// [definition; the reception carry §2.1] **The word's end change, kept on the card**: its
-    /// storage, arrivals and states copied into a buffer of their own (nothing crosses the bus), the
-    /// next reception's carried opening.
+    /// [definition; the reception carry §2.1, §2.4] **The word's last crossing, kept on the
+    /// card**: the change arriving at its last junction (the record's storage, arrivals and states
+    /// at the start of that step) and every resonator state as the last hop left it, copied into a
+    /// buffer of their own (nothing crosses the bus), the next reception's carried opening.
     pub(crate) fn end_words(&self) -> Result<CardBuffer<'c, u8>, HnnError> {
-        let parts = carried_parts(&self.plan);
+        let plan = &self.plan;
+        let last = plan
+            .steps
+            .checked_sub(1)
+            .ok_or_else(|| refused("a word with a junction step"))?;
+        let parts = carried_parts(plan);
+        let from = [
+            self.layout.at(WL_REC_STORAGE) + 8 * last * plan.n,
+            self.layout.at(WL_REC_ARRIVALS) + 8 * last * plan.na,
+            self.layout.at(WL_REC_U) + 8 * last * plan.k,
+            self.layout.at(WL_REC_W) + 8 * last * plan.k,
+            self.layout.at(WL_RES_U),
+            self.layout.at(WL_RES_W),
+        ];
         let octets = parts.iter().map(|(_, _, octets)| octets).sum();
         let words = self.card.alloc::<u8>(octets).map_err(device)?;
-        for (to, entry, octets) in parts {
+        for ((to, _, octets), from) in parts.into_iter().zip(from) {
             self.card
-                .copy_within(&self.buffer, self.layout.at(entry), &words, to, octets)
+                .copy_within(&self.buffer, from, &words, to, octets)
                 .map_err(device)?;
         }
         Ok(words)
@@ -1418,16 +1440,18 @@ impl<'c> ResidentWord<'c> {
     }
 }
 
-/// [definition] **A carried change's layout on the card**: its storage, arrivals, displacements and
-/// rates, each a run of signed 64-bit words at `L_w`, as `(octet offset, the word buffer's entry,
-/// octets)`.
-pub(crate) fn carried_parts(plan: &WordPlan) -> [(usize, usize, usize); 4] {
+/// [definition] **A carried change's layout on the card**: its storage, arrivals, displacements,
+/// rates and resonator states `(u, w)` per ring row, each a run of signed 64-bit words at `L_w`, as
+/// `(octet offset, the word buffer's entry the next word opens on, octets)`.
+pub(crate) fn carried_parts(plan: &WordPlan) -> [(usize, usize, usize); 6] {
     let (n, na, k) = (8 * plan.n, 8 * plan.na, 8 * plan.k);
     [
         (0, WL_STORAGE, n),
         (n, WL_ARRIVALS, na),
         (n + na, WL_U, k),
         (n + na + k, WL_W, k),
+        (n + na + 2 * k, WL_RES_U, n),
+        (2 * n + na + 2 * k, WL_RES_W, n),
     ]
 }
 
@@ -1509,18 +1533,45 @@ impl WordPlan {
     pub(crate) fn with_carry(mut self, carry: CarryPlan) -> Result<Self, HnnError> {
         let shaped = carry.gains.len() == self.contacts.len()
             && carry.jumps.len() == self.k
-            && carry.gains.iter().chain(&carry.jumps).all(|&(_, d)| d > 0);
+            && carry.resonator_jumps.len() == self.n
+            && carry
+                .gains
+                .iter()
+                .chain(&carry.jumps)
+                .chain(&carry.resonator_jumps)
+                .all(|&(_, d)| d > 0);
         if !shaped {
             return Err(refused(
                 "a carry table of one gain per contact and one jump per row",
             ));
         }
         self.plan[WP_CARRY] = self.plan.len() as i64;
-        for &(numerator, denominator) in carry.gains.iter().chain(&carry.jumps) {
+        for &(numerator, denominator) in carry
+            .gains
+            .iter()
+            .chain(&carry.jumps)
+            .chain(&carry.resonator_jumps)
+        {
             self.plan.extend([numerator, denominator]);
         }
         self.carry = Some(carry);
         Ok(self)
+    }
+
+    /// [definition; record B §2.4] **The plan opening at the field's elapsed ticks**: its pump
+    /// phases read `opened_at + step` (`WP_OPENED`).
+    pub(crate) fn opened_at(mut self, ticks: usize) -> Self {
+        self.plan[WP_OPENED] = ticks as i64;
+        self.opened_at = ticks;
+        self
+    }
+
+    /// The denominator ring row `e`'s resonator velocity remainder carries over (its held rate's
+    /// jump's), `1` at rest.
+    pub(crate) fn velocity_over(&self, e: usize) -> i64 {
+        self.carry
+            .as_ref()
+            .map_or(1, |carry| carry.resonator_jumps[e].1)
     }
 
     /// The denominator contact `a`'s arrival remainders carry over (its crossed wave's gain's),

@@ -7167,7 +7167,7 @@ pub struct ContinuingState {
     /// The identity of the material the state continues ([`Constitution::material_identity`]).
     material: u128,
     /// [definition; agent-inferred, October 3; the reception carry §2.4] The reception's carried
-    /// end ([`ReceptionCarry`]: the end change and the field's elapsed ticks), where the state was
+    /// end ([`ReceptionCarry`]: the change at its last crossing and the field's elapsed ticks), where the state was
     /// written under the carry; `None` at rest (`A = I`, and every state written before the carry).
     /// It is resident motion, not constitution: [`Constitution::continued`] does not read it, and
     /// its consumer mounts it beside the restored constitution

@@ -195,13 +195,23 @@ fn measured_phases(plan: &WordPlan, ticks: usize) -> Vec<Option<usize>> {
     (0..plan.rings.len())
         .map(|ring| {
             let resonator = plan.resonators.iter().find(|res| res.ring == ring)?;
-            Some(
-                ticks
-                    .checked_sub(1)
-                    .map_or(0, |last| last % resonator.phases),
-            )
+            Some(phase_before(plan, resonator.phases, ticks))
         })
         .collect()
+}
+
+/// [definition; record B §2.4] **The pump phase at word tick `t`**: the field's tick
+/// `opened_at + t` on the pump's circle (`ResonatorOperands::phase_at`).
+fn phase_at(plan: &WordPlan, phases: usize, tick: usize) -> usize {
+    (plan.opened_at + tick) % phases
+}
+
+/// The pump phase that measures a state before word tick `t` (the previous hop's, phase `0` at the
+/// field's first tick): `phase_at(opened_at + t − 1)`.
+fn phase_before(plan: &WordPlan, phases: usize, tick: usize) -> usize {
+    (plan.opened_at + tick)
+        .checked_sub(1)
+        .map_or(0, |previous| previous % phases)
 }
 
 /// `⟨x, F x⟩` for a form at its scale and a coordinate vector at `σ_x`: the value, or zero for a
@@ -302,17 +312,17 @@ fn resonator_balance(
     let mut port = Rat::zero();
     let mut dissipation_work = Rat::zero();
     let mut chart_work = Rat::zero();
-    let split_work = Rat::zero();
+    let mut split_work = Rat::zero();
     let mut bound = Rat::zero();
     let unit = rat(BigInt::from(1), plan.lw);
     let ring = &plan.rings[resonator.ring];
     for tick in 0..full {
         let at = tick * plan.n + ring.rows;
-        let phase = tick % resonator.phases;
-        let previous_phase = if tick == 0 {
+        let phase = phase_at(plan, resonator.phases, tick);
+        let previous_phase = if plan.opened_at + tick == 0 {
             phase
         } else {
-            (tick - 1) % resonator.phases
+            phase_before(plan, resonator.phases, tick)
         };
         let displacement: Vec<BigInt> = slice(&record.resonator_u, at, n)
             .iter()
@@ -354,13 +364,25 @@ fn resonator_balance(
             .zip(&rate)
             .map(|(u, w)| u + (w << resonator.hop_exp as usize))
             .collect();
-        let velocity_after: Vec<BigInt> = rate
+        // The velocity's image `2ω − w` and the velocity the word carried, its split: on the
+        // dyadics the image itself; after a rate held at momentum at the open, the split over the
+        // jump's denominator (record B §2.4), whose energy difference is the split term.
+        let velocity_image: Vec<BigInt> = rate
             .iter()
             .zip(&velocity)
             .map(|(w, previous)| (w << 1usize) - previous)
             .collect();
+        let carried_at = if tick + 1 < full {
+            slice(&record.resonator_w, at + plan.n, n)
+        } else {
+            slice(&record.resonator_final_w, ring.rows, n)
+        };
+        let velocity_after: Vec<BigInt> = carried_at.iter().map(|x| BigInt::from(*x)).collect();
         end = (quadratic(&capacity, &velocity_after, plan.lw)
             + quadratic(&stiffness, &displacement_after, plan.lw))
+            / integer(2);
+        split_work += (quadratic(&capacity, &velocity_after, plan.lw)
+            - quadratic(&capacity, &velocity_image, plan.lw))
             / integer(2);
 
         let drive_rat: Vec<Rat> = drive.iter().map(|x| rat(x.clone(), plan.lw)).collect();
@@ -402,7 +424,12 @@ fn resonator_balance(
                 + operator.row_norm() * &unit);
         let doubled =
             |values: &[BigInt]| -> Vec<BigInt> { values.iter().map(|x| x << 1usize).collect() };
-        let stored = capacity.apply(&doubled(&velocity_after));
+        let velocity_sum: Vec<BigInt> = velocity_after
+            .iter()
+            .zip(&velocity_image)
+            .map(|(carried, image)| carried + image)
+            .collect();
+        let stored = capacity.apply(&velocity_sum);
         let stiffened = stiffness.apply(&doubled(&displacement_after));
         bound += &unit
             * (rat(l1(&stored), capacity.exponent + plan.lw)
@@ -420,18 +447,37 @@ fn resonator_balance(
             BigInt::from(record.resonator_remainders[1][row]),
             plan.lw,
         ));
-        released.push(rat(
-            BigInt::from(record.resonator_remainders[2][row]),
-            plan.lw,
+        released.push(over(
+            rat(BigInt::from(record.resonator_remainders[2][row]), plan.lw),
+            plan.velocity_over(row),
         ));
     }
+    // The state the word opened on, measured at the phase before its first hop.
+    let (open_u, open_w) = if full > 0 {
+        (
+            slice(&record.resonator_u, ring.rows, n),
+            slice(&record.resonator_w, ring.rows, n),
+        )
+    } else {
+        (
+            slice(&record.resonator_final_u, ring.rows, n),
+            slice(&record.resonator_final_w, ring.rows, n),
+        )
+    };
+    let open_phase = phase_before(plan, resonator.phases, 0);
+    let open_stiffness = resonator_matrix(
+        plan,
+        resonator.stiffness_offset + open_phase * n * n,
+        n,
+        resonator.material_exp,
+    );
+    let open = (quadratic(&capacity, &wide(open_w), plan.lw)
+        + quadratic(&open_stiffness, &wide(open_u), plan.lw))
+        / integer(2);
     holonics::hnn::word::ResonatorBalance {
         ring: resonator.ring,
         ticks: full,
-        // Device-opening contract: hnn_word_forward (hnn_word.cuh, "the open") sets res_u and
-        // res_w to zero on every invocation, before recording any tick; the terminal junction
-        // does not move them. This device word presently opens at rest, including zero full ticks.
-        open: Rat::zero(),
+        open,
         end,
         pump,
         port,
@@ -890,10 +936,11 @@ pub(crate) fn released(
     }
 }
 
-/// **The word's end change** (`holonics::hnn::word::EndChange`), read from its record: the
-/// reception carry's change (`crate::hnn::carry`).
-pub(crate) fn end(plan: &WordPlan, record: &ForwardRecord) -> EndChange {
-    Change::after(plan, record).end(plan)
+/// [definition; record B §2.4] **The word's last crossing** (`Word::reception_end`), read from its
+/// record: the change at the start of its last junction step, every resonator state as its last
+/// hop left it, measured at that hop's phase; the reception carry's change (`crate::hnn::carry`).
+pub(crate) fn crossing(plan: &WordPlan, record: &ForwardRecord) -> EndChange {
+    Change::at(plan, record, plan.steps - 1).end(plan)
 }
 
 /// [definition] **The return's source on the host** (module header): per receiving epoch the
@@ -1086,7 +1133,7 @@ pub(crate) fn word_return(
                     ResonatorTick {
                         ring: ring_index,
                         tick: t,
-                        phase: t % resonator.phases,
+                        phase: phase_at(plan, resonator.phases, t),
                         drive,
                         displacement: values(&record.resonator_u),
                         velocity: values(&record.resonator_w),
