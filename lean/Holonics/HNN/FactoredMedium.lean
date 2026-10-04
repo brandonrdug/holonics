@@ -73,7 +73,7 @@ and a later deposit's step at a retained locus could differ from the uncollapsed
 resident's retention (`Constitution::deposited_within`), and the joint step whose reads are the
 diamond's and whose budget is the retained set's is `HNN/JointStep`
 (`certified_budgeted_rust_unchanged`): the collapse changes no step and no refusal.
-Owed (#62): the carried statistics in the locus's state.
+The carried statistics in the locus's state are `HNN/LocusStatistics`.
 
 No `sorry`, no `axiom`, no `native_decide`.
 -/

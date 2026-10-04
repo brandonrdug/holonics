@@ -71,7 +71,7 @@ with no inclusion hypothesis. That the joint reading's non-budget reads stay on 
 and its budget on the retained set (`Constitution::deposited_within`) are the Rust's construction,
 checked by its fixtures (`tests/retention.rs`), and remain hypotheses here. The carried
 statistics and remainders in the locus's state (a factor family's `h_x′`, a linear locus's
-successor Gram and chart, the standing's carried remainder) are owed in #62. The step's certified
+successor Gram and chart, the carried remainders) are `HNN/LocusStatistics`. The step's certified
 descent is `Holon/Deposition`. The source port's deposit reads the opening's data the staged deposit
 carries (`TickStanding.TickStage`, `RingLoci.port_gradient`).
 
