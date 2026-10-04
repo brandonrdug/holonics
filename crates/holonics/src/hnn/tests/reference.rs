@@ -582,7 +582,9 @@ fn the_carry_at_complete_absorption_is_todays_reception_exactly() {
         cells: source(length, 81),
         held_out: vec![2..4, length - 4..length],
     };
-    let reference = Reference::new(64, OPEN_BUDGET).with_deadline(6);
+    let reference = Reference::new(64, OPEN_BUDGET)
+        .with_deadline(6)
+        .with_reception(Reception::Rest);
     let rest = without_wall(reference.clone().expose(&field, &cut).unwrap());
     let mut carried = without_wall(
         reference
@@ -605,7 +607,8 @@ fn the_carry_at_complete_absorption_is_todays_reception_exactly() {
     assert_eq!(carried, rest);
 }
 
-/// The reception carry §2.3 and §2.3a: under `Carry(Nothing)` the chained balance closes exactly
+/// The reception carry §2.3, §2.3a and §8: under the default reception, the carry at `A = 0`
+/// (`Carry(Nothing)`, declared nowhere in the test), the chained balance closes exactly
 /// at every reception of a prequential exposure on one baseline (the source rings' end storage
 /// subtracted once, the opening's lattice split read exactly), and the chain is dissipative with
 /// respect to its declared supply at every reception. Each carried wave crosses the lift's move of
@@ -623,11 +626,9 @@ fn the_chained_balance_closes_and_the_chain_is_dissipative() {
         cells: source(length, 81),
         held_out: vec![2..4, length - 4..length],
     };
-    let exposure = Reference::new(64, OPEN_BUDGET)
-        .with_deadline(24)
-        .with_reception(Reception::Carry(Absorption::Nothing))
-        .expose(&field, &cut)
-        .unwrap();
+    let reference = Reference::new(64, OPEN_BUDGET).with_deadline(24);
+    assert_eq!(reference.reception(), Reception::Carry(Absorption::Nothing));
+    let exposure = reference.expose(&field, &cut).unwrap();
     let chained = &exposure.word.chained;
     assert!(exposure.word.words.closed && exposure.word.closed);
     assert_eq!(chained.read, exposure.compares - 1);
@@ -671,11 +672,11 @@ fn the_chained_balance_closes_on_a_pumped_field() {
     assert!(chained.excess.is_zero() && chained.largest_excess.is_zero());
 }
 
-/// The reception carry §2.1 and §2.6: under `Carry(Nothing)` every compare writes its consumed
-/// word's end as the resident's one carried change, at the field's elapsed ticks (the hops every
-/// earlier word ran, §2.4), and the next reception's word opens on its interior with
-/// the source rings imposed by the moment: the refine's faces are the read on that opening, and they
-/// differ from the read at rest. A second refinement while one is pending is refused (one chain).
+/// The reception carry §2.1, §2.6 and §8: under `Carry(Nothing)` every refine writes its word's end
+/// as the resident's one carried change, at the field's elapsed ticks (the hops every earlier word
+/// ran, §2.4), its compare leaves it, and the next reception's word opens on its interior with the
+/// source rings imposed by the moment: the refine's faces are the read on that opening, and they
+/// differ from the read at rest.
 #[test]
 fn the_carry_passes_each_receptions_end_to_the_next() {
     use crate::hnn::{Absorption, PendingRatio, WordOpening};
@@ -745,19 +746,15 @@ fn the_carry_passes_each_receptions_end_to_the_next() {
                 let (_, at_rest) = ratio.read(&field, &theta).unwrap();
                 moved += usize::from(faces != at_rest);
             }
-            if before.is_some() {
-                assert!(matches!(
-                    reference.refine(&mut resident, &moment, &phases),
-                    Err(HnnError::Shape { .. })
-                ));
-            }
+            receptions += 1;
+            let carry = resident.carried().cloned().expect("the refine writes the carry");
+            // Each word's motion stands at its last crossing, whose hop has not run (§2.4).
+            assert_eq!(carry.ticks, receptions * (steps - 1));
+            // The compare reads the word; the motion already carried at its refine (§8).
             let (staged, _) = reference
                 .compare(&mut resident, pending, &one_hot(window))
                 .unwrap();
-            receptions += 1;
-            let carry = resident.carried().expect("the compare writes the carry");
-            // Each word's motion stands at its last crossing, whose hop has not run (§2.4).
-            assert_eq!(carry.ticks, receptions * (steps - 1));
+            assert_eq!(resident.carried(), Some(&carry));
             reference.deposit(&mut resident, staged).unwrap();
         }
         let mut fed = 0;
@@ -776,20 +773,148 @@ fn the_carry_passes_each_receptions_end_to_the_next() {
     }
     // The carried interior moves the read once the constitution reads the receiving ring.
     assert!(moved >= 1 && position > 0);
-    // The carry mounts beside a declared constitution (§2.4), and only under a carrying reception.
+    // The carry mounts beside a declared constitution (§2.4), and only under a carrying reception:
+    // the rest limit refuses it.
     let carry = resident.carried().cloned().expect("the chain carries");
     let mounted = reference
         .mount_carried(&field, resident.current(), resident.constitution().clone(), carry.clone())
         .unwrap();
     assert_eq!(mounted.carried(), Some(&carry));
     assert!(matches!(
-        Reference::new(64, OPEN_BUDGET).mount_carried(
-            &field,
-            resident.current(),
-            resident.constitution().clone(),
-            carry
-        ),
+        Reference::new(64, OPEN_BUDGET)
+            .with_reception(Reception::Rest)
+            .mount_carried(
+                &field,
+                resident.current(),
+                resident.constitution().clone(),
+                carry
+            ),
         Err(HnnError::ContinuingState { .. })
     ));
+}
+
+/// The reception carry §8: several pending ratios are one chain in refine order. Each refine runs
+/// its word on the end of the last word read, compared or not, and carries its own end; a compare
+/// reads its word and leaves the carry. Three refines in a row run the same chain as three
+/// refine-compare receptions with no deposit between. Their compares, taken in refine order with a
+/// deposit after each (every later kept read stale, so its word is read again at the contemporary
+/// constitution) or in reverse order, leave the carry at the third word's end. The chained balance
+/// closes at every opening: between refines with no commit between them, and across the commits
+/// published while the third word's end stood, read as one commit at held momentum.
+#[test]
+fn several_pending_ratios_are_one_chain_in_refine_order_and_the_chained_balance_closes() {
+    use crate::hnn::word::{PowerForm, WordBalance};
+    use crate::hnn::word::{ChainedBalance, EndChange, ReceptionCarry};
+    let length = cut_length();
+    let field = chain_of(length as u64);
+    let cells = source(length, 81);
+    let reference = Reference::new(64, OPEN_BUDGET);
+    assert_eq!(reference.reception(), Reception::Carry(Absorption::Nothing));
+    let mut resident = reference.mount(&field, &Current::at_rest(&field)).unwrap();
+    let phases = resident.admitted()[0].clone();
+    let steps = phases.junction_steps();
+    let (moment, _) = reference
+        .ingest(&mut resident, None, &one_hot(&cells[..phases.aperture()]))
+        .unwrap();
+    let serial = resident.clone();
+    // The form at a word's cut and the opening change it reads, before its refine.
+    let opening = |resident: &crate::hnn::reference::Resident,
+                   carry: &ReceptionCarry|
+     -> (PowerForm, EndChange) {
+        let form =
+            PowerForm::read(&field, resident.constitution(), resident.current()).unwrap();
+        let source = resident
+            .moment(&moment)
+            .unwrap()
+            .open_storage(&field, resident.constitution(), resident.current())
+            .unwrap();
+        let mut opened = form.opening(&field, carry).unwrap();
+        for (wave, added) in opened.storage.iter_mut().zip(&source) {
+            *wave = crate::ratio::linear::vector::add(wave, added);
+        }
+        (form, opened)
+    };
+    let balance = |receipt: &crate::hnn::port::PortReceipt| -> WordBalance {
+        match &receipt.detail {
+            ReceiptDetail::Refine { word, .. } => word.as_ref().clone(),
+            _ => panic!("a refine's word balance"),
+        }
+    };
+    let (mut pending, mut faces, mut balances, mut carries, mut forms) =
+        (Vec::new(), Vec::new(), Vec::new(), Vec::new(), Vec::new());
+    for j in 0..3 {
+        let opened = carries.last().map(|carry| opening(&resident, carry));
+        let (id, refined) = reference.refine(&mut resident, &moment, &phases).unwrap();
+        let carry = resident.carried().cloned().expect("the refine writes the carry");
+        assert_eq!(carry.ticks, (j + 1) * (steps - 1));
+        let word = balance(&refined.receipt);
+        assert!(word.closes());
+        if let (Some((form, opened)), Some(previous)) = (&opened, balances.last()) {
+            let chained = ChainedBalance::read(
+                &field,
+                previous,
+                form,
+                carries.last().unwrap(),
+                opened,
+                &word,
+            )
+            .unwrap();
+            assert!(chained.closes() && chained.dissipative());
+            assert!(chained.deposition.is_zero(), "no commit between the refines");
+        }
+        forms.push(PowerForm::read(&field, resident.constitution(), resident.current()).unwrap());
+        pending.push(id);
+        faces.push(refined.forward.into_present().unwrap());
+        balances.push(word);
+        carries.push(carry);
+    }
+    assert_eq!(resident.carried(), carries.last());
+    // The same chain, one reception at a time with no deposit between.
+    let mut one = serial;
+    for (j, read) in faces.iter().enumerate() {
+        let (id, refined) = reference.refine(&mut one, &moment, &phases).unwrap();
+        assert_eq!(refined.forward.into_present().as_ref(), Some(read));
+        assert_eq!(one.carried(), Some(&carries[j]));
+        reference
+            .compare(&mut one, id, &one_hot(&cells[..phases.aperture()]))
+            .unwrap();
+    }
+    // Compared in reverse order: every compare succeeds and the carry stands.
+    let mut reversed = resident.clone();
+    for &id in pending.iter().rev() {
+        reference
+            .compare(&mut reversed, id, &one_hot(&cells[..phases.aperture()]))
+            .unwrap();
+        assert_eq!(reversed.carried(), carries.last());
+    }
+    // Compared in refine order with a deposit after each: the commits act on the motion where it
+    // stands, the third word's end.
+    let mut moved = 0;
+    for &id in &pending {
+        let commit = resident.constitution().commit();
+        let (staged, _) = reference
+            .compare(&mut resident, id, &one_hot(&cells[..phases.aperture()]))
+            .unwrap();
+        reference.deposit(&mut resident, staged).unwrap();
+        moved += usize::from(resident.constitution().commit() != commit);
+        assert_eq!(resident.carried(), carries.last());
+    }
+    assert!(moved >= 2, "the later compares read their words again");
+    let after = PowerForm::read(&field, resident.constitution(), resident.current()).unwrap();
+    let mut previous = balances.last().unwrap().clone();
+    previous.commit_held(forms.last().unwrap(), &after).unwrap();
+    let (form, opened) = opening(&resident, carries.last().unwrap());
+    let (_, refined) = reference.refine(&mut resident, &moment, &phases).unwrap();
+    let next = balance(&refined.receipt);
+    let chained = ChainedBalance::read(
+        &field,
+        &previous,
+        &form,
+        carries.last().unwrap(),
+        &opened,
+        &next,
+    )
+    .unwrap();
+    assert!(chained.closes() && chained.dissipative());
 }
 

@@ -1804,7 +1804,16 @@ fn a_deposit_reaches_only_the_diamond_and_sums_only_its_window() {
             &phases,
         )
         .unwrap();
-    let (_, deposit) = compose(&field, &theta, &pending, &back, &targets, &[]).unwrap();
+    let (_, deposit) = compose(
+        &field,
+        &theta,
+        &pending,
+        &crate::hnn::WordOpening::Rest,
+        &back,
+        &targets,
+        &[],
+    )
+    .unwrap();
     for step in deposit.linear() {
         if let LinearLocus::Contrast(g) = step.locus {
             assert_eq!(step.samples.len(), 1, "ring {g}'s diamond holds one tick");
@@ -2160,9 +2169,17 @@ fn a_contacts_channel_rebases_with_its_carried_remainders() {
                 &phases,
             )
             .unwrap();
-        compose(&field, theta, &pending, &back, &targets, &[])
-            .unwrap()
-            .1
+        compose(
+            &field,
+            theta,
+            &pending,
+            &crate::hnn::WordOpening::Rest,
+            &back,
+            &targets,
+            &[],
+        )
+        .unwrap()
+        .1
     };
     let deposit = stage(&start);
     let (deposited, _) = start.deposited(&deposit).unwrap();

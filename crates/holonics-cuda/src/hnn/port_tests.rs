@@ -742,7 +742,7 @@ fn the_card_carries_each_reception_as_the_reference() {
         host.compare(&mut h, pending, &one_hot(&cut.cells[..2])),
         device.compare(&mut d, pending, &one_hot(&cut.cells[..2])),
     );
-    let saved = carry_text(h.carried()).expect("the compare writes the carry");
+    let saved = carry_text(h.carried()).expect("the refine writes the carry");
     assert_eq!(
         Some(&saved),
         carry_text(ExposedResident::carried(&d)).as_ref()
@@ -882,7 +882,7 @@ fn the_card_holds_a_resonators_momentum_as_the_reference() {
     let mut h = host.mount_with(&field, &current, theta.clone()).unwrap();
     let mut d = device.mount_with(&field, &current, theta).unwrap();
     receive(&host, &device, &mut h, &mut d, &cut.cells, 0, 3);
-    let saved = carry_text(h.carried()).expect("the compare writes the carry");
+    let saved = carry_text(h.carried()).expect("the refine writes the carry");
     let mut lines = saved.lines();
     let head = lines.next().unwrap();
     let restored = ReceptionCarry::read(head, &mut |what| {

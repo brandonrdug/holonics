@@ -4,11 +4,11 @@
 //!
 //! [definition; agent-inferred, October 3] Under a declared carry
 //! (`holonics::hnn::reference::Reception::Carry`) a reception's word opens on the end change the
-//! previous reception's consumed word left. On the card that change **stays on the card**: the
-//! consumed word's storage, arrivals and states are copied into a buffer of their own
+//! previous word read left (its refine writes it, record B §8). On the card that change **stays on
+//! the card**: the word's storage, arrivals and states are copied into a buffer of their own
 //! ([`crate::hnn::execute::ResidentWord::end_words`], nothing crosses the bus), and the next word
 //! copies them into its own change before its open. Beside them the host keeps the carry's exact
-//! mirror, read from the consumed word's record ([`CardCarry::ended`]): the change, the field's
+//! mirror, read from the word's record ([`CardCarry::ended`]): the change, the field's
 //! elapsed ticks, each contact's conductance at the word's cut and its momentum `π_a = C_a w_a`,
 //! the carry the reference holds, so the chained balance, the state's bits and a saved continuing
 //! state read the same carry on either port.
@@ -32,10 +32,11 @@
 //! remainder carried in the velocity's split over its denominator, as a contact's rate is. A carried
 //! change off the transients' lattice, or past the signed 64-bit word, is refused at its restore.
 
+use std::collections::BTreeSet;
 use std::rc::Rc;
 
 use holonics::hnn::reference::carry_bits;
-use holonics::hnn::{Absorption, Field, HnnError, ReceptionCarry};
+use holonics::hnn::{Absorption, Field, HnnError, Locus, ReceptionCarry, WordOpening};
 use holonics::ratio::Rat;
 use holonics::ratio::linear::ExactRatMatrix;
 use num_bigint::BigInt;
@@ -87,7 +88,7 @@ fn moving(carry: &ReceptionCarry) -> bool {
 }
 
 impl<'c> CardCarry<'c> {
-    /// [definition; the reception carry §2.1, §2.4] **The carried end a consumed word leaves**
+    /// [definition; the reception carry §2.1, §2.4] **The carried end a word leaves**
     /// (`Word::reception_end`): the change arriving at its last crossing, read from its record,
     /// with every resonator state as its last hop left it; that crossing's tick
     /// `opened_at + steps − 1`; each contact's conductance at its cut and momentum `C_a w_a`, and
@@ -198,6 +199,44 @@ impl<'c> CardOpening<'c> {
         match self {
             Self::Rest => 0,
             Self::Received { carry, .. } => carry_bits(&carry.host),
+        }
+    }
+
+    /// **The host opening it mirrors** (`holonics::hnn::WordOpening`), which the host's
+    /// composition reads its diamond from (the reception carry §8).
+    pub(crate) fn host(&self) -> WordOpening {
+        match self {
+            Self::Rest => WordOpening::Rest,
+            Self::Received { carry, absorption } => WordOpening::Received {
+                carry: carry.host.clone(),
+                absorption: *absorption,
+            },
+        }
+    }
+
+    /// [definition; the reception carry §8] **The opening across a releasing collapse**
+    /// (`ReceptionCarry::released`): the motion each released locus's material held leaves with
+    /// it. The card's words are uploaded again only where the release moved a coordinate.
+    pub(crate) fn released(
+        &self,
+        card: &'c Card,
+        field: &Field,
+        released: &BTreeSet<Locus>,
+    ) -> Result<Self, HnnError> {
+        match self {
+            Self::Rest => Ok(Self::Rest),
+            Self::Received { carry, absorption } => {
+                let (host, moved) = carry.host.released(released);
+                let carry = if moved.is_empty() {
+                    Rc::clone(carry)
+                } else {
+                    Rc::new(CardCarry::restored(card, field, host)?)
+                };
+                Ok(Self::Received {
+                    carry,
+                    absorption: *absorption,
+                })
+            }
         }
     }
 

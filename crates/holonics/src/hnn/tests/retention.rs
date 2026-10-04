@@ -7,7 +7,7 @@
 
 use std::collections::BTreeSet;
 
-use num_traits::Signed;
+use num_traits::{Signed, Zero};
 
 use super::learning::{generic, moment, path_with, phases, six_path};
 use super::support::Draw;
@@ -19,8 +19,8 @@ use crate::hnn::port::{ExecutionPort, Handle};
 use crate::hnn::propagation::Operands;
 use crate::hnn::ratio::{HolonRatio, target_phases};
 use crate::hnn::receiving::{ActiveAddress, ReceivingPhases};
-use crate::hnn::reference::{Reference, compose, one_hot};
-use crate::hnn::retention::{Diamond, collapse, loci, retained};
+use crate::hnn::reference::{Reception, Reference, compose, one_hot};
+use crate::hnn::retention::{Diamond, Opens, collapse, loci, retained};
 use crate::hnn::word::Word;
 use crate::ratio::{Rat, integer};
 
@@ -77,7 +77,7 @@ fn the_recursions_release_seventy_two_of_one_fifty_six_on_the_six_ring_path() {
         let admitted = [phases(&field, &theta, &current)];
         let diamond = Diamond::of(&field, &admitted[0]);
         assert_eq!(diamond.last_epoch(), aperture + 1);
-        let kept = retained(&field, &admitted);
+        let kept = retained(&field, &admitted, Opens::AtRest);
         let of = |make: fn(usize) -> Locus, count: usize| -> Vec<usize> {
             (0..count).filter(|i| kept.contains(&make(*i))).collect()
         };
@@ -86,12 +86,46 @@ fn the_recursions_release_seventy_two_of_one_fifty_six_on_the_six_ring_path() {
         assert_eq!(of(Locus::Channel, 5), channels);
         assert_eq!(of(Locus::Conductance, 5), conductances);
         let mut collapsed = theta.clone();
-        let reading = collapse(&field, &mut collapsed, &admitted).unwrap();
+        let reading = collapse(&field, &mut collapsed, &admitted, Opens::AtRest).unwrap();
         assert_eq!(
             (reading.released_entries, reading.total_entries),
             (released, 156)
         );
     }
+}
+
+/// The reception carry §8, the diamond under the carry. A word opened on a carried change moves
+/// from tick 0 wherever that change is: with the carried interior on ring 3 of the six-ring path
+/// (source ring 0, receiver ring 2, `e_last = 3`), ring 3's element is read from tick 0, where the
+/// rest diamond never reads it. The admitted future under the carry at `A = 0` keeps opening on
+/// the continuing motion, which reaches every ring connected to a source and returns to the
+/// receiver over the chain's clock, so the collapse releases none of the 156 entries the rest limit
+/// releases 72 of.
+#[test]
+fn under_the_carry_the_diamond_opens_on_the_motion_and_the_collapse_keeps_every_connected_locus() {
+    let field = six_path(2);
+    let theta = generic(&field, 41);
+    let current = Current::at_rest(&field);
+    let admitted = [phases(&field, &theta, &current)];
+    let rest = Diamond::of(&field, &admitted[0]);
+    let opened = Diamond::opened(&field, &admitted[0], &[3]);
+    assert_eq!(opened.last_epoch(), rest.last_epoch());
+    assert!(!rest.element(3) && opened.element(3));
+    assert!(!rest.element_window(3, 0) && opened.element_window(3, 0));
+    assert!(!opened.element(5));
+    // At rest the support is empty and the opened diamond is the rest one.
+    assert_eq!(Diamond::opened(&field, &admitted[0], &[]), rest);
+    let kept = retained(&field, &admitted, Opens::OnMotion);
+    for g in 0..6 {
+        assert!(kept.contains(&Locus::Element(g)) && kept.contains(&Locus::Junction(g)));
+    }
+    for a in 0..5 {
+        assert!(kept.contains(&Locus::Channel(a)) && kept.contains(&Locus::Conductance(a)));
+    }
+    let mut collapsed = theta.clone();
+    let reading = collapse(&field, &mut collapsed, &admitted, Opens::OnMotion).unwrap();
+    assert_eq!((reading.released_entries, reading.total_entries), (0, 156));
+    assert_eq!(collapsed, theta);
 }
 
 /// Lean `HNN/Retention.release_indistinguishable`: with every released item (elements, channels,
@@ -105,7 +139,7 @@ fn every_admitted_reading_is_identical_with_every_released_item_replaced() {
         let theta = generic(&field, 43);
         let current = Current::at_rest(&field);
         let admitted = [phases(&field, &theta, &current)];
-        let kept = retained(&field, &admitted);
+        let kept = retained(&field, &admitted, Opens::AtRest);
         let mut draw = Draw::new(44);
         let mut junctions = vec![integer(2); 6];
         for (g, junction) in junctions.iter_mut().enumerate() {
@@ -141,7 +175,7 @@ fn every_admitted_reading_is_identical_with_every_released_item_replaced() {
             }
         }
         let mut collapsed = theta.clone();
-        collapse(&field, &mut collapsed, &admitted).unwrap();
+        collapse(&field, &mut collapsed, &admitted, Opens::AtRest).unwrap();
         let injected = injections();
         let read = |field: &Field, theta: &Constitution| -> Vec<Vec<Vec<Rat>>> {
             readings(field, theta, &admitted[0], &injected).collect()
@@ -163,7 +197,7 @@ fn replacing_any_one_retained_item_changes_some_reading() {
         let theta = generic(&field, 47);
         let current = Current::at_rest(&field);
         let admitted = [phases(&field, &theta, &current)];
-        let kept: Vec<Locus> = retained(&field, &admitted)
+        let kept: Vec<Locus> = retained(&field, &admitted, Opens::AtRest)
             .into_iter()
             .filter(|locus| {
                 matches!(
@@ -243,7 +277,16 @@ fn deposited(field: &Field, theta: &Constitution, pending: &PendingRatio) -> Con
             pending.phases(),
         )
         .unwrap();
-    let (_, deposit) = compose(field, theta, pending, &back, &targets, &[]).unwrap();
+    let (_, deposit) = compose(
+        field,
+        theta,
+        pending,
+        &crate::hnn::WordOpening::Rest,
+        &back,
+        &targets,
+        &[],
+    )
+    .unwrap();
     theta.deposited(&deposit).unwrap().0
 }
 
@@ -276,9 +319,9 @@ fn deposit_descends() {
     )
     .unwrap();
     let mut first = deposited(&field, &theta, &pending);
-    collapse(&field, &mut first, &admitted).unwrap();
+    collapse(&field, &mut first, &admitted, Opens::AtRest).unwrap();
     let mut collapsed = theta.clone();
-    collapse(&field, &mut collapsed, &admitted).unwrap();
+    collapse(&field, &mut collapsed, &admitted, Opens::AtRest).unwrap();
     let second = deposited(&field, &collapsed, &pending);
     assert_eq!(first, second);
     assert_ne!(first, theta);
@@ -331,7 +374,13 @@ fn the_collapse_keeps_the_retained_remainders_and_clocks() {
     let before = carried.carried_remainders();
     assert!(!before.is_empty());
     let mut collapsed = carried.clone();
-    let reading = collapse(&field, &mut collapsed, std::slice::from_ref(&phases)).unwrap();
+    let reading = collapse(
+        &field,
+        &mut collapsed,
+        std::slice::from_ref(&phases),
+        Opens::AtRest,
+    )
+    .unwrap();
     assert!(!reading.released.is_empty());
     let kept: Vec<_> = before
         .iter()
@@ -361,7 +410,7 @@ fn the_collapse_keeps_the_retained_remainders_and_clocks() {
     )
     .unwrap();
     let mut shrunk = carried.clone();
-    let narrowed = collapse(&field, &mut shrunk, &[narrow]).unwrap();
+    let narrowed = collapse(&field, &mut shrunk, &[narrow], Opens::AtRest).unwrap();
     let left: Vec<_> = before
         .iter()
         .filter(|(locus, ..)| narrowed.released.contains(locus))
@@ -408,7 +457,7 @@ fn the_collapse_deletes_whole_loci() {
     let current = Current::at_rest(&field);
     let admitted = [phases(&field, &theta, &current)];
     let mut collapsed = theta.clone();
-    let reading = collapse(&field, &mut collapsed, &admitted).unwrap();
+    let reading = collapse(&field, &mut collapsed, &admitted, Opens::AtRest).unwrap();
     let released: BTreeSet<Locus> = reading.released.clone();
     for g in 0..6 {
         let element = released.contains(&Locus::Element(g));
@@ -486,11 +535,15 @@ fn two_receiver_path() -> Field {
 /// whose reading does not factor through the collapse is refused, naming its separator, and a
 /// pending ratio that factors is carried; a staged deposit that reaches a released locus is refused
 /// with the released loci it would reach and discarded (design (c): `close_aeon` carries every open
-/// handle or refuses it).
+/// handle or refuses it). Narrowing the admitted family releases loci only at the rest limit
+/// (`A = I`): under the carry the collapse keeps every locus a source-to-receiver walk passes, and
+/// on this connected path that is every locus (record B §8, Lean
+/// `HNN/Retention.continuing_collapse_connected`), so the refusals this test reads are the rest
+/// regime's and it declares it. Several pending ratios are lawful under either reception.
 #[test]
 fn the_boundary_reaches_the_pending_ratios_and_refuses_out_of_turn() {
     let field = two_receiver_path();
-    let reference = Reference::campaign_one();
+    let reference = Reference::campaign_one().with_reception(Reception::Rest);
     let theta = generic(&field, 57);
     // The mount certifies the field's Holarchy, whose contacts' momentum chart needs each storage
     // `C_a` invertible: this drawn constitution has a singular one and is refused, typed.
@@ -644,4 +697,74 @@ fn contained_after(
 ) -> HnnError {
     to_the_carry_out(reference, resident);
     reference.close_aeon(resident, admitted).unwrap_err()
+}
+
+/// [definition; record B §8] **A releasing collapse under the carry releases the motion its
+/// material held.** Closing an aeon onto no receiver releases every materialized locus (no walk
+/// reaches an admitted receiver). The carried end held momentum `π_a = C_a w_a` at the contacts;
+/// a released contact's storage is zero, so no rate holds that momentum on the next opening, and
+/// the motion leaves with the material (`ReceptionCarry::released`): the resident's carry is the
+/// held one with every released contact's state and momentum zero, and the collapsed medium reads
+/// on. Two pending ratios open across the boundary, as the card's
+/// `the_card_port_returns_the_reference_through_a_releasing_collapse` runs it.
+#[test]
+fn a_releasing_collapse_releases_the_carried_motion_its_material_held() {
+    let field = super::learning::chain();
+    let reference = Reference::campaign_one();
+    let mut resident = reference
+        .mount_with(&field, &Current::at_rest(&field), generic(&field, 23))
+        .unwrap();
+    let (moment, _) = reference.ingest(&mut resident, None, &[]).unwrap();
+    let phases = resident.admitted()[0].clone();
+    let mut draw = Draw::new(23);
+    let cells: Vec<usize> = (0..64)
+        .map(|k| if draw.below(8) == 0 { draw.below(4) } else { [0, 1, 2, 1][k % 4] })
+        .collect();
+    let mut position = 0;
+    loop {
+        let (id, _) = reference.refine(&mut resident, &moment, &phases).unwrap();
+        let targets = one_hot(&cells[position..position + 2]);
+        let (staged, _) = reference.compare(&mut resident, id, &targets).unwrap();
+        reference.deposit(&mut resident, staged).unwrap();
+        let (_, ingested) = reference
+            .ingest(&mut resident, Some(&moment), &targets)
+            .unwrap();
+        let ingested = ingested.forward.into_present().unwrap();
+        position += ingested.cells;
+        if ingested.carry_out {
+            break;
+        }
+        assert!(position + 2 <= cells.len(), "the joint clock carries out within the cut");
+    }
+    let (id, _) = reference.refine(&mut resident, &moment, &phases).unwrap();
+    let (other, _) = reference.refine(&mut resident, &moment, &phases).unwrap();
+    reference
+        .compare(&mut resident, other, &one_hot(&[1, 2]))
+        .unwrap();
+    let held = resident.carried().cloned().expect("the refine writes the carry");
+    assert!(
+        held.momenta.iter().flatten().any(|x| !x.is_zero()),
+        "the carried end holds momentum at a contact"
+    );
+    let boundary = reference.close_aeon(&mut resident, &[]).unwrap();
+    let collapse = &boundary.forward.present().unwrap().collapse;
+    assert!(collapse.released.contains(&Locus::Channel(0)), "the collapse releases the contacts");
+    let (expected, moved) = held.released(&collapse.released);
+    assert!(!moved.is_empty(), "the released material held carried motion");
+    let carry = resident.carried().expect("the carry stays, released where its material was");
+    assert_eq!(carry, &expected);
+    for locus in &collapse.released {
+        if let Locus::Channel(a) = *locus {
+            assert!(carry.change.states[a].iter().flatten().all(|x| x.is_zero()));
+            assert!(carry.momenta[a].iter().all(|x| x.is_zero()));
+            assert_eq!(carry.change.arrivals[a], held.change.arrivals[a], "the waves stay");
+        }
+    }
+    // The collapsed medium reads on: a word opens on the released carry, and is compared.
+    let _ = reference.compare(&mut resident, id, &one_hot(&[0, 1]));
+    let (fresh, _) = reference.refine(&mut resident, &moment, &phases).unwrap();
+    reference
+        .compare(&mut resident, fresh, &one_hot(&[2, 3]))
+        .unwrap();
+    reference.read(&resident).unwrap();
 }
