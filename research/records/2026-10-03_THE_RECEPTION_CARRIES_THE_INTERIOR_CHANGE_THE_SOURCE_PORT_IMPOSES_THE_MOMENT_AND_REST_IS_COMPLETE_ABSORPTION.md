@@ -683,10 +683,20 @@ host word does (`holonics-cuda`: `hnn::carry`, `hnn::port`, `hnn::execute`, `ker
   transmitted, `a′ = 2G/(G + G′)·a`, from the plan's reduced gain; each rate is held,
   `w′ = w + δ`, where `δ` is read from the host owner `ReceptionCarry::crossed` against the
   publication's storage forms (agent-inferred: the card's words carry no exact preimage solve).
-  Both leave the dyadics, so the card splits them onto `L_w` over their denominators
+  Both leave the dyadics. The card splits a crossed wave onto `L_w` over the gain's denominator
   (`hnn_split_over`: `s = q·D·2^k + r`, ties upward, the host's `Lattice::div_rem` at `s/(D·2^k)`)
-  and carries each remainder over its denominator through every later split of the word. At rest
-  every denominator is one and the word's path is unchanged.
+  and carries that remainder over it through every later split of the word. A held rate it takes
+  as the host splits it at the open (`HeldRow`, October 4): the coordinate's jump `W′ − W`, and at
+  the stage's scale `2^(L_w + k)` the remainder's integer part `R` and its fraction `g ∈ [0, 1)`.
+  Every later split adds an integer image and takes an integer multiple of `2^k`, so `g` is fixed
+  for the word; for `k ≥ 1`, `⌊(I + g)/2^k + ½⌋ = ⌊(I + 2^(k−1))/2^k⌋`, and at `k = 0` the split
+  rounds up exactly when `g ≥ ½` (`hnn_split_held`). The card carries `R`, and the host adds `g`
+  back when it reads the remainder. [proved-derived] The host's law (`held_rate`, an exact
+  rational preimage solve) puts no bound on the width of `δ·2^(L_w) = n/d`, and with this split none
+  enters the card: it refuses only a coordinate or integer part past its state word, the bound of
+  every state it carries. The first carry built took `(n, d)` as signed 64-bit words and refused the
+  standing cut's deposit re-read ("a held rate's jump past the word"). At rest the word's path is
+  unchanged.
 - **The carry is the last crossing, and the pump continues** (§2.4). `CardCarry::ended` reads the
   change at the start of the word's last junction step from its record (`readout::crossing`) with
   every resonator state as hop `T − 1` left it, at tick `opened_at + steps − 1`, and
@@ -696,9 +706,9 @@ host word does (`holonics-cuda`: `hnn::carry`, `hnn::port`, `hnn::execute`, `ker
   `(opened_at + step) mod order`, the host's `phase_at`; the readout measures each resonator's
   open, pump and end at the same phases. Both refusals of a received resonator are gone.
 - **A carried resonator's rate is held and split** (§2.4). Its jump `δ_r` (`C′_r w′_r = C_r w_r`)
-  is read from `ReceptionCarry::crossed` against the publication's capacities, added in the card's
-  open and split onto `L_w` over its denominator; the velocity's split carries that remainder over
-  the same denominator through the word. [agent-inferred] The host opening split a carried
+  is read from `ReceptionCarry::crossed` against the publication's capacities and taken as the
+  host splits it (`HeldRow` at `L_w`); the velocity's split carries its remainder through the
+  word. [agent-inferred] The host opening split a carried
   resonator state not at all, so a held rate off the dyadics would have entered its step unsplit;
   `Word::on_change` now splits it once at the transients' lattice as it splits a contact's state,
   its remainder opening `ResonatorRemainders::state`, and `ChainedBalance` reads the carried
@@ -719,6 +729,12 @@ byte-identical as saved text after every compare.
   card's words carrying only dyadic material): all 8 receptions carry the resonator states, and the
   card's exposure from the pumped constitution equals the reference's, its chained balance closing
   and dissipative at all 8.
+- A held contact rate past a word's width (October 4): three receptions in lockstep, their carry
+  saved as text, every contact's storage factor moved to the band `(255 I + B)/128` on the
+  channel's lattice, so the first opening's jump `δ·2^(L_w) = n/d` is 71 bits wide, and the carry
+  restored beside it on both ports for three more receptions: every return the reference's and the
+  carried end byte-identical. Dropping the remainder's integer part in the card's open fails it at
+  the first refine on the restored carry.
 - A held resonator rate off the dyadics: three pumped receptions in lockstep, their carry saved as
   text, every ring's capacity gain moved `1 → 3/4` (`C′_r = (9/16) C_r`, so the held rate is
   `(16/9) w_r`), and the carry restored beside it on both ports for three more receptions: every
