@@ -23,12 +23,14 @@
 //! their denominators and carries those remainders through every later split of the word
 //! ([`crate::hnn::execute::CarryPlan`]).
 //!
-//! [definition; agent-inferred] **What the card refuses.** A declared resonator on a received
-//! opening: under `Absorption::Nothing` exactly as the host refuses it (the pump's carry across
-//! receptions is owed), and under `Absorption::Complete` because the card's pump phase reads the
-//! word's own ticks from zero (`step % phases`), not the field's elapsed ticks; that phase offset
-//! on the card is owed (#76). A carried change off the transients' lattice, or past the signed
-//! 64-bit word, is refused at its restore.
+//! [definition; record B §2.4] **The carry is the last crossing, and the pump continues.** A
+//! word ends between its last crossing `T = opened_at + steps − 1` and hop `T`, so the carry is the
+//! change arriving at that crossing (the record at the start of the last junction step) with every
+//! resonator state as hop `T − 1` left it, at tick `T`. The next word's hops read `T + step`, and
+//! each loaded ring's pump phase is that tick's (`WordPlan::opened_at`). A carried resonator's rate
+//! is held at its momentum `C_r w_r` across the deposit and split onto `L_w` at the open, its
+//! remainder carried in the velocity's split over its denominator, as a contact's rate is. A carried
+//! change off the transients' lattice, or past the signed 64-bit word, is refused at its restore.
 
 use std::rc::Rc;
 
@@ -70,7 +72,8 @@ pub(crate) enum CardOpening<'c> {
     },
 }
 
-/// Whether a change moves anywhere: a storage wave, an arriving wave or a contact state off zero.
+/// Whether a change moves anywhere: a storage wave, an arriving wave, a contact state or a
+/// resonator state off zero.
 fn moving(carry: &ReceptionCarry) -> bool {
     let change = &carry.change;
     change
@@ -78,39 +81,50 @@ fn moving(carry: &ReceptionCarry) -> bool {
         .iter()
         .chain(change.arrivals.iter().flatten())
         .chain(change.states.iter().flatten())
+        .chain(change.resonators.iter().flatten().flatten())
         .flatten()
         .any(|x| !x.is_zero())
 }
 
 impl<'c> CardCarry<'c> {
-    /// [definition; the reception carry §2.1] **The carried end a consumed word leaves**: its end
-    /// change read from its record, the field's elapsed ticks (the opening's plus its junction
-    /// steps), each contact's conductance at its cut and momentum `C_a w_a` under its
-    /// publication's storage, after the boundary's absorption; under `Absorption::Nothing` its
-    /// change's words copied on the card.
+    /// [definition; the reception carry §2.1, §2.4] **The carried end a consumed word leaves**
+    /// (`Word::reception_end`): the change arriving at its last crossing, read from its record,
+    /// with every resonator state as its last hop left it; that crossing's tick
+    /// `opened_at + steps − 1`; each contact's conductance at its cut and momentum `C_a w_a`, and
+    /// each carried resonator's momentum `C_r w_r`, under its publication; after the boundary's
+    /// absorption. Under `Absorption::Nothing` its words are copied on the card.
     pub(crate) fn ended(
         word: &ResidentWord<'c>,
         opened_at: usize,
         absorption: Absorption,
     ) -> Result<Self, HnnError> {
         let plan = &word.plan;
-        let change = readout::end(plan, &word.record);
-        let momenta = word
-            .publication
-            .loci
+        let change = readout::crossing(plan, &word.record);
+        let loci = &word.publication.loci;
+        let momenta = loci
             .contacts
             .iter()
             .zip(&change.states)
             .map(|(contact, [_, rate])| Ok(contact.forms[0].apply(rate)?))
             .collect::<Result<Vec<_>, HnnError>>()?;
+        let resonator_momenta = change
+            .resonators
+            .iter()
+            .zip(&loci.resonators)
+            .map(|(state, material)| match (state, material) {
+                (Some([_, rate]), Some(material)) => Ok(Some(material.forms().0.apply(rate)?)),
+                _ => Ok(None),
+            })
+            .collect::<Result<Vec<_>, HnnError>>()?;
         let host = ReceptionCarry {
-            ticks: opened_at + plan.steps,
+            ticks: opened_at + plan.steps - 1,
             conductances: plan
                 .contacts
                 .iter()
                 .map(|c| c.conductance.clone())
                 .collect(),
             momenta,
+            resonator_momenta,
             change,
         }
         .absorbed(absorption);
@@ -144,12 +158,26 @@ impl<'c> CardCarry<'c> {
             .transient_exponent();
         let change = &host.change;
         let mut words = Vec::new();
+        // Each ring's resonator state per row, zero where none is carried.
+        let resonator = |side: usize| -> Vec<Rat> {
+            change
+                .resonators
+                .iter()
+                .zip(field.rings())
+                .flat_map(|(state, ring)| match state {
+                    Some(state) => state[side].clone(),
+                    None => vec![Rat::zero(); ring.width()],
+                })
+                .collect()
+        };
+        let (resonator_u, resonator_w) = (resonator(0), resonator(1));
         let runs = change
             .storage
             .iter()
             .chain(change.arrivals.iter().flatten())
             .chain(change.states.iter().map(|[u, _]| u))
-            .chain(change.states.iter().map(|[_, w]| w));
+            .chain(change.states.iter().map(|[_, w]| w))
+            .chain([&resonator_u, &resonator_w]);
         for x in runs.flatten() {
             let word = coordinate(x, lw).and_then(|c| c.to_i64()).ok_or_else(|| {
                 refused("a carried change off the transients' lattice or past the word")
@@ -181,35 +209,23 @@ impl<'c> CardOpening<'c> {
         }
     }
 
-    /// [definition; record B §2.3a, the deposit record §3] **The plan opening on this opening**:
-    /// unchanged where the word opens on the rest change (at rest, at complete absorption, or on a
-    /// zero carry), otherwise with its carry table ([`WordPlan::with_carry`]): each contact's gain
-    /// `2G/(G + G′)` from the carried and the plan's conductances, and each row's held-rate jump
-    /// from the host owner (`ReceptionCarry::crossed` against the publication's storage forms),
-    /// with the carried words the word copies in. A declared resonator on a received opening is
-    /// refused (module header).
+    /// [definition; record B §2.3a, §2.4, the deposit record §3] **The plan opening on this
+    /// opening**: at the opening's tick (`WordPlan::opened_at`: the pump continues), with its carry
+    /// table where the word opens on a moving carry under `Absorption::Nothing`
+    /// ([`WordPlan::with_carry`]): each contact's gain `2G/(G + G′)` from the carried and the plan's
+    /// conductances, and each contact row's and each loaded ring row's held-rate jump from the host
+    /// owner (`ReceptionCarry::crossed` against the publication's storage and capacity forms), with
+    /// the carried words the word copies in. At rest, at complete absorption, or on a zero carry the
+    /// word opens on the rest change at its tick.
     pub(crate) fn plan<'w>(
         &'w self,
         plan: WordPlan,
         loci: &Loci,
-        resonators: &[Option<holonics::hnn::ring::ResonatorOperands>],
     ) -> Result<(WordPlan, Option<&'w CardBuffer<'c, u8>>), HnnError> {
+        let plan = plan.opened_at(self.ticks());
         let Self::Received { carry, absorption } = self else {
             return Ok((plan, None));
         };
-        if let Some(ring) = resonators.iter().position(Option::is_some) {
-            return Err(HnnError::Resonator {
-                ring,
-                what: match absorption {
-                    Absorption::Nothing => {
-                        "the reception carry of a declared resonator's pump phase is owed"
-                    }
-                    Absorption::Complete => {
-                        "the card's pump phase at a carried tick is owed (it reads the word's own ticks)"
-                    }
-                },
-            });
-        }
         // At complete absorption the word opens on the rest change whatever the carry holds.
         let (Absorption::Nothing, Some(words)) = (absorption, &carry.words) else {
             return Ok((plan, None));
@@ -221,7 +237,12 @@ impl<'c> CardOpening<'c> {
             .map(|c| c.conductance.clone())
             .collect();
         let storage: Vec<&ExactRatMatrix> = loci.contacts.iter().map(|c| &c.forms[0]).collect();
-        let crossed = host.crossed(&conductances, &storage)?;
+        let capacities: Vec<Option<&ExactRatMatrix>> = loci
+            .resonators
+            .iter()
+            .map(|material| material.as_ref().map(|material| material.forms().0))
+            .collect();
+        let crossed = host.crossed(&conductances, &storage, &capacities)?;
         let reduced = |value: &Rat, what: &'static str| -> Result<(i64, i64), HnnError> {
             match (value.numer().to_i64(), value.denom().to_i64()) {
                 (Some(n), Some(d)) => Ok((n, d)),
@@ -252,6 +273,30 @@ impl<'c> CardOpening<'c> {
                 )?);
             }
         }
-        Ok((plan.with_carry(CarryPlan { gains, jumps })?, Some(words)))
+        let mut resonator_jumps = vec![(0, 1); plan.n];
+        for ((ring, carried), held) in plan
+            .rings
+            .iter()
+            .zip(&host.change.resonators)
+            .zip(&crossed.resonators)
+        {
+            let (Some([_, carried]), Some([_, held])) = (carried, held) else {
+                continue;
+            };
+            for (i, (w, held)) in carried.iter().zip(held).enumerate() {
+                resonator_jumps[ring.rows + i] = reduced(
+                    &((held - w) * &unit),
+                    "a held resonator rate's jump past the word",
+                )?;
+            }
+        }
+        Ok((
+            plan.with_carry(CarryPlan {
+                gains,
+                jumps,
+                resonator_jumps,
+            })?,
+            Some(words),
+        ))
     }
 }

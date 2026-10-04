@@ -604,12 +604,14 @@ tests can comb through anything valuable").
     field refinement"), which the word-local release would cut at every word.
     [agent-inferred, amended October 3 for the reception carry] Under a declared reception carry
     (`Reception::Carry`; the default is `Reception::Rest`, which keeps the guard as stated above) a
-    reception's word opens on the interior of the end change the previous reception's consumed word
-    left, crossed into the next cut's references (each contact's waves at the junction's reference
-    change, its rate at held momentum; `Word::open_received`, `ReceptionCarry::crossed`), so that
+    reception's word opens on the interior of the change arriving at the last crossing of the
+    previous reception's consumed word, at that crossing's tick so a declared pump continues from
+    it, crossed into the next cut's references (each contact's waves at the junction's reference
+    change, each contact's and resonator's rate at held momentum; `Word::open_received`,
+    `ReceptionCarry::crossed`), so that
     change outlives its refinement into the next reception's opening and no further. The resident,
     not `Current`, holds the one carried change, its tick and the references it was measured in
-    (each contact's conductance and momentum at that cut), overwritten at every reception, and the
+    (each contact's conductance and momentum at that cut, and each resonator's momentum), overwritten at every reception, and the
     return stops at the opening: the
     covector reaching the carried change is a reading, deposited nowhere
     ([record](../research/records/2026-10-03_THE_RECEPTION_CARRIES_THE_INTERIOR_CHANGE_THE_SOURCE_PORT_IMPOSES_THE_MOMENT_AND_REST_IS_COMPLETE_ABSORPTION.md)).

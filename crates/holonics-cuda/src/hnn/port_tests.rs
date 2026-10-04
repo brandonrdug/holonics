@@ -294,6 +294,10 @@ struct Compared {
     held: u64,
     /// Received openings whose carried wave crossed a moved conductance (record B §2.3a).
     crossed: u64,
+    /// Received openings that carried a resonator state (record B §2.4).
+    pumped: u64,
+    /// Received openings whose carried resonator rate a deposit moved off its momentum.
+    resonator_held: u64,
 }
 
 /// A carry as its saved text (`ReceptionCarry::write`): the bytes a continuing state holds.
@@ -396,6 +400,14 @@ fn lockstep_receiving(
                         .zip(&carry.change.arrivals)
                         .any(|(after, before)| after != before),
                 );
+                compared.pumped += u64::from(carry.change.resonators.iter().any(Option::is_some));
+                compared.resonator_held +=
+                    u64::from(opened.resonators.iter().zip(&carry.change.resonators).any(
+                        |(after, before)| match (after, before) {
+                            (Some(after), Some(before)) => after[1] != before[1],
+                            _ => false,
+                        },
+                    ));
             }
             let refined = same(
                 "refine",
@@ -788,6 +800,177 @@ fn the_card_carries_the_reference_on_a_generic_constitution() {
     }
 }
 
+/// **The carry chain with a pumped resonator on every ring** (the host's
+/// `the_chained_balance_closes_on_a_pumped_field`, at the dyadic carrier the card's words carry):
+/// the declared initial constitution with a parametron resonator pumped at a half step on each
+/// ring.
+fn pumped(field: &Field) -> Constitution {
+    let mut theta = Constitution::initial(field, CAMPAIGN_ONE_BUDGET).unwrap();
+    for ring in 0..field.rings().len() {
+        let pump = PumpDeclaration::new(
+            rat(1, 16),
+            // The card's words carry dyadic material only: the carrier at phase zero, `(1, 0)`.
+            Carrier::new(Rat::one(), Rat::zero()).unwrap(),
+            PumpStep::Half,
+        )
+        .unwrap();
+        let material =
+            ResonatorMaterial::of_parametron(field.ring(ring).parametron(), &rat(1, 8), Some(pump))
+                .unwrap();
+        theta = theta.with_ring_resonator(field, ring, material).unwrap();
+    }
+    theta
+}
+
+/// **The card carries the pump across receptions as the reference does** (record B §2.4): under
+/// `Carry(Nothing)` on the chain with a pumped resonator on every ring, each reception opens on the
+/// previous one's last crossing with the resonator states as its last hop left them, the next word's
+/// pump phases read the field's elapsed ticks, and each carried resonator rate is held at its
+/// momentum across the deposit. Every return of the lockstep is the reference's and the carried end
+/// byte-identical after every compare; the card's exposure from the pumped constitution is the
+/// reference's.
+#[test]
+#[ignore = "needs the CUDA card; run alone with --include-ignored --test-threads=1"]
+fn the_card_carries_the_pump_as_the_reference() {
+    let (field, cut) = carry_chain();
+    let carry = Reception::Carry(Absorption::Nothing);
+    let windows = (cut.cells.len() / 2) as u64;
+    let theta = pumped(&field);
+    let compared = lockstep_receiving(&field, &cut, windows, Some(theta.clone()), 3, carry);
+    println!("pumped chain, Carry(Nothing): {compared:?}");
+    assert_eq!(compared.compares, windows);
+    assert_eq!(compared.received, 8);
+    assert_eq!(
+        compared.pumped, 8,
+        "every carry holds the resonators' states"
+    );
+    let card = card();
+    let host = Reference::campaign_one().with_reception(carry);
+    let device = Resident::campaign_one(&card).with_reception(carry);
+    let reference = without_wall(host.expose_with(&field, &cut, theta.clone()).unwrap());
+    let carried = without_wall(device.expose_with(&field, &cut, theta).unwrap());
+    let chained = &reference.word.chained;
+    assert_eq!(chained.read, 8);
+    assert!(chained.closed && chained.dissipative == chained.read);
+    assert_eq!(
+        carried, reference,
+        "the card's exposure under the pumped carry"
+    );
+}
+
+/// **The card holds a carried resonator's momentum across a moved capacity as the reference does**
+/// (record B §2.4; `ReceptionCarry::crossed`, `held_resonator_rate`): on the pumped chain under
+/// `Carry(Nothing)`, three receptions run in lockstep and their carry is saved as text; the
+/// constitution is then moved on every ring's capacity gain, `1 → 3/4`, so `C′_r = (9/16) C_r` and
+/// the held rate `w′_r = (16/9) w_r` leaves the dyadics, and both ports mount the saved carry beside
+/// it (`mount_carried`) and receive three more windows. Every return is the reference's, the
+/// carried end byte-identical after every compare, and the first opening's held resonator rate
+/// moves off the dyadics (its jump's denominator is odd), so the card's open splits it over that
+/// denominator and its velocity carries the remainder. [agent-inferred] The capacity move is
+/// declared, not deposited: on these cuts no deposit moves a capacity gain (only the dissipation's
+/// moves), and the hold reads only `C_r` and `C′_r`.
+#[test]
+#[ignore = "needs the CUDA card; run alone with --include-ignored --test-threads=1"]
+fn the_card_holds_a_resonators_momentum_as_the_reference() {
+    let (field, cut) = carry_chain();
+    let carry = Reception::Carry(Absorption::Nothing);
+    let card = card();
+    let host = Reference::campaign_one().with_reception(carry);
+    let device = Resident::campaign_one(&card).with_reception(carry);
+    let current = Current::at_rest(&field);
+    let theta = pumped(&field);
+    let mut h = host.mount_with(&field, &current, theta.clone()).unwrap();
+    let mut d = device.mount_with(&field, &current, theta).unwrap();
+    receive(&host, &device, &mut h, &mut d, &cut.cells, 0, 3);
+    let saved = carry_text(h.carried()).expect("the compare writes the carry");
+    let mut lines = saved.lines();
+    let head = lines.next().unwrap();
+    let restored = ReceptionCarry::read(head, &mut |what| {
+        lines.next().ok_or(HnnError::ContinuingState { what })
+    })
+    .unwrap();
+    // The capacity gain moved on every ring: `C′_r = (3/4)² C_r`.
+    let mut moved = h.constitution().clone();
+    for ring in 0..field.rings().len() {
+        let material = moved.ring_resonator(ring).unwrap().clone();
+        let mut gains = material.gains().clone();
+        gains[0] = rat(3, 4);
+        moved = moved
+            .with_ring_resonator(&field, ring, material.with_gains(gains).unwrap())
+            .unwrap();
+    }
+    // The first opening's held resonator rate leaves the dyadics.
+    let form = holonics::hnn::word::PowerForm::read(&field, &moved, &current).unwrap();
+    let opened = form.opening(&field, &restored).unwrap();
+    let off_dyadic = opened
+        .resonators
+        .iter()
+        .zip(&restored.change.resonators)
+        .filter_map(|(after, before)| Some((after.as_ref()?, before.as_ref()?)))
+        .flat_map(|(after, before)| after[1].iter().zip(&before[1]))
+        .filter(|(after, before)| after != before)
+        .filter(|(after, _)| power_of_two(&Rat::from_integer(after.denom().clone())).is_none())
+        .count();
+    assert!(off_dyadic > 0, "a held resonator rate leaves the dyadics");
+    let mut h = host
+        .mount_carried(&field, &current, moved.clone(), restored.clone())
+        .unwrap();
+    let mut d = device
+        .mount_carried(&field, &current, moved, restored)
+        .unwrap();
+    receive(&host, &device, &mut h, &mut d, &cut.cells, 6, 3);
+}
+
+/// `windows` receptions on both ports from `from`, every return asserted equal and the carried end
+/// byte-identical after every compare.
+fn receive<'c>(
+    host: &Reference,
+    device: &Resident<'c>,
+    h: &mut holonics::hnn::reference::Resident,
+    d: &mut super::Mounted<'c>,
+    cells: &[usize],
+    from: usize,
+    windows: usize,
+) {
+    let phases = h.admitted()[0].clone();
+    let (moment, _) = same(
+        "the open",
+        host.ingest(h, None, &[]),
+        device.ingest(d, None, &[]),
+    )
+    .unwrap();
+    for window in 0..windows {
+        let span = &cells[from + 2 * window..from + 2 * window + 2];
+        let (pending, _) = same(
+            "refine",
+            host.refine(h, &moment, &phases),
+            device.refine(d, &moment, &phases),
+        )
+        .unwrap();
+        let (staged, _) = same(
+            "compare",
+            host.compare(h, pending, &one_hot(span)),
+            device.compare(d, pending, &one_hot(span)),
+        )
+        .unwrap();
+        assert_eq!(
+            carry_text(h.carried()),
+            carry_text(ExposedResident::carried(d)),
+            "the carried ends after the compare"
+        );
+        same(
+            "deposit",
+            host.deposit(h, staged),
+            device.deposit(d, staged),
+        );
+        same(
+            "ingest",
+            host.ingest(h, Some(&moment), &one_hot(span)),
+            device.ingest(d, Some(&moment), &one_hot(span)),
+        );
+    }
+}
+
 /// At complete absorption (`Carry(Complete)`) the carry is the rest change at the field's elapsed
 /// ticks: on the chain every return is the reference's, the carried end byte-identical after
 /// every compare.
@@ -805,6 +988,19 @@ fn the_card_absorbs_each_reception_as_the_reference() {
         Reception::Carry(Absorption::Complete),
     );
     println!("chain, Carry(Complete): {compared:?}");
+    assert_eq!(compared.compares, windows);
+    assert_eq!(compared.received, 8);
+    // With a pumped resonator on every ring the word opens at rest at the carried tick, its pump
+    // phases reading the field's elapsed ticks.
+    let compared = lockstep_receiving(
+        &field,
+        &cut,
+        windows,
+        Some(pumped(&field)),
+        3,
+        Reception::Carry(Absorption::Complete),
+    );
+    println!("pumped chain, Carry(Complete): {compared:?}");
     assert_eq!(compared.compares, windows);
     assert_eq!(compared.received, 8);
 }
