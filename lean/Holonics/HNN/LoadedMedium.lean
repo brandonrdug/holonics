@@ -1,5 +1,6 @@
 import Holonics.HNN.RingLoci
 import Holonics.HNN.LoadedRing
+import Holonics.HNN.HeldCommits
 
 /-!
 # HNN.LoadedMedium: the loaded ring block joined to the medium
@@ -31,9 +32,12 @@ j = t mod P at the field's absolute tick t                        (ResonatorOper
   (`HNN/LoadedRing.resonance_shift`).
 * **The constitution** (`LoadedAt`) is `HNN/RingLoci.RingsAt` with the resonator operands per ring.
   **The loci** (`LLocus`) are `RingLoci.RLocus` and `Resonator(g)`, read on the element edge
-  `g → g` alone. The opening, the reading and the deposit act on the medium part as in `RingLoci`
-  (`loadedOpen`, `liftRecv`, `projData`); a resonator moves by its own law from the data on its
-  edge (`resData`).
+  `g → g` and by its ring's reference. The opening, the reading and the deposit act on the medium
+  part as in `RingLoci` (`loadedOpen`, `liftRecv`, `projData`); a resonator moves by its own law
+  from the data on its edge (`resData`).
+* **The references** (`LRef`) are the medium's and, at each ring, its resonator's capacity `C`
+  (`ResRef`, `resRef`): the carry holds the momentum `π = C w` through the capacity it ran at
+  (`ReceptionCarry`'s `resonator_momenta`).
 
 [proved-derived; formal-checked] What is proved.
 
@@ -47,9 +51,16 @@ j = t mod P at the field's absolute tick t                        (ResonatorOper
 3. **The Rust's rule keeps the retained loci** (`retained_rust_loaded`) at `e_last = 2|B|`: the
    medium's loci by the medium's rule (the ring loci by `RingLoci.retained_rust_ring`), and a
    resonator by `element(g)` (`Diamond::retains(Resonator(g))`, `HNN/LoadedRing.resonatorRule_iff`),
-   since its only reading edge is `g → g`. Hence **the Rust's collapse is sufficient for every
-   per-locus law** (`loaded_collapse_sufficient`), at every pump phase, and on the ring loci of
-   `HNN/RingLoci` (`loaded_ring_rust_collapse_sufficient`).
+   since its reading edge `g → g` and its reference at `g` are on a walk only where `g` is. Hence
+   **the Rust's collapse is sufficient for every per-locus law** (`loaded_collapse_sufficient`), at
+   every pump phase, and on the ring loci of `HNN/RingLoci`
+   (`loaded_ring_rust_collapse_sufficient`).
+4. **The resonator's momentum is held across a deposit** under the held crossing (`heldCross`,
+   `ReceptionCarry::crossed`, `held_resonator_rate`): the position `u` is kept and the rate moves
+   by a hold from the carried capacity to the contemporary one (`heldCross_interior`). Where the
+   hold solves the contemporary capacity, the crossed rate holds the carried momentum,
+   `C′ w′ = C w` (`heldCross_momentum`), and a symmetric `C′` stores the same kinetic energy in
+   every rate that holds it (`heldCross_kinetic`, `HNN/HeldCommits.held_kinetic_unique`).
 
 [open; source-inspected at `5b7712fd`] Here a resonator's law reads only its own operands and
 the data on its edge. The Rust's resonator steps read beyond it. A stepping resonator's gain
@@ -60,8 +71,9 @@ parts of `Locus::Resonator`). Otherwise they share that step, whose gains read `
 ring's contrast port and the span factor `F(s)` over every resonator not certified passive
 (`HNN/FactoredMedium`, module header [open]). The joint step on retained loci, with the carried
 statistics in the locus's state, is owed in #62. The executed split and chart of the lattice word
-are `HNN/Ring`'s and `HNN/LatticeWord`'s; the resonator's held momentum across a deposit is
-`HNN/HeldCommits` and the reception carry's `cross`, a parameter here. The release of a
+are `HNN/Ring`'s and `HNN/LatticeWord`'s. The medium part's crossing (each contact's held rate) is
+a parameter here, and the hold is any linear solve; the Rust's `held_rate` solves exactly and
+refuses a momentum no rate holds (`HnnError::HeldMomentum`). The release of a
 resonator's motion on these blocks (its state, phase and momentum) is `HNN/LoadedMotion`.
 
 No `sorry`, no `axiom`, no `native_decide`.
@@ -110,6 +122,13 @@ instance instModuleResState (b : Ring ⊕ Contact) : Module ℝ (ResState (Conta
 variable (endRing V Ch) in
 /-- [definition] **The loaded blocks**: the word's block and the resonator's state. -/
 abbrev LoadedM (b : Ring ⊕ Contact) : Type u := BlockM endRing V Ch b × ResState V b
+
+variable (V) in
+/-- [definition] **The resonator's reference at a block**: its capacity `C` at ring `g`, the
+momentum `π = C w` it holds being read through it; nothing at a contact. -/
+def ResRef : Ring ⊕ Contact → Type u
+  | .inl g => V g →L[ℝ] V g
+  | .inr _ => PUnit
 
 /-- [definition] **The resonator operands of a ring** (`ResonatorOperands`): the pump's period `P`,
 `C`, `D`, the stiffness `K_j` and the executed solve `M_j⁻¹` at each phase `j`, and the port
@@ -269,6 +288,19 @@ inductive LLocus
   | inner (ℓ : Loc)
   | resonator (g : Ring)
 
+variable (V Ref) in
+/-- [definition] **The references on the loaded blocks**: the medium's and the resonator's. -/
+abbrev LRef (b : Ring ⊕ Contact) : Type _ := Ref b × ResRef (Contact := Contact) V b
+
+/-- [definition] The capacity a ring's resonator reference holds. -/
+def capAt {g : Ring} (r : ResRef (Contact := Contact) V (.inl g)) : V g →L[ℝ] V g := r
+
+/-- [definition] The resonators' references: each ring's capacity. -/
+def resRef (res : (g : Ring) → ResOp (V g)) :
+    (b : Ring ⊕ Contact) → ResRef (Contact := Contact) V b
+  | .inl g => (res g).C
+  | .inr _ => PUnit.unit
+
 variable (endRing V Ch) in
 /-- [definition] The deposit data on the loaded blocks. -/
 abbrev LData : Type u :=
@@ -299,7 +331,7 @@ def liftRecv {b : Ring ⊕ Contact}
       RingHom.id_apply]
 
 variable (h₀ : ℝ)
-  (cross : Λ → Λ → (b : Ring ⊕ Contact) → Ref b → Ref b →
+  (cross : Λ → Λ → (b : Ring ⊕ Contact) → LRef V Ref b → LRef V Ref b →
     (LoadedM endRing V Ch b →ₗ[ℝ] LoadedM endRing V Ch b))
   (absorb : (b : Ring ⊕ Contact) → LoadedM endRing V Ch b →ₗ[ℝ] LoadedM endRing V Ch b)
   (Ψo : (g : Ring) → ResOp (V g) → LData endRing V Ch → ResOp (V g))
@@ -311,15 +343,15 @@ by `L` and each resonator on its ring's element edge, the opening and the readin
 part, the medium's deposit on the data's medium part and each resonator's by its own law from the
 data on its edge, and the release zeroing a released resonator. -/
 def loadedLaw (L : TickLaw ℝ (BlockM endRing V Ch) Con Loc Ref Cls Λ Mo Cell Crib) :
-    TickLaw ℝ (LoadedM endRing V Ch) (LoadedAt V Con) (LLocus Ring Loc) Ref (Cls × ℕ) Λ Mo Cell
-      Crib where
+    TickLaw ℝ (LoadedM endRing V Ch) (LoadedAt V Con) (LLocus Ring Loc) (LRef V Ref) (Cls × ℕ) Λ
+      Mo Cell Crib where
   op c θ := loadedOp (L.op c.1 θ.inner) θ.res h₀ c.2
   reads
     | .inner ℓ, z, y => L.reads ℓ z y
     | .resonator g, z, y => z = .inl g ∧ y = .inl g
   refReads
     | .inner ℓ, b => L.refReads ℓ b
-    | .resonator _, _ => False
+    | .resonator g, b => b = .inl g
   openReads
     | .inner ℓ, b => L.openReads ℓ b
     | .resonator _, _ => False
@@ -329,7 +361,7 @@ def loadedLaw (L : TickLaw ℝ (BlockM endRing V Ch) Con Loc Ref Cls Λ Mo Cell 
   agreeOn
     | .inner ℓ, θ, θ' => L.agreeOn ℓ θ.inner θ'.inner
     | .resonator g, θ, θ' => θ.res g = θ'.res g
-  ref θ := L.ref θ.inner
+  ref θ b := (L.ref θ.inner b, resRef θ.res b)
   recv θ b := liftRecv (L.recv θ.inner b)
   cls l t := (L.cls l t, t)
   openState θ l m b := (L.openState θ.inner l m b, 0)
@@ -380,7 +412,13 @@ theorem loadedLaw_lawful (hL : L.Lawful (blockAdj endRing)) : (LL).Lawful (block
         simp only [loadCorr, resStep, elemMap, hT (.inl g) (.inl g) rfl rfl, hres]
       | inr a => rfl
     · simp only [loadedOp, liftOp, hT y z rfl rfl, diagOp_ne _ hzy]
-  ref_reads θ θ' b h := hL.ref_reads θ.inner θ'.inner b fun ℓ hr => h (.inner ℓ) hr
+  ref_reads θ θ' b h := by
+    refine Prod.ext (hL.ref_reads θ.inner θ'.inner b fun ℓ hr => h (.inner ℓ) hr) ?_
+    cases b with
+    | inl g =>
+      show (θ.res g).C = (θ'.res g).C
+      rw [show θ.res g = θ'.res g from h (.resonator g) rfl]
+    | inr a => rfl
   open_reads θ θ' l m b h := by
     show (L.openState θ.inner l m b, (0 : ResState V b)) = (L.openState θ'.inner l m b, 0)
     rw [hL.open_reads θ.inner θ'.inner l m b fun ℓ hr => h (.inner ℓ) hr]
@@ -493,9 +531,9 @@ def LoadedRetained (keep : Loc → Prop) (S R : Set (Ring ⊕ Contact)) (e : ℕ
   | .resonator g => LocusMap.Retained endRing S R e (.element g)
 
 /-- [proved-derived; formal-checked] **The Rust's rule keeps the retained loci on the loaded
-blocks** whenever the medium's rule keeps the medium's retained loci. A resonator is read only
-on its ring's element edge `g → g`; a walk edge is in the continuing diamond at `2|B|`, where
-`element(g)` is retained. -/
+blocks** whenever the medium's rule keeps the medium's retained loci. A resonator is read on its
+ring's element edge `g → g` and by its ring's reference; either on a walk puts `g → g` in the
+continuing diamond at `2|B|`, where `element(g)` is retained. -/
 theorem retained_rust_loaded {S R : Set (Ring ⊕ Contact)} {keep : Loc → Prop}
     (hk : ∀ ℓ, TickStanding.Retained (blockAdj endRing) L S R ℓ → keep ℓ) {ℓ : LLocus Ring Loc}
     (h : TickStanding.Retained (blockAdj endRing) LL S R ℓ) :
@@ -503,9 +541,9 @@ theorem retained_rust_loaded {S R : Set (Ring ⊕ Contact)} {keep : Loc → Prop
   cases ℓ with
   | inner ℓ => exact hk ℓ h
   | resonator g =>
-    rcases h with ⟨z, y, ⟨rfl, rfl⟩, hw⟩ | ⟨b, hb, -⟩ | ⟨b, hb, -⟩ | ⟨b, hb, -⟩
+    rcases h with ⟨z, y, ⟨rfl, rfl⟩, hw⟩ | ⟨b, rfl, hr, ho⟩ | ⟨b, hb, -⟩ | ⟨b, hb, -⟩
     · exact (inDiamond_continuing_iff (adj := blockAdj endRing) S R _ _).mpr hw
-    · exact hb.elim
+    · exact (inDiamond_continuing_iff (adj := blockAdj endRing) S R _ _).mpr ⟨hr, ho⟩
     · exact hb.elim
     · exact hb.elim
 
@@ -568,8 +606,8 @@ variable {h₀ : ℝ} {χ : LockChart ρ Q endRing} {src : Λ → Mo → (g : Ri
     EdgeData endRing V Ch →
     (Module.Dual ℝ (BlockM endRing V Ch (.inl g)) →ₗ[ℝ]
       Module.Dual ℝ (BlockM endRing V Ch (.inl g)))}
-  {cross : Λ → Λ → (b : Ring ⊕ Contact) → MediumRef Ring Ch b → MediumRef Ring Ch b →
-    (LoadedM endRing V Ch b →ₗ[ℝ] LoadedM endRing V Ch b)}
+  {cross : Λ → Λ → (b : Ring ⊕ Contact) → LRef V (MediumRef Ring Ch) b →
+    LRef V (MediumRef Ring Ch) b → (LoadedM endRing V Ch b →ₗ[ℝ] LoadedM endRing V Ch b)}
   {absorb : (b : Ring ⊕ Contact) → LoadedM endRing V Ch b →ₗ[ℝ] LoadedM endRing V Ch b}
   {Ψo : (g : Ring) → ResOp (V g) → LData endRing V Ch → ResOp (V g)}
 
@@ -603,6 +641,91 @@ theorem loaded_ring_rust_collapse_sufficient {S R : Set (Ring ⊕ Contact)}
 
 end Rings
 
+/-! ## 4. The resonator's momentum held across a deposit -/
+
+section Held
+
+variable {Ring Contact : Type u} [Fintype Ring] [DecidableEq Ring] [Fintype Contact]
+  [DecidableEq Contact]
+variable {endRing : Contact × Bool → Ring}
+variable {V : Ring → Type u} [∀ r, NormedAddCommGroup (V r)] [∀ r, InnerProductSpace ℝ (V r)]
+variable {Ch : Contact → Type u} [∀ a, NormedAddCommGroup (Ch a)]
+  [∀ a, InnerProductSpace ℝ (Ch a)]
+variable {Con Loc : Type*} {Ref : Ring ⊕ Contact → Type*} {Cls Λ Mo Cell Crib : Type*}
+
+/-- [definition] **The held crossing** (`ReceptionCarry::crossed`, `held_resonator_rate`): the
+medium part crossed by the medium's crossing `crossIn`, and at each ring the resonator's position
+`u` kept and its rate moved by `hold g C C′`, from the capacity `C` the carry ran at to the
+contemporary `C′`. -/
+def heldCross
+    (crossIn : Λ → Λ → (b : Ring ⊕ Contact) → Ref b → Ref b →
+      (BlockM endRing V Ch b →ₗ[ℝ] BlockM endRing V Ch b))
+    (hold : (g : Ring) → (V g →L[ℝ] V g) → (V g →L[ℝ] V g) → (V g →ₗ[ℝ] V g)) :
+    Λ → Λ → (b : Ring ⊕ Contact) → LRef V Ref b → LRef V Ref b →
+      (LoadedM endRing V Ch b →ₗ[ℝ] LoadedM endRing V Ch b)
+  | l, l', .inl g, r, r' =>
+    (crossIn l l' (.inl g) r.1 r'.1).prodMap
+      ((LinearMap.id.prodMap (hold g r.2 r'.2) : V g × V g →ₗ[ℝ] V g × V g) :
+        ResState (Contact := Contact) V (.inl g) →ₗ[ℝ] ResState V (.inl g))
+  | l, l', .inr a, r, r' =>
+    (crossIn l l' (.inr a) r.1 r'.1).prodMap LinearMap.id
+
+variable {h₀ : ℝ}
+  {crossIn : Λ → Λ → (b : Ring ⊕ Contact) → Ref b → Ref b →
+    (BlockM endRing V Ch b →ₗ[ℝ] BlockM endRing V Ch b)}
+  {hold : (g : Ring) → (V g →L[ℝ] V g) → (V g →L[ℝ] V g) → (V g →ₗ[ℝ] V g)}
+  {absorb : (b : Ring ⊕ Contact) → LoadedM endRing V Ch b →ₗ[ℝ] LoadedM endRing V Ch b}
+  {Ψo : (g : Ring) → ResOp (V g) → LData endRing V Ch → ResOp (V g)}
+  {L : TickLaw ℝ (BlockM endRing V Ch) Con Loc Ref Cls Λ Mo Cell Crib}
+
+/-- The loaded law with the held crossing. -/
+local notation "HL" => loadedLaw h₀ (heldCross crossIn hold) absorb Ψo L
+
+omit [Fintype Ring] [Fintype Contact] in
+/-- [proved-derived; formal-checked] **The opening's interior at a ring under the held crossing**:
+the medium part crossed by `crossIn`, the resonator's position kept, and its rate moved from the
+capacity the carry ran at to the constitution's. -/
+theorem heldCross_interior (θ : LoadedAt V Con) (l : Λ)
+    (c : TickCarry (LoadedM endRing V Ch) (LRef V Ref) Λ) (g : Ring) :
+    interior HL θ l c (.inl g) =
+      (crossIn c.lift l (.inl g) (c.ref (.inl g)).1 (L.ref θ.inner (.inl g))
+          (c.change (.inl g)).1,
+        ((c.change (.inl g)).2.1,
+          hold g (c.ref (.inl g)).2 (θ.res g).C (c.change (.inl g)).2.2)) :=
+  rfl
+
+omit [Fintype Ring] [Fintype Contact] in
+/-- [proved-derived; formal-checked] **The resonator's momentum is held across a deposit**
+(`held_resonator_rate`, record B §2.3): where the hold solves the contemporary capacity, `C′ w′ =
+C w`, the crossed rate holds the momentum the carried rate held at the capacity the carry ran at,
+whatever the deposit did to the operands between. -/
+theorem heldCross_momentum (θ : LoadedAt V Con) (l : Λ)
+    (c : TickCarry (LoadedM endRing V Ch) (LRef V Ref) Λ) (g : Ring)
+    (hsolve : (θ.res g).C (hold g (c.ref (.inl g)).2 (θ.res g).C (c.change (.inl g)).2.2) =
+      capAt (c.ref (.inl g)).2 (c.change (.inl g)).2.2) :
+    (θ.res g).C (interior HL θ l c (.inl g)).2.2 =
+      capAt (c.ref (.inl g)).2 (c.change (.inl g)).2.2 := by
+  rw [heldCross_interior]
+  exact hsolve
+
+omit [Fintype Ring] [Fintype Contact] in
+/-- [proved-derived; formal-checked] **The held kinetic energy is the hold's, not the solve's**: a
+symmetric contemporary capacity stores the same kinetic energy in every rate that holds the
+carried momentum (`HNN/HeldCommits.held_kinetic_unique`), so the crossed resonator's storage does
+not depend on which solve the hold takes. -/
+theorem heldCross_kinetic (θ : LoadedAt V Con) (l : Λ)
+    (c : TickCarry (LoadedM endRing V Ch) (LRef V Ref) Λ) (g : Ring)
+    (hC : ∀ x y, inner ℝ ((θ.res g).C x) y = inner ℝ x ((θ.res g).C y)) {w : V g}
+    (hw : (θ.res g).C w = capAt (c.ref (.inl g)).2 (c.change (.inl g)).2.2)
+    (hsolve : (θ.res g).C (hold g (c.ref (.inl g)).2 (θ.res g).C (c.change (.inl g)).2.2) =
+      capAt (c.ref (.inl g)).2 (c.change (.inl g)).2.2) :
+    inner ℝ (interior HL θ l c (.inl g)).2.2 ((θ.res g).C (interior HL θ l c (.inl g)).2.2) =
+      inner ℝ w ((θ.res g).C w) :=
+  Holonics.HNN.HeldCommits.held_kinetic_unique _ hC
+    ((heldCross_momentum θ l c g hsolve).trans hw.symm)
+
+end Held
+
 end Holonics.HNN.LoadedMedium
 
 #print axioms Holonics.HNN.LoadedMedium.loadedOp_sparse
@@ -617,3 +740,6 @@ end Holonics.HNN.LoadedMedium
 #print axioms Holonics.HNN.LoadedMedium.retained_rust_loaded
 #print axioms Holonics.HNN.LoadedMedium.loaded_collapse_sufficient
 #print axioms Holonics.HNN.LoadedMedium.loaded_ring_rust_collapse_sufficient
+#print axioms Holonics.HNN.LoadedMedium.heldCross_interior
+#print axioms Holonics.HNN.LoadedMedium.heldCross_momentum
+#print axioms Holonics.HNN.LoadedMedium.heldCross_kinetic

@@ -66,10 +66,10 @@ that edge with the tick.
 
 `Word.Medium` carries no resonator: `HNN/TickBlocks` writes the unloaded ring block
 `V r × (Port r → V r)`. The loaded block family on the whole medium is `HNN/LoadedMedium`, which
-adds the resonator's state to each ring block and loads its element edge by `loadedEdge`. [open]
-The resonator's held momentum across a deposit (5975646405 item 2) is a parameter there (`cross`).
-The executed split and chart terms of the lattice word are `HNN/Ring`'s and `HNN/LatticeWord`'s,
-not restated here.
+adds the resonator's state to each ring block and loads its element edge by `loadedEdge`. The
+resonator's held momentum across a deposit (5975646405 item 2) is its held crossing there
+(`heldCross_momentum`). The executed split and chart terms of the lattice word are `HNN/Ring`'s
+and `HNN/LatticeWord`'s, not restated here.
 
 No `sorry`, no `axiom`, no `native_decide`.
 -/
