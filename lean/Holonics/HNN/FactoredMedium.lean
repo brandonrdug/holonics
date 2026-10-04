@@ -68,9 +68,11 @@ contrast port and the span factor `F(s)` over every resonator not certified pass
 off-walk contrast port is never reached, so it stays at its zero founding and `ω` is unchanged by
 the collapse. An off-walk resonator is declared material, and the collapse releases it
 (`Constitution::release`, `Locus::Resonator`). Where it is pumped, `F(s)` drops after the collapse,
-and a later deposit's step at a retained locus can differ from the uncollapsed run's. Owed (#62):
-the Rust's reach read over the retained rings only, and here a joint step whose scalar reads only
-retained loci, with the carried statistics in the locus's state.
+and a later deposit's step at a retained locus could differ from the uncollapsed run's. Since
+`052d72c2` the Rust reads the reach over the word's diamond only (record B §8, `Reach::loci`), and
+the joint step whose reads are the diamond's and whose budget is the retained set's is
+`HNN/JointStep` (`certified_budgeted_rust_unchanged`): the collapse changes no step and no refusal.
+Owed (#62): the carried statistics in the locus's state.
 
 No `sorry`, no `axiom`, no `native_decide`.
 -/
