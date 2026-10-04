@@ -64,7 +64,7 @@
 //! [definition; agent-inferred, October 3; the
 //! [reception carry](../../../../research/records/2026-10-03_THE_RECEPTION_CARRIES_THE_INTERIOR_CHANGE_THE_SOURCE_PORT_IMPOSES_THE_MOMENT_AND_REST_IS_COMPLETE_ABSORPTION.md)]
 //! **Continuing motion across receptions.** Under a declared carry, a reception's word opens on the
-//! interior of the change arriving at the last crossing of the previous reception's consumed word,
+//! interior of the change arriving at the last crossing of the previous word read,
 //! with the source rings' storage imposed by the moment ([`Word::open_received`],
 //! [`ReceptionCarry`]), at that crossing's tick: the field's elapsed ticks are the hops every
 //! earlier word ran, so a declared resonator's pump continues across receptions. The resident, not [`Current`], holds the one carried change and its tick (guard
@@ -95,12 +95,14 @@
 
 pub mod continuation;
 
+use std::collections::BTreeSet;
+
 use num_bigint::BigUint;
 use num_traits::{Signed, Zero};
 
 use crate::hnn::HnnError;
 use crate::hnn::chart::{ChartReading, Charts, Remainders, carry};
-use crate::hnn::constitution::Lattice;
+use crate::hnn::constitution::{Lattice, Locus};
 use crate::hnn::contact::{BreakReceipt, signed_stiffness};
 use crate::hnn::field::{ConstitutionRead, Current, Field};
 use crate::hnn::moment::SourceMoment;
@@ -360,7 +362,7 @@ pub struct EndChange {
 
 /// [definition; agent-inferred, October 3; the
 /// [reception carry](../../../../research/records/2026-10-03_THE_RECEPTION_CARRIES_THE_INTERIOR_CHANGE_THE_SOURCE_PORT_IMPOSES_THE_MOMENT_AND_REST_IS_COMPLETE_ABSORPTION.md)
-/// §2.1, §2.4] **A reception's carried end**: the change `x_k(end)` the consumed word's motion
+/// §2.1, §2.4] **A reception's carried end**: the change `x_k(end)` the word's motion
 /// reached, arriving at its last crossing, and that crossing's tick `t_(k+1)`, the sum of the hops
 /// every word of the chain executed (record B §2.4: the last junction is a crossing whose hop has
 /// not run, so the next word opens on it and scatters it). It is the field's present motion, of
@@ -585,6 +587,53 @@ impl ReceptionCarry {
         }
     }
 
+    /// [definition; agent-inferred, October 4; the reception carry §8] **The carry across a
+    /// releasing collapse**: the motion each released locus's material held is released with
+    /// it. A released channel `a` takes its storage, stiffness and dissipation to zero, so its
+    /// state `[u, w]` and momentum `π_a = C_a w_a` (the energy `½(⟨w, C_a w⟩ + ⟨u, K_a u⟩)` its
+    /// material held) leave with the material. Its arriving waves are held by the contact's
+    /// conductance at the lift, which the field declares and the collapse does not release, and
+    /// stay. A released resonator leaves with its state and momentum. Ring storage waves are held
+    /// by the rings' declared admittances and stay.
+    ///
+    /// [proved-derived, on formal-checked theorems] Under the carry the collapse releases exactly
+    /// the loci no walk from a source to an admitted receiver passes (Lean `HNN/Retention`,
+    /// `continuing_release_indistinguishable`, `continuing_collapse_connected`). Motion at such a
+    /// locus reaches no admitted receiver along any walk, so releasing it changes no admitted
+    /// reading, as releasing its material does not. Without it the next opening would have to
+    /// hold a nonzero momentum on a zero storage, which no rate does (`HnnError::HeldMomentum`).
+    ///
+    /// Returns the carry and the released loci whose carried motion was off zero.
+    pub fn released(&self, released: &BTreeSet<Locus>) -> (Self, Vec<Locus>) {
+        let mut carry = self.clone();
+        let mut moved = Vec::new();
+        let off = |values: &[Rat]| values.iter().any(|x| !x.is_zero());
+        for locus in released {
+            match *locus {
+                Locus::Channel(a) if a < carry.momenta.len() => {
+                    let [u, w] = &mut carry.change.states[a];
+                    if off(u) || off(w) || off(&carry.momenta[a]) {
+                        moved.push(*locus);
+                    }
+                    *u = zeros(u.len());
+                    *w = zeros(w.len());
+                    carry.momenta[a] = zeros(carry.momenta[a].len());
+                }
+                Locus::Resonator(g) if g < carry.change.resonators.len() => {
+                    let held = carry.change.resonators[g].is_some();
+                    if held || carry.resonator_momenta[g].is_some() {
+                        moved.push(*locus);
+                    }
+                    carry.change.resonators[g] = None;
+                    carry.change.resonator_phases[g] = None;
+                    carry.resonator_momenta[g] = None;
+                }
+                _ => {}
+            }
+        }
+        (carry, moved)
+    }
+
     /// [definition; agent-inferred, October 3; the reception carry §2.4] **The carry as text**,
     /// every value exact, appended to `s`: `carry t r c n` (the elapsed ticks, the rings, the
     /// contacts and the resonator slots), one line per ring's storage wave, two per contact's
@@ -796,6 +845,33 @@ pub enum WordOpening {
         carry: ReceptionCarry,
         absorption: Absorption,
     },
+}
+
+impl WordOpening {
+    /// [definition; agent-inferred, October 4; the reception carry §8] **The opening across a
+    /// releasing collapse** ([`ReceptionCarry::released`]): at rest unchanged.
+    pub fn released(&self, released: &BTreeSet<Locus>) -> Self {
+        match self {
+            WordOpening::Rest => WordOpening::Rest,
+            WordOpening::Received { carry, absorption } => WordOpening::Received {
+                carry: carry.released(released).0,
+                absorption: *absorption,
+            },
+        }
+    }
+
+    /// [definition; October 4, the reception carry §8] **The rings the opening's interior change
+    /// occupies** ([`EndChange::support`]): none at rest or under complete absorption, the carried
+    /// interior's otherwise (the crossing into the next references keeps a zero coordinate zero).
+    pub fn support(&self, field: &Field) -> Vec<usize> {
+        match self {
+            WordOpening::Received {
+                carry,
+                absorption: Absorption::Nothing,
+            } => carry.interior(field).support(field),
+            _ => Vec::new(),
+        }
+    }
 }
 
 /// [definition] **The field's power form at a cut**, `P(x) = (h/4)[Σ_r Y_r|s_r|² + Σ_a G_a(|a_g|² +
@@ -2694,6 +2770,41 @@ impl<'c> Word<'c> {
 }
 
 impl EndChange {
+    /// [definition; October 4, the reception carry §8] **The rings this change occupies**: a ring
+    /// whose storage wave or resonator state is nonzero, the end a nonzero arriving wave arrives at,
+    /// and both ends of a contact whose state is nonzero. A word opened on this change can move at
+    /// tick 0 exactly there and at the sources, which seeds its diamond
+    /// ([`crate::hnn::retention::Diamond::opened`]); the rest change occupies none.
+    pub fn support(&self, field: &Field) -> Vec<usize> {
+        let nonzero = |wave: &[Rat]| wave.iter().any(|x| !x.is_zero());
+        let mut rings = BTreeSet::new();
+        for (ring, wave) in self.storage.iter().enumerate() {
+            if nonzero(wave) {
+                rings.insert(ring);
+            }
+        }
+        for (ring, state) in self.resonators.iter().enumerate() {
+            if state
+                .as_ref()
+                .is_some_and(|[u, w]| nonzero(u) || nonzero(w))
+            {
+                rings.insert(ring);
+            }
+        }
+        for (a, contact) in field.contacts().iter().enumerate() {
+            let (from, to) = contact.ends();
+            let [at_from, at_to] = &self.arrivals[a];
+            let [u, w] = &self.states[a];
+            if nonzero(at_from) || nonzero(u) || nonzero(w) {
+                rings.insert(from);
+            }
+            if nonzero(at_to) || nonzero(u) || nonzero(w) {
+                rings.insert(to);
+            }
+        }
+        rings.into_iter().collect()
+    }
+
     /// **The rest change** of a field at its operands: every storage wave, arriving wave and
     /// contact state zero, and each declared resonator at rest at phase 0; the change a word opened
     /// at rest carries (Lean `HNN/Retention.word_opens_at_zero`).

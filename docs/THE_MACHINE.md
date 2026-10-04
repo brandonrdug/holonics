@@ -602,10 +602,12 @@ tests can comb through anything valuable").
     pending ratio or the constitution except through a deposit's covectors. The reason: generation
     refines one joint field through the model's constituted dynamics (HNN_FORMULA, "Generation as
     field refinement"), which the word-local release would cut at every word.
-    [agent-inferred, amended October 3 for the reception carry] Under a declared reception carry
-    (`Reception::Carry`; the default is `Reception::Rest`, which keeps the guard as stated above) a
+    [proved-derived, amended October 3 and 4 for the reception carry] Under the reception carry
+    (`Reception::Carry(Absorption::Nothing)`, the default since October 4; `Reception::Rest` is its
+    `A = I` limit, which keeps the guard as stated above) a
     reception's word opens on the interior of the change arriving at the last crossing of the
-    previous reception's consumed word, at that crossing's tick so a declared pump continues from
+    previous word read (its refine writes the carry, so several pending ratios are one chain in
+    refine order, record §8), at that crossing's tick so a declared pump continues from
     it, crossed into the next cut's references (each contact's waves at the junction's reference
     change, each contact's and resonator's rate at held momentum; `Word::open_received`,
     `ReceptionCarry::crossed`), so that

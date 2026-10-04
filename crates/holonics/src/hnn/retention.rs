@@ -36,6 +36,15 @@
 //! only over what reaches a locus at these ticks, which is why a deposit gives the same result with
 //! or without the collapse (`deposit_descends`).
 //!
+//! [definition; October 4, the reception carry §8] **The diamond under the carry.** The reach
+//! above counts hops from the source rings because a word at rest opens with its change zero
+//! everywhere else. Under the reception carry the word opens on the motion the previous one
+//! reached, so its change can be nonzero at tick 0 wherever that motion is: one word's diamond is
+//! seeded at the sources and the carried interior's support ([`Diamond::opened`]), and the
+//! admitted future, whose words keep opening on the continuing motion, reads every locus a walk
+//! from a source to the receiver passes ([`Diamond::continuing`]; in a connected field, every
+//! locus). The rest diamond is the `A = I` limit.
+//!
 //! [definition; agent-inferred, U2] **Its place in the retention contract**
 //! ([objects §8](../../../../docs/ELEMENTARY_OBJECTS.md#the-retention-contract), which owns the
 //! contract). The collapse is the standing law's instance through the diamond on the field's
@@ -163,10 +172,46 @@ impl Diamond {
     /// (the linear readout's, retired September 30, batch H; the source re-enters at every word's
     /// open, never before the first, so the reach is the first open's).
     pub fn over(field: &Field, receiver: usize, last_epoch: usize) -> Self {
+        Self::seeded(field, field.sources(), receiver, last_epoch)
+    }
+
+    /// [definition; October 4, the
+    /// [reception carry](../../../../research/records/2026-10-03_THE_RECEPTION_CARRIES_THE_INTERIOR_CHANGE_THE_SOURCE_PORT_IMPOSES_THE_MOMENT_AND_REST_IS_COMPLETE_ABSORPTION.md)
+    /// §8] **The diamond of a word opened on a carried change**: the reach is seeded where the
+    /// word's change can be nonzero at its open, the source rings (the moment's imposed storage) and
+    /// every ring the carried interior occupies ([`EndChange::support`](crate::hnn::word::EndChange::support)). At rest the support is
+    /// empty and this is [`Diamond::of`]. A deposit's statistics sum over this diamond's windows:
+    /// the rest diamond would drop the carried motion's ticks from a locus's covector scale and
+    /// energy while its gradient still reads them.
+    pub fn opened(field: &Field, phases: &ReceivingPhases, support: &[usize]) -> Self {
+        let mut seeds = field.sources().to_vec();
+        seeds.extend(support.iter().filter(|g| !field.is_source(**g)));
+        Self::seeded(field, &seeds, phases.ring(), phases.last_epoch())
+    }
+
+    /// [definition; October 4, record B §8] **The diamond of the continuing motion**: under the
+    /// carry at `A = 0` each word opens on the motion the previous one reached, so over the chain's
+    /// cumulative clock a change reaches every ring connected to a source and is heard from every
+    /// ring connected to the receiver. The admitted future reads a locus exactly when a walk from a
+    /// source through it reaches the receiver (in a connected field, every locus): both recursions
+    /// run until the field's distances close (`|rings|` rounds), and `e_last` is read as
+    /// `2 |rings|`, past every such walk through two closed distances. This is what the aeon's
+    /// collapse keeps under the carry; the rest limit keeps [`Diamond::of`].
+    pub fn continuing(field: &Field, receiver: usize) -> Self {
+        let rings = field.rings().len();
+        Self {
+            receiver,
+            last_epoch: 2 * rings,
+            reach: recursion(field, field.sources(), rings),
+            observe: recursion(field, &[receiver], rings),
+        }
+    }
+
+    fn seeded(field: &Field, seeds: &[usize], receiver: usize, last_epoch: usize) -> Self {
         Self {
             receiver,
             last_epoch,
-            reach: recursion(field, field.sources(), last_epoch),
+            reach: recursion(field, seeds, last_epoch),
             observe: recursion(field, &[receiver], last_epoch),
         }
     }
@@ -300,14 +345,34 @@ pub fn loci(field: &Field) -> Vec<Locus> {
     all
 }
 
+/// [definition; October 4, the reception carry §8] **What the admitted future's words open on**:
+/// [`Opens::AtRest`], each on the moment alone (the `A = I` limit, [`Diamond::of`]), or
+/// [`Opens::OnMotion`], each on the motion the last one reached (the carry at `A = 0`,
+/// [`Diamond::continuing`]).
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub enum Opens {
+    AtRest,
+    OnMotion,
+}
+
+impl Diamond {
+    /// **An admitted receiver's diamond over the future its words open on.**
+    pub fn admitted(field: &Field, phases: &ReceivingPhases, opens: Opens) -> Self {
+        match opens {
+            Opens::AtRest => Self::of(field, phases),
+            Opens::OnMotion => Self::continuing(field, phases.ring()),
+        }
+    }
+}
+
 /// **The union of the admitted receivers' retentions.** The receiving maps are always retained.
-pub fn retained(field: &Field, admitted: &[ReceivingPhases]) -> BTreeSet<Locus> {
+pub fn retained(field: &Field, admitted: &[ReceivingPhases], opens: Opens) -> BTreeSet<Locus> {
     let mut kept: BTreeSet<Locus> = loci(field)
         .into_iter()
         .filter(|locus| matches!(locus, Locus::ReceivingMap(_)))
         .collect();
     for phases in admitted {
-        kept.extend(Diamond::of(field, phases).retained(field));
+        kept.extend(Diamond::admitted(field, phases, opens).retained(field));
     }
     kept
 }
@@ -361,13 +426,17 @@ pub struct Collapse {
 /// `HNN/Retention.collapse` at the budgeted carry, `HNN/LatticeDeposit.lattice_deposit_descends`):
 /// every locus no admitted receiver's diamond retains is released, exactly and whole, through the
 /// constitution's one release mutator; the retained loci keep their values, their carried
-/// remainders and their deposit clocks. Released loci stay released.
+/// remainders and their deposit clocks. Released loci stay released. The diamond is the one the
+/// admitted future's words open on ([`Opens`]): under the carry at `A = 0` only loci no walk from a
+/// source to the receiver passes are released, since a continuing motion carries any other locus's
+/// material into a later word's reading.
 pub fn collapse(
     field: &Field,
     constitution: &mut Constitution,
     admitted: &[ReceivingPhases],
+    opens: Opens,
 ) -> Result<Collapse, HnnError> {
-    let kept = retained(field, admitted);
+    let kept = retained(field, admitted, opens);
     let before = constitution.exact_bits();
     let materialized_resonators: BTreeSet<usize> = (0..field.rings().len())
         .filter(|&ring| {
@@ -412,10 +481,11 @@ pub fn collapse(
     })
 }
 
-/// **A pending ratio's separator**: the loci its own receiver's diamond reads that the admitted
-/// family releases. Empty exactly when its reading factors through the collapse.
-pub fn separator(field: &Field, phases: &ReceivingPhases, kept: &BTreeSet<Locus>) -> Vec<Locus> {
-    Diamond::of(field, phases)
+/// **A pending ratio's separator**: the loci its own word's diamond reads (opened on that word's
+/// opening, [`Diamond::opened`]) that the admitted family releases. Empty exactly when its reading
+/// factors through the collapse.
+pub fn separator(field: &Field, diamond: &Diamond, kept: &BTreeSet<Locus>) -> Vec<Locus> {
+    diamond
         .retained(field)
         .into_iter()
         .filter(|locus| !kept.contains(locus))

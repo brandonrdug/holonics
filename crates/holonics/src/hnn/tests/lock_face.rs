@@ -909,6 +909,35 @@ fn a_continuing_state_carries_the_receptions_end_inside_its_check() {
         ContinuingState::from_text(&damaged),
         Err(HnnError::ContinuingState { what }) if what.contains("damaged")
     ));
+    // The reception carry §8: under the default reception a saved state mounts through one owner.
+    // A state at rest mounts with no carry, so its next reception opens with zero carry; a carried
+    // state mounts its end beside the continued constitution; another opening's material is
+    // refused; a carried state is refused by a reference declared at rest.
+    use crate::hnn::field::Current;
+    use crate::hnn::reference::{Reception, Reference};
+    let current = Current::at_rest(&field);
+    let reference = Reference::campaign_one();
+    assert_eq!(reference.reception(), Reception::Carry(crate::hnn::Absorption::Nothing));
+    let rested = reference
+        .mount_continued(&field, &current, opening.clone(), &at_rest)
+        .unwrap();
+    assert!(rested.carried().is_none());
+    assert_eq!(rested.constitution(), &continued);
+    let resumed = reference
+        .mount_continued(&field, &current, opening.clone(), &read)
+        .unwrap();
+    assert_eq!(resumed.carried(), Some(&carry));
+    assert_eq!(resumed.constitution(), &continued);
+    assert!(matches!(
+        reference.mount_continued(&field, &current, generic(&field, 95), &at_rest),
+        Err(HnnError::ContinuingState { .. })
+    ));
+    assert!(matches!(
+        reference
+            .with_reception(Reception::Rest)
+            .mount_continued(&field, &current, opening.clone(), &read),
+        Err(HnnError::ContinuingState { .. })
+    ));
 }
 
 fn state_of(theta: &Constitution) -> ContinuingState {
