@@ -1058,3 +1058,58 @@ assert is the same at rest and under the carry:
 Under the carry every window after the first opens on a carried end. The chain then steps 667
 loci where it stepped 657 at rest; the other counts of stepped loci are equal. The resonators' mirror
 count (`mirror.carried > 0`) is the card's alone and is read by the GPU run.
+
+## 9. The saved state is the learned material whole (October 4)
+
+[agent-inferred, from the retention law and the owners] A resident under the carry moves far more
+than the source port: every deposit steps elements, standings, channels and resonator gains with
+their statistics, the receiving ring's landmark tree and population, and a collapse releases loci.
+The continuing state (`ContinuingState`, step 1b's pin §13.6) carried only the source port's normal
+law, the receiving laws, their clocks, the commit and the storage product. It refused where another
+locus had a clock, a locus was released or a factor family carried a remainder. That refusal read
+clocks, but the tree and the population move with no clock (`deposit_at`'s landmark and receiving
+arms), and a factor family's statistic moves in pass 1 even where its certified step is zero and
+the clock does not advance. So the refusal did not see every move, and an exposure could not be
+saved once any other locus had moved.
+
+The law decides the repair. Retention is the future-sufficient quotient of the constitution, never a
+record of what moved it, so the saved state is the moved material itself: everything a deposit, a
+lock, a move, a re-base or a collapse writes.
+
+- **What the state carries.** For each ring: the standing, the element (passive map, contrast law,
+  slices), the source law whole with its pair ports and transport modulus, the receiving law whole
+  with its located pair, the tree's executed standing (`Landmarks::standing`, `TreeStanding`: the
+  arena, the node and join charts, the counts), the population's reading (`PortPopulation::reading`,
+  `PortReading`: each family's likelihood bounds and death, and the cells received), and the
+  resonator's four gains, each with its statistics. For each contact: the channel factors `c`, `b`,
+  `F` and their statistics. Beside them: every locus's lattice (a re-base moves it), the carried
+  remainders, the clocks, the released loci, the commit and the storage product.
+- **What its identity covers.** `Constitution::material_identity` is the residue of the
+  constitution with every carried part set to a canonical founding (`RingMaterial::blank`): learned
+  values zero, no source law and unit modulus, each receiving law founded under its declared member,
+  the tree and population at their founding, the resonators at unit gains, no lattice, remainder or
+  clock. What remains is the declared material: the field's junctions, conductances, admittances,
+  hop, grain, lock chart and fixed nodes, the budget, each receiving map's founding member, the
+  trees' laws, the populations' priors, the resonators' base forms and pumps, the boosts and the
+  surfaces. No move changes it.
+- **Restore.** `Constitution::continued` refuses a moved opening, releases the state's released loci
+  on the opening (the collapse's own mutator, so a released resonator leaves its material exactly
+  as the run left it), checks the identity, places every learned part after checking its declared
+  shape (the tree on its law, the population on its declaration, the resonator's gains on its
+  base), places the lattices and then the moduli on them, and refuses an entry off its locus's
+  lattice (`Constitution::on_lattice`). The restored constitution is the saved one.
+- **What changed in what is refused.** An opening founded from another seed, with the same
+  declared material and other learned founding values, now restores the state to the same
+  constitution: the state overwrites every learned value, so the founding is not part of what it
+  continues. An opening of another declared material (another field, budget or receiving founding
+  member) is refused, as before.
+
+Fixtures: `tests/reference.rs`, `the_exposures_retained_state_saves_and_restores_whole` (a
+six-deposit exposure under the default moves the receiving tree and population; the state with the
+carried end reads back equal, restores to the retained constitution, and mounts with the same
+carried end); `tests/lock_face.rs`,
+`a_checkpoint_is_refused_onto_foreign_material_and_when_damaged` (the reseeded opening restores, a
+budget one less is refused, damage is refused) and the restore over successive receptions; and
+`tests/prior_carry.rs`, `a_saved_state_restores_across_a_move`. The Lean restore law
+(`HNN/ExecutedComparison.restoreStanding`) takes `R ∘ S = id` as its hypothesis, which these test;
+its statement on the constitution stays owed (#62).

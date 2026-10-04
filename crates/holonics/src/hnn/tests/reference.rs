@@ -646,6 +646,52 @@ fn the_exposure_returns_its_retained_constitution_and_carried_end() {
     ));
 }
 
+/// **The exposure's retained state saves and restores whole** (the reception carry §9): the
+/// receiver's own chain moved the constitution beyond the source port and the receiving maps (the
+/// receiving ring's landmark tree and population at least), and the complete continuing state
+/// carries all of it with the carried end, reads back equal from its text, and mounts on the
+/// declared opening as the retained constitution with the same carried end, so the next reception
+/// meets what the uninterrupted resident would.
+#[test]
+fn the_exposures_retained_state_saves_and_restores_whole() {
+    use crate::hnn::constitution::{Constitution, ContinuingState};
+    use crate::hnn::field::ConstitutionRead;
+    let length = cut_length();
+    let field = chain_of(length as u64);
+    let cut = Cut {
+        cells: source(length, 81),
+        held_out: vec![2..4, length - 4..length],
+    };
+    let reference = Reference::new(64, OPEN_BUDGET).with_deadline(6);
+    let exposure = reference.clone().expose(&field, &cut).unwrap();
+    let retained = &exposure.retained;
+    let opening = Constitution::initial(&field, OPEN_BUDGET).unwrap();
+    let rings = 0..field.rings().len();
+    let receiving = rings.clone().find(|&g| opening.landmarks(g).is_some()).unwrap();
+    assert_ne!(retained.landmarks(receiving), opening.landmarks(receiving));
+    assert_ne!(retained.population(receiving), opening.population(receiving));
+    let ring = rings.clone().find(|&g| field.is_source(g)).unwrap();
+    let state = retained
+        .continuing_state(ring)
+        .unwrap()
+        .with_carry(exposure.carried.clone());
+    let text = state.to_text();
+    let read = ContinuingState::from_text(&text).unwrap();
+    assert_eq!(read, state);
+    assert_eq!(opening.clone().continued(&read).unwrap(), *retained);
+    let current = Current::at_rest(&field);
+    let resumed = reference
+        .mount_continued(&field, &current, opening, &read)
+        .unwrap();
+    assert_eq!(resumed.constitution(), retained);
+    assert_eq!(resumed.carried(), exposure.carried.as_ref());
+    // The restored resident continues the passage where it stopped, as the retained one does.
+    assert!(matches!(
+        reference.expose_with(&field, &cut, resumed.constitution().clone()),
+        Err(HnnError::Context(ContextError::PopulationReached { .. }))
+    ));
+}
+
 /// The reception carry §2.3, §2.3a and §8: under the default reception, the carry at `A = 0`
 /// (`Carry(Nothing)`, declared nowhere in the test), the chained balance closes exactly
 /// at every reception of a prequential exposure on one baseline (the source rings' end storage

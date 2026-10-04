@@ -2138,6 +2138,185 @@ struct Nodes {
     passed: u64,
 }
 
+impl Nodes {
+    /// The standing a declared law founds: every tree empty, each join at its unit chart.
+    fn founding(law: &Law) -> Self {
+        let trees = law.branches.len() * law.cells();
+        let joins = if law.joined() {
+            vec![law.unit(); law.cells()]
+        } else {
+            Vec::new()
+        };
+        Self {
+            arena: Arena::new(trees),
+            charts: Vec::new(),
+            joins,
+            rebases: 0,
+            releases: 0,
+            passed: 0,
+        }
+    }
+}
+
+/// [definition; agent-inferred, October 4; the reception carry §9] **The landmark tree's executed
+/// standing as a saved state carries it** ([`Landmarks::standing`]): the arena, each node's chart,
+/// each join's chart, and the rebases, releases and cells passed. Its law is the declared
+/// opening's, so the standing is placed back on it ([`Landmarks::with_standing`]).
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct TreeStanding(Nodes);
+
+impl TreeStanding {
+    /// **The standing as text**, every value exact: `tree R N L C J rebases releases passed` (roots,
+    /// nodes, labels, children, joins), the roots on one line (`-` for an empty tree), one line a
+    /// node (its depth word, its two half-unit masses, its label end and its chart), the labels on
+    /// one line, one line a child (its key and node, in key order), and one line a join's chart. A
+    /// chart is `numerator denominator exponent stop rebases drift excess`.
+    pub fn write(&self, s: &mut String) {
+        let nodes = &self.0;
+        let arena = &nodes.arena;
+        let chart = |c: &Chart| {
+            format!(
+                "{} {} {} {} {} {} {}",
+                c.beta.numerator, c.beta.denominator, c.beta.exponent, c.stop, c.rebases, c.drift, c.excess
+            )
+        };
+        *s += &format!(
+            "tree {} {} {} {} {} {} {} {}\n",
+            arena.roots.len(),
+            arena.depths.len(),
+            arena.letters.len(),
+            arena.children.len(),
+            nodes.joins.len(),
+            nodes.rebases,
+            nodes.releases,
+            nodes.passed
+        );
+        let roots: Vec<String> = arena
+            .roots
+            .iter()
+            .map(|root| root.map_or_else(|| "-".to_string(), |r| r.to_string()))
+            .collect();
+        *s += &roots.join(" ");
+        s.push('\n');
+        for i in 0..arena.depths.len() {
+            let [h0, h1] = arena.halves[i];
+            *s += &format!(
+                "{} {h0} {h1} {} {}\n",
+                arena.depths[i],
+                arena.ends[i],
+                chart(&nodes.charts[i])
+            );
+        }
+        let letters: Vec<String> = arena.letters.iter().map(ToString::to_string).collect();
+        *s += &letters.join(" ");
+        s.push('\n');
+        let mut children: Vec<(&u64, &u32)> = arena.children.iter().collect();
+        children.sort();
+        for (key, child) in children {
+            *s += &format!("{key} {child}\n");
+        }
+        for join in &nodes.joins {
+            *s += &chart(join);
+            s.push('\n');
+        }
+    }
+
+    /// **The standing read from its text** ([`TreeStanding::write`]), refused with what was out of
+    /// its form. Its shape against a law is checked where it is placed
+    /// ([`Landmarks::with_standing`]).
+    pub fn read<'t>(lines: &mut impl Iterator<Item = &'t str>) -> Result<Self, &'static str> {
+        fn words<'t, T: std::str::FromStr>(
+            line: Option<&'t str>,
+            what: &'static str,
+        ) -> Result<Vec<T>, &'static str> {
+            line.ok_or(what)?
+                .split_whitespace()
+                .map(|word| word.parse().map_err(|_| what))
+                .collect()
+        }
+        fn chart(words: &[&str], what: &'static str) -> Result<Chart, &'static str> {
+            if words.len() != 7 {
+                return Err(what);
+            }
+            let number = |i: usize| words[i].parse::<u128>().map_err(|_| what);
+            Ok(Chart {
+                beta: Beta {
+                    numerator: words[0].parse().map_err(|_| what)?,
+                    denominator: words[1].parse().map_err(|_| what)?,
+                    exponent: words[2].parse().map_err(|_| what)?,
+                },
+                stop: words[3].parse().map_err(|_| what)?,
+                rebases: words[4].parse().map_err(|_| what)?,
+                drift: number(5)?,
+                excess: number(6)?,
+            })
+        }
+        let head: Vec<u64> = words(
+            lines.next().and_then(|line| line.strip_prefix("tree ")),
+            "the tree's head",
+        )?;
+        let [roots, n, held, children, joins, rebases, releases, passed] = head[..] else {
+            return Err("the tree's head");
+        };
+        let count = |x: u64| usize::try_from(x).map_err(|_| "the tree's head");
+        let (roots, n, held, children, joins) =
+            (count(roots)?, count(n)?, count(held)?, count(children)?, count(joins)?);
+        let root_words: Vec<&str> = lines.next().ok_or("the tree's roots")?.split_whitespace().collect();
+        if root_words.len() != roots {
+            return Err("the tree's roots");
+        }
+        let roots = root_words
+            .into_iter()
+            .map(|word| match word {
+                "-" => Ok(None),
+                root => root.parse().map(Some).map_err(|_| "a tree's root"),
+            })
+            .collect::<Result<Vec<Option<u32>>, _>>()?;
+        let mut arena = Arena::new(0);
+        arena.roots = roots;
+        let mut charts = Vec::with_capacity(n);
+        for _ in 0..n {
+            let words: Vec<&str> = lines.next().ok_or("a tree's node")?.split_whitespace().collect();
+            if words.len() != 11 {
+                return Err("a tree's node");
+            }
+            let number = |i: usize| words[i].parse::<u32>().map_err(|_| "a tree's node");
+            arena.depths.push(number(0)?);
+            arena.halves.push([number(1)?, number(2)?]);
+            arena.ends.push(number(3)?);
+            charts.push(chart(&words[4..], "a tree node's chart")?);
+        }
+        arena.letters = words(lines.next(), "the tree's labels")?;
+        if arena.letters.len() != held {
+            return Err("the tree's labels");
+        }
+        for _ in 0..children {
+            let pair: Vec<u64> = words(lines.next(), "a tree's child")?;
+            let [key, child] = pair[..] else {
+                return Err("a tree's child");
+            };
+            let child = u32::try_from(child).map_err(|_| "a tree's child")?;
+            if arena.children.insert(key, child).is_some() {
+                return Err("a tree's child (twice)");
+            }
+        }
+        let joins = (0..joins)
+            .map(|_| {
+                let words: Vec<&str> = lines.next().ok_or("a tree's join")?.split_whitespace().collect();
+                chart(&words, "a tree's join")
+            })
+            .collect::<Result<Vec<Chart>, _>>()?;
+        Ok(Self(Nodes {
+            arena,
+            charts,
+            joins,
+            rebases,
+            releases,
+            passed,
+        }))
+    }
+}
+
 impl Topology for Nodes {
     fn root(&self, tree: usize) -> Option<u32> {
         self.arena.root(tree)
@@ -3580,22 +3759,67 @@ impl Landmarks {
             ));
         }
         let law = Law::new(declaration, widths);
-        let trees = law.branches.len() * law.cells();
-        let joins = if law.joined() {
-            vec![law.unit(); law.cells()]
-        } else {
-            Vec::new()
-        };
         Ok(Self {
-            nodes: Nodes {
-                arena: Arena::new(trees),
-                charts: Vec::new(),
-                joins,
-                rebases: 0,
-                releases: 0,
-                passed: 0,
-            },
+            nodes: Nodes::founding(&law),
             law,
+        })
+    }
+
+    /// [definition; agent-inferred, October 4; the reception carry §9] **The tree at its founding**:
+    /// its law, every node unfounded ([`Landmarks::new`]'s standing).
+    pub fn founding(&self) -> Self {
+        Self {
+            nodes: Nodes::founding(&self.law),
+            law: self.law.clone(),
+        }
+    }
+
+    /// [definition; agent-inferred, October 4; the reception carry §9] **The tree's executed
+    /// standing**, which a saved state carries whole ([`TreeStanding`]); the law stays with the
+    /// declared opening.
+    pub fn standing(&self) -> TreeStanding {
+        TreeStanding(self.nodes.clone())
+    }
+
+    /// **The tree with a saved standing placed on its law**: refused where the standing is not of
+    /// this law's shape (its trees and joins), or a root, a child, a node's chart or a label end
+    /// lies outside the arena.
+    pub fn with_standing(&self, standing: &TreeStanding) -> Result<Self, ContextError> {
+        let nodes = &standing.0;
+        let founding = Nodes::founding(&self.law);
+        let arena = &nodes.arena;
+        let n = arena.depths.len();
+        if arena.roots.len() != founding.arena.roots.len() {
+            return Err(shape("a saved tree's roots", founding.arena.roots.len(), arena.roots.len()));
+        }
+        if nodes.joins.len() != founding.joins.len() {
+            return Err(shape("a saved tree's joins", founding.joins.len(), nodes.joins.len()));
+        }
+        for (what, len) in [
+            ("a saved tree's masses", arena.halves.len()),
+            ("a saved tree's label ends", arena.ends.len()),
+            ("a saved tree's charts", nodes.charts.len()),
+        ] {
+            if len != n {
+                return Err(shape(what, n, len));
+            }
+        }
+        let inside = |node: u32| (node as usize) < n;
+        let held = arena.letters.len();
+        if u32::try_from(n).is_err()
+            || u32::try_from(held).is_err()
+            || !arena.roots.iter().flatten().all(|&root| inside(root))
+            || !arena
+                .children
+                .iter()
+                .all(|(&key, &child)| inside((key >> 32) as u32) && inside(child))
+            || !arena.ends.iter().all(|&end| end as usize <= held)
+        {
+            return Err(shape("a saved tree's arena within its nodes and labels", n, held));
+        }
+        Ok(Self {
+            nodes: nodes.clone(),
+            law: self.law.clone(),
         })
     }
 
