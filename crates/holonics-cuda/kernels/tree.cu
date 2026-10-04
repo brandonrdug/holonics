@@ -7,7 +7,7 @@
 // mixing chain's β step, a parting chain's split, the founding of the upper part and the leaf, the
 // label run, the masses and their register's carry at the declared ceiling, the register's capacity), with the
 // host's exact integer law: every path face a numerator of `2^(−M_p)`, every β an odd/odd ratio of
-// `W` bits with its binary exponent, every product and quotient in 128-bit words, the carrier's rebase past `u128` at `R` bits (Lean `Compression/Landmark/Context/Tree`
+// `W` bits with its binary exponent, every product and quotient in 128-bit words (the mixture with the host's split operands, `tree_mix`), the carrier's rebase past `u128` at `R` bits (Lean `Compression/Landmark/Context/Tree`
 // §6′, `Compression/Landmark/Context/Carrier`), and each split's two ratios formed exactly on 512-bit integers and
 // carried once at `W` bits (Lean `Compression/Landmark/Context/Compaction.chain_split`). No float. The mirror carries
 // what the reads need (the masses, the charts' β and stop weights, the topology, the labels); the
@@ -110,6 +110,26 @@ __device__ u128 tree_odd_gcd(u128 a, u128 b) {
     return a;
 }
 
+// **`⟦λ̂ u/v + (1 − λ̂) x⟧` on `2^(−M)`** (`context::lattice_mix`, the host's split operands): the
+// nearest lattice numerator (ties up) of `λ̂u/v + (2^M − λ̂)x/2^M`, inside `[1, 2^M − 1]`. Each
+// part is divided with its remainder, `a = λ̂u = ⌊a/v⌋v + ℓ` and `b = (2^M − λ̂)x = ⌊b/2^M⌋2^M + r`,
+// and the remainders round together, `⌊(ℓ 2^(M+1) + 2rv + v 2^M)/(v 2^(M+1))⌋`, so no operand passes
+// `max(2M, M + κ + 3)` bits (`u ≤ v < 2^κ`, `λ̂ ≤ 2^M`, `x < 2^M`): the single division
+// `⌊(2(a 2^M + bv) + v 2^M)/(2 v 2^M)⌋` exactly, without its `2M + κ + 3`-bit numerator.
+__device__ __forceinline__ uint64_t tree_mix(u128 stop, u128 u, u128 v, uint64_t below,
+                                             uint32_t face) {
+    const u128 full = ((u128)1) << face;
+    const u128 a = stop * u, b = (full - stop) * (u128)below;
+    const u128 whole = a / v + (b >> face);
+    const u128 left = a % v, right = b & (full - 1);
+    const u128 half = ((left << (face + 1)) + 2 * right * v + (v << face)) / (v << (face + 1));
+    const u128 mixed = whole + half;
+    const uint64_t top = (1ull << face) - 1;
+    if (mixed < 1) return 1;
+    if (mixed > (u128)top) return top;
+    return (uint64_t)mixed;
+}
+
 // `⟦2^M u/v⟧`: the lattice numerator nearest `u/v` (ties up), inside `[1, 2^M − 1]`.
 __device__ __forceinline__ uint64_t tree_round(u128 numerator, u128 denominator, uint32_t face) {
     u128 rounded = (2 * numerator + denominator) / (2 * denominator);
@@ -121,25 +141,31 @@ __device__ __forceinline__ uint64_t tree_round(u128 numerator, u128 denominator,
     return r;
 }
 
-// **The stop weight** `λ̂ = ⟦β/(1 + β)⟧` on `2^(−M)` (`context::Beta::stop_weight`), decided
-// before any division once `|e| > M + W` (the single division's realization, whose operands the
-// mirror admits: `2W + M + 3 ≤ 128`).
+// **The stop weight** `λ̂ = ⟦β/(1 + β)⟧` on `2^(−M)` (`context::Beta::stop_weight`), its
+// numerator in `[0, 2^M]` (nearest, ties up). With `β = a 2^e / b`, one side of `1 + β` passing the
+// other by at least `2^(M+1)` decides the rounding (the other side's share is below half a lattice
+// step): `λ̂ = 2^M` when `e + bits a ≥ M + 2 + bits b`, `0` when `|e| + bits b ≥ M + 2 + bits a`.
+// It is read from the sides' bits before any division, as the host reads it, so an undecided
+// weight's operands stay within `M + b + 3` bits (`b ≤ W` on the carrier; a founding chart's rung
+// to 63) at every width the host admits.
 __device__ uint64_t tree_stop_weight(uint64_t numerator, uint64_t denominator, int64_t exponent,
                                      uint32_t face, uint32_t width) {
-    uint64_t full = 1ull << face;
-    uint64_t reach = (uint64_t)face + width + 1;
-    u128 a = numerator, b = denominator;
-    u128 twice = ((u128)1) << (face + 1);
+    (void)width;
+    const uint64_t full = 1ull << face;
+    const u128 a = numerator, b = denominator;
+    const int64_t bits_a = (int64_t)tree_bits(a), bits_b = (int64_t)tree_bits(b);
+    const int64_t decided = (int64_t)face + 2;
+    const u128 twice = ((u128)1) << (face + 1);
     if (exponent >= 0) {
-        if ((uint64_t)exponent >= reach) return full;
-        u128 g = (a << exponent) + b;
-        u128 t = twice * b;
-        u128 up = t <= g ? 0 : (t - g + 2 * g - 1) / (2 * g);
+        if (exponent + bits_a >= decided + bits_b) return full;
+        const u128 g = (a << exponent) + b;
+        const u128 t = twice * b;
+        const u128 up = t <= g ? 0 : (t - g + 2 * g - 1) / (2 * g);
         return full - (uint64_t)up;
     } else {
-        uint64_t shift = (uint64_t)(-exponent);
-        if (shift >= reach) return 0;
-        u128 h = a + (b << shift);
+        const int64_t shift = -exponent;
+        if (shift + bits_b >= decided + bits_a) return 0;
+        const u128 h = a + (b << shift);
         return (uint64_t)((twice * a + h) / (2 * h));
     }
 }
@@ -614,9 +640,7 @@ __device__ void tree_read(const TreeLaw& law, const TreeArena& a, uint32_t branc
             u128 stop = (read.parting != TREE_NONE && (uint32_t)level + 1 == read.count)
                             ? read.upper.stop
                             : a.charts[at].stop;
-            u128 numerator =
-                ((stop * u) << law.face) + ((u128)full - stop) * read.faces[level + 1] * v;
-            read.faces[level] = tree_round(numerator, v << law.face, law.face);
+            read.faces[level] = tree_mix(stop, u, v, read.faces[level + 1], law.face);
         }
     }
 }

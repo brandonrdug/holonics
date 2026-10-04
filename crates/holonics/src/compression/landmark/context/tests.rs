@@ -1070,8 +1070,8 @@ fn landmark_tree_declares_past_the_old_refusal_and_stays_within_the_grain() {
 /// numerator of `λ̂u/v + (1 − λ̂)x` (ties up, inside `[1, 2^M − 1]`), read exactly in `ℕ`; the stop
 /// weight decided before its division is the exact rounding of `2^M β/(1 + β)`; and the wide cut's
 /// `2^20` cells declare at `D = 1, …, 8`, where the single division's `2M_p + κ + 3` passed 128
-/// bits (133 at `D = 4`), up to `19,372,659` cells at `D = 4`, while the single divisions (the card
-/// kernel's) admit to `605,394`.
+/// bits (133 at `D = 4`), up to `19,372,659` cells at `D = 4` (the card's kernel mixes and decides
+/// the stop weight with the same split operands, `tree_mix` and `tree_stop_weight`).
 #[test]
 fn landmark_split_operands_are_the_single_division() {
     let mut draw = Draw::new(35);
@@ -1146,15 +1146,6 @@ fn landmark_split_operands_are_the_single_division() {
     };
     assert!(at(19_372_659).is_ok());
     assert!(at(19_372_660).is_err());
-    // The single divisions (the card kernel's realization) admit to 605,394 cells and no further.
-    let single = |population: u64| {
-        Widths::derived(&LandmarkDeclaration {
-            population,
-            ..declaration(256, 4)
-        })
-        .single_division_admitted(population)
-    };
-    assert!(single(1 << 19) && single(605_394) && !single(605_395) && !single(1 << 20));
 }
 
 /// **A passage's code is its faces' product, enclosed once** (`PassageCode`, the wide cut): over
