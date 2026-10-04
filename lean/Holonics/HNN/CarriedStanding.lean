@@ -27,19 +27,22 @@ The model is the Rust at #310's head (`hnn/reference.rs`, `hnn/word.rs`, `hnn/pe
 * Refine (one chain under the carry: refused while a ratio is pending) stores the carry it opens on
   and the end its word reaches at the refine's constitution (`PendingSlot.opening`, `.ended`).
   Compare reads the pending word on its stored carry at the contemporary constitution, moves the
-  carry to that word's end and deposits; discard moves the carry to the stored end. Compare and
-  its commit are one generator here.
+  carry to that word's end and stages its deposit (`compose`, `StagedSlot.deposit`); discard moves
+  the carry to the stored end. A staged deposit is committed by a later generator
+  (`Reference::deposit`, `Constitution::deposited`), which applies it to the loci then current
+  (`applyStaged`, equal to `Retention.deposit` at the staging loci by `deposit_eq_applyStaged`), or
+  dropped (`discard(Handle::Staged)`).
 * The deposit's windows are seeded at the sources and the support of the opening's interior
   (`Diamond::opened`).
 * The collapse keeps the carry whole (`ContinuingState` saves it whole).
 
 [proved-derived; formal-checked] **The standing** (`carriedStanding`). The continuing collapse is a
 `Foundation/Standing.StandingLaw` for this resident: every admitted future face, of the current word
-and of the pending ratio, after any word of ingests, re-keyings, refines, compares (with their
-deposits) and discards, is read off the collapsed resident. The collapse does not commute with the
+and of the pending ratio, after any word of ingests, re-keyings, refines, compares, discards,
+and commits and discards of staged deposits, is read off the collapsed resident. The collapse does not commute with the
 generators (a deposit after it moves only retained loci, and the carry it ends on is read at the
 collapsed constitution), so the law is proved through the agreement it does keep (`Agree`): the
-loci agree on every walk edge, each carry agrees on every block that observes a receiver and its
+loci and the staged data agree on every walk edge, each carry agrees on every block that observes a receiver and its
 references agree on every block also reached from a source. Every generator keeps the agreement
 (`step_agree`): a carried change stays on the blocks reached from the sources and agrees wherever a
 receiver is observed (`Retention.trajectory_agrees_on_walk`); the deposit's data on a walk edge
@@ -48,12 +51,23 @@ its target is reached from a source (`sweep_agrees_on_walk`, on the reversed gra
 agree because every seed that reaches an observing block observes a receiver
 (`windowTicks_agree`). Every face respects it (`observe_agree`).
 
-[definition; agent-inferred] **Model limits.** The word is time-invariant at its class
-configuration (the pump phase and the carried clock are `Retention` §5a's, and enter here only
-through `cls`); a compare and its commit are one generator; the readings carry no epoch bound, since
-the continuing collapse reads every epoch. That the crossing at a block reads only that block's
-loci is the type of `cross`; that a contact's conductance and momentum are the loci of that block's
-own edge is the locus map from the medium's operands to the block edges, owed in #62.
+[definition; agent-inferred] **Model limits, read against the Rust at #310.**
+1. *Compare and commit.* They are separate generators here, as in the Rust: compare stages, a later
+   `deposit i` commits, `discardStaged i` drops. No limit remains.
+2. *The word is time-invariant at its class* (`readOp op (cls λ)` at every tick). The Rust violates
+   this on every ring with a declared, pumped resonator: `Word::tick` runs that ring's element at
+   the pump's phase at each tick (`operands.resonators()[ring]`, `Resonance`), on the refinement's
+   clock, which continues across a continuing word's boundary. The phase moves only the element
+   edge `g → g` (`Locus::Resonator(g)` is retained by the element's rule), so every tick's
+   operators agree on the same walk edges; the time-indexed family's laws
+   (`trajectory_agrees_on_walk` for a tick-indexed operator family, and the word read from its
+   opening phase) are owed in #62. Unpumped rings are time-invariant. The executed tick's carried
+   remainders are a separate matter: the exact law is linear, the lattice outputs are not
+   (`HNN/Word` item 7).
+
+The readings carry no epoch bound, since the continuing collapse reads every epoch. That the
+crossing at a block reads only that block's loci is the type of `cross`; which of the medium's
+operands each block edge reads is `HNN/LocusMap`.
 
 No `sorry`, no `axiom`, no `native_decide`.
 -/
@@ -89,6 +103,35 @@ theorem observesAll_of_reachIn {R : Set B} {x z : B} {n : ℕ} (hr : ReachIn adj
   exact ⟨_, observes_trans ⟨n, le_rfl, hr⟩ hm⟩
 
 end Flip
+
+section Lists
+
+variable {α β : Type*} {r : α → β → Prop}
+
+theorem forall₂_getElem? {l : List α} {l' : List β} (h : List.Forall₂ r l l') (i : ℕ) :
+    Option.Rel r l[i]? l'[i]? := by
+  induction h generalizing i with
+  | nil => exact .none
+  | cons hab _ ih =>
+    cases i with
+    | zero => exact .some hab
+    | succ i => exact ih i
+
+theorem forall₂_eraseIdx {l : List α} {l' : List β} (h : List.Forall₂ r l l') (i : ℕ) :
+    List.Forall₂ r (l.eraseIdx i) (l'.eraseIdx i) := by
+  induction h generalizing i with
+  | nil => exact .nil
+  | cons hab htl ih =>
+    cases i with
+    | zero => exact htl
+    | succ i => exact .cons hab (ih i)
+
+theorem forall₂_self {s : α → α → Prop} (hs : ∀ a, s a a) (l : List α) : List.Forall₂ s l l := by
+  induction l with
+  | nil => exact .nil
+  | cons a l ih => exact .cons (hs a) ih
+
+end Lists
 
 section Walk
 
@@ -130,6 +173,66 @@ theorem windowTicks_agree {R sd sd' : Set B}
 
 variable {Cls : Type*} {Θ : B → B → Type*} {op : Cls → (y z : B) → Θ y z → (M z →ₗ[K] M y)}
 
+/-- [proved-derived; formal-checked] **A deposit's data agree on every walk edge.** For two
+constitutions that agree on every walk edge from `S` to `R`, open states supported on the reached
+blocks and agreeing on the observing ones, windows seeded at sets that agree on the observing blocks
+and readings supported on `R`, the data a deposit reads on a declared walk edge agree: the features
+because its source block observes a receiver, the swept covectors because its target is reached
+from a source, and the windows because every seed that reaches the edge observes a receiver. -/
+theorem depositData_agree {θ θ' : (y z : B) → Θ y z} (hθ : LociSparse adj op θ)
+    (hθ' : LociSparse adj op θ') {S R sd sd' : Set B}
+    (hL : ∀ y z, OnWalk adj S R z y → θ y z = θ' y z)
+    (hsd : ∀ s, ObservesAll adj R s → (s ∈ sd ↔ s ∈ sd')) (c : Cls) {x₀ x₀' : (b : B) → M b}
+    (hx : SupportedIn x₀ (reachAll adj S)) (hx' : SupportedIn x₀' (reachAll adj S))
+    (hxx : ∀ b, ObservesAll adj R b → x₀ b = x₀' b)
+    {rd : List (ℕ × ((b : B) → Module.Dual K (M b)))} (hrd : ∀ r ∈ rd, SupportedIn r.2 R)
+    {y z : B} (hw : OnWalk adj S R z y) (hadj : adj z y) :
+    depositData adj (readOp op c θ) x₀ sd R rd z y =
+      depositData adj (readOp op c θ') x₀' sd' R rd z y := by
+  have hT := sparse_readOp hθ c
+  have hT' := sparse_readOp hθ' c
+  have hagree : ∀ y z, OnWalk adj S R z y → readOp op c θ y z = readOp op c θ' y z :=
+    fun y z h => by simp only [readOp, hL y z h]
+  have hz : ObservesAll adj R z := observesAll_step hadj hw.2
+  have hy : y ∈ reachAll adj S := reachAll_step hw.1 hadj
+  rw [depositData, depositData]
+  refine List.flatMap_congr fun r hr => ?_
+  rw [windowTicks_agree hsd hz]
+  refine List.map_congr_left fun k _ => Prod.ext ?_ ?_
+  · exact (trajectory_agrees_on_walk hT hT' hagree hx hx' hxx k).2.2 z hz
+  · exact sweep_agrees_on_walk hT hT' hagree (hrd r hr) _ hy
+
+variable (adj) in
+open Classical in
+/-- [definition] **A staged deposit committed** (`Reference::deposit`,
+`Constitution::deposited`): on each declared edge the locus law `Φ` reads the locus as it stands at
+the commit and the data the deposit staged for that edge; nothing else changes. -/
+def applyStaged (Φ : (y z : B) → Θ y z → List (M z × Module.Dual K (M y)) → Θ y z)
+    (d : (y z : B) → List (M z × Module.Dual K (M y))) (θ : (y z : B) → Θ y z) :
+    (y z : B) → Θ y z :=
+  fun y z => if adj z y then Φ y z (θ y z) (d y z) else θ y z
+
+/-- [proved-derived; formal-checked] A deposit is its data staged and committed at once. -/
+theorem deposit_eq_applyStaged (Φ : (y z : B) → Θ y z → List (M z × Module.Dual K (M y)) → Θ y z)
+    (S R : Set B) (c : Cls) (x₀ : (b : B) → M b)
+    (rd : List (ℕ × ((b : B) → Module.Dual K (M b)))) (θ : (y z : B) → Θ y z) :
+    deposit adj op Φ S R c x₀ rd θ =
+      applyStaged adj Φ (fun y z => depositData adj (readOp op c θ) x₀ S R rd z y) θ := rfl
+
+omit [Fintype B] in
+/-- [proved-derived; formal-checked] A committed deposit agrees on every walk edge when the loci
+and the staged data agree there. -/
+theorem applyStaged_agree (Φ : (y z : B) → Θ y z → List (M z × Module.Dual K (M y)) → Θ y z)
+    {S R : Set B} {d d' : (y z : B) → List (M z × Module.Dual K (M y))}
+    (hd : ∀ y z, OnWalk adj S R z y → adj z y → d y z = d' y z) {θ θ' : (y z : B) → Θ y z}
+    (hL : ∀ y z, OnWalk adj S R z y → θ y z = θ' y z) {y z : B} (hw : OnWalk adj S R z y) :
+    applyStaged adj Φ d θ y z = applyStaged adj Φ d' θ' y z := by
+  classical
+  simp only [applyStaged]
+  split_ifs with hadj
+  · rw [hL y z hw, hd y z hw hadj]
+  · exact hL y z hw
+
 /-- [proved-derived; formal-checked] **A deposit agrees on every walk edge.** Two constitutions
 that agree on every walk edge from `S` to `R`, deposited from open states supported on the reached
 blocks and agreeing on the observing ones, with windows seeded at sets that agree on the observing
@@ -143,24 +246,9 @@ theorem deposit_agree (Φ : (y z : B) → Θ y z → List (M z × Module.Dual K 
     {rd : List (ℕ × ((b : B) → Module.Dual K (M b)))} (hrd : ∀ r ∈ rd, SupportedIn r.2 R)
     {y z : B} (hw : OnWalk adj S R z y) :
     deposit adj op Φ sd R c x₀ rd θ y z = deposit adj op Φ sd' R c x₀' rd θ' y z := by
-  classical
-  have hT := sparse_readOp hθ c
-  have hT' := sparse_readOp hθ' c
-  have hagree : ∀ y z, OnWalk adj S R z y → readOp op c θ y z = readOp op c θ' y z :=
-    fun y z h => by simp only [readOp, hL y z h]
-  simp only [deposit]
-  split_ifs with hadj
-  · rw [hL y z hw]
-    refine congrArg (Φ y z (θ' y z)) ?_
-    have hz : ObservesAll adj R z := observesAll_step hadj hw.2
-    have hy : y ∈ reachAll adj S := reachAll_step hw.1 hadj
-    rw [depositData, depositData]
-    refine List.flatMap_congr fun r hr => ?_
-    rw [windowTicks_agree hsd hz]
-    refine List.map_congr_left fun k _ => Prod.ext ?_ ?_
-    · exact (trajectory_agrees_on_walk hT hT' hagree hx hx' hxx k).2.2 z hz
-    · exact sweep_agrees_on_walk hT hT' hagree (hrd r hr) _ hy
-  · exact hL y z hw
+  rw [deposit_eq_applyStaged, deposit_eq_applyStaged]
+  exact applyStaged_agree Φ (fun y z hw hadj =>
+    depositData_agree hθ hθ' hL hsd c hx hx' hxx hrd hw hadj) hL hw
 
 end Walk
 
@@ -186,13 +274,16 @@ structure Pend (M : B → Type*) (Θ : B → B → Type*) (Λ Mo : Type*) where
   ended : Carry M Θ Λ
 
 /-- [definition] **The resident field with the carried change**: the constitution's loci, the
-lift point, the open moment, the carried change and the one pending ratio of the chain. -/
-structure CarriedResident (M : B → Type*) (Θ : B → B → Type*) (Λ Mo : Type*) where
+lift point, the open moment, the carried change, the one pending ratio of the chain, and the
+staged deposits (`Resident.staged`), each the data it staged on every edge. -/
+structure CarriedResident (K : Type*) [Field K] (M : B → Type*) [∀ b, AddCommGroup (M b)]
+    [∀ b, Module K (M b)] (Θ : B → B → Type*) (Λ Mo : Type*) where
   loci : (y z : B) → Θ y z
   lift : Λ
   moment : Mo
   carried : Carry M Θ Λ
   pending : Option (Pend M Θ Λ Mo)
+  staged : List ((y z : B) → List (M z × Module.Dual K (M y)))
 
 /-- [definition] **The carry law**: the block operators, the class read at a lift, the moment's
 open state, the word's ticks, the crossing of a carried change into the contemporary references
@@ -211,13 +302,16 @@ structure CarryLaw (K : Type*) [Field K] (M : B → Type*) [∀ b, AddCommGroup 
   Φ : (y z : B) → Θ y z → List (M z × Module.Dual K (M y)) → Θ y z
 
 /-- [definition] The generators under the carry: ingest a source cell, locate keys (re-keying),
-refine, compare (with its deposit) and discard. -/
+refine, compare (staging its deposit), discard the pending ratio, commit a staged deposit, and
+discard a staged deposit. -/
 inductive CarryGen (Cell Crib RD : Type*)
   | ingest (x : Cell)
   | locateKeys (crib : Crib)
   | refine
   | compare (rd : RD)
   | discard
+  | deposit (i : ℕ)
+  | discardStaged (i : ℕ)
 
 end Objects
 
@@ -252,6 +346,16 @@ def endCarry (θ : (y z : B) → Θ y z) (l : Λ) (m : Mo) (c : Carry M Θ Λ) :
   ref b := θ b b
   lift := l
 
+variable (adj) in
+/-- [definition] **The data a compare stages** (`compose`, `StagedSlot.deposit`): on every edge,
+what the pending word opened on its stored carry at the constitution `θ` reads there, in the windows
+seeded at the sources and the opening's interior. -/
+def stagedOf (S R : Set B) (θ : (y z : B) → Θ y z) (p : Pend M Θ Λ Mo)
+    (rd : List (ℕ × ((b : B) → Module.Dual K (M b)))) :
+    (y z : B) → List (M z × Module.Dual K (M y)) :=
+  fun y z => depositData adj (readOp L.op (L.cls p.lift) θ) (opening L θ p.lift p.moment p.opening)
+    (seeds L S θ p.lift p.opening) R rd z y
+
 /-- [definition] The admitted readings under the continuing collapse: any epoch, a covector
 supported on the receivers. -/
 def ReceiverReading (K : Type*) [Field K] (M : B → Type*) [∀ b, AddCommGroup (M b)]
@@ -266,12 +370,14 @@ def ReceiverFamily (K : Type*) [Field K] (M : B → Type*) [∀ b, AddCommGroup 
 variable (adj) in
 /-- [definition] **The generators acting on the resident.** Refine opens the chain's one pending
 ratio on the carried change and stores the end its word reaches; compare reads that word at the
-contemporary constitution, deposits from it and moves the carry to its end; discard moves the carry
-to the stored end. A refine while a ratio is pending, and a compare or discard with none, leave the
-resident unchanged (the Rust refuses them). -/
+contemporary constitution, stages the data its deposit reads and moves the carry to its end; discard
+moves the carry to the stored end; a deposit commits a staged deposit on the constitution as it then
+stands, and a staged deposit may be discarded. A refine while a ratio is pending, a compare or
+discard with none, and a commit of no staged deposit leave the resident unchanged (the Rust refuses
+them). -/
 def step (S R : Set B) :
     CarryGen Cell Crib (ReceiverFamily K M R) →
-      CarriedResident M Θ Λ Mo → CarriedResident M Θ Λ Mo
+      CarriedResident K M Θ Λ Mo → CarriedResident K M Θ Λ Mo
   | .ingest x, res =>
     { res with lift := (L.ingestStep x (res.lift, res.moment)).1,
                moment := (L.ingestStep x (res.lift, res.moment)).2 }
@@ -287,14 +393,18 @@ def step (S R : Set B) :
     | none => res
     | some p =>
       { res with
-        loci := deposit adj L.op L.Φ (seeds L S res.loci p.lift p.opening) R (L.cls p.lift)
-          (opening L res.loci p.lift p.moment p.opening) rd.1 res.loci
         carried := endCarry L res.loci p.lift p.moment p.opening
-        pending := none }
+        pending := none
+        staged := res.staged ++ [stagedOf adj L S R res.loci p rd.1] }
   | .discard, res =>
     match res.pending with
     | none => res
     | some p => { res with carried := p.ended, pending := none }
+  | .deposit i, res =>
+    match res.staged[i]? with
+    | none => res
+    | some d => { res with loci := applyStaged adj L.Φ d res.loci, staged := res.staged.eraseIdx i }
+  | .discardStaged i, res => { res with staged := res.staged.eraseIdx i }
 
 /-- [definition] A word's admitted reading opened on a carry, at the constitution `θ`. -/
 def wordRead {R : Set B} (θ : (y z : B) → Θ y z) (l : Λ) (m : Mo) (c : Carry M Θ Λ)
@@ -303,7 +413,7 @@ def wordRead {R : Set B} (θ : (y z : B) → Θ y z) (l : Λ) (m : Mo) (c : Carr
 
 /-- [definition] **The faces**: the current word opened on the carried change (`false`) and the
 pending word on its stored carry (`true`), each at the contemporary constitution. -/
-def observe {R : Set B} : Bool × ReceiverReading K M R → CarriedResident M Θ Λ Mo → K
+def observe {R : Set B} : Bool × ReceiverReading K M R → CarriedResident K M Θ Λ Mo → K
   | (false, r), res => wordRead L res.loci res.lift res.moment res.carried r
   | (true, r), res =>
     match res.pending with
@@ -313,14 +423,14 @@ def observe {R : Set B} : Bool × ReceiverReading K M R → CarriedResident M Θ
 variable (adj) in
 /-- [definition] **The retention**: the continuing collapse of the constitution; the lift point,
 the moment, the carried change and the pending ratio are kept whole. -/
-def retain (rel : (y z : B) → Θ y z) (S R : Set B) (res : CarriedResident M Θ Λ Mo) :
-    CarriedResident M Θ Λ Mo :=
+def retain (rel : (y z : B) → Θ y z) (S R : Set B) (res : CarriedResident K M Θ Λ Mo) :
+    CarriedResident K M Θ Λ Mo :=
   { res with loci := collapse adj rel S R (2 * Fintype.card B) res.loci }
 
 variable (adj) in
 /-- [definition] **The valid residents**: loci inside the declared graph, and every carry's change
 on the blocks reached from the sources. -/
-def Valid (S : Set B) (res : CarriedResident M Θ Λ Mo) : Prop :=
+def Valid (S : Set B) (res : CarriedResident K M Θ Λ Mo) : Prop :=
   LociSparse adj L.op res.loci ∧ SupportedIn res.carried.change (reachAll adj S) ∧
     ∀ p, res.pending = some p →
       SupportedIn p.opening.change (reachAll adj S) ∧ SupportedIn p.ended.change (reachAll adj S)
@@ -341,12 +451,18 @@ def PendAgree (S R : Set B) (p p' : Pend M Θ Λ Mo) : Prop :=
     CarryAgree adj S R p.ended p'.ended
 
 variable (adj) in
+/-- [definition] Two staged deposits agree on every declared walk edge. -/
+def StagedAgree (S R : Set B) (d d' : (y z : B) → List (M z × Module.Dual K (M y))) : Prop :=
+  ∀ y z, OnWalk adj S R z y → adj z y → d y z = d' y z
+
+variable (adj) in
 /-- [definition] **The agreement**: loci equal on every walk edge, equal lift and moment, agreeing
-carries and agreeing pending ratios. -/
-def Agree (S R : Set B) (res res' : CarriedResident M Θ Λ Mo) : Prop :=
+carries, agreeing pending ratios and agreeing staged deposits. -/
+def Agree (S R : Set B) (res res' : CarriedResident K M Θ Λ Mo) : Prop :=
   (∀ y z, OnWalk adj S R z y → res.loci y z = res'.loci y z) ∧ res.lift = res'.lift ∧
     res.moment = res'.moment ∧ CarryAgree adj S R res.carried res'.carried ∧
-    Option.Rel (PendAgree adj S R) res.pending res'.pending
+    Option.Rel (PendAgree adj S R) res.pending res'.pending ∧
+    List.Forall₂ (StagedAgree adj S R) res.staged res'.staged
 
 omit [Fintype B] [∀ b, AddCommGroup (M b)] [∀ b, Module K (M b)] in
 theorem carryAgree_refl {S R : Set B} (c : Carry M Θ Λ) : CarryAgree adj S R c c :=
@@ -419,9 +535,9 @@ theorem seeds_agree {S R : Set B} {θ θ' : (y z : B) → Θ y z}
 /-! ### Validity, agreement with the collapse, and the generators -/
 
 theorem step_valid {S R : Set B} (hopen : ∀ l m, SupportedIn (L.openState l m) S)
-    (g : CarryGen Cell Crib (ReceiverFamily K M R)) {res : CarriedResident M Θ Λ Mo}
+    (g : CarryGen Cell Crib (ReceiverFamily K M R)) {res : CarriedResident K M Θ Λ Mo}
     (hv : Valid adj L S res) : Valid adj L S (step adj L S R g res) := by
-  obtain ⟨θ, l, m, c, P⟩ := res
+  obtain ⟨θ, l, m, c, P, D⟩ := res
   obtain ⟨hθ, hc, hP⟩ := hv
   cases g with
   | ingest x => exact ⟨hθ, hc, hP⟩
@@ -438,69 +554,91 @@ theorem step_valid {S R : Set B} (hopen : ∀ l m, SupportedIn (L.openState l m)
     cases P with
     | none => exact ⟨hθ, hc, hP⟩
     | some p =>
-      have hp := hP p rfl
-      refine ⟨fun c y z h => ?_, endCarry_supported hopen hθ _ _ hp.1, fun _ h => by
-        simp [step] at h⟩
-      simp only [step, deposit, if_neg h]
-      exact hθ c y z h
+      exact ⟨hθ, endCarry_supported hopen hθ _ _ (hP p rfl).1, fun _ h => by simp [step] at h⟩
   | discard =>
     cases P with
     | none => exact ⟨hθ, hc, hP⟩
     | some p => exact ⟨hθ, (hP p rfl).2, fun _ h => by simp [step] at h⟩
+  | deposit i =>
+    simp only [step]
+    cases D[i]? with
+    | none => exact ⟨hθ, hc, hP⟩
+    | some d =>
+      refine ⟨fun c y z h => ?_, hc, hP⟩
+      classical
+      simp only [applyStaged, if_neg h]
+      exact hθ c y z h
+  | discardStaged i => exact ⟨hθ, hc, hP⟩
 
 theorem step_agree {S R : Set B} (hopen : ∀ l m, SupportedIn (L.openState l m) S)
-    (g : CarryGen Cell Crib (ReceiverFamily K M R)) {res res' : CarriedResident M Θ Λ Mo}
+    (g : CarryGen Cell Crib (ReceiverFamily K M R)) {res res' : CarriedResident K M Θ Λ Mo}
     (hv : Valid adj L S res) (hv' : Valid adj L S res') (h : Agree adj S R res res') :
     Agree adj S R (step adj L S R g res) (step adj L S R g res') := by
-  obtain ⟨θ, l, m, c, P⟩ := res
-  obtain ⟨θ', l', m', c', P'⟩ := res'
+  obtain ⟨θ, l, m, c, P, D⟩ := res
+  obtain ⟨θ', l', m', c', P', D'⟩ := res'
   obtain ⟨hθ, hc, hP⟩ := hv
   obtain ⟨hθ', hc', hP'⟩ := hv'
-  obtain ⟨hL, hl, hm, hcc, hPP⟩ := h
+  obtain ⟨hL, hl, hm, hcc, hPP, hDD⟩ := h
   simp only at hl hm
   subst hl hm
   cases g with
-  | ingest x => exact ⟨hL, rfl, rfl, hcc, hPP⟩
-  | locateKeys crib => exact ⟨hL, rfl, rfl, hcc, hPP⟩
+  | ingest x => exact ⟨hL, rfl, rfl, hcc, hPP, hDD⟩
+  | locateKeys crib => exact ⟨hL, rfl, rfl, hcc, hPP, hDD⟩
   | refine =>
     cases hPP with
     | none =>
-      exact ⟨hL, rfl, rfl, hcc, .some ⟨rfl, rfl, hcc, endCarry_agree hopen hθ hθ' hL l m hc hc' hcc⟩⟩
-    | some hpp => exact ⟨hL, rfl, rfl, hcc, .some hpp⟩
+      exact ⟨hL, rfl, rfl, hcc,
+        .some ⟨rfl, rfl, hcc, endCarry_agree hopen hθ hθ' hL l m hc hc' hcc⟩, hDD⟩
+    | some hpp => exact ⟨hL, rfl, rfl, hcc, .some hpp, hDD⟩
   | compare rd =>
     cases hPP with
-    | none => exact ⟨hL, rfl, rfl, hcc, .none⟩
+    | none => exact ⟨hL, rfl, rfl, hcc, .none, hDD⟩
     | @some p p' hpp =>
       obtain ⟨hpl, hpm, hpo, -⟩ := hpp
       have hp := (hP p rfl).1
       have hp' := (hP' p' rfl).1
+      have hnew : StagedAgree adj S R (stagedOf adj L S R θ p rd.1)
+          (stagedOf adj L S R θ' p' rd.1) := fun y z hw hadj => by
+        simp only [stagedOf]
+        rw [← hpl, ← hpm]
+        exact depositData_agree hθ hθ' hL (seeds_agree hL p.lift hp hp' hpo) _
+          (opening_supported hopen hp) (opening_supported hopen hp')
+          (fun b hb => opening_agree hL p.lift p.moment hp hp' hpo hb) rd.2 hw hadj
       simp only [step]
       rw [← hpl, ← hpm]
-      refine ⟨fun y z hw => ?_, rfl, rfl,
-        endCarry_agree hopen hθ hθ' hL p.lift p.moment hp hp' hpo, .none⟩
-      exact deposit_agree L.Φ hθ hθ' hL (seeds_agree hL p.lift hp hp' hpo) _
-        (opening_supported hopen hp) (opening_supported hopen hp')
-        (fun b hb => opening_agree hL p.lift p.moment hp hp' hpo hb) rd.2 hw
+      exact ⟨hL, rfl, rfl, endCarry_agree hopen hθ hθ' hL p.lift p.moment hp hp' hpo, .none,
+        List.rel_append hDD (.cons hnew .nil)⟩
   | discard =>
     cases hPP with
-    | none => exact ⟨hL, rfl, rfl, hcc, .none⟩
-    | some hpp => exact ⟨hL, rfl, rfl, hpp.2.2.2, .none⟩
+    | none => exact ⟨hL, rfl, rfl, hcc, .none, hDD⟩
+    | some hpp => exact ⟨hL, rfl, rfl, hpp.2.2.2, .none, hDD⟩
+  | deposit i =>
+    have hi := forall₂_getElem? hDD i
+    simp only [step]
+    generalize D[i]? = o at hi ⊢
+    generalize D'[i]? = o' at hi ⊢
+    cases hi with
+    | none => exact ⟨hL, rfl, rfl, hcc, hPP, hDD⟩
+    | some hdd =>
+      exact ⟨fun y z hw => applyStaged_agree L.Φ hdd hL hw, rfl, rfl, hcc, hPP,
+        forall₂_eraseIdx hDD i⟩
+  | discardStaged i => exact ⟨hL, rfl, rfl, hcc, hPP, forall₂_eraseIdx hDD i⟩
 
 theorem retain_valid {S R : Set B} {rel : (y z : B) → Θ y z}
-    (hrel : ∀ c y z, L.op c y z (rel y z) = 0) {res : CarriedResident M Θ Λ Mo}
+    (hrel : ∀ c y z, L.op c y z (rel y z) = 0) {res : CarriedResident K M Θ Λ Mo}
     (hv : Valid adj L S res) : Valid adj L S (retain adj rel S R res) :=
   ⟨lociSparse_collapse hrel hv.1 S R _, hv.2.1, hv.2.2⟩
 
-omit [∀ b, AddCommGroup (M b)] [∀ b, Module K (M b)] in
-theorem agree_retain {S R : Set B} (rel : (y z : B) → Θ y z) (res : CarriedResident M Θ Λ Mo) :
+theorem agree_retain {S R : Set B} (rel : (y z : B) → Θ y z) (res : CarriedResident K M Θ Λ Mo) :
     Agree adj S R res (retain adj rel S R res) := by
-  refine ⟨fun y z hw => ?_, rfl, rfl, carryAgree_refl _, ?_⟩
+  refine ⟨fun y z hw => ?_, rfl, rfl, carryAgree_refl _, ?_, ?_⟩
   · simp only [retain]
     rw [collapse_of_mem ((inDiamond_continuing_iff S R z y).mpr hw)]
   · show Option.Rel (PendAgree adj S R) res.pending res.pending
     cases res.pending with
     | none => exact .none
     | some p => exact .some ⟨rfl, rfl, carryAgree_refl _, carryAgree_refl _⟩
+  · exact forall₂_self (s := StagedAgree adj S R) (fun _ _ _ _ _ => rfl) res.staged
 
 theorem wordRead_agree {S R : Set B} (hopen : ∀ l m, SupportedIn (L.openState l m) S)
     {θ θ' : (y z : B) → Θ y z} (hθ : LociSparse adj L.op θ) (hθ' : LociSparse adj L.op θ')
@@ -514,14 +652,14 @@ theorem wordRead_agree {S R : Set B} (hopen : ∀ l m, SupportedIn (L.openState 
   exact pair_agrees_on_observers r.2 h.2.2
 
 theorem observe_agree {S R : Set B} (hopen : ∀ l m, SupportedIn (L.openState l m) S)
-    (q : Bool × ReceiverReading K M R) {res res' : CarriedResident M Θ Λ Mo}
+    (q : Bool × ReceiverReading K M R) {res res' : CarriedResident K M Θ Λ Mo}
     (hv : Valid adj L S res) (hv' : Valid adj L S res') (h : Agree adj S R res res') :
     observe L q res = observe L q res' := by
-  obtain ⟨θ, l, m, c, P⟩ := res
-  obtain ⟨θ', l', m', c', P'⟩ := res'
+  obtain ⟨θ, l, m, c, P, D⟩ := res
+  obtain ⟨θ', l', m', c', P', D'⟩ := res'
   obtain ⟨hθ, hc, hP⟩ := hv
   obtain ⟨hθ', hc', hP'⟩ := hv'
-  obtain ⟨hL, hl, hm, hcc, hPP⟩ := h
+  obtain ⟨hL, hl, hm, hcc, hPP, -⟩ := h
   simp only at hl hm
   subst hl hm
   obtain ⟨b, r⟩ := q
@@ -540,7 +678,7 @@ theorem observe_agree {S R : Set B} (hopen : ∀ l m, SupportedIn (L.openState l
 
 variable (adj L) in
 /-- [definition] The valid residents, the standing law's sources. -/
-def ValidResident (S : Set B) := {res : CarriedResident M Θ Λ Mo // Valid adj L S res}
+def ValidResident (S : Set B) := {res : CarriedResident K M Θ Λ Mo // Valid adj L S res}
 
 variable (adj L) in
 /-- [definition] The generators on the valid residents. -/
