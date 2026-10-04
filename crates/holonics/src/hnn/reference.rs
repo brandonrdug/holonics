@@ -3039,6 +3039,16 @@ pub struct Exposure {
     pub wall: WallTimes,
     /// The exposure's own readings' wall time (exterior): the word balances and the census.
     pub readout: ReadoutWall,
+    /// [definition; agent-inferred, October 4] **The returned state**: the constitution the
+    /// receiver's own chain retained at the run's end, every admitted locus as its last deposit
+    /// left it. Its consumer is the next exposure, mounted on it ([`Reference::mount_with`]), and
+    /// its commit and carrier bits are the curve's last point.
+    pub retained: Constitution,
+    /// [definition; agent-inferred, October 4] **The carried end**: the reception carry the run's
+    /// last word left for the next reception to open on (record B §2.4); `None` at rest (`A = I`).
+    /// It is resident motion, not constitution, and its consumer mounts it beside the retained
+    /// constitution ([`Reference::mount_carried`]).
+    pub carried: Option<ReceptionCarry>,
 }
 
 /// [definition] **The receiver's population at the end of a run** (ruling A, THE_REBUILD U1,
@@ -4209,6 +4219,7 @@ where
     // (`ReceivingPhases::windows`): the loop reads them, and its position is the epoch's opening.
     let mut position = 0usize;
     for span in phases.windows(cells.len())? {
+        let unit = Instant::now();
         position = span.start;
         let end = span.end;
         let window = &cells[position..end];
@@ -4404,6 +4415,11 @@ where
             }
             words.record(&word);
             previous = Some(word);
+            // The run's progress, one line per compared window (a receipt only, exterior).
+            eprintln!(
+                "  window {compares}, cells {position} to {end}; {} ms",
+                unit.elapsed().as_millis()
+            );
         } else {
             for &code in window {
                 baselines.update(code);
@@ -4508,6 +4524,8 @@ where
             .population(phases.ring())
             .map(PopulationReport::of)
             .transpose()?,
+        retained: resident.constitution().clone(),
+        carried: resident.carried().cloned(),
     })
 }
 

@@ -21,7 +21,7 @@ use num_traits::{One, Zero};
 use super::learning::{OPEN_BUDGET, chain, chain_of};
 use super::support::Draw;
 use crate::compression::landmark::context::{
-    Capacity, LandmarkDeclaration, Landmarks, LetterFamily, StopPrior, address, cell_letters,
+    Capacity, ContextError, LandmarkDeclaration, Landmarks, LetterFamily, StopPrior, address, cell_letters,
     code_length,
 };
 use crate::hnn::HnnError;
@@ -595,6 +595,9 @@ fn the_carry_at_complete_absorption_is_todays_reception_exactly() {
     assert_eq!(rest.compares, 6);
     assert!(carried.state.resident_bits > rest.state.resident_bits);
     carried.state = rest.state.clone();
+    // The carried end at `A = I` is that elapsed tick; at rest none is carried.
+    assert!(rest.carried.is_none() && carried.carried.is_some());
+    carried.carried = None;
     // At `A = I` the carried change is the rest; a chained balance is read only where a word ended
     // exactly at rest, and then nothing was carried, so no work was done on it.
     let chained = &carried.word.chained;
@@ -605,6 +608,42 @@ fn the_carry_at_complete_absorption_is_todays_reception_exactly() {
         a.state_bits = b.state_bits;
     }
     assert_eq!(carried, rest);
+}
+
+/// **The exposure returns its state** (October 4): the constitution the receiver's own chain
+/// retained, whose commit and carrier bits are the curve's last point, and the carried end, `None` at
+/// rest. The exposure reads its field's one declared population: a second exposure of the same cut
+/// on the retained constitution is refused by the receiving ring's landmark tree, which has passed
+/// cells of that population already, so the retained constitution continues the passage where it
+/// stopped (its saved state, [`crate::hnn::constitution::ContinuingState`]) and never re-reads it.
+#[test]
+fn the_exposure_returns_its_retained_constitution_and_carried_end() {
+    use crate::hnn::constitution::Constitution;
+    let length = cut_length();
+    let field = chain_of(length as u64);
+    let cut = Cut {
+        cells: source(length, 81),
+        held_out: vec![2..4, length - 4..length],
+    };
+    let reference = Reference::new(64, OPEN_BUDGET).with_deadline(6);
+    let exposure = reference.clone().expose(&field, &cut).unwrap();
+    assert_eq!(exposure.deposits, 6);
+    let last = exposure.constitution_curve.last().unwrap();
+    assert_eq!(exposure.retained.commit(), last.commit);
+    assert_eq!(exposure.retained.carrier_bits(), last.bits);
+    let opening = Constitution::initial(&field, OPEN_BUDGET).unwrap();
+    assert_ne!(exposure.retained, opening, "the receiver's chain moved its constitution");
+    assert!(exposure.carried.is_some(), "the default reception carries its end");
+    let rest = reference
+        .clone()
+        .with_reception(Reception::Rest)
+        .expose(&field, &cut)
+        .unwrap();
+    assert!(rest.carried.is_none());
+    assert!(matches!(
+        reference.expose_with(&field, &cut, exposure.retained.clone()),
+        Err(HnnError::Context(ContextError::PopulationReached { .. }))
+    ));
 }
 
 /// The reception carry §2.3, §2.3a and §8: under the default reception, the carry at `A = 0`
