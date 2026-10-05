@@ -406,48 +406,53 @@ impl Restriction {
     /// certified family is one class; intact cells as read.
     pub fn release(&self) -> Result<Vec<CellRelease>, CompressionError> {
         let support = self.support();
-        let rule = DecisionRule::new(
-            "the repair's commit at tolerance zero",
-            WithinTolerance::Release,
-            BeyondTolerance::Hold,
-        );
-        let law = |refusal: crate::receiver::face::WidthRefusal| {
-            CompressionError::ReleaseLaw(refusal.to_string())
-        };
         (0..self.families.len())
-            .map(|t| {
-                if let Some(class) = self.passage.cells[t] {
-                    return Ok(CellRelease::Intact(class));
-                }
-                let family = &self.families[t];
-                let certified = support[t] == *family;
-                let (diameter, attaining, read) = if certified && family.len() == 1 {
-                    (Rat::zero(), WidthWitness::Point, 1)
-                } else {
-                    (
-                        Rat::one(),
-                        WidthWitness::Pair { left: 0, right: 1 },
-                        family.len().max(2),
-                    )
-                };
-                let width = ReceiverWidth::declared(
-                    format!("the repaired cell {t}"),
-                    "the cell's class over the joint compatible family of the located pair",
-                    DiameterNorm::Supremum,
-                    diameter,
-                    attaining,
-                    read,
-                )
-                .map_err(law)?;
-                let options =
-                    LawfulOptions::assemble(&width, Rat::zero(), None, true).map_err(law)?;
-                Ok(match release(&rule, &options).map_err(law)? {
-                    ReleaseReturn::Released { .. } => CellRelease::Released(family[0]),
-                    _ => CellRelease::Held(family.clone()),
-                })
+            .map(|t| match self.passage.cells[t] {
+                Some(class) => Ok(CellRelease::Intact(class)),
+                None => decide(t, &self.families[t], support[t] == self.families[t]),
             })
             .collect()
     }
+}
+
+/// **The one decision on an erased cell** (module header, "The release"): its class reading over
+/// the joint fibre has width zero exactly when its family is certified and one class, and
+/// `receiver::release` decides it at tolerance zero: released, or held with the family.
+pub(super) fn decide(
+    t: usize,
+    family: &[usize],
+    certified: bool,
+) -> Result<CellRelease, CompressionError> {
+    let rule = DecisionRule::new(
+        "the repair's commit at tolerance zero",
+        WithinTolerance::Release,
+        BeyondTolerance::Hold,
+    );
+    let law =
+        |refusal: crate::receiver::face::WidthRefusal| CompressionError::ReleaseLaw(refusal.to_string());
+    let (diameter, attaining, read) = if certified && family.len() == 1 {
+        (Rat::zero(), WidthWitness::Point, 1)
+    } else {
+        (
+            Rat::one(),
+            WidthWitness::Pair { left: 0, right: 1 },
+            family.len().max(2),
+        )
+    };
+    let width = ReceiverWidth::declared(
+        format!("the repaired cell {t}"),
+        "the cell's class over the joint compatible family of the located pair",
+        DiameterNorm::Supremum,
+        diameter,
+        attaining,
+        read,
+    )
+    .map_err(law)?;
+    let options = LawfulOptions::assemble(&width, Rat::zero(), None, true).map_err(law)?;
+    Ok(match release(&rule, &options).map_err(law)? {
+        ReleaseReturn::Released { .. } => CellRelease::Released(family[0]),
+        _ => CellRelease::Held(family.to_vec()),
+    })
 }
 
 /// The first held cell of a release, with its family.

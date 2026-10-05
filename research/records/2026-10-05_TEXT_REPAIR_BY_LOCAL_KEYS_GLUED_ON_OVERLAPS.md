@@ -115,6 +115,41 @@ stationary turn fails within 4 to 12 edges].
 - The residual is at most the literal on every passage (a held cell's family is within `A`); with the
   keys coded by `key_code`, the codec exceeds the literal on every passage that codes a key.
 
+**Amendment, after the development read and before the read** [measured; agent-inferred]. The
+development read (the 4 development passages, 48 erased cells; counts only, the bytes stay in
+`.local/`) found a defect in step 3 as pinned:
+- regions: 13 empty, 7 plural, 0 one; joins: 13 open, 2 plural, 1 obstructed, 0 unique;
+- under step 3 as pinned, 2 cells were released and **neither equals its truth**, and one held
+  family (253 classes) excluded its truth, so the codec could not reopen 2 of the 4 passages;
+- both releases came from plural glued regions whose survivors' maps are unpublished (paths): the
+  erased cell was restricted through a read pair at its distance, a byte seen once at that distance
+  elsewhere in the region.
+
+Restricting through an unpublished survivor's read pairs reads `x_t` from a pair seen once elsewhere
+at the same distance: it is the skip-relation index THE_REBUILD's **Text** item refuses ("the context
+tree under another name"), and it repeats lesson 2 (an index of contexts). The turn menu certifies a
+key only by publication, and the windings law locates one only as a class of windings; an
+unpublished survivor is neither. The amended step 3, **the located law**, is the library's
+(`compression::keys::local`):
+- a glued region restricts only through its located key: its joint fibre is one class of windings,
+  and its member is the generator's published map; a plural glued region keeps its fibre and
+  restricts nothing;
+- a region extends the glued region before it while the joint fibre over all of them locates one
+  generator (every join on the way unique), so a plural region that its neighbour resolves is glued
+  into the located key.
+
+The pinned step 3 is read once beside it, in the harness only (`pinned_arm`), as the measurement of
+its certificate failure; it enters no library owner. The claim is read on the located arm, unchanged
+in its counts; on the pinned arm the read measures how many of its releases are wrong (predicted:
+most). The show gives the located arm's repaired passage, with the pinned arm's beside it where that
+arm released a cell. Everything else is unchanged.
+
+**The projection, fixed before the read** [measured]. The development unit (both arms on one
+passage, one thread) read at most `86` ms over four reads (`86, 85, 84, 84`; the scope's peak at most
+`4.4M`, the process's `VmHWM` at most `5,873,664` bytes). The read's projection is `64 · 86 = 5,504`
+ms, its deadline the upper end `6,880` ms (`timeout 7`), run in the foreground (under 60 s), one
+thread.
+
 **Waiting standard.** A development read on the 4 development passages measures the unit; the read's
 projection is the read count times the largest development unit, its deadline the projection's
 upper end (`5/4`) under an outer `timeout`, launched in the background past 60 s; peak memory through

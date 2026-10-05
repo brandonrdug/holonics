@@ -62,6 +62,8 @@ mod loop_1c;
 mod keys_loop;
 #[path = "hnn_repair_loop.rs"]
 mod repair_loop;
+#[path = "hnn_text_repair.rs"]
+mod text_repair;
 
 use std::collections::BTreeMap;
 use std::time::Instant;
@@ -607,6 +609,11 @@ fn main() {
             arguments[6].parse().expect("a count"),
             &arguments[7],
         ),
+        // Text repair by local keys glued on overlaps
+        // (research/records/2026-10-05_TEXT_REPAIR_BY_LOCAL_KEYS_GLUED_ON_OVERLAPS.md).
+        (Some("executed"), Some("text-repair")) => {
+            text_repair::run(&arguments[3], &arguments[4], &arguments[5])
+        }
         (Some("executed"), Some("keys-probe")) => keys_loop::keys_probe(
             &arguments[3],
             arguments[4].parse().expect("a training seed"),
