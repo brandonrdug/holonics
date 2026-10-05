@@ -509,15 +509,19 @@ fn the_field_connection_is_the_block_incidence_of_its_channels() {
 /// is its own Holon, certified on its own; the Holarchy keeps them and its gluing, and its whole,
 /// assembled only when read, is Dirac (Tellegen), its navigators the rings' closing maps, and its
 /// element relations the blocks read from the one constitution: ring 0's resistance is
-/// `−W_s = f fᵀ`, contact 0's storage `(K_a, C_a⁻¹)`. The chart is rebuilt from a changed
-/// constitution, never carried as a second owner, and a singular contact storage is refused.
+/// `−W_s = f fᵀ`, contact 0's storage `(K_a, 1)` on `(u, z = c_aᵀ w)`, the momentum chart
+/// `(K_a, C_a⁻¹)` under `p = c_a z` (`c_aᵀ C_a⁻¹ c_a = 1`). The chart is rebuilt from a changed
+/// constitution, never carried as a second owner, and a singular contact storage (the released
+/// channel `c_a = 0`) has its chart: the pure transmission, Dirac.
 #[test]
 fn the_field_holon_is_a_read_only_holarchy_of_rings_and_contacts() {
     let field = small_field(&[2, 2], vec![contact(0, 1, 1, 0)], 1);
     let theta = generic(&field, 7);
     let holarchy = field.holarchy(&theta).unwrap();
     let sigma: usize = field.rings().iter().map(|ring| ring.width()).sum();
-    let states: usize = field.contacts().iter().map(|c| 2 * c.width()).sum();
+    let states: usize = (0..field.contacts().len())
+        .map(|a| field.contact(a).width() + theta.contact_storage(a).columns())
+        .sum();
     let whole = holarchy.whole();
     let counts = whole.counts();
     assert_eq!((counts.storage, counts.external), (sigma + states, 0));
@@ -546,33 +550,43 @@ fn the_field_holon_is_a_read_only_holarchy_of_rings_and_contacts() {
     let (stiffness, store) = (theta.contact_stiffness(0), theta.contact_storage(0));
     let gram =
         |m: &crate::ratio::linear::ExactRatMatrix| m.multiply(&m.transpose().unwrap()).unwrap();
-    let compliance = gram(store).inverse().unwrap();
+    let m = store.columns();
     for i in 0..k {
         for j in 0..k {
             assert_eq!(
                 storage.get(sigma + i, sigma + j).unwrap(),
                 gram(stiffness).get(i, j).unwrap()
             );
-            assert_eq!(
-                storage.get(sigma + k + i, sigma + k + j).unwrap(),
-                compliance.get(i, j).unwrap()
-            );
         }
     }
+    let unit = crate::ratio::linear::ExactRatMatrix::identity(m).unwrap();
+    for i in 0..m {
+        for j in 0..m {
+            assert_eq!(storage.get(sigma + k + i, sigma + k + j).unwrap(), unit.get(i, j).unwrap());
+        }
+    }
+    // Where `C_a ≻ 0` the factor's chart is the momentum chart: `c_aᵀ C_a⁻¹ c_a = 1`.
+    let compliance = gram(store).inverse().unwrap();
+    assert_eq!(
+        store
+            .transpose()
+            .unwrap()
+            .multiply(&compliance)
+            .unwrap()
+            .multiply(store)
+            .unwrap(),
+        unit
+    );
     let initial = Constitution::initial(&field, OPEN_BUDGET).unwrap();
     let other = field.holarchy(&initial).unwrap();
     assert_ne!(other.whole().active(), whole.active());
-    // A singular contact storage has no momentum chart and is refused, not pseudo-inverted.
-    let singular = initial
-        .with_channel(
-            0,
-            crate::ratio::linear::ExactRatMatrix::zero(k, k).unwrap(),
-            crate::ratio::linear::ExactRatMatrix::identity(k).unwrap(),
-            crate::ratio::linear::ExactRatMatrix::identity(k).unwrap(),
-        )
+    // A singular contact storage has no momentum chart, and is charted on its factor, never
+    // pseudo-inverted (which would state an infinite mass where the word transmits): the released
+    // channel `c_a = K_a = D_a = 0` is the pure transmission, and its whole is Dirac.
+    let zero = crate::ratio::linear::ExactRatMatrix::zero(k, k).unwrap();
+    let released = initial
+        .with_channel(0, zero.clone(), zero.clone(), zero)
         .unwrap();
-    assert!(matches!(
-        field.holarchy(&singular),
-        Err(HnnError::Linear(_))
-    ));
+    let transmission = field.holarchy(&released).unwrap();
+    assert!(check_tellegen(transmission.whole().port_holon().dirac()).unwrap() > 0);
 }
