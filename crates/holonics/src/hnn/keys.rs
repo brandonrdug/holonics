@@ -42,8 +42,26 @@
 //! boundary where it re-keys `λ`. Before the first boundary no cell has been seen, so the rings run
 //! on their declared initial configuration.
 //!
+//! [definition; agent-inferred, October 5; the
+//! [record](../../../../research/records/2026-10-05_LOCATED_KEYS_BECOME_THE_SOURCE_PORTS_PAIR_COMPONENT.md)]
+//! **The pair menu over the span's distances, and the turn machine** (lane B of U6 step 1). The
+//! reflector machine's stage moves with the rotor between two readings, so a stationary relation
+//! between a station and an earlier cell of its span fails every loop of it. The ring's own
+//! stationary transports are its rotor's turns `ρ^c`, and the **turn machine** (its library owner
+//! `compression::keys::TurnMenu`, the library spine's S2) reads an edge `u → v` as
+//! `S(v) = S(u) + c`: the rotor gauge keeps every turn, so the fibre's gauge-invariant reading is
+//! the menu relation itself, and the surviving turns are read from its components (cycles of length
+//! `ord(c)`, shorter paths, disjoint cosets). This module keeps the boundary adapter: the data → menu map
+//! reads each seen station against every earlier cell of its passage at every distance below the
+//! period ([`station_pairs`]); no distance is declared, and [`PairLocation`] keeps one turn menu a
+//! distance and locates the pair when exactly one read distance survives with its map published
+//! ([`LocatedPair`]). The crib is seen cells only: a request and the stations already read. Its
+//! consumer is `hnn::executed::pair_deposit`, which makes the located pair the source port's pair
+//! component, `(E − B) T = P^δ B` on the menu's classes.
+//!
 //! | Lean | Rust |
 //! |---|---|
+//! | `Keys.fibre_cons` (a distance's menu only shrinks; the turn menu's law is `compression::keys::TurnMenu`'s) | [`PairLocation::observe`] |
 //! | `HNN/Keys.contact_menu_closes`, `field_loop_fibre`; `Compression/Core/Keys.fibre_eq_bombe` | [`locate_ring`] |
 //! | `HNN/Keys.propagation_eq_edge_fibre` | [`Menu::propagate`] |
 //! | `HNN/Keys.gauge_fix_unique`; `Keys.Machine.rotorGauge`, `fibre_eq_orbit` | [`RingKeys::published`] |
@@ -53,7 +71,7 @@
 use num_bigint::{BigInt, BigUint};
 use num_traits::ToPrimitive;
 
-use crate::compression::{Candidate, Menu};
+use crate::compression::{Candidate, Menu, TurnMenu, TurnReading};
 use crate::hnn::HnnError;
 use crate::hnn::field::{Current, Field, ring_digit};
 use crate::navigator::Clock;
@@ -375,4 +393,154 @@ pub fn locate_closing(
         };
     }
     Ok(location)
+}
+
+// -------------------------------------------------------------------------------------------
+// the pair menu over the span's distances, and the turn machine
+
+/// [definition; agent-inferred, October 5] **A pair reading**: a seen station's cell read against
+/// an earlier cell of its span at the tick distance `offset` on the source ring, as the menu edge
+/// `from = port(x_(t−δ)) → to = port(x_t)`.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub struct PairReading {
+    pub offset: usize,
+    pub from: usize,
+    pub to: usize,
+}
+
+/// **The data → menu map at every distance of the span** (module section "The pair menu"): for a
+/// seen passage (a request and the stations that continued it, every cell already read) and the
+/// index `opening` of its first station, each station `t ≥ opening` is one observation, read
+/// against every earlier cell of its passage at its distance `δ = t − s ∈ [1, t]`, held below the
+/// ring's period so each distance is one residue of the ring's clock. No distance is selected: the
+/// survivors decide. Refused when the passage holds a cell outside the exterior chart or opens no
+/// station.
+pub fn station_pairs(
+    field: &Field,
+    ring: usize,
+    passage: &[usize],
+    opening: usize,
+) -> Result<Vec<Vec<PairReading>>, HnnError> {
+    if let Some(&code) = passage.iter().find(|&&code| code >= field.alphabet()) {
+        return Err(HnnError::CellOutside {
+            code,
+            alphabet: field.alphabet(),
+        });
+    }
+    if opening == 0 || opening > passage.len() {
+        return Err(HnnError::Crib {
+            cells: passage.len(),
+            offset: opening,
+        });
+    }
+    let geometry = field.ring(ring);
+    let period = usize::try_from(geometry.period()).expect("a period fits");
+    Ok((opening..passage.len())
+        .map(|t| {
+            (1..=t.min(period - 1))
+                .map(|offset| PairReading {
+                    offset,
+                    from: geometry.port(passage[t - offset]),
+                    to: geometry.port(passage[t]),
+                })
+                .collect()
+        })
+        .collect())
+}
+
+/// [definition; agent-inferred, October 5] **A located pair**: the one distance whose turn menu
+/// survives with a published map, the map on its menu ports, its cycles' length and the surviving
+/// turns.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct LocatedPair {
+    pub offset: usize,
+    pub map: Vec<(usize, usize)>,
+    pub cycle: u64,
+    pub turns: Vec<u64>,
+}
+
+/// [definition; agent-inferred, October 5] **Pair location over the span's distances**: one turn
+/// menu per distance `δ ∈ [1, d − 1]`, each observation (a seen station) reading its edge at every
+/// distance its span reaches ([`station_pairs`]). A distance whose menu read no edge is unread, not
+/// a survivor. The pair is **located** when exactly one read distance survives and its map is
+/// published ([`TurnMenu`]); several surviving distances are a plural class (the alternation's
+/// aliases), never a key.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct PairLocation {
+    menus: Vec<TurnMenu>,
+    observations: u64,
+}
+
+/// [definition] **The survivors after an observation**: each read distance still alive with its
+/// reading, and the observations read.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct PairSurvivors {
+    pub observations: u64,
+    pub alive: Vec<(usize, TurnReading)>,
+    pub read: usize,
+}
+
+impl PairSurvivors {
+    /// The located pair, when exactly one read distance survives with a published map.
+    pub fn located(&self) -> Option<LocatedPair> {
+        match self.alive.as_slice() {
+            [(offset, reading)] => Some(LocatedPair {
+                offset: *offset,
+                map: reading.map.clone()?,
+                cycle: reading.cycle?,
+                turns: reading.turns.clone(),
+            }),
+            _ => None,
+        }
+    }
+
+    /// The surviving distances with a nonempty turn set.
+    pub fn distances(&self) -> Vec<usize> {
+        self.alive.iter().map(|(offset, _)| *offset).collect()
+    }
+}
+
+impl PairLocation {
+    /// The location opened on a source ring: every distance's menu empty.
+    pub fn open(field: &Field, ring: usize) -> Self {
+        let period = field.ring(ring).period();
+        Self {
+            menus: (1..period).map(|_| TurnMenu::open(period)).collect(),
+            observations: 0,
+        }
+    }
+
+    /// **Read one observation**: its edge at every distance it reaches.
+    pub fn observe(&mut self, readings: &[PairReading]) {
+        self.observations += 1;
+        for reading in readings {
+            self.menus[reading.offset - 1].observe(reading.from, reading.to);
+        }
+    }
+
+    /// The menu at a distance.
+    pub fn menu(&self, offset: usize) -> &TurnMenu {
+        &self.menus[offset - 1]
+    }
+
+    /// **The survivors**: each read distance whose menu admits a turn.
+    pub fn survivors(&self) -> PairSurvivors {
+        let read: Vec<(usize, &TurnMenu)> = self
+            .menus
+            .iter()
+            .enumerate()
+            .filter(|(_, menu)| menu.edges() > 0)
+            .map(|(index, menu)| (index + 1, menu))
+            .collect();
+        PairSurvivors {
+            observations: self.observations,
+            read: read.len(),
+            alive: read
+                .into_iter()
+                .filter(|(_, menu)| menu.alive())
+                .map(|(offset, menu)| (offset, menu.reading()))
+                .filter(|(_, reading)| !reading.turns.is_empty())
+                .collect(),
+        }
+    }
 }

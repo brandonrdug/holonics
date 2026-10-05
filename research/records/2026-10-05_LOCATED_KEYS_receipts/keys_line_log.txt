@@ -1,0 +1,6 @@
+keys on line, seed 2026093037, 128 requests: 1024 observations read
+  no lock in the passage
+  not located at the passage's end: 11 distances alive [4, 8, 12, 16, 20, 24, 28, 32, 36, 40, 44]
+  one map class from 24 observations (3 requests plus 0 stations) to the passage's end: the distances [4, 8, 12, 16, 20, 24, 28, 32, 36, 40, 44] each publish one map
+executed keys: 41 ms; resident 32051200 now, 32051200 peak
+exit 0 after 46 ms

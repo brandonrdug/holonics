@@ -372,3 +372,88 @@ fn a_closing_crib_is_stepped_back_and_its_key_carried_to_the_boundary() {
         HnnError::NegativeLift { ring: 0 }
     );
 }
+
+// -------------------------------------------------------------------------------------------
+// the pair menu over the span's distances, and the turn machine (lane B, October 5)
+
+use crate::hnn::keys::{PairLocation, PairReading, station_pairs};
+
+/// Seen passages of the order-2 law over four symbols: `n` drawn cells, then `m` stations each the
+/// cell two before it plus one (mod 4).
+fn order_two(seed: u64, count: usize, n: usize, m: usize) -> Vec<Vec<usize>> {
+    let mut draw = Draw::new(seed);
+    (0..count)
+        .map(|_| {
+            let mut passage: Vec<usize> = (0..n).map(|_| draw.below(4) as usize).collect();
+            for _ in 0..m {
+                let next = (passage[passage.len() - 2] + 1) % 4;
+                passage.push(next);
+            }
+            passage
+        })
+        .collect()
+}
+
+/// [implemented-exact] **The pair menu locates order-2 from its seen stations, and keeps the
+/// alternation's aliases plural.** On a ring of period 16, passages of 10 drawn cells continued by
+/// 4 order-2 stations locate the one distance 2 with the map `y ↦ y + 1` on the four symbols, its
+/// 4-cycle and the turns of order 4 (`4` and `12`); no other distance survives. Passages that
+/// alternate two drawn symbols keep every even distance alive with the identity map: a plural
+/// class, never a located pair.
+#[test]
+fn the_pair_menu_locates_order_two_and_keeps_the_alternations_aliases_plural() {
+    let field = rotor_field(&[(16, (0..16).collect())]);
+    let mut location = PairLocation::open(&field, 0);
+    for passage in order_two(2_026_100_502, 12, 10, 4) {
+        for observation in station_pairs(&field, 0, &passage, 10).unwrap() {
+            location.observe(&observation);
+        }
+    }
+    let survivors = location.survivors();
+    assert_eq!(survivors.observations, 48);
+    let located = survivors.located().expect("order-2 located");
+    assert_eq!(located.offset, 2);
+    assert_eq!(located.map, vec![(0, 1), (1, 2), (2, 3), (3, 0)]);
+    assert_eq!(located.cycle, 4);
+    assert_eq!(located.turns, vec![4, 12]);
+
+    let mut draw = Draw::new(2_026_100_503);
+    let mut alternation = PairLocation::open(&field, 0);
+    for _ in 0..6 {
+        let (a, b) = (draw.below(4) as usize, draw.below(4) as usize);
+        let passage: Vec<usize> = (0..14).map(|t| if t % 2 == 0 { a } else { b }).collect();
+        for observation in station_pairs(&field, 0, &passage, 10).unwrap() {
+            alternation.observe(&observation);
+        }
+    }
+    let survivors = alternation.survivors();
+    assert!(survivors.located().is_none());
+    let distances = survivors.distances();
+    assert!(distances.contains(&2) && distances.contains(&4));
+    for (_, reading) in &survivors.alive {
+        if let Some(map) = &reading.map {
+            assert!(map.iter().all(|(y, x)| y == x));
+        }
+    }
+}
+
+/// [implemented-exact] **The pair menu reads only the passage it is given**: one observation per
+/// station after the opening, each at every distance below the period that its passage reaches;
+/// a passage with no station or a cell outside the chart is refused.
+#[test]
+fn the_pair_menu_reads_each_station_at_every_distance_its_passage_reaches() {
+    let field = rotor_field(&[(16, (0..16).collect())]);
+    let passage: Vec<usize> = (0..20).map(|t| t % 4).collect();
+    let readings = station_pairs(&field, 0, &passage, 18).unwrap();
+    assert_eq!(readings.len(), 2);
+    assert_eq!(readings[0].len(), 15);
+    assert_eq!(readings[0][1], PairReading { offset: 2, from: 0, to: 2 });
+    assert!(matches!(
+        station_pairs(&field, 0, &passage, 0),
+        Err(HnnError::Crib { .. })
+    ));
+    assert!(matches!(
+        station_pairs(&field, 0, &[0, 1, 99], 1),
+        Err(HnnError::CellOutside { code: 99, .. })
+    ));
+}

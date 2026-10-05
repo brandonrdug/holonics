@@ -344,3 +344,115 @@ fn the_monotone_excursion_is_the_strict_decrease_and_a_height_admits_a_bounded_r
     let grain = ReleaseExcursion::grain(64, &rat(1, 16)).unwrap();
     assert!(grain > rat(2772, 1000) && grain < rat(2773, 1000));
 }
+
+// -------------------------------------------------------------------------------------------
+// the located pair's deposit (lane B, October 5)
+
+/// A field of one closing ring of period 16, its lock every port, over an exterior chart of
+/// `alphabet` classes (one class a port when `alphabet ≤ 16`).
+fn pair_field(alphabet: usize) -> crate::hnn::field::Field {
+    use crate::hnn::field::{CribDeclaration, Field, FieldDeclaration, ReceiverDeclaration};
+    Field::declare(
+        FieldDeclaration {
+            rings: vec![super::support::ring(16, (0..16).collect())],
+            contacts: Vec::new(),
+            loops: Vec::new(),
+            sources: vec![0],
+            offsets: Vec::new(),
+            alphabet,
+            step: integer(1),
+            exponent_grain: 1,
+            receivers: vec![ReceiverDeclaration {
+                ring: 0,
+                aperture: 1,
+                tolerance: rat(1, 16),
+                depth: 1,
+                prior: crate::compression::landmark::context::StopPrior::half(),
+                mass: 1,
+                base: crate::compression::landmark::context::BaseMeasure::Even,
+                receiving_prior: 0,
+            }],
+            crib: CribDeclaration {
+                window: 16,
+                offset: 1,
+            },
+            population: 1 << 24,
+            lattice: Default::default(),
+        }
+        .by_lattice_rule(),
+    )
+    .unwrap()
+}
+
+/// The order-2 pair the menu locates: distance 2, `y ↦ y + 1` on four symbols, turns of order 4.
+fn order_two_pair() -> crate::hnn::keys::LocatedPair {
+    crate::hnn::keys::LocatedPair {
+        offset: 2,
+        map: vec![(0, 1), (1, 2), (2, 3), (3, 0)],
+        cycle: 4,
+        turns: vec![4, 12],
+    }
+}
+
+/// [implemented-exact] **The located pair's deposit closes its slip, and its consumer holds**: on
+/// the declared opening the slip `Δ_y = U B e_y − (E − B) e_(f(y))` is the carried prior, the
+/// normal law's unit step closes half of it (the one-hot Gram `I + e eᵀ`), the library's certified
+/// step on the quadratic slip is `η = 2` with its certified decrease the whole slip, and after the deposit `(E − B) T = U B` holds exactly on the menu's classes:
+/// each consequence's column is its own prior plus its antecedent's prior carried two ticks. The
+/// classes the key does not reach keep their prior. A second deposit of the same pair finds no slip
+/// and is refused (the key is retained once, never counted).
+#[test]
+fn the_located_pairs_deposit_closes_its_slip_and_its_consumer_holds() {
+    use crate::hnn::constitution::{CAMPAIGN_ONE_BUDGET, Constitution};
+    use crate::hnn::executed::pair_deposit;
+    use crate::hnn::field::ConstitutionRead;
+    let field = pair_field(6);
+    let opening = Constitution::initial(&field, CAMPAIGN_ONE_BUDGET).unwrap();
+    let prior = opening.source_port(0).unwrap().clone();
+    let (theta, deposit) = pair_deposit(&field, &opening, &prior, 0, &order_two_pair()).unwrap();
+    // The slip's certified step: a = 2⟨Δ, D⟩ = 2·16, C = 2|D|² = 2·8, c = ½: η = 2 = a/C exactly,
+    // and the certified decrease ½ η a = 32 is the whole slip.
+    assert_eq!(deposit.certificate.step, integer(2));
+    assert!(deposit.certificate.holds());
+    assert_eq!(deposit.certificate.decrease(), integer(32));
+    assert!(deposit.consumer);
+    assert!(deposit.slip_after.is_zero());
+    // Four classes of 32 entries ±½: the carried prior's squared norm.
+    assert_eq!(deposit.slip_before, integer(32));
+    let port = theta.source_port(0).unwrap();
+    let ring = field.ring(0);
+    for (y, x) in [(0usize, 1usize), (1, 2), (2, 3), (3, 0)] {
+        let column = |m: &ExactRatMatrix, c: usize| -> Vec<Rat> {
+            (0..m.rows()).map(|r| m.get(r, c).unwrap().clone()).collect()
+        };
+        let carried = ring.rotate(&column(&prior, y), &BigInt::from(2));
+        let expected: Vec<Rat> = column(&prior, x).iter().zip(&carried).map(|(b, u)| b + u).collect();
+        assert_eq!(column(port, x), expected);
+    }
+    for unreached in [4usize, 5] {
+        for row in 0..port.rows() {
+            assert_eq!(port.get(row, unreached).unwrap(), prior.get(row, unreached).unwrap());
+        }
+    }
+    assert!(matches!(
+        pair_deposit(&field, &theta, &prior, 0, &order_two_pair()),
+        Err(HnnError::Shape { .. })
+    ));
+}
+
+/// [implemented-exact] **A located port must hold one class of the exterior chart**: on a chart of
+/// 20 classes over a ring of period 16, port 0 holds classes 0 and 16, so the located map on ports
+/// is not a map of classes and the deposit is refused.
+#[test]
+fn a_port_holding_two_classes_refuses_the_pair_deposit() {
+    use crate::hnn::constitution::{CAMPAIGN_ONE_BUDGET, Constitution};
+    use crate::hnn::executed::pair_deposit;
+    use crate::hnn::field::ConstitutionRead;
+    let field = pair_field(20);
+    let opening = Constitution::initial(&field, CAMPAIGN_ONE_BUDGET).unwrap();
+    let prior = opening.source_port(0).unwrap().clone();
+    assert!(matches!(
+        pair_deposit(&field, &opening, &prior, 0, &order_two_pair()),
+        Err(HnnError::Shape { expected: 1, found: 2, .. })
+    ));
+}
