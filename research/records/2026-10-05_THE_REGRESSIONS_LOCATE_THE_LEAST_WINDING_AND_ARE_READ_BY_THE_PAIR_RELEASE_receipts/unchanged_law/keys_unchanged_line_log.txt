@@ -1,0 +1,11 @@
+keys on line, seed 2026093037, 128 requests: 1024 observations read
+  no lock in the passage
+  not located at the passage's end: 11 distances alive [4, 8, 12, 16, 20, 24, 28, 32, 36, 40, 44]
+  one map class from 24 observations (3 requests plus 0 stations) to the passage's end: the distances [4, 8, 12, 16, 20, 24, 28, 32, 36, 40, 44] each publish one map
+executed keys: 43 ms; resident 31510528 now, 31510528 peak
+--- scope
+Main processes terminated with: code=exited, status=0/SUCCESS
+               Service runtime: 68ms
+             CPU time consumed: 51ms
+                   Memory peak: 25.5M (swap: 0B)
+wall 75 ms

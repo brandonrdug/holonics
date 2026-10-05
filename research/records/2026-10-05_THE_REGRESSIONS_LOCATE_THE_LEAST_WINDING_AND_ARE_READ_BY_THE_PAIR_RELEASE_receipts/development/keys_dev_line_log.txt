@@ -1,0 +1,7 @@
+keys on line, seed 2026093041, 16 requests: 128 observations read
+  first lock at 31 observations (3 requests plus 7 stations): δ 4, map [(0, 0), (1, 1), (2, 2), (3, 3)], cycle 1, turns [0]
+  located from 31 observations (3 requests plus 7 stations) to the passage's end: δ 4, map [(0, 0), (1, 1), (2, 2), (3, 3)]
+  one map class from 31 observations (3 requests plus 7 stations) to the passage's end: the distances [4, 8, 12, 16, 20, 24, 28, 32, 36, 40, 44] each publish one map
+  deposit on the lossless opening at observation 31: δ 4, classes [(0, 0), (1, 1), (2, 2), (3, 3)], slip 120 → 0, certified step η 2 (a 120, C 60, c 1/2, decrease 120), consumer (E − B) T = U B holds, storage growth 0, largest entry 1, bits 385320, transport 1; 48 ms
+  deposit on the founded opening at observation 31: δ 4, classes [(0, 0), (1, 1), (2, 2), (3, 3)], slip 120 → 0, certified step η 2 (a 120, C 60, c 1/2, decrease 120), consumer (E − B) T = U B holds, storage growth 0, largest entry 1, bits 385320, transport 102837/131072; 26 ms
+executed keys: 463 ms; resident 129458176 now, 146239488 peak

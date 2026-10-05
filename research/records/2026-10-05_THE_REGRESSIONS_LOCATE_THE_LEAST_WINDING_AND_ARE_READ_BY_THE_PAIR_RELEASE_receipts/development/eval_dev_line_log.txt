@@ -1,0 +1,11 @@
+  lossless (transport modulus 1; closed pair contacts at []): released 0, held 8, refused 0, refused certificates 0; whole sections 0 of 8 (nonconstant 0 of 5, constant 0 of 3); the success rule (every nonconstant section whole): does not hold; incorrect releases 0; reaching the termination 3; stations right 8 by station [1, 0, 1, 0, 1, 0, 3, 2]; first lock at a request-reading station (0 or 1) 0, first lock right 0; 971 ms
+  opening (transport modulus 102837/131072; closed pair contacts at []): released 7, held 1, refused 0, refused certificates 0; whole sections 0 of 8 (nonconstant 0 of 5, constant 0 of 3); the success rule (every nonconstant section whole): does not hold; incorrect releases 7; reaching the termination 0; stations right 15 by station [2, 3, 1, 3, 1, 2, 1, 2]; first lock at a request-reading station (0 or 1) 0, first lock right 2; 19058 ms
+  keys-lossless (transport modulus 1; closed pair contacts at [4]): released 8, held 0, refused 0, refused certificates 0; whole sections 8 of 8 (nonconstant 5 of 5, constant 3 of 3); the success rule (every nonconstant section whole): holds; incorrect releases 0; reaching the termination 0; stations right 64 by station [8, 8, 8, 8, 8, 8, 8, 8]; first lock at a request-reading station (0 or 1) 7, first lock right 8; 5865 ms
+  keys-founded (transport modulus 102837/131072; closed pair contacts at [4]): released 8, held 0, refused 0, refused certificates 0; whole sections 8 of 8 (nonconstant 5 of 5, constant 3 of 3); the success rule (every nonconstant section whole): holds; incorrect releases 0; reaching the termination 0; stations right 64 by station [8, 8, 8, 8, 8, 8, 8, 8]; first lock at a request-reading station (0 or 1) 7, first lock right 8; 5879 ms
+executed evaluate: 32230 ms; resident 148398080 now, 148398080 peak
+--- scope
+Main processes terminated with: code=exited, status=0/SUCCESS
+               Service runtime: 32.262s
+             CPU time consumed: 4min 38.252s
+                   Memory peak: 141M (swap: 0B)
+wall 32275 ms

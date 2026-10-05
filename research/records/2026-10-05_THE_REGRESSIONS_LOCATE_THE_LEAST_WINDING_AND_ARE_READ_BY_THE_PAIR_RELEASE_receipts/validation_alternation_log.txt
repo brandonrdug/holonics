@@ -1,0 +1,10 @@
+  keys-founded (transport modulus 102837/131072; closed pair contacts at [2]): released 64, held 0, refused 0, refused certificates 0; whole sections 11 of 64 (nonconstant 0 of 46, constant 11 of 18); the success rule (every nonconstant section whole): does not hold; incorrect releases 53; reaching the termination 0; stations right 286 by station [19, 23, 48, 53, 19, 23, 48, 53]; first lock at a request-reading station (0 or 1) 64, first lock right 17; 37271 ms
+  keys-lossless (transport modulus 1; closed pair contacts at [2]): released 64, held 0, refused 0, refused certificates 0; whole sections 11 of 64 (nonconstant 0 of 46, constant 11 of 18); the success rule (every nonconstant section whole): does not hold; incorrect releases 53; reaching the termination 0; stations right 286 by station [19, 23, 48, 53, 19, 23, 48, 53]; first lock at a request-reading station (0 or 1) 64, first lock right 17; 50182 ms
+  lossless (transport modulus 1; closed pair contacts at []): released 3, held 61, refused 0, refused certificates 0; whole sections 3 of 64 (nonconstant 0 of 46, constant 3 of 18); the success rule (every nonconstant section whole): does not hold; incorrect releases 0; reaching the termination 0; stations right 219 by station [37, 24, 31, 26, 27, 23, 27, 24]; first lock at a request-reading station (0 or 1) 0, first lock right 3; 31978 ms
+  opening (transport modulus 102837/131072; closed pair contacts at []): released 62, held 2, refused 0, refused certificates 0; whole sections 3 of 64 (nonconstant 0 of 46, constant 3 of 18); the success rule (every nonconstant section whole): does not hold; incorrect releases 59; reaching the termination 0; stations right 127 by station [26, 23, 17, 22, 10, 10, 11, 8]; first lock at a request-reading station (0 or 1) 6, first lock right 8; 208635 ms
+executed evaluate: 328529 ms; resident 51978240 now, 156758016 peak
+--- scope: exit 0; memory.peak 157536256 bytes
+Main processes terminated with: code=exited, status=0/SUCCESS
+               Service runtime: 5min 28.595s
+             CPU time consumed: 48min 3.027s
+wall 328621 ms
