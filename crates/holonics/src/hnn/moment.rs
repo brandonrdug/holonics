@@ -948,8 +948,12 @@ impl SourceMoment {
             &keyed(next("the moment's opening")?, "opening", "the moment's opening")?,
             "the moment's opening",
         )?;
+        // Ingest writes at the cursor before advancing it modulo a nonempty window.
+        // Such a cursor is always strictly inside it. With no offsets, the window is empty
+        // and ingest skips the write/modulo; its sole valid cursor is the founding zero.
         if window.len() != reach
-            || cursor > reach
+            || (reach == 0 && cursor != 0)
+            || (reach != 0 && cursor >= reach)
             || opening.len() != field.rings().len()
             || count != field.sources().len()
         {

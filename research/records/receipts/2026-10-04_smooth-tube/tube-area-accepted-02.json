@@ -1,0 +1,100 @@
+{
+  "status": "accepted isolated tube module importing actual owner",
+  "label": "tube-area-development-02",
+  "source": "TubeSectionAreaVectorFinal.lean",
+  "source_sha256": "7bfa7d44e99274a8b387a451cba5f98940a249e1b4d50382619f4771ab8474ce",
+  "axiom_audits": [
+    {
+      "declaration": "Holonics.Geometry.FrameTransport.tube_section_area_vector",
+      "axioms": [
+        "Classical.choice",
+        "Quot.sound",
+        "propext"
+      ]
+    },
+    {
+      "declaration": "Holonics.Geometry.FrameTransport.tube_section_flux",
+      "axioms": [
+        "Classical.choice",
+        "Quot.sound",
+        "propext"
+      ]
+    }
+  ],
+  "warnings_errors_sorry": false,
+  "complete_import_parts_unchanged_after_execution": true,
+  "complete_import_seal_sha256": "4b2c20a0f4ca8c7e8dc5804d877b6f816d822a3ec99c89370859c5183a418b15",
+  "actual_frame_owner_receipt": "frame-owner-accepted-01.json",
+  "compiler_output": {
+    "exit": 0,
+    "wall_ns": 1348541976,
+    "CPU_count": 1,
+    "CPU_affinity": [
+      0
+    ],
+    "CPU_user_us": 914910,
+    "CPU_system_us": 400949,
+    "CPU_reading_grain_ns": 1000,
+    "timing_source": "monotonic_ns wall; glibc wait4 integer timeval CPU",
+    "peak_child_RSS_KiB": 2870824,
+    "cap_ns": 17000000000,
+    "projection_ns": 17000000000,
+    "projection_kill_triggered": false,
+    "system_floor_breached": false,
+    "system_floor_sampling_period_ns": 10000000,
+    "group_memory_max_bytes": 4294967296,
+    "group_memory_peak_bytes": 404283392,
+    "group_memory_current_bytes": 91017216,
+    "memory_events_after": {
+      "low": 0,
+      "high": 0,
+      "max": 0,
+      "oom": 0,
+      "oom_kill": 0,
+      "oom_group_kill": 0,
+      "sock_throttled": 0
+    },
+    "memory_events_delta": {
+      "low": 0,
+      "high": 0,
+      "max": 0,
+      "oom": 0,
+      "oom_kill": 0,
+      "oom_group_kill": 0,
+      "sock_throttled": 0
+    },
+    "stdout": {
+      "sha256": "94bdeecc18b1466c7cce75622917fd2d771449bd7efe66c5139d4e066e6a67e8",
+      "bytes": 231
+    },
+    "stderr": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "outputs": {
+      "/home/b/Workspaces/holonics/.local/hnn-athena-foundation/lean-geometric-runner/TubeSectionAreaVectorFinal.olean": {
+        "sha256": "9c52fb00d35aa2c05cb70ace0a26bf7319b485f9ad484a8e7e14b57e4607d9aa",
+        "bytes": 106368
+      },
+      "/home/b/Workspaces/holonics/.local/hnn-athena-foundation/lean-geometric-runner/TubeSectionAreaVectorFinal.ilean": {
+        "sha256": "1cabcc5df10d45e7a24c3177366767f4fca3de94635b138456e4893c927c8444",
+        "bytes": 7059
+      }
+    },
+    "all_outputs_present": true,
+    "inputs_unchanged": true,
+    "within_projection": true,
+    "sealed_before_audit": true
+  },
+  "lifecycle": {
+    "released_after_publication": true,
+    "child_reaped": true,
+    "own_group_other_PIDs": [],
+    "monotonic_ns": 115783364136931
+  },
+  "measured_wall_to_projected": "168567747/2125000000",
+  "source_owner_integration": "pending; no canonical Lean edit",
+  "scope": "Pointwise oriented area and current pairing only. Identification as actual C2 derivatives, Piola continuity, global geometry/material decoder and native work joins remain separate.",
+  "no_shadow_frame_theorem": true,
+  "memory_interpretation": "Wait4 child RSS and cgroup charged-page peak are separate readings; actual child stayed below 4 GiB."
+}

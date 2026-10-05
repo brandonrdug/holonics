@@ -1,0 +1,393 @@
+{
+  "status": "seven_reproducible_exact_checks_passed",
+  "grade": "exact computational witnesses; not Lean verification",
+  "method": "all strings parsed as fractions.Fraction; no floats",
+  "fixture_count": 7,
+  "fixtures_sha256": "5c8d19ffea88ae4b5321d06433014ac4db02aa68479d3be44e0d0fe8ea5a4940",
+  "checker_sha256": "bf9ed41d3fbe9ba938347951a1ece5ab49a217b603d780b68be47df91415b30c",
+  "prior_receipt_preserved_sha256": "ac5b353824b24d4949fbb33738d3edaefa9f6d9f511928194fda471531ee0840",
+  "prior_non_diagonal_readings_reproduced": true,
+  "results": [
+    {
+      "name": "pure_chart",
+      "work": "0",
+      "homogeneous_work": "0",
+      "cross_work": "0",
+      "source_work": "0",
+      "V0": [
+        [
+          "1",
+          "0"
+        ],
+        [
+          "0",
+          "1"
+        ]
+      ],
+      "V1": [
+        [
+          "1/2",
+          "0"
+        ],
+        [
+          "0",
+          "1"
+        ]
+      ],
+      "T_hat": [
+        [
+          "2",
+          "0"
+        ],
+        [
+          "0",
+          "1"
+        ]
+      ],
+      "G0_hat": [
+        [
+          "1",
+          "0"
+        ],
+        [
+          "0",
+          "1"
+        ]
+      ],
+      "G1_hat": [
+        [
+          "1/4",
+          "0"
+        ],
+        [
+          "0",
+          "1"
+        ]
+      ],
+      "F": [
+        [
+          "0",
+          "0"
+        ],
+        [
+          "0",
+          "0"
+        ]
+      ],
+      "F_hat": [
+        [
+          "0",
+          "0"
+        ],
+        [
+          "0",
+          "0"
+        ]
+      ],
+      "wrong_untransported_metric_work": "3/2"
+    },
+    {
+      "name": "material_change",
+      "work": "1/2",
+      "homogeneous_work": "1/2",
+      "cross_work": "0",
+      "source_work": "0",
+      "V0": [
+        [
+          "1",
+          "0"
+        ],
+        [
+          "0",
+          "1"
+        ]
+      ],
+      "V1": [
+        [
+          "1/2",
+          "0"
+        ],
+        [
+          "0",
+          "1"
+        ]
+      ],
+      "T_hat": [
+        [
+          "2",
+          "0"
+        ],
+        [
+          "0",
+          "1"
+        ]
+      ],
+      "G0_hat": [
+        [
+          "1",
+          "0"
+        ],
+        [
+          "0",
+          "1"
+        ]
+      ],
+      "G1_hat": [
+        [
+          "1/2",
+          "0"
+        ],
+        [
+          "0",
+          "1"
+        ]
+      ],
+      "F": [
+        [
+          "1",
+          "0"
+        ],
+        [
+          "0",
+          "0"
+        ]
+      ],
+      "F_hat": [
+        [
+          "1",
+          "0"
+        ],
+        [
+          "0",
+          "0"
+        ]
+      ]
+    },
+    {
+      "name": "affine_source",
+      "work": "3/2",
+      "homogeneous_work": "0",
+      "cross_work": "1",
+      "source_work": "1/2"
+    },
+    {
+      "name": "unresolved_opening",
+      "work": "21/8",
+      "homogeneous_work": "0",
+      "cross_work": "1",
+      "source_work": "1/2",
+      "undivided_unresolved_work": "9/4",
+      "unresolved_work": "9/8"
+    },
+    {
+      "name": "future_separator",
+      "present": "0",
+      "future": "-1",
+      "energy_change": "0"
+    },
+    {
+      "name": "non_diagonal_endpoint_case_1",
+      "work": "367369/117600",
+      "homogeneous_work": "181/96",
+      "cross_work": "-13/180",
+      "source_work": "134/225",
+      "V0": [
+        [
+          "1",
+          "-2"
+        ],
+        [
+          "0",
+          "1"
+        ]
+      ],
+      "V1": [
+        [
+          "1",
+          "-1"
+        ],
+        [
+          "-1",
+          "2"
+        ]
+      ],
+      "T_hat": [
+        [
+          "4",
+          "-9"
+        ],
+        [
+          "3",
+          "-6"
+        ]
+      ],
+      "G0_hat": [
+        [
+          "3",
+          "-5"
+        ],
+        [
+          "-5",
+          "10"
+        ]
+      ],
+      "G1_hat": [
+        [
+          "9",
+          "-13"
+        ],
+        [
+          "-13",
+          "20"
+        ]
+      ],
+      "F": [
+        [
+          "9",
+          "2"
+        ],
+        [
+          "2",
+          "7"
+        ]
+      ],
+      "F_hat": [
+        [
+          "9",
+          "-16"
+        ],
+        [
+          "-16",
+          "35"
+        ]
+      ],
+      "gain_form_r": "9/4",
+      "gain_form": [
+        [
+          "21/4",
+          "3/4"
+        ],
+        [
+          "3/4",
+          "9/2"
+        ]
+      ],
+      "gain_form_hat": [
+        [
+          "21/4",
+          "-39/4"
+        ],
+        [
+          "-39/4",
+          "45/2"
+        ]
+      ],
+      "undivided_unresolved_work": "841/588",
+      "unresolved_work": "841/1176"
+    },
+    {
+      "name": "non_diagonal_endpoint_case_2",
+      "work": "-41281/198450",
+      "homogeneous_work": "-421/2450",
+      "cross_work": "16/315",
+      "source_work": "4/81",
+      "V0": [
+        [
+          "0",
+          "1"
+        ],
+        [
+          "1",
+          "0"
+        ]
+      ],
+      "V1": [
+        [
+          "0",
+          "1"
+        ],
+        [
+          "-1",
+          "0"
+        ]
+      ],
+      "T_hat": [
+        [
+          "0",
+          "0"
+        ],
+        [
+          "2",
+          "1"
+        ]
+      ],
+      "G0_hat": [
+        [
+          "1",
+          "0"
+        ],
+        [
+          "0",
+          "1"
+        ]
+      ],
+      "G1_hat": [
+        [
+          "-1",
+          "-1"
+        ],
+        [
+          "-1",
+          "0"
+        ]
+      ],
+      "F": [
+        [
+          "-1",
+          "0"
+        ],
+        [
+          "0",
+          "-1"
+        ]
+      ],
+      "F_hat": [
+        [
+          "-1",
+          "0"
+        ],
+        [
+          "0",
+          "-1"
+        ]
+      ],
+      "gain_form_r": "9/4",
+      "gain_form": [
+        [
+          "-9/4",
+          "0"
+        ],
+        [
+          "0",
+          "-9/4"
+        ]
+      ],
+      "gain_form_hat": [
+        [
+          "-9/4",
+          "0"
+        ],
+        [
+          "0",
+          "-9/4"
+        ]
+      ],
+      "undivided_unresolved_work": "-1804/6615",
+      "unresolved_work": "-902/6615"
+    }
+  ],
+  "elapsed_ns": 2298628,
+  "peak_rss_kib": 18392,
+  "compiler_invocations": 0,
+  "training_runs": 0
+}

@@ -1,0 +1,191 @@
+{
+  "schema": "holonics-isolated-actual-owner-check-v1",
+  "label": "canonical-audit-10",
+  "base_commit": "3a242c990e2fc5bfd31fea7c194372168db8ba09",
+  "public_geometry_same_baseline_commit": "9a62a68515ebc824d583539e53b1a2d5973a82a3",
+  "source_integration_06_patch_sha256": "594f3a98d1853d035eba9ec73fbf13482860143570d359df071116f706376336",
+  "target": "CanonicalGeometricAudit",
+  "target_source_sha256": "70be7af94739bbd03cd61c9e26761399b6d544944fe42ccc50882c3083b7e87e",
+  "scope": "Combined actual-owner import and exact nine-declaration axiom audit; freshly compiled canonical FrameTransport and Motion selected from the isolated namespace; no copied proofs",
+  "canonical_root_applied": false,
+  "fresh_target_object": true,
+  "compiler": "Lean 4.33.0",
+  "threads": 1,
+  "compiler_flags": [
+    "-j1",
+    "-M4096"
+  ],
+  "address_space_limit_bytes": -1,
+  "charged_group_memory_max_bytes": 4294967296,
+  "swap_max_bytes": 0,
+  "prelaunch_MemAvailable_floor_KiB": 8388608,
+  "runtime_MemAvailable_floor_KiB": 4194304,
+  "projection_ns": 17000000000,
+  "fixed_child_deadline_ns": 17000000000,
+  "outer_controller_guard_ns": 60000000000,
+  "compiler_receipt": {
+    "exit": 0,
+    "wall_ns": 1287909036,
+    "CPU_count": 1,
+    "CPU_affinity": [
+      0
+    ],
+    "CPU_user_us": 817649,
+    "CPU_system_us": 444595,
+    "CPU_reading_grain_ns": 1000,
+    "timing_source": "monotonic_ns wall; glibc wait4 integer timeval CPU",
+    "peak_child_RSS_KiB": 3660380,
+    "cap_ns": 17000000000,
+    "projection_ns": 17000000000,
+    "projection_kill_triggered": false,
+    "system_floor_breached": false,
+    "system_floor_sampling_period_ns": 10000000,
+    "group_memory_max_bytes": 4294967296,
+    "group_memory_peak_bytes": 485945344,
+    "group_memory_current_bytes": 113074176,
+    "memory_events_after": {
+      "low": 0,
+      "high": 0,
+      "max": 0,
+      "oom": 0,
+      "oom_kill": 0,
+      "oom_group_kill": 0,
+      "sock_throttled": 0
+    },
+    "memory_events_delta": {
+      "low": 0,
+      "high": 0,
+      "max": 0,
+      "oom": 0,
+      "oom_kill": 0,
+      "oom_group_kill": 0,
+      "sock_throttled": 0
+    },
+    "stdout": {
+      "sha256": "53b736065afe60b047a5c776c36905cf45d414c9f7c3e35eb7f21d7740d7ffdf",
+      "bytes": 4621
+    },
+    "stderr": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "outputs": {
+      "/home/b/Workspaces/holonics/.local/hnn-athena-foundation/canonical-integration-20261004/objects/CanonicalGeometricAudit.olean": {
+        "sha256": "fd191602f911bfe5797b523c8c7ca3e19ce7891e78b059725f354aea11e1bccd",
+        "bytes": 2320
+      },
+      "/home/b/Workspaces/holonics/.local/hnn-athena-foundation/canonical-integration-20261004/objects/CanonicalGeometricAudit.ilean": {
+        "sha256": "263e443970efe21a430cb29a02c3ac8c63daf4a220847d80d733595f96de74a5",
+        "bytes": 1857
+      }
+    },
+    "all_outputs_present": true,
+    "inputs_unchanged": true,
+    "within_projection": true,
+    "sealed_before_audit": true
+  },
+  "measured_to_projected_ratio": [
+    1287909036,
+    17000000000
+  ],
+  "complete_import_scope": {
+    "module_count": 4914,
+    "present_parts_and_sources": 29371,
+    "absent_lookup_or_sidecar_paths": 46980,
+    "seal_sha256": "59beefcdda43a840bee1d6c418111944bbc8292354366792dd99b0626bb1427f",
+    "preparation_wall_ns": 14060004703,
+    "preparation_fixed_outer_deadline_ns": 17000000000,
+    "preparation_peak_RSS_KiB": 513080,
+    "hash_reuse_assumptions": "The pinned RH catalog is immutable and its stored digests came from prior byte hashing. Cataloged files remain immutable through preparation and compiler execution; matching presence/size/mtime/ctime permits digest reuse, not a fresh byte read. Postcheck compares lstat/stat metadata and symlink targets without rehashing. This requires truthful filesystem metadata and no privileged or adversarial mutation that preserves/restores all checked stamps.",
+    "postcheck": {
+      "complete_import_parts_unchanged": true,
+      "changed_paths": [],
+      "module_count": 4914,
+      "present": 29371,
+      "absent": 46980,
+      "wall_ns": 506991690,
+      "CPU_count": 1,
+      "CPU_RLIMIT_ns": 17000000000,
+      "outer_wall_deadline_ns": 17000000000,
+      "outer_wall_deadline_enforced": true,
+      "scope": "complete metadata postcheck under recorded pre-launch hash contract; combined signatures and exactly nine standard axiom lists; no copied proof",
+      "declarations": {
+        "Holonics.Geometry.Motion.finite_work_form_rechart": [
+          "propext",
+          "Classical.choice",
+          "Quot.sound"
+        ],
+        "Holonics.Geometry.Motion.affine_quadratic_work": [
+          "propext",
+          "Classical.choice",
+          "Quot.sound"
+        ],
+        "Holonics.Geometry.FrameTransport.tube_section_area_vector": [
+          "propext",
+          "Classical.choice",
+          "Quot.sound"
+        ],
+        "Holonics.Geometry.FrameTransport.tube_section_flux": [
+          "propext",
+          "Classical.choice",
+          "Quot.sound"
+        ],
+        "Holonics.Geometry.FrameTransport.tube_section_hasFDerivAt": [
+          "propext",
+          "Classical.choice",
+          "Quot.sound"
+        ],
+        "Holonics.Geometry.FrameTransport.tube_section_fderiv_first": [
+          "propext",
+          "Classical.choice",
+          "Quot.sound"
+        ],
+        "Holonics.Geometry.FrameTransport.tube_section_fderiv_second": [
+          "propext",
+          "Classical.choice",
+          "Quot.sound"
+        ],
+        "Holonics.Geometry.FrameTransport.tube_section_actual_area": [
+          "propext",
+          "Classical.choice",
+          "Quot.sound"
+        ],
+        "Holonics.Geometry.FrameTransport.tube_section_actual_flux": [
+          "propext",
+          "Classical.choice",
+          "Quot.sound"
+        ]
+      },
+      "warning_error_sorryAx_count": 0,
+      "all_three_children_reaped_and_leases_released": true
+    }
+  },
+  "raw_receipt_hashes": {
+    "input_seal": "84890be135f681b5930f261be639e62a11ad5396271b14514cc879598229e4d9",
+    "output_seal": "efa3b0c394d256281896945fa42c7685d1a4cb2e7ea607bea188f125d1b0c21c",
+    "publication": "e5b447f8c6ae2fbdd5a053c168bc4d27bed8b2bbc10697dd5fd1a1bd87064808",
+    "quiescence": "284e2ddef135881436b033577fa8f0cb1752f4bbe6cb5365de2ef5acfb27a220",
+    "release": "38e1eb51b282234ef46178dd4d02ce998ed7bfb84fc9ea6fc6a11c03efd451b3"
+  },
+  "raw_stdout_sha256": "53b736065afe60b047a5c776c36905cf45d414c9f7c3e35eb7f21d7740d7ffdf",
+  "raw_stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "raw_stderr_bytes": 0,
+  "lifecycle": {
+    "all_children_reaped": true,
+    "own_group_remaining_PIDs": [],
+    "lease_released_after_publication": true
+  },
+  "interpretation": "complete actual owner/consumer check in isolated snapshot using sealed cached dependencies; does not prove a native physical decoder, full moving-volume calculus or production restoration",
+  "warning_error_count": 0,
+  "declarations": [
+    "Holonics.Geometry.Motion.finite_work_form_rechart",
+    "Holonics.Geometry.Motion.affine_quadratic_work",
+    "Holonics.Geometry.FrameTransport.tube_section_area_vector",
+    "Holonics.Geometry.FrameTransport.tube_section_flux",
+    "Holonics.Geometry.FrameTransport.tube_section_hasFDerivAt",
+    "Holonics.Geometry.FrameTransport.tube_section_fderiv_first",
+    "Holonics.Geometry.FrameTransport.tube_section_fderiv_second",
+    "Holonics.Geometry.FrameTransport.tube_section_actual_area",
+    "Holonics.Geometry.FrameTransport.tube_section_actual_flux"
+  ]
+}

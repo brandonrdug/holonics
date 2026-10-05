@@ -1,0 +1,19 @@
+{
+  "status": "accepted exact witness and deliberate-defect checks",
+  "exit_code": 0,
+  "fixed_deadline_ns": 8000000000,
+  "measured_wall_ns": 3003190,
+  "peak_RSS_KiB": 16276,
+  "primary_review_changes": [
+    "admissible geometric sample",
+    "phase branch and carry admission",
+    "target/source unit formula",
+    "exact alternative-family area refusal"
+  ],
+  "source_sha256": {
+    "dimensions.py": "a1b62f53f0009396213352b0deb7f35b6e3f55705fe5054c2e57a2bf499c22a8",
+    "check.py": "a459cf2da558a459395285e9683b4230262166709c255079a692f01364b96d31"
+  },
+  "no_install": true,
+  "no_native_HNN_execution": true
+}

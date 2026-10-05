@@ -1,0 +1,81 @@
+{
+  "status": "accepted unchanged actual owner dependency",
+  "label": "frame-owner-development-01",
+  "source": "/home/b/Workspaces/holonics/lean/Holonics/Geometry/FrameTransport.lean",
+  "source_sha256": "38e0bd827d7ee54beec5039e44fe0d963a5a4646dbaf2f58312e189980bbee30",
+  "axiom_audits": [],
+  "warnings_errors_sorry": false,
+  "complete_import_parts_unchanged_after_execution": true,
+  "complete_import_seal_sha256": "1dea52804a7c9a1724a1be122d393a85651c9d6e89ebdb3cd56ef6e6d0b83a30",
+  "compiler_output": {
+    "exit": 0,
+    "wall_ns": 4161072502,
+    "CPU_count": 1,
+    "CPU_affinity": [
+      0
+    ],
+    "CPU_user_us": 3547260,
+    "CPU_system_us": 459294,
+    "CPU_reading_grain_ns": 1000,
+    "timing_source": "monotonic_ns wall; glibc wait4 integer timeval CPU",
+    "peak_child_RSS_KiB": 2921372,
+    "cap_ns": 17000000000,
+    "projection_ns": 17000000000,
+    "projection_kill_triggered": false,
+    "system_floor_breached": false,
+    "system_floor_sampling_period_ns": 10000000,
+    "group_memory_max_bytes": 4294967296,
+    "group_memory_peak_bytes": 446787584,
+    "group_memory_current_bytes": 92098560,
+    "memory_events_after": {
+      "low": 0,
+      "high": 0,
+      "max": 0,
+      "oom": 0,
+      "oom_kill": 0,
+      "oom_group_kill": 0,
+      "sock_throttled": 0
+    },
+    "memory_events_delta": {
+      "low": 0,
+      "high": 0,
+      "max": 0,
+      "oom": 0,
+      "oom_kill": 0,
+      "oom_group_kill": 0,
+      "sock_throttled": 0
+    },
+    "stdout": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "stderr": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "outputs": {
+      "/home/b/Workspaces/holonics/.local/hnn-athena-foundation/lean-geometric-runner/tube-owner-build/Holonics/Geometry/FrameTransport.olean": {
+        "sha256": "3e9cebed990fe2e81e1ed5258160fe3799c70464c44176ea7c8f0952fb217347",
+        "bytes": 1093240
+      },
+      "/home/b/Workspaces/holonics/.local/hnn-athena-foundation/lean-geometric-runner/tube-owner-build/Holonics/Geometry/FrameTransport.ilean": {
+        "sha256": "6fabb8bb25efd93f76bd25ca0ade602e04a342b35119caf12d6a9d5d61d27934",
+        "bytes": 78577
+      }
+    },
+    "all_outputs_present": true,
+    "inputs_unchanged": true,
+    "within_projection": true,
+    "sealed_before_audit": true
+  },
+  "lifecycle": {
+    "released_after_publication": true,
+    "child_reaped": true,
+    "own_group_other_PIDs": [],
+    "monotonic_ns": 115192438787405
+  },
+  "measured_wall_to_projected": "2080536251/8500000000",
+  "source_owner_integration": "pending; no canonical Lean edit",
+  "source_scope": "actual owner compiled directly from repository path; no copied frame proof",
+  "memory_interpretation": "Wait4 child RSS and cgroup charged-page peak are separate readings; each actual child stayed below 4 GiB. Cgroup charge peak need not bound shared file-mapped RSS."
+}

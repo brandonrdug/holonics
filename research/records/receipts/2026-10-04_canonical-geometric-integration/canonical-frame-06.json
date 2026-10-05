@@ -1,0 +1,129 @@
+{
+  "schema": "holonics-isolated-actual-owner-check-v1",
+  "label": "canonical-frame-06",
+  "base_commit": "3a242c990e2fc5bfd31fea7c194372168db8ba09",
+  "public_geometry_same_baseline_commit": "9a62a68515ebc824d583539e53b1a2d5973a82a3",
+  "source_integration_06_patch_sha256": "594f3a98d1853d035eba9ec73fbf13482860143570d359df071116f706376336",
+  "target": "Holonics.Geometry.FrameTransport",
+  "target_source_sha256": "8e2dab7ef9ac4a4e0564e23621531742def4edf234e47947cec39422e13c1c7b",
+  "scope": "Complete patched actual FrameTransport owner in pinned3a sparse snapshot; new2area+5actualderivative laws; immutable cached dependencies; no canonical root edits, native code or private proof imports",
+  "canonical_root_applied": false,
+  "fresh_target_object": true,
+  "compiler": "Lean 4.33.0",
+  "threads": 1,
+  "compiler_flags": [
+    "-j1",
+    "-M4096"
+  ],
+  "address_space_limit_bytes": -1,
+  "charged_group_memory_max_bytes": 4294967296,
+  "swap_max_bytes": 0,
+  "prelaunch_MemAvailable_floor_KiB": 8388608,
+  "runtime_MemAvailable_floor_KiB": 4194304,
+  "projection_ns": 17000000000,
+  "fixed_child_deadline_ns": 17000000000,
+  "outer_controller_guard_ns": 60000000000,
+  "compiler_receipt": {
+    "exit": 0,
+    "wall_ns": 6297434153,
+    "CPU_count": 1,
+    "CPU_affinity": [
+      0
+    ],
+    "CPU_user_us": 4474382,
+    "CPU_system_us": 1207082,
+    "CPU_reading_grain_ns": 1000,
+    "timing_source": "monotonic_ns wall; glibc wait4 integer timeval CPU",
+    "peak_child_RSS_KiB": 2970604,
+    "cap_ns": 17000000000,
+    "projection_ns": 17000000000,
+    "projection_kill_triggered": false,
+    "system_floor_breached": false,
+    "system_floor_sampling_period_ns": 10000000,
+    "group_memory_max_bytes": 4294967296,
+    "group_memory_peak_bytes": 3594182656,
+    "group_memory_current_bytes": 3064143872,
+    "memory_events_after": {
+      "low": 0,
+      "high": 0,
+      "max": 0,
+      "oom": 0,
+      "oom_kill": 0,
+      "oom_group_kill": 0,
+      "sock_throttled": 0
+    },
+    "memory_events_delta": {
+      "low": 0,
+      "high": 0,
+      "max": 0,
+      "oom": 0,
+      "oom_kill": 0,
+      "oom_group_kill": 0,
+      "sock_throttled": 0
+    },
+    "stdout": {
+      "sha256": "94bdeecc18b1466c7cce75622917fd2d771449bd7efe66c5139d4e066e6a67e8",
+      "bytes": 231
+    },
+    "stderr": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "outputs": {
+      "/home/b/Workspaces/holonics/.local/hnn-athena-foundation/canonical-integration-20261004/objects/Holonics/Geometry/FrameTransport.olean": {
+        "sha256": "a0d4a10af46478539b04e62a4981d8d5959773d1e6baef772e13b59060ca0252",
+        "bytes": 1411392
+      },
+      "/home/b/Workspaces/holonics/.local/hnn-athena-foundation/canonical-integration-20261004/objects/Holonics/Geometry/FrameTransport.ilean": {
+        "sha256": "8fa345c1d8b434e4962ef880222a6c348c710c0e1a5f26e7f7216fb78372f3b4",
+        "bytes": 97980
+      }
+    },
+    "all_outputs_present": true,
+    "inputs_unchanged": true,
+    "within_projection": true,
+    "sealed_before_audit": true
+  },
+  "measured_to_projected_ratio": [
+    6297434153,
+    17000000000
+  ],
+  "complete_import_scope": {
+    "module_count": 3944,
+    "present_parts_and_sources": 23671,
+    "absent_lookup_or_sidecar_paths": 68167,
+    "seal_sha256": "fbbddcae31a87dcea8ae4ad4d5551720cdf1acea5eb69d2a3d1676ce34fb07f9",
+    "preparation_wall_ns": 12779337307,
+    "preparation_fixed_outer_deadline_ns": 17000000000,
+    "preparation_peak_RSS_KiB": 704516,
+    "hash_reuse_assumptions": "The pinned RH catalog is immutable and its stored digests came from prior byte hashing. Cataloged files remain immutable through preparation and compiler execution; matching presence/size/mtime/ctime permits digest reuse, not a fresh byte read. Postcheck compares lstat/stat metadata and symlink targets without rehashing. This requires truthful filesystem metadata and no privileged or adversarial mutation that preserves/restores all checked stamps.",
+    "postcheck": {
+      "complete_import_parts_unchanged": true,
+      "module_count": 3944,
+      "present": 23671,
+      "absent": 68167,
+      "wall_ns": 995930613,
+      "CPU_count": 1,
+      "CPU_RLIMIT_ns": 17000000000,
+      "outer_wall_deadline_enforced": false,
+      "scope": "complete metadata postcheck finished; CPU1/AS4GiB/CPU17s enforced; no compiler invoked"
+    }
+  },
+  "raw_receipt_hashes": {
+    "input_seal": "f502a25fa9d1cd5941fe5146e85be53a5ae5609556c33e93a53eaa66fb136215",
+    "output_seal": "cda101758ffdb096895bf56b5b8fecf62dbdedfa501f471c9c75b7193f47d895",
+    "publication": "de3ff5442d78a8ed7d78742f5b741fa6fe6d135838e75b8057589fde78f9bee5",
+    "quiescence": "0d6dab63a8204bf395409bf337ee6ea9d1d8859a39440b5dbd7e1c6519244848",
+    "release": "64c21b6f5f4b732cfe3ef09b5404a9e2b66bf22ea521c6ffc05ff0fba4beb5b1"
+  },
+  "raw_stdout_sha256": "94bdeecc18b1466c7cce75622917fd2d771449bd7efe66c5139d4e066e6a67e8",
+  "raw_stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "raw_stderr_bytes": 0,
+  "lifecycle": {
+    "all_children_reaped": true,
+    "own_group_remaining_PIDs": [],
+    "lease_released_after_publication": true
+  },
+  "interpretation": "complete actual owner/consumer check in isolated snapshot using sealed cached dependencies; does not prove a native physical decoder, full moving-volume calculus or production restoration",
+  "warning_error_count": 0
+}

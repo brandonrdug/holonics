@@ -78,6 +78,38 @@ pub struct Against {
 }
 
 impl PendingRatio {
+    /// [definition; agent-inferred, October 4] The one arrived ratio's producing operands:
+    /// commit, anchor, SourceMoment copy, declaring phases and producing address/reader.
+    /// There is no saved material, word or face, and no sequence of prior comparisons.
+    pub(crate) fn write_saved(&self, s: &mut String) {
+        use crate::hnn::state_text::line;
+        line(s, "ratio-commit", [self.commit]);
+        line(s, "ratio-anchor", &self.anchor);
+        self.moment.write(s);
+        self.phases.write_saved(s);
+        self.address.write(s);
+    }
+
+    pub(crate) fn read_saved<'a>(
+        field: &Field,
+        prototype: &ActiveAddress,
+        next: crate::hnn::state_text::Next<'_, 'a>,
+    ) -> Result<Self, HnnError> {
+        use crate::hnn::state_text::{counted, keyed, values};
+        let commit: Vec<u64> = counted(next("the producing commit")?,
+            "ratio-commit", 1, "the producing commit")?;
+        let anchor: Vec<BigInt> = values(
+            &keyed(next("the producing anchor")?, "ratio-anchor", "the producing anchor")?,
+            "the producing anchor",
+        )?;
+        let current = Current::at(field, anchor)?;
+        let moment = SourceMoment::read(field, next("the producing moment")?, next)?;
+        let phases = ReceivingPhases::read_saved(field, next("the producing phases")?)?;
+        let address = prototype.truncated(phases.depth())?
+            .continued(next("the producing address")?, next)?;
+        Self::produce(&current, &moment, &address, &phases, commit[0])
+    }
+
     /// **Produce a pending ratio at the cut**: the lift point, a copy of the moment's counts, the
     /// receiver's first `D` letters of the active suffix address, the receiving phases and the
     /// commit. These are operands only. Refused when the address register is shallower than the

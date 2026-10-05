@@ -1246,3 +1246,200 @@ fn the_receiving_windows_are_the_epochs_of_the_cell_clock() {
         receiving_windows(7, phases.aperture()).unwrap()
     );
 }
+
+// The held reader is a producing operand, not a value recomputed from today's material.
+#[test]
+fn saved_contact_address_preserves_the_producing_site_kinds() {
+    use crate::hnn::receiving::{ActiveAddress, Feature, FeatureFamily, LetterReader};
+    use crate::navigator::trace::SiteKind;
+    let field = chain();
+    let current = crate::hnn::Current::at_rest(&field);
+    let family = FeatureFamily::new(vec![Feature::contact(&field, 0)]).unwrap();
+    let depth = field.receivers()[0].depth;
+    let mut reader = LetterReader::of(&field, family.clone(), &current).unwrap();
+    reader.hold_kinds(vec![SiteKind::Rotation; field.contacts().len()]).unwrap();
+    let original = ActiveAddress::of_reader(depth, reader);
+    let mut today = LetterReader::of(&field, family, &current).unwrap();
+    today.hold_kinds(vec![SiteKind::Boost; field.contacts().len()]).unwrap();
+    let prototype = ActiveAddress::of_reader(depth, today);
+    assert_ne!(original.phase(&[0], 1).unwrap(), prototype.phase(&[0], 1).unwrap(),
+        "the fixture must actually separate producing and contemporary letters");
+    let mut text = String::new();
+    original.write(&mut text);
+    let mut lines = text.lines();
+    let head = lines.next().unwrap();
+    let mut next = |what: &'static str| lines.next().ok_or(crate::hnn::HnnError::ContinuingState { what });
+    let restored = prototype.continued(head, &mut next).unwrap();
+    assert_eq!(restored, original);
+    assert_eq!(restored.phase(&[0], 1).unwrap(), original.phase(&[0], 1).unwrap());
+    assert!(lines.next().is_none());
+}
+
+// Recompute the outer checksum normally: refusal must come from the missing passage operands,
+// not from deliberately corrupting ContinuingState's checksum.
+#[test]
+fn cold_restore_refuses_unversioned_or_unknown_passages() {
+    use crate::hnn::constitution::ContinuingState;
+    use crate::hnn::reference::Reference;
+    let field = chain();
+    let reference = Reference::new(64, u64::MAX);
+    let current = crate::hnn::Current::at_rest(&field);
+    let source = field.sources()[0];
+    for payload in ["lift 0 0 0\n", "resident-passage 3\n"] {
+        let opening = crate::hnn::Constitution::initial(&field, u64::MAX).unwrap();
+        let state = opening.continuing_state(source).unwrap()
+            .with_passage(Some(payload.to_string()));
+        let checked = ContinuingState::from_text(&state.to_text()).unwrap();
+        assert!(matches!(
+            reference.mount_continued(&field, &current, opening, &checked),
+            Err(crate::hnn::HnnError::ContinuingState { .. })
+        ));
+    }
+}
+
+// Change an inner passage operand, then regenerate and verify the real outer checksum.
+// These fixtures must reach the native passage/moment reader, not fail checksum validation.
+fn cold_v3_changed_line(
+    state: &crate::hnn::constitution::ContinuingState,
+    prefix: &str,
+    replacement: &str,
+) -> crate::hnn::constitution::ContinuingState {
+    let mut changed = 0usize;
+    let lines: Vec<String> = state.passage().unwrap().lines().map(|line| {
+        if line.starts_with(prefix) {
+            changed += 1;
+            replacement.to_string()
+        } else {
+            line.to_string()
+        }
+    }).collect();
+    assert_eq!(changed, 1, "the fixture must change exactly its intended operand");
+    let changed = state.clone().with_passage(Some(lines.join("\n") + "\n"));
+    crate::hnn::constitution::ContinuingState::from_text(&changed.to_text()).unwrap()
+}
+
+fn cold_v3_initial_state(
+    field: &crate::hnn::Field,
+) -> (
+    crate::hnn::reference::Reference,
+    crate::hnn::port::MomentId,
+    crate::hnn::constitution::ContinuingState,
+) {
+    use crate::hnn::port::ExecutionPort;
+    let reference = crate::hnn::reference::Reference::new(64, u64::MAX);
+    let mut resident = reference.mount(field, &crate::hnn::Current::at_rest(field)).unwrap();
+    let (moment, ingested) = reference.ingest(
+        &mut resident, None, &crate::hnn::reference::one_hot(&[0]),
+    ).unwrap();
+    assert!(!ingested.forward.present().unwrap().carry_out);
+    let state = resident.continuing_state(field.sources()[0]).unwrap();
+    (reference, moment, state)
+}
+
+#[test]
+fn cold_restore_refuses_a_checksummed_exhausted_handle_counter() {
+    let field = chain();
+    let (reference, _, state) = cold_v3_initial_state(&field);
+    let invalid = cold_v3_changed_line(
+        &state, "handle-counter ", &format!("handle-counter {}", u64::MAX),
+    );
+    assert!(matches!(
+        reference.mount_continued(
+            &field, &crate::hnn::Current::at_rest(&field),
+            crate::hnn::Constitution::initial(&field, u64::MAX).unwrap(), &invalid,
+        ),
+        Err(crate::hnn::HnnError::ContinuingState {
+            what: "an exhausted resident handle counter",
+        })
+    ));
+}
+
+#[test]
+fn cold_restore_refuses_a_checksummed_cursor_at_nonempty_window_end() {
+    let field = chain();
+    let (reference, _, state) = cold_v3_initial_state(&field);
+    let reach = field.offsets().iter().copied().max().unwrap_or(0);
+    assert!(reach > 0);
+    let head = state.passage().unwrap().lines().find(|line| line.starts_with("moment ")).unwrap();
+    let mut words: Vec<String> = head.split_whitespace().map(str::to_string).collect();
+    assert_eq!(words.len(), 4);
+    words[2] = reach.to_string();
+    let invalid = cold_v3_changed_line(&state, "moment ", &words.join(" "));
+    assert!(matches!(
+        reference.mount_continued(
+            &field, &crate::hnn::Current::at_rest(&field),
+            crate::hnn::Constitution::initial(&field, u64::MAX).unwrap(), &invalid,
+        ),
+        Err(crate::hnn::HnnError::ContinuingState {
+            what: "the moment against the field's declaration",
+        })
+    ));
+}
+
+#[test]
+fn cold_restore_preserves_empty_window_zero_cursor_and_rejects_nonzero() {
+    use crate::hnn::port::ExecutionPort;
+    let field = super::learning::chain_of(1 << 16);
+    assert!(field.offsets().is_empty());
+    let (reference, moment, state) = cold_v3_initial_state(&field);
+    assert!(state.passage().unwrap().lines().any(|line| line == "window"));
+    let checked = crate::hnn::constitution::ContinuingState::from_text(&state.to_text()).unwrap();
+    let mut restored = reference.mount_continued(
+        &field, &crate::hnn::Current::at_rest(&field),
+        crate::hnn::Constitution::initial(&field, u64::MAX).unwrap(), &checked,
+    ).unwrap();
+    assert_eq!(restored.continuing_state(field.sources()[0]).unwrap(), checked);
+    let (_, ingested) = reference.ingest(
+        &mut restored, Some(&moment), &crate::hnn::reference::one_hot(&[0]),
+    ).unwrap();
+    assert_eq!(ingested.forward.present().unwrap().cells, 1,
+        "the valid empty-window state must execute its actual ingest consumer");
+    let head = state.passage().unwrap().lines().find(|line| line.starts_with("moment ")).unwrap();
+    let mut words: Vec<String> = head.split_whitespace().map(str::to_string).collect();
+    assert_eq!(words[2], "0");
+    words[2] = "1".to_string();
+    let invalid = cold_v3_changed_line(&state, "moment ", &words.join(" "));
+    assert!(matches!(
+        reference.mount_continued(
+            &field, &crate::hnn::Current::at_rest(&field),
+            crate::hnn::Constitution::initial(&field, u64::MAX).unwrap(), &invalid,
+        ),
+        Err(crate::hnn::HnnError::ContinuingState {
+            what: "the moment against the field's declaration",
+        })
+    ));
+}
+
+#[test]
+fn cold_restore_handle_exhaustion_is_typed_before_new_ingest_work() {
+    use crate::hnn::port::ExecutionPort;
+    let field = chain();
+    let (reference, _, state) = cold_v3_initial_state(&field);
+    let near_end = cold_v3_changed_line(
+        &state, "handle-counter ", &format!("handle-counter {}", u64::MAX - 1),
+    );
+    let mut restored = reference.mount_continued(
+        &field, &crate::hnn::Current::at_rest(&field),
+        crate::hnn::Constitution::initial(&field, u64::MAX).unwrap(), &near_end,
+    ).unwrap();
+    // Allocate the last identifier without advancing the clock, so the next call is
+    // admitted to ingest and cannot be intercepted by the carry-out boundary.
+    let (last, _) = reference.ingest(
+        &mut restored, None, &crate::hnn::reference::one_hot(&[]),
+    ).unwrap();
+    assert_eq!(last.0, u64::MAX);
+    let (_, before_current, before_handles) = reference.read(&restored).unwrap();
+    let before_address = restored.address().clone();
+    let before_material = restored.constitution().clone();
+    let before_balance = restored.ledger().balance().clone();
+    assert!(matches!(
+        reference.ingest(&mut restored, None, &crate::hnn::reference::one_hot(&[0])),
+        Err(crate::hnn::HnnError::HandleCounterExhausted)
+    ));
+    let (_, after_current, after_handles) = reference.read(&restored).unwrap();
+    assert_eq!(after_current, before_current);
+    assert_eq!(after_handles, before_handles);
+    assert_eq!(restored.address(), &before_address);
+    assert_eq!(restored.constitution(), &before_material);
+    assert_eq!(restored.ledger().balance(), &before_balance);
+}

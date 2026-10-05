@@ -1,0 +1,108 @@
+{
+  "status": "accepted complete isolated module; five new derivative/consumer lemmas",
+  "source": "TubeSectionDerivative03.lean",
+  "source_sha256": "0af342373beaff8bd637c23803180897b14a758e408beb4f76968b0967bdb66d",
+  "axiom_audits": {
+    "Holonics.Geometry.FrameTransport.tube_section_hasFDerivAt": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "Holonics.Geometry.FrameTransport.tube_section_fderiv_first": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "Holonics.Geometry.FrameTransport.tube_section_fderiv_second": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "Holonics.Geometry.FrameTransport.tube_section_actual_area": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "Holonics.Geometry.FrameTransport.tube_section_actual_flux": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ]
+  },
+  "warnings_errors_sorry": false,
+  "complete_import_parts_unchanged_after_execution": true,
+  "module_count": 3946,
+  "seal_sha256": "59c8ab8e2a2dc2d1c3659f1d7f00c3e9d6a57486d4099d354b3acdabb958ebbf",
+  "compiler_output": {
+    "exit": 0,
+    "wall_ns": 1963430300,
+    "CPU_count": 1,
+    "CPU_affinity": [
+      0
+    ],
+    "CPU_user_us": 1490855,
+    "CPU_system_us": 421770,
+    "CPU_reading_grain_ns": 1000,
+    "timing_source": "monotonic_ns wall; glibc wait4 integer timeval CPU",
+    "peak_child_RSS_KiB": 2935304,
+    "cap_ns": 17000000000,
+    "projection_ns": 17000000000,
+    "projection_kill_triggered": false,
+    "system_floor_breached": false,
+    "system_floor_sampling_period_ns": 10000000,
+    "group_memory_max_bytes": 4294967296,
+    "group_memory_peak_bytes": 419958784,
+    "group_memory_current_bytes": 92336128,
+    "memory_events_after": {
+      "low": 0,
+      "high": 0,
+      "max": 0,
+      "oom": 0,
+      "oom_kill": 0,
+      "oom_group_kill": 0,
+      "sock_throttled": 0
+    },
+    "memory_events_delta": {
+      "low": 0,
+      "high": 0,
+      "max": 0,
+      "oom": 0,
+      "oom_kill": 0,
+      "oom_group_kill": 0,
+      "sock_throttled": 0
+    },
+    "stdout": {
+      "sha256": "526fe37bca62f7af3e06fb00f5e96fcdc1862a7620c2a64920d5aa2fe2f72d5b",
+      "bytes": 598
+    },
+    "stderr": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "outputs": {
+      "/home/b/Workspaces/holonics/.local/hnn-athena-foundation/lean-geometric-runner/TubeSectionDerivative03.olean": {
+        "sha256": "1340a55bb7ed2a8560cdbc3d45fbbd31a27803c03405c9f8aebac519d9a845a4",
+        "bytes": 325960
+      },
+      "/home/b/Workspaces/holonics/.local/hnn-athena-foundation/lean-geometric-runner/TubeSectionDerivative03.ilean": {
+        "sha256": "f24a03330310c5eb7028c9bd3ab07fe92ee206ac7848aed11c01a8437421ea44",
+        "bytes": 14978
+      }
+    },
+    "all_outputs_present": true,
+    "inputs_unchanged": true,
+    "within_projection": true,
+    "sealed_before_audit": true
+  },
+  "lifecycle": {
+    "released_after_publication": true,
+    "child_reaped": true,
+    "own_group_other_PIDs": [],
+    "monotonic_ns": 118905433240897
+  },
+  "limits_unchanged": true,
+  "source_owner_integration": "proposed, canonical sources unchanged",
+  "scope": "actual fixed-spine-position polynomial section HasFDerivAt, two coordinate columns, actual area and actual current pairing; no longitudinal derivative, global regularity/embedding, full3D Piola, continuum balance or native physical decoder",
+  "memory_interpretation": "child RSS and cgroup charged pages are separate readings; inherited generic runner strictness wording is not a claim that charged pages bound all RSS",
+  "postcheck_wall_ns": 873716381
+}

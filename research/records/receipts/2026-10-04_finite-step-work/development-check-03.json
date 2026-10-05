@@ -1,0 +1,87 @@
+{
+  "status": "incomplete; affine proof elaboration failed; no result object",
+  "submitted_source": "FiniteEndpointWork-submitted-03.lean",
+  "submitted_source_sha256": "05f321050cdb7df338c944396db16b9d0f6c123a2e6a31714497b022d8d24322",
+  "raw_diagnostic": "compiler-03.log",
+  "prior_startup_failure": "startup-02.log",
+  "compiler_sha256": "e8baaa71855a616dc351028f3ad2200051b0671f423a1696a100e809302d5550",
+  "lean_version": "4.33.0",
+  "mathlib_revision": "db584cd6d46c92f209a44c0f1c829460d327499d",
+  "complete_import_seal_sha256": "6fc1d95c190b2013d9358e23ead8608930660302a53260ba5e25faeeb78bd4b6",
+  "controlled_configuration_keys_changed": [
+    "label",
+    "address_space_max_bytes"
+  ],
+  "prior_RLIMIT_AS_bytes": 4294967296,
+  "corrected_RLIMIT_AS": -1,
+  "unchanged_limits": {
+    "group_memory_max_bytes": 4294967296,
+    "minimum_MemAvailable_KiB": 8388608,
+    "system_floor_MemAvailable_KiB": 4194304,
+    "projection_ns": 17000000000
+  },
+  "output_seal": {
+    "exit": 1,
+    "wall_ns": 1470217973,
+    "CPU_count": 1,
+    "CPU_affinity": [
+      0
+    ],
+    "CPU_user_us": 1004053,
+    "CPU_system_us": 387416,
+    "CPU_reading_grain_ns": 1000,
+    "timing_source": "monotonic_ns wall; glibc wait4 integer timeval CPU",
+    "peak_child_RSS_KiB": 1782752,
+    "cap_ns": 17000000000,
+    "projection_ns": 17000000000,
+    "projection_kill_triggered": false,
+    "system_floor_breached": false,
+    "system_floor_sampling_period_ns": 10000000,
+    "group_memory_max_bytes": 4294967296,
+    "group_memory_peak_bytes": 2612985856,
+    "group_memory_current_bytes": 2421047296,
+    "memory_events_after": {
+      "low": 0,
+      "high": 0,
+      "max": 0,
+      "oom": 0,
+      "oom_kill": 0,
+      "oom_group_kill": 0,
+      "sock_throttled": 0
+    },
+    "memory_events_delta": {
+      "low": 0,
+      "high": 0,
+      "max": 0,
+      "oom": 0,
+      "oom_kill": 0,
+      "oom_group_kill": 0,
+      "sock_throttled": 0
+    },
+    "stdout": {
+      "sha256": "068870e640af0d4bfd0f64064de1d8a1623b47699d74efc7dc31a5d5dbace390",
+      "bytes": 827
+    },
+    "stderr": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "outputs": {},
+    "all_outputs_present": false,
+    "inputs_unchanged": true,
+    "within_projection": false,
+    "sealed_before_audit": true
+  },
+  "lifecycle": {
+    "released_after_publication": true,
+    "child_reaped": true,
+    "own_group_other_PIDs": [],
+    "monotonic_ns": 113922645258956
+  },
+  "formal_result": "finite_work_form_rechart clean axiom list in a failed module; affine_quadratic_work failed hT rewrite and emitted sorryAx; not acceptance",
+  "proposed_repair": "Explicit left-operand calc, source-only. No further compiler admission.",
+  "submitted_input_seal_sha256": "902db4cee8261fa6e81905a3d577721d7295dbdde71ddf51d4f439b96b2026c2",
+  "private_proof_contents_included": false,
+  "measured_wall_to_projected": "1470217973/17000000000",
+  "measured_cpu_to_cap": "1391469/17000000"
+}
