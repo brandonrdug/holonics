@@ -324,3 +324,28 @@ threads.
   material identity confirm).
 - The acceptance of §0 holds on validation: 64 whole sections against 0 for both openings, every
   station by the consumer equation.
+
+## The final confirmation, read once (October 5)
+
+[measured] After this record's law merged (`c387b6bf`, #360), the pinned final confirmation
+(order-2, seed `2_026_093_033`, 128 requests × 8 stations; THE_REBUILD U6 step 1's acceptance,
+pinned September 30 in the two counts' pin record §3) was read once at that build, by the
+coordinator, with no law, state or declaration changed after the validation read. The states are
+lane B's, unchanged.
+
+| State | Whole sections | Stations right | Adjacent stations equal |
+|---|---|---|---|
+| keys on the founded opening | 128 of 128 | 1,024 of 1,024 | 214 of 896 (the targets' own count) |
+| keys on the lossless opening | 128 of 128 | 1,024 of 1,024 | 214 of 896 |
+| lossless opening | 0 (every section held: no lock certified) | none released | — |
+| founded opening | 0 | 189 of 904 released | 151 |
+
+Step 1's acceptance holds: on the final confirmation, order-2 with its located key releases strictly
+more whole sections (128) than both openings (0 and 0). `n*_machine` is lane B's 16 observations
+against `n*_terrain = 7`. The alternation and the line are not yet read with located keys; they
+stay the regressions owed beside it.
+
+Time: projected `579,608 ms` (twice the validation read's upper bound), deadline `726,000 ms`,
+measured `406,985 ms` (ratio `406985/579608`), 12 threads; the peak resident set was not read (the
+systemd scope's report was suppressed). Receipt: `final/final_order2_sections.txt` (every section
+whole with its locks; synthetic ℤ/4 terrain).
