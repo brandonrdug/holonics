@@ -1,0 +1,30 @@
+members_order2_2026093042.txt
+  least: wrong {'copy': 0, 'other': 0}, narrowest target/runner-up among right 1 rem 7349/12642
+  joint: wrong {'copy': 32, 'other': 0}, narrowest target/runner-up among right 1 rem 4692049/6723075
+  energy: wrong {'copy': 16, 'other': 0}, narrowest target/runner-up among right 1 rem 108624637991525/710232007327558
+  product: wrong {'copy': 0, 'other': 0}, narrowest target/runner-up among right 20 rem 35334315592666417/60890276604727570
+members_order2_2026093043.txt
+  least: wrong {'copy': 0, 'other': 0}, narrowest target/runner-up among right 1 rem 7349/12642
+  joint: wrong {'copy': 32, 'other': 0}, narrowest target/runner-up among right 1 rem 4692049/6723075
+  energy: wrong {'copy': 16, 'other': 0}, narrowest target/runner-up among right 1 rem 108624637991525/710232007327558
+  product: wrong {'copy': 0, 'other': 0}, narrowest target/runner-up among right 20 rem 35334315592666417/60890276604727570
+members_alternation_2026093042.txt
+  least: wrong {'copy': 0, 'other': 44}, narrowest target/runner-up among right 1 rem 31/39
+  joint: wrong {'copy': 0, 'other': 0}, narrowest target/runner-up among right 60 rem 2027748/2481737
+  energy: wrong {'copy': 0, 'other': 0}, narrowest target/runner-up among right 4588 rem 150764175520/585863833669
+  product: wrong {'copy': 0, 'other': 0}, narrowest target/runner-up among right 1720132 rem 174675122452/791264616395
+members_alternation_2026093043.txt
+  least: wrong {'copy': 0, 'other': 60}, narrowest target/runner-up among right 1 rem 31/39
+  joint: wrong {'copy': 0, 'other': 0}, narrowest target/runner-up among right 60 rem 2027748/2481737
+  energy: wrong {'copy': 0, 'other': 0}, narrowest target/runner-up among right 4588 rem 150764175520/585863833669
+  product: wrong {'copy': 0, 'other': 0}, narrowest target/runner-up among right 1720132 rem 174675122452/791264616395
+members_line_2026093042.txt
+  least: wrong {'copy': 0, 'other': 0}, narrowest target/runner-up among right 2 rem 1302/4579
+  joint: wrong {'copy': 0, 'other': 0}, narrowest target/runner-up among right 1 rem 3118603/6772553
+  energy: wrong {'copy': 0, 'other': 0}, narrowest target/runner-up among right 3 rem 140743883189735/149350006458083
+  product: wrong {'copy': 0, 'other': 0}, narrowest target/runner-up among right 53 rem 21640212604426129303/169159793486985903589
+members_line_2026093043.txt
+  least: wrong {'copy': 0, 'other': 0}, narrowest target/runner-up among right 2 rem 1302/4579
+  joint: wrong {'copy': 0, 'other': 0}, narrowest target/runner-up among right 1 rem 3118603/6772553
+  energy: wrong {'copy': 0, 'other': 0}, narrowest target/runner-up among right 3 rem 140743883189735/149350006458083
+  product: wrong {'copy': 0, 'other': 0}, narrowest target/runner-up among right 53 rem 21640212604426129303/169159793486985903589

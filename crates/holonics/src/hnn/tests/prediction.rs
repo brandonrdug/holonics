@@ -1511,9 +1511,10 @@ fn sixty_field() -> Field {
 /// request's last two cells, then the section's own locks), every lock certified on all four
 /// members with every executed tick closed; the first refinement locks only among stations 0 and 1
 /// (the only stations a closed contact joins to a placed crossing). The declared opening closes no
-/// contact, so it reads the span's law (`the_bank_generates_by_its_certified_locks`). [measured, the
-/// record's §5] On a ring of period 16 the bank's growths sit near one and the least member does not
-/// separate the fit from the antecedent's copy; the law is read here in the harness's regime.
+/// contact, so it reads the span's law (`the_bank_generates_by_its_certified_locks`). [measured, lane
+/// C's record §5.4] On a ring of period 16 the bank's growths sit near one, and lane C's least member
+/// did not separate the fit from the antecedent's copy there; the law is read here in the harness's
+/// regime.
 #[test]
 fn the_release_reads_the_located_pair_and_its_consumer_holds() {
     use crate::hnn::constitution::CAMPAIGN_ONE_BUDGET;
@@ -1542,6 +1543,106 @@ fn the_release_reads_the_located_pair_and_its_consumer_holds() {
     }
     let opening = Constitution::initial(&field, CAMPAIGN_ONE_BUDGET).unwrap();
     assert!(crate::hnn::prediction::closed_pairs(&field, &opening, 0).unwrap().is_empty());
+}
+
+/// [implemented-exact; proved-derived, the joint gain's record §3] **The gain on equal material is
+/// the joined bank's determinant over its members** (`prediction::gain`): the product of the
+/// members' ratios, enclosed exactly (`[∏ L_pair/U_alone, ∏ U_pair/L_alone]`); joining two banks
+/// multiplies their gains (the direct sum's `log det` is the sum, the loss law's additive chart);
+/// a neutral member (its two storages turning alike) leaves the gain unchanged, where the least
+/// member it would join is capped at one by it; refused, typed, on a reading alone whose lower end
+/// is not positive and on two readings of different banks.
+#[test]
+fn the_pair_gain_is_the_joined_banks_determinant_and_a_neutral_member_does_not_move_it() {
+    use crate::hnn::HnnError;
+    use crate::hnn::prediction::gain;
+    use crate::hnn::ring::{Growth, TurnReading};
+    let growth = |lower: Rat, upper: Rat| Growth { lower, upper };
+    let reading = |members: Vec<Growth>| TurnReading {
+        joint: members
+            .iter()
+            .max_by(|a, b| a.upper.cmp(&b.upper))
+            .cloned()
+            .unwrap(),
+        members,
+    };
+    let exact = |x: Rat| growth(x.clone(), x);
+    // Two members, exact: Γ = (3/1)·(10/5) = 6.
+    let pair = reading(vec![exact(integer(3)), exact(integer(10))]);
+    let alone = reading(vec![exact(integer(1)), exact(integer(5))]);
+    assert_eq!(gain(&pair, &alone).unwrap(), exact(integer(6)));
+    // Enclosures: [1, 2] over [1/2, 1] is [1, 4]; with the exact member, [3, 12].
+    let pair_wide = reading(vec![growth(integer(1), integer(2))]);
+    let alone_wide = reading(vec![growth(rat(1, 2), integer(1))]);
+    assert_eq!(gain(&pair_wide, &alone_wide).unwrap(), growth(integer(1), integer(4)));
+    let joined = |a: &TurnReading, b: &TurnReading| {
+        reading(a.members.iter().chain(&b.members).cloned().collect())
+    };
+    let (pair_joined, alone_joined) = (joined(&pair, &pair_wide), joined(&alone, &alone_wide));
+    let product = gain(&pair_joined, &alone_joined).unwrap();
+    assert_eq!(product, growth(integer(6), integer(24)));
+    // A neutral member: its two storages read alike, so it moves nothing; the least member's ratio
+    // over the same three members would be capped at one by it.
+    let neutral = reading(vec![growth(rat(5, 16), rat(6, 16))]);
+    let quiet = reading(vec![growth(rat(5, 16), rat(5, 16))]);
+    let exact_neutral = reading(vec![exact(rat(5, 16))]);
+    assert_eq!(
+        gain(&joined(&pair, &exact_neutral), &joined(&alone, &exact_neutral)).unwrap(),
+        exact(integer(6))
+    );
+    let widened = gain(&joined(&pair, &neutral), &joined(&alone, &quiet)).unwrap();
+    assert_eq!(widened, growth(integer(6), integer(6) * rat(6, 5)));
+    // Refusals: a reading alone at zero, and two banks of different membership.
+    let silent = reading(vec![growth(Rat::zero(), rat(1, 16)), exact(integer(5))]);
+    assert!(matches!(gain(&pair, &silent), Err(HnnError::NonpositiveDeclaration)));
+    assert!(matches!(gain(&pair, &alone_wide), Err(HnnError::NonpositiveDeclaration)));
+}
+
+/// [implemented-exact; the consumer equation] **The release reads a located map that fixes its
+/// antecedent** (`prediction::generate_by_bank`, the gain read by the joined bank): on the ring of
+/// the harness's period 60 with the identity deposited at `δ = 2` (the alternation's key, every
+/// column `(E − B) e_x = P^2 B e_x`), each drawn request's six stations are released whole at width
+/// zero, each released class its antecedent's (`x_t = x_(t−2)`: the request's last two cells
+/// continued), every lock certified on all four members. [measured, the joint gain's record §4]
+/// Under lane C's least member this test fails (seed 41: station 0 is not its antecedent): on the
+/// members where `P^2` half-turns the contact's line every candidate's two storages vanish in the
+/// first-order chart, and the least member read what remained (the regressions' record §5, §8).
+#[test]
+fn the_release_reads_a_located_map_that_fixes_its_antecedent() {
+    use crate::hnn::constitution::CAMPAIGN_ONE_BUDGET;
+    let field = sixty_field();
+    let opening = Constitution::initial(&field, CAMPAIGN_ONE_BUDGET).unwrap();
+    let prior = opening.source_port(0).unwrap().clone();
+    let identity = crate::hnn::keys::LocatedPair {
+        offset: 2,
+        map: (0..4).map(|class| (class, class)).collect(),
+        cycle: 1,
+        turns: vec![0],
+    };
+    let theta = crate::hnn::executed::pair_deposit(&field, &opening, &prior, 0, &identity)
+        .unwrap()
+        .0;
+    assert_eq!(crate::hnn::prediction::closed_pairs(&field, &theta, 0).unwrap(), vec![2]);
+    let bank = super::executed::declared_bank();
+    let refinement = Refinement::declare(&field, 0, 2, 1, 6, 4).unwrap();
+    for seed in [41u64, 42] {
+        let (current, moment, cells) = symbols_request(&field, seed, 8);
+        let generated =
+            generate_by_bank(&field, &theta, &current, &moment, &refinement, &bank, 12).unwrap();
+        assert_eq!(generated.contacts, vec![2]);
+        assert!(generated.release.released(), "seed {seed}: {:?}", generated.release);
+        assert!(generated.release.width.is_zero());
+        let mut passage = cells.clone();
+        passage.extend(&generated.release.classes);
+        for t in 0..6 {
+            let at = cells.len() + t;
+            assert_eq!(passage[at], passage[at - 2], "seed {seed}, station {t}");
+        }
+        let locked: usize = generated.locks.iter().map(Vec::len).sum();
+        assert_eq!(generated.members, 4 * locked);
+        assert_eq!(generated.certified, generated.members);
+        assert_eq!(generated.ticks_closed, generated.ticks);
+    }
 }
 
 /// [implemented-exact] **The executed comparison refuses a material holding a pair contact closed**

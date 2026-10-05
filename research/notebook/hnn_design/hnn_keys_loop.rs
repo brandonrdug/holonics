@@ -268,10 +268,13 @@ pub(super) fn keys_probe(terrain: &str, seed: u64, count: usize, scale: &str, ou
 /// the target's trajectory (each station's target placed once the station is read, the forced
 /// release's reading context, never a commit), every candidate's pair storage and its own column
 /// alone (`BankPlacement::pair_storage`), read by every member of the bank, each member's growth's
-/// lower end at the grain `1/16`, and the candidate's gain on equal material (the least member's
-/// ratio). It reads why the least member decides: a candidate that fits the closed contact gains at
-/// every member, the antecedent's copy only at the members where the contact's distance carries
-/// its line to itself.
+/// lower end at the grain `1/16`, and the candidate's gain on equal material (`prediction::gain`,
+/// the joined bank's determinant over the members, its lower end at the grain `1/16`; the joint
+/// gain's record, `2026-10-05_THE_PAIR_GAIN_IS_THE_JOINED_BANKS_LOG_DETERMINANT.md`). It reads why
+/// the members decide together: a candidate that fits the closed contact gains at every member
+/// where its storage carries the contact's line, the antecedent's copy as a wrong class pays on the
+/// members where the contact's distance half-turns its line what it gains on the others, and a
+/// member at which every candidate's two storages turn alike is neutral.
 pub(super) fn pair_members(terrain: &str, seed: u64, count: usize, state: &str) {
     use holonics::hnn::prediction::BankPlacement;
     use holonics::hnn::ring::turn;
@@ -298,18 +301,12 @@ pub(super) fn pair_members(terrain: &str, seed: u64, count: usize, state: &str) 
                     Some((pair, alone)) => {
                         let pair = bank.read_turn(&turn(&pair), BANK_GRAIN).expect("a reading");
                         let alone = bank.read_turn(&turn(&alone), BANK_GRAIN).expect("a reading");
-                        let least = pair
-                            .members
-                            .iter()
-                            .zip(&alone.members)
-                            .map(|(p, a)| &p.lower / &a.upper)
-                            .min()
-                            .expect("a member");
+                        let joint = holonics::hnn::prediction::gain(&pair, &alone).expect("a gain");
                         println!(
-                            "    class {class}: pair {:?} alone {:?} least ratio ≥ {}",
+                            "    class {class}: pair {:?} alone {:?} joint gain ≥ {}",
                             pair.members.iter().map(|m| at(&m.lower)).collect::<Vec<_>>(),
                             alone.members.iter().map(|m| at(&m.lower)).collect::<Vec<_>>(),
-                            at(&least)
+                            at(&joint.lower)
                         );
                     }
                     None => println!("    class {class}: no closed contact joins a placed crossing"),
