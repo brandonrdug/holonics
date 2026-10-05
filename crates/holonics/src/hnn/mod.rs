@@ -189,7 +189,8 @@ pub use reference::{Cut, Exposure, Reference, Resident};
 pub use retention::AeonBoundary;
 pub use ring::{Floquet, FloquetReading, PumpDeclaration, PumpSchedule, ResonatorMaterial};
 pub use word::{
-    Absorption, ChainedBalance, ReceptionCarry, Released, ResonatorBalance, Word, WordOpening,
+    Absorption, ChainedBalance, ReceptionCarry, Released, ResonatorBalance, SourceOpeningReceipt,
+    Word, WordOpening,
 };
 
 #[cfg(test)]

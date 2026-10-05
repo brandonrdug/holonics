@@ -103,7 +103,7 @@ use crate::geometry::swing::half_turn;
 use crate::hnn::HnnError;
 use crate::hnn::chart::{ChartKey, ChartReading, ChartWords, Charts, WordLattice, refine};
 use crate::hnn::constitution::Lattice;
-use crate::hnn::field::{ConstitutionRead, Current, End, Field};
+use crate::hnn::field::{Current, End, Field, FieldMaterial};
 use crate::hnn::realization::{entries, indexed};
 use crate::hnn::ring::ResonatorOperands;
 #[cfg(test)]
@@ -806,7 +806,7 @@ pub struct Operands {
 /// They read no lift point; the contacts' conductances do.
 pub fn ring_operands(
     field: &Field,
-    constitution: &impl ConstitutionRead,
+    constitution: &dyn FieldMaterial,
     index: usize,
 ) -> Result<RingOperands, HnnError> {
     ring_operands_on(field, constitution, index, None)
@@ -814,7 +814,7 @@ pub fn ring_operands(
 
 fn ring_operands_on(
     field: &Field,
-    constitution: &impl ConstitutionRead,
+    constitution: &dyn FieldMaterial,
     index: usize,
     lattice: Option<(&WordLattice, Option<&ChartWords>)>,
 ) -> Result<RingOperands, HnnError> {
@@ -879,7 +879,7 @@ impl Operands {
     /// law, every solve exact.
     pub fn at_cut(
         field: &Field,
-        constitution: &impl ConstitutionRead,
+        constitution: &dyn FieldMaterial,
         current: &Current,
     ) -> Result<Self, HnnError> {
         Self::at_cut_charted(field, constitution, current, &mut Charts::new())
@@ -889,7 +889,7 @@ impl Operands {
     /// chart its key last left, and the refined charts replace them.
     pub fn at_cut_charted(
         field: &Field,
-        constitution: &impl ConstitutionRead,
+        constitution: &dyn FieldMaterial,
         current: &Current,
         charts: &mut Charts,
     ) -> Result<Self, HnnError> {
@@ -918,7 +918,7 @@ impl Operands {
     /// against).
     pub fn exact_at_cut(
         field: &Field,
-        constitution: &impl ConstitutionRead,
+        constitution: &dyn FieldMaterial,
         current: &Current,
     ) -> Result<Self, HnnError> {
         Self::build(field, constitution, current, None, &Charts::new())
@@ -926,7 +926,7 @@ impl Operands {
 
     fn build(
         field: &Field,
-        constitution: &impl ConstitutionRead,
+        constitution: &dyn FieldMaterial,
         current: &Current,
         lattice: Option<WordLattice>,
         charts: &Charts,

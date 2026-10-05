@@ -1,0 +1,665 @@
+[
+  {
+    "label": "source-entrance-check-v1",
+    "argv": [
+      "/usr/bin/env",
+      "-u",
+      "RUSTC_WRAPPER",
+      "-u",
+      "RUSTC_WORKSPACE_WRAPPER",
+      "CARGO_TARGET_DIR=<worktree>/target",
+      "RUSTC=<stable-toolchain>/bin/rustc",
+      "RUSTDOC=<stable-toolchain>/bin/rustdoc",
+      "RUSTFLAGS=",
+      "CARGO_ENCODED_RUSTFLAGS=",
+      "RUSTDOCFLAGS=",
+      "RAYON_NUM_THREADS=1",
+      "CARGO_BUILD_JOBS=1",
+      "<stable-toolchain>/bin/cargo",
+      "check",
+      "--offline",
+      "--locked",
+      "-p",
+      "holonics",
+      "--test",
+      "source_entrance",
+      "--jobs",
+      "1",
+      "--message-format=json"
+    ],
+    "working_directory": "<worktree>",
+    "source_directories": [
+      "<worktree>/crates/holonics/src"
+    ],
+    "config_digest": {
+      "sha256": "c7203d6110c8932cdffc25e0af84501868fbe06e4457abaa289ed4093742c280",
+      "bytes": 114203
+    },
+    "note": "Commands were executed only through the independently reviewed bounded controller; placeholders normalize machine paths for public receipts."
+  },
+  {
+    "label": "source-entrance-build-v1",
+    "argv": [
+      "/usr/bin/env",
+      "-u",
+      "RUSTC_WRAPPER",
+      "-u",
+      "RUSTC_WORKSPACE_WRAPPER",
+      "CARGO_TARGET_DIR=<worktree>/target",
+      "RUSTC=<stable-toolchain>/bin/rustc",
+      "RUSTDOC=<stable-toolchain>/bin/rustdoc",
+      "RUSTFLAGS=",
+      "CARGO_ENCODED_RUSTFLAGS=",
+      "RUSTDOCFLAGS=",
+      "RAYON_NUM_THREADS=1",
+      "CARGO_BUILD_JOBS=1",
+      "<stable-toolchain>/bin/cargo",
+      "test",
+      "--offline",
+      "--locked",
+      "-p",
+      "holonics",
+      "--test",
+      "source_entrance",
+      "--no-run",
+      "--jobs",
+      "1",
+      "--message-format=json",
+      "--config",
+      "profile.dev.package.holonics.debug=0",
+      "--config",
+      "profile.test.package.holonics.debug=0"
+    ],
+    "working_directory": "<worktree>",
+    "source_directories": [
+      "<worktree>/crates/holonics/src"
+    ],
+    "config_digest": {
+      "sha256": "bf3b031fa1dc3e258a0dc68213e0490dd336b02c1dd97c90ff9275317f7722ec",
+      "bytes": 114402
+    },
+    "note": "Commands were executed only through the independently reviewed bounded controller; placeholders normalize machine paths for public receipts."
+  },
+  {
+    "label": "source-entrance-build-v2",
+    "argv": [
+      "/usr/bin/env",
+      "-u",
+      "RUSTC_WRAPPER",
+      "-u",
+      "RUSTC_WORKSPACE_WRAPPER",
+      "CARGO_TARGET_DIR=<worktree>/target",
+      "RUSTC=<stable-toolchain>/bin/rustc",
+      "RUSTDOC=<stable-toolchain>/bin/rustdoc",
+      "RUSTFLAGS=",
+      "CARGO_ENCODED_RUSTFLAGS=",
+      "RUSTDOCFLAGS=",
+      "RAYON_NUM_THREADS=1",
+      "CARGO_BUILD_JOBS=1",
+      "CARGO_INCREMENTAL=0",
+      "<stable-toolchain>/bin/cargo",
+      "test",
+      "--offline",
+      "--locked",
+      "-p",
+      "holonics",
+      "--test",
+      "source_entrance",
+      "--no-run",
+      "--jobs",
+      "1",
+      "--message-format=json",
+      "--config",
+      "profile.dev.package.holonics.debug=0",
+      "--config",
+      "profile.test.package.holonics.debug=0",
+      "--config",
+      "profile.dev.package.holonics.codegen-units=16",
+      "--config",
+      "profile.test.package.holonics.codegen-units=16"
+    ],
+    "working_directory": "<worktree>",
+    "source_directories": [
+      "<worktree>/crates/holonics/src"
+    ],
+    "config_digest": {
+      "sha256": "48c674975920f816a7a0d37c9cef36d14d0c642111a67c430d285309bc73da1c",
+      "bytes": 114619
+    },
+    "note": "Commands were executed only through the independently reviewed bounded controller; placeholders normalize machine paths for public receipts."
+  },
+  {
+    "label": "source-entrance-check-v2",
+    "argv": [
+      "/usr/bin/env",
+      "-u",
+      "RUSTC_WRAPPER",
+      "-u",
+      "RUSTC_WORKSPACE_WRAPPER",
+      "CARGO_TARGET_DIR=<worktree>/target",
+      "RUSTC=<stable-toolchain>/bin/rustc",
+      "RUSTDOC=<stable-toolchain>/bin/rustdoc",
+      "RUSTFLAGS=",
+      "CARGO_ENCODED_RUSTFLAGS=",
+      "RUSTDOCFLAGS=",
+      "RAYON_NUM_THREADS=1",
+      "CARGO_BUILD_JOBS=1",
+      "CARGO_INCREMENTAL=0",
+      "<stable-toolchain>/bin/cargo",
+      "check",
+      "--offline",
+      "--locked",
+      "-p",
+      "holonics",
+      "--test",
+      "source_entrance",
+      "--jobs",
+      "1",
+      "--message-format=json",
+      "--config",
+      "profile.dev.package.holonics.debug=0",
+      "--config",
+      "profile.test.package.holonics.debug=0",
+      "--config",
+      "profile.dev.package.holonics.codegen-units=16",
+      "--config",
+      "profile.test.package.holonics.codegen-units=16"
+    ],
+    "working_directory": "<worktree>",
+    "source_directories": [
+      "<worktree>/crates/holonics/src"
+    ],
+    "config_digest": {
+      "sha256": "296ae9545db48268a0e5d22525c1cc7b7bb8de77a854e96b9a0ef492b4bf2b16",
+      "bytes": 114527
+    },
+    "note": "Commands were executed only through the independently reviewed bounded controller; placeholders normalize machine paths for public receipts."
+  },
+  {
+    "label": "source-entrance-build-v3",
+    "argv": [
+      "/usr/bin/env",
+      "-u",
+      "RUSTC_WRAPPER",
+      "-u",
+      "RUSTC_WORKSPACE_WRAPPER",
+      "CARGO_TARGET_DIR=<worktree>/target",
+      "RUSTC=<stable-toolchain>/bin/rustc",
+      "RUSTDOC=<stable-toolchain>/bin/rustdoc",
+      "RUSTFLAGS=",
+      "CARGO_ENCODED_RUSTFLAGS=",
+      "RUSTDOCFLAGS=",
+      "RAYON_NUM_THREADS=1",
+      "CARGO_BUILD_JOBS=1",
+      "CARGO_INCREMENTAL=0",
+      "<stable-toolchain>/bin/cargo",
+      "test",
+      "--no-run",
+      "--offline",
+      "--locked",
+      "-p",
+      "holonics",
+      "--test",
+      "source_entrance",
+      "--jobs",
+      "1",
+      "--message-format=json",
+      "--config",
+      "profile.dev.package.holonics.debug=0",
+      "--config",
+      "profile.test.package.holonics.debug=0",
+      "--config",
+      "profile.dev.package.holonics.codegen-units=16",
+      "--config",
+      "profile.test.package.holonics.codegen-units=16"
+    ],
+    "working_directory": "<worktree>",
+    "source_directories": [
+      "<worktree>/crates/holonics/src"
+    ],
+    "config_digest": {
+      "sha256": "584cc0be8183a9a003473afefb2cecf6d0af41e34e82e222678ed714ba982faa",
+      "bytes": 114551
+    },
+    "note": "Commands were executed only through the independently reviewed bounded controller; placeholders normalize machine paths for public receipts."
+  },
+  {
+    "label": "source-entrance-build-v4",
+    "argv": [
+      "/usr/bin/env",
+      "-u",
+      "RUSTC_WRAPPER",
+      "-u",
+      "RUSTC_WORKSPACE_WRAPPER",
+      "CARGO_TARGET_DIR=<worktree>/target",
+      "RUSTC=<stable-toolchain>/bin/rustc",
+      "RUSTDOC=<stable-toolchain>/bin/rustdoc",
+      "RUSTFLAGS=",
+      "CARGO_ENCODED_RUSTFLAGS=",
+      "RUSTDOCFLAGS=",
+      "RAYON_NUM_THREADS=1",
+      "CARGO_BUILD_JOBS=1",
+      "CARGO_INCREMENTAL=0",
+      "<stable-toolchain>/bin/cargo",
+      "test",
+      "--no-run",
+      "--offline",
+      "--locked",
+      "-p",
+      "holonics",
+      "--test",
+      "source_entrance",
+      "--jobs",
+      "1",
+      "--message-format=json",
+      "--config",
+      "profile.dev.package.holonics.debug=0",
+      "--config",
+      "profile.test.package.holonics.debug=0",
+      "--config",
+      "profile.dev.package.holonics.codegen-units=16",
+      "--config",
+      "profile.test.package.holonics.codegen-units=16"
+    ],
+    "working_directory": "<worktree>",
+    "source_directories": [
+      "<worktree>/crates/holonics/src"
+    ],
+    "config_digest": {
+      "sha256": "c8fd4b7003b29c2cf00ca7dbce7a2b463bdd4d082e8b8d10c2b90a2197e36657",
+      "bytes": 115248
+    },
+    "note": "Commands were executed only through the independently reviewed bounded controller; placeholders normalize machine paths for public receipts."
+  },
+  {
+    "label": "source-entrance-runtime-v1",
+    "argv": [
+      "<worktree>/target/debug/deps/source_entrance-85314e3ce9c0aa42",
+      "--test-threads=1",
+      "--nocapture"
+    ],
+    "working_directory": "<worktree>",
+    "source_directories": [
+      "<worktree>/crates/holonics/src"
+    ],
+    "config_digest": {
+      "sha256": "208e6aa5fb3ee5a10d2e9bed6c6c1107e544b901c0be2b6ca55fdfb8170cc2f9",
+      "bytes": 114777
+    },
+    "note": "Commands were executed only through the independently reviewed bounded controller; placeholders normalize machine paths for public receipts."
+  },
+  {
+    "label": "source-entrance-build-v5",
+    "argv": [
+      "/usr/bin/env",
+      "-u",
+      "RUSTC_WRAPPER",
+      "-u",
+      "RUSTC_WORKSPACE_WRAPPER",
+      "CARGO_TARGET_DIR=<worktree>/target",
+      "RUSTC=<stable-toolchain>/bin/rustc",
+      "RUSTDOC=<stable-toolchain>/bin/rustdoc",
+      "RUSTFLAGS=",
+      "CARGO_ENCODED_RUSTFLAGS=",
+      "RUSTDOCFLAGS=",
+      "RAYON_NUM_THREADS=1",
+      "CARGO_BUILD_JOBS=1",
+      "CARGO_INCREMENTAL=0",
+      "<stable-toolchain>/bin/cargo",
+      "test",
+      "--no-run",
+      "--offline",
+      "--locked",
+      "-p",
+      "holonics",
+      "--test",
+      "source_entrance",
+      "--jobs",
+      "1",
+      "--message-format=json",
+      "--config",
+      "profile.dev.package.holonics.debug=0",
+      "--config",
+      "profile.test.package.holonics.debug=0",
+      "--config",
+      "profile.dev.package.holonics.codegen-units=16",
+      "--config",
+      "profile.test.package.holonics.codegen-units=16"
+    ],
+    "working_directory": "<worktree>",
+    "source_directories": [
+      "<worktree>/crates/holonics/src"
+    ],
+    "config_digest": {
+      "sha256": "12b198bb9dfcb360efff2c48fce75e1a2fdaa6cfca2cdeba1aeb91e1fb6a6b8c",
+      "bytes": 115315
+    },
+    "note": "Commands were executed only through the independently reviewed bounded controller; placeholders normalize machine paths for public receipts."
+  },
+  {
+    "label": "source-entrance-build-v6",
+    "argv": [
+      "/usr/bin/env",
+      "-u",
+      "RUSTC_WRAPPER",
+      "-u",
+      "RUSTC_WORKSPACE_WRAPPER",
+      "CARGO_TARGET_DIR=<worktree>/target",
+      "RUSTC=<stable-toolchain>/bin/rustc",
+      "RUSTDOC=<stable-toolchain>/bin/rustdoc",
+      "RUSTFLAGS=",
+      "CARGO_ENCODED_RUSTFLAGS=",
+      "RUSTDOCFLAGS=",
+      "RAYON_NUM_THREADS=1",
+      "CARGO_BUILD_JOBS=1",
+      "CARGO_INCREMENTAL=0",
+      "<stable-toolchain>/bin/cargo",
+      "test",
+      "--no-run",
+      "--offline",
+      "--locked",
+      "-p",
+      "holonics",
+      "--test",
+      "source_entrance",
+      "--jobs",
+      "1",
+      "--message-format=json",
+      "--config",
+      "profile.dev.package.holonics.debug=0",
+      "--config",
+      "profile.test.package.holonics.debug=0",
+      "--config",
+      "profile.dev.package.holonics.codegen-units=16",
+      "--config",
+      "profile.test.package.holonics.codegen-units=16"
+    ],
+    "working_directory": "<worktree>",
+    "source_directories": [
+      "<worktree>/crates/holonics/src"
+    ],
+    "config_digest": {
+      "sha256": "e9035f05ec70b5fa927902c4cfb9f19f626d02477741a29739c11ae570b9d83b",
+      "bytes": 115315
+    },
+    "note": "Commands were executed only through the independently reviewed bounded controller; placeholders normalize machine paths for public receipts."
+  },
+  {
+    "label": "source-entrance-runtime-v2",
+    "argv": [
+      "<worktree>/target/debug/deps/source_entrance-85314e3ce9c0aa42",
+      "--test-threads=1",
+      "--nocapture"
+    ],
+    "working_directory": "<worktree>",
+    "source_directories": [
+      "<worktree>/crates/holonics/src"
+    ],
+    "config_digest": {
+      "sha256": "1e8cd2dc018a3ab024ebf9dcbc87ebb3b8d995166587ef623f5a920428dc771f",
+      "bytes": 114789
+    },
+    "note": "Commands were executed only through the independently reviewed bounded controller; placeholders normalize machine paths for public receipts."
+  },
+  {
+    "label": "source-entrance-build-v7",
+    "argv": [
+      "/usr/bin/env",
+      "-u",
+      "RUSTC_WRAPPER",
+      "-u",
+      "RUSTC_WORKSPACE_WRAPPER",
+      "CARGO_TARGET_DIR=<worktree>/target",
+      "RUSTC=<stable-toolchain>/bin/rustc",
+      "RUSTDOC=<stable-toolchain>/bin/rustdoc",
+      "RUSTFLAGS=",
+      "CARGO_ENCODED_RUSTFLAGS=",
+      "RUSTDOCFLAGS=",
+      "RAYON_NUM_THREADS=1",
+      "CARGO_BUILD_JOBS=1",
+      "CARGO_INCREMENTAL=0",
+      "<stable-toolchain>/bin/cargo",
+      "test",
+      "--no-run",
+      "--offline",
+      "--locked",
+      "-p",
+      "holonics",
+      "--test",
+      "source_entrance",
+      "--jobs",
+      "1",
+      "--message-format=json",
+      "--config",
+      "profile.dev.package.holonics.debug=0",
+      "--config",
+      "profile.test.package.holonics.debug=0",
+      "--config",
+      "profile.dev.package.holonics.codegen-units=16",
+      "--config",
+      "profile.test.package.holonics.codegen-units=16"
+    ],
+    "working_directory": "<worktree>",
+    "source_directories": [
+      "<worktree>/crates/holonics/src"
+    ],
+    "config_digest": {
+      "sha256": "858c1f01b0538faf493686235d1114927ac7dcf26801b73a5765b25eb226c659",
+      "bytes": 115204
+    },
+    "note": "Commands were executed only through the independently reviewed bounded controller; placeholders normalize machine paths for public receipts."
+  },
+  {
+    "label": "source-entrance-runtime-v3",
+    "argv": [
+      "<worktree>/target/debug/deps/source_entrance-85314e3ce9c0aa42",
+      "--test-threads=1",
+      "--nocapture"
+    ],
+    "working_directory": "<worktree>",
+    "source_directories": [
+      "<worktree>/crates/holonics/src"
+    ],
+    "config_digest": {
+      "sha256": "7b86ff1e7bd5c9fe8bdd842d2bd48923fb6165cbf606bad3513b4b2dfc23c768",
+      "bytes": 114755
+    },
+    "note": "Commands were executed only through the independently reviewed bounded controller; placeholders normalize machine paths for public receipts."
+  },
+  {
+    "label": "source-entrance-build-v8",
+    "argv": [
+      "/usr/bin/env",
+      "-u",
+      "RUSTC_WRAPPER",
+      "-u",
+      "RUSTC_WORKSPACE_WRAPPER",
+      "CARGO_TARGET_DIR=<worktree>/target",
+      "RUSTC=<stable-toolchain>/bin/rustc",
+      "RUSTDOC=<stable-toolchain>/bin/rustdoc",
+      "RUSTFLAGS=",
+      "CARGO_ENCODED_RUSTFLAGS=",
+      "RUSTDOCFLAGS=",
+      "RAYON_NUM_THREADS=1",
+      "CARGO_BUILD_JOBS=1",
+      "CARGO_INCREMENTAL=0",
+      "<stable-toolchain>/bin/cargo",
+      "test",
+      "--no-run",
+      "--offline",
+      "--locked",
+      "-p",
+      "holonics",
+      "--test",
+      "source_entrance",
+      "--jobs",
+      "1",
+      "--message-format=json",
+      "--config",
+      "profile.dev.package.holonics.debug=0",
+      "--config",
+      "profile.test.package.holonics.debug=0",
+      "--config",
+      "profile.dev.package.holonics.codegen-units=16",
+      "--config",
+      "profile.test.package.holonics.codegen-units=16"
+    ],
+    "working_directory": "<worktree>",
+    "source_directories": [
+      "<worktree>/crates/holonics/src"
+    ],
+    "config_digest": {
+      "sha256": "b69b8b14e44d61803cc0278a080e7a44d42976f8424a87841a5f3b20a1c0ca2f",
+      "bytes": 115281
+    },
+    "note": "Commands were executed only through the independently reviewed bounded controller; placeholders normalize machine paths for public receipts."
+  },
+  {
+    "label": "source-entrance-runtime-v4",
+    "argv": [
+      "<worktree>/target/debug/deps/source_entrance-85314e3ce9c0aa42",
+      "--test-threads=1",
+      "--nocapture"
+    ],
+    "working_directory": "<worktree>",
+    "source_directories": [
+      "<worktree>/crates/holonics/src"
+    ],
+    "config_digest": {
+      "sha256": "63b4c8e2f1fba7c06b51659af3ddbe1aa81c23a218534f04fb330e06a8c04194",
+      "bytes": 114727
+    },
+    "note": "Commands were executed only through the independently reviewed bounded controller; placeholders normalize machine paths for public receipts."
+  },
+  {
+    "label": "source-entrance-build-v9",
+    "argv": [
+      "/usr/bin/env",
+      "-u",
+      "RUSTC_WRAPPER",
+      "-u",
+      "RUSTC_WORKSPACE_WRAPPER",
+      "CARGO_TARGET_DIR=<worktree>/target",
+      "RUSTC=<stable-toolchain>/bin/rustc",
+      "RUSTDOC=<stable-toolchain>/bin/rustdoc",
+      "RUSTFLAGS=",
+      "CARGO_ENCODED_RUSTFLAGS=",
+      "RUSTDOCFLAGS=",
+      "RAYON_NUM_THREADS=1",
+      "CARGO_BUILD_JOBS=1",
+      "CARGO_INCREMENTAL=0",
+      "<stable-toolchain>/bin/cargo",
+      "test",
+      "--no-run",
+      "--offline",
+      "--locked",
+      "-p",
+      "holonics",
+      "--test",
+      "source_entrance",
+      "--jobs",
+      "1",
+      "--message-format=json",
+      "--config",
+      "profile.dev.package.holonics.debug=0",
+      "--config",
+      "profile.test.package.holonics.debug=0",
+      "--config",
+      "profile.dev.package.holonics.codegen-units=16",
+      "--config",
+      "profile.test.package.holonics.codegen-units=16"
+    ],
+    "working_directory": "<worktree>",
+    "source_directories": [
+      "<worktree>/crates/holonics/src"
+    ],
+    "config_digest": {
+      "sha256": "414ba84aec8c7406a1983b87bcebca448074ddce62cbd31bc1b7284862b8f032",
+      "bytes": 114538
+    },
+    "note": "Commands were executed only through the independently reviewed bounded controller; placeholders normalize machine paths for public receipts."
+  },
+  {
+    "label": "source-entrance-build-v10",
+    "argv": [
+      "/usr/bin/env",
+      "-u",
+      "RUSTC_WRAPPER",
+      "-u",
+      "RUSTC_WORKSPACE_WRAPPER",
+      "CARGO_TARGET_DIR=<worktree>/target",
+      "RUSTC=<stable-toolchain>/bin/rustc",
+      "RUSTDOC=<stable-toolchain>/bin/rustdoc",
+      "RUSTFLAGS=",
+      "CARGO_ENCODED_RUSTFLAGS=",
+      "RUSTDOCFLAGS=",
+      "RAYON_NUM_THREADS=1",
+      "CARGO_BUILD_JOBS=1",
+      "CARGO_INCREMENTAL=0",
+      "<stable-toolchain>/bin/cargo",
+      "test",
+      "--no-run",
+      "--offline",
+      "--locked",
+      "-p",
+      "holonics",
+      "--test",
+      "source_entrance",
+      "--jobs",
+      "1",
+      "--message-format=json",
+      "--config",
+      "profile.dev.package.holonics.debug=0",
+      "--config",
+      "profile.test.package.holonics.debug=0",
+      "--config",
+      "profile.dev.package.holonics.codegen-units=1",
+      "--config",
+      "profile.test.package.holonics.codegen-units=1"
+    ],
+    "working_directory": "<worktree>",
+    "source_directories": [
+      "<worktree>/crates/holonics/src"
+    ],
+    "config_digest": {
+      "sha256": "18fb2d037330eae940294f6341c28dbdf4b7b60db3a68841c78f40e4f8c88217",
+      "bytes": 114657
+    },
+    "note": "Commands were executed only through the independently reviewed bounded controller; placeholders normalize machine paths for public receipts."
+  },
+  {
+    "label": "source-entrance-gate-v1",
+    "argv": [
+      "/usr/bin/env",
+      "-u",
+      "RUSTC_WRAPPER",
+      "-u",
+      "RUSTC_WORKSPACE_WRAPPER",
+      "CARGO_TARGET_DIR=<worktree>/target",
+      "RUSTC=<stable-toolchain>/bin/rustc",
+      "RUSTDOC=<stable-toolchain>/bin/rustdoc",
+      "RUSTFLAGS=",
+      "CARGO_ENCODED_RUSTFLAGS=",
+      "RUSTDOCFLAGS=",
+      "RAYON_NUM_THREADS=1",
+      "CARGO_BUILD_JOBS=1",
+      "CARGO_INCREMENTAL=0",
+      "PATH=<stable-toolchain>/bin:/opt/cuda/bin:/usr/local/bin:/usr/bin:/bin",
+      "CARGO_NET_OFFLINE=true",
+      "/usr/bin/bash",
+      "tools/gate.sh"
+    ],
+    "working_directory": "<worktree>",
+    "source_directories": [
+      "<worktree>/crates/holonics/src",
+      "<worktree>/crates/holonics/tests",
+      "<worktree>/crates/holonics-cuda",
+      "<worktree>/research/notebook/hnn_design"
+    ],
+    "config_digest": {
+      "sha256": "0f014a8603edbd0d95ef535027abeb3e814cbdcab0179ea65dc3d81227c78859",
+      "bytes": 134376
+    },
+    "note": "Commands were executed only through the independently reviewed bounded controller; placeholders normalize machine paths for public receipts."
+  }
+]
