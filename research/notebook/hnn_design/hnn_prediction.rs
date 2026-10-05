@@ -1,7 +1,7 @@
 //! **`hnn_prediction`: step 1's harness, the executed comparison on known-truth terrain**
 //! (THE_REBUILD U6, step 1; #73, #148, #63). Its modes are the `executed …` subcommands of
 //! `hnn_executed_loop.rs` and, for loop 1c, `hnn_loop_1c.rs`, whose headers state each mode and its
-//! pins; this file holds the
+//! pins, and for lane B's keys `hnn_keys_loop.rs`; this file holds the
 //! declaration they share and dispatches to them. Committed commands run once in release, never a
 //! test.
 //!
@@ -20,6 +20,7 @@
 //! cargo run --release -p holonics --example hnn_prediction -- executed resume-coupling <terrain> <seed> <count> <c1 state> <gate A receipt> <move bound ms> <capture dir>
 //! cargo run --release -p holonics --example hnn_prediction -- executed causal <terrain> <seed> <count> <label[=E]>…
 //! cargo run --release -p holonics --example hnn_prediction -- executed joined <terrain> <seed> <count> <arm> <label=source>…
+//! cargo run --release -p holonics --example hnn_prediction -- executed keys <terrain> <training seed> <count> <out>
 //! ```
 //!
 //! [definition; agent-inferred, the order pin and the bank pin] **The declaration**
@@ -53,6 +54,8 @@ mod exterior;
 mod executed_loop;
 #[path = "hnn_loop_1c.rs"]
 mod loop_1c;
+#[path = "hnn_keys_loop.rs"]
+mod keys_loop;
 
 use std::collections::BTreeMap;
 use std::time::Instant;
@@ -564,6 +567,21 @@ fn main() {
             arguments[6].parse().expect("a validation seed"),
             arguments[7].parse().expect("a validation count"),
             &arguments[8],
+        ),
+        // Lane B: the pair menu along the training passage and the located pair's deposit
+        // (research/records/2026-10-05_LOCATED_KEYS_BECOME_THE_SOURCE_PORTS_PAIR_COMPONENT.md).
+        (Some("executed"), Some("keys")) => keys_loop::keys(
+            &arguments[3],
+            arguments[4].parse().expect("a training seed"),
+            arguments[5].parse().expect("a training count"),
+            &arguments[6],
+        ),
+        (Some("executed"), Some("keys-probe")) => keys_loop::keys_probe(
+            &arguments[3],
+            arguments[4].parse().expect("a training seed"),
+            arguments[5].parse().expect("a training count"),
+            &arguments[6],
+            &arguments[7],
         ),
         _ => panic!(
             "executed move <seed> <requests> | train <arm> <terrain> <seed> <batch> <moves> <deadline ms> <out> | evaluate <terrain> <seed> <count> <out> <label[=E]>… | spread <terrain> <seed> <count> <label[=E]>… | slopes <terrain> <seed> <count> <label[=E]>… | counts <terrain> <training seed> <count> <validation seed> <count> <out> | witness <terrain> <seed> <count> <moves> <deadline ms> <out> [<states dir>] | causal <terrain> <seed> <count> <label[=E]>… | restore <label=state>… | replay <terrain> <seed> <count> <label=state|label=partial:file>… | coupling <terrain> <seed> <count> <deadline ms> <label=state|label=partial:file|label=opening>… | represent <terrain> <seed> <count> <iterates> <deadline ms> <out> [<held-out seed>] | resume-coupling <terrain> <seed> <count> <c1 state> <gate A receipt> <move bound ms> <capture dir>"

@@ -61,7 +61,10 @@ pub mod resonance;
 pub use cost::{
     Alphabet, CodecFamily, CodecPivot, CompressionCost, NavigatorCodec, PivotForm, literal_bits,
 };
-pub use keys::{Candidate, Edge, Gauge, Loop, Menu, PortImages, Propagation, ReflectorMachine};
+pub use keys::{
+    Candidate, Edge, Gauge, Loop, Menu, PortImages, Propagation, ReflectorMachine, TurnMenu,
+    TurnReading,
+};
 pub use resonance::{ResonanceSplit, resonance_split};
 
 use thiserror::Error;

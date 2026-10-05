@@ -168,6 +168,7 @@
 //! | the excess's piecewise directional derivative; the chord against the line | owed (#62) | [`ladder_start`], [`FirstOrderReading::excess`] |
 //! | loop 1c's representation readings: each decision term's lock face pulled back to `E` and `ρ`, and the comparison re-read on frozen sites (a search's readings, never a move) | `HNN/ExecutedComparison.lockFace_covector`; the pullback's joined statement owed (#62) | [`site_gradients`], [`frozen_reread`] |
 //! | the restore law as a standing law (the continuing state's consumer) | `HNN/ExecutedComparison.{restoreStanding, restored_continuation_agrees, equal_states_agree}` | `hnn::constitution::{ContinuingState, Constitution::continued}` |
+//! | a located pair's deposit: the pair contact's slip against the carried prior, its exact line minimizer and the consumer `(E − B) T = P^δ B` (lane B, October 5) | owed (#62); the slip's derivative is `contact.dq` | [`pair_deposit`] |
 
 use std::collections::{BTreeMap, BTreeSet};
 use std::sync::OnceLock;
@@ -186,7 +187,7 @@ use crate::hnn::prediction::{
 use crate::hnn::ring::{
     CovectorRefusal, Growth, MemberCovector, ReceivingBank, TurnCovector, TurnReading, turn,
 };
-use crate::holon::deposition::significant;
+use crate::holon::deposition::{CertifiedStep, significant};
 use crate::ratio::GaussianRat;
 use crate::ratio::Rat;
 use crate::ratio::algebraic::{ExactInterval, ln_enclosure};
@@ -5554,6 +5555,220 @@ pub fn pairing_receipt(
         });
     }
     Ok(out)
+}
+
+// -------------------------------------------------------------------------------------------
+// the located pair's deposit (lane B, October 5)
+
+/// [definition; agent-inferred, October 5; the
+/// [record](../../../../research/records/2026-10-05_LOCATED_KEYS_BECOME_THE_SOURCE_PORTS_PAIR_COMPONENT.md)]
+/// **The located pair's deposit**: learning is locating keys, and a located key becomes material by
+/// one certified deposition of the source port. A [`crate::hnn::keys::LocatedPair`] at distance `δ`
+/// with map `f` on its menu ports (read by loop closure over the seen passage, `hnn::keys`, "The
+/// pair menu") is a pair contact between each consequence's column and its antecedent's image
+/// carried over `δ` ticks by the ring's own transport `U = P^δ`. Its slip on a located class `y`,
+/// against the source port's declared prior `B` (the opening `E₀`, the fixed feature map the normal
+/// law keeps), is
+///
+/// ```text
+/// Δ_y = U B e_y − (E − B) e_(f(y))          the consequence's learned part against the carried prior
+/// Q = Σ_y ⟨Δ_y | Δ_y⟩,   ∂Q/∂(E e_(f(y))) = −2 Δ_y                         the pair contact's DQ = 2J*Δ
+/// consumer: (E − B) T = U B   on the menu ports  (T e_y = e_(f(y)))
+/// ```
+///
+/// so in the release's storage a continuation that follows the located pair carries, at its
+/// antecedent's placement `P^(a+δ)`, the antecedent's prior image a second time
+/// (`P^a (E − B) e_(f(y)) = P^(a+δ) B e_y`): a candidate that fits the key adds coherently to its
+/// antecedent, one that does not adds a different column there. Every datum enters by the same law,
+/// whatever its modality: the edge is two ticks of the source ring's clock and the class map.
+///
+/// The deposition is `Θ′|_U = Θ|_U + η Γ_U` at the loci `U` the located key reaches, the located
+/// classes' columns of the source port, through its normal law (`Constitution::stepped_source`):
+/// one sample per located class, feature `e_(f(y))`, covector `Δ_y`, weight one (the key, not its
+/// count: the retention reads the located map, never how often it was seen). The slip is quadratic
+/// along the law's unit step `D`, `Q(η) = Q − η a + ½ η² C` exactly with `a = 2Σ⟨Δ_y, D e_(f(y))⟩`
+/// and `C = 2Σ |D e_(f(y))|²`, so its step is the library's certified step
+/// (`holon::deposition::CertifiedStep`): the largest dyadic `η` with `η C ≤ a` and `η c ≤ 1`, `c`
+/// the largest covector entry of one return, adopted only when `CertifiedStep::holds`, the slip falls
+/// by at least the certified decrease `½ η a`, every entry stays within the [`entry_bound`], and the
+/// constitution's own conditions hold (its storage growth certified, its budget). A key whose slip is
+/// already zero moves nothing and is refused (`a = 0`). Refused, typed, when a menu port holds other
+/// than one class of the exterior chart.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct PairDeposit {
+    pub offset: usize,
+    /// `(y, f(y))` on the exterior chart.
+    pub classes: Vec<(usize, usize)>,
+    pub slip_before: Rat,
+    pub slip_after: Rat,
+    /// The certified step: `η`, `a`, `C` and `c`.
+    pub certificate: CertifiedStep,
+    /// Whether `(E − B) T = U B` holds exactly on the menu's classes after the deposit.
+    pub consumer: bool,
+    pub source: SourceStep,
+}
+
+/// The exterior chart's one class at a ring's port (the residue chart holds one class at each port
+/// when `|A| ≤ d_g`); refused otherwise.
+fn class_at(field: &Field, ring: usize, port: usize) -> Result<usize, HnnError> {
+    let geometry = field.ring(ring);
+    let classes: Vec<usize> = (0..field.alphabet())
+        .filter(|&code| geometry.port(code) == port)
+        .collect();
+    match classes.as_slice() {
+        [class] => Ok(*class),
+        _ => Err(HnnError::Shape {
+            what: "a located port holding one class of the exterior chart",
+            expected: 1,
+            found: classes.len(),
+        }),
+    }
+}
+
+fn column(matrix: &ExactRatMatrix, class: usize) -> Result<Vec<Rat>, HnnError> {
+    (0..matrix.rows())
+        .map(|row| Ok(matrix.get(row, class)?.clone()))
+        .collect()
+}
+
+/// The slips `Δ_y` of every located class at the port `E`.
+fn pair_slips(
+    field: &Field,
+    ring: usize,
+    port: &ExactRatMatrix,
+    prior: &ExactRatMatrix,
+    offset: usize,
+    classes: &[(usize, usize)],
+) -> Result<Vec<Vec<Rat>>, HnnError> {
+    let geometry = field.ring(ring);
+    let carried = BigInt::from(offset);
+    classes
+        .iter()
+        .map(|&(y, x)| {
+            let image = geometry.rotate(&column(prior, y)?, &carried);
+            let (learned, base) = (column(port, x)?, column(prior, x)?);
+            Ok(image
+                .iter()
+                .zip(learned.iter().zip(&base))
+                .map(|(u, (e, b))| u - (e - b))
+                .collect())
+        })
+        .collect()
+}
+
+fn squared(vectors: &[Vec<Rat>]) -> Rat {
+    vectors.iter().flatten().map(|x| x * x).sum()
+}
+
+/// **Deposit a located pair** (the type [`PairDeposit`]) on `constitution`'s source port of `ring`,
+/// against the declared prior `prior` (the opening's `E₀`).
+pub fn pair_deposit(
+    field: &Field,
+    constitution: &Constitution,
+    prior: &ExactRatMatrix,
+    ring: usize,
+    located: &crate::hnn::keys::LocatedPair,
+) -> Result<(Constitution, PairDeposit), HnnError> {
+    let port = constitution
+        .source_port(ring)
+        .ok_or(HnnError::MissingSourcePort { ring })?
+        .clone();
+    if prior.rows() != port.rows() || prior.columns() != port.columns() {
+        return Err(HnnError::Shape {
+            what: "the declared prior against the source port",
+            expected: port.rows() * port.columns(),
+            found: prior.rows() * prior.columns(),
+        });
+    }
+    let classes = located
+        .map
+        .iter()
+        .map(|&(from, to)| Ok((class_at(field, ring, from)?, class_at(field, ring, to)?)))
+        .collect::<Result<Vec<_>, HnnError>>()?;
+    let slips = pair_slips(field, ring, &port, prior, located.offset, &classes)?;
+    let slip_before = squared(&slips);
+    let unit_feature = |class: usize| -> Vec<Rat> {
+        (0..field.alphabet())
+            .map(|code| if code == class { Rat::one() } else { Rat::zero() })
+            .collect()
+    };
+    let samples: Vec<Sample> = classes
+        .iter()
+        .zip(&slips)
+        .map(|(&(_, x), slip)| Sample {
+            weight: Rat::one(),
+            feature: unit_feature(x),
+            covector: slip.clone(),
+        })
+        .collect();
+    let retained = retained_on_motion(field, &[ring]);
+    let refused = |what: &'static str| HnnError::Shape {
+        what,
+        expected: 1,
+        found: 0,
+    };
+    let (unit, _) = constitution
+        .stepped_source(ring, &samples, &Rat::one(), &retained)?
+        .ok_or_else(|| refused("a located pair whose slip reaches the source port"))?;
+    let moved = unit
+        .source_port(ring)
+        .ok_or(HnnError::MissingSourcePort { ring })?;
+    let direction: Vec<Vec<Rat>> = classes
+        .iter()
+        .map(|&(_, x)| {
+            Ok(column(moved, x)?
+                .iter()
+                .zip(column(&port, x)?)
+                .map(|(a, b)| a - b)
+                .collect())
+        })
+        .collect::<Result<_, HnnError>>()?;
+    let two = Rat::from_integer(BigInt::from(2));
+    let along: Rat = slips
+        .iter()
+        .zip(&direction)
+        .map(|(slip, d)| slip.iter().zip(d).map(|(a, b)| a * b).sum::<Rat>())
+        .sum();
+    let alignment = &two * along;
+    let curvature = &two * squared(&direction);
+    let covector = slips
+        .iter()
+        .flatten()
+        .map(Signed::abs)
+        .max()
+        .unwrap_or_else(Rat::zero);
+    let certificate = CertifiedStep::certify(&alignment, &curvature, &covector)?
+        .ok_or_else(|| refused("a located pair whose slip the unit step descends"))?;
+    if !certificate.holds() {
+        return Err(refused("a certified step that holds"));
+    }
+    let (next, source) = constitution
+        .stepped_source(ring, &samples, &certificate.step, &retained)?
+        .ok_or_else(|| refused("a located pair whose slip reaches the source port"))?;
+    let stepped = next
+        .source_port(ring)
+        .ok_or(HnnError::MissingSourcePort { ring })?;
+    if stepped.entries().iter().any(|entry| entry.abs() > entry_bound()) {
+        return Err(refused("a deposit within the entry bound"));
+    }
+    let after = pair_slips(field, ring, stepped, prior, located.offset, &classes)?;
+    let slip_after = squared(&after);
+    if slip_after > &slip_before - certificate.decrease() {
+        return Err(refused("a deposit whose slip falls by its certified decrease"));
+    }
+    let consumer = after.iter().flatten().all(Zero::is_zero);
+    Ok((
+        next,
+        PairDeposit {
+            offset: located.offset,
+            classes,
+            slip_before,
+            slip_after,
+            certificate,
+            consumer,
+            source,
+        },
+    ))
 }
 
 // -------------------------------------------------------------------------------------------
