@@ -31,6 +31,7 @@
 
 use super::*;
 use holonics::hnn::constitution::ContinuingState;
+use holonics::holarchy::terrain::{CyclicLaw, KnownTruth};
 use num_bigint::{BigInt, BigUint};
 use num_traits::One;
 use std::collections::BTreeSet;
@@ -43,9 +44,12 @@ pub(super) fn cell(interval: &ExactInterval, grain: i64) -> String {
     format!("[{low}/{grain}, {high}/{grain})")
 }
 
-/// **A known-truth terrain's pairs** (only the terrain computes truth): `order2`, `x_t = x_(t−2) + 1
-/// (mod 4)` after 40 drawn cells; `alternation`, two drawn classes alternating, `x_t = x_(t−2)`;
-/// `line`, a drawn start and step, `x_t = x_0 + s t (mod 4)`.
+/// **A known-truth terrain's pairs** (only the terrain computes truth; the generation law is the
+/// library's, `holarchy::terrain::KnownTruth::cyclic`, moved there on October 5 for THE_MACHINE
+/// guard 9 with its draws in the same order): `order2`, `x_t = x_(t−2) + 1 (mod 4)` after the
+/// request's drawn cells; `alternation`, two drawn classes alternating, `x_t = x_(t−2)`; `line`, a
+/// drawn start and step, `x_t = x_0 + s t (mod 4)`. Each passage is cut into its request and its
+/// stations.
 pub(super) fn terrain_pairs(
     terrain: &str,
     declared: &Declared,
@@ -54,28 +58,21 @@ pub(super) fn terrain_pairs(
 ) -> Vec<(Vec<usize>, Vec<usize>)> {
     let symbols = declared.alphabet - 1;
     let (n, m) = (declared.request, declared.stations);
-    let mut draw = Draw::new(seed);
-    match terrain {
-        "order2" => order_pairs(declared, seed, count),
-        "alternation" => (0..count)
-            .map(|_| {
-                let (a, b) = (draw.below(symbols), draw.below(symbols));
-                let mut passage: Vec<usize> =
-                    (0..n + m).map(|t| if t % 2 == 0 { a } else { b }).collect();
-                let target = passage.split_off(n);
-                (passage, target)
-            })
-            .collect(),
-        "line" => (0..count)
-            .map(|_| {
-                let (x0, s) = (draw.below(symbols), draw.below(symbols));
-                let mut passage: Vec<usize> = (0..n + m).map(|t| (x0 + s * t) % symbols).collect();
-                let target = passage.split_off(n);
-                (passage, target)
-            })
-            .collect(),
+    let law = match terrain {
+        "order2" => CyclicLaw::OrderTwo { opening: n },
+        "alternation" => CyclicLaw::Alternation,
+        "line" => CyclicLaw::Line,
         _ => panic!("a terrain: order2 | alternation | line"),
-    }
+    };
+    KnownTruth::cyclic(law, symbols, seed, count, n + m)
+        .expect("a declared cyclic terrain")
+        .passages()
+        .iter()
+        .map(|passage| {
+            let (request, target) = passage.split_at(n);
+            (request.to_vec(), target.to_vec())
+        })
+        .collect()
 }
 
 /// [definition; agent-inferred, step 1b's pin §13.6] **A checkpoint: the complete continuing state**

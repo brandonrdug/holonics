@@ -2,7 +2,7 @@
 
 use super::*;
 use crate::geometry::winding::Odometer;
-use crate::hnn::encoding::{Encoding, PassageChart};
+use crate::hnn::encoding::{Encoded, Encoding, EncodingError, PassageChart};
 
 fn helix(periods: &[u64]) -> CarryHelix {
     CarryHelix::new(periods.to_vec()).unwrap()
@@ -413,6 +413,94 @@ fn the_encoding_founds_the_helix_on_the_located_transports() {
     // The receiving grain is silent on the D_low − 1 Fourier modes where a cell's indicator (an
     // interval of D_low lifts) vanishes: k ∈ (D/D_low)ℤ, k ≢ 0.
     assert_eq!(encoding.dimension(), 30 - (6 - 1));
+}
+
+/// [proved-derived; implemented-exact] **The located route encodes without the labels**
+/// (THE_MACHINE guard 9, "The code length does not see the labels"; `hnn::encoding::Encoded::through`):
+/// the read set located to one gauge class founds the located chart, its encoding's squares hold and
+/// every passage enters as receiving cells carrying the located advances' digits. For twelve
+/// permutations `π` of the five classes, the located chart's transports, forms and openings, the
+/// founded encoding, every encoded cell, the decoder `D`, the Preimage Fibre and the digits are
+/// equal on `π∘x`; only the labels are carried, `λ_(π∘x) = π∘λ_x`, and the located code length is
+/// unchanged. A plural fibre founds no chart (`EncodingError::Plural`), nor does a cell outside the
+/// located classes (`EncodingError::Unencoded`).
+///
+/// [agent-inferred, October 5] The draw: the first of `2_026_100_961 … 972` (a range no ref, tree or
+/// receipt held) whose read set locates one gauge class is `…962`; `…961` keeps five classes and is
+/// the plural refusal's. The relabelling seed `…934` above keeps a plural fibre, which the located
+/// chart refuses.
+#[test]
+fn the_located_route_encodes_the_read_set_without_its_labels() {
+    let helix = helix(&[2, 3, 5]);
+    let mut draw = Draw::new(2_026_100_961);
+    let plural = SteppedTerrain::draw(helix.clone(), &mut draw);
+    let plural = every_key(&plural, &mut draw, 60);
+    assert_eq!(
+        PassageChart::located(&locate(&helix, 5, &plural), &plural),
+        Err(EncodingError::Plural { classes: 5 })
+    );
+    let mut draw = Draw::new(2_026_100_962);
+    let terrain = SteppedTerrain::draw(helix.clone(), &mut draw);
+    let passages = every_key(&terrain, &mut draw, 60);
+    let field = crate::hnn::tests::support::small_field(&[5], Vec::new(), 0);
+    let read = |passages: &[Vec<usize>]| {
+        let location = locate(&helix, 5, passages);
+        let TransportFibre::One(member) = location.fibre() else {
+            panic!("the read set locates one gauge class");
+        };
+        let chart = PassageChart::located(&location, passages).unwrap();
+        let encoding = Encoding::found(&chart).unwrap();
+        let encoded = Encoded::through(&encoding, &chart, &field, passages).unwrap();
+        let length = located_code(&member, passages).unwrap().len();
+        (chart, encoding, encoded, length)
+    };
+    let (chart, encoding, encoded, length) = read(&passages);
+    assert_eq!(encoding.squares(&chart).unwrap().transports, 5);
+    assert_eq!(encoding.dimension(), 30 - (6 - 1));
+    for (passage, encoded) in passages.iter().zip(&encoded) {
+        assert_eq!(encoded.classes(), 5);
+        assert_eq!(encoded.fibre().len(), 30 - 25);
+        let digits = encoded.located().unwrap();
+        assert_eq!(digits.periods(), helix.periods());
+        for (&code, &cell) in passage.iter().zip(encoded.cells()) {
+            assert_eq!(encoded.label(cell), Some(code));
+            assert!(digits.digits(cell).unwrap().iter().zip(helix.periods()).all(|(a, d)| a < d));
+        }
+    }
+    for pi in permutations(5).into_iter().step_by(10) {
+        let relabelled: Vec<Vec<usize>> = passages
+            .iter()
+            .map(|p| p.iter().map(|&u| pi[u]).collect())
+            .collect();
+        let (moved_chart, moved_encoding, moved, moved_length) = read(&relabelled);
+        assert_eq!(moved_chart.transports(), chart.transports(), "{pi:?}");
+        assert_eq!(moved_chart.coupling(), chart.coupling());
+        assert_eq!(moved_chart.openings(), chart.openings());
+        assert_eq!(moved_encoding, encoding);
+        assert_eq!(moved_length, length);
+        for (moved, encoded) in moved.iter().zip(&encoded) {
+            assert_eq!(moved.cells(), encoded.cells());
+            assert_eq!(moved.decoder(), encoded.decoder());
+            assert_eq!(moved.fibre(), encoded.fibre());
+            assert_eq!(moved.located(), encoded.located());
+            for &cell in encoded.cells() {
+                assert_eq!(moved.label(cell), encoded.label(cell).map(|u| pi[u]));
+            }
+        }
+    }
+    // The stepped terrain is also a known truth, whose declared identity carries no located
+    // advance; a code no located class reads is refused on the located route.
+    let truth = crate::holarchy::terrain::KnownTruth::stepped(&terrain, &[0, 7], 30);
+    let identity = Encoded::identity(&truth, &field).unwrap();
+    assert_eq!(identity[1].cells().len(), 30);
+    assert!(identity[0].located().is_none());
+    let mut outside = passages[0].clone();
+    outside[3] = 5;
+    let location = locate(&helix, 5, &passages);
+    assert_eq!(
+        PassageChart::located(&location, &[outside]),
+        Err(EncodingError::Unencoded)
+    );
 }
 
 /// [implemented-exact] **Repair through the located navigator**: drawn passages on the helix

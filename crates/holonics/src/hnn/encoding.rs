@@ -57,6 +57,29 @@
 //! `HNN/Encoding` as mathematics. No chart founded from a passage reaches the field: every field
 //! reads its declared port chart (`hnn::field::PortChart`).
 //!
+//! [definition; agent-inferred, October 5; THE_MACHINE guard 9] **The one source type**
+//! ([`Encoded`]). The field reads a source only as a passage of [`PortCell`]s, classes of an
+//! encoding's chart that inject into every source ring's ports (`|A| ≤ d_g`, else
+//! [`EncodingError::Fold`]: no residue chart), carried with `D`, the Preimage Fibre, the boundary's
+//! labels and, on the located route, the located advances as the lift's digits
+//! ([`LocatedAdvances`], each digit at its period's width). Only this module builds one:
+//!
+//! ```text
+//! Encoded::identity(truth, field)       a known truth's classes as themselves; D = I, fibre ∅
+//! Encoded::through(E, chart, field, x)  chart = PassageChart::located(location, read set):
+//!                                       the field's own key location, one gauge class;
+//!                                       squares D E = ρ, E T_c = U_c E checked; u ↦ c = λ⁻¹(u)
+//! ```
+//!
+//! The located chart is read in the receiving cells (`LocatedTransport::chart`: `T_c e_ℓ =
+//! e_(ℓ + A(λ(c)))`, `ρ_c` the indicator of cell `c`), so for every permutation `π` of the exterior
+//! codes the chart, the founded encoding and the encoded cells of `π∘x` equal those of `x`, and only
+//! the labels are carried, `λ_(π∘x) = π∘λ_x` [proved-derived; implemented-exact on twelve
+//! permutations, `compression::keys::transport::tests`]. `Encoding::found` founds any declared chart
+//! as mathematics; [`Encoded::through`] refuses every chart the field did not locate (the byte
+//! chart, bare matrices, the moment chart over exterior codes) with [`EncodingError::Unencoded`],
+//! so exterior data waits for its encoding.
+//!
 //! [definition] The computational object is the helical pair interaction. Of the winding guide's six
 //! general objects this owner touches **faces and placement** (`D`, the founded forms) and the
 //! **helix** (the declared transports' windings: the rings' rotor steps and selective clock). The
@@ -70,16 +93,21 @@
 //! | `HNN/Encoding.injection_square` | [`Encoding::squares`] (the injection square) |
 //! | `HNN/Encoding.encoding_reduced_recurrence` | [`Encoding::reduced_moment`] |
 //! | `HNN/Encoding.encoding_separator` | [`Encoding::fibre`], [`Encoding::separator`] |
+//! | the relabelling law on the located route (the chart and encoded cells of `π∘x` are those of `x`): owed (#62) | [`PassageChart::located`], [`Encoded::through`] |
+//! | the identity's injection `|A| ≤ d_g` (no fold): a runtime law | [`Encoded::identity`] |
 
 use std::collections::BTreeMap;
+use std::sync::Arc;
 
 use num_bigint::{BigInt, BigUint};
 use num_traits::{One, ToPrimitive, Zero};
 use thiserror::Error;
 
+use crate::compression::CompressionError;
+use crate::compression::keys::transport::{TransportFibre, TransportLocation};
 use crate::hnn::HnnError;
 use crate::hnn::field::Field;
-use crate::holarchy::terrain::{Grating, MoireClass, TerrainError};
+use crate::holarchy::terrain::{Grating, KnownTruth, MoireClass, TerrainError};
 use crate::holon::HolonError;
 use crate::holon::contact::menu::{MenuError, PortPermutation};
 use crate::holon::restriction::PreimageFibre;
@@ -100,6 +128,22 @@ pub enum EncodingError {
     Unreached,
     #[error("the {square} square fails at reached state {state}")]
     Square { square: &'static str, state: usize },
+    /// THE_MACHINE guard 9: an exterior passage whose chart nothing the field located reads, or a
+    /// cell the located labels do not read. Exterior data waits for its encoding.
+    #[error("the exterior passage has no founded encoding")]
+    Unencoded,
+    /// The location's fibre holds several gauge classes: the read set does not determine the
+    /// classes, so it founds no encoding.
+    #[error("the located fibre holds {classes} gauge classes, not one")]
+    Plural { classes: usize },
+    /// The classes do not inject into a source ring's ports: `|A| > d_g` would fold them (no
+    /// residue chart).
+    #[error("{classes} classes fold onto source ring {ring}'s {period} ports")]
+    Fold {
+        classes: usize,
+        ring: usize,
+        period: u64,
+    },
     #[error(transparent)]
     Birth(#[from] BirthError),
     #[error(transparent)]
@@ -114,6 +158,15 @@ pub enum EncodingError {
     /// Boxed: a terrain's refusals are wide.
     #[error(transparent)]
     Terrain(Box<TerrainError>),
+    /// Boxed: a compression law's refusals are wide.
+    #[error(transparent)]
+    Compression(Box<CompressionError>),
+}
+
+impl From<CompressionError> for EncodingError {
+    fn from(error: CompressionError) -> Self {
+        Self::Compression(Box::new(error))
+    }
 }
 
 impl From<HnnError> for EncodingError {
@@ -172,7 +225,9 @@ fn close(
 
 /// [definition] **A passage chart** (module header): the chart's dimension, the admitted
 /// transports `T_a` (`n × n`), the injection `B e_u` of each exterior cell (`n`-vectors, one per
-/// cell; empty for an autonomous chart), the receiving forms `ρ_c` and the openings `x_0`.
+/// cell; empty for an autonomous chart), the receiving forms `ρ_c` and the openings `x_0`; and,
+/// for a chart the field's own key location built ([`PassageChart::located`]) and for no other, what
+/// located it (module header, "The one source type").
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct PassageChart {
     chart: usize,
@@ -180,6 +235,46 @@ pub struct PassageChart {
     injection: Vec<Vec<Rat>>,
     coupling: Vec<Vec<Rat>>,
     openings: Vec<Vec<Rat>>,
+    located: Option<LocatedChart>,
+}
+
+/// [definition] **What located a chart** ([`PassageChart::located`]): per class of the chart (a
+/// cell of the receiving ring) its exterior label `λ(c)`, the boundary's decoder, and its located
+/// advance's digits.
+#[derive(Clone, Debug, PartialEq, Eq)]
+struct LocatedChart {
+    labels: Vec<Option<usize>>,
+    advances: LocatedAdvances,
+}
+
+/// [definition; agent-inferred, October 5] **The located advances as the lift's digits**
+/// (`compression::keys::transport`, the odometer chart): the helix's ring periods `d_g`, ring 0
+/// least significant, and per class `c` (a receiving cell) the digits `a_g(c) < d_g` of
+/// `A(λ(c)) = Σ_g a_g(c) ∏_(h<g) d_h`, `None` at an unlabelled cell. Read only; built only by
+/// [`PassageChart::located`].
+///
+/// [definition; agent-inferred, October 5] **Exact width.** Each digit is held at its period's own
+/// width (`u64`, the width `CarryHelix` declares its periods in), never narrowed. A ring's advance
+/// under a located transport is `a_g(c) + carry_g ≤ (d_g − 1) + 1 = d_g`, and its carry out is
+/// `⌊(τ_g + a_g(c) + carry_g) / d_g⌋ ∈ {0, 1}` (the odometer, `CarryHelix::step_digits`): its
+/// declared bound is the ring's period, not the selective step's two ticks, so a consumer stepping
+/// rings by these digits keeps each tick count, section flux and winding at least at that width.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct LocatedAdvances {
+    periods: Vec<u64>,
+    digits: Vec<Option<Vec<u64>>>,
+}
+
+impl LocatedAdvances {
+    /// The helix's ring periods `d_g`, ring 0 least significant.
+    pub fn periods(&self) -> &[u64] {
+        &self.periods
+    }
+
+    /// The digits `a_g(c)` of a class's located advance, ring 0 first; `None` at an unlabelled cell.
+    pub fn digits(&self, cell: PortCell) -> Option<&[u64]> {
+        self.digits.get(cell.class).and_then(|digits| digits.as_deref())
+    }
 }
 
 impl PassageChart {
@@ -222,7 +317,56 @@ impl PassageChart {
             injection,
             coupling,
             openings,
+            located: None,
         })
+    }
+
+    /// **The located chart** (module header, "The one source type"): the field's own key location
+    /// over a read set (`compression::keys::transport::TransportLocation`) founds the chart when its
+    /// fibre is one gauge class. Its chart is the member's (`LocatedTransport::chart`, read in the
+    /// receiving cells, never the labels), opened at each passage's least key with the fewest patches
+    /// (the located code's keys); the member's labels and advances are kept as what located it.
+    /// Refused with [`EncodingError::Unencoded`] on an empty fibre or a passage cell outside the
+    /// location's classes, and with [`EncodingError::Plural`] on a plural fibre.
+    pub fn located(
+        location: &TransportLocation,
+        passages: &[Vec<usize>],
+    ) -> Result<Self, EncodingError> {
+        let member = match location.fibre() {
+            TransportFibre::Empty => return Err(EncodingError::Unencoded),
+            TransportFibre::Plural { classes } => return Err(EncodingError::Plural { classes }),
+            TransportFibre::One(member) => member,
+        };
+        if passages.is_empty() {
+            return Err(chart_refusal("a located chart opens at its passages' keys"));
+        }
+        if passages.iter().flatten().any(|&code| code >= member.classes()) {
+            return Err(EncodingError::Unencoded);
+        }
+        let helix = member.helix();
+        let keys: Vec<u64> = passages
+            .iter()
+            .map(|passage| {
+                (0..helix.period())
+                    .min_by_key(|&key| member.patches(passage, key))
+                    .expect("a helix has a lift")
+            })
+            .collect();
+        let (n, transports, coupling, openings) = member.chart(&keys)?;
+        let mut chart = Self::new(n, transports, Vec::new(), coupling, openings)?;
+        let labels = member.labels().to_vec();
+        let digits = labels
+            .iter()
+            .map(|label| label.map(|class| member.digits(class)))
+            .collect();
+        chart.located = Some(LocatedChart {
+            labels,
+            advances: LocatedAdvances {
+                periods: helix.periods().to_vec(),
+                digits,
+            },
+        });
+        Ok(chart)
     }
 
     /// The chart's dimension `n`.
@@ -811,5 +955,325 @@ impl Encoding {
     /// The transports on `R`'s coordinates, `M_a`.
     pub fn reached_transports(&self) -> &[ExactRatMatrix] {
         &self.reached_transports
+    }
+}
+
+// -------------------------------------------------------------------------------------------
+// the one source type
+
+/// [definition; agent-inferred, October 5] **One occurrence's class of the encoding's chart**
+/// (THE_MACHINE guard 9): a class that injects into every source ring's ports, so its port on ring
+/// `g` is the class itself, `class < d_g` (no fold, no residue). It is read ([`PortCell::class`])
+/// and never built outside `hnn::encoding`: no exterior code becomes one (structural, `E0451` on a
+/// forged cell, `E0308` where a code is passed for a cell, `E0277` on `From<usize>`):
+///
+/// ```compile_fail,E0451
+/// use holonics::hnn::encoding::PortCell;
+/// fn forge(code: usize) -> PortCell {
+///     PortCell { class: code }
+/// }
+/// ```
+///
+/// ```compile_fail,E0308
+/// use holonics::hnn::encoding::PortCell;
+/// fn port(_: PortCell) {}
+/// fn byte(code: usize) {
+///     port(code)
+/// }
+/// ```
+///
+/// ```compile_fail,E0277
+/// use holonics::hnn::encoding::PortCell;
+/// fn convert(code: usize) -> PortCell {
+///     code.into()
+/// }
+/// ```
+#[derive(Clone, Copy, Debug, PartialEq, Eq, PartialOrd, Ord, Hash)]
+pub struct PortCell {
+    class: usize,
+}
+
+impl PortCell {
+    /// The class, which is its port on every source ring the encoded passage was checked against.
+    pub fn class(self) -> usize {
+        self.class
+    }
+}
+
+/// [definition] The chart an encoded passage carries, shared by every passage one encoding produced.
+#[derive(Debug, PartialEq, Eq)]
+struct EncodedChart {
+    classes: usize,
+    sources: Vec<(usize, u64)>,
+    decoder: ExactRatMatrix,
+    fibre: Vec<Vec<Rat>>,
+    labels: Vec<Option<usize>>,
+    advances: Option<LocatedAdvances>,
+}
+
+/// [definition; agent-inferred, October 5] **The one source type** (THE_MACHINE guard 9; module
+/// header): a passage whose every occurrence is a class of an encoding's chart ([`PortCell`]),
+/// carried with the chart's class count, the source rings its classes inject into, the decoder `D`
+/// and the Preimage Fibre of the encoding that produced it, the boundary's labels (class to exterior
+/// code) and, on the located route, the located advances as the lift's digits. Its fields are
+/// private, and only `hnn::encoding` constructs one, in two ways: [`Encoded::identity`] (a known
+/// truth's declared identity) and [`Encoded::through`] (a located chart's founded encoding).
+///
+/// [definition] **Structural guarantees**, each a `compile_fail` doctest checked with its error code
+/// (gate 1 runs them with `RUSTC_BOOTSTRAP=1`): an `Encoded` is never forged (`E0451`); an exterior
+/// code list or one-hot cells are refused where `&Encoded` goes (`E0308`); no `From<usize>`,
+/// `From<Vec<_>>`, `From<Faces>` or `From<Released>` exists (`E0277`), so a release is never fed back
+/// as the next source cell. The refusals (the fold, an unlocated chart, an unread cell) are runtime
+/// laws, each pinned by a test (`hnn::tests::encoding`, `compression::keys::transport::tests`).
+///
+/// ```compile_fail,E0451
+/// use holonics::hnn::encoding::Encoded;
+/// fn forge(other: &Encoded) -> Encoded {
+///     Encoded { cells: Vec::new(), ..other.clone() }
+/// }
+/// ```
+///
+/// ```compile_fail,E0308
+/// use holonics::hnn::encoding::Encoded;
+/// fn ingest(_: &Encoded) {}
+/// fn bytes(codes: &[usize]) {
+///     ingest(codes)
+/// }
+/// ```
+///
+/// ```compile_fail,E0308
+/// use holonics::hnn::encoding::Encoded;
+/// use holonics::ratio::Rat;
+/// fn ingest(_: &Encoded) {}
+/// fn one_hot(cells: &[Vec<(usize, Rat)>]) {
+///     ingest(cells)
+/// }
+/// ```
+///
+/// ```compile_fail,E0277
+/// use holonics::hnn::encoding::Encoded;
+/// fn convert(codes: Vec<usize>) -> Encoded {
+///     codes.into()
+/// }
+/// ```
+///
+/// ```compile_fail,E0277
+/// use holonics::hnn::encoding::Encoded;
+/// fn convert(code: usize) -> Encoded {
+///     code.into()
+/// }
+/// ```
+///
+/// ```compile_fail,E0277
+/// use holonics::hnn::encoding::Encoded;
+/// use holonics::hnn::ratio::Faces;
+/// fn feed_back(faces: Faces) -> Encoded {
+///     faces.into()
+/// }
+/// ```
+///
+/// ```compile_fail,E0277
+/// use holonics::hnn::encoding::Encoded;
+/// use holonics::hnn::word::Released;
+/// fn feed_back(released: Released) -> Encoded {
+///     released.into()
+/// }
+/// ```
+///
+/// The lawful form compiles and runs: a known truth's identity on campaign 1's field, whose source
+/// ring of period 5 holds the four classes, taken where `&Encoded` goes.
+///
+/// ```
+/// use holonics::hnn::encoding::Encoded;
+/// use holonics::hnn::field::{Field, FieldDeclaration};
+/// use holonics::holarchy::terrain::{CyclicLaw, KnownTruth};
+/// fn ingest(encoded: &Encoded) -> usize {
+///     encoded.cells().iter().map(|cell| cell.class()).max().unwrap_or(0)
+/// }
+/// fn main() -> Result<(), Box<dyn std::error::Error>> {
+///     let field = Field::declare(FieldDeclaration::campaign_one(1 << 17))?;
+///     let truth = KnownTruth::cyclic(CyclicLaw::Line, 4, 1, 2, 48)?;
+///     for encoded in Encoded::identity(&truth, &field)? {
+///         assert!(ingest(&encoded) < 4);
+///     }
+///     Ok(())
+/// }
+/// ```
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct Encoded {
+    cells: Vec<PortCell>,
+    chart: Arc<EncodedChart>,
+}
+
+/// The source rings of a field with their periods; refused unless `classes ≤ d_g` on each (no fold).
+fn holding_sources(field: &Field, classes: usize) -> Result<Vec<(usize, u64)>, EncodingError> {
+    field
+        .sources()
+        .iter()
+        .map(|&ring| {
+            let period = field.ring(ring).period();
+            if u64::try_from(classes).is_ok_and(|classes| classes <= period) {
+                Ok((ring, period))
+            } else {
+                Err(EncodingError::Fold {
+                    classes,
+                    ring,
+                    period,
+                })
+            }
+        })
+        .collect()
+}
+
+impl Encoded {
+    /// **The declared identity encoding of a known truth** (THE_MACHINE guard 9): each passage of
+    /// the terrain's own read set, each class its own port cell; `D` the identity on `ℚ^|A|`, the
+    /// Preimage Fibre empty, each class's label itself, and no located advance. Refused with
+    /// [`EncodingError::Fold`] unless the terrain's classes inject into every source ring's ports,
+    /// `|A| ≤ d_g`: no fold, no residue. A `KnownTruth` is built only by a terrain's generator
+    /// (`holarchy::terrain::known`), so a cut file never takes this route.
+    pub fn identity(truth: &KnownTruth, field: &Field) -> Result<Vec<Self>, EncodingError> {
+        let classes = truth.classes();
+        let sources = holding_sources(field, classes)?;
+        let chart = Arc::new(EncodedChart {
+            classes,
+            sources,
+            decoder: ExactRatMatrix::identity(classes)?,
+            fibre: Vec::new(),
+            labels: (0..classes).map(Some).collect(),
+            advances: None,
+        });
+        Ok(truth
+            .passages()
+            .iter()
+            .map(|passage| Self {
+                cells: passage.iter().map(|&class| PortCell { class }).collect(),
+                chart: Arc::clone(&chart),
+            })
+            .collect())
+    }
+
+    /// **Exterior passages through a founded encoding** (THE_MACHINE guard 9): the chart must be
+    /// one the field's own key location built ([`PassageChart::located`]) and the encoding's squares
+    /// `D E = ρ`, `E T_c = U_c E` must hold on every reached state ([`Encoding::squares`]). Each
+    /// occurrence's code `u` becomes the class `c = λ⁻¹(u)` the located labels read it at, a cell of
+    /// the receiving ring; `D` is the encoding's readout and the Preimage Fibre its merged reached
+    /// directions ([`Encoding::fibre`]); the located advances ride along as the lift's digits.
+    /// Refused with [`EncodingError::Unencoded`] when the chart was not located (the byte chart, a
+    /// declared chart, a terrain's chart) or a code is read by no label; with
+    /// [`EncodingError::Fold`] unless the chart's classes inject into every source ring's ports.
+    ///
+    /// [proved-derived; agent-inferred, October 5] **Relabelling.** The located chart is read in the
+    /// receiving cells (`LocatedTransport::chart`), so for every permutation `π` of the exterior
+    /// codes, the encoding of `π∘x` equals the encoding of `x`, its encoded cells are equal, and only
+    /// the labels are carried, `λ_(π∘x) = π∘λ_x`; the located code length is unchanged
+    /// (`compression::keys::transport::tests`, the located route).
+    pub fn through(
+        encoding: &Encoding,
+        chart: &PassageChart,
+        field: &Field,
+        passages: &[Vec<usize>],
+    ) -> Result<Vec<Self>, EncodingError> {
+        let located = chart.located.as_ref().ok_or(EncodingError::Unencoded)?;
+        encoding.squares(chart)?;
+        let classes = located.labels.len();
+        let sources = holding_sources(field, classes)?;
+        let class_of: BTreeMap<usize, usize> = located
+            .labels
+            .iter()
+            .enumerate()
+            .filter_map(|(class, label)| label.map(|code| (code, class)))
+            .collect();
+        let shared = Arc::new(EncodedChart {
+            classes,
+            sources,
+            decoder: encoding.readout().clone(),
+            fibre: encoding.fibre()?,
+            labels: located.labels.clone(),
+            advances: Some(located.advances.clone()),
+        });
+        passages
+            .iter()
+            .map(|passage| {
+                let cells = passage
+                    .iter()
+                    .map(|code| {
+                        class_of
+                            .get(code)
+                            .map(|&class| PortCell { class })
+                            .ok_or(EncodingError::Unencoded)
+                    })
+                    .collect::<Result<Vec<_>, _>>()?;
+                Ok(Self {
+                    cells,
+                    chart: Arc::clone(&shared),
+                })
+            })
+            .collect()
+    }
+
+    /// **The passage cut at an occurrence** (a request and its section): both halves keep the
+    /// encoding that produced them; refused past the passage's end.
+    pub fn split_at(self, at: usize) -> Result<(Self, Self), EncodingError> {
+        if at > self.cells.len() {
+            return Err(chart_refusal("an encoded passage is cut within it"));
+        }
+        let Self { mut cells, chart } = self;
+        let tail = cells.split_off(at);
+        Ok((
+            Self {
+                cells,
+                chart: Arc::clone(&chart),
+            },
+            Self { cells: tail, chart },
+        ))
+    }
+
+    /// The occurrences' classes, in order.
+    pub fn cells(&self) -> &[PortCell] {
+        &self.cells
+    }
+
+    /// The occurrence count.
+    pub fn len(&self) -> usize {
+        self.cells.len()
+    }
+
+    /// Whether the passage holds no occurrence.
+    pub fn is_empty(&self) -> bool {
+        self.cells.is_empty()
+    }
+
+    /// The chart's class count: every class lies below it, and it is at most each source ring's
+    /// period.
+    pub fn classes(&self) -> usize {
+        self.chart.classes
+    }
+
+    /// The source rings the classes were checked to inject into, `(ring, d_g)`.
+    pub fn sources(&self) -> &[(usize, u64)] {
+        &self.chart.sources
+    }
+
+    /// **`D`**, the decoder of the encoding that produced the passage: the identity on `ℚ^|A|` for a
+    /// known truth, the founded readout (`D E = ρ`, one row per class) on the located route.
+    pub fn decoder(&self) -> &ExactRatMatrix {
+        &self.chart.decoder
+    }
+
+    /// **The Preimage Fibre**: the reached directions the encoding merges (`ker E ∩ R`, as chart
+    /// states; empty for a known truth's identity).
+    pub fn fibre(&self) -> &[Vec<Rat>] {
+        &self.chart.fibre
+    }
+
+    /// The exterior code a class decodes to at the boundary, `λ(c)`; `None` at an unlabelled cell.
+    pub fn label(&self, cell: PortCell) -> Option<usize> {
+        self.chart.labels.get(cell.class).copied().flatten()
+    }
+
+    /// The located advances as the lift's digits, on the located route; `None` for an identity.
+    pub fn located(&self) -> Option<&LocatedAdvances> {
+        self.chart.advances.as_ref()
     }
 }

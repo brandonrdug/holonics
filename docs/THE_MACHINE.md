@@ -569,16 +569,24 @@ tests can comb through anything valuable").
    D2, and [September 29](../research/records/2026-09-29_LESSONS_THE_FAILURES_THAT_REPEATED_AFTER_THEY_WERE_RECORDED.md)
    §1.3, "text run on its codec's grain"; recurred October 5 in the byte-chart key location and
    the 2⁸-port text repair).
-   - **One source type.** The field reads only `Encoded` cells (`hnn::encoding::Encoded`, to
-     build): on each source ring, classes of its own port chart `ℤ/d_g`, carried with the decoder
-     `D` and the Preimage Fibre of the encoding that produced them. Its fields are private, and only
-     `hnn::encoding` constructs one, in two ways:
+   - **One source type.** The field reads only `Encoded` cells (`hnn::encoding::Encoded`, each
+     occurrence a `PortCell`): on each source ring, classes of its own port chart `ℤ/d_g`, carried
+     with the decoder `D` and the Preimage Fibre of the encoding that produced them, the boundary's
+     labels and, on the located route, the located advances as the lift's digits at their periods'
+     width (`LocatedAdvances`). Its fields are private, and only `hnn::encoding` constructs one, in
+     two ways:
      - `Encoded::identity`: the declared identity encoding of a known-truth terrain
-       (`holarchy::terrain::KnownTruth`, built only by a terrain's generator, never from a file).
-       It is refused unless the terrain's classes inject into every source ring's ports
-       (`|A| ≤ d_g`): no fold, no residue.
+       (`holarchy::terrain::KnownTruth`, built only by a terrain's generator, never from a file:
+       the cyclic terrains on `ℤ/|A|` and the located transport's stepped terrain,
+       `holarchy::terrain::known`). It is refused unless the terrain's classes inject into every
+       source ring's ports (`|A| ≤ d_g`, else `EncodingError::Fold`): no fold, no residue.
      - `Encoded::through`: the image `E` of a founded `Encoding` (`Encoding::found`), whose squares
-       `D E = ρ`, `E T_a = U_a E` and the injection square are checked on every reached state.
+       `D E = ρ`, `E T_a = U_a E` and the injection square are checked on every reached state. Its
+       chart must be one the field's own key location built: today the located chart
+       (`PassageChart::located`), founded on the transport a `TransportLocation` locates over the
+       read set when its fibre is one gauge class (`EncodingError::Plural` otherwise), and read in
+       the receiving cells, never in the labels; each code enters as the receiving cell its located
+       label reads.
    - **The field's entries take it, and nothing else.** `SourceMoment::ingest`, `Current::step`,
      `ExecutionPort::{ingest, locate_keys, compare}`, `hnn::keys::station_pairs` and
      `compression::keys::local::locate` accept `&Encoded` (or its `PortCell`) only. An exterior
@@ -591,9 +599,13 @@ tests can comb through anything valuable").
      `PortChart` is built only by `hnn::encoding`, from the encoding's classes.
    - **Exterior data waits for its encoding.** Text, image, acoustic and motor passages enter only
      through `Encoded::through`. Until the field's own keys and deposition found their encoding,
-     `Encoding::found` refuses the exterior chart (`EncodingError::Unencoded`), and a run reports
-     that refusal as its result. A declared identity is never the bypass, since a cut file is not
-     a `KnownTruth`.
+     `Encoded::through` refuses the exterior chart (`EncodingError::Unencoded`), and a run reports
+     that refusal as its result. `Encoding::found` founds any declared chart as mathematics (the
+     terrains' moiré, copy, crib and moment charts, the byte chart itself); only a located chart
+     carries the class map an exterior passage needs, so the byte chart, a chart built from bare
+     matrices and the moment chart over exterior codes are refused at `through`, as is a code no
+     located label reads. A declared identity is never the bypass, since a cut file is not a
+     `KnownTruth`.
    - **The alphabet fixes nothing.** `FieldDeclaration` has no exterior alphabet. `Field::declare`
      fixes the ring count and widths, the contacts and the complex. The moment's slots and the
      receiving classes are the encoding's classes, never the codec's.
@@ -601,20 +613,29 @@ tests can comb through anything valuable").
      - One field is declared under two encodings of different exterior alphabets. Its widths,
        channels, complex, moment slot count and receiving class count must be equal.
      - `Encoded::identity` must refuse a terrain of `257` classes on `d_g = 60`, and
-       `Encoding::found` must refuse the byte chart.
+       `Encoded::through` must refuse the byte chart (both built, `hnn::tests::encoding`).
    - **The code length does not see the labels.** For every permutation `π` of an exterior
      alphabet, `L(field; π∘x) = L(field; x)`: the field's description length of a passage is
      unchanged when its symbols are relabelled (code length is invariant under relabelling; keys are
      not, [the egg's genome](../research/records/2026-09-27_THE_EGG_IS_A_GENERATORS_GENOME_SELECTION_IS_BAYES_AND_THE_FACES_OF_INTEGERS_ARE_MOIRES_OF_GRATINGS.md) §5).
      The residue chart breaks it; a test that relabels and compares fails on any chart a code
-     chooses.
-   - **Status (October 5).** `Encoded` and its constructors are the next build (lane E). Until
-     it lands, this guard is a rule with named entries, not yet a type: the byte-chart harness
-     modes of October 5 (`executed text`, `hnn_text_repair`) are evidence of the failure, not a
-     route, and no new run enters exterior data through `one_hot`, `PortChart::residue` or
-     `SourceMoment::ingest(&[usize])`.
-   - **What is structural.** The type and its constructors. The refusals are runtime laws, each
-     pinned by a test. Supersedes the residue chart's "stated exception" and its September 29
+     chooses. On the located route the stronger form holds and is tested
+     (`compression::keys::transport::tests`, the located route): the located chart, the founded
+     encoding and every encoded cell of `π∘x` equal those of `x`, only the labels are carried,
+     `λ_(π∘x) = π∘λ_x`, and the located code length is equal.
+   - **Status (October 5).** The type is built (lane E): `Encoded`, `PortCell` and
+     `LocatedAdvances` with `Encoded::{identity, through}` and the located chart in `hnn::encoding`,
+     `KnownTruth` in `holarchy::terrain::known` (the `ℤ/4` order-2, alternation and line emitters
+     moved there from the notebook, which now calls them). The field's entries accept it after the
+     source entrance (Codex): until they do, the byte-chart harness modes of October 5 (`executed
+     text`, `hnn_text_repair`) are evidence of the failure, not a route, and no new run enters
+     exterior data through `one_hot`, `PortChart::residue` or `SourceMoment::ingest(&[usize])`.
+   - **What is structural.** The type and its constructors: `compile_fail` doctests on `Encoded`
+     and `PortCell` show a forged one (`E0451`), an exterior code list, one-hot cells or a code
+     where they go (`E0308`), and `From<usize>`, `From<Vec<_>>`, `From<Faces>` and `From<Released>`
+     (`E0277`) refused, and the lawful identity compiles and runs. The refusals (the fold, an
+     unlocated chart, a plural fibre, an unread code) are runtime laws, each pinned by a test.
+     Supersedes the residue chart's "stated exception" and its September 29
      `[open]` (`hnn::field`, "The port chart").
 10. **No scalar operand.** `Word::pull_back` accepts only a `RatioCovector`, which only a
     `HolonRatio` constructs (`compile_fail`).

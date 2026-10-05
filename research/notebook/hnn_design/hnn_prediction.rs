@@ -33,9 +33,10 @@
 //! - **The receiving bank** ([`bank_of`]): the parametron record's receiving node, its members the
 //!   pump steps whose order divides `d`, at the strength `p = 5/8`, its turn read at the relative
 //!   grain `2^(−16)` ([`BANK_GRAIN`]).
-//! - **The order-2 terrain** ([`order_pairs`]): a request of `n` cells drawn uniformly from 4
-//!   symbols, its target the continuation `x_t = x_(t−2) + 1 (mod 4)` over the `m` stations. The
-//!   loop's `terrain_pairs` adds the alternation and the line; only the terrain computes truth.
+//! - **The order-2 terrain**: a request of `n` cells drawn uniformly from 4 symbols, its target the
+//!   continuation `x_t = x_(t−2) + 1 (mod 4)` over the `m` stations; the alternation and the line
+//!   beside it. The loop's `terrain_pairs` reads them from the library's generator
+//!   (`holarchy::terrain::KnownTruth::cyclic`, moved October 5); only the terrain computes truth.
 //!
 //! The modes before the executed comparison (`copy`, `moire`, `divergence`, `order2`, `pumped`,
 //! `text`, `probe`, `develop`: native generation, the order repair, the bank's generation and
@@ -270,25 +271,6 @@ fn order_declared() -> Declared {
         stations: 8,
         request: 40,
     }
-}
-
-/// **The order-2 terrain** (module header): a request of `n` cells drawn uniformly from 4 symbols,
-/// its target the continuation `x_t = x_(t−2) + 1 (mod 4)` over `m` stations.
-fn order_pairs(declared: &Declared, seed: u64, count: usize) -> Vec<(Vec<usize>, Vec<usize>)> {
-    let symbols = declared.alphabet - 1;
-    let mut draw = Draw::new(seed);
-    (0..count)
-        .map(|_| {
-            let mut passage: Vec<usize> =
-                (0..declared.request).map(|_| draw.below(symbols)).collect();
-            for _ in 0..declared.stations {
-                let next = (passage[passage.len() - 2] + 1) % symbols;
-                passage.push(next);
-            }
-            let target = passage.split_off(declared.request);
-            (passage, target)
-        })
-        .collect()
 }
 
 /// **The run's pin** (module header, guard 22): read, launched from the process's clock (`arm` for

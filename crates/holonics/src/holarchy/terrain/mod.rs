@@ -19,6 +19,7 @@
 //! | [`RotorCrib`] | a declared HNN field's ring as a reflector machine behind a plugboard | [`CribTruth`]: the key and the plugboard, and their description | key location |
 //! | [`Switching`] | two sources alternating by drawn aeons; for [`Switching::dormant`] one moiré whose grating is silent in the odd aeons while its ring keeps turning | [`SwitchTruth`]: the switch epochs as `aeon::Epochs` of the cell clock's forward aeon at the switch section, and the dormant grating | dormancy across aeon boundaries (campaign 3) |
 //! | [`Chase`] | a fast runner and a scripted pursuer on a bounded exact arena whose cells carry friction classes: the runner's constitution at the ground contact (speed bound, traction coefficient; `⟨Δv, Δv⟩ ≤ (γ μ g h²/ℓ)²`), its slip hold and its evasion navigator (flee, circle, zig-zag) drawn from a declared [`RunnerFamily`]; the pursuer's pure pursuit, whose capture `Q ≤ ρ²` ends the passage; the cells are the runner's realized moves, slips and wall meetings | [`ChaseTruth`]: the drawn candidate and its index, the friction field, the openings, the realized motions, the slips, walls and capture tick, and the key description `⌈log₂ N · m^P · WH · (WH − 1)⌉`; beside it the surviving fibre ([`Chase::fibre`]) and its future classes under the admitted chaser words ([`Chase::futures`]) | motion against another's constitution: reception selects the fibre of runner constitutions the passage leaves (F6); in the action phase ([`pursuit`]) a chaser releases one admitted motion a tick against the runner, and the runner's viable tube, its robust viability kernel at a bounded horizon, is read tick by tick; its switches ([`sensing`]) read the runner through three channels, late by a declared lag and one of them turned on the odd aeons of a drawn switch clock ([`FaultTruth`]), whose loop closure locates the turned channel |
+//! | [`KnownTruth`] | a terrain generator's own passages ([`known`]): the cyclic terrains on `ℤ/|A|` (order-2, the alternation, the line, [`CyclicLaw`]) and the located transport's stepped terrain | the passages themselves, emitted by the exact routine; built only by those generators (no public constructor), so a file is never one | the known truth `hnn::encoding::Encoded::identity` reads (THE_MACHINE guard 9) |
 //!
 //! [definition; agent-inferred] **The draw is a navigator** ([`Draw`]): a Weyl rotation of
 //! `ℤ/2^64` by the odd step `γ = ⌊2^64/φ⌋ = 0x9E37_79B9_7F4A_7C15`, whose orbit is the whole circle
@@ -53,6 +54,7 @@
 
 pub mod chase;
 pub mod crib;
+pub mod known;
 pub mod moire;
 pub mod pursuit;
 pub mod sensing;
@@ -74,6 +76,7 @@ pub use chase::{
     RunnerLaw, RunnerState,
 };
 pub use crib::{CribTruth, RotorCrib, rotor_crib};
+pub use known::{CyclicLaw, KnownTruth};
 pub use moire::{Grating, Moire, MoireClass, MoireFamily, MoireTruth, PairLock};
 pub use pursuit::{
     ActionDeclaration, ActionPassage, Basin, BasinMemo, Candidate, CandidateLaw, CaptureReach,

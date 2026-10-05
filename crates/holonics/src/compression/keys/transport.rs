@@ -472,9 +472,16 @@ impl LocatedTransport {
         driven_patches(&self.helix, &self.advances, &self.labels, passage, key).len()
     }
 
-    /// **The encoding consumer's chart** on the helix `ℚ^D`: each class's transport
-    /// `T_u e_ℓ = e_(ℓ + A(u))`, the receiving forms `ρ_c = Σ_(ℓ: λ(c(ℓ)) = c) e_ℓ*`, and an opening
-    /// `e_k` per key. `hnn::encoding::PassageChart::new` reads them.
+    /// **The encoding consumer's chart** on the helix `ℚ^D`, read in the receiving cells and never
+    /// in the labels: each labelled cell's transport `T_c e_ℓ = e_(ℓ + A(λ(c)))`, in cell order; the
+    /// receiving forms `ρ_c = Σ_(ℓ: c(ℓ) = c) e_ℓ*`, one per cell of the receiving ring; and an
+    /// opening `e_k` per key. `hnn::encoding::PassageChart::located` reads them.
+    ///
+    /// [proved-derived; agent-inferred, October 5] The labels `λ` enter nowhere, so under the
+    /// relabelling law (module header) the chart of `π∘x` is the chart of `x`: the transport of cell
+    /// `c` is `A_(π∘x)(π λ(c)) = A_x(λ(c))`, and the founded encoding is equal, not only isomorphic
+    /// (`transport::tests`, the located route). Its classes are the receiving ring's ports; the labels
+    /// stay the boundary's decoder (`hnn::encoding::Encoded::label`).
     #[allow(clippy::type_complexity)]
     pub fn chart(
         &self,
@@ -487,10 +494,11 @@ impl LocatedTransport {
             vector
         };
         let transports = self
-            .advances
+            .labels
             .iter()
-            .map(|&a| {
-                let a = usize::try_from(a).expect("an advance fits");
+            .flatten()
+            .map(|&class| {
+                let a = usize::try_from(self.advances[class]).expect("an advance fits");
                 ExactRatMatrix::new(
                     (0..n)
                         .map(|row| unit((row + n - a) % n))
@@ -498,11 +506,11 @@ impl LocatedTransport {
                 )
             })
             .collect::<Result<Vec<_>, _>>()?;
-        let coupling = (0..self.classes())
-            .map(|class| {
+        let coupling = (0..self.helix.cells())
+            .map(|cell| {
                 (0..n)
                     .map(|lift| {
-                        if self.emit(lift as u64) == Some(class) {
+                        if self.helix.cell(lift as u64) == cell {
                             Rat::one()
                         } else {
                             Rat::zero()

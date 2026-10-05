@@ -460,3 +460,74 @@ choice of the worst measured unit, reported as such.
   failed, 411,970 ms of tests (417,968 ms wall with its build; four threads, beside the read's four,
   within the budget of 8); receipt `lib_tests.txt`. The owner's nine tests are among them. No Lean
   changed (§8 names the obligations); no card run (no kernel or card path changed).
+
+## 10. The located route founds the one source type (lane E, `Encoded`)
+
+**Grade.** [definition; agent-inferred] for the type and its routes; [proved-derived;
+implemented-exact] for the relabelling law on the located route. **Occasion.** THE_MACHINE guard 9
+named one source type, `hnn::encoding::Encoded`, built only by `hnn::encoding` from a known truth's
+identity or a founded encoding's image, and §6 named the class the selective step should read. This
+section builds the type with no field consumer yet; the field's entries (`SourceMoment::ingest`,
+`Current::step`, `Field::selective_step`, the port, the keys) take it after the source entrance.
+
+**The recorded failures each choice could repeat** ([lessons](2026-09-29_LESSONS_THE_FAILURES_THAT_REPEATED_AFTER_THEY_WERE_RECORDED.md)):
+3, text on its codec's grain (an exterior code never becomes a class: `PortCell` has no public
+constructor and no `From<usize>`, and only a located chart maps a code to a class); 1, an authored
+routine (the identity reads a terrain's own truth, never its advances: the stepped terrain's identity
+carries no located advance); 6, seen graded as unseen (a `KnownTruth` is built only by a terrain's
+generator, so a cut file cannot take the identity route); 11, the programming language (a class is a
+port of the receiving ring, its advance the lift's digits, not an index into a table).
+
+**What was built** (`hnn::encoding`, `holarchy::terrain::known`):
+- `Encoded`, a passage of `PortCell`s with the class count, the source rings `(g, d_g)` it was
+  checked against, `D`, the Preimage Fibre `ker E ∩ R`, the boundary's labels `c ↦ λ(c)` and, on the
+  located route, `LocatedAdvances`: the helix periods and each class's digits `a_g(c) < d_g` of
+  `A(λ(c))`, held at the period's width (`u64`), never narrowed. Under a located transport a ring
+  advances `a_g(c) + carry_g ≤ d_g`, so the selective step's two-tick bound (`SelectiveStep.ticks:
+  Vec<u8>`) is not the located step's; the consumer keeps each tick count, section flux and winding
+  at least at the period's width.
+- `Encoded::identity(&KnownTruth, &Field)`: each class itself, `D = I`, fibre empty; refused with
+  `EncodingError::Fold` unless `|A| ≤ d_g` on every source ring.
+- `PassageChart::located(&TransportLocation, read set)`: the location's one gauge class (`Plural`
+  otherwise, `Unencoded` on an empty fibre or a cell outside its classes), opened at each passage's
+  least key with the fewest patches, and keeping what located it.
+- `Encoded::through(&Encoding, &PassageChart, &Field, passages)`: refused with `Unencoded` unless
+  the chart is located; the squares `D E = ρ`, `E T_c = U_c E` checked on every reached state; each
+  code `u` enters as `c = λ⁻¹(u)` (`Unencoded` where no label reads it).
+- `Encoded::split_at`, the request and its section, both keeping their encoding.
+- `KnownTruth::{cyclic, stepped}`: the `ℤ/4` order-2, alternation and line emitters moved from the
+  notebook (`terrain_pairs`, `order_pairs`) with their draws in the same order, which the harness now
+  calls; and the stepped terrain's passages from declared keys.
+
+**One change to §2's consumer** [agent-inferred]. `LocatedTransport::chart` is now read in the
+receiving cells: a transport per labelled cell, `T_c e_ℓ = e_(ℓ + A(λ(c)))`, and a receiving form per
+cell, `ρ_c = Σ_(c(ℓ) = c) e_ℓ*`. Under a bijective labelling these are §2's matrices re-indexed by
+`λ⁻¹`, so §4's founded dimensions (25, 49) and squares are unchanged (the owner's founding test
+reads 25 again); the labels now enter only the boundary's decoder. The reason is the relabelling
+law in its strong form: the chart of `π∘x` is then the chart of `x`, not an isomorphic one.
+
+**Measured** (`compression::keys::transport::tests::the_located_route_encodes_the_read_set_without_its_labels`;
+`hnn::tests::encoding`):
+- On `(2, 3, 5)` from every key, two turns of the joint clock: the draw `2_026_100_962` (the first of
+  `…961 … 972`, a range nothing held, whose read set locates one gauge class) founds the located chart
+  with 5 transports, reached 30 and founded dimension `25 = 30 − 5`, a Preimage Fibre of 5
+  directions. For twelve permutations (every tenth of 120) the chart's transports, forms and openings,
+  the founded `Encoding`, every encoded cell, `D`, the fibre and the digits are equal on `π∘x`, the
+  labels are carried by `π`, and the located code length is equal. The draw `…961` keeps 5 gauge
+  classes and is refused (`Plural { classes: 5 }`); the relabelling test's draw `…934` is plural too.
+  The scan's outcomes: one class on `…962, 964, 968, 969, 971, 972`; plural (classes) on `…961` (5),
+  `963` (2), `965` (90), `966` (340), `967` (2), `970` (6).
+- On the order-2 field's source ring of period `60 = 2²·3·5`: the identity refuses 257 classes and
+  61, and accepts 60 and the order-2 terrain's 4. The copy ring over the byte alphabet (`Holonics`,
+  `|A| = 256`), the "code itself" chart on 8 codes and the moment chart over exterior codes all found
+  and their squares hold, and `through` refuses each (`Unencoded`).
+
+**Owed in #62.** 6. The relabelling law on the located route: the cell-read chart of `π∘x` equals
+that of `x`, so the founded encoding and the encoded cells are equal and `λ_(π∘x) = π∘λ_x`.
+
+**Gates** (this section's commit, its own target directory, a thread budget of 8). Gate 1,
+`bash tools/gate.sh`: check, guard lints and guard doctests ok (3,429; 6,488; 5,055 ms; 14,979 ms
+wall), the eleven `hnn::encoding` doctests among them, each `compile_fail` reporting its stated code.
+Gate 2, `cargo test -p holonics --lib -- --test-threads=8` in a transient systemd service: 1,007
+passed, 0 failed, 171,930 ms of tests and 177,390 ms wall against the brief's projection of about
+190 s, peak 2.3G. No Lean changed (item 6 above is owed); no kernel or card path changed.
