@@ -59,3 +59,51 @@ byte chart; each release's copy length (`tools/copy_length.py`) is read against 
 and against its own request. Every byte is written only to the worktree's `.local/text_loop/`.
 
 **Thread budget** 12 (`RAYON_NUM_THREADS=12`).
+
+**The projection, fixed after the development read and before the run** (`dev_log.txt`). The
+development window read no lock on the training passage, so the run reads the two openings. A
+request took `6,208` ms on the lossless opening and `48,032` ms on the founded opening (one request
+alone at 12 threads, the bank's own candidates in parallel). The projection is 16 times their sum,
+`16 · 54,240 = 867,840` ms; its upper end, `5/4` of it, `1,084,800` ms, is the deadline (an outer
+`timeout 1085`). Early stop: the lossless state's line is due by `16 · 6,208 · 5/4 = 124,160` ms; a
+later line stops the run, reported incomplete.
+
+## 1. The recorded failures this loop could repeat, and how each was held
+
+From the [lessons](2026-09-29_LESSONS_THE_FAILURES_THAT_REPEATED_AFTER_THEY_WERE_RECORDED.md), the
+[prototypes' lessons](2026-09-24_LESSONS_FROM_THE_WORKBENCH_AND_ATHENA_PROTOTYPES.md) and the
+[contamination cycles](2026-10-05_THE_CONTAMINATION_CYCLES_EVERY_COPY_PIPELINE_FOLLOWED_A_DEMAND_FOR_OUTPUT_BEFORE_THE_FIELD_COULD_RELEASE.md):
+- **3, text as the exception.** Nothing here is text's: the field, the menu, the deposit and the
+  release are step 1's, and the only change is the exterior alphabet (`|A| = 257`), which
+  `Field::declare` does not read. The byte chart and the cut reader are the boundary codec, in the
+  harness. Order-2's `ℤ/4` cells and a pixel's or a sample's codes enter the same mode alike.
+- **1 and 17, an authored routine.** No distance, map, turn or class is declared or chosen; no rule
+  of text enters. The release reads `FieldMaterial` alone (guard 18).
+- **2, recitation.** No context, count or seen passage is read by the release; each release carries
+  its copy length against the training passage and against its own request (guard 19), a receipt,
+  never a control.
+- **6, seen graded as unseen.** The requests are later windows of the choosing role that no run of
+  this loop read before the pinned run; the training passage is read only by key location; the
+  development window is used for timing only.
+- **7, bits read as progress.** No bit count is read; the deliverable is the releases themselves.
+- **9, a larger limit.** One development read, then one run under the deadline fixed from it.
+- **4 and lesson 3, a located cause carried into a new consumer.** The located causes stand where
+  they were recorded: the menu reads a stationary turn, so it needs the passage's relation at a
+  distance to be a partial injection; the deposit refuses a port holding two classes (lane B §3).
+  This loop names them as its expected blockers and measures where each binds.
+
+## 2. The loop in the objects
+
+- **Holarchy.** Step 1's field: three parametron rings of period `60 = 2²·3·5` joined by two pair
+  contacts in a chain `0 — 1 — 2`; ring 0 is the source and the receiving ring. Its ports are the
+  residue chart of the exterior chart: a byte `x` enters ring 0 at the port `x mod 60`.
+- **Aeon, epoch, cycle.** A window is one span of ring 0's clock within one turn (`n + m = 48 < 60`);
+  each station is an epoch, a crossing of the receiving ring's section, and one observation.
+- **Keys.** A key is a distance `δ`, a stationary turn `c` of the rotor and the plugboard images,
+  read by the turn menu's loop law `S(port(x_t)) = S(port(x_(t−δ))) + c` at every edge. It holds only
+  where the menu relation at `δ` is a partial injection: every antecedent port with one
+  consequence, every consequence with one antecedent.
+- **Receiver and receipt.** The release is the receiving ring's bank's reception at the request
+  boundary (`generate_by_bank`); with no closed pair contact it reads the span's law, each
+  candidate's storage from its own station. The receipt is one region per station: its top class,
+  whether its lock is certified, and the plural stations where none is.
