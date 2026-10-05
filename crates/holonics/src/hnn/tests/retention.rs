@@ -570,12 +570,13 @@ fn the_boundary_reaches_the_pending_ratios_and_refuses_out_of_turn() {
     let field = two_receiver_path();
     let reference = Reference::campaign_one().with_reception(Reception::Rest);
     let theta = generic(&field, 57);
-    // The mount certifies the field's Holarchy, whose contacts' momentum chart needs each storage
-    // `C_a` invertible: this drawn constitution has a singular one and is refused, typed.
-    assert!(matches!(
-        reference.mount_with(&field, &Current::at_rest(&field), theta.clone()),
-        Err(HnnError::Linear(_))
-    ));
+    // The mount certifies the field's Holarchy on each contact's storage factor, so this drawn
+    // constitution with a singular `C_a` mounts; the boundary below reads unit storage.
+    assert!(
+        reference
+            .mount_with(&field, &Current::at_rest(&field), theta.clone())
+            .is_ok()
+    );
     let theta = (0..field.contacts().len()).fold(theta, |theta, a| {
         let k = field.contact(a).width();
         let (stiffness, dissipation) = (
@@ -792,6 +793,59 @@ fn a_releasing_collapse_releases_the_carried_motion_its_material_held() {
         .compare(&mut resident, fresh, &one_hot(&[2, 3]))
         .unwrap();
     reference.read(&resident).unwrap();
+}
+
+/// [definition; agent-inferred, October 5] **A collapsed constitution remounts and reads alike.**
+/// Closing an aeon onto no receiver releases every contact's channel (`c_a = K_a = D_a = 0`, the
+/// pure transmission the word executes), and the mount certifies the field's Holarchy on each
+/// contact's storage factor (`Field::contact_holon`), which needs no `C_a⁻¹`. So the collapsed
+/// constitution mounts with the resident's lift point and carried end, and the remounted
+/// resident's next reading is the un-remounted one's, faces, ratio and deposit alike:
+/// `compare(refine(mount(Θ_collapsed, λ, carry), m, φ), t) = compare(refine(resident, m, φ), t)`.
+#[test]
+fn a_collapsed_constitution_remounts_and_reads_alike() {
+    let field = super::learning::chain();
+    let reference = Reference::campaign_one();
+    let mut resident = reference
+        .mount_with(&field, &Current::at_rest(&field), generic(&field, 23))
+        .unwrap();
+    let phases = resident.admitted()[0].clone();
+    let (moment, _) = reference.ingest(&mut resident, None, &[]).unwrap();
+    let (pending, _) = reference.refine(&mut resident, &moment, &phases).unwrap();
+    let (staged, _) = reference
+        .compare(&mut resident, pending, &one_hot(&[1, 0]))
+        .unwrap();
+    reference.discard(&mut resident, Handle::Staged(staged)).unwrap();
+    to_the_carry_out(&reference, &mut resident);
+    let boundary = reference.close_aeon(&mut resident, &[]).unwrap();
+    let released = &boundary.forward.present().unwrap().collapse.released;
+    for a in 0..field.contacts().len() {
+        assert!(released.contains(&Locus::Channel(a)));
+        let factor = resident.constitution().contact_storage(a);
+        assert!(factor.entries().iter().all(Zero::is_zero));
+    }
+    let carry = resident.carried().cloned().expect("the refine wrote the carry");
+    let mut remounted = reference
+        .mount_carried(
+            &field,
+            resident.current(),
+            resident.constitution().clone(),
+            carry,
+        )
+        .unwrap();
+    assert_eq!(remounted.constitution(), resident.constitution());
+    assert_eq!(remounted.carried(), resident.carried());
+    let next = |resident: &mut crate::hnn::reference::Resident| {
+        let (moment, _) = reference
+            .ingest(resident, None, &one_hot(&[1, 2, 3]))
+            .unwrap();
+        let (pending, refined) = reference.refine(resident, &moment, &phases).unwrap();
+        let (_, compared) = reference
+            .compare(resident, pending, &one_hot(&[2, 1]))
+            .unwrap();
+        (refined.forward, compared.forward, compared.deposit)
+    };
+    assert_eq!(next(&mut remounted), next(&mut resident));
 }
 
 /// The six rings of the six-ring path split in two: `0–1–2` (source ring 0, receiver ring 2) and

@@ -1555,8 +1555,8 @@ impl Field {
     /// ring g     x_g ∈ ℚ^(2d_g),  storage ½|x_g|²,  ẋ_g = (Ω_g − R_g + W_c,g) x_g + B_g f_g,  e_g = B_gᵀ x_g
     ///            Ω_g = Σ_ρ σ_ρ A_ρ (the skew slices at the sheet classes),  R_g = f fᵀ = −W_s,g,  W_c,g active
     ///            B_g = [ι_(a,from)] at each contact leaving g,  [−ι_(a,to)] at each contact entering g
-    /// contact a  (u_a, p_a),  storage ½uᵀK_a u + ½pᵀC_a⁻¹p,  u̇ = w,  ṗ = −K_a u − D_a w + e_(a,from) + e_(a,to)
-    ///            (w = C_a⁻¹p; both end ports carry the flow w)
+    /// contact a  (u_a, z_a),  storage ½uᵀK_a u + ½|z|²,  u̇ = w,  ṗ = c_a ż = −K_a u − D_a w + e_(a,from) + e_(a,to)
+    ///            (z = c_aᵀw, C_a = c_a c_aᵀ; both end ports carry the flow w)
     /// ```
     ///
     /// Each ring is its own Holon (storage, resistive, external and active ports; one external
@@ -1568,13 +1568,14 @@ impl Field {
     /// contact's force is the channel difference `ι_(a,g)ᵀ x_g − ι_(a,h)ᵀ x_h` of the block incidence
     /// [`Field::connection`], `(d_A x)_a = U_aᵀ x_h − x_g` read on the channel; its rate leaves ring
     /// `g`'s channel and enters ring `h`'s. The whole is the one Holarchy of the field (storage: the
-    /// rings in order, then each contact's `(u_a, p_a)`), assembled only when read
+    /// rings in order, then each contact's `(u_a, z_a)`), assembled only when read
     /// ([`Holarchy::whole`]). The rings carry their navigators. Every element relation is read from
     /// the constitution, so the chart is never a second owner of `Θ`; a deposit is seen by building
     /// the chart again. [agent-inferred] The chart is the continuous Holon whose tick the word takes
     /// in wave variables; the word's junction Swing and midpoint two-port are its scattering form,
-    /// and the chart claims no more. A singular contact storage `C_a` is refused: its momentum chart
-    /// needs `C_a⁻¹`.
+    /// and the chart claims no more. Each contact is charted on its storage factor
+    /// ([`Field::contact_holon`]), which needs no `C_a⁻¹`, so every constitution the word executes,
+    /// a singular `C_a` and a channel the aeon's collapse released included, has its Holarchy.
     ///
     /// Its consumer is the mount ([`crate::hnn::Reference::mount_with`]): the resident's
     /// declaration certifies the field at the mounted constitution a Holarchy that glues, refused
@@ -1808,9 +1809,28 @@ impl Field {
             .with_navigator(ring.navigator().clone()))
     }
 
-    /// Contact `a`'s own Holon: the medium on `(u_a, p_a)` with storage `(K_a, C_a⁻¹)`,
-    /// dissipation `D_a` on `p_a`, and two `k_a`-port blocks, its `from` end then its `to` end, each
-    /// driving `ṗ_a` and each carrying the flow `w = C_a⁻¹ p_a`.
+    /// [definition; agent-inferred, October 5] **Contact `a`'s own Holon, in its storage factor's
+    /// chart.** The constitution holds the contact's storage as its factor `c_a` (`k × m`,
+    /// `C_a = c_a c_aᵀ ⪰ 0`), and the kinetic energy is `½wᵀC_a w = ½|z|²` with `z = c_aᵀ w ∈ ℚ^m`.
+    /// The Holon stores `(u, z)` with the form `diag(K_a, 1_m)`, and the factor is a transformer
+    /// between `z` and the momentum: `ṗ = c_a ż`, `e_z = c_aᵀ w`. Its kernel form on the ports
+    /// `(u, z | w | from, to)`, with `w` the `from` end's flow:
+    ///
+    /// ```text
+    /// f_u + f_from = 0,   f_to − f_from = 0,   f_R − f_from = 0,   e_z − c_aᵀ f_from = 0,
+    /// c_a f_z − e_u + e_R + e_from + e_to = 0          (the momentum: ṗ = −K_a u − D_a w + e_from + e_to)
+    /// ```
+    ///
+    /// with the resistive relation `D_a` on `w`. It pairs to zero (the power is
+    /// `⟨w, c_a f_z − e_u + e_R + e_from + e_to⟩`) and has `4k + m` independent rows, so it is
+    /// Dirac for every factor. Where `C_a ≻ 0` it is the momentum chart `(u, p)` with storage
+    /// `(K_a, C_a⁻¹)` under `p = c_a z` (`c_aᵀ C_a⁻¹ c_a = 1` for a square invertible factor). It
+    /// needs no inverse, so it is the chart of every storage the constitution admits: a singular
+    /// `C_a`'s kernel directions carry no momentum and their flow is the interconnection's (a
+    /// constraint, not an infinite mass, which a pseudo-inverse would state), and a released channel
+    /// (`c_a = 0`, with `K_a = D_a = 0`) is the pure transmission the word executes
+    /// (`hnn::propagation`, `m = 1 + (G/2h)(2C + hD + (h²/2)K)`): one flow at both ends, the ends'
+    /// efforts balanced.
     fn contact_holon(
         &self,
         constitution: &impl ConstitutionRead,
@@ -1824,29 +1844,69 @@ impl Field {
             constitution.contact_stiffness_signature(a),
         )?;
         let dissipation = crate::hnn::propagation::gram(constitution.contact_dissipation(a))?;
-        let compliance =
-            crate::hnn::propagation::gram(constitution.contact_storage(a))?.inverse()?;
-        let mut omega = vec![vec![Rat::zero(); 2 * k]; 2 * k];
-        let mut resistance = vec![vec![Rat::zero(); 2 * k]; 2 * k];
-        let mut storage = vec![vec![Rat::zero(); 2 * k]; 2 * k];
-        let mut input = vec![vec![Rat::zero(); 2 * k]; 2 * k];
+        let factor = constitution.contact_storage(a);
+        if factor.rows() != k {
+            return Err(HnnError::Shape {
+                what: "contact storage factor rows (the channel width)",
+                expected: k,
+                found: factor.rows(),
+            });
+        }
+        let m = factor.columns();
+        // Ports: storage `u` then `z`, resistive `w`, external `from` then `to`.
+        let (u, z, r, from, to) = (0, k, k + m, 2 * k + m, 3 * k + m);
+        let n = 4 * k + m;
+        let mut flow = vec![vec![Rat::zero(); n]; n];
+        let mut effort = vec![vec![Rat::zero(); n]; n];
         for i in 0..k {
-            omega[i][k + i] = Rat::one();
-            omega[k + i][i] = -Rat::one();
-            input[k + i][i] = Rat::one();
-            input[k + i][k + i] = Rat::one();
-            for j in 0..k {
-                storage[i][j] = stiffness.get(i, j)?.clone();
-                storage[k + i][k + j] = compliance.get(i, j)?.clone();
-                resistance[k + i][k + j] = dissipation.get(i, j)?.clone();
+            // u̇ = w.
+            flow[i][u + i] = Rat::one();
+            flow[i][from + i] = Rat::one();
+            // Both ends carry the flow w.
+            flow[k + i][to + i] = Rat::one();
+            flow[k + i][from + i] = -Rat::one();
+            // The resistive flow is w.
+            flow[2 * k + i][r + i] = Rat::one();
+            flow[2 * k + i][from + i] = -Rat::one();
+            // The momentum through the factor.
+            let row = 3 * k + m + i;
+            for j in 0..m {
+                flow[row][z + j] = factor.get(i, j)?.clone();
+            }
+            effort[row][u + i] = -Rat::one();
+            effort[row][r + i] = Rat::one();
+            effort[row][from + i] = Rat::one();
+            effort[row][to + i] = Rat::one();
+        }
+        for j in 0..m {
+            // e_z = c_aᵀ w.
+            effort[3 * k + j][z + j] = Rat::one();
+            for i in 0..k {
+                flow[3 * k + j][from + i] = -factor.get(i, j)?.clone();
             }
         }
-        Ok(Holon::new(PortHolon::medium(
-            &ExactRatMatrix::shaped(2 * k, 2 * k, omega)?,
-            &ExactRatMatrix::shaped(2 * k, 2 * k, resistance)?,
+        let mut storage = vec![vec![Rat::zero(); k + m]; k + m];
+        for i in 0..k {
+            for j in 0..k {
+                storage[i][j] = stiffness.get(i, j)?.clone();
+            }
+        }
+        for j in 0..m {
+            storage[k + j][k + j] = Rat::one();
+        }
+        Ok(Holon::new(PortHolon::new(
+            DiracStructure::kernel_form(
+                &ExactRatMatrix::shaped(n, n, flow)?,
+                &ExactRatMatrix::shaped(n, n, effort)?,
+            )?,
+            PortCounts {
+                storage: k + m,
+                resistive: k,
+                external: 2 * k,
+                active: 0,
+            },
             SymmetricForm::from_rows(storage).map_err(HolonError::from)?,
-            &ExactRatMatrix::shaped(2 * k, 2 * k, input)?,
-            false,
+            ResistiveRelation::new(dissipation)?,
         )?)?)
     }
 

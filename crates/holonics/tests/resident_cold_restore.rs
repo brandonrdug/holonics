@@ -137,12 +137,10 @@ fn cold_restore_preserves_arrived_without_an_open_moment() {
     cold_equivalence(false, true, false);
 }
 
-/// The post-close save remounts. Ignored until the aeon collapse's constitution mounts: on
-/// `9a62a685` itself, `mount_with` of the constitution `close_aeon` returns refuses with
-/// `Linear(SingularMatrix)` (October 5; refs #73), a retention defect the admitted future of
-/// continuing exposes. The equivalence through close above passes.
+/// The post-close save remounts: the constitution the aeon's collapse returns is charted on each
+/// contact's storage factor (`Field::contact_holon`), so a released channel's zero storage mounts
+/// as the pure transmission the word executes.
 #[test]
-#[ignore = "post-close constitution does not mount: Linear(SingularMatrix) on 9a62a685, refs #73"]
 fn post_close_save_remounts() {
     cold_equivalence(false, false, true);
 }
