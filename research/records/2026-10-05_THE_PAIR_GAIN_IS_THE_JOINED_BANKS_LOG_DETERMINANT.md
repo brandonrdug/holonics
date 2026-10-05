@@ -260,11 +260,67 @@ released 0 of 7 nonconstant development sections whole on `042` (the regressions
 
 ## 6. Validation, read once after the pin
 
-[pending: read once after the commit that pins §0.]
+[measured] `executed evaluate`, 64 requests a terrain, 12 threads, the keys states of §0 mounted from
+the receipts, read once at the build of `4f9a5b3d` (the commit that pins §0; source unchanged since).
+Stations right are of 512 (nonconstant and constant apart in the regressions' `tally.py`).
+
+| Terrain (seed) | State | Closed contacts | Released / held | Whole: nonconstant, constant | Stations right | First lock right | ms |
+|---|---|---|---|---|---|---|---|
+| order-2 (`032`) | keys on the founded opening | `{2}` | 64 / 0 | **64 of 64**, 0 of 0 | 512 | 64 | 35,487 |
+| order-2 (`032`) | keys on the lossless opening | `{2}` | 64 / 0 | 64 of 64, 0 of 0 | 512 | 64 | 41,959 |
+| alternation (`035`) | keys on the founded opening | `{2}` | 64 / 0 | **46 of 46**, 18 of 18 | 512 | 64 | 46,303 |
+| alternation (`035`) | keys on the lossless opening | `{2}` | 64 / 0 | 46 of 46, 18 of 18 | 512 | 64 | 43,036 |
+| line (`038`) | keys on the founded opening | `{4}` | 64 / 0 | **48 of 48**, 16 of 16 | 512 | 64 | 42,985 |
+| line (`038`) | keys on the lossless opening | `{4}` | 64 / 0 | 48 of 48, 16 of 16 | 512 | 64 | 43,271 |
+
+No certificate was refused and no section reached the termination. Every released station follows
+the located pair: order-2's 512 are the targets, `x_t = x_(t−2) + 1 (mod 4)`; the alternation's 512
+follow `x_t = x_(t−2)` and the line's 512 follow `x_t = x_(t−4)` (`tally.py`). Under lane C's least
+member the same states released 0 of 46 alternation sections whole (the regressions record §6).
+
+**The claim of §0 holds**: order-2 keeps 64 of 64, the line keeps 48 of 48 nonconstant, and the
+alternation releases 46 of 46 nonconstant sections whole (strictly more than 0), on both keys
+states. This is a validation reading only: the final confirmation seeds are spent and were not
+read. As regressions, the alternation's and the line's request spaces have 16 members, so these
+readings repeat training content by construction; none is a transfer reading.
+
+**Sections, whole, beside their request tails** (keys on the founded opening, the first validation
+requests in order; synthetic `ℤ/4` terrains; the whole listings are `validation_*_sections.txt`):
+
+```text
+alternation  request …3 1 3 1 | released 3 1 3 1 3 1 3 1 | locks [0], [2], [4], [6], [1], [3], [5], [7]
+alternation  request …0 1 0 1 | released 0 1 0 1 0 1 0 1 | locks [1], [3], [5], [7], [0], [2], [4], [6]
+alternation  request …3 3 3 3 | released 3 3 3 3 3 3 3 3 | locks [0, 1], [2, 3], [4, 5], [6, 7]   (constant)
+order-2      request …2 2 2 0 | released 3 1 0 2 1 3 2 0 | locks [1], [3], [0, 5], [2, 7], [4], [6]
+line         request …0 1 2 3 | released 0 1 2 3 0 1 2 3 | locks [3], [7], [0], [4], [1], [5], [2], [6]
+```
+
+The alternation's chains run one after the other: the station a contact joins to the request's cell
+locks first, then each lock joins the station two ticks on.
 
 ## 7. Time and memory
 
-[pending.]
+Thread budget 12 (`RAYON_NUM_THREADS=12`) on every release read; the terrains read one after the
+other. Peak resident sets: the program's own (`VmHWM`) where marked "program", the systemd scope's
+cgroup `memory.peak` (exact bytes) where marked "scope".
+
+| Run | Projection / deadline | Measured wall ms | Peak resident bytes |
+|---|---|---|---|
+| `pair-members`, development (8 requests × 3 terrains × 2 seeds, six reads together, one thread each) | — / 120,000 each (first read) | 7,169 to 7,398 | not read |
+| release, development `042` (8 × 2 states): order-2, alternation, line | — / 120,000 each (first read with the law) | 10,907; 11,931; 12,392 | 145,547,264; 145,707,008; 146,968,576 (program) |
+| release, development `043`, the same | — / 120,000 each | 10,927; 11,877; 12,498 | 144,515,072; 145,657,856; 145,690,624 (program) |
+| release, validation, order-2 (64 × 2) | 83,952 (upper 104,940) / 105,000 | 77,947 | 155,365,376 (scope); 149,774,336 (program) |
+| release, validation, the alternation (64 × 2) | 95,982 (upper `239955/2`) / 120,000 | 89,821 | 151,572,480 (scope); 154,726,400 (program) |
+| release, validation, the line (64 × 2) | 96,552 (upper 120,690) / 121,000 | 86,724 | 153,858,048 (scope); 153,964,544 (program) |
+
+The validation projection took each state's largest measured time a request before launch, times
+64: order-2's keys on the founded opening `5242/8` (development `043`), on the lossless `5252/8`
+(`042`); the alternation's founded `5725/8` (`043`), lossless `50182/64` (the regressions'
+validation); the line's founded `6036/8` and lossless `6033/8` (`043`). Measured over projected:
+order-2 `77947/83952`, the alternation `89821/95982`, the line `86724/96552`, all inside. One state
+passed its own share inside an on-time run: the alternation's keys on the founded opening read in
+46,303 ms against its share 45,800 (upper 57,250), an overrun of 503 ms on that state; the run's
+deadline held and nothing was relaunched.
 
 ## 8. Owed in #62
 
@@ -282,4 +338,15 @@ released 0 of 7 nonconstant development sections whole on `042` (the regressions
 
 ## 9. Commits and gates
 
-[pending.]
+- `4f9a5b3d`: the law (`prediction::gain`), its two tests, the notebook diagnostic, the atlas rows,
+  the records README's route, this record through §5 with the claim of §0, and the development
+  receipts. The readings' commit: §6, §7, §9 and the validation receipts.
+- Gates, at `4f9a5b3d`'s source: `cargo check --workspace --all-targets` clean but for the
+  pre-existing dead-code warning `ReceivingPhases::with_rank` (11,297 ms); `cargo test -p holonics
+  --lib`, 1010 passed and 0 failed in 278.44 s (284,763 ms with its build, 12 test threads);
+  `RUSTC_BOOTSTRAP=1 cargo test -p holonics --doc FieldMaterial`, the compile_fail guard 18 passes
+  (19,081 ms with its build). No Lean changed (the three statements of §8 are owed in #62). No card
+  run: no kernel or card path changed (the card does not read the release).
+- What failed: the hypothesis of a ratio of joint quadratic forms over the members (§3.2, §5.1: 48 of
+  64 order-2 stations a development seed, every loss the antecedent's copy), and lane C's least
+  member on the alternation (4 and 20 of 64). Nothing of the claim failed.
