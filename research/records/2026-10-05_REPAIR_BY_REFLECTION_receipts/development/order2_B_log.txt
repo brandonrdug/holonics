@@ -1,0 +1,19 @@
+Running as unit: run-p355279-i4592877.service
+executed repair: order2, damage B, seed 2026100701, 64 passages of 48 cells (opening 8); erased cells [7, 9, 11, 13, 15, 17, 19, 21, 23, 25, 27, 29, 31, 33, 35, 37, 39, 41, 43, 45, 47] (21 of 48)
+  first lock at 60 observations (3 passages plus 0): δ 2, map [(0, 1), (1, 2), (2, 3), (3, 0)]
+  n*_machine: located from 60 observations (3 passages plus 0) to the read set's end (1280 observations): δ 2, map [(0, 1), (1, 2), (2, 3), (3, 0)], cycle 4, turns [15, 45]; survivors at the end [2]
+  the relation on ℤ/4: δ 2, consequences [Some(1), Some(2), Some(3), Some(0)]; 0 of 64 passages locate it from their own intact cells alone
+  released 0, held 1344 of 1344 erased cells; released equal to the truth 0 of 0; valid classes of ℤ/4 0 of 0; sweeps at most 1; 1 ms
+  held, by cell: {7: 64, 9: 64, 11: 64, 13: 64, 15: 64, 17: 64, 19: 64, 21: 64, 23: 64, 25: 64, 27: 64, 29: 64, 31: 64, 33: 64, 35: 64, 37: 64, 39: 64, 41: 64, 43: 64, 45: 64, 47: 64}; by family: {[0, 1, 2, 3]: 1344}
+  joint fibres N (passages): {4: 64}
+  the codec: key 18 bits + residual 128 bits (longest a passage 2; the Fold's bound Σ⌈log₂ N⌉ = 128) = 146 bits, against the literal 2688 bits; decoded: 64 of 64 passages reopened exactly, trailing bits 0
+  per passage: the key 18 + its residual against its literal 42 bits
+  the generating key [Some(1), Some(2), Some(3), Some(0)] is the located relation
+  n*_terrain (the repair's grain): 0 observations (0 passages plus 0) (the global family, lags [1, 40]); survivors there: 40 alive: ℓ 1 [· · · ·]; ℓ 2 [· · · ·]; ℓ 3 [· · · ·]; ℓ 4 [· · · ·]; ℓ 5 [· · · ·]; ℓ 6 [· · · ·]; ℓ 7 [· · · ·]; ℓ 8 [· · · ·]; 1431 ms
+  n*_terrain (the syntactic class, S_k unchanged from here): 101 observations (5 passages plus 1); survivors at the end: 2 alive: ℓ 1 [· · · ·]; ℓ 2 [1 2 3 0]
+executed repair: 1447 ms; resident 10256384 now, 10256384 peak
+          Finished with result: success
+Main processes terminated with: code=exited, status=0/SUCCESS
+               Service runtime: 1.467s
+             CPU time consumed: 1.449s
+                   Memory peak: 5.3M (swap: 0B)

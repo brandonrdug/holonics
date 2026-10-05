@@ -1,3 +1,8 @@
+Measurement 1, the first development pass (before the pin's amendment; its logs were overwritten by measurement 2, the *_log.txt here), service time read from systemd-run:
+order2 A 46ms; order2 B 1423ms; line A 39ms; line B 49ms; alternation A 54ms; alternation B 4712ms
+(Five runs of that pass were first launched with malformed arguments by a zsh word-splitting error, refused at argument parsing in 18-19ms, and relaunched under bash; their logs were removed.)
+Measurement 2: the *_log.txt files (order2 A 44ms; order2 B 1467ms; line A 46ms; line B 40ms; alternation A 63ms; alternation B 4641ms).
+Measurements 3 to 5:
 order2 A rep 1:  Service runtime: 45ms  Memory peak: 4.9M (swap: 0B) 
 order2 B rep 1:  Service runtime: 1.440s  Memory peak: 5M (swap: 0B) 
 line A rep 1:  Service runtime: 41ms  Memory peak: 5.4M (swap: 0B) 

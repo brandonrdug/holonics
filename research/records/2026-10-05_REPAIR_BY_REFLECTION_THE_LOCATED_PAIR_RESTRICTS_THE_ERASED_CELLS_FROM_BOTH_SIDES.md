@@ -1,8 +1,10 @@
-# Repair by reflection: the located pair restricts the erased cells from both sides
+# Repair by reflection: the located pair restricts the erased cells from both sides, every released cell is its truth, and a held chain costs one patch
 
 **Date.** October 5. **Issues.** #73, #148, #63, #62. **Lanes.** B and C of U6 (THE_REBUILD, "U6's
 order from October 5", the paragraph "The task is repair, not continuation"). **Grade.**
-[definition; agent-inferred] for the pins of §0, fixed and committed before any read.
+[definition; agent-inferred] for the pins of §0, fixed and committed before any read (`7109bc11`,
+amended before the read at `43788fb9`); [measured] for every count of §4–§7 (the runs of
+`2026-10-05_REPAIR_BY_REFLECTION_receipts/runs.sh` at `43788fb9`); [proved-derived] where marked.
 
 **Occasion.** Brandon, October 5: "the predicting next tokens is just not a good computational
 ontology"; the use is "repairing/decrypting information generally in order to produce
@@ -204,3 +206,153 @@ bijection each held chain costs one patch, whatever its length.
   `a_damaged_passage_locates_its_pair_from_intact_cells_and_is_repaired_through_it`.
 - `research/notebook/hnn_design/hnn_repair_loop.rs`: `executed repair <terrain> <A|B> <seed>
   <count> <out>`, no per-terrain branch in the machine's path.
+
+## 4. Measured: the read, once each (at `43788fb9`'s build)
+
+[measured] `executed repair`, 64 passages a run, one thread; receipts `<terrain>_<damage>.{log,
+sections, curve}`. Nothing changed after the pin's amendment. The claim of §0 holds on every count.
+
+| Terrain, damage (seed) | Located key | `n*_machine` (first lock) | Released / held of erased | Released equal to the truth | Joint fibre `N` | Codec / literal (bits) |
+|---|---|---|---|---|---|---|
+| order-2, A (`…711`) | `(2, y ↦ y + 1)`, turns `15, 45` | 75 = 3·5² (75) | 1,088 / 64 of 1,152 | **1,088 of 1,088** | 4 on every passage | **146 / 2,304** |
+| line, A (`…712`) | `(4, id)` | 74 = 2·37 (7: `δ 1`, a swap on `{0, 2}`) | 1,088 / 64 of 1,152 | **1,088 of 1,088** | 4 | **146 / 2,304** |
+| alternation, A (`…713`) | `(2, id)` | 203 = 7·29 (7: `δ 1`, a swap on `{1, 3}`) | 1,088 / 64 of 1,152 | **1,088 of 1,088** | 4 | **146 / 2,304** |
+| order-2, B (`…721`) | `(2, y ↦ y + 1)` | 40 = 2³·5 (40) | 0 / 1,344 of 1,344 | — | 4 | **146 / 2,688** |
+| line, B (`…722`) | `(4, id)` | 161 = 7·23 (60: `(4, id)` on `{1, 3}`) | 640 / 704 of 1,344 | **640 of 640** | 4 | **146 / 2,688** |
+| alternation, B (`…723`) | `(2, id)` | 81 = 3⁴ (40: `(2, id)` on `{0, 2}`) | 0 / 1,344 of 1,344 | — | 4 | **146 / 2,688** |
+
+- **Every released cell equals its truth**: 1,088 of 1,088 on each damage-A run (17 a passage) and
+  640 of 640 on the line under B (10 a passage). No key other than the generating one was located,
+  no passage refused its key, and every certificate held.
+- **Valid decode**: every released cell is a class of `ℤ/4`, `3,904 = 2⁶·61` of 3,904 over the six
+  runs, by construction (a family is a subset of `A`).
+- **The codec**: the key in 18 bits once, then 2 bits a passage (`64·2 = 128`), equal to the Fold's
+  bound `Σ⌈log₂ N⌉ = 64·⌈log₂ 4⌉ = 128`: `146 = 2·73` bits against the literal `2,304 = 2⁸·3²`
+  (damage A, ratio `73/1152`) and `2,688 = 2⁷·3·7` (damage B, ratio `73/1344`). Decoded from the
+  one code (the key read back, each passage reopened in turn): 64 of 64 passages reopened exactly
+  on every run, no trailing bit. A passage alone: `18 + 2 = 20` bits against its 36 (A) or 42 (B).
+- **The restriction's work**: at most 2 sweeps (one through the passage and back that changes,
+  one that does not); 1 ms for 64 passages.
+
+**Four repaired passages, whole** (synthetic `ℤ/4`; `·` erased, `?` held with the family `ℤ/4`):
+
+```text
+order-2, A, passage 0
+  damaged  013·12····2233001122·····12233001····3001122····
+  repaired 013?12001122330011223300112233001122330011223300
+  truth    013212001122330011223300112233001122330011223300
+line, A, passage 2 (s = 1)
+  damaged  123·12····3012301230·····23012301····2301230····
+  repaired 123?12301230123012301230123012301230123012301230
+  truth    123012301230123012301230123012301230123012301230
+order-2, B, passage 1
+  damaged  3110331·2·3·0·1·2·3·0·1·2·3·0·1·2·3·0·1·2·3·0·1·
+  repaired 3110331?2?3?0?1?2?3?0?1?2?3?0?1?2?3?0?1?2?3?0?1?
+  truth    311033122330011223300112233001122330011223300112
+line, B, passage 14 (s = 3)
+  damaged  0321032·0·2·0·2·0·2·0·2·0·2·0·2·0·2·0·2·0·2·0·2·
+  repaired 0321032?032?032?032?032?032?032?032?032?032?032?
+  truth    032103210321032103210321032103210321032103210321
+```
+
+In the first, cells 6 and 7 are restored through `f⁻¹` from the stations 8 and 9, which are
+themselves restored through `f⁻¹` from 10 and 11 on the same sweep's return; the spans 20–24 and
+33–36 from their antecedents; the tail from 42 and 43. On the line under B, the chain `9, 13, …, 45`
+is released from the opening's cell 5 through the station 9, and the chain `7, 11, …, 47` is held:
+its first edge `3 → 7` lies in the opening, so no intact cell reaches it. Its one 2-bit patch
+(the truth at cell 7) reopens all eleven.
+
+## 5. What was held, and why
+
+- **Damage A, cell 3 on every passage** (64 a run, family `ℤ/4`): its antecedent side would be
+  `1 → 3` and its consequent side `3 → 3 + δ`; both lie inside the opening (`3 + δ < 8` for
+  `δ ∈ {2, 4}`), where the relation was never read. A cell the key's stations never join is held:
+  the relation is applied only where it was observed.
+- **Damage B on order-2 and the alternation, the whole chain `7, 9, …, 47`** (21 a passage): every
+  cell's antecedent and consequent in the chain are themselves erased, and the chain's one link to
+  an intact cell, `5 → 7`, lies in the opening. Both sides leave every family `ℤ/4` at every sweep:
+  nothing is released and nothing guessed. The cells are not independent: the joint fibre is 4
+  (one choice at cell 7 fixes the chain through the bijection `f`), so the residual is 2 bits, not
+  `2·21 = 42`.
+- **Damage B on the line, the chain `7, 11, …, 47`** (11 a passage), for the same reason; the other
+  odd chain is released.
+
+## 6. `n*_machine` against `n*_terrain`
+
+In observations (intact stations; 25 a passage under A, 20 under B), `q` passages plus `j`:
+
+| Terrain, damage | `n*_machine` | `n*_terrain`, the repair's grain (pinned) | `n*_terrain`, the syntactic class (amended) |
+|---|---|---|---|
+| order-2, A | 75 (3 + 0) | 47 (1 + 22): survivors `ℓ 2 [1 2 3 0]`, `ℓ 4 [2 3 0 1]` | 47 (1 + 22) |
+| line, A | 74 (2 + 24) | not reached in 1,600 (weak aliases, §0 amendment) | 74 (2 + 24) |
+| alternation, A | 203 (8 + 3) | not reached in 1,600 | 222 (8 + 22) |
+| order-2, B | 40 (2 + 0) | 0 (degenerate: the key releases no cell) | 41 (2 + 1) |
+| line, B | 161 (8 + 1) | not reached in 1,280 | 177 (8 + 17) |
+| alternation, B | 81 (4 + 1) | 0 (degenerate) | 97 (4 + 17) |
+
+- On order-2 under A the machine reads `75 − 47 = 28` observations more than the terrain: its
+  menus reach every distance to `47`, past the reference's lags `[1, 40]`, and the distance 43
+  (station 43 against cell 0, one edge a passage, a path that is no winding) stays alive until the
+  third passage's last station gives it a second, conflicting edge (curve, observation 75). On the
+  line under A the two counts coincide (74). On the other three nondegenerate readings the
+  machine's pair holds before the reference's survivors stop changing (by 19, 1, 16 and 16
+  observations): the reference keeps filling its aliases' maps after the generator is fixed.
+- No passage alone locates its pair (0 of 64 on every run): within one passage some long distance
+  reads one edge (a path, not a winding of the least survivor), which keeps the class plural. The
+  read set's first passages remove it.
+- `n*_terrain` here is not THE_TWO_COUNTS' `7` for order-2: there each observation read forty
+  drawn request cells, which kill wrong lags at once; here most antecedents are themselves rule
+  cells, which every winding of the generator also fits.
+
+## 7. Time and memory
+
+One thread a run (the harness is serial). Each run's projection is its largest development
+service time over five measurements on `2_026_100_701` (`development/*_log.txt`,
+`development/timing_remeasured.txt`), its deadline `5/4` of it under an outer `timeout`; the peak
+resident set is the process's own (`VmHWM`, exact bytes), beside the systemd scope's reading in each
+log.
+
+| Run | Projection / deadline (ms) | Measured service time (ms) | Peak resident bytes |
+|---|---|---|---|
+| order-2, A | 46 / 58 | 44 | 10,207,232 |
+| line, A | 46 / 58 | 44 | 10,280,960 |
+| alternation, A | 63 / 79 | 57 | 10,448,896 |
+| order-2, B | 1,467 / 1,834 | 1,418 | 10,461,184 |
+| line, B | 50 / 63 | 44 | 10,436,608 |
+| alternation, B | 4,712 / 5,890 | 4,553 | 10,444,800 |
+
+Measured over projected, the six together: `6160/6384 = 385/399`, every run inside its projection.
+The B runs' time is the read-only reference at the repair's grain (every lag's 256 completions on
+every passage at zero observations, where the degenerate stopping object holds); the A runs,
+location, restriction, codec and reference together, take 21 to 38 ms inside the process.
+
+## 8. Owed in #62
+
+1. **The restriction is the joint fibre's projection**: for binary relations on the edges of a
+   forest, the fixed point of `F_t ← F_t ∩ R(F_(t−δ)) ∩ R⁻¹(F_(t+δ))` is, at every cell, the set of
+   that cell's classes over the joint fibre, and some family empties exactly when the fibre is
+   empty (arc consistency is global consistency on an acyclic constraint graph). The owner checks
+   it exactly per passage and the brute-force test holds it on 400 drawn passages; the Lean
+   statement is owed, as an instance of `Transport/ArtifactRelease.step` and
+   `restriction_never_widens`.
+2. **The repair codec is a Fold transition**: with `apply` the damage and `residual` the key and the
+   patches, `reopen_apply` is `reopen(damage x, key, residual x) = x`; the residuals over one fibre
+   are a prefix code, so the longest is at least `⌈log₂ N⌉` (`Transport/Fold.residual_injective_on_fibre`).
+3. **The release at width zero** on a certified one-class family is `Foundation/ReceiverRelease.ReleaseLaw.sound`
+   at tolerance zero (formal-checked); the join to the repair's class reading is owed.
+
+## 9. Commits and gates
+
+- `7109bc11`: the claim and the pins, before any read. `43788fb9`: the owners of §3, the harness,
+  the development receipts and the pin's amendment, before the read. This record's commit: the
+  read's receipts (`<terrain>_<damage>{_log.txt, .sections, .curve}`), §4–§9, the atlas row
+  `compression.pair-repair`, the operator contract's `repair` (ELEMENTARY_OBJECTS, compression and
+  landmarks) and the records README route.
+- Gates: `cargo check --workspace --all-targets` clean (7,590 ms; the one pre-existing dead-code
+  warning, `ReceivingPhases::with_rank`); `cargo test -p holonics --lib -- --test-threads=8`, 1,016 passed and 0 failed (299,313 ms wall with
+  its build, projected at most 495 s from the 250–330 s read at 12 threads, deadline 900 s; the
+  systemd scope's peak reads `2G`, rounded by its display); the guard lints (`cargo clippy -p
+  holonics --lib -- -D clippy::disallowed_types -D clippy::disallowed_methods -D
+  clippy::float_arithmetic`) report nothing in the changed files beyond `result_large_err`, which
+  every `CompressionError` owner already carries. No Lean changed (§8 names the
+  obligations); no card run (no kernel or card path changed).

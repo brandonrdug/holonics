@@ -12,7 +12,7 @@ run() { # <deadline s> <out> <args…>
   local deadline=$1 out=$2; shift 2
   systemd-run --user --wait --collect --pipe -p MemoryAccounting=yes \
     --working-directory="$PWD" -E RAYON_NUM_THREADS=1 \
-    timeout "$deadline" "$bin" executed repair "$@" "$out" > "$out.log" 2>&1 || echo "exit $? for $out" >> "$out.log"
+    timeout "$deadline" "$bin" executed repair "$@" "$out" > "${out}_log.txt" 2>&1 || echo "exit $? for $out" >> "${out}_log.txt"
 }
 # Development (2_026_100_701, readable): timing and checks, every terrain and damage.
 for terrain in order2 line alternation; do
