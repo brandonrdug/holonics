@@ -1,0 +1,7 @@
+# The keys states written again at main (9914bc5a): lane B's and the regressions' training passages
+# (`executed keys <terrain> <seed> 128`, order-2, the alternation, the line), each read once, one after
+# the other. The states of October 5 no longer mount since #367 (the regressions record, §12).
+command = executed keys
+projection = one training passage of 128 requests (1,024 observations), measured 468 to 492 ms at e237c941 (the regressions' receipts; 479 and 487 ms for order-2 at lane B's commit and e237c941); a first read at this build, so the deadline is the records' first-read guard
+deadline_ms = 120000
+threads = 1

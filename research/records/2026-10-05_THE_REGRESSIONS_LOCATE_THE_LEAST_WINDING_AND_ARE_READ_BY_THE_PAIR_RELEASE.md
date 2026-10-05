@@ -384,3 +384,112 @@ stopped early; the run ended inside its fixed deadline and nothing was relaunche
   changed; the run stops on the pre-existing deny-by-default `while_immutable_condition` at
   `hnn/reference.rs:3766`, as lane C recorded. No Lean changed (the three statements of §10 are owed in #62). No card
   run: no kernel or card path changed.
+
+## 12. October 5, after #367: the states written again at `9914bc5a`
+
+**Occasion.** After #367 (lane A's quartic fifth gain, `6a251c38`) no keys state of October 5
+mounts: `executed evaluate` over lane B's states and this record's refuses before its first request
+with "the state continues another opening's material" (found at `9078f103` by the
+[S2 record](2026-10-05_S2_THE_CERTIFIED_DESCENT_RETIRES_AND_KEY_LOCATION_THEN_DEPOSITION_REPLACES_IT.md),
+§4 and §5). The computational object is the helical pair interaction, as above; this section writes
+the pair's deposit again and reads it through faces and placement (the release), and changes no law
+of any of the winding guide's six objects.
+
+**The cause** [measured; source-inspected]. A state's material identity is
+`Constitution::material_identity` (`crates/holonics/src/hnn/constitution.rs:8165–8178` at
+`9914bc5a`): `text_residue` of the derived written form (`Debug`) of the declared opening with its
+learned material blanked. #367 changed `RingMaterial::resonator_scales` from `[Rat; 4]`, founded at
+four ones on every ring (`constitution.rs:2740, 3869` at `94f99d86`), to `Vec<Rat>`, empty on a ring
+that loads no resonator and sized to the declared gain family when one is loaded (four, or five with
+the quartic's `β`; `constitution.rs:2759, 3885, 4158`). The declaration's three rings load none, so
+the blanked form wrote four zero ratios as each ring's `resonator_scales` before and `[]` after.
+Putting the four zeros back into the current blanked form (a diagnostic build that wrote the form
+on refusal, then reverted; `identity_residue.{py,txt}`) gives the residue
+`103161117504419837108713553728969586688`, the identity every October 5 state carries; the current
+form's residue is `104264994666183845477397678652967047577`, the identity every state written again
+carries. Nothing else in the identity moved. A second refusal
+stands behind it: the states wrote `resonator-scales 1 1 1 1` on each resonator-less ring, and
+`LearnedRing::place` (`constitution.rs:7964`) refuses a saved scale count other than the declared
+ring's, now 0.
+
+**The decision** [agent-inferred]. The identity stays as it is, the states are written again, and no
+decoder reads the old ones. The identity is a function of the declared material's exact
+representation, and #367 changed that representation, not a print of an unchanged one: scales are
+the statistics of a gain family, a ring without a resonator has no gain family, and the four scales
+it carried stood for nothing. The saved learned material changed with the representation, so an
+identity read from any other written form would not have mounted these states either (`place`
+refuses them). A residue of the exact written form covers every field with no list kept by hand. A
+hand-kept canonical encoding must be extended with every new field, and a field it misses lets a
+state mount on another material, which is the unsafe direction; a changed written form only
+refuses. The owner's documentation states the law (`constitution.rs:8163–8164`: "a change of that
+layout changes every identity: an earlier save is then refused, never mounted"). An October 5 state
+is a superseded save (CLAUDE.md: "legacy save-format decoders go"). `constitution.rs` is unchanged.
+
+**The states written again** [measured]. [`written_again/runs.sh`](2026-10-05_THE_REGRESSIONS_LOCATE_THE_LEAST_WINDING_AND_ARE_READ_BY_THE_PAIR_RELEASE_receipts/written_again/runs.sh),
+at `9914bc5a`'s build, every limit from a pin committed before its run
+(`research/runs/states-written-again/`, THE_MACHINE guard 22; the script refuses a pin that is
+untracked, edited or committed twice). The passages locate as before: order-2 `(2, x ↦ x + 1)` from
+16 observations, the alternation `(2, id)` from 33, the line `(4, id)` from 24, each deposited at
+that observation on both openings by the same certified step (`η = 2`, slip `120 → 0`; bits 385,320,
+the alternation's 385,348). Each of the seven states (order-2's, the alternation's and the line's on
+both openings, and lane B's probe at the scale 4) differs from its October 5 receipt in exactly the
+three `resonator-scales` lines, `material` and `check`: the learned material is byte-identical.
+#365's development reads over the six keys states (`2_026_093_042`, 8 requests) write its section
+listings byte for byte on all three terrains (`development/compare.txt`), and the probe's state
+mounts (0 of 8 whole, as a representation probe that closes no contact).
+
+**#365's validation readings, reproduced** [measured]. The pair release with the joined bank's gain,
+64 requests a terrain, 12 threads, read once. These seeds were read by this record (§6) and by #365,
+so this is a reproduction of a seen read, not a transfer reading; the final confirmation seeds
+(`033`, `036`, `039`) are spent and no run read them.
+
+| Terrain (seed) | State | Released / held | Whole: nonconstant, constant | Stations right | First lock right | ms |
+|---|---|---|---|---|---|---|
+| order-2 (`032`) | keys on the founded opening | 64 / 0 | **64 of 64**, 0 of 0 | 512 | 64 | 38,682 |
+| order-2 (`032`) | keys on the lossless opening | 64 / 0 | 64 of 64, 0 of 0 | 512 | 64 | 42,965 |
+| alternation (`035`) | keys on the founded opening | 64 / 0 | **46 of 46**, 18 of 18 | 512 | 64 | 45,917 |
+| alternation (`035`) | keys on the lossless opening | 64 / 0 | 46 of 46, 18 of 18 | 512 | 64 | 46,400 |
+| line (`038`) | keys on the founded opening | 64 / 0 | **48 of 48**, 16 of 16 | 512 | 64 | 55,652 |
+| line (`038`) | keys on the lossless opening | 64 / 0 | 48 of 48, 16 of 16 | 512 | 64 | 48,289 |
+
+No certificate was refused, no release was incorrect and no section reached the termination. Each
+terrain's validation section listing is byte-identical to #365's (`validation_compare.txt`), so
+every released station follows the located pair as there. Of the recorded failures: lesson 3 (a
+located cause carried into a new consumer) is held because the refusal is resolved before any
+further consumer reads a keys state; failure 6 (seen graded as unseen) because this read is graded
+as a reproduction; failure 9 (a refusal answered with a larger limit) because every limit was
+pinned once before its run and none was raised.
+
+**Time and memory.** Thread budget 1 for the passages (the location reads no pool) and 12 for every
+release read; every run one after the other. Peak resident bytes are the transient scope's cgroup
+`memory.peak`.
+
+| Run | Projection / deadline (ms) | Measured wall ms | Peak resident bytes |
+|---|---|---|---|
+| keys, the training passages: order-2, the alternation, the line | 468 to 492 measured at `e237c941` / 120,000 each (first read) | 527; 541; 529 (program 486; 499; 495) | 143,839,232; 144,265,216; 143,265,792 |
+| `keys-probe`, order-2 at the scale 4 | the same / 120,000 (first read) | 421 | 121,143,296 |
+| release, development `042` (8 × 2): order-2, the alternation, the line | 10,896 to 12,381 measured at `a00fec4e` / 120,000 each (first read) | 11,266; 12,409; 12,778 | 141,885,440; 141,148,160; 141,271,040 |
+| release, development `042`, the probe (8 × 1) | the same / 120,000 (first read) | 12,040 | 120,303,616 |
+| release, validation, order-2 (64 × 2) | 86,288 (upper 107,860) / 108,000 | 82,257 | 138,326,016 |
+| release, validation, the alternation (64 × 2) | 95,512 (upper 119,390) / 120,000 | 92,892 | 152,379,392 |
+| release, validation, the line (64 × 2) | 98,400 (upper 123,000) / 123,000 | 104,549 | 157,253,632 |
+
+Each validation projection took each state's largest measured time a request before launch (here
+always this build's development read: order-2 `5393/8` on both states, the alternation's founded
+`6012/8` and lossless `5927/8`, the line's founded `6147/8` and lossless `6153/8`) times 64, its upper
+end `5/4` of it. Measured over projected: order-2 `82257/86288`, the alternation `92892/95512`,
+the line `104549/98400` (1 rem `6149/98400`), past its projection and inside its upper end and
+deadline. The line's founded state read in 55,652 ms against its share 49,176 (upper 61,470) while
+another worker's test binary took about 9 cores of the host (load average 21 at its end); inside its
+upper bound, so the read was not stopped, and its lossless state read inside its share (48,289
+against 49,224). Nothing was relaunched. The passages' program times passed the alternation's and the
+line's earlier reads (499 against 492, 495 against 468) inside their first-read deadline.
+
+Receipts: [`written_again/`](2026-10-05_THE_REGRESSIONS_LOCATE_THE_LEAST_WINDING_AND_ARE_READ_BY_THE_PAIR_RELEASE_receipts/written_again/)
+(the script, the seven states and their diff against the October 5 receipts, the identity's
+reconstruction `identity_residue.{py,txt}`, the passages' logs, the development reads and their
+comparison, the validation logs, sections and comparison, the gates). Lane B's and this record's
+October 5 states stay as their records' receipts; no commit after `6a251c38` mounts them. Gates at
+this change (no Rust changed; `gates.txt`): `bash tools/gate.sh`, check, guard lints and the 33 guard
+doctests ok (43,108 ms); `cargo test -p holonics --lib`, 994 passed and 0 failed (162,180 ms of
+tests, 189,042 ms wall). No Lean, kernel or card path changed.

@@ -1,0 +1,134 @@
+# Each state written again against its October 5 receipt (diff old new), at 9914bc5a.
+## 2026-10-05_LOCATED_KEYS_receipts/state_keys_founded.txt -> 2026-10-05_THE_REGRESSIONS_LOCATE_THE_LEAST_WINDING_AND_ARE_READ_BY_THE_PAIR_RELEASE_receipts/written_again/state_order2_keys_founded.txt
+908c908
+< resonator-scales 1 1 1 1
+---
+> resonator-scales
+1535c1535
+< resonator-scales 1 1 1 1
+---
+> resonator-scales
+2162c2162
+< resonator-scales 1 1 1 1
+---
+> resonator-scales
+2910,2911c2910,2911
+< material 103161117504419837108713553728969586688
+< check 643559 7805774612627337290307852582627950170
+---
+> material 104264994666183845477397678652967047577
+> check 643535 170067123946749403960306427634986296525
+## 2026-10-05_LOCATED_KEYS_receipts/state_keys_lossless.txt -> 2026-10-05_THE_REGRESSIONS_LOCATE_THE_LEAST_WINDING_AND_ARE_READ_BY_THE_PAIR_RELEASE_receipts/written_again/state_order2_keys_lossless.txt
+908c908
+< resonator-scales 1 1 1 1
+---
+> resonator-scales
+1535c1535
+< resonator-scales 1 1 1 1
+---
+> resonator-scales
+2162c2162
+< resonator-scales 1 1 1 1
+---
+> resonator-scales
+2910,2911c2910,2911
+< material 103161117504419837108713553728969586688
+< check 643535 112288200914488572827391734970774905432
+---
+> material 104264994666183845477397678652967047577
+> check 643511 73599075720465282060370034800411850649
+## 2026-10-05_LOCATED_KEYS_receipts/state_probe_founded.txt -> 2026-10-05_THE_REGRESSIONS_LOCATE_THE_LEAST_WINDING_AND_ARE_READ_BY_THE_PAIR_RELEASE_receipts/written_again/state_probe_order2_founded.txt
+908c908
+< resonator-scales 1 1 1 1
+---
+> resonator-scales
+1535c1535
+< resonator-scales 1 1 1 1
+---
+> resonator-scales
+2162c2162
+< resonator-scales 1 1 1 1
+---
+> resonator-scales
+2909,2910c2909,2910
+< material 103161117504419837108713553728969586688
+< check 643367 136328954944307352149274596661296733804
+---
+> material 104264994666183845477397678652967047577
+> check 643343 3757335182352178250937548099916902248
+## 2026-10-05_THE_REGRESSIONS_LOCATE_THE_LEAST_WINDING_AND_ARE_READ_BY_THE_PAIR_RELEASE_receipts/state_alternation_keys_founded.txt -> 2026-10-05_THE_REGRESSIONS_LOCATE_THE_LEAST_WINDING_AND_ARE_READ_BY_THE_PAIR_RELEASE_receipts/written_again/state_alternation_keys_founded.txt
+908c908
+< resonator-scales 1 1 1 1
+---
+> resonator-scales
+1535c1535
+< resonator-scales 1 1 1 1
+---
+> resonator-scales
+2162c2162
+< resonator-scales 1 1 1 1
+---
+> resonator-scales
+2910,2911c2910,2911
+< material 103161117504419837108713553728969586688
+< check 643573 64975257821847321816394249883485382510
+---
+> material 104264994666183845477397678652967047577
+> check 643549 157222262371613491016037303072117224398
+## 2026-10-05_THE_REGRESSIONS_LOCATE_THE_LEAST_WINDING_AND_ARE_READ_BY_THE_PAIR_RELEASE_receipts/state_alternation_keys_lossless.txt -> 2026-10-05_THE_REGRESSIONS_LOCATE_THE_LEAST_WINDING_AND_ARE_READ_BY_THE_PAIR_RELEASE_receipts/written_again/state_alternation_keys_lossless.txt
+908c908
+< resonator-scales 1 1 1 1
+---
+> resonator-scales
+1535c1535
+< resonator-scales 1 1 1 1
+---
+> resonator-scales
+2162c2162
+< resonator-scales 1 1 1 1
+---
+> resonator-scales
+2910,2911c2910,2911
+< material 103161117504419837108713553728969586688
+< check 643549 99443339339352659883122610407905833305
+---
+> material 104264994666183845477397678652967047577
+> check 643525 165815852851852395991974486320961082555
+## 2026-10-05_THE_REGRESSIONS_LOCATE_THE_LEAST_WINDING_AND_ARE_READ_BY_THE_PAIR_RELEASE_receipts/state_line_keys_founded.txt -> 2026-10-05_THE_REGRESSIONS_LOCATE_THE_LEAST_WINDING_AND_ARE_READ_BY_THE_PAIR_RELEASE_receipts/written_again/state_line_keys_founded.txt
+908c908
+< resonator-scales 1 1 1 1
+---
+> resonator-scales
+1535c1535
+< resonator-scales 1 1 1 1
+---
+> resonator-scales
+2162c2162
+< resonator-scales 1 1 1 1
+---
+> resonator-scales
+2910,2911c2910,2911
+< material 103161117504419837108713553728969586688
+< check 643559 1454788125826226422903767785015908431
+---
+> material 104264994666183845477397678652967047577
+> check 643535 24955124236829540224475117888877793884
+## 2026-10-05_THE_REGRESSIONS_LOCATE_THE_LEAST_WINDING_AND_ARE_READ_BY_THE_PAIR_RELEASE_receipts/state_line_keys_lossless.txt -> 2026-10-05_THE_REGRESSIONS_LOCATE_THE_LEAST_WINDING_AND_ARE_READ_BY_THE_PAIR_RELEASE_receipts/written_again/state_line_keys_lossless.txt
+908c908
+< resonator-scales 1 1 1 1
+---
+> resonator-scales
+1535c1535
+< resonator-scales 1 1 1 1
+---
+> resonator-scales
+2162c2162
+< resonator-scales 1 1 1 1
+---
+> resonator-scales
+2910,2911c2910,2911
+< material 103161117504419837108713553728969586688
+< check 643535 137317384665037940823247728940550508518
+---
+> material 104264994666183845477397678652967047577
+> check 643511 9002258611939181302561785307253805784

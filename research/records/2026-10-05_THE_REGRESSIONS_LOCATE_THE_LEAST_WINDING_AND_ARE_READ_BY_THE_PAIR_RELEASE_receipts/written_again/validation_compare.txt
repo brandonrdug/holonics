@@ -1,0 +1,3 @@
+order2: validation sections identical to #365's receipt
+alternation: validation sections identical to #365's receipt
+line: validation sections identical to #365's receipt

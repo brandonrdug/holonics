@@ -1,0 +1,6 @@
+# The validation read of alternation over the keys states written again (`executed evaluate alternation 2026093035 64`,
+# both keys states), read once after the passages and the development reads; #365 read 46 of 46 nonconstant and 18 of 18 constant whole there.
+command = executed evaluate
+projection = 64 requests on two states, each state at its largest measured time a request before launch (the development read at this build on 2_026_093_042, #365's development reads on 042 and 043 and its validation read): the founded 6012/8 and the lossless 5927/8 (this build, 042), so 64 · 11939/8 = 95,512 ms, upper 119,390 ms; the deadline is the upper end, 5/4 of it, in whole seconds
+deadline_ms = 120000
+threads = 12

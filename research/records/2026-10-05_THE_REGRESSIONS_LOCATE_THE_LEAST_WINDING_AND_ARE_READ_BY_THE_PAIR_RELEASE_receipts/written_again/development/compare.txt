@@ -1,0 +1,3 @@
+order2: sections identical to #365's development receipt
+alternation: sections identical to #365's development receipt
+line: sections identical to #365's development receipt

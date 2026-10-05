@@ -1,0 +1,11 @@
+# Gates at this change (no Rust changed), the worktree's own target, CARGO_BUILD_JOBS=12
+## bash tools/gate.sh
+gate check: ok (11295 ms)
+gate guard-lints: ok (13976 ms)
+test result: ok. 33 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.49s
+gate guard-doctests: ok (17830 ms)
+gate.sh exit 0 wall 43108 ms
+## cargo test -p holonics --lib -j 12 -- --test-threads=12
+test hnn::tests::reference::the_chained_balance_closes_on_a_pumped_field has been running for over 60 seconds
+test result: ok. 994 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 162.18s
+lib tests exit 0 wall 189042 ms
