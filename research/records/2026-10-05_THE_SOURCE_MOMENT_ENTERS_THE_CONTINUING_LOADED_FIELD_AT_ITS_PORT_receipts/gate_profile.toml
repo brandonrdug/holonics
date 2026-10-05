@@ -1,0 +1,14 @@
+[net]
+offline = true
+[build]
+jobs = 1
+[profile.dev]
+incremental = false
+[profile.test]
+incremental = false
+[profile.dev.package.holonics]
+debug = 0
+codegen-units = 1
+[profile.test.package.holonics]
+debug = 0
+codegen-units = 1

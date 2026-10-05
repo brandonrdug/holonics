@@ -1,0 +1,701 @@
+diff --git a/crates/holonics/src/hnn/field.rs b/crates/holonics/src/hnn/field.rs
+--- a/crates/holonics/src/hnn/field.rs
++++ b/crates/holonics/src/hnn/field.rs
+@@ -1522,7 +1522,7 @@
+     /// (`sign 0 = +1`) are the element's lock classes.
+     pub fn standing_contrast(
+         &self,
+-        constitution: &impl ConstitutionRead,
++        constitution: &dyn FieldMaterial,
+         ring: usize,
+     ) -> Result<Vec<Rat>, HnnError> {
+         let standings: Vec<&[Rat]> = (0..self.rings.len())
+diff --git a/crates/holonics/src/hnn/moment.rs b/crates/holonics/src/hnn/moment.rs
+--- a/crates/holonics/src/hnn/moment.rs
++++ b/crates/holonics/src/hnn/moment.rs
+@@ -1266,7 +1266,7 @@
+     pub fn encode(
+         &self,
+         field: &Field,
+-        constitution: &impl ConstitutionRead,
++        constitution: &dyn FieldMaterial,
+         ring: usize,
+     ) -> Result<Vec<Rat>, HnnError> {
+         let modulus = constitution.transport(ring);
+@@ -1342,7 +1342,7 @@
+     pub fn open_parts(
+         &self,
+         field: &Field,
+-        constitution: &impl FieldMaterial,
++        constitution: &dyn FieldMaterial,
+         current: &Current,
+         ring: usize,
+     ) -> Result<(Vec<(usize, Vec<Rat>)>, Vec<Rat>), HnnError> {
+@@ -1365,7 +1365,7 @@
+     fn moment_parts(
+         &self,
+         field: &Field,
+-        constitution: &impl FieldMaterial,
++        constitution: &dyn FieldMaterial,
+         ring: usize,
+     ) -> Result<(Vec<(usize, Vec<Rat>)>, Vec<Rat>), HnnError> {
+         let counts = self.counts(ring)?;
+@@ -1434,7 +1434,7 @@
+     pub fn open_storage(
+         &self,
+         field: &Field,
+-        constitution: &impl ConstitutionRead,
++        constitution: &dyn FieldMaterial,
+         current: &Current,
+     ) -> Result<Vec<Vec<Rat>>, HnnError> {
+         let mut storage: Vec<Vec<Rat>> = field
+diff --git a/crates/holonics/src/hnn/propagation.rs b/crates/holonics/src/hnn/propagation.rs
+--- a/crates/holonics/src/hnn/propagation.rs
++++ b/crates/holonics/src/hnn/propagation.rs
+@@ -103,7 +103,7 @@
+ use crate::hnn::HnnError;
+ use crate::hnn::chart::{ChartKey, ChartReading, ChartWords, Charts, WordLattice, refine};
+ use crate::hnn::constitution::Lattice;
+-use crate::hnn::field::{ConstitutionRead, Current, End, Field};
++use crate::hnn::field::{FieldMaterial, Current, End, Field};
+ use crate::hnn::realization::{entries, indexed};
+ use crate::hnn::ring::ResonatorOperands;
+ #[cfg(test)]
+@@ -806,7 +806,7 @@
+ /// They read no lift point; the contacts' conductances do.
+ pub fn ring_operands(
+     field: &Field,
+-    constitution: &impl ConstitutionRead,
++    constitution: &dyn FieldMaterial,
+     index: usize,
+ ) -> Result<RingOperands, HnnError> {
+     ring_operands_on(field, constitution, index, None)
+@@ -814,7 +814,7 @@
+ 
+ fn ring_operands_on(
+     field: &Field,
+-    constitution: &impl ConstitutionRead,
++    constitution: &dyn FieldMaterial,
+     index: usize,
+     lattice: Option<(&WordLattice, Option<&ChartWords>)>,
+ ) -> Result<RingOperands, HnnError> {
+@@ -879,7 +879,7 @@
+     /// law, every solve exact.
+     pub fn at_cut(
+         field: &Field,
+-        constitution: &impl ConstitutionRead,
++        constitution: &dyn FieldMaterial,
+         current: &Current,
+     ) -> Result<Self, HnnError> {
+         Self::at_cut_charted(field, constitution, current, &mut Charts::new())
+@@ -889,7 +889,7 @@
+     /// chart its key last left, and the refined charts replace them.
+     pub fn at_cut_charted(
+         field: &Field,
+-        constitution: &impl ConstitutionRead,
++        constitution: &dyn FieldMaterial,
+         current: &Current,
+         charts: &mut Charts,
+     ) -> Result<Self, HnnError> {
+@@ -918,7 +918,7 @@
+     /// against).
+     pub fn exact_at_cut(
+         field: &Field,
+-        constitution: &impl ConstitutionRead,
++        constitution: &dyn FieldMaterial,
+         current: &Current,
+     ) -> Result<Self, HnnError> {
+         Self::build(field, constitution, current, None, &Charts::new())
+@@ -926,7 +926,7 @@
+ 
+     fn build(
+         field: &Field,
+-        constitution: &impl ConstitutionRead,
++        constitution: &dyn FieldMaterial,
+         current: &Current,
+         lattice: Option<WordLattice>,
+         charts: &Charts,
+diff --git a/crates/holonics/src/hnn/word.rs b/crates/holonics/src/hnn/word.rs
+--- a/crates/holonics/src/hnn/word.rs
++++ b/crates/holonics/src/hnn/word.rs
+@@ -868,6 +868,24 @@
+     Nothing,
+ }
+ 
++/// The source port's exact imposition after the declared boundary absorption and crossing.
++/// Both energy readings include contact storage and loaded resonator energy. This receipt
++/// measures no earlier deposition, reflection, pump advance or complete-absorption emission.
++#[derive(Clone, Debug, PartialEq, Eq)]
++pub struct SourceOpeningReceipt {
++    pub before: Rat,
++    pub after: Rat,
++    pub absorbed: Rat,
++    pub imposed: Rat,
++}
++
++impl SourceOpeningReceipt {
++    /// E_after - E_before = imposed - absorbed, at the same contemporary power form.
++    pub fn closes(&self) -> bool {
++        &self.after - &self.before == &self.imposed - &self.absorbed
++    }
++}
++
+ /// [definition; agent-inferred, October 3; the reception carry §2.1] **What a reception's word
+ /// opens on**: at rest at tick zero (today's reception, [`Word::open_charted`]), or on the previous
+ /// reception's carried end under a declared absorption ([`Word::open_received`]).
+@@ -926,7 +944,7 @@
+     /// **The power form at a cut** from the field, a constitution and the lift point.
+     pub fn read(
+         field: &Field,
+-        constitution: &impl ConstitutionRead,
++        constitution: &dyn crate::hnn::field::FieldMaterial,
+         current: &Current,
+     ) -> Result<Self, HnnError> {
+         let contacts = field.contacts().len();
+@@ -1744,6 +1762,81 @@
+             }
+         };
+         Self::continuing(field, operands, &change, &storage, carry.ticks)
++    }
++
++    /// [definition; agent-inferred, October 5] Enter the exact physical field on its
++    /// contemporary material, continuing its received interior and imposing this source once.
++    /// The material-only interface admits no receiving storage, target or reference family.
++    /// SourceMoment supplies the source chart; it is never a loaded displacement.
++    /// The material is read once at the cut through its shared read face; the Word owns
++    /// the copied operands, so this interface carries no material borrow into a tick.
++    ///
++    /// The receipt starts after the declared absorption and material/reference crossing:
++    /// E_after - E_before = imposed - absorbed. Previous crossing/deposition work belongs
++    /// to PowerForm::held and ChainedBalance, not to this source-imposition receipt.
++    /// Subsequent Word::tick executes the actual junction, element and loaded port drive;
++    /// this opening does not certify a frozen-drive periodic component or release a symbol.
++    pub fn open_exact_received(
++        field: &'c Field,
++        material: &dyn crate::hnn::field::FieldMaterial,
++        current: &Current,
++        source: &SourceMoment,
++        opening: &WordOpening,
++    ) -> Result<(Self, SourceOpeningReceipt), HnnError> {
++        let injection = source.open_storage(field, material, current)?;
++        let operands = Operands::exact_at_cut(field, material, current)?;
++        let (change, opened_at) = match opening {
++            WordOpening::Rest => (EndChange::rest(field, &operands), 0),
++            WordOpening::Received { carry, absorption: Absorption::Complete } => (
++                EndChange {
++                    resonators: vec![None; field.rings().len()],
++                    resonator_phases: vec![None; field.rings().len()],
++                    ..EndChange::rest(field, &operands)
++                },
++                carry.ticks,
++            ),
++            WordOpening::Received { carry, absorption: Absorption::Nothing } => {
++                let contacts = operands.contacts();
++                let conductances: Vec<Rat> =
++                    contacts.iter().map(|c| c.conductance().clone()).collect();
++                let capacities: Vec<&ExactRatMatrix> =
++                    contacts.iter().map(|c| c.forms().0).collect();
++                let resonators: Vec<Option<&ExactRatMatrix>> = operands
++                    .resonators()
++                    .iter()
++                    .map(|r| r.as_ref().map(|r| r.material().forms().0))
++                    .collect();
++                (
++                    carry.crossed(&conductances, &capacities, &resonators)?,
++                    carry.ticks,
++                )
++            }
++        };
++        // Validate the entered state and its actual pump phase before reading any energy.
++        // Exact operands split nothing; an absent declared state is its clock's rest point.
++        let entered = Self::on_change(field, operands.clone(), change, opened_at)?;
++        let before_change = entered.change()?;
++        let form = PowerForm::read(field, material, current)?;
++        let before = form.power(&before_change)? + form.resonator_power(&before_change)?;
++        let absorbed: Rat = before_change.storage.iter().enumerate()
++            .filter(|(ring, _)| field.is_source(*ring))
++            .map(|(ring, wave)| form.ring_power(ring, wave))
++            .sum();
++        let interior = interior_of(field, before_change);
++        let word = Self::continuing(field, operands, &interior, &injection, opened_at)?;
++        let after_change = word.change()?;
++        let after = form.power(&after_change)? + form.resonator_power(&after_change)?;
++        let imposed: Rat = injection.iter().enumerate()
++            .filter(|(ring, _)| field.is_source(*ring))
++            .map(|(ring, wave)| form.ring_power(ring, wave))
++            .sum();
++        let receipt = SourceOpeningReceipt { before, after, absorbed, imposed };
++        if !receipt.closes() {
++            return Err(HnnError::ContinuingState {
++                what: "the exact source imposition does not close its work balance",
++            });
++        }
++        Ok((word, receipt))
+     }
+ 
+     /// Open a word on a declared storage injection (every wave and contact state still zero), every
+@@ -2136,7 +2229,7 @@
+     /// `T − 1` left them, at tick `T`. The next word opens there and scatters crossing `T` in the
+     /// medium the reception leaves, and its first hop is `T`, at pump phase `T`. A word not ended at
+     /// a junction carries its full-tick change at `opened_at + ticks`, the within-refinement cut.
+-    pub(crate) fn reception_end(&self) -> Result<ReceptionCarry, HnnError> {
++    pub fn reception_end(&self) -> Result<ReceptionCarry, HnnError> {
+         let mut change = self.end_change();
+         let mut ticks = self.opened_at + self.passage.len();
+         if self.ended {
+diff --git a/crates/holonics/src/hnn/word/continuation.rs b/crates/holonics/src/hnn/word/continuation.rs
+--- a/crates/holonics/src/hnn/word/continuation.rs
++++ b/crates/holonics/src/hnn/word/continuation.rs
+@@ -57,6 +57,22 @@
+         let mut word = Self::open_charted(field, producing, current, &source, charts)?;
+         word.native_source = Some((producing.clone(), current.clone(), source));
+         Ok(word)
++    }
++
++    /// Enter the exact physical field with this native producer binding, on its carried
++    /// interior. The target-independent opening uses the same source chart as open_source;
++    /// a later comparison uses this producing constitution/current/source identity.
++    pub fn open_source_exact_received(
++        field: &'c Field,
++        producing: &Constitution,
++        current: &Current,
++        source: Arc<SourceMoment>,
++        opening: &WordOpening,
++    ) -> Result<(Self, SourceOpeningReceipt), HnnError> {
++        let (mut word, receipt) =
++            Self::open_exact_received(field, producing, current, &source, opening)?;
++        word.native_source = Some((producing.clone(), current.clone(), source));
++        Ok((word, receipt))
+     }
+ 
+     /// Compare the actual receiving anchors and compose contact storage from that same return.
+diff --git a/crates/holonics/src/hnn/mod.rs b/crates/holonics/src/hnn/mod.rs
+--- a/crates/holonics/src/hnn/mod.rs
++++ b/crates/holonics/src/hnn/mod.rs
+@@ -189,7 +189,7 @@
+ pub use retention::AeonBoundary;
+ pub use ring::{Floquet, FloquetReading, PumpDeclaration, PumpSchedule, ResonatorMaterial};
+ pub use word::{
+-    Absorption, ChainedBalance, ReceptionCarry, Released, ResonatorBalance, Word, WordOpening,
++    Absorption, ChainedBalance, ReceptionCarry, Released, ResonatorBalance, SourceOpeningReceipt, Word, WordOpening,
+ };
+ 
+ #[cfg(test)]
+diff --git a/crates/holonics/tests/source_entrance.rs b/crates/holonics/tests/source_entrance.rs
+new file mode 100644
+--- /dev/null
++++ b/crates/holonics/tests/source_entrance.rs
+@@ -0,0 +1,413 @@
++//! Public native source entrance and its actual continuing field consumer.
++//! Fixed physical law fixtures only: no training, private data or scientific repair claim.
++
++use holonics::compression::landmark::context::{BaseMeasure, StopPrior};
++use holonics::geometry::{RatVec3, screw::ScrewGenerator};
++use holonics::hnn::constitution::CAMPAIGN_ONE_BUDGET;
++use holonics::hnn::field::{ContactDeclaration, CribDeclaration, ReceiverDeclaration};
++use holonics::hnn::ring::{PumpDeclaration, PumpStep, ResonatorMaterial};
++use holonics::hnn::word::PowerForm;
++use holonics::hnn::{
++    Absorption, Constitution, Current, Field, FieldDeclaration, RingDeclaration, SourceMoment,
++    Word, WordOpening,
++};
++use holonics::holon::parametron::Carrier;
++use holonics::ratio::linear::ExactRatMatrix;
++use holonics::ratio::{Rat, integer, rat};
++use num_traits::{One, Zero};
++use std::sync::Arc;
++
++fn ring(period: u64, lock: Vec<u64>) -> RingDeclaration {
++    RingDeclaration {
++        period,
++        screw: ScrewGenerator::new(RatVec3::from_i64(0, 0, 1), RatVec3::zero()),
++        placements: (0..period)
++            .map(|node| FieldDeclaration::quarter_turn(node, period))
++            .collect(),
++        lock,
++        reflector: (0..period)
++            .map(|p| ((period - p) % period) as usize)
++            .collect(),
++        admittance: integer(2),
++        initial: 0,
++    }
++}
++
++fn receiver(ring: usize, aperture: usize) -> ReceiverDeclaration {
++    ReceiverDeclaration {
++        ring,
++        aperture,
++        tolerance: rat(1, 16),
++        depth: 2,
++        prior: StopPrior::half(),
++        mass: 1,
++        base: BaseMeasure::Even,
++        receiving_prior: 0,
++    }
++}
++
++fn chain() -> Field {
++    let contact = |from, to, exponent| ContactDeclaration {
++        from,
++        to,
++        channel: vec![(0, 0), (1, 1)],
++        admittance: integer(2),
++        exponent: integer(exponent),
++    };
++    Field::declare(
++        FieldDeclaration {
++            rings: vec![ring(2, vec![0]), ring(3, vec![0]), ring(2, vec![])],
++            contacts: vec![contact(0, 1, 2), contact(1, 2, 0)],
++            loops: Vec::new(),
++            sources: vec![0],
++            offsets: vec![1],
++            alphabet: 4,
++            step: integer(1),
++            exponent_grain: 1,
++            receivers: vec![receiver(2, 2)],
++            crib: CribDeclaration {
++                window: 16,
++                offset: 1,
++            },
++            population: 1 << 16,
++            lattice: Default::default(),
++        }
++        .by_lattice_rule(),
++    )
++    .unwrap()
++}
++
++fn pair_field(alphabet: usize) -> Field {
++    pair_field_with_offsets(alphabet, Vec::new())
++}
++
++fn pair_field_with_offsets(alphabet: usize, offsets: Vec<usize>) -> Field {
++    Field::declare(
++        FieldDeclaration {
++            rings: vec![ring(16, (0..16).collect())],
++            contacts: Vec::new(),
++            loops: Vec::new(),
++            sources: vec![0],
++            offsets,
++            alphabet,
++            step: integer(1),
++            exponent_grain: 1,
++            receivers: vec![receiver(0, 1)],
++            crib: CribDeclaration {
++                window: 16,
++                offset: 1,
++            },
++            population: 1 << 24,
++            lattice: Default::default(),
++        }
++        .by_lattice_rule(),
++    )
++    .unwrap()
++}
++
++fn material(field: &Field, ring: usize) -> ResonatorMaterial {
++    let width = field.ring(ring).width();
++    ResonatorMaterial::new(
++        ExactRatMatrix::identity(width).unwrap(),
++        ExactRatMatrix::identity(width).unwrap().scaled(&rat(1, 8)),
++        ExactRatMatrix::identity(width).unwrap().scaled(&rat(1, 16)),
++        Some(PumpDeclaration::new(rat(1, 16), Carrier::at(&rat(1, 2)), PumpStep::Half).unwrap()),
++    )
++    .unwrap()
++}
++
++// These unit tests exercise the entrance and its actual physical consumer.
++// The synthetic passage supplies lawful unit-test truth; it is not a
++// scientific validation set, training curriculum or evidence of text repair.
++
++#[test]
++fn sparse_source_moments_enter_the_actual_loaded_port_with_exact_work() {
++    let field = chain();
++    let current = Current::at_rest(&field);
++    let theta = Constitution::initial(&field, CAMPAIGN_ONE_BUDGET)
++        .unwrap()
++        .with_ring_resonator(
++            &field,
++            0,
++            material(&field, 0)
++                .with_symmetric_saturation(Rat::one())
++                .unwrap(),
++        )
++        .unwrap();
++    // Only station zero is clamped: missing stations contribute no class and no offset pair.
++    let source = SourceMoment::open(&field, &current)
++        .continued(&field, &current, 0, &[Some(0), None, None])
++        .unwrap();
++    let expected = source.open_storage(&field, &theta, &current).unwrap();
++    let (mut word, receipt) = Word::open_source_exact_received(
++        &field,
++        &theta,
++        &current,
++        Arc::new(source.clone()),
++        &WordOpening::Rest,
++    )
++    .unwrap();
++    assert!(receipt.closes());
++    assert_eq!(receipt.before, Rat::zero());
++    assert_eq!(receipt.absorbed, Rat::zero());
++    assert!(receipt.imposed > Rat::zero());
++    println!(
++        "source entrance: before={} after={} absorbed={} imposed={}",
++        receipt.before, receipt.after, receipt.absorbed, receipt.imposed
++    );
++    assert_eq!(word.change().unwrap().storage, expected);
++    word.tick().unwrap();
++    assert!(word.field_balances().last().unwrap().closes());
++    let first_crossing = word.change().unwrap();
++    let [u, w] = first_crossing.resonators[0].as_ref().unwrap();
++    // At this cut Y_source = G_contact: the first scattering transmits the pulse
++    // into the contact and leaves zero at the source storage/loaded port.
++    assert!(u.iter().chain(w).all(Zero::is_zero));
++    assert!(
++        first_crossing
++            .arrivals
++            .iter()
++            .flatten()
++            .flatten()
++            .any(|x| !x.is_zero())
++    );
++    // The next crossing reads that actual contact return, without resetting the Word.
++    word.tick().unwrap();
++    assert!(word.field_balances().last().unwrap().closes());
++    let change = word.change().unwrap();
++    let [u, w] = change.resonators[0].as_ref().unwrap();
++    assert!(u.iter().chain(w).any(|x| !x.is_zero()));
++    println!(
++        "source passage: first loaded point at rest, second loaded point reached through contact return"
++    );
++}
++
++#[test]
++fn exact_source_reentry_preserves_the_entered_interior_and_counts_source_once() {
++    let field = chain();
++    let current = Current::at_rest(&field);
++    let theta = Constitution::initial(&field, CAMPAIGN_ONE_BUDGET)
++        .unwrap()
++        .with_ring_resonator(
++            &field,
++            0,
++            material(&field, 0)
++                .with_symmetric_saturation(Rat::one())
++                .unwrap(),
++        )
++        .unwrap();
++    let source = SourceMoment::open(&field, &current)
++        .continued(&field, &current, 0, &[Some(0)])
++        .unwrap();
++    let (mut first, _) = Word::open_source_exact_received(
++        &field,
++        &theta,
++        &current,
++        Arc::new(source.clone()),
++        &WordOpening::Rest,
++    )
++    .unwrap();
++    first.run(2).unwrap();
++    let carry = first.reception_end().unwrap();
++    let opening = WordOpening::Received {
++        carry: carry.clone(),
++        absorption: Absorption::Nothing,
++    };
++    let (mut next, receipt) =
++        Word::open_exact_received(&field, &theta, &current, &source, &opening).unwrap();
++    assert!(receipt.closes());
++    assert_eq!(next.opened_at(), carry.ticks);
++    println!(
++        "source re-entry: carried_crossing={} opened_at={} source_absorbed={} source_imposed={}",
++        carry.ticks,
++        next.opened_at(),
++        receipt.absorbed,
++        receipt.imposed
++    );
++    let change = next.change().unwrap();
++    assert_eq!(change.arrivals, carry.change.arrivals);
++    assert_eq!(change.states, carry.change.states);
++    assert_eq!(change.resonators, carry.change.resonators);
++    assert_eq!(change.resonator_phases, carry.change.resonator_phases);
++    let injection = source.open_storage(&field, &theta, &current).unwrap();
++    for ring in 0..field.rings().len() {
++        assert_eq!(
++            change.storage[ring],
++            if field.is_source(ring) {
++                injection[ring].clone()
++            } else {
++                carry.change.storage[ring].clone()
++            },
++        );
++    }
++    let form = PowerForm::read(&field, &theta, &current).unwrap();
++    assert_eq!(
++        receipt.before,
++        form.power(&carry.change).unwrap() + form.resonator_power(&carry.change).unwrap()
++    );
++    next.tick().unwrap();
++    assert!(next.field_balances().last().unwrap().closes());
++}
++
++#[test]
++fn nonzero_offset_moments_drive_the_actual_loaded_port_without_marginal_source() {
++    use holonics::hnn::field::ConstitutionRead;
++    use holonics::hnn::moment::PairPort;
++    let field = pair_field_with_offsets(4, vec![1]);
++    let mut current = Current::at_rest(&field);
++    let mut source = SourceMoment::open(&field, &current);
++    let ingested = source.ingest(&field, &mut current, &[0, 1]).unwrap();
++    assert_eq!(ingested.cells, 2);
++    let theta = Constitution::initial(&field, CAMPAIGN_ONE_BUDGET)
++        .unwrap()
++        .with_ring_resonator(
++            &field,
++            0,
++            material(&field, 0)
++                .with_symmetric_saturation(Rat::one())
++                .unwrap(),
++        )
++        .unwrap()
++        // A declared probe isolates the factored offset port with marginal E zero.
++        .with_ports(
++            0,
++            None,
++            Some(ExactRatMatrix::zero(field.ring(0).width(), field.alphabet()).unwrap()),
++            None,
++        )
++        .unwrap();
++    // Initial E^(1) has zero outputs. Declare one unit output along its existing
++    // factored read axes so the probe exercises a nonzero pair material, without
++    // pretending that this fixture material was located or learned.
++    let pair = theta.pair_port(0, 1).unwrap();
++    let mut outputs = pair.outputs().to_vec();
++    outputs[0][0] = Rat::one();
++    let pair = PairPort::new(
++        outputs,
++        pair.current_reads().to_vec(),
++        pair.earlier_reads().to_vec(),
++    )
++    .unwrap();
++    let theta = theta.with_pair(0, 1, pair).unwrap();
++    let table = source.offset_table(&field, 0, 1).unwrap().unwrap();
++    assert_eq!(table.population, 1);
++    let (marginal, pairs) = source.open_parts(&field, &theta, &current, 0).unwrap();
++    assert!(
++        marginal
++            .iter()
++            .flat_map(|(_, values)| values)
++            .all(Zero::is_zero)
++    );
++    assert!(pairs.iter().any(|x| !x.is_zero()));
++    assert_eq!(
++        source.open_storage(&field, &theta, &current).unwrap()[0],
++        pairs
++    );
++    let (mut word, receipt) = Word::open_source_exact_received(
++        &field,
++        &theta,
++        &current,
++        Arc::new(source),
++        &WordOpening::Rest,
++    )
++    .unwrap();
++    assert!(receipt.closes());
++    assert!(receipt.imposed > Rat::zero());
++    word.tick().unwrap();
++    assert!(word.field_balances().last().unwrap().closes());
++    let change = word.change().unwrap();
++    let [u, w] = change.resonators[0].as_ref().unwrap();
++    assert!(u.iter().chain(w).any(|x| !x.is_zero()));
++    println!(
++        "offset-only source entrance: pair_population={} pair_weight={} source_imposed={}",
++        table.population, table.weight, receipt.imposed
++    );
++}
++
++#[test]
++fn an_observed_pair_deposit_changes_the_later_continuing_loaded_response() {
++    use holonics::hnn::constitution::CAMPAIGN_ONE_BUDGET;
++    use holonics::hnn::executed::pair_deposit;
++    use holonics::hnn::field::ConstitutionRead;
++    use holonics::hnn::keys::{PairLocation, station_pairs};
++    let field = pair_field(4);
++    // The locator is given observations, not the desired LocatedPair or its distance.
++    let mut location = PairLocation::open(&field, 0);
++    for a in 0..4 {
++        for b in 0..4 {
++            let mut passage = vec![a, b];
++            for _ in 0..6 {
++                passage.push((passage[passage.len() - 2] + 1) % 4);
++            }
++            for observation in station_pairs(&field, 0, &passage, 2).unwrap() {
++                location.observe(&observation);
++            }
++        }
++    }
++    let located = location
++        .survivors()
++        .located()
++        .expect("the fixture's pair is located");
++    let theta = Constitution::initial(&field, CAMPAIGN_ONE_BUDGET)
++        .unwrap()
++        .with_ring_resonator(
++            &field,
++            0,
++            material(&field, 0)
++                .with_symmetric_saturation(Rat::one())
++                .unwrap(),
++        )
++        .unwrap();
++    let prior = theta.source_port(0).unwrap().clone();
++    let (learned, deposit) = pair_deposit(&field, &theta, &prior, 0, &located).unwrap();
++    assert!(deposit.certificate.holds());
++    assert!(deposit.slip_after < deposit.slip_before);
++    let current = Current::at_rest(&field);
++    let source = SourceMoment::open(&field, &current)
++        .continued(&field, &current, 0, &[Some(1)])
++        .unwrap();
++    let (mut prior_word, _) = Word::open_source_exact_received(
++        &field,
++        &theta,
++        &current,
++        Arc::new(source.clone()),
++        &WordOpening::Rest,
++    )
++    .unwrap();
++    prior_word.run(2).unwrap();
++    let carry = prior_word.reception_end().unwrap();
++    let opening = WordOpening::Received {
++        carry,
++        absorption: Absorption::Nothing,
++    };
++    let (mut before, before_work) =
++        Word::open_exact_received(&field, &theta, &current, &source, &opening).unwrap();
++    let (mut after, after_work) =
++        Word::open_exact_received(&field, &learned, &current, &source, &opening).unwrap();
++    assert!(before_work.closes() && after_work.closes());
++    assert_eq!(
++        before.change().unwrap().resonators,
++        after.change().unwrap().resonators
++    );
++    before.tick().unwrap();
++    after.tick().unwrap();
++    assert!(before.field_balances().last().unwrap().closes());
++    assert!(after.field_balances().last().unwrap().closes());
++    let before_change = before.change().unwrap();
++    let after_change = after.change().unwrap();
++    let before_state = before_change.resonators[0].as_ref().unwrap();
++    let after_state = after_change.resonators[0].as_ref().unwrap();
++    println!(
++        "reached source relation: slip_before={} slip_after={} next_ring0_delta_u0={} next_ring0_delta_w0={}",
++        deposit.slip_before,
++        deposit.slip_after,
++        &after_state[0][0] - &before_state[0][0],
++        &after_state[1][0] - &before_state[1][0]
++    );
++    assert_ne!(
++        before.change().unwrap().resonators,
++        after.change().unwrap().resonators
++    );
++    // This gate is an arrived-material-to-actual-motion gate. Symbol decoding and the
++    // field's compatible-domain coverage remain the consumer's independent acceptance.
++}

@@ -1,0 +1,1784 @@
+{
+  "kind": "curated engineering verification receipt; fixed law fixtures, no scientific validation",
+  "issues": [
+    73,
+    62
+  ],
+  "current_integration_base": "48f00eff",
+  "current_source_commit": "a87c2d5490cfd45ae49b9e490b2eb0e9194e22bb",
+  "four_test_receipt_base": "ae139650a475aa83a4486b3d97b2568b1a47bf3b",
+  "four_test_status": "passed on its sealed source before current-main rebase; current-main codegen and gate incomplete",
+  "source_files": {
+    "crates/holonics/src/hnn/field.rs": {
+      "sha256": "60a3ad7b314eba243ecc88c559ee1c2e640ac5517e0e71139da57caaa067e144",
+      "bytes": 108578
+    },
+    "crates/holonics/src/hnn/moment.rs": {
+      "sha256": "c234d4d1bed5b4f36821ba1be0f53908c6181255f4c56bb0b545f97407fe49a1",
+      "bytes": 72240
+    },
+    "crates/holonics/src/hnn/propagation.rs": {
+      "sha256": "ebae450035e9a86b53f454d437e51ad9ceebb020f54a0e0dfc5278a741356856",
+      "bytes": 65733
+    },
+    "crates/holonics/src/hnn/word.rs": {
+      "sha256": "0200f5a2920d26b0b6258823ffeb20ae5b23bf4546299ec058e7c60d159b7bb4",
+      "bytes": 139446
+    },
+    "crates/holonics/src/hnn/word/continuation.rs": {
+      "sha256": "45eb28b6c879585b2fb2bb4cbc5be553589df469ef9ac3be15fe565b436edb4f",
+      "bytes": 18094
+    },
+    "crates/holonics/src/hnn/mod.rs": {
+      "sha256": "2b3417a11c882549d69effee4ac1bcf60d70b9dbede510b61bdd4741f9e9ccba",
+      "bytes": 30796
+    },
+    "crates/holonics/tests/source_entrance.rs": {
+      "sha256": "28f448a64c74c1cdd3ace6f4689ec5fa3b30bba5ef9c233f7fa0b653592a68c5",
+      "bytes": 14793
+    }
+  },
+  "four_test_source_files": {
+    "crates/holonics/src/hnn/field.rs": {
+      "sha256": "60a3ad7b314eba243ecc88c559ee1c2e640ac5517e0e71139da57caaa067e144",
+      "bytes": 108578
+    },
+    "crates/holonics/src/hnn/moment.rs": {
+      "sha256": "c234d4d1bed5b4f36821ba1be0f53908c6181255f4c56bb0b545f97407fe49a1",
+      "bytes": 72240
+    },
+    "crates/holonics/src/hnn/propagation.rs": {
+      "sha256": "62624df547bafd07d486a827bd0ec9034a56fc55925480db407adce25fe1c667",
+      "bytes": 65733
+    },
+    "crates/holonics/src/hnn/word.rs": {
+      "sha256": "1139d313998ed75e62741c5bb4c4d1e4e593bcefb549f1b756ba94d585e26484",
+      "bytes": 139234
+    },
+    "crates/holonics/src/hnn/word/continuation.rs": {
+      "sha256": "45eb28b6c879585b2fb2bb4cbc5be553589df469ef9ac3be15fe565b436edb4f",
+      "bytes": 18094
+    },
+    "crates/holonics/src/hnn/mod.rs": {
+      "sha256": "a9566749e186b3b91c5566696ad2a7295d5ab60603be4c3f8a8af44b495c9c3a",
+      "bytes": 30792
+    },
+    "crates/holonics/tests/source_entrance.rs": {
+      "sha256": "28f448a64c74c1cdd3ace6f4689ec5fa3b30bba5ef9c233f7fa0b653592a68c5",
+      "bytes": 14793
+    }
+  },
+  "four_test_executable": {
+    "source_entrance-85314e3ce9c0aa42": {
+      "sha256": "7d5758a26c92fd47f44a2bfe91277e3c447857e938fd4ae28f9a8802a0845f7e",
+      "bytes": 21058008
+    }
+  },
+  "controller_review": {
+    "sha256": "054b64ebaa46a802b0c64be00174f6e928210bfa641396607f395f04f1156a17",
+    "bytes": 1960
+  },
+  "controller_files": {
+    "final_stage.py": {
+      "sha256": "83df6f84512e1a1c807dbddf3396d997c68329f61d39ea22e408883d8506890d",
+      "bytes": 10554
+    },
+    "leased_stage_v2.py": {
+      "sha256": "7c668bad52c3a32e87bf2d4a45dd7c90ea354896f7c5da1cb5c82c6a38cf9cf7",
+      "bytes": 5345
+    },
+    "bounded_stage_v1.py": {
+      "sha256": "8ef953d3a2dc37f5a0407983183f2ec25720a1abf155f120117c5744bdb10ead",
+      "bytes": 12218
+    }
+  },
+  "foreign_cache_preflight": {
+    "sha256": "025952118bd3bd4b4cd2664c7f3bc2925c69a87fbae427a7e60567de5b48fc17",
+    "bytes": 398455
+  },
+  "CUDA_image_cache_preflight": {
+    "sha256": "578fbc1907e886ac1eab7128f6a5e71acc406d09f3ae205b07dbb8a75c64e336",
+    "bytes": 2490
+  },
+  "fixed_policy": {
+    "CPU_affinity_count": 1,
+    "aggregate_CPU_limit_us": 17000000,
+    "sampled_CPU_stop_us": 16000000,
+    "CPU_kernel_hard_total_limit": false,
+    "group_memory_max_bytes": 4294967296,
+    "group_swap_max_bytes": 0,
+    "prelaunch_MemAvailable_floor_bytes": 8589934592,
+    "running_MemAvailable_floor_bytes": 4294967296,
+    "shared_external_lease": true,
+    "full_source_membership_and_hash_seals": true,
+    "wall_caps_are_bounded_development_admission_not_measured_scientific_projections": true
+  },
+  "stage_count": 17,
+  "total_group_CPU_ns": 124879029000,
+  "sum_outer_wall_ns": 130976482963,
+  "maximum_group_memory_peak_bytes": 2308718592,
+  "CPU_total_excludes_review_approval_cache_copy_and_source_editing": true,
+  "stages": [
+    {
+      "label": "source-entrance-check-v1",
+      "passed": true,
+      "note": "targeted metadata check before shared material read face",
+      "native_exit": 0,
+      "final_group_CPU_ns": 7362999000,
+      "CPU_reading_grain_ns": 1000,
+      "outer_wall_ns": 7599899442,
+      "fixed_wall_cap_ns": 60000000000,
+      "wall_to_fixed_cap_ratio": "1266649907/10000000000",
+      "group_memory_peak_bytes": 892579840,
+      "peak_reaped_child_RSS_KiB": 847740,
+      "aggregate_CPU_guard_triggered": false,
+      "inputs_unchanged": true,
+      "quiescent": true,
+      "owned_group_stopped_and_unloaded": true,
+      "lease_released_after_final_and_cleanup": true,
+      "no_unrelated_units_stopped": true,
+      "CPU_affinity": [
+        0
+      ],
+      "sealed_input_count": 393,
+      "prelaunch_MemAvailable_bytes": 13443133440,
+      "minimum_sampled_MemAvailable_KiB": 12431584,
+      "raw_private_receipt_digests": {
+        "source-entrance-check-v1.acceptance.json": {
+          "sha256": "ef70a2fe5b2dce327b0457ca4ecda9f62e7e9d1d916a24d721e38a548f4adee0",
+          "bytes": 378
+        },
+        "source-entrance-check-v1.child-identity.json": {
+          "sha256": "17aa4b1ab50738d75020855c059a09cf6a082f1423204ec9f327ae81bad576b4",
+          "bytes": 76
+        },
+        "source-entrance-check-v1.config.json": {
+          "sha256": "c7203d6110c8932cdffc25e0af84501868fbe06e4457abaa289ed4093742c280",
+          "bytes": 114203
+        },
+        "source-entrance-check-v1.external-lease.json": {
+          "sha256": "7ebe54542b7f39a78200d84a8564061e3f13cf736ec96c322b5080fa5e705b79",
+          "bytes": 486
+        },
+        "source-entrance-check-v1.final.json": {
+          "sha256": "6784a91fa2d30688ecdb7e8fb21ee310123f971d3a29483bbbe2423362710b37",
+          "bytes": 4877
+        },
+        "source-entrance-check-v1.input_seal.json": {
+          "sha256": "df004c175a0f7807babdb9e418f3da66fd2c04f8a59bde41acd7ff1f4a149696",
+          "bytes": 92617
+        },
+        "source-entrance-check-v1.lease-identity.json": {
+          "sha256": "074bbbc4d627ffe030581bdbd8dd9f4360abb55798197835ead4dfb863d29a68",
+          "bytes": 563
+        },
+        "source-entrance-check-v1.memory-gate.json": {
+          "sha256": "4802c547824f402ac3295c6c6171d0ab828c1a4a413708c804e3d786c233d526",
+          "bytes": 120
+        },
+        "source-entrance-check-v1.output_seal.json": {
+          "sha256": "31406fcee5b512e1d95c974b9ddf29cbe25476aabb177cd3aa87c6b4f097ce61",
+          "bytes": 476823
+        },
+        "source-entrance-check-v1.publication.json": {
+          "sha256": "6da1967c34085c90ad404aa2d03e65a15276527282368a6c6cdf19f1b0293b75",
+          "bytes": 2767
+        },
+        "source-entrance-check-v1.quiescence.json": {
+          "sha256": "db4f6470a89bc2ecd9c1b0dec8915ba4ed8b495db12d45da18d77e358d9624a4",
+          "bytes": 129
+        },
+        "source-entrance-check-v1.release.json": {
+          "sha256": "4e9a9090485b5038e47eefa4f8324bb0a2374a3fb3e981022df562628fd00e39",
+          "bytes": 174
+        },
+        "source-entrance-check-v1.stage-quiescence.json": {
+          "sha256": "20108798e581e813c78be669a53c012646b60e7d23737094e4a7fc1ea47bdd8a",
+          "bytes": 136
+        },
+        "source-entrance-check-v1.stderr": {
+          "sha256": "3cb0cc440e6adb2cdb0b58645d0711a8384e95845f6dcd587f4c43394581b2cb",
+          "bytes": 181
+        },
+        "source-entrance-check-v1.stdout": {
+          "sha256": "f1094f27a511858cb9586a6a1e042391db1cfc678f0955a4ba8717c5b386f7da",
+          "bytes": 32162
+        },
+        "source-entrance-check-v1.system-floor.json": {
+          "sha256": "b4270c5fe151c0918a3f22a75d5550b5db3b9edb41ffc629c4d194d32ef76af8",
+          "bytes": 54613
+        },
+        "source-entrance-check-v1.unit-cleanup.json": {
+          "sha256": "743956541e7a4d4f0916b6f7f08ce7d6c3d2df57520e7bf4a11f73d7197b2449",
+          "bytes": 675
+        }
+      }
+    },
+    {
+      "label": "source-entrance-build-v1",
+      "passed": false,
+      "note": "generic material codegen incomplete at fixed CPU boundary",
+      "native_exit": -9,
+      "final_group_CPU_ns": 16355993000,
+      "CPU_reading_grain_ns": 1000,
+      "outer_wall_ns": 17400587187,
+      "fixed_wall_cap_ns": 60000000000,
+      "wall_to_fixed_cap_ratio": "5800195729/20000000000",
+      "group_memory_peak_bytes": 1271783424,
+      "peak_reaped_child_RSS_KiB": 30368,
+      "aggregate_CPU_guard_triggered": true,
+      "inputs_unchanged": true,
+      "quiescent": true,
+      "owned_group_stopped_and_unloaded": false,
+      "lease_released_after_final_and_cleanup": true,
+      "no_unrelated_units_stopped": true,
+      "CPU_affinity": [
+        0
+      ],
+      "sealed_input_count": 393,
+      "prelaunch_MemAvailable_bytes": 11608514560,
+      "minimum_sampled_MemAvailable_KiB": 10671260,
+      "raw_private_receipt_digests": {
+        "source-entrance-build-v1.acceptance.json": {
+          "sha256": "1b3f7d9b3bee1d04fc57113422340a816e04e1db805450d74ec13d7456118160",
+          "bytes": 379
+        },
+        "source-entrance-build-v1.child-identity.json": {
+          "sha256": "d0b3ba3d2988fe36d9b3646eff3f09f74a9f1939bac195fe8112f1f8ba4241e0",
+          "bytes": 76
+        },
+        "source-entrance-build-v1.config.json": {
+          "sha256": "bf3b031fa1dc3e258a0dc68213e0490dd336b02c1dd97c90ff9275317f7722ec",
+          "bytes": 114402
+        },
+        "source-entrance-build-v1.external-lease.json": {
+          "sha256": "6ead88976015576770f7fc284a5ad6101cee0df00e36acf1803f20515dbe466c",
+          "bytes": 486
+        },
+        "source-entrance-build-v1.failure.json": {
+          "sha256": "1341ff82e87384345a7643b5d7ecffdddacab32c9e230eca0ccc048ada36f8f4",
+          "bytes": 225
+        },
+        "source-entrance-build-v1.final.json": {
+          "sha256": "8c9e4d84f654a7c5f57b928b152f1a9a39de6e54d97d218c12d9a4bb11fdd607",
+          "bytes": 5137
+        },
+        "source-entrance-build-v1.input_seal.json": {
+          "sha256": "d9a0e11d4b836e10bfc651b6ff2e29c1351dae740f3b1012471f374338ad0a5d",
+          "bytes": 92816
+        },
+        "source-entrance-build-v1.lease-identity.json": {
+          "sha256": "0d9145f5a7c0425a0cd90bdc527184ad299437ac6850c18bcda95a02728ed197",
+          "bytes": 563
+        },
+        "source-entrance-build-v1.memory-gate.json": {
+          "sha256": "091869699ccfb85e2c16111dbfb23462a168abf51bb93e20543a22d44e8503c5",
+          "bytes": 120
+        },
+        "source-entrance-build-v1.output_seal.json": {
+          "sha256": "b6e358e4e2eb7055f7612fe01ed9241164d82d16120273c4514c36b4ff56257e",
+          "bytes": 1068551
+        },
+        "source-entrance-build-v1.publication.json": {
+          "sha256": "88d1720c29661eba2b26bb61ee71cba6249058ff07b6469a84df1bda67a83f3a",
+          "bytes": 2978
+        },
+        "source-entrance-build-v1.quiescence.json": {
+          "sha256": "436001c5ef7493f3cca45d35310b931edfa7ccd850add540b381ce0e02453b3f",
+          "bytes": 130
+        },
+        "source-entrance-build-v1.release.json": {
+          "sha256": "3d412b0801b310835b817e9d57aeff8a873715b99f24416b4fe0987c18838a57",
+          "bytes": 174
+        },
+        "source-entrance-build-v1.stage-quiescence.json": {
+          "sha256": "789cb9b1ebfe37c0817f2c0f4475d9b8cb1d8ebe3f2ad78f937bdd7381a9592d",
+          "bytes": 136
+        },
+        "source-entrance-build-v1.stderr": {
+          "sha256": "429efa01e927144ba392074f45ef75b18c91b7c7c60ffcf5958c079a9f1ad1c6",
+          "bytes": 109
+        },
+        "source-entrance-build-v1.stdout": {
+          "sha256": "55062c13700451ea2693121939052c8a7f68543ca8057224ce0d70c2617bdd4e",
+          "bytes": 32945
+        },
+        "source-entrance-build-v1.system-floor.json": {
+          "sha256": "b16061eff53dd555bf6dd99d33e56b1ac929af70b38a65496aa0371416a057ae",
+          "bytes": 128172
+        },
+        "source-entrance-build-v1.unit-cleanup.json": {
+          "sha256": "d04df75f31c6608a8fff8500abc046850b49244f2d8d6353de27e1f100879fac",
+          "bytes": 736
+        }
+      }
+    },
+    {
+      "label": "source-entrance-build-v2",
+      "passed": false,
+      "note": "generic material codegen with no incremental cache and sixteen units; incomplete",
+      "native_exit": -9,
+      "final_group_CPU_ns": 16566290000,
+      "CPU_reading_grain_ns": 1000,
+      "outer_wall_ns": 17190236019,
+      "fixed_wall_cap_ns": 60000000000,
+      "wall_to_fixed_cap_ratio": "5730078673/20000000000",
+      "group_memory_peak_bytes": 1410260992,
+      "peak_reaped_child_RSS_KiB": 30432,
+      "aggregate_CPU_guard_triggered": true,
+      "inputs_unchanged": true,
+      "quiescent": true,
+      "owned_group_stopped_and_unloaded": false,
+      "lease_released_after_final_and_cleanup": true,
+      "no_unrelated_units_stopped": true,
+      "CPU_affinity": [
+        0
+      ],
+      "sealed_input_count": 393,
+      "prelaunch_MemAvailable_bytes": 13763026944,
+      "minimum_sampled_MemAvailable_KiB": 8995284,
+      "raw_private_receipt_digests": {
+        "source-entrance-build-v2.acceptance.json": {
+          "sha256": "d4a9d01d83520d19a3ff223c83299b9dc4ef7dbbe5406d304ec61a4ac08bee13",
+          "bytes": 379
+        },
+        "source-entrance-build-v2.child-identity.json": {
+          "sha256": "546d8146f220d2805c3afe5f4878921f6a6d3d7a492ea160706fbc51e39ea801",
+          "bytes": 76
+        },
+        "source-entrance-build-v2.config.json": {
+          "sha256": "48c674975920f816a7a0d37c9cef36d14d0c642111a67c430d285309bc73da1c",
+          "bytes": 114619
+        },
+        "source-entrance-build-v2.external-lease.json": {
+          "sha256": "f3d0dff8583bc8b6895fe09615699fd3647c4aac2b61e2671dc3ef50b7bf4160",
+          "bytes": 486
+        },
+        "source-entrance-build-v2.failure.json": {
+          "sha256": "05113a522c011110d2f26de31542ac5897539cfbee47f8f8e6db73dbf227d65e",
+          "bytes": 225
+        },
+        "source-entrance-build-v2.final.json": {
+          "sha256": "097aca72e001b301c8062d7dbea5ac4d2ec2f5f2ce4d2a1c83e702b1c908c9f9",
+          "bytes": 5137
+        },
+        "source-entrance-build-v2.input_seal.json": {
+          "sha256": "690d6fcc6491ae04dea28f1ec46ca795fba5d572661ee0413b72e91806fe7946",
+          "bytes": 93033
+        },
+        "source-entrance-build-v2.lease-identity.json": {
+          "sha256": "d3edee53fc756fdaf2feae6163c4721d95a5d2953461ea4798e9e918a778a1a9",
+          "bytes": 563
+        },
+        "source-entrance-build-v2.memory-gate.json": {
+          "sha256": "74b68078cb792bba72d8e102b9efc722e692f9eb47166de474d643b4a3081542",
+          "bytes": 120
+        },
+        "source-entrance-build-v2.output_seal.json": {
+          "sha256": "c35cf652985b866cc6c8fcff54944911cc186e54ab57f31d83881b0d9d82b11e",
+          "bytes": 1096757
+        },
+        "source-entrance-build-v2.publication.json": {
+          "sha256": "a0543a80b96600518210e282fa574e000fcea8f1a9977700023e57ade11cd4c8",
+          "bytes": 2978
+        },
+        "source-entrance-build-v2.quiescence.json": {
+          "sha256": "3b79ee29e30137a7c0a61564826df0847ca6a4a626f656bedf7af27c9314b7ca",
+          "bytes": 130
+        },
+        "source-entrance-build-v2.release.json": {
+          "sha256": "7870161d02ad5508d96082becca5338c9726a11e0b90e826ed151e42c59e55d5",
+          "bytes": 174
+        },
+        "source-entrance-build-v2.stage-quiescence.json": {
+          "sha256": "b8f071254f9576e62e127c6a2bc2fcfd9c5a783842f5fa3a59697777d927e9d2",
+          "bytes": 136
+        },
+        "source-entrance-build-v2.stderr": {
+          "sha256": "429efa01e927144ba392074f45ef75b18c91b7c7c60ffcf5958c079a9f1ad1c6",
+          "bytes": 109
+        },
+        "source-entrance-build-v2.stdout": {
+          "sha256": "b8399a0e051a1dd736eabc7c669d9f43c2ce1d5ab2c1dd3a275d1b07b290c960",
+          "bytes": 32945
+        },
+        "source-entrance-build-v2.system-floor.json": {
+          "sha256": "7ed89e2f4122ab9a86e931621a27427ebc57115c245f654194084069af69206b",
+          "bytes": 126406
+        },
+        "source-entrance-build-v2.unit-cleanup.json": {
+          "sha256": "9fce615c2aca8da16415c065cf86e2ed8c761a7440bdb6b539b9c3ef26ba9a5c",
+          "bytes": 736
+        }
+      }
+    },
+    {
+      "label": "source-entrance-check-v2",
+      "passed": true,
+      "note": "shared dyn FieldMaterial metadata check passed",
+      "native_exit": 0,
+      "final_group_CPU_ns": 5493484000,
+      "CPU_reading_grain_ns": 1000,
+      "outer_wall_ns": 5850618011,
+      "fixed_wall_cap_ns": 60000000000,
+      "wall_to_fixed_cap_ratio": "5850618011/60000000000",
+      "group_memory_peak_bytes": 962998272,
+      "peak_reaped_child_RSS_KiB": 835108,
+      "aggregate_CPU_guard_triggered": false,
+      "inputs_unchanged": true,
+      "quiescent": true,
+      "owned_group_stopped_and_unloaded": true,
+      "lease_released_after_final_and_cleanup": true,
+      "no_unrelated_units_stopped": true,
+      "CPU_affinity": [
+        0
+      ],
+      "sealed_input_count": 393,
+      "prelaunch_MemAvailable_bytes": 13755285504,
+      "minimum_sampled_MemAvailable_KiB": 13119716,
+      "raw_private_receipt_digests": {
+        "source-entrance-check-v2.acceptance.json": {
+          "sha256": "a89a0252803a2c291cbaf4ac059c5beee71b2508a68b40d86161df849674f273",
+          "bytes": 378
+        },
+        "source-entrance-check-v2.child-identity.json": {
+          "sha256": "1f41e362c126f99c5757e3e05501212d9be4c44c6941aedfc7ea29ed22313192",
+          "bytes": 76
+        },
+        "source-entrance-check-v2.config.json": {
+          "sha256": "296ae9545db48268a0e5d22525c1cc7b7bb8de77a854e96b9a0ef492b4bf2b16",
+          "bytes": 114527
+        },
+        "source-entrance-check-v2.external-lease.json": {
+          "sha256": "1f6079d4182ca5dc0f95fa32545f164fcd2161d2f3f838c8fafc6855832a7e10",
+          "bytes": 486
+        },
+        "source-entrance-check-v2.final.json": {
+          "sha256": "c06251f37ead5de4923141d3390b548e75ba69e0363b8c69dcbf37283768a0f0",
+          "bytes": 4877
+        },
+        "source-entrance-check-v2.input_seal.json": {
+          "sha256": "d44f6ea09bce3ac1d59e23ca2f42e8435a49a3e876eceb49f8c07d1f0b5cee58",
+          "bytes": 92941
+        },
+        "source-entrance-check-v2.lease-identity.json": {
+          "sha256": "c2d4821f6055b70c4ac14c29f98cee1ce0e4fcf868e62c289ab5cec1a979d80c",
+          "bytes": 563
+        },
+        "source-entrance-check-v2.memory-gate.json": {
+          "sha256": "0742bf33e5e6e6984b0e1812bec39822b1c0a5bac987911b9dac32bc32ae8cc4",
+          "bytes": 120
+        },
+        "source-entrance-check-v2.output_seal.json": {
+          "sha256": "48530870d6626cb6dedb0c206de93763f234081b9fa9f8186d87811b353297a2",
+          "bytes": 343606
+        },
+        "source-entrance-check-v2.publication.json": {
+          "sha256": "b1e40a18fd4809407fd3aaa45411673b7885e57539ca8b0dd5502e96b24fd72b",
+          "bytes": 2767
+        },
+        "source-entrance-check-v2.quiescence.json": {
+          "sha256": "5a8cc82afe5160cbf822dc49a956e7cb580b6576cb5b8475b5f71385b1c990df",
+          "bytes": 129
+        },
+        "source-entrance-check-v2.release.json": {
+          "sha256": "3853a55930f2b8e97d242279f64246695835a26bdc5faec3dc0ce79bd2f31b0b",
+          "bytes": 174
+        },
+        "source-entrance-check-v2.stage-quiescence.json": {
+          "sha256": "cdc6a95ab2c4106662ba9938f9d89eee674ffab6ce8e6ed85d62554e8288faa0",
+          "bytes": 136
+        },
+        "source-entrance-check-v2.stderr": {
+          "sha256": "178da41974c6219b628c52b5bf14228dd3dce52a3b38ac326713a30fba14184d",
+          "bytes": 181
+        },
+        "source-entrance-check-v2.stdout": {
+          "sha256": "d7693ff45f4373f9c29fe4ea6f796bc481b7d009253ca62400382bed6992ff23",
+          "bytes": 32162
+        },
+        "source-entrance-check-v2.system-floor.json": {
+          "sha256": "dffc941ef68b250bda122c0ab54e9c1866bd0862d647ad0db3cdaca0907ba84e",
+          "bytes": 38654
+        },
+        "source-entrance-check-v2.unit-cleanup.json": {
+          "sha256": "0f59404f49df9c44fba1e7b9242f34662db67efd121b574f222379b571f15f0e",
+          "bytes": 675
+        }
+      }
+    },
+    {
+      "label": "source-entrance-build-v3",
+      "passed": true,
+      "note": "shared material read face completed native library and integration executable",
+      "native_exit": 0,
+      "final_group_CPU_ns": 15934963000,
+      "CPU_reading_grain_ns": 1000,
+      "outer_wall_ns": 16447960756,
+      "fixed_wall_cap_ns": 60000000000,
+      "wall_to_fixed_cap_ratio": "4111990189/15000000000",
+      "group_memory_peak_bytes": 1351618560,
+      "peak_reaped_child_RSS_KiB": 1281836,
+      "aggregate_CPU_guard_triggered": false,
+      "inputs_unchanged": true,
+      "quiescent": true,
+      "owned_group_stopped_and_unloaded": true,
+      "lease_released_after_final_and_cleanup": true,
+      "no_unrelated_units_stopped": true,
+      "CPU_affinity": [
+        0
+      ],
+      "sealed_input_count": 393,
+      "prelaunch_MemAvailable_bytes": 14193180672,
+      "minimum_sampled_MemAvailable_KiB": 13089704,
+      "raw_private_receipt_digests": {
+        "source-entrance-build-v3.acceptance.json": {
+          "sha256": "e58f37a0e19db9159646d5f7b92cc63386a6d1acb97a429fe1f890e58a355b24",
+          "bytes": 378
+        },
+        "source-entrance-build-v3.child-identity.json": {
+          "sha256": "a178d4637df8ee41524d621c85c5617d34492f5516c23343b08ea762848d3466",
+          "bytes": 76
+        },
+        "source-entrance-build-v3.config.json": {
+          "sha256": "584cc0be8183a9a003473afefb2cecf6d0af41e34e82e222678ed714ba982faa",
+          "bytes": 114551
+        },
+        "source-entrance-build-v3.external-lease.json": {
+          "sha256": "01081d43bb0fcb28a1c2bee29e7cccc3814228ec0d481d36ea913a77d5f3adff",
+          "bytes": 486
+        },
+        "source-entrance-build-v3.final.json": {
+          "sha256": "bbe9d5ff5aaa144810e97b2925d86ed75e9debf1103476b5036ca10ddbe24f2f",
+          "bytes": 4883
+        },
+        "source-entrance-build-v3.input_seal.json": {
+          "sha256": "0b399bab42e36cec08a175ad1b1f06e8547fcb50b7587463f3133697ecc10444",
+          "bytes": 92965
+        },
+        "source-entrance-build-v3.lease-identity.json": {
+          "sha256": "f4c54e39ac8afb6525a9485d71a0987824acd7515f8ab8fb1cd1f46c43717ef6",
+          "bytes": 563
+        },
+        "source-entrance-build-v3.memory-gate.json": {
+          "sha256": "b68c6ce18cbe02eb7eefc80317bbc2ca8e04ee68d5e8ad86f7379c16d2f859ac",
+          "bytes": 120
+        },
+        "source-entrance-build-v3.output_seal.json": {
+          "sha256": "681c1a3fe6646e8a0b550badb22c02df79c00ba00b4618eed23956fc77402488",
+          "bytes": 1088709
+        },
+        "source-entrance-build-v3.publication.json": {
+          "sha256": "b621a0d37dd9db8482839d86635a0c05142487633ca5bec1422bf15fce2c7598",
+          "bytes": 2773
+        },
+        "source-entrance-build-v3.quiescence.json": {
+          "sha256": "c07fcc941317372876019429a23fdcd5a73f3ce717c8f2e7258ab69c74fbe0b1",
+          "bytes": 129
+        },
+        "source-entrance-build-v3.release.json": {
+          "sha256": "bddadb278684a3cd369b209c524f0f8349f6476a957e27b26b9a837c59a44552",
+          "bytes": 174
+        },
+        "source-entrance-build-v3.stage-quiescence.json": {
+          "sha256": "a13a27b5dbf2b292d9545de2339b293d925aeabed77830e5ba96c3a50ea17299",
+          "bytes": 136
+        },
+        "source-entrance-build-v3.stderr": {
+          "sha256": "91667a0e0020049f048c9fee821fce967670eec23d2c8cc5911b6df8a4cb645d",
+          "bytes": 183
+        },
+        "source-entrance-build-v3.stdout": {
+          "sha256": "9b90d1361ea27b15f6a1d6d27d82acff6bb4e12b83a0b50e0a312251713b213f",
+          "bytes": 34737
+        },
+        "source-entrance-build-v3.system-floor.json": {
+          "sha256": "95f3296266301cf2a3df139634853264a5223040396333c8954a9a74822d3c9a",
+          "bytes": 122177
+        },
+        "source-entrance-build-v3.unit-cleanup.json": {
+          "sha256": "69fb2f2404035f8f498ddb0acaf5c466a63eb5eb113458f6da3cc0a17d7732ec",
+          "bytes": 675
+        }
+      }
+    },
+    {
+      "label": "source-entrance-build-v4",
+      "passed": true,
+      "note": "test-only exact observables",
+      "native_exit": 0,
+      "final_group_CPU_ns": 766874000,
+      "CPU_reading_grain_ns": 1000,
+      "outer_wall_ns": 859208756,
+      "fixed_wall_cap_ns": 60000000000,
+      "wall_to_fixed_cap_ratio": "214802189/15000000000",
+      "group_memory_peak_bytes": 188485632,
+      "peak_reaped_child_RSS_KiB": 236060,
+      "aggregate_CPU_guard_triggered": false,
+      "inputs_unchanged": true,
+      "quiescent": true,
+      "owned_group_stopped_and_unloaded": true,
+      "lease_released_after_final_and_cleanup": true,
+      "no_unrelated_units_stopped": true,
+      "CPU_affinity": [
+        0
+      ],
+      "sealed_input_count": 395,
+      "prelaunch_MemAvailable_bytes": 13772214272,
+      "minimum_sampled_MemAvailable_KiB": 13316092,
+      "raw_private_receipt_digests": {
+        "source-entrance-build-v4.acceptance.json": {
+          "sha256": "e23508adb76731383ce52538df8af57d9d4e96d03fb0f2ee784a79c70161cb02",
+          "bytes": 378
+        },
+        "source-entrance-build-v4.child-identity.json": {
+          "sha256": "23cf9799e558f2941365ca5eba78a8bafaacff2184f800ab356ec64cfe44da76",
+          "bytes": 76
+        },
+        "source-entrance-build-v4.config.json": {
+          "sha256": "c8fd4b7003b29c2cf00ca7dbce7a2b463bdd4d082e8b8d10c2b90a2197e36657",
+          "bytes": 115248
+        },
+        "source-entrance-build-v4.external-lease.json": {
+          "sha256": "6da34868464426122cd7b9e2140a546c696474c484cdb7281990c3792f63c0ba",
+          "bytes": 486
+        },
+        "source-entrance-build-v4.final.json": {
+          "sha256": "d4e854277c8cfa0dd37477854de55bb9ddc0afb9779079c23e4377f5a4b7b55f",
+          "bytes": 4872
+        },
+        "source-entrance-build-v4.input_seal.json": {
+          "sha256": "762e2c825fdcf3da0139374899037f1be08d95c59e719f0e0ce54acef4c45e88",
+          "bytes": 93419
+        },
+        "source-entrance-build-v4.lease-identity.json": {
+          "sha256": "2d763dff2ecb85c3d925fe8e1be86e67f400ae819d7b5fa9e9418453a5ff5d50",
+          "bytes": 563
+        },
+        "source-entrance-build-v4.memory-gate.json": {
+          "sha256": "554a62145223769d2372998321bcdd4ca0562a2fe5ff4c2d4645c31f3a4a89ce",
+          "bytes": 120
+        },
+        "source-entrance-build-v4.output_seal.json": {
+          "sha256": "8fb8c670e663354cddfb8998cb8a060f85d7b7ee06cffd42ba0db7ea8b7e1cc3",
+          "bytes": 22157
+        },
+        "source-entrance-build-v4.publication.json": {
+          "sha256": "4257d53b284de905c4dddd3a9d10652bc1677a053c54c303386a29db6915772e",
+          "bytes": 2763
+        },
+        "source-entrance-build-v4.quiescence.json": {
+          "sha256": "ecf7198dbf779276b633231d35cb8c64dfd67f5c3cc6426154e01f7bd6cac01a",
+          "bytes": 129
+        },
+        "source-entrance-build-v4.release.json": {
+          "sha256": "054476ff8d628b2853a341d76f03b649ae7483313dcb655bfea32f79c646519f",
+          "bytes": 174
+        },
+        "source-entrance-build-v4.stage-quiescence.json": {
+          "sha256": "d7b88f495034b122a9c86a0719c9d12c27e66a29ed894cc809e4b58efb5e17ac",
+          "bytes": 136
+        },
+        "source-entrance-build-v4.stderr": {
+          "sha256": "7640989e62e23268733ada059153ee027497bd2be07b8a576908ee55dbcd9ac2",
+          "bytes": 182
+        },
+        "source-entrance-build-v4.stdout": {
+          "sha256": "66c057fdd7ad28875a998391683e9de571f38a61f0e0b661e28586b5cef5cd82",
+          "bytes": 34736
+        },
+        "source-entrance-build-v4.system-floor.json": {
+          "sha256": "740ff9abb9add8642f1de13af8d80c71dcc875e3408c8fd8e3e1debfff3f0489",
+          "bytes": 2512
+        },
+        "source-entrance-build-v4.unit-cleanup.json": {
+          "sha256": "d50434d20aa9821877f4ceda2b321d0671f23433588790020813ed0662785b9a",
+          "bytes": 675
+        }
+      }
+    },
+    {
+      "label": "source-entrance-runtime-v1",
+      "passed": false,
+      "note": "two passed; one incorrect first-crossing nonzero assertion failed",
+      "native_exit": 101,
+      "final_group_CPU_ns": 2017826000,
+      "CPU_reading_grain_ns": 1000,
+      "outer_wall_ns": 2070391748,
+      "fixed_wall_cap_ns": 16000000000,
+      "wall_to_fixed_cap_ratio": "517597937/4000000000",
+      "group_memory_peak_bytes": 44638208,
+      "peak_reaped_child_RSS_KiB": 38332,
+      "aggregate_CPU_guard_triggered": false,
+      "inputs_unchanged": true,
+      "quiescent": true,
+      "owned_group_stopped_and_unloaded": false,
+      "lease_released_after_final_and_cleanup": true,
+      "no_unrelated_units_stopped": true,
+      "CPU_affinity": [
+        0
+      ],
+      "sealed_input_count": 396,
+      "prelaunch_MemAvailable_bytes": 13629358080,
+      "minimum_sampled_MemAvailable_KiB": 13271720,
+      "raw_private_receipt_digests": {
+        "source-entrance-runtime-v1.acceptance.json": {
+          "sha256": "17f39843da846fe81fb3d633760120b11e88d88e32cfaae778c17f34baf7806f",
+          "bytes": 379
+        },
+        "source-entrance-runtime-v1.child-identity.json": {
+          "sha256": "2cc7c212a0306642a3ae409feef47da3365104b4ab9183ddcb3ddae217cf8d9b",
+          "bytes": 76
+        },
+        "source-entrance-runtime-v1.config.json": {
+          "sha256": "208e6aa5fb3ee5a10d2e9bed6c6c1107e544b901c0be2b6ca55fdfb8170cc2f9",
+          "bytes": 114777
+        },
+        "source-entrance-runtime-v1.external-lease.json": {
+          "sha256": "97fa111ed8fd1ff0b56daf0b50f497ce1543d6f5ed021587ab1bb69779170408",
+          "bytes": 486
+        },
+        "source-entrance-runtime-v1.failure.json": {
+          "sha256": "038353ef1bc626b11702c5dd1471e2a3ce93d8590dc57d381f059a2bafc79204",
+          "bytes": 228
+        },
+        "source-entrance-runtime-v1.final.json": {
+          "sha256": "db8b6c3dc9b73684812f43154767ab554a9c629be4a6633284d6d776b58afe67",
+          "bytes": 5161
+        },
+        "source-entrance-runtime-v1.input_seal.json": {
+          "sha256": "fb50b98e6da48c4558a0219ebba11878308c4a357b55f2bd184ff40dbd9a1129",
+          "bytes": 92828
+        },
+        "source-entrance-runtime-v1.lease-identity.json": {
+          "sha256": "0744691ea8d5777daeb348b93943a91a9a2c2f85674cfe3f441148a100cffc18",
+          "bytes": 563
+        },
+        "source-entrance-runtime-v1.memory-gate.json": {
+          "sha256": "c94abf9d3190d2b10a1d335dddb4e3c82212b2d06ad8b968b0517c6b2c8ca6e4",
+          "bytes": 120
+        },
+        "source-entrance-runtime-v1.output_seal.json": {
+          "sha256": "156afb9c937646e18377ea17df408caca5f487ea5e82810a0d56cf4b317f9dbf",
+          "bytes": 104413
+        },
+        "source-entrance-runtime-v1.publication.json": {
+          "sha256": "22b3653c665f6bb156573751f5e3a332a09e75495aa64652dad8b4dfe4d43ec2",
+          "bytes": 2997
+        },
+        "source-entrance-runtime-v1.quiescence.json": {
+          "sha256": "bd53c3564dae03096c0e30591f0706f39636bc84df6b9d086cd98ecede9dda05",
+          "bytes": 131
+        },
+        "source-entrance-runtime-v1.release.json": {
+          "sha256": "7277b0232ad0d4eeea0d06c4ae4845f06f316d4171827b8397819faf3bc0d006",
+          "bytes": 174
+        },
+        "source-entrance-runtime-v1.stage-quiescence.json": {
+          "sha256": "b2f86d87b34a4902261175bf051f49ed10dbf0e150bdef1da514222b21e96b80",
+          "bytes": 136
+        },
+        "source-entrance-runtime-v1.stderr": {
+          "sha256": "61419e60eca67cb3758846b18e784e5cb4b9b13a3142d45a9be7e15d440011e7",
+          "bytes": 282
+        },
+        "source-entrance-runtime-v1.stdout": {
+          "sha256": "02960f208ab88beeb33cb140c14574b9e318f964708ce4325d5577d759a301c6",
+          "bytes": 2050
+        },
+        "source-entrance-runtime-v1.system-floor.json": {
+          "sha256": "01881843727916e6f7f8be5c1f3dd5d13bb100318b17155914f48c4b4e5b8cf2",
+          "bytes": 11772
+        },
+        "source-entrance-runtime-v1.unit-cleanup.json": {
+          "sha256": "ccfa2d0f40bec358cfcd26fb52c9678edad3ec9cf9e6d1f1a77448ee50e24e1e",
+          "bytes": 737
+        }
+      }
+    },
+    {
+      "label": "source-entrance-build-v5",
+      "passed": true,
+      "note": "cache-only build; correction script had failed before source write",
+      "native_exit": 0,
+      "final_group_CPU_ns": 522859000,
+      "CPU_reading_grain_ns": 1000,
+      "outer_wall_ns": 561264033,
+      "fixed_wall_cap_ns": 60000000000,
+      "wall_to_fixed_cap_ratio": "187088011/20000000000",
+      "group_memory_peak_bytes": 20951040,
+      "peak_reaped_child_RSS_KiB": 30376,
+      "aggregate_CPU_guard_triggered": false,
+      "inputs_unchanged": true,
+      "quiescent": true,
+      "owned_group_stopped_and_unloaded": true,
+      "lease_released_after_final_and_cleanup": true,
+      "no_unrelated_units_stopped": true,
+      "CPU_affinity": [
+        0
+      ],
+      "sealed_input_count": 395,
+      "prelaunch_MemAvailable_bytes": 13280952320,
+      "minimum_sampled_MemAvailable_KiB": 12962724,
+      "raw_private_receipt_digests": {
+        "source-entrance-build-v5.acceptance.json": {
+          "sha256": "1980cc00b571c7bf201b69ab853d5318e9a122c73562f116a956a90cc1e5a58d",
+          "bytes": 378
+        },
+        "source-entrance-build-v5.child-identity.json": {
+          "sha256": "f4855c4c049e900fa335555d4a0c03d174e17b463c50df10b67bb98f920f8bef",
+          "bytes": 76
+        },
+        "source-entrance-build-v5.config.json": {
+          "sha256": "12b198bb9dfcb360efff2c48fce75e1a2fdaa6cfca2cdeba1aeb91e1fb6a6b8c",
+          "bytes": 115315
+        },
+        "source-entrance-build-v5.external-lease.json": {
+          "sha256": "07f13179c27d081faba9dfc3a55585440aa58c0524bffd9b723c6ecaa9a39b8d",
+          "bytes": 486
+        },
+        "source-entrance-build-v5.final.json": {
+          "sha256": "c2425a6eab8a98f83a9f74e806b9e03fa58eaecea5ac7a4bd49949d9bc3ba11f",
+          "bytes": 4868
+        },
+        "source-entrance-build-v5.input_seal.json": {
+          "sha256": "6adf0eb7ae3b25e5a2d61df479efdf69dc48d7a2a8e717f4703af115384be7a7",
+          "bytes": 93486
+        },
+        "source-entrance-build-v5.lease-identity.json": {
+          "sha256": "acc2f2831f270e927c9dc71c46b6577efc71869c515a9afca0188ba8cbe9db2e",
+          "bytes": 563
+        },
+        "source-entrance-build-v5.memory-gate.json": {
+          "sha256": "ecad44a994c23764a38c31a9097adbcd54ec9cfa0d75b1d19178356ac0fed2d5",
+          "bytes": 120
+        },
+        "source-entrance-build-v5.output_seal.json": {
+          "sha256": "02bf872e1721dcbd0d821ce4cd68b1b55c25a6899826fac5d516c169f203414b",
+          "bytes": 3166
+        },
+        "source-entrance-build-v5.publication.json": {
+          "sha256": "b9b9a28259cf56baa1eccd9c8e53fb845aaa0d9675e67fc5337f8670b19994c9",
+          "bytes": 2757
+        },
+        "source-entrance-build-v5.quiescence.json": {
+          "sha256": "cdfaab6f4115d94ad02b48a20b4622dab088b6bdbae36e26c991fe87cb5b6f94",
+          "bytes": 129
+        },
+        "source-entrance-build-v5.release.json": {
+          "sha256": "dc623464c7d57072df56940ac3a5ea42db4c0353ba949875b7c7357bc47c5ddd",
+          "bytes": 174
+        },
+        "source-entrance-build-v5.stage-quiescence.json": {
+          "sha256": "b980e4a0581c426aab09ac8435c70b8f2029b236c0998c84e85adb0aa6c00a63",
+          "bytes": 136
+        },
+        "source-entrance-build-v5.stderr": {
+          "sha256": "3be63a270c1475ea545697ad53d42d734acbfff283f0af9d1d518cc2dca9992c",
+          "bytes": 73
+        },
+        "source-entrance-build-v5.stdout": {
+          "sha256": "8fafb8c12c9141a9b4a9c668c70c7653f2566476c42c30320687c3862f8fe0a3",
+          "bytes": 34735
+        },
+        "source-entrance-build-v5.system-floor.json": {
+          "sha256": "c8008d72446c31022ce829fa622c1576831809b8cff676341fe6500216bcdcee",
+          "bytes": 361
+        },
+        "source-entrance-build-v5.unit-cleanup.json": {
+          "sha256": "cc12cef18707d886a6fcfb37771416422db4a296c5afeb929da70b869b974d41",
+          "bytes": 675
+        }
+      }
+    },
+    {
+      "label": "source-entrance-build-v6",
+      "passed": true,
+      "note": "test correction: second actual crossing receives matched-contact return",
+      "native_exit": 0,
+      "final_group_CPU_ns": 939899000,
+      "CPU_reading_grain_ns": 1000,
+      "outer_wall_ns": 1171697261,
+      "fixed_wall_cap_ns": 60000000000,
+      "wall_to_fixed_cap_ratio": "1171697261/60000000000",
+      "group_memory_peak_bytes": 622600192,
+      "peak_reaped_child_RSS_KiB": 236140,
+      "aggregate_CPU_guard_triggered": false,
+      "inputs_unchanged": true,
+      "quiescent": true,
+      "owned_group_stopped_and_unloaded": true,
+      "lease_released_after_final_and_cleanup": true,
+      "no_unrelated_units_stopped": true,
+      "CPU_affinity": [
+        0
+      ],
+      "sealed_input_count": 395,
+      "prelaunch_MemAvailable_bytes": 13253246976,
+      "minimum_sampled_MemAvailable_KiB": 12743696,
+      "raw_private_receipt_digests": {
+        "source-entrance-build-v6.acceptance.json": {
+          "sha256": "a1cfa61928dfe2b634035abc0755de39a23033fc2eefe6aebd8bd0f1e3e9717f",
+          "bytes": 378
+        },
+        "source-entrance-build-v6.child-identity.json": {
+          "sha256": "6a56405ddde848441045dca6c991babad989a10af21d5e4de7b044290d32afcd",
+          "bytes": 76
+        },
+        "source-entrance-build-v6.config.json": {
+          "sha256": "e9035f05ec70b5fa927902c4cfb9f19f626d02477741a29739c11ae570b9d83b",
+          "bytes": 115315
+        },
+        "source-entrance-build-v6.external-lease.json": {
+          "sha256": "6cb0389e2253f5d564d4ebfd87653433f6e096308ee2b0b532653d3363f889f7",
+          "bytes": 486
+        },
+        "source-entrance-build-v6.final.json": {
+          "sha256": "bd8455ddb111daee31ccdb8b28ef103879032413c2377c3dd4947c3d101d7b19",
+          "bytes": 4873
+        },
+        "source-entrance-build-v6.input_seal.json": {
+          "sha256": "75cc07378a687a92e8eb46bb723ce295d55941a642bfec4f76cb01edf056a20e",
+          "bytes": 93486
+        },
+        "source-entrance-build-v6.lease-identity.json": {
+          "sha256": "3a6eecdee7219bcff1c3666ed229b4ef68ae4fcb56533ac65fa6775e671492c9",
+          "bytes": 563
+        },
+        "source-entrance-build-v6.memory-gate.json": {
+          "sha256": "d0b8ccd8f8b3cb1dcc5a463ad176f3dee23637b65b38e7f453219a1cb3620911",
+          "bytes": 120
+        },
+        "source-entrance-build-v6.output_seal.json": {
+          "sha256": "f7f6dda51c27a625ef73dc0139388cddddc0f3a111dc7b8f676ecf0189259fde",
+          "bytes": 24635
+        },
+        "source-entrance-build-v6.publication.json": {
+          "sha256": "d76942407d9e3f49319ec9899d2348fd60f7f39afcefef18927fd8032151b027",
+          "bytes": 2763
+        },
+        "source-entrance-build-v6.quiescence.json": {
+          "sha256": "4b7cdd1f12aa966fc861989c105efe9661e4ed67ba0981cd88bc41936cbda5b2",
+          "bytes": 129
+        },
+        "source-entrance-build-v6.release.json": {
+          "sha256": "7ae8c62e76e64628474d5e8ef4d14ba308d23ef483fcd9d66f7c43938c633b6c",
+          "bytes": 174
+        },
+        "source-entrance-build-v6.stage-quiescence.json": {
+          "sha256": "6e7538dc1b84cf739f08b4fdb59165ccaf9610570b822a7eab98f9a2ff46e688",
+          "bytes": 136
+        },
+        "source-entrance-build-v6.stderr": {
+          "sha256": "284f45294196169644340cd3b3adf42e634647a231d01b97eb15aedd66dd24b8",
+          "bytes": 182
+        },
+        "source-entrance-build-v6.stdout": {
+          "sha256": "a4060501f13357c36a30ad31b9dc97c67190587343431ca48f817b507c47f8e5",
+          "bytes": 34736
+        },
+        "source-entrance-build-v6.system-floor.json": {
+          "sha256": "4fdf6299952af958acb25fc096aab83a55b0b7101564102396fbb089e29e5c3f",
+          "bytes": 2927
+        },
+        "source-entrance-build-v6.unit-cleanup.json": {
+          "sha256": "e274a25345ed1fdab42d4547132fb832e1e931627723081479eca4a0261c7ec8",
+          "bytes": 675
+        }
+      }
+    },
+    {
+      "label": "source-entrance-runtime-v2",
+      "passed": true,
+      "note": "three physical integration checks passed",
+      "native_exit": 0,
+      "final_group_CPU_ns": 2195572000,
+      "CPU_reading_grain_ns": 1000,
+      "outer_wall_ns": 2262033541,
+      "fixed_wall_cap_ns": 16000000000,
+      "wall_to_fixed_cap_ratio": "2262033541/16000000000",
+      "group_memory_peak_bytes": 46911488,
+      "peak_reaped_child_RSS_KiB": 38332,
+      "aggregate_CPU_guard_triggered": false,
+      "inputs_unchanged": true,
+      "quiescent": true,
+      "owned_group_stopped_and_unloaded": true,
+      "lease_released_after_final_and_cleanup": true,
+      "no_unrelated_units_stopped": true,
+      "CPU_affinity": [
+        0
+      ],
+      "sealed_input_count": 396,
+      "prelaunch_MemAvailable_bytes": 14346330112,
+      "minimum_sampled_MemAvailable_KiB": 13973024,
+      "raw_private_receipt_digests": {
+        "source-entrance-runtime-v2.acceptance.json": {
+          "sha256": "1a25735ee4292e8cfe0a0842548368fd7ae0bec9444312c699aba19a862c3fea",
+          "bytes": 378
+        },
+        "source-entrance-runtime-v2.child-identity.json": {
+          "sha256": "479b5a12deb20217d66dbb39ebe792ba7af618a5a8cc792969b9b5e0d3df0bb5",
+          "bytes": 76
+        },
+        "source-entrance-runtime-v2.config.json": {
+          "sha256": "1e8cd2dc018a3ab024ebf9dcbc87ebb3b8d995166587ef623f5a920428dc771f",
+          "bytes": 114789
+        },
+        "source-entrance-runtime-v2.external-lease.json": {
+          "sha256": "7435c6e8b0a6abab4ad7da2889100c9a8f6ac0abd0f5e0f2730d2e133bce7e21",
+          "bytes": 486
+        },
+        "source-entrance-runtime-v2.final.json": {
+          "sha256": "3eef071afcfb57f877cfbafc026606af3b06873ef083e27d3bc29b046bfb52f8",
+          "bytes": 4902
+        },
+        "source-entrance-runtime-v2.input_seal.json": {
+          "sha256": "86f2e7e0a3d13706dfc31c88ebd29675c1d9971e3d179c90d708873648313ce0",
+          "bytes": 92840
+        },
+        "source-entrance-runtime-v2.lease-identity.json": {
+          "sha256": "79def10faab5d0b25ae22072b78276ca9d8de764c92c0b682ae76833178f029b",
+          "bytes": 563
+        },
+        "source-entrance-runtime-v2.memory-gate.json": {
+          "sha256": "804234b85f665ce45d805d07ac463fd1b1fc2696d77126d421b0e08dedefc256",
+          "bytes": 120
+        },
+        "source-entrance-runtime-v2.output_seal.json": {
+          "sha256": "c7c1c3d099e1ee30a2c489575cfeec5811216e42802d81482cccfcf3a9af58f3",
+          "bytes": 110011
+        },
+        "source-entrance-runtime-v2.publication.json": {
+          "sha256": "6f928ed997397601e5fba9e52e99f3f341b593e7ef0ec4adc7d07a6478dee95e",
+          "bytes": 2781
+        },
+        "source-entrance-runtime-v2.quiescence.json": {
+          "sha256": "abbc54a4cfc96ec26742ea6ca90ec5963c3feb9202c04d431dab5469206ce089",
+          "bytes": 129
+        },
+        "source-entrance-runtime-v2.release.json": {
+          "sha256": "63e5b1a60c60dad644b7886f0bc4e4a4aac2d433f7d0c72f9a9be7d84e665c64",
+          "bytes": 174
+        },
+        "source-entrance-runtime-v2.stage-quiescence.json": {
+          "sha256": "313d9444f5fedba2cf4bd66f7ceecdf89fd901ab4a1e4993c67d315ffd816fcb",
+          "bytes": 136
+        },
+        "source-entrance-runtime-v2.stderr": {
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "bytes": 0
+        },
+        "source-entrance-runtime-v2.stdout": {
+          "sha256": "d4fdf45a7de278abdc46cfd7b922067ddf823d2146b3d1f40f6f0debc3905625",
+          "bytes": 787
+        },
+        "source-entrance-runtime-v2.system-floor.json": {
+          "sha256": "c3dc18704084c5d2dd307ef6fb5725ef63b6d1b76949785a6d0a1f51726c4fcb",
+          "bytes": 12528
+        },
+        "source-entrance-runtime-v2.unit-cleanup.json": {
+          "sha256": "1713cabc79c098fc2bdb1a5e9ff746c4ff5f83749cc00b85f3815dfe5a410b6f",
+          "bytes": 679
+        }
+      }
+    },
+    {
+      "label": "source-entrance-build-v7",
+      "passed": true,
+      "note": "fourth probe isolates ingested offset-pair material",
+      "native_exit": 0,
+      "final_group_CPU_ns": 1379576000,
+      "CPU_reading_grain_ns": 1000,
+      "outer_wall_ns": 2028464129,
+      "fixed_wall_cap_ns": 60000000000,
+      "wall_to_fixed_cap_ratio": "2028464129/60000000000",
+      "group_memory_peak_bytes": 422178816,
+      "peak_reaped_child_RSS_KiB": 236072,
+      "aggregate_CPU_guard_triggered": false,
+      "inputs_unchanged": true,
+      "quiescent": true,
+      "owned_group_stopped_and_unloaded": true,
+      "lease_released_after_final_and_cleanup": true,
+      "no_unrelated_units_stopped": true,
+      "CPU_affinity": [
+        0
+      ],
+      "sealed_input_count": 395,
+      "prelaunch_MemAvailable_bytes": 13905211392,
+      "minimum_sampled_MemAvailable_KiB": 13309944,
+      "raw_private_receipt_digests": {
+        "source-entrance-build-v7.acceptance.json": {
+          "sha256": "91aeac1c345ed289fc23689c9f18585fd5c9b1beee064319a46d84d9aa602728",
+          "bytes": 378
+        },
+        "source-entrance-build-v7.child-identity.json": {
+          "sha256": "e898da8f3287166501dc4227431d7986c5b257e405bb944a55d10fd626a840b7",
+          "bytes": 76
+        },
+        "source-entrance-build-v7.config.json": {
+          "sha256": "858c1f01b0538faf493686235d1114927ac7dcf26801b73a5765b25eb226c659",
+          "bytes": 115204
+        },
+        "source-entrance-build-v7.external-lease.json": {
+          "sha256": "8e2ca5d03ba8a9c084f876cf6cdcd0ef2f55bfa5ccd8b3bba9ff8fd9155b6537",
+          "bytes": 486
+        },
+        "source-entrance-build-v7.final.json": {
+          "sha256": "f1811ccef975ba67cde765ae9510fa56c77a18efcb69c77ed1f228f48fb8bd13",
+          "bytes": 4875
+        },
+        "source-entrance-build-v7.input_seal.json": {
+          "sha256": "f8bfc18b56ad2f710a6ef9dced71ee69bdf9c0612106432081f60c8e66ad9f9b",
+          "bytes": 93375
+        },
+        "source-entrance-build-v7.lease-identity.json": {
+          "sha256": "730e3e790948f6f17ae470da347e1f91e8042362cab4302f1ce0b244a2eadc6a",
+          "bytes": 563
+        },
+        "source-entrance-build-v7.memory-gate.json": {
+          "sha256": "9339aebcfb30cef59c353cff8d6eeda2a3af6f42f0435ed3d88a47e3f09498a9",
+          "bytes": 120
+        },
+        "source-entrance-build-v7.output_seal.json": {
+          "sha256": "f6216cdcfd1aa94a57c643a31844865cab632f2d2af2c2d9314383c840991081",
+          "bytes": 44088
+        },
+        "source-entrance-build-v7.publication.json": {
+          "sha256": "6699555473399e2e3eb682ace2d118cdb79f0fede5f750256d59ec7301c9aed6",
+          "bytes": 2764
+        },
+        "source-entrance-build-v7.quiescence.json": {
+          "sha256": "9560fbcb38b0d17de139a71361d3ea0c9c3c19b30c611c8fbacda995772a3ce8",
+          "bytes": 129
+        },
+        "source-entrance-build-v7.release.json": {
+          "sha256": "e76a2e92c423b93d8316322ac3cc2419ec909f35ac0b5ff06fe8e683a914e1bd",
+          "bytes": 174
+        },
+        "source-entrance-build-v7.stage-quiescence.json": {
+          "sha256": "a7e880909efd7c017b3caafdd41a590dd5afb82bbab82aa3b1f174c9dc015c77",
+          "bytes": 136
+        },
+        "source-entrance-build-v7.stderr": {
+          "sha256": "e7696eb736c192224cf08efe47dc083e552a407d6acd556475e92d61a52118b8",
+          "bytes": 182
+        },
+        "source-entrance-build-v7.stdout": {
+          "sha256": "b4d8d036ec2b3d84e2405baacd6e0a1bb5aec4c1de10a65c074e0221b33b168a",
+          "bytes": 34736
+        },
+        "source-entrance-build-v7.system-floor.json": {
+          "sha256": "a47126b4ad008878fb6a8806c13fe8bd45639958b4bf4fa69769fcb95d4e836e",
+          "bytes": 5666
+        },
+        "source-entrance-build-v7.unit-cleanup.json": {
+          "sha256": "be68743f3749c22246a915bc8da755666b634187475eef49346a2710eb56fab8",
+          "bytes": 675
+        }
+      }
+    },
+    {
+      "label": "source-entrance-runtime-v3",
+      "passed": false,
+      "note": "three passed; fourth assumed initial pair output nonzero, but initial pair is zero",
+      "native_exit": 101,
+      "final_group_CPU_ns": 2813941000,
+      "CPU_reading_grain_ns": 1000,
+      "outer_wall_ns": 3084803831,
+      "fixed_wall_cap_ns": 16000000000,
+      "wall_to_fixed_cap_ratio": "3084803831/16000000000",
+      "group_memory_peak_bytes": 416456704,
+      "peak_reaped_child_RSS_KiB": 38260,
+      "aggregate_CPU_guard_triggered": false,
+      "inputs_unchanged": true,
+      "quiescent": true,
+      "owned_group_stopped_and_unloaded": false,
+      "lease_released_after_final_and_cleanup": true,
+      "no_unrelated_units_stopped": true,
+      "CPU_affinity": [
+        0
+      ],
+      "sealed_input_count": 396,
+      "prelaunch_MemAvailable_bytes": 14446125056,
+      "minimum_sampled_MemAvailable_KiB": 14052064,
+      "raw_private_receipt_digests": {
+        "source-entrance-runtime-v3.acceptance.json": {
+          "sha256": "f1e44521266fb83d3ed2aa3ce0162736cf7116aac2941addf7d9ddc32e37bf61",
+          "bytes": 379
+        },
+        "source-entrance-runtime-v3.child-identity.json": {
+          "sha256": "60f1f1af33194751037e48809dee51c9305245f09ee6aec5a9d6322b8f5cd73b",
+          "bytes": 76
+        },
+        "source-entrance-runtime-v3.config.json": {
+          "sha256": "7b86ff1e7bd5c9fe8bdd842d2bd48923fb6165cbf606bad3513b4b2dfc23c768",
+          "bytes": 114755
+        },
+        "source-entrance-runtime-v3.external-lease.json": {
+          "sha256": "5deb0d282d2c0487fb9f5339284e9694f4385c087f981a67089a18ba25e3fee0",
+          "bytes": 486
+        },
+        "source-entrance-runtime-v3.failure.json": {
+          "sha256": "9b506a1585ebab9b07ca9e9bf8642cbb4ad386e7512486e1b45c0f7b776a4d38",
+          "bytes": 228
+        },
+        "source-entrance-runtime-v3.final.json": {
+          "sha256": "74741029447710aa8988d98d10e36bfc616c4de7086430c0425dab5c319d0eaf",
+          "bytes": 5161
+        },
+        "source-entrance-runtime-v3.input_seal.json": {
+          "sha256": "67103111c48189ac67fd769cba461eda696ecd39e3c337e1c633031319ceb110",
+          "bytes": 92806
+        },
+        "source-entrance-runtime-v3.lease-identity.json": {
+          "sha256": "c362fc1586b611cf851095611732b2731b1d2da1c8908301ea25b9f0cda3c7b3",
+          "bytes": 563
+        },
+        "source-entrance-runtime-v3.memory-gate.json": {
+          "sha256": "173eddb2ae42540f600196ec37d6738e1d8814b8ba861cf7182b2335f7026237",
+          "bytes": 120
+        },
+        "source-entrance-runtime-v3.output_seal.json": {
+          "sha256": "be6ee2ed94d1060583a1cd0f8715d19f73b1dbbeaef42355d85078e2ce495e1e",
+          "bytes": 141730
+        },
+        "source-entrance-runtime-v3.publication.json": {
+          "sha256": "0db78c4f97f7df3c2c1538866b11162d59cb432784dc2933cd44d058611f1e6b",
+          "bytes": 2996
+        },
+        "source-entrance-runtime-v3.quiescence.json": {
+          "sha256": "4d8c362c30ef930861e4a72fe594c9d879621a7b67ddbedea7c5c9e12f4f01ad",
+          "bytes": 131
+        },
+        "source-entrance-runtime-v3.release.json": {
+          "sha256": "f64a5a0e5a2c830a1c05bc5fc085e154395c94ce102a3760c686f0b8a1553219",
+          "bytes": 174
+        },
+        "source-entrance-runtime-v3.stage-quiescence.json": {
+          "sha256": "e93a4248cebcbe21b21ea11be76560686c36101f5672f7176f2786ad6f159e37",
+          "bytes": 136
+        },
+        "source-entrance-runtime-v3.stderr": {
+          "sha256": "aab2eff3643038cf64bb62842ec1759465c4f83229529a2174f47366b7b18108",
+          "bytes": 286
+        },
+        "source-entrance-runtime-v3.stdout": {
+          "sha256": "486f390577ad880b8904498221e173fcd5ba22cf63bdec4629ac5f6e053d2c3a",
+          "bytes": 985
+        },
+        "source-entrance-runtime-v3.system-floor.json": {
+          "sha256": "9986ef3ca6ccb137e68759d642b814cfb979a1d4157b7405d1f3d394362b663b",
+          "bytes": 16560
+        },
+        "source-entrance-runtime-v3.unit-cleanup.json": {
+          "sha256": "a8943481f65db32e4dec867fd10f5b48917ffaf08b04cc88cf72a82434b67e34",
+          "bytes": 738
+        }
+      }
+    },
+    {
+      "label": "source-entrance-build-v8",
+      "passed": true,
+      "note": "correct unit fixture declares one nonzero pair output along native factored read axes",
+      "native_exit": 0,
+      "final_group_CPU_ns": 882055000,
+      "CPU_reading_grain_ns": 1000,
+      "outer_wall_ns": 1010180637,
+      "fixed_wall_cap_ns": 60000000000,
+      "wall_to_fixed_cap_ratio": "336726879/20000000000",
+      "group_memory_peak_bytes": 231661568,
+      "peak_reaped_child_RSS_KiB": 236168,
+      "aggregate_CPU_guard_triggered": false,
+      "inputs_unchanged": true,
+      "quiescent": true,
+      "owned_group_stopped_and_unloaded": true,
+      "lease_released_after_final_and_cleanup": true,
+      "no_unrelated_units_stopped": true,
+      "CPU_affinity": [
+        0
+      ],
+      "sealed_input_count": 395,
+      "prelaunch_MemAvailable_bytes": 13976961024,
+      "minimum_sampled_MemAvailable_KiB": 13380056,
+      "raw_private_receipt_digests": {
+        "source-entrance-build-v8.acceptance.json": {
+          "sha256": "a27b485a6c8111123d4564dcd0d5b5f119b19d5c151a5e948b50c334c9e5f607",
+          "bytes": 378
+        },
+        "source-entrance-build-v8.child-identity.json": {
+          "sha256": "bc232e03abce7d7000b44b2dcc25ed4aac73884d3297f4469fc2f9370f23f76c",
+          "bytes": 76
+        },
+        "source-entrance-build-v8.config.json": {
+          "sha256": "b69b8b14e44d61803cc0278a080e7a44d42976f8424a87841a5f3b20a1c0ca2f",
+          "bytes": 115281
+        },
+        "source-entrance-build-v8.external-lease.json": {
+          "sha256": "ed39322d75658304e323210872634f3976dae16b15884df6e6b7518871e6a336",
+          "bytes": 486
+        },
+        "source-entrance-build-v8.final.json": {
+          "sha256": "f2f0362c34ce9e401e77527da638df2581b3a0d7642dda74741581d0c8b70df5",
+          "bytes": 4873
+        },
+        "source-entrance-build-v8.input_seal.json": {
+          "sha256": "d42a4067108a2023bdc55311ff417fe68e27dc6c9f4df04a9cf1efadfb8d552f",
+          "bytes": 93452
+        },
+        "source-entrance-build-v8.lease-identity.json": {
+          "sha256": "4c2586051102d01f4982866d6235168c8eb6760a208c861f36096efe8dfa6601",
+          "bytes": 563
+        },
+        "source-entrance-build-v8.memory-gate.json": {
+          "sha256": "c47d908ca97e06331dd0e6bedbac55633469f2f5ccdacdee92df5d91f0164fe6",
+          "bytes": 120
+        },
+        "source-entrance-build-v8.output_seal.json": {
+          "sha256": "39777d0b00d8a7452ef11b261e58e1721a16b67906f29acd3728cce2e1fd03df",
+          "bytes": 26359
+        },
+        "source-entrance-build-v8.publication.json": {
+          "sha256": "9c500ef17228f2d4e7c11cb754a191ec00ed99436a1d9462a5ff37e3b3bbe038",
+          "bytes": 2763
+        },
+        "source-entrance-build-v8.quiescence.json": {
+          "sha256": "e4effb43ec5664171fca760438ec7d9082a2b5e3156df2a8f3edfd774e1f3a72",
+          "bytes": 129
+        },
+        "source-entrance-build-v8.release.json": {
+          "sha256": "605f15b75eb4787ddfbad4588b477bdd89d9538b519882cc2c83adaacba30836",
+          "bytes": 174
+        },
+        "source-entrance-build-v8.stage-quiescence.json": {
+          "sha256": "6e197f3f81f0222db67b8316413c7228fe648f69f30d300d9e00e33320afb93a",
+          "bytes": 136
+        },
+        "source-entrance-build-v8.stderr": {
+          "sha256": "8a72fe01d24b4b3b8348e609f76737a37124238e0b9ce66fd313f16b157037aa",
+          "bytes": 182
+        },
+        "source-entrance-build-v8.stdout": {
+          "sha256": "91b80497c08690ba568eba2902e09871a9924fa8987070e1e3b9a47b97eda262",
+          "bytes": 34736
+        },
+        "source-entrance-build-v8.system-floor.json": {
+          "sha256": "7bb3490c102b4a02b9b16b6d7fa0d68fe20b6cdbc366545a552725f5da1b402d",
+          "bytes": 3093
+        },
+        "source-entrance-build-v8.unit-cleanup.json": {
+          "sha256": "42cb690293cea8d0e9c3a3a0946bf802bdc41ceea13fe957ac70d8ed590f30bb",
+          "bytes": 675
+        }
+      }
+    },
+    {
+      "label": "source-entrance-runtime-v4",
+      "passed": true,
+      "note": "four physical integration checks passed at ae139650 plus owned source",
+      "native_exit": 0,
+      "final_group_CPU_ns": 2642597000,
+      "CPU_reading_grain_ns": 1000,
+      "outer_wall_ns": 3107328572,
+      "fixed_wall_cap_ns": 16000000000,
+      "wall_to_fixed_cap_ratio": "776832143/4000000000",
+      "group_memory_peak_bytes": 390610944,
+      "peak_reaped_child_RSS_KiB": 38292,
+      "aggregate_CPU_guard_triggered": false,
+      "inputs_unchanged": true,
+      "quiescent": true,
+      "owned_group_stopped_and_unloaded": true,
+      "lease_released_after_final_and_cleanup": true,
+      "no_unrelated_units_stopped": true,
+      "CPU_affinity": [
+        0
+      ],
+      "sealed_input_count": 396,
+      "prelaunch_MemAvailable_bytes": 10973151232,
+      "minimum_sampled_MemAvailable_KiB": 9814532,
+      "raw_private_receipt_digests": {
+        "source-entrance-runtime-v4.acceptance.json": {
+          "sha256": "2286a9f6200576ec09d793aced0eb6b0cc3be8c4336bb7d70cf7bd3ade0945f9",
+          "bytes": 378
+        },
+        "source-entrance-runtime-v4.child-identity.json": {
+          "sha256": "854dfca67f03f21a848cf9fb15780b4f3d07e166751687a0db308fe3a4f3f6ce",
+          "bytes": 76
+        },
+        "source-entrance-runtime-v4.config.json": {
+          "sha256": "63b4c8e2f1fba7c06b51659af3ddbe1aa81c23a218534f04fb330e06a8c04194",
+          "bytes": 114727
+        },
+        "source-entrance-runtime-v4.external-lease.json": {
+          "sha256": "32113a4f09f14ac4543c8c6f1cad38ca08bae2f87d935f65cd702da9d7200fdb",
+          "bytes": 486
+        },
+        "source-entrance-runtime-v4.final.json": {
+          "sha256": "b1855715472879f420d6ab92f16899afac66829bc737a6a6e634e6b92f43fa48",
+          "bytes": 4903
+        },
+        "source-entrance-runtime-v4.input_seal.json": {
+          "sha256": "642db9fd0831c273055abc9b75ed20cad7b75e5b61315f60e0dca8c1a26a47c8",
+          "bytes": 92778
+        },
+        "source-entrance-runtime-v4.lease-identity.json": {
+          "sha256": "97a2aa888e598ea3d8670ee8ee0922c676e2b862befc64c0178264d5d80d1339",
+          "bytes": 563
+        },
+        "source-entrance-runtime-v4.memory-gate.json": {
+          "sha256": "6f529f7400fa915a761e56c587cf6d15f6f2eecbc4197034d0441ec1caf321ca",
+          "bytes": 120
+        },
+        "source-entrance-runtime-v4.output_seal.json": {
+          "sha256": "15552753bf55b55c1f2778d2ebcd3f46ca0048d7e592c7b3a1c9736cd3812364",
+          "bytes": 132232
+        },
+        "source-entrance-runtime-v4.publication.json": {
+          "sha256": "a124f963ea10b9efbaa0099275f0463a41c78fe47a7969f1dfc55bf8d0e2f0f0",
+          "bytes": 2782
+        },
+        "source-entrance-runtime-v4.quiescence.json": {
+          "sha256": "14ae9898513b97cca3e6a53e313025e98cee1f0c762b23191ebd8e7eb7ece6d5",
+          "bytes": 129
+        },
+        "source-entrance-runtime-v4.release.json": {
+          "sha256": "f8b253ceac9b630b3f4954397e9802174a8d7b7cc51ab89003e8daf558d658c0",
+          "bytes": 174
+        },
+        "source-entrance-runtime-v4.stage-quiescence.json": {
+          "sha256": "0b50bde1ebc3f47c780a22258483a81afe85a153412a61df6b604014d40cf305",
+          "bytes": 136
+        },
+        "source-entrance-runtime-v4.stderr": {
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "bytes": 0
+        },
+        "source-entrance-runtime-v4.stdout": {
+          "sha256": "aa4958cc9782ec00d8b8003821da9c4e817b3a509927db51d3229bc74d08bc44",
+          "bytes": 955
+        },
+        "source-entrance-runtime-v4.system-floor.json": {
+          "sha256": "a4ed1092b333a1171eba9025d7bde76123e0ba4e48857b4539ef2b6e91006648",
+          "bytes": 14916
+        },
+        "source-entrance-runtime-v4.unit-cleanup.json": {
+          "sha256": "e9f0d9bcb6705ad9411589771be4f96f5dde2e6135a0e823e76363e16e1ee674",
+          "bytes": 679
+        }
+      }
+    },
+    {
+      "label": "source-entrance-build-v9",
+      "passed": false,
+      "note": "current-main 48f00eff rebase and scoped formatting; native codegen incomplete",
+      "native_exit": -9,
+      "final_group_CPU_ns": 16314154000,
+      "CPU_reading_grain_ns": 1000,
+      "outer_wall_ns": 16738674783,
+      "fixed_wall_cap_ns": 60000000000,
+      "wall_to_fixed_cap_ratio": "5579558261/20000000000",
+      "group_memory_peak_bytes": 1238159360,
+      "peak_reaped_child_RSS_KiB": 30240,
+      "aggregate_CPU_guard_triggered": true,
+      "inputs_unchanged": true,
+      "quiescent": true,
+      "owned_group_stopped_and_unloaded": false,
+      "lease_released_after_final_and_cleanup": true,
+      "no_unrelated_units_stopped": true,
+      "CPU_affinity": [
+        0
+      ],
+      "sealed_input_count": 393,
+      "prelaunch_MemAvailable_bytes": 15115927552,
+      "minimum_sampled_MemAvailable_KiB": 11686332,
+      "raw_private_receipt_digests": {
+        "source-entrance-build-v9.acceptance.json": {
+          "sha256": "f75ef8af74dadd45930faac94337806d51d6ba16dfc8de8a1a0f5a7e6031fdc7",
+          "bytes": 379
+        },
+        "source-entrance-build-v9.child-identity.json": {
+          "sha256": "d4ea7bac6fd573a81b995a5ae256fc011d974c081b85469366c28c4f15ef6dd4",
+          "bytes": 76
+        },
+        "source-entrance-build-v9.config.json": {
+          "sha256": "414ba84aec8c7406a1983b87bcebca448074ddce62cbd31bc1b7284862b8f032",
+          "bytes": 114538
+        },
+        "source-entrance-build-v9.external-lease.json": {
+          "sha256": "8bccd9e973a91b4f6267ffa331cd796cfc0328884138862409d05ab77c22cc96",
+          "bytes": 486
+        },
+        "source-entrance-build-v9.failure.json": {
+          "sha256": "0c2bb22c38ee3706523402c4b736d143dd5c54a971bfcb77cb19b84eb8b567a5",
+          "bytes": 225
+        },
+        "source-entrance-build-v9.final.json": {
+          "sha256": "d67f39f014d943100fd305900c4fd36e84dee02f0d68d27259c06d73e7b08188",
+          "bytes": 5137
+        },
+        "source-entrance-build-v9.input_seal.json": {
+          "sha256": "e432c807f69cb1f4823e8ee8766158d6fcee0a17d8be1a2743faf22443901714",
+          "bytes": 92952
+        },
+        "source-entrance-build-v9.lease-identity.json": {
+          "sha256": "9a2de4fcaa13e06f725ac48a3b8b7ee11eea98d0df6c70be2fa38082a5798be3",
+          "bytes": 563
+        },
+        "source-entrance-build-v9.memory-gate.json": {
+          "sha256": "941fe51d330727ea4192dabccb8cc331237d7b1894173c5973cb95244eb3424d",
+          "bytes": 120
+        },
+        "source-entrance-build-v9.output_seal.json": {
+          "sha256": "11081b20e4a7e125ce3c982692e2f576be92a2dba4e3d2c9ed256733df1f4b23",
+          "bytes": 1099062
+        },
+        "source-entrance-build-v9.publication.json": {
+          "sha256": "bef64573e7a009a44633f0cbd91d2406839f2b15801bf45f3bbdf02c5a3f5a8f",
+          "bytes": 2978
+        },
+        "source-entrance-build-v9.quiescence.json": {
+          "sha256": "87c05803b53e1bafb46c211273aa0e3c6c3ff0021ea899e5ae0f81b2775c5999",
+          "bytes": 130
+        },
+        "source-entrance-build-v9.release.json": {
+          "sha256": "05196b1532ffcd84cba4dcdfefa15da3994c8e871f356f712903398278b4cc83",
+          "bytes": 174
+        },
+        "source-entrance-build-v9.stage-quiescence.json": {
+          "sha256": "643379e0440983d765e3a6163e9a8f26b5b0927db5adca83d6ba9ffe2c18f8bb",
+          "bytes": 136
+        },
+        "source-entrance-build-v9.stderr": {
+          "sha256": "429efa01e927144ba392074f45ef75b18c91b7c7c60ffcf5958c079a9f1ad1c6",
+          "bytes": 109
+        },
+        "source-entrance-build-v9.stdout": {
+          "sha256": "2ef5dc09f89e830384d7a8f8b91d9069381e479750b91db168f038eef9fc53aa",
+          "bytes": 32945
+        },
+        "source-entrance-build-v9.system-floor.json": {
+          "sha256": "2207061c77d14737fd5ee6d1102f9a755d46c2fcc5366bb27afcd588f57ab992",
+          "bytes": 124638
+        },
+        "source-entrance-build-v9.unit-cleanup.json": {
+          "sha256": "71a1f1725abf726a75af4815cb4b43fe830f535bed2fb384940443011e057920",
+          "bytes": 736
+        }
+      }
+    },
+    {
+      "label": "source-entrance-build-v10",
+      "passed": false,
+      "note": "one codegen unit replaces sixteen; native codegen still incomplete, same fixed limits",
+      "native_exit": -9,
+      "final_group_CPU_ns": 16380459000,
+      "CPU_reading_grain_ns": 1000,
+      "outer_wall_ns": 16821920039,
+      "fixed_wall_cap_ns": 60000000000,
+      "wall_to_fixed_cap_ratio": "16821920039/60000000000",
+      "group_memory_peak_bytes": 2308718592,
+      "peak_reaped_child_RSS_KiB": 30384,
+      "aggregate_CPU_guard_triggered": true,
+      "inputs_unchanged": true,
+      "quiescent": true,
+      "owned_group_stopped_and_unloaded": false,
+      "lease_released_after_final_and_cleanup": true,
+      "no_unrelated_units_stopped": true,
+      "CPU_affinity": [
+        0
+      ],
+      "sealed_input_count": 393,
+      "prelaunch_MemAvailable_bytes": 14628397056,
+      "minimum_sampled_MemAvailable_KiB": 13464312,
+      "raw_private_receipt_digests": {
+        "source-entrance-build-v10.acceptance.json": {
+          "sha256": "314db0e5b552f5f59b877869c770e85c160d7c63f570b5630791c97b9b5f8c74",
+          "bytes": 379
+        },
+        "source-entrance-build-v10.child-identity.json": {
+          "sha256": "b4c5e93e0951c9637213a81dffae9124c7498a27197bf4b449981c27cfc16d86",
+          "bytes": 76
+        },
+        "source-entrance-build-v10.config.json": {
+          "sha256": "18fb2d037330eae940294f6341c28dbdf4b7b60db3a68841c78f40e4f8c88217",
+          "bytes": 114657
+        },
+        "source-entrance-build-v10.external-lease.json": {
+          "sha256": "15a01e198b5790a5a70f2258b0519278cfe357d671b803e56a8b68c0481bb8bf",
+          "bytes": 486
+        },
+        "source-entrance-build-v10.failure.json": {
+          "sha256": "04799db223571960ba1b026620db7a6e3765a18a2b848d30214f2d62d43d19b5",
+          "bytes": 226
+        },
+        "source-entrance-build-v10.final.json": {
+          "sha256": "d96d52f53e7be55fd1f620735c239bd86f0bf25b2dc029fc0eb30c8ab0219ccf",
+          "bytes": 5153
+        },
+        "source-entrance-build-v10.input_seal.json": {
+          "sha256": "4fa2789458dd0ec9e686b9f802c4f075c9f290624dfa4cfc76917f613f812e6f",
+          "bytes": 93071
+        },
+        "source-entrance-build-v10.lease-identity.json": {
+          "sha256": "7829e96f1a63970ba986d90092b44975be77e06da7a3bfde57ea4cdfb7f0acd5",
+          "bytes": 563
+        },
+        "source-entrance-build-v10.memory-gate.json": {
+          "sha256": "fc2c1e48de3c4cce5f1ddd8d84f7b557cebcfd119a3a44cab3fe831f86ad01ce",
+          "bytes": 120
+        },
+        "source-entrance-build-v10.output_seal.json": {
+          "sha256": "7696658da501fda23481ee34bfc1da992b67c2914c337c425566e37a47ab87e5",
+          "bytes": 1100119
+        },
+        "source-entrance-build-v10.publication.json": {
+          "sha256": "e17fda7395b95d220134551a187f59bdf6f86b4d6f086e8888aad8d1eca3e458",
+          "bytes": 2989
+        },
+        "source-entrance-build-v10.quiescence.json": {
+          "sha256": "2fb765279c66c90d8ca9d37297a72899091a810402eaa49716c53db5d8dba7cf",
+          "bytes": 130
+        },
+        "source-entrance-build-v10.release.json": {
+          "sha256": "f60a52590e539924ac05b16352ed0caa6d2e5972ae69b6cc5d8236215c8e102e",
+          "bytes": 174
+        },
+        "source-entrance-build-v10.stage-quiescence.json": {
+          "sha256": "5eb917f05a3cd98d6b043205ee185a8fa2ccfbadca9410217d3887822b09797b",
+          "bytes": 136
+        },
+        "source-entrance-build-v10.stderr": {
+          "sha256": "429efa01e927144ba392074f45ef75b18c91b7c7c60ffcf5958c079a9f1ad1c6",
+          "bytes": 109
+        },
+        "source-entrance-build-v10.stdout": {
+          "sha256": "b2b3fda02a15b7ffcfc35caa8c339eaeaad5426532516812a9cc8caf7b0e0e86",
+          "bytes": 32945
+        },
+        "source-entrance-build-v10.system-floor.json": {
+          "sha256": "cb1e567bbddf4b8bb1748a1c7308ff92ae2c28383eb3b7f9734aa75e8f70d04b",
+          "bytes": 125898
+        },
+        "source-entrance-build-v10.unit-cleanup.json": {
+          "sha256": "7738e18f65fee202fcaa13bdf7d7120fd2b3392a17fd6a0a791f18a7964031c0",
+          "bytes": 738
+        }
+      }
+    },
+    {
+      "label": "source-entrance-gate-v1",
+      "passed": false,
+      "note": "single current-main combined gate; stopped during first workspace check after CUDA compilation; lints/doctests not reached",
+      "native_exit": -9,
+      "final_group_CPU_ns": 16309488000,
+      "CPU_reading_grain_ns": 1000,
+      "outer_wall_ns": 16771214218,
+      "fixed_wall_cap_ns": 60000000000,
+      "wall_to_fixed_cap_ratio": "8385607109/30000000000",
+      "group_memory_peak_bytes": 1074692096,
+      "peak_reaped_child_RSS_KiB": 14752,
+      "aggregate_CPU_guard_triggered": true,
+      "inputs_unchanged": true,
+      "quiescent": true,
+      "owned_group_stopped_and_unloaded": false,
+      "lease_released_after_final_and_cleanup": true,
+      "no_unrelated_units_stopped": true,
+      "CPU_affinity": [
+        0
+      ],
+      "sealed_input_count": 478,
+      "prelaunch_MemAvailable_bytes": 14391169024,
+      "minimum_sampled_MemAvailable_KiB": 13469080,
+      "raw_private_receipt_digests": {
+        "source-entrance-gate-v1.acceptance.json": {
+          "sha256": "54eb010aa12cdcb52e50803307ef1107f7ada4d41e9b994dd6a98866ca1a86ed",
+          "bytes": 379
+        },
+        "source-entrance-gate-v1.child-identity.json": {
+          "sha256": "b0f37c8621a7ba3ff34ca4011a8b5761781dd492df9f2da99a6532c9498d8708",
+          "bytes": 76
+        },
+        "source-entrance-gate-v1.config.json": {
+          "sha256": "0f014a8603edbd0d95ef535027abeb3e814cbdcab0179ea65dc3d81227c78859",
+          "bytes": 134376
+        },
+        "source-entrance-gate-v1.external-lease.json": {
+          "sha256": "35ae6d0237973f33ad99e8d8d59eeeb2d72fe7c1ef8ff931a3c6f149c3f97997",
+          "bytes": 486
+        },
+        "source-entrance-gate-v1.failure.json": {
+          "sha256": "74e24ede8233f22890c6155e7e1bb412e35e1f091707894cc832080f17493b85",
+          "bytes": 224
+        },
+        "source-entrance-gate-v1.final.json": {
+          "sha256": "1127e1144d369461900ba3adb83f65031aee39faf16362bfd71bb2a0018b8092",
+          "bytes": 5118
+        },
+        "source-entrance-gate-v1.input_seal.json": {
+          "sha256": "e31a830769fe494b2099219c686c60c76bcb03690673a06efa3c79fbc75190e9",
+          "bytes": 111657
+        },
+        "source-entrance-gate-v1.lease-identity.json": {
+          "sha256": "5b6089a2d731ece60745d0396ebadd1f01520a9a82647a18a3ba149e21cfc87c",
+          "bytes": 563
+        },
+        "source-entrance-gate-v1.memory-gate.json": {
+          "sha256": "6b35ea8f686fdabbfc42cb2eb7236b0a59d05dc32cf89ce0cee190494475e885",
+          "bytes": 120
+        },
+        "source-entrance-gate-v1.output_seal.json": {
+          "sha256": "585e14794048a597da5c22796a76c44d3e50d784e8495e669645eefc141c92b7",
+          "bytes": 1113283
+        },
+        "source-entrance-gate-v1.publication.json": {
+          "sha256": "3d8539dca0d0efc3fcf27605927b27a1020e26810c402726b0aff38e2a6d9efc",
+          "bytes": 2964
+        },
+        "source-entrance-gate-v1.quiescence.json": {
+          "sha256": "9fe40900eb3e5c47b8fdd75507bc7400279f8038eed6fcd3875207a251b9300c",
+          "bytes": 130
+        },
+        "source-entrance-gate-v1.release.json": {
+          "sha256": "c3ebbbb78de99d0a8a8343dfedaeebda44784dac08b9006e7e45688c9014032f",
+          "bytes": 174
+        },
+        "source-entrance-gate-v1.stage-quiescence.json": {
+          "sha256": "228f469ac1ff7eab5daf545d9c0489cd6f49a8faf41bf7ef59e69cb50366cc77",
+          "bytes": 136
+        },
+        "source-entrance-gate-v1.stderr": {
+          "sha256": "8110805dd4e9ff3d27448886133c1f8e253bf04d0412cc32407464b62cd0e7c7",
+          "bytes": 780
+        },
+        "source-entrance-gate-v1.stdout": {
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "bytes": 0
+        },
+        "source-entrance-gate-v1.system-floor.json": {
+          "sha256": "8a4c80b83a21d23925615bf7e93c7e38145ffeda76d551b9f4af15dbcd18601b",
+          "bytes": 124554
+        },
+        "source-entrance-gate-v1.unit-cleanup.json": {
+          "sha256": "5853bdc820581a3c89e471274479f91d6fe544d9a908def8a492a57792350073",
+          "bytes": 734
+        }
+      }
+    }
+  ],
+  "remaining_checks": [
+    "current-main selected source_entrance executable build/runtime",
+    "tools/gate.sh completion (workspace/all-target check, guard lints, guard doctests)",
+    "required end-of-step GPU suite (no GPU kernels executed in this loop)"
+  ],
+  "saved_temporary_gate_profile": {
+    "file": "gate_profile.toml",
+    "sha256": "c36d4b656ce544fc8fa04809e7301b64481bccce1f594b84ca93c198a9669f4e",
+    "bytes": 226,
+    "temporary_worktree_config_removed_after_group_cleanup": true
+  },
+  "exact_four_test_patch": {
+    "file": "tested-source.patch",
+    "base": "ae139650a475aa83a4486b3d97b2568b1a47bf3b",
+    "sha256": "ef0ce84d2a18168211eac8675231158cff43503ec866532c2f612c732b8483d9",
+    "bytes": 28048,
+    "every_owned_source_file_verified_against_runtime_v4_seal": true
+  }
+}
